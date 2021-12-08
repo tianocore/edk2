@@ -14,7 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0xb0eae4f8, 0x9a04, 0x4c6d, { 0xa7, 0x48, 0x79, 0x3d, 0xaa, 0xf, 0x65, 0xdf } \
   }
 
-extern EFI_GUID gTlsAuthConfigGuid;
+extern EFI_GUID  gTlsAuthConfigGuid;
 
 #endif
-

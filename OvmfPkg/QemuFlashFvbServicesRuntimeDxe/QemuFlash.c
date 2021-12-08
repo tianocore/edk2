@@ -24,22 +24,20 @@
 
 #define CLEARED_ARRAY_STATUS  0x00
 
+UINT8  *mFlashBase;
 
-UINT8 *mFlashBase;
-
-STATIC UINTN       mFdBlockSize = 0;
-STATIC UINTN       mFdBlockCount = 0;
+STATIC UINTN  mFdBlockSize  = 0;
+STATIC UINTN  mFdBlockCount = 0;
 
 STATIC
-volatile UINT8*
+volatile UINT8 *
 QemuFlashPtr (
-  IN        EFI_LBA                             Lba,
-  IN        UINTN                               Offset
+  IN        EFI_LBA  Lba,
+  IN        UINTN    Offset
   )
 {
   return mFlashBase + ((UINTN)Lba * mFdBlockSize) + Offset;
 }
-
 
 /**
   Determines if the QEMU flash memory device is present.
@@ -54,22 +52,23 @@ QemuFlashDetected (
   VOID
   )
 {
-  BOOLEAN  FlashDetected;
+  BOOLEAN         FlashDetected;
   volatile UINT8  *Ptr;
 
-  UINTN Offset;
-  UINT8 OriginalUint8;
-  UINT8 ProbeUint8;
+  UINTN  Offset;
+  UINT8  OriginalUint8;
+  UINT8  ProbeUint8;
 
   FlashDetected = FALSE;
-  Ptr = QemuFlashPtr (0, 0);
+  Ptr           = QemuFlashPtr (0, 0);
 
   for (Offset = 0; Offset < mFdBlockSize; Offset++) {
-    Ptr = QemuFlashPtr (0, Offset);
+    Ptr        = QemuFlashPtr (0, Offset);
     ProbeUint8 = *Ptr;
-    if (ProbeUint8 != CLEAR_STATUS_CMD &&
-        ProbeUint8 != READ_STATUS_CMD &&
-        ProbeUint8 != CLEARED_ARRAY_STATUS) {
+    if ((ProbeUint8 != CLEAR_STATUS_CMD) &&
+        (ProbeUint8 != READ_STATUS_CMD) &&
+        (ProbeUint8 != CLEARED_ARRAY_STATUS))
+    {
       break;
     }
   }
@@ -91,20 +90,23 @@ QemuFlashDetected (
     // the FD appears as ROM and not as FLASH, but report FLASH anyway because
     // FLASH behavior can be simulated using VMGEXIT.
     //
-    DEBUG ((DEBUG_INFO,
-      "QEMU Flash: SEV-ES enabled, assuming FD behaves as FLASH\n"));
+    DEBUG ((
+      DEBUG_INFO,
+      "QEMU Flash: SEV-ES enabled, assuming FD behaves as FLASH\n"
+      ));
     return TRUE;
   }
 
   OriginalUint8 = *Ptr;
-  *Ptr = CLEAR_STATUS_CMD;
-  ProbeUint8 = *Ptr;
-  if (OriginalUint8 != CLEAR_STATUS_CMD &&
-      ProbeUint8 == CLEAR_STATUS_CMD) {
+  *Ptr          = CLEAR_STATUS_CMD;
+  ProbeUint8    = *Ptr;
+  if ((OriginalUint8 != CLEAR_STATUS_CMD) &&
+      (ProbeUint8 == CLEAR_STATUS_CMD))
+  {
     DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as RAM\n"));
     *Ptr = OriginalUint8;
   } else {
-    *Ptr = READ_STATUS_CMD;
+    *Ptr       = READ_STATUS_CMD;
     ProbeUint8 = *Ptr;
     if (ProbeUint8 == OriginalUint8) {
       DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as ROM\n"));
@@ -114,15 +116,17 @@ QemuFlashDetected (
     } else if (ProbeUint8 == CLEARED_ARRAY_STATUS) {
       DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as FLASH\n"));
       FlashDetected = TRUE;
-      *Ptr = READ_ARRAY_CMD;
+      *Ptr          = READ_ARRAY_CMD;
     }
   }
 
-  DEBUG ((DEBUG_INFO, "QemuFlashDetected => %a\n",
-                      FlashDetected ? "Yes" : "No"));
+  DEBUG ((
+    DEBUG_INFO,
+    "QemuFlashDetected => %a\n",
+    FlashDetected ? "Yes" : "No"
+    ));
   return FlashDetected;
 }
-
 
 /**
   Read from QEMU Flash
@@ -136,10 +140,10 @@ QemuFlashDetected (
 **/
 EFI_STATUS
 QemuFlashRead (
-  IN        EFI_LBA                              Lba,
-  IN        UINTN                                Offset,
-  IN        UINTN                                *NumBytes,
-  IN        UINT8                                *Buffer
+  IN        EFI_LBA  Lba,
+  IN        UINTN    Offset,
+  IN        UINTN    *NumBytes,
+  IN        UINT8    *Buffer
   )
 {
   UINT8  *Ptr;
@@ -155,13 +159,12 @@ QemuFlashRead (
   //
   // Get flash address
   //
-  Ptr = (UINT8*) QemuFlashPtr (Lba, Offset);
+  Ptr = (UINT8 *)QemuFlashPtr (Lba, Offset);
 
   CopyMem (Buffer, Ptr, *NumBytes);
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Write to QEMU Flash
@@ -175,10 +178,10 @@ QemuFlashRead (
 **/
 EFI_STATUS
 QemuFlashWrite (
-  IN        EFI_LBA                             Lba,
-  IN        UINTN                               Offset,
-  IN        UINTN                               *NumBytes,
-  IN        UINT8                               *Buffer
+  IN        EFI_LBA  Lba,
+  IN        UINTN    Offset,
+  IN        UINTN    *NumBytes,
+  IN        UINT8    *Buffer
   )
 {
   volatile UINT8  *Ptr;
@@ -213,7 +216,6 @@ QemuFlashWrite (
   return EFI_SUCCESS;
 }
 
-
 /**
   Erase a QEMU Flash block
 
@@ -222,7 +224,7 @@ QemuFlashWrite (
 **/
 EFI_STATUS
 QemuFlashEraseBlock (
-  IN   EFI_LBA      Lba
+  IN   EFI_LBA  Lba
   )
 {
   volatile UINT8  *Ptr;
@@ -237,7 +239,6 @@ QemuFlashEraseBlock (
   return EFI_SUCCESS;
 }
 
-
 /**
   Initializes QEMU flash memory support
 
@@ -250,16 +251,16 @@ QemuFlashInitialize (
   VOID
   )
 {
-  mFlashBase = (UINT8*)(UINTN) PcdGet32 (PcdOvmfFdBaseAddress);
+  mFlashBase   = (UINT8 *)(UINTN)PcdGet32 (PcdOvmfFdBaseAddress);
   mFdBlockSize = PcdGet32 (PcdOvmfFirmwareBlockSize);
-  ASSERT(PcdGet32 (PcdOvmfFirmwareFdSize) % mFdBlockSize == 0);
+  ASSERT (PcdGet32 (PcdOvmfFirmwareFdSize) % mFdBlockSize == 0);
   mFdBlockCount = PcdGet32 (PcdOvmfFirmwareFdSize) / mFdBlockSize;
 
   //
   // execute module specific hooks before probing the flash
   //
   QemuFlashBeforeProbe (
-    (EFI_PHYSICAL_ADDRESS)(UINTN) mFlashBase,
+    (EFI_PHYSICAL_ADDRESS)(UINTN)mFlashBase,
     mFdBlockSize,
     mFdBlockCount
     );
@@ -271,4 +272,3 @@ QemuFlashInitialize (
 
   return EFI_SUCCESS;
 }
-

@@ -61,31 +61,35 @@ LzmaArchGuidedSectionGetInfo (
 
   if (IS_SECTION2 (InputSection)) {
     if (!CompareGuid (
-        &gLzmaF86CustomDecompressGuid,
-        &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid))) {
+           &gLzmaF86CustomDecompressGuid,
+           &(((EFI_GUID_DEFINED_SECTION2 *)InputSection)->SectionDefinitionGuid)
+           ))
+    {
       return RETURN_INVALID_PARAMETER;
     }
 
-    *SectionAttribute = ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->Attributes;
+    *SectionAttribute = ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->Attributes;
 
     return LzmaUefiDecompressGetInfo (
-             (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset,
-             SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset,
+             (UINT8 *)InputSection + ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset,
+             SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset,
              OutputBufferSize,
              ScratchBufferSize
              );
   } else {
     if (!CompareGuid (
-        &gLzmaF86CustomDecompressGuid,
-        &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+           &gLzmaF86CustomDecompressGuid,
+           &(((EFI_GUID_DEFINED_SECTION *)InputSection)->SectionDefinitionGuid)
+           ))
+    {
       return RETURN_INVALID_PARAMETER;
     }
 
-    *SectionAttribute = ((EFI_GUID_DEFINED_SECTION *) InputSection)->Attributes;
+    *SectionAttribute = ((EFI_GUID_DEFINED_SECTION *)InputSection)->Attributes;
 
     return LzmaUefiDecompressGetInfo (
-             (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
-             SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+             (UINT8 *)InputSection + ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset,
+             SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset,
              OutputBufferSize,
              ScratchBufferSize
              );
@@ -130,29 +134,29 @@ EFIAPI
 LzmaArchGuidedSectionExtraction (
   IN CONST  VOID    *InputSection,
   OUT       VOID    **OutputBuffer,
-  OUT       VOID    *ScratchBuffer,        OPTIONAL
+  OUT       VOID    *ScratchBuffer         OPTIONAL,
   OUT       UINT32  *AuthenticationStatus
   )
 {
-  EFI_GUID          *InputGuid;
-  VOID              *Source;
-  UINTN             SourceSize;
-  EFI_STATUS        Status;
-  UINT32            X86State;
-  UINT32            OutputBufferSize;
-  UINT32            ScratchBufferSize;
+  EFI_GUID    *InputGuid;
+  VOID        *Source;
+  UINTN       SourceSize;
+  EFI_STATUS  Status;
+  UINT32      X86State;
+  UINT32      OutputBufferSize;
+  UINT32      ScratchBufferSize;
 
   ASSERT (OutputBuffer != NULL);
   ASSERT (InputSection != NULL);
 
   if (IS_SECTION2 (InputSection)) {
-    InputGuid  = &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid);
-    Source     = (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset;
-    SourceSize = SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset;
+    InputGuid  = &(((EFI_GUID_DEFINED_SECTION2 *)InputSection)->SectionDefinitionGuid);
+    Source     = (UINT8 *)InputSection + ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset;
+    SourceSize = SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset;
   } else {
-    InputGuid  = &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid);
-    Source     = (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset;
-    SourceSize = SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset;
+    InputGuid  = &(((EFI_GUID_DEFINED_SECTION *)InputSection)->SectionDefinitionGuid);
+    Source     = (UINT8 *)InputSection + ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset;
+    SourceSize = SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset;
   }
 
   if (!CompareGuid (&gLzmaF86CustomDecompressGuid, InputGuid)) {
@@ -165,32 +169,31 @@ LzmaArchGuidedSectionExtraction (
   *AuthenticationStatus = 0;
 
   Status = LzmaUefiDecompress (
-           Source,
-           SourceSize,
-           *OutputBuffer,
-           ScratchBuffer
-           );
+             Source,
+             SourceSize,
+             *OutputBuffer,
+             ScratchBuffer
+             );
 
   //
   // After decompress, the data need to be converted to the raw data.
   //
   if (!EFI_ERROR (Status)) {
     Status = LzmaUefiDecompressGetInfo (
-             Source,
-             (UINT32) SourceSize,
-             &OutputBufferSize,
-             &ScratchBufferSize
-             );
+               Source,
+               (UINT32)SourceSize,
+               &OutputBufferSize,
+               &ScratchBufferSize
+               );
 
     if (!EFI_ERROR (Status)) {
-      x86_Convert_Init(X86State);
-      x86_Convert(*OutputBuffer, OutputBufferSize, 0, &X86State, 0);
+      x86_Convert_Init (X86State);
+      x86_Convert (*OutputBuffer, OutputBufferSize, 0, &X86State, 0);
     }
   }
 
   return Status;
 }
-
 
 /**
   Register LzmaArchDecompress and LzmaArchDecompressGetInfo handlers with LzmaF86CustomDecompressGuid.
@@ -205,9 +208,8 @@ LzmaArchDecompressLibConstructor (
   )
 {
   return ExtractGuidedSectionRegisterHandlers (
-          &gLzmaF86CustomDecompressGuid,
-          LzmaArchGuidedSectionGetInfo,
-          LzmaArchGuidedSectionExtraction
-          );
+           &gLzmaF86CustomDecompressGuid,
+           LzmaArchGuidedSectionGetInfo,
+           LzmaArchGuidedSectionExtraction
+           );
 }
-

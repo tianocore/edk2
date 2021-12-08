@@ -31,25 +31,26 @@ EFI_TCG2_PROTOCOL  *mTcg2Protocol = NULL;
 EFI_STATUS
 EFIAPI
 Tpm2SubmitCommand (
-  IN UINT32            InputParameterBlockSize,
-  IN UINT8             *InputParameterBlock,
-  IN OUT UINT32        *OutputParameterBlockSize,
-  IN UINT8             *OutputParameterBlock
+  IN UINT32      InputParameterBlockSize,
+  IN UINT8       *InputParameterBlock,
+  IN OUT UINT32  *OutputParameterBlockSize,
+  IN UINT8       *OutputParameterBlock
   )
 {
-  EFI_STATUS                Status;
-  TPM2_RESPONSE_HEADER      *Header;
+  EFI_STATUS            Status;
+  TPM2_RESPONSE_HEADER  *Header;
 
   if (mTcg2Protocol == NULL) {
-    Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &mTcg2Protocol);
+    Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **)&mTcg2Protocol);
     if (EFI_ERROR (Status)) {
       //
       // Tcg2 protocol is not installed. So, TPM2 is not present.
       //
-      DEBUG ((EFI_D_ERROR, "Tpm2SubmitCommand - Tcg2 - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Tpm2SubmitCommand - Tcg2 - %r\n", Status));
       return EFI_NOT_FOUND;
     }
   }
+
   //
   // Assume when Tcg2 Protocol is ready, RequestUseTpm already done.
   //
@@ -63,7 +64,8 @@ Tpm2SubmitCommand (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  Header = (TPM2_RESPONSE_HEADER *)OutputParameterBlock;
+
+  Header                    = (TPM2_RESPONSE_HEADER *)OutputParameterBlock;
   *OutputParameterBlockSize = SwapBytes32 (Header->paramSize);
 
   return EFI_SUCCESS;
@@ -82,18 +84,19 @@ Tpm2RequestUseTpm (
   VOID
   )
 {
-  EFI_STATUS   Status;
+  EFI_STATUS  Status;
 
   if (mTcg2Protocol == NULL) {
-    Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &mTcg2Protocol);
+    Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **)&mTcg2Protocol);
     if (EFI_ERROR (Status)) {
       //
       // Tcg2 protocol is not installed. So, TPM2 is not present.
       //
-      DEBUG ((EFI_D_ERROR, "Tpm2RequestUseTpm - Tcg2 - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Tpm2RequestUseTpm - Tcg2 - %r\n", Status));
       return EFI_NOT_FOUND;
     }
   }
+
   //
   // Assume when Tcg2 Protocol is ready, RequestUseTpm already done.
   //
@@ -112,7 +115,7 @@ Tpm2RequestUseTpm (
 EFI_STATUS
 EFIAPI
 Tpm2RegisterTpm2DeviceLib (
-  IN TPM2_DEVICE_INTERFACE   *Tpm2Device
+  IN TPM2_DEVICE_INTERFACE  *Tpm2Device
   )
 {
   return EFI_UNSUPPORTED;

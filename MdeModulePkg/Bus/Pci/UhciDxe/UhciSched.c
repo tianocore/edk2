@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Uhci.h"
 
-
 /**
   Create Frame List Structure.
 
@@ -22,7 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 UhciInitFrameList (
-  IN USB_HC_DEV         *Uhc
+  IN USB_HC_DEV  *Uhc
   )
 {
   EFI_PHYSICAL_ADDRESS  MappedAddr;
@@ -70,14 +69,14 @@ UhciInitFrameList (
     goto ON_ERROR;
   }
 
-  Uhc->FrameBase           = (UINT32 *) (UINTN) Buffer;
-  Uhc->FrameMapping        = Mapping;
+  Uhc->FrameBase    = (UINT32 *)(UINTN)Buffer;
+  Uhc->FrameMapping = Mapping;
 
   //
   // Tell the Host Controller where the Frame List lies,
   // by set the Frame List Base Address Register.
   //
-  UhciSetFrameListBaseAddr (Uhc->PciIo, (VOID *) (UINTN) MappedAddr);
+  UhciSetFrameListBaseAddr (Uhc->PciIo, (VOID *)(UINTN)MappedAddr);
 
   //
   // Allocate the QH used by sync interrupt/control/bulk transfer.
@@ -85,9 +84,9 @@ UhciInitFrameList (
   // can be reclaimed. Notice, LS don't support bulk transfer and
   // also doesn't support BW reclamation.
   //
-  Uhc->SyncIntQh  = UhciCreateQh (Uhc, 1);
-  Uhc->CtrlQh     = UhciCreateQh (Uhc, 1);
-  Uhc->BulkQh     = UhciCreateQh (Uhc, 1);
+  Uhc->SyncIntQh = UhciCreateQh (Uhc, 1);
+  Uhc->CtrlQh    = UhciCreateQh (Uhc, 1);
+  Uhc->BulkQh    = UhciCreateQh (Uhc, 1);
 
   if ((Uhc->SyncIntQh == NULL) || (Uhc->CtrlQh == NULL) || (Uhc->BulkQh == NULL)) {
     Uhc->PciIo->Unmap (Uhc->PciIo, Mapping);
@@ -102,22 +101,22 @@ UhciInitFrameList (
   // Each frame entry is linked to this sequence of QH. These QH
   // will remain on the schedul, never got removed
   //
-  PhyAddr = UsbHcGetPciAddressForHostMem (Uhc->MemPool, Uhc->CtrlQh, sizeof (UHCI_QH_HW));
-  Uhc->SyncIntQh->QhHw.HorizonLink  = QH_HLINK (PhyAddr, FALSE);
-  Uhc->SyncIntQh->NextQh            = Uhc->CtrlQh;
+  PhyAddr                          = UsbHcGetPciAddressForHostMem (Uhc->MemPool, Uhc->CtrlQh, sizeof (UHCI_QH_HW));
+  Uhc->SyncIntQh->QhHw.HorizonLink = QH_HLINK (PhyAddr, FALSE);
+  Uhc->SyncIntQh->NextQh           = Uhc->CtrlQh;
 
-  PhyAddr = UsbHcGetPciAddressForHostMem (Uhc->MemPool, Uhc->BulkQh, sizeof (UHCI_QH_HW));
-  Uhc->CtrlQh->QhHw.HorizonLink     = QH_HLINK (PhyAddr, FALSE);
-  Uhc->CtrlQh->NextQh               = Uhc->BulkQh;
+  PhyAddr                       = UsbHcGetPciAddressForHostMem (Uhc->MemPool, Uhc->BulkQh, sizeof (UHCI_QH_HW));
+  Uhc->CtrlQh->QhHw.HorizonLink = QH_HLINK (PhyAddr, FALSE);
+  Uhc->CtrlQh->NextQh           = Uhc->BulkQh;
 
   //
   // Some old platform such as Intel's Tiger 4 has a difficult time
   // in supporting the full speed bandwidth reclamation in the previous
   // mentioned form. Most new platforms don't suffer it.
   //
-  Uhc->BulkQh->QhHw.HorizonLink     = QH_HLINK (PhyAddr, FALSE);
+  Uhc->BulkQh->QhHw.HorizonLink = QH_HLINK (PhyAddr, FALSE);
 
-  Uhc->BulkQh->NextQh               = NULL;
+  Uhc->BulkQh->NextQh = NULL;
 
   Uhc->FrameBaseHostAddr = AllocateZeroPool (4096);
   if (Uhc->FrameBaseHostAddr == NULL) {
@@ -127,7 +126,7 @@ UhciInitFrameList (
 
   PhyAddr = UsbHcGetPciAddressForHostMem (Uhc->MemPool, Uhc->SyncIntQh, sizeof (UHCI_QH_HW));
   for (Index = 0; Index < UHCI_FRAME_NUM; Index++) {
-    Uhc->FrameBase[Index] = QH_HLINK (PhyAddr, FALSE);
+    Uhc->FrameBase[Index]         = QH_HLINK (PhyAddr, FALSE);
     Uhc->FrameBaseHostAddr[Index] = (UINT32)(UINTN)Uhc->SyncIntQh;
   }
 
@@ -150,7 +149,6 @@ ON_ERROR:
   return Status;
 }
 
-
 /**
   Destory FrameList buffer.
 
@@ -159,7 +157,7 @@ ON_ERROR:
 **/
 VOID
 UhciDestoryFrameList (
-  IN USB_HC_DEV           *Uhc
+  IN USB_HC_DEV  *Uhc
   )
 {
   //
@@ -172,7 +170,7 @@ UhciDestoryFrameList (
   Uhc->PciIo->FreeBuffer (
                 Uhc->PciIo,
                 EFI_SIZE_TO_PAGES (4096),
-                (VOID *) Uhc->FrameBase
+                (VOID *)Uhc->FrameBase
                 );
 
   if (Uhc->FrameBaseHostAddr != NULL) {
@@ -191,13 +189,12 @@ UhciDestoryFrameList (
     UsbHcFreeMem (Uhc->MemPool, Uhc->BulkQh, sizeof (UHCI_QH_SW));
   }
 
-  Uhc->FrameBase           = NULL;
-  Uhc->FrameBaseHostAddr   = NULL;
-  Uhc->SyncIntQh           = NULL;
-  Uhc->CtrlQh              = NULL;
-  Uhc->BulkQh              = NULL;
+  Uhc->FrameBase         = NULL;
+  Uhc->FrameBaseHostAddr = NULL;
+  Uhc->SyncIntQh         = NULL;
+  Uhc->CtrlQh            = NULL;
+  Uhc->BulkQh            = NULL;
 }
-
 
 /**
   Convert the poll rate to the maxium 2^n that is smaller
@@ -210,10 +207,10 @@ UhciDestoryFrameList (
 **/
 UINTN
 UhciConvertPollRate (
-  IN  UINTN               Interval
+  IN  UINTN  Interval
   )
 {
-  UINTN                   BitCount;
+  UINTN  BitCount;
 
   ASSERT (Interval != 0);
 
@@ -230,7 +227,6 @@ UhciConvertPollRate (
   return (UINTN)1 << (BitCount - 1);
 }
 
-
 /**
   Link a queue head (for asynchronous interrupt transfer) to
   the frame list.
@@ -241,15 +237,15 @@ UhciConvertPollRate (
 **/
 VOID
 UhciLinkQhToFrameList (
-  USB_HC_DEV              *Uhc,
-  UHCI_QH_SW              *Qh
+  USB_HC_DEV  *Uhc,
+  UHCI_QH_SW  *Qh
   )
 {
-  UINTN                   Index;
-  UHCI_QH_SW              *Prev;
-  UHCI_QH_SW              *Next;
-  EFI_PHYSICAL_ADDRESS    PhyAddr;
-  EFI_PHYSICAL_ADDRESS    QhPciAddr;
+  UINTN                 Index;
+  UHCI_QH_SW            *Prev;
+  UHCI_QH_SW            *Next;
+  EFI_PHYSICAL_ADDRESS  PhyAddr;
+  EFI_PHYSICAL_ADDRESS  QhPciAddr;
 
   ASSERT ((Uhc->FrameBase != NULL) && (Qh != NULL));
 
@@ -261,8 +257,8 @@ UhciLinkQhToFrameList (
     // heads on the frame list
     //
     ASSERT (!LINK_TERMINATED (Uhc->FrameBase[Index]));
-    Next  = (UHCI_QH_SW*)(UINTN)Uhc->FrameBaseHostAddr[Index];
-    Prev  = NULL;
+    Next = (UHCI_QH_SW *)(UINTN)Uhc->FrameBaseHostAddr[Index];
+    Prev = NULL;
 
     //
     // Now, insert the queue head (Qh) into this frame:
@@ -279,8 +275,8 @@ UhciLinkQhToFrameList (
     // rate is correct.
     //
     while (Next->Interval > Qh->Interval) {
-      Prev  = Next;
-      Next  = Next->NextQh;
+      Prev = Next;
+      Next = Next->NextQh;
       ASSERT (Next != NULL);
     }
 
@@ -305,15 +301,15 @@ UhciLinkQhToFrameList (
       //
       ASSERT ((Index == 0) && (Qh->NextQh == NULL));
 
-      Prev                    = Next;
-      Next                    = Next->NextQh;
+      Prev = Next;
+      Next = Next->NextQh;
 
-      Qh->NextQh              = Next;
-      Prev->NextQh            = Qh;
+      Qh->NextQh   = Next;
+      Prev->NextQh = Qh;
 
-      Qh->QhHw.HorizonLink    = Prev->QhHw.HorizonLink;
+      Qh->QhHw.HorizonLink = Prev->QhHw.HorizonLink;
 
-      Prev->QhHw.HorizonLink  = QH_HLINK (QhPciAddr, FALSE);
+      Prev->QhHw.HorizonLink = QH_HLINK (QhPciAddr, FALSE);
       break;
     }
 
@@ -323,21 +319,20 @@ UhciLinkQhToFrameList (
     // guarranted by 2^n polling interval.
     //
     if (Qh->NextQh == NULL) {
-      Qh->NextQh            = Next;
-      PhyAddr = UsbHcGetPciAddressForHostMem (Uhc->MemPool, Next, sizeof (UHCI_QH_HW));
-      Qh->QhHw.HorizonLink  = QH_HLINK (PhyAddr, FALSE);
+      Qh->NextQh           = Next;
+      PhyAddr              = UsbHcGetPciAddressForHostMem (Uhc->MemPool, Next, sizeof (UHCI_QH_HW));
+      Qh->QhHw.HorizonLink = QH_HLINK (PhyAddr, FALSE);
     }
 
     if (Prev == NULL) {
-      Uhc->FrameBase[Index]           = QH_HLINK (QhPciAddr, FALSE);
-      Uhc->FrameBaseHostAddr[Index]   = (UINT32)(UINTN)Qh;
+      Uhc->FrameBase[Index]         = QH_HLINK (QhPciAddr, FALSE);
+      Uhc->FrameBaseHostAddr[Index] = (UINT32)(UINTN)Qh;
     } else {
-      Prev->NextQh            = Qh;
-      Prev->QhHw.HorizonLink  = QH_HLINK (QhPciAddr, FALSE);
+      Prev->NextQh           = Qh;
+      Prev->QhHw.HorizonLink = QH_HLINK (QhPciAddr, FALSE);
     }
   }
 }
-
 
 /**
   Unlink QH from the frame list is easier: find all
@@ -350,13 +345,13 @@ UhciLinkQhToFrameList (
 **/
 VOID
 UhciUnlinkQhFromFrameList (
-  USB_HC_DEV              *Uhc,
-  UHCI_QH_SW              *Qh
+  USB_HC_DEV  *Uhc,
+  UHCI_QH_SW  *Qh
   )
 {
-  UINTN                   Index;
-  UHCI_QH_SW              *Prev;
-  UHCI_QH_SW              *This;
+  UINTN       Index;
+  UHCI_QH_SW  *Prev;
+  UHCI_QH_SW  *This;
 
   ASSERT ((Uhc->FrameBase != NULL) && (Qh != NULL));
 
@@ -366,16 +361,16 @@ UhciUnlinkQhFromFrameList (
     // queue heads on the frame list
     //
     ASSERT (!LINK_TERMINATED (Uhc->FrameBase[Index]));
-    This  = (UHCI_QH_SW*)(UINTN)Uhc->FrameBaseHostAddr[Index];
-    Prev  = NULL;
+    This = (UHCI_QH_SW *)(UINTN)Uhc->FrameBaseHostAddr[Index];
+    Prev = NULL;
 
     //
     // Walk through the frame's QH list to find the
     // queue head to remove
     //
     while ((This != NULL) && (This != Qh)) {
-      Prev  = This;
-      This  = This->NextQh;
+      Prev = This;
+      This = This->NextQh;
     }
 
     //
@@ -390,15 +385,14 @@ UhciUnlinkQhFromFrameList (
       //
       // Qh is the first entry in the frame
       //
-      Uhc->FrameBase[Index]           = Qh->QhHw.HorizonLink;
-      Uhc->FrameBaseHostAddr[Index]   = (UINT32)(UINTN)Qh->NextQh;
+      Uhc->FrameBase[Index]         = Qh->QhHw.HorizonLink;
+      Uhc->FrameBaseHostAddr[Index] = (UINT32)(UINTN)Qh->NextQh;
     } else {
-      Prev->NextQh            = Qh->NextQh;
-      Prev->QhHw.HorizonLink  = Qh->QhHw.HorizonLink;
+      Prev->NextQh           = Qh->NextQh;
+      Prev->QhHw.HorizonLink = Qh->QhHw.HorizonLink;
     }
   }
 }
-
 
 /**
   Check TDs Results.
@@ -413,18 +407,18 @@ UhciUnlinkQhFromFrameList (
 **/
 BOOLEAN
 UhciCheckTdStatus (
-  IN  USB_HC_DEV          *Uhc,
-  IN  UHCI_TD_SW          *Td,
-  IN  BOOLEAN             IsLow,
-  OUT UHCI_QH_RESULT      *QhResult
+  IN  USB_HC_DEV      *Uhc,
+  IN  UHCI_TD_SW      *Td,
+  IN  BOOLEAN         IsLow,
+  OUT UHCI_QH_RESULT  *QhResult
   )
 {
-  UINTN                   Len;
-  UINT8                   State;
-  UHCI_TD_HW              *TdHw;
-  BOOLEAN                 Finished;
+  UINTN       Len;
+  UINT8       State;
+  UHCI_TD_HW  *TdHw;
+  BOOLEAN     Finished;
 
-  Finished             = TRUE;
+  Finished = TRUE;
 
   //
   // Initialize the data toggle to that of the first
@@ -457,7 +451,6 @@ UhciCheckTdStatus (
     if ((State & USBTD_STALLED) != 0) {
       if ((State & USBTD_BABBLE) != 0) {
         QhResult->Result |= EFI_USB_ERR_BABBLE;
-
       } else if (TdHw->ErrorCount != 0) {
         QhResult->Result |= EFI_USB_ERR_STALL;
       }
@@ -480,7 +473,6 @@ UhciCheckTdStatus (
 
       Finished = TRUE;
       goto ON_EXIT;
-
     } else if ((State & USBTD_ACTIVE) != 0) {
       //
       // The TD is still active, no need to check further.
@@ -489,14 +481,13 @@ UhciCheckTdStatus (
 
       Finished = FALSE;
       goto ON_EXIT;
-
     } else {
       //
       // Update the next data toggle, it is always the
       // next to the last known-good TD's data toggle if
       // any TD is executed OK
       //
-      QhResult->NextToggle = (UINT8) (1 - (UINT8)TdHw->DataToggle);
+      QhResult->NextToggle = (UINT8)(1 - (UINT8)TdHw->DataToggle);
 
       //
       // This TD is finished OK or met short packet read. Update the
@@ -530,7 +521,7 @@ ON_EXIT:
   //
   if (!UhciIsHcWorking (Uhc->PciIo)) {
     QhResult->Result |= EFI_USB_ERR_SYSTEM;
-    Finished  = TRUE;
+    Finished          = TRUE;
   }
 
   if (Finished) {
@@ -540,7 +531,6 @@ ON_EXIT:
   UhciAckAllInterrupt (Uhc);
   return Finished;
 }
-
 
 /**
   Check the result of the transfer.
@@ -558,19 +548,19 @@ ON_EXIT:
 **/
 EFI_STATUS
 UhciExecuteTransfer (
-  IN  USB_HC_DEV          *Uhc,
-  IN  UHCI_QH_SW          *Qh,
-  IN  UHCI_TD_SW          *Td,
-  IN  UINTN               TimeOut,
-  IN  BOOLEAN             IsLow,
-  OUT UHCI_QH_RESULT      *QhResult
+  IN  USB_HC_DEV      *Uhc,
+  IN  UHCI_QH_SW      *Qh,
+  IN  UHCI_TD_SW      *Td,
+  IN  UINTN           TimeOut,
+  IN  BOOLEAN         IsLow,
+  OUT UHCI_QH_RESULT  *QhResult
   )
 {
-  UINTN                   Index;
-  UINTN                   Delay;
-  BOOLEAN                 Finished;
-  EFI_STATUS              Status;
-  BOOLEAN                 InfiniteLoop;
+  UINTN       Index;
+  UINTN       Delay;
+  BOOLEAN     Finished;
+  EFI_STATUS  Status;
+  BOOLEAN     InfiniteLoop;
 
   Finished     = FALSE;
   Status       = EFI_SUCCESS;
@@ -600,14 +590,13 @@ UhciExecuteTransfer (
   }
 
   if (!Finished) {
-    DEBUG ((EFI_D_ERROR, "UhciExecuteTransfer: execution not finished for %dms\n", (UINT32)TimeOut));
+    DEBUG ((DEBUG_ERROR, "UhciExecuteTransfer: execution not finished for %dms\n", (UINT32)TimeOut));
     UhciDumpQh (Qh);
     UhciDumpTds (Td);
 
     Status = EFI_TIMEOUT;
-
   } else if (QhResult->Result != EFI_USB_NOERROR) {
-    DEBUG ((EFI_D_ERROR, "UhciExecuteTransfer: execution failed with result %x\n", QhResult->Result));
+    DEBUG ((DEBUG_ERROR, "UhciExecuteTransfer: execution failed with result %x\n", QhResult->Result));
     UhciDumpQh (Qh);
     UhciDumpTds (Td);
 
@@ -616,7 +605,6 @@ UhciExecuteTransfer (
 
   return Status;
 }
-
 
 /**
   Update Async Request, QH and TDs.
@@ -635,12 +623,12 @@ UhciUpdateAsyncReq (
   IN UINT32              NextToggle
   )
 {
-  UHCI_QH_SW              *Qh;
-  UHCI_TD_SW              *FirstTd;
-  UHCI_TD_SW              *Td;
+  UHCI_QH_SW  *Qh;
+  UHCI_TD_SW  *FirstTd;
+  UHCI_TD_SW  *Td;
 
-  Qh          = AsyncReq->QhSw;
-  FirstTd     = AsyncReq->FirstTd;
+  Qh      = AsyncReq->QhSw;
+  FirstTd = AsyncReq->FirstTd;
 
   if (Result == EFI_USB_NOERROR) {
     //
@@ -659,10 +647,9 @@ UhciUpdateAsyncReq (
     }
 
     UhciLinkTdToQh (Uhc, Qh, FirstTd);
-    return ;
+    return;
   }
 }
-
 
 /**
   Create Async Request node, and Link to List.
@@ -699,7 +686,7 @@ UhciCreateAsyncReq (
   IN BOOLEAN                          IsLow
   )
 {
-  UHCI_ASYNC_REQUEST      *AsyncReq;
+  UHCI_ASYNC_REQUEST  *AsyncReq;
 
   AsyncReq = AllocatePool (sizeof (UHCI_ASYNC_REQUEST));
 
@@ -710,17 +697,17 @@ UhciCreateAsyncReq (
   //
   // Fill Request field. Data is allocated host memory, not mapped
   //
-  AsyncReq->Signature   = UHCI_ASYNC_INT_SIGNATURE;
-  AsyncReq->DevAddr     = DevAddr;
-  AsyncReq->EndPoint    = EndPoint;
-  AsyncReq->DataLen     = DataLen;
-  AsyncReq->Interval    = UhciConvertPollRate(Interval);
-  AsyncReq->Data        = Data;
-  AsyncReq->Callback    = Callback;
-  AsyncReq->Context     = Context;
-  AsyncReq->QhSw        = Qh;
-  AsyncReq->FirstTd     = FirstTd;
-  AsyncReq->IsLow       = IsLow;
+  AsyncReq->Signature = UHCI_ASYNC_INT_SIGNATURE;
+  AsyncReq->DevAddr   = DevAddr;
+  AsyncReq->EndPoint  = EndPoint;
+  AsyncReq->DataLen   = DataLen;
+  AsyncReq->Interval  = UhciConvertPollRate (Interval);
+  AsyncReq->Data      = Data;
+  AsyncReq->Callback  = Callback;
+  AsyncReq->Context   = Context;
+  AsyncReq->QhSw      = Qh;
+  AsyncReq->FirstTd   = FirstTd;
+  AsyncReq->IsLow     = IsLow;
 
   //
   // Insert the new interrupt transfer to the head of the list.
@@ -733,7 +720,6 @@ UhciCreateAsyncReq (
   return EFI_SUCCESS;
 }
 
-
 /**
   Free an asynchronous request's resource such as memory.
 
@@ -743,8 +729,8 @@ UhciCreateAsyncReq (
 **/
 VOID
 UhciFreeAsyncReq (
-  IN USB_HC_DEV           *Uhc,
-  IN UHCI_ASYNC_REQUEST   *AsyncReq
+  IN USB_HC_DEV          *Uhc,
+  IN UHCI_ASYNC_REQUEST  *AsyncReq
   )
 {
   ASSERT ((Uhc != NULL) && (AsyncReq != NULL));
@@ -758,7 +744,6 @@ UhciFreeAsyncReq (
 
   gBS->FreePool (AsyncReq);
 }
-
 
 /**
   Unlink an asynchronous request's from UHC's asynchronus list.
@@ -775,9 +760,9 @@ UhciFreeAsyncReq (
 **/
 VOID
 UhciUnlinkAsyncReq (
-  IN USB_HC_DEV           *Uhc,
-  IN UHCI_ASYNC_REQUEST   *AsyncReq,
-  IN BOOLEAN              FreeNow
+  IN USB_HC_DEV          *Uhc,
+  IN UHCI_ASYNC_REQUEST  *AsyncReq,
+  IN BOOLEAN             FreeNow
   )
 {
   ASSERT ((Uhc != NULL) && (AsyncReq != NULL));
@@ -793,11 +778,10 @@ UhciUnlinkAsyncReq (
     // then add AsyncReq to UHC's recycle list
     //
     AsyncReq->QhSw->QhHw.VerticalLink = QH_VLINK (NULL, TRUE);
-    AsyncReq->Recycle = Uhc->RecycleWait;
-    Uhc->RecycleWait  = AsyncReq;
+    AsyncReq->Recycle                 = Uhc->RecycleWait;
+    Uhc->RecycleWait                  = AsyncReq;
   }
 }
-
 
 /**
   Delete Async Interrupt QH and TDs.
@@ -814,10 +798,10 @@ UhciUnlinkAsyncReq (
 **/
 EFI_STATUS
 UhciRemoveAsyncReq (
-  IN  USB_HC_DEV          *Uhc,
-  IN  UINT8               DevAddr,
-  IN  UINT8               EndPoint,
-  OUT UINT8               *Toggle
+  IN  USB_HC_DEV  *Uhc,
+  IN  UINT8       DevAddr,
+  IN  UINT8       EndPoint,
+  OUT UINT8       *Toggle
   )
 {
   EFI_STATUS          Status;
@@ -842,14 +826,13 @@ UhciRemoveAsyncReq (
   Link  = Uhc->AsyncIntList.ForwardLink;
 
   do {
-    AsyncReq  = UHCI_ASYNC_INT_FROM_LINK (Link);
-    Link      = Link->ForwardLink;
+    AsyncReq = UHCI_ASYNC_INT_FROM_LINK (Link);
+    Link     = Link->ForwardLink;
 
     if ((AsyncReq->DevAddr == DevAddr) && (AsyncReq->EndPoint == EndPoint)) {
       Found = TRUE;
       break;
     }
-
   } while (Link != &(Uhc->AsyncIntList));
 
   if (!Found) {
@@ -870,7 +853,6 @@ UhciRemoveAsyncReq (
   return Status;
 }
 
-
 /**
   Recycle the asynchronouse request. When a queue head
   is unlinked from frame list, host controller hardware
@@ -889,25 +871,23 @@ UhciRemoveAsyncReq (
 **/
 VOID
 UhciRecycleAsyncReq (
-  IN USB_HC_DEV           *Uhc
+  IN USB_HC_DEV  *Uhc
   )
 {
-  UHCI_ASYNC_REQUEST      *Req;
-  UHCI_ASYNC_REQUEST      *Next;
+  UHCI_ASYNC_REQUEST  *Req;
+  UHCI_ASYNC_REQUEST  *Next;
 
   Req = Uhc->Recycle;
 
   while (Req != NULL) {
     Next = Req->Recycle;
     UhciFreeAsyncReq (Uhc, Req);
-    Req  = Next;
+    Req = Next;
   }
 
   Uhc->Recycle     = Uhc->RecycleWait;
   Uhc->RecycleWait = NULL;
 }
-
-
 
 /**
   Release all the asynchronous transfers on the lsit.
@@ -917,11 +897,11 @@ UhciRecycleAsyncReq (
 **/
 VOID
 UhciFreeAllAsyncReq (
-  IN USB_HC_DEV           *Uhc
+  IN USB_HC_DEV  *Uhc
   )
 {
-  LIST_ENTRY              *Head;
-  UHCI_ASYNC_REQUEST      *AsyncReq;
+  LIST_ENTRY          *Head;
+  UHCI_ASYNC_REQUEST  *AsyncReq;
 
   //
   // Call UhciRecycleAsyncReq twice. The requests on Recycle
@@ -938,11 +918,10 @@ UhciFreeAllAsyncReq (
   }
 
   while (!IsListEmpty (Head)) {
-    AsyncReq  = UHCI_ASYNC_INT_FROM_LINK (Head->ForwardLink);
+    AsyncReq = UHCI_ASYNC_INT_FROM_LINK (Head->ForwardLink);
     UhciUnlinkAsyncReq (Uhc, AsyncReq, TRUE);
   }
 }
-
 
 /**
   Interrupt transfer periodic check handler.
@@ -954,18 +933,18 @@ UhciFreeAllAsyncReq (
 VOID
 EFIAPI
 UhciMonitorAsyncReqList (
-  IN EFI_EVENT            Event,
-  IN VOID                 *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  UHCI_ASYNC_REQUEST      *AsyncReq;
-  LIST_ENTRY              *Link;
-  USB_HC_DEV              *Uhc;
-  VOID                    *Data;
-  BOOLEAN                 Finished;
-  UHCI_QH_RESULT          QhResult;
+  UHCI_ASYNC_REQUEST  *AsyncReq;
+  LIST_ENTRY          *Link;
+  USB_HC_DEV          *Uhc;
+  VOID                *Data;
+  BOOLEAN             Finished;
+  UHCI_QH_RESULT      QhResult;
 
-  Uhc = (USB_HC_DEV *) Context;
+  Uhc = (USB_HC_DEV *)Context;
 
   //
   // Recycle the asynchronous requests expired, and promote
@@ -975,7 +954,7 @@ UhciMonitorAsyncReqList (
   UhciRecycleAsyncReq (Uhc);
 
   if (IsListEmpty (&(Uhc->AsyncIntList))) {
-    return ;
+    return;
   }
 
   //
@@ -984,8 +963,8 @@ UhciMonitorAsyncReqList (
   Link = Uhc->AsyncIntList.ForwardLink;
 
   do {
-    AsyncReq  = UHCI_ASYNC_INT_FROM_LINK (Link);
-    Link      = Link->ForwardLink;
+    AsyncReq = UHCI_ASYNC_INT_FROM_LINK (Link);
+    Link     = Link->ForwardLink;
 
     Finished = UhciCheckTdStatus (Uhc, AsyncReq->FirstTd, AsyncReq->IsLow, &QhResult);
 
@@ -1004,7 +983,7 @@ UhciMonitorAsyncReqList (
       Data = AllocatePool (QhResult.Complete);
 
       if (Data == NULL) {
-        return ;
+        return;
       }
 
       CopyMem (Data, AsyncReq->FirstTd->Data, QhResult.Complete);

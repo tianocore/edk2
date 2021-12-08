@@ -7,21 +7,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 #include "EsrtImpl.h"
 
-
 //
 // Module globals.
 //
 
-ESRT_PRIVATE_DATA mPrivate;
+ESRT_PRIVATE_DATA  mPrivate;
 
 ESRT_MANAGEMENT_PROTOCOL  mEsrtManagementProtocolTemplate = {
-                            EsrtDxeGetEsrtEntry,
-                            EsrtDxeUpdateEsrtEntry,
-                            EsrtDxeRegisterEsrtEntry,
-                            EsrtDxeUnRegisterEsrtEntry,
-                            EsrtDxeSyncFmp,
-                            EsrtDxeLockEsrtRepository
-                            };
+  EsrtDxeGetEsrtEntry,
+  EsrtDxeUpdateEsrtEntry,
+  EsrtDxeRegisterEsrtEntry,
+  EsrtDxeUnRegisterEsrtEntry,
+  EsrtDxeSyncFmp,
+  EsrtDxeLockEsrtRepository
+};
 
 /**
   Get ESRT entry from ESRT Cache by FwClass Guid
@@ -36,14 +35,14 @@ ESRT_MANAGEMENT_PROTOCOL  mEsrtManagementProtocolTemplate = {
 **/
 EFI_STATUS
 EFIAPI
-EsrtDxeGetEsrtEntry(
-  IN     EFI_GUID                  *FwClass,
-  IN OUT EFI_SYSTEM_RESOURCE_ENTRY *Entry
+EsrtDxeGetEsrtEntry (
+  IN     EFI_GUID                   *FwClass,
+  IN OUT EFI_SYSTEM_RESOURCE_ENTRY  *Entry
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
-  if (FwClass == NULL || Entry == NULL) {
+  if ((FwClass == NULL) || (Entry == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -55,15 +54,15 @@ EsrtDxeGetEsrtEntry(
   //
   // Find in Non-FMP Cached Esrt Repository
   //
-  Status = GetEsrtEntry(
+  Status = GetEsrtEntry (
              FwClass,
              ESRT_FROM_NONFMP,
              Entry
              );
 
-  EfiReleaseLock(&mPrivate.NonFmpLock);
+  EfiReleaseLock (&mPrivate.NonFmpLock);
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     Status = EfiAcquireLockOrFail (&mPrivate.FmpLock);
     if (EFI_ERROR (Status)) {
       return Status;
@@ -72,13 +71,13 @@ EsrtDxeGetEsrtEntry(
     //
     // Find in FMP Cached Esrt NV Variable
     //
-    Status = GetEsrtEntry(
+    Status = GetEsrtEntry (
                FwClass,
                ESRT_FROM_FMP,
                Entry
                );
 
-    EfiReleaseLock(&mPrivate.FmpLock);
+    EfiReleaseLock (&mPrivate.FmpLock);
   }
 
   return Status;
@@ -96,11 +95,11 @@ EsrtDxeGetEsrtEntry(
 **/
 EFI_STATUS
 EFIAPI
-EsrtDxeUpdateEsrtEntry(
-  IN EFI_SYSTEM_RESOURCE_ENTRY *Entry
+EsrtDxeUpdateEsrtEntry (
+  IN EFI_SYSTEM_RESOURCE_ENTRY  *Entry
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   if (Entry == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -111,23 +110,23 @@ EsrtDxeUpdateEsrtEntry(
     return Status;
   }
 
-  Status = UpdateEsrtEntry(Entry, ESRT_FROM_FMP);
+  Status = UpdateEsrtEntry (Entry, ESRT_FROM_FMP);
 
-  if (!EFI_ERROR(Status)) {
-    EfiReleaseLock(&mPrivate.FmpLock);
+  if (!EFI_ERROR (Status)) {
+    EfiReleaseLock (&mPrivate.FmpLock);
     return Status;
   }
-  EfiReleaseLock(&mPrivate.FmpLock);
 
+  EfiReleaseLock (&mPrivate.FmpLock);
 
   Status = EfiAcquireLockOrFail (&mPrivate.NonFmpLock);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = UpdateEsrtEntry(Entry, ESRT_FROM_NONFMP);
+  Status = UpdateEsrtEntry (Entry, ESRT_FROM_NONFMP);
 
-  EfiReleaseLock(&mPrivate.NonFmpLock);
+  EfiReleaseLock (&mPrivate.NonFmpLock);
 
   return Status;
 }
@@ -143,11 +142,11 @@ EsrtDxeUpdateEsrtEntry(
 **/
 EFI_STATUS
 EFIAPI
-EsrtDxeUnRegisterEsrtEntry(
-  IN  EFI_GUID        *FwClass
+EsrtDxeUnRegisterEsrtEntry (
+  IN  EFI_GUID  *FwClass
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   if (FwClass == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -158,9 +157,9 @@ EsrtDxeUnRegisterEsrtEntry(
     return Status;
   }
 
-  Status = DeleteEsrtEntry(FwClass, ESRT_FROM_NONFMP);
+  Status = DeleteEsrtEntry (FwClass, ESRT_FROM_NONFMP);
 
-  EfiReleaseLock(&mPrivate.NonFmpLock);
+  EfiReleaseLock (&mPrivate.NonFmpLock);
 
   return Status;
 }
@@ -177,12 +176,12 @@ EsrtDxeUnRegisterEsrtEntry(
 **/
 EFI_STATUS
 EFIAPI
-EsrtDxeRegisterEsrtEntry(
-  IN EFI_SYSTEM_RESOURCE_ENTRY *Entry
+EsrtDxeRegisterEsrtEntry (
+  IN EFI_SYSTEM_RESOURCE_ENTRY  *Entry
   )
 {
-  EFI_STATUS                Status;
-  EFI_SYSTEM_RESOURCE_ENTRY EsrtEntryTmp;
+  EFI_STATUS                 Status;
+  EFI_SYSTEM_RESOURCE_ENTRY  EsrtEntryTmp;
 
   if (Entry == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -193,17 +192,17 @@ EsrtDxeRegisterEsrtEntry(
     return Status;
   }
 
-  Status = GetEsrtEntry(
+  Status = GetEsrtEntry (
              &Entry->FwClass,
              ESRT_FROM_NONFMP,
              &EsrtEntryTmp
              );
 
   if (Status == EFI_NOT_FOUND) {
-    Status = InsertEsrtEntry(Entry, ESRT_FROM_NONFMP);
+    Status = InsertEsrtEntry (Entry, ESRT_FROM_NONFMP);
   }
 
-  EfiReleaseLock(&mPrivate.NonFmpLock);
+  EfiReleaseLock (&mPrivate.NonFmpLock);
 
   return Status;
 }
@@ -220,27 +219,27 @@ EsrtDxeRegisterEsrtEntry(
 **/
 EFI_STATUS
 EFIAPI
-EsrtDxeSyncFmp(
+EsrtDxeSyncFmp (
   VOID
   )
 {
-  EFI_STATUS                                Status;
-  UINTN                                     Index1;
-  UINTN                                     Index2;
-  UINTN                                     Index3;
-  EFI_HANDLE                                *HandleBuffer;
-  EFI_FIRMWARE_MANAGEMENT_PROTOCOL          **FmpBuf;
-  UINTN                                     NumberOfHandles;
-  UINTN                                     *DescriptorSizeBuf;
-  EFI_FIRMWARE_IMAGE_DESCRIPTOR             **FmpImageInfoBuf;
-  EFI_FIRMWARE_IMAGE_DESCRIPTOR             *TempFmpImageInfo;
-  UINT8                                     *FmpImageInfoCountBuf;
-  UINT32                                    *FmpImageInfoDescriptorVerBuf;
-  UINTN                                     ImageInfoSize;
-  UINT32                                    PackageVersion;
-  CHAR16                                    *PackageVersionName;
-  EFI_SYSTEM_RESOURCE_ENTRY                 *EsrtRepositoryNew;
-  UINTN                                     EntryNumNew;
+  EFI_STATUS                        Status;
+  UINTN                             Index1;
+  UINTN                             Index2;
+  UINTN                             Index3;
+  EFI_HANDLE                        *HandleBuffer;
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  **FmpBuf;
+  UINTN                             NumberOfHandles;
+  UINTN                             *DescriptorSizeBuf;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR     **FmpImageInfoBuf;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR     *TempFmpImageInfo;
+  UINT8                             *FmpImageInfoCountBuf;
+  UINT32                            *FmpImageInfoDescriptorVerBuf;
+  UINTN                             ImageInfoSize;
+  UINT32                            PackageVersion;
+  CHAR16                            *PackageVersionName;
+  EFI_SYSTEM_RESOURCE_ENTRY         *EsrtRepositoryNew;
+  UINTN                             EntryNumNew;
 
   NumberOfHandles              = 0;
   EntryNumNew                  = 0;
@@ -264,49 +263,48 @@ EsrtDxeSyncFmp(
                   &HandleBuffer
                   );
 
-
   if (Status == EFI_NOT_FOUND) {
     EntryNumNew = 0;
     goto UPDATE_REPOSITORY;
-  } else if (EFI_ERROR(Status)){
+  } else if (EFI_ERROR (Status)) {
     goto END;
   }
 
   //
   // Allocate buffer to hold new FMP ESRT Cache repository
   //
-  EsrtRepositoryNew = AllocateZeroPool(PcdGet32(PcdMaxFmpEsrtCacheNum) * sizeof(EFI_SYSTEM_RESOURCE_ENTRY));
+  EsrtRepositoryNew = AllocateZeroPool (PcdGet32 (PcdMaxFmpEsrtCacheNum) * sizeof (EFI_SYSTEM_RESOURCE_ENTRY));
   if (EsrtRepositoryNew == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto END;
   }
 
-  FmpBuf = AllocatePool(sizeof(EFI_FIRMWARE_MANAGEMENT_PROTOCOL *) * NumberOfHandles);
+  FmpBuf = AllocatePool (sizeof (EFI_FIRMWARE_MANAGEMENT_PROTOCOL *) * NumberOfHandles);
   if (FmpBuf == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto END;
   }
 
-  FmpImageInfoBuf = AllocateZeroPool(sizeof(EFI_FIRMWARE_IMAGE_DESCRIPTOR *) * NumberOfHandles);
+  FmpImageInfoBuf = AllocateZeroPool (sizeof (EFI_FIRMWARE_IMAGE_DESCRIPTOR *) * NumberOfHandles);
   if (FmpImageInfoBuf == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto END;
   }
 
-  FmpImageInfoCountBuf = AllocateZeroPool(sizeof(UINT8) * NumberOfHandles);
+  FmpImageInfoCountBuf = AllocateZeroPool (sizeof (UINT8) * NumberOfHandles);
   if (FmpImageInfoCountBuf == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto END;
   }
 
-  DescriptorSizeBuf = AllocateZeroPool(sizeof(UINTN) * NumberOfHandles);
+  DescriptorSizeBuf = AllocateZeroPool (sizeof (UINTN) * NumberOfHandles);
   if (DescriptorSizeBuf == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto END;
   }
 
-  FmpImageInfoDescriptorVerBuf = AllocateZeroPool(sizeof(UINT32) * NumberOfHandles);
-   if (FmpImageInfoDescriptorVerBuf == NULL) {
+  FmpImageInfoDescriptorVerBuf = AllocateZeroPool (sizeof (UINT32) * NumberOfHandles);
+  if (FmpImageInfoDescriptorVerBuf == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto END;
   }
@@ -314,31 +312,31 @@ EsrtDxeSyncFmp(
   //
   // Get all FmpImageInfo Descriptor into FmpImageInfoBuf
   //
-  for (Index1 = 0; Index1 < NumberOfHandles; Index1++){
-    Status = gBS->HandleProtocol(
+  for (Index1 = 0; Index1 < NumberOfHandles; Index1++) {
+    Status = gBS->HandleProtocol (
                     HandleBuffer[Index1],
                     &gEfiFirmwareManagementProtocolGuid,
                     (VOID **)&FmpBuf[Index1]
                     );
 
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       continue;
     }
 
     ImageInfoSize = 0;
-    Status = FmpBuf[Index1]->GetImageInfo (
-                               FmpBuf[Index1],
-                               &ImageInfoSize,
-                               NULL,
-                               NULL,
-                               NULL,
-                               NULL,
-                               NULL,
-                               NULL
-                               );
+    Status        = FmpBuf[Index1]->GetImageInfo (
+                                      FmpBuf[Index1],
+                                      &ImageInfoSize,
+                                      NULL,
+                                      NULL,
+                                      NULL,
+                                      NULL,
+                                      NULL,
+                                      NULL
+                                      );
 
     if (Status == EFI_BUFFER_TOO_SMALL) {
-      FmpImageInfoBuf[Index1] = AllocateZeroPool(ImageInfoSize);
+      FmpImageInfoBuf[Index1] = AllocateZeroPool (ImageInfoSize);
       if (FmpImageInfoBuf[Index1] == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto END;
@@ -348,56 +346,59 @@ EsrtDxeSyncFmp(
     }
 
     PackageVersionName = NULL;
-    Status = FmpBuf[Index1]->GetImageInfo (
-                               FmpBuf[Index1],
-                               &ImageInfoSize,
-                               FmpImageInfoBuf[Index1],
-                               &FmpImageInfoDescriptorVerBuf[Index1],
-                               &FmpImageInfoCountBuf[Index1],
-                               &DescriptorSizeBuf[Index1],
-                               &PackageVersion,
-                               &PackageVersionName
-                               );
+    Status             = FmpBuf[Index1]->GetImageInfo (
+                                           FmpBuf[Index1],
+                                           &ImageInfoSize,
+                                           FmpImageInfoBuf[Index1],
+                                           &FmpImageInfoDescriptorVerBuf[Index1],
+                                           &FmpImageInfoCountBuf[Index1],
+                                           &DescriptorSizeBuf[Index1],
+                                           &PackageVersion,
+                                           &PackageVersionName
+                                           );
 
     //
     // If FMP GetInformation interface failed, skip this resource
     //
-    if (EFI_ERROR(Status)){
+    if (EFI_ERROR (Status)) {
       FmpImageInfoCountBuf[Index1] = 0;
       continue;
     }
 
     if (PackageVersionName != NULL) {
-      FreePool(PackageVersionName);
+      FreePool (PackageVersionName);
     }
   }
 
   //
   // Create new FMP cache repository based on FmpImageInfoBuf
   //
-  for (Index2 = 0; Index2 < NumberOfHandles; Index2++){
+  for (Index2 = 0; Index2 < NumberOfHandles; Index2++) {
     TempFmpImageInfo = FmpImageInfoBuf[Index2];
-    for (Index3 = 0; Index3 < FmpImageInfoCountBuf[Index2]; Index3++){
-      if ((TempFmpImageInfo->AttributesSupported & IMAGE_ATTRIBUTE_IN_USE) != 0
-      && (TempFmpImageInfo->AttributesSetting & IMAGE_ATTRIBUTE_IN_USE) != 0){
+    for (Index3 = 0; Index3 < FmpImageInfoCountBuf[Index2]; Index3++) {
+      if (  ((TempFmpImageInfo->AttributesSupported & IMAGE_ATTRIBUTE_IN_USE) != 0)
+         && ((TempFmpImageInfo->AttributesSetting & IMAGE_ATTRIBUTE_IN_USE) != 0))
+      {
         //
         // Always put the first smallest version of Image info into ESRT cache
         //
-        for(Index1 = 0; Index1 < EntryNumNew; Index1++) {
-          if (CompareGuid(&EsrtRepositoryNew[Index1].FwClass, &TempFmpImageInfo->ImageTypeId)) {
-            if(EsrtRepositoryNew[Index1].FwVersion > TempFmpImageInfo->Version) {
-              SetEsrtEntryFromFmpInfo(&EsrtRepositoryNew[Index1], TempFmpImageInfo, FmpImageInfoDescriptorVerBuf[Index2]);
+        for (Index1 = 0; Index1 < EntryNumNew; Index1++) {
+          if (CompareGuid (&EsrtRepositoryNew[Index1].FwClass, &TempFmpImageInfo->ImageTypeId)) {
+            if (EsrtRepositoryNew[Index1].FwVersion > TempFmpImageInfo->Version) {
+              SetEsrtEntryFromFmpInfo (&EsrtRepositoryNew[Index1], TempFmpImageInfo, FmpImageInfoDescriptorVerBuf[Index2]);
             }
+
             break;
           }
         }
+
         //
         // New ImageTypeId can't be found in EsrtRepositoryNew. Create a new one
         //
-        if (Index1 == EntryNumNew){
-          SetEsrtEntryFromFmpInfo(&EsrtRepositoryNew[EntryNumNew], TempFmpImageInfo, FmpImageInfoDescriptorVerBuf[Index2]);
+        if (Index1 == EntryNumNew) {
+          SetEsrtEntryFromFmpInfo (&EsrtRepositoryNew[EntryNumNew], TempFmpImageInfo, FmpImageInfoDescriptorVerBuf[Index2]);
           EntryNumNew++;
-          if (EntryNumNew >= PcdGet32(PcdMaxFmpEsrtCacheNum)) {
+          if (EntryNumNew >= PcdGet32 (PcdMaxFmpEsrtCacheNum)) {
             break;
           }
         }
@@ -417,48 +418,49 @@ UPDATE_REPOSITORY:
     return Status;
   }
 
-  Status = gRT->SetVariable(
+  Status = gRT->SetVariable (
                   EFI_ESRT_FMP_VARIABLE_NAME,
                   &gEfiCallerIdGuid,
                   EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                  EntryNumNew * sizeof(EFI_SYSTEM_RESOURCE_ENTRY),
+                  EntryNumNew * sizeof (EFI_SYSTEM_RESOURCE_ENTRY),
                   EsrtRepositoryNew
                   );
 
-  EfiReleaseLock(&mPrivate.FmpLock);
+  EfiReleaseLock (&mPrivate.FmpLock);
 
 END:
   if (EsrtRepositoryNew != NULL) {
-    FreePool(EsrtRepositoryNew);
+    FreePool (EsrtRepositoryNew);
   }
 
   if (HandleBuffer != NULL) {
-    FreePool(HandleBuffer);
+    FreePool (HandleBuffer);
   }
 
   if (FmpBuf != NULL) {
-    FreePool(FmpBuf);
+    FreePool (FmpBuf);
   }
 
   if (FmpImageInfoCountBuf != NULL) {
-    FreePool(FmpImageInfoCountBuf);
+    FreePool (FmpImageInfoCountBuf);
   }
 
   if (DescriptorSizeBuf != NULL) {
-    FreePool(DescriptorSizeBuf);
+    FreePool (DescriptorSizeBuf);
   }
 
   if (FmpImageInfoDescriptorVerBuf != NULL) {
-    FreePool(FmpImageInfoDescriptorVerBuf);
+    FreePool (FmpImageInfoDescriptorVerBuf);
   }
 
   if (FmpImageInfoBuf != NULL) {
-    for (Index1 = 0; Index1 < NumberOfHandles; Index1++){
+    for (Index1 = 0; Index1 < NumberOfHandles; Index1++) {
       if (FmpImageInfoBuf[Index1] != NULL) {
-        FreePool(FmpImageInfoBuf[Index1]);
+        FreePool (FmpImageInfoBuf[Index1]);
       }
     }
-    FreePool(FmpImageInfoBuf);
+
+    FreePool (FmpImageInfoBuf);
   }
 
   return Status;
@@ -473,22 +475,23 @@ END:
 **/
 EFI_STATUS
 EFIAPI
-EsrtDxeLockEsrtRepository(
+EsrtDxeLockEsrtRepository (
   VOID
   )
 {
   EFI_STATUS                    Status;
   EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock;
+
   //
   // Mark ACPI_GLOBAL_VARIABLE variable to read-only if the Variable Lock protocol exists
   //
-  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
+  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLock);
   if (!EFI_ERROR (Status)) {
     Status = VariableLock->RequestToLock (VariableLock, EFI_ESRT_FMP_VARIABLE_NAME, &gEfiCallerIdGuid);
-    DEBUG((EFI_D_INFO, "EsrtDxe Lock EsrtFmp Variable Status 0x%x", Status));
+    DEBUG ((DEBUG_INFO, "EsrtDxe Lock EsrtFmp Variable Status 0x%x", Status));
 
     Status = VariableLock->RequestToLock (VariableLock, EFI_ESRT_NONFMP_VARIABLE_NAME, &gEfiCallerIdGuid);
-    DEBUG((EFI_D_INFO, "EsrtDxe Lock EsrtNonFmp Variable Status 0x%x", Status));
+    DEBUG ((DEBUG_INFO, "EsrtDxe Lock EsrtNonFmp Variable Status 0x%x", Status));
   }
 
   return Status;
@@ -505,8 +508,8 @@ EsrtDxeLockEsrtRepository(
 VOID
 EFIAPI
 EsrtReadyToBootEventNotify (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   EFI_STATUS                 Status;
@@ -515,7 +518,6 @@ EsrtReadyToBootEventNotify (
   EFI_SYSTEM_RESOURCE_ENTRY  *NonFmpEsrtRepository;
   UINTN                      FmpRepositorySize;
   UINTN                      NonFmpRepositorySize;
-
 
   FmpEsrtRepository    = NULL;
   NonFmpEsrtRepository = NULL;
@@ -530,39 +532,39 @@ EsrtReadyToBootEventNotify (
   Status = GetVariable2 (
              EFI_ESRT_NONFMP_VARIABLE_NAME,
              &gEfiCallerIdGuid,
-             (VOID **) &NonFmpEsrtRepository,
+             (VOID **)&NonFmpEsrtRepository,
              &NonFmpRepositorySize
              );
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     NonFmpRepositorySize = 0;
   }
 
-  if (NonFmpRepositorySize % sizeof(EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
-    DEBUG((EFI_D_ERROR, "NonFmp Repository Corrupt. Need to rebuild NonFmp Repository.\n"));
+  if (NonFmpRepositorySize % sizeof (EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
+    DEBUG ((DEBUG_ERROR, "NonFmp Repository Corrupt. Need to rebuild NonFmp Repository.\n"));
     NonFmpRepositorySize = 0;
   }
 
-  EfiReleaseLock(&mPrivate.NonFmpLock);
+  EfiReleaseLock (&mPrivate.NonFmpLock);
 
   Status = EfiAcquireLockOrFail (&mPrivate.FmpLock);
   Status = GetVariable2 (
              EFI_ESRT_FMP_VARIABLE_NAME,
              &gEfiCallerIdGuid,
-             (VOID **) &FmpEsrtRepository,
+             (VOID **)&FmpEsrtRepository,
              &FmpRepositorySize
              );
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     FmpRepositorySize = 0;
   }
 
-  if (FmpRepositorySize % sizeof(EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
-    DEBUG((EFI_D_ERROR, "Fmp Repository Corrupt. Need to rebuild Fmp Repository.\n"));
+  if (FmpRepositorySize % sizeof (EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
+    DEBUG ((DEBUG_ERROR, "Fmp Repository Corrupt. Need to rebuild Fmp Repository.\n"));
     FmpRepositorySize = 0;
   }
 
-  EfiReleaseLock(&mPrivate.FmpLock);
+  EfiReleaseLock (&mPrivate.FmpLock);
 
   //
   // Skip ESRT table publish if no ESRT entry exists
@@ -571,22 +573,22 @@ EsrtReadyToBootEventNotify (
     goto EXIT;
   }
 
-  EsrtTable = AllocatePool(sizeof(EFI_SYSTEM_RESOURCE_TABLE) + NonFmpRepositorySize + FmpRepositorySize);
+  EsrtTable = AllocatePool (sizeof (EFI_SYSTEM_RESOURCE_TABLE) + NonFmpRepositorySize + FmpRepositorySize);
   if (EsrtTable == NULL) {
-    DEBUG ((EFI_D_ERROR, "Esrt table memory allocation failure\n"));
+    DEBUG ((DEBUG_ERROR, "Esrt table memory allocation failure\n"));
     goto EXIT;
   }
 
   EsrtTable->FwResourceVersion  = EFI_SYSTEM_RESOURCE_TABLE_FIRMWARE_RESOURCE_VERSION;
-  EsrtTable->FwResourceCount    = (UINT32)((NonFmpRepositorySize + FmpRepositorySize) / sizeof(EFI_SYSTEM_RESOURCE_ENTRY));
-  EsrtTable->FwResourceCountMax = PcdGet32(PcdMaxNonFmpEsrtCacheNum) + PcdGet32(PcdMaxFmpEsrtCacheNum);
+  EsrtTable->FwResourceCount    = (UINT32)((NonFmpRepositorySize + FmpRepositorySize) / sizeof (EFI_SYSTEM_RESOURCE_ENTRY));
+  EsrtTable->FwResourceCountMax = PcdGet32 (PcdMaxNonFmpEsrtCacheNum) + PcdGet32 (PcdMaxFmpEsrtCacheNum);
 
-  if (NonFmpRepositorySize != 0 && NonFmpEsrtRepository != NULL) {
-    CopyMem(EsrtTable + 1, NonFmpEsrtRepository, NonFmpRepositorySize);
+  if ((NonFmpRepositorySize != 0) && (NonFmpEsrtRepository != NULL)) {
+    CopyMem (EsrtTable + 1, NonFmpEsrtRepository, NonFmpRepositorySize);
   }
 
-  if (FmpRepositorySize != 0 && FmpEsrtRepository != NULL) {
-    CopyMem((UINT8 *)(EsrtTable + 1) + NonFmpRepositorySize, FmpEsrtRepository, FmpRepositorySize);
+  if ((FmpRepositorySize != 0) && (FmpEsrtRepository != NULL)) {
+    CopyMem ((UINT8 *)(EsrtTable + 1) + NonFmpRepositorySize, FmpEsrtRepository, FmpRepositorySize);
   }
 
   //
@@ -597,16 +599,16 @@ EsrtReadyToBootEventNotify (
   //
   // Only one successful install
   //
-  gBS->CloseEvent(Event);
+  gBS->CloseEvent (Event);
 
 EXIT:
 
   if (FmpEsrtRepository != NULL) {
-    FreePool(FmpEsrtRepository);
+    FreePool (FmpEsrtRepository);
   }
 
   if (NonFmpEsrtRepository != NULL) {
-    FreePool(NonFmpEsrtRepository);
+    FreePool (NonFmpEsrtRepository);
   }
 }
 
@@ -624,13 +626,13 @@ EXIT:
 EFI_STATUS
 EFIAPI
 EsrtDxeEntryPoint (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                    Status;
+  EFI_STATUS  Status;
 
-  EfiInitializeLock (&mPrivate.FmpLock,    TPL_CALLBACK);
+  EfiInitializeLock (&mPrivate.FmpLock, TPL_CALLBACK);
   EfiInitializeLock (&mPrivate.NonFmpLock, TPL_CALLBACK);
 
   //

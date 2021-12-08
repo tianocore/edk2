@@ -54,8 +54,8 @@ MpInitLibInitialize (
 EFI_STATUS
 EFIAPI
 MpInitLibGetNumberOfProcessors (
-  OUT UINTN                     *NumberOfProcessors,       OPTIONAL
-  OUT UINTN                     *NumberOfEnabledProcessors OPTIONAL
+  OUT UINTN  *NumberOfProcessors        OPTIONAL,
+  OUT UINTN  *NumberOfEnabledProcessors OPTIONAL
   );
 
 /**
@@ -161,12 +161,12 @@ MpInitLibGetProcessorInfo (
 EFI_STATUS
 EFIAPI
 MpInitLibStartupAllAPs (
-  IN  EFI_AP_PROCEDURE          Procedure,
-  IN  BOOLEAN                   SingleThread,
-  IN  EFI_EVENT                 WaitEvent               OPTIONAL,
-  IN  UINTN                     TimeoutInMicroseconds,
-  IN  VOID                      *ProcedureArgument      OPTIONAL,
-  OUT UINTN                     **FailedCpuList         OPTIONAL
+  IN  EFI_AP_PROCEDURE  Procedure,
+  IN  BOOLEAN           SingleThread,
+  IN  EFI_EVENT         WaitEvent               OPTIONAL,
+  IN  UINTN             TimeoutInMicroseconds,
+  IN  VOID              *ProcedureArgument      OPTIONAL,
+  OUT UINTN             **FailedCpuList         OPTIONAL
   );
 
 /**
@@ -243,12 +243,12 @@ MpInitLibStartupAllAPs (
 EFI_STATUS
 EFIAPI
 MpInitLibStartupThisAP (
-  IN  EFI_AP_PROCEDURE          Procedure,
-  IN  UINTN                     ProcessorNumber,
-  IN  EFI_EVENT                 WaitEvent               OPTIONAL,
-  IN  UINTN                     TimeoutInMicroseconds,
-  IN  VOID                      *ProcedureArgument      OPTIONAL,
-  OUT BOOLEAN                   *Finished               OPTIONAL
+  IN  EFI_AP_PROCEDURE  Procedure,
+  IN  UINTN             ProcessorNumber,
+  IN  EFI_EVENT         WaitEvent               OPTIONAL,
+  IN  UINTN             TimeoutInMicroseconds,
+  IN  VOID              *ProcedureArgument      OPTIONAL,
+  OUT BOOLEAN           *Finished               OPTIONAL
   );
 
 /**
@@ -280,8 +280,8 @@ MpInitLibStartupThisAP (
 EFI_STATUS
 EFIAPI
 MpInitLibSwitchBSP (
-  IN UINTN                     ProcessorNumber,
-  IN BOOLEAN                   EnableOldBSP
+  IN UINTN    ProcessorNumber,
+  IN BOOLEAN  EnableOldBSP
   );
 
 /**
@@ -317,9 +317,9 @@ MpInitLibSwitchBSP (
 EFI_STATUS
 EFIAPI
 MpInitLibEnableDisableAP (
-  IN  UINTN                     ProcessorNumber,
-  IN  BOOLEAN                   EnableAP,
-  IN  UINT32                    *HealthFlag OPTIONAL
+  IN  UINTN    ProcessorNumber,
+  IN  BOOLEAN  EnableAP,
+  IN  UINT32   *HealthFlag OPTIONAL
   );
 
 /**
@@ -341,7 +341,7 @@ MpInitLibEnableDisableAP (
 EFI_STATUS
 EFIAPI
 MpInitLibWhoAmI (
-  OUT UINTN                    *ProcessorNumber
+  OUT UINTN  *ProcessorNumber
   );
 
 /**
@@ -373,9 +373,9 @@ MpInitLibWhoAmI (
 EFI_STATUS
 EFIAPI
 MpInitLibStartupAllCPUs (
-  IN  EFI_AP_PROCEDURE          Procedure,
-  IN  UINTN                     TimeoutInMicroseconds,
-  IN  VOID                      *ProcedureArgument      OPTIONAL
+  IN  EFI_AP_PROCEDURE  Procedure,
+  IN  UINTN             TimeoutInMicroseconds,
+  IN  VOID              *ProcedureArgument      OPTIONAL
   );
 
 #endif

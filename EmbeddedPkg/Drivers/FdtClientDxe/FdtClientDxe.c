@@ -26,14 +26,14 @@ STATIC
 EFI_STATUS
 EFIAPI
 GetNodeProperty (
-  IN  FDT_CLIENT_PROTOCOL     *This,
-  IN  INT32                   Node,
-  IN  CONST CHAR8             *PropertyName,
-  OUT CONST VOID              **Prop,
-  OUT UINT32                  *PropSize OPTIONAL
+  IN  FDT_CLIENT_PROTOCOL  *This,
+  IN  INT32                Node,
+  IN  CONST CHAR8          *PropertyName,
+  OUT CONST VOID           **Prop,
+  OUT UINT32               *PropSize OPTIONAL
   )
 {
-  INT32 Len;
+  INT32  Len;
 
   ASSERT (mDeviceTreeBase != NULL);
   ASSERT (Prop != NULL);
@@ -46,6 +46,7 @@ GetNodeProperty (
   if (PropSize != NULL) {
     *PropSize = Len;
   }
+
   return EFI_SUCCESS;
 }
 
@@ -53,14 +54,14 @@ STATIC
 EFI_STATUS
 EFIAPI
 SetNodeProperty (
-  IN  FDT_CLIENT_PROTOCOL     *This,
-  IN  INT32                   Node,
-  IN  CONST CHAR8             *PropertyName,
-  IN  CONST VOID              *Prop,
-  IN  UINT32                  PropSize
+  IN  FDT_CLIENT_PROTOCOL  *This,
+  IN  INT32                Node,
+  IN  CONST CHAR8          *PropertyName,
+  IN  CONST VOID           *Prop,
+  IN  UINT32               PropSize
   )
 {
-  INT32 Ret;
+  INT32  Ret;
 
   ASSERT (mDeviceTreeBase != NULL);
 
@@ -75,11 +76,11 @@ SetNodeProperty (
 STATIC
 BOOLEAN
 IsNodeEnabled (
-  INT32                       Node
+  INT32  Node
   )
 {
-  CONST CHAR8   *NodeStatus;
-  INT32         Len;
+  CONST CHAR8  *NodeStatus;
+  INT32        Len;
 
   //
   // A missing status property implies 'ok' so ignore any errors that
@@ -90,12 +91,15 @@ IsNodeEnabled (
   if (NodeStatus == NULL) {
     return TRUE;
   }
-  if (Len >= 5 && AsciiStrCmp (NodeStatus, "okay") == 0) {
+
+  if ((Len >= 5) && (AsciiStrCmp (NodeStatus, "okay") == 0)) {
     return TRUE;
   }
-  if (Len >= 3 && AsciiStrCmp (NodeStatus, "ok") == 0) {
+
+  if ((Len >= 3) && (AsciiStrCmp (NodeStatus, "ok") == 0)) {
     return TRUE;
   }
+
   return FALSE;
 }
 
@@ -103,20 +107,20 @@ STATIC
 EFI_STATUS
 EFIAPI
 FindNextCompatibleNode (
-  IN  FDT_CLIENT_PROTOCOL     *This,
-  IN  CONST CHAR8             *CompatibleString,
-  IN  INT32                   PrevNode,
-  OUT INT32                   *Node
+  IN  FDT_CLIENT_PROTOCOL  *This,
+  IN  CONST CHAR8          *CompatibleString,
+  IN  INT32                PrevNode,
+  OUT INT32                *Node
   )
 {
-  INT32          Prev, Next;
-  CONST CHAR8    *Type, *Compatible;
-  INT32          Len;
+  INT32        Prev, Next;
+  CONST CHAR8  *Type, *Compatible;
+  INT32        Len;
 
   ASSERT (mDeviceTreeBase != NULL);
   ASSERT (Node != NULL);
 
-  for (Prev = PrevNode;; Prev = Next) {
+  for (Prev = PrevNode; ; Prev = Next) {
     Next = fdt_next_node (mDeviceTreeBase, Prev, NULL);
     if (Next < 0) {
       break;
@@ -136,13 +140,15 @@ FindNextCompatibleNode (
     // compatible strings so check each one
     //
     for (Compatible = Type; Compatible < Type + Len && *Compatible;
-         Compatible += 1 + AsciiStrLen (Compatible)) {
+         Compatible += 1 + AsciiStrLen (Compatible))
+    {
       if (AsciiStrCmp (CompatibleString, Compatible) == 0) {
         *Node = Next;
         return EFI_SUCCESS;
       }
     }
   }
+
   return EFI_NOT_FOUND;
 }
 
@@ -150,9 +156,9 @@ STATIC
 EFI_STATUS
 EFIAPI
 FindCompatibleNode (
-  IN  FDT_CLIENT_PROTOCOL     *This,
-  IN  CONST CHAR8             *CompatibleString,
-  OUT INT32                   *Node
+  IN  FDT_CLIENT_PROTOCOL  *This,
+  IN  CONST CHAR8          *CompatibleString,
+  OUT INT32                *Node
   )
 {
   return FindNextCompatibleNode (This, CompatibleString, 0, Node);
@@ -162,15 +168,15 @@ STATIC
 EFI_STATUS
 EFIAPI
 FindCompatibleNodeProperty (
-  IN  FDT_CLIENT_PROTOCOL     *This,
-  IN  CONST CHAR8             *CompatibleString,
-  IN  CONST CHAR8             *PropertyName,
-  OUT CONST VOID              **Prop,
-  OUT UINT32                  *PropSize OPTIONAL
+  IN  FDT_CLIENT_PROTOCOL  *This,
+  IN  CONST CHAR8          *CompatibleString,
+  IN  CONST CHAR8          *PropertyName,
+  OUT CONST VOID           **Prop,
+  OUT UINT32               *PropSize OPTIONAL
   )
 {
-  EFI_STATUS        Status;
-  INT32             Node;
+  EFI_STATUS  Status;
+  INT32       Node;
 
   Status = FindCompatibleNode (This, CompatibleString, &Node);
   if (EFI_ERROR (Status)) {
@@ -184,15 +190,15 @@ STATIC
 EFI_STATUS
 EFIAPI
 FindCompatibleNodeReg (
-  IN  FDT_CLIENT_PROTOCOL     *This,
-  IN  CONST CHAR8             *CompatibleString,
-  OUT CONST VOID              **Reg,
-  OUT UINTN                   *AddressCells,
-  OUT UINTN                   *SizeCells,
-  OUT UINT32                  *RegSize
+  IN  FDT_CLIENT_PROTOCOL  *This,
+  IN  CONST CHAR8          *CompatibleString,
+  OUT CONST VOID           **Reg,
+  OUT UINTN                *AddressCells,
+  OUT UINTN                *SizeCells,
+  OUT UINT32               *RegSize
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   ASSERT (RegSize != NULL);
 
@@ -201,21 +207,30 @@ FindCompatibleNodeReg (
   // 8 byte quantities for base and size, respectively.
   // TODO use #cells root properties instead
   //
-  Status = FindCompatibleNodeProperty (This, CompatibleString, "reg", Reg,
-             RegSize);
+  Status = FindCompatibleNodeProperty (
+             This,
+             CompatibleString,
+             "reg",
+             Reg,
+             RegSize
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   if ((*RegSize % 16) != 0) {
-    DEBUG ((EFI_D_ERROR,
+    DEBUG ((
+      DEBUG_ERROR,
       "%a: '%a' compatible node has invalid 'reg' property (size == 0x%x)\n",
-      __FUNCTION__, CompatibleString, *RegSize));
+      __FUNCTION__,
+      CompatibleString,
+      *RegSize
+      ));
     return EFI_NOT_FOUND;
   }
 
   *AddressCells = 2;
-  *SizeCells = 2;
+  *SizeCells    = 2;
 
   return EFI_SUCCESS;
 }
@@ -224,24 +239,24 @@ STATIC
 EFI_STATUS
 EFIAPI
 FindNextMemoryNodeReg (
-  IN  FDT_CLIENT_PROTOCOL     *This,
-  IN  INT32                   PrevNode,
-  OUT INT32                   *Node,
-  OUT CONST VOID              **Reg,
-  OUT UINTN                   *AddressCells,
-  OUT UINTN                   *SizeCells,
-  OUT UINT32                  *RegSize
+  IN  FDT_CLIENT_PROTOCOL  *This,
+  IN  INT32                PrevNode,
+  OUT INT32                *Node,
+  OUT CONST VOID           **Reg,
+  OUT UINTN                *AddressCells,
+  OUT UINTN                *SizeCells,
+  OUT UINT32               *RegSize
   )
 {
-  INT32          Prev, Next;
-  CONST CHAR8    *DeviceType;
-  INT32          Len;
-  EFI_STATUS     Status;
+  INT32        Prev, Next;
+  CONST CHAR8  *DeviceType;
+  INT32        Len;
+  EFI_STATUS   Status;
 
   ASSERT (mDeviceTreeBase != NULL);
   ASSERT (Node != NULL);
 
-  for (Prev = PrevNode;; Prev = Next) {
+  for (Prev = PrevNode; ; Prev = Next) {
     Next = fdt_next_node (mDeviceTreeBase, Prev, NULL);
     if (Next < 0) {
       break;
@@ -253,7 +268,7 @@ FindNextMemoryNodeReg (
     }
 
     DeviceType = fdt_getprop (mDeviceTreeBase, Next, "device_type", &Len);
-    if (DeviceType != NULL && AsciiStrCmp (DeviceType, "memory") == 0) {
+    if ((DeviceType != NULL) && (AsciiStrCmp (DeviceType, "memory") == 0)) {
       //
       // Get the 'reg' property of this memory node. For now, we will assume
       // 8 byte quantities for base and size, respectively.
@@ -261,24 +276,31 @@ FindNextMemoryNodeReg (
       //
       Status = GetNodeProperty (This, Next, "reg", Reg, RegSize);
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_WARN,
+        DEBUG ((
+          DEBUG_WARN,
           "%a: ignoring memory node with no 'reg' property\n",
-          __FUNCTION__));
-        continue;
-      }
-      if ((*RegSize % 16) != 0) {
-        DEBUG ((EFI_D_WARN,
-          "%a: ignoring memory node with invalid 'reg' property (size == 0x%x)\n",
-          __FUNCTION__, *RegSize));
+          __FUNCTION__
+          ));
         continue;
       }
 
-      *Node = Next;
+      if ((*RegSize % 16) != 0) {
+        DEBUG ((
+          DEBUG_WARN,
+          "%a: ignoring memory node with invalid 'reg' property (size == 0x%x)\n",
+          __FUNCTION__,
+          *RegSize
+          ));
+        continue;
+      }
+
+      *Node         = Next;
       *AddressCells = 2;
-      *SizeCells = 2;
+      *SizeCells    = 2;
       return EFI_SUCCESS;
     }
   }
+
   return EFI_NOT_FOUND;
 }
 
@@ -286,27 +308,34 @@ STATIC
 EFI_STATUS
 EFIAPI
 FindMemoryNodeReg (
-  IN  FDT_CLIENT_PROTOCOL     *This,
-  OUT INT32                   *Node,
-  OUT CONST VOID              **Reg,
-  OUT UINTN                   *AddressCells,
-  OUT UINTN                   *SizeCells,
-  OUT UINT32                  *RegSize
+  IN  FDT_CLIENT_PROTOCOL  *This,
+  OUT INT32                *Node,
+  OUT CONST VOID           **Reg,
+  OUT UINTN                *AddressCells,
+  OUT UINTN                *SizeCells,
+  OUT UINT32               *RegSize
   )
 {
-  return FindNextMemoryNodeReg (This, 0, Node, Reg, AddressCells, SizeCells,
-           RegSize);
+  return FindNextMemoryNodeReg (
+           This,
+           0,
+           Node,
+           Reg,
+           AddressCells,
+           SizeCells,
+           RegSize
+           );
 }
 
 STATIC
 EFI_STATUS
 EFIAPI
 GetOrInsertChosenNode (
-  IN  FDT_CLIENT_PROTOCOL     *This,
-  OUT INT32                   *Node
+  IN  FDT_CLIENT_PROTOCOL  *This,
+  OUT INT32                *Node
   )
 {
-  INT32 NewNode;
+  INT32  NewNode;
 
   ASSERT (mDeviceTreeBase != NULL);
   ASSERT (Node != NULL);
@@ -325,7 +354,7 @@ GetOrInsertChosenNode (
   return EFI_SUCCESS;
 }
 
-STATIC FDT_CLIENT_PROTOCOL mFdtClientProtocol = {
+STATIC FDT_CLIENT_PROTOCOL  mFdtClientProtocol = {
   GetNodeProperty,
   SetNodeProperty,
   FindCompatibleNode,
@@ -341,13 +370,13 @@ STATIC
 VOID
 EFIAPI
 OnPlatformHasDeviceTree (
-  IN EFI_EVENT Event,
-  IN VOID      *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  EFI_STATUS Status;
-  VOID       *Interface;
-  VOID       *DeviceTreeBase;
+  EFI_STATUS  Status;
+  VOID        *Interface;
+  VOID        *DeviceTreeBase;
 
   Status = gBS->LocateProtocol (
                   &gEdkiiPlatformHasDeviceTreeGuid,
@@ -374,31 +403,36 @@ OnPlatformHasDeviceTree (
 EFI_STATUS
 EFIAPI
 InitializeFdtClientDxe (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  VOID              *Hob;
-  VOID              *DeviceTreeBase;
-  EFI_STATUS        Status;
-  EFI_EVENT         PlatformHasDeviceTreeEvent;
-  VOID              *Registration;
+  VOID        *Hob;
+  VOID        *DeviceTreeBase;
+  EFI_STATUS  Status;
+  EFI_EVENT   PlatformHasDeviceTreeEvent;
+  VOID        *Registration;
 
   Hob = GetFirstGuidHob (&gFdtHobGuid);
-  if (Hob == NULL || GET_GUID_HOB_DATA_SIZE (Hob) != sizeof (UINT64)) {
+  if ((Hob == NULL) || (GET_GUID_HOB_DATA_SIZE (Hob) != sizeof (UINT64))) {
     return EFI_NOT_FOUND;
   }
+
   DeviceTreeBase = (VOID *)(UINTN)*(UINT64 *)GET_GUID_HOB_DATA (Hob);
 
   if (fdt_check_header (DeviceTreeBase) != 0) {
-    DEBUG ((EFI_D_ERROR, "%a: No DTB found @ 0x%p\n", __FUNCTION__,
-      DeviceTreeBase));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: No DTB found @ 0x%p\n",
+      __FUNCTION__,
+      DeviceTreeBase
+      ));
     return EFI_NOT_FOUND;
   }
 
   mDeviceTreeBase = DeviceTreeBase;
 
-  DEBUG ((EFI_D_INFO, "%a: DTB @ 0x%p\n", __FUNCTION__, mDeviceTreeBase));
+  DEBUG ((DEBUG_INFO, "%a: DTB @ 0x%p\n", __FUNCTION__, mDeviceTreeBase));
 
   //
   // Register a protocol notify for the EDKII Platform Has Device Tree

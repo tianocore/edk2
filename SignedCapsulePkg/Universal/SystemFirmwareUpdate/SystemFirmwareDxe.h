@@ -35,32 +35,32 @@
 #include <Library/EdkiiSystemCapsuleLib.h>
 
 typedef struct {
-  UINT32 LastAttemptVersion;
-  UINT32 LastAttemptStatus;
+  UINT32    LastAttemptVersion;
+  UINT32    LastAttemptStatus;
 } SYSTEM_FMP_LAST_ATTEMPT_VARIABLE;
 
 #define SYSTEM_FMP_LAST_ATTEMPT_VARIABLE_NAME  L"SystemLastAttempVar"
 
-#define SYSTEM_FMP_LAST_ATTEMPT_VARIABLE_GUID {0x2f564d6f, 0xcc2c, 0x4838, { 0xb9, 0xa8, 0xbe, 0x59, 0x48, 0xb0, 0x3d, 0x59 }}
+#define SYSTEM_FMP_LAST_ATTEMPT_VARIABLE_GUID  {0x2f564d6f, 0xcc2c, 0x4838, { 0xb9, 0xa8, 0xbe, 0x59, 0x48, 0xb0, 0x3d, 0x59 }}
 
 #define SYSTEM_FMP_PRIVATE_DATA_SIGNATURE  SIGNATURE_32('S', 'Y', 'S', 'F')
 
-#define SYSTEM_FMP_PROTOCOL_GUID {0x6d16624a, 0x26a6, 0x4cb4, { 0x84, 0xfa, 0x6, 0x78, 0x5a, 0x7e, 0x82, 0x6a }}
+#define SYSTEM_FMP_PROTOCOL_GUID  {0x6d16624a, 0x26a6, 0x4cb4, { 0x84, 0xfa, 0x6, 0x78, 0x5a, 0x7e, 0x82, 0x6a }}
 
 //
 // SYSTEM FMP private data structure.
 //
 
 struct _SYSTEM_FMP_PRIVATE_DATA {
-  UINT32                                          Signature;
-  EFI_FIRMWARE_MANAGEMENT_PROTOCOL                Fmp;
-  EFI_HANDLE                                      Handle;
-  UINT8                                           DescriptorCount;
-  EDKII_SYSTEM_FIRMWARE_IMAGE_DESCRIPTOR          *ImageDescriptor;
-  SYSTEM_FMP_LAST_ATTEMPT_VARIABLE                LastAttempt;
+  UINT32                                    Signature;
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL          Fmp;
+  EFI_HANDLE                                Handle;
+  UINT8                                     DescriptorCount;
+  EDKII_SYSTEM_FIRMWARE_IMAGE_DESCRIPTOR    *ImageDescriptor;
+  SYSTEM_FMP_LAST_ATTEMPT_VARIABLE          LastAttempt;
 };
 
-typedef struct _SYSTEM_FMP_PRIVATE_DATA  SYSTEM_FMP_PRIVATE_DATA;
+typedef struct _SYSTEM_FMP_PRIVATE_DATA SYSTEM_FMP_PRIVATE_DATA;
 
 /**
   Returns a pointer to the SYSTEM_FMP_PRIVATE_DATA structure from the input a as Fmp.
@@ -80,50 +80,48 @@ typedef struct _SYSTEM_FMP_PRIVATE_DATA  SYSTEM_FMP_PRIVATE_DATA;
   SYSTEM_FMP_PRIVATE_DATA_SIGNATURE \
   )
 
-
 //
 // Update data
 //
 
 typedef struct {
-  UINTN                           NumOfUpdates;
+  UINTN    NumOfUpdates;
 } CONFIG_HEADER;
 
 typedef struct {
-  UINTN                           Index;
-  PLATFORM_FIRMWARE_TYPE          FirmwareType;
-  FLASH_ADDRESS_TYPE              AddressType;
-  EFI_GUID                        FileGuid;
-  EFI_PHYSICAL_ADDRESS            BaseAddress;
-  UINTN                           Length;
-  UINTN                           ImageOffset;
+  UINTN                     Index;
+  PLATFORM_FIRMWARE_TYPE    FirmwareType;
+  FLASH_ADDRESS_TYPE        AddressType;
+  EFI_GUID                  FileGuid;
+  EFI_PHYSICAL_ADDRESS      BaseAddress;
+  UINTN                     Length;
+  UINTN                     ImageOffset;
 } UPDATE_CONFIG_DATA;
 
 //
 // System Firmware Update SMM Communication
 //
 
-#define SYSTEM_FIRMWARE_UPDATE_COMMUNICATION_FUNCTION_SET_IMAGE 1
+#define SYSTEM_FIRMWARE_UPDATE_COMMUNICATION_FUNCTION_SET_IMAGE  1
 
 typedef struct {
-  UINTN       Function;
-  EFI_STATUS  ReturnStatus;
-//UINT8       Data[];
+  UINTN         Function;
+  EFI_STATUS    ReturnStatus;
+  // UINT8       Data[];
 } SYSTEM_FIRMWARE_UPDATE_COMMUNICATION_HEAD;
 
-#define  ABORT_REASON_MAX_SIZE              0x40  // UnicodeStringSize including final L'\0'
+#define  ABORT_REASON_MAX_SIZE  0x40              // UnicodeStringSize including final L'\0'
 
 #define  CAPSULE_IMAGE_ADDITIONAL_MAX_SIZE  (0x20020 + 0xA0000) // Additional size for Capsule Header, FV block alignment + DispatchImage.
 
 typedef struct {
-  UINT8       ImageIndex;
-  UINTN       ImageSize;
-  UINTN       AbortReasonSize;
-  UINT32      LastAttemptVersion;
-  UINT32      LastAttemptStatus;
-//UINT8       Data[AbortReasonMaxSize + ImageSize];
+  UINT8     ImageIndex;
+  UINTN     ImageSize;
+  UINTN     AbortReasonSize;
+  UINT32    LastAttemptVersion;
+  UINT32    LastAttemptStatus;
+  // UINT8       Data[AbortReasonMaxSize + ImageSize];
 } SYSTEM_FIRMWARE_UPDATE_COMMUNICATION_SET_IMAGE;
-
 
 /**
   Returns information about the current firmware image(s) of the device.
@@ -166,14 +164,14 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 FmpGetImageInfo (
-  IN EFI_FIRMWARE_MANAGEMENT_PROTOCOL       *This,
-  IN OUT    UINTN                           *ImageInfoSize,
-  IN OUT    EFI_FIRMWARE_IMAGE_DESCRIPTOR   *ImageInfo,
-  OUT       UINT32                          *DescriptorVersion,
-  OUT       UINT8                           *DescriptorCount,
-  OUT       UINTN                           *DescriptorSize,
-  OUT       UINT32                          *PackageVersion,
-  OUT       CHAR16                          **PackageVersionName
+  IN EFI_FIRMWARE_MANAGEMENT_PROTOCOL      *This,
+  IN OUT    UINTN                          *ImageInfoSize,
+  IN OUT    EFI_FIRMWARE_IMAGE_DESCRIPTOR  *ImageInfo,
+  OUT       UINT32                         *DescriptorVersion,
+  OUT       UINT8                          *DescriptorCount,
+  OUT       UINTN                          *DescriptorSize,
+  OUT       UINT32                         *PackageVersion,
+  OUT       CHAR16                         **PackageVersionName
   );
 
 /**
@@ -257,13 +255,13 @@ FmpGetImage (
 EFI_STATUS
 EFIAPI
 FmpSetImage (
-  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL                 *This,
-  IN  UINT8                                            ImageIndex,
-  IN  CONST VOID                                       *Image,
-  IN  UINTN                                            ImageSize,
-  IN  CONST VOID                                       *VendorCode,
-  IN  EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS    Progress,
-  OUT CHAR16                                           **AbortReason
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL               *This,
+  IN  UINT8                                          ImageIndex,
+  IN  CONST VOID                                     *Image,
+  IN  UINTN                                          ImageSize,
+  IN  CONST VOID                                     *VendorCode,
+  IN  EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress,
+  OUT CHAR16                                         **AbortReason
   );
 
 /**
@@ -331,12 +329,12 @@ FmpCheckImage (
 EFI_STATUS
 EFIAPI
 FmpGetPackageInfo (
-  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL *This,
-  OUT UINT32                           *PackageVersion,
-  OUT CHAR16                           **PackageVersionName,
-  OUT UINT32                           *PackageVersionNameMaxLen,
-  OUT UINT64                           *AttributesSupported,
-  OUT UINT64                           *AttributesSetting
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *This,
+  OUT UINT32                            *PackageVersion,
+  OUT CHAR16                            **PackageVersionName,
+  OUT UINT32                            *PackageVersionNameMaxLen,
+  OUT UINT64                            *AttributesSupported,
+  OUT UINT64                            *AttributesSetting
   );
 
 /**
@@ -373,12 +371,12 @@ FmpGetPackageInfo (
 EFI_STATUS
 EFIAPI
 FmpSetPackageInfo (
-  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL   *This,
-  IN  CONST VOID                         *Image,
-  IN  UINTN                              ImageSize,
-  IN  CONST VOID                         *VendorCode,
-  IN  UINT32                             PackageVersion,
-  IN  CONST CHAR16                       *PackageVersionName
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *This,
+  IN  CONST VOID                        *Image,
+  IN  UINTN                             ImageSize,
+  IN  CONST VOID                        *VendorCode,
+  IN  UINT32                            PackageVersion,
+  IN  CONST CHAR16                      *PackageVersionName
   );
 
 /**
@@ -393,9 +391,8 @@ InitializePrivateData (
   IN SYSTEM_FMP_PRIVATE_DATA  *SystemFmpPrivate
   );
 
-extern EFI_GUID gSystemFmpLastAttemptVariableGuid;
-extern EFI_GUID mCurrentImageTypeId;
-extern EFI_GUID gSystemFmpProtocolGuid;
+extern EFI_GUID  gSystemFmpLastAttemptVariableGuid;
+extern EFI_GUID  mCurrentImageTypeId;
+extern EFI_GUID  gSystemFmpProtocolGuid;
 
 #endif
-

@@ -11,7 +11,7 @@
 //
 // EFI Component Name Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL gSdMmcPciHcComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gSdMmcPciHcComponentName = {
   SdMmcPciHcComponentNameGetDriverName,
   SdMmcPciHcComponentNameGetControllerName,
   "eng"
@@ -20,20 +20,20 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL gSdMmcPciHcComponentNa
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gSdMmcPciHcComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)     SdMmcPciHcComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) SdMmcPciHcComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gSdMmcPciHcComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)SdMmcPciHcComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)SdMmcPciHcComponentNameGetControllerName,
   "en"
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mSdMmcPciHcDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mSdMmcPciHcDriverNameTable[] = {
   { "eng;en", L"Edkii Sd/Mmc Host Controller Driver" },
-  { NULL , NULL }
+  { NULL,     NULL                                   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mSdMmcPciHcControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mSdMmcPciHcControllerNameTable[] = {
   { "eng;en", L"Edkii Sd/Mmc Host Controller" },
-  { NULL , NULL }
+  { NULL,     NULL                            }
 };
 
 /**
@@ -78,9 +78,9 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mSdMmcPciHcControllerName
 EFI_STATUS
 EFIAPI
 SdMmcPciHcComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL     *This,
-  IN  CHAR8                           *Language,
-  OUT CHAR16                          **DriverName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
   )
 {
   return LookupUnicodeString2 (
@@ -163,16 +163,16 @@ SdMmcPciHcComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 SdMmcPciHcComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL     *This,
-  IN  EFI_HANDLE                      ControllerHandle,
-  IN  EFI_HANDLE                      ChildHandle, OPTIONAL
-  IN  CHAR8                           *Language,
-  OUT CHAR16                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle  OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS         Status;
+  EFI_STATUS  Status;
 
-  if (Language == NULL || ControllerName == NULL) {
+  if ((Language == NULL) || (ControllerName == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 

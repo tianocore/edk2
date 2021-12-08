@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "Snp.h"
 
 /**
@@ -37,72 +36,72 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 PxeReceive (
-  SNP_DRIVER      *Snp,
-  VOID            *Buffer,
-  UINTN           *BufferSize,
-  UINTN           *HeaderSize,
-  EFI_MAC_ADDRESS *SrcAddr,
-  EFI_MAC_ADDRESS *DestAddr,
-  UINT16          *Protocol
+  SNP_DRIVER       *Snp,
+  VOID             *Buffer,
+  UINTN            *BufferSize,
+  UINTN            *HeaderSize,
+  EFI_MAC_ADDRESS  *SrcAddr,
+  EFI_MAC_ADDRESS  *DestAddr,
+  UINT16           *Protocol
   )
 {
-  PXE_CPB_RECEIVE *Cpb;
-  PXE_DB_RECEIVE  *Db;
-  UINTN           BuffSize;
+  PXE_CPB_RECEIVE  *Cpb;
+  PXE_DB_RECEIVE   *Db;
+  UINTN            BuffSize;
 
-  Cpb       = Snp->Cpb;
-  Db        = Snp->Db;
-  BuffSize  = *BufferSize;
+  Cpb      = Snp->Cpb;
+  Db       = Snp->Db;
+  BuffSize = *BufferSize;
 
-  Cpb->BufferAddr = (UINT64)(UINTN) Buffer;
-  Cpb->BufferLen  = (UINT32) *BufferSize;
+  Cpb->BufferAddr = (UINT64)(UINTN)Buffer;
+  Cpb->BufferLen  = (UINT32)*BufferSize;
 
-  Cpb->reserved       = 0;
+  Cpb->reserved = 0;
 
-  Snp->Cdb.OpCode     = PXE_OPCODE_RECEIVE;
-  Snp->Cdb.OpFlags    = PXE_OPFLAGS_NOT_USED;
+  Snp->Cdb.OpCode  = PXE_OPCODE_RECEIVE;
+  Snp->Cdb.OpFlags = PXE_OPFLAGS_NOT_USED;
 
-  Snp->Cdb.CPBsize    = (UINT16) sizeof (PXE_CPB_RECEIVE);
-  Snp->Cdb.CPBaddr    = (UINT64)(UINTN) Cpb;
+  Snp->Cdb.CPBsize = (UINT16)sizeof (PXE_CPB_RECEIVE);
+  Snp->Cdb.CPBaddr = (UINT64)(UINTN)Cpb;
 
-  Snp->Cdb.DBsize     = (UINT16) sizeof (PXE_DB_RECEIVE);
-  Snp->Cdb.DBaddr     = (UINT64)(UINTN) Db;
+  Snp->Cdb.DBsize = (UINT16)sizeof (PXE_DB_RECEIVE);
+  Snp->Cdb.DBaddr = (UINT64)(UINTN)Db;
 
-  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum      = Snp->IfNum;
-  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum     = Snp->IfNum;
+  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.receive ()  "));
+  DEBUG ((DEBUG_NET, "\nsnp->undi.receive ()  "));
 
-  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
 
   switch (Snp->Cdb.StatCode) {
-  case PXE_STATCODE_SUCCESS:
-    break;
+    case PXE_STATCODE_SUCCESS:
+      break;
 
-  case PXE_STATCODE_NO_DATA:
-    DEBUG (
-      (EFI_D_NET,
-      "\nsnp->undi.receive ()  %xh:%xh\n",
-      Snp->Cdb.StatFlags,
-      Snp->Cdb.StatCode)
-      );
+    case PXE_STATCODE_NO_DATA:
+      DEBUG (
+        (DEBUG_NET,
+         "\nsnp->undi.receive ()  %xh:%xh\n",
+         Snp->Cdb.StatFlags,
+         Snp->Cdb.StatCode)
+        );
 
-    return EFI_NOT_READY;
+      return EFI_NOT_READY;
 
-  default:
-    DEBUG (
-      (EFI_D_ERROR,
-      "\nsnp->undi.receive()  %xh:%xh\n",
-      Snp->Cdb.StatFlags,
-      Snp->Cdb.StatCode)
-      );
+    default:
+      DEBUG (
+        (DEBUG_ERROR,
+         "\nsnp->undi.receive()  %xh:%xh\n",
+         Snp->Cdb.StatFlags,
+         Snp->Cdb.StatCode)
+        );
 
-    return EFI_DEVICE_ERROR;
+      return EFI_DEVICE_ERROR;
   }
 
   *BufferSize = Db->FrameLen;
@@ -123,7 +122,7 @@ PxeReceive (
     //
     // We need to do the byte swapping
     //
-    *Protocol = (UINT16) PXE_SWAP_UINT16 (Db->Protocol);
+    *Protocol = (UINT16)PXE_SWAP_UINT16 (Db->Protocol);
   }
 
   //
@@ -190,13 +189,13 @@ PxeReceive (
 EFI_STATUS
 EFIAPI
 SnpUndi32Receive (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
-  OUT UINTN                      *HeaderSize OPTIONAL,
-  IN OUT UINTN                   *BufferSize,
-  OUT VOID                       *Buffer,
-  OUT EFI_MAC_ADDRESS            *SrcAddr OPTIONAL,
-  OUT EFI_MAC_ADDRESS            *DestAddr OPTIONAL,
-  OUT UINT16                     *Protocol OPTIONAL
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  OUT UINTN                       *HeaderSize OPTIONAL,
+  IN OUT UINTN                    *BufferSize,
+  OUT VOID                        *Buffer,
+  OUT EFI_MAC_ADDRESS             *SrcAddr OPTIONAL,
+  OUT EFI_MAC_ADDRESS             *DestAddr OPTIONAL,
+  OUT UINT16                      *Protocol OPTIONAL
   )
 {
   SNP_DRIVER  *Snp;
@@ -212,16 +211,16 @@ SnpUndi32Receive (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   switch (Snp->Mode.State) {
-  case EfiSimpleNetworkInitialized:
-    break;
+    case EfiSimpleNetworkInitialized:
+      break;
 
-  case EfiSimpleNetworkStopped:
-    Status = EFI_NOT_STARTED;
-    goto ON_EXIT;
+    case EfiSimpleNetworkStopped:
+      Status = EFI_NOT_STARTED;
+      goto ON_EXIT;
 
-  default:
-    Status = EFI_DEVICE_ERROR;
-    goto ON_EXIT;
+    default:
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
   }
 
   if ((BufferSize == NULL) || (Buffer == NULL)) {

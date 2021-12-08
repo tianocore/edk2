@@ -18,6 +18,6 @@
     0x296eb418, 0xc4c8, 0x4e05, { 0xab, 0x59, 0x39, 0xe8, 0xaf, 0x56, 0xf0, 0xa } \
   }
 
-extern EFI_GUID gEdkiiSmmExitBootServicesProtocolGuid;
+extern EFI_GUID  gEdkiiSmmExitBootServicesProtocolGuid;
 
 #endif

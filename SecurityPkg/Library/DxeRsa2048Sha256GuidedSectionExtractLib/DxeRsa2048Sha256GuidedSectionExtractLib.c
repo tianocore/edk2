@@ -27,19 +27,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// RSA 2048 SHA 256 Guided Section header
 ///
 typedef struct {
-  EFI_GUID_DEFINED_SECTION        GuidedSectionHeader;     ///< EFI guided section header
-  EFI_CERT_BLOCK_RSA_2048_SHA256  CertBlockRsa2048Sha256;  ///< RSA 2048-bit Signature
+  EFI_GUID_DEFINED_SECTION          GuidedSectionHeader;    ///< EFI guided section header
+  EFI_CERT_BLOCK_RSA_2048_SHA256    CertBlockRsa2048Sha256; ///< RSA 2048-bit Signature
 } RSA_2048_SHA_256_SECTION_HEADER;
 
 typedef struct {
-  EFI_GUID_DEFINED_SECTION2       GuidedSectionHeader;     ///< EFI guided section header
-  EFI_CERT_BLOCK_RSA_2048_SHA256  CertBlockRsa2048Sha256;  ///< RSA 2048-bit Signature
+  EFI_GUID_DEFINED_SECTION2         GuidedSectionHeader;    ///< EFI guided section header
+  EFI_CERT_BLOCK_RSA_2048_SHA256    CertBlockRsa2048Sha256; ///< RSA 2048-bit Signature
 } RSA_2048_SHA_256_SECTION2_HEADER;
 
 ///
 /// Public Exponent of RSA Key.
 ///
-CONST UINT8 mRsaE[] = { 0x01, 0x00, 0x01 };
+CONST UINT8  mRsaE[] = { 0x01, 0x00, 0x01 };
 
 /**
 
@@ -71,31 +71,37 @@ Rsa2048Sha256GuidedSectionGetInfo (
     // Check whether the input guid section is recognized.
     //
     if (!CompareGuid (
-        &gEfiCertTypeRsa2048Sha256Guid,
-        &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid))) {
+           &gEfiCertTypeRsa2048Sha256Guid,
+           &(((EFI_GUID_DEFINED_SECTION2 *)InputSection)->SectionDefinitionGuid)
+           ))
+    {
       return EFI_INVALID_PARAMETER;
     }
+
     //
     // Retrieve the size and attribute of the input section data.
     //
-    *SectionAttribute  = ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->Attributes;
+    *SectionAttribute  = ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->Attributes;
     *ScratchBufferSize = 0;
-    *OutputBufferSize  = SECTION2_SIZE (InputSection) - sizeof(RSA_2048_SHA_256_SECTION2_HEADER);
+    *OutputBufferSize  = SECTION2_SIZE (InputSection) - sizeof (RSA_2048_SHA_256_SECTION2_HEADER);
   } else {
     //
     // Check whether the input guid section is recognized.
     //
     if (!CompareGuid (
-        &gEfiCertTypeRsa2048Sha256Guid,
-        &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+           &gEfiCertTypeRsa2048Sha256Guid,
+           &(((EFI_GUID_DEFINED_SECTION *)InputSection)->SectionDefinitionGuid)
+           ))
+    {
       return EFI_INVALID_PARAMETER;
     }
+
     //
     // Retrieve the size and attribute of the input section data.
     //
-    *SectionAttribute  = ((EFI_GUID_DEFINED_SECTION *) InputSection)->Attributes;
+    *SectionAttribute  = ((EFI_GUID_DEFINED_SECTION *)InputSection)->Attributes;
     *ScratchBufferSize = 0;
-    *OutputBufferSize  = SECTION_SIZE (InputSection) - sizeof(RSA_2048_SHA_256_SECTION_HEADER);
+    *OutputBufferSize  = SECTION_SIZE (InputSection) - sizeof (RSA_2048_SHA_256_SECTION_HEADER);
   }
 
   return EFI_SUCCESS;
@@ -123,7 +129,7 @@ EFIAPI
 Rsa2048Sha256GuidedSectionHandler (
   IN CONST  VOID    *InputSection,
   OUT       VOID    **OutputBuffer,
-  IN        VOID    *ScratchBuffer,        OPTIONAL
+  IN        VOID    *ScratchBuffer         OPTIONAL,
   OUT       UINT32  *AuthenticationStatus
   )
 {
@@ -146,15 +152,17 @@ Rsa2048Sha256GuidedSectionHandler (
     // Check whether the input guid section is recognized.
     //
     if (!CompareGuid (
-        &gEfiCertTypeRsa2048Sha256Guid,
-        &(((EFI_GUID_DEFINED_SECTION2 *)InputSection)->SectionDefinitionGuid))) {
+           &gEfiCertTypeRsa2048Sha256Guid,
+           &(((EFI_GUID_DEFINED_SECTION2 *)InputSection)->SectionDefinitionGuid)
+           ))
+    {
       return EFI_INVALID_PARAMETER;
     }
 
     //
     // Get the RSA 2048 SHA 256 information.
     //
-    CertBlockRsa2048Sha256 = &((RSA_2048_SHA_256_SECTION2_HEADER *) InputSection)->CertBlockRsa2048Sha256;
+    CertBlockRsa2048Sha256 = &((RSA_2048_SHA_256_SECTION2_HEADER *)InputSection)->CertBlockRsa2048Sha256;
     OutputBufferSize       = SECTION2_SIZE (InputSection) - sizeof (RSA_2048_SHA_256_SECTION2_HEADER);
     if ((((EFI_GUID_DEFINED_SECTION *)InputSection)->Attributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) != 0) {
       PERF_INMODULE_BEGIN ("DxeRsaCopy");
@@ -174,8 +182,10 @@ Rsa2048Sha256GuidedSectionHandler (
     // Check whether the input guid section is recognized.
     //
     if (!CompareGuid (
-        &gEfiCertTypeRsa2048Sha256Guid,
-        &(((EFI_GUID_DEFINED_SECTION *)InputSection)->SectionDefinitionGuid))) {
+           &gEfiCertTypeRsa2048Sha256Guid,
+           &(((EFI_GUID_DEFINED_SECTION *)InputSection)->SectionDefinitionGuid)
+           ))
+    {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -195,7 +205,7 @@ Rsa2048Sha256GuidedSectionHandler (
     //
     // Implicitly RSA 2048 SHA 256 GUIDed section should have STATUS_VALID bit set
     //
-    ASSERT ((((EFI_GUID_DEFINED_SECTION *) InputSection)->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) != 0);
+    ASSERT ((((EFI_GUID_DEFINED_SECTION *)InputSection)->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) != 0);
     *AuthenticationStatus = EFI_AUTH_STATUS_IMAGE_SIGNED;
   }
 
@@ -246,13 +256,15 @@ Rsa2048Sha256GuidedSectionHandler (
     *AuthenticationStatus |= EFI_AUTH_STATUS_TEST_FAILED;
     goto Done;
   }
-  CryptoStatus = Sha256Update (HashContext, &CertBlockRsa2048Sha256->PublicKey, sizeof(CertBlockRsa2048Sha256->PublicKey));
+
+  CryptoStatus = Sha256Update (HashContext, &CertBlockRsa2048Sha256->PublicKey, sizeof (CertBlockRsa2048Sha256->PublicKey));
   if (!CryptoStatus) {
     DEBUG ((DEBUG_ERROR, "DxeRsa2048Sha256: Sha256Update() failed\n"));
     *AuthenticationStatus |= EFI_AUTH_STATUS_TEST_FAILED;
     goto Done;
   }
-  CryptoStatus  = Sha256Final (HashContext, Digest);
+
+  CryptoStatus = Sha256Final (HashContext, Digest);
   if (!CryptoStatus) {
     DEBUG ((DEBUG_ERROR, "DxeRsa2048Sha256: Sha256Final() failed\n"));
     *AuthenticationStatus |= EFI_AUTH_STATUS_TEST_FAILED;
@@ -275,9 +287,11 @@ Rsa2048Sha256GuidedSectionHandler (
       CryptoStatus = TRUE;
       break;
     }
-    PublicKey = PublicKey + SHA256_DIGEST_SIZE;
+
+    PublicKey           = PublicKey + SHA256_DIGEST_SIZE;
     PublicKeyBufferSize = PublicKeyBufferSize - SHA256_DIGEST_SIZE;
   }
+
   if (!CryptoStatus) {
     DEBUG ((DEBUG_ERROR, "DxeRsa2048Sha256: Public key in section is not supported\n"));
     *AuthenticationStatus |= EFI_AUTH_STATUS_TEST_FAILED;
@@ -298,12 +312,13 @@ Rsa2048Sha256GuidedSectionHandler (
   // Set RSA Key Components.
   // NOTE: Only N and E are needed to be set as RSA public key for signature verification.
   //
-  CryptoStatus = RsaSetKey (Rsa, RsaKeyN, CertBlockRsa2048Sha256->PublicKey, sizeof(CertBlockRsa2048Sha256->PublicKey));
+  CryptoStatus = RsaSetKey (Rsa, RsaKeyN, CertBlockRsa2048Sha256->PublicKey, sizeof (CertBlockRsa2048Sha256->PublicKey));
   if (!CryptoStatus) {
     DEBUG ((DEBUG_ERROR, "DxeRsa2048Sha256: RsaSetKey(RsaKeyN) failed\n"));
     *AuthenticationStatus |= EFI_AUTH_STATUS_TEST_FAILED;
     goto Done;
   }
+
   CryptoStatus = RsaSetKey (Rsa, RsaKeyE, mRsaE, sizeof (mRsaE));
   if (!CryptoStatus) {
     DEBUG ((DEBUG_ERROR, "DxeRsa2048Sha256: RsaSetKey(RsaKeyE) failed\n"));
@@ -321,6 +336,7 @@ Rsa2048Sha256GuidedSectionHandler (
     *AuthenticationStatus |= EFI_AUTH_STATUS_TEST_FAILED;
     goto Done;
   }
+
   PERF_INMODULE_BEGIN ("DxeRsaShaData");
   CryptoStatus = Sha256Update (HashContext, *OutputBuffer, OutputBufferSize);
   PERF_INMODULE_END ("DxeRsaShaData");
@@ -329,7 +345,8 @@ Rsa2048Sha256GuidedSectionHandler (
     *AuthenticationStatus |= EFI_AUTH_STATUS_TEST_FAILED;
     goto Done;
   }
-  CryptoStatus  = Sha256Final (HashContext, Digest);
+
+  CryptoStatus = Sha256Final (HashContext, Digest);
   if (!CryptoStatus) {
     DEBUG ((DEBUG_ERROR, "DxeRsa2048Sha256: Sha256Final() failed\n"));
     *AuthenticationStatus |= EFI_AUTH_STATUS_TEST_FAILED;
@@ -363,6 +380,7 @@ Done:
   if (Rsa != NULL) {
     RsaFree (Rsa);
   }
+
   if (HashContext != NULL) {
     FreePool (HashContext);
   }

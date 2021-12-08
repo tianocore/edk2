@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "UsbBotPeim.h"
 #include "BotPeim.h"
 
-#define MAXSENSEKEY 5
+#define MAXSENSEKEY  5
 
 /**
   Sends out ATAPI Inquiry Packet Command to the specified device. This command will
@@ -31,7 +31,7 @@ PeiUsbInquiry (
 {
   ATAPI_PACKET_COMMAND  Packet;
   EFI_STATUS            Status;
-  ATAPI_INQUIRY_DATA          Idata;
+  ATAPI_INQUIRY_DATA    Idata;
 
   //
   // fill command packet
@@ -39,9 +39,9 @@ PeiUsbInquiry (
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
   ZeroMem (&Idata, sizeof (ATAPI_INQUIRY_DATA));
 
-  Packet.Inquiry.opcode             = ATA_CMD_INQUIRY;
-  Packet.Inquiry.page_code          = 0;
-  Packet.Inquiry.allocation_length  = 36;
+  Packet.Inquiry.opcode            = ATA_CMD_INQUIRY;
+  Packet.Inquiry.page_code         = 0;
+  Packet.Inquiry.allocation_length = 36;
 
   //
   // Send scsi INQUIRY command packet.
@@ -49,29 +49,29 @@ PeiUsbInquiry (
   // retrieve the first 36 bytes for standard INQUIRY data.
   //
   Status = PeiAtapiCommand (
-            PeiServices,
-            PeiBotDevice,
-            &Packet,
-            (UINT8) sizeof (ATAPI_PACKET_COMMAND),
-            &Idata,
-            36,
-            EfiUsbDataIn,
-            2000
-            );
+             PeiServices,
+             PeiBotDevice,
+             &Packet,
+             (UINT8)sizeof (ATAPI_PACKET_COMMAND),
+             &Idata,
+             36,
+             EfiUsbDataIn,
+             2000
+             );
 
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
 
   if ((Idata.peripheral_type & 0x1f) == 0x05) {
-    PeiBotDevice->DeviceType      = USBCDROM;
-    PeiBotDevice->Media.BlockSize = 0x800;
+    PeiBotDevice->DeviceType            = USBCDROM;
+    PeiBotDevice->Media.BlockSize       = 0x800;
     PeiBotDevice->Media2.ReadOnly       = TRUE;
     PeiBotDevice->Media2.RemovableMedia = TRUE;
     PeiBotDevice->Media2.BlockSize      = 0x800;
   } else {
-    PeiBotDevice->DeviceType      = USBFLOPPY;
-    PeiBotDevice->Media.BlockSize = 0x200;
+    PeiBotDevice->DeviceType            = USBFLOPPY;
+    PeiBotDevice->Media.BlockSize       = 0x200;
     PeiBotDevice->Media2.ReadOnly       = FALSE;
     PeiBotDevice->Media2.RemovableMedia = TRUE;
     PeiBotDevice->Media2.BlockSize      = 0x200;
@@ -110,15 +110,15 @@ PeiUsbTestUnitReady (
   // send command packet
   //
   Status = PeiAtapiCommand (
-            PeiServices,
-            PeiBotDevice,
-            &Packet,
-            (UINT8) sizeof (ATAPI_PACKET_COMMAND),
-            NULL,
-            0,
-            EfiUsbNoData,
-            2000
-            );
+             PeiServices,
+             PeiBotDevice,
+             &Packet,
+             (UINT8)sizeof (ATAPI_PACKET_COMMAND),
+             NULL,
+             0,
+             EfiUsbNoData,
+             2000
+             );
 
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
@@ -147,11 +147,11 @@ PeiUsbRequestSense (
   IN  UINT8             *SenseKeyBuffer
   )
 {
-  EFI_STATUS                  Status;
-  ATAPI_PACKET_COMMAND        Packet;
-  UINT8                       *Ptr;
-  BOOLEAN                     SenseReq;
-  ATAPI_REQUEST_SENSE_DATA    *Sense;
+  EFI_STATUS                Status;
+  ATAPI_PACKET_COMMAND      Packet;
+  UINT8                     *Ptr;
+  BOOLEAN                   SenseReq;
+  ATAPI_REQUEST_SENSE_DATA  *Sense;
 
   *SenseCounts = 0;
 
@@ -160,7 +160,7 @@ PeiUsbRequestSense (
   //
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
   Packet.RequestSence.opcode            = ATA_CMD_REQUEST_SENSE;
-  Packet.RequestSence.allocation_length = (UINT8) sizeof (ATAPI_REQUEST_SENSE_DATA);
+  Packet.RequestSence.allocation_length = (UINT8)sizeof (ATAPI_REQUEST_SENSE_DATA);
 
   Ptr = SenseKeyBuffer;
 
@@ -171,22 +171,22 @@ PeiUsbRequestSense (
   //  until no sense data exists in the device.
   //
   while (SenseReq) {
-    Sense = (ATAPI_REQUEST_SENSE_DATA *) Ptr;
+    Sense = (ATAPI_REQUEST_SENSE_DATA *)Ptr;
 
     //
     // send out Request Sense Packet Command and get one Sense
     // data form device.
     //
     Status = PeiAtapiCommand (
-              PeiServices,
-              PeiBotDevice,
-              &Packet,
-              (UINT8) sizeof (ATAPI_PACKET_COMMAND),
-              (VOID *) Ptr,
-              sizeof (ATAPI_REQUEST_SENSE_DATA),
-              EfiUsbDataIn,
-              2000
-              );
+               PeiServices,
+               PeiBotDevice,
+               &Packet,
+               (UINT8)sizeof (ATAPI_PACKET_COMMAND),
+               (VOID *)Ptr,
+               sizeof (ATAPI_REQUEST_SENSE_DATA),
+               EfiUsbDataIn,
+               2000
+               );
 
     //
     // failed to get Sense data
@@ -200,7 +200,6 @@ PeiUsbRequestSense (
     }
 
     if (Sense->sense_key != ATA_SK_NO_SENSE) {
-
       Ptr += sizeof (ATAPI_REQUEST_SENSE_DATA);
       //
       // Ptr is byte based pointer
@@ -210,7 +209,6 @@ PeiUsbRequestSense (
       if (*SenseCounts == MAXSENSEKEY) {
         break;
       }
-
     } else {
       //
       // when no sense key, skip out the loop
@@ -240,10 +238,10 @@ PeiUsbReadCapacity (
   IN  PEI_BOT_DEVICE    *PeiBotDevice
   )
 {
-  EFI_STATUS                  Status;
-  ATAPI_PACKET_COMMAND        Packet;
-  ATAPI_READ_CAPACITY_DATA    Data;
-  UINT32                      LastBlock;
+  EFI_STATUS                Status;
+  ATAPI_PACKET_COMMAND      Packet;
+  ATAPI_READ_CAPACITY_DATA  Data;
+  UINT32                    LastBlock;
 
   ZeroMem (&Data, sizeof (ATAPI_READ_CAPACITY_DATA));
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
@@ -254,23 +252,24 @@ PeiUsbReadCapacity (
   // send command packet
   //
   Status = PeiAtapiCommand (
-            PeiServices,
-            PeiBotDevice,
-            &Packet,
-            (UINT8) sizeof (ATAPI_PACKET_COMMAND),
-            (VOID *) &Data,
-            sizeof (ATAPI_READ_CAPACITY_DATA),
-            EfiUsbDataIn,
-            2000
-            );
+             PeiServices,
+             PeiBotDevice,
+             &Packet,
+             (UINT8)sizeof (ATAPI_PACKET_COMMAND),
+             (VOID *)&Data,
+             sizeof (ATAPI_READ_CAPACITY_DATA),
+             EfiUsbDataIn,
+             2000
+             );
 
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
-  LastBlock = ((UINT32) Data.LastLba3 << 24) | (Data.LastLba2 << 16) | (Data.LastLba1 << 8) | Data.LastLba0;
+
+  LastBlock = ((UINT32)Data.LastLba3 << 24) | (Data.LastLba2 << 16) | (Data.LastLba1 << 8) | Data.LastLba0;
 
   if (LastBlock == 0xFFFFFFFF) {
-    DEBUG ((EFI_D_INFO, "The usb device LBA count is larger than 0xFFFFFFFF!\n"));
+    DEBUG ((DEBUG_INFO, "The usb device LBA count is larger than 0xFFFFFFFF!\n"));
   }
 
   PeiBotDevice->Media.LastBlock    = LastBlock;
@@ -300,30 +299,30 @@ PeiUsbReadFormattedCapacity (
   IN  PEI_BOT_DEVICE    *PeiBotDevice
   )
 {
-  EFI_STATUS                      Status;
-  ATAPI_PACKET_COMMAND            Packet;
-  ATAPI_READ_FORMAT_CAPACITY_DATA FormatData;
-  UINT32                          LastBlock;
+  EFI_STATUS                       Status;
+  ATAPI_PACKET_COMMAND             Packet;
+  ATAPI_READ_FORMAT_CAPACITY_DATA  FormatData;
+  UINT32                           LastBlock;
 
   ZeroMem (&FormatData, sizeof (ATAPI_READ_FORMAT_CAPACITY_DATA));
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
 
-  Packet.ReadFormatCapacity.opcode                = ATA_CMD_READ_FORMAT_CAPACITY;
-  Packet.ReadFormatCapacity.allocation_length_lo  = 12;
+  Packet.ReadFormatCapacity.opcode               = ATA_CMD_READ_FORMAT_CAPACITY;
+  Packet.ReadFormatCapacity.allocation_length_lo = 12;
 
   //
   // send command packet
   //
   Status = PeiAtapiCommand (
-            PeiServices,
-            PeiBotDevice,
-            &Packet,
-            (UINT8) sizeof (ATAPI_PACKET_COMMAND),
-            (VOID *) &FormatData,
-            sizeof (ATAPI_READ_FORMAT_CAPACITY_DATA),
-            EfiUsbDataIn,
-            2000
-            );
+             PeiServices,
+             PeiBotDevice,
+             &Packet,
+             (UINT8)sizeof (ATAPI_PACKET_COMMAND),
+             (VOID *)&FormatData,
+             sizeof (ATAPI_READ_FORMAT_CAPACITY_DATA),
+             EfiUsbDataIn,
+             2000
+             );
 
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
@@ -335,13 +334,12 @@ PeiUsbReadFormattedCapacity (
     //
     PeiBotDevice->Media.MediaPresent  = FALSE;
     PeiBotDevice->Media.LastBlock     = 0;
-    PeiBotDevice->Media2.MediaPresent  = FALSE;
-    PeiBotDevice->Media2.LastBlock     = 0;
-
+    PeiBotDevice->Media2.MediaPresent = FALSE;
+    PeiBotDevice->Media2.LastBlock    = 0;
   } else {
-    LastBlock = ((UINT32) FormatData.LastLba3 << 24) | (FormatData.LastLba2 << 16) | (FormatData.LastLba1 << 8) | FormatData.LastLba0;
+    LastBlock = ((UINT32)FormatData.LastLba3 << 24) | (FormatData.LastLba2 << 16) | (FormatData.LastLba1 << 8) | FormatData.LastLba0;
     if (LastBlock == 0xFFFFFFFF) {
-      DEBUG ((EFI_D_INFO, "The usb device LBA count is larger than 0xFFFFFFFF!\n"));
+      DEBUG ((DEBUG_INFO, "The usb device LBA count is larger than 0xFFFFFFFF!\n"));
     }
 
     PeiBotDevice->Media.LastBlock = LastBlock;
@@ -397,26 +395,23 @@ PeiUsbRead10 (
   // prepare command packet for the Inquiry Packet Command.
   //
   ZeroMem (&Packet, sizeof (ATAPI_PACKET_COMMAND));
-  Read10Packet    = &Packet.Read10;
-  Lba32           = (UINT32) Lba;
-  PtrBuffer       = Buffer;
+  Read10Packet = &Packet.Read10;
+  Lba32        = (UINT32)Lba;
+  PtrBuffer    = Buffer;
 
-  BlockSize       = (UINT32) PeiBotDevice->Media.BlockSize;
+  BlockSize = (UINT32)PeiBotDevice->Media.BlockSize;
 
-  MaxBlock        = (UINT16) (65535 / BlockSize);
-  BlocksRemaining = (UINT16) NumberOfBlocks;
+  MaxBlock        = (UINT16)(65535 / BlockSize);
+  BlocksRemaining = (UINT16)NumberOfBlocks;
 
-  Status          = EFI_SUCCESS;
+  Status = EFI_SUCCESS;
   while (BlocksRemaining > 0) {
-
     if (BlocksRemaining <= MaxBlock) {
-
       SectorCount = BlocksRemaining;
-
     } else {
-
       SectorCount = MaxBlock;
     }
+
     //
     // fill the Packet data structure
     //
@@ -426,43 +421,43 @@ PeiUsbRead10 (
     // Lba0 ~ Lba3 specify the start logical block address of the data transfer.
     // Lba0 is MSB, Lba3 is LSB
     //
-    Read10Packet->Lba3  = (UINT8) (Lba32 & 0xff);
-    Read10Packet->Lba2  = (UINT8) (Lba32 >> 8);
-    Read10Packet->Lba1  = (UINT8) (Lba32 >> 16);
-    Read10Packet->Lba0  = (UINT8) (Lba32 >> 24);
+    Read10Packet->Lba3 = (UINT8)(Lba32 & 0xff);
+    Read10Packet->Lba2 = (UINT8)(Lba32 >> 8);
+    Read10Packet->Lba1 = (UINT8)(Lba32 >> 16);
+    Read10Packet->Lba0 = (UINT8)(Lba32 >> 24);
 
     //
     // TranLen0 ~ TranLen1 specify the transfer length in block unit.
     // TranLen0 is MSB, TranLen is LSB
     //
-    Read10Packet->TranLen1  = (UINT8) (SectorCount & 0xff);
-    Read10Packet->TranLen0  = (UINT8) (SectorCount >> 8);
+    Read10Packet->TranLen1 = (UINT8)(SectorCount & 0xff);
+    Read10Packet->TranLen0 = (UINT8)(SectorCount >> 8);
 
-    ByteCount               = SectorCount * BlockSize;
+    ByteCount = SectorCount * BlockSize;
 
-    TimeOut                 = (UINT16) (SectorCount * 2000);
+    TimeOut = (UINT16)(SectorCount * 2000);
 
     //
     // send command packet
     //
     Status = PeiAtapiCommand (
-              PeiServices,
-              PeiBotDevice,
-              &Packet,
-              (UINT8) sizeof (ATAPI_PACKET_COMMAND),
-              (VOID *) PtrBuffer,
-              ByteCount,
-              EfiUsbDataIn,
-              TimeOut
-              );
+               PeiServices,
+               PeiBotDevice,
+               &Packet,
+               (UINT8)sizeof (ATAPI_PACKET_COMMAND),
+               (VOID *)PtrBuffer,
+               ByteCount,
+               EfiUsbDataIn,
+               TimeOut
+               );
 
     if (Status != EFI_SUCCESS) {
       return Status;
     }
 
-    Lba32 += SectorCount;
-    PtrBuffer       = (UINT8 *) PtrBuffer + SectorCount * BlockSize;
-    BlocksRemaining = (UINT16) (BlocksRemaining - SectorCount);
+    Lba32          += SectorCount;
+    PtrBuffer       = (UINT8 *)PtrBuffer + SectorCount * BlockSize;
+    BlocksRemaining = (UINT16)(BlocksRemaining - SectorCount);
   }
 
   return Status;
@@ -480,37 +475,36 @@ PeiUsbRead10 (
 **/
 BOOLEAN
 IsNoMedia (
-  IN  ATAPI_REQUEST_SENSE_DATA *SenseData,
-  IN  UINTN                    SenseCounts
+  IN  ATAPI_REQUEST_SENSE_DATA  *SenseData,
+  IN  UINTN                     SenseCounts
   )
 {
   ATAPI_REQUEST_SENSE_DATA  *SensePtr;
   UINTN                     Index;
   BOOLEAN                   NoMedia;
 
-  NoMedia   = FALSE;
-  SensePtr  = SenseData;
+  NoMedia  = FALSE;
+  SensePtr = SenseData;
 
   for (Index = 0; Index < SenseCounts; Index++) {
-
     switch (SensePtr->sense_key) {
+      case ATA_SK_NOT_READY:
+        switch (SensePtr->addnl_sense_code) {
+          //
+          // if no media, fill IdeDev parameter with specific info.
+          //
+          case ATA_ASC_NO_MEDIA:
+            NoMedia = TRUE;
+            break;
 
-    case ATA_SK_NOT_READY:
-      switch (SensePtr->addnl_sense_code) {
-      //
-      // if no media, fill IdeDev parameter with specific info.
-      //
-      case ATA_ASC_NO_MEDIA:
-        NoMedia = TRUE;
+          default:
+            break;
+        }
+
         break;
 
       default:
         break;
-      }
-      break;
-
-    default:
-      break;
     }
 
     SensePtr++;
@@ -531,63 +525,63 @@ IsNoMedia (
 **/
 BOOLEAN
 IsMediaError (
-  IN  ATAPI_REQUEST_SENSE_DATA    *SenseData,
-  IN  UINTN                       SenseCounts
+  IN  ATAPI_REQUEST_SENSE_DATA  *SenseData,
+  IN  UINTN                     SenseCounts
   )
 {
   ATAPI_REQUEST_SENSE_DATA  *SensePtr;
   UINTN                     Index;
   BOOLEAN                   Error;
 
-  SensePtr  = SenseData;
-  Error     = FALSE;
+  SensePtr = SenseData;
+  Error    = FALSE;
 
   for (Index = 0; Index < SenseCounts; Index++) {
-
     switch (SensePtr->sense_key) {
-    //
-    // Medium error case
-    //
-    case ATA_SK_MEDIUM_ERROR:
-      switch (SensePtr->addnl_sense_code) {
-      case ATA_ASC_MEDIA_ERR1:
-        //
-        // fall through
-        //
-      case ATA_ASC_MEDIA_ERR2:
-        //
-        // fall through
-        //
-      case ATA_ASC_MEDIA_ERR3:
-        //
-        // fall through
-        //
-      case ATA_ASC_MEDIA_ERR4:
-        Error = TRUE;
+      //
+      // Medium error case
+      //
+      case ATA_SK_MEDIUM_ERROR:
+        switch (SensePtr->addnl_sense_code) {
+          case ATA_ASC_MEDIA_ERR1:
+          //
+          // fall through
+          //
+          case ATA_ASC_MEDIA_ERR2:
+          //
+          // fall through
+          //
+          case ATA_ASC_MEDIA_ERR3:
+          //
+          // fall through
+          //
+          case ATA_ASC_MEDIA_ERR4:
+            Error = TRUE;
+            break;
+
+          default:
+            break;
+        }
+
+        break;
+
+      //
+      // Medium upside-down case
+      //
+      case ATA_SK_NOT_READY:
+        switch (SensePtr->addnl_sense_code) {
+          case ATA_ASC_MEDIA_UPSIDE_DOWN:
+            Error = TRUE;
+            break;
+
+          default:
+            break;
+        }
+
         break;
 
       default:
         break;
-      }
-
-      break;
-
-    //
-    // Medium upside-down case
-    //
-    case ATA_SK_NOT_READY:
-      switch (SensePtr->addnl_sense_code) {
-      case ATA_ASC_MEDIA_UPSIDE_DOWN:
-        Error = TRUE;
-        break;
-
-      default:
-        break;
-      }
-      break;
-
-    default:
-      break;
     }
 
     SensePtr++;
@@ -608,8 +602,8 @@ IsMediaError (
 **/
 BOOLEAN
 IsMediaChange (
-  IN  ATAPI_REQUEST_SENSE_DATA *SenseData,
-  IN  UINTN                    SenseCounts
+  IN  ATAPI_REQUEST_SENSE_DATA  *SenseData,
+  IN  UINTN                     SenseCounts
   )
 {
   ATAPI_REQUEST_SENSE_DATA  *SensePtr;
@@ -618,26 +612,27 @@ IsMediaChange (
 
   MediaChange = FALSE;
 
-  SensePtr    = SenseData;
+  SensePtr = SenseData;
 
   for (Index = 0; Index < SenseCounts; Index++) {
     //
     // catch media change sense key and addition sense data
     //
     switch (SensePtr->sense_key) {
-    case ATA_SK_UNIT_ATTENTION:
-      switch (SensePtr->addnl_sense_code) {
-      case ATA_ASC_MEDIA_CHANGE:
-        MediaChange = TRUE;
+      case ATA_SK_UNIT_ATTENTION:
+        switch (SensePtr->addnl_sense_code) {
+          case ATA_ASC_MEDIA_CHANGE:
+            MediaChange = TRUE;
+            break;
+
+          default:
+            break;
+        }
+
         break;
 
       default:
         break;
-      }
-      break;
-
-    default:
-      break;
     }
 
     SensePtr++;

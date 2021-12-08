@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Snp.h"
 
-
 /**
   Call UNDI to stop the interface and changes the snp state.
 
@@ -20,44 +19,44 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 PxeStop (
-  SNP_DRIVER *Snp
+  SNP_DRIVER  *Snp
   )
 {
-  Snp->Cdb.OpCode     = PXE_OPCODE_STOP;
-  Snp->Cdb.OpFlags    = PXE_OPFLAGS_NOT_USED;
-  Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.DBsize     = PXE_DBSIZE_NOT_USED;
-  Snp->Cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
-  Snp->Cdb.DBaddr     = PXE_DBADDR_NOT_USED;
-  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum      = Snp->IfNum;
-  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.OpCode    = PXE_OPCODE_STOP;
+  Snp->Cdb.OpFlags   = PXE_OPFLAGS_NOT_USED;
+  Snp->Cdb.CPBsize   = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb.DBsize    = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb.CPBaddr   = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb.DBaddr    = PXE_DBADDR_NOT_USED;
+  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum     = Snp->IfNum;
+  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.stop()  "));
+  DEBUG ((DEBUG_NET, "\nsnp->undi.stop()  "));
 
-  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
 
   if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
-      (EFI_D_WARN,
-      "\nsnp->undi.stop()  %xh:%xh\n",
-      Snp->Cdb.StatFlags,
-      Snp->Cdb.StatCode)
+      (DEBUG_WARN,
+       "\nsnp->undi.stop()  %xh:%xh\n",
+       Snp->Cdb.StatFlags,
+       Snp->Cdb.StatCode)
       );
 
     return EFI_DEVICE_ERROR;
   }
+
   //
   // Set simple network state to Started and return success.
   //
   Snp->Mode.State = EfiSimpleNetworkStopped;
   return EFI_SUCCESS;
 }
-
 
 /**
   Changes the state of a network interface from "started" to "stopped."
@@ -83,7 +82,7 @@ PxeStop (
 EFI_STATUS
 EFIAPI
 SnpUndi32Stop (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This
   )
 {
   SNP_DRIVER  *Snp;
@@ -99,16 +98,16 @@ SnpUndi32Stop (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   switch (Snp->Mode.State) {
-  case EfiSimpleNetworkStarted:
-    break;
+    case EfiSimpleNetworkStarted:
+      break;
 
-  case EfiSimpleNetworkStopped:
-    Status = EFI_NOT_STARTED;
-    goto ON_EXIT;
+    case EfiSimpleNetworkStopped:
+      Status = EFI_NOT_STARTED;
+      goto ON_EXIT;
 
-  default:
-    Status = EFI_DEVICE_ERROR;
-    goto ON_EXIT;
+    default:
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
   }
 
   Status = PxeStop (Snp);

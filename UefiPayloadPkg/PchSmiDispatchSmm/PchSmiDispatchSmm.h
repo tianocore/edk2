@@ -26,12 +26,11 @@
 #define SMM_DATA_PORT             0xB3
 
 typedef struct {
-  UINTN                          Signature;
-  LIST_ENTRY                     Link;
-  EFI_HANDLE                     DispatchHandle;
-  UINTN                          SwSmiInputValue;
-  UINTN                          DispatchFunction;
+  UINTN         Signature;
+  LIST_ENTRY    Link;
+  EFI_HANDLE    DispatchHandle;
+  UINTN         SwSmiInputValue;
+  UINTN         DispatchFunction;
 } EFI_SMM_SW_DISPATCH2_CONTEXT;
 
 #endif
-

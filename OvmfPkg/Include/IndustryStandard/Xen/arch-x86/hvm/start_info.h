@@ -84,7 +84,7 @@
  *             of the structure must check that memmap_entries is non-zero
  *             before trying to read the memory map.
  */
-#define XEN_HVM_START_MAGIC_VALUE 0x336ec578
+#define XEN_HVM_START_MAGIC_VALUE  0x336ec578
 
 /*
  * The values used in the type field of the memory map table entries are
@@ -107,37 +107,37 @@
  * represent the layout described there using C types.
  */
 struct hvm_start_info {
-    UINT32 magic;             /* Contains the magic value 0x336ec578       */
+  UINT32    magic;            /* Contains the magic value 0x336ec578       */
                               /* ("xEn3" with the 0x80 bit of the "E" set).*/
-    UINT32 version;           /* Version of this structure.                */
-    UINT32 flags;             /* SIF_xxx flags.                            */
-    UINT32 nr_modules;        /* Number of modules passed to the kernel.   */
-    UINT64 modlist_paddr;     /* Physical address of an array of           */
+  UINT32    version;          /* Version of this structure.                */
+  UINT32    flags;            /* SIF_xxx flags.                            */
+  UINT32    nr_modules;       /* Number of modules passed to the kernel.   */
+  UINT64    modlist_paddr;    /* Physical address of an array of           */
                               /* hvm_modlist_entry.                        */
-    UINT64 cmdline_paddr;     /* Physical address of the command line.     */
-    UINT64 rsdp_paddr;        /* Physical address of the RSDP ACPI data    */
+  UINT64    cmdline_paddr;    /* Physical address of the command line.     */
+  UINT64    rsdp_paddr;       /* Physical address of the RSDP ACPI data    */
                               /* structure.                                */
-    /* All following fields only present in version 1 and newer */
-    UINT64 memmap_paddr;      /* Physical address of an array of           */
+  /* All following fields only present in version 1 and newer */
+  UINT64    memmap_paddr;     /* Physical address of an array of           */
                               /* hvm_memmap_table_entry.                   */
-    UINT32 memmap_entries;    /* Number of entries in the memmap table.    */
+  UINT32    memmap_entries;   /* Number of entries in the memmap table.    */
                               /* Value will be zero if there is no memory  */
                               /* map being provided.                       */
-    UINT32 reserved;          /* Must be zero.                             */
+  UINT32    reserved;         /* Must be zero.                             */
 };
 
 struct hvm_modlist_entry {
-    UINT64 paddr;             /* Physical address of the module.           */
-    UINT64 size;              /* Size of the module in bytes.              */
-    UINT64 cmdline_paddr;     /* Physical address of the command line.     */
-    UINT64 reserved;
+  UINT64    paddr;            /* Physical address of the module.           */
+  UINT64    size;             /* Size of the module in bytes.              */
+  UINT64    cmdline_paddr;    /* Physical address of the command line.     */
+  UINT64    reserved;
 };
 
 struct hvm_memmap_table_entry {
-    UINT64 addr;              /* Base address of the memory region         */
-    UINT64 size;              /* Size of the memory region in bytes        */
-    UINT32 type;              /* Mapping type                              */
-    UINT32 reserved;          /* Must be zero for Version 1.               */
+  UINT64    addr;             /* Base address of the memory region         */
+  UINT64    size;             /* Size of the memory region in bytes        */
+  UINT32    type;             /* Mapping type                              */
+  UINT32    reserved;         /* Must be zero for Version 1.               */
 };
 
 #endif /* __XEN_PUBLIC_ARCH_X86_HVM_START_INFO_H__ */

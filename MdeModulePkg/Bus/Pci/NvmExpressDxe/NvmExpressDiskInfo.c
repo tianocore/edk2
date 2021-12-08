@@ -8,7 +8,7 @@
 
 #include "NvmExpress.h"
 
-EFI_DISK_INFO_PROTOCOL gNvmExpressDiskInfoProtocolTemplate = {
+EFI_DISK_INFO_PROTOCOL  gNvmExpressDiskInfoProtocolTemplate = {
   EFI_DISK_INFO_NVME_INTERFACE_GUID,
   NvmExpressDiskInfoInquiry,
   NvmExpressDiskInfoIdentify,
@@ -27,12 +27,11 @@ EFI_DISK_INFO_PROTOCOL gNvmExpressDiskInfoProtocolTemplate = {
 **/
 VOID
 InitializeDiskInfo (
-  IN  NVME_DEVICE_PRIVATE_DATA    *Device
+  IN  NVME_DEVICE_PRIVATE_DATA  *Device
   )
 {
   CopyMem (&Device->DiskInfo, &gNvmExpressDiskInfoProtocolTemplate, sizeof (EFI_DISK_INFO_PROTOCOL));
 }
-
 
 /**
   Provides inquiry information for the controller type.
@@ -53,14 +52,13 @@ InitializeDiskInfo (
 EFI_STATUS
 EFIAPI
 NvmExpressDiskInfoInquiry (
-  IN     EFI_DISK_INFO_PROTOCOL   *This,
-  IN OUT VOID                     *InquiryData,
-  IN OUT UINT32                   *InquiryDataSize
+  IN     EFI_DISK_INFO_PROTOCOL  *This,
+  IN OUT VOID                    *InquiryData,
+  IN OUT UINT32                  *InquiryDataSize
   )
 {
   return EFI_NOT_FOUND;
 }
-
 
 /**
   Provides identify information for the controller type.
@@ -83,13 +81,13 @@ NvmExpressDiskInfoInquiry (
 EFI_STATUS
 EFIAPI
 NvmExpressDiskInfoIdentify (
-  IN     EFI_DISK_INFO_PROTOCOL   *This,
-  IN OUT VOID                     *IdentifyData,
-  IN OUT UINT32                   *IdentifyDataSize
+  IN     EFI_DISK_INFO_PROTOCOL  *This,
+  IN OUT VOID                    *IdentifyData,
+  IN OUT UINT32                  *IdentifyDataSize
   )
 {
-  EFI_STATUS                      Status;
-  NVME_DEVICE_PRIVATE_DATA        *Device;
+  EFI_STATUS                Status;
+  NVME_DEVICE_PRIVATE_DATA  *Device;
 
   Device = NVME_DEVICE_PRIVATE_DATA_FROM_DISK_INFO (This);
 
@@ -98,6 +96,7 @@ NvmExpressDiskInfoIdentify (
     Status = EFI_SUCCESS;
     CopyMem (IdentifyData, &Device->NamespaceData, sizeof (Device->NamespaceData));
   }
+
   *IdentifyDataSize = sizeof (Device->NamespaceData);
   return Status;
 }
@@ -122,15 +121,14 @@ NvmExpressDiskInfoIdentify (
 EFI_STATUS
 EFIAPI
 NvmExpressDiskInfoSenseData (
-  IN     EFI_DISK_INFO_PROTOCOL   *This,
-  IN OUT VOID                     *SenseData,
-  IN OUT UINT32                   *SenseDataSize,
-  OUT    UINT8                    *SenseDataNumber
+  IN     EFI_DISK_INFO_PROTOCOL  *This,
+  IN OUT VOID                    *SenseData,
+  IN OUT UINT32                  *SenseDataSize,
+  OUT    UINT8                   *SenseDataNumber
   )
 {
   return EFI_NOT_FOUND;
 }
-
 
 /**
   This function is used to get controller information.
@@ -146,11 +144,10 @@ NvmExpressDiskInfoSenseData (
 EFI_STATUS
 EFIAPI
 NvmExpressDiskInfoWhichIde (
-  IN  EFI_DISK_INFO_PROTOCOL   *This,
-  OUT UINT32                   *IdeChannel,
-  OUT UINT32                   *IdeDevice
+  IN  EFI_DISK_INFO_PROTOCOL  *This,
+  OUT UINT32                  *IdeChannel,
+  OUT UINT32                  *IdeDevice
   )
 {
   return EFI_UNSUPPORTED;
 }
-

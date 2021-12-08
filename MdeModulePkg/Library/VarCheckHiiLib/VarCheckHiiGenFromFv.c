@@ -12,26 +12,26 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_VFR_ATTRACT_GUID \
 { 0xd0bc7cb4, 0x6a47, 0x495f, { 0xaa, 0x11, 0x71, 0x7, 0x46, 0xda, 0x6, 0xa2 } }
 
-EFI_GUID  gVfrArrayAttractGuid  = EFI_VFR_ATTRACT_GUID;
+EFI_GUID  gVfrArrayAttractGuid = EFI_VFR_ATTRACT_GUID;
 
 #define ALL_FF_GUID \
 { 0xFFFFFFFF, 0xFFFF, 0xFFFF, { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF } }
 
-EFI_GUID mAllFfGuid             = ALL_FF_GUID;
+EFI_GUID  mAllFfGuid = ALL_FF_GUID;
 
-#define VAR_CHECK_VFR_DRIVER_INFO_SIGNATURE     SIGNATURE_32 ('V', 'D', 'R', 'I')
+#define VAR_CHECK_VFR_DRIVER_INFO_SIGNATURE  SIGNATURE_32 ('V', 'D', 'R', 'I')
 
 typedef struct {
-  UINTN             Signature;
-  LIST_ENTRY        Link;
-  EFI_GUID          *DriverGuid;
+  UINTN         Signature;
+  LIST_ENTRY    Link;
+  EFI_GUID      *DriverGuid;
 } VAR_CHECK_VFR_DRIVER_INFO;
 
-LIST_ENTRY                      mVfrDriverList = INITIALIZE_LIST_HEAD_VARIABLE (mVfrDriverList);
+LIST_ENTRY  mVfrDriverList = INITIALIZE_LIST_HEAD_VARIABLE (mVfrDriverList);
 
 #define VAR_CHECK_VFR_DRIVER_INFO_FROM_LINK(a)  CR (a, VAR_CHECK_VFR_DRIVER_INFO, Link, VAR_CHECK_VFR_DRIVER_INFO_SIGNATURE)
 
-#define MAX_MATCH_GUID_NUM      100
+#define MAX_MATCH_GUID_NUM  100
 
 /**
   Get the address by Guid.
@@ -51,17 +51,17 @@ LIST_ENTRY                      mVfrDriverList = INITIALIZE_LIST_HEAD_VARIABLE (
 **/
 EFI_STATUS
 GetAddressByGuid (
-  IN  VOID          *Ffs,
-  IN  EFI_GUID      *Guid,
-  IN  UINTN         Length,
-  OUT UINTN         **Offset,
-  OUT UINT8         *NumOfMatchingGuid
+  IN  VOID      *Ffs,
+  IN  EFI_GUID  *Guid,
+  IN  UINTN     Length,
+  OUT UINTN     **Offset,
+  OUT UINT8     *NumOfMatchingGuid
   )
 {
-  UINTN     LoopControl;
-  BOOLEAN   Found;
+  UINTN    LoopControl;
+  BOOLEAN  Found;
 
-  if((Ffs == NULL) || (Guid == NULL) || (Length == 0)){
+  if ((Ffs == NULL) || (Guid == NULL) || (Length == 0)) {
     return EFI_NOT_FOUND;
   }
 
@@ -71,7 +71,7 @@ GetAddressByGuid (
 
   Found = FALSE;
   for (LoopControl = 0; LoopControl < Length; LoopControl++) {
-    if (CompareGuid (Guid, (EFI_GUID *) ((UINT8 *) Ffs + LoopControl))) {
+    if (CompareGuid (Guid, (EFI_GUID *)((UINT8 *)Ffs + LoopControl))) {
       Found = TRUE;
       //
       // If NumOfMatchGuid or Offset are NULL, means user only want
@@ -82,6 +82,7 @@ GetAddressByGuid (
           *Offset = InternalVarCheckAllocateZeroPool (sizeof (UINTN) * MAX_MATCH_GUID_NUM);
           ASSERT (*Offset != NULL);
         }
+
         *(*Offset + *NumOfMatchingGuid) = LoopControl + sizeof (EFI_GUID);
         (*NumOfMatchingGuid)++;
       } else {
@@ -110,20 +111,21 @@ GetAddressByGuid (
 **/
 EFI_STATUS
 SearchVfrBinInFfs (
-   IN  VOID      *Ffs,
-   IN  VOID      *EfiAddr,
-   IN  UINTN     Length,
-   OUT UINTN     **Offset,
-   OUT UINT8     *NumOfMatchingOffset
+  IN  VOID   *Ffs,
+  IN  VOID   *EfiAddr,
+  IN  UINTN  Length,
+  OUT UINTN  **Offset,
+  OUT UINT8  *NumOfMatchingOffset
   )
 {
-  UINTN        Index;
-  EFI_STATUS   Status;
-  UINTN        VirOffValue;
+  UINTN       Index;
+  EFI_STATUS  Status;
+  UINTN       VirOffValue;
 
   if ((Ffs == NULL) || (Offset == NULL)) {
     return EFI_NOT_FOUND;
   }
+
   Status = GetAddressByGuid (
              Ffs,
              &gVfrArrayAttractGuid,
@@ -139,11 +141,11 @@ SearchVfrBinInFfs (
     //
     // Got the virOffset after the GUID
     //
-    VirOffValue = *(UINTN *) ((UINTN) Ffs + *(*Offset + Index));
+    VirOffValue = *(UINTN *)((UINTN)Ffs + *(*Offset + Index));
     //
     // Transfer the offset to the VA address. One modules may own multiple VfrBin address.
     //
-    *(*Offset + Index) = (UINTN) EfiAddr + VirOffValue;
+    *(*Offset + Index) = (UINTN)EfiAddr + VirOffValue;
   }
 
   return Status;
@@ -164,17 +166,17 @@ ParseFfs (
   IN EFI_GUID                       *DriverGuid
   )
 {
-  EFI_STATUS                    Status;
-  EFI_FV_FILETYPE               FoundType;
-  EFI_FV_FILE_ATTRIBUTES        FileAttributes;
-  UINT32                        AuthenticationStatus;
-  UINTN                         Size;
-  VOID                          *Buffer;
-  UINTN                         SectionSize;
-  VOID                          *SectionBuffer;
-  UINTN                         VfrBinIndex;
-  UINT8                         NumberofMatchingVfrBin;
-  UINTN                         *VfrBinBaseAddress;
+  EFI_STATUS              Status;
+  EFI_FV_FILETYPE         FoundType;
+  EFI_FV_FILE_ATTRIBUTES  FileAttributes;
+  UINT32                  AuthenticationStatus;
+  UINTN                   Size;
+  VOID                    *Buffer;
+  UINTN                   SectionSize;
+  VOID                    *SectionBuffer;
+  UINTN                   VfrBinIndex;
+  UINT8                   NumberofMatchingVfrBin;
+  UINTN                   *VfrBinBaseAddress;
 
   Status = Fv2->ReadFile (
                   Fv2,
@@ -199,42 +201,42 @@ ParseFfs (
                   &Size,
                   &AuthenticationStatus
                   );
-   if (!EFI_ERROR (Status)) {
-     Status = SearchVfrBinInFfs (Buffer, 0, Size, &VfrBinBaseAddress, &NumberofMatchingVfrBin);
-     if (!EFI_ERROR (Status)) {
-        SectionBuffer = NULL;
-        Status = Fv2->ReadSection (
-                        Fv2,
-                        DriverGuid,
-                        EFI_SECTION_PE32,
-                        0, // Instance
-                        &SectionBuffer,
-                        &SectionSize,
-                        &AuthenticationStatus
-                        );
-        if (!EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_INFO , "FfsNameGuid - %g\n", DriverGuid));
-          DEBUG ((DEBUG_INFO , "NumberofMatchingVfrBin - 0x%02x\n", NumberofMatchingVfrBin));
+  if (!EFI_ERROR (Status)) {
+    Status = SearchVfrBinInFfs (Buffer, 0, Size, &VfrBinBaseAddress, &NumberofMatchingVfrBin);
+    if (!EFI_ERROR (Status)) {
+      SectionBuffer = NULL;
+      Status        = Fv2->ReadSection (
+                             Fv2,
+                             DriverGuid,
+                             EFI_SECTION_PE32,
+                             0, // Instance
+                             &SectionBuffer,
+                             &SectionSize,
+                             &AuthenticationStatus
+                             );
+      if (!EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_INFO, "FfsNameGuid - %g\n", DriverGuid));
+        DEBUG ((DEBUG_INFO, "NumberofMatchingVfrBin - 0x%02x\n", NumberofMatchingVfrBin));
 
-          for (VfrBinIndex = 0; VfrBinIndex < NumberofMatchingVfrBin; VfrBinIndex++) {
-#ifdef DUMP_HII_DATA
-            DEBUG_CODE (
-              DumpHiiPackage ((UINT8 *) (UINTN) SectionBuffer + VfrBinBaseAddress[VfrBinIndex] + sizeof (UINT32));
-              );
-#endif
-            VarCheckParseHiiPackage ((UINT8 *) (UINTN) SectionBuffer + VfrBinBaseAddress[VfrBinIndex] + sizeof (UINT32), TRUE);
-          }
-
-          FreePool (SectionBuffer);
+        for (VfrBinIndex = 0; VfrBinIndex < NumberofMatchingVfrBin; VfrBinIndex++) {
+ #ifdef DUMP_HII_DATA
+          DEBUG_CODE (
+            DumpHiiPackage ((UINT8 *)(UINTN)SectionBuffer + VfrBinBaseAddress[VfrBinIndex] + sizeof (UINT32));
+            );
+ #endif
+          VarCheckParseHiiPackage ((UINT8 *)(UINTN)SectionBuffer + VfrBinBaseAddress[VfrBinIndex] + sizeof (UINT32), TRUE);
         }
 
-        InternalVarCheckFreePool (VfrBinBaseAddress);
+        FreePool (SectionBuffer);
       }
 
-      FreePool (Buffer);
+      InternalVarCheckFreePool (VfrBinBaseAddress);
     }
 
-   return TRUE;
+    FreePool (Buffer);
+  }
+
+  return TRUE;
 }
 
 /**
@@ -245,31 +247,31 @@ ParseFfs (
 **/
 VOID
 ParseFv (
-  IN BOOLEAN    ScanAll
+  IN BOOLEAN  ScanAll
   )
 {
-  EFI_STATUS                    Status;
-  EFI_HANDLE                    *HandleBuffer;
-  UINTN                         HandleCount;
-  UINTN                         Index;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv2;
-  VOID                          *Key;
-  EFI_FV_FILETYPE               FileType;
-  EFI_GUID                      NameGuid;
-  EFI_FV_FILE_ATTRIBUTES        FileAttributes;
-  UINTN                         Size;
-  UINTN                         FfsIndex;
-  VAR_CHECK_VFR_DRIVER_INFO     *VfrDriverInfo;
-  LIST_ENTRY                    *VfrDriverLink;
+  EFI_STATUS                     Status;
+  EFI_HANDLE                     *HandleBuffer;
+  UINTN                          HandleCount;
+  UINTN                          Index;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL  *Fv2;
+  VOID                           *Key;
+  EFI_FV_FILETYPE                FileType;
+  EFI_GUID                       NameGuid;
+  EFI_FV_FILE_ATTRIBUTES         FileAttributes;
+  UINTN                          Size;
+  UINTN                          FfsIndex;
+  VAR_CHECK_VFR_DRIVER_INFO      *VfrDriverInfo;
+  LIST_ENTRY                     *VfrDriverLink;
 
   HandleBuffer = NULL;
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiFirmwareVolume2ProtocolGuid,
-                  NULL,
-                  &HandleCount,
-                  &HandleBuffer
-                  );
+  Status       = gBS->LocateHandleBuffer (
+                        ByProtocol,
+                        &gEfiFirmwareVolume2ProtocolGuid,
+                        NULL,
+                        &HandleCount,
+                        &HandleBuffer
+                        );
   if (EFI_ERROR (Status)) {
     return;
   }
@@ -278,32 +280,33 @@ ParseFv (
   // Search all FVs
   //
   for (Index = 0; Index < HandleCount; Index++) {
-    DEBUG ((DEBUG_INFO , "FvIndex - %x\n", Index));
+    DEBUG ((DEBUG_INFO, "FvIndex - %x\n", Index));
     Status = gBS->HandleProtocol (
                     HandleBuffer[Index],
                     &gEfiFirmwareVolume2ProtocolGuid,
-                    (VOID **) &Fv2
+                    (VOID **)&Fv2
                     );
     ASSERT_EFI_ERROR (Status);
 
-    DEBUG_CODE (
-      EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL   *Fvb2;
-      EFI_PHYSICAL_ADDRESS                  FvAddress;
-      UINT64                                FvSize;
+    DEBUG_CODE_BEGIN ();
+    EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *Fvb2;
+    EFI_PHYSICAL_ADDRESS                 FvAddress;
+    UINT64                               FvSize;
 
-      Status = gBS->HandleProtocol (
-                      HandleBuffer[Index],
-                      &gEfiFirmwareVolumeBlock2ProtocolGuid,
-                      (VOID **) &Fvb2
-                      );
-      ASSERT_EFI_ERROR (Status);
-      Status = Fvb2->GetPhysicalAddress (Fvb2, &FvAddress);
-      if (!EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_INFO , "FvAddress - 0x%08x\n", FvAddress));
-        FvSize = ((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) FvAddress)->FvLength;
-        DEBUG ((DEBUG_INFO , "FvSize    - 0x%08x\n", FvSize));
-      }
-    );
+    Status = gBS->HandleProtocol (
+                    HandleBuffer[Index],
+                    &gEfiFirmwareVolumeBlock2ProtocolGuid,
+                    (VOID **)&Fvb2
+                    );
+    ASSERT_EFI_ERROR (Status);
+    Status = Fvb2->GetPhysicalAddress (Fvb2, &FvAddress);
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "FvAddress - 0x%08x\n", FvAddress));
+      FvSize = ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FvAddress)->FvLength;
+      DEBUG ((DEBUG_INFO, "FvSize    - 0x%08x\n", FvSize));
+    }
+
+    DEBUG_CODE_END ();
 
     if (ScanAll) {
       //
@@ -314,14 +317,14 @@ ParseFv (
 
       for (FfsIndex = 0; ; FfsIndex++) {
         FileType = EFI_FV_FILETYPE_ALL;
-        Status = Fv2->GetNextFile (
-                        Fv2,
-                        Key,
-                        &FileType,
-                        &NameGuid,
-                        &FileAttributes,
-                        &Size
-                      );
+        Status   = Fv2->GetNextFile (
+                          Fv2,
+                          Key,
+                          &FileType,
+                          &NameGuid,
+                          &FileAttributes,
+                          &Size
+                          );
         if (EFI_ERROR (Status)) {
           break;
         }
@@ -360,19 +363,19 @@ ParseFv (
 **/
 VOID
 CreateVfrDriverList (
-  IN EFI_GUID   *DriverGuidArray
+  IN EFI_GUID  *DriverGuidArray
   )
 {
-  UINTN                         Index;
-  VAR_CHECK_VFR_DRIVER_INFO     *VfrDriverInfo;
+  UINTN                      Index;
+  VAR_CHECK_VFR_DRIVER_INFO  *VfrDriverInfo;
 
   for (Index = 0; !IsZeroGuid (&DriverGuidArray[Index]); Index++) {
-     DEBUG ((DEBUG_INFO , "CreateVfrDriverList: %g\n", &DriverGuidArray[Index]));
-     VfrDriverInfo = InternalVarCheckAllocateZeroPool (sizeof (*VfrDriverInfo));
-     ASSERT (VfrDriverInfo != NULL);
-     VfrDriverInfo->Signature = VAR_CHECK_VFR_DRIVER_INFO_SIGNATURE;
-     VfrDriverInfo->DriverGuid = &DriverGuidArray[Index];
-     InsertTailList (&mVfrDriverList, &VfrDriverInfo->Link);
+    DEBUG ((DEBUG_INFO, "CreateVfrDriverList: %g\n", &DriverGuidArray[Index]));
+    VfrDriverInfo = InternalVarCheckAllocateZeroPool (sizeof (*VfrDriverInfo));
+    ASSERT (VfrDriverInfo != NULL);
+    VfrDriverInfo->Signature  = VAR_CHECK_VFR_DRIVER_INFO_SIGNATURE;
+    VfrDriverInfo->DriverGuid = &DriverGuidArray[Index];
+    InsertTailList (&mVfrDriverList, &VfrDriverInfo->Link);
   }
 }
 
@@ -385,8 +388,8 @@ DestroyVfrDriverList (
   VOID
   )
 {
-  VAR_CHECK_VFR_DRIVER_INFO     *VfrDriverInfo;
-  LIST_ENTRY                    *VfrDriverLink;
+  VAR_CHECK_VFR_DRIVER_INFO  *VfrDriverInfo;
+  LIST_ENTRY                 *VfrDriverLink;
 
   while (mVfrDriverList.ForwardLink != &mVfrDriverList) {
     VfrDriverLink = mVfrDriverList.ForwardLink;
@@ -405,15 +408,15 @@ VarCheckHiiGenFromFv (
   VOID
   )
 {
-  EFI_GUID      *DriverGuidArray;
-  BOOLEAN       ScanAll;
+  EFI_GUID  *DriverGuidArray;
+  BOOLEAN   ScanAll;
 
-  DEBUG ((DEBUG_INFO , "VarCheckHiiGenDxeFromFv\n"));
+  DEBUG ((DEBUG_INFO, "VarCheckHiiGenDxeFromFv\n"));
 
   //
   // Get vfr driver guid array from PCD.
   //
-  DriverGuidArray = (EFI_GUID *) PcdGetPtr (PcdVarCheckVfrDriverGuidArray);
+  DriverGuidArray = (EFI_GUID *)PcdGetPtr (PcdVarCheckVfrDriverGuidArray);
 
   if (IsZeroGuid (&DriverGuidArray[0])) {
     //

@@ -20,40 +20,58 @@
 EFI_STATUS
 EFIAPI
 InitializeHighMemDxe (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  FDT_CLIENT_PROTOCOL               *FdtClient;
-  EFI_CPU_ARCH_PROTOCOL             *Cpu;
-  EFI_STATUS                        Status, FindNodeStatus;
-  INT32                             Node;
-  CONST UINT32                      *Reg;
-  UINT32                            RegSize;
-  UINTN                             AddressCells, SizeCells;
-  UINT64                            CurBase;
-  UINT64                            CurSize;
-  UINT64                            Attributes;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR   GcdDescriptor;
+  FDT_CLIENT_PROTOCOL              *FdtClient;
+  EFI_CPU_ARCH_PROTOCOL            *Cpu;
+  EFI_STATUS                       Status, FindNodeStatus;
+  INT32                            Node;
+  CONST UINT32                     *Reg;
+  UINT32                           RegSize;
+  UINTN                            AddressCells, SizeCells;
+  UINT64                           CurBase;
+  UINT64                           CurSize;
+  UINT64                           Attributes;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  GcdDescriptor;
 
-  Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
-                  (VOID **)&FdtClient);
+  Status = gBS->LocateProtocol (
+                  &gFdtClientProtocolGuid,
+                  NULL,
+                  (VOID **)&FdtClient
+                  );
   ASSERT_EFI_ERROR (Status);
 
-  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL,
-                  (VOID **)&Cpu);
+  Status = gBS->LocateProtocol (
+                  &gEfiCpuArchProtocolGuid,
+                  NULL,
+                  (VOID **)&Cpu
+                  );
   ASSERT_EFI_ERROR (Status);
 
   //
   // Check for memory node and add the memory spaces except the lowest one
   //
-  for (FindNodeStatus = FdtClient->FindMemoryNodeReg (FdtClient, &Node,
-                                     (CONST VOID **) &Reg, &AddressCells,
-                                     &SizeCells, &RegSize);
+  for (FindNodeStatus = FdtClient->FindMemoryNodeReg (
+                                     FdtClient,
+                                     &Node,
+                                     (CONST VOID **)&Reg,
+                                     &AddressCells,
+                                     &SizeCells,
+                                     &RegSize
+                                     );
        !EFI_ERROR (FindNodeStatus);
-       FindNodeStatus = FdtClient->FindNextMemoryNodeReg (FdtClient, Node,
-                                     &Node, (CONST VOID **) &Reg, &AddressCells,
-                                     &SizeCells, &RegSize)) {
+       FindNodeStatus = FdtClient->FindNextMemoryNodeReg (
+                                     FdtClient,
+                                     Node,
+                                     &Node,
+                                     (CONST VOID **)&Reg,
+                                     &AddressCells,
+                                     &SizeCells,
+                                     &RegSize
+                                     ))
+  {
     ASSERT (AddressCells <= 2);
     ASSERT (SizeCells <= 2);
 
@@ -62,36 +80,60 @@ InitializeHighMemDxe (
       if (AddressCells > 1) {
         CurBase = (CurBase << 32) | SwapBytes32 (*Reg++);
       }
+
       CurSize = SwapBytes32 (*Reg++);
       if (SizeCells > 1) {
         CurSize = (CurSize << 32) | SwapBytes32 (*Reg++);
       }
+
       RegSize -= (AddressCells + SizeCells) * sizeof (UINT32);
 
       Status = gDS->GetMemorySpaceDescriptor (CurBase, &GcdDescriptor);
       if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_WARN,
+        DEBUG ((
+          DEBUG_WARN,
           "%a: Region 0x%lx - 0x%lx not found in the GCD memory space map\n",
-          __FUNCTION__, CurBase, CurBase + CurSize - 1));
-          continue;
+          __FUNCTION__,
+          CurBase,
+          CurBase + CurSize - 1
+          ));
+        continue;
       }
+
       if (GcdDescriptor.GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
-        Status = gDS->AddMemorySpace (EfiGcdMemoryTypeSystemMemory, CurBase,
-                        CurSize, EFI_MEMORY_WB);
+        Status = gDS->AddMemorySpace (
+                        EfiGcdMemoryTypeSystemMemory,
+                        CurBase,
+                        CurSize,
+                        EFI_MEMORY_WB
+                        );
 
         if (EFI_ERROR (Status)) {
-          DEBUG ((EFI_D_ERROR,
+          DEBUG ((
+            DEBUG_ERROR,
             "%a: Failed to add System RAM @ 0x%lx - 0x%lx (%r)\n",
-            __FUNCTION__, CurBase, CurBase + CurSize - 1, Status));
+            __FUNCTION__,
+            CurBase,
+            CurBase + CurSize - 1,
+            Status
+            ));
           continue;
         }
 
-        Status = gDS->SetMemorySpaceAttributes (CurBase, CurSize,
-                        EFI_MEMORY_WB);
+        Status = gDS->SetMemorySpaceAttributes (
+                        CurBase,
+                        CurSize,
+                        EFI_MEMORY_WB
+                        );
         if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_WARN,
+          DEBUG ((
+            DEBUG_WARN,
             "%a: gDS->SetMemorySpaceAttributes() failed on region 0x%lx - 0x%lx (%r)\n",
-            __FUNCTION__, CurBase, CurBase + CurSize - 1, Status));
+            __FUNCTION__,
+            CurBase,
+            CurBase + CurSize - 1,
+            Status
+            ));
         }
 
         //
@@ -107,19 +149,30 @@ InitializeHighMemDxe (
         //
         Attributes = EFI_MEMORY_WB;
         if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) &
-             (1U << (UINT32)EfiConventionalMemory)) != 0) {
+             (1U << (UINT32)EfiConventionalMemory)) != 0)
+        {
           Attributes |= EFI_MEMORY_XP;
         }
 
         Status = Cpu->SetMemoryAttributes (Cpu, CurBase, CurSize, Attributes);
 
         if (EFI_ERROR (Status)) {
-          DEBUG ((EFI_D_ERROR,
+          DEBUG ((
+            DEBUG_ERROR,
             "%a: Failed to set System RAM @ 0x%lx - 0x%lx attribute (%r)\n",
-            __FUNCTION__, CurBase, CurBase + CurSize - 1, Status));
+            __FUNCTION__,
+            CurBase,
+            CurBase + CurSize - 1,
+            Status
+            ));
         } else {
-          DEBUG ((EFI_D_INFO, "%a: Add System RAM @ 0x%lx - 0x%lx\n",
-            __FUNCTION__, CurBase, CurBase + CurSize - 1));
+          DEBUG ((
+            DEBUG_INFO,
+            "%a: Add System RAM @ 0x%lx - 0x%lx\n",
+            __FUNCTION__,
+            CurBase,
+            CurBase + CurSize - 1
+            ));
         }
       }
     }

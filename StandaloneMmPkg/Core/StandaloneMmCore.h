@@ -59,64 +59,64 @@ typedef struct {
 //
 // Structure for recording the state of an MM Driver
 //
-#define EFI_MM_DRIVER_ENTRY_SIGNATURE SIGNATURE_32('s', 'd','r','v')
+#define EFI_MM_DRIVER_ENTRY_SIGNATURE  SIGNATURE_32('s', 'd','r','v')
 
 typedef struct {
-  UINTN                           Signature;
-  LIST_ENTRY                      Link;             // mDriverList
+  UINTN                         Signature;
+  LIST_ENTRY                    Link;               // mDriverList
 
-  LIST_ENTRY                      ScheduledLink;    // mScheduledQueue
+  LIST_ENTRY                    ScheduledLink;      // mScheduledQueue
 
-  EFI_FIRMWARE_VOLUME_HEADER      *FwVolHeader;
-  EFI_GUID                        FileName;
-  VOID                            *Pe32Data;
-  UINTN                           Pe32DataSize;
+  EFI_FIRMWARE_VOLUME_HEADER    *FwVolHeader;
+  EFI_GUID                      FileName;
+  VOID                          *Pe32Data;
+  UINTN                         Pe32DataSize;
 
-  VOID                            *Depex;
-  UINTN                           DepexSize;
+  VOID                          *Depex;
+  UINTN                         DepexSize;
 
-  BOOLEAN                         Before;
-  BOOLEAN                         After;
-  EFI_GUID                        BeforeAfterGuid;
+  BOOLEAN                       Before;
+  BOOLEAN                       After;
+  EFI_GUID                      BeforeAfterGuid;
 
-  BOOLEAN                         Dependent;
-  BOOLEAN                         Scheduled;
-  BOOLEAN                         Initialized;
-  BOOLEAN                         DepexProtocolError;
+  BOOLEAN                       Dependent;
+  BOOLEAN                       Scheduled;
+  BOOLEAN                       Initialized;
+  BOOLEAN                       DepexProtocolError;
 
-  EFI_HANDLE                      ImageHandle;
-  EFI_LOADED_IMAGE_PROTOCOL       *LoadedImage;
+  EFI_HANDLE                    ImageHandle;
+  EFI_LOADED_IMAGE_PROTOCOL     *LoadedImage;
   //
   // Image EntryPoint in MMRAM
   //
-  PHYSICAL_ADDRESS                ImageEntryPoint;
+  PHYSICAL_ADDRESS              ImageEntryPoint;
   //
   // Image Buffer in MMRAM
   //
-  PHYSICAL_ADDRESS                ImageBuffer;
+  PHYSICAL_ADDRESS              ImageBuffer;
   //
   // Image Page Number
   //
-  UINTN                           NumberOfPage;
+  UINTN                         NumberOfPage;
 } EFI_MM_DRIVER_ENTRY;
 
-#define EFI_HANDLE_SIGNATURE            SIGNATURE_32('h','n','d','l')
+#define EFI_HANDLE_SIGNATURE  SIGNATURE_32('h','n','d','l')
 
 ///
 /// IHANDLE - contains a list of protocol handles
 ///
 typedef struct {
-  UINTN               Signature;
+  UINTN         Signature;
   /// All handles list of IHANDLE
-  LIST_ENTRY          AllHandles;
+  LIST_ENTRY    AllHandles;
   /// List of PROTOCOL_INTERFACE's for this handle
-  LIST_ENTRY          Protocols;
-  UINTN               LocateRequest;
+  LIST_ENTRY    Protocols;
+  UINTN         LocateRequest;
 } IHANDLE;
 
 #define ASSERT_IS_HANDLE(a)  ASSERT((a)->Signature == EFI_HANDLE_SIGNATURE)
 
-#define PROTOCOL_ENTRY_SIGNATURE        SIGNATURE_32('p','r','t','e')
+#define PROTOCOL_ENTRY_SIGNATURE  SIGNATURE_32('p','r','t','e')
 
 ///
 /// PROTOCOL_ENTRY - each different protocol has 1 entry in the protocol
@@ -124,15 +124,15 @@ typedef struct {
 /// with a list of registered notifies.
 ///
 typedef struct {
-  UINTN               Signature;
+  UINTN         Signature;
   /// Link Entry inserted to mProtocolDatabase
-  LIST_ENTRY          AllEntries;
+  LIST_ENTRY    AllEntries;
   /// ID of the protocol
-  EFI_GUID            ProtocolID;
+  EFI_GUID      ProtocolID;
   /// All protocol interfaces
-  LIST_ENTRY          Protocols;
+  LIST_ENTRY    Protocols;
   /// Registered notification handlers
-  LIST_ENTRY          Notify;
+  LIST_ENTRY    Notify;
 } PROTOCOL_ENTRY;
 
 #define PROTOCOL_INTERFACE_SIGNATURE  SIGNATURE_32('p','i','f','c')
@@ -142,20 +142,20 @@ typedef struct {
 /// with a protocol interface structure
 ///
 typedef struct {
-  UINTN                       Signature;
+  UINTN             Signature;
   /// Link on IHANDLE.Protocols
-  LIST_ENTRY                  Link;
+  LIST_ENTRY        Link;
   /// Back pointer
-  IHANDLE                     *Handle;
+  IHANDLE           *Handle;
   /// Link on PROTOCOL_ENTRY.Protocols
-  LIST_ENTRY                  ByProtocol;
+  LIST_ENTRY        ByProtocol;
   /// The protocol ID
-  PROTOCOL_ENTRY              *Protocol;
+  PROTOCOL_ENTRY    *Protocol;
   /// The interface value
-  VOID                        *Interface;
+  VOID              *Interface;
 } PROTOCOL_INTERFACE;
 
-#define PROTOCOL_NOTIFY_SIGNATURE       SIGNATURE_32('p','r','t','n')
+#define PROTOCOL_NOTIFY_SIGNATURE  SIGNATURE_32('p','r','t','n')
 
 ///
 /// PROTOCOL_NOTIFY - used for each register notification for a protocol
@@ -166,7 +166,7 @@ typedef struct {
   /// All notifications for this protocol
   LIST_ENTRY          Link;
   /// Notification function
-  EFI_MM_NOTIFY_FN   Function;
+  EFI_MM_NOTIFY_FN    Function;
   /// Last position notified
   LIST_ENTRY          *Position;
 } PROTOCOL_NOTIFY;
@@ -213,9 +213,9 @@ EFI_STATUS
 EFIAPI
 MmInstallConfigurationTable (
   IN  CONST EFI_MM_SYSTEM_TABLE  *SystemTable,
-  IN  CONST EFI_GUID              *Guid,
-  IN  VOID                        *Table,
-  IN  UINTN                       TableSize
+  IN  CONST EFI_GUID             *Guid,
+  IN  VOID                       *Table,
+  IN  UINTN                      TableSize
   );
 
 /**
@@ -235,10 +235,10 @@ MmInstallConfigurationTable (
 EFI_STATUS
 EFIAPI
 MmInstallProtocolInterface (
-  IN OUT EFI_HANDLE     *UserHandle,
-  IN EFI_GUID           *Protocol,
-  IN EFI_INTERFACE_TYPE InterfaceType,
-  IN VOID               *Interface
+  IN OUT EFI_HANDLE      *UserHandle,
+  IN EFI_GUID            *Protocol,
+  IN EFI_INTERFACE_TYPE  InterfaceType,
+  IN VOID                *Interface
   );
 
 /**
@@ -260,10 +260,10 @@ MmInstallProtocolInterface (
 EFI_STATUS
 EFIAPI
 MmAllocatePages (
-  IN      EFI_ALLOCATE_TYPE         Type,
-  IN      EFI_MEMORY_TYPE           MemoryType,
-  IN      UINTN                     NumberOfPages,
-  OUT     EFI_PHYSICAL_ADDRESS      *Memory
+  IN      EFI_ALLOCATE_TYPE     Type,
+  IN      EFI_MEMORY_TYPE       MemoryType,
+  IN      UINTN                 NumberOfPages,
+  OUT     EFI_PHYSICAL_ADDRESS  *Memory
   );
 
 /**
@@ -285,10 +285,10 @@ MmAllocatePages (
 EFI_STATUS
 EFIAPI
 MmInternalAllocatePages (
-  IN      EFI_ALLOCATE_TYPE         Type,
-  IN      EFI_MEMORY_TYPE           MemoryType,
-  IN      UINTN                     NumberOfPages,
-  OUT     EFI_PHYSICAL_ADDRESS      *Memory
+  IN      EFI_ALLOCATE_TYPE     Type,
+  IN      EFI_MEMORY_TYPE       MemoryType,
+  IN      UINTN                 NumberOfPages,
+  OUT     EFI_PHYSICAL_ADDRESS  *Memory
   );
 
 /**
@@ -305,8 +305,8 @@ MmInternalAllocatePages (
 EFI_STATUS
 EFIAPI
 MmFreePages (
-  IN      EFI_PHYSICAL_ADDRESS      Memory,
-  IN      UINTN                     NumberOfPages
+  IN      EFI_PHYSICAL_ADDRESS  Memory,
+  IN      UINTN                 NumberOfPages
   );
 
 /**
@@ -323,8 +323,8 @@ MmFreePages (
 EFI_STATUS
 EFIAPI
 MmInternalFreePages (
-  IN      EFI_PHYSICAL_ADDRESS      Memory,
-  IN      UINTN                     NumberOfPages
+  IN      EFI_PHYSICAL_ADDRESS  Memory,
+  IN      UINTN                 NumberOfPages
   );
 
 /**
@@ -343,9 +343,9 @@ MmInternalFreePages (
 EFI_STATUS
 EFIAPI
 MmAllocatePool (
-  IN      EFI_MEMORY_TYPE           PoolType,
-  IN      UINTN                     Size,
-  OUT     VOID                      **Buffer
+  IN      EFI_MEMORY_TYPE  PoolType,
+  IN      UINTN            Size,
+  OUT     VOID             **Buffer
   );
 
 /**
@@ -364,9 +364,9 @@ MmAllocatePool (
 EFI_STATUS
 EFIAPI
 MmInternalAllocatePool (
-  IN      EFI_MEMORY_TYPE           PoolType,
-  IN      UINTN                     Size,
-  OUT     VOID                      **Buffer
+  IN      EFI_MEMORY_TYPE  PoolType,
+  IN      UINTN            Size,
+  OUT     VOID             **Buffer
   );
 
 /**
@@ -381,7 +381,7 @@ MmInternalAllocatePool (
 EFI_STATUS
 EFIAPI
 MmFreePool (
-  IN      VOID                      *Buffer
+  IN      VOID  *Buffer
   );
 
 /**
@@ -396,7 +396,7 @@ MmFreePool (
 EFI_STATUS
 EFIAPI
 MmInternalFreePool (
-  IN      VOID                      *Buffer
+  IN      VOID  *Buffer
   );
 
 /**
@@ -418,11 +418,11 @@ MmInternalFreePool (
 **/
 EFI_STATUS
 MmInstallProtocolInterfaceNotify (
-  IN OUT EFI_HANDLE     *UserHandle,
-  IN EFI_GUID           *Protocol,
-  IN EFI_INTERFACE_TYPE InterfaceType,
-  IN VOID               *Interface,
-  IN BOOLEAN            Notify
+  IN OUT EFI_HANDLE      *UserHandle,
+  IN EFI_GUID            *Protocol,
+  IN EFI_INTERFACE_TYPE  InterfaceType,
+  IN VOID                *Interface,
+  IN BOOLEAN             Notify
   );
 
 /**
@@ -441,9 +441,9 @@ MmInstallProtocolInterfaceNotify (
 EFI_STATUS
 EFIAPI
 MmUninstallProtocolInterface (
-  IN EFI_HANDLE       UserHandle,
-  IN EFI_GUID         *Protocol,
-  IN VOID             *Interface
+  IN EFI_HANDLE  UserHandle,
+  IN EFI_GUID    *Protocol,
+  IN VOID        *Interface
   );
 
 /**
@@ -460,9 +460,9 @@ MmUninstallProtocolInterface (
 EFI_STATUS
 EFIAPI
 MmHandleProtocol (
-  IN EFI_HANDLE       UserHandle,
-  IN EFI_GUID         *Protocol,
-  OUT VOID            **Interface
+  IN EFI_HANDLE  UserHandle,
+  IN EFI_GUID    *Protocol,
+  OUT VOID       **Interface
   );
 
 /**
@@ -481,9 +481,9 @@ MmHandleProtocol (
 EFI_STATUS
 EFIAPI
 MmRegisterProtocolNotify (
-  IN  CONST EFI_GUID              *Protocol,
-  IN  EFI_MM_NOTIFY_FN           Function,
-  OUT VOID                        **Registration
+  IN  CONST EFI_GUID    *Protocol,
+  IN  EFI_MM_NOTIFY_FN  Function,
+  OUT VOID              **Registration
   );
 
 /**
@@ -507,11 +507,11 @@ MmRegisterProtocolNotify (
 EFI_STATUS
 EFIAPI
 MmLocateHandle (
-  IN EFI_LOCATE_SEARCH_TYPE   SearchType,
-  IN EFI_GUID                 *Protocol   OPTIONAL,
-  IN VOID                     *SearchKey  OPTIONAL,
-  IN OUT UINTN                *BufferSize,
-  OUT EFI_HANDLE              *Buffer
+  IN EFI_LOCATE_SEARCH_TYPE  SearchType,
+  IN EFI_GUID                *Protocol   OPTIONAL,
+  IN VOID                    *SearchKey  OPTIONAL,
+  IN OUT UINTN               *BufferSize,
+  OUT EFI_HANDLE             *Buffer
   );
 
 /**
@@ -555,10 +555,10 @@ MmLocateProtocol (
 EFI_STATUS
 EFIAPI
 MmiManage (
-  IN     CONST EFI_GUID           *HandlerType,
-  IN     CONST VOID               *Context         OPTIONAL,
-  IN OUT VOID                     *CommBuffer      OPTIONAL,
-  IN OUT UINTN                    *CommBufferSize  OPTIONAL
+  IN     CONST EFI_GUID  *HandlerType,
+  IN     CONST VOID      *Context         OPTIONAL,
+  IN OUT VOID            *CommBuffer      OPTIONAL,
+  IN OUT UINTN           *CommBufferSize  OPTIONAL
   );
 
 /**
@@ -575,9 +575,9 @@ MmiManage (
 EFI_STATUS
 EFIAPI
 MmiHandlerRegister (
-  IN   EFI_MM_HANDLER_ENTRY_POINT     Handler,
-  IN   CONST EFI_GUID                 *HandlerType  OPTIONAL,
-  OUT  EFI_HANDLE                     *DispatchHandle
+  IN   EFI_MM_HANDLER_ENTRY_POINT  Handler,
+  IN   CONST EFI_GUID              *HandlerType  OPTIONAL,
+  OUT  EFI_HANDLE                  *DispatchHandle
   );
 
 /**
@@ -592,7 +592,7 @@ MmiHandlerRegister (
 EFI_STATUS
 EFIAPI
 MmiHandlerUnRegister (
-  IN  EFI_HANDLE                      DispatchHandle
+  IN  EFI_HANDLE  DispatchHandle
   );
 
 /**
@@ -611,10 +611,10 @@ MmiHandlerUnRegister (
 EFI_STATUS
 EFIAPI
 MmDriverDispatchHandler (
-  IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
-  IN OUT UINTN                    *CommBufferSize  OPTIONAL
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
+  IN OUT UINTN       *CommBufferSize  OPTIONAL
   );
 
 /**
@@ -633,10 +633,10 @@ MmDriverDispatchHandler (
 EFI_STATUS
 EFIAPI
 MmExitBootServiceHandler (
-  IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
-  IN OUT UINTN                    *CommBufferSize  OPTIONAL
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
+  IN OUT UINTN       *CommBufferSize  OPTIONAL
   );
 
 /**
@@ -655,10 +655,10 @@ MmExitBootServiceHandler (
 EFI_STATUS
 EFIAPI
 MmReadyToBootHandler (
-  IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
-  IN OUT UINTN                    *CommBufferSize  OPTIONAL
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
+  IN OUT UINTN       *CommBufferSize  OPTIONAL
   );
 
 /**
@@ -677,10 +677,10 @@ MmReadyToBootHandler (
 EFI_STATUS
 EFIAPI
 MmReadyToLockHandler (
-  IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
-  IN OUT UINTN                    *CommBufferSize  OPTIONAL
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
+  IN OUT UINTN       *CommBufferSize  OPTIONAL
   );
 
 /**
@@ -699,10 +699,10 @@ MmReadyToLockHandler (
 EFI_STATUS
 EFIAPI
 MmEndOfDxeHandler (
-  IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
-  IN OUT UINTN                    *CommBufferSize  OPTIONAL
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
+  IN OUT UINTN       *CommBufferSize  OPTIONAL
   );
 
 /**
@@ -720,15 +720,15 @@ MmEndOfDxeHandler (
 EFI_STATUS
 EFIAPI
 MmEfiNotAvailableYetArg5 (
-  UINTN Arg1,
-  UINTN Arg2,
-  UINTN Arg3,
-  UINTN Arg4,
-  UINTN Arg5
+  UINTN  Arg1,
+  UINTN  Arg2,
+  UINTN  Arg3,
+  UINTN  Arg4,
+  UINTN  Arg5
   );
 
 //
-//Functions used during debug builds
+// Functions used during debug builds
 //
 
 /**
@@ -752,10 +752,10 @@ MmDisplayDiscoveredNotDispatched (
 **/
 VOID
 MmAddMemoryRegion (
-  IN      EFI_PHYSICAL_ADDRESS      MemBase,
-  IN      UINT64                    MemLength,
-  IN      EFI_MEMORY_TYPE           Type,
-  IN      UINT64                    Attributes
+  IN      EFI_PHYSICAL_ADDRESS  MemBase,
+  IN      UINT64                MemLength,
+  IN      EFI_MEMORY_TYPE       Type,
+  IN      UINT64                Attributes
   );
 
 /**
@@ -769,8 +769,8 @@ MmAddMemoryRegion (
 **/
 PROTOCOL_ENTRY  *
 MmFindProtocolEntry (
-  IN EFI_GUID   *Protocol,
-  IN BOOLEAN    Create
+  IN EFI_GUID  *Protocol,
+  IN BOOLEAN   Create
   );
 
 /**
@@ -781,7 +781,7 @@ MmFindProtocolEntry (
 **/
 VOID
 MmNotifyProtocol (
-  IN PROTOCOL_INTERFACE   *Prot
+  IN PROTOCOL_INTERFACE  *Prot
   );
 
 /**
@@ -798,9 +798,9 @@ MmNotifyProtocol (
 **/
 PROTOCOL_INTERFACE *
 MmFindProtocolInterface (
-  IN IHANDLE        *Handle,
-  IN EFI_GUID       *Protocol,
-  IN VOID           *Interface
+  IN IHANDLE   *Handle,
+  IN EFI_GUID  *Protocol,
+  IN VOID      *Interface
   );
 
 /**
@@ -815,9 +815,9 @@ MmFindProtocolInterface (
 **/
 PROTOCOL_INTERFACE *
 MmRemoveInterfaceFromProtocol (
-  IN IHANDLE        *Handle,
-  IN EFI_GUID       *Protocol,
-  IN VOID           *Interface
+  IN IHANDLE   *Handle,
+  IN EFI_GUID  *Protocol,
+  IN VOID      *Interface
   );
 
 /**
@@ -834,7 +834,7 @@ MmRemoveInterfaceFromProtocol (
 **/
 BOOLEAN
 MmIsSchedulable (
-  IN  EFI_MM_DRIVER_ENTRY   *DriverEntry
+  IN  EFI_MM_DRIVER_ENTRY  *DriverEntry
   );
 
 /**
@@ -846,8 +846,8 @@ DumpMmramInfo (
   VOID
   );
 
-extern UINTN                    mMmramRangeCount;
-extern EFI_MMRAM_DESCRIPTOR     *mMmramRanges;
-extern EFI_SYSTEM_TABLE         *mEfiSystemTable;
+extern UINTN                 mMmramRangeCount;
+extern EFI_MMRAM_DESCRIPTOR  *mMmramRanges;
+extern EFI_SYSTEM_TABLE      *mEfiSystemTable;
 
 #endif

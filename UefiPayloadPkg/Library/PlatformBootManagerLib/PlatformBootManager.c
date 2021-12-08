@@ -24,22 +24,22 @@ InstallReadyToLock (
   VOID
   )
 {
-  EFI_STATUS                            Status;
-  EFI_HANDLE                            Handle;
-  EFI_SMM_ACCESS2_PROTOCOL              *SmmAccess;
+  EFI_STATUS                Status;
+  EFI_HANDLE                Handle;
+  EFI_SMM_ACCESS2_PROTOCOL  *SmmAccess;
 
-  DEBUG((DEBUG_INFO,"InstallReadyToLock  entering......\n"));
+  DEBUG ((DEBUG_INFO, "InstallReadyToLock  entering......\n"));
   //
   // Inform the SMM infrastructure that we're entering BDS and may run 3rd party code hereafter
   // Since PI1.2.1, we need signal EndOfDxe as ExitPmAuth
   //
   EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
-  DEBUG((DEBUG_INFO,"All EndOfDxe callbacks have returned successfully\n"));
+  DEBUG ((DEBUG_INFO, "All EndOfDxe callbacks have returned successfully\n"));
 
   //
   // Install DxeSmmReadyToLock protocol in order to lock SMM
   //
-  Status = gBS->LocateProtocol (&gEfiSmmAccess2ProtocolGuid, NULL, (VOID **) &SmmAccess);
+  Status = gBS->LocateProtocol (&gEfiSmmAccess2ProtocolGuid, NULL, (VOID **)&SmmAccess);
   if (!EFI_ERROR (Status)) {
     Handle = NULL;
     Status = gBS->InstallProtocolInterface (
@@ -51,7 +51,7 @@ InstallReadyToLock (
     ASSERT_EFI_ERROR (Status);
   }
 
-  DEBUG((DEBUG_INFO,"InstallReadyToLock  end\n"));
+  DEBUG ((DEBUG_INFO, "InstallReadyToLock  end\n"));
   return;
 }
 
@@ -70,12 +70,12 @@ InstallReadyToLock (
 **/
 INTN
 PlatformFindLoadOption (
-  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *Key,
-  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *Array,
-  IN UINTN                              Count
-)
+  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Key,
+  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Array,
+  IN UINTN                               Count
+  )
 {
-  UINTN                             Index;
+  UINTN  Index;
 
   for (Index = 0; Index < Count; Index++) {
     if ((Key->OptionType == Array[Index].OptionType) &&
@@ -83,8 +83,9 @@ PlatformFindLoadOption (
         (StrCmp (Key->Description, Array[Index].Description) == 0) &&
         (CompareMem (Key->FilePath, Array[Index].FilePath, GetDevicePathSize (Key->FilePath)) == 0) &&
         (Key->OptionalDataSize == Array[Index].OptionalDataSize) &&
-        (CompareMem (Key->OptionalData, Array[Index].OptionalData, Key->OptionalDataSize) == 0)) {
-      return (INTN) Index;
+        (CompareMem (Key->OptionalData, Array[Index].OptionalData, Key->OptionalDataSize) == 0))
+    {
+      return (INTN)Index;
     }
   }
 
@@ -100,28 +101,28 @@ PlatformFindLoadOption (
 **/
 VOID
 PlatformRegisterFvBootOption (
-  EFI_GUID                         *FileGuid,
-  CHAR16                           *Description,
-  UINT32                           Attributes
-)
+  EFI_GUID  *FileGuid,
+  CHAR16    *Description,
+  UINT32    Attributes
+  )
 {
-  EFI_STATUS                        Status;
-  UINTN                             OptionIndex;
-  EFI_BOOT_MANAGER_LOAD_OPTION      NewOption;
-  EFI_BOOT_MANAGER_LOAD_OPTION      *BootOptions;
-  UINTN                             BootOptionCount;
-  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH FileNode;
-  EFI_LOADED_IMAGE_PROTOCOL         *LoadedImage;
-  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
+  EFI_STATUS                         Status;
+  UINTN                              OptionIndex;
+  EFI_BOOT_MANAGER_LOAD_OPTION       NewOption;
+  EFI_BOOT_MANAGER_LOAD_OPTION       *BootOptions;
+  UINTN                              BootOptionCount;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  FileNode;
+  EFI_LOADED_IMAGE_PROTOCOL          *LoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
 
-  Status = gBS->HandleProtocol (gImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **) &LoadedImage);
+  Status = gBS->HandleProtocol (gImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **)&LoadedImage);
   ASSERT_EFI_ERROR (Status);
 
   EfiInitializeFwVolDevicepathNode (&FileNode, FileGuid);
   DevicePath = AppendDevicePathNode (
                  DevicePathFromHandle (LoadedImage->DeviceHandle),
-                 (EFI_DEVICE_PATH_PROTOCOL *) &FileNode
-               );
+                 (EFI_DEVICE_PATH_PROTOCOL *)&FileNode
+                 );
 
   Status = EfiBootManagerInitializeLoadOption (
              &NewOption,
@@ -132,16 +133,17 @@ PlatformRegisterFvBootOption (
              DevicePath,
              NULL,
              0
-           );
+             );
   if (!EFI_ERROR (Status)) {
     BootOptions = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
 
     OptionIndex = PlatformFindLoadOption (&NewOption, BootOptions, BootOptionCount);
 
     if (OptionIndex == -1) {
-      Status = EfiBootManagerAddLoadOptionVariable (&NewOption, (UINTN) -1);
+      Status = EfiBootManagerAddLoadOptionVariable (&NewOption, (UINTN)-1);
       ASSERT_EFI_ERROR (Status);
     }
+
     EfiBootManagerFreeLoadOption (&NewOption);
     EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
   }
@@ -159,20 +161,21 @@ VOID
 EFIAPI
 PlatformBootManagerBeforeConsole (
   VOID
-)
+  )
 {
-  EFI_INPUT_KEY                Enter;
-  EFI_INPUT_KEY                F2;
-  EFI_INPUT_KEY                Down;
-  EFI_BOOT_MANAGER_LOAD_OPTION BootOption;
-  EFI_STATUS                   Status;
+  EFI_INPUT_KEY                 Enter;
+  EFI_INPUT_KEY                 F2;
+  EFI_INPUT_KEY                 Down;
+  EFI_BOOT_MANAGER_LOAD_OPTION  BootOption;
+  EFI_STATUS                    Status;
 
-  Status = gBS->LocateProtocol (&gUniversalPayloadPlatformBootManagerOverrideProtocolGuid, NULL, (VOID **) &mUniversalPayloadPlatformBootManagerOverrideInstance);
+  Status = gBS->LocateProtocol (&gUniversalPayloadPlatformBootManagerOverrideProtocolGuid, NULL, (VOID **)&mUniversalPayloadPlatformBootManagerOverrideInstance);
   if (EFI_ERROR (Status)) {
     mUniversalPayloadPlatformBootManagerOverrideInstance = NULL;
   }
-  if (mUniversalPayloadPlatformBootManagerOverrideInstance != NULL){
-    mUniversalPayloadPlatformBootManagerOverrideInstance->BeforeConsole();
+
+  if (mUniversalPayloadPlatformBootManagerOverrideInstance != NULL) {
+    mUniversalPayloadPlatformBootManagerOverrideInstance->BeforeConsole ();
     return;
   }
 
@@ -189,7 +192,7 @@ PlatformBootManagerBeforeConsole (
   F2.ScanCode    = SCAN_F2;
   F2.UnicodeChar = CHAR_NULL;
   EfiBootManagerGetBootManagerMenu (&BootOption);
-  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16) BootOption.OptionNumber, 0, &F2, NULL);
+  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16)BootOption.OptionNumber, 0, &F2, NULL);
 
   //
   // Also add Down key to Boot Manager Menu since some serial terminals don't support F2 key.
@@ -197,7 +200,7 @@ PlatformBootManagerBeforeConsole (
   Down.ScanCode    = SCAN_DOWN;
   Down.UnicodeChar = CHAR_NULL;
   EfiBootManagerGetBootManagerMenu (&BootOption);
-  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16) BootOption.OptionNumber, 0, &Down, NULL);
+  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16)BootOption.OptionNumber, 0, &Down, NULL);
 
   //
   // Install ready to lock.
@@ -227,15 +230,16 @@ VOID
 EFIAPI
 PlatformBootManagerAfterConsole (
   VOID
-)
+  )
 {
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Black;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL  White;
 
-  if (mUniversalPayloadPlatformBootManagerOverrideInstance != NULL){
-    mUniversalPayloadPlatformBootManagerOverrideInstance->AfterConsole();
+  if (mUniversalPayloadPlatformBootManagerOverrideInstance != NULL) {
+    mUniversalPayloadPlatformBootManagerOverrideInstance->AfterConsole ();
     return;
   }
+
   Black.Blue = Black.Green = Black.Red = Black.Reserved = 0;
   White.Blue = White.Green = White.Red = White.Reserved = 0xFF;
 
@@ -252,8 +256,7 @@ PlatformBootManagerAfterConsole (
     L"F2 or Down      to enter Boot Manager Menu.\n"
     L"ENTER           to boot directly.\n"
     L"\n"
-  );
-
+    );
 }
 
 /**
@@ -264,12 +267,13 @@ PlatformBootManagerAfterConsole (
 VOID
 EFIAPI
 PlatformBootManagerWaitCallback (
-  UINT16          TimeoutRemain
-)
+  UINT16  TimeoutRemain
+  )
 {
-  if (mUniversalPayloadPlatformBootManagerOverrideInstance != NULL){
+  if (mUniversalPayloadPlatformBootManagerOverrideInstance != NULL) {
     mUniversalPayloadPlatformBootManagerOverrideInstance->WaitCallback (TimeoutRemain);
   }
+
   return;
 }
 
@@ -286,9 +290,10 @@ PlatformBootManagerUnableToBoot (
   VOID
   )
 {
-  if (mUniversalPayloadPlatformBootManagerOverrideInstance != NULL){
-    mUniversalPayloadPlatformBootManagerOverrideInstance->UnableToBoot();
+  if (mUniversalPayloadPlatformBootManagerOverrideInstance != NULL) {
+    mUniversalPayloadPlatformBootManagerOverrideInstance->UnableToBoot ();
   }
+
   return;
 }
 
@@ -307,7 +312,7 @@ EFIAPI
 PlatformBootManagerLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
-)
+  )
 {
   EFI_STATUS                           Status;
   UINTN                                Size;
@@ -324,16 +329,18 @@ PlatformBootManagerLibConstructor (
     return EFI_SUCCESS;
   }
 
-  GenericHeader = (UNIVERSAL_PAYLOAD_GENERIC_HEADER *) GET_GUID_HOB_DATA (GuidHob);
+  GenericHeader = (UNIVERSAL_PAYLOAD_GENERIC_HEADER *)GET_GUID_HOB_DATA (GuidHob);
   if ((sizeof (UNIVERSAL_PAYLOAD_GENERIC_HEADER) > GET_GUID_HOB_DATA_SIZE (GuidHob)) || (GenericHeader->Length > GET_GUID_HOB_DATA_SIZE (GuidHob))) {
     return EFI_NOT_FOUND;
   }
+
   if (GenericHeader->Revision == UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU_REVISION) {
-    BootManagerMenuFile = (UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU *) GET_GUID_HOB_DATA (GuidHob);
+    BootManagerMenuFile = (UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU *)GET_GUID_HOB_DATA (GuidHob);
     if (BootManagerMenuFile->Header.Length < UNIVERSAL_PAYLOAD_SIZEOF_THROUGH_FIELD (UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU, FileName)) {
       return EFI_NOT_FOUND;
     }
-    Size = sizeof (BootManagerMenuFile->FileName);
+
+    Size   = sizeof (BootManagerMenuFile->FileName);
     Status = PcdSetPtrS (PcdBootManagerMenuFile, &Size, &BootManagerMenuFile->FileName);
     ASSERT_EFI_ERROR (Status);
   } else {

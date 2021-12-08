@@ -20,14 +20,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gPs2MouseComponentNam
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gPs2MouseComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) Ps2MouseComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) Ps2MouseComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gPs2MouseComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)Ps2MouseComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)Ps2MouseComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mPs2MouseDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mPs2MouseDriverNameTable[] = {
   {
     "eng;en",
     L"PS/2 Mouse Driver"
@@ -165,16 +164,16 @@ Ps2MouseComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 Ps2MouseComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS                                  Status;
-  EFI_SIMPLE_POINTER_PROTOCOL                 *SimplePointerProtocol;
-  PS2_MOUSE_DEV                               *MouseDev;
+  EFI_STATUS                   Status;
+  EFI_SIMPLE_POINTER_PROTOCOL  *SimplePointerProtocol;
+  PS2_MOUSE_DEV                *MouseDev;
 
   //
   // This is a device driver, so ChildHandle must be NULL.
@@ -182,6 +181,7 @@ Ps2MouseComponentNameGetControllerName (
   if (ChildHandle != NULL) {
     return EFI_UNSUPPORTED;
   }
+
   //
   // Check Controller's handle
   //
@@ -190,13 +190,14 @@ Ps2MouseComponentNameGetControllerName (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Get the device context
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiSimplePointerProtocolGuid,
-                  (VOID **) &SimplePointerProtocol,
+                  (VOID **)&SimplePointerProtocol,
                   gPS2MouseDriver.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL

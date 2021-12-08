@@ -28,13 +28,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 VOID
 EFIAPI
 SnpUndi32CallbackBlock (
-  IN UINT64 UniqueId,
-  IN UINT32 Enable
+  IN UINT64  UniqueId,
+  IN UINT32  Enable
   )
 {
   SNP_DRIVER  *Snp;
 
-  Snp = (SNP_DRIVER *) (UINTN) UniqueId;
+  Snp = (SNP_DRIVER *)(UINTN)UniqueId;
   //
   // tcpip was calling snp at tpl_notify and when we acquire a lock that was
   // created at a lower level (TPL_CALLBACK) it gives an assert!
@@ -60,12 +60,12 @@ SnpUndi32CallbackBlock (
 VOID
 EFIAPI
 SnpUndi32CallbackDelay (
-  IN UINT64 UniqueId,
-  IN UINT64 MicroSeconds
+  IN UINT64  UniqueId,
+  IN UINT64  MicroSeconds
   )
 {
   if (MicroSeconds != 0) {
-    gBS->Stall ((UINTN) MicroSeconds);
+    gBS->Stall ((UINTN)MicroSeconds);
   }
 }
 
@@ -87,92 +87,96 @@ SnpUndi32CallbackDelay (
 VOID
 EFIAPI
 SnpUndi32CallbackMemio (
-  IN UINT64     UniqueId,
-  IN UINT8      ReadOrWrite,
-  IN UINT8      NumBytes,
-  IN UINT64     MemOrPortAddr,
-  IN OUT UINT64 BufferPtr
+  IN UINT64      UniqueId,
+  IN UINT8       ReadOrWrite,
+  IN UINT8       NumBytes,
+  IN UINT64      MemOrPortAddr,
+  IN OUT UINT64  BufferPtr
   )
 {
-  SNP_DRIVER                *Snp;
-  EFI_PCI_IO_PROTOCOL_WIDTH Width;
+  SNP_DRIVER                 *Snp;
+  EFI_PCI_IO_PROTOCOL_WIDTH  Width;
 
-  Snp   = (SNP_DRIVER *) (UINTN) UniqueId;
+  Snp = (SNP_DRIVER *)(UINTN)UniqueId;
 
-  Width = (EFI_PCI_IO_PROTOCOL_WIDTH) 0;
+  Width = (EFI_PCI_IO_PROTOCOL_WIDTH)0;
   switch (NumBytes) {
-  case 2:
-    Width = (EFI_PCI_IO_PROTOCOL_WIDTH) 1;
-    break;
+    case 2:
+      Width = (EFI_PCI_IO_PROTOCOL_WIDTH)1;
+      break;
 
-  case 4:
-    Width = (EFI_PCI_IO_PROTOCOL_WIDTH) 2;
-    break;
+    case 4:
+      Width = (EFI_PCI_IO_PROTOCOL_WIDTH)2;
+      break;
 
-  case 8:
-    Width = (EFI_PCI_IO_PROTOCOL_WIDTH) 3;
-    break;
+    case 8:
+      Width = (EFI_PCI_IO_PROTOCOL_WIDTH)3;
+      break;
   }
 
   switch (ReadOrWrite) {
-  case PXE_IO_READ:
-    ASSERT (Snp->IoBarIndex < PCI_MAX_BAR);
-    if (Snp->IoBarIndex < PCI_MAX_BAR) {
-      Snp->PciIo->Io.Read (
-                       Snp->PciIo,
-                       Width,
-                       Snp->IoBarIndex,      // BAR 1 (for 32bit regs), IO base address
-                       MemOrPortAddr,
-                       1,                    // count
-                       (VOID *) (UINTN) BufferPtr
-                       );
-    }
-    break;
+    case PXE_IO_READ:
+      ASSERT (Snp->IoBarIndex < PCI_MAX_BAR);
+      if (Snp->IoBarIndex < PCI_MAX_BAR) {
+        Snp->PciIo->Io.Read (
+                         Snp->PciIo,
+                         Width,
+                         Snp->IoBarIndex,    // BAR 1 (for 32bit regs), IO base address
+                         MemOrPortAddr,
+                         1,                  // count
+                         (VOID *)(UINTN)BufferPtr
+                         );
+      }
 
-  case PXE_IO_WRITE:
-    ASSERT (Snp->IoBarIndex < PCI_MAX_BAR);
-    if (Snp->IoBarIndex < PCI_MAX_BAR) {
-      Snp->PciIo->Io.Write (
-                       Snp->PciIo,
-                       Width,
-                       Snp->IoBarIndex,      // BAR 1 (for 32bit regs), IO base address
-                       MemOrPortAddr,
-                       1,                    // count
-                       (VOID *) (UINTN) BufferPtr
-                       );
-    }
-    break;
+      break;
 
-  case PXE_MEM_READ:
-    ASSERT (Snp->MemoryBarIndex < PCI_MAX_BAR);
-    if (Snp->MemoryBarIndex < PCI_MAX_BAR) {
-      Snp->PciIo->Mem.Read (
-                        Snp->PciIo,
-                        Width,
-                        Snp->MemoryBarIndex,  // BAR 0, Memory base address
-                        MemOrPortAddr,
-                        1,                    // count
-                        (VOID *) (UINTN) BufferPtr
-                        );
-    }
-    break;
+    case PXE_IO_WRITE:
+      ASSERT (Snp->IoBarIndex < PCI_MAX_BAR);
+      if (Snp->IoBarIndex < PCI_MAX_BAR) {
+        Snp->PciIo->Io.Write (
+                         Snp->PciIo,
+                         Width,
+                         Snp->IoBarIndex,    // BAR 1 (for 32bit regs), IO base address
+                         MemOrPortAddr,
+                         1,                  // count
+                         (VOID *)(UINTN)BufferPtr
+                         );
+      }
 
-  case PXE_MEM_WRITE:
-    ASSERT (Snp->MemoryBarIndex < PCI_MAX_BAR);
-    if (Snp->MemoryBarIndex < PCI_MAX_BAR) {
-      Snp->PciIo->Mem.Write (
-                        Snp->PciIo,
-                        Width,
-                        Snp->MemoryBarIndex,  // BAR 0, Memory base address
-                        MemOrPortAddr,
-                        1,                    // count
-                        (VOID *) (UINTN) BufferPtr
-                        );
-    }
-    break;
+      break;
+
+    case PXE_MEM_READ:
+      ASSERT (Snp->MemoryBarIndex < PCI_MAX_BAR);
+      if (Snp->MemoryBarIndex < PCI_MAX_BAR) {
+        Snp->PciIo->Mem.Read (
+                          Snp->PciIo,
+                          Width,
+                          Snp->MemoryBarIndex, // BAR 0, Memory base address
+                          MemOrPortAddr,
+                          1,                  // count
+                          (VOID *)(UINTN)BufferPtr
+                          );
+      }
+
+      break;
+
+    case PXE_MEM_WRITE:
+      ASSERT (Snp->MemoryBarIndex < PCI_MAX_BAR);
+      if (Snp->MemoryBarIndex < PCI_MAX_BAR) {
+        Snp->PciIo->Mem.Write (
+                          Snp->PciIo,
+                          Width,
+                          Snp->MemoryBarIndex, // BAR 0, Memory base address
+                          MemOrPortAddr,
+                          1,                  // count
+                          (VOID *)(UINTN)BufferPtr
+                          );
+      }
+
+      break;
   }
 
-  return ;
+  return;
 }
 
 /**
@@ -193,49 +197,50 @@ SnpUndi32CallbackMemio (
 VOID
 EFIAPI
 SnpUndi32CallbackMap (
-  IN UINT64     UniqueId,
-  IN UINT64     CpuAddr,
-  IN UINT32     NumBytes,
-  IN UINT32     Direction,
-  IN OUT UINT64 DeviceAddrPtr
+  IN UINT64      UniqueId,
+  IN UINT64      CpuAddr,
+  IN UINT32      NumBytes,
+  IN UINT32      Direction,
+  IN OUT UINT64  DeviceAddrPtr
   )
 {
-  EFI_PHYSICAL_ADDRESS          *DevAddrPtr;
-  EFI_PCI_IO_PROTOCOL_OPERATION DirectionFlag;
-  UINTN                         BuffSize;
-  SNP_DRIVER                    *Snp;
-  UINTN                         Index;
-  EFI_STATUS                    Status;
+  EFI_PHYSICAL_ADDRESS           *DevAddrPtr;
+  EFI_PCI_IO_PROTOCOL_OPERATION  DirectionFlag;
+  UINTN                          BuffSize;
+  SNP_DRIVER                     *Snp;
+  UINTN                          Index;
+  EFI_STATUS                     Status;
 
-  BuffSize    = (UINTN) NumBytes;
-  Snp         = (SNP_DRIVER *) (UINTN) UniqueId;
-  DevAddrPtr  = (EFI_PHYSICAL_ADDRESS *) (UINTN) DeviceAddrPtr;
+  BuffSize   = (UINTN)NumBytes;
+  Snp        = (SNP_DRIVER *)(UINTN)UniqueId;
+  DevAddrPtr = (EFI_PHYSICAL_ADDRESS *)(UINTN)DeviceAddrPtr;
 
   if (CpuAddr == 0) {
     *DevAddrPtr = 0;
-    return ;
+    return;
   }
 
   switch (Direction) {
-  case TO_AND_FROM_DEVICE:
-    DirectionFlag = EfiPciIoOperationBusMasterCommonBuffer;
-    break;
+    case TO_AND_FROM_DEVICE:
+      DirectionFlag = EfiPciIoOperationBusMasterCommonBuffer;
+      break;
 
-  case FROM_DEVICE:
-    DirectionFlag = EfiPciIoOperationBusMasterWrite;
-    break;
+    case FROM_DEVICE:
+      DirectionFlag = EfiPciIoOperationBusMasterWrite;
+      break;
 
-  case TO_DEVICE:
-    DirectionFlag = EfiPciIoOperationBusMasterRead;
-    break;
+    case TO_DEVICE:
+      DirectionFlag = EfiPciIoOperationBusMasterRead;
+      break;
 
-  default:
-    *DevAddrPtr = 0;
-    //
-    // any non zero indicates error!
-    //
-    return ;
+    default:
+      *DevAddrPtr = 0;
+      //
+      // any non zero indicates error!
+      //
+      return;
   }
+
   //
   // find an unused map_list entry
   //
@@ -246,17 +251,17 @@ SnpUndi32CallbackMap (
   }
 
   if (Index >= MAX_MAP_LENGTH) {
-    DEBUG ((EFI_D_INFO, "SNP maplist is FULL\n"));
+    DEBUG ((DEBUG_INFO, "SNP maplist is FULL\n"));
     *DevAddrPtr = 0;
-    return ;
+    return;
   }
 
-  Snp->MapList[Index].VirtualAddress = (EFI_PHYSICAL_ADDRESS) CpuAddr;
+  Snp->MapList[Index].VirtualAddress = (EFI_PHYSICAL_ADDRESS)CpuAddr;
 
   Status = Snp->PciIo->Map (
                          Snp->PciIo,
                          DirectionFlag,
-                         (VOID *) (UINTN) CpuAddr,
+                         (VOID *)(UINTN)CpuAddr,
                          &BuffSize,
                          DevAddrPtr,
                          &(Snp->MapList[Index].MapCookie)
@@ -266,7 +271,7 @@ SnpUndi32CallbackMap (
     Snp->MapList[Index].VirtualAddress = 0;
   }
 
-  return ;
+  return;
 }
 
 /**
@@ -287,17 +292,17 @@ SnpUndi32CallbackMap (
 VOID
 EFIAPI
 SnpUndi32CallbackUnmap (
-  IN UINT64 UniqueId,
-  IN UINT64 CpuAddr,
-  IN UINT32 NumBytes,
-  IN UINT32 Direction,
-  IN UINT64 DeviceAddr
+  IN UINT64  UniqueId,
+  IN UINT64  CpuAddr,
+  IN UINT32  NumBytes,
+  IN UINT32  Direction,
+  IN UINT64  DeviceAddr
   )
 {
   SNP_DRIVER  *Snp;
   UINT16      Index;
 
-  Snp = (SNP_DRIVER *) (UINTN) UniqueId;
+  Snp = (SNP_DRIVER *)(UINTN)UniqueId;
 
   for (Index = 0; Index < MAX_MAP_LENGTH; Index++) {
     if (Snp->MapList[Index].VirtualAddress == CpuAddr) {
@@ -306,14 +311,14 @@ SnpUndi32CallbackUnmap (
   }
 
   if (Index >= MAX_MAP_LENGTH) {
-    DEBUG ((EFI_D_ERROR, "SNP could not find a mapping, failed to unmap.\n"));
-    return ;
+    DEBUG ((DEBUG_ERROR, "SNP could not find a mapping, failed to unmap.\n"));
+    return;
   }
 
   Snp->PciIo->Unmap (Snp->PciIo, Snp->MapList[Index].MapCookie);
   Snp->MapList[Index].VirtualAddress = 0;
   Snp->MapList[Index].MapCookie      = NULL;
-  return ;
+  return;
 }
 
 /**
@@ -341,27 +346,26 @@ SnpUndi32CallbackUnmap (
 VOID
 EFIAPI
 SnpUndi32CallbackSync (
-  IN UINT64             UniqueId,
-  IN UINT64             CpuAddr,
-  IN UINT32             NumBytes,
-  IN UINT32             Direction,
-  IN UINT64             DeviceAddr
+  IN UINT64  UniqueId,
+  IN UINT64  CpuAddr,
+  IN UINT32  NumBytes,
+  IN UINT32  Direction,
+  IN UINT64  DeviceAddr
   )
 {
   if ((CpuAddr == 0) || (DeviceAddr == 0) || (NumBytes == 0)) {
-    return ;
-
+    return;
   }
 
   switch (Direction) {
-  case FROM_DEVICE:
-    CopyMem ((UINT8 *) (UINTN) CpuAddr, (UINT8 *) (UINTN) DeviceAddr, NumBytes);
-    break;
+    case FROM_DEVICE:
+      CopyMem ((UINT8 *)(UINTN)CpuAddr, (UINT8 *)(UINTN)DeviceAddr, NumBytes);
+      break;
 
-  case TO_DEVICE:
-    CopyMem ((UINT8 *) (UINTN) DeviceAddr, (UINT8 *) (UINTN) CpuAddr, NumBytes);
-    break;
+    case TO_DEVICE:
+      CopyMem ((UINT8 *)(UINTN)DeviceAddr, (UINT8 *)(UINTN)CpuAddr, NumBytes);
+      break;
   }
 
-  return ;
+  return;
 }

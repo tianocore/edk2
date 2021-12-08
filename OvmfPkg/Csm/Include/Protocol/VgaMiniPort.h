@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// Forward declaration for the EFI_VGA_MINI_PORT_PROTOCOL.
 ///
-typedef struct _EFI_VGA_MINI_PORT_PROTOCOL  EFI_VGA_MINI_PORT_PROTOCOL;
+typedef struct _EFI_VGA_MINI_PORT_PROTOCOL EFI_VGA_MINI_PORT_PROTOCOL;
 
 /**
   Sets the text display mode of a VGA controller.
@@ -49,40 +49,40 @@ EFI_STATUS
   );
 
 struct _EFI_VGA_MINI_PORT_PROTOCOL {
-  EFI_VGA_MINI_PORT_SET_MODE  SetMode;
+  EFI_VGA_MINI_PORT_SET_MODE    SetMode;
   ///
   /// MMIO base address of the VGA text mode framebuffer.  Typically set to 0xB8000.
   ///
-  UINT64                      VgaMemoryOffset;
+  UINT64                        VgaMemoryOffset;
   ///
   /// I/O Port address for the VGA CRTC address register. Typically set to 0x3D4.
   ///
-  UINT64                      CrtcAddressRegisterOffset;
+  UINT64                        CrtcAddressRegisterOffset;
   ///
   /// I/O Port address for the VGA CRTC data register.  Typically set to 0x3D5.
   ///
-  UINT64                      CrtcDataRegisterOffset;
+  UINT64                        CrtcDataRegisterOffset;
   ///
   /// PCI Controller MMIO BAR index of the VGA text mode frame buffer.  Typically
   /// set to EFI_PCI_IO_PASS_THROUGH_BAR
   ///
-  UINT8                       VgaMemoryBar;
+  UINT8                         VgaMemoryBar;
   ///
   /// PCI Controller I/O BAR index of the VGA CRTC address register.  Typically
   /// set to EFI_PCI_IO_PASS_THROUGH_BAR
   ///
-  UINT8                       CrtcAddressRegisterBar;
+  UINT8                         CrtcAddressRegisterBar;
   ///
   /// PCI Controller I/O BAR index of the VGA CRTC data register.  Typically set
   /// to EFI_PCI_IO_PASS_THROUGH_BAR
   ///
-  UINT8                       CrtcDataRegisterBar;
+  UINT8                         CrtcDataRegisterBar;
   ///
   /// The maximum number of text modes that this VGA controller supports.
   ///
-  UINT8                       MaxMode;
+  UINT8                         MaxMode;
 };
 
-extern EFI_GUID gEfiVgaMiniPortProtocolGuid;
+extern EFI_GUID  gEfiVgaMiniPortProtocolGuid;
 
 #endif

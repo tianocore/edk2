@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "ArpDriver.h"
 #include "ArpImpl.h"
 
-EFI_DRIVER_BINDING_PROTOCOL gArpDriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gArpDriverBinding = {
   ArpDriverBindingSupported,
   ArpDriverBindingStart,
   ArpDriverBindingStop,
@@ -17,7 +17,6 @@ EFI_DRIVER_BINDING_PROTOCOL gArpDriverBinding = {
   NULL,
   NULL
 };
-
 
 /**
   Create and initialize the arp service context data.
@@ -37,8 +36,8 @@ EFI_DRIVER_BINDING_PROTOCOL gArpDriverBinding = {
 **/
 EFI_STATUS
 ArpCreateService (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_HANDLE        ControllerHandle,
+  IN EFI_HANDLE            ImageHandle,
+  IN EFI_HANDLE            ControllerHandle,
   IN OUT ARP_SERVICE_DATA  *ArpService
   )
 {
@@ -176,7 +175,6 @@ ERROR_EXIT:
   return Status;
 }
 
-
 /**
   Clean the arp service context data.
 
@@ -226,7 +224,7 @@ ArpCleanService (
     //
     // Destroy the mnp child.
     //
-    NetLibDestroyServiceChild(
+    NetLibDestroyServiceChild (
       ArpService->ControllerHandle,
       ArpService->ImageHandle,
       &gEfiManagedNetworkServiceBindingProtocolGuid,
@@ -248,19 +246,19 @@ ArpCleanService (
 EFI_STATUS
 EFIAPI
 ArpDestroyChildEntryInHandleBuffer (
-  IN LIST_ENTRY         *Entry,
-  IN VOID               *Context
+  IN LIST_ENTRY  *Entry,
+  IN VOID        *Context
   )
 {
   ARP_INSTANCE_DATA             *Instance;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
 
-  if (Entry == NULL || Context == NULL) {
+  if ((Entry == NULL) || (Context == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Instance = NET_LIST_USER_STRUCT_S (Entry, ARP_INSTANCE_DATA, List, ARP_INSTANCE_DATA_SIGNATURE);
-  ServiceBinding    = (EFI_SERVICE_BINDING_PROTOCOL *) Context;
+  Instance       = NET_LIST_USER_STRUCT_S (Entry, ARP_INSTANCE_DATA, List, ARP_INSTANCE_DATA_SIGNATURE);
+  ServiceBinding = (EFI_SERVICE_BINDING_PROTOCOL *)Context;
 
   return ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
 }
@@ -334,7 +332,6 @@ ArpDriverBindingSupported (
   return Status;
 }
 
-
 /**
   Start this driver on ControllerHandle.
 
@@ -380,7 +377,7 @@ ArpDriverBindingStart (
   //
   // Allocate a zero pool for ArpService.
   //
-  ArpService = AllocateZeroPool (sizeof(ARP_SERVICE_DATA));
+  ArpService = AllocateZeroPool (sizeof (ARP_SERVICE_DATA));
   if (ArpService == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -426,7 +423,6 @@ ERROR:
 
   return Status;
 }
-
 
 /**
   Stop this driver on ControllerHandle.
@@ -492,7 +488,7 @@ ArpDriverBindingStop (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "ArpDriverBindingStop: Open ArpSb failed, %r.\n", Status));
+    DEBUG ((DEBUG_ERROR, "ArpDriverBindingStop: Open ArpSb failed, %r.\n", Status));
     return EFI_DEVICE_ERROR;
   }
 
@@ -502,7 +498,7 @@ ArpDriverBindingStop (
     //
     // NumberOfChildren is not zero, destroy all the ARP children instances.
     //
-    List = &ArpService->ChildrenList;
+    List   = &ArpService->ChildrenList;
     Status = NetDestroyLinkList (
                List,
                ArpDestroyChildEntryInHandleBuffer,
@@ -576,9 +572,9 @@ ArpServiceBindingCreateChild (
   //
   // Allocate memory for the instance context data.
   //
-  Instance = AllocateZeroPool (sizeof(ARP_INSTANCE_DATA));
+  Instance = AllocateZeroPool (sizeof (ARP_INSTANCE_DATA));
   if (Instance == NULL) {
-    DEBUG ((EFI_D_ERROR, "ArpSBCreateChild: Failed to allocate memory for Instance.\n"));
+    DEBUG ((DEBUG_ERROR, "ArpSBCreateChild: Failed to allocate memory for Instance.\n"));
 
     return EFI_OUT_OF_RESOURCES;
   }
@@ -615,7 +611,7 @@ ArpServiceBindingCreateChild (
   Status = gBS->OpenProtocol (
                   ArpService->MnpChildHandle,
                   &gEfiManagedNetworkProtocolGuid,
-                  (VOID **) &Mnp,
+                  (VOID **)&Mnp,
                   gArpDriverBinding.DriverBindingHandle,
                   Instance->Handle,
                   EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -637,7 +633,6 @@ ArpServiceBindingCreateChild (
 ERROR:
 
   if (EFI_ERROR (Status)) {
-
     gBS->CloseProtocol (
            ArpService->MnpChildHandle,
            &gEfiManagedNetworkProtocolGuid,
@@ -660,7 +655,6 @@ ERROR:
 
   return Status;
 }
-
 
 /**
   Destroys a child handle with a protocol installed on it.
@@ -746,8 +740,11 @@ ArpServiceBindingDestroyChild (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "ArpSBDestroyChild: Failed to uninstall the arp protocol, %r.\n",
-      Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "ArpSBDestroyChild: Failed to uninstall the arp protocol, %r.\n",
+      Status
+      ));
 
     Instance->InDestroy = FALSE;
     return Status;
@@ -808,4 +805,3 @@ ArpDriverEntryPoint (
            &gArpComponentName2
            );
 }
-

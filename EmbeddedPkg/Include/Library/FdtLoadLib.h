@@ -21,7 +21,7 @@
 **/
 EFI_STATUS
 InstallFdtFromSemihosting (
-  IN  CONST CHAR16*   FileName
+  IN  CONST CHAR16  *FileName
   );
 
 /**
@@ -36,7 +36,7 @@ InstallFdtFromSemihosting (
 **/
 EFI_STATUS
 InstallFdtFromFv (
-  IN  CONST EFI_GUID *FileName
+  IN  CONST EFI_GUID  *FileName
   );
 
 #endif

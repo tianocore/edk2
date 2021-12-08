@@ -24,26 +24,26 @@
   Arm SBBR specification versions.
 **/
 typedef enum {
-  ArmSbbrVersion_1_0    = 0,
-  ArmSbbrVersion_1_1    = 1,
-  ArmSbbrVersion_1_2    = 2,
-  ArmSbbrVersionMax     = 3
+  ArmSbbrVersion_1_0 = 0,
+  ArmSbbrVersion_1_1 = 1,
+  ArmSbbrVersion_1_2 = 2,
+  ArmSbbrVersionMax  = 3
 } ARM_SBBR_VERSION;
 
 /**
   The ACPI table instance counter.
 **/
 typedef struct AcpiTableCounter {
-  CONST UINT32  Signature;        /// ACPI table signature
-  UINT32        Count;            /// Instance count
+  CONST UINT32    Signature;      /// ACPI table signature
+  UINT32          Count;          /// Instance count
 } ACPI_TABLE_COUNTER;
 
 /**
   ACPI table SBBR requirements.
 **/
 typedef struct AcpiSbbrReq {
-  CONST UINT32* Tables;          /// List of required tables
-  CONST UINT32  TableCount;      /// Number of elements in Tables
+  CONST UINT32    *Tables;       /// List of required tables
+  CONST UINT32    TableCount;    /// Number of elements in Tables
 } ACPI_SBBR_REQ;
 
 /**
@@ -67,7 +67,7 @@ ArmSbbrResetTableCounts (
 BOOLEAN
 EFIAPI
 ArmSbbrIncrementTableCount (
-  UINT32 Signature
+  UINT32  Signature
   );
 
 /**
@@ -85,7 +85,7 @@ ArmSbbrIncrementTableCount (
 EFI_STATUS
 EFIAPI
 ArmSbbrReqsValidate (
-  ARM_SBBR_VERSION Version
+  ARM_SBBR_VERSION  Version
   );
 
 #endif // SBBR_VALIDATOR_H_

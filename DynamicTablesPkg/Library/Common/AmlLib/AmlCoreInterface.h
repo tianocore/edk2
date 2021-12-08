@@ -67,9 +67,9 @@
 EFI_STATUS
 EFIAPI
 AmlSerializeTree (
-  IN      AML_ROOT_NODE_HANDLE    RootNode,
-  IN      UINT8                 * Buffer,     OPTIONAL
-  IN  OUT UINT32                * BufferSize
+  IN      AML_ROOT_NODE_HANDLE  RootNode,
+  IN      UINT8                 *Buffer      OPTIONAL,
+  IN  OUT UINT32                *BufferSize
   );
 
 /** Clone a node.
@@ -89,8 +89,8 @@ AmlSerializeTree (
 EFI_STATUS
 EFIAPI
 AmlCloneNode (
-  IN  AML_NODE_HANDLE   Node,
-  OUT AML_NODE_HANDLE * ClonedNode
+  IN  AML_NODE_HANDLE  Node,
+  OUT AML_NODE_HANDLE  *ClonedNode
   );
 
 /**
@@ -127,7 +127,7 @@ AmlCloneNode (
 EFI_STATUS
 EFIAPI
 AmlRemoveNodeFromVarArgList (
-  IN  AML_NODE_HANDLE   Node
+  IN  AML_NODE_HANDLE  Node
   );
 
 /** Add the NewNode to the head of the variable list of arguments
@@ -145,8 +145,8 @@ AmlRemoveNodeFromVarArgList (
 EFI_STATUS
 EFIAPI
 AmlVarListAddHead (
-  IN  AML_NODE_HANDLE   ParentNode,
-  IN  AML_NODE_HANDLE   NewNode
+  IN  AML_NODE_HANDLE  ParentNode,
+  IN  AML_NODE_HANDLE  NewNode
   );
 
 /** Add the NewNode to the tail of the variable list of arguments
@@ -164,8 +164,8 @@ AmlVarListAddHead (
 EFI_STATUS
 EFIAPI
 AmlVarListAddTail (
-  IN  AML_NODE_HANDLE   ParentNode,
-  IN  AML_NODE_HANDLE   NewNode
+  IN  AML_NODE_HANDLE  ParentNode,
+  IN  AML_NODE_HANDLE  NewNode
   );
 
 /** Add the NewNode before the Node in the list of variable
@@ -183,8 +183,8 @@ AmlVarListAddTail (
 EFI_STATUS
 EFIAPI
 AmlVarListAddBefore (
-  IN  AML_NODE_HANDLE   Node,
-  IN  AML_NODE_HANDLE   NewNode
+  IN  AML_NODE_HANDLE  Node,
+  IN  AML_NODE_HANDLE  NewNode
   );
 
 /** Add the NewNode after the Node in the variable list of arguments
@@ -202,8 +202,8 @@ AmlVarListAddBefore (
 EFI_STATUS
 EFIAPI
 AmlVarListAddAfter (
-  IN  AML_NODE_HANDLE   Node,
-  IN  AML_NODE_HANDLE   NewNode
+  IN  AML_NODE_HANDLE  Node,
+  IN  AML_NODE_HANDLE  NewNode
   );
 
 /** Append a Resource Data node to the BufferOpNode.
@@ -221,8 +221,8 @@ AmlVarListAddAfter (
 EFI_STATUS
 EFIAPI
 AmlAppendRdNode (
-  IN  AML_OBJECT_NODE_HANDLE   BufferOpNode,
-  IN  AML_DATA_NODE_HANDLE     NewRdNode
+  IN  AML_OBJECT_NODE_HANDLE  BufferOpNode,
+  IN  AML_DATA_NODE_HANDLE    NewRdNode
   );
 
 /** Replace the OldNode, which is in a variable list of arguments,
@@ -244,8 +244,8 @@ AmlAppendRdNode (
 EFI_STATUS
 EFIAPI
 AmlReplaceVariableArgument (
-  IN  AML_NODE_HANDLE   OldNode,
-  IN  AML_NODE_HANDLE   NewNode
+  IN  AML_NODE_HANDLE  OldNode,
+  IN  AML_NODE_HANDLE  NewNode
   );
 
 /**
@@ -285,7 +285,7 @@ AmlReplaceVariableArgument (
 EAML_NODE_TYPE
 EFIAPI
 AmlGetNodeType (
-  IN  AML_NODE_HANDLE   Node
+  IN  AML_NODE_HANDLE  Node
   );
 
 /** Get the RootNode information.
@@ -302,8 +302,8 @@ AmlGetNodeType (
 EFI_STATUS
 EFIAPI
 AmlGetRootNodeInfo (
-  IN  AML_ROOT_NODE_HANDLE            RootNode,
-  OUT EFI_ACPI_DESCRIPTION_HEADER   * SdtHeaderBuffer
+  IN  AML_ROOT_NODE_HANDLE         RootNode,
+  OUT EFI_ACPI_DESCRIPTION_HEADER  *SdtHeaderBuffer
   );
 
 /** Get the ObjectNode information.
@@ -333,11 +333,11 @@ AmlGetRootNodeInfo (
 EFI_STATUS
 EFIAPI
 AmlGetObjectNodeInfo (
-  IN  AML_OBJECT_NODE_HANDLE    ObjectNode,
-  OUT UINT8                   * OpCode,           OPTIONAL
-  OUT UINT8                   * SubOpCode,        OPTIONAL
-  OUT UINT32                  * PkgLen,           OPTIONAL
-  OUT BOOLEAN                 * IsNameSpaceNode   OPTIONAL
+  IN  AML_OBJECT_NODE_HANDLE  ObjectNode,
+  OUT UINT8                   *OpCode            OPTIONAL,
+  OUT UINT8                   *SubOpCode         OPTIONAL,
+  OUT UINT32                  *PkgLen            OPTIONAL,
+  OUT BOOLEAN                 *IsNameSpaceNode   OPTIONAL
   );
 
 /** Returns the count of the fixed arguments for the input Node.
@@ -368,8 +368,8 @@ AmlGetFixedArgumentCount (
 EFI_STATUS
 EFIAPI
 AmlGetNodeDataType (
-  IN  AML_DATA_NODE_HANDLE    DataNode,
-  OUT EAML_NODE_DATA_TYPE   * DataType
+  IN  AML_DATA_NODE_HANDLE  DataNode,
+  OUT EAML_NODE_DATA_TYPE   *DataType
   );
 
 /** Get the descriptor Id of the resource data element
@@ -392,8 +392,8 @@ AmlGetNodeDataType (
 EFI_STATUS
 EFIAPI
 AmlGetResourceDataType (
-  IN  AML_DATA_NODE_HANDLE    DataNode,
-  OUT AML_RD_HEADER         * ResourceDataType
+  IN  AML_DATA_NODE_HANDLE  DataNode,
+  OUT AML_RD_HEADER         *ResourceDataType
   );
 
 /** Get the data buffer and size of the DataNode.
@@ -422,9 +422,9 @@ AmlGetResourceDataType (
 EFI_STATUS
 EFIAPI
 AmlGetDataNodeBuffer (
-  IN      AML_DATA_NODE_HANDLE    DataNode,
-      OUT UINT8                 * Buffer,     OPTIONAL
-  IN  OUT UINT32                * BufferSize
+  IN      AML_DATA_NODE_HANDLE  DataNode,
+  OUT UINT8                     *Buffer      OPTIONAL,
+  IN  OUT UINT32                *BufferSize
   );
 
 /** Update the ACPI DSDT/SSDT table header.
@@ -444,8 +444,8 @@ AmlGetDataNodeBuffer (
 EFI_STATUS
 EFIAPI
 AmlUpdateRootNode (
-  IN        AML_ROOT_NODE_HANDLE            RootNode,
-  IN  CONST EFI_ACPI_DESCRIPTION_HEADER   * SdtHeader
+  IN        AML_ROOT_NODE_HANDLE         RootNode,
+  IN  CONST EFI_ACPI_DESCRIPTION_HEADER  *SdtHeader
   );
 
 /** Update an object node representing an integer with a new value.
@@ -472,8 +472,8 @@ AmlUpdateRootNode (
 EFI_STATUS
 EFIAPI
 AmlUpdateInteger (
-  IN  AML_OBJECT_NODE_HANDLE    IntegerOpNode,
-  IN  UINT64                    NewInteger
+  IN  AML_OBJECT_NODE_HANDLE  IntegerOpNode,
+  IN  UINT64                  NewInteger
   );
 
 /** Update the buffer of a data node.
@@ -496,10 +496,10 @@ AmlUpdateInteger (
 EFI_STATUS
 EFIAPI
 AmlUpdateDataNode (
-  IN  AML_DATA_NODE_HANDLE    DataNode,
-  IN  EAML_NODE_DATA_TYPE     DataType,
-  IN  UINT8                 * Buffer,
-  IN  UINT32                  Size
+  IN  AML_DATA_NODE_HANDLE  DataNode,
+  IN  EAML_NODE_DATA_TYPE   DataType,
+  IN  UINT8                 *Buffer,
+  IN  UINT32                Size
   );
 
 /**
@@ -541,7 +541,7 @@ AmlUpdateDataNode (
 AML_NODE_HANDLE
 EFIAPI
 AmlGetParent (
-  IN  AML_NODE_HANDLE   Node
+  IN  AML_NODE_HANDLE  Node
   );
 
 /** Get the node at the input Index in the fixed argument list of the input
@@ -590,7 +590,7 @@ AmlGetFixedArgument (
 AML_NODE_HANDLE
 EFIAPI
 AmlGetSiblingVariableArgument (
-  IN  AML_NODE_HANDLE   VarArgNode
+  IN  AML_NODE_HANDLE  VarArgNode
   );
 
 /** Get the next variable argument.
@@ -619,8 +619,8 @@ AmlGetSiblingVariableArgument (
 AML_NODE_HANDLE
 EFIAPI
 AmlGetNextVariableArgument (
-  IN  AML_NODE_HANDLE   Node,
-  IN  AML_NODE_HANDLE   CurrVarArg
+  IN  AML_NODE_HANDLE  Node,
+  IN  AML_NODE_HANDLE  CurrVarArg
   );
 
 /** Get the previous variable argument.
@@ -650,8 +650,8 @@ AmlGetNextVariableArgument (
 AML_NODE_HANDLE
 EFIAPI
 AmlGetPreviousVariableArgument (
-  IN  AML_NODE_HANDLE   Node,
-  IN  AML_NODE_HANDLE   CurrVarArg
+  IN  AML_NODE_HANDLE  Node,
+  IN  AML_NODE_HANDLE  CurrVarArg
   );
 
 /**
@@ -682,10 +682,10 @@ AmlGetPreviousVariableArgument (
 **/
 typedef
 BOOLEAN
-(EFIAPI * EDKII_AML_TREE_ENUM_CALLBACK) (
+(EFIAPI *EDKII_AML_TREE_ENUM_CALLBACK)(
   IN       AML_NODE_HANDLE     Node,
-  IN  OUT  VOID              * Context,    OPTIONAL
-  IN  OUT  EFI_STATUS        * Status      OPTIONAL
+  IN  OUT  VOID              *Context     OPTIONAL,
+  IN  OUT  EFI_STATUS        *Status      OPTIONAL
   );
 
 /** Enumerate all nodes of the subtree under the input Node in the AML
@@ -712,10 +712,10 @@ BOOLEAN
 BOOLEAN
 EFIAPI
 AmlEnumTree (
-  IN      AML_NODE_HANDLE                 Node,
-  IN      EDKII_AML_TREE_ENUM_CALLBACK    CallBack,
-  IN  OUT VOID                          * Context,  OPTIONAL
-      OUT EFI_STATUS                    * Status    OPTIONAL
+  IN      AML_NODE_HANDLE               Node,
+  IN      EDKII_AML_TREE_ENUM_CALLBACK  CallBack,
+  IN  OUT VOID                          *Context   OPTIONAL,
+  OUT EFI_STATUS                        *Status    OPTIONAL
   );
 
 /**
@@ -759,9 +759,9 @@ AmlEnumTree (
 EFI_STATUS
 EFIAPI
 AmlGetAslPathName (
-  IN      AML_NODE_HANDLE     Node,
-      OUT CHAR8             * Buffer,
-  IN  OUT UINT32            * BufferSize
+  IN      AML_NODE_HANDLE  Node,
+  OUT CHAR8                *Buffer,
+  IN  OUT UINT32           *BufferSize
   );
 
 #endif // AML_CORE_INTERFACE_H_

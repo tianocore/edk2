@@ -22,11 +22,11 @@ Abstract:
 
 #define ARM_GIC_DEFAULT_PRIORITY  0x80
 
-extern EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptV2Protocol;
-extern EFI_HARDWARE_INTERRUPT2_PROTOCOL gHardwareInterrupt2V2Protocol;
+extern EFI_HARDWARE_INTERRUPT_PROTOCOL   gHardwareInterruptV2Protocol;
+extern EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V2Protocol;
 
-STATIC UINT32 mGicInterruptInterfaceBase;
-STATIC UINT32 mGicDistributorBase;
+STATIC UINT32  mGicInterruptInterfaceBase;
+STATIC UINT32  mGicDistributorBase;
 
 /**
   Enable interrupt source Source.
@@ -42,12 +42,12 @@ STATIC
 EFI_STATUS
 EFIAPI
 GicV2EnableInterruptSource (
-  IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
-  IN HARDWARE_INTERRUPT_SOURCE          Source
+  IN EFI_HARDWARE_INTERRUPT_PROTOCOL  *This,
+  IN HARDWARE_INTERRUPT_SOURCE        Source
   )
 {
   if (Source >= mGicNumInterrupts) {
-    ASSERT(FALSE);
+    ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
 
@@ -70,12 +70,12 @@ STATIC
 EFI_STATUS
 EFIAPI
 GicV2DisableInterruptSource (
-  IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
-  IN HARDWARE_INTERRUPT_SOURCE          Source
+  IN EFI_HARDWARE_INTERRUPT_PROTOCOL  *This,
+  IN HARDWARE_INTERRUPT_SOURCE        Source
   )
 {
   if (Source >= mGicNumInterrupts) {
-    ASSERT(FALSE);
+    ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
 
@@ -99,13 +99,13 @@ STATIC
 EFI_STATUS
 EFIAPI
 GicV2GetInterruptSourceState (
-  IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
-  IN HARDWARE_INTERRUPT_SOURCE          Source,
-  IN BOOLEAN                            *InterruptState
+  IN EFI_HARDWARE_INTERRUPT_PROTOCOL  *This,
+  IN HARDWARE_INTERRUPT_SOURCE        Source,
+  IN BOOLEAN                          *InterruptState
   )
 {
   if (Source >= mGicNumInterrupts) {
-    ASSERT(FALSE);
+    ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
 
@@ -129,12 +129,12 @@ STATIC
 EFI_STATUS
 EFIAPI
 GicV2EndOfInterrupt (
-  IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
-  IN HARDWARE_INTERRUPT_SOURCE          Source
+  IN EFI_HARDWARE_INTERRUPT_PROTOCOL  *This,
+  IN HARDWARE_INTERRUPT_SOURCE        Source
   )
 {
   if (Source >= mGicNumInterrupts) {
-    ASSERT(FALSE);
+    ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
 
@@ -158,8 +158,8 @@ STATIC
 VOID
 EFIAPI
 GicV2IrqInterruptHandler (
-  IN EFI_EXCEPTION_TYPE           InterruptType,
-  IN EFI_SYSTEM_CONTEXT           SystemContext
+  IN EFI_EXCEPTION_TYPE  InterruptType,
+  IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
   UINT32                      GicInterrupt;
@@ -185,7 +185,7 @@ GicV2IrqInterruptHandler (
 }
 
 // The protocol instance produced by this driver
-EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptV2Protocol = {
+EFI_HARDWARE_INTERRUPT_PROTOCOL  gHardwareInterruptV2Protocol = {
   RegisterInterruptSource,
   GicV2EnableInterruptSource,
   GicV2DisableInterruptSource,
@@ -208,28 +208,28 @@ EFI_STATUS
 EFIAPI
 GicV2GetTriggerType (
   IN  EFI_HARDWARE_INTERRUPT2_PROTOCOL      *This,
-  IN  HARDWARE_INTERRUPT_SOURCE              Source,
+  IN  HARDWARE_INTERRUPT_SOURCE             Source,
   OUT EFI_HARDWARE_INTERRUPT2_TRIGGER_TYPE  *TriggerType
   )
 {
-  UINTN                   RegAddress;
-  UINTN                   Config1Bit;
-  EFI_STATUS              Status;
+  UINTN       RegAddress;
+  UINTN       Config1Bit;
+  EFI_STATUS  Status;
 
   Status = GicGetDistributorIcfgBaseAndBit (
-              Source,
-              &RegAddress,
-              &Config1Bit
-              );
+             Source,
+             &RegAddress,
+             &Config1Bit
+             );
 
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   if ((MmioRead32 (RegAddress) & (1 << Config1Bit)) == 0) {
-     *TriggerType = EFI_HARDWARE_INTERRUPT2_TRIGGER_LEVEL_HIGH;
+    *TriggerType = EFI_HARDWARE_INTERRUPT2_TRIGGER_LEVEL_HIGH;
   } else {
-     *TriggerType = EFI_HARDWARE_INTERRUPT2_TRIGGER_EDGE_RISING;
+    *TriggerType = EFI_HARDWARE_INTERRUPT2_TRIGGER_EDGE_RISING;
   }
 
   return EFI_SUCCESS;
@@ -254,18 +254,22 @@ GicV2SetTriggerType (
   IN  EFI_HARDWARE_INTERRUPT2_TRIGGER_TYPE  TriggerType
   )
 {
-  UINTN                   RegAddress;
-  UINTN                   Config1Bit;
-  UINT32                  Value;
-  EFI_STATUS              Status;
-  BOOLEAN                 SourceEnabled;
+  UINTN       RegAddress;
+  UINTN       Config1Bit;
+  UINT32      Value;
+  EFI_STATUS  Status;
+  BOOLEAN     SourceEnabled;
 
-  if (   (TriggerType != EFI_HARDWARE_INTERRUPT2_TRIGGER_EDGE_RISING)
-      && (TriggerType != EFI_HARDWARE_INTERRUPT2_TRIGGER_LEVEL_HIGH)) {
-          DEBUG ((DEBUG_ERROR, "Invalid interrupt trigger type: %d\n", \
-                  TriggerType));
-          ASSERT (FALSE);
-          return EFI_UNSUPPORTED;
+  if (  (TriggerType != EFI_HARDWARE_INTERRUPT2_TRIGGER_EDGE_RISING)
+     && (TriggerType != EFI_HARDWARE_INTERRUPT2_TRIGGER_LEVEL_HIGH))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Invalid interrupt trigger type: %d\n", \
+      TriggerType
+      ));
+    ASSERT (FALSE);
+    return EFI_UNSUPPORTED;
   }
 
   Status = GicGetDistributorIcfgBaseAndBit (
@@ -279,7 +283,7 @@ GicV2SetTriggerType (
   }
 
   Status = GicV2GetInterruptSourceState (
-             (EFI_HARDWARE_INTERRUPT_PROTOCOL*)This,
+             (EFI_HARDWARE_INTERRUPT_PROTOCOL *)This,
              Source,
              &SourceEnabled
              );
@@ -296,7 +300,7 @@ GicV2SetTriggerType (
   // otherwise GIC behavior is UNPREDICTABLE.
   if (SourceEnabled) {
     GicV2DisableInterruptSource (
-      (EFI_HARDWARE_INTERRUPT_PROTOCOL*)This,
+      (EFI_HARDWARE_INTERRUPT_PROTOCOL *)This,
       Source
       );
   }
@@ -310,7 +314,7 @@ GicV2SetTriggerType (
   // Restore interrupt state
   if (SourceEnabled) {
     GicV2EnableInterruptSource (
-      (EFI_HARDWARE_INTERRUPT_PROTOCOL*)This,
+      (EFI_HARDWARE_INTERRUPT_PROTOCOL *)This,
       Source
       );
   }
@@ -318,7 +322,7 @@ GicV2SetTriggerType (
   return EFI_SUCCESS;
 }
 
-EFI_HARDWARE_INTERRUPT2_PROTOCOL gHardwareInterrupt2V2Protocol = {
+EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V2Protocol = {
   (HARDWARE_INTERRUPT2_REGISTER)RegisterInterruptSource,
   (HARDWARE_INTERRUPT2_ENABLE)GicV2EnableInterruptSource,
   (HARDWARE_INTERRUPT2_DISABLE)GicV2DisableInterruptSource,
@@ -345,8 +349,8 @@ GicV2ExitBootServicesEvent (
   IN VOID       *Context
   )
 {
-  UINTN    Index;
-  UINT32   GicInterrupt;
+  UINTN   Index;
+  UINT32  GicInterrupt;
 
   // Disable all the interrupts
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
@@ -382,30 +386,30 @@ GicV2ExitBootServicesEvent (
 **/
 EFI_STATUS
 GicV2DxeInitialize (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS              Status;
-  UINTN                   Index;
-  UINT32                  RegOffset;
-  UINTN                   RegShift;
-  UINT32                  CpuTarget;
+  EFI_STATUS  Status;
+  UINTN       Index;
+  UINT32      RegOffset;
+  UINTN       RegShift;
+  UINT32      CpuTarget;
 
   // Make sure the Interrupt Controller Protocol is not already installed in
   // the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
   mGicInterruptInterfaceBase = PcdGet64 (PcdGicInterruptInterfaceBase);
-  mGicDistributorBase = PcdGet64 (PcdGicDistributorBase);
-  mGicNumInterrupts = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
+  mGicDistributorBase        = PcdGet64 (PcdGicDistributorBase);
+  mGicNumInterrupts          = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
 
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
     GicV2DisableInterruptSource (&gHardwareInterruptV2Protocol, Index);
 
     // Set Priority
     RegOffset = Index / 4;
-    RegShift = (Index % 4) * 8;
+    RegShift  = (Index % 4) * 8;
     MmioAndThenOr32 (
       mGicDistributorBase + ARM_GIC_ICDIPR + (4 * RegOffset),
       ~(0xff << RegShift),

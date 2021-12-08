@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _LEGACY_BIOS_INTERFACE_
 #define _LEGACY_BIOS_INTERFACE_
 
-
 #include <FrameworkDxe.h>
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/SmBios.h>
@@ -62,7 +61,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // BUGBUG: This entry maybe changed to PCD in future and wait for
 //         redesign of BDS library
 //
-#define MAX_BBS_ENTRIES 0x100
+#define MAX_BBS_ENTRIES  0x100
 
 //
 // Thunk Status Codes
@@ -79,8 +78,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // 8259 Hardware definitions
 //
-#define LEGACY_MODE_BASE_VECTOR_MASTER     0x08
-#define LEGACY_MODE_BASE_VECTOR_SLAVE      0x70
+#define LEGACY_MODE_BASE_VECTOR_MASTER  0x08
+#define LEGACY_MODE_BASE_VECTOR_SLAVE   0x70
 
 //
 // The original PC used INT8-F for master PIC. Since these mapped over
@@ -96,53 +95,53 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // offset + 0xabcd could overflow which exceeds 0xFFFF which is invalid in real mode.
 // So this will keep offset as small as possible to avoid offset overflow in real mode.
 //
-#define NORMALIZE_EFI_SEGMENT(_Adr)      (UINT16) (((UINTN) (_Adr)) >> 4)
-#define NORMALIZE_EFI_OFFSET(_Adr)       (UINT16) (((UINT16) ((UINTN) (_Adr))) & 0xf)
+#define NORMALIZE_EFI_SEGMENT(_Adr)  (UINT16) (((UINTN) (_Adr)) >> 4)
+#define NORMALIZE_EFI_OFFSET(_Adr)   (UINT16) (((UINT16) ((UINTN) (_Adr))) & 0xf)
 
 //
 // Trace defines
 //
 //
-#define LEGACY_BDA_TRACE    0x000
-#define LEGACY_BIOS_TRACE   0x040
-#define LEGACY_BOOT_TRACE   0x080
-#define LEGACY_CMOS_TRACE   0x0C0
-#define LEGACY_IDE_TRACE    0x100
-#define LEGACY_MP_TRACE     0x140
-#define LEGACY_PCI_TRACE    0x180
-#define LEGACY_SIO_TRACE    0x1C0
+#define LEGACY_BDA_TRACE   0x000
+#define LEGACY_BIOS_TRACE  0x040
+#define LEGACY_BOOT_TRACE  0x080
+#define LEGACY_CMOS_TRACE  0x0C0
+#define LEGACY_IDE_TRACE   0x100
+#define LEGACY_MP_TRACE    0x140
+#define LEGACY_PCI_TRACE   0x180
+#define LEGACY_SIO_TRACE   0x1C0
 
-#define LEGACY_PCI_TRACE_000 LEGACY_PCI_TRACE + 0x00
-#define LEGACY_PCI_TRACE_001 LEGACY_PCI_TRACE + 0x01
-#define LEGACY_PCI_TRACE_002 LEGACY_PCI_TRACE + 0x02
-#define LEGACY_PCI_TRACE_003 LEGACY_PCI_TRACE + 0x03
-#define LEGACY_PCI_TRACE_004 LEGACY_PCI_TRACE + 0x04
-#define LEGACY_PCI_TRACE_005 LEGACY_PCI_TRACE + 0x05
-#define LEGACY_PCI_TRACE_006 LEGACY_PCI_TRACE + 0x06
-#define LEGACY_PCI_TRACE_007 LEGACY_PCI_TRACE + 0x07
-#define LEGACY_PCI_TRACE_008 LEGACY_PCI_TRACE + 0x08
-#define LEGACY_PCI_TRACE_009 LEGACY_PCI_TRACE + 0x09
-#define LEGACY_PCI_TRACE_00A LEGACY_PCI_TRACE + 0x0A
-#define LEGACY_PCI_TRACE_00B LEGACY_PCI_TRACE + 0x0B
-#define LEGACY_PCI_TRACE_00C LEGACY_PCI_TRACE + 0x0C
-#define LEGACY_PCI_TRACE_00D LEGACY_PCI_TRACE + 0x0D
-#define LEGACY_PCI_TRACE_00E LEGACY_PCI_TRACE + 0x0E
-#define LEGACY_PCI_TRACE_00F LEGACY_PCI_TRACE + 0x0F
+#define LEGACY_PCI_TRACE_000  LEGACY_PCI_TRACE + 0x00
+#define LEGACY_PCI_TRACE_001  LEGACY_PCI_TRACE + 0x01
+#define LEGACY_PCI_TRACE_002  LEGACY_PCI_TRACE + 0x02
+#define LEGACY_PCI_TRACE_003  LEGACY_PCI_TRACE + 0x03
+#define LEGACY_PCI_TRACE_004  LEGACY_PCI_TRACE + 0x04
+#define LEGACY_PCI_TRACE_005  LEGACY_PCI_TRACE + 0x05
+#define LEGACY_PCI_TRACE_006  LEGACY_PCI_TRACE + 0x06
+#define LEGACY_PCI_TRACE_007  LEGACY_PCI_TRACE + 0x07
+#define LEGACY_PCI_TRACE_008  LEGACY_PCI_TRACE + 0x08
+#define LEGACY_PCI_TRACE_009  LEGACY_PCI_TRACE + 0x09
+#define LEGACY_PCI_TRACE_00A  LEGACY_PCI_TRACE + 0x0A
+#define LEGACY_PCI_TRACE_00B  LEGACY_PCI_TRACE + 0x0B
+#define LEGACY_PCI_TRACE_00C  LEGACY_PCI_TRACE + 0x0C
+#define LEGACY_PCI_TRACE_00D  LEGACY_PCI_TRACE + 0x0D
+#define LEGACY_PCI_TRACE_00E  LEGACY_PCI_TRACE + 0x0E
+#define LEGACY_PCI_TRACE_00F  LEGACY_PCI_TRACE + 0x0F
 
-#define BDA_VIDEO_MODE      0x49
+#define BDA_VIDEO_MODE  0x49
 
-#define IDE_PI_REGISTER_PNE     BIT0
-#define IDE_PI_REGISTER_SNE     BIT2
+#define IDE_PI_REGISTER_PNE  BIT0
+#define IDE_PI_REGISTER_SNE  BIT2
 
 typedef struct {
-  UINTN   PciSegment;
-  UINTN   PciBus;
-  UINTN   PciDevice;
-  UINTN   PciFunction;
-  UINT32  ShadowAddress;
-  UINT32  ShadowedSize;
-  UINT8   DiskStart;
-  UINT8   DiskEnd;
+  UINTN     PciSegment;
+  UINTN     PciBus;
+  UINTN     PciDevice;
+  UINTN     PciFunction;
+  UINT32    ShadowAddress;
+  UINT32    ShadowedSize;
+  UINT8     DiskStart;
+  UINT8     DiskEnd;
 } ROM_INSTANCE_ENTRY;
 
 //
@@ -150,15 +149,15 @@ typedef struct {
 //
 #if defined (MDE_CPU_IA32)
 
-#define NUM_REAL_GDT_ENTRIES  3
-#define CONVENTIONAL_MEMORY_TOP 0xA0000   // 640 KB
-#define INITIAL_VALUE_BELOW_1K  0x0
+#define NUM_REAL_GDT_ENTRIES     3
+#define CONVENTIONAL_MEMORY_TOP  0xA0000  // 640 KB
+#define INITIAL_VALUE_BELOW_1K   0x0
 
 #elif defined (MDE_CPU_X64)
 
-#define NUM_REAL_GDT_ENTRIES  8
-#define CONVENTIONAL_MEMORY_TOP 0xA0000   // 640 KB
-#define INITIAL_VALUE_BELOW_1K  0x0
+#define NUM_REAL_GDT_ENTRIES     8
+#define CONVENTIONAL_MEMORY_TOP  0xA0000  // 640 KB
+#define INITIAL_VALUE_BELOW_1K   0x0
 
 #endif
 
@@ -168,28 +167,28 @@ typedef struct {
 // Define what a processor GDT looks like
 //
 typedef struct {
-  UINT32  LimitLo : 16;
-  UINT32  BaseLo : 16;
-  UINT32  BaseMid : 8;
-  UINT32  Type : 4;
-  UINT32  System : 1;
-  UINT32  Dpl : 2;
-  UINT32  Present : 1;
-  UINT32  LimitHi : 4;
-  UINT32  Software : 1;
-  UINT32  Reserved : 1;
-  UINT32  DefaultSize : 1;
-  UINT32  Granularity : 1;
-  UINT32  BaseHi : 8;
+  UINT32    LimitLo     : 16;
+  UINT32    BaseLo      : 16;
+  UINT32    BaseMid     : 8;
+  UINT32    Type        : 4;
+  UINT32    System      : 1;
+  UINT32    Dpl         : 2;
+  UINT32    Present     : 1;
+  UINT32    LimitHi     : 4;
+  UINT32    Software    : 1;
+  UINT32    Reserved    : 1;
+  UINT32    DefaultSize : 1;
+  UINT32    Granularity : 1;
+  UINT32    BaseHi      : 8;
 } GDT32;
 
 typedef struct {
-  UINT16  LimitLow;
-  UINT16  BaseLow;
-  UINT8   BaseMid;
-  UINT8   Attribute;
-  UINT8   LimitHi;
-  UINT8   BaseHi;
+  UINT16    LimitLow;
+  UINT16    BaseLow;
+  UINT8     BaseMid;
+  UINT8     Attribute;
+  UINT8     LimitHi;
+  UINT8     BaseHi;
 } GDT64;
 
 //
@@ -197,13 +196,13 @@ typedef struct {
 // This data structure must be kept in sync with ASM STRUCT in Thunk.inc
 //
 typedef struct {
-  UINT16  Limit;
-  UINT64  Base;
+  UINT16    Limit;
+  UINT64    Base;
 } DESCRIPTOR64;
 
 typedef struct {
-  UINT16  Limit;
-  UINT32  Base;
+  UINT16    Limit;
+  UINT32    Base;
 } DESCRIPTOR32;
 
 //
@@ -220,33 +219,33 @@ typedef struct {
   // Space for the code
   //  The address of Code is also the beginning of the relocated Thunk code
   //
-  CHAR8                             Code[4096]; // ?
+  CHAR8                                Code[4096]; // ?
   //
   // The address of the Reverse Thunk code
   //  Note that this member CONTAINS the address of the relocated reverse thunk
   //  code unlike the member variable 'Code', which IS the address of the Thunk
   //  code.
   //
-  UINT32                            LowReverseThunkStart;
+  UINT32                               LowReverseThunkStart;
 
   //
   // Data for the code (cs releative)
   //
-  DESCRIPTOR32                      GdtDesc;          // Protected mode GDT
-  DESCRIPTOR32                      IdtDesc;          // Protected mode IDT
-  UINT32                            FlatSs;
-  UINT32                            FlatEsp;
+  DESCRIPTOR32                         GdtDesc;       // Protected mode GDT
+  DESCRIPTOR32                         IdtDesc;       // Protected mode IDT
+  UINT32                               FlatSs;
+  UINT32                               FlatEsp;
 
-  UINT32                            LowCodeSelector;  // Low code selector in GDT
-  UINT32                            LowDataSelector;  // Low data selector in GDT
-  UINT32                            LowStack;
-  DESCRIPTOR32                      RealModeIdtDesc;
+  UINT32                               LowCodeSelector; // Low code selector in GDT
+  UINT32                               LowDataSelector; // Low data selector in GDT
+  UINT32                               LowStack;
+  DESCRIPTOR32                         RealModeIdtDesc;
 
   //
   // real-mode GDT (temporary GDT with two real mode segment descriptors)
   //
-  GDT32                             RealModeGdt[NUM_REAL_GDT_ENTRIES];
-  DESCRIPTOR32                      RealModeGdtDesc;
+  GDT32                                RealModeGdt[NUM_REAL_GDT_ENTRIES];
+  DESCRIPTOR32                         RealModeGdtDesc;
 
   //
   // Members specifically for the reverse thunk
@@ -254,36 +253,36 @@ typedef struct {
   //  before performing the reverse thunk.  The RevFlat* members must be set
   //  before calling the reverse thunk assembly code.
   //
-  UINT16                            RevRealDs;
-  UINT16                            RevRealSs;
-  UINT32                            RevRealEsp;
-  DESCRIPTOR32                      RevRealIdtDesc;
-  UINT16                            RevFlatDataSelector;  // Flat data selector in GDT
-  UINT32                            RevFlatStack;
+  UINT16                               RevRealDs;
+  UINT16                               RevRealSs;
+  UINT32                               RevRealEsp;
+  DESCRIPTOR32                         RevRealIdtDesc;
+  UINT16                               RevFlatDataSelector; // Flat data selector in GDT
+  UINT32                               RevFlatStack;
 
   //
   // A low memory stack
   //
-  CHAR8                             Stack[LOW_STACK_SIZE];
+  CHAR8                                Stack[LOW_STACK_SIZE];
 
   //
   // Stack for flat mode after reverse thunk
   // @bug    - This may no longer be necessary if the reverse thunk interface
   //           is changed to have the flat stack in a different location.
   //
-  CHAR8                             RevThunkStack[LOW_STACK_SIZE];
+  CHAR8                                RevThunkStack[LOW_STACK_SIZE];
 
   //
   // Legacy16 Init memory map info
   //
-  EFI_TO_COMPATIBILITY16_INIT_TABLE EfiToLegacy16InitTable;
+  EFI_TO_COMPATIBILITY16_INIT_TABLE    EfiToLegacy16InitTable;
 
-  EFI_TO_COMPATIBILITY16_BOOT_TABLE EfiToLegacy16BootTable;
+  EFI_TO_COMPATIBILITY16_BOOT_TABLE    EfiToLegacy16BootTable;
 
-  CHAR8                             InterruptRedirectionCode[32];
-  EFI_LEGACY_INSTALL_PCI_HANDLER    PciHandler;
-  EFI_DISPATCH_OPROM_TABLE          DispatchOpromTable;
-  BBS_TABLE                         BbsTable[MAX_BBS_ENTRIES];
+  CHAR8                                InterruptRedirectionCode[32];
+  EFI_LEGACY_INSTALL_PCI_HANDLER       PciHandler;
+  EFI_DISPATCH_OPROM_TABLE             DispatchOpromTable;
+  BBS_TABLE                            BbsTable[MAX_BBS_ENTRIES];
 } LOW_MEMORY_THUNK;
 
 #elif defined (MDE_CPU_X64)
@@ -293,42 +292,42 @@ typedef struct {
   // Space for the code
   //  The address of Code is also the beginning of the relocated Thunk code
   //
-  CHAR8                             Code[4096]; // ?
+  CHAR8                                Code[4096]; // ?
 
   //
   // Data for the code (cs releative)
   //
-  DESCRIPTOR64                      X64GdtDesc;          // Protected mode GDT
-  DESCRIPTOR64                      X64IdtDesc;          // Protected mode IDT
-  UINTN                             X64Ss;
-  UINTN                             X64Esp;
+  DESCRIPTOR64                         X64GdtDesc;       // Protected mode GDT
+  DESCRIPTOR64                         X64IdtDesc;       // Protected mode IDT
+  UINTN                                X64Ss;
+  UINTN                                X64Esp;
 
-  UINTN                             RealStack;
-  DESCRIPTOR32                      RealModeIdtDesc;
-  DESCRIPTOR32                      RealModeGdtDesc;
+  UINTN                                RealStack;
+  DESCRIPTOR32                         RealModeIdtDesc;
+  DESCRIPTOR32                         RealModeGdtDesc;
 
   //
   // real-mode GDT (temporary GDT with two real mode segment descriptors)
   //
-  GDT64                             RealModeGdt[NUM_REAL_GDT_ENTRIES];
-  UINT64                            PageMapLevel4;
+  GDT64                                RealModeGdt[NUM_REAL_GDT_ENTRIES];
+  UINT64                               PageMapLevel4;
 
   //
   // A low memory stack
   //
-  CHAR8                             Stack[LOW_STACK_SIZE];
+  CHAR8                                Stack[LOW_STACK_SIZE];
 
   //
   // Legacy16 Init memory map info
   //
-  EFI_TO_COMPATIBILITY16_INIT_TABLE EfiToLegacy16InitTable;
+  EFI_TO_COMPATIBILITY16_INIT_TABLE    EfiToLegacy16InitTable;
 
-  EFI_TO_COMPATIBILITY16_BOOT_TABLE EfiToLegacy16BootTable;
+  EFI_TO_COMPATIBILITY16_BOOT_TABLE    EfiToLegacy16BootTable;
 
-  CHAR8                             InterruptRedirectionCode[32];
-  EFI_LEGACY_INSTALL_PCI_HANDLER    PciHandler;
-  EFI_DISPATCH_OPROM_TABLE          DispatchOpromTable;
-  BBS_TABLE                         BbsTable[MAX_BBS_ENTRIES];
+  CHAR8                                InterruptRedirectionCode[32];
+  EFI_LEGACY_INSTALL_PCI_HANDLER       PciHandler;
+  EFI_DISPATCH_OPROM_TABLE             DispatchOpromTable;
+  BBS_TABLE                            BbsTable[MAX_BBS_ENTRIES];
 } LOW_MEMORY_THUNK;
 
 #endif
@@ -337,42 +336,42 @@ typedef struct {
 // PnP Expansion Header
 //
 typedef struct {
-  UINT32  PnpSignature;
-  UINT8   Revision;
-  UINT8   Length;
-  UINT16  NextHeader;
-  UINT8   Reserved1;
-  UINT8   Checksum;
-  UINT32  DeviceId;
-  UINT16  MfgPointer;
-  UINT16  ProductNamePointer;
-  UINT8   Class;
-  UINT8   SubClass;
-  UINT8   Interface;
-  UINT8   DeviceIndicators;
-  UINT16  Bcv;
-  UINT16  DisconnectVector;
-  UINT16  Bev;
-  UINT16  Reserved2;
-  UINT16  StaticResourceVector;
+  UINT32    PnpSignature;
+  UINT8     Revision;
+  UINT8     Length;
+  UINT16    NextHeader;
+  UINT8     Reserved1;
+  UINT8     Checksum;
+  UINT32    DeviceId;
+  UINT16    MfgPointer;
+  UINT16    ProductNamePointer;
+  UINT8     Class;
+  UINT8     SubClass;
+  UINT8     Interface;
+  UINT8     DeviceIndicators;
+  UINT16    Bcv;
+  UINT16    DisconnectVector;
+  UINT16    Bev;
+  UINT16    Reserved2;
+  UINT16    StaticResourceVector;
 } LEGACY_PNP_EXPANSION_HEADER;
 
 typedef struct {
-  UINT8   PciSegment;
-  UINT8   PciBus;
-  UINT8   PciDevice;
-  UINT8   PciFunction;
-  UINT16  Vid;
-  UINT16  Did;
-  UINT16  SysSid;
-  UINT16  SVid;
-  UINT8   Class;
-  UINT8   SubClass;
-  UINT8   Interface;
-  UINT8   Reserved;
-  UINTN   RomStart;
-  UINTN   ManufacturerString;
-  UINTN   ProductNameString;
+  UINT8     PciSegment;
+  UINT8     PciBus;
+  UINT8     PciDevice;
+  UINT8     PciFunction;
+  UINT16    Vid;
+  UINT16    Did;
+  UINT16    SysSid;
+  UINT16    SVid;
+  UINT8     Class;
+  UINT8     SubClass;
+  UINT8     Interface;
+  UINT8     Reserved;
+  UINTN     RomStart;
+  UINTN     ManufacturerString;
+  UINTN     ProductNameString;
 } LEGACY_ROM_AND_BBS_TABLE;
 
 //
@@ -382,218 +381,216 @@ typedef struct {
 // This mapping is ignored booting to a legacy OS.
 //
 typedef struct {
-  UINT8 PciSegment;
-  UINT8 PciBus;
-  UINT8 PciDevice;
-  UINT8 PciFunction;
-  UINT8 StartDriveNumber;
-  UINT8 EndDriveNumber;
+  UINT8    PciSegment;
+  UINT8    PciBus;
+  UINT8    PciDevice;
+  UINT8    PciFunction;
+  UINT8    StartDriveNumber;
+  UINT8    EndDriveNumber;
 } LEGACY_EFI_HDD_TABLE;
 
 //
 // This data is passed to Leacy16Boot
 //
 typedef enum {
-  EfiAcpiAddressRangeMemory   = 1,
-  EfiAcpiAddressRangeReserved = 2,
-  EfiAcpiAddressRangeACPI     = 3,
-  EfiAcpiAddressRangeNVS      = 4,
+  EfiAcpiAddressRangeMemory       = 1,
+  EfiAcpiAddressRangeReserved     = 2,
+  EfiAcpiAddressRangeACPI         = 3,
+  EfiAcpiAddressRangeNVS          = 4,
   EfiAddressRangePersistentMemory = 7
 } EFI_ACPI_MEMORY_TYPE;
 
 typedef struct {
-  UINT64                BaseAddr;
-  UINT64                Length;
-  EFI_ACPI_MEMORY_TYPE  Type;
+  UINT64                  BaseAddr;
+  UINT64                  Length;
+  EFI_ACPI_MEMORY_TYPE    Type;
 } EFI_E820_ENTRY64;
 
 typedef struct {
-  UINT32                BassAddrLow;
-  UINT32                BaseAddrHigh;
-  UINT32                LengthLow;
-  UINT32                LengthHigh;
-  EFI_ACPI_MEMORY_TYPE  Type;
+  UINT32                  BassAddrLow;
+  UINT32                  BaseAddrHigh;
+  UINT32                  LengthLow;
+  UINT32                  LengthHigh;
+  EFI_ACPI_MEMORY_TYPE    Type;
 } EFI_E820_ENTRY;
 
 #pragma pack()
 
-extern BBS_TABLE           *mBbsTable;
+extern BBS_TABLE  *mBbsTable;
 
-extern EFI_GENERIC_MEMORY_TEST_PROTOCOL *gGenMemoryTest;
+extern EFI_GENERIC_MEMORY_TEST_PROTOCOL  *gGenMemoryTest;
 
-extern BOOLEAN mEndOfDxe;
+extern BOOLEAN  mEndOfDxe;
 
-#define PORT_70 0x70
-#define PORT_71 0x71
+#define PORT_70  0x70
+#define PORT_71  0x71
 
-#define CMOS_0A     0x0a  ///< Status register A
-#define CMOS_0D     0x0d  ///< Status register D
-#define CMOS_0E     0x0e  ///< Diagnostic Status
-#define CMOS_0F     0x0f  ///< Shutdown status
-#define CMOS_10     0x10  ///< Floppy type
-#define CMOS_12     0x12  ///< IDE type
-#define CMOS_14     0x14  ///< Same as BDA 40:10
-#define CMOS_15     0x15  ///< Low byte of base memory in 1k increments
-#define CMOS_16     0x16  ///< High byte of base memory in 1k increments
-#define CMOS_17     0x17  ///< Low byte of 1MB+ memory in 1k increments - max 15 MB
-#define CMOS_18     0x18  ///< High byte of 1MB+ memory in 1k increments - max 15 MB
-#define CMOS_19     0x19  ///< C: extended drive type
-#define CMOS_1A     0x1a  ///< D: extended drive type
-#define CMOS_2E     0x2e  ///< Most significient byte of standard checksum
-#define CMOS_2F     0x2f  ///< Least significient byte of standard checksum
-#define CMOS_30     0x30  ///< CMOS 0x17
-#define CMOS_31     0x31  ///< CMOS 0x18
-#define CMOS_32     0x32  ///< Century byte
+#define CMOS_0A  0x0a     ///< Status register A
+#define CMOS_0D  0x0d     ///< Status register D
+#define CMOS_0E  0x0e     ///< Diagnostic Status
+#define CMOS_0F  0x0f     ///< Shutdown status
+#define CMOS_10  0x10     ///< Floppy type
+#define CMOS_12  0x12     ///< IDE type
+#define CMOS_14  0x14     ///< Same as BDA 40:10
+#define CMOS_15  0x15     ///< Low byte of base memory in 1k increments
+#define CMOS_16  0x16     ///< High byte of base memory in 1k increments
+#define CMOS_17  0x17     ///< Low byte of 1MB+ memory in 1k increments - max 15 MB
+#define CMOS_18  0x18     ///< High byte of 1MB+ memory in 1k increments - max 15 MB
+#define CMOS_19  0x19     ///< C: extended drive type
+#define CMOS_1A  0x1a     ///< D: extended drive type
+#define CMOS_2E  0x2e     ///< Most significient byte of standard checksum
+#define CMOS_2F  0x2f     ///< Least significient byte of standard checksum
+#define CMOS_30  0x30     ///< CMOS 0x17
+#define CMOS_31  0x31     ///< CMOS 0x18
+#define CMOS_32  0x32     ///< Century byte
 
 //
 // 8254 Timer registers
 //
-#define TIMER0_COUNT_PORT                         0x40
-#define TIMER1_COUNT_PORT                         0x41
-#define TIMER2_COUNT_PORT                         0x42
-#define TIMER_CONTROL_PORT                        0x43
+#define TIMER0_COUNT_PORT   0x40
+#define TIMER1_COUNT_PORT   0x41
+#define TIMER2_COUNT_PORT   0x42
+#define TIMER_CONTROL_PORT  0x43
 
 //
 // Timer 0, Read/Write LSB then MSB, Square wave output, binary count use.
 //
-#define TIMER0_CONTROL_WORD         0x36
+#define TIMER0_CONTROL_WORD  0x36
 
 #define LEGACY_BIOS_INSTANCE_SIGNATURE  SIGNATURE_32 ('L', 'B', 'I', 'T')
 typedef struct {
-  UINTN                             Signature;
+  UINTN                                Signature;
 
-  EFI_HANDLE                        Handle;
-  EFI_LEGACY_BIOS_PROTOCOL          LegacyBios;
+  EFI_HANDLE                           Handle;
+  EFI_LEGACY_BIOS_PROTOCOL             LegacyBios;
 
-  EFI_HANDLE                        ImageHandle;
+  EFI_HANDLE                           ImageHandle;
 
   //
   // CPU Architectural Protocol
   //
-  EFI_CPU_ARCH_PROTOCOL             *Cpu;
+  EFI_CPU_ARCH_PROTOCOL                *Cpu;
 
   //
   // Timer Architectural Protocol
   //
-  EFI_TIMER_ARCH_PROTOCOL           *Timer;
-  BOOLEAN                           TimerUses8254;
+  EFI_TIMER_ARCH_PROTOCOL              *Timer;
+  BOOLEAN                              TimerUses8254;
 
   //
   // Protocol to Lock and Unlock 0xc0000 - 0xfffff
   //
-  EFI_LEGACY_REGION2_PROTOCOL       *LegacyRegion;
+  EFI_LEGACY_REGION2_PROTOCOL          *LegacyRegion;
 
-  EFI_LEGACY_BIOS_PLATFORM_PROTOCOL *LegacyBiosPlatform;
+  EFI_LEGACY_BIOS_PLATFORM_PROTOCOL    *LegacyBiosPlatform;
 
   //
   // Interrupt control for thunk and PCI IRQ
   //
-  EFI_LEGACY_8259_PROTOCOL          *Legacy8259;
+  EFI_LEGACY_8259_PROTOCOL             *Legacy8259;
 
   //
   // PCI Interrupt PIRQ control
   //
-  EFI_LEGACY_INTERRUPT_PROTOCOL     *LegacyInterrupt;
+  EFI_LEGACY_INTERRUPT_PROTOCOL        *LegacyInterrupt;
 
   //
   // Generic Memory Test
   //
-  EFI_GENERIC_MEMORY_TEST_PROTOCOL  *GenericMemoryTest;
+  EFI_GENERIC_MEMORY_TEST_PROTOCOL     *GenericMemoryTest;
 
   //
   // TRUE if PCI Interrupt Line registers have been programmed.
   //
-  BOOLEAN                           PciInterruptLine;
+  BOOLEAN                              PciInterruptLine;
 
   //
   // Code space below 1MB needed by thunker to transition to real mode.
   // Contains stack and real mode code fragments
   //
-  LOW_MEMORY_THUNK                  *IntThunk;
+  LOW_MEMORY_THUNK                     *IntThunk;
 
   //
   // Starting shadow address of the Legacy BIOS
   //
-  UINT32                            BiosStart;
-  UINT32                            LegacyBiosImageSize;
+  UINT32                               BiosStart;
+  UINT32                               LegacyBiosImageSize;
 
   //
   // Start of variables used by CsmItp.mac ITP macro file and/os LegacyBios
   //
-  UINT8                             Dump[4];
+  UINT8                                Dump[4];
 
   //
   // $EFI Legacy16 code entry info in memory < 1 MB;
   //
-  EFI_COMPATIBILITY16_TABLE         *Legacy16Table;
-  VOID                              *Legacy16InitPtr;
-  VOID                              *Legacy16BootPtr;
-  VOID                              *InternalIrqRoutingTable;
-  UINT32                            NumberIrqRoutingEntries;
-  VOID                              *BbsTablePtr;
-  VOID                              *HddTablePtr;
-  UINT32                            NumberHddControllers;
+  EFI_COMPATIBILITY16_TABLE            *Legacy16Table;
+  VOID                                 *Legacy16InitPtr;
+  VOID                                 *Legacy16BootPtr;
+  VOID                                 *InternalIrqRoutingTable;
+  UINT32                               NumberIrqRoutingEntries;
+  VOID                                 *BbsTablePtr;
+  VOID                                 *HddTablePtr;
+  UINT32                               NumberHddControllers;
 
   //
   // Cached copy of Legacy16 entry point
   //
-  UINT16                            Legacy16CallSegment;
-  UINT16                            Legacy16CallOffset;
+  UINT16                               Legacy16CallSegment;
+  UINT16                               Legacy16CallOffset;
 
   //
   // Returned from $EFI and passed in to OPROMS
   //
-  UINT16                            PnPInstallationCheckSegment;
-  UINT16                            PnPInstallationCheckOffset;
+  UINT16                               PnPInstallationCheckSegment;
+  UINT16                               PnPInstallationCheckOffset;
 
   //
   // E820 table
   //
-  EFI_E820_ENTRY                    E820Table[EFI_MAX_E820_ENTRY];
-  UINT32                            NumberE820Entries;
+  EFI_E820_ENTRY                       E820Table[EFI_MAX_E820_ENTRY];
+  UINT32                               NumberE820Entries;
 
   //
   // True if legacy VGA INT 10h handler installed
   //
-  BOOLEAN                           VgaInstalled;
+  BOOLEAN                              VgaInstalled;
 
   //
   // Number of IDE drives
   //
-  UINT8                             IdeDriveCount;
+  UINT8                                IdeDriveCount;
 
   //
   // Current Free Option ROM space. An option ROM must NOT go past
   // BiosStart.
   //
-  UINT32                            OptionRom;
+  UINT32                               OptionRom;
 
   //
   // Save Legacy16 unexpected interrupt vector. Reprogram INT 68-6F from
   // EFI values to legacy value just before boot.
   //
-  UINT32                            BiosUnexpectedInt;
-  UINT32                            ThunkSavedInt[8];
-  UINT16                            ThunkSeg;
-  LEGACY_EFI_HDD_TABLE              *LegacyEfiHddTable;
-  UINT16                            LegacyEfiHddTableIndex;
-  UINT8                             DiskEnd;
-  UINT8                             Disk4075;
-  UINT16                            TraceIndex;
-  UINT16                            Trace[0x200];
+  UINT32                               BiosUnexpectedInt;
+  UINT32                               ThunkSavedInt[8];
+  UINT16                               ThunkSeg;
+  LEGACY_EFI_HDD_TABLE                 *LegacyEfiHddTable;
+  UINT16                               LegacyEfiHddTableIndex;
+  UINT8                                DiskEnd;
+  UINT8                                Disk4075;
+  UINT16                               TraceIndex;
+  UINT16                               Trace[0x200];
 
   //
   // Indicate that whether GenericLegacyBoot is entered or not
   //
-  BOOLEAN                           LegacyBootEntered;
+  BOOLEAN                              LegacyBootEntered;
 
   //
   // CSM16 PCI Interface Version
   //
-  UINT16                            Csm16PciInterfaceVersion;
-
+  UINT16                               Csm16PciInterfaceVersion;
 } LEGACY_BIOS_INSTANCE;
-
 
 #pragma pack(1)
 
@@ -636,41 +633,41 @@ typedef struct {
   40:98-101 skip
 */
 typedef struct {
-  UINT16  Com1;
-  UINT16  Com2;
-  UINT16  Com3;
-  UINT16  Com4;
-  UINT16  Lpt1;
-  UINT16  Lpt2;
-  UINT16  Lpt3;
-  UINT16  Ebda;
-  UINT16  MachineConfig;
-  UINT8   Bda12;
-  UINT16  MemSize;
-  UINT8   Bda15_16[0x02];
-  UINT8   ShiftStatus;
-  UINT8   Bda18_19[0x02];
-  UINT16  KeyHead;
-  UINT16  KeyTail;
-  UINT16  Bda1E_3D[0x10];
-  UINT16  FloppyData;
-  UINT8   FloppyTimeout;
-  UINT8   Bda41_74[0x34];
-  UINT8   NumberOfDrives;
-  UINT8   Bda76_77[0x02];
-  UINT16  Lpt1_2Timeout;
-  UINT16  Lpt3_4Timeout;
-  UINT16  Com1_2Timeout;
-  UINT16  Com3_4Timeout;
-  UINT16  KeyStart;
-  UINT16  KeyEnd;
-  UINT8   Bda84_87[0x4];
-  UINT8   DataXmit;
-  UINT8   Bda89_8F[0x07];
-  UINT8   FloppyXRate;
-  UINT8   Bda91_95[0x05];
-  UINT8   KeyboardStatus;
-  UINT8   LedStatus;
+  UINT16    Com1;
+  UINT16    Com2;
+  UINT16    Com3;
+  UINT16    Com4;
+  UINT16    Lpt1;
+  UINT16    Lpt2;
+  UINT16    Lpt3;
+  UINT16    Ebda;
+  UINT16    MachineConfig;
+  UINT8     Bda12;
+  UINT16    MemSize;
+  UINT8     Bda15_16[0x02];
+  UINT8     ShiftStatus;
+  UINT8     Bda18_19[0x02];
+  UINT16    KeyHead;
+  UINT16    KeyTail;
+  UINT16    Bda1E_3D[0x10];
+  UINT16    FloppyData;
+  UINT8     FloppyTimeout;
+  UINT8     Bda41_74[0x34];
+  UINT8     NumberOfDrives;
+  UINT8     Bda76_77[0x02];
+  UINT16    Lpt1_2Timeout;
+  UINT16    Lpt3_4Timeout;
+  UINT16    Com1_2Timeout;
+  UINT16    Com3_4Timeout;
+  UINT16    KeyStart;
+  UINT16    KeyEnd;
+  UINT8     Bda84_87[0x4];
+  UINT8     DataXmit;
+  UINT8     Bda89_8F[0x07];
+  UINT8     FloppyXRate;
+  UINT8     Bda91_95[0x05];
+  UINT8     KeyboardStatus;
+  UINT8     LedStatus;
 } BDA_STRUC;
 #pragma pack()
 
@@ -694,11 +691,10 @@ typedef struct {
 BOOLEAN
 EFIAPI
 LegacyBiosInt86 (
-  IN  EFI_LEGACY_BIOS_PROTOCOL          *This,
-  IN  UINT8                             BiosInt,
-  IN  EFI_IA32_REGISTER_SET             *Regs
+  IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN  UINT8                     BiosInt,
+  IN  EFI_IA32_REGISTER_SET     *Regs
   );
-
 
 /**
   Thunk to 16-bit real mode and call Segment:Offset. Regs will contain the
@@ -721,14 +717,13 @@ LegacyBiosInt86 (
 BOOLEAN
 EFIAPI
 LegacyBiosFarCall86 (
-  IN  EFI_LEGACY_BIOS_PROTOCOL          *This,
-  IN  UINT16                            Segment,
-  IN  UINT16                            Offset,
-  IN  EFI_IA32_REGISTER_SET             *Regs,
-  IN  VOID                              *Stack,
-  IN  UINTN                             StackSize
+  IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN  UINT16                    Segment,
+  IN  UINT16                    Offset,
+  IN  EFI_IA32_REGISTER_SET     *Regs,
+  IN  VOID                      *Stack,
+  IN  UINTN                     StackSize
   );
-
 
 /**
   Test to see if a legacy PCI ROM exists for this device. Optionally return
@@ -748,13 +743,12 @@ LegacyBiosFarCall86 (
 EFI_STATUS
 EFIAPI
 LegacyBiosCheckPciRom (
-  IN  EFI_LEGACY_BIOS_PROTOCOL          *This,
-  IN  EFI_HANDLE                        PciHandle,
-  OUT VOID                              **RomImage, OPTIONAL
-  OUT UINTN                             *RomSize, OPTIONAL
-  OUT UINTN                             *Flags
+  IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN  EFI_HANDLE                PciHandle,
+  OUT VOID                      **RomImage  OPTIONAL,
+  OUT UINTN                     *RomSize  OPTIONAL,
+  OUT UINTN                     *Flags
   );
-
 
 /**
   Assign drive number to legacy HDD drives prior to booting an EFI
@@ -772,11 +766,10 @@ LegacyBiosCheckPciRom (
 EFI_STATUS
 EFIAPI
 LegacyBiosPrepareToBootEfi (
-  IN EFI_LEGACY_BIOS_PROTOCOL         *This,
-  OUT UINT16                          *BbsCount,
-  OUT BBS_TABLE                       **BbsTable
+  IN EFI_LEGACY_BIOS_PROTOCOL  *This,
+  OUT UINT16                   *BbsCount,
+  OUT BBS_TABLE                **BbsTable
   );
-
 
 /**
   To boot from an unconventional device like parties and/or execute
@@ -796,13 +789,12 @@ LegacyBiosPrepareToBootEfi (
 EFI_STATUS
 EFIAPI
 LegacyBiosBootUnconventionalDevice (
-  IN EFI_LEGACY_BIOS_PROTOCOL         *This,
-  IN UDC_ATTRIBUTES                   Attributes,
-  IN UINTN                            BbsEntry,
-  IN VOID                             *BeerData,
-  IN VOID                             *ServiceAreaData
+  IN EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN UDC_ATTRIBUTES            Attributes,
+  IN UINTN                     BbsEntry,
+  IN VOID                      *BeerData,
+  IN VOID                      *ServiceAreaData
   );
-
 
 /**
   Load a legacy PC-AT OPROM on the PciHandle device. Return information
@@ -834,16 +826,15 @@ LegacyBiosBootUnconventionalDevice (
 EFI_STATUS
 EFIAPI
 LegacyBiosInstallPciRom (
-  IN  EFI_LEGACY_BIOS_PROTOCOL          * This,
-  IN  EFI_HANDLE                        PciHandle,
-  IN  VOID                              **RomImage,
-  OUT UINTN                             *Flags,
-  OUT UINT8                             *DiskStart, OPTIONAL
-  OUT UINT8                             *DiskEnd, OPTIONAL
-  OUT VOID                              **RomShadowAddress, OPTIONAL
-  OUT UINT32                            *RomShadowedSize OPTIONAL
+  IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN  EFI_HANDLE                PciHandle,
+  IN  VOID                      **RomImage,
+  OUT UINTN                     *Flags,
+  OUT UINT8                     *DiskStart  OPTIONAL,
+  OUT UINT8                     *DiskEnd  OPTIONAL,
+  OUT VOID                      **RomShadowAddress  OPTIONAL,
+  OUT UINT32                    *RomShadowedSize OPTIONAL
   );
-
 
 /**
   Fill in the standard BDA for Keyboard LEDs
@@ -857,10 +848,9 @@ LegacyBiosInstallPciRom (
 EFI_STATUS
 EFIAPI
 LegacyBiosUpdateKeyboardLedStatus (
-  IN EFI_LEGACY_BIOS_PROTOCOL           *This,
-  IN UINT8                              Leds
+  IN EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN UINT8                     Leds
   );
-
 
 /**
   Get all BBS info
@@ -879,13 +869,12 @@ LegacyBiosUpdateKeyboardLedStatus (
 EFI_STATUS
 EFIAPI
 LegacyBiosGetBbsInfo (
-  IN  EFI_LEGACY_BIOS_PROTOCOL          *This,
-  OUT UINT16                            *HddCount,
-  OUT HDD_INFO                          **HddInfo,
-  OUT UINT16                            *BbsCount,
-  OUT BBS_TABLE                         **BbsTable
+  IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
+  OUT UINT16                    *HddCount,
+  OUT HDD_INFO                  **HddInfo,
+  OUT UINT16                    *BbsCount,
+  OUT BBS_TABLE                 **BbsTable
   );
-
 
 /**
   Shadow all legacy16 OPROMs that haven't been shadowed.
@@ -901,9 +890,8 @@ LegacyBiosGetBbsInfo (
 EFI_STATUS
 EFIAPI
 LegacyBiosShadowAllLegacyOproms (
-  IN EFI_LEGACY_BIOS_PROTOCOL   *This
+  IN EFI_LEGACY_BIOS_PROTOCOL  *This
   );
-
 
 /**
   Attempt to legacy boot the BootOption. If the EFI contexted has been
@@ -920,12 +908,11 @@ LegacyBiosShadowAllLegacyOproms (
 EFI_STATUS
 EFIAPI
 LegacyBiosLegacyBoot (
-  IN  EFI_LEGACY_BIOS_PROTOCOL          *This,
-  IN  BBS_BBS_DEVICE_PATH               *BbsDevicePath,
-  IN  UINT32                            LoadOptionsSize,
-  IN  VOID                              *LoadOptions
+  IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN  BBS_BBS_DEVICE_PATH       *BbsDevicePath,
+  IN  UINT32                    LoadOptionsSize,
+  IN  VOID                      *LoadOptions
   );
-
 
 /**
   Allocate memory < 1 MB and copy the thunker code into low memory. Se up
@@ -938,9 +925,8 @@ LegacyBiosLegacyBoot (
 **/
 EFI_STATUS
 LegacyBiosInitializeThunk (
-  IN  LEGACY_BIOS_INSTANCE    *Private
+  IN  LEGACY_BIOS_INSTANCE  *Private
   );
-
 
 /**
   Fill in the standard BDA and EBDA stuff before Legacy16 load
@@ -952,9 +938,8 @@ LegacyBiosInitializeThunk (
 **/
 EFI_STATUS
 LegacyBiosInitBda (
-  IN  LEGACY_BIOS_INSTANCE    *Private
+  IN  LEGACY_BIOS_INSTANCE  *Private
   );
-
 
 /**
   Collect IDE Inquiry data from the IDE disks
@@ -968,11 +953,10 @@ LegacyBiosInitBda (
 **/
 EFI_STATUS
 LegacyBiosBuildIdeData (
-  IN  LEGACY_BIOS_INSTANCE      *Private,
-  IN  HDD_INFO                  **HddInfo,
-  IN  UINT16                    Flag
+  IN  LEGACY_BIOS_INSTANCE  *Private,
+  IN  HDD_INFO              **HddInfo,
+  IN  UINT16                Flag
   );
-
 
 /**
   Enable ide controller.  This gets disabled when LegacyBoot.c is about
@@ -984,9 +968,8 @@ LegacyBiosBuildIdeData (
 **/
 VOID
 EnableIdeController (
-  IN LEGACY_BIOS_INSTANCE       *Private
+  IN LEGACY_BIOS_INSTANCE  *Private
   );
-
 
 /**
   If the IDE channel is in compatibility (legacy) mode, remove all
@@ -998,9 +981,8 @@ EnableIdeController (
 **/
 VOID
 InitLegacyIdeController (
-  IN EFI_HANDLE                 IdeController
+  IN EFI_HANDLE  IdeController
   );
-
 
 /**
   Program the interrupt routing register in all the PCI devices. On a PC AT system
@@ -1014,9 +996,8 @@ InitLegacyIdeController (
 **/
 EFI_STATUS
 PciProgramAllInterruptLineRegisters (
-  IN  LEGACY_BIOS_INSTANCE      *Private
+  IN  LEGACY_BIOS_INSTANCE  *Private
   );
-
 
 /**
   Collect EFI Info about legacy devices.
@@ -1028,9 +1009,8 @@ PciProgramAllInterruptLineRegisters (
 **/
 EFI_STATUS
 LegacyBiosBuildSioData (
-  IN  LEGACY_BIOS_INSTANCE      *Private
+  IN  LEGACY_BIOS_INSTANCE  *Private
   );
-
 
 /**
   Shadow all the PCI legacy ROMs. Use data from the Legacy BIOS Protocol
@@ -1045,9 +1025,8 @@ LegacyBiosBuildSioData (
 **/
 EFI_STATUS
 PciShadowRoms (
-  IN  LEGACY_BIOS_INSTANCE      *Private
+  IN  LEGACY_BIOS_INSTANCE  *Private
   );
-
 
 /**
   Fill in the standard BDA and EBDA stuff prior to legacy Boot
@@ -1059,9 +1038,8 @@ PciShadowRoms (
 **/
 EFI_STATUS
 LegacyBiosCompleteBdaBeforeBoot (
-  IN  LEGACY_BIOS_INSTANCE    *Private
+  IN  LEGACY_BIOS_INSTANCE  *Private
   );
-
 
 /**
   Fill in the standard CMOS stuff before Legacy16 load
@@ -1073,9 +1051,8 @@ LegacyBiosCompleteBdaBeforeBoot (
 **/
 EFI_STATUS
 LegacyBiosInitCmos (
-  IN  LEGACY_BIOS_INSTANCE    *Private
+  IN  LEGACY_BIOS_INSTANCE  *Private
   );
-
 
 /**
   Fill in the standard CMOS stuff prior to legacy Boot
@@ -1087,9 +1064,8 @@ LegacyBiosInitCmos (
 **/
 EFI_STATUS
 LegacyBiosCompleteStandardCmosBeforeBoot (
-  IN  LEGACY_BIOS_INSTANCE    *Private
+  IN  LEGACY_BIOS_INSTANCE  *Private
   );
-
 
 /**
   Contains the code that is copied into low memory (below 640K).
@@ -1105,7 +1081,6 @@ InterruptRedirectionTemplate (
   VOID
   );
 
-
 /**
   Build the E820 table.
 
@@ -1117,8 +1092,8 @@ InterruptRedirectionTemplate (
 **/
 EFI_STATUS
 LegacyBiosBuildE820 (
-  IN  LEGACY_BIOS_INSTANCE    *Private,
-  OUT UINTN                   *Size
+  IN  LEGACY_BIOS_INSTANCE  *Private,
+  OUT UINTN                 *Size
   );
 
 /**
@@ -1129,7 +1104,7 @@ LegacyBiosBuildE820 (
 **/
 VOID
 ShutdownAPs (
-  IN LEGACY_BIOS_INSTANCE              *Private
+  IN LEGACY_BIOS_INSTANCE  *Private
   );
 
 /**
@@ -1141,7 +1116,7 @@ ShutdownAPs (
 **/
 VOID
 GetRegisters (
-  LOW_MEMORY_THUNK    *IntThunk
+  LOW_MEMORY_THUNK  *IntThunk
   );
 
 /**
@@ -1156,9 +1131,9 @@ GetRegisters (
 **/
 UINTN
 CallRealThunkCode (
-  UINT8               *RealCode,
-  UINT8               BiosInt,
-  UINT32              CallAddress
+  UINT8   *RealCode,
+  UINT8   BiosInt,
+  UINT32  CallAddress
   );
 
 /**
@@ -1169,7 +1144,7 @@ CallRealThunkCode (
 **/
 VOID
 GenerateSoftInit (
-  UINT8               Vector
+  UINT8  Vector
   );
 
 /**
@@ -1187,11 +1162,11 @@ GenerateSoftInit (
 **/
 EFI_STATUS
 AllocateLegacyMemory (
-  IN  EFI_ALLOCATE_TYPE         AllocateType,
-  IN  EFI_MEMORY_TYPE           MemoryType,
-  IN  EFI_PHYSICAL_ADDRESS      StartPageAddress,
-  IN  UINTN                     Pages,
-  OUT EFI_PHYSICAL_ADDRESS      *Result
+  IN  EFI_ALLOCATE_TYPE     AllocateType,
+  IN  EFI_MEMORY_TYPE       MemoryType,
+  IN  EFI_PHYSICAL_ADDRESS  StartPageAddress,
+  IN  UINTN                 Pages,
+  OUT EFI_PHYSICAL_ADDRESS  *Result
   );
 
 /**
@@ -1214,11 +1189,11 @@ AllocateLegacyMemory (
 EFI_STATUS
 EFIAPI
 LegacyBiosGetLegacyRegion (
-  IN    EFI_LEGACY_BIOS_PROTOCOL *This,
-  IN    UINTN                    LegacyMemorySize,
-  IN    UINTN                    Region,
-  IN    UINTN                    Alignment,
-  OUT   VOID                     **LegacyMemoryAddress
+  IN    EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN    UINTN                     LegacyMemorySize,
+  IN    UINTN                     Region,
+  IN    UINTN                     Alignment,
+  OUT   VOID                      **LegacyMemoryAddress
   );
 
 /**
@@ -1238,10 +1213,10 @@ LegacyBiosGetLegacyRegion (
 EFI_STATUS
 EFIAPI
 LegacyBiosCopyLegacyRegion (
-  IN EFI_LEGACY_BIOS_PROTOCOL *This,
-  IN    UINTN                 LegacyMemorySize,
-  IN    VOID                  *LegacyMemoryAddress,
-  IN    VOID                  *LegacyMemorySourceAddress
+  IN EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN    UINTN                  LegacyMemorySize,
+  IN    VOID                   *LegacyMemoryAddress,
+  IN    VOID                   *LegacyMemorySourceAddress
   );
 
 /**
@@ -1295,8 +1270,8 @@ HasMediaInFloppy (
 **/
 EFI_STATUS
 CalculateIdentifyDriveChecksum (
-  IN  UINT8     *IdentifyDriveData,
-  OUT UINT8     *Checksum
+  IN  UINT8  *IdentifyDriveData,
+  OUT UINT8  *Checksum
   );
 
 /**
@@ -1307,7 +1282,7 @@ CalculateIdentifyDriveChecksum (
 **/
 VOID
 UpdateIdentifyDriveData (
-  IN  UINT8     *IdentifyDriveData
+  IN  UINT8  *IdentifyDriveData
   );
 
 /**
@@ -1321,8 +1296,8 @@ UpdateIdentifyDriveData (
 **/
 EFI_STATUS
 LegacyBiosBuildBbs (
-  IN  LEGACY_BIOS_INSTANCE      *Private,
-  IN  BBS_TABLE                 *BbsTable
+  IN  LEGACY_BIOS_INSTANCE  *Private,
+  IN  BBS_TABLE             *BbsTable
   );
 
 /**
@@ -1386,14 +1361,14 @@ LegacyCalculateWriteStandardCmosChecksum (
 **/
 EFI_STATUS
 LegacyBiosCheckPciRomEx (
-  IN EFI_LEGACY_BIOS_PROTOCOL           *This,
-  IN  EFI_HANDLE                        PciHandle,
-  OUT VOID                              **RomImage, OPTIONAL
-  OUT UINTN                             *RomSize, OPTIONAL
-  OUT UINTN                             *RuntimeImageLength, OPTIONAL
-  OUT UINTN                             *Flags, OPTIONAL
-  OUT UINT8                             *OpromRevision, OPTIONAL
-  OUT VOID                              **ConfigUtilityCodeHeader OPTIONAL
+  IN EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN  EFI_HANDLE               PciHandle,
+  OUT VOID                     **RomImage  OPTIONAL,
+  OUT UINTN                    *RomSize  OPTIONAL,
+  OUT UINTN                    *RuntimeImageLength  OPTIONAL,
+  OUT UINTN                    *Flags  OPTIONAL,
+  OUT UINT8                    *OpromRevision  OPTIONAL,
+  OUT VOID                     **ConfigUtilityCodeHeader OPTIONAL
   );
 
 /**
@@ -1408,8 +1383,8 @@ LegacyBiosCheckPciRomEx (
 **/
 EFI_STATUS
 RelocateImageUnder4GIfNeeded (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
 /**
@@ -1433,12 +1408,12 @@ RelocateImageUnder4GIfNeeded (
 BOOLEAN
 EFIAPI
 InternalLegacyBiosFarCall (
-  IN  EFI_LEGACY_BIOS_PROTOCOL        *This,
-  IN  UINT16                          Segment,
-  IN  UINT16                          Offset,
-  IN  EFI_IA32_REGISTER_SET           *Regs,
-  IN  VOID                            *Stack,
-  IN  UINTN                           StackSize
+  IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN  UINT16                    Segment,
+  IN  UINT16                    Offset,
+  IN  EFI_IA32_REGISTER_SET     *Regs,
+  IN  VOID                      *Stack,
+  IN  UINTN                     StackSize
   );
 
 /**
@@ -1454,7 +1429,7 @@ InternalLegacyBiosFarCall (
 **/
 EFI_STATUS
 LegacyBiosInstallVgaRom (
-  IN  LEGACY_BIOS_INSTANCE            *Private
+  IN  LEGACY_BIOS_INSTANCE  *Private
   );
 
 #endif

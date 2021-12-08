@@ -15,8 +15,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack(1)
 
 typedef struct {
-  TPM_RQU_COMMAND_HDR   Hdr;
-  TPM_PHYSICAL_PRESENCE PhysicalPresence;
+  TPM_RQU_COMMAND_HDR      Hdr;
+  TPM_PHYSICAL_PRESENCE    PhysicalPresence;
 } TPM_CMD_PHYSICAL_PRESENCE;
 
 #pragma pack()
@@ -50,15 +50,15 @@ Tpm12PhysicalPresence (
   Command.Hdr.paramSize    = SwapBytes32 (sizeof (Command));
   Command.Hdr.ordinal      = SwapBytes32 (TSC_ORD_PhysicalPresence);
   Command.PhysicalPresence = SwapBytes16 (PhysicalPresence);
-  Length = sizeof (Response);
+  Length                   = sizeof (Response);
 
   Status = Tpm12SubmitCommand (sizeof (Command), (UINT8 *)&Command, &Length, (UINT8 *)&Response);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  if (SwapBytes32(Response.returnCode) != TPM_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "Tpm12PhysicalPresence: Response Code error! 0x%08x\r\n", SwapBytes32(Response.returnCode)));
+  if (SwapBytes32 (Response.returnCode) != TPM_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "Tpm12PhysicalPresence: Response Code error! 0x%08x\r\n", SwapBytes32 (Response.returnCode)));
     return EFI_DEVICE_ERROR;
   }
 

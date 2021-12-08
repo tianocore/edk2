@@ -17,29 +17,30 @@
 
 #define DIAGNOSTIC_LOGBUFFER_MAXCHAR  1024
 
-CHAR16* mLogBuffer = NULL;
+CHAR16  *mLogBuffer    = NULL;
 UINTN   mLogRemainChar = 0;
 
-CHAR16*
+CHAR16 *
 DiagnosticInitLog (
-  UINTN MaxBufferChar
+  UINTN  MaxBufferChar
   )
 {
   mLogRemainChar = MaxBufferChar;
-  mLogBuffer = AllocatePool ((UINTN)MaxBufferChar * sizeof (CHAR16));
+  mLogBuffer     = AllocatePool ((UINTN)MaxBufferChar * sizeof (CHAR16));
   return mLogBuffer;
 }
 
 UINTN
 DiagnosticLog (
-  CONST CHAR16* Str
+  CONST CHAR16  *Str
   )
 {
-  UINTN len = StrLen (Str);
+  UINTN  len = StrLen (Str);
+
   if (len < mLogRemainChar) {
     StrCpyS (mLogBuffer, mLogRemainChar, Str);
     mLogRemainChar -= len;
-    mLogBuffer += len;
+    mLogBuffer     += len;
     return len;
   } else {
     return 0;
@@ -48,12 +49,12 @@ DiagnosticLog (
 
 VOID
 GenerateRandomBuffer (
-  VOID* Buffer,
-  UINTN BufferSize
+  VOID   *Buffer,
+  UINTN  BufferSize
   )
 {
   UINT64  i;
-  UINT64* Buffer64 = (UINT64*)Buffer;
+  UINT64  *Buffer64 = (UINT64 *)Buffer;
 
   for (i = 0; i < (BufferSize >> 3); i++) {
     *Buffer64 = i | LShiftU64 (~i, 32);
@@ -63,38 +64,40 @@ GenerateRandomBuffer (
 
 BOOLEAN
 CompareBuffer (
-  VOID  *BufferA,
-  VOID  *BufferB,
-  UINTN BufferSize
+  VOID   *BufferA,
+  VOID   *BufferB,
+  UINTN  BufferSize
   )
 {
-  UINTN i;
-  UINT64* BufferA64 = (UINT64*)BufferA;
-  UINT64* BufferB64 = (UINT64*)BufferB;
+  UINTN   i;
+  UINT64  *BufferA64 = (UINT64 *)BufferA;
+  UINT64  *BufferB64 = (UINT64 *)BufferB;
 
   for (i = 0; i < (BufferSize >> 3); i++) {
     if (*BufferA64 != *BufferB64) {
-      DEBUG ((EFI_D_ERROR, "CompareBuffer: Error at %i", i));
-      DEBUG ((EFI_D_ERROR, "(0x%lX) != (0x%lX)\n", *BufferA64, *BufferB64));
+      DEBUG ((DEBUG_ERROR, "CompareBuffer: Error at %i", i));
+      DEBUG ((DEBUG_ERROR, "(0x%lX) != (0x%lX)\n", *BufferA64, *BufferB64));
       return FALSE;
     }
+
     BufferA64++;
     BufferB64++;
   }
+
   return TRUE;
 }
 
 EFI_STATUS
 MmcReadWriteDataTest (
-  MMC_HOST_INSTANCE *MmcHostInstance,
-  EFI_LBA           Lba,
-  UINTN             BufferSize
+  MMC_HOST_INSTANCE  *MmcHostInstance,
+  EFI_LBA            Lba,
+  UINTN              BufferSize
   )
 {
-  VOID                        *BackBuffer;
-  VOID                        *WriteBuffer;
-  VOID                        *ReadBuffer;
-  EFI_STATUS                  Status;
+  VOID        *BackBuffer;
+  VOID        *WriteBuffer;
+  VOID        *ReadBuffer;
+  EFI_STATUS  Status;
 
   // Check if a Media is Present
   if (!MmcHostInstance->BlockIo.Media->MediaPresent) {
@@ -107,54 +110,54 @@ MmcReadWriteDataTest (
     return EFI_NOT_READY;
   }
 
-  BackBuffer = AllocatePool (BufferSize);
+  BackBuffer  = AllocatePool (BufferSize);
   WriteBuffer = AllocatePool (BufferSize);
-  ReadBuffer = AllocatePool (BufferSize);
+  ReadBuffer  = AllocatePool (BufferSize);
 
   // Read (and save) buffer at a specific location
-  Status = MmcReadBlocks (&(MmcHostInstance->BlockIo), MmcHostInstance->BlockIo.Media->MediaId,Lba,BufferSize,BackBuffer);
+  Status = MmcReadBlocks (&(MmcHostInstance->BlockIo), MmcHostInstance->BlockIo.Media->MediaId, Lba, BufferSize, BackBuffer);
   if (Status != EFI_SUCCESS) {
     DiagnosticLog (L"ERROR: Fail to Read Block (1)\n");
     return Status;
   }
 
   // Write buffer at the same location
-  GenerateRandomBuffer (WriteBuffer,BufferSize);
-  Status = MmcWriteBlocks (&(MmcHostInstance->BlockIo), MmcHostInstance->BlockIo.Media->MediaId,Lba,BufferSize,WriteBuffer);
+  GenerateRandomBuffer (WriteBuffer, BufferSize);
+  Status = MmcWriteBlocks (&(MmcHostInstance->BlockIo), MmcHostInstance->BlockIo.Media->MediaId, Lba, BufferSize, WriteBuffer);
   if (Status != EFI_SUCCESS) {
     DiagnosticLog (L"ERROR: Fail to Write Block (1)\n");
     return Status;
   }
 
   // Read the buffer at the same location
-  Status = MmcReadBlocks (&(MmcHostInstance->BlockIo), MmcHostInstance->BlockIo.Media->MediaId,Lba,BufferSize,ReadBuffer);
+  Status = MmcReadBlocks (&(MmcHostInstance->BlockIo), MmcHostInstance->BlockIo.Media->MediaId, Lba, BufferSize, ReadBuffer);
   if (Status != EFI_SUCCESS) {
     DiagnosticLog (L"ERROR: Fail to Read Block (2)\n");
     return Status;
   }
 
   // Check that is conform
-  if (!CompareBuffer (ReadBuffer,WriteBuffer,BufferSize)) {
+  if (!CompareBuffer (ReadBuffer, WriteBuffer, BufferSize)) {
     DiagnosticLog (L"ERROR: Fail to Read/Write Block (1)\n");
     return EFI_INVALID_PARAMETER;
   }
 
   // Restore content at the original location
-  Status = MmcWriteBlocks (&(MmcHostInstance->BlockIo), MmcHostInstance->BlockIo.Media->MediaId,Lba,BufferSize,BackBuffer);
+  Status = MmcWriteBlocks (&(MmcHostInstance->BlockIo), MmcHostInstance->BlockIo.Media->MediaId, Lba, BufferSize, BackBuffer);
   if (Status != EFI_SUCCESS) {
     DiagnosticLog (L"ERROR: Fail to Write Block (2)\n");
     return Status;
   }
 
   // Read the restored content
-  Status = MmcReadBlocks (&(MmcHostInstance->BlockIo), MmcHostInstance->BlockIo.Media->MediaId,Lba,BufferSize,ReadBuffer);
+  Status = MmcReadBlocks (&(MmcHostInstance->BlockIo), MmcHostInstance->BlockIo.Media->MediaId, Lba, BufferSize, ReadBuffer);
   if (Status != EFI_SUCCESS) {
     DiagnosticLog (L"ERROR: Fail to Read Block (3)\n");
     return Status;
   }
 
   // Check the content is correct
-  if (!CompareBuffer (ReadBuffer,BackBuffer,BufferSize)) {
+  if (!CompareBuffer (ReadBuffer, BackBuffer, BufferSize)) {
     DiagnosticLog (L"ERROR: Fail to Read/Write Block (2)\n");
     return EFI_INVALID_PARAMETER;
   }
@@ -165,25 +168,26 @@ MmcReadWriteDataTest (
 EFI_STATUS
 EFIAPI
 MmcDriverDiagnosticsRunDiagnostics (
-  IN  EFI_DRIVER_DIAGNOSTICS_PROTOCOL               *This,
-  IN  EFI_HANDLE                                    ControllerHandle,
-  IN  EFI_HANDLE                                    ChildHandle  OPTIONAL,
-  IN  EFI_DRIVER_DIAGNOSTIC_TYPE                    DiagnosticType,
-  IN  CHAR8                                         *Language,
-  OUT EFI_GUID                                      **ErrorType,
-  OUT UINTN                                         *BufferSize,
-  OUT CHAR16                                        **Buffer
+  IN  EFI_DRIVER_DIAGNOSTICS_PROTOCOL  *This,
+  IN  EFI_HANDLE                       ControllerHandle,
+  IN  EFI_HANDLE                       ChildHandle  OPTIONAL,
+  IN  EFI_DRIVER_DIAGNOSTIC_TYPE       DiagnosticType,
+  IN  CHAR8                            *Language,
+  OUT EFI_GUID                         **ErrorType,
+  OUT UINTN                            *BufferSize,
+  OUT CHAR16                           **Buffer
   )
 {
-  LIST_ENTRY              *CurrentLink;
-  MMC_HOST_INSTANCE       *MmcHostInstance;
-  EFI_STATUS              Status;
+  LIST_ENTRY         *CurrentLink;
+  MMC_HOST_INSTANCE  *MmcHostInstance;
+  EFI_STATUS         Status;
 
   if ((Language         == NULL) ||
       (ErrorType        == NULL) ||
       (Buffer           == NULL) ||
       (ControllerHandle == NULL) ||
-      (BufferSize       == NULL)) {
+      (BufferSize       == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -192,28 +196,30 @@ MmcDriverDiagnosticsRunDiagnostics (
     return EFI_UNSUPPORTED;
   }
 
-  Status = EFI_SUCCESS;
+  Status      = EFI_SUCCESS;
   *ErrorType  = NULL;
   *BufferSize = DIAGNOSTIC_LOGBUFFER_MAXCHAR;
-  *Buffer = DiagnosticInitLog (DIAGNOSTIC_LOGBUFFER_MAXCHAR);
+  *Buffer     = DiagnosticInitLog (DIAGNOSTIC_LOGBUFFER_MAXCHAR);
 
   DiagnosticLog (L"MMC Driver Diagnostics\n");
 
   // Find the MMC Host instance on which we have been asked to run diagnostics
   MmcHostInstance = NULL;
-  CurrentLink = mMmcHostPool.ForwardLink;
+  CurrentLink     = mMmcHostPool.ForwardLink;
   while (CurrentLink != NULL && CurrentLink != &mMmcHostPool && (Status == EFI_SUCCESS)) {
-    MmcHostInstance = MMC_HOST_INSTANCE_FROM_LINK(CurrentLink);
-    ASSERT(MmcHostInstance != NULL);
+    MmcHostInstance = MMC_HOST_INSTANCE_FROM_LINK (CurrentLink);
+    ASSERT (MmcHostInstance != NULL);
     if (MmcHostInstance->MmcHandle == ControllerHandle) {
       break;
     }
+
     CurrentLink = CurrentLink->ForwardLink;
   }
 
   // If we didn't find the controller, return EFI_UNSUPPORTED
-  if ((MmcHostInstance == NULL)
-      || (MmcHostInstance->MmcHandle != ControllerHandle)) {
+  if (  (MmcHostInstance == NULL)
+     || (MmcHostInstance->MmcHandle != ControllerHandle))
+  {
     return EFI_UNSUPPORTED;
   }
 
@@ -247,7 +253,7 @@ MmcDriverDiagnosticsRunDiagnostics (
 //
 // EFI Driver Diagnostics 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_DRIVER_DIAGNOSTICS2_PROTOCOL gMmcDriverDiagnostics2 = {
-  (EFI_DRIVER_DIAGNOSTICS2_RUN_DIAGNOSTICS) MmcDriverDiagnosticsRunDiagnostics,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_DRIVER_DIAGNOSTICS2_PROTOCOL  gMmcDriverDiagnostics2 = {
+  (EFI_DRIVER_DIAGNOSTICS2_RUN_DIAGNOSTICS)MmcDriverDiagnosticsRunDiagnostics,
   "en"
 };

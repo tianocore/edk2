@@ -11,27 +11,27 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "MnpDriver.h"
 
-#define NET_ETHER_FCS_SIZE            4
+#define NET_ETHER_FCS_SIZE  4
 
-#define MNP_SYS_POLL_INTERVAL         (10 * TICKS_PER_MS)   // 10 milliseconds
-#define MNP_TIMEOUT_CHECK_INTERVAL    (50 * TICKS_PER_MS)   // 50 milliseconds
-#define MNP_MEDIA_DETECT_INTERVAL     (500 * TICKS_PER_MS)  // 500 milliseconds
-#define MNP_TX_TIMEOUT_TIME           (500 * TICKS_PER_MS)  // 500 milliseconds
-#define MNP_INIT_NET_BUFFER_NUM       512
-#define MNP_NET_BUFFER_INCREASEMENT   64
-#define MNP_MAX_NET_BUFFER_NUM        65536
-#define MNP_TX_BUFFER_INCREASEMENT    32    // Same as the recycling Q length for xmit_done in UNDI command.
-#define MNP_MAX_TX_BUFFER_NUM         65536
+#define MNP_SYS_POLL_INTERVAL        (10 * TICKS_PER_MS)    // 10 milliseconds
+#define MNP_TIMEOUT_CHECK_INTERVAL   (50 * TICKS_PER_MS)    // 50 milliseconds
+#define MNP_MEDIA_DETECT_INTERVAL    (500 * TICKS_PER_MS)   // 500 milliseconds
+#define MNP_TX_TIMEOUT_TIME          (500 * TICKS_PER_MS)   // 500 milliseconds
+#define MNP_INIT_NET_BUFFER_NUM      512
+#define MNP_NET_BUFFER_INCREASEMENT  64
+#define MNP_MAX_NET_BUFFER_NUM       65536
+#define MNP_TX_BUFFER_INCREASEMENT   32     // Same as the recycling Q length for xmit_done in UNDI command.
+#define MNP_MAX_TX_BUFFER_NUM        65536
 
 #define MNP_MAX_RCVD_PACKET_QUE_SIZE  256
 
-#define MNP_RECEIVE_UNICAST           0x01
-#define MNP_RECEIVE_BROADCAST         0x02
+#define MNP_RECEIVE_UNICAST    0x01
+#define MNP_RECEIVE_BROADCAST  0x02
 
-#define UNICAST_PACKET                MNP_RECEIVE_UNICAST
-#define BROADCAST_PACKET              MNP_RECEIVE_BROADCAST
+#define UNICAST_PACKET    MNP_RECEIVE_UNICAST
+#define BROADCAST_PACKET  MNP_RECEIVE_BROADCAST
 
-#define MNP_INSTANCE_DATA_SIGNATURE   SIGNATURE_32 ('M', 'n', 'p', 'I')
+#define MNP_INSTANCE_DATA_SIGNATURE  SIGNATURE_32 ('M', 'n', 'p', 'I')
 
 #define MNP_INSTANCE_DATA_FROM_THIS(a) \
   CR ( \
@@ -42,59 +42,59 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   )
 
 typedef struct {
-  UINT32                          Signature;
+  UINT32                             Signature;
 
-  MNP_SERVICE_DATA                *MnpServiceData;
+  MNP_SERVICE_DATA                   *MnpServiceData;
 
-  EFI_HANDLE                      Handle;
+  EFI_HANDLE                         Handle;
 
-  LIST_ENTRY                      InstEntry;
+  LIST_ENTRY                         InstEntry;
 
-  EFI_MANAGED_NETWORK_PROTOCOL    ManagedNetwork;
+  EFI_MANAGED_NETWORK_PROTOCOL       ManagedNetwork;
 
-  BOOLEAN                         Configured;
-  BOOLEAN                         Destroyed;
+  BOOLEAN                            Configured;
+  BOOLEAN                            Destroyed;
 
-  LIST_ENTRY                      GroupCtrlBlkList;
+  LIST_ENTRY                         GroupCtrlBlkList;
 
-  NET_MAP                         RxTokenMap;
+  NET_MAP                            RxTokenMap;
 
-  LIST_ENTRY                      RxDeliveredPacketQueue;
-  LIST_ENTRY                      RcvdPacketQueue;
-  UINTN                           RcvdPacketQueueSize;
+  LIST_ENTRY                         RxDeliveredPacketQueue;
+  LIST_ENTRY                         RcvdPacketQueue;
+  UINTN                              RcvdPacketQueueSize;
 
-  EFI_MANAGED_NETWORK_CONFIG_DATA ConfigData;
+  EFI_MANAGED_NETWORK_CONFIG_DATA    ConfigData;
 
-  UINT8                           ReceiveFilter;
+  UINT8                              ReceiveFilter;
 } MNP_INSTANCE_DATA;
 
 typedef struct {
-  LIST_ENTRY      AddrEntry;
-  EFI_MAC_ADDRESS Address;
-  INTN            RefCnt;
+  LIST_ENTRY         AddrEntry;
+  EFI_MAC_ADDRESS    Address;
+  INTN               RefCnt;
 } MNP_GROUP_ADDRESS;
 
 typedef struct {
-  LIST_ENTRY        CtrlBlkEntry;
-  MNP_GROUP_ADDRESS *GroupAddress;
+  LIST_ENTRY           CtrlBlkEntry;
+  MNP_GROUP_ADDRESS    *GroupAddress;
 } MNP_GROUP_CONTROL_BLOCK;
 
 typedef struct {
-  LIST_ENTRY                        WrapEntry;
-  MNP_INSTANCE_DATA                 *Instance;
-  EFI_MANAGED_NETWORK_RECEIVE_DATA  RxData;
-  NET_BUF                           *Nbuf;
-  UINT64                            TimeoutTick;
+  LIST_ENTRY                          WrapEntry;
+  MNP_INSTANCE_DATA                   *Instance;
+  EFI_MANAGED_NETWORK_RECEIVE_DATA    RxData;
+  NET_BUF                             *Nbuf;
+  UINT64                              TimeoutTick;
 } MNP_RXDATA_WRAP;
 
-#define MNP_TX_BUF_WRAP_SIGNATURE   SIGNATURE_32 ('M', 'T', 'B', 'W')
+#define MNP_TX_BUF_WRAP_SIGNATURE  SIGNATURE_32 ('M', 'T', 'B', 'W')
 
 typedef struct {
-  UINT32                  Signature;
-  LIST_ENTRY              WrapEntry;  // Link to FreeTxBufList
-  LIST_ENTRY              AllEntry;   // Link to AllTxBufList
-  BOOLEAN                 InUse;
-  UINT8                   TxBuf[1];
+  UINT32        Signature;
+  LIST_ENTRY    WrapEntry;            // Link to FreeTxBufList
+  LIST_ENTRY    AllEntry;             // Link to AllTxBufList
+  BOOLEAN       InUse;
+  UINT8         TxBuf[1];
 } MNP_TX_BUF_WRAP;
 
 /**
@@ -111,9 +111,9 @@ typedef struct {
 **/
 EFI_STATUS
 MnpInitializeDeviceData (
-  IN OUT MNP_DEVICE_DATA   *MnpDeviceData,
-  IN     EFI_HANDLE        ImageHandle,
-  IN     EFI_HANDLE        ControllerHandle
+  IN OUT MNP_DEVICE_DATA  *MnpDeviceData,
+  IN     EFI_HANDLE       ImageHandle,
+  IN     EFI_HANDLE       ControllerHandle
   );
 
 /**
@@ -125,8 +125,8 @@ MnpInitializeDeviceData (
 **/
 VOID
 MnpDestroyDeviceData (
-  IN OUT MNP_DEVICE_DATA   *MnpDeviceData,
-  IN     EFI_HANDLE        ImageHandle
+  IN OUT MNP_DEVICE_DATA  *MnpDeviceData,
+  IN     EFI_HANDLE       ImageHandle
   );
 
 /**
@@ -142,9 +142,9 @@ MnpDestroyDeviceData (
 **/
 MNP_SERVICE_DATA *
 MnpCreateServiceData (
-  IN MNP_DEVICE_DATA     *MnpDeviceData,
-  IN UINT16              VlanId,
-  IN UINT8                Priority OPTIONAL
+  IN MNP_DEVICE_DATA  *MnpDeviceData,
+  IN UINT16           VlanId,
+  IN UINT8            Priority OPTIONAL
   );
 
 /**
@@ -161,9 +161,9 @@ MnpCreateServiceData (
 **/
 EFI_STATUS
 MnpInitializeServiceData (
-  IN OUT MNP_SERVICE_DATA    *MnpServiceData,
-  IN     EFI_HANDLE          ImageHandle,
-  IN     EFI_HANDLE          ControllerHandle
+  IN OUT MNP_SERVICE_DATA  *MnpServiceData,
+  IN     EFI_HANDLE        ImageHandle,
+  IN     EFI_HANDLE        ControllerHandle
   );
 
 /**
@@ -177,7 +177,7 @@ MnpInitializeServiceData (
 **/
 EFI_STATUS
 MnpDestroyServiceData (
-  IN OUT MNP_SERVICE_DATA    *MnpServiceData
+  IN OUT MNP_SERVICE_DATA  *MnpServiceData
   );
 
 /**
@@ -191,7 +191,7 @@ MnpDestroyServiceData (
 **/
 EFI_STATUS
 MnpDestroyServiceChild (
-  IN OUT MNP_SERVICE_DATA    *MnpServiceData
+  IN OUT MNP_SERVICE_DATA  *MnpServiceData
   );
 
 /**
@@ -205,8 +205,8 @@ MnpDestroyServiceChild (
 **/
 MNP_SERVICE_DATA *
 MnpFindServiceData (
-  IN MNP_DEVICE_DATA     *MnpDeviceData,
-  IN UINT16              VlanId
+  IN MNP_DEVICE_DATA  *MnpDeviceData,
+  IN UINT16           VlanId
   );
 
 /**
@@ -219,8 +219,8 @@ MnpFindServiceData (
 **/
 VOID
 MnpInitializeInstanceData (
-  IN     MNP_SERVICE_DATA    *MnpServiceData,
-  IN OUT MNP_INSTANCE_DATA   *Instance
+  IN     MNP_SERVICE_DATA   *MnpServiceData,
+  IN OUT MNP_INSTANCE_DATA  *Instance
   );
 
 /**
@@ -240,9 +240,9 @@ MnpInitializeInstanceData (
 EFI_STATUS
 EFIAPI
 MnpTokenExist (
-  IN NET_MAP         *Map,
-  IN NET_MAP_ITEM    *Item,
-  IN VOID            *Arg
+  IN NET_MAP       *Map,
+  IN NET_MAP_ITEM  *Item,
+  IN VOID          *Arg
   );
 
 /**
@@ -263,9 +263,9 @@ MnpTokenExist (
 EFI_STATUS
 EFIAPI
 MnpCancelTokens (
-  IN OUT NET_MAP         *Map,
-  IN OUT NET_MAP_ITEM    *Item,
-  IN     VOID            *Arg
+  IN OUT NET_MAP       *Map,
+  IN OUT NET_MAP_ITEM  *Item,
+  IN     VOID          *Arg
   );
 
 /**
@@ -276,7 +276,7 @@ MnpCancelTokens (
 **/
 VOID
 MnpFlushRcvdDataQueue (
-  IN OUT MNP_INSTANCE_DATA   *Instance
+  IN OUT MNP_INSTANCE_DATA  *Instance
   );
 
 /**
@@ -294,8 +294,8 @@ MnpFlushRcvdDataQueue (
 **/
 EFI_STATUS
 MnpConfigureInstance (
-  IN OUT MNP_INSTANCE_DATA                 *Instance,
-  IN     EFI_MANAGED_NETWORK_CONFIG_DATA   *ConfigData OPTIONAL
+  IN OUT MNP_INSTANCE_DATA                *Instance,
+  IN     EFI_MANAGED_NETWORK_CONFIG_DATA  *ConfigData OPTIONAL
   );
 
 /**
@@ -315,10 +315,10 @@ MnpConfigureInstance (
 **/
 EFI_STATUS
 MnpGroupOp (
-  IN OUT MNP_INSTANCE_DATA         *Instance,
-  IN     BOOLEAN                   JoinFlag,
-  IN     EFI_MAC_ADDRESS           *MacAddress OPTIONAL,
-  IN     MNP_GROUP_CONTROL_BLOCK   *CtrlBlk OPTIONAL
+  IN OUT MNP_INSTANCE_DATA        *Instance,
+  IN     BOOLEAN                  JoinFlag,
+  IN     EFI_MAC_ADDRESS          *MacAddress OPTIONAL,
+  IN     MNP_GROUP_CONTROL_BLOCK  *CtrlBlk OPTIONAL
   );
 
 /**
@@ -332,8 +332,8 @@ MnpGroupOp (
 **/
 BOOLEAN
 MnpIsValidTxToken (
-  IN MNP_INSTANCE_DATA                       *Instance,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN    *Token
+  IN MNP_INSTANCE_DATA                     *Instance,
+  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
   );
 
 /**
@@ -352,10 +352,10 @@ MnpIsValidTxToken (
 **/
 EFI_STATUS
 MnpBuildTxPacket (
-  IN     MNP_SERVICE_DATA                    *MnpServiceData,
-  IN     EFI_MANAGED_NETWORK_TRANSMIT_DATA   *TxData,
-     OUT UINT8                               **PktBuf,
-     OUT UINT32                              *PktLen
+  IN     MNP_SERVICE_DATA                   *MnpServiceData,
+  IN     EFI_MANAGED_NETWORK_TRANSMIT_DATA  *TxData,
+  OUT UINT8                                 **PktBuf,
+  OUT UINT32                                *PktLen
   );
 
 /**
@@ -377,10 +377,10 @@ MnpBuildTxPacket (
 **/
 EFI_STATUS
 MnpSyncSendPacket (
-  IN     MNP_SERVICE_DATA                        *MnpServiceData,
-  IN     UINT8                                   *Packet,
-  IN     UINT32                                  Length,
-  IN OUT EFI_MANAGED_NETWORK_COMPLETION_TOKEN    *Token
+  IN     MNP_SERVICE_DATA                      *MnpServiceData,
+  IN     UINT8                                 *Packet,
+  IN     UINT32                                Length,
+  IN OUT EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
   );
 
 /**
@@ -396,7 +396,7 @@ MnpSyncSendPacket (
 **/
 EFI_STATUS
 MnpInstanceDeliverPacket (
-  IN OUT MNP_INSTANCE_DATA   *Instance
+  IN OUT MNP_INSTANCE_DATA  *Instance
   );
 
 /**
@@ -410,8 +410,8 @@ MnpInstanceDeliverPacket (
 VOID
 EFIAPI
 MnpRecycleRxData (
-  IN EFI_EVENT     Event,
-  IN VOID          *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -427,7 +427,7 @@ MnpRecycleRxData (
 **/
 EFI_STATUS
 MnpReceivePacket (
-  IN OUT MNP_DEVICE_DATA   *MnpDeviceData
+  IN OUT MNP_DEVICE_DATA  *MnpDeviceData
   );
 
 /**
@@ -443,7 +443,7 @@ MnpReceivePacket (
 **/
 NET_BUF *
 MnpAllocNbuf (
-  IN OUT MNP_DEVICE_DATA   *MnpDeviceData
+  IN OUT MNP_DEVICE_DATA  *MnpDeviceData
   );
 
 /**
@@ -455,8 +455,8 @@ MnpAllocNbuf (
 **/
 VOID
 MnpFreeNbuf (
-  IN OUT MNP_DEVICE_DATA   *MnpDeviceData,
-  IN OUT NET_BUF           *Nbuf
+  IN OUT MNP_DEVICE_DATA  *MnpDeviceData,
+  IN OUT NET_BUF          *Nbuf
   );
 
 /**
@@ -472,7 +472,7 @@ MnpFreeNbuf (
 **/
 UINT8 *
 MnpAllocTxBuf (
-  IN OUT MNP_DEVICE_DATA   *MnpDeviceData
+  IN OUT MNP_DEVICE_DATA  *MnpDeviceData
   );
 
 /**
@@ -486,7 +486,7 @@ MnpAllocTxBuf (
 **/
 EFI_STATUS
 MnpRecycleTxBuf (
-  IN OUT MNP_DEVICE_DATA   *MnpDeviceData
+  IN OUT MNP_DEVICE_DATA  *MnpDeviceData
   );
 
 /**
@@ -499,8 +499,8 @@ MnpRecycleTxBuf (
 VOID
 EFIAPI
 MnpCheckPacketTimeout (
-  IN EFI_EVENT     Event,
-  IN VOID          *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -513,8 +513,8 @@ MnpCheckPacketTimeout (
 VOID
 EFIAPI
 MnpCheckMediaStatus (
-  IN EFI_EVENT     Event,
-  IN VOID          *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -528,8 +528,8 @@ MnpCheckMediaStatus (
 VOID
 EFIAPI
 MnpSystemPoll (
-  IN EFI_EVENT     Event,
-  IN VOID          *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -560,9 +560,9 @@ MnpSystemPoll (
 EFI_STATUS
 EFIAPI
 MnpGetModeData (
-  IN     EFI_MANAGED_NETWORK_PROTOCOL      *This,
-     OUT EFI_MANAGED_NETWORK_CONFIG_DATA   *MnpConfigData OPTIONAL,
-     OUT EFI_SIMPLE_NETWORK_MODE           *SnpModeData OPTIONAL
+  IN     EFI_MANAGED_NETWORK_PROTOCOL  *This,
+  OUT EFI_MANAGED_NETWORK_CONFIG_DATA  *MnpConfigData OPTIONAL,
+  OUT EFI_SIMPLE_NETWORK_MODE          *SnpModeData OPTIONAL
   );
 
 /**
@@ -620,8 +620,8 @@ MnpGetModeData (
 EFI_STATUS
 EFIAPI
 MnpConfigure (
-  IN EFI_MANAGED_NETWORK_PROTOCOL        *This,
-  IN EFI_MANAGED_NETWORK_CONFIG_DATA     *MnpConfigData OPTIONAL
+  IN EFI_MANAGED_NETWORK_PROTOCOL     *This,
+  IN EFI_MANAGED_NETWORK_CONFIG_DATA  *MnpConfigData OPTIONAL
   );
 
 /**
@@ -657,10 +657,10 @@ MnpConfigure (
 EFI_STATUS
 EFIAPI
 MnpMcastIpToMac (
-  IN     EFI_MANAGED_NETWORK_PROTOCOL    *This,
-  IN     BOOLEAN                         Ipv6Flag,
-  IN     EFI_IP_ADDRESS                  *IpAddress,
-     OUT EFI_MAC_ADDRESS                 *MacAddress
+  IN     EFI_MANAGED_NETWORK_PROTOCOL  *This,
+  IN     BOOLEAN                       Ipv6Flag,
+  IN     EFI_IP_ADDRESS                *IpAddress,
+  OUT EFI_MAC_ADDRESS                  *MacAddress
   );
 
 /**
@@ -702,9 +702,9 @@ MnpMcastIpToMac (
 EFI_STATUS
 EFIAPI
 MnpGroups (
-  IN EFI_MANAGED_NETWORK_PROTOCOL    *This,
-  IN BOOLEAN                         JoinFlag,
-  IN EFI_MAC_ADDRESS                 *MacAddress OPTIONAL
+  IN EFI_MANAGED_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                       JoinFlag,
+  IN EFI_MAC_ADDRESS               *MacAddress OPTIONAL
   );
 
 /**
@@ -765,8 +765,8 @@ MnpGroups (
 EFI_STATUS
 EFIAPI
 MnpTransmit (
-  IN EFI_MANAGED_NETWORK_PROTOCOL            *This,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN    *Token
+  IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
+  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
   );
 
 /**
@@ -801,8 +801,8 @@ MnpTransmit (
 EFI_STATUS
 EFIAPI
 MnpCancel (
-  IN EFI_MANAGED_NETWORK_PROTOCOL            *This,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN    *Token OPTIONAL
+  IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
+  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token OPTIONAL
   );
 
 /**
@@ -843,8 +843,8 @@ MnpCancel (
 EFI_STATUS
 EFIAPI
 MnpReceive (
-  IN EFI_MANAGED_NETWORK_PROTOCOL            *This,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN    *Token
+  IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
+  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
   );
 
 /**
@@ -876,7 +876,7 @@ MnpReceive (
 EFI_STATUS
 EFIAPI
 MnpPoll (
-  IN EFI_MANAGED_NETWORK_PROTOCOL    *This
+  IN EFI_MANAGED_NETWORK_PROTOCOL  *This
   );
 
 /**
@@ -892,7 +892,7 @@ MnpPoll (
 **/
 EFI_STATUS
 MnpConfigReceiveFilters (
-  IN MNP_DEVICE_DATA     *MnpDeviceData
+  IN MNP_DEVICE_DATA  *MnpDeviceData
   );
 
 #endif

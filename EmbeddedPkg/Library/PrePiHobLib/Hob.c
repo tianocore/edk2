@@ -44,8 +44,6 @@ GetHobList (
   return PrePeiGetHobList ();
 }
 
-
-
 /**
   Updates the pointer to the HOB list.
 
@@ -55,7 +53,7 @@ GetHobList (
 EFI_STATUS
 EFIAPI
 SetHobList (
-  IN  VOID      *HobList
+  IN  VOID  *HobList
   )
 {
   return PrePeiSetHobList (HobList);
@@ -65,7 +63,7 @@ SetHobList (
 
 
 **/
-EFI_HOB_HANDOFF_INFO_TABLE*
+EFI_HOB_HANDOFF_INFO_TABLE *
 HobConstructor (
   IN VOID   *EfiMemoryBegin,
   IN UINTN  EfiMemoryLength,
@@ -79,16 +77,16 @@ HobConstructor (
   Hob    = EfiFreeMemoryBottom;
   HobEnd = (EFI_HOB_GENERIC_HEADER *)(Hob+1);
 
-  Hob->Header.HobType     = EFI_HOB_TYPE_HANDOFF;
-  Hob->Header.HobLength   = sizeof(EFI_HOB_HANDOFF_INFO_TABLE);
-  Hob->Header.Reserved    = 0;
+  Hob->Header.HobType   = EFI_HOB_TYPE_HANDOFF;
+  Hob->Header.HobLength = sizeof (EFI_HOB_HANDOFF_INFO_TABLE);
+  Hob->Header.Reserved  = 0;
 
-  HobEnd->HobType     = EFI_HOB_TYPE_END_OF_HOB_LIST;
-  HobEnd->HobLength   = sizeof(EFI_HOB_GENERIC_HEADER);
-  HobEnd->Reserved    = 0;
+  HobEnd->HobType   = EFI_HOB_TYPE_END_OF_HOB_LIST;
+  HobEnd->HobLength = sizeof (EFI_HOB_GENERIC_HEADER);
+  HobEnd->Reserved  = 0;
 
-  Hob->Version             = EFI_HOB_HANDOFF_TABLE_VERSION;
-  Hob->BootMode            = BOOT_WITH_FULL_CONFIGURATION;
+  Hob->Version  = EFI_HOB_HANDOFF_TABLE_VERSION;
+  Hob->BootMode = BOOT_WITH_FULL_CONFIGURATION;
 
   Hob->EfiMemoryTop        = (UINTN)EfiMemoryBegin + EfiMemoryLength;
   Hob->EfiMemoryBottom     = (UINTN)EfiMemoryBegin;
@@ -101,8 +99,8 @@ HobConstructor (
 
 VOID *
 CreateHob (
-  IN  UINT16    HobType,
-  IN  UINT16    HobLength
+  IN  UINT16  HobType,
+  IN  UINT16  HobLength
   )
 {
   EFI_HOB_HANDOFF_INFO_TABLE  *HandOffHob;
@@ -117,22 +115,22 @@ CreateHob (
   FreeMemory = HandOffHob->EfiFreeMemoryTop - HandOffHob->EfiFreeMemoryBottom;
 
   if (FreeMemory < HobLength) {
-      return NULL;
+    return NULL;
   }
 
-  Hob = (VOID*) (UINTN) HandOffHob->EfiEndOfHobList;
-  ((EFI_HOB_GENERIC_HEADER*) Hob)->HobType = HobType;
-  ((EFI_HOB_GENERIC_HEADER*) Hob)->HobLength = HobLength;
-  ((EFI_HOB_GENERIC_HEADER*) Hob)->Reserved = 0;
+  Hob                                        = (VOID *)(UINTN)HandOffHob->EfiEndOfHobList;
+  ((EFI_HOB_GENERIC_HEADER *)Hob)->HobType   = HobType;
+  ((EFI_HOB_GENERIC_HEADER *)Hob)->HobLength = HobLength;
+  ((EFI_HOB_GENERIC_HEADER *)Hob)->Reserved  = 0;
 
-  HobEnd = (EFI_HOB_GENERIC_HEADER*) ((UINTN)Hob + HobLength);
-  HandOffHob->EfiEndOfHobList = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
+  HobEnd                      = (EFI_HOB_GENERIC_HEADER *)((UINTN)Hob + HobLength);
+  HandOffHob->EfiEndOfHobList = (EFI_PHYSICAL_ADDRESS)(UINTN)HobEnd;
 
   HobEnd->HobType   = EFI_HOB_TYPE_END_OF_HOB_LIST;
-  HobEnd->HobLength = sizeof(EFI_HOB_GENERIC_HEADER);
+  HobEnd->HobLength = sizeof (EFI_HOB_GENERIC_HEADER);
   HobEnd->Reserved  = 0;
   HobEnd++;
-  HandOffHob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
+  HandOffHob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS)(UINTN)HobEnd;
 
   return Hob;
 }
@@ -161,7 +159,7 @@ BuildResourceDescriptorHob (
   EFI_HOB_RESOURCE_DESCRIPTOR  *Hob;
 
   Hob = CreateHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
-  ASSERT(Hob != NULL);
+  ASSERT (Hob != NULL);
 
   Hob->ResourceType      = ResourceType;
   Hob->ResourceAttribute = ResourceAttribute;
@@ -177,8 +175,7 @@ BuildFvHobs (
   IN EFI_RESOURCE_ATTRIBUTE_TYPE  *ResourceAttribute
   )
 {
-
-  EFI_RESOURCE_ATTRIBUTE_TYPE Resource;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  Resource;
 
   BuildFvHob (PhysicalStart, NumberOfBytes);
 
@@ -213,15 +210,15 @@ BuildFvHobs (
 VOID *
 EFIAPI
 GetNextHob (
-  IN UINT16                 Type,
-  IN CONST VOID             *HobStart
+  IN UINT16      Type,
+  IN CONST VOID  *HobStart
   )
 {
   EFI_PEI_HOB_POINTERS  Hob;
 
   ASSERT (HobStart != NULL);
 
-  Hob.Raw = (UINT8 *) HobStart;
+  Hob.Raw = (UINT8 *)HobStart;
   //
   // Parse the HOB list until end of list or matching type is found.
   //
@@ -229,12 +226,12 @@ GetNextHob (
     if (Hob.Header->HobType == Type) {
       return Hob.Raw;
     }
+
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
+
   return NULL;
 }
-
-
 
 /**
   Returns the first instance of a HOB type among the whole HOB list.
@@ -250,15 +247,14 @@ GetNextHob (
 VOID *
 EFIAPI
 GetFirstHob (
-  IN UINT16                 Type
+  IN UINT16  Type
   )
 {
-  VOID      *HobList;
+  VOID  *HobList;
 
   HobList = GetHobList ();
   return GetNextHob (Type, HobList);
 }
-
 
 /**
   This function searches the first instance of a HOB from the starting HOB pointer.
@@ -282,21 +278,23 @@ GetFirstHob (
 VOID *
 EFIAPI
 GetNextGuidHob (
-  IN CONST EFI_GUID         *Guid,
-  IN CONST VOID             *HobStart
-  ){
+  IN CONST EFI_GUID  *Guid,
+  IN CONST VOID      *HobStart
+  )
+{
   EFI_PEI_HOB_POINTERS  GuidHob;
 
-  GuidHob.Raw = (UINT8 *) HobStart;
+  GuidHob.Raw = (UINT8 *)HobStart;
   while ((GuidHob.Raw = GetNextHob (EFI_HOB_TYPE_GUID_EXTENSION, GuidHob.Raw)) != NULL) {
     if (CompareGuid (Guid, &GuidHob.Guid->Name)) {
       break;
     }
+
     GuidHob.Raw = GET_NEXT_HOB (GuidHob);
   }
+
   return GuidHob.Raw;
 }
-
 
 /**
   This function searches the first instance of a HOB among the whole HOB list.
@@ -315,15 +313,14 @@ GetNextGuidHob (
 VOID *
 EFIAPI
 GetFirstGuidHob (
-  IN CONST EFI_GUID         *Guid
+  IN CONST EFI_GUID  *Guid
   )
 {
-  VOID      *HobList;
+  VOID  *HobList;
 
   HobList = GetHobList ();
   return GetNextGuidHob (Guid, HobList);
 }
-
 
 /**
   Get the Boot Mode from the HOB list.
@@ -348,7 +345,6 @@ GetBootMode (
   return Hob.HandoffInformationTable->BootMode;
 }
 
-
 /**
   Get the Boot Mode from the HOB list.
 
@@ -363,12 +359,12 @@ GetBootMode (
 EFI_STATUS
 EFIAPI
 SetBootMode (
-  IN  EFI_BOOT_MODE   BootMode
+  IN  EFI_BOOT_MODE  BootMode
   )
 {
   EFI_PEI_HOB_POINTERS  Hob;
 
-  Hob.Raw = GetHobList ();
+  Hob.Raw                               = GetHobList ();
   Hob.HandoffInformationTable->BootMode = BootMode;
   return BootMode;
 }
@@ -391,16 +387,18 @@ SetBootMode (
 VOID
 EFIAPI
 BuildModuleHob (
-  IN CONST EFI_GUID         *ModuleName,
-  IN EFI_PHYSICAL_ADDRESS   MemoryAllocationModule,
-  IN UINT64                 ModuleLength,
-  IN EFI_PHYSICAL_ADDRESS   EntryPoint
+  IN CONST EFI_GUID        *ModuleName,
+  IN EFI_PHYSICAL_ADDRESS  MemoryAllocationModule,
+  IN UINT64                ModuleLength,
+  IN EFI_PHYSICAL_ADDRESS  EntryPoint
   )
 {
   EFI_HOB_MEMORY_ALLOCATION_MODULE  *Hob;
 
-  ASSERT (((MemoryAllocationModule & (EFI_PAGE_SIZE - 1)) == 0) &&
-          ((ModuleLength & (EFI_PAGE_SIZE - 1)) == 0));
+  ASSERT (
+    ((MemoryAllocationModule & (EFI_PAGE_SIZE - 1)) == 0) &&
+    ((ModuleLength & (EFI_PAGE_SIZE - 1)) == 0)
+    );
 
   Hob = CreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE));
 
@@ -439,22 +437,21 @@ BuildModuleHob (
 VOID *
 EFIAPI
 BuildGuidHob (
-  IN CONST EFI_GUID              *Guid,
-  IN UINTN                       DataLength
+  IN CONST EFI_GUID  *Guid,
+  IN UINTN           DataLength
   )
 {
-  EFI_HOB_GUID_TYPE *Hob;
+  EFI_HOB_GUID_TYPE  *Hob;
 
   //
   // Make sure that data length is not too long.
   //
   ASSERT (DataLength <= (0xffff - sizeof (EFI_HOB_GUID_TYPE)));
 
-  Hob = CreateHob (EFI_HOB_TYPE_GUID_EXTENSION, (UINT16) (sizeof (EFI_HOB_GUID_TYPE) + DataLength));
+  Hob = CreateHob (EFI_HOB_TYPE_GUID_EXTENSION, (UINT16)(sizeof (EFI_HOB_GUID_TYPE) + DataLength));
   CopyGuid (&Hob->Name, Guid);
   return Hob + 1;
 }
-
 
 /**
   Copies a data buffer to a newly-built HOB.
@@ -479,9 +476,9 @@ BuildGuidHob (
 VOID *
 EFIAPI
 BuildGuidDataHob (
-  IN CONST EFI_GUID              *Guid,
-  IN VOID                        *Data,
-  IN UINTN                       DataLength
+  IN CONST EFI_GUID  *Guid,
+  IN VOID            *Data,
+  IN UINTN           DataLength
   )
 {
   VOID  *HobData;
@@ -492,7 +489,6 @@ BuildGuidDataHob (
 
   return CopyMem (HobData, Data, DataLength);
 }
-
 
 /**
   Builds a Firmware Volume HOB.
@@ -509,8 +505,8 @@ BuildGuidDataHob (
 VOID
 EFIAPI
 BuildFvHob (
-  IN EFI_PHYSICAL_ADDRESS        BaseAddress,
-  IN UINT64                      Length
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT64                Length
   )
 {
   EFI_HOB_FIRMWARE_VOLUME  *Hob;
@@ -520,7 +516,6 @@ BuildFvHob (
   Hob->BaseAddress = BaseAddress;
   Hob->Length      = Length;
 }
-
 
 /**
   Builds a EFI_HOB_TYPE_FV2 HOB.
@@ -539,10 +534,10 @@ BuildFvHob (
 VOID
 EFIAPI
 BuildFv2Hob (
-  IN          EFI_PHYSICAL_ADDRESS        BaseAddress,
-  IN          UINT64                      Length,
-  IN CONST    EFI_GUID                    *FvName,
-  IN CONST    EFI_GUID                    *FileName
+  IN          EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN          UINT64                Length,
+  IN CONST    EFI_GUID              *FvName,
+  IN CONST    EFI_GUID              *FileName
   )
 {
   EFI_HOB_FIRMWARE_VOLUME2  *Hob;
@@ -578,12 +573,12 @@ BuildFv2Hob (
 VOID
 EFIAPI
 BuildFv3Hob (
-  IN          EFI_PHYSICAL_ADDRESS        BaseAddress,
-  IN          UINT64                      Length,
-  IN          UINT32                      AuthenticationStatus,
-  IN          BOOLEAN                     ExtractedFv,
-  IN CONST    EFI_GUID                    *FvName, OPTIONAL
-  IN CONST    EFI_GUID                    *FileName OPTIONAL
+  IN          EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN          UINT64                Length,
+  IN          UINT32                AuthenticationStatus,
+  IN          BOOLEAN               ExtractedFv,
+  IN CONST    EFI_GUID              *FvName  OPTIONAL,
+  IN CONST    EFI_GUID              *FileName OPTIONAL
   )
 {
   EFI_HOB_FIRMWARE_VOLUME3  *Hob;
@@ -615,13 +610,12 @@ BuildFv3Hob (
 VOID
 EFIAPI
 BuildCvHob (
-  IN EFI_PHYSICAL_ADDRESS        BaseAddress,
-  IN UINT64                      Length
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT64                Length
   )
 {
   ASSERT (FALSE);
 }
-
 
 /**
   Builds a HOB for the CPU.
@@ -638,8 +632,8 @@ BuildCvHob (
 VOID
 EFIAPI
 BuildCpuHob (
-  IN UINT8                       SizeOfMemorySpace,
-  IN UINT8                       SizeOfIoSpace
+  IN UINT8  SizeOfMemorySpace,
+  IN UINT8  SizeOfIoSpace
   )
 {
   EFI_HOB_CPU  *Hob;
@@ -654,7 +648,6 @@ BuildCpuHob (
   //
   ZeroMem (Hob->Reserved, sizeof (Hob->Reserved));
 }
-
 
 /**
   Builds a HOB for the Stack.
@@ -671,14 +664,16 @@ BuildCpuHob (
 VOID
 EFIAPI
 BuildStackHob (
-  IN EFI_PHYSICAL_ADDRESS        BaseAddress,
-  IN UINT64                      Length
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT64                Length
   )
 {
   EFI_HOB_MEMORY_ALLOCATION_STACK  *Hob;
 
-  ASSERT (((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
-          ((Length & (EFI_PAGE_SIZE - 1)) == 0));
+  ASSERT (
+    ((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
+    ((Length & (EFI_PAGE_SIZE - 1)) == 0)
+    );
 
   Hob = CreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_STACK));
 
@@ -693,7 +688,6 @@ BuildStackHob (
   ZeroMem (Hob->AllocDescriptor.Reserved, sizeof (Hob->AllocDescriptor.Reserved));
 }
 
-
 /**
   Update the Stack Hob if the stack has been moved
 
@@ -703,11 +697,11 @@ BuildStackHob (
 **/
 VOID
 UpdateStackHob (
-  IN EFI_PHYSICAL_ADDRESS        BaseAddress,
-  IN UINT64                      Length
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT64                Length
   )
 {
-  EFI_PEI_HOB_POINTERS           Hob;
+  EFI_PEI_HOB_POINTERS  Hob;
 
   Hob.Raw = GetHobList ();
   while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
@@ -725,14 +719,13 @@ UpdateStackHob (
       // Update the BSP Stack Hob to reflect the new stack info.
       //
       Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress = BaseAddress;
-      Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength = Length;
+      Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength      = Length;
       break;
     }
+
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
 }
-
-
 
 /**
   Builds a HOB for the memory allocation.
@@ -750,15 +743,17 @@ UpdateStackHob (
 VOID
 EFIAPI
 BuildMemoryAllocationHob (
-  IN EFI_PHYSICAL_ADDRESS        BaseAddress,
-  IN UINT64                      Length,
-  IN EFI_MEMORY_TYPE             MemoryType
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT64                Length,
+  IN EFI_MEMORY_TYPE       MemoryType
   )
 {
   EFI_HOB_MEMORY_ALLOCATION  *Hob;
 
-  ASSERT (((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
-          ((Length & (EFI_PAGE_SIZE - 1)) == 0));
+  ASSERT (
+    ((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
+    ((Length & (EFI_PAGE_SIZE - 1)) == 0)
+    );
 
   Hob = CreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION));
 
@@ -772,24 +767,22 @@ BuildMemoryAllocationHob (
   ZeroMem (Hob->AllocDescriptor.Reserved, sizeof (Hob->AllocDescriptor.Reserved));
 }
 
-
-
 VOID
 EFIAPI
 BuildExtractSectionHob (
-  IN  EFI_GUID                                  *Guid,
-  IN  EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER   SectionGetInfo,
-  IN  EXTRACT_GUIDED_SECTION_DECODE_HANDLER     SectionExtraction
+  IN  EFI_GUID                                 *Guid,
+  IN  EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER  SectionGetInfo,
+  IN  EXTRACT_GUIDED_SECTION_DECODE_HANDLER    SectionExtraction
   )
 {
-  EXTRACT_SECTION_DATA Data;
+  EXTRACT_SECTION_DATA  Data;
 
   Data.SectionGetInfo    = SectionGetInfo;
   Data.SectionExtraction = SectionExtraction;
   BuildGuidDataHob (Guid, &Data, sizeof (Data));
 }
 
-PE_COFF_LOADER_PROTOCOL gPeCoffProtocol = {
+PE_COFF_LOADER_PROTOCOL  gPeCoffProtocol = {
   PeCoffLoaderGetImageInfo,
   PeCoffLoaderLoadImage,
   PeCoffLoaderRelocateImage,
@@ -797,8 +790,6 @@ PE_COFF_LOADER_PROTOCOL gPeCoffProtocol = {
   PeCoffLoaderRelocateImageForRuntime,
   PeCoffLoaderUnloadImage
 };
-
-
 
 VOID
 EFIAPI
@@ -818,7 +809,7 @@ BuildMemoryTypeInformationHob (
   VOID
   )
 {
-  EFI_MEMORY_TYPE_INFORMATION   Info[10];
+  EFI_MEMORY_TYPE_INFORMATION  Info[10];
 
   Info[0].Type          = EfiACPIReclaimMemory;
   Info[0].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiACPIReclaimMemory);
@@ -843,7 +834,5 @@ BuildMemoryTypeInformationHob (
   Info[9].Type          = EfiMaxMemoryType;
   Info[9].NumberOfPages = 0;
 
-
   BuildGuidDataHob (&gEfiMemoryTypeInformationGuid, &Info, sizeof (Info));
 }
-

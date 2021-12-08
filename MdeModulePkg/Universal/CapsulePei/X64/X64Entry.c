@@ -14,28 +14,28 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugAgentLib.h>
 #include "CommonHeader.h"
 
-#define EXCEPTION_VECTOR_NUMBER     0x22
+#define EXCEPTION_VECTOR_NUMBER  0x22
 
-#define IA32_PG_P                   BIT0
-#define IA32_PG_RW                  BIT1
-#define IA32_PG_PS                  BIT7
+#define IA32_PG_P   BIT0
+#define IA32_PG_RW  BIT1
+#define IA32_PG_PS  BIT7
 
 typedef struct _PAGE_FAULT_CONTEXT {
-  BOOLEAN                       Page1GSupport;
-  UINT64                        PhyMask;
-  UINTN                         PageFaultBuffer;
-  UINTN                         PageFaultIndex;
-  UINT64                        AddressEncMask;
+  BOOLEAN    Page1GSupport;
+  UINT64     PhyMask;
+  UINTN      PageFaultBuffer;
+  UINTN      PageFaultIndex;
+  UINT64     AddressEncMask;
   //
   // Store the uplink information for each page being used.
   //
-  UINT64                        *PageFaultUplink[EXTRA_PAGE_TABLE_PAGES];
-  VOID                          *OriginalHandler;
+  UINT64     *PageFaultUplink[EXTRA_PAGE_TABLE_PAGES];
+  VOID       *OriginalHandler;
 } PAGE_FAULT_CONTEXT;
 
 typedef struct _PAGE_FAULT_IDT_TABLE {
-  PAGE_FAULT_CONTEXT            PageFaultContext;
-  IA32_IDT_GATE_DESCRIPTOR      IdtEntryTable[EXCEPTION_VECTOR_NUMBER];
+  PAGE_FAULT_CONTEXT          PageFaultContext;
+  IA32_IDT_GATE_DESCRIPTOR    IdtEntryTable[EXCEPTION_VECTOR_NUMBER];
 } PAGE_FAULT_IDT_TABLE;
 
 /**
@@ -57,22 +57,23 @@ PageFaultHandlerHook (
 **/
 VOID
 HookPageFaultHandler (
-  IN OUT IA32_IDT_GATE_DESCRIPTOR   *IdtEntry,
-  IN OUT PAGE_FAULT_CONTEXT         *PageFaultContext
+  IN OUT IA32_IDT_GATE_DESCRIPTOR  *IdtEntry,
+  IN OUT PAGE_FAULT_CONTEXT        *PageFaultContext
   )
 {
-  UINT32            RegEax;
-  UINT8             PhysicalAddressBits;
-  UINTN             PageFaultHandlerHookAddress;
+  UINT32  RegEax;
+  UINT8   PhysicalAddressBits;
+  UINTN   PageFaultHandlerHookAddress;
 
   AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
   if (RegEax >= 0x80000008) {
     AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-    PhysicalAddressBits = (UINT8) RegEax;
+    PhysicalAddressBits = (UINT8)RegEax;
   } else {
     PhysicalAddressBits = 36;
   }
-  PageFaultContext->PhyMask = LShiftU64 (1, PhysicalAddressBits) - 1;
+
+  PageFaultContext->PhyMask  = LShiftU64 (1, PhysicalAddressBits) - 1;
   PageFaultContext->PhyMask &= (1ull << 48) - SIZE_4KB;
 
   //
@@ -89,10 +90,11 @@ HookPageFaultHandler (
   IdtEntry->Bits.Reserved_1         = 0;
 
   if (PageFaultContext->Page1GSupport) {
-    PageFaultContext->PageFaultBuffer = (UINTN)(AsmReadCr3 () & PageFaultContext->PhyMask) + EFI_PAGES_TO_SIZE(2);
-  }else {
-    PageFaultContext->PageFaultBuffer = (UINTN)(AsmReadCr3 () & PageFaultContext->PhyMask) + EFI_PAGES_TO_SIZE(6);
+    PageFaultContext->PageFaultBuffer = (UINTN)(AsmReadCr3 () & PageFaultContext->PhyMask) + EFI_PAGES_TO_SIZE (2);
+  } else {
+    PageFaultContext->PageFaultBuffer = (UINTN)(AsmReadCr3 () & PageFaultContext->PhyMask) + EFI_PAGES_TO_SIZE (6);
   }
+
   PageFaultContext->PageFaultIndex = 0;
   ZeroMem (PageFaultContext->PageFaultUplink, sizeof (PageFaultContext->PageFaultUplink));
 }
@@ -106,15 +108,15 @@ HookPageFaultHandler (
 **/
 VOID
 AcquirePage (
-  IN OUT PAGE_FAULT_CONTEXT     *PageFaultContext,
-  IN OUT UINT64                 *Uplink
+  IN OUT PAGE_FAULT_CONTEXT  *PageFaultContext,
+  IN OUT UINT64              *Uplink
   )
 {
-  UINTN             Address;
-  UINT64            AddressEncMask;
+  UINTN   Address;
+  UINT64  AddressEncMask;
 
   Address = PageFaultContext->PageFaultBuffer + EFI_PAGES_TO_SIZE (PageFaultContext->PageFaultIndex);
-  ZeroMem ((VOID *) Address, EFI_PAGES_TO_SIZE (1));
+  ZeroMem ((VOID *)Address, EFI_PAGES_TO_SIZE (1));
 
   AddressEncMask = PageFaultContext->AddressEncMask;
 
@@ -122,14 +124,15 @@ AcquirePage (
   // Cut the previous uplink if it exists and wasn't overwritten.
   //
   if ((PageFaultContext->PageFaultUplink[PageFaultContext->PageFaultIndex] != NULL) &&
-     ((*PageFaultContext->PageFaultUplink[PageFaultContext->PageFaultIndex] & ~AddressEncMask & PageFaultContext->PhyMask) == Address)) {
+      ((*PageFaultContext->PageFaultUplink[PageFaultContext->PageFaultIndex] & ~AddressEncMask & PageFaultContext->PhyMask) == Address))
+  {
     *PageFaultContext->PageFaultUplink[PageFaultContext->PageFaultIndex] = 0;
   }
 
   //
   // Link & Record the current uplink.
   //
-  *Uplink = Address | AddressEncMask | IA32_PG_P | IA32_PG_RW;
+  *Uplink                                                             = Address | AddressEncMask | IA32_PG_P | IA32_PG_RW;
   PageFaultContext->PageFaultUplink[PageFaultContext->PageFaultIndex] = Uplink;
 
   PageFaultContext->PageFaultIndex = (PageFaultContext->PageFaultIndex + 1) % EXTRA_PAGE_TABLE_PAGES;
@@ -148,42 +151,44 @@ PageFaultHandler (
   VOID
   )
 {
-  IA32_DESCRIPTOR           Idtr;
-  PAGE_FAULT_CONTEXT        *PageFaultContext;
-  UINT64                    PhyMask;
-  UINT64                    *PageTable;
-  UINT64                    PFAddress;
-  UINTN                     PTIndex;
-  UINT64                    AddressEncMask;
+  IA32_DESCRIPTOR     Idtr;
+  PAGE_FAULT_CONTEXT  *PageFaultContext;
+  UINT64              PhyMask;
+  UINT64              *PageTable;
+  UINT64              PFAddress;
+  UINTN               PTIndex;
+  UINT64              AddressEncMask;
 
   //
   // Get the IDT Descriptor.
   //
-  AsmReadIdtr ((IA32_DESCRIPTOR *) &Idtr);
+  AsmReadIdtr ((IA32_DESCRIPTOR *)&Idtr);
   //
   // Then get page fault context by IDT Descriptor.
   //
-  PageFaultContext = (PAGE_FAULT_CONTEXT *) (UINTN) (Idtr.Base - sizeof (PAGE_FAULT_CONTEXT));
-  PhyMask = PageFaultContext->PhyMask;
-  AddressEncMask = PageFaultContext->AddressEncMask;
+  PageFaultContext = (PAGE_FAULT_CONTEXT *)(UINTN)(Idtr.Base - sizeof (PAGE_FAULT_CONTEXT));
+  PhyMask          = PageFaultContext->PhyMask;
+  AddressEncMask   = PageFaultContext->AddressEncMask;
 
   PFAddress = AsmReadCr2 ();
-  DEBUG ((EFI_D_ERROR, "CapsuleX64 - PageFaultHandler: Cr2 - %lx\n", PFAddress));
+  DEBUG ((DEBUG_ERROR, "CapsuleX64 - PageFaultHandler: Cr2 - %lx\n", PFAddress));
 
   if (PFAddress >= PhyMask + SIZE_4KB) {
     return PageFaultContext->OriginalHandler;
   }
+
   PFAddress &= PhyMask;
 
-  PageTable = (UINT64*)(UINTN)(AsmReadCr3 () & PhyMask);
+  PageTable = (UINT64 *)(UINTN)(AsmReadCr3 () & PhyMask);
 
   PTIndex = BitFieldRead64 (PFAddress, 39, 47);
   // PML4E
   if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
     AcquirePage (PageFaultContext, &PageTable[PTIndex]);
   }
-  PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & ~AddressEncMask & PhyMask);
-  PTIndex = BitFieldRead64 (PFAddress, 30, 38);
+
+  PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~AddressEncMask & PhyMask);
+  PTIndex   = BitFieldRead64 (PFAddress, 30, 38);
   // PDPTE
   if (PageFaultContext->Page1GSupport) {
     PageTable[PTIndex] = ((PFAddress | AddressEncMask) & ~((1ull << 30) - 1)) | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
@@ -191,15 +196,15 @@ PageFaultHandler (
     if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
       AcquirePage (PageFaultContext, &PageTable[PTIndex]);
     }
-    PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & ~AddressEncMask & PhyMask);
-    PTIndex = BitFieldRead64 (PFAddress, 21, 29);
+
+    PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~AddressEncMask & PhyMask);
+    PTIndex   = BitFieldRead64 (PFAddress, 21, 29);
     // PD
     PageTable[PTIndex] = ((PFAddress | AddressEncMask) & ~((1ull << 21) - 1)) | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
   }
 
   return NULL;
 }
-
 
 /**
   The X64 entrypoint is used to process capsule in long mode then
@@ -214,28 +219,28 @@ PageFaultHandler (
 EFI_STATUS
 EFIAPI
 _ModuleEntryPoint (
-  SWITCH_32_TO_64_CONTEXT       *EntrypointContext,
-  SWITCH_64_TO_32_CONTEXT       *ReturnContext
-)
+  SWITCH_32_TO_64_CONTEXT  *EntrypointContext,
+  SWITCH_64_TO_32_CONTEXT  *ReturnContext
+  )
 {
-  EFI_STATUS                    Status;
-  IA32_DESCRIPTOR               Ia32Idtr;
-  IA32_DESCRIPTOR               X64Idtr;
-  PAGE_FAULT_IDT_TABLE          PageFaultIdtTable;
-  IA32_IDT_GATE_DESCRIPTOR      *IdtEntry;
+  EFI_STATUS                Status;
+  IA32_DESCRIPTOR           Ia32Idtr;
+  IA32_DESCRIPTOR           X64Idtr;
+  PAGE_FAULT_IDT_TABLE      PageFaultIdtTable;
+  IA32_IDT_GATE_DESCRIPTOR  *IdtEntry;
 
   //
   // Save the IA32 IDT Descriptor
   //
-  AsmReadIdtr ((IA32_DESCRIPTOR *) &Ia32Idtr);
+  AsmReadIdtr ((IA32_DESCRIPTOR *)&Ia32Idtr);
 
   //
   // Setup X64 IDT table
   //
   ZeroMem (PageFaultIdtTable.IdtEntryTable, sizeof (IA32_IDT_GATE_DESCRIPTOR) * EXCEPTION_VECTOR_NUMBER);
-  X64Idtr.Base = (UINTN) PageFaultIdtTable.IdtEntryTable;
-  X64Idtr.Limit = (UINT16) (sizeof (IA32_IDT_GATE_DESCRIPTOR) * EXCEPTION_VECTOR_NUMBER - 1);
-  AsmWriteIdtr ((IA32_DESCRIPTOR *) &X64Idtr);
+  X64Idtr.Base  = (UINTN)PageFaultIdtTable.IdtEntryTable;
+  X64Idtr.Limit = (UINT16)(sizeof (IA32_IDT_GATE_DESCRIPTOR) * EXCEPTION_VECTOR_NUMBER - 1);
+  AsmWriteIdtr ((IA32_DESCRIPTOR *)&X64Idtr);
 
   //
   // Setup the default CPU exception handlers
@@ -246,25 +251,25 @@ _ModuleEntryPoint (
   //
   // Hook page fault handler to handle >4G request.
   //
-  PageFaultIdtTable.PageFaultContext.Page1GSupport = EntrypointContext->Page1GSupport;
+  PageFaultIdtTable.PageFaultContext.Page1GSupport  = EntrypointContext->Page1GSupport;
   PageFaultIdtTable.PageFaultContext.AddressEncMask = EntrypointContext->AddressEncMask;
-  IdtEntry = (IA32_IDT_GATE_DESCRIPTOR *) (X64Idtr.Base + (14 * sizeof (IA32_IDT_GATE_DESCRIPTOR)));
+  IdtEntry                                          = (IA32_IDT_GATE_DESCRIPTOR *)(X64Idtr.Base + (14 * sizeof (IA32_IDT_GATE_DESCRIPTOR)));
   HookPageFaultHandler (IdtEntry, &(PageFaultIdtTable.PageFaultContext));
 
   //
   // Initialize Debug Agent to support source level debug
   //
-  InitializeDebugAgent (DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64, (VOID *) &Ia32Idtr, NULL);
+  InitializeDebugAgent (DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64, (VOID *)&Ia32Idtr, NULL);
 
   //
   // Call CapsuleDataCoalesce to process capsule.
   //
   Status = CapsuleDataCoalesce (
              NULL,
-             (EFI_PHYSICAL_ADDRESS *) (UINTN) EntrypointContext->BlockListAddr,
-             (MEMORY_RESOURCE_DESCRIPTOR *) (UINTN) EntrypointContext->MemoryResource,
-             (VOID **) (UINTN) EntrypointContext->MemoryBase64Ptr,
-             (UINTN *) (UINTN) EntrypointContext->MemorySize64Ptr
+             (EFI_PHYSICAL_ADDRESS *)(UINTN)EntrypointContext->BlockListAddr,
+             (MEMORY_RESOURCE_DESCRIPTOR *)(UINTN)EntrypointContext->MemoryResource,
+             (VOID **)(UINTN)EntrypointContext->MemoryBase64Ptr,
+             (UINTN *)(UINTN)EntrypointContext->MemorySize64Ptr
              );
 
   ReturnContext->ReturnStatus = Status;
@@ -284,17 +289,17 @@ _ModuleEntryPoint (
   //
   // Restore IA32 IDT table
   //
-  AsmWriteIdtr ((IA32_DESCRIPTOR *) &Ia32Idtr);
+  AsmWriteIdtr ((IA32_DESCRIPTOR *)&Ia32Idtr);
 
   //
   // Finish to coalesce capsule, and return to 32-bit mode.
   //
   AsmDisablePaging64 (
     ReturnContext->ReturnCs,
-    (UINT32) ReturnContext->ReturnEntryPoint,
-    (UINT32) (UINTN) EntrypointContext,
-    (UINT32) (UINTN) ReturnContext,
-    (UINT32) (EntrypointContext->StackBufferBase + EntrypointContext->StackBufferLength)
+    (UINT32)ReturnContext->ReturnEntryPoint,
+    (UINT32)(UINTN)EntrypointContext,
+    (UINT32)(UINTN)ReturnContext,
+    (UINT32)(EntrypointContext->StackBufferBase + EntrypointContext->StackBufferLength)
     );
 
   //

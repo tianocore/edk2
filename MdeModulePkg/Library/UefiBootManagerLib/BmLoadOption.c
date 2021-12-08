@@ -10,20 +10,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "InternalBm.h"
 
 GLOBAL_REMOVE_IF_UNREFERENCED
-  CHAR16 *mBmLoadOptionName[] = {
-    L"Driver",
-    L"SysPrep",
-    L"Boot",
-    L"PlatformRecovery"
-  };
+CHAR16  *mBmLoadOptionName[] = {
+  L"Driver",
+  L"SysPrep",
+  L"Boot",
+  L"PlatformRecovery"
+};
 
 GLOBAL_REMOVE_IF_UNREFERENCED
-  CHAR16 *mBmLoadOptionOrderName[] = {
-    EFI_DRIVER_ORDER_VARIABLE_NAME,
-    EFI_SYS_PREP_ORDER_VARIABLE_NAME,
-    EFI_BOOT_ORDER_VARIABLE_NAME,
-    NULL  // PlatformRecovery#### doesn't have associated *Order variable
-  };
+CHAR16  *mBmLoadOptionOrderName[] = {
+  EFI_DRIVER_ORDER_VARIABLE_NAME,
+  EFI_SYS_PREP_ORDER_VARIABLE_NAME,
+  EFI_BOOT_ORDER_VARIABLE_NAME,
+  NULL    // PlatformRecovery#### doesn't have associated *Order variable
+};
 
 /**
   Call Visitor function for each variable in variable storage.
@@ -33,32 +33,33 @@ GLOBAL_REMOVE_IF_UNREFERENCED
 **/
 VOID
 BmForEachVariable (
-  BM_VARIABLE_VISITOR         Visitor,
-  VOID                        *Context
+  BM_VARIABLE_VISITOR  Visitor,
+  VOID                 *Context
   )
 {
-  EFI_STATUS                  Status;
-  CHAR16                      *Name;
-  EFI_GUID                    Guid;
-  UINTN                       NameSize;
-  UINTN                       NewNameSize;
+  EFI_STATUS  Status;
+  CHAR16      *Name;
+  EFI_GUID    Guid;
+  UINTN       NameSize;
+  UINTN       NewNameSize;
 
   NameSize = sizeof (CHAR16);
-  Name = AllocateZeroPool (NameSize);
+  Name     = AllocateZeroPool (NameSize);
   ASSERT (Name != NULL);
   while (TRUE) {
     NewNameSize = NameSize;
-    Status = gRT->GetNextVariableName (&NewNameSize, Name, &Guid);
+    Status      = gRT->GetNextVariableName (&NewNameSize, Name, &Guid);
     if (Status == EFI_BUFFER_TOO_SMALL) {
       Name = ReallocatePool (NameSize, NewNameSize, Name);
       ASSERT (Name != NULL);
-      Status = gRT->GetNextVariableName (&NewNameSize, Name, &Guid);
+      Status   = gRT->GetNextVariableName (&NewNameSize, Name, &Guid);
       NameSize = NewNameSize;
     }
 
     if (Status == EFI_NOT_FOUND) {
       break;
     }
+
     ASSERT_EFI_ERROR (Status);
 
     Visitor (Name, &Guid, Context);
@@ -80,35 +81,37 @@ BmForEachVariable (
 **/
 EFI_STATUS
 BmGetFreeOptionNumber (
-  IN  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE LoadOptionType,
-  OUT UINT16                            *FreeOptionNumber
+  IN  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE  LoadOptionType,
+  OUT UINT16                             *FreeOptionNumber
   )
 {
-
-  UINTN         OptionNumber;
-  UINTN         Index;
-  UINT16        *OptionOrder;
-  UINTN         OptionOrderSize;
-  UINT16        *BootNext;
+  UINTN   OptionNumber;
+  UINTN   Index;
+  UINT16  *OptionOrder;
+  UINTN   OptionOrderSize;
+  UINT16  *BootNext;
 
   ASSERT (FreeOptionNumber != NULL);
-  ASSERT (LoadOptionType == LoadOptionTypeDriver ||
-          LoadOptionType == LoadOptionTypeBoot ||
-          LoadOptionType == LoadOptionTypeSysPrep);
+  ASSERT (
+    LoadOptionType == LoadOptionTypeDriver ||
+    LoadOptionType == LoadOptionTypeBoot ||
+    LoadOptionType == LoadOptionTypeSysPrep
+    );
 
-  GetEfiGlobalVariable2 (mBmLoadOptionOrderName[LoadOptionType], (VOID **) &OptionOrder, &OptionOrderSize);
+  GetEfiGlobalVariable2 (mBmLoadOptionOrderName[LoadOptionType], (VOID **)&OptionOrder, &OptionOrderSize);
   ASSERT ((OptionOrder != NULL && OptionOrderSize != 0) || (OptionOrder == NULL && OptionOrderSize == 0));
 
   BootNext = NULL;
   if (LoadOptionType == LoadOptionTypeBoot) {
-    GetEfiGlobalVariable2 (L"BootNext", (VOID**) &BootNext, NULL);
+    GetEfiGlobalVariable2 (L"BootNext", (VOID **)&BootNext, NULL);
   }
 
   for (OptionNumber = 0;
        OptionNumber < OptionOrderSize / sizeof (UINT16)
-                    + ((BootNext != NULL) ? 1 : 0);
+       + ((BootNext != NULL) ? 1 : 0);
        OptionNumber++
-       ) {
+       )
+  {
     //
     // Search in OptionOrder whether the OptionNumber exists
     //
@@ -124,10 +127,12 @@ BmGetFreeOptionNumber (
     //
     if ((Index == OptionOrderSize / sizeof (UINT16)) &&
         ((BootNext == NULL) || (OptionNumber != *BootNext))
-        ) {
+        )
+    {
       break;
     }
   }
+
   if (OptionOrder != NULL) {
     FreePool (OptionOrder);
   }
@@ -144,7 +149,7 @@ BmGetFreeOptionNumber (
   if (OptionNumber == 0x10000) {
     return EFI_OUT_OF_RESOURCES;
   } else {
-    *FreeOptionNumber = (UINT16) OptionNumber;
+    *FreeOptionNumber = (UINT16)OptionNumber;
     return EFI_SUCCESS;
   }
 }
@@ -161,23 +166,24 @@ BmGetFreeOptionNumber (
 EFI_STATUS
 EFIAPI
 EfiBootManagerLoadOptionToVariable (
-  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION     *Option
+  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Option
   )
 {
-  EFI_STATUS                       Status;
-  UINTN                            VariableSize;
-  UINT8                            *Variable;
-  UINT8                            *Ptr;
-  CHAR16                           OptionName[BM_OPTION_NAME_LEN];
-  CHAR16                           *Description;
-  CHAR16                           NullChar;
-  EDKII_VARIABLE_LOCK_PROTOCOL     *VariableLock;
-  UINT32                           VariableAttributes;
+  EFI_STATUS                    Status;
+  UINTN                         VariableSize;
+  UINT8                         *Variable;
+  UINT8                         *Ptr;
+  CHAR16                        OptionName[BM_OPTION_NAME_LEN];
+  CHAR16                        *Description;
+  CHAR16                        NullChar;
+  EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock;
+  UINT32                        VariableAttributes;
 
   if ((Option->OptionNumber == LoadOptionNumberUnassigned) ||
       (Option->FilePath == NULL) ||
-      ((UINT32) Option->OptionType >= LoadOptionTypeMax)
-     ) {
+      ((UINT32)Option->OptionType >= LoadOptionTypeMax)
+      )
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -206,26 +212,26 @@ in the array is variable length, and ends at the device path end
 structure.
   */
   VariableSize = sizeof (Option->Attributes)
-               + sizeof (UINT16)
-               + StrSize (Description)
-               + GetDevicePathSize (Option->FilePath)
-               + Option->OptionalDataSize;
+                 + sizeof (UINT16)
+                 + StrSize (Description)
+                 + GetDevicePathSize (Option->FilePath)
+                 + Option->OptionalDataSize;
 
-  Variable     = AllocatePool (VariableSize);
+  Variable = AllocatePool (VariableSize);
   ASSERT (Variable != NULL);
 
-  Ptr             = Variable;
-  WriteUnaligned32 ((UINT32 *) Ptr, Option->Attributes);
-  Ptr            += sizeof (Option->Attributes);
+  Ptr = Variable;
+  WriteUnaligned32 ((UINT32 *)Ptr, Option->Attributes);
+  Ptr += sizeof (Option->Attributes);
 
-  WriteUnaligned16 ((UINT16 *) Ptr, (UINT16) GetDevicePathSize (Option->FilePath));
-  Ptr            += sizeof (UINT16);
+  WriteUnaligned16 ((UINT16 *)Ptr, (UINT16)GetDevicePathSize (Option->FilePath));
+  Ptr += sizeof (UINT16);
 
   CopyMem (Ptr, Description, StrSize (Description));
-  Ptr            += StrSize (Description);
+  Ptr += StrSize (Description);
 
   CopyMem (Ptr, Option->FilePath, GetDevicePathSize (Option->FilePath));
-  Ptr            += GetDevicePathSize (Option->FilePath);
+  Ptr += GetDevicePathSize (Option->FilePath);
 
   CopyMem (Ptr, Option->OptionalData, Option->OptionalDataSize);
 
@@ -236,11 +242,12 @@ structure.
     //
     // Lock the PlatformRecovery####
     //
-    Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
+    Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLock);
     if (!EFI_ERROR (Status)) {
       Status = VariableLock->RequestToLock (VariableLock, OptionName, &gEfiGlobalVariableGuid);
       ASSERT_EFI_ERROR (Status);
     }
+
     VariableAttributes = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS;
   }
 
@@ -270,20 +277,21 @@ structure.
 **/
 EFI_STATUS
 BmAddOptionNumberToOrderVariable (
-  IN CHAR16               *OptionOrderName,
-  IN UINT16               OptionNumber,
-  IN UINTN                Position
+  IN CHAR16  *OptionOrderName,
+  IN UINT16  OptionNumber,
+  IN UINTN   Position
   )
 {
-  EFI_STATUS              Status;
-  UINTN                   Index;
-  UINT16                  *OptionOrder;
-  UINT16                  *NewOptionOrder;
-  UINTN                   OptionOrderSize;
+  EFI_STATUS  Status;
+  UINTN       Index;
+  UINT16      *OptionOrder;
+  UINT16      *NewOptionOrder;
+  UINTN       OptionOrderSize;
+
   //
   // Update the option order variable
   //
-  GetEfiGlobalVariable2 (OptionOrderName, (VOID **) &OptionOrder, &OptionOrderSize);
+  GetEfiGlobalVariable2 (OptionOrderName, (VOID **)&OptionOrder, &OptionOrderSize);
   ASSERT ((OptionOrder != NULL && OptionOrderSize != 0) || (OptionOrder == NULL && OptionOrderSize == 0));
 
   Status = EFI_SUCCESS;
@@ -295,7 +303,7 @@ BmAddOptionNumberToOrderVariable (
   }
 
   if (!EFI_ERROR (Status)) {
-    Position       = MIN (Position, OptionOrderSize / sizeof (UINT16));
+    Position = MIN (Position, OptionOrderSize / sizeof (UINT16));
 
     NewOptionOrder = AllocatePool (OptionOrderSize + sizeof (UINT16));
     ASSERT (NewOptionOrder != NULL);
@@ -303,6 +311,7 @@ BmAddOptionNumberToOrderVariable (
       CopyMem (NewOptionOrder, OptionOrder, Position * sizeof (UINT16));
       CopyMem (&NewOptionOrder[Position + 1], &OptionOrder[Position], OptionOrderSize - Position * sizeof (UINT16));
     }
+
     NewOptionOrder[Position] = OptionNumber;
 
     Status = gRT->SetVariable (
@@ -345,21 +354,22 @@ BmAddOptionNumberToOrderVariable (
 EFI_STATUS
 EFIAPI
 EfiBootManagerAddLoadOptionVariable (
-  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION *Option,
-  IN     UINTN                        Position
+  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION  *Option,
+  IN     UINTN                         Position
   )
 {
-  EFI_STATUS                      Status;
-  UINT16                          OptionNumber;
+  EFI_STATUS  Status;
+  UINT16      OptionNumber;
 
   if (Option == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Option->OptionType != LoadOptionTypeDriver &&
-      Option->OptionType != LoadOptionTypeSysPrep &&
-      Option->OptionType != LoadOptionTypeBoot
-      ) {
+  if ((Option->OptionType != LoadOptionTypeDriver) &&
+      (Option->OptionType != LoadOptionTypeSysPrep) &&
+      (Option->OptionType != LoadOptionTypeBoot)
+      )
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -371,6 +381,7 @@ EfiBootManagerAddLoadOptionVariable (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     Option->OptionNumber = OptionNumber;
   }
 
@@ -378,7 +389,7 @@ EfiBootManagerAddLoadOptionVariable (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = BmAddOptionNumberToOrderVariable (mBmLoadOptionOrderName[Option->OptionType], (UINT16) Option->OptionNumber, Position);
+  Status = BmAddOptionNumberToOrderVariable (mBmLoadOptionOrderName[Option->OptionType], (UINT16)Option->OptionNumber, Position);
   if (!EFI_ERROR (Status)) {
     //
     // Save the Boot#### or Driver#### variable
@@ -405,15 +416,15 @@ EfiBootManagerAddLoadOptionVariable (
 VOID
 EFIAPI
 EfiBootManagerSortLoadOptionVariable (
-  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE        OptionType,
-  SORT_COMPARE                             CompareFunction
+  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE  OptionType,
+  SORT_COMPARE                       CompareFunction
   )
 {
-  EFI_STATUS                     Status;
-  EFI_BOOT_MANAGER_LOAD_OPTION   *LoadOption;
-  UINTN                          LoadOptionCount;
-  UINTN                          Index;
-  UINT16                         *OptionOrder;
+  EFI_STATUS                    Status;
+  EFI_BOOT_MANAGER_LOAD_OPTION  *LoadOption;
+  UINTN                         LoadOptionCount;
+  UINTN                         Index;
+  UINT16                        *OptionOrder;
 
   LoadOption = EfiBootManagerGetLoadOptions (&LoadOptionCount, OptionType);
 
@@ -433,7 +444,7 @@ EfiBootManagerSortLoadOptionVariable (
   OptionOrder = AllocatePool (LoadOptionCount * sizeof (UINT16));
   ASSERT (OptionOrder != NULL);
   for (Index = 0; Index < LoadOptionCount; Index++) {
-    OptionOrder[Index] = (UINT16) LoadOption[Index].OptionNumber;
+    OptionOrder[Index] = (UINT16)LoadOption[Index].OptionNumber;
   }
 
   Status = gRT->SetVariable (
@@ -470,14 +481,14 @@ EfiBootManagerSortLoadOptionVariable (
 EFI_STATUS
 EFIAPI
 EfiBootManagerInitializeLoadOption (
-  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION   *Option,
-  IN  UINTN                             OptionNumber,
-  IN  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE OptionType,
-  IN  UINT32                            Attributes,
-  IN  CHAR16                            *Description,
-  IN  EFI_DEVICE_PATH_PROTOCOL          *FilePath,
-  IN  UINT8                             *OptionalData,   OPTIONAL
-  IN  UINT32                            OptionalDataSize
+  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION    *Option,
+  IN  UINTN                              OptionNumber,
+  IN  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE  OptionType,
+  IN  UINT32                             Attributes,
+  IN  CHAR16                             *Description,
+  IN  EFI_DEVICE_PATH_PROTOCOL           *FilePath,
+  IN  UINT8                              *OptionalData    OPTIONAL,
+  IN  UINT32                             OptionalDataSize
   )
 {
   if ((Option == NULL) || (Description == NULL) || (FilePath == NULL)) {
@@ -485,20 +496,21 @@ EfiBootManagerInitializeLoadOption (
   }
 
   if (((OptionalData != NULL) && (OptionalDataSize == 0)) ||
-      ((OptionalData == NULL) && (OptionalDataSize != 0))) {
+      ((OptionalData == NULL) && (OptionalDataSize != 0)))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((UINT32) OptionType >= LoadOptionTypeMax) {
+  if ((UINT32)OptionType >= LoadOptionTypeMax) {
     return EFI_INVALID_PARAMETER;
   }
 
   ZeroMem (Option, sizeof (EFI_BOOT_MANAGER_LOAD_OPTION));
-  Option->OptionNumber       = OptionNumber;
-  Option->OptionType         = OptionType;
-  Option->Attributes         = Attributes;
-  Option->Description        = AllocateCopyPool (StrSize (Description), Description);
-  Option->FilePath           = DuplicateDevicePath (FilePath);
+  Option->OptionNumber = OptionNumber;
+  Option->OptionType   = OptionType;
+  Option->Attributes   = Attributes;
+  Option->Description  = AllocateCopyPool (StrSize (Description), Description);
+  Option->FilePath     = DuplicateDevicePath (FilePath);
   if (OptionalData != NULL) {
     Option->OptionalData     = AllocateCopyPool (OptionalDataSize, OptionalData);
     Option->OptionalDataSize = OptionalDataSize;
@@ -506,7 +518,6 @@ EfiBootManagerInitializeLoadOption (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Return the index of the load option in the load option array.
@@ -524,12 +535,12 @@ EfiBootManagerInitializeLoadOption (
 INTN
 EFIAPI
 EfiBootManagerFindLoadOption (
-  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *Key,
-  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *Array,
-  IN UINTN                              Count
+  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Key,
+  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Array,
+  IN UINTN                               Count
   )
 {
-  UINTN                             Index;
+  UINTN  Index;
 
   for (Index = 0; Index < Count; Index++) {
     if ((Key->OptionType == Array[Index].OptionType) &&
@@ -537,8 +548,9 @@ EfiBootManagerFindLoadOption (
         (StrCmp (Key->Description, Array[Index].Description) == 0) &&
         (CompareMem (Key->FilePath, Array[Index].FilePath, GetDevicePathSize (Key->FilePath)) == 0) &&
         (Key->OptionalDataSize == Array[Index].OptionalDataSize) &&
-        (CompareMem (Key->OptionalData, Array[Index].OptionalData, Key->OptionalDataSize) == 0)) {
-      return (INTN) Index;
+        (CompareMem (Key->OptionalData, Array[Index].OptionalData, Key->OptionalDataSize) == 0))
+    {
+      return (INTN)Index;
     }
   }
 
@@ -563,21 +575,21 @@ EfiBootManagerDeleteLoadOptionVariable (
   IN EFI_BOOT_MANAGER_LOAD_OPTION_TYPE  OptionType
   )
 {
-  UINT16                            *OptionOrder;
-  UINTN                             OptionOrderSize;
-  UINTN                             Index;
-  CHAR16                            OptionName[BM_OPTION_NAME_LEN];
+  UINT16  *OptionOrder;
+  UINTN   OptionOrderSize;
+  UINTN   Index;
+  CHAR16  OptionName[BM_OPTION_NAME_LEN];
 
-  if (((UINT32) OptionType >= LoadOptionTypeMax) || (OptionNumber >= LoadOptionNumberMax)) {
+  if (((UINT32)OptionType >= LoadOptionTypeMax) || (OptionNumber >= LoadOptionNumberMax)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (OptionType == LoadOptionTypeDriver || OptionType == LoadOptionTypeSysPrep || OptionType == LoadOptionTypeBoot) {
+  if ((OptionType == LoadOptionTypeDriver) || (OptionType == LoadOptionTypeSysPrep) || (OptionType == LoadOptionTypeBoot)) {
     //
     // If the associated *Order exists, firstly remove the reference in *Order for
     //  Driver####, SysPrep#### and Boot####.
     //
-    GetEfiGlobalVariable2 (mBmLoadOptionOrderName[OptionType], (VOID **) &OptionOrder, &OptionOrderSize);
+    GetEfiGlobalVariable2 (mBmLoadOptionOrderName[OptionType], (VOID **)&OptionOrder, &OptionOrderSize);
     ASSERT ((OptionOrder != NULL && OptionOrderSize != 0) || (OptionOrder == NULL && OptionOrderSize == 0));
 
     for (Index = 0; Index < OptionOrderSize / sizeof (UINT16); Index++) {
@@ -594,6 +606,7 @@ EfiBootManagerDeleteLoadOptionVariable (
         break;
       }
     }
+
     if (OptionOrder != NULL) {
       FreePool (OptionOrder);
     }
@@ -650,12 +663,15 @@ BmGetDevicePathSizeEx (
     if (NodeSize == 0) {
       return 0;
     }
+
     Size += NodeSize;
     if (Size > MaxSize) {
       return 0;
     }
+
     DevicePath = NextDevicePathNode (DevicePath);
   }
+
   Size += DevicePathNodeLength (DevicePath);
   if (Size > MaxSize) {
     return 0;
@@ -684,18 +700,19 @@ BmGetDevicePathSizeEx (
 **/
 UINTN
 BmStrSizeEx (
-  IN      CONST CHAR16              *String,
-  IN      UINTN                     MaxStringLen
+  IN      CONST CHAR16  *String,
+  IN      UINTN         MaxStringLen
   )
 {
-  UINTN                             Length;
+  UINTN  Length;
 
   ASSERT (String != NULL && MaxStringLen != 0);
-  ASSERT (((UINTN) String & BIT0) == 0);
+  ASSERT (((UINTN)String & BIT0) == 0);
 
-  for (Length = 0; *String != L'\0' && MaxStringLen != Length; String++, Length+=2);
+  for (Length = 0; *String != L'\0' && MaxStringLen != Length; String++, Length += 2) {
+  }
 
-  if (*String != L'\0' && MaxStringLen == Length) {
+  if ((*String != L'\0') && (MaxStringLen == Length)) {
     return 0;
   }
 
@@ -715,8 +732,8 @@ BmStrSizeEx (
 **/
 BOOLEAN
 BmValidateOption (
-  UINT8                     *Variable,
-  UINTN                     VariableSize
+  UINT8  *Variable,
+  UINTN  VariableSize
   )
 {
   UINT16                    FilePathSize;
@@ -735,19 +752,19 @@ BmValidateOption (
   //
   // Get the option's device path size
   //
-  FilePathSize = ReadUnaligned16 ((UINT16 *) Variable);
-  Variable += sizeof (UINT16);
+  FilePathSize = ReadUnaligned16 ((UINT16 *)Variable);
+  Variable    += sizeof (UINT16);
 
   //
   // Get the option's description string size
   //
-  DescriptionSize = BmStrSizeEx ((CHAR16 *) Variable, VariableSize - sizeof (UINT16) - sizeof (UINT32));
-  Variable += DescriptionSize;
+  DescriptionSize = BmStrSizeEx ((CHAR16 *)Variable, VariableSize - sizeof (UINT16) - sizeof (UINT32));
+  Variable       += DescriptionSize;
 
   //
   // Get the option's device path
   //
-  DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) Variable;
+  DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)Variable;
 
   //
   // Validation boot option variable.
@@ -760,7 +777,7 @@ BmValidateOption (
     return FALSE;
   }
 
-  return (BOOLEAN) (BmGetDevicePathSizeEx (DevicePath, FilePathSize) != 0);
+  return (BOOLEAN)(BmGetDevicePathSizeEx (DevicePath, FilePathSize) != 0);
 }
 
 /**
@@ -778,16 +795,16 @@ BmValidateOption (
 BOOLEAN
 EFIAPI
 EfiBootManagerIsValidLoadOptionVariableName (
-  IN CHAR16                             *VariableName,
-  OUT EFI_BOOT_MANAGER_LOAD_OPTION_TYPE *OptionType   OPTIONAL,
-  OUT UINT16                            *OptionNumber OPTIONAL
+  IN CHAR16                              *VariableName,
+  OUT EFI_BOOT_MANAGER_LOAD_OPTION_TYPE  *OptionType   OPTIONAL,
+  OUT UINT16                             *OptionNumber OPTIONAL
   )
 {
-  UINTN                             VariableNameLen;
-  UINTN                             Index;
-  UINTN                             Uint;
-  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE LocalOptionType;
-  UINT16                            LocalOptionNumber;
+  UINTN                              VariableNameLen;
+  UINTN                              Index;
+  UINTN                              Uint;
+  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE  LocalOptionType;
+  UINT16                             LocalOptionNumber;
 
   if (VariableName == NULL) {
     return FALSE;
@@ -808,10 +825,12 @@ EfiBootManagerIsValidLoadOptionVariableName (
   for (LocalOptionType = 0; LocalOptionType < ARRAY_SIZE (mBmLoadOptionName); LocalOptionType++) {
     if ((VariableNameLen - 4 == StrLen (mBmLoadOptionName[LocalOptionType])) &&
         (StrnCmp (VariableName, mBmLoadOptionName[LocalOptionType], VariableNameLen - 4) == 0)
-        ) {
+        )
+    {
       break;
     }
   }
+
   if (LocalOptionType == ARRAY_SIZE (mBmLoadOptionName)) {
     return FALSE;
   }
@@ -825,9 +844,10 @@ EfiBootManagerIsValidLoadOptionVariableName (
     if (Uint == -1) {
       break;
     } else {
-      LocalOptionNumber = (UINT16) Uint + LocalOptionNumber * 0x10;
+      LocalOptionNumber = (UINT16)Uint + LocalOptionNumber * 0x10;
     }
   }
+
   if (Index != VariableNameLen) {
     return FALSE;
   }
@@ -857,9 +877,9 @@ EfiBootManagerIsValidLoadOptionVariableName (
 EFI_STATUS
 EFIAPI
 EfiBootManagerVariableToLoadOptionEx (
-  IN CHAR16                           *VariableName,
-  IN EFI_GUID                         *VendorGuid,
-  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION *Option
+  IN CHAR16                            *VariableName,
+  IN EFI_GUID                          *VendorGuid,
+  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION  *Option
   )
 {
   EFI_STATUS                         Status;
@@ -886,7 +906,7 @@ EfiBootManagerVariableToLoadOptionEx (
   //
   // Read the variable
   //
-  GetVariable2 (VariableName, VendorGuid, (VOID **) &Variable, &VariableSize);
+  GetVariable2 (VariableName, VendorGuid, (VOID **)&Variable, &VariableSize);
   if (Variable == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -894,7 +914,7 @@ EfiBootManagerVariableToLoadOptionEx (
   //
   // Validate *#### variable data.
   //
-  if (!BmValidateOption(Variable, VariableSize)) {
+  if (!BmValidateOption (Variable, VariableSize)) {
     FreePool (Variable);
     return EFI_INVALID_PARAMETER;
   }
@@ -902,33 +922,33 @@ EfiBootManagerVariableToLoadOptionEx (
   //
   // Get the option attribute
   //
-  VariablePtr = Variable;
-  Attribute = ReadUnaligned32 ((UINT32 *) VariablePtr);
+  VariablePtr  = Variable;
+  Attribute    = ReadUnaligned32 ((UINT32 *)VariablePtr);
   VariablePtr += sizeof (UINT32);
 
   //
   // Get the option's device path size
   //
-  FilePathSize = ReadUnaligned16 ((UINT16 *) VariablePtr);
+  FilePathSize = ReadUnaligned16 ((UINT16 *)VariablePtr);
   VariablePtr += sizeof (UINT16);
 
   //
   // Get the option's description string
   //
-  Description = (CHAR16 *) VariablePtr;
+  Description = (CHAR16 *)VariablePtr;
 
   //
   // Get the option's description string size
   //
-  VariablePtr += StrSize ((CHAR16 *) VariablePtr);
+  VariablePtr += StrSize ((CHAR16 *)VariablePtr);
 
   //
   // Get the option's device path
   //
-  FilePath = (EFI_DEVICE_PATH_PROTOCOL *) VariablePtr;
+  FilePath     = (EFI_DEVICE_PATH_PROTOCOL *)VariablePtr;
   VariablePtr += FilePathSize;
 
-  OptionalDataSize = (UINT32) (VariableSize - ((UINTN) VariablePtr - (UINTN) Variable));
+  OptionalDataSize = (UINT32)(VariableSize - ((UINTN)VariablePtr - (UINTN)Variable));
   if (OptionalDataSize == 0) {
     OptionalData = NULL;
   } else {
@@ -965,18 +985,18 @@ Build the Boot#### or Driver#### option from the VariableName.
 EFI_STATUS
 EFIAPI
 EfiBootManagerVariableToLoadOption (
-  IN  CHAR16                          *VariableName,
-  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION *Option
+  IN  CHAR16                           *VariableName,
+  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION  *Option
   )
 {
   return EfiBootManagerVariableToLoadOptionEx (VariableName, &gEfiGlobalVariableGuid, Option);
 }
 
 typedef struct {
-  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE OptionType;
-  EFI_GUID                          *Guid;
-  EFI_BOOT_MANAGER_LOAD_OPTION      *Options;
-  UINTN                             OptionCount;
+  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE    OptionType;
+  EFI_GUID                             *Guid;
+  EFI_BOOT_MANAGER_LOAD_OPTION         *Options;
+  UINTN                                OptionCount;
 } BM_COLLECT_LOAD_OPTIONS_PARAM;
 
 /**
@@ -989,25 +1009,26 @@ typedef struct {
 **/
 VOID
 BmCollectLoadOptions (
-  IN CHAR16               *Name,
-  IN EFI_GUID             *Guid,
-  IN VOID                 *Context
+  IN CHAR16    *Name,
+  IN EFI_GUID  *Guid,
+  IN VOID      *Context
   )
 {
-  EFI_STATUS                        Status;
-  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE OptionType;
-  UINT16                            OptionNumber;
-  EFI_BOOT_MANAGER_LOAD_OPTION      Option;
-  UINTN                             Index;
-  BM_COLLECT_LOAD_OPTIONS_PARAM     *Param;
+  EFI_STATUS                         Status;
+  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE  OptionType;
+  UINT16                             OptionNumber;
+  EFI_BOOT_MANAGER_LOAD_OPTION       Option;
+  UINTN                              Index;
+  BM_COLLECT_LOAD_OPTIONS_PARAM      *Param;
 
-  Param = (BM_COLLECT_LOAD_OPTIONS_PARAM *) Context;
+  Param = (BM_COLLECT_LOAD_OPTIONS_PARAM *)Context;
 
   if (CompareGuid (Guid, Param->Guid) && (
-      Param->OptionType == LoadOptionTypePlatformRecovery &&
-      EfiBootManagerIsValidLoadOptionVariableName (Name, &OptionType, &OptionNumber) &&
-      OptionType == LoadOptionTypePlatformRecovery
-     )) {
+                                          (Param->OptionType == LoadOptionTypePlatformRecovery) &&
+                                          EfiBootManagerIsValidLoadOptionVariableName (Name, &OptionType, &OptionNumber) &&
+                                          (OptionType == LoadOptionTypePlatformRecovery)
+                                          ))
+  {
     Status = EfiBootManagerVariableToLoadOptionEx (Name, Guid, &Option);
     if (!EFI_ERROR (Status)) {
       for (Index = 0; Index < Param->OptionCount; Index++) {
@@ -1015,6 +1036,7 @@ BmCollectLoadOptions (
           break;
         }
       }
+
       Param->Options = ReallocatePool (
                          Param->OptionCount * sizeof (EFI_BOOT_MANAGER_LOAD_OPTION),
                          (Param->OptionCount + 1) * sizeof (EFI_BOOT_MANAGER_LOAD_OPTION),
@@ -1047,24 +1069,24 @@ EfiBootManagerGetLoadOptions (
   IN EFI_BOOT_MANAGER_LOAD_OPTION_TYPE  LoadOptionType
   )
 {
-  EFI_STATUS                    Status;
-  UINT16                        *OptionOrder;
-  UINTN                         OptionOrderSize;
-  UINTN                         Index;
-  UINTN                         OptionIndex;
-  EFI_BOOT_MANAGER_LOAD_OPTION  *Options;
-  CHAR16                        OptionName[BM_OPTION_NAME_LEN];
-  UINT16                        OptionNumber;
-  BM_COLLECT_LOAD_OPTIONS_PARAM Param;
+  EFI_STATUS                     Status;
+  UINT16                         *OptionOrder;
+  UINTN                          OptionOrderSize;
+  UINTN                          Index;
+  UINTN                          OptionIndex;
+  EFI_BOOT_MANAGER_LOAD_OPTION   *Options;
+  CHAR16                         OptionName[BM_OPTION_NAME_LEN];
+  UINT16                         OptionNumber;
+  BM_COLLECT_LOAD_OPTIONS_PARAM  Param;
 
   *OptionCount = 0;
   Options      = NULL;
 
-  if (LoadOptionType == LoadOptionTypeDriver || LoadOptionType == LoadOptionTypeSysPrep || LoadOptionType == LoadOptionTypeBoot) {
+  if ((LoadOptionType == LoadOptionTypeDriver) || (LoadOptionType == LoadOptionTypeSysPrep) || (LoadOptionType == LoadOptionTypeBoot)) {
     //
     // Read the BootOrder, or DriverOrder variable.
     //
-    GetEfiGlobalVariable2 (mBmLoadOptionOrderName[LoadOptionType], (VOID **) &OptionOrder, &OptionOrderSize);
+    GetEfiGlobalVariable2 (mBmLoadOptionOrderName[LoadOptionType], (VOID **)&OptionOrder, &OptionOrderSize);
     if (OptionOrder == NULL) {
       return NULL;
     }
@@ -1081,7 +1103,7 @@ EfiBootManagerGetLoadOptions (
 
       Status = EfiBootManagerVariableToLoadOption (OptionName, &Options[OptionIndex]);
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_INFO, "[Bds] %s doesn't exist - Update ****Order variable to remove the reference!!", OptionName));
+        DEBUG ((DEBUG_INFO, "[Bds] %s doesn't exist - Update ****Order variable to remove the reference!!", OptionName));
         EfiBootManagerDeleteLoadOptionVariable (OptionNumber, LoadOptionType);
       } else {
         ASSERT (Options[OptionIndex].OptionNumber == OptionNumber);
@@ -1098,17 +1120,16 @@ EfiBootManagerGetLoadOptions (
       ASSERT (Options != NULL);
       *OptionCount = OptionIndex;
     }
-
   } else if (LoadOptionType == LoadOptionTypePlatformRecovery) {
-    Param.OptionType = LoadOptionTypePlatformRecovery;
-    Param.Options = NULL;
+    Param.OptionType  = LoadOptionTypePlatformRecovery;
+    Param.Options     = NULL;
     Param.OptionCount = 0;
-    Param.Guid = &gEfiGlobalVariableGuid;
+    Param.Guid        = &gEfiGlobalVariableGuid;
 
-    BmForEachVariable (BmCollectLoadOptions, (VOID *) &Param);
+    BmForEachVariable (BmCollectLoadOptions, (VOID *)&Param);
 
     *OptionCount = Param.OptionCount;
-    Options = Param.Options;
+    Options      = Param.Options;
   }
 
   return Options;
@@ -1136,9 +1157,11 @@ EfiBootManagerFreeLoadOption (
   if (LoadOption->Description != NULL) {
     FreePool (LoadOption->Description);
   }
+
   if (LoadOption->FilePath != NULL) {
     FreePool (LoadOption->FilePath);
   }
+
   if (LoadOption->OptionalData != NULL) {
     FreePool (LoadOption->OptionalData);
   }
@@ -1164,13 +1187,13 @@ EfiBootManagerFreeLoadOptions (
   IN  UINTN                         OptionCount
   )
 {
-  UINTN   Index;
+  UINTN  Index;
 
   if (Option == NULL) {
     return EFI_NOT_FOUND;
   }
 
-  for (Index = 0;Index < OptionCount; Index++) {
+  for (Index = 0; Index < OptionCount; Index++) {
     EfiBootManagerFreeLoadOption (&Option[Index]);
   }
 
@@ -1195,40 +1218,43 @@ EfiBootManagerFreeLoadOptions (
 **/
 BOOLEAN
 BmIsLoadOptionPeHeaderValid (
-  IN EFI_BOOT_MANAGER_LOAD_OPTION_TYPE Type,
-  IN VOID                              *FileBuffer,
-  IN UINTN                             FileSize
+  IN EFI_BOOT_MANAGER_LOAD_OPTION_TYPE  Type,
+  IN VOID                               *FileBuffer,
+  IN UINTN                              FileSize
   )
 {
-  EFI_IMAGE_DOS_HEADER              *DosHeader;
-  EFI_IMAGE_OPTIONAL_HEADER_UNION   *PeHeader;
-  EFI_IMAGE_OPTIONAL_HEADER32       *OptionalHeader;
-  UINT16                            Subsystem;
+  EFI_IMAGE_DOS_HEADER             *DosHeader;
+  EFI_IMAGE_OPTIONAL_HEADER_UNION  *PeHeader;
+  EFI_IMAGE_OPTIONAL_HEADER32      *OptionalHeader;
+  UINT16                           Subsystem;
 
-  if (FileBuffer == NULL || FileSize == 0) {
+  if ((FileBuffer == NULL) || (FileSize == 0)) {
     return FALSE;
   }
 
   //
   // Read dos header
   //
-  DosHeader = (EFI_IMAGE_DOS_HEADER *) FileBuffer;
-  if (FileSize >= sizeof (EFI_IMAGE_DOS_HEADER) &&
-      FileSize > DosHeader->e_lfanew && DosHeader->e_magic == EFI_IMAGE_DOS_SIGNATURE
-      ) {
+  DosHeader = (EFI_IMAGE_DOS_HEADER *)FileBuffer;
+  if ((FileSize >= sizeof (EFI_IMAGE_DOS_HEADER)) &&
+      (FileSize > DosHeader->e_lfanew) && (DosHeader->e_magic == EFI_IMAGE_DOS_SIGNATURE)
+      )
+  {
     //
     // Read and check PE signature
     //
-    PeHeader = (EFI_IMAGE_OPTIONAL_HEADER_UNION *) ((UINT8 *) FileBuffer + DosHeader->e_lfanew);
-    if (FileSize >= DosHeader->e_lfanew + sizeof (EFI_IMAGE_OPTIONAL_HEADER_UNION) &&
-        PeHeader->Pe32.Signature == EFI_IMAGE_NT_SIGNATURE
-        ) {
+    PeHeader = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((UINT8 *)FileBuffer + DosHeader->e_lfanew);
+    if ((FileSize >= DosHeader->e_lfanew + sizeof (EFI_IMAGE_OPTIONAL_HEADER_UNION)) &&
+        (PeHeader->Pe32.Signature == EFI_IMAGE_NT_SIGNATURE)
+        )
+    {
       //
       // Check PE32 or PE32+ magic, and machine type
       //
-      OptionalHeader = (EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHeader->Pe32.OptionalHeader;
-      if (OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC ||
-          OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
+      OptionalHeader = (EFI_IMAGE_OPTIONAL_HEADER32 *)&PeHeader->Pe32.OptionalHeader;
+      if ((OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) ||
+          (OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC))
+      {
         //
         // Check the Subsystem:
         //   Driver#### must be of type BootServiceDriver or RuntimeDriver
@@ -1236,12 +1262,13 @@ BmIsLoadOptionPeHeaderValid (
         //
         Subsystem = OptionalHeader->Subsystem;
         if ((Type == LoadOptionTypeMax) ||
-            (Type == LoadOptionTypeDriver && Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER) ||
-            (Type == LoadOptionTypeDriver && Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER) ||
-            (Type == LoadOptionTypeSysPrep && Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION) ||
-            (Type == LoadOptionTypeBoot && Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION) ||
-            (Type == LoadOptionTypePlatformRecovery && Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION)
-            ) {
+            ((Type == LoadOptionTypeDriver) && (Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER)) ||
+            ((Type == LoadOptionTypeDriver) && (Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER)) ||
+            ((Type == LoadOptionTypeSysPrep) && (Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION)) ||
+            ((Type == LoadOptionTypeBoot) && (Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION)) ||
+            ((Type == LoadOptionTypePlatformRecovery) && (Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION))
+            )
+        {
           return TRUE;
         }
       }
@@ -1273,22 +1300,22 @@ BmIsLoadOptionPeHeaderValid (
 **/
 VOID *
 BmGetNextLoadOptionBuffer (
-  IN  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE Type,
-  IN  EFI_DEVICE_PATH_PROTOCOL          *FilePath,
-  OUT EFI_DEVICE_PATH_PROTOCOL          **FullPath,
-  OUT UINTN                             *FileSize
+  IN  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE  Type,
+  IN  EFI_DEVICE_PATH_PROTOCOL           *FilePath,
+  OUT EFI_DEVICE_PATH_PROTOCOL           **FullPath,
+  OUT UINTN                              *FileSize
   )
 {
-  VOID                                  *FileBuffer;
-  EFI_DEVICE_PATH_PROTOCOL              *PreFullPath;
-  EFI_DEVICE_PATH_PROTOCOL              *CurFullPath;
-  UINTN                                 LocalFileSize;
-  UINT32                                AuthenticationStatus;
-  EFI_DEVICE_PATH_PROTOCOL              *RamDiskDevicePath;
+  VOID                      *FileBuffer;
+  EFI_DEVICE_PATH_PROTOCOL  *PreFullPath;
+  EFI_DEVICE_PATH_PROTOCOL  *CurFullPath;
+  UINTN                     LocalFileSize;
+  UINT32                    AuthenticationStatus;
+  EFI_DEVICE_PATH_PROTOCOL  *RamDiskDevicePath;
 
   LocalFileSize = 0;
-  FileBuffer  = NULL;
-  CurFullPath = *FullPath;
+  FileBuffer    = NULL;
+  CurFullPath   = *FullPath;
   do {
     PreFullPath = CurFullPath;
     CurFullPath = BmGetNextLoadOptionDevicePath (FilePath, CurFullPath);
@@ -1298,9 +1325,11 @@ BmGetNextLoadOptionBuffer (
     if ((PreFullPath != NULL) && (PreFullPath != *FullPath)) {
       FreePool (PreFullPath);
     }
+
     if (CurFullPath == NULL) {
       break;
     }
+
     FileBuffer = GetFileBufferByFilePath (TRUE, CurFullPath, &LocalFileSize, &AuthenticationStatus);
     if ((FileBuffer != NULL) && !BmIsLoadOptionPeHeaderValid (Type, FileBuffer, LocalFileSize)) {
       //
@@ -1321,7 +1350,7 @@ BmGetNextLoadOptionBuffer (
   } while (FileBuffer == NULL);
 
   if (FileBuffer == NULL) {
-    CurFullPath = NULL;
+    CurFullPath   = NULL;
     LocalFileSize = 0;
   }
 
@@ -1349,18 +1378,18 @@ BmGetNextLoadOptionBuffer (
 EFI_STATUS
 EFIAPI
 EfiBootManagerProcessLoadOption (
-  IN EFI_BOOT_MANAGER_LOAD_OPTION       *LoadOption
+  IN EFI_BOOT_MANAGER_LOAD_OPTION  *LoadOption
   )
 {
-  EFI_STATUS                        Status;
-  EFI_DEVICE_PATH_PROTOCOL          *PreFullPath;
-  EFI_DEVICE_PATH_PROTOCOL          *CurFullPath;
-  EFI_HANDLE                        ImageHandle;
-  EFI_LOADED_IMAGE_PROTOCOL         *ImageInfo;
-  VOID                              *FileBuffer;
-  UINTN                             FileSize;
+  EFI_STATUS                 Status;
+  EFI_DEVICE_PATH_PROTOCOL   *PreFullPath;
+  EFI_DEVICE_PATH_PROTOCOL   *CurFullPath;
+  EFI_HANDLE                 ImageHandle;
+  EFI_LOADED_IMAGE_PROTOCOL  *ImageInfo;
+  VOID                       *FileBuffer;
+  UINTN                      FileSize;
 
-  if ((UINT32) LoadOption->OptionType >= LoadOptionTypeMax) {
+  if ((UINT32)LoadOption->OptionType >= LoadOptionTypeMax) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1380,8 +1409,10 @@ EfiBootManagerProcessLoadOption (
   // Load and start the load option.
   //
   DEBUG ((
-    DEBUG_INFO | DEBUG_LOAD, "Process %s%04x (%s) ...\n",
-    mBmLoadOptionName[LoadOption->OptionType], LoadOption->OptionNumber,
+    DEBUG_INFO | DEBUG_LOAD,
+    "Process %s%04x (%s) ...\n",
+    mBmLoadOptionName[LoadOption->OptionType],
+    LoadOption->OptionNumber,
     LoadOption->Description
     ));
   ImageHandle = NULL;
@@ -1398,9 +1429,11 @@ EfiBootManagerProcessLoadOption (
     if (PreFullPath != NULL) {
       FreePool (PreFullPath);
     }
+
     if (FileBuffer == NULL) {
       break;
     }
+
     Status = gBS->LoadImage (
                     FALSE,
                     gImageHandle,
@@ -1426,7 +1459,7 @@ EfiBootManagerProcessLoadOption (
       ASSERT_EFI_ERROR (Status);
 
       ImageInfo->LoadOptionsSize = LoadOption->OptionalDataSize;
-      ImageInfo->LoadOptions = LoadOption->OptionalData;
+      ImageInfo->LoadOptions     = LoadOption->OptionalData;
       //
       // Before calling the image, enable the Watchdog Timer for the 5-minute period
       //
@@ -1434,9 +1467,12 @@ EfiBootManagerProcessLoadOption (
 
       LoadOption->Status = gBS->StartImage (ImageHandle, &LoadOption->ExitDataSize, &LoadOption->ExitData);
       DEBUG ((
-        DEBUG_INFO | DEBUG_LOAD, "%s%04x Return Status = %r\n",
-        mBmLoadOptionName[LoadOption->OptionType], LoadOption->OptionNumber, LoadOption->Status
-      ));
+        DEBUG_INFO | DEBUG_LOAD,
+        "%s%04x Return Status = %r\n",
+        mBmLoadOptionName[LoadOption->OptionType],
+        LoadOption->OptionNumber,
+        LoadOption->Status
+        ));
 
       //
       // Clear the Watchdog Timer after the image returns

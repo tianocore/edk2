@@ -50,8 +50,8 @@ Pkcs1v2Encrypt (
   IN   UINTN        PublicKeySize,
   IN   UINT8        *InData,
   IN   UINTN        InDataSize,
-  IN   CONST UINT8  *PrngSeed,  OPTIONAL
-  IN   UINTN        PrngSeedSize,  OPTIONAL
+  IN   CONST UINT8  *PrngSeed   OPTIONAL,
+  IN   UINTN        PrngSeedSize   OPTIONAL,
   OUT  UINT8        **EncryptedData,
   OUT  UINTN        *EncryptedDataSize
   )
@@ -67,8 +67,9 @@ Pkcs1v2Encrypt (
   //
   // Check input parameters.
   //
-  if (PublicKey == NULL || InData == NULL ||
-      EncryptedData == NULL || EncryptedDataSize == NULL) {
+  if ((PublicKey == NULL) || (InData == NULL) ||
+      (EncryptedData == NULL) || (EncryptedDataSize == NULL))
+  {
     return FALSE;
   }
 
@@ -82,15 +83,15 @@ Pkcs1v2Encrypt (
     return FALSE;
   }
 
-  *EncryptedData        = NULL;
-  *EncryptedDataSize    = 0;
-  Result                = FALSE;
-  TempPointer           = NULL;
-  CertData              = NULL;
-  InternalPublicKey     = NULL;
-  PkeyCtx               = NULL;
-  OutData               = NULL;
-  OutDataSize           = 0;
+  *EncryptedData     = NULL;
+  *EncryptedDataSize = 0;
+  Result             = FALSE;
+  TempPointer        = NULL;
+  CertData           = NULL;
+  InternalPublicKey  = NULL;
+  PkeyCtx            = NULL;
+  OutData            = NULL;
+  OutDataSize        = 0;
 
   //
   // If it provides a seed then use it.
@@ -107,7 +108,7 @@ Pkcs1v2Encrypt (
   // Parse the X509 cert and extract the public key.
   //
   TempPointer = PublicKey;
-  CertData = d2i_X509 (&CertData, &TempPointer, (UINT32)PublicKeySize);
+  CertData    = d2i_X509 (&CertData, &TempPointer, (UINT32)PublicKeySize);
   if (CertData == NULL) {
     //
     // Fail to parse X509 cert.
@@ -137,11 +138,13 @@ Pkcs1v2Encrypt (
     //
     goto _Exit;
   }
+
   //
   // Initialize the context and set the desired padding.
   //
-  if (EVP_PKEY_encrypt_init (PkeyCtx) <= 0 ||
-      EVP_PKEY_CTX_set_rsa_padding (PkeyCtx, RSA_PKCS1_OAEP_PADDING) <= 0) {
+  if ((EVP_PKEY_encrypt_init (PkeyCtx) <= 0) ||
+      (EVP_PKEY_CTX_set_rsa_padding (PkeyCtx, RSA_PKCS1_OAEP_PADDING) <= 0))
+  {
     //
     // Fail to initialize the context.
     //
@@ -177,7 +180,7 @@ Pkcs1v2Encrypt (
     // Fail to encrypt data, need to free the output buffer.
     //
     FreePool (OutData);
-    OutData = NULL;
+    OutData     = NULL;
     OutDataSize = 0;
     goto _Exit;
   }
@@ -185,24 +188,25 @@ Pkcs1v2Encrypt (
   //
   // Encrypt done.
   //
-  *EncryptedData = OutData;
+  *EncryptedData     = OutData;
   *EncryptedDataSize = OutDataSize;
-  Result = TRUE;
+  Result             = TRUE;
 
 _Exit:
   //
   // Release Resources
   //
   if (CertData != NULL) {
-    X509_free (CertData );
+    X509_free (CertData);
   }
+
   if (InternalPublicKey != NULL) {
     EVP_PKEY_free (InternalPublicKey);
   }
+
   if (PkeyCtx != NULL) {
     EVP_PKEY_CTX_free (PkeyCtx);
   }
 
   return Result;
 }
-

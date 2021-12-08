@@ -21,35 +21,34 @@
 EFI_STATUS
 EFIAPI
 FindImageBase (
-  IN  EFI_FIRMWARE_VOLUME_HEADER       *FirmwareVolumePtr,
-  IN  EFI_FV_FILETYPE                  FileType,
-  OUT EFI_PHYSICAL_ADDRESS             *CoreImageBase
+  IN  EFI_FIRMWARE_VOLUME_HEADER  *FirmwareVolumePtr,
+  IN  EFI_FV_FILETYPE             FileType,
+  OUT EFI_PHYSICAL_ADDRESS        *CoreImageBase
   )
 {
-  EFI_PHYSICAL_ADDRESS        CurrentAddress;
-  EFI_PHYSICAL_ADDRESS        EndOfFirmwareVolume;
-  EFI_FFS_FILE_HEADER         *File;
-  UINT32                      Size;
-  EFI_PHYSICAL_ADDRESS        EndOfFile;
-  EFI_COMMON_SECTION_HEADER   *Section;
-  EFI_PHYSICAL_ADDRESS        EndOfSection;
+  EFI_PHYSICAL_ADDRESS       CurrentAddress;
+  EFI_PHYSICAL_ADDRESS       EndOfFirmwareVolume;
+  EFI_FFS_FILE_HEADER        *File;
+  UINT32                     Size;
+  EFI_PHYSICAL_ADDRESS       EndOfFile;
+  EFI_COMMON_SECTION_HEADER  *Section;
+  EFI_PHYSICAL_ADDRESS       EndOfSection;
 
   *CoreImageBase = 0;
 
-  CurrentAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) FirmwareVolumePtr;
+  CurrentAddress      = (EFI_PHYSICAL_ADDRESS)(UINTN)FirmwareVolumePtr;
   EndOfFirmwareVolume = CurrentAddress + FirmwareVolumePtr->FvLength;
 
   //
   // Loop through the FFS files in the Boot Firmware Volume
   //
   for (EndOfFile = CurrentAddress + FirmwareVolumePtr->HeaderLength; ; ) {
-
     CurrentAddress = (EndOfFile + 7) & 0xfffffffffffffff8ULL;
     if (CurrentAddress > EndOfFirmwareVolume) {
       return EFI_NOT_FOUND;
     }
 
-    File = (EFI_FFS_FILE_HEADER*)(UINTN) CurrentAddress;
+    File = (EFI_FFS_FILE_HEADER *)(UINTN)CurrentAddress;
     if (IS_FFS_FILE2 (File)) {
       Size = FFS_FILE2_SIZE (File);
       if (Size <= 0x00FFFFFF) {
@@ -78,13 +77,14 @@ FindImageBase (
     // Loop through the FFS file sections within the FFS file
     //
     if (IS_FFS_FILE2 (File)) {
-      EndOfSection = (EFI_PHYSICAL_ADDRESS) (UINTN) ((UINT8 *) File + sizeof (EFI_FFS_FILE_HEADER2));
+      EndOfSection = (EFI_PHYSICAL_ADDRESS)(UINTN)((UINT8 *)File + sizeof (EFI_FFS_FILE_HEADER2));
     } else {
-      EndOfSection = (EFI_PHYSICAL_ADDRESS) (UINTN) ((UINT8 *) File + sizeof (EFI_FFS_FILE_HEADER));
+      EndOfSection = (EFI_PHYSICAL_ADDRESS)(UINTN)((UINT8 *)File + sizeof (EFI_FFS_FILE_HEADER));
     }
-    for (;;) {
+
+    for ( ; ;) {
       CurrentAddress = (EndOfSection + 3) & 0xfffffffffffffffcULL;
-      Section = (EFI_COMMON_SECTION_HEADER*)(UINTN) CurrentAddress;
+      Section        = (EFI_COMMON_SECTION_HEADER *)(UINTN)CurrentAddress;
 
       if (IS_SECTION2 (Section)) {
         Size = SECTION2_SIZE (Section);
@@ -106,14 +106,15 @@ FindImageBase (
       //
       // Look for executable sections
       //
-      if (Section->Type == EFI_SECTION_PE32 || Section->Type == EFI_SECTION_TE) {
+      if ((Section->Type == EFI_SECTION_PE32) || (Section->Type == EFI_SECTION_TE)) {
         if (File->Type == FileType) {
           if (IS_SECTION2 (Section)) {
-            *CoreImageBase = (PHYSICAL_ADDRESS) (UINTN) ((UINT8 *) Section + sizeof (EFI_COMMON_SECTION_HEADER2));
+            *CoreImageBase = (PHYSICAL_ADDRESS)(UINTN)((UINT8 *)Section + sizeof (EFI_COMMON_SECTION_HEADER2));
           } else {
-            *CoreImageBase = (PHYSICAL_ADDRESS) (UINTN) ((UINT8 *) Section + sizeof (EFI_COMMON_SECTION_HEADER));
+            *CoreImageBase = (PHYSICAL_ADDRESS)(UINTN)((UINT8 *)Section + sizeof (EFI_COMMON_SECTION_HEADER));
           }
         }
+
         break;
       }
     }
@@ -141,15 +142,15 @@ FindImageBase (
 VOID
 EFIAPI
 FindAndReportEntryPoints (
-  IN  EFI_FIRMWARE_VOLUME_HEADER       *SecCoreFirmwareVolumePtr,
-  IN  EFI_FIRMWARE_VOLUME_HEADER       *PeiCoreFirmwareVolumePtr,
-  OUT EFI_PEI_CORE_ENTRY_POINT         *PeiCoreEntryPoint
+  IN  EFI_FIRMWARE_VOLUME_HEADER  *SecCoreFirmwareVolumePtr,
+  IN  EFI_FIRMWARE_VOLUME_HEADER  *PeiCoreFirmwareVolumePtr,
+  OUT EFI_PEI_CORE_ENTRY_POINT    *PeiCoreEntryPoint
   )
 {
-  EFI_STATUS                       Status;
-  EFI_PHYSICAL_ADDRESS             SecCoreImageBase;
-  EFI_PHYSICAL_ADDRESS             PeiCoreImageBase;
-  PE_COFF_LOADER_IMAGE_CONTEXT     ImageContext;
+  EFI_STATUS                    Status;
+  EFI_PHYSICAL_ADDRESS          SecCoreImageBase;
+  EFI_PHYSICAL_ADDRESS          PeiCoreImageBase;
+  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
 
   //
   // Find SEC Core image base
@@ -157,12 +158,12 @@ FindAndReportEntryPoints (
   Status = FindImageBase (SecCoreFirmwareVolumePtr, EFI_FV_FILETYPE_SECURITY_CORE, &SecCoreImageBase);
   ASSERT_EFI_ERROR (Status);
 
-  ZeroMem ((VOID *) &ImageContext, sizeof (PE_COFF_LOADER_IMAGE_CONTEXT));
+  ZeroMem ((VOID *)&ImageContext, sizeof (PE_COFF_LOADER_IMAGE_CONTEXT));
   //
   // Report SEC Core debug information when remote debug is enabled
   //
   ImageContext.ImageAddress = SecCoreImageBase;
-  ImageContext.PdbPointer = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageContext.ImageAddress);
+  ImageContext.PdbPointer   = PeCoffLoaderGetPdbPointer ((VOID *)(UINTN)ImageContext.ImageAddress);
   PeCoffLoaderRelocateImageExtraAction (&ImageContext);
 
   //
@@ -175,13 +176,13 @@ FindAndReportEntryPoints (
   // Report PEI Core debug information when remote debug is enabled
   //
   ImageContext.ImageAddress = PeiCoreImageBase;
-  ImageContext.PdbPointer = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageContext.ImageAddress);
+  ImageContext.PdbPointer   = PeCoffLoaderGetPdbPointer ((VOID *)(UINTN)ImageContext.ImageAddress);
   PeCoffLoaderRelocateImageExtraAction (&ImageContext);
 
   //
   // Find PEI Core entry point
   //
-  Status = PeCoffLoaderGetEntryPoint ((VOID *) (UINTN) PeiCoreImageBase, (VOID**) PeiCoreEntryPoint);
+  Status = PeCoffLoaderGetEntryPoint ((VOID *)(UINTN)PeiCoreImageBase, (VOID **)PeiCoreEntryPoint);
   if (EFI_ERROR (Status)) {
     *PeiCoreEntryPoint = 0;
   }

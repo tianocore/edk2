@@ -13,10 +13,10 @@
 /// SMM Page Size Type
 ///
 typedef enum {
-    SmmPageSize4K,
-    SmmPageSize2M,
-    SmmPageSize1G,
-    MaxSmmPageSizeType
+  SmmPageSize4K,
+  SmmPageSize2M,
+  SmmPageSize1G,
+  MaxSmmPageSizeType
 } SMM_PAGE_SIZE_TYPE;
 
 /**
@@ -74,7 +74,7 @@ ClearTopLevelSmiStatus (
 EFI_STATUS
 EFIAPI
 PlatformSmmBspElection (
-  OUT BOOLEAN     *IsBsp
+  OUT BOOLEAN  *IsBsp
   );
 
 /**
@@ -94,10 +94,10 @@ PlatformSmmBspElection (
 EFI_STATUS
 EFIAPI
 GetPlatformPageTableAttribute (
-  IN  UINT64                Address,
-  OUT SMM_PAGE_SIZE_TYPE    *PageSize,
-  OUT UINTN                 *NumOfPages,
-  OUT UINTN                 *PageAttribute
+  IN  UINT64              Address,
+  OUT SMM_PAGE_SIZE_TYPE  *PageSize,
+  OUT UINTN               *NumOfPages,
+  OUT UINTN               *PageAttribute
   );
 
 #endif

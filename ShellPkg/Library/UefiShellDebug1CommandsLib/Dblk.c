@@ -20,49 +20,49 @@
   @retval SHELL_SUCCESS   The display was successful.
 **/
 SHELL_STATUS
-DisplayTheBlocks(
-  IN CONST EFI_DEVICE_PATH_PROTOCOL *DevPath,
-  IN CONST UINT64                   Lba,
-  IN CONST UINT8                    BlockCount
+DisplayTheBlocks (
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevPath,
+  IN CONST UINT64                    Lba,
+  IN CONST UINT8                     BlockCount
   )
 {
-  EFI_BLOCK_IO_PROTOCOL     *BlockIo;
-  EFI_HANDLE                BlockIoHandle;
-  EFI_STATUS                Status;
-  SHELL_STATUS              ShellStatus;
-  UINT8                     *Buffer;
-  UINT8                     *OriginalBuffer;
-  UINTN                     BufferSize;
+  EFI_BLOCK_IO_PROTOCOL  *BlockIo;
+  EFI_HANDLE             BlockIoHandle;
+  EFI_STATUS             Status;
+  SHELL_STATUS           ShellStatus;
+  UINT8                  *Buffer;
+  UINT8                  *OriginalBuffer;
+  UINTN                  BufferSize;
 
   ShellStatus = SHELL_SUCCESS;
 
-  Status = gBS->LocateDevicePath(&gEfiBlockIoProtocolGuid, (EFI_DEVICE_PATH_PROTOCOL **)&DevPath, &BlockIoHandle);
-  if (EFI_ERROR(Status)) {
+  Status = gBS->LocateDevicePath (&gEfiBlockIoProtocolGuid, (EFI_DEVICE_PATH_PROTOCOL **)&DevPath, &BlockIoHandle);
+  if (EFI_ERROR (Status)) {
     return (SHELL_NOT_FOUND);
   }
 
-  Status = gBS->OpenProtocol(BlockIoHandle, &gEfiBlockIoProtocolGuid, (VOID**)&BlockIo, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-  if (EFI_ERROR(Status)) {
+  Status = gBS->OpenProtocol (BlockIoHandle, &gEfiBlockIoProtocolGuid, (VOID **)&BlockIo, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  if (EFI_ERROR (Status)) {
     return (SHELL_NOT_FOUND);
   }
 
   BufferSize = BlockIo->Media->BlockSize * BlockCount;
-  if(BlockIo->Media->IoAlign == 0) {
+  if (BlockIo->Media->IoAlign == 0) {
     BlockIo->Media->IoAlign = 1;
   }
 
   if (BufferSize > 0) {
-    OriginalBuffer = AllocateZeroPool(BufferSize + BlockIo->Media->IoAlign);
-    Buffer         = ALIGN_POINTER (OriginalBuffer,BlockIo->Media->IoAlign);
+    OriginalBuffer = AllocateZeroPool (BufferSize + BlockIo->Media->IoAlign);
+    Buffer         = ALIGN_POINTER (OriginalBuffer, BlockIo->Media->IoAlign);
   } else {
-    ShellPrintEx(-1,-1,L"  BlockSize: 0x%08x, BlockCount: 0x%08x\r\n", BlockIo->Media->BlockSize, BlockCount);
+    ShellPrintEx (-1, -1, L"  BlockSize: 0x%08x, BlockCount: 0x%08x\r\n", BlockIo->Media->BlockSize, BlockCount);
     OriginalBuffer = NULL;
     Buffer         = NULL;
   }
 
-  Status = BlockIo->ReadBlocks(BlockIo, BlockIo->Media->MediaId, Lba, BufferSize, Buffer);
-  if (!EFI_ERROR(Status) && Buffer != NULL) {
-    ShellPrintHiiEx(
+  Status = BlockIo->ReadBlocks (BlockIo, BlockIo->Media->MediaId, Lba, BufferSize, Buffer);
+  if (!EFI_ERROR (Status) && (Buffer != NULL)) {
+    ShellPrintHiiEx (
       -1,
       -1,
       NULL,
@@ -73,9 +73,9 @@ DisplayTheBlocks(
       BlockIo
       );
 
-    DumpHex(2,0,BufferSize,Buffer);
+    DumpHex (2, 0, BufferSize, Buffer);
   } else {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_READ_FAIL), gShellDebug1HiiHandle, L"dblk", L"BlockIo");
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_FILE_READ_FAIL), gShellDebug1HiiHandle, L"dblk", L"BlockIo");
     ShellStatus = SHELL_DEVICE_ERROR;
   }
 
@@ -83,7 +83,7 @@ DisplayTheBlocks(
     FreePool (OriginalBuffer);
   }
 
-  gBS->CloseProtocol(BlockIoHandle, &gEfiBlockIoProtocolGuid, gImageHandle, NULL);
+  gBS->CloseProtocol (BlockIoHandle, &gEfiBlockIoProtocolGuid, gImageHandle, NULL);
   return (ShellStatus);
 }
 
@@ -111,67 +111,69 @@ ShellCommandRunDblk (
   UINT64                    BlockCount;
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
 
-  ShellStatus         = SHELL_SUCCESS;
-  Status              = EFI_SUCCESS;
+  ShellStatus = SHELL_SUCCESS;
+  Status      = EFI_SUCCESS;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
   //
-  Status = ShellInitialize();
-  ASSERT_EFI_ERROR(Status);
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
 
-  Status = CommandInit();
-  ASSERT_EFI_ERROR(Status);
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
 
   //
   // parse the command line
   //
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR(Status)) {
-    if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"dblk", ProblemParam);
-      FreePool(ProblemParam);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"dblk", ProblemParam);
+      FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      ASSERT(FALSE);
+      ASSERT (FALSE);
     }
   } else {
-    if (ShellCommandLineGetCount(Package) > 4) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"dblk");
+    if (ShellCommandLineGetCount (Package) > 4) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"dblk");
       ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetCount(Package) < 2) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"dblk");
+    } else if (ShellCommandLineGetCount (Package) < 2) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"dblk");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
       // Parse the params
       //
-      BlockName         = ShellCommandLineGetRawValue(Package, 1);
-      LbaString         = ShellCommandLineGetRawValue(Package, 2);
-      BlockCountString  = ShellCommandLineGetRawValue(Package, 3);
+      BlockName        = ShellCommandLineGetRawValue (Package, 1);
+      LbaString        = ShellCommandLineGetRawValue (Package, 2);
+      BlockCountString = ShellCommandLineGetRawValue (Package, 3);
 
       if (LbaString == NULL) {
         Lba = 0;
       } else {
-        if (!ShellIsHexOrDecimalNumber(LbaString, TRUE, FALSE)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", LbaString);
+        if (!ShellIsHexOrDecimalNumber (LbaString, TRUE, FALSE)) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", LbaString);
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
-        ShellConvertStringToUint64(LbaString, &Lba, TRUE, FALSE);
+
+        ShellConvertStringToUint64 (LbaString, &Lba, TRUE, FALSE);
       }
 
       if (BlockCountString == NULL) {
         BlockCount = 1;
       } else {
-        if (!ShellIsHexOrDecimalNumber(BlockCountString, TRUE, FALSE)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", BlockCountString);
+        if (!ShellIsHexOrDecimalNumber (BlockCountString, TRUE, FALSE)) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", BlockCountString);
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
-        ShellConvertStringToUint64(BlockCountString, &BlockCount, TRUE, FALSE);
+
+        ShellConvertStringToUint64 (BlockCountString, &BlockCount, TRUE, FALSE);
         if (BlockCount > 0x10) {
           BlockCount = 0x10;
         } else if (BlockCount == 0) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", BlockCountString);
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", BlockCountString);
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
       }
@@ -180,16 +182,16 @@ ShellCommandRunDblk (
         //
         // do the work if we have a valid block identifier
         //
-        if (gEfiShellProtocol->GetDevicePathFromMap(BlockName) == NULL) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", BlockName);
+        if (gEfiShellProtocol->GetDevicePathFromMap (BlockName) == NULL) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", BlockName);
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
-          DevPath = (EFI_DEVICE_PATH_PROTOCOL*)gEfiShellProtocol->GetDevicePathFromMap(BlockName);
-          if (gBS->LocateDevicePath(&gEfiBlockIoProtocolGuid, &DevPath, NULL) == EFI_NOT_FOUND) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_MAP_PROTOCOL), gShellDebug1HiiHandle, L"dblk", BlockName, L"BlockIo");
+          DevPath = (EFI_DEVICE_PATH_PROTOCOL *)gEfiShellProtocol->GetDevicePathFromMap (BlockName);
+          if (gBS->LocateDevicePath (&gEfiBlockIoProtocolGuid, &DevPath, NULL) == EFI_NOT_FOUND) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_MAP_PROTOCOL), gShellDebug1HiiHandle, L"dblk", BlockName, L"BlockIo");
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
-            ShellStatus = DisplayTheBlocks(gEfiShellProtocol->GetDevicePathFromMap(BlockName), Lba, (UINT8)BlockCount);
+            ShellStatus = DisplayTheBlocks (gEfiShellProtocol->GetDevicePathFromMap (BlockName), Lba, (UINT8)BlockCount);
           }
         }
       }
@@ -197,5 +199,6 @@ ShellCommandRunDblk (
 
     ShellCommandLineFreeVarList (Package);
   }
+
   return (ShellStatus);
 }

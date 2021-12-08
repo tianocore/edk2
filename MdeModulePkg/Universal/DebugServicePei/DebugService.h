@@ -6,6 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef __DEBUG_SERVICE_H__
 #define __DEBUG_SERVICE_H__
 
@@ -22,10 +23,10 @@
 **/
 VOID
 EFIAPI
-PeiDebugBPrint(
-  IN UINTN                          ErrorLevel,
-  IN CONST CHAR8                    *Format,
-  IN BASE_LIST                      Marker
+PeiDebugBPrint (
+  IN UINTN        ErrorLevel,
+  IN CONST CHAR8  *Format,
+  IN BASE_LIST    Marker
   );
 
 /**
@@ -41,10 +42,10 @@ PeiDebugBPrint(
 **/
 VOID
 EFIAPI
-PeiDebugAssert(
-  IN CONST CHAR8                    *FileName,
-  IN UINTN                          LineNumber,
-  IN CONST CHAR8                    *Description
+PeiDebugAssert (
+  IN CONST CHAR8  *FileName,
+  IN UINTN        LineNumber,
+  IN CONST CHAR8  *Description
   );
 
 #endif

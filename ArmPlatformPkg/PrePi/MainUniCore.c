@@ -10,23 +10,22 @@
 
 VOID
 PrimaryMain (
-  IN  UINTN                     UefiMemoryBase,
-  IN  UINTN                     StacksBase,
-  IN  UINT64                    StartTimeStamp
+  IN  UINTN   UefiMemoryBase,
+  IN  UINTN   StacksBase,
+  IN  UINT64  StartTimeStamp
   )
 {
   PrePiMain (UefiMemoryBase, StacksBase, StartTimeStamp);
 
   // We must never return
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 VOID
 SecondaryMain (
-  IN  UINTN                     MpId
+  IN  UINTN  MpId
   )
 {
   // We must never get into this function on UniCore system
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
-

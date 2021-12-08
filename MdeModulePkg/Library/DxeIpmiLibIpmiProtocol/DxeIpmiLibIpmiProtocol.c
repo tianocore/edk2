@@ -11,7 +11,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 
-IPMI_PROTOCOL *mIpmiProtocol = NULL;
+IPMI_PROTOCOL  *mIpmiProtocol = NULL;
 
 /**
   This service enables submitting commands via Ipmi.
@@ -34,27 +34,27 @@ IPMI_PROTOCOL *mIpmiProtocol = NULL;
 EFI_STATUS
 EFIAPI
 IpmiSubmitCommand (
-  IN     UINT8     NetFunction,
-  IN     UINT8     Command,
-  IN     UINT8     *RequestData,
-  IN     UINT32    RequestDataSize,
-     OUT UINT8     *ResponseData,
-  IN OUT UINT32    *ResponseDataSize
+  IN     UINT8   NetFunction,
+  IN     UINT8   Command,
+  IN     UINT8   *RequestData,
+  IN     UINT32  RequestDataSize,
+  OUT UINT8      *ResponseData,
+  IN OUT UINT32  *ResponseDataSize
   )
 {
   EFI_STATUS  Status;
 
   if (mIpmiProtocol == NULL) {
     Status = gBS->LocateProtocol (
-              &gIpmiProtocolGuid,
-              NULL,
-              (VOID **) &mIpmiProtocol
-              );
+                    &gIpmiProtocolGuid,
+                    NULL,
+                    (VOID **)&mIpmiProtocol
+                    );
     if (EFI_ERROR (Status)) {
       //
       // Dxe Ipmi Protocol is not installed. So, IPMI device is not present.
       //
-      DEBUG ((EFI_D_ERROR, "IpmiSubmitCommand in Dxe Phase under SMS Status - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "IpmiSubmitCommand in Dxe Phase under SMS Status - %r\n", Status));
       return EFI_NOT_FOUND;
     }
   }
@@ -71,5 +71,6 @@ IpmiSubmitCommand (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   return EFI_SUCCESS;
 }

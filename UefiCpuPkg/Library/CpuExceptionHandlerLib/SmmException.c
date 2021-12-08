@@ -9,16 +9,17 @@
 #include <PiSmm.h>
 #include "CpuExceptionCommon.h"
 
-CONST UINTN   mDoFarReturnFlag   = 1;
+CONST UINTN  mDoFarReturnFlag = 1;
 
 //
 // Spin lock for CPU information display
 //
-SPIN_LOCK        mDisplayMessageSpinLock;
+SPIN_LOCK  mDisplayMessageSpinLock;
 
-RESERVED_VECTORS_DATA       mReservedVectorsData[CPU_EXCEPTION_NUM];
-EFI_CPU_INTERRUPT_HANDLER   mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
-EXCEPTION_HANDLER_DATA      mExceptionHandlerData;
+RESERVED_VECTORS_DATA      mReservedVectorsData[CPU_EXCEPTION_NUM];
+EFI_CPU_INTERRUPT_HANDLER  mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
+EXCEPTION_HANDLER_DATA     mExceptionHandlerData;
+
 /**
   Common exception handler.
 
@@ -28,8 +29,8 @@ EXCEPTION_HANDLER_DATA      mExceptionHandlerData;
 VOID
 EFIAPI
 CommonExceptionHandler (
-  IN EFI_EXCEPTION_TYPE          ExceptionType,
-  IN EFI_SYSTEM_CONTEXT          SystemContext
+  IN EFI_EXCEPTION_TYPE  ExceptionType,
+  IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
   CommonExceptionHandlerWorker (ExceptionType, SystemContext, &mExceptionHandlerData);
@@ -54,7 +55,7 @@ CommonExceptionHandler (
 EFI_STATUS
 EFIAPI
 InitializeCpuExceptionHandlers (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
   )
 {
   mExceptionHandlerData.ReservedVectors          = mReservedVectorsData;
@@ -82,7 +83,7 @@ InitializeCpuExceptionHandlers (
 EFI_STATUS
 EFIAPI
 InitializeCpuInterruptHandlers (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
   )
 {
   return EFI_UNSUPPORTED;
@@ -114,8 +115,8 @@ InitializeCpuInterruptHandlers (
 EFI_STATUS
 EFIAPI
 RegisterCpuInterruptHandler (
-  IN EFI_EXCEPTION_TYPE            InterruptType,
-  IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
+  IN EFI_EXCEPTION_TYPE         InterruptType,
+  IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler
   )
 {
   return RegisterCpuInterruptHandlerWorker (InterruptType, InterruptHandler, &mExceptionHandlerData);
@@ -146,8 +147,8 @@ RegisterCpuInterruptHandler (
 EFI_STATUS
 EFIAPI
 InitializeCpuExceptionHandlersEx (
-  IN EFI_VECTOR_HANDOFF_INFO            *VectorInfo OPTIONAL,
-  IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL,
+  IN CPU_EXCEPTION_INIT_DATA  *InitData OPTIONAL
   )
 {
   return InitializeCpuExceptionHandlers (VectorInfo);

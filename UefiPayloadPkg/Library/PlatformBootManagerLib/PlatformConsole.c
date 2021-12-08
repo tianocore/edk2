@@ -90,11 +90,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     DEVICE_PATH_MESSAGING_PC_ANSI \
   }
 
-ACPI_HID_DEVICE_PATH       gPnpPs2KeyboardDeviceNode  = gPnpPs2Keyboard;
-ACPI_HID_DEVICE_PATH       gPnp16550ComPortDeviceNode = gPnp16550ComPort;
-UART_DEVICE_PATH           gUartDeviceNode            = gUart;
-VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode    = gPcAnsiTerminal;
-VENDOR_DEVICE_PATH         gUartDeviceVendorNode      = gUartVendor;
+ACPI_HID_DEVICE_PATH  gPnpPs2KeyboardDeviceNode  = gPnpPs2Keyboard;
+ACPI_HID_DEVICE_PATH  gPnp16550ComPortDeviceNode = gPnp16550ComPort;
+UART_DEVICE_PATH      gUartDeviceNode            = gUart;
+VENDOR_DEVICE_PATH    gTerminalTypeDeviceNode    = gPcAnsiTerminal;
+VENDOR_DEVICE_PATH    gUartDeviceVendorNode      = gUartVendor;
 
 //
 // Predefined platform root bridge
@@ -104,12 +104,12 @@ PLATFORM_ROOT_BRIDGE_DEVICE_PATH  gPlatformRootBridge0 = {
   gEndEntire
 };
 
-EFI_DEVICE_PATH_PROTOCOL          *gPlatformRootBridges[] = {
-  (EFI_DEVICE_PATH_PROTOCOL *) &gPlatformRootBridge0,
+EFI_DEVICE_PATH_PROTOCOL  *gPlatformRootBridges[] = {
+  (EFI_DEVICE_PATH_PROTOCOL *)&gPlatformRootBridge0,
   NULL
 };
 
-BOOLEAN       mDetectVgaOnly;
+BOOLEAN  mDetectVgaOnly;
 
 /**
   Add IsaKeyboard to ConIn; add IsaSerial to ConOut, ConIn, ErrOut.
@@ -124,22 +124,23 @@ BOOLEAN       mDetectVgaOnly;
 **/
 EFI_STATUS
 PrepareLpcBridgeDevicePath (
-  IN EFI_HANDLE                DeviceHandle
-)
+  IN EFI_HANDLE  DeviceHandle
+  )
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
 
   DevicePath = NULL;
-  Status = gBS->HandleProtocol (
-             DeviceHandle,
-             &gEfiDevicePathProtocolGuid,
-             (VOID*)&DevicePath
-           );
+  Status     = gBS->HandleProtocol (
+                      DeviceHandle,
+                      &gEfiDevicePathProtocolGuid,
+                      (VOID *)&DevicePath
+                      );
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   TempDevicePath = DevicePath;
 
   //
@@ -175,19 +176,19 @@ PrepareLpcBridgeDevicePath (
 **/
 EFI_STATUS
 GetGopDevicePath (
-  IN  EFI_DEVICE_PATH_PROTOCOL *PciDevicePath,
-  OUT EFI_DEVICE_PATH_PROTOCOL **GopDevicePath
-)
+  IN  EFI_DEVICE_PATH_PROTOCOL  *PciDevicePath,
+  OUT EFI_DEVICE_PATH_PROTOCOL  **GopDevicePath
+  )
 {
-  UINTN                           Index;
-  EFI_STATUS                      Status;
-  EFI_HANDLE                      PciDeviceHandle;
-  EFI_DEVICE_PATH_PROTOCOL        *TempDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL        *TempPciDevicePath;
-  UINTN                           GopHandleCount;
-  EFI_HANDLE                      *GopHandleBuffer;
+  UINTN                     Index;
+  EFI_STATUS                Status;
+  EFI_HANDLE                PciDeviceHandle;
+  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *TempPciDevicePath;
+  UINTN                     GopHandleCount;
+  EFI_HANDLE                *GopHandleBuffer;
 
-  if (PciDevicePath == NULL || GopDevicePath == NULL) {
+  if ((PciDevicePath == NULL) || (GopDevicePath == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -198,10 +199,10 @@ GetGopDevicePath (
   TempPciDevicePath = PciDevicePath;
 
   Status = gBS->LocateDevicePath (
-             &gEfiDevicePathProtocolGuid,
-             &TempPciDevicePath,
-             &PciDeviceHandle
-           );
+                  &gEfiDevicePathProtocolGuid,
+                  &TempPciDevicePath,
+                  &PciDeviceHandle
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -209,26 +210,28 @@ GetGopDevicePath (
   gBS->ConnectController (PciDeviceHandle, NULL, NULL, FALSE);
 
   Status = gBS->LocateHandleBuffer (
-             ByProtocol,
-             &gEfiGraphicsOutputProtocolGuid,
-             NULL,
-             &GopHandleCount,
-             &GopHandleBuffer
-           );
+                  ByProtocol,
+                  &gEfiGraphicsOutputProtocolGuid,
+                  NULL,
+                  &GopHandleCount,
+                  &GopHandleBuffer
+                  );
   if (!EFI_ERROR (Status)) {
     //
     // Add all the child handles as possible Console Device
     //
     for (Index = 0; Index < GopHandleCount; Index++) {
-      Status = gBS->HandleProtocol (GopHandleBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID*)&TempDevicePath);
+      Status = gBS->HandleProtocol (GopHandleBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID *)&TempDevicePath);
       if (EFI_ERROR (Status)) {
         continue;
       }
+
       if (CompareMem (
             PciDevicePath,
             TempDevicePath,
             GetDevicePathSize (PciDevicePath) - END_DEVICE_PATH_LENGTH
-          ) == 0) {
+            ) == 0)
+      {
         //
         // In current implementation, we only enable one of the child handles
         // as console device, i.e. sotre one of the child handle's device
@@ -245,6 +248,7 @@ GetGopDevicePath (
         EfiBootManagerUpdateConsoleVariable (ConOut, TempDevicePath, NULL);
       }
     }
+
     gBS->FreePool (GopHandleBuffer);
   }
 
@@ -262,19 +266,19 @@ GetGopDevicePath (
 **/
 EFI_STATUS
 PreparePciVgaDevicePath (
-  IN EFI_HANDLE                DeviceHandle
-)
+  IN EFI_HANDLE  DeviceHandle
+  )
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *GopDevicePath;
 
   DevicePath = NULL;
-  Status = gBS->HandleProtocol (
-             DeviceHandle,
-             &gEfiDevicePathProtocolGuid,
-             (VOID*)&DevicePath
-           );
+  Status     = gBS->HandleProtocol (
+                      DeviceHandle,
+                      &gEfiDevicePathProtocolGuid,
+                      (VOID *)&DevicePath
+                      );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -298,18 +302,18 @@ PreparePciVgaDevicePath (
 **/
 EFI_STATUS
 PreparePciSerialDevicePath (
-  IN EFI_HANDLE                DeviceHandle
-)
+  IN EFI_HANDLE  DeviceHandle
+  )
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
 
   DevicePath = NULL;
-  Status = gBS->HandleProtocol (
-             DeviceHandle,
-             &gEfiDevicePathProtocolGuid,
-             (VOID*)&DevicePath
-           );
+  Status     = gBS->HandleProtocol (
+                      DeviceHandle,
+                      &gEfiDevicePathProtocolGuid,
+                      (VOID *)&DevicePath
+                      );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -318,12 +322,11 @@ PreparePciSerialDevicePath (
   DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
 
   EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
-  EfiBootManagerUpdateConsoleVariable (ConIn,  DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
   EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
 
   return EFI_SUCCESS;
 }
-
 
 /**
   For every PCI instance execute a callback function.
@@ -341,26 +344,26 @@ VisitAllInstancesOfProtocol (
   IN EFI_GUID                    *Id,
   IN PROTOCOL_INSTANCE_CALLBACK  CallBackFunction,
   IN VOID                        *Context
-)
+  )
 {
-  EFI_STATUS                Status;
-  UINTN                     HandleCount;
-  EFI_HANDLE                *HandleBuffer;
-  UINTN                     Index;
-  VOID                      *Instance;
+  EFI_STATUS  Status;
+  UINTN       HandleCount;
+  EFI_HANDLE  *HandleBuffer;
+  UINTN       Index;
+  VOID        *Instance;
 
   //
   // Start to check all the PciIo to find all possible device
   //
-  HandleCount = 0;
+  HandleCount  = 0;
   HandleBuffer = NULL;
-  Status = gBS->LocateHandleBuffer (
-             ByProtocol,
-             Id,
-             NULL,
-             &HandleCount,
-             &HandleBuffer
-           );
+  Status       = gBS->LocateHandleBuffer (
+                        ByProtocol,
+                        Id,
+                        NULL,
+                        &HandleCount,
+                        &HandleBuffer
+                        );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -371,18 +374,17 @@ VisitAllInstancesOfProtocol (
       continue;
     }
 
-    Status = (*CallBackFunction) (
-               HandleBuffer[Index],
-               Instance,
-               Context
-             );
+    Status = (*CallBackFunction)(
+  HandleBuffer[Index],
+  Instance,
+  Context
+  );
   }
 
   gBS->FreePool (HandleBuffer);
 
   return EFI_SUCCESS;
 }
-
 
 /**
   For every PCI instance execute a callback function.
@@ -400,36 +402,34 @@ VisitingAPciInstance (
   IN EFI_HANDLE  Handle,
   IN VOID        *Instance,
   IN VOID        *Context
-)
+  )
 {
-  EFI_STATUS                Status;
-  EFI_PCI_IO_PROTOCOL       *PciIo;
-  PCI_TYPE00                Pci;
+  EFI_STATUS           Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  PCI_TYPE00           Pci;
 
-  PciIo = (EFI_PCI_IO_PROTOCOL*) Instance;
+  PciIo = (EFI_PCI_IO_PROTOCOL *)Instance;
 
   //
   // Check for all PCI device
   //
   Status = PciIo->Pci.Read (
-             PciIo,
-             EfiPciIoWidthUint32,
-             0,
-             sizeof (Pci) / sizeof (UINT32),
-             &Pci
-           );
+                        PciIo,
+                        EfiPciIoWidthUint32,
+                        0,
+                        sizeof (Pci) / sizeof (UINT32),
+                        &Pci
+                        );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  return (*(VISIT_PCI_INSTANCE_CALLBACK)(UINTN) Context) (
-           Handle,
-           PciIo,
-           &Pci
-         );
-
+  return (*(VISIT_PCI_INSTANCE_CALLBACK)(UINTN)Context)(
+  Handle,
+  PciIo,
+  &Pci
+  );
 }
-
 
 /**
   For every PCI instance execute a callback function.
@@ -442,16 +442,15 @@ VisitingAPciInstance (
 EFI_STATUS
 EFIAPI
 VisitAllPciInstances (
-  IN VISIT_PCI_INSTANCE_CALLBACK CallBackFunction
-)
+  IN VISIT_PCI_INSTANCE_CALLBACK  CallBackFunction
+  )
 {
   return VisitAllInstancesOfProtocol (
            &gEfiPciIoProtocolGuid,
            VisitingAPciInstance,
-           (VOID*)(UINTN) CallBackFunction
-         );
+           (VOID *)(UINTN)CallBackFunction
+           );
 }
-
 
 /**
   Do platform specific PCI Device check and add them to
@@ -471,16 +470,16 @@ DetectAndPreparePlatformPciDevicePath (
   IN EFI_HANDLE           Handle,
   IN EFI_PCI_IO_PROTOCOL  *PciIo,
   IN PCI_TYPE00           *Pci
-)
+  )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   Status = PciIo->Attributes (
-             PciIo,
-             EfiPciIoAttributeOperationEnable,
-             EFI_PCI_DEVICE_ENABLE,
-             NULL
-           );
+                    PciIo,
+                    EfiPciIoAttributeOperationEnable,
+                    EFI_PCI_DEVICE_ENABLE,
+                    NULL
+                    );
   ASSERT_EFI_ERROR (Status);
 
   if (!mDetectVgaOnly) {
@@ -491,7 +490,8 @@ DetectAndPreparePlatformPciDevicePath (
         ((IS_PCI_ISA_PDECODE (Pci)) &&
          (Pci->Hdr.VendorId == 0x8086)
         )
-       ) {
+        )
+    {
       //
       // Add IsaKeyboard to ConIn,
       // add IsaSerial to ConOut, ConIn, ErrOut
@@ -500,6 +500,7 @@ DetectAndPreparePlatformPciDevicePath (
       PrepareLpcBridgeDevicePath (Handle);
       return EFI_SUCCESS;
     }
+
     //
     // Here we decide which Serial device to enable in PCI bus
     //
@@ -528,7 +529,6 @@ DetectAndPreparePlatformPciDevicePath (
   return Status;
 }
 
-
 /**
   Do platform specific PCI Device check and add them to ConOut, ConIn, ErrOut
 
@@ -540,20 +540,19 @@ DetectAndPreparePlatformPciDevicePath (
 **/
 EFI_STATUS
 DetectAndPreparePlatformPciDevicePaths (
-  BOOLEAN DetectVgaOnly
-)
+  BOOLEAN  DetectVgaOnly
+  )
 {
   mDetectVgaOnly = DetectVgaOnly;
 
   EfiBootManagerUpdateConsoleVariable (
     ConIn,
-    (EFI_DEVICE_PATH_PROTOCOL *) &gUsbClassKeyboardDevicePath,
+    (EFI_DEVICE_PATH_PROTOCOL *)&gUsbClassKeyboardDevicePath,
     NULL
     );
 
   return VisitAllPciInstances (DetectAndPreparePlatformPciDevicePath);
 }
-
 
 /**
   The function will connect root bridge
@@ -564,19 +563,19 @@ DetectAndPreparePlatformPciDevicePaths (
 EFI_STATUS
 ConnectRootBridge (
   VOID
-)
+  )
 {
-  EFI_STATUS                Status;
-  EFI_HANDLE                RootHandle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  RootHandle;
 
   //
   // Make all the PCI_IO protocols on PCI Seg 0 show up
   //
   Status = gBS->LocateDevicePath (
-             &gEfiDevicePathProtocolGuid,
-             &gPlatformRootBridges[0],
-             &RootHandle
-           );
+                  &gEfiDevicePathProtocolGuid,
+                  &gPlatformRootBridges[0],
+                  &RootHandle
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -598,7 +597,7 @@ VOID
 EFIAPI
 PlatformConsoleInit (
   VOID
-)
+  )
 {
   gUartDeviceNode.BaudRate = PcdGet64 (PcdUartDefaultBaudRate);
   gUartDeviceNode.DataBits = PcdGet8 (PcdUartDefaultDataBits);
@@ -611,5 +610,4 @@ PlatformConsoleInit (
   // Do platform specific PCI Device check and add them to ConOut, ConIn, ErrOut
   //
   DetectAndPreparePlatformPciDevicePaths (FALSE);
-
 }

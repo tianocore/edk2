@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// Forward declaration for the SD_MMC_HOST_CONTROLLER_PPI.
 ///
-typedef struct _EDKII_SD_MMC_HOST_CONTROLLER_PPI  EDKII_SD_MMC_HOST_CONTROLLER_PPI;
+typedef struct _EDKII_SD_MMC_HOST_CONTROLLER_PPI EDKII_SD_MMC_HOST_CONTROLLER_PPI;
 
 /**
   Get the MMIO base address of SD/MMC host controller.
@@ -42,16 +42,16 @@ EFI_STATUS
   IN     EDKII_SD_MMC_HOST_CONTROLLER_PPI *This,
   IN     UINT8                            ControllerId,
   IN OUT UINTN                            **MmioBar,
-     OUT UINT8                            *BarNum
+  OUT UINT8                            *BarNum
   );
 
 ///
 /// This PPI contains a set of services to interact with the SD_MMC host controller.
 ///
 struct _EDKII_SD_MMC_HOST_CONTROLLER_PPI {
-  EDKII_SD_MMC_HC_GET_MMIO_BAR               GetSdMmcHcMmioBar;
+  EDKII_SD_MMC_HC_GET_MMIO_BAR    GetSdMmcHcMmioBar;
 };
 
-extern EFI_GUID gEdkiiPeiSdMmcHostControllerPpiGuid;
+extern EFI_GUID  gEdkiiPeiSdMmcHostControllerPpiGuid;
 
 #endif

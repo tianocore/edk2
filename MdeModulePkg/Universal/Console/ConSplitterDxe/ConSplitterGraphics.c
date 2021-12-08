@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "ConSplitter.h"
 
-
-CHAR16 mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
+CHAR16  mCrLfString[3] = { CHAR_CARRIAGE_RETURN, CHAR_LINEFEED, CHAR_NULL };
 
 /**
   Returns information for an available graphics mode that the graphics device
@@ -42,7 +41,7 @@ ConSplitterGraphicsOutputQueryMode (
   EFI_STATUS                      Status;
   UINTN                           Index;
 
-  if (This == NULL || Info == NULL || SizeOfInfo == NULL || ModeNumber >= This->Mode->MaxMode) {
+  if ((This == NULL) || (Info == NULL) || (SizeOfInfo == NULL) || (ModeNumber >= This->Mode->MaxMode)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -69,7 +68,7 @@ ConSplitterGraphicsOutputQueryMode (
     //
     // If only one physical GOP device exist, return its information.
     //
-    Status = GraphicsOutput->QueryMode (GraphicsOutput, (UINT32) ModeNumber, SizeOfInfo, Info);
+    Status = GraphicsOutput->QueryMode (GraphicsOutput, (UINT32)ModeNumber, SizeOfInfo, Info);
     return Status;
   } else {
     //
@@ -80,13 +79,13 @@ ConSplitterGraphicsOutputQueryMode (
     if (*Info == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     *SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
     CopyMem (*Info, &Private->GraphicsOutputModeBuffer[ModeNumber], *SizeOfInfo);
   }
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Set the video device into the specified mode and clears the visible portions of
@@ -104,31 +103,31 @@ ConSplitterGraphicsOutputQueryMode (
 EFI_STATUS
 EFIAPI
 ConSplitterGraphicsOutputSetMode (
-  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL * This,
-  IN  UINT32                       ModeNumber
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL  *This,
+  IN  UINT32                        ModeNumber
   )
 {
-  EFI_STATUS                             Status;
-  TEXT_OUT_SPLITTER_PRIVATE_DATA         *Private;
-  UINTN                                  Index;
-  EFI_STATUS                             ReturnStatus;
-  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION   *Mode;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL           *GraphicsOutput;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL           *PhysicalGraphicsOutput;
-  UINTN                                  NumberIndex;
-  UINTN                                  SizeOfInfo;
-  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION   *Info;
-  EFI_UGA_DRAW_PROTOCOL                  *UgaDraw;
+  EFI_STATUS                            Status;
+  TEXT_OUT_SPLITTER_PRIVATE_DATA        *Private;
+  UINTN                                 Index;
+  EFI_STATUS                            ReturnStatus;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *Mode;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL          *GraphicsOutput;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL          *PhysicalGraphicsOutput;
+  UINTN                                 NumberIndex;
+  UINTN                                 SizeOfInfo;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *Info;
+  EFI_UGA_DRAW_PROTOCOL                 *UgaDraw;
 
   if (ModeNumber >= This->Mode->MaxMode) {
     return EFI_UNSUPPORTED;
   }
 
   Private = GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
-  Mode = &Private->GraphicsOutputModeBuffer[ModeNumber];
+  Mode    = &Private->GraphicsOutputModeBuffer[ModeNumber];
 
-  ReturnStatus = EFI_SUCCESS;
-  GraphicsOutput = NULL;
+  ReturnStatus           = EFI_SUCCESS;
+  GraphicsOutput         = NULL;
   PhysicalGraphicsOutput = NULL;
   //
   // return the worst status met
@@ -140,19 +139,21 @@ ConSplitterGraphicsOutputSetMode (
       //
       // Find corresponding ModeNumber of this GraphicsOutput instance
       //
-      for (NumberIndex = 0; NumberIndex < GraphicsOutput->Mode->MaxMode; NumberIndex ++) {
-        Status = GraphicsOutput->QueryMode (GraphicsOutput, (UINT32) NumberIndex, &SizeOfInfo, &Info);
+      for (NumberIndex = 0; NumberIndex < GraphicsOutput->Mode->MaxMode; NumberIndex++) {
+        Status = GraphicsOutput->QueryMode (GraphicsOutput, (UINT32)NumberIndex, &SizeOfInfo, &Info);
         if (EFI_ERROR (Status)) {
           return Status;
         }
+
         if ((Info->HorizontalResolution == Mode->HorizontalResolution) && (Info->VerticalResolution == Mode->VerticalResolution)) {
           FreePool (Info);
           break;
         }
+
         FreePool (Info);
       }
 
-      Status = GraphicsOutput->SetMode (GraphicsOutput, (UINT32) NumberIndex);
+      Status = GraphicsOutput->SetMode (GraphicsOutput, (UINT32)NumberIndex);
       if (EFI_ERROR (Status)) {
         ReturnStatus = Status;
       }
@@ -180,7 +181,7 @@ ConSplitterGraphicsOutputSetMode (
     // If only one physical GOP device exist, copy physical information to consplitter.
     //
     CopyMem (This->Mode->Info, PhysicalGraphicsOutput->Mode->Info, PhysicalGraphicsOutput->Mode->SizeOfInfo);
-    This->Mode->SizeOfInfo = PhysicalGraphicsOutput->Mode->SizeOfInfo;
+    This->Mode->SizeOfInfo      = PhysicalGraphicsOutput->Mode->SizeOfInfo;
     This->Mode->FrameBufferBase = PhysicalGraphicsOutput->Mode->FrameBufferBase;
     This->Mode->FrameBufferSize = PhysicalGraphicsOutput->Mode->FrameBufferSize;
   } else {
@@ -193,8 +194,6 @@ ConSplitterGraphicsOutputSetMode (
 
   return ReturnStatus;
 }
-
-
 
 /**
   The following table defines actions for BltOperations.
@@ -245,16 +244,16 @@ ConSplitterGraphicsOutputSetMode (
 EFI_STATUS
 EFIAPI
 ConSplitterGraphicsOutputBlt (
-  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL                  *This,
-  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL                 *BltBuffer, OPTIONAL
-  IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION             BltOperation,
-  IN  UINTN                                         SourceX,
-  IN  UINTN                                         SourceY,
-  IN  UINTN                                         DestinationX,
-  IN  UINTN                                         DestinationY,
-  IN  UINTN                                         Width,
-  IN  UINTN                                         Height,
-  IN  UINTN                                         Delta         OPTIONAL
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL       *This,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer  OPTIONAL,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
+  IN  UINTN                              SourceX,
+  IN  UINTN                              SourceY,
+  IN  UINTN                              DestinationX,
+  IN  UINTN                              DestinationY,
+  IN  UINTN                              Width,
+  IN  UINTN                              Height,
+  IN  UINTN                              Delta         OPTIONAL
   )
 {
   EFI_STATUS                      Status;
@@ -264,7 +263,7 @@ ConSplitterGraphicsOutputBlt (
   EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput;
   EFI_UGA_DRAW_PROTOCOL           *UgaDraw;
 
-  if (This == NULL || ((UINTN) BltOperation) >= EfiGraphicsOutputBltOperationMax) {
+  if ((This == NULL) || (((UINTN)BltOperation) >= EfiGraphicsOutputBltOperationMax)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -279,17 +278,17 @@ ConSplitterGraphicsOutputBlt (
     GraphicsOutput = Private->TextOutList[Index].GraphicsOutput;
     if (GraphicsOutput != NULL) {
       Status = GraphicsOutput->Blt (
-                              GraphicsOutput,
-                              BltBuffer,
-                              BltOperation,
-                              SourceX,
-                              SourceY,
-                              DestinationX,
-                              DestinationY,
-                              Width,
-                              Height,
-                              Delta
-                              );
+                                 GraphicsOutput,
+                                 BltBuffer,
+                                 BltOperation,
+                                 SourceX,
+                                 SourceY,
+                                 DestinationX,
+                                 DestinationY,
+                                 Width,
+                                 Height,
+                                 Delta
+                                 );
       if (EFI_ERROR (Status)) {
         ReturnStatus = Status;
       } else if (BltOperation == EfiBltVideoToBltBuffer) {
@@ -301,19 +300,19 @@ ConSplitterGraphicsOutputBlt (
     }
 
     UgaDraw = Private->TextOutList[Index].UgaDraw;
-    if (UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
+    if ((UgaDraw != NULL) && FeaturePcdGet (PcdUgaConsumeSupport)) {
       Status = UgaDraw->Blt (
-                              UgaDraw,
-                              (EFI_UGA_PIXEL *) BltBuffer,
-                              (EFI_UGA_BLT_OPERATION) BltOperation,
-                              SourceX,
-                              SourceY,
-                              DestinationX,
-                              DestinationY,
-                              Width,
-                              Height,
-                              Delta
-                              );
+                          UgaDraw,
+                          (EFI_UGA_PIXEL *)BltBuffer,
+                          (EFI_UGA_BLT_OPERATION)BltOperation,
+                          SourceX,
+                          SourceY,
+                          DestinationX,
+                          DestinationY,
+                          Width,
+                          Height,
+                          Delta
+                          );
       if (EFI_ERROR (Status)) {
         ReturnStatus = Status;
       } else if (BltOperation == EfiBltVideoToBltBuffer) {
@@ -345,11 +344,11 @@ ConSplitterGraphicsOutputBlt (
 EFI_STATUS
 EFIAPI
 ConSplitterUgaDrawGetMode (
-  IN  EFI_UGA_DRAW_PROTOCOL           *This,
-  OUT UINT32                          *HorizontalResolution,
-  OUT UINT32                          *VerticalResolution,
-  OUT UINT32                          *ColorDepth,
-  OUT UINT32                          *RefreshRate
+  IN  EFI_UGA_DRAW_PROTOCOL  *This,
+  OUT UINT32                 *HorizontalResolution,
+  OUT UINT32                 *VerticalResolution,
+  OUT UINT32                 *ColorDepth,
+  OUT UINT32                 *RefreshRate
   )
 {
   TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private;
@@ -357,13 +356,15 @@ ConSplitterUgaDrawGetMode (
   if ((HorizontalResolution == NULL) ||
       (VerticalResolution   == NULL) ||
       (RefreshRate          == NULL) ||
-      (ColorDepth           == NULL)) {
+      (ColorDepth           == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // retrieve private data
   //
-  Private               = UGA_DRAW_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
+  Private = UGA_DRAW_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
   *HorizontalResolution = Private->UgaHorizontalResolution;
   *VerticalResolution   = Private->UgaVerticalResolution;
@@ -372,7 +373,6 @@ ConSplitterUgaDrawGetMode (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Set the current video mode information.
@@ -391,22 +391,22 @@ ConSplitterUgaDrawGetMode (
 EFI_STATUS
 EFIAPI
 ConSplitterUgaDrawSetMode (
-  IN  EFI_UGA_DRAW_PROTOCOL           *This,
-  IN UINT32                           HorizontalResolution,
-  IN UINT32                           VerticalResolution,
-  IN UINT32                           ColorDepth,
-  IN UINT32                           RefreshRate
+  IN  EFI_UGA_DRAW_PROTOCOL  *This,
+  IN UINT32                  HorizontalResolution,
+  IN UINT32                  VerticalResolution,
+  IN UINT32                  ColorDepth,
+  IN UINT32                  RefreshRate
   )
 {
-  EFI_STATUS                             Status;
-  TEXT_OUT_SPLITTER_PRIVATE_DATA         *Private;
-  UINTN                                  Index;
-  EFI_STATUS                             ReturnStatus;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL           *GraphicsOutput;
-  UINTN                                  NumberIndex;
-  UINTN                                  SizeOfInfo;
-  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION   *Info;
-  EFI_UGA_DRAW_PROTOCOL                  *UgaDraw;
+  EFI_STATUS                            Status;
+  TEXT_OUT_SPLITTER_PRIVATE_DATA        *Private;
+  UINTN                                 Index;
+  EFI_STATUS                            ReturnStatus;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL          *GraphicsOutput;
+  UINTN                                 NumberIndex;
+  UINTN                                 SizeOfInfo;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *Info;
+  EFI_UGA_DRAW_PROTOCOL                 *UgaDraw;
 
   Private = UGA_DRAW_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
@@ -415,47 +415,48 @@ ConSplitterUgaDrawSetMode (
   //
   // Update the Mode data
   //
-  Private->UgaHorizontalResolution  = HorizontalResolution;
-  Private->UgaVerticalResolution    = VerticalResolution;
-  Private->UgaColorDepth            = ColorDepth;
-  Private->UgaRefreshRate           = RefreshRate;
+  Private->UgaHorizontalResolution = HorizontalResolution;
+  Private->UgaVerticalResolution   = VerticalResolution;
+  Private->UgaColorDepth           = ColorDepth;
+  Private->UgaRefreshRate          = RefreshRate;
 
   //
   // return the worst status met
   //
   for (Index = 0; Index < Private->CurrentNumberOfConsoles; Index++) {
-
     GraphicsOutput = Private->TextOutList[Index].GraphicsOutput;
     if (GraphicsOutput != NULL) {
       //
       // Find corresponding ModeNumber of this GraphicsOutput instance
       //
-      for (NumberIndex = 0; NumberIndex < GraphicsOutput->Mode->MaxMode; NumberIndex ++) {
-        Status = GraphicsOutput->QueryMode (GraphicsOutput, (UINT32) NumberIndex, &SizeOfInfo, &Info);
+      for (NumberIndex = 0; NumberIndex < GraphicsOutput->Mode->MaxMode; NumberIndex++) {
+        Status = GraphicsOutput->QueryMode (GraphicsOutput, (UINT32)NumberIndex, &SizeOfInfo, &Info);
         if (EFI_ERROR (Status)) {
           return Status;
         }
+
         if ((Info->HorizontalResolution == HorizontalResolution) && (Info->VerticalResolution == VerticalResolution)) {
           FreePool (Info);
           break;
         }
+
         FreePool (Info);
       }
 
-      Status = GraphicsOutput->SetMode (GraphicsOutput, (UINT32) NumberIndex);
+      Status = GraphicsOutput->SetMode (GraphicsOutput, (UINT32)NumberIndex);
       if (EFI_ERROR (Status)) {
         ReturnStatus = Status;
       }
-    } else if (FeaturePcdGet (PcdUgaConsumeSupport)){
+    } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
       UgaDraw = Private->TextOutList[Index].UgaDraw;
       if (UgaDraw != NULL) {
         Status = UgaDraw->SetMode (
-                          UgaDraw,
-                          HorizontalResolution,
-                          VerticalResolution,
-                          ColorDepth,
-                          RefreshRate
-                          );
+                            UgaDraw,
+                            HorizontalResolution,
+                            VerticalResolution,
+                            ColorDepth,
+                            RefreshRate
+                            );
         if (EFI_ERROR (Status)) {
           ReturnStatus = Status;
         }
@@ -465,7 +466,6 @@ ConSplitterUgaDrawSetMode (
 
   return ReturnStatus;
 }
-
 
 /**
   Blt a rectangle of pixels on the graphics screen.
@@ -519,16 +519,16 @@ ConSplitterUgaDrawSetMode (
 EFI_STATUS
 EFIAPI
 ConSplitterUgaDrawBlt (
-  IN  EFI_UGA_DRAW_PROTOCOL                         *This,
-  IN  EFI_UGA_PIXEL                                 *BltBuffer, OPTIONAL
-  IN  EFI_UGA_BLT_OPERATION                         BltOperation,
-  IN  UINTN                                         SourceX,
-  IN  UINTN                                         SourceY,
-  IN  UINTN                                         DestinationX,
-  IN  UINTN                                         DestinationY,
-  IN  UINTN                                         Width,
-  IN  UINTN                                         Height,
-  IN  UINTN                                         Delta         OPTIONAL
+  IN  EFI_UGA_DRAW_PROTOCOL  *This,
+  IN  EFI_UGA_PIXEL          *BltBuffer  OPTIONAL,
+  IN  EFI_UGA_BLT_OPERATION  BltOperation,
+  IN  UINTN                  SourceX,
+  IN  UINTN                  SourceY,
+  IN  UINTN                  DestinationX,
+  IN  UINTN                  DestinationY,
+  IN  UINTN                  Width,
+  IN  UINTN                  Height,
+  IN  UINTN                  Delta         OPTIONAL
   )
 {
   EFI_STATUS                      Status;
@@ -547,17 +547,17 @@ ConSplitterUgaDrawBlt (
     GraphicsOutput = Private->TextOutList[Index].GraphicsOutput;
     if (GraphicsOutput != NULL) {
       Status = GraphicsOutput->Blt (
-                              GraphicsOutput,
-                              (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) BltBuffer,
-                              (EFI_GRAPHICS_OUTPUT_BLT_OPERATION) BltOperation,
-                              SourceX,
-                              SourceY,
-                              DestinationX,
-                              DestinationY,
-                              Width,
-                              Height,
-                              Delta
-                              );
+                                 GraphicsOutput,
+                                 (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)BltBuffer,
+                                 (EFI_GRAPHICS_OUTPUT_BLT_OPERATION)BltOperation,
+                                 SourceX,
+                                 SourceY,
+                                 DestinationX,
+                                 DestinationY,
+                                 Width,
+                                 Height,
+                                 Delta
+                                 );
       if (EFI_ERROR (Status)) {
         ReturnStatus = Status;
       } else if (BltOperation == EfiUgaVideoToBltBuffer) {
@@ -568,7 +568,7 @@ ConSplitterUgaDrawBlt (
       }
     }
 
-    if (Private->TextOutList[Index].UgaDraw != NULL && FeaturePcdGet (PcdUgaConsumeSupport)) {
+    if ((Private->TextOutList[Index].UgaDraw != NULL) && FeaturePcdGet (PcdUgaConsumeSupport)) {
       Status = Private->TextOutList[Index].UgaDraw->Blt (
                                                       Private->TextOutList[Index].UgaDraw,
                                                       BltBuffer,
@@ -613,7 +613,7 @@ TextOutSetMode (
   // been checked in ConSplitterTextOutSetCursorPosition. And (0, 0) should
   // always be supported.
   //
-  Private->TextOutMode.Mode          = (INT32) ModeNumber;
+  Private->TextOutMode.Mode          = (INT32)ModeNumber;
   Private->TextOutMode.CursorColumn  = 0;
   Private->TextOutMode.CursorRow     = 0;
   Private->TextOutMode.CursorVisible = TRUE;

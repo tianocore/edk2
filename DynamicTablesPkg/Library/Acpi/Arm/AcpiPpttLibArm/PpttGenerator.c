@@ -101,14 +101,14 @@ GET_OBJECT_LIST (
 STATIC
 UINT32
 GetProcHierarchyNodeSize (
-  IN  CONST CM_ARM_PROC_HIERARCHY_INFO * Node
+  IN  CONST CM_ARM_PROC_HIERARCHY_INFO  *Node
   )
 {
   ASSERT (Node != NULL);
 
   // <size of Processor Hierarchy Node> + <size of Private Resources array>
   return sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR) +
-                 (Node->NoOfPrivateResources * sizeof (UINT32));
+         (Node->NoOfPrivateResources * sizeof (UINT32));
 }
 
 /**
@@ -157,10 +157,10 @@ GET_SIZE_OF_PPTT_STRUCTS (
 STATIC
 EFI_STATUS
 GetPpttNodeReferencedByToken (
-  IN          PPTT_NODE_INDEXER    * NodeIndexer,
-  IN  UINT32                         NodeCount,
-  IN  CONST   CM_OBJECT_TOKEN        SearchToken,
-  OUT         PPTT_NODE_INDEXER   ** IndexedNodeFound
+  IN          PPTT_NODE_INDEXER  *NodeIndexer,
+  IN  UINT32                     NodeCount,
+  IN  CONST   CM_OBJECT_TOKEN    SearchToken,
+  OUT         PPTT_NODE_INDEXER  **IndexedNodeFound
   )
 {
   EFI_STATUS  Status;
@@ -183,7 +183,7 @@ GetPpttNodeReferencedByToken (
 
     if (NodeIndexer->Token == SearchToken) {
       *IndexedNodeFound = NodeIndexer;
-      Status = EFI_SUCCESS;
+      Status            = EFI_SUCCESS;
       DEBUG ((
         DEBUG_INFO,
         "PPTT: Node Indexer: Token = %p. Found, Status = %r\n",
@@ -192,6 +192,7 @@ GetPpttNodeReferencedByToken (
         ));
       return Status;
     }
+
     NodeIndexer++;
   }
 
@@ -218,17 +219,17 @@ GetPpttNodeReferencedByToken (
 STATIC
 EFI_STATUS
 DetectCyclesInTopology (
-  IN  CONST ACPI_PPTT_GENERATOR         * CONST Generator
+  IN  CONST ACPI_PPTT_GENERATOR         *CONST  Generator
   )
 {
-  EFI_STATUS            Status;
-  PPTT_NODE_INDEXER   * Iterator;
-  PPTT_NODE_INDEXER   * CycleDetector;
-  UINT32                NodesRemaining;
+  EFI_STATUS         Status;
+  PPTT_NODE_INDEXER  *Iterator;
+  PPTT_NODE_INDEXER  *CycleDetector;
+  UINT32             NodesRemaining;
 
   ASSERT (Generator != NULL);
 
-  Iterator = Generator->NodeIndexer;
+  Iterator       = Generator->NodeIndexer;
   NodesRemaining = Generator->ProcTopologyStructCount;
 
   while (NodesRemaining != 0) {
@@ -265,7 +266,7 @@ DetectCyclesInTopology (
 
       // Stamp the visited node
       CycleDetector->CycleDetectionStamp = NodesRemaining;
-      CycleDetector = CycleDetector->TopologyParent;
+      CycleDetector                      = CycleDetector->TopologyParent;
     } // Continue topology tree walk
 
     Iterator++;
@@ -293,17 +294,17 @@ DetectCyclesInTopology (
 STATIC
 EFI_STATUS
 AddPrivateResources (
-  IN  CONST ACPI_PPTT_GENERATOR                    * CONST Generator,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   * CONST CfgMgrProtocol,
-  IN        UINT32                                 *       PrivResArray,
+  IN  CONST ACPI_PPTT_GENERATOR                    *CONST  Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,
+  IN        UINT32                                         *PrivResArray,
   IN        UINT32                                         PrivResCount,
   IN  CONST CM_OBJECT_TOKEN                                PrivResArrayToken
   )
 {
-  EFI_STATUS            Status;
-  CM_ARM_OBJ_REF      * CmObjRefs;
-  UINT32                CmObjRefCount;
-  PPTT_NODE_INDEXER   * PpttNodeFound;
+  EFI_STATUS         Status;
+  CM_ARM_OBJ_REF     *CmObjRefs;
+  UINT32             CmObjRefCount;
+  PPTT_NODE_INDEXER  *PpttNodeFound;
 
   ASSERT (
     (Generator != NULL) &&
@@ -422,32 +423,33 @@ AddPrivateResources (
 BOOLEAN
 EFIAPI
 IsGicCTokenEqual (
-  IN  CONST VOID          * Object1,
-  IN  CONST VOID          * Object2,
-  IN        UINTN           Index1,
-  IN        UINTN           Index2
+  IN  CONST VOID   *Object1,
+  IN  CONST VOID   *Object2,
+  IN        UINTN  Index1,
+  IN        UINTN  Index2
   )
 {
-  PPTT_NODE_INDEXER           * IndexedObject1;
-  PPTT_NODE_INDEXER           * IndexedObject2;
-  CM_ARM_PROC_HIERARCHY_INFO  * ProcNode1;
-  CM_ARM_PROC_HIERARCHY_INFO  * ProcNode2;
+  PPTT_NODE_INDEXER           *IndexedObject1;
+  PPTT_NODE_INDEXER           *IndexedObject2;
+  CM_ARM_PROC_HIERARCHY_INFO  *ProcNode1;
+  CM_ARM_PROC_HIERARCHY_INFO  *ProcNode2;
 
   ASSERT (
     (Object1 != NULL) &&
     (Object2 != NULL)
     );
 
-  IndexedObject1 = (PPTT_NODE_INDEXER*)Object1;
-  IndexedObject2 = (PPTT_NODE_INDEXER*)Object2;
-  ProcNode1 = (CM_ARM_PROC_HIERARCHY_INFO*)IndexedObject1->Object;
-  ProcNode2 = (CM_ARM_PROC_HIERARCHY_INFO*)IndexedObject2->Object;
+  IndexedObject1 = (PPTT_NODE_INDEXER *)Object1;
+  IndexedObject2 = (PPTT_NODE_INDEXER *)Object2;
+  ProcNode1      = (CM_ARM_PROC_HIERARCHY_INFO *)IndexedObject1->Object;
+  ProcNode2      = (CM_ARM_PROC_HIERARCHY_INFO *)IndexedObject2->Object;
 
   if (IS_ACPI_PROC_ID_VALID (ProcNode1) &&
       IS_ACPI_PROC_ID_VALID (ProcNode2) &&
       (ProcNode1->GicCToken != CM_NULL_TOKEN) &&
       (ProcNode2->GicCToken != CM_NULL_TOKEN) &&
-      (ProcNode1->GicCToken == ProcNode2->GicCToken)) {
+      (ProcNode1->GicCToken == ProcNode2->GicCToken))
+  {
     DEBUG ((
       DEBUG_ERROR,
       "ERROR: PPTT: Two Processor Hierarchy Info objects (%d and %d) map to " \
@@ -484,27 +486,27 @@ IsGicCTokenEqual (
 STATIC
 EFI_STATUS
 AddProcHierarchyNodes (
-  IN  CONST ACPI_PPTT_GENERATOR                   * CONST Generator,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  IN  CONST EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER * Pptt,
-  IN  CONST UINT32                                        NodesStartOffset
+  IN  CONST ACPI_PPTT_GENERATOR                   *CONST             Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST             CfgMgrProtocol,
+  IN  CONST EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER  *Pptt,
+  IN  CONST UINT32                                                   NodesStartOffset
   )
 {
-  EFI_STATUS                              Status;
-  EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR * ProcStruct;
-  UINT32                                * PrivateResources;
-  BOOLEAN                                 IsGicCTokenDuplicated;
+  EFI_STATUS                             Status;
+  EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR  *ProcStruct;
+  UINT32                                 *PrivateResources;
+  BOOLEAN                                IsGicCTokenDuplicated;
 
-  CM_ARM_GICC_INFO                      * GicCInfoList;
-  UINT32                                  GicCInfoCount;
-  UINT32                                  UniqueGicCRefCount;
+  CM_ARM_GICC_INFO  *GicCInfoList;
+  UINT32            GicCInfoCount;
+  UINT32            UniqueGicCRefCount;
 
-  PPTT_NODE_INDEXER                     * PpttNodeFound;
-  CM_ARM_PROC_HIERARCHY_INFO            * ProcInfoNode;
+  PPTT_NODE_INDEXER           *PpttNodeFound;
+  CM_ARM_PROC_HIERARCHY_INFO  *ProcInfoNode;
 
-  PPTT_NODE_INDEXER                     * ProcNodeIterator;
-  UINT32                                  NodeCount;
-  UINT32                                  Length;
+  PPTT_NODE_INDEXER  *ProcNodeIterator;
+  UINT32             NodeCount;
+  UINT32             Length;
 
   ASSERT (
     (Generator != NULL) &&
@@ -512,11 +514,11 @@ AddProcHierarchyNodes (
     (Pptt != NULL)
     );
 
-  ProcStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR*)((UINT8*)Pptt +
-               NodesStartOffset);
+  ProcStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR *)((UINT8 *)Pptt +
+                                                         NodesStartOffset);
 
   ProcNodeIterator = Generator->ProcHierarchyNodeIndexedList;
-  NodeCount = Generator->ProcHierarchyNodeCount;
+  NodeCount        = Generator->ProcHierarchyNodeCount;
 
   // Check if every GICC Object is referenced by onlu one Proc Node
   IsGicCTokenDuplicated = FindDuplicateValue (
@@ -534,7 +536,7 @@ AddProcHierarchyNodes (
   UniqueGicCRefCount = 0;
 
   while (NodeCount-- != 0) {
-    ProcInfoNode = (CM_ARM_PROC_HIERARCHY_INFO*)ProcNodeIterator->Object;
+    ProcInfoNode = (CM_ARM_PROC_HIERARCHY_INFO *)ProcNodeIterator->Object;
 
     // Check if the private resource count is within the size limit
     // imposed on the Processor Hierarchy node by the specification.
@@ -556,16 +558,16 @@ AddProcHierarchyNodes (
     }
 
     // Populate the node header
-    ProcStruct->Type = EFI_ACPI_6_3_PPTT_TYPE_PROCESSOR;
-    ProcStruct->Length = (UINT8)Length;
+    ProcStruct->Type        = EFI_ACPI_6_3_PPTT_TYPE_PROCESSOR;
+    ProcStruct->Length      = (UINT8)Length;
     ProcStruct->Reserved[0] = EFI_ACPI_RESERVED_BYTE;
     ProcStruct->Reserved[1] = EFI_ACPI_RESERVED_BYTE;
 
     // Populate the flags
-    ProcStruct->Flags.PhysicalPackage = ProcInfoNode->Flags & BIT0;
-    ProcStruct->Flags.AcpiProcessorIdValid = (ProcInfoNode->Flags & BIT1) >> 1;
-    ProcStruct->Flags.ProcessorIsAThread = (ProcInfoNode->Flags & BIT2) >> 2;
-    ProcStruct->Flags.NodeIsALeaf = (ProcInfoNode->Flags & BIT3) >> 3;
+    ProcStruct->Flags.PhysicalPackage         = ProcInfoNode->Flags & BIT0;
+    ProcStruct->Flags.AcpiProcessorIdValid    = (ProcInfoNode->Flags & BIT1) >> 1;
+    ProcStruct->Flags.ProcessorIsAThread      = (ProcInfoNode->Flags & BIT2) >> 2;
+    ProcStruct->Flags.NodeIsALeaf             = (ProcInfoNode->Flags & BIT3) >> 3;
     ProcStruct->Flags.IdenticalImplementation =
       (ProcInfoNode->Flags & BIT4) >> 4;
     ProcStruct->Flags.Reserved = 0;
@@ -594,7 +596,9 @@ AddProcHierarchyNodes (
 
       // Test if the reference is to a 'leaf' node
       if (IS_PROC_NODE_LEAF (
-            ((CM_ARM_PROC_HIERARCHY_INFO*)PpttNodeFound->Object))) {
+            ((CM_ARM_PROC_HIERARCHY_INFO *)PpttNodeFound->Object)
+            ))
+      {
         Status = EFI_INVALID_PARAMETER;
         DEBUG ((
           DEBUG_ERROR,
@@ -676,18 +680,18 @@ AddProcHierarchyNodes (
     }
 
     ProcStruct->NumberOfPrivateResources = ProcInfoNode->NoOfPrivateResources;
-    PrivateResources = (UINT32*)((UINT8*)ProcStruct +
-                        sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR));
+    PrivateResources                     = (UINT32 *)((UINT8 *)ProcStruct +
+                                                      sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR));
 
     if (ProcStruct->NumberOfPrivateResources != 0) {
       // Populate the private resources array
       Status = AddPrivateResources (
-                  Generator,
-                  CfgMgrProtocol,
-                  PrivateResources,
-                  ProcStruct->NumberOfPrivateResources,
-                  ProcInfoNode->PrivateResourcesArrayToken
-                  );
+                 Generator,
+                 CfgMgrProtocol,
+                 PrivateResources,
+                 ProcStruct->NumberOfPrivateResources,
+                 ProcInfoNode->PrivateResourcesArrayToken
+                 );
       if (EFI_ERROR (Status)) {
         DEBUG ((
           DEBUG_ERROR,
@@ -700,8 +704,8 @@ AddProcHierarchyNodes (
     }
 
     // Next Processor Hierarchy Node
-    ProcStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR*)((UINT8*)ProcStruct +
-                ProcStruct->Length);
+    ProcStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR *)((UINT8 *)ProcStruct +
+                                                           ProcStruct->Length);
     ProcNodeIterator++;
   } // Processor Hierarchy Node
 
@@ -762,18 +766,18 @@ AddProcHierarchyNodes (
 STATIC
 EFI_STATUS
 AddCacheTypeStructures (
-  IN  CONST ACPI_PPTT_GENERATOR                   * CONST Generator,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  IN  CONST EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER * Pptt,
-  IN  CONST UINT32                                        NodesStartOffset
+  IN  CONST ACPI_PPTT_GENERATOR                   *CONST             Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST             CfgMgrProtocol,
+  IN  CONST EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER  *Pptt,
+  IN  CONST UINT32                                                   NodesStartOffset
   )
 {
-  EFI_STATUS                            Status;
-  EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE   * CacheStruct;
-  PPTT_NODE_INDEXER                   * PpttNodeFound;
-  CM_ARM_CACHE_INFO                   * CacheInfoNode;
-  PPTT_NODE_INDEXER                   * CacheNodeIterator;
-  UINT32                                NodeCount;
+  EFI_STATUS                         Status;
+  EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE  *CacheStruct;
+  PPTT_NODE_INDEXER                  *PpttNodeFound;
+  CM_ARM_CACHE_INFO                  *CacheInfoNode;
+  PPTT_NODE_INDEXER                  *CacheNodeIterator;
+  UINT32                             NodeCount;
 
   ASSERT (
     (Generator != NULL) &&
@@ -781,31 +785,31 @@ AddCacheTypeStructures (
     (Pptt != NULL)
     );
 
-  CacheStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE*)((UINT8*)Pptt +
-                 NodesStartOffset);
+  CacheStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE *)((UINT8 *)Pptt +
+                                                      NodesStartOffset);
 
   CacheNodeIterator = Generator->CacheStructIndexedList;
-  NodeCount = Generator->CacheStructCount;
+  NodeCount         = Generator->CacheStructCount;
 
   while (NodeCount-- != 0) {
-    CacheInfoNode = (CM_ARM_CACHE_INFO*)CacheNodeIterator->Object;
+    CacheInfoNode = (CM_ARM_CACHE_INFO *)CacheNodeIterator->Object;
 
     // Populate the node header
-    CacheStruct->Type = EFI_ACPI_6_3_PPTT_TYPE_CACHE;
-    CacheStruct->Length = sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE);
+    CacheStruct->Type        = EFI_ACPI_6_3_PPTT_TYPE_CACHE;
+    CacheStruct->Length      = sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE);
     CacheStruct->Reserved[0] = EFI_ACPI_RESERVED_BYTE;
     CacheStruct->Reserved[1] = EFI_ACPI_RESERVED_BYTE;
 
     // "On Arm-based systems, all cache properties must be provided in the
     // table." (ACPI 6.3, Section 5.2.29.2)
-    CacheStruct->Flags.SizePropertyValid = 1;
-    CacheStruct->Flags.NumberOfSetsValid = 1;
-    CacheStruct->Flags.AssociativityValid = 1;
+    CacheStruct->Flags.SizePropertyValid   = 1;
+    CacheStruct->Flags.NumberOfSetsValid   = 1;
+    CacheStruct->Flags.AssociativityValid  = 1;
     CacheStruct->Flags.AllocationTypeValid = 1;
-    CacheStruct->Flags.CacheTypeValid = 1;
-    CacheStruct->Flags.WritePolicyValid = 1;
-    CacheStruct->Flags.LineSizeValid = 1;
-    CacheStruct->Flags.Reserved = 0;
+    CacheStruct->Flags.CacheTypeValid      = 1;
+    CacheStruct->Flags.WritePolicyValid    = 1;
+    CacheStruct->Flags.LineSizeValid       = 1;
+    CacheStruct->Flags.Reserved            = 0;
 
     // Populate the reference to the next level of cache
     if (CacheInfoNode->NextLevelOfCacheToken == CM_NULL_TOKEN) {
@@ -886,7 +890,7 @@ AddCacheTypeStructures (
     // current ACPI specification.
     // These checks will be needed in the future when the ACPI specification
     // is extended. Disabling this code for now.
-#if 0
+ #if 0
     if (CacheInfoNode->Associativity > PPTT_ARM_CCIDX_CACHE_ASSOCIATIVITY_MAX) {
       Status = EFI_INVALID_PARAMETER;
       DEBUG ((
@@ -909,7 +913,8 @@ AddCacheTypeStructures (
         CacheInfoNode->Associativity
         ));
     }
-#endif
+
+ #endif
 
     // Note a typecast is needed as the maximum associativity
     // supported by ACPI Cache type structure is MAX_UINT8.
@@ -926,13 +931,13 @@ AddCacheTypeStructures (
 
     // Validate and populate cache line size
     if ((CacheInfoNode->LineSize < PPTT_ARM_CACHE_LINE_SIZE_MIN) ||
-        (CacheInfoNode->LineSize > PPTT_ARM_CACHE_LINE_SIZE_MAX)) {
-
+        (CacheInfoNode->LineSize > PPTT_ARM_CACHE_LINE_SIZE_MAX))
+    {
       Status = EFI_INVALID_PARAMETER;
       DEBUG ((
         DEBUG_ERROR,
         "ERROR: PPTT: The cache line size must be between %d and %d bytes " \
-        "on ARM Platforms. LineSize = %d. Status = %r\n" ,
+        "on ARM Platforms. LineSize = %d. Status = %r\n",
         PPTT_ARM_CACHE_LINE_SIZE_MIN,
         PPTT_ARM_CACHE_LINE_SIZE_MAX,
         CacheInfoNode->LineSize,
@@ -946,7 +951,7 @@ AddCacheTypeStructures (
       DEBUG ((
         DEBUG_ERROR,
         "ERROR: PPTT: The cache line size is not a power of 2. " \
-        "LineSize = %d. Status = %r\n" ,
+        "LineSize = %d. Status = %r\n",
         CacheInfoNode->LineSize,
         Status
         ));
@@ -956,8 +961,8 @@ AddCacheTypeStructures (
     CacheStruct->LineSize = CacheInfoNode->LineSize;
 
     // Next Cache Type Structure
-    CacheStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE*)((UINT8*)CacheStruct +
-                   CacheStruct->Length);
+    CacheStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE *)((UINT8 *)CacheStruct +
+                                                        CacheStruct->Length);
     CacheNodeIterator++;
   } // Cache Type Structure
 
@@ -984,17 +989,16 @@ AddCacheTypeStructures (
 STATIC
 EFI_STATUS
 AddIdTypeStructures (
-  IN  CONST ACPI_PPTT_GENERATOR                   * CONST Generator,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  IN  CONST EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER * Pptt,
-  IN  CONST UINT32                                        NodesStartOffset
+  IN  CONST ACPI_PPTT_GENERATOR                   *CONST             Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST             CfgMgrProtocol,
+  IN  CONST EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER  *Pptt,
+  IN  CONST UINT32                                                   NodesStartOffset
   )
 {
-  EFI_ACPI_6_3_PPTT_STRUCTURE_ID    * IdStruct;
-  CM_ARM_PROC_NODE_ID_INFO          * ProcIdInfoNode;
-  PPTT_NODE_INDEXER                 * IdStructIterator;
-  UINT32                              NodeCount;
-
+  EFI_ACPI_6_3_PPTT_STRUCTURE_ID  *IdStruct;
+  CM_ARM_PROC_NODE_ID_INFO        *ProcIdInfoNode;
+  PPTT_NODE_INDEXER               *IdStructIterator;
+  UINT32                          NodeCount;
 
   ASSERT (
     (Generator != NULL) &&
@@ -1002,28 +1006,28 @@ AddIdTypeStructures (
     (Pptt != NULL)
     );
 
-  IdStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_ID*)((UINT8*)Pptt + NodesStartOffset);
+  IdStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_ID *)((UINT8 *)Pptt + NodesStartOffset);
 
   IdStructIterator = Generator->IdStructIndexedList;
-  NodeCount = Generator->IdStructCount;
+  NodeCount        = Generator->IdStructCount;
   while (NodeCount-- != 0) {
-    ProcIdInfoNode = (CM_ARM_PROC_NODE_ID_INFO*)IdStructIterator->Object;
+    ProcIdInfoNode = (CM_ARM_PROC_NODE_ID_INFO *)IdStructIterator->Object;
 
     // Populate the node
-    IdStruct->Type = EFI_ACPI_6_3_PPTT_TYPE_ID;
-    IdStruct->Length = sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_ID);
+    IdStruct->Type        = EFI_ACPI_6_3_PPTT_TYPE_ID;
+    IdStruct->Length      = sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_ID);
     IdStruct->Reserved[0] = EFI_ACPI_RESERVED_BYTE;
     IdStruct->Reserved[1] = EFI_ACPI_RESERVED_BYTE;
-    IdStruct->VendorId = ProcIdInfoNode->VendorId;
-    IdStruct->Level1Id = ProcIdInfoNode->Level1Id;
-    IdStruct->Level2Id = ProcIdInfoNode->Level2Id;
-    IdStruct->MajorRev = ProcIdInfoNode->MajorRev;
-    IdStruct->MinorRev = ProcIdInfoNode->MinorRev;
-    IdStruct->SpinRev = ProcIdInfoNode->SpinRev;
+    IdStruct->VendorId    = ProcIdInfoNode->VendorId;
+    IdStruct->Level1Id    = ProcIdInfoNode->Level1Id;
+    IdStruct->Level2Id    = ProcIdInfoNode->Level2Id;
+    IdStruct->MajorRev    = ProcIdInfoNode->MajorRev;
+    IdStruct->MinorRev    = ProcIdInfoNode->MinorRev;
+    IdStruct->SpinRev     = ProcIdInfoNode->SpinRev;
 
     // Next ID Type Structure
-    IdStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_ID*)((UINT8*)IdStruct +
-                IdStruct->Length);
+    IdStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_ID *)((UINT8 *)IdStruct +
+                                                  IdStruct->Length);
     IdStructIterator++;
   } // ID Type Structure
 
@@ -1057,33 +1061,33 @@ STATIC
 EFI_STATUS
 EFIAPI
 BuildPpttTable (
-  IN  CONST ACPI_TABLE_GENERATOR                  * CONST This,
-  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER          ** CONST Table
+  IN  CONST ACPI_TABLE_GENERATOR                  *CONST  This,
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
-  EFI_STATUS                      Status;
-  UINT32                          TableSize;
-  UINT32                          ProcTopologyStructCount;
-  UINT32                          ProcHierarchyNodeCount;
-  UINT32                          CacheStructCount;
-  UINT32                          IdStructCount;
+  EFI_STATUS  Status;
+  UINT32      TableSize;
+  UINT32      ProcTopologyStructCount;
+  UINT32      ProcHierarchyNodeCount;
+  UINT32      CacheStructCount;
+  UINT32      IdStructCount;
 
-  UINT32                          ProcHierarchyNodeOffset;
-  UINT32                          CacheStructOffset;
-  UINT32                          IdStructOffset;
+  UINT32  ProcHierarchyNodeOffset;
+  UINT32  CacheStructOffset;
+  UINT32  IdStructOffset;
 
-  CM_ARM_PROC_HIERARCHY_INFO    * ProcHierarchyNodeList;
-  CM_ARM_CACHE_INFO             * CacheStructList;
-  CM_ARM_PROC_NODE_ID_INFO      * IdStructList;
+  CM_ARM_PROC_HIERARCHY_INFO  *ProcHierarchyNodeList;
+  CM_ARM_CACHE_INFO           *CacheStructList;
+  CM_ARM_PROC_NODE_ID_INFO    *IdStructList;
 
-  ACPI_PPTT_GENERATOR           * Generator;
+  ACPI_PPTT_GENERATOR  *Generator;
 
   // Pointer to the Node Indexer array
-  PPTT_NODE_INDEXER             * NodeIndexer;
+  PPTT_NODE_INDEXER  *NodeIndexer;
 
-  EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER * Pptt;
+  EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER  *Pptt;
 
   ASSERT (
     (This != NULL) &&
@@ -1095,7 +1099,8 @@ BuildPpttTable (
     );
 
   if ((AcpiTableInfo->AcpiTableRevision < This->MinAcpiTableRevision) ||
-      (AcpiTableInfo->AcpiTableRevision > This->AcpiTableRevision)) {
+      (AcpiTableInfo->AcpiTableRevision > This->AcpiTableRevision))
+  {
     DEBUG ((
       DEBUG_ERROR,
       "ERROR: PPTT: Requested table revision = %d is not supported. "
@@ -1107,8 +1112,8 @@ BuildPpttTable (
     return EFI_INVALID_PARAMETER;
   }
 
-  Generator = (ACPI_PPTT_GENERATOR*)This;
-  *Table = NULL;
+  Generator = (ACPI_PPTT_GENERATOR *)This;
+  *Table    = NULL;
 
   // Get the processor hierarchy info and update the processor topology
   // structure count with Processor Hierarchy Nodes (Type 0)
@@ -1127,7 +1132,7 @@ BuildPpttTable (
     goto error_handler;
   }
 
-  ProcTopologyStructCount = ProcHierarchyNodeCount;
+  ProcTopologyStructCount           = ProcHierarchyNodeCount;
   Generator->ProcHierarchyNodeCount = ProcHierarchyNodeCount;
 
   // Get the cache info and update the processor topology structure count with
@@ -1147,7 +1152,7 @@ BuildPpttTable (
     goto error_handler;
   }
 
-  ProcTopologyStructCount += CacheStructCount;
+  ProcTopologyStructCount    += CacheStructCount;
   Generator->CacheStructCount = CacheStructCount;
 
   // Get the processor hierarchy node ID info and update the processor topology
@@ -1172,10 +1177,10 @@ BuildPpttTable (
   Generator->IdStructCount = IdStructCount;
 
   // Allocate Node Indexer array
-  NodeIndexer = (PPTT_NODE_INDEXER*)AllocateZeroPool (
-                                      sizeof (PPTT_NODE_INDEXER) *
-                                      ProcTopologyStructCount
-                                      );
+  NodeIndexer = (PPTT_NODE_INDEXER *)AllocateZeroPool (
+                                       sizeof (PPTT_NODE_INDEXER) *
+                                       ProcTopologyStructCount
+                                       );
   if (NodeIndexer == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     DEBUG ((
@@ -1188,21 +1193,21 @@ BuildPpttTable (
 
   DEBUG ((DEBUG_INFO, "INFO: NodeIndexer = %p\n", NodeIndexer));
   Generator->ProcTopologyStructCount = ProcTopologyStructCount;
-  Generator->NodeIndexer = NodeIndexer;
+  Generator->NodeIndexer             = NodeIndexer;
 
   // Calculate the size of the PPTT table
   TableSize = sizeof (EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER);
 
   // Include the size of Processor Hierarchy Nodes and index them
   if (Generator->ProcHierarchyNodeCount != 0) {
-    ProcHierarchyNodeOffset = TableSize;
+    ProcHierarchyNodeOffset                 = TableSize;
     Generator->ProcHierarchyNodeIndexedList = NodeIndexer;
-    TableSize += GetSizeofProcHierarchyNodes (
-                   ProcHierarchyNodeOffset,
-                   ProcHierarchyNodeList,
-                   Generator->ProcHierarchyNodeCount,
-                   &NodeIndexer
-                   );
+    TableSize                              += GetSizeofProcHierarchyNodes (
+                                                ProcHierarchyNodeOffset,
+                                                ProcHierarchyNodeList,
+                                                Generator->ProcHierarchyNodeCount,
+                                                &NodeIndexer
+                                                );
 
     DEBUG ((
       DEBUG_INFO,
@@ -1213,19 +1218,18 @@ BuildPpttTable (
       ProcHierarchyNodeOffset,
       Generator->ProcHierarchyNodeIndexedList
       ));
-
   }
 
   // Include the size of Cache Type Structures and index them
   if (Generator->CacheStructCount != 0) {
-    CacheStructOffset = TableSize;
+    CacheStructOffset                 = TableSize;
     Generator->CacheStructIndexedList = NodeIndexer;
-    TableSize += GetSizeofCacheTypeStructs (
-                   CacheStructOffset,
-                   CacheStructList,
-                   Generator->CacheStructCount,
-                   &NodeIndexer
-                   );
+    TableSize                        += GetSizeofCacheTypeStructs (
+                                          CacheStructOffset,
+                                          CacheStructList,
+                                          Generator->CacheStructCount,
+                                          &NodeIndexer
+                                          );
     DEBUG ((
       DEBUG_INFO,
       " CacheStructCount = %d\n" \
@@ -1239,14 +1243,14 @@ BuildPpttTable (
 
   // Include the size of ID Type Structures and index them
   if (Generator->IdStructCount != 0) {
-    IdStructOffset = TableSize;
+    IdStructOffset                 = TableSize;
     Generator->IdStructIndexedList = NodeIndexer;
-    TableSize += GetSizeofIdStructs (
-                   IdStructOffset,
-                   IdStructList,
-                   Generator->IdStructCount,
-                   &NodeIndexer
-                   );
+    TableSize                     += GetSizeofIdStructs (
+                                       IdStructOffset,
+                                       IdStructList,
+                                       Generator->IdStructCount,
+                                       &NodeIndexer
+                                       );
     DEBUG ((
       DEBUG_INFO,
       " IdStructCount = %d\n" \
@@ -1268,7 +1272,7 @@ BuildPpttTable (
     ));
 
   // Allocate the Buffer for the PPTT table
-  *Table = (EFI_ACPI_DESCRIPTION_HEADER*)AllocateZeroPool (TableSize);
+  *Table = (EFI_ACPI_DESCRIPTION_HEADER *)AllocateZeroPool (TableSize);
   if (*Table == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     DEBUG ((
@@ -1281,7 +1285,7 @@ BuildPpttTable (
     goto error_handler;
   }
 
-  Pptt = (EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER*)*Table;
+  Pptt = (EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER *)*Table;
 
   DEBUG ((
     DEBUG_INFO,
@@ -1403,13 +1407,13 @@ error_handler:
 STATIC
 EFI_STATUS
 FreePpttTableResources (
-  IN      CONST ACPI_TABLE_GENERATOR                  * CONST This,
-  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
-  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  IN OUT        EFI_ACPI_DESCRIPTION_HEADER          ** CONST Table
+  IN      CONST ACPI_TABLE_GENERATOR                  *CONST  This,
+  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN OUT        EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
-  ACPI_PPTT_GENERATOR * Generator;
+  ACPI_PPTT_GENERATOR  *Generator;
 
   ASSERT (
     (This != NULL) &&
@@ -1419,7 +1423,7 @@ FreePpttTableResources (
     (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature)
     );
 
-  Generator = (ACPI_PPTT_GENERATOR*)This;
+  Generator = (ACPI_PPTT_GENERATOR *)This;
 
   // Free any memory allocated by the generator
   if (Generator->NodeIndexer != NULL) {
@@ -1443,12 +1447,12 @@ FreePpttTableResources (
 
 /** The PPTT Table Generator revision.
 */
-#define PPTT_GENERATOR_REVISION CREATE_REVISION (1, 0)
+#define PPTT_GENERATOR_REVISION  CREATE_REVISION (1, 0)
 
 /** The interface for the PPTT Table Generator.
 */
 STATIC
-ACPI_PPTT_GENERATOR PpttGenerator = {
+ACPI_PPTT_GENERATOR  PpttGenerator = {
   // ACPI table generator header
   {
     // Generator ID
@@ -1504,11 +1508,12 @@ ACPI_PPTT_GENERATOR PpttGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiPpttLibConstructor (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *  SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
+
   Status = RegisterAcpiTableGenerator (&PpttGenerator.Header);
   DEBUG ((DEBUG_INFO, "PPTT: Register Generator. Status = %r\n", Status));
   ASSERT_EFI_ERROR (Status);
@@ -1528,11 +1533,12 @@ AcpiPpttLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiPpttLibDestructor (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *  SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
+
   Status = DeregisterAcpiTableGenerator (&PpttGenerator.Header);
   DEBUG ((DEBUG_INFO, "PPTT: Deregister Generator. Status = %r\n", Status));
   ASSERT_EFI_ERROR (Status);

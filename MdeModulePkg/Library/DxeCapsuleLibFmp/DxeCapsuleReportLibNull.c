@@ -24,8 +24,8 @@
 **/
 EFI_STATUS
 RecordCapsuleStatusVariable (
-  IN EFI_CAPSULE_HEADER                           *CapsuleHeader,
-  IN EFI_STATUS                                   CapsuleStatus
+  IN EFI_CAPSULE_HEADER  *CapsuleHeader,
+  IN EFI_STATUS          CapsuleStatus
   )
 {
   return EFI_UNSUPPORTED;
@@ -50,7 +50,7 @@ RecordFmpCapsuleStatusVariable (
   IN EFI_STATUS                                    CapsuleStatus,
   IN UINTN                                         PayloadIndex,
   IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader,
-  IN EFI_DEVICE_PATH_PROTOCOL                      *FmpDevicePath, OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL                      *FmpDevicePath  OPTIONAL,
   IN CHAR16                                        *CapFileName    OPTIONAL
   )
 {

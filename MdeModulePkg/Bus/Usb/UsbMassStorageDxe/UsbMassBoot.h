@@ -17,15 +17,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Others are "Group 1 Timeout Commands". That is,
 // they should be retried if driver is ready.
 //
-#define USB_BOOT_INQUIRY_OPCODE         0x12
-#define USB_BOOT_REQUEST_SENSE_OPCODE   0x03
-#define USB_BOOT_MODE_SENSE10_OPCODE    0x5A
-#define USB_BOOT_READ_CAPACITY_OPCODE   0x25
-#define USB_BOOT_TEST_UNIT_READY_OPCODE 0x00
-#define USB_BOOT_READ10_OPCODE          0x28
-#define USB_BOOT_WRITE10_OPCODE         0x2A
+#define USB_BOOT_INQUIRY_OPCODE          0x12
+#define USB_BOOT_REQUEST_SENSE_OPCODE    0x03
+#define USB_BOOT_MODE_SENSE10_OPCODE     0x5A
+#define USB_BOOT_READ_CAPACITY_OPCODE    0x25
+#define USB_BOOT_TEST_UNIT_READY_OPCODE  0x00
+#define USB_BOOT_READ10_OPCODE           0x28
+#define USB_BOOT_WRITE10_OPCODE          0x2A
 
-#define USB_SCSI_MODE_SENSE6_OPCODE     0x1A
+#define USB_SCSI_MODE_SENSE6_OPCODE  0x1A
 
 //
 // The Sense Key part of the sense data. Sense data has three levels:
@@ -53,25 +53,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Supported PDT codes, or Peripheral Device Type
 //
-#define USB_PDT_DIRECT_ACCESS           0x00       ///< Direct access device
-#define USB_PDT_CDROM                   0x05       ///< CDROM
-#define USB_PDT_OPTICAL                 0x07       ///< Non-CD optical disks
-#define USB_PDT_SIMPLE_DIRECT           0x0E       ///< Simplified direct access device
+#define USB_PDT_DIRECT_ACCESS  0x00                ///< Direct access device
+#define USB_PDT_CDROM          0x05                ///< CDROM
+#define USB_PDT_OPTICAL        0x07                ///< Non-CD optical disks
+#define USB_PDT_SIMPLE_DIRECT  0x0E                ///< Simplified direct access device
 
 //
 // Other parameters, Max carried size is 64KB.
 //
-#define USB_BOOT_MAX_CARRY_SIZE         SIZE_64KB
+#define USB_BOOT_MAX_CARRY_SIZE  SIZE_64KB
 
 //
 // Retry mass command times, set by experience
 //
-#define USB_BOOT_COMMAND_RETRY          5
+#define USB_BOOT_COMMAND_RETRY  5
 
 //
 // Wait for unit ready command, set by experience
 //
-#define USB_BOOT_RETRY_UNIT_READY_STALL (500 * USB_MASS_1_MILLISECOND)
+#define USB_BOOT_RETRY_UNIT_READY_STALL  (500 * USB_MASS_1_MILLISECOND)
 
 //
 // Mass command timeout, refers to specification[USB20-9.2.6.1]
@@ -80,7 +80,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // USB CD-Rom and iPod devices are much slower than USB key when response
 // most of commands, So we set 5s as timeout here.
 //
-#define USB_BOOT_GENERAL_CMD_TIMEOUT    (5 * USB_MASS_1_SECOND)
+#define USB_BOOT_GENERAL_CMD_TIMEOUT  (5 * USB_MASS_1_SECOND)
 
 //
 // The required commands are INQUIRY, READ CAPACITY, TEST UNIT READY,
@@ -90,122 +90,122 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #pragma pack(1)
 typedef struct {
-  UINT8             OpCode;
-  UINT8             Lun;            ///< Lun (high 3 bits)
-  UINT8             Reserved0[2];
-  UINT8             AllocLen;
-  UINT8             Reserved1;
-  UINT8             Pad[6];
+  UINT8    OpCode;
+  UINT8    Lun;                     ///< Lun (high 3 bits)
+  UINT8    Reserved0[2];
+  UINT8    AllocLen;
+  UINT8    Reserved1;
+  UINT8    Pad[6];
 } USB_BOOT_INQUIRY_CMD;
 
 typedef struct {
-  UINT8             Pdt;            ///< Peripheral Device Type (low 5 bits)
-  UINT8             Removable;      ///< Removable Media (highest bit)
-  UINT8             Reserved0[2];
-  UINT8             AddLen;         ///< Additional length
-  UINT8             Reserved1[3];
-  UINT8             VendorID[8];
-  UINT8             ProductID[16];
-  UINT8             ProductRevision[4];
+  UINT8    Pdt;                     ///< Peripheral Device Type (low 5 bits)
+  UINT8    Removable;               ///< Removable Media (highest bit)
+  UINT8    Reserved0[2];
+  UINT8    AddLen;                  ///< Additional length
+  UINT8    Reserved1[3];
+  UINT8    VendorID[8];
+  UINT8    ProductID[16];
+  UINT8    ProductRevision[4];
 } USB_BOOT_INQUIRY_DATA;
 
 typedef struct {
-  UINT8             OpCode;
-  UINT8             Lun;
-  UINT8             Reserved0[8];
-  UINT8             Pad[2];
+  UINT8    OpCode;
+  UINT8    Lun;
+  UINT8    Reserved0[8];
+  UINT8    Pad[2];
 } USB_BOOT_READ_CAPACITY_CMD;
 
 typedef struct {
-  UINT8             LastLba[4];
-  UINT8             BlockLen[4];
+  UINT8    LastLba[4];
+  UINT8    BlockLen[4];
 } USB_BOOT_READ_CAPACITY_DATA;
 
 typedef struct {
-  UINT8             OpCode;
-  UINT8             Lun;
-  UINT8             Reserved[4];
-  UINT8             Pad[6];
+  UINT8    OpCode;
+  UINT8    Lun;
+  UINT8    Reserved[4];
+  UINT8    Pad[6];
 } USB_BOOT_TEST_UNIT_READY_CMD;
 
 typedef struct {
-  UINT8             OpCode;
-  UINT8             Lun;
-  UINT8             PageCode;
-  UINT8             Reserved0[4];
-  UINT8             ParaListLenMsb;
-  UINT8             ParaListLenLsb;
-  UINT8             Reserved1;
-  UINT8             Pad[2];
+  UINT8    OpCode;
+  UINT8    Lun;
+  UINT8    PageCode;
+  UINT8    Reserved0[4];
+  UINT8    ParaListLenMsb;
+  UINT8    ParaListLenLsb;
+  UINT8    Reserved1;
+  UINT8    Pad[2];
 } USB_BOOT_MODE_SENSE10_CMD;
 
 typedef struct {
-  UINT8             ModeDataLenMsb;
-  UINT8             ModeDataLenLsb;
-  UINT8             Reserved0[4];
-  UINT8             BlkDesLenMsb;
-  UINT8             BlkDesLenLsb;
+  UINT8    ModeDataLenMsb;
+  UINT8    ModeDataLenLsb;
+  UINT8    Reserved0[4];
+  UINT8    BlkDesLenMsb;
+  UINT8    BlkDesLenLsb;
 } USB_BOOT_MODE_SENSE10_PARA_HEADER;
 
 typedef struct {
-  UINT8             OpCode;
-  UINT8             Lun;            ///< Lun (High 3 bits)
-  UINT8             Lba[4];         ///< Logical block address
-  UINT8             Reserved0;
-  UINT8             TransferLen[2]; ///< Transfer length
-  UINT8             Reserverd1;
-  UINT8             Pad[2];
+  UINT8    OpCode;
+  UINT8    Lun;                     ///< Lun (High 3 bits)
+  UINT8    Lba[4];                  ///< Logical block address
+  UINT8    Reserved0;
+  UINT8    TransferLen[2];          ///< Transfer length
+  UINT8    Reserverd1;
+  UINT8    Pad[2];
 } USB_BOOT_READ_WRITE_10_CMD;
 
 typedef struct {
-  UINT8             OpCode;
-  UINT8             Lun;            ///< Lun (High 3 bits)
-  UINT8             Reserved0[2];
-  UINT8             AllocLen;       ///< Allocation length
-  UINT8             Reserved1;
-  UINT8             Pad[6];
+  UINT8    OpCode;
+  UINT8    Lun;                     ///< Lun (High 3 bits)
+  UINT8    Reserved0[2];
+  UINT8    AllocLen;                ///< Allocation length
+  UINT8    Reserved1;
+  UINT8    Pad[6];
 } USB_BOOT_REQUEST_SENSE_CMD;
 
 typedef struct {
-  UINT8             ErrorCode;
-  UINT8             Reserved0;
-  UINT8             SenseKey;       ///< Sense key (low 4 bits)
-  UINT8             Infor[4];
-  UINT8             AddLen;         ///< Additional Sense length, 10
-  UINT8             Reserved1[4];
-  UINT8             Asc;            ///< Additional Sense Code
-  UINT8             Ascq;           ///< Additional Sense Code Qualifier
-  UINT8             Reserverd2[4];
+  UINT8    ErrorCode;
+  UINT8    Reserved0;
+  UINT8    SenseKey;                ///< Sense key (low 4 bits)
+  UINT8    Infor[4];
+  UINT8    AddLen;                  ///< Additional Sense length, 10
+  UINT8    Reserved1[4];
+  UINT8    Asc;                     ///< Additional Sense Code
+  UINT8    Ascq;                    ///< Additional Sense Code Qualifier
+  UINT8    Reserverd2[4];
 } USB_BOOT_REQUEST_SENSE_DATA;
 
 typedef struct {
-  UINT8             OpCode;
-  UINT8             Lun;
-  UINT8             PageCode;
-  UINT8             Reserved0;
-  UINT8             AllocateLen;
-  UINT8             Control;
+  UINT8    OpCode;
+  UINT8    Lun;
+  UINT8    PageCode;
+  UINT8    Reserved0;
+  UINT8    AllocateLen;
+  UINT8    Control;
 } USB_SCSI_MODE_SENSE6_CMD;
 
 typedef struct {
-  UINT8             ModeDataLen;
-  UINT8             MediumType;
-  UINT8             DevicePara;
-  UINT8             BlkDesLen;
+  UINT8    ModeDataLen;
+  UINT8    MediumType;
+  UINT8    DevicePara;
+  UINT8    BlkDesLen;
 } USB_SCSI_MODE_SENSE6_PARA_HEADER;
 #pragma pack()
 
 //
 // Convert a LUN number to that in the command
 //
-#define USB_BOOT_LUN(Lun) ((Lun) << 5)
+#define USB_BOOT_LUN(Lun)  ((Lun) << 5)
 
 //
 // Get the removable, PDT, and sense key bits from the command data
 //
-#define USB_BOOT_REMOVABLE(RmbByte) (((RmbByte) & BIT7) != 0)
-#define USB_BOOT_PDT(Pdt)           ((Pdt) & 0x1f)
-#define USB_BOOT_SENSE_KEY(Key)     ((Key) & 0x0f)
+#define USB_BOOT_REMOVABLE(RmbByte)  (((RmbByte) & BIT7) != 0)
+#define USB_BOOT_PDT(Pdt)            ((Pdt) & 0x1f)
+#define USB_BOOT_SENSE_KEY(Key)      ((Key) & 0x0f)
 
 /**
   Get the parameters for the USB mass storage media.
@@ -224,7 +224,7 @@ typedef struct {
 **/
 EFI_STATUS
 UsbBootGetParams (
-  IN USB_MASS_DEVICE          *UsbMass
+  IN USB_MASS_DEVICE  *UsbMass
   );
 
 /**
@@ -238,7 +238,7 @@ UsbBootGetParams (
 **/
 EFI_STATUS
 UsbBootIsUnitReady (
-  IN USB_MASS_DEVICE          *UsbMass
+  IN USB_MASS_DEVICE  *UsbMass
   );
 
 /**
@@ -252,7 +252,7 @@ UsbBootIsUnitReady (
 **/
 EFI_STATUS
 UsbBootDetectMedia (
-  IN  USB_MASS_DEVICE       *UsbMass
+  IN  USB_MASS_DEVICE  *UsbMass
   );
 
 /**
@@ -269,10 +269,10 @@ UsbBootDetectMedia (
 **/
 EFI_STATUS
 UsbBootReadBlocks (
-  IN  USB_MASS_DEVICE         *UsbMass,
-  IN  UINT32                  Lba,
-  IN  UINTN                   TotalBlock,
-  OUT UINT8                   *Buffer
+  IN  USB_MASS_DEVICE  *UsbMass,
+  IN  UINT32           Lba,
+  IN  UINTN            TotalBlock,
+  OUT UINT8            *Buffer
   );
 
 /**
@@ -290,11 +290,11 @@ UsbBootReadBlocks (
 **/
 EFI_STATUS
 UsbBootReadWriteBlocks (
-  IN  USB_MASS_DEVICE       *UsbMass,
-  IN  BOOLEAN               Write,
-  IN  UINT32                Lba,
-  IN  UINTN                 TotalBlock,
-  IN OUT UINT8              *Buffer
+  IN  USB_MASS_DEVICE  *UsbMass,
+  IN  BOOLEAN          Write,
+  IN  UINT32           Lba,
+  IN  UINTN            TotalBlock,
+  IN OUT UINT8         *Buffer
   );
 
 /**
@@ -311,11 +311,11 @@ UsbBootReadWriteBlocks (
 **/
 EFI_STATUS
 UsbBootReadWriteBlocks16 (
-  IN  USB_MASS_DEVICE       *UsbMass,
-  IN  BOOLEAN               Write,
-  IN  UINT64                Lba,
-  IN  UINTN                 TotalBlock,
-  IN OUT UINT8              *Buffer
+  IN  USB_MASS_DEVICE  *UsbMass,
+  IN  BOOLEAN          Write,
+  IN  UINT64           Lba,
+  IN  UINTN            TotalBlock,
+  IN OUT UINT8         *Buffer
   );
 
 /**
@@ -330,9 +330,8 @@ UsbBootReadWriteBlocks16 (
 **/
 EFI_STATUS
 UsbClearEndpointStall (
-  IN EFI_USB_IO_PROTOCOL    *UsbIo,
-  IN UINT8                  EndpointAddr
+  IN EFI_USB_IO_PROTOCOL  *UsbIo,
+  IN UINT8                EndpointAddr
   );
 
 #endif
-

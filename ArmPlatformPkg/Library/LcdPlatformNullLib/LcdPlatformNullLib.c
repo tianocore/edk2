@@ -20,7 +20,7 @@
 **/
 EFI_STATUS
 LcdPlatformInitializeDisplay (
-  IN EFI_HANDLE   Handle
+  IN EFI_HANDLE  Handle
   )
 {
   ASSERT (FALSE);
@@ -40,8 +40,8 @@ LcdPlatformInitializeDisplay (
 **/
 EFI_STATUS
 LcdPlatformGetVram (
-  OUT EFI_PHYSICAL_ADDRESS*                 VramBaseAddress,
-  OUT UINTN*                                VramSize
+  OUT EFI_PHYSICAL_ADDRESS  *VramBaseAddress,
+  OUT UINTN                 *VramSize
   )
 {
   ASSERT (FALSE);
@@ -73,7 +73,7 @@ LcdPlatformGetMaxMode (
 **/
 EFI_STATUS
 LcdPlatformSetMode (
-  IN UINT32                                 ModeNumber
+  IN UINT32  ModeNumber
   )
 {
   ASSERT (FALSE);
@@ -116,9 +116,9 @@ LcdPlatformQueryMode (
 **/
 EFI_STATUS
 LcdPlatformGetTimings (
-  IN  UINT32                              ModeNumber,
-  OUT SCAN_TIMINGS                        **Horizontal,
-  OUT SCAN_TIMINGS                        **Vertical
+  IN  UINT32        ModeNumber,
+  OUT SCAN_TIMINGS  **Horizontal,
+  OUT SCAN_TIMINGS  **Vertical
   )
 {
   ASSERT (FALSE);
@@ -136,8 +136,8 @@ LcdPlatformGetTimings (
 **/
 EFI_STATUS
 LcdPlatformGetBpp (
-  IN  UINT32                                ModeNumber,
-  OUT LCD_BPP*                              Bpp
+  IN  UINT32   ModeNumber,
+  OUT LCD_BPP  *Bpp
   )
 {
   ASSERT (FALSE);

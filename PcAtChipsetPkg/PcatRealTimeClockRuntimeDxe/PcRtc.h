@@ -8,10 +8,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef _RTC_H_
 #define _RTC_H_
-
 
 #include <Uefi.h>
 
@@ -33,10 +31,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/ReportStatusCodeLib.h>
 
 typedef struct {
-  EFI_LOCK  RtcLock;
-  INT16     SavedTimeZone;
-  UINT8     Daylight;
-  UINT8     CenturyRtcAddress;
+  EFI_LOCK    RtcLock;
+  INT16       SavedTimeZone;
+  UINT8       Daylight;
+  UINT8       CenturyRtcAddress;
 } PC_RTC_MODULE_GLOBALS;
 
 extern PC_RTC_MODULE_GLOBALS  mModuleGlobal;
@@ -62,73 +60,73 @@ extern PC_RTC_MODULE_GLOBALS  mModuleGlobal;
 // Date and time initial values.
 // They are used if the RTC values are invalid during driver initialization
 //
-#define RTC_INIT_SECOND 0
-#define RTC_INIT_MINUTE 0
-#define RTC_INIT_HOUR   0
-#define RTC_INIT_DAY    1
-#define RTC_INIT_MONTH  1
+#define RTC_INIT_SECOND  0
+#define RTC_INIT_MINUTE  0
+#define RTC_INIT_HOUR    0
+#define RTC_INIT_DAY     1
+#define RTC_INIT_MONTH   1
 
 #pragma pack(1)
 //
 // Register A
 //
 typedef struct {
-  UINT8 Rs : 4;   // Rate Selection Bits
-  UINT8 Dv : 3;   // Divisor
-  UINT8 Uip : 1;  // Update in progress
+  UINT8    Rs  : 4; // Rate Selection Bits
+  UINT8    Dv  : 3; // Divisor
+  UINT8    Uip : 1; // Update in progress
 } RTC_REGISTER_A_BITS;
 
 typedef union {
-  RTC_REGISTER_A_BITS Bits;
-  UINT8               Data;
+  RTC_REGISTER_A_BITS    Bits;
+  UINT8                  Data;
 } RTC_REGISTER_A;
 
 //
 // Register B
 //
 typedef struct {
-  UINT8 Dse : 1;  // 0 - Daylight saving disabled  1 - Daylight savings enabled
-  UINT8 Mil : 1;  // 0 - 12 hour mode              1 - 24 hour mode
-  UINT8 Dm : 1;   // 0 - BCD Format                1 - Binary Format
-  UINT8 Sqwe : 1; // 0 - Disable SQWE output       1 - Enable SQWE output
-  UINT8 Uie : 1;  // 0 - Update INT disabled       1 - Update INT enabled
-  UINT8 Aie : 1;  // 0 - Alarm INT disabled        1 - Alarm INT Enabled
-  UINT8 Pie : 1;  // 0 - Periodic INT disabled     1 - Periodic INT Enabled
-  UINT8 Set : 1;  // 0 - Normal operation.         1 - Updates inhibited
+  UINT8    Dse  : 1; // 0 - Daylight saving disabled  1 - Daylight savings enabled
+  UINT8    Mil  : 1; // 0 - 12 hour mode              1 - 24 hour mode
+  UINT8    Dm   : 1; // 0 - BCD Format                1 - Binary Format
+  UINT8    Sqwe : 1; // 0 - Disable SQWE output       1 - Enable SQWE output
+  UINT8    Uie  : 1; // 0 - Update INT disabled       1 - Update INT enabled
+  UINT8    Aie  : 1; // 0 - Alarm INT disabled        1 - Alarm INT Enabled
+  UINT8    Pie  : 1; // 0 - Periodic INT disabled     1 - Periodic INT Enabled
+  UINT8    Set  : 1; // 0 - Normal operation.         1 - Updates inhibited
 } RTC_REGISTER_B_BITS;
 
 typedef union {
-  RTC_REGISTER_B_BITS Bits;
-  UINT8               Data;
+  RTC_REGISTER_B_BITS    Bits;
+  UINT8                  Data;
 } RTC_REGISTER_B;
 
 //
 // Register C
 //
 typedef struct {
-  UINT8 Reserved : 4; // Read as zero.  Can not be written.
-  UINT8 Uf : 1;       // Update End Interrupt Flag
-  UINT8 Af : 1;       // Alarm Interrupt Flag
-  UINT8 Pf : 1;       // Periodic Interrupt Flag
-  UINT8 Irqf : 1;     // Interrupt Request Flag = PF & PIE | AF & AIE | UF & UIE
+  UINT8    Reserved : 4; // Read as zero.  Can not be written.
+  UINT8    Uf       : 1; // Update End Interrupt Flag
+  UINT8    Af       : 1; // Alarm Interrupt Flag
+  UINT8    Pf       : 1; // Periodic Interrupt Flag
+  UINT8    Irqf     : 1; // Interrupt Request Flag = PF & PIE | AF & AIE | UF & UIE
 } RTC_REGISTER_C_BITS;
 
 typedef union {
-  RTC_REGISTER_C_BITS Bits;
-  UINT8               Data;
+  RTC_REGISTER_C_BITS    Bits;
+  UINT8                  Data;
 } RTC_REGISTER_C;
 
 //
 // Register D
 //
 typedef struct {
-  UINT8 Reserved : 7; // Read as zero.  Can not be written.
-  UINT8 Vrt : 1;      // Valid RAM and Time
+  UINT8    Reserved : 7; // Read as zero.  Can not be written.
+  UINT8    Vrt      : 1; // Valid RAM and Time
 } RTC_REGISTER_D_BITS;
 
 typedef union {
-  RTC_REGISTER_D_BITS Bits;
-  UINT8               Data;
+  RTC_REGISTER_D_BITS    Bits;
+  UINT8                  Data;
 } RTC_REGISTER_D;
 
 #pragma pack()
@@ -180,9 +178,9 @@ PcRtcSetTime (
 **/
 EFI_STATUS
 PcRtcGetTime (
-  OUT EFI_TIME              *Time,
-  OUT EFI_TIME_CAPABILITIES *Capabilities, OPTIONAL
-  IN  PC_RTC_MODULE_GLOBALS *Global
+  OUT EFI_TIME               *Time,
+  OUT EFI_TIME_CAPABILITIES  *Capabilities  OPTIONAL,
+  IN  PC_RTC_MODULE_GLOBALS  *Global
   );
 
 /**
@@ -203,7 +201,7 @@ PcRtcGetTime (
 EFI_STATUS
 PcRtcSetWakeupTime (
   IN BOOLEAN                Enable,
-  IN EFI_TIME               *Time,  OPTIONAL
+  IN EFI_TIME               *Time   OPTIONAL,
   IN PC_RTC_MODULE_GLOBALS  *Global
   );
 
@@ -225,10 +223,10 @@ PcRtcSetWakeupTime (
 **/
 EFI_STATUS
 PcRtcGetWakeupTime (
-  OUT BOOLEAN               *Enabled,
-  OUT BOOLEAN               *Pending,
-  OUT EFI_TIME              *Time,
-  IN  PC_RTC_MODULE_GLOBALS *Global
+  OUT BOOLEAN                *Enabled,
+  OUT BOOLEAN                *Pending,
+  OUT EFI_TIME               *Time,
+  IN  PC_RTC_MODULE_GLOBALS  *Global
   );
 
 /**
@@ -247,8 +245,8 @@ PcRtcGetWakeupTime (
 EFI_STATUS
 EFIAPI
 InitializePcRtc (
-  IN EFI_HANDLE                            ImageHandle,
-  IN EFI_SYSTEM_TABLE                      *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
 /**
@@ -262,7 +260,7 @@ InitializePcRtc (
 **/
 EFI_STATUS
 RtcTimeFieldsValid (
-  IN EFI_TIME *Time
+  IN EFI_TIME  *Time
   );
 
 /**
@@ -281,7 +279,6 @@ ConvertEfiTimeToRtcTime (
   IN OUT EFI_TIME        *Time,
   IN     RTC_REGISTER_B  RegisterB
   );
-
 
 /**
   Converts time read from RTC to EFI_TIME format defined by UEFI spec.
@@ -316,7 +313,7 @@ ConvertRtcTimeToEfiTime (
 **/
 EFI_STATUS
 RtcWaitToUpdate (
-  UINTN Timeout
+  UINTN  Timeout
   );
 
 /**
@@ -342,7 +339,7 @@ DayValid (
 **/
 BOOLEAN
 IsLeapYear (
-  IN EFI_TIME   *Time
+  IN EFI_TIME  *Time
   );
 
 /**
@@ -368,7 +365,8 @@ GetCenturyRtcAddress (
 VOID
 EFIAPI
 PcRtcAcpiTableChangeCallback (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
+
 #endif

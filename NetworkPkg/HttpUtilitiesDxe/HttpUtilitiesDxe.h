@@ -33,7 +33,7 @@
 //
 // Protocol instances
 //
-extern EFI_HTTP_UTILITIES_PROTOCOL mHttpUtilitiesProtocol;
+extern EFI_HTTP_UTILITIES_PROTOCOL  mHttpUtilitiesProtocol;
 
 /**
   Create HTTP header based on a combination of seed header, fields
@@ -70,17 +70,16 @@ extern EFI_HTTP_UTILITIES_PROTOCOL mHttpUtilitiesProtocol;
 EFI_STATUS
 EFIAPI
 HttpUtilitiesBuild (
-  IN     EFI_HTTP_UTILITIES_PROTOCOL *This,
-  IN     UINTN                       SeedMessageSize,
-  IN     VOID                        *SeedMessage, OPTIONAL
-  IN     UINTN                       DeleteCount,
-  IN     CHAR8                       *DeleteList[], OPTIONAL
-  IN     UINTN                       AppendCount,
-  IN     EFI_HTTP_HEADER             *AppendList[], OPTIONAL
-     OUT UINTN                       *NewMessageSize,
-     OUT VOID                        **NewMessage
+  IN     EFI_HTTP_UTILITIES_PROTOCOL  *This,
+  IN     UINTN                        SeedMessageSize,
+  IN     VOID                         *SeedMessage  OPTIONAL,
+  IN     UINTN                        DeleteCount,
+  IN     CHAR8                        *DeleteList[]  OPTIONAL,
+  IN     UINTN                        AppendCount,
+  IN     EFI_HTTP_HEADER              *AppendList[]  OPTIONAL,
+  OUT UINTN                           *NewMessageSize,
+  OUT VOID                            **NewMessage
   );
-
 
 /**
   Parses HTTP header and produces an array of key/value pairs.

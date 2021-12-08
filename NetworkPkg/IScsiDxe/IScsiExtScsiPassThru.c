@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "IScsiImpl.h"
 
-EFI_EXT_SCSI_PASS_THRU_PROTOCOL gIScsiExtScsiPassThruProtocolTemplate = {
+EFI_EXT_SCSI_PASS_THRU_PROTOCOL  gIScsiExtScsiPassThruProtocolTemplate = {
   NULL,
   IScsiExtScsiPassThruFunction,
   IScsiExtScsiPassThruGetNextTargetLun,
@@ -18,7 +18,6 @@ EFI_EXT_SCSI_PASS_THRU_PROTOCOL gIScsiExtScsiPassThruProtocolTemplate = {
   IScsiExtScsiPassThruResetTargetLun,
   IScsiExtScsiPassThruGetNextTarget
 };
-
 
 /**
   Sends a SCSI Request Packet to a SCSI device that is attached to the SCSI channel.
@@ -73,11 +72,11 @@ EFI_EXT_SCSI_PASS_THRU_PROTOCOL gIScsiExtScsiPassThruProtocolTemplate = {
 EFI_STATUS
 EFIAPI
 IScsiExtScsiPassThruFunction (
-  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                          *This,
-  IN UINT8                                                    *Target,
-  IN UINT64                                                   Lun,
-  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET           *Packet,
-  IN EFI_EVENT                                                Event     OPTIONAL
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                 *This,
+  IN UINT8                                           *Target,
+  IN UINT64                                          Lun,
+  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet,
+  IN EFI_EVENT                                       Event     OPTIONAL
   )
 {
   EFI_STATUS         Status;
@@ -106,7 +105,6 @@ IScsiExtScsiPassThruFunction (
 
   return Status;
 }
-
 
 /**
   Used to retrieve the list of legal Target IDs and LUNs for SCSI devices on
@@ -145,14 +143,14 @@ IScsiExtScsiPassThruGetNextTargetLun (
   IN OUT UINT64                       *Lun
   )
 {
-  ISCSI_DRIVER_DATA           *Private;
-  ISCSI_SESSION_CONFIG_NVDATA *ConfigNvData;
-  UINT8                       TargetId[TARGET_MAX_BYTES];
+  ISCSI_DRIVER_DATA            *Private;
+  ISCSI_SESSION_CONFIG_NVDATA  *ConfigNvData;
+  UINT8                        TargetId[TARGET_MAX_BYTES];
 
-  Private       = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (This);
-  ConfigNvData  = &Private->Session->ConfigData->SessionConfigData;
+  Private      = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (This);
+  ConfigNvData = &Private->Session->ConfigData->SessionConfigData;
 
-  if ((*Target)[0] == 0 && (CompareMem (Lun, ConfigNvData->BootLun, sizeof (UINT64)) == 0)) {
+  if (((*Target)[0] == 0) && (CompareMem (Lun, ConfigNvData->BootLun, sizeof (UINT64)) == 0)) {
     //
     // Only one <Target, Lun> pair per iSCSI Driver instance.
     //
@@ -169,7 +167,6 @@ IScsiExtScsiPassThruGetNextTargetLun (
 
   return EFI_INVALID_PARAMETER;
 }
-
 
 /**
   Allocate and build a device path node for a SCSI device on a SCSI channel.
@@ -206,12 +203,12 @@ IScsiExtScsiPassThruBuildDevicePath (
   IN OUT EFI_DEVICE_PATH_PROTOCOL     **DevicePath
   )
 {
-  ISCSI_DRIVER_DATA             *Private;
-  ISCSI_SESSION                 *Session;
-  ISCSI_SESSION_CONFIG_NVDATA   *ConfigNvData;
-  ISCSI_CHAP_AUTH_CONFIG_NVDATA *AuthConfig;
-  EFI_DEV_PATH                  *Node;
-  UINTN                         DevPathNodeLen;
+  ISCSI_DRIVER_DATA              *Private;
+  ISCSI_SESSION                  *Session;
+  ISCSI_SESSION_CONFIG_NVDATA    *ConfigNvData;
+  ISCSI_CHAP_AUTH_CONFIG_NVDATA  *AuthConfig;
+  EFI_DEV_PATH                   *Node;
+  UINTN                          DevPathNodeLen;
 
   if (DevicePath == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -221,17 +218,17 @@ IScsiExtScsiPassThruBuildDevicePath (
     return EFI_NOT_FOUND;
   }
 
-  Private       = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (This);
-  Session       = Private->Session;
-  ConfigNvData  = &Session->ConfigData->SessionConfigData;
-  AuthConfig    = Session->AuthData.CHAP.AuthConfig;
+  Private      = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (This);
+  Session      = Private->Session;
+  ConfigNvData = &Session->ConfigData->SessionConfigData;
+  AuthConfig   = Session->AuthData.CHAP.AuthConfig;
 
   if (CompareMem (&Lun, ConfigNvData->BootLun, sizeof (UINT64)) != 0) {
     return EFI_NOT_FOUND;
   }
 
-  DevPathNodeLen  = sizeof (ISCSI_DEVICE_PATH) + AsciiStrLen (ConfigNvData->TargetName) + 1;
-  Node            = AllocateZeroPool (DevPathNodeLen);
+  DevPathNodeLen = sizeof (ISCSI_DEVICE_PATH) + AsciiStrLen (ConfigNvData->TargetName) + 1;
+  Node           = AllocateZeroPool (DevPathNodeLen);
   if (Node == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -245,35 +242,35 @@ IScsiExtScsiPassThruBuildDevicePath (
   //
   Node->Iscsi.NetworkProtocol = 0;
 
-  Node->Iscsi.LoginOption     = 0;
+  Node->Iscsi.LoginOption = 0;
 
   switch (Session->AuthType) {
-  case ISCSI_AUTH_TYPE_NONE:
-    Node->Iscsi.LoginOption |= 0x0800;
-    break;
+    case ISCSI_AUTH_TYPE_NONE:
+      Node->Iscsi.LoginOption |= 0x0800;
+      break;
 
-  case ISCSI_AUTH_TYPE_CHAP:
-    //
-    // Bit12: 0=CHAP_BI, 1=CHAP_UNI
-    //
-    if (AuthConfig->CHAPType == ISCSI_CHAP_UNI) {
-      Node->Iscsi.LoginOption |= 0x1000;
-    }
-    break;
+    case ISCSI_AUTH_TYPE_CHAP:
+      //
+      // Bit12: 0=CHAP_BI, 1=CHAP_UNI
+      //
+      if (AuthConfig->CHAPType == ISCSI_CHAP_UNI) {
+        Node->Iscsi.LoginOption |= 0x1000;
+      }
 
-  default:
-    break;
+      break;
+
+    default:
+      break;
   }
 
   CopyMem (&Node->Iscsi.Lun, ConfigNvData->BootLun, sizeof (UINT64));
   Node->Iscsi.TargetPortalGroupTag = Session->TargetPortalGroupTag;
-  AsciiStrCpyS ((CHAR8 *) Node + sizeof (ISCSI_DEVICE_PATH), AsciiStrLen (ConfigNvData->TargetName) + 1, ConfigNvData->TargetName);
+  AsciiStrCpyS ((CHAR8 *)Node + sizeof (ISCSI_DEVICE_PATH), AsciiStrLen (ConfigNvData->TargetName) + 1, ConfigNvData->TargetName);
 
-  *DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) Node;
+  *DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)Node;
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Translate a device path node to a Target ID and LUN.
@@ -305,8 +302,8 @@ IScsiExtScsiPassThruGetTargetLun (
   OUT UINT64                          *Lun
   )
 {
-  ISCSI_DRIVER_DATA           *Private;
-  ISCSI_SESSION_CONFIG_NVDATA *ConfigNvData;
+  ISCSI_DRIVER_DATA            *Private;
+  ISCSI_SESSION_CONFIG_NVDATA  *ConfigNvData;
 
   if ((DevicePath == NULL) || (Target == NULL) || (Lun == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -315,17 +312,18 @@ IScsiExtScsiPassThruGetTargetLun (
   if ((DevicePath->Type != MESSAGING_DEVICE_PATH) ||
       (DevicePath->SubType != MSG_ISCSI_DP) ||
       (DevicePathNodeLength (DevicePath) <= sizeof (ISCSI_DEVICE_PATH))
-      ) {
+      )
+  {
     return EFI_UNSUPPORTED;
   }
 
-  Private       = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (This);
-  ConfigNvData  = &Private->Session->ConfigData->SessionConfigData;
+  Private      = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (This);
+  ConfigNvData = &Private->Session->ConfigData->SessionConfigData;
 
   SetMem (*Target, TARGET_MAX_BYTES, 0xFF);
   (*Target)[0] = 0;
 
-  if (AsciiStrCmp (ConfigNvData->TargetName, (CHAR8 *) DevicePath + sizeof (ISCSI_DEVICE_PATH)) != 0) {
+  if (AsciiStrCmp (ConfigNvData->TargetName, (CHAR8 *)DevicePath + sizeof (ISCSI_DEVICE_PATH)) != 0) {
     return EFI_UNSUPPORTED;
   }
 
@@ -333,7 +331,6 @@ IScsiExtScsiPassThruGetTargetLun (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Resets a SCSI channel. This operation resets all the SCSI devices connected to
@@ -352,7 +349,6 @@ IScsiExtScsiPassThruResetChannel (
 {
   return EFI_UNSUPPORTED;
 }
-
 
 /**
   Resets a SCSI device that is connected to a SCSI channel.
@@ -403,7 +399,7 @@ IScsiExtScsiPassThruGetNextTarget (
   IN OUT UINT8                        **Target
   )
 {
-  UINT8 TargetId[TARGET_MAX_BYTES];
+  UINT8  TargetId[TARGET_MAX_BYTES];
 
   SetMem (TargetId, TARGET_MAX_BYTES, 0xFF);
 
@@ -416,4 +412,3 @@ IScsiExtScsiPassThruGetNextTarget (
     return EFI_INVALID_PARAMETER;
   }
 }
-

@@ -38,4 +38,3 @@ InternalGetPerformanceCounterFrequency (
 {
   return CpuidCoreClockCalculateTscFrequency ();
 }
-

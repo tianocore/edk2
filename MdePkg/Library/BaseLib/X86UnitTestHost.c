@@ -59,25 +59,29 @@ STATIC IA32_DESCRIPTOR  mUnitTestHostBaseLibIdtr;
 UINT32
 EFIAPI
 UnitTestHostBaseLibAsmCpuid (
-  IN      UINT32                    Index,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
-  OUT     UINT32                    *Edx   OPTIONAL
+  IN      UINT32  Index,
+  OUT     UINT32  *Eax   OPTIONAL,
+  OUT     UINT32  *Ebx   OPTIONAL,
+  OUT     UINT32  *Ecx   OPTIONAL,
+  OUT     UINT32  *Edx   OPTIONAL
   )
 {
   if (Eax != NULL) {
     *Eax = 0;
   }
+
   if (Ebx != NULL) {
     *Ebx = 0;
   }
+
   if (Ecx != NULL) {
     *Ecx = 0;
   }
+
   if (Edx != NULL) {
     *Edx = 0;
   }
+
   return Index;
 }
 
@@ -116,26 +120,30 @@ UnitTestHostBaseLibAsmCpuid (
 UINT32
 EFIAPI
 UnitTestHostBaseLibAsmCpuidEx (
-  IN      UINT32                    Index,
-  IN      UINT32                    SubIndex,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
-  OUT     UINT32                    *Edx   OPTIONAL
+  IN      UINT32  Index,
+  IN      UINT32  SubIndex,
+  OUT     UINT32  *Eax   OPTIONAL,
+  OUT     UINT32  *Ebx   OPTIONAL,
+  OUT     UINT32  *Ecx   OPTIONAL,
+  OUT     UINT32  *Edx   OPTIONAL
   )
 {
   if (Eax != NULL) {
     *Eax = 0;
   }
+
   if (Ebx != NULL) {
     *Ebx = 0;
   }
+
   if (Ecx != NULL) {
     *Ecx = 0;
   }
+
   if (Edx != NULL) {
     *Edx = 0;
   }
+
   return Index;
 }
 
@@ -186,15 +194,17 @@ UnitTestHostBaseLibAsmEnableCache (
 UINT64
 EFIAPI
 UnitTestHostBaseLibAsmReadMsr64 (
-  IN      UINT32                    Index
+  IN      UINT32  Index
   )
 {
   if (Index < 0x1000) {
     return mUnitTestHostBaseLibMsr[0][Index];
   }
-  if (Index >= 0xC0000000 && Index < 0xC0001000) {
+
+  if ((Index >= 0xC0000000) && (Index < 0xC0001000)) {
     return mUnitTestHostBaseLibMsr[1][Index];
   }
+
   return 0;
 }
 
@@ -218,16 +228,18 @@ UnitTestHostBaseLibAsmReadMsr64 (
 UINT64
 EFIAPI
 UnitTestHostBaseLibAsmWriteMsr64 (
-  IN      UINT32                    Index,
-  IN      UINT64                    Value
+  IN      UINT32  Index,
+  IN      UINT64  Value
   )
 {
   if (Index < 0x1000) {
     mUnitTestHostBaseLibMsr[0][Index] = Value;
   }
-  if (Index >= 0xC0000000 && Index < 0xC0001000) {
+
+  if ((Index >= 0xC0000000) && (Index < 0xC0001000)) {
     mUnitTestHostBaseLibMsr[1][Index - 0xC00000000] = Value;
   }
+
   return Value;
 }
 
@@ -851,7 +863,7 @@ UnitTestHostBaseLibAsmReadTr (
 VOID
 EFIAPI
 UnitTestHostBaseLibAsmReadGdtr (
-  OUT     IA32_DESCRIPTOR           *Gdtr
+  OUT     IA32_DESCRIPTOR  *Gdtr
   )
 {
   Gdtr = &mUnitTestHostBaseLibGdtr;
@@ -871,7 +883,7 @@ UnitTestHostBaseLibAsmReadGdtr (
 VOID
 EFIAPI
 UnitTestHostBaseLibAsmWriteGdtr (
-  IN      CONST IA32_DESCRIPTOR     *Gdtr
+  IN      CONST IA32_DESCRIPTOR  *Gdtr
   )
 {
   CopyMem (&mUnitTestHostBaseLibGdtr, Gdtr, sizeof (IA32_DESCRIPTOR));
@@ -891,7 +903,7 @@ UnitTestHostBaseLibAsmWriteGdtr (
 VOID
 EFIAPI
 UnitTestHostBaseLibAsmReadIdtr (
-  OUT     IA32_DESCRIPTOR           *Idtr
+  OUT     IA32_DESCRIPTOR  *Idtr
   )
 {
   Idtr = &mUnitTestHostBaseLibIdtr;
@@ -911,7 +923,7 @@ UnitTestHostBaseLibAsmReadIdtr (
 VOID
 EFIAPI
 UnitTestHostBaseLibAsmWriteIdtr (
-  IN      CONST IA32_DESCRIPTOR     *Idtr
+  IN      CONST IA32_DESCRIPTOR  *Idtr
   )
 {
   CopyMem (&mUnitTestHostBaseLibIdtr, Idtr, sizeof (IA32_DESCRIPTOR));
@@ -947,7 +959,7 @@ UnitTestHostBaseLibAsmReadLdtr (
 VOID
 EFIAPI
 UnitTestHostBaseLibAsmWriteLdtr (
-  IN      UINT16                    Ldtr
+  IN      UINT16  Ldtr
   )
 {
   mUnitTestHostBaseLibSegment[UNIT_TEST_HOST_BASE_LIB_SEGMENT_LDTR] = Ldtr;
@@ -967,7 +979,7 @@ UnitTestHostBaseLibAsmWriteLdtr (
 UINT64
 EFIAPI
 UnitTestHostBaseLibAsmReadPmc (
-  IN      UINT32                    Index
+  IN      UINT32  Index
   )
 {
   return 0;
@@ -992,9 +1004,9 @@ UnitTestHostBaseLibAsmReadPmc (
 UINTN
 EFIAPI
 UnitTestHostBaseLibAsmMonitor (
-  IN      UINTN                     Eax,
-  IN      UINTN                     Ecx,
-  IN      UINTN                     Edx
+  IN      UINTN  Eax,
+  IN      UINTN  Ecx,
+  IN      UINTN  Edx
   )
 {
   return Eax;
@@ -1017,8 +1029,8 @@ UnitTestHostBaseLibAsmMonitor (
 UINTN
 EFIAPI
 UnitTestHostBaseLibAsmMwait (
-  IN      UINTN                     Eax,
-  IN      UINTN                     Ecx
+  IN      UINTN  Eax,
+  IN      UINTN  Ecx
   )
 {
   return Eax;
@@ -1072,7 +1084,7 @@ UnitTestHostBaseLibAsmInvd (
 VOID *
 EFIAPI
 UnitTestHostBaseLibAsmFlushCacheLine (
-  IN      VOID                      *LinearAddress
+  IN      VOID  *LinearAddress
   )
 {
   return LinearAddress;
@@ -1119,8 +1131,8 @@ VOID
 EFIAPI
 UnitTestHostBaseLibAsmEnablePaging32 (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1   OPTIONAL,
+  IN      VOID                      *Context2   OPTIONAL,
   IN      VOID                      *NewStack
   )
 {
@@ -1165,8 +1177,8 @@ VOID
 EFIAPI
 UnitTestHostBaseLibAsmDisablePaging32 (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1   OPTIONAL,
+  IN      VOID                      *Context2   OPTIONAL,
   IN      VOID                      *NewStack
   )
 {
@@ -1208,11 +1220,11 @@ UnitTestHostBaseLibAsmDisablePaging32 (
 VOID
 EFIAPI
 UnitTestHostBaseLibAsmEnablePaging64 (
-  IN      UINT16                    Cs,
-  IN      UINT64                    EntryPoint,
-  IN      UINT64                    Context1,  OPTIONAL
-  IN      UINT64                    Context2,  OPTIONAL
-  IN      UINT64                    NewStack
+  IN      UINT16  Cs,
+  IN      UINT64  EntryPoint,
+  IN      UINT64  Context1   OPTIONAL,
+  IN      UINT64  Context2   OPTIONAL,
+  IN      UINT64  NewStack
   )
 {
   SWITCH_STACK_ENTRY_POINT  NewEntryPoint;
@@ -1254,11 +1266,11 @@ UnitTestHostBaseLibAsmEnablePaging64 (
 VOID
 EFIAPI
 UnitTestHostBaseLibAsmDisablePaging64 (
-  IN      UINT16                    Cs,
-  IN      UINT32                    EntryPoint,
-  IN      UINT32                    Context1,  OPTIONAL
-  IN      UINT32                    Context2,  OPTIONAL
-  IN      UINT32                    NewStack
+  IN      UINT16  Cs,
+  IN      UINT32  EntryPoint,
+  IN      UINT32  Context1   OPTIONAL,
+  IN      UINT32  Context2   OPTIONAL,
+  IN      UINT32  NewStack
   )
 {
   SWITCH_STACK_ENTRY_POINT  NewEntryPoint;
@@ -1291,8 +1303,8 @@ UnitTestHostBaseLibAsmDisablePaging64 (
 VOID
 EFIAPI
 UnitTestHostBaseLibAsmGetThunk16Properties (
-  OUT     UINT32                    *RealModeBufferSize,
-  OUT     UINT32                    *ExtraStackSize
+  OUT     UINT32  *RealModeBufferSize,
+  OUT     UINT32  *ExtraStackSize
   )
 {
   *RealModeBufferSize = 0;
@@ -1316,7 +1328,7 @@ UnitTestHostBaseLibAsmGetThunk16Properties (
 VOID
 EFIAPI
 UnitTestHostBaseLibAsmPrepareThunk16 (
-  IN OUT  THUNK_CONTEXT             *ThunkContext
+  IN OUT  THUNK_CONTEXT  *ThunkContext
   )
 {
 }
@@ -1377,7 +1389,7 @@ UnitTestHostBaseLibAsmPrepareThunk16 (
 VOID
 EFIAPI
 UnitTestHostBaseLibAsmThunk16 (
-  IN OUT  THUNK_CONTEXT             *ThunkContext
+  IN OUT  THUNK_CONTEXT  *ThunkContext
   )
 {
 }
@@ -1405,7 +1417,7 @@ UnitTestHostBaseLibAsmThunk16 (
 VOID
 EFIAPI
 UnitTestHostBaseLibAsmPrepareAndThunk16 (
-  IN OUT  THUNK_CONTEXT             *ThunkContext
+  IN OUT  THUNK_CONTEXT  *ThunkContext
   )
 {
 }
@@ -1418,7 +1430,7 @@ UnitTestHostBaseLibAsmPrepareAndThunk16 (
 VOID
 EFIAPI
 UnitTestHostBaseLibAsmWriteTr (
-  IN UINT16 Selector
+  IN UINT16  Selector
   )
 {
   mUnitTestHostBaseLibSegment[UNIT_TEST_HOST_BASE_LIB_SEGMENT_TR] = Selector;
@@ -1476,9 +1488,9 @@ UnitTestHostBaseLibAsmLfence (
 VOID
 EFIAPI
 UnitTestHostBaseLibPatchInstructionX86 (
-  OUT X86_ASSEMBLY_PATCH_LABEL *InstructionEnd,
-  IN  UINT64                   PatchValue,
-  IN  UINTN                    ValueSize
+  OUT X86_ASSEMBLY_PATCH_LABEL  *InstructionEnd,
+  IN  UINT64                    PatchValue,
+  IN  UINTN                     ValueSize
   )
 {
 }
@@ -1511,11 +1523,11 @@ UnitTestHostBaseLibPatchInstructionX86 (
 UINT32
 EFIAPI
 AsmCpuid (
-  IN      UINT32                    Index,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
-  OUT     UINT32                    *Edx   OPTIONAL
+  IN      UINT32  Index,
+  OUT     UINT32  *Eax   OPTIONAL,
+  OUT     UINT32  *Ebx   OPTIONAL,
+  OUT     UINT32  *Ecx   OPTIONAL,
+  OUT     UINT32  *Edx   OPTIONAL
   )
 {
   return gUnitTestHostBaseLib.X86->AsmCpuid (Index, Eax, Ebx, Ecx, Edx);
@@ -1556,12 +1568,12 @@ AsmCpuid (
 UINT32
 EFIAPI
 AsmCpuidEx (
-  IN      UINT32                    Index,
-  IN      UINT32                    SubIndex,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
-  OUT     UINT32                    *Edx   OPTIONAL
+  IN      UINT32  Index,
+  IN      UINT32  SubIndex,
+  OUT     UINT32  *Eax   OPTIONAL,
+  OUT     UINT32  *Ebx   OPTIONAL,
+  OUT     UINT32  *Ecx   OPTIONAL,
+  OUT     UINT32  *Edx   OPTIONAL
   )
 {
   return gUnitTestHostBaseLib.X86->AsmCpuidEx (Index, SubIndex, Eax, Ebx, Ecx, Edx);
@@ -1616,7 +1628,7 @@ AsmEnableCache (
 UINT64
 EFIAPI
 AsmReadMsr64 (
-  IN      UINT32                    Index
+  IN      UINT32  Index
   )
 {
   return gUnitTestHostBaseLib.X86->AsmReadMsr64 (Index);
@@ -1642,8 +1654,8 @@ AsmReadMsr64 (
 UINT64
 EFIAPI
 AsmWriteMsr64 (
-  IN      UINT32                    Index,
-  IN      UINT64                    Value
+  IN      UINT32  Index,
+  IN      UINT64  Value
   )
 {
   return gUnitTestHostBaseLib.X86->AsmWriteMsr64 (Index, Value);
@@ -2257,7 +2269,7 @@ AsmReadTr (
 VOID
 EFIAPI
 AsmReadGdtr (
-  OUT     IA32_DESCRIPTOR           *Gdtr
+  OUT     IA32_DESCRIPTOR  *Gdtr
   )
 {
   gUnitTestHostBaseLib.X86->AsmReadGdtr (Gdtr);
@@ -2277,7 +2289,7 @@ AsmReadGdtr (
 VOID
 EFIAPI
 AsmWriteGdtr (
-  IN      CONST IA32_DESCRIPTOR     *Gdtr
+  IN      CONST IA32_DESCRIPTOR  *Gdtr
   )
 {
   gUnitTestHostBaseLib.X86->AsmWriteGdtr (Gdtr);
@@ -2297,7 +2309,7 @@ AsmWriteGdtr (
 VOID
 EFIAPI
 AsmReadIdtr (
-  OUT     IA32_DESCRIPTOR           *Idtr
+  OUT     IA32_DESCRIPTOR  *Idtr
   )
 {
   gUnitTestHostBaseLib.X86->AsmReadIdtr (Idtr);
@@ -2317,7 +2329,7 @@ AsmReadIdtr (
 VOID
 EFIAPI
 AsmWriteIdtr (
-  IN      CONST IA32_DESCRIPTOR     *Idtr
+  IN      CONST IA32_DESCRIPTOR  *Idtr
   )
 {
   gUnitTestHostBaseLib.X86->AsmWriteIdtr (Idtr);
@@ -2353,7 +2365,7 @@ AsmReadLdtr (
 VOID
 EFIAPI
 AsmWriteLdtr (
-  IN      UINT16                    Ldtr
+  IN      UINT16  Ldtr
   )
 {
   gUnitTestHostBaseLib.X86->AsmWriteLdtr (Ldtr);
@@ -2373,7 +2385,7 @@ AsmWriteLdtr (
 UINT64
 EFIAPI
 AsmReadPmc (
-  IN      UINT32                    Index
+  IN      UINT32  Index
   )
 {
   return gUnitTestHostBaseLib.X86->AsmReadPmc (Index);
@@ -2398,9 +2410,9 @@ AsmReadPmc (
 UINTN
 EFIAPI
 AsmMonitor (
-  IN      UINTN                     Eax,
-  IN      UINTN                     Ecx,
-  IN      UINTN                     Edx
+  IN      UINTN  Eax,
+  IN      UINTN  Ecx,
+  IN      UINTN  Edx
   )
 {
   return gUnitTestHostBaseLib.X86->AsmMonitor (Eax, Ecx, Edx);
@@ -2423,8 +2435,8 @@ AsmMonitor (
 UINTN
 EFIAPI
 AsmMwait (
-  IN      UINTN                     Eax,
-  IN      UINTN                     Ecx
+  IN      UINTN  Eax,
+  IN      UINTN  Ecx
   )
 {
   return gUnitTestHostBaseLib.X86->AsmMwait (Eax, Ecx);
@@ -2480,7 +2492,7 @@ AsmInvd (
 VOID *
 EFIAPI
 AsmFlushCacheLine (
-  IN      VOID                      *LinearAddress
+  IN      VOID  *LinearAddress
   )
 {
   return gUnitTestHostBaseLib.X86->AsmFlushCacheLine (LinearAddress);
@@ -2527,8 +2539,8 @@ VOID
 EFIAPI
 AsmEnablePaging32 (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1   OPTIONAL,
+  IN      VOID                      *Context2   OPTIONAL,
   IN      VOID                      *NewStack
   )
 {
@@ -2573,8 +2585,8 @@ VOID
 EFIAPI
 AsmDisablePaging32 (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1   OPTIONAL,
+  IN      VOID                      *Context2   OPTIONAL,
   IN      VOID                      *NewStack
   )
 {
@@ -2616,11 +2628,11 @@ AsmDisablePaging32 (
 VOID
 EFIAPI
 AsmEnablePaging64 (
-  IN      UINT16                    Cs,
-  IN      UINT64                    EntryPoint,
-  IN      UINT64                    Context1,  OPTIONAL
-  IN      UINT64                    Context2,  OPTIONAL
-  IN      UINT64                    NewStack
+  IN      UINT16  Cs,
+  IN      UINT64  EntryPoint,
+  IN      UINT64  Context1   OPTIONAL,
+  IN      UINT64  Context2   OPTIONAL,
+  IN      UINT64  NewStack
   )
 {
   gUnitTestHostBaseLib.X86->AsmEnablePaging64 (Cs, EntryPoint, Context1, Context2, NewStack);
@@ -2659,11 +2671,11 @@ AsmEnablePaging64 (
 VOID
 EFIAPI
 AsmDisablePaging64 (
-  IN      UINT16                    Cs,
-  IN      UINT32                    EntryPoint,
-  IN      UINT32                    Context1,  OPTIONAL
-  IN      UINT32                    Context2,  OPTIONAL
-  IN      UINT32                    NewStack
+  IN      UINT16  Cs,
+  IN      UINT32  EntryPoint,
+  IN      UINT32  Context1   OPTIONAL,
+  IN      UINT32  Context2   OPTIONAL,
+  IN      UINT32  NewStack
   )
 {
   gUnitTestHostBaseLib.X86->AsmDisablePaging64 (Cs, EntryPoint, Context1, Context2, NewStack);
@@ -2693,8 +2705,8 @@ AsmDisablePaging64 (
 VOID
 EFIAPI
 AsmGetThunk16Properties (
-  OUT     UINT32                    *RealModeBufferSize,
-  OUT     UINT32                    *ExtraStackSize
+  OUT     UINT32  *RealModeBufferSize,
+  OUT     UINT32  *ExtraStackSize
   )
 {
   gUnitTestHostBaseLib.X86->AsmGetThunk16Properties (RealModeBufferSize, ExtraStackSize);
@@ -2717,7 +2729,7 @@ AsmGetThunk16Properties (
 VOID
 EFIAPI
 AsmPrepareThunk16 (
-  IN OUT  THUNK_CONTEXT             *ThunkContext
+  IN OUT  THUNK_CONTEXT  *ThunkContext
   )
 {
   gUnitTestHostBaseLib.X86->AsmPrepareThunk16 (ThunkContext);
@@ -2779,7 +2791,7 @@ AsmPrepareThunk16 (
 VOID
 EFIAPI
 AsmThunk16 (
-  IN OUT  THUNK_CONTEXT             *ThunkContext
+  IN OUT  THUNK_CONTEXT  *ThunkContext
   )
 {
   gUnitTestHostBaseLib.X86->AsmThunk16 (ThunkContext);
@@ -2808,7 +2820,7 @@ AsmThunk16 (
 VOID
 EFIAPI
 AsmPrepareAndThunk16 (
-  IN OUT  THUNK_CONTEXT             *ThunkContext
+  IN OUT  THUNK_CONTEXT  *ThunkContext
   )
 {
   gUnitTestHostBaseLib.X86->AsmPrepareAndThunk16 (ThunkContext);
@@ -2822,7 +2834,7 @@ AsmPrepareAndThunk16 (
 VOID
 EFIAPI
 AsmWriteTr (
-  IN UINT16 Selector
+  IN UINT16  Selector
   )
 {
   gUnitTestHostBaseLib.X86->AsmWriteTr (Selector);
@@ -2881,9 +2893,9 @@ AsmLfence (
 VOID
 EFIAPI
 PatchInstructionX86 (
-  OUT X86_ASSEMBLY_PATCH_LABEL *InstructionEnd,
-  IN  UINT64                   PatchValue,
-  IN  UINTN                    ValueSize
+  OUT X86_ASSEMBLY_PATCH_LABEL  *InstructionEnd,
+  IN  UINT64                    PatchValue,
+  IN  UINTN                     ValueSize
   )
 {
   gUnitTestHostBaseLib.X86->PatchInstructionX86 (InstructionEnd, PatchValue, ValueSize);

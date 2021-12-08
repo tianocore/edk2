@@ -22,7 +22,7 @@ GetCachedIdleByPass (
   VOID
   )
 {
-  return PcdGet8(PcdCRBIdleByPass);
+  return PcdGet8 (PcdCRBIdleByPass);
 }
 
 /**
@@ -35,7 +35,7 @@ GetCachedPtpInterface (
   VOID
   )
 {
-  return PcdGet8(PcdActiveTpmInterfaceType);
+  return PcdGet8 (PcdActiveTpmInterfaceType);
 }
 
 /**
@@ -54,14 +54,14 @@ InternalTpm2DeviceLibDTpmCommonConstructor (
   //
   // Cache current active TpmInterfaceType only when needed
   //
-  if (PcdGet8(PcdActiveTpmInterfaceType) == 0xFF) {
-    PtpInterface = Tpm2GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
-    PcdSet8S(PcdActiveTpmInterfaceType, PtpInterface);
+  if (PcdGet8 (PcdActiveTpmInterfaceType) == 0xFF) {
+    PtpInterface = Tpm2GetPtpInterface ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
+    PcdSet8S (PcdActiveTpmInterfaceType, PtpInterface);
   }
 
-  if (PcdGet8(PcdActiveTpmInterfaceType) == Tpm2PtpInterfaceCrb && PcdGet8(PcdCRBIdleByPass) == 0xFF) {
-    IdleByPass = Tpm2GetIdleByPass((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
-    PcdSet8S(PcdCRBIdleByPass, IdleByPass);
+  if ((PcdGet8 (PcdActiveTpmInterfaceType) == Tpm2PtpInterfaceCrb) && (PcdGet8 (PcdCRBIdleByPass) == 0xFF)) {
+    IdleByPass = Tpm2GetIdleByPass ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
+    PcdSet8S (PcdCRBIdleByPass, IdleByPass);
   }
 
   return EFI_SUCCESS;

@@ -9,7 +9,6 @@
 
 #include "UefiPayloadEntry.h"
 
-
 /**
   Find the board related info from ACPI table
 
@@ -22,22 +21,22 @@
 **/
 RETURN_STATUS
 ParseAcpiInfo (
-  IN   UINT64                                   AcpiTableBase,
-  OUT  ACPI_BOARD_INFO                          *AcpiBoardInfo
+  IN   UINT64           AcpiTableBase,
+  OUT  ACPI_BOARD_INFO  *AcpiBoardInfo
   )
 {
-  EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp;
-  EFI_ACPI_DESCRIPTION_HEADER                   *Rsdt;
-  UINT32                                        *Entry32;
-  UINTN                                         Entry32Num;
-  EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE     *Fadt;
-  EFI_ACPI_DESCRIPTION_HEADER                   *Xsdt;
-  UINT64                                        *Entry64;
-  UINTN                                         Entry64Num;
-  UINTN                                         Idx;
-  UINT32                                        *Signature;
-  EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER *MmCfgHdr;
-  EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE *MmCfgBase;
+  EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER                                           *Rsdp;
+  EFI_ACPI_DESCRIPTION_HEADER                                                            *Rsdt;
+  UINT32                                                                                 *Entry32;
+  UINTN                                                                                  Entry32Num;
+  EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE                                              *Fadt;
+  EFI_ACPI_DESCRIPTION_HEADER                                                            *Xsdt;
+  UINT64                                                                                 *Entry64;
+  UINTN                                                                                  Entry64Num;
+  UINTN                                                                                  Idx;
+  UINT32                                                                                 *Signature;
+  EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER                         *MmCfgHdr;
+  EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE  *MmCfgBase;
 
   Rsdp = (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER *)(UINTN)AcpiTableBase;
   DEBUG ((DEBUG_INFO, "Rsdp at 0x%p\n", Rsdp));
@@ -50,8 +49,8 @@ ParseAcpiInfo (
   MmCfgHdr = NULL;
   Rsdt     = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)(Rsdp->RsdtAddress);
   if (Rsdt != NULL) {
-    Entry32  = (UINT32 *)(Rsdt + 1);
-    Entry32Num = (Rsdt->Length - sizeof(EFI_ACPI_DESCRIPTION_HEADER)) >> 2;
+    Entry32    = (UINT32 *)(Rsdt + 1);
+    Entry32Num = (Rsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) >> 2;
     for (Idx = 0; Idx < Entry32Num; Idx++) {
       Signature = (UINT32 *)(UINTN)Entry32[Idx];
       if (*Signature == EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
@@ -73,10 +72,10 @@ ParseAcpiInfo (
   //
   // Search Xsdt Second
   //
-  Xsdt     = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)(Rsdp->XsdtAddress);
+  Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)(Rsdp->XsdtAddress);
   if (Xsdt != NULL) {
-    Entry64  = (UINT64 *)(Xsdt + 1);
-    Entry64Num = (Xsdt->Length - sizeof(EFI_ACPI_DESCRIPTION_HEADER)) >> 3;
+    Entry64    = (UINT64 *)(Xsdt + 1);
+    Entry64Num = (Xsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) >> 3;
     for (Idx = 0; Idx < Entry64Num; Idx++) {
       Signature = (UINT32 *)(UINTN)Entry64[Idx];
       if (*Signature == EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
@@ -109,67 +108,72 @@ Done:
   AcpiBoardInfo->PmGpeEnBase     = Fadt->Gpe0Blk + Fadt->Gpe0BlkLen / 2;
 
   if (MmCfgHdr != NULL) {
-    MmCfgBase = (EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE *)((UINT8*) MmCfgHdr + sizeof (*MmCfgHdr));
+    MmCfgBase                      = (EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE *)((UINT8 *)MmCfgHdr + sizeof (*MmCfgHdr));
     AcpiBoardInfo->PcieBaseAddress = MmCfgBase->BaseAddress;
-    AcpiBoardInfo->PcieBaseSize = (MmCfgBase->EndBusNumber + 1 - MmCfgBase->StartBusNumber) * 4096 * 32 * 8;
+    AcpiBoardInfo->PcieBaseSize    = (MmCfgBase->EndBusNumber + 1 - MmCfgBase->StartBusNumber) * 4096 * 32 * 8;
   } else {
     AcpiBoardInfo->PcieBaseAddress = 0;
-    AcpiBoardInfo->PcieBaseSize = 0;
+    AcpiBoardInfo->PcieBaseSize    = 0;
   }
-  DEBUG ((DEBUG_INFO, "PmCtrl  Reg 0x%lx\n",  AcpiBoardInfo->PmCtrlRegBase));
-  DEBUG ((DEBUG_INFO, "PmTimer Reg 0x%lx\n",  AcpiBoardInfo->PmTimerRegBase));
-  DEBUG ((DEBUG_INFO, "Reset   Reg 0x%lx\n",  AcpiBoardInfo->ResetRegAddress));
+
+  DEBUG ((DEBUG_INFO, "PmCtrl  Reg 0x%lx\n", AcpiBoardInfo->PmCtrlRegBase));
+  DEBUG ((DEBUG_INFO, "PmTimer Reg 0x%lx\n", AcpiBoardInfo->PmTimerRegBase));
+  DEBUG ((DEBUG_INFO, "Reset   Reg 0x%lx\n", AcpiBoardInfo->ResetRegAddress));
   DEBUG ((DEBUG_INFO, "Reset   Value 0x%x\n", AcpiBoardInfo->ResetValue));
-  DEBUG ((DEBUG_INFO, "PmEvt   Reg 0x%lx\n",  AcpiBoardInfo->PmEvtBase));
-  DEBUG ((DEBUG_INFO, "PmGpeEn Reg 0x%lx\n",  AcpiBoardInfo->PmGpeEnBase));
+  DEBUG ((DEBUG_INFO, "PmEvt   Reg 0x%lx\n", AcpiBoardInfo->PmEvtBase));
+  DEBUG ((DEBUG_INFO, "PmGpeEn Reg 0x%lx\n", AcpiBoardInfo->PmGpeEnBase));
   DEBUG ((DEBUG_INFO, "PcieBaseAddr 0x%lx\n", AcpiBoardInfo->PcieBaseAddress));
   DEBUG ((DEBUG_INFO, "PcieBaseSize 0x%lx\n", AcpiBoardInfo->PcieBaseSize));
 
   //
   // Verify values for proper operation
   //
-  ASSERT(Fadt->Pm1aCntBlk != 0);
-  ASSERT(Fadt->PmTmrBlk != 0);
-  ASSERT(Fadt->ResetReg.Address != 0);
-  ASSERT(Fadt->Pm1aEvtBlk != 0);
-  ASSERT(Fadt->Gpe0Blk != 0);
+  ASSERT (Fadt->Pm1aCntBlk != 0);
+  ASSERT (Fadt->PmTmrBlk != 0);
+  ASSERT (Fadt->ResetReg.Address != 0);
+  ASSERT (Fadt->Pm1aEvtBlk != 0);
+  ASSERT (Fadt->Gpe0Blk != 0);
 
   DEBUG_CODE_BEGIN ();
-    BOOLEAN    SciEnabled;
+  BOOLEAN  SciEnabled;
 
-    //
-    // Check the consistency of SCI enabling
-    //
+  //
+  // Check the consistency of SCI enabling
+  //
 
+  //
+  // Get SCI_EN value
+  //
+  if (Fadt->Pm1CntLen == 4) {
+    SciEnabled = (IoRead32 (Fadt->Pm1aCntBlk) & BIT0) ? TRUE : FALSE;
+  } else {
     //
-    // Get SCI_EN value
+    // if (Pm1CntLen == 2), use 16 bit IO read;
+    // if (Pm1CntLen != 2 && Pm1CntLen != 4), use 16 bit IO read as a fallback
     //
-   if (Fadt->Pm1CntLen == 4) {
-      SciEnabled = (IoRead32 (Fadt->Pm1aCntBlk) & BIT0)? TRUE : FALSE;
-    } else {
-      //
-      // if (Pm1CntLen == 2), use 16 bit IO read;
-      // if (Pm1CntLen != 2 && Pm1CntLen != 4), use 16 bit IO read as a fallback
-      //
-      SciEnabled = (IoRead16 (Fadt->Pm1aCntBlk) & BIT0)? TRUE : FALSE;
-    }
+    SciEnabled = (IoRead16 (Fadt->Pm1aCntBlk) & BIT0) ? TRUE : FALSE;
+  }
 
-    if (!(Fadt->Flags & EFI_ACPI_5_0_HW_REDUCED_ACPI) &&
-        (Fadt->SmiCmd == 0) &&
-       !SciEnabled) {
-      //
-      // The ACPI enabling status is inconsistent: SCI is not enabled but ACPI
-      // table does not provide a means to enable it through FADT->SmiCmd
-      //
-      DEBUG ((DEBUG_ERROR, "ERROR: The ACPI enabling status is inconsistent: SCI is not"
-        " enabled but the ACPI table does not provide a means to enable it through FADT->SmiCmd."
-        " This may cause issues in OS.\n"));
-    }
+  if (!(Fadt->Flags & EFI_ACPI_5_0_HW_REDUCED_ACPI) &&
+      (Fadt->SmiCmd == 0) &&
+      !SciEnabled)
+  {
+    //
+    // The ACPI enabling status is inconsistent: SCI is not enabled but ACPI
+    // table does not provide a means to enable it through FADT->SmiCmd
+    //
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: The ACPI enabling status is inconsistent: SCI is not"
+      " enabled but the ACPI table does not provide a means to enable it through FADT->SmiCmd."
+      " This may cause issues in OS.\n"
+      ));
+  }
+
   DEBUG_CODE_END ();
 
   return RETURN_SUCCESS;
 }
-
 
 /**
   Build ACPI board info HOB using infomation from ACPI table
@@ -180,15 +184,15 @@ Done:
 **/
 ACPI_BOARD_INFO *
 BuildHobFromAcpi (
-  IN   UINT64                           AcpiTableBase
+  IN   UINT64  AcpiTableBase
   )
 {
-  EFI_STATUS                            Status;
-  ACPI_BOARD_INFO                       AcpiBoardInfo;
-  ACPI_BOARD_INFO                       *NewAcpiBoardInfo;
+  EFI_STATUS       Status;
+  ACPI_BOARD_INFO  AcpiBoardInfo;
+  ACPI_BOARD_INFO  *NewAcpiBoardInfo;
 
   NewAcpiBoardInfo = NULL;
-  Status = ParseAcpiInfo (AcpiTableBase, &AcpiBoardInfo);
+  Status           = ParseAcpiInfo (AcpiTableBase, &AcpiBoardInfo);
   ASSERT_EFI_ERROR (Status);
   if (!EFI_ERROR (Status)) {
     NewAcpiBoardInfo = BuildGuidHob (&gUefiAcpiBoardInfoGuid, sizeof (ACPI_BOARD_INFO));
@@ -196,7 +200,6 @@ BuildHobFromAcpi (
     CopyMem (NewAcpiBoardInfo, &AcpiBoardInfo, sizeof (ACPI_BOARD_INFO));
     DEBUG ((DEBUG_INFO, "Create acpi board info guid hob\n"));
   }
+
   return NewAcpiBoardInfo;
 }
-
-

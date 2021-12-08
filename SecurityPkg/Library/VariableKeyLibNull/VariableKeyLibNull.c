@@ -22,8 +22,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 GetVariableKey (
-      OUT VOID    **VariableKey,
-  IN  OUT UINTN   *VariableKeySize
+  OUT VOID       **VariableKey,
+  IN  OUT UINTN  *VariableKeySize
   )
 {
   ASSERT (FALSE);
@@ -64,4 +64,3 @@ LockVariableKeyInterface (
   ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
-

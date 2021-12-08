@@ -10,24 +10,24 @@
 
 #include "HddPasswordDxe.h"
 
-EFI_GUID   mHddPasswordVendorGuid          = HDD_PASSWORD_CONFIG_GUID;
-CHAR16     mHddPasswordVendorStorageName[] = L"HDD_PASSWORD_CONFIG";
-LIST_ENTRY mHddPasswordConfigFormList;
-UINT32     mNumberOfHddDevices = 0;
+EFI_GUID    mHddPasswordVendorGuid          = HDD_PASSWORD_CONFIG_GUID;
+CHAR16      mHddPasswordVendorStorageName[] = L"HDD_PASSWORD_CONFIG";
+LIST_ENTRY  mHddPasswordConfigFormList;
+UINT32      mNumberOfHddDevices = 0;
 
-EFI_GUID mHddPasswordDeviceInfoGuid = HDD_PASSWORD_DEVICE_INFO_GUID;
-BOOLEAN                         mHddPasswordEndOfDxe = FALSE;
-HDD_PASSWORD_REQUEST_VARIABLE   *mHddPasswordRequestVariable = NULL;
-UINTN                           mHddPasswordRequestVariableSize = 0;
+EFI_GUID                       mHddPasswordDeviceInfoGuid      = HDD_PASSWORD_DEVICE_INFO_GUID;
+BOOLEAN                        mHddPasswordEndOfDxe            = FALSE;
+HDD_PASSWORD_REQUEST_VARIABLE  *mHddPasswordRequestVariable    = NULL;
+UINTN                          mHddPasswordRequestVariableSize = 0;
 
-HII_VENDOR_DEVICE_PATH          mHddPasswordHiiVendorDevicePath = {
+HII_VENDOR_DEVICE_PATH  mHddPasswordHiiVendorDevicePath = {
   {
     {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
       {
-        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+        (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
     HDD_PASSWORD_CONFIG_GUID
@@ -36,12 +36,11 @@ HII_VENDOR_DEVICE_PATH          mHddPasswordHiiVendorDevicePath = {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
     {
-      (UINT8) (END_DEVICE_PATH_LENGTH),
-      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+      (UINT8)(END_DEVICE_PATH_LENGTH),
+      (UINT8)((END_DEVICE_PATH_LENGTH) >> 8)
     }
   }
 };
-
 
 /**
   Check if the password is full zero.
@@ -54,10 +53,10 @@ HII_VENDOR_DEVICE_PATH          mHddPasswordHiiVendorDevicePath = {
 **/
 BOOLEAN
 PasswordIsFullZero (
-  IN CHAR8                    *Password
+  IN CHAR8  *Password
   )
 {
-  UINTN                       Index;
+  UINTN  Index;
 
   for (Index = 0; Index < HDD_PASSWORD_MAX_LENGTH; Index++) {
     if (Password[Index] != 0) {
@@ -77,17 +76,17 @@ PasswordIsFullZero (
 **/
 VOID
 SaveDeviceInfo (
-  IN     HDD_PASSWORD_CONFIG_FORM_ENTRY    *ConfigFormEntry,
-  IN OUT HDD_PASSWORD_DEVICE_INFO          *TempDevInfo
+  IN     HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry,
+  IN OUT HDD_PASSWORD_DEVICE_INFO        *TempDevInfo
   )
 {
-  TempDevInfo->Device.Bus                = (UINT8) ConfigFormEntry->Bus;
-  TempDevInfo->Device.Device             = (UINT8) ConfigFormEntry->Device;
-  TempDevInfo->Device.Function           = (UINT8) ConfigFormEntry->Function;
+  TempDevInfo->Device.Bus                = (UINT8)ConfigFormEntry->Bus;
+  TempDevInfo->Device.Device             = (UINT8)ConfigFormEntry->Device;
+  TempDevInfo->Device.Function           = (UINT8)ConfigFormEntry->Function;
   TempDevInfo->Device.Port               = ConfigFormEntry->Port;
   TempDevInfo->Device.PortMultiplierPort = ConfigFormEntry->PortMultiplierPort;
   CopyMem (TempDevInfo->Password, ConfigFormEntry->Password, HDD_PASSWORD_MAX_LENGTH);
-  TempDevInfo->DevicePathLength          = (UINT32) GetDevicePathSize (ConfigFormEntry->DevicePath);
+  TempDevInfo->DevicePathLength = (UINT32)GetDevicePathSize (ConfigFormEntry->DevicePath);
   CopyMem (TempDevInfo->DevicePath, ConfigFormEntry->DevicePath, TempDevInfo->DevicePathLength);
 }
 
@@ -100,17 +99,17 @@ BuildHddPasswordDeviceInfo (
   VOID
   )
 {
-  EFI_STATUS                        Status;
-  LIST_ENTRY                        *Entry;
-  HDD_PASSWORD_CONFIG_FORM_ENTRY    *ConfigFormEntry;
-  HDD_PASSWORD_DEVICE_INFO          *DevInfo;
-  HDD_PASSWORD_DEVICE_INFO          *TempDevInfo;
-  UINTN                             DevInfoLength;
-  UINT8                             DummyData;
-  BOOLEAN                           S3InitDevicesExist;
-  UINTN                             S3InitDevicesLength;
-  EFI_DEVICE_PATH_PROTOCOL          *S3InitDevices;
-  EFI_DEVICE_PATH_PROTOCOL          *S3InitDevicesBak;
+  EFI_STATUS                      Status;
+  LIST_ENTRY                      *Entry;
+  HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry;
+  HDD_PASSWORD_DEVICE_INFO        *DevInfo;
+  HDD_PASSWORD_DEVICE_INFO        *TempDevInfo;
+  UINTN                           DevInfoLength;
+  UINT8                           DummyData;
+  BOOLEAN                         S3InitDevicesExist;
+  UINTN                           S3InitDevicesLength;
+  EFI_DEVICE_PATH_PROTOCOL        *S3InitDevices;
+  EFI_DEVICE_PATH_PROTOCOL        *S3InitDevicesBak;
 
   //
   // Build HDD password device info and save them to LockBox.
@@ -126,7 +125,8 @@ BuildHddPasswordDeviceInfo (
     //
     if ((!PasswordIsFullZero (ConfigFormEntry->Password)) ||
         ((ConfigFormEntry->IfrData.SecurityStatus.Supported != 0) &&
-         (ConfigFormEntry->IfrData.SecurityStatus.Enabled == 0))) {
+         (ConfigFormEntry->IfrData.SecurityStatus.Enabled == 0)))
+    {
       DevInfoLength += sizeof (HDD_PASSWORD_DEVICE_INFO) +
                        GetDevicePathSize (ConfigFormEntry->DevicePath);
     }
@@ -137,11 +137,11 @@ BuildHddPasswordDeviceInfo (
   }
 
   S3InitDevicesLength = sizeof (DummyData);
-  Status = RestoreLockBox (
-             &gS3StorageDeviceInitListGuid,
-             &DummyData,
-             &S3InitDevicesLength
-             );
+  Status              = RestoreLockBox (
+                          &gS3StorageDeviceInitListGuid,
+                          &DummyData,
+                          &S3InitDevicesLength
+                          );
   ASSERT ((Status == EFI_NOT_FOUND) || (Status == EFI_BUFFER_TOO_SMALL));
   if (Status == EFI_NOT_FOUND) {
     S3InitDevices      = NULL;
@@ -170,7 +170,8 @@ BuildHddPasswordDeviceInfo (
 
     if ((!PasswordIsFullZero (ConfigFormEntry->Password)) ||
         ((ConfigFormEntry->IfrData.SecurityStatus.Supported != 0) &&
-         (ConfigFormEntry->IfrData.SecurityStatus.Enabled == 0))) {
+         (ConfigFormEntry->IfrData.SecurityStatus.Enabled == 0)))
+    {
       SaveDeviceInfo (ConfigFormEntry, TempDevInfo);
 
       S3InitDevicesBak = S3InitDevices;
@@ -181,11 +182,12 @@ BuildHddPasswordDeviceInfo (
       if (S3InitDevicesBak != NULL) {
         FreePool (S3InitDevicesBak);
       }
+
       ASSERT (S3InitDevices != NULL);
 
-      TempDevInfo = (HDD_PASSWORD_DEVICE_INFO *) ((UINTN)TempDevInfo +
-                                                  sizeof (HDD_PASSWORD_DEVICE_INFO) +
-                                                  TempDevInfo->DevicePathLength);
+      TempDevInfo = (HDD_PASSWORD_DEVICE_INFO *)((UINTN)TempDevInfo +
+                                                 sizeof (HDD_PASSWORD_DEVICE_INFO) +
+                                                 TempDevInfo->DevicePathLength);
     }
   }
 
@@ -247,9 +249,9 @@ BuildHddPasswordDeviceInfo (
 **/
 EFI_STATUS
 FreezeLockDevice (
-  IN EFI_ATA_PASS_THRU_PROTOCOL     *AtaPassThru,
-  IN UINT16                         Port,
-  IN UINT16                         PortMultiplierPort
+  IN EFI_ATA_PASS_THRU_PROTOCOL  *AtaPassThru,
+  IN UINT16                      Port,
+  IN UINT16                      PortMultiplierPort
   )
 {
   EFI_STATUS                        Status;
@@ -284,7 +286,7 @@ FreezeLockDevice (
   ZeroMem (&Acb, sizeof (Acb));
   ZeroMem (Asb, sizeof (EFI_ATA_STATUS_BLOCK));
   Acb.AtaCommand    = ATA_SECURITY_FREEZE_LOCK_CMD;
-  Acb.AtaDeviceHead = (UINT8) (PortMultiplierPort == 0xFFFF ? 0 : (PortMultiplierPort << 4));
+  Acb.AtaDeviceHead = (UINT8)(PortMultiplierPort == 0xFFFF ? 0 : (PortMultiplierPort << 4));
 
   //
   // Prepare for ATA pass through packet.
@@ -305,7 +307,8 @@ FreezeLockDevice (
                           );
   if (!EFI_ERROR (Status) &&
       ((Asb->AtaStatus & ATA_STSREG_ERR) != 0) &&
-      ((Asb->AtaError & ATA_ERRREG_ABRT) != 0)) {
+      ((Asb->AtaError & ATA_ERRREG_ABRT) != 0))
+  {
     Status = EFI_DEVICE_ERROR;
   }
 
@@ -332,10 +335,10 @@ FreezeLockDevice (
 **/
 EFI_STATUS
 GetHddDeviceIdentifyData (
-  IN  EFI_ATA_PASS_THRU_PROTOCOL    *AtaPassThru,
-  IN  UINT16                        Port,
-  IN  UINT16                        PortMultiplierPort,
-  IN  ATA_IDENTIFY_DATA             *IdentifyData
+  IN  EFI_ATA_PASS_THRU_PROTOCOL  *AtaPassThru,
+  IN  UINT16                      Port,
+  IN  UINT16                      PortMultiplierPort,
+  IN  ATA_IDENTIFY_DATA           *IdentifyData
   )
 {
   EFI_STATUS                        Status;
@@ -370,16 +373,16 @@ GetHddDeviceIdentifyData (
   ZeroMem (&Acb, sizeof (Acb));
   ZeroMem (Asb, sizeof (EFI_ATA_STATUS_BLOCK));
   Acb.AtaCommand    = ATA_CMD_IDENTIFY_DRIVE;
-  Acb.AtaDeviceHead = (UINT8) (BIT7 | BIT6 | BIT5 | (PortMultiplierPort == 0xFFFF ? 0 : (PortMultiplierPort << 4)));
+  Acb.AtaDeviceHead = (UINT8)(BIT7 | BIT6 | BIT5 | (PortMultiplierPort == 0xFFFF ? 0 : (PortMultiplierPort << 4)));
 
   //
   // Prepare for ATA pass through packet.
   //
   ZeroMem (&Packet, sizeof (Packet));
-  Packet.Protocol = EFI_ATA_PASS_THRU_PROTOCOL_PIO_DATA_IN;
-  Packet.Length   = EFI_ATA_PASS_THRU_LENGTH_BYTES | EFI_ATA_PASS_THRU_LENGTH_SECTOR_COUNT;
-  Packet.Asb      = Asb;
-  Packet.Acb      = &Acb;
+  Packet.Protocol         = EFI_ATA_PASS_THRU_PROTOCOL_PIO_DATA_IN;
+  Packet.Length           = EFI_ATA_PASS_THRU_LENGTH_BYTES | EFI_ATA_PASS_THRU_LENGTH_SECTOR_COUNT;
+  Packet.Asb              = Asb;
+  Packet.Acb              = &Acb;
   Packet.InDataBuffer     = IdentifyData;
   Packet.InTransferLength = sizeof (ATA_IDENTIFY_DATA);
   Packet.Timeout          = ATA_TIMEOUT;
@@ -410,10 +413,10 @@ GetHddPasswordSecurityStatus (
   IN OUT HDD_PASSWORD_CONFIG  *IfrData
   )
 {
-  IfrData->SecurityStatus.Supported = (IdentifyData->command_set_supported_82 & BIT1) ? 1 : 0;
-  IfrData->SecurityStatus.Enabled   = (IdentifyData->security_status & BIT1) ? 1 : 0;
-  IfrData->SecurityStatus.Locked    = (IdentifyData->security_status & BIT2) ? 1 : 0;
-  IfrData->SecurityStatus.Frozen    = (IdentifyData->security_status & BIT3) ? 1 : 0;
+  IfrData->SecurityStatus.Supported            = (IdentifyData->command_set_supported_82 & BIT1) ? 1 : 0;
+  IfrData->SecurityStatus.Enabled              = (IdentifyData->security_status & BIT1) ? 1 : 0;
+  IfrData->SecurityStatus.Locked               = (IdentifyData->security_status & BIT2) ? 1 : 0;
+  IfrData->SecurityStatus.Frozen               = (IdentifyData->security_status & BIT3) ? 1 : 0;
   IfrData->SecurityStatus.UserPasswordStatus   = IfrData->SecurityStatus.Enabled;
   IfrData->SecurityStatus.MasterPasswordStatus = IfrData->SecurityStatus.Supported;
 
@@ -437,14 +440,14 @@ GetHddPasswordSecurityStatus (
 VOID
 EFIAPI
 HddPasswordEndOfDxeEventNotify (
-  EFI_EVENT                               Event,
-  VOID                                    *Context
+  EFI_EVENT  Event,
+  VOID       *Context
   )
 {
-  LIST_ENTRY                        *Entry;
-  HDD_PASSWORD_CONFIG_FORM_ENTRY    *ConfigFormEntry;
-  EFI_STATUS                        Status;
-  ATA_IDENTIFY_DATA                 IdentifyData;
+  LIST_ENTRY                      *Entry;
+  HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry;
+  EFI_STATUS                      Status;
+  ATA_IDENTIFY_DATA               IdentifyData;
 
   DEBUG ((DEBUG_INFO, "%a() - enter\n", __FUNCTION__));
 
@@ -456,7 +459,7 @@ HddPasswordEndOfDxeEventNotify (
     // as the HDD password requests should have been processed.
     //
     FreePool (mHddPasswordRequestVariable);
-    mHddPasswordRequestVariable = NULL;
+    mHddPasswordRequestVariable     = NULL;
     mHddPasswordRequestVariableSize = 0;
   }
 
@@ -486,7 +489,8 @@ HddPasswordEndOfDxeEventNotify (
     //
     if ((ConfigFormEntry->IfrData.SecurityStatus.Supported != 0) &&
         (ConfigFormEntry->IfrData.SecurityStatus.Locked == 0) &&
-        (ConfigFormEntry->IfrData.SecurityStatus.Frozen == 0)) {
+        (ConfigFormEntry->IfrData.SecurityStatus.Frozen == 0))
+    {
       Status = FreezeLockDevice (ConfigFormEntry->AtaPassThru, ConfigFormEntry->Port, ConfigFormEntry->PortMultiplierPort);
       DEBUG ((DEBUG_INFO, "FreezeLockDevice return %r!\n", Status));
       Status = GetHddDeviceIdentifyData (
@@ -533,20 +537,20 @@ GenSalt (
 **/
 BOOLEAN
 GenerateCredential (
-  IN      UINT8               *Buffer,
-  IN      UINTN               BufferSize,
-  IN      UINT8               *SaltValue,
-     OUT  UINT8               *Credential
+  IN      UINT8  *Buffer,
+  IN      UINTN  BufferSize,
+  IN      UINT8  *SaltValue,
+  OUT  UINT8     *Credential
   )
 {
-  BOOLEAN                     Status;
-  UINTN                       HashSize;
-  VOID                        *Hash;
-  VOID                        *HashData;
+  BOOLEAN  Status;
+  UINTN    HashSize;
+  VOID     *Hash;
+  VOID     *HashData;
 
-  Hash      = NULL;
-  HashData  = NULL;
-  Status    = FALSE;
+  Hash     = NULL;
+  HashData = NULL;
+  Status   = FALSE;
 
   HashSize = Sha256GetContextSize ();
   Hash     = AllocateZeroPool (HashSize);
@@ -567,7 +571,7 @@ GenerateCredential (
   }
 
   CopyMem (HashData, SaltValue, PASSWORD_SALT_SIZE);
-  CopyMem ((UINT8 *) HashData + PASSWORD_SALT_SIZE, Buffer, BufferSize);
+  CopyMem ((UINT8 *)HashData + PASSWORD_SALT_SIZE, Buffer, BufferSize);
 
   Status = Sha256Update (Hash, HashData, PASSWORD_SALT_SIZE + BufferSize);
   if (!Status) {
@@ -580,10 +584,12 @@ Done:
   if (Hash != NULL) {
     FreePool (Hash);
   }
+
   if (HashData != NULL) {
     ZeroMem (HashData, PASSWORD_SALT_SIZE + BufferSize);
     FreePool (HashData);
   }
+
   return Status;
 }
 
@@ -597,22 +603,22 @@ Done:
 **/
 VOID
 SaveHddPasswordVariable (
-  IN HDD_PASSWORD_CONFIG_FORM_ENTRY *ConfigFormEntry,
-  IN CHAR8                          *Password
+  IN HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry,
+  IN CHAR8                           *Password
   )
 {
-  EFI_STATUS                        Status;
-  HDD_PASSWORD_VARIABLE             *TempVariable;
-  UINTN                             TempVariableSize;
-  HDD_PASSWORD_VARIABLE             *NextNode;
-  HDD_PASSWORD_VARIABLE             *Variable;
-  UINTN                             VariableSize;
-  HDD_PASSWORD_VARIABLE             *NewVariable;
-  UINTN                             NewVariableSize;
-  BOOLEAN                           Delete;
-  BOOLEAN                           HashOk;
-  UINT8                             HashData[SHA256_DIGEST_SIZE];
-  UINT8                             SaltData[PASSWORD_SALT_SIZE];
+  EFI_STATUS             Status;
+  HDD_PASSWORD_VARIABLE  *TempVariable;
+  UINTN                  TempVariableSize;
+  HDD_PASSWORD_VARIABLE  *NextNode;
+  HDD_PASSWORD_VARIABLE  *Variable;
+  UINTN                  VariableSize;
+  HDD_PASSWORD_VARIABLE  *NewVariable;
+  UINTN                  NewVariableSize;
+  BOOLEAN                Delete;
+  BOOLEAN                HashOk;
+  UINT8                  HashData[SHA256_DIGEST_SIZE];
+  UINT8                  SaltData[PASSWORD_SALT_SIZE];
 
   DEBUG ((DEBUG_INFO, "%a() - enter\n", __FUNCTION__));
 
@@ -624,7 +630,7 @@ SaveHddPasswordVariable (
     ZeroMem (HashData, sizeof (HashData));
     ZeroMem (SaltData, sizeof (SaltData));
     GenSalt (SaltData);
-    HashOk = GenerateCredential ((UINT8 *) Password, HDD_PASSWORD_MAX_LENGTH, SaltData, HashData);
+    HashOk = GenerateCredential ((UINT8 *)Password, HDD_PASSWORD_MAX_LENGTH, SaltData, HashData);
     if (!HashOk) {
       DEBUG ((DEBUG_INFO, "GenerateCredential failed\n"));
       return;
@@ -637,40 +643,43 @@ SaveHddPasswordVariable (
     Delete = TRUE;
   }
 
-  Variable = NULL;
-  VariableSize = 0;
-  NewVariable = NULL;
+  Variable        = NULL;
+  VariableSize    = 0;
+  NewVariable     = NULL;
   NewVariableSize = 0;
 
   Status = GetVariable2 (
              HDD_PASSWORD_VARIABLE_NAME,
              &mHddPasswordVendorGuid,
-             (VOID **) &Variable,
+             (VOID **)&Variable,
              &VariableSize
              );
   if (Delete) {
     if (!EFI_ERROR (Status) && (Variable != NULL)) {
-      TempVariable = Variable;
+      TempVariable     = Variable;
       TempVariableSize = VariableSize;
       while (TempVariableSize >= sizeof (HDD_PASSWORD_VARIABLE)) {
         if ((TempVariable->Device.Bus                == ConfigFormEntry->Bus) &&
             (TempVariable->Device.Device             == ConfigFormEntry->Device) &&
             (TempVariable->Device.Function           == ConfigFormEntry->Function) &&
             (TempVariable->Device.Port               == ConfigFormEntry->Port) &&
-            (TempVariable->Device.PortMultiplierPort == ConfigFormEntry->PortMultiplierPort)) {
+            (TempVariable->Device.PortMultiplierPort == ConfigFormEntry->PortMultiplierPort))
+        {
           //
           // Found the node for the HDD password device.
           // Delete the node.
           //
           NextNode = TempVariable + 1;
-          CopyMem (TempVariable, NextNode, (UINTN) Variable + VariableSize - (UINTN) NextNode);
-          NewVariable = Variable;
+          CopyMem (TempVariable, NextNode, (UINTN)Variable + VariableSize - (UINTN)NextNode);
+          NewVariable     = Variable;
           NewVariableSize = VariableSize - sizeof (HDD_PASSWORD_VARIABLE);
           break;
         }
+
         TempVariableSize -= sizeof (HDD_PASSWORD_VARIABLE);
-        TempVariable += 1;
+        TempVariable     += 1;
       }
+
       if (NewVariable == NULL) {
         DEBUG ((DEBUG_INFO, "The variable node for the HDD password device is not found\n"));
       }
@@ -679,40 +688,43 @@ SaveHddPasswordVariable (
     }
   } else {
     if (!EFI_ERROR (Status) && (Variable != NULL)) {
-      TempVariable = Variable;
+      TempVariable     = Variable;
       TempVariableSize = VariableSize;
       while (TempVariableSize >= sizeof (HDD_PASSWORD_VARIABLE)) {
         if ((TempVariable->Device.Bus                == ConfigFormEntry->Bus) &&
             (TempVariable->Device.Device             == ConfigFormEntry->Device) &&
             (TempVariable->Device.Function           == ConfigFormEntry->Function) &&
             (TempVariable->Device.Port               == ConfigFormEntry->Port) &&
-            (TempVariable->Device.PortMultiplierPort == ConfigFormEntry->PortMultiplierPort)) {
+            (TempVariable->Device.PortMultiplierPort == ConfigFormEntry->PortMultiplierPort))
+        {
           //
           // Found the node for the HDD password device.
           // Update the node.
           //
           CopyMem (TempVariable->PasswordHash, HashData, sizeof (HashData));
           CopyMem (TempVariable->PasswordSalt, SaltData, sizeof (SaltData));
-          NewVariable = Variable;
+          NewVariable     = Variable;
           NewVariableSize = VariableSize;
           break;
         }
+
         TempVariableSize -= sizeof (HDD_PASSWORD_VARIABLE);
-        TempVariable += 1;
+        TempVariable     += 1;
       }
+
       if (NewVariable == NULL) {
         //
         // The node for the HDD password device is not found.
         // Create node for the HDD password device.
         //
         NewVariableSize = VariableSize + sizeof (HDD_PASSWORD_VARIABLE);
-        NewVariable = AllocateZeroPool (NewVariableSize);
+        NewVariable     = AllocateZeroPool (NewVariableSize);
         ASSERT (NewVariable != NULL);
         CopyMem (NewVariable, Variable, VariableSize);
-        TempVariable = (HDD_PASSWORD_VARIABLE *) ((UINTN) NewVariable + VariableSize);
-        TempVariable->Device.Bus                = (UINT8) ConfigFormEntry->Bus;
-        TempVariable->Device.Device             = (UINT8) ConfigFormEntry->Device;
-        TempVariable->Device.Function           = (UINT8) ConfigFormEntry->Function;
+        TempVariable                            = (HDD_PASSWORD_VARIABLE *)((UINTN)NewVariable + VariableSize);
+        TempVariable->Device.Bus                = (UINT8)ConfigFormEntry->Bus;
+        TempVariable->Device.Device             = (UINT8)ConfigFormEntry->Device;
+        TempVariable->Device.Function           = (UINT8)ConfigFormEntry->Function;
         TempVariable->Device.Port               = ConfigFormEntry->Port;
         TempVariable->Device.PortMultiplierPort = ConfigFormEntry->PortMultiplierPort;
         CopyMem (TempVariable->PasswordHash, HashData, sizeof (HashData));
@@ -720,11 +732,11 @@ SaveHddPasswordVariable (
       }
     } else {
       NewVariableSize = sizeof (HDD_PASSWORD_VARIABLE);
-      NewVariable = AllocateZeroPool (NewVariableSize);
+      NewVariable     = AllocateZeroPool (NewVariableSize);
       ASSERT (NewVariable != NULL);
-      NewVariable->Device.Bus                = (UINT8) ConfigFormEntry->Bus;
-      NewVariable->Device.Device             = (UINT8) ConfigFormEntry->Device;
-      NewVariable->Device.Function           = (UINT8) ConfigFormEntry->Function;
+      NewVariable->Device.Bus                = (UINT8)ConfigFormEntry->Bus;
+      NewVariable->Device.Device             = (UINT8)ConfigFormEntry->Device;
+      NewVariable->Device.Function           = (UINT8)ConfigFormEntry->Function;
       NewVariable->Device.Port               = ConfigFormEntry->Port;
       NewVariable->Device.PortMultiplierPort = ConfigFormEntry->PortMultiplierPort;
       CopyMem (NewVariable->PasswordHash, HashData, sizeof (HashData));
@@ -748,6 +760,7 @@ SaveHddPasswordVariable (
   if (NewVariable != Variable) {
     FreePool (NewVariable);
   }
+
   if (Variable != NULL) {
     FreePool (Variable);
   }
@@ -768,25 +781,25 @@ SaveHddPasswordVariable (
 **/
 BOOLEAN
 GetSavedHddPasswordVariable (
-  IN  HDD_PASSWORD_CONFIG_FORM_ENTRY    *ConfigFormEntry,
-  OUT HDD_PASSWORD_VARIABLE             *HddPasswordVariable
+  IN  HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry,
+  OUT HDD_PASSWORD_VARIABLE           *HddPasswordVariable
   )
 {
-  EFI_STATUS                        Status;
-  HDD_PASSWORD_VARIABLE             *TempVariable;
-  HDD_PASSWORD_VARIABLE             *Variable;
-  UINTN                             VariableSize;
-  BOOLEAN                           Found;
+  EFI_STATUS             Status;
+  HDD_PASSWORD_VARIABLE  *TempVariable;
+  HDD_PASSWORD_VARIABLE  *Variable;
+  UINTN                  VariableSize;
+  BOOLEAN                Found;
 
   DEBUG ((DEBUG_INFO, "%a() - enter\n", __FUNCTION__));
 
-  Variable = NULL;
+  Variable     = NULL;
   VariableSize = 0;
 
   Status = GetVariable2 (
              HDD_PASSWORD_VARIABLE_NAME,
              &mHddPasswordVendorGuid,
-             (VOID **) &Variable,
+             (VOID **)&Variable,
              &VariableSize
              );
   if (EFI_ERROR (Status) || (Variable == NULL)) {
@@ -794,14 +807,15 @@ GetSavedHddPasswordVariable (
     return FALSE;
   }
 
-  Found = FALSE;
+  Found        = FALSE;
   TempVariable = Variable;
   while (VariableSize >= sizeof (HDD_PASSWORD_VARIABLE)) {
     if ((TempVariable->Device.Bus                == ConfigFormEntry->Bus) &&
         (TempVariable->Device.Device             == ConfigFormEntry->Device) &&
         (TempVariable->Device.Function           == ConfigFormEntry->Function) &&
         (TempVariable->Device.Port               == ConfigFormEntry->Port) &&
-        (TempVariable->Device.PortMultiplierPort == ConfigFormEntry->PortMultiplierPort)) {
+        (TempVariable->Device.PortMultiplierPort == ConfigFormEntry->PortMultiplierPort))
+    {
       //
       // Found the node for the HDD password device.
       // Get the node.
@@ -810,6 +824,7 @@ GetSavedHddPasswordVariable (
       Found = TRUE;
       break;
     }
+
     VariableSize -= sizeof (HDD_PASSWORD_VARIABLE);
     TempVariable += 1;
   }
@@ -840,14 +855,14 @@ GetSavedHddPasswordVariable (
 **/
 EFI_STATUS
 ValidateHddPassword (
-  IN HDD_PASSWORD_CONFIG_FORM_ENTRY *ConfigFormEntry,
-  IN CHAR8                          *Password
+  IN HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry,
+  IN CHAR8                           *Password
   )
 {
-  EFI_STATUS                        Status;
-  HDD_PASSWORD_VARIABLE             HddPasswordVariable;
-  BOOLEAN                           HashOk;
-  UINT8                             HashData[SHA256_DIGEST_SIZE];
+  EFI_STATUS             Status;
+  HDD_PASSWORD_VARIABLE  HddPasswordVariable;
+  BOOLEAN                HashOk;
+  UINT8                  HashData[SHA256_DIGEST_SIZE];
 
   DEBUG ((DEBUG_INFO, "%a() - enter\n", __FUNCTION__));
 
@@ -857,7 +872,7 @@ ValidateHddPassword (
   }
 
   ZeroMem (HashData, sizeof (HashData));
-  HashOk = GenerateCredential ((UINT8 *) Password, HDD_PASSWORD_MAX_LENGTH, HddPasswordVariable.PasswordSalt, HashData);
+  HashOk = GenerateCredential ((UINT8 *)Password, HDD_PASSWORD_MAX_LENGTH, HddPasswordVariable.PasswordSalt, HashData);
   if (!HashOk) {
     DEBUG ((DEBUG_INFO, "GenerateCredential failed\n"));
     return EFI_DEVICE_ERROR;
@@ -891,11 +906,11 @@ ValidateHddPassword (
 **/
 EFI_STATUS
 UnlockHddPassword (
-  IN EFI_ATA_PASS_THRU_PROTOCOL     *AtaPassThru,
-  IN UINT16                         Port,
-  IN UINT16                         PortMultiplierPort,
-  IN CHAR8                          Identifier,
-  IN CHAR8                          *Password
+  IN EFI_ATA_PASS_THRU_PROTOCOL  *AtaPassThru,
+  IN UINT16                      Port,
+  IN UINT16                      PortMultiplierPort,
+  IN CHAR8                       Identifier,
+  IN CHAR8                       *Password
   )
 {
   EFI_STATUS                        Status;
@@ -931,7 +946,7 @@ UnlockHddPassword (
   ZeroMem (&Acb, sizeof (Acb));
   ZeroMem (Asb, sizeof (EFI_ATA_STATUS_BLOCK));
   Acb.AtaCommand    = ATA_SECURITY_UNLOCK_CMD;
-  Acb.AtaDeviceHead = (UINT8) (PortMultiplierPort == 0xFFFF ? 0 : (PortMultiplierPort << 4));
+  Acb.AtaDeviceHead = (UINT8)(PortMultiplierPort == 0xFFFF ? 0 : (PortMultiplierPort << 4));
 
   //
   // Prepare for ATA pass through packet.
@@ -942,8 +957,8 @@ UnlockHddPassword (
   Packet.Asb      = Asb;
   Packet.Acb      = &Acb;
 
-  ((CHAR16 *) Buffer)[0] = Identifier & BIT0;
-  CopyMem (&((CHAR16 *) Buffer)[1], Password, HDD_PASSWORD_MAX_LENGTH);
+  ((CHAR16 *)Buffer)[0] = Identifier & BIT0;
+  CopyMem (&((CHAR16 *)Buffer)[1], Password, HDD_PASSWORD_MAX_LENGTH);
 
   Packet.OutDataBuffer     = Buffer;
   Packet.OutTransferLength = sizeof (Buffer);
@@ -958,7 +973,8 @@ UnlockHddPassword (
                           );
   if (!EFI_ERROR (Status) &&
       ((Asb->AtaStatus & ATA_STSREG_ERR) != 0) &&
-      ((Asb->AtaError & ATA_ERRREG_ABRT) != 0)) {
+      ((Asb->AtaError & ATA_ERRREG_ABRT) != 0))
+  {
     Status = EFI_DEVICE_ERROR;
   }
 
@@ -988,11 +1004,11 @@ UnlockHddPassword (
 **/
 EFI_STATUS
 DisableHddPassword (
-  IN EFI_ATA_PASS_THRU_PROTOCOL     *AtaPassThru,
-  IN UINT16                         Port,
-  IN UINT16                         PortMultiplierPort,
-  IN CHAR8                          Identifier,
-  IN CHAR8                          *Password
+  IN EFI_ATA_PASS_THRU_PROTOCOL  *AtaPassThru,
+  IN UINT16                      Port,
+  IN UINT16                      PortMultiplierPort,
+  IN CHAR8                       Identifier,
+  IN CHAR8                       *Password
   )
 {
   EFI_STATUS                        Status;
@@ -1028,7 +1044,7 @@ DisableHddPassword (
   ZeroMem (&Acb, sizeof (Acb));
   ZeroMem (Asb, sizeof (EFI_ATA_STATUS_BLOCK));
   Acb.AtaCommand    = ATA_SECURITY_DIS_PASSWORD_CMD;
-  Acb.AtaDeviceHead = (UINT8) (PortMultiplierPort == 0xFFFF ? 0 : (PortMultiplierPort << 4));
+  Acb.AtaDeviceHead = (UINT8)(PortMultiplierPort == 0xFFFF ? 0 : (PortMultiplierPort << 4));
 
   //
   // Prepare for ATA pass through packet.
@@ -1039,8 +1055,8 @@ DisableHddPassword (
   Packet.Asb      = Asb;
   Packet.Acb      = &Acb;
 
-  ((CHAR16 *) Buffer)[0] = Identifier & BIT0;
-  CopyMem (&((CHAR16 *) Buffer)[1], Password, HDD_PASSWORD_MAX_LENGTH);
+  ((CHAR16 *)Buffer)[0] = Identifier & BIT0;
+  CopyMem (&((CHAR16 *)Buffer)[1], Password, HDD_PASSWORD_MAX_LENGTH);
 
   Packet.OutDataBuffer     = Buffer;
   Packet.OutTransferLength = sizeof (Buffer);
@@ -1055,7 +1071,8 @@ DisableHddPassword (
                           );
   if (!EFI_ERROR (Status) &&
       ((Asb->AtaStatus & ATA_STSREG_ERR) != 0) &&
-      ((Asb->AtaError & ATA_ERRREG_ABRT) != 0)) {
+      ((Asb->AtaError & ATA_ERRREG_ABRT) != 0))
+  {
     Status = EFI_DEVICE_ERROR;
   }
 
@@ -1087,13 +1104,13 @@ DisableHddPassword (
 **/
 EFI_STATUS
 SetHddPassword (
-  IN EFI_ATA_PASS_THRU_PROTOCOL     *AtaPassThru,
-  IN UINT16                         Port,
-  IN UINT16                         PortMultiplierPort,
-  IN CHAR8                          Identifier,
-  IN CHAR8                          SecurityLevel,
-  IN CHAR16                         MasterPasswordIdentifier,
-  IN CHAR8                          *Password
+  IN EFI_ATA_PASS_THRU_PROTOCOL  *AtaPassThru,
+  IN UINT16                      Port,
+  IN UINT16                      PortMultiplierPort,
+  IN CHAR8                       Identifier,
+  IN CHAR8                       SecurityLevel,
+  IN CHAR16                      MasterPasswordIdentifier,
+  IN CHAR8                       *Password
   )
 {
   EFI_STATUS                        Status;
@@ -1129,7 +1146,7 @@ SetHddPassword (
   ZeroMem (&Acb, sizeof (Acb));
   ZeroMem (Asb, sizeof (EFI_ATA_STATUS_BLOCK));
   Acb.AtaCommand    = ATA_SECURITY_SET_PASSWORD_CMD;
-  Acb.AtaDeviceHead = (UINT8) (PortMultiplierPort == 0xFFFF ? 0 : (PortMultiplierPort << 4));
+  Acb.AtaDeviceHead = (UINT8)(PortMultiplierPort == 0xFFFF ? 0 : (PortMultiplierPort << 4));
 
   //
   // Prepare for ATA pass through packet.
@@ -1140,10 +1157,10 @@ SetHddPassword (
   Packet.Asb      = Asb;
   Packet.Acb      = &Acb;
 
-  ((CHAR16 *) Buffer)[0] = (Identifier | (UINT16)(SecurityLevel << 8)) & (BIT0 | BIT8);
-  CopyMem (&((CHAR16 *) Buffer)[1], Password, HDD_PASSWORD_MAX_LENGTH);
+  ((CHAR16 *)Buffer)[0] = (Identifier | (UINT16)(SecurityLevel << 8)) & (BIT0 | BIT8);
+  CopyMem (&((CHAR16 *)Buffer)[1], Password, HDD_PASSWORD_MAX_LENGTH);
   if ((Identifier & BIT0) != 0) {
-    ((CHAR16 *) Buffer)[17] = MasterPasswordIdentifier;
+    ((CHAR16 *)Buffer)[17] = MasterPasswordIdentifier;
   }
 
   Packet.OutDataBuffer     = Buffer;
@@ -1159,7 +1176,8 @@ SetHddPassword (
                           );
   if (!EFI_ERROR (Status) &&
       ((Asb->AtaStatus & ATA_STSREG_ERR) != 0) &&
-      ((Asb->AtaError & ATA_ERRREG_ABRT) != 0)) {
+      ((Asb->AtaError & ATA_ERRREG_ABRT) != 0))
+  {
     Status = EFI_DEVICE_ERROR;
   }
 
@@ -1180,19 +1198,19 @@ SetHddPassword (
 **/
 VOID
 GetHddDeviceModelNumber (
-  IN ATA_IDENTIFY_DATA             *IdentifyData,
-  IN OUT CHAR16                    *String
+  IN ATA_IDENTIFY_DATA  *IdentifyData,
+  IN OUT CHAR16         *String
   )
 {
-  UINTN             Index;
+  UINTN  Index;
 
   //
   // Swap the byte order in the original module name.
   // From Ata spec, the maximum length is 40 bytes.
   //
   for (Index = 0; Index < 40; Index += 2) {
-    String[Index]      = IdentifyData->ModelName[Index + 1];
-    String[Index + 1]  = IdentifyData->ModelName[Index];
+    String[Index]     = IdentifyData->ModelName[Index + 1];
+    String[Index + 1] = IdentifyData->ModelName[Index];
   }
 
   //
@@ -1200,7 +1218,7 @@ GetHddDeviceModelNumber (
   //
   String[20] = L'\0';
 
-  return ;
+  return;
 }
 
 /**
@@ -1216,22 +1234,22 @@ GetHddDeviceModelNumber (
 **/
 EFI_STATUS
 PopupHddPasswordInputWindows (
-  IN CHAR16         *PopUpString1,
-  IN CHAR16         *PopUpString2,
-  IN OUT CHAR8      *Password
+  IN CHAR16     *PopUpString1,
+  IN CHAR16     *PopUpString2,
+  IN OUT CHAR8  *Password
   )
 {
-  EFI_INPUT_KEY Key;
-  UINTN         Length;
-  CHAR16        Mask[HDD_PASSWORD_MAX_LENGTH + 1];
-  CHAR16        Unicode[HDD_PASSWORD_MAX_LENGTH + 1];
-  CHAR8         Ascii[HDD_PASSWORD_MAX_LENGTH + 1];
+  EFI_INPUT_KEY  Key;
+  UINTN          Length;
+  CHAR16         Mask[HDD_PASSWORD_MAX_LENGTH + 1];
+  CHAR16         Unicode[HDD_PASSWORD_MAX_LENGTH + 1];
+  CHAR8          Ascii[HDD_PASSWORD_MAX_LENGTH + 1];
 
   ZeroMem (Unicode, sizeof (Unicode));
   ZeroMem (Ascii, sizeof (Ascii));
   ZeroMem (Mask, sizeof (Mask));
 
-  gST->ConOut->ClearScreen(gST->ConOut);
+  gST->ConOut->ClearScreen (gST->ConOut);
 
   Length = 0;
   while (TRUE) {
@@ -1244,7 +1262,7 @@ PopupHddPasswordInputWindows (
         L"---------------------",
         Mask,
         NULL
-      );
+        );
     } else {
       CreatePopUp (
         EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
@@ -1254,8 +1272,9 @@ PopupHddPasswordInputWindows (
         L"---------------------",
         Mask,
         NULL
-      );
+        );
     }
+
     //
     // Check key.
     //
@@ -1269,25 +1288,26 @@ PopupHddPasswordInputWindows (
       } else if ((Key.UnicodeChar == CHAR_NULL) ||
                  (Key.UnicodeChar == CHAR_TAB) ||
                  (Key.UnicodeChar == CHAR_LINEFEED)
-                 ) {
+                 )
+      {
         continue;
       } else {
         if (Key.UnicodeChar == CHAR_BACKSPACE) {
           if (Length > 0) {
             Unicode[Length] = 0;
-            Mask[Length] = 0;
+            Mask[Length]    = 0;
             Length--;
           }
         } else {
           Unicode[Length] = Key.UnicodeChar;
-          Mask[Length] = L'*';
+          Mask[Length]    = L'*';
           Length++;
           if (Length == HDD_PASSWORD_MAX_LENGTH) {
             //
             // Add the null terminator.
             //
             Unicode[Length] = 0;
-            Mask[Length] = 0;
+            Mask[Length]    = 0;
             break;
           }
         }
@@ -1297,7 +1317,7 @@ PopupHddPasswordInputWindows (
     if (Key.ScanCode == SCAN_ESC) {
       ZeroMem (Unicode, sizeof (Unicode));
       ZeroMem (Ascii, sizeof (Ascii));
-      gST->ConOut->ClearScreen(gST->ConOut);
+      gST->ConOut->ClearScreen (gST->ConOut);
       return EFI_ABORTED;
     }
   }
@@ -1307,7 +1327,7 @@ PopupHddPasswordInputWindows (
   ZeroMem (Unicode, sizeof (Unicode));
   ZeroMem (Ascii, sizeof (Ascii));
 
-  gST->ConOut->ClearScreen(gST->ConOut);
+  gST->ConOut->ClearScreen (gST->ConOut);
   return EFI_SUCCESS;
 }
 
@@ -1322,18 +1342,18 @@ PopupHddPasswordInputWindows (
 **/
 VOID
 HddPasswordRequestPassword (
-  IN EFI_ATA_PASS_THRU_PROTOCOL     *AtaPassThru,
-  IN UINT16                         Port,
-  IN UINT16                         PortMultiplierPort,
-  IN HDD_PASSWORD_CONFIG_FORM_ENTRY *ConfigFormEntry
+  IN EFI_ATA_PASS_THRU_PROTOCOL      *AtaPassThru,
+  IN UINT16                          Port,
+  IN UINT16                          PortMultiplierPort,
+  IN HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry
   )
 {
-  EFI_STATUS                        Status;
-  CHAR16                            PopUpString[100];
-  ATA_IDENTIFY_DATA                 IdentifyData;
-  EFI_INPUT_KEY                     Key;
-  UINT16                            RetryCount;
-  CHAR8                             Password[HDD_PASSWORD_MAX_LENGTH];
+  EFI_STATUS         Status;
+  CHAR16             PopUpString[100];
+  ATA_IDENTIFY_DATA  IdentifyData;
+  EFI_INPUT_KEY      Key;
+  UINT16             RetryCount;
+  CHAR8              Password[HDD_PASSWORD_MAX_LENGTH];
 
   RetryCount = 0;
 
@@ -1345,23 +1365,24 @@ HddPasswordRequestPassword (
   // Check the device security status.
   //
   if ((ConfigFormEntry->IfrData.SecurityStatus.Supported) &&
-      (ConfigFormEntry->IfrData.SecurityStatus.Enabled)) {
-
-     //
-     // Add PcdSkipHddPasswordPrompt to determin whether to skip password prompt.
-     // Due to board design, device may not power off during system warm boot, which result in
-     // security status remain unlocked status, hence we add device security status check here.
-     //
-     // If device is in the locked status, device keeps locked and system continues booting.
-     // If device is in the unlocked status, system is forced shutdown for security concern.
-     //
-     if (PcdGetBool (PcdSkipHddPasswordPrompt)) {
-       if (ConfigFormEntry->IfrData.SecurityStatus.Locked) {
-         return;
-       } else {
-         gRT->ResetSystem (EfiResetShutdown, EFI_SUCCESS, 0, NULL);
-       }
+      (ConfigFormEntry->IfrData.SecurityStatus.Enabled))
+  {
+    //
+    // Add PcdSkipHddPasswordPrompt to determin whether to skip password prompt.
+    // Due to board design, device may not power off during system warm boot, which result in
+    // security status remain unlocked status, hence we add device security status check here.
+    //
+    // If device is in the locked status, device keeps locked and system continues booting.
+    // If device is in the unlocked status, system is forced shutdown for security concern.
+    //
+    if (PcdGetBool (PcdSkipHddPasswordPrompt)) {
+      if (ConfigFormEntry->IfrData.SecurityStatus.Locked) {
+        return;
+      } else {
+        gRT->ResetSystem (EfiResetShutdown, EFI_SUCCESS, 0, NULL);
+      }
     }
+
     //
     // As soon as the HDD password is in enabled state, we pop up a window to unlock hdd
     // no matter it's really in locked or unlocked state.
@@ -1386,11 +1407,13 @@ HddPasswordRequestPassword (
         } else {
           Status = EFI_INVALID_PARAMETER;
         }
+
         if (!EFI_ERROR (Status)) {
           CopyMem (ConfigFormEntry->Password, Password, HDD_PASSWORD_MAX_LENGTH);
           if (!ConfigFormEntry->IfrData.SecurityStatus.Frozen) {
             SaveHddPasswordVariable (ConfigFormEntry, Password);
           }
+
           ZeroMem (Password, HDD_PASSWORD_MAX_LENGTH);
           Status = GetHddDeviceIdentifyData (AtaPassThru, Port, PortMultiplierPort, &IdentifyData);
           ASSERT_EFI_ERROR (Status);
@@ -1405,7 +1428,7 @@ HddPasswordRequestPassword (
         ZeroMem (Password, HDD_PASSWORD_MAX_LENGTH);
 
         if (EFI_ERROR (Status)) {
-          RetryCount ++;
+          RetryCount++;
           if (RetryCount < MAX_HDD_PASSWORD_RETRY_COUNT) {
             do {
               CreatePopUp (
@@ -1416,6 +1439,7 @@ HddPasswordRequestPassword (
                 NULL
                 );
             } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
             continue;
           } else {
             do {
@@ -1427,6 +1451,7 @@ HddPasswordRequestPassword (
                 NULL
                 );
             } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
             gRT->ResetSystem (EfiResetShutdown, EFI_SUCCESS, 0, NULL);
             break;
           }
@@ -1449,7 +1474,7 @@ HddPasswordRequestPassword (
           } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
 
           if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
-            gST->ConOut->ClearScreen(gST->ConOut);
+            gST->ConOut->ClearScreen (gST->ConOut);
             //
             // Keep lock and continue boot.
             //
@@ -1500,19 +1525,19 @@ HddPasswordRequestPassword (
 **/
 VOID
 ProcessHddPasswordRequestSetUserPwd (
-  IN EFI_ATA_PASS_THRU_PROTOCOL     *AtaPassThru,
-  IN UINT16                         Port,
-  IN UINT16                         PortMultiplierPort,
-  IN HDD_PASSWORD_CONFIG_FORM_ENTRY *ConfigFormEntry
+  IN EFI_ATA_PASS_THRU_PROTOCOL      *AtaPassThru,
+  IN UINT16                          Port,
+  IN UINT16                          PortMultiplierPort,
+  IN HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry
   )
 {
-  EFI_STATUS                        Status;
-  CHAR16                            PopUpString[100];
-  ATA_IDENTIFY_DATA                 IdentifyData;
-  EFI_INPUT_KEY                     Key;
-  UINT16                            RetryCount;
-  CHAR8                             Password[HDD_PASSWORD_MAX_LENGTH];
-  CHAR8                             PasswordConfirm[HDD_PASSWORD_MAX_LENGTH];
+  EFI_STATUS         Status;
+  CHAR16             PopUpString[100];
+  ATA_IDENTIFY_DATA  IdentifyData;
+  EFI_INPUT_KEY      Key;
+  UINT16             RetryCount;
+  CHAR8              Password[HDD_PASSWORD_MAX_LENGTH];
+  CHAR8              PasswordConfirm[HDD_PASSWORD_MAX_LENGTH];
 
   RetryCount = 0;
 
@@ -1549,6 +1574,7 @@ ProcessHddPasswordRequestSetUserPwd (
                 Status = EFI_INVALID_PARAMETER;
               }
             }
+
             if (!EFI_ERROR (Status)) {
               CopyMem (ConfigFormEntry->Password, Password, HDD_PASSWORD_MAX_LENGTH);
               SaveHddPasswordVariable (ConfigFormEntry, Password);
@@ -1583,6 +1609,7 @@ ProcessHddPasswordRequestSetUserPwd (
                 NULL
                 );
             } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
             Status = EFI_INVALID_PARAMETER;
           }
         }
@@ -1591,7 +1618,7 @@ ProcessHddPasswordRequestSetUserPwd (
         ZeroMem (PasswordConfirm, HDD_PASSWORD_MAX_LENGTH);
 
         if (EFI_ERROR (Status)) {
-          RetryCount ++;
+          RetryCount++;
           if (RetryCount >= MAX_HDD_PASSWORD_RETRY_COUNT) {
             do {
               CreatePopUp (
@@ -1602,7 +1629,8 @@ ProcessHddPasswordRequestSetUserPwd (
                 NULL
                 );
             } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
-            gST->ConOut->ClearScreen(gST->ConOut);
+
+            gST->ConOut->ClearScreen (gST->ConOut);
             return;
           }
         }
@@ -1618,7 +1646,7 @@ ProcessHddPasswordRequestSetUserPwd (
         } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
 
         if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
-          gST->ConOut->ClearScreen(gST->ConOut);
+          gST->ConOut->ClearScreen (gST->ConOut);
           return;
         } else {
           //
@@ -1642,18 +1670,18 @@ ProcessHddPasswordRequestSetUserPwd (
 **/
 VOID
 ProcessHddPasswordRequestSetMasterPwd (
-  IN EFI_ATA_PASS_THRU_PROTOCOL     *AtaPassThru,
-  IN UINT16                         Port,
-  IN UINT16                         PortMultiplierPort,
-  IN HDD_PASSWORD_CONFIG_FORM_ENTRY *ConfigFormEntry
+  IN EFI_ATA_PASS_THRU_PROTOCOL      *AtaPassThru,
+  IN UINT16                          Port,
+  IN UINT16                          PortMultiplierPort,
+  IN HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry
   )
 {
-  EFI_STATUS                        Status;
-  CHAR16                            PopUpString[100];
-  EFI_INPUT_KEY                     Key;
-  UINT16                            RetryCount;
-  CHAR8                             Password[HDD_PASSWORD_MAX_LENGTH];
-  CHAR8                             PasswordConfirm[HDD_PASSWORD_MAX_LENGTH];
+  EFI_STATUS     Status;
+  CHAR16         PopUpString[100];
+  EFI_INPUT_KEY  Key;
+  UINT16         RetryCount;
+  CHAR8          Password[HDD_PASSWORD_MAX_LENGTH];
+  CHAR8          PasswordConfirm[HDD_PASSWORD_MAX_LENGTH];
 
   RetryCount = 0;
 
@@ -1686,6 +1714,7 @@ ProcessHddPasswordRequestSetMasterPwd (
             } else {
               Status = EFI_INVALID_PARAMETER;
             }
+
             if (!EFI_ERROR (Status)) {
               ZeroMem (Password, HDD_PASSWORD_MAX_LENGTH);
               ZeroMem (PasswordConfirm, HDD_PASSWORD_MAX_LENGTH);
@@ -1711,6 +1740,7 @@ ProcessHddPasswordRequestSetMasterPwd (
                 NULL
                 );
             } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
             Status = EFI_INVALID_PARAMETER;
           }
         }
@@ -1719,7 +1749,7 @@ ProcessHddPasswordRequestSetMasterPwd (
         ZeroMem (PasswordConfirm, HDD_PASSWORD_MAX_LENGTH);
 
         if (EFI_ERROR (Status)) {
-          RetryCount ++;
+          RetryCount++;
           if (RetryCount >= MAX_HDD_PASSWORD_RETRY_COUNT) {
             do {
               CreatePopUp (
@@ -1730,7 +1760,8 @@ ProcessHddPasswordRequestSetMasterPwd (
                 NULL
                 );
             } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
-            gST->ConOut->ClearScreen(gST->ConOut);
+
+            gST->ConOut->ClearScreen (gST->ConOut);
             return;
           }
         }
@@ -1746,7 +1777,7 @@ ProcessHddPasswordRequestSetMasterPwd (
         } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
 
         if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
-          gST->ConOut->ClearScreen(gST->ConOut);
+          gST->ConOut->ClearScreen (gST->ConOut);
           return;
         } else {
           //
@@ -1770,16 +1801,16 @@ ProcessHddPasswordRequestSetMasterPwd (
 **/
 VOID
 ProcessHddPasswordRequest (
-  IN EFI_ATA_PASS_THRU_PROTOCOL     *AtaPassThru,
-  IN UINT16                         Port,
-  IN UINT16                         PortMultiplierPort,
-  IN HDD_PASSWORD_CONFIG_FORM_ENTRY *ConfigFormEntry
+  IN EFI_ATA_PASS_THRU_PROTOCOL      *AtaPassThru,
+  IN UINT16                          Port,
+  IN UINT16                          PortMultiplierPort,
+  IN HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry
   )
 {
-  EFI_STATUS                        Status;
-  HDD_PASSWORD_REQUEST_VARIABLE     *TempVariable;
-  HDD_PASSWORD_REQUEST_VARIABLE     *Variable;
-  UINTN                             VariableSize;
+  EFI_STATUS                     Status;
+  HDD_PASSWORD_REQUEST_VARIABLE  *TempVariable;
+  HDD_PASSWORD_REQUEST_VARIABLE  *Variable;
+  UINTN                          VariableSize;
 
   DEBUG ((DEBUG_INFO, "%a() - enter\n", __FUNCTION__));
 
@@ -1787,13 +1818,14 @@ ProcessHddPasswordRequest (
     Status = GetVariable2 (
                HDD_PASSWORD_REQUEST_VARIABLE_NAME,
                &mHddPasswordVendorGuid,
-               (VOID **) &Variable,
+               (VOID **)&Variable,
                &VariableSize
                );
     if (EFI_ERROR (Status) || (Variable == NULL)) {
       return;
     }
-    mHddPasswordRequestVariable = Variable;
+
+    mHddPasswordRequestVariable     = Variable;
     mHddPasswordRequestVariableSize = VariableSize;
 
     //
@@ -1808,7 +1840,7 @@ ProcessHddPasswordRequest (
                     );
     ASSERT_EFI_ERROR (Status);
   } else {
-    Variable = mHddPasswordRequestVariable;
+    Variable     = mHddPasswordRequestVariable;
     VariableSize = mHddPasswordRequestVariableSize;
   }
 
@@ -1821,13 +1853,15 @@ ProcessHddPasswordRequest (
         (TempVariable->Device.Device             == ConfigFormEntry->Device) &&
         (TempVariable->Device.Function           == ConfigFormEntry->Function) &&
         (TempVariable->Device.Port               == ConfigFormEntry->Port) &&
-        (TempVariable->Device.PortMultiplierPort == ConfigFormEntry->PortMultiplierPort)) {
+        (TempVariable->Device.PortMultiplierPort == ConfigFormEntry->PortMultiplierPort))
+    {
       //
       // Found the node for the HDD password device.
       //
       if (TempVariable->Request.UserPassword != 0) {
         ProcessHddPasswordRequestSetUserPwd (AtaPassThru, Port, PortMultiplierPort, ConfigFormEntry);
       }
+
       if (TempVariable->Request.MasterPassword != 0) {
         ProcessHddPasswordRequestSetMasterPwd (AtaPassThru, Port, PortMultiplierPort, ConfigFormEntry);
       }
@@ -1850,23 +1884,23 @@ ProcessHddPasswordRequest (
 **/
 VOID
 GetSavedHddPasswordRequest (
-  IN OUT HDD_PASSWORD_CONFIG_FORM_ENTRY *ConfigFormEntry
+  IN OUT HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry
   )
 {
-  EFI_STATUS                        Status;
-  HDD_PASSWORD_REQUEST_VARIABLE     *TempVariable;
-  HDD_PASSWORD_REQUEST_VARIABLE     *Variable;
-  UINTN                             VariableSize;
+  EFI_STATUS                     Status;
+  HDD_PASSWORD_REQUEST_VARIABLE  *TempVariable;
+  HDD_PASSWORD_REQUEST_VARIABLE  *Variable;
+  UINTN                          VariableSize;
 
   DEBUG ((DEBUG_INFO, "%a() - enter\n", __FUNCTION__));
 
-  Variable = NULL;
+  Variable     = NULL;
   VariableSize = 0;
 
   Status = GetVariable2 (
              HDD_PASSWORD_REQUEST_VARIABLE_NAME,
              &mHddPasswordVendorGuid,
-             (VOID **) &Variable,
+             (VOID **)&Variable,
              &VariableSize
              );
   if (EFI_ERROR (Status) || (Variable == NULL)) {
@@ -1879,7 +1913,8 @@ GetSavedHddPasswordRequest (
         (TempVariable->Device.Device             == ConfigFormEntry->Device) &&
         (TempVariable->Device.Function           == ConfigFormEntry->Function) &&
         (TempVariable->Device.Port               == ConfigFormEntry->Port) &&
-        (TempVariable->Device.PortMultiplierPort == ConfigFormEntry->PortMultiplierPort)) {
+        (TempVariable->Device.PortMultiplierPort == ConfigFormEntry->PortMultiplierPort))
+    {
       //
       // Found the node for the HDD password device.
       // Get the HDD password request.
@@ -1892,6 +1927,7 @@ GetSavedHddPasswordRequest (
         ));
       break;
     }
+
     VariableSize -= sizeof (HDD_PASSWORD_REQUEST_VARIABLE);
     TempVariable += 1;
   }
@@ -1909,16 +1945,16 @@ GetSavedHddPasswordRequest (
 **/
 VOID
 SaveHddPasswordRequest (
-  IN HDD_PASSWORD_CONFIG_FORM_ENTRY *ConfigFormEntry
+  IN HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry
   )
 {
-  EFI_STATUS                        Status;
-  HDD_PASSWORD_REQUEST_VARIABLE     *TempVariable;
-  UINTN                             TempVariableSize;
-  HDD_PASSWORD_REQUEST_VARIABLE     *Variable;
-  UINTN                             VariableSize;
-  HDD_PASSWORD_REQUEST_VARIABLE     *NewVariable;
-  UINTN                             NewVariableSize;
+  EFI_STATUS                     Status;
+  HDD_PASSWORD_REQUEST_VARIABLE  *TempVariable;
+  UINTN                          TempVariableSize;
+  HDD_PASSWORD_REQUEST_VARIABLE  *Variable;
+  UINTN                          VariableSize;
+  HDD_PASSWORD_REQUEST_VARIABLE  *NewVariable;
+  UINTN                          NewVariableSize;
 
   DEBUG ((DEBUG_INFO, "%a() - enter\n", __FUNCTION__));
 
@@ -1928,66 +1964,70 @@ SaveHddPasswordRequest (
     ConfigFormEntry->IfrData.Request
     ));
 
-  Variable = NULL;
-  VariableSize = 0;
-  NewVariable = NULL;
+  Variable        = NULL;
+  VariableSize    = 0;
+  NewVariable     = NULL;
   NewVariableSize = 0;
 
   Status = GetVariable2 (
              HDD_PASSWORD_REQUEST_VARIABLE_NAME,
              &mHddPasswordVendorGuid,
-             (VOID **) &Variable,
+             (VOID **)&Variable,
              &VariableSize
              );
   if (!EFI_ERROR (Status) && (Variable != NULL)) {
-    TempVariable = Variable;
+    TempVariable     = Variable;
     TempVariableSize = VariableSize;
     while (TempVariableSize >= sizeof (HDD_PASSWORD_REQUEST_VARIABLE)) {
       if ((TempVariable->Device.Bus                == ConfigFormEntry->Bus) &&
           (TempVariable->Device.Device             == ConfigFormEntry->Device) &&
           (TempVariable->Device.Function           == ConfigFormEntry->Function) &&
           (TempVariable->Device.Port               == ConfigFormEntry->Port) &&
-          (TempVariable->Device.PortMultiplierPort == ConfigFormEntry->PortMultiplierPort)) {
+          (TempVariable->Device.PortMultiplierPort == ConfigFormEntry->PortMultiplierPort))
+      {
         //
         // Found the node for the HDD password device.
         // Update the HDD password request.
         //
         CopyMem (&TempVariable->Request, &ConfigFormEntry->IfrData.Request, sizeof (HDD_PASSWORD_REQUEST));
-        NewVariable = Variable;
+        NewVariable     = Variable;
         NewVariableSize = VariableSize;
         break;
       }
+
       TempVariableSize -= sizeof (HDD_PASSWORD_REQUEST_VARIABLE);
-      TempVariable += 1;
+      TempVariable     += 1;
     }
+
     if (NewVariable == NULL) {
       //
       // The node for the HDD password device is not found.
       // Create node for the HDD password device.
       //
       NewVariableSize = VariableSize + sizeof (HDD_PASSWORD_REQUEST_VARIABLE);
-      NewVariable = AllocateZeroPool (NewVariableSize);
+      NewVariable     = AllocateZeroPool (NewVariableSize);
       ASSERT (NewVariable != NULL);
       CopyMem (NewVariable, Variable, VariableSize);
-      TempVariable = (HDD_PASSWORD_REQUEST_VARIABLE *) ((UINTN) NewVariable + VariableSize);
-      TempVariable->Device.Bus                = (UINT8) ConfigFormEntry->Bus;
-      TempVariable->Device.Device             = (UINT8) ConfigFormEntry->Device;
-      TempVariable->Device.Function           = (UINT8) ConfigFormEntry->Function;
+      TempVariable                            = (HDD_PASSWORD_REQUEST_VARIABLE *)((UINTN)NewVariable + VariableSize);
+      TempVariable->Device.Bus                = (UINT8)ConfigFormEntry->Bus;
+      TempVariable->Device.Device             = (UINT8)ConfigFormEntry->Device;
+      TempVariable->Device.Function           = (UINT8)ConfigFormEntry->Function;
       TempVariable->Device.Port               = ConfigFormEntry->Port;
       TempVariable->Device.PortMultiplierPort = ConfigFormEntry->PortMultiplierPort;
       CopyMem (&TempVariable->Request, &ConfigFormEntry->IfrData.Request, sizeof (HDD_PASSWORD_REQUEST));
     }
   } else {
     NewVariableSize = sizeof (HDD_PASSWORD_REQUEST_VARIABLE);
-    NewVariable = AllocateZeroPool (NewVariableSize);
+    NewVariable     = AllocateZeroPool (NewVariableSize);
     ASSERT (NewVariable != NULL);
-    NewVariable->Device.Bus                = (UINT8) ConfigFormEntry->Bus;
-    NewVariable->Device.Device             = (UINT8) ConfigFormEntry->Device;
-    NewVariable->Device.Function           = (UINT8) ConfigFormEntry->Function;
+    NewVariable->Device.Bus                = (UINT8)ConfigFormEntry->Bus;
+    NewVariable->Device.Device             = (UINT8)ConfigFormEntry->Device;
+    NewVariable->Device.Function           = (UINT8)ConfigFormEntry->Function;
     NewVariable->Device.Port               = ConfigFormEntry->Port;
     NewVariable->Device.PortMultiplierPort = ConfigFormEntry->PortMultiplierPort;
     CopyMem (&NewVariable->Request, &ConfigFormEntry->IfrData.Request, sizeof (HDD_PASSWORD_REQUEST));
   }
+
   Status = gRT->SetVariable (
                   HDD_PASSWORD_REQUEST_VARIABLE_NAME,
                   &mHddPasswordVendorGuid,
@@ -1998,9 +2038,11 @@ SaveHddPasswordRequest (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "HddPasswordRequest variable set failed (%r)\n", Status));
   }
+
   if (NewVariable != Variable) {
     FreePool (NewVariable);
   }
+
   if (Variable != NULL) {
     FreePool (Variable);
   }
@@ -2017,12 +2059,12 @@ SaveHddPasswordRequest (
 **/
 HDD_PASSWORD_CONFIG_FORM_ENTRY *
 HddPasswordGetConfigFormEntryByIndex (
-  IN UINT32 Index
+  IN UINT32  Index
   )
 {
-  LIST_ENTRY                     *Entry;
-  UINT32                         CurrentIndex;
-  HDD_PASSWORD_CONFIG_FORM_ENTRY *ConfigFormEntry;
+  LIST_ENTRY                      *Entry;
+  UINT32                          CurrentIndex;
+  HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry;
 
   CurrentIndex    = 0;
   ConfigFormEntry = NULL;
@@ -2104,22 +2146,22 @@ HddPasswordGetConfigFormEntryByIndex (
 EFI_STATUS
 EFIAPI
 HddPasswordFormExtractConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Request,
-  OUT EFI_STRING                             *Progress,
-  OUT EFI_STRING                             *Results
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Request,
+  OUT EFI_STRING                            *Progress,
+  OUT EFI_STRING                            *Results
   )
 {
-  EFI_STATUS                       Status;
-  UINTN                            BufferSize;
-  HDD_PASSWORD_CONFIG              *IfrData;
-  HDD_PASSWORD_DXE_PRIVATE_DATA    *Private;
-  EFI_STRING                       ConfigRequestHdr;
-  EFI_STRING                       ConfigRequest;
-  BOOLEAN                          AllocatedRequest;
-  UINTN                            Size;
+  EFI_STATUS                     Status;
+  UINTN                          BufferSize;
+  HDD_PASSWORD_CONFIG            *IfrData;
+  HDD_PASSWORD_DXE_PRIVATE_DATA  *Private;
+  EFI_STRING                     ConfigRequestHdr;
+  EFI_STRING                     ConfigRequest;
+  BOOLEAN                        AllocatedRequest;
+  UINTN                          Size;
 
-  if (Progress == NULL || Results == NULL) {
+  if ((Progress == NULL) || (Results == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2143,7 +2185,7 @@ HddPasswordFormExtractConfig (
   //
   // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
   //
-  BufferSize = sizeof (HDD_PASSWORD_CONFIG);
+  BufferSize    = sizeof (HDD_PASSWORD_CONFIG);
   ConfigRequest = Request;
   if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
     //
@@ -2152,17 +2194,18 @@ HddPasswordFormExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&mHddPasswordVendorGuid, mHddPasswordVendorStorageName, Private->DriverHandle);
-    Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-    ConfigRequest = AllocateZeroPool (Size);
+    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest    = AllocateZeroPool (Size);
     ASSERT (ConfigRequest != NULL);
     AllocatedRequest = TRUE;
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
     FreePool (ConfigRequestHdr);
   }
+
   Status = gHiiConfigRouting->BlockToConfig (
                                 gHiiConfigRouting,
                                 ConfigRequest,
-                                (UINT8 *) IfrData,
+                                (UINT8 *)IfrData,
                                 BufferSize,
                                 Results,
                                 Progress
@@ -2224,12 +2267,12 @@ HddPasswordFormExtractConfig (
 EFI_STATUS
 EFIAPI
 HddPasswordFormRouteConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Configuration,
-  OUT EFI_STRING                             *Progress
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Configuration,
+  OUT EFI_STRING                            *Progress
   )
 {
-  if (Configuration == NULL || Progress == NULL) {
+  if ((Configuration == NULL) || (Progress == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2275,18 +2318,18 @@ HddPasswordFormRouteConfig (
 EFI_STATUS
 EFIAPI
 HddPasswordFormCallback (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  EFI_BROWSER_ACTION                     Action,
-  IN  EFI_QUESTION_ID                        QuestionId,
-  IN  UINT8                                  Type,
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  EFI_BROWSER_ACTION                    Action,
+  IN  EFI_QUESTION_ID                       QuestionId,
+  IN  UINT8                                 Type,
+  IN  EFI_IFR_TYPE_VALUE                    *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   )
 {
   HDD_PASSWORD_DXE_PRIVATE_DATA   *Private;
-  EFI_STRING_ID                    DeviceFormTitleToken;
-  HDD_PASSWORD_CONFIG              *IfrData;
-  HDD_PASSWORD_CONFIG_FORM_ENTRY   *ConfigFormEntry;
+  EFI_STRING_ID                   DeviceFormTitleToken;
+  HDD_PASSWORD_CONFIG             *IfrData;
+  HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry;
 
   if (ActionRequest != NULL) {
     *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
@@ -2308,55 +2351,57 @@ HddPasswordFormCallback (
   //
   IfrData = AllocateZeroPool (sizeof (HDD_PASSWORD_CONFIG));
   ASSERT (IfrData != NULL);
-  if (!HiiGetBrowserData (&mHddPasswordVendorGuid, mHddPasswordVendorStorageName, sizeof (HDD_PASSWORD_CONFIG), (UINT8 *) IfrData)) {
+  if (!HiiGetBrowserData (&mHddPasswordVendorGuid, mHddPasswordVendorStorageName, sizeof (HDD_PASSWORD_CONFIG), (UINT8 *)IfrData)) {
     FreePool (IfrData);
     return EFI_NOT_FOUND;
   }
 
   switch (QuestionId) {
-  case KEY_HDD_USER_PASSWORD:
-    if (Action == EFI_BROWSER_ACTION_CHANGED) {
-      DEBUG ((DEBUG_INFO, "KEY_HDD_USER_PASSWORD\n"));
-      ConfigFormEntry = Private->Current;
-      ConfigFormEntry->IfrData.Request.UserPassword = Value->b;
-      SaveHddPasswordRequest (ConfigFormEntry);
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
-    }
-    break;
-  case KEY_HDD_MASTER_PASSWORD:
-    if (Action == EFI_BROWSER_ACTION_CHANGED) {
-      DEBUG ((DEBUG_INFO, "KEY_HDD_MASTER_PASSWORD\n"));
-      ConfigFormEntry = Private->Current;
-      ConfigFormEntry->IfrData.Request.MasterPassword = Value->b;
-      SaveHddPasswordRequest (ConfigFormEntry);
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
-    }
-    break;
-
-  default:
-    if ((QuestionId >= KEY_HDD_DEVICE_ENTRY_BASE) && (QuestionId < (mNumberOfHddDevices + KEY_HDD_DEVICE_ENTRY_BASE))) {
-      if (Action == EFI_BROWSER_ACTION_CHANGING) {
-        //
-        // In case goto the device configuration form, update the device form title.
-        //
-        ConfigFormEntry = HddPasswordGetConfigFormEntryByIndex ((UINT32) (QuestionId - KEY_HDD_DEVICE_ENTRY_BASE));
-        ASSERT (ConfigFormEntry != NULL);
-
-        DeviceFormTitleToken = (EFI_STRING_ID) STR_HDD_SECURITY_HD;
-        HiiSetString (Private->HiiHandle, DeviceFormTitleToken, ConfigFormEntry->HddString, NULL);
-
-        Private->Current = ConfigFormEntry;
-        CopyMem (IfrData, &ConfigFormEntry->IfrData, sizeof (HDD_PASSWORD_CONFIG));
+    case KEY_HDD_USER_PASSWORD:
+      if (Action == EFI_BROWSER_ACTION_CHANGED) {
+        DEBUG ((DEBUG_INFO, "KEY_HDD_USER_PASSWORD\n"));
+        ConfigFormEntry                               = Private->Current;
+        ConfigFormEntry->IfrData.Request.UserPassword = Value->b;
+        SaveHddPasswordRequest (ConfigFormEntry);
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
       }
-    }
 
-    break;
+      break;
+    case KEY_HDD_MASTER_PASSWORD:
+      if (Action == EFI_BROWSER_ACTION_CHANGED) {
+        DEBUG ((DEBUG_INFO, "KEY_HDD_MASTER_PASSWORD\n"));
+        ConfigFormEntry                                 = Private->Current;
+        ConfigFormEntry->IfrData.Request.MasterPassword = Value->b;
+        SaveHddPasswordRequest (ConfigFormEntry);
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
+      }
+
+      break;
+
+    default:
+      if ((QuestionId >= KEY_HDD_DEVICE_ENTRY_BASE) && (QuestionId < (mNumberOfHddDevices + KEY_HDD_DEVICE_ENTRY_BASE))) {
+        if (Action == EFI_BROWSER_ACTION_CHANGING) {
+          //
+          // In case goto the device configuration form, update the device form title.
+          //
+          ConfigFormEntry = HddPasswordGetConfigFormEntryByIndex ((UINT32)(QuestionId - KEY_HDD_DEVICE_ENTRY_BASE));
+          ASSERT (ConfigFormEntry != NULL);
+
+          DeviceFormTitleToken = (EFI_STRING_ID)STR_HDD_SECURITY_HD;
+          HiiSetString (Private->HiiHandle, DeviceFormTitleToken, ConfigFormEntry->HddString, NULL);
+
+          Private->Current = ConfigFormEntry;
+          CopyMem (IfrData, &ConfigFormEntry->IfrData, sizeof (HDD_PASSWORD_CONFIG));
+        }
+      }
+
+      break;
   }
 
   //
   // Pass changed uncommitted data back to Form Browser
   //
-  HiiSetBrowserData (&mHddPasswordVendorGuid, mHddPasswordVendorStorageName, sizeof (HDD_PASSWORD_CONFIG), (UINT8 *) IfrData, NULL);
+  HiiSetBrowserData (&mHddPasswordVendorGuid, mHddPasswordVendorStorageName, sizeof (HDD_PASSWORD_CONFIG), (UINT8 *)IfrData, NULL);
 
   FreePool (IfrData);
   return EFI_SUCCESS;
@@ -2394,17 +2439,17 @@ HddPasswordConfigUpdateForm (
   IN UINT16                      PortMultiplierPort
   )
 {
-  LIST_ENTRY                       *Entry;
-  HDD_PASSWORD_CONFIG_FORM_ENTRY   *ConfigFormEntry;
-  BOOLEAN                          EntryExisted;
-  EFI_STATUS                       Status;
-  VOID                             *StartOpCodeHandle;
-  VOID                             *EndOpCodeHandle;
-  EFI_IFR_GUID_LABEL               *StartLabel;
-  EFI_IFR_GUID_LABEL               *EndLabel;
-  CHAR16                           HddString[40];
-  ATA_IDENTIFY_DATA                IdentifyData;
-  EFI_DEVICE_PATH_PROTOCOL         *AtaDeviceNode;
+  LIST_ENTRY                      *Entry;
+  HDD_PASSWORD_CONFIG_FORM_ENTRY  *ConfigFormEntry;
+  BOOLEAN                         EntryExisted;
+  EFI_STATUS                      Status;
+  VOID                            *StartOpCodeHandle;
+  VOID                            *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL              *StartLabel;
+  EFI_IFR_GUID_LABEL              *EndLabel;
+  CHAR16                          HddString[40];
+  ATA_IDENTIFY_DATA               IdentifyData;
+  EFI_DEVICE_PATH_PROTOCOL        *AtaDeviceNode;
 
   ConfigFormEntry = NULL;
   EntryExisted    = FALSE;
@@ -2416,7 +2461,8 @@ HddPasswordConfigUpdateForm (
         (ConfigFormEntry->Device == Device) &&
         (ConfigFormEntry->Function == Function) &&
         (ConfigFormEntry->Port == Port) &&
-        (ConfigFormEntry->PortMultiplierPort == PortMultiplierPort)) {
+        (ConfigFormEntry->PortMultiplierPort == PortMultiplierPort))
+    {
       EntryExisted = TRUE;
       break;
     }
@@ -2454,6 +2500,7 @@ HddPasswordConfigUpdateForm (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     ConfigFormEntry->DevicePath = AppendDevicePathNode (DevicePathFromHandle (Controller), AtaDeviceNode);
     FreePool (AtaDeviceNode);
     if (ConfigFormEntry->DevicePath == NULL) {
@@ -2468,6 +2515,7 @@ HddPasswordConfigUpdateForm (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     GetHddDeviceModelNumber (&IdentifyData, HddString);
     //
     // Compose the HDD title string and help string of this port and create a new EFI_STRING_ID.
@@ -2492,14 +2540,14 @@ HddPasswordConfigUpdateForm (
     //
     // Create Hii Extend Label OpCode as the start opcode
     //
-    StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+    StartLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
     StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
     StartLabel->Number       = HDD_DEVICE_ENTRY_LABEL;
 
     //
     // Create Hii Extend Label OpCode as the end opcode
     //
-    EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+    EndLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
     EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
     EndLabel->Number       = HDD_DEVICE_LABEL_END;
 
@@ -2508,12 +2556,12 @@ HddPasswordConfigUpdateForm (
       ConfigFormEntry = BASE_CR (Entry, HDD_PASSWORD_CONFIG_FORM_ENTRY, Link);
 
       HiiCreateGotoOpCode (
-        StartOpCodeHandle,                                // Container for dynamic created opcodes
-        FORMID_HDD_DEVICE_FORM,                           // Target Form ID
-        ConfigFormEntry->TitleToken,                      // Prompt text
-        ConfigFormEntry->TitleHelpToken,                  // Help text
-        EFI_IFR_FLAG_CALLBACK,                            // Question flag
-        (UINT16) (KEY_HDD_DEVICE_ENTRY_BASE + mNumberOfHddDevices)   // Question ID
+        StartOpCodeHandle,                                        // Container for dynamic created opcodes
+        FORMID_HDD_DEVICE_FORM,                                   // Target Form ID
+        ConfigFormEntry->TitleToken,                              // Prompt text
+        ConfigFormEntry->TitleHelpToken,                          // Help text
+        EFI_IFR_FLAG_CALLBACK,                                    // Question flag
+        (UINT16)(KEY_HDD_DEVICE_ENTRY_BASE + mNumberOfHddDevices) // Question ID
         );
 
       mNumberOfHddDevices++;
@@ -2557,24 +2605,24 @@ HddPasswordConfigUpdateForm (
 VOID
 EFIAPI
 HddPasswordNotificationEvent (
-  IN  EFI_EVENT       Event,
-  IN  VOID            *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   )
 {
-  EFI_STATUS                        Status;
-  HDD_PASSWORD_DXE_PRIVATE_DATA     *Private;
-  EFI_ATA_PASS_THRU_PROTOCOL        *AtaPassThru;
-  UINT16                            Port;
-  UINT16                            PortMultiplierPort;
-  EFI_HANDLE                        Controller;
-  EFI_HANDLE                        *HandleBuffer;
-  UINTN                             HandleCount;
-  UINTN                             Index;
-  EFI_PCI_IO_PROTOCOL               *PciIo;
-  UINTN                             SegNum;
-  UINTN                             BusNum;
-  UINTN                             DevNum;
-  UINTN                             FuncNum;
+  EFI_STATUS                     Status;
+  HDD_PASSWORD_DXE_PRIVATE_DATA  *Private;
+  EFI_ATA_PASS_THRU_PROTOCOL     *AtaPassThru;
+  UINT16                         Port;
+  UINT16                         PortMultiplierPort;
+  EFI_HANDLE                     Controller;
+  EFI_HANDLE                     *HandleBuffer;
+  UINTN                          HandleCount;
+  UINTN                          Index;
+  EFI_PCI_IO_PROTOCOL            *PciIo;
+  UINTN                          SegNum;
+  UINTN                          BusNum;
+  UINTN                          DevNum;
+  UINTN                          FuncNum;
 
   if (mHddPasswordEndOfDxe) {
     gBS->CloseEvent (Event);
@@ -2594,7 +2642,7 @@ HddPasswordNotificationEvent (
                   &HandleBuffer
                   );
   if (EFI_ERROR (Status)) {
-    return ;
+    return;
   }
 
   //
@@ -2602,11 +2650,11 @@ HddPasswordNotificationEvent (
   //
   for (Index = 0; Index < HandleCount; Index += 1) {
     Controller = HandleBuffer[Index];
-    Status = gBS->HandleProtocol (
-                    Controller,
-                    &gEfiAtaPassThruProtocolGuid,
-                    (VOID **) &AtaPassThru
-                    );
+    Status     = gBS->HandleProtocol (
+                        Controller,
+                        &gEfiAtaPassThruProtocolGuid,
+                        (VOID **)&AtaPassThru
+                        );
     if (EFI_ERROR (Status)) {
       break;
     }
@@ -2621,7 +2669,7 @@ HddPasswordNotificationEvent (
     Status = gBS->HandleProtocol (
                     Controller,
                     &gEfiPciIoProtocolGuid,
-                    (VOID **) &PciIo
+                    (VOID **)&PciIo
                     );
     ASSERT_EFI_ERROR (Status);
     if (EFI_ERROR (Status)) {
@@ -2669,6 +2717,7 @@ HddPasswordNotificationEvent (
           //
           break;
         }
+
         //
         // Find out the attached harddisk devices.
         // Try to add a HDD Password configuration page for the attached devices.
@@ -2684,7 +2733,7 @@ HddPasswordNotificationEvent (
   }
 
   FreePool (HandleBuffer);
-  return ;
+  return;
 }
 
 /**
@@ -2698,11 +2747,11 @@ HddPasswordNotificationEvent (
 **/
 EFI_STATUS
 HddPasswordConfigFormInit (
-  OUT HDD_PASSWORD_DXE_PRIVATE_DATA    **Instance
+  OUT HDD_PASSWORD_DXE_PRIVATE_DATA  **Instance
   )
 {
-  EFI_STATUS                       Status;
-  HDD_PASSWORD_DXE_PRIVATE_DATA    *Private;
+  EFI_STATUS                     Status;
+  HDD_PASSWORD_DXE_PRIVATE_DATA  *Private;
 
   InitializeListHead (&mHddPasswordConfigFormList);
 
@@ -2711,7 +2760,7 @@ HddPasswordConfigFormInit (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Private->Signature   = HDD_PASSWORD_DXE_PRIVATE_SIGNATURE;
+  Private->Signature = HDD_PASSWORD_DXE_PRIVATE_SIGNATURE;
 
   Private->ConfigAccess.ExtractConfig = HddPasswordFormExtractConfig;
   Private->ConfigAccess.RouteConfig   = HddPasswordFormRouteConfig;
@@ -2730,7 +2779,7 @@ HddPasswordConfigFormInit (
                   );
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
-    FreePool(Private);
+    FreePool (Private);
     return Status;
   }
 
@@ -2745,7 +2794,7 @@ HddPasswordConfigFormInit (
                          NULL
                          );
   if (Private->HiiHandle == NULL) {
-    FreePool(Private);
+    FreePool (Private);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -2765,8 +2814,8 @@ HddPasswordConfigFormInit (
 EFI_STATUS
 EFIAPI
 HddPasswordDxeInit (
-  IN EFI_HANDLE                   ImageHandle,
-  IN EFI_SYSTEM_TABLE             *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS                     Status;
@@ -2809,7 +2858,7 @@ HddPasswordDxeInit (
   //
   // Make HDD_PASSWORD_VARIABLE_NAME variable read-only.
   //
-  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
+  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLock);
   if (!EFI_ERROR (Status)) {
     Status = VariableLock->RequestToLock (
                              VariableLock,

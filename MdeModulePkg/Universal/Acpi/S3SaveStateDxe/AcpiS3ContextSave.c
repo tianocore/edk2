@@ -23,9 +23,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // 8 extra pages for PF handler.
 //
-#define EXTRA_PAGE_TABLE_PAGES   8
+#define EXTRA_PAGE_TABLE_PAGES  8
 
-EFI_GUID              mAcpiS3IdtrProfileGuid = {
+EFI_GUID  mAcpiS3IdtrProfileGuid = {
   0xdea652b0, 0xd587, 0x4c54, { 0xb5, 0xb4, 0xc6, 0x82, 0xe7, 0xa0, 0xaa, 0x3d }
 };
 
@@ -40,29 +40,29 @@ EFI_GUID              mAcpiS3IdtrProfileGuid = {
   @return Allocated address for output.
 
 **/
-VOID*
+VOID *
 AllocateMemoryBelow4G (
-  IN EFI_MEMORY_TYPE    MemoryType,
-  IN UINTN              Size
+  IN EFI_MEMORY_TYPE  MemoryType,
+  IN UINTN            Size
   )
 {
   UINTN                 Pages;
   EFI_PHYSICAL_ADDRESS  Address;
   EFI_STATUS            Status;
-  VOID*                 Buffer;
+  VOID                  *Buffer;
 
-  Pages = EFI_SIZE_TO_PAGES (Size);
+  Pages   = EFI_SIZE_TO_PAGES (Size);
   Address = 0xffffffff;
 
-  Status  = gBS->AllocatePages (
-                   AllocateMaxAddress,
-                   MemoryType,
-                   Pages,
-                   &Address
-                   );
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  MemoryType,
+                  Pages,
+                  &Address
+                  );
   ASSERT_EFI_ERROR (Status);
 
-  Buffer = (VOID *) (UINTN) Address;
+  Buffer = (VOID *)(UINTN)Address;
   ZeroMem (Buffer, Size);
 
   return Buffer;
@@ -79,18 +79,21 @@ AllocateMemoryBelow4G (
 **/
 BOOLEAN
 IsLongModeWakingVectorSupport (
-  IN EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *Facs
+  IN EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs
   )
 {
   if ((Facs == NULL) ||
-      (Facs->Signature != EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) ) {
+      (Facs->Signature != EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE))
+  {
     //
     // Something wrong with FACS.
     //
     return FALSE;
   }
+
   if ((Facs->Version == EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
-      ((Facs->Flags & EFI_ACPI_4_0_64BIT_WAKE_SUPPORTED_F) != 0)) {
+      ((Facs->Flags & EFI_ACPI_4_0_64BIT_WAKE_SUPPORTED_F) != 0))
+  {
     //
     // BIOS supports 64bit waking vector.
     //
@@ -98,6 +101,7 @@ IsLongModeWakingVectorSupport (
       return TRUE;
     }
   }
+
   return FALSE;
 }
 
@@ -117,23 +121,23 @@ IsLongModeWakingVectorSupport (
 **/
 EFI_PHYSICAL_ADDRESS
 S3AllocatePageTablesBuffer (
-  IN BOOLEAN    LongModeWakingVectorSupport
+  IN BOOLEAN  LongModeWakingVectorSupport
   )
 {
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
-    UINTN                                         ExtraPageTablePages;
-    UINT32                                        RegEax;
-    UINT32                                        RegEdx;
-    UINT8                                         PhysicalAddressBits;
-    UINT32                                        NumberOfPml4EntriesNeeded;
-    UINT32                                        NumberOfPdpEntriesNeeded;
-    EFI_PHYSICAL_ADDRESS                          S3NvsPageTableAddress;
-    UINTN                                         TotalPageTableSize;
-    VOID                                          *Hob;
-    BOOLEAN                                       Page1GSupport;
+    UINTN                 ExtraPageTablePages;
+    UINT32                RegEax;
+    UINT32                RegEdx;
+    UINT8                 PhysicalAddressBits;
+    UINT32                NumberOfPml4EntriesNeeded;
+    UINT32                NumberOfPdpEntriesNeeded;
+    EFI_PHYSICAL_ADDRESS  S3NvsPageTableAddress;
+    UINTN                 TotalPageTableSize;
+    VOID                  *Hob;
+    BOOLEAN               Page1GSupport;
 
     Page1GSupport = FALSE;
-    if (PcdGetBool(PcdUse1GPageTable)) {
+    if (PcdGetBool (PcdUse1GPageTable)) {
       AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
       if (RegEax >= 0x80000001) {
         AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
@@ -148,12 +152,12 @@ S3AllocatePageTablesBuffer (
     //
     Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
     if (Hob != NULL) {
-      PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
+      PhysicalAddressBits = ((EFI_HOB_CPU *)Hob)->SizeOfMemorySpace;
     } else {
       AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
       if (RegEax >= 0x80000008) {
         AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-        PhysicalAddressBits = (UINT8) RegEax;
+        PhysicalAddressBits = (UINT8)RegEax;
       } else {
         PhysicalAddressBits = 36;
       }
@@ -182,10 +186,10 @@ S3AllocatePageTablesBuffer (
     //
     if (PhysicalAddressBits <= 39 ) {
       NumberOfPml4EntriesNeeded = 1;
-      NumberOfPdpEntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 30));
+      NumberOfPdpEntriesNeeded  = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 30));
     } else {
       NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 39));
-      NumberOfPdpEntriesNeeded = 512;
+      NumberOfPdpEntriesNeeded  = 512;
     }
 
     //
@@ -203,14 +207,14 @@ S3AllocatePageTablesBuffer (
     //
     // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
     //
-    S3NvsPageTableAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateMemoryBelow4G (EfiReservedMemoryType, EFI_PAGES_TO_SIZE(TotalPageTableSize));
+    S3NvsPageTableAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateMemoryBelow4G (EfiReservedMemoryType, EFI_PAGES_TO_SIZE (TotalPageTableSize));
     ASSERT (S3NvsPageTableAddress != 0);
     return S3NvsPageTableAddress;
   } else {
     //
     // If DXE is running 32-bit mode, no need to establish page table.
     //
-    return  (EFI_PHYSICAL_ADDRESS) 0;
+    return (EFI_PHYSICAL_ADDRESS)0;
   }
 }
 
@@ -236,37 +240,37 @@ AcpiS3ContextSaveOnEndOfDxe (
   EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs;
   VOID                                          *Interface;
 
-  DEBUG ((EFI_D_INFO, "AcpiS3ContextSave!\n"));
+  DEBUG ((DEBUG_INFO, "AcpiS3ContextSave!\n"));
 
   Status = gBS->LocateProtocol (&gEfiLockBoxProtocolGuid, NULL, &Interface);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO | EFI_D_WARN, "ACPI S3 context can't be saved without LockBox!\n"));
+    DEBUG ((DEBUG_INFO | DEBUG_WARN, "ACPI S3 context can't be saved without LockBox!\n"));
     goto Done;
   }
 
-  AcpiS3Context = AllocateMemoryBelow4G (EfiReservedMemoryType, sizeof(*AcpiS3Context));
+  AcpiS3Context = AllocateMemoryBelow4G (EfiReservedMemoryType, sizeof (*AcpiS3Context));
   ASSERT (AcpiS3Context != NULL);
   AcpiS3ContextBuffer = (EFI_PHYSICAL_ADDRESS)(UINTN)AcpiS3Context;
 
   //
   // Get ACPI Table because we will save its position to variable
   //
-  Facs = (EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) EfiLocateFirstAcpiTable (
-                                                            EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE
-                                                            );
-  AcpiS3Context->AcpiFacsTable = (EFI_PHYSICAL_ADDRESS) (UINTN) Facs;
+  Facs = (EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)EfiLocateFirstAcpiTable (
+                                                           EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE
+                                                           );
+  AcpiS3Context->AcpiFacsTable = (EFI_PHYSICAL_ADDRESS)(UINTN)Facs;
   ASSERT (AcpiS3Context->AcpiFacsTable != 0);
 
-  IdtGate = AllocateMemoryBelow4G (EfiReservedMemoryType, sizeof(IA32_IDT_GATE_DESCRIPTOR) * 0x100 + sizeof(IA32_DESCRIPTOR));
-  Idtr = (IA32_DESCRIPTOR *)(IdtGate + 0x100);
-  Idtr->Base  = (UINTN)IdtGate;
-  Idtr->Limit = (UINT16)(sizeof(IA32_IDT_GATE_DESCRIPTOR) * 0x100 - 1);
+  IdtGate                    = AllocateMemoryBelow4G (EfiReservedMemoryType, sizeof (IA32_IDT_GATE_DESCRIPTOR) * 0x100 + sizeof (IA32_DESCRIPTOR));
+  Idtr                       = (IA32_DESCRIPTOR *)(IdtGate + 0x100);
+  Idtr->Base                 = (UINTN)IdtGate;
+  Idtr->Limit                = (UINT16)(sizeof (IA32_IDT_GATE_DESCRIPTOR) * 0x100 - 1);
   AcpiS3Context->IdtrProfile = (EFI_PHYSICAL_ADDRESS)(UINTN)Idtr;
 
   Status = SaveLockBox (
              &mAcpiS3IdtrProfileGuid,
              (VOID *)(UINTN)Idtr,
-             (UINTN)sizeof(IA32_DESCRIPTOR)
+             (UINTN)sizeof (IA32_DESCRIPTOR)
              );
   ASSERT_EFI_ERROR (Status);
 
@@ -291,24 +295,24 @@ AcpiS3ContextSaveOnEndOfDxe (
   AcpiS3Context->S3DebugBufferAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateMemoryBelow4G (EfiReservedMemoryType, EFI_PAGE_SIZE);
   SetMem ((VOID *)(UINTN)AcpiS3Context->S3DebugBufferAddress, EFI_PAGE_SIZE, 0xff);
 
-  DEBUG((EFI_D_INFO, "AcpiS3Context: AcpiFacsTable is 0x%8x\n", AcpiS3Context->AcpiFacsTable));
-  DEBUG((EFI_D_INFO, "AcpiS3Context: IdtrProfile is 0x%8x\n", AcpiS3Context->IdtrProfile));
-  DEBUG((EFI_D_INFO, "AcpiS3Context: S3NvsPageTableAddress is 0x%8x\n", AcpiS3Context->S3NvsPageTableAddress));
-  DEBUG((EFI_D_INFO, "AcpiS3Context: S3DebugBufferAddress is 0x%8x\n", AcpiS3Context->S3DebugBufferAddress));
-  DEBUG((EFI_D_INFO, "AcpiS3Context: BootScriptStackBase is 0x%8x\n", AcpiS3Context->BootScriptStackBase));
-  DEBUG((EFI_D_INFO, "AcpiS3Context: BootScriptStackSize is 0x%8x\n", AcpiS3Context->BootScriptStackSize));
+  DEBUG ((DEBUG_INFO, "AcpiS3Context: AcpiFacsTable is 0x%8x\n", AcpiS3Context->AcpiFacsTable));
+  DEBUG ((DEBUG_INFO, "AcpiS3Context: IdtrProfile is 0x%8x\n", AcpiS3Context->IdtrProfile));
+  DEBUG ((DEBUG_INFO, "AcpiS3Context: S3NvsPageTableAddress is 0x%8x\n", AcpiS3Context->S3NvsPageTableAddress));
+  DEBUG ((DEBUG_INFO, "AcpiS3Context: S3DebugBufferAddress is 0x%8x\n", AcpiS3Context->S3DebugBufferAddress));
+  DEBUG ((DEBUG_INFO, "AcpiS3Context: BootScriptStackBase is 0x%8x\n", AcpiS3Context->BootScriptStackBase));
+  DEBUG ((DEBUG_INFO, "AcpiS3Context: BootScriptStackSize is 0x%8x\n", AcpiS3Context->BootScriptStackSize));
 
   Status = SaveLockBox (
              &gEfiAcpiVariableGuid,
              &AcpiS3ContextBuffer,
-             sizeof(AcpiS3ContextBuffer)
+             sizeof (AcpiS3ContextBuffer)
              );
   ASSERT_EFI_ERROR (Status);
 
   Status = SaveLockBox (
              &gEfiAcpiS3ContextGuid,
              (VOID *)(UINTN)AcpiS3Context,
-             (UINTN)sizeof(*AcpiS3Context)
+             (UINTN)sizeof (*AcpiS3Context)
              );
   ASSERT_EFI_ERROR (Status);
 
@@ -322,4 +326,3 @@ Done:
   Status = gBS->CloseEvent (Event);
   ASSERT_EFI_ERROR (Status);
 }
-

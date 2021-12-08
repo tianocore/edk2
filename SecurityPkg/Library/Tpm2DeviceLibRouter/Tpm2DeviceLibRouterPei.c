@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PcdLib.h>
 #include <Library/Tpm2DeviceLib.h>
 
-EFI_GUID mInternalTpm2DeviceInterfaceGuid = {
+EFI_GUID  mInternalTpm2DeviceInterfaceGuid = {
   0x349cf818, 0xc0ba, 0x4c43, { 0x92, 0x9a, 0xc8, 0xa1, 0xb1, 0xb3, 0xd2, 0x55 }
 };
 
@@ -29,12 +29,13 @@ InternalGetTpm2DeviceInterface (
   VOID
   )
 {
-  EFI_HOB_GUID_TYPE *Hob;
+  EFI_HOB_GUID_TYPE  *Hob;
 
   Hob = GetFirstGuidHob (&mInternalTpm2DeviceInterfaceGuid);
   if (Hob == NULL) {
     return NULL;
   }
+
   return (TPM2_DEVICE_INTERFACE *)(Hob + 1);
 }
 
@@ -53,13 +54,13 @@ InternalGetTpm2DeviceInterface (
 EFI_STATUS
 EFIAPI
 Tpm2SubmitCommand (
-  IN UINT32            InputParameterBlockSize,
-  IN UINT8             *InputParameterBlock,
-  IN OUT UINT32        *OutputParameterBlockSize,
-  IN UINT8             *OutputParameterBlock
+  IN UINT32      InputParameterBlockSize,
+  IN UINT8       *InputParameterBlock,
+  IN OUT UINT32  *OutputParameterBlockSize,
+  IN UINT8       *OutputParameterBlock
   )
 {
-  TPM2_DEVICE_INTERFACE *Tpm2DeviceInterface;
+  TPM2_DEVICE_INTERFACE  *Tpm2DeviceInterface;
 
   Tpm2DeviceInterface = InternalGetTpm2DeviceInterface ();
   if (Tpm2DeviceInterface == NULL) {
@@ -87,12 +88,13 @@ Tpm2RequestUseTpm (
   VOID
   )
 {
-  TPM2_DEVICE_INTERFACE *Tpm2DeviceInterface;
+  TPM2_DEVICE_INTERFACE  *Tpm2DeviceInterface;
 
   Tpm2DeviceInterface = InternalGetTpm2DeviceInterface ();
   if (Tpm2DeviceInterface == NULL) {
     return EFI_UNSUPPORTED;
   }
+
   return Tpm2DeviceInterface->Tpm2RequestUseTpm ();
 }
 
@@ -108,12 +110,12 @@ Tpm2RequestUseTpm (
 EFI_STATUS
 EFIAPI
 Tpm2RegisterTpm2DeviceLib (
-  IN TPM2_DEVICE_INTERFACE   *Tpm2Device
+  IN TPM2_DEVICE_INTERFACE  *Tpm2Device
   )
 {
-  TPM2_DEVICE_INTERFACE *Tpm2DeviceInterface;
+  TPM2_DEVICE_INTERFACE  *Tpm2DeviceInterface;
 
-  if (!CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &Tpm2Device->ProviderGuid)){
+  if (!CompareGuid (PcdGetPtr (PcdTpmInstanceGuid), &Tpm2Device->ProviderGuid)) {
     DEBUG ((DEBUG_WARN, "WARNING: Tpm2RegisterTpm2DeviceLib - does not support %g registration\n", &Tpm2Device->ProviderGuid));
     return EFI_UNSUPPORTED;
   }
@@ -123,11 +125,11 @@ Tpm2RegisterTpm2DeviceLib (
     //
     // In PEI phase, there will be shadow driver dispatched again.
     //
-    DEBUG ((EFI_D_INFO, "Tpm2RegisterTpm2DeviceLib - Override\n"));
-    CopyMem (Tpm2DeviceInterface, Tpm2Device, sizeof(*Tpm2Device));
+    DEBUG ((DEBUG_INFO, "Tpm2RegisterTpm2DeviceLib - Override\n"));
+    CopyMem (Tpm2DeviceInterface, Tpm2Device, sizeof (*Tpm2Device));
     return EFI_SUCCESS;
   } else {
-    Tpm2Device = BuildGuidDataHob (&mInternalTpm2DeviceInterfaceGuid, Tpm2Device, sizeof(*Tpm2Device));
+    Tpm2Device = BuildGuidDataHob (&mInternalTpm2DeviceInterfaceGuid, Tpm2Device, sizeof (*Tpm2Device));
     if (Tpm2Device != NULL) {
       return EFI_SUCCESS;
     } else {

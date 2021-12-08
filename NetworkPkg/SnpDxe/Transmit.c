@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Snp.h"
 
-
 /**
   Call UNDI to create the meadia header for the given data buffer.
 
@@ -27,14 +26,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 PxeFillHeader (
-  SNP_DRIVER      *Snp,
-  VOID            *MacHeaderPtr,
-  UINTN           HeaderSize,
-  VOID            *Buffer,
-  UINTN           BufferSize,
-  EFI_MAC_ADDRESS *DestAddr,
-  EFI_MAC_ADDRESS *SrcAddr,
-  UINT16          *ProtocolPtr
+  SNP_DRIVER       *Snp,
+  VOID             *MacHeaderPtr,
+  UINTN            HeaderSize,
+  VOID             *Buffer,
+  UINTN            BufferSize,
+  EFI_MAC_ADDRESS  *DestAddr,
+  EFI_MAC_ADDRESS  *SrcAddr,
+  UINT16           *ProtocolPtr
   )
 {
   PXE_CPB_FILL_HEADER_FRAGMENTED  *Cpb;
@@ -42,89 +41,88 @@ PxeFillHeader (
   Cpb = Snp->Cpb;
   if (SrcAddr != NULL) {
     CopyMem (
-      (VOID *) Cpb->SrcAddr,
-      (VOID *) SrcAddr,
+      (VOID *)Cpb->SrcAddr,
+      (VOID *)SrcAddr,
       Snp->Mode.HwAddressSize
       );
   } else {
     CopyMem (
-      (VOID *) Cpb->SrcAddr,
-      (VOID *) &(Snp->Mode.CurrentAddress),
+      (VOID *)Cpb->SrcAddr,
+      (VOID *)&(Snp->Mode.CurrentAddress),
       Snp->Mode.HwAddressSize
       );
   }
 
   CopyMem (
-    (VOID *) Cpb->DestAddr,
-    (VOID *) DestAddr,
+    (VOID *)Cpb->DestAddr,
+    (VOID *)DestAddr,
     Snp->Mode.HwAddressSize
     );
 
   //
   // we need to do the byte swapping
   //
-  Cpb->Protocol             = (UINT16) PXE_SWAP_UINT16 (*ProtocolPtr);
+  Cpb->Protocol = (UINT16)PXE_SWAP_UINT16 (*ProtocolPtr);
 
-  Cpb->PacketLen            = (UINT32) (BufferSize);
-  Cpb->MediaHeaderLen       = (UINT16) HeaderSize;
+  Cpb->PacketLen      = (UINT32)(BufferSize);
+  Cpb->MediaHeaderLen = (UINT16)HeaderSize;
 
-  Cpb->FragCnt              = 2;
-  Cpb->reserved             = 0;
+  Cpb->FragCnt  = 2;
+  Cpb->reserved = 0;
 
-  Cpb->FragDesc[0].FragAddr = (UINT64)(UINTN) MacHeaderPtr;
-  Cpb->FragDesc[0].FragLen  = (UINT32) HeaderSize;
-  Cpb->FragDesc[1].FragAddr = (UINT64)(UINTN) Buffer;
-  Cpb->FragDesc[1].FragLen  = (UINT32) BufferSize;
+  Cpb->FragDesc[0].FragAddr = (UINT64)(UINTN)MacHeaderPtr;
+  Cpb->FragDesc[0].FragLen  = (UINT32)HeaderSize;
+  Cpb->FragDesc[1].FragAddr = (UINT64)(UINTN)Buffer;
+  Cpb->FragDesc[1].FragLen  = (UINT32)BufferSize;
 
   Cpb->FragDesc[0].reserved = Cpb->FragDesc[1].reserved = 0;
 
-  Snp->Cdb.OpCode     = PXE_OPCODE_FILL_HEADER;
-  Snp->Cdb.OpFlags    = PXE_OPFLAGS_FILL_HEADER_FRAGMENTED;
+  Snp->Cdb.OpCode  = PXE_OPCODE_FILL_HEADER;
+  Snp->Cdb.OpFlags = PXE_OPFLAGS_FILL_HEADER_FRAGMENTED;
 
-  Snp->Cdb.DBsize     = PXE_DBSIZE_NOT_USED;
-  Snp->Cdb.DBaddr     = PXE_DBADDR_NOT_USED;
+  Snp->Cdb.DBsize = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb.DBaddr = PXE_DBADDR_NOT_USED;
 
-  Snp->Cdb.CPBsize    = (UINT16) sizeof (PXE_CPB_FILL_HEADER_FRAGMENTED);
-  Snp->Cdb.CPBaddr    = (UINT64)(UINTN) Cpb;
+  Snp->Cdb.CPBsize = (UINT16)sizeof (PXE_CPB_FILL_HEADER_FRAGMENTED);
+  Snp->Cdb.CPBaddr = (UINT64)(UINTN)Cpb;
 
-  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum      = Snp->IfNum;
-  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum     = Snp->IfNum;
+  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nSnp->undi.fill_header()  "));
+  DEBUG ((DEBUG_NET, "\nSnp->undi.fill_header()  "));
 
-  (*Snp->IssueUndi32Command) ((UINT64) (UINTN) &Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
 
   switch (Snp->Cdb.StatCode) {
-  case PXE_STATCODE_SUCCESS:
-    return EFI_SUCCESS;
+    case PXE_STATCODE_SUCCESS:
+      return EFI_SUCCESS;
 
-  case PXE_STATCODE_INVALID_PARAMETER:
-    DEBUG (
-      (EFI_D_ERROR,
-      "\nSnp->undi.fill_header()  %xh:%xh\n",
-      Snp->Cdb.StatFlags,
-      Snp->Cdb.StatCode)
-      );
+    case PXE_STATCODE_INVALID_PARAMETER:
+      DEBUG (
+        (DEBUG_ERROR,
+         "\nSnp->undi.fill_header()  %xh:%xh\n",
+         Snp->Cdb.StatFlags,
+         Snp->Cdb.StatCode)
+        );
 
-    return EFI_INVALID_PARAMETER;
+      return EFI_INVALID_PARAMETER;
 
-  default:
-    DEBUG (
-      (EFI_D_ERROR,
-      "\nSnp->undi.fill_header()  %xh:%xh\n",
-      Snp->Cdb.StatFlags,
-      Snp->Cdb.StatCode)
-      );
+    default:
+      DEBUG (
+        (DEBUG_ERROR,
+         "\nSnp->undi.fill_header()  %xh:%xh\n",
+         Snp->Cdb.StatFlags,
+         Snp->Cdb.StatCode)
+        );
 
-    return EFI_DEVICE_ERROR;
+      return EFI_DEVICE_ERROR;
   }
 }
-
 
 /**
   This routine calls undi to transmit the given data buffer
@@ -139,75 +137,75 @@ PxeFillHeader (
 **/
 EFI_STATUS
 PxeTransmit (
-  SNP_DRIVER *Snp,
-  VOID       *Buffer,
-  UINTN      BufferSize
+  SNP_DRIVER  *Snp,
+  VOID        *Buffer,
+  UINTN       BufferSize
   )
 {
   PXE_CPB_TRANSMIT  *Cpb;
   EFI_STATUS        Status;
 
-  Cpb             = Snp->Cpb;
-  Cpb->FrameAddr  = (UINT64) (UINTN) Buffer;
-  Cpb->DataLen    = (UINT32) BufferSize;
+  Cpb            = Snp->Cpb;
+  Cpb->FrameAddr = (UINT64)(UINTN)Buffer;
+  Cpb->DataLen   = (UINT32)BufferSize;
 
   Cpb->MediaheaderLen = 0;
   Cpb->reserved       = 0;
 
-  Snp->Cdb.OpFlags    = PXE_OPFLAGS_TRANSMIT_WHOLE;
+  Snp->Cdb.OpFlags = PXE_OPFLAGS_TRANSMIT_WHOLE;
 
-  Snp->Cdb.CPBsize    = (UINT16) sizeof (PXE_CPB_TRANSMIT);
-  Snp->Cdb.CPBaddr    = (UINT64)(UINTN) Cpb;
+  Snp->Cdb.CPBsize = (UINT16)sizeof (PXE_CPB_TRANSMIT);
+  Snp->Cdb.CPBaddr = (UINT64)(UINTN)Cpb;
 
-  Snp->Cdb.OpCode     = PXE_OPCODE_TRANSMIT;
-  Snp->Cdb.DBsize     = PXE_DBSIZE_NOT_USED;
-  Snp->Cdb.DBaddr     = PXE_DBADDR_NOT_USED;
+  Snp->Cdb.OpCode = PXE_OPCODE_TRANSMIT;
+  Snp->Cdb.DBsize = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb.DBaddr = PXE_DBADDR_NOT_USED;
 
-  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum      = Snp->IfNum;
-  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum     = Snp->IfNum;
+  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nSnp->undi.transmit()  "));
-  DEBUG ((EFI_D_NET, "\nSnp->Cdb.OpCode  == %x", Snp->Cdb.OpCode));
-  DEBUG ((EFI_D_NET, "\nSnp->Cdb.CPBaddr == %LX", Snp->Cdb.CPBaddr));
-  DEBUG ((EFI_D_NET, "\nSnp->Cdb.DBaddr  == %LX", Snp->Cdb.DBaddr));
-  DEBUG ((EFI_D_NET, "\nCpb->FrameAddr   == %LX\n", Cpb->FrameAddr));
+  DEBUG ((DEBUG_NET, "\nSnp->undi.transmit()  "));
+  DEBUG ((DEBUG_NET, "\nSnp->Cdb.OpCode  == %x", Snp->Cdb.OpCode));
+  DEBUG ((DEBUG_NET, "\nSnp->Cdb.CPBaddr == %LX", Snp->Cdb.CPBaddr));
+  DEBUG ((DEBUG_NET, "\nSnp->Cdb.DBaddr  == %LX", Snp->Cdb.DBaddr));
+  DEBUG ((DEBUG_NET, "\nCpb->FrameAddr   == %LX\n", Cpb->FrameAddr));
 
-  (*Snp->IssueUndi32Command) ((UINT64) (UINTN) &Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
 
-  DEBUG ((EFI_D_NET, "\nexit Snp->undi.transmit()  "));
+  DEBUG ((DEBUG_NET, "\nexit Snp->undi.transmit()  "));
 
   //
   // we will unmap the buffers in get_status call, not here
   //
   switch (Snp->Cdb.StatCode) {
-  case PXE_STATCODE_SUCCESS:
-    return EFI_SUCCESS;
+    case PXE_STATCODE_SUCCESS:
+      return EFI_SUCCESS;
 
-  case PXE_STATCODE_BUFFER_FULL:
-  case PXE_STATCODE_QUEUE_FULL:
-  case PXE_STATCODE_BUSY:
-    Status = EFI_NOT_READY;
-    DEBUG (
-      (EFI_D_NET,
-      "\nSnp->undi.transmit()  %xh:%xh\n",
-      Snp->Cdb.StatFlags,
-      Snp->Cdb.StatCode)
-      );
-    break;
+    case PXE_STATCODE_BUFFER_FULL:
+    case PXE_STATCODE_QUEUE_FULL:
+    case PXE_STATCODE_BUSY:
+      Status = EFI_NOT_READY;
+      DEBUG (
+        (DEBUG_NET,
+         "\nSnp->undi.transmit()  %xh:%xh\n",
+         Snp->Cdb.StatFlags,
+         Snp->Cdb.StatCode)
+        );
+      break;
 
-  default:
-    DEBUG (
-      (EFI_D_ERROR,
-      "\nSnp->undi.transmit()  %xh:%xh\n",
-      Snp->Cdb.StatFlags,
-      Snp->Cdb.StatCode)
-      );
-    Status = EFI_DEVICE_ERROR;
+    default:
+      DEBUG (
+        (DEBUG_ERROR,
+         "\nSnp->undi.transmit()  %xh:%xh\n",
+         Snp->Cdb.StatFlags,
+         Snp->Cdb.StatCode)
+        );
+      Status = EFI_DEVICE_ERROR;
   }
 
   return Status;
@@ -270,13 +268,13 @@ PxeTransmit (
 EFI_STATUS
 EFIAPI
 SnpUndi32Transmit (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
-  IN UINTN                       HeaderSize,
-  IN UINTN                       BufferSize,
-  IN VOID                        *Buffer,
-  IN EFI_MAC_ADDRESS             *SrcAddr,  OPTIONAL
-  IN EFI_MAC_ADDRESS             *DestAddr, OPTIONAL
-  IN UINT16                      *Protocol  OPTIONAL
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN UINTN                        HeaderSize,
+  IN UINTN                        BufferSize,
+  IN VOID                         *Buffer,
+  IN EFI_MAC_ADDRESS              *SrcAddr   OPTIONAL,
+  IN EFI_MAC_ADDRESS              *DestAddr  OPTIONAL,
+  IN UINT16                       *Protocol  OPTIONAL
   )
 {
   SNP_DRIVER  *Snp;
@@ -296,16 +294,16 @@ SnpUndi32Transmit (
   }
 
   switch (Snp->Mode.State) {
-  case EfiSimpleNetworkInitialized:
-    break;
+    case EfiSimpleNetworkInitialized:
+      break;
 
-  case EfiSimpleNetworkStopped:
-    Status = EFI_NOT_STARTED;
-    goto ON_EXIT;
+    case EfiSimpleNetworkStopped:
+      Status = EFI_NOT_STARTED;
+      goto ON_EXIT;
 
-  default:
-    Status = EFI_DEVICE_ERROR;
-    goto ON_EXIT;
+    default:
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
   }
 
   if (Buffer == NULL) {
@@ -323,21 +321,21 @@ SnpUndi32Transmit (
   // we need the destination address and the protocol
   //
   if (HeaderSize != 0) {
-    if (HeaderSize != Snp->Mode.MediaHeaderSize || DestAddr == 0 || Protocol == 0) {
+    if ((HeaderSize != Snp->Mode.MediaHeaderSize) || (DestAddr == 0) || (Protocol == 0)) {
       Status = EFI_INVALID_PARAMETER;
       goto ON_EXIT;
     }
 
     Status = PxeFillHeader (
-              Snp,
-              Buffer,
-              HeaderSize,
-              (UINT8 *) Buffer + HeaderSize,
-              BufferSize - HeaderSize,
-              DestAddr,
-              SrcAddr,
-              Protocol
-              );
+               Snp,
+               Buffer,
+               HeaderSize,
+               (UINT8 *)Buffer + HeaderSize,
+               BufferSize - HeaderSize,
+               DestAddr,
+               SrcAddr,
+               Protocol
+               );
 
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;

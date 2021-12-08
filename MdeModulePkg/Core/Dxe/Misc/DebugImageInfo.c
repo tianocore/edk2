@@ -9,18 +9,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "DxeMain.h"
 
-
 EFI_DEBUG_IMAGE_INFO_TABLE_HEADER  mDebugInfoTableHeader = {
   0,          // volatile UINT32                 UpdateStatus;
   0,          // UINT32                          TableSize;
   NULL        // EFI_DEBUG_IMAGE_INFO            *EfiDebugImageInfoTable;
 };
 
-UINTN mMaxTableEntries = 0;
+UINTN  mMaxTableEntries = 0;
 
 EFI_SYSTEM_TABLE_POINTER  *mDebugTable = NULL;
 
-#define EFI_DEBUG_TABLE_ENTRY_SIZE       (sizeof (VOID *))
+#define EFI_DEBUG_TABLE_ENTRY_SIZE  (sizeof (VOID *))
 
 /**
   Creates and initializes the DebugImageInfo Table.  Also creates the configuration
@@ -45,9 +44,9 @@ CoreInitializeDebugImageInfoTable (
   // Ideally we would update the CRC now as well, but the service may not yet be available.
   // See comments in the CoreUpdateDebugTableCrc32() function below for details.
   //
-  Pages          = EFI_SIZE_TO_PAGES (sizeof (EFI_SYSTEM_TABLE_POINTER));
-  AlignmentMask  = SIZE_4MB - 1;
-  RealPages      = Pages + EFI_SIZE_TO_PAGES (SIZE_4MB);
+  Pages         = EFI_SIZE_TO_PAGES (sizeof (EFI_SYSTEM_TABLE_POINTER));
+  AlignmentMask = SIZE_4MB - 1;
+  RealPages     = Pages + EFI_SIZE_TO_PAGES (SIZE_4MB);
 
   //
   // Attempt to allocate memory below PcdMaxEfiSystemTablePointerAddress
@@ -58,6 +57,7 @@ CoreInitializeDebugImageInfoTable (
   if (Memory == 0) {
     Memory = MAX_ADDRESS;
   }
+
   Status = CoreAllocatePages (
              AllocateMaxAddress,
              EfiBootServicesData,
@@ -66,9 +66,10 @@ CoreInitializeDebugImageInfoTable (
              );
   if (EFI_ERROR (Status)) {
     if (PcdGet64 (PcdMaxEfiSystemTablePointerAddress) != 0) {
-      DEBUG ((EFI_D_INFO, "Allocate memory for EFI_SYSTEM_TABLE_POINTER below PcdMaxEfiSystemTablePointerAddress failed. \
+      DEBUG ((DEBUG_INFO, "Allocate memory for EFI_SYSTEM_TABLE_POINTER below PcdMaxEfiSystemTablePointerAddress failed. \
                           Retry to allocate memroy as close to the top of memory as feasible.\n"));
     }
+
     //
     // If the initial memory allocation fails, then reattempt allocation
     // as close to the top of memory as feasible.
@@ -88,7 +89,7 @@ CoreInitializeDebugImageInfoTable (
   //
   // Free overallocated pages
   //
-  AlignedMemory  = ((UINTN) Memory + AlignmentMask) & ~AlignmentMask;
+  AlignedMemory  = ((UINTN)Memory + AlignmentMask) & ~AlignmentMask;
   UnalignedPages = EFI_SIZE_TO_PAGES (AlignedMemory - (UINTN)Memory);
   if (UnalignedPages > 0) {
     //
@@ -97,6 +98,7 @@ CoreInitializeDebugImageInfoTable (
     Status = CoreFreePages (Memory, UnalignedPages);
     ASSERT_EFI_ERROR (Status);
   }
+
   Memory         = AlignedMemory + EFI_PAGES_TO_SIZE (Pages);
   UnalignedPages = RealPages - Pages - UnalignedPages;
   if (UnalignedPages > 0) {
@@ -117,7 +119,7 @@ CoreInitializeDebugImageInfoTable (
   // Initialize EFI_SYSTEM_TABLE_POINTER structure
   //
   mDebugTable->Signature          = EFI_SYSTEM_TABLE_SIGNATURE;
-  mDebugTable->EfiSystemTableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) gDxeCoreST;
+  mDebugTable->EfiSystemTableBase = (EFI_PHYSICAL_ADDRESS)(UINTN)gDxeCoreST;
   mDebugTable->Crc32              = 0;
 
   //
@@ -127,7 +129,6 @@ CoreInitializeDebugImageInfoTable (
   Status = CoreInstallConfigurationTable (&gEfiDebugImageInfoTableGuid, &mDebugInfoTableHeader);
   ASSERT_EFI_ERROR (Status);
 }
-
 
 /**
   Update the CRC32 in the Debug Table.
@@ -142,11 +143,10 @@ CoreUpdateDebugTableCrc32 (
   VOID
   )
 {
-  ASSERT(mDebugTable != NULL);
+  ASSERT (mDebugTable != NULL);
   mDebugTable->Crc32 = 0;
   gBS->CalculateCrc32 ((VOID *)mDebugTable, sizeof (EFI_SYSTEM_TABLE_POINTER), &mDebugTable->Crc32);
 }
-
 
 /**
   Adds a new DebugImageInfo structure to the DebugImageInfo Table.  Re-Allocates
@@ -160,15 +160,15 @@ CoreUpdateDebugTableCrc32 (
 **/
 VOID
 CoreNewDebugImageInfoEntry (
-  IN  UINT32                      ImageInfoType,
-  IN  EFI_LOADED_IMAGE_PROTOCOL   *LoadedImage,
-  IN  EFI_HANDLE                  ImageHandle
+  IN  UINT32                     ImageInfoType,
+  IN  EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage,
+  IN  EFI_HANDLE                 ImageHandle
   )
 {
-  EFI_DEBUG_IMAGE_INFO      *Table;
-  EFI_DEBUG_IMAGE_INFO      *NewTable;
-  UINTN                     Index;
-  UINTN                     TableSize;
+  EFI_DEBUG_IMAGE_INFO  *Table;
+  EFI_DEBUG_IMAGE_INFO  *NewTable;
+  UINTN                 Index;
+  UINTN                 TableSize;
 
   //
   // Set the flag indicating that we're in the process of updating the table.
@@ -185,6 +185,7 @@ CoreNewDebugImageInfoEntry (
     while (Table[Index].NormalImage != NULL) {
       Index++;
     }
+
     //
     // There must be an empty entry in the in the table.
     //
@@ -194,11 +195,12 @@ CoreNewDebugImageInfoEntry (
     //  Table is full, so re-allocate another page for a larger table...
     //
     TableSize = mMaxTableEntries * EFI_DEBUG_TABLE_ENTRY_SIZE;
-    NewTable = AllocateZeroPool (TableSize + EFI_PAGE_SIZE);
+    NewTable  = AllocateZeroPool (TableSize + EFI_PAGE_SIZE);
     if (NewTable == NULL) {
       mDebugInfoTableHeader.UpdateStatus &= ~EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS;
       return;
     }
+
     //
     // Copy the old table into the new one
     //
@@ -210,7 +212,7 @@ CoreNewDebugImageInfoEntry (
     //
     // Update the table header
     //
-    Table = NewTable;
+    Table                                        = NewTable;
     mDebugInfoTableHeader.EfiDebugImageInfoTable = NewTable;
     //
     // Enlarge the max table entries and set the first empty entry index to
@@ -228,7 +230,7 @@ CoreNewDebugImageInfoEntry (
     //
     // Update the entry
     //
-    Table[Index].NormalImage->ImageInfoType               = (UINT32) ImageInfoType;
+    Table[Index].NormalImage->ImageInfoType               = (UINT32)ImageInfoType;
     Table[Index].NormalImage->LoadedImageProtocolInstance = LoadedImage;
     Table[Index].NormalImage->ImageHandle                 = ImageHandle;
     //
@@ -237,10 +239,9 @@ CoreNewDebugImageInfoEntry (
     mDebugInfoTableHeader.TableSize++;
     mDebugInfoTableHeader.UpdateStatus |= EFI_DEBUG_IMAGE_INFO_TABLE_MODIFIED;
   }
+
   mDebugInfoTableHeader.UpdateStatus &= ~EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS;
 }
-
-
 
 /**
   Removes and frees an entry from the DebugImageInfo Table.
@@ -250,7 +251,7 @@ CoreNewDebugImageInfoEntry (
 **/
 VOID
 CoreRemoveDebugImageInfoEntry (
-  EFI_HANDLE ImageHandle
+  EFI_HANDLE  ImageHandle
   )
 {
   EFI_DEBUG_IMAGE_INFO  *Table;
@@ -261,7 +262,7 @@ CoreRemoveDebugImageInfoEntry (
   Table = mDebugInfoTableHeader.EfiDebugImageInfoTable;
 
   for (Index = 0; Index < mMaxTableEntries; Index++) {
-    if (Table[Index].NormalImage != NULL && Table[Index].NormalImage->ImageHandle == ImageHandle) {
+    if ((Table[Index].NormalImage != NULL) && (Table[Index].NormalImage->ImageHandle == ImageHandle)) {
       //
       // Found a match. Free up the record, then NULL the pointer to indicate the slot
       // is free.
@@ -276,7 +277,6 @@ CoreRemoveDebugImageInfoEntry (
       break;
     }
   }
+
   mDebugInfoTableHeader.UpdateStatus &= ~EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS;
 }
-
-

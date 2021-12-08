@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef __DEVICE_SECURITY_H__
 #define __DEVICE_SECURITY_H__
 
@@ -24,14 +23,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Forward reference for pure ANSI compatability
 //
-typedef struct _EDKII_DEVICE_SECURITY_PROTOCOL  EDKII_DEVICE_SECURITY_PROTOCOL;
+typedef struct _EDKII_DEVICE_SECURITY_PROTOCOL EDKII_DEVICE_SECURITY_PROTOCOL;
 
 //
 // Revision The revision to which the DEVICE_SECURITY interface adheres.
 //          All future revisions must be backwards compatible.
 //          If a future version is not back wards compatible it is not the same GUID.
 //
-#define EDKII_DEVICE_SECURITY_PROTOCOL_REVISION 0x00010000
+#define EDKII_DEVICE_SECURITY_PROTOCOL_REVISION  0x00010000
 
 //
 // The device identifier.
@@ -40,7 +39,7 @@ typedef struct {
   ///
   /// Version of this data structure.
   ///
-  UINT32                Version;
+  UINT32    Version;
   ///
   /// Type of the device.
   /// This field is also served as a device Access protocol GUID.
@@ -49,7 +48,7 @@ typedef struct {
   ///   EDKII_DEVICE_IDENTIFIER_TYPE_PCI_GUID means the device access protocol is PciIo.
   ///   EDKII_DEVICE_IDENTIFIER_TYPE_USB_GUID means the device access protocol is UsbIo.
   ///
-  EFI_GUID              DeviceType;
+  EFI_GUID    DeviceType;
   ///
   /// The handle created for this device.
   /// NOTE: This might be a temporary handle.
@@ -72,14 +71,14 @@ typedef struct {
   ///       register a protocol notify function. Installing a real protocol may cause
   ///       the callback function being executed before the device is authenticated.
   ///
-  EFI_HANDLE            DeviceHandle;
+  EFI_HANDLE    DeviceHandle;
 } EDKII_DEVICE_IDENTIFIER;
 
 //
 // Revision The revision to which the DEVICE_IDENTIFIER interface adheres.
 //          All future revisions must be backwards compatible.
 //
-#define EDKII_DEVICE_IDENTIFIER_REVISION 0x00010000
+#define EDKII_DEVICE_IDENTIFIER_REVISION  0x00010000
 
 //
 // Device Identifier GUID value
@@ -144,19 +143,19 @@ EFI_STATUS
 /// This protocol is used to authenticate a device based upon the platform policy.
 ///
 struct _EDKII_DEVICE_SECURITY_PROTOCOL {
-  UINT64                              Revision;
-  EDKII_DEVICE_AUTHENTICATE           DeviceAuthenticate;
+  UINT64                       Revision;
+  EDKII_DEVICE_AUTHENTICATE    DeviceAuthenticate;
 };
 
 ///
 /// Device Security Protocol GUID variable.
 ///
-extern EFI_GUID gEdkiiDeviceSecurityProtocolGuid;
+extern EFI_GUID  gEdkiiDeviceSecurityProtocolGuid;
 
 ///
 /// Device Identifier tpye GUID variable.
 ///
-extern EFI_GUID gEdkiiDeviceIdentifierTypePciGuid;
-extern EFI_GUID gEdkiiDeviceIdentifierTypeUsbGuid;
+extern EFI_GUID  gEdkiiDeviceIdentifierTypePciGuid;
+extern EFI_GUID  gEdkiiDeviceIdentifierTypeUsbGuid;
 
 #endif

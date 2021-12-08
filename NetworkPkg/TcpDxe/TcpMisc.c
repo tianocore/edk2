@@ -10,19 +10,19 @@
 
 #include "TcpMain.h"
 
-LIST_ENTRY      mTcpRunQue = {
+LIST_ENTRY  mTcpRunQue = {
   &mTcpRunQue,
   &mTcpRunQue
 };
 
-LIST_ENTRY      mTcpListenQue = {
+LIST_ENTRY  mTcpListenQue = {
   &mTcpListenQue,
   &mTcpListenQue
 };
 
-TCP_SEQNO       mTcpGlobalIss = TCP_BASE_ISS;
+TCP_SEQNO  mTcpGlobalIss = TCP_BASE_ISS;
 
-CHAR16          *mTcpStateName[] = {
+CHAR16  *mTcpStateName[] = {
   L"TCP_CLOSED",
   L"TCP_LISTEN",
   L"TCP_SYN_SENT",
@@ -36,7 +36,6 @@ CHAR16          *mTcpStateName[] = {
   L"TCP_LAST_ACK"
 };
 
-
 /**
   Initialize the Tcb local related members.
 
@@ -45,7 +44,7 @@ CHAR16          *mTcpStateName[] = {
 **/
 VOID
 TcpInitTcbLocal (
-  IN OUT TCP_CB *Tcb
+  IN OUT TCP_CB  *Tcb
   )
 {
   //
@@ -53,18 +52,18 @@ TcpInitTcbLocal (
   //
   if (Tcb->Sk->IpVersion == IP_VERSION_4) {
     Tcb->HeadSum = NetPseudoHeadChecksum (
-                    Tcb->LocalEnd.Ip.Addr[0],
-                    Tcb->RemoteEnd.Ip.Addr[0],
-                    0x06,
-                    0
-                    );
+                     Tcb->LocalEnd.Ip.Addr[0],
+                     Tcb->RemoteEnd.Ip.Addr[0],
+                     0x06,
+                     0
+                     );
   } else {
     Tcb->HeadSum = NetIp6PseudoHeadChecksum (
-                    &Tcb->LocalEnd.Ip.v6,
-                    &Tcb->RemoteEnd.Ip.v6,
-                    0x06,
-                    0
-                    );
+                     &Tcb->LocalEnd.Ip.v6,
+                     &Tcb->RemoteEnd.Ip.v6,
+                     0x06,
+                     0
+                     );
   }
 
   Tcb->Iss    = TcpGetIss ();
@@ -79,7 +78,7 @@ TcpInitTcbLocal (
   //
   // First window size is never scaled
   //
-  Tcb->RcvWndScale  = 0;
+  Tcb->RcvWndScale   = 0;
   Tcb->RetxmitSeqMax = 0;
 
   Tcb->ProbeTimerOn = FALSE;
@@ -95,9 +94,9 @@ TcpInitTcbLocal (
 **/
 VOID
 TcpInitTcbPeer (
-  IN OUT TCP_CB     *Tcb,
-  IN     TCP_SEG    *Seg,
-  IN     TCP_OPTION *Opt
+  IN OUT TCP_CB      *Tcb,
+  IN     TCP_SEG     *Seg,
+  IN     TCP_OPTION  *Opt
   )
 {
   UINT16  RcvMss;
@@ -105,9 +104,9 @@ TcpInitTcbPeer (
   ASSERT ((Tcb != NULL) && (Seg != NULL) && (Opt != NULL));
   ASSERT (TCP_FLG_ON (Seg->Flag, TCP_FLG_SYN));
 
-  Tcb->SndWnd     = Seg->Wnd;
-  Tcb->SndWndMax  = Tcb->SndWnd;
-  Tcb->SndWl1     = Seg->Seq;
+  Tcb->SndWnd    = Seg->Wnd;
+  Tcb->SndWndMax = Tcb->SndWnd;
+  Tcb->SndWl1    = Seg->Seq;
 
   if (TCP_FLG_ON (Seg->Flag, TCP_FLG_ACK)) {
     Tcb->SndWl2 = Seg->Ack;
@@ -116,13 +115,12 @@ TcpInitTcbPeer (
   }
 
   if (TCP_FLG_ON (Opt->Flag, TCP_OPTION_RCVD_MSS)) {
-    Tcb->SndMss = (UINT16) MAX (64, Opt->Mss);
+    Tcb->SndMss = (UINT16)MAX (64, Opt->Mss);
 
-    RcvMss      = TcpGetRcvMss (Tcb->Sk);
+    RcvMss = TcpGetRcvMss (Tcb->Sk);
     if (Tcb->SndMss > RcvMss) {
       Tcb->SndMss = RcvMss;
     }
-
   } else {
     //
     // One end doesn't support MSS option, use default.
@@ -130,7 +128,7 @@ TcpInitTcbPeer (
     Tcb->RcvMss = 536;
   }
 
-  Tcb->CWnd   = Tcb->SndMss;
+  Tcb->CWnd = Tcb->SndMss;
 
   Tcb->Irs    = Seg->Seq;
   Tcb->RcvNxt = Tcb->Irs + 1;
@@ -138,12 +136,10 @@ TcpInitTcbPeer (
   Tcb->RcvWl2 = Tcb->RcvNxt;
 
   if (TCP_FLG_ON (Opt->Flag, TCP_OPTION_RCVD_WS) && !TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_WS)) {
+    Tcb->SndWndScale = Opt->WndScale;
 
-    Tcb->SndWndScale  = Opt->WndScale;
-
-    Tcb->RcvWndScale  = TcpComputeScale (Tcb);
+    Tcb->RcvWndScale = TcpComputeScale (Tcb);
     TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_RCVD_WS);
-
   } else {
     //
     // One end doesn't support window scale option. use zero.
@@ -152,7 +148,6 @@ TcpInitTcbPeer (
   }
 
   if (TCP_FLG_ON (Opt->Flag, TCP_OPTION_RCVD_TS) && !TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_TS)) {
-
     TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_SND_TS);
     TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_RCVD_TS);
 
@@ -189,9 +184,9 @@ TcpIsIpEqual (
   ASSERT ((Version == IP_VERSION_4) || (Version == IP_VERSION_6));
 
   if (Version == IP_VERSION_4) {
-    return (BOOLEAN) (Ip1->Addr[0] == Ip2->Addr[0]);
+    return (BOOLEAN)(Ip1->Addr[0] == Ip2->Addr[0]);
   } else {
-    return (BOOLEAN) EFI_IP6_EQUAL (&Ip1->v6, &Ip2->v6);
+    return (BOOLEAN)EFI_IP6_EQUAL (&Ip1->v6, &Ip2->v6);
   }
 }
 
@@ -208,17 +203,17 @@ TcpIsIpEqual (
 **/
 BOOLEAN
 TcpIsIpZero (
-  IN EFI_IP_ADDRESS *Ip,
-  IN UINT8          Version
+  IN EFI_IP_ADDRESS  *Ip,
+  IN UINT8           Version
   )
 {
   ASSERT ((Version == IP_VERSION_4) || (Version == IP_VERSION_6));
 
   if (Version == IP_VERSION_4) {
-    return (BOOLEAN) (Ip->Addr[0] == 0);
+    return (BOOLEAN)(Ip->Addr[0] == 0);
   } else {
-    return (BOOLEAN) ((Ip->Addr[0] == 0) && (Ip->Addr[1] == 0) &&
-      (Ip->Addr[2] == 0) && (Ip->Addr[3] == 0));
+    return (BOOLEAN)((Ip->Addr[0] == 0) && (Ip->Addr[1] == 0) &&
+                     (Ip->Addr[2] == 0) && (Ip->Addr[3] == 0));
   }
 }
 
@@ -236,16 +231,16 @@ TcpIsIpZero (
 **/
 TCP_CB *
 TcpLocateListenTcb (
-  IN TCP_PEER    *Local,
-  IN TCP_PEER    *Remote,
-  IN UINT8       Version
+  IN TCP_PEER  *Local,
+  IN TCP_PEER  *Remote,
+  IN UINT8     Version
   )
 {
-  LIST_ENTRY      *Entry;
-  TCP_CB          *Node;
-  TCP_CB          *Match;
-  INTN            Last;
-  INTN            Cur;
+  LIST_ENTRY  *Entry;
+  TCP_CB      *Node;
+  TCP_CB      *Match;
+  INTN        Last;
+  INTN        Cur;
 
   Last  = 4;
   Match = NULL;
@@ -257,8 +252,8 @@ TcpLocateListenTcb (
         (Local->Port != Node->LocalEnd.Port) ||
         !TCP_PEER_MATCH (Remote, &Node->RemoteEnd, Version) ||
         !TCP_PEER_MATCH (Local, &Node->LocalEnd, Version)
-          ) {
-
+        )
+    {
       continue;
     }
 
@@ -311,9 +306,9 @@ TcpFindTcbByPeer (
   IN UINT8           Version
   )
 {
-  TCP_PORTNO      LocalPort;
-  LIST_ENTRY      *Entry;
-  TCP_CB          *Tcb;
+  TCP_PORTNO  LocalPort;
+  LIST_ENTRY  *Entry;
+  TCP_CB      *Tcb;
 
   ASSERT ((Addr != NULL) && (Port != 0));
 
@@ -323,10 +318,10 @@ TcpFindTcbByPeer (
     Tcb = NET_LIST_USER_STRUCT (Entry, TCP_CB, List);
 
     if ((Version == Tcb->Sk->IpVersion) &&
-      TcpIsIpEqual (Addr, &Tcb->LocalEnd.Ip, Version) &&
+        TcpIsIpEqual (Addr, &Tcb->LocalEnd.Ip, Version) &&
         (LocalPort == Tcb->LocalEnd.Port)
-        ) {
-
+        )
+    {
       return TRUE;
     }
   }
@@ -335,10 +330,10 @@ TcpFindTcbByPeer (
     Tcb = NET_LIST_USER_STRUCT (Entry, TCP_CB, List);
 
     if ((Version == Tcb->Sk->IpVersion) &&
-      TcpIsIpEqual (Addr, &Tcb->LocalEnd.Ip, Version) &&
+        TcpIsIpEqual (Addr, &Tcb->LocalEnd.Ip, Version) &&
         (LocalPort == Tcb->LocalEnd.Port)
-        ) {
-
+        )
+    {
       return TRUE;
     }
   }
@@ -370,10 +365,10 @@ TcpLocateTcb (
   IN BOOLEAN         Syn
   )
 {
-  TCP_PEER        Local;
-  TCP_PEER        Remote;
-  LIST_ENTRY      *Entry;
-  TCP_CB          *Tcb;
+  TCP_PEER    Local;
+  TCP_PEER    Remote;
+  LIST_ENTRY  *Entry;
+  TCP_CB      *Tcb;
 
   Local.Port  = LocalPort;
   Remote.Port = RemotePort;
@@ -390,8 +385,8 @@ TcpLocateTcb (
     if ((Version == Tcb->Sk->IpVersion) &&
         TCP_PEER_EQUAL (&Remote, &Tcb->RemoteEnd, Version) &&
         TCP_PEER_EQUAL (&Local, &Tcb->LocalEnd, Version)
-          ) {
-
+        )
+    {
       RemoveEntryList (&Tcb->List);
       InsertHeadList (&mTcpRunQue, &Tcb->List);
 
@@ -420,20 +415,20 @@ TcpLocateTcb (
 **/
 INTN
 TcpInsertTcb (
-  IN TCP_CB *Tcb
+  IN TCP_CB  *Tcb
   )
 {
-  LIST_ENTRY       *Entry;
-  LIST_ENTRY       *Head;
-  TCP_CB           *Node;
+  LIST_ENTRY  *Entry;
+  LIST_ENTRY  *Head;
+  TCP_CB      *Node;
 
   ASSERT (
     (Tcb != NULL) &&
     (
-    (Tcb->State == TCP_LISTEN) ||
-    (Tcb->State == TCP_SYN_SENT) ||
-    (Tcb->State == TCP_SYN_RCVD) ||
-    (Tcb->State == TCP_CLOSED)
+     (Tcb->State == TCP_LISTEN) ||
+     (Tcb->State == TCP_SYN_SENT) ||
+     (Tcb->State == TCP_SYN_RCVD) ||
+     (Tcb->State == TCP_CLOSED)
     )
     );
 
@@ -455,14 +450,13 @@ TcpInsertTcb (
 
     if (TCP_PEER_EQUAL (&Tcb->LocalEnd, &Node->LocalEnd, Tcb->Sk->IpVersion) &&
         TCP_PEER_EQUAL (&Tcb->RemoteEnd, &Node->RemoteEnd, Tcb->Sk->IpVersion)
-          ) {
-
+        )
+    {
       return -1;
     }
   }
 
   InsertHeadList (Head, &Tcb->List);
-
 
   return 0;
 }
@@ -477,10 +471,10 @@ TcpInsertTcb (
 **/
 TCP_CB *
 TcpCloneTcb (
-  IN TCP_CB *Tcb
+  IN TCP_CB  *Tcb
   )
 {
-  TCP_CB             *Clone;
+  TCP_CB  *Clone;
 
   Clone = AllocateZeroPool (sizeof (TCP_CB));
 
@@ -501,12 +495,12 @@ TcpCloneTcb (
 
   Clone->Sk = SockClone (Tcb->Sk);
   if (Clone->Sk == NULL) {
-    DEBUG ((EFI_D_ERROR, "TcpCloneTcb: failed to clone a sock\n"));
+    DEBUG ((DEBUG_ERROR, "TcpCloneTcb: failed to clone a sock\n"));
     FreePool (Clone);
     return NULL;
   }
 
-  ((TCP_PROTO_DATA *) (Clone->Sk->ProtoReserved))->TcpPcb = Clone;
+  ((TCP_PROTO_DATA *)(Clone->Sk->ProtoReserved))->TcpPcb = Clone;
 
   return Clone;
 }
@@ -539,25 +533,25 @@ TcpGetRcvMss (
   IN SOCKET  *Sock
   )
 {
-  EFI_IP4_MODE_DATA      Ip4Mode;
-  EFI_IP6_MODE_DATA      Ip6Mode;
-  EFI_IP4_PROTOCOL       *Ip4;
-  EFI_IP6_PROTOCOL       *Ip6;
-  TCP_PROTO_DATA         *TcpProto;
+  EFI_IP4_MODE_DATA  Ip4Mode;
+  EFI_IP6_MODE_DATA  Ip6Mode;
+  EFI_IP4_PROTOCOL   *Ip4;
+  EFI_IP6_PROTOCOL   *Ip6;
+  TCP_PROTO_DATA     *TcpProto;
 
   ASSERT (Sock != NULL);
 
   ZeroMem (&Ip4Mode, sizeof (EFI_IP4_MODE_DATA));
   ZeroMem (&Ip6Mode, sizeof (EFI_IP6_MODE_DATA));
 
-  TcpProto = (TCP_PROTO_DATA *) Sock->ProtoReserved;
+  TcpProto = (TCP_PROTO_DATA *)Sock->ProtoReserved;
 
   if (Sock->IpVersion == IP_VERSION_4) {
     Ip4 = TcpProto->TcpService->IpIo->Ip.Ip4;
     ASSERT (Ip4 != NULL);
     Ip4->GetModeData (Ip4, &Ip4Mode, NULL, NULL);
 
-    return (UINT16) (Ip4Mode.MaxPacketSize - sizeof (TCP_HEAD));
+    return (UINT16)(Ip4Mode.MaxPacketSize - sizeof (TCP_HEAD));
   } else {
     Ip6 = TcpProto->TcpService->IpIo->Ip.Ip6;
     ASSERT (Ip6 != NULL);
@@ -587,7 +581,7 @@ TcpGetRcvMss (
       }
     }
 
-    return (UINT16) (Ip6Mode.MaxPacketSize - sizeof (TCP_HEAD));
+    return (UINT16)(Ip6Mode.MaxPacketSize - sizeof (TCP_HEAD));
   }
 }
 
@@ -600,45 +594,45 @@ TcpGetRcvMss (
 **/
 VOID
 TcpSetState (
-  IN TCP_CB *Tcb,
-  IN UINT8  State
+  IN TCP_CB  *Tcb,
+  IN UINT8   State
   )
 {
   ASSERT (Tcb->State < (sizeof (mTcpStateName) / sizeof (CHAR16 *)));
   ASSERT (State < (sizeof (mTcpStateName) / sizeof (CHAR16 *)));
 
   DEBUG (
-    (EFI_D_NET,
-    "Tcb (%p) state %s --> %s\n",
-    Tcb,
-    mTcpStateName[Tcb->State],
-    mTcpStateName[State])
+    (DEBUG_NET,
+     "Tcb (%p) state %s --> %s\n",
+     Tcb,
+     mTcpStateName[Tcb->State],
+     mTcpStateName[State])
     );
 
   Tcb->State = State;
 
   switch (State) {
-  case TCP_ESTABLISHED:
+    case TCP_ESTABLISHED:
 
-    SockConnEstablished (Tcb->Sk);
+      SockConnEstablished (Tcb->Sk);
 
-    if (Tcb->Parent != NULL) {
-      //
-      // A new connection is accepted by a listening socket. Install
-      // the device path.
-      //
-      TcpInstallDevicePath (Tcb->Sk);
-    }
+      if (Tcb->Parent != NULL) {
+        //
+        // A new connection is accepted by a listening socket. Install
+        // the device path.
+        //
+        TcpInstallDevicePath (Tcb->Sk);
+      }
 
-    break;
+      break;
 
-  case TCP_CLOSED:
+    case TCP_CLOSED:
 
-    SockConnClosed (Tcb->Sk);
+      SockConnClosed (Tcb->Sk);
 
-    break;
-  default:
-    break;
+      break;
+    default:
+      break;
   }
 }
 
@@ -653,21 +647,21 @@ TcpSetState (
 **/
 UINT16
 TcpChecksum (
-  IN NET_BUF *Nbuf,
-  IN UINT16  HeadSum
+  IN NET_BUF  *Nbuf,
+  IN UINT16   HeadSum
   )
 {
   UINT16  Checksum;
 
-  Checksum  = NetbufChecksum (Nbuf);
-  Checksum  = NetAddChecksum (Checksum, HeadSum);
+  Checksum = NetbufChecksum (Nbuf);
+  Checksum = NetAddChecksum (Checksum, HeadSum);
 
   Checksum = NetAddChecksum (
-              Checksum,
-              HTONS ((UINT16) Nbuf->TotalSize)
-              );
+               Checksum,
+               HTONS ((UINT16)Nbuf->TotalSize)
+               );
 
-  return (UINT16) (~Checksum);
+  return (UINT16)(~Checksum);
 }
 
 /**
@@ -682,22 +676,22 @@ TcpChecksum (
 **/
 TCP_SEG *
 TcpFormatNetbuf (
-  IN     TCP_CB  *Tcb,
-  IN OUT NET_BUF *Nbuf
+  IN     TCP_CB   *Tcb,
+  IN OUT NET_BUF  *Nbuf
   )
 {
   TCP_SEG   *Seg;
   TCP_HEAD  *Head;
 
-  Seg       = TCPSEG_NETBUF (Nbuf);
-  Head      = (TCP_HEAD *) NetbufGetByte (Nbuf, 0, NULL);
+  Seg  = TCPSEG_NETBUF (Nbuf);
+  Head = (TCP_HEAD *)NetbufGetByte (Nbuf, 0, NULL);
   ASSERT (Head != NULL);
 
   Nbuf->Tcp = Head;
 
-  Seg->Seq  = NTOHL (Head->Seq);
-  Seg->Ack  = NTOHL (Head->Ack);
-  Seg->End  = Seg->Seq + (Nbuf->TotalSize - (Head->HeadLen << 2));
+  Seg->Seq = NTOHL (Head->Seq);
+  Seg->Ack = NTOHL (Head->Ack);
+  Seg->End = Seg->Seq + (Nbuf->TotalSize - (Head->HeadLen << 2));
 
   Seg->Urg  = NTOHS (Head->Urg);
   Seg->Wnd  = (NTOHS (Head->Wnd) << Tcb->SndWndScale);
@@ -749,17 +743,16 @@ TcpOnAppConnect (
 **/
 VOID
 TcpOnAppClose (
-  IN OUT TCP_CB *Tcb
+  IN OUT TCP_CB  *Tcb
   )
 {
   ASSERT (Tcb != NULL);
 
-  if (!IsListEmpty (&Tcb->RcvQue) || GET_RCV_DATASIZE (Tcb->Sk) != 0) {
-
+  if (!IsListEmpty (&Tcb->RcvQue) || (GET_RCV_DATASIZE (Tcb->Sk) != 0)) {
     DEBUG (
-      (EFI_D_WARN,
-      "TcpOnAppClose: connection reset because data is lost for TCB %p\n",
-      Tcb)
+      (DEBUG_WARN,
+       "TcpOnAppClose: connection reset because data is lost for TCB %p\n",
+       Tcb)
       );
 
     TcpResetConnection (Tcb);
@@ -768,22 +761,22 @@ TcpOnAppClose (
   }
 
   switch (Tcb->State) {
-  case TCP_CLOSED:
-  case TCP_LISTEN:
-  case TCP_SYN_SENT:
-    TcpSetState (Tcb, TCP_CLOSED);
-    break;
+    case TCP_CLOSED:
+    case TCP_LISTEN:
+    case TCP_SYN_SENT:
+      TcpSetState (Tcb, TCP_CLOSED);
+      break;
 
-  case TCP_SYN_RCVD:
-  case TCP_ESTABLISHED:
-    TcpSetState (Tcb, TCP_FIN_WAIT_1);
-    break;
+    case TCP_SYN_RCVD:
+    case TCP_ESTABLISHED:
+      TcpSetState (Tcb, TCP_FIN_WAIT_1);
+      break;
 
-  case TCP_CLOSE_WAIT:
-    TcpSetState (Tcb, TCP_LAST_ACK);
-    break;
-  default:
-    break;
+    case TCP_CLOSE_WAIT:
+      TcpSetState (Tcb, TCP_LAST_ACK);
+      break;
+    default:
+      break;
   }
 
   TcpToSendData (Tcb, 1);
@@ -801,35 +794,34 @@ TcpOnAppClose (
 **/
 INTN
 TcpOnAppSend (
-  IN OUT TCP_CB *Tcb
+  IN OUT TCP_CB  *Tcb
   )
 {
-
   switch (Tcb->State) {
-  case TCP_CLOSED:
-    return -1;
+    case TCP_CLOSED:
+      return -1;
 
-  case TCP_LISTEN:
-    return -1;
+    case TCP_LISTEN:
+      return -1;
 
-  case TCP_SYN_SENT:
-  case TCP_SYN_RCVD:
-    return 0;
+    case TCP_SYN_SENT:
+    case TCP_SYN_RCVD:
+      return 0;
 
-  case TCP_ESTABLISHED:
-  case TCP_CLOSE_WAIT:
-    TcpToSendData (Tcb, 0);
-    return 0;
+    case TCP_ESTABLISHED:
+    case TCP_CLOSE_WAIT:
+      TcpToSendData (Tcb, 0);
+      return 0;
 
-  case TCP_FIN_WAIT_1:
-  case TCP_FIN_WAIT_2:
-  case TCP_CLOSING:
-  case TCP_LAST_ACK:
-  case TCP_TIME_WAIT:
-    return -1;
+    case TCP_FIN_WAIT_1:
+    case TCP_FIN_WAIT_2:
+    case TCP_CLOSING:
+    case TCP_LAST_ACK:
+    case TCP_TIME_WAIT:
+      return -1;
 
-  default:
-    break;
+    default:
+      break;
   }
 
   return 0;
@@ -844,41 +836,38 @@ TcpOnAppSend (
 **/
 VOID
 TcpOnAppConsume (
-  IN TCP_CB *Tcb
+  IN TCP_CB  *Tcb
   )
 {
-  UINT32 TcpOld;
+  UINT32  TcpOld;
 
   switch (Tcb->State) {
-  case TCP_ESTABLISHED:
-    TcpOld = TcpRcvWinOld (Tcb);
-    if (TcpRcvWinNow (Tcb) > TcpOld) {
+    case TCP_ESTABLISHED:
+      TcpOld = TcpRcvWinOld (Tcb);
+      if (TcpRcvWinNow (Tcb) > TcpOld) {
+        if (TcpOld < Tcb->RcvMss) {
+          DEBUG (
+            (DEBUG_NET,
+             "TcpOnAppConsume: send a window update for a window closed Tcb %p\n",
+             Tcb)
+            );
 
-      if (TcpOld < Tcb->RcvMss) {
+          TcpSendAck (Tcb);
+        } else if (Tcb->DelayedAck == 0) {
+          DEBUG (
+            (DEBUG_NET,
+             "TcpOnAppConsume: scheduled a delayed ACK to update window for Tcb %p\n",
+             Tcb)
+            );
 
-        DEBUG (
-          (EFI_D_NET,
-          "TcpOnAppConsume: send a window update for a window closed Tcb %p\n",
-          Tcb)
-          );
-
-        TcpSendAck (Tcb);
-      } else if (Tcb->DelayedAck == 0) {
-
-        DEBUG (
-          (EFI_D_NET,
-          "TcpOnAppConsume: scheduled a delayed ACK to update window for Tcb %p\n",
-          Tcb)
-          );
-
-        Tcb->DelayedAck = 1;
+          Tcb->DelayedAck = 1;
+        }
       }
-    }
 
-    break;
+      break;
 
-  default:
-    break;
+    default:
+      break;
   }
 }
 
@@ -891,25 +880,25 @@ TcpOnAppConsume (
 **/
 VOID
 TcpOnAppAbort (
-  IN TCP_CB *Tcb
+  IN TCP_CB  *Tcb
   )
 {
   DEBUG (
-    (EFI_D_WARN,
-    "TcpOnAppAbort: connection reset issued by application for TCB %p\n",
-    Tcb)
+    (DEBUG_WARN,
+     "TcpOnAppAbort: connection reset issued by application for TCB %p\n",
+     Tcb)
     );
 
   switch (Tcb->State) {
-  case TCP_SYN_RCVD:
-  case TCP_ESTABLISHED:
-  case TCP_FIN_WAIT_1:
-  case TCP_FIN_WAIT_2:
-  case TCP_CLOSE_WAIT:
-    TcpResetConnection (Tcb);
-    break;
-  default:
-    break;
+    case TCP_SYN_RCVD:
+    case TCP_ESTABLISHED:
+    case TCP_FIN_WAIT_1:
+    case TCP_FIN_WAIT_2:
+    case TCP_CLOSE_WAIT:
+      TcpResetConnection (Tcb);
+      break;
+    default:
+      break;
   }
 
   TcpSetState (Tcb, TCP_CLOSED);
@@ -923,7 +912,7 @@ TcpOnAppAbort (
 **/
 VOID
 TcpResetConnection (
-  IN TCP_CB *Tcb
+  IN TCP_CB  *Tcb
   )
 {
   NET_BUF   *Nbuf;
@@ -932,10 +921,10 @@ TcpResetConnection (
   Nbuf = NetbufAlloc (TCP_MAX_HEAD);
 
   if (Nbuf == NULL) {
-    return ;
+    return;
   }
 
-  Nhead = (TCP_HEAD *) NetbufAllocSpace (
+  Nhead = (TCP_HEAD *)NetbufAllocSpace (
                         Nbuf,
                         sizeof (TCP_HEAD),
                         NET_BUF_TAIL
@@ -943,14 +932,14 @@ TcpResetConnection (
 
   ASSERT (Nhead != NULL);
 
-  Nbuf->Tcp       = Nhead;
+  Nbuf->Tcp = Nhead;
 
   Nhead->Flag     = TCP_FLG_RST;
   Nhead->Seq      = HTONL (Tcb->SndNxt);
   Nhead->Ack      = HTONL (Tcb->RcvNxt);
   Nhead->SrcPort  = Tcb->LocalEnd.Port;
   Nhead->DstPort  = Tcb->RemoteEnd.Port;
-  Nhead->HeadLen  = (UINT8) (sizeof (TCP_HEAD) >> 2);
+  Nhead->HeadLen  = (UINT8)(sizeof (TCP_HEAD) >> 2);
   Nhead->Res      = 0;
   Nhead->Wnd      = HTONS (0xFFFF);
   Nhead->Checksum = 0;
@@ -973,24 +962,24 @@ TcpResetConnection (
 **/
 EFI_STATUS
 TcpInstallDevicePath (
-  IN SOCKET *Sock
+  IN SOCKET  *Sock
   )
 {
-  TCP_PROTO_DATA           *TcpProto;
-  TCP_SERVICE_DATA         *TcpService;
-  TCP_CB                   *Tcb;
-  IPv4_DEVICE_PATH         Ip4DPathNode;
-  IPv6_DEVICE_PATH         Ip6DPathNode;
-  EFI_DEVICE_PATH_PROTOCOL *DevicePath;
-  EFI_STATUS               Status;
-  TCP_PORTNO               LocalPort;
-  TCP_PORTNO               RemotePort;
+  TCP_PROTO_DATA            *TcpProto;
+  TCP_SERVICE_DATA          *TcpService;
+  TCP_CB                    *Tcb;
+  IPv4_DEVICE_PATH          Ip4DPathNode;
+  IPv6_DEVICE_PATH          Ip6DPathNode;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  EFI_STATUS                Status;
+  TCP_PORTNO                LocalPort;
+  TCP_PORTNO                RemotePort;
 
-  TcpProto   = (TCP_PROTO_DATA *) Sock->ProtoReserved;
+  TcpProto   = (TCP_PROTO_DATA *)Sock->ProtoReserved;
   TcpService = TcpProto->TcpService;
   Tcb        = TcpProto->TcpPcb;
 
-  LocalPort = NTOHS (Tcb->LocalEnd.Port);
+  LocalPort  = NTOHS (Tcb->LocalEnd.Port);
   RemotePort = NTOHS (Tcb->RemoteEnd.Port);
   if (Sock->IpVersion == IP_VERSION_4) {
     NetLibCreateIPv4DPathNode (
@@ -1006,7 +995,7 @@ TcpInstallDevicePath (
 
     IP4_COPY_ADDRESS (&Ip4DPathNode.SubnetMask, &Tcb->SubnetMask);
 
-    DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) &Ip4DPathNode;
+    DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)&Ip4DPathNode;
   } else {
     NetLibCreateIPv6DPathNode (
       &Ip6DPathNode,
@@ -1018,7 +1007,7 @@ TcpInstallDevicePath (
       EFI_IP_PROTO_TCP
       );
 
-    DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) &Ip6DPathNode;
+    DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)&Ip6DPathNode;
   }
 
   Sock->DevicePath = AppendDevicePathNode (Sock->ParentDevicePath, DevicePath);
@@ -1039,4 +1028,3 @@ TcpInstallDevicePath (
 
   return Status;
 }
-

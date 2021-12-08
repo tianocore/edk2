@@ -9,7 +9,6 @@
 
 #include "PxeBcImpl.h"
 
-
 /**
   Flush the previous configuration using the new station Ip address.
 
@@ -23,20 +22,20 @@
 **/
 EFI_STATUS
 PxeBcFlushStationIp (
-  PXEBC_PRIVATE_DATA       *Private,
-  EFI_IP_ADDRESS           *StationIp,     OPTIONAL
-  EFI_IP_ADDRESS           *SubnetMask     OPTIONAL
+  PXEBC_PRIVATE_DATA  *Private,
+  EFI_IP_ADDRESS      *StationIp      OPTIONAL,
+  EFI_IP_ADDRESS      *SubnetMask     OPTIONAL
   )
 {
-  EFI_PXE_BASE_CODE_MODE   *Mode;
-  EFI_STATUS               Status;
-  EFI_ARP_CONFIG_DATA      ArpConfigData;
+  EFI_PXE_BASE_CODE_MODE  *Mode;
+  EFI_STATUS              Status;
+  EFI_ARP_CONFIG_DATA     ArpConfigData;
 
   Mode   = Private->PxeBc.Mode;
   Status = EFI_SUCCESS;
   ZeroMem (&ArpConfigData, sizeof (EFI_ARP_CONFIG_DATA));
 
-  if (Mode->UsingIpv6 && StationIp != NULL) {
+  if (Mode->UsingIpv6 && (StationIp != NULL)) {
     //
     // Overwrite Udp6CfgData/Ip6CfgData StationAddress.
     //
@@ -61,8 +60,8 @@ PxeBcFlushStationIp (
       // Reconfigure the ARP instance with station Ip address.
       //
       ArpConfigData.SwAddressType   = 0x0800;
-      ArpConfigData.SwAddressLength = (UINT8) sizeof (EFI_IPv4_ADDRESS);
-      ArpConfigData.StationAddress = StationIp;
+      ArpConfigData.SwAddressLength = (UINT8)sizeof (EFI_IPv4_ADDRESS);
+      ArpConfigData.StationAddress  = StationIp;
 
       Private->Arp->Configure (Private->Arp, NULL);
       Private->Arp->Configure (Private->Arp, &ArpConfigData);
@@ -82,7 +81,7 @@ PxeBcFlushStationIp (
       CopyMem (&Private->Ip4CfgData.SubnetMask, SubnetMask, sizeof (EFI_IPv4_ADDRESS));
     }
 
-    if (StationIp != NULL && SubnetMask != NULL) {
+    if ((StationIp != NULL) && (SubnetMask != NULL)) {
       //
       // Updated the route table.
       //
@@ -92,7 +91,7 @@ PxeBcFlushStationIp (
       Mode->RouteTable[0].GwAddr.Addr[0]     = 0;
     }
 
-    if (StationIp != NULL || SubnetMask != NULL) {
+    if ((StationIp != NULL) || (SubnetMask != NULL)) {
       //
       // Reconfigure the Ip4 instance to capture background ICMP packets with new station Ip address.
       //
@@ -112,7 +111,6 @@ ON_EXIT:
   return Status;
 }
 
-
 /**
   Notify the callback function when an event is triggered.
 
@@ -123,13 +121,12 @@ ON_EXIT:
 VOID
 EFIAPI
 PxeBcCommonNotify (
-  IN EFI_EVENT           Event,
-  IN VOID                *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  *((BOOLEAN *) Context) = TRUE;
+  *((BOOLEAN *)Context) = TRUE;
 }
-
 
 /**
   Do arp resolution from arp cache in PxeBcMode.
@@ -145,12 +142,12 @@ PxeBcCommonNotify (
 **/
 BOOLEAN
 PxeBcCheckArpCache (
-  IN  EFI_PXE_BASE_CODE_MODE    *Mode,
-  IN  EFI_IPv4_ADDRESS          *Ip4Addr,
-  OUT EFI_MAC_ADDRESS           *MacAddress
+  IN  EFI_PXE_BASE_CODE_MODE  *Mode,
+  IN  EFI_IPv4_ADDRESS        *Ip4Addr,
+  OUT EFI_MAC_ADDRESS         *MacAddress
   )
 {
-  UINT32       Index;
+  UINT32  Index;
 
   ASSERT (!Mode->UsingIpv6);
 
@@ -171,7 +168,6 @@ PxeBcCheckArpCache (
   return FALSE;
 }
 
-
 /**
   Update the arp cache periodically.
 
@@ -182,8 +178,8 @@ PxeBcCheckArpCache (
 VOID
 EFIAPI
 PxeBcArpCacheUpdate (
-  IN EFI_EVENT            Event,
-  IN VOID                 *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   PXEBC_PRIVATE_DATA      *Private;
@@ -194,7 +190,7 @@ PxeBcArpCacheUpdate (
   UINT32                  Index;
   EFI_STATUS              Status;
 
-  Private = (PXEBC_PRIVATE_DATA *) Context;
+  Private = (PXEBC_PRIVATE_DATA *)Context;
   Mode    = Private->PxeBc.Mode;
 
   ASSERT (!Mode->UsingIpv6);
@@ -228,13 +224,12 @@ PxeBcArpCacheUpdate (
       );
     CopyMem (
       &Mode->ArpCache[Index].MacAddr,
-      (UINT8 *) (ArpEntry + 1) + ArpEntry->SwAddressLength,
+      (UINT8 *)(ArpEntry + 1) + ArpEntry->SwAddressLength,
       ArpEntry->HwAddressLength
       );
-    ArpEntry = (EFI_ARP_FIND_DATA *) ((UINT8 *) ArpEntry + EntryLength);
+    ArpEntry = (EFI_ARP_FIND_DATA *)((UINT8 *)ArpEntry + EntryLength);
   }
 }
-
 
 /**
   Notify function to handle the received ICMP message in DPC.
@@ -245,20 +240,20 @@ PxeBcArpCacheUpdate (
 VOID
 EFIAPI
 PxeBcIcmpErrorDpcHandle (
-  IN VOID                      *Context
+  IN VOID  *Context
   )
 {
-  EFI_STATUS                   Status;
-  EFI_IP4_RECEIVE_DATA         *RxData;
-  EFI_IP4_PROTOCOL             *Ip4;
-  PXEBC_PRIVATE_DATA           *Private;
-  EFI_PXE_BASE_CODE_MODE       *Mode;
-  UINT8                        Type;
-  UINTN                        Index;
-  UINT32                       CopiedLen;
-  UINT8                        *IcmpError;
+  EFI_STATUS              Status;
+  EFI_IP4_RECEIVE_DATA    *RxData;
+  EFI_IP4_PROTOCOL        *Ip4;
+  PXEBC_PRIVATE_DATA      *Private;
+  EFI_PXE_BASE_CODE_MODE  *Mode;
+  UINT8                   Type;
+  UINTN                   Index;
+  UINT32                  CopiedLen;
+  UINT8                   *IcmpError;
 
-  Private = (PXEBC_PRIVATE_DATA *) Context;
+  Private = (PXEBC_PRIVATE_DATA *)Context;
   Mode    = &Private->Mode;
   Status  = Private->IcmpToken.Status;
   RxData  = Private->IcmpToken.Packet.RxData;
@@ -284,10 +279,11 @@ PxeBcIcmpErrorDpcHandle (
     goto ON_RECYCLE;
   }
 
-  if (EFI_IP4 (RxData->Header->SourceAddress) != 0 &&
+  if ((EFI_IP4 (RxData->Header->SourceAddress) != 0) &&
       (NTOHL (Mode->SubnetMask.Addr[0]) != 0) &&
-      IP4_NET_EQUAL (NTOHL(Mode->StationIp.Addr[0]), EFI_NTOHL (RxData->Header->SourceAddress), NTOHL (Mode->SubnetMask.Addr[0])) &&
-      !NetIp4IsUnicast (EFI_NTOHL (RxData->Header->SourceAddress), NTOHL (Mode->SubnetMask.Addr[0]))) {
+      IP4_NET_EQUAL (NTOHL (Mode->StationIp.Addr[0]), EFI_NTOHL (RxData->Header->SourceAddress), NTOHL (Mode->SubnetMask.Addr[0])) &&
+      !NetIp4IsUnicast (EFI_NTOHL (RxData->Header->SourceAddress), NTOHL (Mode->SubnetMask.Addr[0])))
+  {
     //
     // The source address of the received packet should be a valid unicast address.
     //
@@ -306,13 +302,14 @@ PxeBcIcmpErrorDpcHandle (
   //
   ASSERT (RxData->Header->Protocol == EFI_IP_PROTO_ICMP);
 
-  Type = *((UINT8 *) RxData->FragmentTable[0].FragmentBuffer);
+  Type = *((UINT8 *)RxData->FragmentTable[0].FragmentBuffer);
 
-  if (Type != ICMP_DEST_UNREACHABLE &&
-      Type != ICMP_SOURCE_QUENCH &&
-      Type != ICMP_REDIRECT &&
-      Type != ICMP_TIME_EXCEEDED &&
-      Type != ICMP_PARAMETER_PROBLEM) {
+  if ((Type != ICMP_DEST_UNREACHABLE) &&
+      (Type != ICMP_SOURCE_QUENCH) &&
+      (Type != ICMP_REDIRECT) &&
+      (Type != ICMP_TIME_EXCEEDED) &&
+      (Type != ICMP_PARAMETER_PROBLEM))
+  {
     //
     // The type of the receveid ICMP message should be ICMP_ERROR_MESSAGE.
     //
@@ -323,7 +320,7 @@ PxeBcIcmpErrorDpcHandle (
   // Copy the right ICMP error message into mode data.
   //
   CopiedLen = 0;
-  IcmpError = (UINT8 *) &Mode->IcmpError;
+  IcmpError = (UINT8 *)&Mode->IcmpError;
 
   for (Index = 0; Index < RxData->FragmentCount; Index++) {
     CopiedLen += RxData->FragmentTable[Index].FragmentLength;
@@ -340,6 +337,7 @@ PxeBcIcmpErrorDpcHandle (
         CopiedLen - sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR)
         );
     }
+
     IcmpError += CopiedLen;
   }
 
@@ -351,7 +349,6 @@ ON_EXIT:
   Ip4->Receive (Ip4, &Private->IcmpToken);
 }
 
-
 /**
   Callback function to update the latest ICMP6 error message.
 
@@ -362,13 +359,12 @@ ON_EXIT:
 VOID
 EFIAPI
 PxeBcIcmpErrorUpdate (
-  IN EFI_EVENT            Event,
-  IN VOID                 *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   QueueDpc (TPL_CALLBACK, PxeBcIcmpErrorDpcHandle, Context);
 }
-
 
 /**
   Notify function to handle the received ICMP6 message in DPC.
@@ -379,7 +375,7 @@ PxeBcIcmpErrorUpdate (
 VOID
 EFIAPI
 PxeBcIcmp6ErrorDpcHandle (
-  IN VOID                 *Context
+  IN VOID  *Context
   )
 {
   PXEBC_PRIVATE_DATA      *Private;
@@ -392,7 +388,7 @@ PxeBcIcmp6ErrorDpcHandle (
   UINT32                  CopiedLen;
   UINT8                   *Icmp6Error;
 
-  Private = (PXEBC_PRIVATE_DATA *) Context;
+  Private = (PXEBC_PRIVATE_DATA *)Context;
   Mode    = &Private->Mode;
   Status  = Private->Icmp6Token.Status;
   RxData  = Private->Icmp6Token.Packet.RxData;
@@ -426,7 +422,8 @@ PxeBcIcmp6ErrorDpcHandle (
   }
 
   if (!NetIp6IsUnspecifiedAddr (&Mode->StationIp.v6) &&
-      !EFI_IP6_EQUAL (&RxData->Header->DestinationAddress, &Mode->StationIp.v6)) {
+      !EFI_IP6_EQUAL (&RxData->Header->DestinationAddress, &Mode->StationIp.v6))
+  {
     //
     // The destination address of the received packet should be equal to the host address.
     //
@@ -438,12 +435,13 @@ PxeBcIcmp6ErrorDpcHandle (
   //
   ASSERT (RxData->Header->NextHeader == IP6_ICMP);
 
-  Type = *((UINT8 *) RxData->FragmentTable[0].FragmentBuffer);
+  Type = *((UINT8 *)RxData->FragmentTable[0].FragmentBuffer);
 
-  if (Type != ICMP_V6_DEST_UNREACHABLE &&
-      Type != ICMP_V6_PACKET_TOO_BIG &&
-      Type != ICMP_V6_TIME_EXCEEDED &&
-      Type != ICMP_V6_PARAMETER_PROBLEM) {
+  if ((Type != ICMP_V6_DEST_UNREACHABLE) &&
+      (Type != ICMP_V6_PACKET_TOO_BIG) &&
+      (Type != ICMP_V6_TIME_EXCEEDED) &&
+      (Type != ICMP_V6_PARAMETER_PROBLEM))
+  {
     //
     // The type of the receveid packet should be an ICMP6 error message.
     //
@@ -454,7 +452,7 @@ PxeBcIcmp6ErrorDpcHandle (
   // Copy the right ICMP6 error message into mode data.
   //
   CopiedLen  = 0;
-  Icmp6Error = (UINT8 *) &Mode->IcmpError;
+  Icmp6Error = (UINT8 *)&Mode->IcmpError;
 
   for (Index = 0; Index < RxData->FragmentCount; Index++) {
     CopiedLen += RxData->FragmentTable[Index].FragmentLength;
@@ -471,6 +469,7 @@ PxeBcIcmp6ErrorDpcHandle (
         CopiedLen - sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR)
         );
     }
+
     Icmp6Error += CopiedLen;
   }
 
@@ -482,7 +481,6 @@ ON_EXIT:
   Ip6->Receive (Ip6, &Private->Icmp6Token);
 }
 
-
 /**
   Callback function to update the latest ICMP6 error message.
 
@@ -493,13 +491,12 @@ ON_EXIT:
 VOID
 EFIAPI
 PxeBcIcmp6ErrorUpdate (
-  IN EFI_EVENT               Event,
-  IN VOID                    *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   QueueDpc (TPL_CALLBACK, PxeBcIcmp6ErrorDpcHandle, Context);
 }
-
 
 /**
   This function is to configure a UDPv4 instance for UdpWrite.
@@ -563,14 +560,13 @@ PxeBcConfigUdp4Write (
     }
   }
 
-  if (!EFI_ERROR (Status) && *SrcPort == 0) {
+  if (!EFI_ERROR (Status) && (*SrcPort == 0)) {
     Udp4->GetModeData (Udp4, &Udp4CfgData, NULL, NULL, NULL);
     *SrcPort = Udp4CfgData.StationPort;
   }
 
   return Status;
 }
-
 
 /**
   This function is to configure a UDPv6 instance for UdpWrite.
@@ -613,14 +609,13 @@ PxeBcConfigUdp6Write (
     return Status;
   }
 
-  if (!EFI_ERROR (Status) && *SrcPort == 0) {
+  if (!EFI_ERROR (Status) && (*SrcPort == 0)) {
     Udp6->GetModeData (Udp6, &CfgData, NULL, NULL, NULL);
     *SrcPort = CfgData.StationPort;
   }
 
   return Status;
 }
-
 
 /**
   This function is to configure a UDPv4 instance for UdpWrite.
@@ -642,54 +637,54 @@ PxeBcConfigUdp6Write (
 **/
 EFI_STATUS
 PxeBcUdp4Write (
-  IN EFI_UDP4_PROTOCOL       *Udp4,
-  IN EFI_UDP4_SESSION_DATA   *Session,
-  IN EFI_EVENT               TimeoutEvent,
-  IN EFI_IPv4_ADDRESS        *Gateway      OPTIONAL,
-  IN UINTN                   *HeaderSize   OPTIONAL,
-  IN VOID                    *HeaderPtr    OPTIONAL,
-  IN UINTN                   *BufferSize,
-  IN VOID                    *BufferPtr
+  IN EFI_UDP4_PROTOCOL      *Udp4,
+  IN EFI_UDP4_SESSION_DATA  *Session,
+  IN EFI_EVENT              TimeoutEvent,
+  IN EFI_IPv4_ADDRESS       *Gateway      OPTIONAL,
+  IN UINTN                  *HeaderSize   OPTIONAL,
+  IN VOID                   *HeaderPtr    OPTIONAL,
+  IN UINTN                  *BufferSize,
+  IN VOID                   *BufferPtr
   )
 {
-  EFI_UDP4_COMPLETION_TOKEN Token;
-  EFI_UDP4_TRANSMIT_DATA    *TxData;
-  UINT32                    TxLength;
-  UINT32                    FragCount;
-  UINT32                    DataLength;
-  BOOLEAN                   IsDone;
-  EFI_STATUS                Status;
+  EFI_UDP4_COMPLETION_TOKEN  Token;
+  EFI_UDP4_TRANSMIT_DATA     *TxData;
+  UINT32                     TxLength;
+  UINT32                     FragCount;
+  UINT32                     DataLength;
+  BOOLEAN                    IsDone;
+  EFI_STATUS                 Status;
 
   //
   // Arrange one fragment buffer for data, and another fragment buffer for header if has.
   //
   FragCount = (HeaderSize != NULL) ? 2 : 1;
   TxLength  = sizeof (EFI_UDP4_TRANSMIT_DATA) + (FragCount - 1) * sizeof (EFI_UDP4_FRAGMENT_DATA);
-  TxData    = (EFI_UDP4_TRANSMIT_DATA *) AllocateZeroPool (TxLength);
+  TxData    = (EFI_UDP4_TRANSMIT_DATA *)AllocateZeroPool (TxLength);
   if (TxData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   TxData->FragmentCount                               = FragCount;
-  TxData->FragmentTable[FragCount - 1].FragmentLength = (UINT32) *BufferSize;
+  TxData->FragmentTable[FragCount - 1].FragmentLength = (UINT32)*BufferSize;
   TxData->FragmentTable[FragCount - 1].FragmentBuffer = BufferPtr;
-  DataLength                                          = (UINT32) *BufferSize;
+  DataLength                                          = (UINT32)*BufferSize;
 
   if (HeaderSize != NULL) {
-    TxData->FragmentTable[0].FragmentLength = (UINT32) *HeaderSize;
+    TxData->FragmentTable[0].FragmentLength = (UINT32)*HeaderSize;
     TxData->FragmentTable[0].FragmentBuffer = HeaderPtr;
-    DataLength                             += (UINT32) *HeaderSize;
+    DataLength                             += (UINT32)*HeaderSize;
   }
 
   if (Gateway != NULL) {
-    TxData->GatewayAddress  = Gateway;
+    TxData->GatewayAddress = Gateway;
   }
 
-  TxData->UdpSessionData  = Session;
-  TxData->DataLength      = DataLength;
-  Token.Packet.TxData     = TxData;
-  Token.Status            = EFI_NOT_READY;
-  IsDone                  = FALSE;
+  TxData->UdpSessionData = Session;
+  TxData->DataLength     = DataLength;
+  Token.Packet.TxData    = TxData;
+  Token.Status           = EFI_NOT_READY;
+  IsDone                 = FALSE;
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
@@ -712,7 +707,8 @@ PxeBcUdp4Write (
   //
   while (!IsDone &&
          Token.Status == EFI_NOT_READY &&
-         EFI_ERROR (gBS->CheckEvent (TimeoutEvent))) {
+         EFI_ERROR (gBS->CheckEvent (TimeoutEvent)))
+  {
     Udp4->Poll (Udp4);
   }
 
@@ -722,11 +718,11 @@ ON_EXIT:
   if (Token.Event != NULL) {
     gBS->CloseEvent (Token.Event);
   }
+
   FreePool (TxData);
 
   return Status;
 }
-
 
 /**
   This function is to configure a UDPv4 instance for UdpWrite.
@@ -747,49 +743,49 @@ ON_EXIT:
 **/
 EFI_STATUS
 PxeBcUdp6Write (
-  IN EFI_UDP6_PROTOCOL       *Udp6,
-  IN EFI_UDP6_SESSION_DATA   *Session,
-  IN EFI_EVENT               TimeoutEvent,
-  IN UINTN                   *HeaderSize   OPTIONAL,
-  IN VOID                    *HeaderPtr    OPTIONAL,
-  IN UINTN                   *BufferSize,
-  IN VOID                    *BufferPtr
+  IN EFI_UDP6_PROTOCOL      *Udp6,
+  IN EFI_UDP6_SESSION_DATA  *Session,
+  IN EFI_EVENT              TimeoutEvent,
+  IN UINTN                  *HeaderSize   OPTIONAL,
+  IN VOID                   *HeaderPtr    OPTIONAL,
+  IN UINTN                  *BufferSize,
+  IN VOID                   *BufferPtr
   )
 {
-  EFI_UDP6_COMPLETION_TOKEN Token;
-  EFI_UDP6_TRANSMIT_DATA    *TxData;
-  UINT32                    TxLength;
-  UINT32                    FragCount;
-  UINT32                    DataLength;
-  BOOLEAN                   IsDone;
-  EFI_STATUS                Status;
+  EFI_UDP6_COMPLETION_TOKEN  Token;
+  EFI_UDP6_TRANSMIT_DATA     *TxData;
+  UINT32                     TxLength;
+  UINT32                     FragCount;
+  UINT32                     DataLength;
+  BOOLEAN                    IsDone;
+  EFI_STATUS                 Status;
 
   //
   // Arrange one fragment buffer for data, and another fragment buffer for header if has.
   //
   FragCount = (HeaderSize != NULL) ? 2 : 1;
   TxLength  = sizeof (EFI_UDP6_TRANSMIT_DATA) + (FragCount - 1) * sizeof (EFI_UDP6_FRAGMENT_DATA);
-  TxData    = (EFI_UDP6_TRANSMIT_DATA *) AllocateZeroPool (TxLength);
+  TxData    = (EFI_UDP6_TRANSMIT_DATA *)AllocateZeroPool (TxLength);
   if (TxData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   TxData->FragmentCount                               = FragCount;
-  TxData->FragmentTable[FragCount - 1].FragmentLength = (UINT32) *BufferSize;
+  TxData->FragmentTable[FragCount - 1].FragmentLength = (UINT32)*BufferSize;
   TxData->FragmentTable[FragCount - 1].FragmentBuffer = BufferPtr;
-  DataLength                                          = (UINT32) *BufferSize;
+  DataLength                                          = (UINT32)*BufferSize;
 
   if (HeaderSize != NULL) {
-    TxData->FragmentTable[0].FragmentLength = (UINT32) *HeaderSize;
+    TxData->FragmentTable[0].FragmentLength = (UINT32)*HeaderSize;
     TxData->FragmentTable[0].FragmentBuffer = HeaderPtr;
-    DataLength                             += (UINT32) *HeaderSize;
+    DataLength                             += (UINT32)*HeaderSize;
   }
 
-  TxData->UdpSessionData  = Session;
-  TxData->DataLength      = DataLength;
-  Token.Packet.TxData     = TxData;
-  Token.Status            = EFI_NOT_READY;
-  IsDone                  = FALSE;
+  TxData->UdpSessionData = Session;
+  TxData->DataLength     = DataLength;
+  Token.Packet.TxData    = TxData;
+  Token.Status           = EFI_NOT_READY;
+  IsDone                 = FALSE;
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
@@ -812,7 +808,8 @@ PxeBcUdp6Write (
   //
   while (!IsDone &&
          Token.Status == EFI_NOT_READY &&
-         EFI_ERROR (gBS->CheckEvent (TimeoutEvent))) {
+         EFI_ERROR (gBS->CheckEvent (TimeoutEvent)))
+  {
     Udp6->Poll (Udp6);
   }
 
@@ -822,11 +819,11 @@ ON_EXIT:
   if (Token.Event != NULL) {
     gBS->CloseEvent (Token.Event);
   }
+
   FreePool (TxData);
 
   return Status;
 }
-
 
 /**
   Check the received packet using the Ip filter.
@@ -841,13 +838,13 @@ ON_EXIT:
 **/
 BOOLEAN
 PxeBcCheckByIpFilter (
-  IN EFI_PXE_BASE_CODE_MODE    *Mode,
-  IN VOID                      *Session,
-  IN UINT16                    OpFlags
+  IN EFI_PXE_BASE_CODE_MODE  *Mode,
+  IN VOID                    *Session,
+  IN UINT16                  OpFlags
   )
 {
-  EFI_IP_ADDRESS               DestinationIp;
-  UINTN                        Index;
+  EFI_IP_ADDRESS  DestinationIp;
+  UINTN           Index;
 
   if ((OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_USE_FILTER) == 0) {
     return TRUE;
@@ -863,7 +860,7 @@ PxeBcCheckByIpFilter (
   if (Mode->UsingIpv6) {
     CopyMem (
       &DestinationIp,
-      &((EFI_UDP6_SESSION_DATA *) Session)->DestinationAddress,
+      &((EFI_UDP6_SESSION_DATA *)Session)->DestinationAddress,
       sizeof (EFI_IPv6_ADDRESS)
       );
     NTOHLLL (&DestinationIp.v6);
@@ -871,27 +868,30 @@ PxeBcCheckByIpFilter (
     ZeroMem (&DestinationIp, sizeof (EFI_IP_ADDRESS));
     CopyMem (
       &DestinationIp,
-      &((EFI_UDP4_SESSION_DATA *) Session)->DestinationAddress,
+      &((EFI_UDP4_SESSION_DATA *)Session)->DestinationAddress,
       sizeof (EFI_IPv4_ADDRESS)
       );
     EFI_NTOHL (DestinationIp);
   }
 
-  if ((Mode->IpFilter.Filters & EFI_PXE_BASE_CODE_IP_FILTER_PROMISCUOUS_MULTICAST) != 0 &&
+  if (((Mode->IpFilter.Filters & EFI_PXE_BASE_CODE_IP_FILTER_PROMISCUOUS_MULTICAST) != 0) &&
       (IP4_IS_MULTICAST (DestinationIp.Addr[0]) ||
-       IP6_IS_MULTICAST (&DestinationIp))) {
+       IP6_IS_MULTICAST (&DestinationIp)))
+  {
     return TRUE;
   }
 
-  if ((Mode->IpFilter.Filters & EFI_PXE_BASE_CODE_IP_FILTER_BROADCAST) != 0 &&
-      IP4_IS_LOCAL_BROADCAST (DestinationIp.Addr[0])) {
+  if (((Mode->IpFilter.Filters & EFI_PXE_BASE_CODE_IP_FILTER_BROADCAST) != 0) &&
+      IP4_IS_LOCAL_BROADCAST (DestinationIp.Addr[0]))
+  {
     ASSERT (!Mode->UsingIpv6);
     return TRUE;
   }
 
-  if ((Mode->IpFilter.Filters & EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP) != 0 &&
+  if (((Mode->IpFilter.Filters & EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP) != 0) &&
       (EFI_IP4_EQUAL (&Mode->StationIp.v4, &DestinationIp) ||
-       EFI_IP6_EQUAL (&Mode->StationIp.v6, &DestinationIp))) {
+       EFI_IP6_EQUAL (&Mode->StationIp.v6, &DestinationIp)))
+  {
     //
     // Matched if the dest address is equal to the station address.
     //
@@ -901,7 +901,8 @@ PxeBcCheckByIpFilter (
   for (Index = 0; Index < Mode->IpFilter.IpCnt; Index++) {
     ASSERT (Index < EFI_PXE_BASE_CODE_MAX_IPCNT);
     if (EFI_IP4_EQUAL (&Mode->IpFilter.IpList[Index].v4, &DestinationIp) ||
-        EFI_IP6_EQUAL (&Mode->IpFilter.IpList[Index].v6, &DestinationIp)) {
+        EFI_IP6_EQUAL (&Mode->IpFilter.IpList[Index].v6, &DestinationIp))
+    {
       //
       // Matched if the dest address is equal to any of address in the filter list.
       //
@@ -911,7 +912,6 @@ PxeBcCheckByIpFilter (
 
   return FALSE;
 }
-
 
 /**
   Filter the received packet using the destination Ip.
@@ -927,10 +927,10 @@ PxeBcCheckByIpFilter (
 **/
 BOOLEAN
 PxeBcCheckByDestIp (
-  IN     EFI_PXE_BASE_CODE_MODE    *Mode,
-  IN     VOID                      *Session,
-  IN OUT EFI_IP_ADDRESS            *DestIp,
-  IN     UINT16                    OpFlags
+  IN     EFI_PXE_BASE_CODE_MODE  *Mode,
+  IN     VOID                    *Session,
+  IN OUT EFI_IP_ADDRESS          *DestIp,
+  IN     UINT16                  OpFlags
   )
 {
   if ((OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_DEST_IP) != 0) {
@@ -952,18 +952,20 @@ PxeBcCheckByDestIp (
           sizeof (EFI_IPv4_ADDRESS)
           );
       }
-
     }
+
     return TRUE;
-  } else if (DestIp != NULL &&
+  } else if ((DestIp != NULL) &&
              (EFI_IP4_EQUAL (DestIp, &((EFI_UDP4_SESSION_DATA *)Session)->DestinationAddress) ||
-              EFI_IP6_EQUAL (DestIp, &((EFI_UDP6_SESSION_DATA *)Session)->DestinationAddress))) {
+              EFI_IP6_EQUAL (DestIp, &((EFI_UDP6_SESSION_DATA *)Session)->DestinationAddress)))
+  {
     //
     // The destination address in the received packet is matched if present.
     //
     return TRUE;
   } else if (EFI_IP4_EQUAL (&Mode->StationIp, &((EFI_UDP4_SESSION_DATA *)Session)->DestinationAddress) ||
-             EFI_IP6_EQUAL (&Mode->StationIp, &((EFI_UDP6_SESSION_DATA *)Session)->DestinationAddress)) {
+             EFI_IP6_EQUAL (&Mode->StationIp, &((EFI_UDP6_SESSION_DATA *)Session)->DestinationAddress))
+  {
     //
     // The destination address in the received packet is equal to the host address.
     //
@@ -972,7 +974,6 @@ PxeBcCheckByDestIp (
 
   return FALSE;
 }
-
 
 /**
   Check the received packet using the destination port.
@@ -988,18 +989,18 @@ PxeBcCheckByDestIp (
 **/
 BOOLEAN
 PxeBcCheckByDestPort (
-  IN     EFI_PXE_BASE_CODE_MODE    *Mode,
-  IN     VOID                      *Session,
-  IN OUT UINT16                    *DestPort,
-  IN     UINT16                    OpFlags
+  IN     EFI_PXE_BASE_CODE_MODE  *Mode,
+  IN     VOID                    *Session,
+  IN OUT UINT16                  *DestPort,
+  IN     UINT16                  OpFlags
   )
 {
-  UINT16       Port;
+  UINT16  Port;
 
   if (Mode->UsingIpv6) {
-    Port = ((EFI_UDP6_SESSION_DATA *) Session)->DestinationPort;
+    Port = ((EFI_UDP6_SESSION_DATA *)Session)->DestinationPort;
   } else {
-    Port = ((EFI_UDP4_SESSION_DATA *) Session)->DestinationPort;
+    Port = ((EFI_UDP4_SESSION_DATA *)Session)->DestinationPort;
   }
 
   if ((OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_DEST_PORT) != 0) {
@@ -1009,8 +1010,9 @@ PxeBcCheckByDestPort (
     if (DestPort != NULL) {
       *DestPort = Port;
     }
+
     return TRUE;
-  } else if (DestPort != NULL && *DestPort == Port) {
+  } else if ((DestPort != NULL) && (*DestPort == Port)) {
     //
     // The destination port in the received packet is matched if present.
     //
@@ -1019,7 +1021,6 @@ PxeBcCheckByDestPort (
 
   return FALSE;
 }
-
 
 /**
   Filter the received packet using the source Ip.
@@ -1035,10 +1036,10 @@ PxeBcCheckByDestPort (
 **/
 BOOLEAN
 PxeBcFilterBySrcIp (
-  IN     EFI_PXE_BASE_CODE_MODE    *Mode,
-  IN     VOID                      *Session,
-  IN OUT EFI_IP_ADDRESS            *SrcIp,
-  IN     UINT16                    OpFlags
+  IN     EFI_PXE_BASE_CODE_MODE  *Mode,
+  IN     VOID                    *Session,
+  IN OUT EFI_IP_ADDRESS          *SrcIp,
+  IN     UINT16                  OpFlags
   )
 {
   if ((OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_IP) != 0) {
@@ -1060,12 +1061,13 @@ PxeBcFilterBySrcIp (
           sizeof (EFI_IPv4_ADDRESS)
           );
       }
-
     }
+
     return TRUE;
-  } else if (SrcIp != NULL &&
+  } else if ((SrcIp != NULL) &&
              (EFI_IP4_EQUAL (SrcIp, &((EFI_UDP4_SESSION_DATA *)Session)->SourceAddress) ||
-              EFI_IP6_EQUAL (SrcIp, &((EFI_UDP6_SESSION_DATA *)Session)->SourceAddress))) {
+              EFI_IP6_EQUAL (SrcIp, &((EFI_UDP6_SESSION_DATA *)Session)->SourceAddress)))
+  {
     //
     // The source address in the received packet is matched if present.
     //
@@ -1074,7 +1076,6 @@ PxeBcFilterBySrcIp (
 
   return FALSE;
 }
-
 
 /**
   Filter the received packet using the source port.
@@ -1090,18 +1091,18 @@ PxeBcFilterBySrcIp (
 **/
 BOOLEAN
 PxeBcFilterBySrcPort (
-  IN     EFI_PXE_BASE_CODE_MODE    *Mode,
-  IN     VOID                      *Session,
-  IN OUT UINT16                    *SrcPort,
-  IN     UINT16                    OpFlags
+  IN     EFI_PXE_BASE_CODE_MODE  *Mode,
+  IN     VOID                    *Session,
+  IN OUT UINT16                  *SrcPort,
+  IN     UINT16                  OpFlags
   )
 {
-  UINT16       Port;
+  UINT16  Port;
 
   if (Mode->UsingIpv6) {
-    Port = ((EFI_UDP6_SESSION_DATA *) Session)->SourcePort;
+    Port = ((EFI_UDP6_SESSION_DATA *)Session)->SourcePort;
   } else {
-    Port = ((EFI_UDP4_SESSION_DATA *) Session)->SourcePort;
+    Port = ((EFI_UDP4_SESSION_DATA *)Session)->SourcePort;
   }
 
   if ((OpFlags & EFI_PXE_BASE_CODE_UDP_OPFLAGS_ANY_SRC_PORT) != 0) {
@@ -1111,8 +1112,9 @@ PxeBcFilterBySrcPort (
     if (SrcPort != NULL) {
       *SrcPort = Port;
     }
+
     return TRUE;
-  } else if (SrcPort != NULL && *SrcPort == Port) {
+  } else if ((SrcPort != NULL) && (*SrcPort == Port)) {
     //
     // The source port in the received packet is matched if present.
     //
@@ -1121,7 +1123,6 @@ PxeBcFilterBySrcPort (
 
   return FALSE;
 }
-
 
 /**
   This function is to receive packet using Udp4Read.
@@ -1144,22 +1145,22 @@ PxeBcFilterBySrcPort (
 **/
 EFI_STATUS
 PxeBcUdp4Read (
-  IN     EFI_UDP4_PROTOCOL            *Udp4,
-  IN     EFI_UDP4_COMPLETION_TOKEN    *Token,
-  IN     EFI_PXE_BASE_CODE_MODE       *Mode,
-  IN     EFI_EVENT                    TimeoutEvent,
-  IN     UINT16                       OpFlags,
-  IN     BOOLEAN                      *IsDone,
-     OUT BOOLEAN                      *IsMatched,
-  IN OUT EFI_IP_ADDRESS               *DestIp      OPTIONAL,
-  IN OUT EFI_PXE_BASE_CODE_UDP_PORT   *DestPort    OPTIONAL,
-  IN OUT EFI_IP_ADDRESS               *SrcIp       OPTIONAL,
-  IN OUT EFI_PXE_BASE_CODE_UDP_PORT   *SrcPort     OPTIONAL
+  IN     EFI_UDP4_PROTOCOL           *Udp4,
+  IN     EFI_UDP4_COMPLETION_TOKEN   *Token,
+  IN     EFI_PXE_BASE_CODE_MODE      *Mode,
+  IN     EFI_EVENT                   TimeoutEvent,
+  IN     UINT16                      OpFlags,
+  IN     BOOLEAN                     *IsDone,
+  OUT BOOLEAN                        *IsMatched,
+  IN OUT EFI_IP_ADDRESS              *DestIp      OPTIONAL,
+  IN OUT EFI_PXE_BASE_CODE_UDP_PORT  *DestPort    OPTIONAL,
+  IN OUT EFI_IP_ADDRESS              *SrcIp       OPTIONAL,
+  IN OUT EFI_PXE_BASE_CODE_UDP_PORT  *SrcPort     OPTIONAL
   )
 {
-  EFI_UDP4_RECEIVE_DATA     *RxData;
-  EFI_UDP4_SESSION_DATA     *Session;
-  EFI_STATUS                Status;
+  EFI_UDP4_RECEIVE_DATA  *RxData;
+  EFI_UDP4_SESSION_DATA  *Session;
+  EFI_STATUS             Status;
 
   Token->Status = EFI_NOT_READY;
   *IsDone       = FALSE;
@@ -1174,16 +1175,18 @@ PxeBcUdp4Read (
   //
   while (!(*IsDone) &&
          Token->Status == EFI_NOT_READY &&
-         EFI_ERROR (gBS->CheckEvent (TimeoutEvent))) {
+         EFI_ERROR (gBS->CheckEvent (TimeoutEvent)))
+  {
     //
     // Poll the token until reply/ICMPv6 error message received or timeout.
     //
     Udp4->Poll (Udp4);
-    if (Token->Status == EFI_ICMP_ERROR ||
-        Token->Status == EFI_NETWORK_UNREACHABLE ||
-        Token->Status == EFI_HOST_UNREACHABLE ||
-        Token->Status == EFI_PROTOCOL_UNREACHABLE ||
-        Token->Status == EFI_PORT_UNREACHABLE) {
+    if ((Token->Status == EFI_ICMP_ERROR) ||
+        (Token->Status == EFI_NETWORK_UNREACHABLE) ||
+        (Token->Status == EFI_HOST_UNREACHABLE) ||
+        (Token->Status == EFI_PROTOCOL_UNREACHABLE) ||
+        (Token->Status == EFI_PORT_UNREACHABLE))
+    {
       break;
     }
   }
@@ -1194,8 +1197,8 @@ PxeBcUdp4Read (
     //
     // check whether this packet matches the filters
     //
-    RxData    = Token->Packet.RxData;
-    Session   = &RxData->UdpSession;
+    RxData  = Token->Packet.RxData;
+    Session = &RxData->UdpSession;
 
     *IsMatched = PxeBcCheckByIpFilter (Mode, Session, OpFlags);
 
@@ -1225,7 +1228,6 @@ PxeBcUdp4Read (
 
   return Status;
 }
-
 
 /**
   This function is to receive packets using Udp6Read.
@@ -1248,22 +1250,22 @@ PxeBcUdp4Read (
 **/
 EFI_STATUS
 PxeBcUdp6Read (
-  IN     EFI_UDP6_PROTOCOL            *Udp6,
-  IN     EFI_UDP6_COMPLETION_TOKEN    *Token,
-  IN     EFI_PXE_BASE_CODE_MODE       *Mode,
-  IN     EFI_EVENT                    TimeoutEvent,
-  IN     UINT16                       OpFlags,
-  IN     BOOLEAN                      *IsDone,
-     OUT BOOLEAN                      *IsMatched,
-  IN OUT EFI_IP_ADDRESS               *DestIp      OPTIONAL,
-  IN OUT EFI_PXE_BASE_CODE_UDP_PORT   *DestPort    OPTIONAL,
-  IN OUT EFI_IP_ADDRESS               *SrcIp       OPTIONAL,
-  IN OUT EFI_PXE_BASE_CODE_UDP_PORT   *SrcPort     OPTIONAL
+  IN     EFI_UDP6_PROTOCOL           *Udp6,
+  IN     EFI_UDP6_COMPLETION_TOKEN   *Token,
+  IN     EFI_PXE_BASE_CODE_MODE      *Mode,
+  IN     EFI_EVENT                   TimeoutEvent,
+  IN     UINT16                      OpFlags,
+  IN     BOOLEAN                     *IsDone,
+  OUT BOOLEAN                        *IsMatched,
+  IN OUT EFI_IP_ADDRESS              *DestIp      OPTIONAL,
+  IN OUT EFI_PXE_BASE_CODE_UDP_PORT  *DestPort    OPTIONAL,
+  IN OUT EFI_IP_ADDRESS              *SrcIp       OPTIONAL,
+  IN OUT EFI_PXE_BASE_CODE_UDP_PORT  *SrcPort     OPTIONAL
   )
 {
-  EFI_UDP6_RECEIVE_DATA     *RxData;
-  EFI_UDP6_SESSION_DATA     *Session;
-  EFI_STATUS                Status;
+  EFI_UDP6_RECEIVE_DATA  *RxData;
+  EFI_UDP6_SESSION_DATA  *Session;
+  EFI_STATUS             Status;
 
   Token->Status = EFI_NOT_READY;
   *IsDone       = FALSE;
@@ -1278,16 +1280,18 @@ PxeBcUdp6Read (
   //
   while (!(*IsDone) &&
          Token->Status == EFI_NOT_READY &&
-         EFI_ERROR (gBS->CheckEvent (TimeoutEvent))) {
+         EFI_ERROR (gBS->CheckEvent (TimeoutEvent)))
+  {
     //
     // Poll the token until reply/ICMPv6 error message received or timeout.
     //
     Udp6->Poll (Udp6);
-    if (Token->Status == EFI_ICMP_ERROR ||
-        Token->Status == EFI_NETWORK_UNREACHABLE ||
-        Token->Status == EFI_HOST_UNREACHABLE ||
-        Token->Status == EFI_PROTOCOL_UNREACHABLE ||
-        Token->Status == EFI_PORT_UNREACHABLE) {
+    if ((Token->Status == EFI_ICMP_ERROR) ||
+        (Token->Status == EFI_NETWORK_UNREACHABLE) ||
+        (Token->Status == EFI_HOST_UNREACHABLE) ||
+        (Token->Status == EFI_PROTOCOL_UNREACHABLE) ||
+        (Token->Status == EFI_PORT_UNREACHABLE))
+    {
       break;
     }
   }
@@ -1298,8 +1302,8 @@ PxeBcUdp6Read (
     //
     // check whether this packet matches the filters
     //
-    RxData    = Token->Packet.RxData;
-    Session   = &RxData->UdpSession;
+    RxData  = Token->Packet.RxData;
+    Session = &RxData->UdpSession;
 
     *IsMatched = PxeBcCheckByIpFilter (Mode, Session, OpFlags);
 
@@ -1330,7 +1334,6 @@ PxeBcUdp6Read (
   return Status;
 }
 
-
 /**
   This function is to display the IPv4 address.
 
@@ -1339,10 +1342,10 @@ PxeBcUdp6Read (
 **/
 VOID
 PxeBcShowIp4Addr (
-  IN EFI_IPv4_ADDRESS   *Ip
+  IN EFI_IPv4_ADDRESS  *Ip
   )
 {
-  UINTN                 Index;
+  UINTN  Index;
 
   for (Index = 0; Index < 4; Index++) {
     AsciiPrint ("%d", Ip->Addr[Index]);
@@ -1352,7 +1355,6 @@ PxeBcShowIp4Addr (
   }
 }
 
-
 /**
   This function is to display the IPv6 address.
 
@@ -1361,30 +1363,31 @@ PxeBcShowIp4Addr (
 **/
 VOID
 PxeBcShowIp6Addr (
-  IN EFI_IPv6_ADDRESS   *Ip
+  IN EFI_IPv6_ADDRESS  *Ip
   )
 {
-  UINTN                 Index;
+  UINTN  Index;
 
   for (Index = 0; Index < 16; Index++) {
-
     if (Ip->Addr[Index] != 0) {
       AsciiPrint ("%x", Ip->Addr[Index]);
     }
+
     Index++;
     if (Index > 15) {
       return;
     }
+
     if (((Ip->Addr[Index] & 0xf0) == 0) && (Ip->Addr[Index - 1] != 0)) {
       AsciiPrint ("0");
     }
+
     AsciiPrint ("%x", Ip->Addr[Index]);
     if (Index < 15) {
       AsciiPrint (":");
     }
   }
 }
-
 
 /**
   This function is to convert UINTN to ASCII string with the required formatting.
@@ -1396,20 +1399,19 @@ PxeBcShowIp6Addr (
 **/
 VOID
 PxeBcUintnToAscDecWithFormat (
-  IN UINTN                       Number,
-  IN UINT8                       *Buffer,
-  IN INTN                        Length
+  IN UINTN  Number,
+  IN UINT8  *Buffer,
+  IN INTN   Length
   )
 {
-  UINTN                          Remainder;
+  UINTN  Remainder;
 
-  for (; Length > 0; Length--) {
-    Remainder      = Number % 10;
-    Number        /= 10;
-    Buffer[Length - 1] = (UINT8) ('0' + Remainder);
+  for ( ; Length > 0; Length--) {
+    Remainder          = Number % 10;
+    Number            /= 10;
+    Buffer[Length - 1] = (UINT8)('0' + Remainder);
   }
 }
-
 
 /**
   This function is to convert a UINTN to a ASCII string, and return the
@@ -1424,31 +1426,30 @@ PxeBcUintnToAscDecWithFormat (
 **/
 UINTN
 PxeBcUintnToAscDec (
-  IN UINTN               Number,
-  IN UINT8               *Buffer,
-  IN UINTN               BufferSize
+  IN UINTN  Number,
+  IN UINT8  *Buffer,
+  IN UINTN  BufferSize
   )
 {
-  UINTN           Index;
-  UINTN           Length;
-  CHAR8           TempStr[64];
+  UINTN  Index;
+  UINTN  Length;
+  CHAR8  TempStr[64];
 
-  Index           = 63;
-  TempStr[Index]  = 0;
+  Index          = 63;
+  TempStr[Index] = 0;
 
   do {
     Index--;
-    TempStr[Index] = (CHAR8) ('0' + (Number % 10));
-    Number         = (UINTN) (Number / 10);
+    TempStr[Index] = (CHAR8)('0' + (Number % 10));
+    Number         = (UINTN)(Number / 10);
   } while (Number != 0);
 
-  AsciiStrCpyS ((CHAR8 *) Buffer, BufferSize, &TempStr[Index]);
+  AsciiStrCpyS ((CHAR8 *)Buffer, BufferSize, &TempStr[Index]);
 
-  Length = AsciiStrLen ((CHAR8 *) Buffer);
+  Length = AsciiStrLen ((CHAR8 *)Buffer);
 
   return Length;
 }
-
 
 /**
   This function is to convert unicode hex number to a UINT8.
@@ -1462,22 +1463,22 @@ PxeBcUintnToAscDec (
 **/
 EFI_STATUS
 PxeBcUniHexToUint8 (
-  OUT UINT8                *Digit,
-  IN  CHAR16               Char
+  OUT UINT8   *Digit,
+  IN  CHAR16  Char
   )
 {
   if ((Char >= L'0') && (Char <= L'9')) {
-    *Digit = (UINT8) (Char - L'0');
+    *Digit = (UINT8)(Char - L'0');
     return EFI_SUCCESS;
   }
 
   if ((Char >= L'A') && (Char <= L'F')) {
-    *Digit = (UINT8) (Char - L'A' + 0x0A);
+    *Digit = (UINT8)(Char - L'A' + 0x0A);
     return EFI_SUCCESS;
   }
 
   if ((Char >= L'a') && (Char <= L'f')) {
-    *Digit = (UINT8) (Char - L'a' + 0x0A);
+    *Digit = (UINT8)(Char - L'a' + 0x0A);
     return EFI_SUCCESS;
   }
 
@@ -1492,12 +1493,12 @@ PxeBcUniHexToUint8 (
 **/
 VOID
 CalcElapsedTime (
-  IN     PXEBC_PRIVATE_DATA     *Private
+  IN     PXEBC_PRIVATE_DATA  *Private
   )
 {
-  EFI_TIME          Time;
-  UINT64            CurrentStamp;
-  UINT64            ElapsedTimeValue;
+  EFI_TIME  Time;
+  UINT64    CurrentStamp;
+  UINT64    ElapsedTimeValue;
 
   //
   // Generate a time stamp of the centiseconds from 1900/1/1, assume 30day/month.
@@ -1529,10 +1530,10 @@ CalcElapsedTime (
     if (ElapsedTimeValue > 0xffff) {
       ElapsedTimeValue = 0xffff;
     }
+
     //
     // Save the elapsed time
     //
     Private->ElapsedTime = ElapsedTimeValue;
   }
 }
-

@@ -16,62 +16,62 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack(1)
 
 typedef struct {
-  TPM2_COMMAND_HEADER  Header;
-  TPM2B_AUTH           Auth;
-  TPMI_ALG_HASH        HashAlg;
+  TPM2_COMMAND_HEADER    Header;
+  TPM2B_AUTH             Auth;
+  TPMI_ALG_HASH          HashAlg;
 } TPM2_HASH_SEQUENCE_START_COMMAND;
 
 typedef struct {
-  TPM2_RESPONSE_HEADER  Header;
-  TPMI_DH_OBJECT        SequenceHandle;
+  TPM2_RESPONSE_HEADER    Header;
+  TPMI_DH_OBJECT          SequenceHandle;
 } TPM2_HASH_SEQUENCE_START_RESPONSE;
 
 typedef struct {
-  TPM2_COMMAND_HEADER       Header;
-  TPMI_DH_OBJECT            SequenceHandle;
-  UINT32                    AuthorizationSize;
-  TPMS_AUTH_COMMAND         AuthSessionSeq;
-  TPM2B_MAX_BUFFER          Buffer;
+  TPM2_COMMAND_HEADER    Header;
+  TPMI_DH_OBJECT         SequenceHandle;
+  UINT32                 AuthorizationSize;
+  TPMS_AUTH_COMMAND      AuthSessionSeq;
+  TPM2B_MAX_BUFFER       Buffer;
 } TPM2_SEQUENCE_UPDATE_COMMAND;
 
 typedef struct {
-  TPM2_RESPONSE_HEADER       Header;
-  UINT32                     ParameterSize;
-  TPMS_AUTH_RESPONSE         AuthSessionSeq;
+  TPM2_RESPONSE_HEADER    Header;
+  UINT32                  ParameterSize;
+  TPMS_AUTH_RESPONSE      AuthSessionSeq;
 } TPM2_SEQUENCE_UPDATE_RESPONSE;
 
 typedef struct {
-  TPM2_COMMAND_HEADER       Header;
-  TPMI_DH_PCR               PcrHandle;
-  TPMI_DH_OBJECT            SequenceHandle;
-  UINT32                    AuthorizationSize;
-  TPMS_AUTH_COMMAND         AuthSessionPcr;
-  TPMS_AUTH_COMMAND         AuthSessionSeq;
-  TPM2B_MAX_BUFFER          Buffer;
+  TPM2_COMMAND_HEADER    Header;
+  TPMI_DH_PCR            PcrHandle;
+  TPMI_DH_OBJECT         SequenceHandle;
+  UINT32                 AuthorizationSize;
+  TPMS_AUTH_COMMAND      AuthSessionPcr;
+  TPMS_AUTH_COMMAND      AuthSessionSeq;
+  TPM2B_MAX_BUFFER       Buffer;
 } TPM2_EVENT_SEQUENCE_COMPLETE_COMMAND;
 
 typedef struct {
-  TPM2_RESPONSE_HEADER       Header;
-  UINT32                     ParameterSize;
-  TPML_DIGEST_VALUES         Results;
-  TPMS_AUTH_RESPONSE         AuthSessionPcr;
-  TPMS_AUTH_RESPONSE         AuthSessionSeq;
+  TPM2_RESPONSE_HEADER    Header;
+  UINT32                  ParameterSize;
+  TPML_DIGEST_VALUES      Results;
+  TPMS_AUTH_RESPONSE      AuthSessionPcr;
+  TPMS_AUTH_RESPONSE      AuthSessionSeq;
 } TPM2_EVENT_SEQUENCE_COMPLETE_RESPONSE;
 
 typedef struct {
-  TPM2_COMMAND_HEADER       Header;
-  TPMI_DH_OBJECT            SequenceHandle;
-  UINT32                    AuthorizationSize;
-  TPMS_AUTH_COMMAND         AuthSessionSeq;
-  TPM2B_MAX_BUFFER          Buffer;
-  TPMI_RH_HIERARCHY         Hierarchy;
+  TPM2_COMMAND_HEADER    Header;
+  TPMI_DH_OBJECT         SequenceHandle;
+  UINT32                 AuthorizationSize;
+  TPMS_AUTH_COMMAND      AuthSessionSeq;
+  TPM2B_MAX_BUFFER       Buffer;
+  TPMI_RH_HIERARCHY      Hierarchy;
 } TPM2_SEQUENCE_COMPLETE_COMMAND;
 
 typedef struct {
-  TPM2_RESPONSE_HEADER       Header;
-  UINT32                     ParameterSize;
-  TPM2B_DIGEST               Digest;
-  TPMS_AUTH_RESPONSE         AuthSessionSeq;
+  TPM2_RESPONSE_HEADER    Header;
+  UINT32                  ParameterSize;
+  TPM2B_DIGEST            Digest;
+  TPMS_AUTH_RESPONSE      AuthSessionSeq;
 } TPM2_SEQUENCE_COMPLETE_RESPONSE;
 
 #pragma pack()
@@ -91,67 +91,67 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 Tpm2HashSequenceStart (
-  IN TPMI_ALG_HASH   HashAlg,
-  OUT TPMI_DH_OBJECT *SequenceHandle
+  IN TPMI_ALG_HASH    HashAlg,
+  OUT TPMI_DH_OBJECT  *SequenceHandle
   )
 {
-  EFI_STATUS                        Status;
-  TPM2_HASH_SEQUENCE_START_COMMAND  Cmd;
-  TPM2_HASH_SEQUENCE_START_RESPONSE Res;
-  UINT32                            CmdSize;
-  UINT32                            RespSize;
-  UINT8                             *Buffer;
-  UINT32                            ResultBufSize;
+  EFI_STATUS                         Status;
+  TPM2_HASH_SEQUENCE_START_COMMAND   Cmd;
+  TPM2_HASH_SEQUENCE_START_RESPONSE  Res;
+  UINT32                             CmdSize;
+  UINT32                             RespSize;
+  UINT8                              *Buffer;
+  UINT32                             ResultBufSize;
 
-  ZeroMem(&Cmd, sizeof(Cmd));
+  ZeroMem (&Cmd, sizeof (Cmd));
 
   //
   // Construct command
   //
-  Cmd.Header.tag         = SwapBytes16(TPM_ST_NO_SESSIONS);
-  Cmd.Header.commandCode = SwapBytes32(TPM_CC_HashSequenceStart);
+  Cmd.Header.tag         = SwapBytes16 (TPM_ST_NO_SESSIONS);
+  Cmd.Header.commandCode = SwapBytes32 (TPM_CC_HashSequenceStart);
 
   Buffer = (UINT8 *)&Cmd.Auth;
 
   // auth = nullAuth
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(0));
-  Buffer += sizeof(UINT16);
+  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (0));
+  Buffer += sizeof (UINT16);
 
   // hashAlg
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(HashAlg));
-  Buffer += sizeof(UINT16);
+  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (HashAlg));
+  Buffer += sizeof (UINT16);
 
-  CmdSize = (UINT32)(Buffer - (UINT8 *)&Cmd);
-  Cmd.Header.paramSize = SwapBytes32(CmdSize);
+  CmdSize              = (UINT32)(Buffer - (UINT8 *)&Cmd);
+  Cmd.Header.paramSize = SwapBytes32 (CmdSize);
 
   //
   // Call the TPM
   //
-  ResultBufSize = sizeof(Res);
-  Status = Tpm2SubmitCommand (CmdSize, (UINT8 *)&Cmd, &ResultBufSize, (UINT8 *)&Res);
-  if (EFI_ERROR(Status)) {
+  ResultBufSize = sizeof (Res);
+  Status        = Tpm2SubmitCommand (CmdSize, (UINT8 *)&Cmd, &ResultBufSize, (UINT8 *)&Res);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  if (ResultBufSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "HashSequenceStart: Failed ExecuteCommand: Buffer Too Small\r\n"));
+  if (ResultBufSize > sizeof (Res)) {
+    DEBUG ((DEBUG_ERROR, "HashSequenceStart: Failed ExecuteCommand: Buffer Too Small\r\n"));
     return EFI_BUFFER_TOO_SMALL;
   }
 
   //
   // Validate response headers
   //
-  RespSize = SwapBytes32(Res.Header.paramSize);
-  if (RespSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "HashSequenceStart: Response size too large! %d\r\n", RespSize));
+  RespSize = SwapBytes32 (Res.Header.paramSize);
+  if (RespSize > sizeof (Res)) {
+    DEBUG ((DEBUG_ERROR, "HashSequenceStart: Response size too large! %d\r\n", RespSize));
     return EFI_BUFFER_TOO_SMALL;
   }
 
   //
   // Fail if command failed
   //
-  if (SwapBytes32(Res.Header.responseCode) != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "HashSequenceStart: Response Code error! 0x%08x\r\n", SwapBytes32(Res.Header.responseCode)));
+  if (SwapBytes32 (Res.Header.responseCode) != TPM_RC_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "HashSequenceStart: Response Code error! 0x%08x\r\n", SwapBytes32 (Res.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
 
@@ -160,7 +160,7 @@ Tpm2HashSequenceStart (
   //
 
   // sequenceHandle
-  *SequenceHandle = SwapBytes32(Res.SequenceHandle);
+  *SequenceHandle = SwapBytes32 (Res.SequenceHandle);
 
   return EFI_SUCCESS;
 }
@@ -179,27 +179,27 @@ Tpm2HashSequenceStart (
 EFI_STATUS
 EFIAPI
 Tpm2SequenceUpdate (
-  IN TPMI_DH_OBJECT   SequenceHandle,
-  IN TPM2B_MAX_BUFFER *Buffer
+  IN TPMI_DH_OBJECT    SequenceHandle,
+  IN TPM2B_MAX_BUFFER  *Buffer
   )
 {
-  EFI_STATUS                    Status;
-  TPM2_SEQUENCE_UPDATE_COMMAND  Cmd;
-  TPM2_SEQUENCE_UPDATE_RESPONSE Res;
-  UINT32                        CmdSize;
-  UINT32                        RespSize;
-  UINT8                         *BufferPtr;
-  UINT32                        SessionInfoSize;
-  UINT32                        ResultBufSize;
+  EFI_STATUS                     Status;
+  TPM2_SEQUENCE_UPDATE_COMMAND   Cmd;
+  TPM2_SEQUENCE_UPDATE_RESPONSE  Res;
+  UINT32                         CmdSize;
+  UINT32                         RespSize;
+  UINT8                          *BufferPtr;
+  UINT32                         SessionInfoSize;
+  UINT32                         ResultBufSize;
 
-  ZeroMem(&Cmd, sizeof(Cmd));
+  ZeroMem (&Cmd, sizeof (Cmd));
 
   //
   // Construct command
   //
-  Cmd.Header.tag = SwapBytes16(TPM_ST_SESSIONS);
-  Cmd.Header.commandCode = SwapBytes32(TPM_CC_SequenceUpdate);
-  Cmd.SequenceHandle = SwapBytes32(SequenceHandle);
+  Cmd.Header.tag         = SwapBytes16 (TPM_ST_SESSIONS);
+  Cmd.Header.commandCode = SwapBytes32 (TPM_CC_SequenceUpdate);
+  Cmd.SequenceHandle     = SwapBytes32 (SequenceHandle);
 
   //
   // Add in Auth session
@@ -207,48 +207,48 @@ Tpm2SequenceUpdate (
   BufferPtr = (UINT8 *)&Cmd.AuthSessionSeq;
 
   // sessionInfoSize
-  SessionInfoSize = CopyAuthSessionCommand (NULL, BufferPtr);
-  BufferPtr += SessionInfoSize;
-  Cmd.AuthorizationSize = SwapBytes32(SessionInfoSize);
+  SessionInfoSize       = CopyAuthSessionCommand (NULL, BufferPtr);
+  BufferPtr            += SessionInfoSize;
+  Cmd.AuthorizationSize = SwapBytes32 (SessionInfoSize);
 
   // buffer.size
-  WriteUnaligned16 ((UINT16 *)BufferPtr, SwapBytes16(Buffer->size));
-  BufferPtr += sizeof(UINT16);
+  WriteUnaligned16 ((UINT16 *)BufferPtr, SwapBytes16 (Buffer->size));
+  BufferPtr += sizeof (UINT16);
 
-  CopyMem(BufferPtr, &Buffer->buffer, Buffer->size);
+  CopyMem (BufferPtr, &Buffer->buffer, Buffer->size);
   BufferPtr += Buffer->size;
 
-  CmdSize = (UINT32)(BufferPtr - (UINT8 *)&Cmd);
-  Cmd.Header.paramSize = SwapBytes32(CmdSize);
+  CmdSize              = (UINT32)(BufferPtr - (UINT8 *)&Cmd);
+  Cmd.Header.paramSize = SwapBytes32 (CmdSize);
 
   //
   // Call the TPM
   //
-  ResultBufSize = sizeof(Res);
-  Status = Tpm2SubmitCommand (CmdSize, (UINT8 *)&Cmd,&ResultBufSize, (UINT8 *)&Res);
-  if (EFI_ERROR(Status)) {
+  ResultBufSize = sizeof (Res);
+  Status        = Tpm2SubmitCommand (CmdSize, (UINT8 *)&Cmd, &ResultBufSize, (UINT8 *)&Res);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  if (ResultBufSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "SequenceUpdate: Failed ExecuteCommand: Buffer Too Small\r\n"));
+  if (ResultBufSize > sizeof (Res)) {
+    DEBUG ((DEBUG_ERROR, "SequenceUpdate: Failed ExecuteCommand: Buffer Too Small\r\n"));
     return EFI_BUFFER_TOO_SMALL;
   }
 
   //
   // Validate response headers
   //
-  RespSize = SwapBytes32(Res.Header.paramSize);
-  if (RespSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "SequenceUpdate: Response size too large! %d\r\n", RespSize));
+  RespSize = SwapBytes32 (Res.Header.paramSize);
+  if (RespSize > sizeof (Res)) {
+    DEBUG ((DEBUG_ERROR, "SequenceUpdate: Response size too large! %d\r\n", RespSize));
     return EFI_BUFFER_TOO_SMALL;
   }
 
   //
   // Fail if command failed
   //
-  if (SwapBytes32(Res.Header.responseCode) != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "SequenceUpdate: Response Code error! 0x%08x\r\n", SwapBytes32(Res.Header.responseCode)));
+  if (SwapBytes32 (Res.Header.responseCode) != TPM_RC_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "SequenceUpdate: Response Code error! 0x%08x\r\n", SwapBytes32 (Res.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
 
@@ -278,33 +278,33 @@ Tpm2SequenceUpdate (
 EFI_STATUS
 EFIAPI
 Tpm2EventSequenceComplete (
-  IN TPMI_DH_PCR         PcrHandle,
-  IN TPMI_DH_OBJECT      SequenceHandle,
-  IN TPM2B_MAX_BUFFER    *Buffer,
-  OUT TPML_DIGEST_VALUES *Results
+  IN TPMI_DH_PCR          PcrHandle,
+  IN TPMI_DH_OBJECT       SequenceHandle,
+  IN TPM2B_MAX_BUFFER     *Buffer,
+  OUT TPML_DIGEST_VALUES  *Results
   )
 {
-  EFI_STATUS                            Status;
-  TPM2_EVENT_SEQUENCE_COMPLETE_COMMAND  Cmd;
-  TPM2_EVENT_SEQUENCE_COMPLETE_RESPONSE Res;
-  UINT32                                CmdSize;
-  UINT32                                RespSize;
-  UINT8                                 *BufferPtr;
-  UINT32                                SessionInfoSize;
-  UINT32                                SessionInfoSize2;
-  UINT32                                Index;
-  UINT32                                ResultBufSize;
-  UINT16                                DigestSize;
+  EFI_STATUS                             Status;
+  TPM2_EVENT_SEQUENCE_COMPLETE_COMMAND   Cmd;
+  TPM2_EVENT_SEQUENCE_COMPLETE_RESPONSE  Res;
+  UINT32                                 CmdSize;
+  UINT32                                 RespSize;
+  UINT8                                  *BufferPtr;
+  UINT32                                 SessionInfoSize;
+  UINT32                                 SessionInfoSize2;
+  UINT32                                 Index;
+  UINT32                                 ResultBufSize;
+  UINT16                                 DigestSize;
 
-  ZeroMem(&Cmd, sizeof(Cmd));
+  ZeroMem (&Cmd, sizeof (Cmd));
 
   //
   // Construct command
   //
-  Cmd.Header.tag = SwapBytes16(TPM_ST_SESSIONS);
-  Cmd.Header.commandCode = SwapBytes32(TPM_CC_EventSequenceComplete);
-  Cmd.PcrHandle = SwapBytes32(PcrHandle);
-  Cmd.SequenceHandle = SwapBytes32(SequenceHandle);
+  Cmd.Header.tag         = SwapBytes16 (TPM_ST_SESSIONS);
+  Cmd.Header.commandCode = SwapBytes32 (TPM_CC_EventSequenceComplete);
+  Cmd.PcrHandle          = SwapBytes32 (PcrHandle);
+  Cmd.SequenceHandle     = SwapBytes32 (SequenceHandle);
 
   //
   // Add in pcrHandle Auth session
@@ -313,51 +313,51 @@ Tpm2EventSequenceComplete (
 
   // sessionInfoSize
   SessionInfoSize = CopyAuthSessionCommand (NULL, BufferPtr);
-  BufferPtr += SessionInfoSize;
+  BufferPtr      += SessionInfoSize;
 
   // sessionInfoSize
-  SessionInfoSize2 = CopyAuthSessionCommand (NULL, BufferPtr);
-  BufferPtr += SessionInfoSize2;
-  Cmd.AuthorizationSize = SwapBytes32(SessionInfoSize + SessionInfoSize2);
+  SessionInfoSize2      = CopyAuthSessionCommand (NULL, BufferPtr);
+  BufferPtr            += SessionInfoSize2;
+  Cmd.AuthorizationSize = SwapBytes32 (SessionInfoSize + SessionInfoSize2);
 
   // buffer.size
-  WriteUnaligned16 ((UINT16 *)BufferPtr, SwapBytes16(Buffer->size));
-  BufferPtr += sizeof(UINT16);
+  WriteUnaligned16 ((UINT16 *)BufferPtr, SwapBytes16 (Buffer->size));
+  BufferPtr += sizeof (UINT16);
 
-  CopyMem(BufferPtr, &Buffer->buffer[0], Buffer->size);
+  CopyMem (BufferPtr, &Buffer->buffer[0], Buffer->size);
   BufferPtr += Buffer->size;
 
-  CmdSize = (UINT32)(BufferPtr - (UINT8 *)&Cmd);
-  Cmd.Header.paramSize = SwapBytes32(CmdSize);
+  CmdSize              = (UINT32)(BufferPtr - (UINT8 *)&Cmd);
+  Cmd.Header.paramSize = SwapBytes32 (CmdSize);
 
   //
   // Call the TPM
   //
-  ResultBufSize = sizeof(Res);
-  Status = Tpm2SubmitCommand (CmdSize, (UINT8 *)&Cmd, &ResultBufSize, (UINT8 *)&Res);
-  if (EFI_ERROR(Status)) {
+  ResultBufSize = sizeof (Res);
+  Status        = Tpm2SubmitCommand (CmdSize, (UINT8 *)&Cmd, &ResultBufSize, (UINT8 *)&Res);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  if (ResultBufSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "EventSequenceComplete: Failed ExecuteCommand: Buffer Too Small\r\n"));
+  if (ResultBufSize > sizeof (Res)) {
+    DEBUG ((DEBUG_ERROR, "EventSequenceComplete: Failed ExecuteCommand: Buffer Too Small\r\n"));
     return EFI_BUFFER_TOO_SMALL;
   }
 
   //
   // Validate response headers
   //
-  RespSize = SwapBytes32(Res.Header.paramSize);
-  if (RespSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "EventSequenceComplete: Response size too large! %d\r\n", RespSize));
+  RespSize = SwapBytes32 (Res.Header.paramSize);
+  if (RespSize > sizeof (Res)) {
+    DEBUG ((DEBUG_ERROR, "EventSequenceComplete: Response size too large! %d\r\n", RespSize));
     return EFI_BUFFER_TOO_SMALL;
   }
 
   //
   // Fail if command failed
   //
-  if (SwapBytes32(Res.Header.responseCode) != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "EventSequenceComplete: Response Code error! 0x%08x\r\n", SwapBytes32(Res.Header.responseCode)));
+  if (SwapBytes32 (Res.Header.responseCode) != TPM_RC_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "EventSequenceComplete: Response Code error! 0x%08x\r\n", SwapBytes32 (Res.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
 
@@ -368,24 +368,25 @@ Tpm2EventSequenceComplete (
   BufferPtr = (UINT8 *)&Res.Results;
 
   // count
-  Results->count = SwapBytes32(ReadUnaligned32 ((UINT32 *)BufferPtr));
+  Results->count = SwapBytes32 (ReadUnaligned32 ((UINT32 *)BufferPtr));
   if (Results->count > HASH_COUNT) {
     DEBUG ((DEBUG_ERROR, "Tpm2EventSequenceComplete - Results->count error %x\n", Results->count));
     return EFI_DEVICE_ERROR;
   }
 
-  BufferPtr += sizeof(UINT32);
+  BufferPtr += sizeof (UINT32);
 
   for (Index = 0; Index < Results->count; Index++) {
-    Results->digests[Index].hashAlg = SwapBytes16(ReadUnaligned16 ((UINT16 *)BufferPtr));
-    BufferPtr += sizeof(UINT16);
+    Results->digests[Index].hashAlg = SwapBytes16 (ReadUnaligned16 ((UINT16 *)BufferPtr));
+    BufferPtr                      += sizeof (UINT16);
 
     DigestSize = GetHashSizeFromAlgo (Results->digests[Index].hashAlg);
     if (DigestSize == 0) {
-      DEBUG ((EFI_D_ERROR, "EventSequenceComplete: Unknown hash algorithm %d\r\n", Results->digests[Index].hashAlg));
+      DEBUG ((DEBUG_ERROR, "EventSequenceComplete: Unknown hash algorithm %d\r\n", Results->digests[Index].hashAlg));
       return EFI_DEVICE_ERROR;
     }
-    CopyMem(
+
+    CopyMem (
       &Results->digests[Index].digest,
       BufferPtr,
       DigestSize
@@ -409,28 +410,28 @@ Tpm2EventSequenceComplete (
 EFI_STATUS
 EFIAPI
 Tpm2SequenceComplete (
-  IN TPMI_DH_OBJECT      SequenceHandle,
-  IN TPM2B_MAX_BUFFER    *Buffer,
-  OUT TPM2B_DIGEST       *Result
+  IN TPMI_DH_OBJECT    SequenceHandle,
+  IN TPM2B_MAX_BUFFER  *Buffer,
+  OUT TPM2B_DIGEST     *Result
   )
 {
-  EFI_STATUS                            Status;
-  TPM2_SEQUENCE_COMPLETE_COMMAND        Cmd;
-  TPM2_SEQUENCE_COMPLETE_RESPONSE       Res;
-  UINT32                                CmdSize;
-  UINT32                                RespSize;
-  UINT8                                 *BufferPtr;
-  UINT32                                SessionInfoSize;
-  UINT32                                ResultBufSize;
+  EFI_STATUS                       Status;
+  TPM2_SEQUENCE_COMPLETE_COMMAND   Cmd;
+  TPM2_SEQUENCE_COMPLETE_RESPONSE  Res;
+  UINT32                           CmdSize;
+  UINT32                           RespSize;
+  UINT8                            *BufferPtr;
+  UINT32                           SessionInfoSize;
+  UINT32                           ResultBufSize;
 
-  ZeroMem(&Cmd, sizeof(Cmd));
+  ZeroMem (&Cmd, sizeof (Cmd));
 
   //
   // Construct command
   //
-  Cmd.Header.tag = SwapBytes16(TPM_ST_SESSIONS);
-  Cmd.Header.commandCode = SwapBytes32(TPM_CC_SequenceComplete);
-  Cmd.SequenceHandle = SwapBytes32(SequenceHandle);
+  Cmd.Header.tag         = SwapBytes16 (TPM_ST_SESSIONS);
+  Cmd.Header.commandCode = SwapBytes32 (TPM_CC_SequenceComplete);
+  Cmd.SequenceHandle     = SwapBytes32 (SequenceHandle);
 
   //
   // Add in Auth session
@@ -438,52 +439,52 @@ Tpm2SequenceComplete (
   BufferPtr = (UINT8 *)&Cmd.AuthSessionSeq;
 
   // sessionInfoSize
-  SessionInfoSize = CopyAuthSessionCommand (NULL, BufferPtr);
-  BufferPtr += SessionInfoSize;
-  Cmd.AuthorizationSize = SwapBytes32(SessionInfoSize);
+  SessionInfoSize       = CopyAuthSessionCommand (NULL, BufferPtr);
+  BufferPtr            += SessionInfoSize;
+  Cmd.AuthorizationSize = SwapBytes32 (SessionInfoSize);
 
   // buffer.size
-  WriteUnaligned16 ((UINT16 *)BufferPtr, SwapBytes16(Buffer->size));
-  BufferPtr += sizeof(UINT16);
+  WriteUnaligned16 ((UINT16 *)BufferPtr, SwapBytes16 (Buffer->size));
+  BufferPtr += sizeof (UINT16);
 
-  CopyMem(BufferPtr, &Buffer->buffer[0], Buffer->size);
+  CopyMem (BufferPtr, &Buffer->buffer[0], Buffer->size);
   BufferPtr += Buffer->size;
 
   // Hierarchy
   WriteUnaligned32 ((UINT32 *)BufferPtr, SwapBytes32 (TPM_RH_NULL));
   BufferPtr += sizeof (UINT32);
 
-  CmdSize = (UINT32)(BufferPtr - (UINT8 *)&Cmd);
-  Cmd.Header.paramSize = SwapBytes32(CmdSize);
+  CmdSize              = (UINT32)(BufferPtr - (UINT8 *)&Cmd);
+  Cmd.Header.paramSize = SwapBytes32 (CmdSize);
 
   //
   // Call the TPM
   //
-  ResultBufSize = sizeof(Res);
-  Status = Tpm2SubmitCommand (CmdSize, (UINT8 *)&Cmd, &ResultBufSize, (UINT8 *)&Res);
-  if (EFI_ERROR(Status)) {
+  ResultBufSize = sizeof (Res);
+  Status        = Tpm2SubmitCommand (CmdSize, (UINT8 *)&Cmd, &ResultBufSize, (UINT8 *)&Res);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  if (ResultBufSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "SequenceComplete: Failed ExecuteCommand: Buffer Too Small\r\n"));
+  if (ResultBufSize > sizeof (Res)) {
+    DEBUG ((DEBUG_ERROR, "SequenceComplete: Failed ExecuteCommand: Buffer Too Small\r\n"));
     return EFI_BUFFER_TOO_SMALL;
   }
 
   //
   // Validate response headers
   //
-  RespSize = SwapBytes32(Res.Header.paramSize);
-  if (RespSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "SequenceComplete: Response size too large! %d\r\n", RespSize));
+  RespSize = SwapBytes32 (Res.Header.paramSize);
+  if (RespSize > sizeof (Res)) {
+    DEBUG ((DEBUG_ERROR, "SequenceComplete: Response size too large! %d\r\n", RespSize));
     return EFI_BUFFER_TOO_SMALL;
   }
 
   //
   // Fail if command failed
   //
-  if (SwapBytes32(Res.Header.responseCode) != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "SequenceComplete: Response Code error! 0x%08x\r\n", SwapBytes32(Res.Header.responseCode)));
+  if (SwapBytes32 (Res.Header.responseCode) != TPM_RC_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "SequenceComplete: Response Code error! 0x%08x\r\n", SwapBytes32 (Res.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
 
@@ -494,15 +495,15 @@ Tpm2SequenceComplete (
   BufferPtr = (UINT8 *)&Res.Digest;
 
   // digestSize
-  Result->size = SwapBytes16(ReadUnaligned16 ((UINT16 *)BufferPtr));
-  if (Result->size > sizeof(TPMU_HA)){
+  Result->size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)BufferPtr));
+  if (Result->size > sizeof (TPMU_HA)) {
     DEBUG ((DEBUG_ERROR, "Tpm2SequenceComplete - Result->size error %x\n", Result->size));
     return EFI_DEVICE_ERROR;
   }
 
-  BufferPtr += sizeof(UINT16);
+  BufferPtr += sizeof (UINT16);
 
-  CopyMem(
+  CopyMem (
     Result->buffer,
     BufferPtr,
     Result->size

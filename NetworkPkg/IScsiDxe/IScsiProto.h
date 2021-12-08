@@ -24,21 +24,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
       (((INT32) (s1) > (INT32) (s2)) && (s1 - s2) < ((UINT32) 1 << 31)) \
     )
 
-#define ISCSI_WELL_KNOWN_PORT                   3260
-#define ISCSI_MAX_CONNS_PER_SESSION             1
+#define ISCSI_WELL_KNOWN_PORT        3260
+#define ISCSI_MAX_CONNS_PER_SESSION  1
 
-#define DEFAULT_MAX_RECV_DATA_SEG_LEN           8192
-#define MAX_RECV_DATA_SEG_LEN_IN_FFP            65536
-#define DEFAULT_MAX_OUTSTANDING_R2T             1
+#define DEFAULT_MAX_RECV_DATA_SEG_LEN  8192
+#define MAX_RECV_DATA_SEG_LEN_IN_FFP   65536
+#define DEFAULT_MAX_OUTSTANDING_R2T    1
 
-#define ISCSI_VERSION_MAX                       0x00
-#define ISCSI_VERSION_MIN                       0x00
+#define ISCSI_VERSION_MAX  0x00
+#define ISCSI_VERSION_MIN  0x00
 
-#define ISCSI_CHECK_MEDIA_LOGIN_WAITING_TIME       EFI_TIMER_PERIOD_SECONDS(20)
-#define ISCSI_CHECK_MEDIA_GET_DHCP_WAITING_TIME    EFI_TIMER_PERIOD_SECONDS(20)
+#define ISCSI_CHECK_MEDIA_LOGIN_WAITING_TIME     EFI_TIMER_PERIOD_SECONDS(20)
+#define ISCSI_CHECK_MEDIA_GET_DHCP_WAITING_TIME  EFI_TIMER_PERIOD_SECONDS(20)
 
-#define ISCSI_REDIRECT_ADDR_START_DELIMITER     '['
-#define ISCSI_REDIRECT_ADDR_END_DELIMITER       ']'
+#define ISCSI_REDIRECT_ADDR_START_DELIMITER  '['
+#define ISCSI_REDIRECT_ADDR_END_DELIMITER    ']'
 
 #define ISCSI_KEY_AUTH_METHOD                   "AuthMethod"
 #define ISCSI_KEY_HEADER_DIGEST                 "HeaderDigest"
@@ -63,32 +63,32 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ISCSI_KEY_SESSION_TYPE                  "SessionType"
 #define ISCSI_KEY_MAX_RECV_DATA_SEGMENT_LENGTH  "MaxRecvDataSegmentLength"
 
-#define ISCSI_KEY_VALUE_NONE                    "None"
+#define ISCSI_KEY_VALUE_NONE  "None"
 
 ///
 /// connection state for initiator
 ///
 
-#define CONN_STATE_FREE                         0
-#define CONN_STATE_XPT_WAIT                     1
-#define CONN_STATE_IN_LOGIN                     2
-#define CONN_STATE_LOGGED_IN                    3
-#define CONN_STATE_IN_LOGOUT                    4
-#define CONN_STATE_LOGOUT_REQUESTED             5
-#define CONN_STATE_CLEANUP_WAIT                 6
-#define CONN_STATE_IN_CLEANUP                   7
+#define CONN_STATE_FREE              0
+#define CONN_STATE_XPT_WAIT          1
+#define CONN_STATE_IN_LOGIN          2
+#define CONN_STATE_LOGGED_IN         3
+#define CONN_STATE_IN_LOGOUT         4
+#define CONN_STATE_LOGOUT_REQUESTED  5
+#define CONN_STATE_CLEANUP_WAIT      6
+#define CONN_STATE_IN_CLEANUP        7
 
 ///
 /// session state for initiator
 ///
-#define SESSION_STATE_FREE                      0
-#define SESSION_STATE_LOGGED_IN                 1
-#define SESSION_STATE_FAILED                    2
+#define SESSION_STATE_FREE       0
+#define SESSION_STATE_LOGGED_IN  1
+#define SESSION_STATE_FAILED     2
 
-#define ISCSI_RESERVED_TAG                      0xffffffff
+#define ISCSI_RESERVED_TAG  0xffffffff
 
-#define ISCSI_REQ_IMMEDIATE                     0x40
-#define ISCSI_OPCODE_MASK                       0x3F
+#define ISCSI_REQ_IMMEDIATE  0x40
+#define ISCSI_OPCODE_MASK    0x3F
 
 #define ISCSI_SET_OPCODE(PduHdr, Op, Flgs)  ((((ISCSI_BASIC_HEADER *) (PduHdr))->OpCode) = ((Op) | (Flgs)))
 #define ISCSI_GET_OPCODE(PduHdr)            ((((ISCSI_BASIC_HEADER *) (PduHdr))->OpCode) & ISCSI_OPCODE_MASK)
@@ -101,8 +101,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ISCSI_GET_CURRENT_STAGE(PduHdr)     ((UINT8) (((PduHdr)->Flags >> 2) & 0x3))
 #define ISCSI_GET_NEXT_STAGE(PduHdr)        ((UINT8) (((PduHdr)->Flags) & 0x3))
 
-#define ISCSI_GET_PAD_LEN(DataLen)          ((~(DataLen) + 1) & 0x3)
-#define ISCSI_ROUNDUP(DataLen)              (((DataLen) + 3) &~(0x3))
+#define ISCSI_GET_PAD_LEN(DataLen)  ((~(DataLen) + 1) & 0x3)
+#define ISCSI_ROUNDUP(DataLen)      (((DataLen) + 3) &~(0x3))
 
 #define HTON24(Dst, Src) \
   do { \
@@ -111,7 +111,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     (Dst)[2]  = (UINT8) ((UINT8) (Src) & 0xFF); \
   } while (0);
 
-#define NTOH24(src)                         (((src)[0] << 16) | ((src)[1] << 8) | ((src)[2]))
+#define NTOH24(src)  (((src)[0] << 16) | ((src)[1] << 8) | ((src)[2]))
 
 #define ISCSI_GET_DATASEG_LEN(PduHdr)       NTOH24 (((ISCSI_BASIC_HEADER *) (PduHdr))->DataSegmentLength)
 #define ISCSI_SET_DATASEG_LEN(PduHdr, Len)  HTON24 (((ISCSI_BASIC_HEADER *) (PduHdr))->DataSegmentLength, (Len))
@@ -135,30 +135,30 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Target opcodes.
 //
-#define ISCSI_OPCODE_NOP_IN       0x20
-#define ISCSI_OPCODE_SCSI_RSP     0x21
-#define ISCSI_OPCODE_SCSI_TMF_RSP 0x22
-#define ISCSI_OPCODE_LOGIN_RSP    0x23
-#define ISCSI_OPCODE_TEXT_RSP     0x24
-#define ISCSI_OPCODE_SCSI_DATA_IN 0x25
-#define ISCSI_OPCODE_LOGOUT_RSP   0x26
-#define ISCSI_OPCODE_R2T          0x31
-#define ISCSI_OPCODE_ASYNC_MSG    0x32
-#define ISCSI_OPCODE_VENDOR_T0    0x3c
-#define ISCSI_OPCODE_VENDOR_T1    0x3d
-#define ISCSI_OPCODE_VENDOR_T2    0x3e
-#define ISCSI_OPCODE_REJECT       0x3f
+#define ISCSI_OPCODE_NOP_IN        0x20
+#define ISCSI_OPCODE_SCSI_RSP      0x21
+#define ISCSI_OPCODE_SCSI_TMF_RSP  0x22
+#define ISCSI_OPCODE_LOGIN_RSP     0x23
+#define ISCSI_OPCODE_TEXT_RSP      0x24
+#define ISCSI_OPCODE_SCSI_DATA_IN  0x25
+#define ISCSI_OPCODE_LOGOUT_RSP    0x26
+#define ISCSI_OPCODE_R2T           0x31
+#define ISCSI_OPCODE_ASYNC_MSG     0x32
+#define ISCSI_OPCODE_VENDOR_T0     0x3c
+#define ISCSI_OPCODE_VENDOR_T1     0x3d
+#define ISCSI_OPCODE_VENDOR_T2     0x3e
+#define ISCSI_OPCODE_REJECT        0x3f
 
-#define ISCSI_BHS_FLAG_FINAL      0x80
+#define ISCSI_BHS_FLAG_FINAL  0x80
 
 //
 // Defined AHS types, others are reserved.
 //
-#define ISCSI_AHS_TYPE_EXT_CDB              0x1
-#define ISCSI_AHS_TYPE_BI_EXP_READ_DATA_LEN 0x2
+#define ISCSI_AHS_TYPE_EXT_CDB               0x1
+#define ISCSI_AHS_TYPE_BI_EXP_READ_DATA_LEN  0x2
 
-#define SCSI_CMD_PDU_FLAG_READ        0x40
-#define SCSI_CMD_PDU_FLAG_WRITE       0x20
+#define SCSI_CMD_PDU_FLAG_READ   0x40
+#define SCSI_CMD_PDU_FLAG_WRITE  0x20
 
 #define ISCSI_CMD_PDU_TASK_ATTR_MASK  0x07
 
@@ -174,10 +174,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Flag bit definitions in SCSI response.
 //
-#define SCSI_RSP_PDU_FLAG_BI_READ_OVERFLOW  0x10
-#define SCSI_RSP_PDU_FLAG_BI_READ_UNDERFLOW 0x08
-#define SCSI_RSP_PDU_FLAG_OVERFLOW          0x04
-#define SCSI_RSP_PDU_FLAG_UNDERFLOW         0x02
+#define SCSI_RSP_PDU_FLAG_BI_READ_OVERFLOW   0x10
+#define SCSI_RSP_PDU_FLAG_BI_READ_UNDERFLOW  0x08
+#define SCSI_RSP_PDU_FLAG_OVERFLOW           0x04
+#define SCSI_RSP_PDU_FLAG_UNDERFLOW          0x02
 
 //
 // iSCSI service response codes.
@@ -185,25 +185,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ISCSI_SERVICE_RSP_COMMAND_COMPLETE_AT_TARGET  0x00
 #define ISCSI_SERVICE_RSP_TARGET_FAILURE              0x01
 
-#define ISCSI_TMF_RSP_PDU_RSP_FUNCTION_COMPLETE           0
-#define ISCSI_TMF_RSP_PDU_RSP_TASK_NOT_EXIST              1
-#define ISCSI_TMF_RSP_PDU_RSP_LUN_NOT_EXIST               2
-#define ISCSI_TMF_RSP_PDU_RSP_TASK_STILL_ALLEGIANT        3
-#define ISCSI_TMF_RSP_PDU_RSP_TASK_REASSGIN_NOT_SUPPORTED 4
-#define ISCSI_TMF_RSP_PDU_RSP_NOT_SUPPORTED               5
-#define ISCSI_TMF_RSP_PDU_RSP_FUNCTION_AHTH_FAILED        6
-#define ISCSI_TMF_RSP_PDU_RSP_FUNCTION_REJECTED           255
+#define ISCSI_TMF_RSP_PDU_RSP_FUNCTION_COMPLETE            0
+#define ISCSI_TMF_RSP_PDU_RSP_TASK_NOT_EXIST               1
+#define ISCSI_TMF_RSP_PDU_RSP_LUN_NOT_EXIST                2
+#define ISCSI_TMF_RSP_PDU_RSP_TASK_STILL_ALLEGIANT         3
+#define ISCSI_TMF_RSP_PDU_RSP_TASK_REASSGIN_NOT_SUPPORTED  4
+#define ISCSI_TMF_RSP_PDU_RSP_NOT_SUPPORTED                5
+#define ISCSI_TMF_RSP_PDU_RSP_FUNCTION_AHTH_FAILED         6
+#define ISCSI_TMF_RSP_PDU_RSP_FUNCTION_REJECTED            255
 
 #define SCSI_DATA_IN_PDU_FLAG_ACKKNOWLEDGE  0x40
 #define SCSI_DATA_IN_PDU_FLAG_OVERFLOW      SCSI_RSP_PDU_FLAG_OVERFLOW
 #define SCSI_DATA_IN_PDU_FLAG_UNDERFLOW     SCSI_RSP_PDU_FLAG_UNDERFLOW
 #define SCSI_DATA_IN_PDU_FLAG_STATUS_VALID  0x01
 
-#define ISCSI_LOGIN_REQ_PDU_FLAG_TRANSIT  0x80
-#define ISCSI_LOGIN_REQ_PDU_FLAG_CONTINUE 0x40
+#define ISCSI_LOGIN_REQ_PDU_FLAG_TRANSIT   0x80
+#define ISCSI_LOGIN_REQ_PDU_FLAG_CONTINUE  0x40
 
-#define ISCSI_LOGIN_RSP_PDU_FLAG_TRANSIT    ISCSI_LOGIN_REQ_PDU_FLAG_TRANSIT
-#define ISCSI_LOGIN_RSP_PDU_FLAG_CONTINUE   ISCSI_LOGIN_REQ_PDU_FLAG_CONTINUE
+#define ISCSI_LOGIN_RSP_PDU_FLAG_TRANSIT   ISCSI_LOGIN_REQ_PDU_FLAG_TRANSIT
+#define ISCSI_LOGIN_RSP_PDU_FLAG_CONTINUE  ISCSI_LOGIN_REQ_PDU_FLAG_CONTINUE
 
 #define ISCSI_LOGIN_STATUS_SUCCESS          0
 #define ISCSI_LOGIN_STATUS_REDIRECTION      1
@@ -224,12 +224,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ISCSI_SNACK_REQUEST_TYPE_DATA_ACK     2
 #define ISCSI_SNACK_REQUEST_TYPE_RDATA        3
 
-#define ISCSI_SECURITY_NEGOTIATION          0
-#define ISCSI_LOGIN_OPERATIONAL_NEGOTIATION 1
-#define ISCSI_FULL_FEATURE_PHASE            3
+#define ISCSI_SECURITY_NEGOTIATION           0
+#define ISCSI_LOGIN_OPERATIONAL_NEGOTIATION  1
+#define ISCSI_FULL_FEATURE_PHASE             3
 
-typedef struct _ISCSI_SESSION               ISCSI_SESSION;
-typedef struct _ISCSI_CONNECTION            ISCSI_CONNECTION;
+typedef struct _ISCSI_SESSION     ISCSI_SESSION;
+typedef struct _ISCSI_CONNECTION  ISCSI_CONNECTION;
 
 typedef enum {
   DataIn  = 0,
@@ -241,340 +241,340 @@ typedef enum {
 /// iSCSI Basic Header Segment
 ///
 typedef struct _ISCSI_BASIC_HEADER {
-  UINT8   OpCode;
-  UINT8   Flags;
-  UINT16  OpCodeSpecific1;
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT8   Lun[8];
-  UINT32  InitiatorTaskTag;
-  UINT32  OpCodeSpecific2[7];
+  UINT8     OpCode;
+  UINT8     Flags;
+  UINT16    OpCodeSpecific1;
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT8     Lun[8];
+  UINT32    InitiatorTaskTag;
+  UINT32    OpCodeSpecific2[7];
 } ISCSI_BASIC_HEADER;
 
 typedef struct _ISCSI_ADDTIONAL_HEADER {
-  UINT16  Length;
-  UINT8   Type;
-  UINT8   TypeSpecific[1];
+  UINT16    Length;
+  UINT8     Type;
+  UINT8     TypeSpecific[1];
 } ISCSI_ADDITIONAL_HEADER;
 
 typedef struct _ISCSI_BI_EXP_READ_DATA_LEN_AHS {
-  UINT16  Length;
-  UINT8   Type;
-  UINT8   Reserved;
-  UINT32  ExpReadDataLength;
+  UINT16    Length;
+  UINT8     Type;
+  UINT8     Reserved;
+  UINT32    ExpReadDataLength;
 } ISCSI_BI_EXP_READ_DATA_LEN_AHS;
 
 ///
 /// SCSI Command
 ///
 typedef struct _SCSI_COMMAND {
-  UINT8   OpCode;
-  UINT8   Flags;
-  UINT16  Reserved;
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT8   Lun[8];
-  UINT32  InitiatorTaskTag;
-  UINT32  ExpDataXferLength;
-  UINT32  CmdSN;
-  UINT32  ExpStatSN;
-  UINT8   Cdb[16];
+  UINT8     OpCode;
+  UINT8     Flags;
+  UINT16    Reserved;
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT8     Lun[8];
+  UINT32    InitiatorTaskTag;
+  UINT32    ExpDataXferLength;
+  UINT32    CmdSN;
+  UINT32    ExpStatSN;
+  UINT8     Cdb[16];
 } SCSI_COMMAND;
 
 ///
 /// SCSI Response
 ///
 typedef struct _SCSI_RESPONSE {
-  UINT8   OpCode;
-  UINT8   Flags;
-  UINT8   Response;
-  UINT8   Status;
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT8   Reserved[8];
-  UINT32  InitiatorTaskTag;
-  UINT32  SNACKTag;
-  UINT32  StatSN;
-  UINT32  ExpCmdSN;
-  UINT32  MaxCmdSN;
-  UINT32  ExpDataSN;
-  UINT32  BiReadResidualCount;
-  UINT32  ResidualCount;
+  UINT8     OpCode;
+  UINT8     Flags;
+  UINT8     Response;
+  UINT8     Status;
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT8     Reserved[8];
+  UINT32    InitiatorTaskTag;
+  UINT32    SNACKTag;
+  UINT32    StatSN;
+  UINT32    ExpCmdSN;
+  UINT32    MaxCmdSN;
+  UINT32    ExpDataSN;
+  UINT32    BiReadResidualCount;
+  UINT32    ResidualCount;
 } SCSI_RESPONSE;
 
 typedef struct _ISCSI_SENSE_DATA {
-  UINT16  Length;
-  UINT8   Data[2];
+  UINT16    Length;
+  UINT8     Data[2];
 } ISCSI_SENSE_DATA;
 
 ///
 /// iSCSI Task Management Function Request.
 ///
 typedef struct _ISCSI_TMF_REQUEST {
-  UINT8   OpCode;
-  UINT8   Fuction;
-  UINT16  Reserved1;
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT8   Lun[8];
-  UINT32  InitiatorTaskTag;
-  UINT32  ReferencedTaskTag;
-  UINT32  CmdSN;
-  UINT32  ExpStatSN;
-  UINT32  RefCmdSN;
-  UINT32  ExpDataSN;
-  UINT32  Reserved2[2];
+  UINT8     OpCode;
+  UINT8     Fuction;
+  UINT16    Reserved1;
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT8     Lun[8];
+  UINT32    InitiatorTaskTag;
+  UINT32    ReferencedTaskTag;
+  UINT32    CmdSN;
+  UINT32    ExpStatSN;
+  UINT32    RefCmdSN;
+  UINT32    ExpDataSN;
+  UINT32    Reserved2[2];
 } ISCSI_TMF_REQUEST;
 
 ///
 /// iSCSI Task Management Function Response.
 ///
 typedef struct _ISCSI_TMF_RESPONSE {
-  UINT8   OpCode;
-  UINT8   Reserved1;
-  UINT8   Response;
-  UINT8   Reserved2;
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT32  Reserver3[2];
-  UINT32  InitiatorTaskTag;
-  UINT32  Reserved4;
-  UINT32  StatSN;
-  UINT32  ExpCmdSN;
-  UINT32  MaxCmdSN;
-  UINT32  Reserved[3];
+  UINT8     OpCode;
+  UINT8     Reserved1;
+  UINT8     Response;
+  UINT8     Reserved2;
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT32    Reserver3[2];
+  UINT32    InitiatorTaskTag;
+  UINT32    Reserved4;
+  UINT32    StatSN;
+  UINT32    ExpCmdSN;
+  UINT32    MaxCmdSN;
+  UINT32    Reserved[3];
 } ISCSI_TMF_RESPONSE;
 
 ///
 /// SCSI Data-Out
 ///
 typedef struct _ISCSI_SCSI_DATA_OUT {
-  UINT8   OpCode;
-  UINT8   Reserved1[3];
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT8   Lun[8];
-  UINT32  InitiatorTaskTag;
-  UINT32  TargetTransferTag;
-  UINT32  Reserved2;
-  UINT32  ExpStatSN;
-  UINT32  Reserved3;
-  UINT32  DataSN;
-  UINT32  BufferOffset;
-  UINT32  Reserved4;
+  UINT8     OpCode;
+  UINT8     Reserved1[3];
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT8     Lun[8];
+  UINT32    InitiatorTaskTag;
+  UINT32    TargetTransferTag;
+  UINT32    Reserved2;
+  UINT32    ExpStatSN;
+  UINT32    Reserved3;
+  UINT32    DataSN;
+  UINT32    BufferOffset;
+  UINT32    Reserved4;
 } ISCSI_SCSI_DATA_OUT;
 
 ///
 /// SCSI Data-In
 ///
 typedef struct _ISCSI_SCSI_DATA_IN {
-  UINT8   OpCode;
-  UINT8   Flags;
-  UINT8   Reserved1;
-  UINT8   Status;
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT8   Lun[8];
-  UINT32  InitiatorTaskTag;
-  UINT32  TargetTransferTag;
-  UINT32  StatSN;
-  UINT32  ExpCmdSN;
-  UINT32  MaxCmdSN;
-  UINT32  DataSN;
-  UINT32  BufferOffset;
-  UINT32  ResidualCount;
+  UINT8     OpCode;
+  UINT8     Flags;
+  UINT8     Reserved1;
+  UINT8     Status;
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT8     Lun[8];
+  UINT32    InitiatorTaskTag;
+  UINT32    TargetTransferTag;
+  UINT32    StatSN;
+  UINT32    ExpCmdSN;
+  UINT32    MaxCmdSN;
+  UINT32    DataSN;
+  UINT32    BufferOffset;
+  UINT32    ResidualCount;
 } ISCSI_SCSI_DATA_IN;
 
 ///
 /// Ready To Transfer.
 ///
 typedef struct _ISCSI_READY_TO_TRANSFER {
-  UINT8   OpCode;
-  UINT8   Reserved1[3];
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT8   Lun[8];
-  UINT32  InitiatorTaskTag;
-  UINT32  TargetTransferTag;
-  UINT32  StatSN;
-  UINT32  ExpCmdSN;
-  UINT32  MaxCmdSN;
-  UINT32  R2TSeqNum;
-  UINT32  BufferOffset;
-  UINT32  DesiredDataTransferLength;
+  UINT8     OpCode;
+  UINT8     Reserved1[3];
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT8     Lun[8];
+  UINT32    InitiatorTaskTag;
+  UINT32    TargetTransferTag;
+  UINT32    StatSN;
+  UINT32    ExpCmdSN;
+  UINT32    MaxCmdSN;
+  UINT32    R2TSeqNum;
+  UINT32    BufferOffset;
+  UINT32    DesiredDataTransferLength;
 } ISCSI_READY_TO_TRANSFER;
 
 typedef struct _ISCSI_ASYNC_MESSAGE {
-  UINT8   OpCode;
-  UINT8   Reserved1[8];
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT8   Lun[8];
-  UINT32  InitiatorTaskTag;
-  UINT32  Reserved2;
-  UINT32  StatSN;
-  UINT32  ExpCmdSN;
-  UINT32  MaxCmdSN;
-  UINT8   AsyncEvent;
-  UINT8   AsyncVCode;
-  UINT16  Parameter1;
-  UINT16  Parameter2;
-  UINT16  Parameter3;
-  UINT32  Reserved3;
+  UINT8     OpCode;
+  UINT8     Reserved1[8];
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT8     Lun[8];
+  UINT32    InitiatorTaskTag;
+  UINT32    Reserved2;
+  UINT32    StatSN;
+  UINT32    ExpCmdSN;
+  UINT32    MaxCmdSN;
+  UINT8     AsyncEvent;
+  UINT8     AsyncVCode;
+  UINT16    Parameter1;
+  UINT16    Parameter2;
+  UINT16    Parameter3;
+  UINT32    Reserved3;
 } ISCSI_ASYNC_MESSAGE;
 
 ///
 /// Login Request.
 ///
 typedef struct _ISCSI_LOGIN_REQUEST {
-  UINT8   OpCode;
-  UINT8   Flags;
-  UINT8   VersionMax;
-  UINT8   VersionMin;
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT8   Isid[6];
-  UINT16  Tsih;
-  UINT32  InitiatorTaskTag;
-  UINT16  Cid;
-  UINT16  Reserved1;
-  UINT32  CmdSN;
-  UINT32  ExpStatSN;
-  UINT32  Reserved2[4];
+  UINT8     OpCode;
+  UINT8     Flags;
+  UINT8     VersionMax;
+  UINT8     VersionMin;
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT8     Isid[6];
+  UINT16    Tsih;
+  UINT32    InitiatorTaskTag;
+  UINT16    Cid;
+  UINT16    Reserved1;
+  UINT32    CmdSN;
+  UINT32    ExpStatSN;
+  UINT32    Reserved2[4];
 } ISCSI_LOGIN_REQUEST;
 
 ///
 /// Login Response.
 ///
 typedef struct _ISCSI_LOGIN_RESPONSE {
-  UINT8   OpCode;
-  UINT8   Flags;
-  UINT8   VersionMax;
-  UINT8   VersionActive;
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT8   Isid[6];
-  UINT16  Tsih;
-  UINT32  InitiatorTaskTag;
-  UINT32  Reserved1;
-  UINT32  StatSN;
-  UINT32  ExpCmdSN;
-  UINT32  MaxCmdSN;
-  UINT8   StatusClass;
-  UINT8   StatusDetail;
-  UINT8   Reserved2[10];
+  UINT8     OpCode;
+  UINT8     Flags;
+  UINT8     VersionMax;
+  UINT8     VersionActive;
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT8     Isid[6];
+  UINT16    Tsih;
+  UINT32    InitiatorTaskTag;
+  UINT32    Reserved1;
+  UINT32    StatSN;
+  UINT32    ExpCmdSN;
+  UINT32    MaxCmdSN;
+  UINT8     StatusClass;
+  UINT8     StatusDetail;
+  UINT8     Reserved2[10];
 } ISCSI_LOGIN_RESPONSE;
 
 ///
 /// Logout Request.
 ///
 typedef struct _ISCSI_LOGOUT_REQUEST {
-  UINT8   OpCode;
-  UINT8   ReasonCode;
-  UINT16  Reserved1;
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT32  Reserved2[2];
-  UINT32  InitiatorTaskTag;
-  UINT16  Cid;
-  UINT16  Reserved3;
-  UINT32  CmdSN;
-  UINT32  ExpStatSN;
-  UINT32  Reserved4[4];
+  UINT8     OpCode;
+  UINT8     ReasonCode;
+  UINT16    Reserved1;
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT32    Reserved2[2];
+  UINT32    InitiatorTaskTag;
+  UINT16    Cid;
+  UINT16    Reserved3;
+  UINT32    CmdSN;
+  UINT32    ExpStatSN;
+  UINT32    Reserved4[4];
 } ISCSI_LOGOUT_REQUEST;
 
 ///
 /// Logout Response.
 ///
 typedef struct _ISCSI_LOGOUT_RESPONSE {
-  UINT8   OpCode;
-  UINT8   Reserved1;
-  UINT8   Response;
-  UINT8   Reserved2;
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT32  Reserved3[2];
-  UINT32  InitiatorTaskTag;
-  UINT32  Reserved4;
-  UINT32  StatSN;
-  UINT32  ExpCmdSN;
-  UINT32  MaxCmdSN;
-  UINT32  Reserved5;
-  UINT16  Time2Wait;
-  UINT16  Time2Retain;
-  UINT32  Reserved6;
+  UINT8     OpCode;
+  UINT8     Reserved1;
+  UINT8     Response;
+  UINT8     Reserved2;
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT32    Reserved3[2];
+  UINT32    InitiatorTaskTag;
+  UINT32    Reserved4;
+  UINT32    StatSN;
+  UINT32    ExpCmdSN;
+  UINT32    MaxCmdSN;
+  UINT32    Reserved5;
+  UINT16    Time2Wait;
+  UINT16    Time2Retain;
+  UINT32    Reserved6;
 } ISCSI_LOGOUT_RESPONSE;
 
 ///
 /// SNACK Request.
 ///
 typedef struct _ISCSI_SNACK_REQUEST {
-  UINT8   OpCode;
-  UINT8   Type;
-  UINT16  Reserved1;
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT8   Lun[8];
-  UINT32  InitiatorTaskTag;
-  UINT32  TargetTransferTag;
-  UINT32  Reserved2;
-  UINT32  ExpStatSN;
-  UINT32  Reserved[2];
-  UINT32  BegRun;
-  UINT32  RunLength;
+  UINT8     OpCode;
+  UINT8     Type;
+  UINT16    Reserved1;
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT8     Lun[8];
+  UINT32    InitiatorTaskTag;
+  UINT32    TargetTransferTag;
+  UINT32    Reserved2;
+  UINT32    ExpStatSN;
+  UINT32    Reserved[2];
+  UINT32    BegRun;
+  UINT32    RunLength;
 } ISCSI_SNACK_REQUEST;
 
 ///
 /// Reject.
 ///
 typedef struct _ISCSI_REJECT {
-  UINT8   OpCode;
-  UINT8   Reserved1;
-  UINT8   Reason;
-  UINT8   Reserved2;
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT32  Reserved3[2];
-  UINT32  InitiatorTaskTag;
-  UINT32  Reserved4;
-  UINT32  StatSN;
-  UINT32  ExpCmdSN;
-  UINT32  MaxCmdSN;
-  UINT32  DataSN;
-  UINT32  Reserved5[2];
+  UINT8     OpCode;
+  UINT8     Reserved1;
+  UINT8     Reason;
+  UINT8     Reserved2;
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT32    Reserved3[2];
+  UINT32    InitiatorTaskTag;
+  UINT32    Reserved4;
+  UINT32    StatSN;
+  UINT32    ExpCmdSN;
+  UINT32    MaxCmdSN;
+  UINT32    DataSN;
+  UINT32    Reserved5[2];
 } ISCSI_REJECT;
 
 ///
 /// NOP-Out.
 ///
 typedef struct _ISCSI_NOP_OUT {
-  UINT8   OpCode;
-  UINT8   Reserved1[3];
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT8   Lun[8];
-  UINT32  InitiatorTaskTag;
-  UINT32  TargetTransferTag;
-  UINT32  CmdSN;
-  UINT32  ExpStatSN;
-  UINT32  Reserved2[4];
+  UINT8     OpCode;
+  UINT8     Reserved1[3];
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT8     Lun[8];
+  UINT32    InitiatorTaskTag;
+  UINT32    TargetTransferTag;
+  UINT32    CmdSN;
+  UINT32    ExpStatSN;
+  UINT32    Reserved2[4];
 } ISCSI_NOP_OUT;
 
 ///
 /// NOP-In.
 ///
 typedef struct _ISCSI_NOP_IN {
-  UINT8   OpCode;
-  UINT8   Reserved1[3];
-  UINT8   TotalAHSLength;
-  UINT8   DataSegmentLength[3];
-  UINT8   Lun[8];
-  UINT32  InitiatorTaskTag;
-  UINT32  TargetTransferTag;
-  UINT32  StatSN;
-  UINT32  ExpCmdSN;
-  UINT32  MaxCmdSN;
-  UINT32  Reserved2[3];
+  UINT8     OpCode;
+  UINT8     Reserved1[3];
+  UINT8     TotalAHSLength;
+  UINT8     DataSegmentLength[3];
+  UINT8     Lun[8];
+  UINT32    InitiatorTaskTag;
+  UINT32    TargetTransferTag;
+  UINT32    StatSN;
+  UINT32    ExpCmdSN;
+  UINT32    MaxCmdSN;
+  UINT32    Reserved2[3];
 } ISCSI_NOP_IN;
 
 typedef enum {
@@ -583,41 +583,41 @@ typedef enum {
 } ISCSI_DIGEST_TYPE;
 
 typedef struct _ISCSI_XFER_CONTEXT {
-  UINT32  TargetTransferTag;
-  UINT32  Offset;
-  UINT32  DesiredLength;
-  UINT32  ExpDataSN;
+  UINT32    TargetTransferTag;
+  UINT32    Offset;
+  UINT32    DesiredLength;
+  UINT32    ExpDataSN;
 } ISCSI_XFER_CONTEXT;
 
 typedef struct _ISCSI_IN_BUFFER_CONTEXT {
-  UINT8   *InData;
-  UINT32  InDataLen;
+  UINT8     *InData;
+  UINT32    InDataLen;
 } ISCSI_IN_BUFFER_CONTEXT;
 
 typedef struct _ISCSI_TCB {
-  LIST_ENTRY          Link;
+  LIST_ENTRY            Link;
 
-  BOOLEAN             SoFarInOrder;
-  UINT32              ExpDataSN;
-  BOOLEAN             FbitReceived;
-  BOOLEAN             StatusXferd;
-  UINT32              ActiveR2Ts;
-  UINT32              Response;
-  CHAR8               *Reason;
-  UINT32              InitiatorTaskTag;
-  UINT32              CmdSN;
-  UINT32              SNACKTag;
+  BOOLEAN               SoFarInOrder;
+  UINT32                ExpDataSN;
+  BOOLEAN               FbitReceived;
+  BOOLEAN               StatusXferd;
+  UINT32                ActiveR2Ts;
+  UINT32                Response;
+  CHAR8                 *Reason;
+  UINT32                InitiatorTaskTag;
+  UINT32                CmdSN;
+  UINT32                SNACKTag;
 
-  ISCSI_XFER_CONTEXT  XferContext;
+  ISCSI_XFER_CONTEXT    XferContext;
 
-  ISCSI_CONNECTION    *Conn;
+  ISCSI_CONNECTION      *Conn;
 } ISCSI_TCB;
 
 typedef struct _ISCSI_KEY_VALUE_PAIR {
-  LIST_ENTRY      List;
+  LIST_ENTRY    List;
 
-  CHAR8           *Key;
-  CHAR8           *Value;
+  CHAR8         *Key;
+  CHAR8         *Value;
 } ISCSI_KEY_VALUE_PAIR;
 
 /**
@@ -657,8 +657,8 @@ IScsiDetatchConnection (
 **/
 EFI_STATUS
 IScsiConnLogin (
-  IN OUT ISCSI_CONNECTION    *Conn,
-  IN     UINT16              Timeout
+  IN OUT ISCSI_CONNECTION  *Conn,
+  IN     UINT16            Timeout
   );
 
 /**
@@ -671,7 +671,7 @@ IScsiConnLogin (
 **/
 ISCSI_CONNECTION *
 IScsiCreateConnection (
-  IN ISCSI_SESSION      *Session
+  IN ISCSI_SESSION  *Session
   );
 
 /**
@@ -764,9 +764,9 @@ IScsiReceiveLoginRsp (
 **/
 EFI_STATUS
 IScsiAddKeyValuePair (
-  IN OUT NET_BUF      *Pdu,
-  IN CHAR8            *Key,
-  IN CHAR8            *Value
+  IN OUT NET_BUF  *Pdu,
+  IN CHAR8        *Key,
+  IN CHAR8        *Value
   );
 
 /**
@@ -818,9 +818,9 @@ IScsiProcessLoginRsp (
 **/
 EFI_STATUS
 IScsiUpdateTargetAddress (
-  IN OUT ISCSI_SESSION         *Session,
-  IN     CHAR8                 *Data,
-  IN     UINT32                Len
+  IN OUT ISCSI_SESSION  *Session,
+  IN     CHAR8          *Data,
+  IN     UINT32         Len
   );
 
 /**
@@ -832,7 +832,7 @@ IScsiUpdateTargetAddress (
 VOID
 EFIAPI
 IScsiFreeNbufList (
-  VOID *Arg
+  VOID  *Arg
   );
 
 /**
@@ -857,12 +857,12 @@ IScsiFreeNbufList (
 **/
 EFI_STATUS
 IScsiReceivePdu (
-  IN ISCSI_CONNECTION                      *Conn,
-  OUT NET_BUF                              **Pdu,
-  IN ISCSI_IN_BUFFER_CONTEXT               *Context, OPTIONAL
-  IN BOOLEAN                               HeaderDigest,
-  IN BOOLEAN                               DataDigest,
-  IN EFI_EVENT                             TimeoutEvent OPTIONAL
+  IN ISCSI_CONNECTION         *Conn,
+  OUT NET_BUF                 **Pdu,
+  IN ISCSI_IN_BUFFER_CONTEXT  *Context  OPTIONAL,
+  IN BOOLEAN                  HeaderDigest,
+  IN BOOLEAN                  DataDigest,
+  IN EFI_EVENT                TimeoutEvent OPTIONAL
   );
 
 /**
@@ -905,8 +905,8 @@ IScsiFillOpParams (
 **/
 EFI_STATUS
 IScsiPadSegment (
-  IN OUT NET_BUF      *Pdu,
-  IN     UINT32       Len
+  IN OUT NET_BUF  *Pdu,
+  IN     UINT32   Len
   );
 
 /**
@@ -921,8 +921,8 @@ IScsiPadSegment (
 **/
 LIST_ENTRY *
 IScsiBuildKeyValueList (
-  IN CHAR8  *Data,
-  IN UINT32 Len
+  IN CHAR8   *Data,
+  IN UINT32  Len
   );
 
 /**
@@ -938,8 +938,8 @@ IScsiBuildKeyValueList (
 **/
 CHAR8 *
 IScsiGetValueByKeyFromList (
-  IN OUT LIST_ENTRY     *KeyValueList,
-  IN     CHAR8          *Key
+  IN OUT LIST_ENTRY  *KeyValueList,
+  IN     CHAR8       *Key
   );
 
 /**
@@ -950,7 +950,7 @@ IScsiGetValueByKeyFromList (
 **/
 VOID
 IScsiFreeKeyValueList (
-  IN LIST_ENTRY      *KeyValueList
+  IN LIST_ENTRY  *KeyValueList
   );
 
 /**
@@ -965,8 +965,8 @@ IScsiFreeKeyValueList (
 **/
 EFI_STATUS
 IScsiNormalizeName (
-  IN OUT CHAR8      *Name,
-  IN     UINTN      Len
+  IN OUT CHAR8  *Name,
+  IN     UINTN  Len
   );
 
 /**

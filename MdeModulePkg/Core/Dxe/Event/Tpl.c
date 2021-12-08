@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 CoreSetInterruptState (
-  IN BOOLEAN      Enable
+  IN BOOLEAN  Enable
   )
 {
   EFI_STATUS  Status;
@@ -26,20 +26,22 @@ CoreSetInterruptState (
   if (gCpu == NULL) {
     return;
   }
+
   if (!Enable) {
     gCpu->DisableInterrupt (gCpu);
     return;
   }
+
   if (gSmmBase2 == NULL) {
     gCpu->EnableInterrupt (gCpu);
     return;
   }
+
   Status = gSmmBase2->InSmm (gSmmBase2, &InSmm);
   if (!EFI_ERROR (Status) && !InSmm) {
-    gCpu->EnableInterrupt(gCpu);
+    gCpu->EnableInterrupt (gCpu);
   }
 }
-
 
 /**
   Raise the task priority level to the new level.
@@ -53,22 +55,23 @@ CoreSetInterruptState (
 EFI_TPL
 EFIAPI
 CoreRaiseTpl (
-  IN EFI_TPL      NewTpl
+  IN EFI_TPL  NewTpl
   )
 {
-  EFI_TPL     OldTpl;
+  EFI_TPL  OldTpl;
 
   OldTpl = gEfiCurrentTpl;
   if (OldTpl > NewTpl) {
-    DEBUG ((EFI_D_ERROR, "FATAL ERROR - RaiseTpl with OldTpl(0x%x) > NewTpl(0x%x)\n", OldTpl, NewTpl));
+    DEBUG ((DEBUG_ERROR, "FATAL ERROR - RaiseTpl with OldTpl(0x%x) > NewTpl(0x%x)\n", OldTpl, NewTpl));
     ASSERT (FALSE);
   }
+
   ASSERT (VALID_TPL (NewTpl));
 
   //
   // If raising to high level, disable interrupts
   //
-  if (NewTpl >= TPL_HIGH_LEVEL  &&  OldTpl < TPL_HIGH_LEVEL) {
+  if ((NewTpl >= TPL_HIGH_LEVEL) &&  (OldTpl < TPL_HIGH_LEVEL)) {
     CoreSetInterruptState (FALSE);
   }
 
@@ -80,9 +83,6 @@ CoreRaiseTpl (
   return OldTpl;
 }
 
-
-
-
 /**
   Lowers the task priority to the previous value.   If the new
   priority unmasks events at a higher priority, they are dispatched.
@@ -93,17 +93,18 @@ CoreRaiseTpl (
 VOID
 EFIAPI
 CoreRestoreTpl (
-  IN EFI_TPL NewTpl
+  IN EFI_TPL  NewTpl
   )
 {
-  EFI_TPL     OldTpl;
-  EFI_TPL     PendingTpl;
+  EFI_TPL  OldTpl;
+  EFI_TPL  PendingTpl;
 
   OldTpl = gEfiCurrentTpl;
   if (NewTpl > OldTpl) {
-    DEBUG ((EFI_D_ERROR, "FATAL ERROR - RestoreTpl with NewTpl(0x%x) > OldTpl(0x%x)\n", NewTpl, OldTpl));
+    DEBUG ((DEBUG_ERROR, "FATAL ERROR - RestoreTpl with NewTpl(0x%x) > OldTpl(0x%x)\n", NewTpl, OldTpl));
     ASSERT (FALSE);
   }
+
   ASSERT (VALID_TPL (NewTpl));
 
   //
@@ -111,7 +112,7 @@ CoreRestoreTpl (
   // interrupts are enabled
   //
 
-  if (OldTpl >= TPL_HIGH_LEVEL  &&  NewTpl < TPL_HIGH_LEVEL) {
+  if ((OldTpl >= TPL_HIGH_LEVEL) &&  (NewTpl < TPL_HIGH_LEVEL)) {
     gEfiCurrentTpl = TPL_HIGH_LEVEL;
   }
 
@@ -119,7 +120,7 @@ CoreRestoreTpl (
   // Dispatch any pending events
   //
   while (gEventPending != 0) {
-    PendingTpl = (UINTN) HighBitSet64 (gEventPending);
+    PendingTpl = (UINTN)HighBitSet64 (gEventPending);
     if (PendingTpl <= NewTpl) {
       break;
     }
@@ -128,6 +129,7 @@ CoreRestoreTpl (
     if (gEfiCurrentTpl < TPL_HIGH_LEVEL) {
       CoreSetInterruptState (TRUE);
     }
+
     CoreDispatchEventNotifies (gEfiCurrentTpl);
   }
 
@@ -144,5 +146,4 @@ CoreRestoreTpl (
   if (gEfiCurrentTpl < TPL_HIGH_LEVEL) {
     CoreSetInterruptState (TRUE);
   }
-
 }

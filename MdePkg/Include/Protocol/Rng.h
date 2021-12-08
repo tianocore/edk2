@@ -93,7 +93,7 @@ typedef EFI_GUID EFI_RNG_ALGORITHM;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_RNG_GET_INFO) (
+(EFIAPI *EFI_RNG_GET_INFO)(
   IN EFI_RNG_PROTOCOL             *This,
   IN OUT UINTN                    *RNGAlgorithmListSize,
   OUT EFI_RNG_ALGORITHM           *RNGAlgorithmList
@@ -123,9 +123,9 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_RNG_GET_RNG) (
+(EFIAPI *EFI_RNG_GET_RNG)(
   IN EFI_RNG_PROTOCOL            *This,
-  IN EFI_RNG_ALGORITHM           *RNGAlgorithm, OPTIONAL
+  IN EFI_RNG_ALGORITHM           *RNGAlgorithm  OPTIONAL,
   IN UINTN                       RNGValueLength,
   OUT UINT8                      *RNGValue
   );
@@ -135,16 +135,16 @@ EFI_STATUS
 /// applications, or entropy for seeding other random number generators.
 ///
 struct _EFI_RNG_PROTOCOL {
-  EFI_RNG_GET_INFO                GetInfo;
-  EFI_RNG_GET_RNG                 GetRNG;
+  EFI_RNG_GET_INFO    GetInfo;
+  EFI_RNG_GET_RNG     GetRNG;
 };
 
-extern EFI_GUID gEfiRngProtocolGuid;
-extern EFI_GUID gEfiRngAlgorithmSp80090Hash256Guid;
-extern EFI_GUID gEfiRngAlgorithmSp80090Hmac256Guid;
-extern EFI_GUID gEfiRngAlgorithmSp80090Ctr256Guid;
-extern EFI_GUID gEfiRngAlgorithmX9313DesGuid;
-extern EFI_GUID gEfiRngAlgorithmX931AesGuid;
-extern EFI_GUID gEfiRngAlgorithmRaw;
+extern EFI_GUID  gEfiRngProtocolGuid;
+extern EFI_GUID  gEfiRngAlgorithmSp80090Hash256Guid;
+extern EFI_GUID  gEfiRngAlgorithmSp80090Hmac256Guid;
+extern EFI_GUID  gEfiRngAlgorithmSp80090Ctr256Guid;
+extern EFI_GUID  gEfiRngAlgorithmX9313DesGuid;
+extern EFI_GUID  gEfiRngAlgorithmX931AesGuid;
+extern EFI_GUID  gEfiRngAlgorithmRaw;
 
 #endif

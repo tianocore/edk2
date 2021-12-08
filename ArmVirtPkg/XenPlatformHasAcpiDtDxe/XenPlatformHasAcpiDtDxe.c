@@ -16,11 +16,11 @@
 EFI_STATUS
 EFIAPI
 XenPlatformHasAcpiDt (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   //
   // If we fail to install any of the necessary protocols below, the OS will be

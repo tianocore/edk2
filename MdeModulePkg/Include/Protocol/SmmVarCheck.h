@@ -19,12 +19,11 @@
 typedef struct _EDKII_SMM_VAR_CHECK_PROTOCOL EDKII_SMM_VAR_CHECK_PROTOCOL;
 
 struct _EDKII_SMM_VAR_CHECK_PROTOCOL {
-  EDKII_VAR_CHECK_REGISTER_SET_VARIABLE_CHECK_HANDLER   SmmRegisterSetVariableCheckHandler;
-  EDKII_VAR_CHECK_VARIABLE_PROPERTY_SET                 SmmVariablePropertySet;
-  EDKII_VAR_CHECK_VARIABLE_PROPERTY_GET                 SmmVariablePropertyGet;
+  EDKII_VAR_CHECK_REGISTER_SET_VARIABLE_CHECK_HANDLER    SmmRegisterSetVariableCheckHandler;
+  EDKII_VAR_CHECK_VARIABLE_PROPERTY_SET                  SmmVariablePropertySet;
+  EDKII_VAR_CHECK_VARIABLE_PROPERTY_GET                  SmmVariablePropertyGet;
 };
 
-extern EFI_GUID gEdkiiSmmVarCheckProtocolGuid;
+extern EFI_GUID  gEdkiiSmmVarCheckProtocolGuid;
 
 #endif
-

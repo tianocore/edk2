@@ -15,8 +15,8 @@
 
 #pragma pack(1)
 typedef struct {
-  CHAR16 NullTerminator;
-  GUID   ResetSubtype;
+  CHAR16    NullTerminator;
+  GUID      ResetSubtype;
 } RESET_UTILITY_GUID_SPECIFIC_RESET_DATA;
 #pragma pack()
 
@@ -45,8 +45,8 @@ STATIC_ASSERT (
 VOID
 EFIAPI
 ResetSystemWithSubtype (
-  IN EFI_RESET_TYPE     ResetType,
-  IN CONST  GUID        *ResetSubtype
+  IN EFI_RESET_TYPE  ResetType,
+  IN CONST  GUID     *ResetSubtype
   )
 {
   RESET_UTILITY_GUID_SPECIFIC_RESET_DATA  ResetData;
@@ -79,7 +79,7 @@ ResetSystemWithSubtype (
 VOID
 EFIAPI
 ResetPlatformSpecificGuid (
-  IN CONST  GUID        *ResetSubtype
+  IN CONST  GUID  *ResetSubtype
   )
 {
   ResetSystemWithSubtype (EfiResetPlatformSpecific, ResetSubtype);
@@ -110,8 +110,8 @@ GetResetPlatformSpecificGuid (
   IN CONST VOID  *ResetData
   )
 {
-  UINTN          ResetDataStringSize;
-  GUID           *ResetSubtypeGuid;
+  UINTN  ResetDataStringSize;
+  GUID   *ResetSubtypeGuid;
 
   //
   // Make sure parameters are valid
@@ -130,11 +130,12 @@ GetResetPlatformSpecificGuid (
   // Now, assuming that we have enough data for a GUID after the string, the
   // GUID should be immediately after the string itself.
   //
-  if ((ResetDataStringSize < DataSize) && (DataSize - ResetDataStringSize) >= sizeof (GUID)) {
+  if ((ResetDataStringSize < DataSize) && ((DataSize - ResetDataStringSize) >= sizeof (GUID))) {
     ResetSubtypeGuid = (GUID *)((UINT8 *)ResetData + ResetDataStringSize);
     DEBUG ((DEBUG_VERBOSE, "%a - Detected reset subtype %g...\n", __FUNCTION__, ResetSubtypeGuid));
     return ResetSubtypeGuid;
   }
+
   return NULL;
 }
 
@@ -174,12 +175,12 @@ GetResetPlatformSpecificGuid (
 RETURN_STATUS
 EFIAPI
 BuildResetData (
-  IN OUT   UINTN     *ResetDataSize,
-  IN OUT   VOID      *ResetData,
-  IN CONST GUID      *ResetSubtype  OPTIONAL,
-  IN CONST CHAR16    *ResetString   OPTIONAL,
-  IN       UINTN     ExtraDataSize  OPTIONAL,
-  IN CONST VOID      *ExtraData     OPTIONAL
+  IN OUT   UINTN   *ResetDataSize,
+  IN OUT   VOID    *ResetData,
+  IN CONST GUID    *ResetSubtype  OPTIONAL,
+  IN CONST CHAR16  *ResetString   OPTIONAL,
+  IN       UINTN   ExtraDataSize  OPTIONAL,
+  IN CONST VOID    *ExtraData     OPTIONAL
   )
 {
   UINTN  ResetStringSize;
@@ -192,16 +193,18 @@ BuildResetData (
   if (ResetDataSize == NULL) {
     return RETURN_INVALID_PARAMETER;
   }
+
   //
   // If extra data is indicated, but pointer is NULL.
   //
-  if (ExtraDataSize > 0 && ExtraData == NULL) {
+  if ((ExtraDataSize > 0) && (ExtraData == NULL)) {
     return RETURN_INVALID_PARAMETER;
   }
+
   //
   // If extra data is indicated, but no subtype GUID is supplied.
   //
-  if (ResetSubtype == NULL && ExtraDataSize > 0) {
+  if ((ResetSubtype == NULL) && (ExtraDataSize > 0)) {
     return RETURN_INVALID_PARAMETER;
   }
 
@@ -229,6 +232,7 @@ BuildResetData (
     *ResetDataSize = ResetDataBufferSize;
     return RETURN_BUFFER_TOO_SMALL;
   }
+
   *ResetDataSize = ResetDataBufferSize;
   if (ResetData == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -244,6 +248,7 @@ BuildResetData (
     CopyMem (Data, ResetSubtype, sizeof (GUID));
     Data += sizeof (GUID);
   }
+
   if (ExtraDataSize > 0) {
     CopyMem (Data, ExtraData, ExtraDataSize);
   }

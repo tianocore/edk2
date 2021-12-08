@@ -10,7 +10,7 @@
 #ifndef __SMM_MEMORYATTRIBUTE_H__
 #define __SMM_MEMORYATTRIBUTE_H__
 
-//{69B792EA-39CE-402D-A2A6-F721DE351DFE}
+// {69B792EA-39CE-402D-A2A6-F721DE351DFE}
 #define EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL_GUID \
   { \
     0x69b792ea, 0x39ce, 0x402d, { 0xa2, 0xa6, 0xf7, 0x21, 0xde, 0x35, 0x1d, 0xfe } \
@@ -117,11 +117,11 @@ EFI_STATUS
 /// attribute of memory in the EFI SMM environment.
 ///
 struct _EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL {
-  EDKII_SMM_GET_MEMORY_ATTRIBUTES       GetMemoryAttributes;
-  EDKII_SMM_SET_MEMORY_ATTRIBUTES       SetMemoryAttributes;
-  EDKII_SMM_CLEAR_MEMORY_ATTRIBUTES     ClearMemoryAttributes;
+  EDKII_SMM_GET_MEMORY_ATTRIBUTES      GetMemoryAttributes;
+  EDKII_SMM_SET_MEMORY_ATTRIBUTES      SetMemoryAttributes;
+  EDKII_SMM_CLEAR_MEMORY_ATTRIBUTES    ClearMemoryAttributes;
 };
 
-extern EFI_GUID gEdkiiSmmMemoryAttributeProtocolGuid;
+extern EFI_GUID  gEdkiiSmmMemoryAttributeProtocolGuid;
 
 #endif

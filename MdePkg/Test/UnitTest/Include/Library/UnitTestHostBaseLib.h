@@ -128,9 +128,9 @@ typedef
 UINT32
 (EFIAPI *UNIT_TEST_HOST_BASE_LIB_ASM_CPUID)(
   IN      UINT32                    Index,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
+  OUT     UINT32                    *Eax   OPTIONAL,
+  OUT     UINT32                    *Ebx   OPTIONAL,
+  OUT     UINT32                    *Ecx   OPTIONAL,
   OUT     UINT32                    *Edx   OPTIONAL
   );
 
@@ -171,9 +171,9 @@ UINT32
 (EFIAPI *UNIT_TEST_HOST_BASE_LIB_ASM_CPUID_EX)(
   IN      UINT32                    Index,
   IN      UINT32                    SubIndex,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
+  OUT     UINT32                    *Eax   OPTIONAL,
+  OUT     UINT32                    *Ebx   OPTIONAL,
+  OUT     UINT32                    *Ecx   OPTIONAL,
   OUT     UINT32                    *Edx   OPTIONAL
   );
 
@@ -321,8 +321,8 @@ typedef
 VOID
 (EFIAPI *UNIT_TEST_HOST_BASE_LIB_ASM_PAGING_32)(
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1   OPTIONAL,
+  IN      VOID                      *Context2   OPTIONAL,
   IN      VOID                      *NewStack
   );
 
@@ -363,8 +363,8 @@ VOID
 (EFIAPI *UNIT_TEST_HOST_BASE_LIB_ASM_ENABLE_PAGING_64)(
   IN      UINT16                    Cs,
   IN      UINT64                    EntryPoint,
-  IN      UINT64                    Context1,  OPTIONAL
-  IN      UINT64                    Context2,  OPTIONAL
+  IN      UINT64                    Context1   OPTIONAL,
+  IN      UINT64                    Context2   OPTIONAL,
   IN      UINT64                    NewStack
   );
 
@@ -403,8 +403,8 @@ VOID
 (EFIAPI *UNIT_TEST_HOST_BASE_LIB_ASM_DISABLE_PAGING_64)(
   IN      UINT16                    Cs,
   IN      UINT32                    EntryPoint,
-  IN      UINT32                    Context1,  OPTIONAL
-  IN      UINT32                    Context2,  OPTIONAL
+  IN      UINT32                    Context1   OPTIONAL,
+  IN      UINT32                    Context2   OPTIONAL,
   IN      UINT32                    NewStack
   );
 
@@ -495,76 +495,76 @@ VOID
 /// Common services
 ///
 typedef struct {
-  UNIT_TEST_HOST_BASE_LIB_VOID          EnableInterrupts;
-  UNIT_TEST_HOST_BASE_LIB_VOID          DisableInterrupts;
-  UNIT_TEST_HOST_BASE_LIB_VOID          EnableDisableInterrupts;
-  UNIT_TEST_HOST_BASE_LIB_READ_BOOLEAN  GetInterruptState;
+  UNIT_TEST_HOST_BASE_LIB_VOID            EnableInterrupts;
+  UNIT_TEST_HOST_BASE_LIB_VOID            DisableInterrupts;
+  UNIT_TEST_HOST_BASE_LIB_VOID            EnableDisableInterrupts;
+  UNIT_TEST_HOST_BASE_LIB_READ_BOOLEAN    GetInterruptState;
 } UNIT_TEST_HOST_BASE_LIB_COMMON;
 
 ///
 /// IA32/X64 services
 ///
 typedef struct {
-  UNIT_TEST_HOST_BASE_LIB_ASM_CPUID                    AsmCpuid;
-  UNIT_TEST_HOST_BASE_LIB_ASM_CPUID_EX                 AsmCpuidEx;
-  UNIT_TEST_HOST_BASE_LIB_VOID                         AsmDisableCache;
-  UNIT_TEST_HOST_BASE_LIB_VOID                         AsmEnableCache;
-  UNIT_TEST_HOST_BASE_LIB_ASM_READ_MSR_64              AsmReadMsr64;
-  UNIT_TEST_HOST_BASE_LIB_ASM_WRITE_MSR_64             AsmWriteMsr64;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                   AsmReadCr0;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                   AsmReadCr2;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                   AsmReadCr3;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                   AsmReadCr4;
-  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                  AsmWriteCr0;
-  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                  AsmWriteCr2;
-  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                  AsmWriteCr3;
-  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                  AsmWriteCr4;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                   AsmReadDr0;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                   AsmReadDr1;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                   AsmReadDr2;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                   AsmReadDr3;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                   AsmReadDr4;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                   AsmReadDr5;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                   AsmReadDr6;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                   AsmReadDr7;
-  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                  AsmWriteDr0;
-  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                  AsmWriteDr1;
-  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                  AsmWriteDr2;
-  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                  AsmWriteDr3;
-  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                  AsmWriteDr4;
-  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                  AsmWriteDr5;
-  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                  AsmWriteDr6;
-  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                  AsmWriteDr7;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                  AsmReadCs;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                  AsmReadDs;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                  AsmReadEs;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                  AsmReadFs;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                  AsmReadGs;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                  AsmReadSs;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                  AsmReadTr;
-  UNIT_TEST_HOST_BASE_LIB_ASM_READ_IA32_DESCRIPTOR     AsmReadGdtr;
-  UNIT_TEST_HOST_BASE_LIB_ASM_WRITE_IA32_DESCRIPTOR    AsmWriteGdtr;
-  UNIT_TEST_HOST_BASE_LIB_ASM_READ_IA32_DESCRIPTOR     AsmReadIdtr;
-  UNIT_TEST_HOST_BASE_LIB_ASM_WRITE_IA32_DESCRIPTOR    AsmWriteIdtr;
-  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                  AsmReadLdtr;
-  UNIT_TEST_HOST_BASE_LIB_WRITE_UINT16                 AsmWriteLdtr;
-  UNIT_TEST_HOST_BASE_LIB_ASM_READ_PMC                 AsmReadPmc;
-  UNIT_TEST_HOST_BASE_LIB_ASM_MONITOR                  AsmMonitor;
-  UNIT_TEST_HOST_BASE_LIB_ASM_MWAIT                    AsmMwait;
-  UNIT_TEST_HOST_BASE_LIB_VOID                         AsmWbinvd;
-  UNIT_TEST_HOST_BASE_LIB_VOID                         AsmInvd;
-  UNIT_TEST_HOST_BASE_LIB_ASM_FLUSH_CACHE_LINE         AsmFlushCacheLine;
-  UNIT_TEST_HOST_BASE_LIB_ASM_PAGING_32                AsmEnablePaging32;
-  UNIT_TEST_HOST_BASE_LIB_ASM_PAGING_32                AsmDisablePaging32;
-  UNIT_TEST_HOST_BASE_LIB_ASM_ENABLE_PAGING_64         AsmEnablePaging64;
-  UNIT_TEST_HOST_BASE_LIB_ASM_DISABLE_PAGING_64        AsmDisablePaging64;
-  UNIT_TEST_HOST_BASE_LIB_ASM_GET_THUNK_16_PROPERTIES  AsmGetThunk16Properties;
-  UNIT_TEST_HOST_BASE_LIB_ASM_THUNK_16                 AsmPrepareThunk16;
-  UNIT_TEST_HOST_BASE_LIB_ASM_THUNK_16                 AsmThunk16;
-  UNIT_TEST_HOST_BASE_LIB_ASM_THUNK_16                 AsmPrepareAndThunk16;
-  UNIT_TEST_HOST_BASE_LIB_WRITE_UINT16                 AsmWriteTr;
-  UNIT_TEST_HOST_BASE_LIB_VOID                         AsmLfence;
-  UNIT_TEST_HOST_BASE_LIB_ASM_PATCH_INSTRUCTION_X86    PatchInstructionX86;
+  UNIT_TEST_HOST_BASE_LIB_ASM_CPUID                      AsmCpuid;
+  UNIT_TEST_HOST_BASE_LIB_ASM_CPUID_EX                   AsmCpuidEx;
+  UNIT_TEST_HOST_BASE_LIB_VOID                           AsmDisableCache;
+  UNIT_TEST_HOST_BASE_LIB_VOID                           AsmEnableCache;
+  UNIT_TEST_HOST_BASE_LIB_ASM_READ_MSR_64                AsmReadMsr64;
+  UNIT_TEST_HOST_BASE_LIB_ASM_WRITE_MSR_64               AsmWriteMsr64;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                     AsmReadCr0;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                     AsmReadCr2;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                     AsmReadCr3;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                     AsmReadCr4;
+  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                    AsmWriteCr0;
+  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                    AsmWriteCr2;
+  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                    AsmWriteCr3;
+  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                    AsmWriteCr4;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                     AsmReadDr0;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                     AsmReadDr1;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                     AsmReadDr2;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                     AsmReadDr3;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                     AsmReadDr4;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                     AsmReadDr5;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                     AsmReadDr6;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINTN                     AsmReadDr7;
+  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                    AsmWriteDr0;
+  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                    AsmWriteDr1;
+  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                    AsmWriteDr2;
+  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                    AsmWriteDr3;
+  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                    AsmWriteDr4;
+  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                    AsmWriteDr5;
+  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                    AsmWriteDr6;
+  UNIT_TEST_HOST_BASE_LIB_WRITE_UINTN                    AsmWriteDr7;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                    AsmReadCs;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                    AsmReadDs;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                    AsmReadEs;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                    AsmReadFs;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                    AsmReadGs;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                    AsmReadSs;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                    AsmReadTr;
+  UNIT_TEST_HOST_BASE_LIB_ASM_READ_IA32_DESCRIPTOR       AsmReadGdtr;
+  UNIT_TEST_HOST_BASE_LIB_ASM_WRITE_IA32_DESCRIPTOR      AsmWriteGdtr;
+  UNIT_TEST_HOST_BASE_LIB_ASM_READ_IA32_DESCRIPTOR       AsmReadIdtr;
+  UNIT_TEST_HOST_BASE_LIB_ASM_WRITE_IA32_DESCRIPTOR      AsmWriteIdtr;
+  UNIT_TEST_HOST_BASE_LIB_READ_UINT16                    AsmReadLdtr;
+  UNIT_TEST_HOST_BASE_LIB_WRITE_UINT16                   AsmWriteLdtr;
+  UNIT_TEST_HOST_BASE_LIB_ASM_READ_PMC                   AsmReadPmc;
+  UNIT_TEST_HOST_BASE_LIB_ASM_MONITOR                    AsmMonitor;
+  UNIT_TEST_HOST_BASE_LIB_ASM_MWAIT                      AsmMwait;
+  UNIT_TEST_HOST_BASE_LIB_VOID                           AsmWbinvd;
+  UNIT_TEST_HOST_BASE_LIB_VOID                           AsmInvd;
+  UNIT_TEST_HOST_BASE_LIB_ASM_FLUSH_CACHE_LINE           AsmFlushCacheLine;
+  UNIT_TEST_HOST_BASE_LIB_ASM_PAGING_32                  AsmEnablePaging32;
+  UNIT_TEST_HOST_BASE_LIB_ASM_PAGING_32                  AsmDisablePaging32;
+  UNIT_TEST_HOST_BASE_LIB_ASM_ENABLE_PAGING_64           AsmEnablePaging64;
+  UNIT_TEST_HOST_BASE_LIB_ASM_DISABLE_PAGING_64          AsmDisablePaging64;
+  UNIT_TEST_HOST_BASE_LIB_ASM_GET_THUNK_16_PROPERTIES    AsmGetThunk16Properties;
+  UNIT_TEST_HOST_BASE_LIB_ASM_THUNK_16                   AsmPrepareThunk16;
+  UNIT_TEST_HOST_BASE_LIB_ASM_THUNK_16                   AsmThunk16;
+  UNIT_TEST_HOST_BASE_LIB_ASM_THUNK_16                   AsmPrepareAndThunk16;
+  UNIT_TEST_HOST_BASE_LIB_WRITE_UINT16                   AsmWriteTr;
+  UNIT_TEST_HOST_BASE_LIB_VOID                           AsmLfence;
+  UNIT_TEST_HOST_BASE_LIB_ASM_PATCH_INSTRUCTION_X86      PatchInstructionX86;
 } UNIT_TEST_HOST_BASE_LIB_X86;
 
 ///
@@ -573,8 +573,8 @@ typedef struct {
 /// can be added to the end of this structure.
 ///
 typedef struct {
-  UNIT_TEST_HOST_BASE_LIB_COMMON  *Common;
-  UNIT_TEST_HOST_BASE_LIB_X86     *X86;
+  UNIT_TEST_HOST_BASE_LIB_COMMON    *Common;
+  UNIT_TEST_HOST_BASE_LIB_X86       *X86;
 } UNIT_TEST_HOST_BASE_LIB;
 
 extern UNIT_TEST_HOST_BASE_LIB  gUnitTestHostBaseLib;

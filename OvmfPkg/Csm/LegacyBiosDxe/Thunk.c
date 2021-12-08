@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "LegacyBiosInterface.h"
 
-THUNK_CONTEXT      mThunkContext;
+THUNK_CONTEXT  mThunkContext;
 
 /**
   Sets the counter value for Timer #0 in a legacy 8254 timer.
@@ -23,8 +23,8 @@ SetPitCount (
   )
 {
   IoWrite8 (TIMER_CONTROL_PORT, TIMER0_CONTROL_WORD);
-  IoWrite8 (TIMER0_COUNT_PORT, (UINT8) (Count & 0xFF));
-  IoWrite8 (TIMER0_COUNT_PORT, (UINT8) ((Count>>8) & 0xFF));
+  IoWrite8 (TIMER0_COUNT_PORT, (UINT8)(Count & 0xFF));
+  IoWrite8 (TIMER0_COUNT_PORT, (UINT8)((Count>>8) & 0xFF));
 }
 
 /**
@@ -45,13 +45,13 @@ SetPitCount (
 BOOLEAN
 EFIAPI
 LegacyBiosInt86 (
-  IN  EFI_LEGACY_BIOS_PROTOCOL      *This,
-  IN  UINT8                         BiosInt,
-  IN  EFI_IA32_REGISTER_SET         *Regs
+  IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN  UINT8                     BiosInt,
+  IN  EFI_IA32_REGISTER_SET     *Regs
   )
 {
-  UINT16                Segment;
-  UINT16                Offset;
+  UINT16  Segment;
+  UINT16  Offset;
 
   Regs->X.Flags.Reserved1 = 1;
   Regs->X.Flags.Reserved2 = 0;
@@ -67,9 +67,9 @@ LegacyBiosInt86 (
   // We use this base address to get the legacy interrupt handler.
   //
   ACCESS_PAGE0_CODE (
-    Segment               = (UINT16)(((UINT32 *)0)[BiosInt] >> 16);
-    Offset                = (UINT16)((UINT32 *)0)[BiosInt];
-  );
+    Segment = (UINT16)(((UINT32 *)0)[BiosInt] >> 16);
+    Offset  = (UINT16)((UINT32 *)0)[BiosInt];
+    );
 
   return InternalLegacyBiosFarCall (
            This,
@@ -102,12 +102,12 @@ LegacyBiosInt86 (
 BOOLEAN
 EFIAPI
 LegacyBiosFarCall86 (
-  IN  EFI_LEGACY_BIOS_PROTOCOL        *This,
-  IN  UINT16                          Segment,
-  IN  UINT16                          Offset,
-  IN  EFI_IA32_REGISTER_SET           *Regs,
-  IN  VOID                            *Stack,
-  IN  UINTN                           StackSize
+  IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN  UINT16                    Segment,
+  IN  UINT16                    Offset,
+  IN  EFI_IA32_REGISTER_SET     *Regs,
+  IN  VOID                      *Stack,
+  IN  UINTN                     StackSize
   )
 {
   Regs->X.Flags.Reserved1 = 1;
@@ -134,8 +134,8 @@ LegacyBiosFarCall86 (
 VOID
 EFIAPI
 LegacyBiosNullInterruptHandler (
-  IN EFI_EXCEPTION_TYPE   InterruptType,
-  IN EFI_SYSTEM_CONTEXT   SystemContext
+  IN EFI_EXCEPTION_TYPE  InterruptType,
+  IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
 }
@@ -161,12 +161,12 @@ LegacyBiosNullInterruptHandler (
 BOOLEAN
 EFIAPI
 InternalLegacyBiosFarCall (
-  IN  EFI_LEGACY_BIOS_PROTOCOL        *This,
-  IN  UINT16                          Segment,
-  IN  UINT16                          Offset,
-  IN  EFI_IA32_REGISTER_SET           *Regs,
-  IN  VOID                            *Stack,
-  IN  UINTN                           StackSize
+  IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
+  IN  UINT16                    Segment,
+  IN  UINT16                    Offset,
+  IN  EFI_IA32_REGISTER_SET     *Regs,
+  IN  VOID                      *Stack,
+  IN  UINTN                     StackSize
   )
 {
   UINTN                 Status;
@@ -180,19 +180,19 @@ InternalLegacyBiosFarCall (
   Private = LEGACY_BIOS_INSTANCE_FROM_THIS (This);
 
   ZeroMem (&ThunkRegSet, sizeof (ThunkRegSet));
-  ThunkRegSet.X.DI   = Regs->X.DI;
-  ThunkRegSet.X.SI   = Regs->X.SI;
-  ThunkRegSet.X.BP   = Regs->X.BP;
-  ThunkRegSet.X.BX   = Regs->X.BX;
-  ThunkRegSet.X.DX   = Regs->X.DX;
+  ThunkRegSet.X.DI = Regs->X.DI;
+  ThunkRegSet.X.SI = Regs->X.SI;
+  ThunkRegSet.X.BP = Regs->X.BP;
+  ThunkRegSet.X.BX = Regs->X.BX;
+  ThunkRegSet.X.DX = Regs->X.DX;
   //
   // Sometimes, ECX is used to pass in 32 bit data. For example, INT 1Ah, AX = B10Dh is
   // "PCI BIOS v2.0c + Write Configuration DWORD" and ECX has the dword to write.
   //
-  ThunkRegSet.E.ECX   = Regs->E.ECX;
-  ThunkRegSet.X.AX   = Regs->X.AX;
-  ThunkRegSet.E.DS   = Regs->X.DS;
-  ThunkRegSet.E.ES   = Regs->X.ES;
+  ThunkRegSet.E.ECX = Regs->E.ECX;
+  ThunkRegSet.X.AX  = Regs->X.AX;
+  ThunkRegSet.E.DS  = Regs->X.DS;
+  ThunkRegSet.E.ES  = Regs->X.ES;
 
   CopyMem (&(ThunkRegSet.E.EFLAGS.UintN), &(Regs->X.Flags), sizeof (Regs->X.Flags));
 
@@ -200,7 +200,7 @@ InternalLegacyBiosFarCall (
   // Clear the error flag; thunk code may set it. Stack16 should be the high address
   // Make Statk16 address the low 16 bit must be not zero.
   //
-  Stack16 = (UINT16 *)((UINT8 *) mThunkContext.RealModeBuffer + mThunkContext.RealModeBufferSize - sizeof (UINT16));
+  Stack16 = (UINT16 *)((UINT8 *)mThunkContext.RealModeBuffer + mThunkContext.RealModeBufferSize - sizeof (UINT16));
 
   //
   // Save current rate of DXE Timer
@@ -228,35 +228,38 @@ InternalLegacyBiosFarCall (
   // interupts other than the Timer interrupt that was disabled above can not be
   // handled properly from real mode.
   //
-  DEBUG_CODE (
-    UINTN  Vector;
-    UINTN  Count;
+  DEBUG_CODE_BEGIN ();
+  UINTN  Vector;
+  UINTN  Count;
 
-    for (Vector = 0x20, Count = 0; Vector < 0x100; Vector++) {
-      Status = Private->Cpu->RegisterInterruptHandler (Private->Cpu, Vector, LegacyBiosNullInterruptHandler);
-      if (Status == EFI_ALREADY_STARTED) {
-        Count++;
-      }
-      if (Status == EFI_SUCCESS) {
-        Private->Cpu->RegisterInterruptHandler (Private->Cpu, Vector, NULL);
-      }
+  for (Vector = 0x20, Count = 0; Vector < 0x100; Vector++) {
+    Status = Private->Cpu->RegisterInterruptHandler (Private->Cpu, Vector, LegacyBiosNullInterruptHandler);
+    if (Status == EFI_ALREADY_STARTED) {
+      Count++;
     }
-    if (Count >= 2) {
-      DEBUG ((DEBUG_ERROR, "ERROR: More than one HW interrupt active with CSM enabled\n"));
+
+    if (Status == EFI_SUCCESS) {
+      Private->Cpu->RegisterInterruptHandler (Private->Cpu, Vector, NULL);
     }
-    ASSERT (Count < 2);
-  );
+  }
+
+  if (Count >= 2) {
+    DEBUG ((DEBUG_ERROR, "ERROR: More than one HW interrupt active with CSM enabled\n"));
+  }
+
+  ASSERT (Count < 2);
+  DEBUG_CODE_END ();
 
   //
   // If the Timer AP has enabled the 8254 timer IRQ and the current 8254 timer
   // period is less than the CSM required rate of 54.9254, then force the 8254
   // PIT counter to 0, which is the CSM required rate of 54.9254 ms
   //
-  if (Private->TimerUses8254 && TimerPeriod < 549254) {
+  if (Private->TimerUses8254 && (TimerPeriod < 549254)) {
     SetPitCount (0);
   }
 
-  if (Stack != NULL && StackSize != 0) {
+  if ((Stack != NULL) && (StackSize != 0)) {
     //
     // Copy Stack to low memory stack
     //
@@ -264,12 +267,12 @@ InternalLegacyBiosFarCall (
     CopyMem (Stack16, Stack, StackSize);
   }
 
-  ThunkRegSet.E.SS   = (UINT16) (((UINTN) Stack16 >> 16) << 12);
-  ThunkRegSet.E.ESP  = (UINT16) (UINTN) Stack16;
-  ThunkRegSet.E.CS   = Segment;
-  ThunkRegSet.E.Eip  = Offset;
+  ThunkRegSet.E.SS  = (UINT16)(((UINTN)Stack16 >> 16) << 12);
+  ThunkRegSet.E.ESP = (UINT16)(UINTN)Stack16;
+  ThunkRegSet.E.CS  = Segment;
+  ThunkRegSet.E.Eip = Offset;
 
-  mThunkContext.RealModeState      = &ThunkRegSet;
+  mThunkContext.RealModeState = &ThunkRegSet;
 
   //
   // Set Legacy16 state. 0x08, 0x70 is legacy 8259 vector bases.
@@ -279,7 +282,7 @@ InternalLegacyBiosFarCall (
 
   AsmThunk16 (&mThunkContext);
 
-  if (Stack != NULL && StackSize != 0) {
+  if ((Stack != NULL) && (StackSize != 0)) {
     //
     // Copy low memory stack to Stack
     //
@@ -310,40 +313,40 @@ InternalLegacyBiosFarCall (
   // EBDA base address, if the current EBDA base address is smaller, it indicates
   // PcdEbdaReservedMemorySize should be adjusted to larger for more OPROMs.
   //
-  DEBUG_CODE (
-    {
-      UINTN                 EbdaBaseAddress;
-      UINTN                 ReservedEbdaBaseAddress;
+  DEBUG_CODE_BEGIN ();
+  {
+    UINTN  EbdaBaseAddress;
+    UINTN  ReservedEbdaBaseAddress;
 
-      ACCESS_PAGE0_CODE (
-        EbdaBaseAddress = (*(UINT16 *) (UINTN) 0x40E) << 4;
-        ReservedEbdaBaseAddress = CONVENTIONAL_MEMORY_TOP
-                                  - PcdGet32 (PcdEbdaReservedMemorySize);
-        ASSERT (ReservedEbdaBaseAddress <= EbdaBaseAddress);
+    ACCESS_PAGE0_CODE (
+      EbdaBaseAddress         = (*(UINT16 *)(UINTN)0x40E) << 4;
+      ReservedEbdaBaseAddress = CONVENTIONAL_MEMORY_TOP
+                                - PcdGet32 (PcdEbdaReservedMemorySize);
+      ASSERT (ReservedEbdaBaseAddress <= EbdaBaseAddress);
       );
-    }
-  );
+  }
+  DEBUG_CODE_END ();
 
   //
   // Restore interrupt of debug timer
   //
   SaveAndSetDebugTimerInterrupt (InterruptState);
 
-  Regs->E.EDI      = ThunkRegSet.E.EDI;
-  Regs->E.ESI      = ThunkRegSet.E.ESI;
-  Regs->E.EBP      = ThunkRegSet.E.EBP;
-  Regs->E.EBX      = ThunkRegSet.E.EBX;
-  Regs->E.EDX      = ThunkRegSet.E.EDX;
-  Regs->E.ECX      = ThunkRegSet.E.ECX;
-  Regs->E.EAX      = ThunkRegSet.E.EAX;
-  Regs->X.SS       = ThunkRegSet.E.SS;
-  Regs->X.CS       = ThunkRegSet.E.CS;
-  Regs->X.DS       = ThunkRegSet.E.DS;
-  Regs->X.ES       = ThunkRegSet.E.ES;
+  Regs->E.EDI = ThunkRegSet.E.EDI;
+  Regs->E.ESI = ThunkRegSet.E.ESI;
+  Regs->E.EBP = ThunkRegSet.E.EBP;
+  Regs->E.EBX = ThunkRegSet.E.EBX;
+  Regs->E.EDX = ThunkRegSet.E.EDX;
+  Regs->E.ECX = ThunkRegSet.E.ECX;
+  Regs->E.EAX = ThunkRegSet.E.EAX;
+  Regs->X.SS  = ThunkRegSet.E.SS;
+  Regs->X.CS  = ThunkRegSet.E.CS;
+  Regs->X.DS  = ThunkRegSet.E.DS;
+  Regs->X.ES  = ThunkRegSet.E.ES;
 
   CopyMem (&(Regs->X.Flags), &(ThunkRegSet.E.EFLAGS.UintN), sizeof (Regs->X.Flags));
 
-  return (BOOLEAN) (Regs->X.Flags.CF == 1);
+  return (BOOLEAN)(Regs->X.Flags.CF == 1);
 }
 
 /**
@@ -357,16 +360,16 @@ InternalLegacyBiosFarCall (
 **/
 EFI_STATUS
 LegacyBiosInitializeThunk (
-  IN  LEGACY_BIOS_INSTANCE    *Private
+  IN  LEGACY_BIOS_INSTANCE  *Private
   )
 {
-  EFI_STATUS              Status;
-  EFI_PHYSICAL_ADDRESS    MemoryAddress;
-  UINT8                   TimerVector;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  MemoryAddress;
+  UINT8                 TimerVector;
 
-  MemoryAddress   = (EFI_PHYSICAL_ADDRESS) (UINTN) Private->IntThunk;
+  MemoryAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)Private->IntThunk;
 
-  mThunkContext.RealModeBuffer     = (VOID *) (UINTN) (MemoryAddress + ((sizeof (LOW_MEMORY_THUNK) / EFI_PAGE_SIZE) + 1) * EFI_PAGE_SIZE);
+  mThunkContext.RealModeBuffer     = (VOID *)(UINTN)(MemoryAddress + ((sizeof (LOW_MEMORY_THUNK) / EFI_PAGE_SIZE) + 1) * EFI_PAGE_SIZE);
   mThunkContext.RealModeBufferSize = EFI_PAGE_SIZE;
   mThunkContext.ThunkAttributes    = THUNK_ATTRIBUTE_BIG_REAL_MODE | THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15;
 
@@ -376,7 +379,7 @@ LegacyBiosInitializeThunk (
   // Get the interrupt vector number corresponding to IRQ0 from the 8259 driver
   //
   TimerVector = 0;
-  Status = Private->Legacy8259->GetVector (Private->Legacy8259, Efi8259Irq0, &TimerVector);
+  Status      = Private->Legacy8259->GetVector (Private->Legacy8259, Efi8259Irq0, &TimerVector);
   ASSERT_EFI_ERROR (Status);
 
   //
