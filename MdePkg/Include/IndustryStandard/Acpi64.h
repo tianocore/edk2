@@ -2680,6 +2680,8 @@ typedef struct {
 #define EFI_ACPI_6_4_PPTT_WRITE_POLICY_VALID       0x1
 #define EFI_ACPI_6_4_PPTT_LINE_SIZE_INVALID        0x0
 #define EFI_ACPI_6_4_PPTT_LINE_SIZE_VALID          0x1
+#define EFI_ACPI_6_4_PPTT_CACHE_ID_INVALID         0x0
+#define EFI_ACPI_6_4_PPTT_CACHE_ID_VALID           0x1
 
 ///
 /// Cache Type Structure flags
