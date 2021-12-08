@@ -1,11 +1,11 @@
 /** @file
   PPTT Table Generator
 
-  Copyright (c) 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2021, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
-  - ACPI 6.3 Specification, January 2019
+  - ACPI 6.4 Specification, January 2021
 
   @par Glossary:
   - Cm or CM   - Configuration Manager
@@ -96,7 +96,7 @@ GetProcHierarchyNodeSize (
   ASSERT (Node != NULL);
 
   // <size of Processor Hierarchy Node> + <size of Private Resources array>
-  return sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR) +
+  return sizeof (EFI_ACPI_6_4_PPTT_STRUCTURE_PROCESSOR) +
          (Node->NoOfPrivateResources * sizeof (UINT32));
 }
 
@@ -116,7 +116,7 @@ GET_SIZE_OF_PPTT_STRUCTS (
 */
 GET_SIZE_OF_PPTT_STRUCTS (
   CacheTypeStructs,
-  sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE),
+  sizeof (EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE),
   CM_ARM_CACHE_INFO
   );
 
@@ -468,12 +468,12 @@ EFI_STATUS
 AddProcHierarchyNodes (
   IN  CONST ACPI_PPTT_GENERATOR                   *CONST             Generator,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST             CfgMgrProtocol,
-  IN  CONST EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER  *Pptt,
+  IN  CONST EFI_ACPI_6_4_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER  *Pptt,
   IN  CONST UINT32                                                   NodesStartOffset
   )
 {
   EFI_STATUS                             Status;
-  EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR  *ProcStruct;
+  EFI_ACPI_6_4_PPTT_STRUCTURE_PROCESSOR  *ProcStruct;
   UINT32                                 *PrivateResources;
   BOOLEAN                                IsGicCTokenDuplicated;
 
@@ -494,7 +494,7 @@ AddProcHierarchyNodes (
     (Pptt != NULL)
     );
 
-  ProcStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR *)((UINT8 *)Pptt +
+  ProcStruct = (EFI_ACPI_6_4_PPTT_STRUCTURE_PROCESSOR *)((UINT8 *)Pptt +
                                                          NodesStartOffset);
 
   ProcNodeIterator = Generator->ProcHierarchyNodeIndexedList;
@@ -538,7 +538,7 @@ AddProcHierarchyNodes (
     }
 
     // Populate the node header
-    ProcStruct->Type        = EFI_ACPI_6_3_PPTT_TYPE_PROCESSOR;
+    ProcStruct->Type        = EFI_ACPI_6_4_PPTT_TYPE_PROCESSOR;
     ProcStruct->Length      = (UINT8)Length;
     ProcStruct->Reserved[0] = EFI_ACPI_RESERVED_BYTE;
     ProcStruct->Reserved[1] = EFI_ACPI_RESERVED_BYTE;
@@ -661,7 +661,7 @@ AddProcHierarchyNodes (
 
     ProcStruct->NumberOfPrivateResources = ProcInfoNode->NoOfPrivateResources;
     PrivateResources                     = (UINT32 *)((UINT8 *)ProcStruct +
-                                                      sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR));
+                                                      sizeof (EFI_ACPI_6_4_PPTT_STRUCTURE_PROCESSOR));
 
     if (ProcStruct->NumberOfPrivateResources != 0) {
       // Populate the private resources array
@@ -684,7 +684,7 @@ AddProcHierarchyNodes (
     }
 
     // Next Processor Hierarchy Node
-    ProcStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR *)((UINT8 *)ProcStruct +
+    ProcStruct = (EFI_ACPI_6_4_PPTT_STRUCTURE_PROCESSOR *)((UINT8 *)ProcStruct +
                                                            ProcStruct->Length);
     ProcNodeIterator++;
   } // Processor Hierarchy Node
@@ -748,12 +748,12 @@ EFI_STATUS
 AddCacheTypeStructures (
   IN  CONST ACPI_PPTT_GENERATOR                   *CONST             Generator,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST             CfgMgrProtocol,
-  IN  CONST EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER  *Pptt,
+  IN  CONST EFI_ACPI_6_4_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER  *Pptt,
   IN  CONST UINT32                                                   NodesStartOffset
   )
 {
   EFI_STATUS                         Status;
-  EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE  *CacheStruct;
+  EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE  *CacheStruct;
   PPTT_NODE_INDEXER                  *PpttNodeFound;
   CM_ARM_CACHE_INFO                  *CacheInfoNode;
   PPTT_NODE_INDEXER                  *CacheNodeIterator;
@@ -765,7 +765,7 @@ AddCacheTypeStructures (
     (Pptt != NULL)
     );
 
-  CacheStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE *)((UINT8 *)Pptt +
+  CacheStruct = (EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE *)((UINT8 *)Pptt +
                                                       NodesStartOffset);
 
   CacheNodeIterator = Generator->CacheStructIndexedList;
@@ -775,13 +775,13 @@ AddCacheTypeStructures (
     CacheInfoNode = (CM_ARM_CACHE_INFO *)CacheNodeIterator->Object;
 
     // Populate the node header
-    CacheStruct->Type        = EFI_ACPI_6_3_PPTT_TYPE_CACHE;
-    CacheStruct->Length      = sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE);
+    CacheStruct->Type        = EFI_ACPI_6_4_PPTT_TYPE_CACHE;
+    CacheStruct->Length      = sizeof (EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE);
     CacheStruct->Reserved[0] = EFI_ACPI_RESERVED_BYTE;
     CacheStruct->Reserved[1] = EFI_ACPI_RESERVED_BYTE;
 
     // "On Arm-based systems, all cache properties must be provided in the
-    // table." (ACPI 6.3, Section 5.2.29.2)
+    // table." (ACPI 6.4, Section 5.2.29.2)
     CacheStruct->Flags.SizePropertyValid   = 1;
     CacheStruct->Flags.NumberOfSetsValid   = 1;
     CacheStruct->Flags.AssociativityValid  = 1;
@@ -941,7 +941,7 @@ AddCacheTypeStructures (
     CacheStruct->LineSize = CacheInfoNode->LineSize;
 
     // Next Cache Type Structure
-    CacheStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE *)((UINT8 *)CacheStruct +
+    CacheStruct = (EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE *)((UINT8 *)CacheStruct +
                                                         CacheStruct->Length);
     CacheNodeIterator++;
   } // Cache Type Structure
@@ -999,7 +999,7 @@ BuildPpttTable (
   // Pointer to the Node Indexer array
   PPTT_NODE_INDEXER  *NodeIndexer;
 
-  EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER  *Pptt;
+  EFI_ACPI_6_4_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER  *Pptt;
 
   ASSERT (
     (This != NULL) &&
@@ -1087,7 +1087,7 @@ BuildPpttTable (
   Generator->NodeIndexer             = NodeIndexer;
 
   // Calculate the size of the PPTT table
-  TableSize = sizeof (EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER);
+  TableSize = sizeof (EFI_ACPI_6_4_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER);
 
   // Include the size of Processor Hierarchy Nodes and index them
   if (Generator->ProcHierarchyNodeCount != 0) {
@@ -1155,7 +1155,7 @@ BuildPpttTable (
     goto error_handler;
   }
 
-  Pptt = (EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER *)*Table;
+  Pptt = (EFI_ACPI_6_4_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER *)*Table;
 
   DEBUG ((
     DEBUG_INFO,
@@ -1312,9 +1312,9 @@ ACPI_PPTT_GENERATOR  PpttGenerator = {
     // Generator Description
     L"ACPI.STD.PPTT.GENERATOR",
     // ACPI Table Signature
-    EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_STRUCTURE_SIGNATURE,
+    EFI_ACPI_6_4_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_STRUCTURE_SIGNATURE,
     // ACPI Table Revision supported by this Generator
-    EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_REVISION,
+    EFI_ACPI_6_4_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_REVISION,
     // Minimum supported ACPI Table Revision
     EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_REVISION,
     // Creator ID
