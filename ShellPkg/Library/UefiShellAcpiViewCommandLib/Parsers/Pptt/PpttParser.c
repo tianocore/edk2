@@ -1,11 +1,11 @@
 /** @file
   PPTT table parser
 
-  Copyright (c) 2019 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2019 - 2021, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
-    - ACPI 6.3 Specification - January 2019
+    - ACPI 6.4 Specification - January 2021
     - ARM Architecture Reference Manual ARMv8 (D.a)
 **/
 
@@ -161,8 +161,8 @@ ValidateCacheAttributes (
   )
 {
   // Reference: Advanced Configuration and Power Interface (ACPI) Specification
-  //            Version 6.2 Errata A, September 2017
-  // Table 5-153: Cache Type Structure
+  //            Version 6.4, January 2021
+  // Table 5-140: Cache Type Structure
   UINT8  Attributes;
 
   Attributes = *(UINT8 *)Ptr;
@@ -225,22 +225,6 @@ STATIC CONST ACPI_PARSER  CacheTypeStructureParser[] = {
   { L"Associativity",       1, 20, L"%d",   NULL, NULL, ValidateCacheAssociativity, NULL },
   { L"Attributes",          1, 21, L"0x%x", NULL, NULL, ValidateCacheAttributes,    NULL },
   { L"Line size",           2, 22, L"%d",   NULL, NULL, ValidateCacheLineSize,      NULL }
-};
-
-/**
-  An ACPI_PARSER array describing the ID Type Structure - Type 2.
-**/
-STATIC CONST ACPI_PARSER  IdStructureParser[] = {
-  { L"Type",       1, 0,  L"0x%x", NULL,       NULL, NULL, NULL },
-  { L"Length",     1, 1,  L"%d",   NULL,       NULL, NULL, NULL },
-  { L"Reserved",   2, 2,  L"0x%x", NULL,       NULL, NULL, NULL },
-
-  { L"VENDOR_ID",  4, 4,  NULL,    Dump4Chars, NULL, NULL, NULL },
-  { L"LEVEL_1_ID", 8, 8,  L"0x%x", NULL,       NULL, NULL, NULL },
-  { L"LEVEL_2_ID", 8, 16, L"0x%x", NULL,       NULL, NULL, NULL },
-  { L"MAJOR_REV",  2, 24, L"0x%x", NULL,       NULL, NULL, NULL },
-  { L"MINOR_REV",  2, 26, L"0x%x", NULL,       NULL, NULL, NULL },
-  { L"SPIN_REV",   2, 28, L"0x%x", NULL,       NULL, NULL, NULL },
 };
 
 /**
@@ -341,29 +325,6 @@ DumpCacheTypeStructure (
 }
 
 /**
-  This function parses the ID Structure (Type 2).
-
-  @param [in] Ptr     Pointer to the start of the ID Structure data.
-  @param [in] Length  Length of the ID Structure.
-**/
-STATIC
-VOID
-DumpIDStructure (
-  IN UINT8  *Ptr,
-  IN UINT8  Length
-  )
-{
-  ParseAcpi (
-    TRUE,
-    2,
-    "ID Structure",
-    Ptr,
-    Length,
-    PARSER_PARAMS (IdStructureParser)
-    );
-}
-
-/**
   This function parses the ACPI PPTT table.
   When trace is enabled this function parses the PPTT table and
   traces the ACPI table fields.
@@ -371,7 +332,6 @@ DumpIDStructure (
   This function parses the following processor topology structures:
     - Processor hierarchy node structure (Type 0)
     - Cache Type Structure (Type 1)
-    - ID structure (Type 2)
 
   This function also performs validation of the ACPI table fields.
 
@@ -451,22 +411,23 @@ ParseAcpiPptt (
     Print (L"0x%x\n", Offset);
 
     switch (*ProcessorTopologyStructureType) {
-      case EFI_ACPI_6_2_PPTT_TYPE_PROCESSOR:
+      case EFI_ACPI_6_4_PPTT_TYPE_PROCESSOR:
         DumpProcessorHierarchyNodeStructure (
           ProcessorTopologyStructurePtr,
           *ProcessorTopologyStructureLength
           );
         break;
-      case EFI_ACPI_6_2_PPTT_TYPE_CACHE:
+      case EFI_ACPI_6_4_PPTT_TYPE_CACHE:
         DumpCacheTypeStructure (
           ProcessorTopologyStructurePtr,
           *ProcessorTopologyStructureLength
           );
         break;
-      case EFI_ACPI_6_2_PPTT_TYPE_ID:
-        DumpIDStructure (
-          ProcessorTopologyStructurePtr,
-          *ProcessorTopologyStructureLength
+      case EFI_ACPI_6_3_PPTT_TYPE_ID:
+        IncrementErrorCount ();
+        Print (
+          L"ERROR: PPTT Type 2 - Processor ID has been removed and must not be"
+          L"used.\n"
           );
         break;
       default:
