@@ -741,10 +741,12 @@ typedef struct CmArmCacheInfo {
   /// PPTT_ARM_CCIDX_CACHE_ASSOCIATIVITY_MAX. Therfore this field
   /// is 32-bit wide.
   UINT32             Associativity;
-  /// Cache attributes (ACPI 6.3 - January 2019, PPTT, Table 5-156)
+  /// Cache attributes (ACPI 6.4 - January 2021, PPTT, Table 5.140)
   UINT8              Attributes;
   /// Line size in bytes
   UINT16             LineSize;
+  /// Unique ID for the cache
+  UINT32             CacheId;
 } CM_ARM_CACHE_INFO;
 
 /** A structure that describes a reference to another Configuration Manager
