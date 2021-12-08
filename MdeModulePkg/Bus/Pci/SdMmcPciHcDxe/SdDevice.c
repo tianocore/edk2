@@ -1421,3 +1421,4 @@ Error:
   Status = SdMmcHcAndMmio (PciIo, Slot, SD_MMC_HC_POWER_CTRL, sizeof (PowerCtrl), &PowerCtrl);
   return EFI_DEVICE_ERROR;
 }
+

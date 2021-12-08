@@ -1393,3 +1393,4 @@ SdMmcPassThruResetDevice (
 
   return EFI_SUCCESS;
 }
+

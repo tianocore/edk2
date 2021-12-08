@@ -20,3 +20,4 @@
 #string STR_MODULE_ABSTRACT             #language en-US "SD/MMC Pci Host Controller driver to manage SD/MMC host controllers"
 
 #string STR_MODULE_DESCRIPTION          #language en-US "This driver follows the UEFI driver model and produces SD/MMC Pass Thru protocol for upper layer bus driver."
+
