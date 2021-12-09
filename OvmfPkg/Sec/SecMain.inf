@@ -23,6 +23,8 @@
 
 [Sources]
   SecMain.c
+  AmdSev.c
+  AmdSev.h
 
 [Sources.IA32]
   Ia32/SecEntry.nasm
