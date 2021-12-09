@@ -688,6 +688,7 @@ ParseCmObjDesc (
   UINT32                      ObjIndex;
   UINT32                      ObjectCount;
   INTN                        RemainingSize;
+  INTN                        Offset;
   CONST  CM_OBJ_PARSER_ARRAY  *ParserArray;
 
   if ((CmObjDesc == NULL) || (CmObjDesc->Data == NULL)) {
@@ -722,6 +723,7 @@ ParseCmObjDesc (
 
   ObjectCount   = CmObjDesc->Count;
   RemainingSize = CmObjDesc->Size;
+  Offset        = 0;
 
   for (ObjIndex = 0; ObjIndex < ObjectCount; ObjIndex++) {
     DEBUG ((
@@ -733,11 +735,21 @@ ParseCmObjDesc (
       ObjectCount
       ));
     PrintCmObjDesc (
-      CmObjDesc->Data,
+      (VOID *)((UINTN)CmObjDesc->Data + Offset),
       ParserArray->Parser,
       ParserArray->ItemCount,
       &RemainingSize,
       1
       );
+    if ((RemainingSize > CmObjDesc->Size) ||
+        (RemainingSize < 0))
+    {
+      ASSERT (0);
+      return;
+    }
+
+    Offset = CmObjDesc->Size - RemainingSize;
   } // for
+
+  ASSERT (RemainingSize == 0);
 }
