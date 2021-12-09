@@ -58,3 +58,5 @@
 
 [FixedPcd]
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
