@@ -104,6 +104,11 @@ AmdSevInitialize (
 
 extern EFI_BOOT_MODE  mBootMode;
 
+VOID
+SevInitializeRam (
+  VOID
+  );
+
 extern BOOLEAN  mS3Supported;
 
 extern UINT8  mPhysMemAddressWidth;
