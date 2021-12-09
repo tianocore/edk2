@@ -52,6 +52,7 @@
   PeCoffExtraActionLib
   ExtractGuidedSectionLib
   LocalApicLib
+  MemEncryptSevLib
   CpuExceptionHandlerLib
 
 [Ppis]
@@ -74,6 +75,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedStart
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedEnd
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
