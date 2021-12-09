@@ -118,6 +118,32 @@ SevEsGetApicId:
     or         rax, rdx
     mov        rdi, rax             ; RDI now holds the original GHCB GPA
 
+    ;
+    ; For SEV-SNP, the recommended handling for getting the x2APIC ID
+    ; would be to use the SNP CPUID table to fetch CPUID.00H:EAX and
+    ; CPUID:0BH:EBX[15:0] instead of the GHCB MSR protocol vmgexits
+    ; below.
+    ;
+    ; To avoid the unecessary ugliness to accomplish that here, the BSP
+    ; has performed these checks in advance (where #VC handler handles
+    ; the CPUID table lookups automatically) and cached them in a flag
+    ; so those checks can be skipped here.
+    ;
+    mov        eax, [esi + MP_CPU_EXCHANGE_INFO_FIELD (SevSnpIsEnabled)]
+    cmp        al, 1
+    jne        CheckExtTopoAvail
+
+    ;
+    ; Even with SEV-SNP, the actual x2APIC ID in CPUID.0BH:EDX
+    ; fetched from the hypervisor the same way SEV-ES does it.
+    ;
+    mov        eax, [esi + MP_CPU_EXCHANGE_INFO_FIELD (ExtTopoAvail)]
+    cmp        al, 1
+    je         GetApicIdSevEs
+    ; The 8-bit APIC ID fallback is also the same as with SEV-ES
+    jmp        NoX2ApicSevEs
+
+CheckExtTopoAvail:
     mov        rdx, 0               ; CPUID function 0
     mov        rax, 0               ; RAX register requested
     or         rax, 4
@@ -136,6 +162,7 @@ SevEsGetApicId:
     test       edx, 0ffffh
     jz         NoX2ApicSevEs        ; CPUID.0BH:EBX[15:0] is zero
 
+GetApicIdSevEs:
     mov        rdx, 0bh             ; CPUID function 0x0b
     mov        rax, 0c0000000h      ; RDX register requested
     or         rax, 4

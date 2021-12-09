@@ -901,6 +901,13 @@ FillExchangeInfoData (
   ExchangeInfo->GhcbBase        = (UINTN)CpuMpData->GhcbBase;
 
   //
+  // Populate SEV-ES specific exchange data.
+  //
+  if (ExchangeInfo->SevSnpIsEnabled) {
+    FillExchangeInfoDataSevEs (ExchangeInfo);
+  }
+
+  //
   // Get the BSP's data of GDT and IDT
   //
   AsmReadGdtr ((IA32_DESCRIPTOR *)&ExchangeInfo->GdtrProfile);

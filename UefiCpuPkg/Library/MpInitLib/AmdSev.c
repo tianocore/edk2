@@ -243,3 +243,24 @@ SevEsPlaceApHlt (
 
   MpInitLibSevEsAPReset (Ghcb, CpuMpData);
 }
+
+/**
+  The function fills the exchange data for the AP.
+
+  @param[in]   ExchangeInfo  The pointer to CPU Exchange Data structure
+**/
+VOID
+FillExchangeInfoDataSevEs (
+  IN volatile MP_CPU_EXCHANGE_INFO  *ExchangeInfo
+  )
+{
+  UINT32  StdRangeMax;
+
+  AsmCpuid (CPUID_SIGNATURE, &StdRangeMax, NULL, NULL, NULL);
+  if (StdRangeMax >= CPUID_EXTENDED_TOPOLOGY) {
+    CPUID_EXTENDED_TOPOLOGY_EBX  ExtTopoEbx;
+
+    AsmCpuid (CPUID_EXTENDED_TOPOLOGY, NULL, &ExtTopoEbx.Uint32, NULL, NULL);
+    ExchangeInfo->ExtTopoAvail = !!ExtTopoEbx.Bits.LogicalProcessors;
+  }
+}

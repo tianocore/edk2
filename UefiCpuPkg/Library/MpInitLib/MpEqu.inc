@@ -94,6 +94,7 @@ struc MP_CPU_EXCHANGE_INFO
   .SevEsIsEnabled:               CTYPE_BOOLEAN 1
   .SevSnpIsEnabled               CTYPE_BOOLEAN 1
   .GhcbBase:                     CTYPE_UINTN 1
+  .ExtTopoAvail:                 CTYPE_BOOLEAN 1
 endstruc
 
 MP_CPU_EXCHANGE_INFO_OFFSET equ (SwitchToRealProcEnd - RendezvousFunnelProcStart)

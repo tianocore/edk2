@@ -224,6 +224,7 @@ typedef struct {
   BOOLEAN            SevEsIsEnabled;
   BOOLEAN            SevSnpIsEnabled;
   UINTN              GhcbBase;
+  BOOLEAN            ExtTopoAvail;
 } MP_CPU_EXCHANGE_INFO;
 
 #pragma pack()
@@ -786,6 +787,16 @@ BOOLEAN
 EFIAPI
 ConfidentialComputingGuestHas (
   CONFIDENTIAL_COMPUTING_GUEST_ATTR  Attr
+  );
+
+/**
+  The function fills the exchange data for the AP.
+
+  @param[in]   ExchangeInfo  The pointer to CPU Exchange Data structure
+**/
+VOID
+FillExchangeInfoDataSevEs (
+  IN volatile MP_CPU_EXCHANGE_INFO  *ExchangeInfo
   );
 
 #endif
