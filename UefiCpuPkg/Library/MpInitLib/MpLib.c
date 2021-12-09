@@ -896,8 +896,9 @@ FillExchangeInfoData (
   ExchangeInfo->Enable5LevelPaging = (BOOLEAN)(Cr4.Bits.LA57 == 1);
   DEBUG ((DEBUG_INFO, "%a: 5-Level Paging = %d\n", gEfiCallerBaseName, ExchangeInfo->Enable5LevelPaging));
 
-  ExchangeInfo->SevEsIsEnabled = CpuMpData->SevEsIsEnabled;
-  ExchangeInfo->GhcbBase       = (UINTN)CpuMpData->GhcbBase;
+  ExchangeInfo->SevEsIsEnabled  = CpuMpData->SevEsIsEnabled;
+  ExchangeInfo->SevSnpIsEnabled = CpuMpData->SevSnpIsEnabled;
+  ExchangeInfo->GhcbBase        = (UINTN)CpuMpData->GhcbBase;
 
   //
   // Get the BSP's data of GDT and IDT
@@ -1847,9 +1848,10 @@ MpInitLibInitialize (
   CpuMpData->CpuData          = (CPU_AP_DATA *)(CpuMpData + 1);
   CpuMpData->CpuInfoInHob     = (UINT64)(UINTN)(CpuMpData->CpuData + MaxLogicalProcessorNumber);
   InitializeSpinLock (&CpuMpData->MpLock);
-  CpuMpData->SevEsIsEnabled = ConfidentialComputingGuestHas (CCAttrAmdSevEs);
-  CpuMpData->SevEsAPBuffer  = (UINTN)-1;
-  CpuMpData->GhcbBase       = PcdGet64 (PcdGhcbBase);
+  CpuMpData->SevEsIsEnabled  = ConfidentialComputingGuestHas (CCAttrAmdSevEs);
+  CpuMpData->SevSnpIsEnabled = ConfidentialComputingGuestHas (CCAttrAmdSevSnp);
+  CpuMpData->SevEsAPBuffer   = (UINTN)-1;
+  CpuMpData->GhcbBase        = PcdGet64 (PcdGhcbBase);
 
   //
   // Make sure no memory usage outside of the allocated buffer.
