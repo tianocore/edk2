@@ -15,6 +15,7 @@
 
 #include <Register/Intel/Cpuid.h>
 #include <Register/Amd/Cpuid.h>
+#include <Register/Amd/Ghcb.h>
 #include <Register/Intel/Msr.h>
 #include <Register/Intel/LocalApic.h>
 #include <Register/Intel/Microcode.h>
@@ -150,6 +151,7 @@ typedef struct {
   UINT8                     PlatformId;
   UINT64                    MicrocodeEntryAddr;
   UINT32                    MicrocodeRevision;
+  SEV_ES_SAVE_AREA          *SevEsSaveArea;
 } CPU_AP_DATA;
 
 //
@@ -294,6 +296,7 @@ struct _CPU_MP_DATA {
 
   BOOLEAN        SevEsIsEnabled;
   BOOLEAN        SevSnpIsEnabled;
+  BOOLEAN        UseSevEsAPMethod;
   UINTN          SevEsAPBuffer;
   UINTN          SevEsAPResetStackStart;
   CPU_MP_DATA    *NewCpuMpData;
@@ -797,6 +800,47 @@ ConfidentialComputingGuestHas (
 VOID
 FillExchangeInfoDataSevEs (
   IN volatile MP_CPU_EXCHANGE_INFO  *ExchangeInfo
+  );
+
+/**
+  Issue RMPADJUST to adjust the VMSA attribute of an SEV-SNP page.
+
+  @param[in]  PageAddress
+  @param[in]  VmsaPage
+
+  @return  RMPADJUST return value
+**/
+UINT32
+SevSnpRmpAdjust (
+  IN  EFI_PHYSICAL_ADDRESS  PageAddress,
+  IN  BOOLEAN               VmsaPage
+  );
+
+/**
+  Create an SEV-SNP AP save area (VMSA) for use in running the vCPU.
+
+  @param[in]  CpuMpData        Pointer to CPU MP Data
+  @param[in]  CpuData          Pointer to CPU AP Data
+  @param[in]  ApicId           APIC ID of the vCPU
+**/
+VOID
+SevSnpCreateSaveArea (
+  IN CPU_MP_DATA  *CpuMpData,
+  IN CPU_AP_DATA  *CpuData,
+  UINT32          ApicId
+  );
+
+/**
+  Create SEV-SNP APs.
+
+  @param[in]  CpuMpData        Pointer to CPU MP Data
+  @param[in]  ProcessorNumber  The handle number of specified processor
+                               (-1 for all APs)
+**/
+VOID
+SevSnpCreateAP (
+  IN CPU_MP_DATA  *CpuMpData,
+  IN INTN         ProcessorNumber
   );
 
 #endif

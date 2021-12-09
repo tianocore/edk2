@@ -93,7 +93,14 @@ GetWakeupBuffer (
   EFI_PHYSICAL_ADDRESS  StartAddress;
   EFI_MEMORY_TYPE       MemoryType;
 
-  if (ConfidentialComputingGuestHas (CCAttrAmdSevEs)) {
+  if (ConfidentialComputingGuestHas (CCAttrAmdSevEs) &&
+      !ConfidentialComputingGuestHas (CCAttrAmdSevSnp))
+  {
+    //
+    // An SEV-ES-only guest requires the memory to be reserved. SEV-SNP, which
+    // is also considered SEV-ES, uses a different AP startup method, though,
+    // which does not have the same requirement.
+    //
     MemoryType = EfiReservedMemoryType;
   } else {
     MemoryType = EfiBootServicesData;
@@ -380,7 +387,7 @@ RelocateApLoop (
   MpInitLibWhoAmI (&ProcessorNumber);
   CpuMpData    = GetCpuMpData ();
   MwaitSupport = IsMwaitSupport ();
-  if (CpuMpData->SevEsIsEnabled) {
+  if (CpuMpData->UseSevEsAPMethod) {
     StackStart = CpuMpData->SevEsAPResetStackStart;
   } else {
     StackStart = mReservedTopOfApStack;
@@ -430,7 +437,7 @@ MpInitChangeApLoopCallback (
     CpuPause ();
   }
 
-  if (CpuMpData->SevEsIsEnabled && (CpuMpData->WakeupBuffer != (UINTN)-1)) {
+  if (CpuMpData->UseSevEsAPMethod && (CpuMpData->WakeupBuffer != (UINTN)-1)) {
     //
     // There are APs present. Re-use reserved memory area below 1MB from
     // WakeupBuffer as the area to be used for transitioning to 16-bit mode
