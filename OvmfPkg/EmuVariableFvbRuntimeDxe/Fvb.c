@@ -782,16 +782,16 @@ FvbInitialize (
     InitializeFvAndVariableStoreHeaders (Ptr);
   }
 
-  PcdStatus = PcdSet64S (PcdFlashNvStorageVariableBase64, (UINT32)(UINTN)Ptr);
+  PcdStatus = PcdSet64S (PcdFlashNvStorageVariableBase64, (UINTN)Ptr);
   ASSERT_RETURN_ERROR (PcdStatus);
 
   //
   // Initialize the Fault Tolerant Write data area
   //
   SubPtr    = (VOID *)((UINT8 *)Ptr + PcdGet32 (PcdFlashNvStorageVariableSize));
-  PcdStatus = PcdSet32S (
-                PcdFlashNvStorageFtwWorkingBase,
-                (UINT32)(UINTN)SubPtr
+  PcdStatus = PcdSet64S (
+                PcdFlashNvStorageFtwWorkingBase64,
+                (UINTN)SubPtr
                 );
   ASSERT_RETURN_ERROR (PcdStatus);
 
@@ -800,9 +800,9 @@ FvbInitialize (
   //
   SubPtr = (VOID *)((UINT8 *)Ptr +
                     EMU_FVB_NUM_SPARE_BLOCKS * EMU_FVB_BLOCK_SIZE);
-  PcdStatus = PcdSet32S (
-                PcdFlashNvStorageFtwSpareBase,
-                (UINT32)(UINTN)SubPtr
+  PcdStatus = PcdSet64S (
+                PcdFlashNvStorageFtwSpareBase64,
+                (UINTN)SubPtr
                 );
   ASSERT_RETURN_ERROR (PcdStatus);
 
