@@ -1,0 +1,32 @@
+## @file
+# Ssdt Serial Port Table Generator
+#
+#  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SsdtPcieLibArm
+  FILE_GUID      = E431D7FD-26BF-4E3D-9064-5B13B0439057
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiSsdtPcieLibConstructor
+  DESTRUCTOR     = AcpiSsdtPcieLibDestructor
+
+[Sources]
+  SsdtPcieGenerator.c
+  SsdtPcieGenerator.h
+  SsdtPcieOscTemplate.asl
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  AcpiHelperLib
+  AmlLib
+  BaseLib
