@@ -34,6 +34,9 @@
 #include <Library/PcdLib.h>
 #include <Library/MicrocodeLib.h>
 
+#include <Register/Amd/Fam17Msr.h>
+#include <Register/Amd/Ghcb.h>
+
 #include <Guid/MicrocodePatchHob.h>
 
 #define WAKEUP_AP_SIGNAL  SIGNATURE_32 ('S', 'T', 'A', 'P')
@@ -321,7 +324,7 @@ typedef struct {
                            from long mode to real mode.
 **/
 typedef
-VOID
+  VOID
 (EFIAPI AP_RESET)(
   IN UINTN    BufferStart,
   IN UINT16   Code16,
@@ -346,7 +349,7 @@ extern EFI_GUID  mCpuInitMpLibHobGuid;
   @param[in] PmCodeSegment   Protected mode code segment value.
 **/
 typedef
-VOID
+  VOID
 (EFIAPI *ASM_RELOCATE_AP_LOOP)(
   IN BOOLEAN                 MwaitSupport,
   IN UINTN                   ApTargetCState,
@@ -738,6 +741,36 @@ GetProcessorNumber (
 EFI_STATUS
 PlatformShadowMicrocode (
   IN OUT CPU_MP_DATA  *CpuMpData
+  );
+
+/**
+  Allocate the SEV-ES AP jump table buffer.
+
+  @param[in, out]  CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+AllocateSevEsAPMemory (
+  IN OUT CPU_MP_DATA  *CpuMpData
+  );
+
+/**
+  Program the SEV-ES AP jump table buffer.
+
+  @param[in]  SipiVector  The SIPI vector used for the AP Reset
+**/
+VOID
+SetSevEsJumpTable (
+  IN UINTN  SipiVector
+  );
+
+/**
+  The function puts the AP in halt loop.
+
+  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+SevEsPlaceApHlt (
+  CPU_MP_DATA  *CpuMpData
   );
 
 #endif

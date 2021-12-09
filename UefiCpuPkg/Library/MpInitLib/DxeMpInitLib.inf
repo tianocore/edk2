@@ -28,6 +28,7 @@
   X64/MpFuncs.nasm
 
 [Sources.common]
+  AmdSev.c
   MpEqu.inc
   DxeMpLib.c
   MpLib.c
