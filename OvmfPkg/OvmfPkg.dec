@@ -350,6 +350,13 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataOffset|0|UINT32|0x56
   gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataSize|0|UINT32|0x57
 
+  ## The base address and size of the SEV-SNP Secrets Area that contains
+  #  the VM platform communication key used to send and recieve the
+  #  messages to the PSP. If this is set in the .fdf, the platform
+  #  is responsible to reserve this area from DXE phase overwrites.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase|0|UINT32|0x58
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize|0|UINT32|0x59
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
