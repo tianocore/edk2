@@ -93,7 +93,14 @@ GetWakeupBuffer (
   EFI_PHYSICAL_ADDRESS  StartAddress;
   EFI_MEMORY_TYPE       MemoryType;
 
-  if (PcdGetBool (PcdSevEsIsEnabled)) {
+  if (ConfidentialComputingGuestHas (CCAttrAmdSevEs) &&
+      !ConfidentialComputingGuestHas (CCAttrAmdSevSnp))
+  {
+    //
+    // An SEV-ES-only guest requires the memory to be reserved. SEV-SNP, which
+    // is also considered SEV-ES, uses a different AP startup method, though,
+    // which does not have the same requirement.
+    //
     MemoryType = EfiReservedMemoryType;
   } else {
     MemoryType = EfiBootServicesData;
@@ -107,7 +114,7 @@ GetWakeupBuffer (
   // LagacyBios driver depends on CPU Arch protocol which guarantees below
   // allocation runs earlier than LegacyBios driver.
   //
-  if (PcdGetBool (PcdSevEsIsEnabled)) {
+  if (ConfidentialComputingGuestHas (CCAttrAmdSevEs)) {
     //
     // SEV-ES Wakeup buffer should be under 0x88000 and under any previous one
     //
@@ -125,7 +132,7 @@ GetWakeupBuffer (
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
     StartAddress = (EFI_PHYSICAL_ADDRESS)-1;
-  } else if (PcdGetBool (PcdSevEsIsEnabled)) {
+  } else if (ConfidentialComputingGuestHas (CCAttrAmdSevEs)) {
     //
     // Next SEV-ES wakeup buffer allocation must be below this allocation
     //
@@ -380,7 +387,7 @@ RelocateApLoop (
   MpInitLibWhoAmI (&ProcessorNumber);
   CpuMpData    = GetCpuMpData ();
   MwaitSupport = IsMwaitSupport ();
-  if (CpuMpData->SevEsIsEnabled) {
+  if (CpuMpData->UseSevEsAPMethod) {
     StackStart = CpuMpData->SevEsAPResetStackStart;
   } else {
     StackStart = mReservedTopOfApStack;
@@ -430,7 +437,7 @@ MpInitChangeApLoopCallback (
     CpuPause ();
   }
 
-  if (CpuMpData->SevEsIsEnabled && (CpuMpData->WakeupBuffer != (UINTN)-1)) {
+  if (CpuMpData->UseSevEsAPMethod && (CpuMpData->WakeupBuffer != (UINTN)-1)) {
     //
     // There are APs present. Re-use reserved memory area below 1MB from
     // WakeupBuffer as the area to be used for transitioning to 16-bit mode

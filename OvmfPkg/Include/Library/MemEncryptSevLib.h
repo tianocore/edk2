@@ -48,6 +48,18 @@ typedef enum {
 } MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE;
 
 /**
+  Returns a boolean to indicate whether SEV-SNP is enabled
+
+  @retval TRUE           SEV-SNP is enabled
+  @retval FALSE          SEV-SNP is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevSnpIsEnabled (
+  VOID
+  );
+
+/**
   Returns a boolean to indicate whether SEV-ES is enabled.
 
   @retval TRUE           SEV-ES is enabled
@@ -198,6 +210,20 @@ RETURN_STATUS
 EFIAPI
 MemEncryptSevClearMmioPageEncMask (
   IN PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             NumPages
+  );
+
+/**
+  Pre-validate the system RAM when SEV-SNP is enabled in the guest VM.
+
+  @param[in]  BaseAddress             Base address
+  @param[in]  NumPages                Number of pages starting from the base address
+
+**/
+VOID
+EFIAPI
+MemEncryptSevSnpPreValidateSystemRam (
   IN PHYSICAL_ADDRESS  BaseAddress,
   IN UINTN             NumPages
   );

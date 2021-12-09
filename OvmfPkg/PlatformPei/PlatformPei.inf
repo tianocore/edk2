@@ -62,6 +62,7 @@
   MtrrLib
   MemEncryptSevLib
   PcdLib
+  VmgExitLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
@@ -106,8 +107,12 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+  gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures
 
 [FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
@@ -118,6 +123,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable

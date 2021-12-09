@@ -15,6 +15,7 @@
 
 #include <Register/Intel/Cpuid.h>
 #include <Register/Amd/Cpuid.h>
+#include <Register/Amd/Ghcb.h>
 #include <Register/Intel/Msr.h>
 #include <Register/Intel/LocalApic.h>
 #include <Register/Intel/Microcode.h>
@@ -33,6 +34,10 @@
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/MicrocodeLib.h>
+#include <ConfidentialComputingGuestAttr.h>
+
+#include <Register/Amd/Fam17Msr.h>
+#include <Register/Amd/Ghcb.h>
 
 #include <Guid/MicrocodePatchHob.h>
 
@@ -146,6 +151,7 @@ typedef struct {
   UINT8                     PlatformId;
   UINT64                    MicrocodeEntryAddr;
   UINT32                    MicrocodeRevision;
+  SEV_ES_SAVE_AREA          *SevEsSaveArea;
 } CPU_AP_DATA;
 
 //
@@ -218,7 +224,9 @@ typedef struct {
   //
   BOOLEAN            Enable5LevelPaging;
   BOOLEAN            SevEsIsEnabled;
+  BOOLEAN            SevSnpIsEnabled;
   UINTN              GhcbBase;
+  BOOLEAN            ExtTopoAvail;
 } MP_CPU_EXCHANGE_INFO;
 
 #pragma pack()
@@ -287,6 +295,8 @@ struct _CPU_MP_DATA {
   BOOLEAN        WakeUpByInitSipiSipi;
 
   BOOLEAN        SevEsIsEnabled;
+  BOOLEAN        SevSnpIsEnabled;
+  BOOLEAN        UseSevEsAPMethod;
   UINTN          SevEsAPBuffer;
   UINTN          SevEsAPResetStackStart;
   CPU_MP_DATA    *NewCpuMpData;
@@ -321,7 +331,7 @@ typedef struct {
                            from long mode to real mode.
 **/
 typedef
-VOID
+  VOID
 (EFIAPI AP_RESET)(
   IN UINTN    BufferStart,
   IN UINT16   Code16,
@@ -346,7 +356,7 @@ extern EFI_GUID  mCpuInitMpLibHobGuid;
   @param[in] PmCodeSegment   Protected mode code segment value.
 **/
 typedef
-VOID
+  VOID
 (EFIAPI *ASM_RELOCATE_AP_LOOP)(
   IN BOOLEAN                 MwaitSupport,
   IN UINTN                   ApTargetCState,
@@ -738,6 +748,99 @@ GetProcessorNumber (
 EFI_STATUS
 PlatformShadowMicrocode (
   IN OUT CPU_MP_DATA  *CpuMpData
+  );
+
+/**
+  Allocate the SEV-ES AP jump table buffer.
+
+  @param[in, out]  CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+AllocateSevEsAPMemory (
+  IN OUT CPU_MP_DATA  *CpuMpData
+  );
+
+/**
+  Program the SEV-ES AP jump table buffer.
+
+  @param[in]  SipiVector  The SIPI vector used for the AP Reset
+**/
+VOID
+SetSevEsJumpTable (
+  IN UINTN  SipiVector
+  );
+
+/**
+  The function puts the AP in halt loop.
+
+  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+SevEsPlaceApHlt (
+  CPU_MP_DATA  *CpuMpData
+  );
+
+/**
+ Check if the specified confidential computing attribute is active.
+
+ @retval TRUE   The specified Attr is active.
+ @retval FALSE  The specified Attr is not active.
+**/
+BOOLEAN
+EFIAPI
+ConfidentialComputingGuestHas (
+  CONFIDENTIAL_COMPUTING_GUEST_ATTR  Attr
+  );
+
+/**
+  The function fills the exchange data for the AP.
+
+  @param[in]   ExchangeInfo  The pointer to CPU Exchange Data structure
+**/
+VOID
+FillExchangeInfoDataSevEs (
+  IN volatile MP_CPU_EXCHANGE_INFO  *ExchangeInfo
+  );
+
+/**
+  Issue RMPADJUST to adjust the VMSA attribute of an SEV-SNP page.
+
+  @param[in]  PageAddress
+  @param[in]  VmsaPage
+
+  @return  RMPADJUST return value
+**/
+UINT32
+SevSnpRmpAdjust (
+  IN  EFI_PHYSICAL_ADDRESS  PageAddress,
+  IN  BOOLEAN               VmsaPage
+  );
+
+/**
+  Create an SEV-SNP AP save area (VMSA) for use in running the vCPU.
+
+  @param[in]  CpuMpData        Pointer to CPU MP Data
+  @param[in]  CpuData          Pointer to CPU AP Data
+  @param[in]  ApicId           APIC ID of the vCPU
+**/
+VOID
+SevSnpCreateSaveArea (
+  IN CPU_MP_DATA  *CpuMpData,
+  IN CPU_AP_DATA  *CpuData,
+  UINT32          ApicId
+  );
+
+/**
+  Create SEV-SNP APs.
+
+  @param[in]  CpuMpData        Pointer to CPU MP Data
+  @param[in]  ProcessorNumber  The handle number of specified processor
+                               (-1 for all APs)
+**/
+VOID
+SevSnpCreateAP (
+  IN CPU_MP_DATA  *CpuMpData,
+  IN INTN         ProcessorNumber
   );
 
 #endif

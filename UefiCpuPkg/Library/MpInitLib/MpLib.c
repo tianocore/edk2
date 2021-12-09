@@ -295,10 +295,12 @@ GetApLoopMode (
       ApLoopMode = ApInHltLoop;
     }
 
-    if (PcdGetBool (PcdSevEsIsEnabled)) {
+    if (ConfidentialComputingGuestHas (CCAttrAmdSevEs) &&
+        !ConfidentialComputingGuestHas (CCAttrAmdSevSnp))
+    {
       //
-      // For SEV-ES, force AP in Hlt-loop mode in order to use the GHCB
-      // protocol for starting APs
+      // For SEV-ES (SEV-SNP is also considered SEV-ES), force AP in Hlt-loop
+      // mode in order to use the GHCB protocol for starting APs
       //
       ApLoopMode = ApInHltLoop;
     }
@@ -600,123 +602,6 @@ InitializeApData (
 }
 
 /**
-  Get Protected mode code segment with 16-bit default addressing
-  from current GDT table.
-
-  @return  Protected mode 16-bit code segment value.
-**/
-STATIC
-UINT16
-GetProtectedMode16CS (
-  VOID
-  )
-{
-  IA32_DESCRIPTOR          GdtrDesc;
-  IA32_SEGMENT_DESCRIPTOR  *GdtEntry;
-  UINTN                    GdtEntryCount;
-  UINT16                   Index;
-
-  Index = (UINT16)-1;
-  AsmReadGdtr (&GdtrDesc);
-  GdtEntryCount = (GdtrDesc.Limit + 1) / sizeof (IA32_SEGMENT_DESCRIPTOR);
-  GdtEntry      = (IA32_SEGMENT_DESCRIPTOR *)GdtrDesc.Base;
-  for (Index = 0; Index < GdtEntryCount; Index++) {
-    if ((GdtEntry->Bits.L == 0) &&
-        (GdtEntry->Bits.DB == 0) &&
-        (GdtEntry->Bits.Type > 8))
-    {
-      break;
-    }
-
-    GdtEntry++;
-  }
-
-  ASSERT (Index != GdtEntryCount);
-  return Index * 8;
-}
-
-/**
-  Get Protected mode code segment with 32-bit default addressing
-  from current GDT table.
-
-  @return  Protected mode 32-bit code segment value.
-**/
-STATIC
-UINT16
-GetProtectedMode32CS (
-  VOID
-  )
-{
-  IA32_DESCRIPTOR          GdtrDesc;
-  IA32_SEGMENT_DESCRIPTOR  *GdtEntry;
-  UINTN                    GdtEntryCount;
-  UINT16                   Index;
-
-  Index = (UINT16)-1;
-  AsmReadGdtr (&GdtrDesc);
-  GdtEntryCount = (GdtrDesc.Limit + 1) / sizeof (IA32_SEGMENT_DESCRIPTOR);
-  GdtEntry      = (IA32_SEGMENT_DESCRIPTOR *)GdtrDesc.Base;
-  for (Index = 0; Index < GdtEntryCount; Index++) {
-    if ((GdtEntry->Bits.L == 0) &&
-        (GdtEntry->Bits.DB == 1) &&
-        (GdtEntry->Bits.Type > 8))
-    {
-      break;
-    }
-
-    GdtEntry++;
-  }
-
-  ASSERT (Index != GdtEntryCount);
-  return Index * 8;
-}
-
-/**
-  Reset an AP when in SEV-ES mode.
-
-  If successful, this function never returns.
-
-  @param[in] Ghcb                 Pointer to the GHCB
-  @param[in] CpuMpData            Pointer to CPU MP Data
-
-**/
-STATIC
-VOID
-MpInitLibSevEsAPReset (
-  IN GHCB         *Ghcb,
-  IN CPU_MP_DATA  *CpuMpData
-  )
-{
-  EFI_STATUS  Status;
-  UINTN       ProcessorNumber;
-  UINT16      Code16, Code32;
-  AP_RESET    *APResetFn;
-  UINTN       BufferStart;
-  UINTN       StackStart;
-
-  Status = GetProcessorNumber (CpuMpData, &ProcessorNumber);
-  ASSERT_EFI_ERROR (Status);
-
-  Code16 = GetProtectedMode16CS ();
-  Code32 = GetProtectedMode32CS ();
-
-  if (CpuMpData->WakeupBufferHigh != 0) {
-    APResetFn = (AP_RESET *)(CpuMpData->WakeupBufferHigh + CpuMpData->AddressMap.SwitchToRealNoNxOffset);
-  } else {
-    APResetFn = (AP_RESET *)(CpuMpData->MpCpuExchangeInfo->BufferStart + CpuMpData->AddressMap.SwitchToRealOffset);
-  }
-
-  BufferStart = CpuMpData->MpCpuExchangeInfo->BufferStart;
-  StackStart  = CpuMpData->SevEsAPResetStackStart -
-                (AP_RESET_STACK_SIZE * ProcessorNumber);
-
-  //
-  // This call never returns.
-  //
-  APResetFn (BufferStart, Code16, Code32, StackStart);
-}
-
-/**
   This function will be called from AP reset code if BSP uses WakeUpAP.
 
   @param[in] ExchangeInfo     Pointer to the MP exchange info buffer
@@ -880,7 +765,7 @@ ApWakeupFunction (
       // to allow the APs to issue an AP_RESET_HOLD before the BSP possibly
       // performs another INIT-SIPI-SIPI sequence.
       //
-      if (!CpuMpData->SevEsIsEnabled) {
+      if (!CpuMpData->UseSevEsAPMethod) {
         InterlockedDecrement ((UINT32 *)&CpuMpData->MpCpuExchangeInfo->NumApsExecuting);
       }
     }
@@ -894,48 +779,8 @@ ApWakeupFunction (
       //
       while (TRUE) {
         DisableInterrupts ();
-        if (CpuMpData->SevEsIsEnabled) {
-          MSR_SEV_ES_GHCB_REGISTER  Msr;
-          GHCB                      *Ghcb;
-          UINT64                    Status;
-          BOOLEAN                   DoDecrement;
-          BOOLEAN                   InterruptState;
-
-          DoDecrement = (BOOLEAN)(CpuMpData->InitFlag == ApInitConfig);
-
-          while (TRUE) {
-            Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
-            Ghcb                    = Msr.Ghcb;
-
-            VmgInit (Ghcb, &InterruptState);
-
-            if (DoDecrement) {
-              DoDecrement = FALSE;
-
-              //
-              // Perform the delayed decrement just before issuing the first
-              // VMGEXIT with AP_RESET_HOLD.
-              //
-              InterlockedDecrement ((UINT32 *)&CpuMpData->MpCpuExchangeInfo->NumApsExecuting);
-            }
-
-            Status = VmgExit (Ghcb, SVM_EXIT_AP_RESET_HOLD, 0, 0);
-            if ((Status == 0) && (Ghcb->SaveArea.SwExitInfo2 != 0)) {
-              VmgDone (Ghcb, InterruptState);
-              break;
-            }
-
-            VmgDone (Ghcb, InterruptState);
-          }
-
-          //
-          // Awakened in a new phase? Use the new CpuMpData
-          //
-          if (CpuMpData->NewCpuMpData != NULL) {
-            CpuMpData = CpuMpData->NewCpuMpData;
-          }
-
-          MpInitLibSevEsAPReset (Ghcb, CpuMpData);
+        if (CpuMpData->UseSevEsAPMethod) {
+          SevEsPlaceApHlt (CpuMpData);
         } else {
           CpuSleep ();
         }
@@ -1053,8 +898,16 @@ FillExchangeInfoData (
   ExchangeInfo->Enable5LevelPaging = (BOOLEAN)(Cr4.Bits.LA57 == 1);
   DEBUG ((DEBUG_INFO, "%a: 5-Level Paging = %d\n", gEfiCallerBaseName, ExchangeInfo->Enable5LevelPaging));
 
-  ExchangeInfo->SevEsIsEnabled = CpuMpData->SevEsIsEnabled;
-  ExchangeInfo->GhcbBase       = (UINTN)CpuMpData->GhcbBase;
+  ExchangeInfo->SevEsIsEnabled  = CpuMpData->SevEsIsEnabled;
+  ExchangeInfo->SevSnpIsEnabled = CpuMpData->SevSnpIsEnabled;
+  ExchangeInfo->GhcbBase        = (UINTN)CpuMpData->GhcbBase;
+
+  //
+  // Populate SEV-ES specific exchange data.
+  //
+  if (ExchangeInfo->SevSnpIsEnabled) {
+    FillExchangeInfoDataSevEs (ExchangeInfo);
+  }
 
   //
   // Get the BSP's data of GDT and IDT
@@ -1210,9 +1063,13 @@ AllocateResetVector (
                                     );
     //
     // The AP reset stack is only used by SEV-ES guests. Do not allocate it
-    // if SEV-ES is not enabled.
+    // if SEV-ES is not enabled. An SEV-SNP guest is also considered
+    // an SEV-ES guest, but uses a different method of AP startup, eliminating
+    // the need for the allocation.
     //
-    if (PcdGetBool (PcdSevEsIsEnabled)) {
+    if (ConfidentialComputingGuestHas (CCAttrAmdSevEs) &&
+        !ConfidentialComputingGuestHas (CCAttrAmdSevSnp))
+    {
       //
       // Stack location is based on ProcessorNumber, so use the total number
       // of processors for calculating the total stack area.
@@ -1263,74 +1120,9 @@ FreeResetVector (
   // perform the restore as this will overwrite memory which has data
   // needed by SEV-ES.
   //
-  if (!CpuMpData->SevEsIsEnabled) {
+  if (!CpuMpData->UseSevEsAPMethod) {
     RestoreWakeupBuffer (CpuMpData);
   }
-}
-
-/**
-  Allocate the SEV-ES AP jump table buffer.
-
-  @param[in, out]  CpuMpData  The pointer to CPU MP Data structure.
-**/
-VOID
-AllocateSevEsAPMemory (
-  IN OUT CPU_MP_DATA  *CpuMpData
-  )
-{
-  if (CpuMpData->SevEsAPBuffer == (UINTN)-1) {
-    CpuMpData->SevEsAPBuffer =
-      CpuMpData->SevEsIsEnabled ? GetSevEsAPMemory () : 0;
-  }
-}
-
-/**
-  Program the SEV-ES AP jump table buffer.
-
-  @param[in]  SipiVector  The SIPI vector used for the AP Reset
-**/
-VOID
-SetSevEsJumpTable (
-  IN UINTN  SipiVector
-  )
-{
-  SEV_ES_AP_JMP_FAR  *JmpFar;
-  UINT32             Offset, InsnByte;
-  UINT8              LoNib, HiNib;
-
-  JmpFar = (SEV_ES_AP_JMP_FAR *)(UINTN)FixedPcdGet32 (PcdSevEsWorkAreaBase);
-  ASSERT (JmpFar != NULL);
-
-  //
-  // Obtain the address of the Segment/Rip location in the workarea.
-  // This will be set to a value derived from the SIPI vector and will
-  // be the memory address used for the far jump below.
-  //
-  Offset  = FixedPcdGet32 (PcdSevEsWorkAreaBase);
-  Offset += sizeof (JmpFar->InsnBuffer);
-  LoNib   = (UINT8)Offset;
-  HiNib   = (UINT8)(Offset >> 8);
-
-  //
-  // Program the workarea (which is the initial AP boot address) with
-  // far jump to the SIPI vector (where XX and YY represent the
-  // address of where the SIPI vector is stored.
-  //
-  //   JMP FAR [CS:XXYY] => 2E FF 2E YY XX
-  //
-  InsnByte                       = 0;
-  JmpFar->InsnBuffer[InsnByte++] = 0x2E;  // CS override prefix
-  JmpFar->InsnBuffer[InsnByte++] = 0xFF;  // JMP (FAR)
-  JmpFar->InsnBuffer[InsnByte++] = 0x2E;  // ModRM (JMP memory location)
-  JmpFar->InsnBuffer[InsnByte++] = LoNib; // YY offset ...
-  JmpFar->InsnBuffer[InsnByte++] = HiNib; // XX offset ...
-
-  //
-  // Program the Segment/Rip based on the SIPI vector (always at least
-  // 16-byte aligned, so Rip is set to 0).
-  //
-  JmpFar->Rip     = 0;
-  JmpFar->Segment = (UINT16)(SipiVector >> 4);
 }
 
 /**
@@ -1407,7 +1199,7 @@ WakeUpAP (
 
     if (ResetVectorRequired) {
       //
-      // For SEV-ES, the initial AP boot address will be defined by
+      // For SEV-ES and SEV-SNP, the initial AP boot address will be defined by
       // PcdSevEsWorkAreaBase. The Segment/Rip must be the jump address
       // from the original INIT-SIPI-SIPI.
       //
@@ -1417,8 +1209,14 @@ WakeUpAP (
 
       //
       // Wakeup all APs
+      //   Must use the INIT-SIPI-SIPI method for initial configuration in
+      //   order to obtain the APIC ID.
       //
-      SendInitSipiSipiAllExcludingSelf ((UINT32)ExchangeInfo->BufferStart);
+      if (CpuMpData->SevSnpIsEnabled && (CpuMpData->InitFlag != ApInitConfig)) {
+        SevSnpCreateAP (CpuMpData, -1);
+      } else {
+        SendInitSipiSipiAllExcludingSelf ((UINT32)ExchangeInfo->BufferStart);
+      }
     }
 
     if (CpuMpData->InitFlag == ApInitConfig) {
@@ -1509,7 +1307,7 @@ WakeUpAP (
       CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
 
       //
-      // For SEV-ES, the initial AP boot address will be defined by
+      // For SEV-ES and SEV-SNP, the initial AP boot address will be defined by
       // PcdSevEsWorkAreaBase. The Segment/Rip must be the jump address
       // from the original INIT-SIPI-SIPI.
       //
@@ -1517,10 +1315,14 @@ WakeUpAP (
         SetSevEsJumpTable (ExchangeInfo->BufferStart);
       }
 
-      SendInitSipiSipi (
-        CpuInfoInHob[ProcessorNumber].ApicId,
-        (UINT32)ExchangeInfo->BufferStart
-        );
+      if (CpuMpData->SevSnpIsEnabled && (CpuMpData->InitFlag != ApInitConfig)) {
+        SevSnpCreateAP (CpuMpData, (INTN)ProcessorNumber);
+      } else {
+        SendInitSipiSipi (
+          CpuInfoInHob[ProcessorNumber].ApicId,
+          (UINT32)ExchangeInfo->BufferStart
+          );
+      }
     }
 
     //
@@ -2069,9 +1871,15 @@ MpInitLibInitialize (
   CpuMpData->CpuData          = (CPU_AP_DATA *)(CpuMpData + 1);
   CpuMpData->CpuInfoInHob     = (UINT64)(UINTN)(CpuMpData->CpuData + MaxLogicalProcessorNumber);
   InitializeSpinLock (&CpuMpData->MpLock);
-  CpuMpData->SevEsIsEnabled = PcdGetBool (PcdSevEsIsEnabled);
-  CpuMpData->SevEsAPBuffer  = (UINTN)-1;
-  CpuMpData->GhcbBase       = PcdGet64 (PcdGhcbBase);
+  CpuMpData->SevEsIsEnabled   = ConfidentialComputingGuestHas (CCAttrAmdSevEs);
+  CpuMpData->SevSnpIsEnabled  = ConfidentialComputingGuestHas (CCAttrAmdSevSnp);
+  CpuMpData->SevEsAPBuffer    = (UINTN)-1;
+  CpuMpData->GhcbBase         = PcdGet64 (PcdGhcbBase);
+  CpuMpData->UseSevEsAPMethod = CpuMpData->SevEsIsEnabled && !CpuMpData->SevSnpIsEnabled;
+
+  if (CpuMpData->SevSnpIsEnabled) {
+    ASSERT ((PcdGet64 (PcdGhcbHypervisorFeatures) & GHCB_HV_FEATURES_SNP_AP_CREATE) == GHCB_HV_FEATURES_SNP_AP_CREATE);
+  }
 
   //
   // Make sure no memory usage outside of the allocated buffer.
@@ -2976,4 +2784,71 @@ MpInitLibStartupAllCPUs (
            ProcedureArgument,
            NULL
            );
+}
+
+/**
+  The function check if the specified Attr is set.
+
+  @param[in]  CurrentAttr   The current attribute.
+  @param[in]  Attr          The attribute to check.
+
+  @retval  TRUE      The specified Attr is set.
+  @retval  FALSE     The specified Attr is not set.
+
+**/
+STATIC
+BOOLEAN
+AmdMemEncryptionAttrCheck (
+  IN  UINT64                             CurrentAttr,
+  IN  CONFIDENTIAL_COMPUTING_GUEST_ATTR  Attr
+  )
+{
+  switch (Attr) {
+    case CCAttrAmdSev:
+      //
+      // SEV is automatically enabled if SEV-ES or SEV-SNP is active.
+      //
+      return CurrentAttr >= CCAttrAmdSev;
+    case CCAttrAmdSevEs:
+      //
+      // SEV-ES is automatically enabled if SEV-SNP is active.
+      //
+      return CurrentAttr >= CCAttrAmdSevEs;
+    case CCAttrAmdSevSnp:
+      return CurrentAttr == CCAttrAmdSevSnp;
+    default:
+      return FALSE;
+  }
+}
+
+/**
+  Check if the specified confidential computing attribute is active.
+
+  @param[in]  Attr          The attribute to check.
+
+  @retval TRUE   The specified Attr is active.
+  @retval FALSE  The specified Attr is not active.
+
+**/
+BOOLEAN
+EFIAPI
+ConfidentialComputingGuestHas (
+  IN  CONFIDENTIAL_COMPUTING_GUEST_ATTR  Attr
+  )
+{
+  UINT64  CurrentAttr;
+
+  //
+  // Get the current CC attribute.
+  //
+  CurrentAttr = PcdGet64 (PcdConfidentialComputingGuestAttr);
+
+  //
+  // If attr is for the AMD group then call AMD specific checks.
+  //
+  if (((RShiftU64 (CurrentAttr, 8)) & 0xff) == 1) {
+    return AmdMemEncryptionAttrCheck (CurrentAttr, Attr);
+  }
+
+  return (CurrentAttr == Attr);
 }

@@ -23,6 +23,8 @@
 
 [Sources]
   SecMain.c
+  AmdSev.c
+  AmdSev.h
 
 [Sources.IA32]
   Ia32/SecEntry.nasm
@@ -50,6 +52,7 @@
   PeCoffExtraActionLib
   ExtractGuidedSectionLib
   LocalApicLib
+  MemEncryptSevLib
   CpuExceptionHandlerLib
 
 [Ppis]
@@ -72,6 +75,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedStart
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedEnd
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
