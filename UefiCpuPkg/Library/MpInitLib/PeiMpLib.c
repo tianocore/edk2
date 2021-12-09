@@ -225,7 +225,7 @@ GetWakeupBuffer (
         // Need memory under 1MB to be collected here
         //
         WakeupBufferEnd = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
-        if (PcdGetBool (PcdSevEsIsEnabled) &&
+        if (ConfidentialComputingGuestHas (CCAttrAmdSevEs) &&
             (WakeupBufferEnd > mSevEsPeiWakeupBuffer))
         {
           //
@@ -264,7 +264,7 @@ GetWakeupBuffer (
             WakeupBufferSize
             ));
 
-          if (PcdGetBool (PcdSevEsIsEnabled)) {
+          if (ConfidentialComputingGuestHas (CCAttrAmdSevEs)) {
             //
             // Next SEV-ES wakeup buffer allocation must be below this
             // allocation
