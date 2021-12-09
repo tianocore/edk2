@@ -60,3 +60,5 @@
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedEnd
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedStart
