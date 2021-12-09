@@ -109,6 +109,7 @@
 %include "Ia32/AmdSev.asm"
 %include "Ia32/PageTables64.asm"
 %include "Ia32/IntelTdx.asm"
+%include "X64/OvmfSevMetadata.asm"
 %endif
 
 %include "Ia16/Real16ToFlat32.asm"
