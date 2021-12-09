@@ -92,6 +92,7 @@ struc MP_CPU_EXCHANGE_INFO
   .ModeHighSegment:              CTYPE_UINT16 1
   .Enable5LevelPaging:           CTYPE_BOOLEAN 1
   .SevEsIsEnabled:               CTYPE_BOOLEAN 1
+  .SevSnpIsEnabled               CTYPE_BOOLEAN 1
   .GhcbBase:                     CTYPE_UINTN 1
 endstruc
 
