@@ -151,7 +151,6 @@ DescribeExceptionSyndrome (
   DEBUG ((DEBUG_ERROR, "\n %a \n", Message));
 }
 
-#ifndef MDEPKG_NDEBUG
 STATIC
 CONST CHAR8 *
 BaseName (
@@ -170,8 +169,6 @@ BaseName (
 
   return Str;
 }
-
-#endif
 
 /**
   This is the default action to take on an unexpected exception
