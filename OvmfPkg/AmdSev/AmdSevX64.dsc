@@ -575,6 +575,9 @@
 
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
 
+  # Set ConfidentialComputing defaults
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
+
 !if $(TPM_ENABLE) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 !endif

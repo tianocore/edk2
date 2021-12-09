@@ -659,6 +659,9 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 !endif
 
+  # Set ConfidentialComputing defaults
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
+
 [PcdsDynamicDefault.X64]
   # IPv4 and IPv6 PXE Boot support.
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01
