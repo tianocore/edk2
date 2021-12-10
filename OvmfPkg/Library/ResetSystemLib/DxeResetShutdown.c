@@ -16,6 +16,7 @@
 #include <OvmfPlatforms.h>          // PIIX4_PMBA_VALUE
 
 STATIC UINT16  mAcpiPmBaseAddress;
+STATIC UINT16  mAcpiHwReducedSleepCtl;
 
 EFI_STATUS
 EFIAPI
@@ -33,6 +34,9 @@ DxeResetInit (
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
       mAcpiPmBaseAddress = ICH9_PMBASE_VALUE;
+      break;
+    case CLOUDHV_DEVICE_ID:
+      mAcpiHwReducedSleepCtl = CLOUDHV_ACPI_SHUTDOWN_IO_ADDRESS;
       break;
     default:
       ASSERT (FALSE);
@@ -56,7 +60,11 @@ ResetShutdown (
   VOID
   )
 {
-  IoBitFieldWrite16 (mAcpiPmBaseAddress + 4, 10, 13, 0);
-  IoOr16 (mAcpiPmBaseAddress + 4, BIT13);
+  if (mAcpiHwReducedSleepCtl) {
+    IoWrite8 (mAcpiHwReducedSleepCtl, 5 << 2 | 1 << 5);
+  } else {
+    IoBitFieldWrite16 (mAcpiPmBaseAddress + 4, 10, 13, 0);
+    IoOr16 (mAcpiPmBaseAddress + 4, BIT13);
+  }
   CpuDeadLoop ();
 }
