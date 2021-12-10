@@ -24,6 +24,7 @@
 #
 
 [Sources]
+  EntryPoint.c
   Qemu.c
   SmbiosPlatformDxe.c
   SmbiosPlatformDxe.h
