@@ -24,6 +24,7 @@
   AcpiPlatform.c
   AcpiPlatform.h
   BootScript.c
+  CloudHvAcpi.c
   EntryPoint.c
   PciDecoding.c
   QemuFwCfgAcpi.c
@@ -54,6 +55,7 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
 
 [Depex]
   gEfiAcpiTableProtocolGuid
