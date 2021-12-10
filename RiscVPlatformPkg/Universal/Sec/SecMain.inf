@@ -32,7 +32,7 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
-  Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec
+  RiscVPlatformPkg/RiscVPlatformPkg.dec
 
 [LibraryClasses]
   BaseLib

@@ -40,7 +40,7 @@
 
 [LibraryClasses.common]
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
-  RiscVOpensbiPlatformLib|Platform/RISC-V/PlatformPkg/Library/OpensbiPlatformLib/OpensbiPlatformLib.inf
+  RiscVOpensbiPlatformLib|RiscVPlatformPkg/Library/OpensbiPlatformLib/OpensbiPlatformLib.inf
   RiscVCpuLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVCpuLib/RiscVCpuLib.inf
   RiscVEdk2SbiLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVEdk2SbiLib/RiscVEdk2SbiLib.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
@@ -60,11 +60,11 @@
 
 [LibraryClasses.common.PEI_CORE]
   # RISC-V platform PEI core entry point.
-  PeiCoreEntryPoint|Platform/RISC-V/PlatformPkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
-  PlatformSecPpiLib|Platform/RISC-V/PlatformPkg/Library/PlatformSecPpiLibNull/PlatformSecPpiLibNull.inf
+  PeiCoreEntryPoint|RiscVPlatformPkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
+  PlatformSecPpiLib|RiscVPlatformPkg/Library/PlatformSecPpiLibNull/PlatformSecPpiLibNull.inf
 
 [LibraryClasses.common.PEIM]
-  FirmwareContextProcessorSpecificLib|Platform/RISC-V/PlatformPkg/Library/FirmwareContextProcessorSpecificLib/FirmwareContextProcessorSpecificLib.inf
+  FirmwareContextProcessorSpecificLib|RiscVPlatformPkg/Library/FirmwareContextProcessorSpecificLib/FirmwareContextProcessorSpecificLib.inf
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
@@ -72,24 +72,24 @@
 [LibraryClasses.common.SEC]
   ExtractGuidedSectionLib|MdePkg/Library/BaseExtractGuidedSectionLib/BaseExtractGuidedSectionLib.inf
   RiscVOpensbiLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVOpensbiLib/RiscVOpensbiLib.inf
-  Edk2OpensbiPlatformWrapperLib|Platform/RISC-V/PlatformPkg/Library/Edk2OpensbiPlatformWrapperLib/Edk2OpensbiPlatformWrapperLib.inf
-  RiscVSpecialPlatformLib|Platform/RISC-V/PlatformPkg/Library/RiscVSpecialPlatformLibNull/RiscVSpecialPlatformLibNull.inf
+  Edk2OpensbiPlatformWrapperLib|RiscVPlatformPkg/Library/Edk2OpensbiPlatformWrapperLib/Edk2OpensbiPlatformWrapperLib.inf
+  RiscVSpecialPlatformLib|RiscVPlatformPkg/Library/RiscVSpecialPlatformLibNull/RiscVSpecialPlatformLibNull.inf
 
 [LibraryClasses.common.DXE_DRIVER]
-  PlatformBootManagerLib|Platform/RISC-V/PlatformPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+  PlatformBootManagerLib|RiscVPlatformPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
 
 [Components.common]
-  Platform/RISC-V/PlatformPkg/Library/OpensbiPlatformLib/OpensbiPlatformLib.inf
-  Platform/RISC-V/PlatformPkg/Library/PlatformMemoryTestLibNull/PlatformMemoryTestLibNull.inf
-  Platform/RISC-V/PlatformPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
-  Platform/RISC-V/PlatformPkg/Library/PlatformUpdateProgressLibNull/PlatformUpdateProgressLibNull.inf
-  Platform/RISC-V/PlatformPkg/Library/FirmwareContextProcessorSpecificLib/FirmwareContextProcessorSpecificLib.inf
-  Platform/RISC-V/PlatformPkg/Library/RiscVPlatformTempMemoryInitLibNull/RiscVPlatformTempMemoryInitLibNull.inf
-  Platform/RISC-V/PlatformPkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
-  Platform/RISC-V/PlatformPkg/Library/PlatformSecPpiLibNull/PlatformSecPpiLibNull.inf
-  Platform/RISC-V/PlatformPkg/Library/RiscVSpecialPlatformLibNull/RiscVSpecialPlatformLibNull.inf
-  Platform/RISC-V/PlatformPkg/Library/Edk2OpensbiPlatformWrapperLib/Edk2OpensbiPlatformWrapperLib.inf
+  RiscVPlatformPkg/Library/OpensbiPlatformLib/OpensbiPlatformLib.inf
+  RiscVPlatformPkg/Library/PlatformMemoryTestLibNull/PlatformMemoryTestLibNull.inf
+  RiscVPlatformPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+  RiscVPlatformPkg/Library/PlatformUpdateProgressLibNull/PlatformUpdateProgressLibNull.inf
+  RiscVPlatformPkg/Library/FirmwareContextProcessorSpecificLib/FirmwareContextProcessorSpecificLib.inf
+  RiscVPlatformPkg/Library/RiscVPlatformTempMemoryInitLibNull/RiscVPlatformTempMemoryInitLibNull.inf
+  RiscVPlatformPkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
+  RiscVPlatformPkg/Library/PlatformSecPpiLibNull/PlatformSecPpiLibNull.inf
+  RiscVPlatformPkg/Library/RiscVSpecialPlatformLibNull/RiscVSpecialPlatformLibNull.inf
+  RiscVPlatformPkg/Library/Edk2OpensbiPlatformWrapperLib/Edk2OpensbiPlatformWrapperLib.inf
 
 [Components.common.SEC]
-  Platform/RISC-V/PlatformPkg/Universal/Sec/SecMain.inf
+  RiscVPlatformPkg/Universal/Sec/SecMain.inf
 

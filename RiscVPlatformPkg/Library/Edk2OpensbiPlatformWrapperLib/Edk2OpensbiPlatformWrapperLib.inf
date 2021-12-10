@@ -1,7 +1,5 @@
 ## @file
-#  RISC-V OpenSBI Platform Library
-#  This is the the library which provides platform
-#  level opensbi functions follow RISC-V OpenSBI implementation.
+#  EDK2 OpenSBI generic platform wrapper library
 #
 #  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
@@ -11,11 +9,11 @@
 
 [Defines]
   INF_VERSION                    = 0x0001001b
-  BASE_NAME                      = RiscVOpensbiPlatformLib
-  FILE_GUID                      = 80C09428-44DD-437F-8252-F7AB64711AA5
+  BASE_NAME                      = Edk2OpensbiPlatformWrapperLib
+  FILE_GUID                      = 364395A3-21BA-400C-96F7-5D9817F6FEE5
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = RiscVOpensbiPlatformLib
+  LIBRARY_CLASS                  = Edk2OpensbiPlatformWrapperLib
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -24,28 +22,23 @@
 #
 
 [Sources]
-  Platform.c
+  Edk2OpensbiPlatformWrapperLib.c
 
 [Packages]
-  EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-  Platform/SiFive/U5SeriesPkg/U5SeriesPkg.dec
-  Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec
+  RiscVPlatformPkg/RiscVPlatformPkg.dec
   Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
+
+[Pcd]
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFirmwareDomainBaseAddress
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFirmwareDomainSize
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFirmwareRegionBaseAddress
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFirmwareRegionSize
 
 [LibraryClasses]
   BaseLib
-  BaseMemoryLib
   DebugLib
   DebugAgentLib
-  FdtLib
   PcdLib
   PrintLib
-  RiscVCpuLib
-  RiscVSpecialPlatformLib
-
-[FixedPcd]
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdOpenSbiStackSize
-
-

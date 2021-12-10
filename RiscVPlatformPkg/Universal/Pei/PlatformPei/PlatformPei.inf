@@ -31,10 +31,8 @@
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-  Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec
-  Platform/SiFive/U5SeriesPkg/U5SeriesPkg.dec
+  RiscVPlatformPkg/RiscVPlatformPkg.dec
   Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
-  Silicon/SiFive/SiFive.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
 [Guids]
