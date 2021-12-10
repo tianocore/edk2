@@ -16,6 +16,7 @@
 #include <IndustryStandard/I440FxPiix4.h>
 #include <IndustryStandard/Bhyve.h>
 #include <IndustryStandard/Microvm.h>
+#include <IndustryStandard/CloudHv.h>
 
 //
 // OVMF Host Bridge DID Address
