@@ -5,6 +5,7 @@
 **/
 
 #include <Library/MemoryAllocationLib.h> // FreePool()
+#include <OvmfPlatforms.h>               // CLOUDHV_DEVICE_ID
 
 #include "SmbiosPlatformDxe.h"
 
@@ -27,15 +28,24 @@ SmbiosTablePublishEntry (
 {
   EFI_STATUS  Status;
   UINT8       *SmbiosTables;
+  UINT16      HostBridgeDevId;
 
   Status = EFI_NOT_FOUND;
   //
-  // Add QEMU SMBIOS data if found
+  // Add SMBIOS data if found
   //
-  SmbiosTables = GetQemuSmbiosTables ();
-  if (SmbiosTables != NULL) {
-    Status = InstallAllStructures (SmbiosTables);
-    FreePool (SmbiosTables);
+  HostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
+  if (HostBridgeDevId == CLOUDHV_DEVICE_ID) {
+    SmbiosTables = GetCloudHvSmbiosTables ();
+    if (SmbiosTables != NULL) {
+      Status = InstallAllStructures (SmbiosTables);
+    }
+  } else {
+    SmbiosTables = GetQemuSmbiosTables ();
+    if (SmbiosTables != NULL) {
+      Status = InstallAllStructures (SmbiosTables);
+      FreePool (SmbiosTables);
+    }
   }
 
   return Status;

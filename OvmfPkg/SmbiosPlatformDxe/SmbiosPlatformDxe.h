@@ -33,4 +33,15 @@ GetQemuSmbiosTables (
   VOID
   );
 
+/**
+  Locates and extracts Cloud Hypervisor SMBIOS data
+
+  @return                 Address of extracted Cloud Hypervisor SMBIOS data
+
+**/
+UINT8 *
+GetCloudHvSmbiosTables (
+  VOID
+  );
+
 #endif
