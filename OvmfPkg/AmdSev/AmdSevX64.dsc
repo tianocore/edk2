@@ -775,7 +775,7 @@
   # ACPI Support
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
+  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
 
   #
