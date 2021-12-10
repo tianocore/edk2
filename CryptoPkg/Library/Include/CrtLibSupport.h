@@ -4,6 +4,7 @@
 
 Copyright (c) 2010 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -46,7 +47,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define CONFIG_HEADER_BN_H
 
 #if !defined (SIXTY_FOUR_BIT) && !defined (THIRTY_TWO_BIT)
-  #if defined (MDE_CPU_X64) || defined (MDE_CPU_AARCH64) || defined (MDE_CPU_IA64) || defined (MDE_CPU_RISCV64)
+  #if defined (MDE_CPU_X64) || defined (MDE_CPU_AARCH64) || defined (MDE_CPU_IA64) || defined (MDE_CPU_RISCV64) || defined (MDE_CPU_LOONGARCH64)
 //
 // With GCC we would normally use SIXTY_FOUR_BIT_LONG, but MSVC needs
 // SIXTY_FOUR_BIT, because 'long' is 32-bit and only 'long long' is
