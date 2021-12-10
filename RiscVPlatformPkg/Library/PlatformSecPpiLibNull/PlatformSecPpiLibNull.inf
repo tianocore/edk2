@@ -28,7 +28,6 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   RiscVPlatformPkg/RiscVPlatformPkg.dec
-  #Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
 
 [LibraryClasses]
   #BaseLib

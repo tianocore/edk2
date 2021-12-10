@@ -41,8 +41,8 @@
 [LibraryClasses.common]
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
   RiscVOpensbiPlatformLib|RiscVPlatformPkg/Library/OpensbiPlatformLib/OpensbiPlatformLib.inf
-  RiscVCpuLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVCpuLib/RiscVCpuLib.inf
-  RiscVEdk2SbiLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVEdk2SbiLib/RiscVEdk2SbiLib.inf
+  RiscVCpuLib|RiscVPkg/Library/RiscVCpuLib/RiscVCpuLib.inf
+  RiscVEdk2SbiLib|RiscVPkg/Library/RiscVEdk2SbiLib/RiscVEdk2SbiLib.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
@@ -71,7 +71,7 @@
 
 [LibraryClasses.common.SEC]
   ExtractGuidedSectionLib|MdePkg/Library/BaseExtractGuidedSectionLib/BaseExtractGuidedSectionLib.inf
-  RiscVOpensbiLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVOpensbiLib/RiscVOpensbiLib.inf
+  RiscVOpensbiLib|RiscVPkg/Library/RiscVOpensbiLib/RiscVOpensbiLib.inf
   Edk2OpensbiPlatformWrapperLib|RiscVPlatformPkg/Library/Edk2OpensbiPlatformWrapperLib/Edk2OpensbiPlatformWrapperLib.inf
   RiscVSpecialPlatformLib|RiscVPlatformPkg/Library/RiscVSpecialPlatformLibNull/RiscVSpecialPlatformLibNull.inf
 

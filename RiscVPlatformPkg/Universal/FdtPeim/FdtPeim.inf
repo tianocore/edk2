@@ -30,7 +30,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
+  RiscVPkg/RiscVPkg.dec
 
 [LibraryClasses]
   DebugLib

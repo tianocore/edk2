@@ -1,0 +1,34 @@
+## @file
+# Instance of OpebSBI Firmware Conext Library
+#
+# This iinstance uses RISC-V OpenSBI Firmware Extension SBI.
+#
+#  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = RiscVFirmwareContextSbiLib
+  FILE_GUID                      = 3709E048-6794-427A-B728-BFE3FFD6D461
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RiscVFirmwareContextLib|PEIM PEI_CORE
+
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+[Sources]
+  RiscVFirmwareContextSbiLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  RiscVPkg/RiscVPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  RiscVCpuLib
+  RiscVEdk2SbiLib
+
