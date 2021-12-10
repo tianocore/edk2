@@ -16,6 +16,7 @@ Module Name:
 #include <IndustryStandard/E820.h>
 #include <IndustryStandard/I440FxPiix4.h>
 #include <IndustryStandard/Q35MchIch9.h>
+#include <IndustryStandard/CloudHv.h>
 #include <PiPei.h>
 #include <Register/Intel/SmramSaveStateMap.h>
 
@@ -156,6 +157,12 @@ QemuUc32BaseInitialization (
     //
     ASSERT (FixedPcdGet64 (PcdPciExpressBaseAddress) <= MAX_UINT32);
     mQemuUc32Base = (UINT32)FixedPcdGet64 (PcdPciExpressBaseAddress);
+    return;
+  }
+
+  if (mHostBridgeDevId == CLOUDHV_DEVICE_ID) {
+    Uc32Size = CLOUDHV_MMIO_HOLE_SIZE;
+    mQemuUc32Base = CLOUDHV_MMIO_HOLE_ADDRESS;
     return;
   }
 
@@ -819,7 +826,7 @@ QemuInitializeRam (
   // practically any alignment, and we may not have enough variable MTRRs to
   // cover it exactly.
   //
-  if (IsMtrrSupported ()) {
+  if (IsMtrrSupported () && mHostBridgeDevId != CLOUDHV_DEVICE_ID) {
     MtrrGetAllMtrrs (&MtrrSettings);
 
     //
