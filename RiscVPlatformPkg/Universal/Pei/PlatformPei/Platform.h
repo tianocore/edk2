@@ -83,4 +83,15 @@ InitializeXen (
   VOID
   );
 
+/**
+  Build processor and platform information for the U5 platform
+
+  @return EFI_SUCCESS     Status.
+
+**/
+EFI_STATUS
+BuildRiscVSmbiosHobs (
+  VOID
+);
+
 #endif // _PLATFORM_PEI_H_INCLUDED_

@@ -30,8 +30,6 @@
 #include <Ppi/MasterBootMode.h>
 #include <IndustryStandard/Pci22.h>
 
-#include <SiFiveU5MCCoreplex.h>
-
 #include "Platform.h"
 
 EFI_MEMORY_TYPE_INFORMATION mDefaultMemoryTypeInformation[] = {

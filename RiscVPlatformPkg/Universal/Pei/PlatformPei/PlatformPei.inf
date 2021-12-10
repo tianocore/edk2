@@ -37,7 +37,6 @@
 
 [Guids]
   gEfiMemoryTypeInformationGuid
-  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid
 
 [LibraryClasses]
   DebugLib
@@ -62,8 +61,6 @@
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDxeFvSize
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamBase
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamSize
-  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdNumberofU5Cores
-  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdE5MCSupported
 
 [Ppis]
   gEfiPeiMasterBootModePpiGuid
