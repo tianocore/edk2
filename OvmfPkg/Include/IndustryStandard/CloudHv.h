@@ -33,4 +33,9 @@
 //
 #define CLOUDHV_MMIO_HOLE_SIZE  0x38000000
 
+//
+// SMBIOS address
+//
+#define CLOUDHV_SMBIOS_ADDRESS  0xf0000
+
 #endif // __CLOUDHV_H__
