@@ -270,7 +270,7 @@ INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 INF  OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 
 INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-INF  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
+INF  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
 INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
 
 INF  FatPkg/EnhancedFatDxe/Fat.inf
