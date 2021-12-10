@@ -1,5 +1,5 @@
 /** @file
-  OVMF ACPI Platform Driver using QEMU's fw-cfg interface
+  OVMF ACPI Platform Driver
 
   Copyright (C) 2015, Red Hat, Inc.
   Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
@@ -10,7 +10,7 @@
 #include "AcpiPlatform.h"
 
 /**
-  Effective entrypoint of QEMU fw-cfg Acpi Platform driver.
+  Effective entrypoint of Acpi Platform driver.
 
   @param  ImageHandle
   @param  SystemTable
