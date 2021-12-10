@@ -19,14 +19,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Protocol/Reset.h>
 
-
 VOID
 EFIAPI
 EmuResetSystem (
-  IN EFI_RESET_TYPE   ResetType,
-  IN EFI_STATUS       ResetStatus,
-  IN UINTN            DataSize,
-  IN VOID             *ResetData OPTIONAL
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
   )
 {
   EFI_STATUS  Status;
@@ -52,7 +51,6 @@ EmuResetSystem (
     gBS->FreePool (HandleBuffer);
   }
 
-
   //
   // Discard ResetType, always return 0 as exit code
   //
@@ -66,14 +64,13 @@ EmuResetSystem (
   return;
 }
 
-
-
 EFI_STATUS
 EFIAPI
 InitializeEmuReset (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
+
 /*++
 
 Routine Description:
@@ -105,4 +102,3 @@ Returns:
 
   return Status;
 }
-

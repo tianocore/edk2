@@ -19,8 +19,179 @@
 #include <PiPei.h>
 #include <Register/Amd/Msr.h>
 #include <Register/Intel/SmramSaveStateMap.h>
+#include <Library/VmgExitLib.h>
+#include <ConfidentialComputingGuestAttr.h>
 
 #include "Platform.h"
+
+STATIC
+UINT64
+GetHypervisorFeature (
+  VOID
+  );
+
+/**
+  Initialize SEV-SNP support if running as an SEV-SNP guest.
+
+**/
+STATIC
+VOID
+AmdSevSnpInitialize (
+  VOID
+  )
+{
+  EFI_PEI_HOB_POINTERS         Hob;
+  EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
+  UINT64                       HvFeatures;
+  EFI_STATUS                   PcdStatus;
+
+  if (!MemEncryptSevSnpIsEnabled ()) {
+    return;
+  }
+
+  //
+  // Query the hypervisor feature using the VmgExit and set the value in the
+  // hypervisor features PCD.
+  //
+  HvFeatures = GetHypervisorFeature ();
+  PcdStatus  = PcdSet64S (PcdGhcbHypervisorFeatures, HvFeatures);
+  ASSERT_RETURN_ERROR (PcdStatus);
+
+  //
+  // Iterate through the system RAM and validate it.
+  //
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if ((Hob.Raw != NULL) && (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR)) {
+      ResourceHob = Hob.ResourceDescriptor;
+
+      if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
+        MemEncryptSevSnpPreValidateSystemRam (
+          ResourceHob->PhysicalStart,
+          EFI_SIZE_TO_PAGES ((UINTN)ResourceHob->ResourceLength)
+          );
+      }
+    }
+  }
+}
+
+/**
+  Handle an SEV-SNP/GHCB protocol check failure.
+
+  Notify the hypervisor using the VMGEXIT instruction that the SEV-SNP guest
+  wishes to be terminated.
+
+  @param[in] ReasonCode  Reason code to provide to the hypervisor for the
+                         termination request.
+
+**/
+STATIC
+VOID
+SevEsProtocolFailure (
+  IN UINT8  ReasonCode
+  )
+{
+  MSR_SEV_ES_GHCB_REGISTER  Msr;
+
+  //
+  // Use the GHCB MSR Protocol to request termination by the hypervisor
+  //
+  Msr.GhcbPhysicalAddress         = 0;
+  Msr.GhcbTerminate.Function      = GHCB_INFO_TERMINATE_REQUEST;
+  Msr.GhcbTerminate.ReasonCodeSet = GHCB_TERMINATE_GHCB;
+  Msr.GhcbTerminate.ReasonCode    = ReasonCode;
+  AsmWriteMsr64 (MSR_SEV_ES_GHCB, Msr.GhcbPhysicalAddress);
+
+  AsmVmgExit ();
+
+  ASSERT (FALSE);
+  CpuDeadLoop ();
+}
+
+/**
+ Get the hypervisor features bitmap
+
+**/
+STATIC
+UINT64
+GetHypervisorFeature (
+  VOID
+  )
+{
+  UINT64                    Status;
+  GHCB                      *Ghcb;
+  MSR_SEV_ES_GHCB_REGISTER  Msr;
+  BOOLEAN                   InterruptState;
+  UINT64                    Features;
+
+  Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+  Ghcb                    = Msr.Ghcb;
+
+  //
+  // Initialize the GHCB
+  //
+  VmgInit (Ghcb, &InterruptState);
+
+  //
+  // Query the Hypervisor Features.
+  //
+  Status = VmgExit (Ghcb, SVM_EXIT_HYPERVISOR_FEATURES, 0, 0);
+  if ((Status != 0)) {
+    SevEsProtocolFailure (GHCB_TERMINATE_GHCB_GENERAL);
+  }
+
+  Features = Ghcb->SaveArea.SwExitInfo2;
+
+  VmgDone (Ghcb, InterruptState);
+
+  return Features;
+}
+
+/**
+
+  This function can be used to register the GHCB GPA.
+
+  @param[in]  Address           The physical address to be registered.
+
+**/
+STATIC
+VOID
+GhcbRegister (
+  IN  EFI_PHYSICAL_ADDRESS  Address
+  )
+{
+  MSR_SEV_ES_GHCB_REGISTER  Msr;
+  MSR_SEV_ES_GHCB_REGISTER  CurrentMsr;
+
+  //
+  // Save the current MSR Value
+  //
+  CurrentMsr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+
+  //
+  // Use the GHCB MSR Protocol to request to register the GPA.
+  //
+  Msr.GhcbPhysicalAddress      = Address & ~EFI_PAGE_MASK;
+  Msr.GhcbGpaRegister.Function = GHCB_INFO_GHCB_GPA_REGISTER_REQUEST;
+  AsmWriteMsr64 (MSR_SEV_ES_GHCB, Msr.GhcbPhysicalAddress);
+
+  AsmVmgExit ();
+
+  Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+
+  //
+  // If hypervisor responded with a different GPA than requested then fail.
+  //
+  if ((Msr.GhcbGpaRegister.Function != GHCB_INFO_GHCB_GPA_REGISTER_RESPONSE) ||
+      ((Msr.GhcbPhysicalAddress & ~EFI_PAGE_MASK) != Address))
+  {
+    SevEsProtocolFailure (GHCB_TERMINATE_GHCB_GENERAL);
+  }
+
+  //
+  // Restore the MSR
+  //
+  AsmWriteMsr64 (MSR_SEV_ES_GHCB, CurrentMsr.GhcbPhysicalAddress);
+}
 
 /**
 
@@ -58,10 +229,10 @@ AmdSevEsInitialize (
   //   make them reserved.
   //
   GhcbPageCount = mMaxCpuCount * 2;
-  GhcbBase = AllocateReservedPages (GhcbPageCount);
+  GhcbBase      = AllocateReservedPages (GhcbPageCount);
   ASSERT (GhcbBase != NULL);
 
-  GhcbBasePa = (PHYSICAL_ADDRESS)(UINTN) GhcbBase;
+  GhcbBasePa = (PHYSICAL_ADDRESS)(UINTN)GhcbBase;
 
   //
   // Each vCPU gets two consecutive pages, the first is the GHCB and the
@@ -70,10 +241,10 @@ AmdSevEsInitialize (
   //
   for (PageCount = 0; PageCount < GhcbPageCount; PageCount += 2) {
     DecryptStatus = MemEncryptSevClearPageEncMask (
-      0,
-      GhcbBasePa + EFI_PAGES_TO_SIZE (PageCount),
-      1
-      );
+                      0,
+                      GhcbBasePa + EFI_PAGES_TO_SIZE (PageCount),
+                      1
+                      );
     ASSERT_RETURN_ERROR (DecryptStatus);
   }
 
@@ -84,16 +255,19 @@ AmdSevEsInitialize (
   PcdStatus = PcdSet64S (PcdGhcbSize, EFI_PAGES_TO_SIZE (GhcbPageCount));
   ASSERT_RETURN_ERROR (PcdStatus);
 
-  DEBUG ((DEBUG_INFO,
+  DEBUG ((
+    DEBUG_INFO,
     "SEV-ES is enabled, %lu GHCB pages allocated starting at 0x%p\n",
-    (UINT64)GhcbPageCount, GhcbBase));
+    (UINT64)GhcbPageCount,
+    GhcbBase
+    ));
 
   //
   // Allocate #VC recursion backup pages. The number of backup pages needed is
   // one less than the maximum VC count.
   //
   GhcbBackupPageCount = mMaxCpuCount * (VMGEXIT_MAXIMUM_VC_COUNT - 1);
-  GhcbBackupBase = AllocatePages (GhcbBackupPageCount);
+  GhcbBackupBase      = AllocatePages (GhcbBackupPageCount);
   ASSERT (GhcbBackupBase != NULL);
 
   GhcbBackupPages = GhcbBackupBase;
@@ -105,9 +279,19 @@ AmdSevEsInitialize (
     GhcbBackupPages += EFI_PAGE_SIZE * (VMGEXIT_MAXIMUM_VC_COUNT - 1);
   }
 
-  DEBUG ((DEBUG_INFO,
+  DEBUG ((
+    DEBUG_INFO,
     "SEV-ES is enabled, %lu GHCB backup pages allocated starting at 0x%p\n",
-    (UINT64)GhcbBackupPageCount, GhcbBackupBase));
+    (UINT64)GhcbBackupPageCount,
+    GhcbBackupBase
+    ));
+
+  //
+  // SEV-SNP guest requires that GHCB GPA must be registered before using it.
+  //
+  if (MemEncryptSevSnpIsEnabled ()) {
+    GhcbRegister (GhcbBasePa);
+  }
 
   AsmWriteMsr64 (MSR_SEV_ES_GHCB, GhcbBasePa);
 
@@ -120,11 +304,11 @@ AmdSevEsInitialize (
   //
   AsmReadGdtr (&Gdtr);
 
-  Gdt = AllocatePages (EFI_SIZE_TO_PAGES ((UINTN) Gdtr.Limit + 1));
+  Gdt = AllocatePages (EFI_SIZE_TO_PAGES ((UINTN)Gdtr.Limit + 1));
   ASSERT (Gdt != NULL);
 
-  CopyMem (Gdt, (VOID *) Gdtr.Base, Gdtr.Limit + 1);
-  Gdtr.Base = (UINTN) Gdt;
+  CopyMem (Gdt, (VOID *)Gdtr.Base, Gdtr.Limit + 1);
+  Gdtr.Base = (UINTN)Gdt;
   AsmWriteGdtr (&Gdtr);
 }
 
@@ -139,8 +323,8 @@ AmdSevInitialize (
   VOID
   )
 {
-  UINT64                            EncryptionMask;
-  RETURN_STATUS                     PcdStatus;
+  UINT64         EncryptionMask;
+  RETURN_STATUS  PcdStatus;
 
   //
   // Check if SEV is enabled
@@ -150,10 +334,18 @@ AmdSevInitialize (
   }
 
   //
+  // Check and perform SEV-SNP initialization if required. This need to be
+  // done before the GHCB page is made shared in the AmdSevEsInitialize(). This
+  // is because the system RAM must be validated before it is made shared.
+  // The AmdSevSnpInitialize() validates the system RAM.
+  //
+  AmdSevSnpInitialize ();
+
+  //
   // Set Memory Encryption Mask PCD
   //
   EncryptionMask = MemEncryptSevGetEncryptionMask ();
-  PcdStatus = PcdSet64S (PcdPteMemoryEncryptionAddressOrMask, EncryptionMask);
+  PcdStatus      = PcdSet64S (PcdPteMemoryEncryptionAddressOrMask, EncryptionMask);
   ASSERT_RETURN_ERROR (PcdStatus);
 
   DEBUG ((DEBUG_INFO, "SEV is enabled (mask 0x%lx)\n", EncryptionMask));
@@ -176,9 +368,9 @@ AmdSevInitialize (
   // hypervisor.
   //
   if (FeaturePcdGet (PcdSmmSmramRequire) && (mBootMode != BOOT_ON_S3_RESUME)) {
-    RETURN_STATUS LocateMapStatus;
-    UINTN         MapPagesBase;
-    UINTN         MapPagesCount;
+    RETURN_STATUS  LocateMapStatus;
+    UINTN          MapPagesBase;
+    UINTN          MapPagesCount;
 
     LocateMapStatus = MemEncryptSevLocateInitialSmramSaveStateMapPages (
                         &MapPagesBase,
@@ -209,4 +401,49 @@ AmdSevInitialize (
   // Check and perform SEV-ES initialization if required.
   //
   AmdSevEsInitialize ();
+
+  //
+  // Set the Confidential computing attr PCD to communicate which SEV
+  // technology is active.
+  //
+  if (MemEncryptSevSnpIsEnabled ()) {
+    PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrAmdSevSnp);
+  } else if (MemEncryptSevEsIsEnabled ()) {
+    PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrAmdSevEs);
+  } else {
+    PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrAmdSev);
+  }
+
+  ASSERT_RETURN_ERROR (PcdStatus);
+}
+
+/**
+ The function performs SEV specific region initialization.
+
+ **/
+VOID
+SevInitializeRam (
+  VOID
+  )
+{
+  if (MemEncryptSevSnpIsEnabled ()) {
+    //
+    // If SEV-SNP is enabled, reserve the Secrets and CPUID memory area.
+    //
+    // This memory range is given to the PSP by the hypervisor to populate
+    // the information used during the SNP VM boots, and it need to persist
+    // across the kexec boots. Mark it as EfiReservedMemoryType so that
+    // the guest firmware and OS does not use it as a system memory.
+    //
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfSnpSecretsBase),
+      (UINT64)(UINTN)PcdGet32 (PcdOvmfSnpSecretsSize),
+      EfiReservedMemoryType
+      );
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfCpuidBase),
+      (UINT64)(UINTN)PcdGet32 (PcdOvmfCpuidSize),
+      EfiReservedMemoryType
+      );
+  }
 }

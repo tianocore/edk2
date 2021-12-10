@@ -21,10 +21,10 @@
 #include <Library/UnitTestLib.h>
 #include <Library/SortLib.h>
 
-#define UNIT_TEST_APP_NAME        "UefiSortLib Unit Tests"
-#define UNIT_TEST_APP_VERSION     "1.0"
+#define UNIT_TEST_APP_NAME     "UefiSortLib Unit Tests"
+#define UNIT_TEST_APP_VERSION  "1.0"
 
-#define TEST_ARRAY_SIZE_9         9
+#define TEST_ARRAY_SIZE_9  9
 
 /**
   The function is called by PerformQuickSort to compare int values.
@@ -40,13 +40,13 @@
 INTN
 EFIAPI
 TestCompareFunction (
-  IN CONST VOID                         *Left,
-  IN CONST VOID                         *Right
+  IN CONST VOID  *Left,
+  IN CONST VOID  *Right
   )
 {
-  if (*(UINT32*)Right > *(UINT32*)Left) {
+  if (*(UINT32 *)Right > *(UINT32 *)Left) {
     return 1;
-  } else if (*(UINT32*)Right < *(UINT32*)Left) {
+  } else if (*(UINT32 *)Right < *(UINT32 *)Left) {
     return -1;
   }
 
@@ -74,10 +74,10 @@ SortUINT32ArrayShouldSucceed (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
-  UINTN  TestCount;
-  UINT32 Index;
-  UINT32 TestBuffer[TEST_ARRAY_SIZE_9];
-  UINT32 TestResult[TEST_ARRAY_SIZE_9];
+  UINTN   TestCount;
+  UINT32  Index;
+  UINT32  TestBuffer[TEST_ARRAY_SIZE_9];
+  UINT32  TestResult[TEST_ARRAY_SIZE_9];
 
   TestCount = TEST_ARRAY_SIZE_9;
   for (Index = 0; Index < TEST_ARRAY_SIZE_9; Index++) {
@@ -112,8 +112,8 @@ CompareSameBufferShouldSucceed (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
-  INTN retval;
-  CONST CHAR16* TestBuffer[] = { L"abcdefg" };
+  INTN          retval;
+  CONST CHAR16  *TestBuffer[] = { L"abcdefg" };
 
   retval = StringCompare (TestBuffer, TestBuffer);
   UT_ASSERT_TRUE (retval == 0);
@@ -142,7 +142,7 @@ UnitTestingEntry (
 
   Framework = NULL;
 
-  DEBUG(( DEBUG_INFO, "%a v%a\n", UNIT_TEST_APP_NAME, UNIT_TEST_APP_VERSION ));
+  DEBUG ((DEBUG_INFO, "%a v%a\n", UNIT_TEST_APP_NAME, UNIT_TEST_APP_VERSION));
 
   //
   // Start setting up the test framework for running the tests.
@@ -166,8 +166,8 @@ UnitTestingEntry (
   //
   // --------------Suite--------Description------------Name--------------Function----------------Pre---Post---Context-----------
   //
-  AddTestCase (SortTests, "Sort the Array",        "Sort",       SortUINT32ArrayShouldSucceed,   NULL, NULL, NULL);
-  AddTestCase (SortTests, "Compare the Buffer",    "Compare",    CompareSameBufferShouldSucceed, NULL, NULL, NULL);
+  AddTestCase (SortTests, "Sort the Array", "Sort", SortUINT32ArrayShouldSucceed, NULL, NULL, NULL);
+  AddTestCase (SortTests, "Compare the Buffer", "Compare", CompareSameBufferShouldSucceed, NULL, NULL, NULL);
 
   //
   // Execute the tests.
@@ -185,7 +185,7 @@ EXIT:
 ///
 /// Avoid ECC error for function name that starts with lower case letter
 ///
-#define UefiSortLibUnitTestMain main
+#define UefiSortLibUnitTestMain  main
 
 /**
   Standard POSIX C entry point for host based unit test execution.

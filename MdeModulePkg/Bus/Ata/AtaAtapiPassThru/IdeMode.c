@@ -19,11 +19,11 @@
 UINT8
 EFIAPI
 IdeReadPortB (
-  IN  EFI_PCI_IO_PROTOCOL   *PciIo,
-  IN  UINT16                Port
+  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN  UINT16               Port
   )
 {
-  UINT8 Data;
+  UINT8  Data;
 
   ASSERT (PciIo != NULL);
 
@@ -35,7 +35,7 @@ IdeReadPortB (
               PciIo,
               EfiPciIoWidthUint8,
               EFI_PCI_IO_PASS_THROUGH_BAR,
-              (UINT64) Port,
+              (UINT64)Port,
               1,
               &Data
               );
@@ -52,9 +52,9 @@ IdeReadPortB (
 VOID
 EFIAPI
 IdeWritePortB (
-  IN  EFI_PCI_IO_PROTOCOL   *PciIo,
-  IN  UINT16                Port,
-  IN  UINT8                 Data
+  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN  UINT16               Port,
+  IN  UINT8                Data
   )
 {
   ASSERT (PciIo != NULL);
@@ -66,7 +66,7 @@ IdeWritePortB (
               PciIo,
               EfiPciIoWidthUint8,
               EFI_PCI_IO_PASS_THROUGH_BAR,
-              (UINT64) Port,
+              (UINT64)Port,
               1,
               &Data
               );
@@ -82,9 +82,9 @@ IdeWritePortB (
 VOID
 EFIAPI
 IdeWritePortW (
-  IN  EFI_PCI_IO_PROTOCOL   *PciIo,
-  IN  UINT16                Port,
-  IN  UINT16                Data
+  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN  UINT16               Port,
+  IN  UINT16               Data
   )
 {
   ASSERT (PciIo != NULL);
@@ -96,7 +96,7 @@ IdeWritePortW (
               PciIo,
               EfiPciIoWidthUint16,
               EFI_PCI_IO_PASS_THROUGH_BAR,
-              (UINT64) Port,
+              (UINT64)Port,
               1,
               &Data
               );
@@ -112,9 +112,9 @@ IdeWritePortW (
 VOID
 EFIAPI
 IdeWritePortDW (
-  IN  EFI_PCI_IO_PROTOCOL   *PciIo,
-  IN  UINT16                Port,
-  IN  UINT32                Data
+  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN  UINT16               Port,
+  IN  UINT32               Data
   )
 {
   ASSERT (PciIo != NULL);
@@ -126,7 +126,7 @@ IdeWritePortDW (
               PciIo,
               EfiPciIoWidthUint32,
               EFI_PCI_IO_PASS_THROUGH_BAR,
-              (UINT64) Port,
+              (UINT64)Port,
               1,
               &Data
               );
@@ -146,10 +146,10 @@ IdeWritePortDW (
 VOID
 EFIAPI
 IdeWritePortWMultiple (
-  IN  EFI_PCI_IO_PROTOCOL   *PciIo,
-  IN  UINT16                Port,
-  IN  UINTN                 Count,
-  IN  VOID                  *Buffer
+  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN  UINT16               Port,
+  IN  UINTN                Count,
+  IN  VOID                 *Buffer
   )
 {
   ASSERT (PciIo  != NULL);
@@ -162,11 +162,10 @@ IdeWritePortWMultiple (
               PciIo,
               EfiPciIoWidthFifoUint16,
               EFI_PCI_IO_PASS_THROUGH_BAR,
-              (UINT64) Port,
+              (UINT64)Port,
               Count,
-              (UINT16 *) Buffer
+              (UINT16 *)Buffer
               );
-
 }
 
 /**
@@ -183,10 +182,10 @@ IdeWritePortWMultiple (
 VOID
 EFIAPI
 IdeReadPortWMultiple (
-  IN  EFI_PCI_IO_PROTOCOL   *PciIo,
-  IN  UINT16                Port,
-  IN  UINTN                 Count,
-  IN  VOID                  *Buffer
+  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN  UINT16               Port,
+  IN  UINTN                Count,
+  IN  VOID                 *Buffer
   )
 {
   ASSERT (PciIo  != NULL);
@@ -199,11 +198,10 @@ IdeReadPortWMultiple (
               PciIo,
               EfiPciIoWidthFifoUint16,
               EFI_PCI_IO_PASS_THROUGH_BAR,
-              (UINT64) Port,
+              (UINT64)Port,
               Count,
-              (UINT16 *) Buffer
+              (UINT16 *)Buffer
               );
-
 }
 
 /**
@@ -219,12 +217,12 @@ IdeReadPortWMultiple (
 VOID
 EFIAPI
 DumpAllIdeRegisters (
-  IN     EFI_PCI_IO_PROTOCOL      *PciIo,
-  IN     EFI_IDE_REGISTERS        *IdeRegisters,
-  IN OUT EFI_ATA_STATUS_BLOCK     *AtaStatusBlock
+  IN     EFI_PCI_IO_PROTOCOL   *PciIo,
+  IN     EFI_IDE_REGISTERS     *IdeRegisters,
+  IN OUT EFI_ATA_STATUS_BLOCK  *AtaStatusBlock
   )
 {
-  EFI_ATA_STATUS_BLOCK StatusBlock;
+  EFI_ATA_STATUS_BLOCK  StatusBlock;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
@@ -252,38 +250,39 @@ DumpAllIdeRegisters (
 
   DEBUG_CODE_BEGIN ();
   if ((StatusBlock.AtaStatus & ATA_STSREG_DWF) != 0) {
-    DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Write Fault\n", StatusBlock.AtaStatus));
+    DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Write Fault\n", StatusBlock.AtaStatus));
   }
 
   if ((StatusBlock.AtaStatus & ATA_STSREG_CORR) != 0) {
-    DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Corrected Data\n", StatusBlock.AtaStatus));
+    DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Corrected Data\n", StatusBlock.AtaStatus));
   }
 
   if ((StatusBlock.AtaStatus & ATA_STSREG_ERR) != 0) {
     if ((StatusBlock.AtaError & ATA_ERRREG_BBK) != 0) {
-      DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Bad Block Detected\n", StatusBlock.AtaError));
+      DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Bad Block Detected\n", StatusBlock.AtaError));
     }
 
     if ((StatusBlock.AtaError & ATA_ERRREG_UNC) != 0) {
-      DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Uncorrectable Data\n", StatusBlock.AtaError));
+      DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Uncorrectable Data\n", StatusBlock.AtaError));
     }
 
     if ((StatusBlock.AtaError & ATA_ERRREG_MC) != 0) {
-      DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Media Change\n", StatusBlock.AtaError));
+      DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Media Change\n", StatusBlock.AtaError));
     }
 
     if ((StatusBlock.AtaError & ATA_ERRREG_ABRT) != 0) {
-      DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Abort\n", StatusBlock.AtaError));
+      DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Abort\n", StatusBlock.AtaError));
     }
 
     if ((StatusBlock.AtaError & ATA_ERRREG_TK0NF) != 0) {
-      DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Track 0 Not Found\n", StatusBlock.AtaError));
+      DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Track 0 Not Found\n", StatusBlock.AtaError));
     }
 
     if ((StatusBlock.AtaError & ATA_ERRREG_AMNF) != 0) {
-      DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Address Mark Not Found\n", StatusBlock.AtaError));
+      DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Address Mark Not Found\n", StatusBlock.AtaError));
     }
   }
+
   DEBUG_CODE_END ();
 }
 
@@ -301,11 +300,11 @@ DumpAllIdeRegisters (
 EFI_STATUS
 EFIAPI
 CheckStatusRegister (
-  IN  EFI_PCI_IO_PROTOCOL      *PciIo,
-  IN  EFI_IDE_REGISTERS        *IdeRegisters
+  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN  EFI_IDE_REGISTERS    *IdeRegisters
   )
 {
-  UINT8           StatusRegister;
+  UINT8  StatusRegister;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
@@ -319,6 +318,7 @@ CheckStatusRegister (
       return EFI_DEVICE_ERROR;
     }
   }
+
   return EFI_SUCCESS;
 }
 
@@ -342,14 +342,14 @@ CheckStatusRegister (
 EFI_STATUS
 EFIAPI
 DRQClear (
-  IN  EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN  EFI_IDE_REGISTERS         *IdeRegisters,
-  IN  UINT64                    Timeout
+  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN  EFI_IDE_REGISTERS    *IdeRegisters,
+  IN  UINT64               Timeout
   )
 {
-  UINT64  Delay;
-  UINT8   StatusRegister;
-  BOOLEAN InfiniteWait;
+  UINT64   Delay;
+  UINT8    StatusRegister;
+  BOOLEAN  InfiniteWait;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
@@ -360,7 +360,7 @@ DRQClear (
     InfiniteWait = FALSE;
   }
 
-  Delay = DivU64x32(Timeout, 1000) + 1;
+  Delay = DivU64x32 (Timeout, 1000) + 1;
   do {
     StatusRegister = IdeReadPortB (PciIo, IdeRegisters->CmdOrStatus);
 
@@ -381,11 +381,11 @@ DRQClear (
     MicroSecondDelay (100);
 
     Delay--;
-
   } while (InfiniteWait || (Delay > 0));
 
   return EFI_TIMEOUT;
 }
+
 /**
   This function is used to poll for the DRQ bit clear in the Alternate
   Status Register. DRQ is cleared when the device is finished
@@ -410,9 +410,9 @@ DRQClear2 (
   IN  UINT64               Timeout
   )
 {
-  UINT64  Delay;
-  UINT8   AltRegister;
-  BOOLEAN InfiniteWait;
+  UINT64   Delay;
+  UINT8    AltRegister;
+  BOOLEAN  InfiniteWait;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
@@ -423,7 +423,7 @@ DRQClear2 (
     InfiniteWait = FALSE;
   }
 
-  Delay = DivU64x32(Timeout, 1000) + 1;
+  Delay = DivU64x32 (Timeout, 1000) + 1;
   do {
     AltRegister = IdeReadPortB (PciIo, IdeRegisters->AltOrDev);
 
@@ -444,7 +444,6 @@ DRQClear2 (
     MicroSecondDelay (100);
 
     Delay--;
-
   } while (InfiniteWait || (Delay > 0));
 
   return EFI_TIMEOUT;
@@ -485,10 +484,10 @@ DRQReady (
   IN  UINT64               Timeout
   )
 {
-  UINT64  Delay;
-  UINT8   StatusRegister;
-  UINT8   ErrorRegister;
-  BOOLEAN InfiniteWait;
+  UINT64   Delay;
+  UINT8    StatusRegister;
+  UINT8    ErrorRegister;
+  BOOLEAN  InfiniteWait;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
@@ -499,7 +498,7 @@ DRQReady (
     InfiniteWait = FALSE;
   }
 
-  Delay = DivU64x32(Timeout, 1000) + 1;
+  Delay = DivU64x32 (Timeout, 1000) + 1;
   do {
     //
     // Read Status Register will clear interrupt
@@ -516,6 +515,7 @@ DRQReady (
         if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
           return EFI_ABORTED;
         }
+
         return EFI_DEVICE_ERROR;
       }
 
@@ -536,6 +536,7 @@ DRQReady (
 
   return EFI_TIMEOUT;
 }
+
 /**
   This function is used to poll for the DRQ bit set in the Alternate Status Register.
   DRQ is set when the device is ready to transfer data. So this function is called after
@@ -569,10 +570,10 @@ DRQReady2 (
   IN  UINT64               Timeout
   )
 {
-  UINT64  Delay;
-  UINT8   AltRegister;
-  UINT8   ErrorRegister;
-  BOOLEAN InfiniteWait;
+  UINT64   Delay;
+  UINT8    AltRegister;
+  UINT8    ErrorRegister;
+  BOOLEAN  InfiniteWait;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
@@ -583,7 +584,7 @@ DRQReady2 (
     InfiniteWait = FALSE;
   }
 
-  Delay = DivU64x32(Timeout, 1000) + 1;
+  Delay = DivU64x32 (Timeout, 1000) + 1;
 
   do {
     //
@@ -600,6 +601,7 @@ DRQReady2 (
         if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
           return EFI_ABORTED;
         }
+
         return EFI_DEVICE_ERROR;
       }
 
@@ -620,9 +622,6 @@ DRQReady2 (
 
   return EFI_TIMEOUT;
 }
-
-
-
 
 /**
   This function is used to poll for the BSY bit clear in the Status Register. BSY
@@ -645,9 +644,9 @@ WaitForBSYClear (
   IN  UINT64               Timeout
   )
 {
-  UINT64  Delay;
-  UINT8   StatusRegister;
-  BOOLEAN InfiniteWait;
+  UINT64   Delay;
+  UINT8    StatusRegister;
+  BOOLEAN  InfiniteWait;
 
   ASSERT (PciIo != NULL);
   ASSERT (IdeRegisters != NULL);
@@ -658,7 +657,7 @@ WaitForBSYClear (
     InfiniteWait = FALSE;
   }
 
-  Delay = DivU64x32(Timeout, 1000) + 1;
+  Delay = DivU64x32 (Timeout, 1000) + 1;
   do {
     StatusRegister = IdeReadPortB (PciIo, IdeRegisters->CmdOrStatus);
 
@@ -672,12 +671,10 @@ WaitForBSYClear (
     MicroSecondDelay (100);
 
     Delay--;
-
   } while (InfiniteWait || (Delay > 0));
 
   return EFI_TIMEOUT;
 }
-
 
 /**
   Get IDE i/o port registers' base addresses by mode.
@@ -729,15 +726,15 @@ WaitForBSYClear (
 EFI_STATUS
 EFIAPI
 GetIdeRegisterIoAddr (
-  IN     EFI_PCI_IO_PROTOCOL         *PciIo,
-  IN OUT EFI_IDE_REGISTERS           *IdeRegisters
+  IN     EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN OUT EFI_IDE_REGISTERS    *IdeRegisters
   )
 {
-  EFI_STATUS        Status;
-  PCI_TYPE00        PciData;
-  UINT16            CommandBlockBaseAddr;
-  UINT16            ControlBlockBaseAddr;
-  UINT16            BusMasterBaseAddr;
+  EFI_STATUS  Status;
+  PCI_TYPE00  PciData;
+  UINT16      CommandBlockBaseAddr;
+  UINT16      ControlBlockBaseAddr;
+  UINT16      BusMasterBaseAddr;
 
   if ((PciIo == NULL) || (IdeRegisters == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -755,7 +752,7 @@ GetIdeRegisterIoAddr (
     return Status;
   }
 
-  BusMasterBaseAddr    = (UINT16) ((PciData.Device.Bar[4] & 0x0000fff0));
+  BusMasterBaseAddr = (UINT16)((PciData.Device.Bar[4] & 0x0000fff0));
 
   if ((PciData.Hdr.ClassCode[0] & IDE_PRIMARY_OPERATING_MODE) == 0) {
     CommandBlockBaseAddr = 0x1f0;
@@ -764,26 +761,27 @@ GetIdeRegisterIoAddr (
     //
     // The BARs should be of IO type
     //
-    if ((PciData.Device.Bar[0] & BIT0) == 0 ||
-        (PciData.Device.Bar[1] & BIT0) == 0) {
+    if (((PciData.Device.Bar[0] & BIT0) == 0) ||
+        ((PciData.Device.Bar[1] & BIT0) == 0))
+    {
       return EFI_UNSUPPORTED;
     }
 
-    CommandBlockBaseAddr = (UINT16) (PciData.Device.Bar[0] & 0x0000fff8);
-    ControlBlockBaseAddr = (UINT16) ((PciData.Device.Bar[1] & 0x0000fffc) + 2);
+    CommandBlockBaseAddr = (UINT16)(PciData.Device.Bar[0] & 0x0000fff8);
+    ControlBlockBaseAddr = (UINT16)((PciData.Device.Bar[1] & 0x0000fffc) + 2);
   }
 
   //
   // Calculate IDE primary channel I/O register base address.
   //
   IdeRegisters[EfiIdePrimary].Data              = CommandBlockBaseAddr;
-  IdeRegisters[EfiIdePrimary].ErrOrFeature      = (UINT16) (CommandBlockBaseAddr + 0x01);
-  IdeRegisters[EfiIdePrimary].SectorCount       = (UINT16) (CommandBlockBaseAddr + 0x02);
-  IdeRegisters[EfiIdePrimary].SectorNumber      = (UINT16) (CommandBlockBaseAddr + 0x03);
-  IdeRegisters[EfiIdePrimary].CylinderLsb       = (UINT16) (CommandBlockBaseAddr + 0x04);
-  IdeRegisters[EfiIdePrimary].CylinderMsb       = (UINT16) (CommandBlockBaseAddr + 0x05);
-  IdeRegisters[EfiIdePrimary].Head              = (UINT16) (CommandBlockBaseAddr + 0x06);
-  IdeRegisters[EfiIdePrimary].CmdOrStatus       = (UINT16) (CommandBlockBaseAddr + 0x07);
+  IdeRegisters[EfiIdePrimary].ErrOrFeature      = (UINT16)(CommandBlockBaseAddr + 0x01);
+  IdeRegisters[EfiIdePrimary].SectorCount       = (UINT16)(CommandBlockBaseAddr + 0x02);
+  IdeRegisters[EfiIdePrimary].SectorNumber      = (UINT16)(CommandBlockBaseAddr + 0x03);
+  IdeRegisters[EfiIdePrimary].CylinderLsb       = (UINT16)(CommandBlockBaseAddr + 0x04);
+  IdeRegisters[EfiIdePrimary].CylinderMsb       = (UINT16)(CommandBlockBaseAddr + 0x05);
+  IdeRegisters[EfiIdePrimary].Head              = (UINT16)(CommandBlockBaseAddr + 0x06);
+  IdeRegisters[EfiIdePrimary].CmdOrStatus       = (UINT16)(CommandBlockBaseAddr + 0x07);
   IdeRegisters[EfiIdePrimary].AltOrDev          = ControlBlockBaseAddr;
   IdeRegisters[EfiIdePrimary].BusMasterBaseAddr = BusMasterBaseAddr;
 
@@ -794,32 +792,32 @@ GetIdeRegisterIoAddr (
     //
     // The BARs should be of IO type
     //
-    if ((PciData.Device.Bar[2] & BIT0) == 0 ||
-        (PciData.Device.Bar[3] & BIT0) == 0) {
+    if (((PciData.Device.Bar[2] & BIT0) == 0) ||
+        ((PciData.Device.Bar[3] & BIT0) == 0))
+    {
       return EFI_UNSUPPORTED;
     }
 
-    CommandBlockBaseAddr = (UINT16) (PciData.Device.Bar[2] & 0x0000fff8);
-    ControlBlockBaseAddr = (UINT16) ((PciData.Device.Bar[3] & 0x0000fffc) + 2);
+    CommandBlockBaseAddr = (UINT16)(PciData.Device.Bar[2] & 0x0000fff8);
+    ControlBlockBaseAddr = (UINT16)((PciData.Device.Bar[3] & 0x0000fffc) + 2);
   }
 
   //
   // Calculate IDE secondary channel I/O register base address.
   //
   IdeRegisters[EfiIdeSecondary].Data              = CommandBlockBaseAddr;
-  IdeRegisters[EfiIdeSecondary].ErrOrFeature      = (UINT16) (CommandBlockBaseAddr + 0x01);
-  IdeRegisters[EfiIdeSecondary].SectorCount       = (UINT16) (CommandBlockBaseAddr + 0x02);
-  IdeRegisters[EfiIdeSecondary].SectorNumber      = (UINT16) (CommandBlockBaseAddr + 0x03);
-  IdeRegisters[EfiIdeSecondary].CylinderLsb       = (UINT16) (CommandBlockBaseAddr + 0x04);
-  IdeRegisters[EfiIdeSecondary].CylinderMsb       = (UINT16) (CommandBlockBaseAddr + 0x05);
-  IdeRegisters[EfiIdeSecondary].Head              = (UINT16) (CommandBlockBaseAddr + 0x06);
-  IdeRegisters[EfiIdeSecondary].CmdOrStatus       = (UINT16) (CommandBlockBaseAddr + 0x07);
+  IdeRegisters[EfiIdeSecondary].ErrOrFeature      = (UINT16)(CommandBlockBaseAddr + 0x01);
+  IdeRegisters[EfiIdeSecondary].SectorCount       = (UINT16)(CommandBlockBaseAddr + 0x02);
+  IdeRegisters[EfiIdeSecondary].SectorNumber      = (UINT16)(CommandBlockBaseAddr + 0x03);
+  IdeRegisters[EfiIdeSecondary].CylinderLsb       = (UINT16)(CommandBlockBaseAddr + 0x04);
+  IdeRegisters[EfiIdeSecondary].CylinderMsb       = (UINT16)(CommandBlockBaseAddr + 0x05);
+  IdeRegisters[EfiIdeSecondary].Head              = (UINT16)(CommandBlockBaseAddr + 0x06);
+  IdeRegisters[EfiIdeSecondary].CmdOrStatus       = (UINT16)(CommandBlockBaseAddr + 0x07);
   IdeRegisters[EfiIdeSecondary].AltOrDev          = ControlBlockBaseAddr;
-  IdeRegisters[EfiIdeSecondary].BusMasterBaseAddr = (UINT16) (BusMasterBaseAddr + 0x8);
+  IdeRegisters[EfiIdeSecondary].BusMasterBaseAddr = (UINT16)(BusMasterBaseAddr + 0x8);
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Send ATA Ext command into device with NON_DATA protocol.
@@ -836,10 +834,10 @@ GetIdeRegisterIoAddr (
 EFI_STATUS
 EFIAPI
 AtaIssueCommand (
-  IN  EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN  EFI_IDE_REGISTERS         *IdeRegisters,
-  IN  EFI_ATA_COMMAND_BLOCK     *AtaCommandBlock,
-  IN  UINT64                    Timeout
+  IN  EFI_PCI_IO_PROTOCOL    *PciIo,
+  IN  EFI_IDE_REGISTERS      *IdeRegisters,
+  IN  EFI_ATA_COMMAND_BLOCK  *AtaCommandBlock,
+  IN  UINT64                 Timeout
   )
 {
   EFI_STATUS  Status;
@@ -861,7 +859,7 @@ AtaIssueCommand (
   //
   // Select device (bit4), set LBA mode(bit6) (use 0xe0 for compatibility)
   //
-  IdeWritePortB (PciIo, IdeRegisters->Head, (UINT8) (0xe0 | DeviceHead));
+  IdeWritePortB (PciIo, IdeRegisters->Head, (UINT8)(0xe0 | DeviceHead));
 
   //
   // set all the command parameters
@@ -934,15 +932,15 @@ AtaIssueCommand (
 EFI_STATUS
 EFIAPI
 AtaPioDataInOut (
-  IN     EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN     EFI_IDE_REGISTERS         *IdeRegisters,
-  IN OUT VOID                      *Buffer,
-  IN     UINT64                    ByteCount,
-  IN     BOOLEAN                   Read,
-  IN     EFI_ATA_COMMAND_BLOCK     *AtaCommandBlock,
-  IN OUT EFI_ATA_STATUS_BLOCK      *AtaStatusBlock,
-  IN     UINT64                    Timeout,
-  IN     ATA_NONBLOCK_TASK         *Task
+  IN     EFI_PCI_IO_PROTOCOL    *PciIo,
+  IN     EFI_IDE_REGISTERS      *IdeRegisters,
+  IN OUT VOID                   *Buffer,
+  IN     UINT64                 ByteCount,
+  IN     BOOLEAN                Read,
+  IN     EFI_ATA_COMMAND_BLOCK  *AtaCommandBlock,
+  IN OUT EFI_ATA_STATUS_BLOCK   *AtaStatusBlock,
+  IN     UINT64                 Timeout,
+  IN     ATA_NONBLOCK_TASK      *Task
   )
 {
   UINTN       WordCount;
@@ -963,7 +961,7 @@ AtaPioDataInOut (
     goto Exit;
   }
 
-  Buffer16 = (UINT16 *) Buffer;
+  Buffer16 = (UINT16 *)Buffer;
 
   //
   // According to PIO data in protocol, host can perform a series of reads to
@@ -987,7 +985,7 @@ AtaPioDataInOut (
   //
   WordCount = 0;
 
-  while (WordCount < RShiftU64(ByteCount, 1)) {
+  while (WordCount < RShiftU64 (ByteCount, 1)) {
     //
     // Poll DRQ bit set, data transfer can be performed only when DRQ is ready
     //
@@ -1000,8 +998,8 @@ AtaPioDataInOut (
     //
     // Get the byte count for one series of read
     //
-    if ((WordCount + Increment) > RShiftU64(ByteCount, 1)) {
-      Increment = (UINTN)(RShiftU64(ByteCount, 1) - WordCount);
+    if ((WordCount + Increment) > RShiftU64 (ByteCount, 1)) {
+      Increment = (UINTN)(RShiftU64 (ByteCount, 1) - WordCount);
     }
 
     if (Read) {
@@ -1069,12 +1067,12 @@ Exit:
 EFI_STATUS
 EFIAPI
 AtaNonDataCommandIn (
-  IN     EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN     EFI_IDE_REGISTERS         *IdeRegisters,
-  IN     EFI_ATA_COMMAND_BLOCK     *AtaCommandBlock,
-  IN OUT EFI_ATA_STATUS_BLOCK      *AtaStatusBlock,
-  IN     UINT64                    Timeout,
-  IN     ATA_NONBLOCK_TASK         *Task
+  IN     EFI_PCI_IO_PROTOCOL    *PciIo,
+  IN     EFI_IDE_REGISTERS      *IdeRegisters,
+  IN     EFI_ATA_COMMAND_BLOCK  *AtaCommandBlock,
+  IN OUT EFI_ATA_STATUS_BLOCK   *AtaStatusBlock,
+  IN     UINT64                 Timeout,
+  IN     ATA_NONBLOCK_TASK      *Task
   )
 {
   EFI_STATUS  Status;
@@ -1133,16 +1131,16 @@ Exit:
 **/
 EFI_STATUS
 AtaUdmStatusWait (
-  IN  EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN  EFI_IDE_REGISTERS         *IdeRegisters,
-  IN  UINT64                    Timeout
- )
+  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN  EFI_IDE_REGISTERS    *IdeRegisters,
+  IN  UINT64               Timeout
+  )
 {
-  UINT8                         RegisterValue;
-  EFI_STATUS                    Status;
-  UINT16                        IoPortForBmis;
-  UINT64                        Delay;
-  BOOLEAN                       InfiniteWait;
+  UINT8       RegisterValue;
+  EFI_STATUS  Status;
+  UINT16      IoPortForBmis;
+  UINT64      Delay;
+  BOOLEAN     InfiniteWait;
 
   if (Timeout == 0) {
     InfiniteWait = TRUE;
@@ -1159,10 +1157,10 @@ AtaUdmStatusWait (
       break;
     }
 
-    IoPortForBmis = (UINT16) (IdeRegisters->BusMasterBaseAddr + BMIS_OFFSET);
+    IoPortForBmis = (UINT16)(IdeRegisters->BusMasterBaseAddr + BMIS_OFFSET);
     RegisterValue = IdeReadPortB (PciIo, IoPortForBmis);
     if (((RegisterValue & BMIS_ERROR) != 0) || (Timeout == 0)) {
-      DEBUG ((EFI_D_ERROR, "ATA UDMA operation fails\n"));
+      DEBUG ((DEBUG_ERROR, "ATA UDMA operation fails\n"));
       Status = EFI_DEVICE_ERROR;
       break;
     }
@@ -1171,6 +1169,7 @@ AtaUdmStatusWait (
       Status = EFI_SUCCESS;
       break;
     }
+
     //
     // Stall for 100 microseconds.
     //
@@ -1197,14 +1196,14 @@ AtaUdmStatusWait (
 **/
 EFI_STATUS
 AtaUdmStatusCheck (
-  IN     EFI_PCI_IO_PROTOCOL        *PciIo,
-  IN     ATA_NONBLOCK_TASK          *Task,
-  IN     EFI_IDE_REGISTERS          *IdeRegisters
- )
+  IN     EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN     ATA_NONBLOCK_TASK    *Task,
+  IN     EFI_IDE_REGISTERS    *IdeRegisters
+  )
 {
-  UINT8          RegisterValue;
-  UINT16         IoPortForBmis;
-  EFI_STATUS     Status;
+  UINT8       RegisterValue;
+  UINT16      IoPortForBmis;
+  EFI_STATUS  Status;
 
   Task->RetryTimes--;
 
@@ -1213,11 +1212,11 @@ AtaUdmStatusCheck (
     return EFI_DEVICE_ERROR;
   }
 
-  IoPortForBmis = (UINT16) (IdeRegisters->BusMasterBaseAddr + BMIS_OFFSET);
+  IoPortForBmis = (UINT16)(IdeRegisters->BusMasterBaseAddr + BMIS_OFFSET);
   RegisterValue = IdeReadPortB (PciIo, IoPortForBmis);
 
   if ((RegisterValue & BMIS_ERROR) != 0) {
-    DEBUG ((EFI_D_ERROR, "ATA UDMA operation fails\n"));
+    DEBUG ((DEBUG_ERROR, "ATA UDMA operation fails\n"));
     return EFI_DEVICE_ERROR;
   }
 
@@ -1273,36 +1272,36 @@ AtaUdmaInOut (
   IN     ATA_NONBLOCK_TASK             *Task
   )
 {
-  EFI_STATUS                    Status;
-  UINT16                        IoPortForBmic;
-  UINT16                        IoPortForBmis;
-  UINT16                        IoPortForBmid;
+  EFI_STATUS  Status;
+  UINT16      IoPortForBmic;
+  UINT16      IoPortForBmis;
+  UINT16      IoPortForBmid;
 
-  UINTN                         PrdTableSize;
-  EFI_PHYSICAL_ADDRESS          PrdTableMapAddr;
-  VOID                          *PrdTableMap;
-  EFI_PHYSICAL_ADDRESS          PrdTableBaseAddr;
-  EFI_ATA_DMA_PRD               *TempPrdBaseAddr;
-  UINTN                         PrdTableNum;
+  UINTN                 PrdTableSize;
+  EFI_PHYSICAL_ADDRESS  PrdTableMapAddr;
+  VOID                  *PrdTableMap;
+  EFI_PHYSICAL_ADDRESS  PrdTableBaseAddr;
+  EFI_ATA_DMA_PRD       *TempPrdBaseAddr;
+  UINTN                 PrdTableNum;
 
-  UINT8                         RegisterValue;
-  UINTN                         PageCount;
-  UINTN                         ByteCount;
-  UINTN                         ByteRemaining;
-  UINT8                         DeviceControl;
+  UINT8  RegisterValue;
+  UINTN  PageCount;
+  UINTN  ByteCount;
+  UINTN  ByteRemaining;
+  UINT8  DeviceControl;
 
-  VOID                          *BufferMap;
-  EFI_PHYSICAL_ADDRESS          BufferMapAddress;
-  EFI_PCI_IO_PROTOCOL_OPERATION PciIoOperation;
+  VOID                           *BufferMap;
+  EFI_PHYSICAL_ADDRESS           BufferMapAddress;
+  EFI_PCI_IO_PROTOCOL_OPERATION  PciIoOperation;
 
-  UINT8                         DeviceHead;
-  EFI_PCI_IO_PROTOCOL           *PciIo;
-  EFI_TPL                       OldTpl;
+  UINT8                DeviceHead;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  EFI_TPL              OldTpl;
 
-  UINTN                         AlignmentMask;
-  UINTN                         RealPageCount;
-  EFI_PHYSICAL_ADDRESS          BaseAddr;
-  EFI_PHYSICAL_ADDRESS          BaseMapAddr;
+  UINTN                 AlignmentMask;
+  UINTN                 RealPageCount;
+  EFI_PHYSICAL_ADDRESS  BaseAddr;
+  EFI_PHYSICAL_ADDRESS  BaseMapAddr;
 
   Status        = EFI_SUCCESS;
   PrdTableMap   = NULL;
@@ -1329,6 +1328,7 @@ AtaUdmaInOut (
     //
     MicroSecondDelay (1000);
   }
+
   gBS->RestoreTPL (OldTpl);
 
   //
@@ -1341,9 +1341,9 @@ AtaUdmaInOut (
   //
   // Set relevant IO Port address.
   //
-  IoPortForBmic = (UINT16) (IdeRegisters->BusMasterBaseAddr + BMIC_OFFSET);
-  IoPortForBmis = (UINT16) (IdeRegisters->BusMasterBaseAddr + BMIS_OFFSET);
-  IoPortForBmid = (UINT16) (IdeRegisters->BusMasterBaseAddr + BMID_OFFSET);
+  IoPortForBmic = (UINT16)(IdeRegisters->BusMasterBaseAddr + BMIC_OFFSET);
+  IoPortForBmis = (UINT16)(IdeRegisters->BusMasterBaseAddr + BMIS_OFFSET);
+  IoPortForBmid = (UINT16)(IdeRegisters->BusMasterBaseAddr + BMID_OFFSET);
 
   //
   // For Blocking mode, start the command.
@@ -1355,7 +1355,7 @@ AtaUdmaInOut (
     // Calculate the number of PRD entry.
     // Every entry in PRD table can specify a 64K memory region.
     //
-    PrdTableNum   = (UINTN)(RShiftU64(DataLength, 16) + 1);
+    PrdTableNum = (UINTN)(RShiftU64 (DataLength, 16) + 1);
 
     //
     // Make sure that the memory region of PRD table is not cross 64K boundary
@@ -1378,14 +1378,14 @@ AtaUdmaInOut (
     //
     ASSERT (RealPageCount > PageCount);
 
-    Status    = PciIo->AllocateBuffer (
-                         PciIo,
-                         AllocateAnyPages,
-                         EfiBootServicesData,
-                         RealPageCount,
-                         (VOID **)&BaseAddr,
-                         0
-                         );
+    Status = PciIo->AllocateBuffer (
+                      PciIo,
+                      AllocateAnyPages,
+                      EfiBootServicesData,
+                      RealPageCount,
+                      (VOID **)&BaseAddr,
+                      0
+                      );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -1394,7 +1394,7 @@ AtaUdmaInOut (
     Status    = PciIo->Map (
                          PciIo,
                          EfiPciIoOperationBusMasterCommonBuffer,
-                         (VOID*)(UINTN)BaseAddr,
+                         (VOID *)(UINTN)BaseAddr,
                          &ByteCount,
                          &BaseMapAddr,
                          &PrdTableMap
@@ -1405,18 +1405,18 @@ AtaUdmaInOut (
       // it means the DMA operation may be broken into several discontinuous smaller chunks.
       // Can't handle this case.
       //
-      PciIo->FreeBuffer (PciIo, RealPageCount, (VOID*)(UINTN)BaseAddr);
+      PciIo->FreeBuffer (PciIo, RealPageCount, (VOID *)(UINTN)BaseAddr);
       return EFI_OUT_OF_RESOURCES;
     }
 
-    ZeroMem ((VOID *) ((UINTN) BaseAddr), ByteCount);
+    ZeroMem ((VOID *)((UINTN)BaseAddr), ByteCount);
 
     //
     // Calculate the 64K align address as PRD Table base address.
     //
     AlignmentMask    = SIZE_64KB - 1;
-    PrdTableBaseAddr = ((UINTN) BaseAddr + AlignmentMask) & ~AlignmentMask;
-    PrdTableMapAddr  = ((UINTN) BaseMapAddr + AlignmentMask) & ~AlignmentMask;
+    PrdTableBaseAddr = ((UINTN)BaseAddr + AlignmentMask) & ~AlignmentMask;
+    PrdTableMapAddr  = ((UINTN)BaseMapAddr + AlignmentMask) & ~AlignmentMask;
 
     //
     // Map the host address of DataBuffer to DMA master address.
@@ -1438,7 +1438,7 @@ AtaUdmaInOut (
                          );
     if (EFI_ERROR (Status) || (ByteCount != DataLength)) {
       PciIo->Unmap (PciIo, PrdTableMap);
-      PciIo->FreeBuffer (PciIo, RealPageCount, (VOID*)(UINTN)BaseAddr);
+      PciIo->FreeBuffer (PciIo, RealPageCount, (VOID *)(UINTN)BaseAddr);
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -1452,17 +1452,17 @@ AtaUdmaInOut (
     // Fill the PRD table with appropriate bus master address of data buffer and data length.
     //
     ByteRemaining   = ByteCount;
-    TempPrdBaseAddr = (EFI_ATA_DMA_PRD*)(UINTN)PrdTableBaseAddr;
+    TempPrdBaseAddr = (EFI_ATA_DMA_PRD *)(UINTN)PrdTableBaseAddr;
     while (ByteRemaining != 0) {
       if (ByteRemaining <= 0x10000) {
-        TempPrdBaseAddr->RegionBaseAddr = (UINT32) ((UINTN) BufferMapAddress);
-        TempPrdBaseAddr->ByteCount      = (UINT16) ByteRemaining;
+        TempPrdBaseAddr->RegionBaseAddr = (UINT32)((UINTN)BufferMapAddress);
+        TempPrdBaseAddr->ByteCount      = (UINT16)ByteRemaining;
         TempPrdBaseAddr->EndOfTable     = 0x8000;
         break;
       }
 
-      TempPrdBaseAddr->RegionBaseAddr = (UINT32) ((UINTN) BufferMapAddress);
-      TempPrdBaseAddr->ByteCount      = (UINT16) 0x0;
+      TempPrdBaseAddr->RegionBaseAddr = (UINT32)((UINTN)BufferMapAddress);
+      TempPrdBaseAddr->ByteCount      = (UINT16)0x0;
 
       ByteRemaining    -= 0x10000;
       BufferMapAddress += 0x10000;
@@ -1485,7 +1485,7 @@ AtaUdmaInOut (
     //
     // Read BMIS register and clear ERROR and INTR bit
     //
-    RegisterValue  = IdeReadPortB(PciIo, IoPortForBmis);
+    RegisterValue  = IdeReadPortB (PciIo, IoPortForBmis);
     RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
     IdeWritePortB (PciIo, IoPortForBmis, RegisterValue);
 
@@ -1497,18 +1497,19 @@ AtaUdmaInOut (
     //
     // Set BMIC register to identify the operation direction
     //
-    RegisterValue = IdeReadPortB(PciIo, IoPortForBmic);
+    RegisterValue = IdeReadPortB (PciIo, IoPortForBmic);
     if (Read) {
       RegisterValue |= BMIC_NREAD;
     } else {
-      RegisterValue &= ~((UINT8) BMIC_NREAD);
+      RegisterValue &= ~((UINT8)BMIC_NREAD);
     }
+
     IdeWritePortB (PciIo, IoPortForBmic, RegisterValue);
 
     if (Task != NULL) {
       Task->Map            = BufferMap;
       Task->TableMap       = PrdTableMap;
-      Task->MapBaseAddress = (EFI_ATA_DMA_PRD*)(UINTN)BaseAddr;
+      Task->MapBaseAddress = (EFI_ATA_DMA_PRD *)(UINTN)BaseAddr;
       Task->PageCount      = RealPageCount;
       Task->IsStart        = TRUE;
     }
@@ -1528,13 +1529,13 @@ AtaUdmaInOut (
       Status = EFI_DEVICE_ERROR;
       goto Exit;
     }
+
     //
     // Set START bit of BMIC register
     //
-    RegisterValue  = IdeReadPortB(PciIo, IoPortForBmic);
+    RegisterValue  = IdeReadPortB (PciIo, IoPortForBmic);
     RegisterValue |= BMIC_START;
-    IdeWritePortB(PciIo, IoPortForBmic, RegisterValue);
-
+    IdeWritePortB (PciIo, IoPortForBmic, RegisterValue);
   }
 
   //
@@ -1552,7 +1553,7 @@ AtaUdmaInOut (
   // out, or a error has been happened, it needs to clear the register and free
   // buffer.
   //
-  if ((Task == NULL) || Status != EFI_NOT_READY) {
+  if ((Task == NULL) || (Status != EFI_NOT_READY)) {
     //
     // Read BMIS register and clear ERROR and INTR bit
     //
@@ -1563,13 +1564,13 @@ AtaUdmaInOut (
     //
     // Read Status Register of IDE device to clear interrupt
     //
-    RegisterValue  = IdeReadPortB(PciIo, IdeRegisters->CmdOrStatus);
+    RegisterValue = IdeReadPortB (PciIo, IdeRegisters->CmdOrStatus);
 
     //
     // Clear START bit of BMIC register
     //
-    RegisterValue  = IdeReadPortB(PciIo, IoPortForBmic);
-    RegisterValue &= ~((UINT8) BMIC_START);
+    RegisterValue  = IdeReadPortB (PciIo, IoPortForBmic);
+    RegisterValue &= ~((UINT8)BMIC_START);
     IdeWritePortB (PciIo, IoPortForBmic, RegisterValue);
 
     //
@@ -1582,21 +1583,20 @@ AtaUdmaInOut (
     // Stall for 10 milliseconds.
     //
     MicroSecondDelay (10000);
-
   }
 
 Exit:
   //
   // Free all allocated resource
   //
-  if ((Task == NULL) || Status != EFI_NOT_READY) {
+  if ((Task == NULL) || (Status != EFI_NOT_READY)) {
     if (Task != NULL) {
       PciIo->Unmap (PciIo, Task->TableMap);
       PciIo->FreeBuffer (PciIo, Task->PageCount, Task->MapBaseAddress);
       PciIo->Unmap (PciIo, Task->Map);
     } else {
       PciIo->Unmap (PciIo, PrdTableMap);
-      PciIo->FreeBuffer (PciIo, RealPageCount, (VOID*)(UINTN)BaseAddr);
+      PciIo->FreeBuffer (PciIo, RealPageCount, (VOID *)(UINTN)BaseAddr);
       PciIo->Unmap (PciIo, BufferMap);
     }
 
@@ -1622,12 +1622,12 @@ Exit:
 EFI_STATUS
 EFIAPI
 AtaPacketReadPendingData (
-  IN  EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN  EFI_IDE_REGISTERS         *IdeRegisters
+  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN  EFI_IDE_REGISTERS    *IdeRegisters
   )
 {
-  UINT8     AltRegister;
-  UINT16    TempWordBuffer;
+  UINT8   AltRegister;
+  UINT16  TempWordBuffer;
 
   AltRegister = IdeReadPortB (PciIo, IdeRegisters->AltOrDev);
   if ((AltRegister & ATA_STSREG_BSY) == ATA_STSREG_BSY) {
@@ -1646,6 +1646,7 @@ AtaPacketReadPendingData (
       TempWordBuffer = IdeReadPortB (PciIo, IdeRegisters->AltOrDev);
     }
   }
+
   return EFI_SUCCESS;
 }
 
@@ -1670,12 +1671,12 @@ AtaPacketReadPendingData (
 EFI_STATUS
 EFIAPI
 AtaPacketReadWrite (
-  IN     EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN     EFI_IDE_REGISTERS         *IdeRegisters,
-  IN OUT VOID                      *Buffer,
-  IN OUT UINT32                    *ByteCount,
-  IN     BOOLEAN                   Read,
-  IN     UINT64                    Timeout
+  IN     EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN     EFI_IDE_REGISTERS    *IdeRegisters,
+  IN OUT VOID                 *Buffer,
+  IN OUT UINT32               *ByteCount,
+  IN     BOOLEAN              Read,
+  IN     UINT64               Timeout
   )
 {
   UINT32      RequiredWordCount;
@@ -1803,17 +1804,17 @@ AtaPacketReadWrite (
 EFI_STATUS
 EFIAPI
 AtaPacketCommandExecute (
-  IN  EFI_PCI_IO_PROTOCOL                           *PciIo,
-  IN  EFI_IDE_REGISTERS                             *IdeRegisters,
-  IN  UINT8                                         Channel,
-  IN  UINT8                                         Device,
-  IN  EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET    *Packet
+  IN  EFI_PCI_IO_PROTOCOL                         *PciIo,
+  IN  EFI_IDE_REGISTERS                           *IdeRegisters,
+  IN  UINT8                                       Channel,
+  IN  UINT8                                       Device,
+  IN  EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
   )
 {
-  EFI_ATA_COMMAND_BLOCK       AtaCommandBlock;
-  EFI_STATUS                  Status;
-  UINT8                       Count;
-  UINT8                       PacketCommand[12];
+  EFI_ATA_COMMAND_BLOCK  AtaCommandBlock;
+  EFI_STATUS             Status;
+  UINT8                  Count;
+  UINT8                  PacketCommand[12];
 
   ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
 
@@ -1836,9 +1837,9 @@ AtaPacketCommandExecute (
   // set the transfersize to ATAPI_MAX_BYTE_COUNT to let the device
   // determine how many data should be transferred.
   //
-  AtaCommandBlock.AtaCylinderLow  = (UINT8) (ATAPI_MAX_BYTE_COUNT & 0x00ff);
-  AtaCommandBlock.AtaCylinderHigh = (UINT8) (ATAPI_MAX_BYTE_COUNT >> 8);
-  AtaCommandBlock.AtaDeviceHead   = (UINT8) (Device << 0x4);
+  AtaCommandBlock.AtaCylinderLow  = (UINT8)(ATAPI_MAX_BYTE_COUNT & 0x00ff);
+  AtaCommandBlock.AtaCylinderHigh = (UINT8)(ATAPI_MAX_BYTE_COUNT >> 8);
+  AtaCommandBlock.AtaDeviceHead   = (UINT8)(Device << 0x4);
   AtaCommandBlock.AtaCommand      = ATA_CMD_PACKET;
 
   IdeWritePortB (PciIo, IdeRegisters->Head, (UINT8)(0xe0 | (Device << 0x4)));
@@ -1864,7 +1865,7 @@ AtaPacketCommandExecute (
   // Send out ATAPI command packet
   //
   for (Count = 0; Count < 6; Count++) {
-    IdeWritePortW (PciIo, IdeRegisters->Data, *((UINT16*)PacketCommand + Count));
+    IdeWritePortW (PciIo, IdeRegisters->Data, *((UINT16 *)PacketCommand + Count));
     //
     // Stall for 10 microseconds.
     //
@@ -1897,7 +1898,6 @@ AtaPacketCommandExecute (
   return Status;
 }
 
-
 /**
   Set the calculated Best transfer mode to a detected device.
 
@@ -1922,8 +1922,8 @@ SetDeviceTransferMode (
   IN OUT EFI_ATA_STATUS_BLOCK          *AtaStatusBlock
   )
 {
-  EFI_STATUS              Status;
-  EFI_ATA_COMMAND_BLOCK   AtaCommandBlock;
+  EFI_STATUS             Status;
+  EFI_ATA_COMMAND_BLOCK  AtaCommandBlock;
 
   ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
 
@@ -1971,14 +1971,14 @@ SetDriveParameters (
   IN OUT EFI_ATA_STATUS_BLOCK          *AtaStatusBlock
   )
 {
-  EFI_STATUS              Status;
-  EFI_ATA_COMMAND_BLOCK   AtaCommandBlock;
+  EFI_STATUS             Status;
+  EFI_ATA_COMMAND_BLOCK  AtaCommandBlock;
 
   ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
 
   AtaCommandBlock.AtaCommand     = ATA_CMD_INIT_DRIVE_PARAM;
   AtaCommandBlock.AtaSectorCount = DriveParameters->Sector;
-  AtaCommandBlock.AtaDeviceHead  = (UINT8) ((Device << 0x4) + DriveParameters->Heads);
+  AtaCommandBlock.AtaDeviceHead  = (UINT8)((Device << 0x4) + DriveParameters->Heads);
 
   //
   // Send Init drive parameters
@@ -2032,10 +2032,10 @@ IdeAtaSmartReturnStatusCheck (
   IN OUT EFI_ATA_STATUS_BLOCK          *AtaStatusBlock
   )
 {
-  EFI_STATUS              Status;
-  EFI_ATA_COMMAND_BLOCK   AtaCommandBlock;
-  UINT8                   LBAMid;
-  UINT8                   LBAHigh;
+  EFI_STATUS             Status;
+  EFI_ATA_COMMAND_BLOCK  AtaCommandBlock;
+  UINT8                  LBAMid;
+  UINT8                  LBAHigh;
 
   ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
 
@@ -2043,7 +2043,7 @@ IdeAtaSmartReturnStatusCheck (
   AtaCommandBlock.AtaFeatures     = ATA_SMART_RETURN_STATUS;
   AtaCommandBlock.AtaCylinderLow  = ATA_CONSTANT_4F;
   AtaCommandBlock.AtaCylinderHigh = ATA_CONSTANT_C2;
-  AtaCommandBlock.AtaDeviceHead   = (UINT8) ((Device << 0x4) | 0xe0);
+  AtaCommandBlock.AtaDeviceHead   = (UINT8)((Device << 0x4) | 0xe0);
 
   //
   // Send S.M.A.R.T Read Return Status command to device
@@ -2077,20 +2077,20 @@ IdeAtaSmartReturnStatusCheck (
     //
     // The threshold exceeded condition is not detected by the device
     //
-    DEBUG ((EFI_D_INFO, "The S.M.A.R.T threshold exceeded condition is not detected\n"));
+    DEBUG ((DEBUG_INFO, "The S.M.A.R.T threshold exceeded condition is not detected\n"));
     REPORT_STATUS_CODE (
-          EFI_PROGRESS_CODE,
-          (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_UNDERTHRESHOLD)
-          );
+      EFI_PROGRESS_CODE,
+      (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_UNDERTHRESHOLD)
+      );
   } else if ((LBAMid == 0xf4) && (LBAHigh == 0x2c)) {
     //
     // The threshold exceeded condition is detected by the device
     //
-    DEBUG ((EFI_D_INFO, "The S.M.A.R.T threshold exceeded condition is detected\n"));
+    DEBUG ((DEBUG_INFO, "The S.M.A.R.T threshold exceeded condition is detected\n"));
     REPORT_STATUS_CODE (
-         EFI_PROGRESS_CODE,
-         (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_OVERTHRESHOLD)
-         );
+      EFI_PROGRESS_CODE,
+      (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_OVERTHRESHOLD)
+      );
   }
 
   return EFI_SUCCESS;
@@ -2116,8 +2116,8 @@ IdeAtaSmartSupport (
   IN OUT EFI_ATA_STATUS_BLOCK          *AtaStatusBlock
   )
 {
-  EFI_STATUS              Status;
-  EFI_ATA_COMMAND_BLOCK   AtaCommandBlock;
+  EFI_STATUS             Status;
+  EFI_ATA_COMMAND_BLOCK  AtaCommandBlock;
 
   //
   // Detect if the device supports S.M.A.R.T.
@@ -2126,8 +2126,12 @@ IdeAtaSmartSupport (
     //
     // S.M.A.R.T is not supported by the device
     //
-    DEBUG ((EFI_D_INFO, "S.M.A.R.T feature is not supported at [%a] channel [%a] device!\n",
-            (Channel == 1) ? "secondary" : "primary", (Device == 1) ? "slave" : "master"));
+    DEBUG ((
+      DEBUG_INFO,
+      "S.M.A.R.T feature is not supported at [%a] channel [%a] device!\n",
+      (Channel == 1) ? "secondary" : "primary",
+      (Device == 1) ? "slave" : "master"
+      ));
     REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
       (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_NOTSUPPORTED)
@@ -2137,7 +2141,6 @@ IdeAtaSmartSupport (
     // Check if the feature is enabled. If not, then enable S.M.A.R.T.
     //
     if ((IdentifyData->AtaData.command_set_feature_enb_85 & 0x0001) != 0x0001) {
-
       REPORT_STATUS_CODE (
         EFI_PROGRESS_CODE,
         (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_DISABLE)
@@ -2149,7 +2152,7 @@ IdeAtaSmartSupport (
       AtaCommandBlock.AtaFeatures     = ATA_SMART_ENABLE_OPERATION;
       AtaCommandBlock.AtaCylinderLow  = ATA_CONSTANT_4F;
       AtaCommandBlock.AtaCylinderHigh = ATA_CONSTANT_C2;
-      AtaCommandBlock.AtaDeviceHead   = (UINT8) ((Device << 0x4) | 0xe0);
+      AtaCommandBlock.AtaDeviceHead   = (UINT8)((Device << 0x4) | 0xe0);
 
       //
       // Send S.M.A.R.T Enable command to device
@@ -2174,7 +2177,7 @@ IdeAtaSmartSupport (
         AtaCommandBlock.AtaSectorCount  = 0xF1;
         AtaCommandBlock.AtaCylinderLow  = ATA_CONSTANT_4F;
         AtaCommandBlock.AtaCylinderHigh = ATA_CONSTANT_C2;
-        AtaCommandBlock.AtaDeviceHead   = (UINT8) ((Device << 0x4) | 0xe0);
+        AtaCommandBlock.AtaDeviceHead   = (UINT8)((Device << 0x4) | 0xe0);
 
         Status = AtaNonDataCommandIn (
                    Instance->PciIo,
@@ -2195,14 +2198,16 @@ IdeAtaSmartSupport (
       }
     }
 
-    DEBUG ((EFI_D_INFO, "Enabled S.M.A.R.T feature at [%a] channel [%a] device!\n",
-           (Channel == 1) ? "secondary" : "primary", (Device == 1) ? "slave" : "master"));
-
+    DEBUG ((
+      DEBUG_INFO,
+      "Enabled S.M.A.R.T feature at [%a] channel [%a] device!\n",
+      (Channel == 1) ? "secondary" : "primary",
+      (Device == 1) ? "slave" : "master"
+      ));
   }
 
-  return ;
+  return;
 }
-
 
 /**
   Sends out an ATA Identify Command to the specified device.
@@ -2315,7 +2320,7 @@ AtaIdentifyPacket (
   Status = AtaPioDataInOut (
              Instance->PciIo,
              &Instance->IdeRegisters[Channel],
-             (VOID *) Buffer,
+             (VOID *)Buffer,
              sizeof (EFI_IDENTIFY_DATA),
              TRUE,
              &AtaCommandBlock,
@@ -2326,7 +2331,6 @@ AtaIdentifyPacket (
 
   return Status;
 }
-
 
 /**
   This function is used for detect whether the IDE device exists in the
@@ -2357,22 +2361,22 @@ DetectAndConfigIdeDevice (
   IN  UINT8                         IdeChannel
   )
 {
-  EFI_STATUS                        Status;
-  UINT8                             SectorCountReg;
-  UINT8                             LBALowReg;
-  UINT8                             LBAMidReg;
-  UINT8                             LBAHighReg;
-  EFI_ATA_DEVICE_TYPE               DeviceType;
-  UINT8                             IdeDevice;
-  EFI_IDE_REGISTERS                 *IdeRegisters;
-  EFI_IDENTIFY_DATA                 Buffer;
+  EFI_STATUS           Status;
+  UINT8                SectorCountReg;
+  UINT8                LBALowReg;
+  UINT8                LBAMidReg;
+  UINT8                LBAHighReg;
+  EFI_ATA_DEVICE_TYPE  DeviceType;
+  UINT8                IdeDevice;
+  EFI_IDE_REGISTERS    *IdeRegisters;
+  EFI_IDENTIFY_DATA    Buffer;
 
   EFI_IDE_CONTROLLER_INIT_PROTOCOL  *IdeInit;
   EFI_PCI_IO_PROTOCOL               *PciIo;
 
-  EFI_ATA_COLLECTIVE_MODE           *SupportedModes;
-  EFI_ATA_TRANSFER_MODE             TransferMode;
-  EFI_ATA_DRIVE_PARMS               DriveParameters;
+  EFI_ATA_COLLECTIVE_MODE  *SupportedModes;
+  EFI_ATA_TRANSFER_MODE    TransferMode;
+  EFI_ATA_DRIVE_PARMS      DriveParameters;
 
   IdeRegisters = &Instance->IdeRegisters[IdeChannel];
   IdeInit      = Instance->IdeControllerInit;
@@ -2392,7 +2396,7 @@ DetectAndConfigIdeDevice (
 
     Status = WaitForBSYClear (PciIo, IdeRegisters, 350000000);
     if (EFI_ERROR (Status)) {
-      DEBUG((EFI_D_ERROR, "New detecting method: Send Execute Diagnostic Command: WaitForBSYClear: Status: %d\n", Status));
+      DEBUG ((DEBUG_ERROR, "New detecting method: Send Execute Diagnostic Command: WaitForBSYClear: Status: %d\n", Status));
       continue;
     }
 
@@ -2453,9 +2457,13 @@ DetectAndConfigIdeDevice (
       continue;
     }
 
-    DEBUG ((EFI_D_INFO, "[%a] channel [%a] [%a] device\n",
-            (IdeChannel == 1) ? "secondary" : "primary  ", (IdeDevice == 1) ? "slave " : "master",
-            DeviceType == EfiIdeCdrom ? "cdrom   " : "harddisk"));
+    DEBUG ((
+      DEBUG_INFO,
+      "[%a] channel [%a] [%a] device\n",
+      (IdeChannel == 1) ? "secondary" : "primary  ",
+      (IdeDevice == 1) ? "slave " : "master",
+      DeviceType == EfiIdeCdrom ? "cdrom   " : "harddisk"
+      ));
     //
     // If the device is a hard disk, then try to enable S.M.A.R.T feature
     //
@@ -2484,7 +2492,7 @@ DetectAndConfigIdeDevice (
                         &SupportedModes
                         );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Calculate Mode Fail, Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Calculate Mode Fail, Status = %r\n", Status));
       continue;
     }
 
@@ -2497,13 +2505,13 @@ DetectAndConfigIdeDevice (
       TransferMode.ModeCategory = EFI_ATA_MODE_FLOW_PIO;
     }
 
-    TransferMode.ModeNumber = (UINT8) (SupportedModes->PioMode.Mode);
+    TransferMode.ModeNumber = (UINT8)(SupportedModes->PioMode.Mode);
 
-    if (SupportedModes->ExtModeCount == 0){
+    if (SupportedModes->ExtModeCount == 0) {
       Status = SetDeviceTransferMode (Instance, IdeChannel, IdeDevice, &TransferMode, NULL);
 
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
+        DEBUG ((DEBUG_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
         continue;
       }
     }
@@ -2516,20 +2524,20 @@ DetectAndConfigIdeDevice (
     //
     if (SupportedModes->UdmaMode.Valid) {
       TransferMode.ModeCategory = EFI_ATA_MODE_UDMA;
-      TransferMode.ModeNumber   = (UINT8) (SupportedModes->UdmaMode.Mode);
-      Status = SetDeviceTransferMode (Instance, IdeChannel, IdeDevice, &TransferMode, NULL);
+      TransferMode.ModeNumber   = (UINT8)(SupportedModes->UdmaMode.Mode);
+      Status                    = SetDeviceTransferMode (Instance, IdeChannel, IdeDevice, &TransferMode, NULL);
 
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
+        DEBUG ((DEBUG_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
         continue;
       }
     } else if (SupportedModes->MultiWordDmaMode.Valid) {
       TransferMode.ModeCategory = EFI_ATA_MODE_MDMA;
-      TransferMode.ModeNumber   = (UINT8) SupportedModes->MultiWordDmaMode.Mode;
-      Status = SetDeviceTransferMode (Instance, IdeChannel, IdeDevice, &TransferMode, NULL);
+      TransferMode.ModeNumber   = (UINT8)SupportedModes->MultiWordDmaMode.Mode;
+      Status                    = SetDeviceTransferMode (Instance, IdeChannel, IdeDevice, &TransferMode, NULL);
 
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
+        DEBUG ((DEBUG_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
         continue;
       }
     }
@@ -2543,9 +2551,9 @@ DetectAndConfigIdeDevice (
       //
       // Init driver parameters
       //
-      DriveParameters.Sector         = (UINT8) ((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->sectors_per_track;
-      DriveParameters.Heads          = (UINT8) (((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->heads - 1);
-      DriveParameters.MultipleSector = (UINT8) ((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->multi_sector_cmd_max_sct_cnt;
+      DriveParameters.Sector         = (UINT8)((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->sectors_per_track;
+      DriveParameters.Heads          = (UINT8)(((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->heads - 1);
+      DriveParameters.MultipleSector = (UINT8)((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->multi_sector_cmd_max_sct_cnt;
 
       Status = SetDriveParameters (Instance, IdeChannel, IdeDevice, &DriveParameters, NULL);
     }
@@ -2568,9 +2576,9 @@ DetectAndConfigIdeDevice (
       REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_PC_ENABLE));
     }
   }
+
   return EFI_SUCCESS;
 }
-
 
 /**
   Initialize ATA host controller at IDE mode.
@@ -2583,7 +2591,7 @@ DetectAndConfigIdeDevice (
 EFI_STATUS
 EFIAPI
 IdeModeInitialization (
-  IN  ATA_ATAPI_PASS_THRU_INSTANCE    *Instance
+  IN  ATA_ATAPI_PASS_THRU_INSTANCE  *Instance
   )
 {
   EFI_STATUS                        Status;
@@ -2619,7 +2627,7 @@ IdeModeInitialization (
                         &MaxDevices
                         );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[GetChannel, Status=%x]", Status));
+      DEBUG ((DEBUG_ERROR, "[GetChannel, Status=%x]", Status));
       continue;
     }
 
@@ -2658,4 +2666,3 @@ IdeModeInitialization (
 ErrorExit:
   return Status;
 }
-

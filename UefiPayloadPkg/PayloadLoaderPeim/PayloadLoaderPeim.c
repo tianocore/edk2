@@ -38,25 +38,25 @@ EFIAPI
 PeiLoadFileLoadPayload (
   IN     CONST EFI_PEI_LOAD_FILE_PPI  *This,
   IN     EFI_PEI_FILE_HANDLE          FileHandle,
-  OUT    EFI_PHYSICAL_ADDRESS         *ImageAddressArg,  OPTIONAL
-  OUT    UINT64                       *ImageSizeArg,     OPTIONAL
+  OUT    EFI_PHYSICAL_ADDRESS         *ImageAddressArg   OPTIONAL,
+  OUT    UINT64                       *ImageSizeArg      OPTIONAL,
   OUT    EFI_PHYSICAL_ADDRESS         *EntryPoint,
   OUT    UINT32                       *AuthenticationState
   )
 {
-  EFI_STATUS                    Status;
-  VOID                          *Elf;
-  UNIVERSAL_PAYLOAD_EXTRA_DATA  *ExtraData;
-  ELF_IMAGE_CONTEXT             Context;
-  UNIVERSAL_PAYLOAD_INFO_HEADER *PldInfo;
-  UINT32                        Index;
-  UINT16                        ExtraDataIndex;
-  CHAR8                         *SectionName;
-  UINTN                         Offset;
-  UINTN                         Size;
-  UINT32                        ExtraDataCount;
-  UINTN                         Instance;
-  UINTN                         Length;
+  EFI_STATUS                     Status;
+  VOID                           *Elf;
+  UNIVERSAL_PAYLOAD_EXTRA_DATA   *ExtraData;
+  ELF_IMAGE_CONTEXT              Context;
+  UNIVERSAL_PAYLOAD_INFO_HEADER  *PldInfo;
+  UINT32                         Index;
+  UINT16                         ExtraDataIndex;
+  CHAR8                          *SectionName;
+  UINTN                          Offset;
+  UINTN                          Size;
+  UINT32                         ExtraDataCount;
+  UINTN                          Instance;
+  UINTN                          Length;
 
   //
   // ELF is added to file as RAW section for EDKII bootloader.
@@ -75,8 +75,11 @@ PeiLoadFileLoadPayload (
   } while (EFI_ERROR (Status));
 
   DEBUG ((
-    DEBUG_INFO, "Payload File Size: 0x%08X, Mem Size: 0x%08x, Reload: %d\n",
-    Context.FileSize, Context.ImageSize, Context.ReloadRequired
+    DEBUG_INFO,
+    "Payload File Size: 0x%08X, Mem Size: 0x%08x, Reload: %d\n",
+    Context.FileSize,
+    Context.ImageSize,
+    Context.ReloadRequired
     ));
 
   //
@@ -86,16 +89,17 @@ PeiLoadFileLoadPayload (
   ExtraDataCount = 0;
   for (Index = 0; Index < Context.ShNum; Index++) {
     Status = GetElfSectionName (&Context, Index, &SectionName);
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       continue;
     }
+
     DEBUG ((DEBUG_INFO, "Payload Section[%d]: %a\n", Index, SectionName));
-    if (AsciiStrCmp(SectionName, UNIVERSAL_PAYLOAD_INFO_SEC_NAME) == 0) {
+    if (AsciiStrCmp (SectionName, UNIVERSAL_PAYLOAD_INFO_SEC_NAME) == 0) {
       Status = GetElfSectionPos (&Context, Index, &Offset, &Size);
-      if (!EFI_ERROR(Status)) {
+      if (!EFI_ERROR (Status)) {
         PldInfo = (UNIVERSAL_PAYLOAD_INFO_HEADER *)(Context.FileBase + Offset);
       }
-    } else if (AsciiStrnCmp(SectionName, UNIVERSAL_PAYLOAD_EXTRA_SEC_NAME_PREFIX, UNIVERSAL_PAYLOAD_EXTRA_SEC_NAME_PREFIX_LENGTH) == 0) {
+    } else if (AsciiStrnCmp (SectionName, UNIVERSAL_PAYLOAD_EXTRA_SEC_NAME_PREFIX, UNIVERSAL_PAYLOAD_EXTRA_SEC_NAME_PREFIX_LENGTH) == 0) {
       Status = GetElfSectionPos (&Context, Index, &Offset, &Size);
       if (!EFI_ERROR (Status)) {
         ExtraDataCount++;
@@ -106,27 +110,28 @@ PeiLoadFileLoadPayload (
   //
   // Report the additional PLD sections through HOB.
   //
-  Length = sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA) + ExtraDataCount * sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA_ENTRY);
+  Length    = sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA) + ExtraDataCount * sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA_ENTRY);
   ExtraData = BuildGuidHob (
-               &gUniversalPayloadExtraDataGuid,
-               Length
-               );
-  ExtraData->Count = ExtraDataCount;
+                &gUniversalPayloadExtraDataGuid,
+                Length
+                );
+  ExtraData->Count           = ExtraDataCount;
   ExtraData->Header.Revision = UNIVERSAL_PAYLOAD_EXTRA_DATA_REVISION;
-  ExtraData->Header.Length = (UINT16) Length;
+  ExtraData->Header.Length   = (UINT16)Length;
   if (ExtraDataCount != 0) {
     for (ExtraDataIndex = 0, Index = 0; Index < Context.ShNum; Index++) {
       Status = GetElfSectionName (&Context, Index, &SectionName);
-      if (EFI_ERROR(Status)) {
+      if (EFI_ERROR (Status)) {
         continue;
       }
-      if (AsciiStrnCmp(SectionName, UNIVERSAL_PAYLOAD_EXTRA_SEC_NAME_PREFIX, UNIVERSAL_PAYLOAD_EXTRA_SEC_NAME_PREFIX_LENGTH) == 0) {
+
+      if (AsciiStrnCmp (SectionName, UNIVERSAL_PAYLOAD_EXTRA_SEC_NAME_PREFIX, UNIVERSAL_PAYLOAD_EXTRA_SEC_NAME_PREFIX_LENGTH) == 0) {
         Status = GetElfSectionPos (&Context, Index, &Offset, &Size);
         if (!EFI_ERROR (Status)) {
           ASSERT (ExtraDataIndex < ExtraDataCount);
           AsciiStrCpyS (
             ExtraData->Entry[ExtraDataIndex].Identifier,
-            sizeof(ExtraData->Entry[ExtraDataIndex].Identifier),
+            sizeof (ExtraData->Entry[ExtraDataIndex].Identifier),
             SectionName + UNIVERSAL_PAYLOAD_EXTRA_SEC_NAME_PREFIX_LENGTH
             );
           ExtraData->Entry[ExtraDataIndex].Base = (UINTN)(Context.FileBase + Offset);
@@ -137,7 +142,7 @@ PeiLoadFileLoadPayload (
     }
   }
 
-  if (Context.ReloadRequired || Context.PreferredImageAddress != Context.FileBase) {
+  if (Context.ReloadRequired || (Context.PreferredImageAddress != Context.FileBase)) {
     Context.ImageAddress = AllocatePages (EFI_SIZE_TO_PAGES (Context.ImageSize));
   } else {
     Context.ImageAddress = Context.FileBase;
@@ -147,25 +152,25 @@ PeiLoadFileLoadPayload (
   // Load ELF into the required base
   //
   Status = LoadElfImage (&Context);
-  if (!EFI_ERROR(Status)) {
-    *ImageAddressArg = (UINTN) Context.ImageAddress;
+  if (!EFI_ERROR (Status)) {
+    *ImageAddressArg = (UINTN)Context.ImageAddress;
     *EntryPoint      = Context.EntryPoint;
     *ImageSizeArg    = Context.ImageSize;
   }
+
   return Status;
 }
 
-
-EFI_PEI_LOAD_FILE_PPI   mPeiLoadFilePpi = {
+EFI_PEI_LOAD_FILE_PPI  mPeiLoadFilePpi = {
   PeiLoadFileLoadPayload
 };
 
-
-EFI_PEI_PPI_DESCRIPTOR     gPpiLoadFilePpiList = {
+EFI_PEI_PPI_DESCRIPTOR  gPpiLoadFilePpiList = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiLoadFilePpiGuid,
   &mPeiLoadFilePpi
 };
+
 /**
 
   Install Pei Load File PPI.
@@ -185,6 +190,7 @@ InitializePayloadLoaderPeim (
   )
 {
   EFI_STATUS  Status;
+
   Status = PeiServicesInstallPpi (&gPpiLoadFilePpiList);
 
   return Status;

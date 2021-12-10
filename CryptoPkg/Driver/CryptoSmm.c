@@ -36,6 +36,6 @@ CryptoSmmEntry (
                   &Handle,
                   &gEdkiiSmmCryptoProtocolGuid,
                   EFI_NATIVE_INTERFACE,
-                  (EDKII_CRYPTO_PROTOCOL *) &mEdkiiCrypto
+                  (EDKII_CRYPTO_PROTOCOL *)&mEdkiiCrypto
                   );
 }

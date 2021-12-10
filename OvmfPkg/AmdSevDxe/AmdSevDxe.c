@@ -17,13 +17,25 @@
 #include <Library/DxeServicesTableLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Guid/ConfidentialComputingSevSnpBlob.h>
 #include <Library/PcdLib.h>
+
+STATIC CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION  mSnpBootDxeTable = {
+  SIGNATURE_32 ('A',                                    'M', 'D', 'E'),
+  1,
+  0,
+  (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfSnpSecretsBase),
+  FixedPcdGet32 (PcdOvmfSnpSecretsSize),
+  (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfCpuidBase),
+  FixedPcdGet32 (PcdOvmfCpuidSize),
+};
 
 EFI_STATUS
 EFIAPI
 AmdSevDxeEntryPoint (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS                       Status;
@@ -48,11 +60,12 @@ AmdSevDxeEntryPoint (
   Status = gDS->GetMemorySpaceMap (&NumEntries, &AllDescMap);
   if (!EFI_ERROR (Status)) {
     for (Index = 0; Index < NumEntries; Index++) {
-      CONST EFI_GCD_MEMORY_SPACE_DESCRIPTOR *Desc;
+      CONST EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *Desc;
 
       Desc = &AllDescMap[Index];
-      if (Desc->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo ||
-          Desc->GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
+      if ((Desc->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) ||
+          (Desc->GcdMemoryType == EfiGcdMemoryTypeNonExistent))
+      {
         Status = MemEncryptSevClearMmioPageEncMask (
                    0,
                    Desc->BaseAddress,
@@ -101,8 +114,8 @@ AmdSevDxeEntryPoint (
   // is completed (See OvmfPkg/Library/SmmCpuFeaturesLib/SmmCpuFeaturesLib.c).
   //
   if (FeaturePcdGet (PcdSmmSmramRequire)) {
-    UINTN MapPagesBase;
-    UINTN MapPagesCount;
+    UINTN  MapPagesBase;
+    UINTN  MapPagesCount;
 
     Status = MemEncryptSevLocateInitialSmramSaveStateMapPages (
                &MapPagesBase,
@@ -123,11 +136,26 @@ AmdSevDxeEntryPoint (
                MapPagesCount  // NumPages
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: MemEncryptSevClearPageEncMask(): %r\n",
-        __FUNCTION__, Status));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: MemEncryptSevClearPageEncMask(): %r\n",
+        __FUNCTION__,
+        Status
+        ));
       ASSERT (FALSE);
       CpuDeadLoop ();
     }
+  }
+
+  //
+  // If its SEV-SNP active guest then install the CONFIDENTIAL_COMPUTING_SEV_SNP_BLOB.
+  // It contains the location for both the Secrets and CPUID page.
+  //
+  if (MemEncryptSevSnpIsEnabled ()) {
+    return gBS->InstallConfigurationTable (
+                  &gConfidentialComputingSevSnpBlobGuid,
+                  &mSnpBootDxeTable
+                  );
   }
 
   return EFI_SUCCESS;

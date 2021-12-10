@@ -27,7 +27,7 @@
 
 #include <Protocol/FdtClient.h>
 
-STATIC UINT32 mArmPsciMethod;
+STATIC UINT32  mArmPsciMethod;
 
 RETURN_STATUS
 EFIAPI
@@ -35,16 +35,24 @@ ArmPsciResetSystemLibConstructor (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  FDT_CLIENT_PROTOCOL   *FdtClient;
-  CONST VOID            *Prop;
+  EFI_STATUS           Status;
+  FDT_CLIENT_PROTOCOL  *FdtClient;
+  CONST VOID           *Prop;
 
-  Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
-                  (VOID **)&FdtClient);
+  Status = gBS->LocateProtocol (
+                  &gFdtClientProtocolGuid,
+                  NULL,
+                  (VOID **)&FdtClient
+                  );
   ASSERT_EFI_ERROR (Status);
 
-  Status = FdtClient->FindCompatibleNodeProperty (FdtClient, "arm,psci-0.2",
-                        "method", &Prop, NULL);
+  Status = FdtClient->FindCompatibleNodeProperty (
+                        FdtClient,
+                        "arm,psci-0.2",
+                        "method",
+                        &Prop,
+                        NULL
+                        );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -54,10 +62,15 @@ ArmPsciResetSystemLibConstructor (
   } else if (AsciiStrnCmp (Prop, "smc", 3) == 0) {
     mArmPsciMethod = 2;
   } else {
-    DEBUG ((EFI_D_ERROR, "%a: Unknown PSCI method \"%a\"\n", __FUNCTION__,
-      Prop));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Unknown PSCI method \"%a\"\n",
+      __FUNCTION__,
+      Prop
+      ));
     return EFI_NOT_FOUND;
   }
+
   return EFI_SUCCESS;
 }
 
@@ -75,24 +88,24 @@ ResetCold (
   VOID
   )
 {
-  ARM_SMC_ARGS ArmSmcArgs;
-  ARM_HVC_ARGS ArmHvcArgs;
+  ARM_SMC_ARGS  ArmSmcArgs;
+  ARM_HVC_ARGS  ArmHvcArgs;
 
   // Send a PSCI 0.2 SYSTEM_RESET command
   ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
   ArmHvcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
 
   switch (mArmPsciMethod) {
-  case 1:
-    ArmCallHvc (&ArmHvcArgs);
-    break;
+    case 1:
+      ArmCallHvc (&ArmHvcArgs);
+      break;
 
-  case 2:
-    ArmCallSmc (&ArmSmcArgs);
-    break;
+    case 2:
+      ArmCallSmc (&ArmSmcArgs);
+      break;
 
-  default:
-    DEBUG ((EFI_D_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
+    default:
+      DEBUG ((DEBUG_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
   }
 }
 
@@ -124,24 +137,24 @@ ResetShutdown (
   VOID
   )
 {
-  ARM_SMC_ARGS ArmSmcArgs;
-  ARM_HVC_ARGS ArmHvcArgs;
+  ARM_SMC_ARGS  ArmSmcArgs;
+  ARM_HVC_ARGS  ArmHvcArgs;
 
   // Send a PSCI 0.2 SYSTEM_OFF command
   ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_OFF;
   ArmHvcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_OFF;
 
   switch (mArmPsciMethod) {
-  case 1:
-    ArmCallHvc (&ArmHvcArgs);
-    break;
+    case 1:
+      ArmCallHvc (&ArmHvcArgs);
+      break;
 
-  case 2:
-    ArmCallSmc (&ArmSmcArgs);
-    break;
+    case 2:
+      ArmCallSmc (&ArmSmcArgs);
+      break;
 
-  default:
-    DEBUG ((EFI_D_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
+    default:
+      DEBUG ((DEBUG_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
   }
 }
 
@@ -159,8 +172,8 @@ ResetShutdown (
 VOID
 EFIAPI
 ResetPlatformSpecific (
-  IN UINTN   DataSize,
-  IN VOID    *ResetData
+  IN UINTN  DataSize,
+  IN VOID   *ResetData
   )
 {
   // Map the platform specific reset as reboot
@@ -182,30 +195,30 @@ ResetPlatformSpecific (
 VOID
 EFIAPI
 ResetSystem (
-  IN EFI_RESET_TYPE               ResetType,
-  IN EFI_STATUS                   ResetStatus,
-  IN UINTN                        DataSize,
-  IN VOID                         *ResetData OPTIONAL
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
   )
 {
   switch (ResetType) {
-  case EfiResetWarm:
-    ResetWarm ();
-    break;
+    case EfiResetWarm:
+      ResetWarm ();
+      break;
 
-  case EfiResetCold:
-    ResetCold ();
-    break;
+    case EfiResetCold:
+      ResetCold ();
+      break;
 
-  case EfiResetShutdown:
-    ResetShutdown ();
-    return;
+    case EfiResetShutdown:
+      ResetShutdown ();
+      return;
 
-  case EfiResetPlatformSpecific:
-    ResetPlatformSpecific (DataSize, ResetData);
-    return;
+    case EfiResetPlatformSpecific:
+      ResetPlatformSpecific (DataSize, ResetData);
+      return;
 
-  default:
-    return;
+    default:
+      return;
   }
 }

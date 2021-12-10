@@ -36,9 +36,9 @@
 EFI_STATUS
 EFIAPI
 SecPlatformInformationPostMemory (
-  IN CONST EFI_PEI_SERVICES                     **PeiServices,
-  IN OUT   UINT64                               *StructureSize,
-     OUT   EFI_SEC_PLATFORM_INFORMATION_RECORD  *PlatformInformationRecord
+  IN CONST EFI_PEI_SERVICES                  **PeiServices,
+  IN OUT   UINT64                            *StructureSize,
+  OUT   EFI_SEC_PLATFORM_INFORMATION_RECORD  *PlatformInformationRecord
   );
 
 /**
@@ -55,9 +55,9 @@ SecPlatformInformationPostMemory (
 EFI_STATUS
 EFIAPI
 SecPlatformInformationPpiNotifyCallback (
-  IN EFI_PEI_SERVICES              **PeiServices,
-  IN EFI_PEI_NOTIFY_DESCRIPTOR     *NotifyDescriptor,
-  IN VOID                          *Ppi
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
   );
 
 /**
@@ -110,10 +110,10 @@ SecTemporaryRamDonePostMemory (
 EFI_STATUS
 EFIAPI
 SecTemporaryRamSupportPostMemory (
-  IN CONST EFI_PEI_SERVICES   **PeiServices,
-  IN EFI_PHYSICAL_ADDRESS     TemporaryMemoryBase,
-  IN EFI_PHYSICAL_ADDRESS     PermanentMemoryBase,
-  IN UINTN                    CopySize
+  IN CONST EFI_PEI_SERVICES  **PeiServices,
+  IN EFI_PHYSICAL_ADDRESS    TemporaryMemoryBase,
+  IN EFI_PHYSICAL_ADDRESS    PermanentMemoryBase,
+  IN UINTN                   CopySize
   );
 
 /**
@@ -143,16 +143,16 @@ GetPerformancePostMemory (
   );
 
 typedef struct {
-  UINT64                                StructureSize;
-  EFI_SEC_PLATFORM_INFORMATION_RECORD   *PlatformInformationRecord;
+  UINT64                                 StructureSize;
+  EFI_SEC_PLATFORM_INFORMATION_RECORD    *PlatformInformationRecord;
 } SEC_PLATFORM_INFORMATION_CONTEXT;
 
 typedef struct {
-  EFI_HOB_GUID_TYPE                     Header;
-  UINT8                                 Revision;
-  UINT8                                 Reserved[3];
-  FIRMWARE_SEC_PERFORMANCE              FirmwareSecPerformance;
-  SEC_PLATFORM_INFORMATION_CONTEXT      Context;
+  EFI_HOB_GUID_TYPE                   Header;
+  UINT8                               Revision;
+  UINT8                               Reserved[3];
+  FIRMWARE_SEC_PERFORMANCE            FirmwareSecPerformance;
+  SEC_PLATFORM_INFORMATION_CONTEXT    Context;
 } SEC_PLATFORM_INFORMATION_CONTEXT_HOB;
 
 #endif

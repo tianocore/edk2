@@ -31,29 +31,29 @@
 **/
 EFI_STATUS
 LocateAndInstallAcpiFromFvConditional (
-  IN CONST EFI_GUID*        AcpiFile,
+  IN CONST EFI_GUID         *AcpiFile,
   IN EFI_LOCATE_ACPI_CHECK  CheckAcpiTableFunction
   )
 {
-  EFI_STATUS                    Status;
-  EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol;
-  EFI_HANDLE                    *HandleBuffer;
-  UINTN                         NumberOfHandles;
-  UINT32                        FvStatus;
-  UINTN                         Index;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL *FvInstance;
-  INTN                          SectionInstance;
-  UINTN                         SectionSize;
-  EFI_ACPI_COMMON_HEADER       *AcpiTable;
-  UINTN                         AcpiTableSize;
-  UINTN                         AcpiTableKey;
-  BOOLEAN                       Valid;
+  EFI_STATUS                     Status;
+  EFI_ACPI_TABLE_PROTOCOL        *AcpiProtocol;
+  EFI_HANDLE                     *HandleBuffer;
+  UINTN                          NumberOfHandles;
+  UINT32                         FvStatus;
+  UINTN                          Index;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL  *FvInstance;
+  INTN                           SectionInstance;
+  UINTN                          SectionSize;
+  EFI_ACPI_COMMON_HEADER         *AcpiTable;
+  UINTN                          AcpiTableSize;
+  UINTN                          AcpiTableKey;
+  BOOLEAN                        Valid;
 
   // Ensure the ACPI Table is present
   Status = gBS->LocateProtocol (
                   &gEfiAcpiTableProtocolGuid,
                   NULL,
-                  (VOID**)&AcpiProtocol
+                  (VOID **)&AcpiProtocol
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -64,12 +64,12 @@ LocateAndInstallAcpiFromFvConditional (
 
   // Locate all the Firmware Volume protocols.
   Status = gBS->LocateHandleBuffer (
-                   ByProtocol,
-                   &gEfiFirmwareVolume2ProtocolGuid,
-                   NULL,
-                   &NumberOfHandles,
-                   &HandleBuffer
-                   );
+                  ByProtocol,
+                  &gEfiFirmwareVolume2ProtocolGuid,
+                  NULL,
+                  &NumberOfHandles,
+                  &HandleBuffer
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -81,10 +81,10 @@ LocateAndInstallAcpiFromFvConditional (
     // This should not fail because of LocateHandleBuffer
     //
     Status = gBS->HandleProtocol (
-                     HandleBuffer[Index],
-                     &gEfiFirmwareVolume2ProtocolGuid,
-                     (VOID**) &FvInstance
-                     );
+                    HandleBuffer[Index],
+                    &gEfiFirmwareVolume2ProtocolGuid,
+                    (VOID **)&FvInstance
+                    );
     if (EFI_ERROR (Status)) {
       goto FREE_HANDLE_BUFFER;
     }
@@ -95,24 +95,27 @@ LocateAndInstallAcpiFromFvConditional (
 
       // See if it has the ACPI storage file
       Status = FvInstance->ReadSection (
-                        FvInstance,
-                        AcpiFile,
-                        EFI_SECTION_RAW,
-                        SectionInstance,
-                        (VOID**) &AcpiTable,
-                        &SectionSize,
-                        &FvStatus
-                        );
+                             FvInstance,
+                             AcpiFile,
+                             EFI_SECTION_RAW,
+                             SectionInstance,
+                             (VOID **)&AcpiTable,
+                             &SectionSize,
+                             &FvStatus
+                             );
       if (!EFI_ERROR (Status)) {
-        AcpiTableKey = 0;
-        AcpiTableSize = ((EFI_ACPI_DESCRIPTION_HEADER *) AcpiTable)->Length;
+        AcpiTableKey  = 0;
+        AcpiTableSize = ((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Length;
         ASSERT (SectionSize >= AcpiTableSize);
 
-        DEBUG ((EFI_D_ERROR, "- Found '%c%c%c%c' ACPI Table\n",
-            (((EFI_ACPI_DESCRIPTION_HEADER *) AcpiTable)->Signature & 0xFF),
-            ((((EFI_ACPI_DESCRIPTION_HEADER *) AcpiTable)->Signature >> 8) & 0xFF),
-            ((((EFI_ACPI_DESCRIPTION_HEADER *) AcpiTable)->Signature >> 16) & 0xFF),
-            ((((EFI_ACPI_DESCRIPTION_HEADER *) AcpiTable)->Signature >> 24) & 0xFF)));
+        DEBUG ((
+          DEBUG_ERROR,
+          "- Found '%c%c%c%c' ACPI Table\n",
+          (((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Signature & 0xFF),
+          ((((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Signature >> 8) & 0xFF),
+          ((((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Signature >> 16) & 0xFF),
+          ((((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Signature >> 24) & 0xFF)
+          ));
 
         // Is the ACPI table valid?
         if (CheckAcpiTableFunction) {
@@ -124,11 +127,11 @@ LocateAndInstallAcpiFromFvConditional (
         // Install the ACPI Table
         if (Valid) {
           Status = AcpiProtocol->InstallAcpiTable (
-                                 AcpiProtocol,
-                                 AcpiTable,
-                                 AcpiTableSize,
-                                 &AcpiTableKey
-                                 );
+                                   AcpiProtocol,
+                                   AcpiTable,
+                                   AcpiTableSize,
+                                   &AcpiTableKey
+                                   );
         }
 
         // Free memory allocated by ReadSection
@@ -165,7 +168,7 @@ FREE_HANDLE_BUFFER:
 **/
 EFI_STATUS
 LocateAndInstallAcpiFromFv (
-  IN CONST EFI_GUID* AcpiFile
+  IN CONST EFI_GUID  *AcpiFile
   )
 {
   return LocateAndInstallAcpiFromFvConditional (AcpiFile, NULL);

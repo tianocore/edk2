@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 InitializePciDriverOverrideInstance (
-  IN OUT PCI_IO_DEVICE          *PciIoDevice
+  IN OUT PCI_IO_DEVICE  *PciIoDevice
   )
 {
   PciIoDevice->PciDriverOverride.GetDriver = GetDriver;
@@ -31,16 +31,16 @@ InitializePciDriverOverrideInstance (
 **/
 EFI_HANDLE
 LocateImageHandle (
-  IN EFI_DEVICE_PATH_PROTOCOL   *ImagePath
+  IN EFI_DEVICE_PATH_PROTOCOL  *ImagePath
   )
 {
-  EFI_STATUS                    Status;
-  EFI_HANDLE                    *Handles;
-  UINTN                         Index;
-  UINTN                         HandleNum;
-  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
-  UINTN                         ImagePathSize;
-  EFI_HANDLE                    ImageHandle;
+  EFI_STATUS                Status;
+  EFI_HANDLE                *Handles;
+  UINTN                     Index;
+  UINTN                     HandleNum;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  UINTN                     ImagePathSize;
+  EFI_HANDLE                ImageHandle;
 
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
@@ -57,13 +57,15 @@ LocateImageHandle (
   ImagePathSize = GetDevicePathSize (ImagePath);
 
   for (Index = 0; Index < HandleNum; Index++) {
-    Status = gBS->HandleProtocol (Handles[Index], &gEfiLoadedImageDevicePathProtocolGuid, (VOID **) &DevicePath);
+    Status = gBS->HandleProtocol (Handles[Index], &gEfiLoadedImageDevicePathProtocolGuid, (VOID **)&DevicePath);
     if (EFI_ERROR (Status)) {
       continue;
     }
+
     if ((ImagePathSize == GetDevicePathSize (DevicePath)) &&
         (CompareMem (ImagePath, DevicePath, ImagePathSize) == 0)
-        ) {
+        )
+    {
       ImageHandle = Handles[Index];
       break;
     }
@@ -92,8 +94,8 @@ LocateImageHandle (
 EFI_STATUS
 EFIAPI
 GetDriver (
-  IN EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL              *This,
-  IN OUT EFI_HANDLE                                         *DriverImageHandle
+  IN EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL  *This,
+  IN OUT EFI_HANDLE                             *DriverImageHandle
   )
 {
   PCI_IO_DEVICE             *PciIoDevice;
@@ -103,12 +105,12 @@ GetDriver (
 
   Override    = NULL;
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_DRIVER_OVERRIDE_THIS (This);
-  ReturnNext  = (BOOLEAN) (*DriverImageHandle == NULL);
+  ReturnNext  = (BOOLEAN)(*DriverImageHandle == NULL);
   for ( Link = GetFirstNode (&PciIoDevice->OptionRomDriverList)
-      ; !IsNull (&PciIoDevice->OptionRomDriverList, Link)
-      ; Link = GetNextNode (&PciIoDevice->OptionRomDriverList, Link)
-      ) {
-
+        ; !IsNull (&PciIoDevice->OptionRomDriverList, Link)
+        ; Link = GetNextNode (&PciIoDevice->OptionRomDriverList, Link)
+        )
+  {
     Override = DRIVER_OVERRIDE_FROM_LINK (Link);
 
     if (ReturnNext) {
@@ -159,12 +161,12 @@ GetDriver (
 **/
 EFI_STATUS
 AddDriver (
-  IN PCI_IO_DEVICE            *PciIoDevice,
-  IN EFI_HANDLE               DriverImageHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL *DriverImagePath
+  IN PCI_IO_DEVICE             *PciIoDevice,
+  IN EFI_HANDLE                DriverImageHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL  *DriverImagePath
   )
 {
-  PCI_DRIVER_OVERRIDE_LIST      *Node;
+  PCI_DRIVER_OVERRIDE_LIST  *Node;
 
   //
   // Caller should pass in either Image Handle or Image Path, but not both.
@@ -182,7 +184,6 @@ AddDriver (
 
   InsertTailList (&PciIoDevice->OptionRomDriverList, &Node->Link);
 
-  PciIoDevice->BusOverride  = TRUE;
+  PciIoDevice->BusOverride = TRUE;
   return EFI_SUCCESS;
 }
-

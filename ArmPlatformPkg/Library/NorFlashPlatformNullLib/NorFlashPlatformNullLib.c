@@ -18,11 +18,11 @@ NorFlashPlatformInitialization (
 
 EFI_STATUS
 NorFlashPlatformGetDevices (
-  OUT NOR_FLASH_DESCRIPTION   **NorFlashDescriptions,
-  OUT UINT32                  *Count
+  OUT NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
+  OUT UINT32                 *Count
   )
 {
   *NorFlashDescriptions = NULL;
-  *Count = 0;
+  *Count                = 0;
   return EFI_SUCCESS;
 }

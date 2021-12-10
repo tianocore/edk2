@@ -6,7 +6,6 @@
 
 **/
 
-
 #include <Uefi.h>
 #include <Protocol/Security.h>
 #include <Protocol/Security2.h>
@@ -19,7 +18,7 @@
 //
 // Handle for the Security Architectural Protocol instance produced by this driver
 //
-EFI_HANDLE                  mSecurityArchProtocolHandle = NULL;
+EFI_HANDLE  mSecurityArchProtocolHandle = NULL;
 
 /**
   The EFI_SECURITY_ARCH_PROTOCOL (SAP) is used to abstract platform-specific
@@ -64,15 +63,16 @@ SecurityStubAuthenticateState (
   IN CONST EFI_DEVICE_PATH_PROTOCOL    *File
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
-  Status = ExecuteSecurity2Handlers (EFI_AUTH_OPERATION_AUTHENTICATION_STATE,
-                                   AuthenticationStatus,
-                                   File,
-                                   NULL,
-                                   0,
-                                   FALSE
-                                   );
+  Status = ExecuteSecurity2Handlers (
+             EFI_AUTH_OPERATION_AUTHENTICATION_STATE,
+             AuthenticationStatus,
+             File,
+             NULL,
+             0,
+             FALSE
+             );
   if (Status == EFI_SUCCESS) {
     Status = ExecuteSecurityHandlers (AuthenticationStatus, File);
   }
@@ -128,14 +128,14 @@ SecurityStubAuthenticateState (
 EFI_STATUS
 EFIAPI
 Security2StubAuthenticate (
-  IN CONST EFI_SECURITY2_ARCH_PROTOCOL *This,
-  IN CONST EFI_DEVICE_PATH_PROTOCOL    *File, OPTIONAL
-  IN VOID                              *FileBuffer,
-  IN UINTN                             FileSize,
-  IN BOOLEAN                           BootPolicy
+  IN CONST EFI_SECURITY2_ARCH_PROTOCOL  *This,
+  IN CONST EFI_DEVICE_PATH_PROTOCOL     *File  OPTIONAL,
+  IN VOID                               *FileBuffer,
+  IN UINTN                              FileSize,
+  IN BOOLEAN                            BootPolicy
   )
 {
-  EFI_STATUS                           Status;
+  EFI_STATUS  Status;
 
   if (FileBuffer != NULL) {
     Status = Defer3rdPartyImageLoad (File, BootPolicy);
@@ -144,16 +144,17 @@ Security2StubAuthenticate (
     }
   }
 
-  return ExecuteSecurity2Handlers (EFI_AUTH_OPERATION_VERIFY_IMAGE |
-                                   EFI_AUTH_OPERATION_DEFER_IMAGE_LOAD |
-                                   EFI_AUTH_OPERATION_MEASURE_IMAGE |
-                                   EFI_AUTH_OPERATION_CONNECT_POLICY,
-                                   0,
-                                   File,
-                                   FileBuffer,
-                                   FileSize,
-                                   BootPolicy
-                                   );
+  return ExecuteSecurity2Handlers (
+           EFI_AUTH_OPERATION_VERIFY_IMAGE |
+           EFI_AUTH_OPERATION_DEFER_IMAGE_LOAD |
+           EFI_AUTH_OPERATION_MEASURE_IMAGE |
+           EFI_AUTH_OPERATION_CONNECT_POLICY,
+           0,
+           File,
+           FileBuffer,
+           FileSize,
+           BootPolicy
+           );
 }
 
 //
@@ -163,7 +164,7 @@ EFI_SECURITY_ARCH_PROTOCOL  mSecurityStub = {
   SecurityStubAuthenticateState
 };
 
-EFI_SECURITY2_ARCH_PROTOCOL mSecurity2Stub = {
+EFI_SECURITY2_ARCH_PROTOCOL  mSecurity2Stub = {
   Security2StubAuthenticate
 };
 

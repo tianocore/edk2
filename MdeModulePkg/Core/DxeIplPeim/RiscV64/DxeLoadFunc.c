@@ -22,28 +22,29 @@
 **/
 VOID
 HandOffToDxeCore (
-  IN EFI_PHYSICAL_ADDRESS   DxeCoreEntryPoint,
-  IN EFI_PEI_HOB_POINTERS   HobList
+  IN EFI_PHYSICAL_ADDRESS  DxeCoreEntryPoint,
+  IN EFI_PEI_HOB_POINTERS  HobList
   )
 {
-  VOID                            *BaseOfStack;
-  VOID                            *TopOfStack;
-  EFI_STATUS                      Status;
+  VOID        *BaseOfStack;
+  VOID        *TopOfStack;
+  EFI_STATUS  Status;
+
   //
   //
   // Allocate 128KB for the Stack
   //
   BaseOfStack = AllocatePages (EFI_SIZE_TO_PAGES (STACK_SIZE));
   if (BaseOfStack == NULL) {
-    DEBUG((DEBUG_ERROR, "%a: Can't allocate memory for stack.", __FUNCTION__));
-    ASSERT(FALSE);
+    DEBUG ((DEBUG_ERROR, "%a: Can't allocate memory for stack.", __FUNCTION__));
+    ASSERT (FALSE);
   }
 
   //
   // Compute the top of the stack we were allocated. Pre-allocate a UINTN
   // for safety.
   //
-  TopOfStack = (VOID *)((UINTN) BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT);
+  TopOfStack = (VOID *)((UINTN)BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT);
   TopOfStack = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
   //
@@ -51,13 +52,14 @@ HandOffToDxeCore (
   //
   Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
   if (EFI_ERROR (Status)) {
-    DEBUG((DEBUG_ERROR, "%a: Fail to signal End of PEI event.", __FUNCTION__));
-    ASSERT(FALSE);
+    DEBUG ((DEBUG_ERROR, "%a: Fail to signal End of PEI event.", __FUNCTION__));
+    ASSERT (FALSE);
   }
+
   //
   // Update the contents of BSP stack HOB to reflect the real stack info passed to DxeCore.
   //
-  UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN) BaseOfStack, STACK_SIZE);
+  UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN)BaseOfStack, STACK_SIZE);
 
   DEBUG ((DEBUG_INFO, "DXE Core new stack at %x, stack pointer at %x\n", BaseOfStack, TopOfStack));
 
@@ -71,4 +73,3 @@ HandOffToDxeCore (
     TopOfStack
     );
 }
-

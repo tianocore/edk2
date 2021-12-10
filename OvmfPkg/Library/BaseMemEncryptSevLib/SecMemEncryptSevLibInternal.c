@@ -35,8 +35,8 @@ InternalMemEncryptSevStatus (
 
   ReadSevMsr = FALSE;
 
-  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *) FixedPcdGet32 (PcdSevEsWorkAreaBase);
-  if (SevEsWorkArea != NULL && SevEsWorkArea->EncryptionMask != 0) {
+  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  if ((SevEsWorkArea != NULL) && (SevEsWorkArea->EncryptionMask != 0)) {
     //
     // The MSR has been read before, so it is safe to read it again and avoid
     // having to validate the CPUID information.
@@ -63,6 +63,25 @@ InternalMemEncryptSevStatus (
 }
 
 /**
+  Returns a boolean to indicate whether SEV-SNP is enabled.
+
+  @retval TRUE           SEV-SNP is enabled
+  @retval FALSE          SEV-SNP is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevSnpIsEnabled (
+  VOID
+  )
+{
+  MSR_SEV_STATUS_REGISTER  Msr;
+
+  Msr.Uint32 = InternalMemEncryptSevStatus ();
+
+  return Msr.Bits.SevSnpBit ? TRUE : FALSE;
+}
+
+/**
   Returns a boolean to indicate whether SEV-ES is enabled.
 
   @retval TRUE           SEV-ES is enabled
@@ -74,7 +93,7 @@ MemEncryptSevEsIsEnabled (
   VOID
   )
 {
-  MSR_SEV_STATUS_REGISTER           Msr;
+  MSR_SEV_STATUS_REGISTER  Msr;
 
   Msr.Uint32 = InternalMemEncryptSevStatus ();
 
@@ -93,7 +112,7 @@ MemEncryptSevIsEnabled (
   VOID
   )
 {
-  MSR_SEV_STATUS_REGISTER           Msr;
+  MSR_SEV_STATUS_REGISTER  Msr;
 
   Msr.Uint32 = InternalMemEncryptSevStatus ();
 
@@ -115,7 +134,7 @@ MemEncryptSevGetEncryptionMask (
   SEC_SEV_ES_WORK_AREA              *SevEsWorkArea;
   UINT64                            EncryptionMask;
 
-  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *) FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
   if (SevEsWorkArea != NULL) {
     EncryptionMask = SevEsWorkArea->EncryptionMask;
   } else {
@@ -147,8 +166,8 @@ MemEncryptSevGetEncryptionMask (
 RETURN_STATUS
 EFIAPI
 MemEncryptSevLocateInitialSmramSaveStateMapPages (
-  OUT UINTN *BaseAddress,
-  OUT UINTN *NumberOfPages
+  OUT UINTN  *BaseAddress,
+  OUT UINTN  *NumberOfPages
   )
 {
   return RETURN_UNSUPPORTED;

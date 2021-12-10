@@ -30,11 +30,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 STATIC
 VOID
 FatFlushDataCacheRange (
-  IN  FAT_VOLUME         *Volume,
-  IN  IO_MODE            IoMode,
-  IN  UINTN              StartPageNo,
-  IN  UINTN              EndPageNo,
-  OUT UINT8              *Buffer
+  IN  FAT_VOLUME  *Volume,
+  IN  IO_MODE     IoMode,
+  IN  UINTN       StartPageNo,
+  IN  UINTN       EndPageNo,
+  OUT UINT8       *Buffer
   )
 {
   UINTN       PageNo;
@@ -53,9 +53,9 @@ FatFlushDataCacheRange (
   PageSize      = (UINTN)1 << PageAlignment;
 
   for (PageNo = StartPageNo; PageNo < EndPageNo; PageNo++) {
-    GroupNo   = PageNo & GroupMask;
-    CacheTag  = &DiskCache->CacheTag[GroupNo];
-    if (CacheTag->RealSize > 0 && CacheTag->PageNo == PageNo) {
+    GroupNo  = PageNo & GroupMask;
+    CacheTag = &DiskCache->CacheTag[GroupNo];
+    if ((CacheTag->RealSize > 0) && (CacheTag->PageNo == PageNo)) {
       //
       // When reading data form disk directly, if some dirty data
       // in cache is in this rang, this data in the Buffer need to
@@ -96,11 +96,11 @@ FatFlushDataCacheRange (
 STATIC
 EFI_STATUS
 FatExchangeCachePage (
-  IN FAT_VOLUME         *Volume,
-  IN CACHE_DATA_TYPE    DataType,
-  IN IO_MODE            IoMode,
-  IN CACHE_TAG          *CacheTag,
-  IN FAT_TASK           *Task
+  IN FAT_VOLUME       *Volume,
+  IN CACHE_DATA_TYPE  DataType,
+  IN IO_MODE          IoMode,
+  IN CACHE_TAG        *CacheTag,
+  IN FAT_TASK         *Task
   )
 {
   EFI_STATUS  Status;
@@ -122,16 +122,16 @@ FatExchangeCachePage (
   EntryPos      = DiskCache->BaseAddress + LShiftU64 (PageNo, PageAlignment);
   RealSize      = CacheTag->RealSize;
   if (IoMode == ReadDisk) {
-    RealSize  = (UINTN)1 << PageAlignment;
-    MaxSize   = DiskCache->LimitAddress - EntryPos;
+    RealSize = (UINTN)1 << PageAlignment;
+    MaxSize  = DiskCache->LimitAddress - EntryPos;
     if (MaxSize < RealSize) {
-      DEBUG ((EFI_D_INFO, "FatDiskIo: Cache Page OutBound occurred! \n"));
-      RealSize = (UINTN) MaxSize;
+      DEBUG ((DEBUG_INFO, "FatDiskIo: Cache Page OutBound occurred! \n"));
+      RealSize = (UINTN)MaxSize;
     }
   }
 
   WriteCount = 1;
-  if (DataType == CacheFat && IoMode == WriteDisk) {
+  if ((DataType == CacheFat) && (IoMode == WriteDisk)) {
     WriteCount = Volume->NumFats;
   }
 
@@ -147,8 +147,8 @@ FatExchangeCachePage (
     EntryPos += Volume->FatSize;
   } while (--WriteCount > 0);
 
-  CacheTag->Dirty     = FALSE;
-  CacheTag->RealSize  = RealSize;
+  CacheTag->Dirty    = FALSE;
+  CacheTag->RealSize = RealSize;
   return EFI_SUCCESS;
 }
 
@@ -168,17 +168,17 @@ FatExchangeCachePage (
 STATIC
 EFI_STATUS
 FatGetCachePage (
-  IN FAT_VOLUME         *Volume,
-  IN CACHE_DATA_TYPE    CacheDataType,
-  IN UINTN              PageNo,
-  IN CACHE_TAG          *CacheTag
+  IN FAT_VOLUME       *Volume,
+  IN CACHE_DATA_TYPE  CacheDataType,
+  IN UINTN            PageNo,
+  IN CACHE_TAG        *CacheTag
   )
 {
   EFI_STATUS  Status;
   UINTN       OldPageNo;
 
   OldPageNo = CacheTag->PageNo;
-  if (CacheTag->RealSize > 0 && OldPageNo == PageNo) {
+  if ((CacheTag->RealSize > 0) && (OldPageNo == PageNo)) {
     //
     // Cache Hit occurred
     //
@@ -188,17 +188,18 @@ FatGetCachePage (
   //
   // Write dirty cache page back to disk
   //
-  if (CacheTag->RealSize > 0 && CacheTag->Dirty) {
+  if ((CacheTag->RealSize > 0) && CacheTag->Dirty) {
     Status = FatExchangeCachePage (Volume, CacheDataType, WriteDisk, CacheTag, NULL);
     if (EFI_ERROR (Status)) {
       return Status;
     }
   }
+
   //
   // Load new data from disk;
   //
-  CacheTag->PageNo  = PageNo;
-  Status            = FatExchangeCachePage (Volume, CacheDataType, ReadDisk, CacheTag, NULL);
+  CacheTag->PageNo = PageNo;
+  Status           = FatExchangeCachePage (Volume, CacheDataType, ReadDisk, CacheTag, NULL);
 
   return Status;
 }
@@ -223,13 +224,13 @@ FatGetCachePage (
 STATIC
 EFI_STATUS
 FatAccessUnalignedCachePage (
-  IN     FAT_VOLUME        *Volume,
-  IN     CACHE_DATA_TYPE   CacheDataType,
-  IN     IO_MODE           IoMode,
-  IN     UINTN             PageNo,
-  IN     UINTN             Offset,
-  IN     UINTN             Length,
-  IN OUT VOID              *Buffer
+  IN     FAT_VOLUME       *Volume,
+  IN     CACHE_DATA_TYPE  CacheDataType,
+  IN     IO_MODE          IoMode,
+  IN     UINTN            PageNo,
+  IN     UINTN            Offset,
+  IN     UINTN            Length,
+  IN OUT VOID             *Buffer
   )
 {
   EFI_STATUS  Status;
@@ -247,10 +248,10 @@ FatAccessUnalignedCachePage (
     Source      = DiskCache->CacheBase + (GroupNo << DiskCache->PageAlignment) + Offset;
     Destination = Buffer;
     if (IoMode != ReadDisk) {
-      CacheTag->Dirty   = TRUE;
-      DiskCache->Dirty  = TRUE;
-      Destination       = Source;
-      Source            = Buffer;
+      CacheTag->Dirty  = TRUE;
+      DiskCache->Dirty = TRUE;
+      Destination      = Source;
+      Source           = Buffer;
     }
 
     CopyMem (Destination, Source, Length);
@@ -290,13 +291,13 @@ FatAccessUnalignedCachePage (
 **/
 EFI_STATUS
 FatAccessCache (
-  IN     FAT_VOLUME         *Volume,
-  IN     CACHE_DATA_TYPE    CacheDataType,
-  IN     IO_MODE            IoMode,
-  IN     UINT64             Offset,
-  IN     UINTN              BufferSize,
-  IN OUT UINT8              *Buffer,
-  IN     FAT_TASK           *Task
+  IN     FAT_VOLUME       *Volume,
+  IN     CACHE_DATA_TYPE  CacheDataType,
+  IN     IO_MODE          IoMode,
+  IN     UINT64           Offset,
+  IN     UINTN            BufferSize,
+  IN OUT UINT8            *Buffer,
+  IN     FAT_TASK         *Task
   )
 {
   EFI_STATUS  Status;
@@ -319,8 +320,8 @@ FatAccessCache (
   EntryPos      = Offset - DiskCache->BaseAddress;
   PageAlignment = DiskCache->PageAlignment;
   PageSize      = (UINTN)1 << PageAlignment;
-  PageNo        = (UINTN) RShiftU64 (EntryPos, PageAlignment);
-  UnderRun      = ((UINTN) EntryPos) & (PageSize - 1);
+  PageNo        = (UINTN)RShiftU64 (EntryPos, PageAlignment);
+  UnderRun      = ((UINTN)EntryPos) & (PageSize - 1);
 
   if (UnderRun > 0) {
     Length = PageSize - UnderRun;
@@ -338,8 +339,8 @@ FatAccessCache (
     PageNo++;
   }
 
-  AlignedPageCount  = BufferSize >> PageAlignment;
-  OverRunPageNo     = PageNo + AlignedPageCount;
+  AlignedPageCount = BufferSize >> PageAlignment;
+  OverRunPageNo    = PageNo + AlignedPageCount;
   //
   // The access of the Aligned data
   //
@@ -355,14 +356,16 @@ FatAccessCache (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     //
     // If these access data over laps the relative cache range, these cache pages need
     // to be updated.
     //
     FatFlushDataCacheRange (Volume, IoMode, PageNo, OverRunPageNo, Buffer);
-    Buffer      += AlignedSize;
-    BufferSize  -= AlignedSize;
+    Buffer     += AlignedSize;
+    BufferSize -= AlignedSize;
   }
+
   //
   // The access of the OverRun data
   //
@@ -390,18 +393,18 @@ FatAccessCache (
 **/
 EFI_STATUS
 FatVolumeFlushCache (
-  IN FAT_VOLUME         *Volume,
-  IN FAT_TASK           *Task
+  IN FAT_VOLUME  *Volume,
+  IN FAT_TASK    *Task
   )
 {
-  EFI_STATUS      Status;
-  CACHE_DATA_TYPE CacheDataType;
-  UINTN           GroupIndex;
-  UINTN           GroupMask;
-  DISK_CACHE      *DiskCache;
-  CACHE_TAG       *CacheTag;
+  EFI_STATUS       Status;
+  CACHE_DATA_TYPE  CacheDataType;
+  UINTN            GroupIndex;
+  UINTN            GroupMask;
+  DISK_CACHE       *DiskCache;
+  CACHE_TAG        *CacheTag;
 
-  for (CacheDataType = (CACHE_DATA_TYPE) 0; CacheDataType < CacheMaxType; CacheDataType++) {
+  for (CacheDataType = (CACHE_DATA_TYPE)0; CacheDataType < CacheMaxType; CacheDataType++) {
     DiskCache = &Volume->DiskCache[CacheDataType];
     if (DiskCache->Dirty) {
       //
@@ -410,7 +413,7 @@ FatVolumeFlushCache (
       GroupMask = DiskCache->GroupMask;
       for (GroupIndex = 0; GroupIndex <= GroupMask; GroupIndex++) {
         CacheTag = &DiskCache->CacheTag[GroupIndex];
-        if (CacheTag->RealSize > 0 && CacheTag->Dirty) {
+        if ((CacheTag->RealSize > 0) && CacheTag->Dirty) {
           //
           // Write back all Dirty Data Cache Page to disk
           //
@@ -424,6 +427,7 @@ FatVolumeFlushCache (
       DiskCache->Dirty = FALSE;
     }
   }
+
   //
   // Flush the block device.
   //
@@ -443,7 +447,7 @@ FatVolumeFlushCache (
 **/
 EFI_STATUS
 FatInitializeDiskCache (
-  IN FAT_VOLUME         *Volume
+  IN FAT_VOLUME  *Volume
   )
 {
   DISK_CACHE  *DiskCache;
@@ -457,23 +461,23 @@ FatInitializeDiskCache (
   // Configure the parameters of disk cache
   //
   if (Volume->FatType == Fat12) {
-    FatCacheGroupCount                  = FAT_FATCACHE_GROUP_MIN_COUNT;
+    FatCacheGroupCount                 = FAT_FATCACHE_GROUP_MIN_COUNT;
     DiskCache[CacheFat].PageAlignment  = FAT_FATCACHE_PAGE_MIN_ALIGNMENT;
     DiskCache[CacheData].PageAlignment = FAT_DATACACHE_PAGE_MIN_ALIGNMENT;
   } else {
-    FatCacheGroupCount                  = FAT_FATCACHE_GROUP_MAX_COUNT;
+    FatCacheGroupCount                 = FAT_FATCACHE_GROUP_MAX_COUNT;
     DiskCache[CacheFat].PageAlignment  = FAT_FATCACHE_PAGE_MAX_ALIGNMENT;
     DiskCache[CacheData].PageAlignment = FAT_DATACACHE_PAGE_MAX_ALIGNMENT;
   }
 
-  DiskCache[CacheData].GroupMask     = FAT_DATACACHE_GROUP_COUNT - 1;
-  DiskCache[CacheData].BaseAddress   = Volume->RootPos;
-  DiskCache[CacheData].LimitAddress  = Volume->VolumeSize;
-  DiskCache[CacheFat].GroupMask      = FatCacheGroupCount - 1;
-  DiskCache[CacheFat].BaseAddress    = Volume->FatPos;
-  DiskCache[CacheFat].LimitAddress   = Volume->FatPos + Volume->FatSize;
-  FatCacheSize                        = FatCacheGroupCount << DiskCache[CacheFat].PageAlignment;
-  DataCacheSize                       = FAT_DATACACHE_GROUP_COUNT << DiskCache[CacheData].PageAlignment;
+  DiskCache[CacheData].GroupMask    = FAT_DATACACHE_GROUP_COUNT - 1;
+  DiskCache[CacheData].BaseAddress  = Volume->RootPos;
+  DiskCache[CacheData].LimitAddress = Volume->VolumeSize;
+  DiskCache[CacheFat].GroupMask     = FatCacheGroupCount - 1;
+  DiskCache[CacheFat].BaseAddress   = Volume->FatPos;
+  DiskCache[CacheFat].LimitAddress  = Volume->FatPos + Volume->FatSize;
+  FatCacheSize                      = FatCacheGroupCount << DiskCache[CacheFat].PageAlignment;
+  DataCacheSize                     = FAT_DATACACHE_GROUP_COUNT << DiskCache[CacheData].PageAlignment;
   //
   // Allocate the Fat Cache buffer
   //
@@ -482,7 +486,7 @@ FatInitializeDiskCache (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Volume->CacheBuffer             = CacheBuffer;
+  Volume->CacheBuffer            = CacheBuffer;
   DiskCache[CacheFat].CacheBase  = CacheBuffer;
   DiskCache[CacheData].CacheBase = CacheBuffer + FatCacheSize;
   return EFI_SUCCESS;

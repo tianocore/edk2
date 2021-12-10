@@ -20,7 +20,7 @@
 
 #include "VirtioPciDevice.h"
 
-STATIC VIRTIO_DEVICE_PROTOCOL mDeviceProtocolTemplate = {
+STATIC VIRTIO_DEVICE_PROTOCOL  mDeviceProtocolTemplate = {
   0,                                    // Revision
   0,                                    // SubSystemDeviceId
   VirtioPciGetDeviceFeatures,           // GetDeviceFeatures
@@ -67,16 +67,16 @@ STATIC VIRTIO_DEVICE_PROTOCOL mDeviceProtocolTemplate = {
 EFI_STATUS
 EFIAPI
 VirtioPciIoRead (
-  IN  VIRTIO_PCI_DEVICE         *Dev,
-  IN  UINTN                     FieldOffset,
-  IN  UINTN                     FieldSize,
-  IN  UINTN                     BufferSize,
-  OUT VOID                      *Buffer
+  IN  VIRTIO_PCI_DEVICE  *Dev,
+  IN  UINTN              FieldOffset,
+  IN  UINTN              FieldSize,
+  IN  UINTN              BufferSize,
+  OUT VOID               *Buffer
   )
 {
-  UINTN                     Count;
-  EFI_PCI_IO_PROTOCOL_WIDTH Width;
-  EFI_PCI_IO_PROTOCOL       *PciIo;
+  UINTN                      Count;
+  EFI_PCI_IO_PROTOCOL_WIDTH  Width;
+  EFI_PCI_IO_PROTOCOL        *PciIo;
 
   ASSERT (FieldSize == BufferSize);
 
@@ -105,9 +105,9 @@ VirtioPciIoRead (
       //
       Count = 2;
 
-      //
-      // fall through
-      //
+    //
+    // fall through
+    //
     case 4:
       Width = EfiPciIoWidthUint32;
       break;
@@ -150,15 +150,15 @@ VirtioPciIoRead (
 EFI_STATUS
 EFIAPI
 VirtioPciIoWrite (
-  IN  VIRTIO_PCI_DEVICE         *Dev,
-  IN UINTN                      FieldOffset,
-  IN UINTN                      FieldSize,
-  IN UINT64                     Value
+  IN  VIRTIO_PCI_DEVICE  *Dev,
+  IN UINTN               FieldOffset,
+  IN UINTN               FieldSize,
+  IN UINT64              Value
   )
 {
-  UINTN                     Count;
-  EFI_PCI_IO_PROTOCOL_WIDTH Width;
-  EFI_PCI_IO_PROTOCOL       *PciIo;
+  UINTN                      Count;
+  EFI_PCI_IO_PROTOCOL_WIDTH  Width;
+  EFI_PCI_IO_PROTOCOL        *PciIo;
 
   PciIo = Dev->PciIo;
   Count = 1;
@@ -185,9 +185,9 @@ VirtioPciIoWrite (
       //
       Count = Count * 2;
 
-      //
-      // fall through
-      //
+    //
+    // fall through
+    //
     case 4:
       Width = EfiPciIoWidthUint32;
       break;
@@ -236,14 +236,14 @@ STATIC
 EFI_STATUS
 EFIAPI
 VirtioPciDeviceBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  DeviceHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   DeviceHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS          Status;
-  EFI_PCI_IO_PROTOCOL *PciIo;
-  PCI_TYPE00          Pci;
+  EFI_STATUS           Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  PCI_TYPE00           Pci;
 
   //
   // Attempt to open the device with the PciIo set of interfaces. On success,
@@ -284,7 +284,8 @@ VirtioPciDeviceBindingSupported (
     if ((Pci.Hdr.VendorId == VIRTIO_VENDOR_ID) &&
         (Pci.Hdr.DeviceId >= 0x1000) &&
         (Pci.Hdr.DeviceId <= 0x103F) &&
-        (Pci.Hdr.RevisionID == 0x00)) {
+        (Pci.Hdr.RevisionID == 0x00))
+    {
       Status = EFI_SUCCESS;
     } else {
       Status = EFI_UNSUPPORTED;
@@ -295,8 +296,12 @@ VirtioPciDeviceBindingSupported (
   // We needed PCI IO access only transitorily, to see whether we support the
   // device or not.
   //
-  gBS->CloseProtocol (DeviceHandle, &gEfiPciIoProtocolGuid,
-         This->DriverBindingHandle, DeviceHandle);
+  gBS->CloseProtocol (
+         DeviceHandle,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         DeviceHandle
+         );
 
   return Status;
 }
@@ -321,12 +326,12 @@ STATIC
 EFI_STATUS
 EFIAPI
 VirtioPciInit (
-  IN OUT VIRTIO_PCI_DEVICE *Device
+  IN OUT VIRTIO_PCI_DEVICE  *Device
   )
 {
-  EFI_STATUS            Status;
-  EFI_PCI_IO_PROTOCOL   *PciIo;
-  PCI_TYPE00            Pci;
+  EFI_STATUS           Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  PCI_TYPE00           Pci;
 
   ASSERT (Device != NULL);
   PciIo = Device->PciIo;
@@ -334,13 +339,13 @@ VirtioPciInit (
   ASSERT (PciIo->Pci.Read != NULL);
 
   Status = PciIo->Pci.Read (
-                        PciIo,                        // (protocol, device)
-                                                      // handle
-                        EfiPciIoWidthUint32,          // access width & copy
-                                                      // mode
-                        0,                            // Offset
+                        PciIo,                          // (protocol, device)
+                                                        // handle
+                        EfiPciIoWidthUint32,            // access width & copy
+                                                        // mode
+                        0,                              // Offset
                         sizeof (Pci) / sizeof (UINT32), // Count
-                        &Pci                          // target buffer
+                        &Pci                            // target buffer
                         );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -349,13 +354,16 @@ VirtioPciInit (
   //
   // Copy protocol template
   //
-  CopyMem (&Device->VirtioDevice, &mDeviceProtocolTemplate,
-      sizeof (VIRTIO_DEVICE_PROTOCOL));
+  CopyMem (
+    &Device->VirtioDevice,
+    &mDeviceProtocolTemplate,
+    sizeof (VIRTIO_DEVICE_PROTOCOL)
+    );
 
   //
   // Initialize the protocol interface attributes
   //
-  Device->VirtioDevice.Revision = VIRTIO_SPEC_REVISION (0, 9, 5);
+  Device->VirtioDevice.Revision          = VIRTIO_SPEC_REVISION (0, 9, 5);
   Device->VirtioDevice.SubSystemDeviceId = Pci.Device.SubsystemID;
 
   //
@@ -363,7 +371,7 @@ VirtioPciInit (
   //       the offset would become 24 after enabling MSI-X.
   //
   Device->DeviceSpecificConfigurationOffset =
-      VIRTIO_DEVICE_SPECIFIC_CONFIGURATION_OFFSET_PCI;
+    VIRTIO_DEVICE_SPECIFIC_CONFIGURATION_OFFSET_PCI;
 
   return EFI_SUCCESS;
 }
@@ -376,12 +384,11 @@ VirtioPciInit (
   @param[in, out]  Dev  The device to clean up.
 
 **/
-
 STATIC
 VOID
 EFIAPI
 VirtioPciUninit (
-  IN OUT VIRTIO_PCI_DEVICE *Device
+  IN OUT VIRTIO_PCI_DEVICE  *Device
   )
 {
   // Note: This function mirrors VirtioPciInit() that does not allocate any
@@ -420,22 +427,27 @@ STATIC
 EFI_STATUS
 EFIAPI
 VirtioPciDeviceBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  DeviceHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   DeviceHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  VIRTIO_PCI_DEVICE   *Device;
-  EFI_STATUS           Status;
+  VIRTIO_PCI_DEVICE  *Device;
+  EFI_STATUS         Status;
 
-  Device = (VIRTIO_PCI_DEVICE *) AllocateZeroPool (sizeof *Device);
+  Device = (VIRTIO_PCI_DEVICE *)AllocateZeroPool (sizeof *Device);
   if (Device == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = gBS->OpenProtocol (DeviceHandle, &gEfiPciIoProtocolGuid,
-                  (VOID **)&Device->PciIo, This->DriverBindingHandle,
-                  DeviceHandle, EFI_OPEN_PROTOCOL_BY_DRIVER);
+  Status = gBS->OpenProtocol (
+                  DeviceHandle,
+                  &gEfiPciIoProtocolGuid,
+                  (VOID **)&Device->PciIo,
+                  This->DriverBindingHandle,
+                  DeviceHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
   if (EFI_ERROR (Status)) {
     goto FreeVirtioPci;
   }
@@ -451,8 +463,12 @@ VirtioPciDeviceBindingStart (
   //
   // For virtio-pci we only need IO space access.
   //
-  Status = Device->PciIo->Attributes (Device->PciIo,
-      EfiPciIoAttributeOperationGet, 0, &Device->OriginalPciAttributes);
+  Status = Device->PciIo->Attributes (
+                            Device->PciIo,
+                            EfiPciIoAttributeOperationGet,
+                            0,
+                            &Device->OriginalPciAttributes
+                            );
   if (EFI_ERROR (Status)) {
     goto ClosePciIo;
   }
@@ -482,9 +498,12 @@ VirtioPciDeviceBindingStart (
   // interface.
   //
   Device->Signature = VIRTIO_PCI_DEVICE_SIGNATURE;
-  Status = gBS->InstallProtocolInterface (&DeviceHandle,
-                  &gVirtioDeviceProtocolGuid, EFI_NATIVE_INTERFACE,
-                  &Device->VirtioDevice);
+  Status            = gBS->InstallProtocolInterface (
+                             &DeviceHandle,
+                             &gVirtioDeviceProtocolGuid,
+                             EFI_NATIVE_INTERFACE,
+                             &Device->VirtioDevice
+                             );
   if (EFI_ERROR (Status)) {
     goto UninitDev;
   }
@@ -495,12 +514,20 @@ UninitDev:
   VirtioPciUninit (Device);
 
 RestorePciAttributes:
-  Device->PciIo->Attributes (Device->PciIo, EfiPciIoAttributeOperationSet,
-                Device->OriginalPciAttributes, NULL);
+  Device->PciIo->Attributes (
+                   Device->PciIo,
+                   EfiPciIoAttributeOperationSet,
+                   Device->OriginalPciAttributes,
+                   NULL
+                   );
 
 ClosePciIo:
-  gBS->CloseProtocol (DeviceHandle, &gEfiPciIoProtocolGuid,
-         This->DriverBindingHandle, DeviceHandle);
+  gBS->CloseProtocol (
+         DeviceHandle,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         DeviceHandle
+         );
 
 FreeVirtioPci:
   FreePool (Device);
@@ -537,13 +564,13 @@ STATIC
 EFI_STATUS
 EFIAPI
 VirtioPciDeviceBindingStop (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  DeviceHandle,
-  IN UINTN                       NumberOfChildren,
-  IN EFI_HANDLE                  *ChildHandleBuffer
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   DeviceHandle,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_STATUS               Status;
+  EFI_STATUS              Status;
   VIRTIO_DEVICE_PROTOCOL  *VirtioDevice;
   VIRTIO_PCI_DEVICE       *Device;
 
@@ -564,32 +591,42 @@ VirtioPciDeviceBindingStop (
   //
   // Handle Stop() requests for in-use driver instances gracefully.
   //
-  Status = gBS->UninstallProtocolInterface (DeviceHandle,
-                  &gVirtioDeviceProtocolGuid, &Device->VirtioDevice);
+  Status = gBS->UninstallProtocolInterface (
+                  DeviceHandle,
+                  &gVirtioDeviceProtocolGuid,
+                  &Device->VirtioDevice
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   VirtioPciUninit (Device);
 
-  Device->PciIo->Attributes (Device->PciIo, EfiPciIoAttributeOperationSet,
-                Device->OriginalPciAttributes, NULL);
+  Device->PciIo->Attributes (
+                   Device->PciIo,
+                   EfiPciIoAttributeOperationSet,
+                   Device->OriginalPciAttributes,
+                   NULL
+                   );
 
-  Status = gBS->CloseProtocol (DeviceHandle, &gEfiPciIoProtocolGuid,
-         This->DriverBindingHandle, DeviceHandle);
+  Status = gBS->CloseProtocol (
+                  DeviceHandle,
+                  &gEfiPciIoProtocolGuid,
+                  This->DriverBindingHandle,
+                  DeviceHandle
+                  );
 
   FreePool (Device);
 
   return Status;
 }
 
-
 //
 // The static object that groups the Supported() (ie. probe), Start() and
 // Stop() functions of the driver together. Refer to UEFI Spec 2.3.1 + Errata
 // C, 10.1 EFI Driver Binding Protocol.
 //
-STATIC EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
+STATIC EFI_DRIVER_BINDING_PROTOCOL  gDriverBinding = {
   &VirtioPciDeviceBindingSupported,
   &VirtioPciDeviceBindingStart,
   &VirtioPciDeviceBindingStop,
@@ -599,7 +636,6 @@ STATIC EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
   NULL  // DriverBindingHandle, ditto
 };
 
-
 //
 // The purpose of the following scaffolding (EFI_COMPONENT_NAME_PROTOCOL and
 // EFI_COMPONENT_NAME2_PROTOCOL implementation) is to format the driver's name
@@ -608,20 +644,20 @@ STATIC EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
 // Guide for UEFI 2.3.1 v1.01, 11 UEFI Driver and Controller Names.
 //
 STATIC
-EFI_UNICODE_STRING_TABLE mDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE  mDriverNameTable[] = {
   { "eng;en", L"Virtio PCI Driver" },
-  { NULL,     NULL                   }
+  { NULL,     NULL                 }
 };
 
 STATIC
-EFI_COMPONENT_NAME_PROTOCOL gComponentName;
+EFI_COMPONENT_NAME_PROTOCOL  gComponentName;
 
 EFI_STATUS
 EFIAPI
 VirtioPciGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
-  IN  CHAR8                       *Language,
-  OUT CHAR16                      **DriverName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
   )
 {
   return LookupUnicodeString2 (
@@ -636,30 +672,29 @@ VirtioPciGetDriverName (
 EFI_STATUS
 EFIAPI
 VirtioPciGetDeviceName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
-  IN  EFI_HANDLE                  DeviceHandle,
-  IN  EFI_HANDLE                  ChildHandle,
-  IN  CHAR8                       *Language,
-  OUT CHAR16                      **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   DeviceHandle,
+  IN  EFI_HANDLE                   ChildHandle,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
   return EFI_UNSUPPORTED;
 }
 
 STATIC
-EFI_COMPONENT_NAME_PROTOCOL gComponentName = {
+EFI_COMPONENT_NAME_PROTOCOL  gComponentName = {
   &VirtioPciGetDriverName,
   &VirtioPciGetDeviceName,
   "eng" // SupportedLanguages, ISO 639-2 language codes
 };
 
 STATIC
-EFI_COMPONENT_NAME2_PROTOCOL gComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)     &VirtioPciGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) &VirtioPciGetDeviceName,
+EFI_COMPONENT_NAME2_PROTOCOL  gComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)&VirtioPciGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)&VirtioPciGetDeviceName,
   "en" // SupportedLanguages, RFC 4646 language codes
 };
-
 
 //
 // Entry point of this driver.
@@ -667,8 +702,8 @@ EFI_COMPONENT_NAME2_PROTOCOL gComponentName2 = {
 EFI_STATUS
 EFIAPI
 VirtioPciDeviceEntryPoint (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return EfiLibInstallDriverBindingComponentName2 (

@@ -20,9 +20,9 @@
 **/
 EFI_STATUS
 AmlConstructNodeList (
-  IN EFI_AML_HANDLE      *AmlHandle,
-  IN EFI_AML_NODE_LIST   *AmlRootNodeList,
-  IN EFI_AML_NODE_LIST   *AmlParentNodeList
+  IN EFI_AML_HANDLE     *AmlHandle,
+  IN EFI_AML_NODE_LIST  *AmlRootNodeList,
+  IN EFI_AML_NODE_LIST  *AmlParentNodeList
   );
 
 /**
@@ -41,18 +41,18 @@ AmlCreateNode (
   IN AML_BYTE_ENCODING  *AmlByteEncoding
   )
 {
-  EFI_AML_NODE_LIST      *AmlNodeList;
+  EFI_AML_NODE_LIST  *AmlNodeList;
 
-  AmlNodeList = AllocatePool (sizeof(*AmlNodeList));
+  AmlNodeList = AllocatePool (sizeof (*AmlNodeList));
   ASSERT (AmlNodeList != NULL);
 
   AmlNodeList->Signature = EFI_AML_NODE_LIST_SIGNATURE;
   CopyMem (AmlNodeList->Name, NameSeg, AML_NAME_SEG_SIZE);
-  AmlNodeList->Buffer    = NULL;
-  AmlNodeList->Size      = 0;
+  AmlNodeList->Buffer = NULL;
+  AmlNodeList->Size   = 0;
   InitializeListHead (&AmlNodeList->Link);
   InitializeListHead (&AmlNodeList->Children);
-  AmlNodeList->Parent = Parent;
+  AmlNodeList->Parent          = Parent;
   AmlNodeList->AmlByteEncoding = AmlByteEncoding;
 
   return AmlNodeList;
@@ -69,15 +69,15 @@ AmlCreateNode (
 **/
 EFI_AML_NODE_LIST *
 AmlFindNodeInThis (
-  IN UINT8               *NameSeg,
-  IN EFI_AML_NODE_LIST   *AmlParentNodeList,
-  IN BOOLEAN             Create
+  IN UINT8              *NameSeg,
+  IN EFI_AML_NODE_LIST  *AmlParentNodeList,
+  IN BOOLEAN            Create
   )
 {
-  EFI_AML_NODE_LIST      *CurrentAmlNodeList;
-  LIST_ENTRY             *CurrentLink;
-  LIST_ENTRY             *StartLink;
-  EFI_AML_NODE_LIST      *AmlNodeList;
+  EFI_AML_NODE_LIST  *CurrentAmlNodeList;
+  LIST_ENTRY         *CurrentLink;
+  LIST_ENTRY         *StartLink;
+  EFI_AML_NODE_LIST  *AmlNodeList;
 
   StartLink   = &AmlParentNodeList->Children;
   CurrentLink = StartLink->ForwardLink;
@@ -93,6 +93,7 @@ AmlFindNodeInThis (
       //
       return CurrentAmlNodeList;
     }
+
     CurrentLink = CurrentLink->ForwardLink;
   }
 
@@ -124,17 +125,17 @@ AmlFindNodeInThis (
 **/
 EFI_AML_NODE_LIST *
 AmlFindNodeInTheTree (
-  IN UINT8               *NameString,
-  IN EFI_AML_NODE_LIST   *AmlRootNodeList,
-  IN EFI_AML_NODE_LIST   *AmlParentNodeList,
-  IN BOOLEAN             Create
+  IN UINT8              *NameString,
+  IN EFI_AML_NODE_LIST  *AmlRootNodeList,
+  IN EFI_AML_NODE_LIST  *AmlParentNodeList,
+  IN BOOLEAN            Create
   )
 {
-  UINT8               *Buffer;
-  EFI_AML_NODE_LIST   *AmlNodeList;
-  EFI_AML_NODE_LIST   *AmlCurrentNodeList;
-  UINT8               Index;
-  UINT8               SegCount;
+  UINT8              *Buffer;
+  EFI_AML_NODE_LIST  *AmlNodeList;
+  EFI_AML_NODE_LIST  *AmlCurrentNodeList;
+  UINT8              Index;
+  UINT8              SegCount;
 
   Buffer = NameString;
 
@@ -143,7 +144,7 @@ AmlFindNodeInTheTree (
   //
   if (*Buffer == AML_ROOT_CHAR) {
     AmlCurrentNodeList = AmlRootNodeList;
-    Buffer += 1;
+    Buffer            += 1;
   } else if (*Buffer == AML_PARENT_PREFIX_CHAR) {
     AmlCurrentNodeList = AmlParentNodeList;
     do {
@@ -155,6 +156,7 @@ AmlFindNodeInTheTree (
         //
         ASSERT (AmlCurrentNodeList == AmlRootNodeList);
       }
+
       Buffer += 1;
     } while (*Buffer == AML_PARENT_PREFIX_CHAR);
   } else {
@@ -165,12 +167,12 @@ AmlFindNodeInTheTree (
   // Handle name segment
   //
   if (*Buffer == AML_DUAL_NAME_PREFIX) {
-    Buffer += 1;
+    Buffer  += 1;
     SegCount = 2;
   } else if (*Buffer == AML_MULTI_NAME_PREFIX) {
-    Buffer += 1;
+    Buffer  += 1;
     SegCount = *Buffer;
-    Buffer += 1;
+    Buffer  += 1;
   } else if (*Buffer == 0) {
     //
     // NULL name, only for Root
@@ -190,9 +192,10 @@ AmlFindNodeInTheTree (
     if (AmlNodeList == NULL) {
       return NULL;
     }
+
     AmlCurrentNodeList = AmlNodeList;
-    Buffer += AML_NAME_SEG_SIZE;
-    Index ++;
+    Buffer            += AML_NAME_SEG_SIZE;
+    Index++;
   } while (Index < SegCount);
 
   return AmlNodeList;
@@ -211,14 +214,14 @@ AmlFindNodeInTheTree (
 **/
 EFI_AML_NODE_LIST *
 AmlInsertNodeToTree (
-  IN UINT8               *NameString,
-  IN VOID                *Buffer,
-  IN UINTN               Size,
-  IN EFI_AML_NODE_LIST   *AmlRootNodeList,
-  IN EFI_AML_NODE_LIST   *AmlParentNodeList
+  IN UINT8              *NameString,
+  IN VOID               *Buffer,
+  IN UINTN              Size,
+  IN EFI_AML_NODE_LIST  *AmlRootNodeList,
+  IN EFI_AML_NODE_LIST  *AmlParentNodeList
   )
 {
-  EFI_AML_NODE_LIST   *AmlNodeList;
+  EFI_AML_NODE_LIST  *AmlNodeList;
 
   AmlNodeList = AmlFindNodeInTheTree (
                   NameString,
@@ -243,10 +246,11 @@ AmlInsertNodeToTree (
       // We need check if new one is SCOPE_OP, because SCOPE_OP just means namespace, not a real device.
       // We should not return SCOPE_OP.
       //
-      AmlNodeList->Buffer = Buffer;
-      AmlNodeList->Size   = Size;
+      AmlNodeList->Buffer          = Buffer;
+      AmlNodeList->Size            = Size;
       AmlNodeList->AmlByteEncoding = AmlSearchByOpByte (Buffer);
     }
+
     return AmlNodeList;
   }
 
@@ -263,9 +267,9 @@ AmlInsertNodeToTree (
   //
   // Oops!!!, There must be something wrong.
   //
-  DEBUG ((EFI_D_ERROR, "AML: Override Happen - %a!\n", NameString));
-  DEBUG ((EFI_D_ERROR, "AML: Existing Node - %x\n", AmlNodeList->Buffer));
-  DEBUG ((EFI_D_ERROR, "AML: New Buffer - %x\n", Buffer));
+  DEBUG ((DEBUG_ERROR, "AML: Override Happen - %a!\n", NameString));
+  DEBUG ((DEBUG_ERROR, "AML: Existing Node - %x\n", AmlNodeList->Buffer));
+  DEBUG ((DEBUG_ERROR, "AML: New Buffer - %x\n", Buffer));
 
   return NULL;
 }
@@ -282,17 +286,17 @@ AmlInsertNodeToTree (
 **/
 EFI_STATUS
 AmlConstructNodeListForChild (
-  IN EFI_AML_HANDLE      *AmlHandle,
-  IN EFI_AML_NODE_LIST   *AmlRootNodeList,
-  IN EFI_AML_NODE_LIST   *AmlParentNodeList
+  IN EFI_AML_HANDLE     *AmlHandle,
+  IN EFI_AML_NODE_LIST  *AmlRootNodeList,
+  IN EFI_AML_NODE_LIST  *AmlParentNodeList
   )
 {
-  AML_BYTE_ENCODING   *AmlByteEncoding;
-  UINT8               *Buffer;
-  UINTN               BufferSize;
-  UINT8               *CurrentBuffer;
-  EFI_AML_HANDLE      *AmlChildHandle;
-  EFI_STATUS          Status;
+  AML_BYTE_ENCODING  *AmlByteEncoding;
+  UINT8              *Buffer;
+  UINTN              BufferSize;
+  UINT8              *CurrentBuffer;
+  EFI_AML_HANDLE     *AmlChildHandle;
+  EFI_STATUS         Status;
 
   CurrentBuffer   = NULL;
   AmlChildHandle  = NULL;
@@ -373,13 +377,13 @@ AmlConstructNodeListForChild (
 **/
 EFI_STATUS
 AmlConstructNodeList (
-  IN EFI_AML_HANDLE      *AmlHandle,
-  IN EFI_AML_NODE_LIST   *AmlRootNodeList,
-  IN EFI_AML_NODE_LIST   *AmlParentNodeList
+  IN EFI_AML_HANDLE     *AmlHandle,
+  IN EFI_AML_NODE_LIST  *AmlRootNodeList,
+  IN EFI_AML_NODE_LIST  *AmlParentNodeList
   )
 {
-  VOID                *NameString;
-  EFI_AML_NODE_LIST   *AmlNodeList;
+  VOID               *NameString;
+  EFI_AML_NODE_LIST  *AmlNodeList;
 
   //
   // 1. Check if there is need to construct node for this OpCode.
@@ -419,12 +423,12 @@ AmlConstructNodeList (
 **/
 VOID
 AmlDestructNodeList (
-  IN EFI_AML_NODE_LIST *AmlParentNodeList
+  IN EFI_AML_NODE_LIST  *AmlParentNodeList
   )
 {
-  EFI_AML_NODE_LIST      *CurrentAmlNodeList;
-  LIST_ENTRY             *CurrentLink;
-  LIST_ENTRY             *StartLink;
+  EFI_AML_NODE_LIST  *CurrentAmlNodeList;
+  LIST_ENTRY         *CurrentLink;
+  LIST_ENTRY         *StartLink;
 
   //
   // Get the children link
@@ -440,7 +444,7 @@ AmlDestructNodeList (
     // Destruct the child's list recursively
     //
     CurrentAmlNodeList = EFI_AML_NODE_LIST_FROM_LINK (CurrentLink);
-    CurrentLink = CurrentLink->ForwardLink;
+    CurrentLink        = CurrentLink->ForwardLink;
 
     //
     // Remove this child from list and free the node
@@ -454,7 +458,7 @@ AmlDestructNodeList (
   // Done.
   //
   FreePool (AmlParentNodeList);
-  return ;
+  return;
 }
 
 /**
@@ -465,25 +469,27 @@ AmlDestructNodeList (
 **/
 VOID
 AmlDumpNodeInfo (
-  IN EFI_AML_NODE_LIST *AmlParentNodeList,
-  IN UINTN             Level
+  IN EFI_AML_NODE_LIST  *AmlParentNodeList,
+  IN UINTN              Level
   )
 {
-  EFI_AML_NODE_LIST      *CurrentAmlNodeList;
-  volatile LIST_ENTRY    *CurrentLink;
-  UINTN                  Index;
+  EFI_AML_NODE_LIST    *CurrentAmlNodeList;
+  volatile LIST_ENTRY  *CurrentLink;
+  UINTN                Index;
 
   CurrentLink = AmlParentNodeList->Children.ForwardLink;
 
   if (Level == 0) {
-    DEBUG ((EFI_D_ERROR, "\\"));
+    DEBUG ((DEBUG_ERROR, "\\"));
   } else {
     for (Index = 0; Index < Level; Index++) {
-      DEBUG ((EFI_D_ERROR, "    "));
+      DEBUG ((DEBUG_ERROR, "    "));
     }
+
     AmlPrintNameSeg (AmlParentNodeList->Name);
   }
-  DEBUG ((EFI_D_ERROR, "\n"));
+
+  DEBUG ((DEBUG_ERROR, "\n"));
 
   while (CurrentLink != &AmlParentNodeList->Children) {
     CurrentAmlNodeList = EFI_AML_NODE_LIST_FROM_LINK (CurrentLink);
@@ -491,7 +497,7 @@ AmlDumpNodeInfo (
     CurrentLink = CurrentLink->ForwardLink;
   }
 
-  return ;
+  return;
 }
 
 /**
@@ -515,12 +521,12 @@ AmlFindPath (
   IN    BOOLEAN         FromRoot
   )
 {
-  EFI_AML_NODE_LIST   *AmlRootNodeList;
-  EFI_STATUS          Status;
-  EFI_AML_NODE_LIST   *AmlNodeList;
-  UINT8               RootNameSeg[AML_NAME_SEG_SIZE];
-  EFI_AML_NODE_LIST   *CurrentAmlNodeList;
-  LIST_ENTRY          *CurrentLink;
+  EFI_AML_NODE_LIST  *AmlRootNodeList;
+  EFI_STATUS         Status;
+  EFI_AML_NODE_LIST  *AmlNodeList;
+  UINT8              RootNameSeg[AML_NAME_SEG_SIZE];
+  EFI_AML_NODE_LIST  *CurrentAmlNodeList;
+  LIST_ENTRY         *CurrentLink;
 
   //
   // 1. create tree
@@ -529,8 +535,8 @@ AmlFindPath (
   //
   // Create root handle
   //
-  RootNameSeg[0] = AML_ROOT_CHAR;
-  RootNameSeg[1] = 0;
+  RootNameSeg[0]  = AML_ROOT_CHAR;
+  RootNameSeg[1]  = 0;
   AmlRootNodeList = AmlCreateNode (RootNameSeg, NULL, AmlHandle->AmlByteEncoding);
 
   Status = AmlConstructNodeList (
@@ -543,7 +549,7 @@ AmlFindPath (
   }
 
   DEBUG_CODE_BEGIN ();
-  DEBUG ((EFI_D_ERROR, "AcpiSdt: NameSpace:\n"));
+  DEBUG ((DEBUG_ERROR, "AcpiSdt: NameSpace:\n"));
   AmlDumpNodeInfo (AmlRootNodeList, 0);
   DEBUG_CODE_END ();
 
@@ -579,9 +585,9 @@ AmlFindPath (
   //
   if (CurrentAmlNodeList != NULL) {
     DEBUG_CODE_BEGIN ();
-    DEBUG ((EFI_D_ERROR, "AcpiSdt: Search from: \\"));
+    DEBUG ((DEBUG_ERROR, "AcpiSdt: Search from: \\"));
     AmlPrintNameSeg (CurrentAmlNodeList->Name);
-    DEBUG ((EFI_D_ERROR, "\n"));
+    DEBUG ((DEBUG_ERROR, "\n"));
     DEBUG_CODE_END ();
     AmlNodeList = AmlFindNodeInTheTree (
                     AmlPath,
@@ -594,8 +600,8 @@ AmlFindPath (
   }
 
   *Buffer = NULL;
-  Status = EFI_SUCCESS;
-  if (AmlNodeList != NULL && AmlNodeList->Buffer != NULL) {
+  Status  = EFI_SUCCESS;
+  if ((AmlNodeList != NULL) && (AmlNodeList->Buffer != NULL)) {
     *Buffer = AmlNodeList->Buffer;
   }
 

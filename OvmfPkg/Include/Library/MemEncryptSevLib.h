@@ -21,7 +21,7 @@
 //   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
 // in any FDF file using this PCD.
 //
-#define VMGEXIT_MAXIMUM_VC_COUNT   2
+#define VMGEXIT_MAXIMUM_VC_COUNT  2
 
 //
 // Per-CPU data mapping structure
@@ -30,11 +30,11 @@
 //   writing random data to that area.
 //
 typedef struct {
-  UINT32  Dr7Cached;
-  UINT64  Dr7;
+  UINT32    Dr7Cached;
+  UINT64    Dr7;
 
-  UINTN   VcCount;
-  VOID    *GhcbBackupPages;
+  UINTN     VcCount;
+  VOID      *GhcbBackupPages;
 } SEV_ES_PER_CPU_DATA;
 
 //
@@ -46,6 +46,18 @@ typedef enum {
   MemEncryptSevAddressRangeMixed,
   MemEncryptSevAddressRangeError,
 } MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE;
+
+/**
+  Returns a boolean to indicate whether SEV-SNP is enabled
+
+  @retval TRUE           SEV-SNP is enabled
+  @retval FALSE          SEV-SNP is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevSnpIsEnabled (
+  VOID
+  );
 
 /**
   Returns a boolean to indicate whether SEV-ES is enabled.
@@ -91,9 +103,9 @@ MemEncryptSevIsEnabled (
 RETURN_STATUS
 EFIAPI
 MemEncryptSevClearPageEncMask (
-  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
-  IN PHYSICAL_ADDRESS         BaseAddress,
-  IN UINTN                    NumPages
+  IN PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             NumPages
   );
 
 /**
@@ -116,11 +128,10 @@ MemEncryptSevClearPageEncMask (
 RETURN_STATUS
 EFIAPI
 MemEncryptSevSetPageEncMask (
-  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
-  IN PHYSICAL_ADDRESS         BaseAddress,
-  IN UINTN                    NumPages
+  IN PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             NumPages
   );
-
 
 /**
   Locate the page range that covers the initial (pre-SMBASE-relocation) SMRAM
@@ -140,8 +151,8 @@ MemEncryptSevSetPageEncMask (
 RETURN_STATUS
 EFIAPI
 MemEncryptSevLocateInitialSmramSaveStateMapPages (
-  OUT UINTN *BaseAddress,
-  OUT UINTN *NumberOfPages
+  OUT UINTN  *BaseAddress,
+  OUT UINTN  *NumberOfPages
   );
 
 /**
@@ -173,9 +184,9 @@ MemEncryptSevGetEncryptionMask (
 MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE
 EFIAPI
 MemEncryptSevGetAddressRangeState (
-  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
-  IN PHYSICAL_ADDRESS         BaseAddress,
-  IN UINTN                    Length
+  IN PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             Length
   );
 
 /**
@@ -198,9 +209,23 @@ MemEncryptSevGetAddressRangeState (
 RETURN_STATUS
 EFIAPI
 MemEncryptSevClearMmioPageEncMask (
-  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
-  IN PHYSICAL_ADDRESS         BaseAddress,
-  IN UINTN                    NumPages
+  IN PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             NumPages
+  );
+
+/**
+  Pre-validate the system RAM when SEV-SNP is enabled in the guest VM.
+
+  @param[in]  BaseAddress             Base address
+  @param[in]  NumPages                Number of pages starting from the base address
+
+**/
+VOID
+EFIAPI
+MemEncryptSevSnpPreValidateSystemRam (
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             NumPages
   );
 
 #endif // _MEM_ENCRYPT_SEV_LIB_H_

@@ -35,9 +35,9 @@
 RETURN_STATUS
 EFIAPI
 MemEncryptSevClearPageEncMask (
-  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
-  IN PHYSICAL_ADDRESS         BaseAddress,
-  IN UINTN                    NumPages
+  IN PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             NumPages
   )
 {
   //
@@ -66,9 +66,9 @@ MemEncryptSevClearPageEncMask (
 RETURN_STATUS
 EFIAPI
 MemEncryptSevSetPageEncMask (
-  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
-  IN PHYSICAL_ADDRESS         BaseAddress,
-  IN UINTN                    NumPages
+  IN PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             NumPages
   )
 {
   //
@@ -95,9 +95,9 @@ MemEncryptSevSetPageEncMask (
 MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE
 EFIAPI
 MemEncryptSevGetAddressRangeState (
-  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
-  IN PHYSICAL_ADDRESS         BaseAddress,
-  IN UINTN                    Length
+  IN PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             Length
   )
 {
   //
@@ -126,13 +126,30 @@ MemEncryptSevGetAddressRangeState (
 RETURN_STATUS
 EFIAPI
 MemEncryptSevClearMmioPageEncMask (
-  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
-  IN PHYSICAL_ADDRESS         BaseAddress,
-  IN UINTN                    NumPages
+  IN PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             NumPages
   )
 {
   //
   // Memory encryption bit is not accessible in 32-bit mode
   //
   return RETURN_UNSUPPORTED;
+}
+
+/**
+  Pre-validate the system RAM when SEV-SNP is enabled in the guest VM.
+
+  @param[in]  BaseAddress             Base address
+  @param[in]  NumPages                Number of pages starting from the base address
+
+**/
+VOID
+EFIAPI
+MemEncryptSevSnpPreValidateSystemRam (
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             NumPages
+  )
+{
+  ASSERT (FALSE);
 }

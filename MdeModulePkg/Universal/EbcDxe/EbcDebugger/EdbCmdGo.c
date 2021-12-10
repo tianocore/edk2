@@ -24,15 +24,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_DEBUG_STATUS
 DebuggerGo (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
-  UINTN        Address;
-  CHAR16       *CommandStr;
-  EFI_STATUS   Status;
+  UINTN       Address;
+  CHAR16      *CommandStr;
+  EFI_STATUS  Status;
 
   //
   // Check argument
@@ -48,7 +48,7 @@ DebuggerGo (
         Status = Symboltoi (CommandStr, &Address);
         if (EFI_ERROR (Status)) {
           if (Status == EFI_NOT_FOUND) {
-            Address = Xtoi(CommandStr);
+            Address = Xtoi (CommandStr);
           } else {
             //
             // Something wrong, let Symboltoi print error info.
@@ -57,8 +57,9 @@ DebuggerGo (
             return EFI_DEBUG_CONTINUE;
           }
         }
+
         DebuggerPrivate->GoTilContext.BreakAddress = Address;
-        DebuggerPrivate->FeatureFlags |= EFI_DEBUG_FLAG_EBC_GT;
+        DebuggerPrivate->FeatureFlags             |= EFI_DEBUG_FLAG_EBC_GT;
       } else {
         EDBPrint (L"Command Argument error!\n");
         return EFI_DEBUG_CONTINUE;

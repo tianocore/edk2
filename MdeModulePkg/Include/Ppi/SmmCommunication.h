@@ -12,7 +12,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef _SMM_COMMUNICATION_PPI_H_
 #define _SMM_COMMUNICATION_PPI_H_
 
@@ -21,7 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0xae933e1c, 0xcc47, 0x4e38, { 0x8f, 0xe, 0xe2, 0xf6, 0x1d, 0x26, 0x5, 0xdf } \
   }
 
-typedef struct _EFI_PEI_SMM_COMMUNICATION_PPI  EFI_PEI_SMM_COMMUNICATION_PPI;
+typedef struct _EFI_PEI_SMM_COMMUNICATION_PPI EFI_PEI_SMM_COMMUNICATION_PPI;
 
 /**
   Communicates with a registered handler.
@@ -49,9 +48,9 @@ EFI_STATUS
 /// between DXE drivers and a registered SMI handler.
 ///
 struct _EFI_PEI_SMM_COMMUNICATION_PPI {
-  EFI_PEI_SMM_COMMUNICATE  Communicate;
+  EFI_PEI_SMM_COMMUNICATE    Communicate;
 };
 
-extern EFI_GUID gEfiPeiSmmCommunicationPpiGuid;
+extern EFI_GUID  gEfiPeiSmmCommunicationPpiGuid;
 
 #endif

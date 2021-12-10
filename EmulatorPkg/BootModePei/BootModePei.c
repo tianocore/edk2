@@ -6,8 +6,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
-
 //
 // The package level header files this module uses
 //
@@ -15,7 +13,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/PcdLib.h>
 #include <Library/PeiServicesLib.h>
-
 
 //
 // The protocols, PPI and GUID defintions for this module
@@ -27,7 +24,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
-
 
 //
 // Module globals
@@ -47,9 +43,10 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiListRecoveryBootMode = {
 EFI_STATUS
 EFIAPI
 InitializeBootMode (
-  IN       EFI_PEI_FILE_HANDLE       FileHandle,
-  IN CONST EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
   )
+
 /*++
 
 Routine Description:
@@ -66,14 +63,14 @@ Returns:
 
 **/
 {
-  EFI_STATUS    Status;
-  EFI_BOOT_MODE BootMode;
+  EFI_STATUS     Status;
+  EFI_BOOT_MODE  BootMode;
 
-  DEBUG ((EFI_D_ERROR, "Emu Boot Mode PEIM Loaded\n"));
+  DEBUG ((DEBUG_ERROR, "Emu Boot Mode PEIM Loaded\n"));
 
-  BootMode  = FixedPcdGet32 (PcdEmuBootMode);
+  BootMode = FixedPcdGet32 (PcdEmuBootMode);
 
-  Status    = PeiServicesSetBootMode (BootMode);
+  Status = PeiServicesSetBootMode (BootMode);
   ASSERT_EFI_ERROR (Status);
 
   Status = PeiServicesInstallPpi (&mPpiListBootMode);

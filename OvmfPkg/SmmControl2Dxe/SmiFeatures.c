@@ -21,19 +21,19 @@
 // The following bit value stands for "broadcast SMI" in the
 // "etc/smi/supported-features" and "etc/smi/requested-features" fw_cfg files.
 //
-#define ICH9_LPC_SMI_F_BROADCAST BIT0
+#define ICH9_LPC_SMI_F_BROADCAST  BIT0
 //
 // The following bit value stands for "enable CPU hotplug, and inject an SMI
 // with control value ICH9_APM_CNT_CPU_HOTPLUG upon hotplug", in the
 // "etc/smi/supported-features" and "etc/smi/requested-features" fw_cfg files.
 //
-#define ICH9_LPC_SMI_F_CPU_HOTPLUG BIT1
+#define ICH9_LPC_SMI_F_CPU_HOTPLUG  BIT1
 //
 // The following bit value stands for "enable CPU hot-unplug, and inject an SMI
 // with control value ICH9_APM_CNT_CPU_HOTPLUG upon hot-unplug", in the
 // "etc/smi/supported-features" and "etc/smi/requested-features" fw_cfg files.
 //
-#define ICH9_LPC_SMI_F_CPU_HOT_UNPLUG BIT2
+#define ICH9_LPC_SMI_F_CPU_HOT_UNPLUG  BIT2
 
 //
 // Provides a scratch buffer (allocated in EfiReservedMemoryType type memory)
@@ -41,8 +41,8 @@
 //
 #pragma pack (1)
 typedef union {
-  UINT64 Features;
-  UINT8  FeaturesOk;
+  UINT64    Features;
+  UINT8     FeaturesOk;
 } SCRATCH_BUFFER;
 #pragma pack ()
 
@@ -51,14 +51,14 @@ typedef union {
 // "etc/smi/features-ok" fw_cfg files from NegotiateSmiFeatures() to
 // AppendFwCfgBootScript().
 //
-STATIC FIRMWARE_CONFIG_ITEM mRequestedFeaturesItem;
-STATIC FIRMWARE_CONFIG_ITEM mFeaturesOkItem;
+STATIC FIRMWARE_CONFIG_ITEM  mRequestedFeaturesItem;
+STATIC FIRMWARE_CONFIG_ITEM  mFeaturesOkItem;
 
 //
 // Carries the negotiated SMI features from NegotiateSmiFeatures() to
 // AppendFwCfgBootScript().
 //
-STATIC UINT64 mSmiFeatures;
+STATIC UINT64  mSmiFeatures;
 
 /**
   Negotiate SMI features with QEMU.
@@ -76,11 +76,11 @@ NegotiateSmiFeatures (
   VOID
   )
 {
-  FIRMWARE_CONFIG_ITEM SupportedFeaturesItem;
-  UINTN                SupportedFeaturesSize;
-  UINTN                RequestedFeaturesSize;
-  UINTN                FeaturesOkSize;
-  UINT64               RequestedFeaturesMask;
+  FIRMWARE_CONFIG_ITEM  SupportedFeaturesItem;
+  UINTN                 SupportedFeaturesSize;
+  UINTN                 RequestedFeaturesSize;
+  UINTN                 FeaturesOkSize;
+  UINT64                RequestedFeaturesMask;
 
   //
   // Look up the fw_cfg files used for feature negotiation. The selector keys
@@ -88,14 +88,33 @@ NegotiateSmiFeatures (
   // statically. If the files are missing, then QEMU doesn't support SMI
   // feature negotiation.
   //
-  if (RETURN_ERROR (QemuFwCfgFindFile ("etc/smi/supported-features",
-                      &SupportedFeaturesItem, &SupportedFeaturesSize)) ||
-      RETURN_ERROR (QemuFwCfgFindFile ("etc/smi/requested-features",
-                      &mRequestedFeaturesItem, &RequestedFeaturesSize)) ||
-      RETURN_ERROR (QemuFwCfgFindFile ("etc/smi/features-ok",
-                      &mFeaturesOkItem, &FeaturesOkSize))) {
-    DEBUG ((DEBUG_INFO, "%a: SMI feature negotiation unavailable\n",
-      __FUNCTION__));
+  if (RETURN_ERROR (
+        QemuFwCfgFindFile (
+          "etc/smi/supported-features",
+          &SupportedFeaturesItem,
+          &SupportedFeaturesSize
+          )
+        ) ||
+      RETURN_ERROR (
+        QemuFwCfgFindFile (
+          "etc/smi/requested-features",
+          &mRequestedFeaturesItem,
+          &RequestedFeaturesSize
+          )
+        ) ||
+      RETURN_ERROR (
+        QemuFwCfgFindFile (
+          "etc/smi/features-ok",
+          &mFeaturesOkItem,
+          &FeaturesOkSize
+          )
+        ))
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: SMI feature negotiation unavailable\n",
+      __FUNCTION__
+      ));
     return FALSE;
   }
 
@@ -103,11 +122,15 @@ NegotiateSmiFeatures (
   // If the files are present but their sizes disagree with us, that's a fatal
   // error (we can't trust the behavior of SMIs either way).
   //
-  if (SupportedFeaturesSize != sizeof mSmiFeatures ||
-      RequestedFeaturesSize != sizeof mSmiFeatures ||
-      FeaturesOkSize != sizeof (UINT8)) {
-    DEBUG ((DEBUG_ERROR, "%a: size mismatch in feature negotiation\n",
-      __FUNCTION__));
+  if ((SupportedFeaturesSize != sizeof mSmiFeatures) ||
+      (RequestedFeaturesSize != sizeof mSmiFeatures) ||
+      (FeaturesOkSize != sizeof (UINT8)))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: size mismatch in feature negotiation\n",
+      __FUNCTION__
+      ));
     goto FatalError;
   }
 
@@ -129,6 +152,7 @@ NegotiateSmiFeatures (
     RequestedFeaturesMask |= ICH9_LPC_SMI_F_CPU_HOTPLUG;
     RequestedFeaturesMask |= ICH9_LPC_SMI_F_CPU_HOT_UNPLUG;
   }
+
   mSmiFeatures &= RequestedFeaturesMask;
   QemuFwCfgSelectItem (mRequestedFeaturesItem);
   QemuFwCfgWriteBytes (sizeof mSmiFeatures, &mSmiFeatures);
@@ -141,8 +165,12 @@ NegotiateSmiFeatures (
   //
   QemuFwCfgSelectItem (mFeaturesOkItem);
   if (QemuFwCfgRead8 () != 1) {
-    DEBUG ((DEBUG_ERROR, "%a: negotiation failed for feature bitmap 0x%Lx\n",
-      __FUNCTION__, mSmiFeatures));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: negotiation failed for feature bitmap 0x%Lx\n",
+      __FUNCTION__,
+      mSmiFeatures
+      ));
     goto FatalError;
   }
 
@@ -159,26 +187,37 @@ NegotiateSmiFeatures (
     // the original QEMU behavior (i.e., unicast SMI) used to differ.
     //
     if (RETURN_ERROR (PcdSet64S (PcdCpuSmmApSyncTimeout, 1000000)) ||
-        RETURN_ERROR (PcdSet8S (PcdCpuSmmSyncMode, 0x00))) {
-      DEBUG ((DEBUG_ERROR, "%a: PiSmmCpuDxeSmm PCD configuration failed\n",
-        __FUNCTION__));
+        RETURN_ERROR (PcdSet8S (PcdCpuSmmSyncMode, 0x00)))
+    {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: PiSmmCpuDxeSmm PCD configuration failed\n",
+        __FUNCTION__
+        ));
       goto FatalError;
     }
+
     DEBUG ((DEBUG_INFO, "%a: using SMI broadcast\n", __FUNCTION__));
   }
 
   if ((mSmiFeatures & ICH9_LPC_SMI_F_CPU_HOTPLUG) == 0) {
     DEBUG ((DEBUG_INFO, "%a: CPU hotplug not negotiated\n", __FUNCTION__));
   } else {
-    DEBUG ((DEBUG_INFO, "%a: CPU hotplug with SMI negotiated\n",
-      __FUNCTION__));
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: CPU hotplug with SMI negotiated\n",
+      __FUNCTION__
+      ));
   }
 
   if ((mSmiFeatures & ICH9_LPC_SMI_F_CPU_HOT_UNPLUG) == 0) {
     DEBUG ((DEBUG_INFO, "%a: CPU hot-unplug not negotiated\n", __FUNCTION__));
   } else {
-    DEBUG ((DEBUG_INFO, "%a: CPU hot-unplug with SMI negotiated\n",
-      __FUNCTION__));
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: CPU hot-unplug with SMI negotiated\n",
+      __FUNCTION__
+      ));
   }
 
   //
@@ -203,12 +242,12 @@ STATIC
 VOID
 EFIAPI
 AppendFwCfgBootScript (
-  IN OUT VOID *Context,              OPTIONAL
-  IN OUT VOID *ExternalScratchBuffer
+  IN OUT VOID  *Context               OPTIONAL,
+  IN OUT VOID  *ExternalScratchBuffer
   )
 {
-  SCRATCH_BUFFER *ScratchBuffer;
-  RETURN_STATUS  Status;
+  SCRATCH_BUFFER  *ScratchBuffer;
+  RETURN_STATUS   Status;
 
   ScratchBuffer = ExternalScratchBuffer;
 
@@ -216,8 +255,10 @@ AppendFwCfgBootScript (
   // Write the negotiated feature bitmap into "etc/smi/requested-features".
   //
   ScratchBuffer->Features = mSmiFeatures;
-  Status = QemuFwCfgS3ScriptWriteBytes (mRequestedFeaturesItem,
-             sizeof ScratchBuffer->Features);
+  Status                  = QemuFwCfgS3ScriptWriteBytes (
+                              mRequestedFeaturesItem,
+                              sizeof ScratchBuffer->Features
+                              );
   if (RETURN_ERROR (Status)) {
     goto FatalError;
   }
@@ -226,8 +267,10 @@ AppendFwCfgBootScript (
   // Read back "etc/smi/features-ok". This invokes the feature validation &
   // lockdown. (The validation succeeded at first boot.)
   //
-  Status = QemuFwCfgS3ScriptReadBytes (mFeaturesOkItem,
-             sizeof ScratchBuffer->FeaturesOk);
+  Status = QemuFwCfgS3ScriptReadBytes (
+             mFeaturesOkItem,
+             sizeof ScratchBuffer->FeaturesOk
+             );
   if (RETURN_ERROR (Status)) {
     goto FatalError;
   }
@@ -236,21 +279,27 @@ AppendFwCfgBootScript (
   // If "etc/smi/features-ok" read as 1, we're good. Otherwise, hang the S3
   // resume process.
   //
-  Status = QemuFwCfgS3ScriptCheckValue (&ScratchBuffer->FeaturesOk,
-             sizeof ScratchBuffer->FeaturesOk, MAX_UINT8, 1);
+  Status = QemuFwCfgS3ScriptCheckValue (
+             &ScratchBuffer->FeaturesOk,
+             sizeof ScratchBuffer->FeaturesOk,
+             MAX_UINT8,
+             1
+             );
   if (RETURN_ERROR (Status)) {
     goto FatalError;
   }
 
-  DEBUG ((DEBUG_VERBOSE, "%a: SMI feature negotiation boot script saved\n",
-    __FUNCTION__));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: SMI feature negotiation boot script saved\n",
+    __FUNCTION__
+    ));
   return;
 
 FatalError:
   ASSERT (FALSE);
   CpuDeadLoop ();
 }
-
 
 /**
   Append a boot script fragment that will re-select the previously negotiated
@@ -261,15 +310,18 @@ SaveSmiFeatures (
   VOID
   )
 {
-  RETURN_STATUS Status;
+  RETURN_STATUS  Status;
 
   //
   // We are already running at TPL_CALLBACK, on the stack of
   // OnS3SaveStateInstalled(). But that's okay, we can easily queue more
   // notification functions while executing a notification function.
   //
-  Status = QemuFwCfgS3CallWhenBootScriptReady (AppendFwCfgBootScript, NULL,
-             sizeof (SCRATCH_BUFFER));
+  Status = QemuFwCfgS3CallWhenBootScriptReady (
+             AppendFwCfgBootScript,
+             NULL,
+             sizeof (SCRATCH_BUFFER)
+             );
   if (RETURN_ERROR (Status)) {
     ASSERT (FALSE);
     CpuDeadLoop ();

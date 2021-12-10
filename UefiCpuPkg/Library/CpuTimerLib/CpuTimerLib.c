@@ -13,7 +13,9 @@
 #include <Library/DebugLib.h>
 #include <Register/Cpuid.h>
 
-GUID mCpuCrystalFrequencyHobGuid = { 0xe1ec5ad0, 0x8569, 0x46bd, { 0x8d, 0xcd, 0x3b, 0x9f, 0x6f, 0x45, 0x82, 0x7a } };
+GUID  mCpuCrystalFrequencyHobGuid = {
+  0xe1ec5ad0, 0x8569, 0x46bd, { 0x8d, 0xcd, 0x3b, 0x9f, 0x6f, 0x45, 0x82, 0x7a }
+};
 
 /**
   Internal function to retrieves the 64-bit frequency in Hz.
@@ -41,11 +43,11 @@ CpuidCoreClockCalculateTscFrequency (
   VOID
   )
 {
-  UINT64                 TscFrequency;
-  UINT64                 CoreXtalFrequency;
-  UINT32                 RegEax;
-  UINT32                 RegEbx;
-  UINT32                 RegEcx;
+  UINT64  TscFrequency;
+  UINT64  CoreXtalFrequency;
+  UINT32  RegEax;
+  UINT32  RegEbx;
+  UINT32  RegEcx;
 
   //
   // Use CPUID leaf 0x15 Time Stamp Counter and Nominal Core Crystal Clock Information
@@ -57,11 +59,12 @@ CpuidCoreClockCalculateTscFrequency (
   //
   // If EAX or EBX returns 0, the XTAL ratio is not enumerated.
   //
-  if (RegEax == 0 || RegEbx ==0 ) {
+  if ((RegEax == 0) || (RegEbx == 0)) {
     ASSERT (RegEax != 0);
     ASSERT (RegEbx != 0);
     return 0;
   }
+
   //
   // If ECX returns 0, the XTAL frequency is not enumerated.
   // And PcdCpuCoreCrystalClockFrequency defined should base on processor series.
@@ -69,7 +72,7 @@ CpuidCoreClockCalculateTscFrequency (
   if (RegEcx == 0) {
     CoreXtalFrequency = PcdGet64 (PcdCpuCoreCrystalClockFrequency);
   } else {
-    CoreXtalFrequency = (UINT64) RegEcx;
+    CoreXtalFrequency = (UINT64)RegEcx;
   }
 
   //
@@ -99,7 +102,7 @@ InternalCpuDelay (
   //
   // The target timer count is calculated here
   //
-  Ticks = AsmReadTsc() + Delay;
+  Ticks = AsmReadTsc () + Delay;
 
   //
   // Wait until time out
@@ -107,8 +110,8 @@ InternalCpuDelay (
   // Thus, this function must be called within 10 years of reset since
   // Intel guarantees a minimum of 10 years before the TSC wraps.
   //
-  while (AsmReadTsc() <= Ticks) {
-    CpuPause();
+  while (AsmReadTsc () <= Ticks) {
+    CpuPause ();
   }
 }
 
@@ -128,7 +131,6 @@ MicroSecondDelay (
   IN UINTN  MicroSeconds
   )
 {
-
   InternalCpuDelay (
     DivU64x32 (
       MultU64x64 (
@@ -136,8 +138,8 @@ MicroSecondDelay (
         InternalGetPerformanceCounterFrequency ()
         ),
       1000000u
-    )
-  );
+      )
+    );
 
   return MicroSeconds;
 }
@@ -158,7 +160,6 @@ NanoSecondDelay (
   IN UINTN  NanoSeconds
   )
 {
-
   InternalCpuDelay (
     DivU64x32 (
       MultU64x64 (
@@ -166,8 +167,8 @@ NanoSecondDelay (
         InternalGetPerformanceCounterFrequency ()
         ),
       1000000000u
-    )
-  );
+      )
+    );
 
   return NanoSeconds;
 }
@@ -219,7 +220,7 @@ GetPerformanceCounter (
 UINT64
 EFIAPI
 GetPerformanceCounterProperties (
-  OUT UINT64  *StartValue,  OPTIONAL
+  OUT UINT64  *StartValue   OPTIONAL,
   OUT UINT64  *EndValue     OPTIONAL
   )
 {
@@ -230,6 +231,7 @@ GetPerformanceCounterProperties (
   if (EndValue != NULL) {
     *EndValue = 0xffffffffffffffffULL;
   }
+
   return InternalGetPerformanceCounterFrequency ();
 }
 
@@ -269,11 +271,10 @@ GetTimeInNanoSecond (
   // Since 2^29 < 1,000,000,000 = 0x3B9ACA00 < 2^30, Remainder should < 2^(64-30) = 2^34,
   // i.e. highest bit set in Remainder should <= 33.
   //
-  Shift = MAX (0, HighBitSet64 (Remainder) - 33);
-  Remainder = RShiftU64 (Remainder, (UINTN) Shift);
-  Frequency = RShiftU64 (Frequency, (UINTN) Shift);
+  Shift        = MAX (0, HighBitSet64 (Remainder) - 33);
+  Remainder    = RShiftU64 (Remainder, (UINTN)Shift);
+  Frequency    = RShiftU64 (Frequency, (UINTN)Shift);
   NanoSeconds += DivU64x64Remainder (MultU64x32 (Remainder, 1000000000u), Frequency, NULL);
 
   return NanoSeconds;
 }
-

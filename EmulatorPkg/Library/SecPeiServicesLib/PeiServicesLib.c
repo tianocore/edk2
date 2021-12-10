@@ -6,29 +6,25 @@
 
 **/
 
-
 #include <PiPei.h>
 #include <Library/EmuMagicPageLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 
-
-
 EFI_STATUS
 SecFfsFindNextFile (
-  IN EFI_FV_FILETYPE            SearchType,
-  IN EFI_PEI_FV_HANDLE          VolumeHandle,
-  IN OUT EFI_PEI_FILE_HANDLE    *FileHandle
+  IN EFI_FV_FILETYPE          SearchType,
+  IN EFI_PEI_FV_HANDLE        VolumeHandle,
+  IN OUT EFI_PEI_FILE_HANDLE  *FileHandle
   );
 
 EFI_STATUS
 SecFfsFindSectionData (
-  IN EFI_SECTION_TYPE           SectionType,
-  IN EFI_PEI_FILE_HANDLE        FileHandle,
-  OUT VOID                      **SectionData
+  IN EFI_SECTION_TYPE     SectionType,
+  IN EFI_PEI_FILE_HANDLE  FileHandle,
+  OUT VOID                **SectionData
   );
-
 
 /**
   This service enables a given PEIM to register an interface into the PEI Foundation.
@@ -45,7 +41,7 @@ SecFfsFindSectionData (
 EFI_STATUS
 EFIAPI
 PeiServicesInstallPpi (
-  IN CONST EFI_PEI_PPI_DESCRIPTOR     *PpiList
+  IN CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList
   )
 {
   ASSERT (FALSE);
@@ -70,8 +66,8 @@ PeiServicesInstallPpi (
 EFI_STATUS
 EFIAPI
 PeiServicesReInstallPpi (
-  IN CONST EFI_PEI_PPI_DESCRIPTOR     *OldPpi,
-  IN CONST EFI_PEI_PPI_DESCRIPTOR     *NewPpi
+  IN CONST EFI_PEI_PPI_DESCRIPTOR  *OldPpi,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR  *NewPpi
   )
 {
   ASSERT (FALSE);
@@ -97,26 +93,28 @@ PeiServicesReInstallPpi (
 EFI_STATUS
 EFIAPI
 PeiServicesLocatePpi (
-  IN CONST EFI_GUID             *Guid,
-  IN UINTN                      Instance,
-  IN OUT EFI_PEI_PPI_DESCRIPTOR **PpiDescriptor,
-  IN OUT VOID                   **Ppi
+  IN CONST EFI_GUID              *Guid,
+  IN UINTN                       Instance,
+  IN OUT EFI_PEI_PPI_DESCRIPTOR  **PpiDescriptor,
+  IN OUT VOID                    **Ppi
   )
 {
-  EFI_PEI_PPI_DESCRIPTOR *PpiList;
+  EFI_PEI_PPI_DESCRIPTOR  *PpiList;
 
   if (Instance != 0) {
     return EFI_NOT_FOUND;
   }
 
-  for (PpiList = EMU_MAGIC_PAGE()->PpiList; ; PpiList++) {
+  for (PpiList = EMU_MAGIC_PAGE ()->PpiList; ; PpiList++) {
     if (CompareGuid (PpiList->Guid, Guid)) {
       if (PpiDescriptor != NULL) {
         *PpiDescriptor = PpiList;
       }
+
       if (Ppi != NULL) {
         *Ppi = PpiList->Ppi;
       }
+
       return EFI_SUCCESS;
     }
 
@@ -124,7 +122,6 @@ PeiServicesLocatePpi (
       break;
     }
   }
-
 
   return EFI_NOT_FOUND;
 }
@@ -166,7 +163,7 @@ PeiServicesNotifyPpi (
 EFI_STATUS
 EFIAPI
 PeiServicesGetBootMode (
-  OUT EFI_BOOT_MODE          *BootMode
+  OUT EFI_BOOT_MODE  *BootMode
   )
 {
   ASSERT (FALSE);
@@ -184,7 +181,7 @@ PeiServicesGetBootMode (
 EFI_STATUS
 EFIAPI
 PeiServicesSetBootMode (
-  IN EFI_BOOT_MODE              BootMode
+  IN EFI_BOOT_MODE  BootMode
   )
 {
   ASSERT (FALSE);
@@ -204,7 +201,7 @@ PeiServicesSetBootMode (
 EFI_STATUS
 EFIAPI
 PeiServicesGetHobList (
-  OUT VOID                      **HobList
+  OUT VOID  **HobList
   )
 {
   ASSERT (FALSE);
@@ -226,9 +223,9 @@ PeiServicesGetHobList (
 EFI_STATUS
 EFIAPI
 PeiServicesCreateHob (
-  IN UINT16                     Type,
-  IN UINT16                     Length,
-  OUT VOID                      **Hob
+  IN UINT16  Type,
+  IN UINT16  Length,
+  OUT VOID   **Hob
   )
 {
   ASSERT (FALSE);
@@ -251,8 +248,8 @@ PeiServicesCreateHob (
 EFI_STATUS
 EFIAPI
 PeiServicesFfsFindNextVolume (
-  IN UINTN                          Instance,
-  IN OUT EFI_PEI_FV_HANDLE          *VolumeHandle
+  IN UINTN                  Instance,
+  IN OUT EFI_PEI_FV_HANDLE  *VolumeHandle
   )
 {
   ASSERT (FALSE);
@@ -276,9 +273,9 @@ PeiServicesFfsFindNextVolume (
 EFI_STATUS
 EFIAPI
 PeiServicesFfsFindNextFile (
-  IN EFI_FV_FILETYPE            SearchType,
-  IN EFI_PEI_FV_HANDLE          VolumeHandle,
-  IN OUT EFI_PEI_FILE_HANDLE    *FileHandle
+  IN EFI_FV_FILETYPE          SearchType,
+  IN EFI_PEI_FV_HANDLE        VolumeHandle,
+  IN OUT EFI_PEI_FILE_HANDLE  *FileHandle
   )
 {
   return SecFfsFindNextFile (SearchType, VolumeHandle, FileHandle);
@@ -299,9 +296,9 @@ PeiServicesFfsFindNextFile (
 EFI_STATUS
 EFIAPI
 PeiServicesFfsFindSectionData (
-  IN EFI_SECTION_TYPE           SectionType,
-  IN EFI_PEI_FILE_HANDLE        FileHandle,
-  OUT VOID                      **SectionData
+  IN EFI_SECTION_TYPE     SectionType,
+  IN EFI_PEI_FILE_HANDLE  FileHandle,
+  OUT VOID                **SectionData
   )
 {
   return SecFfsFindSectionData (SectionType, FileHandle, SectionData);
@@ -322,8 +319,8 @@ PeiServicesFfsFindSectionData (
 EFI_STATUS
 EFIAPI
 PeiServicesInstallPeiMemory (
-  IN EFI_PHYSICAL_ADDRESS       MemoryBegin,
-  IN UINT64                     MemoryLength
+  IN EFI_PHYSICAL_ADDRESS  MemoryBegin,
+  IN UINT64                MemoryLength
   )
 {
   ASSERT (FALSE);
@@ -347,9 +344,9 @@ PeiServicesInstallPeiMemory (
 EFI_STATUS
 EFIAPI
 PeiServicesAllocatePages (
-  IN EFI_MEMORY_TYPE            MemoryType,
-  IN UINTN                      Pages,
-  OUT EFI_PHYSICAL_ADDRESS      *Memory
+  IN EFI_MEMORY_TYPE        MemoryType,
+  IN UINTN                  Pages,
+  OUT EFI_PHYSICAL_ADDRESS  *Memory
   )
 {
   ASSERT (FALSE);
@@ -370,8 +367,8 @@ PeiServicesAllocatePages (
 EFI_STATUS
 EFIAPI
 PeiServicesAllocatePool (
-  IN UINTN                      Size,
-  OUT VOID                      **Buffer
+  IN UINTN  Size,
+  OUT VOID  **Buffer
   )
 {
   ASSERT (FALSE);
@@ -415,7 +412,7 @@ PeiServicesResetSystem (
 EFI_STATUS
 EFIAPI
 PeiServicesRegisterForShadow (
-  IN  EFI_PEI_FILE_HANDLE FileHandle
+  IN  EFI_PEI_FILE_HANDLE  FileHandle
   )
 {
   ASSERT (FALSE);
@@ -443,14 +440,13 @@ PeiServicesRegisterForShadow (
 EFI_STATUS
 EFIAPI
 PeiServicesFfsGetFileInfo (
-  IN CONST  EFI_PEI_FILE_HANDLE   FileHandle,
-  OUT EFI_FV_FILE_INFO            *FileInfo
+  IN CONST  EFI_PEI_FILE_HANDLE  FileHandle,
+  OUT EFI_FV_FILE_INFO           *FileInfo
   )
 {
   ASSERT (FALSE);
   return EFI_OUT_OF_RESOURCES;
 }
-
 
 /**
   This service is a wrapper for the PEI Service FfsFindByName(), except the pointer to the PEI Services
@@ -476,15 +472,14 @@ PeiServicesFfsGetFileInfo (
 EFI_STATUS
 EFIAPI
 PeiServicesFfsFindFileByName (
-  IN CONST  EFI_GUID            *FileName,
-  IN CONST  EFI_PEI_FV_HANDLE   VolumeHandle,
-  OUT       EFI_PEI_FILE_HANDLE *FileHandle
+  IN CONST  EFI_GUID             *FileName,
+  IN CONST  EFI_PEI_FV_HANDLE    VolumeHandle,
+  OUT       EFI_PEI_FILE_HANDLE  *FileHandle
   )
 {
   ASSERT (FALSE);
   return EFI_OUT_OF_RESOURCES;
 }
-
 
 /**
   This service is a wrapper for the PEI Service FfsGetVolumeInfo(), except the pointer to the PEI Services
@@ -507,8 +502,8 @@ PeiServicesFfsFindFileByName (
 EFI_STATUS
 EFIAPI
 PeiServicesFfsGetVolumeInfo (
-  IN  EFI_PEI_FV_HANDLE       VolumeHandle,
-  OUT EFI_FV_INFO             *VolumeInfo
+  IN  EFI_PEI_FV_HANDLE  VolumeHandle,
+  OUT EFI_FV_INFO        *VolumeInfo
   )
 {
   ASSERT (FALSE);
@@ -548,14 +543,13 @@ PeiServicesFfsGetVolumeInfo (
 VOID
 EFIAPI
 PeiServicesInstallFvInfoPpi (
-  IN CONST EFI_GUID                *FvFormat, OPTIONAL
-  IN CONST VOID                    *FvInfo,
-  IN       UINT32                  FvInfoSize,
-  IN CONST EFI_GUID                *ParentFvName, OPTIONAL
-  IN CONST EFI_GUID                *ParentFileName OPTIONAL
+  IN CONST EFI_GUID  *FvFormat  OPTIONAL,
+  IN CONST VOID      *FvInfo,
+  IN       UINT32    FvInfoSize,
+  IN CONST EFI_GUID  *ParentFvName  OPTIONAL,
+  IN CONST EFI_GUID  *ParentFileName OPTIONAL
   )
 {
   ASSERT (FALSE);
   return;
 }
-

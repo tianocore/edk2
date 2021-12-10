@@ -18,17 +18,17 @@
 
 #pragma pack(1)
 typedef struct {
-  EFI_GUID             Guid;
-  EFI_PHYSICAL_ADDRESS OrigAddress;
-  EFI_PHYSICAL_ADDRESS CopyAddress;
-  UINT32               Size;
-  UINT64               Attributes;
+  EFI_GUID                Guid;
+  EFI_PHYSICAL_ADDRESS    OrigAddress;
+  EFI_PHYSICAL_ADDRESS    CopyAddress;
+  UINT32                  Size;
+  UINT64                  Attributes;
 } LOCK_BOX_ENTRY;
 #pragma pack()
 
-LOCK_BOX_GLOBAL *mLockBoxGlobal = NULL;
-STATIC LOCK_BOX_ENTRY *StartOfEntries = NULL;
-STATIC LOCK_BOX_ENTRY *EndOfEntries = NULL;
+LOCK_BOX_GLOBAL        *mLockBoxGlobal = NULL;
+STATIC LOCK_BOX_ENTRY  *StartOfEntries = NULL;
+STATIC LOCK_BOX_ENTRY  *EndOfEntries   = NULL;
 
 RETURN_STATUS
 EFIAPI
@@ -36,7 +36,7 @@ LockBoxLibInitialize (
   VOID
   )
 {
-  UINTN NumEntries;
+  UINTN  NumEntries;
 
   ASSERT (!FeaturePcdGet (PcdSmmSmramRequire));
 
@@ -44,10 +44,10 @@ LockBoxLibInitialize (
     return RETURN_UNSUPPORTED;
   }
 
-  mLockBoxGlobal = (LOCK_BOX_GLOBAL *)(UINTN) PcdGet32 (PcdOvmfLockBoxStorageBase);
-  StartOfEntries = ((LOCK_BOX_ENTRY *) (mLockBoxGlobal + 1));
-  NumEntries = ((PcdGet32 (PcdOvmfLockBoxStorageSize) - sizeof (LOCK_BOX_GLOBAL)) /
-                sizeof (LOCK_BOX_ENTRY));
+  mLockBoxGlobal = (LOCK_BOX_GLOBAL *)(UINTN)PcdGet32 (PcdOvmfLockBoxStorageBase);
+  StartOfEntries = ((LOCK_BOX_ENTRY *)(mLockBoxGlobal + 1));
+  NumEntries     = ((PcdGet32 (PcdOvmfLockBoxStorageSize) - sizeof (LOCK_BOX_GLOBAL)) /
+                    sizeof (LOCK_BOX_ENTRY));
   EndOfEntries = StartOfEntries + NumEntries;
   if (mLockBoxGlobal->Signature != LOCK_BOX_GLOBAL_SIGNATURE) {
     //
@@ -57,9 +57,9 @@ LockBoxLibInitialize (
     //
     mLockBoxGlobal->Signature = LOCK_BOX_GLOBAL_SIGNATURE;
   }
+
   return RETURN_SUCCESS;
 }
-
 
 /**
   Find LockBox entry based on GUID.
@@ -80,20 +80,19 @@ STATIC
 LOCK_BOX_ENTRY *
 EFIAPI
 FindHeaderByGuid (
-  IN CONST EFI_GUID *Guid
+  IN CONST EFI_GUID  *Guid
   )
 {
-  LOCK_BOX_ENTRY *Header;
+  LOCK_BOX_ENTRY  *Header;
 
   for (Header = StartOfEntries; Header < EndOfEntries; Header++) {
-    if (Header->Size == 0 || CompareGuid (Guid, &Header->Guid)) {
+    if ((Header->Size == 0) || CompareGuid (Guid, &Header->Guid)) {
       return Header;
     }
   }
 
   return NULL;
 }
-
 
 /**
   This function will save confidential information to lockbox.
@@ -115,18 +114,24 @@ FindHeaderByGuid (
 RETURN_STATUS
 EFIAPI
 SaveLockBox (
-  IN  GUID                        *Guid,
-  IN  VOID                        *Buffer,
-  IN  UINTN                       Length
+  IN  GUID   *Guid,
+  IN  VOID   *Buffer,
+  IN  UINTN  Length
   )
 {
-  LOCK_BOX_ENTRY *Header;
+  LOCK_BOX_ENTRY  *Header;
   VOID            *CopyBuffer;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: Guid=%g Buffer=%p Length=0x%x\n", __FUNCTION__,
-    Guid, Buffer, (UINT32) Length));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: Guid=%g Buffer=%p Length=0x%x\n",
+    __FUNCTION__,
+    Guid,
+    Buffer,
+    (UINT32)Length
+    ));
 
-  if (Guid == NULL || Buffer == NULL || Length == 0) {
+  if ((Guid == NULL) || (Buffer == NULL) || (Length == 0)) {
     return RETURN_INVALID_PARAMETER;
   }
 
@@ -152,9 +157,9 @@ SaveLockBox (
   // overwrite the current terminator header with new metadata
   //
   CopyGuid (&Header->Guid, Guid);
-  Header->OrigAddress = (UINTN) Buffer;
-  Header->CopyAddress = (UINTN) CopyBuffer;
-  Header->Size        = (UINT32) Length;
+  Header->OrigAddress = (UINTN)Buffer;
+  Header->CopyAddress = (UINTN)CopyBuffer;
+  Header->Size        = (UINT32)Length;
   Header->Attributes  = 0;
 
   //
@@ -164,7 +169,6 @@ SaveLockBox (
 
   return RETURN_SUCCESS;
 }
-
 
 /**
   This function will set lockbox attributes.
@@ -183,28 +187,33 @@ SaveLockBox (
 RETURN_STATUS
 EFIAPI
 SetLockBoxAttributes (
-  IN  GUID                        *Guid,
-  IN  UINT64                      Attributes
+  IN  GUID    *Guid,
+  IN  UINT64  Attributes
   )
 {
-  LOCK_BOX_ENTRY *Header;
+  LOCK_BOX_ENTRY  *Header;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: Guid=%g Attributes=0x%Lx\n", __FUNCTION__, Guid,
-    Attributes));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: Guid=%g Attributes=0x%Lx\n",
+    __FUNCTION__,
+    Guid,
+    Attributes
+    ));
 
   if (Guid == NULL) {
     return RETURN_INVALID_PARAMETER;
   }
 
   Header = FindHeaderByGuid (Guid);
-  if (!Header || Header->Size == 0) {
+  if (!Header || (Header->Size == 0)) {
     return RETURN_NOT_FOUND;
   }
+
   Header->Attributes = Attributes;
 
   return RETURN_SUCCESS;
 }
-
 
 /**
   This function will update confidential information to lockbox.
@@ -233,36 +242,42 @@ SetLockBoxAttributes (
 RETURN_STATUS
 EFIAPI
 UpdateLockBox (
-  IN  GUID                        *Guid,
-  IN  UINTN                       Offset,
-  IN  VOID                        *Buffer,
-  IN  UINTN                       Length
+  IN  GUID   *Guid,
+  IN  UINTN  Offset,
+  IN  VOID   *Buffer,
+  IN  UINTN  Length
   )
 {
-  LOCK_BOX_ENTRY *Header;
+  LOCK_BOX_ENTRY  *Header;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: Guid=%g Offset=0x%x Length=0x%x\n", __FUNCTION__,
-    Guid, (UINT32) Offset, (UINT32) Length));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: Guid=%g Offset=0x%x Length=0x%x\n",
+    __FUNCTION__,
+    Guid,
+    (UINT32)Offset,
+    (UINT32)Length
+    ));
 
-  if (Guid == NULL || Buffer == NULL || Length == 0) {
+  if ((Guid == NULL) || (Buffer == NULL) || (Length == 0)) {
     return RETURN_INVALID_PARAMETER;
   }
 
   Header = FindHeaderByGuid (Guid);
-  if (!Header || Header->Size == 0) {
+  if (!Header || (Header->Size == 0)) {
     return RETURN_NOT_FOUND;
   }
 
-  if (Header->Size < Offset ||
-      Length > Header->Size - Offset) {
+  if ((Header->Size < Offset) ||
+      (Length > Header->Size - Offset))
+  {
     return RETURN_BUFFER_TOO_SMALL;
   }
 
-  CopyMem ((UINT8 *)(UINTN) (Header->CopyAddress) + Offset, Buffer, Length);
+  CopyMem ((UINT8 *)(UINTN)(Header->CopyAddress) + Offset, Buffer, Length);
 
   return RETURN_SUCCESS;
 }
-
 
 /**
   This function will restore confidential information from lockbox.
@@ -290,24 +305,30 @@ UpdateLockBox (
 RETURN_STATUS
 EFIAPI
 RestoreLockBox (
-  IN  GUID                        *Guid,
-  IN  VOID                        *Buffer, OPTIONAL
-  IN  OUT UINTN                   *Length  OPTIONAL
+  IN  GUID       *Guid,
+  IN  VOID       *Buffer  OPTIONAL,
+  IN  OUT UINTN  *Length  OPTIONAL
   )
 {
-  LOCK_BOX_ENTRY *Header;
+  LOCK_BOX_ENTRY  *Header;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: Guid=%g Buffer=%p\n", __FUNCTION__, Guid,
-    Buffer));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: Guid=%g Buffer=%p\n",
+    __FUNCTION__,
+    Guid,
+    Buffer
+    ));
 
   if ((Guid == NULL) ||
       ((Buffer == NULL) && (Length != NULL)) ||
-      ((Buffer != NULL) && (Length == NULL))) {
+      ((Buffer != NULL) && (Length == NULL)))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
   Header = FindHeaderByGuid (Guid);
-  if (!Header || Header->Size == 0) {
+  if (!Header || (Header->Size == 0)) {
     return RETURN_NOT_FOUND;
   }
 
@@ -315,10 +336,12 @@ RestoreLockBox (
     if (!(Header->Attributes & LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE)) {
       return RETURN_WRITE_PROTECTED;
     }
+
     if (Header->OrigAddress + (Header->Size - 1) > MAX_ADDRESS) {
       return RETURN_UNSUPPORTED;
     }
-    Buffer = (VOID *)(UINTN) Header->OrigAddress;
+
+    Buffer = (VOID *)(UINTN)Header->OrigAddress;
   }
 
   //
@@ -332,14 +355,14 @@ RestoreLockBox (
       *Length = Header->Size;
       return EFI_BUFFER_TOO_SMALL;
     }
+
     *Length = Header->Size;
   }
 
-  CopyMem (Buffer, (VOID*)(UINTN) Header->CopyAddress, Header->Size);
+  CopyMem (Buffer, (VOID *)(UINTN)Header->CopyAddress, Header->Size);
 
   return RETURN_SUCCESS;
 }
-
 
 /**
   This function will restore confidential information from all lockbox which
@@ -356,22 +379,30 @@ RestoreAllLockBoxInPlace (
   VOID
   )
 {
-  LOCK_BOX_ENTRY *Header;
+  LOCK_BOX_ENTRY  *Header;
 
   for (Header = StartOfEntries;
        Header < EndOfEntries && Header->Size > 0;
-       Header++) {
+       Header++)
+  {
     if (Header->Attributes & LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE) {
-      VOID *Buffer;
+      VOID  *Buffer;
 
       if (Header->OrigAddress + (Header->Size - 1) > MAX_ADDRESS) {
         return RETURN_UNSUPPORTED;
       }
-      Buffer = (VOID *)(UINTN) Header->OrigAddress;
-      CopyMem (Buffer, (VOID*)(UINTN)Header->CopyAddress, Header->Size);
-      DEBUG ((DEBUG_VERBOSE, "%a: Guid=%g Buffer=%p\n", __FUNCTION__,
-        &Header->Guid, Buffer));
+
+      Buffer = (VOID *)(UINTN)Header->OrigAddress;
+      CopyMem (Buffer, (VOID *)(UINTN)Header->CopyAddress, Header->Size);
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "%a: Guid=%g Buffer=%p\n",
+        __FUNCTION__,
+        &Header->Guid,
+        Buffer
+        ));
     }
   }
+
   return RETURN_SUCCESS;
 }

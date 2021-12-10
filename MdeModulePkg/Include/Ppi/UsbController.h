@@ -28,25 +28,25 @@ typedef struct _PEI_USB_CONTROLLER_PPI PEI_USB_CONTROLLER_PPI;
 /// This bit is used in the ControllerType return parameter of GetUsbController()
 /// to identify the USB Host Controller type as UHCI
 ///
-#define PEI_UHCI_CONTROLLER 0x01
+#define PEI_UHCI_CONTROLLER  0x01
 
 ///
 /// This bit is used in the ControllerType return parameter of GetUsbController()
 /// to identify the USB Host Controller type as OHCI
 ///
-#define PEI_OHCI_CONTROLLER 0x02
+#define PEI_OHCI_CONTROLLER  0x02
 
 ///
 /// This bit is used in the ControllerType return parameter of GetUsbController()
 /// to identify the USB Host Controller type as EHCI
 ///
-#define PEI_EHCI_CONTROLLER 0x03
+#define PEI_EHCI_CONTROLLER  0x03
 
 ///
 /// This bit is used in the ControllerType return parameter of GetUsbController()
 /// to identify the USB Host Controller type as XHCI
 ///
-#define PEI_XHCI_CONTROLLER 0x04
+#define PEI_XHCI_CONTROLLER  0x04
 
 /**
   Retrieve USB Host Controller Info such as controller type and I/O Base Address.
@@ -79,9 +79,9 @@ EFI_STATUS
 /// and the base address of the I/O ports used to access the USB Host Controller.
 ///
 struct _PEI_USB_CONTROLLER_PPI {
-  PEI_GET_USB_CONTROLLER  GetUsbController;
+  PEI_GET_USB_CONTROLLER    GetUsbController;
 };
 
-extern EFI_GUID gPeiUsbControllerPpiGuid;
+extern EFI_GUID  gPeiUsbControllerPpiGuid;
 
 #endif

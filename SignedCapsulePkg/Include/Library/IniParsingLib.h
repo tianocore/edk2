@@ -24,7 +24,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef __INI_PARSING_LIB_H__
 #define __INI_PARSING_LIB_H__
 
@@ -41,8 +40,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 VOID *
 EFIAPI
 OpenIniFile (
-  IN      UINT8                         *DataBuffer,
-  IN      UINTN                         BufferSize
+  IN      UINT8  *DataBuffer,
+  IN      UINTN  BufferSize
   );
 
 /**
@@ -59,10 +58,10 @@ OpenIniFile (
 EFI_STATUS
 EFIAPI
 GetStringFromDataFile (
-  IN      VOID                          *Context,
-  IN      CHAR8                         *SectionName,
-  IN      CHAR8                         *EntryName,
-  OUT     CHAR8                         **EntryValue
+  IN      VOID   *Context,
+  IN      CHAR8  *SectionName,
+  IN      CHAR8  *EntryName,
+  OUT     CHAR8  **EntryValue
   );
 
 /**
@@ -79,10 +78,10 @@ GetStringFromDataFile (
 EFI_STATUS
 EFIAPI
 GetGuidFromDataFile (
-  IN      VOID                          *Context,
-  IN      CHAR8                         *SectionName,
-  IN      CHAR8                         *EntryName,
-  OUT     EFI_GUID                      *Guid
+  IN      VOID      *Context,
+  IN      CHAR8     *SectionName,
+  IN      CHAR8     *EntryName,
+  OUT     EFI_GUID  *Guid
   );
 
 /**
@@ -99,10 +98,10 @@ GetGuidFromDataFile (
 EFI_STATUS
 EFIAPI
 GetDecimalUintnFromDataFile (
-  IN      VOID                          *Context,
-  IN      CHAR8                         *SectionName,
-  IN      CHAR8                         *EntryName,
-  OUT     UINTN                         *Data
+  IN      VOID   *Context,
+  IN      CHAR8  *SectionName,
+  IN      CHAR8  *EntryName,
+  OUT     UINTN  *Data
   );
 
 /**
@@ -119,10 +118,10 @@ GetDecimalUintnFromDataFile (
 EFI_STATUS
 EFIAPI
 GetHexUintnFromDataFile (
-  IN      VOID                          *Context,
-  IN      CHAR8                         *SectionName,
-  IN      CHAR8                         *EntryName,
-  OUT     UINTN                         *Data
+  IN      VOID   *Context,
+  IN      CHAR8  *SectionName,
+  IN      CHAR8  *EntryName,
+  OUT     UINTN  *Data
   );
 
 /**
@@ -139,10 +138,10 @@ GetHexUintnFromDataFile (
 EFI_STATUS
 EFIAPI
 GetHexUint64FromDataFile (
-  IN      VOID                          *Context,
-  IN      CHAR8                         *SectionName,
-  IN      CHAR8                         *EntryName,
-  OUT     UINT64                        *Data
+  IN      VOID    *Context,
+  IN      CHAR8   *SectionName,
+  IN      CHAR8   *EntryName,
+  OUT     UINT64  *Data
   );
 
 /**
@@ -153,8 +152,7 @@ GetHexUint64FromDataFile (
 VOID
 EFIAPI
 CloseIniFile (
-  IN      VOID                          *Context
+  IN      VOID  *Context
   );
 
 #endif
-

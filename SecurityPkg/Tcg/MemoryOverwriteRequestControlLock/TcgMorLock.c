@@ -18,13 +18,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "TcgMorLock.h"
 
 typedef struct {
-  CHAR16                                 *VariableName;
-  EFI_GUID                               *VendorGuid;
+  CHAR16      *VariableName;
+  EFI_GUID    *VendorGuid;
 } VARIABLE_TYPE;
 
 VARIABLE_TYPE  mMorVariableType[] = {
-  {MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,      &gEfiMemoryOverwriteControlDataGuid},
-  {MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME,  &gEfiMemoryOverwriteRequestControlLockGuid},
+  { MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,     &gEfiMemoryOverwriteControlDataGuid        },
+  { MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME, &gEfiMemoryOverwriteRequestControlLockGuid },
 };
 
 /**
@@ -38,18 +38,20 @@ VARIABLE_TYPE  mMorVariableType[] = {
 **/
 BOOLEAN
 IsAnyMorVariable (
-  IN CHAR16                                 *VariableName,
-  IN EFI_GUID                               *VendorGuid
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid
   )
 {
-  UINTN   Index;
+  UINTN  Index;
 
-  for (Index = 0; Index < sizeof(mMorVariableType)/sizeof(mMorVariableType[0]); Index++) {
+  for (Index = 0; Index < sizeof (mMorVariableType)/sizeof (mMorVariableType[0]); Index++) {
     if ((StrCmp (VariableName, mMorVariableType[Index].VariableName) == 0) &&
-        (CompareGuid (VendorGuid, mMorVariableType[Index].VendorGuid))) {
+        (CompareGuid (VendorGuid, mMorVariableType[Index].VendorGuid)))
+    {
       return TRUE;
     }
   }
+
   return FALSE;
 }
 
@@ -64,14 +66,16 @@ IsAnyMorVariable (
 **/
 BOOLEAN
 IsMorLockVariable (
-  IN CHAR16                                 *VariableName,
-  IN EFI_GUID                               *VendorGuid
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid
   )
 {
   if ((StrCmp (VariableName, MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME) == 0) &&
-      (CompareGuid (VendorGuid, &gEfiMemoryOverwriteRequestControlLockGuid))) {
+      (CompareGuid (VendorGuid, &gEfiMemoryOverwriteRequestControlLockGuid)))
+  {
     return TRUE;
   }
+
   return FALSE;
 }
 
@@ -104,11 +108,11 @@ IsMorLockVariable (
 EFI_STATUS
 EFIAPI
 SetVariableCheckHandlerMor (
-  IN CHAR16     *VariableName,
-  IN EFI_GUID   *VendorGuid,
-  IN UINT32     Attributes,
-  IN UINTN      DataSize,
-  IN VOID       *Data
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid,
+  IN UINT32    Attributes,
+  IN UINTN     DataSize,
+  IN VOID      *Data
   )
 {
   UINTN       MorLockDataSize;
@@ -122,14 +126,14 @@ SetVariableCheckHandlerMor (
     return EFI_SUCCESS;
   }
 
-  MorLockDataSize = sizeof(MorLock);
-  Status = InternalGetVariable (
-             MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME,
-             &gEfiMemoryOverwriteRequestControlLockGuid,
-             NULL,
-             &MorLockDataSize,
-             &MorLock
-             );
+  MorLockDataSize = sizeof (MorLock);
+  Status          = InternalGetVariable (
+                      MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME,
+                      &gEfiMemoryOverwriteRequestControlLockGuid,
+                      NULL,
+                      &MorLockDataSize,
+                      &MorLock
+                      );
   if (!EFI_ERROR (Status) && MorLock) {
     //
     // If lock, deny access
@@ -140,14 +144,14 @@ SetVariableCheckHandlerMor (
   //
   // Delete not OK
   //
-  if ((DataSize != sizeof(UINT8)) || (Data == NULL) || (Attributes == 0)) {
+  if ((DataSize != sizeof (UINT8)) || (Data == NULL) || (Attributes == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
   // check format
   //
-  if (IsMorLockVariable(VariableName, VendorGuid)) {
+  if (IsMorLockVariable (VariableName, VendorGuid)) {
     //
     // set to any other value not OK
     //
@@ -155,6 +159,7 @@ SetVariableCheckHandlerMor (
       return EFI_INVALID_PARAMETER;
     }
   }
+
   //
   // Or grant access
   //
@@ -179,7 +184,7 @@ MorLockDriverInit (
   EFI_STATUS  Status;
   UINT8       Data;
 
-  Data = 0;
+  Data   = 0;
   Status = InternalSetVariable (
              MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME,
              &gEfiMemoryOverwriteRequestControlLockGuid,

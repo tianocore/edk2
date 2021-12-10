@@ -18,7 +18,7 @@
 **/
 BOOLEAN
 AmlIsRootPath (
-  IN UINT8              *Buffer
+  IN UINT8  *Buffer
   )
 {
   if ((Buffer[0] == AML_ROOT_CHAR) && (Buffer[1] == 0)) {
@@ -38,10 +38,10 @@ AmlIsRootPath (
 **/
 BOOLEAN
 AmlIsLeadName (
-  IN CHAR8 Ch
+  IN CHAR8  Ch
   )
 {
-  if ((Ch == '_') || (Ch >= 'A' && Ch <= 'Z')) {
+  if ((Ch == '_') || ((Ch >= 'A') && (Ch <= 'Z'))) {
     return TRUE;
   } else {
     return FALSE;
@@ -58,10 +58,10 @@ AmlIsLeadName (
 **/
 BOOLEAN
 AmlIsName (
-  IN CHAR8 Ch
+  IN CHAR8  Ch
   )
 {
-  if (AmlIsLeadName (Ch) || (Ch >= '0' && Ch <= '9')) {
+  if (AmlIsLeadName (Ch) || ((Ch >= '0') && (Ch <= '9'))) {
     return TRUE;
   } else {
     return FALSE;
@@ -78,18 +78,21 @@ AmlIsName (
 **/
 BOOLEAN
 AmlIsNameSeg (
-  IN  UINT8              *Buffer
+  IN  UINT8  *Buffer
   )
 {
   UINTN  Index;
+
   if (!AmlIsLeadName (Buffer[0])) {
     return FALSE;
   }
+
   for (Index = 1; Index < AML_NAME_SEG_SIZE; Index++) {
     if (!AmlIsName (Buffer[Index])) {
       return FALSE;
     }
   }
+
   return TRUE;
 }
 
@@ -104,13 +107,13 @@ AmlIsNameSeg (
 **/
 EFI_STATUS
 AmlGetNameStringSize (
-  IN  UINT8              *Buffer,
-  OUT UINTN              *BufferSize
+  IN  UINT8  *Buffer,
+  OUT UINTN  *BufferSize
   )
 {
-  UINTN                 SegCount;
-  UINTN                 Length;
-  UINTN                 Index;
+  UINTN  SegCount;
+  UINTN  Length;
+  UINTN  Index;
 
   Length = 0;
 
@@ -118,12 +121,12 @@ AmlGetNameStringSize (
   // Parse root or parent prefix
   //
   if (*Buffer == AML_ROOT_CHAR) {
-    Buffer ++;
-    Length ++;
+    Buffer++;
+    Length++;
   } else if (*Buffer == AML_PARENT_PREFIX_CHAR) {
     do {
-      Buffer ++;
-      Length ++;
+      Buffer++;
+      Length++;
     } while (*Buffer == AML_PARENT_PREFIX_CHAR);
   }
 
@@ -131,21 +134,21 @@ AmlGetNameStringSize (
   // Parse name segment
   //
   if (*Buffer == AML_DUAL_NAME_PREFIX) {
-    Buffer ++;
-    Length ++;
+    Buffer++;
+    Length++;
     SegCount = 2;
   } else if (*Buffer == AML_MULTI_NAME_PREFIX) {
-    Buffer ++;
-    Length ++;
+    Buffer++;
+    Length++;
     SegCount = *Buffer;
-    Buffer ++;
-    Length ++;
+    Buffer++;
+    Length++;
   } else if (*Buffer == 0) {
     //
     // NULL Name, only for Root
     //
     SegCount = 0;
-    Buffer --;
+    Buffer--;
     if ((Length == 1) && (*Buffer == AML_ROOT_CHAR)) {
       *BufferSize = 2;
       return EFI_SUCCESS;
@@ -164,9 +167,10 @@ AmlGetNameStringSize (
     if (!AmlIsNameSeg (Buffer)) {
       return EFI_INVALID_PARAMETER;
     }
+
     Buffer += AML_NAME_SEG_SIZE;
     Length += AML_NAME_SEG_SIZE;
-    Index ++;
+    Index++;
   } while (Index < SegCount);
 
   *BufferSize = Length;
@@ -183,10 +187,10 @@ AmlGetNameStringSize (
 **/
 BOOLEAN
 AmlIsAslLeadName (
-  IN CHAR8 Ch
+  IN CHAR8  Ch
   )
 {
-  if (AmlIsLeadName (Ch) || (Ch >= 'a' && Ch <= 'z')) {
+  if (AmlIsLeadName (Ch) || ((Ch >= 'a') && (Ch <= 'z'))) {
     return TRUE;
   } else {
     return FALSE;
@@ -203,10 +207,10 @@ AmlIsAslLeadName (
 **/
 BOOLEAN
 AmlIsAslName (
-  IN CHAR8 Ch
+  IN CHAR8  Ch
   )
 {
-  if (AmlIsAslLeadName (Ch) || (Ch >= '0' && Ch <= '9')) {
+  if (AmlIsAslLeadName (Ch) || ((Ch >= '0') && (Ch <= '9'))) {
     return TRUE;
   } else {
     return FALSE;
@@ -222,11 +226,11 @@ AmlIsAslName (
 **/
 UINTN
 AmlGetAslNameSegLength (
-  IN UINT8 *Buffer
+  IN UINT8  *Buffer
   )
 {
-  UINTN Length;
-  UINTN Index;
+  UINTN  Length;
+  UINTN  Index;
 
   if (*Buffer == 0) {
     return 0;
@@ -237,20 +241,23 @@ AmlGetAslNameSegLength (
   // 1st
   //
   if (AmlIsAslLeadName (*Buffer)) {
-    Length ++;
-    Buffer ++;
+    Length++;
+    Buffer++;
   }
+
   if ((*Buffer == 0) || (*Buffer == '.')) {
     return Length;
   }
+
   //
   // 2, 3, 4 name char
   //
   for (Index = 0; Index < 3; Index++) {
     if (AmlIsAslName (*Buffer)) {
-      Length ++;
-      Buffer ++;
+      Length++;
+      Buffer++;
     }
+
     if ((*Buffer == 0) || (*Buffer == '.')) {
       return Length;
     }
@@ -274,27 +281,27 @@ AmlGetAslNameSegLength (
 **/
 UINTN
 AmlGetAslNameStringSize (
-  IN UINT8              *Buffer,
-  OUT UINTN             *Root,
-  OUT UINTN             *Parent,
-  OUT UINTN             *SegCount
+  IN UINT8   *Buffer,
+  OUT UINTN  *Root,
+  OUT UINTN  *Parent,
+  OUT UINTN  *SegCount
   )
 {
-  UINTN NameLength;
-  UINTN TotalLength;
+  UINTN  NameLength;
+  UINTN  TotalLength;
 
-  *Root   = 0;
-  *Parent = 0;
-  *SegCount = 0;
+  *Root       = 0;
+  *Parent     = 0;
+  *SegCount   = 0;
   TotalLength = 0;
-  NameLength = 0;
+  NameLength  = 0;
   if (*Buffer == AML_ROOT_CHAR) {
     *Root = 1;
-    Buffer ++;
+    Buffer++;
   } else if (*Buffer == AML_PARENT_PREFIX_CHAR) {
     do {
-      Buffer ++;
-      (*Parent) ++;
+      Buffer++;
+      (*Parent)++;
     } while (*Buffer == AML_PARENT_PREFIX_CHAR);
   }
 
@@ -306,12 +313,14 @@ AmlGetAslNameStringSize (
     if ((NameLength == 0) || (NameLength > AML_NAME_SEG_SIZE)) {
       return 0;
     }
-    (*SegCount) ++;
+
+    (*SegCount)++;
     Buffer += NameLength;
     if (*Buffer == 0) {
       break;
     }
-    Buffer ++;
+
+    Buffer++;
   }
 
   //
@@ -334,7 +343,7 @@ AmlGetAslNameStringSize (
   //
   // Add NULL char
   //
-  TotalLength ++;
+  TotalLength++;
 
   return TotalLength;
 }
@@ -348,15 +357,15 @@ AmlGetAslNameStringSize (
 **/
 VOID
 AmlUpperCaseCopyMem (
-  IN UINT8 *DstBuffer,
-  IN UINT8 *SrcBuffer,
-  IN UINTN Length
+  IN UINT8  *DstBuffer,
+  IN UINT8  *SrcBuffer,
+  IN UINTN  Length
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   for (Index = 0; Index < Length; Index++) {
-    if (SrcBuffer[Index] >= 'a' && SrcBuffer[Index] <= 'z') {
+    if ((SrcBuffer[Index] >= 'a') && (SrcBuffer[Index] <= 'z')) {
       DstBuffer[Index] = (UINT8)(SrcBuffer[Index] - 'a' + 'A');
     } else {
       DstBuffer[Index] = SrcBuffer[Index];
@@ -374,17 +383,17 @@ AmlUpperCaseCopyMem (
 **/
 UINT8 *
 AmlNameFromAslName (
-  IN UINT8 *AslPath
+  IN UINT8  *AslPath
   )
 {
-  UINTN Root;
-  UINTN Parent;
-  UINTN SegCount;
-  UINTN TotalLength;
-  UINTN NameLength;
-  UINT8 *Buffer;
-  UINT8 *AmlPath;
-  UINT8 *AmlBuffer;
+  UINTN  Root;
+  UINTN  Parent;
+  UINTN  SegCount;
+  UINTN  TotalLength;
+  UINTN  NameLength;
+  UINT8  *Buffer;
+  UINT8  *AmlPath;
+  UINT8  *AmlBuffer;
 
   TotalLength = AmlGetAslNameStringSize (AslPath, &Root, &Parent, &SegCount);
   if (TotalLength == 0) {
@@ -395,19 +404,19 @@ AmlNameFromAslName (
   ASSERT (AmlPath != NULL);
 
   AmlBuffer = AmlPath;
-  Buffer = AslPath;
+  Buffer    = AslPath;
 
   //
   // Handle Root and Parent
   //
   if (Root == 1) {
     *AmlBuffer = AML_ROOT_CHAR;
-    AmlBuffer ++;
-    Buffer ++;
+    AmlBuffer++;
+    Buffer++;
   } else if (Parent > 0) {
     SetMem (AmlBuffer, Parent, AML_PARENT_PREFIX_CHAR);
     AmlBuffer += Parent;
-    Buffer += Parent;
+    Buffer    += Parent;
   }
 
   //
@@ -415,12 +424,12 @@ AmlNameFromAslName (
   //
   if (SegCount > 2) {
     *AmlBuffer = AML_MULTI_NAME_PREFIX;
-    AmlBuffer ++;
+    AmlBuffer++;
     *AmlBuffer = (UINT8)SegCount;
-    AmlBuffer ++;
+    AmlBuffer++;
   } else if (SegCount == 2) {
     *AmlBuffer = AML_DUAL_NAME_PREFIX;
-    AmlBuffer ++;
+    AmlBuffer++;
   }
 
   //
@@ -431,12 +440,13 @@ AmlNameFromAslName (
     ASSERT ((NameLength != 0) && (NameLength <= AML_NAME_SEG_SIZE));
     AmlUpperCaseCopyMem (AmlBuffer, Buffer, NameLength);
     SetMem (AmlBuffer + NameLength, AML_NAME_SEG_SIZE - NameLength, AML_NAME_CHAR__);
-    Buffer += NameLength;
+    Buffer    += NameLength;
     AmlBuffer += AML_NAME_SEG_SIZE;
     if (*Buffer == 0) {
       break;
     }
-    Buffer ++;
+
+    Buffer++;
   }
 
   //
@@ -454,23 +464,26 @@ AmlNameFromAslName (
 **/
 VOID
 AmlPrintNameSeg (
-  IN UINT8              *Buffer
+  IN UINT8  *Buffer
   )
 {
-  DEBUG ((EFI_D_ERROR, "%c", Buffer[0]));
+  DEBUG ((DEBUG_ERROR, "%c", Buffer[0]));
   if ((Buffer[1] == '_') && (Buffer[2] == '_') && (Buffer[3] == '_')) {
-    return ;
+    return;
   }
-  DEBUG ((EFI_D_ERROR, "%c", Buffer[1]));
+
+  DEBUG ((DEBUG_ERROR, "%c", Buffer[1]));
   if ((Buffer[2] == '_') && (Buffer[3] == '_')) {
-    return ;
+    return;
   }
-  DEBUG ((EFI_D_ERROR, "%c", Buffer[2]));
+
+  DEBUG ((DEBUG_ERROR, "%c", Buffer[2]));
   if (Buffer[3] == '_') {
-    return ;
+    return;
   }
-  DEBUG ((EFI_D_ERROR, "%c", Buffer[3]));
-  return ;
+
+  DEBUG ((DEBUG_ERROR, "%c", Buffer[3]));
+  return;
 }
 
 /**
@@ -480,25 +493,25 @@ AmlPrintNameSeg (
 **/
 VOID
 AmlPrintNameString (
-  IN UINT8              *Buffer
+  IN UINT8  *Buffer
   )
 {
-  UINT8                 SegCount;
-  UINT8                 Index;
+  UINT8  SegCount;
+  UINT8  Index;
 
   if (*Buffer == AML_ROOT_CHAR) {
     //
     // RootChar
     //
-    Buffer ++;
-    DEBUG ((EFI_D_ERROR, "\\"));
+    Buffer++;
+    DEBUG ((DEBUG_ERROR, "\\"));
   } else if (*Buffer == AML_PARENT_PREFIX_CHAR) {
     //
     // ParentPrefixChar
     //
     do {
-      Buffer ++;
-      DEBUG ((EFI_D_ERROR, "^"));
+      Buffer++;
+      DEBUG ((DEBUG_ERROR, "^"));
     } while (*Buffer == AML_PARENT_PREFIX_CHAR);
   }
 
@@ -506,20 +519,20 @@ AmlPrintNameString (
     //
     // DualName
     //
-    Buffer ++;
+    Buffer++;
     SegCount = 2;
   } else if (*Buffer == AML_MULTI_NAME_PREFIX) {
     //
     // MultiName
     //
-    Buffer ++;
+    Buffer++;
     SegCount = *Buffer;
-    Buffer ++;
+    Buffer++;
   } else if (*Buffer == 0) {
     //
     // NULL Name
     //
-    return ;
+    return;
   } else {
     //
     // NameSeg
@@ -530,10 +543,10 @@ AmlPrintNameString (
   AmlPrintNameSeg (Buffer);
   Buffer += AML_NAME_SEG_SIZE;
   for (Index = 0; Index < SegCount - 1; Index++) {
-    DEBUG ((EFI_D_ERROR, "."));
+    DEBUG ((DEBUG_ERROR, "."));
     AmlPrintNameSeg (Buffer);
     Buffer += AML_NAME_SEG_SIZE;
   }
 
-  return ;
+  return;
 }

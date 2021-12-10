@@ -16,14 +16,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack(1)
 
 typedef struct {
-  TPM_RQU_COMMAND_HDR   Hdr;
-  TPM_PCRINDEX          PcrIndex;
-  TPM_DIGEST            TpmDigest;
+  TPM_RQU_COMMAND_HDR    Hdr;
+  TPM_PCRINDEX           PcrIndex;
+  TPM_DIGEST             TpmDigest;
 } TPM_CMD_EXTEND;
 
 typedef struct {
-  TPM_RSP_COMMAND_HDR   Hdr;
-  TPM_DIGEST            TpmDigest;
+  TPM_RSP_COMMAND_HDR    Hdr;
+  TPM_DIGEST             TpmDigest;
 } TPM_RSP_EXTEND;
 
 #pragma pack()
@@ -68,8 +68,8 @@ Tpm12Extend (
     return Status;
   }
 
-  if (SwapBytes32(Response.Hdr.returnCode) != TPM_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "Tpm12Extend: Response Code error! 0x%08x\r\n", SwapBytes32(Response.Hdr.returnCode)));
+  if (SwapBytes32 (Response.Hdr.returnCode) != TPM_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "Tpm12Extend: Response Code error! 0x%08x\r\n", SwapBytes32 (Response.Hdr.returnCode)));
     return EFI_DEVICE_ERROR;
   }
 

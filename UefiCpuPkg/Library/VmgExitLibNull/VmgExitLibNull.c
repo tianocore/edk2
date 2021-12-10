@@ -35,15 +35,15 @@
 UINT64
 EFIAPI
 VmgExit (
-  IN OUT GHCB                *Ghcb,
-  IN     UINT64              ExitCode,
-  IN     UINT64              ExitInfo1,
-  IN     UINT64              ExitInfo2
+  IN OUT GHCB    *Ghcb,
+  IN     UINT64  ExitCode,
+  IN     UINT64  ExitInfo1,
+  IN     UINT64  ExitInfo2
   )
 {
   GHCB_EVENT_INJECTION  Event;
 
-  Event.Uint64 = 0;
+  Event.Uint64          = 0;
   Event.Elements.Vector = GP_EXCEPTION;
   Event.Elements.Type   = GHCB_EVENT_INJECTION_TYPE_EXCEPTION;
   Event.Elements.Valid  = 1;
@@ -65,8 +65,8 @@ VmgExit (
 VOID
 EFIAPI
 VmgInit (
-  IN OUT GHCB                *Ghcb,
-  IN OUT BOOLEAN             *InterruptState
+  IN OUT GHCB     *Ghcb,
+  IN OUT BOOLEAN  *InterruptState
   )
 {
 }
@@ -85,8 +85,8 @@ VmgInit (
 VOID
 EFIAPI
 VmgDone (
-  IN OUT GHCB                *Ghcb,
-  IN     BOOLEAN             InterruptState
+  IN OUT GHCB     *Ghcb,
+  IN     BOOLEAN  InterruptState
   )
 {
 }
@@ -104,8 +104,8 @@ VmgDone (
 VOID
 EFIAPI
 VmgSetOffsetValid (
-  IN OUT GHCB                *Ghcb,
-  IN     GHCB_REGISTER       Offset
+  IN OUT GHCB           *Ghcb,
+  IN     GHCB_REGISTER  Offset
   )
 {
 }
@@ -126,8 +126,8 @@ VmgSetOffsetValid (
 BOOLEAN
 EFIAPI
 VmgIsOffsetValid (
-  IN GHCB                    *Ghcb,
-  IN GHCB_REGISTER           Offset
+  IN GHCB           *Ghcb,
+  IN GHCB_REGISTER  Offset
   )
 {
   return FALSE;

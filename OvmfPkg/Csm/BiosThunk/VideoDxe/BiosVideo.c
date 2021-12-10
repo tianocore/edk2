@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // EFI Driver Binding Protocol Instance
 //
-EFI_DRIVER_BINDING_PROTOCOL gBiosVideoDriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gBiosVideoDriverBinding = {
   BiosVideoDriverBindingSupported,
   BiosVideoDriverBindingStart,
   BiosVideoDriverBindingStop,
@@ -24,17 +24,17 @@ EFI_DRIVER_BINDING_PROTOCOL gBiosVideoDriverBinding = {
 //
 // Global lookup tables for VGA graphics modes
 //
-UINT8                          mVgaLeftMaskTable[]   = { 0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x01 };
+UINT8  mVgaLeftMaskTable[] = { 0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x01 };
 
-UINT8                          mVgaRightMaskTable[]  = { 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff };
+UINT8  mVgaRightMaskTable[] = { 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff };
 
-UINT8                          mVgaBitMaskTable[]    = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
+UINT8  mVgaBitMaskTable[] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
 
 //
 // Save controller attributes during first start
 //
-UINT64                         mOriginalPciAttributes;
-BOOLEAN                        mPciAttributesSaved = FALSE;
+UINT64   mOriginalPciAttributes;
+BOOLEAN  mPciAttributesSaved = FALSE;
 
 EFI_GRAPHICS_OUTPUT_BLT_PIXEL  mVgaColorToGraphicsOutputColor[] = {
   { 0x00, 0x00, 0x00, 0x00 },
@@ -58,33 +58,33 @@ EFI_GRAPHICS_OUTPUT_BLT_PIXEL  mVgaColorToGraphicsOutputColor[] = {
 //
 // Standard timing defined by VESA EDID
 //
-VESA_BIOS_EXTENSIONS_EDID_TIMING mEstablishedEdidTiming[] = {
+VESA_BIOS_EXTENSIONS_EDID_TIMING  mEstablishedEdidTiming[] = {
   //
   // Established Timing I
   //
-  {800, 600, 60},
-  {800, 600, 56},
-  {640, 480, 75},
-  {640, 480, 72},
-  {640, 480, 67},
-  {640, 480, 60},
-  {720, 400, 88},
-  {720, 400, 70},
+  { 800,  600,  60 },
+  { 800,  600,  56 },
+  { 640,  480,  75 },
+  { 640,  480,  72 },
+  { 640,  480,  67 },
+  { 640,  480,  60 },
+  { 720,  400,  88 },
+  { 720,  400,  70 },
   //
   // Established Timing II
   //
-  {1280, 1024, 75},
-  {1024,  768, 75},
-  {1024,  768, 70},
-  {1024,  768, 60},
-  {1024,  768, 87},
-  {832,   624, 75},
-  {800,   600, 75},
-  {800,   600, 72},
+  { 1280, 1024, 75 },
+  { 1024, 768,  75 },
+  { 1024, 768,  70 },
+  { 1024, 768,  60 },
+  { 1024, 768,  87 },
+  { 832,  624,  75 },
+  { 800,  600,  75 },
+  { 800,  600,  72 },
   //
   // Established Timing III
   //
-  {1152, 870, 75}
+  { 1152, 870,  75 }
 };
 
 /**
@@ -117,7 +117,7 @@ BiosVideoDriverBindingSupported (
   //
   // See if the Legacy BIOS Protocol is available
   //
-  Status = gBS->LocateProtocol (&gEfiLegacyBiosProtocolGuid, NULL, (VOID **) &LegacyBios);
+  Status = gBS->LocateProtocol (&gEfiLegacyBiosProtocolGuid, NULL, (VOID **)&LegacyBios);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -128,7 +128,7 @@ BiosVideoDriverBindingSupported (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiPciIoProtocolGuid,
-                  (VOID **) &PciIo,
+                  (VOID **)&PciIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -154,6 +154,7 @@ BiosVideoDriverBindingSupported (
       return EFI_ALREADY_STARTED;
     }
   }
+
   //
   // See if this is a PCI Graphics Controller by looking at the Command register and
   // Class Code Register
@@ -171,15 +172,14 @@ BiosVideoDriverBindingSupported (
   }
 
   Status = EFI_UNSUPPORTED;
-  if (Pci.Hdr.ClassCode[2] == 0x03 || (Pci.Hdr.ClassCode[2] == 0x00 && Pci.Hdr.ClassCode[1] == 0x01)) {
-
+  if ((Pci.Hdr.ClassCode[2] == 0x03) || ((Pci.Hdr.ClassCode[2] == 0x00) && (Pci.Hdr.ClassCode[1] == 0x01))) {
     Status = EFI_SUCCESS;
     //
     // If this is a graphics controller,
     // go further check RemainingDevicePath validation
     //
     if (RemainingDevicePath != NULL) {
-      Node = (EFI_DEV_PATH *) RemainingDevicePath;
+      Node = (EFI_DEV_PATH *)RemainingDevicePath;
       //
       // Check if RemainingDevicePath is the End of Device Path Node,
       // if yes, return EFI_SUCCESS
@@ -189,9 +189,10 @@ BiosVideoDriverBindingSupported (
         // If RemainingDevicePath isn't the End of Device Path Node,
         // check its validation
         //
-        if (Node->DevPath.Type != ACPI_DEVICE_PATH ||
-            Node->DevPath.SubType != ACPI_ADR_DP ||
-            DevicePathNodeLength(&Node->DevPath) < sizeof(ACPI_ADR_DEVICE_PATH)) {
+        if ((Node->DevPath.Type != ACPI_DEVICE_PATH) ||
+            (Node->DevPath.SubType != ACPI_ADR_DP) ||
+            (DevicePathNodeLength (&Node->DevPath) < sizeof (ACPI_ADR_DEVICE_PATH)))
+        {
           Status = EFI_UNSUPPORTED;
         }
       }
@@ -208,7 +209,6 @@ Done:
 
   return Status;
 }
-
 
 /**
   Install Graphics Output Protocol onto VGA device handles.
@@ -246,7 +246,7 @@ BiosVideoDriverBindingStart (
   //
   // See if the Legacy BIOS Protocol is available
   //
-  Status = gBS->LocateProtocol (&gEfiLegacyBiosProtocolGuid, NULL, (VOID **) &LegacyBios);
+  Status = gBS->LocateProtocol (&gEfiLegacyBiosProtocolGuid, NULL, (VOID **)&LegacyBios);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -257,7 +257,7 @@ BiosVideoDriverBindingStart (
   Status = gBS->HandleProtocol (
                   Controller,
                   &gEfiDevicePathProtocolGuid,
-                  (VOID **) &ParentDevicePath
+                  (VOID **)&ParentDevicePath
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -269,7 +269,7 @@ BiosVideoDriverBindingStart (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiPciIoProtocolGuid,
-                  (VOID **) &PciIo,
+                  (VOID **)&PciIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -292,6 +292,7 @@ BiosVideoDriverBindingStart (
     if (EFI_ERROR (Status)) {
       goto Done;
     }
+
     mPciAttributesSaved = TRUE;
   }
 
@@ -309,7 +310,7 @@ BiosVideoDriverBindingStart (
   }
 
   Supports &= (UINT64)(EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16);
-  if (Supports == 0 || Supports == (EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16)) {
+  if ((Supports == 0) || (Supports == (EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16))) {
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
@@ -323,11 +324,11 @@ BiosVideoDriverBindingStart (
   // Enable the device and make sure VGA cycles are being forwarded to this VGA device
   //
   Status = PciIo->Attributes (
-             PciIo,
-             EfiPciIoAttributeOperationEnable,
-             EFI_PCI_DEVICE_ENABLE | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | Supports,
-             NULL
-             );
+                    PciIo,
+                    EfiPciIoAttributeOperationEnable,
+                    EFI_PCI_DEVICE_ENABLE | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | Supports,
+                    NULL
+                    );
   if (EFI_ERROR (Status)) {
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
@@ -336,6 +337,7 @@ BiosVideoDriverBindingStart (
       );
     goto Done;
   }
+
   //
   // Check to see if there is a legacy option ROM image associated with this PCI device
   //
@@ -349,6 +351,7 @@ BiosVideoDriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto Done;
   }
+
   //
   // Post the legacy option ROM if it is available.
   //
@@ -378,7 +381,8 @@ BiosVideoDriverBindingStart (
 
   if (RemainingDevicePath != NULL) {
     if (IsDevicePathEnd (RemainingDevicePath) &&
-        (FeaturePcdGet (PcdBiosVideoCheckVbeEnable) || FeaturePcdGet (PcdBiosVideoCheckVgaEnable))) {
+        (FeaturePcdGet (PcdBiosVideoCheckVbeEnable) || FeaturePcdGet (PcdBiosVideoCheckVgaEnable)))
+    {
       //
       // If RemainingDevicePath is the End of Device Path Node,
       // don't create any child device and return EFI_SUCCESS
@@ -418,13 +422,14 @@ Done:
         // Restore original PCI attributes
         //
         PciIo->Attributes (
-                        PciIo,
-                        EfiPciIoAttributeOperationSet,
-                        mOriginalPciAttributes,
-                        NULL
-                        );
+                 PciIo,
+                 EfiPciIoAttributeOperationSet,
+                 mOriginalPciAttributes,
+                 NULL
+                 );
       }
     }
+
     //
     // Release PCI I/O Protocols on the controller handle.
     //
@@ -438,7 +443,6 @@ Done:
 
   return Status;
 }
-
 
 /**
   Stop.
@@ -455,16 +459,16 @@ Done:
 EFI_STATUS
 EFIAPI
 BiosVideoDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN  EFI_HANDLE                      Controller,
-  IN  UINTN                           NumberOfChildren,
-  IN  EFI_HANDLE                      *ChildHandleBuffer
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   Controller,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_STATUS                   Status;
-  BOOLEAN                      AllChildrenStopped;
-  UINTN                        Index;
-  EFI_PCI_IO_PROTOCOL          *PciIo;
+  EFI_STATUS           Status;
+  BOOLEAN              AllChildrenStopped;
+  UINTN                Index;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
 
   AllChildrenStopped = TRUE;
 
@@ -499,7 +503,7 @@ BiosVideoDriverBindingStop (
       Status = gBS->HandleProtocol (
                       Controller,
                       &gEfiPciIoProtocolGuid,
-                      (VOID **) &PciIo
+                      (VOID **)&PciIo
                       );
       ASSERT_EFI_ERROR (Status);
 
@@ -516,10 +520,8 @@ BiosVideoDriverBindingStop (
     }
   }
 
-
   return EFI_SUCCESS;
 }
-
 
 /**
   Install child handles if the Handle supports MBR format.
@@ -545,18 +547,18 @@ BiosVideoChildHandleInstall (
   IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS               Status;
-  BIOS_VIDEO_DEV           *BiosVideoPrivate;
-  PCI_TYPE00               Pci;
-  ACPI_ADR_DEVICE_PATH     AcpiDeviceNode;
-  BOOLEAN                  ProtocolInstalled;
+  EFI_STATUS            Status;
+  BIOS_VIDEO_DEV        *BiosVideoPrivate;
+  PCI_TYPE00            Pci;
+  ACPI_ADR_DEVICE_PATH  AcpiDeviceNode;
+  BOOLEAN               ProtocolInstalled;
 
   //
   // Allocate the private device structure for video device
   //
-  BiosVideoPrivate = (BIOS_VIDEO_DEV *) AllocateZeroPool (
-                                          sizeof (BIOS_VIDEO_DEV)
-                                          );
+  BiosVideoPrivate = (BIOS_VIDEO_DEV *)AllocateZeroPool (
+                                         sizeof (BIOS_VIDEO_DEV)
+                                         );
   if (NULL == BiosVideoPrivate) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
@@ -566,12 +568,12 @@ BiosVideoChildHandleInstall (
   // See if this is a VGA compatible controller or not
   //
   Status = ParentPciIo->Pci.Read (
-                          ParentPciIo,
-                          EfiPciIoWidthUint32,
-                          0,
-                          sizeof (Pci) / sizeof (UINT32),
-                          &Pci
-                          );
+                              ParentPciIo,
+                              EfiPciIoWidthUint32,
+                              0,
+                              sizeof (Pci) / sizeof (UINT32),
+                              &Pci
+                              );
   if (EFI_ERROR (Status)) {
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
@@ -580,16 +582,17 @@ BiosVideoChildHandleInstall (
       );
     goto Done;
   }
+
   BiosVideoPrivate->VgaCompatible = FALSE;
-  if (Pci.Hdr.ClassCode[2] == 0x00 && Pci.Hdr.ClassCode[1] == 0x01) {
+  if ((Pci.Hdr.ClassCode[2] == 0x00) && (Pci.Hdr.ClassCode[1] == 0x01)) {
     BiosVideoPrivate->VgaCompatible = TRUE;
   }
 
-  if (Pci.Hdr.ClassCode[2] == 0x03 && Pci.Hdr.ClassCode[1] == 0x00 && Pci.Hdr.ClassCode[0] == 0x00) {
+  if ((Pci.Hdr.ClassCode[2] == 0x03) && (Pci.Hdr.ClassCode[1] == 0x00) && (Pci.Hdr.ClassCode[0] == 0x00)) {
     BiosVideoPrivate->VgaCompatible = TRUE;
   }
 
- if (PcdGetBool (PcdBiosVideoSetTextVgaModeEnable)) {
+  if (PcdGetBool (PcdBiosVideoSetTextVgaModeEnable)) {
     //
     // Create EXIT_BOOT_SERIVES Event
     //
@@ -626,21 +629,20 @@ BiosVideoChildHandleInstall (
   BiosVideoPrivate->GraphicsOutput.QueryMode = BiosVideoGraphicsOutputQueryMode;
   BiosVideoPrivate->GraphicsOutput.SetMode   = BiosVideoGraphicsOutputSetMode;
 
-
   //
   // Allocate buffer for Graphics Output Protocol mode information
   //
-  BiosVideoPrivate->GraphicsOutput.Mode = (EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE *) AllocatePool (
-                                             sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE)
-                                             );
+  BiosVideoPrivate->GraphicsOutput.Mode = (EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE *)AllocatePool (
+                                                                                 sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE)
+                                                                                 );
   if (NULL == BiosVideoPrivate->GraphicsOutput.Mode) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
-  BiosVideoPrivate->GraphicsOutput.Mode->Info = (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *) AllocatePool (
-                                             sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION)
-                                             );
+  BiosVideoPrivate->GraphicsOutput.Mode->Info = (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *)AllocatePool (
+                                                                                          sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION)
+                                                                                          );
   if (NULL ==  BiosVideoPrivate->GraphicsOutput.Mode->Info) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
@@ -657,14 +659,14 @@ BiosVideoChildHandleInstall (
   if ((RemainingDevicePath == NULL) || (!IsDevicePathEnd (RemainingDevicePath))) {
     if (RemainingDevicePath == NULL) {
       ZeroMem (&AcpiDeviceNode, sizeof (ACPI_ADR_DEVICE_PATH));
-      AcpiDeviceNode.Header.Type = ACPI_DEVICE_PATH;
+      AcpiDeviceNode.Header.Type    = ACPI_DEVICE_PATH;
       AcpiDeviceNode.Header.SubType = ACPI_ADR_DP;
-      AcpiDeviceNode.ADR = ACPI_DISPLAY_ADR (1, 0, 0, 1, 0, ACPI_ADR_DISPLAY_TYPE_VGA, 0, 0);
+      AcpiDeviceNode.ADR            = ACPI_DISPLAY_ADR (1, 0, 0, 1, 0, ACPI_ADR_DISPLAY_TYPE_VGA, 0, 0);
       SetDevicePathNodeLength (&AcpiDeviceNode.Header, sizeof (ACPI_ADR_DEVICE_PATH));
 
       BiosVideoPrivate->GopDevicePath = AppendDevicePathNode (
                                           ParentDevicePath,
-                                          (EFI_DEVICE_PATH_PROTOCOL *) &AcpiDeviceNode
+                                          (EFI_DEVICE_PATH_PROTOCOL *)&AcpiDeviceNode
                                           );
     } else {
       BiosVideoPrivate->GopDevicePath = AppendDevicePathNode (ParentDevicePath, RemainingDevicePath);
@@ -674,12 +676,12 @@ BiosVideoChildHandleInstall (
     // Creat child handle and device path protocol firstly
     //
     BiosVideoPrivate->Handle = NULL;
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &BiosVideoPrivate->Handle,
-                    &gEfiDevicePathProtocolGuid,
-                    BiosVideoPrivate->GopDevicePath,
-                    NULL
-                    );
+    Status                   = gBS->InstallMultipleProtocolInterfaces (
+                                      &BiosVideoPrivate->Handle,
+                                      &gEfiDevicePathProtocolGuid,
+                                      BiosVideoPrivate->GopDevicePath,
+                                      NULL
+                                      );
     if (EFI_ERROR (Status)) {
       goto Done;
     }
@@ -704,7 +706,7 @@ BiosVideoChildHandleInstall (
   //
   // When check for VBE, PCI I/O protocol is needed, so use parent's protocol interface temporally
   //
-  BiosVideoPrivate->PciIo                 = ParentPciIo;
+  BiosVideoPrivate->PciIo = ParentPciIo;
 
   //
   // Check for VESA BIOS Extensions for modes that are compatible with Graphics Output
@@ -715,6 +717,7 @@ BiosVideoChildHandleInstall (
   } else {
     Status = EFI_UNSUPPORTED;
   }
+
   if (EFI_ERROR (Status)) {
     //
     // The VESA BIOS Extensions are not compatible with Graphics Output, so check for support
@@ -740,6 +743,7 @@ BiosVideoChildHandleInstall (
           FreePool (BiosVideoPrivate->GraphicsOutput.Mode->Info);
           BiosVideoPrivate->GraphicsOutput.Mode->Info = NULL;
         }
+
         FreePool (BiosVideoPrivate->GraphicsOutput.Mode);
         BiosVideoPrivate->GraphicsOutput.Mode = NULL;
       }
@@ -781,7 +785,7 @@ BiosVideoChildHandleInstall (
       Status = gBS->OpenProtocol (
                       ParentHandle,
                       &gEfiPciIoProtocolGuid,
-                      (VOID **) &BiosVideoPrivate->PciIo,
+                      (VOID **)&BiosVideoPrivate->PciIo,
                       This->DriverBindingHandle,
                       BiosVideoPrivate->Handle,
                       EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -789,6 +793,7 @@ BiosVideoChildHandleInstall (
       if (EFI_ERROR (Status)) {
         goto Done;
       }
+
       ProtocolInstalled = TRUE;
     }
   }
@@ -810,6 +815,7 @@ Done:
     if ((BiosVideoPrivate != NULL) && (BiosVideoPrivate->ExitBootServicesEvent != NULL)) {
       gBS->CloseEvent (BiosVideoPrivate->ExitBootServicesEvent);
     }
+
     //
     // Free private data structure
     //
@@ -818,7 +824,6 @@ Done:
 
   return Status;
 }
-
 
 /**
   Deregister an video child handle and free resources.
@@ -832,17 +837,17 @@ Done:
 **/
 EFI_STATUS
 BiosVideoChildHandleUninstall (
-  EFI_DRIVER_BINDING_PROTOCOL    *This,
-  EFI_HANDLE                     Controller,
-  EFI_HANDLE                     Handle
+  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  EFI_HANDLE                   Controller,
+  EFI_HANDLE                   Handle
   )
 {
-  EFI_STATUS                   Status;
-  EFI_IA32_REGISTER_SET        Regs;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL *GraphicsOutput;
-  EFI_VGA_MINI_PORT_PROTOCOL   *VgaMiniPort;
-  BIOS_VIDEO_DEV               *BiosVideoPrivate;
-  EFI_PCI_IO_PROTOCOL          *PciIo;
+  EFI_STATUS                    Status;
+  EFI_IA32_REGISTER_SET         Regs;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
+  EFI_VGA_MINI_PORT_PROTOCOL    *VgaMiniPort;
+  BIOS_VIDEO_DEV                *BiosVideoPrivate;
+  EFI_PCI_IO_PROTOCOL           *PciIo;
 
   BiosVideoPrivate = NULL;
   GraphicsOutput   = NULL;
@@ -852,24 +857,24 @@ BiosVideoChildHandleUninstall (
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiGraphicsOutputProtocolGuid,
-                  (VOID **) &GraphicsOutput,
+                  (VOID **)&GraphicsOutput,
                   This->DriverBindingHandle,
                   Handle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (!EFI_ERROR (Status)) {
-      BiosVideoPrivate = BIOS_VIDEO_DEV_FROM_GRAPHICS_OUTPUT_THIS (GraphicsOutput);
+    BiosVideoPrivate = BIOS_VIDEO_DEV_FROM_GRAPHICS_OUTPUT_THIS (GraphicsOutput);
   }
 
   if (EFI_ERROR (Status)) {
     Status = gBS->OpenProtocol (
-                   Handle,
-                   &gEfiVgaMiniPortProtocolGuid,
-                   (VOID **) &VgaMiniPort,
-                   This->DriverBindingHandle,
-                   Handle,
-                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                   );
+                    Handle,
+                    &gEfiVgaMiniPortProtocolGuid,
+                    (VOID **)&VgaMiniPort,
+                    This->DriverBindingHandle,
+                    Handle,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
     if (!EFI_ERROR (Status)) {
       BiosVideoPrivate = BIOS_VIDEO_DEV_FROM_VGA_MINI_PORT_THIS (VgaMiniPort);
     }
@@ -918,6 +923,7 @@ BiosVideoChildHandleUninstall (
                     NULL
                     );
   }
+
   if (!BiosVideoPrivate->ProduceGraphicsOutput) {
     Status = gBS->UninstallMultipleProtocolInterfaces (
                     Controller,
@@ -931,7 +937,7 @@ BiosVideoChildHandleUninstall (
     gBS->OpenProtocol (
            Controller,
            &gEfiPciIoProtocolGuid,
-           (VOID **) &PciIo,
+           (VOID **)&PciIo,
            This->DriverBindingHandle,
            Handle,
            EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -954,7 +960,6 @@ BiosVideoChildHandleUninstall (
   return EFI_SUCCESS;
 }
 
-
 /**
   Release resource for biso video instance.
 
@@ -967,7 +972,7 @@ BiosVideoDeviceReleaseResource (
   )
 {
   if (BiosVideoPrivate == NULL) {
-    return ;
+    return;
   }
 
   //
@@ -980,24 +985,28 @@ BiosVideoDeviceReleaseResource (
   if (BiosVideoPrivate->VgaFrameBuffer != NULL) {
     FreePool (BiosVideoPrivate->VgaFrameBuffer);
   }
+
   //
   // Free VBE Frame Buffer
   //
   if (BiosVideoPrivate->VbeFrameBuffer != NULL) {
     FreePool (BiosVideoPrivate->VbeFrameBuffer);
   }
+
   //
   // Free line buffer
   //
   if (BiosVideoPrivate->LineBuffer != NULL) {
     FreePool (BiosVideoPrivate->LineBuffer);
   }
+
   //
   // Free mode data
   //
   if (BiosVideoPrivate->ModeData != NULL) {
     FreePool (BiosVideoPrivate->ModeData);
   }
+
   //
   // Free memory allocated below 1MB
   //
@@ -1014,18 +1023,21 @@ BiosVideoDeviceReleaseResource (
   //
   if (BiosVideoPrivate->GraphicsOutput.Mode != NULL) {
     if (BiosVideoPrivate->GraphicsOutput.Mode->Info != NULL) {
-        FreePool (BiosVideoPrivate->GraphicsOutput.Mode->Info);
-        BiosVideoPrivate->GraphicsOutput.Mode->Info = NULL;
+      FreePool (BiosVideoPrivate->GraphicsOutput.Mode->Info);
+      BiosVideoPrivate->GraphicsOutput.Mode->Info = NULL;
     }
+
     FreePool (BiosVideoPrivate->GraphicsOutput.Mode);
     BiosVideoPrivate->GraphicsOutput.Mode = NULL;
   }
+
   //
   // Free EDID discovered protocol occupied resource
   //
   if (BiosVideoPrivate->EdidDiscovered.Edid != NULL) {
     FreePool (BiosVideoPrivate->EdidDiscovered.Edid);
   }
+
   //
   // Free EDID active protocol occupied resource
   //
@@ -1033,15 +1045,14 @@ BiosVideoDeviceReleaseResource (
     FreePool (BiosVideoPrivate->EdidActive.Edid);
   }
 
-  if (BiosVideoPrivate->GopDevicePath!= NULL) {
+  if (BiosVideoPrivate->GopDevicePath != NULL) {
     FreePool (BiosVideoPrivate->GopDevicePath);
   }
 
   FreePool (BiosVideoPrivate);
 
-  return ;
+  return;
 }
-
 
 /**
   Generate a search key for a specified timing data.
@@ -1053,10 +1064,10 @@ BiosVideoDeviceReleaseResource (
 **/
 UINT32
 CalculateEdidKey (
-  VESA_BIOS_EXTENSIONS_EDID_TIMING       *EdidTiming
+  VESA_BIOS_EXTENSIONS_EDID_TIMING  *EdidTiming
   )
 {
-  UINT32 Key;
+  UINT32  Key;
 
   //
   // Be sure no conflicts for all standard timing defined by VESA.
@@ -1064,7 +1075,6 @@ CalculateEdidKey (
   Key = (EdidTiming->HorizontalResolution * 2) + EdidTiming->VerticalResolution;
   return Key;
 }
-
 
 /**
   Parse the Established Timing and Standard Timing in EDID data block.
@@ -1078,31 +1088,32 @@ CalculateEdidKey (
 **/
 BOOLEAN
 ParseEdidData (
-  UINT8                                      *EdidBuffer,
-  VESA_BIOS_EXTENSIONS_VALID_EDID_TIMING     *ValidEdidTiming
+  UINT8                                   *EdidBuffer,
+  VESA_BIOS_EXTENSIONS_VALID_EDID_TIMING  *ValidEdidTiming
   )
 {
-  UINT8  CheckSum;
-  UINT32 Index;
-  UINT32 ValidNumber;
-  UINT32 TimingBits;
-  UINT8  *BufferIndex;
-  UINT16 HorizontalResolution;
-  UINT16 VerticalResolution;
-  UINT8  AspectRatio;
-  UINT8  RefreshRate;
-  VESA_BIOS_EXTENSIONS_EDID_TIMING     TempTiming;
-  VESA_BIOS_EXTENSIONS_EDID_DATA_BLOCK *EdidDataBlock;
+  UINT8                                 CheckSum;
+  UINT32                                Index;
+  UINT32                                ValidNumber;
+  UINT32                                TimingBits;
+  UINT8                                 *BufferIndex;
+  UINT16                                HorizontalResolution;
+  UINT16                                VerticalResolution;
+  UINT8                                 AspectRatio;
+  UINT8                                 RefreshRate;
+  VESA_BIOS_EXTENSIONS_EDID_TIMING      TempTiming;
+  VESA_BIOS_EXTENSIONS_EDID_DATA_BLOCK  *EdidDataBlock;
 
-  EdidDataBlock = (VESA_BIOS_EXTENSIONS_EDID_DATA_BLOCK *) EdidBuffer;
+  EdidDataBlock = (VESA_BIOS_EXTENSIONS_EDID_DATA_BLOCK *)EdidBuffer;
 
   //
   // Check the checksum of EDID data
   //
   CheckSum = 0;
-  for (Index = 0; Index < VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE; Index ++) {
-    CheckSum = (UINT8) (CheckSum + EdidBuffer[Index]);
+  for (Index = 0; Index < VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE; Index++) {
+    CheckSum = (UINT8)(CheckSum + EdidBuffer[Index]);
   }
+
   if (CheckSum != 0) {
     return FALSE;
   }
@@ -1113,20 +1124,26 @@ ParseEdidData (
   if ((EdidDataBlock->EstablishedTimings[0] != 0) ||
       (EdidDataBlock->EstablishedTimings[1] != 0) ||
       (EdidDataBlock->EstablishedTimings[2] != 0)
-      ) {
+      )
+  {
     //
     // Established timing data
     //
     TimingBits = EdidDataBlock->EstablishedTimings[0] |
                  (EdidDataBlock->EstablishedTimings[1] << 8) |
-                 ((EdidDataBlock->EstablishedTimings[2] & 0x80) << 9) ;
-    for (Index = 0; Index < VESA_BIOS_EXTENSIONS_EDID_ESTABLISHED_TIMING_MAX_NUMBER; Index ++) {
+                 ((EdidDataBlock->EstablishedTimings[2] & 0x80) << 9);
+    for (Index = 0; Index < VESA_BIOS_EXTENSIONS_EDID_ESTABLISHED_TIMING_MAX_NUMBER; Index++) {
       if ((TimingBits & 0x1) != 0) {
-        DEBUG ((DEBUG_INFO, "Established Timing: %d x %d\n",
-        mEstablishedEdidTiming[Index].HorizontalResolution, mEstablishedEdidTiming[Index].VerticalResolution));
+        DEBUG ((
+          DEBUG_INFO,
+          "Established Timing: %d x %d\n",
+          mEstablishedEdidTiming[Index].HorizontalResolution,
+          mEstablishedEdidTiming[Index].VerticalResolution
+          ));
         ValidEdidTiming->Key[ValidNumber] = CalculateEdidKey (&mEstablishedEdidTiming[Index]);
-        ValidNumber ++;
+        ValidNumber++;
       }
+
       TimingBits = TimingBits >> 1;
     }
   }
@@ -1135,42 +1152,44 @@ ParseEdidData (
   // Parse the standard timing data
   //
   BufferIndex = &EdidDataBlock->StandardTimingIdentification[0];
-  for (Index = 0; Index < 8; Index ++) {
+  for (Index = 0; Index < 8; Index++) {
     //
     // Check if this is a valid Standard Timing entry
     // VESA documents unused fields should be set to 01h
     //
-    if ((BufferIndex[0] != 0x1) && (BufferIndex[1] != 0x1)){
+    if ((BufferIndex[0] != 0x1) && (BufferIndex[1] != 0x1)) {
       //
       // A valid Standard Timing
       //
-      HorizontalResolution = (UINT16) (BufferIndex[0] * 8 + 248);
-      AspectRatio = (UINT8) (BufferIndex[1] >> 6);
+      HorizontalResolution = (UINT16)(BufferIndex[0] * 8 + 248);
+      AspectRatio          = (UINT8)(BufferIndex[1] >> 6);
       switch (AspectRatio) {
         case 0:
-          VerticalResolution = (UINT16) (HorizontalResolution / 16 * 10);
+          VerticalResolution = (UINT16)(HorizontalResolution / 16 * 10);
           break;
         case 1:
-          VerticalResolution = (UINT16) (HorizontalResolution / 4 * 3);
+          VerticalResolution = (UINT16)(HorizontalResolution / 4 * 3);
           break;
         case 2:
-          VerticalResolution = (UINT16) (HorizontalResolution / 5 * 4);
+          VerticalResolution = (UINT16)(HorizontalResolution / 5 * 4);
           break;
         case 3:
-          VerticalResolution = (UINT16) (HorizontalResolution / 16 * 9);
+          VerticalResolution = (UINT16)(HorizontalResolution / 16 * 9);
           break;
         default:
-          VerticalResolution = (UINT16) (HorizontalResolution / 4 * 3);
+          VerticalResolution = (UINT16)(HorizontalResolution / 4 * 3);
           break;
       }
-      RefreshRate = (UINT8) ((BufferIndex[1] & 0x1f) + 60);
+
+      RefreshRate = (UINT8)((BufferIndex[1] & 0x1f) + 60);
       DEBUG ((DEBUG_INFO, "Standard Timing: %d x %d\n", HorizontalResolution, VerticalResolution));
-      TempTiming.HorizontalResolution = HorizontalResolution;
-      TempTiming.VerticalResolution = VerticalResolution;
-      TempTiming.RefreshRate = RefreshRate;
+      TempTiming.HorizontalResolution   = HorizontalResolution;
+      TempTiming.VerticalResolution     = VerticalResolution;
+      TempTiming.RefreshRate            = RefreshRate;
       ValidEdidTiming->Key[ValidNumber] = CalculateEdidKey (&TempTiming);
-      ValidNumber ++;
+      ValidNumber++;
     }
+
     BufferIndex += 2;
   }
 
@@ -1178,7 +1197,7 @@ ParseEdidData (
   // Parse the Detailed Timing data
   //
   BufferIndex = &EdidDataBlock->DetailedTimingDescriptions[0];
-  for (Index = 0; Index < 4; Index ++, BufferIndex += VESA_BIOS_EXTENSIONS_DETAILED_TIMING_EACH_DESCRIPTOR_SIZE) {
+  for (Index = 0; Index < 4; Index++, BufferIndex += VESA_BIOS_EXTENSIONS_DETAILED_TIMING_EACH_DESCRIPTOR_SIZE) {
     if ((BufferIndex[0] == 0x0) && (BufferIndex[1] == 0x0)) {
       //
       // Check if this is a valid Detailed Timing Descriptor
@@ -1186,21 +1205,26 @@ ParseEdidData (
       //
       continue;
     }
+
     //
     // Calculate Horizontal and Vertical resolution
     //
     TempTiming.HorizontalResolution = ((UINT16)(BufferIndex[4] & 0xF0) << 4) | (BufferIndex[2]);
-    TempTiming.VerticalResolution = ((UINT16)(BufferIndex[7] & 0xF0) << 4) | (BufferIndex[5]);
-    DEBUG ((DEBUG_INFO, "Detailed Timing %d: %d x %d\n",
-            Index, TempTiming.HorizontalResolution, TempTiming.VerticalResolution));
+    TempTiming.VerticalResolution   = ((UINT16)(BufferIndex[7] & 0xF0) << 4) | (BufferIndex[5]);
+    DEBUG ((
+      DEBUG_INFO,
+      "Detailed Timing %d: %d x %d\n",
+      Index,
+      TempTiming.HorizontalResolution,
+      TempTiming.VerticalResolution
+      ));
     ValidEdidTiming->Key[ValidNumber] = CalculateEdidKey (&TempTiming);
-    ValidNumber ++;
+    ValidNumber++;
   }
 
   ValidEdidTiming->ValidNumber = ValidNumber;
   return TRUE;
 }
-
 
 /**
   Search a specified Timing in all the valid EDID timings.
@@ -1214,16 +1238,16 @@ ParseEdidData (
 **/
 BOOLEAN
 SearchEdidTiming (
-  VESA_BIOS_EXTENSIONS_VALID_EDID_TIMING *ValidEdidTiming,
-  VESA_BIOS_EXTENSIONS_EDID_TIMING       *EdidTiming
+  VESA_BIOS_EXTENSIONS_VALID_EDID_TIMING  *ValidEdidTiming,
+  VESA_BIOS_EXTENSIONS_EDID_TIMING        *EdidTiming
   )
 {
-  UINT32 Index;
-  UINT32 Key;
+  UINT32  Index;
+  UINT32  Key;
 
   Key = CalculateEdidKey (EdidTiming);
 
-  for (Index = 0; Index < ValidEdidTiming->ValidNumber; Index ++) {
+  for (Index = 0; Index < ValidEdidTiming->ValidNumber; Index++) {
     if (Key == ValidEdidTiming->Key[Index]) {
       return TRUE;
     }
@@ -1281,34 +1305,34 @@ BiosVideoCheckForVbe (
   IN OUT BIOS_VIDEO_DEV  *BiosVideoPrivate
   )
 {
-  EFI_STATUS                             Status;
-  EFI_IA32_REGISTER_SET                  Regs;
-  UINT16                                 *ModeNumberPtr;
-  UINT16                                 VbeModeNumber;
-  BOOLEAN                                ModeFound;
-  BOOLEAN                                EdidFound;
-  BIOS_VIDEO_MODE_DATA                   *ModeBuffer;
-  BIOS_VIDEO_MODE_DATA                   *CurrentModeData;
-  UINTN                                  PreferMode;
-  UINTN                                  ModeNumber;
-  VESA_BIOS_EXTENSIONS_EDID_TIMING       Timing;
-  VESA_BIOS_EXTENSIONS_VALID_EDID_TIMING ValidEdidTiming;
-  EFI_EDID_OVERRIDE_PROTOCOL             *EdidOverride;
-  UINT32                                 EdidAttributes;
-  BOOLEAN                                EdidOverrideFound;
-  UINTN                                  EdidOverrideDataSize;
-  UINT8                                  *EdidOverrideDataBlock;
-  UINTN                                  EdidActiveDataSize;
-  UINT8                                  *EdidActiveDataBlock;
-  UINT32                                 HighestHorizontalResolution;
-  UINT32                                 HighestVerticalResolution;
-  UINTN                                  HighestResolutionMode;
+  EFI_STATUS                              Status;
+  EFI_IA32_REGISTER_SET                   Regs;
+  UINT16                                  *ModeNumberPtr;
+  UINT16                                  VbeModeNumber;
+  BOOLEAN                                 ModeFound;
+  BOOLEAN                                 EdidFound;
+  BIOS_VIDEO_MODE_DATA                    *ModeBuffer;
+  BIOS_VIDEO_MODE_DATA                    *CurrentModeData;
+  UINTN                                   PreferMode;
+  UINTN                                   ModeNumber;
+  VESA_BIOS_EXTENSIONS_EDID_TIMING        Timing;
+  VESA_BIOS_EXTENSIONS_VALID_EDID_TIMING  ValidEdidTiming;
+  EFI_EDID_OVERRIDE_PROTOCOL              *EdidOverride;
+  UINT32                                  EdidAttributes;
+  BOOLEAN                                 EdidOverrideFound;
+  UINTN                                   EdidOverrideDataSize;
+  UINT8                                   *EdidOverrideDataBlock;
+  UINTN                                   EdidActiveDataSize;
+  UINT8                                   *EdidActiveDataBlock;
+  UINT32                                  HighestHorizontalResolution;
+  UINT32                                  HighestVerticalResolution;
+  UINTN                                   HighestResolutionMode;
 
-  EdidFound             = TRUE;
-  EdidOverrideFound     = FALSE;
-  EdidOverrideDataBlock = NULL;
-  EdidActiveDataSize    = 0;
-  EdidActiveDataBlock   = NULL;
+  EdidFound                   = TRUE;
+  EdidOverrideFound           = FALSE;
+  EdidOverrideDataBlock       = NULL;
+  EdidActiveDataSize          = 0;
+  EdidActiveDataBlock         = NULL;
   HighestHorizontalResolution = 0;
   HighestVerticalResolution   = 0;
   HighestResolutionMode       = 0;
@@ -1340,12 +1364,12 @@ BiosVideoCheckForVbe (
   //
   // Fill in the VBE related data structures
   //
-  BiosVideoPrivate->VbeInformationBlock = (VESA_BIOS_EXTENSIONS_INFORMATION_BLOCK *) (UINTN) (BiosVideoPrivate->PagesBelow1MB);
-  BiosVideoPrivate->VbeModeInformationBlock = (VESA_BIOS_EXTENSIONS_MODE_INFORMATION_BLOCK *) (BiosVideoPrivate->VbeInformationBlock + 1);
-  BiosVideoPrivate->VbeEdidDataBlock = (VESA_BIOS_EXTENSIONS_EDID_DATA_BLOCK *) (BiosVideoPrivate->VbeModeInformationBlock + 1);
-  BiosVideoPrivate->VbeCrtcInformationBlock = (VESA_BIOS_EXTENSIONS_CRTC_INFORMATION_BLOCK *) (BiosVideoPrivate->VbeEdidDataBlock + 1);
-  BiosVideoPrivate->VbeSaveRestorePages   = 0;
-  BiosVideoPrivate->VbeSaveRestoreBuffer  = 0;
+  BiosVideoPrivate->VbeInformationBlock     = (VESA_BIOS_EXTENSIONS_INFORMATION_BLOCK *)(UINTN)(BiosVideoPrivate->PagesBelow1MB);
+  BiosVideoPrivate->VbeModeInformationBlock = (VESA_BIOS_EXTENSIONS_MODE_INFORMATION_BLOCK *)(BiosVideoPrivate->VbeInformationBlock + 1);
+  BiosVideoPrivate->VbeEdidDataBlock        = (VESA_BIOS_EXTENSIONS_EDID_DATA_BLOCK *)(BiosVideoPrivate->VbeModeInformationBlock + 1);
+  BiosVideoPrivate->VbeCrtcInformationBlock = (VESA_BIOS_EXTENSIONS_CRTC_INFORMATION_BLOCK *)(BiosVideoPrivate->VbeEdidDataBlock + 1);
+  BiosVideoPrivate->VbeSaveRestorePages     = 0;
+  BiosVideoPrivate->VbeSaveRestoreBuffer    = 0;
 
   //
   // Test to see if the Video Adapter is compliant with VBE 3.0
@@ -1353,9 +1377,9 @@ BiosVideoCheckForVbe (
   gBS->SetMem (&Regs, sizeof (Regs), 0);
   Regs.X.AX = VESA_BIOS_EXTENSIONS_RETURN_CONTROLLER_INFORMATION;
   gBS->SetMem (BiosVideoPrivate->VbeInformationBlock, sizeof (VESA_BIOS_EXTENSIONS_INFORMATION_BLOCK), 0);
-  BiosVideoPrivate->VbeInformationBlock->VESASignature  = VESA_BIOS_EXTENSIONS_VBE2_SIGNATURE;
-  Regs.X.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeInformationBlock);
-  Regs.X.DI = EFI_OFFSET ((UINTN) BiosVideoPrivate->VbeInformationBlock);
+  BiosVideoPrivate->VbeInformationBlock->VESASignature = VESA_BIOS_EXTENSIONS_VBE2_SIGNATURE;
+  Regs.X.ES                                            = EFI_SEGMENT ((UINTN)BiosVideoPrivate->VbeInformationBlock);
+  Regs.X.DI                                            = EFI_OFFSET ((UINTN)BiosVideoPrivate->VbeInformationBlock);
 
   BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
 
@@ -1367,12 +1391,14 @@ BiosVideoCheckForVbe (
   if (Regs.X.AX != VESA_BIOS_EXTENSIONS_STATUS_SUCCESS) {
     return Status;
   }
+
   //
   // Check for 'VESA' signature
   //
   if (BiosVideoPrivate->VbeInformationBlock->VESASignature != VESA_BIOS_EXTENSIONS_VESA_SIGNATURE) {
     return Status;
   }
+
   //
   // Check to see if this is VBE 2.0 or higher
   //
@@ -1388,10 +1414,10 @@ BiosVideoCheckForVbe (
   // Find EDID Override protocol firstly, this protocol is installed by platform if needed.
   //
   Status = gBS->LocateProtocol (
-                   &gEfiEdidOverrideProtocolGuid,
-                   NULL,
-                   (VOID **) &EdidOverride
-                   );
+                  &gEfiEdidOverrideProtocolGuid,
+                  NULL,
+                  (VOID **)&EdidOverride
+                  );
   if (!EFI_ERROR (Status)) {
     //
     // Allocate double size of VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE to avoid overflow
@@ -1407,11 +1433,12 @@ BiosVideoCheckForVbe (
                              BiosVideoPrivate->Handle,
                              &EdidAttributes,
                              &EdidOverrideDataSize,
-                             (UINT8 **) &EdidOverrideDataBlock
+                             (UINT8 **)&EdidOverrideDataBlock
                              );
     if (!EFI_ERROR (Status)  &&
-         EdidAttributes == 0 &&
-         EdidOverrideDataSize != 0) {
+        (EdidAttributes == 0) &&
+        (EdidOverrideDataSize != 0))
+    {
       //
       // Succeeded to get EDID Override Data
       //
@@ -1419,7 +1446,7 @@ BiosVideoCheckForVbe (
     }
   }
 
-  if (!EdidOverrideFound || EdidAttributes == EFI_EDID_OVERRIDE_DONT_OVERRIDE) {
+  if (!EdidOverrideFound || (EdidAttributes == EFI_EDID_OVERRIDE_DONT_OVERRIDE)) {
     //
     // If EDID Override data doesn't exist or EFI_EDID_OVERRIDE_DONT_OVERRIDE returned,
     // read EDID information through INT10 call
@@ -1430,8 +1457,8 @@ BiosVideoCheckForVbe (
     Regs.X.BX = 1;
     Regs.X.CX = 0;
     Regs.X.DX = 0;
-    Regs.X.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeEdidDataBlock);
-    Regs.X.DI = EFI_OFFSET  ((UINTN) BiosVideoPrivate->VbeEdidDataBlock);
+    Regs.X.ES = EFI_SEGMENT ((UINTN)BiosVideoPrivate->VbeEdidDataBlock);
+    Regs.X.DI = EFI_OFFSET ((UINTN)BiosVideoPrivate->VbeEdidDataBlock);
 
     BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
     //
@@ -1442,13 +1469,13 @@ BiosVideoCheckForVbe (
       // Set EDID Discovered Data
       //
       BiosVideoPrivate->EdidDiscovered.SizeOfEdid = VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE;
-       BiosVideoPrivate->EdidDiscovered.Edid = (UINT8 *) AllocateCopyPool (
-                                                          VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE,
-                                                          BiosVideoPrivate->VbeEdidDataBlock
-                                                           );
+      BiosVideoPrivate->EdidDiscovered.Edid       = (UINT8 *)AllocateCopyPool (
+                                                               VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE,
+                                                               BiosVideoPrivate->VbeEdidDataBlock
+                                                               );
 
       if (NULL == BiosVideoPrivate->EdidDiscovered.Edid) {
-         Status = EFI_OUT_OF_RESOURCES;
+        Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
 
@@ -1462,41 +1489,41 @@ BiosVideoCheckForVbe (
   } else if (EdidOverrideFound) {
     EdidActiveDataSize  = EdidOverrideDataSize;
     EdidActiveDataBlock = EdidOverrideDataBlock;
-    EdidFound = TRUE;
-   }
+    EdidFound           = TRUE;
+  }
 
-   if (EdidFound) {
+  if (EdidFound) {
     //
     // Parse EDID data structure to retrieve modes supported by monitor
     //
-    if (ParseEdidData ((UINT8 *) EdidActiveDataBlock, &ValidEdidTiming)) {
+    if (ParseEdidData ((UINT8 *)EdidActiveDataBlock, &ValidEdidTiming)) {
       //
       // Copy EDID Override Data to EDID Active Data
       //
-      BiosVideoPrivate->EdidActive.SizeOfEdid = (UINT32) EdidActiveDataSize;
-      BiosVideoPrivate->EdidActive.Edid = (UINT8 *) AllocateCopyPool (
-                                                      EdidActiveDataSize,
-                                                      EdidActiveDataBlock
-                                                      );
+      BiosVideoPrivate->EdidActive.SizeOfEdid = (UINT32)EdidActiveDataSize;
+      BiosVideoPrivate->EdidActive.Edid       = (UINT8 *)AllocateCopyPool (
+                                                           EdidActiveDataSize,
+                                                           EdidActiveDataBlock
+                                                           );
       if (NULL ==  BiosVideoPrivate->EdidActive.Edid) {
-         Status = EFI_OUT_OF_RESOURCES;
+        Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
     }
   } else {
     BiosVideoPrivate->EdidActive.SizeOfEdid = 0;
-    BiosVideoPrivate->EdidActive.Edid = NULL;
-    EdidFound = FALSE;
+    BiosVideoPrivate->EdidActive.Edid       = NULL;
+    EdidFound                               = FALSE;
   }
 
   //
   // Walk through the mode list to see if there is at least one mode the is compatible with the EDID mode
   //
   ModeNumberPtr = (UINT16 *)
-    (
-      (((UINTN) BiosVideoPrivate->VbeInformationBlock->VideoModePtr & 0xffff0000) >> 12) |
-        ((UINTN) BiosVideoPrivate->VbeInformationBlock->VideoModePtr & 0x0000ffff)
-    );
+                  (
+                   (((UINTN)BiosVideoPrivate->VbeInformationBlock->VideoModePtr & 0xffff0000) >> 12) |
+                   ((UINTN)BiosVideoPrivate->VbeInformationBlock->VideoModePtr & 0x0000ffff)
+                  );
 
   PreferMode = 0;
   ModeNumber = 0;
@@ -1506,13 +1533,15 @@ BiosVideoCheckForVbe (
   //
   for (VbeModeNumber = ReadUnaligned16 (ModeNumberPtr);
        VbeModeNumber != VESA_BIOS_EXTENSIONS_END_OF_MODE_LIST;
-       VbeModeNumber = ReadUnaligned16 (++ModeNumberPtr)) {
+       VbeModeNumber = ReadUnaligned16 (++ModeNumberPtr))
+  {
     //
     // Make sure this is a mode number defined by the VESA VBE specification.  If it isn'tm then skip this mode number.
     //
     if ((VbeModeNumber & VESA_BIOS_EXTENSIONS_MODE_NUMBER_VESA) == 0) {
       continue;
     }
+
     //
     // Get the information about the mode
     //
@@ -1520,8 +1549,8 @@ BiosVideoCheckForVbe (
     Regs.X.AX = VESA_BIOS_EXTENSIONS_RETURN_MODE_INFORMATION;
     Regs.X.CX = VbeModeNumber;
     gBS->SetMem (BiosVideoPrivate->VbeModeInformationBlock, sizeof (VESA_BIOS_EXTENSIONS_MODE_INFORMATION_BLOCK), 0);
-    Regs.X.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeModeInformationBlock);
-    Regs.X.DI = EFI_OFFSET ((UINTN) BiosVideoPrivate->VbeModeInformationBlock);
+    Regs.X.ES = EFI_SEGMENT ((UINTN)BiosVideoPrivate->VbeModeInformationBlock);
+    Regs.X.DI = EFI_OFFSET ((UINTN)BiosVideoPrivate->VbeModeInformationBlock);
 
     BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
 
@@ -1531,24 +1560,28 @@ BiosVideoCheckForVbe (
     if (Regs.X.AX != VESA_BIOS_EXTENSIONS_STATUS_SUCCESS) {
       continue;
     }
+
     //
     // See if the mode supports color.  If it doesn't then try the next mode.
     //
     if ((BiosVideoPrivate->VbeModeInformationBlock->ModeAttributes & VESA_BIOS_EXTENSIONS_MODE_ATTRIBUTE_COLOR) == 0) {
       continue;
     }
+
     //
     // See if the mode supports graphics.  If it doesn't then try the next mode.
     //
     if ((BiosVideoPrivate->VbeModeInformationBlock->ModeAttributes & VESA_BIOS_EXTENSIONS_MODE_ATTRIBUTE_GRAPHICS) == 0) {
       continue;
     }
+
     //
     // See if the mode supports a linear frame buffer.  If it doesn't then try the next mode.
     //
     if ((BiosVideoPrivate->VbeModeInformationBlock->ModeAttributes & VESA_BIOS_EXTENSIONS_MODE_ATTRIBUTE_LINEAR_FRAME_BUFFER) == 0) {
       continue;
     }
+
     //
     // See if the mode supports 32 bit color.  If it doesn't then try the next mode.
     // 32 bit mode can be implemented by 24 Bits Per Pixels. Also make sure the
@@ -1565,6 +1598,7 @@ BiosVideoCheckForVbe (
     if ((BiosVideoPrivate->VbeModeInformationBlock->BitsPerPixel % 8) != 0) {
       continue;
     }
+
     //
     // See if the physical base pointer for the linear mode is valid.  If it isn't then try the next mode.
     //
@@ -1572,25 +1606,31 @@ BiosVideoCheckForVbe (
       continue;
     }
 
-    DEBUG ((DEBUG_INFO, "Video Controller Mode 0x%x: %d x %d\n",
-            VbeModeNumber, BiosVideoPrivate->VbeModeInformationBlock->XResolution, BiosVideoPrivate->VbeModeInformationBlock->YResolution));
+    DEBUG ((
+      DEBUG_INFO,
+      "Video Controller Mode 0x%x: %d x %d\n",
+      VbeModeNumber,
+      BiosVideoPrivate->VbeModeInformationBlock->XResolution,
+      BiosVideoPrivate->VbeModeInformationBlock->YResolution
+      ));
 
     if (EdidFound && (ValidEdidTiming.ValidNumber > 0)) {
       //
       // EDID exist, check whether this mode match with any mode in EDID
       //
       Timing.HorizontalResolution = BiosVideoPrivate->VbeModeInformationBlock->XResolution;
-      Timing.VerticalResolution = BiosVideoPrivate->VbeModeInformationBlock->YResolution;
+      Timing.VerticalResolution   = BiosVideoPrivate->VbeModeInformationBlock->YResolution;
       if (!SearchEdidTiming (&ValidEdidTiming, &Timing)) {
         //
         // When EDID comes from INT10 call, EDID does not include 800x600, 640x480 and 1024x768,
         // but INT10 can support these modes, we add them into GOP mode.
         //
         if ((BiosVideoPrivate->EdidDiscovered.SizeOfEdid != 0) &&
-            !((Timing.HorizontalResolution) == 1024 && (Timing.VerticalResolution == 768)) &&
-            !((Timing.HorizontalResolution) == 800 && (Timing.VerticalResolution == 600)) &&
-            !((Timing.HorizontalResolution) == 640 && (Timing.VerticalResolution == 480))) {
-        continue;
+            !(((Timing.HorizontalResolution) == 1024) && (Timing.VerticalResolution == 768)) &&
+            !(((Timing.HorizontalResolution) == 800) && (Timing.VerticalResolution == 600)) &&
+            !(((Timing.HorizontalResolution) == 640) && (Timing.VerticalResolution == 480)))
+        {
+          continue;
         }
       }
     }
@@ -1600,20 +1640,25 @@ BiosVideoCheckForVbe (
     //
     ModeFound = FALSE;
 
-    if (BiosVideoPrivate->VbeModeInformationBlock->XResolution == 1024 &&
-        BiosVideoPrivate->VbeModeInformationBlock->YResolution == 768
-        ) {
+    if ((BiosVideoPrivate->VbeModeInformationBlock->XResolution == 1024) &&
+        (BiosVideoPrivate->VbeModeInformationBlock->YResolution == 768)
+        )
+    {
       ModeFound = TRUE;
     }
-    if (BiosVideoPrivate->VbeModeInformationBlock->XResolution == 800 &&
-        BiosVideoPrivate->VbeModeInformationBlock->YResolution == 600
-        ) {
-      ModeFound = TRUE;
+
+    if ((BiosVideoPrivate->VbeModeInformationBlock->XResolution == 800) &&
+        (BiosVideoPrivate->VbeModeInformationBlock->YResolution == 600)
+        )
+    {
+      ModeFound  = TRUE;
       PreferMode = ModeNumber;
     }
-    if (BiosVideoPrivate->VbeModeInformationBlock->XResolution == 640 &&
-        BiosVideoPrivate->VbeModeInformationBlock->YResolution == 480
-        ) {
+
+    if ((BiosVideoPrivate->VbeModeInformationBlock->XResolution == 640) &&
+        (BiosVideoPrivate->VbeModeInformationBlock->YResolution == 480)
+        )
+    {
       ModeFound = TRUE;
     }
 
@@ -1629,19 +1674,20 @@ BiosVideoCheckForVbe (
     //
     if ((BiosVideoPrivate->VbeModeInformationBlock->XResolution > HighestHorizontalResolution) ||
         ((BiosVideoPrivate->VbeModeInformationBlock->XResolution == HighestHorizontalResolution) &&
-         (BiosVideoPrivate->VbeModeInformationBlock->YResolution > HighestVerticalResolution))) {
+         (BiosVideoPrivate->VbeModeInformationBlock->YResolution > HighestVerticalResolution)))
+    {
       HighestHorizontalResolution = BiosVideoPrivate->VbeModeInformationBlock->XResolution;
-      HighestVerticalResolution = BiosVideoPrivate->VbeModeInformationBlock->YResolution;
-      HighestResolutionMode = ModeNumber;
+      HighestVerticalResolution   = BiosVideoPrivate->VbeModeInformationBlock->YResolution;
+      HighestResolutionMode       = ModeNumber;
     }
 
     //
     // Add mode to the list of available modes
     //
-    ModeNumber ++;
-    ModeBuffer = (BIOS_VIDEO_MODE_DATA *) AllocatePool (
-                                            ModeNumber * sizeof (BIOS_VIDEO_MODE_DATA)
-                                            );
+    ModeNumber++;
+    ModeBuffer = (BIOS_VIDEO_MODE_DATA *)AllocatePool (
+                                           ModeNumber * sizeof (BIOS_VIDEO_MODE_DATA)
+                                           );
     if (NULL == ModeBuffer) {
       Status = EFI_OUT_OF_RESOURCES;
       goto Done;
@@ -1659,33 +1705,34 @@ BiosVideoCheckForVbe (
       FreePool (BiosVideoPrivate->ModeData);
     }
 
-    CurrentModeData = &ModeBuffer[ModeNumber - 1];
+    CurrentModeData                = &ModeBuffer[ModeNumber - 1];
     CurrentModeData->VbeModeNumber = VbeModeNumber;
     if (BiosVideoPrivate->VbeInformationBlock->VESAVersion >= VESA_BIOS_EXTENSIONS_VERSION_3_0) {
-      CurrentModeData->BytesPerScanLine = BiosVideoPrivate->VbeModeInformationBlock->LinBytesPerScanLine;
-      CurrentModeData->Red.Position = BiosVideoPrivate->VbeModeInformationBlock->LinRedFieldPosition;
-      CurrentModeData->Red.Mask = (UINT8) ((1 << BiosVideoPrivate->VbeModeInformationBlock->LinRedMaskSize) - 1);
-      CurrentModeData->Blue.Position = BiosVideoPrivate->VbeModeInformationBlock->LinBlueFieldPosition;
-      CurrentModeData->Blue.Mask = (UINT8) ((1 << BiosVideoPrivate->VbeModeInformationBlock->LinBlueMaskSize) - 1);
-      CurrentModeData->Green.Position = BiosVideoPrivate->VbeModeInformationBlock->LinGreenFieldPosition;
-      CurrentModeData->Green.Mask = (UINT8) ((1 << BiosVideoPrivate->VbeModeInformationBlock->LinGreenMaskSize) - 1);
+      CurrentModeData->BytesPerScanLine  = BiosVideoPrivate->VbeModeInformationBlock->LinBytesPerScanLine;
+      CurrentModeData->Red.Position      = BiosVideoPrivate->VbeModeInformationBlock->LinRedFieldPosition;
+      CurrentModeData->Red.Mask          = (UINT8)((1 << BiosVideoPrivate->VbeModeInformationBlock->LinRedMaskSize) - 1);
+      CurrentModeData->Blue.Position     = BiosVideoPrivate->VbeModeInformationBlock->LinBlueFieldPosition;
+      CurrentModeData->Blue.Mask         = (UINT8)((1 << BiosVideoPrivate->VbeModeInformationBlock->LinBlueMaskSize) - 1);
+      CurrentModeData->Green.Position    = BiosVideoPrivate->VbeModeInformationBlock->LinGreenFieldPosition;
+      CurrentModeData->Green.Mask        = (UINT8)((1 << BiosVideoPrivate->VbeModeInformationBlock->LinGreenMaskSize) - 1);
       CurrentModeData->Reserved.Position = BiosVideoPrivate->VbeModeInformationBlock->LinRsvdFieldPosition;
-      CurrentModeData->Reserved.Mask = (UINT8) ((1 << BiosVideoPrivate->VbeModeInformationBlock->LinRsvdMaskSize) - 1);
+      CurrentModeData->Reserved.Mask     = (UINT8)((1 << BiosVideoPrivate->VbeModeInformationBlock->LinRsvdMaskSize) - 1);
     } else {
-      CurrentModeData->BytesPerScanLine = BiosVideoPrivate->VbeModeInformationBlock->BytesPerScanLine;
-      CurrentModeData->Red.Position = BiosVideoPrivate->VbeModeInformationBlock->RedFieldPosition;
-      CurrentModeData->Red.Mask = (UINT8) ((1 << BiosVideoPrivate->VbeModeInformationBlock->RedMaskSize) - 1);
-      CurrentModeData->Blue.Position = BiosVideoPrivate->VbeModeInformationBlock->BlueFieldPosition;
-      CurrentModeData->Blue.Mask = (UINT8) ((1 << BiosVideoPrivate->VbeModeInformationBlock->BlueMaskSize) - 1);
-      CurrentModeData->Green.Position = BiosVideoPrivate->VbeModeInformationBlock->GreenFieldPosition;
-      CurrentModeData->Green.Mask = (UINT8) ((1 << BiosVideoPrivate->VbeModeInformationBlock->GreenMaskSize) - 1);
+      CurrentModeData->BytesPerScanLine  = BiosVideoPrivate->VbeModeInformationBlock->BytesPerScanLine;
+      CurrentModeData->Red.Position      = BiosVideoPrivate->VbeModeInformationBlock->RedFieldPosition;
+      CurrentModeData->Red.Mask          = (UINT8)((1 << BiosVideoPrivate->VbeModeInformationBlock->RedMaskSize) - 1);
+      CurrentModeData->Blue.Position     = BiosVideoPrivate->VbeModeInformationBlock->BlueFieldPosition;
+      CurrentModeData->Blue.Mask         = (UINT8)((1 << BiosVideoPrivate->VbeModeInformationBlock->BlueMaskSize) - 1);
+      CurrentModeData->Green.Position    = BiosVideoPrivate->VbeModeInformationBlock->GreenFieldPosition;
+      CurrentModeData->Green.Mask        = (UINT8)((1 << BiosVideoPrivate->VbeModeInformationBlock->GreenMaskSize) - 1);
       CurrentModeData->Reserved.Position = BiosVideoPrivate->VbeModeInformationBlock->RsvdFieldPosition;
-      CurrentModeData->Reserved.Mask = (UINT8) ((1 << BiosVideoPrivate->VbeModeInformationBlock->RsvdMaskSize) - 1);
+      CurrentModeData->Reserved.Mask     = (UINT8)((1 << BiosVideoPrivate->VbeModeInformationBlock->RsvdMaskSize) - 1);
     }
 
     CurrentModeData->PixelFormat = PixelBitMask;
     if ((BiosVideoPrivate->VbeModeInformationBlock->BitsPerPixel == 32) &&
-        (CurrentModeData->Red.Mask == 0xff) && (CurrentModeData->Green.Mask == 0xff) && (CurrentModeData->Blue.Mask == 0xff)) {
+        (CurrentModeData->Red.Mask == 0xff) && (CurrentModeData->Green.Mask == 0xff) && (CurrentModeData->Blue.Mask == 0xff))
+    {
       if ((CurrentModeData->Red.Position == 0) && (CurrentModeData->Green.Position == 8) && (CurrentModeData->Blue.Position == 16)) {
         CurrentModeData->PixelFormat = PixelRedGreenBlueReserved8BitPerColor;
       } else if ((CurrentModeData->Blue.Position == 0) && (CurrentModeData->Green.Position == 8) && (CurrentModeData->Red.Position == 16)) {
@@ -1693,16 +1740,16 @@ BiosVideoCheckForVbe (
       }
     }
 
-    CurrentModeData->PixelBitMask.RedMask = ((UINT32) CurrentModeData->Red.Mask) << CurrentModeData->Red.Position;
-    CurrentModeData->PixelBitMask.GreenMask = ((UINT32) CurrentModeData->Green.Mask) << CurrentModeData->Green.Position;
-    CurrentModeData->PixelBitMask.BlueMask = ((UINT32) CurrentModeData->Blue.Mask) << CurrentModeData->Blue.Position;
-    CurrentModeData->PixelBitMask.ReservedMask = ((UINT32) CurrentModeData->Reserved.Mask) << CurrentModeData->Reserved.Position;
+    CurrentModeData->PixelBitMask.RedMask      = ((UINT32)CurrentModeData->Red.Mask) << CurrentModeData->Red.Position;
+    CurrentModeData->PixelBitMask.GreenMask    = ((UINT32)CurrentModeData->Green.Mask) << CurrentModeData->Green.Position;
+    CurrentModeData->PixelBitMask.BlueMask     = ((UINT32)CurrentModeData->Blue.Mask) << CurrentModeData->Blue.Position;
+    CurrentModeData->PixelBitMask.ReservedMask = ((UINT32)CurrentModeData->Reserved.Mask) << CurrentModeData->Reserved.Position;
 
-    CurrentModeData->LinearFrameBuffer = (VOID *) (UINTN)BiosVideoPrivate->VbeModeInformationBlock->PhysBasePtr;
+    CurrentModeData->LinearFrameBuffer    = (VOID *)(UINTN)BiosVideoPrivate->VbeModeInformationBlock->PhysBasePtr;
     CurrentModeData->HorizontalResolution = BiosVideoPrivate->VbeModeInformationBlock->XResolution;
-    CurrentModeData->VerticalResolution = BiosVideoPrivate->VbeModeInformationBlock->YResolution;
+    CurrentModeData->VerticalResolution   = BiosVideoPrivate->VbeModeInformationBlock->YResolution;
 
-    CurrentModeData->BitsPerPixel  = BiosVideoPrivate->VbeModeInformationBlock->BitsPerPixel;
+    CurrentModeData->BitsPerPixel    = BiosVideoPrivate->VbeModeInformationBlock->BitsPerPixel;
     CurrentModeData->FrameBufferSize = CurrentModeData->BytesPerScanLine * CurrentModeData->VerticalResolution;
     //
     // Make sure the FrameBufferSize does not exceed the max available frame buffer size reported by VEB.
@@ -1711,6 +1758,7 @@ BiosVideoCheckForVbe (
 
     BiosVideoPrivate->ModeData = ModeBuffer;
   }
+
   //
   // Check to see if we found any modes that are compatible with GRAPHICS OUTPUT
   //
@@ -1722,9 +1770,9 @@ BiosVideoCheckForVbe (
   //
   // Assign Gop's Blt function
   //
-  BiosVideoPrivate->GraphicsOutput.Blt     = BiosVideoGraphicsOutputVbeBlt;
+  BiosVideoPrivate->GraphicsOutput.Blt = BiosVideoGraphicsOutputVbeBlt;
 
-  BiosVideoPrivate->GraphicsOutput.Mode->MaxMode = (UINT32) ModeNumber;
+  BiosVideoPrivate->GraphicsOutput.Mode->MaxMode = (UINT32)ModeNumber;
   //
   // Current mode is unknow till now, set it to an invalid mode.
   //
@@ -1737,22 +1785,28 @@ BiosVideoCheckForVbe (
     DEBUG_CODE (
       BIOS_VIDEO_MODE_DATA    *ModeData;
       ModeData = &BiosVideoPrivate->ModeData[HighestResolutionMode];
-      DEBUG ((DEBUG_INFO, "BiosVideo set highest resolution %d x %d\n",
-              ModeData->HorizontalResolution, ModeData->VerticalResolution));
-    );
+      DEBUG ((
+        DEBUG_INFO,
+        "BiosVideo set highest resolution %d x %d\n",
+        ModeData->HorizontalResolution,
+        ModeData->VerticalResolution
+        ));
+      );
     PreferMode = HighestResolutionMode;
   }
-  Status = BiosVideoGraphicsOutputSetMode (&BiosVideoPrivate->GraphicsOutput, (UINT32) PreferMode);
+
+  Status = BiosVideoGraphicsOutputSetMode (&BiosVideoPrivate->GraphicsOutput, (UINT32)PreferMode);
   if (EFI_ERROR (Status)) {
-    for (PreferMode = 0; PreferMode < ModeNumber; PreferMode ++) {
+    for (PreferMode = 0; PreferMode < ModeNumber; PreferMode++) {
       Status = BiosVideoGraphicsOutputSetMode (
-                &BiosVideoPrivate->GraphicsOutput,
-                (UINT32) PreferMode
-                );
+                 &BiosVideoPrivate->GraphicsOutput,
+                 (UINT32)PreferMode
+                 );
       if (!EFI_ERROR (Status)) {
         break;
       }
     }
+
     if (PreferMode == ModeNumber) {
       //
       // None mode is set successfully.
@@ -1768,9 +1822,10 @@ Done:
   if (EFI_ERROR (Status)) {
     if (BiosVideoPrivate->ModeData != NULL) {
       FreePool (BiosVideoPrivate->ModeData);
-      BiosVideoPrivate->ModeData  = NULL;
-      BiosVideoPrivate->MaxMode   = 0;
+      BiosVideoPrivate->ModeData = NULL;
+      BiosVideoPrivate->MaxMode  = 0;
     }
+
     if (EdidOverrideDataBlock != NULL) {
       FreePool (EdidOverrideDataBlock);
     }
@@ -1778,7 +1833,6 @@ Done:
 
   return Status;
 }
-
 
 /**
   Check for VGA device.
@@ -1801,7 +1855,7 @@ BiosVideoCheckForVga (
   //
   // Assign Gop's Blt function
   //
-  BiosVideoPrivate->GraphicsOutput.Blt     = BiosVideoGraphicsOutputVgaBlt;
+  BiosVideoPrivate->GraphicsOutput.Blt = BiosVideoGraphicsOutputVgaBlt;
 
   //
   // Add mode to the list of available modes
@@ -1810,23 +1864,23 @@ BiosVideoCheckForVga (
   ASSERT (BiosVideoPrivate->GraphicsOutput.Mode != NULL);
   BiosVideoPrivate->GraphicsOutput.Mode->MaxMode = 1;
 
-  ModeBuffer = (BIOS_VIDEO_MODE_DATA *) AllocatePool (
-                                          sizeof (BIOS_VIDEO_MODE_DATA)
-                                          );
+  ModeBuffer = (BIOS_VIDEO_MODE_DATA *)AllocatePool (
+                                         sizeof (BIOS_VIDEO_MODE_DATA)
+                                         );
   if (NULL == ModeBuffer) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
-  ModeBuffer->VbeModeNumber         = 0x0012;
-  ModeBuffer->BytesPerScanLine      = 640;
-  ModeBuffer->LinearFrameBuffer     = (VOID *) (UINTN) (0xa0000);
-  ModeBuffer->HorizontalResolution  = 640;
-  ModeBuffer->VerticalResolution    = 480;
-  ModeBuffer->PixelFormat           = PixelBltOnly;
-  ModeBuffer->BitsPerPixel          = 8;
-  ModeBuffer->ColorDepth            = 32;
-  ModeBuffer->RefreshRate           = 60;
+  ModeBuffer->VbeModeNumber        = 0x0012;
+  ModeBuffer->BytesPerScanLine     = 640;
+  ModeBuffer->LinearFrameBuffer    = (VOID *)(UINTN)(0xa0000);
+  ModeBuffer->HorizontalResolution = 640;
+  ModeBuffer->VerticalResolution   = 480;
+  ModeBuffer->PixelFormat          = PixelBltOnly;
+  ModeBuffer->BitsPerPixel         = 8;
+  ModeBuffer->ColorDepth           = 32;
+  ModeBuffer->RefreshRate          = 60;
 
   BiosVideoPrivate->ModeData = ModeBuffer;
 
@@ -1834,7 +1888,7 @@ BiosVideoCheckForVga (
   // Test to see if the Video Adapter support the 640x480 16 color mode
   //
   BiosVideoPrivate->GraphicsOutput.Mode->Mode = GRAPHICS_OUTPUT_INVALIDE_MODE_NUMBER;
-  Status = BiosVideoGraphicsOutputSetMode (&BiosVideoPrivate->GraphicsOutput, 0);
+  Status                                      = BiosVideoGraphicsOutputSetMode (&BiosVideoPrivate->GraphicsOutput, 0);
 
 Done:
   //
@@ -1845,15 +1899,18 @@ Done:
       FreePool (BiosVideoPrivate->ModeData);
       BiosVideoPrivate->ModeData = NULL;
     }
+
     if (BiosVideoPrivate->GraphicsOutput.Mode != NULL) {
       if (BiosVideoPrivate->GraphicsOutput.Mode->Info != NULL) {
         FreePool (BiosVideoPrivate->GraphicsOutput.Mode->Info);
         BiosVideoPrivate->GraphicsOutput.Mode->Info = NULL;
       }
+
       FreePool (BiosVideoPrivate->GraphicsOutput.Mode);
       BiosVideoPrivate->GraphicsOutput.Mode = NULL;
     }
   }
+
   return Status;
 }
 
@@ -1901,11 +1958,11 @@ BiosVideoGraphicsOutputQueryMode (
     return EFI_NOT_STARTED;
   }
 
-  if (This == NULL || Info == NULL || SizeOfInfo == NULL || ModeNumber >= This->Mode->MaxMode) {
+  if ((This == NULL) || (Info == NULL) || (SizeOfInfo == NULL) || (ModeNumber >= This->Mode->MaxMode)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  *Info = (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *) AllocatePool (
+  *Info = (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *)AllocatePool (
                                                     sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION)
                                                     );
   if (NULL == *Info) {
@@ -1914,12 +1971,12 @@ BiosVideoGraphicsOutputQueryMode (
 
   *SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
 
-  ModeData = &BiosVideoPrivate->ModeData[ModeNumber];
-  (*Info)->Version = 0;
+  ModeData                      = &BiosVideoPrivate->ModeData[ModeNumber];
+  (*Info)->Version              = 0;
   (*Info)->HorizontalResolution = ModeData->HorizontalResolution;
   (*Info)->VerticalResolution   = ModeData->VerticalResolution;
-  (*Info)->PixelFormat = ModeData->PixelFormat;
-  CopyMem (&((*Info)->PixelInformation), &(ModeData->PixelBitMask), sizeof(ModeData->PixelBitMask));
+  (*Info)->PixelFormat          = ModeData->PixelFormat;
+  CopyMem (&((*Info)->PixelInformation), &(ModeData->PixelBitMask), sizeof (ModeData->PixelBitMask));
 
   (*Info)->PixelsPerScanLine =  (ModeData->BytesPerScanLine * 8) / ModeData->BitsPerPixel;
 
@@ -1941,13 +1998,13 @@ BiosVideoGraphicsOutputQueryMode (
 **/
 EFI_STATUS
 BiosVideoSetModeWorker (
-  IN  BIOS_VIDEO_DEV               *BiosVideoPrivate,
-  IN  BIOS_VIDEO_MODE_DATA         *ModeData,
-  IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
+  IN  BIOS_VIDEO_DEV            *BiosVideoPrivate,
+  IN  BIOS_VIDEO_MODE_DATA      *ModeData,
+  IN  EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   )
 {
-  EFI_STATUS              Status;
-  EFI_IA32_REGISTER_SET   Regs;
+  EFI_STATUS             Status;
+  EFI_IA32_REGISTER_SET  Regs;
 
   if (BiosVideoPrivate->LineBuffer != NULL) {
     FreePool (BiosVideoPrivate->LineBuffer);
@@ -1961,12 +2018,13 @@ BiosVideoSetModeWorker (
     FreePool (BiosVideoPrivate->VbeFrameBuffer);
   }
 
-  BiosVideoPrivate->LineBuffer = (UINT8 *) AllocatePool (
-                                             ModeData->BytesPerScanLine
-                                             );
+  BiosVideoPrivate->LineBuffer = (UINT8 *)AllocatePool (
+                                            ModeData->BytesPerScanLine
+                                            );
   if (NULL == BiosVideoPrivate->LineBuffer) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   //
   // Clear all registers
   //
@@ -1976,35 +2034,36 @@ BiosVideoSetModeWorker (
     //
     // Allocate a working buffer for BLT operations to the VGA frame buffer
     //
-    BiosVideoPrivate->VgaFrameBuffer = (UINT8 *) AllocatePool (4 * 480 * 80);
+    BiosVideoPrivate->VgaFrameBuffer = (UINT8 *)AllocatePool (4 * 480 * 80);
     if (NULL == BiosVideoPrivate->VgaFrameBuffer) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     //
     // Set VGA Mode
     //
     Regs.X.AX = ModeData->VbeModeNumber;
     BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
-
   } else {
     //
     // Allocate a working buffer for BLT operations to the VBE frame buffer
     //
     BiosVideoPrivate->VbeFrameBuffer =
-      (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) AllocatePool (
-                                          ModeData->BytesPerScanLine * ModeData->VerticalResolution
-                                          );
+      (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)AllocatePool (
+                                         ModeData->BytesPerScanLine * ModeData->VerticalResolution
+                                         );
     if (NULL == BiosVideoPrivate->VbeFrameBuffer) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     //
     // Set VBE mode
     //
     Regs.X.AX = VESA_BIOS_EXTENSIONS_SET_MODE;
-    Regs.X.BX = (UINT16) (ModeData->VbeModeNumber | VESA_BIOS_EXTENSIONS_MODE_NUMBER_LINEAR_FRAME_BUFFER);
+    Regs.X.BX = (UINT16)(ModeData->VbeModeNumber | VESA_BIOS_EXTENSIONS_MODE_NUMBER_LINEAR_FRAME_BUFFER);
     ZeroMem (BiosVideoPrivate->VbeCrtcInformationBlock, sizeof (VESA_BIOS_EXTENSIONS_CRTC_INFORMATION_BLOCK));
-    Regs.X.ES = EFI_SEGMENT ((UINTN) BiosVideoPrivate->VbeCrtcInformationBlock);
-    Regs.X.DI = EFI_OFFSET ((UINTN) BiosVideoPrivate->VbeCrtcInformationBlock);
+    Regs.X.ES = EFI_SEGMENT ((UINTN)BiosVideoPrivate->VbeCrtcInformationBlock);
+    Regs.X.DI = EFI_OFFSET ((UINTN)BiosVideoPrivate->VbeCrtcInformationBlock);
     BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
 
     //
@@ -2018,6 +2077,7 @@ BiosVideoSetModeWorker (
         );
       return EFI_DEVICE_ERROR;
     }
+
     //
     // Initialize the state of the VbeFrameBuffer
     //
@@ -2025,7 +2085,7 @@ BiosVideoSetModeWorker (
                                             BiosVideoPrivate->PciIo,
                                             EfiPciIoWidthUint32,
                                             EFI_PCI_IO_PASS_THROUGH_BAR,
-                                            (UINT64) (UINTN) ModeData->LinearFrameBuffer,
+                                            (UINT64)(UINTN)ModeData->LinearFrameBuffer,
                                             (ModeData->BytesPerScanLine * ModeData->VerticalResolution) >> 2,
                                             BiosVideoPrivate->VbeFrameBuffer
                                             );
@@ -2052,14 +2112,14 @@ BiosVideoSetModeWorker (
 EFI_STATUS
 EFIAPI
 BiosVideoGraphicsOutputSetMode (
-  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL * This,
-  IN  UINT32                       ModeNumber
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL  *This,
+  IN  UINT32                        ModeNumber
   )
 {
-  EFI_STATUS              Status;
-  BIOS_VIDEO_DEV          *BiosVideoPrivate;
-  BIOS_VIDEO_MODE_DATA    *ModeData;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background;
+  EFI_STATUS                     Status;
+  BIOS_VIDEO_DEV                 *BiosVideoPrivate;
+  BIOS_VIDEO_MODE_DATA           *ModeData;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Background;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2079,17 +2139,17 @@ BiosVideoGraphicsOutputSetMode (
     //
     ZeroMem (&Background, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
     BiosVideoGraphicsOutputVbeBlt (
-                        This,
-                        &Background,
-                        EfiBltVideoFill,
-                        0,
-                        0,
-                        0,
-                        0,
-                        ModeData->HorizontalResolution,
-                        ModeData->VerticalResolution,
-                        0
-    );
+      This,
+      &Background,
+      EfiBltVideoFill,
+      0,
+      0,
+      0,
+      0,
+      ModeData->HorizontalResolution,
+      ModeData->VerticalResolution,
+      0
+      );
     return EFI_SUCCESS;
   }
 
@@ -2098,16 +2158,16 @@ BiosVideoGraphicsOutputSetMode (
     return Status;
   }
 
-  This->Mode->Mode = ModeNumber;
-  This->Mode->Info->Version = 0;
+  This->Mode->Mode                       = ModeNumber;
+  This->Mode->Info->Version              = 0;
   This->Mode->Info->HorizontalResolution = ModeData->HorizontalResolution;
-  This->Mode->Info->VerticalResolution = ModeData->VerticalResolution;
-  This->Mode->Info->PixelFormat = ModeData->PixelFormat;
+  This->Mode->Info->VerticalResolution   = ModeData->VerticalResolution;
+  This->Mode->Info->PixelFormat          = ModeData->PixelFormat;
   CopyMem (&(This->Mode->Info->PixelInformation), &(ModeData->PixelBitMask), sizeof (ModeData->PixelBitMask));
   This->Mode->Info->PixelsPerScanLine =  (ModeData->BytesPerScanLine * 8) / ModeData->BitsPerPixel;
-  This->Mode->SizeOfInfo = sizeof(EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
-  This->Mode->FrameBufferSize = ModeData->FrameBufferSize;
-  This->Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) (UINTN) ModeData->LinearFrameBuffer;
+  This->Mode->SizeOfInfo              = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
+  This->Mode->FrameBufferSize         = ModeData->FrameBufferSize;
+  This->Mode->FrameBufferBase         = (EFI_PHYSICAL_ADDRESS)(UINTN)ModeData->LinearFrameBuffer;
 
   BiosVideoPrivate->HardwareNeedsStarting = FALSE;
 
@@ -2129,36 +2189,36 @@ BiosVideoGraphicsOutputSetMode (
 **/
 VOID
 CopyVideoBuffer (
-  IN  EFI_PCI_IO_PROTOCOL   *PciIo,
-  IN  UINT8                 *VbeBuffer,
-  IN  VOID                  *MemAddress,
-  IN  UINTN                 DestinationX,
-  IN  UINTN                 DestinationY,
-  IN  UINTN                 TotalBytes,
-  IN  UINT32                VbePixelWidth,
-  IN  UINTN                 BytesPerScanLine
+  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN  UINT8                *VbeBuffer,
+  IN  VOID                 *MemAddress,
+  IN  UINTN                DestinationX,
+  IN  UINTN                DestinationY,
+  IN  UINTN                TotalBytes,
+  IN  UINT32               VbePixelWidth,
+  IN  UINTN                BytesPerScanLine
   )
 {
-  UINTN                 FrameBufferAddr;
-  UINTN                 CopyBlockNum;
-  UINTN                 RemainingBytes;
-  UINTN                 UnalignedBytes;
-  EFI_STATUS            Status;
+  UINTN       FrameBufferAddr;
+  UINTN       CopyBlockNum;
+  UINTN       RemainingBytes;
+  UINTN       UnalignedBytes;
+  EFI_STATUS  Status;
 
-  FrameBufferAddr = (UINTN) MemAddress + (DestinationY * BytesPerScanLine) + DestinationX * VbePixelWidth;
+  FrameBufferAddr = (UINTN)MemAddress + (DestinationY * BytesPerScanLine) + DestinationX * VbePixelWidth;
 
   //
   // If TotalBytes is less than 4 bytes, only start byte copy.
   //
   if (TotalBytes < 4) {
     Status = PciIo->Mem.Write (
-                     PciIo,
-                     EfiPciIoWidthUint8,
-                     EFI_PCI_IO_PASS_THROUGH_BAR,
-                     (UINT64) FrameBufferAddr,
-                     TotalBytes,
-                     VbeBuffer
-                     );
+                          PciIo,
+                          EfiPciIoWidthUint8,
+                          EFI_PCI_IO_PASS_THROUGH_BAR,
+                          (UINT64)FrameBufferAddr,
+                          TotalBytes,
+                          VbeBuffer
+                          );
     ASSERT_EFI_ERROR (Status);
     return;
   }
@@ -2166,17 +2226,17 @@ CopyVideoBuffer (
   //
   // If VbeBuffer is not 4-byte aligned, start byte copy.
   //
-  UnalignedBytes  = (4 - ((UINTN) VbeBuffer & 0x3)) & 0x3;
+  UnalignedBytes = (4 - ((UINTN)VbeBuffer & 0x3)) & 0x3;
 
   if (UnalignedBytes != 0) {
     Status = PciIo->Mem.Write (
-                     PciIo,
-                     EfiPciIoWidthUint8,
-                     EFI_PCI_IO_PASS_THROUGH_BAR,
-                     (UINT64) FrameBufferAddr,
-                     UnalignedBytes,
-                     VbeBuffer
-                     );
+                          PciIo,
+                          EfiPciIoWidthUint8,
+                          EFI_PCI_IO_PASS_THROUGH_BAR,
+                          (UINT64)FrameBufferAddr,
+                          UnalignedBytes,
+                          VbeBuffer
+                          );
     ASSERT_EFI_ERROR (Status);
     FrameBufferAddr += UnalignedBytes;
     VbeBuffer       += UnalignedBytes;
@@ -2193,27 +2253,27 @@ CopyVideoBuffer (
   //
   if (CopyBlockNum != 0) {
     Status = PciIo->Mem.Write (
-                    PciIo,
-                    EfiPciIoWidthUint32,
-                    EFI_PCI_IO_PASS_THROUGH_BAR,
-                    (UINT64) FrameBufferAddr,
-                    CopyBlockNum,
-                    VbeBuffer
-                    );
+                          PciIo,
+                          EfiPciIoWidthUint32,
+                          EFI_PCI_IO_PASS_THROUGH_BAR,
+                          (UINT64)FrameBufferAddr,
+                          CopyBlockNum,
+                          VbeBuffer
+                          );
     ASSERT_EFI_ERROR (Status);
   }
 
   if (RemainingBytes != 0) {
     FrameBufferAddr += (CopyBlockNum << 2);
     VbeBuffer       += (CopyBlockNum << 2);
-    Status = PciIo->Mem.Write (
-                    PciIo,
-                    EfiPciIoWidthUint8,
-                    EFI_PCI_IO_PASS_THROUGH_BAR,
-                    (UINT64) FrameBufferAddr,
-                    RemainingBytes,
-                    VbeBuffer
-                    );
+    Status           = PciIo->Mem.Write (
+                                    PciIo,
+                                    EfiPciIoWidthUint8,
+                                    EFI_PCI_IO_PASS_THROUGH_BAR,
+                                    (UINT64)FrameBufferAddr,
+                                    RemainingBytes,
+                                    VbeBuffer
+                                    );
     ASSERT_EFI_ERROR (Status);
   }
 }
@@ -2249,7 +2309,7 @@ CopyVideoBuffer (
 EFI_STATUS
 BiosVideoVbeBltWorker (
   IN  BIOS_VIDEO_DEV                     *BiosVideoPrivate,
-  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer, OPTIONAL
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer  OPTIONAL,
   IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
   IN  UINTN                              SourceX,
   IN  UINTN                              SourceY,
@@ -2278,22 +2338,23 @@ BiosVideoVbeBltWorker (
   UINT32                         Pixel;
   UINTN                          TotalBytes;
 
-  PciIo             = BiosVideoPrivate->PciIo;
+  PciIo = BiosVideoPrivate->PciIo;
 
-  VbeFrameBuffer    = BiosVideoPrivate->VbeFrameBuffer;
-  MemAddress        = Mode->LinearFrameBuffer;
-  BytesPerScanLine  = Mode->BytesPerScanLine;
-  VbePixelWidth     = Mode->BitsPerPixel / 8;
-  BltUint8          = (UINT8 *) BltBuffer;
-  TotalBytes        = Width * VbePixelWidth;
+  VbeFrameBuffer   = BiosVideoPrivate->VbeFrameBuffer;
+  MemAddress       = Mode->LinearFrameBuffer;
+  BytesPerScanLine = Mode->BytesPerScanLine;
+  VbePixelWidth    = Mode->BitsPerPixel / 8;
+  BltUint8         = (UINT8 *)BltBuffer;
+  TotalBytes       = Width * VbePixelWidth;
 
-  if (((UINTN) BltOperation) >= EfiGraphicsOutputBltOperationMax) {
+  if (((UINTN)BltOperation) >= EfiGraphicsOutputBltOperationMax) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Width == 0 || Height == 0) {
+  if ((Width == 0) || (Height == 0)) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // We need to fill the Virtual Screen buffer with the blt data.
   // The virtual screen is upside down, as the first row is the bootom row of
@@ -2322,6 +2383,7 @@ BiosVideoVbeBltWorker (
       return EFI_INVALID_PARAMETER;
     }
   }
+
   //
   // If Delta is zero, then the entire BltBuffer is being used, so Delta
   // is the number of bytes in each row of BltBuffer.  Since BltBuffer is Width pixels size,
@@ -2330,6 +2392,7 @@ BiosVideoVbeBltWorker (
   if (Delta == 0) {
     Delta = Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
   }
+
   //
   // We have to raise to TPL Notify, so we make an atomic write the frame buffer.
   // We would not want a timer based event (Cursor, ...) to come in while we are
@@ -2338,148 +2401,151 @@ BiosVideoVbeBltWorker (
   OriginalTPL = gBS->RaiseTPL (TPL_NOTIFY);
 
   switch (BltOperation) {
-  case EfiBltVideoToBltBuffer:
-    for (SrcY = SourceY, DstY = DestinationY; DstY < (Height + DestinationY); SrcY++, DstY++) {
-      Blt = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) (BltUint8 + DstY * Delta + DestinationX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-      //
-      // Shuffle the packed bytes in the hardware buffer to match EFI_GRAPHICS_OUTPUT_BLT_PIXEL
-      //
-      VbeBuffer = ((UINT8 *) VbeFrameBuffer + (SrcY * BytesPerScanLine + SourceX * VbePixelWidth));
-      for (DstX = DestinationX; DstX < (Width + DestinationX); DstX++) {
-        Pixel         = VbeBuffer[0] | VbeBuffer[1] << 8 | VbeBuffer[2] << 16 | VbeBuffer[3] << 24;
-        Blt->Red      = (UINT8) ((Pixel >> Mode->Red.Position) & Mode->Red.Mask);
-        Blt->Blue     = (UINT8) ((Pixel >> Mode->Blue.Position) & Mode->Blue.Mask);
-        Blt->Green    = (UINT8) ((Pixel >> Mode->Green.Position) & Mode->Green.Mask);
-        Blt->Reserved = 0;
-        Blt++;
-        VbeBuffer += VbePixelWidth;
+    case EfiBltVideoToBltBuffer:
+      for (SrcY = SourceY, DstY = DestinationY; DstY < (Height + DestinationY); SrcY++, DstY++) {
+        Blt = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)(BltUint8 + DstY * Delta + DestinationX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+        //
+        // Shuffle the packed bytes in the hardware buffer to match EFI_GRAPHICS_OUTPUT_BLT_PIXEL
+        //
+        VbeBuffer = ((UINT8 *)VbeFrameBuffer + (SrcY * BytesPerScanLine + SourceX * VbePixelWidth));
+        for (DstX = DestinationX; DstX < (Width + DestinationX); DstX++) {
+          Pixel         = VbeBuffer[0] | VbeBuffer[1] << 8 | VbeBuffer[2] << 16 | VbeBuffer[3] << 24;
+          Blt->Red      = (UINT8)((Pixel >> Mode->Red.Position) & Mode->Red.Mask);
+          Blt->Blue     = (UINT8)((Pixel >> Mode->Blue.Position) & Mode->Blue.Mask);
+          Blt->Green    = (UINT8)((Pixel >> Mode->Green.Position) & Mode->Green.Mask);
+          Blt->Reserved = 0;
+          Blt++;
+          VbeBuffer += VbePixelWidth;
+        }
       }
 
-    }
-    break;
+      break;
 
-  case EfiBltVideoToVideo:
-    for (Index = 0; Index < Height; Index++) {
-      if (DestinationY <= SourceY) {
-        SrcY  = SourceY + Index;
-        DstY  = DestinationY + Index;
-      } else {
-        SrcY  = SourceY + Height - Index - 1;
-        DstY  = DestinationY + Height - Index - 1;
-      }
+    case EfiBltVideoToVideo:
+      for (Index = 0; Index < Height; Index++) {
+        if (DestinationY <= SourceY) {
+          SrcY = SourceY + Index;
+          DstY = DestinationY + Index;
+        } else {
+          SrcY = SourceY + Height - Index - 1;
+          DstY = DestinationY + Height - Index - 1;
+        }
 
-      VbeBuffer   = ((UINT8 *) VbeFrameBuffer + DstY * BytesPerScanLine + DestinationX * VbePixelWidth);
-      VbeBuffer1  = ((UINT8 *) VbeFrameBuffer + SrcY * BytesPerScanLine + SourceX * VbePixelWidth);
+        VbeBuffer  = ((UINT8 *)VbeFrameBuffer + DstY * BytesPerScanLine + DestinationX * VbePixelWidth);
+        VbeBuffer1 = ((UINT8 *)VbeFrameBuffer + SrcY * BytesPerScanLine + SourceX * VbePixelWidth);
 
-      gBS->CopyMem (
-            VbeBuffer,
-            VbeBuffer1,
-            TotalBytes
-            );
-
-      //
-      // Update physical frame buffer.
-      //
-      CopyVideoBuffer (
-        PciIo,
-        VbeBuffer,
-        MemAddress,
-        DestinationX,
-        DstY,
-        TotalBytes,
-        VbePixelWidth,
-        BytesPerScanLine
-        );
-    }
-    break;
-
-  case EfiBltVideoFill:
-    VbeBuffer = (UINT8 *) ((UINTN) VbeFrameBuffer + (DestinationY * BytesPerScanLine) + DestinationX * VbePixelWidth);
-    Blt       = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) BltUint8;
-    //
-    // Shuffle the RGB fields in EFI_GRAPHICS_OUTPUT_BLT_PIXEL to match the hardware buffer
-    //
-    Pixel = ((Blt->Red & Mode->Red.Mask) << Mode->Red.Position) |
-      (
-        (Blt->Green & Mode->Green.Mask) <<
-        Mode->Green.Position
-      ) |
-          ((Blt->Blue & Mode->Blue.Mask) << Mode->Blue.Position);
-
-    for (Index = 0; Index < Width; Index++) {
-      gBS->CopyMem (
-            VbeBuffer,
-            &Pixel,
-            VbePixelWidth
-            );
-      VbeBuffer += VbePixelWidth;
-    }
-
-    VbeBuffer = (UINT8 *) ((UINTN) VbeFrameBuffer + (DestinationY * BytesPerScanLine) + DestinationX * VbePixelWidth);
-    for (DstY = DestinationY + 1; DstY < (Height + DestinationY); DstY++) {
-      gBS->CopyMem (
-            (VOID *) ((UINTN) VbeFrameBuffer + (DstY * BytesPerScanLine) + DestinationX * VbePixelWidth),
-            VbeBuffer,
-            TotalBytes
-            );
-    }
-
-    for (DstY = DestinationY; DstY < (Height + DestinationY); DstY++) {
-      //
-      // Update physical frame buffer.
-      //
-      CopyVideoBuffer (
-        PciIo,
-        VbeBuffer,
-        MemAddress,
-        DestinationX,
-        DstY,
-        TotalBytes,
-        VbePixelWidth,
-        BytesPerScanLine
-        );
-    }
-    break;
-
-  case EfiBltBufferToVideo:
-    for (SrcY = SourceY, DstY = DestinationY; SrcY < (Height + SourceY); SrcY++, DstY++) {
-      Blt       = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) (BltUint8 + (SrcY * Delta) + (SourceX) * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-      VbeBuffer = ((UINT8 *) VbeFrameBuffer + (DstY * BytesPerScanLine + DestinationX * VbePixelWidth));
-      for (DstX = DestinationX; DstX < (Width + DestinationX); DstX++) {
-        //
-        // Shuffle the RGB fields in EFI_GRAPHICS_OUTPUT_BLT_PIXEL to match the hardware buffer
-        //
-        Pixel = ((Blt->Red & Mode->Red.Mask) << Mode->Red.Position) |
-          ((Blt->Green & Mode->Green.Mask) << Mode->Green.Position) |
-            ((Blt->Blue & Mode->Blue.Mask) << Mode->Blue.Position);
         gBS->CopyMem (
-              VbeBuffer,
-              &Pixel,
-              VbePixelWidth
-              );
-        Blt++;
+               VbeBuffer,
+               VbeBuffer1,
+               TotalBytes
+               );
+
+        //
+        // Update physical frame buffer.
+        //
+        CopyVideoBuffer (
+          PciIo,
+          VbeBuffer,
+          MemAddress,
+          DestinationX,
+          DstY,
+          TotalBytes,
+          VbePixelWidth,
+          BytesPerScanLine
+          );
+      }
+
+      break;
+
+    case EfiBltVideoFill:
+      VbeBuffer = (UINT8 *)((UINTN)VbeFrameBuffer + (DestinationY * BytesPerScanLine) + DestinationX * VbePixelWidth);
+      Blt       = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)BltUint8;
+      //
+      // Shuffle the RGB fields in EFI_GRAPHICS_OUTPUT_BLT_PIXEL to match the hardware buffer
+      //
+      Pixel = ((Blt->Red & Mode->Red.Mask) << Mode->Red.Position) |
+              (
+               (Blt->Green & Mode->Green.Mask) <<
+               Mode->Green.Position
+              ) |
+              ((Blt->Blue & Mode->Blue.Mask) << Mode->Blue.Position);
+
+      for (Index = 0; Index < Width; Index++) {
+        gBS->CopyMem (
+               VbeBuffer,
+               &Pixel,
+               VbePixelWidth
+               );
         VbeBuffer += VbePixelWidth;
       }
 
-      VbeBuffer = ((UINT8 *) VbeFrameBuffer + (DstY * BytesPerScanLine + DestinationX * VbePixelWidth));
+      VbeBuffer = (UINT8 *)((UINTN)VbeFrameBuffer + (DestinationY * BytesPerScanLine) + DestinationX * VbePixelWidth);
+      for (DstY = DestinationY + 1; DstY < (Height + DestinationY); DstY++) {
+        gBS->CopyMem (
+               (VOID *)((UINTN)VbeFrameBuffer + (DstY * BytesPerScanLine) + DestinationX * VbePixelWidth),
+               VbeBuffer,
+               TotalBytes
+               );
+      }
 
-      //
-      // Update physical frame buffer.
-      //
-      CopyVideoBuffer (
-        PciIo,
-        VbeBuffer,
-        MemAddress,
-        DestinationX,
-        DstY,
-        TotalBytes,
-        VbePixelWidth,
-        BytesPerScanLine
-        );
-    }
-    break;
+      for (DstY = DestinationY; DstY < (Height + DestinationY); DstY++) {
+        //
+        // Update physical frame buffer.
+        //
+        CopyVideoBuffer (
+          PciIo,
+          VbeBuffer,
+          MemAddress,
+          DestinationX,
+          DstY,
+          TotalBytes,
+          VbePixelWidth,
+          BytesPerScanLine
+          );
+      }
 
-    default: ;
+      break;
+
+    case EfiBltBufferToVideo:
+      for (SrcY = SourceY, DstY = DestinationY; SrcY < (Height + SourceY); SrcY++, DstY++) {
+        Blt       = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)(BltUint8 + (SrcY * Delta) + (SourceX) * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+        VbeBuffer = ((UINT8 *)VbeFrameBuffer + (DstY * BytesPerScanLine + DestinationX * VbePixelWidth));
+        for (DstX = DestinationX; DstX < (Width + DestinationX); DstX++) {
+          //
+          // Shuffle the RGB fields in EFI_GRAPHICS_OUTPUT_BLT_PIXEL to match the hardware buffer
+          //
+          Pixel = ((Blt->Red & Mode->Red.Mask) << Mode->Red.Position) |
+                  ((Blt->Green & Mode->Green.Mask) << Mode->Green.Position) |
+                  ((Blt->Blue & Mode->Blue.Mask) << Mode->Blue.Position);
+          gBS->CopyMem (
+                 VbeBuffer,
+                 &Pixel,
+                 VbePixelWidth
+                 );
+          Blt++;
+          VbeBuffer += VbePixelWidth;
+        }
+
+        VbeBuffer = ((UINT8 *)VbeFrameBuffer + (DstY * BytesPerScanLine + DestinationX * VbePixelWidth));
+
+        //
+        // Update physical frame buffer.
+        //
+        CopyVideoBuffer (
+          PciIo,
+          VbeBuffer,
+          MemAddress,
+          DestinationX,
+          DstY,
+          TotalBytes,
+          VbePixelWidth,
+          BytesPerScanLine
+          );
+      }
+
+      break;
+
+    default:;
   }
 
   gBS->RestoreTPL (OriginalTPL);
@@ -2518,7 +2584,7 @@ EFI_STATUS
 EFIAPI
 BiosVideoGraphicsOutputVbeBlt (
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL       *This,
-  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer, OPTIONAL
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer  OPTIONAL,
   IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
   IN  UINTN                              SourceX,
   IN  UINTN                              SourceY,
@@ -2529,15 +2595,15 @@ BiosVideoGraphicsOutputVbeBlt (
   IN  UINTN                              Delta
   )
 {
-  BIOS_VIDEO_DEV                 *BiosVideoPrivate;
-  BIOS_VIDEO_MODE_DATA           *Mode;
+  BIOS_VIDEO_DEV        *BiosVideoPrivate;
+  BIOS_VIDEO_MODE_DATA  *Mode;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  BiosVideoPrivate  = BIOS_VIDEO_DEV_FROM_GRAPHICS_OUTPUT_THIS (This);
-  Mode              = &BiosVideoPrivate->ModeData[This->Mode->Mode];
+  BiosVideoPrivate = BIOS_VIDEO_DEV_FROM_GRAPHICS_OUTPUT_THIS (This);
+  Mode             = &BiosVideoPrivate->ModeData[This->Mode->Mode];
 
   return BiosVideoVbeBltWorker (
            BiosVideoPrivate,
@@ -2583,7 +2649,6 @@ WriteGraphicsController (
               );
 }
 
-
 /**
   Read the four bit plane of VGA frame buffer.
 
@@ -2606,11 +2671,11 @@ VgaReadBitPlanes (
   UINTN                Height
   )
 {
-  UINTN BitPlane;
-  UINTN Rows;
-  UINTN FrameBufferOffset;
-  UINT8 *Source;
-  UINT8 *Destination;
+  UINTN  BitPlane;
+  UINTN  Rows;
+  UINTN  FrameBufferOffset;
+  UINT8  *Source;
+  UINT8  *Destination;
 
   //
   // Program the Mode Register Write mode 0, Read mode 0
@@ -2624,7 +2689,8 @@ VgaReadBitPlanes (
   for (BitPlane = 0, FrameBufferOffset = 0;
        BitPlane < VGA_NUMBER_OF_BIT_PLANES;
        BitPlane++, FrameBufferOffset += VGA_BYTES_PER_BIT_PLANE
-      ) {
+       )
+  {
     //
     // Program the Read Map Select Register to select the correct bit plane
     //
@@ -2639,17 +2705,16 @@ VgaReadBitPlanes (
 
     for (Rows = 0; Rows < Height; Rows++, Source += VGA_BYTES_PER_SCAN_LINE, Destination += VGA_BYTES_PER_SCAN_LINE) {
       PciIo->Mem.Read (
-                  PciIo,
-                  EfiPciIoWidthUint8,
-                  EFI_PCI_IO_PASS_THROUGH_BAR,
-                  (UINT64) (UINTN) Source,
-                  WidthInBytes,
-                  (VOID *) Destination
-                  );
+                   PciIo,
+                   EfiPciIoWidthUint8,
+                   EFI_PCI_IO_PASS_THROUGH_BAR,
+                   (UINT64)(UINTN)Source,
+                   WidthInBytes,
+                   (VOID *)Destination
+                   );
     }
   }
 }
-
 
 /**
   Internal routine to convert VGA color to Grahpics Output color.
@@ -2670,12 +2735,12 @@ VgaConvertToGraphicsOutputColor (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *BltBuffer
   )
 {
-  UINTN Mask;
-  UINTN Bit;
-  UINTN Color;
+  UINTN  Mask;
+  UINTN  Bit;
+  UINTN  Color;
 
   MemoryBuffer += ((CoordinateY << 6) + (CoordinateY << 4) + (CoordinateX >> 3));
-  Mask = mVgaBitMaskTable[CoordinateX & 0x07];
+  Mask          = mVgaBitMaskTable[CoordinateX & 0x07];
   for (Bit = 0x01, Color = 0; Bit < 0x10; Bit <<= 1, MemoryBuffer += VGA_BYTES_PER_BIT_PLANE) {
     if ((*MemoryBuffer & Mask) != 0) {
       Color |= Bit;
@@ -2695,19 +2760,18 @@ VgaConvertToGraphicsOutputColor (
 **/
 UINT8
 VgaConvertColor (
-  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL          *BltBuffer
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *BltBuffer
   )
 {
-  UINT8 Color;
+  UINT8  Color;
 
-  Color = (UINT8) ((BltBuffer->Blue >> 7) | ((BltBuffer->Green >> 6) & 0x02) | ((BltBuffer->Red >> 5) & 0x04));
+  Color = (UINT8)((BltBuffer->Blue >> 7) | ((BltBuffer->Green >> 6) & 0x02) | ((BltBuffer->Red >> 5) & 0x04));
   if ((BltBuffer->Red + BltBuffer->Green + BltBuffer->Blue) > 0x180) {
     Color |= 0x08;
   }
 
   return Color;
 }
-
 
 /**
   Grahpics Output protocol instance to block transfer for VGA device.
@@ -2740,7 +2804,7 @@ EFI_STATUS
 EFIAPI
 BiosVideoGraphicsOutputVgaBlt (
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL       *This,
-  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer, OPTIONAL
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer  OPTIONAL,
   IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
   IN  UINTN                              SourceX,
   IN  UINTN                              SourceY,
@@ -2751,51 +2815,51 @@ BiosVideoGraphicsOutputVgaBlt (
   IN  UINTN                              Delta
   )
 {
-  BIOS_VIDEO_DEV      *BiosVideoPrivate;
-  EFI_TPL             OriginalTPL;
-  UINT8               *MemAddress;
-  UINTN               BytesPerScanLine;
-  UINTN               Bit;
-  UINTN               Index;
-  UINTN               Index1;
-  UINTN               StartAddress;
-  UINTN               Bytes;
-  UINTN               Offset;
-  UINT8               LeftMask;
-  UINT8               RightMask;
-  UINTN               Address;
-  UINTN               AddressFix;
-  UINT8               *Address1;
-  UINT8               *SourceAddress;
-  UINT8               *DestinationAddress;
-  EFI_PCI_IO_PROTOCOL *PciIo;
-  UINT8               Data;
-  UINT8               PixelColor;
-  UINT8               *VgaFrameBuffer;
-  UINTN               SourceOffset;
-  UINTN               SourceWidth;
-  UINTN               Rows;
-  UINTN               Columns;
-  UINTN               CoordinateX;
-  UINTN               CoordinateY;
-  UINTN               CurrentMode;
+  BIOS_VIDEO_DEV       *BiosVideoPrivate;
+  EFI_TPL              OriginalTPL;
+  UINT8                *MemAddress;
+  UINTN                BytesPerScanLine;
+  UINTN                Bit;
+  UINTN                Index;
+  UINTN                Index1;
+  UINTN                StartAddress;
+  UINTN                Bytes;
+  UINTN                Offset;
+  UINT8                LeftMask;
+  UINT8                RightMask;
+  UINTN                Address;
+  UINTN                AddressFix;
+  UINT8                *Address1;
+  UINT8                *SourceAddress;
+  UINT8                *DestinationAddress;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  UINT8                Data;
+  UINT8                PixelColor;
+  UINT8                *VgaFrameBuffer;
+  UINTN                SourceOffset;
+  UINTN                SourceWidth;
+  UINTN                Rows;
+  UINTN                Columns;
+  UINTN                CoordinateX;
+  UINTN                CoordinateY;
+  UINTN                CurrentMode;
 
-  if (This == NULL || ((UINTN) BltOperation) >= EfiGraphicsOutputBltOperationMax) {
+  if ((This == NULL) || (((UINTN)BltOperation) >= EfiGraphicsOutputBltOperationMax)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  BiosVideoPrivate  = BIOS_VIDEO_DEV_FROM_GRAPHICS_OUTPUT_THIS (This);
+  BiosVideoPrivate = BIOS_VIDEO_DEV_FROM_GRAPHICS_OUTPUT_THIS (This);
 
-  CurrentMode = This->Mode->Mode;
-  PciIo             = BiosVideoPrivate->PciIo;
-  MemAddress        = BiosVideoPrivate->ModeData[CurrentMode].LinearFrameBuffer;
-  BytesPerScanLine  = BiosVideoPrivate->ModeData[CurrentMode].BytesPerScanLine >> 3;
-  VgaFrameBuffer    = BiosVideoPrivate->VgaFrameBuffer;
+  CurrentMode      = This->Mode->Mode;
+  PciIo            = BiosVideoPrivate->PciIo;
+  MemAddress       = BiosVideoPrivate->ModeData[CurrentMode].LinearFrameBuffer;
+  BytesPerScanLine = BiosVideoPrivate->ModeData[CurrentMode].BytesPerScanLine >> 3;
+  VgaFrameBuffer   = BiosVideoPrivate->VgaFrameBuffer;
 
-
-  if (Width == 0 || Height == 0) {
+  if ((Width == 0) || (Height == 0)) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // We need to fill the Virtual Screen buffer with the blt data.
   // The virtual screen is upside down, as the first row is the bootom row of
@@ -2824,6 +2888,7 @@ BiosVideoGraphicsOutputVgaBlt (
       return EFI_INVALID_PARAMETER;
     }
   }
+
   //
   // If Delta is zero, then the entire BltBuffer is being used, so Delta
   // is the number of bytes in each row of BltBuffer.  Since BltBuffer is Width pixels size,
@@ -2832,6 +2897,7 @@ BiosVideoGraphicsOutputVgaBlt (
   if (Delta == 0) {
     Delta = Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
   }
+
   //
   // We have to raise to TPL Notify, so we make an atomic write the frame buffer.
   // We would not want a timer based event (Cursor, ...) to come in while we are
@@ -2843,67 +2909,10 @@ BiosVideoGraphicsOutputVgaBlt (
   // Compute some values we need for VGA
   //
   switch (BltOperation) {
-  case EfiBltVideoToBltBuffer:
+    case EfiBltVideoToBltBuffer:
 
-    SourceOffset  = (SourceY << 6) + (SourceY << 4) + (SourceX >> 3);
-    SourceWidth   = ((SourceX + Width - 1) >> 3) - (SourceX >> 3) + 1;
-
-    //
-    // Read all the pixels in the 4 bit planes into a memory buffer that looks like the VGA buffer
-    //
-    VgaReadBitPlanes (
-      PciIo,
-      MemAddress + SourceOffset,
-      VgaFrameBuffer + SourceOffset,
-      SourceWidth,
-      Height
-      );
-
-    //
-    // Convert VGA Bit Planes to a Graphics Output 32-bit color value
-    //
-    BltBuffer += (DestinationY * (Delta >> 2) + DestinationX);
-    for (Rows = 0, CoordinateY = SourceY; Rows < Height; Rows++, CoordinateY++, BltBuffer += (Delta >> 2)) {
-      for (Columns = 0, CoordinateX = SourceX; Columns < Width; Columns++, CoordinateX++, BltBuffer++) {
-        VgaConvertToGraphicsOutputColor (VgaFrameBuffer, CoordinateX, CoordinateY, BltBuffer);
-      }
-
-      BltBuffer -= Width;
-    }
-
-    break;
-
-  case EfiBltVideoToVideo:
-    //
-    // Check for an aligned Video to Video operation
-    //
-    if ((SourceX & 0x07) == 0x00 && (DestinationX & 0x07) == 0x00 && (Width & 0x07) == 0x00) {
-      //
-      // Program the Mode Register Write mode 1, Read mode 0
-      //
-      WriteGraphicsController (
-        PciIo,
-        VGA_GRAPHICS_CONTROLLER_MODE_REGISTER,
-        VGA_GRAPHICS_CONTROLLER_READ_MODE_0 | VGA_GRAPHICS_CONTROLLER_WRITE_MODE_1
-        );
-
-      SourceAddress       = (UINT8 *) (MemAddress + (SourceY << 6) + (SourceY << 4) + (SourceX >> 3));
-      DestinationAddress  = (UINT8 *) (MemAddress + (DestinationY << 6) + (DestinationY << 4) + (DestinationX >> 3));
-      Bytes               = Width >> 3;
-      for (Index = 0, Offset = 0; Index < Height; Index++, Offset += BytesPerScanLine) {
-        PciIo->CopyMem (
-                PciIo,
-                EfiPciIoWidthUint8,
-                EFI_PCI_IO_PASS_THROUGH_BAR,
-                (UINT64) (UINTN) (DestinationAddress + Offset),
-                EFI_PCI_IO_PASS_THROUGH_BAR,
-                (UINT64) (UINTN) (SourceAddress + Offset),
-                Bytes
-                );
-      }
-    } else {
-      SourceOffset  = (SourceY << 6) + (SourceY << 4) + (SourceX >> 3);
-      SourceWidth   = ((SourceX + Width - 1) >> 3) - (SourceX >> 3) + 1;
+      SourceOffset = (SourceY << 6) + (SourceY << 4) + (SourceX >> 3);
+      SourceWidth  = ((SourceX + Width - 1) >> 3) - (SourceX >> 3) + 1;
 
       //
       // Read all the pixels in the 4 bit planes into a memory buffer that looks like the VGA buffer
@@ -2915,175 +2924,109 @@ BiosVideoGraphicsOutputVgaBlt (
         SourceWidth,
         Height
         );
-    }
 
-    break;
-
-  case EfiBltVideoFill:
-    StartAddress  = (UINTN) (MemAddress + (DestinationY << 6) + (DestinationY << 4) + (DestinationX >> 3));
-    Bytes         = ((DestinationX + Width - 1) >> 3) - (DestinationX >> 3);
-    LeftMask      = mVgaLeftMaskTable[DestinationX & 0x07];
-    RightMask     = mVgaRightMaskTable[(DestinationX + Width - 1) & 0x07];
-    if (Bytes == 0) {
-      LeftMask = (UINT8) (LeftMask & RightMask);
-      RightMask = 0;
-    }
-
-    if (LeftMask == 0xff) {
-      StartAddress--;
-      Bytes++;
-      LeftMask = 0;
-    }
-
-    if (RightMask == 0xff) {
-      Bytes++;
-      RightMask = 0;
-    }
-
-    PixelColor = VgaConvertColor (BltBuffer);
-
-    //
-    // Program the Mode Register Write mode 2, Read mode 0
-    //
-    WriteGraphicsController (
-      PciIo,
-      VGA_GRAPHICS_CONTROLLER_MODE_REGISTER,
-      VGA_GRAPHICS_CONTROLLER_READ_MODE_0 | VGA_GRAPHICS_CONTROLLER_WRITE_MODE_2
-      );
-
-    //
-    // Program the Data Rotate/Function Select Register to replace
-    //
-    WriteGraphicsController (
-      PciIo,
-      VGA_GRAPHICS_CONTROLLER_DATA_ROTATE_REGISTER,
-      VGA_GRAPHICS_CONTROLLER_FUNCTION_REPLACE
-      );
-
-    if (LeftMask != 0) {
       //
-      // Program the BitMask register with the Left column mask
+      // Convert VGA Bit Planes to a Graphics Output 32-bit color value
+      //
+      BltBuffer += (DestinationY * (Delta >> 2) + DestinationX);
+      for (Rows = 0, CoordinateY = SourceY; Rows < Height; Rows++, CoordinateY++, BltBuffer += (Delta >> 2)) {
+        for (Columns = 0, CoordinateX = SourceX; Columns < Width; Columns++, CoordinateX++, BltBuffer++) {
+          VgaConvertToGraphicsOutputColor (VgaFrameBuffer, CoordinateX, CoordinateY, BltBuffer);
+        }
+
+        BltBuffer -= Width;
+      }
+
+      break;
+
+    case EfiBltVideoToVideo:
+      //
+      // Check for an aligned Video to Video operation
+      //
+      if (((SourceX & 0x07) == 0x00) && ((DestinationX & 0x07) == 0x00) && ((Width & 0x07) == 0x00)) {
+        //
+        // Program the Mode Register Write mode 1, Read mode 0
+        //
+        WriteGraphicsController (
+          PciIo,
+          VGA_GRAPHICS_CONTROLLER_MODE_REGISTER,
+          VGA_GRAPHICS_CONTROLLER_READ_MODE_0 | VGA_GRAPHICS_CONTROLLER_WRITE_MODE_1
+          );
+
+        SourceAddress      = (UINT8 *)(MemAddress + (SourceY << 6) + (SourceY << 4) + (SourceX >> 3));
+        DestinationAddress = (UINT8 *)(MemAddress + (DestinationY << 6) + (DestinationY << 4) + (DestinationX >> 3));
+        Bytes              = Width >> 3;
+        for (Index = 0, Offset = 0; Index < Height; Index++, Offset += BytesPerScanLine) {
+          PciIo->CopyMem (
+                   PciIo,
+                   EfiPciIoWidthUint8,
+                   EFI_PCI_IO_PASS_THROUGH_BAR,
+                   (UINT64)(UINTN)(DestinationAddress + Offset),
+                   EFI_PCI_IO_PASS_THROUGH_BAR,
+                   (UINT64)(UINTN)(SourceAddress + Offset),
+                   Bytes
+                   );
+        }
+      } else {
+        SourceOffset = (SourceY << 6) + (SourceY << 4) + (SourceX >> 3);
+        SourceWidth  = ((SourceX + Width - 1) >> 3) - (SourceX >> 3) + 1;
+
+        //
+        // Read all the pixels in the 4 bit planes into a memory buffer that looks like the VGA buffer
+        //
+        VgaReadBitPlanes (
+          PciIo,
+          MemAddress + SourceOffset,
+          VgaFrameBuffer + SourceOffset,
+          SourceWidth,
+          Height
+          );
+      }
+
+      break;
+
+    case EfiBltVideoFill:
+      StartAddress = (UINTN)(MemAddress + (DestinationY << 6) + (DestinationY << 4) + (DestinationX >> 3));
+      Bytes        = ((DestinationX + Width - 1) >> 3) - (DestinationX >> 3);
+      LeftMask     = mVgaLeftMaskTable[DestinationX & 0x07];
+      RightMask    = mVgaRightMaskTable[(DestinationX + Width - 1) & 0x07];
+      if (Bytes == 0) {
+        LeftMask  = (UINT8)(LeftMask & RightMask);
+        RightMask = 0;
+      }
+
+      if (LeftMask == 0xff) {
+        StartAddress--;
+        Bytes++;
+        LeftMask = 0;
+      }
+
+      if (RightMask == 0xff) {
+        Bytes++;
+        RightMask = 0;
+      }
+
+      PixelColor = VgaConvertColor (BltBuffer);
+
+      //
+      // Program the Mode Register Write mode 2, Read mode 0
       //
       WriteGraphicsController (
         PciIo,
-        VGA_GRAPHICS_CONTROLLER_BIT_MASK_REGISTER,
-        LeftMask
+        VGA_GRAPHICS_CONTROLLER_MODE_REGISTER,
+        VGA_GRAPHICS_CONTROLLER_READ_MODE_0 | VGA_GRAPHICS_CONTROLLER_WRITE_MODE_2
         );
 
-      for (Index = 0, Address = StartAddress; Index < Height; Index++, Address += BytesPerScanLine) {
-        //
-        // Read data from the bit planes into the latches
-        //
-        PciIo->Mem.Read (
-                    PciIo,
-                    EfiPciIoWidthUint8,
-                    EFI_PCI_IO_PASS_THROUGH_BAR,
-                    (UINT64) (UINTN) Address,
-                    1,
-                    &Data
-                    );
-        //
-        // Write the lower 4 bits of PixelColor to the bit planes in the pixels enabled by BitMask
-        //
-        PciIo->Mem.Write (
-                    PciIo,
-                    EfiPciIoWidthUint8,
-                    EFI_PCI_IO_PASS_THROUGH_BAR,
-                    (UINT64) (UINTN) Address,
-                    1,
-                    &PixelColor
-                    );
-      }
-    }
-
-    if (Bytes > 1) {
       //
-      // Program the BitMask register with the middle column mask of 0xff
+      // Program the Data Rotate/Function Select Register to replace
       //
       WriteGraphicsController (
         PciIo,
-        VGA_GRAPHICS_CONTROLLER_BIT_MASK_REGISTER,
-        0xff
+        VGA_GRAPHICS_CONTROLLER_DATA_ROTATE_REGISTER,
+        VGA_GRAPHICS_CONTROLLER_FUNCTION_REPLACE
         );
 
-      for (Index = 0, Address = StartAddress + 1; Index < Height; Index++, Address += BytesPerScanLine) {
-        PciIo->Mem.Write (
-                    PciIo,
-                    EfiPciIoWidthFillUint8,
-                    EFI_PCI_IO_PASS_THROUGH_BAR,
-                    (UINT64) (UINTN) Address,
-                    Bytes - 1,
-                    &PixelColor
-                    );
-      }
-    }
-
-    if (RightMask != 0) {
-      //
-      // Program the BitMask register with the Right column mask
-      //
-      WriteGraphicsController (
-        PciIo,
-        VGA_GRAPHICS_CONTROLLER_BIT_MASK_REGISTER,
-        RightMask
-        );
-
-      for (Index = 0, Address = StartAddress + Bytes; Index < Height; Index++, Address += BytesPerScanLine) {
-        //
-        // Read data from the bit planes into the latches
-        //
-        PciIo->Mem.Read (
-                    PciIo,
-                    EfiPciIoWidthUint8,
-                    EFI_PCI_IO_PASS_THROUGH_BAR,
-                    (UINT64) (UINTN) Address,
-                    1,
-                    &Data
-                    );
-        //
-        // Write the lower 4 bits of PixelColor to the bit planes in the pixels enabled by BitMask
-        //
-        PciIo->Mem.Write (
-                    PciIo,
-                    EfiPciIoWidthUint8,
-                    EFI_PCI_IO_PASS_THROUGH_BAR,
-                    (UINT64) (UINTN) Address,
-                    1,
-                    &PixelColor
-                    );
-      }
-    }
-    break;
-
-  case EfiBltBufferToVideo:
-    StartAddress  = (UINTN) (MemAddress + (DestinationY << 6) + (DestinationY << 4) + (DestinationX >> 3));
-    LeftMask      = mVgaBitMaskTable[DestinationX & 0x07];
-
-    //
-    // Program the Mode Register Write mode 2, Read mode 0
-    //
-    WriteGraphicsController (
-      PciIo,
-      VGA_GRAPHICS_CONTROLLER_MODE_REGISTER,
-      VGA_GRAPHICS_CONTROLLER_READ_MODE_0 | VGA_GRAPHICS_CONTROLLER_WRITE_MODE_2
-      );
-
-    //
-    // Program the Data Rotate/Function Select Register to replace
-    //
-    WriteGraphicsController (
-      PciIo,
-      VGA_GRAPHICS_CONTROLLER_DATA_ROTATE_REGISTER,
-      VGA_GRAPHICS_CONTROLLER_FUNCTION_REPLACE
-      );
-
-    for (Index = 0, Address = StartAddress; Index < Height; Index++, Address += BytesPerScanLine) {
-      for (Index1 = 0; Index1 < Width; Index1++) {
-        BiosVideoPrivate->LineBuffer[Index1] = VgaConvertColor (&BltBuffer[(SourceY + Index) * (Delta >> 2) + SourceX + Index1]);
-      }
-      AddressFix = Address;
-
-      for (Bit = 0; Bit < 8; Bit++) {
+      if (LeftMask != 0) {
         //
         // Program the BitMask register with the Left column mask
         //
@@ -3093,40 +3036,165 @@ BiosVideoGraphicsOutputVgaBlt (
           LeftMask
           );
 
-        for (Index1 = Bit, Address1 = (UINT8 *) AddressFix; Index1 < Width; Index1 += 8, Address1++) {
+        for (Index = 0, Address = StartAddress; Index < Height; Index++, Address += BytesPerScanLine) {
           //
           // Read data from the bit planes into the latches
           //
           PciIo->Mem.Read (
-                      PciIo,
-                      EfiPciIoWidthUint8,
-                      EFI_PCI_IO_PASS_THROUGH_BAR,
-                      (UINT64) (UINTN) Address1,
-                      1,
-                      &Data
-                      );
-
+                       PciIo,
+                       EfiPciIoWidthUint8,
+                       EFI_PCI_IO_PASS_THROUGH_BAR,
+                       (UINT64)(UINTN)Address,
+                       1,
+                       &Data
+                       );
+          //
+          // Write the lower 4 bits of PixelColor to the bit planes in the pixels enabled by BitMask
+          //
           PciIo->Mem.Write (
-                      PciIo,
-                      EfiPciIoWidthUint8,
-                      EFI_PCI_IO_PASS_THROUGH_BAR,
-                      (UINT64) (UINTN) Address1,
-                      1,
-                      &BiosVideoPrivate->LineBuffer[Index1]
-                      );
-        }
-
-        LeftMask = (UINT8) (LeftMask >> 1);
-        if (LeftMask == 0) {
-          LeftMask = 0x80;
-          AddressFix++;
+                       PciIo,
+                       EfiPciIoWidthUint8,
+                       EFI_PCI_IO_PASS_THROUGH_BAR,
+                       (UINT64)(UINTN)Address,
+                       1,
+                       &PixelColor
+                       );
         }
       }
-    }
 
-    break;
+      if (Bytes > 1) {
+        //
+        // Program the BitMask register with the middle column mask of 0xff
+        //
+        WriteGraphicsController (
+          PciIo,
+          VGA_GRAPHICS_CONTROLLER_BIT_MASK_REGISTER,
+          0xff
+          );
 
-    default: ;
+        for (Index = 0, Address = StartAddress + 1; Index < Height; Index++, Address += BytesPerScanLine) {
+          PciIo->Mem.Write (
+                       PciIo,
+                       EfiPciIoWidthFillUint8,
+                       EFI_PCI_IO_PASS_THROUGH_BAR,
+                       (UINT64)(UINTN)Address,
+                       Bytes - 1,
+                       &PixelColor
+                       );
+        }
+      }
+
+      if (RightMask != 0) {
+        //
+        // Program the BitMask register with the Right column mask
+        //
+        WriteGraphicsController (
+          PciIo,
+          VGA_GRAPHICS_CONTROLLER_BIT_MASK_REGISTER,
+          RightMask
+          );
+
+        for (Index = 0, Address = StartAddress + Bytes; Index < Height; Index++, Address += BytesPerScanLine) {
+          //
+          // Read data from the bit planes into the latches
+          //
+          PciIo->Mem.Read (
+                       PciIo,
+                       EfiPciIoWidthUint8,
+                       EFI_PCI_IO_PASS_THROUGH_BAR,
+                       (UINT64)(UINTN)Address,
+                       1,
+                       &Data
+                       );
+          //
+          // Write the lower 4 bits of PixelColor to the bit planes in the pixels enabled by BitMask
+          //
+          PciIo->Mem.Write (
+                       PciIo,
+                       EfiPciIoWidthUint8,
+                       EFI_PCI_IO_PASS_THROUGH_BAR,
+                       (UINT64)(UINTN)Address,
+                       1,
+                       &PixelColor
+                       );
+        }
+      }
+
+      break;
+
+    case EfiBltBufferToVideo:
+      StartAddress = (UINTN)(MemAddress + (DestinationY << 6) + (DestinationY << 4) + (DestinationX >> 3));
+      LeftMask     = mVgaBitMaskTable[DestinationX & 0x07];
+
+      //
+      // Program the Mode Register Write mode 2, Read mode 0
+      //
+      WriteGraphicsController (
+        PciIo,
+        VGA_GRAPHICS_CONTROLLER_MODE_REGISTER,
+        VGA_GRAPHICS_CONTROLLER_READ_MODE_0 | VGA_GRAPHICS_CONTROLLER_WRITE_MODE_2
+        );
+
+      //
+      // Program the Data Rotate/Function Select Register to replace
+      //
+      WriteGraphicsController (
+        PciIo,
+        VGA_GRAPHICS_CONTROLLER_DATA_ROTATE_REGISTER,
+        VGA_GRAPHICS_CONTROLLER_FUNCTION_REPLACE
+        );
+
+      for (Index = 0, Address = StartAddress; Index < Height; Index++, Address += BytesPerScanLine) {
+        for (Index1 = 0; Index1 < Width; Index1++) {
+          BiosVideoPrivate->LineBuffer[Index1] = VgaConvertColor (&BltBuffer[(SourceY + Index) * (Delta >> 2) + SourceX + Index1]);
+        }
+
+        AddressFix = Address;
+
+        for (Bit = 0; Bit < 8; Bit++) {
+          //
+          // Program the BitMask register with the Left column mask
+          //
+          WriteGraphicsController (
+            PciIo,
+            VGA_GRAPHICS_CONTROLLER_BIT_MASK_REGISTER,
+            LeftMask
+            );
+
+          for (Index1 = Bit, Address1 = (UINT8 *)AddressFix; Index1 < Width; Index1 += 8, Address1++) {
+            //
+            // Read data from the bit planes into the latches
+            //
+            PciIo->Mem.Read (
+                         PciIo,
+                         EfiPciIoWidthUint8,
+                         EFI_PCI_IO_PASS_THROUGH_BAR,
+                         (UINT64)(UINTN)Address1,
+                         1,
+                         &Data
+                         );
+
+            PciIo->Mem.Write (
+                         PciIo,
+                         EfiPciIoWidthUint8,
+                         EFI_PCI_IO_PASS_THROUGH_BAR,
+                         (UINT64)(UINTN)Address1,
+                         1,
+                         &BiosVideoPrivate->LineBuffer[Index1]
+                         );
+          }
+
+          LeftMask = (UINT8)(LeftMask >> 1);
+          if (LeftMask == 0) {
+            LeftMask = 0x80;
+            AddressFix++;
+          }
+        }
+      }
+
+      break;
+
+    default:;
   }
 
   gBS->RestoreTPL (OriginalTPL);
@@ -3155,8 +3223,8 @@ BiosVideoVgaMiniPortSetMode (
   IN  UINTN                       ModeNumber
   )
 {
-  BIOS_VIDEO_DEV        *BiosVideoPrivate;
-  EFI_IA32_REGISTER_SET Regs;
+  BIOS_VIDEO_DEV         *BiosVideoPrivate;
+  EFI_IA32_REGISTER_SET  Regs;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -3168,41 +3236,42 @@ BiosVideoVgaMiniPortSetMode (
   if (ModeNumber >= This->MaxMode) {
     return EFI_UNSUPPORTED;
   }
+
   //
   // Get the device structure for this device
   //
   BiosVideoPrivate = BIOS_VIDEO_DEV_FROM_VGA_MINI_PORT_THIS (This);
 
   switch (ModeNumber) {
-  case 0:
-    //
-    // Set the 80x25 Text VGA Mode
-    //
-    Regs.H.AH = 0x00;
-    Regs.H.AL = 0x83;
-    BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
+    case 0:
+      //
+      // Set the 80x25 Text VGA Mode
+      //
+      Regs.H.AH = 0x00;
+      Regs.H.AL = 0x83;
+      BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
 
-    Regs.H.AH = 0x11;
-    Regs.H.AL = 0x14;
-    Regs.H.BL = 0;
-    BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
-    break;
+      Regs.H.AH = 0x11;
+      Regs.H.AL = 0x14;
+      Regs.H.BL = 0;
+      BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
+      break;
 
-  case 1:
-    //
-    // Set the 80x50 Text VGA Mode
-    //
-    Regs.H.AH = 0x00;
-    Regs.H.AL = 0x83;
-    BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
-    Regs.H.AH = 0x11;
-    Regs.H.AL = 0x12;
-    Regs.H.BL = 0;
-    BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
-    break;
+    case 1:
+      //
+      // Set the 80x50 Text VGA Mode
+      //
+      Regs.H.AH = 0x00;
+      Regs.H.AL = 0x83;
+      BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
+      Regs.H.AH = 0x11;
+      Regs.H.AL = 0x12;
+      Regs.H.BL = 0;
+      BiosVideoPrivate->LegacyBios->Int86 (BiosVideoPrivate->LegacyBios, 0x10, &Regs);
+      break;
 
-  default:
-    return EFI_UNSUPPORTED;
+    default:
+      return EFI_UNSUPPORTED;
   }
 
   return EFI_SUCCESS;
@@ -3218,14 +3287,14 @@ BiosVideoVgaMiniPortSetMode (
 VOID
 EFIAPI
 BiosVideoNotifyExitBootServices (
-  IN  EFI_EVENT Event,
-  IN  VOID      *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   )
 {
   BIOS_VIDEO_DEV         *BiosVideoPrivate;
   EFI_IA32_REGISTER_SET  Regs;
 
-  BiosVideoPrivate  = (BIOS_VIDEO_DEV *)Context;
+  BiosVideoPrivate = (BIOS_VIDEO_DEV *)Context;
 
   //
   // Set the 80x25 Text VGA Mode
@@ -3256,9 +3325,9 @@ BiosVideoNotifyExitBootServices (
 **/
 EFI_STATUS
 EFIAPI
-BiosVideoEntryPoint(
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+BiosVideoEntryPoint (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -3286,4 +3355,3 @@ BiosVideoEntryPoint(
                 NULL
                 );
 }
-

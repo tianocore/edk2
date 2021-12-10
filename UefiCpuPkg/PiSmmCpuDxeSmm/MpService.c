@@ -13,18 +13,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Slots for all MTRR( FIXED MTRR + VARIABLE MTRR + MTRR_LIB_IA32_MTRR_DEF_TYPE)
 //
-MTRR_SETTINGS                               gSmiMtrrs;
-UINT64                                      gPhyMask;
-SMM_DISPATCHER_MP_SYNC_DATA                 *mSmmMpSyncData = NULL;
-UINTN                                       mSmmMpSyncDataSize;
-SMM_CPU_SEMAPHORES                          mSmmCpuSemaphores;
-UINTN                                       mSemaphoreSize;
-SPIN_LOCK                                   *mPFLock = NULL;
-SMM_CPU_SYNC_MODE                           mCpuSmmSyncMode;
-BOOLEAN                                     mMachineCheckSupported = FALSE;
-MM_COMPLETION                               mSmmStartupThisApToken;
+MTRR_SETTINGS                gSmiMtrrs;
+UINT64                       gPhyMask;
+SMM_DISPATCHER_MP_SYNC_DATA  *mSmmMpSyncData = NULL;
+UINTN                        mSmmMpSyncDataSize;
+SMM_CPU_SEMAPHORES           mSmmCpuSemaphores;
+UINTN                        mSemaphoreSize;
+SPIN_LOCK                    *mPFLock = NULL;
+SMM_CPU_SYNC_MODE            mCpuSmmSyncMode;
+BOOLEAN                      mMachineCheckSupported = FALSE;
+MM_COMPLETION                mSmmStartupThisApToken;
 
-extern UINTN mSmmShadowStackSize;
+extern UINTN  mSmmShadowStackSize;
 
 /**
   Performs an atomic compare exchange operation to get semaphore.
@@ -38,26 +38,28 @@ extern UINTN mSmmShadowStackSize;
 **/
 UINT32
 WaitForSemaphore (
-  IN OUT  volatile UINT32           *Sem
+  IN OUT  volatile UINT32  *Sem
   )
 {
-  UINT32                            Value;
+  UINT32  Value;
 
-  for (;;) {
+  for ( ; ;) {
     Value = *Sem;
-    if (Value != 0 &&
-        InterlockedCompareExchange32 (
-          (UINT32*)Sem,
-          Value,
-          Value - 1
-          ) == Value) {
+    if ((Value != 0) &&
+        (InterlockedCompareExchange32 (
+           (UINT32 *)Sem,
+           Value,
+           Value - 1
+           ) == Value))
+    {
       break;
     }
+
     CpuPause ();
   }
+
   return Value - 1;
 }
-
 
 /**
   Performs an atomic compare exchange operation to release semaphore.
@@ -71,19 +73,20 @@ WaitForSemaphore (
 **/
 UINT32
 ReleaseSemaphore (
-  IN OUT  volatile UINT32           *Sem
+  IN OUT  volatile UINT32  *Sem
   )
 {
-  UINT32                            Value;
+  UINT32  Value;
 
   do {
     Value = *Sem;
   } while (Value + 1 != 0 &&
            InterlockedCompareExchange32 (
-             (UINT32*)Sem,
+             (UINT32 *)Sem,
              Value,
              Value + 1
              ) != Value);
+
   return Value + 1;
 }
 
@@ -99,17 +102,19 @@ ReleaseSemaphore (
 **/
 UINT32
 LockdownSemaphore (
-  IN OUT  volatile UINT32           *Sem
+  IN OUT  volatile UINT32  *Sem
   )
 {
-  UINT32                            Value;
+  UINT32  Value;
 
   do {
     Value = *Sem;
   } while (InterlockedCompareExchange32 (
-             (UINT32*)Sem,
-             Value, (UINT32)-1
+             (UINT32 *)Sem,
+             Value,
+             (UINT32)-1
              ) != Value);
+
   return Value;
 }
 
@@ -121,10 +126,10 @@ LockdownSemaphore (
 **/
 VOID
 WaitForAllAPs (
-  IN      UINTN                     NumberOfAPs
+  IN      UINTN  NumberOfAPs
   )
 {
-  UINTN                             BspIndex;
+  UINTN  BspIndex;
 
   BspIndex = mSmmMpSyncData->BspIndex;
   while (NumberOfAPs-- > 0) {
@@ -142,7 +147,7 @@ ReleaseAllAPs (
   VOID
   )
 {
-  UINTN                             Index;
+  UINTN  Index;
 
   for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
     if (IsPresentAp (Index)) {
@@ -165,9 +170,9 @@ AllCpusInSmmWithExceptions (
   SMM_CPU_ARRIVAL_EXCEPTIONS  Exceptions
   )
 {
-  UINTN                             Index;
-  SMM_CPU_DATA_BLOCK                *CpuData;
-  EFI_PROCESSOR_INFORMATION         *ProcessorInfo;
+  UINTN                      Index;
+  SMM_CPU_DATA_BLOCK         *CpuData;
+  EFI_PROCESSOR_INFORMATION  *ProcessorInfo;
 
   ASSERT (*mSmmMpSyncData->Counter <= mNumberOfCpus);
 
@@ -175,23 +180,25 @@ AllCpusInSmmWithExceptions (
     return TRUE;
   }
 
-  CpuData = mSmmMpSyncData->CpuData;
+  CpuData       = mSmmMpSyncData->CpuData;
   ProcessorInfo = gSmmCpuPrivate->ProcessorInfo;
   for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
-    if (!(*(CpuData[Index].Present)) && ProcessorInfo[Index].ProcessorId != INVALID_APIC_ID) {
-      if (((Exceptions & ARRIVAL_EXCEPTION_DELAYED) != 0) && SmmCpuFeaturesGetSmmRegister (Index, SmmRegSmmDelayed) != 0) {
+    if (!(*(CpuData[Index].Present)) && (ProcessorInfo[Index].ProcessorId != INVALID_APIC_ID)) {
+      if (((Exceptions & ARRIVAL_EXCEPTION_DELAYED) != 0) && (SmmCpuFeaturesGetSmmRegister (Index, SmmRegSmmDelayed) != 0)) {
         continue;
       }
-      if (((Exceptions & ARRIVAL_EXCEPTION_BLOCKED) != 0) && SmmCpuFeaturesGetSmmRegister (Index, SmmRegSmmBlocked) != 0) {
+
+      if (((Exceptions & ARRIVAL_EXCEPTION_BLOCKED) != 0) && (SmmCpuFeaturesGetSmmRegister (Index, SmmRegSmmBlocked) != 0)) {
         continue;
       }
-      if (((Exceptions & ARRIVAL_EXCEPTION_SMI_DISABLED) != 0) && SmmCpuFeaturesGetSmmRegister (Index, SmmRegSmmEnable) != 0) {
+
+      if (((Exceptions & ARRIVAL_EXCEPTION_SMI_DISABLED) != 0) && (SmmCpuFeaturesGetSmmRegister (Index, SmmRegSmmEnable) != 0)) {
         continue;
       }
+
       return FALSE;
     }
   }
-
 
   return TRUE;
 }
@@ -223,7 +230,7 @@ IsLmceOsEnabled (
   }
 
   McgExtCtrl.Uint64 = AsmReadMsr64 (MSR_IA32_MCG_EXT_CTL);
-  return (BOOLEAN) (McgExtCtrl.Bits.LMCE_EN == 1);
+  return (BOOLEAN)(McgExtCtrl.Bits.LMCE_EN == 1);
 }
 
 /**
@@ -241,10 +248,10 @@ IsLmceSignaled (
   VOID
   )
 {
-  MSR_IA32_MCG_STATUS_REGISTER McgStatus;
+  MSR_IA32_MCG_STATUS_REGISTER  McgStatus;
 
   McgStatus.Uint64 = AsmReadMsr64 (MSR_IA32_MCG_STATUS);
-  return (BOOLEAN) (McgStatus.Bits.LMCE_S == 1);
+  return (BOOLEAN)(McgStatus.Bits.LMCE_S == 1);
 }
 
 /**
@@ -257,10 +264,10 @@ SmmWaitForApArrival (
   VOID
   )
 {
-  UINT64                            Timer;
-  UINTN                             Index;
-  BOOLEAN                           LmceEn;
-  BOOLEAN                           LmceSignal;
+  UINT64   Timer;
+  UINTN    Index;
+  BOOLEAN  LmceEn;
+  BOOLEAN  LmceSignal;
 
   ASSERT (*mSmmMpSyncData->Counter <= mNumberOfCpus);
 
@@ -268,7 +275,7 @@ SmmWaitForApArrival (
   LmceSignal = FALSE;
   if (mMachineCheckSupported) {
     LmceEn     = IsLmceOsEnabled ();
-    LmceSignal = IsLmceSignaled();
+    LmceSignal = IsLmceSignaled ();
   }
 
   //
@@ -287,8 +294,9 @@ SmmWaitForApArrival (
   //
   for (Timer = StartSyncTimer ();
        !IsSyncTimerTimeout (Timer) && !(LmceEn && LmceSignal) &&
-       !AllCpusInSmmWithExceptions (ARRIVAL_EXCEPTION_BLOCKED | ARRIVAL_EXCEPTION_SMI_DISABLED );
-       ) {
+       !AllCpusInSmmWithExceptions (ARRIVAL_EXCEPTION_BLOCKED | ARRIVAL_EXCEPTION_SMI_DISABLED);
+       )
+  {
     CpuPause ();
   }
 
@@ -313,7 +321,7 @@ SmmWaitForApArrival (
     // Send SMI IPIs to bring outside processors in
     //
     for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
-      if (!(*(mSmmMpSyncData->CpuData[Index].Present)) && gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId != INVALID_APIC_ID) {
+      if (!(*(mSmmMpSyncData->CpuData[Index].Present)) && (gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId != INVALID_APIC_ID)) {
         SendSmiIpi ((UINT32)gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId);
       }
     }
@@ -323,15 +331,15 @@ SmmWaitForApArrival (
     //
     for (Timer = StartSyncTimer ();
          !IsSyncTimerTimeout (Timer) &&
-         !AllCpusInSmmWithExceptions (ARRIVAL_EXCEPTION_BLOCKED | ARRIVAL_EXCEPTION_SMI_DISABLED );
-         ) {
+         !AllCpusInSmmWithExceptions (ARRIVAL_EXCEPTION_BLOCKED | ARRIVAL_EXCEPTION_SMI_DISABLED);
+         )
+    {
       CpuPause ();
     }
   }
 
   return;
 }
-
 
 /**
   Replace OS MTRR's with SMI MTRR's.
@@ -341,7 +349,7 @@ SmmWaitForApArrival (
 **/
 VOID
 ReplaceOSMtrrs (
-  IN      UINTN                     CpuIndex
+  IN      UINTN  CpuIndex
   )
 {
   SmmCpuFeaturesDisableSmrr ();
@@ -363,25 +371,25 @@ ReplaceOSMtrrs (
 **/
 BOOLEAN
 WaitForAllAPsNotBusy (
-  IN BOOLEAN                        BlockMode
+  IN BOOLEAN  BlockMode
   )
 {
-  UINTN                             Index;
+  UINTN  Index;
 
   for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
     //
     // Ignore BSP and APs which not call in SMM.
     //
-    if (!IsPresentAp(Index)) {
+    if (!IsPresentAp (Index)) {
       continue;
     }
 
     if (BlockMode) {
-      AcquireSpinLock(mSmmMpSyncData->CpuData[Index].Busy);
-      ReleaseSpinLock(mSmmMpSyncData->CpuData[Index].Busy);
+      AcquireSpinLock (mSmmMpSyncData->CpuData[Index].Busy);
+      ReleaseSpinLock (mSmmMpSyncData->CpuData[Index].Busy);
     } else {
       if (AcquireSpinLockOrFail (mSmmMpSyncData->CpuData[Index].Busy)) {
-        ReleaseSpinLock(mSmmMpSyncData->CpuData[Index].Busy);
+        ReleaseSpinLock (mSmmMpSyncData->CpuData[Index].Busy);
       } else {
         return FALSE;
       }
@@ -402,11 +410,11 @@ WaitForAllAPsNotBusy (
 **/
 BOOLEAN
 IsPresentAp (
-  IN UINTN        CpuIndex
+  IN UINTN  CpuIndex
   )
 {
   return ((CpuIndex != gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu) &&
-    *(mSmmMpSyncData->CpuData[CpuIndex].Present));
+          *(mSmmMpSyncData->CpuData[CpuIndex].Present));
 }
 
 /**
@@ -417,10 +425,10 @@ IsPresentAp (
 **/
 VOID
 ReleaseToken (
-  IN UINTN                  CpuIndex
+  IN UINTN  CpuIndex
   )
 {
-  PROCEDURE_TOKEN                         *Token;
+  PROCEDURE_TOKEN  *Token;
 
   Token = mSmmMpSyncData->CpuData[CpuIndex].Token;
 
@@ -455,15 +463,15 @@ ResetTokens (
 **/
 VOID
 BSPHandler (
-  IN      UINTN                     CpuIndex,
-  IN      SMM_CPU_SYNC_MODE         SyncMode
+  IN      UINTN              CpuIndex,
+  IN      SMM_CPU_SYNC_MODE  SyncMode
   )
 {
-  UINTN                             Index;
-  MTRR_SETTINGS                     Mtrrs;
-  UINTN                             ApCount;
-  BOOLEAN                           ClearTopLevelSmiResult;
-  UINTN                             PresentCount;
+  UINTN          Index;
+  MTRR_SETTINGS  Mtrrs;
+  UINTN          ApCount;
+  BOOLEAN        ClearTopLevelSmiResult;
+  UINTN          PresentCount;
 
   ASSERT (CpuIndex == mSmmMpSyncData->BspIndex);
   ApCount = 0;
@@ -488,7 +496,7 @@ BSPHandler (
   // we cleared it after SMI handlers are run, we would miss the SMI that
   // occurs after SMI handlers are done and before SMI status bit is cleared.
   //
-  ClearTopLevelSmiResult = ClearTopLevelSmiStatus();
+  ClearTopLevelSmiResult = ClearTopLevelSmiStatus ();
   ASSERT (ClearTopLevelSmiResult == TRUE);
 
   //
@@ -499,25 +507,24 @@ BSPHandler (
   //
   // If Traditional Sync Mode or need to configure MTRRs: gather all available APs.
   //
-  if (SyncMode == SmmCpuSyncModeTradition || SmmCpuFeaturesNeedConfigureMtrrs()) {
-
+  if ((SyncMode == SmmCpuSyncModeTradition) || SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // Wait for APs to arrive
     //
-    SmmWaitForApArrival();
+    SmmWaitForApArrival ();
 
     //
     // Lock the counter down and retrieve the number of APs
     //
     *mSmmMpSyncData->AllCpusInSync = TRUE;
-    ApCount = LockdownSemaphore (mSmmMpSyncData->Counter) - 1;
+    ApCount                        = LockdownSemaphore (mSmmMpSyncData->Counter) - 1;
 
     //
     // Wait for all APs to get ready for programming MTRRs
     //
     WaitForAllAPs (ApCount);
 
-    if (SmmCpuFeaturesNeedConfigureMtrrs()) {
+    if (SmmCpuFeaturesNeedConfigureMtrrs ()) {
       //
       // Signal all APs it's time for backup MTRRs
       //
@@ -531,7 +538,7 @@ BSPHandler (
       // We do the backup first and then set MTRR to avoid race condition for threads
       // in the same core.
       //
-      MtrrGetAllMtrrs(&Mtrrs);
+      MtrrGetAllMtrrs (&Mtrrs);
 
       //
       // Wait for all APs to complete their MTRR saving
@@ -587,13 +594,12 @@ BSPHandler (
   // make those APs to exit SMI synchronously. APs which arrive later will be excluded and
   // will run through freely.
   //
-  if (SyncMode != SmmCpuSyncModeTradition && !SmmCpuFeaturesNeedConfigureMtrrs()) {
-
+  if ((SyncMode != SmmCpuSyncModeTradition) && !SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // Lock the counter down and retrieve the number of APs
     //
     *mSmmMpSyncData->AllCpusInSync = TRUE;
-    ApCount = LockdownSemaphore (mSmmMpSyncData->Counter) - 1;
+    ApCount                        = LockdownSemaphore (mSmmMpSyncData->Counter) - 1;
     //
     // Make sure all APs have their Present flag set
     //
@@ -601,9 +607,10 @@ BSPHandler (
       PresentCount = 0;
       for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
         if (*(mSmmMpSyncData->CpuData[Index].Present)) {
-          PresentCount ++;
+          PresentCount++;
         }
       }
+
       if (PresentCount > ApCount) {
         break;
       }
@@ -621,7 +628,7 @@ BSPHandler (
   //
   WaitForAllAPs (ApCount);
 
-  if (SmmCpuFeaturesNeedConfigureMtrrs()) {
+  if (SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // Signal APs to restore MTRRs
     //
@@ -631,7 +638,7 @@ BSPHandler (
     // Restore OS MTRRs
     //
     SmmCpuFeaturesReenableSmrr ();
-    MtrrSetAllMtrrs(&Mtrrs);
+    MtrrSetAllMtrrs (&Mtrrs);
 
     //
     // Wait for all APs to complete MTRR programming
@@ -681,7 +688,7 @@ BSPHandler (
   //
   // Allow APs to check in from this point on
   //
-  *mSmmMpSyncData->Counter = 0;
+  *mSmmMpSyncData->Counter       = 0;
   *mSmmMpSyncData->AllCpusInSync = FALSE;
 }
 
@@ -695,15 +702,15 @@ BSPHandler (
 **/
 VOID
 APHandler (
-  IN      UINTN                     CpuIndex,
-  IN      BOOLEAN                   ValidSmi,
-  IN      SMM_CPU_SYNC_MODE         SyncMode
+  IN      UINTN              CpuIndex,
+  IN      BOOLEAN            ValidSmi,
+  IN      SMM_CPU_SYNC_MODE  SyncMode
   )
 {
-  UINT64                            Timer;
-  UINTN                             BspIndex;
-  MTRR_SETTINGS                     Mtrrs;
-  EFI_STATUS                        ProcedureStatus;
+  UINT64         Timer;
+  UINTN          BspIndex;
+  MTRR_SETTINGS  Mtrrs;
+  EFI_STATUS     ProcedureStatus;
 
   //
   // Timeout BSP
@@ -711,7 +718,8 @@ APHandler (
   for (Timer = StartSyncTimer ();
        !IsSyncTimerTimeout (Timer) &&
        !(*mSmmMpSyncData->InsideSmm);
-       ) {
+       )
+  {
     CpuPause ();
   }
 
@@ -737,7 +745,8 @@ APHandler (
       for (Timer = StartSyncTimer ();
            !IsSyncTimerTimeout (Timer) &&
            !(*mSmmMpSyncData->InsideSmm);
-           ) {
+           )
+      {
         CpuPause ();
       }
 
@@ -768,14 +777,14 @@ APHandler (
   //
   *(mSmmMpSyncData->CpuData[CpuIndex].Present) = TRUE;
 
-  if (SyncMode == SmmCpuSyncModeTradition || SmmCpuFeaturesNeedConfigureMtrrs()) {
+  if ((SyncMode == SmmCpuSyncModeTradition) || SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // Notify BSP of arrival at this point
     //
     ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
   }
 
-  if (SmmCpuFeaturesNeedConfigureMtrrs()) {
+  if (SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // Wait for the signal from BSP to backup MTRRs
     //
@@ -784,7 +793,7 @@ APHandler (
     //
     // Backup OS MTRRs
     //
-    MtrrGetAllMtrrs(&Mtrrs);
+    MtrrGetAllMtrrs (&Mtrrs);
 
     //
     // Signal BSP the completion of this AP
@@ -830,9 +839,9 @@ APHandler (
     //
     // Invoke the scheduled procedure
     //
-    ProcedureStatus = (*mSmmMpSyncData->CpuData[CpuIndex].Procedure) (
-                          (VOID*)mSmmMpSyncData->CpuData[CpuIndex].Parameter
-                          );
+    ProcedureStatus = (*mSmmMpSyncData->CpuData[CpuIndex].Procedure)(
+         (VOID *)mSmmMpSyncData->CpuData[CpuIndex].Parameter
+  );
     if (mSmmMpSyncData->CpuData[CpuIndex].Status != NULL) {
       *mSmmMpSyncData->CpuData[CpuIndex].Status = ProcedureStatus;
     }
@@ -847,7 +856,7 @@ APHandler (
     ReleaseSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
   }
 
-  if (SmmCpuFeaturesNeedConfigureMtrrs()) {
+  if (SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // Notify BSP the readiness of this AP to program MTRRs
     //
@@ -862,7 +871,7 @@ APHandler (
     // Restore OS MTRRs
     //
     SmmCpuFeaturesReenableSmrr ();
-    MtrrSetAllMtrrs(&Mtrrs);
+    MtrrSetAllMtrrs (&Mtrrs);
   }
 
   //
@@ -884,7 +893,6 @@ APHandler (
   // Notify BSP the readiness of this AP to exit SMM
   //
   ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
-
 }
 
 /**
@@ -896,7 +904,7 @@ APHandler (
 **/
 UINT32
 Gen4GPageTable (
-  IN      BOOLEAN                   Is32BitPageTable
+  IN      BOOLEAN  Is32BitPageTable
   )
 {
   VOID    *PageTable;
@@ -911,9 +919,9 @@ Gen4GPageTable (
   UINTN   PageIndex;
   UINTN   PageAddress;
 
-  Low2MBoundary = 0;
+  Low2MBoundary  = 0;
   High2MBoundary = 0;
-  PagesNeeded = 0;
+  PagesNeeded    = 0;
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
     //
     // Add one more page for known good stack, then find the lower 2MB aligned address.
@@ -924,8 +932,9 @@ Gen4GPageTable (
     // then find the lower 2MB aligned address.
     //
     High2MBoundary = (mSmmStackArrayEnd - mSmmStackSize - mSmmShadowStackSize + EFI_PAGE_SIZE * 2) & ~(SIZE_2MB-1);
-    PagesNeeded = ((High2MBoundary - Low2MBoundary) / SIZE_2MB) + 1;
+    PagesNeeded    = ((High2MBoundary - Low2MBoundary) / SIZE_2MB) + 1;
   }
+
   //
   // Allocate the page table
   //
@@ -933,7 +942,7 @@ Gen4GPageTable (
   ASSERT (PageTable != NULL);
 
   PageTable = (VOID *)((UINTN)PageTable);
-  Pte = (UINT64*)PageTable;
+  Pte       = (UINT64 *)PageTable;
 
   //
   // Zero out all page table entries first
@@ -945,8 +954,9 @@ Gen4GPageTable (
   //
   for (Index = 0; Index < 4; Index++) {
     Pte[Index] = ((UINTN)PageTable + EFI_PAGE_SIZE * (Index + 1)) | mAddressEncMask |
-                   (Is32BitPageTable ? IA32_PAE_PDPTE_ATTRIBUTE_BITS : PAGE_ATTRIBUTE_BITS);
+                 (Is32BitPageTable ? IA32_PAE_PDPTE_ATTRIBUTE_BITS : PAGE_ATTRIBUTE_BITS);
   }
+
   Pte += EFI_PAGE_SIZE / sizeof (*Pte);
 
   //
@@ -956,17 +966,17 @@ Gen4GPageTable (
     Pte[Index] = (Index << 21) | mAddressEncMask | IA32_PG_PS | PAGE_ATTRIBUTE_BITS;
   }
 
-  Pdpte = (UINT64*)PageTable;
+  Pdpte = (UINT64 *)PageTable;
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
-    Pages = (UINTN)PageTable + EFI_PAGES_TO_SIZE (5);
+    Pages     = (UINTN)PageTable + EFI_PAGES_TO_SIZE (5);
     GuardPage = mSmmStackArrayBase + EFI_PAGE_SIZE;
     for (PageIndex = Low2MBoundary; PageIndex <= High2MBoundary; PageIndex += SIZE_2MB) {
-      Pte = (UINT64*)(UINTN)(Pdpte[BitFieldRead32 ((UINT32)PageIndex, 30, 31)] & ~mAddressEncMask & ~(EFI_PAGE_SIZE - 1));
+      Pte                                             = (UINT64 *)(UINTN)(Pdpte[BitFieldRead32 ((UINT32)PageIndex, 30, 31)] & ~mAddressEncMask & ~(EFI_PAGE_SIZE - 1));
       Pte[BitFieldRead32 ((UINT32)PageIndex, 21, 29)] = (UINT64)Pages | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
       //
       // Fill in Page Table Entries
       //
-      Pte = (UINT64*)Pages;
+      Pte         = (UINT64 *)Pages;
       PageAddress = PageIndex;
       for (Index = 0; Index < EFI_PAGE_SIZE / sizeof (*Pte); Index++) {
         if (PageAddress == GuardPage) {
@@ -981,17 +991,19 @@ Gen4GPageTable (
         } else {
           Pte[Index] = PageAddress | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
         }
-        PageAddress+= EFI_PAGE_SIZE;
+
+        PageAddress += EFI_PAGE_SIZE;
       }
+
       Pages += EFI_PAGE_SIZE;
     }
   }
 
   if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) {
-    Pte = (UINT64*)(UINTN)(Pdpte[0] & ~mAddressEncMask & ~(EFI_PAGE_SIZE - 1));
+    Pte = (UINT64 *)(UINTN)(Pdpte[0] & ~mAddressEncMask & ~(EFI_PAGE_SIZE - 1));
     if ((Pte[0] & IA32_PG_PS) == 0) {
       // 4K-page entries are already mapped. Just hide the first one anyway.
-      Pte = (UINT64*)(UINTN)(Pte[0] & ~mAddressEncMask & ~(EFI_PAGE_SIZE - 1));
+      Pte     = (UINT64 *)(UINTN)(Pte[0] & ~mAddressEncMask & ~(EFI_PAGE_SIZE - 1));
       Pte[0] &= ~(UINT64)IA32_PG_P; // Hide page 0
     } else {
       // Create 4K-page entries
@@ -1000,12 +1012,12 @@ Gen4GPageTable (
 
       Pte[0] = (UINT64)(Pages | mAddressEncMask | PAGE_ATTRIBUTE_BITS);
 
-      Pte = (UINT64*)Pages;
+      Pte         = (UINT64 *)Pages;
       PageAddress = 0;
-      Pte[0] = PageAddress | mAddressEncMask; // Hide page 0 but present left
+      Pte[0]      = PageAddress | mAddressEncMask; // Hide page 0 but present left
       for (Index = 1; Index < EFI_PAGE_SIZE / sizeof (*Pte); Index++) {
         PageAddress += EFI_PAGE_SIZE;
-        Pte[Index] = PageAddress | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+        Pte[Index]   = PageAddress | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
       }
     }
   }
@@ -1024,11 +1036,11 @@ Gen4GPageTable (
 **/
 BOOLEAN
 IsTokenInUse (
-  IN SPIN_LOCK           *Token
+  IN SPIN_LOCK  *Token
   )
 {
-  LIST_ENTRY        *Link;
-  PROCEDURE_TOKEN   *ProcToken;
+  LIST_ENTRY       *Link;
+  PROCEDURE_TOKEN  *ProcToken;
 
   if (Token == NULL) {
     return FALSE;
@@ -1061,12 +1073,12 @@ AllocateTokenBuffer (
   VOID
   )
 {
-  UINTN               SpinLockSize;
-  UINT32              TokenCountPerChunk;
-  UINTN               Index;
-  SPIN_LOCK           *SpinLock;
-  UINT8               *SpinLockBuffer;
-  PROCEDURE_TOKEN     *ProcTokens;
+  UINTN            SpinLockSize;
+  UINT32           TokenCountPerChunk;
+  UINTN            Index;
+  SPIN_LOCK        *SpinLock;
+  UINT8            *SpinLockBuffer;
+  PROCEDURE_TOKEN  *ProcTokens;
 
   SpinLockSize = GetSpinLockProperties ();
 
@@ -1076,6 +1088,7 @@ AllocateTokenBuffer (
     DEBUG ((DEBUG_ERROR, "PcdCpuSmmMpTokenCountPerChunk should not be Zero!\n"));
     CpuDeadLoop ();
   }
+
   DEBUG ((DEBUG_INFO, "CpuSmm: SpinLock Size = 0x%x, PcdCpuSmmMpTokenCountPerChunk = 0x%x\n", SpinLockSize, TokenCountPerChunk));
 
   //
@@ -1113,7 +1126,7 @@ AllocateTokenBuffer (
 **/
 PROCEDURE_TOKEN *
 GetFreeToken (
-  IN UINT32       RunningApsCount
+  IN UINT32  RunningApsCount
   )
 {
   PROCEDURE_TOKEN  *NewToken;
@@ -1125,7 +1138,8 @@ GetFreeToken (
   if (gSmmCpuPrivate->FirstFreeToken == &gSmmCpuPrivate->TokenList) {
     gSmmCpuPrivate->FirstFreeToken = AllocateTokenBuffer ();
   }
-  NewToken = PROCEDURE_TOKEN_FROM_LINK (gSmmCpuPrivate->FirstFreeToken);
+
+  NewToken                       = PROCEDURE_TOKEN_FROM_LINK (gSmmCpuPrivate->FirstFreeToken);
   gSmmCpuPrivate->FirstFreeToken = GetNextNode (&gSmmCpuPrivate->TokenList, gSmmCpuPrivate->FirstFreeToken);
 
   NewToken->RunningApCount = RunningApsCount;
@@ -1148,7 +1162,7 @@ GetFreeToken (
 **/
 EFI_STATUS
 IsApReady (
-  IN SPIN_LOCK          *Token
+  IN SPIN_LOCK  *Token
   )
 {
   if (AcquireSpinLockOrFail (Token)) {
@@ -1196,42 +1210,50 @@ IsApReady (
 **/
 EFI_STATUS
 InternalSmmStartupThisAp (
-  IN      EFI_AP_PROCEDURE2              Procedure,
-  IN      UINTN                          CpuIndex,
-  IN OUT  VOID                           *ProcArguments OPTIONAL,
-  IN      MM_COMPLETION                  *Token,
-  IN      UINTN                          TimeoutInMicroseconds,
-  IN OUT  EFI_STATUS                     *CpuStatus
+  IN      EFI_AP_PROCEDURE2  Procedure,
+  IN      UINTN              CpuIndex,
+  IN OUT  VOID               *ProcArguments OPTIONAL,
+  IN      MM_COMPLETION      *Token,
+  IN      UINTN              TimeoutInMicroseconds,
+  IN OUT  EFI_STATUS         *CpuStatus
   )
 {
-  PROCEDURE_TOKEN    *ProcToken;
+  PROCEDURE_TOKEN  *ProcToken;
 
   if (CpuIndex >= gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus) {
-    DEBUG((DEBUG_ERROR, "CpuIndex(%d) >= gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus(%d)\n", CpuIndex, gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus));
+    DEBUG ((DEBUG_ERROR, "CpuIndex(%d) >= gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus(%d)\n", CpuIndex, gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus));
     return EFI_INVALID_PARAMETER;
   }
+
   if (CpuIndex == gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu) {
-    DEBUG((DEBUG_ERROR, "CpuIndex(%d) == gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu\n", CpuIndex));
+    DEBUG ((DEBUG_ERROR, "CpuIndex(%d) == gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu\n", CpuIndex));
     return EFI_INVALID_PARAMETER;
   }
+
   if (gSmmCpuPrivate->ProcessorInfo[CpuIndex].ProcessorId == INVALID_APIC_ID) {
     return EFI_INVALID_PARAMETER;
   }
+
   if (!(*(mSmmMpSyncData->CpuData[CpuIndex].Present))) {
     if (mSmmMpSyncData->EffectiveSyncMode == SmmCpuSyncModeTradition) {
-      DEBUG((DEBUG_ERROR, "!mSmmMpSyncData->CpuData[%d].Present\n", CpuIndex));
+      DEBUG ((DEBUG_ERROR, "!mSmmMpSyncData->CpuData[%d].Present\n", CpuIndex));
     }
+
     return EFI_INVALID_PARAMETER;
   }
+
   if (gSmmCpuPrivate->Operation[CpuIndex] == SmmCpuRemove) {
     if (!FeaturePcdGet (PcdCpuHotPlugSupport)) {
-      DEBUG((DEBUG_ERROR, "gSmmCpuPrivate->Operation[%d] == SmmCpuRemove\n", CpuIndex));
+      DEBUG ((DEBUG_ERROR, "gSmmCpuPrivate->Operation[%d] == SmmCpuRemove\n", CpuIndex));
     }
+
     return EFI_INVALID_PARAMETER;
   }
+
   if ((TimeoutInMicroseconds != 0) && ((mSmmMp.Attributes & EFI_MM_MP_TIMEOUT_SUPPORTED) == 0)) {
     return EFI_INVALID_PARAMETER;
   }
+
   if (Procedure == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -1257,12 +1279,13 @@ InternalSmmStartupThisAp (
       // 2. Get a free token from the token buffer.
       // 3. Call ReleaseToken() in APHandler().
       //
-      ProcToken = GetFreeToken (1);
+      ProcToken                               = GetFreeToken (1);
       mSmmMpSyncData->CpuData[CpuIndex].Token = ProcToken;
-      *Token = (MM_COMPLETION)ProcToken->SpinLock;
+      *Token                                  = (MM_COMPLETION)ProcToken->SpinLock;
     }
   }
-  mSmmMpSyncData->CpuData[CpuIndex].Status    = CpuStatus;
+
+  mSmmMpSyncData->CpuData[CpuIndex].Status = CpuStatus;
   if (mSmmMpSyncData->CpuData[CpuIndex].Status != NULL) {
     *mSmmMpSyncData->CpuData[CpuIndex].Status = EFI_NOT_READY;
   }
@@ -1309,20 +1332,21 @@ InternalSmmStartupThisAp (
 **/
 EFI_STATUS
 InternalSmmStartupAllAPs (
-  IN       EFI_AP_PROCEDURE2             Procedure,
-  IN       UINTN                         TimeoutInMicroseconds,
-  IN OUT   VOID                          *ProcedureArguments OPTIONAL,
-  IN OUT   MM_COMPLETION                 *Token,
-  IN OUT   EFI_STATUS                    *CPUStatus
+  IN       EFI_AP_PROCEDURE2  Procedure,
+  IN       UINTN              TimeoutInMicroseconds,
+  IN OUT   VOID               *ProcedureArguments OPTIONAL,
+  IN OUT   MM_COMPLETION      *Token,
+  IN OUT   EFI_STATUS         *CPUStatus
   )
 {
-  UINTN               Index;
-  UINTN               CpuCount;
-  PROCEDURE_TOKEN     *ProcToken;
+  UINTN            Index;
+  UINTN            CpuCount;
+  PROCEDURE_TOKEN  *ProcToken;
 
   if ((TimeoutInMicroseconds != 0) && ((mSmmMp.Attributes & EFI_MM_MP_TIMEOUT_SUPPORTED) == 0)) {
     return EFI_INVALID_PARAMETER;
   }
+
   if (Procedure == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -1330,25 +1354,27 @@ InternalSmmStartupAllAPs (
   CpuCount = 0;
   for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
     if (IsPresentAp (Index)) {
-      CpuCount ++;
+      CpuCount++;
 
       if (gSmmCpuPrivate->Operation[Index] == SmmCpuRemove) {
         return EFI_INVALID_PARAMETER;
       }
 
-      if (!AcquireSpinLockOrFail(mSmmMpSyncData->CpuData[Index].Busy)) {
+      if (!AcquireSpinLockOrFail (mSmmMpSyncData->CpuData[Index].Busy)) {
         return EFI_NOT_READY;
       }
+
       ReleaseSpinLock (mSmmMpSyncData->CpuData[Index].Busy);
     }
   }
+
   if (CpuCount == 0) {
     return EFI_NOT_STARTED;
   }
 
   if (Token != NULL) {
     ProcToken = GetFreeToken ((UINT32)mMaxNumberOfCpus);
-    *Token = (MM_COMPLETION)ProcToken->SpinLock;
+    *Token    = (MM_COMPLETION)ProcToken->SpinLock;
   } else {
     ProcToken = NULL;
   }
@@ -1368,13 +1394,14 @@ InternalSmmStartupAllAPs (
 
   for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
     if (IsPresentAp (Index)) {
-      mSmmMpSyncData->CpuData[Index].Procedure = (EFI_AP_PROCEDURE2) Procedure;
+      mSmmMpSyncData->CpuData[Index].Procedure = (EFI_AP_PROCEDURE2)Procedure;
       mSmmMpSyncData->CpuData[Index].Parameter = ProcedureArguments;
       if (ProcToken != NULL) {
-        mSmmMpSyncData->CpuData[Index].Token   = ProcToken;
+        mSmmMpSyncData->CpuData[Index].Token = ProcToken;
       }
+
       if (CPUStatus != NULL) {
-        mSmmMpSyncData->CpuData[Index].Status    = &CPUStatus[Index];
+        mSmmMpSyncData->CpuData[Index].Status = &CPUStatus[Index];
         if (mSmmMpSyncData->CpuData[Index].Status != NULL) {
           *mSmmMpSyncData->CpuData[Index].Status = EFI_NOT_READY;
         }
@@ -1426,10 +1453,10 @@ InternalSmmStartupAllAPs (
 EFI_STATUS
 EFIAPI
 ProcedureWrapper (
-  IN     VOID *Buffer
+  IN     VOID  *Buffer
   )
 {
-  PROCEDURE_WRAPPER *Wrapper;
+  PROCEDURE_WRAPPER  *Wrapper;
 
   Wrapper = Buffer;
   Wrapper->Procedure (Wrapper->ProcedureArgument);
@@ -1454,14 +1481,14 @@ ProcedureWrapper (
 EFI_STATUS
 EFIAPI
 SmmBlockingStartupThisAp (
-  IN      EFI_AP_PROCEDURE          Procedure,
-  IN      UINTN                     CpuIndex,
-  IN OUT  VOID                      *ProcArguments OPTIONAL
+  IN      EFI_AP_PROCEDURE  Procedure,
+  IN      UINTN             CpuIndex,
+  IN OUT  VOID              *ProcArguments OPTIONAL
   )
 {
   PROCEDURE_WRAPPER  Wrapper;
 
-  Wrapper.Procedure = Procedure;
+  Wrapper.Procedure         = Procedure;
   Wrapper.ProcedureArgument = ProcArguments;
 
   //
@@ -1487,25 +1514,25 @@ SmmBlockingStartupThisAp (
 EFI_STATUS
 EFIAPI
 SmmStartupThisAp (
-  IN      EFI_AP_PROCEDURE          Procedure,
-  IN      UINTN                     CpuIndex,
-  IN OUT  VOID                      *ProcArguments OPTIONAL
+  IN      EFI_AP_PROCEDURE  Procedure,
+  IN      UINTN             CpuIndex,
+  IN OUT  VOID              *ProcArguments OPTIONAL
   )
 {
-  gSmmCpuPrivate->ApWrapperFunc[CpuIndex].Procedure = Procedure;
+  gSmmCpuPrivate->ApWrapperFunc[CpuIndex].Procedure         = Procedure;
   gSmmCpuPrivate->ApWrapperFunc[CpuIndex].ProcedureArgument = ProcArguments;
 
   //
   // Use wrapper function to convert EFI_AP_PROCEDURE to EFI_AP_PROCEDURE2.
   //
   return InternalSmmStartupThisAp (
-    ProcedureWrapper,
-    CpuIndex,
-    &gSmmCpuPrivate->ApWrapperFunc[CpuIndex],
-    FeaturePcdGet (PcdCpuSmmBlockStartupThisAp) ? NULL : &mSmmStartupThisApToken,
-    0,
-    NULL
-    );
+           ProcedureWrapper,
+           CpuIndex,
+           &gSmmCpuPrivate->ApWrapperFunc[CpuIndex],
+           FeaturePcdGet (PcdCpuSmmBlockStartupThisAp) ? NULL : &mSmmStartupThisApToken,
+           0,
+           NULL
+           );
 }
 
 /**
@@ -1524,10 +1551,10 @@ CpuSmmDebugEntry (
   IN UINTN  CpuIndex
   )
 {
-  SMRAM_SAVE_STATE_MAP *CpuSaveState;
+  SMRAM_SAVE_STATE_MAP  *CpuSaveState;
 
   if (FeaturePcdGet (PcdCpuSmmDebug)) {
-    ASSERT(CpuIndex < mMaxNumberOfCpus);
+    ASSERT (CpuIndex < mMaxNumberOfCpus);
     CpuSaveState = (SMRAM_SAVE_STATE_MAP *)gSmmCpuPrivate->CpuSaveState[CpuIndex];
     if (mSmmSaveStateRegisterLma == EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT) {
       AsmWriteDr6 (CpuSaveState->x86._DR6);
@@ -1554,10 +1581,10 @@ CpuSmmDebugExit (
   IN UINTN  CpuIndex
   )
 {
-  SMRAM_SAVE_STATE_MAP *CpuSaveState;
+  SMRAM_SAVE_STATE_MAP  *CpuSaveState;
 
   if (FeaturePcdGet (PcdCpuSmmDebug)) {
-    ASSERT(CpuIndex < mMaxNumberOfCpus);
+    ASSERT (CpuIndex < mMaxNumberOfCpus);
     CpuSaveState = (SMRAM_SAVE_STATE_MAP *)gSmmCpuPrivate->CpuSaveState[CpuIndex];
     if (mSmmSaveStateRegisterLma == EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT) {
       CpuSaveState->x86._DR7 = (UINT32)AsmReadDr7 ();
@@ -1578,17 +1605,17 @@ CpuSmmDebugExit (
 VOID
 EFIAPI
 SmiRendezvous (
-  IN      UINTN                     CpuIndex
+  IN      UINTN  CpuIndex
   )
 {
-  EFI_STATUS                     Status;
-  BOOLEAN                        ValidSmi;
-  BOOLEAN                        IsBsp;
-  BOOLEAN                        BspInProgress;
-  UINTN                          Index;
-  UINTN                          Cr2;
+  EFI_STATUS  Status;
+  BOOLEAN     ValidSmi;
+  BOOLEAN     IsBsp;
+  BOOLEAN     BspInProgress;
+  UINTN       Index;
+  UINTN       Cr2;
 
-  ASSERT(CpuIndex < mMaxNumberOfCpus);
+  ASSERT (CpuIndex < mMaxNumberOfCpus);
 
   //
   // Save Cr2 because Page Fault exception in SMM may override its value,
@@ -1612,7 +1639,7 @@ SmiRendezvous (
   //
   // Determine if this is a valid SMI
   //
-  ValidSmi = PlatformValidSmi();
+  ValidSmi = PlatformValidSmi ();
 
   //
   // Determine if BSP has been already in progress. Note this must be checked after
@@ -1644,9 +1671,9 @@ SmiRendezvous (
       while (*mSmmMpSyncData->AllCpusInSync) {
         CpuPause ();
       }
+
       goto Exit;
     } else {
-
       //
       // The BUSY lock is initialized to Released state.
       // This needs to be done early enough to be ready for BSP's SmmStartupThisAp() call.
@@ -1693,7 +1720,7 @@ SmiRendezvous (
             // Platform hook fails to determine, use default BSP election method
             //
             InterlockedCompareExchange32 (
-              (UINT32*)&mSmmMpSyncData->BspIndex,
+              (UINT32 *)&mSmmMpSyncData->BspIndex,
               (UINT32)-1,
               (UINT32)CpuIndex
               );
@@ -1705,7 +1732,6 @@ SmiRendezvous (
       // "mSmmMpSyncData->BspIndex == CpuIndex" means this is the BSP
       //
       if (mSmmMpSyncData->BspIndex == CpuIndex) {
-
         //
         // Clear last request for SwitchBsp.
         //
@@ -1774,45 +1800,45 @@ InitializeSmmCpuSemaphores (
   VOID
   )
 {
-  UINTN                      ProcessorCount;
-  UINTN                      TotalSize;
-  UINTN                      GlobalSemaphoresSize;
-  UINTN                      CpuSemaphoresSize;
-  UINTN                      SemaphoreSize;
-  UINTN                      Pages;
-  UINTN                      *SemaphoreBlock;
-  UINTN                      SemaphoreAddr;
+  UINTN  ProcessorCount;
+  UINTN  TotalSize;
+  UINTN  GlobalSemaphoresSize;
+  UINTN  CpuSemaphoresSize;
+  UINTN  SemaphoreSize;
+  UINTN  Pages;
+  UINTN  *SemaphoreBlock;
+  UINTN  SemaphoreAddr;
 
-  SemaphoreSize   = GetSpinLockProperties ();
-  ProcessorCount = gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
+  SemaphoreSize        = GetSpinLockProperties ();
+  ProcessorCount       = gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
   GlobalSemaphoresSize = (sizeof (SMM_CPU_SEMAPHORE_GLOBAL) / sizeof (VOID *)) * SemaphoreSize;
   CpuSemaphoresSize    = (sizeof (SMM_CPU_SEMAPHORE_CPU) / sizeof (VOID *)) * ProcessorCount * SemaphoreSize;
-  TotalSize = GlobalSemaphoresSize + CpuSemaphoresSize;
-  DEBUG((EFI_D_INFO, "One Semaphore Size    = 0x%x\n", SemaphoreSize));
-  DEBUG((EFI_D_INFO, "Total Semaphores Size = 0x%x\n", TotalSize));
-  Pages = EFI_SIZE_TO_PAGES (TotalSize);
+  TotalSize            = GlobalSemaphoresSize + CpuSemaphoresSize;
+  DEBUG ((DEBUG_INFO, "One Semaphore Size    = 0x%x\n", SemaphoreSize));
+  DEBUG ((DEBUG_INFO, "Total Semaphores Size = 0x%x\n", TotalSize));
+  Pages          = EFI_SIZE_TO_PAGES (TotalSize);
   SemaphoreBlock = AllocatePages (Pages);
   ASSERT (SemaphoreBlock != NULL);
   ZeroMem (SemaphoreBlock, TotalSize);
 
-  SemaphoreAddr = (UINTN)SemaphoreBlock;
+  SemaphoreAddr                                   = (UINTN)SemaphoreBlock;
   mSmmCpuSemaphores.SemaphoreGlobal.Counter       = (UINT32 *)SemaphoreAddr;
-  SemaphoreAddr += SemaphoreSize;
+  SemaphoreAddr                                  += SemaphoreSize;
   mSmmCpuSemaphores.SemaphoreGlobal.InsideSmm     = (BOOLEAN *)SemaphoreAddr;
-  SemaphoreAddr += SemaphoreSize;
+  SemaphoreAddr                                  += SemaphoreSize;
   mSmmCpuSemaphores.SemaphoreGlobal.AllCpusInSync = (BOOLEAN *)SemaphoreAddr;
-  SemaphoreAddr += SemaphoreSize;
+  SemaphoreAddr                                  += SemaphoreSize;
   mSmmCpuSemaphores.SemaphoreGlobal.PFLock        = (SPIN_LOCK *)SemaphoreAddr;
-  SemaphoreAddr += SemaphoreSize;
+  SemaphoreAddr                                  += SemaphoreSize;
   mSmmCpuSemaphores.SemaphoreGlobal.CodeAccessCheckLock
-                                                  = (SPIN_LOCK *)SemaphoreAddr;
+                 = (SPIN_LOCK *)SemaphoreAddr;
   SemaphoreAddr += SemaphoreSize;
 
-  SemaphoreAddr = (UINTN)SemaphoreBlock + GlobalSemaphoresSize;
+  SemaphoreAddr                          = (UINTN)SemaphoreBlock + GlobalSemaphoresSize;
   mSmmCpuSemaphores.SemaphoreCpu.Busy    = (SPIN_LOCK *)SemaphoreAddr;
-  SemaphoreAddr += ProcessorCount * SemaphoreSize;
+  SemaphoreAddr                         += ProcessorCount * SemaphoreSize;
   mSmmCpuSemaphores.SemaphoreCpu.Run     = (UINT32 *)SemaphoreAddr;
-  SemaphoreAddr += ProcessorCount * SemaphoreSize;
+  SemaphoreAddr                         += ProcessorCount * SemaphoreSize;
   mSmmCpuSemaphores.SemaphoreCpu.Present = (BOOLEAN *)SemaphoreAddr;
 
   mPFLock                       = mSmmCpuSemaphores.SemaphoreGlobal.PFLock;
@@ -1831,7 +1857,7 @@ InitializeMpSyncData (
   VOID
   )
 {
-  UINTN                      CpuIndex;
+  UINTN  CpuIndex;
 
   if (mSmmMpSyncData != NULL) {
     //
@@ -1839,7 +1865,7 @@ InitializeMpSyncData (
     // CpuData array of SMM_CPU_DATA_BLOCK and one CandidateBsp array of BOOLEAN.
     //
     ZeroMem (mSmmMpSyncData, mSmmMpSyncDataSize);
-    mSmmMpSyncData->CpuData = (SMM_CPU_DATA_BLOCK *)((UINT8 *)mSmmMpSyncData + sizeof (SMM_DISPATCHER_MP_SYNC_DATA));
+    mSmmMpSyncData->CpuData      = (SMM_CPU_DATA_BLOCK *)((UINT8 *)mSmmMpSyncData + sizeof (SMM_DISPATCHER_MP_SYNC_DATA));
     mSmmMpSyncData->CandidateBsp = (BOOLEAN *)(mSmmMpSyncData->CpuData + gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus);
     if (FeaturePcdGet (PcdCpuSmmEnableBspElection)) {
       //
@@ -1847,21 +1873,24 @@ InitializeMpSyncData (
       //
       mSmmMpSyncData->BspIndex = (UINT32)-1;
     }
+
     mSmmMpSyncData->EffectiveSyncMode = mCpuSmmSyncMode;
 
     mSmmMpSyncData->Counter       = mSmmCpuSemaphores.SemaphoreGlobal.Counter;
     mSmmMpSyncData->InsideSmm     = mSmmCpuSemaphores.SemaphoreGlobal.InsideSmm;
     mSmmMpSyncData->AllCpusInSync = mSmmCpuSemaphores.SemaphoreGlobal.AllCpusInSync;
-    ASSERT (mSmmMpSyncData->Counter != NULL && mSmmMpSyncData->InsideSmm != NULL &&
-            mSmmMpSyncData->AllCpusInSync != NULL);
+    ASSERT (
+      mSmmMpSyncData->Counter != NULL && mSmmMpSyncData->InsideSmm != NULL &&
+      mSmmMpSyncData->AllCpusInSync != NULL
+      );
     *mSmmMpSyncData->Counter       = 0;
     *mSmmMpSyncData->InsideSmm     = FALSE;
     *mSmmMpSyncData->AllCpusInSync = FALSE;
 
-    for (CpuIndex = 0; CpuIndex < gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus; CpuIndex ++) {
-      mSmmMpSyncData->CpuData[CpuIndex].Busy    =
+    for (CpuIndex = 0; CpuIndex < gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus; CpuIndex++) {
+      mSmmMpSyncData->CpuData[CpuIndex].Busy =
         (SPIN_LOCK *)((UINTN)mSmmCpuSemaphores.SemaphoreCpu.Busy + mSemaphoreSize * CpuIndex);
-      mSmmMpSyncData->CpuData[CpuIndex].Run     =
+      mSmmMpSyncData->CpuData[CpuIndex].Run =
         (UINT32 *)((UINTN)mSmmCpuSemaphores.SemaphoreCpu.Run + mSemaphoreSize * CpuIndex);
       mSmmMpSyncData->CpuData[CpuIndex].Present =
         (BOOLEAN *)((UINTN)mSmmCpuSemaphores.SemaphoreCpu.Present + mSemaphoreSize * CpuIndex);
@@ -1882,9 +1911,9 @@ InitializeMpSyncData (
 **/
 UINT32
 InitializeMpServiceData (
-  IN VOID        *Stacks,
-  IN UINTN       StackSize,
-  IN UINTN       ShadowStackSize
+  IN VOID   *Stacks,
+  IN UINTN  StackSize,
+  IN UINTN  ShadowStackSize
   )
 {
   UINT32                          Cr3;
@@ -1911,7 +1940,7 @@ InitializeMpServiceData (
   //
   mSmmMpSyncDataSize = sizeof (SMM_DISPATCHER_MP_SYNC_DATA) +
                        (sizeof (SMM_CPU_DATA_BLOCK) + sizeof (BOOLEAN)) * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
-  mSmmMpSyncData = (SMM_DISPATCHER_MP_SYNC_DATA*) AllocatePages (EFI_SIZE_TO_PAGES (mSmmMpSyncDataSize));
+  mSmmMpSyncData = (SMM_DISPATCHER_MP_SYNC_DATA *)AllocatePages (EFI_SIZE_TO_PAGES (mSmmMpSyncDataSize));
   ASSERT (mSmmMpSyncData != NULL);
   mCpuSmmSyncMode = (SMM_CPU_SYNC_MODE)PcdGet8 (PcdCpuSmmSyncMode);
   InitializeMpSyncData ();
@@ -1926,7 +1955,8 @@ InitializeMpServiceData (
   } else {
     VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
   }
-  gPhyMask  = LShiftU64 (1, VirPhyAddressSize.Bits.PhysicalAddressBits) - 1;
+
+  gPhyMask = LShiftU64 (1, VirPhyAddressSize.Bits.PhysicalAddressBits) - 1;
   //
   // Clear the low 12 bits
   //
@@ -1946,7 +1976,7 @@ InitializeMpServiceData (
     InstallSmiHandler (
       Index,
       (UINT32)mCpuHotPlugData.SmBase[Index],
-      (VOID*)((UINTN)Stacks + (StackSize + ShadowStackSize) * Index),
+      (VOID *)((UINTN)Stacks + (StackSize + ShadowStackSize) * Index),
       StackSize,
       (UINTN)(GdtTssTables + GdtTableStepSize * Index),
       gcSmiGdtr.Limit + 1,
@@ -2009,13 +2039,14 @@ RegisterSmmEntry (
 **/
 EFI_STATUS
 RegisterStartupProcedure (
-  IN     EFI_AP_PROCEDURE    Procedure,
-  IN OUT VOID                *ProcedureArguments OPTIONAL
+  IN     EFI_AP_PROCEDURE  Procedure,
+  IN OUT VOID              *ProcedureArguments OPTIONAL
   )
 {
-  if (Procedure == NULL && ProcedureArguments != NULL) {
+  if ((Procedure == NULL) && (ProcedureArguments != NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
   if (mSmmMpSyncData == NULL) {
     return EFI_NOT_READY;
   }

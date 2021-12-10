@@ -7,7 +7,6 @@
 
 **/
 
-
 #include "InternalHiiLib.h"
 
 /**
@@ -52,15 +51,15 @@ EFI_STRING_ID
 EFIAPI
 HiiSetString (
   IN EFI_HII_HANDLE    HiiHandle,
-  IN EFI_STRING_ID     StringId,            OPTIONAL
+  IN EFI_STRING_ID     StringId             OPTIONAL,
   IN CONST EFI_STRING  String,
   IN CONST CHAR8       *SupportedLanguages  OPTIONAL
   )
 {
-  EFI_STATUS     Status;
-  CHAR8          *AllocatedLanguages;
-  CHAR8          *Supported;
-  CHAR8          *Language;
+  EFI_STATUS  Status;
+  CHAR8       *AllocatedLanguages;
+  CHAR8       *Supported;
+  CHAR8       *Language;
 
   ASSERT (HiiHandle != NULL);
   ASSERT (String != NULL);
@@ -97,12 +96,14 @@ HiiSetString (
     //
     // Search for the next language separator and replace it with a Null-terminator
     //
-    for (; *Supported != 0 && *Supported != ';'; Supported++);
+    for ( ; *Supported != 0 && *Supported != ';'; Supported++) {
+    }
+
     if (*Supported != 0) {
       *(Supported++) = '\0';
     }
 
-    if ((SupportedLanguages == NULL) && AsciiStrnCmp (Language, UEFI_CONFIG_LANG, AsciiStrLen (UEFI_CONFIG_LANG)) == 0) {
+    if ((SupportedLanguages == NULL) && (AsciiStrnCmp (Language, UEFI_CONFIG_LANG, AsciiStrLen (UEFI_CONFIG_LANG)) == 0)) {
       //
       // Skip string package used for keyword protocol.
       //
@@ -137,7 +138,6 @@ HiiSetString (
     return StringId;
   }
 }
-
 
 /**
   Retrieves a string from a string package names by GUID in a specific language.
@@ -292,7 +292,7 @@ HiiGetStringEx (
   //
   // Get the current platform language setting
   //
-  GetEfiGlobalVariable2 (L"PlatformLang", (VOID**)&PlatformLanguage, NULL);
+  GetEfiGlobalVariable2 (L"PlatformLang", (VOID **)&PlatformLanguage, NULL);
 
   //
   // If Languag is NULL, then set it to an empty string, so it will be
@@ -318,23 +318,22 @@ HiiGetStringEx (
       goto Error;
     }
   } else {
-    BestLanguage = (CHAR8 *) Language;
+    BestLanguage = (CHAR8 *)Language;
   }
-
 
   //
   // Retrieve the size of the string in the string package for the BestLanguage
   //
   StringSize = 0;
-  Status = gHiiString->GetString (
-                         gHiiString,
-                         BestLanguage,
-                         HiiHandle,
-                         StringId,
-                         &TempString,
-                         &StringSize,
-                         NULL
-                         );
+  Status     = gHiiString->GetString (
+                             gHiiString,
+                             BestLanguage,
+                             HiiHandle,
+                             StringId,
+                             &TempString,
+                             &StringSize,
+                             NULL
+                             );
   //
   // If GetString() returns EFI_SUCCESS for a zero size,
   // then there are no supported languages registered for HiiHandle.  If GetString()
@@ -380,10 +379,12 @@ Error:
   if (SupportedLanguages != NULL) {
     FreePool (SupportedLanguages);
   }
+
   if (PlatformLanguage != NULL) {
     FreePool (PlatformLanguage);
   }
-  if (TryBestLanguage && BestLanguage != NULL) {
+
+  if (TryBestLanguage && (BestLanguage != NULL)) {
     FreePool (BestLanguage);
   }
 
@@ -392,4 +393,3 @@ Error:
   //
   return String;
 }
-

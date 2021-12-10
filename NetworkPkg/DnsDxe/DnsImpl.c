@@ -20,8 +20,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 Dns4RemoveTokenEntry (
-  IN NET_MAP                    *TokenMap,
-  IN DNS4_TOKEN_ENTRY           *TokenEntry
+  IN NET_MAP           *TokenMap,
+  IN DNS4_TOKEN_ENTRY  *TokenEntry
   )
 {
   NET_MAP_ITEM  *Item;
@@ -29,7 +29,7 @@ Dns4RemoveTokenEntry (
   //
   // Find the TokenEntry first.
   //
-  Item = NetMapFindKey (TokenMap, (VOID *) TokenEntry);
+  Item = NetMapFindKey (TokenMap, (VOID *)TokenEntry);
 
   if (Item != NULL) {
     //
@@ -55,8 +55,8 @@ Dns4RemoveTokenEntry (
 **/
 EFI_STATUS
 Dns6RemoveTokenEntry (
-  IN NET_MAP                    *TokenMap,
-  IN DNS6_TOKEN_ENTRY           *TokenEntry
+  IN NET_MAP           *TokenMap,
+  IN DNS6_TOKEN_ENTRY  *TokenEntry
   )
 {
   NET_MAP_ITEM  *Item;
@@ -64,7 +64,7 @@ Dns6RemoveTokenEntry (
   //
   // Find the TokenEntry first.
   //
-  Item = NetMapFindKey (TokenMap, (VOID *) TokenEntry);
+  Item = NetMapFindKey (TokenMap, (VOID *)TokenEntry);
 
   if (Item != NULL) {
     //
@@ -102,9 +102,9 @@ Dns4CancelTokens (
   IN VOID          *Arg OPTIONAL
   )
 {
-  DNS4_TOKEN_ENTRY           *TokenEntry;
-  NET_BUF                    *Packet;
-  UDP_IO                     *UdpIo;
+  DNS4_TOKEN_ENTRY  *TokenEntry;
+  NET_BUF           *Packet;
+  UDP_IO            *UdpIo;
 
   if ((Arg != NULL) && (Item->Key != Arg)) {
     return EFI_SUCCESS;
@@ -115,8 +115,8 @@ Dns4CancelTokens (
     // If the TokenEntry is a transmit TokenEntry, the corresponding Packet is recorded in
     // Item->Value.
     //
-    Packet  = (NET_BUF *) (Item->Value);
-    UdpIo = (UDP_IO *) (*((UINTN *) &Packet->ProtoData[0]));
+    Packet = (NET_BUF *)(Item->Value);
+    UdpIo  = (UDP_IO *)(*((UINTN *)&Packet->ProtoData[0]));
 
     UdpIoCancelSentDatagram (UdpIo, Packet);
   }
@@ -124,7 +124,7 @@ Dns4CancelTokens (
   //
   // Remove TokenEntry from Dns4TxTokens.
   //
-  TokenEntry = (DNS4_TOKEN_ENTRY *) Item->Key;
+  TokenEntry = (DNS4_TOKEN_ENTRY *)Item->Key;
   if (Dns4RemoveTokenEntry (Map, TokenEntry) == EFI_SUCCESS) {
     TokenEntry->Token->Status = EFI_ABORTED;
     gBS->SignalEvent (TokenEntry->Token->Event);
@@ -162,9 +162,9 @@ Dns6CancelTokens (
   IN VOID          *Arg OPTIONAL
   )
 {
-  DNS6_TOKEN_ENTRY           *TokenEntry;
-  NET_BUF                    *Packet;
-  UDP_IO                     *UdpIo;
+  DNS6_TOKEN_ENTRY  *TokenEntry;
+  NET_BUF           *Packet;
+  UDP_IO            *UdpIo;
 
   if ((Arg != NULL) && (Item->Key != Arg)) {
     return EFI_SUCCESS;
@@ -175,8 +175,8 @@ Dns6CancelTokens (
     // If the TokenEntry is a transmit TokenEntry, the corresponding Packet is recorded in
     // Item->Value.
     //
-    Packet  = (NET_BUF *) (Item->Value);
-    UdpIo = (UDP_IO *) (*((UINTN *) &Packet->ProtoData[0]));
+    Packet = (NET_BUF *)(Item->Value);
+    UdpIo  = (UDP_IO *)(*((UINTN *)&Packet->ProtoData[0]));
 
     UdpIoCancelSentDatagram (UdpIo, Packet);
   }
@@ -184,7 +184,7 @@ Dns6CancelTokens (
   //
   // Remove TokenEntry from Dns6TxTokens.
   //
-  TokenEntry = (DNS6_TOKEN_ENTRY *) Item->Key;
+  TokenEntry = (DNS6_TOKEN_ENTRY *)Item->Key;
   if (Dns6RemoveTokenEntry (Map, TokenEntry) == EFI_SUCCESS) {
     TokenEntry->Token->Status = EFI_ABORTED;
     gBS->SignalEvent (TokenEntry->Token->Event);
@@ -212,18 +212,18 @@ Dns6CancelTokens (
 EFI_STATUS
 EFIAPI
 GetDns4TokenEntry (
-  IN     NET_MAP                   *TokensMap,
-  IN     EFI_DNS4_COMPLETION_TOKEN *Token,
-     OUT DNS4_TOKEN_ENTRY          **TokenEntry
+  IN     NET_MAP                    *TokensMap,
+  IN     EFI_DNS4_COMPLETION_TOKEN  *Token,
+  OUT DNS4_TOKEN_ENTRY              **TokenEntry
   )
 {
-  LIST_ENTRY              *Entry;
+  LIST_ENTRY  *Entry;
 
-  NET_MAP_ITEM            *Item;
+  NET_MAP_ITEM  *Item;
 
   NET_LIST_FOR_EACH (Entry, &TokensMap->Used) {
-    Item = NET_LIST_USER_STRUCT (Entry, NET_MAP_ITEM, Link);
-    *TokenEntry = (DNS4_TOKEN_ENTRY *) (Item->Key);
+    Item        = NET_LIST_USER_STRUCT (Entry, NET_MAP_ITEM, Link);
+    *TokenEntry = (DNS4_TOKEN_ENTRY *)(Item->Key);
     if ((*TokenEntry)->Token == Token) {
       return EFI_SUCCESS;
     }
@@ -248,24 +248,24 @@ GetDns4TokenEntry (
 EFI_STATUS
 EFIAPI
 GetDns6TokenEntry (
-  IN     NET_MAP                   *TokensMap,
-  IN     EFI_DNS6_COMPLETION_TOKEN *Token,
-     OUT DNS6_TOKEN_ENTRY          **TokenEntry
+  IN     NET_MAP                    *TokensMap,
+  IN     EFI_DNS6_COMPLETION_TOKEN  *Token,
+  OUT DNS6_TOKEN_ENTRY              **TokenEntry
   )
 {
-  LIST_ENTRY              *Entry;
+  LIST_ENTRY  *Entry;
 
-  NET_MAP_ITEM            *Item;
+  NET_MAP_ITEM  *Item;
 
   NET_LIST_FOR_EACH (Entry, &TokensMap->Used) {
-    Item = NET_LIST_USER_STRUCT (Entry, NET_MAP_ITEM, Link);
-    *TokenEntry = (DNS6_TOKEN_ENTRY *) (Item->Key);
+    Item        = NET_LIST_USER_STRUCT (Entry, NET_MAP_ITEM, Link);
+    *TokenEntry = (DNS6_TOKEN_ENTRY *)(Item->Key);
     if ((*TokenEntry)->Token == Token) {
       return EFI_SUCCESS;
     }
   }
 
-  *TokenEntry =NULL;
+  *TokenEntry = NULL;
 
   return EFI_NOT_FOUND;
 }
@@ -293,7 +293,7 @@ Dns4InstanceCancelToken (
 
   TokenEntry = NULL;
 
-  if(Token != NULL  ) {
+  if (Token != NULL  ) {
     Status = GetDns4TokenEntry (&Instance->Dns4TxTokens, Token, &TokenEntry);
     if (EFI_ERROR (Status)) {
       return Status;
@@ -313,8 +313,9 @@ Dns4InstanceCancelToken (
     // the Dns4TxTokens and returns success.
     //
     if (NetMapIsEmpty (&Instance->Dns4TxTokens)) {
-       Instance->UdpIo->Protocol.Udp4->Cancel (Instance->UdpIo->Protocol.Udp4, &Instance->UdpIo->RecvRequest->Token.Udp4);
+      Instance->UdpIo->Protocol.Udp4->Cancel (Instance->UdpIo->Protocol.Udp4, &Instance->UdpIo->RecvRequest->Token.Udp4);
     }
+
     return EFI_SUCCESS;
   }
 
@@ -350,7 +351,7 @@ Dns6InstanceCancelToken (
 
   TokenEntry = NULL;
 
-  if(Token != NULL  ) {
+  if (Token != NULL  ) {
     Status = GetDns6TokenEntry (&Instance->Dns6TxTokens, Token, &TokenEntry);
     if (EFI_ERROR (Status)) {
       return Status;
@@ -370,8 +371,9 @@ Dns6InstanceCancelToken (
     // the Dns6TxTokens and returns success.
     //
     if (NetMapIsEmpty (&Instance->Dns6TxTokens)) {
-       Instance->UdpIo->Protocol.Udp6->Cancel (Instance->UdpIo->Protocol.Udp6, &Instance->UdpIo->RecvRequest->Token.Udp6);
+      Instance->UdpIo->Protocol.Udp6->Cancel (Instance->UdpIo->Protocol.Udp6, &Instance->UdpIo->RecvRequest->Token.Udp6);
     }
+
     return EFI_SUCCESS;
   }
 
@@ -437,8 +439,8 @@ Dns4CopyConfigure (
   IN  EFI_DNS4_CONFIG_DATA  *Src
   )
 {
-  UINTN                     Len;
-  UINT32                    Index;
+  UINTN   Len;
+  UINT32  Index;
 
   CopyMem (Dst, Src, sizeof (*Dst));
   Dst->DnsServerList = NULL;
@@ -479,8 +481,8 @@ Dns6CopyConfigure (
   IN  EFI_DNS6_CONFIG_DATA  *Src
   )
 {
-  UINTN                     Len;
-  UINT32                    Index;
+  UINTN   Len;
+  UINT32  Index;
 
   CopyMem (Dst, Src, sizeof (*Dst));
   Dst->DnsServerList = NULL;
@@ -513,7 +515,7 @@ Dns6CopyConfigure (
 VOID
 EFIAPI
 DnsDummyExtFree (
-  IN VOID                   *Arg
+  IN VOID  *Arg
   )
 {
 }
@@ -535,15 +537,15 @@ DnsDummyExtFree (
 **/
 BOOLEAN
 Dns4GetMapping (
-  IN DNS_INSTANCE           *Instance,
-  IN UDP_IO                 *UdpIo,
-  IN EFI_UDP4_CONFIG_DATA   *UdpCfgData
+  IN DNS_INSTANCE          *Instance,
+  IN UDP_IO                *UdpIo,
+  IN EFI_UDP4_CONFIG_DATA  *UdpCfgData
   )
 {
-  DNS_SERVICE               *Service;
-  EFI_IP4_MODE_DATA         Ip4Mode;
-  EFI_UDP4_PROTOCOL         *Udp;
-  EFI_STATUS                Status;
+  DNS_SERVICE        *Service;
+  EFI_IP4_MODE_DATA  Ip4Mode;
+  EFI_UDP4_PROTOCOL  *Udp;
+  EFI_STATUS         Status;
 
   ASSERT (Instance->Dns4CfgData.UseDefaultSetting);
 
@@ -563,10 +565,10 @@ Dns4GetMapping (
     Udp->Poll (Udp);
 
     if (!EFI_ERROR (Udp->GetModeData (Udp, NULL, &Ip4Mode, NULL, NULL)) &&
-        Ip4Mode.IsConfigured) {
-
+        Ip4Mode.IsConfigured)
+    {
       Udp->Configure (Udp, NULL);
-      return (BOOLEAN) (Udp->Configure (Udp, UdpCfgData) == EFI_SUCCESS);
+      return (BOOLEAN)(Udp->Configure (Udp, UdpCfgData) == EFI_SUCCESS);
     }
   }
 
@@ -587,15 +589,15 @@ Dns4GetMapping (
 **/
 BOOLEAN
 Dns6GetMapping (
-  IN DNS_INSTANCE           *Instance,
-  IN UDP_IO                 *UdpIo,
-  IN EFI_UDP6_CONFIG_DATA   *UdpCfgData
+  IN DNS_INSTANCE          *Instance,
+  IN UDP_IO                *UdpIo,
+  IN EFI_UDP6_CONFIG_DATA  *UdpCfgData
   )
 {
-  DNS_SERVICE               *Service;
-  EFI_IP6_MODE_DATA         Ip6Mode;
-  EFI_UDP6_PROTOCOL         *Udp;
-  EFI_STATUS                Status;
+  DNS_SERVICE        *Service;
+  EFI_IP6_MODE_DATA  Ip6Mode;
+  EFI_UDP6_PROTOCOL  *Udp;
+  EFI_STATUS         Status;
 
   Service = Instance->Service;
   Udp     = UdpIo->Protocol.Udp6;
@@ -661,13 +663,13 @@ Dns6GetMapping (
 **/
 EFI_STATUS
 Dns4ConfigUdp (
-  IN DNS_INSTANCE           *Instance,
-  IN UDP_IO                 *UdpIo
+  IN DNS_INSTANCE  *Instance,
+  IN UDP_IO        *UdpIo
   )
 {
-  EFI_DNS4_CONFIG_DATA      *Config;
-  EFI_UDP4_CONFIG_DATA      UdpConfig;
-  EFI_STATUS                Status;
+  EFI_DNS4_CONFIG_DATA  *Config;
+  EFI_UDP4_CONFIG_DATA  UdpConfig;
+  EFI_STATUS            Status;
 
   Config = &Instance->Dns4CfgData;
 
@@ -709,13 +711,13 @@ Dns4ConfigUdp (
 **/
 EFI_STATUS
 Dns6ConfigUdp (
-  IN DNS_INSTANCE           *Instance,
-  IN UDP_IO                 *UdpIo
+  IN DNS_INSTANCE  *Instance,
+  IN UDP_IO        *UdpIo
   )
 {
-  EFI_DNS6_CONFIG_DATA      *Config;
-  EFI_UDP6_CONFIG_DATA      UdpConfig;
-  EFI_STATUS                Status;
+  EFI_DNS6_CONFIG_DATA  *Config;
+  EFI_UDP6_CONFIG_DATA  UdpConfig;
+  EFI_STATUS            Status;
 
   Config = &Instance->Dns6CfgData;
 
@@ -757,16 +759,16 @@ Dns6ConfigUdp (
 EFI_STATUS
 EFIAPI
 UpdateDns4Cache (
-  IN LIST_ENTRY             *Dns4CacheList,
-  IN BOOLEAN                DeleteFlag,
-  IN BOOLEAN                Override,
-  IN EFI_DNS4_CACHE_ENTRY   DnsCacheEntry
+  IN LIST_ENTRY            *Dns4CacheList,
+  IN BOOLEAN               DeleteFlag,
+  IN BOOLEAN               Override,
+  IN EFI_DNS4_CACHE_ENTRY  DnsCacheEntry
   )
 {
-  DNS4_CACHE    *NewDnsCache;
-  DNS4_CACHE    *Item;
-  LIST_ENTRY    *Entry;
-  LIST_ENTRY    *Next;
+  DNS4_CACHE  *NewDnsCache;
+  DNS4_CACHE  *Item;
+  LIST_ENTRY  *Entry;
+  LIST_ENTRY  *Next;
 
   NewDnsCache = NULL;
   Item        = NULL;
@@ -776,8 +778,9 @@ UpdateDns4Cache (
   //
   NET_LIST_FOR_EACH_SAFE (Entry, Next, Dns4CacheList) {
     Item = NET_LIST_USER_STRUCT (Entry, DNS4_CACHE, AllCacheLink);
-    if (StrCmp (DnsCacheEntry.HostName, Item->DnsCache.HostName) == 0 && \
-        CompareMem (DnsCacheEntry.IpAddress, Item->DnsCache.IpAddress, sizeof (EFI_IPv4_ADDRESS)) == 0) {
+    if ((StrCmp (DnsCacheEntry.HostName, Item->DnsCache.HostName) == 0) && \
+        (CompareMem (DnsCacheEntry.IpAddress, Item->DnsCache.IpAddress, sizeof (EFI_IPv4_ADDRESS)) == 0))
+    {
       //
       // This is the Dns cache entry
       //
@@ -855,16 +858,16 @@ UpdateDns4Cache (
 EFI_STATUS
 EFIAPI
 UpdateDns6Cache (
-  IN LIST_ENTRY             *Dns6CacheList,
-  IN BOOLEAN                DeleteFlag,
-  IN BOOLEAN                Override,
-  IN EFI_DNS6_CACHE_ENTRY   DnsCacheEntry
+  IN LIST_ENTRY            *Dns6CacheList,
+  IN BOOLEAN               DeleteFlag,
+  IN BOOLEAN               Override,
+  IN EFI_DNS6_CACHE_ENTRY  DnsCacheEntry
   )
 {
-  DNS6_CACHE    *NewDnsCache;
-  DNS6_CACHE    *Item;
-  LIST_ENTRY    *Entry;
-  LIST_ENTRY    *Next;
+  DNS6_CACHE  *NewDnsCache;
+  DNS6_CACHE  *Item;
+  LIST_ENTRY  *Entry;
+  LIST_ENTRY  *Next;
 
   NewDnsCache = NULL;
   Item        = NULL;
@@ -874,8 +877,9 @@ UpdateDns6Cache (
   //
   NET_LIST_FOR_EACH_SAFE (Entry, Next, Dns6CacheList) {
     Item = NET_LIST_USER_STRUCT (Entry, DNS6_CACHE, AllCacheLink);
-    if (StrCmp (DnsCacheEntry.HostName, Item->DnsCache.HostName) == 0 && \
-        CompareMem (DnsCacheEntry.IpAddress, Item->DnsCache.IpAddress, sizeof (EFI_IPv6_ADDRESS)) == 0) {
+    if ((StrCmp (DnsCacheEntry.HostName, Item->DnsCache.HostName) == 0) && \
+        (CompareMem (DnsCacheEntry.IpAddress, Item->DnsCache.IpAddress, sizeof (EFI_IPv6_ADDRESS)) == 0))
+    {
       //
       // This is the Dns cache entry
       //
@@ -950,14 +954,14 @@ UpdateDns6Cache (
 EFI_STATUS
 EFIAPI
 AddDns4ServerIp (
-  IN LIST_ENTRY                *Dns4ServerList,
-  IN EFI_IPv4_ADDRESS           ServerIp
+  IN LIST_ENTRY        *Dns4ServerList,
+  IN EFI_IPv4_ADDRESS  ServerIp
   )
 {
-  DNS4_SERVER_IP    *NewServerIp;
-  DNS4_SERVER_IP    *Item;
-  LIST_ENTRY        *Entry;
-  LIST_ENTRY        *Next;
+  DNS4_SERVER_IP  *NewServerIp;
+  DNS4_SERVER_IP  *Item;
+  LIST_ENTRY      *Entry;
+  LIST_ENTRY      *Next;
 
   NewServerIp = NULL;
   Item        = NULL;
@@ -1005,14 +1009,14 @@ AddDns4ServerIp (
 EFI_STATUS
 EFIAPI
 AddDns6ServerIp (
-  IN LIST_ENTRY                *Dns6ServerList,
-  IN EFI_IPv6_ADDRESS           ServerIp
+  IN LIST_ENTRY        *Dns6ServerList,
+  IN EFI_IPv6_ADDRESS  ServerIp
   )
 {
-  DNS6_SERVER_IP    *NewServerIp;
-  DNS6_SERVER_IP    *Item;
-  LIST_ENTRY        *Entry;
-  LIST_ENTRY        *Next;
+  DNS6_SERVER_IP  *NewServerIp;
+  DNS6_SERVER_IP  *Item;
+  LIST_ENTRY      *Entry;
+  LIST_ENTRY      *Next;
 
   NewServerIp = NULL;
   Item        = NULL;
@@ -1062,37 +1066,37 @@ AddDns6ServerIp (
 **/
 BOOLEAN
 IsValidDnsResponse (
-  IN     NET_MAP      *TokensMap,
-  IN     UINT16       Identification,
-  IN     UINT16       Type,
-  IN     UINT16       Class,
-     OUT NET_MAP_ITEM **Item
+  IN     NET_MAP    *TokensMap,
+  IN     UINT16     Identification,
+  IN     UINT16     Type,
+  IN     UINT16     Class,
+  OUT NET_MAP_ITEM  **Item
   )
 {
-  LIST_ENTRY              *Entry;
+  LIST_ENTRY  *Entry;
 
-  NET_BUF                 *Packet;
-  UINT8                   *TxString;
-  DNS_HEADER              *DnsHeader;
-  CHAR8                   *QueryName;
-  DNS_QUERY_SECTION       *QuerySection;
+  NET_BUF            *Packet;
+  UINT8              *TxString;
+  DNS_HEADER         *DnsHeader;
+  CHAR8              *QueryName;
+  DNS_QUERY_SECTION  *QuerySection;
 
   NET_LIST_FOR_EACH (Entry, &TokensMap->Used) {
-    *Item = NET_LIST_USER_STRUCT (Entry, NET_MAP_ITEM, Link);
-    Packet = (NET_BUF *) ((*Item)->Value);
+    *Item  = NET_LIST_USER_STRUCT (Entry, NET_MAP_ITEM, Link);
+    Packet = (NET_BUF *)((*Item)->Value);
     if (Packet == NULL) {
-
       continue;
     } else {
       TxString = NetbufGetByte (Packet, 0, NULL);
       ASSERT (TxString != NULL);
-      DnsHeader = (DNS_HEADER *) TxString;
-      QueryName = (CHAR8 *) (TxString + sizeof (*DnsHeader));
-      QuerySection = (DNS_QUERY_SECTION *) (QueryName + AsciiStrLen (QueryName) + 1);
+      DnsHeader    = (DNS_HEADER *)TxString;
+      QueryName    = (CHAR8 *)(TxString + sizeof (*DnsHeader));
+      QuerySection = (DNS_QUERY_SECTION *)(QueryName + AsciiStrLen (QueryName) + 1);
 
-      if (NTOHS (DnsHeader->Identification) == Identification &&
-          NTOHS (QuerySection->Type) == Type &&
-          NTOHS (QuerySection->Class) == Class) {
+      if ((NTOHS (DnsHeader->Identification) == Identification) &&
+          (NTOHS (QuerySection->Type) == Type) &&
+          (NTOHS (QuerySection->Class) == Class))
+      {
         return TRUE;
       }
     }
@@ -1117,33 +1121,33 @@ IsValidDnsResponse (
 **/
 EFI_STATUS
 ParseDnsResponse (
-  IN OUT DNS_INSTANCE              *Instance,
-  IN     UINT8                     *RxString,
-  IN     UINT32                    Length,
-     OUT BOOLEAN                   *Completed
+  IN OUT DNS_INSTANCE  *Instance,
+  IN     UINT8         *RxString,
+  IN     UINT32        Length,
+  OUT BOOLEAN          *Completed
   )
 {
-  DNS_HEADER            *DnsHeader;
+  DNS_HEADER  *DnsHeader;
 
-  CHAR8                 *QueryName;
-  UINT32                QueryNameLen;
-  DNS_QUERY_SECTION     *QuerySection;
+  CHAR8              *QueryName;
+  UINT32             QueryNameLen;
+  DNS_QUERY_SECTION  *QuerySection;
 
-  CHAR8                 *AnswerName;
-  DNS_ANSWER_SECTION    *AnswerSection;
-  UINT8                 *AnswerData;
+  CHAR8               *AnswerName;
+  DNS_ANSWER_SECTION  *AnswerSection;
+  UINT8               *AnswerData;
 
-  NET_MAP_ITEM          *Item;
-  DNS4_TOKEN_ENTRY      *Dns4TokenEntry;
-  DNS6_TOKEN_ENTRY      *Dns6TokenEntry;
+  NET_MAP_ITEM      *Item;
+  DNS4_TOKEN_ENTRY  *Dns4TokenEntry;
+  DNS6_TOKEN_ENTRY  *Dns6TokenEntry;
 
-  UINT32                IpCount;
-  UINT32                RRCount;
-  UINT32                AnswerSectionNum;
-  UINT32                CNameTtl;
+  UINT32  IpCount;
+  UINT32  RRCount;
+  UINT32  AnswerSectionNum;
+  UINT32  CNameTtl;
 
-  EFI_IPv4_ADDRESS      *HostAddr4;
-  EFI_IPv6_ADDRESS      *HostAddr6;
+  EFI_IPv4_ADDRESS  *HostAddr4;
+  EFI_IPv6_ADDRESS  *HostAddr6;
 
   EFI_DNS4_CACHE_ENTRY  *Dns4CacheEntry;
   EFI_DNS6_CACHE_ENTRY  *Dns6CacheEntry;
@@ -1151,32 +1155,32 @@ ParseDnsResponse (
   DNS_RESOURCE_RECORD   *Dns4RR;
   DNS6_RESOURCE_RECORD  *Dns6RR;
 
-  EFI_STATUS            Status;
-  UINT32                RemainingLength;
+  EFI_STATUS  Status;
+  UINT32      RemainingLength;
 
-  EFI_TPL               OldTpl;
+  EFI_TPL  OldTpl;
 
-  Item             = NULL;
-  Dns4TokenEntry   = NULL;
-  Dns6TokenEntry   = NULL;
+  Item           = NULL;
+  Dns4TokenEntry = NULL;
+  Dns6TokenEntry = NULL;
 
   IpCount          = 0;
   RRCount          = 0;
   AnswerSectionNum = 0;
   CNameTtl         = 0;
 
-  HostAddr4        = NULL;
-  HostAddr6        = NULL;
+  HostAddr4 = NULL;
+  HostAddr6 = NULL;
 
-  Dns4CacheEntry   = NULL;
-  Dns6CacheEntry   = NULL;
+  Dns4CacheEntry = NULL;
+  Dns6CacheEntry = NULL;
 
-  Dns4RR           = NULL;
-  Dns6RR           = NULL;
+  Dns4RR = NULL;
+  Dns6RR = NULL;
 
-  *Completed       = TRUE;
-  Status           = EFI_SUCCESS;
-  RemainingLength  = Length;
+  *Completed      = TRUE;
+  Status          = EFI_SUCCESS;
+  RemainingLength = Length;
 
   //
   // Check whether the remaining packet length is available or not.
@@ -1191,14 +1195,14 @@ ParseDnsResponse (
   //
   // Get header
   //
-  DnsHeader = (DNS_HEADER *) RxString;
+  DnsHeader = (DNS_HEADER *)RxString;
 
   DnsHeader->Identification = NTOHS (DnsHeader->Identification);
-  DnsHeader->Flags.Uint16 = NTOHS (DnsHeader->Flags.Uint16);
-  DnsHeader->QuestionsNum = NTOHS (DnsHeader->QuestionsNum);
-  DnsHeader->AnswersNum = NTOHS (DnsHeader->AnswersNum);
-  DnsHeader->AuthorityNum = NTOHS (DnsHeader->AuthorityNum);
-  DnsHeader->AditionalNum = NTOHS (DnsHeader->AditionalNum);
+  DnsHeader->Flags.Uint16   = NTOHS (DnsHeader->Flags.Uint16);
+  DnsHeader->QuestionsNum   = NTOHS (DnsHeader->QuestionsNum);
+  DnsHeader->AnswersNum     = NTOHS (DnsHeader->AnswersNum);
+  DnsHeader->AuthorityNum   = NTOHS (DnsHeader->AuthorityNum);
+  DnsHeader->AditionalNum   = NTOHS (DnsHeader->AditionalNum);
 
   //
   // There is always one QuestionsNum in DNS message. The capability to handle more
@@ -1212,9 +1216,9 @@ ParseDnsResponse (
   //
   // Get Query name
   //
-  QueryName = (CHAR8 *) (RxString + sizeof (*DnsHeader));
+  QueryName = (CHAR8 *)(RxString + sizeof (*DnsHeader));
 
-  QueryNameLen = (UINT32) AsciiStrLen (QueryName) + 1;
+  QueryNameLen = (UINT32)AsciiStrLen (QueryName) + 1;
 
   //
   // Check whether the remaining packet length is available or not.
@@ -1229,8 +1233,8 @@ ParseDnsResponse (
   //
   // Get query section
   //
-  QuerySection = (DNS_QUERY_SECTION *) (QueryName + QueryNameLen);
-  QuerySection->Type = NTOHS (QuerySection->Type);
+  QuerySection        = (DNS_QUERY_SECTION *)(QueryName + QueryNameLen);
+  QuerySection->Type  = NTOHS (QuerySection->Type);
   QuerySection->Class = NTOHS (QuerySection->Class);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
@@ -1245,13 +1249,15 @@ ParseDnsResponse (
            QuerySection->Type,
            QuerySection->Class,
            &Item
-           )) {
+           ))
+    {
       *Completed = FALSE;
-      Status = EFI_ABORTED;
+      Status     = EFI_ABORTED;
       goto ON_EXIT;
     }
+
     ASSERT (Item != NULL);
-    Dns4TokenEntry = (DNS4_TOKEN_ENTRY *) (Item->Key);
+    Dns4TokenEntry = (DNS4_TOKEN_ENTRY *)(Item->Key);
   } else {
     if (!IsValidDnsResponse (
            &Instance->Dns6TxTokens,
@@ -1259,20 +1265,23 @@ ParseDnsResponse (
            QuerySection->Type,
            QuerySection->Class,
            &Item
-           )) {
+           ))
+    {
       *Completed = FALSE;
-      Status = EFI_ABORTED;
+      Status     = EFI_ABORTED;
       goto ON_EXIT;
     }
+
     ASSERT (Item != NULL);
-    Dns6TokenEntry = (DNS6_TOKEN_ENTRY *) (Item->Key);
+    Dns6TokenEntry = (DNS6_TOKEN_ENTRY *)(Item->Key);
   }
 
   //
   // Continue Check Some Errors.
   //
-  if (DnsHeader->Flags.Bits.RCode != DNS_FLAGS_RCODE_NO_ERROR || DnsHeader->AnswersNum < 1 || \
-      DnsHeader->Flags.Bits.QR != DNS_FLAGS_QR_RESPONSE) {
+  if ((DnsHeader->Flags.Bits.RCode != DNS_FLAGS_RCODE_NO_ERROR) || (DnsHeader->AnswersNum < 1) || \
+      (DnsHeader->Flags.Bits.QR != DNS_FLAGS_QR_RESPONSE))
+  {
     //
     // The domain name referenced in the query does not exist.
     //
@@ -1300,6 +1309,7 @@ ParseDnsResponse (
         Status = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
+
       Dns4TokenEntry->Token->RspData.GLookupData->RRList = AllocateZeroPool (DnsHeader->AnswersNum * sizeof (DNS_RESOURCE_RECORD));
       if (Dns4TokenEntry->Token->RspData.GLookupData->RRList == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
@@ -1315,6 +1325,7 @@ ParseDnsResponse (
           Status = EFI_OUT_OF_RESOURCES;
           goto ON_EXIT;
         }
+
         Dns4TokenEntry->Token->RspData.H2AData->IpList = AllocateZeroPool (DnsHeader->AnswersNum * sizeof (EFI_IPv4_ADDRESS));
         if (Dns4TokenEntry->Token->RspData.H2AData->IpList == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
@@ -1337,6 +1348,7 @@ ParseDnsResponse (
         Status = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
+
       Dns6TokenEntry->Token->RspData.GLookupData->RRList = AllocateZeroPool (DnsHeader->AnswersNum * sizeof (DNS_RESOURCE_RECORD));
       if (Dns6TokenEntry->Token->RspData.GLookupData->RRList == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
@@ -1352,6 +1364,7 @@ ParseDnsResponse (
           Status = EFI_OUT_OF_RESOURCES;
           goto ON_EXIT;
         }
+
         Dns6TokenEntry->Token->RspData.H2AData->IpList = AllocateZeroPool (DnsHeader->AnswersNum * sizeof (EFI_IPv6_ADDRESS));
         if (Dns6TokenEntry->Token->RspData.H2AData->IpList == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
@@ -1369,7 +1382,7 @@ ParseDnsResponse (
   //
   // Get Answer name
   //
-  AnswerName = (CHAR8 *) QuerySection + sizeof (*QuerySection);
+  AnswerName = (CHAR8 *)QuerySection + sizeof (*QuerySection);
 
   //
   // Processing AnswerSection.
@@ -1380,7 +1393,7 @@ ParseDnsResponse (
     //
     if (RemainingLength <= sizeof (UINT16) + sizeof (DNS_ANSWER_SECTION)) {
       *Completed = FALSE;
-      Status = EFI_ABORTED;
+      Status     = EFI_ABORTED;
       goto ON_EXIT;
     } else {
       RemainingLength -= (sizeof (UINT16) + sizeof (DNS_ANSWER_SECTION));
@@ -1389,7 +1402,7 @@ ParseDnsResponse (
     //
     // Answer name should be PTR, else EFI_UNSUPPORTED returned.
     //
-    if ((*(UINT8 *) AnswerName & 0xC0) != 0xC0) {
+    if ((*(UINT8 *)AnswerName & 0xC0) != 0xC0) {
       Status = EFI_UNSUPPORTED;
       goto ON_EXIT;
     }
@@ -1397,10 +1410,10 @@ ParseDnsResponse (
     //
     // Get Answer section.
     //
-    AnswerSection = (DNS_ANSWER_SECTION *) (AnswerName + sizeof (UINT16));
-    AnswerSection->Type = NTOHS (AnswerSection->Type);
-    AnswerSection->Class = NTOHS (AnswerSection->Class);
-    AnswerSection->Ttl = NTOHL (AnswerSection->Ttl);
+    AnswerSection             = (DNS_ANSWER_SECTION *)(AnswerName + sizeof (UINT16));
+    AnswerSection->Type       = NTOHS (AnswerSection->Type);
+    AnswerSection->Class      = NTOHS (AnswerSection->Class);
+    AnswerSection->Ttl        = NTOHL (AnswerSection->Ttl);
     AnswerSection->DataLength = NTOHS (AnswerSection->DataLength);
 
     //
@@ -1408,7 +1421,7 @@ ParseDnsResponse (
     //
     if (RemainingLength < AnswerSection->DataLength) {
       *Completed = FALSE;
-      Status = EFI_ABORTED;
+      Status     = EFI_ABORTED;
       goto ON_EXIT;
     } else {
       RemainingLength -= AnswerSection->DataLength;
@@ -1417,9 +1430,9 @@ ParseDnsResponse (
     //
     // Check whether it's the GeneralLookUp querying.
     //
-    if (Instance->Service->IpVersion == IP_VERSION_4 && Dns4TokenEntry->GeneralLookUp) {
-      Dns4RR = Dns4TokenEntry->Token->RspData.GLookupData->RRList;
-      AnswerData = (UINT8 *) AnswerSection + sizeof (*AnswerSection);
+    if ((Instance->Service->IpVersion == IP_VERSION_4) && Dns4TokenEntry->GeneralLookUp) {
+      Dns4RR     = Dns4TokenEntry->Token->RspData.GLookupData->RRList;
+      AnswerData = (UINT8 *)AnswerSection + sizeof (*AnswerSection);
 
       //
       // Fill the ResourceRecord.
@@ -1429,23 +1442,25 @@ ParseDnsResponse (
         Status = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
+
       CopyMem (Dns4RR[RRCount].QName, QueryName, AsciiStrLen (QueryName));
-      Dns4RR[RRCount].QType = AnswerSection->Type;
-      Dns4RR[RRCount].QClass = AnswerSection->Class;
-      Dns4RR[RRCount].TTL = AnswerSection->Ttl;
+      Dns4RR[RRCount].QType      = AnswerSection->Type;
+      Dns4RR[RRCount].QClass     = AnswerSection->Class;
+      Dns4RR[RRCount].TTL        = AnswerSection->Ttl;
       Dns4RR[RRCount].DataLength = AnswerSection->DataLength;
-      Dns4RR[RRCount].RData = AllocateZeroPool (Dns4RR[RRCount].DataLength);
+      Dns4RR[RRCount].RData      = AllocateZeroPool (Dns4RR[RRCount].DataLength);
       if (Dns4RR[RRCount].RData == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
+
       CopyMem (Dns4RR[RRCount].RData, AnswerData, Dns4RR[RRCount].DataLength);
 
-      RRCount ++;
+      RRCount++;
       Status = EFI_SUCCESS;
-    } else if (Instance->Service->IpVersion == IP_VERSION_6 && Dns6TokenEntry->GeneralLookUp) {
-      Dns6RR = Dns6TokenEntry->Token->RspData.GLookupData->RRList;
-      AnswerData = (UINT8 *) AnswerSection + sizeof (*AnswerSection);
+    } else if ((Instance->Service->IpVersion == IP_VERSION_6) && Dns6TokenEntry->GeneralLookUp) {
+      Dns6RR     = Dns6TokenEntry->Token->RspData.GLookupData->RRList;
+      AnswerData = (UINT8 *)AnswerSection + sizeof (*AnswerSection);
 
       //
       // Fill the ResourceRecord.
@@ -1455,19 +1470,21 @@ ParseDnsResponse (
         Status = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
+
       CopyMem (Dns6RR[RRCount].QName, QueryName, AsciiStrLen (QueryName));
-      Dns6RR[RRCount].QType = AnswerSection->Type;
-      Dns6RR[RRCount].QClass = AnswerSection->Class;
-      Dns6RR[RRCount].TTL = AnswerSection->Ttl;
+      Dns6RR[RRCount].QType      = AnswerSection->Type;
+      Dns6RR[RRCount].QClass     = AnswerSection->Class;
+      Dns6RR[RRCount].TTL        = AnswerSection->Ttl;
       Dns6RR[RRCount].DataLength = AnswerSection->DataLength;
-      Dns6RR[RRCount].RData = AllocateZeroPool (Dns6RR[RRCount].DataLength);
+      Dns6RR[RRCount].RData      = AllocateZeroPool (Dns6RR[RRCount].DataLength);
       if (Dns6RR[RRCount].RData == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
+
       CopyMem (Dns6RR[RRCount].RData, AnswerData, Dns6RR[RRCount].DataLength);
 
-      RRCount ++;
+      RRCount++;
       Status = EFI_SUCCESS;
     } else {
       //
@@ -1475,143 +1492,149 @@ ParseDnsResponse (
       // Check the Query type, parse the response packet.
       //
       switch (AnswerSection->Type) {
-      case DNS_TYPE_A:
-        //
-        // This is address entry, get Data.
-        //
-        ASSERT (Dns4TokenEntry != NULL);
+        case DNS_TYPE_A:
+          //
+          // This is address entry, get Data.
+          //
+          ASSERT (Dns4TokenEntry != NULL);
 
-        if (AnswerSection->DataLength != 4) {
-          Status = EFI_ABORTED;
+          if (AnswerSection->DataLength != 4) {
+            Status = EFI_ABORTED;
+            goto ON_EXIT;
+          }
+
+          HostAddr4  = Dns4TokenEntry->Token->RspData.H2AData->IpList;
+          AnswerData = (UINT8 *)AnswerSection + sizeof (*AnswerSection);
+          CopyMem (&HostAddr4[IpCount], AnswerData, sizeof (EFI_IPv4_ADDRESS));
+
+          //
+          // Allocate new CacheEntry pool to update DNS cache dynamically.
+          //
+          Dns4CacheEntry = AllocateZeroPool (sizeof (EFI_DNS4_CACHE_ENTRY));
+          if (Dns4CacheEntry == NULL) {
+            Status = EFI_OUT_OF_RESOURCES;
+            goto ON_EXIT;
+          }
+
+          Dns4CacheEntry->HostName = AllocateZeroPool (2 * (StrLen (Dns4TokenEntry->QueryHostName) + 1));
+          if (Dns4CacheEntry->HostName == NULL) {
+            Status = EFI_OUT_OF_RESOURCES;
+            goto ON_EXIT;
+          }
+
+          CopyMem (Dns4CacheEntry->HostName, Dns4TokenEntry->QueryHostName, 2 * (StrLen (Dns4TokenEntry->QueryHostName) + 1));
+          Dns4CacheEntry->IpAddress = AllocateZeroPool (sizeof (EFI_IPv4_ADDRESS));
+          if (Dns4CacheEntry->IpAddress == NULL) {
+            Status = EFI_OUT_OF_RESOURCES;
+            goto ON_EXIT;
+          }
+
+          CopyMem (Dns4CacheEntry->IpAddress, AnswerData, sizeof (EFI_IPv4_ADDRESS));
+
+          if ((CNameTtl != 0) && (AnswerSection->Ttl != 0)) {
+            Dns4CacheEntry->Timeout = MIN (CNameTtl, AnswerSection->Ttl);
+          } else {
+            Dns4CacheEntry->Timeout = MAX (CNameTtl, AnswerSection->Ttl);
+          }
+
+          UpdateDns4Cache (&mDriverData->Dns4CacheList, FALSE, TRUE, *Dns4CacheEntry);
+
+          //
+          // Free allocated CacheEntry pool.
+          //
+          FreePool (Dns4CacheEntry->HostName);
+          Dns4CacheEntry->HostName = NULL;
+
+          FreePool (Dns4CacheEntry->IpAddress);
+          Dns4CacheEntry->IpAddress = NULL;
+
+          FreePool (Dns4CacheEntry);
+          Dns4CacheEntry = NULL;
+
+          IpCount++;
+          Status = EFI_SUCCESS;
+          break;
+        case DNS_TYPE_AAAA:
+          //
+          // This is address entry, get Data.
+          //
+          ASSERT (Dns6TokenEntry != NULL);
+
+          if (AnswerSection->DataLength != 16) {
+            Status = EFI_ABORTED;
+            goto ON_EXIT;
+          }
+
+          HostAddr6  = Dns6TokenEntry->Token->RspData.H2AData->IpList;
+          AnswerData = (UINT8 *)AnswerSection + sizeof (*AnswerSection);
+          CopyMem (&HostAddr6[IpCount], AnswerData, sizeof (EFI_IPv6_ADDRESS));
+
+          //
+          // Allocate new CacheEntry pool to update DNS cache dynamically.
+          //
+          Dns6CacheEntry = AllocateZeroPool (sizeof (EFI_DNS6_CACHE_ENTRY));
+          if (Dns6CacheEntry == NULL) {
+            Status = EFI_OUT_OF_RESOURCES;
+            goto ON_EXIT;
+          }
+
+          Dns6CacheEntry->HostName = AllocateZeroPool (2 * (StrLen (Dns6TokenEntry->QueryHostName) + 1));
+          if (Dns6CacheEntry->HostName == NULL) {
+            Status = EFI_OUT_OF_RESOURCES;
+            goto ON_EXIT;
+          }
+
+          CopyMem (Dns6CacheEntry->HostName, Dns6TokenEntry->QueryHostName, 2 * (StrLen (Dns6TokenEntry->QueryHostName) + 1));
+          Dns6CacheEntry->IpAddress = AllocateZeroPool (sizeof (EFI_IPv6_ADDRESS));
+          if (Dns6CacheEntry->IpAddress == NULL) {
+            Status = EFI_OUT_OF_RESOURCES;
+            goto ON_EXIT;
+          }
+
+          CopyMem (Dns6CacheEntry->IpAddress, AnswerData, sizeof (EFI_IPv6_ADDRESS));
+
+          if ((CNameTtl != 0) && (AnswerSection->Ttl != 0)) {
+            Dns6CacheEntry->Timeout = MIN (CNameTtl, AnswerSection->Ttl);
+          } else {
+            Dns6CacheEntry->Timeout = MAX (CNameTtl, AnswerSection->Ttl);
+          }
+
+          UpdateDns6Cache (&mDriverData->Dns6CacheList, FALSE, TRUE, *Dns6CacheEntry);
+
+          //
+          // Free allocated CacheEntry pool.
+          //
+          FreePool (Dns6CacheEntry->HostName);
+          Dns6CacheEntry->HostName = NULL;
+
+          FreePool (Dns6CacheEntry->IpAddress);
+          Dns6CacheEntry->IpAddress = NULL;
+
+          FreePool (Dns6CacheEntry);
+          Dns6CacheEntry = NULL;
+
+          IpCount++;
+          Status = EFI_SUCCESS;
+          break;
+        case DNS_TYPE_CNAME:
+          //
+          // According RFC 1034 - 3.6.2, if the query name is an alias, the name server will include the CNAME
+          // record in the response and restart the query at the domain name specified in the data field of the
+          // CNAME record. So, just record the TTL value of the CNAME, then skip to parse the next record.
+          //
+          CNameTtl = AnswerSection->Ttl;
+          break;
+        default:
+          Status = EFI_UNSUPPORTED;
           goto ON_EXIT;
-        }
-
-        HostAddr4 = Dns4TokenEntry->Token->RspData.H2AData->IpList;
-        AnswerData = (UINT8 *) AnswerSection + sizeof (*AnswerSection);
-        CopyMem (&HostAddr4[IpCount], AnswerData, sizeof (EFI_IPv4_ADDRESS));
-
-        //
-        // Allocate new CacheEntry pool to update DNS cache dynamically.
-        //
-        Dns4CacheEntry = AllocateZeroPool (sizeof (EFI_DNS4_CACHE_ENTRY));
-        if (Dns4CacheEntry == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto ON_EXIT;
-        }
-        Dns4CacheEntry->HostName = AllocateZeroPool (2 * (StrLen(Dns4TokenEntry->QueryHostName) + 1));
-        if (Dns4CacheEntry->HostName == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto ON_EXIT;
-        }
-        CopyMem (Dns4CacheEntry->HostName, Dns4TokenEntry->QueryHostName, 2 * (StrLen(Dns4TokenEntry->QueryHostName) + 1));
-        Dns4CacheEntry->IpAddress = AllocateZeroPool (sizeof (EFI_IPv4_ADDRESS));
-        if (Dns4CacheEntry->IpAddress == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto ON_EXIT;
-        }
-        CopyMem (Dns4CacheEntry->IpAddress, AnswerData, sizeof (EFI_IPv4_ADDRESS));
-
-        if (CNameTtl != 0 && AnswerSection->Ttl != 0) {
-          Dns4CacheEntry->Timeout = MIN (CNameTtl, AnswerSection->Ttl);
-        } else {
-          Dns4CacheEntry->Timeout = MAX (CNameTtl, AnswerSection->Ttl);
-        }
-
-        UpdateDns4Cache (&mDriverData->Dns4CacheList, FALSE, TRUE, *Dns4CacheEntry);
-
-        //
-        // Free allocated CacheEntry pool.
-        //
-        FreePool (Dns4CacheEntry->HostName);
-        Dns4CacheEntry->HostName = NULL;
-
-        FreePool (Dns4CacheEntry->IpAddress);
-        Dns4CacheEntry->IpAddress = NULL;
-
-        FreePool (Dns4CacheEntry);
-        Dns4CacheEntry = NULL;
-
-        IpCount ++;
-        Status = EFI_SUCCESS;
-        break;
-      case DNS_TYPE_AAAA:
-        //
-        // This is address entry, get Data.
-        //
-        ASSERT (Dns6TokenEntry != NULL);
-
-        if (AnswerSection->DataLength != 16) {
-          Status = EFI_ABORTED;
-          goto ON_EXIT;
-        }
-
-        HostAddr6 = Dns6TokenEntry->Token->RspData.H2AData->IpList;
-        AnswerData = (UINT8 *) AnswerSection + sizeof (*AnswerSection);
-        CopyMem (&HostAddr6[IpCount], AnswerData, sizeof (EFI_IPv6_ADDRESS));
-
-        //
-        // Allocate new CacheEntry pool to update DNS cache dynamically.
-        //
-        Dns6CacheEntry = AllocateZeroPool (sizeof (EFI_DNS6_CACHE_ENTRY));
-        if (Dns6CacheEntry == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto ON_EXIT;
-        }
-        Dns6CacheEntry->HostName = AllocateZeroPool (2 * (StrLen(Dns6TokenEntry->QueryHostName) + 1));
-        if (Dns6CacheEntry->HostName == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto ON_EXIT;
-        }
-        CopyMem (Dns6CacheEntry->HostName, Dns6TokenEntry->QueryHostName, 2 * (StrLen(Dns6TokenEntry->QueryHostName) + 1));
-        Dns6CacheEntry->IpAddress = AllocateZeroPool (sizeof (EFI_IPv6_ADDRESS));
-        if (Dns6CacheEntry->IpAddress == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto ON_EXIT;
-        }
-        CopyMem (Dns6CacheEntry->IpAddress, AnswerData, sizeof (EFI_IPv6_ADDRESS));
-
-        if (CNameTtl != 0 && AnswerSection->Ttl != 0) {
-          Dns6CacheEntry->Timeout = MIN (CNameTtl, AnswerSection->Ttl);
-        } else {
-          Dns6CacheEntry->Timeout = MAX (CNameTtl, AnswerSection->Ttl);
-        }
-
-        UpdateDns6Cache (&mDriverData->Dns6CacheList, FALSE, TRUE, *Dns6CacheEntry);
-
-        //
-        // Free allocated CacheEntry pool.
-        //
-        FreePool (Dns6CacheEntry->HostName);
-        Dns6CacheEntry->HostName = NULL;
-
-        FreePool (Dns6CacheEntry->IpAddress);
-        Dns6CacheEntry->IpAddress = NULL;
-
-        FreePool (Dns6CacheEntry);
-        Dns6CacheEntry = NULL;
-
-        IpCount ++;
-        Status = EFI_SUCCESS;
-        break;
-      case DNS_TYPE_CNAME:
-        //
-        // According RFC 1034 - 3.6.2, if the query name is an alias, the name server will include the CNAME
-        // record in the response and restart the query at the domain name specified in the data field of the
-        // CNAME record. So, just record the TTL value of the CNAME, then skip to parse the next record.
-        //
-        CNameTtl = AnswerSection->Ttl;
-        break;
-      default:
-        Status = EFI_UNSUPPORTED;
-        goto ON_EXIT;
       }
     }
 
     //
     // Find next one
     //
-    AnswerName = (CHAR8 *) AnswerSection + sizeof (*AnswerSection) + AnswerSection->DataLength;
-    AnswerSectionNum ++;
+    AnswerName = (CHAR8 *)AnswerSection + sizeof (*AnswerSection) + AnswerSection->DataLength;
+    AnswerSectionNum++;
   }
 
   if (Instance->Service->IpVersion == IP_VERSION_4) {
@@ -1646,8 +1669,8 @@ ON_COMPLETE:
   //
   // Parsing is complete, free the sending packet and signal Event here.
   //
-  if (Item != NULL && Item->Value != NULL) {
-    NetbufFree ((NET_BUF *) (Item->Value));
+  if ((Item != NULL) && (Item->Value != NULL)) {
+    NetbufFree ((NET_BUF *)(Item->Value));
   }
 
   if (Instance->Service->IpVersion == IP_VERSION_4) {
@@ -1678,7 +1701,7 @@ ON_EXIT:
         if (Dns4TokenEntry->Token->RspData.GLookupData != NULL) {
           if (Dns4TokenEntry->Token->RspData.GLookupData->RRList != NULL) {
             while (RRCount != 0) {
-              RRCount --;
+              RRCount--;
               if (Dns4TokenEntry->Token->RspData.GLookupData->RRList[RRCount].QName != NULL) {
                 FreePool (Dns4TokenEntry->Token->RspData.GLookupData->RRList[RRCount].QName);
               }
@@ -1694,12 +1717,13 @@ ON_EXIT:
           FreePool (Dns4TokenEntry->Token->RspData.GLookupData);
         }
       } else {
-        if (QuerySection->Type == DNS_TYPE_A && Dns4TokenEntry->Token->RspData.H2AData != NULL) {
+        if ((QuerySection->Type == DNS_TYPE_A) && (Dns4TokenEntry->Token->RspData.H2AData != NULL)) {
           if (Dns4TokenEntry->Token->RspData.H2AData->IpList != NULL) {
             FreePool (Dns4TokenEntry->Token->RspData.H2AData->IpList);
           }
 
           FreePool (Dns4TokenEntry->Token->RspData.H2AData);
+          Dns4TokenEntry->Token->RspData.H2AData = NULL;
         }
       }
     }
@@ -1709,7 +1733,7 @@ ON_EXIT:
         if (Dns6TokenEntry->Token->RspData.GLookupData != NULL) {
           if (Dns6TokenEntry->Token->RspData.GLookupData->RRList != NULL) {
             while (RRCount != 0) {
-              RRCount --;
+              RRCount--;
               if (Dns6TokenEntry->Token->RspData.GLookupData->RRList[RRCount].QName != NULL) {
                 FreePool (Dns6TokenEntry->Token->RspData.GLookupData->RRList[RRCount].QName);
               }
@@ -1725,12 +1749,13 @@ ON_EXIT:
           FreePool (Dns6TokenEntry->Token->RspData.GLookupData);
         }
       } else {
-        if (QuerySection->Type == DNS_TYPE_AAAA && Dns6TokenEntry->Token->RspData.H2AData != NULL) {
+        if ((QuerySection->Type == DNS_TYPE_AAAA) && (Dns6TokenEntry->Token->RspData.H2AData != NULL)) {
           if (Dns6TokenEntry->Token->RspData.H2AData->IpList != NULL) {
             FreePool (Dns6TokenEntry->Token->RspData.H2AData->IpList);
           }
 
           FreePool (Dns6TokenEntry->Token->RspData.H2AData);
+          Dns6TokenEntry->Token->RspData.H2AData = NULL;
         }
       }
     }
@@ -1776,20 +1801,20 @@ ON_EXIT:
 VOID
 EFIAPI
 DnsOnPacketReceived (
-  NET_BUF                   *Packet,
-  UDP_END_POINT             *EndPoint,
-  EFI_STATUS                IoStatus,
-  VOID                      *Context
+  NET_BUF        *Packet,
+  UDP_END_POINT  *EndPoint,
+  EFI_STATUS     IoStatus,
+  VOID           *Context
   )
 {
-  DNS_INSTANCE              *Instance;
+  DNS_INSTANCE  *Instance;
 
-  UINT8                     *RcvString;
-  UINT32                    Len;
+  UINT8   *RcvString;
+  UINT32  Len;
 
-  BOOLEAN                   Completed;
+  BOOLEAN  Completed;
 
-  Instance  = (DNS_INSTANCE *) Context;
+  Instance = (DNS_INSTANCE *)Context;
   NET_CHECK_SIGNATURE (Instance, DNS_INSTANCE_SIGNATURE);
 
   RcvString = NULL;
@@ -1834,29 +1859,29 @@ ON_EXIT:
 VOID
 EFIAPI
 DnsOnPacketSent (
-  NET_BUF                   *Packet,
-  UDP_END_POINT             *EndPoint,
-  EFI_STATUS                IoStatus,
-  VOID                      *Context
+  NET_BUF        *Packet,
+  UDP_END_POINT  *EndPoint,
+  EFI_STATUS     IoStatus,
+  VOID           *Context
   )
 {
-  DNS_INSTANCE              *Instance;
-  LIST_ENTRY                *Entry;
-  NET_MAP_ITEM              *Item;
-  DNS4_TOKEN_ENTRY          *Dns4TokenEntry;
-  DNS6_TOKEN_ENTRY          *Dns6TokenEntry;
+  DNS_INSTANCE      *Instance;
+  LIST_ENTRY        *Entry;
+  NET_MAP_ITEM      *Item;
+  DNS4_TOKEN_ENTRY  *Dns4TokenEntry;
+  DNS6_TOKEN_ENTRY  *Dns6TokenEntry;
 
   Dns4TokenEntry = NULL;
   Dns6TokenEntry = NULL;
 
-  Instance  = (DNS_INSTANCE *) Context;
+  Instance = (DNS_INSTANCE *)Context;
   NET_CHECK_SIGNATURE (Instance, DNS_INSTANCE_SIGNATURE);
 
   if (Instance->Service->IpVersion == IP_VERSION_4) {
     NET_LIST_FOR_EACH (Entry, &Instance->Dns4TxTokens.Used) {
       Item = NET_LIST_USER_STRUCT (Entry, NET_MAP_ITEM, Link);
       if (Packet == (NET_BUF *)(Item->Value)) {
-        Dns4TokenEntry = ((DNS4_TOKEN_ENTRY *)Item->Key);
+        Dns4TokenEntry               = ((DNS4_TOKEN_ENTRY *)Item->Key);
         Dns4TokenEntry->PacketToLive = Dns4TokenEntry->Token->RetryInterval;
         break;
       }
@@ -1865,7 +1890,7 @@ DnsOnPacketSent (
     NET_LIST_FOR_EACH (Entry, &Instance->Dns6TxTokens.Used) {
       Item = NET_LIST_USER_STRUCT (Entry, NET_MAP_ITEM, Link);
       if (Packet == (NET_BUF *)(Item->Value)) {
-        Dns6TokenEntry = ((DNS6_TOKEN_ENTRY *)Item->Key);
+        Dns6TokenEntry               = ((DNS6_TOKEN_ENTRY *)Item->Key);
         Dns6TokenEntry->PacketToLive = Dns6TokenEntry->Token->RetryInterval;
         break;
       }
@@ -1887,11 +1912,11 @@ DnsOnPacketSent (
 **/
 EFI_STATUS
 DoDnsQuery (
-  IN  DNS_INSTANCE              *Instance,
-  IN  NET_BUF                   *Packet
+  IN  DNS_INSTANCE  *Instance,
+  IN  NET_BUF       *Packet
   )
 {
-  EFI_STATUS      Status;
+  EFI_STATUS  Status;
 
   //
   // Ready to receive the DNS response.
@@ -1928,16 +1953,16 @@ DoDnsQuery (
 **/
 EFI_STATUS
 ConstructDNSQuery (
-  IN  DNS_INSTANCE              *Instance,
-  IN  CHAR8                     *QueryName,
-  IN  UINT16                    Type,
-  IN  UINT16                    Class,
-  OUT NET_BUF                   **Packet
+  IN  DNS_INSTANCE  *Instance,
+  IN  CHAR8         *QueryName,
+  IN  UINT16        Type,
+  IN  UINT16        Class,
+  OUT NET_BUF       **Packet
   )
 {
-  NET_FRAGMENT        Frag;
-  DNS_HEADER          *DnsHeader;
-  DNS_QUERY_SECTION   *DnsQuery;
+  NET_FRAGMENT       Frag;
+  DNS_HEADER         *DnsHeader;
+  DNS_QUERY_SECTION  *DnsQuery;
 
   //
   // Messages carried by UDP are restricted to 512 bytes (not counting the IP
@@ -1951,23 +1976,23 @@ ConstructDNSQuery (
   //
   // Fill header
   //
-  DnsHeader = (DNS_HEADER *) Frag.Bulk;
-  DnsHeader->Identification = (UINT16)NET_RANDOM (NetRandomInitSeed());
-  DnsHeader->Flags.Uint16 = 0x0000;
-  DnsHeader->Flags.Bits.RD = 1;
+  DnsHeader                    = (DNS_HEADER *)Frag.Bulk;
+  DnsHeader->Identification    = (UINT16)NET_RANDOM (NetRandomInitSeed ());
+  DnsHeader->Flags.Uint16      = 0x0000;
+  DnsHeader->Flags.Bits.RD     = 1;
   DnsHeader->Flags.Bits.OpCode = DNS_FLAGS_OPCODE_STANDARD;
-  DnsHeader->Flags.Bits.QR = DNS_FLAGS_QR_QUERY;
-  DnsHeader->QuestionsNum = 1;
-  DnsHeader->AnswersNum = 0;
-  DnsHeader->AuthorityNum = 0;
-  DnsHeader->AditionalNum = 0;
+  DnsHeader->Flags.Bits.QR     = DNS_FLAGS_QR_QUERY;
+  DnsHeader->QuestionsNum      = 1;
+  DnsHeader->AnswersNum        = 0;
+  DnsHeader->AuthorityNum      = 0;
+  DnsHeader->AditionalNum      = 0;
 
   DnsHeader->Identification = HTONS (DnsHeader->Identification);
-  DnsHeader->Flags.Uint16 = HTONS (DnsHeader->Flags.Uint16);
-  DnsHeader->QuestionsNum = HTONS (DnsHeader->QuestionsNum);
-  DnsHeader->AnswersNum = HTONS (DnsHeader->AnswersNum);
-  DnsHeader->AuthorityNum = HTONS (DnsHeader->AuthorityNum);
-  DnsHeader->AditionalNum = HTONS (DnsHeader->AditionalNum);
+  DnsHeader->Flags.Uint16   = HTONS (DnsHeader->Flags.Uint16);
+  DnsHeader->QuestionsNum   = HTONS (DnsHeader->QuestionsNum);
+  DnsHeader->AnswersNum     = HTONS (DnsHeader->AnswersNum);
+  DnsHeader->AuthorityNum   = HTONS (DnsHeader->AuthorityNum);
+  DnsHeader->AditionalNum   = HTONS (DnsHeader->AditionalNum);
 
   Frag.Len = sizeof (*DnsHeader);
 
@@ -1975,16 +2000,16 @@ ConstructDNSQuery (
   // Fill Query name
   //
   CopyMem (Frag.Bulk + Frag.Len, QueryName, AsciiStrLen (QueryName));
-  Frag.Len = (UINT32) (Frag.Len + AsciiStrLen (QueryName));
+  Frag.Len                = (UINT32)(Frag.Len + AsciiStrLen (QueryName));
   *(Frag.Bulk + Frag.Len) = 0;
-  Frag.Len ++;
+  Frag.Len++;
 
   //
   // Rest query section
   //
-  DnsQuery = (DNS_QUERY_SECTION *) (Frag.Bulk + Frag.Len);
+  DnsQuery = (DNS_QUERY_SECTION *)(Frag.Bulk + Frag.Len);
 
-  DnsQuery->Type = HTONS (Type);
+  DnsQuery->Type  = HTONS (Type);
   DnsQuery->Class = HTONS (Class);
 
   Frag.Len += sizeof (*DnsQuery);
@@ -2001,7 +2026,7 @@ ConstructDNSQuery (
   //
   // Store the UdpIo in ProtoData.
   //
-  *((UINTN *) &((*Packet)->ProtoData[0])) = (UINTN) (Instance->UdpIo);
+  *((UINTN *)&((*Packet)->ProtoData[0])) = (UINTN)(Instance->UdpIo);
 
   return EFI_SUCCESS;
 }
@@ -2018,13 +2043,13 @@ ConstructDNSQuery (
 **/
 EFI_STATUS
 DnsRetransmit (
-  IN DNS_INSTANCE        *Instance,
-  IN NET_BUF             *Packet
+  IN DNS_INSTANCE  *Instance,
+  IN NET_BUF       *Packet
   )
 {
-  EFI_STATUS      Status;
+  EFI_STATUS  Status;
 
-  UINT8           *Buffer;
+  UINT8  *Buffer;
 
   ASSERT (Packet != NULL);
 
@@ -2062,26 +2087,25 @@ DnsRetransmit (
 VOID
 EFIAPI
 DnsOnTimerRetransmit (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  DNS_SERVICE                *Service;
+  DNS_SERVICE  *Service;
 
-  LIST_ENTRY                 *Entry;
-  LIST_ENTRY                 *Next;
+  LIST_ENTRY  *Entry;
+  LIST_ENTRY  *Next;
 
-  DNS_INSTANCE               *Instance;
-  LIST_ENTRY                 *EntryNetMap;
-  NET_MAP_ITEM               *ItemNetMap;
-  DNS4_TOKEN_ENTRY           *Dns4TokenEntry;
-  DNS6_TOKEN_ENTRY           *Dns6TokenEntry;
+  DNS_INSTANCE      *Instance;
+  LIST_ENTRY        *EntryNetMap;
+  NET_MAP_ITEM      *ItemNetMap;
+  DNS4_TOKEN_ENTRY  *Dns4TokenEntry;
+  DNS6_TOKEN_ENTRY  *Dns6TokenEntry;
 
   Dns4TokenEntry = NULL;
   Dns6TokenEntry = NULL;
 
-  Service = (DNS_SERVICE *) Context;
-
+  Service = (DNS_SERVICE *)Context;
 
   if (Service->IpVersion == IP_VERSION_4) {
     //
@@ -2093,9 +2117,9 @@ DnsOnTimerRetransmit (
 
       EntryNetMap = Instance->Dns4TxTokens.Used.ForwardLink;
       while (EntryNetMap != &Instance->Dns4TxTokens.Used) {
-        ItemNetMap = NET_LIST_USER_STRUCT (EntryNetMap, NET_MAP_ITEM, Link);
+        ItemNetMap     = NET_LIST_USER_STRUCT (EntryNetMap, NET_MAP_ITEM, Link);
         Dns4TokenEntry = (DNS4_TOKEN_ENTRY *)(ItemNetMap->Key);
-        if (Dns4TokenEntry->PacketToLive == 0 || (--Dns4TokenEntry->PacketToLive > 0)) {
+        if ((Dns4TokenEntry->PacketToLive == 0) || (--Dns4TokenEntry->PacketToLive > 0)) {
           EntryNetMap = EntryNetMap->ForwardLink;
           continue;
         }
@@ -2137,9 +2161,9 @@ DnsOnTimerRetransmit (
 
       EntryNetMap = Instance->Dns6TxTokens.Used.ForwardLink;
       while (EntryNetMap != &Instance->Dns6TxTokens.Used) {
-        ItemNetMap = NET_LIST_USER_STRUCT (EntryNetMap, NET_MAP_ITEM, Link);
-        Dns6TokenEntry = (DNS6_TOKEN_ENTRY *) (ItemNetMap->Key);
-        if (Dns6TokenEntry->PacketToLive == 0 || (--Dns6TokenEntry->PacketToLive > 0)) {
+        ItemNetMap     = NET_LIST_USER_STRUCT (EntryNetMap, NET_MAP_ITEM, Link);
+        Dns6TokenEntry = (DNS6_TOKEN_ENTRY *)(ItemNetMap->Key);
+        if ((Dns6TokenEntry->PacketToLive == 0) || (--Dns6TokenEntry->PacketToLive > 0)) {
           EntryNetMap = EntryNetMap->ForwardLink;
           continue;
         }
@@ -2149,7 +2173,7 @@ DnsOnTimerRetransmit (
         // otherwise exit the transfer.
         //
         if (++Dns6TokenEntry->RetryCounting <= Dns6TokenEntry->Token->RetryCount) {
-          DnsRetransmit (Instance, (NET_BUF *) ItemNetMap->Value);
+          DnsRetransmit (Instance, (NET_BUF *)ItemNetMap->Value);
           EntryNetMap = EntryNetMap->ForwardLink;
         } else {
           //
@@ -2164,7 +2188,7 @@ DnsOnTimerRetransmit (
           // Free the sending packet.
           //
           if (ItemNetMap->Value != NULL) {
-            NetbufFree ((NET_BUF *) (ItemNetMap->Value));
+            NetbufFree ((NET_BUF *)(ItemNetMap->Value));
           }
 
           EntryNetMap = Instance->Dns6TxTokens.Used.ForwardLink;
@@ -2184,14 +2208,14 @@ DnsOnTimerRetransmit (
 VOID
 EFIAPI
 DnsOnTimerUpdate (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  LIST_ENTRY                 *Entry;
-  LIST_ENTRY                 *Next;
-  DNS4_CACHE                 *Item4;
-  DNS6_CACHE                 *Item6;
+  LIST_ENTRY  *Entry;
+  LIST_ENTRY  *Next;
+  DNS4_CACHE  *Item4;
+  DNS6_CACHE  *Item6;
 
   Item4 = NULL;
   Item6 = NULL;
@@ -2240,4 +2264,3 @@ DnsOnTimerUpdate (
     }
   }
 }
-

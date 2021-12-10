@@ -51,7 +51,7 @@ AmlCodeGenRdInterrupt (
   IN  BOOLEAN                 Shared,
   IN  UINT32                  *IrqList,
   IN  UINT8                   IrqCount,
-  IN  AML_OBJECT_NODE_HANDLE  NameOpNode, OPTIONAL
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode  OPTIONAL,
   OUT AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
   );
 
@@ -100,7 +100,7 @@ AmlCodeGenRdRegister (
   IN  UINT8                   BitOffset,
   IN  UINT64                  Address,
   IN  UINT8                   AccessSize,
-  IN  AML_OBJECT_NODE_HANDLE  NameOpNode, OPTIONAL
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode  OPTIONAL,
   OUT AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
   );
 
@@ -142,9 +142,9 @@ AmlCodeGenRdRegister (
 EFI_STATUS
 EFIAPI
 AmlCodeGenEndTag (
-  IN  UINT8               CheckSum,   OPTIONAL
-  IN  AML_OBJECT_NODE   * ParentNode, OPTIONAL
-  OUT AML_DATA_NODE    ** NewRdNode   OPTIONAL
+  IN  UINT8            CheckSum    OPTIONAL,
+  IN  AML_OBJECT_NODE  *ParentNode  OPTIONAL,
+  OUT AML_DATA_NODE    **NewRdNode   OPTIONAL
   );
 
 #endif // AML_RESOURCE_DATA_CODE_GEN_H_

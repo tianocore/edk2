@@ -38,9 +38,9 @@ typedef enum {
 EFI_STATUS
 EFIAPI
 SpiFlashReadSfdp (
-  IN     UINT8              ComponentNumber,
-  IN     UINT32             ByteCount,
-  OUT    UINT8              *SfdpData
+  IN     UINT8   ComponentNumber,
+  IN     UINT32  ByteCount,
+  OUT    UINT8   *SfdpData
   );
 
 /**
@@ -58,9 +58,9 @@ SpiFlashReadSfdp (
 EFI_STATUS
 EFIAPI
 SpiFlashReadJedecId (
-  IN     UINT8              ComponentNumber,
-  IN     UINT32             ByteCount,
-  OUT    UINT8              *JedecId
+  IN     UINT8   ComponentNumber,
+  IN     UINT32  ByteCount,
+  OUT    UINT8   *JedecId
   );
 
 /**
@@ -76,8 +76,8 @@ SpiFlashReadJedecId (
 EFI_STATUS
 EFIAPI
 SpiFlashWriteStatus (
-  IN     UINT32             ByteCount,
-  IN     UINT8              *StatusValue
+  IN     UINT32  ByteCount,
+  IN     UINT8   *StatusValue
   );
 
 /**
@@ -93,8 +93,8 @@ SpiFlashWriteStatus (
 EFI_STATUS
 EFIAPI
 SpiFlashReadStatus (
-  IN     UINT32             ByteCount,
-  OUT    UINT8              *StatusValue
+  IN     UINT32  ByteCount,
+  OUT    UINT8   *StatusValue
   );
 
 /**
@@ -112,11 +112,10 @@ SpiFlashReadStatus (
 EFI_STATUS
 EFIAPI
 SpiReadPchSoftStrap (
-  IN     UINT32             SoftStrapAddr,
-  IN     UINT32             ByteCount,
-  OUT    UINT8              *SoftStrapValue
+  IN     UINT32  SoftStrapAddr,
+  IN     UINT32  ByteCount,
+  OUT    UINT8   *SoftStrapValue
   );
-
 
 /**
   Read data from the flash part.
@@ -207,9 +206,8 @@ EFI_STATUS
 EFIAPI
 SpiGetRegionAddress (
   IN     FLASH_REGION_TYPE  FlashRegionType,
-  OUT    UINT32             *BaseAddress, OPTIONAL
+  OUT    UINT32             *BaseAddress  OPTIONAL,
   OUT    UINT32             *RegionSize OPTIONAL
   );
 
 #endif
-

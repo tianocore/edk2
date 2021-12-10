@@ -28,54 +28,51 @@
 #include <Guid/DebugImageInfoTable.h>
 #include <IndustryStandard/PeImage.h>
 
-extern CONST CHAR8 mHexToStr[];
+extern CONST CHAR8  mHexToStr[];
 
 // maximum size of input and output buffers
 // This value came from the show remote command of the gdb we tested against
-#define MAX_BUF_SIZE 2000
+#define MAX_BUF_SIZE  2000
 
 // maximum size of address buffer
-#define MAX_ADDR_SIZE 32
+#define MAX_ADDR_SIZE  32
 
 // maximum size of register number buffer
-#define MAX_REG_NUM_BUF_SIZE 32
+#define MAX_REG_NUM_BUF_SIZE  32
 
 // maximum size of length buffer
-#define MAX_LENGTH_SIZE 32
+#define MAX_LENGTH_SIZE  32
 
 // maximum size of T signal members
-#define MAX_T_SIGNAL_SIZE 64
+#define MAX_T_SIGNAL_SIZE  64
 
 // the mask used to clear all the cache
-#define TF_BIT 0x00000100
-
+#define TF_BIT  0x00000100
 
 //
 // GDB Signal definitions - generic names for interrupts
 //
-#define GDB_SIGILL      4  // Illegal instruction
-#define GDB_SIGTRAP     5  // Trace Trap (Breakpoint and SingleStep)
-#define GDB_SIGEMT      7  // Emulator Trap
-#define GDB_SIGFPE      8  // Floating point exception
-#define GDB_SIGSEGV     11 // Segment violation, page fault
-
+#define GDB_SIGILL   4     // Illegal instruction
+#define GDB_SIGTRAP  5     // Trace Trap (Breakpoint and SingleStep)
+#define GDB_SIGEMT   7     // Emulator Trap
+#define GDB_SIGFPE   8     // Floating point exception
+#define GDB_SIGSEGV  11    // Segment violation, page fault
 
 //
 // GDB File I/O Error values, zero means no error
 // Includes all general GDB Unix like error values
 //
-#define GDB_EBADMEMADDRBUFSIZE   11  // the buffer that stores memory Address to be read from/written to is not the right size
-#define GDB_EBADMEMLENGBUFSIZE   12  // the buffer that stores Length is not the right size
-#define GDB_EBADMEMLENGTH        13  // Length, the given number of bytes to read or write, is not the right size
-#define GDB_EBADMEMDATA          14  // one of the bytes or nibbles of the memory is less than 0
-#define GDB_EBADMEMDATASIZE      15  // the memory data, 'XX..', is too short or too long
-#define GDB_EBADBUFSIZE          21  // the buffer created is not the correct size
-#define GDB_EINVALIDARG          31  // argument is invalid
-#define GDB_ENOSPACE             41  //
-#define GDB_EINVALIDBRKPOINTTYPE 51  // the breakpoint type is not recognized
-#define GDB_EINVALIDREGNUM       61  // given register number is not valid: either <0 or >=Number of Registers
-#define GDB_EUNKNOWN             255 // unknown
-
+#define GDB_EBADMEMADDRBUFSIZE    11  // the buffer that stores memory Address to be read from/written to is not the right size
+#define GDB_EBADMEMLENGBUFSIZE    12  // the buffer that stores Length is not the right size
+#define GDB_EBADMEMLENGTH         13  // Length, the given number of bytes to read or write, is not the right size
+#define GDB_EBADMEMDATA           14  // one of the bytes or nibbles of the memory is less than 0
+#define GDB_EBADMEMDATASIZE       15  // the memory data, 'XX..', is too short or too long
+#define GDB_EBADBUFSIZE           21  // the buffer created is not the correct size
+#define GDB_EINVALIDARG           31  // argument is invalid
+#define GDB_ENOSPACE              41  //
+#define GDB_EINVALIDBRKPOINTTYPE  51  // the breakpoint type is not recognized
+#define GDB_EINVALIDREGNUM        61  // given register number is not valid: either <0 or >=Number of Registers
+#define GDB_EUNKNOWN              255 // unknown
 
 //
 // These devices are open by GDB so we can just read and write to them
@@ -85,7 +82,7 @@ extern CONST CHAR8 mHexToStr[];
 #define GDB_STDERR  0x02
 
 //
-//Define Register size for different architectures
+// Define Register size for different architectures
 //
 #if defined (MDE_CPU_IA32)
 #define REG_SIZE  32
@@ -95,12 +92,12 @@ extern CONST CHAR8 mHexToStr[];
 #define REG_SIZE  32
 #endif
 
-#define GDB_SERIAL_DEV_SIGNATURE    SIGNATURE_32 ('g', 'd', 'b', 's')
+#define GDB_SERIAL_DEV_SIGNATURE  SIGNATURE_32 ('g', 'd', 'b', 's')
 
 typedef struct {
-  VENDOR_DEVICE_PATH                     VendorDevice;
-  UINT32                                 Index;         // Support more than one
-  EFI_DEVICE_PATH_PROTOCOL               End;
+  VENDOR_DEVICE_PATH          VendorDevice;
+  UINT32                      Index;                    // Support more than one
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } GDB_SERIAL_DEVICE_PATH;
 
 //
@@ -113,24 +110,21 @@ typedef struct {
 //      DevicePath  EFI_DEVICE_PATH_PROTOCOL *: Device path of the serial device
 //
 typedef struct {
-  UINTN                                  Signature;
-  EFI_HANDLE                             Handle;
-  EFI_SERIAL_IO_PROTOCOL                 SerialIo;
-  EFI_SERIAL_IO_MODE                     SerialMode;
-  GDB_SERIAL_DEVICE_PATH                 DevicePath;
-  INTN                                   InFileDescriptor;
-  INTN                                   OutFileDescriptor;
+  UINTN                     Signature;
+  EFI_HANDLE                Handle;
+  EFI_SERIAL_IO_PROTOCOL    SerialIo;
+  EFI_SERIAL_IO_MODE        SerialMode;
+  GDB_SERIAL_DEVICE_PATH    DevicePath;
+  INTN                      InFileDescriptor;
+  INTN                      OutFileDescriptor;
 } GDB_SERIAL_DEV;
 
-
-#define GDB_SERIAL_DEV_FROM_THIS(a) CR (a, GDB_SERIAL_DEV, SerialIo, GDB_SERIAL_DEV_SIGNATURE)
-
+#define GDB_SERIAL_DEV_FROM_THIS(a)  CR (a, GDB_SERIAL_DEV, SerialIo, GDB_SERIAL_DEV_SIGNATURE)
 
 typedef struct {
-    EFI_EXCEPTION_TYPE  Exception;
-    UINT8               SignalNo;
+  EFI_EXCEPTION_TYPE    Exception;
+  UINT8                 SignalNo;
 } EFI_EXCEPTION_TYPE_ENTRY;
-
 
 #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 
@@ -141,17 +135,17 @@ typedef struct {
 //
 typedef union {
   struct {
-    UINT32  B0:1;           // Breakpoint condition detected
-    UINT32  B1:1;           // Breakpoint condition detected
-    UINT32  B2:1;           // Breakpoint condition detected
-    UINT32  B3:1;           // Breakpoint condition detected
-    UINT32  Reserved_1:9;   // Reserved
-    UINT32  BD:1;           // Debug register access detected
-    UINT32  BS:1;           // Single step
-    UINT32  BT:1;           // Task switch
-    UINT32  Reserved_2:16;  // Reserved
+    UINT32    B0         : 1;  // Breakpoint condition detected
+    UINT32    B1         : 1;  // Breakpoint condition detected
+    UINT32    B2         : 1;  // Breakpoint condition detected
+    UINT32    B3         : 1;  // Breakpoint condition detected
+    UINT32    Reserved_1 : 9;  // Reserved
+    UINT32    BD         : 1;  // Debug register access detected
+    UINT32    BS         : 1;  // Single step
+    UINT32    BT         : 1;  // Task switch
+    UINT32    Reserved_2 : 16; // Reserved
   } Bits;
-  UINTN     UintN;
+  UINTN    UintN;
 } IA32_DR6;
 
 //
@@ -161,65 +155,64 @@ typedef union {
 //
 typedef union {
   struct {
-    UINT32  L0:1;           // Local breakpoint enable
-    UINT32  G0:1;           // Global breakpoint enable
-    UINT32  L1:1;           // Local breakpoint enable
-    UINT32  G1:1;           // Global breakpoint enable
-    UINT32  L2:1;           // Local breakpoint enable
-    UINT32  G2:1;           // Global breakpoint enable
-    UINT32  L3:1;           // Local breakpoint enable
-    UINT32  G3:1;           // Global breakpoint enable
-    UINT32  LE:1;           // Local exact breakpoint enable
-    UINT32  GE:1;           // Global exact breakpoint enable
-    UINT32  Reserved_1:3;   // Reserved
-    UINT32  GD:1;           // Global detect enable
-    UINT32  Reserved_2:2;   // Reserved
-    UINT32  RW0:2;          // Read/Write field
-    UINT32  LEN0:2;         // Length field
-    UINT32  RW1:2;          // Read/Write field
-    UINT32  LEN1:2;         // Length field
-    UINT32  RW2:2;          // Read/Write field
-    UINT32  LEN2:2;         // Length field
-    UINT32  RW3:2;          // Read/Write field
-    UINT32  LEN3:2;         // Length field
+    UINT32    L0         : 1; // Local breakpoint enable
+    UINT32    G0         : 1; // Global breakpoint enable
+    UINT32    L1         : 1; // Local breakpoint enable
+    UINT32    G1         : 1; // Global breakpoint enable
+    UINT32    L2         : 1; // Local breakpoint enable
+    UINT32    G2         : 1; // Global breakpoint enable
+    UINT32    L3         : 1; // Local breakpoint enable
+    UINT32    G3         : 1; // Global breakpoint enable
+    UINT32    LE         : 1; // Local exact breakpoint enable
+    UINT32    GE         : 1; // Global exact breakpoint enable
+    UINT32    Reserved_1 : 3; // Reserved
+    UINT32    GD         : 1; // Global detect enable
+    UINT32    Reserved_2 : 2; // Reserved
+    UINT32    RW0        : 2; // Read/Write field
+    UINT32    LEN0       : 2; // Length field
+    UINT32    RW1        : 2; // Read/Write field
+    UINT32    LEN1       : 2; // Length field
+    UINT32    RW2        : 2; // Read/Write field
+    UINT32    LEN2       : 2; // Length field
+    UINT32    RW3        : 2; // Read/Write field
+    UINT32    LEN3       : 2; // Length field
   } Bits;
-  UINTN     UintN;
+  UINTN    UintN;
 } IA32_DR7;
 
 #endif /* if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64) */
 
 typedef enum {
-  InstructionExecution,   //Hardware breakpoint
-  DataWrite,              //watch
-  DataRead,               //rwatch
-  DataReadWrite,          //awatch
-  SoftwareBreakpoint,     //Software breakpoint
+  InstructionExecution,   // Hardware breakpoint
+  DataWrite,              // watch
+  DataRead,               // rwatch
+  DataReadWrite,          // awatch
+  SoftwareBreakpoint,     // Software breakpoint
   NotSupported
 } BREAK_TYPE;
 
 //
 // Array of exception types that need to be hooked by the debugger
 //
-extern EFI_EXCEPTION_TYPE_ENTRY gExceptionType[];
+extern EFI_EXCEPTION_TYPE_ENTRY  gExceptionType[];
 
 //
 // Set TRUE if F Reply package signals a ctrl-c. We can not process the Ctrl-c
 // here we need to wait for the periodic callback to do this.
 //
-extern BOOLEAN gCtrlCBreakFlag;
+extern BOOLEAN  gCtrlCBreakFlag;
 
 //
 // If the periodic callback is called while we are processing an F packet we need
 // to let the callback know to not read from the serial stream as it could steal
 // characters from the F response packet
 //
-extern BOOLEAN gProcessingFPacket;
-
+extern BOOLEAN  gProcessingFPacket;
 
 // The offsets of registers SystemContext.
 // The fields in the array are in the gdb ordering.
 //
-extern UINTN    gRegisterOffsets[];
+extern UINTN  gRegisterOffsets[];
 
 /**
  Return the number of entries in the gExceptionType[]
@@ -231,7 +224,6 @@ MaxEfiException (
   VOID
   );
 
-
 /**
  Return the number of entries in the gRegisters[]
 
@@ -242,7 +234,6 @@ MaxRegisterCount (
   VOID
   );
 
-
 /**
  Check to see if the ISA is supported.
  ISA = Instruction Set Architecture
@@ -252,9 +243,8 @@ MaxRegisterCount (
  **/
 BOOLEAN
 CheckIsa (
-  IN    EFI_INSTRUCTION_SET_ARCHITECTURE    Isa
+  IN    EFI_INSTRUCTION_SET_ARCHITECTURE  Isa
   );
-
 
 /**
  Send the T signal with the given exception type (in gdb order) and possibly with n:r pairs related to the watchpoints
@@ -269,7 +259,6 @@ GdbSendTSignal (
   IN  UINT8               GdbExceptionType
   );
 
-
 /**
  Translates the EFI mapping to GDB mapping
 
@@ -278,9 +267,8 @@ GdbSendTSignal (
  **/
 UINT8
 ConvertEFItoGDBtype (
-  IN  EFI_EXCEPTION_TYPE EFIExceptionType
+  IN  EFI_EXCEPTION_TYPE  EFIExceptionType
   );
-
 
 /**
  Empties the given buffer
@@ -291,7 +279,6 @@ EmptyBuffer (
   IN CHAR8  *Buf
   );
 
-
 /**
  Converts an 8-bit Hex Char into a INTN.
 
@@ -301,9 +288,8 @@ EmptyBuffer (
  **/
 INTN
 HexCharToInt (
-  IN  CHAR8 Char
+  IN  CHAR8  Char
   );
-
 
 /** 'E NN'
  Send an error with the given error number after converting to hex.
@@ -315,9 +301,8 @@ HexCharToInt (
 VOID
 EFIAPI
 SendError (
-  IN  UINT8     ErrorNum
+  IN  UINT8  ErrorNum
   );
-
 
 /**
  Send 'OK' when the function is done executing successfully.
@@ -327,7 +312,6 @@ EFIAPI
 SendSuccess (
   VOID
   );
-
 
 /**
  Send empty packet to specify that particular command/functionality is not supported.
@@ -349,7 +333,6 @@ ReadNthRegister (
   IN    CHAR8               *InBuffer
   );
 
-
 /** ‘g’
  Reads the general registers into an output buffer  and sends it as a packet
  @param     SystemContext           Register content at time of the exception
@@ -359,7 +342,6 @@ EFIAPI
 ReadGeneralRegisters (
   IN    EFI_SYSTEM_CONTEXT  SystemContext
   );
-
 
 /** ‘P n...=r...’
  Writes the new value of n-th register received into the input buffer to the n-th register
@@ -372,7 +354,6 @@ WriteNthRegister (
   IN    EFI_SYSTEM_CONTEXT  SystemContext,
   IN    CHAR8               *InBuffer
   );
-
 
 /** ‘G XX...’
  Writes the new values received into the input buffer to the general registers
@@ -387,7 +368,6 @@ WriteGeneralRegisters (
   IN    CHAR8               *InBuffer
   );
 
-
 /** ‘m addr,length ’
  Find the Length of the area to read and the start address. Finally, pass them to
  another function, TransferFromMemToOutBufAndSend, that will read from that memory space and
@@ -401,7 +381,6 @@ ReadFromMemory (
   IN  CHAR8  *PacketData
   );
 
-
 /** ‘M addr,length :XX...’
  Find the Length of the area in bytes to write and the start address. Finally, pass them to
  another function, TransferFromInBufToMem, that will write to that memory space the info in
@@ -412,9 +391,8 @@ ReadFromMemory (
 VOID
 EFIAPI
 WriteToMemory (
-  IN CHAR8 *PacketData
+  IN CHAR8  *PacketData
   );
-
 
 /** ‘c [addr ]’
  Continue. addr is Address to resume. If addr is omitted, resume at current
@@ -427,10 +405,9 @@ WriteToMemory (
 VOID
 EFIAPI
 ContinueAtAddress (
-  IN  EFI_SYSTEM_CONTEXT   SystemContext,
-  IN  CHAR8                *PacketData
+  IN  EFI_SYSTEM_CONTEXT  SystemContext,
+  IN  CHAR8               *PacketData
   );
-
 
 /** ‘s [addr ]’
  Single step. addr is the Address at which to resume. If addr is omitted, resume
@@ -466,7 +443,6 @@ RemoveSingleStep (
   IN  EFI_SYSTEM_CONTEXT  SystemContext
   );
 
-
 /**
   ‘Z1, [addr], [length]’
   ‘Z2, [addr], [length]’
@@ -481,11 +457,10 @@ RemoveSingleStep (
 **/
 VOID
 EFIAPI
-InsertBreakPoint(
+InsertBreakPoint (
   IN  EFI_SYSTEM_CONTEXT  SystemContext,
   IN  CHAR8               *PacketData
   );
-
 
 /**
   ‘z1, [addr], [length]’
@@ -501,11 +476,10 @@ InsertBreakPoint(
 **/
 VOID
 EFIAPI
-RemoveBreakPoint(
+RemoveBreakPoint (
   IN  EFI_SYSTEM_CONTEXT  SystemContext,
   IN  CHAR8               *PacketData
   );
-
 
 /**
  Exception Handler for GDB. It will be called for all exceptions
@@ -522,7 +496,6 @@ GdbExceptionHandler (
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );
 
-
 /**
  Periodic callback for GDB. This function is used to catch a ctrl-c or other
  break in type command from GDB.
@@ -536,7 +509,6 @@ GdbPeriodicCallBack (
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );
 
-
 /**
   Make two serial consoles: 1) StdIn and StdOut via GDB. 2) StdErr via GDB.
 
@@ -548,7 +520,6 @@ VOID
 GdbInitializeSerialConsole (
   VOID
   );
-
 
 /**
   Send a GDB Remote Serial Protocol Packet
@@ -566,9 +537,8 @@ GdbInitializeSerialConsole (
 **/
 UINTN
 SendPacket (
-  IN  CHAR8 *PacketData
+  IN  CHAR8  *PacketData
   );
-
 
 /**
  Receive a GDB Remote Serial Protocol Packet
@@ -588,10 +558,9 @@ SendPacket (
  **/
 UINTN
 ReceivePacket (
- OUT  CHAR8 *PacketData,
- IN   UINTN PacketDataSize
- );
-
+  OUT  CHAR8  *PacketData,
+  IN   UINTN  PacketDataSize
+  );
 
 /**
   Read data from a FileDescriptor. On success number of bytes read is returned. Zero indicates
@@ -607,11 +576,10 @@ ReceivePacket (
 **/
 INTN
 GdbRead (
-  IN  INTN    FileDescriptor,
-  OUT VOID    *Buffer,
-  IN  UINTN   Count
+  IN  INTN   FileDescriptor,
+  OUT VOID   *Buffer,
+  IN  UINTN  Count
   );
-
 
 /**
   Write data to a FileDescriptor. On success number of bytes written is returned. Zero indicates
@@ -627,29 +595,29 @@ GdbRead (
 **/
 INTN
 GdbWrite (
-  IN  INTN          FileDescriptor,
-  OUT CONST VOID    *Buffer,
-  IN  UINTN         Count
+  IN  INTN        FileDescriptor,
+  OUT CONST VOID  *Buffer,
+  IN  UINTN       Count
   );
 
 UINTN *
 FindPointerToRegister (
-  IN  EFI_SYSTEM_CONTEXT    SystemContext,
-  IN  UINTN                 RegNumber
+  IN  EFI_SYSTEM_CONTEXT  SystemContext,
+  IN  UINTN               RegNumber
   );
 
 CHAR8 *
 BasicReadRegister (
-  IN  EFI_SYSTEM_CONTEXT      SystemContext,
-  IN  UINTN                   RegNumber,
-  IN  CHAR8                   *OutBufPtr
+  IN  EFI_SYSTEM_CONTEXT  SystemContext,
+  IN  UINTN               RegNumber,
+  IN  CHAR8               *OutBufPtr
   );
 
 VOID
 TransferFromInBufToMem (
-  IN  UINTN   Length,
-  IN  UINT8   *Address,
-  IN  CHAR8   *NewData
+  IN  UINTN  Length,
+  IN  UINT8  *Address,
+  IN  CHAR8  *NewData
   );
 
 VOID
@@ -660,22 +628,22 @@ TransferFromMemToOutBufAndSend (
 
 CHAR8 *
 BasicWriteRegister (
-  IN  EFI_SYSTEM_CONTEXT    SystemContext,
-  IN  UINTN                 RegNumber,
-  IN  CHAR8                 *InBufPtr
+  IN  EFI_SYSTEM_CONTEXT  SystemContext,
+  IN  UINTN               RegNumber,
+  IN  CHAR8               *InBufPtr
   );
 
 VOID
 PrintReg (
-  EFI_SYSTEM_CONTEXT SystemContext
+  EFI_SYSTEM_CONTEXT  SystemContext
   );
 
 UINTN
 ParseBreakpointPacket (
-  IN  CHAR8 *PacketData,
-  OUT UINTN *Type,
-  OUT UINTN *Address,
-  OUT UINTN *Length
+  IN  CHAR8  *PacketData,
+  OUT UINTN  *Type,
+  OUT UINTN  *Address,
+  OUT UINTN  *Length
   );
 
 UINTN
@@ -717,18 +685,18 @@ EnableDebugRegister (
 
 EFI_STATUS
 FindMatchingDebugRegister (
- IN  EFI_SYSTEM_CONTEXT  SystemContext,
- IN  UINTN               Address,
- IN  UINTN               Length,
- IN  UINTN               Type,
- OUT UINTN               *Register
- );
+  IN  EFI_SYSTEM_CONTEXT  SystemContext,
+  IN  UINTN               Address,
+  IN  UINTN               Length,
+  IN  UINTN               Type,
+  OUT UINTN               *Register
+  );
 
 EFI_STATUS
 DisableDebugRegister (
- IN  EFI_SYSTEM_CONTEXT  SystemContext,
- IN  UINTN               Register
- );
+  IN  EFI_SYSTEM_CONTEXT  SystemContext,
+  IN  UINTN               Register
+  );
 
 VOID
 InitializeProcessor (
@@ -742,8 +710,8 @@ ValidateAddress (
 
 BOOLEAN
 ValidateException (
-  IN  EFI_EXCEPTION_TYPE    ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT SystemContext
+  IN  EFI_EXCEPTION_TYPE     ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );
 
 #endif

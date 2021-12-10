@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 INTN
 GetConditionalExpressionCount (
-  IN EXPRESS_LEVEL       Level
+  IN EXPRESS_LEVEL  Level
   );
 
 /**
@@ -63,7 +63,7 @@ ResetScopeStack (
 **/
 EFI_STATUS
 PushScope (
-  IN UINT8   Operand
+  IN UINT8  Operand
   );
 
 /**
@@ -77,7 +77,7 @@ PushScope (
 **/
 FORM_EXPRESSION **
 GetConditionalExpressionList (
-  IN EXPRESS_LEVEL       Level
+  IN EXPRESS_LEVEL  Level
   );
 
 /**
@@ -92,7 +92,7 @@ GetConditionalExpressionList (
 **/
 EFI_STATUS
 PopScope (
-  OUT UINT8     *Operand
+  OUT UINT8  *Operand
   );
 
 /**
@@ -131,7 +131,7 @@ PushCurrentExpression (
 **/
 VOID
 ExtendValueToU64 (
-  IN  EFI_HII_VALUE   *Value
+  IN  EFI_HII_VALUE  *Value
   );
 
 /**
@@ -147,8 +147,8 @@ ExtendValueToU64 (
 **/
 EFI_STATUS
 PushConditionalExpression (
-  IN FORM_EXPRESSION   *Pointer,
-  IN EXPRESS_LEVEL     Level
+  IN FORM_EXPRESSION  *Pointer,
+  IN EXPRESS_LEVEL    Level
   );
 
 /**
@@ -163,7 +163,7 @@ PushConditionalExpression (
 **/
 EFI_STATUS
 PopConditionalExpression (
-  IN  EXPRESS_LEVEL      Level
+  IN  EXPRESS_LEVEL  Level
   );
 
 /**
@@ -177,7 +177,7 @@ PopConditionalExpression (
 **/
 EFI_STATUS
 PopMapExpressionList (
-  OUT VOID    **Pointer
+  OUT VOID  **Pointer
   );
 
 /**
@@ -191,7 +191,7 @@ PopMapExpressionList (
 **/
 EFI_STATUS
 PopCurrentExpression (
-  OUT VOID    **Pointer
+  OUT VOID  **Pointer
   );
 
 /**
@@ -218,6 +218,7 @@ EvaluateExpression (
   IN FORM_BROWSER_FORM     *Form,
   IN OUT FORM_EXPRESSION   *Expression
   );
+
 /**
   Return the result of the expression list. Check the expression list and
   return the highest priority express result.
@@ -234,10 +235,10 @@ EvaluateExpression (
 **/
 EXPRESS_RESULT
 EvaluateExpressionList (
-  IN FORM_EXPRESSION_LIST *ExpList,
-  IN BOOLEAN              Evaluate,
-  IN FORM_BROWSER_FORMSET *FormSet, OPTIONAL
-  IN FORM_BROWSER_FORM    *Form OPTIONAL
+  IN FORM_EXPRESSION_LIST  *ExpList,
+  IN BOOLEAN               Evaluate,
+  IN FORM_BROWSER_FORMSET  *FormSet  OPTIONAL,
+  IN FORM_BROWSER_FORM     *Form OPTIONAL
   );
 
 /**

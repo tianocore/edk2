@@ -28,9 +28,9 @@
 EFI_STATUS
 EFIAPI
 SecPlatformInformation (
-  IN CONST EFI_PEI_SERVICES                     **PeiServices,
-  IN OUT   UINT64                               *StructureSize,
-     OUT   EFI_SEC_PLATFORM_INFORMATION_RECORD  *PlatformInformationRecord
+  IN CONST EFI_PEI_SERVICES                  **PeiServices,
+  IN OUT   UINT64                            *StructureSize,
+  OUT   EFI_SEC_PLATFORM_INFORMATION_RECORD  *PlatformInformationRecord
   )
 {
   UINT32      *Bist;
@@ -47,7 +47,7 @@ SecPlatformInformation (
                              &gTopOfTemporaryRamPpiGuid,
                              0,
                              NULL,
-                             (VOID **) &TopOfTemporaryRamPpi
+                             (VOID **)&TopOfTemporaryRamPpi
                              );
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
@@ -59,18 +59,18 @@ SecPlatformInformation (
   // This routine copies the BIST information to the buffer pointed by
   // PlatformInformationRecord for output.
   //
-  TopOfTemporaryRam = (UINT32)(UINTN)TopOfTemporaryRamPpi - sizeof (UINT32);
-  TopOfTemporaryRam -= sizeof(UINT32) * 2;
-  Count             = *((UINT32 *)(UINTN) (TopOfTemporaryRam - sizeof (UINT32)));
-  Size              = Count * sizeof (IA32_HANDOFF_STATUS);
+  TopOfTemporaryRam  = (UINT32)(UINTN)TopOfTemporaryRamPpi - sizeof (UINT32);
+  TopOfTemporaryRam -= sizeof (UINT32) * 2;
+  Count              = *((UINT32 *)(UINTN)(TopOfTemporaryRam - sizeof (UINT32)));
+  Size               = Count * sizeof (IA32_HANDOFF_STATUS);
 
-  if ((*StructureSize) < (UINT64) Size) {
+  if ((*StructureSize) < (UINT64)Size) {
     *StructureSize = Size;
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  *StructureSize  = Size;
-  Bist            = (UINT32 *) (TopOfTemporaryRam - sizeof (UINT32) - Size);
+  *StructureSize = Size;
+  Bist           = (UINT32 *)(TopOfTemporaryRam - sizeof (UINT32) - Size);
 
   CopyMem (PlatformInformationRecord, Bist, Size);
 

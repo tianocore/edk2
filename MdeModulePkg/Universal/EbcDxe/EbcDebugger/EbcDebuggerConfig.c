@@ -31,7 +31,7 @@ PrintUsage (
     L"usage: EdbCfg <Command>\n"
     L"  CommandList:\n"
     L"    BO[C|CX|R|E|T|K] <ON|OFF> - Enable/Disable BOC/BOCX/BOR/BOE/BOT/BOK.\n"
-//    L"    SHOWINFO                - Show Debugger Information.\n"
+    //    L"    SHOWINFO                - Show Debugger Information.\n"
     L"\n"
     );
   return;
@@ -46,11 +46,11 @@ PrintUsage (
 **/
 VOID
 EdbShowInfo (
-  EFI_DEBUGGER_CONFIGURATION_PROTOCOL *DebuggerConfiguration
+  EFI_DEBUGGER_CONFIGURATION_PROTOCOL  *DebuggerConfiguration
   )
 {
   Print (L"Not supported!\n");
-  return ;
+  return;
 }
 
 /**
@@ -64,12 +64,12 @@ EdbShowInfo (
 **/
 VOID
 EdbConfigBreak (
-  EFI_DEBUGGER_CONFIGURATION_PROTOCOL *DebuggerConfiguration,
-  CHAR16                              *Command,
-  CHAR16                              *CommandArg
+  EFI_DEBUGGER_CONFIGURATION_PROTOCOL  *DebuggerConfiguration,
+  CHAR16                               *Command,
+  CHAR16                               *CommandArg
   )
 {
-  EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate;
+  EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate;
 
   DebuggerPrivate = (EFI_DEBUGGER_PRIVATE_DATA *)DebuggerConfiguration->DebuggerPrivateData;
 
@@ -158,7 +158,8 @@ EdbConfigBreak (
       Print (L"Invalid parameter\n");
     }
   }
-  return ;
+
+  return;
 }
 
 /**
@@ -178,18 +179,18 @@ InitializeEbcDebuggerConfig (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  UINTN                               Argc;
-  CHAR16                              **Argv;
-  EFI_SHELL_PARAMETERS_PROTOCOL       *ShellParameters;
-  EFI_DEBUGGER_CONFIGURATION_PROTOCOL *DebuggerConfiguration;
-  EFI_STATUS                          Status;
+  UINTN                                Argc;
+  CHAR16                               **Argv;
+  EFI_SHELL_PARAMETERS_PROTOCOL        *ShellParameters;
+  EFI_DEBUGGER_CONFIGURATION_PROTOCOL  *DebuggerConfiguration;
+  EFI_STATUS                           Status;
 
   Status = gBS->HandleProtocol (
                   gImageHandle,
                   &gEfiShellParametersProtocolGuid,
-                  (VOID**)&ShellParameters
+                  (VOID **)&ShellParameters
                   );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     Print (L"Please use UEFI Shell to run this application.\n");
     return EFI_INVALID_PARAMETER;
   }
@@ -206,18 +207,19 @@ InitializeEbcDebuggerConfig (
     if ((StrCmp (Argv[1], L"/?") == 0) ||
         (StrCmp (Argv[1], L"-?") == 0) ||
         (StrCmp (Argv[1], L"-h") == 0) ||
-        (StrCmp (Argv[1], L"-H") == 0) ) {
+        (StrCmp (Argv[1], L"-H") == 0))
+    {
       PrintUsage ();
       return EFI_SUCCESS;
     }
   }
 
   Status = gBS->LocateProtocol (
-                 &gEfiDebuggerConfigurationProtocolGuid,
-                 NULL,
-                 (VOID**)&DebuggerConfiguration
-                 );
-  if (EFI_ERROR(Status)) {
+                  &gEfiDebuggerConfigurationProtocolGuid,
+                  NULL,
+                  (VOID **)&DebuggerConfiguration
+                  );
+  if (EFI_ERROR (Status)) {
     Print (L"Error: DebuggerConfiguration protocol not found.\n");
     return EFI_NOT_FOUND;
   }
@@ -233,12 +235,14 @@ InitializeEbcDebuggerConfig (
        (StriCmp (Argv[1], L"BOR")  == 0) ||
        (StriCmp (Argv[1], L"BOE")  == 0) ||
        (StriCmp (Argv[1], L"BOT")  == 0) ||
-       (StriCmp (Argv[1], L"BOK")  == 0))) {
+       (StriCmp (Argv[1], L"BOK")  == 0)))
+  {
     if (Argc == 3) {
       EdbConfigBreak (DebuggerConfiguration, Argv[1], Argv[2]);
     } else {
       EdbConfigBreak (DebuggerConfiguration, Argv[1], NULL);
     }
+
     return EFI_SUCCESS;
   }
 

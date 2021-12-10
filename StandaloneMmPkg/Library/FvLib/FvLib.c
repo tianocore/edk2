@@ -37,7 +37,7 @@ GetFileState (
   FileState = FfsHeader->State;
 
   if (ErasePolarity != 0) {
-    FileState = (EFI_FFS_FILE_STATE)~FileState;
+    FileState = (EFI_FFS_FILE_STATE) ~FileState;
   }
 
   HighestBit = 0x80;
@@ -60,31 +60,32 @@ CalculateHeaderChecksum (
   IN EFI_FFS_FILE_HEADER  *FileHeader
   )
 {
-  UINT8 *ptr;
-  UINTN Index;
-  UINT8 Sum;
+  UINT8  *ptr;
+  UINTN  Index;
+  UINT8  Sum;
 
   Sum = 0;
-  ptr = (UINT8 *) FileHeader;
+  ptr = (UINT8 *)FileHeader;
 
   for (Index = 0; Index < sizeof (EFI_FFS_FILE_HEADER) - 3; Index += 4) {
-    Sum = (UINT8) (Sum + ptr[Index]);
-    Sum = (UINT8) (Sum + ptr[Index + 1]);
-    Sum = (UINT8) (Sum + ptr[Index + 2]);
-    Sum = (UINT8) (Sum + ptr[Index + 3]);
+    Sum = (UINT8)(Sum + ptr[Index]);
+    Sum = (UINT8)(Sum + ptr[Index + 1]);
+    Sum = (UINT8)(Sum + ptr[Index + 2]);
+    Sum = (UINT8)(Sum + ptr[Index + 3]);
   }
 
-  for (; Index < sizeof (EFI_FFS_FILE_HEADER); Index++) {
-    Sum = (UINT8) (Sum + ptr[Index]);
+  for ( ; Index < sizeof (EFI_FFS_FILE_HEADER); Index++) {
+    Sum = (UINT8)(Sum + ptr[Index]);
   }
+
   //
   // State field (since this indicates the different state of file).
   //
-  Sum = (UINT8) (Sum - FileHeader->State);
+  Sum = (UINT8)(Sum - FileHeader->State);
   //
   // Checksum field of the file is not part of the header checksum.
   //
-  Sum = (UINT8) (Sum - FileHeader->IntegrityCheck.Checksum.File);
+  Sum = (UINT8)(Sum - FileHeader->IntegrityCheck.Checksum.File);
 
   return Sum;
 }
@@ -112,15 +113,15 @@ FfsFindNextFile (
   IN OUT EFI_FFS_FILE_HEADER     **FileHeader
   )
 {
-  EFI_FIRMWARE_VOLUME_EXT_HEADER *FvExtHeader;
+  EFI_FIRMWARE_VOLUME_EXT_HEADER  *FvExtHeader;
 
-  EFI_FFS_FILE_HEADER *FfsFileHeader;
-  UINT32              FileLength;
-  UINT32              FileOccupiedSize;
-  UINT32              FileOffset;
-  UINT64              FvLength;
-  UINT8               ErasePolarity;
-  UINT8               FileState;
+  EFI_FFS_FILE_HEADER  *FfsFileHeader;
+  UINT32               FileLength;
+  UINT32               FileOccupiedSize;
+  UINT32               FileOffset;
+  UINT64               FvLength;
+  UINT8                ErasePolarity;
+  UINT8                FileState;
 
   FvLength = FwVolHeader->FvLength;
   if (FwVolHeader->Attributes & EFI_FVB2_ERASE_POLARITY) {
@@ -128,41 +129,40 @@ FfsFindNextFile (
   } else {
     ErasePolarity = 0;
   }
+
   //
   // If FileHeader is not specified (NULL) start with the first file in the
   // firmware volume.  Otherwise, start from the FileHeader.
   //
   if (*FileHeader == NULL) {
-
     if (FwVolHeader->ExtHeaderOffset != 0) {
-
       FvExtHeader = (EFI_FIRMWARE_VOLUME_EXT_HEADER *)((UINT8 *)FwVolHeader +
                                                        FwVolHeader->ExtHeaderOffset);
 
       FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FvExtHeader +
                                               FvExtHeader->ExtHeaderSize);
-
     } else {
-
       FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FwVolHeader +
                                               FwVolHeader->HeaderLength);
-
     }
 
     FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINTN)FwVolHeader +
-                                            ALIGN_VALUE((UINTN)FfsFileHeader -
-                                                        (UINTN)FwVolHeader, 8));
+                                            ALIGN_VALUE (
+                                              (UINTN)FfsFileHeader -
+                                              (UINTN)FwVolHeader,
+                                              8
+                                              ));
   } else {
     //
     // Length is 24 bits wide so mask upper 8 bits
     // FileLength is adjusted to FileOccupiedSize as it is 8 byte aligned.
     //
-    FileLength        = FFS_FILE_SIZE(*FileHeader);
-    FileOccupiedSize  = GET_OCCUPIED_SIZE (FileLength, 8);
-    FfsFileHeader     = (EFI_FFS_FILE_HEADER *) ((UINT8 *) *FileHeader + FileOccupiedSize);
+    FileLength       = FFS_FILE_SIZE (*FileHeader);
+    FileOccupiedSize = GET_OCCUPIED_SIZE (FileLength, 8);
+    FfsFileHeader    = (EFI_FFS_FILE_HEADER *)((UINT8 *)*FileHeader + FileOccupiedSize);
   }
 
-  FileOffset = (UINT32) ((UINT8 *) FfsFileHeader - (UINT8 *) FwVolHeader);
+  FileOffset = (UINT32)((UINT8 *)FfsFileHeader - (UINT8 *)FwVolHeader);
 
   while (FileOffset < (FvLength - sizeof (EFI_FFS_FILE_HEADER))) {
     //
@@ -171,42 +171,40 @@ FfsFindNextFile (
     FileState = GetFileState (ErasePolarity, FfsFileHeader);
 
     switch (FileState) {
+      case EFI_FILE_HEADER_INVALID:
+        FileOffset   += sizeof (EFI_FFS_FILE_HEADER);
+        FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsFileHeader + sizeof (EFI_FFS_FILE_HEADER));
+        break;
 
-    case EFI_FILE_HEADER_INVALID:
-      FileOffset += sizeof (EFI_FFS_FILE_HEADER);
-      FfsFileHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsFileHeader + sizeof (EFI_FFS_FILE_HEADER));
-      break;
+      case EFI_FILE_DATA_VALID:
+      case EFI_FILE_MARKED_FOR_UPDATE:
+        if (CalculateHeaderChecksum (FfsFileHeader) == 0) {
+          FileLength       = FFS_FILE_SIZE (FfsFileHeader);
+          FileOccupiedSize = GET_OCCUPIED_SIZE (FileLength, 8);
 
-    case EFI_FILE_DATA_VALID:
-    case EFI_FILE_MARKED_FOR_UPDATE:
-      if (CalculateHeaderChecksum (FfsFileHeader) == 0) {
-        FileLength        = FFS_FILE_SIZE(FfsFileHeader);
-        FileOccupiedSize  = GET_OCCUPIED_SIZE (FileLength, 8);
+          if ((SearchType == FfsFileHeader->Type) || (SearchType == EFI_FV_FILETYPE_ALL)) {
+            *FileHeader = FfsFileHeader;
 
-        if ((SearchType == FfsFileHeader->Type) || (SearchType == EFI_FV_FILETYPE_ALL)) {
+            return EFI_SUCCESS;
+          }
 
-          *FileHeader = FfsFileHeader;
-
-          return EFI_SUCCESS;
+          FileOffset   += FileOccupiedSize;
+          FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsFileHeader + FileOccupiedSize);
+        } else {
+          return EFI_NOT_FOUND;
         }
 
-        FileOffset += FileOccupiedSize;
-        FfsFileHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsFileHeader + FileOccupiedSize);
-      } else {
+        break;
+
+      case EFI_FILE_DELETED:
+        FileLength       = FFS_FILE_SIZE (FfsFileHeader);
+        FileOccupiedSize = GET_OCCUPIED_SIZE (FileLength, 8);
+        FileOffset      += FileOccupiedSize;
+        FfsFileHeader    = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsFileHeader + FileOccupiedSize);
+        break;
+
+      default:
         return EFI_NOT_FOUND;
-      }
-      break;
-
-    case EFI_FILE_DELETED:
-      FileLength        = FFS_FILE_SIZE(FfsFileHeader);
-      FileOccupiedSize  = GET_OCCUPIED_SIZE (FileLength, 8);
-      FileOffset += FileOccupiedSize;
-      FfsFileHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsFileHeader + FileOccupiedSize);
-      break;
-
-    default:
-      return EFI_NOT_FOUND;
-
     }
   }
 
@@ -229,30 +227,31 @@ FfsFindNextFile (
 EFI_STATUS
 EFIAPI
 FindFfsSectionInSections (
-  IN  VOID                             *Sections,
-  IN  UINTN                            SizeOfSections,
-  IN  EFI_SECTION_TYPE                 SectionType,
-  OUT EFI_COMMON_SECTION_HEADER        **FoundSection
+  IN  VOID                       *Sections,
+  IN  UINTN                      SizeOfSections,
+  IN  EFI_SECTION_TYPE           SectionType,
+  OUT EFI_COMMON_SECTION_HEADER  **FoundSection
   )
 {
-  EFI_PHYSICAL_ADDRESS        CurrentAddress;
-  UINT32                      Size;
-  EFI_PHYSICAL_ADDRESS        EndOfSections;
-  EFI_COMMON_SECTION_HEADER   *Section;
-  EFI_PHYSICAL_ADDRESS        EndOfSection;
+  EFI_PHYSICAL_ADDRESS       CurrentAddress;
+  UINT32                     Size;
+  EFI_PHYSICAL_ADDRESS       EndOfSections;
+  EFI_COMMON_SECTION_HEADER  *Section;
+  EFI_PHYSICAL_ADDRESS       EndOfSection;
 
   //
   // Loop through the FFS file sections
   //
-  EndOfSection = (EFI_PHYSICAL_ADDRESS)(UINTN) Sections;
+  EndOfSection  = (EFI_PHYSICAL_ADDRESS)(UINTN)Sections;
   EndOfSections = EndOfSection + SizeOfSections;
-  for (;;) {
+  for ( ; ;) {
     if (EndOfSection == EndOfSections) {
       break;
     }
+
     CurrentAddress = EndOfSection;
 
-    Section = (EFI_COMMON_SECTION_HEADER*)(UINTN) CurrentAddress;
+    Section = (EFI_COMMON_SECTION_HEADER *)(UINTN)CurrentAddress;
 
     Size = SECTION_SIZE (Section);
     if (Size < sizeof (*Section)) {
@@ -263,6 +262,7 @@ FindFfsSectionInSections (
     if (EndOfSection > EndOfSections) {
       return EFI_VOLUME_CORRUPTED;
     }
+
     Size = GET_OCCUPIED_SIZE (Size, 4);
 
     //
@@ -292,22 +292,22 @@ FindFfsSectionInSections (
 EFI_STATUS
 EFIAPI
 FfsFindSection (
-  IN EFI_SECTION_TYPE              SectionType,
-  IN EFI_FFS_FILE_HEADER           *FfsFileHeader,
-  IN OUT EFI_COMMON_SECTION_HEADER **SectionHeader
+  IN EFI_SECTION_TYPE               SectionType,
+  IN EFI_FFS_FILE_HEADER            *FfsFileHeader,
+  IN OUT EFI_COMMON_SECTION_HEADER  **SectionHeader
   )
 {
-  UINT32                    FileSize;
-  EFI_COMMON_SECTION_HEADER *Section;
-  EFI_STATUS                Status;
+  UINT32                     FileSize;
+  EFI_COMMON_SECTION_HEADER  *Section;
+  EFI_STATUS                 Status;
 
   //
   // Size is 24 bits wide so mask upper 8 bits.
   //    Does not include FfsFileHeader header size
   // FileSize is adjusted to FileOccupiedSize as it is 8 byte aligned.
   //
-  Section   = (EFI_COMMON_SECTION_HEADER *) (FfsFileHeader + 1);
-  FileSize  = FFS_FILE_SIZE(FfsFileHeader);
+  Section   = (EFI_COMMON_SECTION_HEADER *)(FfsFileHeader + 1);
+  FileSize  = FFS_FILE_SIZE (FfsFileHeader);
   FileSize -= sizeof (EFI_FFS_FILE_HEADER);
 
   Status = FindFfsSectionInSections (
@@ -335,44 +335,45 @@ FfsFindSection (
 EFI_STATUS
 EFIAPI
 FfsFindSectionData (
-  IN EFI_SECTION_TYPE      SectionType,
-  IN EFI_FFS_FILE_HEADER   *FfsFileHeader,
-  IN OUT VOID              **SectionData,
-  IN OUT UINTN             *SectionDataSize
+  IN EFI_SECTION_TYPE     SectionType,
+  IN EFI_FFS_FILE_HEADER  *FfsFileHeader,
+  IN OUT VOID             **SectionData,
+  IN OUT UINTN            *SectionDataSize
   )
 {
-  UINT32                    FileSize;
-  EFI_COMMON_SECTION_HEADER *Section;
-  UINT32                    SectionLength;
-  UINT32                    ParsedLength;
+  UINT32                     FileSize;
+  EFI_COMMON_SECTION_HEADER  *Section;
+  UINT32                     SectionLength;
+  UINT32                     ParsedLength;
 
   //
   // Size is 24 bits wide so mask upper 8 bits.
   // Does not include FfsFileHeader header size
   // FileSize is adjusted to FileOccupiedSize as it is 8 byte aligned.
   //
-  Section   = (EFI_COMMON_SECTION_HEADER *) (FfsFileHeader + 1);
-  FileSize  = FFS_FILE_SIZE(FfsFileHeader);
+  Section   = (EFI_COMMON_SECTION_HEADER *)(FfsFileHeader + 1);
+  FileSize  = FFS_FILE_SIZE (FfsFileHeader);
   FileSize -= sizeof (EFI_FFS_FILE_HEADER);
 
-  *SectionData  = NULL;
-  ParsedLength  = 0;
+  *SectionData = NULL;
+  ParsedLength = 0;
   while (ParsedLength < FileSize) {
     if (Section->Type == SectionType) {
-      *SectionData = (VOID *) (Section + 1);
-      *SectionDataSize = SECTION_SIZE(Section);
+      *SectionData     = (VOID *)(Section + 1);
+      *SectionDataSize = SECTION_SIZE (Section);
       return EFI_SUCCESS;
     }
+
     //
     // Size is 24 bits wide so mask upper 8 bits.
     // SectionLength is adjusted it is 4 byte aligned.
     // Go to the next section
     //
-    SectionLength = SECTION_SIZE(Section);
+    SectionLength = SECTION_SIZE (Section);
     SectionLength = GET_OCCUPIED_SIZE (SectionLength, 4);
 
     ParsedLength += SectionLength;
-    Section = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) Section + SectionLength);
+    Section       = (EFI_COMMON_SECTION_HEADER *)((UINT8 *)Section + SectionLength);
   }
 
   return EFI_NOT_FOUND;

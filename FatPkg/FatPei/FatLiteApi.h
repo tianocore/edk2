@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // API data structures
 //
-typedef VOID  *PEI_FILE_HANDLE;
+typedef VOID *PEI_FILE_HANDLE;
 
 typedef enum {
   Fat12,

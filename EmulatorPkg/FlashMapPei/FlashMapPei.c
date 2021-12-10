@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "PiPei.h"
 
 #include <Guid/SystemNvDataGuid.h>
@@ -24,9 +23,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 PeimInitializeFlashMap (
-  IN       EFI_PEI_FILE_HANDLE       FileHandle,
-  IN CONST EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
   )
+
 /*++
 
 Routine Description:
@@ -48,17 +48,17 @@ Returns:
   EFI_PHYSICAL_ADDRESS    FdFixUp;
   UINT64                  FdSize;
 
-  DEBUG ((EFI_D_ERROR, "EmulatorPkg Flash Map PEIM Loaded\n"));
+  DEBUG ((DEBUG_ERROR, "EmulatorPkg Flash Map PEIM Loaded\n"));
 
   //
   // Get the Fwh Information PPI
   //
   Status = PeiServicesLocatePpi (
-            &gEmuThunkPpiGuid, // GUID
-            0,                 // INSTANCE
-            &PpiDescriptor,     // EFI_PEI_PPI_DESCRIPTOR
-            (VOID **)&Thunk       // PPI
-            );
+             &gEmuThunkPpiGuid, // GUID
+             0,                 // INSTANCE
+             &PpiDescriptor,    // EFI_PEI_PPI_DESCRIPTOR
+             (VOID **)&Thunk    // PPI
+             );
   ASSERT_EFI_ERROR (Status);
 
   //

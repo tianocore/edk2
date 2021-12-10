@@ -9,35 +9,35 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __EDKII_VARIABLE_POLICY_PROTOCOL__
 #define __EDKII_VARIABLE_POLICY_PROTOCOL__
 
-#define EDKII_VARIABLE_POLICY_PROTOCOL_REVISION   0x0000000000010000
+#define EDKII_VARIABLE_POLICY_PROTOCOL_REVISION  0x0000000000010000
 
 #define EDKII_VARIABLE_POLICY_PROTOCOL_GUID \
   { \
     0x81D1675C, 0x86F6, 0x48DF, { 0xBD, 0x95, 0x9A, 0x6E, 0x4F, 0x09, 0x25, 0xC3 } \
   }
 
-#define VARIABLE_POLICY_ENTRY_REVISION      0x00010000
+#define VARIABLE_POLICY_ENTRY_REVISION  0x00010000
 
 #pragma pack(push, 1)
 typedef struct {
-  UINT32   Version;
-  UINT16   Size;
-  UINT16   OffsetToName;
-  EFI_GUID Namespace;
-  UINT32   MinSize;
-  UINT32   MaxSize;
-  UINT32   AttributesMustHave;
-  UINT32   AttributesCantHave;
-  UINT8    LockPolicyType;
-  UINT8    Padding[3];
+  UINT32      Version;
+  UINT16      Size;
+  UINT16      OffsetToName;
+  EFI_GUID    Namespace;
+  UINT32      MinSize;
+  UINT32      MaxSize;
+  UINT32      AttributesMustHave;
+  UINT32      AttributesCantHave;
+  UINT8       LockPolicyType;
+  UINT8       Padding[3];
   // UINT8    LockPolicy[];     // Variable Length Field
   // CHAR16   Name[]            // Variable Length Field
 } VARIABLE_POLICY_ENTRY;
 
-#define     VARIABLE_POLICY_NO_MIN_SIZE             0
-#define     VARIABLE_POLICY_NO_MAX_SIZE             MAX_UINT32
-#define     VARIABLE_POLICY_NO_MUST_ATTR            0
-#define     VARIABLE_POLICY_NO_CANT_ATTR            0
+#define     VARIABLE_POLICY_NO_MIN_SIZE   0
+#define     VARIABLE_POLICY_NO_MAX_SIZE   MAX_UINT32
+#define     VARIABLE_POLICY_NO_MUST_ATTR  0
+#define     VARIABLE_POLICY_NO_CANT_ATTR  0
 
 #define     VARIABLE_POLICY_TYPE_NO_LOCK            0
 #define     VARIABLE_POLICY_TYPE_LOCK_NOW           1
@@ -45,9 +45,9 @@ typedef struct {
 #define     VARIABLE_POLICY_TYPE_LOCK_ON_VAR_STATE  3
 
 typedef struct {
-  EFI_GUID Namespace;
-  UINT8    Value;
-  UINT8    Padding;
+  EFI_GUID    Namespace;
+  UINT8       Value;
+  UINT8       Padding;
   // CHAR16   Name[];           // Variable Length Field
 } VARIABLE_LOCK_ON_VAR_STATE_POLICY;
 #pragma pack(pop)
@@ -142,16 +142,16 @@ EFI_STATUS
   );
 
 typedef struct {
-  UINT64                     Revision;
-  DISABLE_VARIABLE_POLICY    DisableVariablePolicy;
-  IS_VARIABLE_POLICY_ENABLED IsVariablePolicyEnabled;
-  REGISTER_VARIABLE_POLICY   RegisterVariablePolicy;
-  DUMP_VARIABLE_POLICY       DumpVariablePolicy;
-  LOCK_VARIABLE_POLICY       LockVariablePolicy;
+  UINT64                        Revision;
+  DISABLE_VARIABLE_POLICY       DisableVariablePolicy;
+  IS_VARIABLE_POLICY_ENABLED    IsVariablePolicyEnabled;
+  REGISTER_VARIABLE_POLICY      RegisterVariablePolicy;
+  DUMP_VARIABLE_POLICY          DumpVariablePolicy;
+  LOCK_VARIABLE_POLICY          LockVariablePolicy;
 } _EDKII_VARIABLE_POLICY_PROTOCOL;
 
 typedef _EDKII_VARIABLE_POLICY_PROTOCOL EDKII_VARIABLE_POLICY_PROTOCOL;
 
-extern EFI_GUID gEdkiiVariablePolicyProtocolGuid;
+extern EFI_GUID  gEdkiiVariablePolicyProtocolGuid;
 
 #endif

@@ -24,38 +24,32 @@
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 
-
 //
 // UEFI Driver Model Protocols
 //
 #include <Protocol/DriverBinding.h>
-
 
 //
 // Consumed Protocols
 //
 #include <Protocol/XenIo.h>
 
-
 //
 // Produced Protocols
 //
 #include <Protocol/XenBus.h>
-
 
 //
 // Driver Version
 //
 #define XENBUS_DXE_VERSION  0x00000010
 
-
 //
 // Protocol instances
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gXenBusDxeDriverBinding;
+extern EFI_DRIVER_BINDING_PROTOCOL   gXenBusDxeDriverBinding;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gXenBusDxeComponentName2;
-extern EFI_COMPONENT_NAME_PROTOCOL  gXenBusDxeComponentName;
-
+extern EFI_COMPONENT_NAME_PROTOCOL   gXenBusDxeComponentName;
 
 //
 // Include files with function prototypes
@@ -68,32 +62,32 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gXenBusDxeComponentName;
 //
 #include <IndustryStandard/Xen/xen.h>
 
-typedef struct _XENBUS_DEVICE_PATH XENBUS_DEVICE_PATH;
-typedef struct _XENBUS_DEVICE XENBUS_DEVICE;
+typedef struct _XENBUS_DEVICE_PATH  XENBUS_DEVICE_PATH;
+typedef struct _XENBUS_DEVICE       XENBUS_DEVICE;
 
 // Have the state of the driver.
-#define XENBUS_DEVICE_SIGNATURE SIGNATURE_32 ('X','B','s','t')
+#define XENBUS_DEVICE_SIGNATURE  SIGNATURE_32 ('X','B','s','t')
 struct _XENBUS_DEVICE {
-  UINT32                        Signature;
-  EFI_DRIVER_BINDING_PROTOCOL   *This;
-  EFI_HANDLE                    ControllerHandle;
-  XENIO_PROTOCOL                *XenIo;
-  EFI_EVENT                     ExitBootEvent;
-  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
-  LIST_ENTRY                    ChildList;
+  UINT32                         Signature;
+  EFI_DRIVER_BINDING_PROTOCOL    *This;
+  EFI_HANDLE                     ControllerHandle;
+  XENIO_PROTOCOL                 *XenIo;
+  EFI_EVENT                      ExitBootEvent;
+  EFI_DEVICE_PATH_PROTOCOL       *DevicePath;
+  LIST_ENTRY                     ChildList;
 
-  shared_info_t                 *SharedInfo;
+  shared_info_t                  *SharedInfo;
 };
 
 // There is one of this struct allocated for every child.
-#define XENBUS_PRIVATE_DATA_SIGNATURE SIGNATURE_32 ('X', 'B', 'p', 'd')
+#define XENBUS_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('X', 'B', 'p', 'd')
 typedef struct {
-    UINTN Signature;
-    LIST_ENTRY Link;
-    EFI_HANDLE Handle;
-    XENBUS_PROTOCOL XenBusIo;
-    XENBUS_DEVICE *Dev;
-    XENBUS_DEVICE_PATH *DevicePath;
+  UINTN                 Signature;
+  LIST_ENTRY            Link;
+  EFI_HANDLE            Handle;
+  XENBUS_PROTOCOL       XenBusIo;
+  XENBUS_DEVICE         *Dev;
+  XENBUS_DEVICE_PATH    *DevicePath;
 } XENBUS_PRIVATE_DATA;
 
 #define XENBUS_PRIVATE_DATA_FROM_THIS(a) \
@@ -116,13 +110,13 @@ typedef struct {
 INT32
 EFIAPI
 TestAndClearBit (
-  IN INT32 Bit,
-  IN VOID  *Address
+  IN INT32  Bit,
+  IN VOID   *Address
   );
 
-CHAR8*
+CHAR8 *
 AsciiStrDup (
-  IN CONST CHAR8* Str
+  IN CONST CHAR8  *Str
   );
 
 #endif

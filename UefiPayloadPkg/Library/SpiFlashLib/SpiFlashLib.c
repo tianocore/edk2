@@ -7,7 +7,7 @@
 **/
 #include "SpiCommon.h"
 
-SPI_INSTANCE      *mSpiInstance = NULL;
+SPI_INSTANCE  *mSpiInstance = NULL;
 
 /**
   Get SPI Instance from library global data..
@@ -17,19 +17,19 @@ SPI_INSTANCE      *mSpiInstance = NULL;
 SPI_INSTANCE *
 GetSpiInstance (
   VOID
-)
+  )
 {
   if (mSpiInstance == NULL) {
-    mSpiInstance  = AllocatePool (sizeof(SPI_INSTANCE));
+    mSpiInstance = AllocatePool (sizeof (SPI_INSTANCE));
     if (mSpiInstance == NULL) {
       return NULL;
     }
-    ZeroMem (mSpiInstance, sizeof(SPI_INSTANCE));
+
+    ZeroMem (mSpiInstance, sizeof (SPI_INSTANCE));
   }
 
   return mSpiInstance;
 }
-
 
 /**
   Initialize an SPI library.
@@ -43,11 +43,11 @@ SpiConstructor (
   VOID
   )
 {
-  UINT32              ScSpiBar0;
-  UINT8               Comp0Density;
-  SPI_INSTANCE        *SpiInstance;
-  EFI_HOB_GUID_TYPE   *GuidHob;
-  SPI_FLASH_INFO      *SpiFlashInfo;
+  UINT32             ScSpiBar0;
+  UINT8              Comp0Density;
+  SPI_INSTANCE       *SpiInstance;
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  SPI_FLASH_INFO     *SpiFlashInfo;
 
   //
   // Find SPI flash hob
@@ -57,7 +57,8 @@ SpiConstructor (
     ASSERT (FALSE);
     return EFI_NOT_FOUND;
   }
-  SpiFlashInfo = (SPI_FLASH_INFO *) GET_GUID_HOB_DATA (GuidHob);
+
+  SpiFlashInfo = (SPI_FLASH_INFO *)GET_GUID_HOB_DATA (GuidHob);
 
   //
   // Initialize the SPI instance
@@ -66,10 +67,11 @@ SpiConstructor (
   if (SpiInstance == NULL) {
     return EFI_NOT_FOUND;
   }
+
   DEBUG ((DEBUG_INFO, "SpiInstance = %08X\n", SpiInstance));
 
-  SpiInstance->Signature  = SC_SPI_PRIVATE_DATA_SIGNATURE;
-  SpiInstance->Handle     = NULL;
+  SpiInstance->Signature = SC_SPI_PRIVATE_DATA_SIGNATURE;
+  SpiInstance->Handle    = NULL;
 
   //
   // Check the SPI address
@@ -77,9 +79,11 @@ SpiConstructor (
   if ((SpiFlashInfo->SpiAddress.AddressSpaceId !=  EFI_ACPI_3_0_PCI_CONFIGURATION_SPACE) ||
       (SpiFlashInfo->SpiAddress.RegisterBitWidth !=  32) ||
       (SpiFlashInfo->SpiAddress.RegisterBitOffset !=  0) ||
-      (SpiFlashInfo->SpiAddress.AccessSize !=  EFI_ACPI_3_0_DWORD)){
+      (SpiFlashInfo->SpiAddress.AccessSize !=  EFI_ACPI_3_0_DWORD))
+  {
     DEBUG ((DEBUG_ERROR, "SPI FLASH HOB is not expected. need check the hob or enhance SPI flash driver.\n"));
   }
+
   SpiInstance->PchSpiBase = (UINT32)(UINTN)SpiFlashInfo->SpiAddress.Address;
   SpiInstance->Flags      = SpiFlashInfo->Flags;
   DEBUG ((DEBUG_INFO, "PchSpiBase at 0x%x\n", SpiInstance->PchSpiBase));
@@ -106,34 +110,34 @@ SpiConstructor (
   //
   MmioAndThenOr32 (
     ScSpiBar0 + R_SPI_FDOC,
-    (UINT32) (~(B_SPI_FDOC_FDSS_MASK | B_SPI_FDOC_FDSI_MASK)),
-    (UINT32) (V_SPI_FDOC_FDSS_FSDM | R_SPI_FDBAR_FLASH_MAP0)
+    (UINT32)(~(B_SPI_FDOC_FDSS_MASK | B_SPI_FDOC_FDSI_MASK)),
+    (UINT32)(V_SPI_FDOC_FDSS_FSDM | R_SPI_FDBAR_FLASH_MAP0)
     );
 
   //
   // Copy Zero based Number Of Components
   //
-  SpiInstance->NumberOfComponents = (UINT8) ((MmioRead16 (ScSpiBar0 + R_SPI_FDOD) & B_SPI_FDBAR_NC) >> N_SPI_FDBAR_NC);
+  SpiInstance->NumberOfComponents = (UINT8)((MmioRead16 (ScSpiBar0 + R_SPI_FDOD) & B_SPI_FDBAR_NC) >> N_SPI_FDBAR_NC);
 
   MmioAndThenOr32 (
     ScSpiBar0 + R_SPI_FDOC,
-    (UINT32) (~(B_SPI_FDOC_FDSS_MASK | B_SPI_FDOC_FDSI_MASK)),
-    (UINT32) (V_SPI_FDOC_FDSS_COMP | R_SPI_FCBA_FLCOMP)
+    (UINT32)(~(B_SPI_FDOC_FDSS_MASK | B_SPI_FDOC_FDSI_MASK)),
+    (UINT32)(V_SPI_FDOC_FDSS_COMP | R_SPI_FCBA_FLCOMP)
     );
 
   //
   // Copy Component 0 Density
   //
-  Comp0Density = (UINT8) MmioRead32 (ScSpiBar0 + R_SPI_FDOD) & B_SPI_FLCOMP_COMP1_MASK;
-  SpiInstance->Component1StartAddr = (UINT32) (SIZE_512KB << Comp0Density);
+  Comp0Density                     = (UINT8)MmioRead32 (ScSpiBar0 + R_SPI_FDOD) & B_SPI_FLCOMP_COMP1_MASK;
+  SpiInstance->Component1StartAddr = (UINT32)(SIZE_512KB << Comp0Density);
 
   //
   // Select FLASH_MAP1 to get Flash SC Strap Base Address
   //
   MmioAndThenOr32 (
     (ScSpiBar0 + R_SPI_FDOC),
-    (UINT32) (~(B_SPI_FDOC_FDSS_MASK | B_SPI_FDOC_FDSI_MASK)),
-    (UINT32) (V_SPI_FDOC_FDSS_FSDM | R_SPI_FDBAR_FLASH_MAP1)
+    (UINT32)(~(B_SPI_FDOC_FDSS_MASK | B_SPI_FDOC_FDSI_MASK)),
+    (UINT32)(V_SPI_FDOC_FDSS_FSDM | R_SPI_FDBAR_FLASH_MAP1)
     );
 
   SpiInstance->StrapBaseAddress = MmioRead32 (ScSpiBar0 + R_SPI_FDOD) & B_SPI_FDBAR_FPSBA;
@@ -145,7 +149,6 @@ SpiConstructor (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Read data from the flash part.
@@ -169,7 +172,7 @@ SpiFlashRead (
   OUT    UINT8              *Buffer
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   Status = SendSpiCmd (FlashRegionType, FlashCycleRead, Address, ByteCount, Buffer);
   return Status;
@@ -196,7 +199,7 @@ SpiFlashWrite (
   IN     UINT8              *Buffer
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   Status = SendSpiCmd (FlashRegionType, FlashCycleWrite, Address, ByteCount, Buffer);
   return Status;
@@ -221,7 +224,7 @@ SpiFlashErase (
   IN     UINT32             ByteCount
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   Status = SendSpiCmd (FlashRegionType, FlashCycleErase, Address, ByteCount, NULL);
   return Status;
@@ -242,14 +245,14 @@ SpiFlashErase (
 EFI_STATUS
 EFIAPI
 SpiFlashReadSfdp (
-  IN     UINT8              ComponentNumber,
-  IN     UINT32             ByteCount,
-  OUT    UINT8              *SfdpData
+  IN     UINT8   ComponentNumber,
+  IN     UINT32  ByteCount,
+  OUT    UINT8   *SfdpData
   )
 {
-  EFI_STATUS                Status;
-  UINT32                    Address;
-  SPI_INSTANCE              *SpiInstance;
+  EFI_STATUS    Status;
+  UINT32        Address;
+  SPI_INSTANCE  *SpiInstance;
 
   SpiInstance = GetSpiInstance ();
   if (SpiInstance == NULL) {
@@ -285,14 +288,14 @@ SpiFlashReadSfdp (
 EFI_STATUS
 EFIAPI
 SpiFlashReadJedecId (
-  IN     UINT8              ComponentNumber,
-  IN     UINT32             ByteCount,
-  OUT    UINT8              *JedecId
+  IN     UINT8   ComponentNumber,
+  IN     UINT32  ByteCount,
+  OUT    UINT8   *JedecId
   )
 {
-  EFI_STATUS                Status;
-  UINT32                    Address;
-  SPI_INSTANCE              *SpiInstance;
+  EFI_STATUS    Status;
+  UINT32        Address;
+  SPI_INSTANCE  *SpiInstance;
 
   SpiInstance = GetSpiInstance ();
   if (SpiInstance == NULL) {
@@ -326,11 +329,11 @@ SpiFlashReadJedecId (
 EFI_STATUS
 EFIAPI
 SpiFlashWriteStatus (
-  IN     UINT32             ByteCount,
-  IN     UINT8              *StatusValue
+  IN     UINT32  ByteCount,
+  IN     UINT8   *StatusValue
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   Status = SendSpiCmd (0, FlashCycleWriteStatus, 0, ByteCount, StatusValue);
   return Status;
@@ -349,11 +352,11 @@ SpiFlashWriteStatus (
 EFI_STATUS
 EFIAPI
 SpiFlashReadStatus (
-  IN     UINT32             ByteCount,
-  OUT    UINT8              *StatusValue
+  IN     UINT32  ByteCount,
+  OUT    UINT8   *StatusValue
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   Status = SendSpiCmd (0, FlashCycleReadStatus, 0, ByteCount, StatusValue);
   return Status;
@@ -374,14 +377,14 @@ SpiFlashReadStatus (
 EFI_STATUS
 EFIAPI
 SpiReadPchSoftStrap (
-  IN     UINT32             SoftStrapAddr,
-  IN     UINT32             ByteCount,
-  OUT    UINT8              *SoftStrapValue
+  IN     UINT32  SoftStrapAddr,
+  IN     UINT32  ByteCount,
+  OUT    UINT8   *SoftStrapValue
   )
 {
-  UINT32                    StrapFlashAddr;
-  EFI_STATUS                Status;
-  SPI_INSTANCE              *SpiInstance;
+  UINT32        StrapFlashAddr;
+  EFI_STATUS    Status;
+  SPI_INSTANCE  *SpiInstance;
 
   SpiInstance = GetSpiInstance ();
   if (SpiInstance == NULL) {
@@ -421,28 +424,28 @@ SendSpiCmd (
   IN OUT UINT8              *Buffer
   )
 {
-  EFI_STATUS                Status;
-  UINT32                    Index;
-  UINTN                     SpiBaseAddress;
-  UINT32                    ScSpiBar0;
-  UINT32                    LimitAddress;
-  UINT32                    HardwareSpiAddr;
-  UINT16                    PermissionBit;
-  UINT32                    SpiDataCount;
-  UINT32                    FlashCycle;
-  UINT8                     BiosCtlSave;
-  SPI_INSTANCE              *SpiInstance;
-  UINT32                    Data32;
+  EFI_STATUS    Status;
+  UINT32        Index;
+  UINTN         SpiBaseAddress;
+  UINT32        ScSpiBar0;
+  UINT32        LimitAddress;
+  UINT32        HardwareSpiAddr;
+  UINT16        PermissionBit;
+  UINT32        SpiDataCount;
+  UINT32        FlashCycle;
+  UINT8         BiosCtlSave;
+  SPI_INSTANCE  *SpiInstance;
+  UINT32        Data32;
 
   SpiInstance = GetSpiInstance ();
   if (SpiInstance == NULL) {
     return EFI_DEVICE_ERROR;
   }
 
-  Status         = EFI_SUCCESS;
-  SpiBaseAddress = SpiInstance->PchSpiBase;
-  ScSpiBar0      = AcquireSpiBar0 (SpiBaseAddress);
-  BiosCtlSave    = 0;
+  Status                        = EFI_SUCCESS;
+  SpiBaseAddress                = SpiInstance->PchSpiBase;
+  ScSpiBar0                     = AcquireSpiBar0 (SpiBaseAddress);
+  BiosCtlSave                   = 0;
   SpiInstance->RegionPermission = MmioRead16 (ScSpiBar0 + R_SPI_FRAP);
 
   //
@@ -453,6 +456,7 @@ SendSpiCmd (
     if (EFI_ERROR (Status)) {
       goto SendSpiCmdEnd;
     }
+
     BiosCtlSave = SaveAndDisableSpiPrefetchCache (SpiBaseAddress);
   }
 
@@ -467,76 +471,81 @@ SendSpiCmd (
   HardwareSpiAddr = Address;
   if ((FlashCycleType == FlashCycleRead) ||
       (FlashCycleType == FlashCycleWrite) ||
-      (FlashCycleType == FlashCycleErase)) {
-
+      (FlashCycleType == FlashCycleErase))
+  {
     switch (FlashRegionType) {
-    case FlashRegionDescriptor:
-      if (FlashCycleType == FlashCycleRead) {
-        PermissionBit = B_SPI_FRAP_BRRA_FLASHD;
-      } else {
-        PermissionBit = B_SPI_FRAP_BRWA_FLASHD;
-      }
-      Data32 = MmioRead32 (ScSpiBar0 + R_SPI_FREG0_FLASHD);
-      HardwareSpiAddr += (Data32 & B_SPI_FREG0_BASE_MASK) << N_SPI_FREG0_BASE;
-      LimitAddress     = (Data32 & B_SPI_FREG0_LIMIT_MASK) >> N_SPI_FREG0_LIMIT;
-      break;
+      case FlashRegionDescriptor:
+        if (FlashCycleType == FlashCycleRead) {
+          PermissionBit = B_SPI_FRAP_BRRA_FLASHD;
+        } else {
+          PermissionBit = B_SPI_FRAP_BRWA_FLASHD;
+        }
 
-    case FlashRegionBios:
-      if (FlashCycleType == FlashCycleRead) {
-        PermissionBit = B_SPI_FRAP_BRRA_BIOS;
-      } else {
-        PermissionBit = B_SPI_FRAP_BRWA_BIOS;
-      }
-      Data32 = MmioRead32 (ScSpiBar0 + R_SPI_FREG1_BIOS);
-      HardwareSpiAddr += (Data32 & B_SPI_FREG1_BASE_MASK) << N_SPI_FREG1_BASE;
-      LimitAddress     = (Data32 & B_SPI_FREG1_LIMIT_MASK) >> N_SPI_FREG1_LIMIT;
-      break;
+        Data32           = MmioRead32 (ScSpiBar0 + R_SPI_FREG0_FLASHD);
+        HardwareSpiAddr += (Data32 & B_SPI_FREG0_BASE_MASK) << N_SPI_FREG0_BASE;
+        LimitAddress     = (Data32 & B_SPI_FREG0_LIMIT_MASK) >> N_SPI_FREG0_LIMIT;
+        break;
 
-    case FlashRegionMe:
-      if (FlashCycleType == FlashCycleRead) {
-        PermissionBit = B_SPI_FRAP_BRRA_SEC;
-      } else {
-        PermissionBit = B_SPI_FRAP_BRWA_SEC;
-      }
-      Data32 = MmioRead32 (ScSpiBar0 + R_SPI_FREG2_SEC);
-      HardwareSpiAddr += (Data32 & B_SPI_FREG2_BASE_MASK) << N_SPI_FREG2_BASE;
-      LimitAddress     = (Data32 & B_SPI_FREG2_LIMIT_MASK) >> N_SPI_FREG2_LIMIT;
-      break;
+      case FlashRegionBios:
+        if (FlashCycleType == FlashCycleRead) {
+          PermissionBit = B_SPI_FRAP_BRRA_BIOS;
+        } else {
+          PermissionBit = B_SPI_FRAP_BRWA_BIOS;
+        }
 
-    case FlashRegionGbE:
-      if (FlashCycleType == FlashCycleRead) {
-        PermissionBit = B_SPI_FRAP_BRRA_GBE;
-      } else {
-        PermissionBit = B_SPI_FRAP_BRWA_GBE;
-      }
-      Data32 = MmioRead32 (ScSpiBar0 + R_SPI_FREG3_GBE);
-      HardwareSpiAddr += (Data32 & B_SPI_FREG3_BASE_MASK) << N_SPI_FREG3_BASE;
-      LimitAddress     = (Data32 & B_SPI_FREG3_LIMIT_MASK) >> N_SPI_FREG3_LIMIT;
-      break;
+        Data32           = MmioRead32 (ScSpiBar0 + R_SPI_FREG1_BIOS);
+        HardwareSpiAddr += (Data32 & B_SPI_FREG1_BASE_MASK) << N_SPI_FREG1_BASE;
+        LimitAddress     = (Data32 & B_SPI_FREG1_LIMIT_MASK) >> N_SPI_FREG1_LIMIT;
+        break;
 
-    case FlashRegionPlatformData:
-      if (FlashCycleType == FlashCycleRead) {
-        PermissionBit = B_SPI_FRAP_BRRA_PLATFORM;
-      } else {
-        PermissionBit = B_SPI_FRAP_BRWA_PLATFORM;
-      }
-      Data32 = MmioRead32 (ScSpiBar0 + R_SPI_FREG4_PLATFORM_DATA);
-      HardwareSpiAddr += (Data32 & B_SPI_FREG4_BASE_MASK) << N_SPI_FREG4_BASE;
-      LimitAddress     = (Data32 & B_SPI_FREG4_LIMIT_MASK) >> N_SPI_FREG4_LIMIT;
-      break;
+      case FlashRegionMe:
+        if (FlashCycleType == FlashCycleRead) {
+          PermissionBit = B_SPI_FRAP_BRRA_SEC;
+        } else {
+          PermissionBit = B_SPI_FRAP_BRWA_SEC;
+        }
 
-    case FlashRegionAll:
-      //
-      // FlashRegionAll indicates address is relative to flash device
-      // No error checking for this case
-      //
-      LimitAddress = 0;
-      PermissionBit = 0;
-      break;
+        Data32           = MmioRead32 (ScSpiBar0 + R_SPI_FREG2_SEC);
+        HardwareSpiAddr += (Data32 & B_SPI_FREG2_BASE_MASK) << N_SPI_FREG2_BASE;
+        LimitAddress     = (Data32 & B_SPI_FREG2_LIMIT_MASK) >> N_SPI_FREG2_LIMIT;
+        break;
 
-    default:
-      Status = EFI_UNSUPPORTED;
-      goto SendSpiCmdEnd;
+      case FlashRegionGbE:
+        if (FlashCycleType == FlashCycleRead) {
+          PermissionBit = B_SPI_FRAP_BRRA_GBE;
+        } else {
+          PermissionBit = B_SPI_FRAP_BRWA_GBE;
+        }
+
+        Data32           = MmioRead32 (ScSpiBar0 + R_SPI_FREG3_GBE);
+        HardwareSpiAddr += (Data32 & B_SPI_FREG3_BASE_MASK) << N_SPI_FREG3_BASE;
+        LimitAddress     = (Data32 & B_SPI_FREG3_LIMIT_MASK) >> N_SPI_FREG3_LIMIT;
+        break;
+
+      case FlashRegionPlatformData:
+        if (FlashCycleType == FlashCycleRead) {
+          PermissionBit = B_SPI_FRAP_BRRA_PLATFORM;
+        } else {
+          PermissionBit = B_SPI_FRAP_BRWA_PLATFORM;
+        }
+
+        Data32           = MmioRead32 (ScSpiBar0 + R_SPI_FREG4_PLATFORM_DATA);
+        HardwareSpiAddr += (Data32 & B_SPI_FREG4_BASE_MASK) << N_SPI_FREG4_BASE;
+        LimitAddress     = (Data32 & B_SPI_FREG4_LIMIT_MASK) >> N_SPI_FREG4_LIMIT;
+        break;
+
+      case FlashRegionAll:
+        //
+        // FlashRegionAll indicates address is relative to flash device
+        // No error checking for this case
+        //
+        LimitAddress  = 0;
+        PermissionBit = 0;
+        break;
+
+      default:
+        Status = EFI_UNSUPPORTED;
+        goto SendSpiCmdEnd;
     }
 
     if ((LimitAddress != 0) && (Address > LimitAddress)) {
@@ -559,47 +568,48 @@ SendSpiCmd (
   //
   FlashCycle = 0;
   switch (FlashCycleType) {
-  case FlashCycleRead:
-    FlashCycle = (UINT32) (V_SPI_HSFS_CYCLE_READ << N_SPI_HSFS_CYCLE);
-    break;
+    case FlashCycleRead:
+      FlashCycle = (UINT32)(V_SPI_HSFS_CYCLE_READ << N_SPI_HSFS_CYCLE);
+      break;
 
-  case FlashCycleWrite:
-    FlashCycle = (UINT32) (V_SPI_HSFS_CYCLE_WRITE << N_SPI_HSFS_CYCLE);
-    break;
+    case FlashCycleWrite:
+      FlashCycle = (UINT32)(V_SPI_HSFS_CYCLE_WRITE << N_SPI_HSFS_CYCLE);
+      break;
 
-  case FlashCycleErase:
-    if (((ByteCount % SIZE_4KB) != 0) || ((HardwareSpiAddr % SIZE_4KB) != 0)) {
-      DEBUG ((DEBUG_ERROR, "Erase and erase size must be 4KB aligned. \n"));
+    case FlashCycleErase:
+      if (((ByteCount % SIZE_4KB) != 0) || ((HardwareSpiAddr % SIZE_4KB) != 0)) {
+        DEBUG ((DEBUG_ERROR, "Erase and erase size must be 4KB aligned. \n"));
+        ASSERT (FALSE);
+        Status = EFI_INVALID_PARAMETER;
+        goto SendSpiCmdEnd;
+      }
+
+      break;
+
+    case FlashCycleReadSfdp:
+      FlashCycle = (UINT32)(V_SPI_HSFS_CYCLE_READ_SFDP << N_SPI_HSFS_CYCLE);
+      break;
+
+    case FlashCycleReadJedecId:
+      FlashCycle = (UINT32)(V_SPI_HSFS_CYCLE_READ_JEDEC_ID << N_SPI_HSFS_CYCLE);
+      break;
+
+    case FlashCycleWriteStatus:
+      FlashCycle = (UINT32)(V_SPI_HSFS_CYCLE_WRITE_STATUS << N_SPI_HSFS_CYCLE);
+      break;
+
+    case FlashCycleReadStatus:
+      FlashCycle = (UINT32)(V_SPI_HSFS_CYCLE_READ_STATUS << N_SPI_HSFS_CYCLE);
+      break;
+
+    default:
+      //
+      // Unrecognized Operation
+      //
       ASSERT (FALSE);
       Status = EFI_INVALID_PARAMETER;
       goto SendSpiCmdEnd;
-    }
-    break;
-
-  case FlashCycleReadSfdp:
-    FlashCycle = (UINT32) (V_SPI_HSFS_CYCLE_READ_SFDP << N_SPI_HSFS_CYCLE);
-    break;
-
-  case FlashCycleReadJedecId:
-    FlashCycle = (UINT32) (V_SPI_HSFS_CYCLE_READ_JEDEC_ID << N_SPI_HSFS_CYCLE);
-    break;
-
-  case FlashCycleWriteStatus:
-    FlashCycle = (UINT32) (V_SPI_HSFS_CYCLE_WRITE_STATUS << N_SPI_HSFS_CYCLE);
-    break;
-
-  case FlashCycleReadStatus:
-    FlashCycle = (UINT32) (V_SPI_HSFS_CYCLE_READ_STATUS << N_SPI_HSFS_CYCLE);
-    break;
-
-  default:
-    //
-    // Unrecognized Operation
-    //
-    ASSERT (FALSE);
-    Status = EFI_INVALID_PARAMETER;
-    goto SendSpiCmdEnd;
-    break;
+      break;
   }
 
   do {
@@ -613,8 +623,9 @@ SendSpiCmd (
       //   per operation
       //
       if (HardwareSpiAddr + ByteCount > ((HardwareSpiAddr + BIT8) &~(BIT8 - 1))) {
-        SpiDataCount = (((UINT32) (HardwareSpiAddr) + BIT8) &~(BIT8 - 1)) - (UINT32) (HardwareSpiAddr);
+        SpiDataCount = (((UINT32)(HardwareSpiAddr) + BIT8) &~(BIT8 - 1)) - (UINT32)(HardwareSpiAddr);
       }
+
       //
       // Calculate the number of bytes to shift in/out during the SPI data cycle.
       // Valid settings for the number of bytes during each data portion of the
@@ -630,7 +641,8 @@ SendSpiCmd (
     if (FlashCycleType == FlashCycleErase) {
       if (((ByteCount / SIZE_64KB) != 0) &&
           ((ByteCount % SIZE_64KB) == 0) &&
-          ((HardwareSpiAddr % SIZE_64KB) == 0)) {
+          ((HardwareSpiAddr % SIZE_64KB) == 0))
+      {
         if (HardwareSpiAddr < SpiInstance->Component1StartAddr) {
           //
           // Check whether Component0 support 64k Erase
@@ -653,10 +665,11 @@ SendSpiCmd (
       } else {
         SpiDataCount = SIZE_4KB;
       }
+
       if (SpiDataCount == SIZE_4KB) {
-        FlashCycle = (UINT32) (V_SPI_HSFS_CYCLE_4K_ERASE << N_SPI_HSFS_CYCLE);
+        FlashCycle = (UINT32)(V_SPI_HSFS_CYCLE_4K_ERASE << N_SPI_HSFS_CYCLE);
       } else {
-        FlashCycle = (UINT32) (V_SPI_HSFS_CYCLE_64K_ERASE << N_SPI_HSFS_CYCLE);
+        FlashCycle = (UINT32)(V_SPI_HSFS_CYCLE_64K_ERASE << N_SPI_HSFS_CYCLE);
       }
     }
 
@@ -676,7 +689,7 @@ SendSpiCmd (
         // Use Dword write if Data Count is 8, 16, 24, 32, 40, 48, 56, 64
         //
         for (Index = 0; Index < SpiDataCount; Index += sizeof (UINT32)) {
-          MmioWrite32 (ScSpiBar0 + R_SPI_FDATA00 + Index, *(UINT32 *) (Buffer + Index));
+          MmioWrite32 (ScSpiBar0 + R_SPI_FDATA00 + Index, *(UINT32 *)(Buffer + Index));
         }
       }
     }
@@ -684,15 +697,15 @@ SendSpiCmd (
     //
     // Set the Flash Address
     //
-    MmioWrite32 (ScSpiBar0 + R_SPI_FADDR, (UINT32) (HardwareSpiAddr & B_SPI_FADDR_MASK));
+    MmioWrite32 (ScSpiBar0 + R_SPI_FADDR, (UINT32)(HardwareSpiAddr & B_SPI_FADDR_MASK));
 
     //
     // Set Data count, Flash cycle, and Set Go bit to start a cycle
     //
     MmioAndThenOr32 (
       ScSpiBar0 + R_SPI_HSFS,
-      (UINT32) (~(B_SPI_HSFS_FDBC_MASK | B_SPI_HSFS_CYCLE_MASK)),
-      (UINT32) (((SpiDataCount - 1) << N_SPI_HSFS_FDBC) | FlashCycle | B_SPI_HSFS_CYCLE_FGO)
+      (UINT32)(~(B_SPI_HSFS_FDBC_MASK | B_SPI_HSFS_CYCLE_MASK)),
+      (UINT32)(((SpiDataCount - 1) << N_SPI_HSFS_FDBC) | FlashCycle | B_SPI_HSFS_CYCLE_FGO)
       );
 
     //
@@ -709,7 +722,8 @@ SendSpiCmd (
     if ((FlashCycleType == FlashCycleRead) ||
         (FlashCycleType == FlashCycleReadSfdp) ||
         (FlashCycleType == FlashCycleReadJedecId) ||
-        (FlashCycleType == FlashCycleReadStatus)) {
+        (FlashCycleType == FlashCycleReadStatus))
+    {
       if ((SpiDataCount & 0x07) != 0) {
         //
         // Use Byte read if Data Count is 0, 1, 2, 3, 4, 5, 6, 7
@@ -722,7 +736,7 @@ SendSpiCmd (
         // Use Dword read if Data Count is 8, 16, 24, 32, 40, 48, 56, 64
         //
         for (Index = 0; Index < SpiDataCount; Index += sizeof (UINT32)) {
-          *(UINT32 *) (Buffer + Index) = MmioRead32 (ScSpiBar0 + R_SPI_FDATA00 + Index);
+          *(UINT32 *)(Buffer + Index) = MmioRead32 (ScSpiBar0 + R_SPI_FDATA00 + Index);
         }
       }
     }
@@ -737,7 +751,7 @@ SendSpiCmdEnd:
   /// Restore the settings for SPI Prefetching and Caching and enable BIOS Write Protect
   ///
   if ((FlashCycleType == FlashCycleWrite) || (FlashCycleType == FlashCycleErase)) {
-    EnableBiosWriteProtect (SpiBaseAddress,  mSpiInstance->Flags & FLAGS_SPI_DISABLE_SMM_WRITE_PROTECT);
+    EnableBiosWriteProtect (SpiBaseAddress, mSpiInstance->Flags & FLAGS_SPI_DISABLE_SMM_WRITE_PROTECT);
     SetSpiBiosControlRegister (SpiBaseAddress, BiosCtlSave);
   }
 
@@ -758,13 +772,13 @@ SendSpiCmdEnd:
 **/
 BOOLEAN
 WaitForSpiCycleComplete (
-  IN     UINT32             ScSpiBar0,
-  IN     BOOLEAN            ErrorCheck
+  IN     UINT32   ScSpiBar0,
+  IN     BOOLEAN  ErrorCheck
   )
 {
-  UINT64                    WaitTicks;
-  UINT64                    WaitCount;
-  UINT32                    Data32;
+  UINT64  WaitTicks;
+  UINT64  WaitCount;
+  UINT32  Data32;
 
   //
   // Convert the wait period allowed into to tick count
@@ -783,8 +797,10 @@ WaitForSpiCycleComplete (
         return TRUE;
       }
     }
-    MicroSecondDelay ( WAIT_PERIOD);
+
+    MicroSecondDelay (WAIT_PERIOD);
   }
+
   return FALSE;
 }
 
@@ -803,36 +819,38 @@ EFI_STATUS
 EFIAPI
 SpiGetRegionAddress (
   IN     FLASH_REGION_TYPE  FlashRegionType,
-  OUT    UINT32             *BaseAddress, OPTIONAL
+  OUT    UINT32             *BaseAddress  OPTIONAL,
   OUT    UINT32             *RegionSize OPTIONAL
   )
 {
-  UINT32                    ScSpiBar0;
-  UINT32                    ReadValue;
-  UINT32                    Base;
-  SPI_INSTANCE             *SpiInstance;
+  UINT32        ScSpiBar0;
+  UINT32        ReadValue;
+  UINT32        Base;
+  SPI_INSTANCE  *SpiInstance;
 
   if (FlashRegionType >= FlashRegionMax) {
     return EFI_INVALID_PARAMETER;
   }
 
-  SpiInstance = GetSpiInstance();
+  SpiInstance = GetSpiInstance ();
   if (SpiInstance == NULL) {
     return EFI_DEVICE_ERROR;
   }
 
   if (FlashRegionType == FlashRegionAll) {
     if (BaseAddress != NULL) {
-      *BaseAddress  = 0;
+      *BaseAddress = 0;
     }
+
     if (RegionSize != NULL) {
-      *RegionSize  = SpiInstance->Component1StartAddr;
+      *RegionSize = SpiInstance->Component1StartAddr;
     }
+
     return EFI_SUCCESS;
   }
 
   ScSpiBar0 = AcquireSpiBar0 (SpiInstance->PchSpiBase);
-  ReadValue = MmioRead32 (ScSpiBar0 + R_SPI_FREG0_FLASHD + S_SPI_FREGX * (UINT32) FlashRegionType);
+  ReadValue = MmioRead32 (ScSpiBar0 + R_SPI_FREG0_FLASHD + S_SPI_FREGX * (UINT32)FlashRegionType);
   ReleaseSpiBar0 (SpiInstance->PchSpiBase);
 
   //
@@ -849,9 +867,8 @@ SpiGetRegionAddress (
 
   if (RegionSize != NULL) {
     *RegionSize =  ((((ReadValue & B_SPI_FREGX_LIMIT_MASK) >> N_SPI_FREGX_LIMIT) + 1) <<
-                     N_SPI_FREGX_LIMIT_REPR) - Base;
+                    N_SPI_FREGX_LIMIT_REPR) - Base;
   }
 
   return EFI_SUCCESS;
 }
-

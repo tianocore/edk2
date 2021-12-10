@@ -44,14 +44,13 @@
 EFI_STATUS
 EFIAPI
 VerifyEKUsInPkcs7Signature (
-  IN CONST UINT8    *Pkcs7Signature,
-  IN CONST UINT32   SignatureSize,
-  IN CONST CHAR8    *RequiredEKUs[],
-  IN CONST UINT32   RequiredEKUsSize,
-  IN BOOLEAN        RequireAllPresent
+  IN CONST UINT8   *Pkcs7Signature,
+  IN CONST UINT32  SignatureSize,
+  IN CONST CHAR8   *RequiredEKUs[],
+  IN CONST UINT32  RequiredEKUsSize,
+  IN BOOLEAN       RequireAllPresent
   )
 {
   ASSERT (FALSE);
   return RETURN_UNSUPPORTED;
 }
-

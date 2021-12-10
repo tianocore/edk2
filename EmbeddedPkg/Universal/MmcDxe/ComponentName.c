@@ -21,16 +21,16 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gMmcComponentName = {
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gMmcComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) MmcGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) MmcGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gMmcComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)MmcGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)MmcGetControllerName,
   "en"
 };
 
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE
-mMmcDriverNameTable[] = {
-  {"eng;en", L"MMC/SD Card Interface Driver"},
-  {NULL,  NULL}
+  mMmcDriverNameTable[] = {
+  { "eng;en", L"MMC/SD Card Interface Driver" },
+  { NULL,     NULL                            }
 };
 
 /**
@@ -145,11 +145,11 @@ MmcGetDriverName (
 EFI_STATUS
 EFIAPI
 MmcGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
   return EFI_UNSUPPORTED;

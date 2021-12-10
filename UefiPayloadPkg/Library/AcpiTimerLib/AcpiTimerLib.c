@@ -18,7 +18,7 @@
 
 #define ACPI_TIMER_COUNT_SIZE  BIT24
 
-UINTN mPmTimerReg = 0;
+UINTN  mPmTimerReg = 0;
 
 /**
   The constructor function enables ACPI IO space.
@@ -67,6 +67,7 @@ InternalAcpiGetTimerTick (
   if (mPmTimerReg == 0) {
     AcpiTimerLibConstructor ();
   }
+
   return IoRead32 (mPmTimerReg);
 }
 
@@ -81,20 +82,20 @@ InternalAcpiGetTimerTick (
 **/
 VOID
 InternalAcpiDelay (
-  IN      UINT32                    Delay
+  IN      UINT32  Delay
   )
 {
-  UINT32                            Ticks;
-  UINT32                            Times;
+  UINT32  Ticks;
+  UINT32  Times;
 
-  Times    = Delay >> 22;
-  Delay   &= BIT22 - 1;
+  Times  = Delay >> 22;
+  Delay &= BIT22 - 1;
   do {
     //
     // The target timer count is calculated here
     //
-    Ticks    = InternalAcpiGetTimerTick () + Delay;
-    Delay    = BIT22;
+    Ticks = InternalAcpiGetTimerTick () + Delay;
+    Delay = BIT22;
     //
     // Wait until time out
     // Delay >= 2^23 could not be handled by this function
@@ -119,7 +120,7 @@ InternalAcpiDelay (
 UINTN
 EFIAPI
 MicroSecondDelay (
-  IN UINTN                          MicroSeconds
+  IN UINTN  MicroSeconds
   )
 {
   InternalAcpiDelay (
@@ -147,7 +148,7 @@ MicroSecondDelay (
 UINTN
 EFIAPI
 NanoSecondDelay (
-  IN      UINTN                     NanoSeconds
+  IN      UINTN  NanoSeconds
   )
 {
   InternalAcpiDelay (
@@ -209,8 +210,8 @@ GetPerformanceCounter (
 UINT64
 EFIAPI
 GetPerformanceCounterProperties (
-  OUT      UINT64                    *StartValue,  OPTIONAL
-  OUT      UINT64                    *EndValue     OPTIONAL
+  OUT      UINT64  *StartValue   OPTIONAL,
+  OUT      UINT64  *EndValue     OPTIONAL
   )
 {
   if (StartValue != NULL) {
@@ -238,7 +239,7 @@ GetPerformanceCounterProperties (
 UINT64
 EFIAPI
 GetTimeInNanoSecond (
-  IN      UINT64                     Ticks
+  IN      UINT64  Ticks
   )
 {
   UINT64  Frequency;
@@ -260,11 +261,10 @@ GetTimeInNanoSecond (
   // Since 2^29 < 1,000,000,000 = 0x3B9ACA00 < 2^30, Remainder should < 2^(64-30) = 2^34,
   // i.e. highest bit set in Remainder should <= 33.
   //
-  Shift = MAX (0, HighBitSet64 (Remainder) - 33);
-  Remainder = RShiftU64 (Remainder, (UINTN) Shift);
-  Frequency = RShiftU64 (Frequency, (UINTN) Shift);
+  Shift        = MAX (0, HighBitSet64 (Remainder) - 33);
+  Remainder    = RShiftU64 (Remainder, (UINTN)Shift);
+  Frequency    = RShiftU64 (Frequency, (UINTN)Shift);
   NanoSeconds += DivU64x64Remainder (MultU64x32 (Remainder, 1000000000u), Frequency, NULL);
 
   return NanoSeconds;
 }
-

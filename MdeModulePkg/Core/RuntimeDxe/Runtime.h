@@ -24,10 +24,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/PeCoffLib.h>
 
-
 //
 // Function Prototypes
 //
+
 /**
   Calculate CRC32 for target data.
 
@@ -112,8 +112,8 @@ RuntimeDriverSetVirtualAddressMap (
 EFI_STATUS
 EFIAPI
 RuntimeDriverInitialize (
-  IN EFI_HANDLE                            ImageHandle,
-  IN EFI_SYSTEM_TABLE                      *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
 #endif

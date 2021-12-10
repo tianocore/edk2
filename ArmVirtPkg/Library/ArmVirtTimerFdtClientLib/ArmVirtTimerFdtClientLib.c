@@ -18,9 +18,9 @@
 
 #pragma pack (1)
 typedef struct {
-  UINT32  Type;
-  UINT32  Number;
-  UINT32  Flags;
+  UINT32    Type;
+  UINT32    Number;
+  UINT32    Flags;
 } INTERRUPT_PROPERTY;
 #pragma pack ()
 
@@ -30,25 +30,35 @@ ArmVirtTimerFdtClientLibConstructor (
   VOID
   )
 {
-  EFI_STATUS                    Status;
-  FDT_CLIENT_PROTOCOL           *FdtClient;
-  CONST INTERRUPT_PROPERTY      *InterruptProp;
-  UINT32                        PropSize;
-  INT32                         SecIntrNum, IntrNum, VirtIntrNum, HypIntrNum;
-  RETURN_STATUS                 PcdStatus;
+  EFI_STATUS                Status;
+  FDT_CLIENT_PROTOCOL       *FdtClient;
+  CONST INTERRUPT_PROPERTY  *InterruptProp;
+  UINT32                    PropSize;
+  INT32                     SecIntrNum, IntrNum, VirtIntrNum, HypIntrNum;
+  RETURN_STATUS             PcdStatus;
 
-  Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
-                  (VOID **)&FdtClient);
+  Status = gBS->LocateProtocol (
+                  &gFdtClientProtocolGuid,
+                  NULL,
+                  (VOID **)&FdtClient
+                  );
   ASSERT_EFI_ERROR (Status);
 
-  Status = FdtClient->FindCompatibleNodeProperty (FdtClient, "arm,armv7-timer",
-                        "interrupts", (CONST VOID **)&InterruptProp,
-                        &PropSize);
+  Status = FdtClient->FindCompatibleNodeProperty (
+                        FdtClient,
+                        "arm,armv7-timer",
+                        "interrupts",
+                        (CONST VOID **)&InterruptProp,
+                        &PropSize
+                        );
   if (Status == EFI_NOT_FOUND) {
-    Status = FdtClient->FindCompatibleNodeProperty (FdtClient,
-                          "arm,armv8-timer", "interrupts",
+    Status = FdtClient->FindCompatibleNodeProperty (
+                          FdtClient,
+                          "arm,armv8-timer",
+                          "interrupts",
                           (CONST VOID **)&InterruptProp,
-                          &PropSize);
+                          &PropSize
+                          );
   }
 
   if (EFI_ERROR (Status)) {
@@ -68,10 +78,16 @@ ArmVirtTimerFdtClientLibConstructor (
   VirtIntrNum = SwapBytes32 (InterruptProp[2].Number)
                 + (InterruptProp[2].Type ? 16 : 0);
   HypIntrNum = PropSize < 48 ? 0 : SwapBytes32 (InterruptProp[3].Number)
-                                   + (InterruptProp[3].Type ? 16 : 0);
+               + (InterruptProp[3].Type ? 16 : 0);
 
-  DEBUG ((EFI_D_INFO, "Found Timer interrupts %d, %d, %d, %d\n",
-    SecIntrNum, IntrNum, VirtIntrNum, HypIntrNum));
+  DEBUG ((
+    DEBUG_INFO,
+    "Found Timer interrupts %d, %d, %d, %d\n",
+    SecIntrNum,
+    IntrNum,
+    VirtIntrNum,
+    HypIntrNum
+    ));
 
   PcdStatus = PcdSet32S (PcdArmArchTimerSecIntrNum, SecIntrNum);
   ASSERT_RETURN_ERROR (PcdStatus);

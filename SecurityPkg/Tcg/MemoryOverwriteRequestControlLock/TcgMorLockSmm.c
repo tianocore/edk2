@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/SmmVariable.h>
 #include "TcgMorLock.h"
 
-EFI_SMM_VARIABLE_PROTOCOL *mSmmVariable;
+EFI_SMM_VARIABLE_PROTOCOL  *mSmmVariable;
 
 /**
   This service is a wrapper for the UEFI Runtime Service GetVariable().
@@ -40,11 +40,11 @@ EFI_SMM_VARIABLE_PROTOCOL *mSmmVariable;
 EFI_STATUS
 EFIAPI
 InternalGetVariable (
-  IN      CHAR16                   *VariableName,
-  IN      EFI_GUID                 *VendorGuid,
-  OUT     UINT32                   *Attributes OPTIONAL,
-  IN OUT  UINTN                    *DataSize,
-  OUT     VOID                     *Data
+  IN      CHAR16    *VariableName,
+  IN      EFI_GUID  *VendorGuid,
+  OUT     UINT32    *Attributes OPTIONAL,
+  IN OUT  UINTN     *DataSize,
+  OUT     VOID      *Data
   )
 {
   return mSmmVariable->SmmGetVariable (
@@ -85,11 +85,11 @@ InternalGetVariable (
 EFI_STATUS
 EFIAPI
 InternalSetVariable (
-  IN CHAR16                       *VariableName,
-  IN EFI_GUID                     *VendorGuid,
-  IN UINT32                       Attributes,
-  IN UINTN                        DataSize,
-  IN VOID                         *Data
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid,
+  IN UINT32    Attributes,
+  IN UINTN     DataSize,
+  IN VOID      *Data
   )
 {
   return mSmmVariable->SmmSetVariable (
@@ -113,8 +113,8 @@ InternalSetVariable (
 EFI_STATUS
 EFIAPI
 MorLockDriverEntryPointSmm (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS                    Status;
@@ -123,20 +123,20 @@ MorLockDriverEntryPointSmm (
   //
   // This driver link to Smm Variable driver
   //
-  DEBUG ((EFI_D_INFO, "MorLockDriverEntryPointSmm\n"));
+  DEBUG ((DEBUG_INFO, "MorLockDriverEntryPointSmm\n"));
 
   Status = gSmst->SmmLocateProtocol (
-                  &gEfiSmmVariableProtocolGuid,
-                  NULL,
-                  (VOID **) &mSmmVariable
-                  );
+                    &gEfiSmmVariableProtocolGuid,
+                    NULL,
+                    (VOID **)&mSmmVariable
+                    );
   ASSERT_EFI_ERROR (Status);
 
   Status = gSmst->SmmLocateProtocol (
-                  &gEdkiiSmmVarCheckProtocolGuid,
-                  NULL,
-                  (VOID **) &SmmVarCheck
-                  );
+                    &gEdkiiSmmVarCheckProtocolGuid,
+                    NULL,
+                    (VOID **)&SmmVarCheck
+                    );
   ASSERT_EFI_ERROR (Status);
 
   Status = MorLockDriverInit ();
@@ -149,4 +149,3 @@ MorLockDriverEntryPointSmm (
 
   return Status;
 }
-

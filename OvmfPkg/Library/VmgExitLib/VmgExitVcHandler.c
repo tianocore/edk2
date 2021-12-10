@@ -17,12 +17,13 @@
 #include <IndustryStandard/InstructionParsing.h>
 
 #include "VmgExitVcHandler.h"
+// #include <Library/MemEncryptSevLib.h>
 
 //
 // Instruction execution mode definition
 //
 typedef enum {
-  LongMode64Bit        = 0,
+  LongMode64Bit = 0,
   LongModeCompat32Bit,
   LongModeCompat16Bit,
 } SEV_ES_INSTRUCTION_MODE;
@@ -31,7 +32,7 @@ typedef enum {
 // Instruction size definition (for operand and address)
 //
 typedef enum {
-  Size8Bits            = 0,
+  Size8Bits = 0,
   Size16Bits,
   Size32Bits,
   Size64Bits,
@@ -41,7 +42,7 @@ typedef enum {
 // Intruction segment definition
 //
 typedef enum {
-  SegmentEs            = 0,
+  SegmentEs = 0,
   SegmentCs,
   SegmentSs,
   SegmentDs,
@@ -53,70 +54,70 @@ typedef enum {
 // Instruction rep function definition
 //
 typedef enum {
-  RepNone              = 0,
+  RepNone = 0,
   RepZ,
   RepNZ,
 } SEV_ES_INSTRUCTION_REP;
 
 typedef struct {
-  UINT8  Rm;
-  UINT8  Reg;
-  UINT8  Mod;
+  UINT8    Rm;
+  UINT8    Reg;
+  UINT8    Mod;
 } SEV_ES_INSTRUCTION_MODRM_EXT;
 
 typedef struct {
-  UINT8  Base;
-  UINT8  Index;
-  UINT8  Scale;
+  UINT8    Base;
+  UINT8    Index;
+  UINT8    Scale;
 } SEV_ES_INSTRUCTION_SIB_EXT;
 
 //
 // Instruction opcode definition
 //
 typedef struct {
-  SEV_ES_INSTRUCTION_MODRM_EXT  ModRm;
+  SEV_ES_INSTRUCTION_MODRM_EXT    ModRm;
 
-  SEV_ES_INSTRUCTION_SIB_EXT    Sib;
+  SEV_ES_INSTRUCTION_SIB_EXT      Sib;
 
-  UINTN                         RegData;
-  UINTN                         RmData;
+  UINTN                           RegData;
+  UINTN                           RmData;
 } SEV_ES_INSTRUCTION_OPCODE_EXT;
 
 //
 // Instruction parsing context definition
 //
 typedef struct {
-  GHCB                           *Ghcb;
+  GHCB                             *Ghcb;
 
-  SEV_ES_INSTRUCTION_MODE        Mode;
-  SEV_ES_INSTRUCTION_SIZE        DataSize;
-  SEV_ES_INSTRUCTION_SIZE        AddrSize;
-  BOOLEAN                        SegmentSpecified;
-  SEV_ES_INSTRUCTION_SEGMENT     Segment;
-  SEV_ES_INSTRUCTION_REP         RepMode;
+  SEV_ES_INSTRUCTION_MODE          Mode;
+  SEV_ES_INSTRUCTION_SIZE          DataSize;
+  SEV_ES_INSTRUCTION_SIZE          AddrSize;
+  BOOLEAN                          SegmentSpecified;
+  SEV_ES_INSTRUCTION_SEGMENT       Segment;
+  SEV_ES_INSTRUCTION_REP           RepMode;
 
-  UINT8                          *Begin;
-  UINT8                          *End;
+  UINT8                            *Begin;
+  UINT8                            *End;
 
-  UINT8                          *Prefixes;
-  UINT8                          *OpCodes;
-  UINT8                          *Displacement;
-  UINT8                          *Immediate;
+  UINT8                            *Prefixes;
+  UINT8                            *OpCodes;
+  UINT8                            *Displacement;
+  UINT8                            *Immediate;
 
-  INSTRUCTION_REX_PREFIX         RexPrefix;
+  INSTRUCTION_REX_PREFIX           RexPrefix;
 
-  BOOLEAN                        ModRmPresent;
-  INSTRUCTION_MODRM              ModRm;
+  BOOLEAN                          ModRmPresent;
+  INSTRUCTION_MODRM                ModRm;
 
-  BOOLEAN                        SibPresent;
-  INSTRUCTION_SIB                Sib;
+  BOOLEAN                          SibPresent;
+  INSTRUCTION_SIB                  Sib;
 
-  UINTN                          PrefixSize;
-  UINTN                          OpCodeSize;
-  UINTN                          DisplacementSize;
-  UINTN                          ImmediateSize;
+  UINTN                            PrefixSize;
+  UINTN                            OpCodeSize;
+  UINTN                            DisplacementSize;
+  UINTN                            ImmediateSize;
 
-  SEV_ES_INSTRUCTION_OPCODE_EXT  Ext;
+  SEV_ES_INSTRUCTION_OPCODE_EXT    Ext;
 } SEV_ES_INSTRUCTION_DATA;
 
 //
@@ -129,6 +130,31 @@ UINT64
   EFI_SYSTEM_CONTEXT_X64   *Regs,
   SEV_ES_INSTRUCTION_DATA  *InstructionData
   );
+
+//
+// SEV-SNP Cpuid table entry/function
+//
+typedef PACKED struct {
+  UINT32    EaxIn;
+  UINT32    EcxIn;
+  UINT64    Unused;
+  UINT64    Unused2;
+  UINT32    Eax;
+  UINT32    Ebx;
+  UINT32    Ecx;
+  UINT32    Edx;
+  UINT64    Reserved;
+} SEV_SNP_CPUID_FUNCTION;
+
+//
+// SEV-SNP Cpuid page format
+//
+typedef PACKED struct {
+  UINT32                    Count;
+  UINT32                    Reserved1;
+  UINT64                    Reserved2;
+  SEV_SNP_CPUID_FUNCTION    function[0];
+} SEV_SNP_CPUID_INFO;
 
 /**
   Return a pointer to the contents of the specified register.
@@ -145,64 +171,65 @@ UINT64
 STATIC
 UINT64 *
 GetRegisterPointer (
-  IN EFI_SYSTEM_CONTEXT_X64   *Regs,
-  IN UINT8                    Register
+  IN EFI_SYSTEM_CONTEXT_X64  *Regs,
+  IN UINT8                   Register
   )
 {
-  UINT64 *Reg;
+  UINT64  *Reg;
 
   switch (Register) {
-  case 0:
-    Reg = &Regs->Rax;
-    break;
-  case 1:
-    Reg = &Regs->Rcx;
-    break;
-  case 2:
-    Reg = &Regs->Rdx;
-    break;
-  case 3:
-    Reg = &Regs->Rbx;
-    break;
-  case 4:
-    Reg = &Regs->Rsp;
-    break;
-  case 5:
-    Reg = &Regs->Rbp;
-    break;
-  case 6:
-    Reg = &Regs->Rsi;
-    break;
-  case 7:
-    Reg = &Regs->Rdi;
-    break;
-  case 8:
-    Reg = &Regs->R8;
-    break;
-  case 9:
-    Reg = &Regs->R9;
-    break;
-  case 10:
-    Reg = &Regs->R10;
-    break;
-  case 11:
-    Reg = &Regs->R11;
-    break;
-  case 12:
-    Reg = &Regs->R12;
-    break;
-  case 13:
-    Reg = &Regs->R13;
-    break;
-  case 14:
-    Reg = &Regs->R14;
-    break;
-  case 15:
-    Reg = &Regs->R15;
-    break;
-  default:
-    Reg = NULL;
+    case 0:
+      Reg = &Regs->Rax;
+      break;
+    case 1:
+      Reg = &Regs->Rcx;
+      break;
+    case 2:
+      Reg = &Regs->Rdx;
+      break;
+    case 3:
+      Reg = &Regs->Rbx;
+      break;
+    case 4:
+      Reg = &Regs->Rsp;
+      break;
+    case 5:
+      Reg = &Regs->Rbp;
+      break;
+    case 6:
+      Reg = &Regs->Rsi;
+      break;
+    case 7:
+      Reg = &Regs->Rdi;
+      break;
+    case 8:
+      Reg = &Regs->R8;
+      break;
+    case 9:
+      Reg = &Regs->R9;
+      break;
+    case 10:
+      Reg = &Regs->R10;
+      break;
+    case 11:
+      Reg = &Regs->R11;
+      break;
+    case 12:
+      Reg = &Regs->R12;
+      break;
+    case 13:
+      Reg = &Regs->R13;
+      break;
+    case 14:
+      Reg = &Regs->R14;
+      break;
+    case 15:
+      Reg = &Regs->R15;
+      break;
+    default:
+      Reg = NULL;
   }
+
   ASSERT (Reg != NULL);
 
   return Reg;
@@ -223,8 +250,8 @@ UpdateForDisplacement (
   )
 {
   InstructionData->DisplacementSize = Size;
-  InstructionData->Immediate += Size;
-  InstructionData->End += Size;
+  InstructionData->Immediate       += Size;
+  InstructionData->End             += Size;
 }
 
 /**
@@ -277,42 +304,43 @@ GetEffectiveMemoryAddress (
   SEV_ES_INSTRUCTION_OPCODE_EXT  *Ext;
   UINT64                         EffectiveAddress;
 
-  Ext = &InstructionData->Ext;
+  Ext              = &InstructionData->Ext;
   EffectiveAddress = 0;
 
   if (IsRipRelative (InstructionData)) {
     //
     // RIP-relative displacement is a 32-bit signed value
     //
-    INT32 RipRelative;
+    INT32  RipRelative;
 
-    RipRelative = *(INT32 *) InstructionData->Displacement;
+    RipRelative = *(INT32 *)InstructionData->Displacement;
 
     UpdateForDisplacement (InstructionData, 4);
 
     //
     // Negative displacement is handled by standard UINT64 wrap-around.
     //
-    return Regs->Rip + (UINT64) RipRelative;
+    return Regs->Rip + (UINT64)RipRelative;
   }
 
   switch (Ext->ModRm.Mod) {
-  case 1:
-    UpdateForDisplacement (InstructionData, 1);
-    EffectiveAddress += (UINT64) (*(INT8 *) (InstructionData->Displacement));
-    break;
-  case 2:
-    switch (InstructionData->AddrSize) {
-    case Size16Bits:
-      UpdateForDisplacement (InstructionData, 2);
-      EffectiveAddress += (UINT64) (*(INT16 *) (InstructionData->Displacement));
+    case 1:
+      UpdateForDisplacement (InstructionData, 1);
+      EffectiveAddress += (UINT64)(*(INT8 *)(InstructionData->Displacement));
       break;
-    default:
-      UpdateForDisplacement (InstructionData, 4);
-      EffectiveAddress += (UINT64) (*(INT32 *) (InstructionData->Displacement));
+    case 2:
+      switch (InstructionData->AddrSize) {
+        case Size16Bits:
+          UpdateForDisplacement (InstructionData, 2);
+          EffectiveAddress += (UINT64)(*(INT16 *)(InstructionData->Displacement));
+          break;
+        default:
+          UpdateForDisplacement (InstructionData, 4);
+          EffectiveAddress += (UINT64)(*(INT32 *)(InstructionData->Displacement));
+          break;
+      }
+
       break;
-    }
-    break;
   }
 
   if (InstructionData->SibPresent) {
@@ -329,14 +357,14 @@ GetEffectiveMemoryAddress (
       //
       // Negative displacement is handled by standard UINT64 wrap-around.
       //
-      EffectiveAddress += (UINT64) Displacement;
+      EffectiveAddress += (UINT64)Displacement;
     }
 
     if ((Ext->Sib.Base != 5) || Ext->ModRm.Mod) {
       EffectiveAddress += *GetRegisterPointer (Regs, Ext->Sib.Base);
     } else {
       UpdateForDisplacement (InstructionData, 4);
-      EffectiveAddress += (UINT64) (*(INT32 *) (InstructionData->Displacement));
+      EffectiveAddress += (UINT64)(*(INT32 *)(InstructionData->Displacement));
     }
   } else {
     EffectiveAddress += *GetRegisterPointer (Regs, Ext->ModRm.Rm);
@@ -368,12 +396,12 @@ DecodeModRm (
   INSTRUCTION_SIB                *Sib;
 
   RexPrefix = &InstructionData->RexPrefix;
-  Ext = &InstructionData->Ext;
-  ModRm = &InstructionData->ModRm;
-  Sib = &InstructionData->Sib;
+  Ext       = &InstructionData->Ext;
+  ModRm     = &InstructionData->ModRm;
+  Sib       = &InstructionData->Sib;
 
   InstructionData->ModRmPresent = TRUE;
-  ModRm->Uint8 = *(InstructionData->End);
+  ModRm->Uint8                  = *(InstructionData->End);
 
   InstructionData->Displacement++;
   InstructionData->Immediate++;
@@ -390,7 +418,7 @@ DecodeModRm (
   } else {
     if (ModRm->Bits.Rm == 4) {
       InstructionData->SibPresent = TRUE;
-      Sib->Uint8 = *(InstructionData->End);
+      Sib->Uint8                  = *(InstructionData->End);
 
       InstructionData->Displacement++;
       InstructionData->Immediate++;
@@ -430,11 +458,11 @@ DecodePrefixes (
   //
   // Always in 64-bit mode
   //
-  Mode = LongMode64Bit;
+  Mode         = LongMode64Bit;
   ModeDataSize = Size32Bits;
   ModeAddrSize = Size64Bits;
 
-  InstructionData->Mode = Mode;
+  InstructionData->Mode     = Mode;
   InstructionData->DataSize = ModeDataSize;
   InstructionData->AddrSize = ModeAddrSize;
 
@@ -452,61 +480,64 @@ DecodePrefixes (
       if ((*Byte & REX_64BIT_OPERAND_SIZE_MASK) != 0) {
         InstructionData->DataSize = Size64Bits;
       }
+
       continue;
     }
 
     switch (*Byte) {
-    case OVERRIDE_SEGMENT_CS:
-    case OVERRIDE_SEGMENT_DS:
-    case OVERRIDE_SEGMENT_ES:
-    case OVERRIDE_SEGMENT_SS:
-      if (Mode != LongMode64Bit) {
+      case OVERRIDE_SEGMENT_CS:
+      case OVERRIDE_SEGMENT_DS:
+      case OVERRIDE_SEGMENT_ES:
+      case OVERRIDE_SEGMENT_SS:
+        if (Mode != LongMode64Bit) {
+          InstructionData->SegmentSpecified = TRUE;
+          InstructionData->Segment          = (*Byte >> 3) & 3;
+        }
+
+        break;
+
+      case OVERRIDE_SEGMENT_FS:
+      case OVERRIDE_SEGMENT_GS:
         InstructionData->SegmentSpecified = TRUE;
-        InstructionData->Segment = (*Byte >> 3) & 3;
-      }
-      break;
+        InstructionData->Segment          = *Byte & 7;
+        break;
 
-    case OVERRIDE_SEGMENT_FS:
-    case OVERRIDE_SEGMENT_GS:
-      InstructionData->SegmentSpecified = TRUE;
-      InstructionData->Segment = *Byte & 7;
-      break;
+      case OVERRIDE_OPERAND_SIZE:
+        if (InstructionData->RexPrefix.Uint8 == 0) {
+          InstructionData->DataSize =
+            (Mode == LongMode64Bit)       ? Size16Bits :
+            (Mode == LongModeCompat32Bit) ? Size16Bits :
+            (Mode == LongModeCompat16Bit) ? Size32Bits : 0;
+        }
 
-    case OVERRIDE_OPERAND_SIZE:
-      if (InstructionData->RexPrefix.Uint8 == 0) {
-        InstructionData->DataSize =
-          (Mode == LongMode64Bit)       ? Size16Bits :
+        break;
+
+      case OVERRIDE_ADDRESS_SIZE:
+        InstructionData->AddrSize =
+          (Mode == LongMode64Bit)       ? Size32Bits :
           (Mode == LongModeCompat32Bit) ? Size16Bits :
           (Mode == LongModeCompat16Bit) ? Size32Bits : 0;
-      }
-      break;
+        break;
 
-    case OVERRIDE_ADDRESS_SIZE:
-      InstructionData->AddrSize =
-        (Mode == LongMode64Bit)       ? Size32Bits :
-        (Mode == LongModeCompat32Bit) ? Size16Bits :
-        (Mode == LongModeCompat16Bit) ? Size32Bits : 0;
-      break;
+      case LOCK_PREFIX:
+        break;
 
-    case LOCK_PREFIX:
-      break;
+      case REPZ_PREFIX:
+        InstructionData->RepMode = RepZ;
+        break;
 
-    case REPZ_PREFIX:
-      InstructionData->RepMode = RepZ;
-      break;
+      case REPNZ_PREFIX:
+        InstructionData->RepMode = RepNZ;
+        break;
 
-    case REPNZ_PREFIX:
-      InstructionData->RepMode = RepNZ;
-      break;
+      default:
+        InstructionData->OpCodes    = Byte;
+        InstructionData->OpCodeSize = (*Byte == TWO_BYTE_OPCODE_ESCAPE) ? 2 : 1;
 
-    default:
-      InstructionData->OpCodes = Byte;
-      InstructionData->OpCodeSize = (*Byte == TWO_BYTE_OPCODE_ESCAPE) ? 2 : 1;
-
-      InstructionData->End = Byte + InstructionData->OpCodeSize;
-      InstructionData->Displacement = InstructionData->End;
-      InstructionData->Immediate = InstructionData->End;
-      return;
+        InstructionData->End          = Byte + InstructionData->OpCodeSize;
+        InstructionData->Displacement = InstructionData->End;
+        InstructionData->Immediate    = InstructionData->End;
+        return;
     }
   }
 }
@@ -527,7 +558,7 @@ InstructionLength (
   IN SEV_ES_INSTRUCTION_DATA  *InstructionData
   )
 {
-  return (UINT64) (InstructionData->End - InstructionData->Begin);
+  return (UINT64)(InstructionData->End - InstructionData->Begin);
 }
 
 /**
@@ -551,9 +582,9 @@ InitInstructionData (
   )
 {
   SetMem (InstructionData, sizeof (*InstructionData), 0);
-  InstructionData->Ghcb = Ghcb;
-  InstructionData->Begin = (UINT8 *) Regs->Rip;
-  InstructionData->End = (UINT8 *) Regs->Rip;
+  InstructionData->Ghcb  = Ghcb;
+  InstructionData->Begin = (UINT8 *)Regs->Rip;
+  InstructionData->End   = (UINT8 *)Regs->Rip;
 
   DecodePrefixes (Regs, InstructionData);
 }
@@ -585,7 +616,7 @@ UnsupportedExit (
   if (Status == 0) {
     GHCB_EVENT_INJECTION  Event;
 
-    Event.Uint64 = 0;
+    Event.Uint64          = 0;
     Event.Elements.Vector = GP_EXCEPTION;
     Event.Elements.Type   = GHCB_EVENT_INJECTION_TYPE_EXCEPTION;
     Event.Elements.Valid  = 1;
@@ -643,10 +674,12 @@ ValidateMmioMemory (
   //
   // Any state other than unencrypted is an error, issue a #GP.
   //
-  DEBUG ((DEBUG_ERROR,
+  DEBUG ((
+    DEBUG_ERROR,
     "MMIO using encrypted memory: %lx\n",
-    (UINT64) MemoryAddress));
-  GpEvent.Uint64 = 0;
+    (UINT64)MemoryAddress
+    ));
+  GpEvent.Uint64          = 0;
   GpEvent.Elements.Vector = GP_EXCEPTION;
   GpEvent.Elements.Type   = GHCB_EVENT_INJECTION_TYPE_EXCEPTION;
   GpEvent.Elements.Valid  = 1;
@@ -690,317 +723,322 @@ MmioExit (
   }
 
   switch (OpCode) {
-  //
-  // MMIO write (MOV reg/memX, regX)
-  //
-  case 0x88:
-    Bytes = 1;
+    //
+    // MMIO write (MOV reg/memX, regX)
+    //
+    case 0x88:
+      Bytes = 1;
     //
     // fall through
     //
-  case 0x89:
-    DecodeModRm (Regs, InstructionData);
-    Bytes = ((Bytes != 0) ? Bytes :
-             (InstructionData->DataSize == Size16Bits) ? 2 :
-             (InstructionData->DataSize == Size32Bits) ? 4 :
-             (InstructionData->DataSize == Size64Bits) ? 8 :
-             0);
+    case 0x89:
+      DecodeModRm (Regs, InstructionData);
+      Bytes = ((Bytes != 0) ? Bytes :
+               (InstructionData->DataSize == Size16Bits) ? 2 :
+               (InstructionData->DataSize == Size32Bits) ? 4 :
+               (InstructionData->DataSize == Size64Bits) ? 8 :
+               0);
 
-    if (InstructionData->Ext.ModRm.Mod == 3) {
-      //
-      // NPF on two register operands???
-      //
-      return UnsupportedExit (Ghcb, Regs, InstructionData);
-    }
+      if (InstructionData->Ext.ModRm.Mod == 3) {
+        //
+        // NPF on two register operands???
+        //
+        return UnsupportedExit (Ghcb, Regs, InstructionData);
+      }
 
-    Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
-    if (Status != 0) {
-      return Status;
-    }
+      Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
+      if (Status != 0) {
+        return Status;
+      }
 
-    ExitInfo1 = InstructionData->Ext.RmData;
-    ExitInfo2 = Bytes;
-    CopyMem (Ghcb->SharedBuffer, &InstructionData->Ext.RegData, Bytes);
+      ExitInfo1 = InstructionData->Ext.RmData;
+      ExitInfo2 = Bytes;
+      CopyMem (Ghcb->SharedBuffer, &InstructionData->Ext.RegData, Bytes);
 
-    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
-    VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-    Status = VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, ExitInfo1, ExitInfo2);
-    if (Status != 0) {
-      return Status;
-    }
-    break;
+      Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
+      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, ExitInfo1, ExitInfo2);
+      if (Status != 0) {
+        return Status;
+      }
 
-  //
-  // MMIO write (MOV moffsetX, aX)
-  //
-  case 0xA2:
-    Bytes = 1;
+      break;
+
+    //
+    // MMIO write (MOV moffsetX, aX)
+    //
+    case 0xA2:
+      Bytes = 1;
     //
     // fall through
     //
-  case 0xA3:
-    Bytes = ((Bytes != 0) ? Bytes :
-             (InstructionData->DataSize == Size16Bits) ? 2 :
-             (InstructionData->DataSize == Size32Bits) ? 4 :
-             (InstructionData->DataSize == Size64Bits) ? 8 :
-             0);
+    case 0xA3:
+      Bytes = ((Bytes != 0) ? Bytes :
+               (InstructionData->DataSize == Size16Bits) ? 2 :
+               (InstructionData->DataSize == Size32Bits) ? 4 :
+               (InstructionData->DataSize == Size64Bits) ? 8 :
+               0);
 
-    InstructionData->ImmediateSize = (UINTN) (1 << InstructionData->AddrSize);
-    InstructionData->End += InstructionData->ImmediateSize;
+      InstructionData->ImmediateSize = (UINTN)(1 << InstructionData->AddrSize);
+      InstructionData->End          += InstructionData->ImmediateSize;
+
+      //
+      // This code is X64 only, so a possible 8-byte copy to a UINTN is ok.
+      // Use a STATIC_ASSERT to be certain the code is being built as X64.
+      //
+      STATIC_ASSERT (
+        sizeof (UINTN) == sizeof (UINT64),
+        "sizeof (UINTN) != sizeof (UINT64), this file must be built as X64"
+        );
+
+      Address = 0;
+      CopyMem (
+        &Address,
+        InstructionData->Immediate,
+        InstructionData->ImmediateSize
+        );
+
+      Status = ValidateMmioMemory (Ghcb, Address, Bytes);
+      if (Status != 0) {
+        return Status;
+      }
+
+      ExitInfo1 = Address;
+      ExitInfo2 = Bytes;
+      CopyMem (Ghcb->SharedBuffer, &Regs->Rax, Bytes);
+
+      Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
+      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, ExitInfo1, ExitInfo2);
+      if (Status != 0) {
+        return Status;
+      }
+
+      break;
 
     //
-    // This code is X64 only, so a possible 8-byte copy to a UINTN is ok.
-    // Use a STATIC_ASSERT to be certain the code is being built as X64.
+    // MMIO write (MOV reg/memX, immX)
     //
-    STATIC_ASSERT (
-      sizeof (UINTN) == sizeof (UINT64),
-      "sizeof (UINTN) != sizeof (UINT64), this file must be built as X64"
-      );
-
-    Address = 0;
-    CopyMem (
-      &Address,
-      InstructionData->Immediate,
-      InstructionData->ImmediateSize
-      );
-
-    Status = ValidateMmioMemory (Ghcb, Address, Bytes);
-    if (Status != 0) {
-      return Status;
-    }
-
-    ExitInfo1 = Address;
-    ExitInfo2 = Bytes;
-    CopyMem (Ghcb->SharedBuffer, &Regs->Rax, Bytes);
-
-    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
-    VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-    Status = VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, ExitInfo1, ExitInfo2);
-    if (Status != 0) {
-      return Status;
-    }
-    break;
-
-  //
-  // MMIO write (MOV reg/memX, immX)
-  //
-  case 0xC6:
-    Bytes = 1;
+    case 0xC6:
+      Bytes = 1;
     //
     // fall through
     //
-  case 0xC7:
-    DecodeModRm (Regs, InstructionData);
-    Bytes = ((Bytes != 0) ? Bytes :
-             (InstructionData->DataSize == Size16Bits) ? 2 :
-             (InstructionData->DataSize == Size32Bits) ? 4 :
-             0);
+    case 0xC7:
+      DecodeModRm (Regs, InstructionData);
+      Bytes = ((Bytes != 0) ? Bytes :
+               (InstructionData->DataSize == Size16Bits) ? 2 :
+               (InstructionData->DataSize == Size32Bits) ? 4 :
+               0);
 
-    InstructionData->ImmediateSize = Bytes;
-    InstructionData->End += Bytes;
+      InstructionData->ImmediateSize = Bytes;
+      InstructionData->End          += Bytes;
 
-    Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
-    if (Status != 0) {
-      return Status;
-    }
+      Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
+      if (Status != 0) {
+        return Status;
+      }
 
-    ExitInfo1 = InstructionData->Ext.RmData;
-    ExitInfo2 = Bytes;
-    CopyMem (Ghcb->SharedBuffer, InstructionData->Immediate, Bytes);
+      ExitInfo1 = InstructionData->Ext.RmData;
+      ExitInfo2 = Bytes;
+      CopyMem (Ghcb->SharedBuffer, InstructionData->Immediate, Bytes);
 
-    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
-    VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-    Status = VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, ExitInfo1, ExitInfo2);
-    if (Status != 0) {
-      return Status;
-    }
-    break;
+      Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
+      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, ExitInfo1, ExitInfo2);
+      if (Status != 0) {
+        return Status;
+      }
 
-  //
-  // MMIO read (MOV regX, reg/memX)
-  //
-  case 0x8A:
-    Bytes = 1;
+      break;
+
+    //
+    // MMIO read (MOV regX, reg/memX)
+    //
+    case 0x8A:
+      Bytes = 1;
     //
     // fall through
     //
-  case 0x8B:
-    DecodeModRm (Regs, InstructionData);
-    Bytes = ((Bytes != 0) ? Bytes :
-             (InstructionData->DataSize == Size16Bits) ? 2 :
-             (InstructionData->DataSize == Size32Bits) ? 4 :
-             (InstructionData->DataSize == Size64Bits) ? 8 :
-             0);
-    if (InstructionData->Ext.ModRm.Mod == 3) {
-      //
-      // NPF on two register operands???
-      //
-      return UnsupportedExit (Ghcb, Regs, InstructionData);
-    }
+    case 0x8B:
+      DecodeModRm (Regs, InstructionData);
+      Bytes = ((Bytes != 0) ? Bytes :
+               (InstructionData->DataSize == Size16Bits) ? 2 :
+               (InstructionData->DataSize == Size32Bits) ? 4 :
+               (InstructionData->DataSize == Size64Bits) ? 8 :
+               0);
+      if (InstructionData->Ext.ModRm.Mod == 3) {
+        //
+        // NPF on two register operands???
+        //
+        return UnsupportedExit (Ghcb, Regs, InstructionData);
+      }
 
-    Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
-    if (Status != 0) {
-      return Status;
-    }
+      Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
+      if (Status != 0) {
+        return Status;
+      }
 
-    ExitInfo1 = InstructionData->Ext.RmData;
-    ExitInfo2 = Bytes;
+      ExitInfo1 = InstructionData->Ext.RmData;
+      ExitInfo2 = Bytes;
 
-    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
-    VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-    Status = VmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
-    if (Status != 0) {
-      return Status;
-    }
+      Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
+      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = VmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
+      if (Status != 0) {
+        return Status;
+      }
 
-    Register = GetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
-    if (Bytes == 4) {
-      //
-      // Zero-extend for 32-bit operation
-      //
-      *Register = 0;
-    }
-    CopyMem (Register, Ghcb->SharedBuffer, Bytes);
-    break;
+      Register = GetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
+      if (Bytes == 4) {
+        //
+        // Zero-extend for 32-bit operation
+        //
+        *Register = 0;
+      }
 
-  //
-  // MMIO read (MOV aX, moffsetX)
-  //
-  case 0xA0:
-    Bytes = 1;
+      CopyMem (Register, Ghcb->SharedBuffer, Bytes);
+      break;
+
+    //
+    // MMIO read (MOV aX, moffsetX)
+    //
+    case 0xA0:
+      Bytes = 1;
     //
     // fall through
     //
-  case 0xA1:
-    Bytes = ((Bytes != 0) ? Bytes :
-             (InstructionData->DataSize == Size16Bits) ? 2 :
-             (InstructionData->DataSize == Size32Bits) ? 4 :
-             (InstructionData->DataSize == Size64Bits) ? 8 :
-             0);
+    case 0xA1:
+      Bytes = ((Bytes != 0) ? Bytes :
+               (InstructionData->DataSize == Size16Bits) ? 2 :
+               (InstructionData->DataSize == Size32Bits) ? 4 :
+               (InstructionData->DataSize == Size64Bits) ? 8 :
+               0);
 
-    InstructionData->ImmediateSize = (UINTN) (1 << InstructionData->AddrSize);
-    InstructionData->End += InstructionData->ImmediateSize;
+      InstructionData->ImmediateSize = (UINTN)(1 << InstructionData->AddrSize);
+      InstructionData->End          += InstructionData->ImmediateSize;
+
+      //
+      // This code is X64 only, so a possible 8-byte copy to a UINTN is ok.
+      // Use a STATIC_ASSERT to be certain the code is being built as X64.
+      //
+      STATIC_ASSERT (
+        sizeof (UINTN) == sizeof (UINT64),
+        "sizeof (UINTN) != sizeof (UINT64), this file must be built as X64"
+        );
+
+      Address = 0;
+      CopyMem (
+        &Address,
+        InstructionData->Immediate,
+        InstructionData->ImmediateSize
+        );
+
+      Status = ValidateMmioMemory (Ghcb, Address, Bytes);
+      if (Status != 0) {
+        return Status;
+      }
+
+      ExitInfo1 = Address;
+      ExitInfo2 = Bytes;
+
+      Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
+      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = VmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
+      if (Status != 0) {
+        return Status;
+      }
+
+      if (Bytes == 4) {
+        //
+        // Zero-extend for 32-bit operation
+        //
+        Regs->Rax = 0;
+      }
+
+      CopyMem (&Regs->Rax, Ghcb->SharedBuffer, Bytes);
+      break;
 
     //
-    // This code is X64 only, so a possible 8-byte copy to a UINTN is ok.
-    // Use a STATIC_ASSERT to be certain the code is being built as X64.
+    // MMIO read w/ zero-extension ((MOVZX regX, reg/memX)
     //
-    STATIC_ASSERT (
-      sizeof (UINTN) == sizeof (UINT64),
-      "sizeof (UINTN) != sizeof (UINT64), this file must be built as X64"
-      );
-
-    Address = 0;
-    CopyMem (
-      &Address,
-      InstructionData->Immediate,
-      InstructionData->ImmediateSize
-      );
-
-    Status = ValidateMmioMemory (Ghcb, Address, Bytes);
-    if (Status != 0) {
-      return Status;
-    }
-
-    ExitInfo1 = Address;
-    ExitInfo2 = Bytes;
-
-    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
-    VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-    Status = VmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
-    if (Status != 0) {
-      return Status;
-    }
-
-    if (Bytes == 4) {
-      //
-      // Zero-extend for 32-bit operation
-      //
-      Regs->Rax = 0;
-    }
-    CopyMem (&Regs->Rax, Ghcb->SharedBuffer, Bytes);
-    break;
-
-  //
-  // MMIO read w/ zero-extension ((MOVZX regX, reg/memX)
-  //
-  case 0xB6:
-    Bytes = 1;
+    case 0xB6:
+      Bytes = 1;
     //
     // fall through
     //
-  case 0xB7:
-    DecodeModRm (Regs, InstructionData);
-    Bytes = (Bytes != 0) ? Bytes : 2;
+    case 0xB7:
+      DecodeModRm (Regs, InstructionData);
+      Bytes = (Bytes != 0) ? Bytes : 2;
 
-    Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
-    if (Status != 0) {
-      return Status;
-    }
+      Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
+      if (Status != 0) {
+        return Status;
+      }
 
-    ExitInfo1 = InstructionData->Ext.RmData;
-    ExitInfo2 = Bytes;
+      ExitInfo1 = InstructionData->Ext.RmData;
+      ExitInfo2 = Bytes;
 
-    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
-    VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-    Status = VmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
-    if (Status != 0) {
-      return Status;
-    }
+      Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
+      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = VmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
+      if (Status != 0) {
+        return Status;
+      }
 
-    Register = GetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
-    SetMem (Register, (UINTN) (1 << InstructionData->DataSize), 0);
-    CopyMem (Register, Ghcb->SharedBuffer, Bytes);
-    break;
+      Register = GetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
+      SetMem (Register, (UINTN)(1 << InstructionData->DataSize), 0);
+      CopyMem (Register, Ghcb->SharedBuffer, Bytes);
+      break;
 
-  //
-  // MMIO read w/ sign-extension (MOVSX regX, reg/memX)
-  //
-  case 0xBE:
-    Bytes = 1;
+    //
+    // MMIO read w/ sign-extension (MOVSX regX, reg/memX)
+    //
+    case 0xBE:
+      Bytes = 1;
     //
     // fall through
     //
-  case 0xBF:
-    DecodeModRm (Regs, InstructionData);
-    Bytes = (Bytes != 0) ? Bytes : 2;
+    case 0xBF:
+      DecodeModRm (Regs, InstructionData);
+      Bytes = (Bytes != 0) ? Bytes : 2;
 
-    Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
-    if (Status != 0) {
-      return Status;
-    }
+      Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
+      if (Status != 0) {
+        return Status;
+      }
 
-    ExitInfo1 = InstructionData->Ext.RmData;
-    ExitInfo2 = Bytes;
+      ExitInfo1 = InstructionData->Ext.RmData;
+      ExitInfo2 = Bytes;
 
-    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
-    VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-    Status = VmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
-    if (Status != 0) {
-      return Status;
-    }
+      Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
+      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = VmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
+      if (Status != 0) {
+        return Status;
+      }
 
-    if (Bytes == 1) {
-      UINT8 *Data;
+      if (Bytes == 1) {
+        UINT8  *Data;
 
-      Data = (UINT8 *) Ghcb->SharedBuffer;
-      SignByte = ((*Data & BIT7) != 0) ? 0xFF : 0x00;
-    } else {
-      UINT16 *Data;
+        Data     = (UINT8 *)Ghcb->SharedBuffer;
+        SignByte = ((*Data & BIT7) != 0) ? 0xFF : 0x00;
+      } else {
+        UINT16  *Data;
 
-      Data = (UINT16 *) Ghcb->SharedBuffer;
-      SignByte = ((*Data & BIT15) != 0) ? 0xFF : 0x00;
-    }
+        Data     = (UINT16 *)Ghcb->SharedBuffer;
+        SignByte = ((*Data & BIT15) != 0) ? 0xFF : 0x00;
+      }
 
-    Register = GetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
-    SetMem (Register, (UINTN) (1 << InstructionData->DataSize), SignByte);
-    CopyMem (Register, Ghcb->SharedBuffer, Bytes);
-    break;
+      Register = GetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
+      SetMem (Register, (UINTN)(1 << InstructionData->DataSize), SignByte);
+      CopyMem (Register, Ghcb->SharedBuffer, Bytes);
+      break;
 
-  default:
-    DEBUG ((DEBUG_ERROR, "Invalid MMIO opcode (%x)\n", OpCode));
-    Status = GP_EXCEPTION;
-    ASSERT (FALSE);
+    default:
+      DEBUG ((DEBUG_ERROR, "Invalid MMIO opcode (%x)\n", OpCode));
+      Status = GP_EXCEPTION;
+      ASSERT (FALSE);
   }
 
   return Status;
@@ -1130,9 +1168,11 @@ RdtscpExit (
 
   if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
       !VmgIsOffsetValid (Ghcb, GhcbRcx) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRdx)) {
+      !VmgIsOffsetValid (Ghcb, GhcbRdx))
+  {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
+
   Regs->Rax = Ghcb->SaveArea.Rax;
   Regs->Rcx = Ghcb->SaveArea.Rcx;
   Regs->Rdx = Ghcb->SaveArea.Rdx;
@@ -1168,7 +1208,7 @@ VmmCallExit (
 
   Ghcb->SaveArea.Rax = Regs->Rax;
   VmgSetOffsetValid (Ghcb, GhcbRax);
-  Ghcb->SaveArea.Cpl = (UINT8) (Regs->Cs & 0x3);
+  Ghcb->SaveArea.Cpl = (UINT8)(Regs->Cs & 0x3);
   VmgSetOffsetValid (Ghcb, GhcbCpl);
 
   Status = VmgExit (Ghcb, SVM_EXIT_VMMCALL, 0, 0);
@@ -1179,6 +1219,7 @@ VmmCallExit (
   if (!VmgIsOffsetValid (Ghcb, GhcbRax)) {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
+
   Regs->Rax = Ghcb->SaveArea.Rax;
 
   return 0;
@@ -1211,21 +1252,21 @@ MsrExit (
   ExitInfo1 = 0;
 
   switch (*(InstructionData->OpCodes + 1)) {
-  case 0x30: // WRMSR
-    ExitInfo1 = 1;
-    Ghcb->SaveArea.Rax = Regs->Rax;
-    VmgSetOffsetValid (Ghcb, GhcbRax);
-    Ghcb->SaveArea.Rdx = Regs->Rdx;
-    VmgSetOffsetValid (Ghcb, GhcbRdx);
+    case 0x30: // WRMSR
+      ExitInfo1          = 1;
+      Ghcb->SaveArea.Rax = Regs->Rax;
+      VmgSetOffsetValid (Ghcb, GhcbRax);
+      Ghcb->SaveArea.Rdx = Regs->Rdx;
+      VmgSetOffsetValid (Ghcb, GhcbRdx);
     //
     // fall through
     //
-  case 0x32: // RDMSR
-    Ghcb->SaveArea.Rcx = Regs->Rcx;
-    VmgSetOffsetValid (Ghcb, GhcbRcx);
-    break;
-  default:
-    return UnsupportedExit (Ghcb, Regs, InstructionData);
+    case 0x32: // RDMSR
+      Ghcb->SaveArea.Rcx = Regs->Rcx;
+      VmgSetOffsetValid (Ghcb, GhcbRcx);
+      break;
+    default:
+      return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
 
   Status = VmgExit (Ghcb, SVM_EXIT_MSR, ExitInfo1, 0);
@@ -1235,9 +1276,11 @@ MsrExit (
 
   if (ExitInfo1 == 0) {
     if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
-        !VmgIsOffsetValid (Ghcb, GhcbRdx)) {
+        !VmgIsOffsetValid (Ghcb, GhcbRdx))
+    {
       return UnsupportedExit (Ghcb, Regs, InstructionData);
     }
+
     Regs->Rax = Ghcb->SaveArea.Rax;
     Regs->Rdx = Ghcb->SaveArea.Rdx;
   }
@@ -1269,106 +1312,106 @@ IoioExitInfo (
   ExitInfo = 0;
 
   switch (*(InstructionData->OpCodes)) {
-  //
-  // INS opcodes
-  //
-  case 0x6C:
-  case 0x6D:
-    ExitInfo |= IOIO_TYPE_INS;
-    ExitInfo |= IOIO_SEG_ES;
-    ExitInfo |= ((Regs->Rdx & 0xffff) << 16);
-    break;
+    //
+    // INS opcodes
+    //
+    case 0x6C:
+    case 0x6D:
+      ExitInfo |= IOIO_TYPE_INS;
+      ExitInfo |= IOIO_SEG_ES;
+      ExitInfo |= ((Regs->Rdx & 0xffff) << 16);
+      break;
 
-  //
-  // OUTS opcodes
-  //
-  case 0x6E:
-  case 0x6F:
-    ExitInfo |= IOIO_TYPE_OUTS;
-    ExitInfo |= IOIO_SEG_DS;
-    ExitInfo |= ((Regs->Rdx & 0xffff) << 16);
-    break;
+    //
+    // OUTS opcodes
+    //
+    case 0x6E:
+    case 0x6F:
+      ExitInfo |= IOIO_TYPE_OUTS;
+      ExitInfo |= IOIO_SEG_DS;
+      ExitInfo |= ((Regs->Rdx & 0xffff) << 16);
+      break;
 
-  //
-  // IN immediate opcodes
-  //
-  case 0xE4:
-  case 0xE5:
-    InstructionData->ImmediateSize = 1;
-    InstructionData->End++;
-    ExitInfo |= IOIO_TYPE_IN;
-    ExitInfo |= ((*(InstructionData->OpCodes + 1)) << 16);
-    break;
+    //
+    // IN immediate opcodes
+    //
+    case 0xE4:
+    case 0xE5:
+      InstructionData->ImmediateSize = 1;
+      InstructionData->End++;
+      ExitInfo |= IOIO_TYPE_IN;
+      ExitInfo |= ((*(InstructionData->OpCodes + 1)) << 16);
+      break;
 
-  //
-  // OUT immediate opcodes
-  //
-  case 0xE6:
-  case 0xE7:
-    InstructionData->ImmediateSize = 1;
-    InstructionData->End++;
-    ExitInfo |= IOIO_TYPE_OUT;
-    ExitInfo |= ((*(InstructionData->OpCodes + 1)) << 16) | IOIO_TYPE_OUT;
-    break;
+    //
+    // OUT immediate opcodes
+    //
+    case 0xE6:
+    case 0xE7:
+      InstructionData->ImmediateSize = 1;
+      InstructionData->End++;
+      ExitInfo |= IOIO_TYPE_OUT;
+      ExitInfo |= ((*(InstructionData->OpCodes + 1)) << 16) | IOIO_TYPE_OUT;
+      break;
 
-  //
-  // IN register opcodes
-  //
-  case 0xEC:
-  case 0xED:
-    ExitInfo |= IOIO_TYPE_IN;
-    ExitInfo |= ((Regs->Rdx & 0xffff) << 16);
-    break;
+    //
+    // IN register opcodes
+    //
+    case 0xEC:
+    case 0xED:
+      ExitInfo |= IOIO_TYPE_IN;
+      ExitInfo |= ((Regs->Rdx & 0xffff) << 16);
+      break;
 
-  //
-  // OUT register opcodes
-  //
-  case 0xEE:
-  case 0xEF:
-    ExitInfo |= IOIO_TYPE_OUT;
-    ExitInfo |= ((Regs->Rdx & 0xffff) << 16);
-    break;
+    //
+    // OUT register opcodes
+    //
+    case 0xEE:
+    case 0xEF:
+      ExitInfo |= IOIO_TYPE_OUT;
+      ExitInfo |= ((Regs->Rdx & 0xffff) << 16);
+      break;
 
-  default:
-    return 0;
+    default:
+      return 0;
   }
 
   switch (*(InstructionData->OpCodes)) {
-  //
-  // Single-byte opcodes
-  //
-  case 0x6C:
-  case 0x6E:
-  case 0xE4:
-  case 0xE6:
-  case 0xEC:
-  case 0xEE:
-    ExitInfo |= IOIO_DATA_8;
-    break;
+    //
+    // Single-byte opcodes
+    //
+    case 0x6C:
+    case 0x6E:
+    case 0xE4:
+    case 0xE6:
+    case 0xEC:
+    case 0xEE:
+      ExitInfo |= IOIO_DATA_8;
+      break;
 
-  //
-  // Length determined by instruction parsing
-  //
-  default:
-    ExitInfo |= (InstructionData->DataSize == Size16Bits) ? IOIO_DATA_16
+    //
+    // Length determined by instruction parsing
+    //
+    default:
+      ExitInfo |= (InstructionData->DataSize == Size16Bits) ? IOIO_DATA_16
                                                           : IOIO_DATA_32;
   }
 
   switch (InstructionData->AddrSize) {
-  case Size16Bits:
-    ExitInfo |= IOIO_ADDR_16;
-    break;
+    case Size16Bits:
+      ExitInfo |= IOIO_ADDR_16;
+      break;
 
-  case Size32Bits:
-    ExitInfo |= IOIO_ADDR_32;
-    break;
+    case Size32Bits:
+      ExitInfo |= IOIO_ADDR_32;
+      break;
 
-  case Size64Bits:
-    ExitInfo |= IOIO_ADDR_64;
-    break;
+    case Size64Bits:
+      ExitInfo |= IOIO_ADDR_64;
+      break;
 
-  default:
-    break;
+    default:
+      break;
   }
 
   if (InstructionData->RepMode != 0) {
@@ -1415,20 +1458,20 @@ IoioExit (
 
     Status = 0;
 
-    IoBytes = IOIO_DATA_BYTES (ExitInfo1);
+    IoBytes   = IOIO_DATA_BYTES (ExitInfo1);
     GhcbCount = sizeof (Ghcb->SharedBuffer) / IoBytes;
 
     OpCount = ((ExitInfo1 & IOIO_REP) != 0) ? Regs->Rcx : 1;
     while (OpCount != 0) {
-      ExitInfo2 = MIN (OpCount, GhcbCount);
+      ExitInfo2    = MIN (OpCount, GhcbCount);
       VmgExitBytes = ExitInfo2 * IoBytes;
 
       if ((ExitInfo1 & IOIO_TYPE_IN) == 0) {
-        CopyMem (Ghcb->SharedBuffer, (VOID *) Regs->Rsi, VmgExitBytes);
+        CopyMem (Ghcb->SharedBuffer, (VOID *)Regs->Rsi, VmgExitBytes);
         Regs->Rsi += VmgExitBytes;
       }
 
-      Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
+      Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
       VmgSetOffsetValid (Ghcb, GhcbSwScratch);
       Status = VmgExit (Ghcb, SVM_EXIT_IOIO_PROT, ExitInfo1, ExitInfo2);
       if (Status != 0) {
@@ -1436,7 +1479,7 @@ IoioExit (
       }
 
       if ((ExitInfo1 & IOIO_TYPE_IN) != 0) {
-        CopyMem ((VOID *) Regs->Rdi, Ghcb->SharedBuffer, VmgExitBytes);
+        CopyMem ((VOID *)Regs->Rdi, Ghcb->SharedBuffer, VmgExitBytes);
         Regs->Rdi += VmgExitBytes;
       }
 
@@ -1452,6 +1495,7 @@ IoioExit (
     } else {
       CopyMem (&Ghcb->SaveArea.Rax, &Regs->Rax, IOIO_DATA_BYTES (ExitInfo1));
     }
+
     VmgSetOffsetValid (Ghcb, GhcbRax);
 
     Status = VmgExit (Ghcb, SVM_EXIT_IOIO_PROT, ExitInfo1, 0);
@@ -1463,6 +1507,7 @@ IoioExit (
       if (!VmgIsOffsetValid (Ghcb, GhcbRax)) {
         return UnsupportedExit (Ghcb, Regs, InstructionData);
       }
+
       CopyMem (&Regs->Rax, &Ghcb->SaveArea.Rax, IOIO_DATA_BYTES (ExitInfo1));
     }
   }
@@ -1496,9 +1541,401 @@ InvdExit (
 }
 
 /**
+  Fetch CPUID leaf/function via hypervisor/VMGEXIT.
+
+  @param[in, out] Ghcb         Pointer to the Guest-Hypervisor Communication
+                               Block
+  @param[in]      EaxIn        EAX input for cpuid instruction
+  @param[in]      EcxIn        ECX input for cpuid instruction
+  @param[in]      Xcr0In       XCR0 at time of cpuid instruction
+  @param[in, out] Eax          Pointer to store leaf's EAX value
+  @param[in, out] Ebx          Pointer to store leaf's EBX value
+  @param[in, out] Ecx          Pointer to store leaf's ECX value
+  @param[in, out] Edx          Pointer to store leaf's EDX value
+  @param[in, out] Status       Pointer to store status from VMGEXIT (always 0
+                               unless return value indicates failure)
+  @param[in, out] Unsupported  Pointer to store indication of unsupported
+                               VMGEXIT (always false unless return value
+                               indicates failure)
+
+  @retval TRUE                 CPUID leaf fetch successfully.
+  @retval FALSE                Error occurred while fetching CPUID leaf. Callers
+                               should Status and Unsupported and handle
+                               accordingly if they indicate a more precise
+                               error condition.
+
+**/
+STATIC
+BOOLEAN
+GetCpuidHyp (
+  IN OUT GHCB     *Ghcb,
+  IN     UINT32   EaxIn,
+  IN     UINT32   EcxIn,
+  IN     UINT64   XCr0,
+  IN OUT UINT32   *Eax,
+  IN OUT UINT32   *Ebx,
+  IN OUT UINT32   *Ecx,
+  IN OUT UINT32   *Edx,
+  IN OUT UINT64   *Status,
+  IN OUT BOOLEAN  *UnsupportedExit
+  )
+{
+  *UnsupportedExit   = FALSE;
+  Ghcb->SaveArea.Rax = EaxIn;
+  VmgSetOffsetValid (Ghcb, GhcbRax);
+  Ghcb->SaveArea.Rcx = EcxIn;
+  VmgSetOffsetValid (Ghcb, GhcbRcx);
+  if (EaxIn == CPUID_EXTENDED_STATE) {
+    Ghcb->SaveArea.XCr0 = XCr0;
+    VmgSetOffsetValid (Ghcb, GhcbXCr0);
+  }
+
+  *Status = VmgExit (Ghcb, SVM_EXIT_CPUID, 0, 0);
+  if (*Status != 0) {
+    return FALSE;
+  }
+
+  if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
+      !VmgIsOffsetValid (Ghcb, GhcbRbx) ||
+      !VmgIsOffsetValid (Ghcb, GhcbRcx) ||
+      !VmgIsOffsetValid (Ghcb, GhcbRdx))
+  {
+    *UnsupportedExit = TRUE;
+    return FALSE;
+  }
+
+  if (Eax) {
+    *Eax = (UINT32)(UINTN)Ghcb->SaveArea.Rax;
+  }
+
+  if (Ebx) {
+    *Ebx = (UINT32)(UINTN)Ghcb->SaveArea.Rbx;
+  }
+
+  if (Ecx) {
+    *Ecx = (UINT32)(UINTN)Ghcb->SaveArea.Rcx;
+  }
+
+  if (Edx) {
+    *Edx = (UINT32)(UINTN)Ghcb->SaveArea.Rdx;
+  }
+
+  return TRUE;
+}
+
+/**
+  Check if SEV-SNP enabled.
+
+  @retval TRUE      SEV-SNP is enabled.
+  @retval FALSE     SEV-SNP is disabled.
+
+**/
+STATIC
+BOOLEAN
+SnpEnabled (
+  VOID
+  )
+{
+  MSR_SEV_STATUS_REGISTER  Msr;
+
+  Msr.Uint32 = AsmReadMsr32 (MSR_SEV_STATUS);
+
+  return !!Msr.Bits.SevSnpBit;
+}
+
+/**
+  Calculate the total XSAVE area size for enabled XSAVE areas
+
+  @param[in]      XFeaturesEnabled  Bit-mask of enabled XSAVE features/areas as
+                                    indicated by XCR0/MSR_IA32_XSS bits
+  @param[in]      XSaveBaseSize     Base/legacy XSAVE area size (e.g. when
+                                    XCR0 is 1)
+  @param[in, out] XSaveSize         Pointer to storage for calculated XSAVE area
+                                    size
+  @param[in]      Compacted         Whether or not the calculation is for the
+                                    normal XSAVE area size (leaf 0xD,0x0,EBX) or
+                                    compacted XSAVE area size (leaf 0xD,0x1,EBX)
+
+
+  @retval TRUE                      XSAVE size calculation was successful.
+  @retval FALSE                     XSAVE size calculation was unsuccessful.
+**/
+STATIC
+BOOLEAN
+GetCpuidXSaveSize (
+  IN     UINT64   XFeaturesEnabled,
+  IN     UINT32   XSaveBaseSize,
+  IN OUT UINT32   *XSaveSize,
+  IN     BOOLEAN  Compacted
+  )
+{
+  SEV_SNP_CPUID_INFO  *CpuidInfo;
+  UINT64              XFeaturesFound = 0;
+  UINT32              Idx;
+
+  *XSaveSize = XSaveBaseSize;
+  CpuidInfo  = (SEV_SNP_CPUID_INFO *)(UINT64)PcdGet32 (PcdOvmfCpuidBase);
+
+  for (Idx = 0; Idx < CpuidInfo->Count; Idx++) {
+    SEV_SNP_CPUID_FUNCTION  *CpuidFn = &CpuidInfo->function[Idx];
+
+    if (!((CpuidFn->EaxIn == 0xD) &&
+          ((CpuidFn->EcxIn == 0) || (CpuidFn->EcxIn == 1))))
+    {
+      continue;
+    }
+
+    if (XFeaturesFound & (1ULL << CpuidFn->EcxIn) ||
+        !(XFeaturesEnabled & (1ULL << CpuidFn->EcxIn)))
+    {
+      continue;
+    }
+
+    XFeaturesFound |= (1ULL << CpuidFn->EcxIn);
+    if (Compacted) {
+      *XSaveSize += CpuidFn->Eax;
+    } else {
+      *XSaveSize = MAX (*XSaveSize, CpuidFn->Eax + CpuidFn->Ebx);
+    }
+  }
+
+  /*
+   * Either the guest set unsupported XCR0/XSS bits, or the corresponding
+   * entries in the CPUID table were not present. This is an invalid state.
+   */
+  if (XFeaturesFound != (XFeaturesEnabled & ~3UL)) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Check if a CPUID leaf/function is indexed via ECX sub-leaf/sub-function
+
+  @param[in]      EaxIn        EAX input for cpuid instruction
+
+  @retval FALSE                cpuid leaf/function is not indexed by ECX input
+  @retval TRUE                 cpuid leaf/function is indexed by ECX input
+
+**/
+STATIC
+BOOLEAN
+IsFunctionIndexed (
+  IN     UINT32  EaxIn
+  )
+{
+  switch (EaxIn) {
+    case CPUID_CACHE_PARAMS:
+    case CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS:
+    case CPUID_EXTENDED_TOPOLOGY:
+    case CPUID_EXTENDED_STATE:
+    case CPUID_INTEL_RDT_MONITORING:
+    case CPUID_INTEL_RDT_ALLOCATION:
+    case CPUID_INTEL_SGX:
+    case CPUID_INTEL_PROCESSOR_TRACE:
+    case CPUID_DETERMINISTIC_ADDRESS_TRANSLATION_PARAMETERS:
+    case CPUID_V2_EXTENDED_TOPOLOGY:
+    case 0x8000001D: /* Cache Topology Information */
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+  Fetch CPUID leaf/function via SEV-SNP CPUID table.
+
+  @param[in, out] Ghcb         Pointer to the Guest-Hypervisor Communication
+                               Block
+  @param[in]      EaxIn        EAX input for cpuid instruction
+  @param[in]      EcxIn        ECX input for cpuid instruction
+  @param[in]      Xcr0In       XCR0 at time of cpuid instruction
+  @param[in, out] Eax          Pointer to store leaf's EAX value
+  @param[in, out] Ebx          Pointer to store leaf's EBX value
+  @param[in, out] Ecx          Pointer to store leaf's ECX value
+  @param[in, out] Edx          Pointer to store leaf's EDX value
+  @param[in, out] Status       Pointer to store status from VMGEXIT (always 0
+                               unless return value indicates failure)
+  @param[in, out] Unsupported  Pointer to store indication of unsupported
+                               VMGEXIT (always false unless return value
+                               indicates failure)
+
+  @retval TRUE                 CPUID leaf fetch successfully.
+  @retval FALSE                Error occurred while fetching CPUID leaf. Callers
+                               should Status and Unsupported and handle
+                               accordingly if they indicate a more precise
+                               error condition.
+
+**/
+STATIC
+BOOLEAN
+GetCpuidFw (
+  IN OUT GHCB     *Ghcb,
+  IN     UINT32   EaxIn,
+  IN     UINT32   EcxIn,
+  IN     UINT64   XCr0,
+  IN OUT UINT32   *Eax,
+  IN OUT UINT32   *Ebx,
+  IN OUT UINT32   *Ecx,
+  IN OUT UINT32   *Edx,
+  IN OUT UINT64   *Status,
+  IN OUT BOOLEAN  *Unsupported
+  )
+{
+  SEV_SNP_CPUID_INFO  *CpuidInfo;
+  BOOLEAN             Found;
+  UINT32              Idx;
+
+  CpuidInfo = (SEV_SNP_CPUID_INFO *)(UINT64)PcdGet32 (PcdOvmfCpuidBase);
+  Found     = FALSE;
+
+  for (Idx = 0; Idx < CpuidInfo->Count; Idx++) {
+    SEV_SNP_CPUID_FUNCTION  *CpuidFn = &CpuidInfo->function[Idx];
+
+    if (CpuidFn->EaxIn != EaxIn) {
+      continue;
+    }
+
+    if (IsFunctionIndexed (CpuidFn->EaxIn) && (CpuidFn->EcxIn != EcxIn)) {
+      continue;
+    }
+
+    *Eax = CpuidFn->Eax;
+    *Ebx = CpuidFn->Ebx;
+    *Ecx = CpuidFn->Ecx;
+    *Edx = CpuidFn->Edx;
+
+    Found = TRUE;
+    break;
+  }
+
+  if (!Found) {
+    *Eax = *Ebx = *Ecx = *Edx = 0;
+    goto Out;
+  }
+
+  if (EaxIn == CPUID_VERSION_INFO) {
+    IA32_CR4  Cr4;
+    UINT32    Ebx2;
+    UINT32    Edx2;
+
+    if (!GetCpuidHyp (
+           Ghcb,
+           EaxIn,
+           EcxIn,
+           XCr0,
+           NULL,
+           &Ebx2,
+           NULL,
+           &Edx2,
+           Status,
+           Unsupported
+           ))
+    {
+      return FALSE;
+    }
+
+    /* initial APIC ID */
+    *Ebx = (*Ebx & 0x00FFFFFF) | (Ebx2 & 0xFF000000);
+    /* APIC enabled bit */
+    *Edx = (*Edx & ~BIT9) | (Edx2 & BIT9);
+    /* OSXSAVE enabled bit */
+    Cr4.UintN = AsmReadCr4 ();
+    *Ecx      = (Cr4.Bits.OSXSAVE) ? (*Ecx & ~BIT27) | (*Ecx & BIT27)
+                              : (*Ecx & ~BIT27);
+  } else if (EaxIn == CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS) {
+    IA32_CR4  Cr4;
+
+    Cr4.UintN = AsmReadCr4 ();
+    /* OSPKE enabled bit */
+    *Ecx = (Cr4.Bits.PKE) ? (*Ecx | BIT4) : (*Ecx & ~BIT4);
+  } else if (EaxIn == CPUID_EXTENDED_TOPOLOGY) {
+    if (!GetCpuidHyp (
+           Ghcb,
+           EaxIn,
+           EcxIn,
+           XCr0,
+           NULL,
+           NULL,
+           NULL,
+           Edx,
+           Status,
+           Unsupported
+           ))
+    {
+      return FALSE;
+    }
+  } else if ((EaxIn == CPUID_EXTENDED_STATE) && ((EcxIn == 0) || (EcxIn == 1))) {
+    MSR_IA32_XSS_REGISTER  XssMsr;
+    BOOLEAN                Compacted;
+    UINT32                 XSaveSize;
+
+    XssMsr.Uint64 = 0;
+    if (EcxIn == 1) {
+      /*
+       * The PPR and APM aren't clear on what size should be encoded in
+       * 0xD:0x1:EBX when compaction is not enabled by either XSAVEC or
+       * XSAVES, as these are generally fixed to 1 on real CPUs. Report
+       * this undefined case as an error.
+       */
+      if (!(*Eax & (BIT3 | BIT1))) {
+        /* (XSAVES | XSAVEC) */
+        return FALSE;
+      }
+
+      Compacted     = TRUE;
+      XssMsr.Uint64 = AsmReadMsr64 (MSR_IA32_XSS);
+    }
+
+    if (!GetCpuidXSaveSize (
+           XCr0 | XssMsr.Uint64,
+           *Ebx,
+           &XSaveSize,
+           Compacted
+           ))
+    {
+      return FALSE;
+    }
+
+    *Ebx = XSaveSize;
+  } else if (EaxIn == 0x8000001E) {
+    UINT32  Ebx2;
+    UINT32  Ecx2;
+
+    /* extended APIC ID */
+    if (!GetCpuidHyp (
+           Ghcb,
+           EaxIn,
+           EcxIn,
+           XCr0,
+           Eax,
+           &Ebx2,
+           &Ecx2,
+           NULL,
+           Status,
+           Unsupported
+           ))
+    {
+      return FALSE;
+    }
+
+    /* compute ID */
+    *Ebx = (*Ebx & 0xFFFFFF00) | (Ebx2 & 0x000000FF);
+    /* node ID */
+    *Ecx = (*Ecx & 0xFFFFFF00) | (Ecx2 & 0x000000FF);
+  }
+
+Out:
+  *Status      = 0;
+  *Unsupported = FALSE;
+  return TRUE;
+}
+
+/**
   Handle a CPUID event.
 
-  Use the VMGEXIT instruction to handle a CPUID event.
+  Use VMGEXIT instruction or CPUID table to handle a CPUID event.
 
   @param[in, out] Ghcb             Pointer to the Guest-Hypervisor Communication
                                    Block
@@ -1517,37 +1954,74 @@ CpuidExit (
   IN     SEV_ES_INSTRUCTION_DATA  *InstructionData
   )
 {
-  UINT64  Status;
+  BOOLEAN  Unsupported;
+  UINT64   Status;
+  UINT32   EaxIn;
+  UINT32   EcxIn;
+  UINT64   XCr0;
+  UINT32   Eax;
+  UINT32   Ebx;
+  UINT32   Ecx;
+  UINT32   Edx;
 
-  Ghcb->SaveArea.Rax = Regs->Rax;
-  VmgSetOffsetValid (Ghcb, GhcbRax);
-  Ghcb->SaveArea.Rcx = Regs->Rcx;
-  VmgSetOffsetValid (Ghcb, GhcbRcx);
-  if (Regs->Rax == CPUID_EXTENDED_STATE) {
+  EaxIn = (UINT32)(UINTN)Regs->Rax;
+  EcxIn = (UINT32)(UINTN)Regs->Rcx;
+
+  if (EaxIn == CPUID_EXTENDED_STATE) {
     IA32_CR4  Cr4;
 
-    Cr4.UintN = AsmReadCr4 ();
+    Cr4.UintN           = AsmReadCr4 ();
     Ghcb->SaveArea.XCr0 = (Cr4.Bits.OSXSAVE == 1) ? AsmXGetBv (0) : 1;
-    VmgSetOffsetValid (Ghcb, GhcbXCr0);
+    XCr0                = (Cr4.Bits.OSXSAVE == 1) ? AsmXGetBv (0) : 1;
   }
 
-  Status = VmgExit (Ghcb, SVM_EXIT_CPUID, 0, 0);
-  if (Status != 0) {
-    return Status;
+  if (SnpEnabled ()) {
+    if (!GetCpuidFw (
+           Ghcb,
+           EaxIn,
+           EcxIn,
+           XCr0,
+           &Eax,
+           &Ebx,
+           &Ecx,
+           &Edx,
+           &Status,
+           &Unsupported
+           ))
+    {
+      goto CpuidFail;
+    }
+  } else {
+    if (!GetCpuidHyp (
+           Ghcb,
+           EaxIn,
+           EcxIn,
+           XCr0,
+           &Eax,
+           &Ebx,
+           &Ecx,
+           &Edx,
+           &Status,
+           &Unsupported
+           ))
+    {
+      goto CpuidFail;
+    }
   }
 
-  if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRbx) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRcx) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRdx)) {
-    return UnsupportedExit (Ghcb, Regs, InstructionData);
-  }
-  Regs->Rax = Ghcb->SaveArea.Rax;
-  Regs->Rbx = Ghcb->SaveArea.Rbx;
-  Regs->Rcx = Ghcb->SaveArea.Rcx;
-  Regs->Rdx = Ghcb->SaveArea.Rdx;
+  Regs->Rax = Eax;
+  Regs->Rbx = Ebx;
+  Regs->Rcx = Ecx;
+  Regs->Rdx = Edx;
 
   return 0;
+
+CpuidFail:
+  if (Unsupported) {
+    return UnsupportedExit (Ghcb, Regs, InstructionData);
+  }
+
+  return Status;
 }
 
 /**
@@ -1583,9 +2057,11 @@ RdpmcExit (
   }
 
   if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRdx)) {
+      !VmgIsOffsetValid (Ghcb, GhcbRdx))
+  {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
+
   Regs->Rax = Ghcb->SaveArea.Rax;
   Regs->Rdx = Ghcb->SaveArea.Rdx;
 
@@ -1622,9 +2098,11 @@ RdtscExit (
   }
 
   if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRdx)) {
+      !VmgIsOffsetValid (Ghcb, GhcbRdx))
+  {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
+
   Regs->Rax = Ghcb->SaveArea.Rax;
   Regs->Rdx = Ghcb->SaveArea.Rdx;
 
@@ -1658,8 +2136,8 @@ Dr7WriteExit (
   UINT64                         *Register;
   UINT64                         Status;
 
-  Ext = &InstructionData->Ext;
-  SevEsData = (SEV_ES_PER_CPU_DATA *) (Ghcb + 1);
+  Ext       = &InstructionData->Ext;
+  SevEsData = (SEV_ES_PER_CPU_DATA *)(Ghcb + 1);
 
   DecodeModRm (Regs, InstructionData);
 
@@ -1679,7 +2157,7 @@ Dr7WriteExit (
     return Status;
   }
 
-  SevEsData->Dr7 = *Register;
+  SevEsData->Dr7       = *Register;
   SevEsData->Dr7Cached = 1;
 
   return 0;
@@ -1710,8 +2188,8 @@ Dr7ReadExit (
   SEV_ES_PER_CPU_DATA            *SevEsData;
   UINT64                         *Register;
 
-  Ext = &InstructionData->Ext;
-  SevEsData = (SEV_ES_PER_CPU_DATA *) (Ghcb + 1);
+  Ext       = &InstructionData->Ext;
+  SevEsData = (SEV_ES_PER_CPU_DATA *)(Ghcb + 1);
 
   DecodeModRm (Regs, InstructionData);
 
@@ -1754,12 +2232,12 @@ InternalVmgExitHandleVc (
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  EFI_SYSTEM_CONTEXT_X64    *Regs;
-  NAE_EXIT                  NaeExit;
-  SEV_ES_INSTRUCTION_DATA   InstructionData;
-  UINT64                    ExitCode, Status;
-  EFI_STATUS                VcRet;
-  BOOLEAN                   InterruptState;
+  EFI_SYSTEM_CONTEXT_X64   *Regs;
+  NAE_EXIT                 NaeExit;
+  SEV_ES_INSTRUCTION_DATA  InstructionData;
+  UINT64                   ExitCode, Status;
+  EFI_STATUS               VcRet;
+  BOOLEAN                  InterruptState;
 
   VcRet = EFI_SUCCESS;
 
@@ -1769,64 +2247,64 @@ InternalVmgExitHandleVc (
 
   ExitCode = Regs->ExceptionData;
   switch (ExitCode) {
-  case SVM_EXIT_DR7_READ:
-    NaeExit = Dr7ReadExit;
-    break;
+    case SVM_EXIT_DR7_READ:
+      NaeExit = Dr7ReadExit;
+      break;
 
-  case SVM_EXIT_DR7_WRITE:
-    NaeExit = Dr7WriteExit;
-    break;
+    case SVM_EXIT_DR7_WRITE:
+      NaeExit = Dr7WriteExit;
+      break;
 
-  case SVM_EXIT_RDTSC:
-    NaeExit = RdtscExit;
-    break;
+    case SVM_EXIT_RDTSC:
+      NaeExit = RdtscExit;
+      break;
 
-  case SVM_EXIT_RDPMC:
-    NaeExit = RdpmcExit;
-    break;
+    case SVM_EXIT_RDPMC:
+      NaeExit = RdpmcExit;
+      break;
 
-  case SVM_EXIT_CPUID:
-    NaeExit = CpuidExit;
-    break;
+    case SVM_EXIT_CPUID:
+      NaeExit = CpuidExit;
+      break;
 
-  case SVM_EXIT_INVD:
-    NaeExit = InvdExit;
-    break;
+    case SVM_EXIT_INVD:
+      NaeExit = InvdExit;
+      break;
 
-  case SVM_EXIT_IOIO_PROT:
-    NaeExit = IoioExit;
-    break;
+    case SVM_EXIT_IOIO_PROT:
+      NaeExit = IoioExit;
+      break;
 
-  case SVM_EXIT_MSR:
-    NaeExit = MsrExit;
-    break;
+    case SVM_EXIT_MSR:
+      NaeExit = MsrExit;
+      break;
 
-  case SVM_EXIT_VMMCALL:
-    NaeExit = VmmCallExit;
-    break;
+    case SVM_EXIT_VMMCALL:
+      NaeExit = VmmCallExit;
+      break;
 
-  case SVM_EXIT_RDTSCP:
-    NaeExit = RdtscpExit;
-    break;
+    case SVM_EXIT_RDTSCP:
+      NaeExit = RdtscpExit;
+      break;
 
-  case SVM_EXIT_WBINVD:
-    NaeExit = WbinvdExit;
-    break;
+    case SVM_EXIT_WBINVD:
+      NaeExit = WbinvdExit;
+      break;
 
-  case SVM_EXIT_MONITOR:
-    NaeExit = MonitorExit;
-    break;
+    case SVM_EXIT_MONITOR:
+      NaeExit = MonitorExit;
+      break;
 
-  case SVM_EXIT_MWAIT:
-    NaeExit = MwaitExit;
-    break;
+    case SVM_EXIT_MWAIT:
+      NaeExit = MwaitExit;
+      break;
 
-  case SVM_EXIT_NPF:
-    NaeExit = MmioExit;
-    break;
+    case SVM_EXIT_NPF:
+      NaeExit = MmioExit;
+      break;
 
-  default:
-    NaeExit = UnsupportedExit;
+    default:
+      NaeExit = UnsupportedExit;
   }
 
   InitInstructionData (&InstructionData, Ghcb, Regs);

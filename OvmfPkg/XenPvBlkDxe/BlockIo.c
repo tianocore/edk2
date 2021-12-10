@@ -46,9 +46,6 @@ EFI_BLOCK_IO_PROTOCOL  gXenPvBlkDxeBlockIo = {
   XenPvBlkDxeBlockIoFlushBlocks             // FlushBlocks
 };
 
-
-
-
 /**
   Read/Write BufferSize bytes from Lba into Buffer.
 
@@ -76,29 +73,38 @@ XenPvBlkDxeBlockIoReadWriteBlocks (
   IN     BOOLEAN                IsWrite
   )
 {
-  XEN_BLOCK_FRONT_IO IoData;
-  EFI_BLOCK_IO_MEDIA *Media = This->Media;
-  UINTN Sector;
-  EFI_STATUS Status;
+  XEN_BLOCK_FRONT_IO  IoData;
+  EFI_BLOCK_IO_MEDIA  *Media = This->Media;
+  UINTN               Sector;
+  EFI_STATUS          Status;
 
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   if (BufferSize == 0) {
     return EFI_SUCCESS;
   }
 
   if (BufferSize % Media->BlockSize != 0) {
-    DEBUG ((DEBUG_ERROR, "XenPvBlkDxe: Bad buffer size: 0x%Lx\n",
-      (UINT64)BufferSize));
+    DEBUG ((
+      DEBUG_ERROR,
+      "XenPvBlkDxe: Bad buffer size: 0x%Lx\n",
+      (UINT64)BufferSize
+      ));
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  if (Lba > Media->LastBlock ||
-      (BufferSize / Media->BlockSize) - 1 > Media->LastBlock - Lba) {
-    DEBUG ((DEBUG_ERROR,
+  if ((Lba > Media->LastBlock) ||
+      ((BufferSize / Media->BlockSize) - 1 > Media->LastBlock - Lba))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
       "XenPvBlkDxe: %a with invalid LBA: 0x%Lx, size: 0x%Lx\n",
-      IsWrite ? "Write" : "Read", Lba, (UINT64)BufferSize));
+      IsWrite ? "Write" : "Read",
+      Lba,
+      (UINT64)BufferSize
+      ));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -111,53 +117,73 @@ XenPvBlkDxeBlockIoReadWriteBlocks (
     // Grub2 does not appear to respect IoAlign of 512, so reallocate the
     // buffer here.
     //
-    VOID *NewBuffer;
+    VOID  *NewBuffer;
 
     //
     // Try again with a properly aligned buffer.
     //
-    NewBuffer = AllocateAlignedPages((BufferSize + EFI_PAGE_SIZE) / EFI_PAGE_SIZE,
-                                     Media->IoAlign);
+    NewBuffer = AllocateAlignedPages (
+                  (BufferSize + EFI_PAGE_SIZE) / EFI_PAGE_SIZE,
+                  Media->IoAlign
+                  );
     if (!IsWrite) {
-      Status = XenPvBlkDxeBlockIoReadBlocks (This, MediaId,
-                                             Lba, BufferSize, NewBuffer);
+      Status = XenPvBlkDxeBlockIoReadBlocks (
+                 This,
+                 MediaId,
+                 Lba,
+                 BufferSize,
+                 NewBuffer
+                 );
       CopyMem (Buffer, NewBuffer, BufferSize);
     } else {
       CopyMem (NewBuffer, Buffer, BufferSize);
-      Status = XenPvBlkDxeBlockIoWriteBlocks (This, MediaId,
-                                              Lba, BufferSize, NewBuffer);
+      Status = XenPvBlkDxeBlockIoWriteBlocks (
+                 This,
+                 MediaId,
+                 Lba,
+                 BufferSize,
+                 NewBuffer
+                 );
     }
+
     FreeAlignedPages (NewBuffer, (BufferSize + EFI_PAGE_SIZE) / EFI_PAGE_SIZE);
     return Status;
   }
 
   IoData.Dev = XEN_BLOCK_FRONT_FROM_BLOCK_IO (This);
-  Sector = (UINTN)MultU64x32 (Lba, Media->BlockSize / 512);
+  Sector     = (UINTN)MultU64x32 (Lba, Media->BlockSize / 512);
 
   while (BufferSize > 0) {
     if (((UINTN)Buffer & EFI_PAGE_MASK) == 0) {
-      IoData.Size = MIN (BLKIF_MAX_SEGMENTS_PER_REQUEST * EFI_PAGE_SIZE,
-                         BufferSize);
+      IoData.Size = MIN (
+                      BLKIF_MAX_SEGMENTS_PER_REQUEST * EFI_PAGE_SIZE,
+                      BufferSize
+                      );
     } else {
-      IoData.Size = MIN ((BLKIF_MAX_SEGMENTS_PER_REQUEST - 1) * EFI_PAGE_SIZE,
-                         BufferSize);
+      IoData.Size = MIN (
+                      (BLKIF_MAX_SEGMENTS_PER_REQUEST - 1) * EFI_PAGE_SIZE,
+                      BufferSize
+                      );
     }
 
     IoData.Buffer = Buffer;
     IoData.Sector = Sector;
-    BufferSize -= IoData.Size;
-    Buffer = (VOID*) ((UINTN) Buffer + IoData.Size);
-    Sector += IoData.Size / 512;
-    Status = XenPvBlockIo (&IoData, IsWrite);
+    BufferSize   -= IoData.Size;
+    Buffer        = (VOID *)((UINTN)Buffer + IoData.Size);
+    Sector       += IoData.Size / 512;
+    Status        = XenPvBlockIo (&IoData, IsWrite);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "XenPvBlkDxe: Error during %a operation.\n",
-              IsWrite ? "write" : "read"));
+      DEBUG ((
+        DEBUG_ERROR,
+        "XenPvBlkDxe: Error during %a operation.\n",
+        IsWrite ? "write" : "read"
+        ));
       return Status;
     }
   }
+
   return EFI_SUCCESS;
 }
-
 
 /**
   Read BufferSize bytes from Lba into Buffer.
@@ -181,15 +207,21 @@ XenPvBlkDxeBlockIoReadWriteBlocks (
 EFI_STATUS
 EFIAPI
 XenPvBlkDxeBlockIoReadBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL         *This,
-  IN  UINT32                        MediaId,
-  IN  EFI_LBA                       Lba,
-  IN  UINTN                         BufferSize,
-  OUT VOID                          *Buffer
+  IN  EFI_BLOCK_IO_PROTOCOL  *This,
+  IN  UINT32                 MediaId,
+  IN  EFI_LBA                Lba,
+  IN  UINTN                  BufferSize,
+  OUT VOID                   *Buffer
   )
 {
-  return XenPvBlkDxeBlockIoReadWriteBlocks (This,
-      MediaId, Lba, BufferSize, Buffer, FALSE);
+  return XenPvBlkDxeBlockIoReadWriteBlocks (
+           This,
+           MediaId,
+           Lba,
+           BufferSize,
+           Buffer,
+           FALSE
+           );
 }
 
 /**
@@ -215,15 +247,21 @@ XenPvBlkDxeBlockIoReadBlocks (
 EFI_STATUS
 EFIAPI
 XenPvBlkDxeBlockIoWriteBlocks (
-  IN EFI_BLOCK_IO_PROTOCOL          *This,
-  IN UINT32                         MediaId,
-  IN EFI_LBA                        Lba,
-  IN UINTN                          BufferSize,
-  IN VOID                           *Buffer
+  IN EFI_BLOCK_IO_PROTOCOL  *This,
+  IN UINT32                 MediaId,
+  IN EFI_LBA                Lba,
+  IN UINTN                  BufferSize,
+  IN VOID                   *Buffer
   )
 {
-  return XenPvBlkDxeBlockIoReadWriteBlocks (This,
-      MediaId, Lba, BufferSize, Buffer, TRUE);
+  return XenPvBlkDxeBlockIoReadWriteBlocks (
+           This,
+           MediaId,
+           Lba,
+           BufferSize,
+           Buffer,
+           TRUE
+           );
 }
 
 /**
@@ -258,8 +296,8 @@ XenPvBlkDxeBlockIoFlushBlocks (
 EFI_STATUS
 EFIAPI
 XenPvBlkDxeBlockIoReset (
-  IN EFI_BLOCK_IO_PROTOCOL   *This,
-  IN BOOLEAN                 ExtendedVerification
+  IN EFI_BLOCK_IO_PROTOCOL  *This,
+  IN BOOLEAN                ExtendedVerification
   )
 {
   //

@@ -15,13 +15,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack (1)
 
 typedef struct {
-  UNIVERSAL_PAYLOAD_GENERIC_HEADER   Header;
-  GUID                               FileName;
+  UNIVERSAL_PAYLOAD_GENERIC_HEADER    Header;
+  GUID                                FileName;
 } UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU;
 
 #pragma pack()
 
-#define UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU_REVISION 1
+#define UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU_REVISION  1
 
-extern GUID gEdkiiBootManagerMenuFileGuid;
+extern GUID  gEdkiiBootManagerMenuFileGuid;
 #endif

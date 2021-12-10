@@ -21,25 +21,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PrivilegePolymorphic.h"
 
 typedef struct {
-  CHAR16                                 *VariableName;
-  EFI_GUID                               *VendorGuid;
+  CHAR16      *VariableName;
+  EFI_GUID    *VendorGuid;
 } VARIABLE_TYPE;
 
 VARIABLE_TYPE  mVariableType[] = {
-  {EFI_SECURE_BOOT_MODE_NAME,    &gEfiGlobalVariableGuid},
-  {EFI_PLATFORM_KEY_NAME,        &gEfiGlobalVariableGuid},
-  {EFI_KEY_EXCHANGE_KEY_NAME,    &gEfiGlobalVariableGuid},
-  {EFI_IMAGE_SECURITY_DATABASE,  &gEfiImageSecurityDatabaseGuid},
-  {EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid},
-  {EFI_IMAGE_SECURITY_DATABASE2, &gEfiImageSecurityDatabaseGuid},
+  { EFI_SECURE_BOOT_MODE_NAME,    &gEfiGlobalVariableGuid        },
+  { EFI_PLATFORM_KEY_NAME,        &gEfiGlobalVariableGuid        },
+  { EFI_KEY_EXCHANGE_KEY_NAME,    &gEfiGlobalVariableGuid        },
+  { EFI_IMAGE_SECURITY_DATABASE,  &gEfiImageSecurityDatabaseGuid },
+  { EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid },
+  { EFI_IMAGE_SECURITY_DATABASE2, &gEfiImageSecurityDatabaseGuid },
 };
 
 //
 // "SecureBoot" may update following PK Del/Add
 //  Cache its value to detect value update
 //
-UINT8       *mSecureBootVarData    = NULL;
-UINTN       mSecureBootVarDataSize = 0;
+UINT8  *mSecureBootVarData    = NULL;
+UINTN  mSecureBootVarDataSize = 0;
 
 /**
   This function will return if this variable is SecureBootPolicy Variable.
@@ -52,18 +52,20 @@ UINTN       mSecureBootVarDataSize = 0;
 **/
 BOOLEAN
 IsSecureBootPolicyVariable (
-  IN CHAR16                                 *VariableName,
-  IN EFI_GUID                               *VendorGuid
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid
   )
 {
-  UINTN   Index;
+  UINTN  Index;
 
-  for (Index = 0; Index < sizeof(mVariableType)/sizeof(mVariableType[0]); Index++) {
+  for (Index = 0; Index < sizeof (mVariableType)/sizeof (mVariableType[0]); Index++) {
     if ((StrCmp (VariableName, mVariableType[Index].VariableName) == 0) &&
-        (CompareGuid (VendorGuid, mVariableType[Index].VendorGuid))) {
+        (CompareGuid (VendorGuid, mVariableType[Index].VendorGuid)))
+    {
       return TRUE;
     }
   }
+
   return FALSE;
 }
 
@@ -83,46 +85,46 @@ IsSecureBootPolicyVariable (
 EFI_STATUS
 EFIAPI
 MeasureVariable (
-  IN      CHAR16                    *VarName,
-  IN      EFI_GUID                  *VendorGuid,
-  IN      VOID                      *VarData,
-  IN      UINTN                     VarSize
+  IN      CHAR16    *VarName,
+  IN      EFI_GUID  *VendorGuid,
+  IN      VOID      *VarData,
+  IN      UINTN     VarSize
   )
 {
-  EFI_STATUS                        Status;
-  UINTN                             VarNameLength;
-  UEFI_VARIABLE_DATA                *VarLog;
-  UINT32                            VarLogSize;
+  EFI_STATUS          Status;
+  UINTN               VarNameLength;
+  UEFI_VARIABLE_DATA  *VarLog;
+  UINT32              VarLogSize;
 
   ASSERT ((VarSize == 0 && VarData == NULL) || (VarSize != 0 && VarData != NULL));
 
-  VarNameLength      = StrLen (VarName);
-  VarLogSize = (UINT32)(sizeof (*VarLog) + VarNameLength * sizeof (*VarName) + VarSize
-                        - sizeof (VarLog->UnicodeName) - sizeof (VarLog->VariableData));
+  VarNameLength = StrLen (VarName);
+  VarLogSize    = (UINT32)(sizeof (*VarLog) + VarNameLength * sizeof (*VarName) + VarSize
+                           - sizeof (VarLog->UnicodeName) - sizeof (VarLog->VariableData));
 
-  VarLog = (UEFI_VARIABLE_DATA *) AllocateZeroPool (VarLogSize);
+  VarLog = (UEFI_VARIABLE_DATA *)AllocateZeroPool (VarLogSize);
   if (VarLog == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  CopyMem (&VarLog->VariableName, VendorGuid, sizeof(VarLog->VariableName));
+  CopyMem (&VarLog->VariableName, VendorGuid, sizeof (VarLog->VariableName));
   VarLog->UnicodeNameLength  = VarNameLength;
   VarLog->VariableDataLength = VarSize;
   CopyMem (
-     VarLog->UnicodeName,
-     VarName,
-     VarNameLength * sizeof (*VarName)
-     );
+    VarLog->UnicodeName,
+    VarName,
+    VarNameLength * sizeof (*VarName)
+    );
   if (VarSize != 0) {
     CopyMem (
-       (CHAR16 *)VarLog->UnicodeName + VarNameLength,
-       VarData,
-       VarSize
-       );
+      (CHAR16 *)VarLog->UnicodeName + VarNameLength,
+      VarData,
+      VarSize
+      );
   }
 
-  DEBUG ((EFI_D_INFO, "VariableDxe: MeasureVariable (Pcr - %x, EventType - %x, ", (UINTN)7, (UINTN)EV_EFI_VARIABLE_DRIVER_CONFIG));
-  DEBUG ((EFI_D_INFO, "VariableName - %s, VendorGuid - %g)\n", VarName, VendorGuid));
+  DEBUG ((DEBUG_INFO, "VariableDxe: MeasureVariable (Pcr - %x, EventType - %x, ", (UINTN)7, (UINTN)EV_EFI_VARIABLE_DRIVER_CONFIG));
+  DEBUG ((DEBUG_INFO, "VariableName - %s, VendorGuid - %g)\n", VarName, VendorGuid));
 
   Status = TpmMeasureAndLogData (
              7,
@@ -171,10 +173,10 @@ InternalGetVariable (
   BufferSize = 0;
   *Value     = NULL;
   if (Size != NULL) {
-    *Size  = 0;
+    *Size = 0;
   }
 
-  Status = gRT->GetVariable ((CHAR16 *) Name, (EFI_GUID *) Guid, NULL, &BufferSize, *Value);
+  Status = gRT->GetVariable ((CHAR16 *)Name, (EFI_GUID *)Guid, NULL, &BufferSize, *Value);
   if (Status != EFI_BUFFER_TOO_SMALL) {
     return Status;
   }
@@ -191,9 +193,9 @@ InternalGetVariable (
   //
   // Get the variable data.
   //
-  Status = gRT->GetVariable ((CHAR16 *) Name, (EFI_GUID *) Guid, NULL, &BufferSize, *Value);
+  Status = gRT->GetVariable ((CHAR16 *)Name, (EFI_GUID *)Guid, NULL, &BufferSize, *Value);
   if (EFI_ERROR (Status)) {
-    FreePool(*Value);
+    FreePool (*Value);
     *Value = NULL;
   }
 
@@ -214,16 +216,16 @@ InternalGetVariable (
 VOID
 EFIAPI
 SecureBootHook (
-  IN CHAR16                                 *VariableName,
-  IN EFI_GUID                               *VendorGuid
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid
   )
 {
-  EFI_STATUS                        Status;
-  UINTN                             VariableDataSize;
-  VOID                              *VariableData;
+  EFI_STATUS  Status;
+  UINTN       VariableDataSize;
+  VOID        *VariableData;
 
   if (!IsSecureBootPolicyVariable (VariableName, VendorGuid)) {
-    return ;
+    return;
   }
 
   //
@@ -241,9 +243,10 @@ SecureBootHook (
     //
     // Measure DBT only if present and not empty
     //
-    if (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE2) == 0 &&
-        CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid)) {
-      DEBUG((DEBUG_INFO, "Skip measuring variable %s since it's deleted\n", EFI_IMAGE_SECURITY_DATABASE2));
+    if ((StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE2) == 0) &&
+        CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid))
+    {
+      DEBUG ((DEBUG_INFO, "Skip measuring variable %s since it's deleted\n", EFI_IMAGE_SECURITY_DATABASE2));
       return;
     } else {
       VariableData     = NULL;
@@ -257,7 +260,7 @@ SecureBootHook (
              VariableData,
              VariableDataSize
              );
-  DEBUG ((EFI_D_INFO, "MeasureBootPolicyVariable - %r\n", Status));
+  DEBUG ((DEBUG_INFO, "MeasureBootPolicyVariable - %r\n", Status));
 
   if (VariableData != NULL) {
     FreePool (VariableData);
@@ -267,44 +270,45 @@ SecureBootHook (
   // "SecureBoot" is 8bit & read-only. It can only be changed according to PK update
   //
   if ((StrCmp (VariableName, EFI_PLATFORM_KEY_NAME) == 0) &&
-       CompareGuid (VendorGuid, &gEfiGlobalVariableGuid)) {
-     Status = InternalGetVariable (
-                EFI_SECURE_BOOT_MODE_NAME,
-                &gEfiGlobalVariableGuid,
-                &VariableData,
-                &VariableDataSize
-                );
-     if (EFI_ERROR (Status)) {
-       return;
-     }
+      CompareGuid (VendorGuid, &gEfiGlobalVariableGuid))
+  {
+    Status = InternalGetVariable (
+               EFI_SECURE_BOOT_MODE_NAME,
+               &gEfiGlobalVariableGuid,
+               &VariableData,
+               &VariableDataSize
+               );
+    if (EFI_ERROR (Status)) {
+      return;
+    }
 
-     //
-     // If PK update is successful. "SecureBoot" shall always exist ever since variable write service is ready
-     //
-     ASSERT(mSecureBootVarData != NULL);
+    //
+    // If PK update is successful. "SecureBoot" shall always exist ever since variable write service is ready
+    //
+    ASSERT (mSecureBootVarData != NULL);
 
-     if (CompareMem(mSecureBootVarData, VariableData, VariableDataSize) != 0) {
-       FreePool(mSecureBootVarData);
-       mSecureBootVarData     = VariableData;
-       mSecureBootVarDataSize = VariableDataSize;
+    if (CompareMem (mSecureBootVarData, VariableData, VariableDataSize) != 0) {
+      FreePool (mSecureBootVarData);
+      mSecureBootVarData     = VariableData;
+      mSecureBootVarDataSize = VariableDataSize;
 
-       DEBUG((DEBUG_INFO, "%s variable updated according to PK change. Remeasure the value!\n", EFI_SECURE_BOOT_MODE_NAME));
-       Status = MeasureVariable (
-                  EFI_SECURE_BOOT_MODE_NAME,
-                  &gEfiGlobalVariableGuid,
-                  mSecureBootVarData,
-                  mSecureBootVarDataSize
-                  );
-       DEBUG ((DEBUG_INFO, "MeasureBootPolicyVariable - %r\n", Status));
-     } else {
-       //
-       // "SecureBoot" variable is not changed
-       //
-       FreePool(VariableData);
-     }
+      DEBUG ((DEBUG_INFO, "%s variable updated according to PK change. Remeasure the value!\n", EFI_SECURE_BOOT_MODE_NAME));
+      Status = MeasureVariable (
+                 EFI_SECURE_BOOT_MODE_NAME,
+                 &gEfiGlobalVariableGuid,
+                 mSecureBootVarData,
+                 mSecureBootVarDataSize
+                 );
+      DEBUG ((DEBUG_INFO, "MeasureBootPolicyVariable - %r\n", Status));
+    } else {
+      //
+      // "SecureBoot" variable is not changed
+      //
+      FreePool (VariableData);
+    }
   }
 
-  return ;
+  return;
 }
 
 /**
@@ -314,11 +318,11 @@ SecureBootHook (
 **/
 VOID
 EFIAPI
-RecordSecureBootPolicyVarData(
+RecordSecureBootPolicyVarData (
   VOID
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   //
   // Record initial "SecureBoot" variable value.
@@ -330,10 +334,10 @@ RecordSecureBootPolicyVarData(
              (VOID **)&mSecureBootVarData,
              &mSecureBootVarDataSize
              );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     //
     // Read could fail when Auth Variable solution is not supported
     //
-    DEBUG((DEBUG_INFO, "RecordSecureBootPolicyVarData GetVariable %s Status %x\n", EFI_SECURE_BOOT_MODE_NAME, Status));
+    DEBUG ((DEBUG_INFO, "RecordSecureBootPolicyVarData GetVariable %s Status %x\n", EFI_SECURE_BOOT_MODE_NAME, Status));
   }
 }

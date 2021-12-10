@@ -16,17 +16,16 @@
 
 #include <Protocol/Timer.h>
 
-
-STATIC UINT64                  gTimerPeriod = 0;
-STATIC EFI_TIMER_ARCH_PROTOCOL *gTimerAp = NULL;
-STATIC EFI_EVENT               gTimerEvent = NULL;
-STATIC VOID                    *gRegistration = NULL;
+STATIC UINT64                   gTimerPeriod   = 0;
+STATIC EFI_TIMER_ARCH_PROTOCOL  *gTimerAp      = NULL;
+STATIC EFI_EVENT                gTimerEvent    = NULL;
+STATIC VOID                     *gRegistration = NULL;
 
 VOID
 EFIAPI
 RegisterTimerArchProtocol (
-  IN EFI_EVENT     Event,
-  IN VOID          *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   EFI_STATUS  Status;
@@ -46,8 +45,6 @@ RegisterTimerArchProtocol (
   }
 }
 
-
-
 /**
   Stalls the CPU for at least the given number of microseconds.
 
@@ -61,12 +58,11 @@ RegisterTimerArchProtocol (
 UINTN
 EFIAPI
 MicroSecondDelay (
-  IN      UINTN                     MicroSeconds
+  IN      UINTN  MicroSeconds
   )
 {
   return NanoSecondDelay (MicroSeconds * 1000);
 }
-
 
 /**
   Stalls the CPU for at least the given number of nanoseconds.
@@ -81,7 +77,7 @@ MicroSecondDelay (
 UINTN
 EFIAPI
 NanoSecondDelay (
-  IN      UINTN                     NanoSeconds
+  IN      UINTN  NanoSeconds
   )
 {
   EFI_STATUS  Status;
@@ -90,24 +86,24 @@ NanoSecondDelay (
 
   if ((gTimerPeriod != 0) &&
       ((UINT64)NanoSeconds > gTimerPeriod) &&
-      (EfiGetCurrentTpl () == TPL_APPLICATION)) {
+      (EfiGetCurrentTpl () == TPL_APPLICATION))
+  {
     //
     // This stall is long, so use gBS->WaitForEvent () to yield CPU to DXE Core
     //
 
     HundredNanoseconds = DivU64x32 (NanoSeconds, 100);
-    Status = gBS->SetTimer (gTimerEvent, TimerRelative, HundredNanoseconds);
+    Status             = gBS->SetTimer (gTimerEvent, TimerRelative, HundredNanoseconds);
     ASSERT_EFI_ERROR (Status);
 
     Status = gBS->WaitForEvent (sizeof (gTimerEvent)/sizeof (EFI_EVENT), &gTimerEvent, &Index);
     ASSERT_EFI_ERROR (Status);
-
   } else {
     gEmuThunk->Sleep (NanoSeconds);
   }
+
   return NanoSeconds;
 }
-
 
 /**
   Retrieves the current value of a 64-bit free running performance counter.
@@ -155,21 +151,20 @@ GetPerformanceCounter (
 UINT64
 EFIAPI
 GetPerformanceCounterProperties (
-  OUT      UINT64                    *StartValue,  OPTIONAL
-  OUT      UINT64                    *EndValue     OPTIONAL
+  OUT      UINT64  *StartValue   OPTIONAL,
+  OUT      UINT64  *EndValue     OPTIONAL
   )
 {
-
   if (StartValue != NULL) {
     *StartValue = 0ULL;
   }
+
   if (EndValue != NULL) {
     *EndValue = (UINT64)-1LL;
   }
 
   return gEmuThunk->QueryPerformanceFrequency ();
 }
-
 
 /**
   Register for the Timer AP protocol.
@@ -234,9 +229,9 @@ GetTimeInNanoSecond (
   // Since 2^29 < 1,000,000,000 = 0x3B9ACA00 < 2^30, Remainder should < 2^(64-30) = 2^34,
   // i.e. highest bit set in Remainder should <= 33.
   //
-  Shift = MAX (0, HighBitSet64 (Remainder) - 33);
-  Remainder = RShiftU64 (Remainder, (UINTN) Shift);
-  Frequency = RShiftU64 (Frequency, (UINTN) Shift);
+  Shift        = MAX (0, HighBitSet64 (Remainder) - 33);
+  Remainder    = RShiftU64 (Remainder, (UINTN)Shift);
+  Frequency    = RShiftU64 (Frequency, (UINTN)Shift);
   NanoSeconds += DivU64x64Remainder (MultU64x32 (Remainder, 1000000000u), Frequency, NULL);
 
   return NanoSeconds;

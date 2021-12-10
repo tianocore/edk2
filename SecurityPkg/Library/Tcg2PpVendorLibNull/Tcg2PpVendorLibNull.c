@@ -30,10 +30,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 UINT32
 EFIAPI
 Tcg2PpVendorLibExecutePendingRequest (
-  IN TPM2B_AUTH             *PlatformAuth,  OPTIONAL
-  IN UINT32                 OperationRequest,
-  IN OUT UINT32             *ManagementFlags,
-  OUT BOOLEAN               *ResetRequired
+  IN TPM2B_AUTH  *PlatformAuth   OPTIONAL,
+  IN UINT32      OperationRequest,
+  IN OUT UINT32  *ManagementFlags,
+  OUT BOOLEAN    *ResetRequired
   )
 {
   ASSERT (OperationRequest >= TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION);
@@ -61,9 +61,9 @@ Tcg2PpVendorLibExecutePendingRequest (
 BOOLEAN
 EFIAPI
 Tcg2PpVendorLibHasValidRequest (
-  IN UINT32                 OperationRequest,
-  IN UINT32                 ManagementFlags,
-  OUT BOOLEAN               *RequestConfirmed
+  IN UINT32    OperationRequest,
+  IN UINT32    ManagementFlags,
+  OUT BOOLEAN  *RequestConfirmed
   )
 {
   ASSERT (OperationRequest >= TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION);
@@ -91,9 +91,9 @@ Tcg2PpVendorLibHasValidRequest (
 UINT32
 EFIAPI
 Tcg2PpVendorLibSubmitRequestToPreOSFunction (
-  IN UINT32                 OperationRequest,
-  IN UINT32                 ManagementFlags,
-  IN UINT32                 RequestParameter
+  IN UINT32  OperationRequest,
+  IN UINT32  ManagementFlags,
+  IN UINT32  RequestParameter
   )
 {
   ASSERT (OperationRequest >= TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION);
@@ -118,8 +118,8 @@ Tcg2PpVendorLibSubmitRequestToPreOSFunction (
 UINT32
 EFIAPI
 Tcg2PpVendorLibGetUserConfirmationStatusFunction (
-  IN UINT32                 OperationRequest,
-  IN UINT32                 ManagementFlags
+  IN UINT32  OperationRequest,
+  IN UINT32  ManagementFlags
   )
 {
   ASSERT (OperationRequest >= TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION);

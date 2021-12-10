@@ -24,10 +24,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 BOOLEAN
 EFIAPI
 TlsInHandshake (
-  IN     VOID                     *Tls
+  IN     VOID  *Tls
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return FALSE;
 }
 
@@ -60,14 +60,14 @@ TlsInHandshake (
 EFI_STATUS
 EFIAPI
 TlsDoHandshake (
-  IN     VOID                     *Tls,
-  IN     UINT8                    *BufferIn, OPTIONAL
-  IN     UINTN                    BufferInSize, OPTIONAL
-     OUT UINT8                    *BufferOut, OPTIONAL
-  IN OUT UINTN                    *BufferOutSize
+  IN     VOID   *Tls,
+  IN     UINT8  *BufferIn  OPTIONAL,
+  IN     UINTN  BufferInSize  OPTIONAL,
+  OUT UINT8     *BufferOut  OPTIONAL,
+  IN OUT UINTN  *BufferOutSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -99,14 +99,14 @@ TlsDoHandshake (
 EFI_STATUS
 EFIAPI
 TlsHandleAlert (
-  IN     VOID                     *Tls,
-  IN     UINT8                    *BufferIn, OPTIONAL
-  IN     UINTN                    BufferInSize, OPTIONAL
-     OUT UINT8                    *BufferOut, OPTIONAL
-  IN OUT UINTN                    *BufferOutSize
+  IN     VOID   *Tls,
+  IN     UINT8  *BufferIn  OPTIONAL,
+  IN     UINTN  BufferInSize  OPTIONAL,
+  OUT UINT8     *BufferOut  OPTIONAL,
+  IN OUT UINTN  *BufferOutSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -131,12 +131,12 @@ TlsHandleAlert (
 EFI_STATUS
 EFIAPI
 TlsCloseNotify (
-  IN     VOID                     *Tls,
-  IN OUT UINT8                    *Buffer,
-  IN OUT UINTN                    *BufferSize
+  IN     VOID   *Tls,
+  IN OUT UINT8  *Buffer,
+  IN OUT UINTN  *BufferSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -157,12 +157,12 @@ TlsCloseNotify (
 INTN
 EFIAPI
 TlsCtrlTrafficOut (
-  IN     VOID                     *Tls,
-  IN OUT VOID                     *Buffer,
-  IN     UINTN                    BufferSize
+  IN     VOID   *Tls,
+  IN OUT VOID   *Buffer,
+  IN     UINTN  BufferSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
 
@@ -183,14 +183,15 @@ TlsCtrlTrafficOut (
 INTN
 EFIAPI
 TlsCtrlTrafficIn (
-  IN     VOID                     *Tls,
-  IN     VOID                     *Buffer,
-  IN     UINTN                    BufferSize
+  IN     VOID   *Tls,
+  IN     VOID   *Buffer,
+  IN     UINTN  BufferSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
+
 /**
   Attempts to read bytes from the specified TLS connection into the buffer.
 
@@ -209,12 +210,12 @@ TlsCtrlTrafficIn (
 INTN
 EFIAPI
 TlsRead (
-  IN     VOID                     *Tls,
-  IN OUT VOID                     *Buffer,
-  IN     UINTN                    BufferSize
+  IN     VOID   *Tls,
+  IN OUT VOID   *Buffer,
+  IN     UINTN  BufferSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
 
@@ -236,12 +237,11 @@ TlsRead (
 INTN
 EFIAPI
 TlsWrite (
-  IN     VOID                     *Tls,
-  IN     VOID                     *Buffer,
-  IN     UINTN                    BufferSize
+  IN     VOID   *Tls,
+  IN     VOID   *Buffer,
+  IN     UINTN  BufferSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
-

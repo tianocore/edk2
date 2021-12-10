@@ -15,7 +15,9 @@
 #include <Library/DebugLib.h>
 #include <IndustryStandard/Acpi.h>
 
-GUID mFrequencyHobGuid = { 0x3fca54f6, 0xe1a2, 0x4b20, { 0xbe, 0x76, 0x92, 0x6b, 0x4b, 0x48, 0xbf, 0xaa }};
+GUID  mFrequencyHobGuid = {
+  0x3fca54f6, 0xe1a2, 0x4b20, { 0xbe, 0x76, 0x92, 0x6b, 0x4b, 0x48, 0xbf, 0xaa }
+};
 
 /**
   Internal function to retrieves the 64-bit frequency in Hz.
@@ -45,11 +47,11 @@ AcpiTimerLibConstructor (
   VOID
   )
 {
-  UINTN   Bus;
-  UINTN   Device;
-  UINTN   Function;
-  UINTN   EnableRegister;
-  UINT8   EnableMask;
+  UINTN  Bus;
+  UINTN  Device;
+  UINTN  Function;
+  UINTN  EnableRegister;
+  UINT8  EnableMask;
 
   //
   // ASSERT for the invalid PCD values. They must be configured to the real value.
@@ -69,18 +71,18 @@ AcpiTimerLibConstructor (
   //
   // ASSERT for the invalid PCD values. They must be configured to the real value.
   //
-  ASSERT (PcdGet8  (PcdAcpiIoPciDeviceNumber)   != 0xFF);
-  ASSERT (PcdGet8  (PcdAcpiIoPciFunctionNumber) != 0xFF);
+  ASSERT (PcdGet8 (PcdAcpiIoPciDeviceNumber)   != 0xFF);
+  ASSERT (PcdGet8 (PcdAcpiIoPciFunctionNumber) != 0xFF);
   ASSERT (PcdGet16 (PcdAcpiIoPciEnableRegisterOffset) != 0xFFFF);
 
   //
   // Retrieve the PCD values for the PCI configuration space required to program the ACPI I/O Port Base Address
   //
-  Bus            = PcdGet8  (PcdAcpiIoPciBusNumber);
-  Device         = PcdGet8  (PcdAcpiIoPciDeviceNumber);
-  Function       = PcdGet8  (PcdAcpiIoPciFunctionNumber);
+  Bus            = PcdGet8 (PcdAcpiIoPciBusNumber);
+  Device         = PcdGet8 (PcdAcpiIoPciDeviceNumber);
+  Function       = PcdGet8 (PcdAcpiIoPciFunctionNumber);
   EnableRegister = PcdGet16 (PcdAcpiIoPciEnableRegisterOffset);
-  EnableMask     = PcdGet8  (PcdAcpiIoBarEnableMask);
+  EnableMask     = PcdGet8 (PcdAcpiIoBarEnableMask);
 
   //
   // If ACPI I/O space is not enabled yet, program ACPI I/O base address and enable it.
@@ -122,12 +124,14 @@ InternalAcpiGetAcpiTimerIoPort (
   // value other than PcdAcpiIoPortBaseAddress
   //
   if (PcdGet16 (PcdAcpiIoPciBarRegisterOffset) != 0x0000) {
-    Port = PciRead16 (PCI_LIB_ADDRESS (
-                        PcdGet8  (PcdAcpiIoPciBusNumber),
-                        PcdGet8  (PcdAcpiIoPciDeviceNumber),
-                        PcdGet8  (PcdAcpiIoPciFunctionNumber),
-                        PcdGet16 (PcdAcpiIoPciBarRegisterOffset)
-                        ));
+    Port = PciRead16 (
+             PCI_LIB_ADDRESS (
+               PcdGet8 (PcdAcpiIoPciBusNumber),
+               PcdGet8 (PcdAcpiIoPciDeviceNumber),
+               PcdGet8 (PcdAcpiIoPciFunctionNumber),
+               PcdGet16 (PcdAcpiIoPciBarRegisterOffset)
+               )
+             );
   }
 
   return (Port & PcdGet16 (PcdAcpiIoPortBaseAddressMask)) + PcdGet16 (PcdAcpiPm1TmrOffset);
@@ -147,9 +151,9 @@ InternalAcpiDelay (
   IN UINT32  Delay
   )
 {
-  UINT16   Port;
-  UINT32   Ticks;
-  UINT32   Times;
+  UINT16  Port;
+  UINT32  Ticks;
+  UINT32  Times;
 
   Port   = InternalAcpiGetAcpiTimerIoPort ();
   Times  = Delay >> 22;
@@ -274,7 +278,7 @@ GetPerformanceCounter (
 UINT64
 EFIAPI
 GetPerformanceCounterProperties (
-  OUT UINT64  *StartValue,  OPTIONAL
+  OUT UINT64  *StartValue   OPTIONAL,
   OUT UINT64  *EndValue     OPTIONAL
   )
 {
@@ -285,6 +289,7 @@ GetPerformanceCounterProperties (
   if (EndValue != NULL) {
     *EndValue = 0xffffffffffffffffULL;
   }
+
   return InternalGetPerformanceCounterFrequency ();
 }
 
@@ -324,9 +329,9 @@ GetTimeInNanoSecond (
   // Since 2^29 < 1,000,000,000 = 0x3B9ACA00 < 2^30, Remainder should < 2^(64-30) = 2^34,
   // i.e. highest bit set in Remainder should <= 33.
   //
-  Shift = MAX (0, HighBitSet64 (Remainder) - 33);
-  Remainder = RShiftU64 (Remainder, (UINTN) Shift);
-  Frequency = RShiftU64 (Frequency, (UINTN) Shift);
+  Shift        = MAX (0, HighBitSet64 (Remainder) - 33);
+  Remainder    = RShiftU64 (Remainder, (UINTN)Shift);
+  Frequency    = RShiftU64 (Frequency, (UINTN)Shift);
   NanoSeconds += DivU64x64Remainder (MultU64x32 (Remainder, 1000000000u), Frequency, NULL);
 
   return NanoSeconds;
@@ -352,12 +357,12 @@ InternalCalculateTscFrequency (
   VOID
   )
 {
-  UINT64      StartTSC;
-  UINT64      EndTSC;
-  UINT16      TimerAddr;
-  UINT32      Ticks;
-  UINT64      TscFrequency;
-  BOOLEAN     InterruptState;
+  UINT64   StartTSC;
+  UINT64   EndTSC;
+  UINT16   TimerAddr;
+  UINT32   Ticks;
+  UINT64   TscFrequency;
+  BOOLEAN  InterruptState;
 
   InterruptState = SaveAndDisableInterrupts ();
 
@@ -377,8 +382,9 @@ InternalCalculateTscFrequency (
   // the while loop will exit.
   //
   while (((Ticks - IoBitFieldRead32 (TimerAddr, 0, 23)) & BIT23) == 0) {
-    CpuPause();
+    CpuPause ();
   }
+
   EndTSC = AsmReadTsc ();                                           // TSC value 101.4 us later
 
   TscFrequency = MultU64x32 (
@@ -390,4 +396,3 @@ InternalCalculateTscFrequency (
 
   return TscFrequency;
 }
-

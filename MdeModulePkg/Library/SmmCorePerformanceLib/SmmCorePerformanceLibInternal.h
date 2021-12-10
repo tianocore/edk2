@@ -12,7 +12,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _SMM_CORE_PERFORMANCE_LIB_INTERNAL_H_
 #define _SMM_CORE_PERFORMANCE_LIB_INTERNAL_H_
 
-
 #include <Guid/Performance.h>
 #include <Guid/PerformanceMeasurement.h>
 #include <Guid/ExtendedFirmwarePerformance.h>
@@ -43,6 +42,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Interface declarations for SMM PerformanceMeasurement Protocol.
 //
+
 /**
   Create performance record with event description and a timestamp.
 
@@ -63,12 +63,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 EFIAPI
-CreatePerformanceMeasurement(
-  IN CONST VOID                        *CallerIdentifier, OPTIONAL
-  IN CONST VOID                        *Guid,     OPTIONAL
-  IN CONST CHAR8                       *String,   OPTIONAL
-  IN       UINT64                      TimeStamp, OPTIONAL
-  IN       UINT64                      Address,   OPTIONAL
+CreatePerformanceMeasurement (
+  IN CONST VOID                        *CallerIdentifier  OPTIONAL,
+  IN CONST VOID                        *Guid      OPTIONAL,
+  IN CONST CHAR8                       *String    OPTIONAL,
+  IN       UINT64                      TimeStamp  OPTIONAL,
+  IN       UINT64                      Address    OPTIONAL,
   IN       UINT32                      Identifier,
   IN       PERF_MEASUREMENT_ATTRIBUTE  Attribute
   );

@@ -59,31 +59,35 @@ LzmaGuidedSectionGetInfo (
 
   if (IS_SECTION2 (InputSection)) {
     if (!CompareGuid (
-        &gLzmaCustomDecompressGuid,
-        &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid))) {
+           &gLzmaCustomDecompressGuid,
+           &(((EFI_GUID_DEFINED_SECTION2 *)InputSection)->SectionDefinitionGuid)
+           ))
+    {
       return RETURN_INVALID_PARAMETER;
     }
 
-    *SectionAttribute = ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->Attributes;
+    *SectionAttribute = ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->Attributes;
 
     return LzmaUefiDecompressGetInfo (
-             (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset,
-             SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset,
+             (UINT8 *)InputSection + ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset,
+             SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset,
              OutputBufferSize,
              ScratchBufferSize
              );
   } else {
     if (!CompareGuid (
-        &gLzmaCustomDecompressGuid,
-        &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+           &gLzmaCustomDecompressGuid,
+           &(((EFI_GUID_DEFINED_SECTION *)InputSection)->SectionDefinitionGuid)
+           ))
+    {
       return RETURN_INVALID_PARAMETER;
     }
 
-    *SectionAttribute = ((EFI_GUID_DEFINED_SECTION *) InputSection)->Attributes;
+    *SectionAttribute = ((EFI_GUID_DEFINED_SECTION *)InputSection)->Attributes;
 
     return LzmaUefiDecompressGetInfo (
-             (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
-             SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+             (UINT8 *)InputSection + ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset,
+             SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset,
              OutputBufferSize,
              ScratchBufferSize
              );
@@ -128,7 +132,7 @@ EFIAPI
 LzmaGuidedSectionExtraction (
   IN CONST  VOID    *InputSection,
   OUT       VOID    **OutputBuffer,
-  OUT       VOID    *ScratchBuffer,        OPTIONAL
+  OUT       VOID    *ScratchBuffer         OPTIONAL,
   OUT       UINT32  *AuthenticationStatus
   )
 {
@@ -137,8 +141,10 @@ LzmaGuidedSectionExtraction (
 
   if (IS_SECTION2 (InputSection)) {
     if (!CompareGuid (
-        &gLzmaCustomDecompressGuid,
-        &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid))) {
+           &gLzmaCustomDecompressGuid,
+           &(((EFI_GUID_DEFINED_SECTION2 *)InputSection)->SectionDefinitionGuid)
+           ))
+    {
       return RETURN_INVALID_PARAMETER;
     }
 
@@ -148,15 +154,17 @@ LzmaGuidedSectionExtraction (
     *AuthenticationStatus = 0;
 
     return LzmaUefiDecompress (
-             (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset,
-             SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset,
+             (UINT8 *)InputSection + ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset,
+             SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset,
              *OutputBuffer,
              ScratchBuffer
              );
   } else {
     if (!CompareGuid (
-        &gLzmaCustomDecompressGuid,
-        &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+           &gLzmaCustomDecompressGuid,
+           &(((EFI_GUID_DEFINED_SECTION *)InputSection)->SectionDefinitionGuid)
+           ))
+    {
       return RETURN_INVALID_PARAMETER;
     }
 
@@ -166,14 +174,13 @@ LzmaGuidedSectionExtraction (
     *AuthenticationStatus = 0;
 
     return LzmaUefiDecompress (
-             (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
-             SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+             (UINT8 *)InputSection + ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset,
+             SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset,
              *OutputBuffer,
              ScratchBuffer
-    );
+             );
   }
 }
-
 
 /**
   Register LzmaDecompress and LzmaDecompressGetInfo handlers with LzmaCustomerDecompressGuid.
@@ -188,9 +195,8 @@ LzmaDecompressLibConstructor (
   )
 {
   return ExtractGuidedSectionRegisterHandlers (
-          &gLzmaCustomDecompressGuid,
-          LzmaGuidedSectionGetInfo,
-          LzmaGuidedSectionExtraction
-          );
+           &gLzmaCustomDecompressGuid,
+           LzmaGuidedSectionGetInfo,
+           LzmaGuidedSectionExtraction
+           );
 }
-

@@ -14,11 +14,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Authentication Operation defintions for User Identity (UID), Measured and Secure boot.
 //
-#define EFI_AUTH_OPERATION_NONE                0x00
-#define EFI_AUTH_OPERATION_VERIFY_IMAGE        0x01
-#define EFI_AUTH_OPERATION_DEFER_IMAGE_LOAD    0x02
-#define EFI_AUTH_OPERATION_MEASURE_IMAGE       0x04
-#define EFI_AUTH_OPERATION_CONNECT_POLICY      0x08
+#define EFI_AUTH_OPERATION_NONE              0x00
+#define EFI_AUTH_OPERATION_VERIFY_IMAGE      0x01
+#define EFI_AUTH_OPERATION_DEFER_IMAGE_LOAD  0x02
+#define EFI_AUTH_OPERATION_MEASURE_IMAGE     0x04
+#define EFI_AUTH_OPERATION_CONNECT_POLICY    0x08
 //
 // Authentication State Operation will check the authentication status of a file.
 //
@@ -27,7 +27,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// Image buffer is required by the security handler.
 ///
-#define EFI_AUTH_OPERATION_IMAGE_REQUIRED      0x80000000
+#define EFI_AUTH_OPERATION_IMAGE_REQUIRED  0x80000000
 
 /**
   The security handler is used to abstract platform-specific policy
@@ -141,8 +141,8 @@ RegisterSecurityHandler (
 EFI_STATUS
 EFIAPI
 ExecuteSecurityHandlers (
-  IN  UINT32                            AuthenticationStatus,
-  IN  CONST EFI_DEVICE_PATH_PROTOCOL    *FilePath
+  IN  UINT32                          AuthenticationStatus,
+  IN  CONST EFI_DEVICE_PATH_PROTOCOL  *FilePath
   );
 
 /**
@@ -184,7 +184,7 @@ ExecuteSecurityHandlers (
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SECURITY2_FILE_AUTHENTICATION_HANDLER) (
+(EFIAPI *SECURITY2_FILE_AUTHENTICATION_HANDLER)(
   IN  UINT32                           AuthenticationStatus,
   IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File,
   IN  VOID                             *FileBuffer,
@@ -210,8 +210,8 @@ EFI_STATUS
 EFI_STATUS
 EFIAPI
 RegisterSecurity2Handler (
-  IN  SECURITY2_FILE_AUTHENTICATION_HANDLER       Security2Handler,
-  IN  UINT32                                      AuthenticationOperation
+  IN  SECURITY2_FILE_AUTHENTICATION_HANDLER  Security2Handler,
+  IN  UINT32                                 AuthenticationOperation
   );
 
 /**
@@ -259,12 +259,12 @@ RegisterSecurity2Handler (
 EFI_STATUS
 EFIAPI
 ExecuteSecurity2Handlers (
-  IN  UINT32                           AuthenticationOperation,
-  IN  UINT32                           AuthenticationStatus,
-  IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File, OPTIONAL
-  IN  VOID                             *FileBuffer,
-  IN  UINTN                            FileSize,
-  IN  BOOLEAN                          BootPolicy
+  IN  UINT32                          AuthenticationOperation,
+  IN  UINT32                          AuthenticationStatus,
+  IN  CONST EFI_DEVICE_PATH_PROTOCOL  *File  OPTIONAL,
+  IN  VOID                            *FileBuffer,
+  IN  UINTN                           FileSize,
+  IN  BOOLEAN                         BootPolicy
   );
 
 #endif

@@ -34,6 +34,18 @@ BITS    32
 %define GHCB_CPUID_REGISTER_SHIFT  30
 %define CPUID_INSN_LEN              2
 
+; #VC handler offsets/sizes for accessing SNP CPUID page
+;
+%define SNP_CPUID_ENTRY_SZ         48
+%define SNP_CPUID_COUNT             0
+%define SNP_CPUID_ENTRY            16
+%define SNP_CPUID_ENTRY_EAX_IN      0
+%define SNP_CPUID_ENTRY_ECX_IN      4
+%define SNP_CPUID_ENTRY_EAX        24
+%define SNP_CPUID_ENTRY_EBX        28
+%define SNP_CPUID_ENTRY_ECX        32
+%define SNP_CPUID_ENTRY_EDX        36
+
 
 %define SEV_GHCB_MSR                0xc0010130
 %define SEV_STATUS_MSR              0xc0010131
@@ -176,12 +188,6 @@ pageTableEntries4kLoop:
     ;
     mov     ecx, (GHCB_BASE & 0x1F_FFFF) >> 12
     mov     [ecx * 8 + GHCB_PT_ADDR + 4], strict dword 0
-
-    mov     ecx, GHCB_SIZE / 4
-    xor     eax, eax
-clearGhcbMemoryLoop:
-    mov     dword[ecx * 4 + GHCB_BASE - 4], eax
-    loop    clearGhcbMemoryLoop
 
 SevClearPageEncMaskForGhcbPageExit:
     OneTimeCallRet SevClearPageEncMaskForGhcbPage
@@ -341,11 +347,61 @@ SevEsIdtNotCpuid:
     TerminateVmgExit TERM_VC_NOT_CPUID
     iret
 
-    ;
-    ; Total stack usage for the #VC handler is 44 bytes:
-    ;   - 12 bytes for the exception IRET (after popping error code)
-    ;   - 32 bytes for the local variables.
-    ;
+; Use the SNP CPUID page to handle the cpuid lookup
+;
+;  Modified: EAX, EBX, ECX, EDX
+;
+;  Relies on the stack setup/usage in #VC handler:
+;
+;    On entry,
+;      [esp + VC_CPUID_FUNCTION] contains EAX input to cpuid instruction
+;
+;    On return, stores corresponding results of CPUID lookup in:
+;      [esp + VC_CPUID_RESULT_EAX]
+;      [esp + VC_CPUID_RESULT_EBX]
+;      [esp + VC_CPUID_RESULT_ECX]
+;      [esp + VC_CPUID_RESULT_EDX]
+;
+SnpCpuidLookup:
+    mov     eax, [esp + VC_CPUID_FUNCTION]
+    mov     ebx, [CPUID_BASE + SNP_CPUID_COUNT]
+    mov     ecx, CPUID_BASE + SNP_CPUID_ENTRY
+    ; Zero these out now so we can simply return if lookup fails
+    mov     dword[esp + VC_CPUID_RESULT_EAX], 0
+    mov     dword[esp + VC_CPUID_RESULT_EBX], 0
+    mov     dword[esp + VC_CPUID_RESULT_ECX], 0
+    mov     dword[esp + VC_CPUID_RESULT_EDX], 0
+
+SnpCpuidCheckEntry:
+    cmp     ebx, 0
+    je      VmmDoneSnpCpuid
+    cmp     dword[ecx + SNP_CPUID_ENTRY_EAX_IN], eax
+    jne     SnpCpuidCheckEntryNext
+    ; As with SEV-ES handler we assume requested CPUID sub-leaf/index is 0
+    cmp     dword[ecx + SNP_CPUID_ENTRY_ECX_IN], 0
+    je      SnpCpuidEntryFound
+
+SnpCpuidCheckEntryNext:
+    dec     ebx
+    add     ecx, SNP_CPUID_ENTRY_SZ
+    jmp     SnpCpuidCheckEntry
+
+SnpCpuidEntryFound:
+    mov     eax, [ecx + SNP_CPUID_ENTRY_EAX]
+    mov     [esp + VC_CPUID_RESULT_EAX], eax
+    mov     eax, [ecx + SNP_CPUID_ENTRY_EBX]
+    mov     [esp + VC_CPUID_RESULT_EBX], eax
+    mov     eax, [ecx + SNP_CPUID_ENTRY_EDX]
+    mov     [esp + VC_CPUID_RESULT_ECX], eax
+    mov     eax, [ecx + SNP_CPUID_ENTRY_ECX]
+    mov     [esp + VC_CPUID_RESULT_EDX], eax
+    jmp     VmmDoneSnpCpuid
+
+;
+; Total stack usage for the #VC handler is 44 bytes:
+;   - 12 bytes for the exception IRET (after popping error code)
+;   - 32 bytes for the local variables.
+;
 SevEsIdtVmmComm:
     ;
     ; If we're here, then we are an SEV-ES guest and this
@@ -372,6 +428,13 @@ SevEsIdtVmmComm:
 
     ; Save the CPUID function being requested
     mov     [esp + VC_CPUID_FUNCTION], eax
+
+    ; If SEV-SNP is enabled, use the CPUID page to handle the CPUID
+    ; instruction.
+    mov     ecx, SEV_STATUS_MSR
+    rdmsr
+    bt      eax, 2
+    jc      SnpCpuidLookup
 
     ; The GHCB CPUID protocol uses the following mapping to request
     ; a specific register:
@@ -430,6 +493,7 @@ VmmDone:
     mov     ecx, SEV_GHCB_MSR
     wrmsr
 
+VmmDoneSnpCpuid:
     mov     eax, [esp + VC_CPUID_RESULT_EAX]
     mov     ebx, [esp + VC_CPUID_RESULT_EBX]
     mov     ecx, [esp + VC_CPUID_RESULT_ECX]

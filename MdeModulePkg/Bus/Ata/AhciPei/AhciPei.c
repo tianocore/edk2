@@ -40,7 +40,6 @@ EFI_PEI_NOTIFY_DESCRIPTOR  mAhciEndOfPeiNotifyListTemplate = {
   AhciPeimEndOfPei
 };
 
-
 /**
   Free the DMA resources allocated by an ATA AHCI controller.
 
@@ -50,10 +49,10 @@ EFI_PEI_NOTIFY_DESCRIPTOR  mAhciEndOfPeiNotifyListTemplate = {
 **/
 VOID
 AhciFreeDmaResource (
-  IN PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private
+  IN PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private
   )
 {
-  EFI_AHCI_REGISTERS    *AhciRegisters;
+  EFI_AHCI_REGISTERS  *AhciRegisters;
 
   ASSERT (Private != NULL);
 
@@ -61,18 +60,18 @@ AhciFreeDmaResource (
 
   if (AhciRegisters->AhciRFisMap != NULL) {
     IoMmuFreeBuffer (
-       EFI_SIZE_TO_PAGES (AhciRegisters->MaxRFisSize),
-       AhciRegisters->AhciRFis,
-       AhciRegisters->AhciRFisMap
-       );
+      EFI_SIZE_TO_PAGES (AhciRegisters->MaxRFisSize),
+      AhciRegisters->AhciRFis,
+      AhciRegisters->AhciRFisMap
+      );
   }
 
   if (AhciRegisters->AhciCmdListMap != NULL) {
     IoMmuFreeBuffer (
-       EFI_SIZE_TO_PAGES (AhciRegisters->MaxCmdListSize),
-       AhciRegisters->AhciCmdList,
-       AhciRegisters->AhciCmdListMap
-       );
+      EFI_SIZE_TO_PAGES (AhciRegisters->MaxCmdListSize),
+      AhciRegisters->AhciCmdList,
+      AhciRegisters->AhciCmdListMap
+      );
   }
 
   if (AhciRegisters->AhciCmdTableMap != NULL) {
@@ -82,7 +81,6 @@ AhciFreeDmaResource (
       AhciRegisters->AhciCmdTableMap
       );
   }
-
 }
 
 /**
@@ -104,7 +102,7 @@ AhciPeimEndOfPei (
   IN VOID                       *Ppi
   )
 {
-  PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private;
+  PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private;
 
   Private = GET_AHCI_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY (NotifyDescriptor);
   AhciFreeDmaResource (Private);
@@ -124,20 +122,20 @@ AhciPeimEndOfPei (
 EFI_STATUS
 EFIAPI
 AtaAhciPeimEntry (
-  IN EFI_PEI_FILE_HANDLE       FileHandle,
-  IN CONST EFI_PEI_SERVICES    **PeiServices
+  IN EFI_PEI_FILE_HANDLE     FileHandle,
+  IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
-  EFI_STATUS                            Status;
-  EFI_BOOT_MODE                         BootMode;
-  EDKII_ATA_AHCI_HOST_CONTROLLER_PPI    *AhciHcPpi;
-  UINT8                                 Controller;
-  UINTN                                 MmioBase;
-  UINTN                                 DevicePathLength;
-  EFI_DEVICE_PATH_PROTOCOL              *DevicePath;
-  UINT32                                PortBitMap;
-  PEI_AHCI_CONTROLLER_PRIVATE_DATA      *Private;
-  UINT8                                 NumberOfPorts;
+  EFI_STATUS                          Status;
+  EFI_BOOT_MODE                       BootMode;
+  EDKII_ATA_AHCI_HOST_CONTROLLER_PPI  *AhciHcPpi;
+  UINT8                               Controller;
+  UINTN                               MmioBase;
+  UINTN                               DevicePathLength;
+  EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
+  UINT32                              PortBitMap;
+  PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private;
+  UINT8                               NumberOfPorts;
 
   DEBUG ((DEBUG_INFO, "%a: Enters.\n", __FUNCTION__));
 
@@ -157,7 +155,7 @@ AtaAhciPeimEntry (
              &gEdkiiPeiAtaAhciHostControllerPpiGuid,
              0,
              NULL,
-             (VOID **) &AhciHcPpi
+             (VOID **)&AhciHcPpi
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Failed to locate AtaAhciHostControllerPpi.\n", __FUNCTION__));
@@ -187,8 +185,10 @@ AtaAhciPeimEntry (
                           );
     if (EFI_ERROR (Status)) {
       DEBUG ((
-        DEBUG_ERROR, "%a: Fail to allocate get the device path for Controller %d.\n",
-        __FUNCTION__, Controller
+        DEBUG_ERROR,
+        "%a: Fail to allocate get the device path for Controller %d.\n",
+        __FUNCTION__,
+        Controller
         ));
       return Status;
     }
@@ -199,8 +199,10 @@ AtaAhciPeimEntry (
     Status = AhciIsHcDevicePathValid (DevicePath, DevicePathLength);
     if (EFI_ERROR (Status)) {
       DEBUG ((
-        DEBUG_ERROR, "%a: The device path is invalid for Controller %d.\n",
-        __FUNCTION__, Controller
+        DEBUG_ERROR,
+        "%a: The device path is invalid for Controller %d.\n",
+        __FUNCTION__,
+        Controller
         ));
       Controller++;
       continue;
@@ -231,8 +233,10 @@ AtaAhciPeimEntry (
     Private = AllocateZeroPool (sizeof (PEI_AHCI_CONTROLLER_PRIVATE_DATA));
     if (Private == NULL) {
       DEBUG ((
-        DEBUG_ERROR, "%a: Fail to allocate private data for Controller %d.\n",
-        __FUNCTION__, Controller
+        DEBUG_ERROR,
+        "%a: Fail to allocate private data for Controller %d.\n",
+        __FUNCTION__,
+        Controller
         ));
       return EFI_OUT_OF_RESOURCES;
     }
@@ -260,8 +264,8 @@ AtaAhciPeimEntry (
       continue;
     }
 
-    Private->AtaPassThruMode.Attributes   = EFI_ATA_PASS_THRU_ATTRIBUTES_PHYSICAL |
-                                            EFI_ATA_PASS_THRU_ATTRIBUTES_LOGICAL;
+    Private->AtaPassThruMode.Attributes = EFI_ATA_PASS_THRU_ATTRIBUTES_PHYSICAL |
+                                          EFI_ATA_PASS_THRU_ATTRIBUTES_LOGICAL;
     Private->AtaPassThruMode.IoAlign      = sizeof (UINTN);
     Private->AtaPassThruPpi.Revision      = EDKII_PEI_ATA_PASS_THRU_PPI_REVISION;
     Private->AtaPassThruPpi.Mode          = &Private->AtaPassThruMode;
@@ -274,18 +278,18 @@ AtaAhciPeimEntry (
       &mAhciAtaPassThruPpiListTemplate,
       sizeof (EFI_PEI_PPI_DESCRIPTOR)
       );
-    Private->AtaPassThruPpiList.Ppi       = &Private->AtaPassThruPpi;
+    Private->AtaPassThruPpiList.Ppi = &Private->AtaPassThruPpi;
     PeiServicesInstallPpi (&Private->AtaPassThruPpiList);
 
-    Private->BlkIoPpi.GetNumberOfBlockDevices  = AhciBlockIoGetDeviceNo;
-    Private->BlkIoPpi.GetBlockDeviceMediaInfo  = AhciBlockIoGetMediaInfo;
-    Private->BlkIoPpi.ReadBlocks               = AhciBlockIoReadBlocks;
+    Private->BlkIoPpi.GetNumberOfBlockDevices = AhciBlockIoGetDeviceNo;
+    Private->BlkIoPpi.GetBlockDeviceMediaInfo = AhciBlockIoGetMediaInfo;
+    Private->BlkIoPpi.ReadBlocks              = AhciBlockIoReadBlocks;
     CopyMem (
       &Private->BlkIoPpiList,
       &mAhciBlkIoPpiListTemplate,
       sizeof (EFI_PEI_PPI_DESCRIPTOR)
       );
-    Private->BlkIoPpiList.Ppi                  = &Private->BlkIoPpi;
+    Private->BlkIoPpiList.Ppi = &Private->BlkIoPpi;
     PeiServicesInstallPpi (&Private->BlkIoPpiList);
 
     Private->BlkIo2Ppi.Revision                = EFI_PEI_RECOVERY_BLOCK_IO2_PPI_REVISION;
@@ -297,14 +301,15 @@ AtaAhciPeimEntry (
       &mAhciBlkIo2PpiListTemplate,
       sizeof (EFI_PEI_PPI_DESCRIPTOR)
       );
-    Private->BlkIo2PpiList.Ppi                 = &Private->BlkIo2Ppi;
+    Private->BlkIo2PpiList.Ppi = &Private->BlkIo2Ppi;
     PeiServicesInstallPpi (&Private->BlkIo2PpiList);
 
     if (Private->TrustComputingDevices != 0) {
       DEBUG ((
         DEBUG_INFO,
         "%a: Security Security Command PPI will be produced for Controller %d.\n",
-        __FUNCTION__, Controller
+        __FUNCTION__,
+        Controller
         ));
       Private->StorageSecurityPpi.Revision           = EDKII_STORAGE_SECURITY_PPI_REVISION;
       Private->StorageSecurityPpi.GetNumberofDevices = AhciStorageSecurityGetDeviceNo;
@@ -316,7 +321,7 @@ AtaAhciPeimEntry (
         &mAhciStorageSecurityPpiListTemplate,
         sizeof (EFI_PEI_PPI_DESCRIPTOR)
         );
-      Private->StorageSecurityPpiList.Ppi            = &Private->StorageSecurityPpi;
+      Private->StorageSecurityPpiList.Ppi = &Private->StorageSecurityPpi;
       PeiServicesInstallPpi (&Private->StorageSecurityPpiList);
     }
 
@@ -325,11 +330,13 @@ AtaAhciPeimEntry (
       &mAhciEndOfPeiNotifyListTemplate,
       sizeof (EFI_PEI_NOTIFY_DESCRIPTOR)
       );
-    PeiServicesNotifyPpi  (&Private->EndOfPeiNotifyList);
+    PeiServicesNotifyPpi (&Private->EndOfPeiNotifyList);
 
     DEBUG ((
-      DEBUG_INFO, "%a: Controller %d has been successfully initialized.\n",
-      __FUNCTION__, Controller
+      DEBUG_INFO,
+      "%a: Controller %d has been successfully initialized.\n",
+      __FUNCTION__,
+      Controller
       ));
     Controller++;
   }

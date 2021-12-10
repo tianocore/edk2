@@ -26,6 +26,5 @@ PlatformHookSerialPortInitialize (
   VOID
   )
 {
-  return  RETURN_SUCCESS;
+  return RETURN_SUCCESS;
 }
-

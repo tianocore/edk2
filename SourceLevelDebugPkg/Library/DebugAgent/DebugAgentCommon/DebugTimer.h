@@ -19,8 +19,8 @@
 **/
 UINT32
 InitializeDebugTimer (
-  OUT UINT32     *TimerFrequency,
-  IN  BOOLEAN    DumpFlag
+  OUT UINT32   *TimerFrequency,
+  IN  BOOLEAN  DumpFlag
   );
 
 /**
@@ -36,10 +36,9 @@ InitializeDebugTimer (
 **/
 BOOLEAN
 IsDebugTimerTimeout (
-  IN UINT32                     TimerCycle,
-  IN UINT32                     Timer,
-  IN UINT32                     TimeoutTicker
+  IN UINT32  TimerCycle,
+  IN UINT32  Timer,
+  IN UINT32  TimeoutTicker
   );
 
 #endif
-

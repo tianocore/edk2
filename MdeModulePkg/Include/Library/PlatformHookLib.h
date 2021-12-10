@@ -29,4 +29,3 @@ PlatformHookSerialPortInitialize (
   );
 
 #endif // __PLATFORM_HOOK_LIB__
-

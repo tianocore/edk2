@@ -36,9 +36,9 @@
 EFI_STATUS
 EFIAPI
 RngGetInfo (
-  IN EFI_RNG_PROTOCOL             *This,
-  IN OUT UINTN                    *RNGAlgorithmListSize,
-  OUT EFI_RNG_ALGORITHM           *RNGAlgorithmList
+  IN EFI_RNG_PROTOCOL    *This,
+  IN OUT UINTN           *RNGAlgorithmListSize,
+  OUT EFI_RNG_ALGORITHM  *RNGAlgorithmList
   );
 
 /**
@@ -66,10 +66,10 @@ RngGetInfo (
 EFI_STATUS
 EFIAPI
 RngGetRNG (
-  IN EFI_RNG_PROTOCOL            *This,
-  IN EFI_RNG_ALGORITHM           *RNGAlgorithm, OPTIONAL
-  IN UINTN                       RNGValueLength,
-  OUT UINT8                      *RNGValue
+  IN EFI_RNG_PROTOCOL   *This,
+  IN EFI_RNG_ALGORITHM  *RNGAlgorithm  OPTIONAL,
+  IN UINTN              RNGValueLength,
+  OUT UINT8             *RNGValue
   );
 
 /**
@@ -93,8 +93,8 @@ RngGetRNG (
 UINTN
 EFIAPI
 ArchGetSupportedRngAlgorithms (
-  IN OUT UINTN                     *RNGAlgorithmListSize,
-  OUT    EFI_RNG_ALGORITHM         *RNGAlgorithmList
+  IN OUT UINTN              *RNGAlgorithmListSize,
+  OUT    EFI_RNG_ALGORITHM  *RNGAlgorithmList
   );
 
 /**
@@ -110,8 +110,8 @@ ArchGetSupportedRngAlgorithms (
 EFI_STATUS
 EFIAPI
 RngGetBytes (
-  IN UINTN         Length,
-  OUT UINT8        *RandBuffer
+  IN UINTN   Length,
+  OUT UINT8  *RandBuffer
   );
 
-#endif  // RNGDXE_INTERNALS_H_
+#endif // RNGDXE_INTERNALS_H_

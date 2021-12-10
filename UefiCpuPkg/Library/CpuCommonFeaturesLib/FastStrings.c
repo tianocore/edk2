@@ -30,7 +30,7 @@ EFIAPI
 FastStringsInitialize (
   IN UINTN                             ProcessorNumber,
   IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
-  IN VOID                              *ConfigData,  OPTIONAL
+  IN VOID                              *ConfigData   OPTIONAL,
   IN BOOLEAN                           State
   )
 {
@@ -40,7 +40,8 @@ FastStringsInitialize (
   //
   if (IS_SILVERMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
       IS_GOLDMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
-      IS_PENTIUM_4_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+      IS_PENTIUM_4_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel))
+  {
     if (CpuInfo->ProcessorInfo.Location.Thread != 0) {
       return RETURN_SUCCESS;
     }

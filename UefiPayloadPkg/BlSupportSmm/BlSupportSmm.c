@@ -13,10 +13,10 @@
 
 #include <BlSupportSmm.h>
 
-PLD_S3_COMMUNICATION              mPldS3Hob;
-EFI_SMRAM_HOB_DESCRIPTOR_BLOCK    *mSmramHob         = NULL;
-PLD_SMM_REGISTERS                 *mSmmRegisterHob   = NULL;;
-UINT64                            mSmmFeatureControl = 0;
+PLD_S3_COMMUNICATION            mPldS3Hob;
+EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *mSmramHob         = NULL;
+PLD_SMM_REGISTERS               *mSmmRegisterHob   = NULL;
+UINT64                          mSmmFeatureControl = 0;
 
 /**
   Save SMM rebase and SMI handler information to SMM communication area
@@ -33,24 +33,26 @@ UINT64                            mSmmFeatureControl = 0;
 **/
 EFI_STATUS
 SaveSmmInfoForS3 (
-  IN UINT8                         BlSwSmiHandlerInput
+  IN UINT8  BlSwSmiHandlerInput
   )
 {
-  EFI_STATUS                       Status;
-  EFI_PROCESSOR_INFORMATION        ProcessorInfo;
-  EFI_MP_SERVICES_PROTOCOL         *MpService;
-  CPU_SMMBASE                      *SmmBaseInfo;
-  PLD_TO_BL_SMM_INFO               *PldSmmInfo;
-  UINTN                            Index;
+  EFI_STATUS                 Status;
+  EFI_PROCESSOR_INFORMATION  ProcessorInfo;
+  EFI_MP_SERVICES_PROTOCOL   *MpService;
+  CPU_SMMBASE                *SmmBaseInfo;
+  PLD_TO_BL_SMM_INFO         *PldSmmInfo;
+  UINTN                      Index;
 
-  PldSmmInfo = (PLD_TO_BL_SMM_INFO *)(UINTN)mPldS3Hob.CommBuffer.PhysicalStart;
+  PldSmmInfo                          = (PLD_TO_BL_SMM_INFO *)(UINTN)mPldS3Hob.CommBuffer.PhysicalStart;
   PldSmmInfo->Header.Header.HobLength = (UINT16)(sizeof (PLD_TO_BL_SMM_INFO) + gSmst->NumberOfCpus * sizeof (CPU_SMMBASE));
   for (Index = 0; Index < mSmramHob->NumberOfSmmReservedRegions; Index++) {
     if ((mPldS3Hob.CommBuffer.PhysicalStart >= mSmramHob->Descriptor[Index].PhysicalStart) &&
-        (mPldS3Hob.CommBuffer.PhysicalStart <  mSmramHob->Descriptor[Index].PhysicalStart + mSmramHob->Descriptor[Index].PhysicalSize)) {
+        (mPldS3Hob.CommBuffer.PhysicalStart <  mSmramHob->Descriptor[Index].PhysicalStart + mSmramHob->Descriptor[Index].PhysicalSize))
+    {
       break;
     }
   }
+
   if (Index == mSmramHob->NumberOfSmmReservedRegions) {
     return EFI_NOT_FOUND;
   }
@@ -76,14 +78,15 @@ SaveSmmInfoForS3 (
   // Save APIC ID and SMM base
   //
   Status = gBS->LocateProtocol (&gEfiMpServiceProtocolGuid, NULL, (VOID **)&MpService);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return Status;
   }
-  PldSmmInfo->S3Info.CpuCount         = (UINT32)gSmst->NumberOfCpus;
-  SmmBaseInfo = &PldSmmInfo->S3Info.SmmBase[0];
+
+  PldSmmInfo->S3Info.CpuCount = (UINT32)gSmst->NumberOfCpus;
+  SmmBaseInfo                 = &PldSmmInfo->S3Info.SmmBase[0];
   for (Index = 0; Index < gSmst->NumberOfCpus; Index++) {
     Status = MpService->GetProcessorInfo (MpService, Index, &ProcessorInfo);
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       return Status;
     }
 
@@ -96,7 +99,6 @@ SaveSmmInfoForS3 (
   return EFI_SUCCESS;
 }
 
-
 /**
   Get specified SMI register based on given register ID
 
@@ -108,16 +110,17 @@ SaveSmmInfoForS3 (
 **/
 PLD_GENERIC_REGISTER *
 GetRegisterById (
-  UINT64                Id
+  UINT64  Id
   )
 {
-  UINT32                Index;
+  UINT32  Index;
 
   for (Index = 0; Index < mSmmRegisterHob->Count; Index++) {
     if (mSmmRegisterHob->Registers[Index].Id == Id) {
       return &mSmmRegisterHob->Registers[Index];
     }
   }
+
   return NULL;
 }
 
@@ -130,9 +133,9 @@ LockSmiGlobalEn (
   VOID
   )
 {
-  PLD_GENERIC_REGISTER       *SmiLockReg;
+  PLD_GENERIC_REGISTER  *SmiLockReg;
 
-    DEBUG ((DEBUG_ERROR, "LockSmiGlobalEn .....\n"));
+  DEBUG ((DEBUG_ERROR, "LockSmiGlobalEn .....\n"));
 
   SmiLockReg = GetRegisterById (REGISTER_ID_SMI_GBL_EN_LOCK);
   if (SmiLockReg == NULL) {
@@ -147,7 +150,8 @@ LockSmiGlobalEn (
       (SmiLockReg->Address.Address          != 0) &&
       (SmiLockReg->Address.RegisterBitWidth == 1) &&
       (SmiLockReg->Address.AddressSpaceId   == EFI_ACPI_3_0_SYSTEM_MEMORY) &&
-      (SmiLockReg->Value == 1)) {
+      (SmiLockReg->Value == 1))
+  {
     DEBUG ((DEBUG_ERROR, "LockSmiGlobalEn ....is locked\n"));
 
     MmioOr32 ((UINT32)SmiLockReg->Address.Address, 1 << SmiLockReg->Address.RegisterBitOffset);
@@ -166,22 +170,20 @@ SmmFeatureLockOnS3 (
   VOID
   )
 {
-
   if (mSmmFeatureControl != 0) {
     return;
   }
 
-  mSmmFeatureControl = AsmReadMsr64(MSR_SMM_FEATURE_CONTROL);
+  mSmmFeatureControl = AsmReadMsr64 (MSR_SMM_FEATURE_CONTROL);
   if ((mSmmFeatureControl & 0x5) != 0x5) {
     //
     // Set Lock bit [BIT0] for this register and SMM code check enable bit [BIT2]
     //
     AsmWriteMsr64 (MSR_SMM_FEATURE_CONTROL, mSmmFeatureControl | 0x5);
   }
-  mSmmFeatureControl = AsmReadMsr64(MSR_SMM_FEATURE_CONTROL);
+
+  mSmmFeatureControl = AsmReadMsr64 (MSR_SMM_FEATURE_CONTROL);
 }
-
-
 
 /**
   Function to program SMRR base and mask.
@@ -190,7 +192,7 @@ SmmFeatureLockOnS3 (
 **/
 VOID
 SetSmrr (
-  IN VOID                   *ProcedureArgument
+  IN VOID  *ProcedureArgument
   )
 {
   if (ProcedureArgument != NULL) {
@@ -208,11 +210,11 @@ SetSmrrOnS3 (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  SMRR_BASE_MASK        Arguments;
-  UINTN                 Index;
-  UINT32                SmmBase;
-  UINT32                SmmSize;
+  EFI_STATUS      Status;
+  SMRR_BASE_MASK  Arguments;
+  UINTN           Index;
+  UINT32          SmmBase;
+  UINT32          SmmSize;
 
   if ((AsmReadMsr64 (MSR_IA32_SMRR_PHYSBASE) != 0) && ((AsmReadMsr64 (MSR_IA32_SMRR_PHYSMASK) & BIT11) != 0)) {
     return;
@@ -224,18 +226,19 @@ SetSmrrOnS3 (
     DEBUG ((DEBUG_ERROR, "%d SMM ranges are not supported.\n", mSmramHob->NumberOfSmmReservedRegions));
     return;
   } else if (mSmramHob->NumberOfSmmReservedRegions == 2) {
-    if ((mSmramHob->Descriptor[1].PhysicalStart + mSmramHob->Descriptor[1].PhysicalSize) == SmmBase){
+    if ((mSmramHob->Descriptor[1].PhysicalStart + mSmramHob->Descriptor[1].PhysicalSize) == SmmBase) {
       SmmBase = (UINT32)(UINTN)mSmramHob->Descriptor[1].PhysicalStart;
     } else if (mSmramHob->Descriptor[1].PhysicalStart != (SmmBase + SmmSize)) {
       DEBUG ((DEBUG_ERROR, "Two SMM regions are not continous.\n"));
       return;
     }
+
     SmmSize += (UINT32)(UINTN)mSmramHob->Descriptor[1].PhysicalSize;
   }
 
   if ((SmmBase == 0) || (SmmSize < SIZE_4KB)) {
     DEBUG ((DEBUG_ERROR, "Invalid SMM range.\n"));
-    return ;
+    return;
   }
 
   //
@@ -244,7 +247,7 @@ SetSmrrOnS3 (
   //
   if ((SmmSize != GetPowerOfTwo32 (SmmSize)) || ((SmmBase & ~(SmmSize - 1)) != SmmBase)) {
     DEBUG ((DEBUG_ERROR, " Invalid SMM range.\n"));
-    return ;
+    return;
   }
 
   //
@@ -261,17 +264,16 @@ SetSmrrOnS3 (
   //
   // Program smrr base and mask on BSP first and then on APs
   //
-  SetSmrr(&Arguments);
+  SetSmrr (&Arguments);
   for (Index = 0; Index < gSmst->NumberOfCpus; Index++) {
     if (Index != gSmst->CurrentlyExecutingCpu) {
       Status = gSmst->SmmStartupThisAp (SetSmrr, Index, (VOID *)&Arguments);
-      if (EFI_ERROR(Status)) {
+      if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "Programming SMRR on AP# %d status: %r\n", Index, Status));
       }
     }
   }
 }
-
 
 /**
   Software SMI callback for restoring SMRR base and mask in S3 path.
@@ -289,10 +291,10 @@ SetSmrrOnS3 (
 EFI_STATUS
 EFIAPI
 BlSwSmiHandler (
-  IN EFI_HANDLE                  DispatchHandle,
-  IN CONST VOID                  *Context,
-  IN OUT VOID                    *CommBuffer,
-  IN OUT UINTN                   *CommBufferSize
+  IN EFI_HANDLE  DispatchHandle,
+  IN CONST VOID  *Context,
+  IN OUT VOID    *CommBuffer,
+  IN OUT UINTN   *CommBufferSize
   )
 {
   SetSmrrOnS3 ();
@@ -301,7 +303,6 @@ BlSwSmiHandler (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Lock SMI in this SMM ready to lock event.
@@ -316,9 +317,9 @@ BlSwSmiHandler (
 EFI_STATUS
 EFIAPI
 BlSupportSmmReadyToLockCallback (
-  IN CONST EFI_GUID                       *Protocol,
-  IN VOID                                 *Interface,
-  IN EFI_HANDLE                           Handle
+  IN CONST EFI_GUID  *Protocol,
+  IN VOID            *Interface,
+  IN EFI_HANDLE      Handle
   )
 {
   //
@@ -327,7 +328,6 @@ BlSupportSmmReadyToLockCallback (
   LockSmiGlobalEn ();
   return EFI_SUCCESS;
 }
-
 
 /**
   The driver's entry point.
@@ -342,8 +342,8 @@ BlSupportSmmReadyToLockCallback (
 EFI_STATUS
 EFIAPI
 BlSupportSmm (
-  IN EFI_HANDLE                  ImageHandle,
-  IN EFI_SYSTEM_TABLE            *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS                     Status;
@@ -359,8 +359,8 @@ BlSupportSmm (
   //
   GuidHob = GetFirstGuidHob (&gS3CommunicationGuid);
   if (GuidHob != NULL) {
-    SmmHob = (VOID *) (GET_GUID_HOB_DATA(GuidHob));
-    CopyMem (&mPldS3Hob, SmmHob, GET_GUID_HOB_DATA_SIZE(GuidHob));
+    SmmHob = (VOID *)(GET_GUID_HOB_DATA (GuidHob));
+    CopyMem (&mPldS3Hob, SmmHob, GET_GUID_HOB_DATA_SIZE (GuidHob));
   } else {
     return EFI_NOT_FOUND;
   }
@@ -375,12 +375,13 @@ BlSupportSmm (
   //
   GuidHob = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
   if (GuidHob != NULL) {
-    SmmHob = (VOID *) (GET_GUID_HOB_DATA(GuidHob));
-    mSmramHob = AllocatePool (GET_GUID_HOB_DATA_SIZE(GuidHob));
+    SmmHob    = (VOID *)(GET_GUID_HOB_DATA (GuidHob));
+    mSmramHob = AllocatePool (GET_GUID_HOB_DATA_SIZE (GuidHob));
     if (mSmramHob == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    CopyMem (mSmramHob, SmmHob, GET_GUID_HOB_DATA_SIZE(GuidHob));
+
+    CopyMem (mSmramHob, SmmHob, GET_GUID_HOB_DATA_SIZE (GuidHob));
   } else {
     return EFI_NOT_FOUND;
   }
@@ -390,12 +391,13 @@ BlSupportSmm (
   //
   GuidHob = GetFirstGuidHob (&gSmmRegisterInfoGuid);
   if (GuidHob != NULL) {
-    SmmHob = (VOID *) (GET_GUID_HOB_DATA(GuidHob));
-    mSmmRegisterHob = AllocatePool (GET_GUID_HOB_DATA_SIZE(GuidHob));
+    SmmHob          = (VOID *)(GET_GUID_HOB_DATA (GuidHob));
+    mSmmRegisterHob = AllocatePool (GET_GUID_HOB_DATA_SIZE (GuidHob));
     if (mSmmRegisterHob == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    CopyMem (mSmmRegisterHob, SmmHob, GET_GUID_HOB_DATA_SIZE(GuidHob));
+
+    CopyMem (mSmmRegisterHob, SmmHob, GET_GUID_HOB_DATA_SIZE (GuidHob));
   } else {
     return EFI_NOT_FOUND;
   }
@@ -403,12 +405,13 @@ BlSupportSmm (
   //
   // Get the Sw dispatch protocol and register SMI handler.
   //
-  Status = gSmst->SmmLocateProtocol (&gEfiSmmSwDispatch2ProtocolGuid, NULL, (VOID**)&SwDispatch);
+  Status = gSmst->SmmLocateProtocol (&gEfiSmmSwDispatch2ProtocolGuid, NULL, (VOID **)&SwDispatch);
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  SwContext.SwSmiInputValue = (UINTN) -1;
-  Status = SwDispatch->Register (SwDispatch, BlSwSmiHandler, &SwContext, &SwHandle);
+
+  SwContext.SwSmiInputValue = (UINTN)-1;
+  Status                    = SwDispatch->Register (SwDispatch, BlSwSmiHandler, &SwContext, &SwHandle);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Registering S3 smi handler failed: %r\n", Status));
     return Status;
@@ -428,4 +431,3 @@ BlSupportSmm (
 
   return EFI_SUCCESS;
 }
-

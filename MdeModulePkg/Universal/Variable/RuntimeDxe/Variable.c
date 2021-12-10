@@ -35,35 +35,35 @@ VARIABLE_MODULE_GLOBAL  *mVariableModuleGlobal;
 /// Define a memory cache that improves the search performance for a variable.
 /// For EmuNvMode == TRUE, it will be equal to NonVolatileVariableBase.
 ///
-VARIABLE_STORE_HEADER  *mNvVariableCache      = NULL;
+VARIABLE_STORE_HEADER  *mNvVariableCache = NULL;
 
 ///
 /// Memory cache of Fv Header.
 ///
-EFI_FIRMWARE_VOLUME_HEADER *mNvFvHeaderCache  = NULL;
+EFI_FIRMWARE_VOLUME_HEADER  *mNvFvHeaderCache = NULL;
 
 ///
 /// The memory entry used for variable statistics data.
 ///
-VARIABLE_INFO_ENTRY    *gVariableInfo         = NULL;
+VARIABLE_INFO_ENTRY  *gVariableInfo = NULL;
 
 ///
 /// The flag to indicate whether the platform has left the DXE phase of execution.
 ///
-BOOLEAN                mEndOfDxe              = FALSE;
+BOOLEAN  mEndOfDxe = FALSE;
 
 ///
 /// It indicates the var check request source.
 /// In the implementation, DXE is regarded as untrusted, and SMM is trusted.
 ///
-VAR_CHECK_REQUEST_SOURCE mRequestSource       = VarCheckFromUntrusted;
+VAR_CHECK_REQUEST_SOURCE  mRequestSource = VarCheckFromUntrusted;
 
 //
 // It will record the current boot error flag before EndOfDxe.
 //
-VAR_ERROR_FLAG         mCurrentBootVarErrFlag = VAR_ERROR_FLAG_NO_ERROR;
+VAR_ERROR_FLAG  mCurrentBootVarErrFlag = VAR_ERROR_FLAG_NO_ERROR;
 
-VARIABLE_ENTRY_PROPERTY mVariableEntryProperty[] = {
+VARIABLE_ENTRY_PROPERTY  mVariableEntryProperty[] = {
   {
     &gEdkiiVarErrorFlagGuid,
     VAR_ERROR_FLAG_NAME,
@@ -77,7 +77,7 @@ VARIABLE_ENTRY_PROPERTY mVariableEntryProperty[] = {
   },
 };
 
-AUTH_VAR_LIB_CONTEXT_IN mAuthContextIn = {
+AUTH_VAR_LIB_CONTEXT_IN  mAuthContextIn = {
   AUTH_VAR_LIB_CONTEXT_IN_STRUCT_VERSION,
   //
   // StructSize, TO BE FILLED
@@ -95,7 +95,7 @@ AUTH_VAR_LIB_CONTEXT_IN mAuthContextIn = {
   VariableExLibAtRuntime,
 };
 
-AUTH_VAR_LIB_CONTEXT_OUT mAuthContextOut;
+AUTH_VAR_LIB_CONTEXT_OUT  mAuthContextOut;
 
 /**
 
@@ -129,21 +129,21 @@ UpdateVariableStore (
   IN  UINT8                               *Buffer
   )
 {
-  EFI_FV_BLOCK_MAP_ENTRY      *PtrBlockMapEntry;
-  UINTN                       BlockIndex2;
-  UINTN                       LinearOffset;
-  UINTN                       CurrWriteSize;
-  UINTN                       CurrWritePtr;
-  UINT8                       *CurrBuffer;
-  EFI_LBA                     LbaNumber;
-  UINTN                       Size;
-  VARIABLE_STORE_HEADER       *VolatileBase;
-  EFI_PHYSICAL_ADDRESS        FvVolHdr;
-  EFI_PHYSICAL_ADDRESS        DataPtr;
-  EFI_STATUS                  Status;
+  EFI_FV_BLOCK_MAP_ENTRY  *PtrBlockMapEntry;
+  UINTN                   BlockIndex2;
+  UINTN                   LinearOffset;
+  UINTN                   CurrWriteSize;
+  UINTN                   CurrWritePtr;
+  UINT8                   *CurrBuffer;
+  EFI_LBA                 LbaNumber;
+  UINTN                   Size;
+  VARIABLE_STORE_HEADER   *VolatileBase;
+  EFI_PHYSICAL_ADDRESS    FvVolHdr;
+  EFI_PHYSICAL_ADDRESS    DataPtr;
+  EFI_STATUS              Status;
 
-  FvVolHdr    = 0;
-  DataPtr     = DataPtrIndex;
+  FvVolHdr = 0;
+  DataPtr  = DataPtrIndex;
 
   //
   // Check if the Data is Volatile.
@@ -152,7 +152,8 @@ UpdateVariableStore (
     if (Fvb == NULL) {
       return EFI_UNSUPPORTED;
     }
-    Status = Fvb->GetPhysicalAddress(Fvb, &FvVolHdr);
+
+    Status = Fvb->GetPhysicalAddress (Fvb, &FvVolHdr);
     ASSERT_EFI_ERROR (Status);
 
     //
@@ -172,12 +173,12 @@ UpdateVariableStore (
     // written.
     //
     if (Volatile) {
-      VolatileBase = (VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase);
+      VolatileBase = (VARIABLE_STORE_HEADER *)((UINTN)mVariableModuleGlobal->VariableGlobal.VolatileVariableBase);
       if (SetByIndex) {
         DataPtr += mVariableModuleGlobal->VariableGlobal.VolatileVariableBase;
       }
 
-      if ((DataPtr + DataSize) > ((UINTN) VolatileBase + VolatileBase->Size)) {
+      if ((DataPtr + DataSize) > ((UINTN)VolatileBase + VolatileBase->Size)) {
         return EFI_OUT_OF_RESOURCES;
       }
     } else {
@@ -185,10 +186,10 @@ UpdateVariableStore (
       // Emulated non-volatile variable mode.
       //
       if (SetByIndex) {
-        DataPtr += (UINTN) mNvVariableCache;
+        DataPtr += (UINTN)mNvVariableCache;
       }
 
-      if ((DataPtr + DataSize) > ((UINTN) mNvVariableCache + mNvVariableCache->Size)) {
+      if ((DataPtr + DataSize) > ((UINTN)mNvVariableCache + mNvVariableCache->Size)) {
         return EFI_OUT_OF_RESOURCES;
       }
     }
@@ -203,8 +204,8 @@ UpdateVariableStore (
   //
   // If we are here we are dealing with Non-Volatile Variables.
   //
-  LinearOffset  = (UINTN) FvVolHdr;
-  CurrWritePtr  = (UINTN) DataPtr;
+  LinearOffset  = (UINTN)FvVolHdr;
+  CurrWritePtr  = (UINTN)DataPtr;
   CurrWriteSize = DataSize;
   CurrBuffer    = Buffer;
   LbaNumber     = 0;
@@ -222,22 +223,22 @@ UpdateVariableStore (
       if ((CurrWritePtr >= LinearOffset) && (CurrWritePtr < LinearOffset + PtrBlockMapEntry->Length)) {
         if ((CurrWritePtr + CurrWriteSize) <= (LinearOffset + PtrBlockMapEntry->Length)) {
           Status = Fvb->Write (
-                    Fvb,
-                    LbaNumber,
-                    (UINTN) (CurrWritePtr - LinearOffset),
-                    &CurrWriteSize,
-                    CurrBuffer
-                    );
+                          Fvb,
+                          LbaNumber,
+                          (UINTN)(CurrWritePtr - LinearOffset),
+                          &CurrWriteSize,
+                          CurrBuffer
+                          );
           return Status;
         } else {
-          Size = (UINT32) (LinearOffset + PtrBlockMapEntry->Length - CurrWritePtr);
+          Size   = (UINT32)(LinearOffset + PtrBlockMapEntry->Length - CurrWritePtr);
           Status = Fvb->Write (
-                    Fvb,
-                    LbaNumber,
-                    (UINTN) (CurrWritePtr - LinearOffset),
-                    &Size,
-                    CurrBuffer
-                    );
+                          Fvb,
+                          LbaNumber,
+                          (UINTN)(CurrWritePtr - LinearOffset),
+                          &Size,
+                          CurrBuffer
+                          );
           if (EFI_ERROR (Status)) {
             return Status;
           }
@@ -268,30 +269,31 @@ UpdateVariableStore (
 **/
 VOID
 RecordVarErrorFlag (
-  IN VAR_ERROR_FLAG         Flag,
-  IN CHAR16                 *VariableName,
-  IN EFI_GUID               *VendorGuid,
-  IN UINT32                 Attributes,
-  IN UINTN                  VariableSize
+  IN VAR_ERROR_FLAG  Flag,
+  IN CHAR16          *VariableName,
+  IN EFI_GUID        *VendorGuid,
+  IN UINT32          Attributes,
+  IN UINTN           VariableSize
   )
 {
-  EFI_STATUS                Status;
-  VARIABLE_POINTER_TRACK    Variable;
-  VAR_ERROR_FLAG            *VarErrFlag;
-  VAR_ERROR_FLAG            TempFlag;
+  EFI_STATUS              Status;
+  VARIABLE_POINTER_TRACK  Variable;
+  VAR_ERROR_FLAG          *VarErrFlag;
+  VAR_ERROR_FLAG          TempFlag;
 
-  DEBUG_CODE (
-    DEBUG ((EFI_D_ERROR, "RecordVarErrorFlag (0x%02x) %s:%g - 0x%08x - 0x%x\n", Flag, VariableName, VendorGuid, Attributes, VariableSize));
-    if (Flag == VAR_ERROR_FLAG_SYSTEM_ERROR) {
-      if (AtRuntime ()) {
-        DEBUG ((EFI_D_ERROR, "CommonRuntimeVariableSpace = 0x%x - CommonVariableTotalSize = 0x%x\n", mVariableModuleGlobal->CommonRuntimeVariableSpace, mVariableModuleGlobal->CommonVariableTotalSize));
-      } else {
-        DEBUG ((EFI_D_ERROR, "CommonVariableSpace = 0x%x - CommonVariableTotalSize = 0x%x\n", mVariableModuleGlobal->CommonVariableSpace, mVariableModuleGlobal->CommonVariableTotalSize));
-      }
+  DEBUG_CODE_BEGIN ();
+  DEBUG ((DEBUG_ERROR, "RecordVarErrorFlag (0x%02x) %s:%g - 0x%08x - 0x%x\n", Flag, VariableName, VendorGuid, Attributes, VariableSize));
+  if (Flag == VAR_ERROR_FLAG_SYSTEM_ERROR) {
+    if (AtRuntime ()) {
+      DEBUG ((DEBUG_ERROR, "CommonRuntimeVariableSpace = 0x%x - CommonVariableTotalSize = 0x%x\n", mVariableModuleGlobal->CommonRuntimeVariableSpace, mVariableModuleGlobal->CommonVariableTotalSize));
     } else {
-      DEBUG ((EFI_D_ERROR, "CommonMaxUserVariableSpace = 0x%x - CommonUserVariableTotalSize = 0x%x\n", mVariableModuleGlobal->CommonMaxUserVariableSpace, mVariableModuleGlobal->CommonUserVariableTotalSize));
+      DEBUG ((DEBUG_ERROR, "CommonVariableSpace = 0x%x - CommonVariableTotalSize = 0x%x\n", mVariableModuleGlobal->CommonVariableSpace, mVariableModuleGlobal->CommonVariableTotalSize));
     }
-  );
+  } else {
+    DEBUG ((DEBUG_ERROR, "CommonMaxUserVariableSpace = 0x%x - CommonUserVariableTotalSize = 0x%x\n", mVariableModuleGlobal->CommonMaxUserVariableSpace, mVariableModuleGlobal->CommonUserVariableTotalSize));
+  }
+
+  DEBUG_CODE_END ();
 
   if (!mEndOfDxe) {
     //
@@ -315,18 +317,19 @@ RecordVarErrorFlag (
              FALSE
              );
   if (!EFI_ERROR (Status)) {
-    VarErrFlag = (VAR_ERROR_FLAG *) GetVariableDataPtr (Variable.CurrPtr, mVariableModuleGlobal->VariableGlobal.AuthFormat);
-    TempFlag = *VarErrFlag;
-    TempFlag &= Flag;
+    VarErrFlag = (VAR_ERROR_FLAG *)GetVariableDataPtr (Variable.CurrPtr, mVariableModuleGlobal->VariableGlobal.AuthFormat);
+    TempFlag   = *VarErrFlag;
+    TempFlag  &= Flag;
     if (TempFlag == *VarErrFlag) {
       return;
     }
+
     Status = UpdateVariableStore (
                &mVariableModuleGlobal->VariableGlobal,
                FALSE,
                FALSE,
                mVariableModuleGlobal->FvbInstance,
-               (UINTN) VarErrFlag - (UINTN) mNvVariableCache + (UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
+               (UINTN)VarErrFlag - (UINTN)mNvVariableCache + (UINTN)mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
                sizeof (TempFlag),
                &TempFlag
                );
@@ -335,11 +338,11 @@ RecordVarErrorFlag (
       // Update the data in NV cache.
       //
       *VarErrFlag = TempFlag;
-      Status =  SynchronizeRuntimeVariableCache (
-                  &mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeNvCache,
-                  0,
-                  mNvVariableCache->Size
-                  );
+      Status      =  SynchronizeRuntimeVariableCache (
+                       &mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeNvCache,
+                       0,
+                       mNvVariableCache->Size
+                       );
       ASSERT_EFI_ERROR (Status);
     }
   }
@@ -359,17 +362,17 @@ InitializeVarErrorFlag (
   VOID
   )
 {
-  EFI_STATUS                Status;
-  VARIABLE_POINTER_TRACK    Variable;
-  VAR_ERROR_FLAG            Flag;
-  VAR_ERROR_FLAG            VarErrFlag;
+  EFI_STATUS              Status;
+  VARIABLE_POINTER_TRACK  Variable;
+  VAR_ERROR_FLAG          Flag;
+  VAR_ERROR_FLAG          VarErrFlag;
 
   if (!mEndOfDxe) {
     return;
   }
 
   Flag = mCurrentBootVarErrFlag;
-  DEBUG ((EFI_D_INFO, "Initialize variable error flag (%02x)\n", Flag));
+  DEBUG ((DEBUG_INFO, "Initialize variable error flag (%02x)\n", Flag));
 
   Status = FindVariable (
              VAR_ERROR_FLAG_NAME,
@@ -379,7 +382,7 @@ InitializeVarErrorFlag (
              FALSE
              );
   if (!EFI_ERROR (Status)) {
-    VarErrFlag = *((VAR_ERROR_FLAG *) GetVariableDataPtr (Variable.CurrPtr, mVariableModuleGlobal->VariableGlobal.AuthFormat));
+    VarErrFlag = *((VAR_ERROR_FLAG *)GetVariableDataPtr (Variable.CurrPtr, mVariableModuleGlobal->VariableGlobal.AuthFormat));
     if (VarErrFlag == Flag) {
       return;
     }
@@ -409,10 +412,10 @@ InitializeVarErrorFlag (
 **/
 BOOLEAN
 IsUserVariable (
-  IN VARIABLE_HEADER    *Variable
+  IN VARIABLE_HEADER  *Variable
   )
 {
-  VAR_CHECK_VARIABLE_PROPERTY   Property;
+  VAR_CHECK_VARIABLE_PROPERTY  Property;
 
   //
   // Only after End Of Dxe, the variables belong to system variable are fixed.
@@ -424,10 +427,12 @@ IsUserVariable (
           GetVariableNamePtr (Variable, mVariableModuleGlobal->VariableGlobal.AuthFormat),
           GetVendorGuidPtr (Variable, mVariableModuleGlobal->VariableGlobal.AuthFormat),
           &Property
-          ) == EFI_NOT_FOUND) {
+          ) == EFI_NOT_FOUND)
+    {
       return TRUE;
     }
   }
+
   return FALSE;
 }
 
@@ -440,10 +445,10 @@ CalculateCommonUserVariableTotalSize (
   VOID
   )
 {
-  VARIABLE_HEADER               *Variable;
-  VARIABLE_HEADER               *NextVariable;
-  UINTN                         VariableSize;
-  VAR_CHECK_VARIABLE_PROPERTY   Property;
+  VARIABLE_HEADER              *Variable;
+  VARIABLE_HEADER              *NextVariable;
+  UINTN                        VariableSize;
+  VAR_CHECK_VARIABLE_PROPERTY  Property;
 
   //
   // Only after End Of Dxe, the variables belong to system variable are fixed.
@@ -454,13 +459,14 @@ CalculateCommonUserVariableTotalSize (
     Variable = GetStartPointer (mNvVariableCache);
     while (IsValidVariableHeader (Variable, GetEndPointer (mNvVariableCache))) {
       NextVariable = GetNextVariablePtr (Variable, mVariableModuleGlobal->VariableGlobal.AuthFormat);
-      VariableSize = (UINTN) NextVariable - (UINTN) Variable;
+      VariableSize = (UINTN)NextVariable - (UINTN)Variable;
       if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
         if (VarCheckLibVariablePropertyGet (
               GetVariableNamePtr (Variable, mVariableModuleGlobal->VariableGlobal.AuthFormat),
               GetVendorGuidPtr (Variable, mVariableModuleGlobal->VariableGlobal.AuthFormat),
               &Property
-              ) == EFI_NOT_FOUND) {
+              ) == EFI_NOT_FOUND)
+        {
           //
           // No property, it is user variable.
           //
@@ -509,49 +515,49 @@ InitializeVariableQuota (
 **/
 EFI_STATUS
 Reclaim (
-  IN     EFI_PHYSICAL_ADDRESS         VariableBase,
-  OUT    UINTN                        *LastVariableOffset,
-  IN     BOOLEAN                      IsVolatile,
-  IN OUT VARIABLE_POINTER_TRACK       *UpdatingPtrTrack,
-  IN     VARIABLE_HEADER              *NewVariable,
-  IN     UINTN                        NewVariableSize
+  IN     EFI_PHYSICAL_ADDRESS    VariableBase,
+  OUT    UINTN                   *LastVariableOffset,
+  IN     BOOLEAN                 IsVolatile,
+  IN OUT VARIABLE_POINTER_TRACK  *UpdatingPtrTrack,
+  IN     VARIABLE_HEADER         *NewVariable,
+  IN     UINTN                   NewVariableSize
   )
 {
-  VARIABLE_HEADER       *Variable;
-  VARIABLE_HEADER       *AddedVariable;
-  VARIABLE_HEADER       *NextVariable;
-  VARIABLE_HEADER       *NextAddedVariable;
-  VARIABLE_STORE_HEADER *VariableStoreHeader;
-  UINT8                 *ValidBuffer;
-  UINTN                 MaximumBufferSize;
-  UINTN                 VariableSize;
-  UINTN                 NameSize;
-  UINT8                 *CurrPtr;
-  VOID                  *Point0;
-  VOID                  *Point1;
-  BOOLEAN               FoundAdded;
-  EFI_STATUS            Status;
-  EFI_STATUS            DoneStatus;
-  UINTN                 CommonVariableTotalSize;
-  UINTN                 CommonUserVariableTotalSize;
-  UINTN                 HwErrVariableTotalSize;
-  VARIABLE_HEADER       *UpdatingVariable;
-  VARIABLE_HEADER       *UpdatingInDeletedTransition;
-  BOOLEAN               AuthFormat;
+  VARIABLE_HEADER        *Variable;
+  VARIABLE_HEADER        *AddedVariable;
+  VARIABLE_HEADER        *NextVariable;
+  VARIABLE_HEADER        *NextAddedVariable;
+  VARIABLE_STORE_HEADER  *VariableStoreHeader;
+  UINT8                  *ValidBuffer;
+  UINTN                  MaximumBufferSize;
+  UINTN                  VariableSize;
+  UINTN                  NameSize;
+  UINT8                  *CurrPtr;
+  VOID                   *Point0;
+  VOID                   *Point1;
+  BOOLEAN                FoundAdded;
+  EFI_STATUS             Status;
+  EFI_STATUS             DoneStatus;
+  UINTN                  CommonVariableTotalSize;
+  UINTN                  CommonUserVariableTotalSize;
+  UINTN                  HwErrVariableTotalSize;
+  VARIABLE_HEADER        *UpdatingVariable;
+  VARIABLE_HEADER        *UpdatingInDeletedTransition;
+  BOOLEAN                AuthFormat;
 
-  AuthFormat = mVariableModuleGlobal->VariableGlobal.AuthFormat;
-  UpdatingVariable = NULL;
+  AuthFormat                  = mVariableModuleGlobal->VariableGlobal.AuthFormat;
+  UpdatingVariable            = NULL;
   UpdatingInDeletedTransition = NULL;
   if (UpdatingPtrTrack != NULL) {
-    UpdatingVariable = UpdatingPtrTrack->CurrPtr;
+    UpdatingVariable            = UpdatingPtrTrack->CurrPtr;
     UpdatingInDeletedTransition = UpdatingPtrTrack->InDeletedTransitionPtr;
   }
 
-  VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINTN) VariableBase);
+  VariableStoreHeader = (VARIABLE_STORE_HEADER *)((UINTN)VariableBase);
 
-  CommonVariableTotalSize = 0;
+  CommonVariableTotalSize     = 0;
   CommonUserVariableTotalSize = 0;
-  HwErrVariableTotalSize  = 0;
+  HwErrVariableTotalSize      = 0;
 
   if (IsVolatile || mVariableModuleGlobal->VariableGlobal.EmuNvMode) {
     //
@@ -562,11 +568,12 @@ Reclaim (
 
     while (IsValidVariableHeader (Variable, GetEndPointer (VariableStoreHeader))) {
       NextVariable = GetNextVariablePtr (Variable, AuthFormat);
-      if ((Variable->State == VAR_ADDED || Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) &&
-          Variable != UpdatingVariable &&
-          Variable != UpdatingInDeletedTransition
-         ) {
-        VariableSize = (UINTN) NextVariable - (UINTN) Variable;
+      if (((Variable->State == VAR_ADDED) || (Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED))) &&
+          (Variable != UpdatingVariable) &&
+          (Variable != UpdatingInDeletedTransition)
+          )
+      {
+        VariableSize       = (UINTN)NextVariable - (UINTN)Variable;
         MaximumBufferSize += VariableSize;
       }
 
@@ -585,7 +592,7 @@ Reclaim (
     // end of the variable buffer.
     //
     MaximumBufferSize += 1;
-    ValidBuffer = AllocatePool (MaximumBufferSize);
+    ValidBuffer        = AllocatePool (MaximumBufferSize);
     if (ValidBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -595,7 +602,7 @@ Reclaim (
     // as the buffer to reduce SMRAM consumption for SMM variable driver.
     //
     MaximumBufferSize = mNvVariableCache->Size;
-    ValidBuffer = (UINT8 *) mNvVariableCache;
+    ValidBuffer       = (UINT8 *)mNvVariableCache;
   }
 
   SetMem (ValidBuffer, MaximumBufferSize, 0xff);
@@ -604,7 +611,7 @@ Reclaim (
   // Copy variable store header.
   //
   CopyMem (ValidBuffer, VariableStoreHeader, sizeof (VARIABLE_STORE_HEADER));
-  CurrPtr = (UINT8 *) GetStartPointer ((VARIABLE_STORE_HEADER *) ValidBuffer);
+  CurrPtr = (UINT8 *)GetStartPointer ((VARIABLE_STORE_HEADER *)ValidBuffer);
 
   //
   // Reinstall all ADDED variables as long as they are not identical to Updating Variable.
@@ -612,9 +619,9 @@ Reclaim (
   Variable = GetStartPointer (VariableStoreHeader);
   while (IsValidVariableHeader (Variable, GetEndPointer (VariableStoreHeader))) {
     NextVariable = GetNextVariablePtr (Variable, AuthFormat);
-    if (Variable != UpdatingVariable && Variable->State == VAR_ADDED) {
-      VariableSize = (UINTN) NextVariable - (UINTN) Variable;
-      CopyMem (CurrPtr, (UINT8 *) Variable, VariableSize);
+    if ((Variable != UpdatingVariable) && (Variable->State == VAR_ADDED)) {
+      VariableSize = (UINTN)NextVariable - (UINTN)Variable;
+      CopyMem (CurrPtr, (UINT8 *)Variable, VariableSize);
       CurrPtr += VariableSize;
       if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
         HwErrVariableTotalSize += VariableSize;
@@ -625,6 +632,7 @@ Reclaim (
         }
       }
     }
+
     Variable = NextVariable;
   }
 
@@ -634,40 +642,42 @@ Reclaim (
   Variable = GetStartPointer (VariableStoreHeader);
   while (IsValidVariableHeader (Variable, GetEndPointer (VariableStoreHeader))) {
     NextVariable = GetNextVariablePtr (Variable, AuthFormat);
-    if (Variable != UpdatingVariable && Variable != UpdatingInDeletedTransition && Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
-
+    if ((Variable != UpdatingVariable) && (Variable != UpdatingInDeletedTransition) && (Variable->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED))) {
       //
       // Buffer has cached all ADDED variable.
       // Per IN_DELETED variable, we have to guarantee that
       // no ADDED one in previous buffer.
       //
 
-      FoundAdded = FALSE;
-      AddedVariable = GetStartPointer ((VARIABLE_STORE_HEADER *) ValidBuffer);
-      while (IsValidVariableHeader (AddedVariable, GetEndPointer ((VARIABLE_STORE_HEADER *) ValidBuffer))) {
+      FoundAdded    = FALSE;
+      AddedVariable = GetStartPointer ((VARIABLE_STORE_HEADER *)ValidBuffer);
+      while (IsValidVariableHeader (AddedVariable, GetEndPointer ((VARIABLE_STORE_HEADER *)ValidBuffer))) {
         NextAddedVariable = GetNextVariablePtr (AddedVariable, AuthFormat);
-        NameSize = NameSizeOfVariable (AddedVariable, AuthFormat);
+        NameSize          = NameSizeOfVariable (AddedVariable, AuthFormat);
         if (CompareGuid (
               GetVendorGuidPtr (AddedVariable, AuthFormat),
               GetVendorGuidPtr (Variable, AuthFormat)
-            ) && NameSize == NameSizeOfVariable (Variable, AuthFormat)) {
-          Point0 = (VOID *) GetVariableNamePtr (AddedVariable, AuthFormat);
-          Point1 = (VOID *) GetVariableNamePtr (Variable, AuthFormat);
+              ) && (NameSize == NameSizeOfVariable (Variable, AuthFormat)))
+        {
+          Point0 = (VOID *)GetVariableNamePtr (AddedVariable, AuthFormat);
+          Point1 = (VOID *)GetVariableNamePtr (Variable, AuthFormat);
           if (CompareMem (Point0, Point1, NameSize) == 0) {
             FoundAdded = TRUE;
             break;
           }
         }
+
         AddedVariable = NextAddedVariable;
       }
+
       if (!FoundAdded) {
         //
         // Promote VAR_IN_DELETED_TRANSITION to VAR_ADDED.
         //
-        VariableSize = (UINTN) NextVariable - (UINTN) Variable;
-        CopyMem (CurrPtr, (UINT8 *) Variable, VariableSize);
-        ((VARIABLE_HEADER *) CurrPtr)->State = VAR_ADDED;
-        CurrPtr += VariableSize;
+        VariableSize = (UINTN)NextVariable - (UINTN)Variable;
+        CopyMem (CurrPtr, (UINT8 *)Variable, VariableSize);
+        ((VARIABLE_HEADER *)CurrPtr)->State = VAR_ADDED;
+        CurrPtr                            += VariableSize;
         if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
           HwErrVariableTotalSize += VariableSize;
         } else if ((!IsVolatile) && ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
@@ -686,13 +696,14 @@ Reclaim (
   // Install the new variable if it is not NULL.
   //
   if (NewVariable != NULL) {
-    if (((UINTN) CurrPtr - (UINTN) ValidBuffer) + NewVariableSize > VariableStoreHeader->Size) {
+    if (((UINTN)CurrPtr - (UINTN)ValidBuffer) + NewVariableSize > VariableStoreHeader->Size) {
       //
       // No enough space to store the new variable.
       //
       Status = EFI_OUT_OF_RESOURCES;
       goto Done;
     }
+
     if (!IsVolatile) {
       if ((NewVariable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
         HwErrVariableTotalSize += NewVariableSize;
@@ -702,9 +713,11 @@ Reclaim (
           CommonUserVariableTotalSize += NewVariableSize;
         }
       }
+
       if ((HwErrVariableTotalSize > PcdGet32 (PcdHwErrStorageSize)) ||
           (CommonVariableTotalSize > mVariableModuleGlobal->CommonVariableSpace) ||
-          (CommonUserVariableTotalSize > mVariableModuleGlobal->CommonMaxUserVariableSpace)) {
+          (CommonUserVariableTotalSize > mVariableModuleGlobal->CommonMaxUserVariableSpace))
+      {
         //
         // No enough space to store the new variable by NV or NV+HR attribute.
         //
@@ -713,12 +726,13 @@ Reclaim (
       }
     }
 
-    CopyMem (CurrPtr, (UINT8 *) NewVariable, NewVariableSize);
-    ((VARIABLE_HEADER *) CurrPtr)->State = VAR_ADDED;
+    CopyMem (CurrPtr, (UINT8 *)NewVariable, NewVariableSize);
+    ((VARIABLE_HEADER *)CurrPtr)->State = VAR_ADDED;
     if (UpdatingVariable != NULL) {
-      UpdatingPtrTrack->CurrPtr = (VARIABLE_HEADER *)((UINTN)UpdatingPtrTrack->StartPtr + ((UINTN)CurrPtr - (UINTN)GetStartPointer ((VARIABLE_STORE_HEADER *) ValidBuffer)));
+      UpdatingPtrTrack->CurrPtr                = (VARIABLE_HEADER *)((UINTN)UpdatingPtrTrack->StartPtr + ((UINTN)CurrPtr - (UINTN)GetStartPointer ((VARIABLE_STORE_HEADER *)ValidBuffer)));
       UpdatingPtrTrack->InDeletedTransitionPtr = NULL;
     }
+
     CurrPtr += NewVariableSize;
   }
 
@@ -726,39 +740,40 @@ Reclaim (
     //
     // If volatile/emulated non-volatile variable store, just copy valid buffer.
     //
-    SetMem ((UINT8 *) (UINTN) VariableBase, VariableStoreHeader->Size, 0xff);
-    CopyMem ((UINT8 *) (UINTN) VariableBase, ValidBuffer, (UINTN) CurrPtr - (UINTN) ValidBuffer);
-    *LastVariableOffset = (UINTN) CurrPtr - (UINTN) ValidBuffer;
+    SetMem ((UINT8 *)(UINTN)VariableBase, VariableStoreHeader->Size, 0xff);
+    CopyMem ((UINT8 *)(UINTN)VariableBase, ValidBuffer, (UINTN)CurrPtr - (UINTN)ValidBuffer);
+    *LastVariableOffset = (UINTN)CurrPtr - (UINTN)ValidBuffer;
     if (!IsVolatile) {
       //
       // Emulated non-volatile variable mode.
       //
-      mVariableModuleGlobal->HwErrVariableTotalSize = HwErrVariableTotalSize;
-      mVariableModuleGlobal->CommonVariableTotalSize = CommonVariableTotalSize;
+      mVariableModuleGlobal->HwErrVariableTotalSize      = HwErrVariableTotalSize;
+      mVariableModuleGlobal->CommonVariableTotalSize     = CommonVariableTotalSize;
       mVariableModuleGlobal->CommonUserVariableTotalSize = CommonUserVariableTotalSize;
     }
-    Status  = EFI_SUCCESS;
+
+    Status = EFI_SUCCESS;
   } else {
     //
     // If non-volatile variable store, perform FTW here.
     //
     Status = FtwVariableSpace (
-              VariableBase,
-              (VARIABLE_STORE_HEADER *) ValidBuffer
-              );
+               VariableBase,
+               (VARIABLE_STORE_HEADER *)ValidBuffer
+               );
     if (!EFI_ERROR (Status)) {
-      *LastVariableOffset = (UINTN) CurrPtr - (UINTN) ValidBuffer;
-      mVariableModuleGlobal->HwErrVariableTotalSize = HwErrVariableTotalSize;
-      mVariableModuleGlobal->CommonVariableTotalSize = CommonVariableTotalSize;
+      *LastVariableOffset                                = (UINTN)CurrPtr - (UINTN)ValidBuffer;
+      mVariableModuleGlobal->HwErrVariableTotalSize      = HwErrVariableTotalSize;
+      mVariableModuleGlobal->CommonVariableTotalSize     = CommonVariableTotalSize;
       mVariableModuleGlobal->CommonUserVariableTotalSize = CommonUserVariableTotalSize;
     } else {
-      mVariableModuleGlobal->HwErrVariableTotalSize = 0;
-      mVariableModuleGlobal->CommonVariableTotalSize = 0;
+      mVariableModuleGlobal->HwErrVariableTotalSize      = 0;
+      mVariableModuleGlobal->CommonVariableTotalSize     = 0;
       mVariableModuleGlobal->CommonUserVariableTotalSize = 0;
-      Variable = GetStartPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableBase);
+      Variable                                           = GetStartPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableBase);
       while (IsValidVariableHeader (Variable, GetEndPointer ((VARIABLE_STORE_HEADER *)(UINTN)VariableBase))) {
         NextVariable = GetNextVariablePtr (Variable, AuthFormat);
-        VariableSize = (UINTN) NextVariable - (UINTN) Variable;
+        VariableSize = (UINTN)NextVariable - (UINTN)Variable;
         if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
           mVariableModuleGlobal->HwErrVariableTotalSize += VariableSize;
         } else if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
@@ -770,7 +785,8 @@ Reclaim (
 
         Variable = NextVariable;
       }
-      *LastVariableOffset = (UINTN) Variable - (UINTN) VariableBase;
+
+      *LastVariableOffset = (UINTN)Variable - (UINTN)VariableBase;
     }
   }
 
@@ -788,7 +804,7 @@ Done:
     //
     // For NV variable reclaim, we use mNvVariableCache as the buffer, so copy the data back.
     //
-    CopyMem (mNvVariableCache, (UINT8 *) (UINTN) VariableBase, VariableStoreHeader->Size);
+    CopyMem (mNvVariableCache, (UINT8 *)(UINTN)VariableBase, VariableStoreHeader->Size);
     DoneStatus = SynchronizeRuntimeVariableCache (
                    &mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeNvCache,
                    0,
@@ -839,11 +855,11 @@ FindVariable (
   IN  BOOLEAN                 IgnoreRtCheck
   )
 {
-  EFI_STATUS              Status;
-  VARIABLE_STORE_HEADER   *VariableStoreHeader[VariableStoreTypeMax];
-  VARIABLE_STORE_TYPE     Type;
+  EFI_STATUS             Status;
+  VARIABLE_STORE_HEADER  *VariableStoreHeader[VariableStoreTypeMax];
+  VARIABLE_STORE_TYPE    Type;
 
-  if (VariableName[0] != 0 && VendorGuid == NULL) {
+  if ((VariableName[0] != 0) && (VendorGuid == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -852,21 +868,21 @@ FindVariable (
   // The index and attributes mapping must be kept in this order as RuntimeServiceGetNextVariableName
   // make use of this mapping to implement search algorithm.
   //
-  VariableStoreHeader[VariableStoreTypeVolatile] = (VARIABLE_STORE_HEADER *) (UINTN) Global->VolatileVariableBase;
-  VariableStoreHeader[VariableStoreTypeHob]      = (VARIABLE_STORE_HEADER *) (UINTN) Global->HobVariableBase;
+  VariableStoreHeader[VariableStoreTypeVolatile] = (VARIABLE_STORE_HEADER *)(UINTN)Global->VolatileVariableBase;
+  VariableStoreHeader[VariableStoreTypeHob]      = (VARIABLE_STORE_HEADER *)(UINTN)Global->HobVariableBase;
   VariableStoreHeader[VariableStoreTypeNv]       = mNvVariableCache;
 
   //
   // Find the variable by walk through HOB, volatile and non-volatile variable store.
   //
-  for (Type = (VARIABLE_STORE_TYPE) 0; Type < VariableStoreTypeMax; Type++) {
+  for (Type = (VARIABLE_STORE_TYPE)0; Type < VariableStoreTypeMax; Type++) {
     if (VariableStoreHeader[Type] == NULL) {
       continue;
     }
 
     PtrTrack->StartPtr = GetStartPointer (VariableStoreHeader[Type]);
-    PtrTrack->EndPtr   = GetEndPointer   (VariableStoreHeader[Type]);
-    PtrTrack->Volatile = (BOOLEAN) (Type == VariableStoreTypeVolatile);
+    PtrTrack->EndPtr   = GetEndPointer (VariableStoreHeader[Type]);
+    PtrTrack->Volatile = (BOOLEAN)(Type == VariableStoreTypeVolatile);
 
     Status =  FindVariableEx (
                 VariableName,
@@ -879,6 +895,7 @@ FindVariable (
       return Status;
     }
   }
+
   return EFI_NOT_FOUND;
 }
 
@@ -909,15 +926,15 @@ FindVariable (
 
 **/
 UINTN
-GetIndexFromSupportedLangCodes(
-  IN  CHAR8            *SupportedLang,
-  IN  CHAR8            *Lang,
-  IN  BOOLEAN          Iso639Language
+GetIndexFromSupportedLangCodes (
+  IN  CHAR8    *SupportedLang,
+  IN  CHAR8    *Lang,
+  IN  BOOLEAN  Iso639Language
   )
 {
-  UINTN    Index;
-  UINTN    CompareLength;
-  UINTN    LanguageLength;
+  UINTN  Index;
+  UINTN  CompareLength;
+  UINTN  LanguageLength;
 
   if (Iso639Language) {
     CompareLength = ISO_639_2_ENTRY_SIZE;
@@ -930,6 +947,7 @@ GetIndexFromSupportedLangCodes(
         return Index;
       }
     }
+
     ASSERT (FALSE);
     return 0;
   } else {
@@ -937,26 +955,32 @@ GetIndexFromSupportedLangCodes(
     // Compare RFC4646 language code
     //
     Index = 0;
-    for (LanguageLength = 0; Lang[LanguageLength] != '\0'; LanguageLength++);
+    for (LanguageLength = 0; Lang[LanguageLength] != '\0'; LanguageLength++) {
+    }
 
     for (Index = 0; *SupportedLang != '\0'; Index++, SupportedLang += CompareLength) {
       //
       // Skip ';' characters in SupportedLang
       //
-      for (; *SupportedLang != '\0' && *SupportedLang == ';'; SupportedLang++);
+      for ( ; *SupportedLang != '\0' && *SupportedLang == ';'; SupportedLang++) {
+      }
+
       //
       // Determine the length of the next language code in SupportedLang
       //
-      for (CompareLength = 0; SupportedLang[CompareLength] != '\0' && SupportedLang[CompareLength] != ';'; CompareLength++);
+      for (CompareLength = 0; SupportedLang[CompareLength] != '\0' && SupportedLang[CompareLength] != ';'; CompareLength++) {
+      }
 
       if ((CompareLength == LanguageLength) &&
-          (AsciiStrnCmp (Lang, SupportedLang, CompareLength) == 0)) {
+          (AsciiStrnCmp (Lang, SupportedLang, CompareLength) == 0))
+      {
         //
         // Successfully find the index of Lang string in SupportedLang string.
         //
         return Index;
       }
     }
+
     ASSERT (FALSE);
     return 0;
   }
@@ -990,14 +1014,14 @@ GetIndexFromSupportedLangCodes(
 **/
 CHAR8 *
 GetLangFromSupportedLangCodes (
-  IN  CHAR8            *SupportedLang,
-  IN  UINTN            Index,
-  IN  BOOLEAN          Iso639Language
-)
+  IN  CHAR8    *SupportedLang,
+  IN  UINTN    Index,
+  IN  BOOLEAN  Iso639Language
+  )
 {
-  UINTN    SubIndex;
-  UINTN    CompareLength;
-  CHAR8    *Supported;
+  UINTN  SubIndex;
+  UINTN  CompareLength;
+  CHAR8  *Supported;
 
   SubIndex  = 0;
   Supported = SupportedLang;
@@ -1007,10 +1031,9 @@ GetLangFromSupportedLangCodes (
     // This code will be invoked in RUNTIME, therefore there is not a memory allocate/free operation.
     // In driver entry, it pre-allocates a runtime attribute memory to accommodate this string.
     //
-    CompareLength = ISO_639_2_ENTRY_SIZE;
+    CompareLength                              = ISO_639_2_ENTRY_SIZE;
     mVariableModuleGlobal->Lang[CompareLength] = '\0';
     return CopyMem (mVariableModuleGlobal->Lang, SupportedLang + Index * CompareLength, CompareLength);
-
   } else {
     while (TRUE) {
       //
@@ -1019,14 +1042,16 @@ GetLangFromSupportedLangCodes (
       for (CompareLength = 0; *Supported != ';' && *Supported != '\0'; CompareLength++) {
         Supported++;
       }
+
       if ((*Supported == '\0') && (SubIndex != Index)) {
         //
         // Have completed the traverse, but not find corrsponding string.
         // This case is not allowed to happen.
         //
-        ASSERT(FALSE);
+        ASSERT (FALSE);
         return NULL;
       }
+
       if (SubIndex == Index) {
         //
         // According to the index of Lang string in SupportedLang string to get the language.
@@ -1036,12 +1061,14 @@ GetLangFromSupportedLangCodes (
         mVariableModuleGlobal->PlatformLang[CompareLength] = '\0';
         return CopyMem (mVariableModuleGlobal->PlatformLang, Supported - CompareLength, CompareLength);
       }
+
       SubIndex++;
 
       //
       // Skip ';' characters in Supported
       //
-      for (; *Supported != '\0' && *Supported == ';'; Supported++);
+      for ( ; *Supported != '\0' && *Supported == ';'; Supported++) {
+      }
     }
   }
 }
@@ -1116,7 +1143,8 @@ VariableGetBestLanguage (
     // If in RFC 4646 mode, then determine the length of the first RFC 4646 language code in Language
     //
     if (Iso639Language == 0) {
-      for (LanguageLength = 0; Language[LanguageLength] != 0 && Language[LanguageLength] != ';'; LanguageLength++);
+      for (LanguageLength = 0; Language[LanguageLength] != 0 && Language[LanguageLength] != ';'; LanguageLength++) {
+      }
     }
 
     //
@@ -1134,11 +1162,15 @@ VariableGetBestLanguage (
           //
           // Skip ';' characters in Supported
           //
-          for (; *Supported != '\0' && *Supported == ';'; Supported++);
+          for ( ; *Supported != '\0' && *Supported == ';'; Supported++) {
+          }
+
           //
           // Determine the length of the next language code in Supported
           //
-          for (CompareLength = 0; Supported[CompareLength] != 0 && Supported[CompareLength] != ';'; CompareLength++);
+          for (CompareLength = 0; Supported[CompareLength] != 0 && Supported[CompareLength] != ';'; CompareLength++) {
+          }
+
           //
           // If Language is longer than the Supported, then skip to the next language
           //
@@ -1146,13 +1178,14 @@ VariableGetBestLanguage (
             continue;
           }
         }
+
         //
         // See if the first LanguageLength characters in Supported match Language
         //
         if (AsciiStrnCmp (Supported, Language, LanguageLength) == 0) {
           VA_END (Args);
 
-          Buffer = (Iso639Language != 0) ? mVariableModuleGlobal->Lang : mVariableModuleGlobal->PlatformLang;
+          Buffer                = (Iso639Language != 0) ? mVariableModuleGlobal->Lang : mVariableModuleGlobal->PlatformLang;
           Buffer[CompareLength] = '\0';
           return CopyMem (Buffer, Supported, CompareLength);
         }
@@ -1167,10 +1200,12 @@ VariableGetBestLanguage (
         //
         // If RFC 4646 mode, then trim Language from the right to the next '-' character
         //
-        for (LanguageLength--; LanguageLength > 0 && Language[LanguageLength] != '-'; LanguageLength--);
+        for (LanguageLength--; LanguageLength > 0 && Language[LanguageLength] != '-'; LanguageLength--) {
+        }
       }
     }
   }
+
   VA_END (Args);
 
   //
@@ -1202,23 +1237,23 @@ VariableGetBestLanguage (
 BOOLEAN
 EFIAPI
 CheckRemainingSpaceForConsistencyInternal (
-  IN UINT32                     Attributes,
-  IN VA_LIST                    Marker
+  IN UINT32   Attributes,
+  IN VA_LIST  Marker
   )
 {
-  EFI_STATUS                    Status;
-  VA_LIST                       Args;
-  VARIABLE_ENTRY_CONSISTENCY    *VariableEntry;
-  UINT64                        MaximumVariableStorageSize;
-  UINT64                        RemainingVariableStorageSize;
-  UINT64                        MaximumVariableSize;
-  UINTN                         TotalNeededSize;
-  UINTN                         OriginalVarSize;
-  VARIABLE_STORE_HEADER         *VariableStoreHeader;
-  VARIABLE_POINTER_TRACK        VariablePtrTrack;
-  VARIABLE_HEADER               *NextVariable;
-  UINTN                         VarNameSize;
-  UINTN                         VarDataSize;
+  EFI_STATUS                  Status;
+  VA_LIST                     Args;
+  VARIABLE_ENTRY_CONSISTENCY  *VariableEntry;
+  UINT64                      MaximumVariableStorageSize;
+  UINT64                      RemainingVariableStorageSize;
+  UINT64                      MaximumVariableSize;
+  UINTN                       TotalNeededSize;
+  UINTN                       OriginalVarSize;
+  VARIABLE_STORE_HEADER       *VariableStoreHeader;
+  VARIABLE_POINTER_TRACK      VariablePtrTrack;
+  VARIABLE_HEADER             *NextVariable;
+  UINTN                       VarNameSize;
+  UINTN                       VarDataSize;
 
   //
   // Non-Volatile related.
@@ -1240,10 +1275,10 @@ CheckRemainingSpaceForConsistencyInternal (
     //
     // Calculate variable total size.
     //
-    VarNameSize  = StrSize (VariableEntry->Name);
-    VarNameSize += GET_PAD_SIZE (VarNameSize);
-    VarDataSize  = VariableEntry->VariableSize;
-    VarDataSize += GET_PAD_SIZE (VarDataSize);
+    VarNameSize                 = StrSize (VariableEntry->Name);
+    VarNameSize                += GET_PAD_SIZE (VarNameSize);
+    VarDataSize                 = VariableEntry->VariableSize;
+    VarDataSize                += GET_PAD_SIZE (VarDataSize);
     VariableEntry->VariableSize = HEADER_ALIGN (
                                     GetVariableHeaderSize (
                                       mVariableModuleGlobal->VariableGlobal.AuthFormat
@@ -1251,9 +1286,10 @@ CheckRemainingSpaceForConsistencyInternal (
                                     );
 
     TotalNeededSize += VariableEntry->VariableSize;
-    VariableEntry = VA_ARG (Args, VARIABLE_ENTRY_CONSISTENCY *);
+    VariableEntry    = VA_ARG (Args, VARIABLE_ENTRY_CONSISTENCY *);
   }
-  VA_END  (Args);
+
+  VA_END (Args);
 
   if (RemainingVariableStorageSize >= TotalNeededSize) {
     //
@@ -1274,27 +1310,28 @@ CheckRemainingSpaceForConsistencyInternal (
     //
     // Check if Variable[Index] has been present and get its size.
     //
-    OriginalVarSize = 0;
+    OriginalVarSize           = 0;
     VariablePtrTrack.StartPtr = GetStartPointer (VariableStoreHeader);
-    VariablePtrTrack.EndPtr   = GetEndPointer   (VariableStoreHeader);
-    Status = FindVariableEx (
-               VariableEntry->Name,
-               VariableEntry->Guid,
-               FALSE,
-               &VariablePtrTrack,
-               mVariableModuleGlobal->VariableGlobal.AuthFormat
-               );
+    VariablePtrTrack.EndPtr   = GetEndPointer (VariableStoreHeader);
+    Status                    = FindVariableEx (
+                                  VariableEntry->Name,
+                                  VariableEntry->Guid,
+                                  FALSE,
+                                  &VariablePtrTrack,
+                                  mVariableModuleGlobal->VariableGlobal.AuthFormat
+                                  );
     if (!EFI_ERROR (Status)) {
       //
       // Get size of Variable[Index].
       //
-      NextVariable = GetNextVariablePtr (VariablePtrTrack.CurrPtr, mVariableModuleGlobal->VariableGlobal.AuthFormat);
-      OriginalVarSize = (UINTN) NextVariable - (UINTN) VariablePtrTrack.CurrPtr;
+      NextVariable    = GetNextVariablePtr (VariablePtrTrack.CurrPtr, mVariableModuleGlobal->VariableGlobal.AuthFormat);
+      OriginalVarSize = (UINTN)NextVariable - (UINTN)VariablePtrTrack.CurrPtr;
       //
       // Add the original size of Variable[Index] to remaining variable storage size.
       //
       RemainingVariableStorageSize += OriginalVarSize;
     }
+
     if (VariableEntry->VariableSize > RemainingVariableStorageSize) {
       //
       // No enough space for Variable[Index].
@@ -1302,13 +1339,15 @@ CheckRemainingSpaceForConsistencyInternal (
       VA_END (Args);
       return FALSE;
     }
+
     //
     // Sub the (new) size of Variable[Index] from remaining variable storage size.
     //
     RemainingVariableStorageSize -= VariableEntry->VariableSize;
-    VariableEntry = VA_ARG (Args, VARIABLE_ENTRY_CONSISTENCY *);
+    VariableEntry                 = VA_ARG (Args, VARIABLE_ENTRY_CONSISTENCY *);
   }
-  VA_END  (Args);
+
+  VA_END (Args);
 
   return TRUE;
 }
@@ -1335,12 +1374,12 @@ CheckRemainingSpaceForConsistencyInternal (
 BOOLEAN
 EFIAPI
 CheckRemainingSpaceForConsistency (
-  IN UINT32                     Attributes,
+  IN UINT32  Attributes,
   ...
   )
 {
-  VA_LIST Marker;
-  BOOLEAN Return;
+  VA_LIST  Marker;
+  BOOLEAN  Return;
 
   VA_START (Marker, Attributes);
 
@@ -1373,19 +1412,19 @@ CheckRemainingSpaceForConsistency (
 **/
 EFI_STATUS
 AutoUpdateLangVariable (
-  IN  CHAR16             *VariableName,
-  IN  VOID               *Data,
-  IN  UINTN              DataSize
+  IN  CHAR16  *VariableName,
+  IN  VOID    *Data,
+  IN  UINTN   DataSize
   )
 {
-  EFI_STATUS             Status;
-  CHAR8                  *BestPlatformLang;
-  CHAR8                  *BestLang;
-  UINTN                  Index;
-  UINT32                 Attributes;
-  VARIABLE_POINTER_TRACK Variable;
-  BOOLEAN                SetLanguageCodes;
-  VARIABLE_ENTRY_CONSISTENCY VariableEntry[2];
+  EFI_STATUS                  Status;
+  CHAR8                       *BestPlatformLang;
+  CHAR8                       *BestLang;
+  UINTN                       Index;
+  UINT32                      Attributes;
+  VARIABLE_POINTER_TRACK      Variable;
+  BOOLEAN                     SetLanguageCodes;
+  VARIABLE_ENTRY_CONSISTENCY  VariableEntry[2];
 
   //
   // Don't do updates for delete operation
@@ -1413,6 +1452,7 @@ AutoUpdateLangVariable (
     if (mVariableModuleGlobal->PlatformLangCodes != NULL) {
       FreePool (mVariableModuleGlobal->PlatformLangCodes);
     }
+
     mVariableModuleGlobal->PlatformLangCodes = AllocateRuntimeCopyPool (DataSize, Data);
     ASSERT (mVariableModuleGlobal->PlatformLangCodes != NULL);
 
@@ -1423,9 +1463,9 @@ AutoUpdateLangVariable (
     if (mVariableModuleGlobal->PlatformLang != NULL) {
       FreePool (mVariableModuleGlobal->PlatformLang);
     }
+
     mVariableModuleGlobal->PlatformLang = AllocateRuntimePool (DataSize);
     ASSERT (mVariableModuleGlobal->PlatformLang != NULL);
-
   } else if (StrCmp (VariableName, EFI_LANG_CODES_VARIABLE_NAME) == 0) {
     //
     // LangCodes is a volatile variable, so it can not be updated at runtime.
@@ -1443,13 +1483,15 @@ AutoUpdateLangVariable (
     if (mVariableModuleGlobal->LangCodes != NULL) {
       FreePool (mVariableModuleGlobal->LangCodes);
     }
+
     mVariableModuleGlobal->LangCodes = AllocateRuntimeCopyPool (DataSize, Data);
     ASSERT (mVariableModuleGlobal->LangCodes != NULL);
   }
 
-  if (SetLanguageCodes
-      && (mVariableModuleGlobal->PlatformLangCodes != NULL)
-      && (mVariableModuleGlobal->LangCodes != NULL)) {
+  if (  SetLanguageCodes
+     && (mVariableModuleGlobal->PlatformLangCodes != NULL)
+     && (mVariableModuleGlobal->LangCodes != NULL))
+  {
     //
     // Update Lang if PlatformLang is already set
     // Update PlatformLang if Lang is already set
@@ -1511,12 +1553,12 @@ AutoUpdateLangVariable (
         // Check the variable space for both Lang and PlatformLang variable.
         //
         VariableEntry[0].VariableSize = ISO_639_2_ENTRY_SIZE + 1;
-        VariableEntry[0].Guid = &gEfiGlobalVariableGuid;
-        VariableEntry[0].Name = EFI_LANG_VARIABLE_NAME;
+        VariableEntry[0].Guid         = &gEfiGlobalVariableGuid;
+        VariableEntry[0].Name         = EFI_LANG_VARIABLE_NAME;
 
         VariableEntry[1].VariableSize = AsciiStrSize (BestPlatformLang);
-        VariableEntry[1].Guid = &gEfiGlobalVariableGuid;
-        VariableEntry[1].Name = EFI_PLATFORM_LANG_VARIABLE_NAME;
+        VariableEntry[1].Guid         = &gEfiGlobalVariableGuid;
+        VariableEntry[1].Name         = EFI_PLATFORM_LANG_VARIABLE_NAME;
         if (!CheckRemainingSpaceForConsistency (VARIABLE_ATTRIBUTE_NV_BS_RT, &VariableEntry[0], &VariableEntry[1], NULL)) {
           //
           // No enough variable space to set both Lang and PlatformLang successfully.
@@ -1528,14 +1570,22 @@ AutoUpdateLangVariable (
           //
           FindVariable (EFI_LANG_VARIABLE_NAME, &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
 
-          Status = UpdateVariable (EFI_LANG_VARIABLE_NAME, &gEfiGlobalVariableGuid, BestLang,
-                                   ISO_639_2_ENTRY_SIZE + 1, Attributes, 0, 0, &Variable, NULL);
+          Status = UpdateVariable (
+                     EFI_LANG_VARIABLE_NAME,
+                     &gEfiGlobalVariableGuid,
+                     BestLang,
+                     ISO_639_2_ENTRY_SIZE + 1,
+                     Attributes,
+                     0,
+                     0,
+                     &Variable,
+                     NULL
+                     );
         }
 
-        DEBUG ((EFI_D_INFO, "Variable Driver Auto Update PlatformLang, PlatformLang:%a, Lang:%a Status: %r\n", BestPlatformLang, BestLang, Status));
+        DEBUG ((DEBUG_INFO, "Variable Driver Auto Update PlatformLang, PlatformLang:%a, Lang:%a Status: %r\n", BestPlatformLang, BestLang, Status));
       }
     }
-
   } else if (StrCmp (VariableName, EFI_LANG_VARIABLE_NAME) == 0) {
     //
     // Update PlatformLang when PlatformLangCodes/LangCodes were set.
@@ -1560,12 +1610,12 @@ AutoUpdateLangVariable (
         // Check the variable space for both PlatformLang and Lang variable.
         //
         VariableEntry[0].VariableSize = AsciiStrSize (BestPlatformLang);
-        VariableEntry[0].Guid = &gEfiGlobalVariableGuid;
-        VariableEntry[0].Name = EFI_PLATFORM_LANG_VARIABLE_NAME;
+        VariableEntry[0].Guid         = &gEfiGlobalVariableGuid;
+        VariableEntry[0].Name         = EFI_PLATFORM_LANG_VARIABLE_NAME;
 
         VariableEntry[1].VariableSize = ISO_639_2_ENTRY_SIZE + 1;
-        VariableEntry[1].Guid = &gEfiGlobalVariableGuid;
-        VariableEntry[1].Name = EFI_LANG_VARIABLE_NAME;
+        VariableEntry[1].Guid         = &gEfiGlobalVariableGuid;
+        VariableEntry[1].Name         = EFI_LANG_VARIABLE_NAME;
         if (!CheckRemainingSpaceForConsistency (VARIABLE_ATTRIBUTE_NV_BS_RT, &VariableEntry[0], &VariableEntry[1], NULL)) {
           //
           // No enough variable space to set both PlatformLang and Lang successfully.
@@ -1577,11 +1627,20 @@ AutoUpdateLangVariable (
           //
           FindVariable (EFI_PLATFORM_LANG_VARIABLE_NAME, &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
 
-          Status = UpdateVariable (EFI_PLATFORM_LANG_VARIABLE_NAME, &gEfiGlobalVariableGuid, BestPlatformLang,
-                                   AsciiStrSize (BestPlatformLang), Attributes, 0, 0, &Variable, NULL);
+          Status = UpdateVariable (
+                     EFI_PLATFORM_LANG_VARIABLE_NAME,
+                     &gEfiGlobalVariableGuid,
+                     BestPlatformLang,
+                     AsciiStrSize (BestPlatformLang),
+                     Attributes,
+                     0,
+                     0,
+                     &Variable,
+                     NULL
+                     );
         }
 
-        DEBUG ((EFI_D_INFO, "Variable Driver Auto Update Lang, Lang:%a, PlatformLang:%a Status: %r\n", BestLang, BestPlatformLang, Status));
+        DEBUG ((DEBUG_INFO, "Variable Driver Auto Update Lang, Lang:%a, PlatformLang:%a Status: %r\n", BestLang, BestPlatformLang, Status));
       }
     }
   }
@@ -1616,15 +1675,15 @@ AutoUpdateLangVariable (
 **/
 EFI_STATUS
 UpdateVariable (
-  IN      CHAR16                      *VariableName,
-  IN      EFI_GUID                    *VendorGuid,
-  IN      VOID                        *Data,
-  IN      UINTN                       DataSize,
-  IN      UINT32                      Attributes      OPTIONAL,
-  IN      UINT32                      KeyIndex        OPTIONAL,
-  IN      UINT64                      MonotonicCount  OPTIONAL,
-  IN OUT  VARIABLE_POINTER_TRACK      *CacheVariable,
-  IN      EFI_TIME                    *TimeStamp      OPTIONAL
+  IN      CHAR16                  *VariableName,
+  IN      EFI_GUID                *VendorGuid,
+  IN      VOID                    *Data,
+  IN      UINTN                   DataSize,
+  IN      UINT32                  Attributes      OPTIONAL,
+  IN      UINT32                  KeyIndex        OPTIONAL,
+  IN      UINT64                  MonotonicCount  OPTIONAL,
+  IN OUT  VARIABLE_POINTER_TRACK  *CacheVariable,
+  IN      EFI_TIME                *TimeStamp      OPTIONAL
   )
 {
   EFI_STATUS                          Status;
@@ -1651,7 +1710,7 @@ UpdateVariable (
   AUTHENTICATED_VARIABLE_HEADER       *AuthVariable;
   BOOLEAN                             AuthFormat;
 
-  if (mVariableModuleGlobal->FvbInstance == NULL && !mVariableModuleGlobal->VariableGlobal.EmuNvMode) {
+  if ((mVariableModuleGlobal->FvbInstance == NULL) && !mVariableModuleGlobal->VariableGlobal.EmuNvMode) {
     //
     // The FVB protocol is not ready, so the EFI_VARIABLE_WRITE_ARCH_PROTOCOL is not installed.
     //
@@ -1659,14 +1718,14 @@ UpdateVariable (
       //
       // Trying to update NV variable prior to the installation of EFI_VARIABLE_WRITE_ARCH_PROTOCOL
       //
-      DEBUG ((EFI_D_ERROR, "Update NV variable before EFI_VARIABLE_WRITE_ARCH_PROTOCOL ready - %r\n", EFI_NOT_AVAILABLE_YET));
+      DEBUG ((DEBUG_ERROR, "Update NV variable before EFI_VARIABLE_WRITE_ARCH_PROTOCOL ready - %r\n", EFI_NOT_AVAILABLE_YET));
       return EFI_NOT_AVAILABLE_YET;
     } else if ((Attributes & VARIABLE_ATTRIBUTE_AT_AW) != 0) {
       //
       // Trying to update volatile authenticated variable prior to the installation of EFI_VARIABLE_WRITE_ARCH_PROTOCOL
       // The authenticated variable perhaps is not initialized, just return here.
       //
-      DEBUG ((EFI_D_ERROR, "Update AUTH variable before EFI_VARIABLE_WRITE_ARCH_PROTOCOL ready - %r\n", EFI_NOT_AVAILABLE_YET));
+      DEBUG ((DEBUG_ERROR, "Update AUTH variable before EFI_VARIABLE_WRITE_ARCH_PROTOCOL ready - %r\n", EFI_NOT_AVAILABLE_YET));
       return EFI_NOT_AVAILABLE_YET;
     }
   }
@@ -1679,13 +1738,14 @@ UpdateVariable (
   //
   if ((CacheVariable->CurrPtr != NULL) &&
       (mVariableModuleGlobal->VariableGlobal.HobVariableBase != 0) &&
-      (CacheVariable->StartPtr == GetStartPointer ((VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase))
-     ) {
+      (CacheVariable->StartPtr == GetStartPointer ((VARIABLE_STORE_HEADER *)(UINTN)mVariableModuleGlobal->VariableGlobal.HobVariableBase))
+      )
+  {
     CacheVariable->StartPtr = GetStartPointer (mNvVariableCache);
-    CacheVariable->EndPtr   = GetEndPointer   (mNvVariableCache);
+    CacheVariable->EndPtr   = GetEndPointer (mNvVariableCache);
     CacheVariable->Volatile = FALSE;
-    Status = FindVariableEx (VariableName, VendorGuid, FALSE, CacheVariable, AuthFormat);
-    if (CacheVariable->CurrPtr == NULL || EFI_ERROR (Status)) {
+    Status                  = FindVariableEx (VariableName, VendorGuid, FALSE, CacheVariable, AuthFormat);
+    if ((CacheVariable->CurrPtr == NULL) || EFI_ERROR (Status)) {
       //
       // There is no matched variable in NV variable cache.
       //
@@ -1710,28 +1770,29 @@ UpdateVariable (
     // CacheVariable points to the variable in the memory copy of Flash area
     // Now let Variable points to the same variable in Flash area.
     //
-    VariableStoreHeader  = (VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
-    Variable = &NvVariable;
-    Variable->StartPtr = GetStartPointer (VariableStoreHeader);
-    Variable->EndPtr   = (VARIABLE_HEADER *)((UINTN)Variable->StartPtr + ((UINTN)CacheVariable->EndPtr - (UINTN)CacheVariable->StartPtr));
+    VariableStoreHeader = (VARIABLE_STORE_HEADER *)((UINTN)mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
+    Variable            = &NvVariable;
+    Variable->StartPtr  = GetStartPointer (VariableStoreHeader);
+    Variable->EndPtr    = (VARIABLE_HEADER *)((UINTN)Variable->StartPtr + ((UINTN)CacheVariable->EndPtr - (UINTN)CacheVariable->StartPtr));
 
-    Variable->CurrPtr  = (VARIABLE_HEADER *)((UINTN)Variable->StartPtr + ((UINTN)CacheVariable->CurrPtr - (UINTN)CacheVariable->StartPtr));
+    Variable->CurrPtr = (VARIABLE_HEADER *)((UINTN)Variable->StartPtr + ((UINTN)CacheVariable->CurrPtr - (UINTN)CacheVariable->StartPtr));
     if (CacheVariable->InDeletedTransitionPtr != NULL) {
       Variable->InDeletedTransitionPtr = (VARIABLE_HEADER *)((UINTN)Variable->StartPtr + ((UINTN)CacheVariable->InDeletedTransitionPtr - (UINTN)CacheVariable->StartPtr));
     } else {
       Variable->InDeletedTransitionPtr = NULL;
     }
+
     Variable->Volatile = FALSE;
   }
 
-  Fvb       = mVariableModuleGlobal->FvbInstance;
+  Fvb = mVariableModuleGlobal->FvbInstance;
 
   //
   // Tricky part: Use scratch data area at the end of volatile variable store
   // as a temporary storage.
   //
-  NextVariable = GetEndPointer ((VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase));
-  ScratchSize = mVariableModuleGlobal->ScratchBufferSize;
+  NextVariable = GetEndPointer ((VARIABLE_STORE_HEADER *)((UINTN)mVariableModuleGlobal->VariableGlobal.VolatileVariableBase));
+  ScratchSize  = mVariableModuleGlobal->ScratchBufferSize;
   SetMem (NextVariable, ScratchSize, 0xff);
   DataReady = FALSE;
 
@@ -1749,6 +1810,7 @@ UpdateVariable (
         Status = EFI_WRITE_PROTECTED;
         goto Done;
       }
+
       //
       // Only variable that have NV attributes can be updated/deleted in Runtime.
       //
@@ -1772,21 +1834,21 @@ UpdateVariable (
     // When the EFI_VARIABLE_APPEND_WRITE attribute is set, DataSize of zero will
     // not delete the variable.
     //
-    if ((((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0) && (DataSize == 0))|| ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 0)) {
+    if ((((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0) && (DataSize == 0)) || ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 0)) {
       if (Variable->InDeletedTransitionPtr != NULL) {
         //
         // Both ADDED and IN_DELETED_TRANSITION variable are present,
         // set IN_DELETED_TRANSITION one to DELETED state first.
         //
         ASSERT (CacheVariable->InDeletedTransitionPtr != NULL);
-        State = CacheVariable->InDeletedTransitionPtr->State;
+        State  = CacheVariable->InDeletedTransitionPtr->State;
         State &= VAR_DELETED;
         Status = UpdateVariableStore (
                    &mVariableModuleGlobal->VariableGlobal,
                    Variable->Volatile,
                    FALSE,
                    Fvb,
-                   (UINTN) &Variable->InDeletedTransitionPtr->State,
+                   (UINTN)&Variable->InDeletedTransitionPtr->State,
                    sizeof (UINT8),
                    &State
                    );
@@ -1799,7 +1861,7 @@ UpdateVariable (
         }
       }
 
-      State = CacheVariable->CurrPtr->State;
+      State  = CacheVariable->CurrPtr->State;
       State &= VAR_DELETED;
 
       Status = UpdateVariableStore (
@@ -1807,7 +1869,7 @@ UpdateVariable (
                  Variable->Volatile,
                  FALSE,
                  Fvb,
-                 (UINTN) &Variable->CurrPtr->State,
+                 (UINTN)&Variable->CurrPtr->State,
                  sizeof (UINT8),
                  &State
                  );
@@ -1818,16 +1880,19 @@ UpdateVariable (
           FlushHobVariableToFlash (VariableName, VendorGuid);
         }
       }
+
       goto Done;
     }
+
     //
     // If the variable is marked valid, and the same data has been passed in,
     // then return to the caller immediately.
     //
-    if (DataSizeOfVariable (CacheVariable->CurrPtr, AuthFormat) == DataSize &&
+    if ((DataSizeOfVariable (CacheVariable->CurrPtr, AuthFormat) == DataSize) &&
         (CompareMem (Data, GetVariableDataPtr (CacheVariable->CurrPtr, AuthFormat), DataSize) == 0) &&
         ((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0) &&
-        (TimeStamp == NULL)) {
+        (TimeStamp == NULL))
+    {
       //
       // Variable content unchanged and no need to update timestamp, just return.
       //
@@ -1835,8 +1900,8 @@ UpdateVariable (
       Status = EFI_SUCCESS;
       goto Done;
     } else if ((CacheVariable->CurrPtr->State == VAR_ADDED) ||
-               (CacheVariable->CurrPtr->State == (VAR_ADDED & VAR_IN_DELETED_TRANSITION))) {
-
+               (CacheVariable->CurrPtr->State == (VAR_ADDED & VAR_IN_DELETED_TRANSITION)))
+    {
       //
       // EFI_VARIABLE_APPEND_WRITE attribute only effects for existing variable.
       //
@@ -1845,11 +1910,11 @@ UpdateVariable (
         // NOTE: From 0 to DataOffset of NextVariable is reserved for Variable Header and Name.
         // From DataOffset of NextVariable is to save the existing variable data.
         //
-        DataOffset = GetVariableDataOffset (CacheVariable->CurrPtr, AuthFormat);
-        BufferForMerge = (UINT8 *) ((UINTN) NextVariable + DataOffset);
+        DataOffset     = GetVariableDataOffset (CacheVariable->CurrPtr, AuthFormat);
+        BufferForMerge = (UINT8 *)((UINTN)NextVariable + DataOffset);
         CopyMem (
           BufferForMerge,
-          (UINT8 *) ((UINTN) CacheVariable->CurrPtr + DataOffset),
+          (UINT8 *)((UINTN)CacheVariable->CurrPtr + DataOffset),
           DataSizeOfVariable (CacheVariable->CurrPtr, AuthFormat)
           );
 
@@ -1879,15 +1944,16 @@ UpdateVariable (
           Status = EFI_INVALID_PARAMETER;
           goto Done;
         }
+
         CopyMem (
-          (UINT8*) (
-            (UINTN) BufferForMerge + DataSizeOfVariable (CacheVariable->CurrPtr, AuthFormat)
-            ),
+          (UINT8 *)(
+                    (UINTN)BufferForMerge + DataSizeOfVariable (CacheVariable->CurrPtr, AuthFormat)
+                    ),
           Data,
           DataSize
           );
         MergedBufSize = DataSizeOfVariable (CacheVariable->CurrPtr, AuthFormat) +
-                          DataSize;
+                        DataSize;
 
         //
         // BufferForMerge(from DataOffset of NextVariable) has included the merged existing and new data.
@@ -1900,7 +1966,7 @@ UpdateVariable (
       //
       // Mark the old variable as in delete transition.
       //
-      State = CacheVariable->CurrPtr->State;
+      State  = CacheVariable->CurrPtr->State;
       State &= VAR_IN_DELETED_TRANSITION;
 
       Status = UpdateVariableStore (
@@ -1908,13 +1974,14 @@ UpdateVariable (
                  Variable->Volatile,
                  FALSE,
                  Fvb,
-                 (UINTN) &Variable->CurrPtr->State,
+                 (UINTN)&Variable->CurrPtr->State,
                  sizeof (UINT8),
                  &State
                  );
       if (EFI_ERROR (Status)) {
         goto Done;
       }
+
       if (!Variable->Volatile) {
         CacheVariable->CurrPtr->State = State;
       }
@@ -1933,7 +2000,7 @@ UpdateVariable (
     // Make sure we are trying to create a new variable.
     // Setting a data variable with zero DataSize or no access attributes means to delete it.
     //
-    if (DataSize == 0 || (Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 0) {
+    if ((DataSize == 0) || ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 0)) {
       Status = EFI_NOT_FOUND;
       goto Done;
     }
@@ -1942,7 +2009,8 @@ UpdateVariable (
     // Only variable have NV|RT attribute can be created in Runtime.
     //
     if (AtRuntime () &&
-        (((Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0) || ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0))) {
+        (((Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0) || ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0)))
+    {
       Status = EFI_INVALID_PARAMETER;
       goto Done;
     }
@@ -1952,19 +2020,20 @@ UpdateVariable (
   // Function part - create a new variable and copy the data.
   // Both update a variable and create a variable will come here.
   //
-  NextVariable->StartId     = VARIABLE_DATA;
+  NextVariable->StartId = VARIABLE_DATA;
   //
   // NextVariable->State = VAR_ADDED;
   //
-  NextVariable->Reserved        = 0;
+  NextVariable->Reserved = 0;
   if (mVariableModuleGlobal->VariableGlobal.AuthFormat) {
-    AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) NextVariable;
+    AuthVariable                 = (AUTHENTICATED_VARIABLE_HEADER *)NextVariable;
     AuthVariable->PubKeyIndex    = KeyIndex;
     AuthVariable->MonotonicCount = MonotonicCount;
     ZeroMem (&AuthVariable->TimeStamp, sizeof (EFI_TIME));
 
     if (((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) &&
-        (TimeStamp != NULL)) {
+        (TimeStamp != NULL))
+    {
       if ((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0) {
         CopyMem (&AuthVariable->TimeStamp, TimeStamp, sizeof (EFI_TIME));
       } else {
@@ -1974,10 +2043,10 @@ UpdateVariable (
         // with the variable, we need associate the new timestamp with the updated value.
         //
         if (Variable->CurrPtr != NULL) {
-          if (VariableCompareTimeStampInternal (&(((AUTHENTICATED_VARIABLE_HEADER *) CacheVariable->CurrPtr)->TimeStamp), TimeStamp)) {
+          if (VariableCompareTimeStampInternal (&(((AUTHENTICATED_VARIABLE_HEADER *)CacheVariable->CurrPtr)->TimeStamp), TimeStamp)) {
             CopyMem (&AuthVariable->TimeStamp, TimeStamp, sizeof (EFI_TIME));
           } else {
-            CopyMem (&AuthVariable->TimeStamp, &(((AUTHENTICATED_VARIABLE_HEADER *) CacheVariable->CurrPtr)->TimeStamp), sizeof (EFI_TIME));
+            CopyMem (&AuthVariable->TimeStamp, &(((AUTHENTICATED_VARIABLE_HEADER *)CacheVariable->CurrPtr)->TimeStamp), sizeof (EFI_TIME));
           }
         }
       }
@@ -1988,12 +2057,12 @@ UpdateVariable (
   // The EFI_VARIABLE_APPEND_WRITE attribute will never be set in the returned
   // Attributes bitmask parameter of a GetVariable() call.
   //
-  NextVariable->Attributes  = Attributes & (~EFI_VARIABLE_APPEND_WRITE);
+  NextVariable->Attributes = Attributes & (~EFI_VARIABLE_APPEND_WRITE);
 
-  VarNameOffset                 = GetVariableHeaderSize (AuthFormat);
-  VarNameSize                   = StrSize (VariableName);
+  VarNameOffset = GetVariableHeaderSize (AuthFormat);
+  VarNameSize   = StrSize (VariableName);
   CopyMem (
-    (UINT8 *) ((UINTN) NextVariable + VarNameOffset),
+    (UINT8 *)((UINTN)NextVariable + VarNameOffset),
     VariableName,
     VarNameSize
     );
@@ -2005,7 +2074,7 @@ UpdateVariable (
   //
   if (!DataReady) {
     CopyMem (
-      (UINT8 *) ((UINTN) NextVariable + VarDataOffset),
+      (UINT8 *)((UINTN)NextVariable + VarDataOffset),
       Data,
       DataSize
       );
@@ -2035,27 +2104,32 @@ UpdateVariable (
     //
     Volatile = FALSE;
 
-    IsCommonVariable = FALSE;
+    IsCommonVariable     = FALSE;
     IsCommonUserVariable = FALSE;
     if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == 0) {
-      IsCommonVariable = TRUE;
+      IsCommonVariable     = TRUE;
       IsCommonUserVariable = IsUserVariable (NextVariable);
     }
-    if ((((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0)
-      && ((VarSize + mVariableModuleGlobal->HwErrVariableTotalSize) > PcdGet32 (PcdHwErrStorageSize)))
-      || (IsCommonVariable && ((VarSize + mVariableModuleGlobal->CommonVariableTotalSize) > mVariableModuleGlobal->CommonVariableSpace))
-      || (IsCommonVariable && AtRuntime () && ((VarSize + mVariableModuleGlobal->CommonVariableTotalSize) > mVariableModuleGlobal->CommonRuntimeVariableSpace))
-      || (IsCommonUserVariable && ((VarSize + mVariableModuleGlobal->CommonUserVariableTotalSize) > mVariableModuleGlobal->CommonMaxUserVariableSpace))) {
+
+    if (  (  ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0)
+          && ((VarSize + mVariableModuleGlobal->HwErrVariableTotalSize) > PcdGet32 (PcdHwErrStorageSize)))
+       || (IsCommonVariable && ((VarSize + mVariableModuleGlobal->CommonVariableTotalSize) > mVariableModuleGlobal->CommonVariableSpace))
+       || (IsCommonVariable && AtRuntime () && ((VarSize + mVariableModuleGlobal->CommonVariableTotalSize) > mVariableModuleGlobal->CommonRuntimeVariableSpace))
+       || (IsCommonUserVariable && ((VarSize + mVariableModuleGlobal->CommonUserVariableTotalSize) > mVariableModuleGlobal->CommonMaxUserVariableSpace)))
+    {
       if (AtRuntime ()) {
         if (IsCommonUserVariable && ((VarSize + mVariableModuleGlobal->CommonUserVariableTotalSize) > mVariableModuleGlobal->CommonMaxUserVariableSpace)) {
           RecordVarErrorFlag (VAR_ERROR_FLAG_USER_ERROR, VariableName, VendorGuid, Attributes, VarSize);
         }
+
         if (IsCommonVariable && ((VarSize + mVariableModuleGlobal->CommonVariableTotalSize) > mVariableModuleGlobal->CommonRuntimeVariableSpace)) {
           RecordVarErrorFlag (VAR_ERROR_FLAG_SYSTEM_ERROR, VariableName, VendorGuid, Attributes, VarSize);
         }
+
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
+
       //
       // Perform garbage collection & reclaim operation, and integrate the new variable at the same time.
       //
@@ -2072,19 +2146,22 @@ UpdateVariable (
         // The new variable has been integrated successfully during reclaiming.
         //
         if (Variable->CurrPtr != NULL) {
-          CacheVariable->CurrPtr = (VARIABLE_HEADER *)((UINTN) CacheVariable->StartPtr + ((UINTN) Variable->CurrPtr - (UINTN) Variable->StartPtr));
+          CacheVariable->CurrPtr                = (VARIABLE_HEADER *)((UINTN)CacheVariable->StartPtr + ((UINTN)Variable->CurrPtr - (UINTN)Variable->StartPtr));
           CacheVariable->InDeletedTransitionPtr = NULL;
         }
+
         UpdateVariableInfo (VariableName, VendorGuid, FALSE, FALSE, TRUE, FALSE, FALSE, &gVariableInfo);
         FlushHobVariableToFlash (VariableName, VendorGuid);
       } else {
         if (IsCommonUserVariable && ((VarSize + mVariableModuleGlobal->CommonUserVariableTotalSize) > mVariableModuleGlobal->CommonMaxUserVariableSpace)) {
           RecordVarErrorFlag (VAR_ERROR_FLAG_USER_ERROR, VariableName, VendorGuid, Attributes, VarSize);
         }
+
         if (IsCommonVariable && ((VarSize + mVariableModuleGlobal->CommonVariableTotalSize) > mVariableModuleGlobal->CommonVariableSpace)) {
           RecordVarErrorFlag (VAR_ERROR_FLAG_SYSTEM_ERROR, VariableName, VendorGuid, Attributes, VarSize);
         }
       }
+
       goto Done;
     }
 
@@ -2105,8 +2182,8 @@ UpdateVariable (
                  TRUE,
                  Fvb,
                  mVariableModuleGlobal->NonVolatileLastVariableOffset,
-                 (UINT32) GetVariableHeaderSize (AuthFormat),
-                 (UINT8 *) NextVariable
+                 (UINT32)GetVariableHeaderSize (AuthFormat),
+                 (UINT8 *)NextVariable
                  );
 
       if (EFI_ERROR (Status)) {
@@ -2117,19 +2194,20 @@ UpdateVariable (
       // Step 2:
       //
       NextVariable->State = VAR_HEADER_VALID_ONLY;
-      Status = UpdateVariableStore (
-                 &mVariableModuleGlobal->VariableGlobal,
-                 FALSE,
-                 TRUE,
-                 Fvb,
-                 mVariableModuleGlobal->NonVolatileLastVariableOffset + OFFSET_OF (VARIABLE_HEADER, State),
-                 sizeof (UINT8),
-                 &NextVariable->State
-                 );
+      Status              = UpdateVariableStore (
+                              &mVariableModuleGlobal->VariableGlobal,
+                              FALSE,
+                              TRUE,
+                              Fvb,
+                              mVariableModuleGlobal->NonVolatileLastVariableOffset + OFFSET_OF (VARIABLE_HEADER, State),
+                              sizeof (UINT8),
+                              &NextVariable->State
+                              );
 
       if (EFI_ERROR (Status)) {
         goto Done;
       }
+
       //
       // Step 3:
       //
@@ -2139,26 +2217,27 @@ UpdateVariable (
                  TRUE,
                  Fvb,
                  mVariableModuleGlobal->NonVolatileLastVariableOffset + GetVariableHeaderSize (AuthFormat),
-                 (UINT32) (VarSize - GetVariableHeaderSize (AuthFormat)),
-                 (UINT8 *) NextVariable + GetVariableHeaderSize (AuthFormat)
+                 (UINT32)(VarSize - GetVariableHeaderSize (AuthFormat)),
+                 (UINT8 *)NextVariable + GetVariableHeaderSize (AuthFormat)
                  );
 
       if (EFI_ERROR (Status)) {
         goto Done;
       }
+
       //
       // Step 4:
       //
       NextVariable->State = VAR_ADDED;
-      Status = UpdateVariableStore (
-                 &mVariableModuleGlobal->VariableGlobal,
-                 FALSE,
-                 TRUE,
-                 Fvb,
-                 mVariableModuleGlobal->NonVolatileLastVariableOffset + OFFSET_OF (VARIABLE_HEADER, State),
-                 sizeof (UINT8),
-                 &NextVariable->State
-                 );
+      Status              = UpdateVariableStore (
+                              &mVariableModuleGlobal->VariableGlobal,
+                              FALSE,
+                              TRUE,
+                              Fvb,
+                              mVariableModuleGlobal->NonVolatileLastVariableOffset + OFFSET_OF (VARIABLE_HEADER, State),
+                              sizeof (UINT8),
+                              &NextVariable->State
+                              );
 
       if (EFI_ERROR (Status)) {
         goto Done;
@@ -2173,15 +2252,15 @@ UpdateVariable (
       // Emulated non-volatile variable mode.
       //
       NextVariable->State = VAR_ADDED;
-      Status = UpdateVariableStore (
-                 &mVariableModuleGlobal->VariableGlobal,
-                 FALSE,
-                 TRUE,
-                 Fvb,
-                 mVariableModuleGlobal->NonVolatileLastVariableOffset,
-                 (UINT32) VarSize,
-                 (UINT8 *) NextVariable
-                 );
+      Status              = UpdateVariableStore (
+                              &mVariableModuleGlobal->VariableGlobal,
+                              FALSE,
+                              TRUE,
+                              Fvb,
+                              mVariableModuleGlobal->NonVolatileLastVariableOffset,
+                              (UINT32)VarSize,
+                              (UINT8 *)NextVariable
+                              );
 
       if (EFI_ERROR (Status)) {
         goto Done;
@@ -2204,8 +2283,9 @@ UpdateVariable (
     //
     Volatile = TRUE;
 
-    if ((UINT32) (VarSize + mVariableModuleGlobal->VolatileLastVariableOffset) >
-        ((VARIABLE_STORE_HEADER *) ((UINTN) (mVariableModuleGlobal->VariableGlobal.VolatileVariableBase)))->Size) {
+    if ((UINT32)(VarSize + mVariableModuleGlobal->VolatileLastVariableOffset) >
+        ((VARIABLE_STORE_HEADER *)((UINTN)(mVariableModuleGlobal->VariableGlobal.VolatileVariableBase)))->Size)
+    {
       //
       // Perform garbage collection & reclaim operation, and integrate the new variable at the same time.
       //
@@ -2222,24 +2302,26 @@ UpdateVariable (
         // The new variable has been integrated successfully during reclaiming.
         //
         if (Variable->CurrPtr != NULL) {
-          CacheVariable->CurrPtr = (VARIABLE_HEADER *)((UINTN) CacheVariable->StartPtr + ((UINTN) Variable->CurrPtr - (UINTN) Variable->StartPtr));
+          CacheVariable->CurrPtr                = (VARIABLE_HEADER *)((UINTN)CacheVariable->StartPtr + ((UINTN)Variable->CurrPtr - (UINTN)Variable->StartPtr));
           CacheVariable->InDeletedTransitionPtr = NULL;
         }
+
         UpdateVariableInfo (VariableName, VendorGuid, TRUE, FALSE, TRUE, FALSE, FALSE, &gVariableInfo);
       }
+
       goto Done;
     }
 
     NextVariable->State = VAR_ADDED;
-    Status = UpdateVariableStore (
-               &mVariableModuleGlobal->VariableGlobal,
-               TRUE,
-               TRUE,
-               Fvb,
-               mVariableModuleGlobal->VolatileLastVariableOffset,
-               (UINT32) VarSize,
-               (UINT8 *) NextVariable
-               );
+    Status              = UpdateVariableStore (
+                            &mVariableModuleGlobal->VariableGlobal,
+                            TRUE,
+                            TRUE,
+                            Fvb,
+                            mVariableModuleGlobal->VolatileLastVariableOffset,
+                            (UINT32)VarSize,
+                            (UINT8 *)NextVariable
+                            );
 
     if (EFI_ERROR (Status)) {
       goto Done;
@@ -2251,21 +2333,21 @@ UpdateVariable (
   //
   // Mark the old variable as deleted.
   //
-  if (!EFI_ERROR (Status) && Variable->CurrPtr != NULL) {
+  if (!EFI_ERROR (Status) && (Variable->CurrPtr != NULL)) {
     if (Variable->InDeletedTransitionPtr != NULL) {
       //
       // Both ADDED and IN_DELETED_TRANSITION old variable are present,
       // set IN_DELETED_TRANSITION one to DELETED state first.
       //
       ASSERT (CacheVariable->InDeletedTransitionPtr != NULL);
-      State = CacheVariable->InDeletedTransitionPtr->State;
+      State  = CacheVariable->InDeletedTransitionPtr->State;
       State &= VAR_DELETED;
       Status = UpdateVariableStore (
                  &mVariableModuleGlobal->VariableGlobal,
                  Variable->Volatile,
                  FALSE,
                  Fvb,
-                 (UINTN) &Variable->InDeletedTransitionPtr->State,
+                 (UINTN)&Variable->InDeletedTransitionPtr->State,
                  sizeof (UINT8),
                  &State
                  );
@@ -2278,18 +2360,18 @@ UpdateVariable (
       }
     }
 
-    State = CacheVariable->CurrPtr->State;
+    State  = CacheVariable->CurrPtr->State;
     State &= VAR_DELETED;
 
     Status = UpdateVariableStore (
-             &mVariableModuleGlobal->VariableGlobal,
-             Variable->Volatile,
-             FALSE,
-             Fvb,
-             (UINTN) &Variable->CurrPtr->State,
-             sizeof (UINT8),
-             &State
-             );
+               &mVariableModuleGlobal->VariableGlobal,
+               Variable->Volatile,
+               FALSE,
+               Fvb,
+               (UINTN)&Variable->CurrPtr->State,
+               sizeof (UINT8),
+               &State
+               );
     if (!EFI_ERROR (Status) && !Variable->Volatile) {
       CacheVariable->CurrPtr->State = State;
     }
@@ -2304,7 +2386,7 @@ UpdateVariable (
 
 Done:
   if (!EFI_ERROR (Status)) {
-    if ((Variable->CurrPtr != NULL && !Variable->Volatile) || (Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
+    if (((Variable->CurrPtr != NULL) && !Variable->Volatile) || ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0)) {
       VolatileCacheInstance = &(mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeNvCache);
     } else {
       VolatileCacheInstance = &(mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeVolatileCache);
@@ -2348,18 +2430,18 @@ Done:
 EFI_STATUS
 EFIAPI
 VariableServiceGetVariable (
-  IN      CHAR16            *VariableName,
-  IN      EFI_GUID          *VendorGuid,
-  OUT     UINT32            *Attributes OPTIONAL,
-  IN OUT  UINTN             *DataSize,
-  OUT     VOID              *Data OPTIONAL
+  IN      CHAR16    *VariableName,
+  IN      EFI_GUID  *VendorGuid,
+  OUT     UINT32    *Attributes OPTIONAL,
+  IN OUT  UINTN     *DataSize,
+  OUT     VOID      *Data OPTIONAL
   )
 {
   EFI_STATUS              Status;
   VARIABLE_POINTER_TRACK  Variable;
   UINTN                   VarDataSize;
 
-  if (VariableName == NULL || VendorGuid == NULL || DataSize == NULL) {
+  if ((VariableName == NULL) || (VendorGuid == NULL) || (DataSize == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2367,10 +2449,10 @@ VariableServiceGetVariable (
     return EFI_NOT_FOUND;
   }
 
-  AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+  AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
   Status = FindVariable (VariableName, VendorGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
-  if (Variable.CurrPtr == NULL || EFI_ERROR (Status)) {
+  if ((Variable.CurrPtr == NULL) || EFI_ERROR (Status)) {
     goto Done;
   }
 
@@ -2395,16 +2477,17 @@ VariableServiceGetVariable (
     goto Done;
   } else {
     *DataSize = VarDataSize;
-    Status = EFI_BUFFER_TOO_SMALL;
+    Status    = EFI_BUFFER_TOO_SMALL;
     goto Done;
   }
 
 Done:
-  if (Status == EFI_SUCCESS || Status == EFI_BUFFER_TOO_SMALL) {
-    if (Attributes != NULL && Variable.CurrPtr != NULL) {
+  if ((Status == EFI_SUCCESS) || (Status == EFI_BUFFER_TOO_SMALL)) {
+    if ((Attributes != NULL) && (Variable.CurrPtr != NULL)) {
       *Attributes = Variable.CurrPtr->Attributes;
     }
   }
+
   ReleaseLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
   return Status;
 }
@@ -2437,19 +2520,19 @@ Done:
 EFI_STATUS
 EFIAPI
 VariableServiceGetNextVariableName (
-  IN OUT  UINTN             *VariableNameSize,
-  IN OUT  CHAR16            *VariableName,
-  IN OUT  EFI_GUID          *VendorGuid
+  IN OUT  UINTN     *VariableNameSize,
+  IN OUT  CHAR16    *VariableName,
+  IN OUT  EFI_GUID  *VendorGuid
   )
 {
-  EFI_STATUS              Status;
-  UINTN                   MaxLen;
-  UINTN                   VarNameSize;
-  BOOLEAN                 AuthFormat;
-  VARIABLE_HEADER         *VariablePtr;
-  VARIABLE_STORE_HEADER   *VariableStoreHeader[VariableStoreTypeMax];
+  EFI_STATUS             Status;
+  UINTN                  MaxLen;
+  UINTN                  VarNameSize;
+  BOOLEAN                AuthFormat;
+  VARIABLE_HEADER        *VariablePtr;
+  VARIABLE_STORE_HEADER  *VariableStoreHeader[VariableStoreTypeMax];
 
-  if (VariableNameSize == NULL || VariableName == NULL || VendorGuid == NULL) {
+  if ((VariableNameSize == NULL) || (VariableName == NULL) || (VendorGuid == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2467,15 +2550,15 @@ VariableServiceGetNextVariableName (
     return EFI_INVALID_PARAMETER;
   }
 
-  AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+  AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
   //
   // 0: Volatile, 1: HOB, 2: Non-Volatile.
   // The index and attributes mapping must be kept in this order as FindVariable
   // makes use of this mapping to implement search algorithm.
   //
-  VariableStoreHeader[VariableStoreTypeVolatile] = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase;
-  VariableStoreHeader[VariableStoreTypeHob]      = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase;
+  VariableStoreHeader[VariableStoreTypeVolatile] = (VARIABLE_STORE_HEADER *)(UINTN)mVariableModuleGlobal->VariableGlobal.VolatileVariableBase;
+  VariableStoreHeader[VariableStoreTypeHob]      = (VARIABLE_STORE_HEADER *)(UINTN)mVariableModuleGlobal->VariableGlobal.HobVariableBase;
   VariableStoreHeader[VariableStoreTypeNv]       = mNvVariableCache;
 
   Status =  VariableServiceGetNextVariableInternal (
@@ -2539,30 +2622,30 @@ VariableServiceGetNextVariableName (
 EFI_STATUS
 EFIAPI
 VariableServiceSetVariable (
-  IN CHAR16                  *VariableName,
-  IN EFI_GUID                *VendorGuid,
-  IN UINT32                  Attributes,
-  IN UINTN                   DataSize,
-  IN VOID                    *Data
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid,
+  IN UINT32    Attributes,
+  IN UINTN     DataSize,
+  IN VOID      *Data
   )
 {
-  VARIABLE_POINTER_TRACK              Variable;
-  EFI_STATUS                          Status;
-  VARIABLE_HEADER                     *NextVariable;
-  EFI_PHYSICAL_ADDRESS                Point;
-  UINTN                               PayloadSize;
-  BOOLEAN                             AuthFormat;
+  VARIABLE_POINTER_TRACK  Variable;
+  EFI_STATUS              Status;
+  VARIABLE_HEADER         *NextVariable;
+  EFI_PHYSICAL_ADDRESS    Point;
+  UINTN                   PayloadSize;
+  BOOLEAN                 AuthFormat;
 
   AuthFormat = mVariableModuleGlobal->VariableGlobal.AuthFormat;
 
   //
   // Check input parameters.
   //
-  if (VariableName == NULL || VariableName[0] == 0 || VendorGuid == NULL) {
+  if ((VariableName == NULL) || (VariableName[0] == 0) || (VendorGuid == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (DataSize != 0 && Data == NULL) {
+  if ((DataSize != 0) && (Data == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2605,8 +2688,9 @@ VariableServiceSetVariable (
   // EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS and EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute
   // cannot be set both.
   //
-  if (((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) == EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS)
-     && ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) == EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS)) {
+  if (  ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) == EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS)
+     && ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) == EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS))
+  {
     return EFI_UNSUPPORTED;
   }
 
@@ -2618,16 +2702,19 @@ VariableServiceSetVariable (
     if (DataSize != AUTHINFO_SIZE) {
       return EFI_UNSUPPORTED;
     }
+
     PayloadSize = DataSize - AUTHINFO_SIZE;
   } else if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) == EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) {
     //
     // Sanity check for EFI_VARIABLE_AUTHENTICATION_2 descriptor.
     //
-    if (DataSize < OFFSET_OF_AUTHINFO2_CERT_DATA ||
-      ((EFI_VARIABLE_AUTHENTICATION_2 *) Data)->AuthInfo.Hdr.dwLength > DataSize - (OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo)) ||
-      ((EFI_VARIABLE_AUTHENTICATION_2 *) Data)->AuthInfo.Hdr.dwLength < OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData)) {
+    if ((DataSize < OFFSET_OF_AUTHINFO2_CERT_DATA) ||
+        (((EFI_VARIABLE_AUTHENTICATION_2 *)Data)->AuthInfo.Hdr.dwLength > DataSize - (OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo))) ||
+        (((EFI_VARIABLE_AUTHENTICATION_2 *)Data)->AuthInfo.Hdr.dwLength < OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData)))
+    {
       return EFI_SECURITY_VIOLATION;
     }
+
     //
     // The VariableSpeculationBarrier() call here is to ensure the above sanity
     // check for the EFI_VARIABLE_AUTHENTICATION_2 descriptor has been completed
@@ -2639,7 +2726,7 @@ VariableServiceSetVariable (
     PayloadSize = DataSize;
   }
 
-  if ((UINTN)(~0) - PayloadSize < StrSize(VariableName)){
+  if ((UINTN)(~0) - PayloadSize < StrSize (VariableName)) {
     //
     // Prevent whole variable size overflow
     //
@@ -2653,7 +2740,8 @@ VariableServiceSetVariable (
   //
   if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
     if (StrSize (VariableName) + PayloadSize >
-        PcdGet32 (PcdMaxHardwareErrorVariableSize) - GetVariableHeaderSize (AuthFormat)) {
+        PcdGet32 (PcdMaxHardwareErrorVariableSize) - GetVariableHeaderSize (AuthFormat))
+    {
       return EFI_INVALID_PARAMETER;
     }
   } else {
@@ -2664,14 +2752,21 @@ VariableServiceSetVariable (
     if ((Attributes & VARIABLE_ATTRIBUTE_AT_AW) != 0) {
       if (StrSize (VariableName) + PayloadSize >
           mVariableModuleGlobal->MaxAuthVariableSize -
-          GetVariableHeaderSize (AuthFormat)) {
-        DEBUG ((DEBUG_ERROR,
+          GetVariableHeaderSize (AuthFormat))
+      {
+        DEBUG ((
+          DEBUG_ERROR,
           "%a: Failed to set variable '%s' with Guid %g\n",
-          __FUNCTION__, VariableName, VendorGuid));
-        DEBUG ((DEBUG_ERROR,
+          __FUNCTION__,
+          VariableName,
+          VendorGuid
+          ));
+        DEBUG ((
+          DEBUG_ERROR,
           "NameSize(0x%x) + PayloadSize(0x%x) > "
           "MaxAuthVariableSize(0x%x) - HeaderSize(0x%x)\n",
-          StrSize (VariableName), PayloadSize,
+          StrSize (VariableName),
+          PayloadSize,
           mVariableModuleGlobal->MaxAuthVariableSize,
           GetVariableHeaderSize (AuthFormat)
           ));
@@ -2679,14 +2774,21 @@ VariableServiceSetVariable (
       }
     } else if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
       if (StrSize (VariableName) + PayloadSize >
-          mVariableModuleGlobal->MaxVariableSize - GetVariableHeaderSize (AuthFormat)) {
-        DEBUG ((DEBUG_ERROR,
+          mVariableModuleGlobal->MaxVariableSize - GetVariableHeaderSize (AuthFormat))
+      {
+        DEBUG ((
+          DEBUG_ERROR,
           "%a: Failed to set variable '%s' with Guid %g\n",
-          __FUNCTION__, VariableName, VendorGuid));
-        DEBUG ((DEBUG_ERROR,
+          __FUNCTION__,
+          VariableName,
+          VendorGuid
+          ));
+        DEBUG ((
+          DEBUG_ERROR,
           "NameSize(0x%x) + PayloadSize(0x%x) > "
           "MaxVariableSize(0x%x) - HeaderSize(0x%x)\n",
-          StrSize (VariableName), PayloadSize,
+          StrSize (VariableName),
+          PayloadSize,
           mVariableModuleGlobal->MaxVariableSize,
           GetVariableHeaderSize (AuthFormat)
           ));
@@ -2694,14 +2796,21 @@ VariableServiceSetVariable (
       }
     } else {
       if (StrSize (VariableName) + PayloadSize >
-          mVariableModuleGlobal->MaxVolatileVariableSize - GetVariableHeaderSize (AuthFormat)) {
-        DEBUG ((DEBUG_ERROR,
+          mVariableModuleGlobal->MaxVolatileVariableSize - GetVariableHeaderSize (AuthFormat))
+      {
+        DEBUG ((
+          DEBUG_ERROR,
           "%a: Failed to set variable '%s' with Guid %g\n",
-          __FUNCTION__, VariableName, VendorGuid));
-        DEBUG ((DEBUG_ERROR,
+          __FUNCTION__,
+          VariableName,
+          VendorGuid
+          ));
+        DEBUG ((
+          DEBUG_ERROR,
           "NameSize(0x%x) + PayloadSize(0x%x) > "
           "MaxVolatileVariableSize(0x%x) - HeaderSize(0x%x)\n",
-          StrSize (VariableName), PayloadSize,
+          StrSize (VariableName),
+          PayloadSize,
           mVariableModuleGlobal->MaxVolatileVariableSize,
           GetVariableHeaderSize (AuthFormat)
           ));
@@ -2713,7 +2822,7 @@ VariableServiceSetVariable (
   //
   // Special Handling for MOR Lock variable.
   //
-  Status = SetVariableCheckHandlerMor (VariableName, VendorGuid, Attributes, PayloadSize, (VOID *) ((UINTN) Data + DataSize - PayloadSize));
+  Status = SetVariableCheckHandlerMor (VariableName, VendorGuid, Attributes, PayloadSize, (VOID *)((UINTN)Data + DataSize - PayloadSize));
   if (Status == EFI_ALREADY_STARTED) {
     //
     // EFI_ALREADY_STARTED means the SetVariable() action is handled inside of SetVariableCheckHandlerMor().
@@ -2721,16 +2830,17 @@ VariableServiceSetVariable (
     //
     return EFI_SUCCESS;
   }
+
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = VarCheckLibSetVariableCheck (VariableName, VendorGuid, Attributes, PayloadSize, (VOID *) ((UINTN) Data + DataSize - PayloadSize), mRequestSource);
+  Status = VarCheckLibSetVariableCheck (VariableName, VendorGuid, Attributes, PayloadSize, (VOID *)((UINTN)Data + DataSize - PayloadSize), mRequestSource);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+  AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
   //
   // Consider reentrant in MCA/INIT/NMI. It needs be reupdated.
@@ -2740,11 +2850,12 @@ VariableServiceSetVariable (
     //
     // Parse non-volatile variable data and get last variable offset.
     //
-    NextVariable  = GetStartPointer ((VARIABLE_STORE_HEADER *) (UINTN) Point);
-    while (IsValidVariableHeader (NextVariable, GetEndPointer ((VARIABLE_STORE_HEADER *) (UINTN) Point))) {
+    NextVariable = GetStartPointer ((VARIABLE_STORE_HEADER *)(UINTN)Point);
+    while (IsValidVariableHeader (NextVariable, GetEndPointer ((VARIABLE_STORE_HEADER *)(UINTN)Point))) {
       NextVariable = GetNextVariablePtr (NextVariable, AuthFormat);
     }
-    mVariableModuleGlobal->NonVolatileLastVariableOffset = (UINTN) NextVariable - (UINTN) Point;
+
+    mVariableModuleGlobal->NonVolatileLastVariableOffset = (UINTN)NextVariable - (UINTN)Point;
   }
 
   //
@@ -2756,7 +2867,8 @@ VariableServiceSetVariable (
       Status = EFI_WRITE_PROTECTED;
       goto Done;
     }
-    if (Attributes != 0 && (Attributes & (~EFI_VARIABLE_APPEND_WRITE)) != Variable.CurrPtr->Attributes) {
+
+    if ((Attributes != 0) && ((Attributes & (~EFI_VARIABLE_APPEND_WRITE)) != Variable.CurrPtr->Attributes)) {
       //
       // If a preexisting variable is rewritten with different attributes, SetVariable() shall not
       // modify the variable and shall return EFI_INVALID_PARAMETER. Two exceptions to this rule:
@@ -2764,7 +2876,7 @@ VariableServiceSetVariable (
       // 2. The only attribute differing is EFI_VARIABLE_APPEND_WRITE
       //
       Status = EFI_INVALID_PARAMETER;
-      DEBUG ((EFI_D_INFO, "[Variable]: Rewritten a preexisting variable(0x%08x) with different attributes(0x%08x) - %g:%s\n", Variable.CurrPtr->Attributes, Attributes, VendorGuid, VariableName));
+      DEBUG ((DEBUG_INFO, "[Variable]: Rewritten a preexisting variable(0x%08x) with different attributes(0x%08x) - %g:%s\n", Variable.CurrPtr->Attributes, Attributes, VendorGuid, VariableName));
       goto Done;
     }
   }
@@ -2826,29 +2938,29 @@ Done:
 EFI_STATUS
 EFIAPI
 VariableServiceQueryVariableInfoInternal (
-  IN  UINT32                 Attributes,
-  OUT UINT64                 *MaximumVariableStorageSize,
-  OUT UINT64                 *RemainingVariableStorageSize,
-  OUT UINT64                 *MaximumVariableSize
+  IN  UINT32  Attributes,
+  OUT UINT64  *MaximumVariableStorageSize,
+  OUT UINT64  *RemainingVariableStorageSize,
+  OUT UINT64  *MaximumVariableSize
   )
 {
-  VARIABLE_HEADER        *Variable;
-  VARIABLE_HEADER        *NextVariable;
-  UINT64                 VariableSize;
-  VARIABLE_STORE_HEADER  *VariableStoreHeader;
-  UINT64                 CommonVariableTotalSize;
-  UINT64                 HwErrVariableTotalSize;
-  EFI_STATUS             Status;
-  VARIABLE_POINTER_TRACK VariablePtrTrack;
+  VARIABLE_HEADER         *Variable;
+  VARIABLE_HEADER         *NextVariable;
+  UINT64                  VariableSize;
+  VARIABLE_STORE_HEADER   *VariableStoreHeader;
+  UINT64                  CommonVariableTotalSize;
+  UINT64                  HwErrVariableTotalSize;
+  EFI_STATUS              Status;
+  VARIABLE_POINTER_TRACK  VariablePtrTrack;
 
   CommonVariableTotalSize = 0;
-  HwErrVariableTotalSize = 0;
+  HwErrVariableTotalSize  = 0;
 
-  if((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
+  if ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
     //
     // Query is Volatile related.
     //
-    VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase);
+    VariableStoreHeader = (VARIABLE_STORE_HEADER *)((UINTN)mVariableModuleGlobal->VariableGlobal.VolatileVariableBase);
   } else {
     //
     // Query is Non-Volatile related.
@@ -2860,15 +2972,15 @@ VariableServiceQueryVariableInfoInternal (
   // Now let's fill *MaximumVariableStorageSize *RemainingVariableStorageSize
   // with the storage size (excluding the storage header size).
   //
-  *MaximumVariableStorageSize   = VariableStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER);
+  *MaximumVariableStorageSize = VariableStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER);
 
   //
   // Harware error record variable needs larger size.
   //
   if ((Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
     *MaximumVariableStorageSize = PcdGet32 (PcdHwErrStorageSize);
-    *MaximumVariableSize =  PcdGet32 (PcdMaxHardwareErrorVariableSize) -
-                              GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
+    *MaximumVariableSize        =  PcdGet32 (PcdMaxHardwareErrorVariableSize) -
+                                  GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
   } else {
     if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
       if (AtRuntime ()) {
@@ -2883,13 +2995,13 @@ VariableServiceQueryVariableInfoInternal (
     //
     if ((Attributes & VARIABLE_ATTRIBUTE_AT_AW) != 0) {
       *MaximumVariableSize =  mVariableModuleGlobal->MaxAuthVariableSize -
-                                GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
+                             GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
     } else if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
       *MaximumVariableSize =  mVariableModuleGlobal->MaxVariableSize -
-                                GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
+                             GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
     } else {
       *MaximumVariableSize =   mVariableModuleGlobal->MaxVolatileVariableSize -
-                                GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
+                             GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
     }
   }
 
@@ -2903,7 +3015,7 @@ VariableServiceQueryVariableInfoInternal (
   //
   while (IsValidVariableHeader (Variable, GetEndPointer (VariableStoreHeader))) {
     NextVariable = GetNextVariablePtr (Variable, mVariableModuleGlobal->VariableGlobal.AuthFormat);
-    VariableSize = (UINT64) (UINTN) NextVariable - (UINT64) (UINTN) Variable;
+    VariableSize = (UINT64)(UINTN)NextVariable - (UINT64)(UINTN)Variable;
 
     if (AtRuntime ()) {
       //
@@ -2935,15 +3047,15 @@ VariableServiceQueryVariableInfoInternal (
         // this IN_DELETED_TRANSITION variable is valid.
         //
         VariablePtrTrack.StartPtr = GetStartPointer (VariableStoreHeader);
-        VariablePtrTrack.EndPtr   = GetEndPointer   (VariableStoreHeader);
-        Status = FindVariableEx (
-                   GetVariableNamePtr (Variable, mVariableModuleGlobal->VariableGlobal.AuthFormat),
-                   GetVendorGuidPtr (Variable, mVariableModuleGlobal->VariableGlobal.AuthFormat),
-                   FALSE,
-                   &VariablePtrTrack,
-                   mVariableModuleGlobal->VariableGlobal.AuthFormat
-                   );
-        if (!EFI_ERROR (Status) && VariablePtrTrack.CurrPtr->State != VAR_ADDED) {
+        VariablePtrTrack.EndPtr   = GetEndPointer (VariableStoreHeader);
+        Status                    = FindVariableEx (
+                                      GetVariableNamePtr (Variable, mVariableModuleGlobal->VariableGlobal.AuthFormat),
+                                      GetVendorGuidPtr (Variable, mVariableModuleGlobal->VariableGlobal.AuthFormat),
+                                      FALSE,
+                                      &VariablePtrTrack,
+                                      mVariableModuleGlobal->VariableGlobal.AuthFormat
+                                      );
+        if (!EFI_ERROR (Status) && (VariablePtrTrack.CurrPtr->State != VAR_ADDED)) {
           if ((Variable->Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
             HwErrVariableTotalSize += VariableSize;
           } else {
@@ -2959,7 +3071,7 @@ VariableServiceQueryVariableInfoInternal (
     Variable = NextVariable;
   }
 
-  if ((Attributes  & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD){
+  if ((Attributes  & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
     *RemainingVariableStorageSize = *MaximumVariableStorageSize - HwErrVariableTotalSize;
   } else {
     if (*MaximumVariableStorageSize < CommonVariableTotalSize) {
@@ -2972,10 +3084,11 @@ VariableServiceQueryVariableInfoInternal (
   if (*RemainingVariableStorageSize < GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat)) {
     *MaximumVariableSize = 0;
   } else if ((*RemainingVariableStorageSize - GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat)) <
-              *MaximumVariableSize
-              ) {
+             *MaximumVariableSize
+             )
+  {
     *MaximumVariableSize = *RemainingVariableStorageSize -
-                             GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
+                           GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
   }
 
   return EFI_SUCCESS;
@@ -3005,15 +3118,15 @@ VariableServiceQueryVariableInfoInternal (
 EFI_STATUS
 EFIAPI
 VariableServiceQueryVariableInfo (
-  IN  UINT32                 Attributes,
-  OUT UINT64                 *MaximumVariableStorageSize,
-  OUT UINT64                 *RemainingVariableStorageSize,
-  OUT UINT64                 *MaximumVariableSize
+  IN  UINT32  Attributes,
+  OUT UINT64  *MaximumVariableStorageSize,
+  OUT UINT64  *RemainingVariableStorageSize,
+  OUT UINT64  *MaximumVariableSize
   )
 {
-  EFI_STATUS             Status;
+  EFI_STATUS  Status;
 
-  if(MaximumVariableStorageSize == NULL || RemainingVariableStorageSize == NULL || MaximumVariableSize == NULL || Attributes == 0) {
+  if ((MaximumVariableStorageSize == NULL) || (RemainingVariableStorageSize == NULL) || (MaximumVariableSize == NULL) || (Attributes == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -3060,7 +3173,7 @@ VariableServiceQueryVariableInfo (
     }
   }
 
-  AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+  AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
   Status = VariableServiceQueryVariableInfoInternal (
              Attributes,
@@ -3081,14 +3194,14 @@ VariableServiceQueryVariableInfo (
 
 **/
 VOID
-ReclaimForOS(
+ReclaimForOS (
   VOID
   )
 {
-  EFI_STATUS                     Status;
-  UINTN                          RemainingCommonRuntimeVariableSpace;
-  UINTN                          RemainingHwErrVariableSpace;
-  STATIC BOOLEAN                 Reclaimed;
+  EFI_STATUS      Status;
+  UINTN           RemainingCommonRuntimeVariableSpace;
+  UINTN           RemainingHwErrVariableSpace;
+  STATIC BOOLEAN  Reclaimed;
 
   //
   // This function will be called only once at EndOfDxe or ReadyToBoot event.
@@ -3096,9 +3209,10 @@ ReclaimForOS(
   if (Reclaimed) {
     return;
   }
+
   Reclaimed = TRUE;
 
-  Status  = EFI_SUCCESS;
+  Status = EFI_SUCCESS;
 
   if (mVariableModuleGlobal->CommonRuntimeVariableSpace < mVariableModuleGlobal->CommonVariableTotalSize) {
     RemainingCommonRuntimeVariableSpace = 0;
@@ -3114,15 +3228,16 @@ ReclaimForOS(
   if (((RemainingCommonRuntimeVariableSpace < mVariableModuleGlobal->MaxVariableSize) ||
        (RemainingCommonRuntimeVariableSpace < mVariableModuleGlobal->MaxAuthVariableSize)) ||
       ((PcdGet32 (PcdHwErrStorageSize) != 0) &&
-       (RemainingHwErrVariableSpace < PcdGet32 (PcdMaxHardwareErrorVariableSize)))){
+       (RemainingHwErrVariableSpace < PcdGet32 (PcdMaxHardwareErrorVariableSize))))
+  {
     Status = Reclaim (
-            mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
-            &mVariableModuleGlobal->NonVolatileLastVariableOffset,
-            FALSE,
-            NULL,
-            NULL,
-            0
-            );
+               mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
+               &mVariableModuleGlobal->NonVolatileLastVariableOffset,
+               FALSE,
+               NULL,
+               NULL,
+               0
+               );
     ASSERT_EFI_ERROR (Status);
   }
 }
@@ -3138,9 +3253,9 @@ GetMaxVariableSize (
   VOID
   )
 {
-  UINTN MaxVariableSize;
+  UINTN  MaxVariableSize;
 
-  MaxVariableSize = GetNonVolatileMaxVariableSize();
+  MaxVariableSize = GetNonVolatileMaxVariableSize ();
   //
   // The condition below fails implicitly if PcdMaxVolatileVariableSize equals
   // the default zero value.
@@ -3148,6 +3263,7 @@ GetMaxVariableSize (
   if (MaxVariableSize < PcdGet32 (PcdMaxVolatileVariableSize)) {
     MaxVariableSize = PcdGet32 (PcdMaxVolatileVariableSize);
   }
+
   return MaxVariableSize;
 }
 
@@ -3160,50 +3276,54 @@ GetMaxVariableSize (
 **/
 VOID
 FlushHobVariableToFlash (
-  IN CHAR16                     *VariableName,
-  IN EFI_GUID                   *VendorGuid
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid
   )
 {
-  EFI_STATUS                    Status;
-  VARIABLE_STORE_HEADER         *VariableStoreHeader;
-  VARIABLE_HEADER               *Variable;
-  VOID                          *VariableData;
-  VARIABLE_POINTER_TRACK        VariablePtrTrack;
-  BOOLEAN                       ErrorFlag;
-  BOOLEAN                       AuthFormat;
+  EFI_STATUS              Status;
+  VARIABLE_STORE_HEADER   *VariableStoreHeader;
+  VARIABLE_HEADER         *Variable;
+  VOID                    *VariableData;
+  VARIABLE_POINTER_TRACK  VariablePtrTrack;
+  BOOLEAN                 ErrorFlag;
+  BOOLEAN                 AuthFormat;
 
-  ErrorFlag = FALSE;
+  ErrorFlag  = FALSE;
   AuthFormat = mVariableModuleGlobal->VariableGlobal.AuthFormat;
 
   //
   // Flush the HOB variable to flash.
   //
   if (mVariableModuleGlobal->VariableGlobal.HobVariableBase != 0) {
-    VariableStoreHeader = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase;
+    VariableStoreHeader = (VARIABLE_STORE_HEADER *)(UINTN)mVariableModuleGlobal->VariableGlobal.HobVariableBase;
     //
     // Set HobVariableBase to 0, it can avoid SetVariable to call back.
     //
     mVariableModuleGlobal->VariableGlobal.HobVariableBase = 0;
     for ( Variable = GetStartPointer (VariableStoreHeader)
-        ; IsValidVariableHeader (Variable, GetEndPointer (VariableStoreHeader))
-        ; Variable = GetNextVariablePtr (Variable, AuthFormat)
-        ) {
+          ; IsValidVariableHeader (Variable, GetEndPointer (VariableStoreHeader))
+          ; Variable = GetNextVariablePtr (Variable, AuthFormat)
+          )
+    {
       if (Variable->State != VAR_ADDED) {
         //
         // The HOB variable has been set to DELETED state in local.
         //
         continue;
       }
+
       ASSERT ((Variable->Attributes & EFI_VARIABLE_NON_VOLATILE) != 0);
-      if (VendorGuid == NULL || VariableName == NULL ||
+      if ((VendorGuid == NULL) || (VariableName == NULL) ||
           !CompareGuid (VendorGuid, GetVendorGuidPtr (Variable, AuthFormat)) ||
-          StrCmp (VariableName, GetVariableNamePtr (Variable, AuthFormat)) != 0) {
+          (StrCmp (VariableName, GetVariableNamePtr (Variable, AuthFormat)) != 0))
+      {
         VariableData = GetVariableDataPtr (Variable, AuthFormat);
         FindVariable (
           GetVariableNamePtr (Variable, AuthFormat),
           GetVendorGuidPtr (Variable, AuthFormat),
           &VariablePtrTrack,
-          &mVariableModuleGlobal->VariableGlobal, FALSE
+          &mVariableModuleGlobal->VariableGlobal,
+          FALSE
           );
         Status = UpdateVariable (
                    GetVariableNamePtr (Variable, AuthFormat),
@@ -3215,7 +3335,7 @@ FlushHobVariableToFlash (
                    0,
                    &VariablePtrTrack,
                    NULL
-                 );
+                   );
         DEBUG ((
           DEBUG_INFO,
           "Variable driver flush the HOB variable to flash: %g %s %r\n",
@@ -3231,6 +3351,7 @@ FlushHobVariableToFlash (
         //
         Status = EFI_SUCCESS;
       }
+
       if (!EFI_ERROR (Status)) {
         //
         // If set variable successful, or the updated or deleted variable is matched with the HOB variable,
@@ -3247,6 +3368,7 @@ FlushHobVariableToFlash (
         ErrorFlag = TRUE;
       }
     }
+
     if (mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeHobCache.Store != NULL) {
       Status =  SynchronizeRuntimeVariableCache (
                   &mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeHobCache,
@@ -3255,25 +3377,26 @@ FlushHobVariableToFlash (
                   );
       ASSERT_EFI_ERROR (Status);
     }
+
     if (ErrorFlag) {
       //
       // We still have HOB variable(s) not flushed in flash.
       //
-      mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) VariableStoreHeader;
+      mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS)(UINTN)VariableStoreHeader;
     } else {
       //
       // All HOB variables have been flushed in flash.
       //
-      DEBUG ((EFI_D_INFO, "Variable driver: all HOB variables have been flushed in flash.\n"));
+      DEBUG ((DEBUG_INFO, "Variable driver: all HOB variables have been flushed in flash.\n"));
       if (mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.HobFlushComplete != NULL) {
         *(mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.HobFlushComplete) = TRUE;
       }
+
       if (!AtRuntime ()) {
-        FreePool ((VOID *) VariableStoreHeader);
+        FreePool ((VOID *)VariableStoreHeader);
       }
     }
   }
-
 }
 
 /**
@@ -3288,18 +3411,18 @@ VariableWriteServiceInitialize (
   VOID
   )
 {
-  EFI_STATUS                      Status;
-  UINTN                           Index;
-  UINT8                           Data;
-  VARIABLE_ENTRY_PROPERTY         *VariableEntry;
+  EFI_STATUS               Status;
+  UINTN                    Index;
+  UINT8                    Data;
+  VARIABLE_ENTRY_PROPERTY  *VariableEntry;
 
-  AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
+  AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
   //
   // Check if the free area is really free.
   //
   for (Index = mVariableModuleGlobal->NonVolatileLastVariableOffset; Index < mNvVariableCache->Size; Index++) {
-    Data = ((UINT8 *) mNvVariableCache)[Index];
+    Data = ((UINT8 *)mNvVariableCache)[Index];
     if (Data != 0xff) {
       //
       // There must be something wrong in variable store, do reclaim operation.
@@ -3316,6 +3439,7 @@ VariableWriteServiceInitialize (
         ReleaseLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
         return Status;
       }
+
       break;
     }
   }
@@ -3328,36 +3452,36 @@ VariableWriteServiceInitialize (
     //
     // Authenticated variable initialize.
     //
-    mAuthContextIn.StructSize = sizeof (AUTH_VAR_LIB_CONTEXT_IN);
+    mAuthContextIn.StructSize          = sizeof (AUTH_VAR_LIB_CONTEXT_IN);
     mAuthContextIn.MaxAuthVariableSize =  mVariableModuleGlobal->MaxAuthVariableSize -
-                                            GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
+                                         GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
     Status = AuthVariableLibInitialize (&mAuthContextIn, &mAuthContextOut);
     if (!EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_INFO, "Variable driver will work with auth variable support!\n"));
+      DEBUG ((DEBUG_INFO, "Variable driver will work with auth variable support!\n"));
       mVariableModuleGlobal->VariableGlobal.AuthSupport = TRUE;
       if (mAuthContextOut.AuthVarEntry != NULL) {
         for (Index = 0; Index < mAuthContextOut.AuthVarEntryCount; Index++) {
           VariableEntry = &mAuthContextOut.AuthVarEntry[Index];
-          Status = VarCheckLibVariablePropertySet (
-                     VariableEntry->Name,
-                     VariableEntry->Guid,
-                     &VariableEntry->VariableProperty
-                     );
+          Status        = VarCheckLibVariablePropertySet (
+                            VariableEntry->Name,
+                            VariableEntry->Guid,
+                            &VariableEntry->VariableProperty
+                            );
           ASSERT_EFI_ERROR (Status);
         }
       }
     } else if (Status == EFI_UNSUPPORTED) {
-      DEBUG ((EFI_D_INFO, "NOTICE - AuthVariableLibInitialize() returns %r!\n", Status));
-      DEBUG ((EFI_D_INFO, "Variable driver will continue to work without auth variable support!\n"));
+      DEBUG ((DEBUG_INFO, "NOTICE - AuthVariableLibInitialize() returns %r!\n", Status));
+      DEBUG ((DEBUG_INFO, "Variable driver will continue to work without auth variable support!\n"));
       mVariableModuleGlobal->VariableGlobal.AuthSupport = FALSE;
-      Status = EFI_SUCCESS;
+      Status                                            = EFI_SUCCESS;
     }
   }
 
   if (!EFI_ERROR (Status)) {
     for (Index = 0; Index < ARRAY_SIZE (mVariableEntryProperty); Index++) {
       VariableEntry = &mVariableEntryProperty[Index];
-      Status = VarCheckLibVariablePropertySet (VariableEntry->Name, VariableEntry->Guid, &VariableEntry->VariableProperty);
+      Status        = VarCheckLibVariablePropertySet (VariableEntry->Name, VariableEntry->Guid, &VariableEntry->VariableProperty);
       ASSERT_EFI_ERROR (Status);
     }
   }
@@ -3381,17 +3505,17 @@ VariableWriteServiceInitialize (
 **/
 VOID *
 ConvertNormalVarStorageToAuthVarStorage (
-  VARIABLE_STORE_HEADER *NormalVarStorage
+  VARIABLE_STORE_HEADER  *NormalVarStorage
   )
 {
-  VARIABLE_HEADER *StartPtr;
-  UINT8           *NextPtr;
-  VARIABLE_HEADER *EndPtr;
-  UINTN           AuthVarStroageSize;
-  AUTHENTICATED_VARIABLE_HEADER *AuthStartPtr;
-  VARIABLE_STORE_HEADER         *AuthVarStorage;
+  VARIABLE_HEADER                *StartPtr;
+  UINT8                          *NextPtr;
+  VARIABLE_HEADER                *EndPtr;
+  UINTN                          AuthVarStroageSize;
+  AUTHENTICATED_VARIABLE_HEADER  *AuthStartPtr;
+  VARIABLE_STORE_HEADER          *AuthVarStorage;
 
-  AuthVarStroageSize  = sizeof (VARIABLE_STORE_HEADER);
+  AuthVarStroageSize = sizeof (VARIABLE_STORE_HEADER);
   //
   // Set AuthFormat as FALSE for normal variable storage
   //
@@ -3404,12 +3528,13 @@ ConvertNormalVarStorageToAuthVarStorage (
   EndPtr   = GetEndPointer (NormalVarStorage);
   while (StartPtr < EndPtr) {
     if (StartPtr->State == VAR_ADDED) {
-      AuthVarStroageSize = HEADER_ALIGN (AuthVarStroageSize);
+      AuthVarStroageSize  = HEADER_ALIGN (AuthVarStroageSize);
       AuthVarStroageSize += sizeof (AUTHENTICATED_VARIABLE_HEADER);
       AuthVarStroageSize += StartPtr->NameSize + GET_PAD_SIZE (StartPtr->NameSize);
       AuthVarStroageSize += StartPtr->DataSize + GET_PAD_SIZE (StartPtr->DataSize);
     }
-    StartPtr  = GetNextVariablePtr (StartPtr, mVariableModuleGlobal->VariableGlobal.AuthFormat);
+
+    StartPtr = GetNextVariablePtr (StartPtr, mVariableModuleGlobal->VariableGlobal.AuthFormat);
   }
 
   //
@@ -3424,25 +3549,25 @@ ConvertNormalVarStorageToAuthVarStorage (
   //
   // Copy Variable from Normal storage to Auth storage
   //
-  StartPtr = GetStartPointer (NormalVarStorage);
-  EndPtr   = GetEndPointer (NormalVarStorage);
-  AuthStartPtr = (AUTHENTICATED_VARIABLE_HEADER *) GetStartPointer (AuthVarStorage);
+  StartPtr     = GetStartPointer (NormalVarStorage);
+  EndPtr       = GetEndPointer (NormalVarStorage);
+  AuthStartPtr = (AUTHENTICATED_VARIABLE_HEADER *)GetStartPointer (AuthVarStorage);
   while (StartPtr < EndPtr) {
     if (StartPtr->State == VAR_ADDED) {
-      AuthStartPtr = (AUTHENTICATED_VARIABLE_HEADER *) HEADER_ALIGN (AuthStartPtr);
+      AuthStartPtr = (AUTHENTICATED_VARIABLE_HEADER *)HEADER_ALIGN (AuthStartPtr);
       //
       // Copy Variable Header
       //
-      AuthStartPtr->StartId     = StartPtr->StartId;
-      AuthStartPtr->State       = StartPtr->State;
-      AuthStartPtr->Attributes  = StartPtr->Attributes;
-      AuthStartPtr->NameSize    = StartPtr->NameSize;
-      AuthStartPtr->DataSize    = StartPtr->DataSize;
+      AuthStartPtr->StartId    = StartPtr->StartId;
+      AuthStartPtr->State      = StartPtr->State;
+      AuthStartPtr->Attributes = StartPtr->Attributes;
+      AuthStartPtr->NameSize   = StartPtr->NameSize;
+      AuthStartPtr->DataSize   = StartPtr->DataSize;
       CopyGuid (&AuthStartPtr->VendorGuid, &StartPtr->VendorGuid);
       //
       // Copy Variable Name
       //
-      NextPtr = (UINT8 *) (AuthStartPtr + 1);
+      NextPtr = (UINT8 *)(AuthStartPtr + 1);
       CopyMem (
         NextPtr,
         GetVariableNamePtr (StartPtr, mVariableModuleGlobal->VariableGlobal.AuthFormat),
@@ -3456,16 +3581,18 @@ ConvertNormalVarStorageToAuthVarStorage (
       //
       // Go to next variable
       //
-      AuthStartPtr = (AUTHENTICATED_VARIABLE_HEADER *) (NextPtr + AuthStartPtr->DataSize + GET_PAD_SIZE (AuthStartPtr->DataSize));
+      AuthStartPtr = (AUTHENTICATED_VARIABLE_HEADER *)(NextPtr + AuthStartPtr->DataSize + GET_PAD_SIZE (AuthStartPtr->DataSize));
     }
+
     StartPtr = GetNextVariablePtr (StartPtr, mVariableModuleGlobal->VariableGlobal.AuthFormat);
   }
+
   //
   // Update Auth Storage Header
   //
   AuthVarStorage->Format = NormalVarStorage->Format;
   AuthVarStorage->State  = NormalVarStorage->State;
-  AuthVarStorage->Size = (UINT32)((UINTN)AuthStartPtr - (UINTN)AuthVarStorage);
+  AuthVarStorage->Size   = (UINT32)((UINTN)AuthStartPtr - (UINTN)AuthVarStorage);
   CopyGuid (&AuthVarStorage->Signature, &gEfiAuthenticatedVariableGuid);
   ASSERT (AuthVarStorage->Size <= AuthVarStroageSize);
 
@@ -3487,37 +3614,38 @@ ConvertNormalVarStorageToAuthVarStorage (
 **/
 EFI_STATUS
 GetHobVariableStore (
-  IN EFI_GUID                   *VariableGuid
+  IN EFI_GUID  *VariableGuid
   )
 {
-  VARIABLE_STORE_HEADER         *VariableStoreHeader;
-  UINT64                        VariableStoreLength;
-  EFI_HOB_GUID_TYPE             *GuidHob;
-  BOOLEAN                       NeedConvertNormalToAuth;
+  VARIABLE_STORE_HEADER  *VariableStoreHeader;
+  UINT64                 VariableStoreLength;
+  EFI_HOB_GUID_TYPE      *GuidHob;
+  BOOLEAN                NeedConvertNormalToAuth;
 
   //
   // Make sure there is no more than one Variable HOB.
   //
-  DEBUG_CODE (
-    GuidHob = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
+  DEBUG_CODE_BEGIN ();
+  GuidHob = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
+  if (GuidHob != NULL) {
+    if ((GetNextGuidHob (&gEfiAuthenticatedVariableGuid, GET_NEXT_HOB (GuidHob)) != NULL)) {
+      DEBUG ((DEBUG_ERROR, "ERROR: Found two Auth Variable HOBs\n"));
+      ASSERT (FALSE);
+    } else if (GetFirstGuidHob (&gEfiVariableGuid) != NULL) {
+      DEBUG ((DEBUG_ERROR, "ERROR: Found one Auth + one Normal Variable HOBs\n"));
+      ASSERT (FALSE);
+    }
+  } else {
+    GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
     if (GuidHob != NULL) {
-      if ((GetNextGuidHob (&gEfiAuthenticatedVariableGuid, GET_NEXT_HOB (GuidHob)) != NULL)) {
-        DEBUG ((DEBUG_ERROR, "ERROR: Found two Auth Variable HOBs\n"));
+      if ((GetNextGuidHob (&gEfiVariableGuid, GET_NEXT_HOB (GuidHob)) != NULL)) {
+        DEBUG ((DEBUG_ERROR, "ERROR: Found two Normal Variable HOBs\n"));
         ASSERT (FALSE);
-      } else if (GetFirstGuidHob (&gEfiVariableGuid) != NULL) {
-        DEBUG ((DEBUG_ERROR, "ERROR: Found one Auth + one Normal Variable HOBs\n"));
-        ASSERT (FALSE);
-      }
-    } else {
-      GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
-      if (GuidHob != NULL) {
-        if ((GetNextGuidHob (&gEfiVariableGuid, GET_NEXT_HOB (GuidHob)) != NULL)) {
-          DEBUG ((DEBUG_ERROR, "ERROR: Found two Normal Variable HOBs\n"));
-          ASSERT (FALSE);
-        }
       }
     }
-  );
+  }
+
+  DEBUG_CODE_END ();
 
   //
   // Combinations supported:
@@ -3529,28 +3657,30 @@ GetHobVariableStore (
   //    Normal HOB variable store (code will convert it to Auth Format)
   //
   NeedConvertNormalToAuth = FALSE;
-  GuidHob = GetFirstGuidHob (VariableGuid);
-  if (GuidHob == NULL && VariableGuid == &gEfiAuthenticatedVariableGuid) {
+  GuidHob                 = GetFirstGuidHob (VariableGuid);
+  if ((GuidHob == NULL) && (VariableGuid == &gEfiAuthenticatedVariableGuid)) {
     //
     // Try getting it from normal variable HOB
     //
-    GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
+    GuidHob                 = GetFirstGuidHob (&gEfiVariableGuid);
     NeedConvertNormalToAuth = TRUE;
   }
+
   if (GuidHob != NULL) {
     VariableStoreHeader = GET_GUID_HOB_DATA (GuidHob);
     VariableStoreLength = GuidHob->Header.HobLength - sizeof (EFI_HOB_GUID_TYPE);
     if (GetVariableStoreStatus (VariableStoreHeader) == EfiValid) {
       if (!NeedConvertNormalToAuth) {
-        mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) AllocateRuntimeCopyPool ((UINTN) VariableStoreLength, (VOID *) VariableStoreHeader);
+        mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateRuntimeCopyPool ((UINTN)VariableStoreLength, (VOID *)VariableStoreHeader);
       } else {
-        mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) ConvertNormalVarStorageToAuthVarStorage ((VOID *) VariableStoreHeader);
+        mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS)(UINTN)ConvertNormalVarStorageToAuthVarStorage ((VOID *)VariableStoreHeader);
       }
+
       if (mVariableModuleGlobal->VariableGlobal.HobVariableBase == 0) {
         return EFI_OUT_OF_RESOURCES;
       }
     } else {
-      DEBUG ((EFI_D_ERROR, "HOB Variable Store header is corrupted!\n"));
+      DEBUG ((DEBUG_ERROR, "HOB Variable Store header is corrupted!\n"));
     }
   }
 
@@ -3569,10 +3699,10 @@ VariableCommonInitialize (
   VOID
   )
 {
-  EFI_STATUS                      Status;
-  VARIABLE_STORE_HEADER           *VolatileVariableStore;
-  UINTN                           ScratchSize;
-  EFI_GUID                        *VariableGuid;
+  EFI_STATUS             Status;
+  VARIABLE_STORE_HEADER  *VolatileVariableStore;
+  UINTN                  ScratchSize;
+  EFI_GUID               *VariableGuid;
 
   //
   // Allocate runtime memory for variable driver global structure.
@@ -3598,16 +3728,16 @@ VariableCommonInitialize (
   // has been initialized in InitNonVolatileVariableStore().
   //
   if (mVariableModuleGlobal->VariableGlobal.AuthFormat) {
-    DEBUG ((EFI_D_INFO, "Variable driver will work with auth variable format!\n"));
+    DEBUG ((DEBUG_INFO, "Variable driver will work with auth variable format!\n"));
     //
     // Set AuthSupport to FALSE first, VariableWriteServiceInitialize() will initialize it.
     //
     mVariableModuleGlobal->VariableGlobal.AuthSupport = FALSE;
-    VariableGuid = &gEfiAuthenticatedVariableGuid;
+    VariableGuid                                      = &gEfiAuthenticatedVariableGuid;
   } else {
-    DEBUG ((EFI_D_INFO, "Variable driver will work without auth variable support!\n"));
+    DEBUG ((DEBUG_INFO, "Variable driver will work without auth variable support!\n"));
     mVariableModuleGlobal->VariableGlobal.AuthSupport = FALSE;
-    VariableGuid = &gEfiVariableGuid;
+    VariableGuid                                      = &gEfiVariableGuid;
   }
 
   //
@@ -3618,6 +3748,7 @@ VariableCommonInitialize (
     if (mNvFvHeaderCache != NULL) {
       FreePool (mNvFvHeaderCache);
     }
+
     FreePool (mVariableModuleGlobal);
     return Status;
   }
@@ -3629,16 +3760,18 @@ VariableCommonInitialize (
   //
   // Allocate memory for volatile variable store, note that there is a scratch space to store scratch data.
   //
-  ScratchSize = GetMaxVariableSize ();
+  ScratchSize                              = GetMaxVariableSize ();
   mVariableModuleGlobal->ScratchBufferSize = ScratchSize;
-  VolatileVariableStore = AllocateRuntimePool (PcdGet32 (PcdVariableStoreSize) + ScratchSize);
+  VolatileVariableStore                    = AllocateRuntimePool (PcdGet32 (PcdVariableStoreSize) + ScratchSize);
   if (VolatileVariableStore == NULL) {
     if (mVariableModuleGlobal->VariableGlobal.HobVariableBase != 0) {
-      FreePool ((VOID *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase);
+      FreePool ((VOID *)(UINTN)mVariableModuleGlobal->VariableGlobal.HobVariableBase);
     }
+
     if (mNvFvHeaderCache != NULL) {
       FreePool (mNvFvHeaderCache);
     }
+
     FreePool (mVariableModuleGlobal);
     return EFI_OUT_OF_RESOURCES;
   }
@@ -3648,19 +3781,18 @@ VariableCommonInitialize (
   //
   // Initialize Variable Specific Data.
   //
-  mVariableModuleGlobal->VariableGlobal.VolatileVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) VolatileVariableStore;
-  mVariableModuleGlobal->VolatileLastVariableOffset = (UINTN) GetStartPointer (VolatileVariableStore) - (UINTN) VolatileVariableStore;
+  mVariableModuleGlobal->VariableGlobal.VolatileVariableBase = (EFI_PHYSICAL_ADDRESS)(UINTN)VolatileVariableStore;
+  mVariableModuleGlobal->VolatileLastVariableOffset          = (UINTN)GetStartPointer (VolatileVariableStore) - (UINTN)VolatileVariableStore;
 
   CopyGuid (&VolatileVariableStore->Signature, VariableGuid);
-  VolatileVariableStore->Size        = PcdGet32 (PcdVariableStoreSize);
-  VolatileVariableStore->Format      = VARIABLE_STORE_FORMATTED;
-  VolatileVariableStore->State       = VARIABLE_STORE_HEALTHY;
-  VolatileVariableStore->Reserved    = 0;
-  VolatileVariableStore->Reserved1   = 0;
+  VolatileVariableStore->Size      = PcdGet32 (PcdVariableStoreSize);
+  VolatileVariableStore->Format    = VARIABLE_STORE_FORMATTED;
+  VolatileVariableStore->State     = VARIABLE_STORE_HEALTHY;
+  VolatileVariableStore->Reserved  = 0;
+  VolatileVariableStore->Reserved1 = 0;
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Get the proper fvb handle and/or fvb protocol by the given Flash address.
@@ -3677,15 +3809,15 @@ GetFvbInfoByAddress (
   OUT EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  **FvbProtocol OPTIONAL
   )
 {
-  EFI_STATUS                              Status;
-  EFI_HANDLE                              *HandleBuffer;
-  UINTN                                   HandleCount;
-  UINTN                                   Index;
-  EFI_PHYSICAL_ADDRESS                    FvbBaseAddress;
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL      *Fvb;
-  EFI_FVB_ATTRIBUTES_2                    Attributes;
-  UINTN                                   BlockSize;
-  UINTN                                   NumberOfBlocks;
+  EFI_STATUS                          Status;
+  EFI_HANDLE                          *HandleBuffer;
+  UINTN                               HandleCount;
+  UINTN                               Index;
+  EFI_PHYSICAL_ADDRESS                FvbBaseAddress;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
+  EFI_FVB_ATTRIBUTES_2                Attributes;
+  UINTN                               BlockSize;
+  UINTN                               NumberOfBlocks;
 
   HandleBuffer = NULL;
   //
@@ -3733,15 +3865,18 @@ GetFvbInfoByAddress (
 
     if ((Address >= FvbBaseAddress) && (Address < (FvbBaseAddress + BlockSize * NumberOfBlocks))) {
       if (FvbHandle != NULL) {
-        *FvbHandle  = HandleBuffer[Index];
+        *FvbHandle = HandleBuffer[Index];
       }
+
       if (FvbProtocol != NULL) {
         *FvbProtocol = Fvb;
       }
+
       Status = EFI_SUCCESS;
       break;
     }
   }
+
   FreePool (HandleBuffer);
 
   if (Fvb == NULL) {
@@ -3750,4 +3885,3 @@ GetFvbInfoByAddress (
 
   return Status;
 }
-

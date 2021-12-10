@@ -7,9 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "Ehci.h"
-
 
 /**
   Read EHCI capability register.
@@ -23,24 +21,24 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 UINT32
 EhcReadCapRegister (
-  IN  USB2_HC_DEV         *Ehc,
-  IN  UINT32              Offset
+  IN  USB2_HC_DEV  *Ehc,
+  IN  UINT32       Offset
   )
 {
-  UINT32                  Data;
-  EFI_STATUS              Status;
+  UINT32      Data;
+  EFI_STATUS  Status;
 
   Status = Ehc->PciIo->Mem.Read (
                              Ehc->PciIo,
                              EfiPciIoWidthUint32,
                              EHC_BAR_INDEX,
-                             (UINT64) Offset,
+                             (UINT64)Offset,
                              1,
                              &Data
                              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EhcReadCapRegister: Pci Io read error - %r at %d\n", Status, Offset));
+    DEBUG ((DEBUG_ERROR, "EhcReadCapRegister: Pci Io read error - %r at %d\n", Status, Offset));
     Data = 0xFFFF;
   }
 
@@ -59,12 +57,12 @@ EhcReadCapRegister (
 **/
 UINT32
 EhcReadDbgRegister (
-  IN  CONST USB2_HC_DEV   *Ehc,
-  IN  UINT32              Offset
+  IN  CONST USB2_HC_DEV  *Ehc,
+  IN  UINT32             Offset
   )
 {
-  UINT32                  Data;
-  EFI_STATUS              Status;
+  UINT32      Data;
+  EFI_STATUS  Status;
 
   Status = Ehc->PciIo->Mem.Read (
                              Ehc->PciIo,
@@ -76,13 +74,12 @@ EhcReadDbgRegister (
                              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EhcReadDbgRegister: Pci Io read error - %r at %d\n", Status, Offset));
+    DEBUG ((DEBUG_ERROR, "EhcReadDbgRegister: Pci Io read error - %r at %d\n", Status, Offset));
     Data = 0xFFFF;
   }
 
   return Data;
 }
-
 
 /**
   Check whether the host controller has an in-use debug port.
@@ -105,11 +102,11 @@ EhcReadDbgRegister (
 **/
 BOOLEAN
 EhcIsDebugPortInUse (
-  IN CONST USB2_HC_DEV *Ehc,
-  IN CONST UINT8       *PortNumber OPTIONAL
+  IN CONST USB2_HC_DEV  *Ehc,
+  IN CONST UINT8        *PortNumber OPTIONAL
   )
 {
-  UINT32 State;
+  UINT32  State;
 
   if (Ehc->DebugPortNum == 0) {
     //
@@ -121,7 +118,7 @@ EhcIsDebugPortInUse (
   //
   // The Debug Port Number field in HCSPARAMS is one-based.
   //
-  if (PortNumber != NULL && *PortNumber != Ehc->DebugPortNum - 1) {
+  if ((PortNumber != NULL) && (*PortNumber != Ehc->DebugPortNum - 1)) {
     //
     // The caller specified a port, but it's not the debug port of the host
     // controller.
@@ -132,10 +129,9 @@ EhcIsDebugPortInUse (
   //
   // Deduce usage from the Control Register.
   //
-  State = EhcReadDbgRegister(Ehc, 0);
+  State = EhcReadDbgRegister (Ehc, 0);
   return (State & USB_DEBUG_PORT_IN_USE_MASK) == USB_DEBUG_PORT_IN_USE_MASK;
 }
-
 
 /**
   Read EHCI Operation register.
@@ -149,12 +145,12 @@ EhcIsDebugPortInUse (
 **/
 UINT32
 EhcReadOpReg (
-  IN  USB2_HC_DEV         *Ehc,
-  IN  UINT32              Offset
+  IN  USB2_HC_DEV  *Ehc,
+  IN  UINT32       Offset
   )
 {
-  UINT32                  Data;
-  EFI_STATUS              Status;
+  UINT32      Data;
+  EFI_STATUS  Status;
 
   ASSERT (Ehc->CapLen != 0);
 
@@ -168,13 +164,12 @@ EhcReadOpReg (
                              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EhcReadOpReg: Pci Io Read error - %r at %d\n", Status, Offset));
+    DEBUG ((DEBUG_ERROR, "EhcReadOpReg: Pci Io Read error - %r at %d\n", Status, Offset));
     Data = 0xFFFF;
   }
 
   return Data;
 }
-
 
 /**
   Write  the data to the EHCI operation register.
@@ -186,12 +181,12 @@ EhcReadOpReg (
 **/
 VOID
 EhcWriteOpReg (
-  IN USB2_HC_DEV          *Ehc,
-  IN UINT32               Offset,
-  IN UINT32               Data
+  IN USB2_HC_DEV  *Ehc,
+  IN UINT32       Offset,
+  IN UINT32       Data
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   ASSERT (Ehc->CapLen != 0);
 
@@ -205,10 +200,9 @@ EhcWriteOpReg (
                              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EhcWriteOpReg: Pci Io Write error: %r at %d\n", Status, Offset));
+    DEBUG ((DEBUG_ERROR, "EhcWriteOpReg: Pci Io Write error: %r at %d\n", Status, Offset));
   }
 }
-
 
 /**
   Set one bit of the operational register while keeping other bits.
@@ -220,18 +214,17 @@ EhcWriteOpReg (
 **/
 VOID
 EhcSetOpRegBit (
-  IN USB2_HC_DEV          *Ehc,
-  IN UINT32               Offset,
-  IN UINT32               Bit
+  IN USB2_HC_DEV  *Ehc,
+  IN UINT32       Offset,
+  IN UINT32       Bit
   )
 {
-  UINT32                  Data;
+  UINT32  Data;
 
   Data  = EhcReadOpReg (Ehc, Offset);
   Data |= Bit;
   EhcWriteOpReg (Ehc, Offset, Data);
 }
-
 
 /**
   Clear one bit of the operational register while keeping other bits.
@@ -243,18 +236,17 @@ EhcSetOpRegBit (
 **/
 VOID
 EhcClearOpRegBit (
-  IN USB2_HC_DEV          *Ehc,
-  IN UINT32               Offset,
-  IN UINT32               Bit
+  IN USB2_HC_DEV  *Ehc,
+  IN UINT32       Offset,
+  IN UINT32       Bit
   )
 {
-  UINT32                  Data;
+  UINT32  Data;
 
   Data  = EhcReadOpReg (Ehc, Offset);
   Data &= ~Bit;
   EhcWriteOpReg (Ehc, Offset, Data);
 }
-
 
 /**
   Wait the operation register's bit as specified by Bit
@@ -272,14 +264,14 @@ EhcClearOpRegBit (
 **/
 EFI_STATUS
 EhcWaitOpRegBit (
-  IN USB2_HC_DEV          *Ehc,
-  IN UINT32               Offset,
-  IN UINT32               Bit,
-  IN BOOLEAN              WaitToSet,
-  IN UINT32               Timeout
+  IN USB2_HC_DEV  *Ehc,
+  IN UINT32       Offset,
+  IN UINT32       Bit,
+  IN BOOLEAN      WaitToSet,
+  IN UINT32       Timeout
   )
 {
-  UINT32                  Index;
+  UINT32  Index;
 
   for (Index = 0; Index < Timeout / EHC_SYNC_POLL_INTERVAL + 1; Index++) {
     if (EHC_REG_BIT_IS_SET (Ehc, Offset, Bit) == WaitToSet) {
@@ -292,7 +284,6 @@ EhcWaitOpRegBit (
   return EFI_TIMEOUT;
 }
 
-
 /**
   Add support for UEFI Over Legacy (UoL) feature, stop
   the legacy USB SMI support.
@@ -302,15 +293,15 @@ EhcWaitOpRegBit (
 **/
 VOID
 EhcClearLegacySupport (
-  IN USB2_HC_DEV          *Ehc
+  IN USB2_HC_DEV  *Ehc
   )
 {
-  UINT32                    ExtendCap;
-  EFI_PCI_IO_PROTOCOL       *PciIo;
-  UINT32                    Value;
-  UINT32                    TimeOut;
+  UINT32               ExtendCap;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  UINT32               Value;
+  UINT32               TimeOut;
 
-  DEBUG ((EFI_D_INFO, "EhcClearLegacySupport: called to clear legacy support\n"));
+  DEBUG ((DEBUG_INFO, "EhcClearLegacySupport: called to clear legacy support\n"));
 
   PciIo     = Ehc->PciIo;
   ExtendCap = (Ehc->HcCapParams >> 8) & 0xFF;
@@ -337,8 +328,6 @@ EhcClearLegacySupport (
   PciIo->Pci.Read (PciIo, EfiPciIoWidthUint32, ExtendCap + 0x4, 1, &Value);
 }
 
-
-
 /**
   Set door bell and wait it to be ACKed by host controller.
   This function is used to synchronize with the hardware.
@@ -352,12 +341,12 @@ EhcClearLegacySupport (
 **/
 EFI_STATUS
 EhcSetAndWaitDoorBell (
-  IN  USB2_HC_DEV         *Ehc,
-  IN  UINT32              Timeout
+  IN  USB2_HC_DEV  *Ehc,
+  IN  UINT32       Timeout
   )
 {
-  EFI_STATUS              Status;
-  UINT32                  Data;
+  EFI_STATUS  Status;
+  UINT32      Data;
 
   EhcSetOpRegBit (Ehc, EHC_USBCMD_OFFSET, USBCMD_IAAD);
 
@@ -376,7 +365,6 @@ EhcSetAndWaitDoorBell (
   return Status;
 }
 
-
 /**
   Clear all the interrutp status bits, these bits
   are Write-Clean.
@@ -386,12 +374,11 @@ EhcSetAndWaitDoorBell (
 **/
 VOID
 EhcAckAllInterrupt (
-  IN  USB2_HC_DEV         *Ehc
+  IN  USB2_HC_DEV  *Ehc
   )
 {
   EhcWriteOpReg (Ehc, EHC_USBSTS_OFFSET, USBSTS_INTACK_MASK);
 }
-
 
 /**
   Enable the periodic schedule then wait EHC to
@@ -406,22 +393,17 @@ EhcAckAllInterrupt (
 **/
 EFI_STATUS
 EhcEnablePeriodSchd (
-  IN USB2_HC_DEV          *Ehc,
-  IN UINT32               Timeout
+  IN USB2_HC_DEV  *Ehc,
+  IN UINT32       Timeout
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   EhcSetOpRegBit (Ehc, EHC_USBCMD_OFFSET, USBCMD_ENABLE_PERIOD);
 
   Status = EhcWaitOpRegBit (Ehc, EHC_USBSTS_OFFSET, USBSTS_PERIOD_ENABLED, TRUE, Timeout);
   return Status;
 }
-
-
-
-
-
 
 /**
   Enable asynchrounous schedule.
@@ -435,23 +417,17 @@ EhcEnablePeriodSchd (
 **/
 EFI_STATUS
 EhcEnableAsyncSchd (
-  IN USB2_HC_DEV          *Ehc,
-  IN UINT32               Timeout
+  IN USB2_HC_DEV  *Ehc,
+  IN UINT32       Timeout
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   EhcSetOpRegBit (Ehc, EHC_USBCMD_OFFSET, USBCMD_ENABLE_ASYNC);
 
   Status = EhcWaitOpRegBit (Ehc, EHC_USBSTS_OFFSET, USBSTS_ASYNC_ENABLED, TRUE, Timeout);
   return Status;
 }
-
-
-
-
-
-
 
 /**
   Whether Ehc is halted.
@@ -464,12 +440,11 @@ EhcEnableAsyncSchd (
 **/
 BOOLEAN
 EhcIsHalt (
-  IN USB2_HC_DEV          *Ehc
+  IN USB2_HC_DEV  *Ehc
   )
 {
   return EHC_REG_BIT_IS_SET (Ehc, EHC_USBSTS_OFFSET, USBSTS_HALT);
 }
-
 
 /**
   Whether system error occurred.
@@ -482,12 +457,11 @@ EhcIsHalt (
 **/
 BOOLEAN
 EhcIsSysError (
-  IN USB2_HC_DEV          *Ehc
+  IN USB2_HC_DEV  *Ehc
   )
 {
   return EHC_REG_BIT_IS_SET (Ehc, EHC_USBSTS_OFFSET, USBSTS_SYS_ERROR);
 }
-
 
 /**
   Reset the host controller.
@@ -501,11 +475,11 @@ EhcIsSysError (
 **/
 EFI_STATUS
 EhcResetHC (
-  IN USB2_HC_DEV          *Ehc,
-  IN UINT32               Timeout
+  IN USB2_HC_DEV  *Ehc,
+  IN UINT32       Timeout
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   //
   // Host can only be reset when it is halt. If not so, halt it
@@ -523,7 +497,6 @@ EhcResetHC (
   return Status;
 }
 
-
 /**
   Halt the host controller.
 
@@ -536,17 +509,16 @@ EhcResetHC (
 **/
 EFI_STATUS
 EhcHaltHC (
-  IN USB2_HC_DEV         *Ehc,
-  IN UINT32              Timeout
+  IN USB2_HC_DEV  *Ehc,
+  IN UINT32       Timeout
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   EhcClearOpRegBit (Ehc, EHC_USBCMD_OFFSET, USBCMD_RUN);
   Status = EhcWaitOpRegBit (Ehc, EHC_USBSTS_OFFSET, USBSTS_HALT, TRUE, Timeout);
   return Status;
 }
-
 
 /**
   Set the EHCI to run.
@@ -560,17 +532,16 @@ EhcHaltHC (
 **/
 EFI_STATUS
 EhcRunHC (
-  IN USB2_HC_DEV          *Ehc,
-  IN UINT32               Timeout
+  IN USB2_HC_DEV  *Ehc,
+  IN UINT32       Timeout
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   EhcSetOpRegBit (Ehc, EHC_USBCMD_OFFSET, USBCMD_RUN);
   Status = EhcWaitOpRegBit (Ehc, EHC_USBSTS_OFFSET, USBSTS_HALT, FALSE, Timeout);
   return Status;
 }
-
 
 /**
   Initialize the HC hardware.
@@ -589,12 +560,12 @@ EhcRunHC (
 **/
 EFI_STATUS
 EhcInitHC (
-  IN USB2_HC_DEV          *Ehc
+  IN USB2_HC_DEV  *Ehc
   )
 {
-  EFI_STATUS              Status;
-  UINT32                  Index;
-  UINT32                  RegVal;
+  EFI_STATUS  Status;
+  UINT32      Index;
+  UINT32      RegVal;
 
   // This ASSERT crashes the BeagleBoard. There is some issue in the USB stack.
   // This ASSERT needs to be removed so the BeagleBoard will boot. When we fix
@@ -629,15 +600,15 @@ EhcInitHC (
   // 3. Power up all ports if EHCI has Port Power Control (PPC) support
   //
   if (Ehc->HcStructParams & HCSP_PPC) {
-    for (Index = 0; Index < (UINT8) (Ehc->HcStructParams & HCSP_NPORTS); Index++) {
+    for (Index = 0; Index < (UINT8)(Ehc->HcStructParams & HCSP_NPORTS); Index++) {
       //
       // Do not clear port status bits on initialization.  Otherwise devices will
       // not enumerate properly at startup.
       //
-      RegVal  = EhcReadOpReg(Ehc, (UINT32)(EHC_PORT_STAT_OFFSET + (4 * Index)));
+      RegVal  = EhcReadOpReg (Ehc, (UINT32)(EHC_PORT_STAT_OFFSET + (4 * Index)));
       RegVal &= ~PORTSC_CHANGE_MASK;
       RegVal |= PORTSC_POWER;
-      EhcWriteOpReg (Ehc, (UINT32) (EHC_PORT_STAT_OFFSET + (4 * Index)), RegVal);
+      EhcWriteOpReg (Ehc, (UINT32)(EHC_PORT_STAT_OFFSET + (4 * Index)), RegVal);
     }
   }
 
@@ -654,14 +625,14 @@ EhcInitHC (
   Status = EhcEnablePeriodSchd (Ehc, EHC_GENERIC_TIMEOUT);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EhcInitHC: failed to enable period schedule\n"));
+    DEBUG ((DEBUG_ERROR, "EhcInitHC: failed to enable period schedule\n"));
     return Status;
   }
 
   Status = EhcEnableAsyncSchd (Ehc, EHC_GENERIC_TIMEOUT);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EhcInitHC: failed to enable async schedule\n"));
+    DEBUG ((DEBUG_ERROR, "EhcInitHC: failed to enable async schedule\n"));
     return Status;
   }
 

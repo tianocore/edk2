@@ -19,11 +19,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 UINT32
 GetLocalTokenNumber (
-  IN PEI_PCD_DATABASE   *Database,
-  IN UINTN              TokenNumber
+  IN PEI_PCD_DATABASE  *Database,
+  IN UINTN             TokenNumber
   )
 {
-  UINT32                LocalTokenNumber;
+  UINT32  LocalTokenNumber;
 
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
@@ -46,7 +46,7 @@ GetLocalTokenNumber (
 **/
 EFI_PCD_TYPE
 GetPcdType (
-  IN UINT32             LocalTokenNumber
+  IN UINT32  LocalTokenNumber
   )
 {
   switch (LocalTokenNumber & PCD_DATUM_TYPE_ALL_SET) {
@@ -58,6 +58,7 @@ GetPcdType (
       } else {
         return EFI_PCD_TYPE_8;
       }
+
     case PCD_DATUM_TYPE_UINT16:
       return EFI_PCD_TYPE_16;
     case PCD_DATUM_TYPE_UINT32:
@@ -82,17 +83,17 @@ GetPcdType (
 **/
 CHAR8 *
 GetPcdName (
-  IN BOOLEAN            OnlyTokenSpaceName,
-  IN PEI_PCD_DATABASE   *Database,
-  IN UINTN              TokenNumber
+  IN BOOLEAN           OnlyTokenSpaceName,
+  IN PEI_PCD_DATABASE  *Database,
+  IN UINTN             TokenNumber
   )
 {
-  UINT8             *StringTable;
-  UINTN             NameSize;
-  PCD_NAME_INDEX    *PcdNameIndex;
-  CHAR8             *TokenSpaceName;
-  CHAR8             *PcdName;
-  CHAR8             *Name;
+  UINT8           *StringTable;
+  UINTN           NameSize;
+  PCD_NAME_INDEX  *PcdNameIndex;
+  CHAR8           *TokenSpaceName;
+  CHAR8           *PcdName;
+  CHAR8           *Name;
 
   //
   // Return NULL when PCD name table is absent.
@@ -108,14 +109,14 @@ GetPcdName (
   //
   TokenNumber--;
 
-  StringTable = (UINT8 *) Database + Database->StringTableOffset;
+  StringTable = (UINT8 *)Database + Database->StringTableOffset;
 
   //
   // Get the PCD name index.
   //
-  PcdNameIndex = (PCD_NAME_INDEX *)((UINT8 *) Database + Database->PcdNameTableOffset) + TokenNumber;
+  PcdNameIndex   = (PCD_NAME_INDEX *)((UINT8 *)Database + Database->PcdNameTableOffset) + TokenNumber;
   TokenSpaceName = (CHAR8 *)&StringTable[PcdNameIndex->TokenSpaceCNameIndex];
-  PcdName = (CHAR8 *)&StringTable[PcdNameIndex->PcdCNameIndex];
+  PcdName        = (CHAR8 *)&StringTable[PcdNameIndex->PcdCNameIndex];
 
   if (OnlyTokenSpaceName) {
     //
@@ -127,7 +128,7 @@ GetPcdName (
     // Need to get the full PCD name.
     //
     NameSize = AsciiStrSize (TokenSpaceName) + AsciiStrSize (PcdName);
-    Name = AllocateZeroPool (NameSize);
+    Name     = AllocateZeroPool (NameSize);
     ASSERT (Name != NULL);
     //
     // Catenate TokenSpaceCName and PcdCName with a '.' to form the full PCD name.
@@ -157,21 +158,21 @@ GetPcdName (
 **/
 EFI_STATUS
 ExGetPcdInfo (
-  IN        PEI_PCD_DATABASE    *Database,
-  IN CONST  EFI_GUID            *Guid,
-  IN        UINTN               TokenNumber,
-  OUT       EFI_PCD_INFO        *PcdInfo
+  IN        PEI_PCD_DATABASE  *Database,
+  IN CONST  EFI_GUID          *Guid,
+  IN        UINTN             TokenNumber,
+  OUT       EFI_PCD_INFO      *PcdInfo
   )
 {
-  UINTN                 GuidTableIdx;
-  EFI_GUID              *MatchGuid;
-  EFI_GUID              *GuidTable;
-  DYNAMICEX_MAPPING     *ExMapTable;
-  UINTN                 Index;
-  UINT32                LocalTokenNumber;
+  UINTN              GuidTableIdx;
+  EFI_GUID           *MatchGuid;
+  EFI_GUID           *GuidTable;
+  DYNAMICEX_MAPPING  *ExMapTable;
+  UINTN              Index;
+  UINT32             LocalTokenNumber;
 
   GuidTable = (EFI_GUID *)((UINT8 *)Database + Database->GuidTableOffset);
-  MatchGuid = ScanGuid (GuidTable, Database->GuidTableCount * sizeof(EFI_GUID), Guid);
+  MatchGuid = ScanGuid (GuidTable, Database->GuidTableCount * sizeof (EFI_GUID), Guid);
 
   if (MatchGuid == NULL) {
     return EFI_NOT_FOUND;
@@ -228,15 +229,15 @@ ExGetPcdInfo (
 **/
 EFI_STATUS
 PeiGetPcdInfo (
-  IN CONST  EFI_GUID        *Guid,
-  IN        UINTN           TokenNumber,
-  OUT       EFI_PCD_INFO    *PcdInfo
+  IN CONST  EFI_GUID      *Guid,
+  IN        UINTN         TokenNumber,
+  OUT       EFI_PCD_INFO  *PcdInfo
   )
 {
-  PEI_PCD_DATABASE      *PeiPcdDb;
-  BOOLEAN               PeiExMapTableEmpty;
-  UINTN                 PeiNexTokenNumber;
-  UINT32                LocalTokenNumber;
+  PEI_PCD_DATABASE  *PeiPcdDb;
+  BOOLEAN           PeiExMapTableEmpty;
+  UINTN             PeiNexTokenNumber;
+  UINT32            LocalTokenNumber;
 
   ASSERT (PcdInfo != NULL);
 
@@ -266,11 +267,13 @@ PeiGetPcdInfo (
       PcdInfo->PcdType = GetPcdType (LocalTokenNumber);
       PcdInfo->PcdName = GetPcdName (FALSE, PeiPcdDb, TokenNumber);
     }
+
     return EFI_SUCCESS;
   } else {
     if (PeiExMapTableEmpty) {
       return EFI_NOT_FOUND;
     }
+
     return ExGetPcdInfo (
              PeiPcdDb,
              Guid,
@@ -297,24 +300,24 @@ PeiGetPcdInfo (
 **/
 EFI_STATUS
 PeiRegisterCallBackWorker (
-  IN  UINTN                       ExTokenNumber,
-  IN  CONST EFI_GUID              *Guid, OPTIONAL
-  IN  PCD_PPI_CALLBACK            CallBackFunction,
-  IN  BOOLEAN                     Register
-)
+  IN  UINTN             ExTokenNumber,
+  IN  CONST EFI_GUID    *Guid  OPTIONAL,
+  IN  PCD_PPI_CALLBACK  CallBackFunction,
+  IN  BOOLEAN           Register
+  )
 {
-  EFI_HOB_GUID_TYPE       *GuidHob;
-  PCD_PPI_CALLBACK        *CallbackTable;
-  PCD_PPI_CALLBACK        Compare;
-  PCD_PPI_CALLBACK        Assign;
-  UINT32                  LocalTokenNumber;
-  UINT32                  LocalTokenCount;
-  UINTN                   PeiNexTokenNumber;
-  UINTN                   TokenNumber;
-  UINTN                   Idx;
-  PEI_PCD_DATABASE        *PeiPcdDb;
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  PCD_PPI_CALLBACK   *CallbackTable;
+  PCD_PPI_CALLBACK   Compare;
+  PCD_PPI_CALLBACK   Assign;
+  UINT32             LocalTokenNumber;
+  UINT32             LocalTokenCount;
+  UINTN              PeiNexTokenNumber;
+  UINTN              TokenNumber;
+  UINTN              Idx;
+  PEI_PCD_DATABASE   *PeiPcdDb;
 
-  PeiPcdDb          = GetPcdDatabase();
+  PeiPcdDb          = GetPcdDatabase ();
   LocalTokenCount   = PeiPcdDb->LocalTokenCount;
   PeiNexTokenNumber = PeiPcdDb->LocalTokenCount - PeiPcdDb->ExTokenCount;
 
@@ -332,6 +335,7 @@ PeiRegisterCallBackWorker (
     if (TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
       return EFI_NOT_FOUND;
     }
+
     //
     // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
     // We have to decrement TokenNumber by 1 to make it usable
@@ -343,7 +347,6 @@ PeiRegisterCallBackWorker (
     // comparison.
     ASSERT ((TokenNumber + 1) < (LocalTokenCount + 1));
   }
-
 
   LocalTokenNumber = *((UINT32 *)((UINT8 *)PeiPcdDb + PeiPcdDb->LocalTokenNumberTableOffset) + TokenNumber);
 
@@ -360,9 +363,8 @@ PeiRegisterCallBackWorker (
   CallbackTable = GET_GUID_HOB_DATA (GuidHob);
   CallbackTable = CallbackTable + (TokenNumber * PcdGet32 (PcdMaxPeiPcdCallBackNumberPerPcdEntry));
 
-  Compare = Register? NULL: CallBackFunction;
-  Assign  = Register? CallBackFunction: NULL;
-
+  Compare = Register ? NULL : CallBackFunction;
+  Assign  = Register ? CallBackFunction : NULL;
 
   for (Idx = 0; Idx < PcdGet32 (PcdMaxPeiPcdCallBackNumberPerPcdEntry); Idx++) {
     if (CallbackTable[Idx] == Compare) {
@@ -371,10 +373,8 @@ PeiRegisterCallBackWorker (
     }
   }
 
-  return Register? EFI_OUT_OF_RESOURCES : EFI_INVALID_PARAMETER;
-
+  return Register ? EFI_OUT_OF_RESOURCES : EFI_INVALID_PARAMETER;
 }
-
 
 /**
   Find the Pcd database.
@@ -386,13 +386,13 @@ PeiRegisterCallBackWorker (
 **/
 VOID *
 LocateExPcdBinary (
-  IN EFI_PEI_FILE_HANDLE    FileHandle
+  IN EFI_PEI_FILE_HANDLE  FileHandle
   )
 {
-  EFI_STATUS            Status;
-  VOID                  *PcdDb;
+  EFI_STATUS  Status;
+  VOID        *PcdDb;
 
-  PcdDb       = NULL;
+  PcdDb = NULL;
 
   ASSERT (FileHandle != NULL);
 
@@ -403,12 +403,13 @@ LocateExPcdBinary (
   // Check the first bytes (Header Signature Guid) and build version.
   //
   if (!CompareGuid (PcdDb, &gPcdDataBaseSignatureGuid) ||
-      (((PEI_PCD_DATABASE *) PcdDb)->BuildVersion != PCD_SERVICE_PEIM_VERSION)) {
+      (((PEI_PCD_DATABASE *)PcdDb)->BuildVersion != PCD_SERVICE_PEIM_VERSION))
+  {
     ASSERT (FALSE);
   }
+
   return PcdDb;
 }
-
 
 /**
   The function builds the PCD database.
@@ -419,20 +420,20 @@ LocateExPcdBinary (
 **/
 PEI_PCD_DATABASE *
 BuildPcdDatabase (
-  IN EFI_PEI_FILE_HANDLE    FileHandle
+  IN EFI_PEI_FILE_HANDLE  FileHandle
   )
 {
-  PEI_PCD_DATABASE       *Database;
-  PEI_PCD_DATABASE       *PeiPcdDbBinary;
-  VOID                   *CallbackFnTable;
-  UINTN                  SizeOfCallbackFnTable;
+  PEI_PCD_DATABASE  *Database;
+  PEI_PCD_DATABASE  *PeiPcdDbBinary;
+  VOID              *CallbackFnTable;
+  UINTN             SizeOfCallbackFnTable;
 
   //
   // Locate the external PCD database binary for one section of current FFS
   //
   PeiPcdDbBinary = LocateExPcdBinary (FileHandle);
 
-  ASSERT(PeiPcdDbBinary != NULL);
+  ASSERT (PeiPcdDbBinary != NULL);
 
   Database = BuildGuidHob (&gPcdDataBaseHobGuid, PeiPcdDbBinary->Length + PeiPcdDbBinary->UninitDataBaseSize);
 
@@ -466,25 +467,25 @@ BuildPcdDatabase (
 **/
 EFI_STATUS
 GetHiiVariable (
-  IN  CONST EFI_GUID      *VariableGuid,
-  IN  UINT16              *VariableName,
-  OUT VOID                **VariableData,
-  OUT UINTN               *VariableSize
+  IN  CONST EFI_GUID  *VariableGuid,
+  IN  UINT16          *VariableName,
+  OUT VOID            **VariableData,
+  OUT UINTN           *VariableSize
   )
 {
-  UINTN      Size;
-  EFI_STATUS Status;
-  VOID       *Buffer;
-  EFI_PEI_READ_ONLY_VARIABLE2_PPI *VariablePpi;
+  UINTN                            Size;
+  EFI_STATUS                       Status;
+  VOID                             *Buffer;
+  EFI_PEI_READ_ONLY_VARIABLE2_PPI  *VariablePpi;
 
-  Status = PeiServicesLocatePpi (&gEfiPeiReadOnlyVariable2PpiGuid, 0, NULL, (VOID **) &VariablePpi);
+  Status = PeiServicesLocatePpi (&gEfiPeiReadOnlyVariable2PpiGuid, 0, NULL, (VOID **)&VariablePpi);
   ASSERT_EFI_ERROR (Status);
 
-  Size = 0;
+  Size   = 0;
   Status = VariablePpi->GetVariable (
                           VariablePpi,
                           VariableName,
-                          (EFI_GUID *) VariableGuid,
+                          (EFI_GUID *)VariableGuid,
                           NULL,
                           &Size,
                           NULL
@@ -495,13 +496,13 @@ GetHiiVariable (
     ASSERT_EFI_ERROR (Status);
 
     Status = VariablePpi->GetVariable (
-                              VariablePpi,
-                              (UINT16 *) VariableName,
-                              (EFI_GUID *) VariableGuid,
-                              NULL,
-                              &Size,
-                              Buffer
-                              );
+                            VariablePpi,
+                            (UINT16 *)VariableName,
+                            (EFI_GUID *)VariableGuid,
+                            NULL,
+                            &Size,
+                            Buffer
+                            );
     ASSERT_EFI_ERROR (Status);
 
     *VariableSize = Size;
@@ -528,18 +529,18 @@ GetHiiVariable (
 **/
 VOID
 InvokeCallbackOnSet (
-  UINTN             ExTokenNumber,
-  CONST EFI_GUID    *Guid, OPTIONAL
-  UINTN             TokenNumber,
-  VOID              *Data,
-  UINTN             Size
+  UINTN           ExTokenNumber,
+  CONST EFI_GUID  *Guid  OPTIONAL,
+  UINTN           TokenNumber,
+  VOID            *Data,
+  UINTN           Size
   )
 {
-  EFI_HOB_GUID_TYPE   *GuidHob;
-  PCD_PPI_CALLBACK    *CallbackTable;
-  UINTN               Idx;
-  PEI_PCD_DATABASE    *PeiPcdDb;
-  UINT32              LocalTokenCount;
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  PCD_PPI_CALLBACK   *CallbackTable;
+  UINTN              Idx;
+  PEI_PCD_DATABASE   *PeiPcdDb;
+  UINT32             LocalTokenCount;
 
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
@@ -567,11 +568,11 @@ InvokeCallbackOnSet (
 
   for (Idx = 0; Idx < PcdGet32 (PcdMaxPeiPcdCallBackNumberPerPcdEntry); Idx++) {
     if (CallbackTable[Idx] != NULL) {
-      CallbackTable[Idx] (Guid,
-                          (Guid == NULL) ? (TokenNumber + 1) : ExTokenNumber,
-                          Data,
-                          Size
-                          );
+      CallbackTable[Idx](Guid,
+                         (Guid == NULL) ? (TokenNumber + 1) : ExTokenNumber,
+                         Data,
+                         Size
+                         );
     }
   }
 }
@@ -588,9 +589,9 @@ InvokeCallbackOnSet (
 **/
 EFI_STATUS
 SetValueWorker (
-  IN          UINTN              TokenNumber,
-  IN          VOID               *Data,
-  IN          UINTN              Size
+  IN          UINTN  TokenNumber,
+  IN          VOID   *Data,
+  IN          UINTN  Size
   )
 {
   return SetWorker (TokenNumber, Data, &Size, FALSE);
@@ -614,22 +615,22 @@ SetValueWorker (
 **/
 EFI_STATUS
 SetWorker (
-  IN          UINTN               TokenNumber,
-  IN          VOID                *Data,
-  IN OUT      UINTN               *Size,
-  IN          BOOLEAN             PtrType
+  IN          UINTN    TokenNumber,
+  IN          VOID     *Data,
+  IN OUT      UINTN    *Size,
+  IN          BOOLEAN  PtrType
   )
 {
-  UINT32              LocalTokenNumber;
-  UINTN               PeiNexTokenNumber;
-  PEI_PCD_DATABASE    *PeiPcdDb;
-  STRING_HEAD         StringTableIdx;
-  UINTN               Offset;
-  VOID                *InternalData;
-  UINTN               MaxSize;
-  UINT32              LocalTokenCount;
+  UINT32            LocalTokenNumber;
+  UINTN             PeiNexTokenNumber;
+  PEI_PCD_DATABASE  *PeiPcdDb;
+  STRING_HEAD       StringTableIdx;
+  UINTN             Offset;
+  VOID              *InternalData;
+  UINTN             MaxSize;
+  UINT32            LocalTokenCount;
 
-  if (!FeaturePcdGet(PcdPeiFullPcdDatabaseEnable)) {
+  if (!FeaturePcdGet (PcdPeiFullPcdDatabaseEnable)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -674,8 +675,8 @@ SetWorker (
 
   LocalTokenNumber = GetLocalTokenNumber (PeiPcdDb, TokenNumber + 1);
 
-  Offset          = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
-  InternalData    = (VOID *) ((UINT8 *) PeiPcdDb + Offset);
+  Offset       = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
+  InternalData = (VOID *)((UINT8 *)PeiPcdDb + Offset);
 
   switch (LocalTokenNumber & PCD_TYPE_ALL_SET) {
     case PCD_TYPE_VPD:
@@ -707,20 +708,20 @@ SetWorker (
       }
 
       switch (*Size) {
-        case sizeof(UINT8):
-          *((UINT8 *) InternalData) = *((UINT8 *) Data);
+        case sizeof (UINT8):
+          *((UINT8 *)InternalData) = *((UINT8 *)Data);
           return EFI_SUCCESS;
 
-        case sizeof(UINT16):
-          *((UINT16 *) InternalData) = *((UINT16 *) Data);
+        case sizeof (UINT16):
+          *((UINT16 *)InternalData) = *((UINT16 *)Data);
           return EFI_SUCCESS;
 
-        case sizeof(UINT32):
-          *((UINT32 *) InternalData) = *((UINT32 *) Data);
+        case sizeof (UINT32):
+          *((UINT32 *)InternalData) = *((UINT32 *)Data);
           return EFI_SUCCESS;
 
-        case sizeof(UINT64):
-          *((UINT64 *) InternalData) = *((UINT64 *) Data);
+        case sizeof (UINT64):
+          *((UINT64 *)InternalData) = *((UINT64 *)Data);
           return EFI_SUCCESS;
 
         default:
@@ -728,12 +729,10 @@ SetWorker (
           return EFI_NOT_FOUND;
       }
     }
-
   }
 
   ASSERT (FALSE);
   return EFI_NOT_FOUND;
-
 }
 
 /**
@@ -749,10 +748,10 @@ SetWorker (
 **/
 EFI_STATUS
 ExSetValueWorker (
-  IN          UINTN                ExTokenNumber,
-  IN          CONST EFI_GUID       *Guid,
-  IN          VOID                 *Data,
-  IN          UINTN                Size
+  IN          UINTN           ExTokenNumber,
+  IN          CONST EFI_GUID  *Guid,
+  IN          VOID            *Data,
+  IN          UINTN           Size
   )
 {
   return ExSetWorker (ExTokenNumber, Guid, Data, &Size, FALSE);
@@ -778,16 +777,16 @@ ExSetValueWorker (
 **/
 EFI_STATUS
 ExSetWorker (
-  IN            UINTN                ExTokenNumber,
-  IN            CONST EFI_GUID       *Guid,
-  IN            VOID                 *Data,
-  IN OUT        UINTN                *Size,
-  IN            BOOLEAN              PtrType
+  IN            UINTN           ExTokenNumber,
+  IN            CONST EFI_GUID  *Guid,
+  IN            VOID            *Data,
+  IN OUT        UINTN           *Size,
+  IN            BOOLEAN         PtrType
   )
 {
-  UINTN                     TokenNumber;
+  UINTN  TokenNumber;
 
-  if (!FeaturePcdGet(PcdPeiFullPcdDatabaseEnable)) {
+  if (!FeaturePcdGet (PcdPeiFullPcdDatabaseEnable)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -799,7 +798,6 @@ ExSetWorker (
   InvokeCallbackOnSet (ExTokenNumber, Guid, TokenNumber, Data, *Size);
 
   return SetWorker (TokenNumber, Data, Size, PtrType);
-
 }
 
 /**
@@ -838,24 +836,24 @@ ExGetWorker (
 **/
 VOID *
 GetWorker (
-  IN UINTN               TokenNumber,
-  IN UINTN               GetSize
+  IN UINTN  TokenNumber,
+  IN UINTN  GetSize
   )
 {
-  UINT32              Offset;
-  EFI_GUID            *Guid;
-  UINT16              *Name;
-  VARIABLE_HEAD       *VariableHead;
-  EFI_STATUS          Status;
-  UINTN               DataSize;
-  VOID                *Data;
-  UINT8               *StringTable;
-  STRING_HEAD         StringTableIdx;
-  PEI_PCD_DATABASE    *PeiPcdDb;
-  UINT32              LocalTokenNumber;
-  UINT32              LocalTokenCount;
-  UINT8               *VaraiableDefaultBuffer;
-  UINTN               VpdBaseAddress;
+  UINT32            Offset;
+  EFI_GUID          *Guid;
+  UINT16            *Name;
+  VARIABLE_HEAD     *VariableHead;
+  EFI_STATUS        Status;
+  UINTN             DataSize;
+  VOID              *Data;
+  UINT8             *StringTable;
+  STRING_HEAD       StringTableIdx;
+  PEI_PCD_DATABASE  *PeiPcdDb;
+  UINT32            LocalTokenNumber;
+  UINT32            LocalTokenCount;
+  UINT8             *VaraiableDefaultBuffer;
+  UINTN             VpdBaseAddress;
 
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
@@ -872,7 +870,7 @@ GetWorker (
   // comparison.
   ASSERT (TokenNumber + 1 < (LocalTokenCount + 1));
 
-  ASSERT ((GetSize == PeiPcdGetSize(TokenNumber + 1)) || (GetSize == 0));
+  ASSERT ((GetSize == PeiPcdGetSize (TokenNumber + 1)) || (GetSize == 0));
 
   LocalTokenNumber = GetLocalTokenNumber (PeiPcdDb, TokenNumber + 1);
 
@@ -882,19 +880,20 @@ GetWorker (
   switch (LocalTokenNumber & PCD_TYPE_ALL_SET) {
     case PCD_TYPE_VPD:
     {
-      VPD_HEAD *VpdHead;
-      VpdHead = (VPD_HEAD *) ((UINT8 *)PeiPcdDb + Offset);
+      VPD_HEAD  *VpdHead;
+      VpdHead = (VPD_HEAD *)((UINT8 *)PeiPcdDb + Offset);
 
       //
       // PcdVpdBaseAddress64 is DynamicEx PCD only. So, PeiPcdGet64Ex() is used to get its value.
       //
-      VpdBaseAddress = (UINTN) PeiPcdGet64Ex (&gEfiMdeModulePkgTokenSpaceGuid, PcdToken (PcdVpdBaseAddress64));
+      VpdBaseAddress = (UINTN)PeiPcdGet64Ex (&gEfiMdeModulePkgTokenSpaceGuid, PcdToken (PcdVpdBaseAddress64));
       if (VpdBaseAddress == 0) {
         //
         // PcdVpdBaseAddress64 is not set, get value from PcdVpdBaseAddress.
         //
-        VpdBaseAddress = (UINTN) PcdGet32 (PcdVpdBaseAddress);
+        VpdBaseAddress = (UINTN)PcdGet32 (PcdVpdBaseAddress);
       }
+
       ASSERT (VpdBaseAddress != 0);
       return (VOID *)(VpdBaseAddress + VpdHead->Offset);
     }
@@ -902,20 +901,21 @@ GetWorker (
     case PCD_TYPE_HII|PCD_TYPE_STRING:
     case PCD_TYPE_HII:
     {
-      VariableHead = (VARIABLE_HEAD *) ((UINT8 *)PeiPcdDb + Offset);
+      VariableHead = (VARIABLE_HEAD *)((UINT8 *)PeiPcdDb + Offset);
 
-      Guid = (EFI_GUID *) ((UINT8 *)PeiPcdDb + PeiPcdDb->GuidTableOffset) + VariableHead->GuidTableIndex;
-      Name = (UINT16*)&StringTable[VariableHead->StringIndex];
+      Guid = (EFI_GUID *)((UINT8 *)PeiPcdDb + PeiPcdDb->GuidTableOffset) + VariableHead->GuidTableIndex;
+      Name = (UINT16 *)&StringTable[VariableHead->StringIndex];
 
       if ((LocalTokenNumber & PCD_TYPE_ALL_SET) == (PCD_TYPE_HII|PCD_TYPE_STRING)) {
         //
         // If a HII type PCD's datum type is VOID*, the DefaultValueOffset is the index of
         // string array in string table.
         //
-        VaraiableDefaultBuffer = (UINT8 *) &StringTable[*(STRING_HEAD*)((UINT8*) PeiPcdDb + VariableHead->DefaultValueOffset)];
+        VaraiableDefaultBuffer = (UINT8 *)&StringTable[*(STRING_HEAD *)((UINT8 *)PeiPcdDb + VariableHead->DefaultValueOffset)];
       } else {
-        VaraiableDefaultBuffer = (UINT8 *) PeiPcdDb + VariableHead->DefaultValueOffset;
+        VaraiableDefaultBuffer = (UINT8 *)PeiPcdDb + VariableHead->DefaultValueOffset;
       }
+
       Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
       if ((Status == EFI_SUCCESS) && (DataSize >= (VariableHead->Offset + GetSize))) {
         if (GetSize == 0) {
@@ -931,32 +931,32 @@ GetWorker (
             GetSize = DataSize - VariableHead->Offset;
           }
         }
+
         //
         // If the operation is successful, we copy the data
         // to the default value buffer in the PCD Database.
         //
-        CopyMem (VaraiableDefaultBuffer, (UINT8 *) Data + VariableHead->Offset, GetSize);
+        CopyMem (VaraiableDefaultBuffer, (UINT8 *)Data + VariableHead->Offset, GetSize);
       }
-      return (VOID *) VaraiableDefaultBuffer;
+
+      return (VOID *)VaraiableDefaultBuffer;
     }
 
     case PCD_TYPE_DATA:
-      return (VOID *) ((UINT8 *)PeiPcdDb + Offset);
+      return (VOID *)((UINT8 *)PeiPcdDb + Offset);
 
     case PCD_TYPE_STRING:
-      StringTableIdx = * (STRING_HEAD*) ((UINT8 *) PeiPcdDb + Offset);
-      return (VOID *) (&StringTable[StringTableIdx]);
+      StringTableIdx = *(STRING_HEAD *)((UINT8 *)PeiPcdDb + Offset);
+      return (VOID *)(&StringTable[StringTableIdx]);
 
     default:
       ASSERT (FALSE);
       break;
-
   }
 
   ASSERT (FALSE);
 
   return NULL;
-
 }
 
 /**
@@ -974,23 +974,23 @@ GetWorker (
 **/
 UINTN
 GetExPcdTokenNumber (
-  IN CONST EFI_GUID             *Guid,
-  IN UINTN                      ExTokenNumber
+  IN CONST EFI_GUID  *Guid,
+  IN UINTN           ExTokenNumber
   )
 {
-  UINT32              Index;
-  DYNAMICEX_MAPPING   *ExMap;
-  EFI_GUID            *GuidTable;
-  EFI_GUID            *MatchGuid;
-  UINTN               MatchGuidIdx;
-  PEI_PCD_DATABASE    *PeiPcdDb;
+  UINT32             Index;
+  DYNAMICEX_MAPPING  *ExMap;
+  EFI_GUID           *GuidTable;
+  EFI_GUID           *MatchGuid;
+  UINTN              MatchGuidIdx;
+  PEI_PCD_DATABASE   *PeiPcdDb;
 
-  PeiPcdDb    = GetPcdDatabase();
+  PeiPcdDb = GetPcdDatabase ();
 
-  ExMap       = (DYNAMICEX_MAPPING *)((UINT8 *)PeiPcdDb + PeiPcdDb->ExMapTableOffset);
-  GuidTable   = (EFI_GUID *)((UINT8 *)PeiPcdDb + PeiPcdDb->GuidTableOffset);
+  ExMap     = (DYNAMICEX_MAPPING *)((UINT8 *)PeiPcdDb + PeiPcdDb->ExMapTableOffset);
+  GuidTable = (EFI_GUID *)((UINT8 *)PeiPcdDb + PeiPcdDb->GuidTableOffset);
 
-  MatchGuid = ScanGuid (GuidTable, PeiPcdDb->GuidTableCount * sizeof(EFI_GUID), Guid);
+  MatchGuid = ScanGuid (GuidTable, PeiPcdDb->GuidTableCount * sizeof (EFI_GUID), Guid);
   //
   // We need to ASSERT here. If GUID can't be found in GuidTable, this is a
   // error in the BUILD system.
@@ -1001,7 +1001,8 @@ GetExPcdTokenNumber (
 
   for (Index = 0; Index < PeiPcdDb->ExTokenCount; Index++) {
     if ((ExTokenNumber == ExMap[Index].ExTokenNumber) &&
-        (MatchGuidIdx == ExMap[Index].ExGuidIndex)) {
+        (MatchGuidIdx == ExMap[Index].ExGuidIndex))
+    {
       return ExMap[Index].TokenNumber;
     }
   }
@@ -1020,12 +1021,12 @@ GetPcdDatabase (
   VOID
   )
 {
-  EFI_HOB_GUID_TYPE *GuidHob;
+  EFI_HOB_GUID_TYPE  *GuidHob;
 
   GuidHob = GetFirstGuidHob (&gPcdDataBaseHobGuid);
   ASSERT (GuidHob != NULL);
 
-  return (PEI_PCD_DATABASE *) GET_GUID_HOB_DATA (GuidHob);
+  return (PEI_PCD_DATABASE *)GET_GUID_HOB_DATA (GuidHob);
 }
 
 /**
@@ -1043,9 +1044,9 @@ GetSizeTableIndex (
   IN    PEI_PCD_DATABASE  *Database
   )
 {
-  UINTN       Index;
-  UINTN       SizeTableIdx;
-  UINTN       LocalTokenNumber;
+  UINTN  Index;
+  UINTN  SizeTableIdx;
+  UINTN  LocalTokenNumber;
 
   SizeTableIdx = 0;
 
@@ -1058,23 +1059,22 @@ GetSizeTableIndex (
       // PCD entry.
       //
       if ((LocalTokenNumber & PCD_TYPE_VPD) != 0) {
-          //
-          // We have only two entry for VPD enabled PCD entry:
-          // 1) MAX Size.
-          // 2) Current Size
-          // Current size is equal to MAX size.
-          //
-          SizeTableIdx += 2;
+        //
+        // We have only two entry for VPD enabled PCD entry:
+        // 1) MAX Size.
+        // 2) Current Size
+        // Current size is equal to MAX size.
+        //
+        SizeTableIdx += 2;
       } else {
-          //
-          // We have only two entry for Non-Sku enabled PCD entry:
-          // 1) MAX SIZE
-          // 2) Current Size
-          //
-          SizeTableIdx += 2;
+        //
+        // We have only two entry for Non-Sku enabled PCD entry:
+        // 1) MAX SIZE
+        // 2) Current Size
+        //
+        SizeTableIdx += 2;
       }
     }
-
   }
 
   return SizeTableIdx;

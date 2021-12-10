@@ -57,7 +57,7 @@ EFIAPI
 VmxInitialize (
   IN UINTN                             ProcessorNumber,
   IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
-  IN VOID                              *ConfigData,  OPTIONAL
+  IN VOID                              *ConfigData   OPTIONAL,
   IN BOOLEAN                           State
   )
 {
@@ -68,7 +68,8 @@ VmxInitialize (
   //
   if (IS_SILVERMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
       IS_GOLDMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
-      IS_GOLDMONT_PLUS_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+      IS_GOLDMONT_PLUS_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel))
+  {
     if (CpuInfo->ProcessorInfo.Location.Thread != 0) {
       return RETURN_SUCCESS;
     }
@@ -135,7 +136,7 @@ EFIAPI
 LockFeatureControlRegisterInitialize (
   IN UINTN                             ProcessorNumber,
   IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
-  IN VOID                              *ConfigData,  OPTIONAL
+  IN VOID                              *ConfigData   OPTIONAL,
   IN BOOLEAN                           State
   )
 {
@@ -146,7 +147,8 @@ LockFeatureControlRegisterInitialize (
   //
   if (IS_SILVERMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
       IS_GOLDMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
-      IS_GOLDMONT_PLUS_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+      IS_GOLDMONT_PLUS_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel))
+  {
     if (CpuInfo->ProcessorInfo.Location.Thread != 0) {
       return RETURN_SUCCESS;
     }
@@ -214,11 +216,11 @@ EFIAPI
 SmxInitialize (
   IN UINTN                             ProcessorNumber,
   IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
-  IN VOID                              *ConfigData,  OPTIONAL
+  IN VOID                              *ConfigData   OPTIONAL,
   IN BOOLEAN                           State
   )
 {
-  RETURN_STATUS                        Status;
+  RETURN_STATUS  Status;
 
   //
   // The scope of Lock bit in the MSR_IA32_FEATURE_CONTROL is core for
@@ -226,7 +228,8 @@ SmxInitialize (
   // core.
   //
   if (IS_GOLDMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
-      IS_GOLDMONT_PLUS_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+      IS_GOLDMONT_PLUS_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel))
+  {
     if (CpuInfo->ProcessorInfo.Location.Thread != 0) {
       return RETURN_SUCCESS;
     }
@@ -236,7 +239,7 @@ SmxInitialize (
 
   if (State && (!IsCpuFeatureInSetting (CPU_FEATURE_VMX))) {
     DEBUG ((DEBUG_WARN, "Warning :: Can't enable SMX feature when VMX feature not enabled, disable it.\n"));
-    State = FALSE;
+    State  = FALSE;
     Status = RETURN_UNSUPPORTED;
   }
 
@@ -247,7 +250,7 @@ SmxInitialize (
     IA32_CR4,
     Bits.SMXE,
     (State) ? 1 : 0
-  )
+    )
 
   CPU_REGISTER_TABLE_TEST_THEN_WRITE_FIELD (
     ProcessorNumber,
