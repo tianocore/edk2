@@ -7,6 +7,8 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <OvmfPlatforms.h> // CLOUDHV_DEVICE_ID
+
 #include "AcpiPlatform.h"
 
 /**
@@ -27,7 +29,14 @@ InstallAcpiTables (
   )
 {
   EFI_STATUS  Status;
+  UINT16      HostBridgeDevId;
 
-  Status = InstallQemuFwCfgTables (AcpiTable);
+  HostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
+  if (HostBridgeDevId == CLOUDHV_DEVICE_ID) {
+    Status = InstallCloudHvTables (AcpiTable);
+  } else {
+    Status = InstallQemuFwCfgTables (AcpiTable);
+  }
+
   return Status;
 }
