@@ -3,6 +3,7 @@
 
 Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -40,6 +41,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE  HTTP_CLIENT_ARCH_RISCV64
 #elif defined (MDE_CPU_EBC)
 #define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE  HTTP_CLIENT_ARCH_EBC
+#elif defined (MDE_CPU_LOONGARCH64)
+#define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE  HTTP_CLIENT_ARCH_LOONGARCH64
 #endif
 
 /// DHCP offer types among HTTP boot.
