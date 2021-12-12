@@ -1,0 +1,82 @@
+## @file
+# RISC-V Opensbi Library Instance.
+#
+#  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001b
+  BASE_NAME      = RiscVOpensbiLib
+  FILE_GUID      = 6EF0C812-66F6-11E9-93CE-3F5D5F0DF0A7
+  MODULE_TYPE    = BASE
+  VERSION_STRING = 1.0
+  LIBRARY_CLASS  = RiscVOpensbiLib
+
+[Sources]
+  opensbi/lib/sbi/riscv_asm.c
+  opensbi/lib/sbi/riscv_atomic.c
+  opensbi/lib/sbi/riscv_hardfp.S
+  opensbi/lib/sbi/riscv_locks.c
+  opensbi/lib/sbi/sbi_bitmap.c
+  opensbi/lib/sbi/sbi_bitops.c
+  opensbi/lib/sbi/sbi_console.c
+  opensbi/lib/sbi/sbi_ecall.c
+  opensbi/lib/sbi/sbi_ecall_base.c
+  opensbi/lib/sbi/sbi_ecall_hsm.c
+  opensbi/lib/sbi/sbi_ecall_legacy.c
+  opensbi/lib/sbi/sbi_ecall_replace.c
+  opensbi/lib/sbi/sbi_ecall_vendor.c
+  opensbi/lib/sbi/sbi_emulate_csr.c
+  opensbi/lib/sbi/sbi_fifo.c
+  opensbi/lib/sbi/sbi_hart.c
+  opensbi/lib/sbi/sbi_math.c
+  opensbi/lib/sbi/sbi_hfence.S
+  opensbi/lib/sbi/sbi_hsm.c
+  opensbi/lib/sbi/sbi_illegal_insn.c
+  opensbi/lib/sbi/sbi_init.c
+  opensbi/lib/sbi/sbi_ipi.c
+  opensbi/lib/sbi/sbi_misaligned_ldst.c
+  opensbi/lib/sbi/sbi_platform.c
+  opensbi/lib/sbi/sbi_scratch.c
+  opensbi/lib/sbi/sbi_string.c
+  opensbi/lib/sbi/sbi_system.c
+  opensbi/lib/sbi/sbi_timer.c
+  opensbi/lib/sbi/sbi_tlb.c
+  opensbi/lib/sbi/sbi_trap.c
+  opensbi/lib/sbi/sbi_unpriv.c
+  opensbi/lib/sbi/sbi_expected_trap.S
+
+  opensbi/lib/utils/fdt/fdt_helper.c
+  opensbi/lib/utils/fdt/fdt_fixup.c
+  opensbi/lib/utils/ipi/fdt_ipi.c
+  opensbi/lib/utils/ipi/fdt_ipi_clint.c
+  opensbi/lib/utils/irqchip/fdt_irqchip.c
+  opensbi/lib/utils/irqchip/fdt_irqchip_plic.c
+  opensbi/lib/utils/irqchip/plic.c
+  opensbi/lib/utils/reset/fdt_reset.c
+  opensbi/lib/utils/reset/fdt_reset_htif.c
+  opensbi/lib/utils/reset/fdt_reset_sifive.c
+  opensbi/lib/utils/serial/fdt_serial.c
+  opensbi/lib/utils/serial/fdt_serial_htif.c
+  opensbi/lib/utils/serial/fdt_serial_shakti.c
+  opensbi/lib/utils/serial/fdt_serial_sifive.c
+  opensbi/lib/utils/serial/fdt_serial_uart8250.c
+  opensbi/lib/utils/serial/shakti-uart.c
+  opensbi/lib/utils/serial/sifive-uart.c
+  opensbi/lib/utils/serial/uart8250.c
+  opensbi/lib/utils/sys/clint.c
+  opensbi/lib/utils/sys/htif.c
+  opensbi/lib/utils/sys/sifive_test.c
+  opensbi/lib/utils/timer/fdt_timer.c
+  opensbi/lib/utils/timer/fdt_timer_clint.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec   # For libfdt.
+  MdePkg/MdePkg.dec
+  Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
+
+[BuildOptions]
+  GCC:*_*_*_PP_FLAGS = -D__ASSEMBLY__
