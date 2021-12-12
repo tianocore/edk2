@@ -1,0 +1,77 @@
+## @file
+#  RISC-V SEC module.
+#
+#  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = SecMain
+  FILE_GUID                      = 743467B0-849F-4ACE-9BFB-515CE6206388
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SecMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+
+[Sources]
+  SecMain.c
+
+[Sources.RISCV64]
+  Riscv64/SecEntry.S
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
+  Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugAgentLib
+  DebugLib
+  ExtractGuidedSectionLib
+  IoLib
+  PcdLib
+  PeCoffLib
+  PeCoffGetEntryPointLib
+  PeCoffExtraActionLib
+  PrintLib
+  RiscVCpuLib
+  RiscVOpensbiLib
+  RiscVOpensbiPlatformLib
+  RiscVEdk2SbiLib
+
+[Ppis]
+  gEfiTemporaryRamSupportPpiGuid # PPI ALWAYS_PRODUCED
+  gEfiTemporaryRamDonePpiGuid    # PPI ALWAYS_PRODUCED
+
+[FixedPcd]
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVPeiFvBase
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVPeiFvSize
+
+[Pcd]
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdHartCount
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFwStartAddress
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFwEndAddress
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdOpenSbiStackSize
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdScratchRamBase
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdScratchRamSize
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamBase
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamSize
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPeiCorePrivilegeMode
+
+[BuildOptions]
+  GCC:*_*_*_PP_FLAGS = -D__ASSEMBLY__
+
+
