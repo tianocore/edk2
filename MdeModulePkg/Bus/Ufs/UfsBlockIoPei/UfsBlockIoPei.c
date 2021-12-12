@@ -1037,9 +1037,10 @@ InitializeUfsBlockIoPeim (
   UFS_PEIM_HC_PRIVATE_DATA       *Private;
   EDKII_UFS_HOST_CONTROLLER_PPI  *UfsHcPpi;
   UINT32                         Index;
-  UFS_CONFIG_DESC                Config;
   UINTN                          MmioBase;
   UINT8                          Controller;
+  UFS_UNIT_DESC                  UnitDescriptor;
+  UINT32                         UnitDescriptorSize;
 
   //
   // Shadow this PEIM to run from memory
@@ -1126,19 +1127,18 @@ InitializeUfsBlockIoPeim (
     }
 
     //
-    // Get Ufs Device's Lun Info by reading Configuration Descriptor.
+    // Check if 8 common luns are active and set corresponding bit mask.
     //
-    Status = UfsRwDeviceDesc (Private, TRUE, UfsConfigDesc, 0, 0, &Config, sizeof (UFS_CONFIG_DESC));
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "Ufs Get Configuration Descriptor Error, Status = %r\n", Status));
-      Controller++;
-      continue;
-    }
-
-    for (Index = 0; Index < UFS_PEIM_MAX_LUNS; Index++) {
-      if (Config.UnitDescConfParams[Index].LunEn != 0) {
+    UnitDescriptorSize = sizeof (UFS_UNIT_DESC);
+    for (Index = 0; Index < 8; Index++) {
+      Status = UfsRwDeviceDesc (Private, TRUE, UfsUnitDesc, (UINT8) Index, 0, &UnitDescriptor, UnitDescriptorSize);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "Failed to read unit descriptor, index = %X, status = %r\n", Index, Status));
+        continue;
+      }
+      if (UnitDescriptor.LunEn == 0x1) {
+        DEBUG ((DEBUG_INFO, "UFS LUN %X is enabled\n", Index));
         Private->Luns.BitMask |= (BIT0 << Index);
-        DEBUG ((DEBUG_INFO, "Ufs %d Lun %d is enabled\n", Controller, Index));
       }
     }
 
