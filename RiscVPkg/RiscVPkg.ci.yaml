@@ -1,10 +1,10 @@
 ## @file
-# Core CI configuration for RiscVPltformPkg
+# Core CI configuration for RiscVPkg
 #
-# RiscVPltformPkg is part of Platform Ci for builds so this is only
+# RiscVPkg is part of Platform Ci for builds so this is only
 # used for code analysis.
 #
-# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP<BR>
+# (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -25,10 +25,10 @@
             ## Below source files incorporate with open source
             ## RISC-V OpenSBI project, in which some coding style is
             ## not able to pass the ECC.
-            "Universal/Sec/SecMain.c",
-            "Library/OpensbiPlatformLib/OpensbiPlatform.c",
-            "Library/RiscVSpecialPlatformLibNull/RiscVSpecialPlatformLib.c",
-            "Library/Edk2OpensbiPlatformWrapperLib/Edk2OpensbiPlatformWrapperLib.c"
+            "Library/RiscVOpensbiLib/opensbi",
+            "Include/OpensbiTypes.h",
+            "Library/RiscVExceptionLib/CpuExceptionHandlerLib.h",
+            "Library/RiscVEdk2SbiLib/RiscVEdk2SbiLib.c"
         ]
     },
     ## options defined .pytool/Plugin/CompilerPlugin
@@ -92,29 +92,58 @@
     ## options defined .pytool/Plugin/SpellCheck
     "SpellCheck": {
         "AuditOnly": False,          # Fails right now with over 270 errors
-        "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
-        "ExtendWords": [             # words to extend to the dictionary for this package
-            "bootable",
-            "coreplex",
+        "IgnoreFiles": [             # use gitignore syntax to ignore errors in matching files
+            "Library/RiscVOpensbiLib/opensbi/**"
+        ],
+        "ExtendWords": [            # words to extend to the dictionary for this package
+            "aclint",
             "dmdepkg",
             "ecall",
             "ecalls",
-            "enotsupp",
-            "etrap",
+            "efifstub",
             "excep",
-            "extid",
-            "hifive",
+            "execption",
+            "gaisler",
+            "hardfp",
+            "hfence",
+            "htimehw",
+            "htimew",
+            "impid",
             "irqchip",
             "keepexceptiontable",
-            "mmisa",
+            "libfdt",
+            "mbase",
+            "mbound",
+            "mcause",
+            "mdbase",
+            "mdbound",
+            "memeory",
+            "mfromhost",
+            "mhartid",
+            "mibase",
+            "mibound",
+            "mideleg",
             "mscratch",
+            "mstatus",
+            "mtimeh",
+            "mtimer",
+            "mtohost",
+            "mtvec",
+            "mvendorid",
             "opensbi",
-            "opensbiplatform",
-            "peiservicetablepointeropensbi",
-            "platformsecppilib",
-            "riscvopensbilib",
-            "riscvspecialplatformlib",
-            "riscvfirmwarecontextlib"
+            "prilx",
+            "rfence",
+            "scasue",
+            "scause",
+            "sfence",
+            "sifive",
+            "smode",
+            "sramt",
+            "sscratch",
+            "sstatus",
+            "stval",
+            "stvec",
+            "transational"
         ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
