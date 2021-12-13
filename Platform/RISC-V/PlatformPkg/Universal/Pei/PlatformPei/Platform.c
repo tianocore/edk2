@@ -254,22 +254,7 @@ BuildCoreInformationHob (
   VOID
 )
 {
-  EFI_STATUS Status;
-  RISC_V_PROCESSOR_SMBIOS_HOB_DATA *SmbiosHobPtr;
-
-  // TODO: Create SMBIOS libs for non-U540 platforms
-  Status = CreateU5MCCoreplexProcessorSpecificDataHob (0);
-  if (EFI_ERROR (Status)) {
-    ASSERT(FALSE);
-  }
-  Status = CreateU5MCProcessorSmbiosDataHob (0, &SmbiosHobPtr);
-  if (EFI_ERROR (Status)) {
-    ASSERT(FALSE);
-  }
-
-  DEBUG ((DEBUG_INFO, "U5 MC Coreplex SMBIOS DATA HOB at address 0x%x\n", SmbiosHobPtr));
-
-  return EFI_SUCCESS;
+  return BuildRiscVSmbiosHobs ();
 }
 
 /**
