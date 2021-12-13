@@ -6,6 +6,7 @@
 ##
 import os
 import sys
+import subprocess
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from PlatformBuildLib import SettingsManager
@@ -35,3 +36,7 @@ class CommonPlatform():
 
 import PlatformBuildLib
 PlatformBuildLib.CommonPlatform = CommonPlatform
+
+# hack alert -- create dummy grub.efi
+subprocess.run(['touch', 'OvmfPkg/AmdSev/Grub/grub.efi'])
+subprocess.run(['ls', '-l', '--sort=time', 'OvmfPkg/AmdSev/Grub'])
