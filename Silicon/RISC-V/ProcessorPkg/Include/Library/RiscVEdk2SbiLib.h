@@ -1,7 +1,7 @@
 /** @file
   Library to call the RISC-V SBI ecalls
 
-  Copyright (c) 2020, Hewlett Packard Development LP. All rights reserved.<BR>
+  Copyright (c) 2021, Hewlett Packard Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -472,6 +472,42 @@ SbiRemoteHfenceVvma (
   IN  UINTN                          HartMaskBase,
   IN  UINTN                          StartAddr,
   IN  UINTN                          Size
+  );
+
+///
+/// Firmware System Reset (SRST) Extension
+///
+
+/**
+  Reset the system
+
+  The System Reset Extension provides a function that allow the supervisor
+  software to request system-level reboot or shutdown. The term "system" refers
+  to the world-view of supervisor software and the underlying SBI
+  implementation could be machine mode firmware or hypervisor.
+
+  Valid parameters for ResetType and ResetReason are defined in sbi_ecall_interface.h
+
+  #define SBI_SRST_RESET_TYPE_SHUTDOWN    0x0
+  #define SBI_SRST_RESET_TYPE_COLD_REBOOT 0x1
+  #define SBI_SRST_RESET_TYPE_WARM_REBOOT 0x2
+
+  #define SBI_SRST_RESET_REASON_NONE      0x0
+  #define SBI_SRST_RESET_REASON_SYSFAIL   0x1
+
+  When the call is successful, it will not return.
+
+  @param[in]  ResetType            Typ of reset: Shutdown, cold-, or warm-reset.
+  @param[in]  ResetReason          Why the system resets. No reason or system failure.
+  @retval EFI_INVALID_PARAMETER    Either ResetType or ResetReason is invalid.
+  @retval EFI_UNSUPPORTED          ResetType is valid but not implemented on the platform.
+  @retval EFI_DEVICE_ERROR         Unknown error.
+**/
+EFI_STATUS
+EFIAPI
+SbiSystemReset (
+  IN  UINTN                          ResetType,
+  IN  UINTN                          ResetReason
   );
 
 ///
