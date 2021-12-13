@@ -1,0 +1,121 @@
+## @file
+# Core CI configuration for RiscVPltformPkg
+#
+# RiscVPltformPkg is part of Platform Ci for builds so this is only
+# used for code analysis.
+#
+# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+    ## options defined .pytool/Plugin/LicenseCheck
+    "LicenseCheck": {
+        "IgnoreFiles": []
+    },
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+            ## Below source files incorporate with open source
+            ## RISC-V OpenSBI project, in which some coding style is
+            ## not able to pass the ECC.
+            "Universal/Sec/SecMain.c",
+            "Library/OpensbiPlatformLib/OpensbiPlatform.c",
+            "Library/RiscVSpecialPlatformLibNull/RiscVSpecialPlatformLib.c",
+            "Library/Edk2OpensbiPlatformWrapperLib/Edk2OpensbiPlatformWrapperLib.c"
+        ]
+    },
+    ## options defined .pytool/Plugin/CompilerPlugin
+    "CompilerPlugin": {
+        "DscPath": "" # Don't support this test
+    },
+
+    ## options defined .pytool/Plugin/HostUnitTestCompilerPlugin
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "" # Don't support this test
+    },
+
+    ## options defined .pytool/Plugin/CharEncodingCheck
+    "CharEncodingCheck": {
+        "IgnoreFiles": []
+    },
+
+    ## options defined .pytool/Plugin/DependencyCheck
+    "DependencyCheck": {
+        "AcceptableDependencies": [
+            "MdePkg/MdePkg.dec",
+            "MdeModulePkg/MdeModulePkg.dec",
+            "EmbeddedPkg/EmbeddedPkg.dec",
+            "RiscVPkg/RiscVPkg.dec"
+        ],
+        # For host based unit tests
+        "AcceptableDependencies-HOST_APPLICATION":[
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
+        ],
+        # For UEFI shell based apps
+        "AcceptableDependencies-UEFI_APPLICATION":[],
+        "IgnoreInf": []
+    },
+
+    ## options defined .pytool/Plugin/DscCompleteCheck
+    "DscCompleteCheck": {
+        "IgnoreInf": [""],
+        "DscPath": ""  # Don't support this test
+    },
+
+    ## options defined .pytool/Plugin/HostUnitTestDscCompleteCheck
+    "HostUnitTestDscCompleteCheck": {
+        "IgnoreInf": [""],
+        "DscPath": "" # Don't support this test
+    },
+
+    ## options defined .pytool/Plugin/GuidCheck
+    "GuidCheck": {
+        "IgnoreGuidName": [],
+        "IgnoreGuidValue": [],
+        "IgnoreFoldersAndFiles": [],
+        "IgnoreDuplicates": [],
+    },
+
+    ## options defined .pytool/Plugin/LibraryClassCheck
+    "LibraryClassCheck": {
+        "IgnoreHeaderFile": []
+    },
+
+    ## options defined .pytool/Plugin/SpellCheck
+    "SpellCheck": {
+        "AuditOnly": False,          # Fails right now with over 270 errors
+        "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
+        "ExtendWords": [             # words to extend to the dictionary for this package
+            "bootable",
+            "coreplex",
+            "dmdepkg",
+            "ecall",
+            "ecalls",
+            "enotsupp",
+            "etrap",
+            "excep",
+            "extid",
+            "hifive",
+            "irqchip",
+            "keepexceptiontable",
+            "mmisa",
+            "mscratch",
+            "opensbi",
+            "opensbiplatform",
+            "peiservicetablepointeropensbi",
+            "platformsecppilib",
+            "riscvopensbilib",
+            "riscvspecialplatformlib",
+            "riscvfirmwarecontextlib"
+        ],
+        "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
+        "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
+    }
+}
