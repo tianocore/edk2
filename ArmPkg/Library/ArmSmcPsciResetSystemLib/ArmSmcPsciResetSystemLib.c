@@ -31,11 +31,8 @@ ResetCold (
   VOID
   )
 {
-  ARM_SMC_ARGS  ArmSmcArgs;
-
   // Send a PSCI 0.2 SYSTEM_RESET command
-  ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
-  ArmCallSmc (&ArmSmcArgs);
+  ArmCallSmc0 (ARM_SMC_ID_PSCI_SYSTEM_RESET, NULL, NULL, NULL);
 }
 
 /**
@@ -66,11 +63,8 @@ ResetShutdown (
   VOID
   )
 {
-  ARM_SMC_ARGS  ArmSmcArgs;
-
   // Send a PSCI 0.2 SYSTEM_OFF command
-  ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_OFF;
-  ArmCallSmc (&ArmSmcArgs);
+  ArmCallSmc0 (ARM_SMC_ID_PSCI_SYSTEM_OFF, NULL, NULL, NULL);
 }
 
 /**
