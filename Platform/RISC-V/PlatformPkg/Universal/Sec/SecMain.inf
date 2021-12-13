@@ -1,7 +1,7 @@
 ## @file
 #  RISC-V SEC module.
 #
-#  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -64,8 +64,8 @@
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdHartCount
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFwStartAddress
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFwEndAddress
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRootFirmwareDomainBaseAddress
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRootFirmwareDomainSize
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdOpenSbiStackSize
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdScratchRamBase
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdScratchRamSize

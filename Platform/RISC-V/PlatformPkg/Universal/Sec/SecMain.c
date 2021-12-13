@@ -1,7 +1,7 @@
 /** @file
   RISC-V SEC phase module.
 
-  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -336,7 +336,7 @@ FindAndReportEntryPoints (
 
 **/
 VOID
-DebutPrintFirmwareContext (
+DebugPrintFirmwareContext (
     EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *FirmwareContext
     )
 {
@@ -398,7 +398,7 @@ TemporaryRamMigration (
   //
   FirmwareContext->PeiServiceTable += (unsigned long)((UINTN)NewStack - (UINTN)OldStack);
   DEBUG ((DEBUG_INFO, "%a: OpenSBI Firmware Context is relocated to 0x%x\n", __FUNCTION__, FirmwareContext));
-  DebutPrintFirmwareContext ((EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *)FirmwareContext);
+  DebugPrintFirmwareContext ((EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *)FirmwareContext);
 
   register uintptr_t a0 asm ("a0") = (uintptr_t)((UINTN)NewStack - (UINTN)OldStack);
   asm volatile ("add sp, sp, a0"::"r"(a0):);
@@ -496,12 +496,12 @@ RegisterFirmwareSbiExtension (
   This function transits to S-mode PEI phase from M-mode SEC phase.
 
   @param[in]  BootHartId     Hardware thread ID of boot hart.
-  @param[in]  FuncArg1       Arg1 delivered from previous phase.
+  @param[in]  Scratch       Pointer to sbi_scratch structure.
 
 **/
 VOID EFIAPI PeiCore (
-  IN  UINTN  BootHartId,
-  IN  UINTN  FuncArg1
+  IN  UINTN BootHartId,
+  IN  struct sbi_scratch *Scratch
   )
 {
   EFI_SEC_PEI_HAND_OFF        SecCoreData;
@@ -529,7 +529,7 @@ VOID EFIAPI PeiCore (
   //
   DEBUG ((DEBUG_INFO, "%a: OpenSBI scratch address for each hart:\n", __FUNCTION__));
   for (HartId = 0; HartId < SBI_HARTMASK_MAX_BITS; HartId ++) {
-    SbiGetMscratchHartid (HartId, &ScratchSpace);
+    ScratchSpace = sbi_hartid_to_scratch (HartId);
     if(ScratchSpace != NULL) {
       DEBUG((DEBUG_INFO, "          Hart %d: 0x%x\n", HartId, ScratchSpace));
     }
@@ -540,9 +540,8 @@ VOID EFIAPI PeiCore (
   // Firmware context residents in stack and will be switched to memory when
   // temporary RAM migration.
   //
-  SbiGetMscratchHartid (BootHartId, &ScratchSpace);
   ZeroMem ((VOID *)&FirmwareContext, sizeof (EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT));
-  ThisSbiPlatform = (struct sbi_platform *)sbi_platform_ptr(ScratchSpace);
+  ThisSbiPlatform = (struct sbi_platform *)sbi_platform_ptr(Scratch);
   if (ThisSbiPlatform->opensbi_version > OPENSBI_VERSION) {
       DEBUG ((DEBUG_ERROR, "%a: OpenSBI platform table version 0x%x is newer than OpenSBI version 0x%x.\n"
                            "There maybe be some backward compatable issues.\n",
@@ -562,13 +561,13 @@ VOID EFIAPI PeiCore (
   //
   // Save Flattened Device tree in firmware context
   //
-  FirmwareContext.FlattenedDeviceTree = FuncArg1;
+  FirmwareContext.FlattenedDeviceTree = Scratch->next_arg1;
 
   //
   // Set firmware context Hart-specific pointer
   //
   for (HartId = 0; HartId < SBI_HARTMASK_MAX_BITS; HartId ++) {
-    SbiGetMscratchHartid (HartId, &ScratchSpace);
+    ScratchSpace = sbi_hartid_to_scratch (HartId);
     if (ScratchSpace != NULL) {
       FirmwareContext.HartSpecific[HartId] =
         (EFI_RISCV_FIRMWARE_CONTEXT_HART_SPECIFIC *)((UINT8 *)ScratchSpace - FIRMWARE_CONTEXT_HART_SPECIFIC_SIZE);
@@ -588,6 +587,10 @@ VOID EFIAPI PeiCore (
   //
   // Transfer the control to the PEI core
   //
+  Scratch->next_addr = (UINTN)(*PeiCoreEntryPoint);
+  Scratch->next_mode = PRV_S;
+  DEBUG ((DEBUG_INFO, "%a: Initializing OpenSBI library for booting hart %d\n", __FUNCTION__, BootHartId));
+  sbi_init(Scratch);
   (*PeiCoreEntryPoint) (&SecCoreData, (EFI_PEI_PPI_DESCRIPTOR *)&mPrivateDispatchTable);
 }
 
@@ -598,34 +601,19 @@ VOID EFIAPI PeiCore (
   To register the SBI extension we stay in M-Mode and then transition here,
   rather than before in sbi_init.
 
-  @param[in]  ThisHartId     Hardware thread ID.
-  @param[in]  FuncArg1       Arg1 delivered from previous phase.
+  @param[in]  ThisHartId    Hardware thread ID.
+  @param[in]  Scratch       Pointer to sbi_scratch structure.
 
 **/
 VOID
 EFIAPI
 LaunchPeiCore (
   IN  UINTN  ThisHartId,
-  IN  UINTN  FuncArg1
+  IN  struct sbi_scratch *Scratch
   )
 {
-  UINT32 PeiCoreMode;
-
-  DEBUG ((DEBUG_INFO, "%a: Set boot hart done.\n", __FUNCTION__));
-  atomic_write (&BootHartDone, (UINT64)TRUE);
   RegisterFirmwareSbiExtension ();
-
-  PeiCoreMode = FixedPcdGet32 (PcdPeiCorePrivilegeMode);
-  if (PeiCoreMode == PRV_S) {
-    DEBUG ((DEBUG_INFO, "%a: Switch to S-Mode for PeiCore.\n", __FUNCTION__));
-    sbi_hart_switch_mode (ThisHartId, FuncArg1, (UINTN)PeiCore, PRV_S, FALSE);
-  } else if (PeiCoreMode == PRV_M) {
-    DEBUG ((DEBUG_INFO, "%a: Switch to M-Mode for PeiCore.\n", __FUNCTION__));
-    PeiCore (ThisHartId, FuncArg1);
-  } else {
-    DEBUG ((DEBUG_INFO, "%a: The privilege mode specified in PcdPeiCorePrivilegeMode is not supported.\n", __FUNCTION__));
-    while (TRUE);
-  }
+  PeiCore (ThisHartId, Scratch);
 }
 
 /**
@@ -750,10 +738,7 @@ VOID EFIAPI SecCoreStartUpWithStack(
   HartFirmwareContext->HartSwitchMode = RiscVOpenSbiHartSwitchMode;
 
   if (HartId == FixedPcdGet32(PcdBootHartId)) {
-    Scratch->next_addr = (UINTN)LaunchPeiCore;
-    Scratch->next_mode = PRV_M;
-    DEBUG ((DEBUG_INFO, "%a: Initializing OpenSBI library for booting hart %d\n", __FUNCTION__, HartId));
-    sbi_init(Scratch);
+    LaunchPeiCore (HartId, Scratch);
   }
 
   //

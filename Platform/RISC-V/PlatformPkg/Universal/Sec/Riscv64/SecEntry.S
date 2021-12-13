@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 , Hewlett Packard Enterprise Development LP. All rights reserved.
+ * Copyright (c) 2021 , Hewlett Packard Enterprise Development LP. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-2-Clause
  *
@@ -71,9 +71,8 @@ _scratch_init:
   /* Initialize scratch space */
 
   /* Firmware range and size */
-  li    a4, FixedPcdGet32 (PcdFwStartAddress)
-  li    a5, FixedPcdGet32 (PcdFwEndAddress)
-  sub   a5, a5, a4
+  li    a4, FixedPcdGet32 (PcdRootFirmwareDomainBaseAddress)
+  li    a5, FixedPcdGet32 (PcdRootFirmwareDomainSize)
   sd    a4, SBI_SCRATCH_FW_START_OFFSET(tp)
   sd    a5, SBI_SCRATCH_FW_SIZE_OFFSET(tp)
 

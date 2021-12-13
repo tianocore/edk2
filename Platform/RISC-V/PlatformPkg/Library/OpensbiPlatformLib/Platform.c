@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-2-Clause
  *
- * Copyright (c) 2020 Western Digital Corporation or its affiliates.
+ * Copyright (c) 2021 Western Digital Corporation or its affiliates.
  *
  * Authors:
  *   Anup Patel <anup.patel@wdc.com>
@@ -10,6 +10,7 @@
 #include <libfdt.h>
 #include <PlatformOverride.h>
 #include <sbi/riscv_asm.h>
+#include <sbi/sbi_domain.h>
 #include <sbi/sbi_hartmask.h>
 #include <sbi/sbi_platform.h>
 #include <sbi/sbi_string.h>
@@ -185,20 +186,77 @@ static u64 generic_tlbr_flush_limit(void)
   return SBI_PLATFORM_TLB_RANGE_FLUSH_LIMIT_DEFAULT;
 }
 
+static int generic_system_reset_check(u32 reset_type, u32 reset_reason)
+{
+  if (generic_plat && generic_plat->system_reset_check)
+    return generic_plat->system_reset_check(reset_type,
+              reset_reason,
+              generic_plat_match);
+  return fdt_system_reset_check(reset_type, reset_reason);
+}
+
+static void generic_system_reset(u32 reset_type, u32 reset_reason)
+{
+  if (generic_plat && generic_plat->system_reset) {
+    generic_plat->system_reset(reset_type, reset_reason,
+             generic_plat_match);
+    return;
+  }
+
+  fdt_system_reset(reset_type, reset_reason);
+}
+
+#define EDK2_ROOT_FW_REGION       0
+#define EDK2_FW_REGION            1
+#define EDK2_VARIABLE_REGION    2
+#define EDK2_ALL_REGION            3
+#define EDK2_END_REGION            4
+static struct sbi_domain_memregion root_memregs[EDK2_END_REGION + 1] = { 0 };
+
+struct sbi_domain_memregion *get_mem_regions(void) {
+  /* EDK2 root firmware domain memory region */
+  root_memregs[EDK2_ROOT_FW_REGION].order = log2roundup(FixedPcdGet32(PcdRootFirmwareDomainSize));
+  root_memregs[EDK2_ROOT_FW_REGION].base = FixedPcdGet32(PcdRootFirmwareDomainBaseAddress);
+  root_memregs[EDK2_ROOT_FW_REGION].flags = 0;
+
+    /*EDK2 firmware domain memory region */
+  root_memregs[EDK2_FW_REGION].order = log2roundup(FixedPcdGet32(PcdFirmwareDomainSize));
+  root_memregs[EDK2_FW_REGION].base = FixedPcdGet32(PcdFirmwareDomainBaseAddress);
+  root_memregs[EDK2_FW_REGION].flags = SBI_DOMAIN_MEMREGION_EXECUTABLE | SBI_DOMAIN_MEMREGION_READABLE;
+
+    /*EDK2 firmware domain memory region */
+  root_memregs[EDK2_VARIABLE_REGION].order = log2roundup(FixedPcdGet32(PcdVariableFirmwareRegionSize));
+  root_memregs[EDK2_VARIABLE_REGION].base = FixedPcdGet32(PcdVariableFirmwareRegionBaseAddress);
+  root_memregs[EDK2_VARIABLE_REGION].flags = SBI_DOMAIN_MEMREGION_READABLE | SBI_DOMAIN_MEMREGION_WRITEABLE;
+
+  /* EDK2 domain allow everything memory region */
+  root_memregs[EDK2_ALL_REGION].order = __riscv_xlen;
+  root_memregs[EDK2_ALL_REGION].base = 0;
+  root_memregs[EDK2_ALL_REGION].flags = (SBI_DOMAIN_MEMREGION_READABLE |
+            SBI_DOMAIN_MEMREGION_WRITEABLE |
+            SBI_DOMAIN_MEMREGION_EXECUTABLE);
+
+  /* EDK2 domain memory region end */
+  root_memregs[EDK2_END_REGION].order = 0;
+
+  return root_memregs;
+}
+
 const struct sbi_platform_operations platform_ops = {
-  .early_init    = generic_early_init,
-  .final_init    = generic_final_init,
-  .early_exit    = generic_early_exit,
-  .final_exit    = generic_final_exit,
-  .domains_init    = generic_domains_init,
-  .console_init    = fdt_serial_init,
-  .irqchip_init    = fdt_irqchip_init,
-  .irqchip_exit    = fdt_irqchip_exit,
-  .ipi_init    = fdt_ipi_init,
-  .ipi_exit    = fdt_ipi_exit,
+  .early_init            = generic_early_init,
+  .final_init            = generic_final_init,
+  .early_exit            = generic_early_exit,
+  .final_exit            = generic_final_exit,
+  .domains_root_regions  = get_mem_regions,
+  .domains_init          = generic_domains_init,
+  .console_init          = fdt_serial_init,
+  .irqchip_init          = fdt_irqchip_init,
+  .irqchip_exit          = fdt_irqchip_exit,
+  .ipi_init              = fdt_ipi_init,
+  .ipi_exit              = fdt_ipi_exit,
   .get_tlbr_flush_limit  = generic_tlbr_flush_limit,
-  .timer_init    = fdt_timer_init,
-  .timer_exit    = fdt_timer_exit,
+  .timer_init            = fdt_timer_init,
+  .timer_exit            = fdt_timer_exit,
 };
 
 #if FixedPcdGet32(PcdBootableHartNumber) == 4

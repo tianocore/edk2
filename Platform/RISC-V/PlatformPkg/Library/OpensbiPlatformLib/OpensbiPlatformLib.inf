@@ -3,7 +3,7 @@
 #  This is the the library which provides platform
 #  level opensbi functions follow RISC-V OpenSBI implementation.
 #
-#  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -54,3 +54,10 @@
 
   gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5UartBase
   gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5PlatformSystemClock
+
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRootFirmwareDomainBaseAddress
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRootFirmwareDomainSize
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFirmwareDomainBaseAddress
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFirmwareDomainSize
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFirmwareRegionBaseAddress
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFirmwareRegionSize

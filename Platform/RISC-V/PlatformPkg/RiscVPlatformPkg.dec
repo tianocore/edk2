@@ -1,7 +1,7 @@
 ## @file  RiscVPlatformPkg.dec
 # This Package provides UEFI RISC-V platform modules and libraries.
 #
-# Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+# Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -31,33 +31,33 @@
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVPeiFvSize|0x0|UINT32|0x00001003
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDxeFvBase|0x0|UINT32|0x00001004
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDxeFvSize|0x0|UINT32|0x00001005
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDtbFvBase|0x0|UINT32|0x00001016
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDtbFvSize|0x0|UINT32|0x00001017
-
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDtbFvBase|0x0|UINT32|0x00001006
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDtbFvSize|0x0|UINT32|0x00001007
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRootFirmwareDomainBaseAddress|0x0|UINT32|0x00001008
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRootFirmwareDomainSize|0x0|UINT32|0x00001009
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFirmwareDomainBaseAddress|0x0|UINT32|0x0000100a
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFirmwareDomainSize|0x0|UINT32|0x0000100b
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFirmwareRegionBaseAddress|0x0|UINT32|0x0000100c
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFirmwareRegionSize|0x0|UINT32|0x0000100d
 #
 # Definition of EFI Variable region
 #
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFdBaseAddress|0|UINT32|0x00001010
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFdSize|0|UINT32|0x00001011
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFdBlockSize|0|UINT32|0x00001012
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPlatformFlashNvStorageVariableBase|0|UINT32|0x00001013
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPlatformFlashNvStorageFtwWorkingBase|0|UINT32|0x00001014
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPlatformFlashNvStorageFtwSpareBase|0|UINT32|0x00001015
-#
-# Firmware region which is protected by PMP.
-#
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFwBlockSize|0|UINT32|0x00001020
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFwStartAddress|0|UINT32|0x00001021
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFwEndAddress|0|UINT32|0x00001022
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFdBaseAddress|0|UINT32|0x00001040
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFdSize|0|UINT32|0x00001041
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFdBlockSize|0|UINT32|0x00001042
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPlatformFlashNvStorageVariableBase|0|UINT32|0x00001043
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPlatformFlashNvStorageFtwWorkingBase|0|UINT32|0x00001044
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPlatformFlashNvStorageFtwSpareBase|0|UINT32|0x00001045
+
 #
 # Definition of RISC-V Hart
 #
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdHartCount|0|UINT32|0x00001023
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId|0|UINT32|0x00001024
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdHartCount|0|UINT32|0x00001083
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId|0|UINT32|0x00001084
 #
 # The bootable hart core number, which is incorporate with OpenSBI platform hart_index2id value.
 #
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber|0|UINT32|0x00001025
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber|0|UINT32|0x00001085
 #
 # Definitions for OpenSbi
 #
@@ -73,7 +73,7 @@
 [PcdsPatchableInModule]
 
 [PcdsFeatureFlag]
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootlogoOnlyEnable|FALSE|BOOLEAN|0x00001006
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootlogoOnlyEnable|FALSE|BOOLEAN|0x00001200
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
 
