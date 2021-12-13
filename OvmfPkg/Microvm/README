@@ -1,0 +1,50 @@
+
+This is an *experimental* port of OVMF for the QEMU microvm
+machine type.
+
+microvm background info
+-----------------------
+
+microvm is designed for modern, virtio-based workloads.  Most legacy
+lpc/isa devices like pit and pic can be turned off.  virtio-mmio
+(i.e. '-device virtio-{blk,net,scsi,...}-device') is used for
+storage/network/etc.
+
+Optional pcie support is available and any pcie device supported by
+QEMU can be plugged in (including virtio-pci if you prefer that over
+virtio-mmio).
+
+https://qemu.readthedocs.io/en/latest/system/i386/microvm.html
+https://www.kraxel.org/blog/2020/10/qemu-microvm-acpi/
+
+design issues
+-------------
+
+Not fully clear yet how to do hardware detection best.  Right now
+using device tree to find virtio-mmio devices and pcie host bridge,
+can reuse existing ArmVirtPkg code that way.  Needs patched QEMU.
+
+features
+--------
+ [working] serial console
+ [working] direct kernel boot
+ [working] virtio-mmio support
+ [in progress] pcie support
+
+known limitations
+-----------------
+ * rtc=on is required for now.
+ * can't use separate code/vars (actually an microvm limitation,
+   there is no pflash support).
+ * transitional virtio-pci devices do not work.  microvm doesn't
+   support ioports on pcie, and ovmf doesn't initialize pcie devices
+   with ioports if there is no address space for them (even though
+   pcie devices are required to be functional without ioports).
+
+usage
+-----
+qemu-system-x86_64 \
+    -nographic \
+    -machine microvm,acpi=on,pit=off,pic=off,rtc=on \
+    -bios /path/to/MICROVM.fd \
+    [ ... more args here ... ]

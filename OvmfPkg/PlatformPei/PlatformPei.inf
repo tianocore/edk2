@@ -44,6 +44,7 @@
 
 [Guids]
   gEfiMemoryTypeInformationGuid
+  gFdtHobGuid
 
 [LibraryClasses]
   BaseLib

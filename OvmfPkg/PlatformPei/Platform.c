@@ -16,6 +16,7 @@
 //
 // The Library classes this module consumes
 //
+#include <Library/BaseMemoryLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
@@ -321,6 +322,67 @@ PciExBarInitialization (
     );
 }
 
+static const UINT8  EmptyFdt[] = {
+  0xd0, 0x0d, 0xfe, 0xed, 0x00, 0x00, 0x00, 0x48,
+  0x00, 0x00, 0x00, 0x38, 0x00, 0x00, 0x00, 0x48,
+  0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x11,
+  0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x09,
+};
+
+VOID
+MicrovmInitialization (
+  VOID
+  )
+{
+  FIRMWARE_CONFIG_ITEM  FdtItem;
+  UINTN                 FdtSize;
+  UINTN                 FdtPages;
+  EFI_STATUS            Status;
+  UINT64                *FdtHobData;
+  VOID                  *NewBase;
+
+  Status = QemuFwCfgFindFile ("etc/fdt", &FdtItem, &FdtSize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "%a: no etc/fdt found in fw_cfg, using dummy\n", __FUNCTION__));
+    FdtItem = 0;
+    FdtSize = sizeof (EmptyFdt);
+  }
+
+  FdtPages = EFI_SIZE_TO_PAGES (FdtSize);
+  NewBase  = AllocatePages (FdtPages);
+  if (NewBase == NULL) {
+    DEBUG ((DEBUG_INFO, "%a: AllocatePages failed\n", __FUNCTION__));
+    return;
+  }
+
+  if (FdtItem) {
+    QemuFwCfgSelectItem (FdtItem);
+    QemuFwCfgReadBytes (FdtSize, NewBase);
+  } else {
+    CopyMem (NewBase, EmptyFdt, FdtSize);
+  }
+
+  FdtHobData = BuildGuidHob (&gFdtHobGuid, sizeof (*FdtHobData));
+  if (FdtHobData == NULL) {
+    DEBUG ((DEBUG_INFO, "%a: BuildGuidHob failed\n", __FUNCTION__));
+    return;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: fdt at 0x%x (size %d)\n",
+    __FUNCTION__,
+    NewBase,
+    FdtSize
+    ));
+  *FdtHobData = (UINTN)NewBase;
+}
+
 VOID
 MiscInitialization (
   VOID
@@ -368,6 +430,7 @@ MiscInitialization (
       break;
     case 0xffff: /* microvm */
       DEBUG ((DEBUG_INFO, "%a: microvm\n", __FUNCTION__));
+      MicrovmInitialization ();
       PcdStatus = PcdSet16S (
                     PcdOvmfHostBridgePciDevId,
                     MICROVM_PSEUDO_DEVICE_ID
