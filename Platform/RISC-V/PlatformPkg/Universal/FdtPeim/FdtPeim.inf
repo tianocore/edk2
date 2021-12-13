@@ -1,0 +1,49 @@
+## @file
+# The FDT Peim driver is used to pass the device tree to DXE phase.
+#
+# Copyright (c) 2021, Hewlett Packard Enterprise Developmente LP. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FdtPei
+  MODULE_UNI_FILE                = FdtPei.uni
+  FILE_GUID                      = 724FD5E9-F35E-4386-B1E1-2ADA6103C4F9
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = PeimPassFdt
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+
+[Sources]
+  FdtPeim.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  DebugLib
+  HobLib
+  FdtLib
+  PcdLib
+  PeiServicesLib
+  PeimEntryPoint
+  RiscVFirmwareContextLib
+
+[Guids]
+  gFdtHobGuid   ## PRODUCES
+
+[Depex]
+  TRUE
