@@ -1,44 +1,16 @@
 /** @file
-*
-*  Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
-*  Copyright (c) 2012-2014, ARM Limited. All rights reserved.
-*
-*  SPDX-License-Identifier: BSD-2-Clause-Patent
-*
-**/
+  SMC helper functions.
 
-#ifndef ARM_SMC_LIB_H_
-#define ARM_SMC_LIB_H_
+  Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
 
-/**
- * The size of the SMC arguments are different between AArch64 and AArch32.
- * The native size is used for the arguments.
- */
-typedef struct {
-  UINTN    Arg0;
-  UINTN    Arg1;
-  UINTN    Arg2;
-  UINTN    Arg3;
-  UINTN    Arg4;
-  UINTN    Arg5;
-  UINTN    Arg6;
-  UINTN    Arg7;
-} ARM_SMC_ARGS;
-
-/**
-  Trigger an SMC call
-
-  SMC calls can take up to 7 arguments and return up to 4 return values.
-  Therefore, the 4 first fields in the ARM_SMC_ARGS structure are used
-  for both input and output values.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-VOID
-ArmCallSmc (
-  IN OUT ARM_SMC_ARGS  *Args
-  );
 
-/** Trigger an SMC call with 3 arguments.
+#include <Library/ArmSmcLib.h>
+#include <Library/BaseMemoryLib.h>
+
+/** Triggers an SMC call with 3 arguments.
 
   @param Function The SMC function.
   @param Arg1     Argument/result.
@@ -46,7 +18,6 @@ ArmCallSmc (
   @param Arg3     Argument/result.
 
   @return The SMC error code.
-
 **/
 UINTN
 ArmCallSmc3 (
@@ -54,7 +25,45 @@ ArmCallSmc3 (
   IN OUT UINTN  *Arg1 OPTIONAL,
   IN OUT UINTN  *Arg2 OPTIONAL,
   IN OUT UINTN  *Arg3 OPTIONAL
-  );
+  )
+{
+  ARM_SMC_ARGS  Args;
+  UINTN         ErrorCode;
+
+  ZeroMem (&Args, sizeof (ARM_SMC_ARGS));
+
+  Args.Arg0 = Function;
+
+  if (Arg1 != NULL) {
+    Args.Arg1 = *Arg1;
+  }
+
+  if (Arg2 != NULL) {
+    Args.Arg2 = *Arg2;
+  }
+
+  if (Arg3 != NULL) {
+    Args.Arg3 = *Arg3;
+  }
+
+  ArmCallSmc (&Args);
+
+  ErrorCode = Args.Arg0;
+
+  if (Arg1 != NULL) {
+    *Arg1 = Args.Arg1;
+  }
+
+  if (Arg2 != NULL) {
+    *Arg2 = Args.Arg2;
+  }
+
+  if (Arg3 != NULL) {
+    *Arg3 = Args.Arg3;
+  }
+
+  return ErrorCode;
+}
 
 /** Trigger an SMC call with 2 arguments.
 
@@ -72,7 +81,10 @@ ArmCallSmc2 (
   IN OUT UINTN  *Arg1 OPTIONAL,
   IN OUT UINTN  *Arg2 OPTIONAL,
   OUT UINTN     *Arg3 OPTIONAL
-  );
+  )
+{
+  return ArmCallSmc3 (Function, Arg1, Arg2, Arg3);
+}
 
 /** Trigger an SMC call with 1 argument.
 
@@ -90,7 +102,10 @@ ArmCallSmc1 (
   IN OUT UINTN  *Arg1 OPTIONAL,
   OUT UINTN     *Arg2 OPTIONAL,
   OUT UINTN     *Arg3 OPTIONAL
-  );
+  )
+{
+  return ArmCallSmc3 (Function, Arg1, Arg2, Arg3);
+}
 
 /** Trigger an SMC call with 0 arguments.
 
@@ -108,6 +123,7 @@ ArmCallSmc0 (
   OUT UINTN     *Arg1 OPTIONAL,
   OUT UINTN     *Arg2 OPTIONAL,
   OUT UINTN     *Arg3 OPTIONAL
-  );
-
-#endif // ARM_SMC_LIB_H_
+  )
+{
+  return ArmCallSmc3 (Function, Arg1, Arg2, Arg3);
+}
