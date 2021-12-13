@@ -530,7 +530,7 @@ GetDeviceTreeAddress (
   EFI_COMMON_SECTION_HEADER *FoundSection;
 
   if (FixedPcdGet32 (PcdDeviceTreeAddress)) {
-      DEBUG ((DEBUG_INFO, "Use fixed address of DBT from PcdDeviceTreeAddress 0x%x.\n", FixedPcdGet32 (PcdDeviceTreeAddress)));
+      DEBUG ((DEBUG_INFO, "Use fixed address of DBT from PcdDeviceTreeAddress 0x%x 0x%x.\n", FixedPcdGet32 (PcdDeviceTreeAddress), *((unsigned long *)FixedPcdGet32 (PcdDeviceTreeAddress))));
       //
       // Device tree address is pointed by PcdDeviceTreeAddress.
       //
@@ -647,11 +647,10 @@ VOID EFIAPI SecCoreStartUpWithStack(
   //
   ThisSbiPlatform = (struct sbi_platform *)sbi_platform_ptr(Scratch);
   ThisSbiPlatform->platform_ops_addr = (unsigned long)&Edk2OpensbiPlatformOps;
+  Scratch->next_arg1 = (unsigned long)GetDeviceTreeAddress ();
   if (HartId == FixedPcdGet32(PcdBootHartId)) {
-
-    Scratch->next_arg1 = (unsigned long)GetDeviceTreeAddress ();
     if (Scratch->next_arg1 == (unsigned long)NULL) {
-      DEBUG ((DEBUG_ERROR, "Platform Device Tree is not found\n"));
+      DEBUG ((DEBUG_ERROR, "Platform Device Tree is not found on boot hart\n"));
       ASSERT (FALSE);
     }
     DEBUG ((DEBUG_INFO, "Device Tree at  0x%x\n", Scratch->next_arg1));
@@ -685,6 +684,11 @@ VOID EFIAPI SecCoreStartUpWithStack(
     NonBootHartMessageLockValue = atomic_xchg(&NonBootHartMessageLock, TRUE);
   };
   DEBUG((DEBUG_INFO, "%a: Non boot hart %d initialization.\n", __FUNCTION__, HartId));
+  if (Scratch->next_arg1 == (unsigned long)NULL) {
+    DEBUG ((DEBUG_ERROR, "Platform Device Tree is not found\n"));
+    ASSERT (FALSE);
+  }
+  DEBUG((DEBUG_INFO, "%a: Non boot hart %d DTB is at 0x%x.\n", __FUNCTION__, HartId, Scratch->next_arg1));
   NonBootHartMessageLockValue = atomic_xchg(&NonBootHartMessageLock, FALSE);
   //
   // Non boot hart wiil be halted waiting for SBI_HART_STARTING.

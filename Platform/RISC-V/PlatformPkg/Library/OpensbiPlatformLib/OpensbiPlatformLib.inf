@@ -46,9 +46,6 @@
   RiscVSpecialPlatformLib
 
 [FixedPcd]
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdHartCount
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdOpenSbiStackSize
 
 

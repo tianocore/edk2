@@ -37,14 +37,39 @@ ASM_FUNC (_ModuleEntryPoint)
   li    a5, FixedPcdGet32 (PcdBootHartId)
   bne   a6, a5, _wait_for_boot_hart
 
-  li    ra, 0
-  call  _reset_regs
+  /*
+   * Initial the hart count reported in DTB
+   */
+  li    a4, FixedPcdGet32 (PcdTemporaryRamBase)
+  li    a5, FixedPcdGet32 (PcdTemporaryRamSize)
 
+  /* Use Temp memory as the stack for calling to C code */
+  add   sp, a4, a5
+  /* Get the address of device tree and call generic fw_platform_init */
+  call  GetDeviceTreeAddress /* a0 return the device tree address */
+  beqz  a0, skip_fw_init
+  add   a1, a0, 0            /* a1 is device tree */
+  csrr  a0, CSR_MHARTID      /* a0 is boot hart ID */
+  call  fw_platform_init
+skip_fw_init:
   /* Preload HART details
-   * s7 -> HART Count
+   * s7 -> Total HART count from PCD or DTB
    * s8 -> HART Stack Size
    */
-  li    s7, FixedPcdGet32 (PcdHartCount)
+  la    a0, platform
+#if __riscv_xlen == 64
+  lwu   s7, SBI_PLATFORM_HART_COUNT_OFFSET(a0)
+#else
+  lw    s7, SBI_PLATFORM_HART_COUNT_OFFSET(a0)
+#endif
+  /*
+   * This is the number of HARTs described in
+   * DTB for this processor. We allocate the
+   * scratch buffer according to this number.
+   */
+  la    a4, _pysical_hart_count
+  sd    s7, (a4)
+
   li    s8, FixedPcdGet32 (PcdOpenSbiStackSize)
 
   /*
@@ -113,20 +138,9 @@ _scratch_init:
 
   li    a4, FixedPcdGet32 (PcdTemporaryRamBase)
   li    a5, FixedPcdGet32 (PcdTemporaryRamSize)
-
   /* Use Temp memory as the stack for calling to C code */
   add   sp, a4, a5
-  /* Get the address of device tree and call generic fw_platform_init */
-  call  GetDeviceTreeAddress /* a0 return the device tree address */
-  beqz  a0, skip_fw_init
-  add   a1, a0, 0            /* a1 is device tree */
-  csrr  a0, CSR_MHARTID      /* a0 is hart ID */
-  call  fw_platform_init
-skip_fw_init:
-
   /* Zero out temporary memory */
-  li    a4, FixedPcdGet32 (PcdTemporaryRamBase)
-  li    a5, FixedPcdGet32 (PcdTemporaryRamSize)
   add   a5, a4, a5
 1:
   li    a3, 0x0
@@ -167,7 +181,11 @@ _start_warm:
   li    s7, FixedPcdGet32 (PcdBootableHartNumber)
   bnez  s7, 1f
   la    a4, platform
-  REG_L s7, SBI_PLATFORM_HART_COUNT_OFFSET(a4)
+#if __riscv_xlen == 64
+  lwu   s7, SBI_PLATFORM_HART_COUNT_OFFSET(a4)
+#else
+  lw    s7, SBI_PLATFORM_HART_COUNT_OFFSET(a4)
+#endif
 1:
   li    s8, FixedPcdGet32 (PcdOpenSbiStackSize)
   la    a4, platform
@@ -209,7 +227,8 @@ _start_warm:
   csrr  a0, CSR_MHARTID
   j _uninitialized_hart_wait
 4:
-  li    s7, FixedPcdGet32 (PcdHartCount)
+  la    a5, _pysical_hart_count
+  ld    s7, (a5)
   /* Find the scratch space for this hart
    *
    * Scratch buffer is on the top of stack buffer
@@ -275,6 +294,8 @@ _start_warm:
   .section .data, "aw"
 _boot_hart_done:
   RISCV_PTR 0
+_pysical_hart_count:
+  RISCV_PTR 0
 
   .align 3
   .section .entry, "ax", %progbits
@@ -293,7 +314,7 @@ _hartid_to_scratch:
   /*
    * s0 -> HART Stack Size
    * s1 -> HART Stack End
-   * s2 -> Temporary
+   * s2 -> Total hart count
    */
   la    s2, platform
 #if __riscv_xlen == 64
@@ -301,8 +322,9 @@ _hartid_to_scratch:
 #else
   lw    s0, SBI_PLATFORM_HART_STACK_SIZE_OFFSET(s2)
 #endif
-  li    s2, FixedPcdGet32 (PcdHartCount)
 
+  la    s1, _pysical_hart_count /* total HART count */
+  ld    s2, (s1)
   mul   s2, s2, s0
   li    s1, FixedPcdGet32 (PcdScratchRamBase)
   add   s1, s1, s2
