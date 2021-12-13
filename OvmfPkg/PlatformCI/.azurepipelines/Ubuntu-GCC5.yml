@@ -114,6 +114,16 @@ jobs:
             Run.Flags: $(run_flags)
             Run: $(should_run)
 
+          AMDSEV_X64_DEBUG:
+            Build.File: "$(package)/PlatformCI/AmdSevBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            # restricted + stripped down build
+            # can't boot to uefi shell -> skip test
+            Run.Flags: "QEMU_SKIP=TRUE"
+            Run: $(should_run)
+
           BHYVE_X64_DEBUG:
             Build.File: "$(package)/PlatformCI/BhyveBuild.py"
             Build.Arch: "X64"
