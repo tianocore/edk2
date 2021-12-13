@@ -1872,6 +1872,7 @@ GetCpuidFw (
     UINT32                 XSaveSize;
 
     XssMsr.Uint64 = 0;
+    Compacted = FALSE;
     if (EcxIn == 1) {
       /*
        * The PPR and APM aren't clear on what size should be encoded in
