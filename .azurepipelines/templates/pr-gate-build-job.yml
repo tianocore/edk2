@@ -56,6 +56,9 @@ jobs:
         # to build them.
         Build.Pkgs: 'ArmVirtPkg,EmulatorPkg,OvmfPkg'
         Build.Targets: 'NO-TARGET'
+      TARGET_RISCV_RISCVPLATFORM:
+        Build.Pkgs: 'RiscVPkg,RiscVPlatformPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
 
   workspace:
     clean: all
