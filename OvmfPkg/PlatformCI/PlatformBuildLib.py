@@ -183,6 +183,11 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         os.makedirs(VirtualDrive, exist_ok=True)
         OutputPath_FV = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
 
+        if (self.env.GetValue("QEMU_SKIP") and
+            self.env.GetValue("QEMU_SKIP").upper() == "TRUE"):
+            logging.info("skipping qemu boot test")
+            return 0
+
         #
         # QEMU must be on the path
         #
