@@ -415,7 +415,10 @@ EFI_STATUS EFIAPI TemporaryRamDone (
   return EFI_SUCCESS;
 }
 
-/** Handles SBI calls of EDK2's SBI FW extension
+/**
+  Handles SBI calls of EDK2's SBI FW extension.
+
+  The return value is the error code returned by the SBI call.
 
   @param[in]  ExtId        The extension ID of the FW extension.
   @param[in]  FuncId       The called function ID.
@@ -424,7 +427,7 @@ EFI_STATUS EFIAPI TemporaryRamDone (
   @param[out] OutTrap      Trap info for trapping further, see OpenSBI code.
                            Is ignored if return value is not SBI_ETRAP.
 
-  @retval 0                If the handler succeeds.
+  @retval SBI_OK           If the handler succeeds.
   @retval SBI_ENOTSUPP     If there's no function with the given ID.
   @retval SBI_ETRAP        If the called SBI functions wants to trap further.
 **/
@@ -436,7 +439,7 @@ STATIC int SbiEcallFirmwareHandler (
   OUT struct sbi_trap_info *OutTrap
   )
 {
-  int Ret = 0;
+  int Ret = SBI_OK;
 
   switch (FuncId) {
     case SBI_EXT_FW_MSCRATCH_FUNC:
@@ -447,6 +450,8 @@ STATIC int SbiEcallFirmwareHandler (
       break;
     default:
       Ret = SBI_ENOTSUPP;
+      DEBUG ((DEBUG_ERROR, "%a: Called SBI firmware ecall with invalid function ID\n", __FUNCTION__));
+      ASSERT (FALSE);
   };
 
   return Ret;
