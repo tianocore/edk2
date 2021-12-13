@@ -23,6 +23,7 @@
   opensbi/lib/sbi/sbi_bitmap.c
   opensbi/lib/sbi/sbi_bitops.c
   opensbi/lib/sbi/sbi_console.c
+  opensbi/lib/sbi/sbi_domain.c
   opensbi/lib/sbi/sbi_ecall.c
   opensbi/lib/sbi/sbi_ecall_base.c
   opensbi/lib/sbi/sbi_ecall_hsm.c
@@ -51,27 +52,33 @@
 
   opensbi/lib/utils/fdt/fdt_helper.c
   opensbi/lib/utils/fdt/fdt_fixup.c
+  opensbi/lib/utils/fdt/fdt_domain.c
   opensbi/lib/utils/ipi/fdt_ipi.c
-  opensbi/lib/utils/ipi/fdt_ipi_clint.c
+  opensbi/lib/utils/ipi/aclint_mswi.c
+  opensbi/lib/utils/ipi/fdt_ipi_mswi.c
   opensbi/lib/utils/irqchip/fdt_irqchip.c
   opensbi/lib/utils/irqchip/fdt_irqchip_plic.c
   opensbi/lib/utils/irqchip/plic.c
   opensbi/lib/utils/reset/fdt_reset.c
   opensbi/lib/utils/reset/fdt_reset_htif.c
   opensbi/lib/utils/reset/fdt_reset_sifive.c
+  opensbi/lib/utils/reset/fdt_reset_thead.c
+  opensbi/lib/utils/reset/fdt_reset_thead_asm.S
   opensbi/lib/utils/serial/fdt_serial.c
   opensbi/lib/utils/serial/fdt_serial_htif.c
   opensbi/lib/utils/serial/fdt_serial_shakti.c
   opensbi/lib/utils/serial/fdt_serial_sifive.c
   opensbi/lib/utils/serial/fdt_serial_uart8250.c
+  opensbi/lib/utils/serial/fdt_serial_gaisler.c
+  opensbi/lib/utils/serial/gaisler-uart.c
   opensbi/lib/utils/serial/shakti-uart.c
   opensbi/lib/utils/serial/sifive-uart.c
   opensbi/lib/utils/serial/uart8250.c
-  opensbi/lib/utils/sys/clint.c
   opensbi/lib/utils/sys/htif.c
   opensbi/lib/utils/sys/sifive_test.c
   opensbi/lib/utils/timer/fdt_timer.c
-  opensbi/lib/utils/timer/fdt_timer_clint.c
+  opensbi/lib/utils/timer/aclint_mtimer.c
+  opensbi/lib/utils/timer/fdt_timer_mtimer.c
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec   # For libfdt.

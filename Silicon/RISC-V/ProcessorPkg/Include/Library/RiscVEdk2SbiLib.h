@@ -16,6 +16,7 @@
 #include <IndustryStandard/RiscVOpensbi.h>
 #include <sbi/sbi_scratch.h>
 #include <sbi/sbi_platform.h>
+#include <sbi/sbi_ecall.h>
 
 //
 // EDK2 OpenSBI Firmware extension.

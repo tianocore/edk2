@@ -21,6 +21,8 @@
 .text
 .align 3
 
+    .globl _start_warm
+
 ASM_FUNC (_ModuleEntryPoint)
   /*
    * Jump to warm-boot if this is not the selected core booting,

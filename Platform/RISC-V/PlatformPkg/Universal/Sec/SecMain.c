@@ -21,6 +21,7 @@
 #include <sbi/sbi_platform.h> // Reference to header file in opensbi
 #include <sbi/sbi_init.h>     // Reference to header file in opensbi
 #include <sbi/sbi_ecall.h>    // Reference to header file in opensbi
+#include <sbi/sbi_trap.h>     // Reference to header file in opensbi
 
 //
 // Indicates the boot hart (PcdBootHartId) OpenSBI initialization is done.
@@ -434,7 +435,7 @@ EFI_STATUS EFIAPI TemporaryRamDone (
 STATIC int SbiEcallFirmwareHandler (
   IN  unsigned long         ExtId,
   IN  unsigned long         FuncId,
-  IN  unsigned long        *Args,
+  IN  CONST struct sbi_trap_regs *TrapRegs,
   OUT unsigned long        *OutVal,
   OUT struct sbi_trap_info *OutTrap
   )
@@ -446,7 +447,7 @@ STATIC int SbiEcallFirmwareHandler (
       *OutVal = (unsigned long) sbi_scratch_thishart_ptr();
       break;
     case SBI_EXT_FW_MSCRATCH_HARTID_FUNC:
-      *OutVal = (unsigned long) sbi_hartid_to_scratch (Args[0]);
+      *OutVal = (unsigned long) sbi_hartid_to_scratch (TrapRegs->a0);
       break;
     default:
       Ret = SBI_ENOTSUPP;

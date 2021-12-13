@@ -14,31 +14,38 @@
 #include <sbi/sbi_platform.h>
 
 const struct sbi_platform_operations platform_ops = {
-    .pmp_region_count   = NULL,
-    .pmp_region_info    = NULL,
+    .early_init         = NULL,
     .final_init         = NULL,
+    .early_exit         = NULL,
+    .final_exit         = NULL,
+    .domains_root_regions = NULL,
+    .domains_init       = NULL,
     .console_putc       = NULL,
     .console_getc       = NULL,
     .console_init       = NULL,
     .irqchip_init       = NULL,
+    .irqchip_exit       = NULL,
     .ipi_send           = NULL,
     .ipi_clear          = NULL,
     .ipi_init           = NULL,
+    .ipi_exit           = NULL,
+    .get_tlbr_flush_limit = NULL,
     .timer_value        = NULL,
     .timer_event_stop   = NULL,
     .timer_event_start  = NULL,
     .timer_init         = NULL,
-    .system_reboot      = NULL,
-    .system_shutdown    = NULL
+    .timer_exit         = NULL,
+    .system_reset_check = NULL,
+    .system_reset       = NULL,
 };
 
-const struct sbi_platform platform = {
-    .opensbi_version    = OPENSBI_VERSION,                      // The OpenSBI version this platform table is built bassed on.
-    .platform_version   = SBI_PLATFORM_VERSION(0x0000, 0x0000), // SBI Platform version 1.0
-    .name               = "NULL platform",
+struct sbi_platform platform = {
+    .opensbi_version    = OPENSBI_VERSION,
+    .platform_version   = SBI_PLATFORM_VERSION(0x0, 0x01),
+    .name               = "NULL Platform",
     .features           = 0,
     .hart_count         = 0,
+    .hart_index2id      = 0,
     .hart_stack_size    = 0,
-    .disabled_hart_mask = 0,
-    .platform_ops_addr  = 0
+    .platform_ops_addr  = 0,
 };
