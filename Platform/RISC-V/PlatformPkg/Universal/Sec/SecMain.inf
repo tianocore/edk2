@@ -23,7 +23,6 @@
 
 [Sources]
   SecMain.c
-  Edk2OpenSbiPlatform.c
 
 [Sources.RISCV64]
   Riscv64/SecEntry.S
@@ -40,6 +39,7 @@
   BaseMemoryLib
   DebugAgentLib
   DebugLib
+  Edk2OpensbiPlatformWrapperLib
   ExtractGuidedSectionLib
   FdtLib
   IoLib
@@ -62,14 +62,10 @@
 [Pcd]
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdHartCount
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartIndexToId
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRootFirmwareDomainBaseAddress
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRootFirmwareDomainSize
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFirmwareDomainBaseAddress
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFirmwareDomainSize
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFirmwareRegionBaseAddress
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFirmwareRegionSize
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartIndexToId
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdOpenSbiStackSize
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdScratchRamBase
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdScratchRamSize

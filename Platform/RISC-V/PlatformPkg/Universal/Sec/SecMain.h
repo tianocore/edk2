@@ -16,6 +16,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/DebugLib.h>
+#include <Library/Edk2OpensbiPlatformWrapperLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
 #include <Library/IoLib.h>
 #include <Library/HobLib.h>

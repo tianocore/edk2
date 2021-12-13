@@ -25,48 +25,11 @@
 #include <sbi/sbi_ecall.h>    // Reference to header file in opensbi
 #include <sbi/sbi_trap.h>     // Reference to header file in opensbi
 
-extern struct sbi_platform_operations Edk2OpensbiPlatformOps;
-
 //
 // Indicates the boot hart (PcdBootHartId) OpenSBI initialization is done.
 //
 atomic_t BootHartDone = ATOMIC_INITIALIZER(0);
 atomic_t NonBootHartMessageLock = ATOMIC_INITIALIZER(0);
-
-int sbi_domain_root_add_memregion(const struct sbi_domain_memregion *reg);
-
-typedef struct sbi_scratch *(*hartid2scratch)(ulong hartid, ulong hartindex);
-
-struct sbi_domain_memregion fw_memregs;
-
-int SecSetEdk2FwMemoryRegions (VOID) {
-  int Ret;
-
-  Ret = 0;
-
-  //
-  // EDK2 PEI domain memory region
-  //
-  fw_memregs.order = log2roundup(FixedPcdGet32(PcdFirmwareDomainSize));
-  fw_memregs.base = FixedPcdGet32(PcdFirmwareDomainBaseAddress);
-  fw_memregs.flags = SBI_DOMAIN_MEMREGION_EXECUTABLE | SBI_DOMAIN_MEMREGION_READABLE;
-  Ret = sbi_domain_root_add_memregion ((const struct sbi_domain_memregion *)&fw_memregs);
-  if (Ret != 0) {
-    DEBUG ((DEBUG_ERROR, "%a: Add firmware regiosn of FW Domain fail\n", __FUNCTION__));
-  }
-
-  //
-  // EDK2 EFI Variable domain memory region
-  //
-  fw_memregs.order = log2roundup(FixedPcdGet32(PcdVariableFirmwareRegionSize));
-  fw_memregs.base = FixedPcdGet32(PcdVariableFirmwareRegionBaseAddress);
-  fw_memregs.flags = SBI_DOMAIN_MEMREGION_READABLE | SBI_DOMAIN_MEMREGION_WRITEABLE;
-  Ret = sbi_domain_root_add_memregion ((const struct sbi_domain_memregion *)&fw_memregs);
-  if (Ret != 0) {
-    DEBUG ((DEBUG_ERROR, "%a: Add firmware regiosn of variable FW Domain fail\n", __FUNCTION__));
-  }
-  return Ret;
-}
 
 /**
   Locates a section within a series of sections
@@ -424,109 +387,6 @@ RegisterFirmwareSbiExtension (
   return EFI_SUCCESS;
 }
 
-/**
-  OpenSBI platform early init hook.
-
-**/
-int
-SecPostOpenSbiPlatformEarlylInit(
-  IN BOOLEAN ColdBoot
-  )
-{
-  UINT32 HartId;
-
-  if (!ColdBoot) {
-    HartId = current_hartid();
-    DEBUG ((DEBUG_INFO, "%a: Non boot hart %d.\n", __FUNCTION__, HartId));
-    return 0;
-  }
-  //
-  // Setup firmware memory region.
-  //
-  if (SecSetEdk2FwMemoryRegions () != 0) {
-    ASSERT (FALSE);
-  }
-
-  //
-  // Boot HART is already in the process of OpenSBI initialization.
-  // We can let other HART to keep booting.
-  //
-  DEBUG ((DEBUG_INFO, "%a: Set boot hart done.\n", __FUNCTION__));
-  atomic_write (&BootHartDone, (UINT64)TRUE);
-  return 0;
-}
-
-/**
-  OpenSBI platform final init hook.
-  We restore the next_arg1 to the pointer of EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT.
-
-**/
-int
-SecPostOpenSbiPlatformFinalInit (
-  IN BOOLEAN ColdBoot
-  )
-{
-  UINT32 HartId;
-  struct sbi_scratch *SbiScratch;
-  struct sbi_scratch *ScratchSpace;
-  struct sbi_platform *SbiPlatform;
-  EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *FirmwareContext;
-
-  if (!ColdBoot) {
-    HartId = current_hartid();
-    DEBUG ((DEBUG_INFO, "%a: Non boot hart %d.\n", __FUNCTION__, HartId));
-    return 0;
-  }
-
-  DEBUG((DEBUG_INFO, "%a: Entry, preparing to jump to PEI Core\n\n", __FUNCTION__));
-
-  SbiScratch = sbi_scratch_thishart_ptr();
-  SbiPlatform = (struct sbi_platform *)sbi_platform_ptr(SbiScratch);
-  FirmwareContext = (EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *)SbiPlatform->firmware_context;
-
-  //
-  // Print out scratch address of each hart
-  //
-  DEBUG ((DEBUG_INFO, "%a: OpenSBI scratch address for each hart:\n", __FUNCTION__));
-  for (HartId = 0; HartId < SBI_HARTMASK_MAX_BITS; HartId ++) {
-    if (sbi_platform_hart_invalid(SbiPlatform, HartId)) {
-      continue;
-    }
-    ScratchSpace = sbi_hartid_to_scratch (HartId);
-    if(ScratchSpace != NULL) {
-      DEBUG((DEBUG_INFO, "          Hart %d: 0x%x\n", HartId, ScratchSpace));
-    } else {
-      DEBUG((DEBUG_INFO, "          Hart %d not initialized yet\n", HartId));
-    }
-  }
-
-  //
-  // Set firmware context Hart-specific pointer
-  //
-  for (HartId = 0; HartId < SBI_HARTMASK_MAX_BITS; HartId ++) {
-    if (sbi_platform_hart_invalid(SbiPlatform, HartId)) {
-      continue;
-    }
-    ScratchSpace = sbi_hartid_to_scratch (HartId);
-    if (ScratchSpace != NULL) {
-      FirmwareContext->HartSpecific[HartId] =
-        (EFI_RISCV_FIRMWARE_CONTEXT_HART_SPECIFIC *)((UINT8 *)ScratchSpace - FIRMWARE_CONTEXT_HART_SPECIFIC_SIZE);
-        DEBUG ((DEBUG_INFO, "%a: OpenSBI Hart %d Firmware Context Hart-specific at address: 0x%x\n",
-                __FUNCTION__,
-                 HartId,
-                 FirmwareContext->HartSpecific [HartId]
-                 ));
-    }
-  }
-
-  DEBUG((DEBUG_INFO, "%a: Will jump to PEI Core in OpenSBI with \n", __FUNCTION__));
-  DEBUG((DEBUG_INFO, "  sbi_scratch = %x\n", SbiScratch));
-  DEBUG((DEBUG_INFO, "  sbi_platform = %x\n", SbiPlatform));
-  DEBUG((DEBUG_INFO, "  FirmwareContext = %x\n", FirmwareContext));
-  SbiScratch->next_arg1 = (unsigned long)FirmwareContext;
-
-  return 0;
-}
 
 /** Transion from SEC phase to PEI phase.
 
@@ -787,7 +647,6 @@ VOID EFIAPI SecCoreStartUpWithStack(
   //
   ThisSbiPlatform = (struct sbi_platform *)sbi_platform_ptr(Scratch);
   ThisSbiPlatform->platform_ops_addr = (unsigned long)&Edk2OpensbiPlatformOps;
-
   if (HartId == FixedPcdGet32(PcdBootHartId)) {
 
     Scratch->next_arg1 = (unsigned long)GetDeviceTreeAddress ();
