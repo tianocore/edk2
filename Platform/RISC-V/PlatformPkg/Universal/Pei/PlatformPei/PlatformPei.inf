@@ -51,7 +51,7 @@
   PeiServicesTablePointerLib
   PeimEntryPoint
   PcdLib
-  SiliconSiFiveU5MCCoreplexInfoLib
+  RiscVCoreplexInfoLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
