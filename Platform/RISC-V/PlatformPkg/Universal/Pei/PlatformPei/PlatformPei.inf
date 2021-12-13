@@ -1,0 +1,74 @@
+## @file
+#  Platform PEI driver
+#
+#  This module provides platform specific function to detect boot mode.
+#
+#  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = PlatformPei
+  FILE_GUID                      = 5592FC16-8FEF-4DE3-A6CF-6C59081E4EB7
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializePlatform
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+
+[Sources]
+  Fv.c
+  MemDetect.c
+  Platform.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec
+  Platform/SiFive/U5SeriesPkg/U5SeriesPkg.dec
+  Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
+  Silicon/SiFive/SiFive.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[Guids]
+  gEfiMemoryTypeInformationGuid
+  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid
+
+[LibraryClasses]
+  DebugLib
+  HobLib
+  IoLib
+  PciLib
+  PeiResourcePublicationLib
+  PeiServicesLib
+  PeiServicesTablePointerLib
+  PeimEntryPoint
+  PcdLib
+  SiliconSiFiveU5MCCoreplexInfoLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
+  gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDxeFvBase
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDxeFvSize
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamBase
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamSize
+  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdNumberofU5Cores
+  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdE5MCSupported
+
+[Ppis]
+  gEfiPeiMasterBootModePpiGuid
+
+[Depex]
+  TRUE
