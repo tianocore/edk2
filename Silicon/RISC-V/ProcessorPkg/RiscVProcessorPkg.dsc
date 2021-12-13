@@ -1,7 +1,7 @@
 #/** @file
 # RISC-V processor package.
 #
-# Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+# Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -102,3 +102,4 @@
 
   Silicon/RISC-V/ProcessorPkg/Universal/CpuDxe/CpuDxe.inf
   Silicon/RISC-V/ProcessorPkg/Universal/SmbiosDxe/RiscVSmbiosDxe.inf
+  Silicon/RISC-V/ProcessorPkg/Universal/FdtDxe/FdtDxe.inf
