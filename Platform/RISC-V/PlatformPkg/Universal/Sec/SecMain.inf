@@ -23,11 +23,13 @@
 
 [Sources]
   SecMain.c
+  Edk2OpenSbiPlatform.c
 
 [Sources.RISCV64]
   Riscv64/SecEntry.S
 
 [Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec

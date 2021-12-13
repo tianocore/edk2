@@ -1,7 +1,7 @@
 /** @file
   SBI inline function calls.
 
-  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -46,8 +46,10 @@ typedef struct {
                                                       // structure. Referred by both C code and assembly code.
 
 typedef struct {
-  VOID            *PeiServiceTable;       // PEI Service table
-  UINT64           FlattenedDeviceTree;   // Pointer to Flattened Device tree
+  UINT64              BootHartId;
+  VOID                *PeiServiceTable;      // PEI Service table
+  UINT64              FlattenedDeviceTree;   // Pointer to Flattened Device tree
+  UINT64              SecPeiHandOffData;     // This is EFI_SEC_PEI_HAND_OFF passed to PEI Core.
   EFI_RISCV_FIRMWARE_CONTEXT_HART_SPECIFIC  *HartSpecific[RISC_V_MAX_HART_SUPPORTED];
 } EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT;
 

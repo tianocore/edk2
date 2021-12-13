@@ -28,6 +28,16 @@
 #include <Ppi/TemporaryRamDone.h>
 #include <Ppi/TemporaryRamSupport.h>
 
+int
+SecPostOpenSbiPlatformEarlylInit(
+  IN BOOLEAN ColdBoot
+  );
+
+int
+SecPostOpenSbiPlatformFinalInit (
+  IN BOOLEAN ColdBoot
+  );
+
 VOID
 SecMachineModeTrapHandler (
   IN VOID
