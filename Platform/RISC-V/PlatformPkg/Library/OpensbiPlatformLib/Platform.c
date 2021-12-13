@@ -5,10 +5,16 @@
  *
  * Authors:
  *   Anup Patel <anup.patel@wdc.com>
+
+  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
  */
 
 #include <libfdt.h>
-#include <PlatformOverride.h>
+#include <Library/RiscVSpecialPlatformLib.h>
+
 #include <sbi/riscv_asm.h>
 #include <sbi/sbi_domain.h>
 #include <sbi/sbi_hartmask.h>
@@ -24,11 +30,12 @@
 #include <sbi_utils/ipi/fdt_ipi.h>
 #include <sbi_utils/reset/fdt_reset.h>
 
-extern const struct platform_override sifive_fu540;
-
-static const struct platform_override *special_platforms[] = {
-  &sifive_fu540,
-};
+//
+// SpecialPlatformArray and NumberOfSpecialPlatform are
+// provided by RiscVSpecialPlatformLib library.
+//
+extern const struct platform_override *special_platforms[];
+extern INTN NumberOfPlaformsInArray;
 
 static const struct platform_override *generic_plat = NULL;
 static const struct fdt_match *generic_plat_match = NULL;
@@ -39,7 +46,11 @@ static void fw_platform_lookup_special(void *fdt, int root_offset)
   const struct platform_override *plat;
   const struct fdt_match *match;
 
-  for (pos = 0; pos < array_size(special_platforms); pos++) {
+    if (special_platforms == NULL || NumberOfPlaformsInArray == 0) {
+      return;
+    }
+
+  for (pos = 0; pos < (int)NumberOfPlaformsInArray; pos++) {
     plat = special_platforms[pos];
     if (!plat->match_table)
       continue;
