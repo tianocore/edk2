@@ -122,6 +122,16 @@ jobs:
             # this build is for freebsd bhyve not qemu-kvm
             Run.Flags: "QEMU_SKIP=TRUE"
             Run: $(should_run)
+
+          MICROVM_X64_DEBUG:
+            Build.File: "$(package)/PlatformCI/MicrovmBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            # no storage supported by microvm build
+            # can't boot to uefi shell -> skip test
+            Run.Flags: "QEMU_SKIP=TRUE"
+            Run: $(should_run)
     workspace:
       clean: all
 
