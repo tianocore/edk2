@@ -142,7 +142,7 @@ BuildSmbiosType4 (
   DEBUG ((DEBUG_VERBOSE, "     Socket StringID: %d\n", Type4HobData->SmbiosType4Processor.Socket));
   DEBUG ((DEBUG_VERBOSE, "     Processor Type: 0x%x\n", Type4HobData->SmbiosType4Processor.ProcessorType));
   DEBUG ((DEBUG_VERBOSE, "     Processor Family: 0x%x\n", Type4HobData->SmbiosType4Processor.ProcessorFamily));
-  DEBUG ((DEBUG_VERBOSE, "     Processor Manufacture StringID: %d\n", Type4HobData->SmbiosType4Processor.ProcessorManufacture));
+  DEBUG ((DEBUG_VERBOSE, "     Processor Manufacture StringID: %d\n", Type4HobData->SmbiosType4Processor.ProcessorManufacturer));
   DEBUG ((DEBUG_VERBOSE, "     Processor Id: 0x%x:0x%x\n", \
           Type4HobData->SmbiosType4Processor.ProcessorId.Signature, Type4HobData->SmbiosType4Processor.ProcessorId.FeatureFlags));
   DEBUG ((DEBUG_VERBOSE, "     Processor Version StringID: %d\n", Type4HobData->SmbiosType4Processor.ProcessorVersion));
