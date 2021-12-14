@@ -6,10 +6,16 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Uefi/UefiBaseType.h>
+#include <Uefi/UefiMultiPhase.h>
+#include <Pi/PiBootMode.h>
+#include <Pi/PiHob.h>
+#include <Library/HobLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PciLib.h>
+#include <Library/PlatformInitLib.h>
 #include <OvmfPlatforms.h>
 
 //
@@ -36,13 +42,26 @@ AcpiTimerLibConstructor (
   VOID
   )
 {
-  UINT16  HostBridgeDevId;
-  UINTN   Pmba;
+  UINT16                 HostBridgeDevId;
+  UINTN                  Pmba;
+  EFI_HOB_GUID_TYPE      *GuidHob;
+  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob = NULL;
 
   //
   // Query Host Bridge DID to determine platform type
+  // Tdx guest stores the HostBridgePciDevId in a GuidHob.
+  // So we first check if this HOB exists
   //
-  HostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
+  GuidHob = GetFirstGuidHob (&gUefiOvmfPkgPlatformInfoGuid);
+  if (GuidHob != NULL) {
+    PlatformInfoHob = (EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (GuidHob);
+    HostBridgeDevId = PlatformInfoHob->HostBridgeDevId;
+  } else {
+    DEBUG ((DEBUG_ERROR, "PlatformInfoHob is not found.\n"));
+    ASSERT (FALSE);
+    return RETURN_UNSUPPORTED;
+  }
+
   switch (HostBridgeDevId) {
     case INTEL_82441_DEVICE_ID:
       Pmba = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMBA);
