@@ -40,9 +40,9 @@ LogCacheFlagError (
   IncrementErrorCount ();
   Print (
     L"\nERROR: On Arm based systems, all cache properties must be"
-    L"provided in the cache type structure."
-    L"Missing '%s' flag.",
-    *FlagName
+    L" provided in the cache type structure."
+    L" Missing '%s' flag.",
+    FlagName
     );
 }
 
