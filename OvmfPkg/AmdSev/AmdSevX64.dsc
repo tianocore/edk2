@@ -174,6 +174,7 @@
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
   BlobVerifierLib|OvmfPkg/AmdSev/BlobVerifierLibSevHashes/BlobVerifierLibSevHashes.inf
+  MemEncryptTdxLib|OvmfPkg/Library/BaseMemEncryptTdxLib/BaseMemEncryptTdxLib.inf
 
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   PeCoffExtraActionLib|SourceLevelDebugPkg/Library/PeCoffExtraActionLibDebug/PeCoffExtraActionLibDebug.inf
@@ -217,6 +218,8 @@
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   VmgExitLib|OvmfPkg/Library/VmgExitLib/VmgExitLib.inf
+  TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
+  TdxStartupLib|OvmfPkg/IntelTdx/TdxStartupLib/TdxStartupLibNull.inf
 
 [LibraryClasses.common.SEC]
   TimerLib|OvmfPkg/Library/AcpiTimerLib/BaseRomAcpiTimerLib.inf

@@ -276,6 +276,7 @@
 !endif
   VmgExitLib|OvmfPkg/Library/VmgExitLib/SecVmgExitLib.inf
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/SecMemEncryptSevLib.inf
+  TdxStartupLib|OvmfPkg/IntelTdx/TdxStartupLib/TdxStartupLibNull.inf
 
 [LibraryClasses.common.PEI_CORE]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf

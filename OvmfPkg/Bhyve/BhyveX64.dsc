@@ -169,6 +169,7 @@
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/DxeMemEncryptSevLib.inf
   LockBoxLib|OvmfPkg/Library/LockBoxLib/LockBoxBaseLib.inf
+  MemEncryptTdxLib|OvmfPkg/Library/BaseMemEncryptTdxLib/BaseMemEncryptTdxLib.inf
 
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
@@ -228,6 +229,8 @@
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   VmgExitLib|UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
+  TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
+  TdxStartupLib|OvmfPkg/IntelTdx/TdxStartupLib/TdxStartupLibNull.inf
 
 [LibraryClasses.common.SEC]
 !ifdef $(DEBUG_ON_SERIAL_PORT)
