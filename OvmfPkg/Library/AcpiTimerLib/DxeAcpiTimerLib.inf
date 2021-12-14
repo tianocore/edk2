@@ -33,3 +33,7 @@
   BaseLib
   PciLib
   IoLib
+  HobLib
+
+[Guids]
+  gUefiOvmfPkgTdxPlatformGuid                      ## CONSUMES
