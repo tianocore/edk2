@@ -1,0 +1,52 @@
+## @file
+# MP Initialization Library instance for DXE driver.
+#
+# Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = DxeMpInitLib
+  FILE_GUID                      = c9ca773c-8ae4-4b74-82fd-f7345503294e
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MpInitLib|DXE_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources.AARCH64]
+  AArch64/MpFuncs.S
+
+[Sources]
+  DxeMpLib.c
+  InternalMpInitLib.h
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  ArmSmcLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiMpServiceProtocolGuid
+
+[Guids]
+  gArmMpCoreInfoGuid

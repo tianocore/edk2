@@ -100,6 +100,9 @@
   PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
 
+[LibraryClasses.AARCH64]
+  MpInitLib|ArmPkg/Library/MpInitLib/DxeMpInitLib.inf
+
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
@@ -163,6 +166,7 @@
 [Components.AARCH64]
   ArmPkg/Drivers/MmCommunicationDxe/MmCommunication.inf
   ArmPkg/Library/ArmMmuLib/ArmMmuPeiLib.inf
+  ArmPkg/Library/MpInitLib/DxeMpInitLib.inf
 
 [Components.AARCH64, Components.ARM]
   ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf

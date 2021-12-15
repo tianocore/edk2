@@ -75,6 +75,10 @@
   #
   DefaultExceptionHandlerLib|Include/Library/DefaultExceptionHandlerLib.h
 
+  ##  @libraryclass  Provides a MP Services interface.
+  #
+  MpInitLib|Include/Library/MpInitLib.h
+
   ##  @libraryclass  Provides an interface to query miscellaneous OEM
   #   information.
   #
