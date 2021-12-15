@@ -141,4 +141,14 @@ SetGcdMemorySpaceAttributes (
   IN UINT64                           Attributes
   );
 
+VOID
+InitializeMpSupport (
+  VOID
+  );
+
+VOID
+ArchInitializeMpSupport (
+  VOID
+  );
+
 #endif // CPU_DXE_H_

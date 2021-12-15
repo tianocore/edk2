@@ -275,5 +275,7 @@ CpuDxeInitialize (
                   );
   ASSERT_EFI_ERROR (Status);
 
+  ArchInitializeMpSupport ();
+
   return Status;
 }

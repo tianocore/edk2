@@ -26,16 +26,22 @@
   Exception.c
 
 [Sources.ARM]
+  Arm/Arch.c
   Arm/Mmu.c
 
 [Sources.AARCH64]
+  AArch64/Arch.c
   AArch64/Mmu.c
+  CpuMpInit.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses.AARCH64]
+  MpInitLib
 
 [LibraryClasses]
   ArmLib
