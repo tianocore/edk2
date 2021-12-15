@@ -261,6 +261,9 @@
 [LibraryClasses.ARM]
   ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
 
+[LibraryClasses.AARCH64]
+  MpInitLib|ArmPkg/Library/MpInitLib/DxeMpInitLib.inf
+
 [BuildOptions]
   RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
 
