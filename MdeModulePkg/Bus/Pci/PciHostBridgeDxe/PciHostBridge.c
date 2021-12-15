@@ -1085,6 +1085,12 @@ NotifyPhase (
               RootBridge->ResAllocNode[Index].Base   = BaseAddress;
               RootBridge->ResAllocNode[Index].Status = ResAllocated;
               DEBUG ((DEBUG_INFO, "Success\n"));
+            } else if ((Index == TypeIo) &&
+                       (RootBridge->Io.Base == MAX_UINT64) &&
+                       (RootBridge->ResAllocNode[Index].Length == 0))
+            {
+              /* I/O is optional on PCIe */
+              DEBUG ((DEBUG_INFO, "Success (PCIe NoIO)\n"));
             } else {
               ReturnStatus = EFI_OUT_OF_RESOURCES;
               DEBUG ((DEBUG_ERROR, "Out Of Resource!\n"));
