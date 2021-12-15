@@ -3,4 +3,3 @@
 ##
 
   DEFINE TPM_ENABLE              = FALSE
-  DEFINE TPM_CONFIG_ENABLE       = FALSE
