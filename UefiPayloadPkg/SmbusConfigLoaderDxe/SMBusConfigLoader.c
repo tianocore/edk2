@@ -142,7 +142,7 @@ ReadBootOverrideFromEEPROM(IN OUT UINT8 *Buffer, IN UINT32 Size) {
       DEBUG((DEBUG_ERROR, "Failed to read SMBUS byte at offset 0x%x\n", Index));
       return Status;
     }
-    CopyMem(&Buffer[Index-BOARD_SETTINGS_OFFSET], &Value, sizeof(Value));
+    CopyMem(&Buffer[Index - BOARD_BOOT_OVERRIDE_OFFSET], &Value, sizeof(Value));
   }
   return EFI_SUCCESS;
 }
@@ -262,6 +262,9 @@ InstallSMBusConfigLoader (
     BoardSettings.PrimaryVideo = 0;
     BoardSettings.SecureBoot = 1;
   }
+
+  /* Maximum of 5 milliseconds */
+  MicroSecondDelay(5000);
 
   Status = ReadBootOverrideFromEEPROM((UINT8 *)&BoardBootOverride, sizeof(BoardBootOverride));
   if (!EFI_ERROR(Status)) {
