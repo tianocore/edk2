@@ -238,6 +238,24 @@ INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
   }
 !endif
 
+!if (NETWORK_IPXE_IP4_IP6)
+  FILE FREEFORM = 35B66AF8-5E35-4D35-9336-AD9FBD801F37 {
+   SECTION PE32 = UefiPayloadPkg/NetworkDrivers/ipxe_ipv4_ipv6.efi
+  }
+!endif
+
+!if (NETWORK_IPXE_IP4)
+  FILE FREEFORM = 4C9A9033-DC7A-4A08-A2E8-EC97BEF557BF {
+   SECTION PE32 = UefiPayloadPkg/NetworkDrivers/ipxe_ipv4.efi
+  }
+!endif
+
+!if (NETWORK_IPXE_IP6)
+  FILE FREEFORM = 57C6823F-7F93-47D2-8CFC-aCEC5A51EE42 {
+   SECTION PE32 = UefiPayloadPkg/NetworkDrivers/ipxe_ipv6.efi
+  }
+!endif
+
 #
 # Network Support
 #
