@@ -291,7 +291,7 @@ FfsProcessSection (
   UINT16                    SectionAttribute;
   UINT32                    AuthenticationStatus;
   CHAR8                     *CompressedData;
-  UINTN                     CompressedDataLength;
+  UINT32                    CompressedDataLength;
 
   *OutputBuffer = NULL;
   ParsedLength  = 0;
@@ -320,7 +320,7 @@ FfsProcessSection (
           }
 
           CompressedData       = (CHAR8 *)((EFI_COMPRESSION_SECTION2 *)Section + 1);
-          CompressedDataLength = (UINT32)SectionLength - sizeof (EFI_COMPRESSION_SECTION2);
+          CompressedDataLength = SectionLength - sizeof (EFI_COMPRESSION_SECTION2);
         } else {
           CompressionSection = (EFI_COMPRESSION_SECTION *)Section;
           SectionLength      = SECTION_SIZE (Section);
@@ -330,7 +330,7 @@ FfsProcessSection (
           }
 
           CompressedData       = (CHAR8 *)((EFI_COMPRESSION_SECTION *)Section + 1);
-          CompressedDataLength = (UINT32)SectionLength - sizeof (EFI_COMPRESSION_SECTION);
+          CompressedDataLength = SectionLength - sizeof (EFI_COMPRESSION_SECTION);
         }
 
         Status = UefiDecompressGetInfo (
