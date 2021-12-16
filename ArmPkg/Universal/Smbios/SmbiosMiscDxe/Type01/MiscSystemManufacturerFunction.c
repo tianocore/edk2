@@ -74,12 +74,24 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscSystemManufacturer) {
   if (StrLen (Product) > 0) {
     TokenToUpdate = STRING_TOKEN (STR_MISC_SYSTEM_PRODUCT_NAME);
     HiiSetString (mSmbiosMiscHiiHandle, TokenToUpdate, Product, NULL);
+  } else {
+    OemUpdateSmbiosInfo (
+      mSmbiosMiscHiiHandle,
+      STRING_TOKEN (STR_MISC_SYSTEM_PRODUCT_NAME),
+      ProductNameType01
+      );
   }
 
   pVersion = (CHAR16 *)PcdGetPtr (PcdSystemVersion);
   if (StrLen (pVersion) > 0) {
     TokenToUpdate = STRING_TOKEN (STR_MISC_SYSTEM_VERSION);
     HiiSetString (mSmbiosMiscHiiHandle, TokenToUpdate, pVersion, NULL);
+  } else {
+    OemUpdateSmbiosInfo (
+      mSmbiosMiscHiiHandle,
+      STRING_TOKEN (STR_MISC_SYSTEM_VERSION),
+      VersionType01
+      );
   }
 
   OemUpdateSmbiosInfo (
