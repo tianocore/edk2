@@ -56,6 +56,8 @@ typedef enum {
   ChassisTypeType03,
   ManufacturerType03,
   SkuNumberType03,
+  ProcessorPartNumType04,
+  ProcessorSerialNumType04,
   SmbiosHiiStringFieldMax
 } OEM_MISC_SMBIOS_HII_STRING_FIELD;
 
