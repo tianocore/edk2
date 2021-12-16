@@ -1,7 +1,7 @@
 /** @file
   Initialize TPM2 device and measure FVs before handing off control to DXE.
 
-Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, Microsoft Corporation.  All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -252,7 +252,7 @@ EndofPeiSignalNotifyCallBack (
 
 /**
   Make sure that the current PCR allocations, the TPM supported PCRs,
-  and the PcdTpm2HashMask are all in agreement.
+  PcdTcg2HashAlgorithmBitmap and the PcdTpm2HashMask are all in agreement.
 **/
 VOID
 SyncPcrAllocationsAndPcrMask (
@@ -261,6 +261,7 @@ SyncPcrAllocationsAndPcrMask (
 {
   EFI_STATUS                       Status;
   EFI_TCG2_EVENT_ALGORITHM_BITMAP  TpmHashAlgorithmBitmap;
+  EFI_TCG2_EVENT_ALGORITHM_BITMAP  BiosHashAlgorithmBitmap;
   UINT32                           TpmActivePcrBanks;
   UINT32                           NewTpmActivePcrBanks;
   UINT32                           Tpm2PcrMask;
@@ -274,33 +275,50 @@ SyncPcrAllocationsAndPcrMask (
   Status = Tpm2GetCapabilitySupportedAndActivePcrs (&TpmHashAlgorithmBitmap, &TpmActivePcrBanks);
   ASSERT_EFI_ERROR (Status);
 
+  DEBUG ((DEBUG_INFO, "Tpm2GetCapabilitySupportedAndActivePcrs - TpmHashAlgorithmBitmap: 0x%08x\n", TpmHashAlgorithmBitmap));
+  DEBUG ((DEBUG_INFO, "Tpm2GetCapabilitySupportedAndActivePcrs - TpmActivePcrBanks 0x%08x\n", TpmActivePcrBanks));
+
   Tpm2PcrMask = PcdGet32 (PcdTpm2HashMask);
   if (Tpm2PcrMask == 0) {
     //
-    // if PcdTPm2HashMask is zero, use ActivePcr setting
+    // If PcdTpm2HashMask is zero, use ActivePcr setting.
+    // Only when PcdTpm2HashMask is initialized to 0, will it be updated to current Active Pcrs.
     //
     PcdSet32S (PcdTpm2HashMask, TpmActivePcrBanks);
     Tpm2PcrMask = TpmActivePcrBanks;
   }
 
-  //
-  // Find the intersection of Pcd support and TPM support.
-  // If banks are missing from the TPM support that are in the PCD, update the PCD.
-  // If banks are missing from the PCD that are active in the TPM, reallocate the banks and reboot.
-  //
+  DEBUG ((DEBUG_INFO, "Tpm2PcrMask 0x%08x\n", Tpm2PcrMask));
 
   //
-  // If there are active PCR banks that are not supported by the Platform mask,
-  // update the TPM allocations and reboot the machine.
+  // The Active PCRs in the TPM need to be a strict subset of the hashing algorithms supported by BIOS.
   //
-  if ((TpmActivePcrBanks & Tpm2PcrMask) != TpmActivePcrBanks) {
-    NewTpmActivePcrBanks = TpmActivePcrBanks & Tpm2PcrMask;
+  // * Find the intersection of Pcd support and TPM active PCRs. If banks are missing from the TPM support
+  // that are in the PCD, update the PCD.
+  // * Find intersection of TPM Active PCRs and BIOS supported algorithms. If there are active PCR banks
+  // that are not supported by the platform, update the TPM allocations and reboot.
+  // Note: When the HashLibBaseCryptoRouter solution is used, the hash algorithm support from BIOS is reported
+  //       by Tcg2HashAlgorithmBitmap, which is populated by HashLib instances at runtime.
+  BiosHashAlgorithmBitmap = PcdGet32 (PcdTcg2HashAlgorithmBitmap);
+  DEBUG ((DEBUG_INFO, "Tcg2HashAlgorithmBitmap: 0x%08x\n", BiosHashAlgorithmBitmap));
+
+  if (((TpmActivePcrBanks & Tpm2PcrMask) != TpmActivePcrBanks) ||
+      ((TpmActivePcrBanks & BiosHashAlgorithmBitmap) != TpmActivePcrBanks))
+  {
+    DEBUG ((DEBUG_INFO, "TpmActivePcrBanks & Tpm2PcrMask = 0x%08x\n", (TpmActivePcrBanks & Tpm2PcrMask)));
+    DEBUG ((DEBUG_INFO, "TpmActivePcrBanks & BiosHashAlgorithmBitmap = 0x%08x\n", (TpmActivePcrBanks & BiosHashAlgorithmBitmap)));
+    NewTpmActivePcrBanks  = TpmActivePcrBanks;
+    NewTpmActivePcrBanks &= Tpm2PcrMask;
+    NewTpmActivePcrBanks &= BiosHashAlgorithmBitmap;
+    DEBUG ((DEBUG_INFO, "NewTpmActivePcrBanks 0x%08x\n", NewTpmActivePcrBanks));
 
     DEBUG ((DEBUG_INFO, "%a - Reallocating PCR banks from 0x%X to 0x%X.\n", __FUNCTION__, TpmActivePcrBanks, NewTpmActivePcrBanks));
+
     if (NewTpmActivePcrBanks == 0) {
       DEBUG ((DEBUG_ERROR, "%a - No viable PCRs active! Please set a less restrictive value for PcdTpm2HashMask!\n", __FUNCTION__));
       ASSERT (FALSE);
     } else {
+      DEBUG ((DEBUG_ERROR, "Tpm2PcrAllocateBanks (TpmHashAlgorithmBitmap: 0x%08x, NewTpmActivePcrBanks: 0x%08x)\n", TpmHashAlgorithmBitmap, NewTpmActivePcrBanks));
       Status = Tpm2PcrAllocateBanks (NULL, (UINT32)TpmHashAlgorithmBitmap, NewTpmActivePcrBanks);
       if (EFI_ERROR (Status)) {
         //
@@ -331,6 +349,7 @@ SyncPcrAllocationsAndPcrMask (
     }
 
     Status = PcdSet32S (PcdTpm2HashMask, NewTpm2PcrMask);
+    DEBUG ((DEBUG_ERROR, "Set PcdTpm2Hash Mask to 0x%08x\n", NewTpm2PcrMask));
     ASSERT_EFI_ERROR (Status);
   }
 }
