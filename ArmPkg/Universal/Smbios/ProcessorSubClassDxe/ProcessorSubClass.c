@@ -513,9 +513,19 @@ AllocateType4AndSetProcessorInformationStrings (
 
   SET_HII_STRING_IF_PCD_NOT_EMPTY (PcdProcessorManufacturer, ProcessorManu);
   SET_HII_STRING_IF_PCD_NOT_EMPTY (PcdProcessorVersion, ProcessorVersion);
-  SET_HII_STRING_IF_PCD_NOT_EMPTY (PcdProcessorSerialNumber, SerialNumber);
   SET_HII_STRING_IF_PCD_NOT_EMPTY (PcdProcessorAssetTag, AssetTag);
-  SET_HII_STRING_IF_PCD_NOT_EMPTY (PcdProcessorPartNumber, PartNumber);
+
+  if (StrLen ((CHAR16 *)FixedPcdGetPtr (PcdProcessorSerialNumber)) > 0) {
+    HiiSetString (mHiiHandle, SerialNumber, (CHAR16 *)FixedPcdGetPtr (PcdProcessorSerialNumber), NULL);
+  } else {
+    OemUpdateSmbiosInfo (mHiiHandle, SerialNumber, ProcessorSerialNumType04);
+  }
+
+  if (StrLen ((CHAR16 *)FixedPcdGetPtr (PcdProcessorPartNumber)) > 0) {
+    HiiSetString (mHiiHandle, PartNumber, (CHAR16 *)FixedPcdGetPtr (PcdProcessorPartNumber), NULL);
+  } else {
+    OemUpdateSmbiosInfo (mHiiHandle, PartNumber, ProcessorPartNumType04);
+  }
 
   // Processor Designation
   StringBufferSize = sizeof (CHAR16) * SMBIOS_STRING_MAX_LENGTH;
