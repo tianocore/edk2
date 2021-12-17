@@ -21,7 +21,6 @@
 [Sources.Common]
   CpuDxe.c
   CpuDxe.h
-  CpuMpCore.c
   CpuMmuCommon.c
   Exception.c
 
