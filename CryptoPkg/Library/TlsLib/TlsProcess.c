@@ -140,11 +140,10 @@ TlsDoHandshake (
 
         DEBUG ((
           DEBUG_ERROR,
-          "%a ERROR 0x%x=L%x:F%x:R%x\n",
+          "%a ERROR 0x%x=L%x:R%x\n",
           __func__,
           ErrorCode,
           ERR_GET_LIB (ErrorCode),
-          ERR_GET_FUNC (ErrorCode),
           ERR_GET_REASON (ErrorCode)
           ));
       }
