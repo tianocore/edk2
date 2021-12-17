@@ -3,7 +3,7 @@
   hash handler registered, such as SHA1, SHA256.
   Platform can use PcdTpm2HashMask to mask some hash engines.
 
-Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2021, Intel Corporation. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -234,13 +234,18 @@ RegisterHashInterfaceLib (
 {
   UINTN       Index;
   UINT32      HashMask;
+  UINT32      Tpm2HashMask;
   EFI_STATUS  Status;
 
   //
   // Check allow
   //
-  HashMask = Tpm2GetHashMaskFromAlgo (&HashInterface->HashGuid);
-  if ((HashMask & PcdGet32 (PcdTpm2HashMask)) == 0) {
+  HashMask     = Tpm2GetHashMaskFromAlgo (&HashInterface->HashGuid);
+  Tpm2HashMask = PcdGet32 (PcdTpm2HashMask);
+
+  if ((Tpm2HashMask != 0) &&
+      ((HashMask & Tpm2HashMask) == 0))
+  {
     return EFI_UNSUPPORTED;
   }
 
