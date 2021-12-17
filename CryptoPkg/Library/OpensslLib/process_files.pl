@@ -253,6 +253,7 @@ foreach my $product ((@{$unified_info{libraries}},
 
             next if $s =~ "crypto/bio/bio_print.c";
             next if $s =~ "providers/implementations/storemgmt/";
+            next if $s =~ "ssl/ssl_txt.c";
 
             if ($unified_info{generate}->{$s}) {
                 if (defined $arch) {
