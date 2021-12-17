@@ -392,6 +392,11 @@ PlatformBootManagerBeforeConsole (
   //
   EfiBootManagerDispatchDeferredImages ();
 
+  //
+  // GPU passthrough only allows Console enablement after ROM image load
+  //
+  PlatformInitializeConsole (gPlatformConsole);
+
   Status = gRT->SetVariable (
                   EFI_TIME_OUT_VARIABLE_NAME,
                   &gEfiGlobalVariableGuid,

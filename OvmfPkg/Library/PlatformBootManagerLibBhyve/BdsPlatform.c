@@ -434,6 +434,11 @@ PlatformBootManagerBeforeConsole (
   //
   EfiBootManagerDispatchDeferredImages ();
 
+  //
+  // GPU passthrough only allows Console enablement after ROM image load
+  //
+  PlatformInitializeConsole (gPlatformConsole);
+
   PlatformRegisterOptionsAndKeys ();
 
   //

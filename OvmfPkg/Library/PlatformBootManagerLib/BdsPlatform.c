@@ -448,6 +448,13 @@ PlatformBootManagerBeforeConsole (
   //
   EfiBootManagerDispatchDeferredImages ();
 
+  //
+  // GPU passthrough only allows Console enablement after ROM image load
+  //
+  PlatformInitializeConsole (
+    XenDetected () ? gXenPlatformConsole : gPlatformConsole
+    );
+
   FrontPageTimeout = GetFrontPageTimeoutFromQemu ();
   PcdStatus        = PcdSet16S (PcdPlatformBootTimeOut, FrontPageTimeout);
   ASSERT_RETURN_ERROR (PcdStatus);
