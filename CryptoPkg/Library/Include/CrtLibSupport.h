@@ -104,6 +104,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Basic types mapping
 //
 typedef UINTN   size_t;
+typedef UINTN   off_t;
 typedef UINTN   u_int;
 typedef INTN    ptrdiff_t;
 typedef INTN    ssize_t;
