@@ -1,7 +1,7 @@
 /** @file
   PTP (Platform TPM Profile) CRB (Command Response Buffer) interface used by dTPM2.0 library.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 Copyright (c), Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -320,7 +320,7 @@ PtpCrbTpmCommand (
     // Command completed, but buffer is not enough
     //
     Status = EFI_BUFFER_TOO_SMALL;
-    goto GoReady_Exit;
+    goto GoIdle_Exit;
   }
 
   *SizeOut = TpmOutSize;
@@ -339,16 +339,6 @@ PtpCrbTpmCommand (
 
   DEBUG ((DEBUG_VERBOSE, "\n"));
   DEBUG_CODE_END ();
-
-GoReady_Exit:
-  //
-  // Goto Ready State if command is completed successfully and TPM support IdleBypass
-  // If not supported. flow down to GoIdle
-  //
-  if (GetCachedIdleByPass () == 1) {
-    MmioWrite32 ((UINTN)&CrbReg->CrbControlRequest, PTP_CRB_CONTROL_AREA_REQUEST_COMMAND_READY);
-    return Status;
-  }
 
   //
   // Do not wait for state transition for TIMEOUT_C
