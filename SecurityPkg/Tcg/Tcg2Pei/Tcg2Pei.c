@@ -1,7 +1,7 @@
 /** @file
   Initialize TPM2 device and measure FVs before handing off control to DXE.
 
-Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, Microsoft Corporation.  All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1105,6 +1105,13 @@ PeimEntryMA (
         }
       }
     }
+
+    DEBUG_CODE_BEGIN ();
+    //
+    // Peek into TPM PCR 00 before any BIOS measurement.
+    //
+    Tpm2PcrReadForActiveBank (00, NULL);
+    DEBUG_CODE_END ();
 
     //
     // Only install TpmInitializedPpi on success

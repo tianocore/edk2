@@ -1,7 +1,7 @@
 /** @file
   Implement TPM2 Integrity related command.
 
-Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2021, Intel Corporation. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -138,6 +138,23 @@ Tpm2PcrExtend (
       &Digests->digests[Index].digest,
       DigestSize
       );
+
+    DEBUG_CODE_BEGIN ();
+    UINTN  Index2;
+    DEBUG ((
+      DEBUG_VERBOSE,
+      "Tpm2PcrExtend - Hash = 0x%04x, Pcr[%02d], digest = ",
+      Digests->digests[Index].hashAlg,
+      (UINT8)PcrHandle
+      ));
+
+    for (Index2 = 0; Index2 < DigestSize; Index2++) {
+      DEBUG ((DEBUG_VERBOSE, "%02x ", Buffer[Index2]));
+    }
+
+    DEBUG ((DEBUG_VERBOSE, "\n"));
+    DEBUG_CODE_END ();
+
     Buffer += DigestSize;
   }
 
@@ -171,6 +188,11 @@ Tpm2PcrExtend (
     DEBUG ((DEBUG_ERROR, "Tpm2PcrExtend: Response Code error! 0x%08x\r\n", SwapBytes32 (Res.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
+
+  DEBUG_CODE_BEGIN ();
+  DEBUG ((DEBUG_VERBOSE, "Tpm2PcrExtend: PCR read after extend...\n"));
+  Tpm2PcrReadForActiveBank (PcrHandle, NULL);
+  DEBUG_CODE_END ();
 
   //
   // Unmarshal the response
@@ -704,4 +726,170 @@ Tpm2PcrAllocateBanks (
 Done:
   ZeroMem (&LocalAuthSession.hmac, sizeof (LocalAuthSession.hmac));
   return Status;
+}
+
+/**
+   This function will query the TPM to determine which hashing algorithms and
+   get the digests of all active and supported PCR banks of a specific PCR register.
+
+   @param[in]     PcrHandle     The index of the PCR register to be read.
+   @param[out]    HashList      List of digests from PCR register being read.
+
+   @retval EFI_SUCCESS           The Pcr was read successfully.
+   @retval EFI_DEVICE_ERROR      The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2PcrReadForActiveBank (
+  IN      TPMI_DH_PCR  PcrHandle,
+  OUT     TPML_DIGEST  *HashList
+  )
+{
+  EFI_STATUS          Status;
+  TPML_PCR_SELECTION  Pcrs;
+  TPML_PCR_SELECTION  PcrSelectionIn;
+  TPML_PCR_SELECTION  PcrSelectionOut;
+  TPML_DIGEST         PcrValues;
+  UINT32              PcrUpdateCounter;
+  UINT8               PcrIndex;
+  UINT32              TpmHashAlgorithmBitmap;
+  TPMI_ALG_HASH       CurrentPcrBankHash;
+  UINT32              ActivePcrBanks;
+  UINT32              TcgRegistryHashAlg;
+  UINTN               Index;
+  UINTN               Index2;
+
+  PcrIndex = (UINT8)PcrHandle;
+
+  if ((PcrIndex < 0) ||
+      (PcrIndex >= IMPLEMENTATION_PCR))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ZeroMem (&PcrSelectionIn, sizeof (PcrSelectionIn));
+  ZeroMem (&PcrUpdateCounter, sizeof (UINT32));
+  ZeroMem (&PcrSelectionOut, sizeof (PcrSelectionOut));
+  ZeroMem (&PcrValues, sizeof (PcrValues));
+  ZeroMem (&Pcrs, sizeof (TPML_PCR_SELECTION));
+
+  DEBUG ((DEBUG_INFO, "ReadPcr - %02d\n", PcrIndex));
+
+  //
+  // Read TPM capabilities
+  //
+  Status = Tpm2GetCapabilityPcrs (&Pcrs);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "ReadPcr: Unable to read TPM capabilities\n"));
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Get Active Pcrs
+  //
+  Status = Tpm2GetCapabilitySupportedAndActivePcrs (
+             &TpmHashAlgorithmBitmap,
+             &ActivePcrBanks
+             );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "ReadPcr: Unable to read TPM capabilities and active PCRs\n"));
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Select from Active PCRs
+  //
+  for (Index = 0; Index < Pcrs.count; Index++) {
+    CurrentPcrBankHash = Pcrs.pcrSelections[Index].hash;
+
+    switch (CurrentPcrBankHash) {
+      case TPM_ALG_SHA1:
+        DEBUG ((DEBUG_VERBOSE, "HASH_ALG_SHA1 Present\n"));
+        TcgRegistryHashAlg = HASH_ALG_SHA1;
+        break;
+      case TPM_ALG_SHA256:
+        DEBUG ((DEBUG_VERBOSE, "HASH_ALG_SHA256 Present\n"));
+        TcgRegistryHashAlg = HASH_ALG_SHA256;
+        break;
+      case TPM_ALG_SHA384:
+        DEBUG ((DEBUG_VERBOSE, "HASH_ALG_SHA384 Present\n"));
+        TcgRegistryHashAlg = HASH_ALG_SHA384;
+        break;
+      case TPM_ALG_SHA512:
+        DEBUG ((DEBUG_VERBOSE, "HASH_ALG_SHA512 Present\n"));
+        TcgRegistryHashAlg = HASH_ALG_SHA512;
+        break;
+      case TPM_ALG_SM3_256:
+        DEBUG ((DEBUG_VERBOSE, "HASH_ALG_SM3 Present\n"));
+        TcgRegistryHashAlg = HASH_ALG_SM3_256;
+        break;
+      default:
+        //
+        // Unsupported algorithm
+        //
+        DEBUG ((DEBUG_VERBOSE, "Unknown algorithm present\n"));
+        TcgRegistryHashAlg = 0;
+        break;
+    }
+
+    //
+    // Skip unsupported and inactive PCR banks
+    //
+    if ((TcgRegistryHashAlg & ActivePcrBanks) == 0) {
+      DEBUG ((DEBUG_VERBOSE, "Skipping unsupported or inactive bank: 0x%04x\n", CurrentPcrBankHash));
+      continue;
+    }
+
+    //
+    // Select PCR from current active bank
+    //
+    PcrSelectionIn.pcrSelections[PcrSelectionIn.count].hash         = Pcrs.pcrSelections[Index].hash;
+    PcrSelectionIn.pcrSelections[PcrSelectionIn.count].sizeofSelect = PCR_SELECT_MAX;
+    PcrSelectionIn.pcrSelections[PcrSelectionIn.count].pcrSelect[0] = (PcrIndex < 8) ? 1 << PcrIndex : 0;
+    PcrSelectionIn.pcrSelections[PcrSelectionIn.count].pcrSelect[1] = (PcrIndex > 7) && (PcrIndex < 16) ? 1 << (PcrIndex - 8) : 0;
+    PcrSelectionIn.pcrSelections[PcrSelectionIn.count].pcrSelect[2] = (PcrIndex > 15) ? 1 << (PcrIndex - 16) : 0;
+    PcrSelectionIn.count++;
+  }
+
+  //
+  // Read PCRs
+  //
+  Status = Tpm2PcrRead (
+             &PcrSelectionIn,
+             &PcrUpdateCounter,
+             &PcrSelectionOut,
+             &PcrValues
+             );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PcrRead failed Status = %r \n", Status));
+    return EFI_DEVICE_ERROR;
+  }
+
+  for (Index = 0; Index < PcrValues.count; Index++) {
+    DEBUG ((
+      DEBUG_INFO,
+      "ReadPcr - HashAlg = 0x%04x, Pcr[%02d], digest = ",
+      PcrSelectionOut.pcrSelections[Index].hash,
+      PcrIndex
+      ));
+
+    for (Index2 = 0; Index2 < PcrValues.digests[Index].size; Index2++) {
+      DEBUG ((DEBUG_INFO, "%02x ", PcrValues.digests[Index].buffer[Index2]));
+    }
+
+    DEBUG ((DEBUG_INFO, "\n"));
+  }
+
+  if (HashList != NULL) {
+    CopyMem (
+      HashList,
+      &PcrValues,
+      sizeof (TPML_DIGEST)
+      );
+  }
+
+  return EFI_SUCCESS;
 }
