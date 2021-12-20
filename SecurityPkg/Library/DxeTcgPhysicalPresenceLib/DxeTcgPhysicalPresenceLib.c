@@ -29,6 +29,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/EventGroup.h>
 #include <Guid/PhysicalPresenceData.h>
 #include <Library/TcgPpVendorLib.h>
+#include <Library/VariablePolicyHelperLib.h>
 
 #define CONFIRM_BUFFER_SIZE  4096
 
@@ -1183,14 +1184,14 @@ TcgPhysicalPresenceLibProcessRequest (
   VOID
   )
 {
-  EFI_STATUS                    Status;
-  BOOLEAN                       LifetimeLock;
-  BOOLEAN                       CmdEnable;
-  UINTN                         DataSize;
-  EFI_PHYSICAL_PRESENCE         TcgPpData;
-  EFI_TCG_PROTOCOL              *TcgProtocol;
-  EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLockProtocol;
-  EFI_PHYSICAL_PRESENCE_FLAGS   PpiFlags;
+  EFI_STATUS                      Status;
+  BOOLEAN                         LifetimeLock;
+  BOOLEAN                         CmdEnable;
+  UINTN                           DataSize;
+  EFI_PHYSICAL_PRESENCE           TcgPpData;
+  EFI_TCG_PROTOCOL                *TcgProtocol;
+  EDKII_VARIABLE_POLICY_PROTOCOL  *VariablePolicy;
+  EFI_PHYSICAL_PRESENCE_FLAGS     PpiFlags;
 
   Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **)&TcgProtocol);
   if (EFI_ERROR (Status)) {
@@ -1229,13 +1230,18 @@ TcgPhysicalPresenceLibProcessRequest (
   // This flags variable controls whether physical presence is required for TPM command.
   // It should be protected from malicious software. We set it as read-only variable here.
   //
-  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLockProtocol);
+  Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicy);
   if (!EFI_ERROR (Status)) {
-    Status = VariableLockProtocol->RequestToLock (
-                                     VariableLockProtocol,
-                                     PHYSICAL_PRESENCE_FLAGS_VARIABLE,
-                                     &gEfiPhysicalPresenceGuid
-                                     );
+    Status = RegisterBasicVariablePolicy (
+               VariablePolicy,
+               &gEfiPhysicalPresenceGuid,
+               PHYSICAL_PRESENCE_FLAGS_VARIABLE,
+               VARIABLE_POLICY_NO_MIN_SIZE,
+               VARIABLE_POLICY_NO_MAX_SIZE,
+               VARIABLE_POLICY_NO_MUST_ATTR,
+               VARIABLE_POLICY_NO_CANT_ATTR,
+               VARIABLE_POLICY_TYPE_LOCK_NOW
+               );
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "[TPM] Error when lock variable %s, Status = %r\n", PHYSICAL_PRESENCE_FLAGS_VARIABLE, Status));
       ASSERT_EFI_ERROR (Status);

@@ -54,6 +54,7 @@
   Tpm2CommandLib
   Tcg2PhysicalPresenceLib
   IoLib
+  VariablePolicyHelperLib
 
 [Guids]
   ## PRODUCES           ## HII
@@ -66,7 +67,7 @@
 [Protocols]
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
   gEfiDevicePathProtocolGuid                    ## PRODUCES
-  gEdkiiVariableLockProtocolGuid                ## SOMETIMES_CONSUMES
+  gEdkiiVariablePolicyProtocolGuid              ## SOMETIMES_CONSUMES
   gEfiTcg2ProtocolGuid                          ## CONSUMES
 
 [Pcd]

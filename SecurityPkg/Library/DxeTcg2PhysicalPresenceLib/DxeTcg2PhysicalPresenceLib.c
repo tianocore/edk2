@@ -31,6 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/Tpm2CommandLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
 #include <Library/Tcg2PpVendorLib.h>
+#include <Library/VariablePolicyHelperLib.h>
 
 #define CONFIRM_BUFFER_SIZE  4096
 
@@ -918,20 +919,25 @@ Tcg2PhysicalPresenceLibProcessRequest (
   EFI_STATUS                        Status;
   UINTN                             DataSize;
   EFI_TCG2_PHYSICAL_PRESENCE        TcgPpData;
-  EDKII_VARIABLE_LOCK_PROTOCOL      *VariableLockProtocol;
+  EDKII_VARIABLE_POLICY_PROTOCOL    *VariablePolicy;
   EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
 
   //
   // This flags variable controls whether physical presence is required for TPM command.
   // It should be protected from malicious software. We set it as read-only variable here.
   //
-  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLockProtocol);
+  Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicy);
   if (!EFI_ERROR (Status)) {
-    Status = VariableLockProtocol->RequestToLock (
-                                     VariableLockProtocol,
-                                     TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
-                                     &gEfiTcg2PhysicalPresenceGuid
-                                     );
+    Status = RegisterBasicVariablePolicy (
+               VariablePolicy,
+               &gEfiTcg2PhysicalPresenceGuid,
+               TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
+               VARIABLE_POLICY_NO_MIN_SIZE,
+               VARIABLE_POLICY_NO_MAX_SIZE,
+               VARIABLE_POLICY_NO_MUST_ATTR,
+               VARIABLE_POLICY_NO_CANT_ATTR,
+               VARIABLE_POLICY_TYPE_LOCK_NOW
+               );
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "[TPM2] Error when lock variable %s, Status = %r\n", TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE, Status));
       ASSERT_EFI_ERROR (Status);
