@@ -45,7 +45,6 @@ extern EFI_GUID  gFspHobGuid;
 **/
 
 UINTN
-EFIAPI
 GetFspmUpdDataAddress (
   VOID
   )
