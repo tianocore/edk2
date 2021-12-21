@@ -188,7 +188,6 @@ FspSiliconInitDoneGetFspHobList (
 **/
 
 UINTN
-EFIAPI
 GetFspsUpdDataAddress (
   VOID
   )
