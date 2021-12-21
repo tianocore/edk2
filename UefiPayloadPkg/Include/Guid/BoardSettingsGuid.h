@@ -30,6 +30,7 @@ typedef struct {
   UINT8 PxeBootCapability;
   UINT8 PinkRearPort;
   UINT8 VtxDisabled;
+  UINT8 PinkRearVref;
 } BOARD_SETTINGS;
 
 #define PRIMARY_VIDEO_ASPEED 0
