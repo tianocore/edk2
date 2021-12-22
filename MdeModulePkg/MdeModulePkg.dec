@@ -154,6 +154,10 @@
   #
   VariablePolicyHelperLib|Include/Library/VariablePolicyHelperLib.h
 
+  ##  @libraryclass  This library contains helper functions for Page tables (X64)
+  #
+  PageTablesLib|Include/Library/PageTablesLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
