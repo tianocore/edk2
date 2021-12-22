@@ -214,6 +214,9 @@ IntelTdxInitialize (
   PcdStatus = PcdSet64S (PcdTdxSharedBitMask, TdSharedPageMask ());
   ASSERT_RETURN_ERROR (PcdStatus);
 
+  PcdStatus = PcdSetBoolS (PcdSetNxForStack, TRUE);
+  ASSERT_RETURN_ERROR (PcdStatus);
+
   ZeroMem (&PlatformInfoHob, sizeof (PlatformInfoHob));
   PlatformInfoHob.HostBridgePciDevId = mHostBridgeDevId;
 
