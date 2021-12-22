@@ -234,6 +234,7 @@
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
   TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
+  PageTablesLib|MdeModulePkg/Library/PageTablesLib/PageTablesLib.inf
 
 [LibraryClasses.common.SEC]
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
