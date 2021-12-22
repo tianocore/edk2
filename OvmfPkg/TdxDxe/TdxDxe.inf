@@ -65,3 +65,4 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdIa32EferChangeAllowed
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
   gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack

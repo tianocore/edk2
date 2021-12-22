@@ -191,6 +191,9 @@ TdxDxeEntryPoint (
 
   PcdStatus = PcdSet64S (PcdTdxSharedBitMask, TdSharedPageMask ());
   ASSERT_RETURN_ERROR (PcdStatus);
+
+  PcdStatus = PcdSetBoolS (PcdSetNxForStack, TRUE);
+  ASSERT_RETURN_ERROR (PcdStatus);
  #endif
 
   PlatformInfo = (EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (GuidHob);
