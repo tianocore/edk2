@@ -17,8 +17,8 @@ DEFINE FD_SIZE     = 0x00850000
 DEFINE NUM_BLOCKS  = 0x850
 !else
 
-DEFINE FD_SIZE     = 0x00800000
-DEFINE NUM_BLOCKS  = 0x800
+DEFINE FD_SIZE     = 0x01000000
+DEFINE NUM_BLOCKS  = 0x1000
 !endif
 
 ################################################################################
