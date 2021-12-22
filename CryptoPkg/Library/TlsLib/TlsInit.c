@@ -106,6 +106,14 @@ TlsCtxNew (
   //
   SSL_CTX_set_min_proto_version (TlsCtx, ProtoVersion);
 
+  //
+  // we have no ec -> so no tls 1.3 -> set max tls version to 1.2
+  //
+  MajorVer = 0x03; // TLS12_PROTOCOL_VERSION_MAJOR;
+  MinorVer = 0x03; // TLS12_PROTOCOL_VERSION_MINOR;
+  ProtoVersion = (MajorVer << 8) | MinorVer;
+  SSL_CTX_set_max_proto_version (TlsCtx, ProtoVersion);
+
   return (VOID *)TlsCtx;
 }
 
