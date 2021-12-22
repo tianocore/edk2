@@ -18,8 +18,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/PcdDataBaseSignatureGuid.h>
 #include <Register/Intel/Cpuid.h>
 #include <Library/PrePiLib.h>
-#include "X64/PageTables.h"
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/TdxLib.h>
+#include <Library/PageTablesLib.h>
 
 #define STACK_SIZE  0x20000
 
@@ -32,6 +33,19 @@ EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
   { EfiBootServicesCode,    0x180 },
   { EfiBootServicesData,    0xF00 },
   { EfiMaxMemoryType,       0x000 }
+};
+
+PAGE_TABLES_PCD_SETTINGS  mPageTablesPcdSettings = {
+  TRUE,                                               // PcdSetNxForStack
+  FALSE,                                              // PcdIa32EferChangeAllowed
+  FixedPcdGetBool (PcdCpuStackGuard),                 // PcdCpuStackGuard
+  FixedPcdGetBool (PcdUse1GPageTable),                // PcdUse1GPageTable
+  FALSE,                                              // PcdUse5LevelPageTable
+  FixedPcdGet8 (PcdNullPointerDetectionPropertyMask), // PcdNullPointerDetectionPropertyMask
+  FixedPcdGet32 (PcdImageProtectionPolicy),           // PcdImageProtectionPolicy
+  FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy),     // PcdDxeNxMemoryProtectionPolicy
+  0,                                                  // PcdPteMemoryEncryptionAddressOrMask
+  0                                                   // PgTableMask
 };
 
 /**
@@ -51,6 +65,12 @@ HandOffToDxeCore (
   VOID   *BaseOfStack;
   VOID   *TopOfStack;
   UINTN  PageTables;
+
+  //
+  //  Before call the PageTablesLib function, set the PCDs first
+  //
+  mPageTablesPcdSettings.PgTableMask = TdSharedPageMask () | EFI_PAGE_MASK;
+  SetPageTablesPcdSettings (&mPageTablesPcdSettings);
 
   //
   // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
@@ -80,7 +100,9 @@ HandOffToDxeCore (
   //
   PageTables = CreateIdentityMappingPageTables (
                  (EFI_PHYSICAL_ADDRESS)(UINTN)BaseOfStack,
-                 STACK_SIZE
+                 STACK_SIZE,
+                 0,
+                 0
                  );
   if (PageTables == 0) {
     DEBUG ((DEBUG_ERROR, "Failed to create idnetity mapping page tables.\n"));

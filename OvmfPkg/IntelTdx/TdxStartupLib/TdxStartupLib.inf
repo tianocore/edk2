@@ -30,9 +30,6 @@
   Hob.c
   DxeLoad.c
 
-[Sources.X64]
-  X64/VirtualMemory.c
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -56,6 +53,7 @@
   TdxPlatformLib
   PrePiLib
   QemuFwCfgLib
+  PageTablesLib
 
 [Guids]
   gEfiHobMemoryAllocModuleGuid
@@ -75,7 +73,6 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBase
-  gUefiOvmfPkgTokenSpaceGuid.PcdTdxSetNxForStack
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard               ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable              ## SOMETIMES_CONSUMES
