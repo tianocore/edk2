@@ -512,6 +512,7 @@
 
 [Components.X64]
   MdeModulePkg/Universal/CapsulePei/CapsuleX64.inf
+  MdeModulePkg/Library/PageTablesLib/PageTablesLib.inf
 
 [BuildOptions]
 

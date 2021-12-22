@@ -1,0 +1,39 @@
+## @file
+#  Library for Page tables
+#
+# Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017 Advanced Micro Devices. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PageTablesLib
+  FILE_GUID                      = fc608c6b-1dfa-481d-87c2-88c3a7a4d3b1
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PageTablesLib
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+  VALID_ARCHITECTURES           = X64
+#
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[Sources]
+  VirtualMemory.c
+
+[LibraryClasses]
+  BaseLib
+  CacheMaintenanceLib
+  CpuLib
+  DebugLib
+  MemoryAllocationLib
