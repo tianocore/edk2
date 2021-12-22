@@ -199,6 +199,7 @@
   VmgExitLib|OvmfPkg/Library/VmgExitLib/VmgExitLib.inf
   TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
   TdxMailboxLib|OvmfPkg/Library/TdxMailboxLib/TdxMailboxLib.inf
+  PageTablesLib|MdeModulePkg/Library/PageTablesLib/PageTablesLib.inf
 
 [LibraryClasses.common.SEC]
   TimerLib|OvmfPkg/Library/AcpiTimerLib/BaseRomAcpiTimerLib.inf
