@@ -198,6 +198,7 @@ class AutoGenWorkerInProcess(mp.Process):
             self.Wa._SrcTimeStamp = self.data_pipe.Get("Workspace_timestamp")
             GlobalData.gGlobalDefines = self.data_pipe.Get("G_defines")
             GlobalData.gCommandLineDefines = self.data_pipe.Get("CL_defines")
+            GlobalData.gCommandMaxLength = self.data_pipe.Get('gCommandMaxLength')
             os.environ._data = self.data_pipe.Get("Env_Var")
             GlobalData.gWorkspace = workspacedir
             GlobalData.gDisableIncludePathCheck = False
