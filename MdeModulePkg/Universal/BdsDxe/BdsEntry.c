@@ -719,7 +719,7 @@ STATIC UINT8 GetUSBPort(IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePathNode)
         (DevicePathType(ChildDevicePathNode) == MESSAGING_DEVICE_PATH) &&
         (DevicePathSubType(ChildDevicePathNode) == MSG_USB_DP)) {
       //
-      // We find the valid SATA device path
+      // We find the valid USB device path
       //
       USBDevicePath = (USB_DEVICE_PATH *)ChildDevicePathNode;
       return USBDevicePath->ParentPortNumber;
@@ -738,8 +738,22 @@ IsBootTypeMatch(
 {
   switch (Override.Type) {
   case BootOverridePXE:
-    if (StrCmp(BootOption->Description, L"iPXE Network boot") == 0)
-      return 1;
+    switch (Override.Port) {
+    default:
+      break;
+    case IPV4IPV6:
+      if (StrCmp(BootOption->Description, L"iPXE Network boot IPv4 and IPV6") == 0)
+        return 1;
+      break;
+    case IPV4:
+      if (StrCmp(BootOption->Description, L"iPXE Network boot IPv4") == 0)
+        return 1;
+      break;
+    case IPV6:
+      if (StrCmp(BootOption->Description, L"iPXE Network boot IPv6") == 0)
+        return 1;
+      break;
+    }
     break;
   case BootOverrideSATA:
     if (BootOptionType(BootOption->FilePath) == MSG_SATA_DP) {

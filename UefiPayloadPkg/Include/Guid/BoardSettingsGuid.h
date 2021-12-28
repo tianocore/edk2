@@ -61,6 +61,12 @@ enum BoardBootOverride {
   BootOverrideMax
 };
 
+enum iPXEBootOverride {
+  IPV4IPV6 = 0,
+  IPV4 = 1,
+  IPV6 = 2,
+};
+
 typedef struct {
   UINT8 Type;
   UINT8 Port;
