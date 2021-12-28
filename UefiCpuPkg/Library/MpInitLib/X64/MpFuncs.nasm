@@ -345,7 +345,7 @@ BITS 64
     ;
     ; Far return into 32-bit mode
     ;
-o64 retf
+    retfq
 
 BITS 32
 CompatMode:
@@ -507,7 +507,7 @@ NoSevEs:
     ;
     ; Far return into 32-bit mode
     ;
-o64 retf
+    retfq
 
 BITS 32
 PmEntry:
