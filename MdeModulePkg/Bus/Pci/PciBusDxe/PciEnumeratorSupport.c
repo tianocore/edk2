@@ -2116,6 +2116,27 @@ AuthenticatePciDevice (
 }
 
 /**
+  Checks if PCI device is Root Bridge.
+
+  @param PciIoDevice       Instance of PCI device
+
+  @retval TRUE             Device is Root Bridge
+  @retval FALSE            Device is not Root Bridge
+
+**/
+BOOLEAN
+IsRootBridge (
+  IN PCI_IO_DEVICE  *PciIoDevice
+  )
+{
+  if (PciIoDevice->Parent == NULL) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
+/**
   Create and initialize general PCI I/O device instance for
   PCI device/bridge device/hotplug bridge device.
 
@@ -2217,7 +2238,10 @@ CreatePciIoDevice (
     return NULL;
   }
 
-  if (PcdGetBool (PcdAriSupport)) {
+  //
+  // Check if device's parent is not Root Bridge
+  //
+  if (PcdGetBool (PcdAriSupport) && !IsRootBridge (Bridge)) {
     //
     // Check if the device is an ARI device.
     //
