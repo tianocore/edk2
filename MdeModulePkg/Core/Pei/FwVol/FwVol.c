@@ -1551,7 +1551,7 @@ ProcessFvFile (
     PeiServicesInstallFvInfoPpi (
       &FvHeader->FileSystemGuid,
       (VOID **)FvHeader,
-      (UINT32)FvHeader->FvLength,
+      (UINTN) FvHeader->FvLength,
       &ParentFvImageInfo.FvName,
       &FileInfo.FileName
       );
