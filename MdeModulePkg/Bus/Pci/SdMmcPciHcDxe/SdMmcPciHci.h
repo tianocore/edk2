@@ -2,8 +2,8 @@
 
   Provides some data structure definitions used by the SD/MMC host controller driver.
 
-Copyright (c) 2018-2019, NVIDIA CORPORATION. All rights reserved.
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2018-2020, NVIDIA CORPORATION. All rights reserved.
+Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -214,8 +214,8 @@ typedef struct {
 **/
 VOID
 DumpCapabilityReg (
-  IN UINT8               Slot,
-  IN SD_MMC_HC_SLOT_CAP  *Capability
+  IN UINT8              Slot,
+  IN SD_MMC_HC_SLOT_CAP *Capability
   );
 
 /**
@@ -232,9 +232,9 @@ DumpCapabilityReg (
 EFI_STATUS
 EFIAPI
 SdMmcHcGetSlotInfo (
-  IN     EFI_PCI_IO_PROTOCOL  *PciIo,
-  OUT UINT8                   *FirstBar,
-  OUT UINT8                   *SlotNum
+  IN     EFI_PCI_IO_PROTOCOL *PciIo,
+  OUT UINT8                  *FirstBar,
+  OUT UINT8                  *SlotNum
   );
 
 /**
@@ -263,12 +263,12 @@ SdMmcHcGetSlotInfo (
 EFI_STATUS
 EFIAPI
 SdMmcHcRwMmio (
-  IN     EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN     UINT8                BarIndex,
-  IN     UINT32               Offset,
-  IN     BOOLEAN              Read,
-  IN     UINT8                Count,
-  IN OUT VOID                 *Data
+  IN     EFI_PCI_IO_PROTOCOL *PciIo,
+  IN     UINT8               BarIndex,
+  IN     UINT32              Offset,
+  IN     BOOLEAN             Read,
+  IN     UINT8               Count,
+  IN OUT VOID                *Data
   );
 
 /**
@@ -295,11 +295,11 @@ SdMmcHcRwMmio (
 EFI_STATUS
 EFIAPI
 SdMmcHcOrMmio (
-  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN  UINT8                BarIndex,
-  IN  UINT32               Offset,
-  IN  UINT8                Count,
-  IN  VOID                 *OrData
+  IN  EFI_PCI_IO_PROTOCOL *PciIo,
+  IN  UINT8               BarIndex,
+  IN  UINT32              Offset,
+  IN  UINT8               Count,
+  IN  VOID                *OrData
   );
 
 /**
@@ -326,11 +326,11 @@ SdMmcHcOrMmio (
 EFI_STATUS
 EFIAPI
 SdMmcHcAndMmio (
-  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN  UINT8                BarIndex,
-  IN  UINT32               Offset,
-  IN  UINT8                Count,
-  IN  VOID                 *AndData
+  IN  EFI_PCI_IO_PROTOCOL *PciIo,
+  IN  UINT8               BarIndex,
+  IN  UINT32              Offset,
+  IN  UINT8               Count,
+  IN  VOID                *AndData
   );
 
 /**
@@ -358,13 +358,13 @@ SdMmcHcAndMmio (
 EFI_STATUS
 EFIAPI
 SdMmcHcWaitMmioSet (
-  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN  UINT8                BarIndex,
-  IN  UINT32               Offset,
-  IN  UINT8                Count,
-  IN  UINT64               MaskValue,
-  IN  UINT64               TestValue,
-  IN  UINT64               Timeout
+  IN  EFI_PCI_IO_PROTOCOL *PciIo,
+  IN  UINT8               BarIndex,
+  IN  UINT32              Offset,
+  IN  UINT8               Count,
+  IN  UINT64              MaskValue,
+  IN  UINT64              TestValue,
+  IN  UINT64              Timeout
   );
 
 /**
@@ -380,9 +380,9 @@ SdMmcHcWaitMmioSet (
 **/
 EFI_STATUS
 SdMmcHcGetControllerVersion (
-  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN  UINT8                Slot,
-  OUT UINT16               *Version
+  IN  EFI_PCI_IO_PROTOCOL *PciIo,
+  IN  UINT8               Slot,
+  OUT UINT16              *Version
   );
 
 /**
@@ -398,8 +398,8 @@ SdMmcHcGetControllerVersion (
 **/
 EFI_STATUS
 SdMmcHcEnableInterrupt (
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN UINT8                Slot
+  IN EFI_PCI_IO_PROTOCOL *PciIo,
+  IN UINT8               Slot
   );
 
 /**
@@ -415,9 +415,9 @@ SdMmcHcEnableInterrupt (
 **/
 EFI_STATUS
 SdMmcHcGetCapability (
-  IN     EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN     UINT8                Slot,
-  OUT SD_MMC_HC_SLOT_CAP      *Capability
+  IN     EFI_PCI_IO_PROTOCOL *PciIo,
+  IN     UINT8               Slot,
+  OUT SD_MMC_HC_SLOT_CAP     *Capability
   );
 
 /**
@@ -433,9 +433,9 @@ SdMmcHcGetCapability (
 **/
 EFI_STATUS
 SdMmcHcGetMaxCurrent (
-  IN     EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN     UINT8                Slot,
-  OUT UINT64                  *MaxCurrent
+  IN     EFI_PCI_IO_PROTOCOL *PciIo,
+  IN     UINT8               Slot,
+  OUT UINT64                 *MaxCurrent
   );
 
 /**
@@ -455,9 +455,9 @@ SdMmcHcGetMaxCurrent (
 **/
 EFI_STATUS
 SdMmcHcCardDetect (
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN UINT8                Slot,
-  OUT BOOLEAN             *MediaPresent
+  IN EFI_PCI_IO_PROTOCOL *PciIo,
+  IN UINT8               Slot,
+  OUT BOOLEAN            *MediaPresent
   );
 
 /**
@@ -474,23 +474,32 @@ SdMmcHcCardDetect (
 **/
 EFI_STATUS
 SdMmcHcStopClock (
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN UINT8                Slot
+  IN EFI_PCI_IO_PROTOCOL *PciIo,
+  IN UINT8               Slot
   );
 
 /**
-  Start the SD clock.
+  SD/MMC card clock supply.
 
-  @param[in] PciIo  The PCI IO protocol instance.
-  @param[in] Slot   The slot number.
+  Refer to SD Host Controller Simplified spec 3.0 Section 3.2.1 for details.
 
-  @retval EFI_SUCCESS  Succeeded to start the SD clock.
-  @retval Others       Failed to start the SD clock.
+  @param[in] PciIo          The PCI IO protocol instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+  @param[in] ClockFreq      The max clock frequency to be set. The unit is KHz.
+  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
+  @param[in] ControllerVer  The version of host controller.
+
+  @retval EFI_SUCCESS       The clock is supplied successfully.
+  @retval Others            The clock isn't supplied successfully.
+
 **/
 EFI_STATUS
-SdMmcHcStartSdClock (
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN UINT8                Slot
+SdMmcHcClockSupply (
+  IN EFI_PCI_IO_PROTOCOL *PciIo,
+  IN UINT8               Slot,
+  IN UINT64              ClockFreq,
+  IN UINT32              BaseClkFreq,
+  IN UINT16              ControllerVer
   );
 
 /**
@@ -508,9 +517,9 @@ SdMmcHcStartSdClock (
 **/
 EFI_STATUS
 SdMmcHcPowerControl (
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN UINT8                Slot,
-  IN UINT8                PowerCtrl
+  IN EFI_PCI_IO_PROTOCOL *PciIo,
+  IN UINT8               Slot,
+  IN UINT8               PowerCtrl
   );
 
 /**
@@ -528,9 +537,29 @@ SdMmcHcPowerControl (
 **/
 EFI_STATUS
 SdMmcHcSetBusWidth (
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN UINT8                Slot,
-  IN UINT16               BusWidth
+  IN EFI_PCI_IO_PROTOCOL *PciIo,
+  IN UINT8               Slot,
+  IN UINT16              BusWidth
+  );
+
+/**
+  Supply SD/MMC card with lowest clock frequency at initialization.
+
+  @param[in] PciIo          The PCI IO protocol instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
+  @param[in] ControllerVer  The version of host controller.
+
+  @retval EFI_SUCCESS       The clock is supplied successfully.
+  @retval Others            The clock isn't supplied successfully.
+
+**/
+EFI_STATUS
+SdMmcHcInitClockFreq (
+  IN EFI_PCI_IO_PROTOCOL *PciIo,
+  IN UINT8               Slot,
+  IN UINT32              BaseClkFreq,
+  IN UINT16              ControllerVer
   );
 
 /**
@@ -548,9 +577,9 @@ SdMmcHcSetBusWidth (
 **/
 EFI_STATUS
 SdMmcHcInitPowerVoltage (
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN UINT8                Slot,
-  IN SD_MMC_HC_SLOT_CAP   Capability
+  IN EFI_PCI_IO_PROTOCOL *PciIo,
+  IN UINT8               Slot,
+  IN SD_MMC_HC_SLOT_CAP  Capability
   );
 
 /**
@@ -567,8 +596,8 @@ SdMmcHcInitPowerVoltage (
 **/
 EFI_STATUS
 SdMmcHcInitTimeoutCtrl (
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN UINT8                Slot
+  IN EFI_PCI_IO_PROTOCOL *PciIo,
+  IN UINT8               Slot
   );
 
 /**
@@ -584,10 +613,10 @@ SdMmcHcInitTimeoutCtrl (
 **/
 EFI_STATUS
 SdMmcHcUhsSignaling (
-  IN EFI_HANDLE           ControllerHandle,
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN UINT8                Slot,
-  IN SD_MMC_BUS_MODE      Timing
+  IN EFI_HANDLE          ControllerHandle,
+  IN EFI_PCI_IO_PROTOCOL *PciIo,
+  IN UINT8               Slot,
+  IN SD_MMC_BUS_MODE     Timing
   );
 
 /**
@@ -602,9 +631,9 @@ SdMmcHcUhsSignaling (
 **/
 EFI_STATUS
 SdMmcSetDriverStrength (
-  IN EFI_PCI_IO_PROTOCOL      *PciIo,
-  IN UINT8                    SlotIndex,
-  IN SD_DRIVER_STRENGTH_TYPE  DriverStrength
+  IN EFI_PCI_IO_PROTOCOL     *PciIo,
+  IN UINT8                   SlotIndex,
+  IN SD_DRIVER_STRENGTH_TYPE DriverStrength
   );
 
 #endif
