@@ -41,7 +41,7 @@ typedef struct {
   UINT64                           SpPcpuStackSize;
   UINT64                           SpHeapSize;
   UINT64                           SpNsCommBufSize;
-  UINT64                           SpPcpuSharedBufSize;
+  UINT64                           SpSharedBufSize;
   UINT32                           NumSpMemRegions;
   UINT32                           NumCpus;
   EFI_SECURE_PARTITION_CPU_INFO    *CpuInfo;
