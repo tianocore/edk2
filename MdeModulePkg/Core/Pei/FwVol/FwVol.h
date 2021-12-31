@@ -343,7 +343,7 @@ FindUnknownFormatFvInfo (
   IN  PEI_CORE_INSTANCE  *PrivateData,
   IN  EFI_GUID           *Format,
   OUT VOID               **FvInfo,
-  OUT UINT32             *FvInfoSize,
+  OUT UINTN              *FvInfoSize,
   OUT UINT32             *AuthenticationStatus
   );
 

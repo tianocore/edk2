@@ -151,7 +151,7 @@ typedef struct {
 typedef struct {
   EFI_GUID                     FvFormat;
   VOID                         *FvInfo;
-  UINT32                       FvInfoSize;
+  UINTN                        FvInfoSize;
   UINT32                       AuthenticationStatus;
   EFI_PEI_NOTIFY_DESCRIPTOR    NotifyDescriptor;
 } PEI_CORE_UNKNOW_FORMAT_FV_INFO;

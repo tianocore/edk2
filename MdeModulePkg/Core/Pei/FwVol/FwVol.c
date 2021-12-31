@@ -1542,7 +1542,7 @@ ProcessFvFile (
     PeiServicesInstallFvInfo2Ppi (
       &FvHeader->FileSystemGuid,
       (VOID **)FvHeader,
-      (UINT32)FvHeader->FvLength,
+      (UINTN) FvHeader->FvLength,
       &ParentFvImageInfo.FvName,
       &FileInfo.FileName,
       AuthenticationStatus
@@ -1551,7 +1551,7 @@ ProcessFvFile (
     PeiServicesInstallFvInfoPpi (
       &FvHeader->FileSystemGuid,
       (VOID **)FvHeader,
-      (UINT32)FvHeader->FvLength,
+      (UINTN) FvHeader->FvLength,
       &ParentFvImageInfo.FvName,
       &FileInfo.FileName
       );
@@ -2293,7 +2293,7 @@ FindUnknownFormatFvInfo (
   IN  PEI_CORE_INSTANCE  *PrivateData,
   IN  EFI_GUID           *Format,
   OUT VOID               **FvInfo,
-  OUT UINT32             *FvInfoSize,
+  OUT UINTN              *FvInfoSize,
   OUT UINT32             *AuthenticationStatus
   )
 {
@@ -2350,7 +2350,7 @@ ThirdPartyFvPpiNotifyCallback (
   PEI_CORE_INSTANCE            *PrivateData;
   EFI_PEI_FIRMWARE_VOLUME_PPI  *FvPpi;
   VOID                         *FvInfo;
-  UINT32                       FvInfoSize;
+  UINTN                        FvInfoSize;
   UINT32                       AuthenticationStatus;
   EFI_STATUS                   Status;
   EFI_PEI_FV_HANDLE            FvHandle;

@@ -39,7 +39,7 @@ struct _EFI_PEI_FIRMWARE_VOLUME_INFO_PPI {
   /// Size of the data provided by FvInfo. For memory-mapped firmware volumes,
   /// this is typically the size of the firmware volume.
   ///
-  UINT32      FvInfoSize;
+  UINTN       FvInfoSize;
   ///
   /// If the firmware volume originally came from a firmware file, then these
   /// point to the parent firmware volume name and firmware volume file.
