@@ -106,6 +106,7 @@ StandaloneMmCpuInitialize (
   UINTN                            Index;
   UINTN                            ArraySize;
   VOID                             *HobStart;
+  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK   *MmramRangesHob;
 
   ASSERT (SystemTable != NULL);
   mMmst = SystemTable;
@@ -187,6 +188,26 @@ StandaloneMmCpuInitialize (
 
   CopyMem (&mNsCommBuffer, NsCommBufMmramRange, sizeof (EFI_MMRAM_DESCRIPTOR));
   DEBUG ((DEBUG_INFO, "mNsCommBuffer: 0x%016lx - 0x%lx\n", mNsCommBuffer.CpuStart, mNsCommBuffer.PhysicalSize));
+
+  Status = GetGuidedHobData (
+             HobStart,
+             &gEfiMmPeiMmramMemoryReserveGuid,
+             (VOID **)&MmramRangesHob
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "MmramRangesHob data extraction failed - 0x%x\n", Status));
+    return Status;
+  }
+
+  //
+  // As CreateHobListFromBootInfo(), the base and size of buffer shared with
+  // privileged Secure world software is in second one.
+  //
+  CopyMem (
+    &mSCommBuffer,
+    &MmramRangesHob->Descriptor[0] + 1,
+    sizeof (EFI_MMRAM_DESCRIPTOR)
+    );
 
   //
   // Extract the MP information from the Hoblist
