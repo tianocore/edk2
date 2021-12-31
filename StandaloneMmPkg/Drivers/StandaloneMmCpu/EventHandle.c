@@ -95,7 +95,7 @@ PiMmStandaloneArmTfCpuDriverEntry (
   if ((ARM_SMC_ID_MM_COMMUNICATE != EventId) &&
       (ARM_SVC_ID_FFA_MSG_SEND_DIRECT_REQ != EventId))
   {
-    DEBUG ((DEBUG_INFO, "UnRecognized Event - 0x%x\n", EventId));
+    DEBUG ((DEBUG_ERROR, "UnRecognized Event - 0x%x\n", EventId));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -135,7 +135,7 @@ PiMmStandaloneArmTfCpuDriverEntry (
                     );
 
   if (Status != EFI_SUCCESS) {
-    DEBUG ((DEBUG_INFO, "Mem alloc failed - 0x%x\n", EventId));
+    DEBUG ((DEBUG_ERROR, "Mem alloc failed - 0x%x\n", EventId));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -158,7 +158,7 @@ PiMmStandaloneArmTfCpuDriverEntry (
   mMmst->CpuSaveState          = NULL;
 
   if (mMmEntryPoint == NULL) {
-    DEBUG ((DEBUG_INFO, "Mm Entry point Not Found\n"));
+    DEBUG ((DEBUG_ERROR, "Mm Entry point Not Found\n"));
     return EFI_UNSUPPORTED;
   }
 
