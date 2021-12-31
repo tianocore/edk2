@@ -485,7 +485,7 @@ EFIAPI
 PeiServicesInstallFvInfoPpi (
   IN CONST EFI_GUID  *FvFormat  OPTIONAL,
   IN CONST VOID      *FvInfo,
-  IN       UINT32    FvInfoSize,
+  IN       UINTN     FvInfoSize,
   IN CONST EFI_GUID  *ParentFvName  OPTIONAL,
   IN CONST EFI_GUID  *ParentFileName OPTIONAL
   );
@@ -525,7 +525,7 @@ EFIAPI
 PeiServicesInstallFvInfo2Ppi (
   IN CONST EFI_GUID  *FvFormat  OPTIONAL,
   IN CONST VOID      *FvInfo,
-  IN       UINT32    FvInfoSize,
+  IN       UINTN     FvInfoSize,
   IN CONST EFI_GUID  *ParentFvName  OPTIONAL,
   IN CONST EFI_GUID  *ParentFileName  OPTIONAL,
   IN       UINT32    AuthenticationStatus
