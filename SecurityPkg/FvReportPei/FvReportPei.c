@@ -275,7 +275,7 @@ ReportHashedFv (
     PeiServicesInstallFvInfoPpi (
       FvFormat,
       (VOID *)(UINTN)FvInfo->Base,
-      (UINT32)FvInfo->Length,
+      (UINTN)FvInfo->Length,
       NULL,
       NULL
       );

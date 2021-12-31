@@ -195,7 +195,7 @@ FspmWrapperInit (
     PeiServicesInstallFvInfoPpi (
       NULL,
       (VOID *)(UINTN)PcdGet32 (PcdFspmBaseAddress),
-      (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspmBaseAddress))->FvLength,
+      (UINTN)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspmBaseAddress))->FvLength,
       NULL,
       NULL
       );

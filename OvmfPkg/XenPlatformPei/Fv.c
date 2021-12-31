@@ -65,7 +65,7 @@ PeiFvInitialization (
   PeiServicesInstallFvInfoPpi (
     NULL,
     (VOID *)(UINTN)PcdGet32 (PcdOvmfDxeMemFvBase),
-    PcdGet32 (PcdOvmfDxeMemFvSize),
+    (UINTN)PcdGet32 (PcdOvmfDxeMemFvSize),
     NULL,
     NULL
     );
