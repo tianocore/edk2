@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Library to provide platform_override for the special
   RISC-V platform. This module incorporates with
   OpensbiPlatformLib and RISC-V Opensbi library.

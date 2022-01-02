@@ -27,6 +27,7 @@
   Fv.c
   MemDetect.c
   Platform.c
+  Platform.h
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
@@ -42,12 +43,9 @@
   DebugLib
   HobLib
   IoLib
-  PciLib
-  PeiResourcePublicationLib
-  PeiServicesLib
-  PeiServicesTablePointerLib
-  PeimEntryPoint
   PcdLib
+  PeimEntryPoint
+  PeiResourcePublicationLib
   RiscVCoreplexInfoLib
 
 [Pcd]

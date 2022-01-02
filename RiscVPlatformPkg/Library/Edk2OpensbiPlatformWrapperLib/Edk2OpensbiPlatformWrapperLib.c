@@ -1,11 +1,11 @@
-/*
+/** @file
   EDK2 OpenSBI generic platform wrapper library
 
   Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
- */
+ **/
 
 #include <Library/DebugAgentLib.h>
 #include <Library/DebugLib.h>
@@ -189,7 +189,7 @@ Edk2OpensbiPlatformEarlyInit (
             return ReturnCode;
         }
     }
-    if (ColdBoot == TRUE) {
+    if (ColdBoot) {
         return SecPostOpenSbiPlatformEarlylInit(ColdBoot);
     }
     return 0;
@@ -216,7 +216,7 @@ Edk2OpensbiPlatformFinalInit (
             return ReturnCode;
         }
     }
-    if (ColdBoot == TRUE) {
+    if (ColdBoot) {
         return SecPostOpenSbiPlatformFinalInit(ColdBoot);
     }
     return 0;

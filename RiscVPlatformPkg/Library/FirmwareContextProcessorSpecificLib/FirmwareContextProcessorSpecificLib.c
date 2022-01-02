@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Common library to build upfirmware context processor-specific information
 
   Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
@@ -93,7 +93,7 @@ CommonFirmwareContextHartSpecificInfo (
 }
 
 /**
-  Print debug information of the processor specific data for a hart
+  Print debug information of the processor specific data for a hart.
 
   @param  ProcessorSpecificDataHob     Pointer to RISC_V_PROCESSOR_SPECIFIC_DATA_HOB
 **/

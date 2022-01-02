@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Memory Detection for Virtual Machines.
 
   Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
@@ -32,7 +32,7 @@ Module Name:
 
 
 /**
-  Publish PEI core memory
+  Publish PEI core memory.
 
   @return EFI_SUCCESS     The PEIM initialized successfully.
 
@@ -65,7 +65,7 @@ PublishPeiMemory (
 }
 
 /**
-  Publish system RAM and reserve memory regions
+  Publish system RAM and reserve memory regions.
 
 **/
 VOID

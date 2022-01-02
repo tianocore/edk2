@@ -227,10 +227,10 @@ FindFfsFileAndSection (
 }
 
 /**
-  Locates the PEI Core entry point address
+  Locates the PEI Core entry point address.
 
   @param[in]  Fv                 The firmware volume to search
-  @param[out] PeiCoreEntryPoint  The entry point of the PEI Core image
+  @param[out] PeiCoreImageBase   The entry point of the PEI Core image
 
   @retval EFI_SUCCESS           The file and section was found
   @retval EFI_NOT_FOUND         The file and section was not found
@@ -270,14 +270,10 @@ FindPeiCoreImageBaseInFv (
 }
 
 /**
-  Locates the PEI Core entry point address
+  Locates the PEI Core entry point address.
 
-  @param[in,out]  Fv                 The firmware volume to search
-  @param[out]     PeiCoreEntryPoint  The entry point of the PEI Core image
-
-  @retval EFI_SUCCESS           The file and section was found
-  @retval EFI_NOT_FOUND         The file and section was not found
-  @retval EFI_VOLUME_CORRUPTED  The firmware volume was corrupted
+  @param[in,out]  BootFv             The firmware volume to search
+  @param[out]     PeiCoreImageBase   The entry point of the PEI Core image
 
 **/
 VOID
@@ -292,11 +288,15 @@ FindPeiCoreImageBase (
   FindPeiCoreImageBaseInFv (*BootFv, PeiCoreImageBase);
 }
 
-/*
+/**
   Find and return Pei Core entry point.
 
   It also find SEC and PEI Core file debug inforamtion. It will report them if
   remote debug is enabled.
+
+  @param[in]  BootFirmwareVolumePtr   The firmware volume pointer to search
+  @param[out] PeiCoreEntryPoint       The entry point of the PEI Core image
+
 
 **/
 VOID
@@ -330,7 +330,7 @@ FindAndReportEntryPoints (
 
   @param[in]  ExtId        The extension ID of the FW extension.
   @param[in]  FuncId       The called function ID.
-  @param[in]  Args         The args to the function.
+  @param[in]  TrapRegs     The args to the function.
   @param[out] OutVal       The value the function returns to the caller.
   @param[out] OutTrap      Trap info for trapping further, see OpenSBI code.
                            Is ignored if return value is not SBI_ETRAP.
@@ -339,7 +339,8 @@ FindAndReportEntryPoints (
   @retval SBI_ENOTSUPP     If there's no function with the given ID.
   @retval SBI_ETRAP        If the called SBI functions wants to trap further.
 **/
-STATIC int SbiEcallFirmwareHandler (
+int
+SbiEcallFirmwareHandler (
   IN  unsigned long         ExtId,
   IN  unsigned long         FuncId,
   IN  CONST struct sbi_trap_regs *TrapRegs,
@@ -347,8 +348,9 @@ STATIC int SbiEcallFirmwareHandler (
   OUT struct sbi_trap_info *OutTrap
   )
 {
-  int Ret = SBI_OK;
+  int Ret;
 
+  Ret = SBI_OK;
   switch (FuncId) {
     case SBI_EXT_FW_MSCRATCH_FUNC:
       *OutVal = (unsigned long) sbi_scratch_thishart_ptr();
@@ -408,17 +410,20 @@ RegisterFirmwareSbiExtension (
   @param[in]  Scratch       Pointer to sbi_scratch structure.
 
 **/
-VOID EFIAPI PeiCore (
+VOID
+EFIAPI
+PeiCore (
   IN  UINTN BootHartId,
   IN  struct sbi_scratch *Scratch
   )
 {
   EFI_SEC_PEI_HAND_OFF        SecCoreData;
   EFI_PEI_CORE_ENTRY_POINT    PeiCoreEntryPoint;
-  EFI_FIRMWARE_VOLUME_HEADER *BootFv = (EFI_FIRMWARE_VOLUME_HEADER *)FixedPcdGet32(PcdRiscVPeiFvBase);
+  EFI_FIRMWARE_VOLUME_HEADER  *BootFv;
   EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT FirmwareContext;
-  struct sbi_platform        *ThisSbiPlatform;
+  struct sbi_platform         *ThisSbiPlatform;
 
+  BootFv = (EFI_FIRMWARE_VOLUME_HEADER *)FixedPcdGet32(PcdRiscVPeiFvBase);
   FindAndReportEntryPoints (&BootFv, &PeiCoreEntryPoint);
 
   SecCoreData.DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
@@ -571,8 +576,6 @@ GetDeviceTreeAddress (
   bootable harts other than those declared in Device Tree
 
   @param[in]  SbiPlatform   Pointer to SBI platform
-  @retval  hart_index2id Index to ID value may be overwrote.
-  @retval  hart_count Index to ID value may be overwrote.
 
 **/
 VOID
@@ -626,7 +629,9 @@ Edk2PlatformHartIndex2Id (
   @param[in]  Scratch         Pointer to sbi_scratch structure.
 
 **/
-VOID EFIAPI SecCoreStartUpWithStack(
+VOID
+EFIAPI
+SecCoreStartUpWithStack(
   IN  UINTN HartId,
   IN  struct sbi_scratch *Scratch
   )
@@ -710,11 +715,3 @@ VOID EFIAPI SecCoreStartUpWithStack(
   sbi_init(Scratch);
 }
 
-VOID OpensbiDebugPrint (CHAR8 *debugstr, ...)
-{
-  VA_LIST  Marker;
-
-  VA_START (Marker, debugstr);
-  DebugVPrint (DEBUG_INFO, debugstr, Marker);
-  VA_END (Marker);
-}

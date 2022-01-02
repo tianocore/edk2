@@ -1,4 +1,4 @@
-/**@file
+/** @file
   NULL library instance of PlatformSecPpiLib
 
   Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>

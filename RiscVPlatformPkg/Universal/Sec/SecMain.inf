@@ -22,6 +22,7 @@
 #
 
 [Sources]
+  SecMain.h
   SecMain.c
 
 [Sources.RISCV64]

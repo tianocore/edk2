@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Platform PEI driver
 
   Copyright (c) 2019-2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
@@ -54,6 +54,14 @@ EFI_PEI_PPI_DESCRIPTOR   mPpiBootMode[] = {
 
 STATIC EFI_BOOT_MODE mBootMode = BOOT_WITH_FULL_CONFIGURATION;
 
+/**
+  Build memory map I/O range resource HOB using the
+  base address and size.
+
+  @param  MemoryBase     Memory map I/O base.
+  @param  MemorySize     Memory map I/O size.
+
+**/
 VOID
 AddIoMemoryBaseSizeHob (
   EFI_PHYSICAL_ADDRESS        MemoryBase,
@@ -71,6 +79,13 @@ AddIoMemoryBaseSizeHob (
     );
 }
 
+/**
+  Build reserved memory range resource HOB.
+
+  @param  MemoryBase     Reserved memory range base address.
+  @param  MemorySize     Reserved memory range size.
+
+**/
 VOID
 AddReservedMemoryBaseSizeHob (
   EFI_PHYSICAL_ADDRESS        MemoryBase,
@@ -88,6 +103,14 @@ AddReservedMemoryBaseSizeHob (
     );
 }
 
+/**
+  Build memory map I/O resource using the base address
+  and the top address of memory range.
+
+  @param  MemoryBase     Memory map I/O range base address.
+  @param  MemoryLimit    The top address of memory map I/O range
+
+**/
 VOID
 AddIoMemoryRangeHob (
   EFI_PHYSICAL_ADDRESS        MemoryBase,
@@ -97,7 +120,14 @@ AddIoMemoryRangeHob (
   AddIoMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
 }
 
+/**
+  Create memory range resource HOB using the memory base
+  address and size.
 
+  @param  MemoryBase     Memory range base address.
+  @param  MemorySize     Memory range size.
+
+**/
 VOID
 AddMemoryBaseSizeHob (
   EFI_PHYSICAL_ADDRESS        MemoryBase,
@@ -118,7 +148,14 @@ AddMemoryBaseSizeHob (
     );
 }
 
+/**
+  Create memory range resource HOB using memory base
+  address and top address of the memory range.
 
+  @param  MemoryBase     Memory range base address.
+  @param  MemoryLimit    Memory range size.
+
+**/
 VOID
 AddMemoryRangeHob (
   EFI_PHYSICAL_ADDRESS        MemoryBase,
@@ -128,7 +165,14 @@ AddMemoryRangeHob (
   AddMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
 }
 
+/**
+  Create untested memory range resource HOB using memory base
+  address and top address of the memory range.
 
+  @param  MemoryBase     Memory range base address.
+  @param  MemorySize     Memory range size.
+
+**/
 VOID
 AddUntestedMemoryBaseSizeHob (
   EFI_PHYSICAL_ADDRESS        MemoryBase,
@@ -148,6 +192,14 @@ AddUntestedMemoryBaseSizeHob (
     );
 }
 
+/**
+  Create untested memory range resource HOB using memory base
+  address and top address of the memory range.
+
+  @param  MemoryBase     Memory range base address.
+  @param  MemoryLimit    Memory range size.
+
+**/
 VOID
 AddUntestedMemoryRangeHob (
   EFI_PHYSICAL_ADDRESS        MemoryBase,
@@ -157,6 +209,10 @@ AddUntestedMemoryRangeHob (
   AddUntestedMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
 }
 
+/**
+  Add PCI resource.
+
+**/
 VOID
 AddPciResource (
   VOID
@@ -167,6 +223,10 @@ AddPciResource (
   //
 }
 
+/**
+  Platform memory map initialization.
+
+**/
 VOID
 MemMapInitialization (
   VOID
@@ -187,6 +247,10 @@ MemMapInitialization (
   AddPciResource ();
 }
 
+/**
+  Platform misc initialization.
+
+**/
 VOID
 MiscInitialization (
   VOID
@@ -221,7 +285,10 @@ CheckResumeFromS3 (
   return FALSE;
 }
 
+/**
+  Platform boot mode initialization.
 
+**/
 VOID
 BootModeInitialization (
   VOID
@@ -229,7 +296,7 @@ BootModeInitialization (
 {
   EFI_STATUS    Status;
 
-  if (CheckResumeFromS3 () == TRUE) {
+  if (CheckResumeFromS3) {
     DEBUG ((DEBUG_INFO, "This is wake from S3\n"));
   } else {
     DEBUG ((DEBUG_INFO, "This is normal boot\n"));

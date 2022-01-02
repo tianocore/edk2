@@ -45,7 +45,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 EFIAPI
-_ModuleEntryPoint(
+_ModuleEntryPoint (
   IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
   IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList
 )

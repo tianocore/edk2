@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Build up platform processor information.
 
   Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>

@@ -22,7 +22,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @param  FileHandle             Handle of the file being invoked.
   @param  PeiServices            Describes the list of possible PEI Services.
 
-  @retval TODO
+  @retval EFI_SUCCESS            The address of FDT is passed in HOB.
+          EFI_UNSUPPORTED        Can't locate FDT.
 **/
 EFI_STATUS
 EFIAPI

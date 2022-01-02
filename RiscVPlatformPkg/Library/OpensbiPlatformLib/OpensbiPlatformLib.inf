@@ -24,7 +24,7 @@
 #
 
 [Sources]
-  Platform.c
+  OpensbiPlatform.c
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec

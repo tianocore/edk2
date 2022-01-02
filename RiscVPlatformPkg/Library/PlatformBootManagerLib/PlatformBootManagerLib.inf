@@ -34,18 +34,11 @@
 
 [LibraryClasses]
   BaseLib
-  UefiBootServicesTableLib
-  UefiRuntimeServicesTableLib
-  UefiLib
-  UefiBootManagerLib
   PcdLib
+  MemoryAllocationLib
+  PrintLib
   PlatformMemoryTestLib
   PlatformUpdateProgressLib
-  DxeServicesLib
-  MemoryAllocationLib
-  DevicePathLib
-  HiiLib
-  PrintLib
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
@@ -59,4 +52,4 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
   gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootlogoOnlyEnable
+

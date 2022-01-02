@@ -85,7 +85,6 @@
 [PcdsPatchableInModule]
 
 [PcdsFeatureFlag]
-  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootlogoOnlyEnable|FALSE|BOOLEAN|0x00001200
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
 

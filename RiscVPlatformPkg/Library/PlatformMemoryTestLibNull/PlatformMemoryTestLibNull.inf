@@ -1,10 +1,10 @@
-#/** @file
+## @file
+#  Platform NULL memory test library instance.
 #
 #  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
-#**/
 
 [Defines]
   INF_VERSION                    = 0x0001001b
@@ -22,8 +22,6 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
-  UefiLib
-  DebugLib
 
 [Pcd]
 

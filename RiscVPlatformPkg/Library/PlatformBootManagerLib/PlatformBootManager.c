@@ -86,6 +86,13 @@ PlatformFindLoadOption (
   return -1;
 }
 
+/**
+  Register a boot option using a file GUID in the FV.
+
+  @param FileGuid     The file GUID name in FV.
+  @param Description  The boot option description.
+  @param Attributes   The attributes used for the boot option loading.
+**/
 VOID
 PlatformRegisterFvBootOption (
   EFI_GUID                         *FileGuid,

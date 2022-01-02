@@ -1,4 +1,4 @@
-/**@file
+/** @file
    Head file for BDS Platform specific code
 
 Copyright (c) 2016, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
@@ -38,14 +38,6 @@ typedef struct {
 } PLATFORM_CONSOLE_CONNECT_ENTRY;
 
 extern PLATFORM_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
-
-#define gEndEntire \
-  { \
-    END_DEVICE_PATH_TYPE,\
-    END_ENTIRE_DEVICE_PATH_SUBTYPE,\
-    END_DEVICE_PATH_LENGTH,\
-    0\
-  }
 
 #define CONSOLE_OUT BIT0
 #define CONSOLE_IN  BIT1

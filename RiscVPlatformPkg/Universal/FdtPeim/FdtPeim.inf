@@ -34,13 +34,10 @@
 
 [LibraryClasses]
   DebugLib
-  DebugLib
   HobLib
   FdtLib
   PcdLib
-  PeiServicesLib
   PeimEntryPoint
-  RiscVFirmwareContextLib
 
 [Guids]
   gFdtHobGuid   ## PRODUCES

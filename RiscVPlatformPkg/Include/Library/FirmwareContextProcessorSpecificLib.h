@@ -6,8 +6,8 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-#ifndef FIRMWARE_CONTEXT_PROCESSOR_SPECIFIC_LIB_H
-#define FIRMWARE_CONTEXT_PROCESSOR_SPECIFIC_LIB_H
+#ifndef FIRMWARE_CONTEXT_PROCESSOR_SPECIFIC_LIB_H_
+#define FIRMWARE_CONTEXT_PROCESSOR_SPECIFIC_LIB_H_
 
 #include <IndustryStandard/RiscVOpensbi.h>
 #include <PiPei.h>

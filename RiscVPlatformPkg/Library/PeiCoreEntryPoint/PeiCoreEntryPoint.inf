@@ -33,5 +33,4 @@
   BaseLib
   DebugLib
   PlatformSecPpiLib
-  RiscVFirmwareContextLib
 
