@@ -33,6 +33,8 @@
   DEFINE UNIVERSAL_PAYLOAD            = FALSE
   DEFINE SECURITY_STUB_ENABLE         = TRUE
   DEFINE SMM_SUPPORT                  = FALSE
+  DEFINE BOOT_MANAGER_ESCAPE          = FALSE
+  DEFINE PLATFORM_BOOT_TIMEOUT        = 3
   #
   # SBL:      UEFI payload for Slim Bootloader
   # COREBOOT: UEFI payload for coreboot
@@ -397,6 +399,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdEdkiiFpdtStringRecordEnableOnly| TRUE
 !if $(PERFORMANCE_MEASUREMENT_ENABLE)
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask       | 0x1
+!endif
+
+!if $(BOOT_MANAGER_ESCAPE) == TRUE
+  gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape|TRUE
+!else
+  gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape|FALSE
 !endif
 
 [PcdsPatchableInModule.X64]
