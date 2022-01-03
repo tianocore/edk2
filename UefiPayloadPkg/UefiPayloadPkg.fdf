@@ -61,7 +61,6 @@ FILE FV_IMAGE = 4E35FD93-9C72-4c15-8C4B-E77F1DB2D793 {
 }
 
 ################################################################################
-
 [FV.DXEFV]
 FvNameGuid         = 8063C21A-8E58-4576-95CE-089E87975D23
 BlockSize          = $(FD_BLOCK_SIZE)
@@ -89,6 +88,11 @@ APRIORI DXE {
   INF  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
   INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
   INF  UefiPayloadPkg/BlSupportDxe/BlSupportDxe.inf
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  INF  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+  INF  SecurityPkg/VariableAuthenticated/SecureBootDefaultKeysDxe/SecureBootDefaultKeysDxe.inf # After SMBusConfigLoader and PcatRealTimeClockRuntimeDxe, before Tcg2Dxe
+  INF  UefiPayloadPkg/SecureBootEnrollDefaultKeys/SecureBootSetup.inf
+!endif
 }
 
 #
@@ -237,6 +241,19 @@ INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
 !endif
 
 #
+# Security
+#
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+  INF  SecurityPkg/VariableAuthenticated/SecureBootDefaultKeysDxe/SecureBootDefaultKeysDxe.inf
+  INF  UefiPayloadPkg/SecureBootEnrollDefaultKeys/SecureBootSetup.inf
+
+  FILE FREEFORM = PCD(gUefiPayloadPkgTokenSpaceGuid.PcdNvsDataFile) {
+    SECTION RAW = UefiVariableBinary/SECUREBOOT.Fv
+  }
+!endif
+
+#
 # Shell
 #
 !if $(SHELL_TYPE) == BUILD_SHELL
@@ -364,3 +381,17 @@ INF ShellPkg/Application/Shell/Shell.inf
     UI        STRING="Enter Setup"
     VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
+
+[RULE.COMMON.USER_DEFINED]
+  FILE FREEFORM = $(NAMED_GUID) {
+    RAW BIN                |.crt
+    RAW BIN                |.bin
+  }
+
+[RULE.COMMON.USER_DEFINED.BINARY]
+  FILE FREEFORM = $(NAMED_GUID) {
+    RAW BIN                |.crt
+    RAW BIN                |.bin
+    UI       STRING="$(MODULE_NAME)" Optional
+  }
+

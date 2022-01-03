@@ -1,0 +1,31 @@
+## @file
+# FDF include file which allows to embed Secure Boot keys
+#
+#  Copyright (c) 2021, Star Labs Online Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+[Defines]
+DEFINE FD_SIZE     = 0x00850000
+DEFINE NUM_BLOCKS  = 0x850
+
+[FV.SecureBoot]
+FILE FREEFORM = 85254ea7-4759-4fc4-82d4-5eed5fb0a4a0 {
+  SECTION RAW = UefiVariableBinary/keys/pk.crt
+  SECTION UI  = "PK Default"
+}
+
+FILE FREEFORM = 6f64916e-9f7a-4c35-b952-cd041efb05a3 {
+  SECTION RAW = UefiVariableBinary/keys/MicCorKEKCA2011_2011-06-24.crt
+  SECTION UI  = "KEK Default"
+}
+
+FILE FREEFORM = c491d352-7623-4843-accc-2791a7574421 {
+  SECTION RAW = UefiVariableBinary/keys/MicWinProPCA2011_2011-10-19.crt
+  SECTION UI  = "DB Default"
+}
+
+FILE FREEFORM = 5740766a-718e-4dc0-9935-c36f7d3f884f {
+  SECTION RAW = UefiVariableBinary/keys/dbxupdate_x64.bin
+  SECTION UI  = "DBX Default"
+}
