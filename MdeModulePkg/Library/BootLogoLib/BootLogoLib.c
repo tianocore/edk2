@@ -176,7 +176,12 @@ BootLogoEnableLogo (
         break;
       case EdkiiPlatformLogoDisplayAttributeCenter:
         DestX = (SizeOfX - Image.Width) / 2;
-        DestY = (SizeOfY - Image.Height) / 2;
+        if (FixedPcdGetBool (PcdFollowBGRTSpec)) {
+          DestY = (SizeOfY * 382) / 1000 - Image.Height / 2;
+        } else {
+          DestY = (SizeOfY - Image.Height) / 2;
+        }
+
         break;
       case EdkiiPlatformLogoDisplayAttributeCenterRight:
         DestX = SizeOfX - Image.Width;
