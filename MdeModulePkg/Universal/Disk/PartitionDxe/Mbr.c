@@ -293,6 +293,12 @@ PartitionInstallMbrChildHandles (
           (Mbr->Partition[0].OSIndicator == EXTENDED_WINDOWS_PARTITION))
       {
         ExtMbrStartingLba = UNPACK_UINT32 (Mbr->Partition[0].StartingLBA);
+        //
+        // A value of 0 is invalid for StartingLBA
+        //
+        if (ExtMbrStartingLba == 0) {
+          break;
+        }
         continue;
       }
 
