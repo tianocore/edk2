@@ -184,7 +184,7 @@ ProcessAsyncTaskList (
       Status = SdMmcCheckTrbEnv (Private, Trb);
       if (!EFI_ERROR (Status)) {
         Trb->Started = TRUE;
-        Status       = SdMmcExecTrb (Private, Trb);
+        Status = SdMmcExecTrb (Private, Trb);
         if (EFI_ERROR (Status)) {
           goto Done;
         }
@@ -208,19 +208,18 @@ Done:
     if ((!InfiniteWait) && (Trb->Timeout-- == 0)) {
       RemoveEntryList (Link);
       Trb->Packet->TransactionStatus = EFI_TIMEOUT;
-      TrbEvent                       = Trb->Event;
+      TrbEvent = Trb->Event;
       SdMmcFreeTrb (Trb);
       DEBUG ((DEBUG_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p EFI_TIMEOUT\n", TrbEvent));
       gBS->SignalEvent (TrbEvent);
       return;
     }
-  } else if ((Trb != NULL) && (Status == EFI_CRC_ERROR) && (Trb->Retries > 0)) {
-    Trb->Retries--;
-    Trb->Started = FALSE;
-  } else if ((Trb != NULL)) {
+  }
+
+  if ((Trb != NULL) && (Status != EFI_NOT_READY)) {
     RemoveEntryList (Link);
     Trb->Packet->TransactionStatus = Status;
-    TrbEvent                       = Trb->Event;
+    TrbEvent = Trb->Event;
     SdMmcFreeTrb (Trb);
     DEBUG ((DEBUG_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p with %r\n", TrbEvent, Status));
     gBS->SignalEvent (TrbEvent);
@@ -274,7 +273,7 @@ SdMmcPciHcEnumerateDevice (
              Link = NextLink)
         {
           NextLink = GetNextNode (&Private->Queue, Link);
-          Trb      = SD_MMC_HC_TRB_FROM_THIS (Link);
+          Trb = SD_MMC_HC_TRB_FROM_THIS (Link);
           if (Trb->Slot == Slot) {
             RemoveEntryList (Link);
             Trb->Packet->TransactionStatus = EFI_NO_MEDIA;
@@ -315,7 +314,7 @@ SdMmcPciHcEnumerateDevice (
 
         Private->Slot[Slot].MediaPresent = TRUE;
         Private->Slot[Slot].Initialized  = TRUE;
-        RoutineNum                       = sizeof (mCardTypeDetectRoutineTable) / sizeof (CARD_TYPE_DETECT_ROUTINE);
+        RoutineNum = sizeof (mCardTypeDetectRoutineTable) / sizeof (CARD_TYPE_DETECT_ROUTINE);
         for (Index = 0; Index < RoutineNum; Index++) {
           Routine = &mCardTypeDetectRoutineTable[Index];
           if (*Routine != NULL) {
@@ -614,8 +613,8 @@ SdMmcPciHcDriverBindingStart (
   }
 
   Private->ControllerHandle = Controller;
-  Private->PciIo            = PciIo;
-  Private->PciAttributes    = PciAttributes;
+  Private->PciIo = PciIo;
+  Private->PciAttributes = PciAttributes;
   InitializeListHead (&Private->Queue);
 
   //
@@ -761,7 +760,7 @@ SdMmcPciHcDriverBindingStart (
 
     Private->Slot[Slot].MediaPresent = TRUE;
     Private->Slot[Slot].Initialized  = TRUE;
-    RoutineNum                       = sizeof (mCardTypeDetectRoutineTable) / sizeof (CARD_TYPE_DETECT_ROUTINE);
+    RoutineNum = sizeof (mCardTypeDetectRoutineTable) / sizeof (CARD_TYPE_DETECT_ROUTINE);
     for (Index = 0; Index < RoutineNum; Index++) {
       Routine = &mCardTypeDetectRoutineTable[Index];
       if (*Routine != NULL) {
@@ -909,10 +908,10 @@ Done:
 EFI_STATUS
 EFIAPI
 SdMmcPciHcDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN  EFI_HANDLE                   Controller,
-  IN  UINTN                        NumberOfChildren,
-  IN  EFI_HANDLE                   *ChildHandleBuffer
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer
   )
 {
   EFI_STATUS                     Status;
@@ -961,7 +960,7 @@ SdMmcPciHcDriverBindingStop (
   {
     NextLink = GetNextNode (&Private->Queue, Link);
     RemoveEntryList (Link);
-    Trb                            = SD_MMC_HC_TRB_FROM_THIS (Link);
+    Trb = SD_MMC_HC_TRB_FROM_THIS (Link);
     Trb->Packet->TransactionStatus = EFI_ABORTED;
     gBS->SignalEvent (Trb->Event);
     SdMmcFreeTrb (Trb);
@@ -1006,59 +1005,6 @@ SdMmcPciHcDriverBindingStop (
 }
 
 /**
-  Execute TRB synchronously.
-
-  @param[in] Private  Pointer to driver private data.
-  @param[in] Trb      Pointer to TRB to execute.
-
-  @retval EFI_SUCCESS  TRB executed successfully.
-  @retval Other        TRB failed.
-**/
-EFI_STATUS
-SdMmcPassThruExecSyncTrb (
-  IN SD_MMC_HC_PRIVATE_DATA  *Private,
-  IN SD_MMC_HC_TRB           *Trb
-  )
-{
-  EFI_STATUS  Status;
-  EFI_TPL     OldTpl;
-
-  //
-  // Wait async I/O list is empty before execute sync I/O operation.
-  //
-  while (TRUE) {
-    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-    if (IsListEmpty (&Private->Queue)) {
-      gBS->RestoreTPL (OldTpl);
-      break;
-    }
-
-    gBS->RestoreTPL (OldTpl);
-  }
-
-  while (Trb->Retries) {
-    Status = SdMmcWaitTrbEnv (Private, Trb);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    Status = SdMmcExecTrb (Private, Trb);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    Status = SdMmcWaitTrbResult (Private, Trb);
-    if (Status == EFI_CRC_ERROR) {
-      Trb->Retries--;
-    } else {
-      return Status;
-    }
-  }
-
-  return Status;
-}
-
-/**
   Sends SD command to an SD card that is attached to the SD controller.
 
   The PassThru() function sends the SD command specified by Packet to the SD card
@@ -1098,15 +1044,16 @@ SdMmcPassThruExecSyncTrb (
 EFI_STATUS
 EFIAPI
 SdMmcPassThruPassThru (
-  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL        *This,
-  IN     UINT8                                Slot,
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL            *This,
+  IN UINT8                                    Slot,
   IN OUT EFI_SD_MMC_PASS_THRU_COMMAND_PACKET  *Packet,
-  IN     EFI_EVENT                            Event    OPTIONAL
+  IN EFI_EVENT                                Event OPTIONAL
   )
 {
   EFI_STATUS              Status;
   SD_MMC_HC_PRIVATE_DATA  *Private;
   SD_MMC_HC_TRB           *Trb;
+  EFI_TPL                 OldTpl;
 
   if ((This == NULL) || (Packet == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1150,8 +1097,35 @@ SdMmcPassThruPassThru (
     return EFI_SUCCESS;
   }
 
-  Status = SdMmcPassThruExecSyncTrb (Private, Trb);
+  //
+  // Wait async I/O list is empty before execute sync I/O operation.
+  //
+  while (TRUE) {
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    if (IsListEmpty (&Private->Queue)) {
+      gBS->RestoreTPL (OldTpl);
+      break;
+    }
 
+    gBS->RestoreTPL (OldTpl);
+  }
+
+  Status = SdMmcWaitTrbEnv (Private, Trb);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  Status = SdMmcExecTrb (Private, Trb);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  Status = SdMmcWaitTrbResult (Private, Trb);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+Done:
   SdMmcFreeTrb (Trb);
 
   return Status;
@@ -1189,8 +1163,8 @@ SdMmcPassThruPassThru (
 EFI_STATUS
 EFIAPI
 SdMmcPassThruGetNextSlot (
-  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL  *This,
-  IN OUT UINT8                          *Slot
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *This,
+  IN OUT UINT8                      *Slot
   )
 {
   SD_MMC_HC_PRIVATE_DATA  *Private;
@@ -1205,7 +1179,7 @@ SdMmcPassThruGetNextSlot (
   if (*Slot == 0xFF) {
     for (Index = 0; Index < SD_MMC_HC_MAX_SLOT; Index++) {
       if (Private->Slot[Index].Enable) {
-        *Slot                 = Index;
+        *Slot = Index;
         Private->PreviousSlot = Index;
         return EFI_SUCCESS;
       }
@@ -1215,7 +1189,7 @@ SdMmcPassThruGetNextSlot (
   } else if (*Slot == Private->PreviousSlot) {
     for (Index = *Slot + 1; Index < SD_MMC_HC_MAX_SLOT; Index++) {
       if (Private->Slot[Index].Enable) {
-        *Slot                 = Index;
+        *Slot = Index;
         Private->PreviousSlot = Index;
         return EFI_SUCCESS;
       }
@@ -1264,9 +1238,9 @@ SdMmcPassThruGetNextSlot (
 EFI_STATUS
 EFIAPI
 SdMmcPassThruBuildDevicePath (
-  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL  *This,
-  IN     UINT8                          Slot,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL       **DevicePath
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *This,
+  IN UINT8                          Slot,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL   **DevicePath
   )
 {
   SD_MMC_HC_PRIVATE_DATA  *Private;
@@ -1335,9 +1309,9 @@ SdMmcPassThruBuildDevicePath (
 EFI_STATUS
 EFIAPI
 SdMmcPassThruGetSlotNumber (
-  IN  EFI_SD_MMC_PASS_THRU_PROTOCOL  *This,
-  IN  EFI_DEVICE_PATH_PROTOCOL       *DevicePath,
-  OUT UINT8                          *Slot
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *This,
+  IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath,
+  OUT UINT8                         *Slot
   )
 {
   SD_MMC_HC_PRIVATE_DATA  *Private;
@@ -1448,7 +1422,7 @@ SdMmcPassThruResetDevice (
   {
     NextLink = GetNextNode (&Private->Queue, Link);
     RemoveEntryList (Link);
-    Trb                            = SD_MMC_HC_TRB_FROM_THIS (Link);
+    Trb = SD_MMC_HC_TRB_FROM_THIS (Link);
     Trb->Packet->TransactionStatus = EFI_ABORTED;
     gBS->SignalEvent (Trb->Event);
     SdMmcFreeTrb (Trb);
