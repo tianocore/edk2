@@ -24,8 +24,8 @@
 **/
 EFI_STATUS
 EmmcReset (
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot
   )
 {
   EFI_SD_MMC_COMMAND_BLOCK             SdMmcCmdBlk;
@@ -39,7 +39,7 @@ EmmcReset (
 
   Packet.SdMmcCmdBlk    = &SdMmcCmdBlk;
   Packet.SdMmcStatusBlk = &SdMmcStatusBlk;
-  Packet.Timeout        = SD_MMC_HC_GENERIC_TIMEOUT;
+  Packet.Timeout = SD_MMC_HC_GENERIC_TIMEOUT;
 
   SdMmcCmdBlk.CommandIndex    = EMMC_GO_IDLE_STATE;
   SdMmcCmdBlk.CommandType     = SdMmcCommandTypeBc;
@@ -69,9 +69,9 @@ EmmcReset (
 **/
 EFI_STATUS
 EmmcGetOcr (
-  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN     UINT8                          Slot,
-  IN OUT UINT32                         *Argument
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  IN OUT UINT32                    *Argument
   )
 {
   EFI_SD_MMC_COMMAND_BLOCK             SdMmcCmdBlk;
@@ -85,7 +85,7 @@ EmmcGetOcr (
 
   Packet.SdMmcCmdBlk    = &SdMmcCmdBlk;
   Packet.SdMmcStatusBlk = &SdMmcStatusBlk;
-  Packet.Timeout        = SD_MMC_HC_GENERIC_TIMEOUT;
+  Packet.Timeout = SD_MMC_HC_GENERIC_TIMEOUT;
 
   SdMmcCmdBlk.CommandIndex    = EMMC_SEND_OP_COND;
   SdMmcCmdBlk.CommandType     = SdMmcCommandTypeBcr;
@@ -118,8 +118,8 @@ EmmcGetOcr (
 **/
 EFI_STATUS
 EmmcGetAllCid (
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot
   )
 {
   EFI_SD_MMC_COMMAND_BLOCK             SdMmcCmdBlk;
@@ -133,7 +133,7 @@ EmmcGetAllCid (
 
   Packet.SdMmcCmdBlk    = &SdMmcCmdBlk;
   Packet.SdMmcStatusBlk = &SdMmcStatusBlk;
-  Packet.Timeout        = SD_MMC_HC_GENERIC_TIMEOUT;
+  Packet.Timeout = SD_MMC_HC_GENERIC_TIMEOUT;
 
   SdMmcCmdBlk.CommandIndex    = EMMC_ALL_SEND_CID;
   SdMmcCmdBlk.CommandType     = SdMmcCommandTypeBcr;
@@ -161,9 +161,9 @@ EmmcGetAllCid (
 **/
 EFI_STATUS
 EmmcSetRca (
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot,
-  IN UINT16                         Rca
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  IN UINT16                        Rca
   )
 {
   EFI_SD_MMC_COMMAND_BLOCK             SdMmcCmdBlk;
@@ -177,7 +177,7 @@ EmmcSetRca (
 
   Packet.SdMmcCmdBlk    = &SdMmcCmdBlk;
   Packet.SdMmcStatusBlk = &SdMmcStatusBlk;
-  Packet.Timeout        = SD_MMC_HC_GENERIC_TIMEOUT;
+  Packet.Timeout = SD_MMC_HC_GENERIC_TIMEOUT;
 
   SdMmcCmdBlk.CommandIndex    = EMMC_SET_RELATIVE_ADDR;
   SdMmcCmdBlk.CommandType     = SdMmcCommandTypeAc;
@@ -208,10 +208,10 @@ EmmcSetRca (
 **/
 EFI_STATUS
 EmmcGetCsd (
-  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN     UINT8                          Slot,
-  IN     UINT16                         Rca,
-  OUT EMMC_CSD                          *Csd
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  IN UINT16                        Rca,
+  OUT EMMC_CSD                     *Csd
   )
 {
   EFI_SD_MMC_COMMAND_BLOCK             SdMmcCmdBlk;
@@ -225,7 +225,7 @@ EmmcGetCsd (
 
   Packet.SdMmcCmdBlk    = &SdMmcCmdBlk;
   Packet.SdMmcStatusBlk = &SdMmcStatusBlk;
-  Packet.Timeout        = SD_MMC_HC_GENERIC_TIMEOUT;
+  Packet.Timeout = SD_MMC_HC_GENERIC_TIMEOUT;
 
   SdMmcCmdBlk.CommandIndex    = EMMC_SEND_CSD;
   SdMmcCmdBlk.CommandType     = SdMmcCommandTypeAc;
@@ -258,9 +258,9 @@ EmmcGetCsd (
 **/
 EFI_STATUS
 EmmcSelect (
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot,
-  IN UINT16                         Rca
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  IN UINT16                        Rca
   )
 {
   EFI_SD_MMC_COMMAND_BLOCK             SdMmcCmdBlk;
@@ -274,7 +274,7 @@ EmmcSelect (
 
   Packet.SdMmcCmdBlk    = &SdMmcCmdBlk;
   Packet.SdMmcStatusBlk = &SdMmcStatusBlk;
-  Packet.Timeout        = SD_MMC_HC_GENERIC_TIMEOUT;
+  Packet.Timeout = SD_MMC_HC_GENERIC_TIMEOUT;
 
   SdMmcCmdBlk.CommandIndex    = EMMC_SELECT_DESELECT_CARD;
   SdMmcCmdBlk.CommandType     = SdMmcCommandTypeAc;
@@ -301,9 +301,9 @@ EmmcSelect (
 **/
 EFI_STATUS
 EmmcGetExtCsd (
-  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN     UINT8                          Slot,
-  OUT EMMC_EXT_CSD                      *ExtCsd
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  OUT EMMC_EXT_CSD                 *ExtCsd
   )
 {
   EFI_SD_MMC_COMMAND_BLOCK             SdMmcCmdBlk;
@@ -317,7 +317,7 @@ EmmcGetExtCsd (
 
   Packet.SdMmcCmdBlk    = &SdMmcCmdBlk;
   Packet.SdMmcStatusBlk = &SdMmcStatusBlk;
-  Packet.Timeout        = SD_MMC_HC_GENERIC_TIMEOUT;
+  Packet.Timeout = SD_MMC_HC_GENERIC_TIMEOUT;
 
   SdMmcCmdBlk.CommandIndex    = EMMC_SEND_EXT_CSD;
   SdMmcCmdBlk.CommandType     = SdMmcCommandTypeAdtc;
@@ -350,12 +350,12 @@ EmmcGetExtCsd (
 **/
 EFI_STATUS
 EmmcSwitch (
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot,
-  IN UINT8                          Access,
-  IN UINT8                          Index,
-  IN UINT8                          Value,
-  IN UINT8                          CmdSet
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  IN UINT8                         Access,
+  IN UINT8                         Index,
+  IN UINT8                         Value,
+  IN UINT8                         CmdSet
   )
 {
   EFI_SD_MMC_COMMAND_BLOCK             SdMmcCmdBlk;
@@ -369,7 +369,7 @@ EmmcSwitch (
 
   Packet.SdMmcCmdBlk    = &SdMmcCmdBlk;
   Packet.SdMmcStatusBlk = &SdMmcStatusBlk;
-  Packet.Timeout        = SD_MMC_HC_GENERIC_TIMEOUT;
+  Packet.Timeout = SD_MMC_HC_GENERIC_TIMEOUT;
 
   SdMmcCmdBlk.CommandIndex    = EMMC_SWITCH;
   SdMmcCmdBlk.CommandType     = SdMmcCommandTypeAc;
@@ -397,10 +397,10 @@ EmmcSwitch (
 **/
 EFI_STATUS
 EmmcSendStatus (
-  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN     UINT8                          Slot,
-  IN     UINT16                         Rca,
-  OUT UINT32                            *DevStatus
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  IN UINT16                        Rca,
+  OUT UINT32                       *DevStatus
   )
 {
   EFI_SD_MMC_COMMAND_BLOCK             SdMmcCmdBlk;
@@ -414,7 +414,7 @@ EmmcSendStatus (
 
   Packet.SdMmcCmdBlk    = &SdMmcCmdBlk;
   Packet.SdMmcStatusBlk = &SdMmcStatusBlk;
-  Packet.Timeout        = SD_MMC_HC_GENERIC_TIMEOUT;
+  Packet.Timeout = SD_MMC_HC_GENERIC_TIMEOUT;
 
   SdMmcCmdBlk.CommandIndex    = EMMC_SEND_STATUS;
   SdMmcCmdBlk.CommandType     = SdMmcCommandTypeAc;
@@ -447,9 +447,9 @@ EmmcSendStatus (
 **/
 EFI_STATUS
 EmmcSendTuningBlk (
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot,
-  IN UINT8                          BusWidth
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  IN UINT8                         BusWidth
   )
 {
   EFI_SD_MMC_COMMAND_BLOCK             SdMmcCmdBlk;
@@ -464,7 +464,7 @@ EmmcSendTuningBlk (
 
   Packet.SdMmcCmdBlk    = &SdMmcCmdBlk;
   Packet.SdMmcStatusBlk = &SdMmcStatusBlk;
-  Packet.Timeout        = SD_MMC_HC_GENERIC_TIMEOUT;
+  Packet.Timeout = SD_MMC_HC_GENERIC_TIMEOUT;
 
   SdMmcCmdBlk.CommandIndex    = EMMC_SEND_TUNING_BLOCK;
   SdMmcCmdBlk.CommandType     = SdMmcCommandTypeAdtc;
@@ -503,10 +503,10 @@ EmmcSendTuningBlk (
 **/
 EFI_STATUS
 EmmcTuningClkForHs200 (
-  IN EFI_PCI_IO_PROTOCOL            *PciIo,
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot,
-  IN UINT8                          BusWidth
+  IN EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  IN UINT8                         BusWidth
   )
 {
   EFI_STATUS  Status;
@@ -561,43 +561,6 @@ EmmcTuningClkForHs200 (
 }
 
 /**
-  Check the SWITCH operation status.
-
-  @param[in] PassThru  A pointer to the EFI_SD_MMC_PASS_THRU_PROTOCOL instance.
-  @param[in] Slot      The slot number on which command should be sent.
-  @param[in] Rca       The relative device address.
-
-  @retval EFI_SUCCESS  The SWITCH finished siccessfully.
-  @retval others       The SWITCH failed.
-**/
-EFI_STATUS
-EmmcCheckSwitchStatus (
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot,
-  IN UINT16                         Rca
-  )
-{
-  EFI_STATUS  Status;
-  UINT32      DevStatus;
-
-  Status = EmmcSendStatus (PassThru, Slot, Rca, &DevStatus);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "EmmcCheckSwitchStatus: Send status fails with %r\n", Status));
-    return Status;
-  }
-
-  //
-  // Check the switch operation is really successful or not.
-  //
-  if ((DevStatus & BIT7) != 0) {
-    DEBUG ((DEBUG_ERROR, "EmmcCheckSwitchStatus: The switch operation fails as DevStatus is 0x%08x\n", DevStatus));
-    return EFI_DEVICE_ERROR;
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
   Switch the bus width to specified width.
 
   Refer to EMMC Electrical Standard Spec 5.1 Section 6.6.9 and SD Host Controller
@@ -617,12 +580,12 @@ EmmcCheckSwitchStatus (
 **/
 EFI_STATUS
 EmmcSwitchBusWidth (
-  IN EFI_PCI_IO_PROTOCOL            *PciIo,
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot,
-  IN UINT16                         Rca,
-  IN BOOLEAN                        IsDdr,
-  IN UINT8                          BusWidth
+  IN EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  IN UINT16                        Rca,
+  IN BOOLEAN                       IsDdr,
+  IN UINT8                         BusWidth
   )
 {
   EFI_STATUS  Status;
@@ -630,6 +593,7 @@ EmmcSwitchBusWidth (
   UINT8       Index;
   UINT8       Value;
   UINT8       CmdSet;
+  UINT32      DevStatus;
 
   //
   // Write Byte, the Value field is written into the byte pointed by Index.
@@ -655,9 +619,18 @@ EmmcSwitchBusWidth (
     return Status;
   }
 
-  Status = EmmcCheckSwitchStatus (PassThru, Slot, Rca);
+  Status = EmmcSendStatus (PassThru, Slot, Rca, &DevStatus);
   if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "EmmcSwitchBusWidth: Send status fails with %r\n", Status));
     return Status;
+  }
+
+  //
+  // Check the switch operation is really successful or not.
+  //
+  if ((DevStatus & BIT7) != 0) {
+    DEBUG ((DEBUG_ERROR, "EmmcSwitchBusWidth: The switch operation fails as DevStatus is 0x%08x\n", DevStatus));
+    return EFI_DEVICE_ERROR;
   }
 
   Status = SdMmcHcSetBusWidth (PciIo, Slot, BusWidth);
@@ -685,13 +658,13 @@ EmmcSwitchBusWidth (
 **/
 EFI_STATUS
 EmmcSwitchBusTiming (
-  IN EFI_PCI_IO_PROTOCOL            *PciIo,
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot,
-  IN UINT16                         Rca,
-  IN EDKII_SD_MMC_DRIVER_STRENGTH   DriverStrength,
-  IN SD_MMC_BUS_MODE                BusTiming,
-  IN UINT32                         ClockFreq
+  IN EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  IN UINT16                        Rca,
+  IN EDKII_SD_MMC_DRIVER_STRENGTH  DriverStrength,
+  IN SD_MMC_BUS_MODE               BusTiming,
+  IN UINT32                        ClockFreq
   )
 {
   EFI_STATUS              Status;
@@ -699,9 +672,9 @@ EmmcSwitchBusTiming (
   UINT8                   Index;
   UINT8                   Value;
   UINT8                   CmdSet;
+  UINT32                  DevStatus;
   SD_MMC_HC_PRIVATE_DATA  *Private;
   UINT8                   HostCtrl1;
-  BOOLEAN                 DelaySendStatus;
 
   Private = SD_MMC_HC_PRIVATE_FROM_THIS (PassThru);
   //
@@ -725,7 +698,7 @@ EmmcSwitchBusTiming (
       Value = 0;
       break;
     default:
-      DEBUG ((DEBUG_ERROR, "EmmcSwitchBusTiming: Unsupported BusTiming(%d)\n", BusTiming));
+      DEBUG ((DEBUG_ERROR, "EmmcSwitchBusTiming: Unsupported BusTiming(%d\n)", BusTiming));
       return EFI_INVALID_PARAMETER;
   }
 
@@ -755,37 +728,41 @@ EmmcSwitchBusTiming (
   }
 
   //
-  // For cases when we switch bus timing to higher mode from current we want to
-  // send SEND_STATUS at current, lower, frequency then the target frequency to avoid
-  // stability issues. It has been observed that some designs are unable to process the
-  // SEND_STATUS at higher frequency during switch to HS200 @200MHz irrespective of the number of retries
-  // and only running the clock tuning is able to make them work at target frequency.
-  //
-  // For cases when we are downgrading the frequency and current high frequency is invalid
-  // we have to first change the frequency to target frequency and then send the SEND_STATUS.
-  //
-  if (Private->Slot[Slot].CurrentFreq < (ClockFreq * 1000)) {
-    Status = EmmcCheckSwitchStatus (PassThru, Slot, Rca);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    DelaySendStatus = FALSE;
-  } else {
-    DelaySendStatus = TRUE;
-  }
-
-  //
   // Convert the clock freq unit from MHz to KHz.
   //
-  Status = SdMmcHcClockSupply (Private, Slot, BusTiming, FALSE, ClockFreq * 1000);
+  Status = SdMmcHcClockSupply (PciIo, Slot, ClockFreq * 1000, Private->BaseClkFreq[Slot], Private->ControllerVersion[Slot]);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  if (DelaySendStatus) {
-    Status = EmmcCheckSwitchStatus (PassThru, Slot, Rca);
+  Status = EmmcSendStatus (PassThru, Slot, Rca, &DevStatus);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "EmmcSwitchBusTiming: Send status fails with %r\n", Status));
+    return Status;
+  }
+
+  //
+  // Check the switch operation is really successful or not.
+  //
+  if ((DevStatus & BIT7) != 0) {
+    DEBUG ((DEBUG_ERROR, "EmmcSwitchBusTiming: The switch operation fails as DevStatus is 0x%08x\n", DevStatus));
+    return EFI_DEVICE_ERROR;
+  }
+
+  if ((mOverride != NULL) && (mOverride->NotifyPhase != NULL)) {
+    Status = mOverride->NotifyPhase (
+                          Private->ControllerHandle,
+                          Slot,
+                          EdkiiSdMmcSwitchClockFreqPost,
+                          &BusTiming
+                          );
     if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: SD/MMC switch clock freq post notifier callback failed - %r\n",
+        __FUNCTION__,
+        Status
+        ));
       return Status;
     }
   }
@@ -811,11 +788,11 @@ EmmcSwitchBusTiming (
 **/
 EFI_STATUS
 EmmcSwitchToHighSpeed (
-  IN EFI_PCI_IO_PROTOCOL            *PciIo,
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot,
-  IN UINT16                         Rca,
-  IN SD_MMC_BUS_SETTINGS            *BusMode
+  IN EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  IN UINT16                        Rca,
+  IN SD_MMC_BUS_SETTINGS           *BusMode
   )
 {
   EFI_STATUS  Status;
@@ -859,11 +836,11 @@ EmmcSwitchToHighSpeed (
 **/
 EFI_STATUS
 EmmcSwitchToHS200 (
-  IN EFI_PCI_IO_PROTOCOL            *PciIo,
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot,
-  IN UINT16                         Rca,
-  IN SD_MMC_BUS_SETTINGS            *BusMode
+  IN EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  IN UINT16                        Rca,
+  IN SD_MMC_BUS_SETTINGS           *BusMode
   )
 {
   EFI_STATUS  Status;
@@ -907,11 +884,11 @@ EmmcSwitchToHS200 (
 **/
 EFI_STATUS
 EmmcSwitchToHS400 (
-  IN EFI_PCI_IO_PROTOCOL            *PciIo,
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot,
-  IN UINT16                         Rca,
-  IN SD_MMC_BUS_SETTINGS            *BusMode
+  IN EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  IN UINT16                        Rca,
+  IN SD_MMC_BUS_SETTINGS           *BusMode
   )
 {
   EFI_STATUS           Status;
@@ -924,9 +901,9 @@ EmmcSwitchToHS400 (
     return EFI_INVALID_PARAMETER;
   }
 
-  Hs200BusMode.BusTiming      = SdMmcMmcHs200;
-  Hs200BusMode.BusWidth       = BusMode->BusWidth;
-  Hs200BusMode.ClockFreq      = BusMode->ClockFreq;
+  Hs200BusMode.BusTiming = SdMmcMmcHs200;
+  Hs200BusMode.BusWidth  = BusMode->BusWidth;
+  Hs200BusMode.ClockFreq = BusMode->ClockFreq;
   Hs200BusMode.DriverStrength = BusMode->DriverStrength;
 
   Status = EmmcSwitchToHS200 (PciIo, PassThru, Slot, Rca, &Hs200BusMode);
@@ -965,10 +942,10 @@ EmmcSwitchToHS400 (
 **/
 BOOLEAN
 EmmcIsBusTimingSupported (
-  IN SD_MMC_HC_PRIVATE_DATA  *Private,
-  IN UINT8                   SlotIndex,
-  IN EMMC_EXT_CSD            *ExtCsd,
-  IN SD_MMC_BUS_MODE         BusTiming
+  IN SD_MMC_HC_PRIVATE_DATA *Private,
+  IN UINT8                  SlotIndex,
+  IN EMMC_EXT_CSD           *ExtCsd,
+  IN SD_MMC_BUS_MODE        BusTiming
   )
 {
   BOOLEAN             Supported;
@@ -979,25 +956,25 @@ EmmcIsBusTimingSupported (
   Supported = FALSE;
   switch (BusTiming) {
     case SdMmcMmcHs400:
-      if ((((ExtCsd->DeviceType & (BIT6 | BIT7))  != 0) && (Capabilities->Hs400 != 0)) && (Capabilities->BusWidth8 != 0)) {
+      if ((((ExtCsd->DeviceType & (BIT6 | BIT7)) != 0) && (Capabilities->Hs400 != 0)) && (Capabilities->BusWidth8 != 0)) {
         Supported = TRUE;
       }
 
       break;
     case SdMmcMmcHs200:
-      if ((((ExtCsd->DeviceType & (BIT4 | BIT5))  != 0) && (Capabilities->Sdr104 != 0))) {
+      if ((((ExtCsd->DeviceType & (BIT4 | BIT5)) != 0) && (Capabilities->Sdr104 != 0))) {
         Supported = TRUE;
       }
 
       break;
     case SdMmcMmcHsDdr:
-      if ((((ExtCsd->DeviceType & (BIT2 | BIT3))  != 0) && (Capabilities->Ddr50 != 0))) {
+      if ((((ExtCsd->DeviceType & (BIT2 | BIT3)) != 0) && (Capabilities->Ddr50 != 0))) {
         Supported = TRUE;
       }
 
       break;
     case SdMmcMmcHsSdr:
-      if ((((ExtCsd->DeviceType & BIT1)  != 0) && (Capabilities->HighSpeed != 0))) {
+      if ((((ExtCsd->DeviceType & BIT1) != 0) && (Capabilities->HighSpeed != 0))) {
         Supported = TRUE;
       }
 
@@ -1028,9 +1005,9 @@ EmmcIsBusTimingSupported (
 **/
 SD_MMC_BUS_MODE
 EmmcGetTargetBusTiming (
-  IN SD_MMC_HC_PRIVATE_DATA  *Private,
-  IN UINT8                   SlotIndex,
-  IN EMMC_EXT_CSD            *ExtCsd
+  IN SD_MMC_HC_PRIVATE_DATA *Private,
+  IN UINT8                  SlotIndex,
+  IN EMMC_EXT_CSD           *ExtCsd
   )
 {
   SD_MMC_BUS_MODE  BusTiming;
@@ -1064,10 +1041,10 @@ EmmcGetTargetBusTiming (
 **/
 BOOLEAN
 EmmcIsBusWidthSupported (
-  IN SD_MMC_HC_PRIVATE_DATA  *Private,
-  IN UINT8                   SlotIndex,
-  IN SD_MMC_BUS_MODE         BusTiming,
-  IN UINT16                  BusWidth
+  IN SD_MMC_HC_PRIVATE_DATA *Private,
+  IN UINT8                  SlotIndex,
+  IN SD_MMC_BUS_MODE        BusTiming,
+  IN UINT16                 BusWidth
   )
 {
   if ((BusWidth == 8) && (Private->Capability[SlotIndex].BusWidth8 != 0)) {
@@ -1093,10 +1070,10 @@ EmmcIsBusWidthSupported (
 **/
 UINT8
 EmmcGetTargetBusWidth (
-  IN SD_MMC_HC_PRIVATE_DATA  *Private,
-  IN UINT8                   SlotIndex,
-  IN EMMC_EXT_CSD            *ExtCsd,
-  IN SD_MMC_BUS_MODE         BusTiming
+  IN SD_MMC_HC_PRIVATE_DATA *Private,
+  IN UINT8                  SlotIndex,
+  IN EMMC_EXT_CSD           *ExtCsd,
+  IN SD_MMC_BUS_MODE        BusTiming
   )
 {
   UINT8  BusWidth;
@@ -1131,10 +1108,10 @@ EmmcGetTargetBusWidth (
 **/
 UINT32
 EmmcGetTargetClockFreq (
-  IN SD_MMC_HC_PRIVATE_DATA  *Private,
-  IN UINT8                   SlotIndex,
-  IN EMMC_EXT_CSD            *ExtCsd,
-  IN SD_MMC_BUS_MODE         BusTiming
+  IN SD_MMC_HC_PRIVATE_DATA *Private,
+  IN UINT8                  SlotIndex,
+  IN EMMC_EXT_CSD           *ExtCsd,
+  IN SD_MMC_BUS_MODE        BusTiming
   )
 {
   UINT32  PreferredClockFreq;
@@ -1175,10 +1152,10 @@ EmmcGetTargetClockFreq (
 **/
 EDKII_SD_MMC_DRIVER_STRENGTH
 EmmcGetTargetDriverStrength (
-  IN SD_MMC_HC_PRIVATE_DATA  *Private,
-  IN UINT8                   SlotIndex,
-  IN EMMC_EXT_CSD            *ExtCsd,
-  IN SD_MMC_BUS_MODE         BusTiming
+  IN SD_MMC_HC_PRIVATE_DATA *Private,
+  IN UINT8                  SlotIndex,
+  IN EMMC_EXT_CSD           *ExtCsd,
+  IN SD_MMC_BUS_MODE        BusTiming
   )
 {
   EDKII_SD_MMC_DRIVER_STRENGTH  PreferredDriverStrength;
@@ -1206,15 +1183,15 @@ EmmcGetTargetDriverStrength (
 **/
 VOID
 EmmcGetTargetBusMode (
-  IN SD_MMC_HC_PRIVATE_DATA  *Private,
-  IN UINT8                   SlotIndex,
-  IN EMMC_EXT_CSD            *ExtCsd,
-  OUT SD_MMC_BUS_SETTINGS    *BusMode
+  IN SD_MMC_HC_PRIVATE_DATA *Private,
+  IN UINT8                  SlotIndex,
+  IN EMMC_EXT_CSD           *ExtCsd,
+  OUT SD_MMC_BUS_SETTINGS   *BusMode
   )
 {
-  BusMode->BusTiming      = EmmcGetTargetBusTiming (Private, SlotIndex, ExtCsd);
-  BusMode->BusWidth       = EmmcGetTargetBusWidth (Private, SlotIndex, ExtCsd, BusMode->BusTiming);
-  BusMode->ClockFreq      = EmmcGetTargetClockFreq (Private, SlotIndex, ExtCsd, BusMode->BusTiming);
+  BusMode->BusTiming = EmmcGetTargetBusTiming (Private, SlotIndex, ExtCsd);
+  BusMode->BusWidth  = EmmcGetTargetBusWidth (Private, SlotIndex, ExtCsd, BusMode->BusTiming);
+  BusMode->ClockFreq = EmmcGetTargetClockFreq (Private, SlotIndex, ExtCsd, BusMode->BusTiming);
   BusMode->DriverStrength = EmmcGetTargetDriverStrength (Private, SlotIndex, ExtCsd, BusMode->BusTiming);
 }
 
@@ -1235,10 +1212,10 @@ EmmcGetTargetBusMode (
 **/
 EFI_STATUS
 EmmcSetBusMode (
-  IN EFI_PCI_IO_PROTOCOL            *PciIo,
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot,
-  IN UINT16                         Rca
+  IN EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL *PassThru,
+  IN UINT8                         Slot,
+  IN UINT16                        Rca
   )
 {
   EFI_STATUS              Status;
@@ -1316,8 +1293,8 @@ EmmcSetBusMode (
 **/
 EFI_STATUS
 EmmcIdentification (
-  IN SD_MMC_HC_PRIVATE_DATA  *Private,
-  IN UINT8                   Slot
+  IN SD_MMC_HC_PRIVATE_DATA *Private,
+  IN UINT8                  Slot
   )
 {
   EFI_STATUS                     Status;
