@@ -1564,7 +1564,7 @@ AmlCodeGenReturn (
   Status = AmlSetFixedArgument (
              ObjectNode,
              EAmlParseIndexTerm0,
-             (AML_NODE_HEADER *)ReturnNode
+             ReturnNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
