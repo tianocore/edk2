@@ -118,6 +118,7 @@
   gSmiHandlerProfileGuid
   gEdkiiEndOfS3ResumeGuid ## SOMETIMES_PRODUCES ## GUID # Install protocol
   gEdkiiS3SmmInitDoneGuid ## SOMETIMES_PRODUCES ## GUID # Install protocol
+  gCommunicateHeaderV3Guid    ## CONSUMES   ## GUID # Communicate header
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PiSmmCoreExtra.uni
