@@ -39,6 +39,7 @@
   UefiRuntimeServicesTableLib
   UefiLib
   UefiBootManagerLib
+  BootLogoLib
   PcdLib
   DxeServicesLib
   MemoryAllocationLib
@@ -73,3 +74,4 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile
+  gUefiPayloadPkgTokenSpaceGuid.PcdBootSplashImage
