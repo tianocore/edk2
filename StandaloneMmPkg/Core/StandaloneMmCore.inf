@@ -75,6 +75,7 @@
   gEfiEventLegacyBootGuid
   gEfiEventExitBootServicesGuid
   gEfiEventReadyToBootGuid
+  gCommunicateHeaderV3Guid    ## CONSUMES   ## GUID # Communicate header
 
 #
 # This configuration fails for CLANGPDB, which does not support PIE in the GCC
