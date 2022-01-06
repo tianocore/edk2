@@ -397,10 +397,10 @@ EmmcSwitch (
 **/
 EFI_STATUS
 EmmcSendStatus (
-  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN     UINT8                          Slot,
-  IN     UINT16                         Rca,
-  OUT UINT32                            *DevStatus
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
+  IN UINT8                          Slot,
+  IN UINT16                         Rca,
+  OUT UINT32                        *DevStatus
   )
 {
   EFI_SD_MMC_COMMAND_BLOCK             SdMmcCmdBlk;
@@ -561,43 +561,6 @@ EmmcTuningClkForHs200 (
 }
 
 /**
-  Check the SWITCH operation status.
-
-  @param[in] PassThru  A pointer to the EFI_SD_MMC_PASS_THRU_PROTOCOL instance.
-  @param[in] Slot      The slot number on which command should be sent.
-  @param[in] Rca       The relative device address.
-
-  @retval EFI_SUCCESS  The SWITCH finished siccessfully.
-  @retval others       The SWITCH failed.
-**/
-EFI_STATUS
-EmmcCheckSwitchStatus (
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
-  IN UINT8                          Slot,
-  IN UINT16                         Rca
-  )
-{
-  EFI_STATUS  Status;
-  UINT32      DevStatus;
-
-  Status = EmmcSendStatus (PassThru, Slot, Rca, &DevStatus);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "EmmcCheckSwitchStatus: Send status fails with %r\n", Status));
-    return Status;
-  }
-
-  //
-  // Check the switch operation is really successful or not.
-  //
-  if ((DevStatus & BIT7) != 0) {
-    DEBUG ((DEBUG_ERROR, "EmmcCheckSwitchStatus: The switch operation fails as DevStatus is 0x%08x\n", DevStatus));
-    return EFI_DEVICE_ERROR;
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
   Switch the bus width to specified width.
 
   Refer to EMMC Electrical Standard Spec 5.1 Section 6.6.9 and SD Host Controller
@@ -630,6 +593,7 @@ EmmcSwitchBusWidth (
   UINT8       Index;
   UINT8       Value;
   UINT8       CmdSet;
+  UINT32      DevStatus;
 
   //
   // Write Byte, the Value field is written into the byte pointed by Index.
@@ -655,9 +619,18 @@ EmmcSwitchBusWidth (
     return Status;
   }
 
-  Status = EmmcCheckSwitchStatus (PassThru, Slot, Rca);
+  Status = EmmcSendStatus (PassThru, Slot, Rca, &DevStatus);
   if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "EmmcSwitchBusWidth: Send status fails with %r\n", Status));
     return Status;
+  }
+
+  //
+  // Check the switch operation is really successful or not.
+  //
+  if ((DevStatus & BIT7) != 0) {
+    DEBUG ((DEBUG_ERROR, "EmmcSwitchBusWidth: The switch operation fails as DevStatus is 0x%08x\n", DevStatus));
+    return EFI_DEVICE_ERROR;
   }
 
   Status = SdMmcHcSetBusWidth (PciIo, Slot, BusWidth);
@@ -699,9 +672,9 @@ EmmcSwitchBusTiming (
   UINT8                   Index;
   UINT8                   Value;
   UINT8                   CmdSet;
+  UINT32                  DevStatus;
   SD_MMC_HC_PRIVATE_DATA  *Private;
   UINT8                   HostCtrl1;
-  BOOLEAN                 DelaySendStatus;
 
   Private = SD_MMC_HC_PRIVATE_FROM_THIS (PassThru);
   //
@@ -725,7 +698,7 @@ EmmcSwitchBusTiming (
       Value = 0;
       break;
     default:
-      DEBUG ((DEBUG_ERROR, "EmmcSwitchBusTiming: Unsupported BusTiming(%d)\n", BusTiming));
+      DEBUG ((DEBUG_ERROR, "EmmcSwitchBusTiming: Unsupported BusTiming(%d\n)", BusTiming));
       return EFI_INVALID_PARAMETER;
   }
 
@@ -755,37 +728,41 @@ EmmcSwitchBusTiming (
   }
 
   //
-  // For cases when we switch bus timing to higher mode from current we want to
-  // send SEND_STATUS at current, lower, frequency then the target frequency to avoid
-  // stability issues. It has been observed that some designs are unable to process the
-  // SEND_STATUS at higher frequency during switch to HS200 @200MHz irrespective of the number of retries
-  // and only running the clock tuning is able to make them work at target frequency.
-  //
-  // For cases when we are downgrading the frequency and current high frequency is invalid
-  // we have to first change the frequency to target frequency and then send the SEND_STATUS.
-  //
-  if (Private->Slot[Slot].CurrentFreq < (ClockFreq * 1000)) {
-    Status = EmmcCheckSwitchStatus (PassThru, Slot, Rca);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    DelaySendStatus = FALSE;
-  } else {
-    DelaySendStatus = TRUE;
-  }
-
-  //
   // Convert the clock freq unit from MHz to KHz.
   //
-  Status = SdMmcHcClockSupply (Private, Slot, BusTiming, FALSE, ClockFreq * 1000);
+  Status = SdMmcHcClockSupply (PciIo, Slot, ClockFreq * 1000, Private->BaseClkFreq[Slot], Private->ControllerVersion[Slot]);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  if (DelaySendStatus) {
-    Status = EmmcCheckSwitchStatus (PassThru, Slot, Rca);
+  Status = EmmcSendStatus (PassThru, Slot, Rca, &DevStatus);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "EmmcSwitchBusTiming: Send status fails with %r\n", Status));
+    return Status;
+  }
+
+  //
+  // Check the switch operation is really successful or not.
+  //
+  if ((DevStatus & BIT7) != 0) {
+    DEBUG ((DEBUG_ERROR, "EmmcSwitchBusTiming: The switch operation fails as DevStatus is 0x%08x\n", DevStatus));
+    return EFI_DEVICE_ERROR;
+  }
+
+  if ((mOverride != NULL) && (mOverride->NotifyPhase != NULL)) {
+    Status = mOverride->NotifyPhase (
+                          Private->ControllerHandle,
+                          Slot,
+                          EdkiiSdMmcSwitchClockFreqPost,
+                          &BusTiming
+                          );
     if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: SD/MMC switch clock freq post notifier callback failed - %r\n",
+        __FUNCTION__,
+        Status
+        ));
       return Status;
     }
   }
@@ -979,25 +956,25 @@ EmmcIsBusTimingSupported (
   Supported = FALSE;
   switch (BusTiming) {
     case SdMmcMmcHs400:
-      if ((((ExtCsd->DeviceType & (BIT6 | BIT7))  != 0) && (Capabilities->Hs400 != 0)) && (Capabilities->BusWidth8 != 0)) {
+      if ((((ExtCsd->DeviceType & (BIT6 | BIT7)) != 0) && (Capabilities->Hs400 != 0)) && (Capabilities->BusWidth8 != 0)) {
         Supported = TRUE;
       }
 
       break;
     case SdMmcMmcHs200:
-      if ((((ExtCsd->DeviceType & (BIT4 | BIT5))  != 0) && (Capabilities->Sdr104 != 0))) {
+      if ((((ExtCsd->DeviceType & (BIT4 | BIT5)) != 0) && (Capabilities->Sdr104 != 0))) {
         Supported = TRUE;
       }
 
       break;
     case SdMmcMmcHsDdr:
-      if ((((ExtCsd->DeviceType & (BIT2 | BIT3))  != 0) && (Capabilities->Ddr50 != 0))) {
+      if ((((ExtCsd->DeviceType & (BIT2 | BIT3)) != 0) && (Capabilities->Ddr50 != 0))) {
         Supported = TRUE;
       }
 
       break;
     case SdMmcMmcHsSdr:
-      if ((((ExtCsd->DeviceType & BIT1)  != 0) && (Capabilities->HighSpeed != 0))) {
+      if ((((ExtCsd->DeviceType & BIT1) != 0) && (Capabilities->HighSpeed != 0))) {
         Supported = TRUE;
       }
 
