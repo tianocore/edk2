@@ -26,6 +26,8 @@
   RiscVCpuLib|Include/Library/RiscVCpuLib.h
   RiscVEdk2SbiLib|Include/Library/RiscVEdk2SbiLib.h
   RiscVFirmwareContextLib|Include/Library/RiscVFirmwareContextLib.h
+  RiscVPlatformTimerLib|Include/Library/RiscVPlatformTimerLib.h
+  MachineModeTimerLib|Include/Library/MachineModeTimerLib.h
 
 [Guids]
   gUefiRiscVPkgTokenSpaceGuid  = { 0x4261e9c8, 0x52c0, 0x4b34, { 0x85, 0x3d, 0x48, 0x46, 0xea, 0xd3, 0xb7, 0x2c}}

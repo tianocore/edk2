@@ -12,7 +12,7 @@
 [Defines]
   INF_VERSION                    = 0x0001001b
   BASE_NAME                      = RiscVFirmwareContextSbiLib
-  FILE_GUID                      = 3709E048-6794-427A-B728-BFE3FFD6D461
+  FILE_GUID                      = 308117C0-400A-79C5-6ED4-AB9763A202E5
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = RiscVFirmwareContextLib|PEIM PEI_CORE

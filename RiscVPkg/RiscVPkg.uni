@@ -8,6 +8,22 @@
 // **/
 
 #string STR_PACKAGE_ABSTRACT            #language en-US "Provides UEFI compatible RISC-V processor modules and libraries"
-
 #string STR_PACKAGE_DESCRIPTION         #language en-US "This Package provides UEFI compatible RISC-V processor modules and libraries."
+
+#string STR_gUefiRiscVPkgTokenSpaceGuid_PcdProcessorSpecificDataGuidHobGuid_PROMPT    #language en-US "Processor Specific Data HOB GUID"
+#string STR_gUefiRiscVPkgTokenSpaceGuid_PcdProcessorSpecificDataGuidHobGuid_HELP      #language en-US "This is the GUID definition of HOB that passes the "
+                                                                                                      "processor specific data to DXE phase."
+#string STR_gUefiRiscVPkgTokenSpaceGuid_PcdProcessorSmbiosGuidHobGuid_PROMPT          #language en-US "RISC-V SMBIOS Data HOB GUID"
+#string STR_gUefiRiscVPkgTokenSpaceGuid_PcdProcessorSmbiosGuidHobGuid_HELP            #language en-US "This is the GUID definition of HOB that passes RISC-V SMBIOS"
+                                                                                                      "Data to DXE phase."
+#string STR_gUefiRiscVPkgTokenSpaceGuid_PcdProcessorSmbiosType4GuidHobGuid_PROMPT     #language en-US "RISC-V SMBIOS Type 4 Data HOB GUID"
+#string STR_gUefiRiscVPkgTokenSpaceGuid_PcdProcessorSmbiosType4GuidHobGuid_HELP       #language en-US "This is the GUID definition of HOB that passes RISC-V SMBIOS"
+                                                                                      "Type 4 information to DXE phase for building up SMBIOS record."
+#string STR_gUefiRiscVPkgTokenSpaceGuid_PcdProcessorSmbiosType7GuidHobGuid_PROMPT     #language en-US "RISC-V SMBIOS Type 7 Data HOB GUID"
+#string STR_gUefiRiscVPkgTokenSpaceGuid_PcdProcessorSmbiosType7GuidHobGuid_HELP       #language en-US "This is the GUID definition of HOB that passes RISC-V SMBIOS"
+                                                                                      "Type 7 information to DXE phase for building up SMBIOS record."
+#string STR_gUefiRiscVPkgTokenSpaceGuid_PcdRiscVMachineTimerTickInNanoSecond_PROMPT   #language en-US "RISC-V Machine Mode Timer Duration"
+#string STR_gUefiRiscVPkgTokenSpaceGuid_PcdRiscVMachineTimerTickInNanoSecond_HELP     #language en-US "RISC-V Machine Mode Timer Duration in nanosecond."
+#string STR_gUefiRiscVPkgTokenSpaceGuid_PcdRiscVMachineTimerFrequencyInHerz_PROMPT    #language en-US "RISC-V Machine Mode Timer frequency."
+#string STR_gUefiRiscVPkgTokenSpaceGuid_PcdRiscVMachineTimerFrequencyInHerz_HELP      #language en-US "RISC-V Machine Mode Timer frequency in Herz"
 
