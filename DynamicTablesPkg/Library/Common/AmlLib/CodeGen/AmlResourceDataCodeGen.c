@@ -609,6 +609,65 @@ AmlCodeGenRdDWordMemory (
            );
 }
 
+/** Code generation for the "Memory32Fixed ()" ASL macro.
+
+ The Resource Data effectively created is a 32-bit Memory Resource
+  Data. Cf ACPI 6.4:
+   - s19.6.83 "Memory Resource Descriptor Macro".
+   - s19.2.8 "Memory32FixedTerm".
+
+  See ACPI 6.4 spec, s19.2.8 for more.
+
+  @param [in]  IsReadWrite          ReadAndWrite parameter.
+  @param [in]  Addres               AddressBase parameter.
+  @param [in]  RangeLength          Range length.
+  @param [in]  NameOpNode           NameOp object node defining a named object.
+                                    If provided, append the new resource data
+                                    node to the list of resource data elements
+                                    of this node.
+  @param [out] NewMemNode           If provided and success,
+                                    contain the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenMemory32Fixed (
+  BOOLEAN                 IsReadWrite,
+  UINT32                  Address,
+  UINT32                  RangeLength,
+  AML_OBJECT_NODE_HANDLE  NameOpNode,
+  AML_DATA_NODE_HANDLE    *NewMemNode
+  )
+{
+  EFI_STATUS     Status;
+  AML_DATA_NODE  *MemNode;
+  UINT8          Data[12];
+
+  Data[0]  = 0x86;
+  Data[1]  = 0x09;
+  Data[2]  = 0x00;
+  Data[3]  = IsReadWrite;
+  Data[4]  = Address & 0xFF;
+  Data[5]  = (Address & 0xFF00) >> 8;
+  Data[6]  = (Address & 0xFF0000) >> 16;
+  Data[7]  = (Address & 0xFF000000) >> 24;
+  Data[8]  = RangeLength & 0xFF;
+  Data[9]  = (RangeLength & 0xFF00) >> 8;
+  Data[10] = (RangeLength & 0xFF0000) >> 16;
+  Data[11] = (RangeLength & 0xFF000000) >> 24;
+
+  Status = AmlCreateDataNode (EAmlNodeDataTypeResourceData, Data, sizeof (Data), &MemNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  return LinkRdNode (MemNode, NameOpNode, NewMemNode);
+}
+
 /** Code generation for the "WordSpace ()" ASL function.
 
   The Resource Data effectively created is a Word Address Space Resource
