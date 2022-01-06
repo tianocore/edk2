@@ -1167,9 +1167,27 @@ SdCardSetBusMode (
     return Status;
   }
 
-  Status = SdMmcHcClockSupply (Private, Slot, BusMode.BusTiming, FALSE, BusMode.ClockFreq * 1000);
+  Status = SdMmcHcClockSupply (PciIo, Slot, BusMode.ClockFreq * 1000, Private->BaseClkFreq[Slot], Private->ControllerVersion[Slot]);
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  if ((mOverride != NULL) && (mOverride->NotifyPhase != NULL)) {
+    Status = mOverride->NotifyPhase (
+                          Private->ControllerHandle,
+                          Slot,
+                          EdkiiSdMmcSwitchClockFreqPost,
+                          &BusMode.BusTiming
+                          );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: SD/MMC switch clock freq post notifier callback failed - %r\n",
+        __FUNCTION__,
+        Status
+        ));
+      return Status;
+    }
   }
 
   if ((BusMode.BusTiming == SdMmcUhsSdr104) || ((BusMode.BusTiming == SdMmcUhsSdr50) && (Capability->TuningSDR50 != 0))) {
@@ -1204,6 +1222,7 @@ SdCardIdentification (
   EFI_PCI_IO_PROTOCOL            *PciIo;
   EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru;
   UINT32                         Ocr;
+  UINT32                         ResponseOcr;
   UINT16                         Rca;
   BOOLEAN                        Xpc;
   BOOLEAN                        S18r;
@@ -1213,167 +1232,197 @@ SdCardIdentification (
   UINT32                         PresentState;
   UINT8                          HostCtrl2;
   UINTN                          Retry;
+  BOOLEAN                        Force3p3v;
+
+  Force3p3v = FALSE;
 
   PciIo    = Private->PciIo;
   PassThru = &Private->PassThru;
-  //
-  // 1. Send Cmd0 to the device
-  //
-  Status = SdCardReset (PassThru, Slot);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "SdCardIdentification: Executing Cmd0 fails with %r\n", Status));
-    return Status;
-  }
 
   //
-  // 2. Send Cmd8 to the device
+  // Step 12 of SD Host Controller Simplified Specification Version 3.00, 3.6.1 Signal Voltage Switch Procedure: Retry 3.3V if 1.8V fails.
   //
-  Status = SdCardVoltageCheck (PassThru, Slot, 0x1, 0xFF);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "SdCardIdentification: Executing Cmd8 fails with %r\n", Status));
-    return Status;
-  }
-
-  //
-  // 3. Send SDIO Cmd5 to the device to the SDIO device OCR register.
-  //
-  Status = SdioSendOpCond (PassThru, Slot, 0, FALSE);
-  if (!EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "SdCardIdentification: Found SDIO device, ignore it as we don't support\n"));
-    return EFI_DEVICE_ERROR;
-  }
-
-  //
-  // 4. Send Acmd41 with voltage window 0 to the device
-  //
-  Status = SdCardSendOpCond (PassThru, Slot, 0, 0, FALSE, FALSE, FALSE, &Ocr);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "SdCardIdentification: Executing SdCardSendOpCond fails with %r\n", Status));
-    return EFI_DEVICE_ERROR;
-  }
-
-  if (Private->Capability[Slot].Voltage33 != 0) {
-    //
-    // Support 3.3V
-    //
-    MaxCurrent = ((UINT32)Private->MaxCurrent[Slot] & 0xFF) * 4;
-  } else if (Private->Capability[Slot].Voltage30 != 0) {
-    //
-    // Support 3.0V
-    //
-    MaxCurrent = (((UINT32)Private->MaxCurrent[Slot] >> 8) & 0xFF) * 4;
-  } else if (Private->Capability[Slot].Voltage18 != 0) {
-    //
-    // Support 1.8V
-    //
-    MaxCurrent = (((UINT32)Private->MaxCurrent[Slot] >> 16) & 0xFF) * 4;
-  } else {
-    ASSERT (FALSE);
-    return EFI_DEVICE_ERROR;
-  }
-
-  if (MaxCurrent >= 150) {
-    Xpc = TRUE;
-  } else {
-    Xpc = FALSE;
-  }
-
-  Status = SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_CTRL_VER, TRUE, sizeof (ControllerVer), &ControllerVer);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  if (((ControllerVer & 0xFF) >= SD_MMC_HC_CTRL_VER_300) &&
-      ((ControllerVer & 0xFF) <= SD_MMC_HC_CTRL_VER_420))
-  {
-    S18r = TRUE;
-  } else if (((ControllerVer & 0xFF) == SD_MMC_HC_CTRL_VER_100) || ((ControllerVer & 0xFF) == SD_MMC_HC_CTRL_VER_200)) {
-    S18r = FALSE;
-  } else {
-    ASSERT (FALSE);
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // 5. Repeatly send Acmd41 with supply voltage window to the device.
-  //    Note here we only support the cards complied with SD physical
-  //    layer simplified spec version 2.0 and version 3.0 and above.
-  //
-  Ocr   = 0;
-  Retry = 0;
   do {
-    Status = SdCardSendOpCond (PassThru, Slot, 0, Ocr, S18r, Xpc, TRUE, &Ocr);
+    //
+    // 1. Send Cmd0 to the device
+    //
+    Status = SdCardReset (PassThru, Slot);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "SdCardIdentification: SdCardSendOpCond fails with %r Ocr %x, S18r %x, Xpc %x\n", Status, Ocr, S18r, Xpc));
+      DEBUG ((DEBUG_INFO, "SdCardIdentification: Executing Cmd0 fails with %r\n", Status));
+      return Status;
+    }
+
+    //
+    // 2. Send Cmd8 to the device
+    //
+    Status = SdCardVoltageCheck (PassThru, Slot, 0x1, 0xFF);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "SdCardIdentification: Executing Cmd8 fails with %r\n", Status));
+      return Status;
+    }
+
+    //
+    // 3. Send SDIO Cmd5 to the device to the SDIO device OCR register.
+    //
+    Status = SdioSendOpCond (PassThru, Slot, 0, FALSE);
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "SdCardIdentification: Found SDIO device, ignore it as we don't support\n"));
       return EFI_DEVICE_ERROR;
     }
 
-    if (Retry++ == 100) {
-      DEBUG ((DEBUG_ERROR, "SdCardIdentification: SdCardSendOpCond fails too many times\n"));
+    //
+    // 4. Send Acmd41 with voltage window 0 to the device
+    //
+    Status = SdCardSendOpCond (PassThru, Slot, 0, 0, FALSE, FALSE, FALSE, &Ocr);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "SdCardIdentification: Executing SdCardSendOpCond fails with %r\n", Status));
       return EFI_DEVICE_ERROR;
     }
 
-    gBS->Stall (10 * 1000);
-  } while ((Ocr & BIT31) == 0);
-
-  //
-  // 6. If the S18A bit is set and the Host Controller supports 1.8V signaling
-  //    (One of support bits is set to 1: SDR50, SDR104 or DDR50 in the
-  //    Capabilities register), switch its voltage to 1.8V.
-  //
-  if (((Private->Capability[Slot].Sdr50 != 0) ||
-       (Private->Capability[Slot].Sdr104 != 0) ||
-       (Private->Capability[Slot].Ddr50 != 0)) &&
-      ((Ocr & BIT24) != 0))
-  {
-    Status = SdCardVoltageSwitch (PassThru, Slot);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "SdCardIdentification: Executing SdCardVoltageSwitch fails with %r\n", Status));
-      Status = EFI_DEVICE_ERROR;
-      goto Error;
+    if (Private->Capability[Slot].Voltage33 != 0) {
+      //
+      // Support 3.3V
+      //
+      MaxCurrent = ((UINT32)Private->MaxCurrent[Slot] & 0xFF) * 4;
+    } else if (Private->Capability[Slot].Voltage30 != 0) {
+      //
+      // Support 3.0V
+      //
+      MaxCurrent = (((UINT32)Private->MaxCurrent[Slot] >> 8) & 0xFF) * 4;
+    } else if (Private->Capability[Slot].Voltage18 != 0) {
+      //
+      // Support 1.8V
+      //
+      MaxCurrent = (((UINT32)Private->MaxCurrent[Slot] >> 16) & 0xFF) * 4;
     } else {
-      Status = SdMmcHcStopClock (PciIo, Slot);
-      if (EFI_ERROR (Status)) {
-        Status = EFI_DEVICE_ERROR;
-        goto Error;
-      }
-
-      SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
-      if (((PresentState >> 20) & 0xF) != 0) {
-        DEBUG ((DEBUG_ERROR, "SdCardIdentification: SwitchVoltage fails with PresentState = 0x%x\n", PresentState));
-        Status = EFI_DEVICE_ERROR;
-        goto Error;
-      }
-
-      HostCtrl2 = BIT3;
-      SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, sizeof (HostCtrl2), &HostCtrl2);
-
-      gBS->Stall (5000);
-
-      SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, TRUE, sizeof (HostCtrl2), &HostCtrl2);
-      if ((HostCtrl2 & BIT3) == 0) {
-        DEBUG ((DEBUG_ERROR, "SdCardIdentification: SwitchVoltage fails with HostCtrl2 = 0x%x\n", HostCtrl2));
-        Status = EFI_DEVICE_ERROR;
-        goto Error;
-      }
-
-      Status = SdMmcHcStartSdClock (PciIo, Slot);
-      if (EFI_ERROR (Status)) {
-        goto Error;
-      }
-
-      gBS->Stall (1000);
-
-      SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
-      if (((PresentState >> 20) & 0xF) != 0xF) {
-        DEBUG ((DEBUG_ERROR, "SdCardIdentification: SwitchVoltage fails with PresentState = 0x%x, It should be 0xF\n", PresentState));
-        Status = EFI_DEVICE_ERROR;
-        goto Error;
-      }
+      ASSERT (FALSE);
+      return EFI_DEVICE_ERROR;
     }
 
-    DEBUG ((DEBUG_INFO, "SdCardIdentification: Switch to 1.8v signal voltage success\n"));
-  }
+    if (MaxCurrent >= 150) {
+      Xpc = TRUE;
+    } else {
+      Xpc = FALSE;
+    }
+
+    Status = SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_CTRL_VER, TRUE, sizeof (ControllerVer), &ControllerVer);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if (((ControllerVer & 0xFF) >= SD_MMC_HC_CTRL_VER_300) &&
+        ((ControllerVer & 0xFF) <= SD_MMC_HC_CTRL_VER_420))
+    {
+      S18r = TRUE;
+    } else if (((ControllerVer & 0xFF) == SD_MMC_HC_CTRL_VER_100) || ((ControllerVer & 0xFF) == SD_MMC_HC_CTRL_VER_200)) {
+      S18r = FALSE;
+    } else {
+      ASSERT (FALSE);
+      return EFI_UNSUPPORTED;
+    }
+
+    //
+    // 1.8V had failed in the previous run, forcing a retry with 3.3V instead
+    //
+    if (Force3p3v == TRUE) {
+      S18r = FALSE;
+      Force3p3v = FALSE;
+    }
+
+    //
+    // 5. Repeatly send Acmd41 with supply voltage window to the device.
+    //    Note here we only support the cards complied with SD physical
+    //    layer simplified spec version 2.0 and version 3.0 and above.
+    //
+    DEBUG ((DEBUG_ERROR, "SdCardIdentification: First Ocr: 0x%X, S18r: 0x%X, Xpc: 0x%X\n", Ocr, S18r, Xpc));
+    ResponseOcr = Ocr;
+    Ocr         = 0;
+    Retry       = 0;
+    do {
+      Status = SdCardSendOpCond (PassThru, Slot, 0, ResponseOcr, S18r, Xpc, TRUE, &Ocr);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "SdCardIdentification: SdCardSendOpCond fails with %r Ocr %x, S18r %x, Xpc %x\n", Status, Ocr, S18r, Xpc));
+        return EFI_DEVICE_ERROR;
+      }
+
+      if (Retry++ == 100) {
+        DEBUG ((DEBUG_ERROR, "SdCardIdentification: SdCardSendOpCond fails too many times\n"));
+        return EFI_DEVICE_ERROR;
+      }
+
+      gBS->Stall (10 * 1000);
+    } while ((Ocr & BIT31) == 0);
+
+    DEBUG ((DEBUG_ERROR, "SdCardIdentification: Second Ocr: 0x%X\n", Ocr));
+    //
+    // 6. If the S18A bit is set and the Host Controller supports 1.8V signaling
+    //    (One of support bits is set to 1: SDR50, SDR104 or DDR50 in the
+    //    Capabilities register), switch its voltage to 1.8V.
+    //
+    if (((Private->Capability[Slot].Sdr50 != 0) ||
+         (Private->Capability[Slot].Sdr104 != 0) ||
+         (Private->Capability[Slot].Ddr50 != 0)) &&
+        ((Ocr & BIT24) != 0))
+    {
+      Status = SdCardVoltageSwitch (PassThru, Slot);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "SdCardIdentification: Executing SdCardVoltageSwitch fails with %r\n", Status));
+        Status = EFI_DEVICE_ERROR;
+        goto Error;
+      } else {
+        Status = SdMmcHcStopClock (PciIo, Slot);
+        if (EFI_ERROR (Status)) {
+          Status = EFI_DEVICE_ERROR;
+          goto Error;
+        }
+
+        SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
+        if (((PresentState >> 20) & 0xF) != 0) {
+          DEBUG ((DEBUG_ERROR, "SdCardIdentification: SwitchVoltage fails with PresentState = 0x%x\n", PresentState));
+          Status = EFI_DEVICE_ERROR;
+          goto Error;
+        }
+
+        HostCtrl2 = BIT3;
+        SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, sizeof (HostCtrl2), &HostCtrl2);
+
+        gBS->Stall (5000);
+
+        SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, TRUE, sizeof (HostCtrl2), &HostCtrl2);
+        if ((HostCtrl2 & BIT3) == 0) {
+          DEBUG ((DEBUG_ERROR, "SdCardIdentification: SwitchVoltage fails with HostCtrl2 = 0x%x\n", HostCtrl2));
+          Status = EFI_DEVICE_ERROR;
+          goto Error;
+        }
+
+        //
+        // PCH:RestrictedBegin
+        //
+        // Workaround to add a delay of 100ms in order for clock to stabilize before turning on the SD clock again.
+        // HSDES ID: 1507602829
+        //
+        // PCH:RestrictedEnd
+        //
+        gBS->Stall (50000);
+        SdMmcHcInitClockFreq (PciIo, Slot, Private->BaseClkFreq[Slot], Private->ControllerVersion[Slot]);
+
+        gBS->Stall (1000);
+
+        SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
+        if (((PresentState >> 20) & 0xF) != 0xF) {
+          DEBUG ((DEBUG_ERROR, "SdCardIdentification: SwitchVoltage fails with PresentState = 0x%x, It should be 0xF\n", PresentState));
+          Status    = SdMmcHcReset (Private, Slot);
+          Status    = SdMmcHcInitHost (Private, Slot);
+          Force3p3v = TRUE;
+          DEBUG ((DEBUG_ERROR, "SdCardIdentification: Switching to 1.8V had failed in the previous run, forcing a retry with 3.3V instead\n"));
+        }
+      }
+
+      if (((PresentState >> 20) & 0xF) == 0xF) {
+        DEBUG ((DEBUG_INFO, "SdCardIdentification: Switch to 1.8v signal voltage success\n"));
+      }
+    }
+  } while (Force3p3v);
 
   Status = SdCardAllSendCid (PassThru, Slot);
   if (EFI_ERROR (Status)) {
