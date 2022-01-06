@@ -985,6 +985,7 @@ typedef struct {
 #define EFI_SW_EC_EVENT_LOG_FULL          0x00000011
 #define EFI_SW_EC_WRITE_PROTECTED         0x00000012
 #define EFI_SW_EC_FV_CORRUPTED            0x00000013
+#define EFI_SW_EC_FRAGMENTED_MEMORY_MAP   0x00000014
 ///@}
 
 //
