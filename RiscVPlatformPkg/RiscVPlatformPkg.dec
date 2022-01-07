@@ -21,6 +21,8 @@
   FirmwareContextProcessorSpecificLib|Include/Library/FirmwareContextProcessorSpecificLib.h
   RiscVPlatformTempMemoryInitLib|Include/Library/RiscVPlatformTempMemoryInitLib.h
   Edk2OpensbiPlatformWrapperLib|Include/Library/Edk2OpensbiPlatformWrapperLib.h
+  RiscVSpecialPlatformLib|Include/Library/RiscVSpecialPlatformLib.h
+  PlatformSecPpiLib|Include/Library/PlatformSecPpiLib.h
 
 [Guids]
   gUefiRiscVPlatformPkgTokenSpaceGuid  = {0x6A67AF99, 0x4592, 0x40F8, { 0xB6, 0xBE, 0x62, 0xBC, 0xA1, 0x0D, 0xA1, 0xEC}}
