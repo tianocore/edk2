@@ -22,7 +22,6 @@
   Library/RiscVOpensbiLib/opensbi/platform/generic/include # Header file reference from opensbi files, ("sbi/...")
 
 [LibraryClasses]
-  RiscVPlatformDxeIplLib|Include/Library/RiscVPlatformDxeIpl.h
   RiscVCpuLib|Include/Library/RiscVCpuLib.h
   RiscVEdk2SbiLib|Include/Library/RiscVEdk2SbiLib.h
   RiscVFirmwareContextLib|Include/Library/RiscVFirmwareContextLib.h
