@@ -9,7 +9,7 @@
 
 #include "RiscVSmbiosDxe.h"
 
-STATIC EFI_SMBIOS_PROTOCOL   *mSmbios;
+STATIC EFI_SMBIOS_PROTOCOL  *mSmbios;
 
 /**
   This function builds SMBIOS type 7 record according to
@@ -25,28 +25,31 @@ STATIC EFI_SMBIOS_PROTOCOL   *mSmbios;
 STATIC
 EFI_STATUS
 BuildSmbiosType7 (
- IN RISC_V_PROCESSOR_TYPE4_HOB_DATA *Type4HobData,
- IN RISC_V_PROCESSOR_TYPE7_HOB_DATA *Type7DataHob,
- OUT SMBIOS_HANDLE *SmbiosHandle
-)
+  IN RISC_V_PROCESSOR_TYPE4_HOB_DATA  *Type4HobData,
+  IN RISC_V_PROCESSOR_TYPE7_HOB_DATA  *Type7DataHob,
+  OUT SMBIOS_HANDLE                   *SmbiosHandle
+  )
 {
-  EFI_STATUS Status;
-  SMBIOS_HANDLE Handle;
+  EFI_STATUS     Status;
+  SMBIOS_HANDLE  Handle;
 
   if (!CompareGuid (&Type4HobData->ProcessorGuid, &Type7DataHob->ProcessorGuid) ||
-    Type4HobData->ProcessorUid != Type7DataHob->ProcessorUid) {
+      (Type4HobData->ProcessorUid != Type7DataHob->ProcessorUid))
+  {
     return EFI_INVALID_PARAMETER;
   }
-  Handle = SMBIOS_HANDLE_PI_RESERVED;
-  Type7DataHob->SmbiosType7Cache.Hdr.Type = SMBIOS_TYPE_CACHE_INFORMATION;
-  Type7DataHob->SmbiosType7Cache.Hdr.Length = sizeof(SMBIOS_TABLE_TYPE7);
+
+  Handle                                    = SMBIOS_HANDLE_PI_RESERVED;
+  Type7DataHob->SmbiosType7Cache.Hdr.Type   = SMBIOS_TYPE_CACHE_INFORMATION;
+  Type7DataHob->SmbiosType7Cache.Hdr.Length = sizeof (SMBIOS_TABLE_TYPE7);
   Type7DataHob->SmbiosType7Cache.Hdr.Handle = 0;
-  Type7DataHob->EndingZero = 0;
-  Status = mSmbios->Add (mSmbios, NULL, &Handle, &Type7DataHob->SmbiosType7Cache.Hdr);
-  if (EFI_ERROR(Status)) {
+  Type7DataHob->EndingZero                  = 0;
+  Status                                    = mSmbios->Add (mSmbios, NULL, &Handle, &Type7DataHob->SmbiosType7Cache.Hdr);
+  if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Fail to add SMBIOS Type 7\n", __FUNCTION__));
     return Status;
   }
+
   DEBUG ((DEBUG_INFO, "SMBIOS Type 7 was added. SMBIOS Handle: 0x%x\n", Handle));
   DEBUG ((DEBUG_VERBOSE, "     Cache belone to processor GUID: %g\n", &Type7DataHob->ProcessorGuid));
   DEBUG ((DEBUG_VERBOSE, "     Cache belone processor  UID: %d\n", Type7DataHob->ProcessorUid));
@@ -79,15 +82,15 @@ BuildSmbiosType7 (
 STATIC
 EFI_STATUS
 BuildSmbiosType4 (
-  IN RISC_V_PROCESSOR_TYPE4_HOB_DATA *Type4HobData,
-  OUT SMBIOS_HANDLE *SmbiosHandle
+  IN RISC_V_PROCESSOR_TYPE4_HOB_DATA  *Type4HobData,
+  OUT SMBIOS_HANDLE                   *SmbiosHandle
   )
 {
-  EFI_HOB_GUID_TYPE *GuidHob;
-  RISC_V_PROCESSOR_TYPE7_HOB_DATA *Type7HobData;
-  SMBIOS_HANDLE Cache;
-  SMBIOS_HANDLE Processor;
-  EFI_STATUS Status;
+  EFI_HOB_GUID_TYPE                *GuidHob;
+  RISC_V_PROCESSOR_TYPE7_HOB_DATA  *Type7HobData;
+  SMBIOS_HANDLE                    Cache;
+  SMBIOS_HANDLE                    Processor;
+  EFI_STATUS                       Status;
 
   DEBUG ((DEBUG_INFO, "Building Type 4.\n"));
   DEBUG ((DEBUG_INFO, "    Processor GUID: %g\n", &Type4HobData->ProcessorGuid));
@@ -96,55 +99,66 @@ BuildSmbiosType4 (
   Type4HobData->SmbiosType4Processor.L1CacheHandle = RISC_V_CACHE_INFO_NOT_PROVIDED;
   Type4HobData->SmbiosType4Processor.L2CacheHandle = RISC_V_CACHE_INFO_NOT_PROVIDED;
   Type4HobData->SmbiosType4Processor.L3CacheHandle = RISC_V_CACHE_INFO_NOT_PROVIDED;
-  GuidHob = (EFI_HOB_GUID_TYPE *)GetFirstGuidHob ((EFI_GUID *)PcdGetPtr(PcdProcessorSmbiosType7GuidHobGuid));
+  GuidHob                                          = (EFI_HOB_GUID_TYPE *)GetFirstGuidHob ((EFI_GUID *)PcdGetPtr (PcdProcessorSmbiosType7GuidHobGuid));
   if (GuidHob == NULL) {
     DEBUG ((DEBUG_ERROR, "No RISC-V SMBIOS Type7 data HOB found.\n"));
     return EFI_NOT_FOUND;
   }
+
   //
   // Go through each RISC_V_PROCESSOR_TYPE4_HOB_DATA for multiple processors.
   //
   do {
     Type7HobData = (RISC_V_PROCESSOR_TYPE7_HOB_DATA *)GET_GUID_HOB_DATA (GuidHob);
-    Status = BuildSmbiosType7 (Type4HobData, Type7HobData, &Cache);
+    Status       = BuildSmbiosType7 (Type4HobData, Type7HobData, &Cache);
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     if ((Type7HobData->SmbiosType7Cache.SystemCacheType & RISC_V_CACHE_CONFIGURATION_CACHE_LEVEL_MASK) ==
-        RISC_V_CACHE_CONFIGURATION_CACHE_LEVEL_1) {
+        RISC_V_CACHE_CONFIGURATION_CACHE_LEVEL_1)
+    {
       Type4HobData->SmbiosType4Processor.L1CacheHandle = Cache;
     } else if ((Type7HobData->SmbiosType7Cache.SystemCacheType & RISC_V_CACHE_CONFIGURATION_CACHE_LEVEL_MASK) ==
-        RISC_V_CACHE_CONFIGURATION_CACHE_LEVEL_2) {
+               RISC_V_CACHE_CONFIGURATION_CACHE_LEVEL_2)
+    {
       Type4HobData->SmbiosType4Processor.L2CacheHandle = Cache;
     } else if ((Type7HobData->SmbiosType7Cache.SystemCacheType & RISC_V_CACHE_CONFIGURATION_CACHE_LEVEL_MASK) ==
-        RISC_V_CACHE_CONFIGURATION_CACHE_LEVEL_3) {
+               RISC_V_CACHE_CONFIGURATION_CACHE_LEVEL_3)
+    {
       Type4HobData->SmbiosType4Processor.L3CacheHandle = Cache;
     } else {
       DEBUG ((DEBUG_ERROR, "Improper cache level of SMBIOS handle %d\n", Cache));
     }
-    GuidHob = GetNextGuidHob((EFI_GUID *)PcdGetPtr(PcdProcessorSmbiosType7GuidHobGuid), GET_NEXT_HOB(GuidHob));
+
+    GuidHob = GetNextGuidHob ((EFI_GUID *)PcdGetPtr (PcdProcessorSmbiosType7GuidHobGuid), GET_NEXT_HOB (GuidHob));
   } while (GuidHob != NULL);
 
   //
   // Build SMBIOS Type 4 record
   //
-  Processor = SMBIOS_HANDLE_PI_RESERVED;
-  Type4HobData->SmbiosType4Processor.Hdr.Type = SMBIOS_TYPE_PROCESSOR_INFORMATION;
-  Type4HobData->SmbiosType4Processor.Hdr.Length = sizeof(SMBIOS_TABLE_TYPE4);
+  Processor                                     = SMBIOS_HANDLE_PI_RESERVED;
+  Type4HobData->SmbiosType4Processor.Hdr.Type   = SMBIOS_TYPE_PROCESSOR_INFORMATION;
+  Type4HobData->SmbiosType4Processor.Hdr.Length = sizeof (SMBIOS_TABLE_TYPE4);
   Type4HobData->SmbiosType4Processor.Hdr.Handle = 0;
-  Type4HobData->EndingZero = 0;
-  Status = mSmbios->Add (mSmbios, NULL, &Processor, &Type4HobData->SmbiosType4Processor.Hdr);
-  if (EFI_ERROR(Status)) {
+  Type4HobData->EndingZero                      = 0;
+  Status                                        = mSmbios->Add (mSmbios, NULL, &Processor, &Type4HobData->SmbiosType4Processor.Hdr);
+  if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Fail to add SMBIOS Type 4\n"));
     return Status;
   }
+
   DEBUG ((DEBUG_INFO, "SMBIOS Type 4 was added. SMBIOS Handle: 0x%x\n", Processor));
   DEBUG ((DEBUG_VERBOSE, "     Socket StringID: %d\n", Type4HobData->SmbiosType4Processor.Socket));
   DEBUG ((DEBUG_VERBOSE, "     Processor Type: 0x%x\n", Type4HobData->SmbiosType4Processor.ProcessorType));
   DEBUG ((DEBUG_VERBOSE, "     Processor Family: 0x%x\n", Type4HobData->SmbiosType4Processor.ProcessorFamily));
   DEBUG ((DEBUG_VERBOSE, "     Processor Manufacture StringID: %d\n", Type4HobData->SmbiosType4Processor.ProcessorManufacturer));
-  DEBUG ((DEBUG_VERBOSE, "     Processor Id: 0x%x:0x%x\n", \
-          Type4HobData->SmbiosType4Processor.ProcessorId.Signature, Type4HobData->SmbiosType4Processor.ProcessorId.FeatureFlags));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "     Processor Id: 0x%x:0x%x\n", \
+    Type4HobData->SmbiosType4Processor.ProcessorId.Signature,
+    Type4HobData->SmbiosType4Processor.ProcessorId.FeatureFlags
+    ));
   DEBUG ((DEBUG_VERBOSE, "     Processor Version StringID: %d\n", Type4HobData->SmbiosType4Processor.ProcessorVersion));
   DEBUG ((DEBUG_VERBOSE, "     Voltage: 0x%x\n", Type4HobData->SmbiosType4Processor.Voltage));
   DEBUG ((DEBUG_VERBOSE, "     External Clock: 0x%x\n", Type4HobData->SmbiosType4Processor.ExternalClock));
@@ -153,7 +167,7 @@ BuildSmbiosType4 (
   DEBUG ((DEBUG_VERBOSE, "     Status: 0x%x\n", Type4HobData->SmbiosType4Processor.Status));
   DEBUG ((DEBUG_VERBOSE, "     ProcessorUpgrade: 0x%x\n", Type4HobData->SmbiosType4Processor.ProcessorUpgrade));
   DEBUG ((DEBUG_VERBOSE, "     L1 Cache Handle: 0x%x\n", Type4HobData->SmbiosType4Processor.L1CacheHandle));
-  DEBUG ((DEBUG_VERBOSE, "     L2 Cache Handle: 0x%x\n",Type4HobData->SmbiosType4Processor.L2CacheHandle));
+  DEBUG ((DEBUG_VERBOSE, "     L2 Cache Handle: 0x%x\n", Type4HobData->SmbiosType4Processor.L2CacheHandle));
   DEBUG ((DEBUG_VERBOSE, "     L3 Cache Handle: 0x%x\n", Type4HobData->SmbiosType4Processor.L3CacheHandle));
   DEBUG ((DEBUG_VERBOSE, "     Serial Number StringID: %d\n", Type4HobData->SmbiosType4Processor.SerialNumber));
   DEBUG ((DEBUG_VERBOSE, "     Asset Tag StringID: %d\n", Type4HobData->SmbiosType4Processor.AssetTag));
@@ -182,51 +196,55 @@ BuildSmbiosType4 (
 **/
 EFI_STATUS
 BuildSmbiosType44 (
-  IN RISC_V_PROCESSOR_TYPE4_HOB_DATA *Type4HobData,
-  IN SMBIOS_HANDLE Type4Handle
+  IN RISC_V_PROCESSOR_TYPE4_HOB_DATA  *Type4HobData,
+  IN SMBIOS_HANDLE                    Type4Handle
   )
 {
-  EFI_HOB_GUID_TYPE *GuidHob;
-  RISC_V_PROCESSOR_SPECIFIC_HOB_DATA *ProcessorSpecificData;
-  SMBIOS_HANDLE RiscVType44;
-  SMBIOS_TABLE_TYPE44 *Type44Ptr;
-  EFI_STATUS Status;
+  EFI_HOB_GUID_TYPE                   *GuidHob;
+  RISC_V_PROCESSOR_SPECIFIC_HOB_DATA  *ProcessorSpecificData;
+  SMBIOS_HANDLE                       RiscVType44;
+  SMBIOS_TABLE_TYPE44                 *Type44Ptr;
+  EFI_STATUS                          Status;
 
   DEBUG ((DEBUG_INFO, "Building Type 44 for...\n"));
   DEBUG ((DEBUG_VERBOSE, "     Processor GUID: %g\n", &Type4HobData->ProcessorGuid));
   DEBUG ((DEBUG_VERBOSE, "     Processor UUID: %d\n", Type4HobData->ProcessorUid));
 
-  GuidHob = (EFI_HOB_GUID_TYPE *)GetFirstGuidHob ((EFI_GUID *)PcdGetPtr(PcdProcessorSpecificDataGuidHobGuid));
+  GuidHob = (EFI_HOB_GUID_TYPE *)GetFirstGuidHob ((EFI_GUID *)PcdGetPtr (PcdProcessorSpecificDataGuidHobGuid));
   if (GuidHob == NULL) {
     DEBUG ((DEBUG_ERROR, "No RISC_V_PROCESSOR_SPECIFIC_HOB_DATA found.\n"));
     return EFI_NOT_FOUND;
   }
+
   //
   // Go through each RISC_V_PROCESSOR_SPECIFIC_HOB_DATA for multiple cores.
   //
   do {
     ProcessorSpecificData = (RISC_V_PROCESSOR_SPECIFIC_HOB_DATA *)GET_GUID_HOB_DATA (GuidHob);
     if (!CompareGuid (&ProcessorSpecificData->ParentProcessorGuid, &Type4HobData->ProcessorGuid) ||
-      ProcessorSpecificData->ParentProcessorUid != Type4HobData->ProcessorUid) {
-      GuidHob = GetNextGuidHob((EFI_GUID *)PcdGetPtr(PcdProcessorSpecificDataGuidHobGuid), GET_NEXT_HOB(GuidHob));
+        (ProcessorSpecificData->ParentProcessorUid != Type4HobData->ProcessorUid))
+    {
+      GuidHob = GetNextGuidHob ((EFI_GUID *)PcdGetPtr (PcdProcessorSpecificDataGuidHobGuid), GET_NEXT_HOB (GuidHob));
       if (GuidHob == NULL) {
         break;
       }
+
       continue;
     }
 
     DEBUG ((DEBUG_VERBOSE, "================================\n"));
     DEBUG ((DEBUG_VERBOSE, "Core GUID: %g\n", &ProcessorSpecificData->CoreGuid));
 
-    Type44Ptr = AllocateZeroPool(sizeof(SMBIOS_TABLE_TYPE44) + sizeof(SMBIOS_RISC_V_PROCESSOR_SPECIFIC_DATA) + 2); // Two ending zero.
+    Type44Ptr = AllocateZeroPool (sizeof (SMBIOS_TABLE_TYPE44) + sizeof (SMBIOS_RISC_V_PROCESSOR_SPECIFIC_DATA) + 2); // Two ending zero.
     if (Type44Ptr == NULL) {
       return EFI_NOT_FOUND;
     }
-    Type44Ptr->Hdr.Type = SMBIOS_TYPE_PROCESSOR_ADDITIONAL_INFORMATION;
-    Type44Ptr->Hdr.Handle = 0;
-    Type44Ptr->Hdr.Length = sizeof(SMBIOS_TABLE_TYPE44) + sizeof(SMBIOS_RISC_V_PROCESSOR_SPECIFIC_DATA);
-    Type44Ptr->RefHandle = Type4Handle;
-    Type44Ptr->ProcessorSpecificBlock.Length = sizeof(SMBIOS_RISC_V_PROCESSOR_SPECIFIC_DATA);
+
+    Type44Ptr->Hdr.Type                                 = SMBIOS_TYPE_PROCESSOR_ADDITIONAL_INFORMATION;
+    Type44Ptr->Hdr.Handle                               = 0;
+    Type44Ptr->Hdr.Length                               = sizeof (SMBIOS_TABLE_TYPE44) + sizeof (SMBIOS_RISC_V_PROCESSOR_SPECIFIC_DATA);
+    Type44Ptr->RefHandle                                = Type4Handle;
+    Type44Ptr->ProcessorSpecificBlock.Length            = sizeof (SMBIOS_RISC_V_PROCESSOR_SPECIFIC_DATA);
     Type44Ptr->ProcessorSpecificBlock.ProcessorArchType = Type4HobData->SmbiosType4Processor.ProcessorFamily2 -
                                                           ProcessorFamilyRiscvRV32 + \
                                                           ProcessorSpecificBlockArchTypeRiscVRV32;
@@ -251,15 +269,17 @@ BuildSmbiosType44 (
     // Add to SMBIOS table.
     //
     RiscVType44 = SMBIOS_HANDLE_PI_RESERVED;
-    Status = mSmbios->Add (mSmbios, NULL, &RiscVType44, &Type44Ptr->Hdr);
-    if (EFI_ERROR(Status)) {
+    Status      = mSmbios->Add (mSmbios, NULL, &RiscVType44, &Type44Ptr->Hdr);
+    if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Fail to add SMBIOS Type 44\n"));
       return Status;
     }
+
     DEBUG ((DEBUG_INFO, "SMBIOS Type 44 was added. SMBIOS Handle: 0x%x\n", RiscVType44));
 
-    GuidHob = GetNextGuidHob((EFI_GUID *)PcdGetPtr(PcdProcessorSpecificDataGuidHobGuid), GET_NEXT_HOB(GuidHob));
+    GuidHob = GetNextGuidHob ((EFI_GUID *)PcdGetPtr (PcdProcessorSpecificDataGuidHobGuid), GET_NEXT_HOB (GuidHob));
   } while (GuidHob != NULL);
+
   return EFI_SUCCESS;
 }
 
@@ -277,14 +297,14 @@ BuildSmbiosType44 (
 EFI_STATUS
 EFIAPI
 RiscVSmbiosBuilderEntry (
-  IN EFI_HANDLE                            ImageHandle,
-  IN EFI_SYSTEM_TABLE                      *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS Status;
-  EFI_HOB_GUID_TYPE *GuidHob;
-  RISC_V_PROCESSOR_TYPE4_HOB_DATA *Type4HobData;
-  SMBIOS_HANDLE Processor;
+  EFI_STATUS                       Status;
+  EFI_HOB_GUID_TYPE                *GuidHob;
+  RISC_V_PROCESSOR_TYPE4_HOB_DATA  *Type4HobData;
+  SMBIOS_HANDLE                    Processor;
 
   DEBUG ((DEBUG_INFO, "%a: entry\n", __FUNCTION__));
 
@@ -297,13 +317,15 @@ RiscVSmbiosBuilderEntry (
     DEBUG ((DEBUG_ERROR, "Locate SMBIOS Protocol fail\n"));
     return Status;
   }
-  GuidHob = (EFI_HOB_GUID_TYPE *)GetFirstGuidHob ((EFI_GUID *)PcdGetPtr(PcdProcessorSmbiosType4GuidHobGuid));
+
+  GuidHob = (EFI_HOB_GUID_TYPE *)GetFirstGuidHob ((EFI_GUID *)PcdGetPtr (PcdProcessorSmbiosType4GuidHobGuid));
   if (GuidHob == NULL) {
     DEBUG ((DEBUG_ERROR, "No RISC-V SMBIOS information found.\n"));
     return EFI_NOT_FOUND;
   }
+
   Type4HobData = (RISC_V_PROCESSOR_TYPE4_HOB_DATA *)GET_GUID_HOB_DATA (GuidHob);
-  Status = EFI_NOT_FOUND;
+  Status       = EFI_NOT_FOUND;
   //
   // Go through each RISC_V_PROCESSOR_TYPE4_HOB_DATA for multiple processors.
   //
@@ -313,15 +335,16 @@ RiscVSmbiosBuilderEntry (
       DEBUG ((DEBUG_ERROR, "No RISC-V SMBIOS type 4 created.\n"));
       ASSERT (FALSE);
     }
+
     Status = BuildSmbiosType44 (Type4HobData, Processor);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "No RISC-V SMBIOS type 44 found.\n"));
       ASSERT (FALSE);
     }
 
-    GuidHob = GetNextGuidHob((EFI_GUID *)PcdGetPtr(PcdProcessorSmbiosType4GuidHobGuid), GET_NEXT_HOB(GuidHob));
+    GuidHob = GetNextGuidHob ((EFI_GUID *)PcdGetPtr (PcdProcessorSmbiosType4GuidHobGuid), GET_NEXT_HOB (GuidHob));
   } while (GuidHob != NULL);
+
   DEBUG ((DEBUG_INFO, "%a: exit\n", __FUNCTION__));
   return Status;
 }
-

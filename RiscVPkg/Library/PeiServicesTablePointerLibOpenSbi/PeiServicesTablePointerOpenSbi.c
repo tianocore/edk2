@@ -1,7 +1,7 @@
 /** @file
   PEI Services Table Pointer Library.
 
-  Copyright (c) 2019 - 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2019 - 2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -28,18 +28,20 @@
 VOID
 EFIAPI
 SetPeiServicesTablePointer (
-  IN CONST EFI_PEI_SERVICES ** PeiServicesTablePointer
+  IN CONST EFI_PEI_SERVICES  **PeiServicesTablePointer
   )
 {
-  EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *FirmwareContext;
+  EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT  *FirmwareContext;
 
   GetFirmwareContextPointer (&FirmwareContext);
   FirmwareContext->PeiServiceTable = (VOID *)(UINTN)PeiServicesTablePointer;
 
-  DEBUG ((DEBUG_INFO, "Set PEI Service 0x%x at OpenSBI Firmware Context at 0x%x\n",
-         PeiServicesTablePointer,
-         FirmwareContext
-         ));
+  DEBUG ((
+    DEBUG_INFO,
+    "Set PEI Service 0x%x at OpenSBI Firmware Context at 0x%x\n",
+    PeiServicesTablePointer,
+    FirmwareContext
+    ));
 }
 
 /**
@@ -60,7 +62,7 @@ GetPeiServicesTablePointer (
   VOID
   )
 {
-  EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *FirmwareContext;
+  EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT  *FirmwareContext;
 
   GetFirmwareContextPointer (&FirmwareContext);
   return (CONST EFI_PEI_SERVICES **)FirmwareContext->PeiServiceTable;
@@ -81,8 +83,8 @@ GetPeiServicesTablePointer (
 EFI_STATUS
 EFIAPI
 PeiServicesTablePointerLibOpenSbiConstructor (
-  IN EFI_PEI_FILE_HANDLE        FileHandle,
-  IN CONST EFI_PEI_SERVICES     **PeiServices
+  IN EFI_PEI_FILE_HANDLE     FileHandle,
+  IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
   SetPeiServicesTablePointer (PeiServices);

@@ -2,7 +2,7 @@
   This instance uses Supervisor mode SCRATCH CSR to get/set the
   pointer of firmware context.
 
-  Copyright (c) 2021 Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2021-2022 Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -25,7 +25,7 @@
 VOID
 EFIAPI
 GetFirmwareContextPointer (
-  IN OUT EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT **FirmwareContextPtr
+  IN OUT EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT  **FirmwareContextPtr
   )
 {
   *FirmwareContextPtr = (EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *)RiscVGetSupervisorScratch ();
@@ -41,7 +41,7 @@ GetFirmwareContextPointer (
 VOID
 EFIAPI
 SetFirmwareContextPointer (
-  IN EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *FirmwareContextPtr
+  IN EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT  *FirmwareContextPtr
   )
 {
   RiscVSetSupervisorScratch ((UINT64)FirmwareContextPtr);

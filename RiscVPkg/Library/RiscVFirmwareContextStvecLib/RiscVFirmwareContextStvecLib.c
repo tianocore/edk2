@@ -25,7 +25,7 @@
 VOID
 EFIAPI
 GetFirmwareContextPointer (
-  IN OUT EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT **FirmwareContextPtr
+  IN OUT EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT  **FirmwareContextPtr
   )
 {
   *FirmwareContextPtr = (EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *)RiscVGetSupervisorStvec ();
@@ -41,7 +41,7 @@ GetFirmwareContextPointer (
 VOID
 EFIAPI
 SetFirmwareContextPointer (
-  IN EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *FirmwareContextPtr
+  IN EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT  *FirmwareContextPtr
   )
 {
   RiscVSetSupervisorStvec ((UINT64)FirmwareContextPtr);

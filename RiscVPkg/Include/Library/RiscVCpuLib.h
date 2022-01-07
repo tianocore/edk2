@@ -1,7 +1,7 @@
 /** @file
   RISC-V CPU library definitions.
 
-  Copyright (c) 2016 - 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2016 - 2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -21,66 +21,98 @@ VOID
   );
 
 VOID
-RiscVSetMachineScratch (RISCV_MACHINE_MODE_CONTEXT *RiscvContext);
+RiscVSetMachineScratch (
+  RISCV_MACHINE_MODE_CONTEXT  *RiscvContext
+  );
 
 UINT32
-RiscVGetMachineScratch (VOID);
+RiscVGetMachineScratch (
+  VOID
+  );
 
 UINT32
-RiscVGetMachineTrapCause (VOID);
+RiscVGetMachineTrapCause (
+  VOID
+  );
 
 UINT64
-RiscVReadMachineTimer (VOID);
+RiscVReadMachineTimer (
+  VOID
+  );
 
 UINT64
-RiscVReadMachineTimerInterface (VOID);
+RiscVReadMachineTimerInterface (
+  VOID
+  );
 
 VOID
-RiscVSetMachineTimerCmp (UINT64);
+  RiscVSetMachineTimerCmp (UINT64);
 
 UINT64
-RiscVReadMachineTimerCmp(VOID);
+RiscVReadMachineTimerCmp (
+  VOID
+  );
 
 UINT64
-RiscVReadMachineInterruptEnable(VOID);
+RiscVReadMachineInterruptEnable (
+  VOID
+  );
 
 UINT64
-RiscVReadMachineInterruptPending(VOID);
+RiscVReadMachineInterruptPending (
+  VOID
+  );
 
 UINT64
-RiscVReadMachineStatus(VOID);
+RiscVReadMachineStatus (
+  VOID
+  );
 
 VOID
-RiscVWriteMachineStatus(UINT64);
+  RiscVWriteMachineStatus (UINT64);
 
 UINT64
-RiscVReadMachineTrapVector(VOID);
+RiscVReadMachineTrapVector (
+  VOID
+  );
 
 UINT64
-RiscVReadMachineIsa (VOID);
+RiscVReadMachineIsa (
+  VOID
+  );
 
 UINT64
-RiscVReadMachineVendorId (VOID);
+RiscVReadMachineVendorId (
+  VOID
+  );
 
 UINT64
-RiscVReadMachineArchitectureId (VOID);
+RiscVReadMachineArchitectureId (
+  VOID
+  );
 
 UINT64
-RiscVReadMachineImplementId (VOID);
+RiscVReadMachineImplementId (
+  VOID
+  );
 
 VOID
-RiscVSetSupervisorAddressTranslationRegister(UINT64);
+  RiscVSetSupervisorAddressTranslationRegister (UINT64);
 
 VOID
-RiscVSetSupervisorScratch (UINT64);
+  RiscVSetSupervisorScratch (UINT64);
 
 UINT64
-RiscVGetSupervisorScratch (VOID);
+RiscVGetSupervisorScratch (
+  VOID
+  );
 
 VOID
-RiscVSetSupervisorStvec (UINT64);
+  RiscVSetSupervisorStvec (UINT64);
 
 UINT64
-RiscVGetSupervisorStvec (VOID);
+RiscVGetSupervisorStvec (
+  VOID
+  );
 
 #endif

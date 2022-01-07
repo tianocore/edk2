@@ -17,7 +17,7 @@
 
 #include "CpuExceptionHandlerLib.h"
 
-STATIC EFI_CPU_INTERRUPT_HANDLER mInterruptHandlers[2];
+STATIC EFI_CPU_INTERRUPT_HANDLER  mInterruptHandlers[2];
 
 /**
   Initializes all CPU exceptions entries and provides the default exception handlers.
@@ -38,7 +38,7 @@ STATIC EFI_CPU_INTERRUPT_HANDLER mInterruptHandlers[2];
 EFI_STATUS
 EFIAPI
 InitializeCpuExceptionHandlers (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
   )
 {
   return EFI_SUCCESS;
@@ -63,7 +63,7 @@ InitializeCpuExceptionHandlers (
 EFI_STATUS
 EFIAPI
 InitializeCpuInterruptHandlers (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
   )
 {
   return EFI_SUCCESS;
@@ -95,15 +95,15 @@ InitializeCpuInterruptHandlers (
 EFI_STATUS
 EFIAPI
 RegisterCpuInterruptHandler (
-  IN EFI_EXCEPTION_TYPE            InterruptType,
-  IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
+  IN EFI_EXCEPTION_TYPE         InterruptType,
+  IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler
   )
 {
-
   DEBUG ((DEBUG_INFO, "%a: Type:%x Handler: %x\n", __FUNCTION__, InterruptType, InterruptHandler));
   mInterruptHandlers[InterruptType] = InterruptHandler;
   return EFI_SUCCESS;
 }
+
 /**
   Machine mode trap handler.
 
@@ -112,23 +112,23 @@ RegisterCpuInterruptHandler (
 **/
 VOID
 RiscVSupervisorModeTrapHandler (
-  SMODE_TRAP_REGISTERS *SmodeTrapReg
+  SMODE_TRAP_REGISTERS  *SmodeTrapReg
   )
 {
-  UINTN SCause;
-  EFI_SYSTEM_CONTEXT RiscVSystemContext;
+  UINTN               SCause;
+  EFI_SYSTEM_CONTEXT  RiscVSystemContext;
 
   RiscVSystemContext.SystemContextRiscV64 = (EFI_SYSTEM_CONTEXT_RISCV64 *)SmodeTrapReg;
   //
   // Check scasue register.
   //
-  SCause = (UINTN)csr_read(RISCV_CSR_SUPERVISOR_SCAUSE);
+  SCause = (UINTN)csr_read (RISCV_CSR_SUPERVISOR_SCAUSE);
   if ((SCause & (1UL << (sizeof (UINTN) * 8- 1))) != 0) {
     //
     // This is interrupt event.
     //
     SCause &= ~(1UL << (sizeof (UINTN) * 8- 1));
-    if((SCause == SCAUSE_SUPERVISOR_TIMER_INT) && (mInterruptHandlers[EXCEPT_RISCV_TIMER_INT] != NULL)) {
+    if ((SCause == SCAUSE_SUPERVISOR_TIMER_INT) && (mInterruptHandlers[EXCEPT_RISCV_TIMER_INT] != NULL)) {
       mInterruptHandlers[EXCEPT_RISCV_TIMER_INT](EXCEPT_RISCV_TIMER_INT, RiscVSystemContext);
     }
   }
@@ -160,8 +160,8 @@ RiscVSupervisorModeTrapHandler (
 EFI_STATUS
 EFIAPI
 InitializeCpuExceptionHandlersEx (
-  IN EFI_VECTOR_HANDOFF_INFO            *VectorInfo OPTIONAL,
-  IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL,
+  IN CPU_EXCEPTION_INIT_DATA  *InitData OPTIONAL
   )
 {
   return InitializeCpuExceptionHandlers (VectorInfo);
@@ -188,7 +188,7 @@ CpuExceptionHandlerLibConstructor (
   //
   // Set Supervisor mode trap handler.
   //
-  csr_write(CSR_STVEC, SupervisorModeTrap);
+  csr_write (CSR_STVEC, SupervisorModeTrap);
 
   return EFI_SUCCESS;
 }

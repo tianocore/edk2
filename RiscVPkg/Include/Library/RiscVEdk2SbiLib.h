@@ -21,20 +21,20 @@
 //
 // EDK2 OpenSBI Firmware extension.
 //
-#define SBI_EDK2_FW_EXT (SBI_EXT_FIRMWARE_START | SBI_OPENSBI_IMPID)
+#define SBI_EDK2_FW_EXT  (SBI_EXT_FIRMWARE_START | SBI_OPENSBI_IMPID)
 //
 // EDK2 OpenSBI Firmware extension functions.
 //
-#define SBI_EXT_FW_MSCRATCH_FUNC        0
-#define SBI_EXT_FW_MSCRATCH_HARTID_FUNC 1
+#define SBI_EXT_FW_MSCRATCH_FUNC         0
+#define SBI_EXT_FW_MSCRATCH_HARTID_FUNC  1
 
 //
 // EDK2 OpenSBI firmware extension return status.
 //
 typedef struct {
-  UINTN Error;   ///< SBI status code
-  UINTN Value;   ///< Value returned
-} SbiRet;
+  UINTN    Error; ///< SBI status code
+  UINTN    Value; ///< Value returned
+} SBI_RET;
 
 /**
   Get the implemented SBI specification version
@@ -48,7 +48,7 @@ typedef struct {
 VOID
 EFIAPI
 SbiGetSpecVersion (
-  OUT UINTN                       *SpecVersion
+  OUT UINTN  *SpecVersion
   );
 
 /**
@@ -62,7 +62,7 @@ SbiGetSpecVersion (
 VOID
 EFIAPI
 SbiGetImplId (
-  OUT UINTN                      *ImplId
+  OUT UINTN  *ImplId
   );
 
 /**
@@ -76,7 +76,7 @@ SbiGetImplId (
 VOID
 EFIAPI
 SbiGetImplVersion (
-  OUT UINTN                       *ImplVersion
+  OUT UINTN  *ImplVersion
   );
 
 /**
@@ -91,8 +91,8 @@ SbiGetImplVersion (
 VOID
 EFIAPI
 SbiProbeExtension (
-  IN  INTN                         ExtensionId,
-  OUT INTN                        *ProbeResult
+  IN  INTN  ExtensionId,
+  OUT INTN  *ProbeResult
   );
 
 /**
@@ -105,7 +105,7 @@ SbiProbeExtension (
 VOID
 EFIAPI
 SbiGetMachineVendorId (
-  OUT UINTN                       *MachineVendorId
+  OUT UINTN  *MachineVendorId
   );
 
 /**
@@ -118,7 +118,7 @@ SbiGetMachineVendorId (
 VOID
 EFIAPI
 SbiGetMachineArchId (
-  OUT UINTN                       *MachineArchId
+  OUT UINTN  *MachineArchId
   );
 
 /**
@@ -131,7 +131,7 @@ SbiGetMachineArchId (
 VOID
 EFIAPI
 SbiGetMachineImplId (
-  OUT UINTN                       *MachineImplId
+  OUT UINTN  *MachineImplId
   );
 
 /**
@@ -160,9 +160,9 @@ SbiGetMachineImplId (
 EFI_STATUS
 EFIAPI
 SbiHartStart (
-  IN  UINTN                          HartId,
-  IN  UINTN                          StartAddr,
-  IN  UINTN                          Priv
+  IN  UINTN  HartId,
+  IN  UINTN  StartAddr,
+  IN  UINTN  Priv
   );
 
 /**
@@ -199,8 +199,8 @@ SbiHartStop (
 EFI_STATUS
 EFIAPI
 SbiHartGetStatus (
-  IN  UINTN                          HartId,
-  OUT UINTN                         *HartStatus
+  IN  UINTN  HartId,
+  OUT UINTN  *HartStatus
   );
 
 ///
@@ -218,7 +218,7 @@ SbiHartGetStatus (
 VOID
 EFIAPI
 SbiSetTimer (
-  IN  UINT64                         Time
+  IN  UINT64  Time
   );
 
 ///
@@ -244,8 +244,8 @@ SbiSetTimer (
 EFI_STATUS
 EFIAPI
 SbiSendIpi (
-  IN  UINTN                         *HartMask,
-  IN  UINTN                          HartMaskBase
+  IN  UINTN  *HartMask,
+  IN  UINTN  HartMaskBase
   );
 
 ///
@@ -268,8 +268,8 @@ SbiSendIpi (
 EFI_STATUS
 EFIAPI
 SbiRemoteFenceI (
-  IN  UINTN                         *HartMask,
-  IN  UINTN                          HartMaskBase
+  IN  UINTN  *HartMask,
+  IN  UINTN  HartMaskBase
   );
 
 /**
@@ -296,10 +296,10 @@ SbiRemoteFenceI (
 EFI_STATUS
 EFIAPI
 SbiRemoteSfenceVma (
-  IN  UINTN                         *HartMask,
-  IN  UINTN                          HartMaskBase,
-  IN  UINTN                          StartAddr,
-  IN  UINTN                          Size
+  IN  UINTN  *HartMask,
+  IN  UINTN  HartMaskBase,
+  IN  UINTN  StartAddr,
+  IN  UINTN  Size
   );
 
 /**
@@ -327,11 +327,11 @@ SbiRemoteSfenceVma (
 EFI_STATUS
 EFIAPI
 SbiRemoteSfenceVmaAsid (
-  IN  UINTN                         *HartMask,
-  IN  UINTN                          HartMaskBase,
-  IN  UINTN                          StartAddr,
-  IN  UINTN                          Size,
-  IN  UINTN                          Asid
+  IN  UINTN  *HartMask,
+  IN  UINTN  HartMaskBase,
+  IN  UINTN  StartAddr,
+  IN  UINTN  Size,
+  IN  UINTN  Asid
   );
 
 /**
@@ -363,11 +363,11 @@ SbiRemoteSfenceVmaAsid (
 EFI_STATUS
 EFIAPI
 SbiRemoteHfenceGvmaVmid (
-  IN  UINTN                         *HartMask,
-  IN  UINTN                          HartMaskBase,
-  IN  UINTN                          StartAddr,
-  IN  UINTN                          Size,
-  IN  UINTN                          Vmid
+  IN  UINTN  *HartMask,
+  IN  UINTN  HartMaskBase,
+  IN  UINTN  StartAddr,
+  IN  UINTN  Size,
+  IN  UINTN  Vmid
   );
 
 /**
@@ -398,10 +398,10 @@ SbiRemoteHfenceGvmaVmid (
 EFI_STATUS
 EFIAPI
 SbiRemoteHfenceGvma (
-  IN  UINTN                         *HartMask,
-  IN  UINTN                          HartMaskBase,
-  IN  UINTN                          StartAddr,
-  IN  UINTN                          Size
+  IN  UINTN  *HartMask,
+  IN  UINTN  HartMaskBase,
+  IN  UINTN  StartAddr,
+  IN  UINTN  Size
   );
 
 /**
@@ -433,11 +433,11 @@ SbiRemoteHfenceGvma (
 EFI_STATUS
 EFIAPI
 SbiRemoteHfenceVvmaAsid (
-  IN  UINTN                         *HartMask,
-  IN  UINTN                          HartMaskBase,
-  IN  UINTN                          StartAddr,
-  IN  UINTN                          Size,
-  IN  UINTN                          Asid
+  IN  UINTN  *HartMask,
+  IN  UINTN  HartMaskBase,
+  IN  UINTN  StartAddr,
+  IN  UINTN  Size,
+  IN  UINTN  Asid
   );
 
 /**
@@ -468,10 +468,10 @@ SbiRemoteHfenceVvmaAsid (
 EFI_STATUS
 EFIAPI
 SbiRemoteHfenceVvma (
-  IN  UINTN                         *HartMask,
-  IN  UINTN                          HartMaskBase,
-  IN  UINTN                          StartAddr,
-  IN  UINTN                          Size
+  IN  UINTN  *HartMask,
+  IN  UINTN  HartMaskBase,
+  IN  UINTN  StartAddr,
+  IN  UINTN  Size
   );
 
 ///
@@ -506,8 +506,8 @@ SbiRemoteHfenceVvma (
 EFI_STATUS
 EFIAPI
 SbiSystemReset (
-  IN  UINTN                          ResetType,
-  IN  UINTN                          ResetReason
+  IN  UINTN  ResetType,
+  IN  UINTN  ResetReason
   );
 
 ///
@@ -531,9 +531,9 @@ SbiSystemReset (
 EFI_STATUS
 EFIAPI
 SbiVendorCall (
-  IN  UINTN                          ExtensionId,
-  IN  UINTN                          FunctionId,
-  IN  UINTN                          NumArgs,
+  IN  UINTN  ExtensionId,
+  IN  UINTN  FunctionId,
+  IN  UINTN  NumArgs,
   ...
   );
 
@@ -555,7 +555,7 @@ SbiVendorCall (
 VOID
 EFIAPI
 SbiGetMscratch (
-  OUT SBI_SCRATCH                    **ScratchSpace
+  OUT SBI_SCRATCH  **ScratchSpace
   );
 
 /**
@@ -567,8 +567,8 @@ SbiGetMscratch (
 VOID
 EFIAPI
 SbiGetMscratchHartid (
-  IN  UINTN                            HartId,
-  OUT SBI_SCRATCH                    **ScratchSpace
+  IN  UINTN        HartId,
+  OUT SBI_SCRATCH  **ScratchSpace
   );
 
 /**
@@ -579,7 +579,7 @@ SbiGetMscratchHartid (
 VOID
 EFIAPI
 SbiGetFirmwareContext (
-  OUT EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT **FirmwareContext
+  OUT EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT  **FirmwareContext
   );
 
 /**
@@ -590,7 +590,7 @@ SbiGetFirmwareContext (
 VOID
 EFIAPI
 SbiSetFirmwareContext (
-  IN EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *FirmwareContext
+  IN EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT  *FirmwareContext
   );
 
 #endif

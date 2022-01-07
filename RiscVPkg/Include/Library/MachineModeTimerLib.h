@@ -10,6 +10,8 @@
 #define MACHINE_MODE_TIMER_LIB_H_
 
 UINT64
-RiscVReadMachineTimerInterface (VOID);
+RiscVReadMachineTimerInterface (
+  VOID
+  );
 
 #endif

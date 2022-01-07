@@ -1,7 +1,7 @@
 /** @file
   RISC-V CPU DXE driver.
 
-  Copyright (c) 2016 - 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2016 - 2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -12,8 +12,8 @@
 //
 // Global Variables
 //
-STATIC BOOLEAN mInterruptState = FALSE;
-STATIC EFI_HANDLE mCpuHandle = NULL;
+STATIC BOOLEAN     mInterruptState = FALSE;
+STATIC EFI_HANDLE  mCpuHandle      = NULL;
 
 EFI_CPU_ARCH_PROTOCOL  gCpu = {
   CpuFlushCpuDataCache,
@@ -50,15 +50,14 @@ EFI_CPU_ARCH_PROTOCOL  gCpu = {
 EFI_STATUS
 EFIAPI
 CpuFlushCpuDataCache (
-  IN EFI_CPU_ARCH_PROTOCOL     *This,
-  IN EFI_PHYSICAL_ADDRESS      Start,
-  IN UINT64                    Length,
-  IN EFI_CPU_FLUSH_TYPE        FlushType
+  IN EFI_CPU_ARCH_PROTOCOL  *This,
+  IN EFI_PHYSICAL_ADDRESS   Start,
+  IN UINT64                 Length,
+  IN EFI_CPU_FLUSH_TYPE     FlushType
   )
 {
   return EFI_SUCCESS;
 }
-
 
 /**
   Enables CPU interrupts.
@@ -72,14 +71,13 @@ CpuFlushCpuDataCache (
 EFI_STATUS
 EFIAPI
 CpuEnableInterrupt (
-  IN EFI_CPU_ARCH_PROTOCOL          *This
+  IN EFI_CPU_ARCH_PROTOCOL  *This
   )
 {
   EnableInterrupts ();
   mInterruptState = TRUE;
   return EFI_SUCCESS;
 }
-
 
 /**
   Disables CPU interrupts.
@@ -93,14 +91,13 @@ CpuEnableInterrupt (
 EFI_STATUS
 EFIAPI
 CpuDisableInterrupt (
-  IN EFI_CPU_ARCH_PROTOCOL     *This
+  IN EFI_CPU_ARCH_PROTOCOL  *This
   )
 {
   DisableInterrupts ();
   mInterruptState = FALSE;
   return EFI_SUCCESS;
 }
-
 
 /**
   Return the state of interrupts.
@@ -115,8 +112,8 @@ CpuDisableInterrupt (
 EFI_STATUS
 EFIAPI
 CpuGetInterruptState (
-  IN  EFI_CPU_ARCH_PROTOCOL     *This,
-  OUT BOOLEAN                   *State
+  IN  EFI_CPU_ARCH_PROTOCOL  *This,
+  OUT BOOLEAN                *State
   )
 {
   if (State == NULL) {
@@ -126,7 +123,6 @@ CpuGetInterruptState (
   *State = mInterruptState;
   return EFI_SUCCESS;
 }
-
 
 /**
   Generates an INIT to the CPU.
@@ -143,13 +139,12 @@ CpuGetInterruptState (
 EFI_STATUS
 EFIAPI
 CpuInit (
-  IN EFI_CPU_ARCH_PROTOCOL      *This,
-  IN EFI_CPU_INIT_TYPE          InitType
+  IN EFI_CPU_ARCH_PROTOCOL  *This,
+  IN EFI_CPU_INIT_TYPE      InitType
   )
 {
   return EFI_UNSUPPORTED;
 }
-
 
 /**
   Registers a function to be called from the CPU interrupt handler.
@@ -174,14 +169,13 @@ CpuInit (
 EFI_STATUS
 EFIAPI
 CpuRegisterInterruptHandler (
-  IN EFI_CPU_ARCH_PROTOCOL         *This,
-  IN EFI_EXCEPTION_TYPE            InterruptType,
-  IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
+  IN EFI_CPU_ARCH_PROTOCOL      *This,
+  IN EFI_EXCEPTION_TYPE         InterruptType,
+  IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler
   )
 {
   return RegisterCpuInterruptHandler (InterruptType, InterruptHandler);
 }
-
 
 /**
   Returns a timer value from one of the CPU's internal timers. There is no
@@ -209,10 +203,10 @@ CpuRegisterInterruptHandler (
 EFI_STATUS
 EFIAPI
 CpuGetTimerValue (
-  IN  EFI_CPU_ARCH_PROTOCOL     *This,
-  IN  UINT32                    TimerIndex,
-  OUT UINT64                    *TimerValue,
-  OUT UINT64                    *TimerPeriod OPTIONAL
+  IN  EFI_CPU_ARCH_PROTOCOL  *This,
+  IN  UINT32                 TimerIndex,
+  OUT UINT64                 *TimerValue,
+  OUT UINT64                 *TimerPeriod OPTIONAL
   )
 {
   if (TimerValue == NULL) {
@@ -225,14 +219,14 @@ CpuGetTimerValue (
 
   *TimerValue = (UINT64)RiscVReadMachineTimerInterface ();
   if (TimerPeriod != NULL) {
-    *TimerPeriod  = DivU64x32 (
-                      1000000000000000u,
-                      PcdGet64 (PcdRiscVMachineTimerFrequencyInHerz)
-                      );
+    *TimerPeriod = DivU64x32 (
+                     1000000000000000u,
+                     PcdGet64 (PcdRiscVMachineTimerFrequencyInHerz)
+                     );
   }
+
   return EFI_SUCCESS;
 }
-
 
 /**
   Implementation of SetMemoryAttributes() service of CPU Architecture Protocol.
@@ -262,10 +256,10 @@ CpuGetTimerValue (
 EFI_STATUS
 EFIAPI
 CpuSetMemoryAttributes (
-  IN EFI_CPU_ARCH_PROTOCOL     *This,
-  IN EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN UINT64                    Length,
-  IN UINT64                    Attributes
+  IN EFI_CPU_ARCH_PROTOCOL  *This,
+  IN EFI_PHYSICAL_ADDRESS   BaseAddress,
+  IN UINT64                 Length,
+  IN UINT64                 Attributes
   )
 {
   DEBUG ((DEBUG_INFO, "%a: Set memory attributes not supported yet\n", __FUNCTION__));
@@ -286,8 +280,8 @@ CpuSetMemoryAttributes (
 EFI_STATUS
 EFIAPI
 InitializeCpu (
-  IN EFI_HANDLE                            ImageHandle,
-  IN EFI_SYSTEM_TABLE                      *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -307,10 +301,10 @@ InitializeCpu (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mCpuHandle,
-                  &gEfiCpuArchProtocolGuid, &gCpu,
+                  &gEfiCpuArchProtocolGuid,
+                  &gCpu,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
   return Status;
 }
-

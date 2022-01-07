@@ -1,7 +1,7 @@
 /** @file
   RISC-V instance of Timer Library.
 
-  Copyright (c) 2016 - 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2016 - 2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -24,21 +24,21 @@
 **/
 VOID
 InternalRiscVTimerDelay (
-  IN UINT32 Delay
+  IN UINT32  Delay
   )
 {
-  UINT32                            Ticks;
-  UINT32                            Times;
+  UINT32  Ticks;
+  UINT32  Times;
 
-  Times = Delay >> (RISCV_TIMER_COMPARE_BITS - 2);
-  Delay &= (( 1 << (RISCV_TIMER_COMPARE_BITS - 2)) - 1);
+  Times  = Delay >> (RISCV_TIMER_COMPARE_BITS - 2);
+  Delay &= ((1 << (RISCV_TIMER_COMPARE_BITS - 2)) - 1);
   do {
     //
     // The target timer count is calculated here
     //
     Ticks = RiscVReadMachineTimerInterface () + Delay;
     Delay = 1 << (RISCV_TIMER_COMPARE_BITS - 2);
-    while (((Ticks - RiscVReadMachineTimerInterface ()) & ( 1 << (RISCV_TIMER_COMPARE_BITS - 1))) == 0) {
+    while (((Ticks - RiscVReadMachineTimerInterface ()) & (1 << (RISCV_TIMER_COMPARE_BITS - 1))) == 0) {
       CpuPause ();
     }
   } while (Times-- > 0);
@@ -57,7 +57,7 @@ InternalRiscVTimerDelay (
 UINTN
 EFIAPI
 MicroSecondDelay (
-  IN UINTN MicroSeconds
+  IN UINTN  MicroSeconds
   )
 {
   InternalRiscVTimerDelay (
@@ -85,7 +85,7 @@ MicroSecondDelay (
 UINTN
 EFIAPI
 NanoSecondDelay (
-  IN UINTN NanoSeconds
+  IN UINTN  NanoSeconds
   )
 {
   InternalRiscVTimerDelay (
@@ -147,7 +147,7 @@ GetPerformanceCounter (
 UINT64
 EFIAPI
 GetPerformanceCounterProperties (
-  OUT      UINT64                    *StartValue,  OPTIONAL
+  OUT      UINT64 *StartValue, OPTIONAL
   OUT      UINT64                    *EndValue     OPTIONAL
   )
 {
@@ -176,7 +176,7 @@ GetPerformanceCounterProperties (
 UINT64
 EFIAPI
 GetTimeInNanoSecond (
-  IN      UINT64                     Ticks
+  IN      UINT64  Ticks
   )
 {
   UINT64  NanoSeconds;
@@ -193,7 +193,7 @@ GetTimeInNanoSecond (
   // Frequency < 0x100000000, so Remainder < 0x100000000, then (Remainder * 1,000,000,000)
   // will not overflow 64-bit.
   //
-  NanoSeconds += DivU64x32 (MultU64x32 ((UINT64) Remainder, 1000000000u), PcdGet64 (PcdRiscVMachineTimerFrequencyInHerz));
+  NanoSeconds += DivU64x32 (MultU64x32 ((UINT64)Remainder, 1000000000u), PcdGet64 (PcdRiscVMachineTimerFrequencyInHerz));
 
   return NanoSeconds;
 }

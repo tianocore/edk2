@@ -25,7 +25,7 @@
 VOID
 EFIAPI
 GetFirmwareContextPointer (
-  IN OUT EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT **FirmwareContextPtr
+  IN OUT EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT  **FirmwareContextPtr
   )
 {
   SbiGetFirmwareContext (FirmwareContextPtr);
@@ -41,7 +41,7 @@ GetFirmwareContextPointer (
 VOID
 EFIAPI
 SetFirmwareContextPointer (
-  IN EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *FirmwareContextPtr
+  IN EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT  *FirmwareContextPtr
   )
 {
   //
@@ -49,4 +49,3 @@ SetFirmwareContextPointer (
   // OpenSBI FW Extension SBI.
   //
 }
-

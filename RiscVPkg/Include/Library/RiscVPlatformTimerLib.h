@@ -10,12 +10,16 @@
 #define RISCV_PLATFORM_TIMER_LIB_H_
 
 UINT64
-RiscVReadMachineTimer (VOID);
+RiscVReadMachineTimer (
+  VOID
+  );
 
 VOID
-RiscVSetMachineTimerCmp (UINT64);
+  RiscVSetMachineTimerCmp (UINT64);
 
 UINT64
-RiscVReadMachineTimerCmp(VOID);
+RiscVReadMachineTimerCmp (
+  VOID
+  );
 
 #endif

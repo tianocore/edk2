@@ -1,7 +1,7 @@
 /** @file
   Library to get/set Firmware Context.
 
-  Copyright (c) 2021, Hewlett Packard Development LP. All rights reserved.<BR>
+  Copyright (c) 2021-2022, Hewlett Packard Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -24,7 +24,7 @@
 VOID
 EFIAPI
 GetFirmwareContextPointer (
-  IN OUT EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT **FirmwareContextPtr
+  IN OUT EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT  **FirmwareContextPtr
   );
 
 /**
@@ -37,7 +37,7 @@ GetFirmwareContextPointer (
 VOID
 EFIAPI
 SetFirmwareContextPointer (
-  IN EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *FirmwareContextPtr
+  IN EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT  *FirmwareContextPtr
   );
 
 #endif
