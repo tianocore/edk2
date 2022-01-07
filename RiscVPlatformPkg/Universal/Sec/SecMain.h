@@ -1,7 +1,7 @@
 /** @file
   RISC-V SEC phase module definitions..
 
-  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2019-2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -35,7 +35,7 @@
 
 **/
 INT32
-SecPostOpenSbiPlatformEarlylInit(
+SecPostOpenSbiPlatformEarlyInit(
   IN BOOLEAN ColdBoot
   );
 

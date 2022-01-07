@@ -1,8 +1,8 @@
 ## @file
 #  This is the library module of RISC-V EDK2 OpenSBI Firmware Context
-#  Processor Specific hwardware information.
+#  Processor Specific hardware information.
 #
-#  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#  Copyright (c) 2019-2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #

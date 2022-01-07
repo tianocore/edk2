@@ -26,16 +26,16 @@ differently from the default settings according to the OEM platform design.
 to align with OpenSBI project. As mentioned earlier, ***RiscVOpensbiLib*** provides the RISC-V SBI
 implementation and initialize the OpenSBI boot flow. SEC module is also linked with below libraries,
 - edk2 [OpenSbiPlatformLib](#OpenSbiPlatformLib-library) library that provides the generic RISC-V platform initialization code.
-- edk2 [RiscVSpecifialPlatformLib](#RiscVSpecifialPlatformLib-library) library which is provided by the RISC-V
+- edk2 [RiscVSpecialPlatformLib](#RiscVSpecialPlatformLib-library) library which is provided by the RISC-V
 platform vendor for the platform-specific initialization. The underlying implementation of above two edk2 libraries
 are from OpenSBI project. edk2 libraries are introduced as the wrapper libraries that separates and organizes OpenSBI core and platform code based on edk2 framework and the the build mechanism for edk2 RISC-V platforms. ***RiscVOpensbiLib*** library is located under [RISC-V ProcessorPkg](https://github.com/tianocore/edk2-platforms/tree/master/Silicon/RISC-V/ProcessorPkg) while the platform code (e.g. OpenSbiPlatformLib) is located under [RISC-V PlatformPkg](https://github.com/tianocore/edk2-platforms/tree/master/Platform/RISC-V/PlatformPkg).
-- edk2 [RiscVSpecifialPlatformLib](#riscvspecifialplatformlib) library is provided by the platform vendor and located under edk2 RISC-V platform-specific folder.
+- edk2 [RiscVSpecialPlatformLib](#riscvspecialplatformlib) library is provided by the platform vendor and located under edk2 RISC-V platform-specific folder.
 
 ##### OpenSbiPlatformLib Library
 [Indicated as #2 in the figure](#risc-v-edk2-port-design-diagrams)
 > ***OpenSbiPlatformLib*** provides the generic RISC-V platform initialization code. Platform vendor can just utilize this library if they don't have additional requirements on the platform initialization.
 
-##### RiscVSpecifialPlatformLib Library
+##### RiscVSpecialPlatformLib Library
 [Indicated as #3 in the figure](#risc-v-edk2-port-design-diagrams)
 > The major use case of this library is to facilitate the interfaces for platform vendors to provide the special
 platform initialization based on the generic platform initialization library.
@@ -57,7 +57,7 @@ privilege according to the PCD.
 
 #### PEI Phase
 SEC module hands off the boot process to PEI core in the privilege configured by ***PcdPeiCorePrivilegeMode*** PCD *(TODO, currently the privilege is forced to S-mode)*. PEI and later phases are allowed to executed in M-mode
-if the platform doesn't require Hypervisor-extended Supervisor mode (HS-mode) for the virtualization. RISC-V edk2 port provides its own instance ***PeiCoreEntryPoint*** library [(indicated as #7 in the figure)](#risc-v-edk2-port-design-diagrams) and linked with [PlatformSecPpiLib](#platformsecppilib-library) in order to support the S-mode PEI phase. PEI core requires [RiscVFirmwareContextLib](#riscVfirmwarecontextlib-library) library to retrieve the information of RISC-V HARTs and platform (e.g. FDT) configurations that built up in SEC phase. ***PeiServicePointer*** is also maintained in the ***RISC-V OpenSBI FirmwareContext*** structure and the pointer is retrieved by [PeiServiceTablePointerOpensbi](#peiservicetablepointeropensbi-library) library.
+if the platform doesn't require Hypervisor-extended Supervisor mode (HS-mode) for the virtualization. RISC-V edk2 port provides its own instance ***PeiCoreEntryPoint*** library [(indicated as #7 in the figure)](#risc-v-edk2-port-design-diagrams) and linked with [PlatformSecPpiLib](#platformsecppilib-library) in order to support the S-mode PEI phase. PEI core requires [RiscVFirmwareContextLib](#riscvfirmwarecontextlib-library) library to retrieve the information of RISC-V HARTs and platform (e.g. FDT) configurations that built up in SEC phase. ***PeiServicePointer*** is also maintained in the ***RISC-V OpenSBI FirmwareContext*** structure and the pointer is retrieved by [PeiServiceTablePointerOpensbi](#peiservicetablepointeropensbi-library) library.
 
 ##### PlatformSecPpiLib Library
 [Indicated as #8 in the figure](#risc-v-edk2-port-design-diagrams)
@@ -178,7 +178,7 @@ The PCD settings regard to EFI Variable
 |PcdVariableFdSize| The EFI variable firmware device size|
 |PcdVariableFdBlockSize| The block size of EFI variable firmware device|
 |PcdPlatformFlashNvStorageVariableBase| EFI variable base address within firmware device|
-|PcdPlatformFlashNvStorageFtwWorkingBase| The base address of EFI variable fault tolerance worksapce (FTW) within firmware device|
+|PcdPlatformFlashNvStorageFtwWorkingBase| The base address of EFI variable fault tolerance workspace (FTW) within firmware device|
 |PcdPlatformFlashNvStorageFtwSpareBase| The base address of EFI variable spare FTW within firmware device|
 
 ### RISC-V Physical Memory Protection (PMP) Region Settings
@@ -190,7 +190,7 @@ Below PCDs could be set in platform FDF file.
 |PcdRootFirmwareDomainSize| The size of root firmware domain|-|-|
 |PcdFirmwareDomainBaseAddress| The starting address of firmware domain that can be accessed and executed in S-mode|Full access|Readable and Executable|
 |PcdFirmwareDomainSize| The size of firmware domain|-|-|
-|PcdVariableFirmwareRegionBaseAddress| The starting address of EFI variable region that can be accessed in S-mode|Full access|Readale and Writable|
+|PcdVariableFirmwareRegionBaseAddress| The starting address of EFI variable region that can be accessed in S-mode|Full access|Readable and Writable|
 |PcdVariableFirmwareRegionSize| The size of EFI variable firmware region|-|-|
 
 ### RISC-V Processor HART Settings
@@ -198,7 +198,7 @@ Below PCDs could be set in platform FDF file.
 | **PCD name** |**Usage**|
 |--------------|---------|
 |PcdHartCount| Number of RISC-V HARTs, the value is processor-implementation specific|
-|PcdBootHartId| The ID of RISC-V HART to execute main fimrware code and boot system to OS|
+|PcdBootHartId| The ID of RISC-V HART to execute main firmware code and boot system to OS|
 |PcdBootableHartNumber|The bootable HART number, which is incorporate with RISC-V OpenSBI platform hart_index2id value|
 |PcdBootableHartIndexToId| if PcdBootableHartNumber == 0, hart_index2id is built from Device Tree, otherwise this is an array of HART index to HART ID|
 

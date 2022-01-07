@@ -1,7 +1,7 @@
 /** @file
   EDK2 OpenSBI generic platform wrapper library
 
-  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2019-2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -43,7 +43,7 @@ SecSetEdk2FwMemoryRegions (
   fw_memregs.flags = SBI_DOMAIN_MEMREGION_EXECUTABLE | SBI_DOMAIN_MEMREGION_READABLE;
   Ret = sbi_domain_root_add_memregion ((CONST struct sbi_domain_memregion *)&fw_memregs);
   if (Ret != 0) {
-    DEBUG ((DEBUG_ERROR, "%a: Add firmware regiosn of FW Domain fail\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Add firmware regions of FW Domain fail\n", __FUNCTION__));
   }
 
   //
@@ -54,7 +54,7 @@ SecSetEdk2FwMemoryRegions (
   fw_memregs.flags = SBI_DOMAIN_MEMREGION_READABLE | SBI_DOMAIN_MEMREGION_WRITEABLE;
   Ret = sbi_domain_root_add_memregion ((CONST struct sbi_domain_memregion *)&fw_memregs);
   if (Ret != 0) {
-    DEBUG ((DEBUG_ERROR, "%a: Add firmware regiosn of variable FW Domain fail\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Add firmware regions of variable FW Domain fail\n", __FUNCTION__));
   }
   return Ret;
 }
@@ -66,7 +66,7 @@ SecSetEdk2FwMemoryRegions (
 
 **/
 INT32
-SecPostOpenSbiPlatformEarlylInit(
+SecPostOpenSbiPlatformEarlyInit(
   IN BOOLEAN ColdBoot
   )
 {
@@ -190,7 +190,7 @@ Edk2OpensbiPlatformEarlyInit (
         }
     }
     if (ColdBoot) {
-        return SecPostOpenSbiPlatformEarlylInit(ColdBoot);
+        return SecPostOpenSbiPlatformEarlyInit(ColdBoot);
     }
     return 0;
 }

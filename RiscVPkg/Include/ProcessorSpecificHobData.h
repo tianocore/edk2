@@ -1,7 +1,7 @@
 /** @file
   Definition of Processor Specific Data HOB.
 
-  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2019-2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -24,7 +24,7 @@
 /// RISC-V processor specific data HOB
 ///
 typedef struct {
-  EFI_GUID ParentPrcessorGuid;
+  EFI_GUID ParentProcessorGuid;
   UINTN    ParentProcessorUid;
   EFI_GUID CoreGuid;
   VOID     *Context;        // The additional information of this core which
@@ -37,7 +37,7 @@ typedef struct {
 /// RISC-V SMBIOS type 4 (Processor) GUID data HOB
 ///
 typedef struct {
-  EFI_GUID           PrcessorGuid;
+  EFI_GUID           ProcessorGuid;
   UINTN              ProcessorUid;
   SMBIOS_TABLE_TYPE4 SmbiosType4Processor;
   UINT16             EndingZero;
@@ -75,7 +75,7 @@ typedef struct {
 /// RISC-V SMBIOS type 7 (Cache) GUID data HOB
 ///
 typedef struct {
-  EFI_GUID           PrcessorGuid;
+  EFI_GUID           ProcessorGuid;
   UINTN              ProcessorUid;
   SMBIOS_TABLE_TYPE7 SmbiosType7Cache;
   UINT16             EndingZero;

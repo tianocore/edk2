@@ -1,7 +1,7 @@
 /** @file
   RISC-V generic SMBIOS DXE driver to build up SMBIOS type 4, type 7 and type 44 records.
 
-  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2019-2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -33,7 +33,7 @@ BuildSmbiosType7 (
   EFI_STATUS Status;
   SMBIOS_HANDLE Handle;
 
-  if (!CompareGuid (&Type4HobData->PrcessorGuid, &Type7DataHob->PrcessorGuid) ||
+  if (!CompareGuid (&Type4HobData->ProcessorGuid, &Type7DataHob->ProcessorGuid) ||
     Type4HobData->ProcessorUid != Type7DataHob->ProcessorUid) {
     return EFI_INVALID_PARAMETER;
   }
@@ -48,7 +48,7 @@ BuildSmbiosType7 (
     return Status;
   }
   DEBUG ((DEBUG_INFO, "SMBIOS Type 7 was added. SMBIOS Handle: 0x%x\n", Handle));
-  DEBUG ((DEBUG_VERBOSE, "     Cache belone to processor GUID: %g\n", &Type7DataHob->PrcessorGuid));
+  DEBUG ((DEBUG_VERBOSE, "     Cache belone to processor GUID: %g\n", &Type7DataHob->ProcessorGuid));
   DEBUG ((DEBUG_VERBOSE, "     Cache belone processor  UID: %d\n", Type7DataHob->ProcessorUid));
   DEBUG ((DEBUG_VERBOSE, "     ==============================\n"));
   DEBUG ((DEBUG_VERBOSE, "     Socket Designation: %d\n", Type7DataHob->SmbiosType7Cache.SocketDesignation));
@@ -90,7 +90,7 @@ BuildSmbiosType4 (
   EFI_STATUS Status;
 
   DEBUG ((DEBUG_INFO, "Building Type 4.\n"));
-  DEBUG ((DEBUG_INFO, "    Processor GUID: %g\n", &Type4HobData->PrcessorGuid));
+  DEBUG ((DEBUG_INFO, "    Processor GUID: %g\n", &Type4HobData->ProcessorGuid));
   DEBUG ((DEBUG_INFO, "    Processor UUID: %d\n", Type4HobData->ProcessorUid));
 
   Type4HobData->SmbiosType4Processor.L1CacheHandle = RISC_V_CACHE_INFO_NOT_PROVIDED;
@@ -193,7 +193,7 @@ BuildSmbiosType44 (
   EFI_STATUS Status;
 
   DEBUG ((DEBUG_INFO, "Building Type 44 for...\n"));
-  DEBUG ((DEBUG_VERBOSE, "     Processor GUID: %g\n", &Type4HobData->PrcessorGuid));
+  DEBUG ((DEBUG_VERBOSE, "     Processor GUID: %g\n", &Type4HobData->ProcessorGuid));
   DEBUG ((DEBUG_VERBOSE, "     Processor UUID: %d\n", Type4HobData->ProcessorUid));
 
   GuidHob = (EFI_HOB_GUID_TYPE *)GetFirstGuidHob ((EFI_GUID *)PcdGetPtr(PcdProcessorSpecificDataGuidHobGuid));
@@ -206,7 +206,7 @@ BuildSmbiosType44 (
   //
   do {
     ProcessorSpecificData = (RISC_V_PROCESSOR_SPECIFIC_HOB_DATA *)GET_GUID_HOB_DATA (GuidHob);
-    if (!CompareGuid (&ProcessorSpecificData->ParentPrcessorGuid, &Type4HobData->PrcessorGuid) ||
+    if (!CompareGuid (&ProcessorSpecificData->ParentProcessorGuid, &Type4HobData->ProcessorGuid) ||
       ProcessorSpecificData->ParentProcessorUid != Type4HobData->ProcessorUid) {
       GuidHob = GetNextGuidHob((EFI_GUID *)PcdGetPtr(PcdProcessorSpecificDataGuidHobGuid), GET_NEXT_HOB(GuidHob));
       if (GuidHob == NULL) {

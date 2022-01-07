@@ -1,7 +1,7 @@
 /** @file
   RISC-V SEC phase module.
 
-  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2021-2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -291,7 +291,7 @@ FindPeiCoreImageBase (
 /**
   Find and return Pei Core entry point.
 
-  It also find SEC and PEI Core file debug inforamtion. It will report them if
+  It also find SEC and PEI Core file debug information. It will report them if
   remote debug is enabled.
 
   @param[in]  BootFirmwareVolumePtr   The firmware volume pointer to search
@@ -516,7 +516,7 @@ LaunchPeiCore (
   @param[in]  FuncArg1       Arg1 to pass to next phase entry point address.
   @param[in]  NextAddr       Entry point of next phase.
   @param[in]  NextMode       Privilege mode of next phase.
-  @param[in]  NextVirt       Next phase is in virtualiztion.
+  @param[in]  NextVirt       Next phase is in virtualization.
 
 **/
 VOID
@@ -600,7 +600,7 @@ Edk2PlatformHartIndex2Id (
 }
 
 /**
-  This function initilizes hart specific information and SBI.
+  This function initializes hart specific information and SBI.
   For the boot hart, it boots system through PEI core and initial SBI in the DXE IPL.
   For others, it goes to initial SBI and halt.
 
@@ -658,9 +658,9 @@ SecCoreStartUpWithStack(
   HartFirmwareContext->HartSwitchMode = RiscVOpenSbiHartSwitchMode;
 
   //
-  // Hook platorm_ops with EDK2 one. Thus we can have interface
+  // Hook platform_ops with EDK2 one. Thus we can have interface
   // call out to OEM EDK2 platform code in M-mode before switching
-  // to S-mode in opensbo init.
+  // to S-mode in opensbi init.
   //
   ThisSbiPlatform = (struct sbi_platform *)sbi_platform_ptr(Scratch);
   ThisSbiPlatform->platform_ops_addr = (unsigned long)&Edk2OpensbiPlatformOps;

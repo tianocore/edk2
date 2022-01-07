@@ -1,7 +1,7 @@
 ## @file
 # The FDT Peim driver is used to pass the device tree to DXE phase.
 #
-# Copyright (c) 2021, Hewlett Packard Enterprise Developmente LP. All rights reserved.<BR>
+# Copyright (c) 2021-2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #

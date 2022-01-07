@@ -1,7 +1,7 @@
 /** @file
   Platform PEI driver
 
-  Copyright (c) 2019-2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2019-2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2011, Andrei Warkentin <andreiw@motorola.com>
 
@@ -357,7 +357,7 @@ InitializePlatform (
   MiscInitialization ();
   Status = BuildCoreInformationHob ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Fail to build processor informstion HOB.\n"));
+    DEBUG ((DEBUG_ERROR, "Fail to build processor information HOB.\n"));
     ASSERT(FALSE);
   }
   return EFI_SUCCESS;
