@@ -32,16 +32,19 @@ PeiFvInitialization (
   // Let DXE know about the DXE FV
   //
   BuildFvHob (PcdGet32 (PcdRiscVDxeFvBase), PcdGet32 (PcdRiscVDxeFvSize));
-  DEBUG ((DEBUG_INFO, "Platform builds DXE FV at %x, size %x.\n",
+  DEBUG ((
+    DEBUG_INFO,
+    "Platform builds DXE FV at %x, size %x.\n",
     PcdGet32 (PcdRiscVDxeFvBase),
-    PcdGet32 (PcdRiscVDxeFvSize)));
+    PcdGet32 (PcdRiscVDxeFvSize)
+    ));
 
   //
   // Let PEI know about the DXE FV so it can find the DXE Core
   //
   PeiServicesInstallFvInfoPpi (
     NULL,
-    (VOID *)(UINTN) PcdGet32 (PcdRiscVDxeFvBase),
+    (VOID *)(UINTN)PcdGet32 (PcdRiscVDxeFvBase),
     PcdGet32 (PcdRiscVDxeFvSize),
     NULL,
     NULL

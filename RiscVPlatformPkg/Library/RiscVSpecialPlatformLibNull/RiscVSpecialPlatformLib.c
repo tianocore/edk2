@@ -14,7 +14,6 @@
 //
 #include <Library/RiscVSpecialPlatformLib.h>
 
-const struct platform_override *special_platforms = NULL;
-const struct platform_override *SpecialPlatformArray = NULL;
-INTN NumberOfPlaformsInArray = 0;
-
+const struct platform_override  *special_platforms      = NULL;
+const struct platform_override  *SpecialPlatformArray   = NULL;
+INTN                            NumberOfPlaformsInArray = 0;

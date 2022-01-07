@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include <PiPei.h>
 #include <IndustryStandard/RiscVOpensbi.h>
 //
@@ -48,19 +47,19 @@ EFIAPI
 _ModuleEntryPoint (
   IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
   IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList
-)
+  )
 {
-  EFI_STATUS Status;
-  EFI_SEC_PEI_HAND_OFF    *ThisSecCoreData;
-  EFI_PEI_PPI_DESCRIPTOR  *ThisPpiList;
-  EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *FirmwareContext;
+  EFI_STATUS                          Status;
+  EFI_SEC_PEI_HAND_OFF                *ThisSecCoreData;
+  EFI_PEI_PPI_DESCRIPTOR              *ThisPpiList;
+  EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT  *FirmwareContext;
 
   FirmwareContext = (EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *)PpiList;
   SetFirmwareContextPointer (FirmwareContext);
   FirmwareContext->BootHartId = (UINT64)SecCoreData;
 
   ThisSecCoreData = (EFI_SEC_PEI_HAND_OFF *)FirmwareContext->SecPeiHandOffData;
-  Status = GetPlatformPrePeiCorePpiDescriptor (&ThisPpiList);
+  Status          = GetPlatformPrePeiCorePpiDescriptor (&ThisPpiList);
   if (EFI_ERROR (Status)) {
     ThisPpiList = NULL;
   }
@@ -68,15 +67,14 @@ _ModuleEntryPoint (
   //
   // Invoke PEI Core entry point.
   //
-  ProcessModuleEntryPointList(ThisSecCoreData, ThisPpiList, NULL);
+  ProcessModuleEntryPointList (ThisSecCoreData, ThisPpiList, NULL);
 
   //
   // Should never return
   //
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   CpuDeadLoop ();
 }
-
 
 /**
   Required by the EBC compiler and identical in functionality to _ModuleEntryPoint().

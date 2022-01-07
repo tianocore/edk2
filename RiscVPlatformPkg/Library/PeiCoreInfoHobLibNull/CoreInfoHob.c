@@ -21,7 +21,6 @@
 
 #include <ProcessorSpecificHobData.h>
 
-
 /**
   Build processor and platform information for a generic RISC-V
 
@@ -31,7 +30,7 @@
 EFI_STATUS
 BuildRiscVSmbiosHobs (
   VOID
-)
+  )
 {
   return EFI_SUCCESS;
 }

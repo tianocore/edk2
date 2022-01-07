@@ -10,8 +10,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PlatformBootManager.h"
 
-
-EFI_GUID mUefiShellFileGuid = { 0x7C04A583, 0x9E3E, 0x4f1c, {0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1}};
+EFI_GUID  mUefiShellFileGuid = {
+  0x7C04A583, 0x9E3E, 0x4f1c, { 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }
+};
 
 /**
   Perform the platform diagnostic, such like test memory. OEM/IBV also
@@ -23,11 +24,11 @@ EFI_GUID mUefiShellFileGuid = { 0x7C04A583, 0x9E3E, 0x4f1c, {0xAD, 0x65, 0xE0, 0
 **/
 VOID
 PlatformBootManagerDiagnostics (
-  IN EXTENDMEM_COVERAGE_LEVEL    MemoryTestLevel,
-  IN BOOLEAN                     QuietBoot
+  IN EXTENDMEM_COVERAGE_LEVEL  MemoryTestLevel,
+  IN BOOLEAN                   QuietBoot
   )
 {
-  EFI_STATUS                     Status;
+  EFI_STATUS  Status;
 
   //
   // Here we can decide if we need to show
@@ -36,7 +37,6 @@ PlatformBootManagerDiagnostics (
   // from the graphic lib
   //
   if (QuietBoot) {
-
     //
     // Perform system diagnostic
     //
@@ -65,12 +65,12 @@ PlatformBootManagerDiagnostics (
 **/
 INTN
 PlatformFindLoadOption (
-  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *Key,
-  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *Array,
-  IN UINTN                              Count
+  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Key,
+  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Array,
+  IN UINTN                               Count
   )
 {
-  UINTN                             Index;
+  UINTN  Index;
 
   for (Index = 0; Index < Count; Index++) {
     if ((Key->OptionType == Array[Index].OptionType) &&
@@ -78,8 +78,9 @@ PlatformFindLoadOption (
         (StrCmp (Key->Description, Array[Index].Description) == 0) &&
         (CompareMem (Key->FilePath, Array[Index].FilePath, GetDevicePathSize (Key->FilePath)) == 0) &&
         (Key->OptionalDataSize == Array[Index].OptionalDataSize) &&
-        (CompareMem (Key->OptionalData, Array[Index].OptionalData, Key->OptionalDataSize) == 0)) {
-      return (INTN) Index;
+        (CompareMem (Key->OptionalData, Array[Index].OptionalData, Key->OptionalDataSize) == 0))
+    {
+      return (INTN)Index;
     }
   }
 
@@ -95,27 +96,27 @@ PlatformFindLoadOption (
 **/
 VOID
 PlatformRegisterFvBootOption (
-  EFI_GUID                         *FileGuid,
-  CHAR16                           *Description,
-  UINT32                           Attributes
+  EFI_GUID  *FileGuid,
+  CHAR16    *Description,
+  UINT32    Attributes
   )
 {
-  EFI_STATUS                        Status;
-  UINTN                             OptionIndex;
-  EFI_BOOT_MANAGER_LOAD_OPTION      NewOption;
-  EFI_BOOT_MANAGER_LOAD_OPTION      *BootOptions;
-  UINTN                             BootOptionCount;
-  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH FileNode;
-  EFI_LOADED_IMAGE_PROTOCOL         *LoadedImage;
-  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
+  EFI_STATUS                         Status;
+  UINTN                              OptionIndex;
+  EFI_BOOT_MANAGER_LOAD_OPTION       NewOption;
+  EFI_BOOT_MANAGER_LOAD_OPTION       *BootOptions;
+  UINTN                              BootOptionCount;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  FileNode;
+  EFI_LOADED_IMAGE_PROTOCOL          *LoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
 
-  Status = gBS->HandleProtocol (gImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **) &LoadedImage);
+  Status = gBS->HandleProtocol (gImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **)&LoadedImage);
   ASSERT_EFI_ERROR (Status);
 
   EfiInitializeFwVolDevicepathNode (&FileNode, FileGuid);
   DevicePath = AppendDevicePathNode (
                  DevicePathFromHandle (LoadedImage->DeviceHandle),
-                 (EFI_DEVICE_PATH_PROTOCOL *) &FileNode
+                 (EFI_DEVICE_PATH_PROTOCOL *)&FileNode
                  );
 
   Status = EfiBootManagerInitializeLoadOption (
@@ -134,9 +135,10 @@ PlatformRegisterFvBootOption (
     OptionIndex = PlatformFindLoadOption (&NewOption, BootOptions, BootOptionCount);
 
     if (OptionIndex == -1) {
-      Status = EfiBootManagerAddLoadOptionVariable (&NewOption, (UINTN) -1);
+      Status = EfiBootManagerAddLoadOptionVariable (&NewOption, (UINTN)-1);
       ASSERT_EFI_ERROR (Status);
     }
+
     EfiBootManagerFreeLoadOption (&NewOption);
     EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
   }
@@ -156,11 +158,11 @@ PlatformBootManagerBeforeConsole (
   VOID
   )
 {
-  UINTN                        Index;
-  EFI_STATUS                   Status;
-  EFI_INPUT_KEY                Enter;
-  EFI_INPUT_KEY                F2;
-  EFI_BOOT_MANAGER_LOAD_OPTION BootOption;
+  UINTN                         Index;
+  EFI_STATUS                    Status;
+  EFI_INPUT_KEY                 Enter;
+  EFI_INPUT_KEY                 F2;
+  EFI_BOOT_MANAGER_LOAD_OPTION  BootOption;
 
   //
   // Signal EndOfDxe PI Event
@@ -200,7 +202,7 @@ PlatformBootManagerBeforeConsole (
   F2.ScanCode    = SCAN_F2;
   F2.UnicodeChar = CHAR_NULL;
   EfiBootManagerGetBootManagerMenu (&BootOption);
-  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16) BootOption.OptionNumber, 0, &F2, NULL);
+  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16)BootOption.OptionNumber, 0, &F2, NULL);
   //
   // Register UEFI Shell
   //

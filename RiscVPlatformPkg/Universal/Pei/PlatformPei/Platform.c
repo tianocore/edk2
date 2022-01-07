@@ -32,7 +32,7 @@
 
 #include "Platform.h"
 
-EFI_MEMORY_TYPE_INFORMATION mDefaultMemoryTypeInformation[] = {
+EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
   { EfiACPIMemoryNVS,       0x004 },
   { EfiACPIReclaimMemory,   0x008 },
   { EfiReservedMemoryType,  0x004 },
@@ -43,8 +43,7 @@ EFI_MEMORY_TYPE_INFORMATION mDefaultMemoryTypeInformation[] = {
   { EfiMaxMemoryType,       0x000 }
 };
 
-
-EFI_PEI_PPI_DESCRIPTOR   mPpiBootMode[] = {
+EFI_PEI_PPI_DESCRIPTOR  mPpiBootMode[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
     &gEfiPeiMasterBootModePpiGuid,
@@ -52,7 +51,7 @@ EFI_PEI_PPI_DESCRIPTOR   mPpiBootMode[] = {
   }
 };
 
-STATIC EFI_BOOT_MODE mBootMode = BOOT_WITH_FULL_CONFIGURATION;
+STATIC EFI_BOOT_MODE  mBootMode = BOOT_WITH_FULL_CONFIGURATION;
 
 /**
   Build memory map I/O range resource HOB using the
@@ -64,16 +63,16 @@ STATIC EFI_BOOT_MODE mBootMode = BOOT_WITH_FULL_CONFIGURATION;
 **/
 VOID
 AddIoMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  UINT64                MemorySize
   )
 {
   BuildResourceDescriptorHob (
     EFI_RESOURCE_MEMORY_MAPPED_IO,
-      EFI_RESOURCE_ATTRIBUTE_PRESENT     |
-      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_TESTED,
+    EFI_RESOURCE_ATTRIBUTE_PRESENT     |
+    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+    EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+    EFI_RESOURCE_ATTRIBUTE_TESTED,
     MemoryBase,
     MemorySize
     );
@@ -88,16 +87,16 @@ AddIoMemoryBaseSizeHob (
 **/
 VOID
 AddReservedMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  UINT64                MemorySize
   )
 {
   BuildResourceDescriptorHob (
     EFI_RESOURCE_MEMORY_RESERVED,
-      EFI_RESOURCE_ATTRIBUTE_PRESENT     |
-      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_TESTED,
+    EFI_RESOURCE_ATTRIBUTE_PRESENT     |
+    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+    EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+    EFI_RESOURCE_ATTRIBUTE_TESTED,
     MemoryBase,
     MemorySize
     );
@@ -113,8 +112,8 @@ AddReservedMemoryBaseSizeHob (
 **/
 VOID
 AddIoMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  EFI_PHYSICAL_ADDRESS        MemoryLimit
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  EFI_PHYSICAL_ADDRESS  MemoryLimit
   )
 {
   AddIoMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
@@ -130,19 +129,19 @@ AddIoMemoryRangeHob (
 **/
 VOID
 AddMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  UINT64                MemorySize
   )
 {
   BuildResourceDescriptorHob (
     EFI_RESOURCE_SYSTEM_MEMORY,
-      EFI_RESOURCE_ATTRIBUTE_PRESENT |
-      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
-      EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_TESTED,
+    EFI_RESOURCE_ATTRIBUTE_PRESENT |
+    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+    EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+    EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+    EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+    EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
+    EFI_RESOURCE_ATTRIBUTE_TESTED,
     MemoryBase,
     MemorySize
     );
@@ -158,8 +157,8 @@ AddMemoryBaseSizeHob (
 **/
 VOID
 AddMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  EFI_PHYSICAL_ADDRESS        MemoryLimit
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  EFI_PHYSICAL_ADDRESS  MemoryLimit
   )
 {
   AddMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
@@ -175,18 +174,18 @@ AddMemoryRangeHob (
 **/
 VOID
 AddUntestedMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  UINT64                MemorySize
   )
 {
   BuildResourceDescriptorHob (
     EFI_RESOURCE_SYSTEM_MEMORY,
-      EFI_RESOURCE_ATTRIBUTE_PRESENT |
-      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
-      EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE,
+    EFI_RESOURCE_ATTRIBUTE_PRESENT |
+    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+    EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+    EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+    EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+    EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE,
     MemoryBase,
     MemorySize
     );
@@ -202,8 +201,8 @@ AddUntestedMemoryBaseSizeHob (
 **/
 VOID
 AddUntestedMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  EFI_PHYSICAL_ADDRESS        MemoryLimit
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  EFI_PHYSICAL_ADDRESS  MemoryLimit
   )
 {
   AddUntestedMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
@@ -238,7 +237,7 @@ MemMapInitialization (
   BuildGuidDataHob (
     &gEfiMemoryTypeInformationGuid,
     mDefaultMemoryTypeInformation,
-    sizeof(mDefaultMemoryTypeInformation)
+    sizeof (mDefaultMemoryTypeInformation)
     );
 
   //
@@ -280,7 +279,7 @@ CheckResumeFromS3 (
   )
 {
   //
-  //Platform implementation-specific
+  // Platform implementation-specific
   //
   return FALSE;
 }
@@ -294,13 +293,14 @@ BootModeInitialization (
   VOID
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   if (CheckResumeFromS3) {
     DEBUG ((DEBUG_INFO, "This is wake from S3\n"));
   } else {
     DEBUG ((DEBUG_INFO, "This is normal boot\n"));
   }
+
   Status = PeiServicesSetBootMode (mBootMode);
   ASSERT_EFI_ERROR (Status);
 
@@ -317,7 +317,7 @@ BootModeInitialization (
 EFI_STATUS
 BuildCoreInformationHob (
   VOID
-)
+  )
 {
   return BuildRiscVSmbiosHobs ();
 }
@@ -338,7 +338,7 @@ InitializePlatform (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
 
@@ -358,7 +358,8 @@ InitializePlatform (
   Status = BuildCoreInformationHob ();
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Fail to build processor information HOB.\n"));
-    ASSERT(FALSE);
+    ASSERT (FALSE);
   }
+
   return EFI_SUCCESS;
 }

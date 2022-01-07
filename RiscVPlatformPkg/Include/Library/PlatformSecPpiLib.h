@@ -19,6 +19,6 @@
 EFI_STATUS
 GetPlatformPrePeiCorePpiDescriptor (
   IN OUT EFI_PEI_PPI_DESCRIPTOR  **ThisPpiList
-);
+  );
 
 #endif

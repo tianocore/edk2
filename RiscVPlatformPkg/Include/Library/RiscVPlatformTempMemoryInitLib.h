@@ -11,7 +11,19 @@
 
 #include "RiscVImpl.h"
 
-VOID EFIAPI   RiscVPlatformTemporaryMemInit (VOID);
-UINT32 EFIAPI RiscVPlatformTemporaryMemSize (VOID);
-UINT32 EFIAPI RiscVPlatformTemporaryMemBase (VOID);
+VOID EFIAPI
+RiscVPlatformTemporaryMemInit (
+  VOID
+  );
+
+UINT32 EFIAPI
+RiscVPlatformTemporaryMemSize (
+  VOID
+  );
+
+UINT32 EFIAPI
+RiscVPlatformTemporaryMemBase (
+  VOID
+  );
+
 #endif

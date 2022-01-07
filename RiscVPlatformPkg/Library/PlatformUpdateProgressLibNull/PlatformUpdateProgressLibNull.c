@@ -19,11 +19,12 @@
 VOID
 EFIAPI
 PlatformBootManagerWaitCallback (
-  UINT16          TimeoutRemain
+  UINT16  TimeoutRemain
   )
 {
   return;
 }
+
 /**
 
   Show progress bar with title above it. It only works in Graphics mode.
@@ -40,12 +41,12 @@ PlatformBootManagerWaitCallback (
 **/
 EFI_STATUS
 PlatformBootManagerShowProgress (
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleForeground,
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleBackground,
-  IN CHAR16                        *Title,
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL ProgressColor,
-  IN UINTN                         Progress,
-  IN UINTN                         PreviousValue
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  TitleForeground,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  TitleBackground,
+  IN CHAR16                         *Title,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  ProgressColor,
+  IN UINTN                          Progress,
+  IN UINTN                          PreviousValue
   )
 {
   return EFI_SUCCESS;

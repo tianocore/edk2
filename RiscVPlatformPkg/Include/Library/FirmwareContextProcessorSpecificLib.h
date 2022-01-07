@@ -6,6 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef FIRMWARE_CONTEXT_PROCESSOR_SPECIFIC_LIB_H_
 #define FIRMWARE_CONTEXT_PROCESSOR_SPECIFIC_LIB_H_
 
@@ -30,13 +31,13 @@
 EFI_STATUS
 EFIAPI
 CommonFirmwareContextHartSpecificInfo (
-  EFI_RISCV_FIRMWARE_CONTEXT_HART_SPECIFIC *FirmwareContextHartSpecific,
-  EFI_GUID  *ParentProcessorGuid,
-  UINTN     ParentProcessorUid,
-  EFI_GUID  *CoreGuid,
-  UINTN     HartId,
-  BOOLEAN   IsBootHart,
-  RISC_V_PROCESSOR_SPECIFIC_HOB_DATA *ProcessorSpecDataHob
+  EFI_RISCV_FIRMWARE_CONTEXT_HART_SPECIFIC  *FirmwareContextHartSpecific,
+  EFI_GUID                                  *ParentProcessorGuid,
+  UINTN                                     ParentProcessorUid,
+  EFI_GUID                                  *CoreGuid,
+  UINTN                                     HartId,
+  BOOLEAN                                   IsBootHart,
+  RISC_V_PROCESSOR_SPECIFIC_HOB_DATA        *ProcessorSpecDataHob
   );
 
 /**
@@ -47,7 +48,7 @@ CommonFirmwareContextHartSpecificInfo (
 VOID
 EFIAPI
 DebugPrintHartSpecificInfo (
-  RISC_V_PROCESSOR_SPECIFIC_HOB_DATA *ProcessorSpecificDataHob
+  RISC_V_PROCESSOR_SPECIFIC_HOB_DATA  *ProcessorSpecificDataHob
   );
 
 #endif

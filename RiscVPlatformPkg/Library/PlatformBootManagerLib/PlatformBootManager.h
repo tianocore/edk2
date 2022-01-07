@@ -33,25 +33,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PrintLib.h>
 
 typedef struct {
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  UINTN                     ConnectType;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  UINTN                       ConnectType;
 } PLATFORM_CONSOLE_CONNECT_ENTRY;
 
 extern PLATFORM_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
 
-#define CONSOLE_OUT BIT0
-#define CONSOLE_IN  BIT1
-#define STD_ERROR   BIT2
+#define CONSOLE_OUT  BIT0
+#define CONSOLE_IN   BIT1
+#define STD_ERROR    BIT2
 
-//D3987D4B-971A-435F-8CAF-4967EB627241
+// D3987D4B-971A-435F-8CAF-4967EB627241
 #define EFI_SERIAL_DXE_GUID \
   { 0xD3987D4B, 0x971A, 0x435F, { 0x8C, 0xAF, 0x49, 0x67, 0xEB, 0x62, 0x72, 0x41 } }
 
 typedef struct {
-  VENDOR_DEVICE_PATH        Guid;
-  UART_DEVICE_PATH          Uart;
-  VENDOR_DEVICE_PATH        TerminalType;
-  EFI_DEVICE_PATH_PROTOCOL  End;
+  VENDOR_DEVICE_PATH          Guid;
+  UART_DEVICE_PATH            Uart;
+  VENDOR_DEVICE_PATH          TerminalType;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } SERIAL_CONSOLE_DEVICE_PATH;
 
 /**
@@ -78,7 +78,7 @@ PlatformBootManagerDisableQuietBoot (
 **/
 EFI_STATUS
 PlatformBootManagerMemoryTest (
-  IN EXTENDMEM_COVERAGE_LEVEL Level
+  IN EXTENDMEM_COVERAGE_LEVEL  Level
   );
 
 /**
@@ -98,12 +98,12 @@ PlatformBootManagerMemoryTest (
 **/
 EFI_STATUS
 PlatformBootManagerShowProgress (
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleForeground,
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleBackground,
-  IN CHAR16                        *Title,
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL ProgressColor,
-  IN UINTN                         Progress,
-  IN UINTN                         PreviousValue
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  TitleForeground,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  TitleBackground,
+  IN CHAR16                         *Title,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  ProgressColor,
+  IN UINTN                          Progress,
+  IN UINTN                          PreviousValue
   );
 
 #endif // _PLATFORM_BOOT_MANAGER_H

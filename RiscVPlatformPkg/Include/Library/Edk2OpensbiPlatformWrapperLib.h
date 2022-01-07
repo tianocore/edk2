@@ -11,6 +11,6 @@
 
 #include <sbi/sbi_platform.h>
 
-extern struct sbi_platform_operations Edk2OpensbiPlatformOps;
+extern struct sbi_platform_operations  Edk2OpensbiPlatformOps;
 
 #endif

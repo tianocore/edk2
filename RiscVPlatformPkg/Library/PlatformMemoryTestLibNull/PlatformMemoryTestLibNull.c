@@ -22,7 +22,7 @@
 **/
 EFI_STATUS
 PlatformBootManagerMemoryTest (
-  IN EXTENDMEM_COVERAGE_LEVEL Level
+  IN EXTENDMEM_COVERAGE_LEVEL  Level
   )
 {
   return EFI_SUCCESS;

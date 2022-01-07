@@ -35,8 +35,8 @@
 
 **/
 INT32
-SecPostOpenSbiPlatformEarlyInit(
-  IN BOOLEAN ColdBoot
+SecPostOpenSbiPlatformEarlyInit (
+  IN BOOLEAN  ColdBoot
   );
 
 /**
@@ -49,7 +49,7 @@ SecPostOpenSbiPlatformEarlyInit(
 **/
 INT32
 SecPostOpenSbiPlatformFinalInit (
-  IN BOOLEAN ColdBoot
+  IN BOOLEAN  ColdBoot
   );
 
 /**
