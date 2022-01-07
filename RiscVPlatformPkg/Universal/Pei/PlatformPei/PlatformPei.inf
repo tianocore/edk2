@@ -34,7 +34,6 @@
   MdePkg/MdePkg.dec
   RiscVPlatformPkg/RiscVPlatformPkg.dec
   RiscVPkg/RiscVPkg.dec
-  UefiCpuPkg/UefiCpuPkg.dec
 
 [Guids]
   gEfiMemoryTypeInformationGuid

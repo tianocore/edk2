@@ -30,7 +30,6 @@
   EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-  Platform/SiFive/U5SeriesPkg/U5SeriesPkg.dec
   RiscVPlatformPkg/RiscVPlatformPkg.dec
   RiscVPkg/RiscVPkg.dec
 
