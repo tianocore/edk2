@@ -1417,6 +1417,20 @@ CoreInternalAllocatePages (
     Status = CoreConvertPages (Start, NumberOfPages, MemoryType);
   }
 
+  if (EFI_ERROR (Status)) {
+    //
+    // If requested memory region is unavailable it may be untested memory
+    // Attempt to promote memory resources, then re-attempt the allocation
+    //
+    if (PromoteMemoryResource ()) {
+      if (NeedGuard) {
+        Status = CoreConvertPagesWithGuard (Start, NumberOfPages, MemoryType);
+      } else {
+        Status = CoreConvertPages (Start, NumberOfPages, MemoryType);
+      }
+    }
+  }
+
 Done:
   CoreReleaseMemoryLock ();
 
