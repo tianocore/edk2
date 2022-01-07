@@ -1,7 +1,7 @@
 /** @file
   Library to call the RISC-V SBI ecalls
 
-  Copyright (c) 2021, Hewlett Packard Development LP. All rights reserved.<BR>
+  Copyright (c) 2021-2022, Hewlett Packard Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -54,7 +54,7 @@ SbiGetSpecVersion (
 /**
   Get the SBI implementation ID
 
-  This ID is used to idenetify a specific SBI implementation in order to work
+  This ID is used to identify a specific SBI implementation in order to work
   around any quirks it might have.
 
   @param[out] ImplId               The ID of the SBI implementation.
@@ -275,7 +275,7 @@ SbiRemoteFenceI (
 /**
   Instructs the remote harts to execute one or more SFENCE.VMA instructions.
 
-  The SFENCE.VMA covers the range of virtual addresses between StartAaddr and Size.
+  The SFENCE.VMA covers the range of virtual addresses between StartAddr and Size.
 
   The remote fence function acts as a full tlb flush if * StartAddr and size
   are both 0 * size is equal to 2^XLEN-1
@@ -305,7 +305,7 @@ SbiRemoteSfenceVma (
 /**
   Instructs the remote harts to execute one or more SFENCE.VMA instructions.
 
-  The SFENCE.VMA covers the range of virtual addresses between StartAaddr and Size.
+  The SFENCE.VMA covers the range of virtual addresses between StartAddr and Size.
   Covers only the given ASID.
 
   The remote fence function acts as a full tlb flush if * StartAddr and size
@@ -337,7 +337,7 @@ SbiRemoteSfenceVmaAsid (
 /**
   Instructs the remote harts to execute one or more SFENCE.GVMA instructions.
 
-  The SFENCE.GVMA covers the range of virtual addresses between StartAaddr and Size.
+  The SFENCE.GVMA covers the range of virtual addresses between StartAddr and Size.
   Covers only the given VMID.
   This function call is only valid for harts implementing the hypervisor extension.
 
@@ -373,7 +373,7 @@ SbiRemoteHfenceGvmaVmid (
 /**
   Instructs the remote harts to execute one or more SFENCE.GVMA instructions.
 
-  The SFENCE.GVMA covers the range of virtual addresses between StartAaddr and Size.
+  The SFENCE.GVMA covers the range of virtual addresses between StartAddr and Size.
   This function call is only valid for harts implementing the hypervisor extension.
 
   The remote fence function acts as a full tlb flush if * StartAddr and size
@@ -407,7 +407,7 @@ SbiRemoteHfenceGvma (
 /**
   Instructs the remote harts to execute one or more SFENCE.VVMA instructions.
 
-  The SFENCE.GVMA covers the range of virtual addresses between StartAaddr and Size.
+  The SFENCE.GVMA covers the range of virtual addresses between StartAddr and Size.
   Covers only the given ASID.
   This function call is only valid for harts implementing the hypervisor extension.
 
@@ -443,7 +443,7 @@ SbiRemoteHfenceVvmaAsid (
 /**
   Instructs the remote harts to execute one or more SFENCE.VVMA instructions.
 
-  The SFENCE.GVMA covers the range of virtual addresses between StartAaddr and Size.
+  The SFENCE.GVMA covers the range of virtual addresses between StartAddr and Size.
   This function call is only valid for harts implementing the hypervisor extension.
 
   The remote fence function acts as a full tlb flush if * StartAddr and size

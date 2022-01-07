@@ -29,7 +29,7 @@ typedef struct {
   EFI_GUID CoreGuid;
   VOID     *Context;        // The additional information of this core which
                             // built in PEI phase and carried to DXE phase.
-                            // The content is pocessor or platform specific.
+                            // The content is processor or platform specific.
   SMBIOS_RISC_V_PROCESSOR_SPECIFIC_DATA ProcessorSpecificData;
 } RISC_V_PROCESSOR_SPECIFIC_HOB_DATA;
 

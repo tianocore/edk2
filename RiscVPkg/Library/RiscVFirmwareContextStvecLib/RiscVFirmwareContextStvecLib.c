@@ -1,8 +1,8 @@
 /** @file
-  This instance uses This iinstance Supervisor mode STVEC CSR to
+  This instance uses This instance Supervisor mode STVEC CSR to
   get/set the pointer of firmware context.
 
-  Copyright (c) 2021 Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2021-2022 Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/

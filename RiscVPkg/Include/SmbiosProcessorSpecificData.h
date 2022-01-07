@@ -1,9 +1,9 @@
 /** @file
   Industry Standard Definitions of RISC-V Processor Specific data defined in
-  below link for complaiant with SMBIOS Table Specification v3.3.0.
+  below link for compliant with SMBIOS Table Specification v3.3.0.
   https://github.com/riscv/riscv-smbios
 
-  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2019-2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 

@@ -1,7 +1,7 @@
-## @file  RiscVProcesssorPkg.dec
+## @file  RiscVProcessorPkg.dec
 # This Package provides UEFI RISC-V processor modules and libraries.
 #
-# Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+# Copyright (c) 2020-2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #

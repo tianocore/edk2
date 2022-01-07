@@ -1,8 +1,8 @@
 /** @file
-  This iinstance uses RISC-V OpenSBI Firmware Extension SBI to
+  This instance uses RISC-V OpenSBI Firmware Extension SBI to
   get the pointer of firmware context.
 
-  Copyright (c) 2021 Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2021-2022 Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
