@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ;-------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ ASM_PFX(DisableCet):
 
     ; Skip the pushed data for call
     mov     rax, 1
-    INCSSP_RAX
+    incsspq rax
 
     mov     rax, cr4
     btr     eax, 23                      ; clear CET
