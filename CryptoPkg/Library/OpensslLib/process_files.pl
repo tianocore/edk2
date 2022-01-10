@@ -251,7 +251,7 @@ foreach my $product ((@{$unified_info{libraries}},
             next if $s =~ "crypto/err/err_all.c";
             next if $s =~ "crypto/aes/aes_ecb.c";
 
-            next if $s =~ "crypto/bio/bio_print.c";
+#            next if $s =~ "crypto/bio/bio_print.c";
             next if $s =~ "providers/implementations/storemgmt/";
             next if $s =~ "ssl/ssl_txt.c";
 
