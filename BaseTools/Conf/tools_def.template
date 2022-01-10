@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 #  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #  Portions copyright (c) 2011 - 2019, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
@@ -368,8 +368,8 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 # Other Supported Tools
 # =====================
 #   NASM -- http://www.nasm.us/
-#   - NASM 2.10 or later for use with the GCC toolchain family
-#   - NASM 2.12.01 or later for use with all other toolchain families
+#   - NASM 2.15.05 or later for use with the GCC toolchain family
+#   - NASM 2.15.05 or later for use with all other toolchain families
 #
 ####################################################################################
 ####################################################################################
