@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2012 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -32,12 +32,13 @@ SECTION .text
 ALIGN   8
 
 AsmIdtVectorBegin:
+%assign Vector 0
 %rep  32
-    db      0x6a        ; push  #VectorNum
-    db      ($ - AsmIdtVectorBegin) / ((AsmIdtVectorEnd - AsmIdtVectorBegin) / 32) ; VectorNum
+    push    byte %[Vector]
     push    rax
     mov     rax, ASM_PFX(CommonInterruptEntry)
     jmp     rax
+%assign Vector Vector+1
 %endrep
 AsmIdtVectorEnd:
 
@@ -257,7 +258,7 @@ DrFinish:
 ;; FX_SAVE_STATE_X64 FxSaveState;
     sub rsp, 512
     mov rdi, rsp
-    db 0xf, 0xae, 0x7 ;fxsave [rdi]
+    fxsave [rdi]
 
 ;; UEFI calling convention for x64 requires that Direction flag in EFLAGs is clear
     cld
@@ -284,7 +285,7 @@ DrFinish:
 ;; FX_SAVE_STATE_X64 FxSaveState;
 
     mov rsi, rsp
-    db 0xf, 0xae, 0xE ; fxrstor [rsi]
+    fxrstor [rsi]
     add rsp, 512
 
 ;; UINT64  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
@@ -371,8 +372,7 @@ DoReturn:
     push    qword [rax + 0x18]       ; save EFLAGS in new location
     mov     rax, [rax]        ; restore rax
     popfq                     ; restore EFLAGS
-    DB      0x48               ; prefix to composite "retq" with next "retf"
-    retf                      ; far return
+    retfq
 DoIret:
     iretq
 
