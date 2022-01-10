@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2017 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -79,8 +79,7 @@ AsmExceptionEntryBegin:
 DoIret%[Vector]:
     iretd
 ASM_PFX(ExceptionTaskSwtichEntry%[Vector]):
-    db      0x6a        ; push  #VectorNum
-    db      %[Vector]
+    push    byte %[Vector]
     mov     eax, ASM_PFX(CommonTaskSwtichEntryPoint)
     call    eax
     mov     esp, eax    ; Restore stack top
@@ -244,7 +243,7 @@ ASM_PFX(CommonTaskSwtichEntryPoint):
     clts
     sub     esp, 512
     mov     edi, esp
-    db      0xf, 0xae, 0x7 ;fxsave [edi]
+    fxsave  [edi]
 .3:
 
 ;; UINT32  ExceptionData;
@@ -277,7 +276,7 @@ ASM_PFX(CommonTaskSwtichEntryPoint):
     test    edx, BIT24      ; Test for FXSAVE/FXRESTOR support
     jz      .4
     mov     esi, esp
-    db      0xf, 0xae, 0xe  ; fxrstor [esi]
+    fxrstor [esi]
 .4:
     add     esp, 512
 

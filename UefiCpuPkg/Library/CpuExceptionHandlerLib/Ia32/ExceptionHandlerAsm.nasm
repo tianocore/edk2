@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -32,12 +32,13 @@ ALIGN   8
 ; exception handler stub table
 ;
 AsmIdtVectorBegin:
+%assign Vector 0
 %rep  32
-    db      0x6a        ; push  #VectorNum
-    db      ($ - AsmIdtVectorBegin) / ((AsmIdtVectorEnd - AsmIdtVectorBegin) / 32) ; VectorNum
+    push    byte %[Vector];
     push    eax
     mov     eax, ASM_PFX(CommonInterruptEntry)
     jmp     eax
+%assign Vector Vector+1
 %endrep
 AsmIdtVectorEnd:
 
@@ -287,7 +288,7 @@ ErrorCodeAndVectorOnStack:
     test    edx, BIT24  ; Test for FXSAVE/FXRESTOR support.
                         ; edx still contains result from CPUID above
     jz      .3
-    db      0xf, 0xae, 0x7 ;fxsave [edi]
+    fxsave  [edi]
 .3:
 
 ;; UEFI calling convention for IA32 requires that Direction flag in EFLAGs is clear
@@ -320,7 +321,7 @@ ErrorCodeAndVectorOnStack:
                         ; are supported
     test    edx, BIT24  ; Test for FXSAVE/FXRESTOR support
     jz      .4
-    db      0xf, 0xae, 0xe ; fxrstor [esi]
+    fxrstor [esi]
 .4:
     add     esp, 512
 

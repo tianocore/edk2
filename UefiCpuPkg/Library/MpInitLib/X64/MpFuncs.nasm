@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -345,7 +345,7 @@ BITS 64
     ;
     ; Far return into 32-bit mode
     ;
-o64 retf
+    retfq
 
 BITS 32
 CompatMode:
@@ -507,7 +507,7 @@ NoSevEs:
     ;
     ; Far return into 32-bit mode
     ;
-o64 retf
+    retfq
 
 BITS 32
 PmEntry:
