@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -293,7 +293,7 @@ NoExtrPush:
     rep     stosq
     pop     rcx
     mov     rdi, rsp
-    db 0xf, 0xae, 00000111y ;fxsave [rdi]
+    fxsave  [rdi]
 
     ;; save the exception data
     push    qword [rbp + 16]
@@ -314,7 +314,7 @@ NoExtrPush:
     add     rsp, 8
 
     mov     rsi, rsp
-    db 0xf, 0xae, 00001110y ; fxrstor [rsi]
+    fxrstor [rsi]
     add     rsp, 512
 
     ;; UINT64  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
