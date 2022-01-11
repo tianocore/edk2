@@ -440,6 +440,11 @@ F: OvmfPkg/Library/ResetSystemLib/BaseResetSystemLibBhyve.inf
 R: Rebecca Cran <rebecca@bsdio.com> [bcran]
 R: Peter Grehan <grehan@freebsd.org> [grehan-freebsd]
 
+OvmfPkg: cloudhv-related modules
+F: OvmfPkg/CloudHv/
+F: OvmfPkg/Include/IndustryStandard/CloudHv.h
+R: Sebastien Boeuf <sebastien.boeuf@intel.com> [sboeuf]
+
 OvmfPkg: microvm-related modules
 F: OvmfPkg/Microvm/
 F: OvmfPkg/Include/IndustryStandard/Microvm.h
