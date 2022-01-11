@@ -178,16 +178,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
     def PlatformPostBuild(self):
         return 0
 
-    def FlashRomImage(self):
-        VirtualDrive = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive")
-        os.makedirs(VirtualDrive, exist_ok=True)
-        OutputPath_FV = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
-
-        if (self.env.GetValue("QEMU_SKIP") and
-            self.env.GetValue("QEMU_SKIP").upper() == "TRUE"):
-            logging.info("skipping qemu boot test")
-            return 0
-
+    def QemuFlashRomImage(self, virtualDrive, outputPathFv):
         #
         # QEMU must be on the path
         #
@@ -195,7 +186,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args  = "-debugcon stdio"                                           # write messages to stdio
         args += " -global isa-debugcon.iobase=0x402"                        # debug messages out thru virtual io port
         args += " -net none"                                                # turn off network
-        args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk" # Mount disk with startup.nsh
+        args += f" -drive file=fat:rw:{virtualDrive},format=raw,media=disk" # Mount disk with startup.nsh
 
         if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
@@ -205,18 +196,10 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             #args += " -m ..."
             #args += " -smp ..."
             args += " -global driver=cfi.pflash01,property=secure,value=on"
-            args += " -drive if=pflash,format=raw,unit=0,file=" + os.path.join(OutputPath_FV, "OVMF_CODE.fd") + ",readonly=on"
-            args += " -drive if=pflash,format=raw,unit=1,file=" + os.path.join(OutputPath_FV, "OVMF_VARS.fd")
+            args += " -drive if=pflash,format=raw,unit=0,file=" + os.path.join(outputPathFv, "OVMF_CODE.fd") + ",readonly=on"
+            args += " -drive if=pflash,format=raw,unit=1,file=" + os.path.join(outputPathFv, "OVMF_VARS.fd")
         else:
-            args += " -pflash " + os.path.join(OutputPath_FV, "OVMF.fd")    # path to firmware
-
-
-        if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
-            f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
-            f.write("BOOT SUCCESS !!! \n")
-            ## add commands here
-            f.write("reset -s\n")
-            f.close()
+            args += " -pflash " + os.path.join(outputPathFv, "OVMF.fd")    # path to firmware
 
         ret = RunCmd(cmd, args)
 
@@ -225,3 +208,22 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             return 0
 
         return ret
+
+    def FlashRomImage(self):
+        if (self.env.GetValue("QEMU_SKIP") and
+            self.env.GetValue("QEMU_SKIP").upper() == "TRUE"):
+            logging.info("skipping qemu boot test")
+            return 0
+
+        VirtualDrive = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive")
+        os.makedirs(VirtualDrive, exist_ok=True)
+        OutputPath_FV = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
+
+        if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
+            f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
+            f.write("BOOT SUCCESS !!! \n")
+            ## add commands here
+            f.write("reset -s\n")
+            f.close()
+
+        return self.QemuFlashRomImage(VirtualDrive, OutputPath_FV)
