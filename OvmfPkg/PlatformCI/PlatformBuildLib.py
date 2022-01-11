@@ -209,6 +209,20 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
         return ret
 
+    def CloudHvFlashRomImage(self, virtualDrive, outputPathFv):
+        #
+        # Cloud Hypervisor must be on the path
+        #
+        cmd = "cloud-hypervisor"
+        args  = "--cpus boot=1"
+        args += " --memory size=1G"
+        args += " --kernel " + os.path.join(outputPathFv, "CLOUDHV.fd")
+        args += " --serial tty"
+        args += " --console off"
+        args += f" --disk path={virtualDrive}"
+
+        return RunCmd(cmd, args)
+
     def FlashRomImage(self):
         if (self.env.GetValue("BOOT_VMM_SKIP") and
             self.env.GetValue("BOOT_VMM_SKIP").upper() == "TRUE"):
@@ -225,5 +239,9 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             ## add commands here
             f.write("reset -s\n")
             f.close()
+
+        if (self.env.GetValue("VMM") and
+            self.env.GetValue("VMM").upper() == "CLOUDHV"):
+            return self.CloudHvFlashRomImage(VirtualDrive, OutputPath_FV)
 
         return self.QemuFlashRomImage(VirtualDrive, OutputPath_FV)

@@ -139,7 +139,7 @@ jobs:
             Build.Flags: ""
             Build.Target: "DEBUG"
             # this build is for cloud-hypervisor not qemu-kvm
-            Run.Flags: "BOOT_VMM_SKIP=TRUE"
+            Run.Flags: "VMM=CLOUDHV"
             Run: $(should_run)
 
           MICROVM_X64_DEBUG:
@@ -180,3 +180,11 @@ jobs:
         - bash: sudo apt-get install qemu
           displayName: Install qemu
           condition: and(gt(variables.pkg_count, 0), succeeded())
+        - bash: |
+            wget --quiet $(curl --silent https://api.github.com/repos/cloud-hypervisor/cloud-hypervisor/releases/latest | grep "browser_download_url" | grep -o 'https://.*[^ "]' | grep "cloud-hypervisor-static$") -O cloud-hypervisor
+            chmod +x cloud-hypervisor
+            sudo cp cloud-hypervisor /usr/local/bin/
+            echo $PATH
+            export PATH=$PWD:$PATH
+          displayName: Install cloud-hypervisor
+          condition: succeeded()
