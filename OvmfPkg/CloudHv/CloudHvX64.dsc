@@ -533,14 +533,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
 !endif
 
-  # This PCD is used to set the base address of the PCI express hierarchy. It
-  # is only consulted when OVMF runs on Q35. In that case it is programmed into
-  # the PCIEXBAR register.
-  #
-  # On Q35 machine types that QEMU intends to support in the long term, QEMU
-  # never lets the RAM below 4 GB exceed 2816 MB.
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xB0000000
-
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x2
 !endif
@@ -631,8 +623,6 @@
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled|0
 
 !if $(SMM_REQUIRE) == TRUE
-  gUefiOvmfPkgTokenSpaceGuid.PcdQ35TsegMbytes|8
-  gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase|FALSE
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x01
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|100000
 !endif
