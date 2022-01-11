@@ -133,6 +133,15 @@ jobs:
             Run.Flags: "QEMU_SKIP=TRUE"
             Run: $(should_run)
 
+          CLOUDHV_X64_DEBUG:
+            Build.File: "$(package)/PlatformCI/CloudHvBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            # this build is for cloud-hypervisor not qemu-kvm
+            Run.Flags: "QEMU_SKIP=TRUE"
+            Run: $(should_run)
+
           MICROVM_X64_DEBUG:
             Build.File: "$(package)/PlatformCI/MicrovmBuild.py"
             Build.Arch: "X64"
