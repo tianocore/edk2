@@ -418,10 +418,16 @@ PlatformBootManagerBeforeConsole (
     SaveS3BootScript ();
   }
 
+  //
   // We need to connect all trusted consoles for TCG PP. Here we treat all
   // consoles in OVMF to be trusted consoles.
+  //
+  // Cloud Hypervisor doesn't emulate any LPC bridge, which is why it must
+  // rely on the serial I/O port to be connected as a console. It reuses the
+  // definition from Xen as it is very generic.
+  //
   PlatformInitializeConsole (
-    XenDetected () ? gXenPlatformConsole : gPlatformConsole
+    (XenDetected () || PcdGet16 (PcdOvmfHostBridgePciDevId) == CLOUDHV_DEVICE_ID) ? gXenPlatformConsole : gPlatformConsole
     );
 
   //
