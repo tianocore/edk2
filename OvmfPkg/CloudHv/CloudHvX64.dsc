@@ -828,11 +828,9 @@
   OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
 
   #
-  # ISA Support
+  # Serial Support
   #
-  OvmfPkg/SioBusDxe/SioBusDxe.inf
-  MdeModulePkg/Bus/Pci/PciSioSerialDxe/PciSioSerialDxe.inf
-  MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
+  MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 
   #
   # SMBIOS Support
