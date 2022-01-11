@@ -324,12 +324,6 @@ INF MdeModulePkg/Logo/LogoDxe.inf
 !include NetworkPkg/Network.fdf.inc
   INF  OvmfPkg/VirtioNetDxe/VirtioNet.inf
 
-!ifdef $(CSM_ENABLE)
-INF  OvmfPkg/Csm/BiosThunk/VideoDxe/VideoDxe.inf
-INF  OvmfPkg/Csm/LegacyBiosDxe/LegacyBiosDxe.inf
-INF  RuleOverride=CSM OvmfPkg/Csm/Csm16/Csm16.inf
-!endif
-
 INF  OvmfPkg/PlatformDxe/Platform.inf
 INF  OvmfPkg/AmdSevDxe/AmdSevDxe.inf
 INF  OvmfPkg/IoMmuDxe/IoMmuDxe.inf
