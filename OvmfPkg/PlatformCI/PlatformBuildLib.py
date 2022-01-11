@@ -210,9 +210,9 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         return ret
 
     def FlashRomImage(self):
-        if (self.env.GetValue("QEMU_SKIP") and
-            self.env.GetValue("QEMU_SKIP").upper() == "TRUE"):
-            logging.info("skipping qemu boot test")
+        if (self.env.GetValue("BOOT_VMM_SKIP") and
+            self.env.GetValue("BOOT_VMM_SKIP").upper() == "TRUE"):
+            logging.info("skipping VMM boot test")
             return 0
 
         VirtualDrive = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive")
