@@ -76,6 +76,7 @@ sscanf (
 //  -- Dummy OpenSSL Support Routines --
 //
 
+#if 0
 int
 BIO_printf (
   void        *bio,
@@ -96,6 +97,7 @@ BIO_snprintf (
 {
   return 0;
 }
+#endif
 
 uid_t
 getuid (
