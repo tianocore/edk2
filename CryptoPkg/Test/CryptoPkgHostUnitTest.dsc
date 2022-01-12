@@ -13,7 +13,7 @@
   DSC_SPECIFICATION       = 0x00010005
   OUTPUT_DIRECTORY        = Build/CryptoPkg/HostTest
   SUPPORTED_ARCHITECTURES = IA32|X64
-  BUILD_TARGETS           = NOOPT
+  BUILD_TARGETS           = DEBUG|NOOPT
   SKUID_IDENTIFIER        = DEFAULT
 
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
