@@ -58,6 +58,18 @@ WriteDebug64 (
 
 STATIC
 VOID
+ScanSymbol64 (
+  VOID
+  );
+
+STATIC
+VOID
+WriteExport64 (
+  VOID
+  );
+
+STATIC
+VOID
 SetImageSize64 (
   VOID
   );
@@ -122,7 +134,7 @@ STATIC UINT32 mDataOffset;
 STATIC UINT32 mHiiRsrcOffset;
 STATIC UINT32 mRelocOffset;
 STATIC UINT32 mDebugOffset;
-
+STATIC UINT32 mExportOffset;
 //
 // Used for RISC-V relocations.
 //
@@ -131,6 +143,14 @@ STATIC Elf_Shdr    *mRiscVPass1Sym = NULL;
 STATIC Elf64_Half  mRiscVPass1SymSecIndex = 0;
 STATIC INT32       mRiscVPass1Offset;
 STATIC INT32       mRiscVPass1GotFixup;
+
+//
+// Used for Export section.
+//
+STATIC UINT32      mExportSize;
+STATIC UINT32      mExportRVA[PRM_MODULE_EXPORT_SYMBOL_NUM];
+STATIC UINT32      mExportSymNum;
+STATIC CHAR8       mExportSymName[PRM_MODULE_EXPORT_SYMBOL_NUM][PRM_HANDLER_NAME_MAXIMUM_LENGTH];
 
 //
 // Initialization Function
@@ -200,6 +220,10 @@ InitializeElf64 (
   ElfFunctions->SetImageSize = SetImageSize64;
   ElfFunctions->CleanUp = CleanUp64;
 
+  if (mExportFlag) {
+    ElfFunctions->ScanSymbol = ScanSymbol64;
+    ElfFunctions->WriteExport = WriteExport64;
+  }
   return TRUE;
 }
 
@@ -261,6 +285,17 @@ IsHiiRsrcShdr (
   Elf_Shdr *Namedr = GetShdrByIndex(mEhdr->e_shstrndx);
 
   return (BOOLEAN) (strcmp((CHAR8*)mEhdr + Namedr->sh_offset + Shdr->sh_name, ELF_HII_SECTION_NAME) == 0);
+}
+
+STATIC
+BOOLEAN
+IsSymbolShdr (
+  Elf_Shdr *Shdr
+  )
+{
+  Elf_Shdr *Namehdr = GetShdrByIndex(mEhdr->e_shstrndx);
+
+  return (BOOLEAN) (strcmp((CHAR8*)mEhdr + Namehdr->sh_offset + Shdr->sh_name, ELF_SYMBOL_SECTION_NAME) == 0);
 }
 
 STATIC
@@ -333,6 +368,38 @@ GetSymName (
   assert(foundEnd);
 
   return StrtabContents + Sym->st_name;
+}
+
+//
+// Get Prm Handler number and name
+//
+STATIC
+VOID
+FindPrmHandler (
+  UINT64 Offset
+  )
+{
+  PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_HEADER *PrmExport;
+  UINT32   NameOffset;
+  UINT32   HandlerNum;
+  UINT32   Index;
+  UINT8    SymName[PRM_HANDLER_NAME_MAXIMUM_LENGTH];
+
+  PrmExport = (PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_HEADER*)(mCoffFile + Offset);
+  NameOffset = sizeof(PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_HEADER) + sizeof(EFI_GUID);
+
+  for (HandlerNum = 0; HandlerNum < PrmExport->NumberPrmHandlers; HandlerNum++) {
+    for (Index = 0; Index < PRM_HANDLER_NAME_MAXIMUM_LENGTH; Index++) {
+      SymName[Index] = *((UINT8 *)PrmExport + NameOffset + Index);
+      if (SymName[Index] == 0) {
+        break;
+      }
+    }
+
+    strcpy(mExportSymName[mExportSymNum], (CHAR8*)SymName);
+    NameOffset += PRM_HANDLER_NAME_MAXIMUM_LENGTH + sizeof(EFI_GUID);
+    mExportSymNum ++;
+  }
 }
 
 //
@@ -717,6 +784,7 @@ ScanSections64 (
   UINT32                          CoffEntry;
   UINT32                          SectionCount;
   BOOLEAN                         FoundSection;
+  UINT32                          Offset;
 
   CoffEntry = 0;
   mCoffOffset = 0;
@@ -750,7 +818,7 @@ ScanSections64 (
     if (shdr->sh_addralign <= mCoffAlignment) {
       continue;
     }
-    if (IsTextShdr(shdr) || IsDataShdr(shdr) || IsHiiRsrcShdr(shdr)) {
+    if (IsTextShdr(shdr) || IsDataShdr(shdr) || IsHiiRsrcShdr(shdr) || IsSymbolShdr(shdr)) {
       mCoffAlignment = (UINT32)shdr->sh_addralign;
     }
   }
@@ -881,6 +949,16 @@ ScanSections64 (
   }
 
   //
+  //  The Symbol sections.
+  //
+  if (mExportFlag) {
+    mExportOffset = mCoffOffset;
+    mExportSize = sizeof(EFI_IMAGE_EXPORT_DIRECTORY) + strlen(mInImageName) + 1;
+    mCoffOffset += mExportSize;
+    mCoffOffset = CoffAlign(mCoffOffset);
+  }
+
+  //
   //  The HII resource sections.
   //
   mHiiRsrcOffset = mCoffOffset;
@@ -962,7 +1040,11 @@ ScanSections64 (
     | EFI_IMAGE_FILE_LARGE_ADDRESS_AWARE;
 
   NtHdr->Pe32Plus.OptionalHeader.SizeOfCode = mDataOffset - mTextOffset;
-  NtHdr->Pe32Plus.OptionalHeader.SizeOfInitializedData = mRelocOffset - mDataOffset;
+  if(mExportFlag) {
+    NtHdr->Pe32Plus.OptionalHeader.SizeOfInitializedData = mRelocOffset - mExportOffset;
+  } else {
+    NtHdr->Pe32Plus.OptionalHeader.SizeOfInitializedData = mRelocOffset - mDataOffset;
+  }
   NtHdr->Pe32Plus.OptionalHeader.SizeOfUninitializedData = 0;
   NtHdr->Pe32Plus.OptionalHeader.AddressOfEntryPoint = CoffEntry;
 
@@ -989,14 +1071,37 @@ ScanSections64 (
     NtHdr->Pe32Plus.FileHeader.NumberOfSections--;
   }
 
+  //
+  // If found symbol, add edata section between data and rsrc section
+  //
+  if(mExportFlag) {
+    Offset = mExportOffset;
+  } else {
+    Offset = mHiiRsrcOffset;
+  }
+
   if ((mHiiRsrcOffset - mDataOffset) > 0) {
-    CreateSectionHeader (".data", mDataOffset, mHiiRsrcOffset - mDataOffset,
+    CreateSectionHeader (".data", mDataOffset, Offset - mDataOffset,
             EFI_IMAGE_SCN_CNT_INITIALIZED_DATA
             | EFI_IMAGE_SCN_MEM_WRITE
             | EFI_IMAGE_SCN_MEM_READ);
   } else {
     // Don't make a section of size 0.
     NtHdr->Pe32Plus.FileHeader.NumberOfSections--;
+  }
+
+  if(mExportFlag) {
+    if ((mHiiRsrcOffset - mExportOffset) > 0) {
+      CreateSectionHeader (".edata", mExportOffset, mHiiRsrcOffset - mExportOffset,
+              EFI_IMAGE_SCN_CNT_INITIALIZED_DATA
+              | EFI_IMAGE_SCN_MEM_READ);
+      NtHdr->Pe32Plus.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_EXPORT].Size = mHiiRsrcOffset - mExportOffset;
+      NtHdr->Pe32Plus.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress = mExportOffset;
+      NtHdr->Pe32Plus.FileHeader.NumberOfSections++;
+    } else {
+      // Don't make a section of size 0.
+      NtHdr->Pe32Plus.FileHeader.NumberOfSections--;
+    }
   }
 
   if ((mRelocOffset - mHiiRsrcOffset) > 0) {
@@ -1757,4 +1862,145 @@ CleanUp64 (
   }
 }
 
+STATIC
+VOID
+ScanSymbol64 (
+  VOID
+  )
+{
+  UINT32      shIndex;
+  UINT32      SymIndex;
+  Elf_Sym     *Sym;
+  UINT64      SymNum;
+  const UINT8 *SymName;
+
+  for (shIndex = 0; shIndex < mEhdr->e_shnum; shIndex++) {
+    //
+    // Determine if this is a symbol section.
+    //
+    Elf_Shdr *shdr = GetShdrByIndex(shIndex);
+    if (!IsSymbolShdr(shdr)) {
+      continue;
+    }
+
+    UINT8    *Symtab = (UINT8*)mEhdr + shdr->sh_offset;
+    SymNum = (shdr->sh_size) / (shdr->sh_entsize);
+
+    //
+    // First Get PrmModuleExportDescriptor
+    //
+    for (SymIndex = 0; SymIndex < SymNum; SymIndex++) {
+      Sym = (Elf_Sym *)(Symtab + SymIndex * shdr->sh_entsize);
+      SymName = GetSymName(Sym);
+      if (SymName == NULL) {
+          continue;
+      }
+
+      if (strcmp((CHAR8*)SymName, PRM_MODULE_EXPORT_DESCRIPTOR_NAME) == 0) {
+        //
+        // Find PrmHandler Number and Name
+        //
+        FindPrmHandler(Sym->st_value);
+
+        strcpy(mExportSymName[mExportSymNum], (CHAR8*)SymName);
+        mExportRVA[mExportSymNum] = (UINT32)(Sym->st_value);
+        mExportSize += 2 * EFI_IMAGE_EXPORT_ADDR_SIZE + EFI_IMAGE_EXPORT_ORDINAL_SIZE + strlen((CHAR8 *)SymName) + 1;
+        mExportSymNum ++;
+        break;
+      }
+    }
+
+    //
+    // Second Get PrmHandler
+    //
+    for (SymIndex = 0; SymIndex < SymNum; SymIndex++) {
+      UINT32   ExpIndex;
+      Sym = (Elf_Sym *)(Symtab + SymIndex * shdr->sh_entsize);
+      SymName = GetSymName(Sym);
+      if (SymName == NULL) {
+          continue;
+      }
+
+      for (ExpIndex = 0; ExpIndex < (mExportSymNum -1); ExpIndex++) {
+        if (strcmp((CHAR8*)SymName, mExportSymName[ExpIndex]) != 0) {
+          continue;
+        }
+        mExportRVA[ExpIndex] = (UINT32)(Sym->st_value);
+        mExportSize += 2 * EFI_IMAGE_EXPORT_ADDR_SIZE + EFI_IMAGE_EXPORT_ORDINAL_SIZE + strlen((CHAR8 *)SymName) + 1;
+      }
+    }
+
+    break;
+  }
+}
+
+STATIC
+VOID
+WriteExport64 (
+  VOID
+  )
+{
+  EFI_IMAGE_OPTIONAL_HEADER_UNION     *NtHdr;
+  EFI_IMAGE_EXPORT_DIRECTORY          *ExportDir;
+  EFI_IMAGE_DATA_DIRECTORY            *DataDir;
+  UINT32                              FileNameOffset;
+  UINT32                              FuncOffset;
+  UINT16                              Index;
+  UINT8                               *Tdata = NULL;
+
+  ExportDir = (EFI_IMAGE_EXPORT_DIRECTORY*)(mCoffFile + mExportOffset);
+  ExportDir->Characteristics = 0;
+  ExportDir->TimeDateStamp = 0;
+  ExportDir->MajorVersion = 0;
+  ExportDir->MinorVersion =0;
+  ExportDir->Name = 0;
+  ExportDir->NumberOfFunctions = mExportSymNum;
+  ExportDir->NumberOfNames = mExportSymNum;
+  ExportDir->Base = EFI_IMAGE_EXPORT_ORDINAL_BASE;
+  ExportDir->AddressOfFunctions = mExportOffset + sizeof(EFI_IMAGE_EXPORT_DIRECTORY);
+  ExportDir->AddressOfNames = ExportDir->AddressOfFunctions + EFI_IMAGE_EXPORT_ADDR_SIZE * mExportSymNum;
+  ExportDir->AddressOfNameOrdinals = ExportDir->AddressOfNames + EFI_IMAGE_EXPORT_ADDR_SIZE * mExportSymNum;
+
+  FileNameOffset = ExportDir->AddressOfNameOrdinals + EFI_IMAGE_EXPORT_ORDINAL_SIZE * mExportSymNum;
+  FuncOffset = FileNameOffset + strlen(mInImageName) + 1;
+
+  // Write Input image Name RVA
+  Tdata = mCoffFile + 12;
+  *(UINT32 *)Tdata = FileNameOffset;
+
+  // Write Input image Name
+  strcpy((char *)(mCoffFile + FileNameOffset), mInImageName);
+
+  for (Index = 0; Index < mExportSymNum; Index++) {
+    //
+    // Write Export Address Table
+    //
+    Tdata = mCoffFile + ExportDir->AddressOfFunctions + Index * EFI_IMAGE_EXPORT_ADDR_SIZE;
+    *(UINT32 *)Tdata = mExportRVA[Index];
+
+    //
+    // Write Export Name Pointer Table
+    //
+    Tdata = mCoffFile + ExportDir->AddressOfNames + Index * EFI_IMAGE_EXPORT_ADDR_SIZE;
+    *(UINT32 *)Tdata = FuncOffset;
+
+    //
+    // Write Export Ordinal table
+    //
+    Tdata = mCoffFile + ExportDir->AddressOfNameOrdinals + Index * EFI_IMAGE_EXPORT_ORDINAL_SIZE;
+    *(UINT16 *)Tdata = Index;
+
+    //
+    // Write Export Name Table
+    //
+    strcpy((char *)(mCoffFile + FuncOffset), mExportSymName[Index]);
+    FuncOffset += strlen(mExportSymName[Index]) + 1;
+  }
+
+  NtHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)(mCoffFile + mNtHdrOffset);
+  DataDir = &NtHdr->Pe32Plus.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_EXPORT];
+  DataDir->VirtualAddress = mExportOffset;
+  DataDir->Size = mExportSize;
+
+}
 

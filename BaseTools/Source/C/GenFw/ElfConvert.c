@@ -224,6 +224,16 @@ ConvertElf (
   ElfFunctions.WriteDebug ();
 
   //
+  // For PRM Driver to Write export info.
+  //
+  if (mExportFlag) {
+    VerboseMsg ("Scan symbol info.");
+    ElfFunctions.ScanSymbol ();
+    VerboseMsg ("Write export info.");
+    ElfFunctions.WriteExport ();
+  }
+
+  //
   // Make sure image size is correct before returning the new image.
   //
   VerboseMsg ("Set image size.");

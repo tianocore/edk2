@@ -87,7 +87,7 @@ UINT32 mImageTimeStamp = 0;
 UINT32 mImageSize = 0;
 UINT32 mOutImageType = FW_DUMMY_IMAGE;
 BOOLEAN mIsConvertXip = FALSE;
-
+BOOLEAN mExportFlag = FALSE;
 
 STATIC
 EFI_STATUS
@@ -1431,6 +1431,15 @@ Returns:
 
     if (stricmp (argv[0], "--hiibinpackage") == 0) {
       mOutImageType = FW_HII_PACKAGE_LIST_BINIMAGE;
+      argc --;
+      argv ++;
+      continue;
+    }
+
+    if (stricmp (argv[0], "--PRM") == 0) {
+      if (!mExportFlag) {
+        mExportFlag = TRUE;
+      }
       argc --;
       argv ++;
       continue;
