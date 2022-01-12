@@ -152,7 +152,7 @@ ossl_rand_pool_init (
  * This is OpenSSL required interface.
  */
 VOID
-rand_pool_cleanup (
+ossl_rand_pool_cleanup (
   VOID
   )
 {
@@ -164,7 +164,7 @@ rand_pool_cleanup (
  * This is OpenSSL required interface.
  */
 VOID
-rand_pool_keep_random_devices_open (
+ossl_rand_pool_keep_random_devices_open (
   int  keep
   )
 {
