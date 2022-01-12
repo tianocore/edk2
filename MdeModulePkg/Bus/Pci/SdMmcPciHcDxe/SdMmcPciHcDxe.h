@@ -83,7 +83,6 @@ typedef struct {
   BOOLEAN                              MediaPresent;
   BOOLEAN                              Initialized;
   SD_MMC_CARD_TYPE                     CardType;
-  UINT64                               CurrentFreq;
   EDKII_SD_MMC_OPERATING_PARAMETERS    OperatingParameters;
 } SD_MMC_HC_SLOT;
 
@@ -812,11 +811,11 @@ SdCardIdentification (
 
   Refer to SD Host Controller Simplified spec 3.0 Section 3.2.1 for details.
 
-  @param[in] Private         A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
-  @param[in] Slot            The slot number of the SD card to send the command to.
-  @param[in] BusTiming       BusTiming at which the frequency change is done.
-  @param[in] FirstTimeSetup  Flag to indicate whether the clock is being setup for the first time.
-  @param[in] ClockFreq       The max clock frequency to be set. The unit is KHz.
+  @param[in] PciIo          The PCI IO protocol instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+  @param[in] ClockFreq      The max clock frequency to be set. The unit is KHz.
+  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
+  @param[in] ControllerVer  The version of host controller.
 
   @retval EFI_SUCCESS       The clock is supplied successfully.
   @retval Others            The clock isn't supplied successfully.
@@ -824,11 +823,11 @@ SdCardIdentification (
 **/
 EFI_STATUS
 SdMmcHcClockSupply (
-  IN SD_MMC_HC_PRIVATE_DATA  *Private,
-  IN UINT8                   Slot,
-  IN SD_MMC_BUS_MODE         BusTiming,
-  IN BOOLEAN                 FirstTimeSetup,
-  IN UINT64                  ClockFreq
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT8                Slot,
+  IN UINT64               ClockFreq,
+  IN UINT32               BaseClkFreq,
+  IN UINT16               ControllerVer
   );
 
 /**

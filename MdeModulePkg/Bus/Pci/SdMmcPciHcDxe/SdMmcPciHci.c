@@ -801,11 +801,11 @@ SdMmcHcStartSdClock (
 
   Refer to SD Host Controller Simplified spec 3.0 Section 3.2.1 for details.
 
-  @param[in] Private         A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
-  @param[in] Slot            The slot number of the SD card to send the command to.
-  @param[in] BusTiming       BusTiming at which the frequency change is done.
-  @param[in] FirstTimeSetup  Flag to indicate whether the clock is being setup for the first time.
-  @param[in] ClockFreq       The max clock frequency to be set. The unit is KHz.
+  @param[in] PciIo          The PCI IO protocol instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+  @param[in] ClockFreq      The max clock frequency to be set. The unit is KHz.
+  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
+  @param[in] ControllerVer  The version of host controller.
 
   @retval EFI_SUCCESS       The clock is supplied successfully.
   @retval Others            The clock isn't supplied successfully.
@@ -813,27 +813,25 @@ SdMmcHcStartSdClock (
 **/
 EFI_STATUS
 SdMmcHcClockSupply (
-  IN SD_MMC_HC_PRIVATE_DATA  *Private,
-  IN UINT8                   Slot,
-  IN SD_MMC_BUS_MODE         BusTiming,
-  IN BOOLEAN                 FirstTimeSetup,
-  IN UINT64                  ClockFreq
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT8                Slot,
+  IN UINT64               ClockFreq,
+  IN UINT32               BaseClkFreq,
+  IN UINT16               ControllerVer
   )
 {
-  EFI_STATUS           Status;
-  UINT32               SettingFreq;
-  UINT32               Divisor;
-  UINT32               Remainder;
-  UINT16               ClockCtrl;
-  UINT32               BaseClkFreq;
-  UINT16               ControllerVer;
-  EFI_PCI_IO_PROTOCOL  *PciIo;
+  EFI_STATUS  Status;
+  UINT32      SettingFreq;
+  UINT32      Divisor;
+  UINT32      Remainder;
+  UINT16      ClockCtrl;
 
-  PciIo         = Private->PciIo;
-  BaseClkFreq   = Private->BaseClkFreq[Slot];
-  ControllerVer = Private->ControllerVersion[Slot];
+  //
+  // Calculate a divisor for SD clock frequency
+  //
+  ASSERT (BaseClkFreq != 0);
 
-  if ((BaseClkFreq == 0) || (ClockFreq == 0)) {
+  if (ClockFreq == 0) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -921,35 +919,11 @@ SdMmcHcClockSupply (
     return Status;
   }
 
-  Status = SdMmcHcStartSdClock (PciIo, Slot);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
   //
-  // We don't notify the platform on first time setup to avoid changing
-  // legacy behavior. During first time setup we also don't know what type
-  // of the card slot it is and which enum value of BusTiming applies.
+  // Set SD Clock Enable in the Clock Control register to 1
   //
-  if (!FirstTimeSetup && (mOverride != NULL) && (mOverride->NotifyPhase != NULL)) {
-    Status = mOverride->NotifyPhase (
-                          Private->ControllerHandle,
-                          Slot,
-                          EdkiiSdMmcSwitchClockFreqPost,
-                          &BusTiming
-                          );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a: SD/MMC switch clock freq post notifier callback failed - %r\n",
-        __FUNCTION__,
-        Status
-        ));
-      return Status;
-    }
-  }
-
-  Private->Slot[Slot].CurrentFreq = ClockFreq;
+  ClockCtrl = BIT2;
+  Status    = SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_CLOCK_CTRL, sizeof (ClockCtrl), &ClockCtrl);
 
   return Status;
 }
@@ -1111,6 +1085,50 @@ SdMmcHcInitV4Enhancements (
 }
 
 /**
+  Supply SD/MMC card with lowest clock frequency at initialization.
+
+  @param[in] PciIo          The PCI IO protocol instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
+  @param[in] ControllerVer  The version of host controller.
+
+  @retval EFI_SUCCESS       The clock is supplied successfully.
+  @retval Others            The clock isn't supplied successfully.
+
+**/
+EFI_STATUS
+SdMmcHcInitClockFreq (
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT8                Slot,
+  IN UINT32               BaseClkFreq,
+  IN UINT16               ControllerVer
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      InitFreq;
+
+  //
+  // According to SDHCI specification ver. 4.2, BaseClkFreq field value of
+  // the Capability Register 1 can be zero, which means a need for obtaining
+  // the clock frequency via another method. Fail in case it is not updated
+  // by SW at this point.
+  //
+  if (BaseClkFreq == 0) {
+    //
+    // Don't support get Base Clock Frequency information via another method
+    //
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Supply 400KHz clock frequency at initialization phase.
+  //
+  InitFreq = 400;
+  Status   = SdMmcHcClockSupply (PciIo, Slot, InitFreq, BaseClkFreq, ControllerVer);
+  return Status;
+}
+
+/**
   Supply SD/MMC card with maximum voltage at initialization.
 
   Refer to SD Host Controller Simplified spec 3.0 Section 3.3 for details.
@@ -1249,14 +1267,7 @@ SdMmcHcInitHost (
     return Status;
   }
 
-  //
-  // Perform first time clock setup with 400 KHz frequency.
-  // We send the 0 as the BusTiming value because at this time
-  // we still do not know the slot type and which enum value will apply.
-  // Since it is a first time setup SdMmcHcClockSupply won't notify
-  // the platofrm driver anyway so it doesn't matter.
-  //
-  Status = SdMmcHcClockSupply (Private, Slot, 0, TRUE, 400);
+  Status = SdMmcHcInitClockFreq (PciIo, Slot, Private->BaseClkFreq[Slot], Private->ControllerVersion[Slot]);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1852,27 +1863,26 @@ SdMmcCreateTrb (
   IN EFI_EVENT                            Event
   )
 {
-  SD_MMC_HC_TRB  *Trb;
-  EFI_STATUS     Status;
-  EFI_TPL        OldTpl;
+  SD_MMC_HC_TRB                  *Trb;
+  EFI_STATUS                     Status;
+  EFI_TPL                        OldTpl;
+  EFI_PCI_IO_PROTOCOL_OPERATION  Flag;
+  EFI_PCI_IO_PROTOCOL            *PciIo;
+  UINTN                          MapLength;
 
   Trb = AllocateZeroPool (sizeof (SD_MMC_HC_TRB));
   if (Trb == NULL) {
     return NULL;
   }
 
-  Trb->Signature                = SD_MMC_HC_TRB_SIG;
-  Trb->Slot                     = Slot;
-  Trb->BlockSize                = 0x200;
-  Trb->Packet                   = Packet;
-  Trb->Event                    = Event;
-  Trb->Started                  = FALSE;
-  Trb->CommandComplete          = FALSE;
-  Trb->Timeout                  = Packet->Timeout;
-  Trb->Retries                  = SD_MMC_TRB_RETRIES;
-  Trb->PioModeTransferCompleted = FALSE;
-  Trb->PioBlockIndex            = 0;
-  Trb->Private                  = Private;
+  Trb->Signature = SD_MMC_HC_TRB_SIG;
+  Trb->Slot      = Slot;
+  Trb->BlockSize = 0x200;
+  Trb->Packet    = Packet;
+  Trb->Event     = Event;
+  Trb->Started   = FALSE;
+  Trb->Timeout   = Packet->Timeout;
+  Trb->Private   = Private;
 
   if ((Packet->InTransferLength != 0) && (Packet->InDataBuffer != NULL)) {
     Trb->Data    = Packet->InDataBuffer;
@@ -1900,6 +1910,29 @@ SdMmcCreateTrb (
   {
     Trb->Mode = SdMmcPioMode;
   } else {
+    if (Trb->Read) {
+      Flag = EfiPciIoOperationBusMasterWrite;
+    } else {
+      Flag = EfiPciIoOperationBusMasterRead;
+    }
+
+    PciIo = Private->PciIo;
+    if (Trb->DataLen != 0) {
+      MapLength = Trb->DataLen;
+      Status    = PciIo->Map (
+                           PciIo,
+                           Flag,
+                           Trb->Data,
+                           &MapLength,
+                           &Trb->DataPhy,
+                           &Trb->DataMap
+                           );
+      if (EFI_ERROR (Status) || (Trb->DataLen != MapLength)) {
+        Status = EFI_BAD_BUFFER_SIZE;
+        goto Error;
+      }
+    }
+
     if (Trb->DataLen == 0) {
       Trb->Mode = SdMmcNoData;
     } else if (Private->Capability[Slot].Adma2 != 0) {
@@ -1921,16 +1954,12 @@ SdMmcCreateTrb (
         Trb->AdmaLengthMode = SdMmcAdmaLen26b;
       }
 
-      Status = SdMmcSetupMemoryForDmaTransfer (Private, Slot, Trb);
+      Status = BuildAdmaDescTable (Trb, Private->ControllerVersion[Slot]);
       if (EFI_ERROR (Status)) {
         goto Error;
       }
     } else if (Private->Capability[Slot].Sdma != 0) {
       Trb->Mode = SdMmcSdmaMode;
-      Status    = SdMmcSetupMemoryForDmaTransfer (Private, Slot, Trb);
-      if (EFI_ERROR (Status)) {
-        goto Error;
-      }
     } else {
       Trb->Mode = SdMmcPioMode;
     }
@@ -2803,8 +2832,14 @@ SdMmcCheckTrbResult (
   EFI_STATUS                           Status;
   EFI_SD_MMC_PASS_THRU_COMMAND_PACKET  *Packet;
   UINT16                               IntStatus;
+  UINT32                               Response[4];
+  UINT64                               SdmaAddr;
+  UINT8                                Index;
+  UINT8                                SwReset;
+  UINT32                               PioLength;
 
-  Packet = Trb->Packet;
+  SwReset = 0;
+  Packet  = Trb->Packet;
   //
   // Check Trb execution result by reading Normal Interrupt Status register.
   //
@@ -2821,54 +2856,209 @@ SdMmcCheckTrbResult (
   }
 
   //
-  // Check if there are any errors reported by host controller
-  // and if neccessary recover the controller before next command is executed.
+  // Check Transfer Complete bit is set or not.
   //
-  Status = SdMmcCheckAndRecoverErrors (Private, Trb->Slot, IntStatus);
-  if (EFI_ERROR (Status)) {
+  if ((IntStatus & BIT1) == BIT1) {
+    if ((IntStatus & BIT15) == BIT15) {
+      //
+      // Read Error Interrupt Status register to check if the error is
+      // Data Timeout Error.
+      // If yes, treat it as success as Transfer Complete has higher
+      // priority than Data Timeout Error.
+      //
+      Status = SdMmcHcRwMmio (
+                 Private->PciIo,
+                 Trb->Slot,
+                 SD_MMC_HC_ERR_INT_STS,
+                 TRUE,
+                 sizeof (IntStatus),
+                 &IntStatus
+                 );
+      if (!EFI_ERROR (Status)) {
+        if ((IntStatus & BIT4) == BIT4) {
+          Status = EFI_SUCCESS;
+        } else {
+          Status = EFI_DEVICE_ERROR;
+        }
+      }
+    }
+
     goto Done;
   }
 
   //
-  // Tuning commands are the only ones that do not generate command
-  // complete interrupt. Process them here before entering the code
-  // that waits for command completion.
+  // Check if there is a error happened during cmd execution.
+  // If yes, then do error recovery procedure to follow SD Host Controller
+  // Simplified Spec 3.0 section 3.10.1.
   //
+  if ((IntStatus & BIT15) == BIT15) {
+    Status = SdMmcHcRwMmio (
+               Private->PciIo,
+               Trb->Slot,
+               SD_MMC_HC_ERR_INT_STS,
+               TRUE,
+               sizeof (IntStatus),
+               &IntStatus
+               );
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+
+    if ((IntStatus & 0x0F) != 0) {
+      SwReset |= BIT1;
+    }
+
+    if ((IntStatus & 0xF0) != 0) {
+      SwReset |= BIT2;
+    }
+
+    Status = SdMmcHcRwMmio (
+               Private->PciIo,
+               Trb->Slot,
+               SD_MMC_HC_SW_RST,
+               FALSE,
+               sizeof (SwReset),
+               &SwReset
+               );
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+
+    Status = SdMmcHcWaitMmioSet (
+               Private->PciIo,
+               Trb->Slot,
+               SD_MMC_HC_SW_RST,
+               sizeof (SwReset),
+               0xFF,
+               0,
+               SD_MMC_HC_GENERIC_TIMEOUT
+               );
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
+  }
+
+  //
+  // Check if DMA interrupt is signalled for the SDMA transfer.
+  //
+  if ((Trb->Mode == SdMmcSdmaMode) && ((IntStatus & BIT3) == BIT3)) {
+    //
+    // Clear DMA interrupt bit.
+    //
+    IntStatus = BIT3;
+    Status    = SdMmcHcRwMmio (
+                  Private->PciIo,
+                  Trb->Slot,
+                  SD_MMC_HC_NOR_INT_STS,
+                  FALSE,
+                  sizeof (IntStatus),
+                  &IntStatus
+                  );
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+
+    //
+    // Update SDMA Address register.
+    //
+    SdmaAddr = SD_MMC_SDMA_ROUND_UP ((UINTN)Trb->DataPhy, SD_MMC_SDMA_BOUNDARY);
+
+    if (Private->ControllerVersion[Trb->Slot] >= SD_MMC_HC_CTRL_VER_400) {
+      Status = SdMmcHcRwMmio (
+                 Private->PciIo,
+                 Trb->Slot,
+                 SD_MMC_HC_ADMA_SYS_ADDR,
+                 FALSE,
+                 sizeof (UINT64),
+                 &SdmaAddr
+                 );
+    } else {
+      Status = SdMmcHcRwMmio (
+                 Private->PciIo,
+                 Trb->Slot,
+                 SD_MMC_HC_SDMA_ADDR,
+                 FALSE,
+                 sizeof (UINT32),
+                 &SdmaAddr
+                 );
+    }
+
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+
+    Trb->DataPhy = (UINT64)(UINTN)SdmaAddr;
+  }
+
+  if ((Packet->SdMmcCmdBlk->CommandType != SdMmcCommandTypeAdtc) &&
+      (Packet->SdMmcCmdBlk->ResponseType != SdMmcResponseTypeR1b) &&
+      (Packet->SdMmcCmdBlk->ResponseType != SdMmcResponseTypeR5b))
+  {
+    if ((IntStatus & BIT0) == BIT0) {
+      Status = EFI_SUCCESS;
+      goto Done;
+    }
+  }
+
   if (((Private->Slot[Trb->Slot].CardType == EmmcCardType) &&
        (Packet->SdMmcCmdBlk->CommandIndex == EMMC_SEND_TUNING_BLOCK)) ||
       ((Private->Slot[Trb->Slot].CardType == SdCardType) &&
        (Packet->SdMmcCmdBlk->CommandIndex == SD_SEND_TUNING_BLOCK)))
   {
-    Status = SdMmcTransferDataWithPio (Private, Trb, IntStatus);
-    goto Done;
-  }
+    //
+    // When performing tuning procedure (Execute Tuning is set to 1) through PIO mode,
+    // wait Buffer Read Ready bit of Normal Interrupt Status Register to be 1.
+    // Refer to SD Host Controller Simplified Specification 3.0 figure 2-29 for details.
+    //
+    if ((IntStatus & BIT5) == BIT5) {
+      //
+      // Clear Buffer Read Ready interrupt at first.
+      //
+      IntStatus = BIT5;
+      SdMmcHcRwMmio (Private->PciIo, Trb->Slot, SD_MMC_HC_NOR_INT_STS, FALSE, sizeof (IntStatus), &IntStatus);
+      //
+      // Read data out from Buffer Port register
+      //
+      for (PioLength = 0; PioLength < Trb->DataLen; PioLength += 4) {
+        SdMmcHcRwMmio (Private->PciIo, Trb->Slot, SD_MMC_HC_BUF_DAT_PORT, TRUE, 4, (UINT8 *)Trb->Data + PioLength);
+      }
 
-  if (!Trb->CommandComplete) {
-    Status = SdMmcCheckCommandComplete (Private, Trb, IntStatus);
-    if (EFI_ERROR (Status)) {
+      Status = EFI_SUCCESS;
       goto Done;
     }
   }
 
-  if ((Packet->SdMmcCmdBlk->CommandType == SdMmcCommandTypeAdtc) ||
-      (Packet->SdMmcCmdBlk->ResponseType == SdMmcResponseTypeR1b) ||
-      (Packet->SdMmcCmdBlk->ResponseType == SdMmcResponseTypeR5b))
-  {
-    Status = SdMmcCheckDataTransfer (Private, Trb, IntStatus);
-  } else {
-    Status = EFI_SUCCESS;
+  Status = EFI_NOT_READY;
+Done:
+  //
+  // Get response data when the cmd is executed successfully.
+  //
+  if (!EFI_ERROR (Status)) {
+    if (Packet->SdMmcCmdBlk->CommandType != SdMmcCommandTypeBc) {
+      for (Index = 0; Index < 4; Index++) {
+        Status = SdMmcHcRwMmio (
+                   Private->PciIo,
+                   Trb->Slot,
+                   SD_MMC_HC_RESPONSE + Index * 4,
+                   TRUE,
+                   sizeof (UINT32),
+                   &Response[Index]
+                   );
+        if (EFI_ERROR (Status)) {
+          SdMmcHcLedOnOff (Private->PciIo, Trb->Slot, FALSE);
+          return Status;
+        }
+      }
+
+      CopyMem (Packet->SdMmcStatusBlk, Response, sizeof (Response));
+    }
   }
 
-Done:
   if (Status != EFI_NOT_READY) {
     SdMmcHcLedOnOff (Private->PciIo, Trb->Slot, FALSE);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "TRB failed with %r\n", Status));
-      SdMmcPrintTrb (DEBUG_ERROR, Trb);
-    } else {
-      DEBUG ((DEBUG_VERBOSE, "TRB success\n"));
-      SdMmcPrintTrb (DEBUG_VERBOSE, Trb);
-    }
   }
 
   return Status;

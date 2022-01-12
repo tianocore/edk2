@@ -28,7 +28,7 @@ EFI_DRIVER_BINDING_PROTOCOL  gSdMmcPciHcDriverBinding = {
   NULL
 };
 
-#define SLOT_INIT_TEMPLATE  {0, UnknownSlot, 0, 0, 0, 0,\
+#define SLOT_INIT_TEMPLATE  {0, UnknownSlot, 0, 0, 0,\
                                {EDKII_SD_MMC_BUS_WIDTH_IGNORE,\
                                EDKII_SD_MMC_CLOCK_FREQ_IGNORE,\
                                {EDKII_SD_MMC_DRIVER_STRENGTH_IGNORE}}}
@@ -1107,6 +1107,7 @@ SdMmcPassThruPassThru (
   EFI_STATUS              Status;
   SD_MMC_HC_PRIVATE_DATA  *Private;
   SD_MMC_HC_TRB           *Trb;
+  EFI_TPL                 OldTpl;
 
   if ((This == NULL) || (Packet == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1152,6 +1153,35 @@ SdMmcPassThruPassThru (
 
   Status = SdMmcPassThruExecSyncTrb (Private, Trb);
 
+  //
+  // Wait async I/O list is empty before execute sync I/O operation.
+  //
+  while (TRUE) {
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    if (IsListEmpty (&Private->Queue)) {
+      gBS->RestoreTPL (OldTpl);
+      break;
+    }
+
+    gBS->RestoreTPL (OldTpl);
+  }
+
+  Status = SdMmcWaitTrbEnv (Private, Trb);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  Status = SdMmcExecTrb (Private, Trb);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  Status = SdMmcWaitTrbResult (Private, Trb);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+Done:
   SdMmcFreeTrb (Trb);
 
   return Status;

@@ -129,6 +129,10 @@ typedef struct {
   UINT32    UpperAddress;
 } SD_MMC_HC_ADMA_64_V3_DESC_LINE;
 
+//
+// ADMA descriptor for 64b addressing.
+//
+
 typedef struct {
   UINT32    Valid       : 1;
   UINT32    End         : 1;
@@ -187,7 +191,6 @@ typedef struct {
   UINT32    Reserved5     : 7; // bit 56:62
   UINT32    Hs400         : 1; // bit 63
 } SD_MMC_HC_SLOT_CAP;
-
 //
 // SD Host controller version
 //
@@ -479,6 +482,30 @@ SdMmcHcStopClock (
   );
 
 /**
+  SD/MMC card clock supply.
+
+  Refer to SD Host Controller Simplified spec 3.0 Section 3.2.1 for details.
+
+  @param[in] PciIo          The PCI IO protocol instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+  @param[in] ClockFreq      The max clock frequency to be set. The unit is KHz.
+  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
+  @param[in] ControllerVer  The version of host controller.
+
+  @retval EFI_SUCCESS       The clock is supplied successfully.
+  @retval Others            The clock isn't supplied successfully.
+
+**/
+EFI_STATUS
+SdMmcHcClockSupply (
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT8                Slot,
+  IN UINT64               ClockFreq,
+  IN UINT32               BaseClkFreq,
+  IN UINT16               ControllerVer
+  );
+
+/**
   Start the SD clock.
 
   @param[in] PciIo  The PCI IO protocol instance.
@@ -531,6 +558,26 @@ SdMmcHcSetBusWidth (
   IN EFI_PCI_IO_PROTOCOL  *PciIo,
   IN UINT8                Slot,
   IN UINT16               BusWidth
+  );
+
+/**
+  Supply SD/MMC card with lowest clock frequency at initialization.
+
+  @param[in] PciIo          The PCI IO protocol instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
+  @param[in] ControllerVer  The version of host controller.
+
+  @retval EFI_SUCCESS       The clock is supplied successfully.
+  @retval Others            The clock isn't supplied successfully.
+
+**/
+EFI_STATUS
+SdMmcHcInitClockFreq (
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT8                Slot,
+  IN UINT32               BaseClkFreq,
+  IN UINT16               ControllerVer
   );
 
 /**
