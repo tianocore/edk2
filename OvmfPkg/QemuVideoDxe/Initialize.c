@@ -245,16 +245,53 @@ STATIC QEMU_VIDEO_BOCHS_MODES  QemuVideoBochsModes[] = {
 #define QEMU_VIDEO_BOCHS_MODE_COUNT \
   (ARRAY_SIZE (QemuVideoBochsModes))
 
+STATIC
+VOID
+QemuVideoBochsAddMode (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINT32                   AvailableFbSize,
+  UINT32                   Width,
+  UINT32                   Height
+  )
+{
+  QEMU_VIDEO_MODE_DATA  *ModeData = Private->ModeData + Private->MaxMode;
+  UINTN                 RequiredFbSize;
+
+  RequiredFbSize = (UINTN)Width * Height * 4;
+  if (RequiredFbSize > AvailableFbSize) {
+    DEBUG ((
+      DEBUG_INFO,
+      "Skipping Bochs Mode %dx%d, 32-bit (not enough vram)\n",
+      Width,
+      Height
+      ));
+    return;
+  }
+
+  ModeData->InternalModeIndex    = (UINT32)Private->MaxMode;
+  ModeData->HorizontalResolution = Width;
+  ModeData->VerticalResolution   = Height;
+  ModeData->ColorDepth           = 32;
+  DEBUG ((
+    DEBUG_INFO,
+    "Adding Bochs Internal Mode %d: %dx%d, %d-bit\n",
+    ModeData->InternalModeIndex,
+    ModeData->HorizontalResolution,
+    ModeData->VerticalResolution,
+    ModeData->ColorDepth
+    ));
+
+  Private->MaxMode++;
+}
+
 EFI_STATUS
 QemuVideoBochsModeSetup (
   QEMU_VIDEO_PRIVATE_DATA  *Private,
   BOOLEAN                  IsQxl
   )
 {
-  UINT32                  AvailableFbSize;
-  UINT32                  Index;
-  QEMU_VIDEO_MODE_DATA    *ModeData;
-  QEMU_VIDEO_BOCHS_MODES  *VideoMode;
+  UINT32  AvailableFbSize;
+  UINT32  Index;
 
   //
   // Fetch the available framebuffer size.
@@ -343,34 +380,14 @@ QemuVideoBochsModeSetup (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  ModeData  = Private->ModeData;
-  VideoMode = &QemuVideoBochsModes[0];
   for (Index = 0; Index < QEMU_VIDEO_BOCHS_MODE_COUNT; Index++) {
-    UINTN  RequiredFbSize;
-
-    RequiredFbSize = (UINTN)VideoMode->Width * VideoMode->Height * 4;
-    if (RequiredFbSize <= AvailableFbSize) {
-      ModeData->InternalModeIndex    = Index;
-      ModeData->HorizontalResolution = VideoMode->Width;
-      ModeData->VerticalResolution   = VideoMode->Height;
-      ModeData->ColorDepth           = 32;
-      DEBUG ((
-        DEBUG_INFO,
-        "Adding Mode %d as Bochs Internal Mode %d: %dx%d, %d-bit\n",
-        (INT32)(ModeData - Private->ModeData),
-        ModeData->InternalModeIndex,
-        ModeData->HorizontalResolution,
-        ModeData->VerticalResolution,
-        ModeData->ColorDepth
-        ));
-
-      ModeData++;
-    }
-
-    VideoMode++;
+    QemuVideoBochsAddMode (
+      Private,
+      AvailableFbSize,
+      QemuVideoBochsModes[Index].Width,
+      QemuVideoBochsModes[Index].Height
+      );
   }
-
-  Private->MaxMode = ModeData - Private->ModeData;
 
   return EFI_SUCCESS;
 }
