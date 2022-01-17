@@ -893,7 +893,17 @@ class PlatformAutoGen(AutoGen):
                 RetVal[Tool] = OrderedDict()
             if Attr not in RetVal[Tool]:
                 RetVal[Tool][Attr] = Value
-
+        if 'NMAKE' in RetVal.keys() or 'GMAKE' in RetVal.keys():
+            if RetVal['MAKE']['PATH'] == "nmake":
+                if 'FLAGS' in RetVal['MAKE'].keys():
+                    RetVal['MAKE']['FLAGS'] += ' ' + RetVal['NMAKE']['FLAGS']
+                else:
+                    RetVal['MAKE']['FLAGS'] = RetVal['NMAKE']['FLAGS']
+            else:
+                if 'FLAGS' in RetVal['MAKE'].keys():
+                    RetVal['MAKE']['FLAGS'] += ' ' + RetVal['GMAKE']['FLAGS']
+                else:
+                    RetVal['MAKE']['FLAGS'] = RetVal['GMAKE']['FLAGS']
         ToolsDef = ''
         if GlobalData.gOptions.SilentMode and "MAKE" in RetVal:
             if "FLAGS" not in RetVal["MAKE"]:

@@ -2283,6 +2283,8 @@ RELEASE_GCC49_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 *_GCC5_*_*_FAMILY                = GCC
 
 *_GCC5_*_MAKE_PATH               = DEF(GCC_HOST_PREFIX)make
+*_GCC5_*_GMAKE_FLAGS             = --jobs
+*_GCC5_*_NMAKE_FLAGS             = /nologo
 *_GCC5_*_*_DLL                   = ENV(GCC5_DLL)
 *_GCC5_*_ASL_PATH                = DEF(UNIX_IASL_BIN)
 
@@ -2742,6 +2744,8 @@ RELEASE_CLANG38_AARCH64_DLINK_FLAGS = DEF(CLANG38_AARCH64_DLINK_FLAGS) -flto -Wl
 *_CLANGPDB_*_*_FAMILY                = GCC
 *_CLANGPDB_*_*_BUILDRULEFAMILY       = CLANGPDB
 *_CLANGPDB_*_MAKE_PATH               = ENV(CLANG_HOST_BIN)make
+*_CLANGPDB_*_GMAKE_FLAGS             = --jobs
+*_CLANGPDB_*_NMAKE_FLAGS             = /nologo
 *_CLANGPDB_*_*_DLL                   = ENV(CLANGPDB_DLL)
 *_CLANGPDB_*_ASL_PATH                = DEF(UNIX_IASL_BIN)
 

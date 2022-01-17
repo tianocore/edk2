@@ -732,10 +732,11 @@ cleanlib:
                     Src, Dst = CopyCmd
                     Src = self.ReplaceMacro(Src)
                     Dst = self.ReplaceMacro(Dst)
+                    Efi = Src[:-3] + 'efi'
                     if Dst not in self.ResultFileList:
                         self.ResultFileList.append(Dst)
                     if '%s :' %(Dst) not in self.BuildTargetList:
-                        self.BuildTargetList.append("%s : %s" %(Dst,Src))
+                        self.BuildTargetList.append("%s : %s" %(Dst, Efi))
                         self.BuildTargetList.append('\t' + self._CP_TEMPLATE_[self._Platform] %{'Src': Src, 'Dst': Dst})
 
             FfsCmdList = Cmd[0]
@@ -778,7 +779,7 @@ cleanlib:
                                 SecDepsFileList.append(SecCmdList[index + 1])
                             index = index + 1
                         if CmdName == 'Trim':
-                            SecDepsFileList.append(os.path.join('$(DEBUG_DIR)', os.path.basename(OutputFile).replace('offset', 'efi')))
+                            SecDepsFileList.append(os.path.join('$(OUTPUT_DIR)', os.path.basename(OutputFile).replace('offset', 'efi')))
                         if OutputFile.endswith('.ui') or OutputFile.endswith('.ver'):
                             SecDepsFileList.append(os.path.join('$(MODULE_DIR)', '$(MODULE_FILE)'))
                         self.FfsOutputFileList.append((OutputFile, ' '.join(SecDepsFileList), SecCmdStr))
