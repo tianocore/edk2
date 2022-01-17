@@ -203,43 +203,43 @@ QemuVideoCirrusModeSetup (
 /// Table of supported video modes
 ///
 STATIC QEMU_VIDEO_BOCHS_MODES  QemuVideoBochsModes[] = {
-  { 640,  480,  32 },
-  { 800,  480,  32 },
-  { 800,  600,  32 },
-  { 832,  624,  32 },
-  { 960,  640,  32 },
-  { 1024, 600,  32 },
-  { 1024, 768,  32 },
-  { 1152, 864,  32 },
-  { 1152, 870,  32 },
-  { 1280, 720,  32 },
-  { 1280, 760,  32 },
-  { 1280, 768,  32 },
-  { 1280, 800,  32 },
-  { 1280, 960,  32 },
-  { 1280, 1024, 32 },
-  { 1360, 768,  32 },
-  { 1366, 768,  32 },
-  { 1400, 1050, 32 },
-  { 1440, 900,  32 },
-  { 1600, 900,  32 },
-  { 1600, 1200, 32 },
-  { 1680, 1050, 32 },
-  { 1920, 1080, 32 },
-  { 1920, 1200, 32 },
-  { 1920, 1440, 32 },
-  { 2000, 2000, 32 },
-  { 2048, 1536, 32 },
-  { 2048, 2048, 32 },
-  { 2560, 1440, 32 },
-  { 2560, 1600, 32 },
-  { 2560, 2048, 32 },
-  { 2800, 2100, 32 },
-  { 3200, 2400, 32 },
-  { 3840, 2160, 32 },
-  { 4096, 2160, 32 },
-  { 7680, 4320, 32 },
-  { 8192, 4320, 32 }
+  { 640,  480  },
+  { 800,  480  },
+  { 800,  600  },
+  { 832,  624  },
+  { 960,  640  },
+  { 1024, 600  },
+  { 1024, 768  },
+  { 1152, 864  },
+  { 1152, 870  },
+  { 1280, 720  },
+  { 1280, 760  },
+  { 1280, 768  },
+  { 1280, 800  },
+  { 1280, 960  },
+  { 1280, 1024 },
+  { 1360, 768  },
+  { 1366, 768  },
+  { 1400, 1050 },
+  { 1440, 900  },
+  { 1600, 900  },
+  { 1600, 1200 },
+  { 1680, 1050 },
+  { 1920, 1080 },
+  { 1920, 1200 },
+  { 1920, 1440 },
+  { 2000, 2000 },
+  { 2048, 1536 },
+  { 2048, 2048 },
+  { 2560, 1440 },
+  { 2560, 1600 },
+  { 2560, 2048 },
+  { 2800, 2100 },
+  { 3200, 2400 },
+  { 3840, 2160 },
+  { 4096, 2160 },
+  { 7680, 4320 },
+  { 8192, 4320 }
 };
 
 #define QEMU_VIDEO_BOCHS_MODE_COUNT \
@@ -348,14 +348,12 @@ QemuVideoBochsModeSetup (
   for (Index = 0; Index < QEMU_VIDEO_BOCHS_MODE_COUNT; Index++) {
     UINTN  RequiredFbSize;
 
-    ASSERT (VideoMode->ColorDepth % 8 == 0);
-    RequiredFbSize = (UINTN)VideoMode->Width * VideoMode->Height *
-                     (VideoMode->ColorDepth / 8);
+    RequiredFbSize = (UINTN)VideoMode->Width * VideoMode->Height * 4;
     if (RequiredFbSize <= AvailableFbSize) {
       ModeData->InternalModeIndex    = Index;
       ModeData->HorizontalResolution = VideoMode->Width;
       ModeData->VerticalResolution   = VideoMode->Height;
-      ModeData->ColorDepth           = VideoMode->ColorDepth;
+      ModeData->ColorDepth           = 32;
       DEBUG ((
         DEBUG_INFO,
         "Adding Mode %d as Bochs Internal Mode %d: %dx%d, %d-bit\n",
