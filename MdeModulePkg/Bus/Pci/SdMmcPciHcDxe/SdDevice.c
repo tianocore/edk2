@@ -1213,9 +1213,14 @@ SdCardIdentification (
   UINT32                         PresentState;
   UINT8                          HostCtrl2;
   UINTN                          Retry;
+  BOOLEAN                        ForceVoltage33;
+
+  ForceVoltage33 = FALSE;
 
   PciIo    = Private->PciIo;
   PassThru = &Private->PassThru;
+
+Voltage33Retry:
   //
   // 1. Send Cmd0 to the device
   //
@@ -1295,6 +1300,14 @@ SdCardIdentification (
   }
 
   //
+  // 1.8V had failed in the previous run, forcing a retry with 3.3V instead
+  //
+  if (ForceVoltage33 == TRUE) {
+    S18r           = FALSE;
+    ForceVoltage33 = FALSE;
+  }
+
+  //
   // 5. Repeatly send Acmd41 with supply voltage window to the device.
   //    Note here we only support the cards complied with SD physical
   //    layer simplified spec version 2.0 and version 3.0 and above.
@@ -1362,13 +1375,17 @@ SdCardIdentification (
         goto Error;
       }
 
-      gBS->Stall (1000);
+      // Workaround to add a delay of 50 ms in order for clock to stabilize before turning on the SD card again.
+      gBS->Stall (50000);
 
       SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
       if (((PresentState >> 20) & 0xF) != 0xF) {
         DEBUG ((DEBUG_ERROR, "SdCardIdentification: SwitchVoltage fails with PresentState = 0x%x, It should be 0xF\n", PresentState));
-        Status = EFI_DEVICE_ERROR;
-        goto Error;
+        Status         = SdMmcHcReset (Private, Slot);
+        Status         = SdMmcHcInitHost (Private, Slot);
+        ForceVoltage33 = TRUE;
+        DEBUG ((DEBUG_ERROR, "SdCardIdentification: Switching to 1.8V had failed in the previous run, forcing a retry with 3.3V instead\n"));
+        goto Voltage33Retry;
       }
     }
 
