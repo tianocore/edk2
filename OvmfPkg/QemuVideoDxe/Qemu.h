@@ -132,7 +132,6 @@ typedef struct {
 typedef struct {
   UINT32    Width;
   UINT32    Height;
-  UINT32    ColorDepth;
 } QEMU_VIDEO_BOCHS_MODES;
 
 #define QEMU_VIDEO_PRIVATE_DATA_FROM_GRAPHICS_OUTPUT_THIS(a) \
