@@ -150,7 +150,6 @@ extern UINT16                        Seq_800_600_256_60[];
 extern UINT8                         Crtc_1024_768_256_60[];
 extern UINT16                        Seq_1024_768_256_60[];
 extern QEMU_VIDEO_CIRRUS_MODES       QemuVideoCirrusModes[];
-extern QEMU_VIDEO_BOCHS_MODES        QemuVideoBochsModes[];
 extern EFI_DRIVER_BINDING_PROTOCOL   gQemuVideoDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gQemuVideoComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gQemuVideoComponentName2;
@@ -414,7 +413,7 @@ InitializeCirrusGraphicsMode (
 VOID
 InitializeBochsGraphicsMode (
   QEMU_VIDEO_PRIVATE_DATA  *Private,
-  QEMU_VIDEO_BOCHS_MODES   *ModeData
+  QEMU_VIDEO_MODE_DATA     *ModeData
   );
 
 VOID

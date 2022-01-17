@@ -177,7 +177,7 @@ Routine Description:
       break;
     case QEMU_VIDEO_BOCHS_MMIO:
     case QEMU_VIDEO_BOCHS:
-      InitializeBochsGraphicsMode (Private, &QemuVideoBochsModes[ModeData->InternalModeIndex]);
+      InitializeBochsGraphicsMode (Private, ModeData);
       break;
     default:
       ASSERT (FALSE);
