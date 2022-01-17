@@ -115,6 +115,8 @@ typedef struct {
   FRAME_BUFFER_CONFIGURE          *FrameBufferBltConfigure;
   UINTN                           FrameBufferBltConfigureSize;
   UINT8                           FrameBufferVramBarIndex;
+
+  UINT8                           Edid[128];
 } QEMU_VIDEO_PRIVATE_DATA;
 
 ///
