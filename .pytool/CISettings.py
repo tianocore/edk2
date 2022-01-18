@@ -65,6 +65,7 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 "StandaloneMmPkg",
                 "FatPkg",
                 "CryptoPkg",
+                "PrmPkg",
                 "UnitTestFrameworkPkg",
                 "OvmfPkg",
                 "RedfishPkg",
