@@ -540,6 +540,11 @@ F: PcAtChipsetPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/PcAtChipsetPkg
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 
+PrmPkg
+F: PrmPkg/
+M: Michael Kubacki <mikuback@linux.microsoft.com>
+M: Ankit Sinha <ankit.sinha@intel.com>
+
 RedfishPkg: Redfish related modules
 F: RedfishPkg/
 M: Abner Chang <abner.chang@hpe.com> [changab]
