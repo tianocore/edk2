@@ -14,7 +14,6 @@
 #include <Library/HobLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PrePiLib.h>
-#include <Library/TdxPlatformLib.h>
 #include <Library/TpmMeasurementLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <IndustryStandard/Tdx.h>

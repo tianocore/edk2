@@ -14,7 +14,6 @@
 #include <Protocol/DebugSupport.h>
 #include <Library/TdxLib.h>
 #include <IndustryStandard/Tdx.h>
-#include <Library/TdxPlatformLib.h>
 #include <Library/PrePiLib.h>
 #include <Library/TdxStartupLib.h>
 #include <Library/PlatformInitLib.h>

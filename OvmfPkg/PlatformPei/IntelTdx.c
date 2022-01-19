@@ -35,7 +35,7 @@ IntelTdxInitialize (
   VOID
   )
 {
-#ifdef MDE_CPU_X64
+ #ifdef MDE_CPU_X64
   EFI_HOB_PLATFORM_INFO  PlatformInfoHob;
   RETURN_STATUS          PcdStatus;
 
@@ -59,5 +59,5 @@ IntelTdxInitialize (
   PlatformInfoHob.HostBridgePciDevId = mHostBridgeDevId;
 
   BuildGuidDataHob (&gUefiOvmfPkgTdxPlatformGuid, &PlatformInfoHob, sizeof (EFI_HOB_PLATFORM_INFO));
-#endif
+ #endif
 }
