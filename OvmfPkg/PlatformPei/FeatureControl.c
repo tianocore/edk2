@@ -39,7 +39,7 @@ WriteFeatureControl (
   IN OUT VOID  *WorkSpace
   )
 {
-  if (PlatformPeiIsTdxGuest ()) {
+  if (TdIsEnabled ()) {
     TdVmCall (TDVMCALL_WRMSR, (UINT64)MSR_IA32_FEATURE_CONTROL, mFeatureControlValue, 0, 0, 0);
   } else {
     AsmWriteMsr64 (MSR_IA32_FEATURE_CONTROL, mFeatureControlValue);

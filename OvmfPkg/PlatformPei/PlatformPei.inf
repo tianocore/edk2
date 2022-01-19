@@ -25,19 +25,12 @@
 [Sources]
   AmdSev.c
   ClearCache.c
-  Cmos.c
-  Cmos.h
   FeatureControl.c
   Fv.c
   MemDetect.c
   MemTypeInfo.c
   Platform.c
   Platform.h
-
-[Sources.IA32, Sources.EBC]
-  IntelTdxNull.c
-
-[Sources.X64]
   IntelTdx.c
 
 [Packages]
@@ -71,6 +64,7 @@
   MemEncryptSevLib
   PcdLib
   VmgExitLib
+  PlatformInitLib
 
 [LibraryClasses.X64]
   TdxLib
@@ -150,4 +144,3 @@
 
 [Depex]
   TRUE
-
