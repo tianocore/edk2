@@ -111,10 +111,10 @@
   DEFINE SERIAL_DRIVER_ENABLE = TRUE
   DEFINE PERFORMANCE_MEASUREMENT_ENABLE  = FALSE
 
-  # For recent X86 CPU, 0x15 CPUID instruction will return Time Stamp Counter.
-  # This is recommended way to get the time, and also how BaseCpuTimerLib works.
-  # However, some CPU doesn't support this feature, so disable it by default.
-  DEFINE CPU_TIMER_LIB_ENABLE  = FALSE
+  # For recent X86 CPU, 0x15 CPUID instruction will return Time Stamp Counter Frequence.
+  # This is how BaseCpuTimerLib works, and a recommended way to get Frequence, so set the default value as TRUE.
+  # Note: for emulation platform such as QEMU, this may not work and should set it as FALSE
+  DEFINE CPU_TIMER_LIB_ENABLE  = TRUE
 
 [BuildOptions]
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
@@ -222,7 +222,7 @@
   #
   # Platform
   #
-!if $(CPU_TIMER_LIB_ENABLE) == TRUE
+!if $(CPU_TIMER_LIB_ENABLE) == TRUE && $(UNIVERSAL_PAYLOAD) == TRUE
   TimerLib|UefiCpuPkg/Library/CpuTimerLib/BaseCpuTimerLib.inf
 !else
   TimerLib|UefiPayloadPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
