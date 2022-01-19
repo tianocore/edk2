@@ -15,6 +15,22 @@
 typedef struct {
   EFI_HOB_GUID_TYPE    GuidHeader;
   UINT16               HostBridgePciDevId;
+  BOOLEAN              PcdSetNxForStack;
+
+  UINT64               PcdConfidentialComputingGuestAttr;
+  BOOLEAN              PcdIa32EferChangeAllowed;
+  UINT64               PcdTdxSharedBitMask;
+
+  UINT64               PcdPciMmio64Base;
+  UINT64               PcdPciMmio64Size;
+  UINT32               PcdPciMmio32Base;
+  UINT32               PcdPciMmio32Size;
+  UINT64               PcdPciIoBase;
+  UINT64               PcdPciIoSize;
+
+  UINT64               PcdEmuVariableNvStoreReserved;
+  UINT32               PcdCpuBootLogicalProcessorNumber;
+  UINT32               PcdCpuMaxLogicalProcessorNumber;
 } EFI_HOB_PLATFORM_INFO;
 #pragma pack()
 
