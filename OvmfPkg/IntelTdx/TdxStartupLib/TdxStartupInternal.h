@@ -17,32 +17,10 @@
 #include <IndustryStandard/UefiTcgPlatform.h>
 #include <IndustryStandard/IntelTdx.h>
 
-#pragma pack (1)
-
-#define HANDOFF_TABLE_DESC  "TdxTable"
-typedef struct {
-  UINT8                      TableDescriptionSize;
-  UINT8                      TableDescription[sizeof (HANDOFF_TABLE_DESC)];
-  UINT64                     NumberOfTables;
-  EFI_CONFIGURATION_TABLE    TableEntry[1];
-} TDX_HANDOFF_TABLE_POINTERS2;
-#pragma pack()
-
-#define LOOPIT(X)  do {\
-  volatile int foo = (X); \
-  while (foo) ; \
-} while(0)
-
 EFI_STATUS
 EFIAPI
 DxeLoadCore (
   IN INTN  FvInstance
-  );
-
-VOID
-EFIAPI
-TransferHobList (
-  IN CONST VOID  *HobStart
   );
 
 /**
@@ -57,6 +35,17 @@ EFI_STATUS
 EFIAPI
 ConstructFwHobList (
   IN CONST VOID  *VmmHobList
+  );
+
+/**
+ *  Construct the HobList in SEC phase.
+ *
+ * @return EFI_SUCCESS      Successfully construct the firmware hoblist.
+ * @return EFI_NOT_FOUND    Cannot find a memory region to be the fw hoblist.
+ */
+EFI_STATUS
+EFIAPI
+ConstructSecHobList (
   );
 
 #endif

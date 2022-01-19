@@ -50,10 +50,10 @@
   HobLib
   TdxLib
   MemoryAllocationLib
-  TdxPlatformLib
   PrePiLib
   QemuFwCfgLib
   PageTablesLib
+  PlatformInitLib
 
 [Guids]
   gEfiHobMemoryAllocModuleGuid
@@ -80,3 +80,5 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize

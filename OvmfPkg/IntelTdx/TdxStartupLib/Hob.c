@@ -19,7 +19,42 @@
 #include <Library/QemuFwCfgLib.h>
 #include <IndustryStandard/Tdx.h>
 #include <IndustryStandard/UefiTcgPlatform.h>
+#include <Library/PlatformInitLib.h>
 #include "TdxStartupInternal.h"
+
+/**
+ * Construct the HobList in SEC phase.
+ *
+ * @return EFI_SUCCESS      Successfully construct the firmware hoblist.
+ * @return EFI_NOT_FOUND    Cannot find a memory region to be the fw hoblist.
+ */
+EFI_STATUS
+EFIAPI
+ConstructSecHobList (
+  )
+{
+  UINT32  LowMemorySize;
+  UINT32  LowMemoryStart;
+
+  EFI_HOB_HANDOFF_INFO_TABLE  *HobList;
+
+  LowMemorySize = PlatformGetSystemMemorySizeBelow4gb ();
+  ASSERT (LowMemorySize != 0);
+  LowMemoryStart = FixedPcdGet32 (PcdOvmfDxeMemFvBase) + FixedPcdGet32 (PcdOvmfDxeMemFvSize);
+  LowMemorySize -= LowMemoryStart;
+
+  DEBUG ((DEBUG_INFO, "LowMemory Start and End: %x, %x\n", LowMemoryStart, LowMemoryStart + LowMemorySize));
+  HobList = HobConstructor (
+              (VOID *)(UINTN)LowMemoryStart,
+              LowMemorySize,
+              (VOID *)(UINTN)LowMemoryStart,
+              (VOID *)(UINTN)(LowMemoryStart + LowMemorySize)
+              );
+
+  SetHobList ((VOID *)(UINT64)HobList);
+
+  return EFI_SUCCESS;
+}
 
 /**
  * This function is to find a memory region which is the largest one below 4GB.
@@ -41,6 +76,7 @@ ConstructFwHobList (
   UINT64                LowMemoryLength;
 
   ASSERT (VmmHobList != NULL);
+
   Hob.Raw = (UINT8 *)VmmHobList;
 
   LowMemoryLength = 0;
@@ -93,58 +129,4 @@ ConstructFwHobList (
   SetHobList ((VOID *)(UINT64)LowMemoryStart);
 
   return EFI_SUCCESS;
-}
-
-/**
-  Transfer the incoming HobList for the TD to the final HobList for Dxe
-
-  @param[in] VmmHobList    The Hoblist pass the firmware
-
-**/
-VOID
-EFIAPI
-TransferHobList (
-  IN CONST VOID  *VmmHobList
-  )
-{
-  EFI_PEI_HOB_POINTERS         Hob;
-  EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute;
-  EFI_PHYSICAL_ADDRESS         PhysicalEnd;
-
-  Hob.Raw = (UINT8 *)VmmHobList;
-
-  Hob.Raw = (UINT8 *)VmmHobList;
-  while (!END_OF_HOB_LIST (Hob)) {
-    switch (Hob.Header->HobType) {
-      case EFI_HOB_TYPE_RESOURCE_DESCRIPTOR:
-        ResourceAttribute = Hob.ResourceDescriptor->ResourceAttribute;
-        PhysicalEnd       = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
-
-        if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
-          ResourceAttribute |= EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_TESTED;
-
-          if (PhysicalEnd <= BASE_4GB) {
-            ResourceAttribute |= EFI_RESOURCE_ATTRIBUTE_ENCRYPTED;
-          }
-        }
-
-        BuildResourceDescriptorHob (
-          Hob.ResourceDescriptor->ResourceType,
-          ResourceAttribute,
-          Hob.ResourceDescriptor->PhysicalStart,
-          Hob.ResourceDescriptor->ResourceLength
-          );
-        break;
-
-      case EFI_HOB_TYPE_MEMORY_ALLOCATION:
-        BuildMemoryAllocationHob (
-          Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress,
-          Hob.MemoryAllocation->AllocDescriptor.MemoryLength,
-          Hob.MemoryAllocation->AllocDescriptor.MemoryType
-          );
-        break;
-    }
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
-  }
 }

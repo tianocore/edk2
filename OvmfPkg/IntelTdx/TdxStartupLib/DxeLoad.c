@@ -24,17 +24,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define STACK_SIZE  0x20000
 
-EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
-  { EfiACPIMemoryNVS,       0x004 },
-  { EfiACPIReclaimMemory,   0x008 },
-  { EfiReservedMemoryType,  0x004 },
-  { EfiRuntimeServicesData, 0x024 },
-  { EfiRuntimeServicesCode, 0x030 },
-  { EfiBootServicesCode,    0x180 },
-  { EfiBootServicesData,    0xF00 },
-  { EfiMaxMemoryType,       0x000 }
-};
-
 PAGE_TABLES_PCD_SETTINGS  mPageTablesPcdSettings = {
   TRUE,                                               // PcdSetNxForStack
   FALSE,                                              // PcdIa32EferChangeAllowed
@@ -69,7 +58,10 @@ HandOffToDxeCore (
   //
   //  Before call the PageTablesLib function, set the PCDs first
   //
-  mPageTablesPcdSettings.PgTableMask = TdSharedPageMask () | EFI_PAGE_MASK;
+  if (TdIsEnabled ()) {
+    mPageTablesPcdSettings.PgTableMask = TdSharedPageMask () | EFI_PAGE_MASK;
+  }
+
   SetPageTablesPcdSettings (&mPageTablesPcdSettings);
 
   //
@@ -190,15 +182,6 @@ DxeLoadCore (
   EFI_PHYSICAL_ADDRESS  DxeCoreEntryPoint;
   EFI_PEI_FILE_HANDLE   FileHandle;
   VOID                  *PeCoffImage;
-
-  //
-  // Create Memory Type Information HOB
-  //
-  BuildGuidDataHob (
-    &gEfiMemoryTypeInformationGuid,
-    mDefaultMemoryTypeInformation,
-    sizeof (mDefaultMemoryTypeInformation)
-    );
 
   //
   // Look in all the FVs present and find the DXE Core FileHandle
