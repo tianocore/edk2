@@ -18,51 +18,6 @@
 #include <Uefi/UefiBaseType.h>
 
 /**
-  Reads and sets the status of SEV features.
-
-  **/
-STATIC
-UINT32
-EFIAPI
-InternalMemEncryptSevStatus (
-  VOID
-  )
-{
-  UINT32                            RegEax;
-  CPUID_MEMORY_ENCRYPTION_INFO_EAX  Eax;
-  BOOLEAN                           ReadSevMsr;
-  SEC_SEV_ES_WORK_AREA              *SevEsWorkArea;
-
-  ReadSevMsr = FALSE;
-
-  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
-  if ((SevEsWorkArea != NULL) && (SevEsWorkArea->EncryptionMask != 0)) {
-    //
-    // The MSR has been read before, so it is safe to read it again and avoid
-    // having to validate the CPUID information.
-    //
-    ReadSevMsr = TRUE;
-  } else {
-    //
-    // Check if memory encryption leaf exist
-    //
-    AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
-    if (RegEax >= CPUID_MEMORY_ENCRYPTION_INFO) {
-      //
-      // CPUID Fn8000_001F[EAX] Bit 1 (Sev supported)
-      //
-      AsmCpuid (CPUID_MEMORY_ENCRYPTION_INFO, &Eax.Uint32, NULL, NULL, NULL);
-
-      if (Eax.Bits.SevBit) {
-        ReadSevMsr = TRUE;
-      }
-    }
-  }
-
-  return ReadSevMsr ? AsmReadMsr32 (MSR_SEV_STATUS) : 0;
-}
-
-/**
   Returns a boolean to indicate whether SEV-SNP is enabled.
 
   @retval TRUE           SEV-SNP is enabled
@@ -75,8 +30,10 @@ MemEncryptSevSnpIsEnabled (
   )
 {
   MSR_SEV_STATUS_REGISTER  Msr;
+  SEC_SEV_ES_WORK_AREA     *SevEsWorkArea;
 
-  Msr.Uint32 = InternalMemEncryptSevStatus ();
+  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  Msr.Uint32    = SevEsWorkArea->SevStatusMsrVal;
 
   return Msr.Bits.SevSnpBit ? TRUE : FALSE;
 }
@@ -94,8 +51,10 @@ MemEncryptSevEsIsEnabled (
   )
 {
   MSR_SEV_STATUS_REGISTER  Msr;
+  SEC_SEV_ES_WORK_AREA     *SevEsWorkArea;
 
-  Msr.Uint32 = InternalMemEncryptSevStatus ();
+  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  Msr.Uint32    = SevEsWorkArea->SevStatusMsrVal;
 
   return Msr.Bits.SevEsBit ? TRUE : FALSE;
 }
@@ -113,8 +72,10 @@ MemEncryptSevIsEnabled (
   )
 {
   MSR_SEV_STATUS_REGISTER  Msr;
+  SEC_SEV_ES_WORK_AREA     *SevEsWorkArea;
 
-  Msr.Uint32 = InternalMemEncryptSevStatus ();
+  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  Msr.Uint32    = SevEsWorkArea->SevStatusMsrVal;
 
   return Msr.Bits.SevBit ? TRUE : FALSE;
 }
@@ -130,20 +91,11 @@ MemEncryptSevGetEncryptionMask (
   VOID
   )
 {
-  CPUID_MEMORY_ENCRYPTION_INFO_EBX  Ebx;
-  SEC_SEV_ES_WORK_AREA              *SevEsWorkArea;
-  UINT64                            EncryptionMask;
+  SEC_SEV_ES_WORK_AREA  *SevEsWorkArea;
+  UINT64                EncryptionMask;
 
-  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
-  if (SevEsWorkArea != NULL) {
-    EncryptionMask = SevEsWorkArea->EncryptionMask;
-  } else {
-    //
-    // CPUID Fn8000_001F[EBX] Bit 0:5 (memory encryption bit position)
-    //
-    AsmCpuid (CPUID_MEMORY_ENCRYPTION_INFO, NULL, &Ebx.Uint32, NULL, NULL);
-    EncryptionMask = LShiftU64 (1, Ebx.Bits.PtePosBits);
-  }
+  SevEsWorkArea  = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  EncryptionMask = SevEsWorkArea->EncryptionMask;
 
   return EncryptionMask;
 }

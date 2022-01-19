@@ -16,83 +16,77 @@
 #include <Register/Amd/Msr.h>
 #include <Register/Cpuid.h>
 #include <Uefi/UefiBaseType.h>
-
-STATIC BOOLEAN  mSevStatus        = FALSE;
-STATIC BOOLEAN  mSevEsStatus      = FALSE;
-STATIC BOOLEAN  mSevSnpStatus     = FALSE;
-STATIC BOOLEAN  mSevStatusChecked = FALSE;
+#include <ConfidentialComputingGuestAttr.h>
 
 STATIC UINT64   mSevEncryptionMask      = 0;
 STATIC BOOLEAN  mSevEncryptionMaskSaved = FALSE;
 
 /**
-  Reads and sets the status of SEV features.
+  The function check if the specified Attr is set.
 
-  **/
+  @param[in]  CurrentAttr   The current attribute.
+  @param[in]  Attr          The attribute to check.
+
+  @retval  TRUE      The specified Attr is set.
+  @retval  FALSE     The specified Attr is not set.
+
+**/
 STATIC
-VOID
-EFIAPI
-InternalMemEncryptSevStatus (
-  VOID
+BOOLEAN
+AmdMemEncryptionAttrCheck (
+  IN  UINT64                             CurrentAttr,
+  IN  CONFIDENTIAL_COMPUTING_GUEST_ATTR  Attr
   )
 {
-  UINT32                            RegEax;
-  MSR_SEV_STATUS_REGISTER           Msr;
-  CPUID_MEMORY_ENCRYPTION_INFO_EAX  Eax;
-  BOOLEAN                           ReadSevMsr;
-  UINT64                            EncryptionMask;
-
-  ReadSevMsr = FALSE;
-
-  EncryptionMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask);
-  if (EncryptionMask != 0) {
-    //
-    // The MSR has been read before, so it is safe to read it again and avoid
-    // having to validate the CPUID information.
-    //
-    ReadSevMsr = TRUE;
-  } else {
-    //
-    // Check if memory encryption leaf exist
-    //
-    AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
-    if (RegEax >= CPUID_MEMORY_ENCRYPTION_INFO) {
+  switch (Attr) {
+    case CCAttrAmdSev:
       //
-      // CPUID Fn8000_001F[EAX] Bit 1 (Sev supported)
+      // SEV is automatically enabled if SEV-ES or SEV-SNP is active.
       //
-      AsmCpuid (CPUID_MEMORY_ENCRYPTION_INFO, &Eax.Uint32, NULL, NULL, NULL);
+      return CurrentAttr >= CCAttrAmdSev;
+    case CCAttrAmdSevEs:
+      //
+      // SEV-ES is automatically enabled if SEV-SNP is active.
+      //
+      return CurrentAttr >= CCAttrAmdSevEs;
+    case CCAttrAmdSevSnp:
+      return CurrentAttr == CCAttrAmdSevSnp;
+    default:
+      return FALSE;
+  }
+}
 
-      if (Eax.Bits.SevBit) {
-        ReadSevMsr = TRUE;
-      }
-    }
+/**
+  Check if the specified confidential computing attribute is active.
+
+  @param[in]  Attr          The attribute to check.
+
+  @retval TRUE   The specified Attr is active.
+  @retval FALSE  The specified Attr is not active.
+
+**/
+STATIC
+BOOLEAN
+EFIAPI
+ConfidentialComputingGuestHas (
+  IN  CONFIDENTIAL_COMPUTING_GUEST_ATTR  Attr
+  )
+{
+  UINT64  CurrentAttr;
+
+  //
+  // Get the current CC attribute.
+  //
+  CurrentAttr = PcdGet64 (PcdConfidentialComputingGuestAttr);
+
+  //
+  // If attr is for the AMD group then call AMD specific checks.
+  //
+  if (((RShiftU64 (CurrentAttr, 8)) & 0xff) == 1) {
+    return AmdMemEncryptionAttrCheck (CurrentAttr, Attr);
   }
 
-  if (ReadSevMsr) {
-    //
-    // Check MSR_0xC0010131 Bit 0 (Sev Enabled)
-    //
-    Msr.Uint32 = AsmReadMsr32 (MSR_SEV_STATUS);
-    if (Msr.Bits.SevBit) {
-      mSevStatus = TRUE;
-    }
-
-    //
-    // Check MSR_0xC0010131 Bit 1 (Sev-Es Enabled)
-    //
-    if (Msr.Bits.SevEsBit) {
-      mSevEsStatus = TRUE;
-    }
-
-    //
-    // Check MSR_0xC0010131 Bit 2 (Sev-Snp Enabled)
-    //
-    if (Msr.Bits.SevSnpBit) {
-      mSevSnpStatus = TRUE;
-    }
-  }
-
-  mSevStatusChecked = TRUE;
+  return (CurrentAttr == Attr);
 }
 
 /**
@@ -107,11 +101,7 @@ MemEncryptSevSnpIsEnabled (
   VOID
   )
 {
-  if (!mSevStatusChecked) {
-    InternalMemEncryptSevStatus ();
-  }
-
-  return mSevSnpStatus;
+  return ConfidentialComputingGuestHas (CCAttrAmdSevSnp);
 }
 
 /**
@@ -126,11 +116,7 @@ MemEncryptSevEsIsEnabled (
   VOID
   )
 {
-  if (!mSevStatusChecked) {
-    InternalMemEncryptSevStatus ();
-  }
-
-  return mSevEsStatus;
+  return ConfidentialComputingGuestHas (CCAttrAmdSevEs);
 }
 
 /**
@@ -145,11 +131,7 @@ MemEncryptSevIsEnabled (
   VOID
   )
 {
-  if (!mSevStatusChecked) {
-    InternalMemEncryptSevStatus ();
-  }
-
-  return mSevStatus;
+  return ConfidentialComputingGuestHas (CCAttrAmdSev);
 }
 
 /**
