@@ -1,0 +1,39 @@
+## @file
+#  Hardware information library to describe non-discoverable hardware resources
+#
+#  Copyright 2021 - 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeHardwareInfoLib
+  FILE_GUID                      = F60B206A-5C56-11EC-AEAC-67CB080BCFF2
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DxeHardwareInfoLib
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  HardwareInfoDxe.c
+  HardwareInfoPciHostBridgeLib.c
+  QemuFwCfgHardwareInfoLib.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
