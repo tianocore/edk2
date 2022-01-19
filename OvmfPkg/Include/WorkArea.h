@@ -63,9 +63,24 @@ typedef struct _SEV_WORK_AREA {
   SEC_SEV_ES_WORK_AREA                       SevEsWorkArea;
 } SEV_WORK_AREA;
 
+//
+// The TDX work area definition
+//
+typedef struct _SEC_TDX_WORK_AREA {
+  UINT32    PageTableReady;
+  UINT32    Gpaw;
+  UINT64    HobList;
+} SEC_TDX_WORK_AREA;
+
+typedef struct _TDX_WORK_AREA {
+  CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER    Header;
+  SEC_TDX_WORK_AREA                          SecTdxWorkArea;
+} TDX_WORK_AREA;
+
 typedef union {
   CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER    Header;
   SEV_WORK_AREA                              SevWorkArea;
+  TDX_WORK_AREA                              TdxWorkArea;
 } OVMF_WORK_AREA;
 
 #endif
