@@ -85,6 +85,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define LONG_MIN      (-LONG_MAX-1)   /* min value for a long */
 #define UINT_MAX      0xFFFFFFFF      /* Maximum unsigned int value */
 #define ULONG_MAX     0xFFFFFFFF      /* Maximum unsigned long value */
+#define SIZE_MAX      0xFFFFFFFF      /* Maximum unsigned size_t */
 #define CHAR_BIT      8               /* Number of bits in a char */
 
 //
