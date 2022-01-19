@@ -193,13 +193,8 @@ SecCoreStartupWithStack (
   InitializeApicTimer (0, MAX_UINT32, TRUE, 5);
   DisableApicTimerInterrupt ();
 
-  if (SecTdxIsEnabled ()) {
-    TdxStartup (&SecCoreData);
+  TdxStartup (&SecCoreData);
 
-    //
-    // Never arrived here
-    //
-    ASSERT (FALSE);
-    CpuDeadLoop ();
-  }
+  ASSERT (FALSE);
+  CpuDeadLoop ();
 }
