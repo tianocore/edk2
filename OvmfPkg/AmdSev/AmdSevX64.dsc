@@ -168,6 +168,7 @@
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
   BlobVerifierLib|OvmfPkg/AmdSev/BlobVerifierLibSevHashes/BlobVerifierLibSevHashes.inf
   MemEncryptTdxLib|OvmfPkg/Library/BaseMemEncryptTdxLib/BaseMemEncryptTdxLib.inf
+  PeiHardwareInfoLib|OvmfPkg/Library/HardwareInfoLib/PeiHardwareInfoLib.inf
 
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   PeCoffExtraActionLib|SourceLevelDebugPkg/Library/PeCoffExtraActionLibDebug/PeCoffExtraActionLibDebug.inf

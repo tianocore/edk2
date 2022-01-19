@@ -1,0 +1,39 @@
+## @file
+#  Hardware information library wrappers over Qemu fw-cfg functionality to parse,
+#  in a static manner, non-discoverable hardware information.
+#
+#  Copyright 2021 - 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiHardwareInfoLib
+  FILE_GUID                      = 3D5011B3-9CBB-4C0B-88E8-1D758283C659
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeiHardwareInfoLib
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  HardwareInfoPei.c
+  QemuFwCfgHardwareInfoLib.c
+  HardwareInfoPciHostBridgeLib.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  QemuFwCfgLib
