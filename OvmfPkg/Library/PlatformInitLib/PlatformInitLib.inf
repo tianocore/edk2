@@ -50,6 +50,7 @@
   MtrrLib
   PcdLib
   PciLib
+  PeiHardwareInfoLib
 
 [LibraryClasses.X64]
   TdxLib
