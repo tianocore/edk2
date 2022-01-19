@@ -74,11 +74,11 @@
   GCC:*_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
 
   #
-  # Add INTEL_TDX_FULL_FEATURE
+  # Add TDX_PEI_LESS_BOOT
   #
-  MSFT:*_*_*_CC_FLAGS = /D INTEL_TDX_FULL_FEATURE
-  INTEL:*_*_*_CC_FLAGS = /D INTEL_TDX_FULL_FEATURE
-  GCC:*_*_*_CC_FLAGS = -D INTEL_TDX_FULL_FEATURE
+  MSFT:*_*_*_CC_FLAGS = /D TDX_PEI_LESS_BOOT
+  INTEL:*_*_*_CC_FLAGS = /D TDX_PEI_LESS_BOOT
+  GCC:*_*_*_CC_FLAGS = -D TDX_PEI_LESS_BOOT
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
@@ -200,6 +200,7 @@
   TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
   TdxMailboxLib|OvmfPkg/Library/TdxMailboxLib/TdxMailboxLib.inf
   PageTablesLib|MdeModulePkg/Library/PageTablesLib/PageTablesLib.inf
+  PlatformInitLib|OvmfPkg/Library/PlatformInitLib/PlatformInitLib.inf
 
 [LibraryClasses.common.SEC]
   TimerLib|OvmfPkg/Library/AcpiTimerLib/BaseRomAcpiTimerLib.inf
@@ -222,7 +223,6 @@
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/SecMemEncryptSevLib.inf
   PrePiHobListPointerLib|OvmfPkg/IntelTdx/PrePiHobListPointerLibTdx/PrePiHobListPointerLibTdx.inf
   HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
-  TdxPlatformLib|OvmfPkg/IntelTdx/SecPlatformLibQemuTdx/TdxPlatformLib.inf
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   TdxStartupLib|OvmfPkg/IntelTdx/TdxStartupLib/TdxStartupLib.inf
 
