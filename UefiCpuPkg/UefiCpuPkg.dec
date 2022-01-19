@@ -178,6 +178,10 @@
   # @Prompt Configure the SEV-ES work area base
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaSize|0x0|UINT32|0x30002006
 
+  ## Area of memory where the TDX work area block lives.
+  # @Prompt Configure the TDX work area base
+  gUefiCpuPkgTokenSpaceGuid.PcdTdxWorkAreaBase|0x0|UINT32|0x30002007
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## This value is the CPU Local APIC base address, which aligns the address on a 4-KByte boundary.
   # @Prompt Configure base address of CPU Local APIC
