@@ -8,8 +8,8 @@
 #include <PiPei.h>
 #include <Library/PrePiHobListPointerLib.h>
 #include <Library/DebugLib.h>
-
-static VOID  *mHobList = NULL;
+#include <Library/HobLib.h>
+#include <WorkArea.h>
 
 /**
   Returns the pointer to the HOB list.
@@ -25,7 +25,13 @@ PrePeiGetHobList (
   VOID
   )
 {
-  return mHobList;
+  TDX_WORK_AREA  *TdxWorkArea;
+
+  TdxWorkArea = (TDX_WORK_AREA *)(UINTN)FixedPcdGet32 (PcdTdxWorkAreaBase);
+  ASSERT (TdxWorkArea != NULL);
+  ASSERT (TdxWorkArea->SecTdxWorkArea.HobList != 0);
+
+  return (VOID *)(UINTN)TdxWorkArea->SecTdxWorkArea.HobList;
 }
 
 /**
@@ -40,6 +46,12 @@ PrePeiSetHobList (
   IN  VOID  *HobList
   )
 {
-  mHobList = HobList;
+  TDX_WORK_AREA  *TdxWorkArea;
+
+  TdxWorkArea = (TDX_WORK_AREA *)(UINTN)FixedPcdGet32 (PcdTdxWorkAreaBase);
+  ASSERT (TdxWorkArea != NULL);
+
+  TdxWorkArea->SecTdxWorkArea.HobList = (UINTN)HobList;
+
   return EFI_SUCCESS;
 }

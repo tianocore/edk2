@@ -20,6 +20,10 @@
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdTdxWorkAreaBase
 
 [LibraryClasses]
   PcdLib
