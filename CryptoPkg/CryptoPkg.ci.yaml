@@ -10,7 +10,13 @@
         "IgnoreFiles": [
             # These directories contain auto-generated OpenSSL content
             "Library/OpensslLib/X64",
-            "Library/OpensslLib/X64Gcc"
+            "Library/OpensslLib/X64Gcc",
+            "Library/OpensslLib/der_digests_gen.c",
+            "Library/OpensslLib/der_rsa_gen.c",
+            "Library/OpensslLib/der_wrap_gen.c",
+            "Library/Include/crypto",
+            "Library/Include/openssl",
+            "Library/Include/prov"
         ]
     },
     "EccCheck": {
@@ -38,7 +44,10 @@
             # These directories contain auto-generated OpenSSL content
             "Library/OpensslLib",
             "Library/IntrinsicLib",
-            "Library/BaseCryptLib/Pk/CryptPkcs7VerifyBase.c"
+            "Library/BaseCryptLib/Pk/CryptPkcs7VerifyBase.c",
+            "Library/Include/crypto",
+            "Library/Include/openssl",
+            "Library/Include/prov"
         ]
     },
     "CompilerPlugin": {
