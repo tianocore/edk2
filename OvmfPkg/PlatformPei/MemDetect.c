@@ -37,7 +37,6 @@ Module Name:
 
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
-
 #include "Platform.h"
 
 VOID
@@ -231,7 +230,12 @@ GetPeiMemoryCap (
     PdpEntries  = 1 << (mPlatformInfoHob.PhysMemAddressWidth - 30);
     ASSERT (PdpEntries <= 0x200);
   } else {
-    Pml4Entries = 1 << (mPlatformInfoHob.PhysMemAddressWidth - 39);
+    if (mPlatformInfoHob.PhysMemAddressWidth > 48) {
+      Pml4Entries = 0x200;
+    } else {
+      Pml4Entries = 1 << (mPlatformInfoHob.PhysMemAddressWidth - 39);
+    }
+
     ASSERT (Pml4Entries <= 0x200);
     PdpEntries = 512;
   }
@@ -354,6 +358,11 @@ InitializeRamRegions (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
+  if (TdIsEnabled ()) {
+    PlatformTdxPublishRamRegions ();
+    return;
+  }
+
   PlatformQemuInitializeRam (PlatformInfoHob);
 
   SevInitializeRam ();

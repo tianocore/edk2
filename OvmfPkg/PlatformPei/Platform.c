@@ -311,6 +311,17 @@ MaxCpuCountInitialization (
 }
 
 /**
+ * @brief Builds PlatformInfo Hob
+ */
+VOID
+BuildPlatformInfoHob (
+  VOID
+  )
+{
+  BuildGuidDataHob (&gUefiOvmfPkgPlatformInfoGuid, &mPlatformInfoHob, sizeof (EFI_HOB_PLATFORM_INFO));
+}
+
+/**
   Perform Platform PEI initialization.
 
   @param  FileHandle      Handle of the file being invoked.
@@ -386,7 +397,9 @@ InitializePlatform (
     MiscInitialization (&mPlatformInfoHob);
   }
 
+  IntelTdxInitialize ();
   InstallFeatureControlCallback ();
+  BuildPlatformInfoHob ();
 
   return EFI_SUCCESS;
 }
