@@ -368,6 +368,22 @@ MaxCpuCountInitialization (
 }
 
 /**
+ * @brief Builds PlatformInfo Hob
+ */
+VOID
+BuildPlatformInfoHob (
+  VOID
+  )
+{
+  EFI_HOB_PLATFORM_INFO  PlatformInfoHob;
+
+  ZeroMem (&PlatformInfoHob, sizeof (PlatformInfoHob));
+  PlatformInfoHob.HostBridgePciDevId = mHostBridgeDevId;
+
+  BuildGuidDataHob (&gUefiOvmfPkgPlatformInfoGuid, &PlatformInfoHob, sizeof (EFI_HOB_PLATFORM_INFO));
+}
+
+/**
   Perform Platform PEI initialization.
 
   @param  FileHandle      Handle of the file being invoked.
@@ -437,8 +453,10 @@ InitializePlatform (
 
   InstallClearCacheCallback ();
   AmdSevInitialize ();
+  IntelTdxInitialize ();
   MiscInitialization ();
   InstallFeatureControlCallback ();
+  BuildPlatformInfoHob ();
 
   return EFI_SUCCESS;
 }
