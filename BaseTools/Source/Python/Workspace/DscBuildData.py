@@ -3033,7 +3033,7 @@ class DscBuildData(PlatformBuildClassObject):
             returncode, StdOut, StdErr = DscBuildData.ExecuteCommand (Command)
             EdkLogger.verbose ('%s\n%s\n%s' % (Command, StdOut, StdErr))
             if returncode != 0:
-                EdkLogger.warn('Build', COMMAND_FAILURE, 'Can not collect output from command: %s\n%s\n' % (Command, StdOut, StdErr))
+                EdkLogger.warn('Build', COMMAND_FAILURE, 'Can not collect output from command: %s\n%s\n%s\n' % (Command, StdOut, StdErr))
 
         #start update structure pcd final value
         File = open (OutputValueFile, 'r')
