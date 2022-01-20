@@ -14,6 +14,7 @@
   Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
   Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -85,6 +86,7 @@ RngGetRNG (
 /**
   Returns information about the random number generation implementation.
 
+  @param[in]     This                 A pointer to the EFI_RNG_PROTOCOL instance.
   @param[in,out] RNGAlgorithmListSize On input, the size in bytes of RNGAlgorithmList.
                                       On output with a return code of EFI_SUCCESS, the size
                                       in bytes of the data returned in RNGAlgorithmList. On output
@@ -97,20 +99,29 @@ RngGetRNG (
                                       is the default algorithm for the driver.
 
   @retval EFI_SUCCESS                 The RNG algorithm list was returned successfully.
+  @retval EFI_UNSUPPORTED             The services is not supported by this driver.
+  @retval EFI_DEVICE_ERROR            The list of algorithms could not be retrieved due to a
+                                      hardware or firmware error.
+  @retval EFI_INVALID_PARAMETER       One or more of the parameters are incorrect.
   @retval EFI_BUFFER_TOO_SMALL        The buffer RNGAlgorithmList is too small to hold the result.
 
 **/
-UINTN
+EFI_STATUS
 EFIAPI
-ArchGetSupportedRngAlgorithms (
-  IN OUT UINTN              *RNGAlgorithmListSize,
-  OUT    EFI_RNG_ALGORITHM  *RNGAlgorithmList
+RngGetInfo (
+  IN EFI_RNG_PROTOCOL    *This,
+  IN OUT UINTN           *RNGAlgorithmListSize,
+  OUT EFI_RNG_ALGORITHM  *RNGAlgorithmList
   )
 {
   UINTN              RequiredSize;
   EFI_RNG_ALGORITHM  *CpuRngSupportedAlgorithm;
 
   RequiredSize = sizeof (EFI_RNG_ALGORITHM);
+
+  if ((This == NULL) || (RNGAlgorithmListSize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (*RNGAlgorithmListSize < RequiredSize) {
     *RNGAlgorithmListSize = RequiredSize;
