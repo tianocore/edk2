@@ -669,7 +669,7 @@ TlsSetCaCertificate (
   TLS_CONNECTION  *TlsConn;
   SSL_CTX         *SslCtx;
   INTN            Ret;
-  UINTN           ErrorCode;
+  UINT32          ErrorCode;
 
   BioCert   = NULL;
   Cert      = NULL;

@@ -81,7 +81,7 @@ TlsDoHandshake (
   TLS_CONNECTION  *TlsConn;
   UINTN           PendingBufferSize;
   INTN            Ret;
-  UINTN           ErrorCode;
+  UINT32          ErrorCode;
 
   TlsConn           = (TLS_CONNECTION *)Tls;
   PendingBufferSize = 0;
