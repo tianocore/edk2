@@ -31,6 +31,7 @@
   MemTypeInfo.c
   Platform.c
   Platform.h
+  IntelTdx.c
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
@@ -43,6 +44,7 @@
 [Guids]
   gEfiMemoryTypeInformationGuid
   gFdtHobGuid
+  gUefiOvmfPkgTdxPlatformGuid
 
 [LibraryClasses]
   BaseLib
@@ -63,6 +65,9 @@
   PcdLib
   VmgExitLib
   PlatformInitLib
+
+[LibraryClasses.X64]
+  TdxLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
@@ -109,6 +114,8 @@
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
   gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures
+  gEfiMdeModulePkgTokenSpaceGuid.PcdIa32EferChangeAllowed
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase

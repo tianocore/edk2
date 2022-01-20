@@ -37,6 +37,7 @@ Module Name:
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/PlatformInitLib.h>
+#include <Library/TdxLib.h>
 #include "Platform.h"
 
 UINT8  mPhysMemAddressWidth;
@@ -218,7 +219,12 @@ GetPeiMemoryCap (
     PdpEntries  = 1 << (mPhysMemAddressWidth - 30);
     ASSERT (PdpEntries <= 0x200);
   } else {
-    Pml4Entries = 1 << (mPhysMemAddressWidth - 39);
+    if (TdIsEnabled ()) {
+      Pml4Entries = 0x200;
+    } else {
+      Pml4Entries = 1 << (mPhysMemAddressWidth - 39);
+    }
+
     ASSERT (Pml4Entries <= 0x200);
     PdpEntries = 512;
   }
@@ -333,6 +339,11 @@ InitializeRamRegions (
   VOID
   )
 {
+  if (TdIsEnabled ()) {
+    PlatformTdxPublishRamRegions ();
+    return;
+  }
+
   PlatformInitializeRamRegions (
     mQemuUc32Base,
     mHostBridgeDevId,
