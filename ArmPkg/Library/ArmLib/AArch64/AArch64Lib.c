@@ -117,3 +117,16 @@ ArmHasRngExt (
 {
   return ArmReadIdIsar0 () & ID_AA64ISAR0_EL1_RNDR_MASK;
 }
+
+/** Check if FEAT_AES extension is available.
+
+  @retval TRUE if FEAT_AES extension is available.
+  @retval FALSE otherwise.
+**/
+BOOLEAN
+ArmHasAesExt (
+  VOID
+  )
+{
+  return ArmReadIdIsar0 () & ID_AA64ISAR0_EL1_AES_MASK;
+}
