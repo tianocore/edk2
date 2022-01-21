@@ -1,0 +1,24 @@
+## @file
+#  Null AES Library
+#
+#  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = AesLibNull
+  FILE_GUID      = F6DED279-FC26-40F6-88B2-05FF5E6E538F
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = AesLib
+
+[Sources]
+  AesLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
