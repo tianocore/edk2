@@ -10,6 +10,8 @@
 #ifndef ARM_V7_LIB_H_
 #define ARM_V7_LIB_H_
 
+#define ID_ISAR5_AES_MASK  (0xF << 4U)
+
 #define ID_MMFR0_SHARELVL_SHIFT  12
 #define ID_MMFR0_SHARELVL_MASK   0xf
 #define ID_MMFR0_SHARELVL_ONE    0

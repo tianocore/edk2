@@ -133,3 +133,16 @@ ArmHasRngExt (
   // Not supported.
   return FALSE;
 }
+
+/** Check if FEAT_AES extension is available.
+
+  @retval TRUE if FEAT_AES extension is available.
+  @retval FALSE otherwise.
+**/
+BOOLEAN
+ArmHasAesExt (
+  VOID
+  )
+{
+  return ArmReadIdIsaR5 () & ID_ISAR5_AES_MASK;
+}
