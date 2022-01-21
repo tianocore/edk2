@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2011 - 2022, Arm Ltd. All rights reserved.<BR>
   Copyright (c) 2020 - 2021, NUVIA Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -776,6 +776,16 @@ ArmHasCcidx (
 **/
 BOOLEAN
 ArmHasRngExt (
+  VOID
+  );
+
+/** Check if FEAT_AES extension is available.
+
+  @retval TRUE if FEAT_AES extension is available.
+  @retval FALSE otherwise.
+**/
+BOOLEAN
+ArmHasAesExt (
   VOID
   );
 
