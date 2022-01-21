@@ -2,7 +2,7 @@
 # ARM processor package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
+# Copyright (c) 2011 - 2022, Arm Limited. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.<BR>
 # Copyright (c) 2021, Ampere Computing LLC. All rights reserved.
@@ -139,6 +139,7 @@
   ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
   ArmPkg/Library/OpteeLib/OpteeLib.inf
   ArmPkg/Library/ArmFwTrngLib/ArmFwTrngLib.inf
+  ArmPkg/Library/ArmAesLib/ArmAesLib.inf
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
