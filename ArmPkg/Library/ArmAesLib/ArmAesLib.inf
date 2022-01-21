@@ -1,0 +1,34 @@
+## @file
+#  AES Library
+#
+#  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = ArmAesLib
+  FILE_GUID      = 585599F7-DA62-44F5-BA20-3D50AEF638B4
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = BASE
+  LIBRARY_CLASS  = AesLib
+  CONSTRUCTOR    = AesLibConstructor
+
+[Sources]
+  ArmAesLib.c
+  ArmAesLib.h
+
+[Sources.ARM]
+  Arm/ArmAesLib.S
+
+[Sources.AARCH64]
+  AArch64/AArch64AesLib.S
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
