@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2016, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2022, Arm Limited. All rights reserved.
 # Copyright (c) 2016, Linaro Limited. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -165,6 +165,11 @@ ASM_FUNC (ArmGetPhysicalAddressBits)
   cmp     r0, #5                  // >= 5 implies LPAE support
   movlt   r0, #32                 // 32 bits if no LPAE
   movge   r0, #40                 // 40 bits if LPAE
+  bx      lr
+
+// UINTN ArmReadIdIsaR5(VOID)
+ASM_FUNC(ArmReadIdIsaR5)
+  mrc     p15, 0, r0, c0, c2, 5
   bx      lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
