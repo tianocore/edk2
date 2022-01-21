@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2022, Arm Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -63,6 +64,16 @@ ArmReadIdMmfr4 (
 UINTN
 EFIAPI
 ArmReadIdPfr1 (
+  VOID
+  );
+
+/** Reads the ID_ISAR5 register.
+
+   @return The contents of the ID_ISAR5 register.
+**/
+UINTN
+EFIAPI
+ArmReadIdIsaR5 (
   VOID
   );
 
