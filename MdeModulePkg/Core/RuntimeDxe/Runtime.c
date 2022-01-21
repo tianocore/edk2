@@ -365,7 +365,8 @@ RuntimeDriverSetVirtualAddressMap (
   //
   // mVirtualMap is only valid during SetVirtualAddressMap() call
   //
-  mVirtualMap = NULL;
+  mVirtualMap         = NULL;
+  mVirtualMapMaxIndex = 0;
 
   return EFI_SUCCESS;
 }
