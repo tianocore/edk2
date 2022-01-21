@@ -128,15 +128,6 @@ FieldMask (
   return "";
 }
 
-UINT32
-RotateRight (
-  IN UINT32  Op,
-  IN UINT32  Shift
-  )
-{
-  return (Op >> Shift) | (Op << (32 - Shift));
-}
-
 /**
   Place a disassembly of **OpCodePtr into buffer, and update OpCodePtr to
   point to next instruction.
@@ -409,7 +400,7 @@ DisassembleArmInstruction (
     // A4.1.38 MSR{<cond>} CPSR_<fields>, #<immediate> MSR{<cond>} CPSR_<fields>, <Rm>
     if (Imm) {
       // MSR{<cond>} CPSR_<fields>, #<immediate>
-      AsciiSPrint (Buf, Size, "MRS%a %a_%a, #0x%x", COND (OpCode), WriteBack ? "SPSR" : "CPSR", FieldMask ((OpCode >> 16) & 0xf), RotateRight (OpCode & 0xf, ((OpCode >> 8) & 0xf) *2));
+      AsciiSPrint (Buf, Size, "MRS%a %a_%a, #0x%x", COND (OpCode), WriteBack ? "SPSR" : "CPSR", FieldMask ((OpCode >> 16) & 0xf), RRotU32 (OpCode & 0xf, ((OpCode >> 8) & 0xf) *2));
     } else {
       // MSR{<cond>} CPSR_<fields>, <Rm>
       AsciiSPrint (Buf, Size, "MRS%a %a_%a, %a", COND (OpCode), WriteBack ? "SPSR" : "CPSR", gReg[Rd]);
