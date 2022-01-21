@@ -246,4 +246,10 @@ PlatformAddReservedMemoryBaseSizeHob (
   IN BOOLEAN               Cacheable
   );
 
+VOID
+EFIAPI
+PlatformTdxPublishRamRegions (
+  VOID
+  );
+
 #endif // PLATFORM_INIT_LIB_H_

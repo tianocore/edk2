@@ -26,6 +26,7 @@
   Cmos.c
   MemDetect.c
   Platform.c
+  IntelTdx.c
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
@@ -48,6 +49,9 @@
   QemuFwCfgSimpleParserLib
   MtrrLib
   PcdLib
+
+[LibraryClasses.X64]
+  TdxLib
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase
