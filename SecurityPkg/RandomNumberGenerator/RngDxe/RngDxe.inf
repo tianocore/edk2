@@ -43,8 +43,10 @@
 
 [Sources.AARCH64]
   AArch64/RngDxe.c
+  ArmTrng.c
 
 [Packages]
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   SecurityPkg/SecurityPkg.dec
 
@@ -56,6 +58,9 @@
   UefiDriverEntryPoint
   TimerLib
   RngLib
+
+[LibraryClasses.AARCH64]
+  TrngLib
 
 [Guids]
   gEfiRngAlgorithmSp80090Hash256Guid  ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
