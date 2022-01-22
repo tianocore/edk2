@@ -58,10 +58,9 @@ PciRomAddImageMapping (
     {
       //
       // Expect once RomImage and RomSize are recorded, they will be passed in
-      // later when updating ImageHandle
+      // later when updating ImageHandle. They may also be updated with new
+      // values if the platform provides an override of RomImage and RomSize.
       //
-      ASSERT ((mRomImageTable[Index].RomImage == NULL) || (RomImage == mRomImageTable[Index].RomImage));
-      ASSERT ((mRomImageTable[Index].RomSize  == 0) || (RomSize  == mRomImageTable[Index].RomSize));
       break;
     }
   }
