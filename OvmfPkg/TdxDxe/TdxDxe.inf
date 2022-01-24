@@ -60,5 +60,9 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack
