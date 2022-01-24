@@ -23,7 +23,6 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/TimerLib.h>
 #include <Protocol/Rng.h>
 
 #include "RngDxeInternals.h"
@@ -61,7 +60,7 @@ RngGetRNG (
 {
   EFI_STATUS  Status;
 
-  if ((RNGValueLength == 0) || (RNGValue == NULL)) {
+  if ((This == NULL) || (RNGValueLength == 0) || (RNGValue == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
