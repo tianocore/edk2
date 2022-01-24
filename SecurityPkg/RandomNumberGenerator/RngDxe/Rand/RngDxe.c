@@ -59,7 +59,7 @@ RngGetRNG (
 {
   EFI_STATUS  Status;
 
-  if ((RNGValueLength == 0) || (RNGValue == NULL)) {
+  if ((This == NULL) || (RNGValueLength == 0) || (RNGValue == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
