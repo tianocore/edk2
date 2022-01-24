@@ -44,7 +44,7 @@
   TRUE
 
 [Guids]
-  gUefiOvmfPkgTdxPlatformGuid                      ## CONSUMES
+  gUefiOvmfPkgPlatformInfoGuid                      ## CONSUMES
 
 [Protocols]
   gQemuAcpiTableNotifyProtocolGuid                 ## CONSUMES
@@ -60,5 +60,10 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
+  gEfiMdeModulePkgTokenSpaceGuid.PcdIa32EferChangeAllowed
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack
