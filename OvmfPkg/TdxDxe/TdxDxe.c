@@ -24,11 +24,64 @@
 #include <Library/HobLib.h>
 #include <Protocol/Cpu.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <ConfidentialComputingGuestAttr.h>
 #include <IndustryStandard/Tdx.h>
 #include <Library/PlatformInitLib.h>
 #include <Library/TdxLib.h>
 #include <TdxAcpiTable.h>
 #include <Library/MemEncryptTdxLib.h>
+
+VOID
+SetPcdSettings (
+  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  RETURN_STATUS  PcdStatus;
+
+  PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, PlatformInfoHob->PcdConfidentialComputingGuestAttr);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSetBoolS (PcdSetNxForStack, PlatformInfoHob->PcdSetNxForStack);
+  ASSERT_RETURN_ERROR (PcdStatus);
+
+  DEBUG ((
+    DEBUG_INFO,
+    "HostBridgeDevId=0x%x, CCAttr=0x%x, SetNxForStack=%x\n",
+    PlatformInfoHob->HostBridgeDevId,
+    PlatformInfoHob->PcdConfidentialComputingGuestAttr,
+    PlatformInfoHob->PcdSetNxForStack
+    ));
+
+  PcdStatus = PcdSet32S (PcdCpuBootLogicalProcessorNumber, PlatformInfoHob->PcdCpuBootLogicalProcessorNumber);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet32S (PcdCpuMaxLogicalProcessorNumber, PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber);
+  ASSERT_RETURN_ERROR (PcdStatus);
+
+  DEBUG ((
+    DEBUG_INFO,
+    "MaxCpuCount=0x%x, BootCpuCount=0x%x\n",
+    PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber,
+    PlatformInfoHob->PcdCpuBootLogicalProcessorNumber
+    ));
+
+  if (TdIsEnabled ()) {
+    PcdStatus = PcdSet64S (PcdTdxSharedBitMask, TdSharedPageMask ());
+    ASSERT_RETURN_ERROR (PcdStatus);
+    DEBUG ((DEBUG_INFO, "TdxSharedBitMask=0x%llx\n", PcdGet64 (PcdTdxSharedBitMask)));
+  } else {
+    PcdStatus = PcdSet64S (PcdPciMmio64Base, PlatformInfoHob->PcdPciMmio64Base);
+    ASSERT_RETURN_ERROR (PcdStatus);
+    PcdStatus = PcdSet64S (PcdPciMmio64Size, PlatformInfoHob->PcdPciMmio64Size);
+    ASSERT_RETURN_ERROR (PcdStatus);
+    PcdStatus = PcdSet64S (PcdPciMmio32Base, PlatformInfoHob->PcdPciMmio32Base);
+    ASSERT_RETURN_ERROR (PcdStatus);
+    PcdStatus = PcdSet64S (PcdPciMmio32Size, PlatformInfoHob->PcdPciMmio32Size);
+    ASSERT_RETURN_ERROR (PcdStatus);
+    PcdStatus = PcdSet64S (PcdPciIoBase, PlatformInfoHob->PcdPciIoBase);
+    ASSERT_RETURN_ERROR (PcdStatus);
+    PcdStatus = PcdSet64S (PcdPciIoSize, PlatformInfoHob->PcdPciIoSize);
+    ASSERT_RETURN_ERROR (PcdStatus);
+  }
+}
 
 /**
   Location of resource hob matching type and starting address
@@ -187,8 +240,19 @@ TdxDxeEntryPoint (
   PcdStatus = PcdSet16S (PcdOvmfHostBridgePciDevId, PlatformInfo->HostBridgeDevId);
   ASSERT_RETURN_ERROR (PcdStatus);
 
+ #ifdef TDX_PEI_LESS_BOOT
+  //
+  // For Pei-less boot, PlatformInfo contains more information and
+  // need to set PCDs based on these information.
+  //
+  SetPcdSettings (PlatformInfo);
+ #endif
+
   if (!TdIsEnabled ()) {
-    return EFI_UNSUPPORTED;
+    //
+    // If it is Non-Td guest, we're done.
+    //
+    return EFI_SUCCESS;
   }
 
   SetMmioSharedBit ();
