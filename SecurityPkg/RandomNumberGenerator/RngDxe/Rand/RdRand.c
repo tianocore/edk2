@@ -15,7 +15,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/RngLib.h>
-#include <Library/TimerLib.h>
 
 #include "AesCore.h"
 #include "RngDxeInternals.h"
