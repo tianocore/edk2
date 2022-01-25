@@ -27,12 +27,13 @@ typedef struct _EFI_MM_COMMUNICATION2_PROTOCOL EFI_MM_COMMUNICATION2_PROTOCOL;
 
   This function provides a service to send and receive messages from a registered UEFI service.
 
-  @param[in] This                The EFI_MM_COMMUNICATION_PROTOCOL instance.
-  @param[in] CommBufferPhysical  Physical address of the MM communication buffer
-  @param[in] CommBufferVirtual   Virtual address of the MM communication buffer
-  @param[in] CommSize            The size of the data buffer being passed in. On exit, the size of data
-                                 being returned. Zero if the handler does not wish to reply with any data.
-                                 This parameter is optional and may be NULL.
+  @param[in] This                     The EFI_MM_COMMUNICATION_PROTOCOL instance.
+  @param[in, out] CommBufferPhysical  Physical address of the MM communication buffer
+  @param[in, out] CommBufferVirtual   Virtual address of the MM communication buffer
+  @param[in, out] CommSize            The size of the data buffer being passed in. On exit, the
+                                      size of data being returned. Zero if the handler does not
+                                      wish to reply with any data. This parameter is optional
+                                      and may be NULL.
 
   @retval EFI_SUCCESS            The message was successfully posted.
   @retval EFI_INVALID_PARAMETER  CommBufferPhysical was NULL or CommBufferVirtual was NULL.
