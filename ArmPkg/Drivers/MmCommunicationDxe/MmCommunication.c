@@ -92,6 +92,7 @@ MmCommunication2Communicate (
     return EFI_INVALID_PARAMETER;
   }
 
+  Status            = EFI_SUCCESS;
   CommunicateHeader = CommBufferVirtual;
   // CommBuffer is a mandatory parameter. Hence, Rely on
   // MessageLength + Header to ascertain the
@@ -109,28 +110,33 @@ MmCommunication2Communicate (
         (*CommSize > mNsCommBuffMemRegion.Length))
     {
       *CommSize = mNsCommBuffMemRegion.Length;
-      return EFI_BAD_BUFFER_SIZE;
+      Status    = EFI_BAD_BUFFER_SIZE;
     }
 
     //
     // CommSize should cover at least MessageLength + sizeof (EFI_MM_COMMUNICATE_HEADER);
     //
     if (*CommSize < BufferSize) {
-      return EFI_INVALID_PARAMETER;
+      Status = EFI_INVALID_PARAMETER;
     }
   }
 
   //
-  // If the buffer size is 0 or greater than what can be tolerated by the MM
+  // If the message length is 0 or greater than what can be tolerated by the MM
   // environment then return the expected size.
   //
-  if ((BufferSize == 0) ||
+  if ((CommunicateHeader->MessageLength == 0) ||
       (BufferSize > mNsCommBuffMemRegion.Length))
   {
     CommunicateHeader->MessageLength = mNsCommBuffMemRegion.Length -
                                        sizeof (CommunicateHeader->HeaderGuid) -
                                        sizeof (CommunicateHeader->MessageLength);
-    return EFI_BAD_BUFFER_SIZE;
+    Status = EFI_BAD_BUFFER_SIZE;
+  }
+
+  // MessageLength or CommSize check has failed, return here.
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   // SMC Function ID
