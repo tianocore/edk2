@@ -280,12 +280,16 @@ WifiMgrGetStrAKMList (
     //
     // Current AKM Suite is between 1-9
     //
-    AKMListDisplay = (CHAR16 *)AllocateZeroPool (sizeof (CHAR16) * AKMSuiteCount * 2);
+    AKMListDisplay = (CHAR16 *)AllocateZeroPool (sizeof (CHAR16) * (AKMSuiteCount * 2 + 1));
     if (AKMListDisplay != NULL) {
       for (Index = 0; Index < AKMSuiteCount; Index++) {
+        //
+        // The size of buffer should be 3 CHAR16 for Null-terminated Unicode string.
+        // The first char is the AKM Suite number, the second char is ' ', the third char is '\0'.
+        //
         UnicodeSPrint (
           AKMListDisplay + (Index * 2),
-          sizeof (CHAR16) * 2,
+          sizeof (CHAR16) * 3,
           L"%d ",
           Profile->Network.AKMSuite->AKMSuiteList[Index].SuiteType
           );
@@ -333,12 +337,16 @@ WifiMgrGetStrCipherList (
     //
     // Current Cipher Suite is between 1-9
     //
-    CipherListDisplay = (CHAR16 *)AllocateZeroPool (sizeof (CHAR16) * CipherSuiteCount * 2);
+    CipherListDisplay = (CHAR16 *)AllocateZeroPool (sizeof (CHAR16) * (CipherSuiteCount * 2 + 1));
     if (CipherListDisplay != NULL) {
       for (Index = 0; Index < CipherSuiteCount; Index++) {
+        //
+        // The size of buffer should be 3 CHAR16 for Null-terminated Unicode string.
+        // The first char is the Cipher Suite number, the second char is ' ', the third char is '\0'.
+        //
         UnicodeSPrint (
           CipherListDisplay + (Index * 2),
-          sizeof (CHAR16) * 2,
+          sizeof (CHAR16) * 3,
           L"%d ",
           Profile->Network.CipherSuite->CipherSuiteList[Index].SuiteType
           );
