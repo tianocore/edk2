@@ -1,7 +1,7 @@
 /** @file
   Arm Gic cpu parser.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -11,6 +11,10 @@
 
 #ifndef ARM_GICC_PARSER_H_
 #define ARM_GICC_PARSER_H_
+
+/* According to BSA 1.0 s3.6 PPI assignments, PMU IRQ ID is 23.
+*/
+#define BSA_PMU_IRQ  23
 
 /** CM_ARM_GICC_INFO parser function.
 
@@ -22,7 +26,7 @@
     UINT32  AcpiProcessorUid;                 // {Populated}
     UINT32  Flags;                            // {Populated}
     UINT32  ParkingProtocolVersion;           // {default = 0}
-    UINT32  PerformanceInterruptGsiv;         // {default = 0}
+    UINT32  PerformanceInterruptGsiv;         // {Populated}
     UINT64  ParkedAddress;                    // {default = 0}
     UINT64  PhysicalBaseAddress;              // {Populated}
     UINT64  GICV;                             // {Populated}
