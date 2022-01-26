@@ -1,13 +1,14 @@
 /** @file
   Arm Gic cpu parser.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
   - linux/Documentation/devicetree/bindings/arm/cpus.yaml
   - linux/Documentation/devicetree/bindings/interrupt-controller/arm,gic.yaml
   - linux/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
+  - linux/Documentation/devicetree/bindings/arm/pmu.yaml
 **/
 
 #include "FdtHwInfoParser.h"
@@ -32,6 +33,21 @@ STATIC CONST COMPATIBILITY_STR  CpuCompatibleStr[] = {
 STATIC CONST COMPATIBILITY_INFO  CpuCompatibleInfo = {
   ARRAY_SIZE (CpuCompatibleStr),
   CpuCompatibleStr
+};
+
+/** Pmu compatible strings.
+
+  Any other "compatible" value is not supported by this module.
+*/
+STATIC CONST COMPATIBILITY_STR  PmuCompatibleStr[] = {
+  { "arm,armv8-pmuv3" }
+};
+
+/** COMPATIBILITY_INFO structure for the PmuCompatibleStr.
+*/
+CONST COMPATIBILITY_INFO  PmuCompatibleInfo = {
+  ARRAY_SIZE (PmuCompatibleStr),
+  PmuCompatibleStr
 };
 
 /** Parse a "cpu" node.
@@ -639,6 +655,111 @@ GicCv3IntcNodeParser (
   return EFI_SUCCESS;
 }
 
+/** Parse a Pmu compatible node, extracting Pmu information.
+
+  This function modifies a CM_OBJ_DESCRIPTOR object.
+  The following CM_ARM_GICC_INFO fields are patched:
+    - PerformanceInterruptGsiv;
+
+  @param [in]       Fdt              Pointer to a Flattened Device Tree (Fdt).
+  @param [in]       GicIntcNode      Offset of a Gic compatible
+                                     interrupt-controller node.
+  @param [in, out]  GicCCmObjDesc    The CM_ARM_GICC_INFO to patch.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GicCPmuNodeParser (
+  IN      CONST VOID               *Fdt,
+  IN            INT32              GicIntcNode,
+  IN  OUT       CM_OBJ_DESCRIPTOR  *GicCCmObjDesc
+  )
+{
+  EFI_STATUS        Status;
+  INT32             IntCells;
+  INT32             PmuNode;
+  UINT32            PmuNodeCount;
+  UINT32            PmuIrq;
+  UINT32            Index;
+  CM_ARM_GICC_INFO  *GicCInfo;
+  CONST UINT8       *Data;
+  INT32             DataSize;
+
+  if (GicCCmObjDesc == NULL) {
+    ASSERT (GicCCmObjDesc != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  GicCInfo = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data;
+  PmuNode  = 0;
+
+  // Count the number of pmu nodes.
+  Status = FdtCountCompatNodeInBranch (
+             Fdt,
+             0,
+             &PmuCompatibleInfo,
+             &PmuNodeCount
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  if (PmuNodeCount == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  Status = FdtGetNextCompatNodeInBranch (
+             Fdt,
+             0,
+             &PmuCompatibleInfo,
+             &PmuNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    if (Status == EFI_NOT_FOUND) {
+      // Should have found the node.
+      Status = EFI_ABORTED;
+    }
+  }
+
+  // Get the number of cells used to encode an interrupt.
+  Status = FdtGetInterruptCellsInfo (Fdt, GicIntcNode, &IntCells);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Data = fdt_getprop (Fdt, PmuNode, "interrupts", &DataSize);
+  if ((Data == NULL) || (DataSize != (IntCells * sizeof (UINT32)))) {
+    // If error or not 1 interrupt.
+    ASSERT (Data != NULL);
+    ASSERT (DataSize == (IntCells * sizeof (UINT32)));
+    return EFI_ABORTED;
+  }
+
+  PmuIrq = FdtGetInterruptId ((CONST UINT32 *)Data);
+
+  // Only supports PPI 23 for now.
+  // According to BSA 1.0 s3.6 PPI assignments, PMU IRQ ID is 23. A non BSA
+  // compliant system may assign a different IRQ for the PMU, however this
+  // is not implemented for now.
+  if (PmuIrq != BSA_PMU_IRQ) {
+    ASSERT (PmuIrq == BSA_PMU_IRQ);
+    return EFI_ABORTED;
+  }
+
+  for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
+    GicCInfo[Index].PerformanceInterruptGsiv = PmuIrq;
+  }
+
+  return EFI_SUCCESS;
+}
+
 /** CM_ARM_GICC_INFO parser function.
 
   This parser expects FdtBranch to be the "\cpus" node node.
@@ -649,7 +770,7 @@ GicCv3IntcNodeParser (
     UINT32  AcpiProcessorUid;                 // {Populated}
     UINT32  Flags;                            // {Populated}
     UINT32  ParkingProtocolVersion;           // {default = 0}
-    UINT32  PerformanceInterruptGsiv;         // {default = 0}
+    UINT32  PerformanceInterruptGsiv;         // {Populated}
     UINT64  ParkedAddress;                    // {default = 0}
     UINT64  PhysicalBaseAddress;              // {Populated}
     UINT64  GICV;                             // {Populated}
@@ -761,6 +882,13 @@ ArmGicCInfoParser (
   Status = GicCIntcNodeParser (Fdt, IntcNode, NewCmObjDesc);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
+    goto exit_handler;
+  }
+
+  // Parse the Pmu Interrupt.
+  Status = GicCPmuNodeParser (Fdt, IntcNode, NewCmObjDesc);
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    ASSERT_EFI_ERROR (Status);
     goto exit_handler;
   }
 
