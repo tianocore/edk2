@@ -2394,6 +2394,15 @@ ConSplitterAddOutputMode (
       Private->TextOutQueryData[Mode].Rows    = 0;
     }
 
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: #%d: %d x %d\n",
+      __FUNCTION__,
+      Mode,
+      Private->TextOutQueryData[Mode].Columns,
+      Private->TextOutQueryData[Mode].Rows
+      ));
+
     Private->TextOutModeMap[Index] = Mode;
     Mode++;
     Index += Private->TextOutListCount;
@@ -2434,6 +2443,8 @@ ConSplitterGetIntersection (
   INT32  *NewMapEntry;
   INT32  CurrentMaxMode;
   INT32  Mode;
+
+  DEBUG ((DEBUG_INFO, "%a:\n", __FUNCTION__));
 
   //
   // According to EFI/UEFI spec, mode 0 and mode 1 have been reserved
@@ -2519,6 +2530,7 @@ ConSplitterSyncOutputMode (
   MapTable = TextOutModeMap + Private->CurrentNumberOfConsoles;
   while (Mode < TextOut->Mode->MaxMode) {
     Status = TextOut->QueryMode (TextOut, Mode, &Columns, &Rows);
+    DEBUG ((DEBUG_INFO, "%a: #%d: %d x %d\n", __FUNCTION__, Mode, Columns, Rows));
 
     if (EFI_ERROR (Status)) {
       if (Mode == 1) {
@@ -2607,6 +2619,8 @@ ConSplitterGetIntersectionBetweenConOutAndStrErr (
   BOOLEAN                       FoundTheSameTextOut;
   UINTN                         ConOutMapTableSize;
   UINTN                         StdErrMapTableSize;
+
+  DEBUG ((DEBUG_INFO, "%a:\n", __FUNCTION__));
 
   ConOutNumOfConsoles = mConOut.CurrentNumberOfConsoles;
   StdErrNumOfConsoles = mStdErr.CurrentNumberOfConsoles;
@@ -2766,6 +2780,8 @@ ConSplitterAddGraphicsOutputMode (
   UINT32                                UgaVerticalResolution;
   UINT32                                UgaColorDepth;
   UINT32                                UgaRefreshRate;
+
+  DEBUG ((DEBUG_INFO, "%a:\n", __FUNCTION__));
 
   ASSERT (GraphicsOutput != NULL || UgaDraw != NULL);
 
@@ -3072,6 +3088,14 @@ ConsplitterSetConsoleOutMode (
   MaxModeInfo.Row    = 0;
   ModeInfo.Column    = PcdGet32 (PcdConOutColumn);
   ModeInfo.Row       = PcdGet32 (PcdConOutRow);
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: %d x %d (PcdConOut*)\n",
+    __FUNCTION__,
+    ModeInfo.Column,
+    ModeInfo.Row
+    ));
 
   //
   // To find the prefer mode and basic mode from Text Out mode list
