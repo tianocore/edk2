@@ -1,7 +1,7 @@
 /** @file
   SSDT Pcie Table Generator.
 
-  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -295,6 +295,10 @@ GeneratePciDeviceInfo (
     Method (_CRS, 0) {
       Return CRS0
       })
+    Method (_PRS, 0) {
+      Return CRS0
+      })
+    Method (_SRS, 1) { }
     Method (_DIS) { }
   }
 
@@ -302,9 +306,12 @@ GeneratePciDeviceInfo (
   PCI Firmware Specification - Revision 3.3,
   s3.5. "Device State at Firmware/Operating System Handoff"
 
-  The _PRS and _SRS are not supported, cf Arm Base Boot Requirements v1.0:
+  Warning: The Arm Base Boot Requirements v1.0 states the following:
   "The _PRS (Possible Resource Settings) and _SRS (Set Resource Settings)
   are not supported."
+  However, the first model to describe PCI legacy interrupts is used (cf. ACPI
+  6.4 s6.2.13) as PCI defaults (Level Triggered, Active Low) are not compatible
+  with GICv2 (must be Active High).
 
   @param [in]       Irq         Interrupt controller interrupt.
   @param [in]       IrqFlags    Interrupt flags.
@@ -416,7 +423,41 @@ GenerateLinkDevice (
     return Status;
   }
 
-  // ASL:Method (_DIS, 1) {}
+  // ASL:
+  // Method (_PRS, 0) {
+  //   Return (CRS0)
+  // }
+  Status = AmlCodeGenMethodRetNameString (
+             "_PRS",
+             "CRS0",
+             0,
+             FALSE,
+             0,
+             LinkNode,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // ASL:Method (_SRS, 1) {}
+  // Not possible to disable interrupts.
+  Status = AmlCodeGenMethodRetNameString (
+             "_SRS",
+             NULL,
+             1,
+             FALSE,
+             0,
+             LinkNode,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // ASL:Method (_DIS, 0) {}
   // Not possible to disable interrupts.
   Status = AmlCodeGenMethodRetNameString (
              "_DIS",
