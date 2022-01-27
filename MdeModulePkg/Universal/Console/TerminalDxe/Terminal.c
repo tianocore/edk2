@@ -112,9 +112,12 @@ TERMINAL_DEV  mTerminalDevTemplate = {
 };
 
 TERMINAL_CONSOLE_MODE_DATA  mTerminalConsoleModeData[] = {
-  { 80,  25 },
-  { 80,  50 },
-  { 100, 31 },
+  { 80,  25 },  // reserved
+  { 80,  50 },  // reserved
+  { 100, 31 },  //  800 x 600
+  { 128, 40 },  // 1024 x 768
+  { 160, 42 },  // 1280 x 800
+  { 240, 56 },  // 1920 x 1080
   //
   // New modes can be added here.
   //
