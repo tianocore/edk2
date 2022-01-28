@@ -11,7 +11,7 @@
 
 #define FRONT_PAGE_FORM_ID             0x1000
 
-#define LABEL_FRANTPAGE_INFORMATION    0x1000
+#define LABEL_FRONTPAGE_INFORMATION    0x1000
 #define LABEL_END                      0xffff
 
 formset
@@ -68,7 +68,7 @@ formset
       line  5,
       align right;
 
-    label LABEL_FRANTPAGE_INFORMATION;
+    label LABEL_FRONTPAGE_INFORMATION;
     //
     // This is where we will dynamically add a Action type op-code to show
     // the platform information.
