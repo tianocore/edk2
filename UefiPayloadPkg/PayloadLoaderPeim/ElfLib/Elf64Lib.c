@@ -143,7 +143,7 @@ ProcessRelocation64 (
           DEBUG ((DEBUG_INFO, "Unsupported relocation type %02X\n", Type));
           ASSERT (FALSE);
         } else {
-          *Ptr += Delta;
+          *Ptr = *(UINTN *)Ptr + Delta;
         }
 
         break;
@@ -177,12 +177,12 @@ ProcessRelocation64 (
           // Calculation: B + A
           //
           if (RelaType == SHT_RELA) {
-            *Ptr = Delta + Rela->r_addend;
+            *Ptr = Delta + (UINTN)Rela->r_addend;
           } else {
             //
             // A is stored in the field of relocation for REL type.
             //
-            *Ptr = Delta + *Ptr;
+            *Ptr = Delta + *(UINTN *)Ptr;
           }
         } else {
           //
