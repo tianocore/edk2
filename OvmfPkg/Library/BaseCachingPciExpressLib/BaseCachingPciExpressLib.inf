@@ -21,14 +21,13 @@
   CONSTRUCTOR                    = PciExpressLibInitialize
 
 #
-#  VALID_ARCHITECTURES           = ARM AARCH64
+#  VALID_ARCHITECTURES           = ARM AARCH64 RISCV64
 #
 
 [Sources]
   PciExpressLib.c
 
 [Packages]
-  ArmVirtPkg/ArmVirtPkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
