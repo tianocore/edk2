@@ -5,9 +5,46 @@
 
 **/
 
+#include <Guid/MemoryTypeInformation.h>
 #include "UefiPayloadEntry.h"
 
 STATIC UINT32  mTopOfLowerUsableDram = 0;
+
+/**
+   Function to reserve memory below 4GB for EDKII Modules.
+
+   This causes the DXE to dispatch everything under 4GB and allows Operating
+   System's that require EFI_LOADED_IMAGE to be under 4GB to start.
+   e.g. Xen hypervisor used in Qubes
+
+   @param  None
+
+  @retval None
+**/
+VOID
+ForceModulesBelow4G (
+  VOID
+  )
+{
+  DEBUG ((DEBUG_INFO, "Building hob to restrict memory resorces to below 4G.\n"));
+  EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
+    { EfiACPIReclaimMemory,   FixedPcdGet32 (PcdMemoryTypeEfiACPIReclaimMemory)   },
+    { EfiACPIMemoryNVS,       FixedPcdGet32 (PcdMemoryTypeEfiACPIMemoryNVS)       },
+    { EfiReservedMemoryType,  FixedPcdGet32 (PcdMemoryTypeEfiReservedMemoryType)  },
+    { EfiRuntimeServicesData, FixedPcdGet32 (PcdMemoryTypeEfiRuntimeServicesData) },
+    { EfiRuntimeServicesCode, FixedPcdGet32 (PcdMemoryTypeEfiRuntimeServicesCode) },
+    { EfiMaxMemoryType,       0                                                   }
+  };
+
+  //
+  // Create Memory Type Information HOB
+  //
+  BuildGuidDataHob (
+    &gEfiMemoryTypeInformationGuid,
+    mDefaultMemoryTypeInformation,
+    sizeof (mDefaultMemoryTypeInformation)
+    );
+}
 
 /**
    Callback function to build resource descriptor HOB
@@ -437,6 +474,11 @@ _ModuleEntryPoint (
 
   // Build other HOBs required by DXE
   BuildGenericHob ();
+
+  // Create a HOB to make resources for EDKII modules below 4G
+  if (!FixedPcdGetBool (PcdAbove4GMemory)) {
+    ForceModulesBelow4G ();
+  }
 
   // Load the DXE Core
   Status = LoadDxeCore (&DxeCoreEntryPoint);
