@@ -53,7 +53,7 @@
   Pk/CryptRsaPss.c
   Pk/CryptRsaPssSign.c
   Pem/CryptPem.c
-
+  Bn/CryptBn.c
   SysCall/CrtWrapper.c
   SysCall/TimerWrapper.c
   SysCall/BaseMemAllocation.c
