@@ -742,6 +742,9 @@ ExecutePlatformConfig (
                   PlatformConfig.VerticalResolution
                   );
     ASSERT_RETURN_ERROR (PcdStatus);
+
+    PcdStatus = PcdSet8S (PcdVideoResolutionSource, 1);
+    ASSERT_RETURN_ERROR (PcdStatus);
   }
 
   return EFI_SUCCESS;
