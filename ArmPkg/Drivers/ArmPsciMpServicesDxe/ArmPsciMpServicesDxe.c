@@ -37,6 +37,7 @@
 #include <Library/ArmSmcLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/DmaLib.h>
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -1234,15 +1235,18 @@ FillInProcessorInformation (
 
 **/
 STATIC
-VOID
+EFI_STATUS
 MpServicesInitialize (
   IN   UINTN                NumberOfProcessors,
   IN   CONST ARM_CORE_INFO  *CoreInfo
   )
 {
-  EFI_STATUS  Status;
-  UINTN       Index;
-  EFI_EVENT   ReadyToBootEvent;
+  EFI_STATUS         Status;
+  UINTN              Index;
+  UINTN              MappingSize;
+  PHYSICAL_ADDRESS   MappingAddress;
+  VOID               *Mapping;
+  EFI_EVENT          ReadyToBootEvent;
 
   //
   // Clear the data structure area first.
@@ -1254,11 +1258,31 @@ MpServicesInitialize (
   mCpuMpData.NumberOfProcessors        = NumberOfProcessors;
   mCpuMpData.NumberOfEnabledProcessors = NumberOfProcessors;
 
-  mCpuMpData.CpuData = AllocateZeroPool (
-                         mCpuMpData.NumberOfProcessors *
-                         sizeof (CPU_AP_DATA)
-                         );
-  ASSERT (mCpuMpData.CpuData != NULL);
+  MappingSize = mCpuMpData.NumberOfProcessors * sizeof (CPU_AP_DATA);
+  Status = DmaAllocateBuffer (
+             EfiBootServicesData,
+             EFI_SIZE_TO_PAGES (MappingSize),
+             (VOID **)&mCpuMpData.CpuData
+             );
+  if (Status != EFI_SUCCESS) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = DmaMap (
+             MapOperationBusMasterCommonBuffer,
+             mCpuMpData.CpuData,
+             &MappingSize,
+             &MappingAddress,
+             &Mapping);
+  if (Status != EFI_SUCCESS) {
+    ASSERT_EFI_ERROR (Status);
+    DmaFreeBuffer (
+      EFI_SIZE_TO_PAGES (MappingSize),
+      mCpuMpData.CpuData
+      );
+    return Status;
+  }
 
   /* Allocate one extra for the NULL entry at the end */
   gProcessorIDs = AllocatePool ((mCpuMpData.NumberOfProcessors + 1) * sizeof (UINT64));
@@ -1308,6 +1332,7 @@ MpServicesInitialize (
   ASSERT_EFI_ERROR (Status);
 
   gProcessorIDs[Index] = MAX_UINT32;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -1366,7 +1391,11 @@ ArmPsciMpServicesDxeInitialize (
     return EFI_NOT_FOUND;
   }
 
-  MpServicesInitialize (MaxCpus, CoreInfo);
+  Status = MpServicesInitialize (MaxCpus, CoreInfo);
+  if (Status != EFI_SUCCESS) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
 
   //
   // Now install the MP services protocol.
