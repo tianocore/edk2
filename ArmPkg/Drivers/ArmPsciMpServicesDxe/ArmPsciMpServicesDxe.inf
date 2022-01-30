@@ -1,0 +1,47 @@
+#/** @file
+#
+#  ARM MP services protocol driver
+#
+#  Copyright (c) 2022, Google LLC. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = ArmPsciMpServicesDxe
+  FILE_GUID                      = 007ab472-dc4a-4df8-a5c2-abb4a327278c
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = ArmPsciMpServicesDxeInitialize
+
+[Sources.Common]
+  ArmPsciMpServicesDxe.c
+  MpFuncs.S
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  ArmSmcLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiMpServiceProtocolGuid
+
+[Guids]
+  gArmMpCoreInfoGuid
+
+[Depex]
+  TRUE
