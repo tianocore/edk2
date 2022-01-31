@@ -1446,6 +1446,8 @@ ApProcedure (
 
   mCpuMpData.CpuData[ProcessorIndex].State = CpuStateFinished;
 
+  ArmDataMemoryBarrier ();
+
   /* Since we're finished with this AP, turn it off */
   Args.Arg0 = ARM_SMC_ID_PSCI_CPU_OFF;
   ArmCallSmc (&Args);
