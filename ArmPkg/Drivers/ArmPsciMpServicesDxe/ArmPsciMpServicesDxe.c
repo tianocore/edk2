@@ -881,6 +881,7 @@ EnableDisableAP (
     StatusFlag |= (*HealthFlag & PROCESSOR_HEALTH_STATUS_BIT);
   }
 
+  mCpuMpData.CpuData[ProcessorNumber].Info.StatusFlag = StatusFlag;
   return EFI_SUCCESS;
 }
 
