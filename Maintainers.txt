@@ -69,7 +69,7 @@ Tianocore Stewards
 ------------------
 F: *
 M: Andrew Fish <afish@apple.com> [ajfish]
-M: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 
 Responsible Disclosure, Reporting Security Issues
@@ -86,7 +86,7 @@ UEFI Shell Binaries (ShellBinPkg.zip) from EDK II Releases:
 W: https://github.com/tianocore/edk2/releases/
 M: Ray Ni <ray.ni@intel.com> [niruiyu]                        (Ia32/X64)
 M: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]           (Ia32/X64)
-M: Leif Lindholm <leif@nuviainc.com> [leiflindholm]           (ARM/AArch64)
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]           (ARM/AArch64)
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel] (ARM/AArch64)
 
 EDK II Architectures:
@@ -94,7 +94,7 @@ EDK II Architectures:
 ARM, AARCH64
 F: */AArch64/
 F: */Arm/
-M: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 
 RISCV64
@@ -130,21 +130,21 @@ EDK II Packages:
 ArmPkg
 F: ArmPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
-M: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 R: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 
 ArmPlatformPkg
 F: ArmPlatformPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPlatformPkg
-M: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 
 ArmVirtPkg
 F: ArmVirtPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
-R: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
+R: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 R: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 
@@ -182,7 +182,7 @@ M: Alexei Fedorov <Alexei.Fedorov@arm.com> [AlexeiFedorov]
 EmbeddedPkg
 F: EmbeddedPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
-M: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Abner Chang <abner.chang@hpe.com> [changab]
 R: Daniel Schaefer <daniel.schaefer@hpe.com> [JohnAZoidberg]
@@ -477,7 +477,7 @@ R: Tom Lendacky <thomas.lendacky@amd.com> [tlendacky]
 
 OvmfPkg: FDT related modules
 F: OvmfPkg/Fdt
-R: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
+R: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 R: Abner Chang <abner.chang@hpe.com> [changab]
 
