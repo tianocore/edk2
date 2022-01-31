@@ -31,6 +31,7 @@
   ArmLib
   ArmSmcLib
   BaseMemoryLib
+  CacheMaintenanceLib
   DebugLib
   DmaLib
   HobLib
@@ -40,7 +41,8 @@
   UefiLib
 
 [Protocols]
-  gEfiMpServiceProtocolGuid
+  gEfiMpServiceProtocolGuid            ## PRODUCES
+  gEfiLoadedImageProtocolGuid          ## CONSUMES
 
 [Guids]
   gArmMpCoreInfoGuid

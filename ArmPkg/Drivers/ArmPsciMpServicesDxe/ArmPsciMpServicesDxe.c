@@ -36,6 +36,7 @@
 #include <Library/ArmLib.h>
 #include <Library/ArmSmcLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/CacheMaintenanceLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DmaLib.h>
 #include <Library/HobLib.h>
@@ -44,8 +45,8 @@
 #include <Library/UefiLib.h>
 
 #include <IndustryStandard/ArmStdSmc.h>
-
 #include <Ppi/ArmMpCoreInfo.h>
+#include <Protocol/LoadedImage.h>
 
 #include "MpServicesInternal.h"
 
@@ -1365,17 +1366,31 @@ ArmPsciMpServicesDxeInitialize (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS              Status;
-  EFI_HANDLE              Handle;
-  UINTN                   MaxCpus;
-  EFI_HOB_GENERIC_HEADER  *Hob;
-  VOID                    *HobData;
-  UINTN                   HobDataSize;
-  CONST ARM_CORE_INFO	  *CoreInfo;
+  EFI_STATUS                 Status;
+  EFI_HANDLE                 Handle;
+  UINTN                      MaxCpus;
+  EFI_LOADED_IMAGE_PROTOCOL  *Image;
+  EFI_HOB_GENERIC_HEADER     *Hob;
+  VOID                       *HobData;
+  UINTN                      HobDataSize;
+  CONST ARM_CORE_INFO        *CoreInfo;
 
   MaxCpus = 1;
 
   DEBUG ((DEBUG_INFO, "Starting MP services"));
+
+  Status = gBS->HandleProtocol (
+                  ImageHandle,
+                  &gEfiLoadedImageProtocolGuid,
+		  (VOID **)&Image);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Parts of the code in this driver may be executed by other cores running
+  // with the MMU off so we need to ensure that everything is clean to the
+  // point of coherency (PoC)
+  //
+  WriteBackDataCacheRange (Image->ImageBase, Image->ImageSize);
 
   Hob = GetFirstGuidHob (&gArmMpCoreInfoGuid);
   if (Hob != NULL) {
