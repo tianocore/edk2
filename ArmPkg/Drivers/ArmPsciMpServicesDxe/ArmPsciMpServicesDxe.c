@@ -1304,12 +1304,7 @@ MpServicesInitialize (
   gApStacksBase = AllocatePool (mCpuMpData.NumberOfProcessors * gApStackSize);
   ASSERT (gApStacksBase != NULL);
 
-  for (Index = 0; Index < mCpuMpData.NumberOfProcessors; Index++) {
-    if (IsProcessorBSP (Index)) {
-      /* Skip BSP */
-      continue;
-    }
-
+  for (Index = 1; Index < mCpuMpData.NumberOfProcessors; Index++) {
     FillInProcessorInformation (FALSE, CoreInfo[Index].Mpidr, Index);
 
     gProcessorIDs[Index] = mCpuMpData.CpuData[Index].Info.ProcessorId;
