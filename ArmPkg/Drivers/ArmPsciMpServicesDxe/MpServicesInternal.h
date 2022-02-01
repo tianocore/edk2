@@ -73,15 +73,6 @@ typedef struct {
   BOOLEAN             TimeoutActive;
 } CPU_MP_DATA;
 
-EFI_STATUS
-EFIAPI
-CpuMpServicesInit (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  );
-
-extern EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate;
-
 /** Secondary core entry point.
 
 **/

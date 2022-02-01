@@ -919,7 +919,6 @@ WhoAmI (
 {
   UINTN        Index;
   UINT64       ProcessorId;
-  CPU_AP_DATA  *CpuData;
 
   if (ProcessorNumber == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -927,13 +926,11 @@ WhoAmI (
 
   ProcessorId = GET_MPIDR_AFFINITY_BITS (ArmReadMpidr ());
   for (Index = 0; Index < mCpuMpData.NumberOfProcessors; Index++) {
-    CpuData = &mCpuMpData.CpuData[Index];
-    if (CpuData->Info.ProcessorId == ProcessorId) {
+    if (ProcessorId == gProcessorIDs[Index]) {
+      *ProcessorNumber = Index;
       break;
     }
   }
-
-  *ProcessorNumber = Index;
   return EFI_SUCCESS;
 }
 
@@ -1286,7 +1283,7 @@ MpServicesInitialize (
     return Status;
   }
 
-  /* Allocate one extra for the NULL entry at the end */
+  /* Allocate one extra for the sentinel entry at the end */
   gProcessorIDs = AllocatePool ((mCpuMpData.NumberOfProcessors + 1) * sizeof (UINT64));
   ASSERT (gProcessorIDs != NULL);
 
@@ -1302,7 +1299,10 @@ MpServicesInitialize (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  gApStacksBase = AllocatePool (mCpuMpData.NumberOfProcessors * gApStackSize);
+  gApStacksBase = AllocatePages (
+                    EFI_SIZE_TO_PAGES (mCpuMpData.NumberOfProcessors *
+                                       gApStackSize)
+                    );
   ASSERT (gApStacksBase != NULL);
 
   for (Index = 1; Index < mCpuMpData.NumberOfProcessors; Index++) {
@@ -1319,6 +1319,19 @@ MpServicesInitialize (
                     );
     ASSERT_EFI_ERROR (Status);
   }
+  gProcessorIDs[Index] = MAX_UINT64;
+
+  //
+  // The global pointer variables as well as the gProcessorIDs array contents
+  // are accessed by the other cores so we must clean them to the PoC
+  //
+  WriteBackDataCacheRange (&gProcessorIDs, sizeof (UINT64 *));
+  WriteBackDataCacheRange (&gApStacksBase, sizeof (UINT64 *));
+
+  WriteBackDataCacheRange (
+    gProcessorIDs,
+    (mCpuMpData.NumberOfProcessors + 1) * sizeof (UINT64)
+    );
 
   Status = EfiCreateEventReadyToBootEx (
              TPL_CALLBACK,
@@ -1328,7 +1341,6 @@ MpServicesInitialize (
              );
   ASSERT_EFI_ERROR (Status);
 
-  gProcessorIDs[Index] = MAX_UINT32;
   return EFI_SUCCESS;
 }
 
