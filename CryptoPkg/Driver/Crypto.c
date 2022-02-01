@@ -3883,6 +3883,28 @@ CryptoServiceTlsWrite (
 }
 
 /**
+  Shutdown a TLS connection.
+
+  Shutdown the TLS connection without releasing the resources, meaning a new
+  connection can be started without calling TlsNew() and without setting
+  certificates etc.
+
+  @param[in]       Tls            Pointer to the TLS object to shutdown.
+
+  @retval EFI_SUCCESS             The TLS is shutdown successfully.
+  @retval EFI_INVALID_PARAMETER   Tls is NULL.
+  @retval EFI_PROTOCOL_ERROR      Some other error occurred.
+**/
+EFI_STATUS
+EFIAPI
+CryptoServiceTlsShutdown (
+  IN     VOID  *Tls
+  )
+{
+  return CALL_BASECRYPTLIB (Tls.Services.Shutdown, TlsShutdown, (Tls), EFI_UNSUPPORTED);
+}
+
+/**
   Set a new TLS/SSL method for a particular TLS object.
 
   This function sets a new TLS/SSL method for a particular TLS object.
@@ -4471,6 +4493,44 @@ CryptoServiceTlsGetCertRevocationList (
 }
 
 /**
+  Derive keying material from a TLS connection.
+
+  This function exports keying material using the mechanism described in RFC
+  5705.
+
+  @param[in]      Tls          Pointer to the TLS object
+  @param[in]      Label        Description of the key for the PRF function
+  @param[in]      Context,     Optional context
+  @param[in]      ContextLen   The length of the context value in bytes
+  @param[out]     KeyBuffer    Buffer to hold the output of the TLS-PRF
+  @param[in]      KeyBufferLen The length of the KeyBuffer
+
+  @retval  EFI_SUCCESS             The operation succeeded.
+  @retval  EFI_INVALID_PARAMETER   The TLS object is invalid.
+  @retval  EFI_PROTOCOL_ERROR      Some other error occurred.
+
+**/
+EFI_STATUS
+EFIAPI
+CryptoServiceTlsExportKey (
+  IN     VOID         *Tls,
+  IN     CONST CHAR8  *Label,
+  IN     CONST VOID   *Context,
+  IN     UINTN        ContextLen,
+  OUT    VOID         *KeyBuffer,
+  IN     UINTN        KeyBufferLen
+  )
+{
+  return CALL_BASECRYPTLIB (
+           TlsGet.Services.ExportKey,
+           TlsExportKey,
+           (Tls, Label, Context, ContextLen,
+            KeyBuffer, KeyBufferLen),
+           EFI_UNSUPPORTED
+           );
+}
+
+/**
   Carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme.
 
   This function carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme defined in
@@ -4757,6 +4817,7 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   CryptoServiceTlsCtrlTrafficIn,
   CryptoServiceTlsRead,
   CryptoServiceTlsWrite,
+  CryptoServiceTlsShutdown,
   /// TLS Set
   CryptoServiceTlsSetVersion,
   CryptoServiceTlsSetConnectionEnd,
@@ -4783,6 +4844,7 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   CryptoServiceTlsGetHostPublicCert,
   CryptoServiceTlsGetHostPrivateKey,
   CryptoServiceTlsGetCertRevocationList,
+  CryptoServiceTlsExportKey,
   /// RSA PSS
   CryptoServiceRsaPssSign,
   CryptoServiceRsaPssVerify,

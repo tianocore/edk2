@@ -251,6 +251,7 @@ typedef struct {
       UINT8    CtrlTrafficIn  : 1;
       UINT8    Read           : 1;
       UINT8    Write          : 1;
+      UINT8    Shutdown       : 1;
     } Services;
     UINT32    Family;
   } Tls;
@@ -285,6 +286,7 @@ typedef struct {
       UINT8    HostPublicCert       : 1;
       UINT8    HostPrivateKey       : 1;
       UINT8    CertRevocationList   : 1;
+      UINT8    ExportKey            : 1;
     } Services;
     UINT32    Family;
   } TlsGet;
