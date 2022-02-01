@@ -58,6 +58,7 @@
 [Guids]
   gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
   gEfiIfrFrontPageGuid                          ## CONSUMES ## GUID
+  gEfiSmbiosTableGuid                           ## CONSUMES ## GUID
 
 [Protocols]
   gEfiSmbiosProtocolGuid                        ## CONSUMES
@@ -77,6 +78,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed                     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCoreboot                        ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UiAppExtra.uni

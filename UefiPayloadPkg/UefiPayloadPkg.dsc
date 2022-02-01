@@ -399,6 +399,12 @@
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask       | 0x1
 !endif
 
+!if $(BOOTLOADER) == "COREBOOT"
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCoreboot|TRUE
+!else
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCoreboot|FALSE
+!endif
+
 [PcdsPatchableInModule.X64]
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister|$(RTC_INDEX_REGISTER)
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister|$(RTC_TARGET_REGISTER)
