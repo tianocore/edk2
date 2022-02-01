@@ -3403,7 +3403,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EDKII_CRYPTO_TLS_EXPORT_KEY)(
   IN     VOID                     *Tls,
-  IN     CONST VOID               *Label,
+  IN     CONST CHAR8              *Label,
   IN     CONST VOID               *Context,
   IN     UINTN                    ContextLen,
   OUT    VOID                     *KeyBuffer,
@@ -3719,6 +3719,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_TLS_CTRL_TRAFFIC_IN                   TlsCtrlTrafficIn;
   EDKII_CRYPTO_TLS_READ                              TlsRead;
   EDKII_CRYPTO_TLS_WRITE                             TlsWrite;
+  EDKII_CRYPTO_TLS_SHUTDOWN                          TlsShutdown;
   /// TLS Set
   EDKII_CRYPTO_TLS_SET_VERSION                       TlsSetVersion;
   EDKII_CRYPTO_TLS_SET_CONNECTION_END                TlsSetConnectionEnd;
@@ -3746,6 +3747,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_TLS_GET_HOST_PUBLIC_CERT              TlsGetHostPublicCert;
   EDKII_CRYPTO_TLS_GET_HOST_PRIVATE_KEY              TlsGetHostPrivateKey;
   EDKII_CRYPTO_TLS_GET_CERT_REVOCATION_LIST          TlsGetCertRevocationList;
+  EDKII_CRYPTO_TLS_EXPORT_KEY                        TlsExportKey;
   /// RSA PSS
   EDKII_CRYPTO_RSA_PSS_SIGN                          RsaPssSign;
   EDKII_CRYPTO_RSA_PSS_VERIFY                        RsaPssVerify;
