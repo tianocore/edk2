@@ -170,9 +170,10 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x0
 
-[PcdsDynamicDefault.common]
-  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
+[PcdsDynamicHii]
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|5
 
+[PcdsDynamicDefault.common]
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|0x0
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|0x0
   gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|0x0
