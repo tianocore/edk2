@@ -36,6 +36,7 @@
   DEFINE PLATFORM_BOOT_TIMEOUT        = 3
   DEFINE ABOVE_4G_MEMORY              = TRUE
   DEFINE BOOT_MANAGER_ESCAPE          = FALSE
+  DEFINE PRIORITIZE_INTERNAL          = FALSE
   DEFINE SD_MMC_TIMEOUT               = 1000000
   #
   # SBL:      UEFI payload for Slim Bootloader
@@ -402,8 +403,9 @@
 !if $(PERFORMANCE_MEASUREMENT_ENABLE)
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask       | 0x1
 !endif
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSdMmcGenericTimeoutValue|$(SD_MMC_TIMEOUT)
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSdMmcGenericTimeoutValue|$(SD_MMC_TIMEOUT)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPrioritizeInternal|$(PRIORITISE_INTERNAL)
   gUefiPayloadPkgTokenSpaceGuid.PcdDispatchModuleAbove4GMemory|$(ABOVE_4G_MEMORY)
   gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape|$(BOOT_MANAGER_ESCAPE)
 
