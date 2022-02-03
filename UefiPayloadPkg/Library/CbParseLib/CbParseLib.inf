@@ -35,5 +35,9 @@
   DebugLib
   PcdLib
 
+[Guids]
+  gEfiGraphicsInfoHobGuid
+  gEfiGraphicsDeviceInfoHobGuid
+
 [Pcd]
   gUefiPayloadPkgTokenSpaceGuid.PcdBootloaderParameter

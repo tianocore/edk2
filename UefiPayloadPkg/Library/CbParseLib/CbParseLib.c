@@ -12,9 +12,11 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
+#include <Library/PciLib.h>
 #include <Library/IoLib.h>
 #include <Library/BlParseLib.h>
 #include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/Pci22.h>
 #include <Coreboot.h>
 
 /**
@@ -585,7 +587,111 @@ ParseGfxDeviceInfo (
   OUT EFI_PEI_GRAPHICS_DEVICE_INFO_HOB  *GfxDeviceInfo
   )
 {
-  return RETURN_NOT_FOUND;
+  EFI_PEI_GRAPHICS_DEVICE_INFO_HOB  *BlGfxDeviceInfo;
+
+  EFI_STATUS                Status;
+  UINTN                     HandleCount;
+  EFI_HANDLE                *HandleBuffer;
+  UINTN                     Index;
+  EFI_PCI_IO_PROTOCOL       *PciIo;
+  PCI_TYPE00                Pci;
+  UINT8                     MinBus;
+  UINT8                     MaxBus;
+  UINTN                     Segment;
+  UINTN                     Bus;
+  UINTN                     Device;
+  UINTN                     Function;
+  UINTN                     SelectedAddress;
+  UINTN                     CurrentAddress;
+
+  //
+  // Initialize return to 'not found' state
+  //
+  *VgaHandle = NULL;
+
+  //
+  // Initialize variable states.  This is important for selecting the VGA
+  // device if multiple devices exist behind a single bridge.
+  //
+  HandleCount = 0;
+  HandleBuffer = NULL;
+  SelectedAddress = PCI_LIB_ADDRESS(0xff, 0x1f, 0x7, 0);
+
+  //
+  // The bus range to search for a VGA device in.
+  //
+  MinBus = MaxBus = 0;
+
+  //
+  // Start to check all the pci io to find all possible VGA device
+  //
+  HandleCount = 0;
+  HandleBuffer = NULL;
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiPciIoProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiPciIoProtocolGuid, (VOID**)&PciIo);
+    if (!EFI_ERROR (Status)) {
+      //
+      // Detemine if this is in the correct bus range.
+      //
+      Status = PciIo->GetLocation (PciIo, &Segment, &Bus, &Device, &Function);
+      if (EFI_ERROR(Status) || (Bus < MinBus || Bus > MaxBus)) {
+        continue;
+      }
+
+      //
+      // Read device information.
+      //
+      Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint32,
+                        0,
+                        sizeof (Pci) / sizeof (UINT32),
+                        &Pci
+                        );
+      if (EFI_ERROR (Status)) {
+        continue;
+      }
+
+      //
+      // Currently we use the lowest numbered bus/device/function if multiple
+      // devices are found in the target bus range.
+      //
+      CurrentAddress = PCI_LIB_ADDRESS(Bus, Device, Function, 0);
+      if (CurrentAddress < SelectedAddress) {
+        SelectedAddress = CurrentAddress;
+        *VgaHandle = HandleBuffer[Index];
+      }
+
+      //
+      // Make sure the device is a VGA device.
+      //
+      if (!IS_PCI_VGA (&Pci)) {
+        BlGfxDeviceInfo->VendorId          = Pci.Hdr.VendorId;
+        BlGfxDeviceInfo->DeviceId          = Pci.Hdr.DeviceId;
+        BlGfxDeviceInfo->SubsystemVendorId = Pci.Device.SubsystemVendorID;
+        BlGfxDeviceInfo->SubsystemId       = Pci.Device.SubsystemID;
+        BlGfxDeviceInfo->RevisionId        = Pci.Hdr.RevisionID;
+        BlGfxDeviceInfo->BarIndex          = 0xff;
+      }
+
+      CopyMem (GfxDeviceInfo, BlGfxDeviceInfo, sizeof (EFI_PEI_GRAPHICS_DEVICE_INFO_HOB));
+
+      return RETURN_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
 }
 
 /**
