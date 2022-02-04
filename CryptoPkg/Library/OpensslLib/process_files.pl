@@ -169,7 +169,7 @@ BEGIN {
                 "no-dgram",
                 "no-dsa",
                 "no-dynamic-engine",
-                "no-ec",
+                # "no-ec",
                 "no-ec2m",
                 "no-engine",
                 "no-err",
