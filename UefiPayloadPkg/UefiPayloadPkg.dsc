@@ -521,14 +521,14 @@
   !endif
 !endif
 
-#
-# UEFI network modules
-#
+[Components.X64]
+  #
+  # UEFI network modules
+  #
 !if $(NETWORK_DRIVER_ENABLE) == TRUE
   !include NetworkPkg/Network.dsc.inc
 !endif
 
-[Components.X64]
   #
   # DXE Core
   #
