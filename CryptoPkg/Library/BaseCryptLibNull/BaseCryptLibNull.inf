@@ -52,6 +52,7 @@
   Rand/CryptRandNull.c
   Pk/CryptRsaPssNull.c
   Pk/CryptRsaPssSignNull.c
+  Ec/CryptEcNull.c
 
 [Packages]
   MdePkg/MdePkg.dec

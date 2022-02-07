@@ -3457,193 +3457,578 @@ BOOLEAN
   IN  UINT16       SaltLen
   );
 
+/**
+  Initialize new opaque EcGroup object. This object represents an EC curve and
+  and is used for calculation within this group. This object should be freed
+  using EcGroupFree() function.
+
+  @param[in]  Group  Identifying number for the ECC group (IANA "Group
+                     Description" attribute registrty for RFC 2409)
+
+  @retval EcGroup object  On success
+  @retval NULL            On failure
+**/
+typedef
+VOID *
+(EFIAPI *EDKII_CRYPTO_EC_GROUP_INIT)(
+  IN UINTN Group
+  );
+
+/**
+  Get EC curve parameters. While elliptic curve equation is Y^2 mod P = (X^3 + AX + B) Mod P.
+  This function will set the provided Big Number objects  to the corresponding
+  values. The caller needs to make sure all the "out" BigNumber parameters
+  are properly initialized.
+
+  @param[in]  EcGroup    EC group object
+  @param[out] BnPrime    Group prime number
+  @param[out] BnA        A coofecient
+  @param[out] BnB        B coofecient
+  @param[in]  BnCtx      BN context
+
+  @retval EFI_SUCCESS        On success
+  @retval EFI_PROTOCOL_ERROR On failure
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_EC_GROUP_GET_CURVE)(
+  IN CONST VOID *EcGroup,
+  OUT VOID *Bn_Prime,
+  OUT VOID *Bn_A,
+  OUT VOID *Bn_B,
+  IN VOID *Bn_Ctx
+  );
+
+/**
+  Get EC group order.
+  This function will set the provided Big Number object to the corresponding
+  value. The caller needs to make sure that the "out" BigNumber parameter
+  is properly initialized.
+
+  @param[in]  EcGroup   EC group object
+  @param[out] BnOrder   Group prime number
+
+  @retval EFI_SUCCESS        On success
+  @retval EFI_PROTOCOL_ERROR On failure
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_EC_GROUP_GET_ORDER)(
+  IN VOID *EcGroup,
+  OUT VOID *Bn_Order
+  );
+
+/**
+  Free previously allocated EC group object using EcGroupInit()
+
+  @param[in]  EcGroup   EC group object to free
+**/
+typedef
+VOID
+(EFIAPI *EDKII_CRYPTO_EC_GROUP_FREE)(
+  IN VOID *EcGroup
+  );
+
+/**
+  Initialize new opaque EC Point object. This object represents an EC point
+  within the given EC group (curve).
+
+  @param[in]  EC Group, properly initialized using EcGroupInit()
+
+  @retval EC Point object  On success
+  @retval NULL             On failure
+**/
+typedef
+VOID *
+(EFIAPI *EDKII_CRYPTO_EC_POINT_INIT)(
+  IN CONST VOID *EcGroup
+  );
+
+/**
+  Free previously allocated EC Point object using EcPointInit()
+
+  @param[in]  EcPoint   EC Point to free
+  @param[in]  Clear     TRUE iff the memory should be cleared
+**/
+typedef
+VOID
+(EFIAPI *EDKII_CRYPTO_EC_POINT_DE_INIT)(
+  IN VOID *EcPoint,
+  IN BOOLEAN Clear
+  );
+
+/**
+  Get EC point affine (x,y) coordinates.
+  This function will set the provided Big Number objects to the corresponding
+  values. The caller needs to make sure all the "out" BigNumber parameters
+  are properly initialized.
+
+  @param[in]  EcGroup    EC group object
+  @param[in]  EcPoint    EC point object
+  @param[out] BnX        X coordinate
+  @param[out] BnY        Y coordinate
+  @param[in]  BnCtx      BN context, created with BigNumNewContext()
+
+  @retval EFI_SUCCESS        On success
+  @retval EFI_PROTOCOL_ERROR On failure
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_EC_POINT_GET_AFFINE_COORDINATES)(
+  IN CONST VOID *EcGroup,
+  IN CONST VOID *EcPoint,
+  OUT VOID *Bn_X,
+  OUT VOID *Bn_Y,
+  IN VOID *Bn_Ctx
+  );
+
+/**
+  Set EC point affine (x,y) coordinates.
+
+  @param[in]  EcGroup    EC group object
+  @param[in]  EcPoint    EC point object
+  @param[in]  BnX        X coordinate
+  @param[in]  BnY        Y coordinate
+  @param[in]  BnCtx      BN context, created with BigNumNewContext()
+
+  @retval EFI_SUCCESS        On success
+  @retval EFI_PROTOCOL_ERROR On failure
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_EC_POINT_SET_AFFINE_COORDINATES)(
+  IN CONST VOID *EcGroup,
+  IN VOID *EcPoint,
+  IN CONST VOID *Bn_X,
+  IN CONST VOID *Bn_Y,
+  IN VOID *Bn_Ctx
+  );
+
+/**
+  EC Point addition. EcPointResult = EcPointA + EcPointB
+
+  @param[in]  EcGroup          EC group object
+  @param[out] EcPointResult    EC point to hold the result. The point should
+                               be properly initialized.
+  @param[in]  EcPointA         EC Point
+  @param[in]  EcPointB         EC Point
+  @param[in]  BnCtx            BN context, created with BigNumNewContext()
+
+  @retval EFI_SUCCESS        On success
+  @retval EFI_PROTOCOL_ERROR On failure
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_EC_POINT_ADD)(
+  IN CONST VOID *EcGroup,
+  OUT VOID *EcPointResult,
+  IN CONST VOID *EcPointA,
+  IN CONST VOID *EcPointB,
+  IN VOID *Bn_Ctx
+  );
+
+/**
+  Variable EC point multiplication. EcPointResult = EcPoint * BnPScalar
+
+  @param[in]  EcGroup          EC group object
+  @param[out] EcPointResult    EC point to hold the result. The point should
+                               be properly initialized.
+  @param[in]  EcPoint          EC Point
+  @param[in]  BnPScalar        P Scalar
+  @param[in]  BnCtx            BN context, created with BigNumNewContext()
+
+  @retval EFI_SUCCESS       On success
+  @retval EFI_DEVICE_ERROR  On failure
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_EC_POINT_MUL)(
+  IN CONST VOID *EcGroup,
+  OUT VOID *EcPointResult,
+  IN CONST VOID *EcPoint,
+  IN CONST VOID *Bn_PScalar,
+  IN VOID *Bn_Ctx
+  );
+
+/**
+  Calculate the inverse of the supplied EC point.
+
+  @param[in]     EcGroup   EC group object
+  @param[in,out] EcPoint   EC point to invert
+  @param[in]     BnCtx     BN context, created with BigNumNewContext()
+
+  @retval EFI_SUCCESS        On success
+  @retval EFI_PROTOCOL_ERROR On failure
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_EC_POINT_INVERT)(
+  IN CONST VOID *EcGroup,
+  IN OUT VOID *EcPoint,
+  IN VOID *Bn_Ctx
+  );
+
+/**
+  Check if the supplied point is on EC curve
+
+  @param[in]  EcGroup   EC group object
+  @param[in]  EcPoint   EC point to check
+  @param[in]  BnCtx     BN context, created with BigNumNewContext()
+
+  @retval TRUE           On curve
+  @retval FALSE          Otherwise
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_POINT_IS_ON_CURVE)(
+  IN CONST VOID *EcGroup,
+  IN CONST VOID *EcPoint,
+  IN VOID *Bn_Ctx
+  );
+
+/**
+  Check if the supplied point is at infinity
+
+  @param[in]  EcGroup   EC group object
+  @param[in]  EcPoint   EC point to check
+  @param[in]  BnCtx     BN context, created with BigNumNewContext()
+
+  @retval TRUE          At infinity
+  @retval FALSE         Otherwise
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_POINT_IS_AT_INFINITY)(
+  IN CONST VOID *EcGroup,
+  IN CONST VOID *EcPoint
+  );
+
+/**
+  Check if EC points are equal
+
+  @param[in]  EcGroup   EC group object
+  @param[in]  EcPointA  EC point A
+  @param[in]  EcPointB  EC point B
+  @param[in]  BnCtx     BN context, created with BigNumNewContext()
+
+  @retval TRUE          A == B
+  @retval FALSE         Otherwise
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_POINT_EQUAL)(
+  IN CONST VOID *EcGroup,
+  IN CONST VOID *EcPointA,
+  IN CONST VOID *EcPointB,
+  IN VOID *Bn_Ctx
+  );
+
+/**
+  Set EC point compressed coordinates. Points can be described in terms of
+  their compressed coordinates. For a point (x, y), for any given value for x
+  such that the point is on the curve there will only ever be two possible
+  values for y. Therefore, a point can be set using this function where BnX is
+  the x coordinate and YBit is a value 0 or 1 to identify which of the two
+  possible values for y should be used.
+
+  @param[in]  EcGroup    EC group object
+  @param[in]  EcPoint    EC Point
+  @param[in]  BnX        X coordinate
+  @param[in]  YBit       0 or 1 to identify which Y value is used
+  @param[in]  BnCtx      BN context, created with BigNumNewContext()
+
+  @retval EFI_SUCCESS        On success
+  @retval EFI_PROTOCOL_ERROR On failure
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_EC_POINT_SET_COMPRESSED_COORDINATES)(
+  IN CONST VOID *EcGroup,
+  IN VOID *EcPoint,
+  IN CONST VOID *Bn_X,
+  IN UINT8 YBit,
+  IN VOID *Bn_Ctx
+  );
+
+/**
+  Generate a key using ECDH algorithm. Please note, this function uses
+  pseudo random number generator. The caller must make sure RandomSeed()
+  funtion was properly called before.
+
+  @param[in]  Group    Identifying number for the ECC group (IANA "Group
+                       Description" attribute registrty for RFC 2409)
+  @param[out] PKey     Pointer to an object that will hold the ECDH key
+
+  @retval EFI_SUCCESS        On success
+  @retval EFI_PROTOCOL_ERROR On failure
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_EC_DH_GEN_KEY)(
+  IN UINTN Group,
+  OUT VOID **PKey
+  );
+
+/**
+  Free ECDH Key object previously created by EcDhGenKey()
+
+  @param[in] PKey  ECDH Key
+**/
+typedef
+VOID
+(EFIAPI *EDKII_CRYPTO_EC_DH_KEY_FREE)(
+  IN VOID *PKey
+  );
+
+/**
+  Get the public key EC point. The provided EC point's coordinates will
+  be set accordingly.
+
+  @param[in]  PKey     ECDH Key object
+  @param[out] EcPoint  Properly initialized EC Point to hold the public key
+
+  @retval EFI_SUCCESS        On success
+  @retval EFI_PROTOCOL_ERROR On failure
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_EC_DH_GET_PUB_KEY)(
+  IN VOID *PKey,
+  OUT VOID *EcPoint
+  );
+
+/**
+  Derive ECDH secret.
+
+  @param[in]  PKey           ECDH Key object
+  @param[in]  Group          Identifying number for the ECC group (IANA "Group
+                             Description" attribute registrty for RFC 2409)
+  @param[in]  EcPointPublic  Peer public key
+  @param[out] SecretSize     On success, holds secret size
+  @param[out] Secret         On success, holds the derived secret
+                             Should be freed by caller using FreePool()
+                             function.
+
+  @retval EFI_SUCCESS        On success
+  @retval EFI_PROTOCOL_ERROR On failure
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_EC_DH_DERIVE_SECRET)(
+  IN VOID *PKey,
+  IN UINT8 Group,
+  IN VOID *EcPointPublic,
+  OUT UINTN *Secret_Size,
+  OUT UINT8 **Secret
+  );
+
 ///
 /// EDK II Crypto Protocol
 ///
 struct _EDKII_CRYPTO_PROTOCOL {
   /// Version
-  EDKII_CRYPTO_GET_VERSION                           GetVersion;
+  EDKII_CRYPTO_GET_VERSION                            GetVersion;
   /// HMAC MD5 - deprecated and unsupported
-  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_NEW               DeprecatedHmacMd5New;
-  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_FREE              DeprecatedHmacMd5Free;
-  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_SET_KEY           DeprecatedHmacMd5SetKey;
-  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_DUPLICATE         DeprecatedHmacMd5Duplicate;
-  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_UPDATE            DeprecatedHmacMd5Update;
-  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_FINAL             DeprecatedHmacMd5Final;
+  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_NEW                DeprecatedHmacMd5New;
+  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_FREE               DeprecatedHmacMd5Free;
+  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_SET_KEY            DeprecatedHmacMd5SetKey;
+  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_DUPLICATE          DeprecatedHmacMd5Duplicate;
+  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_UPDATE             DeprecatedHmacMd5Update;
+  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_FINAL              DeprecatedHmacMd5Final;
   /// HMAC SHA1 - deprecated and unsupported
-  DEPRECATED_EDKII_CRYPTO_HMAC_SHA1_NEW              DeprecatedHmacSha1New;
-  DEPRECATED_EDKII_CRYPTO_HMAC_SHA1_FREE             DeprecatedHmacSha1Free;
-  DEPRECATED_EDKII_CRYPTO_HMAC_SHA1_SET_KEY          DeprecatedHmacSha1SetKey;
-  DEPRECATED_EDKII_CRYPTO_HMAC_SHA1_DUPLICATE        DeprecatedHmacSha1Duplicate;
-  DEPRECATED_EDKII_CRYPTO_HMAC_SHA1_UPDATE           DeprecatedHmacSha1Update;
-  DEPRECATED_EDKII_CRYPTO_HMAC_SHA1_FINAL            DeprecatedHmacSha1Final;
+  DEPRECATED_EDKII_CRYPTO_HMAC_SHA1_NEW               DeprecatedHmacSha1New;
+  DEPRECATED_EDKII_CRYPTO_HMAC_SHA1_FREE              DeprecatedHmacSha1Free;
+  DEPRECATED_EDKII_CRYPTO_HMAC_SHA1_SET_KEY           DeprecatedHmacSha1SetKey;
+  DEPRECATED_EDKII_CRYPTO_HMAC_SHA1_DUPLICATE         DeprecatedHmacSha1Duplicate;
+  DEPRECATED_EDKII_CRYPTO_HMAC_SHA1_UPDATE            DeprecatedHmacSha1Update;
+  DEPRECATED_EDKII_CRYPTO_HMAC_SHA1_FINAL             DeprecatedHmacSha1Final;
   /// HMAC SHA256
-  EDKII_CRYPTO_HMAC_SHA256_NEW                       HmacSha256New;
-  EDKII_CRYPTO_HMAC_SHA256_FREE                      HmacSha256Free;
-  EDKII_CRYPTO_HMAC_SHA256_SET_KEY                   HmacSha256SetKey;
-  EDKII_CRYPTO_HMAC_SHA256_DUPLICATE                 HmacSha256Duplicate;
-  EDKII_CRYPTO_HMAC_SHA256_UPDATE                    HmacSha256Update;
-  EDKII_CRYPTO_HMAC_SHA256_FINAL                     HmacSha256Final;
+  EDKII_CRYPTO_HMAC_SHA256_NEW                        HmacSha256New;
+  EDKII_CRYPTO_HMAC_SHA256_FREE                       HmacSha256Free;
+  EDKII_CRYPTO_HMAC_SHA256_SET_KEY                    HmacSha256SetKey;
+  EDKII_CRYPTO_HMAC_SHA256_DUPLICATE                  HmacSha256Duplicate;
+  EDKII_CRYPTO_HMAC_SHA256_UPDATE                     HmacSha256Update;
+  EDKII_CRYPTO_HMAC_SHA256_FINAL                      HmacSha256Final;
   /// Md4 - deprecated and unsupported
-  DEPRECATED_EDKII_CRYPTO_MD4_GET_CONTEXT_SIZE       DeprecatedMd4GetContextSize;
-  DEPRECATED_EDKII_CRYPTO_MD4_INIT                   DeprecatedMd4Init;
-  DEPRECATED_EDKII_CRYPTO_MD4_DUPLICATE              DeprecatedMd4Duplicate;
-  DEPRECATED_EDKII_CRYPTO_MD4_UPDATE                 DeprecatedMd4Update;
-  DEPRECATED_EDKII_CRYPTO_MD4_FINAL                  DeprecatedMd4Final;
-  DEPRECATED_EDKII_CRYPTO_MD4_HASH_ALL               DeprecatedMd4HashAll;
+  DEPRECATED_EDKII_CRYPTO_MD4_GET_CONTEXT_SIZE        DeprecatedMd4GetContextSize;
+  DEPRECATED_EDKII_CRYPTO_MD4_INIT                    DeprecatedMd4Init;
+  DEPRECATED_EDKII_CRYPTO_MD4_DUPLICATE               DeprecatedMd4Duplicate;
+  DEPRECATED_EDKII_CRYPTO_MD4_UPDATE                  DeprecatedMd4Update;
+  DEPRECATED_EDKII_CRYPTO_MD4_FINAL                   DeprecatedMd4Final;
+  DEPRECATED_EDKII_CRYPTO_MD4_HASH_ALL                DeprecatedMd4HashAll;
   /// Md5
-  EDKII_CRYPTO_MD5_GET_CONTEXT_SIZE                  Md5GetContextSize;
-  EDKII_CRYPTO_MD5_INIT                              Md5Init;
-  EDKII_CRYPTO_MD5_DUPLICATE                         Md5Duplicate;
-  EDKII_CRYPTO_MD5_UPDATE                            Md5Update;
-  EDKII_CRYPTO_MD5_FINAL                             Md5Final;
-  EDKII_CRYPTO_MD5_HASH_ALL                          Md5HashAll;
+  EDKII_CRYPTO_MD5_GET_CONTEXT_SIZE                   Md5GetContextSize;
+  EDKII_CRYPTO_MD5_INIT                               Md5Init;
+  EDKII_CRYPTO_MD5_DUPLICATE                          Md5Duplicate;
+  EDKII_CRYPTO_MD5_UPDATE                             Md5Update;
+  EDKII_CRYPTO_MD5_FINAL                              Md5Final;
+  EDKII_CRYPTO_MD5_HASH_ALL                           Md5HashAll;
   /// Pkcs
-  EDKII_CRYPTO_PKCS1_ENCRYPT_V2                      Pkcs1v2Encrypt;
-  EDKII_CRYPTO_PKCS5_PW_HASH                         Pkcs5HashPassword;
-  EDKII_CRYPTO_PKCS7_VERIFY                          Pkcs7Verify;
-  EDKII_CRYPTO_PKCS7_VERIFY_EKU                      VerifyEKUsInPkcs7Signature;
-  EDKII_CRYPTO_PKCS7_GET_SIGNERS                     Pkcs7GetSigners;
-  EDKII_CRYPTO_PKCS7_FREE_SIGNERS                    Pkcs7FreeSigners;
-  EDKII_CRYPTO_PKCS7_SIGN                            Pkcs7Sign;
-  EDKII_CRYPTO_PKCS7_GET_ATTACHED_CONTENT            Pkcs7GetAttachedContent;
-  EDKII_CRYPTO_PKCS7_GET_CERTIFICATES_LIST           Pkcs7GetCertificatesList;
-  EDKII_CRYPTO_AUTHENTICODE_VERIFY                   AuthenticodeVerify;
-  EDKII_CRYPTO_IMAGE_TIMESTAMP_VERIFY                ImageTimestampVerify;
+  EDKII_CRYPTO_PKCS1_ENCRYPT_V2                       Pkcs1v2Encrypt;
+  EDKII_CRYPTO_PKCS5_PW_HASH                          Pkcs5HashPassword;
+  EDKII_CRYPTO_PKCS7_VERIFY                           Pkcs7Verify;
+  EDKII_CRYPTO_PKCS7_VERIFY_EKU                       VerifyEKUsInPkcs7Signature;
+  EDKII_CRYPTO_PKCS7_GET_SIGNERS                      Pkcs7GetSigners;
+  EDKII_CRYPTO_PKCS7_FREE_SIGNERS                     Pkcs7FreeSigners;
+  EDKII_CRYPTO_PKCS7_SIGN                             Pkcs7Sign;
+  EDKII_CRYPTO_PKCS7_GET_ATTACHED_CONTENT             Pkcs7GetAttachedContent;
+  EDKII_CRYPTO_PKCS7_GET_CERTIFICATES_LIST            Pkcs7GetCertificatesList;
+  EDKII_CRYPTO_AUTHENTICODE_VERIFY                    AuthenticodeVerify;
+  EDKII_CRYPTO_IMAGE_TIMESTAMP_VERIFY                 ImageTimestampVerify;
   /// DH
-  EDKII_CRYPTO_DH_NEW                                DhNew;
-  EDKII_CRYPTO_DH_FREE                               DhFree;
-  EDKII_CRYPTO_DH_GENERATE_PARAMETER                 DhGenerateParameter;
-  EDKII_CRYPTO_DH_SET_PARAMETER                      DhSetParameter;
-  EDKII_CRYPTO_DH_GENERATE_KEY                       DhGenerateKey;
-  EDKII_CRYPTO_DH_COMPUTE_KEY                        DhComputeKey;
+  EDKII_CRYPTO_DH_NEW                                 DhNew;
+  EDKII_CRYPTO_DH_FREE                                DhFree;
+  EDKII_CRYPTO_DH_GENERATE_PARAMETER                  DhGenerateParameter;
+  EDKII_CRYPTO_DH_SET_PARAMETER                       DhSetParameter;
+  EDKII_CRYPTO_DH_GENERATE_KEY                        DhGenerateKey;
+  EDKII_CRYPTO_DH_COMPUTE_KEY                         DhComputeKey;
   /// Random
-  EDKII_CRYPTO_RANDOM_SEED                           RandomSeed;
-  EDKII_CRYPTO_RANDOM_BYTES                          RandomBytes;
+  EDKII_CRYPTO_RANDOM_SEED                            RandomSeed;
+  EDKII_CRYPTO_RANDOM_BYTES                           RandomBytes;
   /// RSA
-  EDKII_CRYPTO_RSA_VERIFY_PKCS1                      RsaVerifyPkcs1;
-  EDKII_CRYPTO_RSA_NEW                               RsaNew;
-  EDKII_CRYPTO_RSA_FREE                              RsaFree;
-  EDKII_CRYPTO_RSA_SET_KEY                           RsaSetKey;
-  EDKII_CRYPTO_RSA_GET_KEY                           RsaGetKey;
-  EDKII_CRYPTO_RSA_GENERATE_KEY                      RsaGenerateKey;
-  EDKII_CRYPTO_RSA_CHECK_KEY                         RsaCheckKey;
-  EDKII_CRYPTO_RSA_PKCS1_SIGN                        RsaPkcs1Sign;
-  EDKII_CRYPTO_RSA_PKCS1_VERIFY                      RsaPkcs1Verify;
-  EDKII_CRYPTO_RSA_GET_PRIVATE_KEY_FROM_PEM          RsaGetPrivateKeyFromPem;
-  EDKII_CRYPTO_RSA_GET_PUBLIC_KEY_FROM_X509          RsaGetPublicKeyFromX509;
+  EDKII_CRYPTO_RSA_VERIFY_PKCS1                       RsaVerifyPkcs1;
+  EDKII_CRYPTO_RSA_NEW                                RsaNew;
+  EDKII_CRYPTO_RSA_FREE                               RsaFree;
+  EDKII_CRYPTO_RSA_SET_KEY                            RsaSetKey;
+  EDKII_CRYPTO_RSA_GET_KEY                            RsaGetKey;
+  EDKII_CRYPTO_RSA_GENERATE_KEY                       RsaGenerateKey;
+  EDKII_CRYPTO_RSA_CHECK_KEY                          RsaCheckKey;
+  EDKII_CRYPTO_RSA_PKCS1_SIGN                         RsaPkcs1Sign;
+  EDKII_CRYPTO_RSA_PKCS1_VERIFY                       RsaPkcs1Verify;
+  EDKII_CRYPTO_RSA_GET_PRIVATE_KEY_FROM_PEM           RsaGetPrivateKeyFromPem;
+  EDKII_CRYPTO_RSA_GET_PUBLIC_KEY_FROM_X509           RsaGetPublicKeyFromX509;
   /// Sha1
-  EDKII_CRYPTO_SHA1_GET_CONTEXT_SIZE                 Sha1GetContextSize;
-  EDKII_CRYPTO_SHA1_INIT                             Sha1Init;
-  EDKII_CRYPTO_SHA1_DUPLICATE                        Sha1Duplicate;
-  EDKII_CRYPTO_SHA1_UPDATE                           Sha1Update;
-  EDKII_CRYPTO_SHA1_FINAL                            Sha1Final;
-  EDKII_CRYPTO_SHA1_HASH_ALL                         Sha1HashAll;
+  EDKII_CRYPTO_SHA1_GET_CONTEXT_SIZE                  Sha1GetContextSize;
+  EDKII_CRYPTO_SHA1_INIT                              Sha1Init;
+  EDKII_CRYPTO_SHA1_DUPLICATE                         Sha1Duplicate;
+  EDKII_CRYPTO_SHA1_UPDATE                            Sha1Update;
+  EDKII_CRYPTO_SHA1_FINAL                             Sha1Final;
+  EDKII_CRYPTO_SHA1_HASH_ALL                          Sha1HashAll;
   /// Sha256
-  EDKII_CRYPTO_SHA256_GET_CONTEXT_SIZE               Sha256GetContextSize;
-  EDKII_CRYPTO_SHA256_INIT                           Sha256Init;
-  EDKII_CRYPTO_SHA256_DUPLICATE                      Sha256Duplicate;
-  EDKII_CRYPTO_SHA256_UPDATE                         Sha256Update;
-  EDKII_CRYPTO_SHA256_FINAL                          Sha256Final;
-  EDKII_CRYPTO_SHA256_HASH_ALL                       Sha256HashAll;
+  EDKII_CRYPTO_SHA256_GET_CONTEXT_SIZE                Sha256GetContextSize;
+  EDKII_CRYPTO_SHA256_INIT                            Sha256Init;
+  EDKII_CRYPTO_SHA256_DUPLICATE                       Sha256Duplicate;
+  EDKII_CRYPTO_SHA256_UPDATE                          Sha256Update;
+  EDKII_CRYPTO_SHA256_FINAL                           Sha256Final;
+  EDKII_CRYPTO_SHA256_HASH_ALL                        Sha256HashAll;
   /// Sha384
-  EDKII_CRYPTO_SHA384_GET_CONTEXT_SIZE               Sha384GetContextSize;
-  EDKII_CRYPTO_SHA384_INIT                           Sha384Init;
-  EDKII_CRYPTO_SHA384_DUPLICATE                      Sha384Duplicate;
-  EDKII_CRYPTO_SHA384_UPDATE                         Sha384Update;
-  EDKII_CRYPTO_SHA384_FINAL                          Sha384Final;
-  EDKII_CRYPTO_SHA384_HASH_ALL                       Sha384HashAll;
+  EDKII_CRYPTO_SHA384_GET_CONTEXT_SIZE                Sha384GetContextSize;
+  EDKII_CRYPTO_SHA384_INIT                            Sha384Init;
+  EDKII_CRYPTO_SHA384_DUPLICATE                       Sha384Duplicate;
+  EDKII_CRYPTO_SHA384_UPDATE                          Sha384Update;
+  EDKII_CRYPTO_SHA384_FINAL                           Sha384Final;
+  EDKII_CRYPTO_SHA384_HASH_ALL                        Sha384HashAll;
   /// Sha512
-  EDKII_CRYPTO_SHA512_GET_CONTEXT_SIZE               Sha512GetContextSize;
-  EDKII_CRYPTO_SHA512_INIT                           Sha512Init;
-  EDKII_CRYPTO_SHA512_DUPLICATE                      Sha512Duplicate;
-  EDKII_CRYPTO_SHA512_UPDATE                         Sha512Update;
-  EDKII_CRYPTO_SHA512_FINAL                          Sha512Final;
-  EDKII_CRYPTO_SHA512_HASH_ALL                       Sha512HashAll;
+  EDKII_CRYPTO_SHA512_GET_CONTEXT_SIZE                Sha512GetContextSize;
+  EDKII_CRYPTO_SHA512_INIT                            Sha512Init;
+  EDKII_CRYPTO_SHA512_DUPLICATE                       Sha512Duplicate;
+  EDKII_CRYPTO_SHA512_UPDATE                          Sha512Update;
+  EDKII_CRYPTO_SHA512_FINAL                           Sha512Final;
+  EDKII_CRYPTO_SHA512_HASH_ALL                        Sha512HashAll;
   /// X509
-  EDKII_CRYPTO_X509_GET_SUBJECT_NAME                 X509GetSubjectName;
-  EDKII_CRYPTO_X509_GET_COMMON_NAME                  X509GetCommonName;
-  EDKII_CRYPTO_X509_GET_ORGANIZATION_NAME            X509GetOrganizationName;
-  EDKII_CRYPTO_X509_VERIFY_CERT                      X509VerifyCert;
-  EDKII_CRYPTO_X509_CONSTRUCT_CERTIFICATE            X509ConstructCertificate;
-  EDKII_CRYPTO_X509_CONSTRUCT_CERTIFICATE_STACK      X509ConstructCertificateStack;
-  EDKII_CRYPTO_X509_FREE                             X509Free;
-  EDKII_CRYPTO_X509_STACK_FREE                       X509StackFree;
-  EDKII_CRYPTO_X509_GET_TBS_CERT                     X509GetTBSCert;
+  EDKII_CRYPTO_X509_GET_SUBJECT_NAME                  X509GetSubjectName;
+  EDKII_CRYPTO_X509_GET_COMMON_NAME                   X509GetCommonName;
+  EDKII_CRYPTO_X509_GET_ORGANIZATION_NAME             X509GetOrganizationName;
+  EDKII_CRYPTO_X509_VERIFY_CERT                       X509VerifyCert;
+  EDKII_CRYPTO_X509_CONSTRUCT_CERTIFICATE             X509ConstructCertificate;
+  EDKII_CRYPTO_X509_CONSTRUCT_CERTIFICATE_STACK       X509ConstructCertificateStack;
+  EDKII_CRYPTO_X509_FREE                              X509Free;
+  EDKII_CRYPTO_X509_STACK_FREE                        X509StackFree;
+  EDKII_CRYPTO_X509_GET_TBS_CERT                      X509GetTBSCert;
   /// TDES - deprecated and unsupported
-  DEPRECATED_EDKII_CRYPTO_TDES_GET_CONTEXT_SIZE      DeprecatedTdesGetContextSize;
-  DEPRECATED_EDKII_CRYPTO_TDES_INIT                  DeprecatedTdesInit;
-  DEPRECATED_EDKII_CRYPTO_TDES_ECB_ENCRYPT           DeprecatedTdesEcbEncrypt;
-  DEPRECATED_EDKII_CRYPTO_TDES_ECB_DECRYPT           DeprecatedTdesEcbDecrypt;
-  DEPRECATED_EDKII_CRYPTO_TDES_CBC_ENCRYPT           DeprecatedTdesCbcEncrypt;
-  DEPRECATED_EDKII_CRYPTO_TDES_CBC_DECRYPT           DeprecatedTdesCbcDecrypt;
+  DEPRECATED_EDKII_CRYPTO_TDES_GET_CONTEXT_SIZE       DeprecatedTdesGetContextSize;
+  DEPRECATED_EDKII_CRYPTO_TDES_INIT                   DeprecatedTdesInit;
+  DEPRECATED_EDKII_CRYPTO_TDES_ECB_ENCRYPT            DeprecatedTdesEcbEncrypt;
+  DEPRECATED_EDKII_CRYPTO_TDES_ECB_DECRYPT            DeprecatedTdesEcbDecrypt;
+  DEPRECATED_EDKII_CRYPTO_TDES_CBC_ENCRYPT            DeprecatedTdesCbcEncrypt;
+  DEPRECATED_EDKII_CRYPTO_TDES_CBC_DECRYPT            DeprecatedTdesCbcDecrypt;
   /// AES - ECB Mode is deprecated and unsupported
-  EDKII_CRYPTO_AES_GET_CONTEXT_SIZE                  AesGetContextSize;
-  EDKII_CRYPTO_AES_INIT                              AesInit;
-  DEPRECATED_EDKII_CRYPTO_AES_ECB_ENCRYPT            DeprecatedAesEcbEncrypt;
-  DEPRECATED_EDKII_CRYPTO_AES_ECB_DECRYPT            DeprecatedAesEcbDecrypt;
-  EDKII_CRYPTO_AES_CBC_ENCRYPT                       AesCbcEncrypt;
-  EDKII_CRYPTO_AES_CBC_DECRYPT                       AesCbcDecrypt;
+  EDKII_CRYPTO_AES_GET_CONTEXT_SIZE                   AesGetContextSize;
+  EDKII_CRYPTO_AES_INIT                               AesInit;
+  DEPRECATED_EDKII_CRYPTO_AES_ECB_ENCRYPT             DeprecatedAesEcbEncrypt;
+  DEPRECATED_EDKII_CRYPTO_AES_ECB_DECRYPT             DeprecatedAesEcbDecrypt;
+  EDKII_CRYPTO_AES_CBC_ENCRYPT                        AesCbcEncrypt;
+  EDKII_CRYPTO_AES_CBC_DECRYPT                        AesCbcDecrypt;
   /// Arc4 - deprecated and unsupported
-  DEPRECATED_EDKII_CRYPTO_ARC4_GET_CONTEXT_SIZE      DeprecatedArc4GetContextSize;
-  DEPRECATED_EDKII_CRYPTO_ARC4_INIT                  DeprecatedArc4Init;
-  DEPRECATED_EDKII_CRYPTO_ARC4_ENCRYPT               DeprecatedArc4Encrypt;
-  DEPRECATED_EDKII_CRYPTO_ARC4_DECRYPT               DeprecatedArc4Decrypt;
-  DEPRECATED_EDKII_CRYPTO_ARC4_RESET                 DeprecatedArc4Reset;
+  DEPRECATED_EDKII_CRYPTO_ARC4_GET_CONTEXT_SIZE       DeprecatedArc4GetContextSize;
+  DEPRECATED_EDKII_CRYPTO_ARC4_INIT                   DeprecatedArc4Init;
+  DEPRECATED_EDKII_CRYPTO_ARC4_ENCRYPT                DeprecatedArc4Encrypt;
+  DEPRECATED_EDKII_CRYPTO_ARC4_DECRYPT                DeprecatedArc4Decrypt;
+  DEPRECATED_EDKII_CRYPTO_ARC4_RESET                  DeprecatedArc4Reset;
   /// SM3
-  EDKII_CRYPTO_SM3_GET_CONTEXT_SIZE                  Sm3GetContextSize;
-  EDKII_CRYPTO_SM3_INIT                              Sm3Init;
-  EDKII_CRYPTO_SM3_DUPLICATE                         Sm3Duplicate;
-  EDKII_CRYPTO_SM3_UPDATE                            Sm3Update;
-  EDKII_CRYPTO_SM3_FINAL                             Sm3Final;
-  EDKII_CRYPTO_SM3_HASH_ALL                          Sm3HashAll;
+  EDKII_CRYPTO_SM3_GET_CONTEXT_SIZE                   Sm3GetContextSize;
+  EDKII_CRYPTO_SM3_INIT                               Sm3Init;
+  EDKII_CRYPTO_SM3_DUPLICATE                          Sm3Duplicate;
+  EDKII_CRYPTO_SM3_UPDATE                             Sm3Update;
+  EDKII_CRYPTO_SM3_FINAL                              Sm3Final;
+  EDKII_CRYPTO_SM3_HASH_ALL                           Sm3HashAll;
   /// HKDF
-  EDKII_CRYPTO_HKDF_SHA_256_EXTRACT_AND_EXPAND       HkdfSha256ExtractAndExpand;
+  EDKII_CRYPTO_HKDF_SHA_256_EXTRACT_AND_EXPAND        HkdfSha256ExtractAndExpand;
   /// X509 (Continued)
-  EDKII_CRYPTO_X509_CONSTRUCT_CERTIFICATE_STACK_V    X509ConstructCertificateStackV;
+  EDKII_CRYPTO_X509_CONSTRUCT_CERTIFICATE_STACK_V     X509ConstructCertificateStackV;
   /// TLS
-  EDKII_CRYPTO_TLS_INITIALIZE                        TlsInitialize;
-  EDKII_CRYPTO_TLS_CTX_FREE                          TlsCtxFree;
-  EDKII_CRYPTO_TLS_CTX_NEW                           TlsCtxNew;
-  EDKII_CRYPTO_TLS_FREE                              TlsFree;
-  EDKII_CRYPTO_TLS_NEW                               TlsNew;
-  EDKII_CRYPTO_TLS_IN_HANDSHAKE                      TlsInHandshake;
-  EDKII_CRYPTO_TLS_DO_HANDSHAKE                      TlsDoHandshake;
-  EDKII_CRYPTO_TLS_HANDLE_ALERT                      TlsHandleAlert;
-  EDKII_CRYPTO_TLS_CLOSE_NOTIFY                      TlsCloseNotify;
-  EDKII_CRYPTO_TLS_CTRL_TRAFFIC_OUT                  TlsCtrlTrafficOut;
-  EDKII_CRYPTO_TLS_CTRL_TRAFFIC_IN                   TlsCtrlTrafficIn;
-  EDKII_CRYPTO_TLS_READ                              TlsRead;
-  EDKII_CRYPTO_TLS_WRITE                             TlsWrite;
+  EDKII_CRYPTO_TLS_INITIALIZE                         TlsInitialize;
+  EDKII_CRYPTO_TLS_CTX_FREE                           TlsCtxFree;
+  EDKII_CRYPTO_TLS_CTX_NEW                            TlsCtxNew;
+  EDKII_CRYPTO_TLS_FREE                               TlsFree;
+  EDKII_CRYPTO_TLS_NEW                                TlsNew;
+  EDKII_CRYPTO_TLS_IN_HANDSHAKE                       TlsInHandshake;
+  EDKII_CRYPTO_TLS_DO_HANDSHAKE                       TlsDoHandshake;
+  EDKII_CRYPTO_TLS_HANDLE_ALERT                       TlsHandleAlert;
+  EDKII_CRYPTO_TLS_CLOSE_NOTIFY                       TlsCloseNotify;
+  EDKII_CRYPTO_TLS_CTRL_TRAFFIC_OUT                   TlsCtrlTrafficOut;
+  EDKII_CRYPTO_TLS_CTRL_TRAFFIC_IN                    TlsCtrlTrafficIn;
+  EDKII_CRYPTO_TLS_READ                               TlsRead;
+  EDKII_CRYPTO_TLS_WRITE                              TlsWrite;
   /// TLS Set
-  EDKII_CRYPTO_TLS_SET_VERSION                       TlsSetVersion;
-  EDKII_CRYPTO_TLS_SET_CONNECTION_END                TlsSetConnectionEnd;
-  EDKII_CRYPTO_TLS_SET_CIPHER_LIST                   TlsSetCipherList;
-  EDKII_CRYPTO_TLS_SET_COMPRESSION_METHOD            TlsSetCompressionMethod;
-  EDKII_CRYPTO_TLS_SET_VERIFY                        TlsSetVerify;
-  EDKII_CRYPTO_TLS_SET_VERIFY_HOST                   TlsSetVerifyHost;
-  EDKII_CRYPTO_TLS_SET_SESSIONID                     TlsSetSessionId;
-  EDKII_CRYPTO_TLS_SET_CA_CERTIFICATE                TlsSetCaCertificate;
-  EDKII_CRYPTO_TLS_SET_HOST_PUBLIC_CERT              TlsSetHostPublicCert;
-  EDKII_CRYPTO_TLS_SET_HOST_PRIVATE_KEY              TlsSetHostPrivateKey;
-  EDKII_CRYPTO_TLS_SET_CERT_REVOCATION_LIST          TlsSetCertRevocationList;
+  EDKII_CRYPTO_TLS_SET_VERSION                        TlsSetVersion;
+  EDKII_CRYPTO_TLS_SET_CONNECTION_END                 TlsSetConnectionEnd;
+  EDKII_CRYPTO_TLS_SET_CIPHER_LIST                    TlsSetCipherList;
+  EDKII_CRYPTO_TLS_SET_COMPRESSION_METHOD             TlsSetCompressionMethod;
+  EDKII_CRYPTO_TLS_SET_VERIFY                         TlsSetVerify;
+  EDKII_CRYPTO_TLS_SET_VERIFY_HOST                    TlsSetVerifyHost;
+  EDKII_CRYPTO_TLS_SET_SESSIONID                      TlsSetSessionId;
+  EDKII_CRYPTO_TLS_SET_CA_CERTIFICATE                 TlsSetCaCertificate;
+  EDKII_CRYPTO_TLS_SET_HOST_PUBLIC_CERT               TlsSetHostPublicCert;
+  EDKII_CRYPTO_TLS_SET_HOST_PRIVATE_KEY               TlsSetHostPrivateKey;
+  EDKII_CRYPTO_TLS_SET_CERT_REVOCATION_LIST           TlsSetCertRevocationList;
   /// TLS Get
-  EDKII_CRYPTO_TLS_GET_VERSION                       TlsGetVersion;
-  EDKII_CRYPTO_TLS_GET_CONNECTION_END                TlsGetConnectionEnd;
-  EDKII_CRYPTO_TLS_GET_CURRENT_CIPHER                TlsGetCurrentCipher;
-  EDKII_CRYPTO_TLS_GET_CURRENT_COMPRESSION_ID        TlsGetCurrentCompressionId;
-  EDKII_CRYPTO_TLS_GET_VERIFY                        TlsGetVerify;
-  EDKII_CRYPTO_TLS_GET_SESSION_ID                    TlsGetSessionId;
-  EDKII_CRYPTO_TLS_GET_CLIENT_RANDOM                 TlsGetClientRandom;
-  EDKII_CRYPTO_TLS_GET_SERVER_RANDOM                 TlsGetServerRandom;
-  EDKII_CRYPTO_TLS_GET_KEY_MATERIAL                  TlsGetKeyMaterial;
-  EDKII_CRYPTO_TLS_GET_CA_CERTIFICATE                TlsGetCaCertificate;
-  EDKII_CRYPTO_TLS_GET_HOST_PUBLIC_CERT              TlsGetHostPublicCert;
-  EDKII_CRYPTO_TLS_GET_HOST_PRIVATE_KEY              TlsGetHostPrivateKey;
-  EDKII_CRYPTO_TLS_GET_CERT_REVOCATION_LIST          TlsGetCertRevocationList;
+  EDKII_CRYPTO_TLS_GET_VERSION                        TlsGetVersion;
+  EDKII_CRYPTO_TLS_GET_CONNECTION_END                 TlsGetConnectionEnd;
+  EDKII_CRYPTO_TLS_GET_CURRENT_CIPHER                 TlsGetCurrentCipher;
+  EDKII_CRYPTO_TLS_GET_CURRENT_COMPRESSION_ID         TlsGetCurrentCompressionId;
+  EDKII_CRYPTO_TLS_GET_VERIFY                         TlsGetVerify;
+  EDKII_CRYPTO_TLS_GET_SESSION_ID                     TlsGetSessionId;
+  EDKII_CRYPTO_TLS_GET_CLIENT_RANDOM                  TlsGetClientRandom;
+  EDKII_CRYPTO_TLS_GET_SERVER_RANDOM                  TlsGetServerRandom;
+  EDKII_CRYPTO_TLS_GET_KEY_MATERIAL                   TlsGetKeyMaterial;
+  EDKII_CRYPTO_TLS_GET_CA_CERTIFICATE                 TlsGetCaCertificate;
+  EDKII_CRYPTO_TLS_GET_HOST_PUBLIC_CERT               TlsGetHostPublicCert;
+  EDKII_CRYPTO_TLS_GET_HOST_PRIVATE_KEY               TlsGetHostPrivateKey;
+  EDKII_CRYPTO_TLS_GET_CERT_REVOCATION_LIST           TlsGetCertRevocationList;
+  /// EC
+  EDKII_CRYPTO_EC_GROUP_INIT                          EcGroupInit;
+  EDKII_CRYPTO_EC_GROUP_GET_CURVE                     EcGroupGetCurve;
+  EDKII_CRYPTO_EC_GROUP_GET_ORDER                     EcGroupGetOrder;
+  EDKII_CRYPTO_EC_GROUP_FREE                          EcGroupFree;
+  EDKII_CRYPTO_EC_POINT_INIT                          EcPointInit;
+  EDKII_CRYPTO_EC_POINT_DE_INIT                       EcPointDeInit;
+  EDKII_CRYPTO_EC_POINT_GET_AFFINE_COORDINATES        EcPointGetAffineCoordinates;
+  EDKII_CRYPTO_EC_POINT_SET_AFFINE_COORDINATES        EcPointSetAffineCoordinates;
+  EDKII_CRYPTO_EC_POINT_ADD                           EcPointAdd;
+  EDKII_CRYPTO_EC_POINT_MUL                           EcPointMul;
+  EDKII_CRYPTO_EC_POINT_INVERT                        EcPointInvert;
+  EDKII_CRYPTO_EC_POINT_IS_ON_CURVE                   EcPointIsOnCurve;
+  EDKII_CRYPTO_EC_POINT_IS_AT_INFINITY                EcPointIsAtInfinity;
+  EDKII_CRYPTO_EC_POINT_EQUAL                         EcPointEqual;
+  EDKII_CRYPTO_EC_POINT_SET_COMPRESSED_COORDINATES    EcPointSetCompressedCoordinates;
+  EDKII_CRYPTO_EC_DH_GEN_KEY                          EcDhGenKey;
+  EDKII_CRYPTO_EC_DH_KEY_FREE                         EcDhKeyFree;
+  EDKII_CRYPTO_EC_DH_GET_PUB_KEY                      EcDhGetPubKey;
+  EDKII_CRYPTO_EC_DH_DERIVE_SECRET                    EcDhDeriveSecret;
   /// RSA PSS
-  EDKII_CRYPTO_RSA_PSS_SIGN                          RsaPssSign;
-  EDKII_CRYPTO_RSA_PSS_VERIFY                        RsaPssVerify;
+  EDKII_CRYPTO_RSA_PSS_SIGN                           RsaPssSign;
+  EDKII_CRYPTO_RSA_PSS_VERIFY                         RsaPssVerify;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;

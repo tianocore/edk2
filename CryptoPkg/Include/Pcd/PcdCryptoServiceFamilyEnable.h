@@ -288,6 +288,30 @@ typedef struct {
     } Services;
     UINT32    Family;
   } TlsGet;
+  union {
+    struct {
+      UINT8    GroupInit                     : 1;
+      UINT8    GroupGetCurve                 : 1;
+      UINT8    GroupGetOrder                 : 1;
+      UINT8    GroupFree                     : 1;
+      UINT8    PointInit                     : 1;
+      UINT8    PointDeInit                   : 1;
+      UINT8    PointGetAffineCoordinates     : 1;
+      UINT8    PointSetAffineCoordinates     : 1;
+      UINT8    PointAdd                      : 1;
+      UINT8    PointMul                      : 1;
+      UINT8    PointInvert                   : 1;
+      UINT8    PointIsOnCurve                : 1;
+      UINT8    PointIsAtInfinity             : 1;
+      UINT8    PointEqual                    : 1;
+      UINT8    PointSetCompressedCoordinates : 1;
+      UINT8    DhGenKey                      : 1;
+      UINT8    DhKeyFree                     : 1;
+      UINT8    DhGetPubKey                   : 1;
+      UINT8    DhDeriveSecret                : 1;
+    } Services;
+    UINT32    Family;
+  } Ec;
 } PCD_CRYPTO_SERVICE_FAMILY_ENABLE;
 
 #endif

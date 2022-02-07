@@ -55,9 +55,9 @@ extern "C" {
 #ifndef OPENSSL_NO_DSA
 #define OPENSSL_NO_DSA
 #endif
-#ifndef OPENSSL_NO_EC
-#define OPENSSL_NO_EC
-#endif
+// #ifndef OPENSSL_NO_EC
+// # define OPENSSL_NO_EC
+// #endif
 #ifndef OPENSSL_NO_IDEA
 #define OPENSSL_NO_IDEA
 #endif
