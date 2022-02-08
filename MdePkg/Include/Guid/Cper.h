@@ -736,6 +736,528 @@ typedef struct {
 
 #endif
 
+#if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+///
+/// ARM and AARCH64 Specific definitions.
+///
+
+///
+/// The validation bit mask indicates which fields in the processor error
+/// structure are valid.
+///@{
+#define EFI_ERROR_SECTION_MPIDR_VALID               BIT0
+#define EFI_ERROR_SECTION_AFFINITY_LEVEL_VALID      BIT1
+#define EFI_ERROR_SECTION_RUNNING_STATE_VALID       BIT2
+#define EFI_ERROR_SECTION_VENDOR_SPEC_VALID         BIT3
+///@}
+
+//
+// ARM Processor Error Section
+//
+typedef struct {
+  UINT32  ValidFields;
+  UINT16  ErrorInfoNum;
+  UINT16  ContextInfoNum;
+  UINT32  SectionLength;
+  UINT8   AffinityLevel;
+  UINT8   Reserved[3];
+  UINT64  Mpidr;
+  UINT64  Midr;
+  UINT32  RunningState;
+  UINT32  PsciState;
+} EFI_ARM_PROCESSOR_ERROR_SECTION;
+
+///
+/// The validation bit mask indicates which fields in the processor error data
+/// structure are valid.
+///@{
+#define EFI_ERROR_DATA_MULTIPLE_ERROR_VALID      BIT0
+#define EFI_ERROR_DATA_FLAGS_VALID               BIT1
+#define EFI_ERROR_DATA_ERROR_INFO_VALID          BIT2
+#define EFI_ERROR_DATA_VIRTUAL_ADDRESS_VALID     BIT3
+#define EFI_ERROR_DATA_PHYSICAL_ADDRESS_VALID    BIT3
+///@}
+
+///
+/// The Type error in the processor error data structure.
+///@{
+#define EFI_ERROR_DATA_TYPE_CACHE                0
+#define EFI_ERROR_DATA_TYPE_TLB                  1
+#define EFI_ERROR_DATA_TYPE_BUS                  2
+#define EFI_ERROR_DATA_TYPE_VENDOR_SPEC          3
+///@}
+
+///
+/// The options of multiple error in the processor error data structure.
+///@{
+#define EFI_ERROR_DATA_ERROR_SINGLE              0
+#define EFI_ERROR_DATA_ERROR_MULTIPLE            1
+///@}
+
+///
+/// The options of flags in the processor error data structure.
+///@{
+#define EFI_ERROR_DATA_FLAG_FIRST_ERROR           BIT0
+#define EFI_ERROR_DATA_FLAG_LAST_ERROR            BIT1
+#define EFI_ERROR_DATA_FLAG_PROPAGATED            BIT2
+#define EFI_ERROR_DATA_FLAG_OVERFLOW              BIT3
+///@}
+
+//
+// ARM Processor Error Information Structure
+//
+typedef struct {
+  UINT8   Version;
+  UINT8   Length;
+  UINT16  ValidFields;
+  UINT8   Type;
+  UINT16  MultipleError;
+  UINT8   Flags;
+  UINT64  ErrorInfo;
+  UINT64  VirtualFaultAddress;
+  UINT64  PhysicalFaultAddress;
+} EFI_ARM_PROCESSOR_ERROR_DATA;
+
+//
+///
+/// The validation bit mask indicates which fields in the Cache info structure
+/// are valid.
+///@{
+#define EFI_CACHE_INFO_TRANSACTION_TYPE_VALID       BIT0
+#define EFI_CACHE_INFO_OPERATION_VALID              BIT1
+#define EFI_CACHE_INFO_LEVEL_VALID                  BIT2
+#define EFI_CACHE_INFO_CONTEXT_CORRUPT_VALID        BIT3
+#define EFI_CACHE_INFO_CORRECTED_VALID              BIT4
+#define EFI_CACHE_INFO_PRECISE_PC_VALID             BIT5
+#define EFI_CACHE_INFO_RESTARTABLE_PC_VALID         BIT6
+///@}
+
+///
+/// Type of cache error in the Cache info structure
+///@{
+#define EFI_CACHE_INFO_ERROR_TYPE_INSTRUCTION       0
+#define EFI_CACHE_INFO_ERROR_TYPE_DATA_ACCESS       1
+#define EFI_CACHE_INFO_ERROR_TYPE_GENERIC           2
+///@}
+
+///
+/// Type of cache operation that caused the error in the Cache info structure
+///@{
+#define EFI_CACHE_INFO_OPERATION_TYPE_GENERIC                 0
+#define EFI_CACHE_INFO_OPERATION_TYPE_GENERIC_READ            1
+#define EFI_CACHE_INFO_OPERATION_TYPE_GENERIC_WRITE           2
+#define EFI_CACHE_INFO_OPERATION_TYPE_DATA_READ               3
+#define EFI_CACHE_INFO_OPERATION_TYPE_DATA_WRITE              4
+#define EFI_CACHE_INFO_OPERATION_TYPE_INSTRUCTION_FETCH       5
+#define EFI_CACHE_INFO_OPERATION_TYPE_PREFETCH                6
+#define EFI_CACHE_INFO_OPERATION_TYPE_EVICTION                7
+#define EFI_CACHE_INFO_OPERATION_TYPE_SNOOPING                8
+#define EFI_CACHE_INFO_OPERATION_TYPE_SNOOPED                 9
+#define EFI_CACHE_INFO_OPERATION_TYPE_MANAGEMENT              10
+///@}
+
+///
+/// Options of Processor context in the Cache info structure
+///@{
+#define EFI_CACHE_INFO_CONTEXT_NOT_CORRUPTED       0
+#define EFI_CACHE_INFO_CONTEXT_CORRUPTED           1
+///@}
+
+///
+/// Error severity in the Cache info structure
+///@{
+#define EFI_CACHE_INFO_ERROR_SEVERITY_UNCORRECTED  0
+#define EFI_CACHE_INFO_ERROR_SEVERITY_CORRECTED    1
+///@}
+
+//
+// ARM Processor Cache Error Structure
+//
+typedef struct {
+  UINT64  ValidBit:16;
+  UINT64  CacheType:2;
+  UINT64  Operation:4;
+  UINT64  CacheLevel:3;
+  UINT64  ContextCorrupt:1;
+  UINT64  Corrected:1;
+  UINT64  PrecisePc:1;
+  UINT64  RestartablePc:1;
+  UINT64  Reserved:35;
+} EFI_ARM_PROCESSOR_CACHE_ERROR_INFO;
+
+///
+/// The validation bit mask indicates which fields in the tlb info structure
+/// are valid.
+///@{
+#define EFI_TLB_INFO_TRANSACTION_TYPE_VALID       BIT0
+#define EFI_TLB_INFO_OPERATION_VALID              BIT1
+#define EFI_TLB_INFO_LEVEL_VALID                  BIT2
+#define EFI_TLB_INFO_CONTEXT_CORRUPT_VALID        BIT3
+#define EFI_TLB_INFO_CORRECTED_VALID              BIT4
+#define EFI_TLB_INFO_PRECISE_PC_VALID             BIT5
+#define EFI_TLB_INFO_RESTARTABLE_PC_VALID         BIT6
+///@}
+
+///
+/// Type of cache error in the tlb info structure
+///@{
+#define EFI_TLB_INFO_ERROR_TYPE_INSTRUCTION       0
+#define EFI_TLB_INFO_ERROR_TYPE_DATA_ACCESS       1
+#define EFI_TLB_INFO_ERROR_TYPE_GENERIC           2
+///@}
+
+///
+/// Type of cache operation that caused the error in the tlb info structure
+///@{
+#define EFI_TLB_INFO_OPERATION_TYPE_GENERIC                 0
+#define EFI_TLB_INFO_OPERATION_TYPE_GENERIC_READ            1
+#define EFI_TLB_INFO_OPERATION_TYPE_GENERIC_WRITE           2
+#define EFI_TLB_INFO_OPERATION_TYPE_DATA_READ               3
+#define EFI_TLB_INFO_OPERATION_TYPE_DATA_WRITE              4
+#define EFI_TLB_INFO_OPERATION_TYPE_INSTRUCTION_FETCH       5
+#define EFI_TLB_INFO_OPERATION_TYPE_PREFETCH                6
+#define EFI_TLB_INFO_OPERATION_TYPE_LOCAL_MO                7
+#define EFI_TLB_INFO_OPERATION_TYPE_EXTERNAL_MO             8
+///@}
+
+///
+/// Options of Processor context in the tlb info structure
+///@{
+#define EFI_TLB_INFO_CONTEXT_NOT_CORRUPTED       0
+#define EFI_TLB_INFO_CONTEXT_CORRUPTED           1
+///@}
+
+///
+/// Error severity in the tlb info structure
+///@{
+#define EFI_TLB_INFO_ERROR_SEVERITY_UNCORRECTED  0
+#define EFI_TLB_INFO_ERROR_SEVERITY_CORRECTED    1
+///@}
+
+//
+// ARM Processor tlb Error Structure
+//
+typedef struct {
+  UINT64  ValidBit:16;
+  UINT64  TlbType:2;
+  UINT64  Operation:4;
+  UINT64  TlbLevel:3;
+  UINT64  ContextCorrupt:1;
+  UINT64  Corrected:1;
+  UINT64  PrecisePc:1;
+  UINT64  RestartablePc:1;
+  UINT64  Reserved:35;
+} EFI_ARM_PROCESSOR_TLB_ERROR_INFO;
+
+///
+/// The validation bit mask indicates which fields in the Bus info structure
+/// are valid.
+///@{
+#define EFI_BUS_INFO_TRANSACTION_TYPE_VALID       BIT0
+#define EFI_BUS_INFO_OPERATION_VALID              BIT1
+#define EFI_BUS_INFO_LEVEL_VALID                  BIT2
+#define EFI_BUS_INFO_CONTEXT_CORRUPT_VALID        BIT3
+#define EFI_BUS_INFO_CORRECTED_VALID              BIT4
+#define EFI_BUS_INFO_PRECISE_PC_VALID             BIT5
+#define EFI_BUS_INFO_RESTARTABLE_PC_VALID         BIT6
+#define EFI_BUS_INFO_PARTICIPATION_TYPE_VALID     BIT7
+#define EFI_BUS_INFO_TIMEOUT_VALID                BIT8
+#define EFI_BUS_INFO_ADDRESS_SPACE_VALID          BIT9
+#define EFI_BUS_INFO_MEMORY_ATTRIBUTES_VALID      BIT10
+#define EFI_BUS_INFO_ACCESS_MODE_VALID            BIT11
+///@}
+
+///
+/// Type of cache error in the BUS info structure
+///@{
+#define EFI_BUS_INFO_ERROR_TYPE_INSTRUCTION       0
+#define EFI_BUS_INFO_ERROR_TYPE_DATA_ACCESS       1
+#define EFI_BUS_INFO_ERROR_TYPE_GENERIC           2
+///@}
+
+///
+/// Type of cache operation that caused the error in the BUS info structure
+///@{
+#define EFI_BUS_INFO_OPERATION_TYPE_GENERIC           0
+#define EFI_BUS_INFO_OPERATION_TYPE_GENERIC_READ      1
+#define EFI_BUS_INFO_OPERATION_TYPE_GENERIC_WRITE     2
+#define EFI_BUS_INFO_OPERATION_TYPE_DATA_READ         3
+#define EFI_BUS_INFO_OPERATION_TYPE_DATA_WRITE        4
+#define EFI_BUS_INFO_OPERATION_TYPE_INSTRUCTION_FETCH 5
+#define EFI_BUS_INFO_OPERATION_TYPE_PREFETCH          6
+///@}
+
+///
+/// Options of Processor context in the BUS info structure
+///@{
+#define EFI_BUS_INFO_CONTEXT_NOT_CORRUPTED       0
+#define EFI_BUS_INFO_CONTEXT_CORRUPTED           1
+///@}
+
+///
+/// Error severity in the BUS info structure
+///@{
+#define EFI_BUS_INFO_ERROR_SEVERITY_CORRECTED    0
+#define EFI_BUS_INFO_ERROR_SEVERITY_UNCORRECTED  1
+///@}
+
+///
+/// Type of participation in the BUS info structure
+///@{
+#define EFI_BUS_INFO_PARTICIPATION_ORIGINATED    0
+#define EFI_BUS_INFO_PARTICIPATION_RESPONDED     1
+#define EFI_BUS_INFO_PARTICIPATION_OBSERVED      2
+#define EFI_BUS_INFO_PARTICIPATION_GENERIC       3
+///@}
+
+///
+/// Address space in the BUS info structure
+///@{
+#define EFI_BUS_INFO_EXTERNAL_MEMORY_ACCESS      0
+#define EFI_BUS_INFO_INTERNAL_MEMORY_ACCESS      1
+#define EFI_BUS_INFO_DEVICE_MEMORY_ACCESS        2
+///@}
+
+///
+/// Address mode in the BUS info structure
+///@{
+#define EFI_BUS_INFO_ACCESS_MODE_SECURE          0
+#define EFI_BUS_INFO_ACCESS_MODE_NORMAL          1
+///@}
+
+//
+// ARM Processor Bus Error Structure
+//
+typedef struct {
+  UINT64  ValidBit:16;
+  UINT64  BusType:2;
+  UINT64  Operation:4;
+  UINT64  Level:3;
+  UINT64  ContextCorrupt:1;
+  UINT64  Corrected:1;
+  UINT64  PrecisePc:1;
+  UINT64  RestartablePc:1;
+  UINT64  ParticipationType:2;
+  UINT64  Timeout:1;
+  UINT64  AddressSpace:2;
+  UINT64  MemAccessAttributes:9;
+  UINT64  AccessMode:1;
+  UINT64  Reserved:20;
+} EFI_ARM_PROCESSOR_BUS_ERROR_INFO;
+
+///
+/// Register context type in the processor context data structure
+///@{
+#define EFI_CONTEXT_DATA_TYPE_AARCH32_GPRS       0
+#define EFI_CONTEXT_DATA_TYPE_AARCH32_EL1        1
+#define EFI_CONTEXT_DATA_TYPE_AARCH32_EL2        2
+#define EFI_CONTEXT_DATA_TYPE_AARCH32_SECURE     3
+#define EFI_CONTEXT_DATA_TYPE_AARCH64_GPRS       4
+#define EFI_CONTEXT_DATA_TYPE_AARCH64_EL1        5
+#define EFI_CONTEXT_DATA_TYPE_AARCH64_EL2        6
+#define EFI_CONTEXT_DATA_TYPE_AARCH64_EL3        7
+#define EFI_CONTEXT_DATA_TYPE_MISC               8
+///@}
+
+//
+// ARM Processor Context Information Structure, UEFI v2.7 sec N.2.4.4.2
+//
+typedef struct {
+  UINT16  Version;
+  UINT16  ContextType;
+  UINT32  Size;
+} EFI_ARM_PROCESSOR_CONTEXT_DATA;
+
+//
+// ARMv8 AArch32 GPRs(Generic Purpose Registers) (Type 0)
+//
+typedef struct {
+  UINT32  R0;
+  UINT32  R1;
+  UINT32  R2;
+  UINT32  R3;
+  UINT32  R4;
+  UINT32  R5;
+  UINT32  R6;
+  UINT32  R7;
+  UINT32  R8;
+  UINT32  R9;
+  UINT32  R10;
+  UINT32  R11;
+  UINT32  R12;
+  UINT32  R13;
+  UINT32  R14;
+  UINT32  R15;
+} EFI_CONTEXT_ARMV8_AARCH32_GPRS;
+
+//
+// ARM AArch32 EL1 Context system registers(Type 1)
+//
+typedef struct {
+  UINT32  DFAR;
+  UINT32  DFSR;
+  UINT32  IFAR;
+  UINT32  ISR;
+  UINT32  MAIR0;
+  UINT32  MAIR1;
+  UINT32  MIDR;
+  UINT32  MPIDR;
+  UINT32  NMRR;
+  UINT32  PRRR;
+  UINT32  SCTLR;
+  UINT32  SPSR;
+  UINT32  SPSR_ABT;
+  UINT32  SPSR_FIQ;
+  UINT32  SPSR_IRQ;
+  UINT32  SPSR_SVC;
+  UINT32  SPSR_UND;
+  UINT32  TPIDRPRW;
+  UINT32  TPIDRURO;
+  UINT32  TPIDRURW;
+  UINT32  TTBCR;
+  UINT32  TTBR0;
+  UINT32  TTBR1;
+  UINT32  DACR;
+} EFI_CONTEXT_ARM_AARCH32_EL1;
+
+//
+// ARM AArch32 EL2 Context system registers(Type 2)
+//
+typedef struct {
+  UINT32  ELR_HYP;
+  UINT32  HAMAIR0;
+  UINT32  HAMAIR1;
+  UINT32  HCR;
+  UINT32  HCR2;
+  UINT32  HDFAR;
+  UINT32  HIFAR;
+  UINT32  HPFAR;
+  UINT32  HSR;
+  UINT32  HTCR;
+  UINT32  HTPIDR;
+  UINT32  HTTBR;
+  UINT32  SPSR_HYP;
+  UINT32  VTCR;
+  UINT32  VTTBR;
+  UINT32  DACR32_EL2;
+} EFI_CONTEXT_ARM_AARCH32_EL2;
+
+//
+// ARM AArch32 secure Context system registers(Type 3)
+//
+typedef struct {
+  UINT32  SCTLR;
+  UINT32  SPSR_MON;
+} EFI_CONTEXT_ARM_AARCH32_SECURE;
+
+//
+// ARMv8 AArch64 GPRs(Generic Purpose Registers) (Type 4)
+//
+typedef struct {
+  UINT64  X0;
+  UINT64  X1;
+  UINT64  X2;
+  UINT64  X3;
+  UINT64  X4;
+  UINT64  X5;
+  UINT64  X6;
+  UINT64  X7;
+  UINT64  X8;
+  UINT64  X9;
+  UINT64  X10;
+  UINT64  X11;
+  UINT64  X12;
+  UINT64  X13;
+  UINT64  X14;
+  UINT64  X15;
+  UINT64  X16;
+  UINT64  X17;
+  UINT64  X18;
+  UINT64  X19;
+  UINT64  X20;
+  UINT64  X21;
+  UINT64  X22;
+  UINT64  X23;
+  UINT64  X24;
+  UINT64  X25;
+  UINT64  X26;
+  UINT64  X27;
+  UINT64  X28;
+  UINT64  X29;
+  UINT64  X30;
+  UINT64  SP;
+} EFI_CONTEXT_ARMV8_AARCH64_GPRS;
+
+//
+// ARM AArch64 EL1 (Type 5)
+//
+typedef struct {
+  UINT64  ELR_EL1;
+  UINT64  ESR_EL1;
+  UINT64  FAR_EL1;
+  UINT64  ISR_EL1;
+  UINT64  MAIR_EL1;
+  UINT64  MIDR_EL1;
+  UINT64  MPIDR_EL1;
+  UINT64  SCTLR_EL1;
+  UINT64  SP_EL0;
+  UINT64  SP_EL1;
+  UINT64  SPSR_EL1;
+  UINT64  TCR_EL1;
+  UINT64  TPIDR_EL0;
+  UINT64  TPIDR_EL1;
+  UINT64  TPIDRRO_EL0;
+  UINT64  TTBR0_EL1;
+  UINT64  TTBR1_EL1;
+} EFI_CONTEXT_ARM_AARCH64_EL1;
+
+//
+// ARM AArch64 EL2 (Type 6)
+//
+typedef struct {
+  UINT64  ELR_EL2;
+  UINT64  ESR_EL2;
+  UINT64  FAR_EL2;
+  UINT64  HACR_EL2;
+  UINT64  HCR_EL2;
+  UINT64  HPFAR_EL2;
+  UINT64  MAIR_EL2;
+  UINT64  SCTLR_EL2;
+  UINT64  SP_EL2;
+  UINT64  SPSR_EL2;
+  UINT64  TCR_EL2;
+  UINT64  TPIDR_EL2;
+  UINT64  TTBR0_EL2;
+  UINT64  VTCR_EL2;
+  UINT64  VTTBR_EL2;
+} EFI_CONTEXT_ARM_AARCH64_EL2;
+
+//
+// ARM AArch64 EL3 (Type 7)
+//
+typedef struct {
+  UINT64  ELR_EL3;
+  UINT64  ESR_EL3;
+  UINT64  FAR_EL3;
+  UINT64  MAIR_EL3;
+  UINT64  SCTLR_EL3;
+  UINT64  SP_EL3;
+  UINT64  SPSR_EL3;
+  UINT64  TCR_EL3;
+  UINT64  TPIDR_EL3;
+  UINT64  TTBR0_EL3;
+} EFI_CONTEXT_ARM_AARCH64_EL3;
+
+//
+// ARM Misc context system register (Type 8)
+//
+typedef struct {
+  UINT16  MRSEncoding;
+  UINT64  Value;
+} EFI_CONTEXT_ARM_MISC;
+
+#endif
+
 ///
 /// Error Status Fields
 ///
