@@ -1250,6 +1250,35 @@ EXIT:
   return Urb->Finished;
 }
 
+STATIC
+BOOLEAN
+EFIAPI
+XhcEndpointRunning (
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId,
+  IN UINT8              Dci
+  )
+{
+  DEVICE_CONTEXT              *OutputContext;
+
+  OutputContext = Xhc->UsbDevContext[SlotId].OutputContext;
+  return OutputContext && OutputContext->EP[Dci -1].EPState == 1;
+}
+
+STATIC
+BOOLEAN
+EFIAPI
+XhcEndpointHalted (
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId,
+  IN UINT8              Dci
+  )
+{
+  DEVICE_CONTEXT              *OutputContext;
+
+  OutputContext = Xhc->UsbDevContext[SlotId].OutputContext;
+  return OutputContext && OutputContext->EP[Dci -1].EPState == 2;
+}
 
 /**
   Execute the transfer by polling the URB. This is a synchronous operation.
@@ -1297,6 +1326,10 @@ XhcExecTransfer (
     ASSERT (Dci < 32);
   }
 
+  if (!CmdTransfer && XhcEndpointHalted(Xhc, SlotId, Dci)) {
+    goto DONE;
+  }
+
   if (Timeout == 0) {
     IndefiniteTimeout = TRUE;
     goto RINGDOORBELL;
@@ -1337,8 +1370,13 @@ DONE:
   if (EFI_ERROR(Status)) {
     Urb->Result = EFI_USB_ERR_NOTEXECUTE;
   } else if (!Finished) {
-    Urb->Result = EFI_USB_ERR_TIMEOUT;
-    Status      = EFI_TIMEOUT;
+    if (XhcEndpointHalted(Xhc, SlotId, Dci)) {
+      Urb->Result = EFI_USB_ERR_STALL;
+      Status = EFI_DEVICE_ERROR;
+    } else {
+      Urb->Result = EFI_USB_ERR_TIMEOUT;
+      Status      = EFI_TIMEOUT;
+    }
   } else if (Urb->Result != EFI_USB_NOERROR) {
     Status      = EFI_DEVICE_ERROR;
   }
@@ -3319,6 +3357,19 @@ XhcStopEndpoint (
   CMD_TRB_STOP_ENDPOINT         CmdTrbStopED;
 
   DEBUG ((EFI_D_INFO, "XhcStopEndpoint: Slot = 0x%x, Dci = 0x%x\n", SlotId, Dci));
+
+  if (XhcEndpointHalted(Xhc, SlotId, Dci)) {
+    if (PendingUrb != NULL) {
+      PendingUrb->Result = EFI_USB_ERR_STALL;
+    }
+    return EFI_DEVICE_ERROR;
+  }
+  if (!XhcEndpointRunning(Xhc, SlotId, Dci)) {
+    if (PendingUrb != NULL) {
+      PendingUrb->Result = EFI_USB_ERR_SYSTEM;
+    }
+    return EFI_DEVICE_ERROR;
+  }
 
   //
   // When XhcCheckUrbResult waits for the Stop_Endpoint completion, it also checks
