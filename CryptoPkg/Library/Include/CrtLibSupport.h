@@ -2,9 +2,14 @@
   Root include file of C runtime library to support building the third-party
   cryptographic library.
 
-Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
+Copyright 2017-2022 The OpenSSL Project Authors. All Rights Reserved.
+Licensed under the OpenSSL license (the "License").  You may not use
+this file except in compliance with the License.  You can obtain a copy
+in the file LICENSE in the source distribution or at
+https://www.openssl.org/source/license.html
 
 **/
 
@@ -20,6 +25,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ENGINESDIR  ""
 
 #define MAX_STRING_SIZE  0x1000
+
+#define KECCAK1600_WIDTH  1600
 
 //
 // We already have "no-ui" in out Configure invocation.
@@ -111,12 +118,25 @@ typedef UINT8   u_char;
 typedef UINT32  uid_t;
 typedef UINT32  gid_t;
 typedef CHAR16  wchar_t;
+typedef UINT64  uint64_t;
 
 //
 // File operations are not required for EFI building,
 // so FILE is mapped to VOID * to pass build
 //
 typedef VOID *FILE;
+
+//
+// This struct referring to m_sha3.c from opessl and modified its type name.
+//
+typedef struct {
+  uint64_t         A[5][5];
+  size_t           block_size;  /* cached ctx->digest->block_size */
+  size_t           md_size;     /* output length, variable in XOF */
+  size_t           num;         /* used bytes in below buffer */
+  unsigned char    buf[KECCAK1600_WIDTH / 8 - 32];
+  unsigned char    pad;
+} Keccak1600_Ctx;
 
 //
 // Structures Definitions
@@ -369,6 +389,22 @@ getenv     (
 char           *
 secure_getenv (
   const char *
+  );
+
+size_t
+SHA3_absorb (
+  uint64_t             A[5][5],
+  const unsigned char  *inp,
+  size_t               len,
+  size_t               r
+  );
+
+void
+SHA3_squeeze (
+  uint64_t       A[5][5],
+  unsigned char  *out,
+  size_t         len,
+  size_t         r
   );
 
 #if defined (__GNUC__) && (__GNUC__ >= 2)
