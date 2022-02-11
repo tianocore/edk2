@@ -19,7 +19,7 @@ class CommonPlatform():
         for the different parts of stuart
     '''
     PackagesSupported = ("OvmfPkg",)
-    ArchSupported = ("IA32", "X64")
+    ArchSupported = ("IA32", "X64", "RISCV64")
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
     Scopes = ('ovmf', 'edk2-build')
     WorkspaceRoot = os.path.realpath(os.path.join(
@@ -36,6 +36,8 @@ class CommonPlatform():
             dsc += "Ia32"
         if "X64" in ArchCsv.upper().split(","):
             dsc += "X64"
+        if "RISCV64" in ArchCsv.upper().split(","):
+            dsc += "RiscV64"
         dsc += ".dsc"
         return dsc
 

@@ -160,6 +160,29 @@ jobs:
             # this build is for xen not qemu-kvm
             Run.Flags: "QEMU_SKIP=TRUE"
             Run: $(should_run)
+
+          OVMF_RISCV64_DEBUG:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "RISCV64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          OVMF_RISCV64_RELEASE:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "RISCV64"
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          OVMF_RISCV64_NOOPT:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "RISCV64"
+            Build.Flags: ""
+            Build.Target: "NOOPT"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+
     workspace:
       clean: all
 
