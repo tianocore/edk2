@@ -274,10 +274,10 @@ ScanOrAdd64BitE820Ram (
         End  = (E820Entry.BaseAddr + E820Entry.Length) &
                ~(UINT64)EFI_PAGE_MASK;
         if (Base < End) {
-          AddMemoryRangeHob (Base, End);
+          PlatformAddMemoryRangeHob (Base, End);
           DEBUG ((
             DEBUG_VERBOSE,
-            "%a: AddMemoryRangeHob [0x%Lx, 0x%Lx)\n",
+            "%a: PlatformAddMemoryRangeHob [0x%Lx, 0x%Lx)\n",
             __FUNCTION__,
             Base,
             End
@@ -743,8 +743,8 @@ QemuInitializeRamBelow1gb (
   )
 {
   if (FeaturePcdGet (PcdSmmSmramRequire) && mQ35SmramAtDefaultSmbase) {
-    AddMemoryRangeHob (0, SMM_DEFAULT_SMBASE);
-    AddReservedMemoryBaseSizeHob (
+    PlatformAddMemoryRangeHob (0, SMM_DEFAULT_SMBASE);
+    PlatformAddReservedMemoryBaseSizeHob (
       SMM_DEFAULT_SMBASE,
       MCH_DEFAULT_SMBASE_SIZE,
       TRUE /* Cacheable */
@@ -753,12 +753,12 @@ QemuInitializeRamBelow1gb (
       SMM_DEFAULT_SMBASE + MCH_DEFAULT_SMBASE_SIZE < BASE_512KB + BASE_128KB,
       "end of SMRAM at default SMBASE ends at, or exceeds, 640KB"
       );
-    AddMemoryRangeHob (
+    PlatformAddMemoryRangeHob (
       SMM_DEFAULT_SMBASE + MCH_DEFAULT_SMBASE_SIZE,
       BASE_512KB + BASE_128KB
       );
   } else {
-    AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
+    PlatformAddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
   }
 }
 
@@ -816,14 +816,14 @@ QemuInitializeRam (
       UINT32  TsegSize;
 
       TsegSize = mQ35TsegMbytes * SIZE_1MB;
-      AddMemoryRangeHob (BASE_1MB, LowerMemorySize - TsegSize);
-      AddReservedMemoryBaseSizeHob (
+      PlatformAddMemoryRangeHob (BASE_1MB, LowerMemorySize - TsegSize);
+      PlatformAddReservedMemoryBaseSizeHob (
         LowerMemorySize - TsegSize,
         TsegSize,
         TRUE
         );
     } else {
-      AddMemoryRangeHob (BASE_1MB, LowerMemorySize);
+      PlatformAddMemoryRangeHob (BASE_1MB, LowerMemorySize);
     }
 
     //
@@ -835,7 +835,7 @@ QemuInitializeRam (
     if (EFI_ERROR (Status)) {
       UpperMemorySize = GetSystemMemorySizeAbove4gb ();
       if (UpperMemorySize != 0) {
-        AddMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
+        PlatformAddMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
       }
     }
   }
