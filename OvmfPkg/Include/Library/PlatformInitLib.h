@@ -111,12 +111,14 @@ PlatformAddressWidthInitialization (
 /**
  * Get the memory size below 4GB.
  *
+ * @param HostBridgeDevId   The host bridge Dev Id.
+ *
  * @return UINT32 The lower memory size.
  */
 UINT32
 EFIAPI
 PlatformGetSystemMemorySizeBelow4gb (
-  VOID
+  IN UINT16  HostBridgeDevId
   );
 
 /**

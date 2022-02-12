@@ -17,6 +17,7 @@ Module Name:
 #include <IndustryStandard/I440FxPiix4.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/CloudHv.h>
+#include <IndustryStandard/Xen/arch-x86/hvm/start_info.h>
 #include <PiPei.h>
 
 //
@@ -227,20 +228,94 @@ ScanOrAdd64BitE820Ram (
 }
 
 /**
+  Returns PVH memmap
+
+  @param Entries      Pointer to PVH memmap
+  @param Count        Number of entries
+
+  @return EFI_STATUS
+**/
+EFI_STATUS
+GetPvhMemmapEntries (
+  struct hvm_memmap_table_entry  **Entries,
+  UINT32                         *Count
+  )
+{
+  UINT32                 *PVHResetVectorData;
+  struct hvm_start_info  *pvh_start_info;
+
+  PVHResetVectorData = (VOID *)(UINTN)PcdGet32 (PcdXenPvhStartOfDayStructPtr);
+  if (PVHResetVectorData == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  pvh_start_info = (struct hvm_start_info *)(UINTN)PVHResetVectorData[0];
+
+  *Entries = (struct hvm_memmap_table_entry *)(UINTN)pvh_start_info->memmap_paddr;
+  *Count   = pvh_start_info->memmap_entries;
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+UINT64
+GetHighestSystemMemoryAddressFromPvhMemmap (
+  BOOLEAN  Below4gb
+  )
+{
+  struct hvm_memmap_table_entry  *Memmap;
+  UINT32                         MemmapEntriesCount;
+  struct hvm_memmap_table_entry  *Entry;
+  EFI_STATUS                     Status;
+  UINT32                         Loop;
+  UINT64                         HighestAddress;
+  UINT64                         EntryEnd;
+
+  HighestAddress = 0;
+
+  Status = GetPvhMemmapEntries (&Memmap, &MemmapEntriesCount);
+  ASSERT_EFI_ERROR (Status);
+
+  for (Loop = 0; Loop < MemmapEntriesCount; Loop++) {
+    Entry    = Memmap + Loop;
+    EntryEnd = Entry->addr + Entry->size;
+
+    if ((Entry->type == XEN_HVM_MEMMAP_TYPE_RAM) &&
+        (EntryEnd > HighestAddress))
+    {
+      if (Below4gb && (EntryEnd <= BASE_4GB)) {
+        HighestAddress = EntryEnd;
+      } else if (!Below4gb && (EntryEnd >= BASE_4GB)) {
+        HighestAddress = EntryEnd;
+      }
+    }
+  }
+
+  return HighestAddress;
+}
+
+/**
  * Get the memory size below 4GB.
+ *
+ * @param HostBridgeDevId   The host bridge Dev Id.
  *
  * @return UINT32 The lower memory size.
  */
 UINT32
 EFIAPI
 PlatformGetSystemMemorySizeBelow4gb (
-  VOID
+  IN UINT16  HostBridgeDevId
   )
 {
   EFI_STATUS  Status;
   UINT64      LowerMemorySize = 0;
   UINT8       Cmos0x34;
   UINT8       Cmos0x35;
+
+  if (HostBridgeDevId == CLOUDHV_DEVICE_ID) {
+    // Get the information from PVH memmap
+    return (UINT32)GetHighestSystemMemoryAddressFromPvhMemmap (TRUE);
+  }
 
   Status = ScanOrAdd64BitE820Ram (FALSE, &LowerMemorySize, NULL);
   if ((Status == EFI_SUCCESS) && (LowerMemorySize > 0)) {

@@ -49,6 +49,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtr
+  gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtrSize
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
