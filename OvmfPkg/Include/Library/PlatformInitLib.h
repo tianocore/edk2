@@ -78,6 +78,84 @@ PlatformDebugDumpCmos (
   VOID
   );
 
+/**
+ * Return the highest address that DXE could possibly use, plus one.
+ *
+ * @param Pci64Base   The 64-bit PCI host aperture base address.
+ * @param Pci64Size   The 64-bit PCI host aperture size.
+ * @param DefaultPciMmio64Size  The default 64-bit PCI host aperture size.
+ *
+ * @return  The highest address that DXE could possibly use, plus one.
+ */
+UINT64
+EFIAPI
+PlatformGetFirstNonAddress (
+  OUT UINT64  *Pci64Base,
+  OUT UINT64  *Pci64Size,
+  IN  UINT64  DefaultPciMmio64Size
+  );
+
+/**
+ * Initialize the PhysMemAddressWidth variable, based on guest RAM size.
+ *
+ * @param   FirstNonAddress   The highest address that DXE could possibly use, plus one.
+ *
+ * @return  The physical memory address width based on the guest RAM size.
+ */
+UINT8
+EFIAPI
+PlatformAddressWidthInitialization (
+  IN UINT64  FirstNonAddress
+  );
+
+/**
+ * Get the memory size below 4GB.
+ *
+ * @return UINT32 The lower memory size.
+ */
+UINT32
+EFIAPI
+PlatformGetSystemMemorySizeBelow4gb (
+  VOID
+  );
+
+/**
+ * Initializatoin of Qemu UC32Base.
+ *
+ * @param HostBridgeDevId   The host bridge Dev Id.
+ * @param LowerMemorySize   The lower memory size (under 4G).
+ * @return UINT32   The Qemu UC32 base address.
+ */
+UINT32
+EFIAPI
+PlatformQemuUc32BaseInitialization (
+  IN UINT16  HostBridgeDevId,
+  IN UINT32  LowerMemorySize
+  );
+
+/**
+  Publish system RAM and reserve memory regions.
+
+  @param  Uc32Base
+  @param  HostBridgeDevId
+  @param  SmmSmramRequire
+  @param  BootMode
+  @param  S3Supported
+  @param  LowerMemorySize
+  @param  Q35TsegMbytes
+**/
+VOID
+EFIAPI
+PlatformInitializeRamRegions (
+  IN UINT32         Uc32Base,
+  IN UINT16         HostBridgeDevId,
+  IN BOOLEAN        SmmSmramRequire,
+  IN EFI_BOOT_MODE  BootMode,
+  IN BOOLEAN        S3Supported,
+  IN UINT32         LowerMemorySize,
+  IN UINT16         Q35TsegMbytes
+  );
+
 VOID
 EFIAPI
 PlatformAddIoMemoryBaseSizeHob (
