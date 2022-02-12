@@ -119,6 +119,81 @@ PlatformQemuUc32BaseInitialization (
   );
 
 /**
+ * Query Host Bridge Dev Id.
+ *
+ * @return Host Bridge Dev Id.
+ */
+UINT16
+EFIAPI
+PlatformQueryHostBridgeDid (
+  VOID
+  );
+
+/**
+  Fetch the boot CPU count and the possible CPU count from QEMU.
+
+  @param  HostBridgeDevId     The Host bridge Dev Id.
+  @param  DefaultMaxCpuCount  The default max cpu count.
+  @param  MaxCpuCount         The pointer to the returned max cpu count.
+  @param  BootCpuCount        The pointer to the returned boot cpu count.
+**/
+VOID
+EFIAPI
+PlatformMaxCpuCountInitialization (
+  IN  UINT16  HostBridgeDevId,
+  IN  UINT32  DefaultMaxCpuCount,
+  OUT UINT32  *MaxCpuCount,
+  OUT UINT16  *BootCpuCount
+  );
+
+/**
+ * Initialize the Memory Map IO hobs.
+ *
+ * @param HostBridgeDevId The host bridge Dev Id.
+ * @param Uc32Base        The Qemu Uc32Base address.
+ * @param PciBase         The pointer to the Pci base address.
+ * @param PciSize         The pointer to the Pci base size.
+ * @param PciIoBase       The pointer to the Pci Io base address.
+ * @param PciIoSize       The pointer to the Pci Io size.
+ */
+VOID
+EFIAPI
+PlatformMemMapInitialization (
+  IN UINT16   HostBridgeDevId,
+  IN UINT32   Uc32Base,
+  OUT UINT32  *PciBase,
+  OUT UINT32  *PciSize,
+  OUT UINT64  *PciIoBase,
+  OUT UINT64  *PciIoSize
+  );
+
+/**
+ * Fetch "opt/ovmf/PcdSetNxForStack" from QEMU
+ *
+ * @param Setting     The pointer to the setting of "/opt/ovmf/PcdSetNxForStack".
+ * @return EFI_SUCCESS  Successfully fetch the settings.
+ */
+EFI_STATUS
+EFIAPI
+PlatformNoexecDxeInitialization (
+  OUT BOOLEAN  *Setting
+  );
+
+/**
+ * Misc initialization, such as Disable A20 Mask, Build CPU Hob,
+ * PM settings, Set PCI Express Register Range Base Address.
+ *
+ * @param HostBridgeDevId   The host bridge Dev id.
+ * @param PhysMemAddressWidth The physical memory address width.
+ */
+VOID
+EFIAPI
+PlatformMiscInitialization (
+  IN UINT16  HostBridgeDevId,
+  IN UINT8   PhysMemAddressWidth
+  );
+
+/**
   Publish system RAM and reserve memory regions.
 
   @param  Uc32Base
