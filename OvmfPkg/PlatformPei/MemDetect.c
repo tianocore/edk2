@@ -36,9 +36,9 @@ Module Name:
 #include <Library/MtrrLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
+#include <Library/PlatformInitLib.h>
 
 #include "Platform.h"
-#include "Cmos.h"
 
 UINT8  mPhysMemAddressWidth;
 
@@ -339,8 +339,8 @@ GetSystemMemorySizeBelow4gb (
   //   into the calculation to get the total memory size.
   //
 
-  Cmos0x34 = (UINT8)CmosRead8 (0x34);
-  Cmos0x35 = (UINT8)CmosRead8 (0x35);
+  Cmos0x34 = (UINT8)PlatformCmosRead8 (0x34);
+  Cmos0x35 = (UINT8)PlatformCmosRead8 (0x35);
 
   return (UINT32)(((UINTN)((Cmos0x35 << 8) + Cmos0x34) << 16) + SIZE_16MB);
 }
@@ -363,7 +363,7 @@ GetSystemMemorySizeAbove4gb (
 
   Size = 0;
   for (CmosIndex = 0x5d; CmosIndex >= 0x5b; CmosIndex--) {
-    Size = (UINT32)(Size << 8) + (UINT32)CmosRead8 (CmosIndex);
+    Size = (UINT32)(Size << 8) + (UINT32)PlatformCmosRead8 (CmosIndex);
   }
 
   return LShiftU64 (Size, 16);
