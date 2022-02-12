@@ -31,11 +31,6 @@ PublishPeiMemory (
   VOID
   );
 
-UINT32
-GetSystemMemorySizeBelow4gb (
-  VOID
-  );
-
 VOID
 QemuUc32BaseInitialization (
   VOID
