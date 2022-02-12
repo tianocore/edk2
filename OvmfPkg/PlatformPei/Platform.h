@@ -12,37 +12,6 @@
 #include <IndustryStandard/E820.h>
 
 VOID
-AddIoMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS  MemoryBase,
-  UINT64                MemorySize
-  );
-
-VOID
-AddIoMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS  MemoryBase,
-  EFI_PHYSICAL_ADDRESS  MemoryLimit
-  );
-
-VOID
-AddMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS  MemoryBase,
-  UINT64                MemorySize
-  );
-
-VOID
-AddMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS  MemoryBase,
-  EFI_PHYSICAL_ADDRESS  MemoryLimit
-  );
-
-VOID
-AddReservedMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS  MemoryBase,
-  UINT64                MemorySize,
-  BOOLEAN               Cacheable
-  );
-
-VOID
 AddressWidthInitialization (
   VOID
   );

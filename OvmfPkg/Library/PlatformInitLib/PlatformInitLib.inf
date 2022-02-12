@@ -24,6 +24,7 @@
 
 [Sources]
   Cmos.c
+  Platform.c
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
@@ -34,3 +35,4 @@
   BaseLib
   DebugLib
   IoLib
+  HobLib

@@ -58,85 +58,6 @@ BOOLEAN  mS3Supported = FALSE;
 UINT32  mMaxCpuCount;
 
 VOID
-AddIoMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS  MemoryBase,
-  UINT64                MemorySize
-  )
-{
-  BuildResourceDescriptorHob (
-    EFI_RESOURCE_MEMORY_MAPPED_IO,
-    EFI_RESOURCE_ATTRIBUTE_PRESENT     |
-    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-    EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-    EFI_RESOURCE_ATTRIBUTE_TESTED,
-    MemoryBase,
-    MemorySize
-    );
-}
-
-VOID
-AddReservedMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS  MemoryBase,
-  UINT64                MemorySize,
-  BOOLEAN               Cacheable
-  )
-{
-  BuildResourceDescriptorHob (
-    EFI_RESOURCE_MEMORY_RESERVED,
-    EFI_RESOURCE_ATTRIBUTE_PRESENT     |
-    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-    EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-    (Cacheable ?
-     EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
-     EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
-     EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE :
-     0
-    ) |
-    EFI_RESOURCE_ATTRIBUTE_TESTED,
-    MemoryBase,
-    MemorySize
-    );
-}
-
-VOID
-AddIoMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS  MemoryBase,
-  EFI_PHYSICAL_ADDRESS  MemoryLimit
-  )
-{
-  AddIoMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
-}
-
-VOID
-AddMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS  MemoryBase,
-  UINT64                MemorySize
-  )
-{
-  BuildResourceDescriptorHob (
-    EFI_RESOURCE_SYSTEM_MEMORY,
-    EFI_RESOURCE_ATTRIBUTE_PRESENT |
-    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-    EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-    EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
-    EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
-    EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
-    EFI_RESOURCE_ATTRIBUTE_TESTED,
-    MemoryBase,
-    MemorySize
-    );
-}
-
-VOID
-AddMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS  MemoryBase,
-  EFI_PHYSICAL_ADDRESS  MemoryLimit
-  )
-{
-  AddMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
-}
-
-VOID
 MemMapInitialization (
   VOID
   )
@@ -155,12 +76,12 @@ MemMapInitialization (
   //
   // Video memory + Legacy BIOS region
   //
-  AddIoMemoryRangeHob (0x0A0000, BASE_1MB);
+  PlatformAddIoMemoryRangeHob (0x0A0000, BASE_1MB);
 
   if (mHostBridgeDevId == 0xffff /* microvm */) {
-    AddIoMemoryBaseSizeHob (MICROVM_GED_MMIO_BASE, SIZE_4KB);
-    AddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB); /* ioapic #1 */
-    AddIoMemoryBaseSizeHob (0xFEC10000, SIZE_4KB); /* ioapic #2 */
+    PlatformAddIoMemoryBaseSizeHob (MICROVM_GED_MMIO_BASE, SIZE_4KB);
+    PlatformAddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB); /* ioapic #1 */
+    PlatformAddIoMemoryBaseSizeHob (0xFEC10000, SIZE_4KB); /* ioapic #2 */
     return;
   }
 
@@ -194,20 +115,20 @@ MemMapInitialization (
   // 0xFEE00000    LAPIC                          1 MB
   //
   PciSize = 0xFC000000 - PciBase;
-  AddIoMemoryBaseSizeHob (PciBase, PciSize);
+  PlatformAddIoMemoryBaseSizeHob (PciBase, PciSize);
   PcdStatus = PcdSet64S (PcdPciMmio32Base, PciBase);
   ASSERT_RETURN_ERROR (PcdStatus);
   PcdStatus = PcdSet64S (PcdPciMmio32Size, PciSize);
   ASSERT_RETURN_ERROR (PcdStatus);
 
-  AddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
-  AddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
+  PlatformAddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
+  PlatformAddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
   if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
-    AddIoMemoryBaseSizeHob (ICH9_ROOT_COMPLEX_BASE, SIZE_16KB);
+    PlatformAddIoMemoryBaseSizeHob (ICH9_ROOT_COMPLEX_BASE, SIZE_16KB);
     //
     // Note: there should be an
     //
-    //   AddIoMemoryBaseSizeHob (PciExBarBase, SIZE_256MB);
+    //   PlatformAddIoMemoryBaseSizeHob (PciExBarBase, SIZE_256MB);
     //
     // call below, just like the one above for RCBA. However, Linux insists
     // that the MMCONFIG area be marked in the E820 or UEFI memory map as
@@ -225,7 +146,7 @@ MemMapInitialization (
     // is most definitely not RAM; so, as an exception, cover it with
     // uncacheable reserved memory right here.
     //
-    AddReservedMemoryBaseSizeHob (PciExBarBase, SIZE_256MB, FALSE);
+    PlatformAddReservedMemoryBaseSizeHob (PciExBarBase, SIZE_256MB, FALSE);
     BuildMemoryAllocationHob (
       PciExBarBase,
       SIZE_256MB,
@@ -233,7 +154,7 @@ MemMapInitialization (
       );
   }
 
-  AddIoMemoryBaseSizeHob (PcdGet32 (PcdCpuLocalApicBaseAddress), SIZE_1MB);
+  PlatformAddIoMemoryBaseSizeHob (PcdGet32 (PcdCpuLocalApicBaseAddress), SIZE_1MB);
 
   //
   // On Q35, the IO Port space is available for PCI resource allocations from
