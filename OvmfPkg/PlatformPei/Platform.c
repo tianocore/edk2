@@ -36,10 +36,10 @@
 #include <IndustryStandard/Pci22.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/QemuCpuHotplug.h>
+#include <Library/PlatformInitLib.h>
 #include <OvmfPlatforms.h>
 
 #include "Platform.h"
-#include "Cmos.h"
 
 EFI_PEI_PPI_DESCRIPTOR  mPpiBootMode[] = {
   {
@@ -505,11 +505,11 @@ BootModeInitialization (
 {
   EFI_STATUS  Status;
 
-  if (CmosRead8 (0xF) == 0xFE) {
+  if (PlatformCmosRead8 (0xF) == 0xFE) {
     mBootMode = BOOT_ON_S3_RESUME;
   }
 
-  CmosWrite8 (0xF, 0x00);
+  PlatformCmosWrite8 (0xF, 0x00);
 
   Status = PeiServicesSetBootMode (mBootMode);
   ASSERT_EFI_ERROR (Status);
@@ -544,27 +544,6 @@ ReserveEmuVariableNvStore (
     ));
   PcdStatus = PcdSet64S (PcdEmuVariableNvStoreReserved, VariableStore);
   ASSERT_RETURN_ERROR (PcdStatus);
-}
-
-VOID
-DebugDumpCmos (
-  VOID
-  )
-{
-  UINT32  Loop;
-
-  DEBUG ((DEBUG_INFO, "CMOS:\n"));
-
-  for (Loop = 0; Loop < 0x80; Loop++) {
-    if ((Loop % 0x10) == 0) {
-      DEBUG ((DEBUG_INFO, "%02x:", Loop));
-    }
-
-    DEBUG ((DEBUG_INFO, " %02x", CmosRead8 (Loop)));
-    if ((Loop % 0x10) == 0xf) {
-      DEBUG ((DEBUG_INFO, "\n"));
-    }
-  }
 }
 
 VOID
@@ -810,7 +789,7 @@ InitializePlatform (
 
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
 
-  DebugDumpCmos ();
+  PlatformDebugDumpCmos ();
 
   if (QemuFwCfgS3Enabled ()) {
     DEBUG ((DEBUG_INFO, "S3 support was detected on QEMU\n"));
