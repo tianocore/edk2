@@ -24,15 +24,31 @@
 
 [Sources]
   Cmos.c
+  MemDetect.c
   Platform.c
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseLib
   DebugLib
   IoLib
   HobLib
+  QemuFwCfgLib
+  QemuFwCfgSimpleParserLib
+  MtrrLib
+  PcdLib
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode

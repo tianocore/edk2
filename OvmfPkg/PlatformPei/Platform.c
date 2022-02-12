@@ -57,6 +57,8 @@ BOOLEAN  mS3Supported = FALSE;
 
 UINT32  mMaxCpuCount;
 
+extern UINT32  mLowerMemorySize;
+
 VOID
 MemMapInitialization (
   VOID
@@ -85,7 +87,7 @@ MemMapInitialization (
     return;
   }
 
-  TopOfLowRam  = GetSystemMemorySizeBelow4gb ();
+  TopOfLowRam  = PlatformGetSystemMemorySizeBelow4gb ();
   PciExBarBase = 0;
   if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     //
@@ -735,6 +737,11 @@ InitializePlatform (
     Q35TsegMbytesInitialization ();
     Q35SmramAtDefaultSmbaseInitialization ();
   }
+
+  //
+  // Fetch the lower memory size (Below 4G)
+  //
+  mLowerMemorySize = PlatformGetSystemMemorySizeBelow4gb ();
 
   PublishPeiMemory ();
 
