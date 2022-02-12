@@ -1,13 +1,22 @@
 /** @file
-  PC/AT CMOS access routines
+  PlatformInitLib header file.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "Cmos.h"
-#include "Library/IoLib.h"
+#ifndef PLATFORM_INIT_LIB_H_
+#define PLATFORM_INIT_LIB_H_
+
+#include <PiPei.h>
+
+#pragma pack(1)
+typedef struct {
+  EFI_HOB_GUID_TYPE    GuidHeader;
+  UINT16               HostBridgePciDevId;
+} EFI_HOB_PLATFORM_INFO;
+#pragma pack()
 
 /**
   Reads 8-bits of CMOS data.
@@ -22,13 +31,9 @@
 **/
 UINT8
 EFIAPI
-CmosRead8 (
+PlatformCmosRead8 (
   IN      UINTN  Index
-  )
-{
-  IoWrite8 (0x70, (UINT8)Index);
-  return IoRead8 (0x71);
-}
+  );
 
 /**
   Writes 8-bits of CMOS data.
@@ -44,12 +49,18 @@ CmosRead8 (
 **/
 UINT8
 EFIAPI
-CmosWrite8 (
+PlatformCmosWrite8 (
   IN      UINTN  Index,
   IN      UINT8  Value
-  )
-{
-  IoWrite8 (0x70, (UINT8)Index);
-  IoWrite8 (0x71, Value);
-  return Value;
-}
+  );
+
+/**
+   Dump the CMOS content
+ */
+VOID
+EFIAPI
+PlatformDebugDumpCmos (
+  VOID
+  );
+
+#endif // PLATFORM_INIT_LIB_H_
