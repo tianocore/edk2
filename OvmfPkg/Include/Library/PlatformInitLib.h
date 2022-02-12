@@ -57,4 +57,40 @@ PlatformDebugDumpCmos (
   VOID
   );
 
+VOID
+EFIAPI
+PlatformAddIoMemoryBaseSizeHob (
+  IN EFI_PHYSICAL_ADDRESS  MemoryBase,
+  IN UINT64                MemorySize
+  );
+
+VOID
+EFIAPI
+PlatformAddIoMemoryRangeHob (
+  IN EFI_PHYSICAL_ADDRESS  MemoryBase,
+  IN EFI_PHYSICAL_ADDRESS  MemoryLimit
+  );
+
+VOID
+EFIAPI
+PlatformAddMemoryBaseSizeHob (
+  IN EFI_PHYSICAL_ADDRESS  MemoryBase,
+  IN UINT64                MemorySize
+  );
+
+VOID
+EFIAPI
+PlatformAddMemoryRangeHob (
+  IN EFI_PHYSICAL_ADDRESS  MemoryBase,
+  IN EFI_PHYSICAL_ADDRESS  MemoryLimit
+  );
+
+VOID
+EFIAPI
+PlatformAddReservedMemoryBaseSizeHob (
+  IN EFI_PHYSICAL_ADDRESS  MemoryBase,
+  IN UINT64                MemorySize,
+  IN BOOLEAN               Cacheable
+  );
+
 #endif // PLATFORM_INIT_LIB_H_
