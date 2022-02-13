@@ -201,6 +201,10 @@ INF PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 
 !if $(VARIABLE_SUPPORT) == "EMU"
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!elseif $(VARIABLE_SUPPORT) == "SMMSTORE"
+  INF UefiPayloadPkg/SmmStoreFvb/SmmStoreFvbRuntimeDxe.inf
+  INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !elseif $(VARIABLE_SUPPORT) == "SPI"
   INF UefiPayloadPkg/FvbRuntimeDxe/FvbSmm.inf
   INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
