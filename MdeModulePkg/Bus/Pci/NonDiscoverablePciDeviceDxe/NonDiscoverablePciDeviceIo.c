@@ -960,12 +960,24 @@ NonCoherentPciIoFreeBuffer (
   LIST_ENTRY                                   *Entry;
   EFI_STATUS                                   Status;
   NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION  *Alloc;
+  NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION  *AllocHead;
+  NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION  *AllocTail;
   BOOLEAN                                      Found;
+  UINTN                                        StartPages;
+  UINTN                                        EndPages;
+
+  if (HostAddress != ALIGN_POINTER (HostAddress, EFI_PAGE_SIZE)) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
 
   Dev = NON_DISCOVERABLE_PCI_DEVICE_FROM_PCI_IO (This);
 
   Found = FALSE;
   Alloc = NULL;
+
+  AllocHead = NULL;
+  AllocTail = NULL;
 
   //
   // Find the uncached allocation list entry associated
@@ -976,9 +988,19 @@ NonCoherentPciIoFreeBuffer (
        Entry = Entry->ForwardLink)
   {
     Alloc = BASE_CR (Entry, NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION, List);
-    if ((Alloc->HostAddress == HostAddress) && (Alloc->NumPages == Pages)) {
+
+    StartPages = 0;
+    if (Alloc->HostAddress < HostAddress) {
+      StartPages = EFI_SIZE_TO_PAGES (
+                     (UINTN)HostAddress - (UINTN)Alloc->HostAddress
+                     );
+    }
+
+    if ((Alloc->HostAddress <= HostAddress) &&
+        (Alloc->NumPages >= (Pages + StartPages)))
+    {
       //
-      // We are freeing the exact allocation we were given
+      // We are freeing at least part of what we were given
       // before by AllocateBuffer()
       //
       Found = TRUE;
@@ -991,7 +1013,45 @@ NonCoherentPciIoFreeBuffer (
     return EFI_NOT_FOUND;
   }
 
+  EndPages = Alloc->NumPages - (Pages + StartPages);
+
+  if (StartPages != 0) {
+    AllocHead = AllocatePool (sizeof *AllocHead);
+    if (AllocHead == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    AllocHead->HostAddress = Alloc->HostAddress;
+
+    AllocHead->NumPages   = StartPages;
+    AllocHead->Attributes = Alloc->Attributes;
+  }
+
+  if (EndPages != 0) {
+    AllocTail = AllocatePool (sizeof *AllocTail);
+    if (AllocTail == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    AllocTail->HostAddress = (UINT8 *)Alloc->HostAddress +
+                             EFI_PAGES_TO_SIZE (Pages + StartPages);
+
+    AllocTail->NumPages   = EndPages;
+    AllocTail->Attributes = Alloc->Attributes;
+  }
+
   RemoveEntryList (&Alloc->List);
+  //
+  // Record this new sub allocations in the linked list, so we
+  // can restore the memory space attributes later
+  //
+  if (AllocHead != NULL) {
+    InsertHeadList (&Dev->UncachedAllocationList, &AllocHead->List);
+  }
+
+  if (AllocTail != NULL) {
+    InsertHeadList (&Dev->UncachedAllocationList, &AllocTail->List);
+  }
 
   Status = gDS->SetMemorySpaceAttributes (
                   (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress,
