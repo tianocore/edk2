@@ -1200,7 +1200,7 @@ WakeUpAP (
     if (ResetVectorRequired) {
       //
       // For SEV-ES and SEV-SNP, the initial AP boot address will be defined by
-      // PcdSevEsWorkAreaBase. The Segment/Rip must be the jump address
+      // PcdCcWorkAreaBase. The Segment/Rip must be the jump address
       // from the original INIT-SIPI-SIPI.
       //
       if (CpuMpData->SevEsIsEnabled) {
@@ -1308,7 +1308,7 @@ WakeUpAP (
 
       //
       // For SEV-ES and SEV-SNP, the initial AP boot address will be defined by
-      // PcdSevEsWorkAreaBase. The Segment/Rip must be the jump address
+      // PcdCcWorkAreaBase. The Segment/Rip must be the jump address
       // from the original INIT-SIPI-SIPI.
       //
       if (CpuMpData->SevEsIsEnabled) {

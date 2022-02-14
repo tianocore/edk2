@@ -35,7 +35,7 @@ InternalMemEncryptSevStatus (
 
   ReadSevMsr = FALSE;
 
-  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdCcWorkAreaBase);
   if ((SevEsWorkArea != NULL) && (SevEsWorkArea->EncryptionMask != 0)) {
     //
     // The MSR has been read before, so it is safe to read it again and avoid
@@ -134,7 +134,7 @@ MemEncryptSevGetEncryptionMask (
   SEC_SEV_ES_WORK_AREA              *SevEsWorkArea;
   UINT64                            EncryptionMask;
 
-  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdCcWorkAreaBase);
   if (SevEsWorkArea != NULL) {
     EncryptionMask = SevEsWorkArea->EncryptionMask;
   } else {

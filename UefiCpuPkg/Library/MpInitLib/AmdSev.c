@@ -156,7 +156,7 @@ SetSevEsJumpTable (
   UINT32             Offset, InsnByte;
   UINT8              LoNib, HiNib;
 
-  JmpFar = (SEV_ES_AP_JMP_FAR *)(UINTN)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  JmpFar = (SEV_ES_AP_JMP_FAR *)(UINTN)FixedPcdGet32 (PcdCcWorkAreaBase);
   ASSERT (JmpFar != NULL);
 
   //
@@ -164,7 +164,7 @@ SetSevEsJumpTable (
   // This will be set to a value derived from the SIPI vector and will
   // be the memory address used for the far jump below.
   //
-  Offset  = FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  Offset  = FixedPcdGet32 (PcdCcWorkAreaBase);
   Offset += sizeof (JmpFar->InsnBuffer);
   LoNib   = (UINT8)Offset;
   HiNib   = (UINT8)(Offset >> 8);

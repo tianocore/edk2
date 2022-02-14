@@ -51,4 +51,4 @@
   VmgExitLib
 
 [FixedPcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
+  gUefiCpuPkgTokenSpaceGuid.PcdCcWorkAreaBase

@@ -57,7 +57,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
 
 [FixedPcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
+  gUefiCpuPkgTokenSpaceGuid.PcdCcWorkAreaBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedEnd

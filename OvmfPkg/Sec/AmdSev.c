@@ -276,7 +276,7 @@ SevEsIsEnabled (
     return FALSE;
   }
 
-  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdCcWorkAreaBase);
 
   return (SevEsWorkArea->SevEsEnabled != 0);
 }

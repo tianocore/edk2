@@ -99,9 +99,9 @@
   %define GHCB_PT_ADDR (FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase))
   %define GHCB_BASE (FixedPcdGet32 (PcdOvmfSecGhcbBase))
   %define GHCB_SIZE (FixedPcdGet32 (PcdOvmfSecGhcbSize))
-  %define SEV_ES_WORK_AREA (FixedPcdGet32 (PcdSevEsWorkAreaBase))
-  %define SEV_ES_WORK_AREA_RDRAND (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 8)
-  %define SEV_ES_WORK_AREA_ENC_MASK (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 16)
+  %define SEV_ES_WORK_AREA (FixedPcdGet32 (PcdCcWorkAreaBase))
+  %define SEV_ES_WORK_AREA_RDRAND (FixedPcdGet32 (PcdCcWorkAreaBase) + 8)
+  %define SEV_ES_WORK_AREA_ENC_MASK (FixedPcdGet32 (PcdCcWorkAreaBase) + 16)
   %define SEV_ES_VC_TOP_OF_STACK (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + FixedPcdGet32 (PcdOvmfSecPeiTempRamSize))
   %define SEV_SNP_SECRETS_BASE  (FixedPcdGet32 (PcdOvmfSnpSecretsBase))
   %define SEV_SNP_SECRETS_SIZE  (FixedPcdGet32 (PcdOvmfSnpSecretsSize))
@@ -134,7 +134,7 @@
 
 %include "Main.asm"
 
-  %define SEV_ES_AP_RESET_IP  FixedPcdGet32 (PcdSevEsWorkAreaBase)
+  %define SEV_ES_AP_RESET_IP  FixedPcdGet32 (PcdCcWorkAreaBase)
   %define SEV_LAUNCH_SECRET_BASE  FixedPcdGet32 (PcdSevLaunchSecretBase)
   %define SEV_LAUNCH_SECRET_SIZE  FixedPcdGet32 (PcdSevLaunchSecretSize)
   %define SEV_FW_HASH_BLOCK_BASE  FixedPcdGet32 (PcdQemuHashTableBase)
