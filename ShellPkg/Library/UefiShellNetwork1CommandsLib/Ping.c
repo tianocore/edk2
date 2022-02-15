@@ -259,9 +259,11 @@ GetTimerPeriod (
   EFI_EVENT   TimerEvent;
   UINT32      StallCounter;
   EFI_TPL     OldTpl;
+  UINT32      TimerPeriod;
 
   RttTimerTick = 0;
   StallCounter = 0;
+  TimerPeriod  = 0;
 
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
@@ -295,7 +297,12 @@ GetTimerPeriod (
   gBS->SetTimer (TimerEvent, TimerCancel, 0);
   gBS->CloseEvent (TimerEvent);
 
-  return StallCounter / RttTimerTick;
+  TimerPeriod = StallCounter / RttTimerTick;
+  if (TimerPeriod != 0) {
+    return TimerPeriod;
+  } else {
+    return 1;
+  }
 }
 
 /**
