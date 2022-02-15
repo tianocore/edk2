@@ -1,7 +1,7 @@
 /** @file
   DSDT table parser
 
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2022, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -39,4 +39,20 @@ ParseAcpiDsdt (
   }
 
   DumpAcpiHeader (Ptr);
+
+  // As per 19.6.29 in the version 6.4 of the ACPI spec, a revision less than 2
+  // restricts integers to 32 bit width. This may not be intended, raise a
+  // warning
+ #if defined (MDE_CPU_AARCH64) || defined (MDE_CPU_ARM)
+  if (AcpiTableRevision < 2) {
+    IncrementWarningCount ();
+    Print (
+      L"WARNING: DSDT Table Revision less than 2. Integer width restricted to "
+      L"32 bits. Table Revision = %d.\n",
+      AcpiTableRevision
+      );
+    return;
+  }
+
+ #endif
 }
