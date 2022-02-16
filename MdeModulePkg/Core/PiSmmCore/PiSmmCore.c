@@ -11,6 +11,14 @@
 //
 // Physical pointer to private structure shared between SMM IPL and the SMM Core
 //
+// WARNING: The mailbox is exposed to the normal world. Its contents must be
+// carefully validated before use.
+//
+SMM_CORE_PRIVATE_DATA  *gSmmCoreMailbox;
+//
+// Pointer to the SMM Core's private copy of the mailbox in MMRAM. The SMM Core
+// uses this copy for internal operations.
+//
 SMM_CORE_PRIVATE_DATA  *gSmmCorePrivate;
 
 //
@@ -712,7 +720,15 @@ SmmEntryPoint (
     //
     // Mark the InSmm flag as TRUE, it will be used by SmmBase2 protocol
     //
-    gSmmCorePrivate->InSmm = TRUE;
+    gSmmCoreMailbox->InSmm = TRUE;
+
+    if (gSmmCorePrivate == NULL) {
+      DEBUG ((DEBUG_ERROR, "%a Internal Core private data is not allocated. No communication allowed!!!\n", __func__));
+      ASSERT (FALSE);
+      goto AsyncSmi;
+    }
+
+    CopyMem (gSmmCorePrivate, gSmmCoreMailbox, sizeof (*gSmmCoreMailbox));
 
     //
     // Check to see if this is a Synchronous SMI sent through the SMM Communication
@@ -727,8 +743,8 @@ SmmEntryPoint (
       IsOverlapped = InternalIsBufferOverlapped (
                        (UINT8 *)CommunicationBuffer,
                        BufferSize,
-                       (UINT8 *)gSmmCorePrivate,
-                       sizeof (*gSmmCorePrivate)
+                       (UINT8 *)gSmmCoreMailbox,
+                       sizeof (*gSmmCoreMailbox)
                        );
       //
       // Check for over or underflows
@@ -805,10 +821,14 @@ AsyncSmi:
   // If a legacy boot has occurred, then make sure gSmmCorePrivate is not accessed
   //
   if (!InLegacyBoot) {
+    if (gSmmCorePrivate != NULL) {
+      CopyMem (gSmmCoreMailbox, gSmmCorePrivate, sizeof (*gSmmCoreMailbox));
+    }
+
     //
     // Clear the InSmm flag as we are going to leave SMM
     //
-    gSmmCorePrivate->InSmm = FALSE;
+    gSmmCoreMailbox->InSmm = FALSE;
   }
 
   PERF_FUNCTION_END ();
@@ -924,7 +944,9 @@ SmmMain (
   //
   // Get SMM Core Private context passed in from SMM IPL in ImageHandle.
   //
-  gSmmCorePrivate = (SMM_CORE_PRIVATE_DATA *)ImageHandle;
+  gSmmCoreMailbox = (SMM_CORE_PRIVATE_DATA *)ImageHandle;
+  gSmmCorePrivate = AllocateCopyPool (sizeof (*gSmmCoreMailbox), gSmmCoreMailbox);
+  ASSERT (gSmmCorePrivate != NULL);
 
   //
   // Fill in SMRAM physical address for the SMM Services Table and the SMM Entry Point.
@@ -983,6 +1005,8 @@ SmmMain (
   SmmCoreInitializeMemoryAttributesTable ();
 
   SmmCoreInitializeSmiHandlerProfile ();
+
+  CopyMem (gSmmCoreMailbox, gSmmCorePrivate, sizeof (*gSmmCoreMailbox));
 
   return EFI_SUCCESS;
 }
