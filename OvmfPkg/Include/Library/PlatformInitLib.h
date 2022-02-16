@@ -286,4 +286,18 @@ ProcessTdxHobList (
   VOID
   );
 
+/**
+  In Tdx guest, the system memory is passed in TdHob by host VMM. So
+  the major task of PlatformTdxPublishRamRegions is to walk thru the
+  TdHob list and transfer the ResourceDescriptorHob and MemoryAllocationHob
+  to the hobs in DXE phase.
+
+  MemoryAllocationHob should also be created for Mailbox and Ovmf work area.
+**/
+VOID
+EFIAPI
+PlatformTdxPublishRamRegions (
+  VOID
+  );
+
 #endif // PLATFORM_INIT_LIB_H_
