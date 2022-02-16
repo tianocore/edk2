@@ -502,3 +502,52 @@ TransferTdxHobList (
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
 }
+
+/**
+  In Tdx guest, the system memory is passed in TdHob by host VMM. So
+  the major task of PlatformTdxPublishRamRegions is to walk thru the
+  TdHob list and transfer the ResourceDescriptorHob and MemoryAllocationHob
+  to the hobs in DXE phase.
+
+  MemoryAllocationHob should also be created for Mailbox and Ovmf work area.
+**/
+VOID
+EFIAPI
+PlatformTdxPublishRamRegions (
+  VOID
+  )
+{
+  if (!TdIsEnabled ()) {
+    return;
+  }
+
+  TransferTdxHobList ();
+
+  //
+  // The memory region defined by PcdOvmfSecGhcbBackupBase is pre-allocated by
+  // host VMM and used as the td mailbox at the beginning of system boot.
+  //
+  BuildMemoryAllocationHob (
+    FixedPcdGet32 (PcdOvmfSecGhcbBackupBase),
+    FixedPcdGet32 (PcdOvmfSecGhcbBackupSize),
+    EfiACPIMemoryNVS
+    );
+
+  if (FixedPcdGet32 (PcdOvmfWorkAreaSize) != 0) {
+    //
+    // Reserve the work area.
+    //
+    // Since this memory range will be used by the Reset Vector on S3
+    // resume, it must be reserved as ACPI NVS.
+    //
+    // If S3 is unsupported, then various drivers might still write to the
+    // work area. We ought to prevent DXE from serving allocation requests
+    // such that they would overlap the work area.
+    //
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase),
+      (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaSize),
+      EfiBootServicesData
+      );
+  }
+}
