@@ -34,6 +34,7 @@ Module Name:
 #include <Library/MtrrLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
+#include <Library/TdxLib.h>
 
 #include <Library/PlatformInitLib.h>
 
@@ -481,7 +482,19 @@ PlatformAddressWidthInitialization (
     PhysMemAddressWidth = 36;
   }
 
+ #if defined (MDE_CPU_X64)
+  if (TdIsEnabled ()) {
+    if (TdSharedPageMask () == (1ULL << 47)) {
+      PhysMemAddressWidth = 48;
+    } else {
+      PhysMemAddressWidth = 52;
+    }
+  }
+
+  ASSERT (PhysMemAddressWidth <= 52);
+ #else
   ASSERT (PhysMemAddressWidth <= 48);
+ #endif
 
   return PhysMemAddressWidth;
 }
