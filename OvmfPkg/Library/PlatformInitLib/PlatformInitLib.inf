@@ -14,7 +14,7 @@
   FILE_GUID                      = 89f886b0-7109-46e1-9d28-503ad4ab6ee0
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PlatformInitLib|PEIM
+  LIBRARY_CLASS                  = PlatformInitLib|SEC PEIM
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -26,6 +26,12 @@
   Cmos.c
   MemDetect.c
   Platform.c
+
+[Sources.IA32]
+  IntelTdxNull.c
+
+[Sources.X64]
+  IntelTdx.c
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
@@ -44,6 +50,9 @@
   MtrrLib
   PcdLib
   PciLib
+
+[LibraryClasses.X64]
+  TdxLib
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
@@ -82,6 +91,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtrSize
   gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress
   gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
+
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
