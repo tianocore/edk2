@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2022, Intel Corporation. All rights reserved.<BR>
 #  Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 #  Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -126,14 +126,14 @@
         $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
 
     <Command.MSFT, Command.INTEL>
-        "$(CC)" /Fo${dst} $(DEPS_FLAGS) $(CC_FLAGS) $(INC) ${src}
+        "$(CC)" /Fo${dst} $(DEPS_FLAGS) /D DEBUG_FILE="\"${s_base}.c\"" $(CC_FLAGS) $(INC) ${src}
 
     <Command.GCC, Command.RVCT>
         # For RVCTCYGWIN CC_FLAGS must be first to work around pathing issues
-        "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) -c -o ${dst} $(INC) ${src}
+        "$(CC)" $(DEPS_FLAGS) -D DEBUG_FILE="\"${s_base}.c\"" $(CC_FLAGS) -c -o ${dst} $(INC) ${src}
 
     <Command.XCODE>
-        "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) -o ${dst} $(INC) ${src}
+        "$(CC)" $(DEPS_FLAGS) -D DEBUG_FILE="\"${s_base}.c\"" $(CC_FLAGS) -o ${dst} $(INC) ${src}
 
 [C-Code-File.BASE.AARCH64,C-Code-File.SEC.AARCH64,C-Code-File.PEI_CORE.AARCH64,C-Code-File.PEIM.AARCH64,C-Code-File.BASE.ARM,C-Code-File.SEC.ARM,C-Code-File.PEI_CORE.ARM,C-Code-File.PEIM.ARM]
     <InputFile>
@@ -146,7 +146,7 @@
         $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
 
     <Command.GCC, Command.RVCT>
-        "$(CC)" $(CC_FLAGS) $(CC_XIPFLAGS) -c -o ${dst} $(INC) ${src}
+        "$(CC)" -D DEBUG_FILE="\"${s_base}.c\"" $(CC_FLAGS) $(CC_XIPFLAGS) -c -o ${dst} $(INC) ${src}
 
 [C-Header-File]
     <InputFile>
