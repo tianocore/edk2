@@ -8,7 +8,7 @@
   of size reduction when compiler optimization is disabled. If MDEPKG_NDEBUG is
   defined, then debug and assert related macros wrapped by it are the NULL implementations.
 
-Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -83,6 +83,31 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifdef DEBUG_LINE_NUMBER
 #else
 #define DEBUG_LINE_NUMBER  __LINE__
+#endif
+
+//
+// Source file.
+// Default is use the to compiler provided __FILE__ macro value. The __FILE__
+// mapping can be overriden by predefining DEBUG_FILE
+//
+// Defining DEBUG_FILE to a fixed value is useful when comparing builds
+// across machine or configuration with different slash or path
+// file.
+//
+// Another benefit is we can customize the ASSERT path without depending on
+// compiler ability
+//
+// It's for all no matter VS, GCC, CLANG
+//
+#ifdef DEBUG_FILE
+#else
+#define DEBUG_FILE  __FILE__
+#endif
+
+// Blow override for keep clang behavior
+#if defined (__clang__) && defined (__FILE_NAME__)
+#undef DEBUG_FILE
+#define DEBUG_FILE  __FILE_NAME__
 #endif
 
 /**
@@ -337,17 +362,9 @@ UnitTestDebugAssert (
   IN CONST CHAR8  *Description
   );
 
-  #if defined (__clang__) && defined (__FILE_NAME__)
-#define _ASSERT(Expression)  UnitTestDebugAssert (__FILE_NAME__, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
-  #else
-#define _ASSERT(Expression)  UnitTestDebugAssert (__FILE__, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
-  #endif
+#define _ASSERT(Expression)  UnitTestDebugAssert (DEBUG_FILE, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
 #else
-  #if defined (__clang__) && defined (__FILE_NAME__)
-#define _ASSERT(Expression)  DebugAssert (__FILE_NAME__, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
-  #else
-#define _ASSERT(Expression)  DebugAssert (__FILE__, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
-  #endif
+#define _ASSERT(Expression)  DebugAssert (DEBUG_FILE, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
 #endif
 
 /**
