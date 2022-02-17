@@ -85,6 +85,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define DEBUG_LINE_NUMBER  __LINE__
 #endif
 
+//
+// Source file.
+// Default is use the to compiler provided __FILE__ macro value. The __FILE__
+// mapping can be overriden by predefining DEBUG_FILE
+//
+// Defining DEBUG_FILE to a fixed value is useful when comparing builds
+// across machine or configuration with different slash or path
+// file.
+//
+#ifdef DEBUG_FILE
+#else
+#define DEBUG_FILE  __FILE__
+#endif
+
 /**
   Macro that converts a Boolean expression to a Null-terminated ASCII string.
 
@@ -340,13 +354,13 @@ UnitTestDebugAssert (
   #if defined (__clang__) && defined (__FILE_NAME__)
 #define _ASSERT(Expression)  UnitTestDebugAssert (__FILE_NAME__, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
   #else
-#define _ASSERT(Expression)  UnitTestDebugAssert (__FILE__, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
+#define _ASSERT(Expression)  UnitTestDebugAssert (DEBUG_FILE, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
   #endif
 #else
   #if defined (__clang__) && defined (__FILE_NAME__)
 #define _ASSERT(Expression)  DebugAssert (__FILE_NAME__, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
   #else
-#define _ASSERT(Expression)  DebugAssert (__FILE__, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
+#define _ASSERT(Expression)  DebugAssert (DEBUG_FILE, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
   #endif
 #endif
 
