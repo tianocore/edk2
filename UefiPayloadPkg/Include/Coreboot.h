@@ -249,6 +249,20 @@ struct cb_cbmem_tab {
   UINT64    cbmem_tab;
 };
 
+#define CB_TAG_SMMSTOREV2  0x0039
+struct cb_smmstorev2 {
+  UINT32    tag;
+  UINT32    size;
+  UINT32    num_blocks;      /* Number of writeable blocks in the store */
+  UINT32    block_size;      /* Size of a block in bytes (64 KiB by default) */
+  UINT32    mmap_addr;       /* MMIO address of the store for read-only access */
+  UINT32    com_buffer;      /* Physical address of the communication buffer */
+  UINT32    com_buffer_size; /* Size of the communication buffer in bytes */
+  UINT8     apm_cmd;         /* The command byte to write to the APM I/O port to
+                                communicate with the store */
+  UINT8     unused[3];       /* Set to zero */
+} __attribute__ ((packed));
+
 /* Helpful macros */
 
 #define MEM_RANGE_COUNT(_rec) \
