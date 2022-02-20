@@ -1,7 +1,7 @@
 /** @file
   This is the main routine for initializing the Graphics Console support routines.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -518,7 +518,7 @@ GraphicsConsoleControllerDriverStart (
       }
     }
 
-    if (ModeNumber != Private->GraphicsOutput->Mode->Mode) {
+    if (EFI_ERROR (Status) || (ModeNumber != Private->GraphicsOutput->Mode->Mode)) {
       //
       // Current graphics mode is not set or is not set to the mode which we have found,
       // set the new graphic mode.
