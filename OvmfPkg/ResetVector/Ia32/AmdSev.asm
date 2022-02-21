@@ -157,8 +157,9 @@ SevClearPageEncMaskForGhcbPage:
     jnz       SevClearPageEncMaskForGhcbPageExit
 
     ; Check if SEV-ES is enabled
-    cmp       byte[SEV_ES_WORK_AREA], 1
-    jnz       SevClearPageEncMaskForGhcbPageExit
+    mov       ecx, 1
+    bt        [SEV_ES_WORK_AREA_STATUS_MSR], ecx
+    jnc       SevClearPageEncMaskForGhcbPageExit
 
     ;
     ; The initial GHCB will live at GHCB_BASE and needs to be un-encrypted.
@@ -219,12 +220,16 @@ GetSevCBitMaskAbove31Exit:
 ; If SEV is disabled then EAX will be zero.
 ;
 CheckSevFeatures:
-    ; Set the first byte of the workarea to zero to communicate to the SEC
-    ; phase that SEV-ES is not enabled. If SEV-ES is enabled, the CPUID
-    ; instruction will trigger a #VC exception where the first byte of the
-    ; workarea will be set to one or, if CPUID is not being intercepted,
-    ; the MSR check below will set the first byte of the workarea to one.
-    mov     byte[SEV_ES_WORK_AREA], 0
+    ;
+    ; Clear the workarea, if SEV is enabled then later part of routine
+    ; will populate the workarea fields.
+    ;
+    mov    ecx, SEV_ES_WORK_AREA_SIZE
+    mov    eax, SEV_ES_WORK_AREA
+ClearSevEsWorkArea:
+    mov    byte [eax], 0
+    inc    eax
+    loop   ClearSevEsWorkArea
 
     ;
     ; Set up exception handlers to check for SEV-ES
@@ -265,6 +270,10 @@ CheckSevFeatures:
     ; Set the work area header to indicate that the SEV is enabled
     mov     byte[WORK_AREA_GUEST_TYPE], 1
 
+    ; Save the SevStatus MSR value in the workarea
+    mov     [SEV_ES_WORK_AREA_STATUS_MSR], eax
+    mov     [SEV_ES_WORK_AREA_STATUS_MSR + 4], edx
+
     ; Check for SEV-ES memory encryption feature:
     ; CPUID  Fn8000_001F[EAX] - Bit 3
     ;   CPUID raises a #VC exception if running as an SEV-ES guest
@@ -279,10 +288,6 @@ CheckSevFeatures:
     rdmsr
     bt        eax, 1
     jnc       GetSevEncBit
-
-    ; Set the first byte of the workarea to one to communicate to the SEC
-    ; phase that SEV-ES is enabled.
-    mov       byte[SEV_ES_WORK_AREA], 1
 
 GetSevEncBit:
     ; Get pte bit position to enable memory encryption
@@ -313,7 +318,10 @@ NoSev:
     ;
     ; Perform an SEV-ES sanity check by seeing if a #VC exception occurred.
     ;
-    cmp       byte[SEV_ES_WORK_AREA], 0
+    ; If SEV-ES is enabled, the CPUID instruction will trigger a #VC exception
+    ; where the RECEIVED_VC offset in the workarea will be set to one.
+    ;
+    cmp       byte[SEV_ES_WORK_AREA_RECEIVED_VC], 0
     jz        NoSevPass
 
     ;
@@ -407,9 +415,9 @@ SevEsIdtVmmComm:
     ; If we're here, then we are an SEV-ES guest and this
     ; was triggered by a CPUID instruction
     ;
-    ; Set the first byte of the workarea to one to communicate that
+    ; Set the recievedVc field in the workarea to communicate that
     ; a #VC was taken.
-    mov     byte[SEV_ES_WORK_AREA], 1
+    mov     byte[SEV_ES_WORK_AREA_RECEIVED_VC], 1
 
     pop     ecx                     ; Error code
     cmp     ecx, 0x72               ; Be sure it was CPUID
