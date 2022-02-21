@@ -47,6 +47,11 @@
 #define IMD_ENTRY_MAGIC    (~0xC0389481)
 #define CBMEM_ENTRY_MAGIC  (~0xC0389479)
 
+struct imd_root_pointer {
+  UINT32    magic;
+  INT32     root_offset;
+};
+
 struct cbmem_entry {
   UINT32    magic;
   UINT32    start;
@@ -236,7 +241,79 @@ struct cb_cbmem_tab {
   UINT64    cbmem_tab;
 };
 
-/* Helpful macros */
+#define FMAP_STRLEN             32
+#define CBMEM_ID_IMD_SMALL      0x53a11439
+#define CBMEM_ID_FMAP           0x464d4150
+#define CBMEM_ID_CBFS_RO_MCACHE 0x524d5346
+#define MCACHE_MAGIC_FILE       0x454c4946
+#define MCACHE_MAGIC_FULL       0x4c4c5546
+#define MCACHE_MAGIC_END        0x444e4524
+#define CBFS_METADATA_MAX_SIZE  256
+#define CBFS_UNIVERSAL_PAYLOAD  "img/UniversalPayload"
+#define CBFS_MCACHE_ALIGNMENT   sizeof (UINT32)
+
+#pragma pack(1)
+struct cbfs_file {
+  char magic[8];
+  UINT32 len;
+  UINT32 type;
+  UINT32 attributes_offset;
+  UINT32 offset;
+  char filename[0];
+} ;
+
+struct fmap_area {
+  UINT32 offset;            /* offset relative to base */
+  UINT32 size;              /* size in bytes */
+  UINT8  name[FMAP_STRLEN]; /* descriptive name */
+  UINT16 flags;             /* flags for this area */
+};
+
+struct fmap {
+  UINT8  signature[8];      /* "__FMAP__" (0x5F5F464D41505F5F) */
+  UINT8  ver_major;         /* major version */
+  UINT8  ver_minor;         /* minor version */
+  UINT64 base;              /* address of the firmware binary */
+  UINT32 size;              /* size of firmware binary in bytes */
+  UINT8  name[FMAP_STRLEN]; /* name of this firmware binary */
+  UINT16 nareas;            /* number of areas */
+  struct fmap_area areas[];
+};
+
+struct cbfs_payload_segment {
+  UINT32 type;
+  UINT32 compression;
+  UINT32 offset;
+  UINT64 load_addr;
+  UINT32 len;
+  UINT32 mem_len;
+};
+
+struct cbfs_payload {
+  struct cbfs_payload_segment segments;
+};
+#pragma pack()
+
+union cbfs_mdata {
+  struct cbfs_file h;
+  UINT8 raw[CBFS_METADATA_MAX_SIZE];
+};
+
+union mcache_entry {
+  union cbfs_mdata file;
+  struct {  /* These fields exactly overlap file.h.magic */
+    UINT32 magic;
+    UINT32 offset;
+  };
+};
+
+enum cbfs_payload_segment_type {
+  PAYLOAD_SEGMENT_CODE   = 0x434F4445,  /* BE: 'CODE' */
+  PAYLOAD_SEGMENT_DATA   = 0x44415441,  /* BE: 'DATA' */
+  PAYLOAD_SEGMENT_BSS    = 0x42535320,  /* BE: 'BSS ' */
+  PAYLOAD_SEGMENT_PARAMS = 0x50415241,  /* BE: 'PARA' */
+  PAYLOAD_SEGMENT_ENTRY  = 0x454E5452,  /* BE: 'ENTR' */
+};
 
 #define MEM_RANGE_COUNT(_rec) \
   (((_rec)->size - sizeof(*(_rec))) / sizeof((_rec)->map[0]))
