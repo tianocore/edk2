@@ -330,7 +330,11 @@ ParseCbMemTable (
   UINT64                  Start;
   UINT64                  Size;
   UINTN                   Index;
-  struct cbmem_root       *CbMemRoot;
+  struct cbmem_root       *CbMemLgRoot;
+  VOID                    *CbMemSmRoot;
+  VOID                    *CbMemSmRootTable;
+  UINT32                   SmRootTableSize;
+  struct imd_root_pointer *SmRootPointer;
 
   if (MemTable == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -353,10 +357,21 @@ ParseCbMemTable (
     Size  = cb_unpack64 (Range->size);
 
     if ((Range->type == CB_MEM_TABLE) && (Start > 0x1000)) {
-      CbMemRoot = (struct  cbmem_root *)(UINTN)(Start + Size - DYN_CBMEM_ALIGN_SIZE);
-      Status    = FindCbMemTable (CbMemRoot, TableId, MemTable, MemTableSize);
+      CbMemLgRoot = (struct  cbmem_root *)(UINTN)(Start + Size - DYN_CBMEM_ALIGN_SIZE);
+      Status      = FindCbMemTable (CbMemLgRoot, TableId, MemTable, MemTableSize);
       if (!EFI_ERROR (Status)) {
         break;
+      } else {
+        /* Try to locate small root table and find the CBMEM entry in small root table */
+        Status        = FindCbMemTable (CbMemLgRoot, CBMEM_ID_IMD_SMALL, &CbMemSmRootTable, &SmRootTableSize);
+        SmRootPointer = (struct imd_root_pointer *)(UINTN)((UINTN) CbMemSmRootTable + SmRootTableSize - sizeof (struct imd_root_pointer));
+        CbMemSmRoot   = (struct  cbmem_root *)(UINTN)(SmRootPointer->root_offset + (UINTN) SmRootPointer);
+        if (!EFI_ERROR (Status)) {
+          Status = FindCbMemTable ((struct cbmem_root *) CbMemSmRoot, TableId, MemTable, MemTableSize);
+          if (!EFI_ERROR (Status)) {
+            break;
+          }
+        }
       }
     }
   }
