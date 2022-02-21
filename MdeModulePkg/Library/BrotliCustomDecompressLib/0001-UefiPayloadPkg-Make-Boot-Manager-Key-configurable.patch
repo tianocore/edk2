@@ -1,0 +1,137 @@
+From 761adf234fa5ca4fd3e6b3abc608927df1372251 Mon Sep 17 00:00:00 2001
+Message-Id: <761adf234fa5ca4fd3e6b3abc608927df1372251.1646475274.git.sean@starlabs.systems>
+From: Sean Rhodes <sean@starlabs.systems>
+Date: Mon, 3 Jan 2022 21:01:14 +0000
+Subject: [PATCH] UefiPayloadPkg: Make Boot Manager Key configurable
+
+Provide a build option to use [Esc] instead of [F2] for devices
+such as Chromebooks that don't have F-keys.
+
+Cc: Guo Dong <guo.dong@intel.com>
+Cc: Ray Ni <ray.ni@intel.com>
+Cc: Maurice Ma <maurice.ma@intel.com>
+Cc: Benjamin You <benjamin.you@intel.com>
+Signed-off-by: Sean Rhodes <sean@starlabs.systems>
+---
+ .../PlatformBootManager.c                     | 44 +++++++++++++------
+ .../PlatformBootManagerLib.inf                |  1 +
+ UefiPayloadPkg/UefiPayloadPkg.dec             |  3 ++
+ UefiPayloadPkg/UefiPayloadPkg.dsc             |  2 +
+ 4 files changed, 37 insertions(+), 13 deletions(-)
+
+diff --git a/UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManager.c b/UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManager.c
+index a8ead775ea..0eb577313a 100644
+--- a/UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManager.c
++++ b/UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManager.c
+@@ -164,7 +164,7 @@ PlatformBootManagerBeforeConsole (
+   )
+ {
+   EFI_INPUT_KEY                 Enter;
+-  EFI_INPUT_KEY                 F2;
++  EFI_INPUT_KEY                 CustomKey;
+   EFI_INPUT_KEY                 Down;
+   EFI_BOOT_MANAGER_LOAD_OPTION  BootOption;
+   EFI_STATUS                    Status;
+@@ -186,13 +186,22 @@ PlatformBootManagerBeforeConsole (
+   Enter.UnicodeChar = CHAR_CARRIAGE_RETURN;
+   EfiBootManagerRegisterContinueKeyOption (0, &Enter, NULL);
+ 
+-  //
+-  // Map F2 to Boot Manager Menu
+-  //
+-  F2.ScanCode    = SCAN_F2;
+-  F2.UnicodeChar = CHAR_NULL;
++  if (FixedPcdGetBool (PcdBootManagerEscape)) {
++    //
++    // Map Esc to Boot Manager Menu
++    //
++    CustomKey.ScanCode    = SCAN_ESC;
++    CustomKey.UnicodeChar = CHAR_NULL;
++  } else {
++    //
++    // Map Esc to Boot Manager Menu
++    //
++    CustomKey.ScanCode    = SCAN_F2;
++    CustomKey.UnicodeChar = CHAR_NULL;
++  }
++
+   EfiBootManagerGetBootManagerMenu (&BootOption);
+-  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16)BootOption.OptionNumber, 0, &F2, NULL);
++  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16)BootOption.OptionNumber, 0, &CustomKey, NULL);
+ 
+   //
+   // Also add Down key to Boot Manager Menu since some serial terminals don't support F2 key.
+@@ -251,12 +260,21 @@ PlatformBootManagerAfterConsole (
+   //
+   PlatformRegisterFvBootOption (PcdGetPtr (PcdShellFile), L"UEFI Shell", LOAD_OPTION_ACTIVE);
+ 
+-  Print (
+-    L"\n"
+-    L"F2 or Down      to enter Boot Manager Menu.\n"
+-    L"ENTER           to boot directly.\n"
+-    L"\n"
+-    );
++  if (FixedPcdGetBool (PcdBootManagerEscape)) {
++    Print (
++      L"\n"
++      L"Esc or Down      to enter Boot Manager Menu.\n"
++      L"ENTER           to boot directly.\n"
++      L"\n"
++      );
++  } else {
++    Print (
++      L"\n"
++      L"F2 or Down      to enter Boot Manager Menu.\n"
++      L"ENTER           to boot directly.\n"
++      L"\n"
++      );
++  }
+ }
+ 
+ /**
+diff --git a/UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf b/UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+index 9c4a9da943..80390e0d98 100644
+--- a/UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
++++ b/UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+@@ -73,3 +73,4 @@
+   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
+   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile
++  gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape
+diff --git a/UefiPayloadPkg/UefiPayloadPkg.dec b/UefiPayloadPkg/UefiPayloadPkg.dec
+index e9204d1168..4051172caf 100644
+--- a/UefiPayloadPkg/UefiPayloadPkg.dec
++++ b/UefiPayloadPkg/UefiPayloadPkg.dec
+@@ -86,6 +86,9 @@ gUefiPayloadPkgTokenSpaceGuid.PcdPcdDriverFile|{ 0x57, 0x72, 0xcf, 0x80, 0xab, 0
+ # Above 4G Memory
+ gUefiPayloadPkgTokenSpaceGuid.PcdDispatchModuleAbove4GMemory|TRUE|BOOLEAN|0x00000019
+ 
++# Boot Manager Key
++gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape|FALSE|BOOLEAN|0x00000020
++
+ ## FFS filename to find the default variable initial data file.
+ # @Prompt FFS Name of variable initial data file
+  gUefiPayloadPkgTokenSpaceGuid.PcdNvsDataFile |{ 0x1a, 0xf1, 0xb1, 0xae, 0x42, 0xcc, 0xcf, 0x4e, 0xac, 0x60, 0xdb, 0xab, 0xf6, 0xca, 0x69, 0xe6 }|VOID*|0x00000025
+diff --git a/UefiPayloadPkg/UefiPayloadPkg.dsc b/UefiPayloadPkg/UefiPayloadPkg.dsc
+index 4fe81a61d6..558513baf1 100644
+--- a/UefiPayloadPkg/UefiPayloadPkg.dsc
++++ b/UefiPayloadPkg/UefiPayloadPkg.dsc
+@@ -34,6 +34,7 @@
+   DEFINE SECURITY_STUB_ENABLE         = TRUE
+   DEFINE SMM_SUPPORT                  = FALSE
+   DEFINE ABOVE_4G_MEMORY              = TRUE
++  DEFINE BOOT_MANAGER_ESCAPE          = FALSE
+   #
+   # SBL:      UEFI payload for Slim Bootloader
+   # COREBOOT: UEFI payload for coreboot
+@@ -401,6 +402,7 @@
+ !endif
+ 
+   gUefiPayloadPkgTokenSpaceGuid.PcdDispatchModuleAbove4GMemory|$(ABOVE_4G_MEMORY)
++  gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape|$(BOOT_MANAGER_ESCAPE)
+ 
+ [PcdsPatchableInModule.X64]
+   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister|$(RTC_INDEX_REGISTER)
+-- 
+2.32.0
+
