@@ -58,3 +58,4 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
