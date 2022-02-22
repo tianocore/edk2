@@ -891,7 +891,84 @@ TlsSetHostPrivateKey (
   IN     UINTN  DataSize
   )
 {
-  return EFI_UNSUPPORTED;
+  TLS_CONNECTION  *TlsConn;
+  BIO             *Bio;
+
+  TlsConn = (TLS_CONNECTION *)Tls;
+
+  if (!TlsConn || !TlsConn->Ssl || !Data || !DataSize) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (SSL_use_PrivateKey_ASN1 (
+        EVP_PKEY_RSA,
+        TlsConn->Ssl,
+        Data,
+        (long)DataSize
+        ) == 1)
+  {
+    goto verify;
+  }
+}
+
+if (SSL_use_PrivateKey_ASN1 (
+      EVP_PKEY_DSA,
+      TlsConn->Ssl,
+      Data,
+      (long)DataSize
+      ) == 1)
+{
+  goto verify;
+}
+}
+
+if (SSL_use_PrivateKey_ASN1 (
+      EVP_PKEY_EC,
+      TlsConn->Ssl,
+      Data,
+      (long)DataSize
+      ) == 1)
+{
+  goto verify;
+}
+
+if (SSL_use_RSAPrivateKey_ASN1 (
+      TlsConn->Ssl,
+      Data,
+      (long)DataSize
+      ) == 1)
+{
+  goto verify;
+}
+}
+
+// Try to parse the private key in PEM format encoded PKC#8
+Bio = BIO_new_mem_buf (Data, (long)DataSize);
+if (Bio) {
+  EVP_PKEY *Pkey;
+  BOOLEAN  Verify = 0;
+
+  Pkey = PEM_read_bio_PrivateKey (Bio, NULL, NULL, NULL);
+  if (Pkey && (SSL_use_PrivateKey (TlsConn->Ssl, Pkey) == 1)) {
+    Verify = 1;
+  }
+
+  EVP_PKEY_free (Pkey);
+  BIO_free (Bio);
+
+  if (Verify) {
+    goto verify;
+  }
+}
+
+return EFI_ABORTED;
+
+verify:
+if (SSL_check_private_key (TlsConn->Ssl) == 1) {
+  return EFI_SUCCESS;
+}
+
+return EFI_ABORTED;
 }
 
 /**
