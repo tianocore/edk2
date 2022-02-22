@@ -1,0 +1,1914 @@
+From 0e554b998d5c61a8b657b727ecbe0cc0440a0d19 Mon Sep 17 00:00:00 2001
+From: Andrei Otcheretianski <andrei.otcheretianski@intel.com>
+Date: Tue, 18 Jan 2022 17:13:56 +0200
+Subject: [PATCH 2/2] CryptoPkg: Add EC API's
+
+Add EC crypto support.
+
+type=feature
+ticket=jira:WIFI-163236
+
+Change-Id: I4e2d178e513e34c265d42f9cf5d197e789630295
+Signed-off-by: Andrei Otcheretianski <andrei.otcheretianski@intel.com>
+---
+ CryptoPkg/CryptoPkg.dsc                       |   1 +
+ CryptoPkg/Driver/Crypto.c                     | 234 ++++++++++
+ CryptoPkg/Include/Library/BaseCryptLib.h      | 155 +++++++
+ .../Pcd/PcdCryptoServiceFamilyEnable.h        |  24 ++
+ .../Library/BaseCryptLib/BaseCryptLib.inf     |   1 +
+ CryptoPkg/Library/BaseCryptLib/Ec/CryptEc.c   | 403 ++++++++++++++++++
+ .../Library/BaseCryptLib/Ec/CryptEcNull.c     | 238 +++++++++++
+ .../Library/BaseCryptLib/SmmCryptLib.inf      |   1 +
+ .../BaseCryptLibNull/BaseCryptLibNull.inf     |   1 +
+ .../Library/BaseCryptLibNull/Ec/CryptEcNull.c | 238 +++++++++++
+ .../BaseCryptLibOnProtocolPpi/CryptLib.c      | 212 +++++++++
+ .../Library/Include/openssl/opensslconf.h     |   6 +-
+ CryptoPkg/Library/OpensslLib/OpensslLib.inf   |  44 ++
+ CryptoPkg/Private/Protocol/Crypto.h           | 175 ++++++++
+ 14 files changed, 1730 insertions(+), 3 deletions(-)
+ create mode 100644 CryptoPkg/Library/BaseCryptLib/Ec/CryptEc.c
+ create mode 100644 CryptoPkg/Library/BaseCryptLib/Ec/CryptEcNull.c
+ create mode 100644 CryptoPkg/Library/BaseCryptLibNull/Ec/CryptEcNull.c
+
+diff --git a/CryptoPkg/CryptoPkg.dsc b/CryptoPkg/CryptoPkg.dsc
+index 2ec4a8631b7c..a1a41e7fff38 100644
+--- a/CryptoPkg/CryptoPkg.dsc
++++ b/CryptoPkg/CryptoPkg.dsc
+@@ -166,6 +166,7 @@
+   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.TlsSet.Family                            | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.TlsGet.Family                            | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Bn.Family         | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
++  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Ec.Family         | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+ !endif
+ 
+ !if $(CRYPTO_SERVICES) == MIN_PEI
+diff --git a/CryptoPkg/Driver/Crypto.c b/CryptoPkg/Driver/Crypto.c
+index dcb48e999b86..53812c2860b0 100644
+--- a/CryptoPkg/Driver/Crypto.c
++++ b/CryptoPkg/Driver/Crypto.c
+@@ -4724,6 +4724,219 @@ CryptoServiceBigNumAddMod(
+   return CALL_BASECRYPTLIB (Bn.Services.AddMod, BigNumAddMod, (BnA, BnB, BnM, BnRes), EFI_UNSUPPORTED);
+ }
+ 
++
++VOID *
++EFIAPI
++CryptoServiceEcGroupInit(
++  IN UINTN Group
++  )
++{
++  return CALL_BASECRYPTLIB (Ec.Services.GroupInit, EcGroupInit, (Group), NULL);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceEcGroupGetCurve(
++  IN CONST VOID *EcGroup,
++  OUT VOID *BnPrime,
++  OUT VOID *BnA,
++  OUT VOID *BnB,
++  IN VOID *BnCtx
++  )
++{
++  return CALL_BASECRYPTLIB (Ec.Services.GroupGetCurve, EcGroupGetCurve, (EcGroup, BnPrime, BnA, BnB, BnCtx), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceEcGroupGetOrder(
++  IN VOID *EcGroup,
++  OUT VOID *BnOrder
++  )
++{
++  return CALL_BASECRYPTLIB (Ec.Services.GroupGetOrder, EcGroupGetOrder, (EcGroup, BnOrder), EFI_UNSUPPORTED);
++}
++
++VOID
++EFIAPI
++CryptoServiceEcGroupFree(
++  IN VOID *EcGroup
++  )
++{
++  CALL_VOID_BASECRYPTLIB (Ec.Services.GroupFree, EcGroupFree, (EcGroup));
++}
++
++VOID *
++EFIAPI
++CryptoServiceEcPointInit(
++  IN CONST VOID *EcGroup
++  )
++{
++  return CALL_BASECRYPTLIB (Ec.Services.PointInit, EcPointInit, (EcGroup), NULL);
++}
++
++VOID
++EFIAPI
++CryptoServiceEcPointDeInit(
++  IN VOID *EcPoint,
++  IN BOOLEAN Clear
++  )
++{
++  CALL_VOID_BASECRYPTLIB (Ec.Services.PointDeInit, EcPointDeInit, (EcPoint, Clear));
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceEcPointGetAffineCoordinates(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint,
++  OUT VOID *BnX,
++  OUT VOID *BnY,
++  IN VOID *BnCtx
++)
++{
++  return CALL_BASECRYPTLIB (Ec.Services.PointGetAffineCoordinates, EcPointGetAffineCoordinates, (EcGroup, EcPoint, BnX, BnY, BnCtx), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceEcPointSetAffineCoordinates(
++  IN CONST VOID *EcGroup,
++  IN VOID *EcPoint,
++  IN CONST VOID *BnX,
++  IN CONST VOID *BnY,
++  IN VOID *BnCtx
++)
++{
++  return CALL_BASECRYPTLIB (Ec.Services.PointSetAffineCoordinates, EcPointSetAffineCoordinates, (EcGroup, EcPoint, BnX, BnY, BnCtx), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceEcPointAdd(
++  IN CONST VOID *EcGroup,
++  OUT VOID *EcPointResult,
++  IN CONST VOID *EcPointA,
++  IN CONST VOID *EcPointB,
++  IN VOID *BnCtx
++)
++{
++  return CALL_BASECRYPTLIB (Ec.Services.PointAdd, EcPointAdd, (EcGroup, EcPointResult, EcPointA, EcPointB, BnCtx), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceEcPointMul(
++  IN CONST VOID *EcGroup,
++  OUT VOID *EcPointResult,
++  IN CONST VOID *EcPoint,
++  IN CONST VOID *BnPScalar,
++  IN VOID *BnCtx
++)
++{
++  return CALL_BASECRYPTLIB (Ec.Services.PointMul, EcPointMul, (EcGroup, EcPointResult, EcPoint, BnPScalar, BnCtx), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceEcPointInvert(
++  IN CONST VOID *EcGroup,
++  IN OUT VOID *EcPoint,
++  IN VOID *BnCtx
++)
++{
++  return CALL_BASECRYPTLIB (Ec.Services.PointInvert, EcPointInvert, (EcGroup, EcPoint, BnCtx), EFI_UNSUPPORTED);
++}
++
++BOOLEAN
++EFIAPI
++CryptoServiceEcPointIsOnCurve(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint,
++  IN VOID *BnCtx
++)
++{
++  return CALL_BASECRYPTLIB (Ec.Services.PointIsOnCurve, EcPointIsOnCurve, (EcGroup, EcPoint, BnCtx), FALSE);
++}
++
++BOOLEAN
++EFIAPI
++CryptoServiceEcPointIsAtInfinity(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint
++)
++{
++    return CALL_BASECRYPTLIB (Ec.Services.PointIsAtInfinity, EcPointIsAtInfinity, (EcGroup, EcPoint), FALSE);
++}
++
++BOOLEAN
++EFIAPI
++CryptoServiceEcPointEqual(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPointA,
++  IN CONST VOID *EcPointB,
++  IN VOID *BnCtx
++  )
++{
++  return CALL_BASECRYPTLIB (Ec.Services.PointEqual, EcPointEqual, (EcGroup, EcPointA, EcPointB, BnCtx), FALSE);
++}
++
++
++EFI_STATUS
++EFIAPI
++CryptoServiceEcPointSetCompressedCoordinates(
++  IN CONST VOID *EcGroup,
++  IN VOID *EcPoint,
++  IN CONST VOID *BnX,
++  IN UINT8 YBit,
++  IN VOID *BnCtx
++)
++{
++  return CALL_BASECRYPTLIB (Ec.Services.PointSetCompressedCoordinates, EcPointSetCompressedCoordinates, (EcGroup, EcPoint, BnX, YBit, BnCtx), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceEcDhGenKey(
++  IN UINTN Group,
++  OUT VOID **PKey
++  )
++{
++  return CALL_BASECRYPTLIB (Ec.Services.DhGenKey, EcDhGenKey, (Group, PKey), EFI_UNSUPPORTED);
++}
++
++VOID
++EFIAPI
++CryptoServiceEcDhKeyFree(
++  IN VOID *PKey
++  )
++{
++  CALL_VOID_BASECRYPTLIB (Ec.Services.DhKeyFree, EcDhKeyFree, (PKey));
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceEcDhGetPubKey(
++  IN VOID *PKey,
++  OUT VOID *EcPoint
++  )
++{
++  return CALL_BASECRYPTLIB (Ec.Services.DhGetPubKey, EcDhGetPubKey, (PKey, EcPoint), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceEcDhDeriveSecret(
++  IN VOID *PKey,
++  IN UINT8 Group,
++  IN VOID *EcPointPublic,
++  OUT UINTN *SecretSize,
++  OUT UINT8 **Secret
++  )
++{
++  return CALL_BASECRYPTLIB (Ec.Services.DhDeriveSecret, EcDhDeriveSecret, (PKey, Group, EcPointPublic, SecretSize, Secret), EFI_UNSUPPORTED);
++}
++
+ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
+   /// Version
+   CryptoServiceGetCryptoVersion,
+@@ -4952,4 +5165,25 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
+   CryptoServiceBigNumContextFree,
+   CryptoServiceBigNumSetUint,
+   CryptoServiceBigNumAddMod,
++
++  //EC
++  CryptoServiceEcGroupInit,
++  CryptoServiceEcGroupGetCurve,
++  CryptoServiceEcGroupGetOrder,
++  CryptoServiceEcGroupFree,
++  CryptoServiceEcPointInit,
++  CryptoServiceEcPointDeInit,
++  CryptoServiceEcPointGetAffineCoordinates,
++  CryptoServiceEcPointSetAffineCoordinates,
++  CryptoServiceEcPointAdd,
++  CryptoServiceEcPointMul,
++  CryptoServiceEcPointInvert,
++  CryptoServiceEcPointIsOnCurve,
++  CryptoServiceEcPointIsAtInfinity,
++  CryptoServiceEcPointEqual,
++  CryptoServiceEcPointSetCompressedCoordinates,
++  CryptoServiceEcDhGenKey,
++  CryptoServiceEcDhKeyFree,
++  CryptoServiceEcDhGetPubKey,
++  CryptoServiceEcDhDeriveSecret,
+ };
+diff --git a/CryptoPkg/Include/Library/BaseCryptLib.h b/CryptoPkg/Include/Library/BaseCryptLib.h
+index e3d23b2710e1..7671074f313f 100644
+--- a/CryptoPkg/Include/Library/BaseCryptLib.h
++++ b/CryptoPkg/Include/Library/BaseCryptLib.h
+@@ -2806,4 +2806,159 @@ BigNumAddMod(
+   OUT VOID *BnRes
+   );
+ 
++VOID *
++EFIAPI
++EcGroupInit(
++  IN UINTN Group
++  );
++
++EFI_STATUS
++EFIAPI
++EcGroupGetCurve(
++  IN CONST VOID *EcGroup,
++  OUT VOID *BnPrime,
++  OUT VOID *BnA,
++  OUT VOID *BnB,
++  IN VOID *BnCtx
++  );
++
++EFI_STATUS
++EFIAPI
++EcGroupGetOrder(
++  IN VOID *EcGroup,
++  OUT VOID *BnOrder
++  );
++
++VOID
++EFIAPI
++EcGroupFree(
++  IN VOID *EcGroup
++  );
++
++VOID *
++EFIAPI
++EcPointInit(
++  IN CONST VOID *EcGroup
++  );
++
++VOID
++EFIAPI
++EcPointDeInit(
++  IN VOID *EcPoint,
++  IN BOOLEAN Clear
++  );
++
++EFI_STATUS
++EFIAPI
++EcPointGetAffineCoordinates(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint,
++  OUT VOID *BnX,
++  OUT VOID *BnY,
++  IN VOID *BnCtx
++);
++
++EFI_STATUS
++EFIAPI
++EcPointSetAffineCoordinates(
++  IN CONST VOID *EcGroup,
++  IN VOID *EcPoint,
++  IN CONST VOID *BnX,
++  IN CONST VOID *BnY,
++  IN VOID *BnCtx
++);
++
++EFI_STATUS
++EFIAPI
++EcPointAdd(
++  IN CONST VOID *EcGroup,
++  OUT VOID *EcPointResult,
++  IN CONST VOID *EcPointA,
++  IN CONST VOID *EcPointB,
++  IN VOID *BnCtx
++);
++
++EFI_STATUS
++EFIAPI
++EcPointMul(
++  IN CONST VOID *EcGroup,
++  OUT VOID *EcPointResult,
++  IN CONST VOID *EcPoint,
++  IN CONST VOID *BnPScalar,
++  IN VOID *BnCtx
++);
++
++EFI_STATUS
++EFIAPI
++EcPointInvert(
++  IN CONST VOID *EcGroup,
++  IN OUT VOID *EcPoint,
++  IN VOID *BnCtx
++);
++
++BOOLEAN
++EFIAPI
++EcPointIsOnCurve(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint,
++  IN VOID *BnCtx
++);
++
++BOOLEAN
++EFIAPI
++EcPointIsAtInfinity(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint
++);
++
++BOOLEAN
++EFIAPI
++EcPointEqual(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPointA,
++  IN CONST VOID *EcPointB,
++  IN VOID *BnCtx
++  );
++
++
++EFI_STATUS
++EFIAPI
++EcPointSetCompressedCoordinates(
++  IN CONST VOID *EcGroup,
++  IN VOID *EcPoint,
++  IN CONST VOID *BnX,
++  IN UINT8 YBit,
++  IN VOID *BnCtx
++);
++
++EFI_STATUS
++EFIAPI
++EcDhGenKey(
++  IN UINTN Group,
++  OUT VOID **PKey
++  );
++
++VOID
++EFIAPI
++EcDhKeyFree(
++  IN VOID *PKey
++  );
++
++EFI_STATUS
++EFIAPI
++EcDhGetPubKey(
++  IN VOID *PKey,
++  OUT VOID *EcPoint
++  );
++
++EFI_STATUS
++EFIAPI
++EcDhDeriveSecret(
++  IN VOID *PKey,
++  IN UINT8 Group,
++  IN VOID *EcPointPublic,
++  OUT UINTN *SecretSize,
++  OUT UINT8 **Secret
++  );
++
+ #endif // __BASE_CRYPT_LIB_H__
+diff --git a/CryptoPkg/Include/Pcd/PcdCryptoServiceFamilyEnable.h b/CryptoPkg/Include/Pcd/PcdCryptoServiceFamilyEnable.h
+index ac9137806a18..0a34fa3b36f0 100644
+--- a/CryptoPkg/Include/Pcd/PcdCryptoServiceFamilyEnable.h
++++ b/CryptoPkg/Include/Pcd/PcdCryptoServiceFamilyEnable.h
+@@ -318,6 +318,30 @@ typedef struct {
+     } Services;
+     UINT32 Family;
+   } Bn;
++  union {
++    struct {
++      UINT8 GroupInit:1;
++      UINT8 GroupGetCurve:1;
++      UINT8 GroupGetOrder:1;
++      UINT8 GroupFree:1;
++      UINT8 PointInit:1;
++      UINT8 PointDeInit:1;
++      UINT8 PointGetAffineCoordinates:1;
++      UINT8 PointSetAffineCoordinates:1;
++      UINT8 PointAdd:1;
++      UINT8 PointMul:1;
++      UINT8 PointInvert:1;
++      UINT8 PointIsOnCurve:1;
++      UINT8 PointIsAtInfinity:1;
++      UINT8 PointEqual:1;
++      UINT8 PointSetCompressedCoordinates:1;
++      UINT8 DhGenKey:1;
++      UINT8 DhKeyFree:1;
++      UINT8 DhGetPubKey:1;
++      UINT8 DhDeriveSecret:1;
++    } Services;
++    UINT32 Family;
++  } Ec;
+ } PCD_CRYPTO_SERVICE_FAMILY_ENABLE;
+ 
+ #endif
+diff --git a/CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf b/CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+index 3c3564197ee7..1a0b57e805b7 100644
+--- a/CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
++++ b/CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+@@ -53,6 +53,7 @@
+   Pk/CryptRsaPssSign.c
+   Pem/CryptPem.c
+   Bn/CryptBn.c
++  Ec/CryptEc.c
+ 
+   SysCall/CrtWrapper.c
+   SysCall/TimerWrapper.c
+diff --git a/CryptoPkg/Library/BaseCryptLib/Ec/CryptEc.c b/CryptoPkg/Library/BaseCryptLib/Ec/CryptEc.c
+new file mode 100644
+index 000000000000..1c6228c9b54a
+--- /dev/null
++++ b/CryptoPkg/Library/BaseCryptLib/Ec/CryptEc.c
+@@ -0,0 +1,403 @@
++/** @file
++  Big number API implementation based on OpenSSL
++
++  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
++  SPDX-License-Identifier: BSD-2-Clause-Patent
++
++**/
++
++#include <Base.h>
++#include <Library/BaseLib.h>
++#include <Library/BaseMemoryLib.h>
++#include <Library/MemoryAllocationLib.h>
++#include <Library/BaseCryptLib.h>
++#include <Library/DebugLib.h>
++#include <Library/PcdLib.h>
++
++#include <openssl/opensslv.h>
++#include <openssl/err.h>
++#include <openssl/bn.h>
++#include <openssl/evp.h>
++#include <openssl/dh.h>
++#include <openssl/hmac.h>
++#include <openssl/ec.h>
++
++
++static
++int
++GroupToNid(
++  UINTN Group
++  )
++{
++  int Nid;
++
++  switch (Group) {
++  case 19:
++    Nid = NID_X9_62_prime256v1;
++    break;
++  case 20:
++    Nid = NID_secp384r1;
++    break;
++  case 21:
++    Nid = NID_secp521r1;
++    break;
++  case 25:
++    Nid = NID_X9_62_prime192v1;
++    break;
++  case 26:
++    Nid = NID_secp224r1;
++    break;
++  default:
++    return -1;
++  }
++
++  return Nid;
++}
++
++VOID *
++EFIAPI
++EcGroupInit(
++  IN UINTN Group
++  )
++{
++  int Nid = GroupToNid(Group);
++
++  if (Nid < 0)
++    return NULL;
++
++  return EC_GROUP_new_by_curve_name(Nid);
++}
++
++EFI_STATUS
++EFIAPI
++EcGroupGetCurve(
++  IN CONST VOID *EcGroup,
++  OUT VOID *BnPrime,
++  OUT VOID *BnA,
++  OUT VOID *BnB,
++  IN VOID *BnCtx
++  )
++{
++  if (EC_GROUP_get_curve(EcGroup, BnPrime, BnA, BnB, BnCtx))
++    return EFI_SUCCESS;
++  else
++    return EFI_DEVICE_ERROR;
++}
++
++EFI_STATUS
++EFIAPI
++EcGroupGetOrder(
++  IN VOID *EcGroup,
++  OUT VOID *BnOrder
++  )
++{
++  if (EC_GROUP_get_order(EcGroup, BnOrder, NULL))
++    return EFI_SUCCESS;
++  else
++    return EFI_DEVICE_ERROR;
++}
++
++VOID
++EFIAPI
++EcGroupFree(
++  IN VOID *EcGroup
++  )
++{
++  EC_GROUP_free(EcGroup);
++}
++
++VOID *
++EFIAPI
++EcPointInit(
++  IN CONST VOID *EcGroup
++  )
++{
++  return EC_POINT_new(EcGroup);
++}
++
++VOID
++EFIAPI
++EcPointDeInit(
++  IN VOID *EcPoint,
++  IN BOOLEAN Clear
++  )
++{
++  if (Clear)
++    EC_POINT_clear_free(EcPoint);
++  else
++    EC_POINT_free(EcPoint);
++}
++
++EFI_STATUS
++EFIAPI
++EcPointGetAffineCoordinates(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint,
++  OUT VOID *BnX,
++  OUT VOID *BnY,
++  IN VOID *BnCtx
++)
++{
++  if (!EC_POINT_get_affine_coordinates(EcGroup, EcPoint, BnX, BnY, BnCtx))
++    return EFI_INVALID_PARAMETER;
++
++  return EFI_SUCCESS;
++}
++
++EFI_STATUS
++EFIAPI
++EcPointSetAffineCoordinates(
++  IN CONST VOID *EcGroup,
++  IN VOID *EcPoint,
++  IN CONST VOID *BnX,
++  IN CONST VOID *BnY,
++  IN VOID *BnCtx
++)
++{
++  if (!EC_POINT_set_affine_coordinates(EcGroup, EcPoint, BnX, BnY, BnCtx))
++    return EFI_INVALID_PARAMETER;
++
++  return EFI_SUCCESS;
++}
++
++EFI_STATUS
++EFIAPI
++EcPointAdd(
++  IN CONST VOID *EcGroup,
++  OUT VOID *EcPointResult,
++  IN CONST VOID *EcPointA,
++  IN CONST VOID *EcPointB,
++  IN VOID *BnCtx
++)
++{
++  if (!EC_POINT_add(EcGroup, EcPointResult, EcPointA, EcPointB, BnCtx))
++    return EFI_INVALID_PARAMETER;
++
++  return EFI_SUCCESS;
++}
++
++EFI_STATUS
++EFIAPI
++EcPointMul(
++  IN CONST VOID *EcGroup,
++  OUT VOID *EcPointResult,
++  IN CONST VOID *EcPoint,
++  IN CONST VOID *BnPScalar,
++  IN VOID *BnCtx
++)
++{
++  if (!EC_POINT_mul(EcGroup, EcPointResult, NULL, EcPoint, BnPScalar, BnCtx))
++    return EFI_INVALID_PARAMETER;
++
++  return EFI_SUCCESS;
++}
++
++EFI_STATUS
++EFIAPI
++EcPointInvert(
++  IN CONST VOID *EcGroup,
++  IN OUT VOID *EcPoint,
++  IN VOID *BnCtx
++)
++{
++  if (!EC_POINT_invert(EcGroup, EcPoint, BnCtx))
++    return EFI_INVALID_PARAMETER;
++
++  return EFI_SUCCESS;
++}
++
++BOOLEAN
++EFIAPI
++EcPointIsOnCurve(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint,
++  IN VOID *BnCtx
++)
++{
++  return (EC_POINT_is_on_curve(EcGroup, EcPoint, BnCtx) == 1);
++}
++
++BOOLEAN
++EFIAPI
++EcPointIsAtInfinity(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint
++)
++{
++  return (EC_POINT_is_at_infinity(EcGroup, EcPoint) == 1);
++}
++
++BOOLEAN
++EFIAPI
++EcPointEqual(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPointA,
++  IN CONST VOID *EcPointB,
++  IN VOID *BnCtx
++  )
++{
++  return (EC_POINT_cmp(EcGroup, EcPointA, EcPointB, BnCtx) == 0);
++}
++
++
++EFI_STATUS
++EFIAPI
++EcPointSetCompressedCoordinates(
++  IN CONST VOID *EcGroup,
++  IN VOID *EcPoint,
++  IN CONST VOID *BnX,
++  IN UINT8 YBit,
++  IN VOID *BnCtx
++)
++{
++  if (!EC_POINT_set_compressed_coordinates(EcGroup, EcPoint, BnX, YBit, BnCtx))
++    return EFI_INVALID_PARAMETER;
++
++  return EFI_SUCCESS;
++}
++
++EFI_STATUS
++EFIAPI
++EcDhGenKey(
++  IN UINTN Group,
++  OUT VOID **PKey
++  )
++{
++  EVP_PKEY *Params = NULL;
++  EC_KEY *EcParams = NULL;
++  EVP_PKEY_CTX *Kctx = NULL;
++  EFI_STATUS Status = EFI_DEVICE_ERROR;
++  int Nid = GroupToNid(Group);
++
++  if (Nid < 0)
++    return EFI_UNSUPPORTED;
++
++  EcParams = EC_KEY_new_by_curve_name(Nid);
++  if (!EcParams)
++    goto fail;
++
++  EC_KEY_set_asn1_flag(EcParams, OPENSSL_EC_NAMED_CURVE);
++  Params = EVP_PKEY_new();
++  if (!Params || EVP_PKEY_set1_EC_KEY(Params, EcParams) != 1)
++    goto fail;
++
++  Kctx = EVP_PKEY_CTX_new(Params, NULL);
++  if (!Kctx)
++    goto fail;
++
++  if (EVP_PKEY_keygen_init(Kctx) != 1)
++    goto fail;
++
++  // Assume RAND_seed was called
++  if (EVP_PKEY_keygen(Kctx, (EVP_PKEY **)PKey) != 1)
++    goto fail;
++
++  Status = EFI_SUCCESS;
++
++fail:
++  EC_KEY_free(EcParams);
++  EVP_PKEY_free(Params);
++  EVP_PKEY_CTX_free(Kctx);
++
++  return Status;
++}
++
++VOID
++EFIAPI
++EcDhKeyFree(
++  IN VOID *PKey
++  )
++{
++  EVP_PKEY_free(PKey);
++}
++
++EFI_STATUS
++EFIAPI
++EcDhGetPubKey(
++  IN VOID *PKey,
++  OUT VOID *EcPoint
++  )
++{
++  EC_KEY *EcKey;
++  const EC_POINT *Pubkey;
++  EFI_STATUS Status = EFI_DEVICE_ERROR;
++
++  if (!EcPoint)
++    return EFI_INVALID_PARAMETER;
++
++  EcKey = EVP_PKEY_get1_EC_KEY(PKey);
++  if (!EcKey)
++    return EFI_DEVICE_ERROR;
++
++  Pubkey = EC_KEY_get0_public_key(EcKey);
++  if (!Pubkey)
++    goto out;
++
++  if (!EC_POINT_copy(EcPoint, Pubkey))
++    goto out;
++
++  Status = EFI_SUCCESS;
++out:
++  EC_KEY_free(EcKey);
++  return Status;
++}
++
++EFI_STATUS
++EFIAPI
++EcDhDeriveSecret(
++  IN VOID *PKey,
++  IN UINT8 Group,
++  IN VOID *EcPointPublic,
++  OUT UINTN *SecretSize,
++  OUT UINT8 **Secret
++  )
++{
++  EVP_PKEY_CTX *Ctx = NULL;
++  EVP_PKEY *PeerKey = NULL;
++  EC_KEY *EcKey = NULL;
++  int Nid = GroupToNid(Group);
++  UINTN Len;
++  UINT8 *Buf;
++  EFI_STATUS Status = EFI_DEVICE_ERROR;
++
++  if (Nid < 0)
++    return EFI_UNSUPPORTED;
++
++  if (!Secret || !SecretSize)
++    return EFI_INVALID_PARAMETER;
++
++  EcKey = EC_KEY_new_by_curve_name(Nid);
++  if (!EcKey || EC_KEY_set_public_key(EcKey, EcPointPublic) != 1)
++   goto fail;
++
++  PeerKey = EVP_PKEY_new();
++  if (!PeerKey || EVP_PKEY_set1_EC_KEY(PeerKey, EcKey) != 1)
++    goto fail;
++
++  Ctx = EVP_PKEY_CTX_new(PKey, NULL);
++  if (!Ctx || EVP_PKEY_derive_init(Ctx) != 1 ||
++      EVP_PKEY_derive_set_peer(Ctx, PeerKey) != 1 ||
++      EVP_PKEY_derive(Ctx, NULL, &Len) != 1)
++    goto fail;
++
++  Buf = AllocatePool(Len);
++  if (!Buf)
++    goto fail;
++
++  if (EVP_PKEY_derive(Ctx, Buf, &Len) != 1) {
++    FreePool(Buf);
++    goto fail;
++  }
++
++  *SecretSize = Len;
++  *Secret = Buf;
++  Status = EFI_SUCCESS;
++
++fail:
++  EC_KEY_free(EcKey);
++  EVP_PKEY_CTX_free(Ctx);
++  EVP_PKEY_free(PeerKey);
++
++  return Status;
++}
++
+diff --git a/CryptoPkg/Library/BaseCryptLib/Ec/CryptEcNull.c b/CryptoPkg/Library/BaseCryptLib/Ec/CryptEcNull.c
+new file mode 100644
+index 000000000000..bac949404751
+--- /dev/null
++++ b/CryptoPkg/Library/BaseCryptLib/Ec/CryptEcNull.c
+@@ -0,0 +1,238 @@
++/** @file
++  Big number API implementation based on OpenSSL
++
++  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
++  SPDX-License-Identifier: BSD-2-Clause-Patent
++
++**/
++
++#include <Library/BaseCryptLib.h>
++#include <Library/DebugLib.h>
++
++VOID *
++EFIAPI
++EcGroupInit(
++  IN UINTN Group
++  )
++{
++  ASSERT(FALSE);
++  return NULL;
++}
++
++EFI_STATUS
++EFIAPI
++EcGroupGetCurve(
++  IN CONST VOID *EcGroup,
++  OUT VOID *BnPrime,
++  OUT VOID *BnA,
++  OUT VOID *BnB,
++  IN VOID *BnCtx
++  )
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++EFI_STATUS
++EFIAPI
++EcGroupGetOrder(
++  IN VOID *EcGroup,
++  OUT VOID *BnOrder
++  )
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++VOID
++EFIAPI
++EcGroupFree(
++  IN VOID *EcGroup
++  )
++{
++  ASSERT(FALSE);
++}
++
++VOID *
++EFIAPI
++EcPointInit(
++  IN CONST VOID *EcGroup
++  )
++{
++  ASSERT(FALSE);
++  return NULL;
++}
++
++VOID
++EFIAPI
++EcPointDeInit(
++  IN VOID *EcPoint,
++  IN BOOLEAN Clear
++  )
++{
++  ASSERT(FALSE);
++}
++
++EFI_STATUS
++EFIAPI
++EcPointGetAffineCoordinates(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint,
++  OUT VOID *BnX,
++  OUT VOID *BnY,
++  IN VOID *BnCtx
++)
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++EFI_STATUS
++EFIAPI
++EcPointSetAffineCoordinates(
++  IN CONST VOID *EcGroup,
++  IN VOID *EcPoint,
++  IN CONST VOID *BnX,
++  IN CONST VOID *BnY,
++  IN VOID *BnCtx
++)
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++EFI_STATUS
++EFIAPI
++EcPointAdd(
++  IN CONST VOID *EcGroup,
++  OUT VOID *EcPointResult,
++  IN CONST VOID *EcPointA,
++  IN CONST VOID *EcPointB,
++  IN VOID *BnCtx
++)
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++EFI_STATUS
++EFIAPI
++EcPointMul(
++  IN CONST VOID *EcGroup,
++  OUT VOID *EcPointResult,
++  IN CONST VOID *EcPoint,
++  IN CONST VOID *BnPScalar,
++  IN VOID *BnCtx
++)
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++EFI_STATUS
++EFIAPI
++EcPointInvert(
++  IN CONST VOID *EcGroup,
++  IN OUT VOID *EcPoint,
++  IN VOID *BnCtx
++)
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++BOOLEAN
++EFIAPI
++EcPointIsOnCurve(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint,
++  IN VOID *BnCtx
++)
++{
++  ASSERT(FALSE);
++  return FALSE;
++}
++
++BOOLEAN
++EFIAPI
++EcPointIsAtInfinity(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint
++  )
++{
++  ASSERT(FALSE);
++  return FALSE;
++}
++
++BOOLEAN
++EFIAPI
++EcPointEqual(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPointA,
++  IN CONST VOID *EcPointB,
++  IN VOID *BnCtx
++  )
++{
++  ASSERT(FALSE);
++  return FALSE;
++}
++
++
++EFI_STATUS
++EFIAPI
++EcPointSetCompressedCoordinates(
++  IN CONST VOID *EcGroup,
++  IN VOID *EcPoint,
++  IN CONST VOID *BnX,
++  IN UINT8 YBit,
++  IN VOID *BnCtx
++)
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++EFI_STATUS
++EFIAPI
++EcDhGenKey(
++  IN UINTN Group,
++  OUT VOID **PKey
++  )
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++VOID
++EFIAPI
++EcDhKeyFree(
++  IN VOID *PKey
++  )
++{
++  ASSERT(FALSE);
++}
++
++EFI_STATUS
++EFIAPI
++EcDhGetPubKey(
++  IN VOID *PKey,
++  OUT VOID *EcPoint
++  )
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++EFI_STATUS
++EFIAPI
++EcDhDeriveSecret(
++  IN VOID *PKey,
++  IN UINT8 Group,
++  IN VOID *EcPointPublic,
++  OUT UINTN *SecretSize,
++  OUT UINT8 **Secret
++  )
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
+diff --git a/CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf b/CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
+index 8a3fec9b076c..3325a4e68fd9 100644
+--- a/CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
++++ b/CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
+@@ -57,6 +57,7 @@
+   Pk/CryptRsaPssSignNull.c
+   Pem/CryptPem.c
+   Bn/CryptBnNull.c
++  Ec/CryptEc.c
+   SysCall/CrtWrapper.c
+   SysCall/ConstantTimeClock.c
+   SysCall/BaseMemAllocation.c
+diff --git a/CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf b/CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf
+index 1fb4d5c54d4f..90637e9a9908 100644
+--- a/CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf
++++ b/CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf
+@@ -53,6 +53,7 @@
+   Pk/CryptRsaPssNull.c
+   Pk/CryptRsaPssSignNull.c
+   Bn/CryptBnNull.c
++  Ec/CryptEcNull.c
+ 
+ [Packages]
+   MdePkg/MdePkg.dec
+diff --git a/CryptoPkg/Library/BaseCryptLibNull/Ec/CryptEcNull.c b/CryptoPkg/Library/BaseCryptLibNull/Ec/CryptEcNull.c
+new file mode 100644
+index 000000000000..bac949404751
+--- /dev/null
++++ b/CryptoPkg/Library/BaseCryptLibNull/Ec/CryptEcNull.c
+@@ -0,0 +1,238 @@
++/** @file
++  Big number API implementation based on OpenSSL
++
++  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
++  SPDX-License-Identifier: BSD-2-Clause-Patent
++
++**/
++
++#include <Library/BaseCryptLib.h>
++#include <Library/DebugLib.h>
++
++VOID *
++EFIAPI
++EcGroupInit(
++  IN UINTN Group
++  )
++{
++  ASSERT(FALSE);
++  return NULL;
++}
++
++EFI_STATUS
++EFIAPI
++EcGroupGetCurve(
++  IN CONST VOID *EcGroup,
++  OUT VOID *BnPrime,
++  OUT VOID *BnA,
++  OUT VOID *BnB,
++  IN VOID *BnCtx
++  )
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++EFI_STATUS
++EFIAPI
++EcGroupGetOrder(
++  IN VOID *EcGroup,
++  OUT VOID *BnOrder
++  )
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++VOID
++EFIAPI
++EcGroupFree(
++  IN VOID *EcGroup
++  )
++{
++  ASSERT(FALSE);
++}
++
++VOID *
++EFIAPI
++EcPointInit(
++  IN CONST VOID *EcGroup
++  )
++{
++  ASSERT(FALSE);
++  return NULL;
++}
++
++VOID
++EFIAPI
++EcPointDeInit(
++  IN VOID *EcPoint,
++  IN BOOLEAN Clear
++  )
++{
++  ASSERT(FALSE);
++}
++
++EFI_STATUS
++EFIAPI
++EcPointGetAffineCoordinates(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint,
++  OUT VOID *BnX,
++  OUT VOID *BnY,
++  IN VOID *BnCtx
++)
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++EFI_STATUS
++EFIAPI
++EcPointSetAffineCoordinates(
++  IN CONST VOID *EcGroup,
++  IN VOID *EcPoint,
++  IN CONST VOID *BnX,
++  IN CONST VOID *BnY,
++  IN VOID *BnCtx
++)
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++EFI_STATUS
++EFIAPI
++EcPointAdd(
++  IN CONST VOID *EcGroup,
++  OUT VOID *EcPointResult,
++  IN CONST VOID *EcPointA,
++  IN CONST VOID *EcPointB,
++  IN VOID *BnCtx
++)
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++EFI_STATUS
++EFIAPI
++EcPointMul(
++  IN CONST VOID *EcGroup,
++  OUT VOID *EcPointResult,
++  IN CONST VOID *EcPoint,
++  IN CONST VOID *BnPScalar,
++  IN VOID *BnCtx
++)
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++EFI_STATUS
++EFIAPI
++EcPointInvert(
++  IN CONST VOID *EcGroup,
++  IN OUT VOID *EcPoint,
++  IN VOID *BnCtx
++)
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++BOOLEAN
++EFIAPI
++EcPointIsOnCurve(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint,
++  IN VOID *BnCtx
++)
++{
++  ASSERT(FALSE);
++  return FALSE;
++}
++
++BOOLEAN
++EFIAPI
++EcPointIsAtInfinity(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint
++  )
++{
++  ASSERT(FALSE);
++  return FALSE;
++}
++
++BOOLEAN
++EFIAPI
++EcPointEqual(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPointA,
++  IN CONST VOID *EcPointB,
++  IN VOID *BnCtx
++  )
++{
++  ASSERT(FALSE);
++  return FALSE;
++}
++
++
++EFI_STATUS
++EFIAPI
++EcPointSetCompressedCoordinates(
++  IN CONST VOID *EcGroup,
++  IN VOID *EcPoint,
++  IN CONST VOID *BnX,
++  IN UINT8 YBit,
++  IN VOID *BnCtx
++)
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++EFI_STATUS
++EFIAPI
++EcDhGenKey(
++  IN UINTN Group,
++  OUT VOID **PKey
++  )
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++VOID
++EFIAPI
++EcDhKeyFree(
++  IN VOID *PKey
++  )
++{
++  ASSERT(FALSE);
++}
++
++EFI_STATUS
++EFIAPI
++EcDhGetPubKey(
++  IN VOID *PKey,
++  OUT VOID *EcPoint
++  )
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
++
++EFI_STATUS
++EFIAPI
++EcDhDeriveSecret(
++  IN VOID *PKey,
++  IN UINT8 Group,
++  IN VOID *EcPointPublic,
++  OUT UINTN *SecretSize,
++  OUT UINT8 **Secret
++  )
++{
++  ASSERT(FALSE);
++  return EFI_UNSUPPORTED;
++}
+diff --git a/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/CryptLib.c b/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/CryptLib.c
+index 47a0e8eb5347..172aad3fad32 100644
+--- a/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/CryptLib.c
++++ b/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/CryptLib.c
+@@ -3839,3 +3839,215 @@ BigNumAddMod(
+   CALL_CRYPTO_SERVICE (BigNumAddMod, (BnA, BnB, BnM, BnRes), EFI_UNSUPPORTED);
+ }
+ 
++VOID *
++EFIAPI
++EcGroupInit(
++  IN UINTN Group
++  )
++{
++   CALL_CRYPTO_SERVICE (EcGroupInit, (Group), NULL);
++}
++
++EFI_STATUS
++EFIAPI
++EcGroupGetCurve(
++  IN CONST VOID *EcGroup,
++  OUT VOID *BnPrime,
++  OUT VOID *BnA,
++  OUT VOID *BnB,
++  IN VOID *BnCtx
++  )
++{
++   CALL_CRYPTO_SERVICE (EcGroupGetCurve, (EcGroup, BnPrime, BnA, BnB, BnCtx), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++EcGroupGetOrder(
++  IN VOID *EcGroup,
++  OUT VOID *BnOrder
++  )
++{
++   CALL_CRYPTO_SERVICE (EcGroupGetOrder, (EcGroup, BnOrder), EFI_UNSUPPORTED);
++}
++
++VOID
++EFIAPI
++EcGroupFree(
++  IN VOID *EcGroup
++  )
++{
++  CALL_VOID_CRYPTO_SERVICE (EcGroupFree, (EcGroup));
++}
++
++VOID *
++EFIAPI
++EcPointInit(
++  IN CONST VOID *EcGroup
++  )
++{
++   CALL_CRYPTO_SERVICE (EcPointInit, (EcGroup), NULL);
++}
++
++VOID
++EFIAPI
++EcPointDeInit(
++  IN VOID *EcPoint,
++  IN BOOLEAN Clear
++  )
++{
++  CALL_VOID_CRYPTO_SERVICE (EcPointDeInit, (EcPoint, Clear));
++}
++
++EFI_STATUS
++EFIAPI
++EcPointGetAffineCoordinates(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint,
++  OUT VOID *BnX,
++  OUT VOID *BnY,
++  IN VOID *BnCtx
++)
++{
++   CALL_CRYPTO_SERVICE (EcPointGetAffineCoordinates, (EcGroup, EcPoint, BnX, BnY, BnCtx), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++EcPointSetAffineCoordinates(
++  IN CONST VOID *EcGroup,
++  IN VOID *EcPoint,
++  IN CONST VOID *BnX,
++  IN CONST VOID *BnY,
++  IN VOID *BnCtx
++)
++{
++   CALL_CRYPTO_SERVICE (EcPointSetAffineCoordinates, (EcGroup, EcPoint, BnX, BnY, BnCtx), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++EcPointAdd(
++  IN CONST VOID *EcGroup,
++  OUT VOID *EcPointResult,
++  IN CONST VOID *EcPointA,
++  IN CONST VOID *EcPointB,
++  IN VOID *BnCtx
++)
++{
++   CALL_CRYPTO_SERVICE (EcPointAdd, (EcGroup, EcPointResult, EcPointA, EcPointB, BnCtx), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++EcPointMul(
++  IN CONST VOID *EcGroup,
++  OUT VOID *EcPointResult,
++  IN CONST VOID *EcPoint,
++  IN CONST VOID *BnPScalar,
++  IN VOID *BnCtx
++)
++{
++   CALL_CRYPTO_SERVICE (EcPointMul, (EcGroup, EcPointResult, EcPoint, BnPScalar, BnCtx), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++EcPointInvert(
++  IN CONST VOID *EcGroup,
++  IN OUT VOID *EcPoint,
++  IN VOID *BnCtx
++)
++{
++   CALL_CRYPTO_SERVICE (EcPointInvert, (EcGroup, EcPoint, BnCtx), EFI_UNSUPPORTED);
++}
++
++BOOLEAN
++EFIAPI
++EcPointIsOnCurve(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint,
++  IN VOID *BnCtx
++)
++{
++   CALL_CRYPTO_SERVICE (EcPointIsOnCurve, (EcGroup, EcPoint, BnCtx), FALSE);
++}
++
++BOOLEAN
++EFIAPI
++EcPointIsAtInfinity(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint
++)
++{
++     CALL_CRYPTO_SERVICE (EcPointIsAtInfinity, (EcGroup, EcPoint), FALSE);
++}
++
++BOOLEAN
++EFIAPI
++EcPointEqual(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPointA,
++  IN CONST VOID *EcPointB,
++  IN VOID *BnCtx
++  )
++{
++   CALL_CRYPTO_SERVICE (EcPointEqual, (EcGroup, EcPointA, EcPointB, BnCtx), FALSE);
++}
++
++
++EFI_STATUS
++EFIAPI
++EcPointSetCompressedCoordinates(
++  IN CONST VOID *EcGroup,
++  IN VOID *EcPoint,
++  IN CONST VOID *BnX,
++  IN UINT8 YBit,
++  IN VOID *BnCtx
++)
++{
++   CALL_CRYPTO_SERVICE (EcPointSetCompressedCoordinates, (EcGroup, EcPoint, BnX, YBit, BnCtx), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++EcDhGenKey(
++  IN UINTN Group,
++  OUT VOID **PKey
++  )
++{
++   CALL_CRYPTO_SERVICE (EcDhGenKey, (Group, PKey), EFI_UNSUPPORTED);
++}
++
++VOID
++EFIAPI
++EcDhKeyFree(
++  IN VOID *PKey
++  )
++{
++  CALL_VOID_CRYPTO_SERVICE (EcDhKeyFree, (PKey));
++}
++
++EFI_STATUS
++EFIAPI
++EcDhGetPubKey(
++  IN VOID *PKey,
++  OUT VOID *EcPoint
++  )
++{
++   CALL_CRYPTO_SERVICE (EcDhGetPubKey, (PKey, EcPoint), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++EcDhDeriveSecret(
++  IN VOID *PKey,
++  IN UINT8 Group,
++  IN VOID *EcPointPublic,
++  OUT UINTN *SecretSize,
++  OUT UINT8 **Secret
++  )
++{
++   CALL_CRYPTO_SERVICE (EcDhDeriveSecret, (PKey, Group, EcPointPublic, SecretSize, Secret), EFI_UNSUPPORTED);
++}
++
+diff --git a/CryptoPkg/Library/Include/openssl/opensslconf.h b/CryptoPkg/Library/Include/openssl/opensslconf.h
+index b119212ed856..a900f8dfc3f4 100644
+--- a/CryptoPkg/Library/Include/openssl/opensslconf.h
++++ b/CryptoPkg/Library/Include/openssl/opensslconf.h
+@@ -55,9 +55,9 @@ extern "C" {
+ #ifndef OPENSSL_NO_DSA
+ #define OPENSSL_NO_DSA
+ #endif
+-#ifndef OPENSSL_NO_EC
+-#define OPENSSL_NO_EC
+-#endif
++// #ifndef OPENSSL_NO_EC
++// # define OPENSSL_NO_EC
++// #endif
+ #ifndef OPENSSL_NO_IDEA
+ #define OPENSSL_NO_IDEA
+ #endif
+diff --git a/CryptoPkg/Library/OpensslLib/OpensslLib.inf b/CryptoPkg/Library/OpensslLib/OpensslLib.inf
+index d84bde056af2..b18f2215e157 100644
+--- a/CryptoPkg/Library/OpensslLib/OpensslLib.inf
++++ b/CryptoPkg/Library/OpensslLib/OpensslLib.inf
+@@ -569,6 +569,50 @@
+   $(OPENSSL_PATH)/ssl/record/record_local.h
+   $(OPENSSL_PATH)/ssl/statem/statem.h
+   $(OPENSSL_PATH)/ssl/statem/statem_local.h
++  $(OPENSSL_PATH)/crypto/ec/curve448/arch_32/arch_intrinsics.h
++  $(OPENSSL_PATH)/crypto/ec/curve448/arch_32/f_impl.c
++  $(OPENSSL_PATH)/crypto/ec/curve448/word.h
++  $(OPENSSL_PATH)/crypto/ec/curve448/curve448_local.h
++  $(OPENSSL_PATH)/crypto/ec/curve448/curve448_tables.c
++  $(OPENSSL_PATH)/crypto/ec/curve448/curve448.c
++  $(OPENSSL_PATH)/crypto/ec/curve448/eddsa.c
++  $(OPENSSL_PATH)/crypto/ec/curve448/field.h
++  $(OPENSSL_PATH)/crypto/ec/curve448/f_generic.c
++  $(OPENSSL_PATH)/crypto/ec/curve448/scalar.c
++  $(OPENSSL_PATH)/crypto/ec/curve25519.c
++  $(OPENSSL_PATH)/crypto/ec/ec_ameth.c
++  $(OPENSSL_PATH)/crypto/ec/ec_asn1.c
++  $(OPENSSL_PATH)/crypto/ec/ec_curve.c
++  $(OPENSSL_PATH)/crypto/ec/ec_check.c
++  $(OPENSSL_PATH)/crypto/ec/ec_cvt.c
++  $(OPENSSL_PATH)/crypto/ec/ec_err.c
++  $(OPENSSL_PATH)/crypto/ec/ec_key.c
++  $(OPENSSL_PATH)/crypto/ec/ec_kmeth.c
++  $(OPENSSL_PATH)/crypto/ec/ec_lib.c
++  $(OPENSSL_PATH)/crypto/ec/ec_local.h
++  $(OPENSSL_PATH)/crypto/ec/ec_mult.c
++  $(OPENSSL_PATH)/crypto/ec/ec_oct.c
++  $(OPENSSL_PATH)/crypto/ec/ec_pmeth.c
++  $(OPENSSL_PATH)/crypto/ec/ec_print.c
++  $(OPENSSL_PATH)/crypto/ec/ec2_oct.c
++  $(OPENSSL_PATH)/crypto/ec/ec2_smpl.c
++  $(OPENSSL_PATH)/crypto/ec/ecdh_kdf.c
++  $(OPENSSL_PATH)/crypto/ec/ecdh_ossl.c
++  $(OPENSSL_PATH)/crypto/ec/ecdsa_ossl.c
++  $(OPENSSL_PATH)/crypto/ec/ecdsa_sign.c
++  $(OPENSSL_PATH)/crypto/ec/ecdsa_vrf.c
++  $(OPENSSL_PATH)/crypto/ec/eck_prn.c
++  $(OPENSSL_PATH)/crypto/ec/ecp_mont.c
++  $(OPENSSL_PATH)/crypto/ec/ecp_nist.c
++  $(OPENSSL_PATH)/crypto/ec/ecp_nistp224.c
++  $(OPENSSL_PATH)/crypto/ec/ecp_nistp256.c
++  $(OPENSSL_PATH)/crypto/ec/ecp_nistp521.c
++  $(OPENSSL_PATH)/crypto/ec/ecp_nistputil.c
++  # $(OPENSSL_PATH)/crypto/ec/ecp_nistz256_table.c 
++  # $(OPENSSL_PATH)/crypto/ec/ecp_nistz256.c
++  $(OPENSSL_PATH)/crypto/ec/ecp_oct.c
++  $(OPENSSL_PATH)/crypto/ec/ecp_smpl.c
++  $(OPENSSL_PATH)/crypto/ec/ecx_meth.c
+ # Autogenerated files list ends here
+   buildinf.h
+   ossl_store.c
+diff --git a/CryptoPkg/Private/Protocol/Crypto.h b/CryptoPkg/Private/Protocol/Crypto.h
+index bee117d2b072..ac96634b6d64 100644
+--- a/CryptoPkg/Private/Protocol/Crypto.h
++++ b/CryptoPkg/Private/Protocol/Crypto.h
+@@ -3859,6 +3859,161 @@ EFI_STATUS
+   OUT VOID *BnRes
+   );
+ 
++
++typedef
++VOID *
++(EFIAPI* EDKII_CRYPTO_EC_GROUP_INIT)(
++  IN UINTN Group
++  );
++
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_EC_GROUP_GET_CURVE)(
++  IN CONST VOID *EcGroup,
++  OUT VOID *Bn_Prime,
++  OUT VOID *Bn_A,
++  OUT VOID *Bn_B,
++  IN VOID *Bn_Ctx
++  );
++
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_EC_GROUP_GET_ORDER)(
++  IN VOID *EcGroup,
++  OUT VOID *Bn_Order
++  );
++
++typedef
++VOID
++(EFIAPI* EDKII_CRYPTO_EC_GROUP_FREE)(
++  IN VOID *EcGroup
++  );
++
++typedef
++VOID *
++(EFIAPI* EDKII_CRYPTO_EC_POINT_INIT)(
++  IN CONST VOID *EcGroup
++  );
++
++typedef
++VOID
++(EFIAPI* EDKII_CRYPTO_EC_POINT_DE_INIT)(
++  IN VOID *EcPoint,
++  IN BOOLEAN Clear
++  );
++
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_EC_POINT_GET_AFFINE_COORDINATES)(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint,
++  OUT VOID *Bn_X,
++  OUT VOID *Bn_Y,
++  IN VOID *Bn_Ctx
++);
++
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_EC_POINT_SET_AFFINE_COORDINATES)(
++  IN CONST VOID *EcGroup,
++  IN VOID *EcPoint,
++  IN CONST VOID *Bn_X,
++  IN CONST VOID *Bn_Y,
++  IN VOID *Bn_Ctx
++);
++
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_EC_POINT_ADD)(
++  IN CONST VOID *EcGroup,
++  OUT VOID *EcPointResult,
++  IN CONST VOID *EcPointA,
++  IN CONST VOID *EcPointB,
++  IN VOID *Bn_Ctx
++);
++
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_EC_POINT_MUL)(
++  IN CONST VOID *EcGroup,
++  OUT VOID *EcPointResult,
++  IN CONST VOID *EcPoint,
++  IN CONST VOID *Bn_PScalar,
++  IN VOID *Bn_Ctx
++);
++
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_EC_POINT_INVERT)(
++  IN CONST VOID *EcGroup,
++  IN OUT VOID *EcPoint,
++  IN VOID *Bn_Ctx
++);
++
++typedef
++BOOLEAN
++(EFIAPI* EDKII_CRYPTO_EC_POINT_IS_ON_CURVE)(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint,
++  IN VOID *Bn_Ctx
++);
++
++typedef
++BOOLEAN
++(EFIAPI* EDKII_CRYPTO_EC_POINT_IS_AT_INFINITY)(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPoint
++);
++
++typedef
++BOOLEAN
++(EFIAPI* EDKII_CRYPTO_EC_POINT_EQUAL)(
++  IN CONST VOID *EcGroup,
++  IN CONST VOID *EcPointA,
++  IN CONST VOID *EcPointB,
++  IN VOID *Bn_Ctx
++  );
++
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_EC_POINT_SET_COMPRESSED_COORDINATES)(
++  IN CONST VOID *EcGroup,
++  IN VOID *EcPoint,
++  IN CONST VOID *Bn_X,
++  IN UINT8 YBit,
++  IN VOID *Bn_Ctx
++);
++
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_EC_DH_GEN_KEY)(
++  IN UINTN Group,
++  OUT VOID **PKey
++  );
++
++typedef
++VOID
++(EFIAPI* EDKII_CRYPTO_EC_DH_KEY_FREE)(
++  IN VOID *PKey
++  );
++
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_EC_DH_GET_PUB_KEY)(
++  IN VOID *PKey,
++  OUT VOID *EcPoint
++  );
++
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_EC_DH_DERIVE_SECRET)(
++  IN VOID *PKey,
++  IN UINT8 Group,
++  IN VOID *EcPointPublic,
++  OUT UINTN *Secret_Size,
++  OUT UINT8 **Secret
++  );
++
+ ///
+ /// EDK II Crypto Protocol
+ ///
+@@ -4071,6 +4226,26 @@ struct _EDKII_CRYPTO_PROTOCOL {
+   EDKII_CRYPTO_BIGNUM_SET_UINT                    BigNumSetUint;
+   EDKII_CRYPTO_BIGNUM_ADD_MOD                     BigNumAddMod;
+ 
++  ///EC
++  EDKII_CRYPTO_EC_GROUP_INIT                        EcGroupInit;
++  EDKII_CRYPTO_EC_GROUP_GET_CURVE                   EcGroupGetCurve;
++  EDKII_CRYPTO_EC_GROUP_GET_ORDER                   EcGroupGetOrder;
++  EDKII_CRYPTO_EC_GROUP_FREE                        EcGroupFree;
++  EDKII_CRYPTO_EC_POINT_INIT                        EcPointInit;
++  EDKII_CRYPTO_EC_POINT_DE_INIT                     EcPointDeInit;
++  EDKII_CRYPTO_EC_POINT_GET_AFFINE_COORDINATES      EcPointGetAffineCoordinates;
++  EDKII_CRYPTO_EC_POINT_SET_AFFINE_COORDINATES      EcPointSetAffineCoordinates;
++  EDKII_CRYPTO_EC_POINT_ADD                         EcPointAdd;
++  EDKII_CRYPTO_EC_POINT_MUL                         EcPointMul;
++  EDKII_CRYPTO_EC_POINT_INVERT                      EcPointInvert;
++  EDKII_CRYPTO_EC_POINT_IS_ON_CURVE                 EcPointIsOnCurve;
++  EDKII_CRYPTO_EC_POINT_IS_AT_INFINITY              EcPointIsAtInfinity;
++  EDKII_CRYPTO_EC_POINT_EQUAL                       EcPointEqual;
++  EDKII_CRYPTO_EC_POINT_SET_COMPRESSED_COORDINATES  EcPointSetCompressedCoordinates;
++  EDKII_CRYPTO_EC_DH_GEN_KEY                        EcDhGenKey;
++  EDKII_CRYPTO_EC_DH_KEY_FREE                       EcDhKeyFree;
++  EDKII_CRYPTO_EC_DH_GET_PUB_KEY                    EcDhGetPubKey;
++  EDKII_CRYPTO_EC_DH_DERIVE_SECRET                  EcDhDeriveSecret;
+   /// RSA PSS
+   EDKII_CRYPTO_RSA_PSS_SIGN                          RsaPssSign;
+   EDKII_CRYPTO_RSA_PSS_VERIFY                        RsaPssVerify;
+-- 
+2.33.0.windows.2
+

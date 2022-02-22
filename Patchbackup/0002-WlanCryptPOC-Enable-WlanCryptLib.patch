@@ -1,0 +1,263 @@
+From 9d8ecd2203dd54895df605d399523217ae07ebf6 Mon Sep 17 00:00:00 2001
+From: yi1 li <yi1.li@intel.com>
+Date: Wed, 29 Dec 2021 15:13:17 +0800
+Subject: [PATCH 2/2] WlanCryptPOC: Enable WlanCryptLib
+
+Signed-off-by: yi1 li <yi1.li@intel.com>
+---
+ CryptoPkg/CryptoPkg.dec                            |  1 +
+ CryptoPkg/CryptoPkg.dsc                            | 10 ++++++++--
+ CryptoPkg/Driver/Crypto.c                          | 14 +++++++++++++-
+ CryptoPkg/Driver/CryptoDxe.inf                     |  2 ++
+ CryptoPkg/Driver/CryptoPei.inf                     |  2 ++
+ CryptoPkg/Driver/CryptoSmm.inf                     |  2 ++
+ .../Library/BaseCryptLibOnProtocolPpi/CryptLib.c   | 10 ++++++++++
+ .../BaseCryptLibOnProtocolPpi/DxeCryptLib.inf      |  1 +
+ .../BaseCryptLibOnProtocolPpi/PeiCryptLib.inf      |  1 +
+ .../BaseCryptLibOnProtocolPpi/SmmCryptLib.inf      |  1 +
+ CryptoPkg/Private/Protocol/Crypto.h                |  9 ++++++++-
+ 11 files changed, 49 insertions(+), 4 deletions(-)
+
+diff --git a/CryptoPkg/CryptoPkg.dec b/CryptoPkg/CryptoPkg.dec
+index 5888941bab4c..ee9392dd36e8 100644
+--- a/CryptoPkg/CryptoPkg.dec
++++ b/CryptoPkg/CryptoPkg.dec
+@@ -32,6 +32,7 @@
+   ##  @libraryclass  Provides TLS library functions for EFI TLS protocol.
+   ##
+   TlsLib|Include/Library/TlsLib.h
++  WlanCryptLib|Include/Library/WlanCryptLib.h
+ 
+   ##  @libraryclass  Provides Unified API for different hash implementations.
+   #
+diff --git a/CryptoPkg/CryptoPkg.dsc b/CryptoPkg/CryptoPkg.dsc
+index 0aa72ed87846..a37b3fa4eac3 100644
+--- a/CryptoPkg/CryptoPkg.dsc
++++ b/CryptoPkg/CryptoPkg.dsc
+@@ -66,6 +66,7 @@
+   TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
+   HashApiLib|CryptoPkg/Library/BaseHashApiLib/BaseHashApiLib.inf
+   RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
++  WlanCryptLib|CryptoPkg/Library/WlanCryptLib/WlanCryptLib.inf
+ 
+ [LibraryClasses.ARM, LibraryClasses.AARCH64]
+   #
+@@ -105,7 +106,7 @@
+   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+-
++  WlanCryptLib|CryptoPkg/Library/WlanCryptLib/WlanCryptLib.inf
+ [LibraryClasses.ARM]
+   ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
+ 
+@@ -114,6 +115,7 @@
+   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
+   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
+   TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
++  WlanCryptLib|CryptoPkg/Library/WlanCryptLib/WlanCryptLib.inf
+ 
+ [LibraryClasses.IA32.PEIM, LibraryClasses.X64.PEIM]
+   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
+@@ -125,11 +127,12 @@
+   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
+   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+   TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
+-
++  WlanCryptLib|CryptoPkg/Library/WlanCryptLib/WlanCryptLib.inf
+ [LibraryClasses.common.DXE_SMM_DRIVER]
+   ReportStatusCodeLib|MdeModulePkg/Library/SmmReportStatusCodeLib/SmmReportStatusCodeLib.inf
+   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
+   TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
++  
+ !endif
+ 
+ ################################################################################
+@@ -242,6 +245,7 @@
+   CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf
+   CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+   CryptoPkg/Library/TlsLib/TlsLib.inf
++  CryptoPkg/Library/WlanCryptLib/WlanCryptLib.inf
+   CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
+   CryptoPkg/Library/OpensslLib/OpensslLib.inf
+   CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
+@@ -250,6 +254,8 @@
+   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
+   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
+   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/SmmCryptLib.inf
++
++  CryptoPkg/Library/WlanCryptLib/WlanCryptLib.inf
+ !endif
+ 
+ !if $(CRYPTO_SERVICES) IN "PACKAGE ALL NONE MIN_PEI"
+diff --git a/CryptoPkg/Driver/Crypto.c b/CryptoPkg/Driver/Crypto.c
+index 26f280cd5dbe..43bb504dbdd6 100644
+--- a/CryptoPkg/Driver/Crypto.c
++++ b/CryptoPkg/Driver/Crypto.c
+@@ -11,6 +11,7 @@
+ #include <Library/DebugLib.h>
+ #include <Library/BaseCryptLib.h>
+ #include <Library/TlsLib.h>
++#include <Library/WlanCryptLib.h>
+ #include <Protocol/Crypto.h>
+ #include <Pcd/PcdCryptoServiceFamilyEnable.h>
+ 
+@@ -4463,6 +4464,15 @@ CryptoServiceTlsGetCertRevocationList (
+   return CALL_BASECRYPTLIB (TlsGet.Services.CertRevocationList, TlsGetCertRevocationList, (Data, DataSize), EFI_UNSUPPORTED);
+ }
+ 
++BOOLEAN
++EFIAPI
++CryptoServiceWlanCryptInitialize (
++  VOID
++  )
++{
++  return WlanCryptInitialize();
++}
++
+ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
+   /// Version
+   CryptoServiceGetCryptoVersion,
+@@ -4663,5 +4673,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
+   CryptoServiceTlsGetCaCertificate,
+   CryptoServiceTlsGetHostPublicCert,
+   CryptoServiceTlsGetHostPrivateKey,
+-  CryptoServiceTlsGetCertRevocationList
++  CryptoServiceTlsGetCertRevocationList,
++
++  CryptoServiceWlanCryptInitialize
+ };
+diff --git a/CryptoPkg/Driver/CryptoDxe.inf b/CryptoPkg/Driver/CryptoDxe.inf
+index 0d08f3a190c8..57076db0ea48 100644
+--- a/CryptoPkg/Driver/CryptoDxe.inf
++++ b/CryptoPkg/Driver/CryptoDxe.inf
+@@ -39,6 +39,8 @@
+   BaseCryptLib
+   TlsLib
+ 
++  WlanCryptLib
++
+ [Protocols]
+   gEdkiiCryptoProtocolGuid  ## PRODUCES
+ 
+diff --git a/CryptoPkg/Driver/CryptoPei.inf b/CryptoPkg/Driver/CryptoPei.inf
+index dfa1ab58b16f..786841fbd7f3 100644
+--- a/CryptoPkg/Driver/CryptoPei.inf
++++ b/CryptoPkg/Driver/CryptoPei.inf
+@@ -40,6 +40,8 @@
+   BaseCryptLib
+   TlsLib
+ 
++  WlanCryptLib
++
+ [Ppis]
+   gEfiPeiMemoryDiscoveredPpiGuid  ## CONSUMES
+   gEdkiiCryptoPpiGuid             ## PRODUCES
+diff --git a/CryptoPkg/Driver/CryptoSmm.inf b/CryptoPkg/Driver/CryptoSmm.inf
+index 9fe8718823d2..d4f6bea4e383 100644
+--- a/CryptoPkg/Driver/CryptoSmm.inf
++++ b/CryptoPkg/Driver/CryptoSmm.inf
+@@ -39,6 +39,8 @@
+   BaseCryptLib
+   TlsLib
+ 
++  WlanCryptLib
++
+ [Protocols]
+   gEdkiiSmmCryptoProtocolGuid  ## PRODUCES
+ 
+diff --git a/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/CryptLib.c b/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/CryptLib.c
+index fcb59137805b..57385e1d3cb0 100644
+--- a/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/CryptLib.c
++++ b/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/CryptLib.c
+@@ -13,6 +13,7 @@
+ #include <Library/DebugLib.h>
+ #include <Library/BaseCryptLib.h>
+ #include <Library/TlsLib.h>
++#include <Library/WlanCryptLib.h>
+ #include <Protocol/Crypto.h>
+ 
+ /**
+@@ -3577,3 +3578,12 @@ TlsGetCertRevocationList (
+ {
+   CALL_CRYPTO_SERVICE (TlsGetCertRevocationList, (Data, DataSize), EFI_UNSUPPORTED);
+ }
++
++BOOLEAN
++EFIAPI
++WlanCryptInitialize (
++  VOID
++  )
++{
++  CALL_CRYPTO_SERVICE (WlanCryptInitialize, (), FALSE);
++}
+\ No newline at end of file
+diff --git a/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf b/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
+index baa4433cbee8..1d12e6bf9346 100644
+--- a/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
++++ b/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
+@@ -17,6 +17,7 @@
+   MODULE_TYPE                    = DXE_DRIVER
+   LIBRARY_CLASS                  = BaseCryptLib | DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
+   LIBRARY_CLASS                  = TlsLib       | DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
++  LIBRARY_CLASS                  = WlanCryptLib       | DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
+   CONSTRUCTOR                    = DxeCryptLibConstructor
+ 
+ #
+diff --git a/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf b/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
+index 038ca71890dd..b2f6741b32bd 100644
+--- a/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
++++ b/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
+@@ -17,6 +17,7 @@
+   MODULE_TYPE                    = PEIM
+   LIBRARY_CLASS                  = BaseCryptLib | PEIM
+   LIBRARY_CLASS                  = TlsLib       | PEIM
++  LIBRARY_CLASS                  = WlanCryptLib       | PEIM
+ 
+ #
+ # The following information is for reference only and not required by the build tools.
+diff --git a/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/SmmCryptLib.inf b/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/SmmCryptLib.inf
+index b1285b444710..d6d6f48b61eb 100644
+--- a/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/SmmCryptLib.inf
++++ b/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/SmmCryptLib.inf
+@@ -16,6 +16,7 @@
+   MODULE_TYPE                    = DXE_SMM_DRIVER
+   LIBRARY_CLASS                  = BaseCryptLib | DXE_SMM_DRIVER
+   LIBRARY_CLASS                  = TlsLib       | DXE_SMM_DRIVER
++  LIBRARY_CLASS                  = WlanCryptLib       | DXE_SMM_DRIVER
+   CONSTRUCTOR                    = SmmCryptLibConstructor
+ 
+ #
+diff --git a/CryptoPkg/Private/Protocol/Crypto.h b/CryptoPkg/Private/Protocol/Crypto.h
+index 498f8e387dba..c601a0ec4e72 100644
+--- a/CryptoPkg/Private/Protocol/Crypto.h
++++ b/CryptoPkg/Private/Protocol/Crypto.h
+@@ -3482,7 +3482,11 @@ BOOLEAN
+   IN  UINT16       SaltLen
+   );
+ 
+-
++typedef
++BOOLEAN
++(EFIAPI* EDKII_CRYPTO_WLAN_CRYPT_INITIALIZE)(
++  VOID
++  );
+ 
+ ///
+ /// EDK II Crypto Protocol
+@@ -3668,9 +3672,12 @@ struct _EDKII_CRYPTO_PROTOCOL {
+   EDKII_CRYPTO_TLS_GET_HOST_PUBLIC_CERT           TlsGetHostPublicCert;
+   EDKII_CRYPTO_TLS_GET_HOST_PRIVATE_KEY           TlsGetHostPrivateKey;
+   EDKII_CRYPTO_TLS_GET_CERT_REVOCATION_LIST       TlsGetCertRevocationList;
++  EDKII_CRYPTO_WLAN_CRYPT_INITIALIZE              WlanCryptInitialize;
+   /// RSA PSS
+   EDKII_CRYPTO_RSA_PSS_SIGN                       RsaPssSign;
+   EDKII_CRYPTO_RSA_PSS_VERIFY                     RsaPssVerify;
++
++
+ };
+ 
+ extern GUID gEdkiiCryptoProtocolGuid;
+-- 
+2.33.0.windows.2
+

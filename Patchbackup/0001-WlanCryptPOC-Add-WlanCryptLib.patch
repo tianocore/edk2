@@ -1,0 +1,156 @@
+From 79c154b0f9eef384c4699874d2a107a308192fa5 Mon Sep 17 00:00:00 2001
+From: yi1 li <yi1.li@intel.com>
+Date: Wed, 29 Dec 2021 15:12:53 +0800
+Subject: [PATCH 1/2] WlanCryptPOC: Add WlanCryptLib
+
+Signed-off-by: yi1 li <yi1.li@intel.com>
+---
+ CryptoPkg/Include/Library/WlanCryptLib.h      | 26 +++++++++++++
+ .../WlanCryptLib/InternalWlanCryptLib.h       | 22 +++++++++++
+ CryptoPkg/Library/WlanCryptLib/WlanCryptLib.c | 27 ++++++++++++++
+ .../Library/WlanCryptLib/WlanCryptLib.inf     | 37 +++++++++++++++++++
+ 4 files changed, 112 insertions(+)
+ create mode 100644 CryptoPkg/Include/Library/WlanCryptLib.h
+ create mode 100644 CryptoPkg/Library/WlanCryptLib/InternalWlanCryptLib.h
+ create mode 100644 CryptoPkg/Library/WlanCryptLib/WlanCryptLib.c
+ create mode 100644 CryptoPkg/Library/WlanCryptLib/WlanCryptLib.inf
+
+diff --git a/CryptoPkg/Include/Library/WlanCryptLib.h b/CryptoPkg/Include/Library/WlanCryptLib.h
+new file mode 100644
+index 000000000000..e23773c1948a
+--- /dev/null
++++ b/CryptoPkg/Include/Library/WlanCryptLib.h
+@@ -0,0 +1,26 @@
++/** @file
++  Defines Wlan Crypto Library APIs.
++
++Copyright (c) 2021 - 2021, Intel Corporation. All rights reserved.<BR>
++SPDX-License-Identifier: BSD-2-Clause-Patent
++
++**/
++
++#ifndef __WLAN_CRYPT_LIB_H__
++#define __WLAN_CRYPT_LIB_H__
++
++/**
++  Initializes the WlanCrypt library.
++
++  @retval TRUE   The OpenSSL library has been initialized.
++  @retval FALSE  Failed to initialize the OpenSSL library.
++
++**/
++BOOLEAN
++EFIAPI
++WlanCryptInitialize (
++  VOID
++  );
++
++#endif // __WLAN_CRYPT_LIB_H__
++
+diff --git a/CryptoPkg/Library/WlanCryptLib/InternalWlanCryptLib.h b/CryptoPkg/Library/WlanCryptLib/InternalWlanCryptLib.h
+new file mode 100644
+index 000000000000..fb25bb97aa38
+--- /dev/null
++++ b/CryptoPkg/Library/WlanCryptLib/InternalWlanCryptLib.h
+@@ -0,0 +1,22 @@
++/** @file
++  Internal include file for TlsLib.
++
++Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
++SPDX-License-Identifier: BSD-2-Clause-Patent
++
++**/
++
++#ifndef __INTERNAL_WLAN_CRYPT_LIB_H__
++#define __INTERNAL_WLAN_CRYPT_LIB_H__
++
++#undef _WIN32
++#undef _WIN64
++
++#include <Library/BaseCryptLib.h>
++#include <Library/BaseMemoryLib.h>
++#include <Library/DebugLib.h>
++#include <Library/MemoryAllocationLib.h>
++#include <Library/SafeIntLib.h>
++
++#endif
++
+diff --git a/CryptoPkg/Library/WlanCryptLib/WlanCryptLib.c b/CryptoPkg/Library/WlanCryptLib/WlanCryptLib.c
+new file mode 100644
+index 000000000000..eaecaaaecfe8
+--- /dev/null
++++ b/CryptoPkg/Library/WlanCryptLib/WlanCryptLib.c
+@@ -0,0 +1,27 @@
++/** @file
++  Wlan Crypto Library Implementation.
++
++Copyright (c) 2021 - 2021, Intel Corporation. All rights reserved.<BR>
++(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
++SPDX-License-Identifier: BSD-2-Clause-Patent
++
++**/
++
++#include "InternalWlanCryptLib.h"
++
++/**
++  Initializes the WlanCrypt library.
++
++  @retval TRUE   The OpenSSL library has been initialized.
++  @retval FALSE  Failed to initialize the OpenSSL library.
++
++**/
++BOOLEAN
++EFIAPI
++WlanCryptInitialize (
++  VOID
++  )
++{
++  DEBUG((DEBUG_INFO, "TEST WLAN CRYPT FUNCTION!\n"));
++  return FALSE;
++}
+diff --git a/CryptoPkg/Library/WlanCryptLib/WlanCryptLib.inf b/CryptoPkg/Library/WlanCryptLib/WlanCryptLib.inf
+new file mode 100644
+index 000000000000..c1c1f8b67597
+--- /dev/null
++++ b/CryptoPkg/Library/WlanCryptLib/WlanCryptLib.inf
+@@ -0,0 +1,37 @@
++## @file
++# Implements the BaseCryptLib and TlsLib using the services of the EDK II Crypto
++# Protocol.
++#
++# Copyright (C) Microsoft Corporation. All rights reserved.
++# Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
++# SPDX-License-Identifier: BSD-2-Clause-Patent
++#
++##
++
++[Defines]
++  INF_VERSION                    = 0x0001001B
++  BASE_NAME                      = WlanCryptLib
++  FILE_GUID                      = B38CBDA6-8017-4111-8232-9E8328DE82FF
++  VERSION_STRING                 = 1.0
++  MODULE_TYPE                    = DXE_DRIVER
++  LIBRARY_CLASS                  = WlanCryptLib       
++
++#
++# The following information is for reference only and not required by the build tools.
++#
++# VALID_ARCHITECTURES = IA32 X64 ARM AARCH64 RISCV64
++#
++
++[Packages]
++  MdePkg/MdePkg.dec
++  CryptoPkg/CryptoPkg.dec
++
++[LibraryClasses]
++  BaseCryptLib
++  BaseMemoryLib
++  DebugLib
++  MemoryAllocationLib
++
++[Sources]
++  InternalWlanCryptLib.h
++  WlanCryptLib.c
+-- 
+2.33.0.windows.2
+

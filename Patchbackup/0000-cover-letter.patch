@@ -1,0 +1,39 @@
+From 0e554b998d5c61a8b657b727ecbe0cc0440a0d19 Mon Sep 17 00:00:00 2001
+From: yi1 li <yi1.li@intel.com>
+Date: Tue, 25 Jan 2022 10:05:12 +0800
+Subject: [PATCH 0/2] *** SUBJECT HERE ***
+
+*** BLURB HERE ***
+
+Andrei Otcheretianski (2):
+  gitCryptoPkg: Add BigNum support
+  CryptoPkg: Add EC API's
+
+ CryptoPkg/CryptoPkg.dsc                       |   2 +
+ CryptoPkg/Driver/Crypto.c                     | 519 ++++++++++++++-
+ CryptoPkg/Include/Library/BaseCryptLib.h      | 558 ++++++++++++++++
+ .../Pcd/PcdCryptoServiceFamilyEnable.h        |  54 ++
+ .../Library/BaseCryptLib/BaseCryptLib.inf     |   2 +
+ CryptoPkg/Library/BaseCryptLib/Bn/CryptBn.c   | 345 ++++++++++
+ .../Library/BaseCryptLib/Bn/CryptBnNull.c     | 281 ++++++++
+ CryptoPkg/Library/BaseCryptLib/Ec/CryptEc.c   | 403 ++++++++++++
+ .../Library/BaseCryptLib/Ec/CryptEcNull.c     | 238 +++++++
+ .../Library/BaseCryptLib/SmmCryptLib.inf      |   3 +-
+ .../BaseCryptLibNull/BaseCryptLibNull.inf     |   2 +
+ .../Library/BaseCryptLibNull/Bn/CryptBnNull.c | 281 ++++++++
+ .../Library/BaseCryptLibNull/Ec/CryptEcNull.c | 238 +++++++
+ .../BaseCryptLibOnProtocolPpi/CryptLib.c      | 471 ++++++++++++++
+ .../Library/Include/openssl/opensslconf.h     |   6 +-
+ CryptoPkg/Library/OpensslLib/OpensslLib.inf   |  44 ++
+ CryptoPkg/Private/Protocol/Crypto.h           | 605 ++++++++++++++++++
+ 17 files changed, 4046 insertions(+), 6 deletions(-)
+ create mode 100644 CryptoPkg/Library/BaseCryptLib/Bn/CryptBn.c
+ create mode 100644 CryptoPkg/Library/BaseCryptLib/Bn/CryptBnNull.c
+ create mode 100644 CryptoPkg/Library/BaseCryptLib/Ec/CryptEc.c
+ create mode 100644 CryptoPkg/Library/BaseCryptLib/Ec/CryptEcNull.c
+ create mode 100644 CryptoPkg/Library/BaseCryptLibNull/Bn/CryptBnNull.c
+ create mode 100644 CryptoPkg/Library/BaseCryptLibNull/Ec/CryptEcNull.c
+
+-- 
+2.33.0.windows.2
+

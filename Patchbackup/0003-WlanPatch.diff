@@ -1,0 +1,1717 @@
+From ec8e41ddbada7e62418c33133712bcc382b9d178 Mon Sep 17 00:00:00 2001
+From: Andrei Otcheretianski <andrei.otcheretianski@intel.com>
+Date: Sun, 05 Dec 2021 14:00:39 +0200
+Subject: [PATCH] CryptoPkg: Add BigNum support
+
+Add Big Number APIs.
+
+type=feature
+ticket=none
+
+Change-Id: I4b8b67af715fed9d191f3b2487a2085f4ed56ffa
+Signed-off-by: Andrei Otcheretianski <andrei.otcheretianski@intel.com>
+---
+
+diff --git a/CryptoPkg/CryptoPkg.dsc b/CryptoPkg/CryptoPkg.dsc
+index 4cb37b1..384a469 100644
+--- a/CryptoPkg/CryptoPkg.dsc
++++ b/CryptoPkg/CryptoPkg.dsc
+@@ -158,6 +158,7 @@
+   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Tls.Family        | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.TlsSet.Family     | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.TlsGet.Family     | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
++  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Bn.Family         | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+ !endif
+ 
+ !if $(CRYPTO_SERVICES) == MIN_PEI
+diff --git a/CryptoPkg/Driver/Crypto.c b/CryptoPkg/Driver/Crypto.c
+index 35bf2d3..7cab7d3 100644
+--- a/CryptoPkg/Driver/Crypto.c
++++ b/CryptoPkg/Driver/Crypto.c
+@@ -4398,6 +4398,238 @@
+   return CALL_BASECRYPTLIB (TlsGet.Services.CertRevocationList, TlsGetCertRevocationList, (Data, DataSize), EFI_UNSUPPORTED);
+ }
+ 
++VOID *
++EFIAPI
++CryptoServiceBigNumInit (
++  VOID
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.Init, BigNumInit, (), NULL);
++}
++
++VOID *
++EFIAPI
++CryptoServiceBigNumFromBin(
++  IN CONST UINT8 *Buf,
++  IN UINTN Len
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.FromBin, BigNumFromBin, (Buf, Len), NULL);
++}
++
++VOID
++EFIAPI
++CryptoServiceBigNumToBin(
++  IN VOID *Bn,
++  OUT UINT8 *Buf)
++{
++  CALL_VOID_BASECRYPTLIB (Bn.Services.ToBin, BigNumToBin, (Bn, Buf));
++}
++
++VOID
++EFIAPI
++CryptoServiceBigNumFree(
++  IN VOID *Bn,
++  IN BOOLEAN Clear
++  )
++{
++  CALL_VOID_BASECRYPTLIB (Bn.Services.Free, BigNumFree, (Bn, Clear));
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceBigNumAdd(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.Add, BigNumAdd, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceBigNumSub(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.Sub, BigNumSub, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceBigNumMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.Mod, BigNumMod, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceBigNumExpMod(
++  IN VOID *BnA,
++  IN VOID *BnP,
++  IN VOID *BnM,
++  OUT VOID *BnRes
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.ExpMod, BigNumExpMod, (BnA, BnP, BnM, BnRes), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceBigNumInverseMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.InverseMod, BigNumInverseMod, (BnA, BnM, BnRes), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceBigNumDiv(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.Div, BigNumDiv, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceCryptoServiceBigNumMulMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.MulMod, BigNumMulMod, (BnA, BnB, BnM, BnRes), EFI_UNSUPPORTED);
++}
++
++INTN
++EFIAPI
++CryptoServiceBigNumCmp(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.Cmp, BigNumCmp, (BnA, BnB), 0);
++}
++
++UINTN
++EFIAPI
++CryptoServiceBigNumBits(
++  IN CONST VOID *Bn
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.Bits, BigNumBits, (Bn), 0);
++}
++
++UINTN
++EFIAPI
++CryptoServiceBigNumBytes(
++  IN CONST VOID *Bn
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.Bytes, BigNumBytes, (Bn), 0);
++}
++
++BOOLEAN
++EFIAPI
++CryptoServiceBigNumIsWord(
++  IN CONST VOID *Bn,
++  IN UINTN Num)
++{
++  return CALL_BASECRYPTLIB (Bn.Services.IsWord, BigNumIsWord, (Bn, Num), FALSE);
++}
++
++BOOLEAN
++EFIAPI
++CryptoServiceBigNumIsOdd(
++  IN CONST VOID *Bn
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.IsOdd, BigNumIsOdd, (Bn), FALSE);
++}
++
++
++VOID *
++EFIAPI
++CryptoServiceBigNumCopy(
++  IN VOID *BnDst,
++  IN CONST VOID *BnSrc
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.Copy, BigNumCopy, (BnDst, BnSrc), NULL);
++}
++
++CONST VOID *
++EFIAPI
++CryptoServiceBigNumValueOne(
++  VOID
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.ValueOne, BigNumValueOne, (), NULL);
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceBigNumRShift(
++  IN CONST VOID *Bn,
++  IN UINTN n,
++  OUT VOID *BnRes
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.RShift, BigNumRShift, (Bn, n, BnRes), EFI_UNSUPPORTED);
++}
++
++VOID
++EFIAPI
++CryptoServiceBigNumConsttime(
++  IN VOID *Bn
++  )
++{
++  CALL_VOID_BASECRYPTLIB (Bn.Services.Consttime, BigNumConsttime, (Bn));
++}
++
++EFI_STATUS
++EFIAPI
++CryptoServiceBigNumSqrMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.SqrMod, BigNumSqrMod, (BnA, BnM, BnRes), EFI_UNSUPPORTED);
++}
++
++VOID *
++EFIAPI
++CryptoServiceBigNumNewContext(
++  VOID
++  )
++{
++  return CALL_BASECRYPTLIB (Bn.Services.NewContext, BigNumNewContext, (), NULL);
++}
++
++VOID
++EFIAPI
++CryptoServiceBigNumContextFree(
++  IN VOID *BnCtx
++)
++{
++  CALL_VOID_BASECRYPTLIB (Bn.Services.ContextFree, BigNumContextFree, (BnCtx));
++}
++
+ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
+   /// Version
+   CryptoServiceGetCryptoVersion,
+@@ -4578,5 +4810,30 @@
+   CryptoServiceTlsGetCaCertificate,
+   CryptoServiceTlsGetHostPublicCert,
+   CryptoServiceTlsGetHostPrivateKey,
+-  CryptoServiceTlsGetCertRevocationList
++  CryptoServiceTlsGetCertRevocationList,
++
++  //Big Numbers
++  CryptoServiceBigNumInit,
++  CryptoServiceBigNumFromBin,
++  CryptoServiceBigNumToBin,
++  CryptoServiceBigNumFree,
++  CryptoServiceBigNumAdd,
++  CryptoServiceBigNumSub,
++  CryptoServiceBigNumMod,
++  CryptoServiceBigNumExpMod,
++  CryptoServiceBigNumInverseMod,
++  CryptoServiceBigNumDiv,
++  CryptoServiceCryptoServiceBigNumMulMod,
++  CryptoServiceBigNumCmp,
++  CryptoServiceBigNumBits,
++  CryptoServiceBigNumBytes,
++  CryptoServiceBigNumIsWord,
++  CryptoServiceBigNumIsOdd,
++  CryptoServiceBigNumCopy,
++  CryptoServiceBigNumValueOne,
++  CryptoServiceBigNumRShift,
++  CryptoServiceBigNumConsttime,
++  CryptoServiceBigNumSqrMod,
++  CryptoServiceBigNumNewContext,
++  CryptoServiceBigNumContextFree,
+ };
+diff --git a/CryptoPkg/Include/Library/BaseCryptLib.h b/CryptoPkg/Include/Library/BaseCryptLib.h
+index 5e8f2e0..8537f3c 100644
+--- a/CryptoPkg/Include/Library/BaseCryptLib.h
++++ b/CryptoPkg/Include/Library/BaseCryptLib.h
+@@ -3130,4 +3130,372 @@
+   IN   UINTN        OutSize
+   );
+ 
++//=====================================================================================
++//    Big number primitives
++//=====================================================================================
++
++/**
++  Allocate new Big Number
++
++  @retval New BigNum opaque structure or NULL on failure
++**/
++VOID *
++EFIAPI
++BigNumInit (
++  VOID
++  );
++
++/**
++  Allocate new Big Number and assign the provided value to it
++
++  @param[in]   Buf    Big endian encoded buffer
++  @param[in]   Len    Buffer length
++
++  @retval New BigNum opaque structure or NULL on failure
++**/
++VOID *
++EFIAPI
++BigNumFromBin(
++  IN CONST UINT8 *Buf,
++  IN UINTN Len
++  );
++
++/**
++  Convert the absolute value of Bn into big-endian form and stores it at Buf.
++  The Buf array should have at least BigNumBytes() in it.
++
++  @param[in]   Bn     Big number to convert
++  @param[out]  Buf    Output buffer
++**/
++VOID
++EFIAPI
++BigNumToBin(
++  IN VOID *Bn,
++  OUT UINT8 *Buf);
++
++/**
++  Free the Big Number
++
++  @param[in]   Bn      Big number to free
++  @param[in]   Clear   TRUE if the buffer should be cleared
++**/
++VOID
++EFIAPI
++BigNumFree(
++  IN VOID *Bn,
++  IN BOOLEAN Clear
++  );
++
++/**
++  Calculate the sum of two Big Numbers.
++
++  @param[in]   BnA     Big number
++  @param[in]   BnA     Big number
++  @param[out]  BnRes    The result of BnA + BnB
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++EFI_STATUS
++EFIAPI
++BigNumAdd(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  );
++
++/**
++  Subtract two Big Numbers.
++
++  @param[in]   BnA     Big number
++  @param[in]   BnA     Big number
++  @param[out]  BnRes    The result of BnA - BnB
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++
++EFI_STATUS
++EFIAPI
++BigNumSub(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  );
++
++/**
++  Calculate remainder: BnRes = BnA % BnB
++
++  @param[in]   BnA     Big number
++  @param[in]   BnA     Big number
++  @param[out]  BnRes    The result of BnA % BnB
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++EFI_STATUS
++EFIAPI
++BigNumMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  );
++
++/**
++  Compute BnA to the BnP-th power modulo BnM
++
++  @param[in]   BnA     Big number
++  @param[in]   BnP     Big number (power)
++  @param[in]   BnM     Big number (modulo)
++  @param[out]  BnRes    The result of BnA ^ BnP % BnM
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++EFI_STATUS
++EFIAPI
++BigNumExpMod(
++  IN VOID *BnA,
++  IN VOID *BnP,
++  IN VOID *BnM,
++  OUT VOID *BnRes
++  );
++
++/**
++  Compute BnA inverse modulo BnM
++
++  @param[in]   BnA     Big number
++  @param[in]   BnM     Big number (modulo)
++  @param[out]  BnRes   The result, such that (BnA * BnRes) % BnM == 1
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++EFI_STATUS
++EFIAPI
++BigNumInverseMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes
++  );
++
++/**
++  Divide two Big Numbers
++
++  @param[in]   BnA     Big number
++  @param[in]   BnM     Big number (modulo)
++  @param[out]  BnRes   The result, such that BnA / BnB
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++EFI_STATUS
++EFIAPI
++BigNumDiv(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  );
++
++/**
++  Multiply two Big Numbers modulo BnM
++
++  @param[in]   BnA     Big number
++  @param[in]   BnB     Big number
++  @param[in]   BnM     Big number (modulo)
++  @param[out]  BnRes   The result, such that (BnA * BnB) % BnM
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++EFI_STATUS
++EFIAPI
++BigNumMulMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes
++  );
++
++/**
++  Compare two Big Numbers
++
++  @param[in]   BnA     Big number
++  @param[in]   BnB     Big number
++
++  @retval 0          BnA == BnB
++  @retval 1          BnA > BnB
++  @retval -1         BnA < BnB
++**/
++INTN
++EFIAPI
++BigNumCmp(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB
++  );
++
++/**
++  Get number of bits in Bn
++
++  @param[in]   Bn     Big number
++
++  @retval Number of bits
++**/
++
++UINTN
++EFIAPI
++BigNumBits(
++  IN CONST VOID *Bn
++  );
++
++/**
++  Get number of bytes in Bn
++
++  @param[in]   Bn     Big number
++
++  @retval Number of bytes
++**/
++UINTN
++EFIAPI
++BigNumBytes(
++  IN CONST VOID *Bn
++  );
++
++/**
++  Checks if Big Number equals to the given Num
++
++  @param[in]   Bn     Big number
++  @param[in]   Num    Number
++
++  @retval TRUE   iff Bn == Num
++  @retval FALSE  otherwise
++**/
++BOOLEAN
++EFIAPI
++BigNumIsWord(
++  IN CONST VOID *Bn,
++  IN UINTN Num);
++
++/**
++  Checks if Big Number is odd
++
++  @param[in]   Bn     Big number
++
++  @retval TRUE   Bn is odd (Bn % 2 == 1)
++  @retval FALSE  otherwise
++**/
++BOOLEAN
++EFIAPI
++BigNumIsOdd(
++  IN CONST VOID *Bn
++  );
++
++/**
++  Copy Big number
++
++  @param[in]   BnDst     Destination
++  @param[in]   BnSrc     Source
++
++  @retval BnDst on success
++  @retval NULL otherwise
++**/
++VOID *
++EFIAPI
++BigNumCopy(
++  IN VOID *BnDst,
++  IN CONST VOID *BnSrc
++  );
++
++/**
++  Get constant Big number with value of "1".
++  This may be used to save expensive allocations.
++
++  @retval Big Number with value of 1
++**/
++CONST VOID *
++EFIAPI
++BigNumValueOne(
++  VOID
++  );
++
++/**
++  Shift right Big Number
++
++  @param[in]   BnA     Big number
++  @param[in]   BnB     Big number
++  @param[in]   BnM     Big number (modulo)
++  @param[out]  BnRes   The result, such that (BnA * BnB) % BnM
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++EFI_STATUS
++EFIAPI
++BigNumRShift(
++  IN CONST VOID *Bn,
++  IN UINTN n,
++  OUT VOID *BnRes
++  );
++
++/**
++  Mark Big Number for consttime computations.
++  This function should be called before any consttime computations are
++  performed on the given Big number.
++
++  @param[in]   Bn     Big number
++**/
++VOID
++EFIAPI
++BigNumConsttime(
++  IN VOID *Bn
++  );
++
++/**
++  Calculate square modulo
++
++  @param[in]   BnA     Big number
++  @param[in]   BnM     Big number (modulo)
++  @param[out]  BnRes   The result, such that (BnA ^ 2) % BnM
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++EFI_STATUS
++EFIAPI
++BigNumSqrMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes
++  );
++
++/**
++  Create new Big Number computation context. This is an opaque structure
++  which should be passed to any function that require it. The BN context is
++  needed to optimize calculations and expensive allocations.
++
++  @retval Big Number context struct or NULL on failure
++**/
++VOID *
++EFIAPI
++BigNumNewContext(
++  VOID
++  );
++
++/**
++  Free Big Number context that was allocated with BigNumNewContext()
++
++  @param[in]   BnCtx     Big number context to free
++**/
++VOID
++EFIAPI
++BigNumContextFree(
++  IN VOID *BnCtx
++);
+ #endif // __BASE_CRYPT_LIB_H__
+diff --git a/CryptoPkg/Include/Pcd/PcdCryptoServiceFamilyEnable.h b/CryptoPkg/Include/Pcd/PcdCryptoServiceFamilyEnable.h
+index 44fb026..3bdda4b 100644
+--- a/CryptoPkg/Include/Pcd/PcdCryptoServiceFamilyEnable.h
++++ b/CryptoPkg/Include/Pcd/PcdCryptoServiceFamilyEnable.h
+@@ -288,6 +288,34 @@
+     } Services;
+     UINT32    Family;
+   } TlsGet;
++  union {
++    struct {
++      UINT8 Init:1;
++      UINT8 FromBin:1;
++      UINT8 ToBin:1;
++      UINT8 Free:1;
++      UINT8 Add:1;
++      UINT8 Sub:1;
++      UINT8 Mod:1;
++      UINT8 ExpMod:1;
++      UINT8 InverseMod:1;
++      UINT8 Div:1;
++      UINT8 MulMod:1;
++      UINT8 Cmp:1;
++      UINT8 Bits:1;
++      UINT8 Bytes:1;
++      UINT8 IsWord:1;
++      UINT8 IsOdd:1;
++      UINT8 Copy:1;
++      UINT8 ValueOne:1;
++      UINT8 RShift:1;
++      UINT8 Consttime:1;
++      UINT8 SqrMod:1;
++      UINT8 NewContext:1;
++      UINT8 ContextFree:1;
++    } Services;
++    UINT32 Family;
++  } Bn;
+ } PCD_CRYPTO_SERVICE_FAMILY_ENABLE;
+ 
+ #endif
+diff --git a/CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf b/CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+index 1bbe4f4..8b412ff 100644
+--- a/CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
++++ b/CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+@@ -54,6 +54,7 @@
+   Pk/CryptAuthenticode.c
+   Pk/CryptTs.c
+   Pem/CryptPem.c
++  Bn/CryptBn.c
+ 
+   SysCall/CrtWrapper.c
+   SysCall/TimerWrapper.c
+diff --git a/CryptoPkg/Library/BaseCryptLib/Bn/CryptBn.c b/CryptoPkg/Library/BaseCryptLib/Bn/CryptBn.c
+new file mode 100644
+index 0000000..c0a166f
+--- /dev/null
++++ b/CryptoPkg/Library/BaseCryptLib/Bn/CryptBn.c
+@@ -0,0 +1,313 @@
++/** @file
++  Big number API implementation based on OpenSSL
++
++  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
++  SPDX-License-Identifier: BSD-2-Clause-Patent
++
++**/
++
++#include <Base.h>
++#include <Library/BaseLib.h>
++#include <Library/BaseMemoryLib.h>
++#include <Library/MemoryAllocationLib.h>
++#include <Library/BaseCryptLib.h>
++#include <Library/DebugLib.h>
++#include <Library/PcdLib.h>
++#include <openssl/bn.h>
++/**
++  Initializes Big number.
++
++  @return  Newly allocated Big number
++**/
++VOID *
++EFIAPI
++BigNumInit (
++  VOID
++  )
++{
++  return BN_new();
++}
++
++VOID *
++EFIAPI
++BigNumFromBin(
++  IN CONST UINT8 *Buf,
++  IN UINTN Len)
++{
++  return BN_bin2bn(Buf, (int)Len, NULL);
++}
++
++VOID
++EFIAPI
++BigNumToBin(
++  IN VOID *Bn,
++  OUT UINT8 *Buf)
++{
++  BN_bn2bin(Bn, Buf);
++}
++
++VOID
++EFIAPI
++BigNumFree(
++  IN VOID *Bn,
++  IN BOOLEAN Clear
++  )
++{
++  if (Clear)
++    BN_clear_free(Bn);
++  else
++    BN_free(Bn);
++}
++
++EFI_STATUS
++EFIAPI
++BigNumAdd(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  )
++{
++  return BN_add(BnRes, BnA, BnB) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
++}
++
++EFI_STATUS
++EFIAPI
++BigNumSub(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  )
++{
++  return BN_sub(BnRes, BnA, BnB) ? EFI_SUCCESS : EFI_DEVICE_ERROR;
++}
++
++EFI_STATUS
++EFIAPI
++BigNumMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  )
++{
++  int Res;
++  BN_CTX *Bnctx;
++
++  Bnctx = BN_CTX_new();
++  if (!Bnctx)
++    return EFI_OUT_OF_RESOURCES;
++
++  Res = BN_mod(BnRes, BnA, BnB, Bnctx);
++  BN_CTX_free(Bnctx);
++
++  return Res ? EFI_SUCCESS : EFI_DEVICE_ERROR;
++}
++
++EFI_STATUS
++EFIAPI
++BigNumExpMod(
++  IN VOID *BnA,
++  IN VOID *BnP,
++  IN VOID *BnM,
++  OUT VOID *BnRes
++  )
++{
++  int Res;
++  BN_CTX *Bnctx;
++
++  Bnctx = BN_CTX_new();
++  if (Bnctx == NULL)
++    return EFI_OUT_OF_RESOURCES;
++
++  Res = BN_mod_exp(BnRes, BnA, BnP, BnM, Bnctx);
++  BN_CTX_free(Bnctx);
++
++  return Res ? EFI_SUCCESS : EFI_DEVICE_ERROR;
++}
++
++EFI_STATUS
++EFIAPI
++BigNumInverseMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes
++  )
++{
++  BIGNUM *Res;
++  BN_CTX *Bnctx;
++
++  Bnctx = BN_CTX_new();
++  if (!Bnctx)
++    return EFI_OUT_OF_RESOURCES;
++
++  Res = BN_mod_inverse(BnRes, BnA, BnM, Bnctx);
++  BN_CTX_free(Bnctx);
++
++  return Res ? EFI_SUCCESS : EFI_DEVICE_ERROR;
++}
++
++EFI_STATUS
++EFIAPI
++BigNumDiv(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  )
++{
++  int Res;
++  BN_CTX *Bnctx;
++
++  Bnctx = BN_CTX_new();
++  if (!Bnctx)
++    return EFI_OUT_OF_RESOURCES;
++
++  Res = BN_div(BnRes, NULL, BnA, BnB, Bnctx);
++  BN_CTX_free(Bnctx);
++
++  return Res ? EFI_SUCCESS : EFI_DEVICE_ERROR;
++}
++
++EFI_STATUS
++EFIAPI
++BigNumMulMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes
++  )
++{
++  int Res;
++  BN_CTX *Bnctx;
++
++  Bnctx = BN_CTX_new();
++  if (Bnctx == NULL)
++    return EFI_OUT_OF_RESOURCES;
++
++  Res = BN_mod_mul(BnRes, BnA, BnB, BnM, Bnctx);
++  BN_CTX_free(Bnctx);
++
++  return Res ? EFI_SUCCESS : EFI_DEVICE_ERROR;
++}
++
++INTN
++EFIAPI
++BigNumCmp(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB)
++{
++  return BN_cmp(BnA, BnB);
++}
++
++UINTN
++EFIAPI
++BigNumBits(
++  IN CONST VOID *Bn
++  )
++{
++  return BN_num_bits(Bn);
++}
++
++UINTN
++EFIAPI
++BigNumBytes(
++  IN CONST VOID *Bn
++  )
++{
++  return BN_num_bytes(Bn);
++}
++
++BOOLEAN
++EFIAPI
++BigNumIsWord(
++  IN CONST VOID *Bn,
++  IN UINTN Num)
++{
++  return !!BN_is_word(Bn, Num);
++}
++
++BOOLEAN
++EFIAPI
++BigNumIsOdd(
++  IN CONST VOID *Bn
++  )
++{
++  return !!BN_is_odd(Bn);
++}
++
++VOID *
++EFIAPI
++BigNumCopy(
++  IN VOID *BnDst,
++  IN CONST VOID *BnSrc
++  )
++{
++  return BN_copy(BnDst, BnSrc);
++}
++
++CONST VOID *
++EFIAPI
++BigNumValueOne(
++  VOID
++  )
++{
++  return BN_value_one();
++}
++
++EFI_STATUS
++EFIAPI
++BigNumRShift(
++  IN CONST VOID *Bn,
++  IN UINTN n,
++  OUT VOID *BnRes)
++{
++  //BN_rshift() does not modify the first argument even though it
++  if (BN_rshift((BIGNUM *) Bn, BnRes, (int)n) == 1)
++    return EFI_SUCCESS;
++  else
++    return EFI_DEVICE_ERROR;
++}
++
++VOID
++EFIAPI
++BigNumConsttime(
++  IN VOID *Bn
++  )
++{
++  BN_set_flags(Bn, BN_FLG_CONSTTIME);
++}
++
++EFI_STATUS
++EFIAPI
++BigNumSqrMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes)
++{
++  int Res;
++  BN_CTX *Ctx;
++
++  Ctx = BN_CTX_new();
++  if (!Ctx)
++    return EFI_DEVICE_ERROR;
++  Res = BN_mod_sqr(BnRes, BnA, BnM, Ctx);
++  BN_CTX_free(Ctx);
++
++  return Res ? EFI_SUCCESS : EFI_DEVICE_ERROR;
++}
++
++VOID *
++EFIAPI
++BigNumNewContext(
++  VOID
++  )
++{
++  return BN_CTX_new();
++}
++
++VOID
++EFIAPI
++BigNumContextFree(
++  IN VOID *BnCtx
++)
++{
++  BN_CTX_free(BnCtx);
++}
+\ No newline at end of file
+diff --git a/CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf b/CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf
+index 8f53b0d..77eb45e 100644
+--- a/CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf
++++ b/CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf
+@@ -54,6 +54,7 @@
+   Pk/CryptTsNull.c
+   Pem/CryptPemNull.c
+   Rand/CryptRandNull.c
++  Bn/CryptBnNull.c
+ 
+ [Packages]
+   MdePkg/MdePkg.dec
+diff --git a/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/CryptLib.c b/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/CryptLib.c
+index c2a1df9..34b53b5 100644
+--- a/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/CryptLib.c
++++ b/CryptoPkg/Library/BaseCryptLibOnProtocolPpi/CryptLib.c
+@@ -4392,3 +4392,239 @@
+ {
+   CALL_CRYPTO_SERVICE (TlsGetCertRevocationList, (Data, DataSize), EFI_UNSUPPORTED);
+ }
++
++//=====================================================================================
++//    Big number primitive
++//=====================================================================================
++
++VOID *
++EFIAPI
++BigNumInit (
++  VOID
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumInit, (), NULL);
++}
++
++VOID *
++EFIAPI
++BigNumFromBin(
++  IN CONST UINT8 *Buf,
++  IN UINTN Len
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumFromBin, (Buf, Len), NULL);
++}
++
++VOID
++EFIAPI
++BigNumToBin(
++  IN VOID *Bn,
++  OUT UINT8 *Buf)
++{
++  CALL_VOID_CRYPTO_SERVICE (BigNumToBin, (Bn, Buf));
++}
++
++VOID
++EFIAPI
++BigNumFree(
++  IN VOID *Bn,
++  IN BOOLEAN Clear
++  )
++{
++  CALL_VOID_CRYPTO_SERVICE (BigNumFree, (Bn, Clear));
++}
++
++EFI_STATUS
++EFIAPI
++BigNumAdd(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumAdd, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++BigNumSub(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumSub, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++BigNumMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumMod, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++BigNumExpMod(
++  IN VOID *BnA,
++  IN VOID *BnP,
++  IN VOID *BnM,
++  OUT VOID *BnRes
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumExpMod, (BnA, BnP, BnM, BnRes), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++BigNumInverseMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumInverseMod, (BnA, BnM, BnRes), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++BigNumDiv(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumDiv, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
++}
++
++EFI_STATUS
++EFIAPI
++BigNumMulMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumMulMod, (BnA, BnB, BnM, BnRes), EFI_UNSUPPORTED);
++}
++
++INTN
++EFIAPI
++BigNumCmp(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumCmp, (BnA, BnB), 0);
++}
++
++UINTN
++EFIAPI
++BigNumBits(
++  IN CONST VOID *Bn
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumBits, (Bn), 0);
++}
++
++UINTN
++EFIAPI
++BigNumBytes(
++  IN CONST VOID *Bn
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumBytes, (Bn), 0);
++}
++
++BOOLEAN
++EFIAPI
++BigNumIsWord(
++  IN CONST VOID *Bn,
++  IN UINTN Num)
++{
++  CALL_CRYPTO_SERVICE (BigNumIsWord, (Bn, Num), FALSE);
++}
++
++BOOLEAN
++EFIAPI
++BigNumIsOdd(
++  IN CONST VOID *Bn
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumIsOdd, (Bn), FALSE);
++}
++
++
++VOID *
++EFIAPI
++BigNumCopy(
++  IN VOID *BnDst,
++  IN CONST VOID *BnSrc
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumCopy, (BnDst, BnSrc), NULL);
++}
++
++CONST VOID *
++EFIAPI
++BigNumValueOne(
++  VOID
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumValueOne, (), NULL);
++}
++
++EFI_STATUS
++EFIAPI
++BigNumRShift(
++  IN CONST VOID *Bn,
++  IN UINTN n,
++  OUT VOID *BnRes
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumRShift, (Bn, n, BnRes), EFI_UNSUPPORTED);
++}
++
++VOID
++EFIAPI
++BigNumConsttime(
++  IN VOID *Bn
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumConsttime, (), NULL);
++}
++
++EFI_STATUS
++EFIAPI
++BigNumSqrMod(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumRShift, (BnA, BnM, BnRes), EFI_UNSUPPORTED);
++}
++
++VOID *
++EFIAPI
++BigNumNewContext(
++  VOID
++  )
++{
++  CALL_CRYPTO_SERVICE (BigNumInit, (), NULL);
++}
++
++VOID
++EFIAPI
++BigNumContextFree(
++  IN VOID *BnCtx
++)
++{
++  CALL_VOID_CRYPTO_SERVICE (BigNumFree, (BnCtx));
++}
+diff --git a/CryptoPkg/Private/Protocol/Crypto.h b/CryptoPkg/Private/Protocol/Crypto.h
+index 40c387e..a960bf2 100644
+--- a/CryptoPkg/Private/Protocol/Crypto.h
++++ b/CryptoPkg/Private/Protocol/Crypto.h
+@@ -3980,6 +3980,374 @@
+   );
+ 
+ 
++//=====================================================================================
++//   Big Number Primitive
++//=====================================================================================
++
++/**
++  Allocate new Big Number
++
++  @retval New EDKII_CRYPTO_BIGNUM_ opaque structure or NULL on failure
++**/
++typedef
++VOID *
++(EFIAPI* EDKII_CRYPTO_BIGNUM_INIT)(
++  VOID
++  );
++
++/**
++  Allocate new Big Number and assign the provided value to it
++
++  @param[in]   Buf    Big endian encoded buffer
++  @param[in]   Len    Buffer length
++
++  @retval New EDKII_CRYPTO_BIGNUM_ opaque structure or NULL on failure
++**/
++typedef
++VOID *
++(EFIAPI* EDKII_CRYPTO_BIGNUM_FROM_BIN)(
++  IN CONST UINT8 *Buf,
++  IN UINTN Len
++  );
++
++/**
++  Convert the absolute value of Bn into big-endian form and stores it at Buf.
++  The Buf array should have at least EDKII_CRYPTO_BIGNUM_Bytes() in it.
++
++  @param[in]   Bn     Big number to convert
++  @param[out]  Buf    Output buffer
++**/
++typedef
++VOID
++(EFIAPI* EDKII_CRYPTO_BIGNUM_TO_BIN)(
++  IN VOID *Bn,
++  OUT UINT8 *Buf);
++
++/**
++  Free the Big Number
++
++  @param[in]   Bn      Big number to free
++  @param[in]   Clear   TRUE if the buffer should be cleared
++**/
++typedef
++VOID
++(EFIAPI* EDKII_CRYPTO_BIGNUM_FREE)(
++  IN VOID *Bn,
++  IN BOOLEAN Clear
++  );
++
++/**
++  Calculate the sum of two Big Numbers.
++
++  @param[in]   BnA     Big number
++  @param[in]   BnA     Big number
++  @param[out]  BnRes    The result of BnA + BnB
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_BIGNUM_ADD)(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  );
++
++/**
++  Subtract two Big Numbers.
++
++  @param[in]   BnA     Big number
++  @param[in]   BnA     Big number
++  @param[out]  BnRes    The result of BnA - BnB
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_BIGNUM_SUB)(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  );
++
++/**
++  Calculate remainder: BnRes = BnA % BnB
++
++  @param[in]   BnA     Big number
++  @param[in]   BnA     Big number
++  @param[out]  BnRes    The result of BnA % BnB
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_BIGNUM_MOD)(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  );
++
++/**
++  Compute BnA to the BnP-th power modulo BnM
++
++  @param[in]   BnA     Big number
++  @param[in]   BnP     Big number (power)
++  @param[in]   BnM     Big number (modulo)
++  @param[out]  BnRes    The result of BnA ^ BnP % BnM
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_BIGNUM_EXP_MOD)(
++  IN VOID *BnA,
++  IN VOID *BnP,
++  IN VOID *BnM,
++  OUT VOID *BnRes
++  );
++
++/**
++  Compute BnA inverse modulo BnM
++
++  @param[in]   BnA     Big number
++  @param[in]   BnM     Big number (modulo)
++  @param[out]  BnRes   The result, such that (BnA * BnRes) % BnM == 1
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_BIGNUM_INVERSE_MOD)(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes
++  );
++
++/**
++  Divide two Big Numbers
++
++  @param[in]   BnA     Big number
++  @param[in]   BnM     Big number (modulo)
++  @param[out]  BnRes   The result, such that BnA / BnB
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_BIGNUM_DIV)(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  OUT VOID *BnRes
++  );
++
++/**
++  Multiply two Big Numbers modulo BnM
++
++  @param[in]   BnA     Big number
++  @param[in]   BnB     Big number
++  @param[in]   BnM     Big number (modulo)
++  @param[out]  BnRes   The result, such that (BnA * BnB) % BnM
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_BIGNUM_MUL_MOD)(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes
++  );
++
++/**
++  Compare two Big Numbers
++
++  @param[in]   BnA     Big number
++  @param[in]   BnB     Big number
++
++  @retval 0          BnA == BnB
++  @retval 1          BnA > BnB
++  @retval -1         BnA < BnB
++**/
++typedef
++INTN
++(EFIAPI* EDKII_CRYPTO_BIGNUM_CMP)(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnB
++  );
++
++/**
++  Get number of bits in Bn
++
++  @param[in]   Bn     Big number
++
++  @retval Number of bits
++**/
++typedef
++
++UINTN
++(EFIAPI* EDKII_CRYPTO_BIGNUM_BITS)(
++  IN CONST VOID *Bn
++  );
++
++/**
++  Get number of bytes in Bn
++
++  @param[in]   Bn     Big number
++
++  @retval Number of bytes
++**/
++typedef
++UINTN
++(EFIAPI* EDKII_CRYPTO_BIGNUM_BYTES)(
++  IN CONST VOID *Bn
++  );
++
++/**
++  Checks if Big Number equals to the given Num
++
++  @param[in]   Bn     Big number
++  @param[in]   Num    Number
++
++  @retval TRUE   iff Bn == Num
++  @retval FALSE  otherwise
++**/
++typedef
++BOOLEAN
++(EFIAPI* EDKII_CRYPTO_BIGNUM_IS_WORD)(
++  IN CONST VOID *Bn,
++  IN UINTN Num);
++
++/**
++  Checks if Big Number is odd
++
++  @param[in]   Bn     Big number
++
++  @retval TRUE   Bn is odd (Bn % 2 == 1)
++  @retval FALSE  otherwise
++**/
++typedef
++BOOLEAN
++(EFIAPI* EDKII_CRYPTO_BIGNUM_IS_ODD)(
++  IN CONST VOID *Bn
++  );
++
++/**
++  Copy Big number
++
++  @param[in]   BnDst     Destination
++  @param[in]   BnSrc     Source
++
++  @retval BnDst on success
++  @retval NULL otherwise
++**/
++typedef
++VOID *
++(EFIAPI* EDKII_CRYPTO_BIGNUM_COPY)(
++  IN VOID *BnDst,
++  IN CONST VOID *BnSrc
++  );
++
++/**
++  Get constant Big number with value of "1".
++  This may be used to save expensive allocations.
++
++  @retval Big Number with value of 1
++**/
++typedef
++CONST VOID *
++(EFIAPI* EDKII_CRYPTO_BIGNUM_VALUE_ONE)(
++  VOID
++  );
++
++/**
++  Shift right Big Number
++
++  @param[in]   BnA     Big number
++  @param[in]   BnB     Big number
++  @param[in]   BnM     Big number (modulo)
++  @param[out]  BnRes   The result, such that (BnA * BnB) % BnM
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_BIGNUM_R_SHIFT)(
++  IN CONST VOID *Bn,
++  IN UINTN n,
++  OUT VOID *BnRes
++  );
++
++/**
++  Mark Big Number for consttime computations.
++  This function should be called before any consttime computations are
++  performed on the given Big number.
++
++  @param[in]   Bn     Big number
++**/
++typedef
++VOID
++(EFIAPI* EDKII_CRYPTO_BIGNUM_CONSTTIME)(
++  IN VOID *Bn
++  );
++
++/**
++  Calculate square modulo
++
++  @param[in]   BnA     Big number
++  @param[in]   BnM     Big number (modulo)
++  @param[out]  BnRes   The result, such that (BnA ^ 2) % BnM
++
++  @retval EFI_SUCCESS          On success
++  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
++  @retval EFI_DEVICE_ERROR     Otherwise
++**/
++typedef
++EFI_STATUS
++(EFIAPI* EDKII_CRYPTO_BIGNUM_SQR_MOD)(
++  IN CONST VOID *BnA,
++  IN CONST VOID *BnM,
++  OUT VOID *BnRes
++  );
++
++/**
++  Create new Big Number computation context. This is an opaque structure
++  which should be passed to any function that require it. The BN context is
++  needed to optimize calculations and expensive allocations.
++
++  @retval Big Number context struct or NULL on failure
++**/
++typedef
++VOID *
++(EFIAPI* EDKII_CRYPTO_BIGNUM_NEW_CONTEXT)(
++  VOID
++  );
++
++/**
++  Free Big Number context that was allocated with EDKII_CRYPTO_BIGNUM_NewContext()
++
++  @param[in]   BnCtx     Big number context to free
++**/
++typedef
++VOID
++(EFIAPI* EDKII_CRYPTO_BIGNUM_CONTEXT_FREE)(
++  IN VOID *BnCtx
++);
++
+ ///
+ /// EDK II Crypto Protocol
+ ///
+@@ -4164,7 +4532,31 @@
+   EDKII_CRYPTO_TLS_GET_HOST_PUBLIC_CERT           TlsGetHostPublicCert;
+   EDKII_CRYPTO_TLS_GET_HOST_PRIVATE_KEY           TlsGetHostPrivateKey;
+   EDKII_CRYPTO_TLS_GET_CERT_REVOCATION_LIST       TlsGetCertRevocationList;
+-};
++  /// Big Number
++  EDKII_CRYPTO_BIGNUM_INIT                        BigNumInit;
++  EDKII_CRYPTO_BIGNUM_FROM_BIN                    BigNumFromBin;
++  EDKII_CRYPTO_BIGNUM_TO_BIN                      BigNumToBin;
++  EDKII_CRYPTO_BIGNUM_FREE                        BigNumFree;
++  EDKII_CRYPTO_BIGNUM_ADD                         BigNumAdd;
++  EDKII_CRYPTO_BIGNUM_SUB                         BigNumSub;
++  EDKII_CRYPTO_BIGNUM_MOD                         BigNumMod;
++  EDKII_CRYPTO_BIGNUM_EXP_MOD                     BigNumExpMod;
++  EDKII_CRYPTO_BIGNUM_INVERSE_MOD                 BigNumInverseMod;
++  EDKII_CRYPTO_BIGNUM_DIV                         BigNumDiv;
++  EDKII_CRYPTO_BIGNUM_MUL_MOD                     BigNumMulMod;
++  EDKII_CRYPTO_BIGNUM_CMP                         BigNumCmp;
++  EDKII_CRYPTO_BIGNUM_BITS                        BigNumBits;
++  EDKII_CRYPTO_BIGNUM_BYTES                       BigNumBytes;
++  EDKII_CRYPTO_BIGNUM_IS_WORD                     BigNumIsWord;
++  EDKII_CRYPTO_BIGNUM_IS_ODD                      BigNumIsOdd;
++  EDKII_CRYPTO_BIGNUM_COPY                        BigNumCopy;
++  EDKII_CRYPTO_BIGNUM_VALUE_ONE                   BigNumValueOne;
++  EDKII_CRYPTO_BIGNUM_R_SHIFT                     BigNumRShift;
++  EDKII_CRYPTO_BIGNUM_CONSTTIME                   BigNumConsttime;
++  EDKII_CRYPTO_BIGNUM_SQR_MOD                     BigNumSqrMod;
++  EDKII_CRYPTO_BIGNUM_NEW_CONTEXT                 BigNumNewContext;
++  EDKII_CRYPTO_BIGNUM_CONTEXT_FREE                BigNumContextFree;
++  };
+ 
+ extern GUID gEdkiiCryptoProtocolGuid;
+ 

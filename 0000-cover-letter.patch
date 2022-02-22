@@ -1,0 +1,35 @@
+From ff2d7cc113466b46bd1208cc0bb1661a4429b7ba Mon Sep 17 00:00:00 2001
+Message-Id: <cover.1643494016.git.yi1.li@intel.com>
+From: yi1 li <yi1.li@intel.com>
+Date: Sun, 30 Jan 2022 06:06:56 +0800
+Subject: [PATCH 0/2] CryptoPkg: Add BigNum support
+
+This patch series is used to add CryptBn library, which is wrapped
+over OpenSSL. The implementation provides CryptBn library functions
+for EFI BaseCrypt protocol and EFI BaseCrypt Configuration Protocol.
+
+yi1 li (2):
+  CryptoPkg: Add BigNum support
+  CryptoPkg: Add BigNum NullLib
+
+ CryptoPkg/CryptoPkg.dsc                       |   1 +
+ CryptoPkg/Driver/Crypto.c                     | 522 ++++++++++++++-
+ CryptoPkg/Include/Library/BaseCryptLib.h      | 423 +++++++++++++
+ .../Pcd/PcdCryptoServiceFamilyEnable.h        |  30 +
+ .../Library/BaseCryptLib/BaseCryptLib.inf     |   1 +
+ CryptoPkg/Library/BaseCryptLib/Bn/CryptBn.c   | 594 ++++++++++++++++++
+ .../Library/BaseCryptLib/Bn/CryptBnNull.c     | 525 ++++++++++++++++
+ .../Library/BaseCryptLib/PeiCryptLib.inf      |   1 +
+ .../Library/BaseCryptLib/SmmCryptLib.inf      |   2 +-
+ .../BaseCryptLibNull/BaseCryptLibNull.inf     |   1 +
+ .../Library/BaseCryptLibNull/Bn/CryptBnNull.c | 525 ++++++++++++++++
+ .../BaseCryptLibOnProtocolPpi/CryptLib.c      | 497 +++++++++++++++
+ CryptoPkg/Private/Protocol/Crypto.h           | 434 +++++++++++++
+ 13 files changed, 3554 insertions(+), 2 deletions(-)
+ create mode 100644 CryptoPkg/Library/BaseCryptLib/Bn/CryptBn.c
+ create mode 100644 CryptoPkg/Library/BaseCryptLib/Bn/CryptBnNull.c
+ create mode 100644 CryptoPkg/Library/BaseCryptLibNull/Bn/CryptBnNull.c
+
+-- 
+2.33.0.windows.2
+
