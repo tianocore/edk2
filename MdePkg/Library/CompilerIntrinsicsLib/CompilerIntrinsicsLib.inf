@@ -26,6 +26,8 @@
   memcmp_ms.c          | MSFT
   memmove_ms.c         | MSFT
 
+  strcmp.c
+
 [Sources.ARM]
   Arm/ashrdi3.S        | GCC
   Arm/ashldi3.S        | GCC
@@ -66,6 +68,20 @@
 
 [Sources.AARCH64]
   AArch64/Atomics.S    | GCC
+
+[Sources.IA32]
+  Ia32/MathLShiftS64.c      | MSFT
+  Ia32/MathRShiftU64.c      | MSFT
+  Ia32/MathFtol.c           | MSFT
+  Ia32/MathLlmul.asm        | MSFT
+  Ia32/MathLlshr.asm        | MSFT
+
+  Ia32/MathLShiftS64.c      | INTEL
+  Ia32/MathRShiftU64.c      | INTEL
+  Ia32/MathFtol.c           | INTEL
+
+  Ia32/MathLShiftS64.nasm   | GCC
+  Ia32/MathRShiftU64.nasm   | GCC
 
 [Packages]
   MdePkg/MdePkg.dec
