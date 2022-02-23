@@ -69,7 +69,6 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  ArmPkg/ArmPkg.dec
 
 [BuildOptions]
   MSFT:*_*_*_CC_FLAGS = /GL-
