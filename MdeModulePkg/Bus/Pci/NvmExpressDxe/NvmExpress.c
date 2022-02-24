@@ -960,6 +960,33 @@ NvmExpressDriverBindingStart (
     }
 
     //
+    // Save original PCI attributes
+    //
+    Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationGet,
+                      0,
+                      &Private->PciAttributes
+                      );
+
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Enable 64-bit DMA support in the PCI layer.
+    //
+    Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationEnable,
+                      EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE,
+                      NULL
+                      );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "NvmExpressDriverBindingStart: failed to enable 64-bit DMA (%r)\n", Status));
+    }
+
+    //
     // 6 x 4kB aligned buffers will be carved out of this buffer.
     // 1st 4kB boundary is the start of the admin submission queue.
     // 2nd 4kB boundary is the start of the admin completion queue.
