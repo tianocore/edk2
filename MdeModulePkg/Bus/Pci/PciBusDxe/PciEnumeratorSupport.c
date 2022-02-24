@@ -220,8 +220,10 @@ PciSearchDevice (
   )
 {
   PCI_IO_DEVICE  *PciIoDevice;
+  BOOLEAN        IgnoreOptionRom;
 
-  PciIoDevice = NULL;
+  PciIoDevice     = NULL;
+  IgnoreOptionRom = FALSE;
 
   DEBUG ((
     DEBUG_INFO,
@@ -285,7 +287,7 @@ PciSearchDevice (
   //
   // Update the bar information for this PCI device so as to support some specific device
   //
-  UpdatePciInfo (PciIoDevice);
+  UpdatePciInfo (PciIoDevice, &IgnoreOptionRom);
 
   if (PciIoDevice->DevicePath == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -295,7 +297,7 @@ PciSearchDevice (
   // Detect this function has option rom
   //
   if (gFullEnumeration) {
-    if (!IS_CARDBUS_BRIDGE (Pci)) {
+    if (!IS_CARDBUS_BRIDGE (Pci) && !IgnoreOptionRom) {
       GetOpRomInfo (PciIoDevice);
     }
 
@@ -1310,6 +1312,7 @@ DetermineDeviceAttribute (
 
   @param PciIoDevice      Input Pci device instance. Output Pci device instance with updated
                           Bar information.
+  @param IgnoreOptionRom  Output If the option rom of incompatible device need to be ignored.
 
   @retval EFI_SUCCESS     Successfully updated bar information.
   @retval EFI_UNSUPPORTED Given PCI device doesn't belong to incompatible PCI device list.
@@ -1317,7 +1320,8 @@ DetermineDeviceAttribute (
 **/
 EFI_STATUS
 UpdatePciInfo (
-  IN OUT PCI_IO_DEVICE  *PciIoDevice
+  IN OUT PCI_IO_DEVICE  *PciIoDevice,
+  OUT BOOLEAN           *IgnoreOptionRom
   )
 {
   EFI_STATUS                         Status;
@@ -1372,6 +1376,17 @@ UpdatePciInfo (
       // The format is not support
       //
       break;
+    }
+
+    //
+    // According to "Table 20. ACPI 2.0 & 3.0 QWORD Address Space Descriptor Usage"
+    // in PI Spec 1.7, Type-specific flags can be set to 0 when Address Translation
+    // Offset == 6 to skip device option ROM (do not probe option rom BAR).
+    //
+    if (((Ptr->AddrTranslationOffset == PCI_MAX_BAR) && (Ptr->SpecificFlag == 0))) {
+      *IgnoreOptionRom = TRUE;
+      Ptr++;
+      continue;
     }
 
     for (BarIndex = 0; BarIndex < PCI_MAX_BAR; BarIndex++) {

@@ -262,6 +262,7 @@ DetermineDeviceAttribute (
 
   @param PciIoDevice      Input Pci device instance. Output Pci device instance with updated
                           Bar information.
+  @param IgnoreOptionRom  Output If the option rom of incompatible device need to be ignored.
 
   @retval EFI_SUCCESS     Successfully updated bar information.
   @retval EFI_UNSUPPORTED Given PCI device doesn't belong to incompatible PCI device list.
@@ -269,7 +270,8 @@ DetermineDeviceAttribute (
 **/
 EFI_STATUS
 UpdatePciInfo (
-  IN OUT PCI_IO_DEVICE  *PciIoDevice
+  IN OUT PCI_IO_DEVICE  *PciIoDevice,
+  OUT BOOLEAN           *IgnoreOptionRom
   );
 
 /**
