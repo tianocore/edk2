@@ -445,6 +445,12 @@
   #    2 - set by GOP Driver.
   gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource|0|UINT8|0x64
 
+  ## This PCD records LAML field in CC EVENTLOG ACPI table.
+  gUefiOvmfPkgTokenSpaceGuid.PcdCcEventlogAcpiTableLaml|0|UINT32|0x66
+
+  ## This PCD records LASA field in CC EVENTLOG ACPI table.
+  gUefiOvmfPkgTokenSpaceGuid.PcdCcEventlogAcpiTableLasa|0|UINT64|0x67
+
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|FALSE|BOOLEAN|0x1d
