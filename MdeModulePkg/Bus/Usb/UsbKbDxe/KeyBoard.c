@@ -805,7 +805,6 @@ InitUSBKeyboard (
   )
 {
   UINT16      ConfigValue;
-  UINT8       Protocol;
   EFI_STATUS  Status;
   UINT32      TransferResult;
 
@@ -854,22 +853,15 @@ InitUSBKeyboard (
     }
   }
 
-  UsbGetProtocolRequest (
-    UsbKeyboardDevice->UsbIo,
-    UsbKeyboardDevice->InterfaceDescriptor.InterfaceNumber,
-    &Protocol
-    );
   //
   // Set boot protocol for the USB Keyboard.
   // This driver only supports boot protocol.
   //
-  if (Protocol != BOOT_PROTOCOL) {
-    UsbSetProtocolRequest (
-      UsbKeyboardDevice->UsbIo,
-      UsbKeyboardDevice->InterfaceDescriptor.InterfaceNumber,
-      BOOT_PROTOCOL
-      );
-  }
+  UsbSetProtocolRequest (
+    UsbKeyboardDevice->UsbIo,
+    UsbKeyboardDevice->InterfaceDescriptor.InterfaceNumber,
+    BOOT_PROTOCOL
+    );
 
   UsbKeyboardDevice->CtrlOn    = FALSE;
   UsbKeyboardDevice->AltOn     = FALSE;
