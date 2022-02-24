@@ -9,6 +9,8 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <IndustryStandard/Acpi10.h>
 #include <IndustryStandard/Pci22.h>
 
@@ -40,49 +42,38 @@ STATIC EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL
 // This structure is interpreted by the UpdatePciInfo() function in the edk2
 // PCI Bus UEFI_DRIVER.
 //
-#pragma pack (1)
-typedef struct {
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR    AddressSpaceDesc;
-  EFI_ACPI_END_TAG_DESCRIPTOR          EndDesc;
-} MMIO64_PREFERENCE;
-#pragma pack ()
-
-STATIC CONST MMIO64_PREFERENCE  mConfiguration = {
-  //
-  // AddressSpaceDesc
-  //
-  {
-    ACPI_ADDRESS_SPACE_DESCRIPTOR,                 // Desc
-    (UINT16)(                                      // Len
+// This structure looks like:
+// AddressDesc-1 + AddressDesc-2 + ... + AddressDesc-n + EndDesc
+//
+STATIC CONST EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  mMmio64Configuration = {
+  ACPI_ADDRESS_SPACE_DESCRIPTOR,                   // Desc
+  (UINT16)(                                        // Len
                                                    sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
                                                    OFFSET_OF (
                                                      EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
                                                      ResType
                                                      )
                                                    ),
-    ACPI_ADDRESS_SPACE_TYPE_MEM,                   // ResType
-    0,                                             // GenFlag
-    0,                                             // SpecificFlag
-    64,                                            // AddrSpaceGranularity:
+  ACPI_ADDRESS_SPACE_TYPE_MEM,                     // ResType
+  0,                                               // GenFlag
+  0,                                               // SpecificFlag
+  64,                                              // AddrSpaceGranularity:
                                                    //   aperture selection hint
                                                    //   for BAR allocation
-    0,                                             // AddrRangeMin
-    0,                                             // AddrRangeMax:
+  0,                                               // AddrRangeMin
+  0,                                               // AddrRangeMax:
                                                    //   no special alignment
                                                    //   for affected BARs
-    MAX_UINT64,                                    // AddrTranslationOffset:
+  MAX_UINT64,                                      // AddrTranslationOffset:
                                                    //   hint covers all
                                                    //   eligible BARs
-    0                                              // AddrLen:
+  0                                                // AddrLen:
                                                    //   use probed BAR size
-  },
-  //
-  // EndDesc
-  //
-  {
-    ACPI_END_TAG_DESCRIPTOR,                       // Desc
-    0                                              // Checksum: to be ignored
-  }
+};
+
+STATIC CONST EFI_ACPI_END_TAG_DESCRIPTOR  mEndDesc = {
+  ACPI_END_TAG_DESCRIPTOR,                         // Desc
+  0                                                // Checksum: to be ignored
 };
 
 //
@@ -203,6 +194,8 @@ CheckDevice (
   )
 {
   mCheckDeviceCalled = TRUE;
+  UINTN  Length;
+  UINT8  *Ptr;
 
   //
   // Unlike the general description of this protocol member suggests, there is
@@ -232,7 +225,10 @@ CheckDevice (
   // the edk2 PCI Bus UEFI_DRIVER actually handles error codes; see the
   // UpdatePciInfo() function.
   //
-  *Configuration = AllocateCopyPool (sizeof mConfiguration, &mConfiguration);
+  Length = sizeof mMmio64Configuration + sizeof mEndDesc;
+
+  *Configuration = AllocateZeroPool (Length);
+
   if (*Configuration == NULL) {
     DEBUG ((
       DEBUG_WARN,
@@ -244,6 +240,12 @@ CheckDevice (
       ));
     return EFI_OUT_OF_RESOURCES;
   }
+
+  Ptr = (UINT8 *)(UINTN)*Configuration;
+  CopyMem (Ptr, &mMmio64Configuration, sizeof mMmio64Configuration);
+  Length = sizeof mMmio64Configuration;
+
+  CopyMem (Ptr + Length, &mEndDesc, sizeof mEndDesc);
 
   return EFI_SUCCESS;
 }
