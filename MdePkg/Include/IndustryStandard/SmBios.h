@@ -1,9 +1,10 @@
 /** @file
-  Industry Standard Definitions of SMBIOS Table Specification v3.3.0.
+  Industry Standard Definitions of SMBIOS Table Specification v3.5.0.
 
 Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
 (C) Copyright 2015 - 2019 Hewlett Packard Enterprise Development LP<BR>
+Copyright (c) 2022, AMD Incorporated. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -94,6 +95,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SMBIOS_TYPE_MANAGEMENT_CONTROLLER_HOST_INTERFACE  42
 #define SMBIOS_TYPE_TPM_DEVICE                            43
 #define SMBIOS_TYPE_PROCESSOR_ADDITIONAL_INFORMATION      44
+#define SMBIOS_TYPE_FIRMWARE_INVENTORY_INFORMATION        45
+#define SMBIOS_TYPE_STRING_PROPERTY_INFORMATION           46
 
 ///
 /// Inactive type is added from SMBIOS 2.2. Reference SMBIOS 2.6, chapter 3.3.43.
@@ -252,7 +255,9 @@ typedef struct {
   UINT8    TargetContentDistributionEnabled  : 1;
   UINT8    UefiSpecificationSupported        : 1;
   UINT8    VirtualMachineSupported           : 1;
-  UINT8    ExtensionByte2Reserved            : 3;
+  UINT8    ManufacturingModeSupported        : 1;
+  UINT8    ManufacturingModeEnabled          : 1;
+  UINT8    ExtensionByte2Reserved            : 1;
 } MBCE_SYSTEM_RESERVED;
 
 ///
@@ -1402,6 +1407,17 @@ typedef struct {
 } MISC_SLOT_CHARACTERISTICS2;
 
 ///
+/// System Slots - Slot Height
+///
+typedef enum {
+  SlotHeightNone       = 0x00,
+  SlotHeightOther      = 0x01,
+  SlotHeightUnknown    = 0x02,
+  SlotHeightFullHeight = 0x03,
+  SlotHeightLowProfile = 0x04
+} MISC_SLOT_HEIGHT;
+
+///
 /// System Slots - Peer Segment/Bus/Device/Function/Width Groups
 ///
 typedef struct {
@@ -1446,6 +1462,10 @@ typedef struct {
   UINT8                         SlotInformation;
   UINT8                         SlotPhysicalWidth;
   UINT16                        SlotPitch;
+  //
+  // Add for smbios 3.5
+  //
+  UINT8                         SlotHeight;             ///< The enumeration value from MISC_SLOT_HEIGHT.
 } SMBIOS_TABLE_TYPE9;
 
 ///
@@ -2004,7 +2024,9 @@ typedef enum {
   PointingDeviceInterfaceADB              = 0x08,
   PointingDeviceInterfaceBusMouseDB9      = 0xA0,
   PointingDeviceInterfaceBusMouseMicroDin = 0xA1,
-  PointingDeviceInterfaceUsb              = 0xA2
+  PointingDeviceInterfaceUsb              = 0xA2,
+  PointingDeviceInterfaceI2c              = 0xA3,
+  PointingDeviceInterfaceSpi              = 0xA4
 } BUILTIN_POINTING_DEVICE_INTERFACE;
 
 ///
@@ -2508,7 +2530,13 @@ typedef enum {
   OnBoardDeviceExtendedTypeSound          = 0x07,
   OnBoardDeviceExtendedTypePATAController = 0x08,
   OnBoardDeviceExtendedTypeSATAController = 0x09,
-  OnBoardDeviceExtendedTypeSASController  = 0x0A
+  OnBoardDeviceExtendedTypeSASController  = 0x0A,
+  OnBoardDeviceExtendedTypeWirelessLAN    = 0x0B,
+  OnBoardDeviceExtendedTypeBluetooth      = 0x0C,
+  OnBoardDeviceExtendedTypeWWAN           = 0x0D,
+  OnBoardDeviceExtendedTypeeMMC           = 0x0E,
+  OnBoardDeviceExtendedTypeNvme           = 0x0F,
+  OnBoardDeviceExtendedTypeUfc            = 0x10
 } ONBOARD_DEVICE_EXTENDED_INFO_TYPE;
 
 ///
@@ -2647,6 +2675,112 @@ typedef struct {
 } SMBIOS_TABLE_TYPE43;
 
 ///
+/// Firmware Inventory Version Format Type (Type 45).
+///
+typedef enum {
+  VersionFormatTypeFreeForm   = 0x00,
+  VersionFormatTypeMajorMinor = 0x01,
+  VersionFormatType32BitHex   = 0x02,
+  VersionFormatType64BitHex   = 0x03,
+  VersionFormatTypeReserved   = 0x04,  /// 0x04 - 0x7F are reserved
+  VersionFormatTypeOem        = 0x80   /// 0x80 - 0xFF are BIOS Vendor/OEM-specific
+} FIRMWARE_INVENTORY_VERSION_FORMAT_TYPE;
+
+///
+/// Firmware Inventory Firmware Id Format Type (Type 45).
+///
+typedef enum {
+  FirmwareIdFormatTypeFreeForm     = 0x00,
+  FirmwareIdFormatTypeUuid         = 0x01,
+  FirmwareIdFormatTypeReserved     = 0x04,  /// 0x04 - 0x7F are reserved
+  InventoryFirmwareIdFormatTypeOem = 0x80   /// 0x80 - 0xFF are BIOS Vendor/OEM-specific
+} FIRMWARE_INVENTORY_FIRMWARE_ID_FORMAT_TYPE;
+
+///
+/// Firmware Inventory Firmware Characteristics (Type 45).
+///
+typedef enum {
+  CharacteristicsUpdatable      = 0x00,
+  CharacteristicsWriteProtected = 0x01,
+  CharacteristicsReserved       = 0x02    /// 0x02 - 0x0F are reserved
+} FIRMWARE_INVENTORY_CHARACTERISTICS;
+
+///
+/// Firmware Inventory State Information (Type 45).
+///
+typedef enum {
+  FirmwareInventoryStateOther              = 0x01,
+  FirmwareInventoryStateUnknown            = 0x02,
+  FirmwareInventoryStateDisabled           = 0x03,
+  FirmwareInventoryStateEnabled            = 0x04,
+  FirmwareInventoryStateAbsent             = 0x05,
+  FirmwareInventoryStateStandbyOffline     = 0x06,
+  FirmwareInventoryStateStandbySpare       = 0x07,
+  FirmwareInventoryStateUnavailableOffline = 0x08,
+} FIRMWARE_INVENTORY_STATE;
+
+///
+/// Firmware Inventory Information (Type 45)
+///
+/// The information in this structure defines an inventory of firmware
+/// components in the system. This can include firmware components such as
+/// BIOS, BMC, as well as firmware for other devices in the system.
+/// The information can be used by software to display the firmware inventory
+/// in a uniform manner. It can also be used by a management controller,
+/// such as a BMC, for remote system management.
+/// This structure is not intended to replace other standard programmatic
+/// interfaces for firmware updates.
+/// One Type 45 structure is provided for each firmware component.
+///
+typedef struct {
+  SMBIOS_STRUCTURE    Hdr;
+  SMBIOS_HANDLE       RefHandle;
+
+  UINT8               FirmwareComponentName;
+  UINT8               FirmwareVersion;
+  UINT8               FirmwareVersionFormat;    ///< The enumeration value from FIRMWARE_INVENTORY_VERSION_FORMAT_TYPE
+  UINT8               FirmwareId;
+  UINT8               FirmwareIdFormat;
+  UINT8               ReleaseDate;
+  UINT8               Manufacturer;
+  UINT8               LowestSupportedVersion;
+  UINT64              ImageSize;
+  UINT32              Characteristics;
+  UINT8               State;
+  UINT8               AssociatedComponentCount;
+  ///
+  /// zero or n-number of handles depends on AssociatedComponentCount
+  /// handles are of type SMBIOS_HANDLE
+  ///
+} SMBIOS_TABLE_TYPE45;
+
+///
+/// String Property IDs (Type 46).
+///
+typedef enum {
+  StringPropertyIdNone       = 0x0000,
+  StringPropertyIdDevicePath = 0x0001,
+  StringPropertyIdReserved   = 0x0002,  /// Reserved    0x0002 - 0x7FFF
+  StringPropertyIdBiosVendor = 0x8000,  /// BIOS vendor 0x8000 - 0xBFFF
+  StringPropertyIdOem        = 0xC000   /// OEM range   0xC000 - 0xFFFF
+} STRING_PROPERTY_ID;
+
+///
+/// This structure defines a string property for another structure.
+/// This allows adding string properties that are common to several structures
+/// without having to modify the definitions of these structures.
+/// Multiple type 46 structures can add string properties to the same
+/// parent structure.
+///
+typedef struct {
+  SMBIOS_STRUCTURE    Hdr;
+  SMBIOS_HANDLE       RefHandle;
+  UINT16              StringPropertyId;
+  UINT8               StringPropertyValue;
+  SMBIOS_HANDLE       ParentHandle;
+} SMBIOS_TABLE_TYPE46;
+
+///
 /// Inactive (Type 126)
 ///
 typedef struct {
@@ -2710,6 +2844,8 @@ typedef union {
   SMBIOS_TABLE_TYPE42     *Type42;
   SMBIOS_TABLE_TYPE43     *Type43;
   SMBIOS_TABLE_TYPE44     *Type44;
+  SMBIOS_TABLE_TYPE45     *Type45;
+  SMBIOS_TABLE_TYPE46     *Type46;
   SMBIOS_TABLE_TYPE126    *Type126;
   SMBIOS_TABLE_TYPE127    *Type127;
   UINT8                   *Raw;
