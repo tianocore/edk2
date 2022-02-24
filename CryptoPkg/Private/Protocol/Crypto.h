@@ -3126,6 +3126,13 @@ EFI_STATUS
   IN     UINTN                    DataSize
   );
 
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_TLS_SET_MSG_TRACE)(
+  IN     VOID                     *Tls,
+  IN     BOOLEAN                  Enable
+  );
+
 /**
   Gets the protocol version used by the specified TLS connection.
 
@@ -3705,6 +3712,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_TLS_SET_HOST_PUBLIC_CERT              TlsSetHostPublicCert;
   EDKII_CRYPTO_TLS_SET_HOST_PRIVATE_KEY              TlsSetHostPrivateKey;
   EDKII_CRYPTO_TLS_SET_CERT_REVOCATION_LIST          TlsSetCertRevocationList;
+  EDKII_CRYPTO_TLS_SET_MSG_TRACE                     TlsSetMsgTrace;
   /// TLS Get
   EDKII_CRYPTO_TLS_GET_VERSION                       TlsGetVersion;
   EDKII_CRYPTO_TLS_GET_CONNECTION_END                TlsGetConnectionEnd;

@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
+#include <Library/TlsLib.h>
 #include "InternalTlsLib.h"
 
 typedef struct {
@@ -954,6 +955,151 @@ TlsSetCertRevocationList (
   )
 {
   return EFI_UNSUPPORTED;
+}
+
+STATIC CONST CHAR8 *
+TlsContentType (
+  IN     UINT32  ContentType
+  )
+{
+  switch (ContentType) {
+    case 20:
+      return "change cipher spec";
+    case 21:
+      return "alert";
+    case 22:
+      return "handshake";
+    case 23:
+      return "application data";
+    case 24:
+      return "heartbeat";
+    case 256:
+      return "TLS header info"; /* pseudo content type */
+    case 257:
+      return "inner content type"; /* pseudo content type */
+    default:
+      return "?";
+  }
+}
+
+STATIC CONST CHAR8 *
+TlsHandshakeType (
+  IN     UINT32       ContentType,
+  IN     CONST UINT8  *Data,
+  IN     UINTN        DataLen
+  )
+{
+  if ((ContentType == 257) && Data && (DataLen == 1)) {
+    return TlsContentType (Data[0]);
+  }
+
+  if ((ContentType != 22) || !Data || (DataLen == 0)) {
+    return "";
+  }
+
+  switch (Data[0]) {
+    case 0:
+      return "hello request";
+    case 1:
+      return "client hello";
+    case 2:
+      return "server hello";
+    case 3:
+      return "hello verify request";
+    case 4:
+      return "new session ticket";
+    case 5:
+      return "end of early data";
+    case 6:
+      return "hello retry request";
+    case 8:
+      return "encrypted extensions";
+    case 11:
+      return "certificate";
+    case 12:
+      return "server key exchange";
+    case 13:
+      return "certificate request";
+    case 14:
+      return "server hello done";
+    case 15:
+      return "certificate verify";
+    case 16:
+      return "client key exchange";
+    case 20:
+      return "finished";
+    case 21:
+      return "certificate url";
+    case 22:
+      return "certificate status";
+    case 23:
+      return "supplemental data";
+    case 24:
+      return "key update";
+    case 254:
+      return "message hash";
+    default:
+      return "?";
+  }
+}
+
+STATIC VOID
+TlsMsgCb (
+  IN     INT32       Direction,
+  IN     INT32       Version,
+  IN     INT32       ContentType,
+  IN     CONST VOID  *Data,
+  IN     size_t      DataSize,
+  IN     SSL         *Ssl,
+  IN     VOID        *Arg
+  )
+{
+  if (Direction == 2) {
+    DEBUG ((
+      DEBUG_INFO,
+      "TLS Message: session ver=0x%x ContentType=%d\n",
+      Version,
+      ContentType
+      ));
+    return;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "TLS Message: %a ver=0x%x ContentType=%u (%a:%a), len=%u\n",
+    Direction ? "TX" : "RX",
+    Version,
+    ContentType,
+    TlsContentType (ContentType),
+    TlsHandshakeType (ContentType, Data, DataSize),
+    DataSize
+    ));
+}
+
+EFI_STATUS
+EFIAPI
+TlsSetMsgTrace (
+  IN     VOID     *Tls,
+  IN     BOOLEAN  Enable
+  )
+{
+  TLS_CONNECTION  *TlsConn;
+
+  TlsConn = (TLS_CONNECTION *)Tls;
+
+  if (!TlsConn || !TlsConn->Ssl) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Enable) {
+    SSL_set_msg_callback (TlsConn->Ssl, TlsMsgCb);
+    SSL_set_msg_callback_arg (TlsConn->Ssl, TlsConn);
+  } else {
+    SSL_set_msg_callback (TlsConn->Ssl, NULL);
+    SSL_set_msg_callback_arg (TlsConn->Ssl, NULL);
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**

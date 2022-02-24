@@ -268,6 +268,7 @@ typedef struct {
       UINT8    HostPublicCert     : 1;
       UINT8    HostPrivateKey     : 1;
       UINT8    CertRevocationList : 1;
+      UINT8    SetMsgTrace        : 1;
     } Services;
     UINT32    Family;
   } TlsSet;

@@ -554,6 +554,24 @@ TlsSetCertRevocationList (
   );
 
 /**
+  Enable tracing of all TLS protocol messages.
+
+  @param[in]  Tls         Pointer to the TLS object.
+  @param[in]  Enable      Enable tracing iff TRUE.
+
+  @retval  EFI_SUCCESS           The operation succeeded.
+  @retval  EFI_UNSUPPORTED       This function is not supported.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+TlsSetMsgTrace (
+  IN     VOID     *Tls,
+  IN     BOOLEAN  Enable
+  );
+
+/**
   Gets the protocol version used by the specified TLS connection.
 
   This function returns the protocol version used by the specified TLS

@@ -296,6 +296,17 @@ TlsSetCertRevocationList (
   return EFI_UNSUPPORTED;
 }
 
+EFI_STATUS
+EFIAPI
+TlsSetMsgCb (
+  IN     VOID     *Tls,
+  IN     BOOLEAN  Enable
+  )
+{
+  ASSERT (FALSE);
+  return EFI_UNSUPPORTED;
+}
+
 /**
   Gets the protocol version used by the specified TLS connection.
 

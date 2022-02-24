@@ -4177,6 +4177,16 @@ CryptoServiceTlsSetCertRevocationList (
   return CALL_BASECRYPTLIB (TlsSet.Services.CertRevocationList, TlsSetCertRevocationList, (Data, DataSize), EFI_UNSUPPORTED);
 }
 
+EFI_STATUS
+EFIAPI
+CryptoServiceTlsSetMsgTrace (
+  IN     VOID     *Tls,
+  IN     BOOLEAN  Enable
+  )
+{
+  return CALL_BASECRYPTLIB (TlsSet.Services.SetMsgTrace, TlsSetMsgTrace, (Tls, Enable), EFI_UNSUPPORTED);
+}
+
 /**
   Gets the protocol version used by the specified TLS connection.
 
@@ -4830,6 +4840,7 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   CryptoServiceTlsSetHostPublicCert,
   CryptoServiceTlsSetHostPrivateKey,
   CryptoServiceTlsSetCertRevocationList,
+  CryptoServiceTlsSetMsgTrace,
   /// TLS Get
   CryptoServiceTlsGetVersion,
   CryptoServiceTlsGetConnectionEnd,

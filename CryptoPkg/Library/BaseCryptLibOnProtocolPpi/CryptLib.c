@@ -3320,6 +3320,16 @@ TlsSetCertRevocationList (
   CALL_CRYPTO_SERVICE (TlsSetCertRevocationList, (Data, DataSize), EFI_UNSUPPORTED);
 }
 
+EFI_STATUS
+EFIAPI
+TlsSetMsgTrace (
+  IN     VOID     *Tls,
+  IN     BOOLEAN  Enable
+  )
+{
+  CALL_CRYPTO_SERVICE (TlsSetMsgTrace, (Tls, Enable), EFI_UNSUPPORTED);
+}
+
 /**
   Gets the protocol version used by the specified TLS connection.
 
