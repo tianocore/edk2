@@ -1173,6 +1173,10 @@
                                                                                           " TRUE  - Capsule In Ram is supported.<BR>"
                                                                                           " FALSE - Capsule In Ram is not supported."
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSdMmcGenericTimeoutValue_PROMPT #language en-US "SD/MMC Host Controller Operations Timeout (us)."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSdMmcGenericTimeoutValue_HELP   #language en-US "Indicates the default timeout value for SD/MMC Host Controller operations in microseconds."
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCodRelocationDevPath_PROMPT  #language en-US "Capsule On Disk relocation device path."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCodRelocationDevPath_HELP  #language en-US   "Full device path of platform specific device to store Capsule On Disk temp relocation file.<BR>"
