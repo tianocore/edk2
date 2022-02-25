@@ -22,6 +22,7 @@
 #include <Library/IoLib.h>
 #include <Library/PeCoffLib.h>
 #include <Library/BlParseLib.h>
+#include <Library/SmmStoreParseLib.h>
 #include <Library/PlatformSupportLib.h>
 #include <Library/CpuLib.h>
 #include <IndustryStandard/Acpi.h>
@@ -37,6 +38,7 @@
 #include <UniversalPayload/SerialPortInfo.h>
 #include <UniversalPayload/DeviceTree.h>
 #include <Guid/PcdDataBaseSignatureGuid.h>
+#include <Guid/SmmStoreInfoGuid.h>
 
 #define LEGACY_8259_MASK_REGISTER_MASTER  0x21
 #define LEGACY_8259_MASK_REGISTER_SLAVE   0xA1
