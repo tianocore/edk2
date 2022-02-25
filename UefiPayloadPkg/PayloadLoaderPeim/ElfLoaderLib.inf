@@ -1,0 +1,45 @@
+## @file
+#  Produce LoadFile PPI for payload loading.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ElfLoaderLib
+  FILE_GUID                      = EC2CE04E-FCC5-4D4B-87F4-3E5DFF9FD592
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  ElfLib.h
+  ElfLib/ElfLibInternal.h
+  ElfLib/ElfCommon.h
+  ElfLib/Elf32.h
+  ElfLib/Elf64.h
+  ElfLib/ElfLibInternal.h
+  ElfLib/ElfLib.c
+  ElfLib/Elf32Lib.c
+  ElfLib/Elf64Lib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  BaseMemoryLib
+  HobLib
+  BaseLib
+  DebugLib

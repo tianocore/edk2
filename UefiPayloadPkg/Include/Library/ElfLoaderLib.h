@@ -1,33 +1,37 @@
 /** @file
-  ELF library
+  This library can parse and load ELF format binary in memory
+  and extract those required information.
 
-  Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef ELF_LIB_H_
-#define ELF_LIB_H_
+#ifndef ELF_LOADER_LIB_
+#define ELF_LOADER_LIB_
 
 #include <PiPei.h>
-#include <Library/ElfLoaderLib.h>
-
-#define  ELF_CLASS32  1
-#define  ELF_CLASS64  2
-
-#define  ELF_PT_LOAD  1
 
 typedef struct {
-  UINT32    PtType;
-  UINTN     Offset;
-  UINTN     Length;
-  UINTN     MemLen;
-  UINTN     MemAddr;
-  UINTN     Alignment;
-} SEGMENT_INFO;
+  RETURN_STATUS    ParseStatus;            ///< Return the status after ParseElfImage().
+  UINT8            *FileBase;              ///< The source location in memory.
+  UINTN            FileSize;               ///< The size including sections that don't require loading.
+  UINT8            *PreferredImageAddress; ///< The preferred image to be loaded. No relocation is needed if loaded to this address.
+  BOOLEAN          ReloadRequired;         ///< The image needs a new memory location for running.
+  UINT8            *ImageAddress;          ///< The destination memory address set by caller.
+  UINTN            ImageSize;              ///< The memory size for loading and execution.
+  UINT32           EiClass;
+  UINT32           ShNum;
+  UINT32           PhNum;
+  UINTN            ShStrOff;
+  UINTN            ShStrLen;
+  UINTN            EntryPoint;           ///< Return the actual entry point after LoadElfImage().
+} ELF_IMAGE_CONTEXT;
 
 /**
   Parse the ELF image info.
+
+  On return, all fields in ElfCt are updated except ImageAddress.
 
   @param[in]  ImageBase      Memory address of an image.
   @param[out] ElfCt          The EFL image context pointer.
@@ -44,11 +48,14 @@ ParseElfImage (
   OUT ELF_IMAGE_CONTEXT  *ElfCt
   );
 
-/**
-  Load the ELF segments to specified address in ELF header.
 
-  This function loads ELF image segments into memory address specified
-  in ELF program header.
+/**
+  Load the ELF image to Context.ImageAddress.
+
+  Context should be initialized by ParseElfImage().
+  Caller should set Context.ImageAddress to a proper value, either pointing to
+  a new allocated memory whose size equal to Context.ImageSize, or pointing
+  to Context.PreferredImageAddress.
 
   @param[in]  ElfCt               ELF image context pointer.
 
@@ -62,6 +69,7 @@ EFIAPI
 LoadElfImage (
   IN  ELF_IMAGE_CONTEXT  *ElfCt
   );
+
 
 /**
   Get a ELF section name from its index.
@@ -81,6 +89,7 @@ GetElfSectionName (
   IN  UINT32             SectionIndex,
   OUT CHAR8              **SectionName
   );
+
 
 /**
   Get the offset and size of x-th ELF section.
@@ -104,4 +113,4 @@ GetElfSectionPos (
   OUT UINTN              *Size
   );
 
-#endif /* ELF_LIB_H_ */
+#endif
