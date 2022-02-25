@@ -176,6 +176,9 @@
   MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
   MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
 
+[Components.IA32]
+  MdePkg/Library/VsIntrinsicLib/VsIntrinsicLib.inf
+
 [Components.EBC]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
