@@ -1,0 +1,17 @@
+// /** @file
+// VsIntrinsic Library implementation.
+//
+// VsIntrinsic Library implementation.
+//
+//
+//
+//Copyright (c) Microsoft Corporation. All rights reserved.
+//SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "VsIntrinsic Library implementation"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "VsIntrinsic Library implementation"
+
