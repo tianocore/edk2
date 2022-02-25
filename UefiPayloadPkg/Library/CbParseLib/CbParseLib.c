@@ -14,6 +14,7 @@
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
 #include <Library/BlParseLib.h>
+#include <Library/SmmStoreParseLib.h>
 #include <IndustryStandard/Acpi.h>
 #include <Coreboot.h>
 
@@ -602,5 +603,47 @@ ParseMiscInfo (
   VOID
   )
 {
+  return RETURN_SUCCESS;
+}
+
+/**
+  Find the SmmStore HOB.
+
+  @param  SmmStoreInfo       Pointer to the SMMSTORE_INFO structure
+
+  @retval RETURN_SUCCESS     Successfully find the Smm store buffer information.
+  @retval RETURN_NOT_FOUND   Failed to find the Smm store buffer information .
+**/
+RETURN_STATUS
+EFIAPI
+ParseSmmStoreInfo (
+  OUT SMMSTORE_INFO  *SmmStoreInfo
+  )
+{
+  struct cb_smmstorev2  *CbSSRec;
+
+  if (SmmStoreInfo == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  CbSSRec = FindCbTag (CB_TAG_SMMSTOREV2);
+  if (CbSSRec == NULL) {
+    return RETURN_NOT_FOUND;
+  }
+
+  DEBUG ((DEBUG_INFO, "Found Smm Store information\n"));
+  DEBUG ((DEBUG_INFO, "block size: 0x%x\n", CbSSRec->block_size));
+  DEBUG ((DEBUG_INFO, "number of blocks: 0x%x\n", CbSSRec->num_blocks));
+  DEBUG ((DEBUG_INFO, "communication buffer: 0x%x\n", CbSSRec->com_buffer));
+  DEBUG ((DEBUG_INFO, "communication buffer size: 0x%x\n", CbSSRec->com_buffer_size));
+  DEBUG ((DEBUG_INFO, "MMIO address of store: 0x%x\n", CbSSRec->mmap_addr));
+
+  SmmStoreInfo->ComBuffer     = CbSSRec->com_buffer;
+  SmmStoreInfo->ComBufferSize = CbSSRec->com_buffer_size;
+  SmmStoreInfo->BlockSize     = CbSSRec->block_size;
+  SmmStoreInfo->NumBlocks     = CbSSRec->num_blocks;
+  SmmStoreInfo->MmioAddress   = CbSSRec->mmap_addr;
+  SmmStoreInfo->ApmCmd        = CbSSRec->apm_cmd;
+
   return RETURN_SUCCESS;
 }
