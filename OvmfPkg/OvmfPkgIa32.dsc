@@ -231,6 +231,14 @@
 
 !include OvmfPkg/OvmfTpmLibs.dsc.inc
 
+!if $(TOOL_CHAIN_TAG) == "VS2019"
+[LibraryClasses.IA32.UEFI_DRIVER]
+  NULL|MdePkg/Library/VsIntrinsicLib/VsIntrinsicLib.inf
+
+[LibraryClasses.common.PEIM]
+  NULL|MdePkg/Library/VsIntrinsicLib/VsIntrinsicLib.inf
+!endif
+
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   VmgExitLib|UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
