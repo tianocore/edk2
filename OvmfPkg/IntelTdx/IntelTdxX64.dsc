@@ -526,6 +526,10 @@
   OvmfPkg/IntelTdx/Sec/SecMain.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
+      SecMeasurementLib|OvmfPkg/Library/SecMeasurementLib/SecMeasurementLibTdx.inf
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SecCryptLib.inf
+      HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
   }
 
   #
