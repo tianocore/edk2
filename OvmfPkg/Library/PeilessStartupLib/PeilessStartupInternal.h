@@ -52,4 +52,61 @@ EFIAPI
 ConstructSecHobList (
   );
 
+/**
+  Measure the Hoblist passed from the VMM.
+
+  This function will create a unique GUID hob entry will be
+  found from the TCG driver building the event log.
+  This module will generate the measurement with the data in
+  this hob, and log the event.
+
+  @param[in] VmmHobList    The Hoblist pass the firmware
+
+  @retval EFI_SUCCESS           Fv image is measured successfully
+                                or it has been already measured.
+  @retval Others                Other errors as indicated
+**/
+EFI_STATUS
+EFIAPI
+MeasureHobList (
+  IN CONST VOID  *VmmHobList
+  );
+
+/**
+  Check the integrity of CFV data.
+
+  @param[in] TdxCfvBase - A pointer to CFV header
+  @param[in] TdxCfvSize - CFV data size
+
+  @retval  TRUE   - The CFV data is valid.
+  @retval  FALSE  - The CFV data is invalid.
+
+**/
+BOOLEAN
+EFIAPI
+TdxValidateCfv (
+  IN UINT8   *TdxCfvBase,
+  IN UINT32  TdxCfvSize
+  );
+
+/**
+  Measure FV image.
+  Add it into the measured FV list after the FV is measured successfully.
+
+  @param[in]  FvBase            Base address of FV image.
+  @param[in]  FvLength          Length of FV image.
+  @param[in]  PcrIndex          Index of PCR
+
+  @retval EFI_SUCCESS           Fv image is measured successfully
+                                or it has been already measured.
+  @retval Others                Other errors as indicated
+**/
+EFI_STATUS
+EFIAPI
+TdxMeasureCfvImage (
+  IN EFI_PHYSICAL_ADDRESS  FvBase,
+  IN UINT64                FvLength,
+  IN UINT8                 PcrIndex
+  );
+
 #endif
