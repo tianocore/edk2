@@ -233,7 +233,7 @@
 
 !if $(TOOL_CHAIN_TAG) == "VS2019"
 [LibraryClasses.IA32.UEFI_DRIVER]
-  NULL|MdePkg/Library/VsIntrinsicLib/VsIntrinsicLib.inf
+  VsIntrinsicLib|MdePkg/Library/VsIntrinsicLib/VsIntrinsicLib.inf
 !endif
 
 [LibraryClasses.common]

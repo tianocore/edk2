@@ -46,7 +46,7 @@ _allmul PROC NEAR
 A       EQU     [esp + 4]       ; stack address of a
 B       EQU     [esp + 12]      ; stack address of b
 
-HIGH_PART  EQU     [4]             ; 
+HIGH_PART  EQU     [4]             ;
 LOW_PART   EQU     [0]
 
 ;

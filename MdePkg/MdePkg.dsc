@@ -176,9 +176,7 @@
   MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
   MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
 
-[Components.IA32]
-  # For VS2017 support link the VsIntrinsicLib into all 32 bit modules
-  MdePkg/Library/VsIntrinsicLib/VsIntrinsicLib.inf
+
 
 [Components.EBC]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
