@@ -307,4 +307,24 @@ extern EFI_GUID  gEfiCcFinalEventsTableGuid;
 
 extern EFI_GUID  gCcEventEntryHobGuid;
 
+//
+// Define the CC Measure EventLog ACPI Table
+//
+#pragma pack(1)
+
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  UINT32                         Rsvd;
+  UINT64                         Laml;
+  UINT64                         Lasa;
+} EFI_CC_EVENTLOG_ACPI_TABLE;
+
+#pragma pack()
+
+//
+// Define the signature and revision of CC Measurement EventLog ACPI Table for Td guest
+//
+#define EFI_CC_EVENTLOG_ACPI_TABLE_TD_SIGNATURE  SIGNATURE_32('T', 'D', 'E', 'L')
+#define EFI_CC_EVENTLOG_ACPI_TABLE_TD_REVISION   1
+
 #endif
