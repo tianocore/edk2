@@ -634,9 +634,6 @@
   RngLib
   PrintLib
 
-[LibraryClasses.IA32]
-  VsIntrinsicLib
-
 [LibraryClasses.ARM]
   ArmSoftFloatLib
 
