@@ -52,7 +52,8 @@
             "Include/IndustryStandard/UefiTcgPlatform.h",
             "Include/Library/PcdLib.h",
             "Include/Library/SafeIntLib.h",
-            "Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.c"
+            "Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.c",
+            "Library/VsIntrinsicLib/VsIntrinsicLib.inf"
         ]
     },
     ## options defined ci/Plugin/CompilerPlugin
