@@ -299,4 +299,12 @@ typedef struct {
 
 extern EFI_GUID  gEfiCcFinalEventsTableGuid;
 
+//
+// The Global ID of a GUIDed HOB used to pass a CC_EVENT from a SEC to a TDX DXE Driver.
+//
+#define EFI_CC_EVENT_HOB_GUID \
+  { 0x20f8fd36, 0x6d00, 0x40fb, { 0xb7, 0x04, 0xd1, 0x2c, 0x15, 0x3c, 0x62, 0xeb } }
+
+extern EFI_GUID  gCcEventEntryHobGuid;
+
 #endif
