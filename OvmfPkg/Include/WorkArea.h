@@ -46,12 +46,20 @@ typedef struct _CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER {
 // any changes must stay in sync with its usage.
 //
 typedef struct _SEC_SEV_ES_WORK_AREA {
-  UINT8     SevEsEnabled;
-  UINT8     Reserved1[7];
+  //
+  // Hold the SevStatus MSR value read by OvmfPkg/ResetVector/Ia32/AmdSev.c
+  //
+  UINT64    SevStatusMsrValue;
 
   UINT64    RandomData;
 
   UINT64    EncryptionMask;
+
+  //
+  // Indicator that the VC handler is called. It is used during the SevFeature
+  // detection in OvmfPkg/ResetVector/Ia32/AmdSev.c
+  //
+  UINT8     ReceivedVc;
 } SEC_SEV_ES_WORK_AREA;
 
 //
