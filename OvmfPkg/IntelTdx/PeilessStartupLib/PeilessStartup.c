@@ -186,6 +186,13 @@ PeilessStartup (
   DEBUG ((DEBUG_INFO, "HobList: %p\n", GetHobList ()));
 
   //
+  // Measure HobList if it is Td guest
+  //
+  if (TdIsEnabled ()) {
+    MeasureHobList (VmmHobList);
+  }
+
+  //
   // Initialize the Platform
   //
   Status = InitializePlatform (&PlatformInfoHob);

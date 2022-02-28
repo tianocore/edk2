@@ -52,4 +52,20 @@ EFIAPI
 ConstructSecHobList (
   );
 
+/**
+  Measure the Hoblist passed from the VMM.
+
+  This function will create a unique GUID hob entry will be
+  found from the TCG driver building the event log.
+  This module will generate the measurement with the data in
+  this hob, and log the event.
+
+  @param[in] VmmHobList    The Hoblist pass the firmware
+**/
+VOID
+EFIAPI
+MeasureHobList (
+  IN CONST VOID  *VmmHobList
+  );
+
 #endif
