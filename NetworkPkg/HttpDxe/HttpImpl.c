@@ -1106,6 +1106,14 @@ HttpResponseWorker (
     }
 
     //
+    // Check server's HTTP version.
+    //
+    if (AsciiStrnCmp (HttpHeaders, "HTTP/1.0", AsciiStrLen ("HTTP/1.0")) == 0) {
+      DEBUG ((DEBUG_VERBOSE, "HTTP: Server version is 1.0. Setting Connection close.\n"));
+      HttpInstance->ConnectionClose = TRUE;
+    }
+
+    //
     // Search for Status Code.
     //
     StatusCodeStr = HttpHeaders + AsciiStrLen (HTTP_VERSION_STR) + 1;
