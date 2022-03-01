@@ -900,12 +900,17 @@ UsbEnumeratePort (
   Child  = NULL;
   HubApi = HubIf->HubApi;
 
+  // Zero out PortState in case GetPortStatus does not set
+  // it and we continue on the EFI_DEVICE_ERROR path
+  PortState.PortStatus       = 0;
+  PortState.PortChangeStatus = 0;
+
   //
   // Host learns of the new device by polling the hub for port changes.
   //
   Status = HubApi->GetPortStatus (HubIf, Port, &PortState);
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && (Status != EFI_DEVICE_ERROR)) {
     DEBUG ((DEBUG_ERROR, "UsbEnumeratePort: failed to get state of port %d\n", Port));
     return Status;
   }
@@ -987,7 +992,9 @@ UsbEnumeratePort (
     // Now, new device connected, enumerate and configure the device
     //
     DEBUG ((DEBUG_INFO, "UsbEnumeratePort: new device connected at port %d\n", Port));
-    if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_RESET)) {
+    if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_RESET) &&
+        (Status != EFI_DEVICE_ERROR))
+    {
       Status = UsbEnumerateNewDev (HubIf, Port, FALSE);
     } else {
       Status = UsbEnumerateNewDev (HubIf, Port, TRUE);
