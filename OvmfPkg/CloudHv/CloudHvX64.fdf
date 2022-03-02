@@ -14,8 +14,8 @@
 !include OvmfPkg/OvmfPkgDefines.fdf.inc
 
 #
-# Build the variable store and the firmware code as one unified flash device
-# image.
+# This will allow the flash device image to be recognize as an ELF, with first
+# an ELF headers, then the firmware code.
 #
 [FD.CLOUDHV]
 BaseAddress   = $(FW_BASE_ADDRESS)
@@ -24,7 +24,14 @@ ErasePolarity = 1
 BlockSize     = $(BLOCK_SIZE)
 NumBlocks     = $(FW_BLOCKS)
 
-0x00000000|$(FVMAIN_SIZE)
+#
+# Leaving 4kiB for the PVH ELF header. This is more than enough.
+#
+0x00000000|0x00001000
+
+!include CloudHvElfHeader.fdf.inc
+
+0x00001000|$(FVMAIN_SIZE)
 FV = FVMAIN_COMPACT
 
 $(SECFV_OFFSET)|$(SECFV_SIZE)
@@ -114,7 +121,7 @@ READ_LOCK_STATUS   = TRUE
 #
 INF  OvmfPkg/Sec/SecMain.inf
 
-INF  RuleOverride=RESET_VECTOR OvmfPkg/ResetVector/ResetVector.inf
+INF  RuleOverride=RESET_VECTOR OvmfPkg/XenResetVector/XenResetVector.inf
 
 ################################################################################
 [FV.PEIFV]
