@@ -25,6 +25,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <PiPei.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/UefiCpuLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
@@ -738,13 +739,7 @@ CreateIdentityMappingPageTables (
   if (Hob != NULL) {
     PhysicalAddressBits = ((EFI_HOB_CPU *)Hob)->SizeOfMemorySpace;
   } else {
-    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-    if (RegEax >= 0x80000008) {
-      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-      PhysicalAddressBits = (UINT8)RegEax;
-    } else {
-      PhysicalAddressBits = 36;
-    }
+    PhysicalAddressBits = GetPhysicalAddressBits (NULL, NULL);
   }
 
   //
