@@ -891,8 +891,14 @@ CreateTransferRing (
   VOID                  *Buf;
   LINK_TRB              *EndTrb;
   EFI_PHYSICAL_ADDRESS  PhyAddr;
+  VOID                  *NewBuf;
 
   Buf = UsbHcAllocateMem (Xhc->MemPool, sizeof (TRB_TEMPLATE) * TrbNum);
+  if((((UINTN)Buf & ((1<<16)-1)) + sizeof (TRB_TEMPLATE) * TrbNum) & (1<<16)) {
+    NewBuf = UsbHcAllocateMem (Xhc->MemPool,sizeof(TRB_TEMPLATE) * TrbNum);
+    UsbHcFreeMem(Xhc->MemPool,Buf,sizeof(TRB_TEMPLATE)*TrbNum);
+    Buf = NewBuf;
+  }
   ASSERT (Buf != NULL);
   ASSERT (((UINTN)Buf & 0x3F) == 0);
   ZeroMem (Buf, sizeof (TRB_TEMPLATE) * TrbNum);
