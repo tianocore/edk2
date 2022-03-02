@@ -337,7 +337,6 @@
   Ebc/SpeculationBarrier.c
   Unaligned.c
   Math64.c
-  IntelTdxNull.c
 
 [Sources.ARM]
   Arm/InternalSwitchStack.c
@@ -375,8 +374,6 @@
   Arm/MemoryFence.S             | GCC
   Arm/SpeculationBarrier.S      | GCC
 
-  IntelTdxNull.c
-
 [Sources.AARCH64]
   Arm/InternalSwitchStack.c
   Arm/Unaligned.c
@@ -400,8 +397,6 @@
   AArch64/CpuBreakpoint.asm         | MSFT
   AArch64/SpeculationBarrier.asm    | MSFT
 
-  IntelTdxNull.c
-
 [Sources.RISCV64]
   Math64.c
   Unaligned.c
@@ -417,8 +412,6 @@
   RiscV64/RiscVCpuPause.S           | GCC
   RiscV64/RiscVInterrupt.S          | GCC
   RiscV64/FlushCache.S              | GCC
-
-  IntelTdxNull.c
 
 [Packages]
   MdePkg/MdePkg.dec

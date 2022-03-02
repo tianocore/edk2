@@ -4759,6 +4759,8 @@ SpeculationBarrier (
   VOID
   );
 
+#if defined (MDE_CPU_X64) || defined (MDE_CPU_IA32)
+
 /**
   The TDCALL instruction causes a VM exit to the Intel TDX module.  It is
   used to call guest-side Intel TDX functions, either local or a TD exit
@@ -4820,6 +4822,8 @@ EFIAPI
 TdIsEnabled (
   VOID
   );
+
+#endif
 
 #if defined (MDE_CPU_X64)
 //
