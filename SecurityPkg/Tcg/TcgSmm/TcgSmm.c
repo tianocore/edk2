@@ -8,7 +8,7 @@
 
   PhysicalPresenceCallback() and MemoryClearCallback() will receive untrusted input and do some check.
 
-Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -33,7 +33,7 @@ TCG_NVS                    *mTcgNvs;
   @param[in, out] CommBufferSize  The size of the CommBuffer.
 
   @retval EFI_SUCCESS             The interrupt was handled successfully.
-
+  @retval EFI_ABORTED             Fail to wait for all AP check in SMM.
 **/
 EFI_STATUS
 EFIAPI
@@ -90,6 +90,11 @@ PhysicalPresenceCallback (
       //
       mTcgNvs->PhysicalPresence.ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED;
       return EFI_SUCCESS;
+    }
+
+    if (EFI_ERROR (SmmWaitForAllProcessor (TRUE))) {
+      DEBUG ((DEBUG_ERROR, "TPMPhysicalPresent: fail to wait for all AP check in SMM!\n"));
+      return EFI_ABORTED;
     }
 
     if (PpData.PPRequest != mTcgNvs->PhysicalPresence.Request) {
@@ -238,6 +243,7 @@ PhysicalPresenceCallback (
   @param[in, out] CommBufferSize  The size of the CommBuffer.
 
   @retval EFI_SUCCESS             The interrupt was handled successfully.
+  @retval EFI_ABORTED             Fail to wait for all AP check in SMM.
 
 **/
 EFI_STATUS
@@ -280,6 +286,11 @@ MemoryClearCallback (
     mTcgNvs->MemoryClear.ReturnCode = MOR_REQUEST_GENERAL_FAILURE;
     DEBUG ((DEBUG_ERROR, "[TPM] MOR Parameter error! Parameter = %x\n", mTcgNvs->MemoryClear.Parameter));
     return EFI_SUCCESS;
+  }
+
+  if (EFI_ERROR (SmmWaitForAllProcessor (TRUE))) {
+    DEBUG ((DEBUG_ERROR, " TpmMemoryClear: fail to wait for all AP check in SMM!\n"));
+    return EFI_ABORTED;
   }
 
   DataSize = sizeof (UINT8);
