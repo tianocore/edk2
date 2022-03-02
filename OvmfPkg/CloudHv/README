@@ -1,0 +1,67 @@
+
+CloudHv is a port of OVMF for the Cloud Hypervisor project.
+
+The Cloud Hypervisor project
+----------------------------
+
+Cloud Hypervisor is a Virtual Machine Monitor that runs on top of KVM. The
+project focuses on exclusively running modern, cloud workloads, on top of a
+limited set of hardware architectures and platforms. Cloud workloads refers to
+those that are usually run by customers inside a cloud provider. This means
+modern operating systems with most I/O handled by paravirtualised devices
+(i.e. virtio), no requirement for legacy devices, and 64-bit CPUs.
+
+https://github.com/cloud-hypervisor/cloud-hypervisor
+
+Design
+------
+
+Based on Cloud Hypervisor's motto to reduce the emulation as much as possible,
+the project logically decided to support the PVH boot specification as the only
+way of booting virtual machines. That includes both direct kernel boot and OVMF
+firmware which must be generated as PVH ELF binaries.
+PVH allows information like location of ACPI tables and location of guest RAM
+ranges to be shared without the need of an extra emulated device like a CMOS.
+
+Features
+--------
+
+* Serial console
+* EFI shell
+* virtio-pci
+
+Build
+-----
+
+The way to build the CloudHv target is as follows:
+
+OvmfPkg/build.sh -p OvmfPkg/CloudHv/CloudHvX64.dsc -a X64 -b DEBUG
+
+Usage
+-----
+
+Assuming Cloud Hypervisor is already built, one can start a virtual machine as
+follows:
+
+./cloud-hypervisor \
+    --cpus boot=1 \
+    --memory size=1G \
+    --kernel Build/CloudHvX64/DEBUG_GCC5/FV/CLOUDHV.fd \
+    --disk path=/path/to/disk.raw
+
+Releases
+--------
+
+In edk2-stable202202, CloudHv is generated as data-only binary.
+Starting with edk2-stable202205, CloudHv is generated as a PVH ELF binary to
+reduce the amount of emulation needed from Cloud Hypervisor.
+For TDX, things are handled differently and PVH is not used, which is why the
+firmware is always generated as a data-only binary.
+
++-------------------+----------------+
+|                   |    CloudHv     |
++-------------------+----------------+
+| edk2-stable202202 | Data binary    |
++-------------------+----------------+
+| edk2-stable202205 | PVH ELF binary |
++-------------------+----------------+
