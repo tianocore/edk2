@@ -137,8 +137,23 @@ EnumerateNvmeDevNamespace (
     Device->Media.WriteCaching     = FALSE;
     Device->Media.IoAlign          = Private->PassThruMode.IoAlign;
 
-    Flbas                   = NamespaceData->Flbas;
-    LbaFmtIdx               = Flbas & 0xF;
+    Flbas     = NamespaceData->Flbas;
+    LbaFmtIdx = Flbas & 0xF;
+
+    //
+    // Currently this NVME driver only suport Metadata Size == 0
+    //
+    if (NamespaceData->LbaFormat[LbaFmtIdx].Ms != 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "NVME IDENTIFY NAMESPACE [%d] Ms(%d) is not supported.\n",
+        NamespaceId,
+        NamespaceData->LbaFormat[LbaFmtIdx].Ms
+        ));
+      Status = EFI_UNSUPPORTED;
+      goto Exit;
+    }
+
     Lbads                   = NamespaceData->LbaFormat[LbaFmtIdx].Lbads;
     Device->Media.BlockSize = (UINT32)1 << Lbads;
 
