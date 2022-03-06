@@ -10,10 +10,13 @@
 #define _PLATFORM_PEI_H_INCLUDED_
 
 #include <IndustryStandard/E820.h>
+#include <Library/PlatformInitLib.h>
+
+extern EFI_HOB_PLATFORM_INFO  mPlatformInfoHob;
 
 VOID
 AddressWidthInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 VOID
@@ -33,17 +36,37 @@ PublishPeiMemory (
 
 UINT32
 GetSystemMemorySizeBelow4gb (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 VOID
 QemuUc32BaseInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 VOID
 InitializeRamRegions (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+VOID
+MemMapInitialization (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+VOID
+MiscInitialization (
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+VOID
+BootModeInitialization (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+VOID
+MaxCpuCountInitialization (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 EFI_STATUS
@@ -71,23 +94,9 @@ AmdSevInitialize (
   VOID
   );
 
-extern EFI_BOOT_MODE  mBootMode;
-
 VOID
 SevInitializeRam (
   VOID
   );
-
-extern BOOLEAN  mS3Supported;
-
-extern UINT8  mPhysMemAddressWidth;
-
-extern UINT32  mMaxCpuCount;
-
-extern UINT16  mHostBridgeDevId;
-
-extern BOOLEAN  mQ35SmramAtDefaultSmbase;
-
-extern UINT32  mQemuUc32Base;
 
 #endif // _PLATFORM_PEI_H_INCLUDED_
