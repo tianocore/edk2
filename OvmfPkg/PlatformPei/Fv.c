@@ -13,6 +13,8 @@
 #include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
 
+extern EFI_HOB_PLATFORM_INFO  mPlatformInfoHob;
+
 /**
   Publish PEI & DXE (Decompressed) Memory based FVs to let PEI
   and DXE know about them.
@@ -37,7 +39,7 @@ PeiFvInitialization (
   BuildMemoryAllocationHob (
     PcdGet32 (PcdOvmfPeiMemFvBase),
     PcdGet32 (PcdOvmfPeiMemFvSize),
-    mS3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
+    mPlatformInfoHob.S3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
     );
 
   //
@@ -45,7 +47,7 @@ PeiFvInitialization (
   //
   BuildFvHob (PcdGet32 (PcdOvmfDxeMemFvBase), PcdGet32 (PcdOvmfDxeMemFvSize));
 
-  SecureS3Needed = mS3Supported && FeaturePcdGet (PcdSmmSmramRequire);
+  SecureS3Needed = mPlatformInfoHob.S3Supported && mPlatformInfoHob.SmmSmramRequire;
 
   //
   // Create a memory allocation HOB for the DXE FV.

@@ -17,6 +17,8 @@
 
 #include "Platform.h"
 
+extern EFI_HOB_PLATFORM_INFO  mPlatformInfoHob;
+
 #define MEMORY_TYPE_INFO_DEFAULT(Type) \
   { Type, FixedPcdGet32 (PcdMemoryType ## Type) }
 
@@ -208,7 +210,7 @@ MemTypeInfoInitialization (
 {
   EFI_STATUS  Status;
 
-  if (!FeaturePcdGet (PcdSmmSmramRequire)) {
+  if (!mPlatformInfoHob.SmmSmramRequire) {
     //
     // EFI_PEI_READ_ONLY_VARIABLE2_PPI will never be available; install
     // the default memory type information HOB right away.
