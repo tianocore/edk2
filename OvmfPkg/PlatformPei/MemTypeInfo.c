@@ -208,7 +208,7 @@ MemTypeInfoInitialization (
 {
   EFI_STATUS  Status;
 
-  if (!FeaturePcdGet (PcdSmmSmramRequire)) {
+  if (!mPlatformInfoHob.SmmSmramRequire) {
     //
     // EFI_PEI_READ_ONLY_VARIABLE2_PPI will never be available; install
     // the default memory type information HOB right away.
