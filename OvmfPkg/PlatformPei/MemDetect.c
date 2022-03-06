@@ -166,7 +166,7 @@ PlatformQemuUc32BaseInitialization (
   // variable MTRR suffices by truncating the size to a whole power of two,
   // while keeping the end affixed to 4GB. This will round the base up.
   //
-  LowerMemorySize           = GetSystemMemorySizeBelow4gb (PlatformInfoHob);
+  LowerMemorySize           = PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
   PlatformInfoHob->Uc32Size = GetPowerOfTwo32 ((UINT32)(SIZE_4GB - LowerMemorySize));
   PlatformInfoHob->Uc32Base = (UINT32)(SIZE_4GB - PlatformInfoHob->Uc32Size);
   //
@@ -377,7 +377,8 @@ GetHighestSystemMemoryAddressFromPvhMemmap (
 }
 
 UINT32
-GetSystemMemorySizeBelow4gb (
+EFIAPI
+PlatformGetSystemMemorySizeBelow4gb (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
@@ -764,7 +765,7 @@ PublishPeiMemory (
   UINT32                LowerMemorySize;
   UINT32                PeiMemoryCap;
 
-  LowerMemorySize = GetSystemMemorySizeBelow4gb (&mPlatformInfoHob);
+  LowerMemorySize = PlatformGetSystemMemorySizeBelow4gb (&mPlatformInfoHob);
   if (mPlatformInfoHob.SmmSmramRequire) {
     //
     // TSEG is chipped from the end of low RAM
@@ -868,7 +869,7 @@ QemuInitializeRamBelow1gb (
 **/
 STATIC
 VOID
-QemuInitializeRam (
+PlatformQemuInitializeRam (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
@@ -881,7 +882,7 @@ QemuInitializeRam (
   //
   // Determine total memory size available
   //
-  LowerMemorySize = GetSystemMemorySizeBelow4gb (PlatformInfoHob);
+  LowerMemorySize = PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
 
   if (PlatformInfoHob->BootMode == BOOT_ON_S3_RESUME) {
     //
@@ -993,7 +994,7 @@ QemuInitializeRam (
 
 STATIC
 VOID
-QemuInitializeRamForS3SupportAndNotS3Resume (
+PlatformQemuInitializeRamForS3SupportAndNotS3Resume (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
@@ -1073,7 +1074,7 @@ QemuInitializeRamForS3SupportAndNotS3Resume (
 
 STATIC
 VOID
-QemuInitializeRamForNotS3Resume (
+PlatformQemuInitializeRamForNotS3Resume (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
@@ -1112,7 +1113,7 @@ QemuInitializeRamForNotS3Resume (
     //
     TsegSize = PlatformInfoHob->Q35TsegMbytes * SIZE_1MB;
     BuildMemoryAllocationHob (
-      GetSystemMemorySizeBelow4gb (PlatformInfoHob) - TsegSize,
+      PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob) - TsegSize,
       TsegSize,
       EfiReservedMemoryType
       );
@@ -1160,11 +1161,11 @@ InitializeRamRegions (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  QemuInitializeRam (PlatformInfoHob);
+  PlatformQemuInitializeRam (PlatformInfoHob);
 
   SevInitializeRam ();
 
-  QemuInitializeRamForS3SupportAndNotS3Resume (PlatformInfoHob);
+  PlatformQemuInitializeRamForS3SupportAndNotS3Resume (PlatformInfoHob);
 
-  QemuInitializeRamForNotS3Resume (PlatformInfoHob);
+  PlatformQemuInitializeRamForNotS3Resume (PlatformInfoHob);
 }
