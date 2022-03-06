@@ -780,7 +780,7 @@ InitializePlatform (
 
   PublishPeiMemory ();
 
-  QemuUc32BaseInitialization (&mPlatformInfoHob);
+  PlatformQemuUc32BaseInitialization (&mPlatformInfoHob);
 
   InitializeRamRegions (&mPlatformInfoHob);
 
