@@ -228,7 +228,7 @@ AmdSevEsInitialize (
   //   Since the pages must survive across the UEFI to OS transition
   //   make them reserved.
   //
-  GhcbPageCount = mMaxCpuCount * 2;
+  GhcbPageCount = mPlatformInfoHob.PcdCpuMaxLogicalProcessorNumber * 2;
   GhcbBase      = AllocateReservedPages (GhcbPageCount);
   ASSERT (GhcbBase != NULL);
 
@@ -266,7 +266,7 @@ AmdSevEsInitialize (
   // Allocate #VC recursion backup pages. The number of backup pages needed is
   // one less than the maximum VC count.
   //
-  GhcbBackupPageCount = mMaxCpuCount * (VMGEXIT_MAXIMUM_VC_COUNT - 1);
+  GhcbBackupPageCount = mPlatformInfoHob.PcdCpuMaxLogicalProcessorNumber * (VMGEXIT_MAXIMUM_VC_COUNT - 1);
   GhcbBackupBase      = AllocatePages (GhcbBackupPageCount);
   ASSERT (GhcbBackupBase != NULL);
 
@@ -367,7 +367,7 @@ AmdSevInitialize (
   // until after re-encryption, in order to prevent an information leak to the
   // hypervisor.
   //
-  if (FeaturePcdGet (PcdSmmSmramRequire) && (mBootMode != BOOT_ON_S3_RESUME)) {
+  if (mPlatformInfoHob.SmmSmramRequire && (mPlatformInfoHob.BootMode != BOOT_ON_S3_RESUME)) {
     RETURN_STATUS  LocateMapStatus;
     UINTN          MapPagesBase;
     UINTN          MapPagesCount;
@@ -378,7 +378,7 @@ AmdSevInitialize (
                         );
     ASSERT_RETURN_ERROR (LocateMapStatus);
 
-    if (mQ35SmramAtDefaultSmbase) {
+    if (mPlatformInfoHob.Q35SmramAtDefaultSmbase) {
       //
       // The initial SMRAM Save State Map has been covered as part of a larger
       // reserved memory allocation in InitializeRamRegions().
