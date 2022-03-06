@@ -14,10 +14,24 @@
 #pragma pack(1)
 typedef struct {
   EFI_HOB_GUID_TYPE    GuidHeader;
-  UINT16               HostBridgePciDevId;
+  UINT16               HostBridgeDevId;
+
+  UINT64               PcdConfidentialComputingGuestAttr;
+  BOOLEAN              SevEsIsEnabled;
+
+  UINT32               BootMode;
+  BOOLEAN              S3Supported;
+
+  BOOLEAN              SmmSmramRequire;
+  BOOLEAN              Q35SmramAtDefaultSmbase;
+  UINT16               Q35TsegMbytes;
+
+  UINT64               FirstNonAddress;
+  UINT8                PhysMemAddressWidth;
+  UINT32               Uc32Base;
+  UINT32               Uc32Size;
 
   BOOLEAN              PcdSetNxForStack;
-  UINT64               PcdConfidentialComputingGuestAttr;
   UINT64               PcdTdxSharedBitMask;
 
   UINT64               PcdPciMmio64Base;
@@ -30,6 +44,7 @@ typedef struct {
   UINT64               PcdEmuVariableNvStoreReserved;
   UINT32               PcdCpuBootLogicalProcessorNumber;
   UINT32               PcdCpuMaxLogicalProcessorNumber;
+  UINT32               DefaultMaxCpuNumber;
 } EFI_HOB_PLATFORM_INFO;
 #pragma pack()
 
