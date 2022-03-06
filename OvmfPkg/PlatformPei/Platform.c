@@ -380,13 +380,7 @@ MiscInitialization (
       AcpiEnBit  = ICH9_ACPI_CNTL_ACPI_EN;
       break;
     case CLOUDHV_DEVICE_ID:
-      DEBUG ((DEBUG_INFO, "%a: Cloud Hypervisor host bridge\n", __FUNCTION__));
-      PcdStatus = PcdSet16S (
-                    PcdOvmfHostBridgePciDevId,
-                    CLOUDHV_DEVICE_ID
-                    );
-      ASSERT_RETURN_ERROR (PcdStatus);
-      return;
+      break;
     default:
       DEBUG ((
         DEBUG_ERROR,
@@ -400,6 +394,11 @@ MiscInitialization (
 
   PcdStatus = PcdSet16S (PcdOvmfHostBridgePciDevId, PlatformInfoHob->HostBridgeDevId);
   ASSERT_RETURN_ERROR (PcdStatus);
+
+  if (PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) {
+    DEBUG ((DEBUG_INFO, "%a: Cloud Hypervisor is done.\n", __FUNCTION__));
+    return;
+  }
 
   //
   // If the appropriate IOspace enable bit is set, assume the ACPI PMBA has
