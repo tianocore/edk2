@@ -36,10 +36,12 @@
 #include <IndustryStandard/Pci22.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/QemuCpuHotplug.h>
-#include <Library/PlatformInitLib.h>
+#include <Library/MemEncryptSevLib.h>
 #include <OvmfPlatforms.h>
 
 #include "Platform.h"
+
+EFI_HOB_PLATFORM_INFO  mPlatformInfoHob = { 0 };
 
 EFI_PEI_PPI_DESCRIPTOR  mPpiBootMode[] = {
   {
@@ -49,17 +51,9 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiBootMode[] = {
   }
 };
 
-UINT16  mHostBridgeDevId;
-
-EFI_BOOT_MODE  mBootMode = BOOT_WITH_FULL_CONFIGURATION;
-
-BOOLEAN  mS3Supported = FALSE;
-
-UINT32  mMaxCpuCount;
-
 VOID
 MemMapInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   UINT64         PciIoBase;
@@ -78,16 +72,16 @@ MemMapInitialization (
   //
   PlatformAddIoMemoryRangeHob (0x0A0000, BASE_1MB);
 
-  if (mHostBridgeDevId == 0xffff /* microvm */) {
+  if (PlatformInfoHob->HostBridgeDevId == 0xffff /* microvm */) {
     PlatformAddIoMemoryBaseSizeHob (MICROVM_GED_MMIO_BASE, SIZE_4KB);
     PlatformAddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB); /* ioapic #1 */
     PlatformAddIoMemoryBaseSizeHob (0xFEC10000, SIZE_4KB); /* ioapic #2 */
     return;
   }
 
-  TopOfLowRam  = GetSystemMemorySizeBelow4gb ();
+  TopOfLowRam  = GetSystemMemorySizeBelow4gb (PlatformInfoHob);
   PciExBarBase = 0;
-  if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+  if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     //
     // The MMCONFIG area is expected to fall between the top of low RAM and
     // the base of the 32-bit PCI host aperture.
@@ -97,8 +91,8 @@ MemMapInitialization (
     ASSERT (PciExBarBase <= MAX_UINT32 - SIZE_256MB);
     PciBase = (UINT32)(PciExBarBase + SIZE_256MB);
   } else {
-    ASSERT (TopOfLowRam <= mQemuUc32Base);
-    PciBase = mQemuUc32Base;
+    ASSERT (TopOfLowRam <= PlatformInfoHob->Uc32Base);
+    PciBase = PlatformInfoHob->Uc32Base;
   }
 
   //
@@ -121,9 +115,12 @@ MemMapInitialization (
   PcdStatus = PcdSet64S (PcdPciMmio32Size, PciSize);
   ASSERT_RETURN_ERROR (PcdStatus);
 
+  PlatformInfoHob->PcdPciMmio32Base = PciBase;
+  PlatformInfoHob->PcdPciMmio32Size = PciSize;
+
   PlatformAddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
   PlatformAddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
-  if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+  if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     PlatformAddIoMemoryBaseSizeHob (ICH9_ROOT_COMPLEX_BASE, SIZE_16KB);
     //
     // Note: there should be an
@@ -160,7 +157,7 @@ MemMapInitialization (
   // On Q35, the IO Port space is available for PCI resource allocations from
   // 0x6000 up.
   //
-  if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+  if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     PciIoBase = 0x6000;
     PciIoSize = 0xA000;
     ASSERT ((ICH9_PMBASE_VALUE & 0xF000) < PciIoBase);
@@ -180,6 +177,9 @@ MemMapInitialization (
   ASSERT_RETURN_ERROR (PcdStatus);
   PcdStatus = PcdSet64S (PcdPciIoSize, PciIoSize);
   ASSERT_RETURN_ERROR (PcdStatus);
+
+  PlatformInfoHob->PcdPciIoBase = PciIoBase;
+  PlatformInfoHob->PcdPciIoSize = PciIoSize;
 }
 
 #define UPDATE_BOOLEAN_PCD_FROM_FW_CFG(TokenName)                   \
@@ -306,7 +306,7 @@ MicrovmInitialization (
 
 VOID
 MiscInitialization (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   UINTN          PmCmd;
@@ -327,12 +327,12 @@ MiscInitialization (
   // of IO space. (Side note: unlike other HOBs, the CPU HOB is needed during
   // S3 resume as well, so we build it unconditionally.)
   //
-  BuildCpuHob (mPhysMemAddressWidth, 16);
+  BuildCpuHob (PlatformInfoHob->PhysMemAddressWidth, 16);
 
   //
   // Determine platform type and save Host Bridge DID to PCD
   //
-  switch (mHostBridgeDevId) {
+  switch (PlatformInfoHob->HostBridgeDevId) {
     case INTEL_82441_DEVICE_ID:
       PmCmd      = POWER_MGMT_REGISTER_PIIX4 (PCI_COMMAND_OFFSET);
       Pmba       = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMBA);
@@ -371,13 +371,13 @@ MiscInitialization (
         DEBUG_ERROR,
         "%a: Unknown Host Bridge Device ID: 0x%04x\n",
         __FUNCTION__,
-        mHostBridgeDevId
+        PlatformInfoHob->HostBridgeDevId
         ));
       ASSERT (FALSE);
       return;
   }
 
-  PcdStatus = PcdSet16S (PcdOvmfHostBridgePciDevId, mHostBridgeDevId);
+  PcdStatus = PcdSet16S (PcdOvmfHostBridgePciDevId, PlatformInfoHob->HostBridgeDevId);
   ASSERT_RETURN_ERROR (PcdStatus);
 
   //
@@ -403,7 +403,7 @@ MiscInitialization (
     PciOr8 (AcpiCtlReg, AcpiEnBit);
   }
 
-  if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+  if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     //
     // Set Root Complex Register Block BAR
     //
@@ -421,18 +421,18 @@ MiscInitialization (
 
 VOID
 BootModeInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   EFI_STATUS  Status;
 
   if (PlatformCmosRead8 (0xF) == 0xFE) {
-    mBootMode = BOOT_ON_S3_RESUME;
+    PlatformInfoHob->BootMode = BOOT_ON_S3_RESUME;
   }
 
   PlatformCmosWrite8 (0xF, 0x00);
 
-  Status = PeiServicesSetBootMode (mBootMode);
+  Status = PeiServicesSetBootMode (PlatformInfoHob->BootMode);
   ASSERT_EFI_ERROR (Status);
 
   Status = PeiServicesInstallPpi (mPpiBootMode);
@@ -473,7 +473,7 @@ S3Verification (
   )
 {
  #if defined (MDE_CPU_X64)
-  if (FeaturePcdGet (PcdSmmSmramRequire) && mS3Supported) {
+  if (mPlatformInfoHob.SmmSmramRequire && mPlatformInfoHob.S3Supported) {
     DEBUG ((
       DEBUG_ERROR,
       "%a: S3Resume2Pei doesn't support X64 PEI + SMM yet.\n",
@@ -501,7 +501,7 @@ Q35BoardVerification (
   VOID
   )
 {
-  if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+  if (mPlatformInfoHob.HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     return;
   }
 
@@ -510,7 +510,7 @@ Q35BoardVerification (
     "%a: no TSEG (SMRAM) on host bridge DID=0x%04x; "
     "only DID=0x%04x (Q35) is supported\n",
     __FUNCTION__,
-    mHostBridgeDevId,
+    mPlatformInfoHob.HostBridgeDevId,
     INTEL_Q35_MCH_DEVICE_ID
     ));
   ASSERT (FALSE);
@@ -523,10 +523,11 @@ Q35BoardVerification (
 **/
 VOID
 MaxCpuCountInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   UINT16         BootCpuCount;
+  UINT32         MaxCpuCount;
   RETURN_STATUS  PcdStatus;
 
   //
@@ -542,7 +543,7 @@ MaxCpuCountInitialization (
     // first).
     //
     DEBUG ((DEBUG_WARN, "%a: boot CPU count unavailable\n", __FUNCTION__));
-    mMaxCpuCount = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+    MaxCpuCount = PlatformInfoHob->DefaultMaxCpuNumber;
   } else {
     //
     // We will expose BootCpuCount to MpInitLib. MpInitLib will count APs up to
@@ -553,7 +554,7 @@ MaxCpuCountInitialization (
     UINTN   CpuHpBase;
     UINT32  CmdData2;
 
-    CpuHpBase = ((mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) ?
+    CpuHpBase = ((PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) ?
                  ICH9_CPU_HOTPLUG_BASE : PIIX4_CPU_HOTPLUG_BASE);
 
     //
@@ -605,7 +606,7 @@ MaxCpuCountInitialization (
         "%a: modern CPU hotplug interface unavailable\n",
         __FUNCTION__
         ));
-      mMaxCpuCount = BootCpuCount;
+      MaxCpuCount = BootCpuCount;
     } else {
       //
       // Grab the possible CPU count from the modern CPU hotplug interface.
@@ -671,23 +672,26 @@ MaxCpuCountInitialization (
         BootCpuCount = (UINT16)Present;
       }
 
-      mMaxCpuCount = Possible;
+      MaxCpuCount = Possible;
     }
   }
 
   DEBUG ((
     DEBUG_INFO,
-    "%a: BootCpuCount=%d mMaxCpuCount=%u\n",
+    "%a: BootCpuCount=%d MaxCpuCount=%u\n",
     __FUNCTION__,
     BootCpuCount,
-    mMaxCpuCount
+    MaxCpuCount
     ));
-  ASSERT (BootCpuCount <= mMaxCpuCount);
+  ASSERT (BootCpuCount <= MaxCpuCount);
 
   PcdStatus = PcdSet32S (PcdCpuBootLogicalProcessorNumber, BootCpuCount);
   ASSERT_RETURN_ERROR (PcdStatus);
-  PcdStatus = PcdSet32S (PcdCpuMaxLogicalProcessorNumber, mMaxCpuCount);
+  PcdStatus = PcdSet32S (PcdCpuMaxLogicalProcessorNumber, MaxCpuCount);
   ASSERT_RETURN_ERROR (PcdStatus);
+
+  PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber  = MaxCpuCount;
+  PlatformInfoHob->PcdCpuBootLogicalProcessorNumber = BootCpuCount;
 }
 
 /**
@@ -710,27 +714,30 @@ InitializePlatform (
 
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
 
+  mPlatformInfoHob.SmmSmramRequire = FeaturePcdGet (PcdSmmSmramRequire);
+  mPlatformInfoHob.SevEsIsEnabled  = MemEncryptSevEsIsEnabled ();
+
   PlatformDebugDumpCmos ();
 
   if (QemuFwCfgS3Enabled ()) {
     DEBUG ((DEBUG_INFO, "S3 support was detected on QEMU\n"));
-    mS3Supported = TRUE;
-    Status       = PcdSetBoolS (PcdAcpiS3Enable, TRUE);
+    mPlatformInfoHob.S3Supported = TRUE;
+    Status                       = PcdSetBoolS (PcdAcpiS3Enable, TRUE);
     ASSERT_EFI_ERROR (Status);
   }
 
   S3Verification ();
-  BootModeInitialization ();
-  AddressWidthInitialization ();
+  BootModeInitialization (&mPlatformInfoHob);
+  AddressWidthInitialization (&mPlatformInfoHob);
 
   //
   // Query Host Bridge DID
   //
-  mHostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
+  mPlatformInfoHob.HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
 
-  MaxCpuCountInitialization ();
+  MaxCpuCountInitialization (&mPlatformInfoHob);
 
-  if (FeaturePcdGet (PcdSmmSmramRequire)) {
+  if (mPlatformInfoHob.SmmSmramRequire) {
     Q35BoardVerification ();
     Q35TsegMbytesInitialization ();
     Q35SmramAtDefaultSmbaseInitialization ();
@@ -738,24 +745,24 @@ InitializePlatform (
 
   PublishPeiMemory ();
 
-  QemuUc32BaseInitialization ();
+  QemuUc32BaseInitialization (&mPlatformInfoHob);
 
-  InitializeRamRegions ();
+  InitializeRamRegions (&mPlatformInfoHob);
 
-  if (mBootMode != BOOT_ON_S3_RESUME) {
-    if (!FeaturePcdGet (PcdSmmSmramRequire)) {
+  if (mPlatformInfoHob.BootMode != BOOT_ON_S3_RESUME) {
+    if (!mPlatformInfoHob.SmmSmramRequire) {
       ReserveEmuVariableNvStore ();
     }
 
     PeiFvInitialization ();
     MemTypeInfoInitialization ();
-    MemMapInitialization ();
+    MemMapInitialization (&mPlatformInfoHob);
     NoexecDxeInitialization ();
   }
 
   InstallClearCacheCallback ();
   AmdSevInitialize ();
-  MiscInitialization ();
+  MiscInitialization (&mPlatformInfoHob);
   InstallFeatureControlCallback ();
 
   return EFI_SUCCESS;
