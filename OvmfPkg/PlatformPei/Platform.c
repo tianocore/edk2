@@ -734,8 +734,10 @@ InitializePlatform (
 
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
 
-  mPlatformInfoHob.SmmSmramRequire = FeaturePcdGet (PcdSmmSmramRequire);
-  mPlatformInfoHob.SevEsIsEnabled  = MemEncryptSevEsIsEnabled ();
+  mPlatformInfoHob.SmmSmramRequire     = FeaturePcdGet (PcdSmmSmramRequire);
+  mPlatformInfoHob.SevEsIsEnabled      = MemEncryptSevEsIsEnabled ();
+  mPlatformInfoHob.PcdPciMmio64Size    = PcdGet64 (PcdPciMmio64Size);
+  mPlatformInfoHob.DefaultMaxCpuNumber = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
 
   PlatformDebugDumpCmos ();
 
