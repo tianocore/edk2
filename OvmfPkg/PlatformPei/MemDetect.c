@@ -130,7 +130,8 @@ Q35SmramAtDefaultSmbaseInitialization (
 }
 
 VOID
-QemuUc32BaseInitialization (
+EFIAPI
+PlatformQemuUc32BaseInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
