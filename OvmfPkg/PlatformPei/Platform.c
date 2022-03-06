@@ -59,7 +59,6 @@ PlatformMemMapInitialization (
 {
   UINT64         PciIoBase;
   UINT64         PciIoSize;
-  RETURN_STATUS  PcdStatus;
   UINT32         TopOfLowRam;
   UINT64         PciExBarBase;
   UINT32         PciBase;
@@ -199,24 +198,33 @@ MemMapInitialization (
   ASSERT_RETURN_ERROR (PcdStatus);
 }
 
-#define UPDATE_BOOLEAN_PCD_FROM_FW_CFG(TokenName)                   \
-          do {                                                      \
-            BOOLEAN       Setting;                                  \
-            RETURN_STATUS PcdStatus;                                \
-                                                                    \
-            if (!RETURN_ERROR (QemuFwCfgParseBool (                 \
-                              "opt/ovmf/" #TokenName, &Setting))) { \
-              PcdStatus = PcdSetBoolS (TokenName, Setting);         \
-              ASSERT_RETURN_ERROR (PcdStatus);                      \
-            }                                                       \
-          } while (0)
+/**
+ * Fetch "opt/ovmf/PcdSetNxForStack" from QEMU
+ *
+ * @param Setting     The pointer to the setting of "/opt/ovmf/PcdSetNxForStack".
+ * @return EFI_SUCCESS  Successfully fetch the settings.
+ */
+EFI_STATUS
+EFIAPI
+PlatformNoexecDxeInitialization (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  return QemuFwCfgParseBool ("opt/ovmf/PcdSetNxForStack", &PlatformInfoHob->PcdSetNxForStack);
+}
 
 VOID
 NoexecDxeInitialization (
   VOID
   )
 {
-  UPDATE_BOOLEAN_PCD_FROM_FW_CFG (PcdSetNxForStack);
+  RETURN_STATUS  Status;
+
+  Status = PlatformNoexecDxeInitialization (&mPlatformInfoHob);
+  if (!RETURN_ERROR (Status)) {
+    Status = PcdSetBoolS (PcdSetNxForStack, mPlatformInfoHob.PcdSetNxForStack);
+    ASSERT_RETURN_ERROR (Status);
+  }
 }
 
 VOID
