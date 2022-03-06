@@ -305,6 +305,36 @@ MicrovmInitialization (
 }
 
 VOID
+MiscInitializationForMicrovm (
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  RETURN_STATUS  PcdStatus;
+
+  ASSERT (PlatformInfoHob->HostBridgeDevId == 0xffff);
+
+  DEBUG ((DEBUG_INFO, "%a: microvm\n", __FUNCTION__));
+  //
+  // Disable A20 Mask
+  //
+  IoOr8 (0x92, BIT1);
+
+  //
+  // Build the CPU HOB with guest RAM size dependent address width and 16-bits
+  // of IO space. (Side note: unlike other HOBs, the CPU HOB is needed during
+  // S3 resume as well, so we build it unconditionally.)
+  //
+  BuildCpuHob (PlatformInfoHob->PhysMemAddressWidth, 16);
+
+  MicrovmInitialization ();
+  PcdStatus = PcdSet16S (
+                PcdOvmfHostBridgePciDevId,
+                MICROVM_PSEUDO_DEVICE_ID
+                );
+  ASSERT_RETURN_ERROR (PcdStatus);
+}
+
+VOID
 MiscInitialization (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
@@ -349,15 +379,6 @@ MiscInitialization (
       AcpiCtlReg = POWER_MGMT_REGISTER_Q35 (ICH9_ACPI_CNTL);
       AcpiEnBit  = ICH9_ACPI_CNTL_ACPI_EN;
       break;
-    case 0xffff: /* microvm */
-      DEBUG ((DEBUG_INFO, "%a: microvm\n", __FUNCTION__));
-      MicrovmInitialization ();
-      PcdStatus = PcdSet16S (
-                    PcdOvmfHostBridgePciDevId,
-                    MICROVM_PSEUDO_DEVICE_ID
-                    );
-      ASSERT_RETURN_ERROR (PcdStatus);
-      return;
     case CLOUDHV_DEVICE_ID:
       DEBUG ((DEBUG_INFO, "%a: Cloud Hypervisor host bridge\n", __FUNCTION__));
       PcdStatus = PcdSet16S (
@@ -762,7 +783,12 @@ InitializePlatform (
 
   InstallClearCacheCallback ();
   AmdSevInitialize ();
-  MiscInitialization (&mPlatformInfoHob);
+  if (mPlatformInfoHob.HostBridgeDevId == 0xffff) {
+    MiscInitializationForMicrovm (&mPlatformInfoHob);
+  } else {
+    MiscInitialization (&mPlatformInfoHob);
+  }
+
   InstallFeatureControlCallback ();
 
   return EFI_SUCCESS;
