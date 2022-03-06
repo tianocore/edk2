@@ -539,16 +539,15 @@ Q35BoardVerification (
 
 /**
   Fetch the boot CPU count and the possible CPU count from QEMU, and expose
-  them to UefiCpuPkg modules. Set the mMaxCpuCount variable.
+  them to UefiCpuPkg modules. Set the MaxCpuCount field in PlatformInfoHob.
 **/
 VOID
-MaxCpuCountInitialization (
+PlatformMaxCpuCountInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  UINT16         BootCpuCount;
-  UINT32         MaxCpuCount;
-  RETURN_STATUS  PcdStatus;
+  UINT16  BootCpuCount;
+  UINT32  MaxCpuCount;
 
   //
   // Try to fetch the boot CPU count.
@@ -705,13 +704,27 @@ MaxCpuCountInitialization (
     ));
   ASSERT (BootCpuCount <= MaxCpuCount);
 
-  PcdStatus = PcdSet32S (PcdCpuBootLogicalProcessorNumber, BootCpuCount);
-  ASSERT_RETURN_ERROR (PcdStatus);
-  PcdStatus = PcdSet32S (PcdCpuMaxLogicalProcessorNumber, MaxCpuCount);
-  ASSERT_RETURN_ERROR (PcdStatus);
-
   PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber  = MaxCpuCount;
   PlatformInfoHob->PcdCpuBootLogicalProcessorNumber = BootCpuCount;
+}
+
+/**
+  Fetch the boot CPU count and the possible CPU count from QEMU, and expose
+  them to UefiCpuPkg modules. Set the MaxCpuCount field in PlatformInfoHob.
+**/
+VOID
+MaxCpuCountInitialization (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  RETURN_STATUS  PcdStatus;
+
+  PlatformMaxCpuCountInitialization (PlatformInfoHob);
+
+  PcdStatus = PcdSet32S (PcdCpuBootLogicalProcessorNumber, PlatformInfoHob->PcdCpuBootLogicalProcessorNumber);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet32S (PcdCpuMaxLogicalProcessorNumber, PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber);
+  ASSERT_RETURN_ERROR (PcdStatus);
 }
 
 /**
