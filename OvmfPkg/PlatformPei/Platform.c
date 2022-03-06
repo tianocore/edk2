@@ -57,12 +57,12 @@ PlatformMemMapInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  UINT64         PciIoBase;
-  UINT64         PciIoSize;
-  UINT32         TopOfLowRam;
-  UINT64         PciExBarBase;
-  UINT32         PciBase;
-  UINT32         PciSize;
+  UINT64  PciIoBase;
+  UINT64  PciIoSize;
+  UINT32  TopOfLowRam;
+  UINT64  PciExBarBase;
+  UINT32  PciBase;
+  UINT32  PciSize;
 
   PciIoBase = 0xC000;
   PciIoSize = 0x4000;
@@ -360,17 +360,16 @@ MiscInitializationForMicrovm (
 }
 
 VOID
-MiscInitialization (
+PlatformMiscInitialization (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  UINTN          PmCmd;
-  UINTN          Pmba;
-  UINT32         PmbaAndVal;
-  UINT32         PmbaOrVal;
-  UINTN          AcpiCtlReg;
-  UINT8          AcpiEnBit;
-  RETURN_STATUS  PcdStatus;
+  UINTN   PmCmd;
+  UINTN   Pmba;
+  UINT32  PmbaAndVal;
+  UINT32  PmbaOrVal;
+  UINTN   AcpiCtlReg;
+  UINT8   AcpiEnBit;
 
   //
   // Disable A20 Mask
@@ -417,9 +416,6 @@ MiscInitialization (
       return;
   }
 
-  PcdStatus = PcdSet16S (PcdOvmfHostBridgePciDevId, PlatformInfoHob->HostBridgeDevId);
-  ASSERT_RETURN_ERROR (PcdStatus);
-
   if (PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) {
     DEBUG ((DEBUG_INFO, "%a: Cloud Hypervisor is done.\n", __FUNCTION__));
     return;
@@ -462,6 +458,19 @@ MiscInitialization (
     //
     PciExBarInitialization ();
   }
+}
+
+VOID
+MiscInitialization (
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  RETURN_STATUS  PcdStatus;
+
+  PlatformMiscInitialization (PlatformInfoHob);
+
+  PcdStatus = PcdSet16S (PcdOvmfHostBridgePciDevId, PlatformInfoHob->HostBridgeDevId);
+  ASSERT_RETURN_ERROR (PcdStatus);
 }
 
 VOID
