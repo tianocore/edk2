@@ -840,10 +840,9 @@ QemuInitializeRam (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  UINT64         LowerMemorySize;
-  UINT64         UpperMemorySize;
-  MTRR_SETTINGS  MtrrSettings;
-  EFI_STATUS     Status;
+  UINT64      LowerMemorySize;
+  UINT64      UpperMemorySize;
+  EFI_STATUS  Status;
 
   DEBUG ((DEBUG_INFO, "%a called\n", __FUNCTION__));
 
@@ -960,19 +959,12 @@ QemuInitializeRam (
   }
 }
 
-/**
-  Publish system RAM and reserve memory regions
-
-**/
+STATIC
 VOID
-InitializeRamRegions (
+QemuInitializeRamForS3SupportAndNotS3Resume (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  QemuInitializeRam (PlatformInfoHob);
-
-  SevInitializeRam ();
-
   if (PlatformInfoHob->S3Supported && (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME)) {
     //
     // This is the memory range that will be used for PEI on S3 resume
@@ -1045,75 +1037,102 @@ InitializeRamRegions (
 
  #endif
   }
+}
 
-  if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
-    if (!PlatformInfoHob->SmmSmramRequire) {
-      //
-      // Reserve the lock box storage area
-      //
-      // Since this memory range will be used on S3 resume, it must be
-      // reserved as ACPI NVS.
-      //
-      // If S3 is unsupported, then various drivers might still write to the
-      // LockBox area. We ought to prevent DXE from serving allocation requests
-      // such that they would overlap the LockBox storage.
-      //
-      ZeroMem (
-        (VOID *)(UINTN)PcdGet32 (PcdOvmfLockBoxStorageBase),
-        (UINTN)PcdGet32 (PcdOvmfLockBoxStorageSize)
-        );
+STATIC
+VOID
+QemuInitializeRamForNotS3Resume (
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  if (PlatformInfoHob->BootMode == BOOT_ON_S3_RESUME) {
+    return;
+  }
+
+  if (!PlatformInfoHob->SmmSmramRequire) {
+    //
+    // Reserve the lock box storage area
+    //
+    // Since this memory range will be used on S3 resume, it must be
+    // reserved as ACPI NVS.
+    //
+    // If S3 is unsupported, then various drivers might still write to the
+    // LockBox area. We ought to prevent DXE from serving allocation requests
+    // such that they would overlap the LockBox storage.
+    //
+    ZeroMem (
+      (VOID *)(UINTN)PcdGet32 (PcdOvmfLockBoxStorageBase),
+      (UINTN)PcdGet32 (PcdOvmfLockBoxStorageSize)
+      );
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfLockBoxStorageBase),
+      (UINT64)(UINTN)PcdGet32 (PcdOvmfLockBoxStorageSize),
+      PlatformInfoHob->S3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
+      );
+  }
+
+  if (PlatformInfoHob->SmmSmramRequire) {
+    UINT32  TsegSize;
+
+    //
+    // Make sure the TSEG area that we reported as a reserved memory resource
+    // cannot be used for reserved memory allocations.
+    //
+    TsegSize = PlatformInfoHob->Q35TsegMbytes * SIZE_1MB;
+    BuildMemoryAllocationHob (
+      GetSystemMemorySizeBelow4gb (PlatformInfoHob) - TsegSize,
+      TsegSize,
+      EfiReservedMemoryType
+      );
+    //
+    // Similarly, allocate away the (already reserved) SMRAM at the default
+    // SMBASE, if it exists.
+    //
+    if (PlatformInfoHob->Q35SmramAtDefaultSmbase) {
       BuildMemoryAllocationHob (
-        (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfLockBoxStorageBase),
-        (UINT64)(UINTN)PcdGet32 (PcdOvmfLockBoxStorageSize),
-        PlatformInfoHob->S3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
-        );
-    }
-
-    if (PlatformInfoHob->SmmSmramRequire) {
-      UINT32  TsegSize;
-
-      //
-      // Make sure the TSEG area that we reported as a reserved memory resource
-      // cannot be used for reserved memory allocations.
-      //
-      TsegSize = PlatformInfoHob->Q35TsegMbytes * SIZE_1MB;
-      BuildMemoryAllocationHob (
-        GetSystemMemorySizeBelow4gb (PlatformInfoHob) - TsegSize,
-        TsegSize,
+        SMM_DEFAULT_SMBASE,
+        MCH_DEFAULT_SMBASE_SIZE,
         EfiReservedMemoryType
         );
-      //
-      // Similarly, allocate away the (already reserved) SMRAM at the default
-      // SMBASE, if it exists.
-      //
-      if (PlatformInfoHob->Q35SmramAtDefaultSmbase) {
-        BuildMemoryAllocationHob (
-          SMM_DEFAULT_SMBASE,
-          MCH_DEFAULT_SMBASE_SIZE,
-          EfiReservedMemoryType
-          );
-      }
     }
+  }
 
  #ifdef MDE_CPU_X64
-    if (FixedPcdGet32 (PcdOvmfWorkAreaSize) != 0) {
-      //
-      // Reserve the work area.
-      //
-      // Since this memory range will be used by the Reset Vector on S3
-      // resume, it must be reserved as ACPI NVS.
-      //
-      // If S3 is unsupported, then various drivers might still write to the
-      // work area. We ought to prevent DXE from serving allocation requests
-      // such that they would overlap the work area.
-      //
-      BuildMemoryAllocationHob (
-        (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase),
-        (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaSize),
-        PlatformInfoHob->S3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
-        );
-    }
+  if (FixedPcdGet32 (PcdOvmfWorkAreaSize) != 0) {
+    //
+    // Reserve the work area.
+    //
+    // Since this memory range will be used by the Reset Vector on S3
+    // resume, it must be reserved as ACPI NVS.
+    //
+    // If S3 is unsupported, then various drivers might still write to the
+    // work area. We ought to prevent DXE from serving allocation requests
+    // such that they would overlap the work area.
+    //
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase),
+      (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaSize),
+      PlatformInfoHob->S3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
+      );
+  }
 
  #endif
-  }
+}
+
+/**
+  Publish system RAM and reserve memory regions
+
+**/
+VOID
+InitializeRamRegions (
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  QemuInitializeRam (PlatformInfoHob);
+
+  SevInitializeRam ();
+
+  QemuInitializeRamForS3SupportAndNotS3Resume (PlatformInfoHob);
+
+  QemuInitializeRamForNotS3Resume (PlatformInfoHob);
 }
