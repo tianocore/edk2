@@ -189,7 +189,7 @@ QemuUc32BaseInitialization (
   Find the highest exclusive >=4GB RAM address, or produce memory resource
   descriptor HOBs for RAM entries that start at or above 4GB.
 
-  @param[out] MaxAddress  If MaxAddress is NULL, then ScanOrAdd64BitE820Ram()
+  @param[out] MaxAddress  If MaxAddress is NULL, then PlatformScanOrAdd64BitE820Ram()
                           produces memory resource descriptor HOBs for RAM
                           entries that start at or above 4GB.
 
@@ -210,7 +210,7 @@ QemuUc32BaseInitialization (
 **/
 STATIC
 EFI_STATUS
-ScanOrAdd64BitE820Ram (
+PlatformScanOrAdd64BitE820Ram (
   IN BOOLEAN  AddHighHob,
   OUT UINT64  *LowMemory OPTIONAL,
   OUT UINT64  *MaxAddress OPTIONAL
@@ -385,7 +385,7 @@ GetSystemMemorySizeBelow4gb (
     return (UINT32)GetHighestSystemMemoryAddressFromPvhMemmap (TRUE);
   }
 
-  Status = ScanOrAdd64BitE820Ram (FALSE, &LowerMemorySize, NULL);
+  Status = PlatformScanOrAdd64BitE820Ram (FALSE, &LowerMemorySize, NULL);
   if ((Status == EFI_SUCCESS) && (LowerMemorySize > 0)) {
     return (UINT32)LowerMemorySize;
   }
@@ -407,7 +407,7 @@ GetSystemMemorySizeBelow4gb (
 
 STATIC
 UINT64
-GetSystemMemorySizeAbove4gb (
+PlatformGetSystemMemorySizeAbove4gb (
   )
 {
   UINT32  Size;
@@ -434,7 +434,7 @@ GetSystemMemorySizeAbove4gb (
 **/
 STATIC
 UINT64
-GetFirstNonAddress (
+PlatformGetFirstNonAddress (
   IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
@@ -444,7 +444,6 @@ GetFirstNonAddress (
   FIRMWARE_CONFIG_ITEM  FwCfgItem;
   UINTN                 FwCfgSize;
   UINT64                HotPlugMemoryEnd;
-  RETURN_STATUS         PcdStatus;
 
   //
   // set FirstNonAddress to suppress incorrect compiler/analyzer warnings
@@ -458,9 +457,9 @@ GetFirstNonAddress (
   // Otherwise, get the flat size of the memory above 4GB from the CMOS (which
   // can only express a size smaller than 1TB), and add it to 4GB.
   //
-  Status = ScanOrAdd64BitE820Ram (FALSE, NULL, &FirstNonAddress);
+  Status = PlatformScanOrAdd64BitE820Ram (FALSE, NULL, &FirstNonAddress);
   if (EFI_ERROR (Status)) {
-    FirstNonAddress = BASE_4GB + GetSystemMemorySizeAbove4gb ();
+    FirstNonAddress = BASE_4GB + PlatformGetSystemMemorySizeAbove4gb ();
   }
 
   //
@@ -474,12 +473,6 @@ GetFirstNonAddress (
   }
 
  #endif
-
-  //
-  // Otherwise, in order to calculate the highest address plus one, we must
-  // consider the 64-bit PCI host aperture too. Fetch the default size.
-  //
-  PlatformInfoHob->PcdPciMmio64Size = PcdGet64 (PcdPciMmio64Size);
 
   //
   // See if the user specified the number of megabytes for the 64-bit PCI host
@@ -522,8 +515,6 @@ GetFirstNonAddress (
         "%a: disabling 64-bit PCI host aperture\n",
         __FUNCTION__
         ));
-      PcdStatus = PcdSet64S (PcdPciMmio64Size, 0);
-      ASSERT_RETURN_ERROR (PcdStatus);
     }
 
     //
@@ -574,26 +565,6 @@ GetFirstNonAddress (
   //
   PlatformInfoHob->PcdPciMmio64Base = ALIGN_VALUE (PlatformInfoHob->PcdPciMmio64Base, GetPowerOfTwo64 (PlatformInfoHob->PcdPciMmio64Size));
 
-  if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
-    //
-    // The core PciHostBridgeDxe driver will automatically add this range to
-    // the GCD memory space map through our PciHostBridgeLib instance; here we
-    // only need to set the PCDs.
-    //
-    PcdStatus = PcdSet64S (PcdPciMmio64Base, PlatformInfoHob->PcdPciMmio64Base);
-    ASSERT_RETURN_ERROR (PcdStatus);
-    PcdStatus = PcdSet64S (PcdPciMmio64Size, PlatformInfoHob->PcdPciMmio64Size);
-    ASSERT_RETURN_ERROR (PcdStatus);
-
-    DEBUG ((
-      DEBUG_INFO,
-      "%a: Pci64Base=0x%Lx Pci64Size=0x%Lx\n",
-      __FUNCTION__,
-      PlatformInfoHob->PcdPciMmio64Base,
-      PlatformInfoHob->PcdPciMmio64Size
-      ));
-  }
-
   //
   // The useful address space ends with the 64-bit PCI host aperture.
   //
@@ -602,10 +573,11 @@ GetFirstNonAddress (
 }
 
 /**
-  Initialize the mPhysMemAddressWidth variable, based on guest RAM size.
+  Initialize the PhysMemAddressWidth field in PlatformInfoHob based on guest RAM size.
 **/
 VOID
-AddressWidthInitialization (
+EFIAPI
+PlatformAddressWidthInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
@@ -618,7 +590,7 @@ AddressWidthInitialization (
   // The DXL IPL keys off of the physical address bits advertized in the CPU
   // HOB. To conserve memory, we calculate the minimum address width here.
   //
-  FirstNonAddress     = GetFirstNonAddress (PlatformInfoHob);
+  FirstNonAddress     = PlatformGetFirstNonAddress (PlatformInfoHob);
   PhysMemAddressWidth = (UINT8)HighBitSet64 (FirstNonAddress);
 
   //
@@ -643,6 +615,65 @@ AddressWidthInitialization (
 
   PlatformInfoHob->FirstNonAddress     = FirstNonAddress;
   PlatformInfoHob->PhysMemAddressWidth = PhysMemAddressWidth;
+}
+
+/**
+  Initialize the PhysMemAddressWidth field in PlatformInfoHob based on guest RAM size.
+**/
+VOID
+AddressWidthInitialization (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  RETURN_STATUS  PcdStatus;
+
+  PlatformAddressWidthInitialization (PlatformInfoHob);
+
+  //
+  // If DXE is 32-bit, then we're done; PciBusDxe will degrade 64-bit MMIO
+  // resources to 32-bit anyway. See DegradeResource() in
+  // "PciResourceSupport.c".
+  //
+ #ifdef MDE_CPU_IA32
+  if (!FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+    return;
+  }
+
+ #endif
+
+  if (PlatformInfoHob->PcdPciMmio64Size == 0) {
+    if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: disabling 64-bit PCI host aperture\n",
+        __FUNCTION__
+        ));
+      PcdStatus = PcdSet64S (PcdPciMmio64Size, 0);
+      ASSERT_RETURN_ERROR (PcdStatus);
+    }
+
+    return;
+  }
+
+  if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
+    //
+    // The core PciHostBridgeDxe driver will automatically add this range to
+    // the GCD memory space map through our PciHostBridgeLib instance; here we
+    // only need to set the PCDs.
+    //
+    PcdStatus = PcdSet64S (PcdPciMmio64Base, PlatformInfoHob->PcdPciMmio64Base);
+    ASSERT_RETURN_ERROR (PcdStatus);
+    PcdStatus = PcdSet64S (PcdPciMmio64Size, PlatformInfoHob->PcdPciMmio64Size);
+    ASSERT_RETURN_ERROR (PcdStatus);
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: Pci64Base=0x%Lx Pci64Size=0x%Lx\n",
+      __FUNCTION__,
+      PlatformInfoHob->PcdPciMmio64Base,
+      PlatformInfoHob->PcdPciMmio64Size
+      ));
+  }
 }
 
 /**
@@ -704,7 +735,7 @@ GetPeiMemoryCap (
 
   //
   // Add 64 MB for miscellaneous allocations. Note that for
-  // mPhysMemAddressWidth values close to 36, the cap will actually be
+  // PhysMemAddressWidth values close to 36, the cap will actually be
   // dominated by this increment.
   //
   return (UINT32)(EFI_PAGES_TO_SIZE (TotalPages) + SIZE_64MB);
@@ -763,7 +794,7 @@ PublishPeiMemory (
     PeiMemoryCap = GetPeiMemoryCap ();
     DEBUG ((
       DEBUG_INFO,
-      "%a: mPhysMemAddressWidth=%d PeiMemoryCap=%u KB\n",
+      "%a: PhysMemAddressWidth=%d PeiMemoryCap=%u KB\n",
       __FUNCTION__,
       mPlatformInfoHob.PhysMemAddressWidth,
       PeiMemoryCap >> 10
@@ -902,9 +933,9 @@ QemuInitializeRam (
     // entries. Otherwise, create a single memory HOB with the flat >=4GB
     // memory size read from the CMOS.
     //
-    Status = ScanOrAdd64BitE820Ram (TRUE, NULL, NULL);
+    Status = PlatformScanOrAdd64BitE820Ram (TRUE, NULL, NULL);
     if (EFI_ERROR (Status)) {
-      UpperMemorySize = GetSystemMemorySizeAbove4gb ();
+      UpperMemorySize = PlatformGetSystemMemorySizeAbove4gb ();
       if (UpperMemorySize != 0) {
         PlatformAddMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
       }
