@@ -132,4 +132,41 @@ PlatformAddReservedMemoryBaseSizeHob (
   IN BOOLEAN               Cacheable
   );
 
+VOID
+EFIAPI
+PlatformQemuUc32BaseInitialization (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+UINT32
+EFIAPI
+PlatformGetSystemMemorySizeBelow4gb (
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+/**
+  Initialize the mPhysMemAddressWidth variable, based on guest RAM size.
+**/
+VOID
+EFIAPI
+PlatformAddressWidthInitialization (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+/**
+  Peform Memory Detection for QEMU / KVM
+
+**/
+VOID
+EFIAPI
+PlatformQemuInitializeRam (
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+VOID
+EFIAPI
+PlatformQemuInitializeRamForS3 (
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
 #endif // PLATFORM_INIT_LIB_H_
