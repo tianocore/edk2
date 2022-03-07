@@ -35,7 +35,8 @@ PublishPeiMemory (
   );
 
 UINT32
-GetSystemMemorySizeBelow4gb (
+EFIAPI
+PlatformGetSystemMemorySizeBelow4gb (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 

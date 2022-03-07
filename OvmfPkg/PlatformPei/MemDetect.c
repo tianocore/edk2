@@ -161,7 +161,7 @@ PlatformQemuUc32BaseInitialization (
   // variable MTRR suffices by truncating the size to a whole power of two,
   // while keeping the end affixed to 4GB. This will round the base up.
   //
-  LowerMemorySize           = GetSystemMemorySizeBelow4gb (PlatformInfoHob);
+  LowerMemorySize           = PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
   PlatformInfoHob->Uc32Size = GetPowerOfTwo32 ((UINT32)(SIZE_4GB - LowerMemorySize));
   PlatformInfoHob->Uc32Base = (UINT32)(SIZE_4GB - PlatformInfoHob->Uc32Size);
   //
@@ -372,7 +372,8 @@ GetHighestSystemMemoryAddressFromPvhMemmap (
 }
 
 UINT32
-GetSystemMemorySizeBelow4gb (
+EFIAPI
+PlatformGetSystemMemorySizeBelow4gb (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
@@ -761,7 +762,7 @@ PublishPeiMemory (
   UINT32                S3AcpiReservedMemoryBase;
   UINT32                S3AcpiReservedMemorySize;
 
-  LowerMemorySize = GetSystemMemorySizeBelow4gb (&mPlatformInfoHob);
+  LowerMemorySize = PlatformGetSystemMemorySizeBelow4gb (&mPlatformInfoHob);
   if (mPlatformInfoHob.SmmSmramRequire) {
     //
     // TSEG is chipped from the end of low RAM
@@ -871,7 +872,7 @@ QemuInitializeRamBelow1gb (
 **/
 STATIC
 VOID
-QemuInitializeRam (
+PlatformQemuInitializeRam (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
@@ -885,7 +886,7 @@ QemuInitializeRam (
   //
   // Determine total memory size available
   //
-  LowerMemorySize = GetSystemMemorySizeBelow4gb (PlatformInfoHob);
+  LowerMemorySize = PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
 
   if (PlatformInfoHob->BootMode == BOOT_ON_S3_RESUME) {
     //
@@ -995,19 +996,12 @@ QemuInitializeRam (
   }
 }
 
-/**
-  Publish system RAM and reserve memory regions
-
-**/
+STATIC
 VOID
-InitializeRamRegions (
+PlatformQemuInitializeRamForS3 (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  QemuInitializeRam (PlatformInfoHob);
-
-  SevInitializeRam ();
-
   if (PlatformInfoHob->S3Supported && (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME)) {
     //
     // This is the memory range that will be used for PEI on S3 resume
@@ -1113,7 +1107,7 @@ InitializeRamRegions (
       //
       TsegSize = PlatformInfoHob->Q35TsegMbytes * SIZE_1MB;
       BuildMemoryAllocationHob (
-        GetSystemMemorySizeBelow4gb (PlatformInfoHob) - TsegSize,
+        PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob) - TsegSize,
         TsegSize,
         EfiReservedMemoryType
         );
@@ -1151,4 +1145,20 @@ InitializeRamRegions (
 
  #endif
   }
+}
+
+/**
+  Publish system RAM and reserve memory regions
+
+**/
+VOID
+InitializeRamRegions (
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  PlatformQemuInitializeRam (PlatformInfoHob);
+
+  SevInitializeRam ();
+
+  PlatformQemuInitializeRamForS3 (PlatformInfoHob);
 }
