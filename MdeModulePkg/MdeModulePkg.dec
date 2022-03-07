@@ -153,6 +153,9 @@
   #   registering new policies with the VariablePolicy infrastructure.
   #
   VariablePolicyHelperLib|Include/Library/VariablePolicyHelperLib.h
+  
+  ## @libraryclass  Provides function for SMM CPU Rendezvous Library.
+  SmmCpuRendezvousLib|Include/Library/SmmCpuRendezvousLib.h
 
 [Guids]
   ## MdeModule package token space guid
