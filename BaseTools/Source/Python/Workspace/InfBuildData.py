@@ -14,6 +14,7 @@ from types import *
 from .MetaFileParser import *
 from collections import OrderedDict
 from Workspace.BuildClassObject import ModuleBuildClassObject, LibraryClassObject, PcdClassObject
+from Common.Expression import ValueExpressionEx, PcdPattern
 
 ## Get Protocol value from given packages
 #
@@ -554,6 +555,9 @@ class InfBuildData(ModuleBuildClassObject):
             Instance = Record[1]
             if Instance:
                 Instance = NormPath(Instance, self._Macros)
+                FeaturePcdExpression = self.CheckFeatureFlagPcd(Instance)
+                if not FeaturePcdExpression:
+                    continue
                 RetVal[Lib] = Instance
             else:
                 RetVal[Lib] = None
@@ -584,6 +588,10 @@ class InfBuildData(ModuleBuildClassObject):
         self._ProtocolComments = OrderedDict()
         RecordList = self._RawData[MODEL_EFI_PROTOCOL, self._Arch, self._Platform]
         for Record in RecordList:
+            if Record[1]:
+                FeaturePcdExpression = self.CheckFeatureFlagPcd(Record[1])
+                if not FeaturePcdExpression:
+                    continue
             CName = Record[0]
             Value = _ProtocolValue(CName, self.Packages, self.MetaFile.Path)
             if Value is None:
@@ -608,6 +616,10 @@ class InfBuildData(ModuleBuildClassObject):
         self._PpiComments = OrderedDict()
         RecordList = self._RawData[MODEL_EFI_PPI, self._Arch, self._Platform]
         for Record in RecordList:
+            if Record[1]:
+                FeaturePcdExpression = self.CheckFeatureFlagPcd(Record[1])
+                if not FeaturePcdExpression:
+                    continue
             CName = Record[0]
             Value = _PpiValue(CName, self.Packages, self.MetaFile.Path)
             if Value is None:
@@ -631,7 +643,12 @@ class InfBuildData(ModuleBuildClassObject):
         RetVal = OrderedDict()
         self._GuidComments = OrderedDict()
         RecordList = self._RawData[MODEL_EFI_GUID, self._Arch, self._Platform]
+        RetVal.update(self.GetGuidsUsedByPcd())
         for Record in RecordList:
+            if Record[1]:
+                FeaturePcdExpression = self.CheckFeatureFlagPcd(Record[1])
+                if not FeaturePcdExpression:
+                    continue
             CName = Record[0]
             Value = GuidValue(CName, self.Packages, self.MetaFile.Path)
             if Value is None:
@@ -860,7 +877,12 @@ class InfBuildData(ModuleBuildClassObject):
     def GetGuidsUsedByPcd(self):
         self.Guid
         return self._GuidsUsedByPcd
-
+    @cached_class_function
+    def GetGuidDict(self):
+        GuidDict = OrderedDict()
+        for Package in self.Packages:
+            GuidDict.update(Package.Guids)
+        return GuidDict
     ## Retrieve PCD for given type
     def _GetPcd(self, Type):
         Pcds = OrderedDict()
@@ -877,7 +899,6 @@ class InfBuildData(ModuleBuildClassObject):
             self._PcdComments[TokenSpaceGuid, PcdCName] = Comments
 
         # resolve PCD type, value, datum info, etc. by getting its definition from package
-        _GuidDict = self.Guids.copy()
         for PcdCName, TokenSpaceGuid in PcdList:
             PcdRealName = PcdCName
             Setting, LineNo = PcdDict[self._Arch, self.Platform, PcdCName, TokenSpaceGuid]
@@ -895,7 +916,7 @@ class InfBuildData(ModuleBuildClassObject):
                     '',
                     {},
                     False,
-                    self.Guids[TokenSpaceGuid]
+                    self.GetGuidDict()[TokenSpaceGuid]
                     )
             if Type == MODEL_PCD_PATCHABLE_IN_MODULE and ValueList[1]:
                 # Patch PCD: TokenSpace.PcdCName|Value|Offset
@@ -931,7 +952,6 @@ class InfBuildData(ModuleBuildClassObject):
                 #
                 #   TAB_PCDS_FIXED_AT_BUILD, TAB_PCDS_PATCHABLE_IN_MODULE, TAB_PCDS_FEATURE_FLAG, TAB_PCDS_DYNAMIC, TAB_PCDS_DYNAMIC_EX
                 #
-                _GuidDict.update(Package.Guids)
                 PcdType = self._PCD_TYPE_STRING_[Type]
                 if Type == MODEL_PCD_DYNAMIC:
                     Pcd.Pending = True
@@ -1023,7 +1043,7 @@ class InfBuildData(ModuleBuildClassObject):
                         Pcd.DefaultValue = PcdInPackage.DefaultValue
                     else:
                         try:
-                            Pcd.DefaultValue = ValueExpressionEx(Pcd.DefaultValue, Pcd.DatumType, _GuidDict)(True)
+                            Pcd.DefaultValue = ValueExpressionEx(Pcd.DefaultValue, Pcd.DatumType, self.GetGuidDict())(True)
                         except BadExpression as Value:
                             EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s", %s' %(TokenSpaceGuid, PcdRealName, Pcd.DefaultValue, Value),
                                             File=self.MetaFile, Line=LineNo)
@@ -1046,6 +1066,43 @@ class InfBuildData(ModuleBuildClassObject):
         if (self.Binaries and not self.Sources) or GlobalData.gIgnoreSource:
             return True
         return False
+    def CheckFeatureFlagPcd(self,Instance):
+        Pcds = {}
+        if GlobalData.gPlatformFinalPcds.get(self.Arch):
+            Pcds = GlobalData.gPlatformFinalPcds[self.Arch].copy()
+        if PcdPattern.search(Instance):
+            PcdTuple = tuple(Instance.split('.')[::-1])
+            if PcdTuple in self.Pcds:
+                if not (self.Pcds[PcdTuple].Type == 'FeatureFlag' or self.Pcds[PcdTuple].Type == 'FixedAtBuild') and Instance not in Pcds:
+                    EdkLogger.error('build', FORMAT_INVALID,
+                                    "\nit must be defined in a [PcdsFeatureFlag] or [PcdsFixedAtBuild] section of Dsc or Dec file or [FeaturePcd] or [FixedPcd] of Inf file",
+                                    File=str(self), ExtraData=Instance)
+                Pcds[Instance] = self.Pcds[PcdTuple].DefaultValue
+            if Instance in Pcds:
+                if Pcds[Instance] == '0':
+                    return False
+                elif Pcds[Instance] == '1':
+                    return True
+            try:
+                Value = ValueExpression(Instance, Pcds)()
+                if Value == True:
+                    return True
+                return False
+            except:
+                EdkLogger.warn('build', FORMAT_INVALID,"The FeatureFlagExpression cannot be evaluated", File=str(self), ExtraData=Instance)
+                return False
+        else:
+            for Name, Guid in self.Pcds:
+                if self.Pcds[(Name, Guid)].Type == 'FeatureFlag' or self.Pcds[(Name, Guid)].Type == 'FixedAtBuild':
+                    Pcds['%s.%s' % (Guid, Name)] = self.Pcds[(Name, Guid)].DefaultValue
+            try:
+                Value = ValueExpression(Instance, Pcds)()
+                if Value == True:
+                    return True
+                return False
+            except:
+                EdkLogger.warn('build', FORMAT_INVALID, "The FeatureFlagExpression cannot be evaluated", File=str(self), ExtraData=Instance)
+                return False
 def ExtendCopyDictionaryLists(CopyToDict, CopyFromDict):
     for Key in CopyFromDict:
         CopyToDict[Key].extend(CopyFromDict[Key])
