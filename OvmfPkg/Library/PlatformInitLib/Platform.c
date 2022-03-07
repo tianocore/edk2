@@ -33,6 +33,13 @@
 
 #include <Library/PlatformInitLib.h>
 
+/**
+ * @brief
+ *
+ * @param MemoryBase
+ * @param MemorySize
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformAddIoMemoryBaseSizeHob (
@@ -76,6 +83,13 @@ PlatformAddReservedMemoryBaseSizeHob (
     );
 }
 
+/**
+ * @brief
+ *
+ * @param MemoryBase
+ * @param MemoryLimit
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformAddIoMemoryRangeHob (
@@ -86,6 +100,13 @@ PlatformAddIoMemoryRangeHob (
   PlatformAddIoMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
 }
 
+/**
+ * @brief
+ *
+ * @param MemoryBase
+ * @param MemorySize
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformAddMemoryBaseSizeHob (
@@ -107,6 +128,13 @@ PlatformAddMemoryBaseSizeHob (
     );
 }
 
+/**
+ * @brief
+ *
+ * @param MemoryBase
+ * @param MemoryLimit
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformAddMemoryRangeHob (
@@ -117,6 +145,12 @@ PlatformAddMemoryRangeHob (
   PlatformAddMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
 }
 
+/**
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformMemMapInitialization (
@@ -241,10 +275,10 @@ PlatformMemMapInitialization (
 }
 
 /**
- * Fetch "opt/ovmf/PcdSetNxForStack" from QEMU
+ * @brief
  *
- * @param Setting     The pointer to the setting of "/opt/ovmf/PcdSetNxForStack".
- * @return EFI_SUCCESS  Successfully fetch the settings.
+ * @param PlatformInfoHob
+ * @return EFI_STATUS
  */
 EFI_STATUS
 EFIAPI
@@ -255,6 +289,11 @@ PlatformNoexecDxeInitialization (
   return QemuFwCfgParseBool ("opt/ovmf/PcdSetNxForStack", &PlatformInfoHob->PcdSetNxForStack);
 }
 
+/**
+ * @brief
+ *
+ * @return VOID
+ */
 VOID
 PciExBarInitialization (
   VOID
@@ -296,6 +335,12 @@ PciExBarInitialization (
     );
 }
 
+/**
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformMiscInitialization (
@@ -399,9 +444,11 @@ PlatformMiscInitialization (
 }
 
 /**
-  Fetch the boot CPU count and the possible CPU count from QEMU, and expose
-  them to UefiCpuPkg modules. Set the mMaxCpuCount variable.
-**/
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformMaxCpuCountInitialization (

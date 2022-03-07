@@ -93,6 +93,13 @@ PlatformDebugDumpCmos (
   VOID
   );
 
+/**
+ * @brief
+ *
+ * @param MemoryBase
+ * @param MemorySize
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformAddIoMemoryBaseSizeHob (
@@ -100,6 +107,13 @@ PlatformAddIoMemoryBaseSizeHob (
   IN UINT64                MemorySize
   );
 
+/**
+ * @brief
+ *
+ * @param MemoryBase
+ * @param MemoryLimit
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformAddIoMemoryRangeHob (
@@ -107,6 +121,13 @@ PlatformAddIoMemoryRangeHob (
   IN EFI_PHYSICAL_ADDRESS  MemoryLimit
   );
 
+/**
+ * @brief
+ *
+ * @param MemoryBase
+ * @param MemorySize
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformAddMemoryBaseSizeHob (
@@ -114,6 +135,13 @@ PlatformAddMemoryBaseSizeHob (
   IN UINT64                MemorySize
   );
 
+/**
+ * @brief
+ *
+ * @param MemoryBase
+ * @param MemoryLimit
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformAddMemoryRangeHob (
@@ -121,6 +149,14 @@ PlatformAddMemoryRangeHob (
   IN EFI_PHYSICAL_ADDRESS  MemoryLimit
   );
 
+/**
+ * @brief
+ *
+ * @param MemoryBase
+ * @param MemorySize
+ * @param Cacheable
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformAddReservedMemoryBaseSizeHob (
@@ -129,12 +165,24 @@ PlatformAddReservedMemoryBaseSizeHob (
   IN BOOLEAN               Cacheable
   );
 
+/**
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformQemuUc32BaseInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
+/**
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return UINT32
+ */
 UINT32
 EFIAPI
 PlatformGetSystemMemorySizeBelow4gb (
@@ -142,8 +190,11 @@ PlatformGetSystemMemorySizeBelow4gb (
   );
 
 /**
-  Initialize the mPhysMemAddressWidth variable, based on guest RAM size.
-**/
+ * @brief Initialize the mPhysMemAddressWidth variable, based on guest RAM size.
+ *
+ * @param PlatformInfoHob
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformAddressWidthInitialization (
@@ -151,21 +202,35 @@ PlatformAddressWidthInitialization (
   );
 
 /**
-  Peform Memory Detection for QEMU / KVM
-
-**/
+ * @brief Peform Memory Detection for QEMU / KVM
+ *
+ * @param PlatformInfoHob
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformQemuInitializeRam (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
+/**
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformQemuInitializeRamForNotS3Resume (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
+/**
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformMemMapInitialization (
@@ -173,10 +238,10 @@ PlatformMemMapInitialization (
   );
 
 /**
- * Fetch "opt/ovmf/PcdSetNxForStack" from QEMU
+ * @brief Fetch "opt/ovmf/PcdSetNxForStack" from QEMU
  *
- * @param Setting     The pointer to the setting of "/opt/ovmf/PcdSetNxForStack".
- * @return EFI_SUCCESS  Successfully fetch the settings.
+ * @param PlatformInfoHob
+ * @return EFI_STATUS
  */
 EFI_STATUS
 EFIAPI
@@ -184,6 +249,12 @@ PlatformNoexecDxeInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
+/**
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformMiscInitialization (
@@ -191,9 +262,13 @@ PlatformMiscInitialization (
   );
 
 /**
-  Fetch the boot CPU count and the possible CPU count from QEMU, and expose
-  them to UefiCpuPkg modules. Set the mMaxCpuCount variable.
-**/
+ * Fetch the boot CPU count and the possible CPU count from QEMU, and expose
+ * them to UefiCpuPkg modules. Set the mMaxCpuCount variable.
+ *
+ *
+ * @param PlatformInfoHob
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformMaxCpuCountInitialization (

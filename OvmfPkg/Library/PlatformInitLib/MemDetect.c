@@ -39,6 +39,12 @@ Module Name:
 #include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/PlatformInitLib.h>
 
+/**
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformQemuUc32BaseInitialization (
@@ -99,31 +105,13 @@ PlatformQemuUc32BaseInitialization (
 }
 
 /**
-  Iterate over the RAM entries in QEMU's fw_cfg E820 RAM map that start outside
-  of the 32-bit address range.
-
-  Find the highest exclusive >=4GB RAM address, or produce memory resource
-  descriptor HOBs for RAM entries that start at or above 4GB.
-
-  @param[out] MaxAddress  If MaxAddress is NULL, then PlatformScanOrAdd64BitE820Ram()
-                          produces memory resource descriptor HOBs for RAM
-                          entries that start at or above 4GB.
-
-                          Otherwise, MaxAddress holds the highest exclusive
-                          >=4GB RAM address on output. If QEMU's fw_cfg E820
-                          RAM map contains no RAM entry that starts outside of
-                          the 32-bit address range, then MaxAddress is exactly
-                          4GB on output.
-
-  @retval EFI_SUCCESS         The fw_cfg E820 RAM map was found and processed.
-
-  @retval EFI_PROTOCOL_ERROR  The RAM map was found, but its size wasn't a
-                              whole multiple of sizeof(EFI_E820_ENTRY64). No
-                              RAM entry was processed.
-
-  @return                     Error codes from QemuFwCfgFindFile(). No RAM
-                              entry was processed.
-**/
+ * @brief
+ *
+ * @param AddHighHob
+ * @param OPTIONAL
+ * @param OPTIONAL
+ * @return STATIC
+ */
 STATIC
 EFI_STATUS
 PlatformScanOrAdd64BitE820Ram (
@@ -249,6 +237,12 @@ GetPvhMemmapEntries (
   return EFI_SUCCESS;
 }
 
+/**
+ * @brief Get the Highest System Memory Address From Pvh Memmap object
+ *
+ * @param Below4gb
+ * @return STATIC
+ */
 STATIC
 UINT64
 GetHighestSystemMemoryAddressFromPvhMemmap (
@@ -286,6 +280,12 @@ GetHighestSystemMemoryAddressFromPvhMemmap (
   return HighestAddress;
 }
 
+/**
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return UINT32
+ */
 UINT32
 EFIAPI
 PlatformGetSystemMemorySizeBelow4gb (
@@ -322,6 +322,11 @@ PlatformGetSystemMemorySizeBelow4gb (
   return (UINT32)(((UINTN)((Cmos0x35 << 8) + Cmos0x34) << 16) + SIZE_16MB);
 }
 
+/**
+ * @brief
+ *
+ * @return STATIC
+ */
 STATIC
 UINT64
 PlatformGetSystemMemorySizeAbove4gb (
@@ -347,8 +352,11 @@ PlatformGetSystemMemorySizeAbove4gb (
 }
 
 /**
-  Return the highest address that DXE could possibly use, plus one.
-**/
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return STATIC
+ */
 STATIC
 UINT64
 PlatformGetFirstNonAddress (
@@ -490,8 +498,11 @@ PlatformGetFirstNonAddress (
 }
 
 /**
-  Initialize the mPhysMemAddressWidth variable, based on guest RAM size.
-**/
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformAddressWidthInitialization (
@@ -534,6 +545,12 @@ PlatformAddressWidthInitialization (
   PlatformInfoHob->PhysMemAddressWidth = PhysMemAddressWidth;
 }
 
+/**
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return STATIC
+ */
 STATIC
 VOID
 QemuInitializeRamBelow1gb (
@@ -561,9 +578,11 @@ QemuInitializeRamBelow1gb (
 }
 
 /**
-  Peform Memory Detection for QEMU / KVM
-
-**/
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformQemuInitializeRam (
@@ -690,6 +709,12 @@ PlatformQemuInitializeRam (
   }
 }
 
+/**
+ * @brief
+ *
+ * @param PlatformInfoHob
+ * @return VOID
+ */
 VOID
 EFIAPI
 PlatformQemuInitializeRamForNotS3Resume (
