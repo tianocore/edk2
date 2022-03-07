@@ -166,4 +166,38 @@ PlatformQemuInitializeRamForNotS3Resume (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
+VOID
+EFIAPI
+PlatformMemMapInitialization (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+/**
+ * Fetch "opt/ovmf/PcdSetNxForStack" from QEMU
+ *
+ * @param Setting     The pointer to the setting of "/opt/ovmf/PcdSetNxForStack".
+ * @return EFI_SUCCESS  Successfully fetch the settings.
+ */
+EFI_STATUS
+EFIAPI
+PlatformNoexecDxeInitialization (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+VOID
+EFIAPI
+PlatformMiscInitialization (
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+/**
+  Fetch the boot CPU count and the possible CPU count from QEMU, and expose
+  them to UefiCpuPkg modules. Set the mMaxCpuCount variable.
+**/
+VOID
+EFIAPI
+PlatformMaxCpuCountInitialization (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
 #endif // PLATFORM_INIT_LIB_H_

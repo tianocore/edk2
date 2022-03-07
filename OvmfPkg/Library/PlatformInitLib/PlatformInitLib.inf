@@ -81,6 +81,5 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtr
   gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtrSize
 
-
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
