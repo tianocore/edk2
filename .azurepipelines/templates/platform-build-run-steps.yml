@@ -44,6 +44,7 @@ steps:
   inputs:
     versionSpec: "3.8.x"
     architecture: "x64"
+  condition: not(eq('${{ parameters.tool_chain_tag }}', 'GCC5'))
 
 - script: pip install -r pip-requirements.txt --upgrade
   displayName: 'Install/Upgrade pip modules'
