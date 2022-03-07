@@ -2,7 +2,7 @@
   ACPI 5.0 definitions from the ACPI Specification Revision 5.0a November 13, 2013.
 
   Copyright (c) 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2022, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -1361,6 +1361,7 @@ typedef struct {
 // Boot Error Severity types
 //
 #define EFI_ACPI_5_0_ERROR_SEVERITY_CORRECTABLE  0x00
+#define EFI_ACPI_5_0_ERROR_SEVERITY_RECOVERABLE  0x00
 #define EFI_ACPI_5_0_ERROR_SEVERITY_FATAL        0x01
 #define EFI_ACPI_5_0_ERROR_SEVERITY_CORRECTED    0x02
 #define EFI_ACPI_5_0_ERROR_SEVERITY_NONE         0x03
