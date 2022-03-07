@@ -34,18 +34,6 @@ PublishPeiMemory (
   VOID
   );
 
-UINT32
-EFIAPI
-PlatformGetSystemMemorySizeBelow4gb (
-  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
-  );
-
-VOID
-EFIAPI
-PlatformQemuUc32BaseInitialization (
-  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
-  );
-
 VOID
 InitializeRamRegions (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
