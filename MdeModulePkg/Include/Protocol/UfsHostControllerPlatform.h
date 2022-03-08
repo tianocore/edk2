@@ -1,7 +1,7 @@
 /** @file
   EDKII_UFS_HC_PLATFORM_PROTOCOL definition.
 
-Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Protocol/UfsHostController.h>
 
-#define EDKII_UFS_HC_PLATFORM_PROTOCOL_VERSION  1
+#define EDKII_UFS_HC_PLATFORM_PROTOCOL_VERSION  2
 
 extern EFI_GUID  gEdkiiUfsHcPlatformProtocolGuid;
 
@@ -83,6 +83,13 @@ typedef enum {
   EdkiiUfsHcPostLinkStartup
 } EDKII_UFS_HC_PLATFORM_CALLBACK_PHASE;
 
+typedef enum {
+  EdkiiUfsCardRefClkFreq19p2Mhz,
+  EdkiiUfsCardRefClkFreq26Mhz,
+  EdkiiUfsCardRefClkFreq38p4Mhz,
+  EdkiiUfsCardRefClkFreqObsolete
+} EDKII_UFS_CARD_REF_CLK_FREQ_ATTRIBUTE;
+
 /**
   Callback function for platform driver.
 
@@ -118,6 +125,10 @@ struct _EDKII_UFS_HC_PLATFORM_PROTOCOL {
   /// for host controller.
   ///
   EDKII_UFS_HC_PLATFORM_CALLBACK            Callback;
+  ///
+  /// Reference Clock Frequency Ufs Card Attribute that need to be set in this Ufs Host Environment.
+  ///
+  EDKII_UFS_CARD_REF_CLK_FREQ_ATTRIBUTE     RefClkFreq;
 };
 
 #endif

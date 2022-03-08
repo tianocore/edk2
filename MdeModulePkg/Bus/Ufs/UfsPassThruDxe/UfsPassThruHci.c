@@ -2,7 +2,7 @@
   UfsPassThruDxe driver is used to produce EFI_EXT_SCSI_PASS_THRU protocol interface
   for upper layer application to execute UFS-supported SCSI cmds.
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1970,14 +1970,6 @@ UfsDeviceDetection (
         return EFI_DEVICE_ERROR;
       }
     } else {
-      if ((mUfsHcPlatform != NULL) && (mUfsHcPlatform->Callback != NULL)) {
-        Status = mUfsHcPlatform->Callback (Private->Handle, EdkiiUfsHcPostLinkStartup, &Private->UfsHcDriverInterface);
-        if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_ERROR, "Failure from platform driver during EdkiiUfsHcPostLinkStartup, Status = %r\n", Status));
-          return Status;
-        }
-      }
-
       return EFI_SUCCESS;
     }
   }
