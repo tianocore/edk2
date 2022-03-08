@@ -71,6 +71,40 @@ STATIC CONST EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  mMmio64Configuration = {
                                                    //   use probed BAR size
 };
 
+//
+// mOptionRomConfiguration is present only in Td guest.
+// Host VMM can inject option ROM which is untrusted in Td guest,
+// so PCI option ROM needs to be ignored.
+// According to "Table 20. ACPI 2.0 & 3.0 QWORD Address Space Descriptor Usage"
+// PI spec 1.7, type-specific flags can be set to 0 when
+// Address Translation Offset == 6 to skip device option ROM.
+//
+STATIC CONST EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  mOptionRomConfiguration =   {
+  ACPI_ADDRESS_SPACE_DESCRIPTOR,                   // Desc
+  (UINT16)(                                        // Len
+                                                   sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
+                                                   OFFSET_OF (
+                                                     EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
+                                                     ResType
+                                                     )
+                                                   ),
+  ACPI_ADDRESS_SPACE_TYPE_MEM,                     // ResType
+  0,                                               // GenFlag
+  0,                                               // Disable option roms SpecificFlag
+  64,                                              // AddrSpaceGranularity:
+                                                   //   aperture selection hint
+                                                   //   for BAR allocation
+  MAX_UINT64,                                      // AddrRangeMin
+  MAX_UINT64,                                      // AddrRangeMax:
+                                                   //   no special alignment
+                                                   //   for affected BARs
+  6,                                               // AddrTranslationOffset:
+                                                   //   hint covers all
+                                                   //   eligible BARs
+  0                                                // AddrLen:
+                                                   //   use probed BAR size
+};
+
 STATIC CONST EFI_ACPI_END_TAG_DESCRIPTOR  mEndDesc = {
   ACPI_END_TAG_DESCRIPTOR,                         // Desc
   0                                                // Checksum: to be ignored
@@ -227,6 +261,13 @@ CheckDevice (
   //
   Length = sizeof mMmio64Configuration + sizeof mEndDesc;
 
+  //
+  // In Td guest OptionRom is not allowed.
+  //
+  if (TdIsEnabled ()) {
+    Length += sizeof mOptionRomConfiguration;
+  }
+
   *Configuration = AllocateZeroPool (Length);
 
   if (*Configuration == NULL) {
@@ -244,6 +285,11 @@ CheckDevice (
   Ptr = (UINT8 *)(UINTN)*Configuration;
   CopyMem (Ptr, &mMmio64Configuration, sizeof mMmio64Configuration);
   Length = sizeof mMmio64Configuration;
+
+  if (TdIsEnabled ()) {
+    CopyMem (Ptr + Length, &mOptionRomConfiguration, sizeof mOptionRomConfiguration);
+    Length += sizeof mOptionRomConfiguration;
+  }
 
   CopyMem (Ptr + Length, &mEndDesc, sizeof mEndDesc);
 
