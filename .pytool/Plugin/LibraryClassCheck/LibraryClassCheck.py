@@ -63,7 +63,7 @@ class LibraryClassCheck(ICiBuildPlugin):
         overall_status = 0
         LibraryClassIgnore = []
 
-        abs_pkg_path = Edk2pathObj.GetAbsolutePathOnThisSytemFromEdk2RelativePath(packagename)
+        abs_pkg_path = Edk2pathObj.GetAbsolutePathOnThisSystemFromEdk2RelativePath(packagename)
         abs_dec_path = self.__GetPkgDec(abs_pkg_path)
         wsr_dec_path = Edk2pathObj.GetEdk2RelativePathFromAbsolutePath(abs_dec_path)
 

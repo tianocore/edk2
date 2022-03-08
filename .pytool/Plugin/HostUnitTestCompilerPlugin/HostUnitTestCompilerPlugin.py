@@ -93,7 +93,7 @@ class HostUnitTestCompilerPlugin(ICiBuildPlugin):
             tc.LogStdError("DscPath not found in config file.  Nothing to compile for HostBasedUnitTests.")
             return -1
 
-        AP = Edk2pathObj.GetAbsolutePathOnThisSytemFromEdk2RelativePath(packagename)
+        AP = Edk2pathObj.GetAbsolutePathOnThisSystemFromEdk2RelativePath(packagename)
 
         APDSC = os.path.join(AP, pkgconfig["DscPath"].strip())
         AP_Path = Edk2pathObj.GetEdk2RelativePathFromAbsolutePath(APDSC)

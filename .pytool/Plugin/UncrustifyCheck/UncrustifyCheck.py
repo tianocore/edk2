@@ -421,7 +421,7 @@ class UncrustifyCheck(ICiBuildPlugin):
         """
         Initializes plugin environment information.
         """
-        self._abs_package_path = edk2_path.GetAbsolutePathOnThisSytemFromEdk2RelativePath(
+        self._abs_package_path = edk2_path.GetAbsolutePathOnThisSystemFromEdk2RelativePath(
             package_rel_path)
         self._abs_workspace_path = edk2_path.WorkspacePath
         self._package_config = package_config

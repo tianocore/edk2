@@ -55,7 +55,7 @@ class DependencyCheck(ICiBuildPlugin):
         overall_status = 0
 
         # Get current platform
-        abs_pkg_path = Edk2pathObj.GetAbsolutePathOnThisSytemFromEdk2RelativePath(packagename)
+        abs_pkg_path = Edk2pathObj.GetAbsolutePathOnThisSystemFromEdk2RelativePath(packagename)
 
         # Get INF Files
         INFFiles = self.WalkDirectoryForExtension([".inf"], abs_pkg_path)

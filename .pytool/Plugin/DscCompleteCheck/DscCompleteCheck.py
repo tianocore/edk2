@@ -58,7 +58,7 @@ class DscCompleteCheck(ICiBuildPlugin):
                 "DscPath not found in config file.  Nothing to check.")
             return -1
 
-        abs_pkg_path = Edk2pathObj.GetAbsolutePathOnThisSytemFromEdk2RelativePath(
+        abs_pkg_path = Edk2pathObj.GetAbsolutePathOnThisSystemFromEdk2RelativePath(
             packagename)
         abs_dsc_path = os.path.join(abs_pkg_path, pkgconfig["DscPath"].strip())
         wsr_dsc_path = Edk2pathObj.GetEdk2RelativePathFromAbsolutePath(
