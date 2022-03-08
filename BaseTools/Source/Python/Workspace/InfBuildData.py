@@ -529,11 +529,17 @@ class InfBuildData(ModuleBuildClassObject):
         for Record in RecordList:
             LineNo = Record[-1]
             ToolChainFamily = Record[1]
-            TagName = Record[2]
-            ToolCode = Record[3]
-
+            # OptionsList := [TagName, ToolCode, FeatureFlag]
+            OptionsList = ['','','']
+            TokenList = GetSplitValueList(Record[2], TAB_VALUE_SPLIT)
+            for Index in range(len(TokenList)):
+                OptionsList[Index] = TokenList[Index]
+            if OptionsList[2]:
+                FeaturePcdExpression = self.CheckFeatureFlagPcd(OptionsList[2])
+                if not FeaturePcdExpression:
+                    continue
             File = PathClass(NormPath(Record[0], Macros), self._ModuleDir, '',
-                             '', False, self._Arch, ToolChainFamily, '', TagName, ToolCode)
+                             '', False, self._Arch, ToolChainFamily, '', OptionsList[0], OptionsList[1])
             # check the file validation
             ErrorCode, ErrorInfo = File.Validate()
             if ErrorCode != 0:
