@@ -63,6 +63,9 @@ jobs:
   pool:
     vmImage: ${{ parameters.vm_image }}
 
+  ${{ if contains(parameters.tool_chain_tag, 'GCC') }}:
+    container: 'ghcr.io/tianocore/containers/fedora-35-test:9ef7691'
+
   steps:
   - template: pr-gate-steps.yml
     parameters:
