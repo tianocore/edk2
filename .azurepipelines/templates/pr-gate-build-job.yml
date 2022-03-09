@@ -63,6 +63,9 @@ jobs:
   pool:
     vmImage: ${{ parameters.vm_image }}
 
+  ${{ if contains(parameters.tool_chain_tag, 'GCC') }}
+    container: 'ghcr.io/osteffenrh/edk2-build-images/fedora-35:latest'
+
   steps:
   - template: pr-gate-steps.yml
     parameters:

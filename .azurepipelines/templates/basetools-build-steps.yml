@@ -10,15 +10,6 @@ parameters:
   tool_chain_tag: ''
 
 steps:
-- ${{ if contains(parameters.tool_chain_tag, 'GCC') }}:
-  - bash: sudo apt-get update
-    displayName: Update apt
-    condition: and(gt(variables.pkg_count, 0), succeeded())
-
-  - bash: sudo apt-get install gcc g++ make uuid-dev
-    displayName: Install required tools
-    condition: and(gt(variables.pkg_count, 0), succeeded())
-
 - task: CmdLine@1
   displayName: Build Base Tools from source
   inputs:

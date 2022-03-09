@@ -166,6 +166,8 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
+    container: 'ghcr.io/osteffenrh/edk2-build-images/fedora-35:latest'
+
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
@@ -176,7 +178,3 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
-        extra_install_step:
-        - bash: sudo apt-get install qemu
-          displayName: Install qemu
-          condition: and(gt(variables.pkg_count, 0), succeeded())
