@@ -166,6 +166,8 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
+    container: 'quay.io/osteffen/edk2-build:ubuntu-20.04'
+
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
