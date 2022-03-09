@@ -63,6 +63,9 @@ jobs:
   pool:
     vmImage: ${{ parameters.vm_image }}
 
+  ${{ if eq( parameters.tool_chain_tag, 'GCC5' ) }}:
+    container: 'quay.io/osteffen/edk2-build:ubuntu-20.04'
+
   steps:
   - template: pr-gate-steps.yml
     parameters:
