@@ -36,6 +36,12 @@ parameters:
   default: []
 
 steps:
+- bash: |
+    echo "##vso[task.prependpath]${HOME}/.local/bin"
+    echo "new PATH=${PATH}"
+  displayName: Set PATH
+  condition: eq('${{ parameters.tool_chain_tag }}', 'GCC5')
+
 - checkout: self
   clean: true
   fetchDepth: 1
