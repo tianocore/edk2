@@ -63,6 +63,9 @@ jobs:
   pool:
     vmImage: ${{ parameters.vm_image }}
 
+  ${{ if eq( parameters.tool_chain_tag, 'GCC5' ) }}:
+    container: 'ghcr.io/osteffenrh/edk2-build-images/ubuntu-22.04:latest'
+
   steps:
   - template: pr-gate-steps.yml
     parameters:
