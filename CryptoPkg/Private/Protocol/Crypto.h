@@ -3442,6 +3442,26 @@ EFI_STATUS
   );
 
 /**
+  Set the EC curve to be used for TLS flows
+
+  This function sets the EC curve to be used for TLS flows.
+
+  @param[in]  Tls                Pointer to a TLS object.
+  @param[in]  EcCurve            An EC named curve.
+
+  @retval  EFI_SUCCESS           The EC curve was set successfully.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+  @retval  EFI_UNSUPPORTED       The requested TLS EC curve is not supported
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_TLS_SET_EC_CURVE)(
+  IN     VOID                     *Tls,
+  IN     UINT32                   EcCurve
+  );
+
+/**
   Gets the CA-supplied certificate revocation list data set in the specified
   TLS object.
 
@@ -3739,6 +3759,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_TLS_SET_CERT_REVOCATION_LIST          TlsSetCertRevocationList;
   EDKII_CRYPTO_TLS_SET_MSG_TRACE                     TlsSetMsgTrace;
   EDKII_CRYPTO_TLS_SET_SIGNATURE_ALGO_LIST           TlsSetSignatureAlgoList;
+  EDKII_CRYPTO_TLS_SET_EC_CURVE                      TlsSetEcCurve;
   /// TLS Get
   EDKII_CRYPTO_TLS_GET_VERSION                       TlsGetVersion;
   EDKII_CRYPTO_TLS_GET_CONNECTION_END                TlsGetConnectionEnd;

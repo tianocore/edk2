@@ -4221,6 +4221,29 @@ CryptoServiceTlsSetSignatureAlgoList (
 }
 
 /**
+  Set the EC curve to be used for TLS flows
+
+  This function sets the EC curve to be used for TLS flows.
+
+  @param[in]  Tls                Pointer to a TLS object.
+  @param[in]  EcCurve            An EC named curve as defined in section 5.1.1 of RFC 4492.
+
+  @retval  EFI_SUCCESS           The EC curve was set successfully.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+  @retval  EFI_UNSUPPORTED       The requested TLS EC curve is not supported
+
+**/
+EFI_STATUS
+EFIAPI
+CryptoServiceTlsSetEcCurve (
+  IN     VOID    *Tls,
+  IN     UINT32  EcCurve
+  )
+{
+  return CALL_BASECRYPTLIB (TlsSet.Services.EcCurve, TlsSetEcCurve, (Tls, EcCurve), EFI_UNSUPPORTED);
+}
+
+/**
   Gets the protocol version used by the specified TLS connection.
 
   This function returns the protocol version used by the specified TLS
@@ -4875,6 +4898,7 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   CryptoServiceTlsSetCertRevocationList,
   CryptoServiceTlsSetMsgTrace,
   CryptoServiceTlsSetSignatureAlgoList,
+  CryptoServiceTlsSetEcCurve,
   /// TLS Get
   CryptoServiceTlsGetVersion,
   CryptoServiceTlsGetConnectionEnd,

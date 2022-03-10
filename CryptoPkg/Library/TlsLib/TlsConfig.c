@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/TlsLib.h>
 #include <Protocol/Tls.h>
 #include <IndustryStandard/Tls1.h>
+#include <openssl/obj_mac.h>
 #include "InternalTlsLib.h"
 
 typedef struct {
@@ -1241,6 +1242,133 @@ TlsSetSignatureAlgoList (
 
   FreePool (SignAlgoStr);
   return Status;
+}
+
+/**
+  Set the EC curve to be used for TLS flows
+
+  This function sets the EC curve to be used for TLS flows.
+
+  @param[in]  Tls                Pointer to a TLS object.
+  @param[in]  EcCurve            An EC named curve as defined in section 5.1.1 of RFC 4492.
+
+  @retval  EFI_SUCCESS           The EC curve was set successfully.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+  @retval  EFI_UNSUPPORTED       The requested TLS EC curve is not supported
+
+**/
+EFI_STATUS
+EFIAPI
+TlsSetEcCurve (
+  IN     VOID    *Tls,
+  IN     UINT32  EcCurve
+  )
+{
+  TLS_CONNECTION  *TlsConn;
+  EC_KEY *Ecdh;
+  INT32 Nid, Ret;
+
+  TlsConn = (TLS_CONNECTION *)Tls;
+
+  if (!TlsConn || !TlsConn->Ssl) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  switch (EcCurve) {
+    case TlsEcNamedCurve_sect163k1:
+      Nid = NID_sect163k1;
+      break;
+    case TlsEcNamedCurve_sect163r1:
+      Nid = NID_sect163r1;
+      break;
+    case TlsEcNamedCurve_sect163r2:
+      Nid = NID_sect163r2;
+      break;
+    case TlsEcNamedCurve_sect193r1:
+      Nid = NID_sect193r1;
+      break;
+    case TlsEcNamedCurve_sect193r2:
+      Nid = NID_sect193r2;
+      break;
+    case TlsEcNamedCurve_sect233k1:
+      Nid = NID_sect233k1;
+      break;
+    case TlsEcNamedCurve_sect233r1:
+      Nid = NID_sect233r1;
+      break;
+    case TlsEcNamedCurve_sect239k1:
+      Nid = NID_sect239k1;
+      break;
+    case TlsEcNamedCurve_sect283k1:
+      Nid = NID_sect283k1;
+      break;
+    case TlsEcNamedCurve_sect283r1:
+      Nid = NID_sect283r1;
+      break;
+    case TlsEcNamedCurve_sect409k1:
+      Nid = NID_sect409k1;
+      break;
+    case TlsEcNamedCurve_sect409r1:
+      Nid = NID_sect409r1;
+      break;
+    case TlsEcNamedCurve_sect571k1:
+      Nid = NID_sect571k1;
+      break;
+    case TlsEcNamedCurve_sect571r1:
+      Nid = NID_sect571r1;
+      break;
+    case TlsEcNamedCurve_secp160k1:
+      Nid = NID_secp160k1;
+      break;
+    case TlsEcNamedCurve_secp160r1:
+      Nid = NID_secp160r1;
+      break;
+    case TlsEcNamedCurve_secp160r2:
+      Nid = NID_secp160r2;
+      break;
+    case TlsEcNamedCurve_secp192k1:
+      Nid = NID_secp192k1;
+      break;
+    case TlsEcNamedCurve_secp192r1:
+      return EFI_UNSUPPORTED;
+    case TlsEcNamedCurve_secp224k1:
+      Nid = NID_secp224k1;
+      break;
+    case TlsEcNamedCurve_secp224r1:
+      Nid = NID_secp224r1;
+      break;
+    case TlsEcNamedCurve_secp256k1:
+      Nid = NID_secp256k1;
+      break;
+    case TlsEcNamedCurve_secp256r1:
+      return EFI_UNSUPPORTED;
+    case TlsEcNamedCurve_secp384r1:
+      Nid = NID_secp384r1;
+      break;
+    case TlsEcNamedCurve_secp521r1:
+      Nid = NID_secp521r1;
+      break;
+    default:
+      return EFI_UNSUPPORTED;
+  }
+
+  if (SSL_set1_curves (TlsConn->Ssl, &Nid, 1) != 1) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Ecdh = EC_KEY_new_by_curve_name (Nid);
+  if (!Ecdh) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Ret = SSL_set_tmp_ecdh (TlsConn->Ssl, Ecdh);
+  EC_KEY_free (Ecdh);
+
+  if (Ret != 1) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
