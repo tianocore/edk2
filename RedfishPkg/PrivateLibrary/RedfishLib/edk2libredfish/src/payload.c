@@ -620,6 +620,7 @@ collectionEvalOp (
   if (((*StatusCode == NULL) && (members == NULL)) ||
       ((*StatusCode != NULL) && ((**StatusCode < HTTP_STATUS_200_OK) || (**StatusCode > HTTP_STATUS_206_PARTIAL_CONTENT))))
   {
+    free (valid);
     return members;
   }
 
@@ -633,6 +634,7 @@ collectionEvalOp (
     if (((*StatusCode == NULL) && (tmp == NULL)) ||
         ((*StatusCode != NULL) && ((**StatusCode < HTTP_STATUS_200_OK) || (**StatusCode > HTTP_STATUS_206_PARTIAL_CONTENT))))
     {
+      free (valid);
       return tmp;
     }
 
@@ -658,19 +660,15 @@ collectionEvalOp (
 
   cleanupPayload (members);
   if (validCount == 0) {
-    free (valid);
-    return NULL;
-  }
-
-  if (validCount == 1) {
+    ret = NULL;
+  } else if (validCount == 1) {
     ret = valid[0];
-    free (valid);
-    return ret;
   } else {
     ret = createCollection (payload->service, validCount, valid);
-    free (valid);
-    return ret;
   }
+
+  free (valid);
+  return ret;
 }
 
 static redfishPayload *
