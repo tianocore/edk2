@@ -1,7 +1,7 @@
 /** @file
   DBG2 Table Generator
 
-  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -55,13 +55,17 @@ Requirements:
 */
 #define NAME_STR_DBG_PORT0  "COM0"
 
+/** A string representing the full path name of the debug port 0.
+*/
+#define NAMESPACE_STR_DBG_PORT0  "\\_SB_.COM0"
+
 /** An UID representing the debug port 0.
 */
 #define UID_DBG_PORT0  0
 
 /** The length of the namespace string.
 */
-#define DBG2_NAMESPACESTRING_FIELD_SIZE  sizeof (NAME_STR_DBG_PORT0)
+#define DBG2_NAMESPACESTRING_FIELD_SIZE  sizeof (NAMESPACE_STR_DBG_PORT0)
 
 /** The PL011 UART address range length.
 */
@@ -166,7 +170,7 @@ DBG2_TABLE  AcpiDbg2 = {
       0,                    // {Template}: Serial Port Subtype
       0,                    // {Template}: Serial Port Base Address
       PL011_UART_LENGTH,
-      NAME_STR_DBG_PORT0
+      NAMESPACE_STR_DBG_PORT0
       )
   }
 };
