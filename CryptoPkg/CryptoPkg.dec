@@ -80,6 +80,9 @@
   # @Prompt Set policy for hashing unsigned image for Secure Boot.
   # @ValidList 0x80000001 | 0x00000001, 0x00000002, 0x00000004, 0x00000008, 0x00000010
   gEfiCryptoPkgTokenSpaceGuid.PcdHashApiLibPolicy|0x00000002|UINT32|0x00000001
+  gEfiCryptoPkgTokenSpaceGuid.PcdEcEnabled|FALSE|BOOLEAN|0x0000003
+[PcdsFeatureFlag.common]
+  
 
 [UserExtensions.TianoCore."ExtraFiles"]
   CryptoPkgExtra.uni

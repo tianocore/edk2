@@ -9,7 +9,7 @@
  * in the file LICENSE in the source distribution or at
  * https://www.openssl.org/source/license.html
  */
-
+#include <Library/PcdLib.h>
 #include <openssl/opensslv.h>
 
 #ifdef  __cplusplus
@@ -241,7 +241,11 @@ extern "C" {
 #ifndef OPENSSL_NO_DYNAMIC_ENGINE
 #define OPENSSL_NO_DYNAMIC_ENGINE
 #endif
-
+#if !FixedPcdGetBool(PcdEcEnabled)
+  #ifndef OPENSSL_NO_EC
+  #define OPENSSL_NO_EC
+  #endif
+#endif
 /*
  * Sometimes OPENSSSL_NO_xxx ends up with an empty file and some compilers
  * don't like that.  This will hopefully silence them.
