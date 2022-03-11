@@ -2,7 +2,7 @@
   Functions in this module are associated with variable parsing operations and
   are intended to be usable across variable driver source files.
 
-Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @param[in] Variable           Pointer to the Variable Header.
   @param[in] VariableStoreEnd   Pointer to the Variable Store End.
+  @param[in] AuthFormat         Auth-variable indicator.
 
   @retval TRUE              Variable header is valid.
   @retval FALSE             Variable header is not valid.
@@ -27,7 +28,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 BOOLEAN
 IsValidVariableHeader (
   IN  VARIABLE_HEADER  *Variable,
-  IN  VARIABLE_HEADER  *VariableStoreEnd
+  IN  VARIABLE_HEADER  *VariableStoreEnd,
+  IN  BOOLEAN          AuthFormat
   );
 
 /**
@@ -193,6 +195,28 @@ GetVariableDataOffset (
   );
 
 /**
+  Get variable data payload.
+
+  @param[in]      Variable     Pointer to the Variable Header.
+  @param[out]     Data         Pointer to buffer used to store the variable data.
+  @param[in]      DataSize     Size of buffer passed by Data.
+  @param[out]     DataSize     Size of data copied into Data buffer.
+  @param[in]      AuthFlag     Auth-variable indicator.
+
+  @return EFI_SUCCESS             Data was fetched.
+  @return EFI_INVALID_PARAMETER   DataSize is NULL.
+  @return EFI_BUFFER_TOO_SMALL    DataSize is smaller than size of variable data.
+
+**/
+EFI_STATUS
+GetVariableData (
+  IN      VARIABLE_HEADER  *Variable,
+  IN  OUT VOID             *Data,
+  IN  OUT UINT32           *DataSize,
+  IN      BOOLEAN          AuthFlag
+  );
+
+/**
 
   This code gets the pointer to the next variable header.
 
@@ -342,6 +366,69 @@ UpdateVariableInfo (
   IN  BOOLEAN                 Delete,
   IN  BOOLEAN                 Cache,
   IN OUT VARIABLE_INFO_ENTRY  **VariableInfo
+  );
+
+/**
+
+  Retrieve details of the variable next to given variable within VariableStore.
+
+  If VarInfo->Address is NULL, the first one in VariableStore is returned.
+
+  VariableStart and/or VariableEnd can be given optionally for the situation
+  in which the valid storage space is smaller than the VariableStore->Size.
+  This usually happens when PEI variable services make a compact variable
+  cache to save memory, which cannot make use VariableStore->Size to determine
+  the correct variable storage range.
+
+  @param VariableStore            Pointer to a variable storage. It's optional.
+  @param VariableStart            Start point of valid range in VariableStore.
+  @param VariableEnd              End point of valid range in VariableStore.
+  @param VariableInfo             Pointer to variable information.
+
+  @retval EFI_INVALID_PARAMETER  VariableInfo or VariableStore is NULL.
+  @retval EFI_NOT_FOUND          If the end of VariableStore is reached.
+  @retval EFI_SUCCESS            The next variable is retrieved successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+GetNextVariableInfo (
+  IN OUT  PROTECTED_VARIABLE_INFO  *VarInfo
+  );
+
+/**
+
+  Retrieve details about a variable and return them in VariableInfo->Header.
+
+  If VariableInfo->Address is given, this function will calculate its offset
+  relative to given variable storage via VariableStore; Otherwise, it will try
+  other internal variable storages or cached copies. It's assumed that, for all
+  copies of NV variable storage, all variables are stored in the same relative
+  position. If VariableInfo->Address is found in the range of any storage copies,
+  its offset relative to that storage should be the same in other copies.
+
+  If VariableInfo->Offset is given (non-zero) but not VariableInfo->Address,
+  this function will return the variable memory address inside VariableStore,
+  if given, via VariableInfo->Address; Otherwise, the address of other storage
+  copies will be returned, if any.
+
+  For a new variable whose offset has not been determined, a value of -1 as
+  VariableInfo->Offset should be passed to skip the offset calculation.
+
+  @param VariableStore            Pointer to a variable storage. It's optional.
+  @param VariableInfo             Pointer to variable information.
+
+  @retval EFI_INVALID_PARAMETER  VariableInfo is NULL or both VariableInfo->Address
+                                 and VariableInfo->Offset are NULL (0).
+  @retval EFI_NOT_FOUND          If given Address or Offset is out of range of
+                                 any given or internal storage copies.
+  @retval EFI_SUCCESS            Variable details are retrieved successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+GetVariableInfo (
+  IN OUT  PROTECTED_VARIABLE_INFO  *VarInfo
   );
 
 #endif
