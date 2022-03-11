@@ -2,20 +2,22 @@
   Implement ReadOnly Variable Services required by PEIM and install
   PEI ReadOnly Varaiable2 PPI. These services operates the non volatile storage space.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "Variable.h"
+#include "VariableParsing.h"
+#include "VariableStore.h"
 
 //
 // Module globals
 //
 EFI_PEI_READ_ONLY_VARIABLE2_PPI  mVariablePpi = {
-  PeiGetVariable,
-  PeiGetNextVariableName
+  PeiGetVariableEx,
+  PeiGetNextVariableNameEx
 };
 
 EFI_PEI_PPI_DESCRIPTOR  mPpiListVariable = {
@@ -41,6 +43,30 @@ PeimInitializeVariableServices (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
+  EFI_STATUS                     Status;
+  PROTECTED_VARIABLE_CONTEXT_IN  ContextIn;
+
+  //
+  // If protected variable services are not supported, EFI_UNSUPPORTED should
+  // be always returned. Check it here.
+  //
+  ContextIn.StructVersion = PROTECTED_VARIABLE_CONTEXT_IN_STRUCT_VERSION;
+  ContextIn.StructSize    = sizeof (ContextIn);
+
+  ContextIn.MaxVariableSize             = 0;
+  ContextIn.VariableServiceUser         = FromPeiModule;
+  ContextIn.GetVariableInfo             = GetVariableInfo;
+  ContextIn.GetNextVariableInfo         = GetNextVariableInfo;
+  ContextIn.FindVariableSmm             = NULL;
+  ContextIn.UpdateVariableStore         = NULL;
+  ContextIn.UpdateVariable              = NULL;
+  ContextIn.IsHobVariableStoreAvailable = IsHobVariableStoreAvailable;
+
+  Status = ProtectedVariableLibInitialize (&ContextIn);
+  if (EFI_ERROR (Status) && (Status != EFI_UNSUPPORTED)) {
+    return Status;
+  }
+
   return PeiServicesInstallPpi (&mPpiListVariable);
 }
 
@@ -799,6 +825,7 @@ GetVariableNameOrData (
 }
 
 /**
+
   Find the variable in the specified variable store.
 
   @param  StoreInfo           Pointer to the store info structure.
@@ -1249,4 +1276,108 @@ PeiGetNextVariableName (
       Variable.CurrPtr = GetNextVariablePtr (&StoreInfo, Variable.CurrPtr, VariableHeader);
     }
   }
+}
+
+/**
+  This service retrieves a variable's value using its name and GUID.
+
+  Read the specified variable from the UEFI variable store. If the Data
+  buffer is too small to hold the contents of the variable, the error
+  EFI_BUFFER_TOO_SMALL is returned and DataSize is set to the required buffer
+  size to obtain the data.
+
+  @param  This                  A pointer to this instance of the EFI_PEI_READ_ONLY_VARIABLE2_PPI.
+  @param  VariableName          A pointer to a null-terminated string that is the variable's name.
+  @param  VariableGuid          A pointer to an EFI_GUID that is the variable's GUID. The combination of
+                                VariableGuid and VariableName must be unique.
+  @param  Attributes            If non-NULL, on return, points to the variable's attributes.
+  @param  DataSize              On entry, points to the size in bytes of the Data buffer.
+                                On return, points to the size of the data returned in Data.
+  @param  Data                  Points to the buffer which will hold the returned variable value.
+                                May be NULL with a zero DataSize in order to determine the size of the buffer needed.
+
+  @retval EFI_SUCCESS           The variable was read successfully.
+  @retval EFI_NOT_FOUND         The variable was be found.
+  @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the resulting data.
+                                DataSize is updated with the size required for
+                                the specified variable.
+  @retval EFI_INVALID_PARAMETER VariableName, VariableGuid, DataSize or Data is NULL.
+  @retval EFI_DEVICE_ERROR      The variable could not be retrieved because of a device error.
+
+**/
+EFI_STATUS
+EFIAPI
+PeiGetVariableEx (
+  IN CONST  EFI_PEI_READ_ONLY_VARIABLE2_PPI  *This,
+  IN CONST  CHAR16                           *VariableName,
+  IN CONST  EFI_GUID                         *VariableGuid,
+  OUT       UINT32                           *Attributes,
+  IN OUT    UINTN                            *DataSize,
+  OUT       VOID                             *Data OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+
+  //
+  // If variable protection is employed, always get variable data through
+  // ProtectedVariableLib.
+  //
+  Status = ProtectedVariableLibGetByName (VariableName, VariableGuid, Attributes, DataSize, Data);
+  if (Status != EFI_UNSUPPORTED) {
+    return Status;
+  }
+
+  return PeiGetVariable (This, VariableName, VariableGuid, Attributes, DataSize, Data);
+}
+
+/**
+  Return the next variable name and GUID.
+
+  This function is called multiple times to retrieve the VariableName
+  and VariableGuid of all variables currently available in the system.
+  On each call, the previous results are passed into the interface,
+  and, on return, the interface returns the data for the next
+  interface. When the entire variable list has been returned,
+  EFI_NOT_FOUND is returned.
+
+  @param  This              A pointer to this instance of the EFI_PEI_READ_ONLY_VARIABLE2_PPI.
+
+  @param  VariableNameSize  On entry, points to the size of the buffer pointed to by VariableName.
+                            On return, the size of the variable name buffer.
+  @param  VariableName      On entry, a pointer to a null-terminated string that is the variable's name.
+                            On return, points to the next variable's null-terminated name string.
+  @param  VariableGuid      On entry, a pointer to an EFI_GUID that is the variable's GUID.
+                            On return, a pointer to the next variable's GUID.
+
+  @retval EFI_SUCCESS           The variable was read successfully.
+  @retval EFI_NOT_FOUND         The variable could not be found.
+  @retval EFI_BUFFER_TOO_SMALL  The VariableNameSize is too small for the resulting
+                                data. VariableNameSize is updated with the size
+                                required for the specified variable.
+  @retval EFI_INVALID_PARAMETER VariableName, VariableGuid or
+                                VariableNameSize is NULL.
+  @retval EFI_DEVICE_ERROR      The variable could not be retrieved because of a device error.
+
+**/
+EFI_STATUS
+EFIAPI
+PeiGetNextVariableNameEx (
+  IN CONST  EFI_PEI_READ_ONLY_VARIABLE2_PPI  *This,
+  IN OUT UINTN                               *VariableNameSize,
+  IN OUT CHAR16                              *VariableName,
+  IN OUT EFI_GUID                            *VariableGuid
+  )
+{
+  EFI_STATUS  Status;
+
+  //
+  // If variable protection is employed, always get next variable through
+  // ProtectedVariableLib.
+  //
+  Status = ProtectedVariableLibFindNext (VariableNameSize, VariableName, VariableGuid);
+  if (Status != EFI_UNSUPPORTED) {
+    return Status;
+  }
+
+  return PeiGetNextVariableName (This, VariableNameSize, VariableName, VariableGuid);
 }
