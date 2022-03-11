@@ -1,7 +1,7 @@
 /** @file
   Provides services to initialize and process authenticated variables.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -25,9 +25,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
                                        (OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData)))
 
 typedef struct {
+  UINTN       NameSize;
   CHAR16      *VariableName;
   EFI_GUID    *VendorGuid;
   UINT32      Attributes;
+  UINT8       State;
   UINTN       DataSize;
   VOID        *Data;
   UINT32      PubKeyIndex;
