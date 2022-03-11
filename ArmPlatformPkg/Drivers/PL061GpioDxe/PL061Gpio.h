@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __PL061_GPIO_H__
-#define __PL061_GPIO_H__
+#ifndef PL061_GPIO_H_
+#define PL061_GPIO_H_
 
 #include <Protocol/EmbeddedGpio.h>
 
@@ -39,4 +39,4 @@
 // All bits low except one bit high, native bit length
 #define GPIO_PIN_MASK(Pin)  (1UL << ((UINTN)(Pin)))
 
-#endif // __PL061_GPIO_H__
+#endif // PL061_GPIO_H_

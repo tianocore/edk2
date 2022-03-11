@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __PL011UARTCLOCKLIB_H__
-#define __PL011UARTCLOCKLIB_H__
+#ifndef PL011UARTCLOCKLIB_H_
+#define PL011UARTCLOCKLIB_H_
 
 /**
 

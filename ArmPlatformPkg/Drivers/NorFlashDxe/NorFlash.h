@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __NOR_FLASH_H__
-#define __NOR_FLASH_H__
+#ifndef NOR_FLASH_H_
+#define NOR_FLASH_H_
 
 #include <Base.h>
 #include <PiDxe.h>
@@ -419,4 +419,4 @@ NorFlashVirtualNotifyEvent (
   IN VOID       *Context
   );
 
-#endif /* __NOR_FLASH_H__ */
+#endif // NOR_FLASH_H_

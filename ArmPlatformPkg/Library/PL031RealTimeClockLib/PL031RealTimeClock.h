@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __PL031_REAL_TIME_CLOCK_H__
-#define __PL031_REAL_TIME_CLOCK_H__
+#ifndef PL031_REAL_TIME_CLOCK_H_
+#define PL031_REAL_TIME_CLOCK_H_
 
 // PL031 Registers
 #define PL031_RTC_DR_DATA_REGISTER                  0x000

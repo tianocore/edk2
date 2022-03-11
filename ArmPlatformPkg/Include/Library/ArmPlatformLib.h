@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef _ARMPLATFORMLIB_H_
-#define _ARMPLATFORMLIB_H_
+#ifndef ARMPLATFORMLIB_H_
+#define ARMPLATFORMLIB_H_
 
 //
 // The package level header files this module uses

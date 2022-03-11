@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __PL011_UART_H__
-#define __PL011_UART_H__
+#ifndef PL011_UART_H_
+#define PL011_UART_H_
 
 #define PL011_VARIANT_ZTE  1
 
