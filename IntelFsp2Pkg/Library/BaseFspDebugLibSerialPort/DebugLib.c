@@ -33,7 +33,7 @@ VA_LIST  mVaListNull;
 
   @return StackFramePointer  stack frame pointer of function call.
 **/
-UINT32 *
+UINTN *
 EFIAPI
 GetStackFramePointer (
   VOID
@@ -193,13 +193,13 @@ DebugBPrint (
 **/
 VOID
 FillHex (
-  UINT32  Value,
+  UINTN   Value,
   CHAR8   *Buffer
   )
 {
   INTN  Idx;
 
-  for (Idx = 7; Idx >= 0; Idx--) {
+  for (Idx = (sizeof (UINTN) * 2) - 1; Idx >= 0; Idx--) {
     Buffer[Idx] = mHexTable[Value & 0x0F];
     Value     >>= 4;
   }
@@ -228,26 +228,35 @@ DebugAssertInternal (
   )
 {
   CHAR8   Buffer[MAX_DEBUG_MESSAGE_LENGTH];
-  UINT32  *Frame;
+  UINTN   *Frame;
 
-  Frame = (UINT32 *)GetStackFramePointer ();
+  Frame = (UINTN *)GetStackFramePointer ();
 
   //
   // Generate the ASSERT() message in Ascii format
   //
-  AsciiStrnCpyS (
-    Buffer,
-    sizeof (Buffer) / sizeof (CHAR8),
-    "-> EBP:0x00000000  EIP:0x00000000\n",
-    sizeof (Buffer) / sizeof (CHAR8) - 1
-    );
+  if (sizeof (UINTN) == sizeof (UINT32)) {
+    AsciiStrnCpyS (
+      Buffer,
+      sizeof (Buffer) / sizeof (CHAR8),
+      "-> EBP:0x00000000  EIP:0x00000000\n",
+      sizeof (Buffer) / sizeof (CHAR8) - 1
+      );
+  } else {
+    AsciiStrnCpyS (
+      Buffer,
+      sizeof (Buffer) / sizeof (CHAR8),
+      "-> RBP:0x0000000000000000  RIP:0x0000000000000000\n",
+      sizeof (Buffer) / sizeof (CHAR8) - 1
+      );
+  }
   SerialPortWrite ((UINT8 *)"ASSERT DUMP:\n", 13);
   while (Frame != NULL) {
-    FillHex ((UINT32)Frame, Buffer + 9);
-    FillHex (Frame[1], Buffer + 9 + 8 + 8);
+    FillHex ((UINTN)Frame, Buffer + 9);
+    FillHex (Frame[1], Buffer + 9 + (sizeof (UINTN) * 2) + 8);
     SerialPortWrite ((UINT8 *)Buffer, AsciiStrLen (Buffer));
-    if ((Frame[0] > (UINT32)Frame) && (Frame[0] < (UINT32)Frame + 0x00100000)) {
-      Frame = (UINT32 *)Frame[0];
+    if ((Frame[0] > (UINTN)Frame) && (Frame[0] < (UINTN)Frame + 0x00100000)) {
+      Frame = (UINTN *)Frame[0];
     } else {
       Frame = NULL;
     }

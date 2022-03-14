@@ -16,7 +16,7 @@
   LIBRARY_CLASS                  = DebugLib
 
 #
-#  VALID_ARCHITECTURES           = IA32
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]
@@ -24,6 +24,9 @@
 
 [Sources.Ia32]
   Ia32/FspDebug.nasm
+
+[Sources.X64]
+  X64/FspDebug.nasm
 
 [Packages]
   MdePkg/MdePkg.dec
