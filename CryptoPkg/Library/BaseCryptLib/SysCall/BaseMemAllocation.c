@@ -2,13 +2,14 @@
   Base Memory Allocation Routines Wrapper for Crypto library over OpenSSL
   during PEI & DXE phases.
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <CrtLibSupport.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/BaseCryptLib.h>
 
 //
 // Extra header to record the memory buffer size from malloc routine.
@@ -41,7 +42,7 @@ malloc (
   //
   NewSize = (UINTN)(size) + CRYPTMEM_OVERHEAD;
 
-  Data = AllocatePool (NewSize);
+  Data = AllocatePages (EFI_SIZE_TO_PAGES (NewSize));
   if (Data != NULL) {
     PoolHdr = (CRYPTMEM_HEAD *)Data;
     //
@@ -73,7 +74,7 @@ realloc (
   VOID           *Data;
 
   NewSize = (UINTN)size + CRYPTMEM_OVERHEAD;
-  Data    = AllocatePool (NewSize);
+  Data    = AllocatePages (EFI_SIZE_TO_PAGES (NewSize));
   if (Data != NULL) {
     NewPoolHdr            = (CRYPTMEM_HEAD *)Data;
     NewPoolHdr->Signature = CRYPTMEM_HEAD_SIGNATURE;
@@ -90,7 +91,7 @@ realloc (
       // Duplicate the buffer content.
       //
       CopyMem ((VOID *)(NewPoolHdr + 1), ptr, MIN (OldSize, size));
-      FreePool ((VOID *)OldPoolHdr);
+      FreePages (((VOID *)OldPoolHdr), EFI_SIZE_TO_PAGES (OldSize));
     }
 
     return (VOID *)(NewPoolHdr + 1);
@@ -117,6 +118,6 @@ free (
   if (ptr != NULL) {
     PoolHdr = (CRYPTMEM_HEAD *)ptr - 1;
     ASSERT (PoolHdr->Signature == CRYPTMEM_HEAD_SIGNATURE);
-    FreePool (PoolHdr);
+    FreePages (((VOID *)PoolHdr), EFI_SIZE_TO_PAGES (PoolHdr->Size));
   }
 }
