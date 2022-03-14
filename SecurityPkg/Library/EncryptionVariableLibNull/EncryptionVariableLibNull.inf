@@ -1,0 +1,38 @@
+## @file
+#  Provides NULL version of encryption variable services.
+#
+#  Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EncryptionVariableLibNull
+  MODULE_UNI_FILE                = EncryptionVariableLib.uni
+  FILE_GUID                      = 3972E6FE-74D5-45C3-A9FB-DB9E5E5C9C17
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = EncryptionVariableLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  EncryptionVariable.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+
+[Guids]
+
