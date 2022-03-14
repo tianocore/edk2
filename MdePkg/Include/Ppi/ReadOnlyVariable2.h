@@ -2,7 +2,7 @@
   This file declares Read-only Variable Service2 PPI.
   This ppi permits read-only access to the UEFI variable store during the PEI phase.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
@@ -16,7 +16,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_PEI_READ_ONLY_VARIABLE2_PPI_GUID \
   { 0x2ab86ef5, 0xecb5, 0x4134, { 0xb5, 0x56, 0x38, 0x54, 0xca, 0x1f, 0xe1, 0xb4 } }
 
-typedef struct _EFI_PEI_READ_ONLY_VARIABLE2_PPI EFI_PEI_READ_ONLY_VARIABLE2_PPI;
+extern EFI_GUID gEfiPeiVariableStoreDiscoveredPpiGuid;
+
+typedef struct _EFI_PEI_READ_ONLY_VARIABLE2_PPI  EFI_PEI_READ_ONLY_VARIABLE2_PPI;
 
 /**
   This service retrieves a variable's value using its name and GUID.
