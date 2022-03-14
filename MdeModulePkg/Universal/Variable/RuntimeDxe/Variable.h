@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by Variable modules.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -31,6 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/AuthVariableLib.h>
 #include <Library/VarCheckLib.h>
+#include <Library/ProtectedVariableLib.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/EventGroup.h>
 #include <Guid/VariableFormat.h>
@@ -821,6 +822,129 @@ BOOLEAN
 EFIAPI
 VariableExLibAtRuntime (
   VOID
+  );
+
+/**
+  Is user variable?
+
+  @param[in] Variable   Pointer to variable header.
+
+  @retval TRUE          User variable.
+  @retval FALSE         System variable.
+
+**/
+BOOLEAN
+IsUserVariable (
+  IN VARIABLE_HEADER    *Variable
+  );
+
+/**
+
+  Variable store garbage collection and reclaim operation.
+
+  @param[in]      VariableBase            Base address of variable store.
+  @param[out]     LastVariableOffset      Offset of last variable.
+  @param[in]      IsVolatile              The variable store is volatile or not;
+                                          if it is non-volatile, need FTW.
+  @param[in, out] UpdatingPtrTrack        Pointer to updating variable pointer track structure.
+  @param[in]      NewVariable             Pointer to new variable.
+  @param[in]      NewVariableSize         New variable size.
+
+  @return EFI_SUCCESS                  Reclaim operation has finished successfully.
+  @return EFI_OUT_OF_RESOURCES         No enough memory resources or variable space.
+  @return Others                       Unexpect error happened during reclaim operation.
+
+**/
+EFI_STATUS
+Reclaim (
+  IN     EFI_PHYSICAL_ADDRESS         VariableBase,
+  OUT    UINTN                        *LastVariableOffset,
+  IN     BOOLEAN                      IsVolatile,
+  IN OUT VARIABLE_POINTER_TRACK       *UpdatingPtrTrack,
+  IN     VARIABLE_HEADER              *NewVariable,
+  IN     UINTN                        NewVariableSize
+  );
+
+/**
+
+  This function writes data to the FWH at the correct LBA even if the LBAs
+  are fragmented.
+
+  @param Global                  Pointer to VARIABLE_GLOBAL structure.
+  @param Volatile                Point out the Variable is Volatile or Non-Volatile.
+  @param SetByIndex              TRUE if target pointer is given as index.
+                                 FALSE if target pointer is absolute.
+  @param Fvb                     Pointer to the writable FVB protocol.
+  @param DataPtrIndex            Pointer to the Data from the end of VARIABLE_STORE_HEADER
+                                 structure.
+  @param DataSize                Size of data to be written.
+  @param Buffer                  Pointer to the buffer from which data is written.
+
+  @retval EFI_INVALID_PARAMETER  Parameters not valid.
+  @retval EFI_UNSUPPORTED        Fvb is a NULL for Non-Volatile variable update.
+  @retval EFI_OUT_OF_RESOURCES   The remaining size is not enough.
+  @retval EFI_SUCCESS            Variable store successfully updated.
+
+**/
+EFI_STATUS
+UpdateVariableStore (
+  IN VARIABLE_GLOBAL                    *Global,
+  IN BOOLEAN                             Volatile,
+  IN BOOLEAN                             SetByIndex,
+  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL *Fvb,
+  IN UINTN                               DataPtrIndex,
+  IN UINT32                              DataSize,
+  IN UINT8 *Buffer
+  );
+
+/**
+  Update partial data of a variable on NV storage and/or cached copy.
+
+  @param[in]  VariableInfo  Pointer to a variable with detailed information.
+  @param[in]  Offset        Offset to write from.
+  @param[in]  Size          Size of data Buffer to update.
+  @param[in]  Buffer        Pointer to data buffer to update.
+
+  @retval EFI_SUCCESS             The variable data was updated successfully.
+  @retval EFI_UNSUPPORTED         If this function is called directly in runtime.
+  @retval EFI_INVALID_PARAMETER   If VariableInfo, Buffer or Size are not valid.
+  @retval Others                  Failed to update NV storage or variable cache.
+
+**/
+EFI_STATUS
+EFIAPI
+VariableExLibUpdateNvVariable (
+  IN  PROTECTED_VARIABLE_INFO     *VariableInfo,
+  IN  UINTN                       Offset,
+  IN  UINT32                      Size,
+  IN  UINT8                       *Buffer
+  );
+
+/**
+  Finds the given variable in a variable store in SMM.
+
+  Caution: This function may receive untrusted input.
+  The data size is external input, so this function will validate it carefully to avoid buffer overflow.
+
+  @param[in]      VariableName       Name of Variable to be found.
+  @param[in]      VendorGuid         Variable vendor GUID.
+  @param[out]     Attributes         Attribute value of the variable found.
+  @param[in, out] DataSize           Size of Data found. If size is less than the
+                                     data, this value contains the required size.
+  @param[out]     Data               Data pointer.
+
+  @retval EFI_SUCCESS                Found the specified variable.
+  @retval EFI_INVALID_PARAMETER      Invalid parameter.
+  @retval EFI_NOT_FOUND              The specified variable could not be found.
+
+**/
+EFI_STATUS
+FindVariableInSmm (
+  IN      CHAR16                            *VariableName,
+  IN      EFI_GUID                          *VendorGuid,
+  OUT     UINT32                            *Attributes OPTIONAL,
+  IN OUT  UINTN                             *DataSize,
+  OUT     VOID                              *Data OPTIONAL
   );
 
 #endif
