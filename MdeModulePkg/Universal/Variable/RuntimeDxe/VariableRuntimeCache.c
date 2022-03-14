@@ -7,7 +7,7 @@
   This external input must be validated carefully to avoid security issue like
   buffer overflow, integer overflow.
 
-Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
