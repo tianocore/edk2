@@ -194,6 +194,11 @@ M: Andrew Fish <afish@apple.com> [ajfish]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 S: Maintained
 
+EmulatorPkg: Redfish-related modules
+F: EmulatorPkg/*Redfish*
+M: Abner Chang <abner.chang@hpe.com> [changab]
+R: Nickle Wang <nickle.wang@hpe.com> [nicklela]
+
 FatPkg
 F: FatPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/Edk2-fat-driver
