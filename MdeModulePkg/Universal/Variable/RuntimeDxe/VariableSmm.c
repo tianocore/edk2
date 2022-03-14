@@ -14,7 +14,7 @@
   VariableServiceSetVariable(), VariableServiceQueryVariableInfo(), ReclaimForOS(),
   SmmVariableGetStatistics() should also do validation based on its own knowledge.
 
-Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2018, Linaro, Ltd. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -516,8 +516,7 @@ SmmVariableHandler (
       CopyMem (mVariableBufferPayload, SmmVariableFunctionHeader->Data, CommBufferPayloadSize);
       SmmVariableHeader = (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *)mVariableBufferPayload;
       if (((UINTN)(~0) - SmmVariableHeader->DataSize < OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name)) ||
-          ((UINTN)(~0) - SmmVariableHeader->NameSize < OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) + SmmVariableHeader->DataSize))
-      {
+          ((UINTN)(~0) - SmmVariableHeader->NameSize < OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) + SmmVariableHeader->DataSize)) {
         //
         // Prevent InfoSize overflow happen
         //
@@ -840,8 +839,7 @@ SmmVariableHandler (
           (RuntimeVariableCacheContext->RuntimeNvCache == NULL) ||
           (RuntimeVariableCacheContext->PendingUpdate == NULL) ||
           (RuntimeVariableCacheContext->ReadLock == NULL) ||
-          (RuntimeVariableCacheContext->HobFlushComplete == NULL))
-      {
+          (RuntimeVariableCacheContext->HobFlushComplete == NULL)) {
         DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Required runtime cache buffer is NULL!\n"));
         Status = EFI_ACCESS_DENIED;
         goto EXIT;
@@ -853,8 +851,7 @@ SmmVariableHandler (
       if (((RuntimeVariableCacheContext->RuntimeHobCache != NULL) &&
            (RuntimeVariableCacheContext->RuntimeHobCache->Size < sizeof (VARIABLE_STORE_HEADER))) ||
           (RuntimeVariableCacheContext->RuntimeVolatileCache->Size < sizeof (VARIABLE_STORE_HEADER)) ||
-          (RuntimeVariableCacheContext->RuntimeNvCache->Size < sizeof (VARIABLE_STORE_HEADER)))
-      {
+          (RuntimeVariableCacheContext->RuntimeNvCache->Size < sizeof (VARIABLE_STORE_HEADER))) {
         DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: A runtime cache buffer size is invalid!\n"));
         Status = EFI_ACCESS_DENIED;
         goto EXIT;
@@ -866,9 +863,7 @@ SmmVariableHandler (
       if ((RuntimeVariableCacheContext->RuntimeHobCache != NULL) &&
           !VariableSmmIsBufferOutsideSmmValid (
              (UINTN)RuntimeVariableCacheContext->RuntimeHobCache,
-             (UINTN)RuntimeVariableCacheContext->RuntimeHobCache->Size
-             ))
-      {
+            (UINTN) RuntimeVariableCacheContext->RuntimeHobCache->Size)) {
         DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Runtime HOB cache buffer in SMRAM or overflow!\n"));
         Status = EFI_ACCESS_DENIED;
         goto EXIT;
@@ -876,9 +871,7 @@ SmmVariableHandler (
 
       if (!VariableSmmIsBufferOutsideSmmValid (
              (UINTN)RuntimeVariableCacheContext->RuntimeVolatileCache,
-             (UINTN)RuntimeVariableCacheContext->RuntimeVolatileCache->Size
-             ))
-      {
+            (UINTN) RuntimeVariableCacheContext->RuntimeVolatileCache->Size)) {
         DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Runtime volatile cache buffer in SMRAM or overflow!\n"));
         Status = EFI_ACCESS_DENIED;
         goto EXIT;
@@ -886,9 +879,7 @@ SmmVariableHandler (
 
       if (!VariableSmmIsBufferOutsideSmmValid (
              (UINTN)RuntimeVariableCacheContext->RuntimeNvCache,
-             (UINTN)RuntimeVariableCacheContext->RuntimeNvCache->Size
-             ))
-      {
+            (UINTN) RuntimeVariableCacheContext->RuntimeNvCache->Size)) {
         DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Runtime non-volatile cache buffer in SMRAM or overflow!\n"));
         Status = EFI_ACCESS_DENIED;
         goto EXIT;
@@ -896,9 +887,7 @@ SmmVariableHandler (
 
       if (!VariableSmmIsBufferOutsideSmmValid (
              (UINTN)RuntimeVariableCacheContext->PendingUpdate,
-             sizeof (*(RuntimeVariableCacheContext->PendingUpdate))
-             ))
-      {
+            sizeof (*(RuntimeVariableCacheContext->PendingUpdate)))) {
         DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Runtime cache pending update buffer in SMRAM or overflow!\n"));
         Status = EFI_ACCESS_DENIED;
         goto EXIT;
@@ -906,9 +895,7 @@ SmmVariableHandler (
 
       if (!VariableSmmIsBufferOutsideSmmValid (
              (UINTN)RuntimeVariableCacheContext->ReadLock,
-             sizeof (*(RuntimeVariableCacheContext->ReadLock))
-             ))
-      {
+            sizeof (*(RuntimeVariableCacheContext->ReadLock)))) {
         DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Runtime cache read lock buffer in SMRAM or overflow!\n"));
         Status = EFI_ACCESS_DENIED;
         goto EXIT;
@@ -916,9 +903,7 @@ SmmVariableHandler (
 
       if (!VariableSmmIsBufferOutsideSmmValid (
              (UINTN)RuntimeVariableCacheContext->HobFlushComplete,
-             sizeof (*(RuntimeVariableCacheContext->HobFlushComplete))
-             ))
-      {
+            sizeof (*(RuntimeVariableCacheContext->HobFlushComplete)))) {
         DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Runtime cache HOB flush complete buffer in SMRAM or overflow!\n"));
         Status = EFI_ACCESS_DENIED;
         goto EXIT;
@@ -936,8 +921,7 @@ SmmVariableHandler (
       VariableCacheContext->VariableRuntimeHobCache.PendingUpdateOffset = 0;
       VariableCacheContext->VariableRuntimeHobCache.PendingUpdateLength = 0;
       if ((mVariableModuleGlobal->VariableGlobal.HobVariableBase > 0) &&
-          (VariableCacheContext->VariableRuntimeHobCache.Store != NULL))
-      {
+          (VariableCacheContext->VariableRuntimeHobCache.Store != NULL)) {
         VariableCache                                                     = (VARIABLE_STORE_HEADER *)(UINTN)mVariableModuleGlobal->VariableGlobal.HobVariableBase;
         VariableCacheContext->VariableRuntimeHobCache.PendingUpdateLength = (UINT32)((UINTN)GetEndPointer (VariableCache) - (UINTN)VariableCache);
         CopyGuid (&(VariableCacheContext->VariableRuntimeHobCache.Store->Signature), &(VariableCache->Signature));
@@ -1045,6 +1029,13 @@ VariableWriteServiceInitializeSmm (
 {
   EFI_STATUS  Status;
 
+  Status = ProtectedVariableLibWriteInit ();
+  if (EFI_ERROR (Status) && (Status != EFI_UNSUPPORTED)) {
+    DEBUG ((DEBUG_ERROR, "Variable protection service: write-init failed. Status = %r\n", Status));
+    ASSERT_EFI_ERROR (Status);
+    return;
+  }
+
   Status = VariableWriteServiceInitialize ();
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Variable write service initialization failed. Status = %r\n", Status));
@@ -1143,10 +1134,32 @@ MmVariableServiceInitialize (
   VOID
   )
 {
-  EFI_STATUS  Status;
-  EFI_HANDLE  VariableHandle;
-  VOID        *SmmFtwRegistration;
-  VOID        *SmmEndOfDxeRegistration;
+  EFI_STATUS                              Status;
+  EFI_HANDLE                              VariableHandle;
+  VOID                                    *SmmFtwRegistration;
+  VOID                                    *SmmEndOfDxeRegistration;
+  PROTECTED_VARIABLE_CONTEXT_IN           ContextIn;
+
+  //
+  // Initialize protected variable service, if enabled.
+  //
+  ContextIn.StructSize      = sizeof(ContextIn);
+  ContextIn.StructVersion   = PROTECTED_VARIABLE_CONTEXT_IN_STRUCT_VERSION;
+
+  ContextIn.FindVariableSmm     = NULL;
+  ContextIn.GetVariableInfo     = GetVariableInfo;
+  ContextIn.GetNextVariableInfo = GetNextVariableInfo;
+  ContextIn.UpdateVariableStore = VariableExLibUpdateNvVariable;
+  ContextIn.UpdateVariable      = VariableExLibUpdateVariable;
+
+  ContextIn.MaxVariableSize     = (UINT32)GetMaxVariableSize ();
+  ContextIn.VariableServiceUser = FromSmmModule;
+
+  Status = ProtectedVariableLibInitialize (&ContextIn);
+  if (EFI_ERROR (Status) && Status != EFI_UNSUPPORTED) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
 
   //
   // Variable initialize.
