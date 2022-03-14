@@ -15,11 +15,14 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = FspSwitchStackLib
 
-[Sources.IA32]
+[Sources]
   FspSwitchStackLib.c
 
 [Sources.IA32]
   Ia32/Stack.nasm
+
+[Sources.X64]
+  X64/Stack.nasm
 
 [Packages]
   MdePkg/MdePkg.dec
