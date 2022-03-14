@@ -14,7 +14,7 @@
   VariableServiceSetVariable(), VariableServiceQueryVariableInfo(), ReclaimForOS(),
   SmmVariableGetStatistics() should also do validation based on its own knowledge.
 
-Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2018, Linaro, Ltd. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1045,6 +1045,13 @@ VariableWriteServiceInitializeSmm (
 {
   EFI_STATUS  Status;
 
+  Status = ProtectedVariableLibWriteInit ();
+  if (EFI_ERROR (Status) && (Status != EFI_UNSUPPORTED)) {
+    DEBUG ((DEBUG_ERROR, "Variable protection service: write-init failed. Status = %r\n", Status));
+    ASSERT_EFI_ERROR (Status);
+    return;
+  }
+
   Status = VariableWriteServiceInitialize ();
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Variable write service initialization failed. Status = %r\n", Status));
@@ -1143,10 +1150,32 @@ MmVariableServiceInitialize (
   VOID
   )
 {
-  EFI_STATUS  Status;
-  EFI_HANDLE  VariableHandle;
-  VOID        *SmmFtwRegistration;
-  VOID        *SmmEndOfDxeRegistration;
+  EFI_STATUS                     Status;
+  EFI_HANDLE                     VariableHandle;
+  VOID                           *SmmFtwRegistration;
+  VOID                           *SmmEndOfDxeRegistration;
+  PROTECTED_VARIABLE_CONTEXT_IN  ContextIn;
+
+  //
+  // Initialize protected variable service, if enabled.
+  //
+  ContextIn.StructSize    = sizeof (ContextIn);
+  ContextIn.StructVersion = PROTECTED_VARIABLE_CONTEXT_IN_STRUCT_VERSION;
+
+  ContextIn.FindVariableSmm     = NULL;
+  ContextIn.GetVariableInfo     = GetVariableInfo;
+  ContextIn.GetNextVariableInfo = GetNextVariableInfo;
+  ContextIn.UpdateVariableStore = VariableExLibUpdateNvVariable;
+  ContextIn.UpdateVariable      = VariableExLibUpdateVariable;
+
+  ContextIn.MaxVariableSize     = (UINT32)GetMaxVariableSize ();
+  ContextIn.VariableServiceUser = FromSmmModule;
+
+  Status = ProtectedVariableLibInitialize (&ContextIn);
+  if (EFI_ERROR (Status) && (Status != EFI_UNSUPPORTED)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
 
   //
   // Variable initialize.

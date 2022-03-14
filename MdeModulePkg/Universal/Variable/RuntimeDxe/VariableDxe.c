@@ -3,7 +3,7 @@
   and volatile storage space and install variable architecture protocol.
 
 Copyright (C) 2013, Red Hat, Inc.
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Protocol/VariablePolicy.h>
 #include <Library/VariablePolicyLib.h>
+#include "VariableParsing.h"
 
 EFI_STATUS
 EFIAPI
@@ -533,6 +534,29 @@ VariableServiceInitialize (
   EFI_STATUS  Status;
   EFI_EVENT   ReadyToBootEvent;
   EFI_EVENT   EndOfDxeEvent;
+
+  PROTECTED_VARIABLE_CONTEXT_IN  ContextIn;
+
+  //
+  // Initialze protected variable service, if enabled.
+  //
+  ContextIn.StructSize    = sizeof (ContextIn);
+  ContextIn.StructVersion = PROTECTED_VARIABLE_CONTEXT_IN_STRUCT_VERSION;
+
+  ContextIn.FindVariableSmm     = NULL;
+  ContextIn.GetVariableInfo     = GetVariableInfo;
+  ContextIn.GetNextVariableInfo = GetNextVariableInfo;
+  ContextIn.UpdateVariableStore = VariableExLibUpdateNvVariable;
+  ContextIn.UpdateVariable      = VariableExLibUpdateVariable;
+
+  ContextIn.MaxVariableSize     = (UINT32)GetMaxVariableSize ();
+  ContextIn.VariableServiceUser = FromSmmModule;
+
+  Status = ProtectedVariableLibInitialize (&ContextIn);
+  if (EFI_ERROR (Status) && (Status != EFI_UNSUPPORTED)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
 
   Status = VariableCommonInitialize ();
   ASSERT_EFI_ERROR (Status);

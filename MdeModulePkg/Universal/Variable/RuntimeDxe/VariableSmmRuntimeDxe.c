@@ -13,7 +13,7 @@
 
   InitCommunicateBuffer() is really function to check the variable data size.
 
-Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -36,11 +36,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>
 #include <Library/MmUnblockMemoryLib.h>
+#include <Library/IoLib.h>
 
 #include <Guid/EventGroup.h>
 #include <Guid/SmmVariableCommon.h>
 
 #include "PrivilegePolymorphic.h"
+#include "Variable.h"
 #include "VariableParsing.h"
 
 EFI_HANDLE                      mHandle                              = NULL;
@@ -53,6 +55,8 @@ VARIABLE_INFO_ENTRY             *mVariableInfo                       = NULL;
 VARIABLE_STORE_HEADER           *mVariableRuntimeHobCacheBuffer      = NULL;
 VARIABLE_STORE_HEADER           *mVariableRuntimeNvCacheBuffer       = NULL;
 VARIABLE_STORE_HEADER           *mVariableRuntimeVolatileCacheBuffer = NULL;
+VARIABLE_STORE_HEADER           *mNvVariableCache                    = NULL;
+VARIABLE_MODULE_GLOBAL          *mVariableModuleGlobal               = NULL;
 UINTN                           mVariableBufferSize;
 UINTN                           mVariableRuntimeHobCacheBufferSize;
 UINTN                           mVariableRuntimeNvCacheBufferSize;
@@ -616,7 +620,6 @@ FindVariableInRuntimeCache (
   )
 {
   EFI_STATUS              Status;
-  UINTN                   TempDataSize;
   VARIABLE_POINTER_TRACK  RtPtrTrack;
   VARIABLE_STORE_TYPE     StoreType;
   VARIABLE_STORE_HEADER   *VariableStoreList[VariableStoreTypeMax];
@@ -669,31 +672,23 @@ FindVariableInRuntimeCache (
       //
       // Get data size
       //
-      TempDataSize = DataSizeOfVariable (RtPtrTrack.CurrPtr, mVariableAuthFormat);
-      ASSERT (TempDataSize != 0);
+      if (!RtPtrTrack.Volatile) {
+        //
+        // Currently only non-volatile variable needs protection.
+        //
+        Status = ProtectedVariableLibGetByBuffer (RtPtrTrack.CurrPtr, Data, (UINT32 *)DataSize, mVariableAuthFormat);
+      }
 
-      if (*DataSize >= TempDataSize) {
-        if (Data == NULL) {
-          Status = EFI_INVALID_PARAMETER;
-          goto Done;
-        }
+      if (RtPtrTrack.Volatile || (Status == EFI_UNSUPPORTED)) {
+        Status = GetVariableData (RtPtrTrack.CurrPtr, Data, (UINT32 *)DataSize, mVariableAuthFormat);
+      }
 
-        CopyMem (Data, GetVariableDataPtr (RtPtrTrack.CurrPtr, mVariableAuthFormat), TempDataSize);
-        *DataSize = TempDataSize;
-
-        UpdateVariableInfo (VariableName, VendorGuid, RtPtrTrack.Volatile, TRUE, FALSE, FALSE, TRUE, &mVariableInfo);
-
-        Status = EFI_SUCCESS;
-        goto Done;
-      } else {
-        *DataSize = TempDataSize;
-        Status    = EFI_BUFFER_TOO_SMALL;
-        goto Done;
+      if (!EFI_ERROR (Status)) {
+        UpdateVariableInfo (VariableName, VendorGuid, RtPtrTrack.Volatile, TRUE, FALSE, FALSE, FALSE, &mVariableInfo);
       }
     }
   }
 
-Done:
   if ((Status == EFI_SUCCESS) || (Status == EFI_BUFFER_TOO_SMALL)) {
     if ((Attributes != NULL) && (RtPtrTrack.CurrPtr != NULL)) {
       *Attributes = RtPtrTrack.CurrPtr->Attributes;
