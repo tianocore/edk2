@@ -10,7 +10,7 @@
 #  RSA external functions, PKCS#7 SignedData sign functions, Diffie-Hellman functions, and
 #  authenticode signature verification functions are not supported in this instance.
 #
-#  Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2022, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -39,7 +39,7 @@
   Hash/CryptSm3.c
   Hash/CryptSha512.c
   Hmac/CryptHmacSha256.c
-  Kdf/CryptHkdfNull.c
+  Kdf/CryptHkdf.c
   Cipher/CryptAes.c
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExtNull.c
