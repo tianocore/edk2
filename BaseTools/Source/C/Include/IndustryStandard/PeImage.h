@@ -571,6 +571,13 @@ typedef struct {
   UINT32  AddressOfNameOrdinals;
 } EFI_IMAGE_EXPORT_DIRECTORY;
 
+//
+// Based export types.
+//
+#define EFI_IMAGE_EXPORT_ORDINAL_BASE     1
+#define EFI_IMAGE_EXPORT_ADDR_SIZE        4
+#define EFI_IMAGE_EXPORT_ORDINAL_SIZE     2
+
 ///
 /// DLL support.
 /// Import Format

@@ -24,6 +24,7 @@ extern UINT8  *mCoffFile;
 extern UINT32 mTableOffset;
 extern UINT32 mOutImageType;
 extern UINT32 mFileBufferSize;
+extern BOOLEAN mExportFlag;
 
 //
 // Common EFI specific data.
@@ -31,6 +32,44 @@ extern UINT32 mFileBufferSize;
 #define ELF_HII_SECTION_NAME ".hii"
 #define ELF_STRTAB_SECTION_NAME ".strtab"
 #define MAX_COFF_ALIGNMENT 0x10000
+#define ELF_SYMBOL_SECTION_NAME ".symtab"
+
+//
+// Platform Runtime Mechanism (PRM) specific data.
+//
+#define PRM_MODULE_EXPORT_SYMBOL_NUM 256
+
+// <to-do> to include PRM header directly once PrmPkg is in main repo
+#define PRM_HANDLER_NAME_MAXIMUM_LENGTH 128
+
+#define PRM_MODULE_EXPORT_DESCRIPTOR_NAME         "PrmModuleExportDescriptor"
+#define PRM_MODULE_EXPORT_DESCRIPTOR_SIGNATURE    SIGNATURE_64 ('P', 'R', 'M', '_', 'M', 'E', 'D', 'T')
+#define PRM_MODULE_EXPORT_REVISION                0x0
+
+//
+// Platform Runtime Mechanism (PRM) Export Descriptor Structures
+//
+#pragma pack(push, 1)
+
+typedef struct {
+  EFI_GUID                              PrmHandlerGuid;
+  CHAR8                                 PrmHandlerName[PRM_HANDLER_NAME_MAXIMUM_LENGTH];
+} PRM_HANDLER_EXPORT_DESCRIPTOR_STRUCT;
+
+typedef struct {
+  UINT64                                Signature;
+  UINT16                                Revision;
+  UINT16                                NumberPrmHandlers;
+  EFI_GUID                              PlatformGuid;
+  EFI_GUID                              ModuleGuid;
+} PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_HEADER;
+
+typedef struct {
+  PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_HEADER  Header;
+  PRM_HANDLER_EXPORT_DESCRIPTOR_STRUCT        PrmHandlerExportDescriptors[1];
+} PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT;
+
+#pragma pack(pop)
 
 //
 // Filter Types
@@ -38,7 +77,8 @@ extern UINT32 mFileBufferSize;
 typedef enum {
   SECTION_TEXT,
   SECTION_HII,
-  SECTION_DATA
+  SECTION_DATA,
+  SECTION_SYMBOL
 
 } SECTION_FILTER_TYPES;
 
@@ -50,6 +90,7 @@ typedef struct {
   BOOLEAN (*WriteSections) (SECTION_FILTER_TYPES  FilterType);
   VOID    (*WriteRelocations) ();
   VOID    (*WriteDebug) ();
+  VOID    (*WriteExport) ();
   VOID    (*SetImageSize) ();
   VOID    (*CleanUp) ();
 
