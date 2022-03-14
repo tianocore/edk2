@@ -41,9 +41,14 @@ steps:
   fetchDepth: 1
 
 - task: UsePythonVersion@0
+  condition: eq( variables['Agent.OS'], 'Windows_NT' )
   inputs:
     versionSpec: "3.8.x"
     architecture: "x64"
+
+- bash: |
+    cat /etc/os-release
+    python3 --version
 
 - script: pip install -r pip-requirements.txt --upgrade
   displayName: 'Install/Upgrade pip modules'

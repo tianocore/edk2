@@ -75,6 +75,8 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
+    container: registry.gitlab.com/qemu-project/qemu:edk2-cross-build
+
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:

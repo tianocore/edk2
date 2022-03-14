@@ -21,14 +21,21 @@ pr:
 pool:
   vmImage: 'ubuntu-latest'
 
+container: registry.gitlab.com/qemu-project/qemu:edk2-cross-build
+
 steps:
 - checkout: self
   clean: true
 
 - task: UsePythonVersion@0
+  condition: eq( variables['Agent.OS'], 'Windows_NT' )
   inputs:
     versionSpec: '3.7.x'
     architecture: 'x64'
+
+- bash: |
+    cat /etc/os-release
+    python3 --version
 
 - script: |
     git fetch origin $(System.PullRequest.TargetBranch):$(System.PullRequest.TargetBranch)
