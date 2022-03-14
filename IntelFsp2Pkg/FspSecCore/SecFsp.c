@@ -217,7 +217,7 @@ FspGlobalDataInit (
 **/
 VOID
 FspDataPointerFixUp (
-  IN UINT32  OffsetGap
+  IN UINTN  OffsetGap
   )
 {
   FSP_GLOBAL_DATA  *NewFspData;
