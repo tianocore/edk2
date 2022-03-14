@@ -1,7 +1,7 @@
 /** @file
   Null version of VariableKeyLib for build purpose. Don't use it in real product.
 
-Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2020 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -22,8 +22,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 GetVariableKey (
-  OUT VOID       **VariableKey,
-  IN  OUT UINTN  *VariableKeySize
+  OUT VOID      *VariableKey,
+  IN  UINTN     VariableKeySize
   )
 {
   ASSERT (FALSE);
