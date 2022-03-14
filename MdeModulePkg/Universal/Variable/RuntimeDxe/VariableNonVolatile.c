@@ -1,7 +1,7 @@
 /** @file
   Common variable non-volatile store routines.
 
-Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -23,10 +23,8 @@ GetNonVolatileMaxVariableSize (
   )
 {
   if (PcdGet32 (PcdHwErrStorageSize) != 0) {
-    return MAX (
-             MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxAuthVariableSize)),
-             PcdGet32 (PcdMaxHardwareErrorVariableSize)
-             );
+    return MAX (MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxAuthVariableSize)),
+                PcdGet32 (PcdMaxHardwareErrorVariableSize));
   } else {
     return MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxAuthVariableSize));
   }
@@ -77,9 +75,8 @@ InitEmuNonVolatileVariableStore (
         (CompareGuid (&VariableStore->Signature, &gEfiAuthenticatedVariableGuid) ||
          CompareGuid (&VariableStore->Signature, &gEfiVariableGuid)) &&
         (VariableStore->Format == VARIABLE_STORE_FORMATTED) &&
-        (VariableStore->State == VARIABLE_STORE_HEALTHY))
-    {
-      DEBUG ((
+        (VariableStore->State == VARIABLE_STORE_HEALTHY)) {
+      DEBUG((
         DEBUG_INFO,
         "Variable Store reserved at %p appears to be valid\n",
         VariableStore
@@ -116,6 +113,184 @@ InitEmuNonVolatileVariableStore (
   mVariableModuleGlobal->CommonVariableSpace        = ((UINTN)VariableStoreLength - sizeof (VARIABLE_STORE_HEADER) - HwErrStorageSize);
   mVariableModuleGlobal->CommonMaxUserVariableSpace = mVariableModuleGlobal->CommonVariableSpace;
   mVariableModuleGlobal->CommonRuntimeVariableSpace = mVariableModuleGlobal->CommonVariableSpace;
+
+  return EFI_SUCCESS;
+}
+
+/**
+
+  Create a dummy variable used to fill the gap in NV variable storage caused by
+  the invalid variables found in HMAC verification phase.
+
+  @param[out] Variable    Variable buffer.
+  @param[in]  Name        Variable Name.
+  @param[in]  Guid        Vendor GUID of the variable.
+  @param[in]  Size        Whole size of the variable requested.
+  @param[in]  AuthFlag    Variable format flag.
+
+**/
+STATIC
+VOID
+CreateDummyVariable (
+  OUT VARIABLE_HEADER       *Variable,
+  IN  CHAR16                *Name,
+  IN  EFI_GUID              *Guid,
+  IN  UINT32                Size,
+  IN  BOOLEAN               AuthFlag
+  )
+{
+  AUTHENTICATED_VARIABLE_HEADER       *AuthVariable;
+
+  ASSERT (Variable != NULL);
+
+  if (Name == NULL) {
+    Name = L"Dummy";
+  }
+
+  if (AuthFlag) {
+    AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *)Variable;
+
+    AuthVariable->StartId     = VARIABLE_DATA;
+    AuthVariable->State       = VAR_ADDED & VAR_DELETED;
+    AuthVariable->Attributes  = EFI_VARIABLE_NON_VOLATILE;
+    AuthVariable->NameSize    = (UINT32)StrSize (Name);
+    AuthVariable->DataSize    = Size - sizeof (AUTHENTICATED_VARIABLE_HEADER)
+                                - AuthVariable->NameSize;
+    if (Guid != NULL) {
+      CopyMem ((VOID *)&AuthVariable->VendorGuid, (VOID *)Guid, sizeof (EFI_GUID));
+    }
+
+    CopyMem (GetVariableNamePtr(Variable, AuthFlag), (VOID *)Name, AuthVariable->NameSize);
+  } else {
+    Variable->StartId     = VARIABLE_DATA;
+    Variable->State       = VAR_ADDED & VAR_DELETED;
+    Variable->Attributes  = EFI_VARIABLE_NON_VOLATILE;
+    Variable->NameSize    = (UINT32)StrSize (Name);
+    Variable->DataSize    = Size - sizeof (VARIABLE_HEADER) - Variable->NameSize;
+    if (Guid != NULL) {
+      CopyMem ((VOID *)&Variable->VendorGuid, (VOID *)Guid, sizeof (EFI_GUID));
+    }
+
+    CopyMem (GetVariableNamePtr(Variable, AuthFlag), (VOID *)Name, Variable->NameSize);
+  }
+}
+
+/**
+
+  Init protected variable store.
+
+  @param[in, out]  VariableStore  Pointer to real protected variable store base.
+
+**/
+EFI_STATUS
+InitProtectedVariableStore (
+  IN  OUT VARIABLE_STORE_HEADER       *VariableStore
+  )
+{
+  EFI_STATUS                  Status;
+  VOID                        *Variable;
+  PROTECTED_VARIABLE_INFO     VarInfo;
+  UINTN                       Size;
+  UINTN                       Index;
+  BOOLEAN                     AuthFlag;
+  EFI_PHYSICAL_ADDRESS        NextVariableStore;
+  EFI_PHYSICAL_ADDRESS        *VarList;
+  UINTN                       NumVars;
+  UINTN                       CurrVar;
+
+  SetMem (
+    (UINT8 *)VariableStore + sizeof(VARIABLE_STORE_HEADER),
+    VariableStore->Size - sizeof(VARIABLE_STORE_HEADER),
+    0xFF
+    );
+  Index = sizeof(VARIABLE_STORE_HEADER);
+
+  VarList = NULL;
+  NumVars = 0;
+  ProtectedVariableLibGetSortedList (&VarList, &NumVars);
+
+  //
+  // Search variable in the order of StoreIndex
+  //
+  ZeroMem (&VarInfo, sizeof(VarInfo));
+
+  for (CurrVar = 0; CurrVar < NumVars; CurrVar++) {
+    VarInfo.Buffer = NULL;
+    VarInfo.StoreIndex = VarList[CurrVar];
+    if(VarInfo.StoreIndex == VAR_INDEX_INVALID){
+      break;
+    }
+
+    Status = ProtectedVariableLibFind(&VarInfo);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    ASSERT (VarInfo.Buffer != NULL);
+
+    AuthFlag = VarInfo.Flags.Auth;
+    if (VarInfo.StoreIndex == VAR_INDEX_INVALID) {
+      continue;
+    } else {
+      ASSERT (VarInfo.StoreIndex == HEADER_ALIGN (VarInfo.StoreIndex));
+      ASSERT (VarInfo.StoreIndex < (VariableStore->Size - sizeof(VARIABLE_STORE_HEADER)));
+      ASSERT ((VariableStore->Size - VarInfo.StoreIndex) > GetVariableHeaderSize (AuthFlag));
+    }
+
+    //
+    // Fill gap caused by invalid variable.
+    //
+    Variable = (UINT8 *)VariableStore + VarInfo.StoreIndex;
+
+    if (VarInfo.StoreIndex > Index) {
+      Size = (UINTN)VarInfo.StoreIndex - Index;
+      CreateDummyVariable (
+        (VARIABLE_HEADER *)((UINT8 *)VariableStore + Index),
+        NULL,
+        NULL,
+        (UINT32)Size,
+        AuthFlag
+        );
+      Index += Size;
+    }
+
+    Size = (UINTN)GetNextVariablePtr (VarInfo.Buffer, AuthFlag)
+            - (UINTN)VarInfo.Buffer;
+    CopyMem ((UINT8 *)VariableStore + VarInfo.StoreIndex, VarInfo.Buffer, Size);
+
+    Index += Size;
+    Index = HEADER_ALIGN (Index);
+
+    NextVariableStore = (EFI_PHYSICAL_ADDRESS) VariableStore + VarInfo.StoreIndex + Size;
+  }
+
+  //
+  // Search variable in the order of StoreIndex
+  //
+  ZeroMem (&VarInfo, sizeof(VarInfo));
+  for (; CurrVar < NumVars; CurrVar++) {
+    VarInfo.Buffer = NULL;
+    VarInfo.StoreIndex = VarList[CurrVar];
+    Status = ProtectedVariableLibFind(&VarInfo);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    ASSERT (VarInfo.Buffer != NULL);
+
+    AuthFlag = VarInfo.Flags.Auth;
+    if (VarInfo.StoreIndex == VAR_INDEX_INVALID) {
+      Size = (UINTN)GetNextVariablePtr (VarInfo.Buffer, AuthFlag)
+              - (UINTN)VarInfo.Buffer;
+      CopyMem ((UINT8 *)&NextVariableStore, VarInfo.Buffer, Size);
+      Status = ProtectedVariableLibRefresh (VarInfo.Buffer, 0, NextVariableStore - (EFI_PHYSICAL_ADDRESS) VariableStore, FALSE);
+      NextVariableStore = NextVariableStore + Size;
+    }
+  }
+
+  if (Status == EFI_UNSUPPORTED) {
+    return Status;
+  }
 
   return EFI_SUCCESS;
 }
@@ -189,8 +364,7 @@ InitRealNonVolatileVariableStore (
         //
         CopyMem (NvStorageData, (UINT8 *)(UINTN)(FtwLastWriteData->SpareAddress), NvStorageSize);
       } else if ((FtwLastWriteData->TargetAddress > NvStorageBase) &&
-                 (FtwLastWriteData->TargetAddress < (NvStorageBase + NvStorageSize)))
-      {
+                 (FtwLastWriteData->TargetAddress < (NvStorageBase + NvStorageSize))) {
         //
         // Flash NV storage from the Offset is backed up in spare block.
         //
@@ -228,6 +402,16 @@ InitRealNonVolatileVariableStore (
     FreePool (NvStorageData);
     DEBUG ((DEBUG_ERROR, "Variable Store header is corrupted\n"));
     return EFI_VOLUME_CORRUPTED;
+  }
+
+  //
+  // Overwrite the store with verified copy of protected variables, if enabled.
+  //
+  Status = InitProtectedVariableStore (VariableStore);
+  if ((Status != EFI_SUCCESS) && (Status != EFI_UNSUPPORTED)) {
+    FreePool (NvStorageData);
+    DEBUG ((DEBUG_ERROR, "Variable integrity might have been compromised\n"));
+    return Status;
   }
 
   mNvFvHeaderCache = FvHeader;
@@ -323,7 +507,8 @@ InitNonVolatileVariableStore (
   // Parse non-volatile variable data and get last variable offset.
   //
   Variable = GetStartPointer (mNvVariableCache);
-  while (IsValidVariableHeader (Variable, GetEndPointer (mNvVariableCache))) {
+  while (IsValidVariableHeader (Variable, GetEndPointer (mNvVariableCache),
+                                mVariableModuleGlobal->VariableGlobal.AuthFormat)) {
     NextVariable = GetNextVariablePtr (Variable, mVariableModuleGlobal->VariableGlobal.AuthFormat);
     VariableSize = (UINTN)NextVariable - (UINTN)Variable;
     if ((Variable->Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
