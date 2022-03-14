@@ -7,7 +7,7 @@
   This external input must be validated carefully to avoid security issue like
   buffer overflow, integer overflow.
 
-Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -36,15 +36,14 @@ FlushPendingRuntimeVariableCacheUpdates (
 
   if ((VariableRuntimeCacheContext->VariableRuntimeNvCache.Store == NULL) ||
       (VariableRuntimeCacheContext->VariableRuntimeVolatileCache.Store == NULL) ||
-      (VariableRuntimeCacheContext->PendingUpdate == NULL))
-  {
+      (VariableRuntimeCacheContext->PendingUpdate == NULL)) {
     return EFI_UNSUPPORTED;
   }
 
   if (*(VariableRuntimeCacheContext->PendingUpdate)) {
     if ((VariableRuntimeCacheContext->VariableRuntimeHobCache.Store != NULL) &&
-        (mVariableModuleGlobal->VariableGlobal.HobVariableBase > 0))
-    {
+        (mVariableModuleGlobal->VariableGlobal.HobVariableBase > 0)) {
+
       CopyMem (
         (VOID *)(
                  ((UINT8 *)(UINTN)VariableRuntimeCacheContext->VariableRuntimeHobCache.Store) +
@@ -126,14 +125,12 @@ SynchronizeRuntimeVariableCache (
   }
 
   if ((mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.PendingUpdate == NULL) ||
-      (mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.ReadLock == NULL))
-  {
+      (mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.ReadLock == NULL)) {
     return EFI_UNSUPPORTED;
   }
 
   if (*(mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.PendingUpdate) &&
-      (VariableRuntimeCache->PendingUpdateLength > 0))
-  {
+      (VariableRuntimeCache->PendingUpdateLength > 0)) {
     VariableRuntimeCache->PendingUpdateLength =
       (UINT32)(
                MAX (
