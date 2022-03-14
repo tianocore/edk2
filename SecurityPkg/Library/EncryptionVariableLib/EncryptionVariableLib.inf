@@ -1,0 +1,43 @@
+## @file
+#  Provides variable encryption/decryption services.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010029
+  BASE_NAME                      = EncryptionVariableLib
+  FILE_GUID                      = 459E2CB0-AF4B-4415-B6A1-335E71FD8B85
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = EncryptionVariableLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  EncryptionVariable.c
+  EncryptionVariable.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  BaseCryptLib
+
+[Guids]
+  gEfiVariableGuid
+  gEfiAuthenticatedVariableGuid
