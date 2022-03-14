@@ -1,7 +1,7 @@
 /** @file
   Null version of VariableKeyLib for build purpose. Don't use it in real product.
 
-Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2020 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   Retrieves the key for integrity and/or confidentiality of variables.
 
   @param[out]     VariableKey         A pointer to pointer for the variable key buffer.
-  @param[in,out]  VariableKeySize     The size in bytes of the variable key.
+  @param[in]      VariableKeySize     The size in bytes of the variable key.
 
   @retval       EFI_SUCCESS             The variable key was returned.
   @retval       EFI_DEVICE_ERROR        An error occurred while attempting to get the variable key.
@@ -22,8 +22,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 GetVariableKey (
-  OUT VOID       **VariableKey,
-  IN  OUT UINTN  *VariableKeySize
+  OUT VOID   *VariableKey,
+  IN  UINTN  VariableKeySize
   )
 {
   ASSERT (FALSE);
