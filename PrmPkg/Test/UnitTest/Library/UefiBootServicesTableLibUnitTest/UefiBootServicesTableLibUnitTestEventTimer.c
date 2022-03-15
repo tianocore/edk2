@@ -29,9 +29,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 UnitTestCreateEvent (
-  IN UINT32                   Type,
-  IN EFI_TPL                  NotifyTpl,
-  IN EFI_EVENT_NOTIFY         NotifyFunction, OPTIONAL
+  IN UINT32 Type,
+  IN EFI_TPL NotifyTpl,
+  IN EFI_EVENT_NOTIFY NotifyFunction, OPTIONAL
   IN VOID                     *NotifyContext, OPTIONAL
   OUT EFI_EVENT               *Event
   )
@@ -57,9 +57,9 @@ UnitTestCreateEvent (
 EFI_STATUS
 EFIAPI
 UnitTestSetTimer (
-  IN EFI_EVENT            UserEvent,
-  IN EFI_TIMER_DELAY      Type,
-  IN UINT64               TriggerTime
+  IN EFI_EVENT        UserEvent,
+  IN EFI_TIMER_DELAY  Type,
+  IN UINT64           TriggerTime
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -82,9 +82,9 @@ UnitTestSetTimer (
 EFI_STATUS
 EFIAPI
 UnitTestWaitForEvent (
-  IN UINTN        NumberOfEvents,
-  IN EFI_EVENT    *UserEvents,
-  OUT UINTN       *UserIndex
+  IN UINTN      NumberOfEvents,
+  IN EFI_EVENT  *UserEvents,
+  OUT UINTN     *UserIndex
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -102,7 +102,7 @@ UnitTestWaitForEvent (
 EFI_STATUS
 EFIAPI
 UnitTestSignalEvent (
-  IN EFI_EVENT    UserEvent
+  IN EFI_EVENT  UserEvent
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -120,7 +120,7 @@ UnitTestSignalEvent (
 EFI_STATUS
 EFIAPI
 UnitTestCloseEvent (
-  IN EFI_EVENT    UserEvent
+  IN EFI_EVENT  UserEvent
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -139,7 +139,7 @@ UnitTestCloseEvent (
 EFI_STATUS
 EFIAPI
 UnitTestCheckEvent (
-  IN EFI_EVENT        UserEvent
+  IN EFI_EVENT  UserEvent
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -168,11 +168,11 @@ UnitTestCheckEvent (
 EFI_STATUS
 EFIAPI
 UnitTestCreateEventEx (
-  IN UINT32                   Type,
-  IN EFI_TPL                  NotifyTpl,
-  IN EFI_EVENT_NOTIFY         NotifyFunction, OPTIONAL
+  IN UINT32 Type,
+  IN EFI_TPL NotifyTpl,
+  IN EFI_EVENT_NOTIFY NotifyFunction, OPTIONAL
   IN CONST VOID               *NotifyContext, OPTIONAL
-  IN CONST EFI_GUID           *EventGroup,    OPTIONAL
+  IN CONST EFI_GUID           *EventGroup, OPTIONAL
   OUT EFI_EVENT               *Event
   )
 {

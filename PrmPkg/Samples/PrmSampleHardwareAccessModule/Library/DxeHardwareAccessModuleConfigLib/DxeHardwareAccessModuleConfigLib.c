@@ -18,7 +18,9 @@
 STATIC EFI_HANDLE  mPrmConfigProtocolHandle;
 
 // {0ef93ed7-14ae-425b-928f-b85a6213b57e}
-STATIC CONST EFI_GUID mPrmModuleGuid = {0x0ef93ed7, 0x14ae, 0x425b, {0x92, 0x8f, 0xb8, 0x5a, 0x62, 0x13, 0xb5, 0x7e}};
+STATIC CONST EFI_GUID  mPrmModuleGuid = {
+  0x0ef93ed7, 0x14ae, 0x425b, { 0x92, 0x8f, 0xb8, 0x5a, 0x62, 0x13, 0xb5, 0x7e }
+};
 
 /**
   Constructor of the PRM configuration library.
@@ -32,13 +34,13 @@ STATIC CONST EFI_GUID mPrmModuleGuid = {0x0ef93ed7, 0x14ae, 0x425b, {0x92, 0x8f,
 EFI_STATUS
 EFIAPI
 HardwareAccessModuleConfigLibConstructor (
-  IN  EFI_HANDLE                    ImageHandle,
-  IN  EFI_SYSTEM_TABLE              *SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                        Status;
-  PRM_RUNTIME_MMIO_RANGES           *RuntimeMmioRanges;
-  PRM_CONFIG_PROTOCOL               *PrmConfigProtocol;
+  EFI_STATUS               Status;
+  PRM_RUNTIME_MMIO_RANGES  *RuntimeMmioRanges;
+  PRM_CONFIG_PROTOCOL      *PrmConfigProtocol;
 
   RuntimeMmioRanges = NULL;
   PrmConfigProtocol = NULL;
@@ -70,12 +72,13 @@ HardwareAccessModuleConfigLibConstructor (
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
+
   CopyGuid (&PrmConfigProtocol->ModuleContextBuffers.ModuleGuid, &mPrmModuleGuid);
 
   // Populate the Runtime MMIO Ranges structure
-  RuntimeMmioRanges->Count = 1;
+  RuntimeMmioRanges->Count                        = 1;
   RuntimeMmioRanges->Range[0].PhysicalBaseAddress = HPET_BASE_ADDRESS;
-  RuntimeMmioRanges->Range[0].Length = HPET_RANGE_LENGTH;
+  RuntimeMmioRanges->Range[0].Length              = HPET_RANGE_LENGTH;
 
   PrmConfigProtocol->ModuleContextBuffers.RuntimeMmioRanges = RuntimeMmioRanges;
 
@@ -87,7 +90,7 @@ HardwareAccessModuleConfigLibConstructor (
                   &mPrmConfigProtocolHandle,
                   &gPrmConfigProtocolGuid,
                   EFI_NATIVE_INTERFACE,
-                  (VOID *) PrmConfigProtocol
+                  (VOID *)PrmConfigProtocol
                   );
 
 Done:
@@ -95,6 +98,7 @@ Done:
     if (RuntimeMmioRanges != NULL) {
       FreePool (RuntimeMmioRanges);
     }
+
     if (PrmConfigProtocol != NULL) {
       FreePool (PrmConfigProtocol);
     }

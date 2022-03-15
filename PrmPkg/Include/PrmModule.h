@@ -26,16 +26,16 @@
 #define PRM_HANDLER_EXPORT(Name)                                                  \
   STATIC_ASSERT (sizeof (PRM_STRING_(Name)) <= PRM_HANDLER_NAME_MAXIMUM_LENGTH, "The PRM handler exceeds the maximum allowed size of 128.");  \
                                                                                   \
-/**                                                                               \
-  A Platform Runtime Mechanism (PRM) handler.                                     \
-                                                                                  \
-  @param[in]  ParameterBuffer     A pointer to the PRM handler parameter buffer   \
-  @param[in]  ContextBUffer       A pointer to the PRM handler context buffer     \
-                                                                                  \
-  @retval EFI_STATUS              The PRM handler executed successfully.          \
-  @retval Others                  An error occurred in the PRM handler.           \
-                                                                                  \
-**/                                                                               \
+  /**                                                                               \
+    A Platform Runtime Mechanism (PRM) handler.                                     \
+                                                                                    \
+    @param[in]  ParameterBuffer     A pointer to the PRM handler parameter buffer   \
+    @param[in]  ContextBUffer       A pointer to the PRM handler context buffer     \
+                                                                                    \
+    @retval EFI_STATUS              The PRM handler executed successfully.          \
+    @retval Others                  An error occurred in the PRM handler.           \
+                                                                                    \
+  **/                                                                             \
   EFI_STATUS                                    \
   PRM_EXPORT_API                                \
   EFIAPI                                        \
