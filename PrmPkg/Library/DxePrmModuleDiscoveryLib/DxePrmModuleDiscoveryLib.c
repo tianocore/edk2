@@ -23,7 +23,7 @@
 
 #define _DBGMSGID_  "[PRMMODULEDISCOVERYLIB]"
 
-LIST_ENTRY          mPrmModuleList;
+LIST_ENTRY  mPrmModuleList;
 
 /**
   Gets the next PRM module discovered after the given PRM module.
@@ -40,13 +40,13 @@ LIST_ENTRY          mPrmModuleList;
 EFI_STATUS
 EFIAPI
 GetNextPrmModuleEntry (
-  IN OUT  PRM_MODULE_IMAGE_CONTEXT        **ModuleImageContext
+  IN OUT  PRM_MODULE_IMAGE_CONTEXT  **ModuleImageContext
   )
 {
-  LIST_ENTRY                              *CurrentLink;
-  LIST_ENTRY                              *ForwardLink;
-  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY     *CurrentListEntry;
-  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY     *ForwardListEntry;
+  LIST_ENTRY                           *CurrentLink;
+  LIST_ENTRY                           *ForwardLink;
+  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY  *CurrentListEntry;
+  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY  *ForwardListEntry;
 
   DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
 
@@ -59,7 +59,7 @@ GetNextPrmModuleEntry (
   } else {
     CurrentListEntry = NULL;
     CurrentListEntry = CR (*ModuleImageContext, PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY, Context, PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY_SIGNATURE);
-    if (CurrentListEntry == NULL || CurrentListEntry->Signature != PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY_SIGNATURE) {
+    if ((CurrentListEntry == NULL) || (CurrentListEntry->Signature != PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY_SIGNATURE)) {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -92,7 +92,7 @@ CreateNewPrmModuleImageContextListEntry (
   VOID
   )
 {
-  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY     *PrmModuleImageContextListEntry;
+  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY  *PrmModuleImageContextListEntry;
 
   DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
 
@@ -100,12 +100,13 @@ CreateNewPrmModuleImageContextListEntry (
   if (PrmModuleImageContextListEntry == NULL) {
     return NULL;
   }
+
   DEBUG ((
     DEBUG_INFO,
     "  %a %a: Allocated PrmModuleImageContextListEntry at 0x%x of size 0x%x bytes.\n",
     _DBGMSGID_,
     __FUNCTION__,
-    (UINTN) PrmModuleImageContextListEntry,
+    (UINTN)PrmModuleImageContextListEntry,
     sizeof (*PrmModuleImageContextListEntry)
     ));
 
@@ -127,12 +128,12 @@ CreateNewPrmModuleImageContextListEntry (
 BOOLEAN
 EFIAPI
 IsAddressInMmram (
-  IN EFI_PHYSICAL_ADDRESS             Address,
-  IN EFI_MMRAM_DESCRIPTOR             *MmramRanges,
-  IN UINTN                            MmramRangeCount
+  IN EFI_PHYSICAL_ADDRESS  Address,
+  IN EFI_MMRAM_DESCRIPTOR  *MmramRanges,
+  IN UINTN                 MmramRangeCount
   )
 {
-  UINTN         Index;
+  UINTN  Index;
 
   for (Index = 0; Index < MmramRangeCount; Index++) {
     if ((Address >= MmramRanges[Index].CpuStart) &&
@@ -167,28 +168,28 @@ IsAddressInMmram (
 EFI_STATUS
 EFIAPI
 DiscoverPrmModules (
-  OUT UINTN                               *ModuleCount    OPTIONAL,
-  OUT UINTN                               *HandlerCount   OPTIONAL
+  OUT UINTN  *ModuleCount    OPTIONAL,
+  OUT UINTN  *HandlerCount   OPTIONAL
   )
 {
-  EFI_STATUS                              Status;
-  PRM_MODULE_IMAGE_CONTEXT                TempPrmModuleImageContext;
-  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY     *PrmModuleImageContextListEntry;
-  EFI_LOADED_IMAGE_PROTOCOL               *LoadedImageProtocol;
-  EFI_HANDLE                              *HandleBuffer;
-  UINTN                                   HandleCount;
-  UINTN                                   Index;
-  UINTN                                   PrmHandlerCount;
-  UINTN                                   PrmModuleCount;
-  EFI_MM_ACCESS_PROTOCOL                  *MmAccess;
-  UINTN                                   Size;
-  EFI_MMRAM_DESCRIPTOR                    *MmramRanges;
-  UINTN                                   MmramRangeCount;
+  EFI_STATUS                           Status;
+  PRM_MODULE_IMAGE_CONTEXT             TempPrmModuleImageContext;
+  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY  *PrmModuleImageContextListEntry;
+  EFI_LOADED_IMAGE_PROTOCOL            *LoadedImageProtocol;
+  EFI_HANDLE                           *HandleBuffer;
+  UINTN                                HandleCount;
+  UINTN                                Index;
+  UINTN                                PrmHandlerCount;
+  UINTN                                PrmModuleCount;
+  EFI_MM_ACCESS_PROTOCOL               *MmAccess;
+  UINTN                                Size;
+  EFI_MMRAM_DESCRIPTOR                 *MmramRanges;
+  UINTN                                MmramRangeCount;
 
   DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
 
   PrmHandlerCount = 0;
-  PrmModuleCount = 0;
+  PrmModuleCount  = 0;
 
   if (!IsListEmpty (&mPrmModuleList)) {
     return EFI_ALREADY_STARTED;
@@ -206,18 +207,18 @@ DiscoverPrmModules (
     return EFI_NOT_FOUND;
   }
 
-  MmramRanges = NULL;
+  MmramRanges     = NULL;
   MmramRangeCount = 0;
-  Status = gBS->LocateProtocol (
-                  &gEfiMmAccessProtocolGuid,
-                  NULL,
-                  (VOID **)&MmAccess
-                  );
+  Status          = gBS->LocateProtocol (
+                           &gEfiMmAccessProtocolGuid,
+                           NULL,
+                           (VOID **)&MmAccess
+                           );
   if (Status == EFI_SUCCESS) {
     //
     // Get MMRAM range information
     //
-    Size = 0;
+    Size   = 0;
     Status = MmAccess->GetCapabilities (MmAccess, &Size, NULL);
     if ((Status == EFI_BUFFER_TOO_SMALL) && (Size != 0)) {
       MmramRanges = (EFI_MMRAM_DESCRIPTOR *)AllocatePool (Size);
@@ -234,7 +235,7 @@ DiscoverPrmModules (
     Status = gBS->HandleProtocol (
                     HandleBuffer[Index],
                     &gEfiLoadedImageProtocolGuid,
-                    (VOID **) &LoadedImageProtocol
+                    (VOID **)&LoadedImageProtocol
                     );
     if (EFI_ERROR (Status)) {
       continue;
@@ -249,16 +250,17 @@ DiscoverPrmModules (
     TempPrmModuleImageContext.PeCoffImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
 
     Status = PeCoffLoaderGetImageInfo (&TempPrmModuleImageContext.PeCoffImageContext);
-    if (EFI_ERROR (Status) || TempPrmModuleImageContext.PeCoffImageContext.ImageError != IMAGE_ERROR_SUCCESS) {
+    if (EFI_ERROR (Status) || (TempPrmModuleImageContext.PeCoffImageContext.ImageError != IMAGE_ERROR_SUCCESS)) {
       DEBUG ((
         DEBUG_WARN,
         "%a %a: ImageHandle 0x%016lx is not a valid PE/COFF image. It cannot be considered a PRM module.\n",
         _DBGMSGID_,
         __FUNCTION__,
-        (EFI_PHYSICAL_ADDRESS) (UINTN) LoadedImageProtocol->ImageBase
+        (EFI_PHYSICAL_ADDRESS)(UINTN)LoadedImageProtocol->ImageBase
         ));
       continue;
     }
+
     if (TempPrmModuleImageContext.PeCoffImageContext.IsTeImage) {
       // A PRM Module is not allowed to be a TE image
       continue;
@@ -276,13 +278,14 @@ DiscoverPrmModules (
 
     // Attempt to find the PRM Module Export Descriptor in the export table
     Status = GetPrmModuleExportDescriptorTable (
-              TempPrmModuleImageContext.ExportDirectory,
-              &TempPrmModuleImageContext.PeCoffImageContext,
-              &TempPrmModuleImageContext.ExportDescriptor
-              );
-    if (EFI_ERROR (Status) || TempPrmModuleImageContext.ExportDescriptor == NULL) {
+               TempPrmModuleImageContext.ExportDirectory,
+               &TempPrmModuleImageContext.PeCoffImageContext,
+               &TempPrmModuleImageContext.ExportDescriptor
+               );
+    if (EFI_ERROR (Status) || (TempPrmModuleImageContext.ExportDescriptor == NULL)) {
       continue;
     }
+
     // A PRM Module Export Descriptor was successfully found, this is considered a PRM Module.
 
     //
@@ -292,6 +295,7 @@ DiscoverPrmModules (
     if (PrmModuleImageContextListEntry == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     CopyMem (
       &PrmModuleImageContextListEntry->Context,
       &TempPrmModuleImageContext,
@@ -306,6 +310,7 @@ DiscoverPrmModules (
   if (HandlerCount != NULL) {
     *HandlerCount = PrmHandlerCount;
   }
+
   if (ModuleCount != NULL) {
     *ModuleCount = PrmModuleCount;
   }
@@ -331,13 +336,13 @@ DiscoverPrmModules (
 EFI_STATUS
 EFIAPI
 PrmModuleDiscoveryLibDestructor (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  LIST_ENTRY                              *Link;
-  LIST_ENTRY                              *NextLink;
-  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY     *ListEntry;
+  LIST_ENTRY                           *Link;
+  LIST_ENTRY                           *NextLink;
+  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY  *ListEntry;
 
   if (IsListEmpty (&mPrmModuleList)) {
     return EFI_SUCCESS;
@@ -346,7 +351,7 @@ PrmModuleDiscoveryLibDestructor (
   Link = GetFirstNode (&mPrmModuleList);
   while (!IsNull (&mPrmModuleList, Link)) {
     ListEntry = CR (Link, PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY, Link, PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY_SIGNATURE);
-    NextLink = GetNextNode (&mPrmModuleList, Link);
+    NextLink  = GetNextNode (&mPrmModuleList, Link);
 
     RemoveEntryList (Link);
     FreePool (ListEntry);
@@ -371,8 +376,8 @@ PrmModuleDiscoveryLibDestructor (
 EFI_STATUS
 EFIAPI
 PrmModuleDiscoveryLibConstructor (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   InitializeListHead (&mPrmModuleList);

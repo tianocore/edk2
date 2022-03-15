@@ -34,9 +34,9 @@
 **/
 EFI_STATUS
 GetPrmModuleExportDescriptorTable (
-  IN  EFI_IMAGE_EXPORT_DIRECTORY          *ImageExportDirectory,
-  IN  PE_COFF_LOADER_IMAGE_CONTEXT        *PeCoffLoaderImageContext,
-  OUT PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT **ExportDescriptor
+  IN  EFI_IMAGE_EXPORT_DIRECTORY           *ImageExportDirectory,
+  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *PeCoffLoaderImageContext,
+  OUT PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT  **ExportDescriptor
   );
 
 /**
@@ -57,9 +57,9 @@ GetPrmModuleExportDescriptorTable (
 **/
 EFI_STATUS
 GetExportDirectoryInPeCoffImage (
-  IN  VOID                                *Image,
-  IN  PE_COFF_LOADER_IMAGE_CONTEXT        *PeCoffLoaderImageContext,
-  OUT EFI_IMAGE_EXPORT_DIRECTORY          **ImageExportDirectory
+  IN  VOID                          *Image,
+  IN  PE_COFF_LOADER_IMAGE_CONTEXT  *PeCoffLoaderImageContext,
+  OUT EFI_IMAGE_EXPORT_DIRECTORY    **ImageExportDirectory
   );
 
 /**
@@ -80,10 +80,10 @@ GetExportDirectoryInPeCoffImage (
 **/
 EFI_STATUS
 GetImageVersionInPeCoffImage (
-  IN  VOID                                *Image,
-  IN  PE_COFF_LOADER_IMAGE_CONTEXT        *PeCoffLoaderImageContext,
-  OUT UINT16                              *ImageMajorVersion,
-  OUT UINT16                              *ImageMinorVersion
+  IN  VOID                          *Image,
+  IN  PE_COFF_LOADER_IMAGE_CONTEXT  *PeCoffLoaderImageContext,
+  OUT UINT16                        *ImageMajorVersion,
+  OUT UINT16                        *ImageMinorVersion
   );
 
 /**
@@ -102,10 +102,10 @@ GetImageVersionInPeCoffImage (
 **/
 EFI_STATUS
 GetExportEntryAddress (
-  IN  CONST CHAR8                         *ExportName,
-  IN  EFI_PHYSICAL_ADDRESS                ImageBaseAddress,
-  IN  EFI_IMAGE_EXPORT_DIRECTORY          *ImageExportDirectory,
-  OUT EFI_PHYSICAL_ADDRESS                *ExportPhysicalAddress
+  IN  CONST CHAR8                 *ExportName,
+  IN  EFI_PHYSICAL_ADDRESS        ImageBaseAddress,
+  IN  EFI_IMAGE_EXPORT_DIRECTORY  *ImageExportDirectory,
+  OUT EFI_PHYSICAL_ADDRESS        *ExportPhysicalAddress
   );
 
 #endif

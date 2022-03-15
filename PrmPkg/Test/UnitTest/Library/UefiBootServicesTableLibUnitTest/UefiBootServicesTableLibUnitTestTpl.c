@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_TPL
 EFIAPI
 UnitTestRaiseTpl (
-  IN EFI_TPL      NewTpl
+  IN EFI_TPL  NewTpl
   )
 {
   return TPL_APPLICATION;
@@ -36,7 +36,7 @@ UnitTestRaiseTpl (
 VOID
 EFIAPI
 UnitTestRestoreTpl (
-  IN EFI_TPL NewTpl
+  IN EFI_TPL  NewTpl
   )
 {
   return;

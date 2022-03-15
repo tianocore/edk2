@@ -21,7 +21,7 @@
 //
 
 // {e1466081-7562-430f-896b-b0e523dc335a}
-#define CHECK_STATIC_DATA_BUFFER_PRM_HANDLER_GUID {0xe1466081, 0x7562, 0x430f, {0x89, 0x6b, 0xb0, 0xe5, 0x23, 0xdc, 0x33, 0x5a}}
+#define CHECK_STATIC_DATA_BUFFER_PRM_HANDLER_GUID  {0xe1466081, 0x7562, 0x430f, {0x89, 0x6b, 0xb0, 0xe5, 0x23, 0xdc, 0x33, 0x5a}}
 
 /**
   A sample Platform Runtime Mechanism (PRM) handler.
@@ -35,8 +35,7 @@
   @retval Others                  An error occurred in the PRM handler.
 
 **/
-PRM_HANDLER_EXPORT (CheckStaticDataBufferPrmHandler)
-{
+PRM_HANDLER_EXPORT (CheckStaticDataBufferPrmHandler) {
   if (ContextBuffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -49,8 +48,9 @@ PRM_HANDLER_EXPORT (CheckStaticDataBufferPrmHandler)
   // Verify PRM data buffer signature is valid
   //
   if (
-    ContextBuffer->Signature != PRM_CONTEXT_BUFFER_SIGNATURE ||
-    ContextBuffer->StaticDataBuffer->Header.Signature != PRM_DATA_BUFFER_HEADER_SIGNATURE) {
+      (ContextBuffer->Signature != PRM_CONTEXT_BUFFER_SIGNATURE) ||
+      (ContextBuffer->StaticDataBuffer->Header.Signature != PRM_DATA_BUFFER_HEADER_SIGNATURE))
+  {
     return EFI_NOT_FOUND;
   }
 
@@ -76,8 +76,8 @@ PRM_MODULE_EXPORT (
 EFI_STATUS
 EFIAPI
 PrmSampleContextBufferModuleInit (
-  IN  EFI_HANDLE                  ImageHandle,
-  IN  EFI_SYSTEM_TABLE            *SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return EFI_SUCCESS;

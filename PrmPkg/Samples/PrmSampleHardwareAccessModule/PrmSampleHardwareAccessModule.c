@@ -24,18 +24,18 @@
 //
 
 // {2120cd3c-848b-4d8f-abbb-4b74ce64ac89}
-#define MSR_ACCESS_MICROCODE_SIGNATURE_PRM_HANDLER_GUID {0x2120cd3c, 0x848b, 0x4d8f, {0xab, 0xbb, 0x4b, 0x74, 0xce, 0x64, 0xac, 0x89}}
+#define MSR_ACCESS_MICROCODE_SIGNATURE_PRM_HANDLER_GUID  {0x2120cd3c, 0x848b, 0x4d8f, {0xab, 0xbb, 0x4b, 0x74, 0xce, 0x64, 0xac, 0x89}}
 
 // {ea0935a7-506b-4159-bbbb-48deeecb6f58}
-#define MSR_ACCESS_MTRR_DUMP_PRM_HANDLER_GUID {0xea0935a7, 0x506b, 0x4159, {0xbb, 0xbb, 0x48, 0xde, 0xee, 0xcb, 0x6f, 0x58}}
+#define MSR_ACCESS_MTRR_DUMP_PRM_HANDLER_GUID  {0xea0935a7, 0x506b, 0x4159, {0xbb, 0xbb, 0x48, 0xde, 0xee, 0xcb, 0x6f, 0x58}}
 
 // {1bd1bda9-909a-4614-9699-25ec0c2783f7}
-#define MMIO_ACCESS_HPET_PRM_HANDLER_GUID {0x1bd1bda9, 0x909a, 0x4614, {0x96, 0x99, 0x25, 0xec, 0x0c, 0x27, 0x83, 0xf7}}
+#define MMIO_ACCESS_HPET_PRM_HANDLER_GUID  {0x1bd1bda9, 0x909a, 0x4614, {0x96, 0x99, 0x25, 0xec, 0x0c, 0x27, 0x83, 0xf7}}
 
 //
 // BEGIN: MtrrLib internal library globals and function prototypes here for testing
 //
-extern CONST CHAR8        *mMtrrMemoryCacheTypeShortName[];
+extern CONST CHAR8  *mMtrrMemoryCacheTypeShortName[];
 
 /**
   Initializes the valid bits mask and valid address mask for MTRRs.
@@ -48,8 +48,8 @@ extern CONST CHAR8        *mMtrrMemoryCacheTypeShortName[];
 **/
 VOID
 MtrrLibInitializeMtrrMask (
-  OUT UINT64 *MtrrValidBitsMask,
-  OUT UINT64 *MtrrValidAddressMask
+  OUT UINT64  *MtrrValidBitsMask,
+  OUT UINT64  *MtrrValidAddressMask
   );
 
 /**
@@ -109,11 +109,11 @@ MtrrLibApplyFixedMtrrs (
 **/
 RETURN_STATUS
 MtrrLibApplyVariableMtrrs (
-  IN     CONST MTRR_MEMORY_RANGE *VariableMtrr,
-  IN     UINT32                  VariableMtrrCount,
-  IN OUT MTRR_MEMORY_RANGE       *Ranges,
-  IN     UINTN                   RangeCapacity,
-  IN OUT UINTN                   *RangeCount
+  IN     CONST MTRR_MEMORY_RANGE  *VariableMtrr,
+  IN     UINT32                   VariableMtrrCount,
+  IN OUT MTRR_MEMORY_RANGE        *Ranges,
+  IN     UINTN                    RangeCapacity,
+  IN OUT UINTN                    *RangeCount
   );
 
 //
@@ -130,17 +130,17 @@ AccessAllMtrrs (
   VOID
   )
 {
-  MTRR_SETTINGS                   LocalMtrrs;
-  MTRR_SETTINGS                   *Mtrrs;
-  UINTN                           RangeCount;
-  UINT64                          MtrrValidBitsMask;
-  UINT64                          MtrrValidAddressMask;
-  UINT32                          VariableMtrrCount;
+  MTRR_SETTINGS  LocalMtrrs;
+  MTRR_SETTINGS  *Mtrrs;
+  UINTN          RangeCount;
+  UINT64         MtrrValidBitsMask;
+  UINT64         MtrrValidAddressMask;
+  UINT32         VariableMtrrCount;
 
-  MTRR_MEMORY_RANGE Ranges[
-    MTRR_NUMBER_OF_FIXED_MTRR * sizeof (UINT64) + 2 * ARRAY_SIZE (Mtrrs->Variables.Mtrr) + 1
-    ];
-  MTRR_MEMORY_RANGE RawVariableRanges[ARRAY_SIZE (Mtrrs->Variables.Mtrr)];
+  MTRR_MEMORY_RANGE  Ranges[
+                            MTRR_NUMBER_OF_FIXED_MTRR * sizeof (UINT64) + 2 * ARRAY_SIZE (Mtrrs->Variables.Mtrr) + 1
+  ];
+  MTRR_MEMORY_RANGE  RawVariableRanges[ARRAY_SIZE (Mtrrs->Variables.Mtrr)];
 
   if (!IsMtrrSupported ()) {
     return;
@@ -155,15 +155,21 @@ AccessAllMtrrs (
   Ranges[0].BaseAddress = 0;
   Ranges[0].Length      = MtrrValidBitsMask + 1;
   Ranges[0].Type        = MtrrGetDefaultMemoryType ();
-  RangeCount = 1;
+  RangeCount            = 1;
 
   MtrrLibGetRawVariableRanges (
-    &Mtrrs->Variables, VariableMtrrCount,
-    MtrrValidBitsMask, MtrrValidAddressMask, RawVariableRanges
+    &Mtrrs->Variables,
+    VariableMtrrCount,
+    MtrrValidBitsMask,
+    MtrrValidAddressMask,
+    RawVariableRanges
     );
   MtrrLibApplyVariableMtrrs (
-    RawVariableRanges, VariableMtrrCount,
-    Ranges, ARRAY_SIZE (Ranges), &RangeCount
+    RawVariableRanges,
+    VariableMtrrCount,
+    Ranges,
+    ARRAY_SIZE (Ranges),
+    &RangeCount
     );
 
   MtrrLibApplyFixedMtrrs (&Mtrrs->Fixed, Ranges, ARRAY_SIZE (Ranges), &RangeCount);
@@ -187,11 +193,11 @@ AccessAllMtrrs (
 UINT64
 EFIAPI
 HpetRead (
-  IN  UINTN                       Offset
+  IN  UINTN  Offset
   )
 {
-  UINTN                           Address;
-  UINT64                          Value;
+  UINTN   Address;
+  UINT64  Value;
 
   Address = HPET_BASE_ADDRESS + Offset;
 
@@ -200,7 +206,7 @@ HpetRead (
   }
 
   MemoryFence ();
-  Value = *(volatile UINT64*)Address;
+  Value = *(volatile UINT64 *)Address;
   MemoryFence ();
 
   return Value;
@@ -251,8 +257,7 @@ GetMicrocodeSignature (
   @retval Others                  An error occurred in the PRM handler.
 
 **/
-PRM_HANDLER_EXPORT (MsrAccessMicrocodeSignaturePrmHandler)
-{
+PRM_HANDLER_EXPORT (MsrAccessMicrocodeSignaturePrmHandler) {
   UINT32  MicrocodeSignature;
 
   MicrocodeSignature = 0;
@@ -277,8 +282,7 @@ PRM_HANDLER_EXPORT (MsrAccessMicrocodeSignaturePrmHandler)
   @retval Others                  An error occurred in the PRM handler.
 
 **/
-PRM_HANDLER_EXPORT (MsrAccessMtrrDumpPrmHandler)
-{
+PRM_HANDLER_EXPORT (MsrAccessMtrrDumpPrmHandler) {
   AccessAllMtrrs ();
 
   return EFI_SUCCESS;
@@ -296,8 +300,7 @@ PRM_HANDLER_EXPORT (MsrAccessMtrrDumpPrmHandler)
   @retval Others                  An error occurred in the PRM handler.
 
 **/
-PRM_HANDLER_EXPORT (MmioAccessHpetPrmHandler)
-{
+PRM_HANDLER_EXPORT (MmioAccessHpetPrmHandler) {
   AccessHpetConfiguration ();
 
   return EFI_SUCCESS;
@@ -324,8 +327,8 @@ PRM_MODULE_EXPORT (
 EFI_STATUS
 EFIAPI
 PrmSampleHardwareAccessModuleInit (
-  IN  EFI_HANDLE                  ImageHandle,
-  IN  EFI_SYSTEM_TABLE            *SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return EFI_SUCCESS;

@@ -14,24 +14,24 @@
 #include <PrmDataBuffer.h>
 #include <Uefi.h>
 
-#define  APPLICATION_NAME   L"PrmInfo"
+#define  APPLICATION_NAME  L"PrmInfo"
 
-#define PRM_HANDLER_CONTEXT_LIST_ENTRY_SIGNATURE SIGNATURE_32('P','R','H','E')
+#define PRM_HANDLER_CONTEXT_LIST_ENTRY_SIGNATURE  SIGNATURE_32('P','R','H','E')
 
 #pragma pack(push, 1)
 
 typedef struct {
-  CHAR8                     *Name;
-  EFI_GUID                  *Guid;
-  PRM_DATA_BUFFER           *StaticDataBuffer;
-  CHAR8                     *ModuleName;
-  PRM_HANDLER               *Handler;
+  CHAR8              *Name;
+  EFI_GUID           *Guid;
+  PRM_DATA_BUFFER    *StaticDataBuffer;
+  CHAR8              *ModuleName;
+  PRM_HANDLER        *Handler;
 } PRM_HANDLER_CONTEXT;
 
 typedef struct {
-  UINTN                     Signature;
-  LIST_ENTRY                Link;
-  PRM_HANDLER_CONTEXT       Context;
+  UINTN                  Signature;
+  LIST_ENTRY             Link;
+  PRM_HANDLER_CONTEXT    Context;
 } PRM_HANDLER_CONTEXT_LIST_ENTRY;
 
 #pragma pack(pop)
@@ -42,8 +42,8 @@ typedef struct {
 #define EFI_LIST_FOR_EACH(Entry, ListHead)    \
   for(Entry = (ListHead)->ForwardLink; Entry != (ListHead); Entry = Entry->ForwardLink)
 
-#define ONE_MICROSECOND (1000)
-#define ONE_MILLISECOND (1000 * ONE_MICROSECOND)
-#define ONE_SECOND      (1000 * ONE_MILLISECOND)
+#define ONE_MICROSECOND  (1000)
+#define ONE_MILLISECOND  (1000 * ONE_MICROSECOND)
+#define ONE_SECOND       (1000 * ONE_MILLISECOND)
 
 #endif

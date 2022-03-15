@@ -12,7 +12,7 @@
 
 #include <Uefi.h>
 
-#define PRM_DATA_BUFFER_HEADER_SIGNATURE      SIGNATURE_32('P','R','M','D')
+#define PRM_DATA_BUFFER_HEADER_SIGNATURE  SIGNATURE_32('P','R','M','D')
 
 #pragma pack(push, 1)
 
@@ -23,11 +23,11 @@ typedef struct {
   ///
   /// PRM Data Buffer signature.
   ///
-  UINT32                                  Signature;
+  UINT32    Signature;
   ///
   /// Length of the entire data buffer, including the size of the header.
   ///
-  UINT32                                  Length;
+  UINT32    Length;
 } PRM_DATA_BUFFER_HEADER;
 
 ///
@@ -37,12 +37,12 @@ typedef struct {
   ///
   /// The header is required at the beginning of every PRM data buffer.
   ///
-  PRM_DATA_BUFFER_HEADER                  Header;
+  PRM_DATA_BUFFER_HEADER    Header;
 
   ///
   /// The beginning of data immediately follows the header.
   ///
-  UINT8                                   Data[1];
+  UINT8                     Data[1];
 } PRM_DATA_BUFFER;
 
 #pragma pack(pop)

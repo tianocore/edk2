@@ -24,12 +24,12 @@
 
 #include "../PrmModuleDiscovery.h"
 
-#define UNIT_TEST_NAME          "PRM Module Discovery Library Unit Test"
-#define UNIT_TEST_VERSION       "0.1"
+#define UNIT_TEST_NAME     "PRM Module Discovery Library Unit Test"
+#define UNIT_TEST_VERSION  "0.1"
 
-///=== TEST CASES =================================================================================
+/// === TEST CASES =================================================================================
 
-///===== CREATE NEW PRM MODULE IMAGE CONTEXT LIST ENTRY TESTS SUITE ==================================================
+/// ===== CREATE NEW PRM MODULE IMAGE CONTEXT LIST ENTRY TESTS SUITE ==================================================
 
 /**
   Verifies that the buffer returned can be deallocated.
@@ -44,10 +44,10 @@
 UNIT_TEST_STATUS
 EFIAPI
 PrmModuleImageContextListEntryShouldDeallocate (
-  IN UNIT_TEST_CONTEXT            Context
+  IN UNIT_TEST_CONTEXT  Context
   )
 {
-  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY   *ListEntry;
+  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY  *ListEntry;
 
   ListEntry = CreateNewPrmModuleImageContextListEntry ();
 
@@ -72,10 +72,10 @@ PrmModuleImageContextListEntryShouldDeallocate (
 UNIT_TEST_STATUS
 EFIAPI
 PrmModuleImageContextListEntrySignatureShouldBeValid (
-  IN UNIT_TEST_CONTEXT            Context
+  IN UNIT_TEST_CONTEXT  Context
   )
 {
-  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY   *ListEntry;
+  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY  *ListEntry;
 
   ListEntry = CreateNewPrmModuleImageContextListEntry ();
 
@@ -101,11 +101,11 @@ PrmModuleImageContextListEntrySignatureShouldBeValid (
 UNIT_TEST_STATUS
 EFIAPI
 PrmModuleImageContextListEntryImageContextShouldBeZeroed (
-  IN UNIT_TEST_CONTEXT            Context
+  IN UNIT_TEST_CONTEXT  Context
   )
 {
-  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY   *ListEntry;
-  PRM_MODULE_IMAGE_CONTEXT              ImageContext;
+  PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY  *ListEntry;
+  PRM_MODULE_IMAGE_CONTEXT             ImageContext;
 
   ListEntry = CreateNewPrmModuleImageContextListEntry ();
 
@@ -119,7 +119,7 @@ PrmModuleImageContextListEntryImageContextShouldBeZeroed (
   return UNIT_TEST_PASSED;
 }
 
-///=== TEST ENGINE ================================================================================
+/// === TEST ENGINE ================================================================================
 
 /**
   Entry point for the PRM Context Buffer Library unit tests.
@@ -131,7 +131,9 @@ PrmModuleImageContextListEntryImageContextShouldBeZeroed (
   @retval other           Some error occurred when executing this entry point.
 
 **/
-int main ()
+int
+main (
+  )
 {
   EFI_STATUS                  Status;
   UNIT_TEST_FRAMEWORK_HANDLE  Framework;
@@ -200,8 +202,7 @@ int main ()
   Status = RunAllTestSuites (Framework);
 
 EXIT:
-  if (Framework)
-  {
+  if (Framework) {
     FreeUnitTestFramework (Framework);
   }
 

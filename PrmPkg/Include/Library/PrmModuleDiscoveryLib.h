@@ -28,7 +28,7 @@
 EFI_STATUS
 EFIAPI
 GetNextPrmModuleEntry (
-  IN OUT  PRM_MODULE_IMAGE_CONTEXT        **ModuleImageContext
+  IN OUT  PRM_MODULE_IMAGE_CONTEXT  **ModuleImageContext
   );
 
 /**
@@ -53,8 +53,8 @@ GetNextPrmModuleEntry (
 EFI_STATUS
 EFIAPI
 DiscoverPrmModules (
-  OUT UINTN                               *ModuleCount    OPTIONAL,
-  OUT UINTN                               *HandlerCount   OPTIONAL
+  OUT UINTN  *ModuleCount    OPTIONAL,
+  OUT UINTN  *HandlerCount   OPTIONAL
   );
 
 #endif

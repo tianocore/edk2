@@ -13,12 +13,12 @@
 
 #include <Base.h>
 
-#define   SOME_VALUE_ARRAY_MAX_VALUES   16
+#define   SOME_VALUE_ARRAY_MAX_VALUES  16
 
 typedef struct {
-  BOOLEAN       Policy1Enabled;
-  BOOLEAN       Policy2Enabled;
-  UINT8         SomeValueArray[SOME_VALUE_ARRAY_MAX_VALUES];
+  BOOLEAN    Policy1Enabled;
+  BOOLEAN    Policy2Enabled;
+  UINT8      SomeValueArray[SOME_VALUE_ARRAY_MAX_VALUES];
 } STATIC_DATA_SAMPLE_CONTEXT_BUFFER_MODULE;
 
 #endif

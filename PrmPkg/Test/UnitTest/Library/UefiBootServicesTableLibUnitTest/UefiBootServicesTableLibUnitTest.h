@@ -34,10 +34,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_TPL
 EFIAPI
 UnitTestRaiseTpl (
-  IN EFI_TPL      NewTpl
+  IN EFI_TPL  NewTpl
   );
-
-
 
 /**
   Lowers the task priority to the previous value.   If the new
@@ -49,7 +47,7 @@ UnitTestRaiseTpl (
 VOID
 EFIAPI
 UnitTestRestoreTpl (
-  IN EFI_TPL NewTpl
+  IN EFI_TPL  NewTpl
   );
 
 /**
@@ -73,9 +71,9 @@ UnitTestRestoreTpl (
 EFI_STATUS
 EFIAPI
 UnitTestAllocatePages (
-  IN EFI_ALLOCATE_TYPE      Type,
-  IN EFI_MEMORY_TYPE        MemoryType,
-  IN UINTN                  NumberOfPages,
+  IN EFI_ALLOCATE_TYPE         Type,
+  IN EFI_MEMORY_TYPE           MemoryType,
+  IN UINTN                     NumberOfPages,
   IN OUT EFI_PHYSICAL_ADDRESS  *Memory
   );
 
@@ -93,8 +91,8 @@ UnitTestAllocatePages (
 EFI_STATUS
 EFIAPI
 UnitTestFreePages (
-  IN EFI_PHYSICAL_ADDRESS   Memory,
-  IN UINTN                  NumberOfPages
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NumberOfPages
   );
 
 /**
@@ -137,8 +135,6 @@ UnitTestGetMemoryMap (
   OUT UINT32                    *DescriptorVersion
   );
 
-
-
 /**
   Allocate pool of a particular type.
 
@@ -172,7 +168,7 @@ UnitTestAllocatePool (
 EFI_STATUS
 EFIAPI
 UnitTestFreePool (
-  IN VOID        *Buffer
+  IN VOID  *Buffer
   );
 
 /**
@@ -188,8 +184,8 @@ UnitTestFreePool (
 EFI_STATUS
 EFIAPI
 UnitTestInternalFreePool (
-  IN VOID               *Buffer,
-  OUT EFI_MEMORY_TYPE   *PoolType OPTIONAL
+  IN VOID              *Buffer,
+  OUT EFI_MEMORY_TYPE  *PoolType OPTIONAL
   );
 
 /**
@@ -213,9 +209,9 @@ UnitTestInternalFreePool (
 EFI_STATUS
 EFIAPI
 UnitTestCreateEvent (
-  IN UINT32                   Type,
-  IN EFI_TPL                  NotifyTpl,
-  IN EFI_EVENT_NOTIFY         NotifyFunction, OPTIONAL
+  IN UINT32 Type,
+  IN EFI_TPL NotifyTpl,
+  IN EFI_EVENT_NOTIFY NotifyFunction, OPTIONAL
   IN VOID                     *NotifyContext, OPTIONAL
   OUT EFI_EVENT               *Event
   );
@@ -238,9 +234,9 @@ UnitTestCreateEvent (
 EFI_STATUS
 EFIAPI
 UnitTestSetTimer (
-  IN EFI_EVENT            UserEvent,
-  IN EFI_TIMER_DELAY      Type,
-  IN UINT64               TriggerTime
+  IN EFI_EVENT        UserEvent,
+  IN EFI_TIMER_DELAY  Type,
+  IN UINT64           TriggerTime
   );
 
 /**
@@ -260,9 +256,9 @@ UnitTestSetTimer (
 EFI_STATUS
 EFIAPI
 UnitTestWaitForEvent (
-  IN UINTN        NumberOfEvents,
-  IN EFI_EVENT    *UserEvents,
-  OUT UINTN       *UserIndex
+  IN UINTN      NumberOfEvents,
+  IN EFI_EVENT  *UserEvents,
+  OUT UINTN     *UserIndex
   );
 
 /**
@@ -277,7 +273,7 @@ UnitTestWaitForEvent (
 EFI_STATUS
 EFIAPI
 UnitTestSignalEvent (
-  IN EFI_EVENT    UserEvent
+  IN EFI_EVENT  UserEvent
   );
 
 /**
@@ -292,7 +288,7 @@ UnitTestSignalEvent (
 EFI_STATUS
 EFIAPI
 UnitTestCloseEvent (
-  IN EFI_EVENT    UserEvent
+  IN EFI_EVENT  UserEvent
   );
 
 /**
@@ -308,7 +304,7 @@ UnitTestCloseEvent (
 EFI_STATUS
 EFIAPI
 UnitTestCheckEvent (
-  IN EFI_EVENT        UserEvent
+  IN EFI_EVENT  UserEvent
   );
 
 /**
@@ -328,10 +324,10 @@ UnitTestCheckEvent (
 EFI_STATUS
 EFIAPI
 UnitTestInstallProtocolInterface (
-  IN OUT EFI_HANDLE     *UserHandle,
-  IN EFI_GUID           *Protocol,
-  IN EFI_INTERFACE_TYPE InterfaceType,
-  IN VOID               *Interface
+  IN OUT EFI_HANDLE      *UserHandle,
+  IN EFI_GUID            *Protocol,
+  IN EFI_INTERFACE_TYPE  InterfaceType,
+  IN VOID                *Interface
   );
 
 /**
@@ -351,10 +347,10 @@ UnitTestInstallProtocolInterface (
 EFI_STATUS
 EFIAPI
 UnitTestReinstallProtocolInterface (
-  IN EFI_HANDLE     UserHandle,
-  IN EFI_GUID       *Protocol,
-  IN VOID           *OldInterface,
-  IN VOID           *NewInterface
+  IN EFI_HANDLE  UserHandle,
+  IN EFI_GUID    *Protocol,
+  IN VOID        *OldInterface,
+  IN VOID        *NewInterface
   );
 
 /**
@@ -373,9 +369,9 @@ UnitTestReinstallProtocolInterface (
 EFI_STATUS
 EFIAPI
 UnitTestUninstallProtocolInterface (
-  IN EFI_HANDLE       UserHandle,
-  IN EFI_GUID         *Protocol,
-  IN VOID             *Interface
+  IN EFI_HANDLE  UserHandle,
+  IN EFI_GUID    *Protocol,
+  IN VOID        *Interface
   );
 
 /**
@@ -392,9 +388,9 @@ UnitTestUninstallProtocolInterface (
 EFI_STATUS
 EFIAPI
 UnitTestHandleProtocol (
-  IN EFI_HANDLE       UserHandle,
-  IN EFI_GUID         *Protocol,
-  OUT VOID            **Interface
+  IN EFI_HANDLE  UserHandle,
+  IN EFI_GUID    *Protocol,
+  OUT VOID       **Interface
   );
 
 /**
@@ -413,9 +409,9 @@ UnitTestHandleProtocol (
 EFI_STATUS
 EFIAPI
 UnitTestRegisterProtocolNotify (
-  IN EFI_GUID       *Protocol,
-  IN EFI_EVENT      Event,
-  OUT  VOID         **Registration
+  IN EFI_GUID   *Protocol,
+  IN EFI_EVENT  Event,
+  OUT  VOID     **Registration
   );
 
 /**
@@ -439,11 +435,11 @@ UnitTestRegisterProtocolNotify (
 EFI_STATUS
 EFIAPI
 UnitTestLocateHandle (
-  IN EFI_LOCATE_SEARCH_TYPE   SearchType,
-  IN EFI_GUID                 *Protocol   OPTIONAL,
-  IN VOID                     *SearchKey  OPTIONAL,
-  IN OUT UINTN                *BufferSize,
-  OUT EFI_HANDLE              *Buffer
+  IN EFI_LOCATE_SEARCH_TYPE  SearchType,
+  IN EFI_GUID                *Protocol   OPTIONAL,
+  IN VOID                    *SearchKey  OPTIONAL,
+  IN OUT UINTN               *BufferSize,
+  OUT EFI_HANDLE             *Buffer
   );
 
 /**
@@ -464,9 +460,9 @@ UnitTestLocateHandle (
 EFI_STATUS
 EFIAPI
 UnitTestLocateDevicePath (
-  IN EFI_GUID                       *Protocol,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL   **DevicePath,
-  OUT EFI_HANDLE                    *Device
+  IN EFI_GUID                      *Protocol,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePath,
+  OUT EFI_HANDLE                   *Device
   );
 
 /**
@@ -487,8 +483,8 @@ UnitTestLocateDevicePath (
 EFI_STATUS
 EFIAPI
 UnitTestInstallConfigurationTable (
-  IN EFI_GUID *Guid,
-  IN VOID     *Table
+  IN EFI_GUID  *Guid,
+  IN VOID      *Table
   );
 
 /**
@@ -528,12 +524,12 @@ UnitTestInstallConfigurationTable (
 EFI_STATUS
 EFIAPI
 UnitTestLoadImage (
-  IN BOOLEAN                    BootPolicy,
-  IN EFI_HANDLE                 ParentImageHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL   *FilePath,
-  IN VOID                       *SourceBuffer   OPTIONAL,
-  IN UINTN                      SourceSize,
-  OUT EFI_HANDLE                *ImageHandle
+  IN BOOLEAN                   BootPolicy,
+  IN EFI_HANDLE                ParentImageHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL  *FilePath,
+  IN VOID                      *SourceBuffer   OPTIONAL,
+  IN UINTN                     SourceSize,
+  OUT EFI_HANDLE               *ImageHandle
   );
 
 /**
@@ -626,8 +622,8 @@ UnitTestUnloadImage (
 EFI_STATUS
 EFIAPI
 UnitTestExitBootServices (
-  IN EFI_HANDLE   ImageHandle,
-  IN UINTN        MapKey
+  IN EFI_HANDLE  ImageHandle,
+  IN UINTN       MapKey
   );
 
 /**
@@ -643,7 +639,7 @@ UnitTestExitBootServices (
 EFI_STATUS
 EFIAPI
 UnitTestGetNextMonotonicCount (
-  OUT UINT64                  *Count
+  OUT UINT64  *Count
   );
 
 /**
@@ -659,7 +655,7 @@ UnitTestGetNextMonotonicCount (
 EFI_STATUS
 EFIAPI
 UnitTestStall (
-  IN UINTN            Microseconds
+  IN UINTN  Microseconds
   );
 
 /**
@@ -687,10 +683,10 @@ UnitTestStall (
 EFI_STATUS
 EFIAPI
 UnitTestSetWatchdogTimer (
-  IN UINTN    Timeout,
-  IN UINT64   WatchdogCode,
-  IN UINTN    DataSize,
-  IN CHAR16   *WatchdogData OPTIONAL
+  IN UINTN   Timeout,
+  IN UINT64  WatchdogCode,
+  IN UINTN   DataSize,
+  IN CHAR16  *WatchdogData OPTIONAL
   );
 
 /**
@@ -791,12 +787,12 @@ UnitTestDisconnectController (
 EFI_STATUS
 EFIAPI
 UnitTestOpenProtocol (
-  IN  EFI_HANDLE                UserHandle,
-  IN  EFI_GUID                  *Protocol,
-  OUT VOID                      **Interface OPTIONAL,
-  IN  EFI_HANDLE                ImageHandle,
-  IN  EFI_HANDLE                ControllerHandle,
-  IN  UINT32                    Attributes
+  IN  EFI_HANDLE  UserHandle,
+  IN  EFI_GUID    *Protocol,
+  OUT VOID        **Interface OPTIONAL,
+  IN  EFI_HANDLE  ImageHandle,
+  IN  EFI_HANDLE  ControllerHandle,
+  IN  UINT32      Attributes
   );
 
 /**
@@ -827,10 +823,10 @@ UnitTestOpenProtocol (
 EFI_STATUS
 EFIAPI
 UnitTestCloseProtocol (
-  IN  EFI_HANDLE                UserHandle,
-  IN  EFI_GUID                  *Protocol,
-  IN  EFI_HANDLE                AgentHandle,
-  IN  EFI_HANDLE                ControllerHandle
+  IN  EFI_HANDLE  UserHandle,
+  IN  EFI_GUID    *Protocol,
+  IN  EFI_HANDLE  AgentHandle,
+  IN  EFI_HANDLE  ControllerHandle
   );
 
 /**
@@ -847,10 +843,10 @@ UnitTestCloseProtocol (
 EFI_STATUS
 EFIAPI
 UnitTestOpenProtocolInformation (
-  IN  EFI_HANDLE                          UserHandle,
-  IN  EFI_GUID                            *Protocol,
-  OUT EFI_OPEN_PROTOCOL_INFORMATION_ENTRY **EntryBuffer,
-  OUT UINTN                               *EntryCount
+  IN  EFI_HANDLE                           UserHandle,
+  IN  EFI_GUID                             *Protocol,
+  OUT EFI_OPEN_PROTOCOL_INFORMATION_ENTRY  **EntryBuffer,
+  OUT UINTN                                *EntryCount
   );
 
 /**
@@ -879,9 +875,9 @@ UnitTestOpenProtocolInformation (
 EFI_STATUS
 EFIAPI
 UnitTestProtocolsPerHandle (
-  IN EFI_HANDLE       UserHandle,
-  OUT EFI_GUID        ***ProtocolBuffer,
-  OUT UINTN           *ProtocolBufferCount
+  IN EFI_HANDLE  UserHandle,
+  OUT EFI_GUID   ***ProtocolBuffer,
+  OUT UINTN      *ProtocolBufferCount
   );
 
 /**
@@ -909,11 +905,11 @@ UnitTestProtocolsPerHandle (
 EFI_STATUS
 EFIAPI
 UnitTestLocateHandleBuffer (
-  IN EFI_LOCATE_SEARCH_TYPE       SearchType,
-  IN EFI_GUID                     *Protocol OPTIONAL,
-  IN VOID                         *SearchKey OPTIONAL,
-  IN OUT UINTN                    *NumberHandles,
-  OUT EFI_HANDLE                  **Buffer
+  IN EFI_LOCATE_SEARCH_TYPE  SearchType,
+  IN EFI_GUID                *Protocol OPTIONAL,
+  IN VOID                    *SearchKey OPTIONAL,
+  IN OUT UINTN               *NumberHandles,
+  OUT EFI_HANDLE             **Buffer
   );
 
 /**
@@ -964,7 +960,7 @@ UnitTestLocateProtocol (
 EFI_STATUS
 EFIAPI
 UnitTestInstallMultipleProtocolInterfaces (
-  IN OUT EFI_HANDLE           *Handle,
+  IN OUT EFI_HANDLE  *Handle,
   ...
   );
 
@@ -985,7 +981,7 @@ UnitTestInstallMultipleProtocolInterfaces (
 EFI_STATUS
 EFIAPI
 UnitTestUninstallMultipleProtocolInterfaces (
-  IN EFI_HANDLE           Handle,
+  IN EFI_HANDLE  Handle,
   ...
   );
 
@@ -1007,9 +1003,9 @@ UnitTestUninstallMultipleProtocolInterfaces (
 EFI_STATUS
 EFIAPI
 UnitTestCalculateCrc32 (
-  IN  VOID                              *Data,
-  IN  UINTN                             DataSize,
-  OUT UINT32                            *Crc32
+  IN  VOID    *Data,
+  IN  UINTN   DataSize,
+  OUT UINT32  *Crc32
   );
 
 /**
@@ -1035,11 +1031,11 @@ UnitTestCalculateCrc32 (
 EFI_STATUS
 EFIAPI
 UnitTestCreateEventEx (
-  IN UINT32                   Type,
-  IN EFI_TPL                  NotifyTpl,
-  IN EFI_EVENT_NOTIFY         NotifyFunction, OPTIONAL
+  IN UINT32 Type,
+  IN EFI_TPL NotifyTpl,
+  IN EFI_EVENT_NOTIFY NotifyFunction, OPTIONAL
   IN CONST VOID               *NotifyContext, OPTIONAL
-  IN CONST EFI_GUID           *EventGroup,    OPTIONAL
+  IN CONST EFI_GUID           *EventGroup, OPTIONAL
   OUT EFI_EVENT               *Event
   );
 

@@ -32,25 +32,25 @@
 
 #include "PrmInfo.h"
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringPrmInfoHelpTokenId = STRING_TOKEN (STR_PRMINFO_HELP);
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID  mStringPrmInfoHelpTokenId = STRING_TOKEN (STR_PRMINFO_HELP);
 //
 // This is the generated String package data for all .UNI files.
 // This data array is ready to be used as input of HiiAddPackages() to
 // create a packagelist (which contains Form packages, String packages, etc).
 //
-extern UINT8                PrmInfoStrings[];
+extern UINT8  PrmInfoStrings[];
 
-STATIC UINTN                mPrmHandlerCount;
-STATIC UINTN                mPrmModuleCount;
+STATIC UINTN  mPrmHandlerCount;
+STATIC UINTN  mPrmModuleCount;
 
-STATIC EFI_HII_HANDLE       mPrmInfoHiiHandle;
-STATIC LIST_ENTRY           mPrmHandlerList;
+STATIC EFI_HII_HANDLE  mPrmInfoHiiHandle;
+STATIC LIST_ENTRY      mPrmHandlerList;
 
-STATIC CONST SHELL_PARAM_ITEM mParamList[] = {
-  {L"-l", TypeFlag},
-  {L"-t", TypeValue},
-  {NULL, TypeMax}
-  };
+STATIC CONST SHELL_PARAM_ITEM  mParamList[] = {
+  { L"-l", TypeFlag  },
+  { L"-t", TypeValue },
+  { NULL,  TypeMax   }
+};
 
 /**
   Frees all of the nodes in a linked list.
@@ -61,12 +61,12 @@ STATIC CONST SHELL_PARAM_ITEM mParamList[] = {
 VOID
 EFIAPI
 FreeList (
-  IN LIST_ENTRY                         *ListHead
+  IN LIST_ENTRY  *ListHead
   )
 {
-  LIST_ENTRY                            *Link;
-  LIST_ENTRY                            *NextLink;
-  PRM_HANDLER_CONTEXT_LIST_ENTRY        *ListEntry;
+  LIST_ENTRY                      *Link;
+  LIST_ENTRY                      *NextLink;
+  PRM_HANDLER_CONTEXT_LIST_ENTRY  *ListEntry;
 
   if (ListHead == NULL) {
     return;
@@ -75,7 +75,7 @@ FreeList (
   Link = GetFirstNode (&mPrmHandlerList);
   while (!IsNull (&mPrmHandlerList, Link)) {
     ListEntry = CR (Link, PRM_HANDLER_CONTEXT_LIST_ENTRY, Link, PRM_HANDLER_CONTEXT_LIST_ENTRY_SIGNATURE);
-    NextLink = GetNextNode (&mPrmHandlerList, Link);
+    NextLink  = GetNextNode (&mPrmHandlerList, Link);
 
     RemoveEntryList (Link);
     FreePool (ListEntry);
@@ -96,12 +96,13 @@ CreateNewPrmHandlerListEntry (
   VOID
   )
 {
-  PRM_HANDLER_CONTEXT_LIST_ENTRY        *PrmHandlerContextListEntry;
+  PRM_HANDLER_CONTEXT_LIST_ENTRY  *PrmHandlerContextListEntry;
 
   PrmHandlerContextListEntry = AllocateZeroPool (sizeof (*PrmHandlerContextListEntry));
   if (PrmHandlerContextListEntry == NULL) {
     return NULL;
   }
+
   PrmHandlerContextListEntry->Signature = PRM_HANDLER_CONTEXT_LIST_ENTRY_SIGNATURE;
 
   return PrmHandlerContextListEntry;
@@ -118,14 +119,14 @@ PrintMmioRuntimeRangeInfo (
   IN PRM_RUNTIME_MMIO_RANGES  *RuntimeMmioRanges
   )
 {
-  UINTN RuntimeMmioRangeCount;
-  UINTN RuntimeMmioRangeIndex;
+  UINTN  RuntimeMmioRangeCount;
+  UINTN  RuntimeMmioRangeIndex;
 
   if (RuntimeMmioRanges == NULL) {
     return;
   }
 
-  RuntimeMmioRangeCount = (UINTN) RuntimeMmioRanges->Count;
+  RuntimeMmioRangeCount = (UINTN)RuntimeMmioRanges->Count;
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_RUNTIME_MMIO_COUNT), mPrmInfoHiiHandle, RuntimeMmioRangeCount);
 
   for (RuntimeMmioRangeIndex = 0; RuntimeMmioRangeIndex < RuntimeMmioRangeCount; RuntimeMmioRangeIndex++) {
@@ -154,25 +155,25 @@ PrintMmioRuntimeRangeInfo (
 **/
 VOID
 GatherPrmHandlerInfo (
-  IN  BOOLEAN                           PrintInformation
+  IN  BOOLEAN  PrintInformation
   )
 {
-  EFI_STATUS                            Status;
-  UINT16                                MajorVersion;
-  UINT16                                MinorVersion;
-  UINT16                                HandlerCount;
-  UINTN                                 HandlerIndex;
-  EFI_PHYSICAL_ADDRESS                  CurrentHandlerPhysicalAddress;
-  EFI_PHYSICAL_ADDRESS                  CurrentImageAddress;
-  PRM_HANDLER_CONTEXT                   CurrentHandlerContext;
-  EFI_GUID                              *CurrentModuleGuid;
-  EFI_IMAGE_EXPORT_DIRECTORY            *CurrentImageExportDirectory;
-  PRM_CONTEXT_BUFFER                    *CurrentContextBuffer;
-  PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT   *CurrentExportDescriptorStruct;
-  PRM_MODULE_CONTEXT_BUFFERS            *CurrentModuleContextBuffers;
-  PRM_HANDLER_CONTEXT_LIST_ENTRY        *CurrentHandlerContextListEntry;
-  PRM_MODULE_IMAGE_CONTEXT              *CurrentPrmModuleImageContext;
-  PRM_RUNTIME_MMIO_RANGES               *CurrentPrmModuleRuntimeMmioRanges;
+  EFI_STATUS                           Status;
+  UINT16                               MajorVersion;
+  UINT16                               MinorVersion;
+  UINT16                               HandlerCount;
+  UINTN                                HandlerIndex;
+  EFI_PHYSICAL_ADDRESS                 CurrentHandlerPhysicalAddress;
+  EFI_PHYSICAL_ADDRESS                 CurrentImageAddress;
+  PRM_HANDLER_CONTEXT                  CurrentHandlerContext;
+  EFI_GUID                             *CurrentModuleGuid;
+  EFI_IMAGE_EXPORT_DIRECTORY           *CurrentImageExportDirectory;
+  PRM_CONTEXT_BUFFER                   *CurrentContextBuffer;
+  PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT  *CurrentExportDescriptorStruct;
+  PRM_MODULE_CONTEXT_BUFFERS           *CurrentModuleContextBuffers;
+  PRM_HANDLER_CONTEXT_LIST_ENTRY       *CurrentHandlerContextListEntry;
+  PRM_MODULE_IMAGE_CONTEXT             *CurrentPrmModuleImageContext;
+  PRM_RUNTIME_MMIO_RANGES              *CurrentPrmModuleRuntimeMmioRanges;
 
   ASSERT (mPrmModuleCount <= mPrmHandlerCount);
 
@@ -182,25 +183,25 @@ GatherPrmHandlerInfo (
 
   // Iterate across all PRM modules discovered
   for (
-    CurrentPrmModuleImageContext = NULL, Status = GetNextPrmModuleEntry (&CurrentPrmModuleImageContext);
-    !EFI_ERROR (Status);
-    Status = GetNextPrmModuleEntry (&CurrentPrmModuleImageContext)) {
-
-    CurrentImageAddress = CurrentPrmModuleImageContext->PeCoffImageContext.ImageAddress;
-    CurrentImageExportDirectory = CurrentPrmModuleImageContext->ExportDirectory;
+       CurrentPrmModuleImageContext = NULL, Status = GetNextPrmModuleEntry (&CurrentPrmModuleImageContext);
+       !EFI_ERROR (Status);
+       Status = GetNextPrmModuleEntry (&CurrentPrmModuleImageContext))
+  {
+    CurrentImageAddress           = CurrentPrmModuleImageContext->PeCoffImageContext.ImageAddress;
+    CurrentImageExportDirectory   = CurrentPrmModuleImageContext->ExportDirectory;
     CurrentExportDescriptorStruct = CurrentPrmModuleImageContext->ExportDescriptor;
 
     CurrentModuleGuid = &CurrentExportDescriptorStruct->Header.ModuleGuid;
-    HandlerCount = CurrentExportDescriptorStruct->Header.NumberPrmHandlers;
+    HandlerCount      = CurrentExportDescriptorStruct->Header.NumberPrmHandlers;
 
     MajorVersion = 0;
     MinorVersion = 0;
-    Status =  GetImageVersionInPeCoffImage (
-                (VOID *) (UINTN) CurrentImageAddress,
-                &CurrentPrmModuleImageContext->PeCoffImageContext,
-                &MajorVersion,
-                &MinorVersion
-                );
+    Status       =  GetImageVersionInPeCoffImage (
+                      (VOID *)(UINTN)CurrentImageAddress,
+                      &CurrentPrmModuleImageContext->PeCoffImageContext,
+                      &MajorVersion,
+                      &MinorVersion
+                      );
     ASSERT_EFI_ERROR (Status);
 
     if (PrintInformation) {
@@ -210,7 +211,7 @@ GatherPrmHandlerInfo (
         NULL,
         STRING_TOKEN (STR_PRMINFO_MODULE_NAME),
         mPrmInfoHiiHandle,
-        (CHAR8 *) ((UINTN) CurrentImageAddress + CurrentImageExportDirectory->Name)
+        (CHAR8 *)((UINTN)CurrentImageAddress + CurrentImageExportDirectory->Name)
         );
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_MODULE_GUID), mPrmInfoHiiHandle, CurrentModuleGuid);
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_MODULE_VERSION), mPrmInfoHiiHandle, MajorVersion, MinorVersion);
@@ -218,13 +219,13 @@ GatherPrmHandlerInfo (
 
     // It is currently valid for a PRM module not to use a context buffer
     CurrentPrmModuleRuntimeMmioRanges = NULL;
-    Status = GetModuleContextBuffers (
-              ByModuleGuid,
-              CurrentModuleGuid,
-              (CONST PRM_MODULE_CONTEXT_BUFFERS **) &CurrentModuleContextBuffers
-              );
+    Status                            = GetModuleContextBuffers (
+                                          ByModuleGuid,
+                                          CurrentModuleGuid,
+                                          (CONST PRM_MODULE_CONTEXT_BUFFERS **)&CurrentModuleContextBuffers
+                                          );
     ASSERT (!EFI_ERROR (Status) || Status == EFI_NOT_FOUND);
-    if (!EFI_ERROR (Status) && CurrentModuleContextBuffers != NULL) {
+    if (!EFI_ERROR (Status) && (CurrentModuleContextBuffers != NULL)) {
       CurrentPrmModuleRuntimeMmioRanges = CurrentModuleContextBuffers->RuntimeMmioRanges;
     }
 
@@ -234,6 +235,7 @@ GatherPrmHandlerInfo (
       } else {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_NO_MMIO_RANGES), mPrmInfoHiiHandle);
       }
+
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_COUNT), mPrmInfoHiiHandle, HandlerCount);
     }
@@ -241,9 +243,9 @@ GatherPrmHandlerInfo (
     for (HandlerIndex = 0; HandlerIndex < HandlerCount; HandlerIndex++) {
       ZeroMem (&CurrentHandlerContext, sizeof (CurrentHandlerContext));
 
-      CurrentHandlerContext.ModuleName = (CHAR8 *) ((UINTN) CurrentImageAddress + CurrentImageExportDirectory->Name);
-      CurrentHandlerContext.Guid = &CurrentExportDescriptorStruct->PrmHandlerExportDescriptors[HandlerIndex].PrmHandlerGuid;
-      CurrentHandlerContext.Name = (CHAR8 *) CurrentExportDescriptorStruct->PrmHandlerExportDescriptors[HandlerIndex].PrmHandlerName;
+      CurrentHandlerContext.ModuleName = (CHAR8 *)((UINTN)CurrentImageAddress + CurrentImageExportDirectory->Name);
+      CurrentHandlerContext.Guid       = &CurrentExportDescriptorStruct->PrmHandlerExportDescriptors[HandlerIndex].PrmHandlerGuid;
+      CurrentHandlerContext.Name       = (CHAR8 *)CurrentExportDescriptorStruct->PrmHandlerExportDescriptors[HandlerIndex].PrmHandlerName;
 
       if (PrintInformation) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_NAME), mPrmInfoHiiHandle, CurrentHandlerContext.Name);
@@ -258,7 +260,7 @@ GatherPrmHandlerInfo (
                   );
       ASSERT_EFI_ERROR (Status);
       if (!EFI_ERROR (Status)) {
-        CurrentHandlerContext.Handler = (PRM_HANDLER *) (UINTN) CurrentHandlerPhysicalAddress;
+        CurrentHandlerContext.Handler = (PRM_HANDLER *)(UINTN)CurrentHandlerPhysicalAddress;
 
         if (PrintInformation) {
           ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_PA), mPrmInfoHiiHandle, CurrentHandlerPhysicalAddress);
@@ -272,7 +274,7 @@ GatherPrmHandlerInfo (
       Status =  GetContextBuffer (
                   CurrentHandlerContext.Guid,
                   CurrentModuleContextBuffers,
-                  (CONST PRM_CONTEXT_BUFFER **) &CurrentContextBuffer
+                  (CONST PRM_CONTEXT_BUFFER **)&CurrentContextBuffer
                   );
       if (!EFI_ERROR (Status)) {
         CurrentHandlerContext.StaticDataBuffer = CurrentContextBuffer->StaticDataBuffer;
@@ -286,7 +288,7 @@ GatherPrmHandlerInfo (
             NULL,
             STRING_TOKEN (STR_PRMINFO_STATIC_DATA_BUFFER),
             mPrmInfoHiiHandle,
-            (UINTN) CurrentHandlerContext.StaticDataBuffer
+            (UINTN)CurrentHandlerContext.StaticDataBuffer
             );
         } else {
           ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
@@ -324,19 +326,19 @@ GatherPrmHandlerInfo (
 **/
 EFI_STATUS
 PopulateContextBuffer (
-  IN  PRM_DATA_BUFFER                   *StaticDataBuffer OPTIONAL,
-  IN  EFI_GUID                          *HandlerGuid,
-  IN  PRM_CONTEXT_BUFFER                *ContextBuffer
+  IN  PRM_DATA_BUFFER     *StaticDataBuffer OPTIONAL,
+  IN  EFI_GUID            *HandlerGuid,
+  IN  PRM_CONTEXT_BUFFER  *ContextBuffer
   )
 {
-  if (HandlerGuid == NULL || ContextBuffer == NULL) {
+  if ((HandlerGuid == NULL) || (ContextBuffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   ZeroMem (ContextBuffer, sizeof (*ContextBuffer));
 
   ContextBuffer->Signature = PRM_CONTEXT_BUFFER_SIGNATURE;
-  ContextBuffer->Version = PRM_CONTEXT_BUFFER_INTERFACE_VERSION;
+  ContextBuffer->Version   = PRM_CONTEXT_BUFFER_INTERFACE_VERSION;
   CopyGuid (&ContextBuffer->HandlerGuid, HandlerGuid);
 
   if (StaticDataBuffer != NULL) {
@@ -354,7 +356,7 @@ PopulateContextBuffer (
 **/
 VOID
 PrintExecutionTime (
-  IN  UINT64                            TimeInNanoSec
+  IN  UINT64  TimeInNanoSec
   )
 {
   UINT64  Sec;
@@ -363,24 +365,24 @@ PrintExecutionTime (
   UINT64  NanoSec;
   UINT64  RemainingTime;
 
-  Sec = 0;
-  MilliSec = 0;
-  MicroSec = 0;
-  NanoSec = 0;
+  Sec           = 0;
+  MilliSec      = 0;
+  MicroSec      = 0;
+  NanoSec       = 0;
   RemainingTime = TimeInNanoSec;
 
-  if (RemainingTime > ONE_SECOND)  {
-    Sec = DivU64x32 (RemainingTime, ONE_SECOND);
+  if (RemainingTime > ONE_SECOND) {
+    Sec            = DivU64x32 (RemainingTime, ONE_SECOND);
     RemainingTime -= MultU64x32 (Sec, ONE_SECOND);
   }
 
   if (RemainingTime > ONE_MILLISECOND) {
-    MilliSec = DivU64x32 (RemainingTime, ONE_MILLISECOND);
+    MilliSec       = DivU64x32 (RemainingTime, ONE_MILLISECOND);
     RemainingTime -= MultU64x32 (MilliSec, ONE_MILLISECOND);
   }
 
   if (RemainingTime > ONE_MICROSECOND) {
-    MicroSec = DivU64x32 (RemainingTime, ONE_MICROSECOND);
+    MicroSec       = DivU64x32 (RemainingTime, ONE_MICROSECOND);
     RemainingTime -= MultU64x32 (MicroSec, ONE_MICROSECOND);
   }
 
@@ -412,20 +414,20 @@ PrintExecutionTime (
 **/
 EFI_STATUS
 ExecutePrmHandlerByGuid (
-  IN  EFI_GUID                          *HandlerGuid
+  IN  EFI_GUID  *HandlerGuid
   )
 {
-  EFI_STATUS                            Status;
-  BOOLEAN                               ExecuteAllHandlers;
-  BOOLEAN                               HandlerFound;
-  UINT64                                StartTime;
-  UINT64                                EndTime;
-  PRM_CONTEXT_BUFFER                    CurrentContextBuffer;
-  PRM_HANDLER_CONTEXT                   *HandlerContext;
-  PRM_HANDLER_CONTEXT_LIST_ENTRY        *HandlerContextListEntry;
-  LIST_ENTRY                            *Link;
+  EFI_STATUS                      Status;
+  BOOLEAN                         ExecuteAllHandlers;
+  BOOLEAN                         HandlerFound;
+  UINT64                          StartTime;
+  UINT64                          EndTime;
+  PRM_CONTEXT_BUFFER              CurrentContextBuffer;
+  PRM_HANDLER_CONTEXT             *HandlerContext;
+  PRM_HANDLER_CONTEXT_LIST_ENTRY  *HandlerContextListEntry;
+  LIST_ENTRY                      *Link;
 
-  Link = NULL;
+  Link         = NULL;
   HandlerFound = FALSE;
 
   if (HandlerGuid == NULL) {
@@ -439,14 +441,14 @@ ExecutePrmHandlerByGuid (
 
   EFI_LIST_FOR_EACH (Link, &mPrmHandlerList) {
     HandlerContextListEntry = CR (Link, PRM_HANDLER_CONTEXT_LIST_ENTRY, Link, PRM_HANDLER_CONTEXT_LIST_ENTRY_SIGNATURE);
-    HandlerContext = &HandlerContextListEntry->Context;
+    HandlerContext          = &HandlerContextListEntry->Context;
 
     if (!ExecuteAllHandlers && !CompareGuid (HandlerGuid, HandlerContext->Guid)) {
       continue;
     }
 
     HandlerFound = TRUE;
-    Status = PopulateContextBuffer (HandlerContext->StaticDataBuffer, HandlerContext->Guid, &CurrentContextBuffer);
+    Status       = PopulateContextBuffer (HandlerContext->StaticDataBuffer, HandlerContext->Guid, &CurrentContextBuffer);
     if (!EFI_ERROR (Status)) {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
       ShellPrintHiiEx (
@@ -461,10 +463,11 @@ ExecutePrmHandlerByGuid (
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_GUID), mPrmInfoHiiHandle, HandlerContext->Guid);
 
       StartTime = 0;
-      EndTime = 0;
+      EndTime   = 0;
       if (PcdGetBool (PcdPrmInfoPrintHandlerExecutionTime)) {
         StartTime = GetPerformanceCounter ();
       }
+
       Status = HandlerContext->Handler (NULL, &CurrentContextBuffer);
       if (PcdGetBool (PcdPrmInfoPrintHandlerExecutionTime)) {
         EndTime = GetPerformanceCounter ();
@@ -477,11 +480,12 @@ ExecutePrmHandlerByGuid (
       }
 
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_EXEC_TIME), mPrmInfoHiiHandle);
-      if (StartTime == 0 && EndTime == 0) {
+      if ((StartTime == 0) && (EndTime == 0)) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_UNKNOWN), mPrmInfoHiiHandle);
       } else {
         PrintExecutionTime (GetTimeInNanoSecond (EndTime - StartTime));
       }
+
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
     } else {
@@ -519,20 +523,20 @@ ParseParameterList (
   VOID
   )
 {
-  EFI_STATUS                            Status;
-  EFI_STATUS                            ReturnStatus;
-  UINTN                                 ArgumentCount;
-  EFI_GUID                              HandlerGuid;
-  BOOLEAN                               PrintHandlerInfo;
-  LIST_ENTRY                            *Package;
-  LIST_ENTRY                            *TempNode;
-  CHAR16                                *ProblemParam;
-  CONST CHAR16                          *HandlerGuidStr;
+  EFI_STATUS    Status;
+  EFI_STATUS    ReturnStatus;
+  UINTN         ArgumentCount;
+  EFI_GUID      HandlerGuid;
+  BOOLEAN       PrintHandlerInfo;
+  LIST_ENTRY    *Package;
+  LIST_ENTRY    *TempNode;
+  CHAR16        *ProblemParam;
+  CONST CHAR16  *HandlerGuidStr;
 
-  HandlerGuidStr = NULL;
-  Package = NULL;
+  HandlerGuidStr   = NULL;
+  Package          = NULL;
   PrintHandlerInfo = FALSE;
-  ReturnStatus = EFI_SUCCESS;
+  ReturnStatus     = EFI_SUCCESS;
 
   InitializeListHead (&mPrmHandlerList);
 
@@ -541,7 +545,7 @@ ParseParameterList (
   //
   Status = ShellCommandLineParseEx (mParamList, &Package, &ProblemParam, FALSE, FALSE);
   if (EFI_ERROR (Status)) {
-    if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_GEN_PROBLEM), mPrmInfoHiiHandle, APPLICATION_NAME, ProblemParam);
       ReturnStatus = EFI_INVALID_PARAMETER;
       FreePool (ProblemParam);
@@ -561,10 +565,12 @@ ParseParameterList (
   // Get argument count including flags
   //
   for (
-    ArgumentCount = 0, TempNode = Package;
-    GetNextNode (Package, TempNode) != Package;
-    ArgumentCount++, TempNode = GetNextNode (Package, TempNode)
-    );
+       ArgumentCount = 0, TempNode = Package;
+       GetNextNode (Package, TempNode) != Package;
+       ArgumentCount++, TempNode = GetNextNode (Package, TempNode)
+       )
+  {
+  }
 
   if (ArgumentCount == 1) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_NO_ARG), mPrmInfoHiiHandle, APPLICATION_NAME);
@@ -635,13 +641,14 @@ ParseParameterList (
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLERS_FOUND), mPrmInfoHiiHandle, mPrmHandlerCount);
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_LINE_BREAK), mPrmInfoHiiHandle);
   }
+
   GatherPrmHandlerInfo (PrintHandlerInfo);
 
   if (HandlerGuidStr != NULL) {
-      Status = ExecutePrmHandlerByGuid (&HandlerGuid);
-      if (Status == EFI_NOT_FOUND) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_NOT_FOUND), mPrmInfoHiiHandle, APPLICATION_NAME, HandlerGuid);
-      }
+    Status = ExecutePrmHandlerByGuid (&HandlerGuid);
+    if (Status == EFI_NOT_FOUND) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PRMINFO_HANDLER_NOT_FOUND), mPrmInfoHiiHandle, APPLICATION_NAME, HandlerGuid);
+    }
   }
 
 Done:
@@ -667,12 +674,12 @@ Done:
 EFI_STATUS
 EFIAPI
 UefiMain (
-  IN EFI_HANDLE                         ImageHandle,
-  IN EFI_SYSTEM_TABLE                   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                    Status;
-  EFI_HII_PACKAGE_LIST_HEADER   *PackageList;
+  EFI_STATUS                   Status;
+  EFI_HII_PACKAGE_LIST_HEADER  *PackageList;
 
   //
   // Retrieve the HII package list from ImageHandle
@@ -680,7 +687,7 @@ UefiMain (
   Status = gBS->OpenProtocol (
                   ImageHandle,
                   &gEfiHiiPackageListProtocolGuid,
-                  (VOID **) &PackageList,
+                  (VOID **)&PackageList,
                   ImageHandle,
                   NULL,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
