@@ -1,0 +1,36 @@
+## @file
+#  Provides default implementation of VariableKeyLib.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010029
+  BASE_NAME                      = VariableKeyLib
+  FILE_GUID                      = 7DF5A0BA-1DBB-4E67-A9F7-9FCCB1F9D250
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = VariableKeyLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 Arm AArch64
+#
+
+[Sources]
+  VariableKeyLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+
+[PpiS]
+  gKeyServicePpiGuid ## CONSUMES
+
