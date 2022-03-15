@@ -27,8 +27,8 @@
 // copy the ACPI parameter buffer address to the PRMT ACPI table.
 //
 typedef struct {
-  EFI_GUID                              HandlerGuid;
-  UINT64                                AcpiParameterBufferAddress;
+  EFI_GUID    HandlerGuid;
+  UINT64      AcpiParameterBufferAddress;
 } ACPI_PARAMETER_BUFFER_DESCRIPTOR;
 
 //
@@ -45,22 +45,22 @@ typedef struct {
   ///
   /// Signature of this interface.
   ///
-  UINT32                                  Signature;
+  UINT32      Signature;
 
   ///
   /// Version of this interface.
   ///
-  UINT16                                  Version;
+  UINT16      Version;
 
   ///
   /// Reserved field.
   ///
-  UINT16                                  Reserved;
+  UINT16      Reserved;
 
   ///
   /// The GUID of the PRM handler represented by this context instance.
   ///
-  EFI_GUID                                HandlerGuid;
+  EFI_GUID    HandlerGuid;
 
   ///
   /// A virtual address pointer to the static data buffer allocated for
@@ -71,7 +71,7 @@ typedef struct {
   ///
   /// This pointer may be NULL if a static data buffer is not needed.
   ///
-  PRM_DATA_BUFFER                         *StaticDataBuffer;
+  PRM_DATA_BUFFER    *StaticDataBuffer;
 
   ///
   /// A virtual address pointer to an array of PRM_RUNTIME_MMIO_RANGE
@@ -91,30 +91,29 @@ typedef struct {
   ///
   /// This pointer may be NULL if runtime memory ranges are not needed.
   ///
-  PRM_RUNTIME_MMIO_RANGES                 *RuntimeMmioRanges;
+  PRM_RUNTIME_MMIO_RANGES    *RuntimeMmioRanges;
 } PRM_CONTEXT_BUFFER;
 
 //
 // A firmware internal data structure used to track context buffer and
 // runtime MMIO range usage across a PRM module.
 //
-typedef struct
-{
+typedef struct {
   ///
   /// The GUID of the PRM module.
   ///
-  EFI_GUID                                ModuleGuid;
+  EFI_GUID              ModuleGuid;
 
   ///
   /// The number of PRM context buffers in ContextBuffers[].
   /// This count should equal the number of PRM handlers in the module being configured.
   ///
-  UINTN                                   BufferCount;
+  UINTN                 BufferCount;
 
   ///
   /// A pointer to an array of PRM context buffers
   ///
-  PRM_CONTEXT_BUFFER                      *Buffer;
+  PRM_CONTEXT_BUFFER    *Buffer;
 
   /// The MMIO ranges are defined in the firmware boot environment.
   /// The addresses within the PRM_RUNTIME_MMIO_RANGES structure will
@@ -135,13 +134,13 @@ typedef struct
   ///
   /// This pointer may be NULL if runtime memory ranges are not needed.
   ///
-  PRM_RUNTIME_MMIO_RANGES                 *RuntimeMmioRanges;
+  PRM_RUNTIME_MMIO_RANGES    *RuntimeMmioRanges;
 
   ///
   /// The number of ACPI parameter buffer descriptors in the array
   /// AcpiParameterBufferDescriptors
   ///
-  UINTN                                   AcpiParameterBufferDescriptorCount;
+  UINTN                      AcpiParameterBufferDescriptorCount;
 
   ///
   /// A pointer to an array of ACPI parameter buffer descriptors. PRM module
@@ -164,7 +163,7 @@ typedef struct
   /// for each PRM handler that actually uses an ACPI parameter buffer. If
   /// no handlers use an ACPI parameter buffer this pointer should be NULL.
   ///
-  ACPI_PARAMETER_BUFFER_DESCRIPTOR        *AcpiParameterBufferDescriptors;
+  ACPI_PARAMETER_BUFFER_DESCRIPTOR    *AcpiParameterBufferDescriptors;
 } PRM_MODULE_CONTEXT_BUFFERS;
 
 #pragma pack(pop)

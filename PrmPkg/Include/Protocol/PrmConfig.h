@@ -19,14 +19,13 @@
 
 typedef struct _PRM_CONFIG_PROTOCOL PRM_CONFIG_PROTOCOL;
 
-#define PRM_CONFIG_PROTOCOL_SIGNATURE   SIGNATURE_32('P','M','C','P')
-#define PRM_CONFIG_PROTOCOL_VERSION     1
+#define PRM_CONFIG_PROTOCOL_SIGNATURE  SIGNATURE_32('P','M','C','P')
+#define PRM_CONFIG_PROTOCOL_VERSION    1
 
-struct _PRM_CONFIG_PROTOCOL
-{
-  PRM_MODULE_CONTEXT_BUFFERS            ModuleContextBuffers;
+struct _PRM_CONFIG_PROTOCOL {
+  PRM_MODULE_CONTEXT_BUFFERS    ModuleContextBuffers;
 };
 
-extern EFI_GUID gPrmConfigProtocolGuid;
+extern EFI_GUID  gPrmConfigProtocolGuid;
 
 #endif

@@ -12,14 +12,14 @@
 
 #include <PrmModuleImageContext.h>
 
-#define PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY_SIGNATURE SIGNATURE_32('P','R','M','E')
+#define PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY_SIGNATURE  SIGNATURE_32('P','R','M','E')
 
 #pragma pack(push, 1)
 
 typedef struct {
-  UINTN                                 Signature;
-  LIST_ENTRY                            Link;
-  PRM_MODULE_IMAGE_CONTEXT              Context;
+  UINTN                       Signature;
+  LIST_ENTRY                  Link;
+  PRM_MODULE_IMAGE_CONTEXT    Context;
 } PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY;
 
 #pragma pack(pop)

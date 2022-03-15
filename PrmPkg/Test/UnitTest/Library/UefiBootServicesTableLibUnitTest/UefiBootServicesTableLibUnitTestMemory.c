@@ -29,9 +29,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 UnitTestAllocatePages (
-  IN EFI_ALLOCATE_TYPE      Type,
-  IN EFI_MEMORY_TYPE        MemoryType,
-  IN UINTN                  NumberOfPages,
+  IN EFI_ALLOCATE_TYPE         Type,
+  IN EFI_MEMORY_TYPE           MemoryType,
+  IN UINTN                     NumberOfPages,
   IN OUT EFI_PHYSICAL_ADDRESS  *Memory
   )
 {
@@ -52,8 +52,8 @@ UnitTestAllocatePages (
 EFI_STATUS
 EFIAPI
 UnitTestFreePages (
-  IN EFI_PHYSICAL_ADDRESS   Memory,
-  IN UINTN                  NumberOfPages
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NumberOfPages
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -138,7 +138,7 @@ UnitTestAllocatePool (
 EFI_STATUS
 EFIAPI
 UnitTestFreePool (
-  IN VOID        *Buffer
+  IN VOID  *Buffer
   )
 {
   return EFI_NOT_AVAILABLE_YET;

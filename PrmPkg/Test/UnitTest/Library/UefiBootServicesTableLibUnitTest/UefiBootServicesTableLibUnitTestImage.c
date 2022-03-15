@@ -45,12 +45,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 UnitTestLoadImage (
-  IN BOOLEAN                    BootPolicy,
-  IN EFI_HANDLE                 ParentImageHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL   *FilePath,
-  IN VOID                       *SourceBuffer   OPTIONAL,
-  IN UINTN                      SourceSize,
-  OUT EFI_HANDLE                *ImageHandle
+  IN BOOLEAN                   BootPolicy,
+  IN EFI_HANDLE                ParentImageHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL  *FilePath,
+  IN VOID                      *SourceBuffer   OPTIONAL,
+  IN UINTN                     SourceSize,
+  OUT EFI_HANDLE               *ImageHandle
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -155,8 +155,8 @@ UnitTestUnloadImage (
 EFI_STATUS
 EFIAPI
 UnitTestExitBootServices (
-  IN EFI_HANDLE   ImageHandle,
-  IN UINTN        MapKey
+  IN EFI_HANDLE  ImageHandle,
+  IN UINTN       MapKey
   )
 {
   return EFI_NOT_AVAILABLE_YET;

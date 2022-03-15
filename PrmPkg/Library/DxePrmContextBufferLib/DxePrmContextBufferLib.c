@@ -14,7 +14,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/PrmConfig.h>
 
-#define _DBGMSGID_        "[PRMCONTEXTBUFFERLIB]"
+#define _DBGMSGID_  "[PRMCONTEXTBUFFERLIB]"
 
 /**
   Finds a PRM context buffer for the given PRM handler GUID.
@@ -33,16 +33,16 @@
 **/
 EFI_STATUS
 FindContextBufferInModuleBuffers (
-  IN  CONST EFI_GUID                      *HandlerGuid,
-  IN  CONST PRM_MODULE_CONTEXT_BUFFERS    *ModuleContextBuffers,
-  OUT CONST PRM_CONTEXT_BUFFER            **ContextBuffer
+  IN  CONST EFI_GUID                    *HandlerGuid,
+  IN  CONST PRM_MODULE_CONTEXT_BUFFERS  *ModuleContextBuffers,
+  OUT CONST PRM_CONTEXT_BUFFER          **ContextBuffer
   )
 {
-  UINTN                                   Index;
+  UINTN  Index;
 
   DEBUG ((DEBUG_INFO, "    %a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
 
-  if (HandlerGuid == NULL || ModuleContextBuffers == NULL || ContextBuffer == NULL) {
+  if ((HandlerGuid == NULL) || (ModuleContextBuffers == NULL) || (ContextBuffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -77,23 +77,24 @@ FindContextBufferInModuleBuffers (
 **/
 EFI_STATUS
 GetModuleContextBuffers (
-  IN  PRM_GUID_SEARCH_TYPE                GuidSearchType,
-  IN  CONST EFI_GUID                      *Guid,
-  OUT CONST PRM_MODULE_CONTEXT_BUFFERS    **PrmModuleContextBuffers
+  IN  PRM_GUID_SEARCH_TYPE              GuidSearchType,
+  IN  CONST EFI_GUID                    *Guid,
+  OUT CONST PRM_MODULE_CONTEXT_BUFFERS  **PrmModuleContextBuffers
   )
 {
-  EFI_STATUS                  Status;
-  UINTN                       HandleCount;
-  UINTN                       Index;
-  EFI_HANDLE                  *HandleBuffer;
-  PRM_CONFIG_PROTOCOL         *PrmConfigProtocol;
-  CONST PRM_CONTEXT_BUFFER    *PrmContextBuffer;
+  EFI_STATUS                Status;
+  UINTN                     HandleCount;
+  UINTN                     Index;
+  EFI_HANDLE                *HandleBuffer;
+  PRM_CONFIG_PROTOCOL       *PrmConfigProtocol;
+  CONST PRM_CONTEXT_BUFFER  *PrmContextBuffer;
 
   DEBUG ((DEBUG_INFO, "    %a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
 
-  if (Guid == NULL || PrmModuleContextBuffers == NULL) {
+  if ((Guid == NULL) || (PrmModuleContextBuffers == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
   *PrmModuleContextBuffers = NULL;
 
   Status = gBS->LocateHandleBuffer (
@@ -108,10 +109,10 @@ GetModuleContextBuffers (
       Status = gBS->HandleProtocol (
                       HandleBuffer[Index],
                       &gPrmConfigProtocolGuid,
-                      (VOID **) &PrmConfigProtocol
+                      (VOID **)&PrmConfigProtocol
                       );
       ASSERT_EFI_ERROR (Status);
-      if (EFI_ERROR (Status) || PrmConfigProtocol == NULL) {
+      if (EFI_ERROR (Status) || (PrmConfigProtocol == NULL)) {
         continue;
       }
 
@@ -167,19 +168,20 @@ GetModuleContextBuffers (
 **/
 EFI_STATUS
 GetContextBuffer (
-  IN  CONST EFI_GUID                      *PrmHandlerGuid,
-  IN  CONST PRM_MODULE_CONTEXT_BUFFERS    *PrmModuleContextBuffers  OPTIONAL,
-  OUT CONST PRM_CONTEXT_BUFFER            **PrmContextBuffer
+  IN  CONST EFI_GUID                    *PrmHandlerGuid,
+  IN  CONST PRM_MODULE_CONTEXT_BUFFERS  *PrmModuleContextBuffers  OPTIONAL,
+  OUT CONST PRM_CONTEXT_BUFFER          **PrmContextBuffer
   )
 {
-  EFI_STATUS                              Status;
-  CONST PRM_MODULE_CONTEXT_BUFFERS        *ContextBuffers;
+  EFI_STATUS                        Status;
+  CONST PRM_MODULE_CONTEXT_BUFFERS  *ContextBuffers;
 
   DEBUG ((DEBUG_INFO, "    %a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
 
-  if (PrmHandlerGuid == NULL || PrmContextBuffer == NULL) {
+  if ((PrmHandlerGuid == NULL) || (PrmContextBuffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
   *PrmContextBuffer = NULL;
 
   if (PrmModuleContextBuffers == NULL) {
@@ -190,6 +192,7 @@ GetContextBuffer (
   } else {
     ContextBuffers = PrmModuleContextBuffers;
   }
+
   Status = FindContextBufferInModuleBuffers (PrmHandlerGuid, ContextBuffers, PrmContextBuffer);
 
   return Status;
