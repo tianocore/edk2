@@ -28,7 +28,7 @@ steps:
     cat /etc/os-release
     python3 --version
 
-- script: pip install -r pip-requirements.txt --upgrade
+- script: pip3 install -r pip-requirements.txt --upgrade
   displayName: 'Install/Upgrade pip modules'
 
 # Set default
