@@ -8,10 +8,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "UefiBootServicesTableLibUnitTestProtocol.h"
 
-STATIC LIST_ENTRY   mProtocolDatabase       = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolDatabase);
-STATIC LIST_ENTRY   gHandleList             = INITIALIZE_LIST_HEAD_VARIABLE (gHandleList);
-STATIC UINT64       gHandleDatabaseKey      = 0;
-STATIC UINTN        mEfiLocateHandleRequest = 0;
+STATIC LIST_ENTRY  mProtocolDatabase       = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolDatabase);
+STATIC LIST_ENTRY  gHandleList             = INITIALIZE_LIST_HEAD_VARIABLE (gHandleList);
+STATIC UINT64      gHandleDatabaseKey      = 0;
+STATIC UINTN       mEfiLocateHandleRequest = 0;
 
 //
 // Helper Functions
@@ -27,12 +27,12 @@ STATIC UINTN        mEfiLocateHandleRequest = 0;
 
 **/
 EFI_STATUS
- UnitTestValidateHandle (
-  IN  EFI_HANDLE                UserHandle
+UnitTestValidateHandle (
+  IN  EFI_HANDLE  UserHandle
   )
 {
-  IHANDLE             *Handle;
-  LIST_ENTRY          *Link;
+  IHANDLE     *Handle;
+  LIST_ENTRY  *Link;
 
   if (UserHandle == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -40,7 +40,7 @@ EFI_STATUS
 
   for (Link = gHandleList.BackLink; Link != &gHandleList; Link = Link->BackLink) {
     Handle = CR (Link, IHANDLE, AllHandles, EFI_HANDLE_SIGNATURE);
-    if (Handle == (IHANDLE *) UserHandle) {
+    if (Handle == (IHANDLE *)UserHandle) {
       return EFI_SUCCESS;
     }
   }
@@ -59,13 +59,13 @@ EFI_STATUS
 **/
 PROTOCOL_ENTRY  *
 UnitTestFindProtocolEntry (
-  IN EFI_GUID   *Protocol,
-  IN BOOLEAN    Create
+  IN EFI_GUID  *Protocol,
+  IN BOOLEAN   Create
   )
 {
-  LIST_ENTRY          *Link;
-  PROTOCOL_ENTRY      *Item;
-  PROTOCOL_ENTRY      *ProtEntry;
+  LIST_ENTRY      *Link;
+  PROTOCOL_ENTRY  *Item;
+  PROTOCOL_ENTRY  *ProtEntry;
 
   //
   // Search the database for the matching GUID
@@ -74,11 +74,10 @@ UnitTestFindProtocolEntry (
   ProtEntry = NULL;
   for (Link = mProtocolDatabase.ForwardLink;
        Link != &mProtocolDatabase;
-       Link = Link->ForwardLink) {
-
+       Link = Link->ForwardLink)
+  {
     Item = CR (Link, PROTOCOL_ENTRY, AllEntries, PROTOCOL_ENTRY_SIGNATURE);
     if (CompareGuid (&Item->ProtocolID, Protocol)) {
-
       //
       // This is the protocol entry
       //
@@ -100,7 +99,7 @@ UnitTestFindProtocolEntry (
       // Initialize new protocol entry structure
       //
       ProtEntry->Signature = PROTOCOL_ENTRY_SIGNATURE;
-      CopyGuid ((VOID *) &ProtEntry->ProtocolID, Protocol);
+      CopyGuid ((VOID *)&ProtEntry->ProtocolID, Protocol);
       InitializeListHead (&ProtEntry->Protocols);
       InitializeListHead (&ProtEntry->Notify);
 
@@ -128,9 +127,9 @@ UnitTestFindProtocolEntry (
 **/
 PROTOCOL_INTERFACE *
 UnitTestFindProtocolInterface (
-  IN IHANDLE        *Handle,
-  IN EFI_GUID       *Protocol,
-  IN VOID           *Interface
+  IN IHANDLE   *Handle,
+  IN EFI_GUID  *Protocol,
+  IN VOID      *Interface
   )
 {
   PROTOCOL_INTERFACE  *Prot;
@@ -145,17 +144,15 @@ UnitTestFindProtocolInterface (
 
   ProtEntry = UnitTestFindProtocolEntry (Protocol, FALSE);
   if (ProtEntry != NULL) {
-
     //
     // Look at each protocol interface for any matches
     //
-    for (Link = Handle->Protocols.ForwardLink; Link != &Handle->Protocols; Link=Link->ForwardLink) {
-
+    for (Link = Handle->Protocols.ForwardLink; Link != &Handle->Protocols; Link = Link->ForwardLink) {
       //
       // If this protocol interface matches, remove it
       //
-      Prot = CR(Link, PROTOCOL_INTERFACE, Link, PROTOCOL_INTERFACE_SIGNATURE);
-      if (Prot->Interface == Interface && Prot->Protocol == ProtEntry) {
+      Prot = CR (Link, PROTOCOL_INTERFACE, Link, PROTOCOL_INTERFACE_SIGNATURE);
+      if ((Prot->Interface == Interface) && (Prot->Protocol == ProtEntry)) {
         break;
       }
 
@@ -174,14 +171,14 @@ UnitTestFindProtocolInterface (
 **/
 VOID
 UnitTestNotifyProtocolEntry (
-  IN PROTOCOL_ENTRY   *ProtEntry
+  IN PROTOCOL_ENTRY  *ProtEntry
   )
 {
-  PROTOCOL_NOTIFY     *ProtNotify;
-  LIST_ENTRY          *Link;
+  PROTOCOL_NOTIFY  *ProtNotify;
+  LIST_ENTRY       *Link;
 
-  for (Link=ProtEntry->Notify.ForwardLink; Link != &ProtEntry->Notify; Link=Link->ForwardLink) {
-    ProtNotify = CR(Link, PROTOCOL_NOTIFY, Link, PROTOCOL_NOTIFY_SIGNATURE);
+  for (Link = ProtEntry->Notify.ForwardLink; Link != &ProtEntry->Notify; Link = Link->ForwardLink) {
+    ProtNotify = CR (Link, PROTOCOL_NOTIFY, Link, PROTOCOL_NOTIFY_SIGNATURE);
     UnitTestSignalEvent (ProtNotify->Event);
   }
 }
@@ -199,11 +196,11 @@ UnitTestNotifyProtocolEntry (
 **/
 IHANDLE *
 UnitTestGetNextLocateAllHandles (
-  IN OUT LOCATE_POSITION    *Position,
-  OUT VOID                  **Interface
+  IN OUT LOCATE_POSITION  *Position,
+  OUT VOID                **Interface
   )
 {
-  IHANDLE     *Handle;
+  IHANDLE  *Handle;
 
   //
   // Next handle
@@ -213,8 +210,8 @@ UnitTestGetNextLocateAllHandles (
   //
   // If not at the end of the list, get the handle
   //
-  Handle      = NULL;
-  *Interface  = NULL;
+  Handle     = NULL;
+  *Interface = NULL;
   if (Position->Position != &gHandleList) {
     Handle = CR (Position->Position, IHANDLE, AllHandles, EFI_HANDLE_SIGNATURE);
   }
@@ -236,8 +233,8 @@ UnitTestGetNextLocateAllHandles (
 **/
 IHANDLE *
 UnitTestGetNextLocateByRegisterNotify (
-  IN OUT LOCATE_POSITION    *Position,
-  OUT VOID                  **Interface
+  IN OUT LOCATE_POSITION  *Position,
+  OUT VOID                **Interface
   )
 {
   IHANDLE             *Handle;
@@ -245,8 +242,8 @@ UnitTestGetNextLocateByRegisterNotify (
   PROTOCOL_INTERFACE  *Prot;
   LIST_ENTRY          *Link;
 
-  Handle      = NULL;
-  *Interface  = NULL;
+  Handle     = NULL;
+  *Interface = NULL;
   ProtNotify = Position->SearchKey;
 
   //
@@ -261,15 +258,14 @@ UnitTestGetNextLocateByRegisterNotify (
     //
     Link = ProtNotify->Position->ForwardLink;
     if (Link != &ProtNotify->Protocol->Protocols) {
-      Prot = CR (Link, PROTOCOL_INTERFACE, ByProtocol, PROTOCOL_INTERFACE_SIGNATURE);
-      Handle = Prot->Handle;
+      Prot       = CR (Link, PROTOCOL_INTERFACE, ByProtocol, PROTOCOL_INTERFACE_SIGNATURE);
+      Handle     = Prot->Handle;
       *Interface = Prot->Interface;
     }
   }
 
   return Handle;
 }
-
 
 /**
   Routine to get the next Handle, when you are searching for a given protocol.
@@ -284,21 +280,21 @@ UnitTestGetNextLocateByRegisterNotify (
 **/
 IHANDLE *
 UnitTestGetNextLocateByProtocol (
-  IN OUT LOCATE_POSITION    *Position,
-  OUT VOID                  **Interface
+  IN OUT LOCATE_POSITION  *Position,
+  OUT VOID                **Interface
   )
 {
   IHANDLE             *Handle;
   LIST_ENTRY          *Link;
   PROTOCOL_INTERFACE  *Prot;
 
-  Handle      = NULL;
-  *Interface  = NULL;
-  for (; ;) {
+  Handle     = NULL;
+  *Interface = NULL;
+  for ( ; ;) {
     //
     // Next entry
     //
-    Link = Position->Position->ForwardLink;
+    Link               = Position->Position->ForwardLink;
     Position->Position = Link;
 
     //
@@ -312,8 +308,8 @@ UnitTestGetNextLocateByProtocol (
     //
     // Get the handle
     //
-    Prot = CR (Link, PROTOCOL_INTERFACE, ByProtocol, PROTOCOL_INTERFACE_SIGNATURE);
-    Handle = Prot->Handle;
+    Prot       = CR (Link, PROTOCOL_INTERFACE, ByProtocol, PROTOCOL_INTERFACE_SIGNATURE);
+    Handle     = Prot->Handle;
     *Interface = Prot->Interface;
 
     //
@@ -345,14 +341,14 @@ UnitTestGetNextLocateByProtocol (
 **/
 EFI_STATUS
 UnitTestDisconnectControllersUsingProtocolInterface (
-  IN EFI_HANDLE           UserHandle,
-  IN PROTOCOL_INTERFACE   *Prot
+  IN EFI_HANDLE          UserHandle,
+  IN PROTOCOL_INTERFACE  *Prot
   )
 {
-  EFI_STATUS            Status;
-  BOOLEAN               ItemFound;
-  LIST_ENTRY            *Link;
-  OPEN_PROTOCOL_DATA    *OpenData;
+  EFI_STATUS          Status;
+  BOOLEAN             ItemFound;
+  LIST_ENTRY          *Link;
+  OPEN_PROTOCOL_DATA  *OpenData;
 
   Status = EFI_SUCCESS;
 
@@ -368,6 +364,7 @@ UnitTestDisconnectControllersUsingProtocolInterface (
         if (!EFI_ERROR (Status)) {
           ItemFound = TRUE;
         }
+
         break;
       }
     }
@@ -380,7 +377,8 @@ UnitTestDisconnectControllersUsingProtocolInterface (
     for (Link = Prot->OpenList.ForwardLink; Link != &Prot->OpenList;) {
       OpenData = CR (Link, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
       if ((OpenData->Attributes &
-          (EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL | EFI_OPEN_PROTOCOL_GET_PROTOCOL | EFI_OPEN_PROTOCOL_TEST_PROTOCOL)) != 0) {
+           (EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL | EFI_OPEN_PROTOCOL_GET_PROTOCOL | EFI_OPEN_PROTOCOL_TEST_PROTOCOL)) != 0)
+      {
         Link = RemoveEntryList (&OpenData->Link);
         Prot->OpenListCount--;
         FreePool (OpenData);
@@ -413,9 +411,9 @@ UnitTestDisconnectControllersUsingProtocolInterface (
 **/
 PROTOCOL_INTERFACE *
 UnitTestRemoveInterfaceFromProtocol (
-  IN IHANDLE        *Handle,
-  IN EFI_GUID       *Protocol,
-  IN VOID           *Interface
+  IN IHANDLE   *Handle,
+  IN EFI_GUID  *Protocol,
+  IN VOID      *Interface
   )
 {
   PROTOCOL_INTERFACE  *Prot;
@@ -425,14 +423,13 @@ UnitTestRemoveInterfaceFromProtocol (
 
   Prot = UnitTestFindProtocolInterface (Handle, Protocol, Interface);
   if (Prot != NULL) {
-
     ProtEntry = Prot->Protocol;
 
     //
     // If there's a protocol notify location pointing to this entry, back it up one
     //
-    for(Link = ProtEntry->Notify.ForwardLink; Link != &ProtEntry->Notify; Link=Link->ForwardLink) {
-      ProtNotify = CR(Link, PROTOCOL_NOTIFY, Link, PROTOCOL_NOTIFY_SIGNATURE);
+    for (Link = ProtEntry->Notify.ForwardLink; Link != &ProtEntry->Notify; Link = Link->ForwardLink) {
+      ProtNotify = CR (Link, PROTOCOL_NOTIFY, Link, PROTOCOL_NOTIFY_SIGNATURE);
 
       if (ProtNotify->Position == &Prot->ByProtocol) {
         ProtNotify->Position = Prot->ByProtocol.BackLink;
@@ -463,8 +460,8 @@ UnitTestRemoveInterfaceFromProtocol (
 **/
 PROTOCOL_INTERFACE  *
 UnitTestGetProtocolInterface (
-  IN  EFI_HANDLE                UserHandle,
-  IN  EFI_GUID                  *Protocol
+  IN  EFI_HANDLE  UserHandle,
+  IN  EFI_GUID    *Protocol
   )
 {
   EFI_STATUS          Status;
@@ -478,18 +475,19 @@ UnitTestGetProtocolInterface (
     return NULL;
   }
 
-  Handle = (IHANDLE *) UserHandle;
+  Handle = (IHANDLE *)UserHandle;
 
   //
   // Look at each protocol interface for a match
   //
   for (Link = Handle->Protocols.ForwardLink; Link != &Handle->Protocols; Link = Link->ForwardLink) {
-    Prot = CR(Link, PROTOCOL_INTERFACE, Link, PROTOCOL_INTERFACE_SIGNATURE);
+    Prot      = CR (Link, PROTOCOL_INTERFACE, Link, PROTOCOL_INTERFACE_SIGNATURE);
     ProtEntry = Prot->Protocol;
     if (CompareGuid (&ProtEntry->ProtocolID, Protocol)) {
       return Prot;
     }
   }
+
   return NULL;
 }
 
@@ -512,11 +510,11 @@ UnitTestGetProtocolInterface (
 **/
 EFI_STATUS
 UnitTestInstallProtocolInterfaceNotify (
-  IN OUT EFI_HANDLE     *UserHandle,
-  IN EFI_GUID           *Protocol,
-  IN EFI_INTERFACE_TYPE InterfaceType,
-  IN VOID               *Interface,
-  IN BOOLEAN            Notify
+  IN OUT EFI_HANDLE      *UserHandle,
+  IN EFI_GUID            *Protocol,
+  IN EFI_INTERFACE_TYPE  InterfaceType,
+  IN VOID                *Interface,
+  IN BOOLEAN             Notify
   )
 {
   PROTOCOL_INTERFACE  *Prot;
@@ -529,7 +527,7 @@ UnitTestInstallProtocolInterfaceNotify (
   // returns EFI_INVALID_PARAMETER if InterfaceType is invalid.
   // Also added check for invalid UserHandle and Protocol pointers.
   //
-  if (UserHandle == NULL || Protocol == NULL) {
+  if ((UserHandle == NULL) || (Protocol == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -543,11 +541,11 @@ UnitTestInstallProtocolInterfaceNotify (
   UT_LOG_INFO ("InstallProtocolInterface: %g %p\n", Protocol, Interface);
 
   Status = EFI_OUT_OF_RESOURCES;
-  Prot = NULL;
+  Prot   = NULL;
   Handle = NULL;
 
   if (*UserHandle != NULL) {
-    Status = UnitTestHandleProtocol (*UserHandle, Protocol, (VOID **) &ExistingInterface);
+    Status = UnitTestHandleProtocol (*UserHandle, Protocol, (VOID **)&ExistingInterface);
     if (!EFI_ERROR (Status)) {
       return EFI_INVALID_PARAMETER;
     }
@@ -573,7 +571,7 @@ UnitTestInstallProtocolInterfaceNotify (
   //
   // If caller didn't supply a handle, allocate a new one
   //
-  Handle = (IHANDLE *) *UserHandle;
+  Handle = (IHANDLE *)*UserHandle;
   if (Handle == NULL) {
     Handle = AllocateZeroPool (sizeof (IHANDLE));
     if (Handle == NULL) {
@@ -601,7 +599,7 @@ UnitTestInstallProtocolInterfaceNotify (
   } else {
     Status =  UnitTestValidateHandle (Handle);
     if (EFI_ERROR (Status)) {
-      DEBUG((DEBUG_ERROR, "InstallProtocolInterface: input handle at 0x%x is invalid\n", Handle));
+      DEBUG ((DEBUG_ERROR, "InstallProtocolInterface: input handle at 0x%x is invalid\n", Handle));
       goto Done;
     }
   }
@@ -615,8 +613,8 @@ UnitTestInstallProtocolInterfaceNotify (
   // Initialize the protocol interface structure
   //
   Prot->Signature = PROTOCOL_INTERFACE_SIGNATURE;
-  Prot->Handle = Handle;
-  Prot->Protocol = ProtEntry;
+  Prot->Handle    = Handle;
+  Prot->Protocol  = ProtEntry;
   Prot->Interface = Interface;
 
   //
@@ -643,6 +641,7 @@ UnitTestInstallProtocolInterfaceNotify (
   if (Notify) {
     UnitTestNotifyProtocolEntry (ProtEntry);
   }
+
   Status = EFI_SUCCESS;
 
 Done:
@@ -658,6 +657,7 @@ Done:
     if (Prot != NULL) {
       UnitTestFreePool (Prot);
     }
+
     DEBUG ((DEBUG_ERROR, "InstallProtocolInterface: %g %p failed with %r\n", Protocol, Interface, Status));
   }
 
@@ -681,19 +681,19 @@ Done:
 EFI_STATUS
 EFIAPI
 UnitTestInstallProtocolInterface (
-  IN OUT EFI_HANDLE     *UserHandle,
-  IN EFI_GUID           *Protocol,
-  IN EFI_INTERFACE_TYPE InterfaceType,
-  IN VOID               *Interface
+  IN OUT EFI_HANDLE      *UserHandle,
+  IN EFI_GUID            *Protocol,
+  IN EFI_INTERFACE_TYPE  InterfaceType,
+  IN VOID                *Interface
   )
 {
   return UnitTestInstallProtocolInterfaceNotify (
-            UserHandle,
-            Protocol,
-            InterfaceType,
-            Interface,
-            TRUE
-            );
+           UserHandle,
+           Protocol,
+           InterfaceType,
+           Interface,
+           TRUE
+           );
 }
 
 /**
@@ -713,10 +713,10 @@ UnitTestInstallProtocolInterface (
 EFI_STATUS
 EFIAPI
 UnitTestReinstallProtocolInterface (
-  IN EFI_HANDLE     UserHandle,
-  IN EFI_GUID       *Protocol,
-  IN VOID           *OldInterface,
-  IN VOID           *NewInterface
+  IN EFI_HANDLE  UserHandle,
+  IN EFI_GUID    *Protocol,
+  IN VOID        *OldInterface,
+  IN VOID        *NewInterface
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -738,14 +738,14 @@ UnitTestReinstallProtocolInterface (
 EFI_STATUS
 EFIAPI
 UnitTestUninstallProtocolInterface (
-  IN EFI_HANDLE       UserHandle,
-  IN EFI_GUID         *Protocol,
-  IN VOID             *Interface
+  IN EFI_HANDLE  UserHandle,
+  IN EFI_GUID    *Protocol,
+  IN VOID        *Interface
   )
 {
-  EFI_STATUS            Status;
-  IHANDLE               *Handle;
-  PROTOCOL_INTERFACE    *Prot;
+  EFI_STATUS          Status;
+  IHANDLE             *Handle;
+  PROTOCOL_INTERFACE  *Prot;
 
   //
   // Check that Protocol is valid
@@ -789,7 +789,7 @@ UnitTestUninstallProtocolInterface (
   // Remove the protocol interface from the protocol
   //
   Status = EFI_NOT_FOUND;
-  Handle = (IHANDLE *) UserHandle;
+  Handle = (IHANDLE *)UserHandle;
   Prot   = UnitTestRemoveInterfaceFromProtocol (Handle, Protocol, Interface);
 
   if (Prot != NULL) {
@@ -839,19 +839,19 @@ Done:
 EFI_STATUS
 EFIAPI
 UnitTestHandleProtocol (
-  IN EFI_HANDLE       UserHandle,
-  IN EFI_GUID         *Protocol,
-  OUT VOID            **Interface
+  IN EFI_HANDLE  UserHandle,
+  IN EFI_GUID    *Protocol,
+  OUT VOID       **Interface
   )
 {
-  return  UnitTestOpenProtocol (
-            UserHandle,
-            Protocol,
-            Interface,
-            gImageHandle,
-            NULL,
-            EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL
-            );
+  return UnitTestOpenProtocol (
+           UserHandle,
+           Protocol,
+           Interface,
+           gImageHandle,
+           NULL,
+           EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL
+           );
 }
 
 /**
@@ -870,9 +870,9 @@ UnitTestHandleProtocol (
 EFI_STATUS
 EFIAPI
 UnitTestRegisterProtocolNotify (
-  IN EFI_GUID       *Protocol,
-  IN EFI_EVENT      Event,
-  OUT  VOID         **Registration
+  IN EFI_GUID   *Protocol,
+  IN EFI_EVENT  Event,
+  OUT  VOID     **Registration
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -899,11 +899,11 @@ UnitTestRegisterProtocolNotify (
 EFI_STATUS
 EFIAPI
 UnitTestLocateHandle (
-  IN EFI_LOCATE_SEARCH_TYPE   SearchType,
-  IN EFI_GUID                 *Protocol   OPTIONAL,
-  IN VOID                     *SearchKey  OPTIONAL,
-  IN OUT UINTN                *BufferSize,
-  OUT EFI_HANDLE              *Buffer
+  IN EFI_LOCATE_SEARCH_TYPE  SearchType,
+  IN EFI_GUID                *Protocol   OPTIONAL,
+  IN VOID                    *SearchKey  OPTIONAL,
+  IN OUT UINTN               *BufferSize,
+  OUT EFI_HANDLE             *Buffer
   )
 {
   EFI_STATUS          Status;
@@ -932,49 +932,52 @@ UnitTestLocateHandle (
   Position.SearchKey = SearchKey;
   Position.Position  = &gHandleList;
 
-  ResultSize = 0;
-  ResultBuffer = (IHANDLE **) Buffer;
-  Status = EFI_SUCCESS;
+  ResultSize   = 0;
+  ResultBuffer = (IHANDLE **)Buffer;
+  Status       = EFI_SUCCESS;
 
   //
   // Get the search function based on type
   //
   switch (SearchType) {
-  case AllHandles:
-    GetNext = UnitTestGetNextLocateAllHandles;
-    break;
+    case AllHandles:
+      GetNext = UnitTestGetNextLocateAllHandles;
+      break;
 
-  case ByRegisterNotify:
-    //
-    // Must have SearchKey for locate ByRegisterNotify
-    //
-    if (SearchKey == NULL) {
+    case ByRegisterNotify:
+      //
+      // Must have SearchKey for locate ByRegisterNotify
+      //
+      if (SearchKey == NULL) {
+        Status = EFI_INVALID_PARAMETER;
+        break;
+      }
+
+      GetNext = UnitTestGetNextLocateByRegisterNotify;
+      break;
+
+    case ByProtocol:
+      GetNext = UnitTestGetNextLocateByProtocol;
+      if (Protocol == NULL) {
+        Status = EFI_INVALID_PARAMETER;
+        break;
+      }
+
+      //
+      // Look up the protocol entry and set the head pointer
+      //
+      Position.ProtEntry = UnitTestFindProtocolEntry (Protocol, FALSE);
+      if (Position.ProtEntry == NULL) {
+        Status = EFI_NOT_FOUND;
+        break;
+      }
+
+      Position.Position = &Position.ProtEntry->Protocols;
+      break;
+
+    default:
       Status = EFI_INVALID_PARAMETER;
       break;
-    }
-    GetNext = UnitTestGetNextLocateByRegisterNotify;
-    break;
-
-  case ByProtocol:
-    GetNext = UnitTestGetNextLocateByProtocol;
-    if (Protocol == NULL) {
-      Status = EFI_INVALID_PARAMETER;
-      break;
-    }
-    //
-    // Look up the protocol entry and set the head pointer
-    //
-    Position.ProtEntry = UnitTestFindProtocolEntry (Protocol, FALSE);
-    if (Position.ProtEntry == NULL) {
-      Status = EFI_NOT_FOUND;
-      break;
-    }
-    Position.Position = &Position.ProtEntry->Protocols;
-    break;
-
-  default:
-    Status = EFI_INVALID_PARAMETER;
-    break;
   }
 
   if (EFI_ERROR (Status)) {
@@ -986,7 +989,7 @@ UnitTestLocateHandle (
   // Enumerate out the matching handles
   //
   mEfiLocateHandleRequest += 1;
-  for (; ;) {
+  for ( ; ;) {
     //
     // Get the next handle.  If no more handles, stop
     //
@@ -1001,8 +1004,8 @@ UnitTestLocateHandle (
     //
     ResultSize += sizeof (Handle);
     if (ResultSize <= *BufferSize) {
-        *ResultBuffer = Handle;
-        ResultBuffer += 1;
+      *ResultBuffer = Handle;
+      ResultBuffer += 1;
     }
   }
 
@@ -1023,13 +1026,13 @@ UnitTestLocateHandle (
 
     *BufferSize = ResultSize;
 
-    if (SearchType == ByRegisterNotify && !EFI_ERROR(Status)) {
+    if ((SearchType == ByRegisterNotify) && !EFI_ERROR (Status)) {
       //
       // If this is a search by register notify and a handle was
       // returned, update the register notification position
       //
       ASSERT (SearchKey != NULL);
-      ProtNotify = SearchKey;
+      ProtNotify           = SearchKey;
       ProtNotify->Position = ProtNotify->Position->ForwardLink;
     }
   }
@@ -1055,9 +1058,9 @@ UnitTestLocateHandle (
 EFI_STATUS
 EFIAPI
 UnitTestLocateDevicePath (
-  IN EFI_GUID                       *Protocol,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL   **DevicePath,
-  OUT EFI_HANDLE                    *Device
+  IN EFI_GUID                      *Protocol,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePath,
+  OUT EFI_HANDLE                   *Device
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -1081,8 +1084,8 @@ UnitTestLocateDevicePath (
 EFI_STATUS
 EFIAPI
 UnitTestInstallConfigurationTable (
-  IN EFI_GUID *Guid,
-  IN VOID     *Table
+  IN EFI_GUID  *Guid,
+  IN VOID      *Table
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -1111,12 +1114,12 @@ UnitTestInstallConfigurationTable (
 EFI_STATUS
 EFIAPI
 UnitTestOpenProtocol (
-  IN  EFI_HANDLE                UserHandle,
-  IN  EFI_GUID                  *Protocol,
-  OUT VOID                      **Interface OPTIONAL,
-  IN  EFI_HANDLE                ImageHandle,
-  IN  EFI_HANDLE                ControllerHandle,
-  IN  UINT32                    Attributes
+  IN  EFI_HANDLE  UserHandle,
+  IN  EFI_GUID    *Protocol,
+  OUT VOID        **Interface OPTIONAL,
+  IN  EFI_HANDLE  ImageHandle,
+  IN  EFI_HANDLE  ControllerHandle,
+  IN  UINT32      Attributes
   )
 {
   EFI_STATUS          Status;
@@ -1154,42 +1157,48 @@ UnitTestOpenProtocol (
   // Check for invalid Attributes
   //
   switch (Attributes) {
-  case EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER :
-    Status =  UnitTestValidateHandle (ImageHandle);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-    Status =  UnitTestValidateHandle (ControllerHandle);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-    if (UserHandle == ControllerHandle) {
+    case EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER:
+      Status =  UnitTestValidateHandle (ImageHandle);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      Status =  UnitTestValidateHandle (ControllerHandle);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      if (UserHandle == ControllerHandle) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      break;
+    case EFI_OPEN_PROTOCOL_BY_DRIVER:
+    case EFI_OPEN_PROTOCOL_BY_DRIVER | EFI_OPEN_PROTOCOL_EXCLUSIVE:
+      Status =  UnitTestValidateHandle (ImageHandle);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      Status =  UnitTestValidateHandle (ControllerHandle);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      break;
+    case EFI_OPEN_PROTOCOL_EXCLUSIVE:
+      Status =  UnitTestValidateHandle (ImageHandle);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      break;
+    case EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL:
+    case EFI_OPEN_PROTOCOL_GET_PROTOCOL:
+    case EFI_OPEN_PROTOCOL_TEST_PROTOCOL:
+      break;
+    default:
       return EFI_INVALID_PARAMETER;
-    }
-    break;
-  case EFI_OPEN_PROTOCOL_BY_DRIVER :
-  case EFI_OPEN_PROTOCOL_BY_DRIVER | EFI_OPEN_PROTOCOL_EXCLUSIVE :
-    Status =  UnitTestValidateHandle (ImageHandle);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-    Status =  UnitTestValidateHandle (ControllerHandle);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-    break;
-  case EFI_OPEN_PROTOCOL_EXCLUSIVE :
-    Status =  UnitTestValidateHandle (ImageHandle);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-    break;
-  case EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL :
-  case EFI_OPEN_PROTOCOL_GET_PROTOCOL :
-  case EFI_OPEN_PROTOCOL_TEST_PROTOCOL :
-    break;
-  default:
-    return EFI_INVALID_PARAMETER;
   }
 
   //
@@ -1203,10 +1212,10 @@ UnitTestOpenProtocol (
 
   Status = EFI_SUCCESS;
 
-  ByDriver        = FALSE;
-  Exclusive       = FALSE;
+  ByDriver  = FALSE;
+  Exclusive = FALSE;
   for ( Link = Prot->OpenList.ForwardLink; Link != &Prot->OpenList; Link = Link->ForwardLink) {
-    OpenData = CR (Link, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
+    OpenData   = CR (Link, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
     ExactMatch =  (BOOLEAN)((OpenData->AgentHandle == ImageHandle) &&
                             (OpenData->Attributes == Attributes)  &&
                             (OpenData->ControllerHandle == ControllerHandle));
@@ -1217,6 +1226,7 @@ UnitTestOpenProtocol (
         goto Done;
       }
     }
+
     if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_EXCLUSIVE) != 0) {
       Exclusive = TRUE;
     } else if (ExactMatch) {
@@ -1234,60 +1244,64 @@ UnitTestOpenProtocol (
   //
 
   switch (Attributes) {
-  case EFI_OPEN_PROTOCOL_BY_DRIVER :
-    if (Exclusive || ByDriver) {
-      Status = EFI_ACCESS_DENIED;
-      goto Done;
-    }
-    break;
-  case EFI_OPEN_PROTOCOL_BY_DRIVER | EFI_OPEN_PROTOCOL_EXCLUSIVE :
-  case EFI_OPEN_PROTOCOL_EXCLUSIVE :
-    if (Exclusive) {
-      Status = EFI_ACCESS_DENIED;
-      goto Done;
-    }
-    if (ByDriver) {
-      do {
-        Disconnect = FALSE;
-        for (Link = Prot->OpenList.ForwardLink; Link != &Prot->OpenList; Link = Link->ForwardLink) {
-          OpenData = CR (Link, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
-          if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
-            Disconnect = TRUE;
-            Status = UnitTestDisconnectController (UserHandle, OpenData->AgentHandle, NULL);
-            if (EFI_ERROR (Status)) {
-              Status = EFI_ACCESS_DENIED;
-              goto Done;
-            } else {
-              break;
+    case EFI_OPEN_PROTOCOL_BY_DRIVER:
+      if (Exclusive || ByDriver) {
+        Status = EFI_ACCESS_DENIED;
+        goto Done;
+      }
+
+      break;
+    case EFI_OPEN_PROTOCOL_BY_DRIVER | EFI_OPEN_PROTOCOL_EXCLUSIVE:
+    case EFI_OPEN_PROTOCOL_EXCLUSIVE:
+      if (Exclusive) {
+        Status = EFI_ACCESS_DENIED;
+        goto Done;
+      }
+
+      if (ByDriver) {
+        do {
+          Disconnect = FALSE;
+          for (Link = Prot->OpenList.ForwardLink; Link != &Prot->OpenList; Link = Link->ForwardLink) {
+            OpenData = CR (Link, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
+            if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
+              Disconnect = TRUE;
+              Status     = UnitTestDisconnectController (UserHandle, OpenData->AgentHandle, NULL);
+              if (EFI_ERROR (Status)) {
+                Status = EFI_ACCESS_DENIED;
+                goto Done;
+              } else {
+                break;
+              }
             }
           }
-        }
-      } while (Disconnect);
-    }
-    break;
-  case EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER :
-  case EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL :
-  case EFI_OPEN_PROTOCOL_GET_PROTOCOL :
-  case EFI_OPEN_PROTOCOL_TEST_PROTOCOL :
-    break;
+        } while (Disconnect);
+      }
+
+      break;
+    case EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER:
+    case EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL:
+    case EFI_OPEN_PROTOCOL_GET_PROTOCOL:
+    case EFI_OPEN_PROTOCOL_TEST_PROTOCOL:
+      break;
   }
 
   if (ImageHandle == NULL) {
     Status = EFI_SUCCESS;
     goto Done;
   }
+
   //
   // Create new entry
   //
-  OpenData = AllocatePool (sizeof(OPEN_PROTOCOL_DATA));
+  OpenData = AllocatePool (sizeof (OPEN_PROTOCOL_DATA));
   if (OpenData == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
   } else {
-    OpenData->Signature         = OPEN_PROTOCOL_DATA_SIGNATURE;
-    OpenData->AgentHandle       = ImageHandle;
-    OpenData->ControllerHandle  = ControllerHandle;
-    OpenData->Attributes        = Attributes;
-    OpenData->OpenCount         = 1;
+    OpenData->Signature        = OPEN_PROTOCOL_DATA_SIGNATURE;
+    OpenData->AgentHandle      = ImageHandle;
+    OpenData->ControllerHandle = ControllerHandle;
+    OpenData->Attributes       = Attributes;
+    OpenData->OpenCount        = 1;
     InsertTailList (&Prot->OpenList, &OpenData->Link);
     Prot->OpenListCount++;
     Status = EFI_SUCCESS;
@@ -1300,7 +1314,7 @@ Done:
     // Keep Interface unmodified in case of any Error
     // except EFI_ALREADY_STARTED and EFI_UNSUPPORTED.
     //
-    if (!EFI_ERROR (Status) || Status == EFI_ALREADY_STARTED) {
+    if (!EFI_ERROR (Status) || (Status == EFI_ALREADY_STARTED)) {
       //
       // According to above logic, if 'Prot' is NULL, then the 'Status' must be
       // EFI_UNSUPPORTED. Here the 'Status' is not EFI_UNSUPPORTED, so 'Prot'
@@ -1354,10 +1368,10 @@ Done:
 EFI_STATUS
 EFIAPI
 UnitTestCloseProtocol (
-  IN  EFI_HANDLE                UserHandle,
-  IN  EFI_GUID                  *Protocol,
-  IN  EFI_HANDLE                AgentHandle,
-  IN  EFI_HANDLE                ControllerHandle
+  IN  EFI_HANDLE  UserHandle,
+  IN  EFI_GUID    *Protocol,
+  IN  EFI_HANDLE  AgentHandle,
+  IN  EFI_HANDLE  ControllerHandle
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -1377,10 +1391,10 @@ UnitTestCloseProtocol (
 EFI_STATUS
 EFIAPI
 UnitTestOpenProtocolInformation (
-  IN  EFI_HANDLE                          UserHandle,
-  IN  EFI_GUID                            *Protocol,
-  OUT EFI_OPEN_PROTOCOL_INFORMATION_ENTRY **EntryBuffer,
-  OUT UINTN                               *EntryCount
+  IN  EFI_HANDLE                           UserHandle,
+  IN  EFI_GUID                             *Protocol,
+  OUT EFI_OPEN_PROTOCOL_INFORMATION_ENTRY  **EntryBuffer,
+  OUT UINTN                                *EntryCount
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -1412,9 +1426,9 @@ UnitTestOpenProtocolInformation (
 EFI_STATUS
 EFIAPI
 UnitTestProtocolsPerHandle (
-  IN EFI_HANDLE       UserHandle,
-  OUT EFI_GUID        ***ProtocolBuffer,
-  OUT UINTN           *ProtocolBufferCount
+  IN EFI_HANDLE  UserHandle,
+  OUT EFI_GUID   ***ProtocolBuffer,
+  OUT UINTN      *ProtocolBufferCount
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -1445,15 +1459,15 @@ UnitTestProtocolsPerHandle (
 EFI_STATUS
 EFIAPI
 UnitTestLocateHandleBuffer (
-  IN EFI_LOCATE_SEARCH_TYPE       SearchType,
-  IN EFI_GUID                     *Protocol OPTIONAL,
-  IN VOID                         *SearchKey OPTIONAL,
-  IN OUT UINTN                    *NumberHandles,
-  OUT EFI_HANDLE                  **Buffer
+  IN EFI_LOCATE_SEARCH_TYPE  SearchType,
+  IN EFI_GUID                *Protocol OPTIONAL,
+  IN VOID                    *SearchKey OPTIONAL,
+  IN OUT UINTN               *NumberHandles,
+  OUT EFI_HANDLE             **Buffer
   )
 {
-  EFI_STATUS          Status;
-  UINTN               BufferSize;
+  EFI_STATUS  Status;
+  UINTN       BufferSize;
 
   if (NumberHandles == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1463,26 +1477,27 @@ UnitTestLocateHandleBuffer (
     return EFI_INVALID_PARAMETER;
   }
 
-  BufferSize = 0;
+  BufferSize     = 0;
   *NumberHandles = 0;
-  *Buffer = NULL;
-  Status = UnitTestLocateHandle (
-             SearchType,
-             Protocol,
-             SearchKey,
-             &BufferSize,
-             *Buffer
-             );
+  *Buffer        = NULL;
+  Status         = UnitTestLocateHandle (
+                     SearchType,
+                     Protocol,
+                     SearchKey,
+                     &BufferSize,
+                     *Buffer
+                     );
   //
   // LocateHandleBuffer() returns incorrect status code if SearchType is
   // invalid.
   //
   // Add code to correctly handle expected errors from UnitTestLocateHandle().
   //
-  if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
+  if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL)) {
     if (Status != EFI_INVALID_PARAMETER) {
       Status = EFI_NOT_FOUND;
     }
+
     return Status;
   }
 
@@ -1558,7 +1573,7 @@ UnitTestLocateProtocol (
 EFI_STATUS
 EFIAPI
 UnitTestInstallMultipleProtocolInterfaces (
-  IN OUT EFI_HANDLE           *Handle,
+  IN OUT EFI_HANDLE  *Handle,
   ...
   )
 {
@@ -1582,15 +1597,15 @@ UnitTestInstallMultipleProtocolInterfaces (
 EFI_STATUS
 EFIAPI
 UnitTestUninstallMultipleProtocolInterfaces (
-  IN EFI_HANDLE           Handle,
+  IN EFI_HANDLE  Handle,
   ...
   )
 {
-  EFI_STATUS      Status;
-  VA_LIST         Args;
-  EFI_GUID        *Protocol;
-  VOID            *Interface;
-  UINTN           Index;
+  EFI_STATUS  Status;
+  VA_LIST     Args;
+  EFI_GUID    *Protocol;
+  VOID        *Interface;
+  UINTN       Index;
 
   VA_START (Args, Handle);
   for (Index = 0, Status = EFI_SUCCESS; !EFI_ERROR (Status); Index++) {
@@ -1609,6 +1624,7 @@ UnitTestUninstallMultipleProtocolInterfaces (
     //
     Status = UnitTestUninstallProtocolInterface (Handle, Protocol, Interface);
   }
+
   VA_END (Args);
 
   //
@@ -1620,11 +1636,12 @@ UnitTestUninstallMultipleProtocolInterfaces (
     // Reset the va_arg back to the first argument.
     //
     VA_START (Args, Handle);
-    for (; Index > 1; Index--) {
-      Protocol = VA_ARG(Args, EFI_GUID *);
-      Interface = VA_ARG(Args, VOID *);
+    for ( ; Index > 1; Index--) {
+      Protocol  = VA_ARG (Args, EFI_GUID *);
+      Interface = VA_ARG (Args, VOID *);
       UnitTestInstallProtocolInterface (&Handle, Protocol, EFI_NATIVE_INTERFACE, Interface);
     }
+
     VA_END (Args);
     Status = EFI_INVALID_PARAMETER;
   }

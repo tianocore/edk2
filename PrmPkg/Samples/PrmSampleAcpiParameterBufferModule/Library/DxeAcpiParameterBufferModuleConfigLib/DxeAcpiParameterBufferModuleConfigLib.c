@@ -17,10 +17,14 @@
 STATIC EFI_HANDLE  mPrmConfigProtocolHandle;
 
 // {dc2a58a6-5927-4776-b995-d118a27335a2}
-STATIC CONST EFI_GUID mPrmModuleGuid = {0xdc2a58a6, 0x5927, 0x4776, {0xb9, 0x95, 0xd1, 0x18, 0xa2, 0x73, 0x35, 0xa2}};
+STATIC CONST EFI_GUID  mPrmModuleGuid = {
+  0xdc2a58a6, 0x5927, 0x4776, { 0xb9, 0x95, 0xd1, 0x18, 0xa2, 0x73, 0x35, 0xa2 }
+};
 
 // {2e4f2d13-6240-4ed0-a401-c723fbdc34e8}
-STATIC CONST EFI_GUID mCheckParamBufferPrmHandlerGuid = {0x2e4f2d13, 0x6240, 0x4ed0, {0xa4, 0x01, 0xc7, 0x23, 0xfb, 0xdc, 0x34, 0xe8}};
+STATIC CONST EFI_GUID  mCheckParamBufferPrmHandlerGuid = {
+  0x2e4f2d13, 0x6240, 0x4ed0, { 0xa4, 0x01, 0xc7, 0x23, 0xfb, 0xdc, 0x34, 0xe8 }
+};
 
 /**
   Constructor of the PRM configuration library.
@@ -34,8 +38,8 @@ STATIC CONST EFI_GUID mCheckParamBufferPrmHandlerGuid = {0x2e4f2d13, 0x6240, 0x4
 EFI_STATUS
 EFIAPI
 AcpiParameterBufferModuleConfigLibConstructor (
-  IN  EFI_HANDLE                    ImageHandle,
-  IN  EFI_SYSTEM_TABLE              *SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS                        Status;
@@ -43,9 +47,9 @@ AcpiParameterBufferModuleConfigLibConstructor (
   ACPI_PARAMETER_BUFFER_DESCRIPTOR  *AcpiParamBufferDescriptor;
   PRM_CONFIG_PROTOCOL               *PrmConfigProtocol;
 
-  AcpiParameterBuffer = NULL;
+  AcpiParameterBuffer       = NULL;
   AcpiParamBufferDescriptor = NULL;
-  PrmConfigProtocol = NULL;
+  PrmConfigProtocol         = NULL;
 
   /*
     In this sample PRM module, the protocol describing this sample module's resources is simply
@@ -82,15 +86,16 @@ AcpiParameterBufferModuleConfigLibConstructor (
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
+
   CopyGuid (&PrmConfigProtocol->ModuleContextBuffers.ModuleGuid, &mPrmModuleGuid);
 
   // Populate the ACPI Parameter Buffer Descriptor structure
   CopyGuid (&AcpiParamBufferDescriptor->HandlerGuid, &mCheckParamBufferPrmHandlerGuid);
-  AcpiParamBufferDescriptor->AcpiParameterBufferAddress = (UINT64) (UINTN) AcpiParameterBuffer;
+  AcpiParamBufferDescriptor->AcpiParameterBufferAddress = (UINT64)(UINTN)AcpiParameterBuffer;
 
   // Populate the PRM Module Context Buffers structure
   PrmConfigProtocol->ModuleContextBuffers.AcpiParameterBufferDescriptorCount = 1;
-  PrmConfigProtocol->ModuleContextBuffers.AcpiParameterBufferDescriptors = AcpiParamBufferDescriptor;
+  PrmConfigProtocol->ModuleContextBuffers.AcpiParameterBufferDescriptors     = AcpiParamBufferDescriptor;
 
   //
   // Install the PRM Configuration Protocol for this module. This indicates the configuration
@@ -100,7 +105,7 @@ AcpiParameterBufferModuleConfigLibConstructor (
                   &mPrmConfigProtocolHandle,
                   &gPrmConfigProtocolGuid,
                   EFI_NATIVE_INTERFACE,
-                  (VOID *) PrmConfigProtocol
+                  (VOID *)PrmConfigProtocol
                   );
 
 Done:
@@ -108,9 +113,11 @@ Done:
     if (AcpiParameterBuffer != NULL) {
       FreePool (AcpiParameterBuffer);
     }
+
     if (AcpiParamBufferDescriptor != NULL) {
       FreePool (AcpiParamBufferDescriptor);
     }
+
     if (PrmConfigProtocol != NULL) {
       FreePool (PrmConfigProtocol);
     }

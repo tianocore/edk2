@@ -42,9 +42,9 @@ typedef enum {
 **/
 EFI_STATUS
 FindContextBufferInModuleBuffers (
-  IN  CONST EFI_GUID                      *HandlerGuid,
-  IN  CONST PRM_MODULE_CONTEXT_BUFFERS    *ModuleContextBuffers,
-  OUT CONST PRM_CONTEXT_BUFFER            **ContextBuffer
+  IN  CONST EFI_GUID                    *HandlerGuid,
+  IN  CONST PRM_MODULE_CONTEXT_BUFFERS  *ModuleContextBuffers,
+  OUT CONST PRM_CONTEXT_BUFFER          **ContextBuffer
   );
 
 /**
@@ -68,9 +68,9 @@ FindContextBufferInModuleBuffers (
 **/
 EFI_STATUS
 GetModuleContextBuffers (
-  IN  PRM_GUID_SEARCH_TYPE                GuidSearchType,
-  IN  CONST EFI_GUID                      *Guid,
-  OUT CONST PRM_MODULE_CONTEXT_BUFFERS    **PrmModuleContextBuffers
+  IN  PRM_GUID_SEARCH_TYPE              GuidSearchType,
+  IN  CONST EFI_GUID                    *Guid,
+  OUT CONST PRM_MODULE_CONTEXT_BUFFERS  **PrmModuleContextBuffers
   );
 
 /**
@@ -91,9 +91,9 @@ GetModuleContextBuffers (
 **/
 EFI_STATUS
 GetContextBuffer (
-  IN  CONST EFI_GUID                      *PrmHandlerGuid,
-  IN  CONST PRM_MODULE_CONTEXT_BUFFERS    *PrmModuleContextBuffers  OPTIONAL,
-  OUT CONST PRM_CONTEXT_BUFFER            **PrmContextBuffer
+  IN  CONST EFI_GUID                    *PrmHandlerGuid,
+  IN  CONST PRM_MODULE_CONTEXT_BUFFERS  *PrmModuleContextBuffers  OPTIONAL,
+  OUT CONST PRM_CONTEXT_BUFFER          **PrmContextBuffer
   );
 
 #endif

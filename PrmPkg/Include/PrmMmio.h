@@ -20,9 +20,9 @@
 /// The memory range with the given base address and length will be marked as EFI_MEMORY_RUNTIME.
 ///
 typedef struct {
-  EFI_PHYSICAL_ADDRESS                    PhysicalBaseAddress;
-  EFI_PHYSICAL_ADDRESS                    VirtualBaseAddress;
-  UINT32                                  Length;
+  EFI_PHYSICAL_ADDRESS    PhysicalBaseAddress;
+  EFI_PHYSICAL_ADDRESS    VirtualBaseAddress;
+  UINT32                  Length;
 } PRM_RUNTIME_MMIO_RANGE;
 
 ///
@@ -33,11 +33,11 @@ typedef struct {
   ///
   /// The number of runtime memory range elements in this buffer.
   ///
-  UINT64                                  Count;
+  UINT64                    Count;
   ///
   /// The beginning of the runtime memory range data.
   ///
-  PRM_RUNTIME_MMIO_RANGE                  Range[1];
+  PRM_RUNTIME_MMIO_RANGE    Range[1];
 } PRM_RUNTIME_MMIO_RANGES;
 
 #pragma pack(pop)
