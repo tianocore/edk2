@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 UnitTestGetNextMonotonicCount (
-  OUT UINT64                  *Count
+  OUT UINT64  *Count
   )
 {
   STATIC  UINT64  StaticCount = 0;
@@ -44,7 +44,7 @@ UnitTestGetNextMonotonicCount (
 EFI_STATUS
 EFIAPI
 UnitTestStall (
-  IN UINTN            Microseconds
+  IN UINTN  Microseconds
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -75,10 +75,10 @@ UnitTestStall (
 EFI_STATUS
 EFIAPI
 UnitTestSetWatchdogTimer (
-  IN UINTN    Timeout,
-  IN UINT64   WatchdogCode,
-  IN UINTN    DataSize,
-  IN CHAR16   *WatchdogData OPTIONAL
+  IN UINTN   Timeout,
+  IN UINT64  WatchdogCode,
+  IN UINTN   DataSize,
+  IN CHAR16  *WatchdogData OPTIONAL
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -183,12 +183,12 @@ UnitTestDisconnectController (
 EFI_STATUS
 EFIAPI
 UnitTestCalculateCrc32 (
-  IN  VOID                              *Data,
-  IN  UINTN                             DataSize,
-  OUT UINT32                            *Crc32
+  IN  VOID    *Data,
+  IN  UINTN   DataSize,
+  OUT UINT32  *Crc32
   )
 {
-  if (Data == NULL || Crc32 == NULL || DataSize == 0) {
+  if ((Data == NULL) || (Crc32 == NULL) || (DataSize == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 

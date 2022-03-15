@@ -21,10 +21,14 @@
 STATIC EFI_HANDLE  mPrmConfigProtocolHandle;
 
 // {5a6cf42b-8bb4-472c-a233-5c4dc4033dc7}
-STATIC CONST EFI_GUID mPrmModuleGuid = {0x5a6cf42b, 0x8bb4, 0x472c, {0xa2, 0x33, 0x5c, 0x4d, 0xc4, 0x03, 0x3d, 0xc7}};
+STATIC CONST EFI_GUID  mPrmModuleGuid = {
+  0x5a6cf42b, 0x8bb4, 0x472c, { 0xa2, 0x33, 0x5c, 0x4d, 0xc4, 0x03, 0x3d, 0xc7 }
+};
 
 // {e1466081-7562-430f-896b-b0e523dc335a}
-STATIC CONST EFI_GUID mCheckStaticDataBufferPrmHandlerGuid = {0xe1466081, 0x7562, 0x430f, {0x89, 0x6b, 0xb0, 0xe5, 0x23, 0xdc, 0x33, 0x5a}};
+STATIC CONST EFI_GUID  mCheckStaticDataBufferPrmHandlerGuid = {
+  0xe1466081, 0x7562, 0x430f, { 0x89, 0x6b, 0xb0, 0xe5, 0x23, 0xdc, 0x33, 0x5a }
+};
 
 /**
   Populates the static data buffer for this PRM module.
@@ -70,16 +74,17 @@ PopulateStaticDataBuffer (
 **/
 EFI_STATUS
 GetStaticDataBuffer (
-  OUT PRM_DATA_BUFFER         **StaticDataBuffer
+  OUT PRM_DATA_BUFFER  **StaticDataBuffer
   )
 {
-  EFI_STATUS                  Status;
-  PRM_DATA_BUFFER             *DataBuffer;
-  UINTN                       DataBufferLength;
+  EFI_STATUS       Status;
+  PRM_DATA_BUFFER  *DataBuffer;
+  UINTN            DataBufferLength;
 
   if (StaticDataBuffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   *StaticDataBuffer = NULL;
 
   //
@@ -96,9 +101,9 @@ GetStaticDataBuffer (
   // Initialize the data buffer header
   //
   DataBuffer->Header.Signature = PRM_DATA_BUFFER_HEADER_SIGNATURE;
-  DataBuffer->Header.Length = (UINT32) DataBufferLength;
+  DataBuffer->Header.Length    = (UINT32)DataBufferLength;
 
-  Status = PopulateStaticDataBuffer ((STATIC_DATA_SAMPLE_CONTEXT_BUFFER_MODULE *) &DataBuffer->Data[0]);
+  Status = PopulateStaticDataBuffer ((STATIC_DATA_SAMPLE_CONTEXT_BUFFER_MODULE *)&DataBuffer->Data[0]);
   ASSERT_EFI_ERROR (Status);
 
   *StaticDataBuffer = DataBuffer;
@@ -117,17 +122,17 @@ GetStaticDataBuffer (
 EFI_STATUS
 EFIAPI
 ContextBufferModuleConfigLibConstructor (
-  IN  EFI_HANDLE              ImageHandle,
-  IN  EFI_SYSTEM_TABLE        *SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                  Status;
-  PRM_CONTEXT_BUFFER          *PrmContextBuffer;
-  PRM_DATA_BUFFER             *StaticDataBuffer;
-  PRM_CONFIG_PROTOCOL         *PrmConfigProtocol;
+  EFI_STATUS           Status;
+  PRM_CONTEXT_BUFFER   *PrmContextBuffer;
+  PRM_DATA_BUFFER      *StaticDataBuffer;
+  PRM_CONFIG_PROTOCOL  *PrmConfigProtocol;
 
-  PrmContextBuffer = NULL;
-  StaticDataBuffer = NULL;
+  PrmContextBuffer  = NULL;
+  StaticDataBuffer  = NULL;
   PrmConfigProtocol = NULL;
 
   /*
@@ -144,7 +149,7 @@ ContextBufferModuleConfigLibConstructor (
   //
   Status = GetStaticDataBuffer (&StaticDataBuffer);
   ASSERT_EFI_ERROR (Status);
-  if (EFI_ERROR (Status) || StaticDataBuffer == NULL) {
+  if (EFI_ERROR (Status) || (StaticDataBuffer == NULL)) {
     goto Done;
   }
 
@@ -166,9 +171,10 @@ ContextBufferModuleConfigLibConstructor (
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
+
   CopyGuid (&PrmContextBuffer->HandlerGuid, &mCheckStaticDataBufferPrmHandlerGuid);
-  PrmContextBuffer->Signature = PRM_CONTEXT_BUFFER_SIGNATURE;
-  PrmContextBuffer->Version = PRM_CONTEXT_BUFFER_INTERFACE_VERSION;
+  PrmContextBuffer->Signature        = PRM_CONTEXT_BUFFER_SIGNATURE;
+  PrmContextBuffer->Version          = PRM_CONTEXT_BUFFER_INTERFACE_VERSION;
   PrmContextBuffer->StaticDataBuffer = StaticDataBuffer;
 
   PrmConfigProtocol = AllocateZeroPool (sizeof (*PrmConfigProtocol));
@@ -177,9 +183,10 @@ ContextBufferModuleConfigLibConstructor (
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
+
   CopyGuid (&PrmConfigProtocol->ModuleContextBuffers.ModuleGuid, &mPrmModuleGuid);
   PrmConfigProtocol->ModuleContextBuffers.BufferCount = 1;
-  PrmConfigProtocol->ModuleContextBuffers.Buffer = PrmContextBuffer;
+  PrmConfigProtocol->ModuleContextBuffers.Buffer      = PrmContextBuffer;
 
   //
   // Install the PRM Configuration Protocol for this module. This indicates the configuration
@@ -189,7 +196,7 @@ ContextBufferModuleConfigLibConstructor (
                   &mPrmConfigProtocolHandle,
                   &gPrmConfigProtocolGuid,
                   EFI_NATIVE_INTERFACE,
-                  (VOID *) PrmConfigProtocol
+                  (VOID *)PrmConfigProtocol
                   );
 
 Done:
@@ -197,9 +204,11 @@ Done:
     if (StaticDataBuffer != NULL) {
       FreePool (StaticDataBuffer);
     }
+
     if (PrmContextBuffer != NULL) {
       FreePool (PrmContextBuffer);
     }
+
     if (PrmConfigProtocol != NULL) {
       FreePool (PrmConfigProtocol);
     }

@@ -33,14 +33,14 @@
 **/
 EFI_STATUS
 InstallPrmSsdt (
-  IN  CONST UINT8                         *OemId
+  IN  CONST UINT8  *OemId
   )
 {
-  EFI_STATUS                              Status;
-  UINTN                                   SsdtSize;
-  UINTN                                   TableKey;
-  EFI_ACPI_TABLE_PROTOCOL                 *AcpiTableProtocol;
-  EFI_ACPI_DESCRIPTION_HEADER             *Ssdt;
+  EFI_STATUS                   Status;
+  UINTN                        SsdtSize;
+  UINTN                        TableKey;
+  EFI_ACPI_TABLE_PROTOCOL      *AcpiTableProtocol;
+  EFI_ACPI_DESCRIPTION_HEADER  *Ssdt;
 
   DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
 
@@ -48,7 +48,7 @@ InstallPrmSsdt (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID **) &AcpiTableProtocol);
+  Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID **)&AcpiTableProtocol);
   if (!EFI_ERROR (Status)) {
     //
     // Discover the SSDT
@@ -57,7 +57,7 @@ InstallPrmSsdt (
                 &gEfiCallerIdGuid,
                 EFI_SECTION_RAW,
                 0,
-                (VOID **) &Ssdt,
+                (VOID **)&Ssdt,
                 &SsdtSize
                 );
     ASSERT_EFI_ERROR (Status);
@@ -72,12 +72,12 @@ InstallPrmSsdt (
     // Publish the SSDT. Table is re-checksummed.
     //
     TableKey = 0;
-    Status = AcpiTableProtocol->InstallAcpiTable (
-                                  AcpiTableProtocol,
-                                  Ssdt,
-                                  SsdtSize,
-                                  &TableKey
-                                  );
+    Status   = AcpiTableProtocol->InstallAcpiTable (
+                                    AcpiTableProtocol,
+                                    Ssdt,
+                                    SsdtSize,
+                                    &TableKey
+                                    );
     ASSERT_EFI_ERROR (Status);
   }
 
@@ -97,13 +97,13 @@ InstallPrmSsdt (
 EFI_STATUS
 EFIAPI
 PrmSsdtInstallEntryPoint (
-  IN EFI_HANDLE                           ImageHandle,
-  IN EFI_SYSTEM_TABLE                     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
-  Status = InstallPrmSsdt ((UINT8 *) PcdGetPtr (PcdAcpiDefaultOemId));
+  Status = InstallPrmSsdt ((UINT8 *)PcdGetPtr (PcdAcpiDefaultOemId));
   ASSERT_EFI_ERROR (Status);
 
   return Status;

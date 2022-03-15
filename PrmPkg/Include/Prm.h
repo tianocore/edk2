@@ -13,16 +13,16 @@
 #include <Uefi.h>
 #include <PrmContextBuffer.h>
 
-#if defined(_MSC_VER)
-  #define PRM_EXPORT_API                          __declspec(dllexport)
+#if defined (_MSC_VER)
+#define PRM_EXPORT_API  __declspec(dllexport)
 #else
-  #define PRM_EXPORT_API
+#define PRM_EXPORT_API
 #endif
 
-#define PRM_HANDLER_NAME_MAXIMUM_LENGTH           128
+#define PRM_HANDLER_NAME_MAXIMUM_LENGTH  128
 
-#define PRM_STRING_(x)                            #x
-#define PRM_STRING(x)                             PRM_STRING_(x)
+#define PRM_STRING_(x)  #x
+#define PRM_STRING(x)   PRM_STRING_(x)
 
 /**
   A Platform Runtime Mechanism (PRM) handler function.
@@ -38,7 +38,7 @@
 **/
 typedef
 EFI_STATUS
-(EFIAPI PRM_HANDLER) (
+(EFIAPI PRM_HANDLER)(
   IN VOID                 *ParameterBuffer  OPTIONAL,
   IN PRM_CONTEXT_BUFFER   *ContextBuffer  OPTIONAL
   );
