@@ -292,7 +292,12 @@ class UncrustifyCheck(ICiBuildPlugin):
                 f"An error occurred reading git ignore settings. This will prevent Uncrustify from running against the expected set of files.")
 
         # Note: This will potentially be a large list, but at least sorted
-        return outstream_buffer.getvalue().strip().splitlines()
+        rel_paths = outstream_buffer.getvalue().strip().splitlines()
+        abs_paths = []
+        for path in rel_paths:
+            abs_paths.append(
+                os.path.normpath(os.path.join(self._abs_workspace_path, path)))
+        return abs_paths
 
     def _get_git_submodule_paths(self) -> List[str]:
         """
