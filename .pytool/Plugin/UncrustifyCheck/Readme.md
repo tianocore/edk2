@@ -104,6 +104,23 @@ plugin execution.
 By default, files in paths matched in a .gitignore file or a recognized git submodule are excluded. If this option
 is `True`, the plugin will not attempt to recognize these files and exclude them.
 
+### `UNCRUSTIFY_IN_PLACE=TRUE`
+
+This command supports any uncrustify changes to be made in-place to the files in the workspace. This is useful for
+formatting any failing code before submitting a PR. Since this is an option for a local developer to use that would
+modify their files, it must be explicitly specified as a CLI argument or set as an environment variable.
+
+_NOTE:_ This is _not_ an option in the config `yaml`. It is an option passed directly into the tool based on local
+        developer need.
+
+#### Example Usage
+
+In this example, Uncrustify would format files in `UefiCpuPkg` without running any other plugins or building any code.
+
+```bash
+stuart_ci_build -c .pytool/CISettings.py -p UefiCpuPkg -t NO-TARGET UNCRUSTIFY_IN_PLACE=TRUE --disable-all UncrustifyCheck=run
+```
+
 ## High-Level Plugin Operation
 
 This plugin generates two main sets of temporary files:
