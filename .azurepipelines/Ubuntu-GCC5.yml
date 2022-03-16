@@ -20,5 +20,6 @@ steps:
       pwd
       ls -laR
   - bash: git submodule update --init
+
   - bash: ./ci.sh
 
