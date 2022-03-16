@@ -153,6 +153,7 @@ class UncrustifyCheck(ICiBuildPlugin):
         """
         try:
             # Initialize plugin and check pre-requisites.
+            self._env = environment_config
             self._initialize_environment_info(
                 package_rel_path, edk2_path, package_config, tc)
             self._initialize_configuration()
@@ -270,9 +271,17 @@ class UncrustifyCheck(ICiBuildPlugin):
         Executes Uncrustify with the initialized configuration.
         """
         output = StringIO()
+        params = ['-c', self._app_config_file]
+        params += ['-F', self._app_input_file_path]
+        params += ['--if-changed']
+        if self._env.GetValue("UNCRUSTIFY_IN_PLACE", "FALSE") == "TRUE":
+            params += ['--replace', '--no-backup']
+        else:
+            params += ['--suffix', UncrustifyCheck.FORMATTED_FILE_EXTENSION]
         self._app_exit_code = RunCmd(
             self._app_path,
-            f"-c {self._app_config_file} -F {self._app_input_file_path} --if-changed --suffix {UncrustifyCheck.FORMATTED_FILE_EXTENSION}", outstream=output)
+            " ".join(params),
+            outstream=output)
         self._app_output = output.getvalue().strip().splitlines()
 
     def _get_files_ignored_in_config(self):
