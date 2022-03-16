@@ -387,7 +387,7 @@ ProcessHobList (
     if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
       DEBUG ((DEBUG_INFO, "\nResourceType: 0x%x\n", Hob.ResourceDescriptor->ResourceType));
 
-      if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
+      if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
         DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
         DEBUG ((DEBUG_INFO, "PhysicalStart: 0x%llx\n", Hob.ResourceDescriptor->PhysicalStart));
         DEBUG ((DEBUG_INFO, "ResourceLength: 0x%llx\n", Hob.ResourceDescriptor->ResourceLength));
@@ -448,9 +448,9 @@ ProcessTdxHobList (
   //
   // Validate HobList
   //
-  if (ValidateHobList (TdHob) == FALSE) {
-    return EFI_INVALID_PARAMETER;
-  }
+  // if (ValidateHobList (TdHob) == FALSE) {
+  //   return EFI_INVALID_PARAMETER;
+  // }
 
   //
   // Process Hoblist to accept memory
@@ -488,10 +488,10 @@ TransferTdxHobList (
         ResourceType      = Hob.ResourceDescriptor->ResourceType;
         ResourceAttribute = Hob.ResourceDescriptor->ResourceAttribute;
 
-        if (ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
-          ResourceType       = EFI_RESOURCE_SYSTEM_MEMORY;
-          ResourceAttribute |= (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_TESTED);
-        }
+        // if (ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
+        //   ResourceType       = EFI_RESOURCE_SYSTEM_MEMORY;
+        //   ResourceAttribute |= (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_TESTED);
+        // }
 
         BuildResourceDescriptorHob (
           ResourceType,
