@@ -4,7 +4,7 @@
 # and libraries instances, which are used for those modules.
 #
 # Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
-# Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2022, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # (C) Copyright 2016 - 2019 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
@@ -504,6 +504,9 @@
   ## Include/Ppi/CapsuleOnDisk.h
   gEdkiiPeiCapsuleOnDiskPpiGuid             = { 0x71a9ea61, 0x5a35, 0x4a5d, { 0xac, 0xef, 0x9c, 0xf8, 0x6d, 0x6d, 0x67, 0xe0 } }
   gEdkiiPeiBootInCapsuleOnDiskModePpiGuid   = { 0xb08a11e4, 0xe2b7, 0x4b75, { 0xb5, 0x15, 0xaf, 0x61, 0x6, 0x68, 0xbf, 0xd1  } }
+
+  ## Include/Ppi/ReadOnlyVariable2.h
+  gEfiPeiVariableStoreDiscoveredPpiGuid     = { 0xa2fc038d, 0xfdf5, 0x4501, { 0xaf, 0x8e, 0x69, 0xb0, 0x20, 0xec, 0xe6, 0x63 } }
 
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
