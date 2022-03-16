@@ -41,6 +41,7 @@
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
 
   # UefiCpuPkg
+  CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   UefiCpuLib|UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
   LocalApicLib|UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
 

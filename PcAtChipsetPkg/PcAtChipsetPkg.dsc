@@ -42,6 +42,7 @@
   ResetSystemLib|PcAtChipsetPkg/Library/ResetSystemLib/ResetSystemLib.inf
   IoApicLib|PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
   LocalApicLib|UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
+  CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   UefiCpuLib|UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf

@@ -21,6 +21,7 @@
 #include <Library/FspSwitchStackLib.h>
 #include <Library/FspCommonLib.h>
 #include <Library/UefiCpuLib.h>
+#include <Library/CpuLib.h>
 #include <FspEas.h>
 
 typedef VOID (*PEI_CORE_ENTRY) ( \
