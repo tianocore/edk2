@@ -1,7 +1,7 @@
 ## @file
 #  Security Module Package for All Architectures.
 #
-# Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015-2020 Hewlett Packard Enterprise Development LP<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -66,8 +66,11 @@
   TcgStorageCoreLib|SecurityPkg/Library/TcgStorageCoreLib/TcgStorageCoreLib.inf
   TcgStorageOpalLib|SecurityPkg/Library/TcgStorageOpalLib/TcgStorageOpalLib.inf
   ResetSystemLib|MdeModulePkg/Library/BaseResetSystemLibNull/BaseResetSystemLibNull.inf
+
+  # These should be Null by default
   VariableKeyLib|SecurityPkg/Library/VariableKeyLibNull/VariableKeyLibNull.inf
   RpmcLib|SecurityPkg/Library/RpmcLibNull/RpmcLibNull.inf
+  EncryptionVariableLib|SecurityPkg/Library/EncryptionVariableLibNull/EncryptionVariableLibNull.inf
   TcgEventLogRecordLib|SecurityPkg/Library/TcgEventLogRecordLib/TcgEventLogRecordLib.inf
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   SecureBootVariableLib|SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
@@ -251,8 +254,14 @@
   #
   # Variable Confidentiality & Integrity
   #
+  SecurityPkg/Library/ProtectedVariableLib/PeiProtectedVariableLib.inf
+  SecurityPkg/Library/ProtectedVariableLib/DxeProtectedVariableLib.inf
+  SecurityPkg/Library/ProtectedVariableLib/SmmProtectedVariableLib.inf
+  SecurityPkg/Library/ProtectedVariableLib/SmmRuntimeProtectedVariableLib.inf
+
   SecurityPkg/Library/VariableKeyLibNull/VariableKeyLibNull.inf
   SecurityPkg/Library/RpmcLibNull/RpmcLibNull.inf
+  SecurityPkg/Library/EncryptionVariableLibNull/EncryptionVariableLibNull.inf
 
   #
   # Other
