@@ -223,7 +223,6 @@ LibCredentialExitBootServicesNotify (
   IN  EDKII_REDFISH_CREDENTIAL_PROTOCOL  *This
   )
 {
-  LibStopRedfishService (This, ServiceStopTypeExitBootService);
 }
 
 /**
@@ -237,5 +236,4 @@ LibCredentialEndOfDxeNotify (
   IN  EDKII_REDFISH_CREDENTIAL_PROTOCOL  *This
   )
 {
-  LibStopRedfishService (This, ServiceStopTypeSecureBootDisabled);
 }
