@@ -12,6 +12,8 @@
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 2A,
   November 2018, CPUID instruction.
+  Architecture Specification: Intel(R) Trust Domain Extensions Module, Chap 10.2
+  344425-003US, August 2021
 
 **/
 
@@ -321,9 +323,9 @@ typedef union {
     ///
     UINT32    RDRAND              : 1;
     ///
-    /// [Bit 31] Always returns 0.
+    /// [Bit 31] A value of 1 indicates that processor is in Para-Virtualized.
     ///
-    UINT32    NotUsed             : 1;
+    UINT32    ParaVirtualized     : 1;
   } Bits;
   ///
   /// All bit fields as a 32-bit value
@@ -3685,6 +3687,35 @@ typedef union {
 #define   CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_MODULE  0x03
 #define   CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_TILE    0x04
 #define   CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE     0x05
+///
+/// @}
+///
+
+/**
+  CPUID Guest TD Run Time Environment Enumeration Leaf
+
+  @note
+  Guest software can be designed to run either as a TD, as a legacy virtual machine,
+  or directly on the CPU, based on enumeration of its run-time environment.
+  CPUID leaf 21H emulation is done by the Intel TDX module. Sub-leaf 0 returns the values
+  shown below. Other sub-leaves return 0 in EAX/EBX/ECX/EDX.
+    EAX: 0x00000000
+    EBX: 0x65746E49 "Inte"
+    ECX: 0x20202020 "    "
+    EDX: 0x5844546C "lTDX"
+
+  @param   EAX  CPUID_GUESTTD_RUNTIME_ENVIRONMENT                        (0x21)
+  @param   ECX  Level number
+
+**/
+#define CPUID_GUESTTD_RUNTIME_ENVIRONMENT  0x21
+
+///
+/// @{ CPUID Guest TD signature values returned by Intel processors
+///
+#define CPUID_GUESTTD_SIGNATURE_GENUINE_INTEL_EBX  SIGNATURE_32 ('I', 'n', 't', 'e')
+#define CPUID_GUESTTD_SIGNATURE_GENUINE_INTEL_ECX  SIGNATURE_32 (' ', ' ', ' ', ' ')
+#define CPUID_GUESTTD_SIGNATURE_GENUINE_INTEL_EDX  SIGNATURE_32 ('l', 'T', 'D', 'X')
 ///
 /// @}
 ///
