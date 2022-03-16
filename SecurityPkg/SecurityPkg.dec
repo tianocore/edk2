@@ -5,7 +5,7 @@
 #  It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 #  and libraries instances, which are used for those features.
 #
-# Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015 Hewlett Packard Enterprise Development LP <BR>
 # Copyright (c) Microsoft Corporation.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -87,6 +87,10 @@
   ## @libraryclass  Provides interfaces to access variable root key.
   #
   VariableKeyLib|Include/Library/VariableKeyLib.h
+
+  ## @libraryclass  Provides interfaces to encrypt/decrypt variable.
+  #
+  EncryptionVariableLib|Include/Library/EncryptionVariableLib.h
 
   ## @libraryclass  Provides interfaces about firmware TPM measurement.
   #
@@ -217,6 +221,18 @@
   ## GUID used to specify section with default dbt content
   gDefaultdbtFileGuid                = { 0x36c513ee, 0xa338, 0x4976, { 0xa0, 0xfb, 0x6d, 0xdb, 0xa3, 0xda, 0xfe, 0x87 } }
 
+  ## Include/Guid/ProtectedVariable.h
+  # {8EBF379A-F18E-4728-A410-00CF9A65BE91}
+  gEdkiiProtectedVariableGlobalGuid = { 0x8ebf379a, 0xf18e, 0x4728, { 0xa4, 0x10, 0x0, 0xcf, 0x9a, 0x65, 0xbe, 0x91 } }
+
+  ## Include/Guid/ProtectedVariable.h
+  # {e3e890ad-5b67-466e-904f-94ca7e9376bb}
+  gEdkiiMetaDataHmacVariableGuid = {0xe3e890ad, 0x5b67, 0x466e, {0x90, 0x4f, 0x94, 0xca, 0x7e, 0x93, 0x76, 0xbb}}
+
+  ## Include/Guid/ProtectedVariable.h
+  # {a11a3652-875b-495a-b097-200917580b98}
+  gEdkiiProtectedVariableContextGuid = {0xa11a3652, 0x875b, 0x495a, {0xb0, 0x97, 0x20, 0x09, 0x17, 0x58, 0x0b, 0x98} }
+
 [Ppis]
   ## The PPI GUID for that TPM physical presence should be locked.
   # Include/Ppi/LockPhysicalPresence.h
@@ -241,6 +257,10 @@
 
   ## Include/Ppi/Tcg.h
   gEdkiiTcgPpiGuid = {0x57a13b87, 0x133d, 0x4bf3, { 0xbf, 0xf1, 0x1b, 0xca, 0xc7, 0x17, 0x6c, 0xf1 } }
+
+  ## Key Service Ppi
+  # Include/Ppi/KeyServicePpi.h
+  gKeyServicePpiGuid = {0x583592f6, 0xEC34, 0x4CED, {0x8E, 0x81, 0xC8, 0xD1, 0x36, 0x93, 0x04, 0x27}}
 
 #
 # [Error.gEfiSecurityPkgTokenSpaceGuid]
@@ -324,6 +344,31 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeFvVerificationFail|0x0303100B|UINT32|0x00010031
 
   gEfiSecurityPkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm|{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}|VOID*|0x00010032
+
+  ## Progress Code for variable integrity check result.<BR><BR>
+  #  DEFAULT: (EFI_PERIPHERAL_FIXED_MEDIA | [EFI_STATUS&0xFF])
+  # @Prompt Status Code for variable integiry check result
+  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeVariableIntegrity|0x01070000|UINT32|0x00010033
+
+  ## Null-terminated Unicode string of the Platform Variable Name
+  # @Prompt known unprotected variable name
+  gEfiSecurityPkgTokenSpaceGuid.PcdPlatformVariableName|L""|VOID*|0x00010034
+
+  ## Guid name to identify Platform Variable Guid
+  # @Prompt known unprotected variable guid
+  gEfiSecurityPkgTokenSpaceGuid.PcdPlatformVariableGuid|{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }|VOID*|0x00010035
+
+  ## Defines Protected Variable Integrity support.
+  #   TRUE  - Enable Protected Variable Integrity.<BR>
+  #   FALSE - Disable Protected Variable Integrity.<BR>
+  # @Prompt Protected Variable Integrity support.
+  gEfiSecurityPkgTokenSpaceGuid.PcdProtectedVariableIntegrity|FALSE|BOOLEAN|0x00010036
+
+  ## Defines Protected Variable Confidentiality support.
+  #   TRUE  - Enable Protected Variable Confidentiality.<BR>
+  #   FALSE - Disable Protected Variable Confidentiality.<BR>
+  # @Prompt Protected Variable Integrity support.
+  gEfiSecurityPkgTokenSpaceGuid.PcdProtectedVariableConfidentiality|FALSE|BOOLEAN|0x00010037
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Image verification policy for OptionRom. Only following values are valid:<BR><BR>
