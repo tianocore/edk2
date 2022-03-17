@@ -197,25 +197,39 @@ OutputUnitTestFrameworkReport (
 
       ReportPrint ("**********************************************************\n");
     } // End Test iteration
-
-    ReportPrint ("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-    ReportPrint ("Suite Stats\n");
-    ReportPrint (" Passed:  %d  (%d%%)\n", SPassed, (SPassed * 100)/(SPassed+SFailed+SNotRun));
-    ReportPrint (" Failed:  %d  (%d%%)\n", SFailed, (SFailed * 100) / (SPassed + SFailed + SNotRun));
-    ReportPrint (" Not Run: %d  (%d%%)\n", SNotRun, (SNotRun * 100) / (SPassed + SFailed + SNotRun));
-    ReportPrint ("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-
+    
+    if((SPassed+SFailed+SNotRun) == 0) {
+        ReportPrint ("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+        ReportPrint ("Suite Stats\n");
+        ReportPrint (" Empty\n");
+        ReportPrint ("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+    } else {
+        ReportPrint ("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+        ReportPrint ("Suite Stats\n");
+        ReportPrint (" Passed:  %d  (%d%%)\n", SPassed, (SPassed * 100) / (SPassed+SFailed+SNotRun));
+        ReportPrint (" Failed:  %d  (%d%%)\n", SFailed, (SFailed * 100) / (SPassed + SFailed + SNotRun));
+        ReportPrint (" Not Run: %d  (%d%%)\n", SNotRun, (SNotRun * 100) / (SPassed + SFailed + SNotRun));
+        ReportPrint ("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+    }
     Passed += SPassed;  // add to global counters
     Failed += SFailed;  // add to global counters
     NotRun += SNotRun;  // add to global counters
   }// End Suite iteration
 
-  ReportPrint ("=========================================================\n");
-  ReportPrint ("Total Stats\n");
-  ReportPrint (" Passed:  %d  (%d%%)\n", Passed, (Passed * 100) / (Passed + Failed + NotRun));
-  ReportPrint (" Failed:  %d  (%d%%)\n", Failed, (Failed * 100) / (Passed + Failed + NotRun));
-  ReportPrint (" Not Run: %d  (%d%%)\n", NotRun, (NotRun * 100) / (Passed + Failed + NotRun));
-  ReportPrint ("=========================================================\n");
+  if((Passed+Failed+NotRun) == 0) {
+    ReportPrint ("=========================================================\n");
+    ReportPrint ("Total Stats\n");
+    ReportPrint (" Empty\n");
+    ReportPrint ("=========================================================\n");
+  
+  } else {
+    ReportPrint ("=========================================================\n");
+    ReportPrint ("Total Stats\n");
+    ReportPrint (" Passed:  %d  (%d%%)\n", Passed, (Passed * 100) / (Passed + Failed + NotRun));
+    ReportPrint (" Failed:  %d  (%d%%)\n", Failed, (Failed * 100) / (Passed + Failed + NotRun));
+    ReportPrint (" Not Run: %d  (%d%%)\n", NotRun, (NotRun * 100) / (Passed + Failed + NotRun));
+    ReportPrint ("=========================================================\n");
+  }
 
   return EFI_SUCCESS;
 }
