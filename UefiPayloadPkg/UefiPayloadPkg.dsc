@@ -33,6 +33,8 @@
   DEFINE UNIVERSAL_PAYLOAD            = FALSE
   DEFINE SECURITY_STUB_ENABLE         = TRUE
   DEFINE SMM_SUPPORT                  = FALSE
+  DEFINE ABOVE_4G_MEMORY              = TRUE
+  DEFINE BOOT_MANAGER_ESCAPE          = FALSE
   #
   # SBL:      UEFI payload for Slim Bootloader
   # COREBOOT: UEFI payload for coreboot
@@ -110,6 +112,11 @@
 
   DEFINE SERIAL_DRIVER_ENABLE = TRUE
   DEFINE PERFORMANCE_MEASUREMENT_ENABLE  = FALSE
+
+  # For recent X86 CPU, 0x15 CPUID instruction will return Time Stamp Counter Frequence.
+  # This is how BaseCpuTimerLib works, and a recommended way to get Frequence, so set the default value as TRUE.
+  # Note: for emulation platform such as QEMU, this may not work and should set it as FALSE
+  DEFINE CPU_TIMER_LIB_ENABLE  = TRUE
 
 [BuildOptions]
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
@@ -217,7 +224,7 @@
   #
   # Platform
   #
-!if $(UNIVERSAL_PAYLOAD) == TRUE
+!if $(CPU_TIMER_LIB_ENABLE) == TRUE && $(UNIVERSAL_PAYLOAD) == TRUE
   TimerLib|UefiCpuPkg/Library/CpuTimerLib/BaseCpuTimerLib.inf
 !else
   TimerLib|UefiPayloadPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
@@ -393,6 +400,9 @@
 !if $(PERFORMANCE_MEASUREMENT_ENABLE)
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask       | 0x1
 !endif
+
+  gUefiPayloadPkgTokenSpaceGuid.PcdDispatchModuleAbove4GMemory|$(ABOVE_4G_MEMORY)
+  gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape|$(BOOT_MANAGER_ESCAPE)
 
 [PcdsPatchableInModule.X64]
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister|$(RTC_INDEX_REGISTER)

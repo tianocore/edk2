@@ -17,6 +17,7 @@ Module Name:
 #include <IndustryStandard/I440FxPiix4.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/CloudHv.h>
+#include <IndustryStandard/Xen/arch-x86/hvm/start_info.h>
 #include <PiPei.h>
 #include <Register/Intel/SmramSaveStateMap.h>
 
@@ -38,6 +39,7 @@ Module Name:
 #include <Library/QemuFwCfgSimpleParserLib.h>
 
 #include "Platform.h"
+#include "Cmos.h"
 
 UINT8  mPhysMemAddressWidth;
 
@@ -314,6 +316,73 @@ ScanOrAdd64BitE820Ram (
   return EFI_SUCCESS;
 }
 
+/**
+  Returns PVH memmap
+
+  @param Entries      Pointer to PVH memmap
+  @param Count        Number of entries
+
+  @return EFI_STATUS
+**/
+EFI_STATUS
+GetPvhMemmapEntries (
+  struct hvm_memmap_table_entry  **Entries,
+  UINT32                         *Count
+  )
+{
+  UINT32                 *PVHResetVectorData;
+  struct hvm_start_info  *pvh_start_info;
+
+  PVHResetVectorData = (VOID *)(UINTN)PcdGet32 (PcdXenPvhStartOfDayStructPtr);
+  if (PVHResetVectorData == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  pvh_start_info = (struct hvm_start_info *)(UINTN)PVHResetVectorData[0];
+
+  *Entries = (struct hvm_memmap_table_entry *)(UINTN)pvh_start_info->memmap_paddr;
+  *Count   = pvh_start_info->memmap_entries;
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+UINT64
+GetHighestSystemMemoryAddressFromPvhMemmap (
+  BOOLEAN  Below4gb
+  )
+{
+  struct hvm_memmap_table_entry  *Memmap;
+  UINT32                         MemmapEntriesCount;
+  struct hvm_memmap_table_entry  *Entry;
+  EFI_STATUS                     Status;
+  UINT32                         Loop;
+  UINT64                         HighestAddress;
+  UINT64                         EntryEnd;
+
+  HighestAddress = 0;
+
+  Status = GetPvhMemmapEntries (&Memmap, &MemmapEntriesCount);
+  ASSERT_EFI_ERROR (Status);
+
+  for (Loop = 0; Loop < MemmapEntriesCount; Loop++) {
+    Entry    = Memmap + Loop;
+    EntryEnd = Entry->addr + Entry->size;
+
+    if ((Entry->type == XEN_HVM_MEMMAP_TYPE_RAM) &&
+        (EntryEnd > HighestAddress))
+    {
+      if (Below4gb && (EntryEnd <= BASE_4GB)) {
+        HighestAddress = EntryEnd;
+      } else if (!Below4gb && (EntryEnd >= BASE_4GB)) {
+        HighestAddress = EntryEnd;
+      }
+    }
+  }
+
+  return HighestAddress;
+}
+
 UINT32
 GetSystemMemorySizeBelow4gb (
   VOID
@@ -321,11 +390,56 @@ GetSystemMemorySizeBelow4gb (
 {
   EFI_STATUS  Status;
   UINT64      LowerMemorySize = 0;
+  UINT8       Cmos0x34;
+  UINT8       Cmos0x35;
+
+  if (mHostBridgeDevId == CLOUDHV_DEVICE_ID) {
+    // Get the information from PVH memmap
+    return (UINT32)GetHighestSystemMemoryAddressFromPvhMemmap (TRUE);
+  }
 
   Status = ScanOrAdd64BitE820Ram (FALSE, &LowerMemorySize, NULL);
-  ASSERT_EFI_ERROR (Status);
-  ASSERT (LowerMemorySize > 0);
-  return (UINT32)LowerMemorySize;
+  if ((Status == EFI_SUCCESS) && (LowerMemorySize > 0)) {
+    return (UINT32)LowerMemorySize;
+  }
+
+  //
+  // CMOS 0x34/0x35 specifies the system memory above 16 MB.
+  // * CMOS(0x35) is the high byte
+  // * CMOS(0x34) is the low byte
+  // * The size is specified in 64kb chunks
+  // * Since this is memory above 16MB, the 16MB must be added
+  //   into the calculation to get the total memory size.
+  //
+
+  Cmos0x34 = (UINT8)CmosRead8 (0x34);
+  Cmos0x35 = (UINT8)CmosRead8 (0x35);
+
+  return (UINT32)(((UINTN)((Cmos0x35 << 8) + Cmos0x34) << 16) + SIZE_16MB);
+}
+
+STATIC
+UINT64
+GetSystemMemorySizeAbove4gb (
+  )
+{
+  UINT32  Size;
+  UINTN   CmosIndex;
+
+  //
+  // CMOS 0x5b-0x5d specifies the system memory above 4GB MB.
+  // * CMOS(0x5d) is the most significant size byte
+  // * CMOS(0x5c) is the middle size byte
+  // * CMOS(0x5b) is the least significant size byte
+  // * The size is specified in 64kb chunks
+  //
+
+  Size = 0;
+  for (CmosIndex = 0x5d; CmosIndex >= 0x5b; CmosIndex--) {
+    Size = (UINT32)(Size << 8) + (UINT32)CmosRead8 (CmosIndex);
+  }
+
+  return LShiftU64 (Size, 16);
 }
 
 /**
@@ -355,9 +469,12 @@ GetFirstNonAddress (
   // If QEMU presents an E820 map, then get the highest exclusive >=4GB RAM
   // address from it. This can express an address >= 4GB+1TB.
   //
+  // Otherwise, get the flat size of the memory above 4GB from the CMOS (which
+  // can only express a size smaller than 1TB), and add it to 4GB.
+  //
   Status = ScanOrAdd64BitE820Ram (FALSE, NULL, &FirstNonAddress);
   if (EFI_ERROR (Status)) {
-    FirstNonAddress = BASE_4GB;
+    FirstNonAddress = BASE_4GB + GetSystemMemorySizeAbove4gb ();
   }
 
   //
@@ -729,6 +846,7 @@ QemuInitializeRam (
   )
 {
   UINT64         LowerMemorySize;
+  UINT64         UpperMemorySize;
   MTRR_SETTINGS  MtrrSettings;
   EFI_STATUS     Status;
 
@@ -787,6 +905,12 @@ QemuInitializeRam (
     // memory size read from the CMOS.
     //
     Status = ScanOrAdd64BitE820Ram (TRUE, NULL, NULL);
+    if (EFI_ERROR (Status)) {
+      UpperMemorySize = GetSystemMemorySizeAbove4gb ();
+      if (UpperMemorySize != 0) {
+        AddMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
+      }
+    }
   }
 
   //
