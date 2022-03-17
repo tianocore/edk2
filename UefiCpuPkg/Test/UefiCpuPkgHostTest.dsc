@@ -29,3 +29,4 @@
   # Build HOST_APPLICATION that tests the MtrrLib
   #
   UefiCpuPkg/Library/MtrrLib/UnitTest/MtrrLibUnitTestHost.inf
+# modified
