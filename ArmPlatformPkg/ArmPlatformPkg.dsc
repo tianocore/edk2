@@ -133,3 +133,4 @@
 
 [Components.AARCH64]
   ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashStandaloneMm.inf
+# modified
