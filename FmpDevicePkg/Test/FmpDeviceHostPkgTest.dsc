@@ -26,3 +26,4 @@
   # Build HOST_APPLICATION that tests the FmpDependencyLib
   #
   FmpDevicePkg/Test/UnitTest/Library/FmpDependencyLib/FmpDependencyLibUnitTestsHost.inf
+# modified
