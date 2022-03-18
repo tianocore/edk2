@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;*
-;*   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+;*   Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
 ;*   SPDX-License-Identifier: BSD-2-Clause-Patent
 ;*
 ;*    CpuAsm.nasm
@@ -23,7 +23,7 @@ ASM_PFX(SetCodeSelector):
     push    rcx
     lea     rax, [setCodeSelectorLongJump]
     push    rax
-    o64 retf
+    retfq
 setCodeSelectorLongJump:
     ret
 

@@ -1,7 +1,7 @@
 ;/** @file
 ;  Low level x64 routines used by the debug support driver.
 ;
-;  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+;  Copyright (c) 2007 - 2022, Intel Corporation. All rights reserved.<BR>
 ;  SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ;**/
@@ -25,21 +25,6 @@
 %define EXCPT64_SIMD 19
 
 %define FXSTOR_FLAG 0x1000000         ; bit cpuid 24 of feature flags
-
-;; The FXSTOR and FXRSTOR commands are used for saving and restoring the x87,
-;; MMX, SSE, SSE2, etc registers.  The initialization of the debugsupport driver
-;; MUST check the CPUID feature flags to see that these instructions are available
-;; and fail to init if they are not.
-
-;; fxstor [rdi]
-%macro FXSTOR_RDI 0
-                         db 0xf, 0xae, 00000111y ; mod = 00, reg/op = 000, r/m = 111 = [rdi]
-%endmacro
-
-;; fxrstor [rsi]
-%macro FXRSTOR_RSI 0
-                         db 0xf, 0xae, 00001110y ; mod = 00, reg/op = 001, r/m = 110 = [rsi]
-%endmacro
 
 SECTION .data
 
@@ -381,7 +366,7 @@ ExtraPushDone:
                 ; IMPORTANT!! The debug stack has been carefully constructed to
                 ; insure that rsp and rdi are 16 byte aligned when we get here.
                 ; They MUST be.  If they are not, a GP fault will occur.
-                FXSTOR_RDI
+                fxsave  [rdi]
 
 ;; UEFI calling convention for x64 requires that Direction flag in EFLAGs is clear
                 cld
@@ -404,7 +389,7 @@ ExtraPushDone:
 
 ;; FX_SAVE_STATE_X64 FxSaveState;
                 mov     rsi, rsp
-                FXRSTOR_RSI
+                fxrstor [rsi]
                 add     rsp, 512
 
 ;; UINT64  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
