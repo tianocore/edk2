@@ -4,7 +4,8 @@ trigger:
 pr:
   - master
 
-vmImage: 'ubnuntu-latest'
+pool:
+  vmImage: 'ubnuntu-latest'
 
 container: 'quay.io/osteffen/edk2-build:ubuntu-20.04'
 
