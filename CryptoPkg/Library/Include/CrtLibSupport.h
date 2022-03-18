@@ -2,7 +2,7 @@
   Root include file of C runtime library to support building the third-party
   cryptographic library.
 
-Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -111,6 +111,7 @@ typedef UINT8   u_char;
 typedef UINT32  uid_t;
 typedef UINT32  gid_t;
 typedef CHAR16  wchar_t;
+typedef UINT64  uint64_t;
 
 //
 // File operations are not required for EFI building,

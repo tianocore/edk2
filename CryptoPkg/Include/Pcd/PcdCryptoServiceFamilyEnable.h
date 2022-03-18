@@ -2,7 +2,7 @@
   Defines the PCD_CRYPTO_SERVICE_FAMILY_ENABLE structure associated with
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.
 
-  Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -288,6 +288,19 @@ typedef struct {
     } Services;
     UINT32    Family;
   } TlsGet;
+  union {
+    struct {
+      UINT8    Sign   : 1;
+      UINT8    Verify : 1;
+    } Services;
+    UINT32    Family;
+  } RsaPss;
+  union {
+    struct {
+      UINT8    HashAll : 1;
+    } Services;
+    UINT32    Family;
+  } ParallelHash;
 } PCD_CRYPTO_SERVICE_FAMILY_ENABLE;
 
 #endif
