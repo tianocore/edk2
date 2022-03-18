@@ -16,7 +16,7 @@ variables:
   System.Debug: true
 
 steps:
-  - bash: apt-get install -y --no-install-recommends qemu-system-x86-64
+  - bash: sudo apt-get install -y --no-install-recommends qemu-system-x86-64
   - bash: |
       pwd
       ls -laR
