@@ -884,7 +884,7 @@ ParseAcpiBitFields (
     }
 
     // extract Bitfield data for the current item
-    Data = (BitsData >> Parser[Index].Offset) & ~(~0ULL << Parser[Index].Length);
+    Data = RShiftU64 (BitsData, Parser[Index].Offset) & ~(LShiftU64 (~0ULL, Parser[Index].Length));
 
     if (Trace) {
       // if there is a Formatter function let the function handle
