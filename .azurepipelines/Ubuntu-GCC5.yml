@@ -5,7 +5,7 @@ pr:
   - master
 
 pool:
-  vmImage: 'ubnuntu-latest'
+  vmImage: 'ubuntu-latest'
 
 container: 'quay.io/osteffen/edk2-build:ubuntu-20.04'
 
