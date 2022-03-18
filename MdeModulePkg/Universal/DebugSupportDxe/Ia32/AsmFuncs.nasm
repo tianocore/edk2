@@ -1,7 +1,7 @@
 ;/** @file
 ;  Low leve IA32 specific debug support functions.
 ;
-;  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+;  Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 ;  SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ;**/
@@ -26,20 +26,6 @@
 
 %define FXSTOR_FLAG 0x1000000         ; bit cpuid 24 of feature flags
 
-;; The FXSTOR and FXRSTOR commands are used for saving and restoring the x87,
-;; MMX, SSE, SSE2, etc registers.  The initialization of the debugsupport driver
-;; MUST check the CPUID feature flags to see that these instructions are available
-;; and fail to init if they are not.
-
-;; fxstor [edi]
-%macro FXSTOR_EDI 0
-                         db 0xf, 0xae, 00000111y ; mod = 00, reg/op = 000, r/m = 111 = [edi]
-%endmacro
-
-;; fxrstor [esi]
-%macro FXRSTOR_ESI 0
-                         db 0xf, 0xae, 00001110y ; mod = 00, reg/op = 001, r/m = 110 = [esi]
-%endmacro
 SECTION .data
 
 global ASM_PFX(OrigVector)
@@ -348,7 +334,7 @@ ExtraPushDone:
                 ; IMPORTANT!! The debug stack has been carefully constructed to
                 ; insure that esp and edi are 16 byte aligned when we get here.
                 ; They MUST be.  If they are not, a GP fault will occur.
-                FXSTOR_EDI
+                fxsave  [edi]
 
 ;; UEFI calling convention for IA32 requires that Direction flag in EFLAGs is clear
                 cld
@@ -372,7 +358,7 @@ ExtraPushDone:
 
 ;; FX_SAVE_STATE_IA32 FxSaveState;
                 mov     esi, esp
-                FXRSTOR_ESI
+                fxrstor [esi]
                 add     esp, 512
 
 ;; UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
