@@ -20,3 +20,6 @@
 [submodule "RedfishPkg/Library/JsonLib/jansson"]
 	path = RedfishPkg/Library/JsonLib/jansson
 	url = https://github.com/akheron/jansson
+[submodule "UefiCpuPkg/Library/RISC-V/RiscVOpensbiLib/opensbi"]
+	path = UefiCpuPkg/Library/RISC-V/RiscVOpensbiLib/opensbi
+	url = https://github.com/riscv-software-src/opensbi
