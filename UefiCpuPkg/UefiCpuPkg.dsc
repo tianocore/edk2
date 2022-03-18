@@ -2,6 +2,7 @@
 #  UefiCpuPkg Package
 #
 #  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2022 Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -23,7 +24,7 @@
 
 !include MdePkg/MdeLibs.dsc.inc
 
-[LibraryClasses]
+[LibraryClasses.common]
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
@@ -31,9 +32,7 @@
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
-  UefiCpuLib|UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-  MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
@@ -47,48 +46,56 @@
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
-  LocalApicLib|UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   SmmMemLib|MdePkg/Library/SmmMemLib/SmmMemLib.inf
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
   PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
-  SmmCpuPlatformHookLib|UefiCpuPkg/Library/SmmCpuPlatformHookLibNull/SmmCpuPlatformHookLibNull.inf
-  SmmCpuFeaturesLib|UefiCpuPkg/Library/SmmCpuFeaturesLib/SmmCpuFeaturesLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+
+[LibraryClasses.IA32, LibraryClasses.X64]
+  UefiCpuLib|UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
+  MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
+  LocalApicLib|UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
+  SmmCpuPlatformHookLib|UefiCpuPkg/Library/SmmCpuPlatformHookLibNull/SmmCpuPlatformHookLibNull.inf
+  SmmCpuFeaturesLib|UefiCpuPkg/Library/SmmCpuFeaturesLib/SmmCpuFeaturesLib.inf
   VmgExitLib|UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
   MicrocodeLib|UefiCpuPkg/Library/MicrocodeLib/MicrocodeLib.inf
   SmmCpuRendezvousLib|UefiCpuPkg/Library/SmmCpuRendezvousLib/SmmCpuRendezvousLib.inf
 
 [LibraryClasses.common.SEC]
+  HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
+  MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+
+[LibraryClasses.IA32.SEC, LibraryClasses.X64.SEC]
   PlatformSecLib|UefiCpuPkg/Library/PlatformSecLibNull/PlatformSecLibNull.inf
 !if $(TOOL_CHAIN_TAG) == "XCODE5"
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/Xcode5SecPeiCpuExceptionHandlerLib.inf
 !else
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
 !endif
-  HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
-  MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
 
 [LibraryClasses.common.PEIM]
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxPeiLib.inf
-  MpInitLib|UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
-  RegisterCpuFeaturesLib|UefiCpuPkg/Library/RegisterCpuFeaturesLib/PeiRegisterCpuFeaturesLib.inf
-  CpuCacheInfoLib|UefiCpuPkg/Library/CpuCacheInfoLib/PeiCpuCacheInfoLib.inf
 
 [LibraryClasses.IA32.PEIM, LibraryClasses.X64.PEIM]
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/PeiCpuExceptionHandlerLib.inf
+  MpInitLib|UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
+  RegisterCpuFeaturesLib|UefiCpuPkg/Library/RegisterCpuFeaturesLib/PeiRegisterCpuFeaturesLib.inf
+  CpuCacheInfoLib|UefiCpuPkg/Library/CpuCacheInfoLib/PeiCpuCacheInfoLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
+
+[LibraryClasses.IA32.DXE_DRIVER, LibraryClasses.X64.DXE_DRIVER]
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
   RegisterCpuFeaturesLib|UefiCpuPkg/Library/RegisterCpuFeaturesLib/DxeRegisterCpuFeaturesLib.inf
@@ -99,6 +106,8 @@
   MmServicesTableLib|MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
   MemoryAllocationLib|MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
+
+[LibraryClasses.IA32.DXE_SMM_DRIVER, LibraryClasses.X64.DXE_SMM_DRIVER]
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
 
 [LibraryClasses.common.MM_STANDALONE]
@@ -112,7 +121,7 @@
 # Drivers/Libraries within this package
 #
 
-[Components]
+[Components.IA32, Components.X64]
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
   UefiCpuPkg/CpuIoPei/CpuIoPei.inf
   UefiCpuPkg/Library/SecPeiDxeTimerLibUefiCpu/SecPeiDxeTimerLibUefiCpu.inf
@@ -122,7 +131,6 @@
   UefiCpuPkg/Library/CpuCacheInfoLib/DxeCpuCacheInfoLib.inf
   UefiCpuPkg/MicrocodeMeasurementDxe/MicrocodeMeasurementDxe.inf
 
-[Components.IA32, Components.X64]
   UefiCpuPkg/CpuDxe/CpuDxe.inf
   UefiCpuPkg/CpuFeatures/CpuFeaturesPei.inf {
     <LibraryClasses>
