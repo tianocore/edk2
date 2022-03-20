@@ -1,10 +1,7 @@
 ## @file
-#  Component description file for SmmStore module
+#  This is the component description file for SmmStore module.
 #
-#  This module produces the FirmwareVolumeBlock protocol on top of the
-#  SmmStore provided by bootloader and installs the NvVarStoreFormatted protocol.
-#
-#  Copyright (c) 2022, 9elements GmbH<BR>
+#  Copyright (c) 2022, 9elements GmbH.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
