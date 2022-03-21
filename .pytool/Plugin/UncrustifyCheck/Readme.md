@@ -41,6 +41,7 @@ The plugin can be configured with a few optional configuration options.
       "AdditionalIncludePaths": [], # Additional paths to check formatting (wildcards supported).
       "AuditOnly": False,           # Don't fail the build if there are errors.  Just log them.
       "ConfigFilePath": "",         # Custom path to an Uncrustify config file.
+      "IgnoreFiles": [],            # A list of file patterns to ignore.
       "IgnoreStandardPaths": [],    # Standard Plugin defined paths that should be ignored.
       "OutputFileDiffs": True,      # Output chunks of formatting diffs in the test case log.
                                     # This can significantly slow down the plugin on very large packages.
@@ -66,6 +67,12 @@ the test as skipped. This allows visibility into the failures without breaking t
 `String` - Default is `"uncrustify.cfg"`
 
 When specified in the config file, this is a package relative path to the Uncrustify configuration file.
+
+### `IgnoreFiles`
+
+This option supports .gitignore file and folder matching strings including wildcards.
+
+The files specified by this configuration option will not be processed by Uncrustify.
 
 ### `IgnoreStandardPaths`
 
