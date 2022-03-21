@@ -20,7 +20,6 @@
         "IgnoreFiles": [
             "Include/Coreboot.h",
             "Library/CbParseLib/CbParseLib.c",
-            "Library/CbParseLib/CbParseLib.c",
             "PayloadLoaderPeim/ElfLib/ElfCommon.h",
             "PayloadLoaderPeim/ElfLib/Elf32.h",
             "PayloadLoaderPeim/ElfLib/Elf64.h"
