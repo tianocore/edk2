@@ -284,6 +284,10 @@
   #
   AesLib|Include/Library/AesLib.h
 
+  ##  @libraryclass  A library to have a Deterministic Random Bits Generator (DRBG).
+  #
+  DrbgLib|Include/Library/DrbgLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
