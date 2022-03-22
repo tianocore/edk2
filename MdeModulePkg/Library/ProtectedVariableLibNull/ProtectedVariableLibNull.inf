@@ -1,0 +1,34 @@
+## @file
+#  Provides null version of protected variable services.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010029
+  BASE_NAME                      = ProtectedVariableLibNull
+  FILE_GUID                      = 352C6A1B-403A-4E37-8517-FAA50BC45251
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 0.1
+  LIBRARY_CLASS                  = ProtectedVariableLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  ProtectedVariable.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+
