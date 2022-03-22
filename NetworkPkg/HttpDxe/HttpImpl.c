@@ -994,6 +994,7 @@ HttpResponseWorker (
   UINTN             HdrLen;
   NET_FRAGMENT      Fragment;
   UINT32            TimeoutValue;
+  UINTN             Index;
 
   if ((Wrap == NULL) || (Wrap->HttpInstance == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1199,6 +1200,16 @@ HttpResponseWorker (
 
       FreePool (HttpHeaders);
       HttpHeaders = NULL;
+
+      for (Index = 0; Index < HttpMsg->HeaderCount; ++Index) {
+        if ((AsciiStriCmp ("Connection", HttpMsg->Headers[Index].FieldName) == 0) &&
+            (AsciiStriCmp ("close", HttpMsg->Headers[Index].FieldValue) == 0))
+        {
+          DEBUG ((DEBUG_VERBOSE, "Http: 'Connection: close' header received.\n"));
+          HttpInstance->ConnectionClose = TRUE;
+          break;
+        }
+      }
 
       //
       // Init message-body parser by header information.
