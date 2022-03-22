@@ -70,6 +70,7 @@
   MdePkg/Library/BaseTrngLibNull/BaseTrngLibNull.inf
   MdePkg/Library/AesLibNull/AesLibNull.inf
   MdePkg/Library/DrbgLibNull/DrbgLibNull.inf
+  MdePkg/Library/DrbgLib/DrbgLib.inf
 
   MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
   MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf

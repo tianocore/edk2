@@ -1,0 +1,39 @@
+## @file
+#  Drbg library
+#
+#  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = DrbgLib
+  FILE_GUID      = 454B071B-FD44-4055-B689-E06B6FE5D3D7
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = DrbgLib
+
+#
+#  VALID_ARCHITECTURES           = AARCH64 ARM
+#
+
+[Sources]
+  BitStream.c
+  BitStream.h
+  Common.c
+  Common.h
+  CtrDrbg.c
+  CtrDrbg.h
+  DrbgLib.c
+  DrbgLibInternal.h
+  GetEntropyInput.c
+  GetEntropyInput.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  AesLib
+  BaseLib
+  TrngLib
