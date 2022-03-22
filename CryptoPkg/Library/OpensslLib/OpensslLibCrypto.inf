@@ -581,7 +581,8 @@
 
 [LibraryClasses.ARM]
   ArmSoftFloatLib
-
+[Pcd]
+  gEfiCryptoPkgTokenSpaceGuid.PcdEcEnabled      ## CONSUMES
 [BuildOptions]
   #
   # Disables the following Visual Studio compiler warnings brought by openssl source,
