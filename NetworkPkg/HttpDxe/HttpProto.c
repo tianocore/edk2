@@ -1168,6 +1168,18 @@ HttpConfigureTcp6 (
   Tcp6Option->KeepAliveInterval = HTTP_KEEP_ALIVE_INTERVAL;
   Tcp6Option->EnableNagle       = TRUE;
 
+  if ((HttpInstance->State == HTTP_STATE_TCP_CONNECTED) ||
+      (HttpInstance->State == HTTP_STATE_TCP_CLOSED))
+  {
+    Status = HttpInstance->Tcp6->Configure (HttpInstance->Tcp6, NULL);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "HttpConfigureTcp6(NULL) - %r\n", Status));
+      return Status;
+    }
+
+    HttpInstance->State = HTTP_STATE_TCP_UNCONFIGED;
+  }
+
   Status = HttpInstance->Tcp6->Configure (HttpInstance->Tcp6, Tcp6CfgData);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "HttpConfigureTcp6 - %r\n", Status));
