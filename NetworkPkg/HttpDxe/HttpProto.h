@@ -194,6 +194,8 @@ typedef struct _HTTP_PROTOCOL {
   EFI_TCP6_IO_TOKEN                 Tcp6TlsRxToken;
   EFI_TCP6_RECEIVE_DATA             Tcp6TlsRxData;
   BOOLEAN                           TlsIsRxDone;
+
+  BOOLEAN                           ConnectionClose;
 } HTTP_PROTOCOL;
 
 typedef struct {

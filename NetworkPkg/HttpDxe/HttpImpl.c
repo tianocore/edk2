@@ -161,6 +161,7 @@ EfiHttpConfigure (
     HttpInstance->HttpVersion        = HttpConfigData->HttpVersion;
     HttpInstance->TimeOutMillisec    = HttpConfigData->TimeOutMillisec;
     HttpInstance->LocalAddressIsIPv6 = HttpConfigData->LocalAddressIsIPv6;
+    HttpInstance->ConnectionClose    = FALSE;
 
     if (HttpConfigData->LocalAddressIsIPv6) {
       CopyMem (
@@ -440,7 +441,8 @@ EfiHttpRequest (
       //
       ReConfigure = FALSE;
     } else {
-      if ((HttpInstance->RemotePort == RemotePort) &&
+      if ((HttpInstance->ConnectionClose == FALSE) &&
+          (HttpInstance->RemotePort == RemotePort) &&
           (AsciiStrCmp (HttpInstance->RemoteHost, HostName) == 0) &&
           (!HttpInstance->UseHttps || (HttpInstance->UseHttps &&
                                        !TlsConfigure &&
@@ -648,6 +650,8 @@ EfiHttpRequest (
       goto Error4;
     }
   }
+
+  HttpInstance->ConnectionClose = FALSE;
 
   //
   // Transmit the request message.
