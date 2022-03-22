@@ -1,0 +1,21 @@
+## @file
+#  Drbg Null library
+#
+#  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = DrbgLib
+  FILE_GUID      = B8A688E5-C31A-4CF8-9A76-B31211D292DE
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = DrbgLib
+
+[Sources]
+  DrbgLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
