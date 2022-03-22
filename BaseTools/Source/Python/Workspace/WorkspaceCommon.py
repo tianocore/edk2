@@ -75,6 +75,11 @@ def GetDeclaredPcd(Platform, BuildDatabase, Arch, Target, Toolchain, additionalP
                         break
             if (PcdCName, PcdTokenName) not in DecPcds:
                 DecPcds[PcdCName, PcdTokenName] = Pkg.Pcds[Pcd]
+    if not GlobalData.gPlatformFinalPcds.get(Arch):
+        GlobalData.gPlatformFinalPcds[Arch] = OrderedDict()
+    for Name,Guid in DecPcds:
+        if DecPcds[Name,Guid].Type == 'FeatureFlag' or DecPcds[Name, Guid].Type == 'FixedAtBuild':
+            GlobalData.gPlatformFinalPcds[Arch]['%s.%s'%(Guid, Name)]=DecPcds[Name, Guid].DefaultValue
     return DecPcds, GuidDict
 
 ## Get all dependent libraries for a module
