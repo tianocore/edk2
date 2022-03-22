@@ -137,8 +137,23 @@ EnumerateNvmeDevNamespace (
     Device->Media.WriteCaching     = FALSE;
     Device->Media.IoAlign          = Private->PassThruMode.IoAlign;
 
-    Flbas                   = NamespaceData->Flbas;
-    LbaFmtIdx               = Flbas & 0xF;
+    Flbas     = NamespaceData->Flbas;
+    LbaFmtIdx = Flbas & 0xF;
+
+    //
+    // Currently this NVME driver only suport Metadata Size == 0
+    //
+    if (NamespaceData->LbaFormat[LbaFmtIdx].Ms != 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "NVME IDENTIFY NAMESPACE [%d] Ms(%d) is not supported.\n",
+        NamespaceId,
+        NamespaceData->LbaFormat[LbaFmtIdx].Ms
+        ));
+      Status = EFI_UNSUPPORTED;
+      goto Exit;
+    }
+
     Lbads                   = NamespaceData->LbaFormat[LbaFmtIdx].Lbads;
     Device->Media.BlockSize = (UINT32)1 << Lbads;
 
@@ -957,6 +972,33 @@ NvmExpressDriverBindingStart (
       DEBUG ((DEBUG_ERROR, "NvmExpressDriverBindingStart: allocating pool for Nvme Private Data failed!\n"));
       Status = EFI_OUT_OF_RESOURCES;
       goto Exit;
+    }
+
+    //
+    // Save original PCI attributes
+    //
+    Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationGet,
+                      0,
+                      &Private->PciAttributes
+                      );
+
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Enable 64-bit DMA support in the PCI layer.
+    //
+    Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationEnable,
+                      EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE,
+                      NULL
+                      );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "NvmExpressDriverBindingStart: failed to enable 64-bit DMA (%r)\n", Status));
     }
 
     //

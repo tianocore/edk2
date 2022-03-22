@@ -73,7 +73,7 @@ class SpellCheck(ICiBuildPlugin):
     def RunBuildPlugin(self, packagename, Edk2pathObj, pkgconfig, environment, PLM, PLMHelper, tc, output_stream=None):
         Errors = []
 
-        abs_pkg_path = Edk2pathObj.GetAbsolutePathOnThisSytemFromEdk2RelativePath(
+        abs_pkg_path = Edk2pathObj.GetAbsolutePathOnThisSystemFromEdk2RelativePath(
             packagename)
 
         if abs_pkg_path is None:

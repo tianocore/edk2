@@ -40,11 +40,14 @@ typedef enum {
   SerialNumType01,
   UuidType01,
   SystemManufacturerType01,
+  VersionType01,
   SkuNumberType01,
   FamilyType01,
   AssertTagType02,
   SerialNumberType02,
   BoardManufacturerType02,
+  ProductNameType02,
+  VersionType02,
   SkuNumberType02,
   ChassisLocationType02,
   AssetTagType03,
@@ -53,6 +56,8 @@ typedef enum {
   ChassisTypeType03,
   ManufacturerType03,
   SkuNumberType03,
+  ProcessorPartNumType04,
+  ProcessorSerialNumType04,
   SmbiosHiiStringFieldMax
 } OEM_MISC_SMBIOS_HII_STRING_FIELD;
 

@@ -213,7 +213,7 @@ UpdateFrontPageForm (
   //
   StartGuidLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
   StartGuidLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-  StartGuidLabel->Number       = LABEL_FRANTPAGE_INFORMATION;
+  StartGuidLabel->Number       = LABEL_FRONTPAGE_INFORMATION;
   //
   // Create Hii Extend Label OpCode as the end opcode
   //
