@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2010 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -321,7 +321,7 @@ NoExtrPush:
     test    edx, BIT24  ; Test for FXSAVE/FXRESTOR support.
                         ; edx still contains result from CPUID above
     jz      .2
-    db 0xf, 0xae, 00000111y ;fxsave [edi]
+    fxsave  [edi]
 .2:
 
     ;; save the exception data
@@ -342,7 +342,7 @@ NoExtrPush:
     cpuid               ; use CPUID to determine if FXSAVE/FXRESTOR are supported
     test    edx, BIT24  ; Test for FXSAVE/FXRESTOR support
     jz      .3
-    db 0xf, 0xae, 00001110y ; fxrstor [esi]
+    fxrstor [esi]
 .3:
     add esp, 512
 

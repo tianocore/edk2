@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "InternalBm.h"
 
+#include <Library/VariablePolicyHelperLib.h>
+
 GLOBAL_REMOVE_IF_UNREFERENCED
 CHAR16  *mBmLoadOptionName[] = {
   L"Driver",
@@ -169,15 +171,15 @@ EfiBootManagerLoadOptionToVariable (
   IN CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Option
   )
 {
-  EFI_STATUS                    Status;
-  UINTN                         VariableSize;
-  UINT8                         *Variable;
-  UINT8                         *Ptr;
-  CHAR16                        OptionName[BM_OPTION_NAME_LEN];
-  CHAR16                        *Description;
-  CHAR16                        NullChar;
-  EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock;
-  UINT32                        VariableAttributes;
+  EFI_STATUS                      Status;
+  UINTN                           VariableSize;
+  UINT8                           *Variable;
+  UINT8                           *Ptr;
+  CHAR16                          OptionName[BM_OPTION_NAME_LEN];
+  CHAR16                          *Description;
+  CHAR16                          NullChar;
+  EDKII_VARIABLE_POLICY_PROTOCOL  *VariablePolicy;
+  UINT32                          VariableAttributes;
 
   if ((Option->OptionNumber == LoadOptionNumberUnassigned) ||
       (Option->FilePath == NULL) ||
@@ -242,9 +244,18 @@ structure.
     //
     // Lock the PlatformRecovery####
     //
-    Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLock);
+    Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicy);
     if (!EFI_ERROR (Status)) {
-      Status = VariableLock->RequestToLock (VariableLock, OptionName, &gEfiGlobalVariableGuid);
+      Status = RegisterBasicVariablePolicy (
+                 VariablePolicy,
+                 &gEfiGlobalVariableGuid,
+                 OptionName,
+                 VARIABLE_POLICY_NO_MIN_SIZE,
+                 VARIABLE_POLICY_NO_MAX_SIZE,
+                 VARIABLE_POLICY_NO_MUST_ATTR,
+                 VARIABLE_POLICY_NO_CANT_ATTR,
+                 VARIABLE_POLICY_TYPE_LOCK_NOW
+                 );
       ASSERT_EFI_ERROR (Status);
     }
 

@@ -1,7 +1,7 @@
 /** @file
   ACPI 6.0 definitions from the ACPI Specification Revision 6.0 Errata A January, 2016.
 
-  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -1560,10 +1560,16 @@ typedef struct {
 //
 // Boot Error Severity types
 //
-#define EFI_ACPI_6_0_ERROR_SEVERITY_CORRECTABLE  0x00
+#define EFI_ACPI_6_0_ERROR_SEVERITY_RECOVERABLE  0x00
 #define EFI_ACPI_6_0_ERROR_SEVERITY_FATAL        0x01
 #define EFI_ACPI_6_0_ERROR_SEVERITY_CORRECTED    0x02
 #define EFI_ACPI_6_0_ERROR_SEVERITY_NONE         0x03
+//
+// The term 'Correctable' is no longer being used as an error severity of the
+// reported error since ACPI Specification Version 5.1 Errata B.
+// The below macro is considered as deprecated and should no longer be used.
+//
+#define EFI_ACPI_6_0_ERROR_SEVERITY_CORRECTABLE  0x00
 
 ///
 /// Generic Error Data Entry Definition
