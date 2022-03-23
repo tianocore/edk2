@@ -3,7 +3,7 @@
 #
 # Provides drivers and definitions to create uefi payload for bootloaders.
 #
-# Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -263,9 +263,11 @@
   AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
 !if $(VARIABLE_SUPPORT) == "EMU"
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  ProtectedVariableLib|MdeModulePkg/Library/ProtectedVariableLibNull/ProtectedVariableLibNull.inf
 !elseif $(VARIABLE_SUPPORT) == "SPI"
   PlatformSecureLib|SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
   TpmMeasurementLib|SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
+  ProtectedVariableLib|SecurityPkg/Library/ProtectedVariableLib/DxeProtectedVariableLib.inf
   S3BootScriptLib|MdePkg/Library/BaseS3BootScriptLibNull/BaseS3BootScriptLibNull.inf
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
 !endif
