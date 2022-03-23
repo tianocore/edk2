@@ -20,6 +20,7 @@ import Common.GlobalData as GlobalData
 var_info = collections.namedtuple("uefi_var", "pcdindex,pcdname,defaultstoragename,skuname,var_name, var_guid, var_offset,var_attribute,pcd_default_value, default_value, data_type,PcdDscLine,StructurePcd")
 NvStorageHeaderSize = 28
 VariableHeaderSize = 32
+AuthenticatedVariableHeaderSize = 60
 
 class VariableMgr(object):
     def __init__(self, DefaultStoreMap, SkuIdMap):
@@ -171,7 +172,10 @@ class VariableMgr(object):
             DataBuffer = VariableMgr.AlignData(var_name_buffer + default_data)
 
             data_size = len(DataBuffer)
-            offset += VariableHeaderSize + len(default_info.var_name.split(","))
+            if GlobalData.gCommandLineDefines.get(TAB_DSC_DEFINES_VPD_AUTHENTICATED_VARIABLE_STORE,"FALSE").upper() == "TRUE":
+                offset += AuthenticatedVariableHeaderSize + len(default_info.var_name.split(","))
+            else:
+                offset += VariableHeaderSize + len(default_info.var_name.split(","))
             var_data_offset[default_info.pcdindex] = offset
             offset += data_size - len(default_info.var_name.split(","))
             if GlobalData.gCommandLineDefines.get(TAB_DSC_DEFINES_VPD_AUTHENTICATED_VARIABLE_STORE,"FALSE").upper() == "TRUE":

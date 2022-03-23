@@ -165,6 +165,9 @@ LibStopRedfishService (
   IN EDKII_REDFISH_CREDENTIAL_STOP_SERVICE_TYPE  ServiceStopType
   )
 {
+  EFI_STATUS  Status;
+  UINT8       *SecureBootVar;
+
   if (ServiceStopType >= ServiceStopTypeMax) {
     return EFI_INVALID_PARAMETER;
   }
@@ -177,8 +180,18 @@ LibStopRedfishService (
     if (!PcdGetBool (PcdRedfishServieStopIfSecureBootDisabled)) {
       return EFI_UNSUPPORTED;
     } else {
-      mStopRedfishService = TRUE;
-      DEBUG ((DEBUG_INFO, "EFI Redfish service is stopped due to SecureBoot is disabled!!\n"));
+      //
+      // Check Secure Boot status and lock Redfish service if Secure Boot is disabled.
+      //
+      Status = GetVariable2 (EFI_SECURE_BOOT_MODE_NAME, &gEfiGlobalVariableGuid, (VOID **)&SecureBootVar, NULL);
+      if (EFI_ERROR (Status) || (*SecureBootVar != SECURE_BOOT_MODE_ENABLE)) {
+        //
+        // Secure Boot is disabled
+        //
+        mSecureBootDisabled = TRUE;
+        mStopRedfishService = TRUE;
+        DEBUG ((DEBUG_INFO, "EFI Redfish service is stopped due to SecureBoot is disabled!!\n"));
+      }
     }
   } else if (ServiceStopType == ServiceStopTypeExitBootService) {
     //
@@ -210,7 +223,6 @@ LibCredentialExitBootServicesNotify (
   IN  EDKII_REDFISH_CREDENTIAL_PROTOCOL  *This
   )
 {
-  LibStopRedfishService (This, ServiceStopTypeExitBootService);
 }
 
 /**
@@ -224,18 +236,4 @@ LibCredentialEndOfDxeNotify (
   IN  EDKII_REDFISH_CREDENTIAL_PROTOCOL  *This
   )
 {
-  EFI_STATUS  Status;
-  UINT8       *SecureBootVar;
-
-  //
-  // Check Secure Boot status and lock Redfish service if Secure Boot is disabled.
-  //
-  Status = GetVariable2 (EFI_SECURE_BOOT_MODE_NAME, &gEfiGlobalVariableGuid, (VOID **)&SecureBootVar, NULL);
-  if (EFI_ERROR (Status) || (*SecureBootVar != SECURE_BOOT_MODE_ENABLE)) {
-    //
-    // Secure Boot is disabled
-    //
-    mSecureBootDisabled = TRUE;
-    LibStopRedfishService (This, ServiceStopTypeSecureBootDisabled);
-  }
 }

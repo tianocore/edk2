@@ -108,7 +108,7 @@ ProcessRelocation64 (
   IN  UINT64      RelaSize,
   IN  UINT64      RelaEntrySize,
   IN  UINT64      RelaType,
-  IN  INTN        Delta,
+  IN  INT64       Delta,
   IN  BOOLEAN     DynamicLinking
   )
 {
