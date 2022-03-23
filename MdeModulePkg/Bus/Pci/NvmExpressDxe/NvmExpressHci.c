@@ -761,7 +761,7 @@ NvmeControllerInit (
     return Status;
   }
 
-  if (Private->Cap.Css != 0x01) {
+  if ((Private->Cap.Css & BIT0) == 0) {
     DEBUG ((DEBUG_INFO, "NvmeControllerInit: the controller doesn't support NVMe command set\n"));
     return EFI_UNSUPPORTED;
   }
