@@ -1213,9 +1213,14 @@ SdCardIdentification (
   UINT32                         PresentState;
   UINT8                          HostCtrl2;
   UINTN                          Retry;
+  BOOLEAN                        ForceVoltage33;
+
+  ForceVoltage33 = FALSE;
 
   PciIo    = Private->PciIo;
   PassThru = &Private->PassThru;
+
+Voltage33Retry:
   //
   // 1. Send Cmd0 to the device
   //
@@ -1295,6 +1300,13 @@ SdCardIdentification (
   }
 
   //
+  // 1.8V had failed in the previous run, forcing a retry with 3.3V instead
+  //
+  if (ForceVoltage33 == TRUE) {
+    S18r = FALSE;
+  }
+
+  //
   // 5. Repeatly send Acmd41 with supply voltage window to the device.
   //    Note here we only support the cards complied with SD physical
   //    layer simplified spec version 2.0 and version 3.0 and above.
@@ -1366,9 +1378,30 @@ SdCardIdentification (
 
       SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
       if (((PresentState >> 20) & 0xF) != 0xF) {
-        DEBUG ((DEBUG_ERROR, "SdCardIdentification: SwitchVoltage fails with PresentState = 0x%x, It should be 0xF\n", PresentState));
-        Status = EFI_DEVICE_ERROR;
-        goto Error;
+        //
+        // Delay 50 milliseconds in order for clock to stabilize, retry reading the SD_MMC_HC_PRESENT_STATE
+        //
+        gBS->Stall (50000);
+        SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
+        if (((PresentState >> 20) & 0xF) != 0xF) {
+          DEBUG ((DEBUG_ERROR, "SdCardIdentification: SwitchVoltage fails with PresentState = 0x%x, It should be 0xF\n", PresentState));
+          //
+          // Reset and reinitialize the slot before the 3.3V retry.
+          //
+          Status = SdMmcHcReset (Private, Slot);
+          if (EFI_ERROR (Status)) {
+            goto Error;
+          }
+
+          Status = SdMmcHcInitHost (Private, Slot);
+          if (EFI_ERROR (Status)) {
+            goto Error;
+          }
+
+          DEBUG ((DEBUG_ERROR, "SdCardIdentification: Switching to 1.8V failed, forcing a retry with 3.3V instead\n"));
+          ForceVoltage33 = TRUE;
+          goto Voltage33Retry;
+        }
       }
     }
 

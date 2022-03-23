@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -199,8 +199,12 @@ FspGlobalDataInit (
     ImageId, \
     (PeiFspData->FspInfoHeader->ImageRevision >> 24) & 0xFF, \
     (PeiFspData->FspInfoHeader->ImageRevision >> 16) & 0xFF, \
-    (PeiFspData->FspInfoHeader->ImageRevision >> 8) & 0xFF, \
-    PeiFspData->FspInfoHeader->ImageRevision & 0xFF
+    (PeiFspData->FspInfoHeader->HeaderRevision >= 6) ? \
+      (((PeiFspData->FspInfoHeader->ImageRevision >> 8) & 0xFF) | (PeiFspData->FspInfoHeader->ExtendedImageRevision & 0xFF00)) :\
+        ((PeiFspData->FspInfoHeader->ImageRevision >> 8) & 0xFF), \
+    (PeiFspData->FspInfoHeader->HeaderRevision >= 6) ? \
+      ((PeiFspData->FspInfoHeader->ImageRevision & 0xFF) | ((PeiFspData->FspInfoHeader->ExtendedImageRevision & 0xFF) << 8)): \
+        (PeiFspData->FspInfoHeader->ImageRevision & 0xFF)
     ));
 }
 
@@ -213,7 +217,7 @@ FspGlobalDataInit (
 **/
 VOID
 FspDataPointerFixUp (
-  IN UINT32  OffsetGap
+  IN UINTN  OffsetGap
   )
 {
   FSP_GLOBAL_DATA  *NewFspData;
