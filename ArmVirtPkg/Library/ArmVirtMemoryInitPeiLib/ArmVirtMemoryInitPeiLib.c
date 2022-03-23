@@ -91,15 +91,6 @@ MemoryPeim (
       );
   }
 
-  //
-  // When running under virtualization, the PI/UEFI memory region may be
-  // clean but not invalidated in system caches or in lower level caches
-  // on other CPUs. So invalidate the region by virtual address, to ensure
-  // that the contents we put there with the caches and MMU off will still
-  // be visible after turning them on.
-  //
-  InvalidateDataCacheRange ((VOID *)(UINTN)UefiMemoryBase, UefiMemorySize);
-
   // Build Memory Allocation Hob
   InitMmu ();
 

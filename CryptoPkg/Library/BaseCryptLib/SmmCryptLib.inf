@@ -38,6 +38,10 @@
   Hash/CryptSha256.c
   Hash/CryptSm3.c
   Hash/CryptSha512.c
+  Hash/CryptSha3.c
+  Hash/CryptXkcp.c
+  Hash/CryptCShake256.c
+  Hash/CryptParallelHash.c
   Hmac/CryptHmacSha256.c
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
@@ -85,6 +89,8 @@
   OpensslLib
   IntrinsicLib
   PrintLib
+  MmServicesTableLib
+  SynchronizationLib
 
 #
 # Remove these [BuildOptions] after this library is cleaned up

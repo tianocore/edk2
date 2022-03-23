@@ -87,7 +87,7 @@ UINT32 mImageTimeStamp = 0;
 UINT32 mImageSize = 0;
 UINT32 mOutImageType = FW_DUMMY_IMAGE;
 BOOLEAN mIsConvertXip = FALSE;
-
+BOOLEAN mExportFlag = FALSE;
 
 STATIC
 EFI_STATUS
@@ -279,6 +279,10 @@ Returns:
                         except for -o or -r option. It is a action option.\n\
                         If it is combined with other action options, the later\n\
                         input action option will override the previous one.\n");
+  fprintf (stdout, "  --prm                 Scan symbol section from ELF image and \n\
+                        write export table into PE-COFF.\n\
+                        This option can be used together with -e.\n\
+                        It doesn't work for other options.\n");
   fprintf (stdout, "  -v, --verbose         Turn on verbose output with informational messages.\n");
   fprintf (stdout, "  -q, --quiet           Disable all messages except key message and fatal error\n");
   fprintf (stdout, "  -d, --debug level     Enable debug messages, at input debug level.\n");
@@ -1431,6 +1435,20 @@ Returns:
 
     if (stricmp (argv[0], "--hiibinpackage") == 0) {
       mOutImageType = FW_HII_PACKAGE_LIST_BINIMAGE;
+      argc --;
+      argv ++;
+      continue;
+    }
+
+    if (stricmp (argv[0], "--prm") == 0) {
+      if (stricmp (ModuleType, "DXE_RUNTIME_DRIVER") != 0 ){
+        Error (NULL, 0, 1001, "Invalid", "--prm option only supports DXE RUNTIME driver.");
+        goto Finish;
+      }
+
+      if (!mExportFlag) {
+        mExportFlag = TRUE;
+      }
       argc --;
       argv ++;
       continue;
