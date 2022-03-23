@@ -14,7 +14,7 @@
   VariableServiceSetVariable(), VariableServiceQueryVariableInfo(), ReclaimForOS(),
   SmmVariableGetStatistics() should also do validation based on its own knowledge.
 
-Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2018, Linaro, Ltd. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -28,6 +28,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/MmServicesTableLib.h>
 #include <Library/VariablePolicyLib.h>
+#include <Library/SmmCpuRendezvousLib.h>
 
 #include <Guid/SmmVariableCommon.h>
 #include "Variable.h"
@@ -654,6 +655,13 @@ SmmVariableHandler (
         //
         Status = EFI_ACCESS_DENIED;
         goto EXIT;
+      }
+
+      if ((SmmVariableHeader->Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
+        if (EFI_ERROR (SmmWaitForAllProcessor (TRUE))) {
+          DEBUG ((DEBUG_ERROR, "SetVariable: fail to wait for all AP check in SMM!\n"));
+          goto EXIT;
+        }
       }
 
       Status = VariableServiceSetVariable (
