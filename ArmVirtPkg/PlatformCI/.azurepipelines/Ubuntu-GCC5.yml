@@ -22,6 +22,9 @@ jobs:
       vm_image: 'ubuntu-18.04'
       should_run: true
       run_flags: "MAKE_STARTUP_NSH=TRUE QEMU_HEADLESS=TRUE"
+      GCC5_AARCH64_PREFIX: "/usr/bin/aarch64-linux-gnu-"
+      GCC5_ARM_PREFIX:     "/usr/bin/arm-linux-gnueabihf-"
+      GCC5_X64_PREFIX:     "/usr/bin/x86_64-linux-gnu-"
 
     #Use matrix to speed up the build process
     strategy:
@@ -75,7 +78,7 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
-    container: 'quay.io/osteffen/edk2-build:ubuntu-20.04'
+    container: 'quay.io/osteffen/edk2-build:ubuntu-20.04-gcc-10'
 
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml

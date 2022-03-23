@@ -75,7 +75,7 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
-    container: 'quay.io/osteffen/edk2-build:ubuntu-20.04'
+    container: 'quay.io/osteffen/edk2-build:ubuntu-20.04-gcc-10'
 
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml

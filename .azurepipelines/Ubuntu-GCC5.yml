@@ -12,6 +12,11 @@ pr:
 - master
 - stable/*
 
+variables:
+  GCC5_AARCH64_PREFIX: "/usr/bin/aarch64-linux-gnu-"
+  GCC5_ARM_PREFIX:     "/usr/bin/arm-linux-gnueabihf-"
+  GCC5_X64_PREFIX:     "/usr/bin/x86_64-linux-gnu-"
+
 jobs:
 - template: templates/pr-gate-build-job.yml
   parameters:
