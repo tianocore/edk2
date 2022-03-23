@@ -1,7 +1,7 @@
 /** @file
   The header file for TCG SMM driver.
 
-Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -31,6 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/TpmMeasurementLib.h>
 #include <Library/PcdLib.h>
 #include <Library/TcgPpVendorLib.h>
+#include <Library/SmmCpuRendezvousLib.h>
 
 #pragma pack(1)
 typedef struct {

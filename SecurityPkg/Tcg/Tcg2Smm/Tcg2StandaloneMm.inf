@@ -55,6 +55,7 @@
   Tcg2PhysicalPresenceLib
   PcdLib
   MemLib
+  SmmCpuRendezvousLib
 
 [Guids]
   ## SOMETIMES_PRODUCES ## Variable:L"MemoryOverwriteRequestControl"
