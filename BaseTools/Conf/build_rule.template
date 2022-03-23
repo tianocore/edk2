@@ -375,7 +375,7 @@
         -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR) 
     <Command.GCC>
         $(CP) ${src} $(DEBUG_DIR)(+)$(MODULE_NAME).debug
-        $(OBJCOPY) --strip-unneeded -R .eh_frame ${src}
+        $(OBJCOPY) $(OBJCOPY_STRIPFLAG) ${src}
 
         #
         #The below 2 lines are only needed for UNIXGCC tool chain, which generates PE image directly

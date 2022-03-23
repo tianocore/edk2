@@ -1,7 +1,7 @@
 /** @file
   SSDT Pcie Table Generator.
 
-  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -12,6 +12,7 @@
    - s6.1.1 "_ADR (Address)"
   - linux kernel code
   - Arm Base Boot Requirements v1.0
+  - Arm Base System Architecture v1.0
 **/
 
 #include <Library/AcpiLib.h>
@@ -279,171 +280,6 @@ GeneratePciDeviceInfo (
   return Status;
 }
 
-/** Generate a Link device.
-
-  The Link device is added at the beginning of the ASL Pci device definition.
-
-  Each Link device represents a Pci legacy interrupt (INTA-...-INTD).
-
-  ASL code:
-  Device (<Link Name>) {
-    Name (_UID, <Uid>])
-    Name (_HID, EISAID ("PNP0C0F"))
-    Name (CRS0, ResourceTemplate () {
-      Interrupt (ResourceProducer, Level, ActiveHigh, Exclusive) { <Irq>] }
-      })
-    Method (_CRS, 0) {
-      Return CRS0
-      })
-    Method (_DIS) { }
-  }
-
-  The list of objects to define is available at:
-  PCI Firmware Specification - Revision 3.3,
-  s3.5. "Device State at Firmware/Operating System Handoff"
-
-  The _PRS and _SRS are not supported, cf Arm Base Boot Requirements v1.0:
-  "The _PRS (Possible Resource Settings) and _SRS (Set Resource Settings)
-  are not supported."
-
-  @param [in]       Irq         Interrupt controller interrupt.
-  @param [in]       IrqFlags    Interrupt flags.
-  @param [in]       LinkIndex   Legacy Pci interrupt index.
-                                Must be between 0-INTA and 3-INTD.
-  @param [in, out]  PciNode     Pci node to amend.
-
-  @retval EFI_SUCCESS            Success.
-  @retval EFI_INVALID_PARAMETER  Invalid parameter.
-  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
-**/
-STATIC
-EFI_STATUS
-EFIAPI
-GenerateLinkDevice (
-  IN      UINT32                  Irq,
-  IN      UINT32                  IrqFlags,
-  IN      UINT32                  LinkIndex,
-  IN  OUT AML_OBJECT_NODE_HANDLE  PciNode
-  )
-{
-  EFI_STATUS              Status;
-  CHAR8                   AslName[AML_NAME_SEG_SIZE + 1];
-  AML_OBJECT_NODE_HANDLE  LinkNode;
-  AML_OBJECT_NODE_HANDLE  CrsNode;
-  UINT32                  EisaId;
-
-  ASSERT (LinkIndex < 4);
-  ASSERT (PciNode != NULL);
-
-  CopyMem (AslName, "LNKx", AML_NAME_SEG_SIZE + 1);
-  AslName[AML_NAME_SEG_SIZE - 1] = 'A' + LinkIndex;
-
-  // ASL: Device (LNKx) {}
-  Status = AmlCodeGenDevice (AslName, NULL, &LinkNode);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
-  Status = AmlAttachNode (PciNode, LinkNode);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    // Failed to add.
-    AmlDeleteTree ((AML_NODE_HANDLE)LinkNode);
-    return Status;
-  }
-
-  // ASL: Name (_UID, <Uid>)
-  Status = AmlCodeGenNameInteger ("_UID", LinkIndex, LinkNode, NULL);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
-  // ASL: Name (_HID, EISAID ("PNP0C0F"))
-  Status = AmlGetEisaIdFromString ("PNP0C0F", &EisaId);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
-  Status = AmlCodeGenNameInteger ("_HID", EisaId, LinkNode, NULL);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
-  // ASL:
-  // Name (CRS0, ResourceTemplate () {
-  //   Interrupt (ResourceProducer, Level, ActiveHigh, Exclusive) { <Irq> }
-  // })
-  Status = AmlCodeGenNameResourceTemplate ("CRS0", LinkNode, &CrsNode);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
-  Status = AmlCodeGenRdInterrupt (
-             FALSE,
-             (IrqFlags & BIT0) != 0,
-             (IrqFlags & BIT1) != 0,
-             FALSE,
-             &Irq,
-             1,
-             CrsNode,
-             NULL
-             );
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
-  // ASL:
-  // Method (_CRS, 0) {
-  //   Return (CRS0)
-  // }
-  Status = AmlCodeGenMethodRetNameString (
-             "_CRS",
-             "CRS0",
-             0,
-             FALSE,
-             0,
-             LinkNode,
-             NULL
-             );
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
-  // ASL:Method (_DIS, 1) {}
-  // Not possible to disable interrupts.
-  Status = AmlCodeGenMethodRetNameString (
-             "_DIS",
-             NULL,
-             0,
-             FALSE,
-             0,
-             LinkNode,
-             NULL
-             );
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
-  // _STA:
-  // ACPI 6.4, s6.3.7 "_STA (Device Status)":
-  // If a device object describes a device that is not on an enumerable bus
-  // and the device object does not have an _STA object, then OSPM assumes
-  // that the device is present, enabled, shown in the UI, and functioning.
-
-  // _MAT:
-  // Not supported. Mainly used for processors.
-
-  return Status;
-}
-
 /** Generate Pci slots devices.
 
   PCI Firmware Specification - Revision 3.3,
@@ -556,14 +392,10 @@ GeneratePrt (
 {
   EFI_STATUS                     Status;
   INT32                          Index;
-  UINT32                         IrqTableIndex;
   AML_OBJECT_NODE_HANDLE         PrtNode;
-  CHAR8                          AslName[AML_NAME_SEG_SIZE + 1];
   CM_ARM_OBJ_REF                 *RefInfo;
   UINT32                         RefCount;
   CM_ARM_PCI_INTERRUPT_MAP_INFO  *IrqMapInfo;
-  UINT32                         IrqFlags;
-  UINT32                         PrevIrqFlags;
 
   ASSERT (Generator != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -585,13 +417,6 @@ GeneratePrt (
     return Status;
   }
 
-  // Initialized IrqTable.
-  Status = MappingTableInitialize (&Generator->IrqTable, RefCount);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
   // Initialized DeviceTable.
   Status = MappingTableInitialize (&Generator->DeviceTable, RefCount);
   if (EFI_ERROR (Status)) {
@@ -606,8 +431,6 @@ GeneratePrt (
     goto exit_handler;
   }
 
-  CopyMem (AslName, "LNKx", AML_NAME_SEG_SIZE + 1);
-
   for (Index = 0; Index < RefCount; Index++) {
     // Get CM_ARM_PCI_INTERRUPT_MAP_INFO structures one by one.
     Status = GetEArmObjPciInterruptMapInfo (
@@ -621,25 +444,15 @@ GeneratePrt (
       goto exit_handler;
     }
 
-    // Add the interrupt in the IrqTable and get the link name.
-    IrqTableIndex = MappingTableAdd (
-                      &Generator->IrqTable,
-                      IrqMapInfo->IntcInterrupt.Interrupt
-                      );
-    if (IrqTableIndex >= MAX_PCI_LEGACY_INTERRUPT) {
-      ASSERT (0);
+    // Check that the interrupts flags are SPIs, level high.
+    // Cf. Arm BSA v1.0, sE.6 "Legacy interrupts"
+    if ((Index > 0)   &&
+        (IrqMapInfo->IntcInterrupt.Interrupt >= 32)   &&
+        (IrqMapInfo->IntcInterrupt.Interrupt < 1020)  &&
+        ((IrqMapInfo->IntcInterrupt.Flags & 0x3) != BIT0))
+    {
       Status = EFI_INVALID_PARAMETER;
-      goto exit_handler;
-    }
-
-    AslName[AML_NAME_SEG_SIZE - 1] = 'A' + IrqTableIndex;
-
-    // Check that the interrupts flags are identical for all interrupts.
-    PrevIrqFlags = IrqFlags;
-    IrqFlags     = IrqMapInfo->IntcInterrupt.Flags;
-    if ((Index > 0) && (PrevIrqFlags != IrqFlags)) {
-      ASSERT (0);
-      Status = EFI_INVALID_PARAMETER;
+      ASSERT_EFI_ERROR (Status);
       goto exit_handler;
     }
 
@@ -662,8 +475,8 @@ GeneratePrt (
     Status = AmlAddPrtEntry (
                (IrqMapInfo->PciDevice << 16) | 0xFFFF,
                IrqMapInfo->PciInterrupt,
-               AslName,
-               0,
+               NULL,
+               IrqMapInfo->IntcInterrupt.Interrupt,
                PrtNode
                );
     if (EFI_ERROR (Status)) {
@@ -672,24 +485,10 @@ GeneratePrt (
     }
   } // for
 
-  // Generate the LNKx devices now that we know all the interrupts used.
-  for (Index = 0; Index < Generator->IrqTable.LastIndex; Index++) {
-    Status = GenerateLinkDevice (
-               Generator->IrqTable.Table[Index],
-               IrqFlags,
-               Index,
-               PciNode
-               );
-    if (EFI_ERROR (Status)) {
-      ASSERT (0);
-      goto exit_handler;
-    }
-  } // for
-
-  // Attach the _PRT entry now, after the LNKx devices.
+  // Attach the _PRT entry.
   Status = AmlAttachNode (PciNode, PrtNode);
   if (EFI_ERROR (Status)) {
-    ASSERT (0);
+    ASSERT_EFI_ERROR (Status);
     goto exit_handler;
   }
 
@@ -705,7 +504,6 @@ GeneratePrt (
 exit_handler:
   MappingTableFree (&Generator->DeviceTable);
 exit_handler0:
-  MappingTableFree (&Generator->IrqTable);
   if (PrtNode != NULL) {
     AmlDeleteTree (PrtNode);
   }
@@ -1382,15 +1180,6 @@ ACPI_PCI_GENERATOR  SsdtPcieGenerator = {
 
   // Private fields are defined from here.
 
-  // IrqTable
-  {
-    // Table
-    NULL,
-    // LastIndex
-    0,
-    // MaxIndex
-    0
-  },
   // DeviceTable
   {
     // Table

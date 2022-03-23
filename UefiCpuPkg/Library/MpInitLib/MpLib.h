@@ -477,7 +477,7 @@ WakeUpAP (
   IN UINTN             ProcessorNumber,
   IN EFI_AP_PROCEDURE  Procedure               OPTIONAL,
   IN VOID              *ProcedureArgument      OPTIONAL,
-  IN BOOLEAN           WakeUpDisabledAps       OPTIONAL
+  IN BOOLEAN           WakeUpDisabledAps
   );
 
 /**

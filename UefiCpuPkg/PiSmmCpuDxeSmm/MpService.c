@@ -1,7 +1,7 @@
 /** @file
 SMM MP service implementation
 
-Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -293,10 +293,14 @@ SmmWaitForApArrival (
   // Sync with APs 1st timeout
   //
   for (Timer = StartSyncTimer ();
-       !IsSyncTimerTimeout (Timer) && !(LmceEn && LmceSignal) &&
-       !AllCpusInSmmWithExceptions (ARRIVAL_EXCEPTION_BLOCKED | ARRIVAL_EXCEPTION_SMI_DISABLED);
+       !IsSyncTimerTimeout (Timer) && !(LmceEn && LmceSignal);
        )
   {
+    mSmmMpSyncData->AllApArrivedWithException = AllCpusInSmmWithExceptions (ARRIVAL_EXCEPTION_BLOCKED | ARRIVAL_EXCEPTION_SMI_DISABLED);
+    if (mSmmMpSyncData->AllApArrivedWithException) {
+      break;
+    }
+
     CpuPause ();
   }
 
@@ -330,10 +334,14 @@ SmmWaitForApArrival (
     // Sync with APs 2nd timeout.
     //
     for (Timer = StartSyncTimer ();
-         !IsSyncTimerTimeout (Timer) &&
-         !AllCpusInSmmWithExceptions (ARRIVAL_EXCEPTION_BLOCKED | ARRIVAL_EXCEPTION_SMI_DISABLED);
+         !IsSyncTimerTimeout (Timer);
          )
     {
+      mSmmMpSyncData->AllApArrivedWithException = AllCpusInSmmWithExceptions (ARRIVAL_EXCEPTION_BLOCKED | ARRIVAL_EXCEPTION_SMI_DISABLED);
+      if (mSmmMpSyncData->AllApArrivedWithException) {
+        break;
+      }
+
       CpuPause ();
     }
   }
@@ -1886,6 +1894,8 @@ InitializeMpSyncData (
     *mSmmMpSyncData->Counter       = 0;
     *mSmmMpSyncData->InsideSmm     = FALSE;
     *mSmmMpSyncData->AllCpusInSync = FALSE;
+
+    mSmmMpSyncData->AllApArrivedWithException = FALSE;
 
     for (CpuIndex = 0; CpuIndex < gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus; CpuIndex++) {
       mSmmMpSyncData->CpuData[CpuIndex].Busy =
