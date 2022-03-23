@@ -1,5 +1,5 @@
 ## @file
-# Set TPM device type
+# Set TPM device type - supports TPM 2.0 only
 #
 # In SecurityPkg, this module initializes the TPM device type based on a UEFI
 # variable and/or hardware detection. In OvmfPkg, the module only performs TPM
@@ -22,11 +22,6 @@
 [Sources]
   Tcg2ConfigPeim.c
   Tpm12Support.h
-
-[Sources.IA32, Sources.X64]
-  Tpm12Support.c
-
-[Sources.ARM, Sources.AARCH64]
   Tpm12SupportNull.c
 
 [Packages]
@@ -40,10 +35,6 @@
   DebugLib
   PeiServicesLib
   Tpm2DeviceLib
-
-[LibraryClasses.IA32, LibraryClasses.X64]
-  BaseLib
-  Tpm12DeviceLib
 
 [Guids]
   gEfiTpmDeviceSelectedGuid           ## PRODUCES ## GUID # Used as a PPI GUID

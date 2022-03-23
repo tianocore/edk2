@@ -85,7 +85,9 @@ ValidateSerialPortInfo (
         (SerialPortInfo->PortSubtype !=
          EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_DCC) &&
         (SerialPortInfo->PortSubtype !=
-         EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_FULL_16550))
+         EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_FULL_16550) &&
+        (SerialPortInfo->PortSubtype !=
+         EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_16550_WITH_GAS))
     {
       DEBUG ((
         DEBUG_ERROR,
@@ -147,6 +149,7 @@ FixupIds (
   // Get the _CID and _HID value to write.
   switch (SerialPortInfo->PortSubtype) {
     case EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_FULL_16550:
+    case EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_16550_WITH_GAS:
     {
       // If there is a non-BSA compliant HID, use that.
       NonBsaHid = (CONST CHAR8 *)PcdGetPtr (PcdNonBsaCompliant16550SerialHid);
