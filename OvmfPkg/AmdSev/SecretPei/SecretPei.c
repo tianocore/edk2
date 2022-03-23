@@ -19,7 +19,7 @@ InitializeSecretPei (
   BuildMemoryAllocationHob (
     PcdGet32 (PcdSevLaunchSecretBase),
     ALIGN_VALUE (PcdGet32 (PcdSevLaunchSecretSize), EFI_PAGE_SIZE),
-    EfiBootServicesData
+    EfiReservedMemoryType
     );
 
   return EFI_SUCCESS;

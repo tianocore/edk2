@@ -89,7 +89,7 @@ ProtocolDisableVariablePolicy (
   CommHeader   = mMmCommunicationBuffer;
   PolicyHeader = (VAR_CHECK_POLICY_COMM_HEADER *)&CommHeader->Data;
   CopyGuid (&CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid);
-  CommHeader->MessageLength = BufferSize;
+  CommHeader->MessageLength = BufferSize - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
   PolicyHeader->Signature   = VAR_CHECK_POLICY_COMM_SIG;
   PolicyHeader->Revision    = VAR_CHECK_POLICY_COMM_REVISION;
   PolicyHeader->Command     = VAR_CHECK_POLICY_COMMAND_DISABLE;
@@ -138,7 +138,7 @@ ProtocolIsVariablePolicyEnabled (
   PolicyHeader  = (VAR_CHECK_POLICY_COMM_HEADER *)&CommHeader->Data;
   CommandParams = (VAR_CHECK_POLICY_COMM_IS_ENABLED_PARAMS *)(PolicyHeader + 1);
   CopyGuid (&CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid);
-  CommHeader->MessageLength = BufferSize;
+  CommHeader->MessageLength = BufferSize - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
   PolicyHeader->Signature   = VAR_CHECK_POLICY_COMM_SIG;
   PolicyHeader->Revision    = VAR_CHECK_POLICY_COMM_REVISION;
   PolicyHeader->Command     = VAR_CHECK_POLICY_COMMAND_IS_ENABLED;
@@ -213,7 +213,7 @@ ProtocolRegisterVariablePolicy (
   PolicyHeader = (VAR_CHECK_POLICY_COMM_HEADER *)&CommHeader->Data;
   PolicyBuffer = (VOID *)(PolicyHeader + 1);
   CopyGuid (&CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid);
-  CommHeader->MessageLength = BufferSize;
+  CommHeader->MessageLength = BufferSize - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
   PolicyHeader->Signature   = VAR_CHECK_POLICY_COMM_SIG;
   PolicyHeader->Revision    = VAR_CHECK_POLICY_COMM_REVISION;
   PolicyHeader->Command     = VAR_CHECK_POLICY_COMMAND_REGISTER;
@@ -270,7 +270,7 @@ DumpVariablePolicyHelper (
   PolicyHeader  = (VAR_CHECK_POLICY_COMM_HEADER *)&CommHeader->Data;
   CommandParams = (VAR_CHECK_POLICY_COMM_DUMP_PARAMS *)(PolicyHeader + 1);
   CopyGuid (&CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid);
-  CommHeader->MessageLength = BufferSize;
+  CommHeader->MessageLength = BufferSize - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
   PolicyHeader->Signature   = VAR_CHECK_POLICY_COMM_SIG;
   PolicyHeader->Revision    = VAR_CHECK_POLICY_COMM_REVISION;
   PolicyHeader->Command     = VAR_CHECK_POLICY_COMMAND_DUMP;
@@ -397,7 +397,7 @@ ProtocolLockVariablePolicy (
   CommHeader   = mMmCommunicationBuffer;
   PolicyHeader = (VAR_CHECK_POLICY_COMM_HEADER *)&CommHeader->Data;
   CopyGuid (&CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid);
-  CommHeader->MessageLength = BufferSize;
+  CommHeader->MessageLength = BufferSize - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
   PolicyHeader->Signature   = VAR_CHECK_POLICY_COMM_SIG;
   PolicyHeader->Revision    = VAR_CHECK_POLICY_COMM_REVISION;
   PolicyHeader->Command     = VAR_CHECK_POLICY_COMMAND_LOCK;

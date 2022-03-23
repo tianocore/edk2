@@ -191,6 +191,7 @@ SmmFeatureLockOnS3 (
   @param[in] ProcedureArgument  Pointer to SMRR_BASE_MASK structure.
 **/
 VOID
+EFIAPI
 SetSmrr (
   IN VOID  *ProcedureArgument
   )
