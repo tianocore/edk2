@@ -2,7 +2,7 @@
 #  Dsc file for Dynamic Tables Framework.
 #
 #  Copyright (c) 2019, Linaro Limited. All rights reserved.<BR>
-#  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -43,6 +43,8 @@
   DynamicTablesPkg/Library/Common/AmlLib/AmlLib.inf
   DynamicTablesPkg/Library/Common/SsdtSerialPortFixupLib/SsdtSerialPortFixupLib.inf
   DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
+  DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
+  DynamicTablesPkg/Library/Common/DynamicPlatRepoLib/DynamicPlatRepoLib.inf
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES

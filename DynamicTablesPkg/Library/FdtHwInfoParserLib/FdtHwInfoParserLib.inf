@@ -1,0 +1,56 @@
+## @file
+#  Flattened Device Tree information parser.
+#
+#  Copyright (c) 2021, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010019
+  BASE_NAME      = FdtHwInfoParserLib
+  FILE_GUID      = F174A422-BC86-41E2-9E9C-C6D6E437F4AD
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = HwInfoParserLib
+
+[Sources]
+  CmObjectDescUtility.c
+  CmObjectDescUtility.h
+  FdtHwInfoParserInclude.h
+  FdtHwInfoParser.c
+  FdtHwInfoParser.h
+  FdtUtility.c
+  FdtUtility.h
+  BootArch/ArmBootArchParser.c
+  BootArch/ArmBootArchParser.h
+  GenericTimer/ArmGenericTimerParser.c
+  GenericTimer/ArmGenericTimerParser.h
+  Gic/ArmGicCParser.c
+  Gic/ArmGicCParser.h
+  Gic/ArmGicDispatcher.c
+  Gic/ArmGicDispatcher.h
+  Gic/ArmGicDParser.c
+  Gic/ArmGicDParser.h
+  Gic/ArmGicItsParser.c
+  Gic/ArmGicItsParser.h
+  Gic/ArmGicMsiFrameParser.c
+  Gic/ArmGicMsiFrameParser.h
+  Gic/ArmGicRParser.c
+  Gic/ArmGicRParser.h
+  Pci/ArmPciConfigSpaceParser.c
+  Pci/ArmPciConfigSpaceParser.h
+  Serial/ArmSerialPortParser.c
+  Serial/ArmSerialPortParser.h
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  FdtLib
+  MemoryAllocationLib

@@ -202,48 +202,169 @@ QemuVideoCirrusModeSetup (
 ///
 /// Table of supported video modes
 ///
-QEMU_VIDEO_BOCHS_MODES  QemuVideoBochsModes[] = {
-  { 640,  480,  32 },
-  { 800,  480,  32 },
-  { 800,  600,  32 },
-  { 832,  624,  32 },
-  { 960,  640,  32 },
-  { 1024, 600,  32 },
-  { 1024, 768,  32 },
-  { 1152, 864,  32 },
-  { 1152, 870,  32 },
-  { 1280, 720,  32 },
-  { 1280, 760,  32 },
-  { 1280, 768,  32 },
-  { 1280, 800,  32 },
-  { 1280, 960,  32 },
-  { 1280, 1024, 32 },
-  { 1360, 768,  32 },
-  { 1366, 768,  32 },
-  { 1400, 1050, 32 },
-  { 1440, 900,  32 },
-  { 1600, 900,  32 },
-  { 1600, 1200, 32 },
-  { 1680, 1050, 32 },
-  { 1920, 1080, 32 },
-  { 1920, 1200, 32 },
-  { 1920, 1440, 32 },
-  { 2000, 2000, 32 },
-  { 2048, 1536, 32 },
-  { 2048, 2048, 32 },
-  { 2560, 1440, 32 },
-  { 2560, 1600, 32 },
-  { 2560, 2048, 32 },
-  { 2800, 2100, 32 },
-  { 3200, 2400, 32 },
-  { 3840, 2160, 32 },
-  { 4096, 2160, 32 },
-  { 7680, 4320, 32 },
-  { 8192, 4320, 32 }
+STATIC QEMU_VIDEO_BOCHS_MODES  QemuVideoBochsModes[] = {
+  { 640,  480  },
+  { 800,  480  },
+  { 800,  600  },
+  { 832,  624  },
+  { 960,  640  },
+  { 1024, 600  },
+  { 1024, 768  },
+  { 1152, 864  },
+  { 1152, 870  },
+  { 1280, 720  },
+  { 1280, 760  },
+  { 1280, 768  },
+  { 1280, 800  },
+  { 1280, 960  },
+  { 1280, 1024 },
+  { 1360, 768  },
+  { 1366, 768  },
+  { 1400, 1050 },
+  { 1440, 900  },
+  { 1600, 900  },
+  { 1600, 1200 },
+  { 1680, 1050 },
+  { 1920, 1080 },
+  { 1920, 1200 },
+  { 1920, 1440 },
+  { 2000, 2000 },
+  { 2048, 1536 },
+  { 2048, 2048 },
+  { 2560, 1440 },
+  { 2560, 1600 },
+  { 2560, 2048 },
+  { 2800, 2100 },
+  { 3200, 2400 },
+  { 3840, 2160 },
+  { 4096, 2160 },
+  { 7680, 4320 },
+  { 8192, 4320 }
 };
 
 #define QEMU_VIDEO_BOCHS_MODE_COUNT \
   (ARRAY_SIZE (QemuVideoBochsModes))
+
+STATIC
+VOID
+QemuVideoBochsAddMode (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINT32                   AvailableFbSize,
+  UINT32                   Width,
+  UINT32                   Height
+  )
+{
+  QEMU_VIDEO_MODE_DATA  *ModeData = Private->ModeData + Private->MaxMode;
+  UINTN                 RequiredFbSize;
+
+  RequiredFbSize = (UINTN)Width * Height * 4;
+  if (RequiredFbSize > AvailableFbSize) {
+    DEBUG ((
+      DEBUG_INFO,
+      "Skipping Bochs Mode %dx%d, 32-bit (not enough vram)\n",
+      Width,
+      Height
+      ));
+    return;
+  }
+
+  ModeData->InternalModeIndex    = (UINT32)Private->MaxMode;
+  ModeData->HorizontalResolution = Width;
+  ModeData->VerticalResolution   = Height;
+  ModeData->ColorDepth           = 32;
+  DEBUG ((
+    DEBUG_INFO,
+    "Adding Bochs Internal Mode %d: %dx%d, %d-bit\n",
+    ModeData->InternalModeIndex,
+    ModeData->HorizontalResolution,
+    ModeData->VerticalResolution,
+    ModeData->ColorDepth
+    ));
+
+  Private->MaxMode++;
+}
+
+STATIC
+VOID
+QemuVideoBochsEdid (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINT32                   *XRes,
+  UINT32                   *YRes
+  )
+{
+  EFI_STATUS  Status;
+
+  if (Private->Variant != QEMU_VIDEO_BOCHS_MMIO) {
+    return;
+  }
+
+  Status = Private->PciIo->Mem.Read (
+                                 Private->PciIo,
+                                 EfiPciIoWidthUint8,
+                                 PCI_BAR_IDX2,
+                                 0,
+                                 sizeof (Private->Edid),
+                                 Private->Edid
+                                 );
+  if (Status != EFI_SUCCESS) {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: mmio read failed\n",
+      __FUNCTION__
+      ));
+    return;
+  }
+
+  if ((Private->Edid[0] != 0x00) ||
+      (Private->Edid[1] != 0xff))
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: magic check failed\n",
+      __FUNCTION__
+      ));
+    return;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: blob found (extensions: %d)\n",
+    __FUNCTION__,
+    Private->Edid[126]
+    ));
+
+  if ((Private->Edid[54] == 0x00) &&
+      (Private->Edid[55] == 0x00))
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: no detailed timing descriptor\n",
+      __FUNCTION__
+      ));
+    return;
+  }
+
+  *XRes = Private->Edid[56] | ((Private->Edid[58] & 0xf0) << 4);
+  *YRes = Private->Edid[59] | ((Private->Edid[61] & 0xf0) << 4);
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: default resolution: %dx%d\n",
+    __FUNCTION__,
+    *XRes,
+    *YRes
+    ));
+
+  if (PcdGet8 (PcdVideoResolutionSource) == 0) {
+    Status = PcdSet32S (PcdVideoHorizontalResolution, *XRes);
+    ASSERT_RETURN_ERROR (Status);
+    Status = PcdSet32S (PcdVideoVerticalResolution, *YRes);
+    ASSERT_RETURN_ERROR (Status);
+    Status = PcdSet8S (PcdVideoResolutionSource, 2);
+    ASSERT_RETURN_ERROR (Status);
+  }
+
+  // TODO: register edid as gEfiEdidDiscoveredProtocolGuid ?
+}
 
 EFI_STATUS
 QemuVideoBochsModeSetup (
@@ -251,10 +372,8 @@ QemuVideoBochsModeSetup (
   BOOLEAN                  IsQxl
   )
 {
-  UINT32                  AvailableFbSize;
-  UINT32                  Index;
-  QEMU_VIDEO_MODE_DATA    *ModeData;
-  QEMU_VIDEO_BOCHS_MODES  *VideoMode;
+  UINT32  AvailableFbSize;
+  UINT32  Index, XRes = 0, YRes = 0;
 
   //
   // Fetch the available framebuffer size.
@@ -337,42 +456,36 @@ QemuVideoBochsModeSetup (
   // Setup Video Modes
   //
   Private->ModeData = AllocatePool (
-                        sizeof (Private->ModeData[0]) * QEMU_VIDEO_BOCHS_MODE_COUNT
+                        sizeof (Private->ModeData[0]) * (QEMU_VIDEO_BOCHS_MODE_COUNT+1)
                         );
   if (Private->ModeData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  ModeData  = Private->ModeData;
-  VideoMode = &QemuVideoBochsModes[0];
-  for (Index = 0; Index < QEMU_VIDEO_BOCHS_MODE_COUNT; Index++) {
-    UINTN  RequiredFbSize;
-
-    ASSERT (VideoMode->ColorDepth % 8 == 0);
-    RequiredFbSize = (UINTN)VideoMode->Width * VideoMode->Height *
-                     (VideoMode->ColorDepth / 8);
-    if (RequiredFbSize <= AvailableFbSize) {
-      ModeData->InternalModeIndex    = Index;
-      ModeData->HorizontalResolution = VideoMode->Width;
-      ModeData->VerticalResolution   = VideoMode->Height;
-      ModeData->ColorDepth           = VideoMode->ColorDepth;
-      DEBUG ((
-        DEBUG_INFO,
-        "Adding Mode %d as Bochs Internal Mode %d: %dx%d, %d-bit\n",
-        (INT32)(ModeData - Private->ModeData),
-        ModeData->InternalModeIndex,
-        ModeData->HorizontalResolution,
-        ModeData->VerticalResolution,
-        ModeData->ColorDepth
-        ));
-
-      ModeData++;
-    }
-
-    VideoMode++;
+  QemuVideoBochsEdid (Private, &XRes, &YRes);
+  if (XRes && YRes) {
+    QemuVideoBochsAddMode (
+      Private,
+      AvailableFbSize,
+      XRes,
+      YRes
+      );
   }
 
-  Private->MaxMode = ModeData - Private->ModeData;
+  for (Index = 0; Index < QEMU_VIDEO_BOCHS_MODE_COUNT; Index++) {
+    if ((QemuVideoBochsModes[Index].Width == XRes) &&
+        (QemuVideoBochsModes[Index].Height == YRes))
+    {
+      continue; // duplicate with edid resolution
+    }
+
+    QemuVideoBochsAddMode (
+      Private,
+      AvailableFbSize,
+      QemuVideoBochsModes[Index].Width,
+      QemuVideoBochsModes[Index].Height
+      );
+  }
 
   return EFI_SUCCESS;
 }

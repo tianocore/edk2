@@ -987,14 +987,14 @@ VgaOutb (
 VOID
 InitializeBochsGraphicsMode (
   QEMU_VIDEO_PRIVATE_DATA  *Private,
-  QEMU_VIDEO_BOCHS_MODES   *ModeData
+  QEMU_VIDEO_MODE_DATA     *ModeData
   )
 {
   DEBUG ((
     DEBUG_INFO,
     "InitializeBochsGraphicsMode: %dx%d @ %d\n",
-    ModeData->Width,
-    ModeData->Height,
+    ModeData->HorizontalResolution,
+    ModeData->VerticalResolution,
     ModeData->ColorDepth
     ));
 
@@ -1007,10 +1007,10 @@ InitializeBochsGraphicsMode (
   BochsWrite (Private, VBE_DISPI_INDEX_Y_OFFSET, 0);
 
   BochsWrite (Private, VBE_DISPI_INDEX_BPP, (UINT16)ModeData->ColorDepth);
-  BochsWrite (Private, VBE_DISPI_INDEX_XRES, (UINT16)ModeData->Width);
-  BochsWrite (Private, VBE_DISPI_INDEX_VIRT_WIDTH, (UINT16)ModeData->Width);
-  BochsWrite (Private, VBE_DISPI_INDEX_YRES, (UINT16)ModeData->Height);
-  BochsWrite (Private, VBE_DISPI_INDEX_VIRT_HEIGHT, (UINT16)ModeData->Height);
+  BochsWrite (Private, VBE_DISPI_INDEX_XRES, (UINT16)ModeData->HorizontalResolution);
+  BochsWrite (Private, VBE_DISPI_INDEX_VIRT_WIDTH, (UINT16)ModeData->HorizontalResolution);
+  BochsWrite (Private, VBE_DISPI_INDEX_YRES, (UINT16)ModeData->VerticalResolution);
+  BochsWrite (Private, VBE_DISPI_INDEX_VIRT_HEIGHT, (UINT16)ModeData->VerticalResolution);
 
   BochsWrite (
     Private,
