@@ -13,14 +13,23 @@ APPNAME = BrotliCompress
 
 #LIBS = $(LIB_PATH)\Common.lib
 
-COMMON_OBJ = brotli\c\common\dictionary.obj brotli\c\common\transform.obj
+COMMON_OBJ = \
+  brotli\c\common\constants.obj \
+  brotli\c\common\context.obj \
+  brotli\c\common\dictionary.obj \
+  brotli\c\common\platform.obj \
+  brotli\c\common\shared_dictionary.obj \
+  brotli\c\common\transform.obj
 DEC_OBJ = \
   brotli\c\dec\bit_reader.obj \
   brotli\c\dec\decode.obj \
   brotli\c\dec\huffman.obj \
   brotli\c\dec\state.obj
 ENC_OBJ = \
+  brotli\c\enc\command.obj \
+  brotli\c\enc\compound_dictionary.obj \
   brotli\c\enc\backward_references.obj \
+  brotli\c\enc\fast_log.obj \
   brotli\c\enc\backward_references_hq.obj \
   brotli\c\enc\bit_cost.obj \
   brotli\c\enc\block_splitter.obj \

@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2022, ARM Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -83,6 +83,11 @@ Object ID's in the ARM Namespace:
   30 - CM Object Reference
 */
 typedef UINT32 CM_OBJECT_ID;
+
+//
+// Helper macro to format a CM_OBJECT_ID.
+//
+#define FMT_CM_OBJECT_ID  "0x%lx"
 
 /** A mask for Object ID
 */

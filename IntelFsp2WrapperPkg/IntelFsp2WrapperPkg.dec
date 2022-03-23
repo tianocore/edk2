@@ -121,3 +121,11 @@
   #
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspmUpdDataAddress|0x00000000|UINT32|0x50000000
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress|0x00000000|UINT32|0x50000001
+  #
+  # Non-0 means PcdFspmUpdDataAddress will be ignored, otherwise PcdFspmUpdDataAddress will be used.
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmUpdDataAddress64|0x00000000|UINT64|0x50000002
+  #
+  # Non-0 means PcdFspsUpdDataAddress will be ignored, otherwise PcdFspsUpdDataAddress will be used.
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress64|0x00000000|UINT64|0x50000003

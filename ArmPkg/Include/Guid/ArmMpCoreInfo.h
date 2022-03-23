@@ -14,8 +14,7 @@
 #define MPIDR_U_BIT_MASK            0x40000000
 
 typedef struct {
-  UINT32                  ClusterId;
-  UINT32                  CoreId;
+  UINT64                  Mpidr;
 
   // MP Core Mailbox
   EFI_PHYSICAL_ADDRESS    MailboxSetAddress;

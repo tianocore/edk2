@@ -22,7 +22,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PciLib.h>
 #include <Protocol/SmmSwDispatch2.h>
 #include <Protocol/SmmAccess2.h>
-#include <protocol/MpService.h>
+#include <Protocol/MpService.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Register/Intel/ArchitecturalMsr.h>
 #include <Guid/SmmRegisterInfoGuid.h>
