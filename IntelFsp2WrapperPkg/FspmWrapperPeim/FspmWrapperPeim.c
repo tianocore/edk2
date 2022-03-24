@@ -3,7 +3,7 @@
   register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
   notify to call FspSiliconInit API.
 
-  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -39,6 +39,24 @@
 extern EFI_GUID  gFspHobGuid;
 
 /**
+  Get the FSP M UPD Data address
+
+  @return FSP-M UPD Data Address
+**/
+
+UINTN
+GetFspmUpdDataAddress (
+  VOID
+  )
+{
+  if (PcdGet64 (PcdFspmUpdDataAddress64) != 0) {
+    return (UINTN) PcdGet64 (PcdFspmUpdDataAddress64);
+  } else {
+    return (UINTN) PcdGet32 (PcdFspmUpdDataAddress);
+  }
+}
+
+/**
   Call FspMemoryInit API.
 
   @return Status returned by FspMemoryInit API.
@@ -67,7 +85,7 @@ PeiFspMemoryInit (
     return EFI_DEVICE_ERROR;
   }
 
-  if ((PcdGet32 (PcdFspmUpdDataAddress) == 0) && (FspmHeaderPtr->CfgRegionSize != 0) && (FspmHeaderPtr->CfgRegionOffset != 0)) {
+  if ((GetFspmUpdDataAddress () == 0) && (FspmHeaderPtr->CfgRegionSize != 0) && (FspmHeaderPtr->CfgRegionOffset != 0)) {
     //
     // Copy default FSP-M UPD data from Flash
     //
@@ -79,7 +97,7 @@ PeiFspMemoryInit (
     //
     // External UPD is ready, get the buffer from PCD pointer.
     //
-    FspmUpdDataPtr = (FSPM_UPD_COMMON *)PcdGet32 (PcdFspmUpdDataAddress);
+    FspmUpdDataPtr = (FSPM_UPD_COMMON *) GetFspmUpdDataAddress();
     ASSERT (FspmUpdDataPtr != NULL);
   }
 

@@ -1,7 +1,7 @@
 /** @file
   This library is used by other modules to send TPM2 command.
 
-Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2021, Intel Corporation. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -503,9 +503,9 @@ Tpm2PcrExtend (
 EFI_STATUS
 EFIAPI
 Tpm2PcrEvent (
-  IN      TPMI_DH_PCR      PcrHandle,
-  IN      TPM2B_EVENT      *EventData,
-  OUT  TPML_DIGEST_VALUES  *Digests
+  IN      TPMI_DH_PCR         PcrHandle,
+  IN      TPM2B_EVENT         *EventData,
+  OUT     TPML_DIGEST_VALUES  *Digests
   );
 
 /**
@@ -522,10 +522,10 @@ Tpm2PcrEvent (
 EFI_STATUS
 EFIAPI
 Tpm2PcrRead (
-  IN      TPML_PCR_SELECTION  *PcrSelectionIn,
-  OUT  UINT32                 *PcrUpdateCounter,
-  OUT  TPML_PCR_SELECTION     *PcrSelectionOut,
-  OUT  TPML_DIGEST            *PcrValues
+  IN   TPML_PCR_SELECTION  *PcrSelectionIn,
+  OUT  UINT32              *PcrUpdateCounter,
+  OUT  TPML_PCR_SELECTION  *PcrSelectionOut,
+  OUT  TPML_DIGEST         *PcrValues
   );
 
 /**
@@ -1111,6 +1111,23 @@ GetDigestFromDigestList (
   IN TPMI_ALG_HASH       HashAlg,
   IN TPML_DIGEST_VALUES  *DigestList,
   OUT VOID               *Digest
+  );
+
+/**
+   This function will query the TPM to determine which hashing algorithms and
+   get the digests of all active and supported PCR banks of a specific PCR register.
+
+   @param[in]     PcrHandle     The index of the PCR register to be read.
+   @param[out]    HashList      List of digests from PCR register being read.
+
+   @retval EFI_SUCCESS           The Pcr was read successfully.
+   @retval EFI_DEVICE_ERROR      The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2PcrReadForActiveBank (
+  IN      TPMI_DH_PCR  PcrHandle,
+  OUT     TPML_DIGEST  *HashList
   );
 
 #endif

@@ -592,6 +592,39 @@ AmlCodeGenRdDWordMemory (
   OUT       AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
   );
 
+/** Code generation for the "Memory32Fixed ()" ASL macro.
+
+  The Resource Data effectively created is a 32-bit Memory Resource
+  Data. Cf ACPI 6.4:
+   - s19.6.83 "Memory Resource Descriptor Macro".
+   - s19.2.8 "Memory32FixedTerm".
+
+  See ACPI 6.4 spec, s19.2.8 for more.
+
+  @param [in]  IsReadWrite          ReadAndWrite parameter.
+  @param [in]  Address              AddressBase parameter.
+  @param [in]  RangeLength          Range length.
+  @param [in]  NameOpNode           NameOp object node defining a named object.
+                                    If provided, append the new resource data
+                                    node to the list of resource data elements
+                                    of this node.
+  @param [out] NewMemNode           If provided and success,
+                                    contain the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdMemory32Fixed (
+  BOOLEAN                 IsReadWrite,
+  UINT32                  Address,
+  UINT32                  RangeLength,
+  AML_OBJECT_NODE_HANDLE  NameOpNode,
+  AML_DATA_NODE_HANDLE    *NewMemNode
+  );
+
 /** Code generation for the "WordBusNumber ()" ASL function.
 
   The Resource Data effectively created is a Word Address Space Resource
@@ -1078,6 +1111,53 @@ EFIAPI
 AmlCodeGenMethodRetNameString (
   IN  CONST CHAR8                   *MethodNameString,
   IN  CONST CHAR8                   *ReturnedNameString   OPTIONAL,
+  IN        UINT8                   NumArgs,
+  IN        BOOLEAN                 IsSerialized,
+  IN        UINT8                   SyncLevel,
+  IN        AML_NODE_HANDLE         ParentNode           OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode        OPTIONAL
+  );
+
+/** AML code generation for a method returning an Integer.
+
+  AmlCodeGenMethodRetInteger (
+    "_CBA", 0, 1, TRUE, 3, ParentNode, NewObjectNode
+    );
+  is equivalent of the following ASL code:
+    Method(_CBA, 1, Serialized, 3) {
+      Return (0)
+    }
+
+  The ASL parameters "ReturnType" and "ParameterTypes" are not asked
+  in this function. They are optional parameters in ASL.
+
+  @param [in]  MethodNameString     The new Method's name.
+                                    Must be a NULL-terminated ASL NameString
+                                    e.g.: "MET0", "_SB.MET0", etc.
+                                    The input string is copied.
+  @param [in]  ReturnedInteger      The value of the integer returned by the
+                                    method.
+  @param [in]  NumArgs              Number of arguments.
+                                    Must be 0 <= NumArgs <= 6.
+  @param [in]  IsSerialized         TRUE is equivalent to Serialized.
+                                    FALSE is equivalent to NotSerialized.
+                                    Default is NotSerialized in ASL spec.
+  @param [in]  SyncLevel            Synchronization level for the method.
+                                    Must be 0 <= SyncLevel <= 15.
+                                    Default is 0 in ASL.
+  @param [in]  ParentNode           If provided, set ParentNode as the parent
+                                    of the node created.
+  @param [out] NewObjectNode        If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenMethodRetInteger (
+  IN  CONST CHAR8                   *MethodNameString,
+  IN        UINT64                  ReturnedInteger,
   IN        UINT8                   NumArgs,
   IN        BOOLEAN                 IsSerialized,
   IN        UINT8                   SyncLevel,
