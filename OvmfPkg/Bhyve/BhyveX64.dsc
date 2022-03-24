@@ -733,7 +733,7 @@
 !if $(NETWORK_TLS_ENABLE) == TRUE
   NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf {
     <LibraryClasses>
-      NULL|OvmfPkg/Bhyve/Library/TlsAuthConfigLib/TlsAuthConfigLib.inf
+      NULL|OvmfPkg/Library/TlsAuthConfigLib/TlsAuthConfigLib.inf
   }
 !endif
   OvmfPkg/VirtioNetDxe/VirtioNet.inf

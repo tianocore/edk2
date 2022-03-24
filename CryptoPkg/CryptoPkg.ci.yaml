@@ -2,7 +2,7 @@
 # CI configuration for CryptoPkg
 #
 # Copyright (c) Microsoft Corporation
-# Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2020 - 2022, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
@@ -34,6 +34,8 @@
             "Library/OpensslLib/rand_pool.c",
             # This has OpenSSL interfaces that aren't UEFI spec compliant
             "Library/Include/CrtLibSupport.h",
+            # This has OpenSSL interfaces that aren't UEFI spec compliant
+            "Library/BaseCryptLib/Hash/CryptParallelHash.h",
             # These directories contain auto-generated OpenSSL content
             "Library/OpensslLib",
             "Library/IntrinsicLib",
