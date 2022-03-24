@@ -1,6 +1,6 @@
 #
 #  Copyright (c) 2020, Rebecca Cran <rebecca@bsdio.com>
-#  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #  Copyright (c) 2014, Pluribus Networks, Inc.
 #
@@ -171,6 +171,7 @@
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/DxeMemEncryptSevLib.inf
   LockBoxLib|OvmfPkg/Library/LockBoxLib/LockBoxBaseLib.inf
   MemEncryptTdxLib|OvmfPkg/Library/BaseMemEncryptTdxLib/BaseMemEncryptTdxLib.inf
+  ProtectedVariableLib|MdeModulePkg/Library/ProtectedVariableLibNull/ProtectedVariableLibNull.inf
 
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
