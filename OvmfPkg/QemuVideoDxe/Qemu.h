@@ -115,6 +115,8 @@ typedef struct {
   FRAME_BUFFER_CONFIGURE          *FrameBufferBltConfigure;
   UINTN                           FrameBufferBltConfigureSize;
   UINT8                           FrameBufferVramBarIndex;
+
+  UINT8                           Edid[128];
 } QEMU_VIDEO_PRIVATE_DATA;
 
 ///
@@ -132,7 +134,6 @@ typedef struct {
 typedef struct {
   UINT32    Width;
   UINT32    Height;
-  UINT32    ColorDepth;
 } QEMU_VIDEO_BOCHS_MODES;
 
 #define QEMU_VIDEO_PRIVATE_DATA_FROM_GRAPHICS_OUTPUT_THIS(a) \
@@ -150,7 +151,6 @@ extern UINT16                        Seq_800_600_256_60[];
 extern UINT8                         Crtc_1024_768_256_60[];
 extern UINT16                        Seq_1024_768_256_60[];
 extern QEMU_VIDEO_CIRRUS_MODES       QemuVideoCirrusModes[];
-extern QEMU_VIDEO_BOCHS_MODES        QemuVideoBochsModes[];
 extern EFI_DRIVER_BINDING_PROTOCOL   gQemuVideoDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gQemuVideoComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gQemuVideoComponentName2;
@@ -414,7 +414,7 @@ InitializeCirrusGraphicsMode (
 VOID
 InitializeBochsGraphicsMode (
   QEMU_VIDEO_PRIVATE_DATA  *Private,
-  QEMU_VIDEO_BOCHS_MODES   *ModeData
+  QEMU_VIDEO_MODE_DATA     *ModeData
   );
 
 VOID
