@@ -216,6 +216,7 @@
 
   Tcg2PhysicalPresenceLib|OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  ProtectedVariableLib|MdeModulePkg/Library/ProtectedVariableLibNull/ProtectedVariableLibNull.inf
   RealTimeClockLib|OvmfPkg/Library/XenRealTimeClockLib/XenRealTimeClockLib.inf
   TimeBaseLib|EmbeddedPkg/Library/TimeBaseLib/TimeBaseLib.inf
 !ifdef $(DEBUG_ON_HYPERVISOR_CONSOLE)
