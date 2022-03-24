@@ -1040,8 +1040,19 @@ CheckTheImageInternal (
   //
   Status = FmpDeviceCheckImageWithStatus ((((UINT8 *)Image) + AllHeaderSize), RawSize, ImageUpdatable, LastAttemptStatus);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - FmpDeviceLib CheckImage failed. Status = %r\n", mImageIdName, Status));
+    // The image cannot be valid if an error occurred checking the image
+    if (*ImageUpdatable == IMAGE_UPDATABLE_VALID) {
+      *ImageUpdatable = IMAGE_UPDATABLE_INVALID;
+    }
 
+    DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - FmpDeviceLib CheckImage failed. Status = %r\n", mImageIdName, Status));
+  }
+
+  //
+  // Only validate the library last attempt status code if the image is not updatable.
+  // This specifically avoids converting LAST_ATTEMPT_STATUS_SUCCESS if it set for an updatable image.
+  //
+  if (*ImageUpdatable != IMAGE_UPDATABLE_VALID) {
     //
     // LastAttemptStatus returned from the device library should fall within the designated error range
     // [LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MIN_ERROR_CODE_VALUE, LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MAX_ERROR_CODE_VALUE]
@@ -1049,12 +1060,12 @@ CheckTheImageInternal (
     if ((*LastAttemptStatus < LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MIN_ERROR_CODE_VALUE) ||
         (*LastAttemptStatus > LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MAX_ERROR_CODE_VALUE))
     {
-      DEBUG (
-        (DEBUG_ERROR,
-         "FmpDxe(%s): CheckTheImage() - LastAttemptStatus %d from FmpDeviceCheckImageWithStatus() is invalid.\n",
-         mImageIdName,
-         *LastAttemptStatus)
-        );
+      DEBUG ((
+        DEBUG_ERROR,
+        "FmpDxe(%s): CheckTheImage() - LastAttemptStatus %d from FmpDeviceCheckImageWithStatus() is invalid.\n",
+        mImageIdName,
+        *LastAttemptStatus
+        ));
       *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
     }
   }

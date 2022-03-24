@@ -38,9 +38,4 @@
 //
 #define CLOUDHV_SMBIOS_ADDRESS  0xf0000
 
-//
-// RSDP address
-//
-#define CLOUDHV_RSDP_ADDRESS  0xa0000
-
 #endif // __CLOUDHV_H__

@@ -434,8 +434,7 @@ FmpDeviceCheckImage (
                                     IMAGE_UPDATABLE_VALID_WITH_VENDOR_CODE
   @param[out] LastAttemptStatus   A pointer to a UINT32 that holds the last attempt
                                   status to report back to the ESRT table in case
-                                  of error. This value will only be checked when this
-                                  function returns an error.
+                                  of error.
 
                                   The return status code must fall in the range of
                                   LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MIN_ERROR_CODE_VALUE to
