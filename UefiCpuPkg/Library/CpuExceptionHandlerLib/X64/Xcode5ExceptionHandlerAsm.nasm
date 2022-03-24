@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2012 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -54,12 +54,13 @@ SECTION .text
 ALIGN   8
 
 AsmIdtVectorBegin:
+%assign Vector 0
 %rep  32
-    db      0x6a        ; push  #VectorNum
-    db      ($ - AsmIdtVectorBegin) / ((AsmIdtVectorEnd - AsmIdtVectorBegin) / 32) ; VectorNum
+    push    byte %[Vector]
     push    rax
     mov     rax, strict qword 0 ;    mov     rax, ASM_PFX(CommonInterruptEntry)
     jmp     rax
+%assign Vector Vector+1
 %endrep
 AsmIdtVectorEnd:
 
@@ -280,7 +281,7 @@ DrFinish:
 ;; FX_SAVE_STATE_X64 FxSaveState;
     sub rsp, 512
     mov rdi, rsp
-    db 0xf, 0xae, 0x7 ;fxsave [rdi]
+    fxsave [rdi]
 
 ;; UEFI calling convention for x64 requires that Direction flag in EFLAGs is clear
     cld
@@ -335,15 +336,15 @@ DrFinish:
     jz      CetDone
                                 ; SSP should be 0xFC0 at this point
     mov     rax, 0x04           ; advance past cs:lip:prevssp;supervisor shadow stack token
-    INCSSP_RAX                  ; After this SSP should be 0xFE0
-    SAVEPREVSSP                 ; now the shadow stack restore token will be created at 0xFB8
-    READSSP_RAX                 ; Read new SSP, SSP should be 0xFE8
+    incsspq rax                 ; After this SSP should be 0xFE0
+    saveprevssp                 ; now the shadow stack restore token will be created at 0xFB8
+    rdsspq  rax                 ; Read new SSP, SSP should be 0xFE8
     sub     rax, 0x10
-    CLRSSBSY_RAX                ; Clear token at 0xFD8, SSP should be 0 after this
+    clrssbsy [rax]              ; Clear token at 0xFD8, SSP should be 0 after this
     sub     rax, 0x20
-    RSTORSSP_RAX                ; Restore to token at 0xFB8, new SSP will be 0xFB8
+    rstorssp [rax]              ; Restore to token at 0xFB8, new SSP will be 0xFB8
     mov     rax, 0x01           ; Pop off the new save token created
-    INCSSP_RAX                  ; SSP should be 0xFC0 now
+    incsspq rax                 ; SSP should be 0xFC0 now
 CetDone:
 
     cli
@@ -353,7 +354,7 @@ CetDone:
 ;; FX_SAVE_STATE_X64 FxSaveState;
 
     mov rsi, rsp
-    db 0xf, 0xae, 0xE ; fxrstor [rsi]
+    fxrstor [rsi]
     add rsp, 512
 
 ;; UINT64  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
@@ -440,8 +441,7 @@ DoReturn:
     push    qword [rax + 0x18]       ; save EFLAGS in new location
     mov     rax, [rax]        ; restore rax
     popfq                     ; restore EFLAGS
-    DB      0x48                ; prefix to composite "retq" with next "retf"
-    retf                        ; far return
+    retfq
 DoIret:
     iretq
 

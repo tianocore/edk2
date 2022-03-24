@@ -1,6 +1,6 @@
 /*++ @file
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2010 - 2011, Apple Inc. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -107,11 +107,7 @@ EmuGopSetMode (
     return EFI_UNSUPPORTED;
   }
 
-  ModeData                                                 = &Private->ModeData[ModeNumber];
-  This->Mode->Mode                                         = ModeNumber;
-  Private->GraphicsOutput.Mode->Info->HorizontalResolution = ModeData->HorizontalResolution;
-  Private->GraphicsOutput.Mode->Info->VerticalResolution   = ModeData->VerticalResolution;
-  Private->GraphicsOutput.Mode->Info->PixelsPerScanLine    = ModeData->HorizontalResolution;
+  ModeData = &Private->ModeData[ModeNumber];
 
   if (Private->HardwareNeedsStarting) {
     Status = EmuGopStartWindow (
@@ -127,6 +123,11 @@ EmuGopSetMode (
 
     Private->HardwareNeedsStarting = FALSE;
   }
+
+  This->Mode->Mode                                         = ModeNumber;
+  Private->GraphicsOutput.Mode->Info->HorizontalResolution = ModeData->HorizontalResolution;
+  Private->GraphicsOutput.Mode->Info->VerticalResolution   = ModeData->VerticalResolution;
+  Private->GraphicsOutput.Mode->Info->PixelsPerScanLine    = ModeData->HorizontalResolution;
 
   Status = Private->EmuGraphicsWindow->Size (
                                          Private->EmuGraphicsWindow,
