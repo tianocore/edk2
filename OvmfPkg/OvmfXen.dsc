@@ -1,7 +1,7 @@
 ## @file
 #  EFI/Framework Open Virtual Machine Firmware (OVMF) platform
 #
-#  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #  Copyright (c) 2019, Citrix Systems, Inc.
 #  Copyright (c) Microsoft Corporation.
@@ -216,6 +216,7 @@
 
   Tcg2PhysicalPresenceLib|OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  ProtectedVariableLib|MdeModulePkg/Library/ProtectedVariableLibNull/ProtectedVariableLibNull.inf
   RealTimeClockLib|OvmfPkg/Library/XenRealTimeClockLib/XenRealTimeClockLib.inf
   TimeBaseLib|EmbeddedPkg/Library/TimeBaseLib/TimeBaseLib.inf
 !ifdef $(DEBUG_ON_HYPERVISOR_CONSOLE)
