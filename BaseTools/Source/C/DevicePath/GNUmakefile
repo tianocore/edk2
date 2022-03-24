@@ -13,6 +13,9 @@ OBJECTS = DevicePath.o UefiDevicePathLib.o DevicePathFromText.o  DevicePathUtili
 
 include $(MAKEROOT)/Makefiles/app.makefile
 
+# gcc 12 trips over device path handling
+BUILD_CFLAGS += -Wno-error=stringop-overflow
+
 LIBS = -lCommon
 ifeq ($(CYGWIN), CYGWIN)
   LIBS += -L/lib/e2fsprogs -luuid
