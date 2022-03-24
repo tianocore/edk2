@@ -408,6 +408,13 @@
   #  instance in PiSmmCpuDxeSmm, and CpuHotplugSmm.
   gUefiOvmfPkgTokenSpaceGuid.PcdCpuHotEjectDataAddress|0|UINT64|0x46
 
+  ## This PCD tracks where PcdVideo{Horizontal,Vertical}Resolution
+  #  values are coming from.
+  #    0 - unset (defaults from platform dsc)
+  #    1 - set from PlatformConfig
+  #    2 - set by GOP Driver.
+  gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource|0|UINT8|0x64
+
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|FALSE|BOOLEAN|0x1d
