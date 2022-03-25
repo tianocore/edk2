@@ -111,7 +111,6 @@ typedef UINT8   u_char;
 typedef UINT32  uid_t;
 typedef UINT32  gid_t;
 typedef CHAR16  wchar_t;
-typedef UINT64  uint64_t;
 
 //
 // File operations are not required for EFI building,
