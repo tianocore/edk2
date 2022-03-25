@@ -2,11 +2,12 @@
   Functions in this module are associated with variable parsing operations and
   are intended to be usable across variable driver source files.
 
-Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
+#include "Variable.h"
 #include "VariableParsing.h"
 
 /**
@@ -15,6 +16,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @param[in] Variable           Pointer to the Variable Header.
   @param[in] VariableStoreEnd   Pointer to the Variable Store End.
+  @param[in] AuthFormat         TRUE indicates authenticated variables are used.
+                                FALSE indicates authenticated variables are not used.
 
   @retval TRUE              Variable header is valid.
   @retval FALSE             Variable header is not valid.
@@ -23,10 +26,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 BOOLEAN
 IsValidVariableHeader (
   IN  VARIABLE_HEADER  *Variable,
-  IN  VARIABLE_HEADER  *VariableStoreEnd
+  IN  VARIABLE_HEADER  *VariableStoreEnd,
+  IN  BOOLEAN          AuthFormat
   )
 {
-  if ((Variable == NULL) || (Variable >= VariableStoreEnd) || (Variable->StartId != VARIABLE_DATA)) {
+  if (  (Variable == NULL)
+     || (((UINTN)Variable + GetVariableHeaderSize (AuthFormat)) >= (UINTN)VariableStoreEnd)
+     || (Variable->StartId != VARIABLE_DATA))
+  {
     //
     // Variable is NULL or has reached the end of variable store,
     // or the StartId is not correct.
@@ -342,6 +349,52 @@ GetVariableDataOffset (
 }
 
 /**
+  Get variable data payload.
+
+  @param[in]      Variable     Pointer to the Variable Header.
+  @param[in,out]  Data         Pointer to buffer used to store the variable data.
+  @param[in,out]  DataSize     Size of buffer passed by Data.
+                               Size of data copied into Data buffer.
+  @param[in]      AuthFlag     Auth-variable indicator.
+
+  @return EFI_SUCCESS             Data was fetched.
+  @return EFI_INVALID_PARAMETER   DataSize is NULL.
+  @return EFI_BUFFER_TOO_SMALL    DataSize is smaller than size of variable data.
+
+**/
+EFI_STATUS
+GetVariableData (
+  IN      VARIABLE_HEADER  *Variable,
+  IN  OUT VOID             *Data,
+  IN  OUT UINT32           *DataSize,
+  IN      BOOLEAN          AuthFlag
+  )
+{
+  UINT32  Size;
+
+  if (DataSize == NULL) {
+    ASSERT (DataSize != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Size = (UINT32)DataSizeOfVariable (Variable, AuthFlag);
+  if (*DataSize < Size) {
+    *DataSize = Size;
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  if (Data == NULL) {
+    ASSERT (Data != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CopyMem (Data, GetVariableDataPtr (Variable, AuthFlag), Size);
+  *DataSize = Size;
+
+  return EFI_SUCCESS;
+}
+
+/**
 
   This code gets the pointer to the next variable header.
 
@@ -479,7 +532,7 @@ FindVariableEx (
   InDeletedVariable = NULL;
 
   for ( PtrTrack->CurrPtr = PtrTrack->StartPtr
-        ; IsValidVariableHeader (PtrTrack->CurrPtr, PtrTrack->EndPtr)
+        ; IsValidVariableHeader (PtrTrack->CurrPtr, PtrTrack->EndPtr, AuthFormat)
         ; PtrTrack->CurrPtr = GetNextVariablePtr (PtrTrack->CurrPtr, AuthFormat)
         )
   {
@@ -608,7 +661,7 @@ VariableServiceGetNextVariableInternal (
     //
     // Switch to the next variable store if needed
     //
-    while (!IsValidVariableHeader (Variable.CurrPtr, Variable.EndPtr)) {
+    while (!IsValidVariableHeader (Variable.CurrPtr, Variable.EndPtr, AuthFormat)) {
       //
       // Find current storage index
       //
@@ -803,4 +856,261 @@ UpdateVariableInfo (
       }
     }
   }
+}
+
+/**
+
+  Retrieve details about a variable and return them in VariableInfo->Header.
+
+  If VariableInfo->Address is given, this function will calculate its offset
+  relative to given variable storage via VariableStore; Otherwise, it will try
+  other internal variable storages or cached copies. It's assumed that, for all
+  copies of NV variable storage, all variables are stored in the same relative
+  position. If VariableInfo->Address is found in the range of any storage copies,
+  its offset relative to that storage should be the same in other copies.
+
+  If VariableInfo->Offset is given (non-zero) but not VariableInfo->Address,
+  this function will return the variable memory address inside VariableStore,
+  if given, via VariableInfo->Address; Otherwise, the address of other storage
+  copies will be returned, if any.
+
+  For a new variable whose offset has not been determined, a value of -1 as
+  VariableInfo->Offset should be passed to skip the offset calculation.
+
+  @param[in,out] VariableInfo             Pointer to variable information.
+
+  @retval EFI_INVALID_PARAMETER  VariableInfo is NULL or both VariableInfo->Address
+                                 and VariableInfo->Offset are NULL (0).
+  @retval EFI_NOT_FOUND          If given Address or Offset is out of range of
+                                 any given or internal storage copies.
+  @retval EFI_SUCCESS            Variable details are retrieved successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+GetVariableInfo (
+  IN OUT  PROTECTED_VARIABLE_INFO  *VariableInfo
+  )
+{
+  VARIABLE_STORE_HEADER          *Stores[2];
+  UINTN                          Index;
+  VARIABLE_HEADER                *VariablePtr;
+  VARIABLE_HEADER                *VariableBuffer;
+  AUTHENTICATED_VARIABLE_HEADER  *AuthVariablePtr;
+  BOOLEAN                        AuthFlag;
+  UINTN                          NameSize;
+  UINTN                          DataSize;
+  UINTN                          VariableSize;
+
+  if ((VariableInfo == NULL) || (  (VariableInfo->Buffer == NULL)
+                                && (VariableInfo->StoreIndex == VAR_INDEX_INVALID)))
+  {
+    ASSERT (VariableInfo != NULL);
+    ASSERT (VariableInfo->Buffer != NULL || VariableInfo->StoreIndex != VAR_INDEX_INVALID);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Stores[0] = mNvVariableCache;
+  Stores[1] = (mVariableModuleGlobal != NULL)
+              ? (VARIABLE_STORE_HEADER *)(UINTN)mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase
+              : NULL;
+
+  VariableBuffer = VariableInfo->Buffer;
+  VariablePtr    = NULL;
+  if (VariableInfo->StoreIndex != VAR_INDEX_INVALID) {
+    for (Index = 0; Index < ARRAY_SIZE (Stores); ++Index) {
+      if (Stores[Index] == NULL) {
+        continue;
+      }
+
+      if ((UINTN)VariableInfo->StoreIndex
+          < ((UINTN)GetEndPointer (Stores[Index]) - (UINTN)Stores[Index]))
+      {
+        VariablePtr          = (VARIABLE_HEADER *)((UINTN)Stores[Index] + (UINTN)VariableInfo->StoreIndex);
+        VariableInfo->Buffer = VariablePtr;
+        break;
+      }
+    }
+  } else {
+    VariablePtr = VariableInfo->Buffer;
+  }
+
+  if (VariablePtr == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  AuthFlag = VariableInfo->Flags.Auth;
+  ASSERT (AuthFlag == TRUE || AuthFlag == FALSE);
+
+  //
+  // Make a copy of the whole variable if a buffer is passed in.
+  //
+  if ((VariableBuffer != NULL) && (VariableBuffer != VariablePtr)) {
+    VariableSize = (UINTN)GetNextVariablePtr (VariablePtr, AuthFlag)
+                   - (UINTN)VariablePtr;
+    CopyMem (VariableBuffer, VariablePtr, VariableSize);
+  }
+
+  //
+  // AuthVariable header
+  //
+  if (AuthFlag) {
+    AuthVariablePtr = (AUTHENTICATED_VARIABLE_HEADER *)VariablePtr;
+
+    VariableInfo->Header.State          = AuthVariablePtr->State;
+    VariableInfo->Header.Attributes     = AuthVariablePtr->Attributes;
+    VariableInfo->Header.PubKeyIndex    = AuthVariablePtr->PubKeyIndex;
+    VariableInfo->Header.MonotonicCount = ReadUnaligned64 (
+                                            &(AuthVariablePtr->MonotonicCount)
+                                            );
+    if (VariableInfo->Header.TimeStamp != NULL) {
+      CopyMem (
+        VariableInfo->Header.TimeStamp,
+        &AuthVariablePtr->TimeStamp,
+        sizeof (EFI_TIME)
+        );
+    } else if (VariableBuffer != NULL) {
+      AuthVariablePtr                = (AUTHENTICATED_VARIABLE_HEADER *)VariableBuffer;
+      VariableInfo->Header.TimeStamp = &AuthVariablePtr->TimeStamp;
+    }
+  } else {
+    VariableInfo->Header.State          = VariablePtr->State;
+    VariableInfo->Header.Attributes     = VariablePtr->Attributes;
+    VariableInfo->Header.PubKeyIndex    = 0;
+    VariableInfo->Header.MonotonicCount = 0;
+    VariableInfo->Header.TimeStamp      = NULL;
+  }
+
+  //
+  // VendorGuid
+  //
+  if (VariableInfo->Header.VendorGuid != NULL) {
+    CopyGuid (
+      VariableInfo->Header.VendorGuid,
+      GetVendorGuidPtr (VariablePtr, AuthFlag)
+      );
+  } else {
+    VariableInfo->Header.VendorGuid = GetVendorGuidPtr (VariablePtr, AuthFlag);
+  }
+
+  //
+  // VariableName
+  //
+  NameSize = NameSizeOfVariable (VariablePtr, AuthFlag);
+  if (  (VariableInfo->Header.VariableName != NULL)
+     && (VariableInfo->Header.NameSize >= NameSize))
+  {
+    CopyMem (
+      VariableInfo->Header.VariableName,
+      GetVariableNamePtr (VariablePtr, AuthFlag),
+      NameSize
+      );
+  } else if (VariableInfo->Header.VariableName != NULL) {
+    return EFI_BUFFER_TOO_SMALL;
+  } else {
+    VariableInfo->Header.VariableName = GetVariableNamePtr (VariablePtr, AuthFlag);
+  }
+
+  //
+  // Data
+  //
+  DataSize = DataSizeOfVariable (VariablePtr, AuthFlag);
+  if (  (VariableInfo->Header.Data != NULL)
+     && (VariableInfo->Header.DataSize >= DataSize))
+  {
+    CopyMem (
+      VariableInfo->Header.Data,
+      GetVariableDataPtr (VariablePtr, AuthFlag),
+      NameSize
+      );
+  } else if (VariableInfo->Header.Data != NULL) {
+    return EFI_BUFFER_TOO_SMALL;
+  } else {
+    VariableInfo->Header.Data = GetVariableDataPtr (VariablePtr, AuthFlag);
+  }
+
+  //
+  // Update size information about name & data.
+  //
+  VariableInfo->Header.NameSize = NameSize;
+  VariableInfo->Header.DataSize = DataSize;
+
+  return EFI_SUCCESS;
+}
+
+/**
+
+  Retrieve details of the variable next to given variable within VariableStore.
+
+  If VarInfo->Address is NULL, the first one in VariableStore is returned.
+
+  VariableStart and/or VariableEnd can be given optionally for the situation
+  in which the valid storage space is smaller than the VariableStore->Size.
+  This usually happens when PEI variable services make a compact variable
+  cache to save memory, which cannot make use VariableStore->Size to determine
+  the correct variable storage range.
+
+  @param[in,out] VariableInfo             Pointer to variable information.
+
+  @retval EFI_INVALID_PARAMETER  VariableInfo or VariableStore is NULL.
+  @retval EFI_NOT_FOUND          If the end of VariableStore is reached.
+  @retval EFI_SUCCESS            The next variable is retrieved successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+GetNextVariableInfo (
+  IN OUT  PROTECTED_VARIABLE_INFO  *VariableInfo
+  )
+{
+  VARIABLE_STORE_HEADER  *VarStore;
+  VARIABLE_HEADER        *VariablePtr;
+  VARIABLE_HEADER        *VariableStart;
+  VARIABLE_HEADER        *VariableEnd;
+  BOOLEAN                AuthFlag;
+
+  if (VariableInfo == NULL) {
+    ASSERT (VariableInfo != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (mNvVariableCache != NULL) {
+    VarStore = mNvVariableCache;
+  } else if (mVariableModuleGlobal != NULL) {
+    VarStore = (VARIABLE_STORE_HEADER *)(UINTN)
+               mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase;
+  } else {
+    return EFI_NOT_FOUND;
+  }
+
+  VariableStart = GetStartPointer (VarStore);
+  VariableEnd   = GetEndPointer (VarStore);
+
+  if ((VariableInfo->Flags.Auth != TRUE) && (VariableInfo->Flags.Auth != FALSE)) {
+    VariableInfo->Flags.Auth = CompareGuid (
+                                 &VarStore->Signature,
+                                 &gEfiAuthenticatedVariableGuid
+                                 );
+  }
+
+  AuthFlag = VariableInfo->Flags.Auth;
+
+  if (VariableInfo->StoreIndex == VAR_INDEX_INVALID) {
+    VariablePtr = VariableStart;
+  } else {
+    VariablePtr = (VARIABLE_HEADER *)
+                  ((UINTN)VarStore + (UINTN)VariableInfo->StoreIndex);
+    if (VariablePtr >= VariableEnd) {
+      return EFI_NOT_FOUND;
+    }
+
+    VariablePtr = GetNextVariablePtr (VariablePtr, AuthFlag);
+  }
+
+  if (!IsValidVariableHeader (VariablePtr, VariableEnd, AuthFlag)) {
+    return EFI_NOT_FOUND;
+  }
+
+  VariableInfo->StoreIndex = (UINTN)VariablePtr - (UINTN)VarStore;
+  return GetVariableInfo (VariableInfo);
 }

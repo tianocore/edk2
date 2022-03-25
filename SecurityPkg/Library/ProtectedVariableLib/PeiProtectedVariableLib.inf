@@ -1,0 +1,68 @@
+## @file
+#  Provides protected variable services.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010029
+  BASE_NAME                      = PeiProtectedVariableLib
+  MODULE_UNI_FILE                = ProtectedVariableLib.uni
+  FILE_GUID                      = 76FBFBCE-ACBB-4084-A348-8FCC97AAEB9D
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 0.1
+  LIBRARY_CLASS                  = ProtectedVariableLib|PEIM
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  ProtectedVariablePei.c
+  ProtectedVariableCommon.c
+  ProtectedVariableInternal.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  HobLib
+  BaseCryptLib
+  RpmcLib
+  VariableKeyLib
+  EncryptionVariableLib
+  ReportStatusCodeLib
+  PeiServicesLib
+  HashApiLib
+  SortLib
+
+[Guids]
+  gEdkiiMetaDataHmacVariableGuid
+  gEdkiiProtectedVariableGlobalGuid
+  gEdkiiVarErrorFlagGuid
+  gEdkiiProtectedVariableContextGuid
+
+[Ppis]
+  gEfiPeiMemoryDiscoveredPpiGuid
+  gEfiPeiVariableStoreDiscoveredPpiGuid
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeVariableIntegrity
+  gEfiSecurityPkgTokenSpaceGuid.PcdPlatformVariableName
+  gEfiSecurityPkgTokenSpaceGuid.PcdPlatformVariableGuid
+  gEfiSecurityPkgTokenSpaceGuid.PcdProtectedVariableIntegrity
+  gEfiSecurityPkgTokenSpaceGuid.PcdProtectedVariableConfidentiality
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize
