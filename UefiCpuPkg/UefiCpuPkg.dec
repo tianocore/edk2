@@ -15,8 +15,15 @@
   PACKAGE_GUID                   = 2171df9b-0d39-45aa-ac37-2de190010d23
   PACKAGE_VERSION                = 0.90
 
-[Includes]
+[Includes.common]
   Include
+
+[Includes.RISCV64]
+  Include/Library
+  Library/RISC-V/RiscVOpensbiLib/opensbi         # OpenSBI header file reference ("include/sbi/...")
+  Library/RISC-V/RiscVOpensbiLib/opensbi/include # Header file reference from opensbi files, ("sbi/...")
+  Library/RISC-V/RiscVOpensbiLib/opensbi/platform/generic/include # Header file reference from opensbi files, ("sbi/...")
+
 
 [LibraryClasses]
   ##  @libraryclass  Defines some routines that are used to register/manage/program
