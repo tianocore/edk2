@@ -20,6 +20,8 @@ def TheTestSuite():
     suites.append(CheckPythonSyntax.TheTestSuite())
     import CheckUnicodeSourceFiles
     suites.append(CheckUnicodeSourceFiles.TheTestSuite())
+    import TestGenCrc32
+    suites.append(TestGenCrc32.TheTestSuite())
     return unittest.TestSuite(suites)
 
 if __name__ == '__main__':
