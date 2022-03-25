@@ -919,6 +919,23 @@ UfsPassThruDriverBindingStart (
     goto Error;
   }
 
+  //
+  // UFS 2.0 spec Section 13.1.3.3:
+  // At the end of the UFS Interconnect Layer initialization on both host and device side,
+  // the host shall send a NOP OUT UPIU to verify that the device UTP Layer is ready.
+  //
+  Status = UfsExecNopCmds (Private);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Ufs Sending NOP IN command Error, Status = %r\n", Status));
+    goto Error;
+  }
+
+  Status = UfsFinishDeviceInitialization (Private);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Device failed to finish initialization, Status = %r\n", Status));
+    goto Error;
+  }
+
   if ((mUfsHcPlatform != NULL) &&
       ((mUfsHcPlatform->RefClkFreq == EdkiiUfsCardRefClkFreq19p2Mhz) ||
        (mUfsHcPlatform->RefClkFreq == EdkiiUfsCardRefClkFreq26Mhz) ||
@@ -965,23 +982,6 @@ UfsPassThruDriverBindingStart (
         );
       return Status;
     }
-  }
-
-  //
-  // UFS 2.0 spec Section 13.1.3.3:
-  // At the end of the UFS Interconnect Layer initialization on both host and device side,
-  // the host shall send a NOP OUT UPIU to verify that the device UTP Layer is ready.
-  //
-  Status = UfsExecNopCmds (Private);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Ufs Sending NOP IN command Error, Status = %r\n", Status));
-    goto Error;
-  }
-
-  Status = UfsFinishDeviceInitialization (Private);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Device failed to finish initialization, Status = %r\n", Status));
-    goto Error;
   }
 
   //
