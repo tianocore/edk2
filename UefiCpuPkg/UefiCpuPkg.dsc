@@ -14,7 +14,7 @@
   PLATFORM_VERSION               = 0.90
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/UefiCpu
-  SUPPORTED_ARCHITECTURES        = IA32|X64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|RISCV64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -55,9 +55,9 @@
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  UefiCpuLib|UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
 
 [LibraryClasses.IA32, LibraryClasses.X64]
-  UefiCpuLib|UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
   MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
   LocalApicLib|UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
   SmmCpuPlatformHookLib|UefiCpuPkg/Library/SmmCpuPlatformHookLibNull/SmmCpuPlatformHookLibNull.inf
@@ -120,6 +120,8 @@
 #
 # Drivers/Libraries within this package
 #
+[Components.common]
+  UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
 
 [Components.IA32, Components.X64]
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
@@ -144,7 +146,6 @@
   UefiCpuPkg/CpuIo2Smm/CpuIo2StandaloneMm.inf
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
   UefiCpuPkg/CpuS3DataDxe/CpuS3DataDxe.inf
-  UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
   UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
   UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
   UefiCpuPkg/Library/CpuCommonFeaturesLib/CpuCommonFeaturesLib.inf
