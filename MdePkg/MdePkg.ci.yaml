@@ -50,6 +50,8 @@
             "Include/IndustryStandard/Tpm20.h",
             "Include/IndustryStandard/IoRemappingTable.h",
             "Include/IndustryStandard/UefiTcgPlatform.h",
+            "Include/IndustryStandard/RiscVOpensbi.h",
+            "Include/IndustryStandard/RiscVOpensbiTypes.h",
             "Include/Library/PcdLib.h",
             "Include/Library/SafeIntLib.h",
             "Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.c"
