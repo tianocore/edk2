@@ -25,6 +25,8 @@ http://creativecommons.org/publicdomain/zero/1.0/
 
 #define KECCAK1600_WIDTH  1600
 
+typedef UINT64 uint64_t;
+
 //
 // This struct referring to m_sha3.c from opessl and modified its type name.
 //
