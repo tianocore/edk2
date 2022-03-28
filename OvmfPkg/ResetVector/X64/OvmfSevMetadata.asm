@@ -26,6 +26,8 @@ BITS  64
 ;
 %define OVMF_SECTION_TYPE_CPUID           0x3
 
+; Kernel hashes section for measured direct boot
+%define OVMF_SECTION_TYPE_KERNEL_HASHES   0x10
 
 ALIGN 16
 
@@ -64,6 +66,15 @@ CpuidSec:
   DD  CPUID_BASE
   DD  CPUID_SIZE
   DD  OVMF_SECTION_TYPE_CPUID
+
+%if (SEV_SNP_KERNEL_HASHES_BASE > 0)
+; Kernel hashes for measured direct boot, or zero page if
+; there are no kernel hashes / SEV secrets
+SevSnpKernelHashes:
+  DD  SEV_SNP_KERNEL_HASHES_BASE
+  DD  SEV_SNP_KERNEL_HASHES_SIZE
+  DD  OVMF_SECTION_TYPE_KERNEL_HASHES
+%endif
 
 ; Region need to be pre-validated by the hypervisor
 PreValidate3:
