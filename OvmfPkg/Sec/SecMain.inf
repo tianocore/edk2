@@ -44,6 +44,7 @@
   BaseMemoryLib
   PeiServicesLib
   PcdLib
+  CpuLib
   UefiCpuLib
   DebugAgentLib
   IoLib
