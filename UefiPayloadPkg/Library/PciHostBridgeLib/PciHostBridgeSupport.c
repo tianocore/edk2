@@ -20,88 +20,6 @@
 #include "PciHostBridge.h"
 
 /**
-  Adjust the collected PCI resource.
-
-  @param[in]  Io               IO aperture.
-
-  @param[in]  Mem              MMIO aperture.
-
-  @param[in]  MemAbove4G       MMIO aperture above 4G.
-
-  @param[in]  PMem             Prefetchable MMIO aperture.
-
-  @param[in]  PMemAbove4G      Prefetchable MMIO aperture above 4G.
-**/
-VOID
-AdjustRootBridgeResource (
-  IN  PCI_ROOT_BRIDGE_APERTURE *Io,
-  IN  PCI_ROOT_BRIDGE_APERTURE *Mem,
-  IN  PCI_ROOT_BRIDGE_APERTURE *MemAbove4G,
-  IN  PCI_ROOT_BRIDGE_APERTURE *PMem,
-  IN  PCI_ROOT_BRIDGE_APERTURE *PMemAbove4G
-)
-{
-  UINT64  Mask;
-
-  //
-  // For now try to downgrade everything into MEM32 since
-  // - coreboot does not assign resource above 4GB
-  // - coreboot might allocate interleaved MEM32 and PMEM32 resource
-  //   in some cases
-  //
-  if (PMem->Base < Mem->Base) {
-    Mem->Base = PMem->Base;
-  }
-
-  if (PMem->Limit > Mem->Limit) {
-    Mem->Limit = PMem->Limit;
-  }
-
-  PMem->Base  = MAX_UINT64;
-  PMem->Limit = 0;
-
-  if (MemAbove4G->Base < 0x100000000ULL) {
-    if (MemAbove4G->Base < Mem->Base) {
-      Mem->Base  = MemAbove4G->Base;
-    }
-    if (MemAbove4G->Limit > Mem->Limit) {
-      Mem->Limit = MemAbove4G->Limit;
-    }
-    MemAbove4G->Base  = MAX_UINT64;
-    MemAbove4G->Limit = 0;
-  }
-
-  if (PMemAbove4G->Base < 0x100000000ULL) {
-    if (PMemAbove4G->Base < Mem->Base) {
-      Mem->Base  = PMemAbove4G->Base;
-    }
-    if (PMemAbove4G->Limit > Mem->Limit) {
-      Mem->Limit = PMemAbove4G->Limit;
-    }
-    PMemAbove4G->Base  = MAX_UINT64;
-    PMemAbove4G->Limit = 0;
-  }
-
-  //
-  // Align IO  resource at 4K  boundary
-  //
-  Mask        = 0xFFFULL;
-  Io->Limit   = ((Io->Limit + Mask) & ~Mask) - 1;
-  if (Io->Base != MAX_UINT64) {
-    Io->Base &= ~Mask;
-  }
-
-  //
-  // Align MEM resource at 1MB boundary
-  //
-  Mask        = 0xFFFFFULL;
-  Mem->Limit  = ((Mem->Limit + Mask) & ~Mask) - 1;
-  if (Mem->Base != MAX_UINT64) {
-    Mem->Base &= ~Mask;
-  }
-}
-
-/**
   Probe a bar is existed or not.
 
   @param[in]    Address           PCI address for the BAR.
@@ -111,28 +29,24 @@ AdjustRootBridgeResource (
 STATIC
 VOID
 PcatPciRootBridgeBarExisted (
-  IN  UINT64                         Address,
+  IN  UINTN                          Address,
   OUT UINT32                         *OriginalValue,
   OUT UINT32                         *Value
 )
 {
-  UINTN   PciAddress;
-
-  PciAddress = (UINTN)Address;
-
   //
   // Preserve the original value
   //
-  *OriginalValue = PciRead32 (PciAddress);
+  *OriginalValue = PciRead32 (Address);
 
   //
   // Disable timer interrupt while the BAR is probed
   //
   DisableInterrupts ();
 
-  PciWrite32 (PciAddress, 0xFFFFFFFF);
-  *Value = PciRead32 (PciAddress);
-  PciWrite32 (PciAddress, *OriginalValue);
+  PciWrite32 (Address, 0xFFFFFFFF);
+  *Value = PciRead32 (Address);
+  PciWrite32 (Address, *OriginalValue);
 
   //
   // Enable interrupt
@@ -225,9 +139,7 @@ PcatPciRootBridgeParseBars (
   IN UINTN                          BarOffsetEnd,
   IN PCI_ROOT_BRIDGE_APERTURE       *Io,
   IN PCI_ROOT_BRIDGE_APERTURE       *Mem,
-  IN PCI_ROOT_BRIDGE_APERTURE       *MemAbove4G,
-  IN PCI_ROOT_BRIDGE_APERTURE       *PMem,
-  IN PCI_ROOT_BRIDGE_APERTURE       *PMemAbove4G
+  IN PCI_ROOT_BRIDGE_APERTURE       *MemAbove4G
 
 )
 {
@@ -292,11 +204,7 @@ PcatPciRootBridgeParseBars (
           //
           Length = ((~Length) + 1) & 0xffffffff;
 
-          if ((Value & BIT3) == BIT3) {
-            MemAperture = PMem;
-          } else {
-            MemAperture = Mem;
-          }
+          MemAperture = Mem;
         } else {
           //
           // 64bit
@@ -315,8 +223,8 @@ PcatPciRootBridgeParseBars (
             Length = LShiftU64 (1ULL, LowBit);
           }
 
-          if ((Value & BIT3) == BIT3) {
-            MemAperture = PMemAbove4G;
+          if (Base < BASE_4GB) {
+            MemAperture = Mem;
           } else {
             MemAperture = MemAbove4G;
           }
@@ -363,6 +271,7 @@ PcatPciRootBridgeParseBars (
   }
 }
 
+STATIC PCI_ROOT_BRIDGE_APERTURE  mNonExistAperture = { MAX_UINT64, 0 };
 /**
   Scan for all root bridges in platform.
 
@@ -386,7 +295,7 @@ ScanForRootBridges (
   UINT64     Base;
   UINT64     Limit;
   UINT64     Value;
-  PCI_ROOT_BRIDGE_APERTURE Io, Mem, MemAbove4G, PMem, PMemAbove4G, *MemAperture;
+  PCI_ROOT_BRIDGE_APERTURE Io, Mem, MemAbove4G, *MemAperture;
   PCI_ROOT_BRIDGE *RootBridges;
   UINTN      BarOffsetEnd;
 
@@ -406,9 +315,7 @@ ScanForRootBridges (
     ZeroMem (&Io, sizeof (Io));
     ZeroMem (&Mem, sizeof (Mem));
     ZeroMem (&MemAbove4G, sizeof (MemAbove4G));
-    ZeroMem (&PMem, sizeof (PMem));
-    ZeroMem (&PMemAbove4G, sizeof (PMemAbove4G));
-    Io.Base = Mem.Base = MemAbove4G.Base = PMem.Base = PMemAbove4G.Base = MAX_UINT64;
+    Io.Base = Mem.Base = MemAbove4G.Base = MAX_UINT64;
     //
     // Scan all the PCI devices on the primary bus of the PCI root bridge
     //
@@ -518,11 +425,11 @@ ScanForRootBridges (
           Base = ((UINT32) Pci.Bridge.PrefetchableMemoryBase & 0xfff0) << 16;
           Limit = (((UINT32) Pci.Bridge.PrefetchableMemoryLimit & 0xfff0)
                    << 16) | 0xfffff;
-          MemAperture = &PMem;
+          MemAperture = &Mem;
           if (Value == BIT0) {
             Base |= LShiftU64 (Pci.Bridge.PrefetchableBaseUpper32, 32);
             Limit |= LShiftU64 (Pci.Bridge.PrefetchableLimitUpper32, 32);
-            MemAperture = &PMemAbove4G;
+            MemAperture = &MemAbove4G;
           }
           if ((Base > 0) && (Base < Limit)) {
             if (MemAperture->Base > Base) {
@@ -573,8 +480,7 @@ ScanForRootBridges (
           OFFSET_OF (PCI_TYPE00, Device.Bar),
           BarOffsetEnd,
           &Io,
-          &Mem, &MemAbove4G,
-          &PMem, &PMemAbove4G
+          &Mem, &MemAbove4G
         );
 
         //
@@ -644,12 +550,10 @@ ScanForRootBridges (
                     );
       ASSERT (RootBridges != NULL);
 
-      AdjustRootBridgeResource (&Io, &Mem, &MemAbove4G, &PMem, &PMemAbove4G);
-
       InitRootBridge (
         Attributes, Attributes, 0,
         (UINT8) PrimaryBus, (UINT8) SubBus,
-        &Io, &Mem, &MemAbove4G, &PMem, &PMemAbove4G,
+        &Io, &Mem, &MemAbove4G, &mNonExistAperture, &mNonExistAperture,
         &RootBridges[*NumberOfRootBridges]
       );
       RootBridges[*NumberOfRootBridges].ResourceAssigned = TRUE;
