@@ -23,6 +23,7 @@
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PlatformSecLib.h>
+#include <Library/CpuLib.h>
 #include <Library/UefiCpuLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PeCoffExtraActionLib.h>
