@@ -58,6 +58,7 @@
   FspSwitchStackLib
   FspCommonLib
   FspSecPlatformLib
+  CpuLib
   UefiCpuLib
 
 [Pcd]
