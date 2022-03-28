@@ -54,6 +54,7 @@
   HobLib
   PeCoffLib
   PlatformSupportLib
+  CpuLib
   UefiCpuLib
 
 [Guids]
