@@ -64,6 +64,15 @@
 %define SEV_SNP_SECRETS_SIZE          (FixedPcdGet32 (PcdOvmfSnpSecretsSize))
 %define CPUID_BASE                    (FixedPcdGet32 (PcdOvmfCpuidBase))
 %define CPUID_SIZE                    (FixedPcdGet32 (PcdOvmfCpuidSize))
+%if (FixedPcdGet32 (PcdSevLaunchSecretBase) > 0)
+  ; There's a reserved page for SEV secrets and hashes; the VMM will fill and
+  ; validate the page, or mark it as a zero page.
+  %define SEV_SNP_KERNEL_HASHES_BASE    (FixedPcdGet32 (PcdSevLaunchSecretBase))
+  %define SEV_SNP_KERNEL_HASHES_SIZE    (FixedPcdGet32 (PcdSevLaunchSecretSize) + FixedPcdGet32 (PcdQemuHashTableSize))
+%else
+  %define SEV_SNP_KERNEL_HASHES_BASE    0
+  %define SEV_SNP_KERNEL_HASHES_SIZE    0
+%endif
 %define SNP_SEC_MEM_BASE_DESC_1       (FixedPcdGet32 (PcdOvmfSecPageTablesBase))
 %define SNP_SEC_MEM_SIZE_DESC_1       (FixedPcdGet32 (PcdOvmfSecGhcbBase) - SNP_SEC_MEM_BASE_DESC_1)
 ;
@@ -75,7 +84,7 @@
 ;
 %define SNP_SEC_MEM_BASE_DESC_2       (GHCB_BASE + 0x1000)
 %define SNP_SEC_MEM_SIZE_DESC_2       (SEV_SNP_SECRETS_BASE - SNP_SEC_MEM_BASE_DESC_2)
-%define SNP_SEC_MEM_BASE_DESC_3       (CPUID_BASE + CPUID_SIZE)
+%define SNP_SEC_MEM_BASE_DESC_3       (CPUID_BASE + CPUID_SIZE + SEV_SNP_KERNEL_HASHES_SIZE)
 %define SNP_SEC_MEM_SIZE_DESC_3       (FixedPcdGet32 (PcdOvmfPeiMemFvBase) - SNP_SEC_MEM_BASE_DESC_3)
 
 %ifdef ARCH_X64
