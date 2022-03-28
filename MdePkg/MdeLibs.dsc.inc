@@ -13,3 +13,4 @@
 
 [LibraryClasses]
   RegisterFilterLib|MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
+  CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
