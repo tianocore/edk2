@@ -23,6 +23,7 @@
 #include <Library/PeCoffLib.h>
 #include <Library/BlParseLib.h>
 #include <Library/PlatformSupportLib.h>
+#include <Library/CpuLib.h>
 #include <Library/UefiCpuLib.h>
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
