@@ -45,7 +45,6 @@
   DebugLib
   BaseMemoryLib
   PcdLib
-  UefiCpuLib
   CpuLib
   DebugAgentLib
   IoLib

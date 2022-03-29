@@ -10,7 +10,6 @@
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PcdLib.h>
-#include <Library/UefiCpuLib.h>
 #include <Library/CpuLib.h>
 #include <Library/SynchronizationLib.h>
 #include <Uefi/UefiBaseType.h>
