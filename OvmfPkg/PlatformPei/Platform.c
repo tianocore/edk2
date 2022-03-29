@@ -79,7 +79,7 @@ MemMapInitialization (
     return;
   }
 
-  TopOfLowRam  = GetSystemMemorySizeBelow4gb (PlatformInfoHob);
+  TopOfLowRam  = PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
   PciExBarBase = 0;
   if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     //
