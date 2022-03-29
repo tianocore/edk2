@@ -29,16 +29,22 @@
 #  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64 RISCV64 LOONGARCH64
 #
 
+[Sources.IA32, Sources.X64]
+  X86BaseCpuLib.c
+
 [Sources.IA32]
   Ia32/CpuSleep.c | MSFT
   Ia32/CpuSleep.nasm| INTEL
   Ia32/CpuSleepGcc.c | GCC
   X86CpuFlushTlb.c
 
+  Ia32/InitializeFpu.nasm
+
 [Sources.X64]
   X86CpuFlushTlb.c
   X64/CpuSleep.nasm
 
+  X64/InitializeFpu.nasm
 
 [Sources.EBC]
   Ebc/CpuSleepFlushTlb.c
