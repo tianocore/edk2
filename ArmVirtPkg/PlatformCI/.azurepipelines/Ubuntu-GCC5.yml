@@ -36,39 +36,11 @@ jobs:
             Build.Target: "DEBUG"
             Run.Flags: $(run_flags)
             Run: $(should_run)
-          QEMU_AARCH64_RELEASE:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "AARCH64"
-            Build.Flags: ""
-            Build.Target: "RELEASE"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          QEMU_AARCH64_NOOPT:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "AARCH64"
-            Build.Flags: ""
-            Build.Target: "NOOPT"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
           QEMU_ARM_DEBUG:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "ARM"
             Build.Flags: ""
             Build.Target: "DEBUG"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          QEMU_ARM_RELEASE:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "ARM"
-            Build.Flags: ""
-            Build.Target: "RELEASE"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          QEMU_ARM_NOOPT:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "ARM"
-            Build.Flags: ""
-            Build.Target: "NOOPT"
             Run.Flags: $(run_flags)
             Run: $(should_run)
 
