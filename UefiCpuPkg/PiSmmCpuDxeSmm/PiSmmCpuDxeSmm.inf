@@ -89,7 +89,6 @@
   HobLib
   PciLib
   LocalApicLib
-  UefiCpuLib
   SmmCpuPlatformHookLib
   CpuExceptionHandlerLib
   UefiLib
