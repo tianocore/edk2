@@ -27,7 +27,6 @@
 #include <Library/DebugLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/CpuLib.h>
-#include <Library/UefiCpuLib.h>
 #include <Library/TimerLib.h>
 #include <Library/SynchronizationLib.h>
 #include <Library/MtrrLib.h>

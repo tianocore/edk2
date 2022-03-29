@@ -23,7 +23,6 @@
 #include <Library/TimerLib.h>
 #include <Library/PcdLib.h>
 #include <Library/CpuLib.h>
-#include <Library/UefiCpuLib.h>
 #include <IndustryStandard/Tdx.h>
 
 //

@@ -14,7 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/CpuLib.h>
-#include <Library/UefiCpuLib.h>
 #include <IndustryStandard/Acpi.h>
 
 #include "SmmProfileArch.h"

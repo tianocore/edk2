@@ -24,7 +24,6 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/PlatformSecLib.h>
 #include <Library/CpuLib.h>
-#include <Library/UefiCpuLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PeCoffExtraActionLib.h>
 #include <Library/DebugAgentLib.h>
