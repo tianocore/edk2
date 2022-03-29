@@ -49,7 +49,6 @@
   HobLib
   MtrrLib
   CpuLib
-  UefiCpuLib
   SynchronizationLib
   PeiServicesLib
   PcdLib

@@ -22,7 +22,6 @@
 #include <Library/TimerLib.h>
 #include <Library/PcdLib.h>
 #include <Library/CpuLib.h>
-#include <Library/UefiCpuLib.h>
 
 //
 // Library internal functions

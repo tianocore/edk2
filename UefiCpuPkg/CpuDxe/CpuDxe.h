@@ -28,7 +28,6 @@
 #include <Library/DebugLib.h>
 #include <Library/MtrrLib.h>
 #include <Library/LocalApicLib.h>
-#include <Library/UefiCpuLib.h>
 #include <Library/UefiLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Library/HobLib.h>
