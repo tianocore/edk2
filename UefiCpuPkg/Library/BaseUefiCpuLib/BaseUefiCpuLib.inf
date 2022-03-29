@@ -24,14 +24,8 @@
 #  VALID_ARCHITECTURES           = IA32 X64
 #
 
-[Sources.IA32]
-  Ia32/InitializeFpu.nasm
-
-[Sources.X64]
-  X64/InitializeFpu.nasm
-
 [Sources]
-  BaseUefiCpuLib.c
+  BaseUefiCpuLibNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
