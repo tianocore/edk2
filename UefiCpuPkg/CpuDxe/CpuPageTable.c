@@ -307,6 +307,9 @@ GetPageTableEntry (
   // Make sure AddressEncMask is contained to smallest supported address field.
   //
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
+  if (AddressEncMask == 0) {
+    AddressEncMask = PcdGet64 (PcdTdxSharedBitMask) & PAGING_1G_ADDRESS_MASK_64;
+  }
 
   if (PagingContext->MachineType == IMAGE_FILE_MACHINE_X64) {
     if ((PagingContext->ContextData.X64.Attributes & PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_5_LEVEL) != 0) {
