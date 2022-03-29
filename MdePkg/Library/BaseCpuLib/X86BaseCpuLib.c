@@ -13,7 +13,7 @@
 #include <Register/Amd/Cpuid.h>
 
 #include <Library/BaseLib.h>
-#include <Library/UefiCpuLib.h>
+#include <Library/CpuLib.h>
 
 /**
   Determine if the standard CPU signature is "AuthenticAMD".
