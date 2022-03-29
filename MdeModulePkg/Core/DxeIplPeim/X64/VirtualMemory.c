@@ -179,9 +179,11 @@ EnableExecuteDisableBit (
 {
   UINT64  MsrRegisters;
 
-  MsrRegisters  = AsmReadMsr64 (0xC0000080);
-  MsrRegisters |= BIT11;
-  AsmWriteMsr64 (0xC0000080, MsrRegisters);
+  MsrRegisters = AsmReadMsr64 (0xC0000080);
+  if ((MsrRegisters & BIT11) == 0) {
+    MsrRegisters |= BIT11;
+    AsmWriteMsr64 (0xC0000080, MsrRegisters);
+  }
 }
 
 /**
