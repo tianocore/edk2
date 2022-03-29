@@ -11,6 +11,7 @@
 
 #include <IndustryStandard/E820.h>
 #include <Library/PlatformInitLib.h>
+#include <IndustryStandard/IntelTdx.h>
 
 extern EFI_HOB_PLATFORM_INFO  mPlatformInfoHob;
 
@@ -81,6 +82,24 @@ InstallClearCacheCallback (
 
 VOID
 AmdSevInitialize (
+  VOID
+  );
+
+/**
+  This Function checks if TDX is available, if present then it sets
+  the dynamic PCDs for Tdx guest. It also builds Guid hob which contains
+  the Host Bridge DevId.
+  **/
+VOID
+IntelTdxInitialize (
+  VOID
+  );
+
+/**
+ * @brief Builds PlatformInfo Hob
+ */
+VOID
+BuildPlatformInfoHob (
   VOID
   );
 
