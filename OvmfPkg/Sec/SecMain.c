@@ -757,12 +757,17 @@ SecCoreStartupWithStack (
   //
   IdtTableInStack.PeiService = NULL;
   for (Index = 0; Index < SEC_IDT_ENTRY_COUNT; Index++) {
-    UINT8  *Src;
-    UINT8  *Dst;
-    UINTN  Byte;
+    //
+    // Declare the local variables that actually move the data elements as
+    // volatile to prevent the optimizer from replacing this function with
+    // the intrinsic memcpy()
+    //
+    CONST UINT8     *Src;
+    volatile UINT8  *Dst;
+    UINTN           Byte;
 
-    Src = (UINT8 *)&mIdtEntryTemplate;
-    Dst = (UINT8 *)&IdtTableInStack.IdtTable[Index];
+    Src = (CONST UINT8 *)&mIdtEntryTemplate;
+    Dst = (volatile UINT8 *)&IdtTableInStack.IdtTable[Index];
     for (Byte = 0; Byte < sizeof (mIdtEntryTemplate); Byte++) {
       Dst[Byte] = Src[Byte];
     }
