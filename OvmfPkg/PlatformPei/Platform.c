@@ -52,7 +52,8 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiBootMode[] = {
 };
 
 VOID
-MemMapInitialization (
+EFIAPI
+PlatformMemMapInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
@@ -110,10 +111,6 @@ MemMapInitialization (
   //
   PciSize = 0xFC000000 - PciBase;
   PlatformAddIoMemoryBaseSizeHob (PciBase, PciSize);
-  PcdStatus = PcdSet64S (PcdPciMmio32Base, PciBase);
-  ASSERT_RETURN_ERROR (PcdStatus);
-  PcdStatus = PcdSet64S (PcdPciMmio32Size, PciSize);
-  ASSERT_RETURN_ERROR (PcdStatus);
 
   PlatformInfoHob->PcdPciMmio32Base = PciBase;
   PlatformInfoHob->PcdPciMmio32Size = PciSize;
@@ -173,13 +170,33 @@ MemMapInitialization (
     PciIoBase,
     PciIoSize
     );
-  PcdStatus = PcdSet64S (PcdPciIoBase, PciIoBase);
-  ASSERT_RETURN_ERROR (PcdStatus);
-  PcdStatus = PcdSet64S (PcdPciIoSize, PciIoSize);
-  ASSERT_RETURN_ERROR (PcdStatus);
 
   PlatformInfoHob->PcdPciIoBase = PciIoBase;
   PlatformInfoHob->PcdPciIoSize = PciIoSize;
+}
+
+VOID
+MemMapInitialization (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  RETURN_STATUS  PcdStatus;
+
+  PlatformMemMapInitialization (PlatformInfoHob);
+
+  if (PlatformInfoHob->HostBridgeDevId == 0xffff /* microvm */) {
+    return;
+  }
+
+  PcdStatus = PcdSet64S (PcdPciMmio32Base, PlatformInfoHob->PcdPciMmio32Base);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet64S (PcdPciMmio32Size, PlatformInfoHob->PcdPciMmio32Size);
+  ASSERT_RETURN_ERROR (PcdStatus);
+
+  PcdStatus = PcdSet64S (PcdPciIoBase, PlatformInfoHob->PcdPciIoBase);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet64S (PcdPciIoSize, PlatformInfoHob->PcdPciIoSize);
+  ASSERT_RETURN_ERROR (PcdStatus);
 }
 
 #define UPDATE_BOOLEAN_PCD_FROM_FW_CFG(TokenName)                   \
