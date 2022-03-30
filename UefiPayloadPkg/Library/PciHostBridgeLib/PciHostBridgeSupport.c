@@ -354,14 +354,19 @@ ScanForRootBridges (
           Base  = ((UINT32)Pci.Bridge.PrefetchableMemoryBase & 0xfff0) << 16;
           Limit = (((UINT32)Pci.Bridge.PrefetchableMemoryLimit & 0xfff0)
                    << 16) | 0xfffff;
-          MemAperture = &Mem;
+
           if (Value == BIT0) {
-            Base       |= LShiftU64 (Pci.Bridge.PrefetchableBaseUpper32, 32);
-            Limit      |= LShiftU64 (Pci.Bridge.PrefetchableLimitUpper32, 32);
-            MemAperture = &MemAbove4G;
+            Base  |= LShiftU64 (Pci.Bridge.PrefetchableBaseUpper32, 32);
+            Limit |= LShiftU64 (Pci.Bridge.PrefetchableLimitUpper32, 32);
           }
 
           if ((Base > 0) && (Base < Limit)) {
+            if (Base < BASE_4GB) {
+              MemAperture = &Mem;
+            } else {
+              MemAperture = &MemAbove4G;
+            }
+
             if (MemAperture->Base > Base) {
               MemAperture->Base = Base;
             }
