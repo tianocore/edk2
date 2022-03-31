@@ -1121,12 +1121,10 @@ FindFvbForFtw (
           FtwDevice->NumberOfWorkSpaceBlock = FTW_BLOCKS (FtwDevice->FtwWorkSpaceBase + FtwDevice->FtwWorkSpaceSize, FtwDevice->WorkBlockSize);
           if (FtwDevice->FtwWorkSpaceSize >= FtwDevice->WorkBlockSize) {
             //
-            // Check the alignment of work space address and length, they should be block size aligned when work space size is larger than one block size.
+            // Check the alignment of work space length, it should be block size aligned when work space size is larger than one block size.
             //
-            if (((FtwDevice->WorkSpaceAddress & (FtwDevice->WorkBlockSize - 1)) != 0) ||
-                ((FtwDevice->WorkSpaceLength & (FtwDevice->WorkBlockSize - 1)) != 0))
-            {
-              DEBUG ((DEBUG_ERROR, "Ftw: Work space address or length is not block size aligned when work space size is larger than one block size\n"));
+            if ((FtwDevice->WorkSpaceLength & (FtwDevice->WorkBlockSize - 1)) != 0) {
+              DEBUG ((EFI_D_ERROR, "Ftw: Work space length is not block size aligned when work space size is larger than one block size\n"));
               FreePool (HandleBuffer);
               ASSERT (FALSE);
               return EFI_ABORTED;
@@ -1171,12 +1169,10 @@ FindFvbForFtw (
           }
 
           //
-          // Check the alignment of spare area address and length, they should be block size aligned
+          // Check the alignment of spare area length, it should be block size aligned
           //
-          if (((FtwDevice->SpareAreaAddress & (FtwDevice->SpareBlockSize - 1)) != 0) ||
-              ((FtwDevice->SpareAreaLength & (FtwDevice->SpareBlockSize - 1)) != 0))
-          {
-            DEBUG ((DEBUG_ERROR, "Ftw: Spare area address or length is not block size aligned\n"));
+          if ((FtwDevice->SpareAreaLength & (FtwDevice->SpareBlockSize - 1)) != 0) {
+            DEBUG ((EFI_D_ERROR, "Ftw: Spare area address or length is not block size aligned\n"));
             FreePool (HandleBuffer);
             //
             // Report Status Code EFI_SW_EC_ABORTED.
