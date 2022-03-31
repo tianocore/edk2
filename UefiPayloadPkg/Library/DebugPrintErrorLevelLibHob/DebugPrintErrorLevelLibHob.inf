@@ -1,0 +1,39 @@
+## @file
+#  Debug Print Error Level library instance that retrieves
+#  the DebugPrintErrorLevel from bootloader.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DebugPrintErrorLevelLibHob
+  FILE_GUID                      = c3fead6d-bd4c-4131-bd5f-4bbceecc0fef
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugPrintErrorLevelLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DebugPrintErrorLevelLibHob.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  HobLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel
+
+[Guids]
+  gEdkiiDebugPrintErrorLevelGuid
