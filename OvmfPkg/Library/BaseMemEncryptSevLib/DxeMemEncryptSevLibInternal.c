@@ -18,10 +18,14 @@
 #include <Uefi/UefiBaseType.h>
 #include <ConfidentialComputingGuestAttr.h>
 
+#include "PeiDxeMemEncryptSevLibInternal.h"
+
 STATIC UINT64   mCurrentAttr            = 0;
 STATIC BOOLEAN  mCurrentAttrRead        = FALSE;
 STATIC UINT64   mSevEncryptionMask      = 0;
 STATIC BOOLEAN  mSevEncryptionMaskSaved = FALSE;
+STATIC BOOLEAN  mSevLiveMigrationStatus = FALSE;
+STATIC BOOLEAN  mSevLiveMigrationStatusChecked = FALSE;
 
 /**
   The function check if the specified Attr is set.
@@ -112,6 +116,24 @@ MemEncryptSevSnpIsEnabled (
 }
 
 /**
+  Figures out if we are running inside KVM HVM and
+  KVM HVM supports SEV Live Migration feature.
+**/
+STATIC
+VOID
+EFIAPI
+InternalDetectSevLiveMigrationFeature (
+  VOID
+  )
+{
+  if (KvmDetectSevLiveMigrationFeature ()) {
+        mSevLiveMigrationStatus = TRUE;
+  }
+
+  mSevLiveMigrationStatusChecked = TRUE;
+}
+
+/**
   Returns a boolean to indicate whether SEV-ES is enabled.
 
   @retval TRUE           SEV-ES is enabled
@@ -139,6 +161,25 @@ MemEncryptSevIsEnabled (
   )
 {
   return ConfidentialComputingGuestHas (CCAttrAmdSev);
+}
+
+/**
+  Returns a boolean to indicate whether SEV live migration is enabled.
+
+  @retval TRUE           SEV live migration is enabled
+  @retval FALSE          SEV live migration is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevLiveMigrationIsEnabled (
+  VOID
+  )
+{
+  if (!mSevLiveMigrationStatusChecked) {
+    InternalDetectSevLiveMigrationFeature ();
+  }
+
+  return mSevLiveMigrationStatus;
 }
 
 /**
