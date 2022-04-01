@@ -2308,6 +2308,29 @@ HiiGetConfigRespInfo (
   IN CONST EFI_HII_DATABASE_PROTOCOL  *This
   );
 
+/**
+  Find question default value from PcdNvStoreDefaultValueBuffer
+
+  @param DefaultId          Default store ID
+  @param EfiVarStore        Point to EFI VarStore header
+  @param IfrQuestionHdr     Point to Question header
+  @param ValueBuffer        Point to Buffer includes the found default setting
+  @param Width              Width of the default value
+  @param BitFieldQuestion   Whether the Question is stored in Bit field.
+
+  @retval EFI_SUCCESS       Question default value is found.
+  @retval EFI_NOT_FOUND     Question default value is not found.
+**/
+EFI_STATUS
+FindQuestionDefaultSetting (
+  IN  UINT16                   DefaultId,
+  IN  EFI_IFR_VARSTORE_EFI     *EfiVarStore,
+  IN  EFI_IFR_QUESTION_HEADER  *IfrQuestionHdr,
+  OUT VOID                     *ValueBuffer,
+  IN  UINTN                    Width,
+  IN  BOOLEAN                  BitFieldQuestion
+  );
+
 //
 // Global variables
 //

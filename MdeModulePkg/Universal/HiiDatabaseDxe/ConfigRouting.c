@@ -2171,6 +2171,7 @@ ParseIfrData (
   UINTN                        PackageOffset;
   EFI_IFR_VARSTORE             *IfrVarStore;
   EFI_IFR_VARSTORE_EFI         *IfrEfiVarStore;
+  EFI_IFR_VARSTORE_EFI         *IfrEfiVarStoreTmp;
   EFI_IFR_OP_HEADER            *IfrOpHdr;
   EFI_IFR_ONE_OF               *IfrOneOf;
   EFI_IFR_REF4                 *IfrRef;
@@ -2187,6 +2188,7 @@ ParseIfrData (
   IFR_BLOCK_DATA               *BlockData;
   CHAR16                       *VarStoreName;
   UINTN                        NameSize;
+  UINTN                        NvDefaultStoreSize;
   UINT16                       VarWidth;
   UINT16                       VarDefaultId;
   BOOLEAN                      FirstOneOfOption;
@@ -2212,6 +2214,7 @@ ParseIfrData (
   SmallestDefaultId      = 0xFFFF;
   FromOtherDefaultOpcode = FALSE;
   QuestionReferBitField  = FALSE;
+  IfrEfiVarStoreTmp      = NULL;
 
   //
   // Go through the form package to parse OpCode one by one.
@@ -2303,6 +2306,18 @@ ParseIfrData (
         }
 
         AsciiStrToUnicodeStrS ((CHAR8 *)IfrEfiVarStore->Name, VarStoreName, NameSize);
+        if (IfrEfiVarStoreTmp != NULL) {
+          FreePool (IfrEfiVarStoreTmp);
+        }
+
+        IfrEfiVarStoreTmp = AllocatePool (IfrEfiVarStore->Header.Length + AsciiStrSize ((CHAR8 *)IfrEfiVarStore->Name));
+        if (IfrEfiVarStoreTmp == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Done;
+        }
+
+        CopyMem (IfrEfiVarStoreTmp, IfrEfiVarStore, IfrEfiVarStore->Header.Length);
+        AsciiStrToUnicodeStrS ((CHAR8 *)IfrEfiVarStore->Name, (CHAR16 *)&(IfrEfiVarStoreTmp->Name[0]), AsciiStrSize ((CHAR8 *)IfrEfiVarStore->Name) * sizeof (CHAR16));
 
         if (IsThisVarstore (&IfrEfiVarStore->Guid, VarStoreName, ConfigHdr)) {
           //
@@ -2502,9 +2517,14 @@ ParseIfrData (
           //
           // Set default value base on the DefaultId list get from IFR data.
           //
+          NvDefaultStoreSize = PcdGetSize (PcdNvStoreDefaultValueBuffer);
           for (LinkData = DefaultIdArray->Entry.ForwardLink; LinkData != &DefaultIdArray->Entry; LinkData = LinkData->ForwardLink) {
             DefaultDataPtr        = BASE_CR (LinkData, IFR_DEFAULT_DATA, Entry);
             DefaultData.DefaultId = DefaultDataPtr->DefaultId;
+            if (NvDefaultStoreSize > sizeof (PCD_NV_STORE_DEFAULT_BUFFER_HEADER)) {
+              FindQuestionDefaultSetting (DefaultData.DefaultId, IfrEfiVarStoreTmp, &(IfrOneOf->Question), &DefaultData.Value, VarWidth, QuestionReferBitField);
+            }
+
             InsertDefaultValue (BlockData, &DefaultData);
           }
         }
@@ -3190,6 +3210,10 @@ Done:
         FreePool (DefaultDataPtr);
       }
     }
+  }
+
+  if (IfrEfiVarStoreTmp != NULL) {
+    FreePool (IfrEfiVarStoreTmp);
   }
 
   return Status;
