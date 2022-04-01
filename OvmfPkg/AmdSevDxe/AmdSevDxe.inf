@@ -52,3 +52,7 @@
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+
+[Guids]
+  gAmdSevMemEncryptGuid
+  gEfiEndOfDxeEventGroupGuid         ## CONSUMES   ## Event
