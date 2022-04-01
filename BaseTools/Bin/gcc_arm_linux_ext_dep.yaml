@@ -11,11 +11,11 @@
   "scope": "gcc_arm_linux",
   "type": "web",
   "name": "gcc_arm_linux",
-  "source": "https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf.tar.asc",
-  "version": "10.3-2021.07",
-  "sha256": "aa074fa8371a4f73fecbd16bd62c8b1945f23289e26414794f130d6ccdf8e39c",
+  "source": "https://developer.arm.com/-/media/Files/downloads/gnu/11.2-2022.02/binrel/gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf.tar.xz",
+  "version": "11.2-2022.02",
+  "sha256": "c254f7199261fe76c32ef42187502839bda7efad0a66646cf739d074eff45fad",
   "compression_type": "tar",
-  "internal_path": "/gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf/",
+  "internal_path": "/gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf/",
   "flags": ["set_shell_var", ],
   "var_name": "GCC5_ARM_INSTALL"
 }
