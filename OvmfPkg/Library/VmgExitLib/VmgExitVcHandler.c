@@ -1211,6 +1211,19 @@ VmmCallExit (
   Ghcb->SaveArea.Cpl = (UINT8)(Regs->Cs & 0x3);
   VmgSetOffsetValid (Ghcb, GhcbCpl);
 
+  if (Regs->Rax == KVM_HC_MAP_GPA_RANGE) {
+    //
+    // KVM_HC_MAP_GPA_RANGE hypercall requires these
+    // extra registers.
+    //
+    Ghcb->SaveArea.Rbx = Regs->Rbx;
+    VmgSetOffsetValid (Ghcb, GhcbRbx);
+    Ghcb->SaveArea.Rcx = Regs->Rcx;
+    VmgSetOffsetValid (Ghcb, GhcbRcx);
+    Ghcb->SaveArea.Rdx = Regs->Rdx;
+    VmgSetOffsetValid (Ghcb, GhcbRdx);
+  }
+
   Status = VmgExit (Ghcb, SVM_EXIT_VMMCALL, 0, 0);
   if (Status != 0) {
     return Status;
