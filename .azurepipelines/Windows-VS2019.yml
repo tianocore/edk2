@@ -16,5 +16,5 @@ jobs:
 - template: templates/pr-gate-build-job.yml
   parameters:
     tool_chain_tag: 'VS2019'
-    vm_image: 'windows-latest'
+    vm_image: 'windows-2019'
     arch_list: "IA32,X64"
