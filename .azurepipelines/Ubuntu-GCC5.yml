@@ -16,6 +16,6 @@ jobs:
 - template: templates/pr-gate-build-job.yml
   parameters:
     tool_chain_tag: 'GCC5'
-    vm_image: 'ubuntu-latest'
+    vm_image: 'ubuntu-18.04'
     arch_list: "IA32,X64,ARM,AARCH64,RISCV64"
 
