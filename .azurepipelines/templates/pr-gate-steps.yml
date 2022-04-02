@@ -20,7 +20,7 @@ steps:
 
 - task: UsePythonVersion@0
   inputs:
-    versionSpec: '3.9.x'
+    versionSpec: '3.8.x'
     architecture: 'x64'
 
 - script: pip install -r pip-requirements.txt --upgrade
