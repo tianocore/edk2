@@ -15,7 +15,7 @@
   "version": "11.2-2022.02",
   "sha256": "c254f7199261fe76c32ef42187502839bda7efad0a66646cf739d074eff45fad",
   "compression_type": "tar",
-  "internal_path": "/gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf/",
+  "internal_path": "/gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf",
   "flags": ["set_shell_var", ],
   "var_name": "GCC5_ARM_INSTALL"
 }
