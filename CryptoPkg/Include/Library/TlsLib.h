@@ -572,6 +572,31 @@ TlsSetMsgTrace (
   );
 
 /**
+  Set the signature algorithm list to used by the TLS object.
+
+  This function sets the signature algorithms for use by a specified TLS object.
+
+  @param[in]  Tls                Pointer to a TLS object.
+  @param[in]  SignatureAlgoList  Array of UINT8 of signature algorithms. The array consists of
+                                 pairs of the hash algorithm and the signature algorithm as defined
+                                 in RFC 5246
+  @param[in]  SignatureAlgoNum   The length the SignatureAlgoList. Must be divisible by 2.
+
+  @retval  EFI_SUCCESS           The signature algorithm list was set successfully.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+  @retval  EFI_UNSUPPORTED       No supported TLS signature algorithm was found in SignatureAlgoList
+  @retval  EFI_OUT_OF_RESOURCES  Memory allocation failed.
+
+**/
+EFI_STATUS
+EFIAPI
+TlsSetSignatureAlgoList (
+  IN     VOID   *Tls,
+  IN     UINT8  *SignatureAlgoList,
+  IN     UINTN  SignatureAlgoNum
+  );
+
+/**
   Gets the protocol version used by the specified TLS connection.
 
   This function returns the protocol version used by the specified TLS

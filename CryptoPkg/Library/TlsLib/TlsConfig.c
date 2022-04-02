@@ -8,6 +8,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <Library/TlsLib.h>
+#include <Protocol/Tls.h>
+#include <IndustryStandard/Tls1.h>
 #include "InternalTlsLib.h"
 
 typedef struct {
@@ -70,6 +72,34 @@ STATIC CONST TLS_CIPHER_MAPPING  TlsCipherMappingTable[] = {
   MAP (0xC02B, "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"), /// TLS_ECDHE_ECDSA_AES128_GCM_SHA256
   MAP (0xC02C, "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"), /// TLS_ECDHE_ECDSA_AES256_GCM_SHA384
   MAP (0xC030, "ECDHE-RSA-AES256-GCM-SHA384"),             /// TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+};
+
+typedef struct {
+  //
+  // TLS Algorithm
+  //
+  UINT8          Algo;
+  //
+  // TLS Algorithm name
+  //
+  CONST CHAR8    *Name;
+} TLS_ALGO_TO_NAME;
+
+STATIC CONST TLS_ALGO_TO_NAME  TlsHashAlgoToName[] = {
+  { TlsHashAlgoNone,   NULL     },
+  { TlsHashAlgoMd5,    "MD5"    },
+  { TlsHashAlgoSha1,   "SHA1"   },
+  { TlsHashAlgoSha224, "SHA224" },
+  { TlsHashAlgoSha256, "SHA256" },
+  { TlsHashAlgoSha384, "SHA384" },
+  { TlsHashAlgoSha512, "SHA512" },
+};
+
+STATIC CONST TLS_ALGO_TO_NAME  TlsSignatureAlgoToName[] = {
+  { TlsSignatureAlgoAnonymous, NULL    },
+  { TlsSignatureAlgoRsa,       "RSA"   },
+  { TlsSignatureAlgoDsa,       "DSA"   },
+  { TlsSignatureAlgoEcdsa,     "ECDSA" },
 };
 
 /**
@@ -1107,6 +1137,110 @@ TlsSetMsgTrace (
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Set the signature algorithm list to used by the TLS object.
+
+  This function sets the signature algorithms for use by a specified TLS object.
+
+  @param[in]  Tls                Pointer to a TLS object.
+  @param[in]  SignatureAlgoList  Array of UINT8 of signature algorithms. The array consists of
+                                 pairs of the hash algorithm and the signature algorithm as defined
+                                 in RFC 5246
+  @param[in]  SignatureAlgoNum   The length the SignatureAlgoList. Must be divisible by 2.
+
+  @retval  EFI_SUCCESS           The signature algorithm list was set successfully.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+  @retval  EFI_UNSUPPORTED       No supported TLS signature algorithm was found in SignatureAlgoList
+  @retval  EFI_OUT_OF_RESOURCES  Memory allocation failed.
+
+**/
+EFI_STATUS
+EFIAPI
+TlsSetSignatureAlgoList (
+  IN     VOID   *Tls,
+  IN     UINT8  *SignatureAlgoList,
+  IN     UINTN  SignatureAlgoNum
+  )
+{
+  TLS_CONNECTION  *TlsConn;
+  UINTN           Index;
+  UINTN           SignAlgoStrSize;
+  CHAR8           *SignAlgoStr, *Pos;
+  EFI_STATUS      Status;
+
+  TlsConn = (TLS_CONNECTION *)Tls;
+
+  if (!TlsConn || !TlsConn->Ssl || !SignatureAlgoList || !SignatureAlgoNum ||
+      (SignatureAlgoNum % 2))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  SignAlgoStrSize = 0;
+  for (Index = 0; Index < SignatureAlgoNum; Index += 2) {
+    CONST CHAR8 *Tmp;
+
+    if (SignatureAlgoList[Index] >= ARRAY_SIZE (TlsHashAlgoToName)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Tmp = TlsHashAlgoToName[SignatureAlgoList[Index]].Name;
+    if (!Tmp) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    // Add 1 for the '+'
+    SignAlgoStrSize += AsciiStrLen (Tmp) + 1;
+
+    if (SignatureAlgoList[Index + 1] >= ARRAY_SIZE (TlsSignatureAlgoToName)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Tmp = TlsSignatureAlgoToName[SignatureAlgoList[Index + 1]].Name;
+    if (!Tmp) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    // Add 1 for the ':' or for the NULL terminator
+    SignAlgoStrSize += AsciiStrLen (Tmp) + 1;
+  }
+
+  if (!SignAlgoStrSize) {
+    return EFI_UNSUPPORTED;
+  }
+
+  SignAlgoStr = AllocatePool (SignAlgoStrSize);
+  if (!SignAlgoStr) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Pos = SignAlgoStr;
+  for (Index = 0; Index < SignatureAlgoNum; Index += 2) {
+    CONST CHAR8 *Tmp;
+
+    Tmp = TlsHashAlgoToName[SignatureAlgoList[Index]].Name;
+    CopyMem (Pos, Tmp, AsciiStrLen (Tmp));
+    Pos += AsciiStrLen (Tmp);
+    *Pos++ = '+';
+
+    Tmp = TlsSignatureAlgoToName[SignatureAlgoList[Index + 1]].Name;
+    CopyMem (Pos, Tmp, AsciiStrLen (Tmp));
+    Pos += AsciiStrLen (Tmp);
+    *Pos++ = ':';
+  }
+
+  *(Pos - 1) = '\0';
+
+  if (SSL_set1_sigalgs_list (TlsConn->Ssl, SignAlgoStr) < 1) {
+    Status = EFI_INVALID_PARAMETER;
+  } else {
+    Status = EFI_SUCCESS;
+  }
+
+  FreePool (SignAlgoStr);
+  return Status;
 }
 
 /**
