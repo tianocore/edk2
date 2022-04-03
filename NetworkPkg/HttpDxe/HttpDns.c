@@ -108,6 +108,8 @@ HttpDns4 (
   Dns4CfgData.DnsServerListCount = DnsServerListCount;
   Dns4CfgData.DnsServerList      = DnsServerList;
   Dns4CfgData.UseDefaultSetting  = HttpInstance->IPv4Node.UseDefaultAddress;
+  Dns4CfgData.RetryInterval      = PcdGet32 (PcdHttpDnsRetryInterval);
+  Dns4CfgData.RetryCount         = PcdGet32 (PcdHttpDnsRetryCount);
   if (!Dns4CfgData.UseDefaultSetting) {
     IP4_COPY_ADDRESS (&Dns4CfgData.StationIp, &HttpInstance->IPv4Node.LocalAddress);
     IP4_COPY_ADDRESS (&Dns4CfgData.SubnetMask, &HttpInstance->IPv4Node.LocalSubnet);
@@ -315,6 +317,8 @@ HttpDns6 (
   Dns6ConfigData.DnsServerList  = DnsServerList;
   Dns6ConfigData.EnableDnsCache = TRUE;
   Dns6ConfigData.Protocol       = EFI_IP_PROTO_UDP;
+  Dns6ConfigData.RetryInterval  = PcdGet32 (PcdHttpDnsRetryInterval);
+  Dns6ConfigData.RetryCount     = PcdGet32 (PcdHttpDnsRetryCount);
   IP6_COPY_ADDRESS (&Dns6ConfigData.StationIp, &HttpInstance->Ipv6Node.LocalAddress);
   Status = Dns6->Configure (
                    Dns6,
