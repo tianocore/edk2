@@ -163,5 +163,14 @@
   # @Prompt The Timeout value of HTTP Io. Default value is 5000.
   gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout|5000|UINT32|0x0000000F
 
+  ## The Retry Interval of HTTP DNS in seconds. If the Retry Interval is less than
+  # DNS_DEFAULT_TIMEOUT, then use the DNS_DEFAULT_TIMEOUT.
+  # @Prompt The value of Retry Interval. Default value is 0
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpDnsRetryInterval|0|UINT32|0x00000010
+
+  ## The Retry Count of HTTP DNS if no DNS response received after Retry Interval.
+  # @Prompt The value of Retry Count,  Default value is 0.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpDnsRetryCount|0|UINT32|0x00000011
+
 [UserExtensions.TianoCore."ExtraFiles"]
   NetworkPkgExtra.uni
