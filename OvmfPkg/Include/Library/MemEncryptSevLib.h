@@ -256,9 +256,9 @@ MemEncryptSevSnpPreValidateSystemRam (
 RETURN_STATUS
 EFIAPI
 SetMemoryEncDecHypercall3 (
-  IN  UINTN     PhysicalAddress,
-  IN  UINTN     Pages,
-  IN  BOOLEAN   IsEncrypted
+  IN  UINTN   PhysicalAddress,
+  IN  UINTN   Pages,
+  IN  BOOLEAN IsEncrypted
   );
 
 #define KVM_HC_MAP_GPA_RANGE   12

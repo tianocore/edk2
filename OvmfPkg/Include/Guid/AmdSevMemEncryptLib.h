@@ -15,6 +15,6 @@
 #define AMD_SEV_MEMENCRYPT_GUID \
 {0x0cf29b71, 0x9e51, 0x433a, {0xa3, 0xb7, 0x81, 0xf3, 0xab, 0x16, 0xb8, 0x75}}
 
-extern EFI_GUID gAmdSevMemEncryptGuid;
+extern EFI_GUID  gAmdSevMemEncryptGuid;
 
 #endif

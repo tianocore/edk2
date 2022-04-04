@@ -42,10 +42,10 @@ AmdSevDxeOnEndOfDxe (
   IN VOID      *EventToSignal
   )
 {
-  EFI_STATUS Status;
-  BOOLEAN SevLiveMigrationEnabled;
+  EFI_STATUS  Status;
+  BOOLEAN     SevLiveMigrationEnabled;
 
-  SevLiveMigrationEnabled = MemEncryptSevLiveMigrationIsEnabled();
+  SevLiveMigrationEnabled = MemEncryptSevLiveMigrationIsEnabled ();
 
   if (SevLiveMigrationEnabled) {
     Status = gRT->SetVariable (
@@ -58,12 +58,14 @@ AmdSevDxeOnEndOfDxe (
                &SevLiveMigrationEnabled
                );
 
-    DEBUG ((
-      DEBUG_INFO,
-      "%a: Setting SevLiveMigrationEnabled variable, status = %lx\n",
-      __FUNCTION__,
-      Status
-      ));
+    DEBUG (
+           (
+            DEBUG_INFO,
+            "%a: Setting SevLiveMigrationEnabled variable, status = %lx\n",
+            __FUNCTION__,
+            Status
+           )
+           );
   }
 }
 

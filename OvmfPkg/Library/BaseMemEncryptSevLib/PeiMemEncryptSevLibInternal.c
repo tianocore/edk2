@@ -19,8 +19,8 @@
 
 #include "PeiDxeMemEncryptSevLibInternal.h"
 
-STATIC BOOLEAN mSevLiveMigrationStatus = FALSE;
-STATIC BOOLEAN mSevLiveMigrationStatusChecked = FALSE;
+STATIC BOOLEAN  mSevLiveMigrationStatus = FALSE;
+STATIC BOOLEAN  mSevLiveMigrationStatusChecked = FALSE;
 
 /**
    Read the workarea to determine whether SEV is enabled. If enabled,

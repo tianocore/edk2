@@ -159,14 +159,14 @@ MemEncryptSevClearMmioPageEncMask (
 RETURN_STATUS
 EFIAPI
 SetMemoryEncDecHypercall3 (
-  IN  UINTN     PhysicalAddress,
-  IN  UINTN     Pages,
-  IN  BOOLEAN   IsEncrypted
+  IN  UINTN   PhysicalAddress,
+  IN  UINTN   Pages,
+  IN  BOOLEAN IsEncrypted
   )
 {
-  RETURN_STATUS Ret;
-  UINTN Error;
-  UINTN EncryptState;
+  RETURN_STATUS  Ret;
+  UINTN          Error;
+  UINTN          EncryptState;
 
   Ret = RETURN_UNSUPPORTED;
 
@@ -184,7 +184,7 @@ SetMemoryEncDecHypercall3 (
     //
 
     EncryptState = IsEncrypted ? KVM_MAP_GPA_RANGE_ENCRYPTED :
-        KVM_MAP_GPA_RANGE_DECRYPTED;
+                   KVM_MAP_GPA_RANGE_DECRYPTED;
 
     Error = SetMemoryEncDecHypercall3AsmStub (
               KVM_HC_MAP_GPA_RANGE,
@@ -198,7 +198,8 @@ SetMemoryEncDecHypercall3 (
         "SetMemoryEncDecHypercall3 failed, Phys = %x, Pages = %d, Err = %Ld\n",
         PhysicalAddress,
         Pages,
-        (INT64)Error));
+        (INT64)Error)
+        );
 
       Ret = RETURN_NO_MAPPING;
     }

@@ -77,12 +77,12 @@ KvmDetectSevLiveMigrationFeature (
   VOID
   )
 {
-  CHAR8 Signature[13];
-  UINT32 mKvmLeaf;
-  UINT32 RegEax;
-  UINT32 RegEbx;
-  UINT32 RegEcx;
-  UINT32 RegEdx;
+  CHAR8   Signature[13];
+  UINT32  mKvmLeaf;
+  UINT32  RegEax;
+  UINT32  RegEbx;
+  UINT32  RegEcx;
+  UINT32  RegEdx;
 
   Signature[12] = '\0';
   for (mKvmLeaf = 0x40000000; mKvmLeaf < 0x40010000; mKvmLeaf += 0x100) {
