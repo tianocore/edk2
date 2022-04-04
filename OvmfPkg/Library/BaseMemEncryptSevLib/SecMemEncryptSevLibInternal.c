@@ -140,6 +140,26 @@ MemEncryptSevLiveMigrationIsEnabled (
 }
 
 /**
+  Interface exposed by the ASM implementation of the core hypercall
+
+  @retval Hypercall returned status.
+**/
+UINTN
+EFIAPI
+SetMemoryEncDecHypercall3AsmStub (
+  IN  UINTN  HypercallNum,
+  IN  UINTN  PhysicalAddress,
+  IN  UINTN  Pages,
+  IN  UINTN  Attributes
+  )
+{
+  //
+  // Not used in SEC phase.
+  //
+  return RETURN_UNSUPPORTED;
+}
+
+/**
   Returns the SEV encryption mask.
 
   @return  The SEV pagtable encryption mask
