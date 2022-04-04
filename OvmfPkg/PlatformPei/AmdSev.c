@@ -229,10 +229,10 @@ AmdSevEsInitialize (
   // tracking.
   //
   SetMemoryEncDecHypercall3 (
-    FixedPcdGet32 (PcdOvmfSecGhcbBase),
-    EFI_SIZE_TO_PAGES(FixedPcdGet32 (PcdOvmfSecGhcbSize)),
-    FALSE
-    );
+                             FixedPcdGet32 (PcdOvmfSecGhcbBase),
+                             EFI_SIZE_TO_PAGES (FixedPcdGet32 (PcdOvmfSecGhcbSize)),
+                             FALSE
+                             );
 
   //
   // Allocate GHCB and per-CPU variable pages.
