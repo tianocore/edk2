@@ -1,8 +1,7 @@
 /** @file
-  ELF Load Image Support
 
-Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -38,7 +37,9 @@ AllocatePages (
     return NULL;
   }
 
+  //
   // Make sure allocation address is page alligned.
+  //
   Offset = HobTable->EfiFreeMemoryTop & EFI_PAGE_MASK;
   if (Offset != 0) {
     HobTable->EfiFreeMemoryTop -= Offset;
@@ -332,6 +333,7 @@ BuildHobFromBl (
   if (!EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "Detected ACPI Table at 0x%lx\n", AcpiTableHob->Rsdp));
   }
+
   //
   // Parse memory info and build memory HOBs for reserved DRAM and MMIO
   //
@@ -355,7 +357,7 @@ BuildGenericHob (
 {
   EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute;
 
-  //Memory allocaion hob for the Shim Layer
+  // Memory allocaion hob for the Shim Layer
   BuildMemoryAllocationHob (0x800000, 0x100000, EfiBootServicesData);
 
   //
@@ -376,6 +378,9 @@ BuildGenericHob (
   BuildMemoryAllocationHob (0xFEC80000, SIZE_512KB, EfiMemoryMappedIO);
 }
 
+/**
+  This function will put the contents of CBMEM into a Hob.
+**/
 EFI_STATUS
 ConvertCbmemToHob (
   VOID
@@ -388,8 +393,8 @@ ConvertCbmemToHob (
   SERIAL_PORT_INFO                    SerialPortInfo;
   UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *UniversalSerialPort;
 
-  MemBase    = 0x00800000;
-  //Assume the size of shimlayer.elf is 0x100000.
+  MemBase = 0x00800000;
+  // Assume the size of shimlayer.elf is 0x100000.
   HobMemBase = ALIGN_VALUE (MemBase + 0x100000, SIZE_1MB);
   HobMemTop  = HobMemBase + 0x800000;
   HobConstructor ((VOID *)MemBase, (VOID *)HobMemTop, (VOID *)HobMemBase, (VOID *)HobMemTop);
@@ -437,17 +442,17 @@ ParseCbmemInfo (
   OUT UINT32  *MemTableSize
   )
 {
-  EFI_STATUS              Status;
-  CB_MEMORY               *Rec;
-  struct cb_memory_range  *Range;
-  UINT64                  Start;
-  UINT64                  Size;
-  UINTN                   Index;
-  struct cbmem_root       *CbMemLgRoot;
-  VOID                    *CbMemSmRoot;
-  VOID                    *CbMemSmRootTable;
+  EFI_STATUS               Status;
+  CB_MEMORY                *Rec;
+  struct cb_memory_range   *Range;
+  UINT64                   Start;
+  UINT64                   Size;
+  UINTN                    Index;
+  struct cbmem_root        *CbMemLgRoot;
+  VOID                     *CbMemSmRoot;
+  VOID                     *CbMemSmRootTable;
   UINT32                   SmRootTableSize;
-  struct imd_root_pointer *SmRootPointer;
+  struct imd_root_pointer  *SmRootPointer;
 
   if (MemTable == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -477,10 +482,10 @@ ParseCbmemInfo (
       } else {
         /* Try to locate small root table and find the target CBMEM entry in small root table */
         Status        = FindCbMemTable (CbMemLgRoot, CBMEM_ID_IMD_SMALL, &CbMemSmRootTable, &SmRootTableSize);
-        SmRootPointer = (struct imd_root_pointer *)(UINTN)((UINTN) CbMemSmRootTable + SmRootTableSize - sizeof (struct imd_root_pointer));
-        CbMemSmRoot   = (struct cbmem_root *)(UINTN)(SmRootPointer->root_offset + (UINTN) SmRootPointer);
+        SmRootPointer = (struct imd_root_pointer *)(UINTN)((UINTN)CbMemSmRootTable + SmRootTableSize - sizeof (struct imd_root_pointer));
+        CbMemSmRoot   = (struct cbmem_root *)(UINTN)(SmRootPointer->root_offset + (UINTN)SmRootPointer);
         if (!EFI_ERROR (Status)) {
-          Status = FindCbMemTable ((struct cbmem_root *) CbMemSmRoot, TableId, MemTable, MemTableSize);
+          Status = FindCbMemTable ((struct cbmem_root *)CbMemSmRoot, TableId, MemTable, MemTableSize);
           if (!EFI_ERROR (Status)) {
             break;
           }
@@ -492,24 +497,27 @@ ParseCbmemInfo (
   return Status;
 }
 
+/**
+  This function will decompress the payload located at a fixed offset.
+**/
 EFI_STATUS
 LocateAndDecompressPayload (
   VOID
   )
 {
-  EFI_STATUS                  Status;
-  PHYSICAL_ADDRESS            SourceAddress;
-  UINT64                      ImageSize;
-  PHYSICAL_ADDRESS            DestAddress;
-  PHYSICAL_ADDRESS            CBFSAddress;
-  VOID                        *FMapEntry;
-  UINT32                      FMapEntrySize;
-  struct fmap_area            *FMapArea;
-  VOID                        *MCacheEntryBase;
-  union mcache_entry          *MCacheEntry;
-  UINT32                      MCacheEntrySize;
-  struct cbfs_payload_segment *FirstSegment;
-  UINT32                      Index;
+  EFI_STATUS                   Status;
+  PHYSICAL_ADDRESS             SourceAddress;
+  UINT64                       ImageSize;
+  PHYSICAL_ADDRESS             DestAddress;
+  PHYSICAL_ADDRESS             CBFSAddress;
+  VOID                         *FMapEntry;
+  UINT32                       FMapEntrySize;
+  struct fmap_area             *FMapArea;
+  VOID                         *MCacheEntryBase;
+  union mcache_entry           *MCacheEntry;
+  UINT32                       MCacheEntrySize;
+  struct cbfs_payload_segment  *FirstSegment;
+  UINT32                       Index;
 
   DestAddress   = 0x1600000;
   SourceAddress = 0;
@@ -519,16 +527,19 @@ LocateAndDecompressPayload (
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
+
   /*Locate fmap from CBMEM*/
   FMapArea = (struct fmap_area *)((UINTN)FMapEntry + sizeof (struct fmap));
   for (Index = 0; Index < ((struct fmap *)FMapEntry)->nareas; Index++) {
     DEBUG ((DEBUG_INFO, "Coreboot fmap is %a\n", (CONST CHAR8 *)FMapArea->name));
-    if (AsciiStrCmp ((CONST CHAR8 *)FMapArea->name, "COREBOOT") == 0){
+    if (AsciiStrCmp ((CONST CHAR8 *)FMapArea->name, "COREBOOT") == 0) {
       CBFSAddress = ((struct fmap *)FMapEntry)->base + FMapArea->offset;
       break;
     }
+
     FMapArea = (struct fmap_area *)((UINTN)FMapArea + sizeof (struct fmap_area));
   }
+
   if (!CBFSAddress) {
     return EFI_NOT_FOUND;
   }
@@ -538,37 +549,51 @@ LocateAndDecompressPayload (
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
+
   MCacheEntry = (union mcache_entry *)MCacheEntryBase;
-  while(((UINTN)MCacheEntry + CBFS_MCACHE_ALIGNMENT) <= ((UINTN)MCacheEntryBase + MCacheEntrySize)) {
+  while (((UINTN)MCacheEntry + CBFS_MCACHE_ALIGNMENT) <= ((UINTN)MCacheEntryBase + MCacheEntrySize)) {
     if (MCacheEntry->magic == MCACHE_MAGIC_FILE) {
       if (AsciiStrCmp (MCacheEntry->file.h.filename, CBFS_UNIVERSAL_PAYLOAD) == 0) {
-        FirstSegment  = &((struct cbfs_payload *)(CBFSAddress + MCacheEntry->offset + SWAP32(MCacheEntry->file.h.offset)))->segments;
-        SourceAddress = (UINTN)FirstSegment + SWAP32(FirstSegment->offset);
-        ImageSize     = SWAP32(FirstSegment->len);
-        ASSERT (SWAP32(FirstSegment->type)       == PAYLOAD_SEGMENT_CODE);
-        ASSERT (SWAP32((FirstSegment + 1)->type) == PAYLOAD_SEGMENT_ENTRY);
+        FirstSegment  = &((struct cbfs_payload *)(UINTN)(CBFSAddress + MCacheEntry->offset + SWAP32 (MCacheEntry->file.h.offset)))->segments;
+        SourceAddress = (UINTN)FirstSegment + SWAP32 (FirstSegment->offset);
+        ImageSize     = SWAP32 (FirstSegment->len);
+        ASSERT (SWAP32 (FirstSegment->type)              == PAYLOAD_SEGMENT_CODE);
+        ASSERT (SWAP32 ((FirstSegment + 1)->type)        == PAYLOAD_SEGMENT_ENTRY);
         break;
       }
     }
-    MCacheEntry = (union mcache_entry *)((UINTN)MCacheEntry + ALIGN_UP(SWAP32(MCacheEntry->file.h.offset), CBFS_MCACHE_ALIGNMENT));
+
+    MCacheEntry = (union mcache_entry *)((UINTN)MCacheEntry + ALIGN_UP (SWAP32 (MCacheEntry->file.h.offset), CBFS_MCACHE_ALIGNMENT));
   }
+
   if (!SourceAddress) {
     return EFI_NOT_FOUND;
   }
+
   DEBUG ((DEBUG_INFO, "Locate Payload at 0x%x\n", SourceAddress));
-  Status = LzmaUefiDecompress ((VOID *)SourceAddress, ImageSize, (VOID *)DestAddress, (VOID *)0x2000000);
+  Status = LzmaUefiDecompress ((VOID *)(UINTN)SourceAddress, ImageSize, (VOID *)(UINTN)DestAddress, (VOID *)(UINTN)0x2000000);
   if (EFI_ERROR (Status)) {
     return RETURN_INVALID_PARAMETER;
   }
-  return EFI_SUCCESS;
 
+  return EFI_SUCCESS;
 }
 
+/**
+  Load the payload.
+
+  @param  ImageAddressArg         Address of the image
+  @param  ImageSizeArg            Size of the image
+  @param  UniversalPayloadEntry   Address of the payload entry
+
+  @retval RETURN_SUCCESS     Payload was loaded
+
+**/
 EFI_STATUS
 LoadPayload (
-  OUT    EFI_PHYSICAL_ADDRESS    *ImageAddressArg   OPTIONAL,
-  OUT    UINT64                  *ImageSizeArg,
-  OUT    PHYSICAL_ADDRESS        *UniversalPayloadEntry
+  OUT    EFI_PHYSICAL_ADDRESS  *ImageAddressArg   OPTIONAL,
+  OUT    UINT64                *ImageSizeArg,
+  OUT    PHYSICAL_ADDRESS      *UniversalPayloadEntry
   )
 {
   EFI_STATUS                     Status;
@@ -585,7 +610,7 @@ LoadPayload (
   UNIVERSAL_PAYLOAD_INFO_HEADER  *PldInfo;
 
   /* Hard code for now */
-  Elf = (VOID *) 0x1600000;
+  Elf    = (VOID *)0x1600000;
   Status = LocateAndDecompressPayload ();
   if (EFI_ERROR (Status)) {
     return Status;
@@ -620,6 +645,7 @@ LoadPayload (
       Status = GetElfSectionPos (&Context, Index, &Offset, &Size);
       if (!EFI_ERROR (Status)) {
         PldInfo = (UNIVERSAL_PAYLOAD_INFO_HEADER *)(Context.FileBase + Offset);
+        DEBUG ((DEBUG_INFO, "PldInfo: %d\n", PldInfo));
       }
     } else if (AsciiStrnCmp (SectionName, UNIVERSAL_PAYLOAD_EXTRA_SEC_NAME_PREFIX, UNIVERSAL_PAYLOAD_EXTRA_SEC_NAME_PREFIX_LENGTH) == 0) {
       Status = GetElfSectionPos (&Context, Index, &Offset, &Size);
@@ -663,38 +689,46 @@ LoadPayload (
       }
     }
   }
+
   if (Context.ReloadRequired || (Context.PreferredImageAddress != Context.FileBase)) {
     Context.ImageAddress = AllocatePages (EFI_SIZE_TO_PAGES (Context.ImageSize));
   } else {
     Context.ImageAddress = Context.FileBase;
   }
+
   //
   // Load ELF into the required base
   //
   Status = LoadElfImage (&Context);
   if (!EFI_ERROR (Status)) {
-    *ImageAddressArg        = (UINTN)Context.ImageAddress;
-    *UniversalPayloadEntry  = Context.EntryPoint;
-    *ImageSizeArg           = Context.ImageSize;
+    *ImageAddressArg       = (UINTN)Context.ImageAddress;
+    *UniversalPayloadEntry = Context.EntryPoint;
+    *ImageSizeArg          = Context.ImageSize;
   }
+
   return Status;
 }
 
+/**
+  Hand off to payload.
+
+**/
 EFI_STATUS
 HandOffToPayload (
-  IN     PHYSICAL_ADDRESS        UniversalPayloadEntry,
-  IN     EFI_PEI_HOB_POINTERS    Hob
+  IN     PHYSICAL_ADDRESS      UniversalPayloadEntry,
+  IN     EFI_PEI_HOB_POINTERS  Hob
   )
 {
-
   EFI_STATUS  Status;
   UINTN       HobList;
 
   HobList = (UINTN)(VOID *)Hob.Raw;
-  typedef EFI_STATUS (EFIAPI *PayloadEntry) (UINTN);
-  Status = ((PayloadEntry) UniversalPayloadEntry) (HobList);
+  typedef EFI_STATUS (EFIAPI *PayloadEntry)(UINTN);
+  Status = ((PayloadEntry)(UINTN)UniversalPayloadEntry)(HobList);
+  DEBUG ((DEBUG_ERROR, "HandOffToPayload Status = %r\n", Status));
 
   CpuDeadLoop ();
+//return Status;
   return EFI_SUCCESS;
 }
 
@@ -710,19 +744,19 @@ HandOffToPayload (
 EFI_STATUS
 EFIAPI
 _ModuleEntryPoint (
-  IN UINTN                      BootloaderParameter
+  IN UINTN  BootloaderParameter
   )
 {
-  EFI_STATUS              Status;
-  EFI_PEI_HOB_POINTERS    Hob;
-  PHYSICAL_ADDRESS        ImageAddress;
-  UINT64                  ImageSize;
-  PHYSICAL_ADDRESS        UniversalPayloadEntry;
+  EFI_STATUS            Status;
+  EFI_PEI_HOB_POINTERS  Hob;
+  PHYSICAL_ADDRESS      ImageAddress;
+  UINT64                ImageSize;
+  PHYSICAL_ADDRESS      UniversalPayloadEntry;
 
   Status = PcdSet64S (PcdBootloaderParameter, BootloaderParameter);
   ASSERT_EFI_ERROR (Status);
 
-  Status = ConvertCbmemToHob();
+  Status = ConvertCbmemToHob ();
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "ConvertCbmemToHob Status = %r\n", Status));
     return Status;

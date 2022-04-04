@@ -249,13 +249,13 @@
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
 !endif
   PlatformSupportLib|UefiPayloadPkg/Library/PlatformSupportLibNull/PlatformSupportLibNull.inf
-!if $(UNIVERSAL_PAYLOAD) == FALSE
-  !if $(BOOTLOADER) == "COREBOOT"
+#!if $(UNIVERSAL_PAYLOAD) == FALSE
+#  !if $(BOOTLOADER) == "COREBOOT"
     BlParseLib|UefiPayloadPkg/Library/CbParseLib/CbParseLib.inf
-  !else
-    BlParseLib|UefiPayloadPkg/Library/SblParseLib/SblParseLib.inf
-  !endif
-!endif
+#  !else
+#    BlParseLib|UefiPayloadPkg/Library/SblParseLib/SblParseLib.inf
+#  !endif
+#!endif
 
   DebugLib|MdeModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf

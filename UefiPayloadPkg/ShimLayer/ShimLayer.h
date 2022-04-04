@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __UEFI_PAYLOAD_ENTRY_H__
-#define __UEFI_PAYLOAD_ENTRY_H__
+#ifndef UEFI_PAYLOAD_ENTRY_H_
+#define UEFI_PAYLOAD_ENTRY_H_
 
 #include <PiPei.h>
 #include <Library/BaseLib.h>

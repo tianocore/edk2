@@ -48,7 +48,6 @@ ParseElfImage (
   OUT ELF_IMAGE_CONTEXT  *ElfCt
   );
 
-
 /**
   Load the ELF image to Context.ImageAddress.
 
@@ -70,7 +69,6 @@ LoadElfImage (
   IN  ELF_IMAGE_CONTEXT  *ElfCt
   );
 
-
 /**
   Get a ELF section name from its index.
 
@@ -89,7 +87,6 @@ GetElfSectionName (
   IN  UINT32             SectionIndex,
   OUT CHAR8              **SectionName
   );
-
 
 /**
   Get the offset and size of x-th ELF section.
