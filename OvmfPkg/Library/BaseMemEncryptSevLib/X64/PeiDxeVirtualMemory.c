@@ -701,6 +701,7 @@ SetMemoryEncDec (
   UINT64                          PgTableMask;
   UINT64                          AddressEncMask;
   BOOLEAN                         IsWpEnabled;
+  BOOLEAN                         CBitChanged;
   UINTN                           OrigLength;
   RETURN_STATUS                   Status;
 
@@ -769,6 +770,7 @@ SetMemoryEncDec (
   // Save the specified length and physical address (we need it later).
   //
   OrigLength          = Length;
+  CBitChanged         = FALSE;
   OrigPhysicalAddress = PhysicalAddress;
 
   while (Length != 0) {
@@ -829,6 +831,7 @@ SetMemoryEncDec (
           ));
         PhysicalAddress += BIT30;
         Length          -= BIT30;
+        CBitChanged      = TRUE;
       } else {
         //
         // We must split the page
@@ -884,6 +887,7 @@ SetMemoryEncDec (
           SetOrClearCBit (&PageDirectory2MEntry->Uint64, Mode);
           PhysicalAddress += BIT21;
           Length          -= BIT21;
+          CBitChanged      = TRUE;
         } else {
           //
           // We must split up this page into 4K pages
@@ -927,6 +931,7 @@ SetMemoryEncDec (
         SetOrClearCBit (&PageTableEntry->Uint64, Mode);
         PhysicalAddress += EFI_PAGE_SIZE;
         Length          -= EFI_PAGE_SIZE;
+        CBitChanged      = TRUE;
       }
     }
   }
@@ -957,6 +962,17 @@ SetMemoryEncDec (
       SevSnpPagePrivate,
       FALSE
       );
+  }
+
+  //
+  // Notify Hypervisor on C-bit status
+  //
+  if (CBitChanged) {
+    Status = SetMemoryEncDecHypercall3 (
+               OrigPhysicalAddress,
+               EFI_SIZE_TO_PAGES (OrigLength),
+               (Mode == SetCBit) ? TRUE : FALSE
+               );
   }
 
 Done:
