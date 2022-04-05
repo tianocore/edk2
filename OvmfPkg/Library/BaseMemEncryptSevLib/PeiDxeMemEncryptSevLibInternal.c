@@ -95,22 +95,26 @@ KvmDetectSevLiveMigrationFeature (
               );
 
     if (AsciiStrCmp (Signature, "KVMKVMKVM") == 0) {
-      DEBUG ((
-        DEBUG_INFO,
-        "%a: KVM Detected, signature = %a\n",
-        __FUNCTION__,
-        Signature
-        ));
+      DEBUG (
+             (
+              DEBUG_INFO,
+              "%a: KVM Detected, signature = %a\n",
+              __FUNCTION__,
+              Signature
+             )
+             );
 
       RegEax = mKvmLeaf + 1;
       RegEcx = 0;
       AsmCpuid (mKvmLeaf + 1, &RegEax, &RegEbx, &RegEcx, &RegEdx);
       if ((RegEax & KVM_FEATURE_MIGRATION_CONTROL) != 0) {
-        DEBUG ((
-          DEBUG_INFO,
-          "%a: SEV Live Migration feature supported\n",
-          __FUNCTION__
-          ));
+        DEBUG (
+               (
+                DEBUG_INFO,
+                "%a: SEV Live Migration feature supported\n",
+                __FUNCTION__
+               )
+               );
 
         return TRUE;
       }
