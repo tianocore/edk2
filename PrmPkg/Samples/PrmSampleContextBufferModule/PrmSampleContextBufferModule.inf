@@ -7,6 +7,7 @@
 #
 #  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) Microsoft Corporation
+#  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -42,3 +43,6 @@
 [BuildOptions.common]
   MSFT:*_*_*_DLINK_FLAGS  = /DLL /SUBSYSTEM:CONSOLE /VERSION:1.0
   MSFT:*_*_*_GENFW_FLAGS = --keepoptionalheader
+
+  GCC:*_*_AARCH64_GENFW_FLAGS = --keepoptionalheader --prm
+  GCC:*_*_AARCH64_DLINK_FLAGS = -Wl,--no-gc-sections -Wl,--require-defined=PrmModuleExportDescriptor -Wl,--require-defined=CheckStaticDataBufferPrmHandler
