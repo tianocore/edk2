@@ -25,10 +25,10 @@ ArmCallSmc3 (
   IN OUT UINTN  *Arg1 OPTIONAL,
   IN OUT UINTN  *Arg2 OPTIONAL,
   IN OUT UINTN  *Arg3 OPTIONAL
-  )
+)
 {
   ARM_SMC_ARGS  Args;
-  UINTN         ErrorCode;
+  UINTN    ErrorCode;
 
   ZeroMem (&Args, sizeof (ARM_SMC_ARGS));
 
@@ -80,7 +80,7 @@ ArmCallSmc2 (
   IN     UINTN  Function,
   IN OUT UINTN  *Arg1 OPTIONAL,
   IN OUT UINTN  *Arg2 OPTIONAL,
-  OUT UINTN     *Arg3 OPTIONAL
+  OUT UINTN *Arg3 OPTIONAL
   )
 {
   return ArmCallSmc3 (Function, Arg1, Arg2, Arg3);
@@ -102,7 +102,7 @@ ArmCallSmc1 (
   IN OUT UINTN  *Arg1 OPTIONAL,
   OUT UINTN     *Arg2 OPTIONAL,
   OUT UINTN     *Arg3 OPTIONAL
-  )
+)
 {
   return ArmCallSmc3 (Function, Arg1, Arg2, Arg3);
 }
