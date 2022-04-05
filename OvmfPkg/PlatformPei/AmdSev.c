@@ -30,6 +30,11 @@ GetHypervisorFeature (
   VOID
   );
 
+UINT64
+TestGetHypervisorFeature (
+  VOID
+  );
+
 /**
   Initialize SEV-SNP support if running as an SEV-SNP guest.
 
