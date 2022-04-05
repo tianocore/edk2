@@ -84,6 +84,18 @@ MemEncryptSevIsEnabled (
   );
 
 /**
+  Returns a boolean to indicate whether SEV live migration is enabled.
+
+  @retval TRUE           SEV live migration is enabled
+  @retval FALSE          SEV live migration is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevLiveMigrationIsEnabled (
+  VOID
+  );
+
+/**
   This function clears memory encryption bit for the memory region specified by
   BaseAddress and NumPages from the current page table context.
 

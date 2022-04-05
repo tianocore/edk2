@@ -17,6 +17,11 @@
 #include <Register/Cpuid.h>
 #include <Uefi/UefiBaseType.h>
 
+#include "PeiDxeMemEncryptSevLibInternal.h"
+
+STATIC BOOLEAN  mSevLiveMigrationStatus        = FALSE;
+STATIC BOOLEAN  mSevLiveMigrationStatusChecked = FALSE;
+
 /**
    Read the workarea to determine whether SEV is enabled. If enabled,
    then return the SevEsWorkArea pointer.
@@ -84,6 +89,24 @@ MemEncryptSevSnpIsEnabled (
 }
 
 /**
+  Figures out if we are running inside KVM HVM and
+  KVM HVM supports SEV Live Migration feature.
+**/
+STATIC
+VOID
+EFIAPI
+InternalDetectSevLiveMigrationFeature (
+  VOID
+  )
+{
+  if (KvmDetectSevLiveMigrationFeature ()) {
+    mSevLiveMigrationStatus = TRUE;
+  }
+
+  mSevLiveMigrationStatusChecked = TRUE;
+}
+
+/**
   Returns a boolean to indicate whether SEV-ES is enabled.
 
   @retval TRUE           SEV-ES is enabled
@@ -119,6 +142,25 @@ MemEncryptSevIsEnabled (
   Msr.Uint32 = InternalMemEncryptSevStatus ();
 
   return Msr.Bits.SevBit ? TRUE : FALSE;
+}
+
+/**
+  Returns a boolean to indicate whether SEV live migration is enabled.
+
+  @retval TRUE           SEV live migration is enabled
+  @retval FALSE          SEV live migration is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevLiveMigrationIsEnabled (
+  VOID
+  )
+{
+  if (!mSevLiveMigrationStatusChecked) {
+    InternalDetectSevLiveMigrationFeature ();
+  }
+
+  return mSevLiveMigrationStatus;
 }
 
 /**
