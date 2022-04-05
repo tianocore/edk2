@@ -122,6 +122,24 @@ MemEncryptSevIsEnabled (
 }
 
 /**
+  Returns a boolean to indicate whether SEV live migration is enabled.
+
+  @retval TRUE           SEV live migration is enabled
+  @retval FALSE          SEV live migration is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevLiveMigrationIsEnabled (
+  VOID
+  )
+{
+  //
+  // Not used in SEC phase.
+  //
+  return FALSE;
+}
+
+/**
   Returns the SEV encryption mask.
 
   @return  The SEV pagtable encryption mask
