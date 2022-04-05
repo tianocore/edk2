@@ -240,4 +240,56 @@ MemEncryptSevSnpPreValidateSystemRam (
   IN UINTN             NumPages
   );
 
+/**
+ This hypercall is used to notify hypervisor when the page's encryption
+ state changes.
+
+ @param[in]   PhysicalAddress       The physical address that is the start address
+                                    of a memory region.
+ @param[in]   Pages                 Number of pages in memory region.
+ @param[in]   IsEncrypted           Encrypted or Decrypted.
+
+ @retval RETURN_SUCCESS             Hypercall returned success.
+ @retval RETURN_UNSUPPORTED         Hypercall not supported.
+ @retval RETURN_NO_MAPPING          Hypercall returned error.
+**/
+RETURN_STATUS
+EFIAPI
+SetMemoryEncDecHypercall3 (
+  IN  UINTN    PhysicalAddress,
+  IN  UINTN    Pages,
+  IN  BOOLEAN  IsEncrypted
+  );
+
+#define KVM_HC_MAP_GPA_RANGE          12
+#define KVM_MAP_GPA_RANGE_PAGE_SZ_4K  0
+#define KVM_MAP_GPA_RANGE_PAGE_SZ_2M  BIT0
+#define KVM_MAP_GPA_RANGE_PAGE_SZ_1G  BIT1
+#define KVM_MAP_GPA_RANGE_ENC_STATE(n)  ((n) << 4)
+#define KVM_MAP_GPA_RANGE_ENCRYPTED  KVM_MAP_GPA_RANGE_ENC_STATE(1)
+#define KVM_MAP_GPA_RANGE_DECRYPTED  KVM_MAP_GPA_RANGE_ENC_STATE(0)
+
+/**
+ Interface exposed by the ASM implementation of the core hypercall
+
+ @param[in]   HypercallNum          KVM_HC_MAP_GPA_RANGE hypercall.
+ @param[in]   PhysicalAddress       The physical address that is the start address
+                                    of a memory region.
+ @param[in]   Pages                 Number of pages in memory region.
+ @param[in]   Attributes            Bits 3:0 - preferred page size encoding,
+                                    0 = 4kb, 1 = 2mb, 2 = 1gb, etc...
+                                    Bit  4 - plaintext = 0, encrypted = 1
+                                    Bits 63:5 - reserved (must be zero)
+
+  @retval Hypercall returned status.
+**/
+UINTN
+EFIAPI
+SetMemoryEncDecHypercall3AsmStub (
+  IN  UINTN  HypercallNum,
+  IN  UINTN  PhysicalAddress,
+  IN  UINTN  Pages,
+  IN  UINTN  Attributes
+  );
+
 #endif // _MEM_ENCRYPT_SEV_LIB_H_

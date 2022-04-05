@@ -40,6 +40,7 @@
   X64/SnpPageStateChangeInternal.c
   X64/VirtualMemory.c
   X64/VirtualMemory.h
+  X64/AsmHelperStub.nasm
 
 [Sources.IA32]
   Ia32/MemEncryptSevLib.c

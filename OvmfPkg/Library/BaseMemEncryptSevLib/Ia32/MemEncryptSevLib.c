@@ -153,3 +153,30 @@ MemEncryptSevSnpPreValidateSystemRam (
 {
   ASSERT (FALSE);
 }
+
+/**
+ This hyercall is used to notify hypervisor when the page's encryption
+ state changes.
+
+ @param[in]   PhysicalAddress       The physical address that is the start address
+                                    of a memory region.
+ @param[in]   Pages                 Number of Pages in the memory region.
+ @param[in]   IsEncrypted           Encrypted or Decrypted.
+
+ @retval RETURN_SUCCESS             Hypercall returned success.
+ @retval RETURN_UNSUPPORTED         Hypercall not supported.
+ @retval RETURN_NO_MAPPING          Hypercall returned error.
+**/
+RETURN_STATUS
+EFIAPI
+SetMemoryEncDecHypercall3 (
+  IN  UINTN    PhysicalAddress,
+  IN  UINTN    Pages,
+  IN  BOOLEAN  IsEncrypted
+  )
+{
+  //
+  // Memory encryption bit is not accessible in 32-bit mode
+  //
+  return RETURN_UNSUPPORTED;
+}
