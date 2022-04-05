@@ -13,7 +13,7 @@
 
 #include <Library/BaseLib.h>
 
-#define KVM_FEATURE_MIGRATION_CONTROL   BIT17
+#define KVM_FEATURE_MIGRATION_CONTROL  BIT17
 
 /**
   Figures out if we are running inside KVM HVM and
@@ -24,7 +24,7 @@
 **/
 BOOLEAN
 EFIAPI
-KvmDetectSevLiveMigrationFeature(
+KvmDetectSevLiveMigrationFeature (
   VOID
   );
 
