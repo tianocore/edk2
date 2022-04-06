@@ -423,6 +423,8 @@ FtwNotificationEvent (
   EFI_PHYSICAL_ADDRESS                VariableStoreBase;
   UINT64                              VariableStoreLength;
   UINTN                               FtwMaxBlockSize;
+  UINT32                              NvStorageVariableSize;
+  UINT64                              NvStorageVariableSize64;
 
   //
   // Ensure FTW protocol is installed.
@@ -432,13 +434,19 @@ FtwNotificationEvent (
     return;
   }
 
+  Status = GetVariableFlashNvStorageInfo (&NvStorageVariableBase, &NvStorageVariableSize64);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = SafeUint64ToUint32 (NvStorageVariableSize64, &NvStorageVariableSize);
+  // This driver currently assumes the size will be UINT32 so assert the value is safe for now.
+  ASSERT_EFI_ERROR (Status);
+
+  VariableStoreBase = NvStorageVariableBase + mNvFvHeaderCache->HeaderLength;
+
   Status = FtwProtocol->GetMaxBlockSize (FtwProtocol, &FtwMaxBlockSize);
   if (!EFI_ERROR (Status)) {
-    ASSERT (PcdGet32 (PcdFlashNvStorageVariableSize) <= FtwMaxBlockSize);
+    ASSERT (NvStorageVariableSize <= FtwMaxBlockSize);
   }
-
-  NvStorageVariableBase = NV_STORAGE_VARIABLE_BASE;
-  VariableStoreBase     = NvStorageVariableBase + mNvFvHeaderCache->HeaderLength;
 
   //
   // Let NonVolatileVariableBase point to flash variable store base directly after FTW ready.
