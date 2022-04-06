@@ -39,6 +39,8 @@
   DebugLib
   PeiServicesTablePointerLib
   PeiServicesLib
+  SafeIntLib
+  VariableFlashInfoLib
 
 [Guids]
   ## CONSUMES             ## GUID # Variable store header
@@ -59,9 +61,6 @@
   gEfiPeiReadOnlyVariable2PpiGuid   ## PRODUCES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase      ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64    ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable         ## SOMETIMES_CONSUMES
 
 [Depex]
