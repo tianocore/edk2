@@ -26,6 +26,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/SafeIntLib.h>
+#include <Library/VariableFlashInfoLib.h>
 
 //
 // Flash erase polarity is 1
@@ -708,10 +710,13 @@ InitFtwProtocol (
 
   Since Signature and WriteQueueSize have been known, Crc can be calculated out,
   then the work space header will be fixed.
+
+  @param[in]  WorkSpaceLength     Length in bytes of the FTW workspace area.
+
 **/
 VOID
 InitializeLocalWorkSpaceHeader (
-  VOID
+  IN  UINTN  WorkSpaceLength
   );
 
 /**
