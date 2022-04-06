@@ -39,6 +39,8 @@
   HobLib
   BaseMemoryLib
   PcdLib
+  SafeIntLib
+  VariableFlashInfoLib
 
 [Guids]
   ## SOMETIMES_PRODUCES   ## HOB
@@ -46,14 +48,6 @@
   gEdkiiFaultTolerantWriteGuid
   gEdkiiWorkingBlockSignatureGuid               ## SOMETIMES_CONSUMES   ## GUID
   gEfiSystemNvDataFvGuid                        ## SOMETIMES_CONSUMES   ## GUID
-
-[Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase    ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64  ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize    ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase      ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64    ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize      ## CONSUMES
 
 [Depex]
   TRUE
