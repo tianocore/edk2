@@ -567,11 +567,13 @@ GetVariableStore (
   OUT VARIABLE_STORE_INFO  *StoreInfo
   )
 {
+  EFI_STATUS                            Status;
   EFI_HOB_GUID_TYPE                     *GuidHob;
   EFI_FIRMWARE_VOLUME_HEADER            *FvHeader;
   VARIABLE_STORE_HEADER                 *VariableStoreHeader;
   EFI_PHYSICAL_ADDRESS                  NvStorageBase;
   UINT32                                NvStorageSize;
+  UINT64                                NvStorageSize64;
   FAULT_TOLERANT_WRITE_LAST_WRITE_DATA  *FtwLastWriteData;
   UINT32                                BackUpOffset;
 
@@ -591,11 +593,13 @@ GetVariableStore (
         // Emulated non-volatile variable mode is not enabled.
         //
 
-        NvStorageSize = PcdGet32 (PcdFlashNvStorageVariableSize);
-        NvStorageBase = (EFI_PHYSICAL_ADDRESS)(PcdGet64 (PcdFlashNvStorageVariableBase64) != 0 ?
-                                               PcdGet64 (PcdFlashNvStorageVariableBase64) :
-                                               PcdGet32 (PcdFlashNvStorageVariableBase)
-                                               );
+        Status = GetVariableFlashNvStorageInfo (&NvStorageBase, &NvStorageSize64);
+        ASSERT_EFI_ERROR (Status);
+
+        Status = SafeUint64ToUint32 (NvStorageSize64, &NvStorageSize);
+        // This driver currently assumes the size will be UINT32 so assert the value is safe for now.
+        ASSERT_EFI_ERROR (Status);
+
         ASSERT (NvStorageBase != 0);
 
         //
