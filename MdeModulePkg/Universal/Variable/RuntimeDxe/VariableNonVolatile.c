@@ -142,6 +142,7 @@ InitRealNonVolatileVariableStore (
   EFI_PHYSICAL_ADDRESS                  NvStorageBase;
   UINT8                                 *NvStorageData;
   UINT32                                NvStorageSize;
+  UINT64                                NvStorageSize64;
   FAULT_TOLERANT_WRITE_LAST_WRITE_DATA  *FtwLastWriteData;
   UINT32                                BackUpOffset;
   UINT32                                BackUpSize;
@@ -153,18 +154,23 @@ InitRealNonVolatileVariableStore (
 
   mVariableModuleGlobal->FvbInstance = NULL;
 
+  Status = GetVariableFlashNvStorageInfo (&NvStorageBase, &NvStorageSize64);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = SafeUint64ToUint32 (NvStorageSize64, &NvStorageSize);
+  // This driver currently assumes the size will be UINT32 so assert the value is safe for now.
+  ASSERT_EFI_ERROR (Status);
+
+  ASSERT (NvStorageBase != 0);
+
   //
   // Allocate runtime memory used for a memory copy of the FLASH region.
   // Keep the memory and the FLASH in sync as updates occur.
   //
-  NvStorageSize = PcdGet32 (PcdFlashNvStorageVariableSize);
   NvStorageData = AllocateRuntimeZeroPool (NvStorageSize);
   if (NvStorageData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-
-  NvStorageBase = NV_STORAGE_VARIABLE_BASE;
-  ASSERT (NvStorageBase != 0);
 
   //
   // Copy NV storage data to the memory buffer.
