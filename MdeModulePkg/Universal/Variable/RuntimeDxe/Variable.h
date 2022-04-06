@@ -31,6 +31,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/AuthVariableLib.h>
 #include <Library/VarCheckLib.h>
+#include <Library/VariableFlashInfoLib.h>
+#include <Library/SafeIntLib.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/EventGroup.h>
 #include <Guid/VariableFormat.h>
@@ -39,11 +41,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/VarErrorFlag.h>
 
 #include "PrivilegePolymorphic.h"
-
-#define NV_STORAGE_VARIABLE_BASE  (EFI_PHYSICAL_ADDRESS)\
-                                   (PcdGet64 (PcdFlashNvStorageVariableBase64) != 0 ? \
-                                    PcdGet64 (PcdFlashNvStorageVariableBase64) : \
-                                    PcdGet32 (PcdFlashNvStorageVariableBase))
 
 #define EFI_VARIABLE_ATTRIBUTES_MASK  (EFI_VARIABLE_NON_VOLATILE |\
                                       EFI_VARIABLE_BOOTSERVICE_ACCESS | \
