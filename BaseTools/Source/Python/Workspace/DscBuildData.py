@@ -97,7 +97,8 @@ PcdMakefileEnd = '''
 
 AppTarget = '''
 all: $(APPFILE)
-$(APPFILE): $(OBJECTS)
+$(APPLICATION): $(OBJECTS)
+$(APPFILE): $(APPLICATION)
 %s
 '''
 
