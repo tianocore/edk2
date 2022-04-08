@@ -28,7 +28,6 @@ __ashlsi3 (
   int  Count
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (int)LShiftU64 ((UINT64)Datum, (UINTN)Count);
 }
 
@@ -38,7 +37,6 @@ __ashldi3 (
   int   Count
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (long)LShiftU64 ((UINT64)Datum, (UINTN)Count);
 }
 
@@ -48,7 +46,6 @@ __ashlti3 (
   int        Count
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (long long)LShiftU64 ((UINT64)Datum, (UINTN)Count);
 }
 
@@ -60,7 +57,6 @@ __ashrsi3 (
   int  Count
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (int)ARShiftU64 ((UINT64)Datum, (UINTN)Count);
 }
 
@@ -70,7 +66,6 @@ __ashrdi3 (
   int   Count
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (long)ARShiftU64 ((UINT64)Datum, (UINTN)Count);
 }
 
@@ -80,7 +75,6 @@ __ashrti3 (
   int        Count
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (long long)ARShiftU64 ((UINT64)Datum, (UINTN)Count);
 }
 
@@ -92,7 +86,6 @@ __divsi3 (
   int  Divisor
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (int)DivS64x64Remainder ((INT64)Dividend, (INT64)Divisor, NULL);
 }
 
@@ -105,7 +98,6 @@ __divdi3 (
   INT64  Quotient;
 
   Quotient = DivS64x64Remainder ((INT64)Dividend, (INT64)Divisor, NULL);
-  DEBUG ((DEBUG_INFO, "%a: %Ld / %Ld = %Ld\n", __func__, Dividend, Divisor, Quotient));
 
   return Quotient;
 }
@@ -116,7 +108,6 @@ __divti3 (
   long long  Divisor
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (long long)DivS64x64Remainder ((INT64)Dividend, (INT64)Divisor, NULL);
 }
 
@@ -128,7 +119,6 @@ __lshrsi3 (
   int  Count
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (int)RShiftU64 ((UINT64)Datum, (UINTN)Count);
 }
 
@@ -138,7 +128,6 @@ __lshrdi3 (
   int  Count
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (long)RShiftU64 ((UINT64)Datum, (UINTN)Count);
 }
 
@@ -148,7 +137,6 @@ __lshrti3 (
   int  Count
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (long long)RShiftU64 ((UINT64)Datum, (UINTN)Count);
 }
 
@@ -163,7 +151,6 @@ __modsi3 (
   INT64  Remainder;
 
   (void)DivS64x64Remainder ((INT64)Dividend, (INT64)Divisor, &Remainder);
-  DEBUG ((DEBUG_INFO, "modsi3: %d %% %d = %d\n", Dividend, Divisor, (int)Remainder));
 
   return (int)Remainder;
 }
@@ -177,7 +164,6 @@ __moddi3 (
   INT64  Remainder;
 
   (void)DivS64x64Remainder ((INT64)Dividend, (INT64)Divisor, &Remainder);
-  DEBUG ((DEBUG_INFO, "moddi3: %Ld %% %Ld = %Ld\n", (INT64)Dividend, (INT64)Divisor, Remainder));
 
   return Remainder;
 }
@@ -191,7 +177,6 @@ __modti3 (
   INT64  Remainder;
 
   (void)DivS64x64Remainder ((INT64)Dividend, (INT64)Divisor, &Remainder);
-  DEBUG ((DEBUG_INFO, "modti3: %Ld %% %Ld = %Ld\n", (INT64)Dividend, (INT64)Divisor, Remainder));
 
   return (long long)Remainder;
 }
@@ -204,7 +189,6 @@ __multi3 (
   long long  Multiplier
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (long long)MultS64x64 ((INT64)Multiplicand, (INT64)Multiplier);
 }
 
@@ -216,7 +200,6 @@ __udivsi3 (
   unsigned int  Divisor
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (int)DivU64x64Remainder ((UINT64)Dividend, (UINT64)Divisor, NULL);
 }
 
@@ -226,7 +209,6 @@ __udivdi3 (
   unsigned long  Divisor
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (long)DivU64x64Remainder ((UINT64)Dividend, (UINT64)Divisor, NULL);
 }
 
@@ -236,7 +218,6 @@ __udivti3 (
   unsigned long long  Divisor
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   return (long long)DivU64x64Remainder ((UINT64)Dividend, (UINT64)Divisor, NULL);
 }
 
@@ -249,7 +230,6 @@ __umodsi3 (
 {
   UINT64  Remainder;
 
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   (void)DivU64x64Remainder ((UINT64)Dividend, (UINT64)Divisor, &Remainder);
 
   return (unsigned int)Remainder;
@@ -263,7 +243,6 @@ __umoddi3 (
 {
   UINT64  Remainder;
 
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   (void)DivU64x64Remainder ((UINT64)Dividend, (UINT64)Divisor, &Remainder);
 
   return (unsigned long)Remainder;
@@ -277,7 +256,6 @@ __umodti3 (
 {
   UINT64  Remainder;
 
-  DEBUG ((DEBUG_INFO, "%a:\n", __func__));
   (void)DivU64x64Remainder ((UINT64)Dividend, (UINT64)Divisor, &Remainder);
 
   return (unsigned long long)Remainder;
