@@ -83,6 +83,22 @@
   Ia32/MathLShiftS64.nasm   | GCC
   Ia32/MathRShiftU64.nasm   | GCC
 
+  Ia32/ulldiv.c             | MSFT    # __aulldiv
+  Ia32/ullrem.c             | MSFT    # __aullrem
+  Ia32/lldiv.c              | MSFT    # __alldiv
+  Ia32/llrem.c              | MSFT    # __allrem
+  Ia32/lldvrm.c             | MSFT    # __alldvrm
+  Ia32/ulldvrm.c            | MSFT    # __aulldvrm
+
+  Ia32/ulldiv.c             | INTEL
+  Ia32/ullrem.c             | INTEL
+  Ia32/lldiv.c              | INTEL
+  Ia32/llrem.c              | INTEL
+  Ia32/lldvrm.c             | INTEL
+  Ia32/ulldvrm.c            | INTEL
+
+  Ia32/Gcc.c                | GCC
+
 [Packages]
   MdePkg/MdePkg.dec
 
