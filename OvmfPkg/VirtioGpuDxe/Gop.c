@@ -234,19 +234,22 @@ GopSetMode (
   IN  UINT32                        ModeNumber
   )
 {
-  VGPU_GOP              *VgpuGop;
-  UINT32                NewResourceId;
-  UINTN                 NewNumberOfBytes;
-  UINTN                 NewNumberOfPages;
-  VOID                  *NewBackingStore;
-  EFI_PHYSICAL_ADDRESS  NewBackingStoreDeviceAddress;
-  VOID                  *NewBackingStoreMap;
+  VGPU_GOP                              *VgpuGop;
+  UINT32                                NewResourceId;
+  UINTN                                 NewNumberOfBytes;
+  UINTN                                 NewNumberOfPages;
+  VOID                                  *NewBackingStore;
+  EFI_PHYSICAL_ADDRESS                  NewBackingStoreDeviceAddress;
+  VOID                                  *NewBackingStoreMap;
+  UINTN                                 SizeOfInfo;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *GopModeInfo;
 
   EFI_STATUS  Status;
   EFI_STATUS  Status2;
 
-  if (ModeNumber >= ARRAY_SIZE (mGopResolutions)) {
-    return EFI_UNSUPPORTED;
+  Status = GopQueryMode (This, ModeNumber, &SizeOfInfo, &GopModeInfo);
+  if (Status != EFI_SUCCESS) {
+    return Status;
   }
 
   VgpuGop = VGPU_GOP_FROM_GOP (This);
@@ -292,8 +295,8 @@ GopSetMode (
              VgpuGop->ParentBus,                // VgpuDev
              NewResourceId,                     // ResourceId
              VirtioGpuFormatB8G8R8X8Unorm,      // Format
-             mGopResolutions[ModeNumber].Width, // Width
-             mGopResolutions[ModeNumber].Height // Height
+             GopModeInfo->HorizontalResolution, // Width
+             GopModeInfo->VerticalResolution    // Height
              );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -303,8 +306,8 @@ GopSetMode (
   // Allocate, zero and map guest backing store, for bus master common buffer
   // operation.
   //
-  NewNumberOfBytes = mGopResolutions[ModeNumber].Width *
-                     mGopResolutions[ModeNumber].Height * sizeof (UINT32);
+  NewNumberOfBytes = GopModeInfo->HorizontalResolution *
+                     GopModeInfo->VerticalResolution * sizeof (UINT32);
   NewNumberOfPages = EFI_SIZE_TO_PAGES (NewNumberOfBytes);
   Status           = VirtioGpuAllocateZeroAndMapBackingStore (
                        VgpuGop->ParentBus,            // VgpuDev
@@ -337,8 +340,8 @@ GopSetMode (
              VgpuGop->ParentBus,                 // VgpuDev
              0,                                  // X
              0,                                  // Y
-             mGopResolutions[ModeNumber].Width,  // Width
-             mGopResolutions[ModeNumber].Height, // Height
+             GopModeInfo->HorizontalResolution,  // Width
+             GopModeInfo->VerticalResolution,    // Height
              0,                                  // ScanoutId
              NewResourceId                       // ResourceId
              );
@@ -356,8 +359,8 @@ GopSetMode (
                VgpuGop->ParentBus,                 // VgpuDev
                0,                                  // X
                0,                                  // Y
-               mGopResolutions[ModeNumber].Width,  // Width
-               mGopResolutions[ModeNumber].Height, // Height
+               GopModeInfo->HorizontalResolution,  // Width
+               GopModeInfo->VerticalResolution,    // Height
                NewResourceId                       // ResourceId
                );
     if (EFI_ERROR (Status)) {
@@ -367,13 +370,13 @@ GopSetMode (
       // therefore non-recoverable.
       //
       Status2 = VirtioGpuSetScanout (
-                  VgpuGop->ParentBus,                       // VgpuDev
-                  0,                                        // X
-                  0,                                        // Y
-                  mGopResolutions[This->Mode->Mode].Width,  // Width
-                  mGopResolutions[This->Mode->Mode].Height, // Height
-                  0,                                        // ScanoutId
-                  VgpuGop->ResourceId                       // ResourceId
+                  VgpuGop->ParentBus,                        // VgpuDev
+                  0,                                         // X
+                  0,                                         // Y
+                  VgpuGop->GopModeInfo.HorizontalResolution, // Width
+                  VgpuGop->GopModeInfo.VerticalResolution,   // Height
+                  0,                                         // ScanoutId
+                  VgpuGop->ResourceId                        // ResourceId
                   );
       ASSERT_EFI_ERROR (Status2);
       if (EFI_ERROR (Status2)) {
@@ -406,11 +409,9 @@ GopSetMode (
   //
   // Populate Mode and ModeInfo (mutable fields only).
   //
-  VgpuGop->GopMode.Mode                     = ModeNumber;
-  VgpuGop->GopModeInfo.HorizontalResolution =
-    mGopResolutions[ModeNumber].Width;
-  VgpuGop->GopModeInfo.VerticalResolution = mGopResolutions[ModeNumber].Height;
-  VgpuGop->GopModeInfo.PixelsPerScanLine  = mGopResolutions[ModeNumber].Width;
+  VgpuGop->GopMode.Mode = ModeNumber;
+  VgpuGop->GopModeInfo  = *GopModeInfo;
+  FreePool (GopModeInfo);
   return EFI_SUCCESS;
 
 DetachBackingStore:
@@ -435,6 +436,7 @@ DestroyHostResource:
     CpuDeadLoop ();
   }
 
+  FreePool (GopModeInfo);
   return Status;
 }
 
