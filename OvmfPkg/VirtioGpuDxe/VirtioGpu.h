@@ -366,6 +366,12 @@ VirtioGpuResourceFlush (
   IN     UINT32    ResourceId
   );
 
+EFI_STATUS
+VirtioGpuGetDisplayInfo (
+  IN OUT VGPU_DEV                        *VgpuDev,
+  volatile VIRTIO_GPU_RESP_DISPLAY_INFO  *Response
+  );
+
 /**
   Release guest-side and host-side resources that are related to an initialized
   VGPU_GOP.Gop.
