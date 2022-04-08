@@ -20,55 +20,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/BaseLib.h>
 
-// Shift Datum left by Count bits.
-// ===========================================================================
-int
-__ashlsi3 (
-  int  Datum,
-  int  Count
-  )
-{
-  return (int)LShiftU64 ((UINT64)Datum, (UINTN)Count);
-}
-
-long
-__ashldi3 (
-  long  Datum,
-  int   Count
-  )
-{
-  return (long)LShiftU64 ((UINT64)Datum, (UINTN)Count);
-}
-
-long long
-__ashlti3 (
-  long long  Datum,
-  int        Count
-  )
-{
-  return (long long)LShiftU64 ((UINT64)Datum, (UINTN)Count);
-}
-
 // Arithmetically shift Datum right by Count bits.
 // ===========================================================================
-int
-__ashrsi3 (
-  int  Datum,
-  int  Count
-  )
-{
-  return (int)ARShiftU64 ((UINT64)Datum, (UINTN)Count);
-}
-
-long
-__ashrdi3 (
-  long  Datum,
-  int   Count
-  )
-{
-  return (long)ARShiftU64 ((UINT64)Datum, (UINTN)Count);
-}
-
 long long
 __ashrti3 (
   long long  Datum,
