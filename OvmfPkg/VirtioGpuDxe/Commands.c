@@ -828,3 +828,23 @@ VirtioGpuResourceFlush (
            sizeof Request
            );
 }
+
+EFI_STATUS
+VirtioGpuGetDisplayInfo (
+  IN OUT VGPU_DEV                        *VgpuDev,
+  volatile VIRTIO_GPU_RESP_DISPLAY_INFO  *Response
+  )
+{
+  volatile VIRTIO_GPU_CONTROL_HEADER  Request;
+
+  return VirtioGpuSendCommandWithReply (
+           VgpuDev,
+           VirtioGpuCmdGetDisplayInfo,
+           FALSE,                     // Fence
+           &Request,
+           sizeof Request,
+           VirtioGpuRespOkDisplayInfo,
+           &Response->Header,
+           sizeof *Response
+           );
+}
