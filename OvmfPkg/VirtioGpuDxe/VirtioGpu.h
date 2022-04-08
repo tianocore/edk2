@@ -151,6 +151,12 @@ struct VGPU_GOP_STRUCT {
   // BackingStore is non-NULL.
   //
   VOID                                    *BackingStoreMap;
+
+  //
+  // native display resolution
+  //
+  UINT32                                  NativeXRes;
+  UINT32                                  NativeYRes;
 };
 
 //
