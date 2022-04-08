@@ -17,7 +17,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 #include <Uefi.h>
 #include <Library/DebugLib.h>
-#include <sys/EfiCdefs.h>
 
 #include <Library/BaseLib.h>
 
