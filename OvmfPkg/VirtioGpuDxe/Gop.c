@@ -192,6 +192,32 @@ STATIC CONST GOP_RESOLUTION  mGopResolutions[] = {
 #define VGPU_GOP_FROM_GOP(GopPointer) \
           CR (GopPointer, VGPU_GOP, Gop, VGPU_GOP_SIG)
 
+STATIC
+VOID
+EFIAPI
+GopInitialize (
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL  *This
+  )
+{
+  VGPU_GOP  *VgpuGop;
+
+  VgpuGop = VGPU_GOP_FROM_GOP (This);
+
+  //
+  // Set up the Gop -> GopMode -> GopModeInfo pointer chain, and the other
+  // (nonzero) constant fields.
+  //
+  // No direct framebuffer access is supported, only Blt() is.
+  //
+  VgpuGop->Gop.Mode = &VgpuGop->GopMode;
+
+  VgpuGop->GopMode.MaxMode    = (UINT32)(ARRAY_SIZE (mGopResolutions));
+  VgpuGop->GopMode.Info       = &VgpuGop->GopModeInfo;
+  VgpuGop->GopMode.SizeOfInfo = sizeof VgpuGop->GopModeInfo;
+
+  VgpuGop->GopModeInfo.PixelFormat = PixelBltOnly;
+}
+
 //
 // EFI_GRAPHICS_OUTPUT_PROTOCOL member functions.
 //
@@ -207,7 +233,7 @@ GopQueryMode (
 {
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *GopModeInfo;
 
-  if (ModeNumber >= ARRAY_SIZE (mGopResolutions)) {
+  if (ModeNumber >= This->Mode->MaxMode) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -247,6 +273,11 @@ GopSetMode (
   EFI_STATUS  Status;
   EFI_STATUS  Status2;
 
+  if (!This->Mode) {
+    // SetMode() call in InitVgpuGop() triggers this.
+    GopInitialize (This);
+  }
+
   Status = GopQueryMode (This, ModeNumber, &SizeOfInfo, &GopModeInfo);
   if (Status != EFI_SUCCESS) {
     return Status;
@@ -259,20 +290,6 @@ GopSetMode (
   // calls.
   //
   if (VgpuGop->ResourceId == 0) {
-    //
-    // Set up the Gop -> GopMode -> GopModeInfo pointer chain, and the other
-    // (nonzero) constant fields.
-    //
-    // No direct framebuffer access is supported, only Blt() is.
-    //
-    VgpuGop->Gop.Mode = &VgpuGop->GopMode;
-
-    VgpuGop->GopMode.MaxMode    = (UINT32)(ARRAY_SIZE (mGopResolutions));
-    VgpuGop->GopMode.Info       = &VgpuGop->GopModeInfo;
-    VgpuGop->GopMode.SizeOfInfo = sizeof VgpuGop->GopModeInfo;
-
-    VgpuGop->GopModeInfo.PixelFormat = PixelBltOnly;
-
     //
     // This is the first time we create a host side resource.
     //
