@@ -6,6 +6,7 @@ Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
 Copyright (c) 2021, ARM Ltd. All rights reserved.<BR>
 Copyright (c) 2021, Semihalf All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -24,6 +25,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 --*/
 EFI_STATUS
+EFIAPI
 SetSecureBootMode (
   IN  UINT8  SecureBootMode
   );
@@ -73,6 +75,7 @@ SecureBootFetchData (
                                    pointer to NULL to wrap an empty payload.
                                    On output, Pointer to the new payload date buffer allocated from pool,
                                    it's caller's responsibility to free the memory when finish using it.
+  @param[in]        Time           Pointer to time information to created time based payload.
 
   @retval EFI_SUCCESS              Create time based payload successfully.
   @retval EFI_OUT_OF_RESOURCES     There are not enough memory resources to create time based payload.
@@ -81,9 +84,11 @@ SecureBootFetchData (
 
 --*/
 EFI_STATUS
+EFIAPI
 CreateTimeBasedPayload (
-  IN OUT UINTN  *DataSize,
-  IN OUT UINT8  **Data
+  IN OUT UINTN     *DataSize,
+  IN OUT UINT8     **Data,
+  IN     EFI_TIME  *Time
   );
 
 /**
