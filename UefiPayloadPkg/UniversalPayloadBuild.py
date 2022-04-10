@@ -53,6 +53,7 @@ def RunCommand(cmd):
 def BuildUniversalPayload(Args, MacroList):
     BuildTarget = Args.Target
     ToolChain = Args.ToolChain
+    Quiet = Args.Quiet
     BuildArch = "X64" if Args.Arch == 'X64' else "IA32 -a X64"
     ElfToolChain = 'CLANGDWARF'
 
@@ -82,13 +83,13 @@ def BuildUniversalPayload(Args, MacroList):
     #
     # Building DXE core and DXE drivers as DXEFV.
     #
-    BuildPayload = f"build -p {DscPath} -b {BuildTarget} -a X64 -t {ToolChain} -y {PayloadReportPath}"
+    BuildPayload = f"build -p {DscPath} -b {BuildTarget} -a X64 -t {ToolChain} -y {PayloadReportPath} {Quiet}"
     BuildPayload += Defines
     RunCommand(BuildPayload)
     #
     # Building Universal Payload entry.
     #
-    BuildModule = f"build -p {DscPath} -b {BuildTarget} -a {BuildArch} -m {EntryModuleInf} -t {ElfToolChain} -y {ModuleReportPath}"
+    BuildModule = f"build -p {DscPath} -b {BuildTarget} -a {BuildArch} -m {EntryModuleInf} -t {ElfToolChain} -y {ModuleReportPath} {Quiet}"
     BuildModule += Defines
     RunCommand(BuildModule)
 
@@ -120,6 +121,7 @@ def main():
     parser.add_argument('-a', '--Arch', choices=['IA32', 'X64'], help='Specify the ARCH for payload entry module. Default build X64 image.', default ='X64')
     parser.add_argument("-D", "--Macro", action="append", default=["UNIVERSAL_PAYLOAD=TRUE"])
     parser.add_argument('-i', '--ImageId', type=str, help='Specify payload ID (16 bytes maximal).', default ='UEFI')
+    parser.add_argument('-q', '--Quiet')
     MacroList = {}
     args = parser.parse_args()
     if args.Macro is not None:
