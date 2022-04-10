@@ -111,6 +111,7 @@
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
   gEfiDevicePathProtocolGuid                    ## PRODUCES
   gEfiHiiPopupProtocolGuid
+  gEfiRealTimeClockArchProtocolGuid             ## CONSUMES
 
 [Depex]
   gEfiHiiConfigRoutingProtocolGuid  AND
