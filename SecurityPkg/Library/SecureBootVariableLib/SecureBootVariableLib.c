@@ -6,8 +6,10 @@
   (C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2021, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2021, Semihalf All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
+#include <Uefi.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/AuthenticatedVariableFormat.h>
 #include <Guid/ImageAuthentication.h>
@@ -20,6 +22,21 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/SecureBootVariableLib.h>
 #include "Library/DxeServicesLib.h"
+
+// This time can be used when deleting variables, as it should be greater than any variable time.
+EFI_TIME  mMaxTimestamp = {
+  0xFFFF,     // Year
+  0xFF,       // Month
+  0xFF,       // Day
+  0xFF,       // Hour
+  0xFF,       // Minute
+  0xFF,       // Second
+  0x00,
+  0x00000000, // Nanosecond
+  0,
+  0,
+  0x00
+};
 
 /** Creates EFI Signature List structure.
 
@@ -118,7 +135,7 @@ ConcatenateSigList (
 
   @param[in]        KeyFileGuid    A pointer to to the FFS filename GUID
   @param[out]       SigListsSize   A pointer to size of signature list
-  @param[out]       SigListOut    a pointer to a callee-allocated buffer with signature lists
+  @param[out]       SigListsOut    a pointer to a callee-allocated buffer with signature lists
 
   @retval EFI_SUCCESS              Create time based payload successfully.
   @retval EFI_NOT_FOUND            Section with key has not been found.
@@ -210,28 +227,30 @@ SecureBootFetchData (
                                    pointer to NULL to wrap an empty payload.
                                    On output, Pointer to the new payload date buffer allocated from pool,
                                    it's caller's responsibility to free the memory when finish using it.
+  @param[in]        Time           Pointer to time information to created time based payload.
 
   @retval EFI_SUCCESS              Create time based payload successfully.
   @retval EFI_OUT_OF_RESOURCES     There are not enough memory resources to create time based payload.
   @retval EFI_INVALID_PARAMETER    The parameter is invalid.
   @retval Others                   Unexpected error happens.
 
-**/
+--*/
 EFI_STATUS
+EFIAPI
 CreateTimeBasedPayload (
-  IN OUT UINTN  *DataSize,
-  IN OUT UINT8  **Data
+  IN OUT UINTN     *DataSize,
+  IN OUT UINT8     **Data,
+  IN     EFI_TIME  *Time
   )
 {
-  EFI_STATUS                     Status;
   UINT8                          *NewData;
   UINT8                          *Payload;
   UINTN                          PayloadSize;
   EFI_VARIABLE_AUTHENTICATION_2  *DescriptorData;
   UINTN                          DescriptorSize;
-  EFI_TIME                       Time;
 
-  if ((Data == NULL) || (DataSize == NULL)) {
+  if ((Data == NULL) || (DataSize == NULL) || (Time == NULL)) {
+    DEBUG ((DEBUG_ERROR, "%a(), invalid arg\n", __FUNCTION__));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -247,6 +266,7 @@ CreateTimeBasedPayload (
   DescriptorSize = OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo) + OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData);
   NewData        = (UINT8 *)AllocateZeroPool (DescriptorSize + PayloadSize);
   if (NewData == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a() Out of resources.\n", __FUNCTION__));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -256,19 +276,7 @@ CreateTimeBasedPayload (
 
   DescriptorData = (EFI_VARIABLE_AUTHENTICATION_2 *)(NewData);
 
-  ZeroMem (&Time, sizeof (EFI_TIME));
-  Status = gRT->GetTime (&Time, NULL);
-  if (EFI_ERROR (Status)) {
-    FreePool (NewData);
-    return Status;
-  }
-
-  Time.Pad1       = 0;
-  Time.Nanosecond = 0;
-  Time.TimeZone   = 0;
-  Time.Daylight   = 0;
-  Time.Pad2       = 0;
-  CopyMem (&DescriptorData->TimeStamp, &Time, sizeof (EFI_TIME));
+  CopyMem (&DescriptorData->TimeStamp, Time, sizeof (EFI_TIME));
 
   DescriptorData->AuthInfo.Hdr.dwLength         = OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData);
   DescriptorData->AuthInfo.Hdr.wRevision        = 0x0200;
@@ -277,6 +285,7 @@ CreateTimeBasedPayload (
 
   if (Payload != NULL) {
     FreePool (Payload);
+    Payload = NULL;
   }
 
   *DataSize = DescriptorSize + PayloadSize;
@@ -296,6 +305,7 @@ CreateTimeBasedPayload (
 
 **/
 EFI_STATUS
+EFIAPI
 DeleteVariable (
   IN  CHAR16    *VariableName,
   IN  EFI_GUID  *VendorGuid
@@ -319,7 +329,7 @@ DeleteVariable (
   Attr     = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS
              | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
 
-  Status = CreateTimeBasedPayload (&DataSize, &Data);
+  Status = CreateTimeBasedPayload (&DataSize, &Data, &mMaxTimestamp);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
     return Status;
@@ -351,6 +361,7 @@ DeleteVariable (
 
 **/
 EFI_STATUS
+EFIAPI
 SetSecureBootMode (
   IN  UINT8  SecureBootMode
   )
