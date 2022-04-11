@@ -36,6 +36,7 @@
             "Library/Include/CrtLibSupport.h",
             # This has OpenSSL interfaces that aren't UEFI spec compliant
             "Library/BaseCryptLib/Hash/CryptParallelHash.h",
+            "Library/Include/fcntl.h",
             # These directories contain auto-generated OpenSSL content
             "Library/OpensslLib",
             "Library/IntrinsicLib",
