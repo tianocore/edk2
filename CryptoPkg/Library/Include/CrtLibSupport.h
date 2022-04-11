@@ -395,6 +395,12 @@ inet_pton   (
   void *
   );
 
+char *
+strcpy (
+  char *restrict  strDest,
+  const char      *strSource
+  );
+
 //
 // Macros that directly map functions to BaseLib, BaseMemoryLib, and DebugLib functions
 //
@@ -404,7 +410,6 @@ inet_pton   (
 #define memcmp(buf1, buf2, count)           (int)(CompareMem(buf1,buf2,(UINTN)(count)))
 #define memmove(dest, source, count)        CopyMem(dest,source,(UINTN)(count))
 #define strlen(str)                         (size_t)(AsciiStrnLenS(str,MAX_STRING_SIZE))
-#define strcpy(strDest, strSource)          AsciiStrCpyS(strDest,MAX_STRING_SIZE,strSource)
 #define strncpy(strDest, strSource, count)  AsciiStrnCpyS(strDest,MAX_STRING_SIZE,strSource,(UINTN)count)
 #define strcat(strDest, strSource)          AsciiStrCatS(strDest,MAX_STRING_SIZE,strSource)
 #define strncmp(string1, string2, count)    (int)(AsciiStrnCmp(string1,string2,(UINTN)(count)))
