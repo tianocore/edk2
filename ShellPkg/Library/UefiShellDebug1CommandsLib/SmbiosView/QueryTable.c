@@ -1766,6 +1766,30 @@ TABLE_ITEM  OnboardDeviceTypesTable[] = {
     0x0A,
     L"  Sas Controller"
   },
+  {
+    0x0B,
+    L"  Wireless LAN"
+  },
+  {
+    0x0C,
+    L"  Bluetooth"
+  },
+  {
+    0x0D,
+    L"  WWAN"
+  },
+  {
+    0x0E,
+    L"  embedded Multi-Media Controller"
+  },
+  {
+    0x0F,
+    L"  NVMe Controller"
+  },
+  {
+    0x10,
+    L"  UFS Controller"
+  }
 };
 
 TABLE_ITEM  SELTypesTable[] = {
