@@ -12,7 +12,7 @@ EDK2_TOOLCHAIN ?= RVCTLINUX
 EDK2_ARCH ?= ARM
 EDK2_BUILD ?= DEBUG
 
-ifeq ($(EDK2_DSC),"")
+ifndef EDK2_DSC
   $(error The Makfile macro 'EDK2_DSC' must be defined with an EDK2 DSC file.)
 endif
 ifeq ("$(EDK2_DSC)","ArmPlatformPkg/ArmVExpressPkg/ArmVExpress-FVP-AArch64.dsc")
