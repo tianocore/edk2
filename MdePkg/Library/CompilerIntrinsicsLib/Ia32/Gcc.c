@@ -9,6 +9,8 @@
   distribution.  The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.
 
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
