@@ -265,6 +265,16 @@ strcspn (
   return Count;
 }
 
+char *
+strcpy (
+  char *restrict  strDest,
+  const char      *strSource
+  )
+{
+  AsciiStrCpyS (strDest, MAX_STRING_SIZE, strSource);
+  return strDest;
+}
+
 //
 // -- Character Classification Routines --
 //
