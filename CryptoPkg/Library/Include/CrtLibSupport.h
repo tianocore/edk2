@@ -395,15 +395,11 @@ inet_pton   (
   void *
   );
 
-static inline char *
+char *
 strcpy (
   char *restrict  strDest,
   const char      *strSource
-  )
-{
-  AsciiStrCpyS (strDest, MAX_STRING_SIZE, strSource);
-  return strDest;
-}
+  );
 
 //
 // Macros that directly map functions to BaseLib, BaseMemoryLib, and DebugLib functions
