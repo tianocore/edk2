@@ -99,6 +99,11 @@
   ## @libraryclass  Provides support to enroll Secure Boot keys.
   #
   SecureBootVariableProvisionLib|Include/Library/SecureBootVariableProvisionLib.h
+
+  ## @libraryclass  Provides support to manage variable 'PK' related protections.
+  #
+  PlatformPKProtectionLib|Include/Library/PlatformPKProtectionLib.h
+
 [Guids]
   ## Security package token space guid.
   # Include/Guid/SecurityPkgTokenSpace.h
