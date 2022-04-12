@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "SecureBootConfigImpl.h"
+#include <UefiSecureBoot.h>
 #include <Protocol/HiiPopup.h>
 #include <Library/BaseCryptLib.h>
 #include <Library/SecureBootVariableLib.h>
