@@ -166,7 +166,7 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
-    container: 'ghcr.io/osteffenrh/edk2-build-images:ubuntu-20.04'
+    container: 'ghcr.io/osteffenrh/edk2-build-images/ubuntu-20.04:latest'
 
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
