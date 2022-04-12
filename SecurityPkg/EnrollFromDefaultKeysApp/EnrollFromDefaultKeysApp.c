@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiLib.h>                     // AsciiPrint()
 #include <Library/UefiRuntimeServicesTableLib.h> // gRT
 #include <Uefi/UefiMultiPhase.h>
+#include <UefiSecureBoot.h>
 #include <Library/SecureBootVariableLib.h>
 #include <Library/SecureBootVariableProvisionLib.h>
 
