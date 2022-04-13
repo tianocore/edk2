@@ -35,31 +35,17 @@ ASM_PFX(MainEntryPoint):
   // Keep a copy of the MpId register value
   mov   x5, x0
 
-  // Is it the Primary Core ?
-  bl    ASM_PFX(ArmPlatformIsPrimaryCore)
-
-  // Get the top of the primary stacks (and the base of the secondary stacks)
+  // Get the top of the primary stacks
   MOV64 (x1, FixedPcdGet64(PcdCPUCoresStackBase) + FixedPcdGet32(PcdCPUCorePrimaryStackSize))
 
-  // x0 is equal to 1 if I am the primary core
-  cmp   x0, #1
-  b.eq   _SetupPrimaryCoreStack
-
-_SetupSecondaryCoreStack:
-  // x1 contains the base of the secondary stacks
-
-  // Get the Core Position
-  mov   x6, x1      // Save base of the secondary stacks
-  mov   x0, x5
-  bl    ASM_PFX(ArmPlatformGetCorePosition)
-  // The stack starts at the top of the stack region. Add '1' to the Core Position to get the top of the stack
-  add   x0, x0, #1
-
-  // StackOffset = CorePos * StackSize
-  MOV32 (x2, FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
-  mul   x0, x0, x2
-  // SP = StackBase + StackOffset
-  add   sp, x6, x0
+_SetupPrimaryCoreStack:
+  mov   sp, x1
+  MOV64 (x8, FixedPcdGet64 (PcdCPUCoresStackBase))
+  MOV64 (x9, FixedPcdGet32 (PcdInitValueInTempStack) |\
+             FixedPcdGet32 (PcdInitValueInTempStack) << 32)
+0:stp   x9, x9, [x8], #16
+  cmp   x8, x1
+  b.lt  0b
 
 _PrepareArguments:
   // The PEI Core Entry Point has been computed by GenFV and stored in the second entry of the Reset Vector
@@ -78,13 +64,3 @@ _PrepareArguments:
   //    x1 = pei_core_address
   mov   x0, x5
   blr   x3
-
-_SetupPrimaryCoreStack:
-  mov   sp, x1
-  MOV64 (x8, FixedPcdGet64 (PcdCPUCoresStackBase))
-  MOV64 (x9, FixedPcdGet32 (PcdInitValueInTempStack) |\
-             FixedPcdGet32 (PcdInitValueInTempStack) << 32)
-0:stp   x9, x9, [x8], #16
-  cmp   x8, x1
-  b.lt  0b
-  b     _PrepareArguments
