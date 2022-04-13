@@ -7,25 +7,16 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-#include <PiDxe.h>
+#include <IndustryStandard/Pci.h>                     // PCI_MAX_BUS
+#include <IndustryStandard/Q35MchIch9.h>              // INTEL_Q35_MCH_DEVIC...
+#include <Library/BaseMemoryLib.h>                    // ZeroMem()
+#include <Library/PcdLib.h>                           // PcdGet64()
+#include <Library/PciHostBridgeLib.h>                 // PCI_ROOT_BRIDGE_APE...
+#include <Library/PciHostBridgeUtilityLib.h>          // PciHostBridgeUtilit...
+#include <Protocol/PciHostBridgeResourceAllocation.h> // EFI_PCI_HOST_BRIDGE...
+#include <Protocol/PciRootBridgeIo.h>                 // EFI_PCI_ATTRIBUTE_I...
 
-#include <IndustryStandard/Pci.h>
-#include <IndustryStandard/Q35MchIch9.h>
-
-#include <Protocol/PciHostBridgeResourceAllocation.h>
-#include <Protocol/PciRootBridgeIo.h>
-
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/PcdLib.h>
-#include <Library/PciHostBridgeLib.h>
-#include <Library/PciHostBridgeUtilityLib.h>
-#include "PciHostBridge.h"
-
-
-STATIC PCI_ROOT_BRIDGE_APERTURE mNonExistAperture = { MAX_UINT64, 0 };
-
+STATIC PCI_ROOT_BRIDGE_APERTURE  mNonExistAperture = { MAX_UINT64, 0 };
 
 /**
   Return all the root bridge instances in an array.
@@ -39,62 +30,57 @@ STATIC PCI_ROOT_BRIDGE_APERTURE mNonExistAperture = { MAX_UINT64, 0 };
 PCI_ROOT_BRIDGE *
 EFIAPI
 PciHostBridgeGetRootBridges (
-  UINTN *Count
+  UINTN  *Count
   )
 {
-  UINT64               Attributes;
-  UINT64               AllocationAttributes;
-  PCI_ROOT_BRIDGE_APERTURE Io;
-  PCI_ROOT_BRIDGE_APERTURE Mem;
-  PCI_ROOT_BRIDGE_APERTURE MemAbove4G;
-
-  if (PcdGetBool (PcdPciDisableBusEnumeration)) {
-    return ScanForRootBridges (Count);
-  }
+  UINT64                    Attributes;
+  UINT64                    AllocationAttributes;
+  PCI_ROOT_BRIDGE_APERTURE  Io;
+  PCI_ROOT_BRIDGE_APERTURE  Mem;
+  PCI_ROOT_BRIDGE_APERTURE  MemAbove4G;
 
   ZeroMem (&Io, sizeof (Io));
   ZeroMem (&Mem, sizeof (Mem));
   ZeroMem (&MemAbove4G, sizeof (MemAbove4G));
 
   Attributes = EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO |
-    EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO |
-    EFI_PCI_ATTRIBUTE_ISA_IO_16 |
-    EFI_PCI_ATTRIBUTE_ISA_MOTHERBOARD_IO |
-    EFI_PCI_ATTRIBUTE_VGA_MEMORY |
-    EFI_PCI_ATTRIBUTE_VGA_IO_16 |
-    EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16;
+               EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO |
+               EFI_PCI_ATTRIBUTE_ISA_IO_16 |
+               EFI_PCI_ATTRIBUTE_ISA_MOTHERBOARD_IO |
+               EFI_PCI_ATTRIBUTE_VGA_MEMORY |
+               EFI_PCI_ATTRIBUTE_VGA_IO_16 |
+               EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16;
 
   AllocationAttributes = EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM;
   if (PcdGet64 (PcdPciMmio64Size) > 0) {
     AllocationAttributes |= EFI_PCI_HOST_BRIDGE_MEM64_DECODE;
-    MemAbove4G.Base = PcdGet64 (PcdPciMmio64Base);
-    MemAbove4G.Limit = PcdGet64 (PcdPciMmio64Base) +
-                       PcdGet64 (PcdPciMmio64Size) - 1;
+    MemAbove4G.Base       = PcdGet64 (PcdPciMmio64Base);
+    MemAbove4G.Limit      = PcdGet64 (PcdPciMmio64Base) +
+                            PcdGet64 (PcdPciMmio64Size) - 1;
   } else {
     CopyMem (&MemAbove4G, &mNonExistAperture, sizeof (mNonExistAperture));
   }
 
-  Io.Base = PcdGet64 (PcdPciIoBase);
-  Io.Limit = PcdGet64 (PcdPciIoBase) + (PcdGet64 (PcdPciIoSize) - 1);
-  Mem.Base = PcdGet64 (PcdPciMmio32Base);
+  Io.Base   = PcdGet64 (PcdPciIoBase);
+  Io.Limit  = PcdGet64 (PcdPciIoBase) + (PcdGet64 (PcdPciIoSize) - 1);
+  Mem.Base  = PcdGet64 (PcdPciMmio32Base);
   Mem.Limit = PcdGet64 (PcdPciMmio32Base) + (PcdGet64 (PcdPciMmio32Size) - 1);
 
   return PciHostBridgeUtilityGetRootBridges (
-    Count,
-    Attributes,
-    AllocationAttributes,
-    FALSE,
-    PcdGet16 (PcdOvmfHostBridgePciDevId) != INTEL_Q35_MCH_DEVICE_ID,
-    0,
-    PCI_MAX_BUS,
-    &Io,
-    &Mem,
-    &MemAbove4G,
-    &mNonExistAperture,
-    &mNonExistAperture
-    );
+           Count,
+           Attributes,
+           AllocationAttributes,
+           FALSE,
+           PcdGet16 (PcdOvmfHostBridgePciDevId) != INTEL_Q35_MCH_DEVICE_ID,
+           0,
+           PCI_MAX_BUS,
+           &Io,
+           &Mem,
+           &MemAbove4G,
+           &mNonExistAperture,
+           &mNonExistAperture
+           );
 }
-
 
 /**
   Free the root bridge instances array returned from
@@ -106,13 +92,12 @@ PciHostBridgeGetRootBridges (
 VOID
 EFIAPI
 PciHostBridgeFreeRootBridges (
-  PCI_ROOT_BRIDGE *Bridges,
-  UINTN           Count
+  PCI_ROOT_BRIDGE  *Bridges,
+  UINTN            Count
   )
 {
   PciHostBridgeUtilityFreeRootBridges (Bridges, Count);
 }
-
 
 /**
   Inform the platform that the resource conflict happens.
@@ -131,8 +116,8 @@ PciHostBridgeFreeRootBridges (
 VOID
 EFIAPI
 PciHostBridgeResourceConflict (
-  EFI_HANDLE                        HostBridgeHandle,
-  VOID                              *Configuration
+  EFI_HANDLE  HostBridgeHandle,
+  VOID        *Configuration
   )
 {
   PciHostBridgeUtilityResourceConflict (Configuration);

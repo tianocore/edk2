@@ -13,53 +13,53 @@ typedef struct {
   //
   // Package number.
   //
-  UINT32        Package;
+  UINT32    Package;
   //
   // Core type of logical processor.
   // Value = CPUID.1Ah:EAX[31:24]
   //
-  UINT8         CoreType;
+  UINT8     CoreType;
   //
   // Level of the cache that this package's this type of logical processor corresponds to.
   // Value = CPUID.04h:EAX[07:05]
   //
-  UINT8         CacheLevel : 3;
+  UINT8     CacheLevel            : 3;
   //
   // Type of the cache that this package's this type of logical processor corresponds to.
   // Value = CPUID.04h:EAX[04:00]
   //
-  UINT8         CacheType : 5;
+  UINT8     CacheType             : 5;
   //
   // Ways of associativity.
   // Value = CPUID.04h:EBX[31:22]
   //
-  UINT16        CacheWays : 10;
+  UINT16    CacheWays             : 10;
   //
   // Fully associative cache.
   // Value = CPUID.04h:EAX[09]
   //
-  UINT16        FullyAssociativeCache : 1;
+  UINT16    FullyAssociativeCache : 1;
   //
   // Direct mapped cache.
   // Value = CPUID.04h:EDX[02]
   //
-  UINT16        DirectMappedCache : 1;
-  UINT16        Reserved : 4;
+  UINT16    DirectMappedCache     : 1;
+  UINT16    Reserved              : 4;
   //
   // Size of single cache that this package's this type of logical processor corresponds to.
   // Value = (CPUID.04h:EBX[31:22] + 1) * (CPUID.04h:EBX[21:12] + 1) *
   //         (CPUID.04h:EBX[11:00] + 1) * (CPUID.04h:ECX[31:00] + 1)
   //
-  UINT32        CacheSizeinKB;
+  UINT32    CacheSizeinKB;
   //
   // Number of the cache that this package's this type of logical processor corresponds to.
   // Have subtracted the number of caches that are shared.
   //
-  UINT16        CacheCount;
+  UINT16    CacheCount;
 } CPU_CACHE_INFO;
 
 /**
-  Get CpuCacheInfo data array.
+  Get CpuCacheInfo data array. The array is sorted by CPU package ID, core type, cache level and cache type.
 
   @param[in, out] CpuCacheInfo        Pointer to the CpuCacheInfo array.
   @param[in, out] CpuCacheInfoCount   As input, point to the length of response CpuCacheInfo array.
@@ -78,8 +78,8 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 GetCpuCacheInfo (
-  IN OUT CPU_CACHE_INFO     *CpuCacheInfo,
-  IN OUT UINTN              *CpuCacheInfoCount
+  IN OUT CPU_CACHE_INFO  *CpuCacheInfo,
+  IN OUT UINTN           *CpuCacheInfoCount
   );
 
 #endif

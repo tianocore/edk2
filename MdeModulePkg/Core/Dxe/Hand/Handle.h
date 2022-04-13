@@ -9,26 +9,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef  _HAND_H_
 #define  _HAND_H_
 
-
-#define EFI_HANDLE_SIGNATURE            SIGNATURE_32('h','n','d','l')
+#define EFI_HANDLE_SIGNATURE  SIGNATURE_32('h','n','d','l')
 
 ///
 /// IHANDLE - contains a list of protocol handles
 ///
 typedef struct {
-  UINTN               Signature;
+  UINTN         Signature;
   /// All handles list of IHANDLE
-  LIST_ENTRY          AllHandles;
+  LIST_ENTRY    AllHandles;
   /// List of PROTOCOL_INTERFACE's for this handle
-  LIST_ENTRY          Protocols;
-  UINTN               LocateRequest;
+  LIST_ENTRY    Protocols;
+  UINTN         LocateRequest;
   /// The Handle Database Key value when this handle was last created or modified
-  UINT64              Key;
+  UINT64        Key;
 } IHANDLE;
 
 #define ASSERT_IS_HANDLE(a)  ASSERT((a)->Signature == EFI_HANDLE_SIGNATURE)
 
-#define PROTOCOL_ENTRY_SIGNATURE        SIGNATURE_32('p','r','t','e')
+#define PROTOCOL_ENTRY_SIGNATURE  SIGNATURE_32('p','r','t','e')
 
 ///
 /// PROTOCOL_ENTRY - each different protocol has 1 entry in the protocol
@@ -36,17 +35,16 @@ typedef struct {
 /// with a list of registered notifies.
 ///
 typedef struct {
-  UINTN               Signature;
+  UINTN         Signature;
   /// Link Entry inserted to mProtocolDatabase
-  LIST_ENTRY          AllEntries;
+  LIST_ENTRY    AllEntries;
   /// ID of the protocol
-  EFI_GUID            ProtocolID;
+  EFI_GUID      ProtocolID;
   /// All protocol interfaces
-  LIST_ENTRY          Protocols;
+  LIST_ENTRY    Protocols;
   /// Registerd notification handlers
-  LIST_ENTRY          Notify;
+  LIST_ENTRY    Notify;
 } PROTOCOL_ENTRY;
-
 
 #define PROTOCOL_INTERFACE_SIGNATURE  SIGNATURE_32('p','i','f','c')
 
@@ -55,54 +53,50 @@ typedef struct {
 /// with a protocol interface structure
 ///
 typedef struct {
-  UINTN                       Signature;
+  UINTN             Signature;
   /// Link on IHANDLE.Protocols
-  LIST_ENTRY                  Link;
+  LIST_ENTRY        Link;
   /// Back pointer
-  IHANDLE                     *Handle;
+  IHANDLE           *Handle;
   /// Link on PROTOCOL_ENTRY.Protocols
-  LIST_ENTRY                  ByProtocol;
+  LIST_ENTRY        ByProtocol;
   /// The protocol ID
-  PROTOCOL_ENTRY              *Protocol;
+  PROTOCOL_ENTRY    *Protocol;
   /// The interface value
-  VOID                        *Interface;
+  VOID              *Interface;
   /// OPEN_PROTOCOL_DATA list
-  LIST_ENTRY                  OpenList;
-  UINTN                       OpenListCount;
-
+  LIST_ENTRY        OpenList;
+  UINTN             OpenListCount;
 } PROTOCOL_INTERFACE;
 
 #define OPEN_PROTOCOL_DATA_SIGNATURE  SIGNATURE_32('p','o','d','l')
 
 typedef struct {
-  UINTN                       Signature;
-  ///Link on PROTOCOL_INTERFACE.OpenList
-  LIST_ENTRY                  Link;
+  UINTN         Signature;
+  /// Link on PROTOCOL_INTERFACE.OpenList
+  LIST_ENTRY    Link;
 
-  EFI_HANDLE                  AgentHandle;
-  EFI_HANDLE                  ControllerHandle;
-  UINT32                      Attributes;
-  UINT32                      OpenCount;
+  EFI_HANDLE    AgentHandle;
+  EFI_HANDLE    ControllerHandle;
+  UINT32        Attributes;
+  UINT32        OpenCount;
 } OPEN_PROTOCOL_DATA;
 
-
-#define PROTOCOL_NOTIFY_SIGNATURE       SIGNATURE_32('p','r','t','n')
+#define PROTOCOL_NOTIFY_SIGNATURE  SIGNATURE_32('p','r','t','n')
 
 ///
 /// PROTOCOL_NOTIFY - used for each register notification for a protocol
 ///
 typedef struct {
-  UINTN               Signature;
-  PROTOCOL_ENTRY      *Protocol;
+  UINTN             Signature;
+  PROTOCOL_ENTRY    *Protocol;
   /// All notifications for this protocol
-  LIST_ENTRY          Link;
+  LIST_ENTRY        Link;
   /// Event to notify
-  EFI_EVENT           Event;
+  EFI_EVENT         Event;
   /// Last position notified
-  LIST_ENTRY          *Position;
+  LIST_ENTRY        *Position;
 } PROTOCOL_NOTIFY;
-
-
 
 /**
   Finds the protocol entry for the requested protocol.
@@ -116,10 +110,9 @@ typedef struct {
 **/
 PROTOCOL_ENTRY  *
 CoreFindProtocolEntry (
-  IN EFI_GUID   *Protocol,
-  IN BOOLEAN    Create
+  IN EFI_GUID  *Protocol,
+  IN BOOLEAN   Create
   );
-
 
 /**
   Signal event for every protocol in protocol entry.
@@ -129,9 +122,8 @@ CoreFindProtocolEntry (
 **/
 VOID
 CoreNotifyProtocolEntry (
-  IN PROTOCOL_ENTRY   *ProtEntry
+  IN PROTOCOL_ENTRY  *ProtEntry
   );
-
 
 /**
   Finds the protocol instance for the requested handle and protocol.
@@ -147,11 +139,10 @@ CoreNotifyProtocolEntry (
 **/
 PROTOCOL_INTERFACE *
 CoreFindProtocolInterface (
-  IN IHANDLE        *Handle,
-  IN EFI_GUID       *Protocol,
-  IN VOID           *Interface
+  IN IHANDLE   *Handle,
+  IN EFI_GUID  *Protocol,
+  IN VOID      *Interface
   );
-
 
 /**
   Removes Protocol from the protocol list (but not the handle list).
@@ -165,11 +156,10 @@ CoreFindProtocolInterface (
 **/
 PROTOCOL_INTERFACE *
 CoreRemoveInterfaceFromProtocol (
-  IN IHANDLE        *Handle,
-  IN EFI_GUID       *Protocol,
-  IN VOID           *Interface
+  IN IHANDLE   *Handle,
+  IN EFI_GUID  *Protocol,
+  IN VOID      *Interface
   );
-
 
 /**
   Connects a controller to a driver.
@@ -215,10 +205,9 @@ CoreConnectSingleController (
 **/
 EFI_STATUS
 CoreDisconnectControllersUsingProtocolInterface (
-  IN EFI_HANDLE           UserHandle,
-  IN PROTOCOL_INTERFACE   *Prot
+  IN EFI_HANDLE          UserHandle,
+  IN PROTOCOL_INTERFACE  *Prot
   );
-
 
 /**
   Acquire lock on gProtocolDatabaseLock.
@@ -229,7 +218,6 @@ CoreAcquireProtocolLock (
   VOID
   );
 
-
 /**
   Release lock on gProtocolDatabaseLock.
 
@@ -239,9 +227,9 @@ CoreReleaseProtocolLock (
   VOID
   );
 
-
 /**
   Check whether a handle is a valid EFI_HANDLE
+  The gProtocolDatabaseLock must be owned
 
   @param  UserHandle             The handle to check
 
@@ -251,14 +239,14 @@ CoreReleaseProtocolLock (
 **/
 EFI_STATUS
 CoreValidateHandle (
-  IN  EFI_HANDLE                UserHandle
+  IN  EFI_HANDLE  UserHandle
   );
 
 //
 // Externs
 //
-extern EFI_LOCK         gProtocolDatabaseLock;
-extern LIST_ENTRY       gHandleList;
-extern UINT64           gHandleDatabaseKey;
+extern EFI_LOCK    gProtocolDatabaseLock;
+extern LIST_ENTRY  gHandleList;
+extern UINT64      gHandleDatabaseKey;
 
 #endif

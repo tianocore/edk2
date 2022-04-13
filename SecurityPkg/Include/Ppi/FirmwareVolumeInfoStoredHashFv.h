@@ -18,32 +18,32 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Hashed FV flags.
 //
-#define HASHED_FV_FLAG_REPORT_FV_INFO_PPI     0x0000000000000001
-#define HASHED_FV_FLAG_REPORT_FV_HOB          0x0000000000000002
-#define HASHED_FV_FLAG_VERIFIED_BOOT          0x0000000000000010
-#define HASHED_FV_FLAG_MEASURED_BOOT          0x0000000000000020
-#define HASHED_FV_FLAG_SKIP_ALL               0xFFFFFFFFFFFFFF00
-#define HASHED_FV_FLAG_SKIP_BOOT_MODE(Mode)   LShiftU64 (0x100, (Mode))
+#define HASHED_FV_FLAG_REPORT_FV_INFO_PPI  0x0000000000000001
+#define HASHED_FV_FLAG_REPORT_FV_HOB       0x0000000000000002
+#define HASHED_FV_FLAG_VERIFIED_BOOT       0x0000000000000010
+#define HASHED_FV_FLAG_MEASURED_BOOT       0x0000000000000020
+#define HASHED_FV_FLAG_SKIP_ALL            0xFFFFFFFFFFFFFF00
+#define HASHED_FV_FLAG_SKIP_BOOT_MODE(Mode)  LShiftU64 (0x100, (Mode))
 
 //
 // FV hash flags
 //
-#define FV_HASH_FLAG_BOOT_MODE(Mode)          LShiftU64 (0x100, (Mode))
+#define FV_HASH_FLAG_BOOT_MODE(Mode)  LShiftU64 (0x100, (Mode))
 
 typedef struct _EDKII_PEI_FIRMWARE_VOLUME_INFO_STORED_HASH_FV_PPI
                 EDKII_PEI_FIRMWARE_VOLUME_INFO_STORED_HASH_FV_PPI;
 
 typedef struct _HASHED_FV_INFO {
-  UINT64                  Base;
-  UINT64                  Length;
-  UINT64                  Flag;
+  UINT64    Base;
+  UINT64    Length;
+  UINT64    Flag;
 } HASHED_FV_INFO;
 
 typedef struct _FV_HASH_INFO {
-  UINT64                  HashFlag;
-  UINT16                  HashAlgoId;
-  UINT16                  HashSize;
-  UINT8                   Hash[64];
+  UINT64    HashFlag;
+  UINT16    HashAlgoId;
+  UINT16    HashSize;
+  UINT8     Hash[64];
 } FV_HASH_INFO;
 
 //
@@ -51,12 +51,11 @@ typedef struct _FV_HASH_INFO {
 // instance of this PPI is allowed in the platform.
 //
 struct _EDKII_PEI_FIRMWARE_VOLUME_INFO_STORED_HASH_FV_PPI {
-  FV_HASH_INFO            HashInfo;
-  UINTN                   FvNumber;
-  HASHED_FV_INFO          FvInfo[1];
+  FV_HASH_INFO      HashInfo;
+  UINTN             FvNumber;
+  HASHED_FV_INFO    FvInfo[1];
 };
 
-extern EFI_GUID gEdkiiPeiFirmwareVolumeInfoStoredHashFvPpiGuid;
+extern EFI_GUID  gEdkiiPeiFirmwareVolumeInfoStoredHashFvPpiGuid;
 
 #endif
-

@@ -3,7 +3,7 @@
 //
 // This package provides network modules that conform to UEFI 2.4 specification.
 //
-// Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
@@ -105,3 +105,20 @@
 #string STR_gEfiNetworkPkgTokenSpaceGuid_PcdTftpBlockSize_HELP  #language en-US "This setting can override the default TFTP block size. A value of 0 computes "
                                                                                   "the default from MTU information. A non-zero value will be used as block size "
                                                                                   "in bytes."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpIoTimeout_PROMPT  #language en-US "HTTP Boot Image Request and Response Timeout"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpIoTimeout_HELP  #language en-US "This value is used to configure the request and response timeout when getting "
+                                                                               "the recovery image from the remote source during an HTTP recovery boot."
+                                                                               "The default value set is 5 seconds."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpDnsRetryInterval_PROMPT  #language en-US "Retry Interval of HTTP DNS"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpDnsRetryInterval_HELP  #language en-US "This value is used to configure the retry Interval of HTTP DNS."
+                                                                                "The default value set is 0 second. If the value is less than"
+                                                                                "DNS_DEFAULT_TIMEOUT, then use the DNS_DEFAULT_TIMEOUT."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpDnsRetryCount_PROMPT  #language en-US "Retry Count of HTTP DNS"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpDnsRetryCount_HELP  #language en-US "This value is used to configure the Retry Count of HTTP DNS if "
+                                                                                "no DNS response received after Retry Interval. The default value set is 0."

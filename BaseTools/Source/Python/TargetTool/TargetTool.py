@@ -17,6 +17,7 @@ import Common.BuildToolError as BuildToolError
 from Common.DataType import *
 from Common.BuildVersion import gBUILD_VERSION
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.TargetTxtClassObject import gDefaultTargetTxtFile
 
 # To Do 1.set clean, 2. add item, if the line is disabled.
 
@@ -25,7 +26,7 @@ class TargetTool():
         self.WorkSpace = os.path.normpath(os.getenv('WORKSPACE'))
         self.Opt       = opt
         self.Arg       = args[0]
-        self.FileName  = os.path.normpath(os.path.join(self.WorkSpace, 'Conf', 'target.txt'))
+        self.FileName  = os.path.normpath(os.path.join(self.WorkSpace, 'Conf', gDefaultTargetTxtFile))
         if os.path.isfile(self.FileName) == False:
             print("%s does not exist." % self.FileName)
             sys.exit(1)

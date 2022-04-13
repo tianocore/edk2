@@ -3,7 +3,7 @@
   hash handler registered, such as SHA1, SHA256.
   Platform can use PcdTpm2HashMask to mask some hash engines.
 
-Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2021, Intel Corporation. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -24,7 +24,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define HASH_LIB_PEI_ROUTER_GUID \
   { 0x84681c08, 0x6873, 0x46f3, { 0x8b, 0xb7, 0xab, 0x66, 0x18, 0x95, 0xa1, 0xb3 } }
 
-EFI_GUID mHashLibPeiRouterGuid = HASH_LIB_PEI_ROUTER_GUID;
+EFI_GUID  mHashLibPeiRouterGuid = HASH_LIB_PEI_ROUTER_GUID;
 
 typedef struct {
   //
@@ -34,10 +34,10 @@ typedef struct {
   // If gEfiCallerIdGuid, HashInterfaceCount, HashInterface and SupportedHashMask
   //   are the hash interface information of CURRENT module which consumes HashLib.
   //
-  EFI_GUID         Identifier;
-  UINTN            HashInterfaceCount;
-  HASH_INTERFACE   HashInterface[HASH_COUNT];
-  UINT32           SupportedHashMask;
+  EFI_GUID          Identifier;
+  UINTN             HashInterfaceCount;
+  HASH_INTERFACE    HashInterface[HASH_COUNT];
+  UINT32            SupportedHashMask;
 } HASH_INTERFACE_HOB;
 
 /**
@@ -49,7 +49,7 @@ typedef struct {
 **/
 HASH_INTERFACE_HOB *
 InternalGetHashInterfaceHob (
-  EFI_GUID      *Identifier
+  EFI_GUID  *Identifier
   )
 {
   EFI_PEI_HOB_POINTERS  Hob;
@@ -64,9 +64,11 @@ InternalGetHashInterfaceHob (
       //
       return HashInterfaceHob;
     }
+
     Hob.Raw = GET_NEXT_HOB (Hob);
     Hob.Raw = GetNextGuidHob (&mHashLibPeiRouterGuid, Hob.Raw);
   }
+
   return NULL;
 }
 
@@ -79,14 +81,14 @@ InternalGetHashInterfaceHob (
 **/
 HASH_INTERFACE_HOB *
 InternalCreateHashInterfaceHob (
-  EFI_GUID      *Identifier
+  EFI_GUID  *Identifier
   )
 {
-  HASH_INTERFACE_HOB LocalHashInterfaceHob;
+  HASH_INTERFACE_HOB  LocalHashInterfaceHob;
 
-  ZeroMem (&LocalHashInterfaceHob, sizeof(LocalHashInterfaceHob));
+  ZeroMem (&LocalHashInterfaceHob, sizeof (LocalHashInterfaceHob));
   CopyGuid (&LocalHashInterfaceHob.Identifier, Identifier);
-  return BuildGuidDataHob (&mHashLibPeiRouterGuid, &LocalHashInterfaceHob, sizeof(LocalHashInterfaceHob));
+  return BuildGuidDataHob (&mHashLibPeiRouterGuid, &LocalHashInterfaceHob, sizeof (LocalHashInterfaceHob));
 }
 
 /**
@@ -98,16 +100,17 @@ InternalCreateHashInterfaceHob (
 **/
 VOID
 CheckSupportedHashMaskMismatch (
-  IN HASH_INTERFACE_HOB *HashInterfaceHobCurrent
+  IN HASH_INTERFACE_HOB  *HashInterfaceHobCurrent
   )
 {
-  HASH_INTERFACE_HOB    *HashInterfaceHobLast;
+  HASH_INTERFACE_HOB  *HashInterfaceHobLast;
 
   HashInterfaceHobLast = InternalGetHashInterfaceHob (&gZeroGuid);
   ASSERT (HashInterfaceHobLast != NULL);
 
   if ((HashInterfaceHobLast->SupportedHashMask != 0) &&
-      (HashInterfaceHobCurrent->SupportedHashMask != HashInterfaceHobLast->SupportedHashMask)) {
+      (HashInterfaceHobCurrent->SupportedHashMask != HashInterfaceHobLast->SupportedHashMask))
+  {
     DEBUG ((
       DEBUG_WARN,
       "WARNING: There is mismatch of supported HashMask (0x%x - 0x%x) between modules\n",
@@ -129,13 +132,13 @@ CheckSupportedHashMaskMismatch (
 EFI_STATUS
 EFIAPI
 HashStart (
-  OUT HASH_HANDLE    *HashHandle
+  OUT HASH_HANDLE  *HashHandle
   )
 {
-  HASH_INTERFACE_HOB *HashInterfaceHob;
-  HASH_HANDLE        *HashCtx;
-  UINTN              Index;
-  UINT32             HashMask;
+  HASH_INTERFACE_HOB  *HashInterfaceHob;
+  HASH_HANDLE         *HashCtx;
+  UINTN               Index;
+  UINT32              HashMask;
 
   HashInterfaceHob = InternalGetHashInterfaceHob (&gEfiCallerIdGuid);
   if (HashInterfaceHob == NULL) {
@@ -148,7 +151,7 @@ HashStart (
 
   CheckSupportedHashMaskMismatch (HashInterfaceHob);
 
-  HashCtx = AllocatePool (sizeof(*HashCtx) * HashInterfaceHob->HashInterfaceCount);
+  HashCtx = AllocatePool (sizeof (*HashCtx) * HashInterfaceHob->HashInterfaceCount);
   ASSERT (HashCtx != NULL);
 
   for (Index = 0; Index < HashInterfaceHob->HashInterfaceCount; Index++) {
@@ -175,15 +178,15 @@ HashStart (
 EFI_STATUS
 EFIAPI
 HashUpdate (
-  IN HASH_HANDLE    HashHandle,
-  IN VOID           *DataToHash,
-  IN UINTN          DataToHashLen
+  IN HASH_HANDLE  HashHandle,
+  IN VOID         *DataToHash,
+  IN UINTN        DataToHashLen
   )
 {
-  HASH_INTERFACE_HOB *HashInterfaceHob;
-  HASH_HANDLE        *HashCtx;
-  UINTN              Index;
-  UINT32             HashMask;
+  HASH_INTERFACE_HOB  *HashInterfaceHob;
+  HASH_HANDLE         *HashCtx;
+  UINTN               Index;
+  UINT32              HashMask;
 
   HashInterfaceHob = InternalGetHashInterfaceHob (&gEfiCallerIdGuid);
   if (HashInterfaceHob == NULL) {
@@ -222,19 +225,19 @@ HashUpdate (
 EFI_STATUS
 EFIAPI
 HashCompleteAndExtend (
-  IN HASH_HANDLE         HashHandle,
-  IN TPMI_DH_PCR         PcrIndex,
-  IN VOID                *DataToHash,
-  IN UINTN               DataToHashLen,
-  OUT TPML_DIGEST_VALUES *DigestList
+  IN HASH_HANDLE          HashHandle,
+  IN TPMI_DH_PCR          PcrIndex,
+  IN VOID                 *DataToHash,
+  IN UINTN                DataToHashLen,
+  OUT TPML_DIGEST_VALUES  *DigestList
   )
 {
-  TPML_DIGEST_VALUES Digest;
-  HASH_INTERFACE_HOB *HashInterfaceHob;
-  HASH_HANDLE        *HashCtx;
-  UINTN              Index;
-  EFI_STATUS         Status;
-  UINT32             HashMask;
+  TPML_DIGEST_VALUES  Digest;
+  HASH_INTERFACE_HOB  *HashInterfaceHob;
+  HASH_HANDLE         *HashCtx;
+  UINTN               Index;
+  EFI_STATUS          Status;
+  UINT32              HashMask;
 
   HashInterfaceHob = InternalGetHashInterfaceHob (&gEfiCallerIdGuid);
   if (HashInterfaceHob == NULL) {
@@ -248,7 +251,7 @@ HashCompleteAndExtend (
   CheckSupportedHashMaskMismatch (HashInterfaceHob);
 
   HashCtx = (HASH_HANDLE *)HashHandle;
-  ZeroMem (DigestList, sizeof(*DigestList));
+  ZeroMem (DigestList, sizeof (*DigestList));
 
   for (Index = 0; Index < HashInterfaceHob->HashInterfaceCount; Index++) {
     HashMask = Tpm2GetHashMaskFromAlgo (&HashInterfaceHob->HashInterface[Index].HashGuid);
@@ -281,15 +284,15 @@ HashCompleteAndExtend (
 EFI_STATUS
 EFIAPI
 HashAndExtend (
-  IN TPMI_DH_PCR                    PcrIndex,
-  IN VOID                           *DataToHash,
-  IN UINTN                          DataToHashLen,
-  OUT TPML_DIGEST_VALUES            *DigestList
+  IN TPMI_DH_PCR          PcrIndex,
+  IN VOID                 *DataToHash,
+  IN UINTN                DataToHashLen,
+  OUT TPML_DIGEST_VALUES  *DigestList
   )
 {
-  HASH_INTERFACE_HOB *HashInterfaceHob;
-  HASH_HANDLE        HashHandle;
-  EFI_STATUS         Status;
+  HASH_INTERFACE_HOB  *HashInterfaceHob;
+  HASH_HANDLE         HashHandle;
+  EFI_STATUS          Status;
 
   HashInterfaceHob = InternalGetHashInterfaceHob (&gEfiCallerIdGuid);
   if (HashInterfaceHob == NULL) {
@@ -321,19 +324,24 @@ HashAndExtend (
 EFI_STATUS
 EFIAPI
 RegisterHashInterfaceLib (
-  IN HASH_INTERFACE   *HashInterface
+  IN HASH_INTERFACE  *HashInterface
   )
 {
-  UINTN              Index;
-  HASH_INTERFACE_HOB *HashInterfaceHob;
-  UINT32             HashMask;
-  EFI_STATUS         Status;
+  UINTN               Index;
+  HASH_INTERFACE_HOB  *HashInterfaceHob;
+  UINT32              HashMask;
+  UINT32              Tpm2HashMask;
+  EFI_STATUS          Status;
 
   //
   // Check allow
   //
-  HashMask = Tpm2GetHashMaskFromAlgo (&HashInterface->HashGuid);
-  if ((HashMask & PcdGet32 (PcdTpm2HashMask)) == 0) {
+  HashMask     = Tpm2GetHashMaskFromAlgo (&HashInterface->HashGuid);
+  Tpm2HashMask = PcdGet32 (PcdTpm2HashMask);
+
+  if ((Tpm2HashMask != 0) &&
+      ((HashMask & Tpm2HashMask) == 0))
+  {
     return EFI_UNSUPPORTED;
   }
 
@@ -363,11 +371,11 @@ RegisterHashInterfaceLib (
   // Record hash algorithm bitmap of CURRENT module which consumes HashLib.
   //
   HashInterfaceHob->SupportedHashMask = PcdGet32 (PcdTcg2HashAlgorithmBitmap) | HashMask;
-  Status = PcdSet32S (PcdTcg2HashAlgorithmBitmap, HashInterfaceHob->SupportedHashMask);
+  Status                              = PcdSet32S (PcdTcg2HashAlgorithmBitmap, HashInterfaceHob->SupportedHashMask);
   ASSERT_EFI_ERROR (Status);
 
-  CopyMem (&HashInterfaceHob->HashInterface[HashInterfaceHob->HashInterfaceCount], HashInterface, sizeof(*HashInterface));
-  HashInterfaceHob->HashInterfaceCount ++;
+  CopyMem (&HashInterfaceHob->HashInterface[HashInterfaceHob->HashInterfaceCount], HashInterface, sizeof (*HashInterface));
+  HashInterfaceHob->HashInterfaceCount++;
 
   return EFI_SUCCESS;
 }
@@ -385,12 +393,12 @@ RegisterHashInterfaceLib (
 EFI_STATUS
 EFIAPI
 HashLibBaseCryptoRouterPeiConstructor (
-  IN EFI_PEI_FILE_HANDLE        FileHandle,
-  IN CONST EFI_PEI_SERVICES     **PeiServices
+  IN EFI_PEI_FILE_HANDLE     FileHandle,
+  IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
-  EFI_STATUS            Status;
-  HASH_INTERFACE_HOB    *HashInterfaceHob;
+  EFI_STATUS          Status;
+  HASH_INTERFACE_HOB  *HashInterfaceHob;
 
   HashInterfaceHob = InternalGetHashInterfaceHob (&gZeroGuid);
   if (HashInterfaceHob == NULL) {
@@ -420,7 +428,7 @@ HashLibBaseCryptoRouterPeiConstructor (
     //
     ZeroMem (&HashInterfaceHob->HashInterface, sizeof (HashInterfaceHob->HashInterface));
     HashInterfaceHob->HashInterfaceCount = 0;
-    HashInterfaceHob->SupportedHashMask = 0;
+    HashInterfaceHob->SupportedHashMask  = 0;
   }
 
   //

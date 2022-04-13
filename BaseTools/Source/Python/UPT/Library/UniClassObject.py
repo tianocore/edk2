@@ -14,7 +14,7 @@ from __future__ import print_function
 # Import Modules
 #
 import os, codecs, re
-import distutils.util
+import shlex
 from Logger import ToolError
 from Logger import Log as EdkLogger
 from Logger import StringTable as ST
@@ -320,7 +320,7 @@ class UniFileClassObject(object):
     # Get Language definition
     #
     def GetLangDef(self, File, Line):
-        Lang = distutils.util.split_quoted((Line.split(u"//")[0]))
+        Lang = shlex.split(Line.split(u"//")[0])
         if len(Lang) != 3:
             try:
                 FileIn = codecs.open(File.Path, mode='rb', encoding='utf_8').readlines()

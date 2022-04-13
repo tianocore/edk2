@@ -3,6 +3,7 @@
 #
 # Copyright (c) Microsoft Corporation
 # Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
@@ -16,13 +17,15 @@
         ##     "<ErrorID>", "<KeyWord>"
         ## ]
         "ExceptionList": [
+            "8005", "UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE.UID",
+            "8005", "UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE.HID",
+            "8001", "UefiSortLibUnitTestMain",
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
-            "Library/BrotliCustomDecompressLib/brotli",
-            "Universal/RegularExpressionDxe/oniguruma",
-            "Library/LzmaCustomDecompressLib/Sdk/DOC",
-            "Library/LzmaCustomDecompressLib/Sdk/C"
+            "Library/LzmaCustomDecompressLib",
+            "Library/BrotliCustomDecompressLib",
+            "Universal/RegularExpressionDxe"
         ]
     },
     ## options defined ci/Plugin/CompilerPlugin
@@ -78,6 +81,7 @@
         "IgnoreDuplicates": [
             "gEfiPeiMmAccessPpiGuid=gPeiSmmAccessPpiGuid",
             "gPeiSmmControlPpiGuid=gEfiPeiMmControlPpiGuid",
+            "gEfiPeiMmCommunicationPpiGuid=gEfiPeiSmmCommunicationPpiGuid",
         ]
     },
 

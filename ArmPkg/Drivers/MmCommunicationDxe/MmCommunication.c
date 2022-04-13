@@ -41,15 +41,21 @@ STATIC EFI_HANDLE  mMmCommunicateHandle;
 
   This function provides a service to send and receive messages from a registered UEFI service.
 
-  @param[in] This                The EFI_MM_COMMUNICATION_PROTOCOL instance.
-  @param[in] CommBufferPhysical  Physical address of the MM communication buffer
-  @param[in] CommBufferVirtual   Virtual address of the MM communication buffer
-  @param[in] CommSize            The size of the data buffer being passed in. On exit, the size of data
-                                 being returned. Zero if the handler does not wish to reply with any data.
-                                 This parameter is optional and may be NULL.
+  @param[in] This                     The EFI_MM_COMMUNICATION_PROTOCOL instance.
+  @param[in, out] CommBufferPhysical  Physical address of the MM communication buffer
+  @param[in, out] CommBufferVirtual   Virtual address of the MM communication buffer
+  @param[in, out] CommSize            The size of the data buffer being passed in. On input,
+                                      when not omitted, the buffer should cover EFI_MM_COMMUNICATE_HEADER
+                                      and the value of MessageLength field. On exit, the size
+                                      of data being returned. Zero if the handler does not
+                                      wish to reply with any data. This parameter is optional
+                                      and may be NULL.
 
   @retval EFI_SUCCESS            The message was successfully posted.
-  @retval EFI_INVALID_PARAMETER  CommBufferPhysical was NULL or CommBufferVirtual was NULL.
+  @retval EFI_INVALID_PARAMETER  CommBufferPhysical or CommBufferVirtual was NULL, or
+                                 integer value pointed by CommSize does not cover
+                                 EFI_MM_COMMUNICATE_HEADER and the value of MessageLength
+                                 field.
   @retval EFI_BAD_BUFFER_SIZE    The buffer is too large for the MM implementation.
                                  If this error is returned, the MessageLength field
                                  in the CommBuffer header or the integer pointed by
@@ -63,18 +69,18 @@ STATIC EFI_HANDLE  mMmCommunicateHandle;
 EFI_STATUS
 EFIAPI
 MmCommunication2Communicate (
-  IN CONST EFI_MM_COMMUNICATION2_PROTOCOL   *This,
-  IN OUT VOID                               *CommBufferPhysical,
-  IN OUT VOID                               *CommBufferVirtual,
-  IN OUT UINTN                              *CommSize OPTIONAL
+  IN CONST EFI_MM_COMMUNICATION2_PROTOCOL  *This,
+  IN OUT VOID                              *CommBufferPhysical,
+  IN OUT VOID                              *CommBufferVirtual,
+  IN OUT UINTN                             *CommSize OPTIONAL
   )
 {
-  EFI_MM_COMMUNICATE_HEADER   *CommunicateHeader;
-  ARM_SMC_ARGS                CommunicateSmcArgs;
-  EFI_STATUS                  Status;
-  UINTN                       BufferSize;
+  EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
+  ARM_SMC_ARGS               CommunicateSmcArgs;
+  EFI_STATUS                 Status;
+  UINTN                      BufferSize;
 
-  Status = EFI_ACCESS_DENIED;
+  Status     = EFI_ACCESS_DENIED;
   BufferSize = 0;
 
   ZeroMem (&CommunicateSmcArgs, sizeof (ARM_SMC_ARGS));
@@ -82,10 +88,11 @@ MmCommunication2Communicate (
   //
   // Check parameters
   //
-  if (CommBufferVirtual == NULL) {
+  if ((CommBufferVirtual == NULL) || (CommBufferPhysical == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
+  Status            = EFI_SUCCESS;
   CommunicateHeader = CommBufferVirtual;
   // CommBuffer is a mandatory parameter. Hence, Rely on
   // MessageLength + Header to ascertain the
@@ -95,33 +102,41 @@ MmCommunication2Communicate (
                sizeof (CommunicateHeader->HeaderGuid) +
                sizeof (CommunicateHeader->MessageLength);
 
-  // If the length of the CommBuffer is 0 then return the expected length.
-  if (CommSize != 0) {
+  // If CommSize is not omitted, perform size inspection before proceeding.
+  if (CommSize != NULL) {
     // This case can be used by the consumer of this driver to find out the
     // max size that can be used for allocating CommBuffer.
     if ((*CommSize == 0) ||
-        (*CommSize > mNsCommBuffMemRegion.Length)) {
+        (*CommSize > mNsCommBuffMemRegion.Length))
+    {
       *CommSize = mNsCommBuffMemRegion.Length;
-      return EFI_BAD_BUFFER_SIZE;
+      Status    = EFI_BAD_BUFFER_SIZE;
     }
+
     //
-    // CommSize must match MessageLength + sizeof (EFI_MM_COMMUNICATE_HEADER);
+    // CommSize should cover at least MessageLength + sizeof (EFI_MM_COMMUNICATE_HEADER);
     //
-    if (*CommSize != BufferSize) {
-        return EFI_INVALID_PARAMETER;
+    if (*CommSize < BufferSize) {
+      Status = EFI_INVALID_PARAMETER;
     }
   }
 
   //
-  // If the buffer size is 0 or greater than what can be tolerated by the MM
+  // If the message length is 0 or greater than what can be tolerated by the MM
   // environment then return the expected size.
   //
-  if ((BufferSize == 0) ||
-      (BufferSize > mNsCommBuffMemRegion.Length)) {
+  if ((CommunicateHeader->MessageLength == 0) ||
+      (BufferSize > mNsCommBuffMemRegion.Length))
+  {
     CommunicateHeader->MessageLength = mNsCommBuffMemRegion.Length -
                                        sizeof (CommunicateHeader->HeaderGuid) -
                                        sizeof (CommunicateHeader->MessageLength);
-    return EFI_BAD_BUFFER_SIZE;
+    Status = EFI_BAD_BUFFER_SIZE;
+  }
+
+  // MessageLength or CommSize check has failed, return here.
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   // SMC Function ID
@@ -143,41 +158,41 @@ MmCommunication2Communicate (
   ArmCallSmc (&CommunicateSmcArgs);
 
   switch (CommunicateSmcArgs.Arg0) {
-  case ARM_SMC_MM_RET_SUCCESS:
-    ZeroMem (CommBufferVirtual, BufferSize);
-    // On successful return, the size of data being returned is inferred from
-    // MessageLength + Header.
-    CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mNsCommBuffMemRegion.VirtualBase;
-    BufferSize = CommunicateHeader->MessageLength +
-                 sizeof (CommunicateHeader->HeaderGuid) +
-                 sizeof (CommunicateHeader->MessageLength);
+    case ARM_SMC_MM_RET_SUCCESS:
+      ZeroMem (CommBufferVirtual, BufferSize);
+      // On successful return, the size of data being returned is inferred from
+      // MessageLength + Header.
+      CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mNsCommBuffMemRegion.VirtualBase;
+      BufferSize        = CommunicateHeader->MessageLength +
+                          sizeof (CommunicateHeader->HeaderGuid) +
+                          sizeof (CommunicateHeader->MessageLength);
 
-    CopyMem (
-      CommBufferVirtual,
-      (VOID *)mNsCommBuffMemRegion.VirtualBase,
-      BufferSize
-      );
-    Status = EFI_SUCCESS;
-    break;
+      CopyMem (
+        CommBufferVirtual,
+        (VOID *)mNsCommBuffMemRegion.VirtualBase,
+        BufferSize
+        );
+      Status = EFI_SUCCESS;
+      break;
 
-  case ARM_SMC_MM_RET_INVALID_PARAMS:
-    Status = EFI_INVALID_PARAMETER;
-    break;
+    case ARM_SMC_MM_RET_INVALID_PARAMS:
+      Status = EFI_INVALID_PARAMETER;
+      break;
 
-  case ARM_SMC_MM_RET_DENIED:
-    Status = EFI_ACCESS_DENIED;
-    break;
+    case ARM_SMC_MM_RET_DENIED:
+      Status = EFI_ACCESS_DENIED;
+      break;
 
-  case ARM_SMC_MM_RET_NO_MEMORY:
-    // Unexpected error since the CommSize was checked for zero length
-    // prior to issuing the SMC
-    Status = EFI_OUT_OF_RESOURCES;
-    ASSERT (0);
-    break;
+    case ARM_SMC_MM_RET_NO_MEMORY:
+      // Unexpected error since the CommSize was checked for zero length
+      // prior to issuing the SMC
+      Status = EFI_OUT_OF_RESOURCES;
+      ASSERT (0);
+      break;
 
-  default:
-    Status = EFI_ACCESS_DENIED;
-    ASSERT (0);
+    default:
+      Status = EFI_ACCESS_DENIED;
+      ASSERT (0);
   }
 
   return Status;
@@ -209,7 +224,7 @@ VOID
 EFIAPI
 NotifySetVirtualAddressMap (
   IN EFI_EVENT  Event,
-  IN VOID      *Context
+  IN VOID       *Context
   )
 {
   EFI_STATUS  Status;
@@ -219,19 +234,23 @@ NotifySetVirtualAddressMap (
                   (VOID **)&mNsCommBuffMemRegion.VirtualBase
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "NotifySetVirtualAddressMap():"
-            " Unable to convert MM runtime pointer. Status:0x%r\n", Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "NotifySetVirtualAddressMap():"
+      " Unable to convert MM runtime pointer. Status:0x%r\n",
+      Status
+      ));
   }
-
 }
 
 STATIC
 EFI_STATUS
-GetMmCompatibility ()
+GetMmCompatibility (
+  )
 {
-  EFI_STATUS   Status;
-  UINT32       MmVersion;
-  ARM_SMC_ARGS MmVersionArgs;
+  EFI_STATUS    Status;
+  UINT32        MmVersion;
+  ARM_SMC_ARGS  MmVersionArgs;
 
   // MM_VERSION uses SMC32 calling conventions
   MmVersionArgs.Arg0 = ARM_SMC_ID_MM_VERSION_AARCH32;
@@ -240,27 +259,38 @@ GetMmCompatibility ()
 
   MmVersion = MmVersionArgs.Arg0;
 
-  if ((MM_MAJOR_VER(MmVersion) == MM_CALLER_MAJOR_VER) &&
-      (MM_MINOR_VER(MmVersion) >= MM_CALLER_MINOR_VER)) {
-    DEBUG ((DEBUG_INFO, "MM Version: Major=0x%x, Minor=0x%x\n",
-            MM_MAJOR_VER(MmVersion), MM_MINOR_VER(MmVersion)));
+  if ((MM_MAJOR_VER (MmVersion) == MM_CALLER_MAJOR_VER) &&
+      (MM_MINOR_VER (MmVersion) >= MM_CALLER_MINOR_VER))
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "MM Version: Major=0x%x, Minor=0x%x\n",
+      MM_MAJOR_VER (MmVersion),
+      MM_MINOR_VER (MmVersion)
+      ));
     Status = EFI_SUCCESS;
   } else {
-    DEBUG ((DEBUG_ERROR, "Incompatible MM Versions.\n Current Version: Major=0x%x, Minor=0x%x.\n Expected: Major=0x%x, Minor>=0x%x.\n",
-            MM_MAJOR_VER(MmVersion), MM_MINOR_VER(MmVersion), MM_CALLER_MAJOR_VER, MM_CALLER_MINOR_VER));
+    DEBUG ((
+      DEBUG_ERROR,
+      "Incompatible MM Versions.\n Current Version: Major=0x%x, Minor=0x%x.\n Expected: Major=0x%x, Minor>=0x%x.\n",
+      MM_MAJOR_VER (MmVersion),
+      MM_MINOR_VER (MmVersion),
+      MM_CALLER_MAJOR_VER,
+      MM_CALLER_MINOR_VER
+      ));
     Status = EFI_UNSUPPORTED;
   }
 
   return Status;
 }
 
-STATIC EFI_GUID* CONST mGuidedEventGuid[] = {
+STATIC EFI_GUID *CONST  mGuidedEventGuid[] = {
   &gEfiEndOfDxeEventGroupGuid,
   &gEfiEventExitBootServicesGuid,
   &gEfiEventReadyToBootGuid,
 };
 
-STATIC EFI_EVENT mGuidedEvent[ARRAY_SIZE (mGuidedEventGuid)];
+STATIC EFI_EVENT  mGuidedEvent[ARRAY_SIZE (mGuidedEventGuid)];
 
 /**
   Event notification that is fired when GUIDed Event Group is signaled.
@@ -277,15 +307,15 @@ MmGuidedEventNotify (
   IN VOID       *Context
   )
 {
-  EFI_MM_COMMUNICATE_HEADER   Header;
-  UINTN                       Size;
+  EFI_MM_COMMUNICATE_HEADER  Header;
+  UINTN                      Size;
 
   //
   // Use Guid to initialize EFI_SMM_COMMUNICATE_HEADER structure
   //
   CopyGuid (&Header.HeaderGuid, Context);
   Header.MessageLength = 1;
-  Header.Data[0] = 0;
+  Header.Data[0]       = 0;
 
   Size = sizeof (Header);
   MmCommunication2Communicate (&mMmCommunication2, &Header, &Header, &Size);
@@ -308,23 +338,23 @@ MmGuidedEventNotify (
 EFI_STATUS
 EFIAPI
 MmCommunication2Initialize (
-  IN EFI_HANDLE         ImageHandle,
+  IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                 Status;
-  UINTN                      Index;
+  EFI_STATUS  Status;
+  UINTN       Index;
 
   // Check if we can make the MM call
   Status = GetMmCompatibility ();
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     goto ReturnErrorStatus;
   }
 
   mNsCommBuffMemRegion.PhysicalBase = PcdGet64 (PcdMmBufferBase);
   // During boot , Virtual and Physical are same
   mNsCommBuffMemRegion.VirtualBase = mNsCommBuffMemRegion.PhysicalBase;
-  mNsCommBuffMemRegion.Length = PcdGet64 (PcdMmBufferSize);
+  mNsCommBuffMemRegion.Length      = PcdGet64 (PcdMmBufferSize);
 
   ASSERT (mNsCommBuffMemRegion.PhysicalBase != 0);
 
@@ -339,8 +369,11 @@ MmCommunication2Initialize (
                   EFI_MEMORY_RUNTIME
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "MmCommunicateInitialize: "
-            "Failed to add MM-NS Buffer Memory Space\n"));
+    DEBUG ((
+      DEBUG_ERROR,
+      "MmCommunicateInitialize: "
+      "Failed to add MM-NS Buffer Memory Space\n"
+      ));
     goto ReturnErrorStatus;
   }
 
@@ -350,8 +383,11 @@ MmCommunication2Initialize (
                   EFI_MEMORY_WB | EFI_MEMORY_XP | EFI_MEMORY_RUNTIME
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "MmCommunicateInitialize: "
-            "Failed to set MM-NS Buffer Memory attributes\n"));
+    DEBUG ((
+      DEBUG_ERROR,
+      "MmCommunicateInitialize: "
+      "Failed to set MM-NS Buffer Memory attributes\n"
+      ));
     goto CleanAddedMemorySpace;
   }
 
@@ -362,9 +398,12 @@ MmCommunication2Initialize (
                   EFI_NATIVE_INTERFACE,
                   &mMmCommunication2
                   );
-  if (EFI_ERROR(Status)) {
-    DEBUG ((DEBUG_ERROR, "MmCommunicationInitialize: "
-            "Failed to install MM communication protocol\n"));
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "MmCommunicationInitialize: "
+      "Failed to install MM communication protocol\n"
+      ));
     goto CleanAddedMemorySpace;
   }
 
@@ -381,17 +420,24 @@ MmCommunication2Initialize (
   ASSERT_EFI_ERROR (Status);
 
   for (Index = 0; Index < ARRAY_SIZE (mGuidedEventGuid); Index++) {
-    Status = gBS->CreateEventEx (EVT_NOTIFY_SIGNAL, TPL_CALLBACK,
-                    MmGuidedEventNotify, mGuidedEventGuid[Index],
-                    mGuidedEventGuid[Index], &mGuidedEvent[Index]);
+    Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    MmGuidedEventNotify,
+                    mGuidedEventGuid[Index],
+                    mGuidedEventGuid[Index],
+                    &mGuidedEvent[Index]
+                    );
     ASSERT_EFI_ERROR (Status);
     if (EFI_ERROR (Status)) {
       while (Index-- > 0) {
         gBS->CloseEvent (mGuidedEvent[Index]);
       }
+
       goto UninstallProtocol;
     }
   }
+
   return EFI_SUCCESS;
 
 UninstallProtocol:

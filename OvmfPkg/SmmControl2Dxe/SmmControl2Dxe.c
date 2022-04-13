@@ -25,8 +25,6 @@
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PciLib.h>
-#include <Library/QemuFwCfgLib.h>
-#include <Library/QemuFwCfgS3Lib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/S3SaveState.h>
 #include <Protocol/SmmControl2.h>
@@ -40,8 +38,8 @@ STATIC
 VOID
 EFIAPI
 OnS3SaveStateInstalled (
-  IN EFI_EVENT Event,
-  IN VOID      *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 //
@@ -50,19 +48,19 @@ OnS3SaveStateInstalled (
 // S3SaveState protocol installation callback, strictly before the runtime
 // phase.
 //
-STATIC UINTN mSmiEnable;
+STATIC UINTN  mSmiEnable;
 
 //
 // Captures whether SMI feature negotiation is supported. The variable is only
 // used to carry this information from the entry point function to the
 // S3SaveState protocol installation callback.
 //
-STATIC BOOLEAN mSmiFeatureNegotiation;
+STATIC BOOLEAN  mSmiFeatureNegotiation;
 
 //
 // Event signaled when an S3SaveState protocol interface is installed.
 //
-STATIC EFI_EVENT mS3SaveStateInstalled;
+STATIC EFI_EVENT  mS3SaveStateInstalled;
 
 /**
   Invokes SMI activation from either the preboot or runtime environment.
@@ -99,7 +97,7 @@ SmmControl2DxeTrigger (
   //
   // No support for queued or periodic activation.
   //
-  if (Periodic || ActivationInterval > 0) {
+  if (Periodic || (ActivationInterval > 0)) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -163,7 +161,7 @@ SmmControl2DxeClear (
   return EFI_SUCCESS;
 }
 
-STATIC EFI_SMM_CONTROL2_PROTOCOL mControl2 = {
+STATIC EFI_SMM_CONTROL2_PROTOCOL  mControl2 = {
   &SmmControl2DxeTrigger,
   &SmmControl2DxeClear,
   MAX_UINTN // MinimumTriggerPeriod -- we don't support periodic SMIs
@@ -175,13 +173,13 @@ STATIC EFI_SMM_CONTROL2_PROTOCOL mControl2 = {
 EFI_STATUS
 EFIAPI
 SmmControl2DxeEntryPoint (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  UINT32     PmBase;
-  UINT32     SmiEnableVal;
-  EFI_STATUS Status;
+  UINT32      PmBase;
+  UINT32      SmiEnableVal;
+  EFI_STATUS  Status;
 
   //
   // This module should only be included if SMRAM support is required.
@@ -194,7 +192,7 @@ SmmControl2DxeEntryPoint (
   // ACPI PM IO space.)
   //
   PmBase = PciRead32 (POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE)) &
-    ICH9_PMBASE_MASK;
+           ICH9_PMBASE_MASK;
   mSmiEnable = PmBase + ICH9_PMBASE_OFS_SMI_EN;
 
   //
@@ -204,8 +202,11 @@ SmmControl2DxeEntryPoint (
   //
   SmiEnableVal = IoRead32 (mSmiEnable);
   if ((SmiEnableVal & ICH9_SMI_EN_APMC_EN) != 0) {
-    DEBUG ((DEBUG_ERROR, "%a: this Q35 implementation lacks SMI\n",
-      __FUNCTION__));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: this Q35 implementation lacks SMI\n",
+      __FUNCTION__
+      ));
     goto FatalError;
   }
 
@@ -219,8 +220,10 @@ SmmControl2DxeEntryPoint (
   //
   // Prevent software from undoing the above (until platform reset).
   //
-  PciOr16 (POWER_MGMT_REGISTER_Q35 (ICH9_GEN_PMCON_1),
-    ICH9_GEN_PMCON_1_SMI_LOCK);
+  PciOr16 (
+    POWER_MGMT_REGISTER_Q35 (ICH9_GEN_PMCON_1),
+    ICH9_GEN_PMCON_1_SMI_LOCK
+    );
 
   //
   // If we can clear GBL_SMI_EN now, that means QEMU's SMI support is not
@@ -228,8 +231,11 @@ SmmControl2DxeEntryPoint (
   //
   IoWrite32 (mSmiEnable, SmiEnableVal & ~(UINT32)ICH9_SMI_EN_GBL_SMI_EN);
   if (IoRead32 (mSmiEnable) != SmiEnableVal) {
-    DEBUG ((DEBUG_ERROR, "%a: failed to lock down GBL_SMI_EN\n",
-      __FUNCTION__));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: failed to lock down GBL_SMI_EN\n",
+      __FUNCTION__
+      ));
     goto FatalError;
   }
 
@@ -238,27 +244,38 @@ SmmControl2DxeEntryPoint (
   //
   mSmiFeatureNegotiation = NegotiateSmiFeatures ();
 
-  if (QemuFwCfgS3Enabled ()) {
-    VOID *Registration;
+  if (PcdGetBool (PcdAcpiS3Enable)) {
+    VOID  *Registration;
 
     //
     // On S3 resume the above register settings have to be repeated. Register a
     // protocol notify callback that, when boot script saving becomes
     // available, saves operations equivalent to the above to the boot script.
     //
-    Status = gBS->CreateEvent (EVT_NOTIFY_SIGNAL, TPL_CALLBACK,
-                    OnS3SaveStateInstalled, NULL /* Context */,
-                    &mS3SaveStateInstalled);
+    Status = gBS->CreateEvent (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    OnS3SaveStateInstalled,
+                    NULL /* Context */,
+                    &mS3SaveStateInstalled
+                    );
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a: CreateEvent: %r\n", __FUNCTION__, Status));
       goto FatalError;
     }
 
-    Status = gBS->RegisterProtocolNotify (&gEfiS3SaveStateProtocolGuid,
-                    mS3SaveStateInstalled, &Registration);
+    Status = gBS->RegisterProtocolNotify (
+                    &gEfiS3SaveStateProtocolGuid,
+                    mS3SaveStateInstalled,
+                    &Registration
+                    );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: RegisterProtocolNotify: %r\n", __FUNCTION__,
-        Status));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: RegisterProtocolNotify: %r\n",
+        __FUNCTION__,
+        Status
+        ));
       goto ReleaseEvent;
     }
 
@@ -276,12 +293,19 @@ SmmControl2DxeEntryPoint (
   // We have no pointers to convert to virtual addresses. The handle itself
   // doesn't matter, as protocol services are not accessible at runtime.
   //
-  Status = gBS->InstallMultipleProtocolInterfaces (&ImageHandle,
-                  &gEfiSmmControl2ProtocolGuid, &mControl2,
-                  NULL);
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &ImageHandle,
+                  &gEfiSmmControl2ProtocolGuid,
+                  &mControl2,
+                  NULL
+                  );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: InstallMultipleProtocolInterfaces: %r\n",
-      __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: InstallMultipleProtocolInterfaces: %r\n",
+      __FUNCTION__,
+      Status
+      ));
     goto ReleaseEvent;
   }
 
@@ -313,20 +337,23 @@ STATIC
 VOID
 EFIAPI
 OnS3SaveStateInstalled (
-  IN EFI_EVENT Event,
-  IN VOID      *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  EFI_STATUS                 Status;
-  EFI_S3_SAVE_STATE_PROTOCOL *S3SaveState;
-  UINT32                     SmiEnOrMask, SmiEnAndMask;
-  UINT64                     GenPmCon1Address;
-  UINT16                     GenPmCon1OrMask, GenPmCon1AndMask;
+  EFI_STATUS                  Status;
+  EFI_S3_SAVE_STATE_PROTOCOL  *S3SaveState;
+  UINT32                      SmiEnOrMask, SmiEnAndMask;
+  UINT64                      GenPmCon1Address;
+  UINT16                      GenPmCon1OrMask, GenPmCon1AndMask;
 
   ASSERT (Event == mS3SaveStateInstalled);
 
-  Status = gBS->LocateProtocol (&gEfiS3SaveStateProtocolGuid,
-                  NULL /* Registration */, (VOID **)&S3SaveState);
+  Status = gBS->LocateProtocol (
+                  &gEfiS3SaveStateProtocolGuid,
+                  NULL /* Registration */,
+                  (VOID **)&S3SaveState
+                  );
   if (EFI_ERROR (Status)) {
     return;
   }
@@ -337,37 +364,45 @@ OnS3SaveStateInstalled (
   //
   SmiEnOrMask  = ICH9_SMI_EN_APMC_EN | ICH9_SMI_EN_GBL_SMI_EN;
   SmiEnAndMask = MAX_UINT32;
-  Status = S3SaveState->Write (
-                          S3SaveState,
-                          EFI_BOOT_SCRIPT_IO_READ_WRITE_OPCODE,
-                          EfiBootScriptWidthUint32,
-                          (UINT64)mSmiEnable,
-                          &SmiEnOrMask,
-                          &SmiEnAndMask
-                          );
+  Status       = S3SaveState->Write (
+                                S3SaveState,
+                                EFI_BOOT_SCRIPT_IO_READ_WRITE_OPCODE,
+                                EfiBootScriptWidthUint32,
+                                (UINT64)mSmiEnable,
+                                &SmiEnOrMask,
+                                &SmiEnAndMask
+                                );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: EFI_BOOT_SCRIPT_IO_READ_WRITE_OPCODE: %r\n",
-      __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: EFI_BOOT_SCRIPT_IO_READ_WRITE_OPCODE: %r\n",
+      __FUNCTION__,
+      Status
+      ));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
 
   GenPmCon1Address = POWER_MGMT_REGISTER_Q35_EFI_PCI_ADDRESS (
-                       ICH9_GEN_PMCON_1);
+                       ICH9_GEN_PMCON_1
+                       );
   GenPmCon1OrMask  = ICH9_GEN_PMCON_1_SMI_LOCK;
   GenPmCon1AndMask = MAX_UINT16;
-  Status = S3SaveState->Write (
-                          S3SaveState,
-                          EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE_OPCODE,
-                          EfiBootScriptWidthUint16,
-                          GenPmCon1Address,
-                          &GenPmCon1OrMask,
-                          &GenPmCon1AndMask
-                          );
+  Status           = S3SaveState->Write (
+                                    S3SaveState,
+                                    EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE_OPCODE,
+                                    EfiBootScriptWidthUint16,
+                                    GenPmCon1Address,
+                                    &GenPmCon1OrMask,
+                                    &GenPmCon1AndMask
+                                    );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR,
-      "%a: EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE_OPCODE: %r\n", __FUNCTION__,
-      Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE_OPCODE: %r\n",
+      __FUNCTION__,
+      Status
+      ));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }

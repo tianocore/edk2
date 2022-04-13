@@ -8,8 +8,8 @@
 **/
 
 #include <Uefi.h>
+#include <IndustryStandard/ArmCache.h>
 #include <Library/ArmLib.h>
-#include <Library/ArmLib/ArmLibPrivate.h>
 
 #include "SmbiosProcessor.h"
 
@@ -23,19 +23,19 @@
 **/
 UINT64
 SmbiosProcessorGetCacheSize (
-  IN UINT8   CacheLevel,
-  IN BOOLEAN DataCache,
-  IN BOOLEAN UnifiedCache
-)
+  IN UINT8    CacheLevel,
+  IN BOOLEAN  DataCache,
+  IN BOOLEAN  UnifiedCache
+  )
 {
-  CCSIDR_DATA Ccsidr;
-  CSSELR_DATA Csselr;
-  BOOLEAN     CcidxSupported;
-  UINT64      CacheSize;
+  CCSIDR_DATA  Ccsidr;
+  CSSELR_DATA  Csselr;
+  BOOLEAN      CcidxSupported;
+  UINT64       CacheSize;
 
-  Csselr.Data = 0;
+  Csselr.Data       = 0;
   Csselr.Bits.Level = CacheLevel - 1;
-  Csselr.Bits.InD = (!DataCache && !UnifiedCache);
+  Csselr.Bits.InD   = (!DataCache && !UnifiedCache);
 
   Ccsidr.Data = ReadCCSIDR (Csselr.Data);
 
@@ -43,12 +43,12 @@ SmbiosProcessorGetCacheSize (
 
   if (CcidxSupported) {
     CacheSize = (1 << (Ccsidr.BitsCcidxAA64.LineSize + 4)) *
-                      (Ccsidr.BitsCcidxAA64.Associativity + 1) *
-                      (Ccsidr.BitsCcidxAA64.NumSets + 1);
+                (Ccsidr.BitsCcidxAA64.Associativity + 1) *
+                (Ccsidr.BitsCcidxAA64.NumSets + 1);
   } else {
     CacheSize = (1 << (Ccsidr.BitsNonCcidx.LineSize + 4)) *
-                      (Ccsidr.BitsNonCcidx.Associativity + 1) *
-                      (Ccsidr.BitsNonCcidx.NumSets + 1);
+                (Ccsidr.BitsNonCcidx.Associativity + 1) *
+                (Ccsidr.BitsNonCcidx.NumSets + 1);
   }
 
   return CacheSize;
@@ -64,19 +64,19 @@ SmbiosProcessorGetCacheSize (
 **/
 UINT32
 SmbiosProcessorGetCacheAssociativity (
-  IN UINT8   CacheLevel,
-  IN BOOLEAN DataCache,
-  IN BOOLEAN UnifiedCache
+  IN UINT8    CacheLevel,
+  IN BOOLEAN  DataCache,
+  IN BOOLEAN  UnifiedCache
   )
 {
-  CCSIDR_DATA Ccsidr;
-  CSSELR_DATA Csselr;
-  BOOLEAN     CcidxSupported;
-  UINT32      Associativity;
+  CCSIDR_DATA  Ccsidr;
+  CSSELR_DATA  Csselr;
+  BOOLEAN      CcidxSupported;
+  UINT32       Associativity;
 
-  Csselr.Data = 0;
+  Csselr.Data       = 0;
   Csselr.Bits.Level = CacheLevel - 1;
-  Csselr.Bits.InD = (!DataCache && !UnifiedCache);
+  Csselr.Bits.InD   = (!DataCache && !UnifiedCache);
 
   Ccsidr.Data = ReadCCSIDR (Csselr.Data);
 
@@ -90,4 +90,3 @@ SmbiosProcessorGetCacheAssociativity (
 
   return Associativity;
 }
-

@@ -1,26 +1,24 @@
 /** @file
   SSDT Serial Port Table Generator.
 
-  Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2020 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#include <IndustryStandard/DebugPort2Table.h>
 #include <Library/AcpiLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/AcpiTable.h>
 
 // Module specific include files.
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
+#include <Library/AcpiHelperLib.h>
 #include <Library/SsdtSerialPortFixupLib.h>
-#include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 /** ARM standard SSDT Serial Port Table Generator
@@ -48,7 +46,7 @@ GET_OBJECT_LIST (
           respectively. So, the UIDs for serial ports for general use
           start at 2.
 */
-#define SERIAL_PORT_START_UID                      2
+#define SERIAL_PORT_START_UID  2
 
 /** Maximum serial ports supported by this generator.
     This generator supports a maximum of 14 (16 - 2) serial ports.
@@ -59,7 +57,7 @@ GET_OBJECT_LIST (
           UID fields describing the serial port.
 
 */
-#define MAX_SERIAL_PORTS_SUPPORTED                 14
+#define MAX_SERIAL_PORTS_SUPPORTED  14
 
 /** Free any resources allocated for constructing the tables.
 
@@ -78,16 +76,16 @@ STATIC
 EFI_STATUS
 EFIAPI
 FreeSsdtSerialPortTableEx (
-  IN      CONST ACPI_TABLE_GENERATOR                   * CONST This,
-  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO             * CONST AcpiTableInfo,
-  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   * CONST CfgMgrProtocol,
-  IN OUT        EFI_ACPI_DESCRIPTION_HEADER          *** CONST Table,
+  IN      CONST ACPI_TABLE_GENERATOR                   *CONST  This,
+  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,
+  IN OUT        EFI_ACPI_DESCRIPTION_HEADER          ***CONST  Table,
   IN      CONST UINTN                                          TableCount
   )
 {
-  EFI_STATUS                        Status;
-  EFI_ACPI_DESCRIPTION_HEADER    ** TableList;
-  UINTN                             Index;
+  EFI_STATUS                   Status;
+  EFI_ACPI_DESCRIPTION_HEADER  **TableList;
+  UINTN                        Index;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -97,7 +95,8 @@ FreeSsdtSerialPortTableEx (
 
   if ((Table == NULL)   ||
       (*Table == NULL)  ||
-      (TableCount == 0)) {
+      (TableCount == 0))
+  {
     DEBUG ((DEBUG_ERROR, "ERROR: SSDT-SERIAL-PORT: Invalid Table Pointer\n"));
     return EFI_INVALID_PARAMETER;
   }
@@ -107,7 +106,8 @@ FreeSsdtSerialPortTableEx (
   for (Index = 0; Index < TableCount; Index++) {
     if ((TableList[Index] != NULL) &&
         (TableList[Index]->Signature ==
-         EFI_ACPI_6_3_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE)) {
+         EFI_ACPI_6_3_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE))
+    {
       Status = FreeSsdtSerialPortTable (TableList[Index]);
     } else {
       Status = EFI_INVALID_PARAMETER;
@@ -123,7 +123,7 @@ FreeSsdtSerialPortTableEx (
         ));
       return Status;
     }
-  } //for
+  } // for
 
   // Free the table list.
   FreePool (*Table);
@@ -160,20 +160,20 @@ STATIC
 EFI_STATUS
 EFIAPI
 BuildSsdtSerialPortTableEx (
-  IN  CONST ACPI_TABLE_GENERATOR                   *       This,
-  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO             * CONST AcpiTableInfo,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   * CONST CfgMgrProtocol,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER          ***       Table,
-  OUT       UINTN                                  * CONST TableCount
+  IN  CONST ACPI_TABLE_GENERATOR                           *This,
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER                    ***Table,
+  OUT       UINTN                                  *CONST  TableCount
   )
 {
-  EFI_STATUS                      Status;
-  CM_ARM_SERIAL_PORT_INFO       * SerialPortInfo;
-  UINT32                          SerialPortCount;
-  UINTN                           Index;
-  CHAR8                           NewName[5];
-  UINT64                          Uid;
-  EFI_ACPI_DESCRIPTION_HEADER  ** TableList;
+  EFI_STATUS                   Status;
+  CM_ARM_SERIAL_PORT_INFO      *SerialPortInfo;
+  UINT32                       SerialPortCount;
+  UINTN                        Index;
+  CHAR8                        NewName[AML_NAME_SEG_SIZE + 1];
+  UINT64                       Uid;
+  EFI_ACPI_DESCRIPTION_HEADER  **TableList;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -224,9 +224,9 @@ BuildSsdtSerialPortTableEx (
   }
 
   // Allocate a table to store pointers to the SSDT tables.
-  TableList = (EFI_ACPI_DESCRIPTION_HEADER**)
+  TableList = (EFI_ACPI_DESCRIPTION_HEADER **)
               AllocateZeroPool (
-                (sizeof (EFI_ACPI_DESCRIPTION_HEADER*) * SerialPortCount)
+                (sizeof (EFI_ACPI_DESCRIPTION_HEADER *) * SerialPortCount)
                 );
   if (TableList == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -248,7 +248,7 @@ BuildSsdtSerialPortTableEx (
   NewName[2] = 'M';
   NewName[4] = '\0';
   for (Index = 0; Index < SerialPortCount; Index++) {
-    Uid = SERIAL_PORT_START_UID + Index;
+    Uid        = SERIAL_PORT_START_UID + Index;
     NewName[3] = AsciiFromHex ((UINT8)(Uid));
 
     // Build a SSDT table describing the serial port.
@@ -283,13 +283,13 @@ error_handler:
 
 /** This macro defines the SSDT Serial Port Table Generator revision.
 */
-#define SSDT_SERIAL_GENERATOR_REVISION CREATE_REVISION (1, 0)
+#define SSDT_SERIAL_GENERATOR_REVISION  CREATE_REVISION (1, 0)
 
 /** The interface for the SSDT Serial Port Table Generator.
 */
 STATIC
 CONST
-ACPI_TABLE_GENERATOR SsdtSerialPortGenerator = {
+ACPI_TABLE_GENERATOR  SsdtSerialPortGenerator = {
   // Generator ID
   CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdSsdtSerialPort),
   // Generator Description
@@ -327,11 +327,12 @@ ACPI_TABLE_GENERATOR SsdtSerialPortGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiSsdtSerialPortLibConstructor (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *  SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
+
   Status = RegisterAcpiTableGenerator (&SsdtSerialPortGenerator);
   DEBUG ((
     DEBUG_INFO,
@@ -355,11 +356,12 @@ AcpiSsdtSerialPortLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiSsdtSerialPortLibDestructor (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *  SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
+
   Status = DeregisterAcpiTableGenerator (&SsdtSerialPortGenerator);
   DEBUG ((
     DEBUG_INFO,

@@ -44,6 +44,8 @@
   Pk/CryptAuthenticode.c
   Pk/CryptTs.c
   Pem/CryptPem.c
+  Pk/CryptRsaPss.c
+  Pk/CryptRsaPssSign.c
 
   SysCall/UnitTestHostCrtWrapper.c
 

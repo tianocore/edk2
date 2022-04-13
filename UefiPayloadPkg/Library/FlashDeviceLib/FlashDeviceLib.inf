@@ -1,0 +1,38 @@
+## @file
+# Library instace of Flash Device Library Class
+#
+# This library implement the flash device library class for the lakeport platform.
+#@copyright
+# Copyright (c) 2014 - 2021 Intel Corporation. All rights reserved
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FlashDeviceLib
+  FILE_GUID                      = BA7CA537-1C65-4a90-9379-622A24A08141
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FlashDeviceLib | DXE_SMM_DRIVER DXE_RUNTIME_DRIVER
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  FlashDeviceLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseMemoryLib
+  SpiFlashLib
+

@@ -22,10 +22,10 @@
 #
 
 [Binaries.Ia32]
-  RAW|ResetVector.ia32.raw|*
+  RAW|IA32/ResetVector.ia32.raw|*
 
 [Binaries.X64]
-  RAW|ResetVector.x64.raw|*
+  RAW|X64/PageTable2M/ResetVector.x64.raw|*
 
 [UserExtensions.TianoCore."ExtraFiles"]
   ResetVectorExtra.uni

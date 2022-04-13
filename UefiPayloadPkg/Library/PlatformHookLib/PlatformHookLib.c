@@ -1,29 +1,33 @@
 /** @file
   Platform Hook Library instance for UART device.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <Base.h>
-#include <Uefi/UefiBaseType.h>
-#include <Library/PciLib.h>
+#include <PiDxe.h>
+#include <UniversalPayload/SerialPortInfo.h>
 #include <Library/PlatformHookLib.h>
-#include <Library/BlParseLib.h>
 #include <Library/PcdLib.h>
+#include <Library/HobLib.h>
 
-typedef struct {
-  UINT16  VendorId;          ///< Vendor ID to match the PCI device.  The value 0xFFFF terminates the list of entries.
-  UINT16  DeviceId;          ///< Device ID to match the PCI device
-  UINT32  ClockRate;         ///< UART clock rate.  Set to 0 for default clock rate of 1843200 Hz
-  UINT64  Offset;            ///< The byte offset into to the BAR
-  UINT8   BarIndex;          ///< Which BAR to get the UART base address
-  UINT8   RegisterStride;    ///< UART register stride in bytes.  Set to 0 for default register stride of 1 byte.
-  UINT16  ReceiveFifoDepth;  ///< UART receive FIFO depth in bytes. Set to 0 for a default FIFO depth of 16 bytes.
-  UINT16  TransmitFifoDepth; ///< UART transmit FIFO depth in bytes. Set to 0 for a default FIFO depth of 16 bytes.
-  UINT8   Reserved[2];
-} PCI_SERIAL_PARAMETER;
+/** Library Constructor
+
+  @retval RETURN_SUCCESS  Success.
+**/
+EFI_STATUS
+EFIAPI
+PlatformHookSerialPortConstructor (
+  VOID
+  )
+{
+  // Nothing to do here. This constructor is added to
+  // enable the chain of constructor invocation for
+  // dependent libraries.
+  return RETURN_SUCCESS;
+}
 
 /**
   Performs platform specific initialization required for the CPU to access
@@ -42,57 +46,52 @@ PlatformHookSerialPortInitialize (
   VOID
   )
 {
-  RETURN_STATUS         Status;
-  UINT32                DeviceVendor;
-  PCI_SERIAL_PARAMETER  *SerialParam;
-  SERIAL_PORT_INFO      SerialPortInfo;
+  RETURN_STATUS                       Status;
+  UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *SerialPortInfo;
+  UINT8                               *GuidHob;
+  UNIVERSAL_PAYLOAD_GENERIC_HEADER    *GenericHeader;
 
-  Status = ParseSerialInfo (&SerialPortInfo);
-  if (RETURN_ERROR (Status)) {
-    return Status;
-  }
-
-  if (SerialPortInfo.Type == PLD_SERIAL_TYPE_MEMORY_MAPPED) {
-    Status = PcdSetBoolS (PcdSerialUseMmio, TRUE);
-  } else { //IO
-    Status = PcdSetBoolS (PcdSerialUseMmio, FALSE);
-  }
-  if (RETURN_ERROR (Status)) {
-    return Status;
-  }
-  Status = PcdSet64S (PcdSerialRegisterBase, SerialPortInfo.BaseAddr);
-  if (RETURN_ERROR (Status)) {
-    return Status;
+  GuidHob = GetFirstGuidHob (&gUniversalPayloadSerialPortInfoGuid);
+  if (GuidHob == NULL) {
+    return EFI_NOT_FOUND;
   }
 
-  Status = PcdSet32S (PcdSerialRegisterStride, SerialPortInfo.RegWidth);
-  if (RETURN_ERROR (Status)) {
-    return Status;
+  GenericHeader = (UNIVERSAL_PAYLOAD_GENERIC_HEADER *)GET_GUID_HOB_DATA (GuidHob);
+  if ((sizeof (UNIVERSAL_PAYLOAD_GENERIC_HEADER) > GET_GUID_HOB_DATA_SIZE (GuidHob)) || (GenericHeader->Length > GET_GUID_HOB_DATA_SIZE (GuidHob))) {
+    return EFI_NOT_FOUND;
   }
 
-  Status = PcdSet32S (PcdSerialBaudRate, SerialPortInfo.Baud);
-  if (RETURN_ERROR (Status)) {
-    return Status;
+  if (GenericHeader->Revision == UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO_REVISION) {
+    SerialPortInfo = (UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO *)GET_GUID_HOB_DATA (GuidHob);
+    if (GenericHeader->Length < UNIVERSAL_PAYLOAD_SIZEOF_THROUGH_FIELD (UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO, RegisterBase)) {
+      //
+      // Return if can't find the Serial Port Info Hob with enough length
+      //
+      return EFI_NOT_FOUND;
+    }
+
+    Status = PcdSetBoolS (PcdSerialUseMmio, SerialPortInfo->UseMmio);
+    if (RETURN_ERROR (Status)) {
+      return Status;
+    }
+
+    Status = PcdSet64S (PcdSerialRegisterBase, SerialPortInfo->RegisterBase);
+    if (RETURN_ERROR (Status)) {
+      return Status;
+    }
+
+    Status = PcdSet32S (PcdSerialRegisterStride, SerialPortInfo->RegisterStride);
+    if (RETURN_ERROR (Status)) {
+      return Status;
+    }
+
+    Status = PcdSet32S (PcdSerialBaudRate, SerialPortInfo->BaudRate);
+    if (RETURN_ERROR (Status)) {
+      return Status;
+    }
+
+    return RETURN_SUCCESS;
   }
 
-  Status = PcdSet64S (PcdUartDefaultBaudRate, SerialPortInfo.Baud);
-  if (RETURN_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = PcdSet32S (PcdSerialClockRate, SerialPortInfo.InputHertz);
-  if (RETURN_ERROR (Status)) {
-    return Status;
-  }
-
-  if (SerialPortInfo.UartPciAddr >= 0x80000000) {
-    DeviceVendor = PciRead32 (SerialPortInfo.UartPciAddr & 0x0ffff000);
-    SerialParam  = PcdGetPtr(PcdPciSerialParameters);
-    SerialParam->VendorId  = (UINT16)DeviceVendor;
-    SerialParam->DeviceId  = DeviceVendor >> 16;
-    SerialParam->ClockRate = SerialPortInfo.InputHertz;
-    SerialParam->RegisterStride = (UINT8)SerialPortInfo.RegWidth;
-  }
-
-  return RETURN_SUCCESS;
+  return EFI_NOT_FOUND;
 }

@@ -11,7 +11,7 @@
 
 EDKII_UFS_HOST_CONTROLLER_PPI  mUfsHostControllerPpi = { GetUfsHcMmioBar };
 
-EFI_PEI_PPI_DESCRIPTOR   mPpiList = {
+EFI_PEI_PPI_DESCRIPTOR  mPpiList = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEdkiiPeiUfsHostControllerPpiGuid,
   &mUfsHostControllerPpi
@@ -31,9 +31,9 @@ EFI_PEI_PPI_DESCRIPTOR   mPpiList = {
 EFI_STATUS
 EFIAPI
 GetUfsHcMmioBar (
-  IN     EDKII_UFS_HOST_CONTROLLER_PPI *This,
-  IN     UINT8                         ControllerId,
-     OUT UINTN                         *MmioBar
+  IN     EDKII_UFS_HOST_CONTROLLER_PPI  *This,
+  IN     UINT8                          ControllerId,
+  OUT UINTN                             *MmioBar
   )
 {
   UFS_HC_PEI_PRIVATE_DATA  *Private;
@@ -66,8 +66,8 @@ GetUfsHcMmioBar (
 EFI_STATUS
 EFIAPI
 InitializeUfsHcPeim (
-  IN EFI_PEI_FILE_HANDLE       FileHandle,
-  IN CONST EFI_PEI_SERVICES    **PeiServices
+  IN EFI_PEI_FILE_HANDLE     FileHandle,
+  IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
   EFI_BOOT_MODE            BootMode;
@@ -76,6 +76,8 @@ InitializeUfsHcPeim (
   UINT16                   Device;
   UINT16                   Function;
   UINT32                   Size;
+  UINT64                   MmioSize;
+  UINT32                   BarAddr;
   UINT8                    SubClass;
   UINT8                    BaseClass;
   UFS_HC_PEI_PRIVATE_DATA  *Private;
@@ -95,9 +97,9 @@ InitializeUfsHcPeim (
     return EFI_SUCCESS;
   }
 
-  Private = (UFS_HC_PEI_PRIVATE_DATA *) AllocateZeroPool (sizeof (UFS_HC_PEI_PRIVATE_DATA));
+  Private = (UFS_HC_PEI_PRIVATE_DATA *)AllocateZeroPool (sizeof (UFS_HC_PEI_PRIVATE_DATA));
   if (Private == NULL) {
-    DEBUG ((EFI_D_ERROR, "Failed to allocate memory for UFS_HC_PEI_PRIVATE_DATA! \n"));
+    DEBUG ((DEBUG_ERROR, "Failed to allocate memory for UFS_HC_PEI_PRIVATE_DATA! \n"));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -106,6 +108,7 @@ InitializeUfsHcPeim (
   Private->PpiList              = mPpiList;
   Private->PpiList.Ppi          = &Private->UfsHostControllerPpi;
 
+  BarAddr = PcdGet32 (PcdUfsPciHostControllerMmioBase);
   for (Bus = 0; Bus < 256; Bus++) {
     for (Device = 0; Device < 32; Device++) {
       for (Function = 0; Function < 8; Function++) {
@@ -116,20 +119,61 @@ InitializeUfsHcPeim (
           //
           // Get the Ufs Pci host controller's MMIO region size.
           //
-          PciAnd16 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_COMMAND_OFFSET), (UINT16)~(EFI_PCI_COMMAND_BUS_MASTER | EFI_PCI_COMMAND_MEMORY_SPACE));
+          PciAnd16 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_COMMAND_OFFSET), (UINT16) ~(EFI_PCI_COMMAND_BUS_MASTER | EFI_PCI_COMMAND_MEMORY_SPACE));
           PciWrite32 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_BASE_ADDRESSREG_OFFSET), 0xFFFFFFFF);
           Size = PciRead32 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_BASE_ADDRESSREG_OFFSET));
+
+          switch (Size & 0x07) {
+            case 0x0:
+              //
+              // Memory space: anywhere in 32 bit address space
+              //
+              MmioSize = (~(Size & 0xFFFFFFF0)) + 1;
+              break;
+            case 0x4:
+              //
+              // Memory space: anywhere in 64 bit address space
+              //
+              MmioSize = Size & 0xFFFFFFF0;
+              PciWrite32 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_BASE_ADDRESSREG_OFFSET + 4), 0xFFFFFFFF);
+              Size = PciRead32 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_BASE_ADDRESSREG_OFFSET + 4));
+
+              //
+              // Fix the length to support some specific 64 bit BAR
+              //
+              Size |= ((UINT32)(-1) << HighBitSet32 (Size));
+
+              //
+              // Calculate the size of 64bit bar
+              //
+              MmioSize |= LShiftU64 ((UINT64)Size, 32);
+              MmioSize  = (~(MmioSize)) + 1;
+
+              //
+              // Clean the high 32bits of this 64bit BAR to 0 as we only allow a 32bit BAR.
+              //
+              PciWrite32 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_BASE_ADDRESSREG_OFFSET + 4), 0);
+              break;
+            default:
+              //
+              // Unknown BAR type
+              //
+              ASSERT (FALSE);
+              continue;
+          }
+
           //
           // Assign resource to the Ufs Pci host controller's MMIO BAR.
           // Enable the Ufs Pci host controller by setting BME and MSE bits of PCI_CMD register.
           //
-          PciWrite32 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_BASE_ADDRESSREG_OFFSET), (UINT32)(PcdGet32 (PcdUfsPciHostControllerMmioBase) + Size * Private->TotalUfsHcs));
+          PciWrite32 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_BASE_ADDRESSREG_OFFSET), BarAddr);
           PciOr16 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_COMMAND_OFFSET), (EFI_PCI_COMMAND_BUS_MASTER | EFI_PCI_COMMAND_MEMORY_SPACE));
           //
           // Record the allocated Mmio base address.
           //
-          Private->UfsHcPciAddr[Private->TotalUfsHcs] = PcdGet32 (PcdUfsPciHostControllerMmioBase) + Size * Private->TotalUfsHcs;
+          Private->UfsHcPciAddr[Private->TotalUfsHcs] = BarAddr;
           Private->TotalUfsHcs++;
+          BarAddr += (UINT32)MmioSize;
           ASSERT (Private->TotalUfsHcs < MAX_UFS_HCS);
         }
       }

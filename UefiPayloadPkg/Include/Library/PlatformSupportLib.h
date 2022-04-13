@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __BOOTLOADER_PLATFORM_SUPPORT_LIB__
-#define __BOOTLOADER_PLATFORM_SUPPORT_LIB__
+#ifndef BOOTLOADER_PLATFORM_SUPPORT_LIB_
+#define BOOTLOADER_PLATFORM_SUPPORT_LIB_
 
 /**
   Parse platform specific information from bootloader
@@ -25,4 +25,3 @@ ParsePlatformInfo (
   );
 
 #endif // __BOOTLOADER_PLATFORM_SUPPORT_LIB__
-

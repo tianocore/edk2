@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -26,11 +26,11 @@
 **/
 EFI_STATUS
 SearchForExactMtrr (
-  IN  EFI_PHYSICAL_ADDRESS      MemoryAddress,
-  IN  UINT64                    MemoryLength,
-  IN  UINT64                    ValidMtrrAddressMask,
-  OUT UINT32                    *UsedMsrNum,
-  OUT EFI_MEMORY_CACHE_TYPE     *MemoryCacheType
+  IN  EFI_PHYSICAL_ADDRESS   MemoryAddress,
+  IN  UINT64                 MemoryLength,
+  IN  UINT64                 ValidMtrrAddressMask,
+  OUT UINT32                 *UsedMsrNum,
+  OUT EFI_MEMORY_CACHE_TYPE  *MemoryCacheType
   );
 
 /**
@@ -43,7 +43,7 @@ SearchForExactMtrr (
 **/
 BOOLEAN
 IsDefaultType (
-  IN  EFI_MEMORY_CACHE_TYPE     MemoryCacheType
+  IN  EFI_MEMORY_CACHE_TYPE  MemoryCacheType
   );
 
 /**
@@ -58,8 +58,8 @@ IsDefaultType (
 **/
 UINT32
 CheckMtrrAlignment (
-  IN  UINT64                    BaseAddress,
-  IN  UINT64                    Size
+  IN  UINT64  BaseAddress,
+  IN  UINT64  Size
   );
 
 typedef struct {
@@ -68,18 +68,18 @@ typedef struct {
   UINT32    Length;
 } EFI_FIXED_MTRR;
 
-EFI_FIXED_MTRR mFixedMtrrTable[] = {
-  { EFI_MSR_IA32_MTRR_FIX64K_00000, 0,       0x10000},
-  { EFI_MSR_IA32_MTRR_FIX16K_80000, 0x80000, 0x4000},
-  { EFI_MSR_IA32_MTRR_FIX16K_A0000, 0xA0000, 0x4000},
-  { EFI_MSR_IA32_MTRR_FIX4K_C0000,  0xC0000, 0x1000},
-  { EFI_MSR_IA32_MTRR_FIX4K_C8000,  0xC8000, 0x1000},
-  { EFI_MSR_IA32_MTRR_FIX4K_D0000,  0xD0000, 0x1000},
-  { EFI_MSR_IA32_MTRR_FIX4K_D8000,  0xD8000, 0x1000},
-  { EFI_MSR_IA32_MTRR_FIX4K_E0000,  0xE0000, 0x1000},
-  { EFI_MSR_IA32_MTRR_FIX4K_E8000,  0xE8000, 0x1000},
-  { EFI_MSR_IA32_MTRR_FIX4K_F0000,  0xF0000, 0x1000},
-  { EFI_MSR_IA32_MTRR_FIX4K_F8000,  0xF8000, 0x1000}
+EFI_FIXED_MTRR  mFixedMtrrTable[] = {
+  { EFI_MSR_IA32_MTRR_FIX64K_00000, 0,       0x10000 },
+  { EFI_MSR_IA32_MTRR_FIX16K_80000, 0x80000, 0x4000  },
+  { EFI_MSR_IA32_MTRR_FIX16K_A0000, 0xA0000, 0x4000  },
+  { EFI_MSR_IA32_MTRR_FIX4K_C0000,  0xC0000, 0x1000  },
+  { EFI_MSR_IA32_MTRR_FIX4K_C8000,  0xC8000, 0x1000  },
+  { EFI_MSR_IA32_MTRR_FIX4K_D0000,  0xD0000, 0x1000  },
+  { EFI_MSR_IA32_MTRR_FIX4K_D8000,  0xD8000, 0x1000  },
+  { EFI_MSR_IA32_MTRR_FIX4K_E0000,  0xE0000, 0x1000  },
+  { EFI_MSR_IA32_MTRR_FIX4K_E8000,  0xE8000, 0x1000  },
+  { EFI_MSR_IA32_MTRR_FIX4K_F0000,  0xF0000, 0x1000  },
+  { EFI_MSR_IA32_MTRR_FIX4K_F8000,  0xF8000, 0x1000  }
 };
 
 /**
@@ -94,7 +94,7 @@ EFI_FIXED_MTRR mFixedMtrrTable[] = {
 **/
 INT8
 CheckDirection (
-  IN  UINT64                    Input
+  IN  UINT64  Input
   )
 {
   return 0;
@@ -108,7 +108,7 @@ CheckDirection (
 **/
 VOID
 EfiDisableCacheMtrr (
-  OUT UINT64                   *OldMtrr
+  OUT UINT64  *OldMtrr
   )
 {
   UINT64  TempQword;
@@ -116,9 +116,9 @@ EfiDisableCacheMtrr (
   //
   // Disable Cache MTRR
   //
-  *OldMtrr = AsmReadMsr64(EFI_MSR_CACHE_IA32_MTRR_DEF_TYPE);
+  *OldMtrr  = AsmReadMsr64 (EFI_MSR_CACHE_IA32_MTRR_DEF_TYPE);
   TempQword = (*OldMtrr) & ~B_EFI_MSR_GLOBAL_MTRR_ENABLE & ~B_EFI_MSR_FIXED_MTRR_ENABLE;
-  AsmWriteMsr64(EFI_MSR_CACHE_IA32_MTRR_DEF_TYPE, TempQword);
+  AsmWriteMsr64 (EFI_MSR_CACHE_IA32_MTRR_DEF_TYPE, TempQword);
   AsmDisableCache ();
 }
 
@@ -131,8 +131,8 @@ EfiDisableCacheMtrr (
 **/
 VOID
 EfiRecoverCacheMtrr (
-  IN BOOLEAN                  EnableMtrr,
-  IN UINT64                   OldMtrr
+  IN BOOLEAN  EnableMtrr,
+  IN UINT64   OldMtrr
   )
 {
   UINT64  TempQword;
@@ -141,7 +141,7 @@ EfiRecoverCacheMtrr (
   // Enable Cache MTRR
   //
   if (EnableMtrr) {
-    TempQword = AsmReadMsr64(EFI_MSR_CACHE_IA32_MTRR_DEF_TYPE);
+    TempQword  = AsmReadMsr64 (EFI_MSR_CACHE_IA32_MTRR_DEF_TYPE);
     TempQword |= (UINT64)(B_EFI_MSR_GLOBAL_MTRR_ENABLE | B_EFI_MSR_FIXED_MTRR_ENABLE);
   } else {
     TempQword = OldMtrr;
@@ -164,15 +164,15 @@ EfiRecoverCacheMtrr (
 **/
 VOID
 EfiProgramMtrr (
-  IN  UINTN                     MtrrNumber,
-  IN  EFI_PHYSICAL_ADDRESS      MemoryAddress,
-  IN  UINT64                    MemoryLength,
-  IN  EFI_MEMORY_CACHE_TYPE     MemoryCacheType,
-  IN  UINT64                    ValidMtrrAddressMask
+  IN  UINT32                 MtrrNumber,
+  IN  EFI_PHYSICAL_ADDRESS   MemoryAddress,
+  IN  UINT64                 MemoryLength,
+  IN  EFI_MEMORY_CACHE_TYPE  MemoryCacheType,
+  IN  UINT64                 ValidMtrrAddressMask
   )
 {
-  UINT64                        TempQword;
-  UINT64                        OldMtrr;
+  UINT64  TempQword;
+  UINT64  OldMtrr;
 
   if (MemoryLength == 0) {
     return;
@@ -206,11 +206,11 @@ EfiProgramMtrr (
 **/
 UINT64
 Power2MaxMemory (
-  IN UINT64                 MemoryAddress,
-  IN UINT64                 MemoryLength
+  IN UINT64  MemoryAddress,
+  IN UINT64  MemoryLength
   )
 {
-  UINT64                    Result;
+  UINT64  Result;
 
   if (MemoryLength == 0) {
     return EFI_INVALID_PARAMETER;
@@ -219,7 +219,7 @@ Power2MaxMemory (
   //
   // Compute initial power of 2 size to return
   //
-  Result = GetPowerOfTwo64(MemoryLength);
+  Result = GetPowerOfTwo64 (MemoryLength);
 
   //
   // Special case base of 0 as all ranges are valid
@@ -253,20 +253,20 @@ Power2MaxMemory (
 **/
 UINT32
 CheckMtrrAlignment (
-  IN  UINT64    BaseAddress,
-  IN  UINT64    Size
+  IN  UINT64  BaseAddress,
+  IN  UINT64  Size
   )
 {
-  UINT32      ShiftedBase;
-  UINT32      ShiftedSize;
+  UINT32  ShiftedBase;
+  UINT32  ShiftedSize;
 
   //
   // Shift base and size right 12 bits to allow for larger memory sizes.  The
   // MTRRs do not use the first 12 bits so this is safe for now.  Only supports
   // up to 52 bits of physical address space.
   //
-  ShiftedBase = (UINT32) RShiftU64 (BaseAddress, 12);
-  ShiftedSize = (UINT32) RShiftU64 (Size, 12);
+  ShiftedBase = (UINT32)RShiftU64 (BaseAddress, 12);
+  ShiftedSize = (UINT32)RShiftU64 (Size, 12);
 
   //
   // Return the results to the caller of the MOD
@@ -288,47 +288,53 @@ CheckMtrrAlignment (
 **/
 EFI_STATUS
 ProgramFixedMtrr (
-  IN  EFI_MEMORY_CACHE_TYPE     MemoryCacheType,
-  IN  UINT64                    *Base,
-  IN  UINT64                    *Len
+  IN  EFI_MEMORY_CACHE_TYPE  MemoryCacheType,
+  IN  UINT64                 *Base,
+  IN  UINT64                 *Len
   )
 {
-  UINT32                      MsrNum;
-  UINT32                      ByteShift;
-  UINT64                      TempQword;
-  UINT64                      OrMask;
-  UINT64                      ClearMask;
+  UINT32  MsrNum;
+  UINT32  ByteShift;
+  UINT64  TempQword;
+  UINT64  OrMask;
+  UINT64  ClearMask;
 
   TempQword = 0;
-  OrMask =  0;
+  OrMask    =  0;
   ClearMask = 0;
 
   for (MsrNum = 0; MsrNum < V_EFI_FIXED_MTRR_NUMBER; MsrNum++) {
     if ((*Base >= mFixedMtrrTable[MsrNum].BaseAddress) &&
-        (*Base < (mFixedMtrrTable[MsrNum].BaseAddress + 8 * mFixedMtrrTable[MsrNum].Length))) {
+        (*Base < (mFixedMtrrTable[MsrNum].BaseAddress + 8 * mFixedMtrrTable[MsrNum].Length)))
+    {
       break;
     }
   }
+
   if (MsrNum == V_EFI_FIXED_MTRR_NUMBER ) {
     return EFI_DEVICE_ERROR;
   }
+
   //
   // We found the fixed MTRR to be programmed
   //
-  for (ByteShift=0; ByteShift < 8; ByteShift++) {
+  for (ByteShift = 0; ByteShift < 8; ByteShift++) {
     if ( *Base == (mFixedMtrrTable[MsrNum].BaseAddress + ByteShift * mFixedMtrrTable[MsrNum].Length)) {
       break;
     }
   }
+
   if (ByteShift == 8 ) {
     return EFI_DEVICE_ERROR;
   }
-  for (; ((ByteShift<8) && (*Len >= mFixedMtrrTable[MsrNum].Length));ByteShift++) {
-    OrMask |= LShiftU64((UINT64) MemoryCacheType, (UINT32) (ByteShift* 8));
-    ClearMask |= LShiftU64((UINT64) 0xFF, (UINT32) (ByteShift * 8));
-    *Len -= mFixedMtrrTable[MsrNum].Length;
-    *Base += mFixedMtrrTable[MsrNum].Length;
+
+  for ( ; ((ByteShift < 8) && (*Len >= mFixedMtrrTable[MsrNum].Length)); ByteShift++) {
+    OrMask    |= LShiftU64 ((UINT64)MemoryCacheType, (UINT32)(ByteShift* 8));
+    ClearMask |= LShiftU64 ((UINT64)0xFF, (UINT32)(ByteShift * 8));
+    *Len      -= mFixedMtrrTable[MsrNum].Length;
+    *Base     += mFixedMtrrTable[MsrNum].Length;
   }
+
   TempQword = (AsmReadMsr64 (mFixedMtrrTable[MsrNum].Msr) & (~ClearMask)) | OrMask;
   AsmWriteMsr64 (mFixedMtrrTable[MsrNum].Msr, TempQword);
 
@@ -346,8 +352,8 @@ ProgramFixedMtrr (
 **/
 BOOLEAN
 CheckMtrrOverlap (
-  IN  EFI_PHYSICAL_ADDRESS      Start,
-  IN  EFI_PHYSICAL_ADDRESS      End
+  IN  EFI_PHYSICAL_ADDRESS  Start,
+  IN  EFI_PHYSICAL_ADDRESS  End
   )
 {
   return FALSE;
@@ -369,33 +375,33 @@ CheckMtrrOverlap (
 EFI_STATUS
 EFIAPI
 SetCacheAttributes (
-  IN  EFI_PHYSICAL_ADDRESS      MemoryAddress,
-  IN  UINT64                    MemoryLength,
-  IN  EFI_MEMORY_CACHE_TYPE     MemoryCacheType
+  IN  EFI_PHYSICAL_ADDRESS   MemoryAddress,
+  IN  UINT64                 MemoryLength,
+  IN  EFI_MEMORY_CACHE_TYPE  MemoryCacheType
   )
 {
-  EFI_STATUS            Status;
-  UINT32                MsrNum, MsrNumEnd;
-  UINT64                TempQword;
-  UINT32                LastVariableMtrrForBios;
-  UINT64                OldMtrr;
-  UINT32                UsedMsrNum;
-  EFI_MEMORY_CACHE_TYPE UsedMemoryCacheType;
-  UINT64                ValidMtrrAddressMask;
-  UINT32                Cpuid_RegEax;
+  EFI_STATUS             Status;
+  UINT32                 MsrNum, MsrNumEnd;
+  UINT64                 TempQword;
+  UINT32                 LastVariableMtrrForBios;
+  UINT64                 OldMtrr;
+  UINT32                 UsedMsrNum;
+  EFI_MEMORY_CACHE_TYPE  UsedMemoryCacheType;
+  UINT64                 ValidMtrrAddressMask;
+  UINT32                 Cpuid_RegEax;
 
   AsmCpuid (CPUID_EXTENDED_FUNCTION, &Cpuid_RegEax, NULL, NULL, NULL);
   if (Cpuid_RegEax >= CPUID_VIR_PHY_ADDRESS_SIZE) {
     AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &Cpuid_RegEax, NULL, NULL, NULL);
-    ValidMtrrAddressMask = (LShiftU64((UINT64) 1, (Cpuid_RegEax & 0xFF)) - 1) & (~(UINT64)0x0FFF);
+    ValidMtrrAddressMask = (LShiftU64 ((UINT64)1, (Cpuid_RegEax & 0xFF)) - 1) & (~(UINT64)0x0FFF);
   } else {
-    ValidMtrrAddressMask = (LShiftU64((UINT64) 1, 36) - 1) & (~(UINT64)0x0FFF);
+    ValidMtrrAddressMask = (LShiftU64 ((UINT64)1, 36) - 1) & (~(UINT64)0x0FFF);
   }
 
   //
   // Check for invalid parameter
   //
-  if ((MemoryAddress & ~ValidMtrrAddressMask) != 0 || (MemoryLength & ~ValidMtrrAddressMask) != 0) {
+  if (((MemoryAddress & ~ValidMtrrAddressMask) != 0) || ((MemoryLength & ~ValidMtrrAddressMask) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -424,6 +430,7 @@ SetCacheAttributes (
     while ((MemoryLength > 0) && (Status == EFI_SUCCESS)) {
       Status = ProgramFixedMtrr (MemoryCacheType, &MemoryAddress, &MemoryLength);
     }
+
     EfiRecoverCacheMtrr (TRUE, OldMtrr);
     return Status;
   }
@@ -431,15 +438,15 @@ SetCacheAttributes (
   //
   // Search if the range attribute has been set before
   //
-  Status = SearchForExactMtrr(
-                              MemoryAddress,
-                              MemoryLength,
-                              ValidMtrrAddressMask,
-                              &UsedMsrNum,
-                              &UsedMemoryCacheType
-                              );
+  Status = SearchForExactMtrr (
+             MemoryAddress,
+             MemoryLength,
+             ValidMtrrAddressMask,
+             &UsedMsrNum,
+             &UsedMemoryCacheType
+             );
 
-  if (!EFI_ERROR(Status)) {
+  if (!EFI_ERROR (Status)) {
     //
     // Compare if it has the same type as current setting
     //
@@ -453,49 +460,51 @@ SetCacheAttributes (
       //
       // Check if the set type is the same as Default Type
       //
-      if (IsDefaultType(MemoryCacheType)) {
+      if (IsDefaultType (MemoryCacheType)) {
         //
         // Clear the MTRR
         //
-        AsmWriteMsr64(UsedMsrNum, 0);
-        AsmWriteMsr64(UsedMsrNum + 1, 0);
+        AsmWriteMsr64 (UsedMsrNum, 0);
+        AsmWriteMsr64 (UsedMsrNum + 1, 0);
 
         return EFI_SUCCESS;
       } else {
         //
         // Modify the MTRR type
         //
-        EfiProgramMtrr(UsedMsrNum,
-                       MemoryAddress,
-                       MemoryLength,
-                       MemoryCacheType,
-                       ValidMtrrAddressMask
-                       );
+        EfiProgramMtrr (
+          UsedMsrNum,
+          MemoryAddress,
+          MemoryLength,
+          MemoryCacheType,
+          ValidMtrrAddressMask
+          );
         return EFI_SUCCESS;
       }
     }
   }
 
-#if 0
+ #if 0
   //
   // @bug - Need to create memory map so that when checking for overlap we
   //        can determine if an overlap exists based on all caching requests.
   //
   // Don't waste a variable MTRR if the caching attrib is same as default in MTRR_DEF_TYPE
   //
-  if (MemoryCacheType == (AsmReadMsr64(EFI_MSR_CACHE_IA32_MTRR_DEF_TYPE) & B_EFI_MSR_CACHE_MEMORY_TYPE))  {
+  if (MemoryCacheType == (AsmReadMsr64 (EFI_MSR_CACHE_IA32_MTRR_DEF_TYPE) & B_EFI_MSR_CACHE_MEMORY_TYPE)) {
     if (!CheckMtrrOverlap (MemoryAddress, MemoryAddress+MemoryLength-1)) {
       return EFI_SUCCESS;
     }
   }
-#endif
+
+ #endif
 
   //
   // Find first unused MTRR
   //
-  MsrNumEnd = EFI_MSR_CACHE_VARIABLE_MTRR_BASE + (2 * (UINT32)(AsmReadMsr64(EFI_MSR_IA32_MTRR_CAP) & B_EFI_MSR_IA32_MTRR_CAP_VARIABLE_SUPPORT));
-  for (MsrNum = EFI_MSR_CACHE_VARIABLE_MTRR_BASE; MsrNum < MsrNumEnd; MsrNum +=2) {
-    if ((AsmReadMsr64(MsrNum+1) & B_EFI_MSR_CACHE_MTRR_VALID) == 0 ) {
+  MsrNumEnd = EFI_MSR_CACHE_VARIABLE_MTRR_BASE + (2 * (UINT32)(AsmReadMsr64 (EFI_MSR_IA32_MTRR_CAP) & B_EFI_MSR_IA32_MTRR_CAP_VARIABLE_SUPPORT));
+  for (MsrNum = EFI_MSR_CACHE_VARIABLE_MTRR_BASE; MsrNum < MsrNumEnd; MsrNum += 2) {
+    if ((AsmReadMsr64 (MsrNum+1) & B_EFI_MSR_CACHE_MTRR_VALID) == 0 ) {
       break;
     }
   }
@@ -520,14 +529,14 @@ SetCacheAttributes (
   //
   TempQword = MemoryLength;
 
-  if (TempQword == Power2MaxMemory(MemoryAddress, TempQword)) {
-    EfiProgramMtrr(MsrNum,
-                   MemoryAddress,
-                   MemoryLength,
-                   MemoryCacheType,
-                   ValidMtrrAddressMask
-                   );
-
+  if (TempQword == Power2MaxMemory (MemoryAddress, TempQword)) {
+    EfiProgramMtrr (
+      MsrNum,
+      MemoryAddress,
+      MemoryLength,
+      MemoryCacheType,
+      ValidMtrrAddressMask
+      );
   } else {
     //
     // Fill in MTRRs with values.  Direction can not be checked for this method
@@ -545,16 +554,17 @@ SetCacheAttributes (
       //
       // Set next power of 2 region
       //
-      MemoryLength = Power2MaxMemory(MemoryAddress, TempQword);
-      EfiProgramMtrr(MsrNum,
-                     MemoryAddress,
-                     MemoryLength,
-                     MemoryCacheType,
-                     ValidMtrrAddressMask
-                     );
+      MemoryLength = Power2MaxMemory (MemoryAddress, TempQword);
+      EfiProgramMtrr (
+        MsrNum,
+        MemoryAddress,
+        MemoryLength,
+        MemoryCacheType,
+        ValidMtrrAddressMask
+        );
       MemoryAddress += MemoryLength;
-      TempQword -= MemoryLength;
-      MsrNum += 2;
+      TempQword     -= MemoryLength;
+      MsrNum        += 2;
     } while (TempQword != 0);
   }
 
@@ -573,12 +583,13 @@ ResetCacheAttributes (
   VOID
   )
 {
-  UINT32                      MsrNum, MsrNumEnd;
-  UINT16                      Index;
-  UINT64                      OldMtrr;
-  UINT64                      CacheType;
-  BOOLEAN                     DisableCar;
-  Index = 0;
+  UINT32   MsrNum, MsrNumEnd;
+  UINT16   Index;
+  UINT64   OldMtrr;
+  UINT64   CacheType;
+  BOOLEAN  DisableCar;
+
+  Index      = 0;
   DisableCar = TRUE;
 
   //
@@ -589,7 +600,7 @@ ResetCacheAttributes (
   //
   // Set default cache type
   //
-  AsmWriteMsr64(EFI_MSR_CACHE_IA32_MTRR_DEF_TYPE, CacheType);
+  AsmWriteMsr64 (EFI_MSR_CACHE_IA32_MTRR_DEF_TYPE, CacheType);
 
   //
   // Disable CAR
@@ -608,7 +619,7 @@ ResetCacheAttributes (
   //
   // Reset Variable MTRRs
   //
-  MsrNumEnd = EFI_MSR_CACHE_VARIABLE_MTRR_BASE + (2 * (UINT32)(AsmReadMsr64(EFI_MSR_IA32_MTRR_CAP) & B_EFI_MSR_IA32_MTRR_CAP_VARIABLE_SUPPORT));
+  MsrNumEnd = EFI_MSR_CACHE_VARIABLE_MTRR_BASE + (2 * (UINT32)(AsmReadMsr64 (EFI_MSR_IA32_MTRR_CAP) & B_EFI_MSR_IA32_MTRR_CAP_VARIABLE_SUPPORT));
   for (MsrNum = EFI_MSR_CACHE_VARIABLE_MTRR_BASE; MsrNum < MsrNumEnd; MsrNum++) {
     AsmWriteMsr64 (MsrNum, 0);
   }
@@ -636,23 +647,23 @@ ResetCacheAttributes (
 **/
 EFI_STATUS
 SearchForExactMtrr (
-  IN  EFI_PHYSICAL_ADDRESS      MemoryAddress,
-  IN  UINT64                    MemoryLength,
-  IN  UINT64                    ValidMtrrAddressMask,
-  OUT UINT32                    *UsedMsrNum,
-  OUT EFI_MEMORY_CACHE_TYPE     *UsedMemoryCacheType
+  IN  EFI_PHYSICAL_ADDRESS   MemoryAddress,
+  IN  UINT64                 MemoryLength,
+  IN  UINT64                 ValidMtrrAddressMask,
+  OUT UINT32                 *UsedMsrNum,
+  OUT EFI_MEMORY_CACHE_TYPE  *UsedMemoryCacheType
   )
 {
-  UINT32                      MsrNum, MsrNumEnd;
-  UINT64                      TempQword;
+  UINT32  MsrNum, MsrNumEnd;
+  UINT64  TempQword;
 
   if (MemoryLength == 0) {
     return EFI_INVALID_PARAMETER;
   }
 
-  MsrNumEnd = EFI_MSR_CACHE_VARIABLE_MTRR_BASE + (2 * (UINT32)(AsmReadMsr64(EFI_MSR_IA32_MTRR_CAP) & B_EFI_MSR_IA32_MTRR_CAP_VARIABLE_SUPPORT));
-  for (MsrNum = EFI_MSR_CACHE_VARIABLE_MTRR_BASE; MsrNum < MsrNumEnd; MsrNum +=2) {
-    TempQword = AsmReadMsr64(MsrNum+1);
+  MsrNumEnd = EFI_MSR_CACHE_VARIABLE_MTRR_BASE + (2 * (UINT32)(AsmReadMsr64 (EFI_MSR_IA32_MTRR_CAP) & B_EFI_MSR_IA32_MTRR_CAP_VARIABLE_SUPPORT));
+  for (MsrNum = EFI_MSR_CACHE_VARIABLE_MTRR_BASE; MsrNum < MsrNumEnd; MsrNum += 2) {
+    TempQword = AsmReadMsr64 (MsrNum+1);
     if ((TempQword & B_EFI_MSR_CACHE_MTRR_VALID) == 0) {
       continue;
     }
@@ -667,7 +678,7 @@ SearchForExactMtrr (
     }
 
     *UsedMemoryCacheType = (EFI_MEMORY_CACHE_TYPE)(TempQword & B_EFI_MSR_CACHE_MEMORY_TYPE);
-    *UsedMsrNum = MsrNum;
+    *UsedMsrNum          = MsrNum;
 
     return EFI_SUCCESS;
   }
@@ -685,13 +696,12 @@ SearchForExactMtrr (
 **/
 BOOLEAN
 IsDefaultType (
-  IN  EFI_MEMORY_CACHE_TYPE     MemoryCacheType
+  IN  EFI_MEMORY_CACHE_TYPE  MemoryCacheType
   )
 {
-  if ((AsmReadMsr64(EFI_MSR_CACHE_IA32_MTRR_DEF_TYPE) & B_EFI_MSR_CACHE_MEMORY_TYPE) != MemoryCacheType) {
+  if ((AsmReadMsr64 (EFI_MSR_CACHE_IA32_MTRR_DEF_TYPE) & B_EFI_MSR_CACHE_MEMORY_TYPE) != MemoryCacheType) {
     return FALSE;
   }
 
   return TRUE;
 }
-

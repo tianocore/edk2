@@ -1,0 +1,80 @@
+## @file
+#  SecCoreNative module that implements the SEC phase.
+#
+# This is the first module taking control after the reset vector.
+# The entry point function is _ModuleEntryPoint in PlatformSecLib.
+# The entry point function starts in 32bit protected mode or 64bit
+# mode depending on how resetvector is implemented, enables
+# temporary memory and calls into SecStartup().
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecCoreNative
+  MODULE_UNI_FILE                = SecCore.uni
+  FILE_GUID                      = 43CA74CA-7D29-49A0-B3B9-20F84015B27D
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  SecMain.c
+  SecMain.h
+  FindPeiCore.c
+  SecBist.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  PlatformSecLib
+  PcdLib
+  DebugAgentLib
+  UefiCpuLib
+  PeCoffGetEntryPointLib
+  PeCoffExtraActionLib
+  CpuExceptionHandlerLib
+  ReportStatusCodeLib
+  PeiServicesLib
+  PeiServicesTablePointerLib
+  HobLib
+
+[Ppis]
+  ## SOMETIMES_CONSUMES
+  ## PRODUCES
+  gEfiSecPlatformInformationPpiGuid
+  ## SOMETIMES_CONSUMES
+  ## SOMETIMES_PRODUCES
+  gEfiSecPlatformInformation2PpiGuid
+  gEfiTemporaryRamDonePpiGuid                          ## PRODUCES
+  ## NOTIFY
+  ## SOMETIMES_CONSUMES
+  gPeiSecPerformancePpiGuid
+  gEfiPeiCoreFvLocationPpiGuid
+  ## CONSUMES
+  gRepublishSecPpiPpiGuid
+
+[Guids]
+  ## SOMETIMES_PRODUCES   ## HOB
+  gEfiFirmwarePerformanceGuid
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdPeiTemporaryRamStackSize  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMigrateTemporaryRamFirmwareVolumes  ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SecCoreExtra.uni

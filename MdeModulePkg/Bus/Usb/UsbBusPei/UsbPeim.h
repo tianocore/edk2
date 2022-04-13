@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _PEI_USB_PEIM_H_
 #define _PEI_USB_PEIM_H_
 
-
 #include <PiPei.h>
 
 #include <Ppi/UsbHostController.h>
@@ -32,43 +31,43 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #pragma pack(1)
 typedef struct {
-  UINT8                   Len;
-  UINT8                   Type;
+  UINT8    Len;
+  UINT8    Type;
 } USB_DESC_HEAD;
 #pragma pack()
 
-#define MAX_INTERFACE             8
-#define MAX_ENDPOINT              16
+#define MAX_INTERFACE  8
+#define MAX_ENDPOINT   16
 
 #define PEI_USB_DEVICE_SIGNATURE  SIGNATURE_32 ('U', 's', 'b', 'D')
 typedef struct {
-  UINTN                         Signature;
-  PEI_USB_IO_PPI                UsbIoPpi;
-  EFI_PEI_PPI_DESCRIPTOR        UsbIoPpiList;
-  UINT16                        MaxPacketSize0;
-  UINT16                        DataToggle;
-  UINT8                         DeviceAddress;
-  UINT8                         DeviceSpeed;
-  UINT8                         IsHub;
-  UINT8                         DownStreamPortNo;
-  UINTN                         AllocateAddress;
-  PEI_USB_HOST_CONTROLLER_PPI   *UsbHcPpi;
-  PEI_USB2_HOST_CONTROLLER_PPI  *Usb2HcPpi;
-  UINT8                         ConfigurationData[1024];
-  EFI_USB_CONFIG_DESCRIPTOR     *ConfigDesc;
-  EFI_USB_INTERFACE_DESCRIPTOR  *InterfaceDesc;
-  EFI_USB_INTERFACE_DESCRIPTOR  *InterfaceDescList[MAX_INTERFACE];
-  EFI_USB_ENDPOINT_DESCRIPTOR   *EndpointDesc[MAX_ENDPOINT];
-  EFI_USB_ENDPOINT_DESCRIPTOR   *EndpointDescList[MAX_INTERFACE][MAX_ENDPOINT];
-  EFI_USB2_HC_TRANSACTION_TRANSLATOR Translator;
-  UINT8                          Tier;
+  UINTN                                 Signature;
+  PEI_USB_IO_PPI                        UsbIoPpi;
+  EFI_PEI_PPI_DESCRIPTOR                UsbIoPpiList;
+  UINT16                                MaxPacketSize0;
+  UINT16                                DataToggle;
+  UINT8                                 DeviceAddress;
+  UINT8                                 DeviceSpeed;
+  UINT8                                 IsHub;
+  UINT8                                 DownStreamPortNo;
+  UINTN                                 AllocateAddress;
+  PEI_USB_HOST_CONTROLLER_PPI           *UsbHcPpi;
+  PEI_USB2_HOST_CONTROLLER_PPI          *Usb2HcPpi;
+  UINT8                                 ConfigurationData[1024];
+  EFI_USB_CONFIG_DESCRIPTOR             *ConfigDesc;
+  EFI_USB_INTERFACE_DESCRIPTOR          *InterfaceDesc;
+  EFI_USB_INTERFACE_DESCRIPTOR          *InterfaceDescList[MAX_INTERFACE];
+  EFI_USB_ENDPOINT_DESCRIPTOR           *EndpointDesc[MAX_ENDPOINT];
+  EFI_USB_ENDPOINT_DESCRIPTOR           *EndpointDescList[MAX_INTERFACE][MAX_ENDPOINT];
+  EFI_USB2_HC_TRANSACTION_TRANSLATOR    Translator;
+  UINT8                                 Tier;
 } PEI_USB_DEVICE;
 
-#define PEI_USB_DEVICE_FROM_THIS(a) CR (a, PEI_USB_DEVICE, UsbIoPpi, PEI_USB_DEVICE_SIGNATURE)
+#define PEI_USB_DEVICE_FROM_THIS(a)  CR (a, PEI_USB_DEVICE, UsbIoPpi, PEI_USB_DEVICE_SIGNATURE)
 
-#define USB_BIT_IS_SET(Data, Bit)   ((BOOLEAN)(((Data) & (Bit)) == (Bit)))
+#define USB_BIT_IS_SET(Data, Bit)  ((BOOLEAN)(((Data) & (Bit)) == (Bit)))
 
-#define USB_BUS_1_MILLISECOND       1000
+#define USB_BUS_1_MILLISECOND  1000
 
 //
 // Wait for port reset, refers to specification
@@ -78,13 +77,13 @@ typedef struct {
 // According to USB2.0, Chapter 11.5.1.5 Resetting,
 // the worst case for TDRST is 20ms
 //
-#define USB_SET_PORT_RESET_STALL        (20 * USB_BUS_1_MILLISECOND)
-#define USB_SET_ROOT_PORT_RESET_STALL   (50 * USB_BUS_1_MILLISECOND)
+#define USB_SET_PORT_RESET_STALL       (20 * USB_BUS_1_MILLISECOND)
+#define USB_SET_ROOT_PORT_RESET_STALL  (50 * USB_BUS_1_MILLISECOND)
 
 //
 // Wait for clear roothub port reset, set by experience
 //
-#define USB_CLR_ROOT_PORT_RESET_STALL   (20 * USB_BUS_1_MILLISECOND)
+#define USB_CLR_ROOT_PORT_RESET_STALL  (20 * USB_BUS_1_MILLISECOND)
 
 //
 // Wait for port statue reg change, set by experience
@@ -95,24 +94,24 @@ typedef struct {
 // Host software return timeout if port status doesn't change
 // after 500ms(LOOP * STALL = 5000 * 0.1ms), set by experience
 //
-#define USB_WAIT_PORT_STS_CHANGE_LOOP   5000
+#define USB_WAIT_PORT_STS_CHANGE_LOOP  5000
 
 //
 // Wait for hub port power-on, refers to specification
 // [USB20-11.23.2]
 //
-#define USB_SET_PORT_POWER_STALL        (2 * USB_BUS_1_MILLISECOND)
+#define USB_SET_PORT_POWER_STALL  (2 * USB_BUS_1_MILLISECOND)
 
 //
 // Wait for set device address, refers to specification
 // [USB20-9.2.6.3, it says 2ms]
 //
-#define USB_SET_DEVICE_ADDRESS_STALL    (2 * USB_BUS_1_MILLISECOND)
+#define USB_SET_DEVICE_ADDRESS_STALL  (2 * USB_BUS_1_MILLISECOND)
 
 //
 // Wait for get configuration descriptor, set by experience
 //
-#define USB_GET_CONFIG_DESCRIPTOR_STALL (1 * USB_BUS_1_MILLISECOND)
+#define USB_GET_CONFIG_DESCRIPTOR_STALL  (1 * USB_BUS_1_MILLISECOND)
 
 /**
   Submits control transfer to a target USB device.
@@ -137,13 +136,13 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 PeiUsbControlTransfer (
-  IN     EFI_PEI_SERVICES          **PeiServices,
-  IN     PEI_USB_IO_PPI            *This,
-  IN     EFI_USB_DEVICE_REQUEST    *Request,
-  IN     EFI_USB_DATA_DIRECTION    Direction,
-  IN     UINT32                    Timeout,
-  IN OUT VOID                      *Data,      OPTIONAL
-  IN     UINTN                     DataLength  OPTIONAL
+  IN     EFI_PEI_SERVICES        **PeiServices,
+  IN     PEI_USB_IO_PPI          *This,
+  IN     EFI_USB_DEVICE_REQUEST  *Request,
+  IN     EFI_USB_DATA_DIRECTION  Direction,
+  IN     UINT32                  Timeout,
+  IN OUT VOID                    *Data       OPTIONAL,
+  IN     UINTN                   DataLength  OPTIONAL
   );
 
 /**
@@ -170,12 +169,12 @@ PeiUsbControlTransfer (
 EFI_STATUS
 EFIAPI
 PeiUsbBulkTransfer (
-  IN     EFI_PEI_SERVICES    **PeiServices,
-  IN     PEI_USB_IO_PPI      *This,
-  IN     UINT8               DeviceEndpoint,
-  IN OUT VOID                *Data,
-  IN OUT UINTN               *DataLength,
-  IN     UINTN               Timeout
+  IN     EFI_PEI_SERVICES  **PeiServices,
+  IN     PEI_USB_IO_PPI    *This,
+  IN     UINT8             DeviceEndpoint,
+  IN OUT VOID              *Data,
+  IN OUT UINTN             *DataLength,
+  IN     UINTN             Timeout
   );
 
 /**
@@ -192,9 +191,9 @@ PeiUsbBulkTransfer (
 EFI_STATUS
 EFIAPI
 PeiUsbGetInterfaceDescriptor (
-  IN  EFI_PEI_SERVICES                **PeiServices,
-  IN  PEI_USB_IO_PPI                  *This,
-  OUT EFI_USB_INTERFACE_DESCRIPTOR    **InterfaceDescriptor
+  IN  EFI_PEI_SERVICES              **PeiServices,
+  IN  PEI_USB_IO_PPI                *This,
+  OUT EFI_USB_INTERFACE_DESCRIPTOR  **InterfaceDescriptor
   );
 
 /**
@@ -212,10 +211,10 @@ PeiUsbGetInterfaceDescriptor (
 EFI_STATUS
 EFIAPI
 PeiUsbGetEndpointDescriptor (
-  IN  EFI_PEI_SERVICES               **PeiServices,
-  IN  PEI_USB_IO_PPI                 *This,
-  IN  UINT8                          EndpointIndex,
-  OUT EFI_USB_ENDPOINT_DESCRIPTOR    **EndpointDescriptor
+  IN  EFI_PEI_SERVICES             **PeiServices,
+  IN  PEI_USB_IO_PPI               *This,
+  IN  UINT8                        EndpointIndex,
+  OUT EFI_USB_ENDPOINT_DESCRIPTOR  **EndpointDescriptor
   );
 
 /**
@@ -231,8 +230,8 @@ PeiUsbGetEndpointDescriptor (
 EFI_STATUS
 EFIAPI
 PeiUsbPortReset (
-  IN EFI_PEI_SERVICES    **PeiServices,
-  IN PEI_USB_IO_PPI      *This
+  IN EFI_PEI_SERVICES  **PeiServices,
+  IN PEI_USB_IO_PPI    *This
   );
 
 /**
@@ -247,11 +246,11 @@ PeiUsbPortReset (
 **/
 VOID
 ResetRootPort (
-  IN EFI_PEI_SERVICES               **PeiServices,
-  IN PEI_USB_HOST_CONTROLLER_PPI    *UsbHcPpi,
-  IN PEI_USB2_HOST_CONTROLLER_PPI   *Usb2HcPpi,
-  IN UINT8                          PortNum,
-  IN UINT8                          RetryIndex
+  IN EFI_PEI_SERVICES              **PeiServices,
+  IN PEI_USB_HOST_CONTROLLER_PPI   *UsbHcPpi,
+  IN PEI_USB2_HOST_CONTROLLER_PPI  *Usb2HcPpi,
+  IN UINT8                         PortNum,
+  IN UINT8                         RetryIndex
   );
 
 #endif

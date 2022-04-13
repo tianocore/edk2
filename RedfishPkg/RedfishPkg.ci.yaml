@@ -34,8 +34,8 @@
             "PrivateInclude/Crt/stdlib.h",
             "PrivateInclude/Crt/string.h",
             "PrivateInclude/Crt/time.h",
-            "PrivateInclude/Library/RedfishCrtLib.h",
             "PrivateLibrary/RedfishCrtLib/RedfishCrtLib.c",
+            "Include/Library/RedfishCrtLib.h",
             ##
             ## For jansson library open source
             ## load.c is overrided from open source.

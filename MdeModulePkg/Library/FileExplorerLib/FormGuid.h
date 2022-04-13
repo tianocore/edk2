@@ -6,10 +6,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef _FILE_EXPLORER_FORM_GUID_H_
 #define _FILE_EXPLORER_FORM_GUID_H_
-
 
 #define EFI_FILE_EXPLORE_FORMSET_GUID \
   { \
@@ -26,7 +24,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define KEY_VALUE_CREATE_FOLDER_AND_EXIT     0x3002
 #define KEY_VALUE_NO_CREATE_FOLDER_AND_EXIT  0x3003
 
-#define LABEL_END                            0xffff
+#define LABEL_END  0xffff
 
 #endif
-

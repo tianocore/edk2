@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 #  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #  Portions copyright (c) 2011 - 2019, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
@@ -292,9 +292,12 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                             Required to compile nasm source:
 #                               nasm compiler from
 #                               NASM -- http://www.nasm.us/
-#                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler from
-#                               https://acpica.org/downloads
+#   CLANGDWARF -Linux, Windows, Mac-  Requires:
+#                             Clang 9 or above from http://releases.llvm.org/
+#                        Optional:
+#                             Required to compile nasm source:
+#                               nasm compiler from
+#                               NASM -- http://www.nasm.us/
 #   VS2008x86   -win64-  Requires:
 #                             Microsoft Visual Studio 2008 (x86)
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
@@ -365,8 +368,8 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 # Other Supported Tools
 # =====================
 #   NASM -- http://www.nasm.us/
-#   - NASM 2.10 or later for use with the GCC toolchain family
-#   - NASM 2.12.01 or later for use with all other toolchain families
+#   - NASM 2.15.05 or later for use with the GCC toolchain family
+#   - NASM 2.15.05 or later for use with all other toolchain families
 #
 ####################################################################################
 ####################################################################################
@@ -1859,6 +1862,7 @@ NOOPT_VS2019_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 DEBUG_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)/$(MODULE_NAME).debug
 RELEASE_*_*_OBJCOPY_ADDDEBUGFLAG   =
 NOOPT_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)/$(MODULE_NAME).debug
+*_*_*_OBJCOPY_STRIPFLAG            = --strip-unneeded -R .eh_frame
 *_*_*_DTC_FLAGS                    = -H epapr
 *_*_*_DTCPP_PATH                   = DEF(DTCPP_BIN)
 *_*_*_DTC_PATH                     = DEF(DTC_BIN)
@@ -2458,6 +2462,7 @@ RELEASE_GCC5_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 *_GCC5_RISCV64_DLINK2_FLAGS         = DEF(GCC5_RISCV64_DLINK2_FLAGS)
 *_GCC5_RISCV64_RC_FLAGS             = DEF(GCC_RISCV64_RC_FLAGS)
 *_GCC5_RISCV64_OBJCOPY_FLAGS        =
+*_GCC5_RISCV64_DTCPP_FLAGS          = DEF(GCC_DTCPP_FLAGS)
 
 ####################################################################################
 #
@@ -2492,7 +2497,7 @@ RELEASE_GCC5_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 DEFINE CLANG35_ARM_TARGET        = -target arm-linux-gnueabi
 DEFINE CLANG35_AARCH64_TARGET    = -target aarch64-linux-gnu
 
-DEFINE CLANG35_WARNING_OVERRIDES = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unknown-warning-option
+DEFINE CLANG35_WARNING_OVERRIDES = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable
 DEFINE CLANG35_ARM_CC_FLAGS      = DEF(GCC_ARM_CC_FLAGS) DEF(CLANG35_ARM_TARGET) DEF(CLANG35_WARNING_OVERRIDES)
 DEFINE CLANG35_AARCH64_CC_FLAGS  = DEF(GCC_AARCH64_CC_FLAGS) DEF(CLANG35_AARCH64_TARGET) -mcmodel=small DEF(CLANG35_WARNING_OVERRIDES)
 
@@ -2562,7 +2567,7 @@ DEFINE CLANG38_X64_PREFIX           = ENV(CLANG38_BIN)
 DEFINE CLANG38_IA32_TARGET          = -target i686-pc-linux-gnu
 DEFINE CLANG38_X64_TARGET           = -target x86_64-pc-linux-gnu
 
-DEFINE CLANG38_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option
+DEFINE CLANG38_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable
 DEFINE CLANG38_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANG38_WARNING_OVERRIDES) -fno-stack-protector -mms-bitfields -Wno-address -Wno-shift-negative-value -Wno-unknown-pragmas -Wno-incompatible-library-redeclaration -fno-asynchronous-unwind-tables -mno-sse -mno-mmx -msoft-float -mno-implicit-float  -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -funsigned-char -fno-ms-extensions -Wno-null-dereference
 
 ###########################
@@ -2826,6 +2831,106 @@ NOOPT_CLANGPDB_X64_CC_FLAGS         = DEF(CLANGPDB_ALL_CC_FLAGS) -m64 "-DEFIAPI=
 NOOPT_CLANGPDB_X64_DLINK_FLAGS      = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /ALIGN:32 /FILEALIGN:32 /Machine:X64 /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DEBUG:GHASH /MLLVM:-exception-model=wineh /lldmap
 NOOPT_CLANGPDB_X64_DLINK2_FLAGS     =
 NOOPT_CLANGPDB_X64_GENFW_FLAGS      = --keepexceptiontable
+
+####################################################################################
+#
+# CLANGDWARF - This configuration is used to compile under Windows/Linux/Mac to produce
+#  ELF binaries using LLVM/Clang/LLD with Link Time Optimization enabled
+#
+####################################################################################
+*_CLANGDWARF_*_*_FAMILY             = GCC
+*_CLANGDWARF_*_*_BUILDRULEFAMILY    = CLANGGCC
+*_CLANGDWARF_*_MAKE_PATH            = ENV(CLANG_HOST_BIN)make
+*_CLANGDWARF_*_*_DLL                = ENV(CLANGDWARF_DLL)
+*_CLANGDWARF_*_ASL_PATH             = DEF(UNIX_IASL_BIN)
+
+*_CLANGDWARF_*_APP_FLAGS            =
+*_CLANGDWARF_*_ASL_FLAGS            = DEF(IASL_FLAGS)
+*_CLANGDWARF_*_ASL_OUTFLAGS         = DEF(IASL_OUTFLAGS)
+
+DEFINE CLANGDWARF_IA32_PREFIX       = ENV(CLANG_BIN)
+DEFINE CLANGDWARF_X64_PREFIX        = ENV(CLANG_BIN)
+
+# LLVM/CLANG doesn't support -n link option. So, it can't share the same IA32_X64_DLINK_COMMON flag.
+# LLVM/CLANG doesn't support common page size. So, it can't share the same GccBase.lds script.
+DEFINE CLANGDWARF_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-q,--gc-sections -z max-page-size=0x40
+DEFINE CLANGDWARF_DLINK2_FLAGS_COMMON     = -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/ClangBase.lds
+DEFINE CLANGDWARF_IA32_X64_ASLDLINK_FLAGS = DEF(CLANGDWARF_IA32_X64_DLINK_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0 DEF(CLANGDWARF_DLINK2_FLAGS_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
+DEFINE CLANGDWARF_IA32_X64_DLINK_FLAGS    = DEF(CLANGDWARF_IA32_X64_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map,--whole-archive
+DEFINE CLANGDWARF_IA32_DLINK2_FLAGS       = -Wl,--defsym=PECOFF_HEADER_SIZE=0x220 DEF(CLANGDWARF_DLINK2_FLAGS_COMMON)
+DEFINE CLANGDWARF_X64_DLINK2_FLAGS        = -Wl,--defsym=PECOFF_HEADER_SIZE=0x228 DEF(CLANGDWARF_DLINK2_FLAGS_COMMON)
+
+###########################
+# CLANGDWARF IA32 definitions
+###########################
+*_CLANGDWARF_IA32_CC_PATH              = DEF(CLANGDWARF_IA32_PREFIX)clang
+*_CLANGDWARF_IA32_SLINK_PATH           = DEF(CLANGDWARF_IA32_PREFIX)llvm-ar
+*_CLANGDWARF_IA32_DLINK_PATH           = DEF(CLANGDWARF_IA32_PREFIX)clang
+*_CLANGDWARF_IA32_ASLDLINK_PATH        = DEF(CLANGDWARF_IA32_PREFIX)clang
+*_CLANGDWARF_IA32_ASM_PATH             = DEF(CLANGDWARF_IA32_PREFIX)clang
+*_CLANGDWARF_IA32_PP_PATH              = DEF(CLANGDWARF_IA32_PREFIX)clang
+*_CLANGDWARF_IA32_VFRPP_PATH           = DEF(CLANGDWARF_IA32_PREFIX)clang
+*_CLANGDWARF_IA32_ASLCC_PATH           = DEF(CLANGDWARF_IA32_PREFIX)clang
+*_CLANGDWARF_IA32_ASLPP_PATH           = DEF(CLANGDWARF_IA32_PREFIX)clang
+*_CLANGDWARF_IA32_RC_PATH              = DEF(CLANGDWARF_IA32_PREFIX)llvm-rc
+
+*_CLANGDWARF_IA32_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m32 -fno-lto DEF(CLANG38_IA32_TARGET)
+*_CLANGDWARF_IA32_ASLDLINK_FLAGS       = DEF(CLANGDWARF_IA32_X64_ASLDLINK_FLAGS) -Wl,-m,elf_i386 -fuse-ld=lld
+*_CLANGDWARF_IA32_ASM_FLAGS            = DEF(GCC5_ASM_FLAGS) -m32 -march=i386 DEF(CLANG38_IA32_TARGET)
+*_CLANGDWARF_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
+*_CLANGDWARF_IA32_OBJCOPY_FLAGS        =
+*_CLANGDWARF_IA32_NASM_FLAGS           = -f elf32
+*_CLANGDWARF_IA32_PP_FLAGS             = DEF(GCC_PP_FLAGS) DEF(CLANG38_IA32_TARGET)
+*_CLANGDWARF_IA32_ASLPP_FLAGS          = DEF(GCC_ASLPP_FLAGS) DEF(CLANG38_IA32_TARGET)
+*_CLANGDWARF_IA32_VFRPP_FLAGS          = DEF(GCC_VFRPP_FLAGS) DEF(CLANG38_IA32_TARGET)
+
+DEBUG_CLANGDWARF_IA32_CC_FLAGS         = DEF(CLANG38_ALL_CC_FLAGS) -m32 -Oz -flto -march=i586 DEF(CLANG38_IA32_TARGET) -g
+DEBUG_CLANGDWARF_IA32_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
+DEBUG_CLANGDWARF_IA32_DLINK2_FLAGS     = DEF(CLANGDWARF_IA32_DLINK2_FLAGS) -O3 -fuse-ld=lld
+
+RELEASE_CLANGDWARF_IA32_CC_FLAGS       = DEF(CLANG38_ALL_CC_FLAGS) -m32 -Oz -flto -march=i586 DEF(CLANG38_IA32_TARGET)
+RELEASE_CLANGDWARF_IA32_DLINK_FLAGS    = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
+RELEASE_CLANGDWARF_IA32_DLINK2_FLAGS   = DEF(CLANGDWARF_IA32_DLINK2_FLAGS) -O3 -fuse-ld=lld
+
+NOOPT_CLANGDWARF_IA32_CC_FLAGS         = DEF(CLANG38_ALL_CC_FLAGS) -m32 -O0 -march=i586 DEF(CLANG38_IA32_TARGET) -g
+NOOPT_CLANGDWARF_IA32_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -Wl,-O0 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
+NOOPT_CLANGDWARF_IA32_DLINK2_FLAGS     = DEF(CLANGDWARF_IA32_DLINK2_FLAGS) -O0 -fuse-ld=lld
+
+##########################
+# CLANGDWARF X64 definitions
+##########################
+*_CLANGDWARF_X64_CC_PATH              = DEF(CLANGDWARF_X64_PREFIX)clang
+*_CLANGDWARF_X64_SLINK_PATH           = DEF(CLANGDWARF_X64_PREFIX)llvm-ar
+*_CLANGDWARF_X64_DLINK_PATH           = DEF(CLANGDWARF_X64_PREFIX)clang
+*_CLANGDWARF_X64_ASLDLINK_PATH        = DEF(CLANGDWARF_X64_PREFIX)clang
+*_CLANGDWARF_X64_ASM_PATH             = DEF(CLANGDWARF_X64_PREFIX)clang
+*_CLANGDWARF_X64_PP_PATH              = DEF(CLANGDWARF_X64_PREFIX)clang
+*_CLANGDWARF_X64_VFRPP_PATH           = DEF(CLANGDWARF_X64_PREFIX)clang
+*_CLANGDWARF_X64_ASLCC_PATH           = DEF(CLANGDWARF_X64_PREFIX)clang
+*_CLANGDWARF_X64_ASLPP_PATH           = DEF(CLANGDWARF_X64_PREFIX)clang
+*_CLANGDWARF_X64_RC_PATH              = DEF(CLANGDWARF_X64_PREFIX)llvm-rc
+
+*_CLANGDWARF_X64_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m64 -fno-lto DEF(CLANG38_X64_TARGET)
+*_CLANGDWARF_X64_ASLDLINK_FLAGS       = DEF(CLANGDWARF_IA32_X64_ASLDLINK_FLAGS) -Wl,-m,elf_x86_64 -fuse-ld=lld
+*_CLANGDWARF_X64_ASM_FLAGS            = DEF(GCC5_ASM_FLAGS) -m64 DEF(CLANG38_X64_TARGET)
+*_CLANGDWARF_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
+*_CLANGDWARF_X64_OBJCOPY_FLAGS        =
+*_CLANGDWARF_X64_NASM_FLAGS           = -f elf64
+*_CLANGDWARF_X64_PP_FLAGS             = DEF(GCC_PP_FLAGS) DEF(CLANG38_X64_TARGET)
+*_CLANGDWARF_X64_ASLPP_FLAGS          = DEF(GCC_ASLPP_FLAGS) DEF(CLANG38_X64_TARGET)
+*_CLANGDWARF_X64_VFRPP_FLAGS          = DEF(GCC_VFRPP_FLAGS) DEF(CLANG38_X64_TARGET)
+
+DEBUG_CLANGDWARF_X64_CC_FLAGS         = DEF(CLANG38_ALL_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -mcmodel=small -fpie -Oz -flto DEF(CLANG38_X64_TARGET) -g
+DEBUG_CLANGDWARF_X64_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
+DEBUG_CLANGDWARF_X64_DLINK2_FLAGS     = DEF(CLANGDWARF_X64_DLINK2_FLAGS) -O3 -fuse-ld=lld
+
+RELEASE_CLANGDWARF_X64_CC_FLAGS       = DEF(CLANG38_ALL_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -mcmodel=small -fpie -Oz -flto DEF(CLANG38_X64_TARGET)
+RELEASE_CLANGDWARF_X64_DLINK_FLAGS    = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
+RELEASE_CLANGDWARF_X64_DLINK2_FLAGS   = DEF(CLANGDWARF_X64_DLINK2_FLAGS) -O3 -fuse-ld=lld
+
+NOOPT_CLANGDWARF_X64_CC_FLAGS         = DEF(CLANG38_ALL_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -mcmodel=small -fpie -O0 DEF(CLANG38_X64_TARGET) -g
+NOOPT_CLANGDWARF_X64_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -Wl,-O0 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
+NOOPT_CLANGDWARF_X64_DLINK2_FLAGS     = DEF(CLANGDWARF_X64_DLINK2_FLAGS) -O0 -fuse-ld=lld
 
 #
 #

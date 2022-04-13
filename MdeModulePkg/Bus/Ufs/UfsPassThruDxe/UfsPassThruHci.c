@@ -2,7 +2,7 @@
   UfsPassThruDxe driver is used to produce EFI_EXT_SCSI_PASS_THRU protocol interface
   for upper layer application to execute UFS-supported SCSI cmds.
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -25,9 +25,9 @@
 **/
 EFI_STATUS
 UfsMmioRead32 (
-  IN     UFS_PASS_THRU_PRIVATE_DATA   *Private,
-  IN     UINTN                        Offset,
-     OUT UINT32                       *Value
+  IN     UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN     UINTN                       Offset,
+  OUT UINT32                         *Value
   )
 {
   EDKII_UFS_HOST_CONTROLLER_PROTOCOL  *UfsHc;
@@ -55,9 +55,9 @@ UfsMmioRead32 (
 **/
 EFI_STATUS
 UfsMmioWrite32 (
-  IN  UFS_PASS_THRU_PRIVATE_DATA   *Private,
-  IN  UINTN                        Offset,
-  IN  UINT32                       Value
+  IN  UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN  UINTN                       Offset,
+  IN  UINT32                      Value
   )
 {
   EDKII_UFS_HOST_CONTROLLER_PROTOCOL  *UfsHc;
@@ -87,17 +87,17 @@ UfsMmioWrite32 (
 **/
 EFI_STATUS
 UfsWaitMemSet (
-  IN  UFS_PASS_THRU_PRIVATE_DATA   *Private,
-  IN  UINTN                        Offset,
-  IN  UINT32                       MaskValue,
-  IN  UINT32                       TestValue,
-  IN  UINT64                       Timeout
+  IN  UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN  UINTN                       Offset,
+  IN  UINT32                      MaskValue,
+  IN  UINT32                      TestValue,
+  IN  UINT64                      Timeout
   )
 {
-  UINT32     Value;
-  UINT64     Delay;
-  BOOLEAN    InfiniteWait;
-  EFI_STATUS Status;
+  UINT32      Value;
+  UINT64      Delay;
+  BOOLEAN     InfiniteWait;
+  EFI_STATUS  Status;
 
   if (Timeout == 0) {
     InfiniteWait = TRUE;
@@ -128,7 +128,6 @@ UfsWaitMemSet (
     MicroSecondDelay (1);
 
     Delay--;
-
   } while (InfiniteWait || (Delay > 0));
 
   return EFI_TIMEOUT;
@@ -143,8 +142,8 @@ UfsWaitMemSet (
 **/
 VOID
 DumpUicCmdExecResult (
-  IN  UINT8     UicOpcode,
-  IN  UINT8     Result
+  IN  UINT8  UicOpcode,
+  IN  UINT8  Result
   )
 {
   if (UicOpcode <= UfsUicDmePeerSet) {
@@ -181,7 +180,7 @@ DumpUicCmdExecResult (
       case 0x0A:
         DEBUG ((DEBUG_VERBOSE, "UIC configuration command fails - DME_FAILURE\n"));
         break;
-      default :
+      default:
         ASSERT (FALSE);
         break;
     }
@@ -192,7 +191,7 @@ DumpUicCmdExecResult (
       case 0x01:
         DEBUG ((DEBUG_VERBOSE, "UIC control command fails - FAILURE\n"));
         break;
-      default :
+      default:
         ASSERT (FALSE);
         break;
     }
@@ -207,7 +206,7 @@ DumpUicCmdExecResult (
 **/
 VOID
 DumpQueryResponseResult (
-  IN  UINT8     Result
+  IN  UINT8  Result
   )
 {
   switch (Result) {
@@ -241,7 +240,7 @@ DumpQueryResponseResult (
     case 0xFF:
       DEBUG ((DEBUG_VERBOSE, "Query Response with General Failure\n"));
       break;
-    default :
+    default:
       ASSERT (FALSE);
       break;
   }
@@ -257,18 +256,18 @@ DumpQueryResponseResult (
 **/
 VOID
 SwapLittleEndianToBigEndian (
-  IN OUT UINT8         *Buffer,
-  IN     UINT32        BufferSize
+  IN OUT UINT8   *Buffer,
+  IN     UINT32  BufferSize
   )
 {
-  UINT32 Index;
-  UINT8  Temp;
-  UINT32 SwapCount;
+  UINT32  Index;
+  UINT8   Temp;
+  UINT32  SwapCount;
 
   SwapCount = BufferSize / 2;
   for (Index = 0; Index < SwapCount; Index++) {
-    Temp = Buffer[Index];
-    Buffer[Index] = Buffer[BufferSize - 1 - Index];
+    Temp                           = Buffer[Index];
+    Buffer[Index]                  = Buffer[BufferSize - 1 - Index];
     Buffer[BufferSize - 1 - Index] = Temp;
   }
 }
@@ -287,32 +286,32 @@ SwapLittleEndianToBigEndian (
 **/
 VOID
 UfsFillTsfOfQueryReqUpiu (
-  IN OUT UTP_UPIU_TSF        *TsfBase,
-  IN     UINT8               Opcode,
-  IN     UINT8               DescId    OPTIONAL,
-  IN     UINT8               Index     OPTIONAL,
-  IN     UINT8               Selector  OPTIONAL,
-  IN     UINT16              Length    OPTIONAL,
-  IN     UINT32              Value     OPTIONAL
+  IN OUT UTP_UPIU_TSF  *TsfBase,
+  IN     UINT8         Opcode,
+  IN     UINT8         DescId    OPTIONAL,
+  IN     UINT8         Index     OPTIONAL,
+  IN     UINT8         Selector  OPTIONAL,
+  IN     UINT16        Length    OPTIONAL,
+  IN     UINT32        Value     OPTIONAL
   )
 {
   ASSERT (TsfBase != NULL);
   ASSERT (Opcode <= UtpQueryFuncOpcodeTogFlag);
 
-  TsfBase->Opcode   = Opcode;
+  TsfBase->Opcode = Opcode;
   if (Opcode != UtpQueryFuncOpcodeNop) {
     TsfBase->DescId   = DescId;
     TsfBase->Index    = Index;
     TsfBase->Selector = Selector;
 
     if ((Opcode == UtpQueryFuncOpcodeRdDesc) || (Opcode == UtpQueryFuncOpcodeWrDesc)) {
-      SwapLittleEndianToBigEndian ((UINT8*)&Length, sizeof (Length));
+      SwapLittleEndianToBigEndian ((UINT8 *)&Length, sizeof (Length));
       TsfBase->Length = Length;
     }
 
     if (Opcode == UtpQueryFuncOpcodeWrAttr) {
-      SwapLittleEndianToBigEndian ((UINT8*)&Value, sizeof (Value));
-      TsfBase->Value  = Value;
+      SwapLittleEndianToBigEndian ((UINT8 *)&Value, sizeof (Value));
+      TsfBase->Value = Value;
     }
   }
 }
@@ -333,16 +332,16 @@ UfsFillTsfOfQueryReqUpiu (
 **/
 EFI_STATUS
 UfsInitCommandUpiu (
-  IN OUT UTP_COMMAND_UPIU              *Command,
-  IN     UINT8                         Lun,
-  IN     UINT8                         TaskTag,
-  IN     UINT8                         *Cdb,
-  IN     UINT8                         CdbLength,
-  IN     UFS_DATA_DIRECTION            DataDirection,
-  IN     UINT32                        ExpDataTranLen
+  IN OUT UTP_COMMAND_UPIU    *Command,
+  IN     UINT8               Lun,
+  IN     UINT8               TaskTag,
+  IN     UINT8               *Cdb,
+  IN     UINT8               CdbLength,
+  IN     UFS_DATA_DIRECTION  DataDirection,
+  IN     UINT32              ExpDataTranLen
   )
 {
-  UINT8                   Flags;
+  UINT8  Flags;
 
   ASSERT ((Command != NULL) && (Cdb != NULL));
 
@@ -365,7 +364,7 @@ UfsInitCommandUpiu (
   Command->Lun       = Lun;
   Command->TaskTag   = TaskTag;
   Command->CmdSet    = 0x00;
-  SwapLittleEndianToBigEndian ((UINT8*)&ExpDataTranLen, sizeof (ExpDataTranLen));
+  SwapLittleEndianToBigEndian ((UINT8 *)&ExpDataTranLen, sizeof (ExpDataTranLen));
   Command->ExpDataTranLen = ExpDataTranLen;
 
   CopyMem (Command->Cdb, Cdb, CdbLength);
@@ -385,15 +384,15 @@ UfsInitCommandUpiu (
 **/
 EFI_STATUS
 UfsInitUtpPrdt (
-  IN  UTP_TR_PRD                       *Prdt,
-  IN  VOID                             *Buffer,
-  IN  UINT32                           BufferSize
+  IN  UTP_TR_PRD  *Prdt,
+  IN  VOID        *Buffer,
+  IN  UINT32      BufferSize
   )
 {
-  UINT32     PrdtIndex;
-  UINT32     RemainingLen;
-  UINT8      *Remaining;
-  UINTN      PrdtNumber;
+  UINT32  PrdtIndex;
+  UINT32  RemainingLen;
+  UINT8   *Remaining;
+  UINTN   PrdtNumber;
 
   ASSERT (((UINTN)Buffer & (BIT0 | BIT1)) == 0);
   ASSERT ((BufferSize & (BIT1 | BIT0)) == 0);
@@ -415,8 +414,8 @@ UfsInitUtpPrdt (
 
     Prdt[PrdtIndex].DbAddr  = (UINT32)RShiftU64 ((UINT64)(UINTN)Remaining, 2);
     Prdt[PrdtIndex].DbAddrU = (UINT32)RShiftU64 ((UINT64)(UINTN)Remaining, 32);
-    RemainingLen -= UFS_MAX_DATA_LEN_PER_PRD;
-    Remaining    += UFS_MAX_DATA_LEN_PER_PRD;
+    RemainingLen           -= UFS_MAX_DATA_LEN_PER_PRD;
+    Remaining              += UFS_MAX_DATA_LEN_PER_PRD;
   }
 
   return EFI_SUCCESS;
@@ -439,14 +438,14 @@ UfsInitUtpPrdt (
 **/
 EFI_STATUS
 UfsInitQueryRequestUpiu (
-  IN OUT UTP_QUERY_REQ_UPIU            *QueryReq,
-  IN     UINT8                         TaskTag,
-  IN     UINT8                         Opcode,
-  IN     UINT8                         DescId,
-  IN     UINT8                         Index,
-  IN     UINT8                         Selector,
-  IN     UINTN                         DataSize   OPTIONAL,
-  IN     UINT8                         *Data      OPTIONAL
+  IN OUT UTP_QUERY_REQ_UPIU  *QueryReq,
+  IN     UINT8               TaskTag,
+  IN     UINT8               Opcode,
+  IN     UINT8               DescId,
+  IN     UINT8               Index,
+  IN     UINT8               Selector,
+  IN     UINTN               DataSize   OPTIONAL,
+  IN     UINT8               *Data      OPTIONAL
   )
 {
   ASSERT (QueryReq != NULL);
@@ -460,7 +459,7 @@ UfsInitQueryRequestUpiu (
   }
 
   if (Opcode == UtpQueryFuncOpcodeWrAttr) {
-    UfsFillTsfOfQueryReqUpiu (&QueryReq->Tsf, Opcode, DescId, Index, Selector, 0, *(UINT32*)Data);
+    UfsFillTsfOfQueryReqUpiu (&QueryReq->Tsf, Opcode, DescId, Index, Selector, 0, *(UINT32 *)Data);
   } else if ((Opcode == UtpQueryFuncOpcodeRdDesc) || (Opcode == UtpQueryFuncOpcodeWrDesc)) {
     UfsFillTsfOfQueryReqUpiu (&QueryReq->Tsf, Opcode, DescId, Index, Selector, (UINT16)DataSize, 0);
   } else {
@@ -470,7 +469,7 @@ UfsInitQueryRequestUpiu (
   if (Opcode == UtpQueryFuncOpcodeWrDesc) {
     CopyMem (QueryReq + 1, Data, DataSize);
 
-    SwapLittleEndianToBigEndian ((UINT8*)&DataSize, sizeof (UINT16));
+    SwapLittleEndianToBigEndian ((UINT8 *)&DataSize, sizeof (UINT16));
     QueryReq->DataSegLen = (UINT16)DataSize;
   }
 
@@ -498,17 +497,17 @@ UfsCreateScsiCommandDesc (
   IN     UINT8                                       Lun,
   IN     EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet,
   IN     UTP_TRD                                     *Trd,
-     OUT VOID                                        **CmdDescHost,
-     OUT VOID                                        **CmdDescMapping
+  OUT VOID                                           **CmdDescHost,
+  OUT VOID                                           **CmdDescMapping
   )
 {
-  UINTN                             TotalLen;
-  UINTN                             PrdtNumber;
-  UTP_COMMAND_UPIU                  *CommandUpiu;
-  EFI_PHYSICAL_ADDRESS              CmdDescPhyAddr;
-  EFI_STATUS                        Status;
-  UINT32                            DataLen;
-  UFS_DATA_DIRECTION                DataDirection;
+  UINTN                 TotalLen;
+  UINTN                 PrdtNumber;
+  UTP_COMMAND_UPIU      *CommandUpiu;
+  EFI_PHYSICAL_ADDRESS  CmdDescPhyAddr;
+  EFI_STATUS            Status;
+  UINT32                DataLen;
+  UFS_DATA_DIRECTION    DataDirection;
 
   ASSERT ((Private != NULL) && (Packet != NULL) && (Trd != NULL));
 
@@ -526,14 +525,14 @@ UfsCreateScsiCommandDesc (
 
   PrdtNumber = (UINTN)DivU64x32 ((UINT64)DataLen + UFS_MAX_DATA_LEN_PER_PRD - 1, UFS_MAX_DATA_LEN_PER_PRD);
 
-  TotalLen   = ROUNDUP8 (sizeof (UTP_COMMAND_UPIU)) + ROUNDUP8 (sizeof (UTP_RESPONSE_UPIU)) + PrdtNumber * sizeof (UTP_TR_PRD);
+  TotalLen = ROUNDUP8 (sizeof (UTP_COMMAND_UPIU)) + ROUNDUP8 (sizeof (UTP_RESPONSE_UPIU)) + PrdtNumber * sizeof (UTP_TR_PRD);
 
   Status = UfsAllocateAlignCommonBuffer (Private, TotalLen, CmdDescHost, &CmdDescPhyAddr, CmdDescMapping);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  CommandUpiu = (UTP_COMMAND_UPIU*)*CmdDescHost;
+  CommandUpiu = (UTP_COMMAND_UPIU *)*CmdDescHost;
 
   UfsInitCommandUpiu (CommandUpiu, Lun, Private->TaskTag++, Packet->Cdb, Packet->CdbLength, DataDirection, DataLen);
 
@@ -575,18 +574,18 @@ UfsCreateDMCommandDesc (
   IN     UFS_PASS_THRU_PRIVATE_DATA            *Private,
   IN     UFS_DEVICE_MANAGEMENT_REQUEST_PACKET  *Packet,
   IN     UTP_TRD                               *Trd,
-     OUT VOID                                  **CmdDescHost,
-     OUT VOID                                  **CmdDescMapping
+  OUT VOID                                     **CmdDescHost,
+  OUT VOID                                     **CmdDescMapping
   )
 {
-  UINTN                         TotalLen;
-  UTP_QUERY_REQ_UPIU            *QueryReqUpiu;
-  UINT8                         Opcode;
-  UINT32                        DataSize;
-  UINT8                         *Data;
-  UINT8                         DataDirection;
-  EFI_PHYSICAL_ADDRESS          CmdDescPhyAddr;
-  EFI_STATUS                    Status;
+  UINTN                 TotalLen;
+  UTP_QUERY_REQ_UPIU    *QueryReqUpiu;
+  UINT8                 Opcode;
+  UINT32                DataSize;
+  UINT8                 *Data;
+  UINT8                 DataDirection;
+  EFI_PHYSICAL_ADDRESS  CmdDescPhyAddr;
+  EFI_STATUS            Status;
 
   ASSERT ((Private != NULL) && (Packet != NULL) && (Trd != NULL));
 
@@ -600,9 +599,10 @@ UfsCreateDMCommandDesc (
   Data          = Packet->DataBuffer;
 
   if ((Opcode == UtpQueryFuncOpcodeWrDesc) || (Opcode == UtpQueryFuncOpcodeRdDesc)) {
-    if (DataSize == 0 || Data == NULL) {
+    if ((DataSize == 0) || (Data == NULL)) {
       return EFI_INVALID_PARAMETER;
     }
+
     TotalLen = ROUNDUP8 (sizeof (UTP_QUERY_REQ_UPIU)) + ROUNDUP8 (sizeof (UTP_QUERY_RESP_UPIU)) + ROUNDUP8 (DataSize);
   } else {
     TotalLen = ROUNDUP8 (sizeof (UTP_QUERY_REQ_UPIU)) + ROUNDUP8 (sizeof (UTP_QUERY_RESP_UPIU));
@@ -616,7 +616,7 @@ UfsCreateDMCommandDesc (
   //
   // Initialize UTP QUERY REQUEST UPIU
   //
-  QueryReqUpiu = (UTP_QUERY_REQ_UPIU*)*CmdDescHost;
+  QueryReqUpiu = (UTP_QUERY_REQ_UPIU *)*CmdDescHost;
   ASSERT (QueryReqUpiu != NULL);
   UfsInitQueryRequestUpiu (
     QueryReqUpiu,
@@ -640,11 +640,11 @@ UfsCreateDMCommandDesc (
   Trd->UcdBa  = (UINT32)RShiftU64 ((UINT64)CmdDescPhyAddr, 7);
   Trd->UcdBaU = (UINT32)RShiftU64 ((UINT64)CmdDescPhyAddr, 32);
   if (Opcode == UtpQueryFuncOpcodeWrDesc) {
-    Trd->RuL  = (UINT16)DivU64x32 ((UINT64)ROUNDUP8 (sizeof (UTP_QUERY_RESP_UPIU)), sizeof (UINT32));
-    Trd->RuO  = (UINT16)DivU64x32 ((UINT64)ROUNDUP8 (sizeof (UTP_QUERY_REQ_UPIU)) + ROUNDUP8 (DataSize), sizeof (UINT32));
+    Trd->RuL = (UINT16)DivU64x32 ((UINT64)ROUNDUP8 (sizeof (UTP_QUERY_RESP_UPIU)), sizeof (UINT32));
+    Trd->RuO = (UINT16)DivU64x32 ((UINT64)ROUNDUP8 (sizeof (UTP_QUERY_REQ_UPIU)) + ROUNDUP8 (DataSize), sizeof (UINT32));
   } else {
-    Trd->RuL  = (UINT16)DivU64x32 ((UINT64)ROUNDUP8 (sizeof (UTP_QUERY_RESP_UPIU)) + ROUNDUP8 (DataSize), sizeof (UINT32));
-    Trd->RuO  = (UINT16)DivU64x32 ((UINT64)ROUNDUP8 (sizeof (UTP_QUERY_REQ_UPIU)), sizeof (UINT32));
+    Trd->RuL = (UINT16)DivU64x32 ((UINT64)ROUNDUP8 (sizeof (UTP_QUERY_RESP_UPIU)) + ROUNDUP8 (DataSize), sizeof (UINT32));
+    Trd->RuO = (UINT16)DivU64x32 ((UINT64)ROUNDUP8 (sizeof (UTP_QUERY_REQ_UPIU)), sizeof (UINT32));
   }
 
   return EFI_SUCCESS;
@@ -665,16 +665,16 @@ UfsCreateDMCommandDesc (
 **/
 EFI_STATUS
 UfsCreateNopCommandDesc (
-  IN     UFS_PASS_THRU_PRIVATE_DATA        *Private,
-  IN     UTP_TRD                           *Trd,
-     OUT VOID                              **CmdDescHost,
-     OUT VOID                              **CmdDescMapping
+  IN     UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN     UTP_TRD                     *Trd,
+  OUT VOID                           **CmdDescHost,
+  OUT VOID                           **CmdDescMapping
   )
 {
-  UINTN                    TotalLen;
-  UTP_NOP_OUT_UPIU         *NopOutUpiu;
-  EFI_STATUS               Status;
-  EFI_PHYSICAL_ADDRESS     CmdDescPhyAddr;
+  UINTN                 TotalLen;
+  UTP_NOP_OUT_UPIU      *NopOutUpiu;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  CmdDescPhyAddr;
 
   ASSERT ((Private != NULL) && (Trd != NULL));
 
@@ -684,7 +684,7 @@ UfsCreateNopCommandDesc (
     return Status;
   }
 
-  NopOutUpiu = (UTP_NOP_OUT_UPIU*)*CmdDescHost;
+  NopOutUpiu = (UTP_NOP_OUT_UPIU *)*CmdDescHost;
   ASSERT (NopOutUpiu != NULL);
   NopOutUpiu->TaskTag = Private->TaskTag++;
 
@@ -716,23 +716,23 @@ UfsCreateNopCommandDesc (
 **/
 EFI_STATUS
 UfsFindAvailableSlotInTrl (
-  IN     UFS_PASS_THRU_PRIVATE_DATA   *Private,
-     OUT UINT8                        *Slot
+  IN     UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  OUT UINT8                          *Slot
   )
 {
-  UINT8            Nutrs;
-  UINT8            Index;
-  UINT32           Data;
-  EFI_STATUS       Status;
+  UINT8       Nutrs;
+  UINT8       Index;
+  UINT32      Data;
+  EFI_STATUS  Status;
 
   ASSERT ((Private != NULL) && (Slot != NULL));
 
-  Status  = UfsMmioRead32 (Private, UFS_HC_UTRLDBR_OFFSET, &Data);
+  Status = UfsMmioRead32 (Private, UFS_HC_UTRLDBR_OFFSET, &Data);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Nutrs   = (UINT8)((Private->UfsHcInfo.Capabilities & UFS_HC_CAP_NUTRS) + 1);
+  Nutrs = (UINT8)((Private->UfsHcInfo.Capabilities & UFS_HC_CAP_NUTRS) + 1);
 
   for (Index = 0; Index < Nutrs; Index++) {
     if ((Data & (BIT0 << Index)) == 0) {
@@ -744,7 +744,6 @@ UfsFindAvailableSlotInTrl (
   return EFI_NOT_READY;
 }
 
-
 /**
   Start specified slot in transfer list of a UFS device.
 
@@ -754,12 +753,12 @@ UfsFindAvailableSlotInTrl (
 **/
 EFI_STATUS
 UfsStartExecCmd (
-  IN  UFS_PASS_THRU_PRIVATE_DATA   *Private,
-  IN  UINT8                        Slot
+  IN  UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN  UINT8                       Slot
   )
 {
-  UINT32        Data;
-  EFI_STATUS    Status;
+  UINT32      Data;
+  EFI_STATUS  Status;
 
   Status = UfsMmioRead32 (Private, UFS_HC_UTRLRSR_OFFSET, &Data);
   if (EFI_ERROR (Status)) {
@@ -790,12 +789,12 @@ UfsStartExecCmd (
 **/
 EFI_STATUS
 UfsStopExecCmd (
-  IN  UFS_PASS_THRU_PRIVATE_DATA   *Private,
-  IN  UINT8                        Slot
+  IN  UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN  UINT8                       Slot
   )
 {
-  UINT32        Data;
-  EFI_STATUS    Status;
+  UINT32      Data;
+  EFI_STATUS  Status;
 
   Status = UfsMmioRead32 (Private, UFS_HC_UTRLDBR_OFFSET, &Data);
   if (EFI_ERROR (Status)) {
@@ -837,14 +836,14 @@ UfsGetReturnDataFromQueryResponse (
   UINT16  ReturnDataSize;
   UINT32  ReturnData;
 
-  if (Packet == NULL || QueryResp == NULL) {
+  if ((Packet == NULL) || (QueryResp == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   switch (Packet->Opcode) {
     case UtpQueryFuncOpcodeRdDesc:
       ReturnDataSize = QueryResp->Tsf.Length;
-      SwapLittleEndianToBigEndian ((UINT8*)&ReturnDataSize, sizeof (UINT16));
+      SwapLittleEndianToBigEndian ((UINT8 *)&ReturnDataSize, sizeof (UINT16));
       //
       // Make sure the hardware device does not return more data than expected.
       //
@@ -857,7 +856,7 @@ UfsGetReturnDataFromQueryResponse (
       break;
     case UtpQueryFuncOpcodeWrDesc:
       ReturnDataSize = QueryResp->Tsf.Length;
-      SwapLittleEndianToBigEndian ((UINT8*)&ReturnDataSize, sizeof (UINT16));
+      SwapLittleEndianToBigEndian ((UINT8 *)&ReturnDataSize, sizeof (UINT16));
       Packet->TransferLength = ReturnDataSize;
       break;
     case UtpQueryFuncOpcodeRdFlag:
@@ -867,12 +866,12 @@ UfsGetReturnDataFromQueryResponse (
       //
       // The 'FLAG VALUE' field is at byte offset 3 of QueryResp->Tsf.Value
       //
-      *((UINT8*)(Packet->DataBuffer)) = *((UINT8*)&(QueryResp->Tsf.Value) + 3);
+      *((UINT8 *)(Packet->DataBuffer)) = *((UINT8 *)&(QueryResp->Tsf.Value) + 3);
       break;
     case UtpQueryFuncOpcodeRdAttr:
     case UtpQueryFuncOpcodeWrAttr:
       ReturnData = QueryResp->Tsf.Value;
-      SwapLittleEndianToBigEndian ((UINT8*) &ReturnData, sizeof (UINT32));
+      SwapLittleEndianToBigEndian ((UINT8 *)&ReturnData, sizeof (UINT32));
       CopyMem (Packet->DataBuffer, &ReturnData, sizeof (UINT32));
       break;
     default:
@@ -918,7 +917,7 @@ UfsSendDmRequestRetry (
     return Status;
   }
 
-  Trd = ((UTP_TRD*)Private->UtpTrlBase) + Slot;
+  Trd = ((UTP_TRD *)Private->UtpTrlBase) + Slot;
   //
   // Fill transfer request descriptor to this slot.
   //
@@ -928,8 +927,8 @@ UfsSendDmRequestRetry (
     return Status;
   }
 
-  UfsHc       = Private->UfsHostController;
-  QueryResp   = (UTP_QUERY_RESP_UPIU*)((UINT8*)CmdDescHost + Trd->RuO * sizeof (UINT32));
+  UfsHc     = Private->UfsHostController;
+  QueryResp = (UTP_QUERY_RESP_UPIU *)((UINT8 *)CmdDescHost + Trd->RuO * sizeof (UINT32));
   ASSERT (QueryResp != NULL);
   CmdDescSize = Trd->RuO * sizeof (UINT32) + Trd->RuL * sizeof (UINT32);
 
@@ -946,17 +945,19 @@ UfsSendDmRequestRetry (
     goto Exit;
   }
 
-  if (Trd->Ocs != 0 || QueryResp->QueryResp != UfsUtpQueryResponseSuccess) {
+  if ((Trd->Ocs != 0) || (QueryResp->QueryResp != UfsUtpQueryResponseSuccess)) {
     DEBUG ((DEBUG_ERROR, "Failed to send query request, OCS = %X, QueryResp = %X\n", Trd->Ocs, QueryResp->QueryResp));
     DumpQueryResponseResult (QueryResp->QueryResp);
 
     if ((QueryResp->QueryResp == UfsUtpQueryResponseInvalidSelector) ||
         (QueryResp->QueryResp == UfsUtpQueryResponseInvalidIndex) ||
-        (QueryResp->QueryResp == UfsUtpQueryResponseInvalidIdn)) {
+        (QueryResp->QueryResp == UfsUtpQueryResponseInvalidIdn))
+    {
       Status = EFI_INVALID_PARAMETER;
     } else {
       Status = EFI_DEVICE_ERROR;
     }
+
     goto Exit;
   }
 
@@ -974,6 +975,7 @@ Exit:
   if (CmdDescMapping != NULL) {
     UfsHc->Unmap (UfsHc, CmdDescMapping);
   }
+
   if (CmdDescHost != NULL) {
     UfsHc->FreeBuffer (UfsHc, EFI_SIZE_TO_PAGES (CmdDescSize), CmdDescHost);
   }
@@ -1005,7 +1007,7 @@ UfsSendDmRequest (
 
   Status = EFI_SUCCESS;
 
-  for (Retry = 0; Retry < 5; Retry ++) {
+  for (Retry = 0; Retry < 5; Retry++) {
     Status = UfsSendDmRequestRetry (Private, Packet);
     if (!EFI_ERROR (Status)) {
       return EFI_SUCCESS;
@@ -1038,17 +1040,17 @@ UfsSendDmRequest (
 **/
 EFI_STATUS
 UfsRwDeviceDesc (
-  IN     UFS_PASS_THRU_PRIVATE_DATA   *Private,
-  IN     BOOLEAN                      Read,
-  IN     UINT8                        DescId,
-  IN     UINT8                        Index,
-  IN     UINT8                        Selector,
-  IN OUT VOID                         *Descriptor,
-  IN OUT UINT32                       *DescSize
+  IN     UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN     BOOLEAN                     Read,
+  IN     UINT8                       DescId,
+  IN     UINT8                       Index,
+  IN     UINT8                       Selector,
+  IN OUT VOID                        *Descriptor,
+  IN OUT UINT32                      *DescSize
   )
 {
-  UFS_DEVICE_MANAGEMENT_REQUEST_PACKET Packet;
-  EFI_STATUS                           Status;
+  UFS_DEVICE_MANAGEMENT_REQUEST_PACKET  Packet;
+  EFI_STATUS                            Status;
 
   if (DescSize == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1057,18 +1059,19 @@ UfsRwDeviceDesc (
   ZeroMem (&Packet, sizeof (UFS_DEVICE_MANAGEMENT_REQUEST_PACKET));
 
   if (Read) {
-    Packet.DataDirection     = UfsDataIn;
-    Packet.Opcode            = UtpQueryFuncOpcodeRdDesc;
+    Packet.DataDirection = UfsDataIn;
+    Packet.Opcode        = UtpQueryFuncOpcodeRdDesc;
   } else {
-    Packet.DataDirection     = UfsDataOut;
-    Packet.Opcode            = UtpQueryFuncOpcodeWrDesc;
+    Packet.DataDirection = UfsDataOut;
+    Packet.Opcode        = UtpQueryFuncOpcodeWrDesc;
   }
-  Packet.DataBuffer          = Descriptor;
-  Packet.TransferLength      = *DescSize;
-  Packet.DescId              = DescId;
-  Packet.Index               = Index;
-  Packet.Selector            = Selector;
-  Packet.Timeout             = UFS_TIMEOUT;
+
+  Packet.DataBuffer     = Descriptor;
+  Packet.TransferLength = *DescSize;
+  Packet.DescId         = DescId;
+  Packet.Index          = Index;
+  Packet.Selector       = Selector;
+  Packet.Timeout        = UFS_TIMEOUT;
 
   Status = UfsSendDmRequest (Private, &Packet);
   if (EFI_ERROR (Status)) {
@@ -1099,30 +1102,31 @@ UfsRwDeviceDesc (
 **/
 EFI_STATUS
 UfsRwAttributes (
-  IN     UFS_PASS_THRU_PRIVATE_DATA   *Private,
-  IN     BOOLEAN                      Read,
-  IN     UINT8                        AttrId,
-  IN     UINT8                        Index,
-  IN     UINT8                        Selector,
-  IN OUT UINT32                       *Attributes
+  IN     UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN     BOOLEAN                     Read,
+  IN     UINT8                       AttrId,
+  IN     UINT8                       Index,
+  IN     UINT8                       Selector,
+  IN OUT UINT32                      *Attributes
   )
 {
-  UFS_DEVICE_MANAGEMENT_REQUEST_PACKET Packet;
+  UFS_DEVICE_MANAGEMENT_REQUEST_PACKET  Packet;
 
   ZeroMem (&Packet, sizeof (UFS_DEVICE_MANAGEMENT_REQUEST_PACKET));
 
   if (Read) {
-    Packet.DataDirection     = UfsDataIn;
-    Packet.Opcode            = UtpQueryFuncOpcodeRdAttr;
+    Packet.DataDirection = UfsDataIn;
+    Packet.Opcode        = UtpQueryFuncOpcodeRdAttr;
   } else {
-    Packet.DataDirection     = UfsDataOut;
-    Packet.Opcode            = UtpQueryFuncOpcodeWrAttr;
+    Packet.DataDirection = UfsDataOut;
+    Packet.Opcode        = UtpQueryFuncOpcodeWrAttr;
   }
-  Packet.DataBuffer          = Attributes;
-  Packet.DescId              = AttrId;
-  Packet.Index               = Index;
-  Packet.Selector            = Selector;
-  Packet.Timeout             = UFS_TIMEOUT;
+
+  Packet.DataBuffer = Attributes;
+  Packet.DescId     = AttrId;
+  Packet.Index      = Index;
+  Packet.Selector   = Selector;
+  Packet.Timeout    = UFS_TIMEOUT;
 
   return UfsSendDmRequest (Private, &Packet);
 }
@@ -1143,13 +1147,13 @@ UfsRwAttributes (
 **/
 EFI_STATUS
 UfsRwFlags (
-  IN     UFS_PASS_THRU_PRIVATE_DATA   *Private,
-  IN     BOOLEAN                      Read,
-  IN     UINT8                        FlagId,
-  IN OUT UINT8                        *Value
+  IN     UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN     BOOLEAN                     Read,
+  IN     UINT8                       FlagId,
+  IN OUT UINT8                       *Value
   )
 {
-  UFS_DEVICE_MANAGEMENT_REQUEST_PACKET Packet;
+  UFS_DEVICE_MANAGEMENT_REQUEST_PACKET  Packet;
 
   if (Value == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1159,23 +1163,24 @@ UfsRwFlags (
 
   if (Read) {
     ASSERT (Value != NULL);
-    Packet.DataDirection     = UfsDataIn;
-    Packet.Opcode            = UtpQueryFuncOpcodeRdFlag;
+    Packet.DataDirection = UfsDataIn;
+    Packet.Opcode        = UtpQueryFuncOpcodeRdFlag;
   } else {
-    Packet.DataDirection     = UfsDataOut;
+    Packet.DataDirection = UfsDataOut;
     if (*Value == 1) {
-      Packet.Opcode          = UtpQueryFuncOpcodeSetFlag;
+      Packet.Opcode = UtpQueryFuncOpcodeSetFlag;
     } else if (*Value == 0) {
-      Packet.Opcode          = UtpQueryFuncOpcodeClrFlag;
+      Packet.Opcode = UtpQueryFuncOpcodeClrFlag;
     } else {
       return EFI_INVALID_PARAMETER;
     }
   }
-  Packet.DataBuffer          = Value;
-  Packet.DescId              = FlagId;
-  Packet.Index               = 0;
-  Packet.Selector            = 0;
-  Packet.Timeout             = UFS_TIMEOUT;
+
+  Packet.DataBuffer = Value;
+  Packet.DescId     = FlagId;
+  Packet.Index      = 0;
+  Packet.Selector   = 0;
+  Packet.Timeout    = UFS_TIMEOUT;
 
   return UfsSendDmRequest (Private, &Packet);
 }
@@ -1193,12 +1198,12 @@ UfsRwFlags (
 **/
 EFI_STATUS
 UfsSetFlag (
-  IN  UFS_PASS_THRU_PRIVATE_DATA   *Private,
-  IN  UINT8                        FlagId
+  IN  UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN  UINT8                       FlagId
   )
 {
-  EFI_STATUS             Status;
-  UINT8                  Value;
+  EFI_STATUS  Status;
+  UINT8       Value;
 
   Value  = 1;
   Status = UfsRwFlags (Private, FALSE, FlagId, &Value);
@@ -1220,12 +1225,12 @@ UfsSetFlag (
 **/
 EFI_STATUS
 UfsReadFlag (
-  IN     UFS_PASS_THRU_PRIVATE_DATA   *Private,
-  IN     UINT8                        FlagId,
-     OUT UINT8                        *Value
+  IN     UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN     UINT8                       FlagId,
+  OUT UINT8                          *Value
   )
 {
-  EFI_STATUS                           Status;
+  EFI_STATUS  Status;
 
   Status = UfsRwFlags (Private, TRUE, FlagId, Value);
 
@@ -1247,17 +1252,17 @@ UfsReadFlag (
 **/
 EFI_STATUS
 UfsExecNopCmds (
-  IN  UFS_PASS_THRU_PRIVATE_DATA       *Private
+  IN  UFS_PASS_THRU_PRIVATE_DATA  *Private
   )
 {
-  EFI_STATUS                           Status;
-  UINT8                                Slot;
-  UTP_TRD                              *Trd;
-  UTP_NOP_IN_UPIU                      *NopInUpiu;
-  UINT32                               CmdDescSize;
-  VOID                                 *CmdDescHost;
-  VOID                                 *CmdDescMapping;
-  EDKII_UFS_HOST_CONTROLLER_PROTOCOL   *UfsHc;
+  EFI_STATUS                          Status;
+  UINT8                               Slot;
+  UTP_TRD                             *Trd;
+  UTP_NOP_IN_UPIU                     *NopInUpiu;
+  UINT32                              CmdDescSize;
+  VOID                                *CmdDescHost;
+  VOID                                *CmdDescMapping;
+  EDKII_UFS_HOST_CONTROLLER_PROTOCOL  *UfsHc;
 
   //
   // Find out which slot of transfer request list is available.
@@ -1267,7 +1272,7 @@ UfsExecNopCmds (
     return Status;
   }
 
-  Trd    = ((UTP_TRD*)Private->UtpTrlBase) + Slot;
+  Trd    = ((UTP_TRD *)Private->UtpTrlBase) + Slot;
   Status = UfsCreateNopCommandDesc (Private, Trd, &CmdDescHost, &CmdDescMapping);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1276,8 +1281,8 @@ UfsExecNopCmds (
   //
   // Check the transfer request result.
   //
-  UfsHc       = Private->UfsHostController;
-  NopInUpiu   = (UTP_NOP_IN_UPIU*)((UINT8*)CmdDescHost + Trd->RuO * sizeof (UINT32));
+  UfsHc     = Private->UfsHostController;
+  NopInUpiu = (UTP_NOP_IN_UPIU *)((UINT8 *)CmdDescHost + Trd->RuO * sizeof (UINT32));
   ASSERT (NopInUpiu != NULL);
   CmdDescSize = Trd->RuO * sizeof (UINT32) + Trd->RuL * sizeof (UINT32);
 
@@ -1308,6 +1313,7 @@ Exit:
   if (CmdDescMapping != NULL) {
     UfsHc->Unmap (UfsHc, CmdDescMapping);
   }
+
   if (CmdDescHost != NULL) {
     UfsHc->FreeBuffer (UfsHc, EFI_SIZE_TO_PAGES (CmdDescSize), CmdDescHost);
   }
@@ -1346,6 +1352,7 @@ UfsReconcileDataTransferBuffer (
     if (TransReq->Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
       CopyMem (TransReq->Packet->InDataBuffer, TransReq->AlignedDataBuf, TransReq->Packet->InTransferLength);
     }
+
     //
     // Wipe out the transfer buffer in case it contains sensitive data.
     //
@@ -1393,14 +1400,16 @@ UfsPrepareDataTransferBuffer (
       if (DataBuf == NULL) {
         return EFI_DEVICE_ERROR;
       }
+
       ZeroMem (DataBuf, DataLen);
-      TransReq->AlignedDataBuf = DataBuf;
+      TransReq->AlignedDataBuf     = DataBuf;
       TransReq->AlignedDataBufSize = DataLen;
     } else {
-      DataLen       = TransReq->Packet->InTransferLength;
-      DataBuf       = TransReq->Packet->InDataBuffer;
+      DataLen = TransReq->Packet->InTransferLength;
+      DataBuf = TransReq->Packet->InDataBuffer;
     }
-    Flag          = EdkiiUfsHcOperationBusMasterWrite;
+
+    Flag = EdkiiUfsHcOperationBusMasterWrite;
   } else {
     if (((UINTN)TransReq->Packet->OutDataBuffer % 4 != 0) || (TransReq->Packet->OutTransferLength % 4 != 0)) {
       DataLen = TransReq->Packet->OutTransferLength + (4 - (TransReq->Packet->OutTransferLength % 4));
@@ -1408,14 +1417,16 @@ UfsPrepareDataTransferBuffer (
       if (DataBuf == NULL) {
         return EFI_DEVICE_ERROR;
       }
+
       CopyMem (DataBuf, TransReq->Packet->OutDataBuffer, TransReq->Packet->OutTransferLength);
-      TransReq->AlignedDataBuf = DataBuf;
+      TransReq->AlignedDataBuf     = DataBuf;
       TransReq->AlignedDataBufSize = DataLen;
     } else {
-      DataLen       = TransReq->Packet->OutTransferLength;
-      DataBuf       = TransReq->Packet->OutDataBuffer;
+      DataLen = TransReq->Packet->OutTransferLength;
+      DataBuf = TransReq->Packet->OutDataBuffer;
     }
-    Flag          = EdkiiUfsHcOperationBusMasterRead;
+
+    Flag = EdkiiUfsHcOperationBusMasterRead;
   }
 
   if (DataLen != 0) {
@@ -1438,6 +1449,7 @@ UfsPrepareDataTransferBuffer (
         FreeAlignedPages (TransReq->AlignedDataBuf, EFI_SIZE_TO_PAGES (TransReq->AlignedDataBufSize));
         TransReq->AlignedDataBuf = NULL;
       }
+
       return EFI_DEVICE_ERROR;
     }
   }
@@ -1445,9 +1457,9 @@ UfsPrepareDataTransferBuffer (
   //
   // Fill PRDT table of Command UPIU for executed SCSI cmd.
   //
-  PrdtBase = (UTP_TR_PRD*)((UINT8*)TransReq->CmdDescHost + ROUNDUP8 (sizeof (UTP_COMMAND_UPIU)) + ROUNDUP8 (sizeof (UTP_RESPONSE_UPIU)));
+  PrdtBase = (UTP_TR_PRD *)((UINT8 *)TransReq->CmdDescHost + ROUNDUP8 (sizeof (UTP_COMMAND_UPIU)) + ROUNDUP8 (sizeof (UTP_RESPONSE_UPIU)));
   ASSERT (PrdtBase != NULL);
-  UfsInitUtpPrdt (PrdtBase, (VOID*)(UINTN)DataBufPhyAddr, DataLen);
+  UfsInitUtpPrdt (PrdtBase, (VOID *)(UINTN)DataBufPhyAddr, DataLen);
 
   return EFI_SUCCESS;
 }
@@ -1484,13 +1496,13 @@ UfsExecScsiCmds (
   IN     EFI_EVENT                                   Event    OPTIONAL
   )
 {
-  EFI_STATUS                           Status;
-  UTP_RESPONSE_UPIU                    *Response;
-  UINT16                               SenseDataLen;
-  UINT32                               ResTranCount;
-  EFI_TPL                              OldTpl;
-  UFS_PASS_THRU_TRANS_REQ              *TransReq;
-  EDKII_UFS_HOST_CONTROLLER_PROTOCOL   *UfsHc;
+  EFI_STATUS                          Status;
+  UTP_RESPONSE_UPIU                   *Response;
+  UINT16                              SenseDataLen;
+  UINT32                              ResTranCount;
+  EFI_TPL                             OldTpl;
+  UFS_PASS_THRU_TRANS_REQ             *TransReq;
+  EDKII_UFS_HOST_CONTROLLER_PROTOCOL  *UfsHc;
 
   TransReq = AllocateZeroPool (sizeof (UFS_PASS_THRU_TRANS_REQ));
   if (TransReq == NULL) {
@@ -1501,7 +1513,7 @@ UfsExecScsiCmds (
   TransReq->TimeoutRemain = Packet->Timeout;
   TransReq->Packet        = Packet;
 
-  UfsHc          = Private->UfsHostController;
+  UfsHc = Private->UfsHostController;
   //
   // Find out which slot of transfer request list is available.
   //
@@ -1510,7 +1522,7 @@ UfsExecScsiCmds (
     return Status;
   }
 
-  TransReq->Trd = ((UTP_TRD*)Private->UtpTrlBase) + TransReq->Slot;
+  TransReq->Trd = ((UTP_TRD *)Private->UtpTrlBase) + TransReq->Slot;
 
   //
   // Fill transfer request descriptor to this slot.
@@ -1538,7 +1550,7 @@ UfsExecScsiCmds (
   // Insert the async SCSI cmd to the Async I/O list
   //
   if (Event != NULL) {
-    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    OldTpl                = gBS->RaiseTPL (TPL_NOTIFY);
     TransReq->CallerEvent = Event;
     InsertTailList (&Private->Queue, &TransReq->TransferList);
     gBS->RestoreTPL (OldTpl);
@@ -1567,10 +1579,10 @@ UfsExecScsiCmds (
   //
   // Get sense data if exists
   //
-  Response     = (UTP_RESPONSE_UPIU*)((UINT8*)TransReq->CmdDescHost + TransReq->Trd->RuO * sizeof (UINT32));
+  Response = (UTP_RESPONSE_UPIU *)((UINT8 *)TransReq->CmdDescHost + TransReq->Trd->RuO * sizeof (UINT32));
   ASSERT (Response != NULL);
   SenseDataLen = Response->SenseDataLen;
-  SwapLittleEndianToBigEndian ((UINT8*)&SenseDataLen, sizeof (UINT16));
+  SwapLittleEndianToBigEndian ((UINT8 *)&SenseDataLen, sizeof (UINT16));
 
   if ((Packet->SenseDataLength != 0) && (Packet->SenseData != NULL)) {
     //
@@ -1598,13 +1610,13 @@ UfsExecScsiCmds (
     if (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
       if ((Response->Flags & BIT5) == BIT5) {
         ResTranCount = Response->ResTranCount;
-        SwapLittleEndianToBigEndian ((UINT8*)&ResTranCount, sizeof (UINT32));
+        SwapLittleEndianToBigEndian ((UINT8 *)&ResTranCount, sizeof (UINT32));
         Packet->InTransferLength -= ResTranCount;
       }
     } else {
       if ((Response->Flags & BIT5) == BIT5) {
         ResTranCount = Response->ResTranCount;
-        SwapLittleEndianToBigEndian ((UINT8*)&ResTranCount, sizeof (UINT32));
+        SwapLittleEndianToBigEndian ((UINT8 *)&ResTranCount, sizeof (UINT32));
         Packet->OutTransferLength -= ResTranCount;
       }
     }
@@ -1623,12 +1635,15 @@ Exit1:
   if (TransReq->CmdDescMapping != NULL) {
     UfsHc->Unmap (UfsHc, TransReq->CmdDescMapping);
   }
+
   if (TransReq->CmdDescHost != NULL) {
     UfsHc->FreeBuffer (UfsHc, EFI_SIZE_TO_PAGES (TransReq->CmdDescSize), TransReq->CmdDescHost);
   }
+
   if (TransReq != NULL) {
     FreePool (TransReq);
   }
+
   return Status;
 }
 
@@ -1644,8 +1659,8 @@ Exit1:
 **/
 EFI_STATUS
 UfsExecUicCommands (
-  IN  UFS_PASS_THRU_PRIVATE_DATA    *Private,
-  IN OUT EDKII_UIC_COMMAND          *UicCommand
+  IN  UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN OUT EDKII_UIC_COMMAND        *UicCommand
   )
 {
   EFI_STATUS  Status;
@@ -1703,7 +1718,7 @@ UfsExecUicCommands (
   // UFS 2.0 spec section 5.3.1 Offset:0x20 IS.Bit10 UIC Command Completion Status (UCCS)
   // This bit is set to '1' by the host controller upon completion of a UIC command.
   //
-  Status  = UfsWaitMemSet (Private, UFS_HC_IS_OFFSET, UFS_HC_IS_UCCS, UFS_HC_IS_UCCS, UFS_TIMEOUT);
+  Status = UfsWaitMemSet (Private, UFS_HC_IS_OFFSET, UFS_HC_IS_UCCS, UFS_HC_IS_UCCS, UFS_TIMEOUT);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1713,14 +1728,16 @@ UfsExecUicCommands (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     Status = UfsMmioRead32 (Private, UFS_HC_UCMD_ARG3_OFFSET, &UicCommand->Arg3);
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     if ((UicCommand->Arg2 & 0xFF) != 0) {
-      DEBUG_CODE_BEGIN();
-        DumpUicCmdExecResult ((UINT8)UicCommand->Opcode, (UINT8)(UicCommand->Arg2 & 0xFF));
-      DEBUG_CODE_END();
+      DEBUG_CODE_BEGIN ();
+      DumpUicCmdExecResult ((UINT8)UicCommand->Opcode, (UINT8)(UicCommand->Arg2 & 0xFF));
+      DEBUG_CODE_END ();
       return EFI_DEVICE_ERROR;
     }
   }
@@ -1744,17 +1761,17 @@ UfsExecUicCommands (
 **/
 EFI_STATUS
 UfsAllocateAlignCommonBuffer (
-  IN     UFS_PASS_THRU_PRIVATE_DATA    *Private,
-  IN     UINTN                         Size,
-     OUT VOID                          **CmdDescHost,
-     OUT EFI_PHYSICAL_ADDRESS          *CmdDescPhyAddr,
-     OUT VOID                          **CmdDescMapping
+  IN     UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN     UINTN                       Size,
+  OUT VOID                           **CmdDescHost,
+  OUT EFI_PHYSICAL_ADDRESS           *CmdDescPhyAddr,
+  OUT VOID                           **CmdDescMapping
   )
 {
-  EFI_STATUS                           Status;
-  UINTN                                Bytes;
-  BOOLEAN                              Is32BitAddr;
-  EDKII_UFS_HOST_CONTROLLER_PROTOCOL   *UfsHc;
+  EFI_STATUS                          Status;
+  UINTN                               Bytes;
+  BOOLEAN                             Is32BitAddr;
+  EDKII_UFS_HOST_CONTROLLER_PROTOCOL  *UfsHc;
 
   if ((Private->UfsHcInfo.Capabilities & UFS_HC_CAP_64ADDR) == UFS_HC_CAP_64ADDR) {
     Is32BitAddr = FALSE;
@@ -1831,13 +1848,13 @@ UfsAllocateAlignCommonBuffer (
 **/
 EFI_STATUS
 UfsEnableHostController (
-  IN  UFS_PASS_THRU_PRIVATE_DATA     *Private
+  IN  UFS_PASS_THRU_PRIVATE_DATA  *Private
   )
 {
-  EFI_STATUS             Status;
-  UINT32                 Data;
+  EFI_STATUS  Status;
+  UINT32      Data;
 
-  if (mUfsHcPlatform != NULL && mUfsHcPlatform->Callback != NULL) {
+  if ((mUfsHcPlatform != NULL) && (mUfsHcPlatform->Callback != NULL)) {
     Status = mUfsHcPlatform->Callback (Private->Handle, EdkiiUfsHcPreHce, &Private->UfsHcDriverInterface);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Failure from platform driver during EdkiiUfsHcPreHce, Status = %r\n", Status));
@@ -1863,6 +1880,7 @@ UfsEnableHostController (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     //
     // Wait until HCE is read as '0' before continuing.
     //
@@ -1888,7 +1906,7 @@ UfsEnableHostController (
     return EFI_DEVICE_ERROR;
   }
 
-  if (mUfsHcPlatform != NULL && mUfsHcPlatform->Callback != NULL) {
+  if ((mUfsHcPlatform != NULL) && (mUfsHcPlatform->Callback != NULL)) {
     Status = mUfsHcPlatform->Callback (Private->Handle, EdkiiUfsHcPostHce, &Private->UfsHcDriverInterface);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Failure from platform driver during EdkiiUfsHcPostHce, Status = %r\n", Status));
@@ -1911,7 +1929,7 @@ UfsEnableHostController (
 **/
 EFI_STATUS
 UfsDeviceDetection (
-  IN  UFS_PASS_THRU_PRIVATE_DATA     *Private
+  IN  UFS_PASS_THRU_PRIVATE_DATA  *Private
   )
 {
   UINTN              Retry;
@@ -1919,7 +1937,7 @@ UfsDeviceDetection (
   UINT32             Data;
   EDKII_UIC_COMMAND  LinkStartupCommand;
 
-  if (mUfsHcPlatform != NULL && mUfsHcPlatform->Callback != NULL) {
+  if ((mUfsHcPlatform != NULL) && (mUfsHcPlatform->Callback != NULL)) {
     Status = mUfsHcPlatform->Callback (Private->Handle, EdkiiUfsHcPreLinkStartup, &Private->UfsHcDriverInterface);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Failure from platform driver during EdkiiUfsHcPreLinkStartup, Status = %r\n", Status));
@@ -1933,10 +1951,10 @@ UfsDeviceDetection (
   //
   for (Retry = 0; Retry < 3; Retry++) {
     LinkStartupCommand.Opcode = UfsUicDmeLinkStartup;
-    LinkStartupCommand.Arg1 = 0;
-    LinkStartupCommand.Arg2 = 0;
-    LinkStartupCommand.Arg3 = 0;
-    Status = UfsExecUicCommands (Private, &LinkStartupCommand);
+    LinkStartupCommand.Arg1   = 0;
+    LinkStartupCommand.Arg2   = 0;
+    LinkStartupCommand.Arg3   = 0;
+    Status                    = UfsExecUicCommands (Private, &LinkStartupCommand);
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
@@ -1952,13 +1970,6 @@ UfsDeviceDetection (
         return EFI_DEVICE_ERROR;
       }
     } else {
-      if (mUfsHcPlatform != NULL && mUfsHcPlatform->Callback != NULL) {
-        Status = mUfsHcPlatform->Callback (Private->Handle, EdkiiUfsHcPostLinkStartup, &Private->UfsHcDriverInterface);
-        if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_ERROR, "Failure from platform driver during EdkiiUfsHcPostLinkStartup, Status = %r\n", Status));
-          return Status;
-        }
-      }
       return EFI_SUCCESS;
     }
   }
@@ -1977,14 +1988,14 @@ UfsDeviceDetection (
 **/
 EFI_STATUS
 UfsInitTaskManagementRequestList (
-  IN  UFS_PASS_THRU_PRIVATE_DATA     *Private
+  IN  UFS_PASS_THRU_PRIVATE_DATA  *Private
   )
 {
-  UINT8                  Nutmrs;
-  VOID                   *CmdDescHost;
-  EFI_PHYSICAL_ADDRESS   CmdDescPhyAddr;
-  VOID                   *CmdDescMapping;
-  EFI_STATUS             Status;
+  UINT8                 Nutmrs;
+  VOID                  *CmdDescHost;
+  EFI_PHYSICAL_ADDRESS  CmdDescPhyAddr;
+  VOID                  *CmdDescMapping;
+  EFI_STATUS            Status;
 
   //
   // Initial h/w and s/w context for future operations.
@@ -1996,7 +2007,7 @@ UfsInitTaskManagementRequestList (
   //
   // Allocate and initialize UTP Task Management Request List.
   //
-  Nutmrs = (UINT8) (RShiftU64 ((Private->UfsHcInfo.Capabilities & UFS_HC_CAP_NUTMRS), 16) + 1);
+  Nutmrs = (UINT8)(RShiftU64 ((Private->UfsHcInfo.Capabilities & UFS_HC_CAP_NUTMRS), 16) + 1);
   Status = UfsAllocateAlignCommonBuffer (Private, Nutmrs * sizeof (UTP_TMRD), &CmdDescHost, &CmdDescPhyAddr, &CmdDescMapping);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -2015,6 +2026,7 @@ UfsInitTaskManagementRequestList (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   Private->UtpTmrlBase = CmdDescHost;
   Private->Nutmrs      = Nutmrs;
   Private->TmrlMapping = CmdDescMapping;
@@ -2042,14 +2054,14 @@ UfsInitTaskManagementRequestList (
 **/
 EFI_STATUS
 UfsInitTransferRequestList (
-  IN  UFS_PASS_THRU_PRIVATE_DATA     *Private
+  IN  UFS_PASS_THRU_PRIVATE_DATA  *Private
   )
 {
-  UINT8                  Nutrs;
-  VOID                   *CmdDescHost;
-  EFI_PHYSICAL_ADDRESS   CmdDescPhyAddr;
-  VOID                   *CmdDescMapping;
-  EFI_STATUS             Status;
+  UINT8                 Nutrs;
+  VOID                  *CmdDescHost;
+  EFI_PHYSICAL_ADDRESS  CmdDescPhyAddr;
+  VOID                  *CmdDescMapping;
+  EFI_STATUS            Status;
 
   //
   // Initial h/w and s/w context for future operations.
@@ -2108,10 +2120,10 @@ UfsInitTransferRequestList (
 **/
 EFI_STATUS
 UfsControllerInit (
-  IN  UFS_PASS_THRU_PRIVATE_DATA     *Private
+  IN  UFS_PASS_THRU_PRIVATE_DATA  *Private
   )
 {
-  EFI_STATUS             Status;
+  EFI_STATUS  Status;
 
   Status = UfsEnableHostController (Private);
   if (EFI_ERROR (Status)) {
@@ -2152,11 +2164,11 @@ UfsControllerInit (
 **/
 EFI_STATUS
 UfsControllerStop (
-  IN  UFS_PASS_THRU_PRIVATE_DATA     *Private
+  IN  UFS_PASS_THRU_PRIVATE_DATA  *Private
   )
 {
-  EFI_STATUS             Status;
-  UINT32                 Data;
+  EFI_STATUS  Status;
+  UINT32      Data;
 
   //
   // Enable the UTP Task Management Request List by setting the UTP Task Management
@@ -2183,6 +2195,7 @@ UfsControllerStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   ASSERT ((Data & UFS_HC_HCE_EN) == UFS_HC_HCE_EN);
 
   Status = UfsMmioWrite32 (Private, UFS_HC_ENABLE_OFFSET, 0);
@@ -2216,17 +2229,17 @@ UfsControllerStop (
 VOID
 EFIAPI
 SignalCallerEvent (
-  IN UFS_PASS_THRU_PRIVATE_DATA      *Private,
-  IN UFS_PASS_THRU_TRANS_REQ         *TransReq
+  IN UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN UFS_PASS_THRU_TRANS_REQ     *TransReq
   )
 {
-  EDKII_UFS_HOST_CONTROLLER_PROTOCOL *UfsHc;
-  EFI_EVENT                          CallerEvent;
+  EDKII_UFS_HOST_CONTROLLER_PROTOCOL  *UfsHc;
+  EFI_EVENT                           CallerEvent;
 
   ASSERT ((Private != NULL) && (TransReq != NULL));
 
-  UfsHc        = Private->UfsHostController;
-  CallerEvent  = TransReq->CallerEvent;
+  UfsHc       = Private->UfsHostController;
+  CallerEvent = TransReq->CallerEvent;
 
   RemoveEntryList (&TransReq->TransferList);
 
@@ -2239,6 +2252,7 @@ SignalCallerEvent (
   if (TransReq->CmdDescMapping != NULL) {
     UfsHc->Unmap (UfsHc, TransReq->CmdDescMapping);
   }
+
   if (TransReq->CmdDescHost != NULL) {
     UfsHc->FreeBuffer (
              UfsHc,
@@ -2263,36 +2277,37 @@ SignalCallerEvent (
 VOID
 EFIAPI
 ProcessAsyncTaskList (
-  IN EFI_EVENT          Event,
-  IN VOID               *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  UFS_PASS_THRU_PRIVATE_DATA                    *Private;
-  LIST_ENTRY                                    *Entry;
-  LIST_ENTRY                                    *NextEntry;
-  UFS_PASS_THRU_TRANS_REQ                       *TransReq;
-  EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET    *Packet;
-  UTP_RESPONSE_UPIU                             *Response;
-  UINT16                                        SenseDataLen;
-  UINT32                                        ResTranCount;
-  UINT32                                        SlotsMap;
-  UINT32                                        Value;
-  EFI_STATUS                                    Status;
+  UFS_PASS_THRU_PRIVATE_DATA                  *Private;
+  LIST_ENTRY                                  *Entry;
+  LIST_ENTRY                                  *NextEntry;
+  UFS_PASS_THRU_TRANS_REQ                     *TransReq;
+  EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet;
+  UTP_RESPONSE_UPIU                           *Response;
+  UINT16                                      SenseDataLen;
+  UINT32                                      ResTranCount;
+  UINT32                                      SlotsMap;
+  UINT32                                      Value;
+  EFI_STATUS                                  Status;
 
-  Private   = (UFS_PASS_THRU_PRIVATE_DATA*) Context;
-  SlotsMap  = 0;
+  Private  = (UFS_PASS_THRU_PRIVATE_DATA *)Context;
+  SlotsMap = 0;
 
   //
   // Check the entries in the async I/O queue are done or not.
   //
-  if (!IsListEmpty(&Private->Queue)) {
+  if (!IsListEmpty (&Private->Queue)) {
     BASE_LIST_FOR_EACH_SAFE (Entry, NextEntry, &Private->Queue) {
-      TransReq  = UFS_PASS_THRU_TRANS_REQ_FROM_THIS (Entry);
-      Packet    = TransReq->Packet;
+      TransReq = UFS_PASS_THRU_TRANS_REQ_FROM_THIS (Entry);
+      Packet   = TransReq->Packet;
 
       if ((SlotsMap & (BIT0 << TransReq->Slot)) != 0) {
         return;
       }
+
       SlotsMap |= BIT0 << TransReq->Slot;
 
       Status = UfsMmioRead32 (Private, UFS_HC_UTRLDBR_OFFSET, &Value);
@@ -2329,10 +2344,10 @@ ProcessAsyncTaskList (
         //
         // Get sense data if exists
         //
-        Response = (UTP_RESPONSE_UPIU*)((UINT8*)TransReq->CmdDescHost + TransReq->Trd->RuO * sizeof (UINT32));
+        Response = (UTP_RESPONSE_UPIU *)((UINT8 *)TransReq->CmdDescHost + TransReq->Trd->RuO * sizeof (UINT32));
         ASSERT (Response != NULL);
         SenseDataLen = Response->SenseDataLen;
-        SwapLittleEndianToBigEndian ((UINT8*)&SenseDataLen, sizeof (UINT16));
+        SwapLittleEndianToBigEndian ((UINT8 *)&SenseDataLen, sizeof (UINT16));
 
         if ((Packet->SenseDataLength != 0) && (Packet->SenseData != NULL)) {
           //
@@ -2360,13 +2375,13 @@ ProcessAsyncTaskList (
           if (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
             if ((Response->Flags & BIT5) == BIT5) {
               ResTranCount = Response->ResTranCount;
-              SwapLittleEndianToBigEndian ((UINT8*)&ResTranCount, sizeof (UINT32));
+              SwapLittleEndianToBigEndian ((UINT8 *)&ResTranCount, sizeof (UINT32));
               Packet->InTransferLength -= ResTranCount;
             }
           } else {
             if ((Response->Flags & BIT5) == BIT5) {
               ResTranCount = Response->ResTranCount;
-              SwapLittleEndianToBigEndian ((UINT8*)&ResTranCount, sizeof (UINT32));
+              SwapLittleEndianToBigEndian ((UINT8 *)&ResTranCount, sizeof (UINT32));
               Packet->OutTransferLength -= ResTranCount;
             }
           }
@@ -2400,9 +2415,9 @@ UfsHcDriverInterfaceExecUicCommand (
   IN OUT EDKII_UIC_COMMAND              *UicCommand
   )
 {
-  UFS_PASS_THRU_PRIVATE_DATA    *Private;
+  UFS_PASS_THRU_PRIVATE_DATA  *Private;
 
-  if (This == NULL || UicCommand == NULL) {
+  if ((This == NULL) || (UicCommand == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2441,7 +2456,7 @@ GetUfsHcInfo (
 
   Private->UfsHcInfo.Capabilities = Data;
 
-  if (mUfsHcPlatform != NULL && mUfsHcPlatform->OverrideHcInfo != NULL) {
+  if ((mUfsHcPlatform != NULL) && (mUfsHcPlatform->OverrideHcInfo != NULL)) {
     Status = mUfsHcPlatform->OverrideHcInfo (Private->Handle, &Private->UfsHcInfo);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Failure from platform on OverrideHcInfo, Status = %r\n", Status));
@@ -2451,4 +2466,3 @@ GetUfsHcInfo (
 
   return EFI_SUCCESS;
 }
-

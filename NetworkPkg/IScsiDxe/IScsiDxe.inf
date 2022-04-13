@@ -65,6 +65,7 @@
   NetworkPkg/NetworkPkg.dec
 
 [LibraryClasses]
+  BaseCryptLib
   BaseLib
   BaseMemoryLib
   DebugLib
@@ -72,14 +73,14 @@
   HiiLib
   MemoryAllocationLib
   NetLib
-  TcpIoLib
   PrintLib
+  SafeIntLib
+  TcpIoLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+  UefiHiiServicesLib
   UefiLib
   UefiRuntimeServicesTableLib
-  UefiHiiServicesLib
-  BaseCryptLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     ## SOMETIMES_CONSUMES ## SystemTable

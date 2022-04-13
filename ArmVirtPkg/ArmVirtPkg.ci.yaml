@@ -6,7 +6,7 @@
 #
 # Copyright (c) Microsoft Corporation
 # Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) 2020, ARM Limited. All rights reserved.
+# Copyright (c) 2020 - 2022, ARM Limited. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -24,6 +24,7 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
+            "Library/PlatformBootManagerLib/PlatformBm.c"
         ]
     },
     ## options defined .pytool/Plugin/CompilerPlugin
@@ -47,6 +48,7 @@
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
             "ArmVirtPkg/ArmVirtPkg.dec",
+            "DynamicTablesPkg/DynamicTablesPkg.dec",
             "NetworkPkg/NetworkPkg.dec",
             "ArmPkg/ArmPkg.dec",
             "OvmfPkg/OvmfPkg.dec",
@@ -97,6 +99,9 @@
         "AuditOnly": False,           # Fails right now with over 270 errors
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
         "ExtendWords": [
+            "acpiview",
+            "armltd",
+            "ssdts",
             "setjump",
             "plong",
             "lparam",
@@ -115,7 +120,8 @@
             "virt's",
             "werror",
             "xenio",
-            "kvmtool"
+            "kvmtool",
+            "cloudhv"
         ],           # words to extend to the dictionary for this package
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)

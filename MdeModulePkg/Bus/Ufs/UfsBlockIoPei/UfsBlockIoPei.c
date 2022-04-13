@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -10,7 +10,7 @@
 //
 // Template for UFS HC Peim Private Data.
 //
-UFS_PEIM_HC_PRIVATE_DATA   gUfsHcPeimTemplate = {
+UFS_PEIM_HC_PRIVATE_DATA  gUfsHcPeimTemplate = {
   UFS_PEIM_HC_SIG,                // Signature
   NULL,                           // Controller
   NULL,                           // Pool
@@ -131,8 +131,6 @@ UFS_PEIM_HC_PRIVATE_DATA   gUfsHcPeimTemplate = {
   }
 };
 
-
-
 /**
   Execute TEST UNITY READY SCSI command on a specific UFS device.
 
@@ -148,20 +146,20 @@ UFS_PEIM_HC_PRIVATE_DATA   gUfsHcPeimTemplate = {
 **/
 EFI_STATUS
 UfsPeimTestUnitReady (
-  IN     UFS_PEIM_HC_PRIVATE_DATA        *Private,
-  IN     UINTN                           Lun,
-     OUT VOID                            *SenseData,  OPTIONAL
-     OUT UINT8                           *SenseDataLength
+  IN     UFS_PEIM_HC_PRIVATE_DATA  *Private,
+  IN     UINTN                     Lun,
+  OUT VOID                         *SenseData   OPTIONAL,
+  OUT UINT8                        *SenseDataLength
   )
 {
-  UFS_SCSI_REQUEST_PACKET                Packet;
-  UINT8                                  Cdb[UFS_SCSI_OP_LENGTH_SIX];
-  EFI_STATUS                             Status;
+  UFS_SCSI_REQUEST_PACKET  Packet;
+  UINT8                    Cdb[UFS_SCSI_OP_LENGTH_SIX];
+  EFI_STATUS               Status;
 
   ZeroMem (&Packet, sizeof (UFS_SCSI_REQUEST_PACKET));
   ZeroMem (Cdb, sizeof (Cdb));
 
-  Cdb[0]  = EFI_SCSI_OP_TEST_UNIT_READY;
+  Cdb[0] = EFI_SCSI_OP_TEST_UNIT_READY;
 
   Packet.Timeout         = UFS_TIMEOUT;
   Packet.Cdb             = Cdb;
@@ -170,7 +168,7 @@ UfsPeimTestUnitReady (
   Packet.SenseData       = SenseData;
   Packet.SenseDataLength = *SenseDataLength;
 
-  Status = UfsExecScsiCmds (Private,(UINT8)Lun, &Packet);
+  Status = UfsExecScsiCmds (Private, (UINT8)Lun, &Packet);
 
   if (*SenseDataLength != 0) {
     *SenseDataLength = Packet.SenseDataLength;
@@ -178,8 +176,6 @@ UfsPeimTestUnitReady (
 
   return Status;
 }
-
-
 
 /**
   Execute READ CAPACITY(10) SCSI command on a specific UFS device.
@@ -198,17 +194,17 @@ UfsPeimTestUnitReady (
 **/
 EFI_STATUS
 UfsPeimReadCapacity (
-  IN     UFS_PEIM_HC_PRIVATE_DATA     *Private,
-  IN     UINTN                        Lun,
-     OUT VOID                         *DataBuffer,
-     OUT UINT32                       *DataLength,
-     OUT VOID                         *SenseData,  OPTIONAL
-     OUT UINT8                        *SenseDataLength
+  IN     UFS_PEIM_HC_PRIVATE_DATA  *Private,
+  IN     UINTN                     Lun,
+  OUT VOID                         *DataBuffer,
+  OUT UINT32                       *DataLength,
+  OUT VOID                         *SenseData   OPTIONAL,
+  OUT UINT8                        *SenseDataLength
   )
 {
-  UFS_SCSI_REQUEST_PACKET             Packet;
-  UINT8                               Cdb[UFS_SCSI_OP_LENGTH_TEN];
-  EFI_STATUS                          Status;
+  UFS_SCSI_REQUEST_PACKET  Packet;
+  UINT8                    Cdb[UFS_SCSI_OP_LENGTH_TEN];
+  EFI_STATUS               Status;
 
   ZeroMem (&Packet, sizeof (UFS_SCSI_REQUEST_PACKET));
   ZeroMem (Cdb, sizeof (Cdb));
@@ -254,17 +250,17 @@ UfsPeimReadCapacity (
 **/
 EFI_STATUS
 UfsPeimReadCapacity16 (
-  IN     UFS_PEIM_HC_PRIVATE_DATA     *Private,
-  IN     UINTN                        Lun,
-     OUT VOID                         *DataBuffer,
-     OUT UINT32                       *DataLength,
-     OUT VOID                         *SenseData,  OPTIONAL
-     OUT UINT8                        *SenseDataLength
+  IN     UFS_PEIM_HC_PRIVATE_DATA  *Private,
+  IN     UINTN                     Lun,
+  OUT VOID                         *DataBuffer,
+  OUT UINT32                       *DataLength,
+  OUT VOID                         *SenseData   OPTIONAL,
+  OUT UINT8                        *SenseDataLength
   )
 {
-  UFS_SCSI_REQUEST_PACKET             Packet;
-  UINT8                               Cdb[UFS_SCSI_OP_LENGTH_SIXTEEN];
-  EFI_STATUS                          Status;
+  UFS_SCSI_REQUEST_PACKET  Packet;
+  UINT8                    Cdb[UFS_SCSI_OP_LENGTH_SIXTEEN];
+  EFI_STATUS               Status;
 
   ZeroMem (&Packet, sizeof (UFS_SCSI_REQUEST_PACKET));
   ZeroMem (Cdb, sizeof (Cdb));
@@ -314,26 +310,26 @@ UfsPeimReadCapacity16 (
 **/
 EFI_STATUS
 UfsPeimRead10 (
-  IN     UFS_PEIM_HC_PRIVATE_DATA     *Private,
-  IN     UINTN                        Lun,
-  IN     UINTN                        StartLba,
-  IN     UINT32                       SectorNum,
-     OUT VOID                         *DataBuffer,
-     OUT UINT32                       *DataLength,
-     OUT VOID                         *SenseData,  OPTIONAL
-     OUT UINT8                        *SenseDataLength
+  IN     UFS_PEIM_HC_PRIVATE_DATA  *Private,
+  IN     UINTN                     Lun,
+  IN     UINTN                     StartLba,
+  IN     UINT32                    SectorNum,
+  OUT VOID                         *DataBuffer,
+  OUT UINT32                       *DataLength,
+  OUT VOID                         *SenseData   OPTIONAL,
+  OUT UINT8                        *SenseDataLength
   )
 {
-  UFS_SCSI_REQUEST_PACKET             Packet;
-  UINT8                               Cdb[UFS_SCSI_OP_LENGTH_TEN];
-  EFI_STATUS                          Status;
+  UFS_SCSI_REQUEST_PACKET  Packet;
+  UINT8                    Cdb[UFS_SCSI_OP_LENGTH_TEN];
+  EFI_STATUS               Status;
 
   ZeroMem (&Packet, sizeof (UFS_SCSI_REQUEST_PACKET));
   ZeroMem (Cdb, sizeof (Cdb));
 
   Cdb[0] = EFI_SCSI_OP_READ10;
-  WriteUnaligned32 ((UINT32 *)&Cdb[2], SwapBytes32 ((UINT32) StartLba));
-  WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 ((UINT16) SectorNum));
+  WriteUnaligned32 ((UINT32 *)&Cdb[2], SwapBytes32 ((UINT32)StartLba));
+  WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 ((UINT16)SectorNum));
 
   Packet.Timeout          = UFS_TIMEOUT;
   Packet.Cdb              = Cdb;
@@ -376,19 +372,19 @@ UfsPeimRead10 (
 **/
 EFI_STATUS
 UfsPeimRead16 (
-  IN     UFS_PEIM_HC_PRIVATE_DATA     *Private,
-  IN     UINTN                        Lun,
-  IN     UINTN                        StartLba,
-  IN     UINT32                       SectorNum,
-     OUT VOID                         *DataBuffer,
-     OUT UINT32                       *DataLength,
-     OUT VOID                         *SenseData,  OPTIONAL
-     OUT UINT8                        *SenseDataLength
+  IN     UFS_PEIM_HC_PRIVATE_DATA  *Private,
+  IN     UINTN                     Lun,
+  IN     UINTN                     StartLba,
+  IN     UINT32                    SectorNum,
+  OUT VOID                         *DataBuffer,
+  OUT UINT32                       *DataLength,
+  OUT VOID                         *SenseData   OPTIONAL,
+  OUT UINT8                        *SenseDataLength
   )
 {
-  UFS_SCSI_REQUEST_PACKET             Packet;
-  UINT8                               Cdb[UFS_SCSI_OP_LENGTH_SIXTEEN];
-  EFI_STATUS                          Status;
+  UFS_SCSI_REQUEST_PACKET  Packet;
+  UINT8                    Cdb[UFS_SCSI_OP_LENGTH_SIXTEEN];
+  EFI_STATUS               Status;
 
   ZeroMem (&Packet, sizeof (UFS_SCSI_REQUEST_PACKET));
   ZeroMem (Cdb, sizeof (Cdb));
@@ -432,60 +428,64 @@ UfsPeimRead16 (
 **/
 EFI_STATUS
 UfsPeimParsingSenseKeys (
-  IN     EFI_PEI_BLOCK_IO2_MEDIA   *Media,
-  IN     EFI_SCSI_SENSE_DATA       *SenseData,
-     OUT BOOLEAN                   *NeedRetry
+  IN     EFI_PEI_BLOCK_IO2_MEDIA  *Media,
+  IN     EFI_SCSI_SENSE_DATA      *SenseData,
+  OUT BOOLEAN                     *NeedRetry
   )
 {
   if ((SenseData->Sense_Key == EFI_SCSI_SK_NOT_READY) &&
-      (SenseData->Addnl_Sense_Code == EFI_SCSI_ASC_NO_MEDIA)) {
+      (SenseData->Addnl_Sense_Code == EFI_SCSI_ASC_NO_MEDIA))
+  {
     Media->MediaPresent = FALSE;
-    *NeedRetry = FALSE;
-    DEBUG ((EFI_D_VERBOSE, "UfsBlockIoPei: Is No Media\n"));
+    *NeedRetry          = FALSE;
+    DEBUG ((DEBUG_VERBOSE, "UfsBlockIoPei: Is No Media\n"));
     return EFI_DEVICE_ERROR;
   }
 
   if ((SenseData->Sense_Key == EFI_SCSI_SK_UNIT_ATTENTION) &&
-      (SenseData->Addnl_Sense_Code == EFI_SCSI_ASC_MEDIA_CHANGE)) {
+      (SenseData->Addnl_Sense_Code == EFI_SCSI_ASC_MEDIA_CHANGE))
+  {
     *NeedRetry = TRUE;
-    DEBUG ((EFI_D_VERBOSE, "UfsBlockIoPei: Is Media Change\n"));
+    DEBUG ((DEBUG_VERBOSE, "UfsBlockIoPei: Is Media Change\n"));
     return EFI_SUCCESS;
   }
 
   if ((SenseData->Sense_Key == EFI_SCSI_SK_UNIT_ATTENTION) &&
-      (SenseData->Addnl_Sense_Code == EFI_SCSI_ASC_RESET)) {
+      (SenseData->Addnl_Sense_Code == EFI_SCSI_ASC_RESET))
+  {
     *NeedRetry = TRUE;
-    DEBUG ((EFI_D_VERBOSE, "UfsBlockIoPei: Was Reset Before\n"));
+    DEBUG ((DEBUG_VERBOSE, "UfsBlockIoPei: Was Reset Before\n"));
     return EFI_SUCCESS;
   }
 
   if ((SenseData->Sense_Key == EFI_SCSI_SK_MEDIUM_ERROR) ||
       ((SenseData->Sense_Key == EFI_SCSI_SK_NOT_READY) &&
-      (SenseData->Addnl_Sense_Code == EFI_SCSI_ASC_MEDIA_UPSIDE_DOWN))) {
+       (SenseData->Addnl_Sense_Code == EFI_SCSI_ASC_MEDIA_UPSIDE_DOWN)))
+  {
     *NeedRetry = FALSE;
-    DEBUG ((EFI_D_VERBOSE, "UfsBlockIoPei: Media Error\n"));
+    DEBUG ((DEBUG_VERBOSE, "UfsBlockIoPei: Media Error\n"));
     return EFI_DEVICE_ERROR;
   }
 
   if (SenseData->Sense_Key == EFI_SCSI_SK_HARDWARE_ERROR) {
     *NeedRetry = FALSE;
-    DEBUG ((EFI_D_VERBOSE, "UfsBlockIoPei: Hardware Error\n"));
+    DEBUG ((DEBUG_VERBOSE, "UfsBlockIoPei: Hardware Error\n"));
     return EFI_DEVICE_ERROR;
   }
 
   if ((SenseData->Sense_Key == EFI_SCSI_SK_NOT_READY) &&
       (SenseData->Addnl_Sense_Code == EFI_SCSI_ASC_NOT_READY) &&
-      (SenseData->Addnl_Sense_Code_Qualifier == EFI_SCSI_ASCQ_IN_PROGRESS)) {
+      (SenseData->Addnl_Sense_Code_Qualifier == EFI_SCSI_ASCQ_IN_PROGRESS))
+  {
     *NeedRetry = TRUE;
-    DEBUG ((EFI_D_VERBOSE, "UfsBlockIoPei: Was Reset Before\n"));
+    DEBUG ((DEBUG_VERBOSE, "UfsBlockIoPei: Was Reset Before\n"));
     return EFI_SUCCESS;
   }
 
   *NeedRetry = FALSE;
-  DEBUG ((EFI_D_VERBOSE, "UfsBlockIoPei: Sense Key = 0x%x ASC = 0x%x!\n", SenseData->Sense_Key, SenseData->Addnl_Sense_Code));
+  DEBUG ((DEBUG_VERBOSE, "UfsBlockIoPei: Sense Key = 0x%x ASC = 0x%x!\n", SenseData->Sense_Key, SenseData->Addnl_Sense_Code));
   return EFI_DEVICE_ERROR;
 }
-
 
 /**
   Gets the count of block I/O devices that one specific block driver detects.
@@ -573,15 +573,15 @@ UfsBlockIoPeimGetMediaInfo (
   OUT EFI_PEI_BLOCK_IO_MEDIA         *MediaInfo
   )
 {
-  EFI_STATUS                         Status;
-  UFS_PEIM_HC_PRIVATE_DATA           *Private;
-  EFI_SCSI_SENSE_DATA                SenseData;
-  UINT8                              SenseDataLength;
-  EFI_SCSI_DISK_CAPACITY_DATA        Capacity;
-  EFI_SCSI_DISK_CAPACITY_DATA16      Capacity16;
-  UINTN                              DataLength;
-  BOOLEAN                            NeedRetry;
-  UINTN                              Lun;
+  EFI_STATUS                     Status;
+  UFS_PEIM_HC_PRIVATE_DATA       *Private;
+  EFI_SCSI_SENSE_DATA            SenseData;
+  UINT8                          SenseDataLength;
+  EFI_SCSI_DISK_CAPACITY_DATA    Capacity;
+  EFI_SCSI_DISK_CAPACITY_DATA16  Capacity16;
+  UINTN                          DataLength;
+  BOOLEAN                        NeedRetry;
+  UINTN                          Lun;
 
   Private   = GET_UFS_PEIM_HC_PRIVATE_DATA_FROM_THIS (This);
   NeedRetry = TRUE;
@@ -621,30 +621,31 @@ UfsBlockIoPeimGetMediaInfo (
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
-
   } while (NeedRetry);
 
   DataLength      = sizeof (EFI_SCSI_DISK_CAPACITY_DATA);
   SenseDataLength = 0;
-  Status = UfsPeimReadCapacity (Private, Lun, &Capacity, (UINT32 *)&DataLength, NULL, &SenseDataLength);
+  Status          = UfsPeimReadCapacity (Private, Lun, &Capacity, (UINT32 *)&DataLength, NULL, &SenseDataLength);
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
 
   if ((Capacity.LastLba3 == 0xff) && (Capacity.LastLba2 == 0xff) &&
-      (Capacity.LastLba1 == 0xff) && (Capacity.LastLba0 == 0xff)) {
+      (Capacity.LastLba1 == 0xff) && (Capacity.LastLba0 == 0xff))
+  {
     DataLength      = sizeof (EFI_SCSI_DISK_CAPACITY_DATA16);
     SenseDataLength = 0;
-    Status = UfsPeimReadCapacity16 (Private, Lun, &Capacity16, (UINT32 *)&DataLength, NULL, &SenseDataLength);
+    Status          = UfsPeimReadCapacity16 (Private, Lun, &Capacity16, (UINT32 *)&DataLength, NULL, &SenseDataLength);
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
+
     Private->Media[Lun].LastBlock  = ((UINT32)Capacity16.LastLba3 << 24) | (Capacity16.LastLba2 << 16) | (Capacity16.LastLba1 << 8) | Capacity16.LastLba0;
-    Private->Media[Lun].LastBlock |= LShiftU64 ((UINT64)Capacity16.LastLba7, 56) | LShiftU64((UINT64)Capacity16.LastLba6, 48) | LShiftU64 ((UINT64)Capacity16.LastLba5, 40) | LShiftU64 ((UINT64)Capacity16.LastLba4, 32);
+    Private->Media[Lun].LastBlock |= LShiftU64 ((UINT64)Capacity16.LastLba7, 56) | LShiftU64 ((UINT64)Capacity16.LastLba6, 48) | LShiftU64 ((UINT64)Capacity16.LastLba5, 40) | LShiftU64 ((UINT64)Capacity16.LastLba4, 32);
     Private->Media[Lun].BlockSize  = (Capacity16.BlockSize3 << 24) | (Capacity16.BlockSize2 << 16) | (Capacity16.BlockSize1 << 8) | Capacity16.BlockSize0;
   } else {
-    Private->Media[Lun].LastBlock  = ((UINT32)Capacity.LastLba3 << 24) | (Capacity.LastLba2 << 16) | (Capacity.LastLba1 << 8) | Capacity.LastLba0;
-    Private->Media[Lun].BlockSize  = (Capacity.BlockSize3 << 24) | (Capacity.BlockSize2 << 16) | (Capacity.BlockSize1 << 8) | Capacity.BlockSize0;
+    Private->Media[Lun].LastBlock = ((UINT32)Capacity.LastLba3 << 24) | (Capacity.LastLba2 << 16) | (Capacity.LastLba1 << 8) | Capacity.LastLba0;
+    Private->Media[Lun].BlockSize = (Capacity.BlockSize3 << 24) | (Capacity.BlockSize2 << 16) | (Capacity.BlockSize1 << 8) | Capacity.BlockSize0;
   }
 
   MediaInfo->DeviceType   = UfsDevice;
@@ -700,14 +701,14 @@ UfsBlockIoPeimReadBlocks (
   OUT VOID                           *Buffer
   )
 {
-  EFI_STATUS                         Status;
-  UINTN                              BlockSize;
-  UINTN                              NumberOfBlocks;
-  UFS_PEIM_HC_PRIVATE_DATA           *Private;
-  EFI_SCSI_SENSE_DATA                SenseData;
-  UINT8                              SenseDataLength;
-  BOOLEAN                            NeedRetry;
-  UINTN                              Lun;
+  EFI_STATUS                Status;
+  UINTN                     BlockSize;
+  UINTN                     NumberOfBlocks;
+  UFS_PEIM_HC_PRIVATE_DATA  *Private;
+  EFI_SCSI_SENSE_DATA       SenseData;
+  UINT8                     SenseDataLength;
+  BOOLEAN                   NeedRetry;
+  UINTN                     Lun;
 
   Status    = EFI_SUCCESS;
   NeedRetry = TRUE;
@@ -767,7 +768,6 @@ UfsBlockIoPeimReadBlocks (
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
-
   } while (NeedRetry);
 
   SenseDataLength = 0;
@@ -794,6 +794,7 @@ UfsBlockIoPeimReadBlocks (
                &SenseDataLength
                );
   }
+
   return Status;
 }
 
@@ -819,9 +820,9 @@ UfsBlockIoPeimReadBlocks (
 EFI_STATUS
 EFIAPI
 UfsBlockIoPeimGetDeviceNo2 (
-  IN  EFI_PEI_SERVICES               **PeiServices,
-  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
-  OUT UINTN                          *NumberBlockDevices
+  IN  EFI_PEI_SERVICES                **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *This,
+  OUT UINTN                           *NumberBlockDevices
   )
 {
   //
@@ -877,25 +878,25 @@ UfsBlockIoPeimGetDeviceNo2 (
 EFI_STATUS
 EFIAPI
 UfsBlockIoPeimGetMediaInfo2 (
-  IN  EFI_PEI_SERVICES               **PeiServices,
-  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
-  IN  UINTN                          DeviceIndex,
-  OUT EFI_PEI_BLOCK_IO2_MEDIA        *MediaInfo
+  IN  EFI_PEI_SERVICES                **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *This,
+  IN  UINTN                           DeviceIndex,
+  OUT EFI_PEI_BLOCK_IO2_MEDIA         *MediaInfo
   )
 {
-  EFI_STATUS                         Status;
-  UFS_PEIM_HC_PRIVATE_DATA           *Private;
-  EFI_PEI_BLOCK_IO_MEDIA             Media;
-  UINTN                              Lun;
+  EFI_STATUS                Status;
+  UFS_PEIM_HC_PRIVATE_DATA  *Private;
+  EFI_PEI_BLOCK_IO_MEDIA    Media;
+  UINTN                     Lun;
 
-  Private   = GET_UFS_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
+  Private = GET_UFS_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
 
-  Status    = UfsBlockIoPeimGetMediaInfo (
-                PeiServices,
-                &Private->BlkIoPpi,
-                DeviceIndex,
-                &Media
-                );
+  Status = UfsBlockIoPeimGetMediaInfo (
+             PeiServices,
+             &Private->BlkIoPpi,
+             DeviceIndex,
+             &Media
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -942,28 +943,28 @@ UfsBlockIoPeimGetMediaInfo2 (
 EFI_STATUS
 EFIAPI
 UfsBlockIoPeimReadBlocks2 (
-  IN  EFI_PEI_SERVICES               **PeiServices,
-  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
-  IN  UINTN                          DeviceIndex,
-  IN  EFI_PEI_LBA                    StartLBA,
-  IN  UINTN                          BufferSize,
-  OUT VOID                           *Buffer
+  IN  EFI_PEI_SERVICES                **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *This,
+  IN  UINTN                           DeviceIndex,
+  IN  EFI_PEI_LBA                     StartLBA,
+  IN  UINTN                           BufferSize,
+  OUT VOID                            *Buffer
   )
 {
-  EFI_STATUS                         Status;
-  UFS_PEIM_HC_PRIVATE_DATA           *Private;
+  EFI_STATUS                Status;
+  UFS_PEIM_HC_PRIVATE_DATA  *Private;
 
-  Status    = EFI_SUCCESS;
-  Private   = GET_UFS_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
+  Status  = EFI_SUCCESS;
+  Private = GET_UFS_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
 
-  Status  = UfsBlockIoPeimReadBlocks (
-              PeiServices,
-              &Private->BlkIoPpi,
-              DeviceIndex,
-              StartLBA,
-              BufferSize,
-              Buffer
-              );
+  Status = UfsBlockIoPeimReadBlocks (
+             PeiServices,
+             &Private->BlkIoPpi,
+             DeviceIndex,
+             StartLBA,
+             BufferSize,
+             Buffer
+             );
   return Status;
 }
 
@@ -986,7 +987,7 @@ UfsEndOfPei (
   IN VOID                       *Ppi
   )
 {
-  UFS_PEIM_HC_PRIVATE_DATA    *Private;
+  UFS_PEIM_HC_PRIVATE_DATA  *Private;
 
   Private = GET_UFS_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY (NotifyDescriptor);
 
@@ -1028,17 +1029,17 @@ UfsEndOfPei (
 EFI_STATUS
 EFIAPI
 InitializeUfsBlockIoPeim (
-  IN EFI_PEI_FILE_HANDLE        FileHandle,
-  IN CONST EFI_PEI_SERVICES     **PeiServices
+  IN EFI_PEI_FILE_HANDLE     FileHandle,
+  IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
-  EFI_STATUS                    Status;
-  UFS_PEIM_HC_PRIVATE_DATA      *Private;
-  EDKII_UFS_HOST_CONTROLLER_PPI *UfsHcPpi;
-  UINT32                        Index;
-  UFS_CONFIG_DESC               Config;
-  UINTN                         MmioBase;
-  UINT8                         Controller;
+  EFI_STATUS                     Status;
+  UFS_PEIM_HC_PRIVATE_DATA       *Private;
+  EDKII_UFS_HOST_CONTROLLER_PPI  *UfsHcPpi;
+  UINT32                         Index;
+  UINTN                          MmioBase;
+  UINT8                          Controller;
+  UFS_UNIT_DESC                  UnitDescriptor;
 
   //
   // Shadow this PEIM to run from memory
@@ -1054,7 +1055,7 @@ InitializeUfsBlockIoPeim (
              &gEdkiiPeiUfsHostControllerPpiGuid,
              0,
              NULL,
-             (VOID **) &UfsHcPpi
+             (VOID **)&UfsHcPpi
              );
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
@@ -1097,7 +1098,7 @@ InitializeUfsBlockIoPeim (
     //
     Status = UfsControllerInit (Private);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "UfsDevicePei: Host Controller Initialization Error, Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "UfsDevicePei: Host Controller Initialization Error, Status = %r\n", Status));
       Controller++;
       continue;
     }
@@ -1109,7 +1110,7 @@ InitializeUfsBlockIoPeim (
     //
     Status = UfsExecNopCmds (Private);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Ufs Sending NOP IN command Error, Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Ufs Sending NOP IN command Error, Status = %r\n", Status));
       Controller++;
       continue;
     }
@@ -1119,25 +1120,24 @@ InitializeUfsBlockIoPeim (
     //
     Status = UfsSetFlag (Private, UfsFlagDevInit);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Ufs Set fDeviceInit Flag Error, Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Ufs Set fDeviceInit Flag Error, Status = %r\n", Status));
       Controller++;
       continue;
     }
 
     //
-    // Get Ufs Device's Lun Info by reading Configuration Descriptor.
+    // Check if 8 common luns are active and set corresponding bit mask.
     //
-    Status = UfsRwDeviceDesc (Private, TRUE, UfsConfigDesc, 0, 0, &Config, sizeof (UFS_CONFIG_DESC));
-    if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Ufs Get Configuration Descriptor Error, Status = %r\n", Status));
-      Controller++;
-      continue;
-    }
-
     for (Index = 0; Index < UFS_PEIM_MAX_LUNS; Index++) {
-      if (Config.UnitDescConfParams[Index].LunEn != 0) {
+      Status = UfsRwDeviceDesc (Private, TRUE, UfsUnitDesc, (UINT8)Index, 0, &UnitDescriptor, sizeof (UFS_UNIT_DESC));
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "Fail to read UFS Unit Descriptor, Index = %X, Status = %r\n", Index, Status));
+        continue;
+      }
+
+      if (UnitDescriptor.LunEn == 0x1) {
+        DEBUG ((DEBUG_INFO, "Ufs %d Lun %d is enabled\n", Controller, Index));
         Private->Luns.BitMask |= (BIT0 << Index);
-        DEBUG ((EFI_D_INFO, "Ufs %d Lun %d is enabled\n", Controller, Index));
       }
     }
 

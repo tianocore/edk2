@@ -3,6 +3,7 @@
 #
 # Copyright (c) Microsoft Corporation
 # Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
@@ -16,9 +17,42 @@
         ##     "<ErrorID>", "<KeyWord>"
         ## ]
         "ExceptionList": [
+            "9005", "@VDD",
+            "8005", "gST",
+            "8005", "gBS",
+            "8005", "gDS",
+            "8005", "gDS",
+            "8002", "va_list",
+            "8005", "EFI_BLUETOOTH_LE_SCAN_CALLBACK_INFORMATION.RSSI",
+            "8005", "void",
+            "8005", "va_list.__ap",
+            "8005", "__stack_chk_guard",
+            "8001", "MSG_IPv6_DP",
+            "8001", "MSG_IPv4_DP",
+            "8001", "DEFAULT_ToS",
+            "8001", "EFI_SERIAL_IO_PROTOCOL_REVISION1p1",
+            "8001", "EFI_ABS_AltActive",
+            "8001", "EFI_ABSP_SupportsAltActive",
+            "8001", "_ReadWriteBarrier",
+            "8001", "__va_copy",
+            "8003", "__va_copy",
+            "7007", "_EFI_LEGACY_SPI_CONTROLLER_PROTOCOL",
+            "7007", "_EFI_LEGACY_SPI_FLASH_PROTOCOL",
+            "7007", "_EFI_SPI_NOR_FLASH_PROTOCOL",
+            "7007", "_EFI_SPI_HC_PROTOCOL",
+            "8002", "aligned (",
+            "4002", "_ReturnAddress"
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
+            "Include/IndustryStandard/Acpi64.h",
+            "Include/IndustryStandard/Tpm12.h",
+            "Include/IndustryStandard/Tpm20.h",
+            "Include/IndustryStandard/IoRemappingTable.h",
+            "Include/IndustryStandard/UefiTcgPlatform.h",
+            "Include/Library/PcdLib.h",
+            "Include/Library/SafeIntLib.h",
+            "Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.c"
         ]
     },
     ## options defined ci/Plugin/CompilerPlugin
@@ -98,7 +132,8 @@
             "gEfiProcessorSpecificErrorSectionGuid=gEfiIa32X64ProcessorErrorSectionGuid",  ## is this a bug
             "gEfiSmmPeriodicTimerDispatch2ProtocolGuid=gEfiMmPeriodicTimerDispatchProtocolGuid",
             "gEfiPeiMmAccessPpiGuid=gPeiSmmAccessPpiGuid",
-            "gPeiSmmControlPpiGuid=gEfiPeiMmControlPpiGuid"
+            "gPeiSmmControlPpiGuid=gEfiPeiMmControlPpiGuid",
+            "gEfiPeiMmCommunicationPpiGuid=gEfiPeiSmmCommunicationPpiGuid",
             ]
     },
 

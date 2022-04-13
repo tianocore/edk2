@@ -3,7 +3,7 @@
 
 Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2016-2021 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -11,30 +11,30 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "Service.h"
 #include <Library/DxeServicesLib.h>
 
-PCD_DATABASE   mPcdDatabase;
+PCD_DATABASE  mPcdDatabase;
 
-UINT32         mPcdTotalTokenCount;
-UINT32         mPeiLocalTokenCount;
-UINT32         mDxeLocalTokenCount;
-UINT32         mPeiNexTokenCount;
-UINT32         mDxeNexTokenCount;
-UINT32         mPeiExMapppingTableSize;
-UINT32         mDxeExMapppingTableSize;
-UINT32         mPeiGuidTableSize;
-UINT32         mDxeGuidTableSize;
+UINT32  mPcdTotalTokenCount;
+UINT32  mPeiLocalTokenCount;
+UINT32  mDxeLocalTokenCount;
+UINT32  mPeiNexTokenCount;
+UINT32  mDxeNexTokenCount;
+UINT32  mPeiExMapppingTableSize;
+UINT32  mDxeExMapppingTableSize;
+UINT32  mPeiGuidTableSize;
+UINT32  mDxeGuidTableSize;
 
-BOOLEAN        mPeiExMapTableEmpty;
-BOOLEAN        mDxeExMapTableEmpty;
-BOOLEAN        mPeiDatabaseEmpty;
+BOOLEAN  mPeiExMapTableEmpty;
+BOOLEAN  mDxeExMapTableEmpty;
+BOOLEAN  mPeiDatabaseEmpty;
 
-LIST_ENTRY    *mCallbackFnTable;
-EFI_GUID     **TmpTokenSpaceBuffer;
-UINTN          TmpTokenSpaceBufferCount;
+LIST_ENTRY  *mCallbackFnTable;
+EFI_GUID    **TmpTokenSpaceBuffer;
+UINTN       TmpTokenSpaceBufferCount;
 
-UINTN                 mPeiPcdDbSize    = 0;
-PEI_PCD_DATABASE      *mPeiPcdDbBinary = NULL;
-UINTN                 mDxePcdDbSize    = 0;
-DXE_PCD_DATABASE      *mDxePcdDbBinary = NULL;
+UINTN             mPeiPcdDbSize    = 0;
+PEI_PCD_DATABASE  *mPeiPcdDbBinary = NULL;
+UINTN             mDxePcdDbSize    = 0;
+DXE_PCD_DATABASE  *mDxePcdDbBinary = NULL;
 
 /**
   Get Local Token Number by Token Number.
@@ -47,11 +47,11 @@ DXE_PCD_DATABASE      *mDxePcdDbBinary = NULL;
 **/
 UINT32
 GetLocalTokenNumber (
-  IN BOOLEAN            IsPeiDb,
-  IN UINTN              TokenNumber
+  IN BOOLEAN  IsPeiDb,
+  IN UINTN    TokenNumber
   )
 {
-  UINT32                *LocalTokenNumberTable;
+  UINT32  *LocalTokenNumberTable;
 
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
@@ -60,9 +60,9 @@ GetLocalTokenNumber (
   //
   TokenNumber--;
 
-  LocalTokenNumberTable  = IsPeiDb ? (UINT32 *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->LocalTokenNumberTableOffset) :
-                                     (UINT32 *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->LocalTokenNumberTableOffset);
-  TokenNumber            = IsPeiDb ? TokenNumber : TokenNumber - mPeiLocalTokenCount;
+  LocalTokenNumberTable = IsPeiDb ? (UINT32 *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->LocalTokenNumberTableOffset) :
+                          (UINT32 *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->LocalTokenNumberTableOffset);
+  TokenNumber = IsPeiDb ? TokenNumber : TokenNumber - mPeiLocalTokenCount;
 
   return LocalTokenNumberTable[TokenNumber];
 }
@@ -76,7 +76,7 @@ GetLocalTokenNumber (
 **/
 EFI_PCD_TYPE
 GetPcdType (
-  IN UINT32             LocalTokenNumber
+  IN UINT32  LocalTokenNumber
   )
 {
   switch (LocalTokenNumber & PCD_DATUM_TYPE_ALL_SET) {
@@ -88,6 +88,7 @@ GetPcdType (
       } else {
         return EFI_PCD_TYPE_8;
       }
+
     case PCD_DATUM_TYPE_UINT16:
       return EFI_PCD_TYPE_16;
     case PCD_DATUM_TYPE_UINT32:
@@ -113,18 +114,18 @@ GetPcdType (
 **/
 CHAR8 *
 GetPcdName (
-  IN BOOLEAN            OnlyTokenSpaceName,
-  IN BOOLEAN            IsPeiDb,
-  IN UINTN              TokenNumber
+  IN BOOLEAN  OnlyTokenSpaceName,
+  IN BOOLEAN  IsPeiDb,
+  IN UINTN    TokenNumber
   )
 {
-  PCD_DATABASE_INIT *Database;
-  UINT8             *StringTable;
-  UINTN             NameSize;
-  PCD_NAME_INDEX    *PcdNameIndex;
-  CHAR8             *TokenSpaceName;
-  CHAR8             *PcdName;
-  CHAR8             *Name;
+  PCD_DATABASE_INIT  *Database;
+  UINT8              *StringTable;
+  UINTN              NameSize;
+  PCD_NAME_INDEX     *PcdNameIndex;
+  CHAR8              *TokenSpaceName;
+  CHAR8              *PcdName;
+  CHAR8              *Name;
 
   //
   // Return NULL when PCD name table is absent.
@@ -146,17 +147,17 @@ GetPcdName (
   //
   TokenNumber--;
 
-  Database = IsPeiDb ? mPcdDatabase.PeiDb: mPcdDatabase.DxeDb;
+  Database    = IsPeiDb ? mPcdDatabase.PeiDb : mPcdDatabase.DxeDb;
   TokenNumber = IsPeiDb ? TokenNumber : TokenNumber - mPeiLocalTokenCount;
 
-  StringTable = (UINT8 *) Database + Database->StringTableOffset;
+  StringTable = (UINT8 *)Database + Database->StringTableOffset;
 
   //
   // Get the PCD name index.
   //
-  PcdNameIndex = (PCD_NAME_INDEX *)((UINT8 *) Database + Database->PcdNameTableOffset) + TokenNumber;
+  PcdNameIndex   = (PCD_NAME_INDEX *)((UINT8 *)Database + Database->PcdNameTableOffset) + TokenNumber;
   TokenSpaceName = (CHAR8 *)&StringTable[PcdNameIndex->TokenSpaceCNameIndex];
-  PcdName = (CHAR8 *)&StringTable[PcdNameIndex->PcdCNameIndex];
+  PcdName        = (CHAR8 *)&StringTable[PcdNameIndex->PcdCNameIndex];
 
   if (OnlyTokenSpaceName) {
     //
@@ -168,7 +169,7 @@ GetPcdName (
     // Need to get the full PCD name.
     //
     NameSize = AsciiStrSize (TokenSpaceName) + AsciiStrSize (PcdName);
-    Name = AllocateZeroPool (NameSize);
+    Name     = AllocateZeroPool (NameSize);
     ASSERT (Name != NULL);
     //
     // Catenate TokenSpaceCName and PcdCName with a '.' to form the full PCD name.
@@ -199,24 +200,24 @@ GetPcdName (
 **/
 EFI_STATUS
 ExGetPcdInfo (
-  IN        BOOLEAN             IsPeiDb,
-  IN CONST  EFI_GUID            *Guid,
-  IN        UINTN               TokenNumber,
-  OUT       EFI_PCD_INFO        *PcdInfo
+  IN        BOOLEAN       IsPeiDb,
+  IN CONST  EFI_GUID      *Guid,
+  IN        UINTN         TokenNumber,
+  OUT       EFI_PCD_INFO  *PcdInfo
   )
 {
-  PCD_DATABASE_INIT     *Database;
-  UINTN                 GuidTableIdx;
-  EFI_GUID              *MatchGuid;
-  EFI_GUID              *GuidTable;
-  DYNAMICEX_MAPPING     *ExMapTable;
-  UINTN                 Index;
-  UINT32                LocalTokenNumber;
+  PCD_DATABASE_INIT  *Database;
+  UINTN              GuidTableIdx;
+  EFI_GUID           *MatchGuid;
+  EFI_GUID           *GuidTable;
+  DYNAMICEX_MAPPING  *ExMapTable;
+  UINTN              Index;
+  UINT32             LocalTokenNumber;
 
-  Database = IsPeiDb ? mPcdDatabase.PeiDb: mPcdDatabase.DxeDb;
+  Database = IsPeiDb ? mPcdDatabase.PeiDb : mPcdDatabase.DxeDb;
 
   GuidTable = (EFI_GUID *)((UINT8 *)Database + Database->GuidTableOffset);
-  MatchGuid = ScanGuid (GuidTable, Database->GuidTableCount * sizeof(EFI_GUID), Guid);
+  MatchGuid = ScanGuid (GuidTable, Database->GuidTableCount * sizeof (EFI_GUID), Guid);
 
   if (MatchGuid == NULL) {
     return EFI_NOT_FOUND;
@@ -273,26 +274,27 @@ ExGetPcdInfo (
 **/
 EFI_STATUS
 DxeGetPcdInfo (
-  IN CONST  EFI_GUID        *Guid,
-  IN        UINTN           TokenNumber,
-  OUT       EFI_PCD_INFO    *PcdInfo
+  IN CONST  EFI_GUID      *Guid,
+  IN        UINTN         TokenNumber,
+  OUT       EFI_PCD_INFO  *PcdInfo
   )
 {
-  EFI_STATUS            Status;
-  BOOLEAN               PeiExMapTableEmpty;
-  BOOLEAN               DxeExMapTableEmpty;
-  UINT32                LocalTokenNumber;
-  BOOLEAN               IsPeiDb;
+  EFI_STATUS  Status;
+  BOOLEAN     PeiExMapTableEmpty;
+  BOOLEAN     DxeExMapTableEmpty;
+  UINT32      LocalTokenNumber;
+  BOOLEAN     IsPeiDb;
 
   ASSERT (PcdInfo != NULL);
 
-  Status = EFI_NOT_FOUND;
+  Status             = EFI_NOT_FOUND;
   PeiExMapTableEmpty = mPeiExMapTableEmpty;
   DxeExMapTableEmpty = mDxeExMapTableEmpty;
 
   if (Guid == NULL) {
     if (((TokenNumber + 1 > mPeiNexTokenCount + 1) && (TokenNumber + 1 <= mPeiLocalTokenCount + 1)) ||
-        ((TokenNumber + 1 > (mPeiLocalTokenCount + mDxeNexTokenCount + 1)))) {
+        ((TokenNumber + 1 > (mPeiLocalTokenCount + mDxeNexTokenCount + 1))))
+    {
       return EFI_NOT_FOUND;
     } else if (TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
       //
@@ -304,14 +306,16 @@ DxeGetPcdInfo (
       PcdInfo->PcdName = NULL;
     } else {
       PcdInfo->PcdSize = DxePcdGetSize (TokenNumber);
-      IsPeiDb = FALSE;
+      IsPeiDb          = FALSE;
       if ((TokenNumber + 1 <= mPeiNexTokenCount + 1)) {
         IsPeiDb = TRUE;
       }
+
       LocalTokenNumber = GetLocalTokenNumber (IsPeiDb, TokenNumber);
       PcdInfo->PcdType = GetPcdType (LocalTokenNumber);
       PcdInfo->PcdName = GetPcdName (FALSE, IsPeiDb, TokenNumber);
     }
+
     return EFI_SUCCESS;
   }
 
@@ -360,27 +364,27 @@ DxeGetPcdInfo (
 **/
 VOID *
 GetWorker (
-  IN UINTN             TokenNumber,
-  IN UINTN             GetSize
+  IN UINTN  TokenNumber,
+  IN UINTN  GetSize
   )
 {
-  EFI_GUID            *GuidTable;
-  UINT8               *StringTable;
-  EFI_GUID            *Guid;
-  UINT16              *Name;
-  VARIABLE_HEAD       *VariableHead;
-  UINT8               *VaraiableDefaultBuffer;
-  UINT8               *Data;
-  VPD_HEAD            *VpdHead;
-  UINT8               *PcdDb;
-  VOID                *RetPtr;
-  UINTN               TmpTokenNumber;
-  UINTN               DataSize;
-  EFI_STATUS          Status;
-  UINT32              LocalTokenNumber;
-  UINT32              Offset;
-  STRING_HEAD         StringTableIdx;
-  BOOLEAN             IsPeiDb;
+  EFI_GUID       *GuidTable;
+  UINT8          *StringTable;
+  EFI_GUID       *Guid;
+  UINT16         *Name;
+  VARIABLE_HEAD  *VariableHead;
+  UINT8          *VaraiableDefaultBuffer;
+  UINT8          *Data;
+  VPD_HEAD       *VpdHead;
+  UINT8          *PcdDb;
+  VOID           *RetPtr;
+  UINTN          TmpTokenNumber;
+  UINTN          DataSize;
+  EFI_STATUS     Status;
+  UINT32         LocalTokenNumber;
+  UINT32         Offset;
+  STRING_HEAD    StringTableIdx;
+  BOOLEAN        IsPeiDb;
 
   //
   // Aquire lock to prevent reentrance from TPL_CALLBACK level
@@ -411,51 +415,51 @@ GetWorker (
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the
   // comparison.
-  IsPeiDb = (BOOLEAN) ((TokenNumber + 1 < mPeiLocalTokenCount + 1) ? TRUE : FALSE);
+  IsPeiDb = (BOOLEAN)((TokenNumber + 1 < mPeiLocalTokenCount + 1) ? TRUE : FALSE);
 
   LocalTokenNumber = GetLocalTokenNumber (IsPeiDb, TokenNumber + 1);
 
-  PcdDb = IsPeiDb ? ((UINT8 *) mPcdDatabase.PeiDb) : ((UINT8 *) mPcdDatabase.DxeDb);
+  PcdDb = IsPeiDb ? ((UINT8 *)mPcdDatabase.PeiDb) : ((UINT8 *)mPcdDatabase.DxeDb);
 
   if (IsPeiDb) {
-    StringTable = (UINT8 *) ((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->StringTableOffset);
+    StringTable = (UINT8 *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->StringTableOffset);
   } else {
-    StringTable = (UINT8 *) ((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->StringTableOffset);
+    StringTable = (UINT8 *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->StringTableOffset);
   }
 
-
-  Offset     = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
+  Offset = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
 
   switch (LocalTokenNumber & PCD_TYPE_ALL_SET) {
     case PCD_TYPE_VPD:
-      VpdHead = (VPD_HEAD *) ((UINT8 *) PcdDb + Offset);
+      VpdHead = (VPD_HEAD *)((UINT8 *)PcdDb + Offset);
       ASSERT (mVpdBaseAddress != 0);
-      RetPtr = (VOID *) (mVpdBaseAddress + VpdHead->Offset);
+      RetPtr = (VOID *)(mVpdBaseAddress + VpdHead->Offset);
 
       break;
 
     case PCD_TYPE_HII|PCD_TYPE_STRING:
     case PCD_TYPE_HII:
       if (IsPeiDb) {
-        GuidTable = (EFI_GUID *) ((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->GuidTableOffset);
+        GuidTable = (EFI_GUID *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->GuidTableOffset);
       } else {
-        GuidTable = (EFI_GUID *) ((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->GuidTableOffset);
+        GuidTable = (EFI_GUID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->GuidTableOffset);
       }
 
-      VariableHead = (VARIABLE_HEAD *) (PcdDb + Offset);
-      Guid = GuidTable + VariableHead->GuidTableIndex;
-      Name = (UINT16*)(StringTable + VariableHead->StringIndex);
+      VariableHead = (VARIABLE_HEAD *)(PcdDb + Offset);
+      Guid         = GuidTable + VariableHead->GuidTableIndex;
+      Name         = (UINT16 *)(StringTable + VariableHead->StringIndex);
 
       if ((LocalTokenNumber & PCD_TYPE_ALL_SET) == (PCD_TYPE_HII|PCD_TYPE_STRING)) {
         //
         // If a HII type PCD's datum type is VOID*, the DefaultValueOffset is the index of
         // string array in string table.
         //
-        StringTableIdx = *(STRING_HEAD*)((UINT8 *) PcdDb + VariableHead->DefaultValueOffset);
-        VaraiableDefaultBuffer = (UINT8 *) (StringTable + StringTableIdx);
+        StringTableIdx         = *(STRING_HEAD *)((UINT8 *)PcdDb + VariableHead->DefaultValueOffset);
+        VaraiableDefaultBuffer = (UINT8 *)(StringTable + StringTableIdx);
       } else {
-        VaraiableDefaultBuffer = (UINT8 *) PcdDb + VariableHead->DefaultValueOffset;
+        VaraiableDefaultBuffer = (UINT8 *)PcdDb + VariableHead->DefaultValueOffset;
       }
+
       Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
       if (Status == EFI_SUCCESS) {
         if (DataSize >= (VariableHead->Offset + GetSize)) {
@@ -472,6 +476,7 @@ GetWorker (
               GetSize = DataSize - VariableHead->Offset;
             }
           }
+
           //
           // If the operation is successful, we copy the data
           // to the default value buffer in the PCD Database.
@@ -479,30 +484,30 @@ GetWorker (
           //
           CopyMem (VaraiableDefaultBuffer, Data + VariableHead->Offset, GetSize);
         }
+
         FreePool (Data);
       }
-      RetPtr = (VOID *) VaraiableDefaultBuffer;
+
+      RetPtr = (VOID *)VaraiableDefaultBuffer;
       break;
 
     case PCD_TYPE_STRING:
-      StringTableIdx = *(STRING_HEAD*)((UINT8 *) PcdDb + Offset);
-      RetPtr = (VOID *) (StringTable + StringTableIdx);
+      StringTableIdx = *(STRING_HEAD *)((UINT8 *)PcdDb + Offset);
+      RetPtr         = (VOID *)(StringTable + StringTableIdx);
       break;
 
     case PCD_TYPE_DATA:
-      RetPtr = (VOID *) ((UINT8 *) PcdDb + Offset);
+      RetPtr = (VOID *)((UINT8 *)PcdDb + Offset);
       break;
 
     default:
       ASSERT (FALSE);
       break;
-
   }
 
   EfiReleaseLock (&mPcdDatabaseLock);
 
   return RetPtr;
-
 }
 
 /**
@@ -521,17 +526,17 @@ GetWorker (
 **/
 EFI_STATUS
 DxeRegisterCallBackWorker (
-  IN  UINTN                   TokenNumber,
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
-  IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
-)
+  IN  UINTN                  TokenNumber,
+  IN  CONST EFI_GUID         *Guid  OPTIONAL,
+  IN  PCD_PROTOCOL_CALLBACK  CallBackFunction
+  )
 {
-  CALLBACK_FN_ENTRY       *FnTableEntry;
-  LIST_ENTRY              *ListHead;
-  LIST_ENTRY              *ListNode;
+  CALLBACK_FN_ENTRY  *FnTableEntry;
+  LIST_ENTRY         *ListHead;
+  LIST_ENTRY         *ListNode;
 
   if (Guid != NULL) {
-    TokenNumber = GetExPcdTokenNumber (Guid, (UINT32) TokenNumber);
+    TokenNumber = GetExPcdTokenNumber (Guid, (UINT32)TokenNumber);
   }
 
   //
@@ -543,7 +548,7 @@ DxeRegisterCallBackWorker (
   ListNode = GetFirstNode (ListHead);
 
   while (ListNode != ListHead) {
-    FnTableEntry = CR_FNENTRY_FROM_LISTNODE(ListNode, CALLBACK_FN_ENTRY, Node);
+    FnTableEntry = CR_FNENTRY_FROM_LISTNODE (ListNode, CALLBACK_FN_ENTRY, Node);
 
     if (FnTableEntry->CallbackFn == CallBackFunction) {
       //
@@ -552,10 +557,11 @@ DxeRegisterCallBackWorker (
       //
       return EFI_SUCCESS;
     }
+
     ListNode = GetNextNode (ListHead, ListNode);
   }
 
-  FnTableEntry = AllocatePool (sizeof(CALLBACK_FN_ENTRY));
+  FnTableEntry = AllocatePool (sizeof (CALLBACK_FN_ENTRY));
   ASSERT (FnTableEntry != NULL);
 
   FnTableEntry->CallbackFn = CallBackFunction;
@@ -580,17 +586,17 @@ DxeRegisterCallBackWorker (
 **/
 EFI_STATUS
 DxeUnRegisterCallBackWorker (
-  IN  UINTN                   TokenNumber,
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
-  IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
-)
+  IN  UINTN                  TokenNumber,
+  IN  CONST EFI_GUID         *Guid  OPTIONAL,
+  IN  PCD_PROTOCOL_CALLBACK  CallBackFunction
+  )
 {
-  CALLBACK_FN_ENTRY       *FnTableEntry;
-  LIST_ENTRY              *ListHead;
-  LIST_ENTRY              *ListNode;
+  CALLBACK_FN_ENTRY  *FnTableEntry;
+  LIST_ENTRY         *ListHead;
+  LIST_ENTRY         *ListNode;
 
   if (Guid != NULL) {
-    TokenNumber = GetExPcdTokenNumber (Guid, (UINT32) TokenNumber);
+    TokenNumber = GetExPcdTokenNumber (Guid, (UINT32)TokenNumber);
   }
 
   //
@@ -602,7 +608,7 @@ DxeUnRegisterCallBackWorker (
   ListNode = GetFirstNode (ListHead);
 
   while (ListNode != ListHead) {
-    FnTableEntry = CR_FNENTRY_FROM_LISTNODE(ListNode, CALLBACK_FN_ENTRY, Node);
+    FnTableEntry = CR_FNENTRY_FROM_LISTNODE (ListNode, CALLBACK_FN_ENTRY, Node);
 
     if (FnTableEntry->CallbackFn == CallBackFunction) {
       //
@@ -615,6 +621,7 @@ DxeUnRegisterCallBackWorker (
 
       return EFI_SUCCESS;
     }
+
     ListNode = GetNextNode (ListHead, ListNode);
   }
 
@@ -648,19 +655,19 @@ DxeUnRegisterCallBackWorker (
 **/
 EFI_STATUS
 ExGetNextTokeNumber (
-  IN      CONST EFI_GUID         *Guid,
-  IN OUT  UINTN                  *TokenNumber,
-  IN      EFI_GUID               *GuidTable,
-  IN      UINTN                  SizeOfGuidTable,
-  IN      DYNAMICEX_MAPPING      *ExMapTable,
-  IN      UINTN                  SizeOfExMapTable
+  IN      CONST EFI_GUID     *Guid,
+  IN OUT  UINTN              *TokenNumber,
+  IN      EFI_GUID           *GuidTable,
+  IN      UINTN              SizeOfGuidTable,
+  IN      DYNAMICEX_MAPPING  *ExMapTable,
+  IN      UINTN              SizeOfExMapTable
   )
 {
-  EFI_GUID         *MatchGuid;
-  UINTN            Index;
-  UINTN            GuidTableIdx;
-  BOOLEAN          Found;
-  UINTN            ExMapTableCount;
+  EFI_GUID  *MatchGuid;
+  UINTN     Index;
+  UINTN     GuidTableIdx;
+  BOOLEAN   Found;
+  UINTN     ExMapTableCount;
 
   //
   // Scan token space guid
@@ -673,9 +680,9 @@ ExGetNextTokeNumber (
   //
   // Find the token space table in dynamicEx mapping table.
   //
-  Found = FALSE;
-  GuidTableIdx = MatchGuid - GuidTable;
-  ExMapTableCount = SizeOfExMapTable / sizeof(ExMapTable[0]);
+  Found           = FALSE;
+  GuidTableIdx    = MatchGuid - GuidTable;
+  ExMapTableCount = SizeOfExMapTable / sizeof (ExMapTable[0]);
   for (Index = 0; Index < ExMapTableCount; Index++) {
     if (ExMapTable[Index].ExGuidIndex == GuidTableIdx) {
       Found = TRUE;
@@ -729,9 +736,9 @@ ExGetNextTokeNumber (
 DXE_PCD_DATABASE *
 LocateExPcdBinary (
   VOID
-)
+  )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS  Status;
 
   //
   // Search the External Pcd database from one section of current FFS,
@@ -740,7 +747,7 @@ LocateExPcdBinary (
   Status = GetSectionFromFfs (
              EFI_SECTION_RAW,
              0,
-             (VOID **) &mDxePcdDbBinary,
+             (VOID **)&mDxePcdDbBinary,
              &mDxePcdDbSize
              );
   ASSERT_EFI_ERROR (Status);
@@ -749,7 +756,8 @@ LocateExPcdBinary (
   // Check the first bytes (Header Signature Guid) and build version.
   //
   if (!CompareGuid ((VOID *)mDxePcdDbBinary, &gPcdDataBaseSignatureGuid) ||
-      (mDxePcdDbBinary->BuildVersion != PCD_SERVICE_DXE_VERSION)) {
+      (mDxePcdDbBinary->BuildVersion != PCD_SERVICE_DXE_VERSION))
+  {
     ASSERT (FALSE);
   }
 
@@ -767,36 +775,37 @@ LocateExPcdBinary (
 **/
 EFI_STATUS
 UpdatePcdDatabase (
-  IN SKU_ID        SkuId,
-  IN BOOLEAN       IsPeiDb
+  IN SKU_ID   SkuId,
+  IN BOOLEAN  IsPeiDb
   )
 {
-  UINTN                       Index;
-  PCD_DATABASE_SKU_DELTA      *SkuDelta;
-  PCD_DATA_DELTA              *SkuDeltaData;
+  UINTN                   Index;
+  PCD_DATABASE_SKU_DELTA  *SkuDelta;
+  PCD_DATA_DELTA          *SkuDeltaData;
 
-  if (IsPeiDb && mPeiPcdDbBinary != NULL) {
+  if (IsPeiDb && (mPeiPcdDbBinary != NULL)) {
     //
     // Find the delta data for PEI DB
     //
     Index    = (mPcdDatabase.PeiDb->Length + 7) & (~7);
     SkuDelta = NULL;
     while (Index < mPeiPcdDbSize) {
-      SkuDelta = (PCD_DATABASE_SKU_DELTA *) ((UINT8 *) mPeiPcdDbBinary + Index);
-      if (SkuDelta->SkuId == SkuId && SkuDelta->SkuIdCompared == 0) {
+      SkuDelta = (PCD_DATABASE_SKU_DELTA *)((UINT8 *)mPeiPcdDbBinary + Index);
+      if ((SkuDelta->SkuId == SkuId) && (SkuDelta->SkuIdCompared == 0)) {
         break;
       }
+
       Index = (Index + SkuDelta->Length + 7) & (~7);
     }
 
     //
     // Patch the delta data into current PCD database
     //
-    if (Index < mPeiPcdDbSize && SkuDelta != NULL) {
-      SkuDeltaData = (PCD_DATA_DELTA *) (SkuDelta + 1);
-      while ((UINT8 *) SkuDeltaData < (UINT8 *) SkuDelta + SkuDelta->Length) {
-        *((UINT8 *) mPcdDatabase.PeiDb + SkuDeltaData->Offset) = (UINT8) SkuDeltaData->Value;
-        SkuDeltaData ++;
+    if ((Index < mPeiPcdDbSize) && (SkuDelta != NULL)) {
+      SkuDeltaData = (PCD_DATA_DELTA *)(SkuDelta + 1);
+      while ((UINT8 *)SkuDeltaData < (UINT8 *)SkuDelta + SkuDelta->Length) {
+        *((UINT8 *)mPcdDatabase.PeiDb + SkuDeltaData->Offset) = (UINT8)SkuDeltaData->Value;
+        SkuDeltaData++;
       }
     } else {
       return EFI_NOT_FOUND;
@@ -809,22 +818,24 @@ UpdatePcdDatabase (
   Index    = (mPcdDatabase.DxeDb->Length + 7) & (~7);
   SkuDelta = NULL;
   while (Index < mDxePcdDbSize) {
-    SkuDelta = (PCD_DATABASE_SKU_DELTA *) ((UINT8 *) mDxePcdDbBinary + Index);
-    if (SkuDelta->SkuId == SkuId && SkuDelta->SkuIdCompared == 0) {
+    SkuDelta = (PCD_DATABASE_SKU_DELTA *)((UINT8 *)mDxePcdDbBinary + Index);
+    if ((SkuDelta->SkuId == SkuId) && (SkuDelta->SkuIdCompared == 0)) {
       break;
     }
+
     Index = (Index + SkuDelta->Length + 7) & (~7);
   }
 
   //
   // Patch the delta data into current PCD database
   //
-  if (Index < mDxePcdDbSize && SkuDelta != NULL) {
-    SkuDeltaData = (PCD_DATA_DELTA *) (SkuDelta + 1);
-    while ((UINT8 *) SkuDeltaData < (UINT8 *) SkuDelta + SkuDelta->Length) {
-      *((UINT8 *) mPcdDatabase.DxeDb + SkuDeltaData->Offset) = (UINT8) SkuDeltaData->Value;
-      SkuDeltaData ++;
+  if ((Index < mDxePcdDbSize) && (SkuDelta != NULL)) {
+    SkuDeltaData = (PCD_DATA_DELTA *)(SkuDelta + 1);
+    while ((UINT8 *)SkuDeltaData < (UINT8 *)SkuDelta + SkuDelta->Length) {
+      *((UINT8 *)mPcdDatabase.DxeDb + SkuDeltaData->Offset) = (UINT8)SkuDeltaData->Value;
+      SkuDeltaData++;
     }
+
     return EFI_SUCCESS;
   }
 
@@ -843,42 +854,41 @@ BuildPcdDxeDataBase (
   VOID
   )
 {
-  PEI_PCD_DATABASE    *PeiDatabase;
-  EFI_HOB_GUID_TYPE   *GuidHob;
-  UINTN               Index;
-  UINT32              PcdDxeDbLen;
-  VOID                *PcdDxeDb;
-  EFI_STATUS          Status;
+  PEI_PCD_DATABASE   *PeiDatabase;
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  UINTN              Index;
+  UINT32             PcdDxeDbLen;
+  VOID               *PcdDxeDb;
+  EFI_STATUS         Status;
 
   //
   // Assign PCD Entries with default value to PCD DATABASE
   //
   mPcdDatabase.DxeDb = LocateExPcdBinary ();
-  ASSERT(mPcdDatabase.DxeDb != NULL);
+  ASSERT (mPcdDatabase.DxeDb != NULL);
   PcdDxeDbLen = mPcdDatabase.DxeDb->Length + mPcdDatabase.DxeDb->UninitDataBaseSize;
-  PcdDxeDb = AllocateZeroPool (PcdDxeDbLen);
+  PcdDxeDb    = AllocateZeroPool (PcdDxeDbLen);
   ASSERT (PcdDxeDb != NULL);
   CopyMem (PcdDxeDb, mPcdDatabase.DxeDb, mPcdDatabase.DxeDb->Length);
   mPcdDatabase.DxeDb = PcdDxeDb;
 
   GuidHob = GetFirstGuidHob (&gPcdDataBaseHobGuid);
   if (GuidHob != NULL) {
-
     //
     // If no PEIMs use dynamic Pcd Entry, the Pcd Service PEIM
     // should not be included at all. So the GuidHob could
     // be NULL. If it is NULL, we just copy over the DXE Default
     // Value to PCD Database.
     //
-    PeiDatabase = (PEI_PCD_DATABASE *) GET_GUID_HOB_DATA (GuidHob);
+    PeiDatabase = (PEI_PCD_DATABASE *)GET_GUID_HOB_DATA (GuidHob);
 
     //
     // Get next one that stores full PEI data
     //
     GuidHob = GetNextGuidHob (&gPcdDataBaseHobGuid, GET_NEXT_HOB (GuidHob));
     if (GuidHob != NULL) {
-      mPeiPcdDbBinary = (PEI_PCD_DATABASE *) GET_GUID_HOB_DATA (GuidHob);
-      mPeiPcdDbSize   = (UINTN) GET_GUID_HOB_DATA_SIZE (GuidHob);
+      mPeiPcdDbBinary = (PEI_PCD_DATABASE *)GET_GUID_HOB_DATA (GuidHob);
+      mPeiPcdDbSize   = (UINTN)GET_GUID_HOB_DATA_SIZE (GuidHob);
     }
 
     //
@@ -892,39 +902,40 @@ BuildPcdDxeDataBase (
       Status = UpdatePcdDatabase (mPcdDatabase.PeiDb->SystemSkuId, FALSE);
       ASSERT_EFI_ERROR (Status);
     }
+
     mPcdDatabase.DxeDb->SystemSkuId = mPcdDatabase.PeiDb->SystemSkuId;
   } else {
     mPcdDatabase.PeiDb = AllocateZeroPool (sizeof (PEI_PCD_DATABASE));
-    ASSERT(mPcdDatabase.PeiDb != NULL);
+    ASSERT (mPcdDatabase.PeiDb != NULL);
   }
 
   //
   // Initialized the external PCD database local variables
   //
-  mPeiLocalTokenCount     = mPcdDatabase.PeiDb->LocalTokenCount;
-  mDxeLocalTokenCount     = mPcdDatabase.DxeDb->LocalTokenCount;
+  mPeiLocalTokenCount = mPcdDatabase.PeiDb->LocalTokenCount;
+  mDxeLocalTokenCount = mPcdDatabase.DxeDb->LocalTokenCount;
 
   mPeiExMapppingTableSize = mPcdDatabase.PeiDb->ExTokenCount * sizeof (DYNAMICEX_MAPPING);
   mDxeExMapppingTableSize = mPcdDatabase.DxeDb->ExTokenCount * sizeof (DYNAMICEX_MAPPING);
-  mPeiGuidTableSize       = mPcdDatabase.PeiDb->GuidTableCount * sizeof(GUID);
+  mPeiGuidTableSize       = mPcdDatabase.PeiDb->GuidTableCount * sizeof (GUID);
   mDxeGuidTableSize       = mPcdDatabase.DxeDb->GuidTableCount * sizeof (GUID);
 
-  mPcdTotalTokenCount     = mPeiLocalTokenCount + mDxeLocalTokenCount;
-  mPeiNexTokenCount       = mPeiLocalTokenCount - mPcdDatabase.PeiDb->ExTokenCount;
-  mDxeNexTokenCount       = mDxeLocalTokenCount - mPcdDatabase.DxeDb->ExTokenCount;
+  mPcdTotalTokenCount = mPeiLocalTokenCount + mDxeLocalTokenCount;
+  mPeiNexTokenCount   = mPeiLocalTokenCount - mPcdDatabase.PeiDb->ExTokenCount;
+  mDxeNexTokenCount   = mDxeLocalTokenCount - mPcdDatabase.DxeDb->ExTokenCount;
 
-  mPeiExMapTableEmpty     = (mPcdDatabase.PeiDb->ExTokenCount == 0) ? TRUE : FALSE;
-  mDxeExMapTableEmpty     = (mPcdDatabase.DxeDb->ExTokenCount == 0) ? TRUE : FALSE;
-  mPeiDatabaseEmpty       = (mPeiLocalTokenCount == 0) ? TRUE : FALSE;
+  mPeiExMapTableEmpty = (mPcdDatabase.PeiDb->ExTokenCount == 0) ? TRUE : FALSE;
+  mDxeExMapTableEmpty = (mPcdDatabase.DxeDb->ExTokenCount == 0) ? TRUE : FALSE;
+  mPeiDatabaseEmpty   = (mPeiLocalTokenCount == 0) ? TRUE : FALSE;
 
   TmpTokenSpaceBufferCount = mPcdDatabase.PeiDb->ExTokenCount + mPcdDatabase.DxeDb->ExTokenCount;
-  TmpTokenSpaceBuffer     = (EFI_GUID **)AllocateZeroPool(TmpTokenSpaceBufferCount * sizeof (EFI_GUID *));
+  TmpTokenSpaceBuffer      = (EFI_GUID **)AllocateZeroPool (TmpTokenSpaceBufferCount * sizeof (EFI_GUID *));
 
   //
   // Initialized the Callback Function Table
   //
   mCallbackFnTable = AllocateZeroPool (mPcdTotalTokenCount * sizeof (LIST_ENTRY));
-  ASSERT(mCallbackFnTable != NULL);
+  ASSERT (mCallbackFnTable != NULL);
 
   //
   // EBC compiler is very choosy. It may report warning about comparison
@@ -948,45 +959,45 @@ BuildPcdDxeDataBase (
 **/
 EFI_STATUS
 GetHiiVariable (
-  IN  EFI_GUID      *VariableGuid,
-  IN  UINT16        *VariableName,
-  OUT UINT8         **VariableData,
-  OUT UINTN         *VariableSize
+  IN  EFI_GUID  *VariableGuid,
+  IN  UINT16    *VariableName,
+  OUT UINT8     **VariableData,
+  OUT UINTN     *VariableSize
   )
 {
-  UINTN      Size;
-  EFI_STATUS Status;
-  UINT8      *Buffer;
+  UINTN       Size;
+  EFI_STATUS  Status;
+  UINT8       *Buffer;
 
-  Size = 0;
+  Size   = 0;
   Buffer = NULL;
 
   //
   // Firstly get the real size of HII variable
   //
   Status = gRT->GetVariable (
-    (UINT16 *)VariableName,
-    VariableGuid,
-    NULL,
-    &Size,
-    Buffer
-    );
+                  (UINT16 *)VariableName,
+                  VariableGuid,
+                  NULL,
+                  &Size,
+                  Buffer
+                  );
 
   //
   // Allocate buffer to hold whole variable data according to variable size.
   //
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    Buffer = (UINT8 *) AllocatePool (Size);
+    Buffer = (UINT8 *)AllocatePool (Size);
 
     ASSERT (Buffer != NULL);
 
     Status = gRT->GetVariable (
-      VariableName,
-      VariableGuid,
-      NULL,
-      &Size,
-      Buffer
-      );
+                    VariableName,
+                    VariableGuid,
+                    NULL,
+                    &Size,
+                    Buffer
+                    );
 
     ASSERT (Status == EFI_SUCCESS);
     *VariableData = Buffer;
@@ -1017,16 +1028,16 @@ GetHiiVariable (
 **/
 VOID
 InvokeCallbackOnSet (
-  UINT32            ExTokenNumber,
-  CONST EFI_GUID    *Guid, OPTIONAL
-  UINTN             TokenNumber,
-  VOID              *Data,
-  UINTN             Size
+  UINT32          ExTokenNumber,
+  CONST EFI_GUID  *Guid  OPTIONAL,
+  UINTN           TokenNumber,
+  VOID            *Data,
+  UINTN           Size
   )
 {
-  CALLBACK_FN_ENTRY       *FnTableEntry;
-  LIST_ENTRY              *ListHead;
-  LIST_ENTRY              *ListNode;
+  CALLBACK_FN_ENTRY  *FnTableEntry;
+  LIST_ENTRY         *ListHead;
+  LIST_ENTRY         *ListNode;
 
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
@@ -1039,17 +1050,18 @@ InvokeCallbackOnSet (
   while (ListNode != ListHead) {
     FnTableEntry = CR_FNENTRY_FROM_LISTNODE (ListNode, CALLBACK_FN_ENTRY, Node);
 
-    FnTableEntry->CallbackFn(Guid,
+    FnTableEntry->CallbackFn (
+                    Guid,
                     (Guid == NULL) ? TokenNumber : ExTokenNumber,
                     Data,
-                    Size);
+                    Size
+                    );
 
     ListNode = GetNextNode (ListHead, ListNode);
   }
 
   return;
 }
-
 
 /**
   Wrapper function for setting non-pointer type value for a PCD entry.
@@ -1063,14 +1075,13 @@ InvokeCallbackOnSet (
 **/
 EFI_STATUS
 SetValueWorker (
-  IN UINTN                   TokenNumber,
-  IN VOID                    *Data,
-  IN UINTN                   Size
+  IN UINTN  TokenNumber,
+  IN VOID   *Data,
+  IN UINTN  Size
   )
 {
   return SetWorker (TokenNumber, Data, &Size, FALSE);
 }
-
 
 /**
   Set value for an PCD entry
@@ -1090,27 +1101,27 @@ SetValueWorker (
 **/
 EFI_STATUS
 SetWorker (
-  IN          UINTN                   TokenNumber,
-  IN          VOID                    *Data,
-  IN OUT      UINTN                   *Size,
-  IN          BOOLEAN                 PtrType
+  IN          UINTN    TokenNumber,
+  IN          VOID     *Data,
+  IN OUT      UINTN    *Size,
+  IN          BOOLEAN  PtrType
   )
 {
-  BOOLEAN             IsPeiDb;
-  UINT32              LocalTokenNumber;
-  EFI_GUID            *GuidTable;
-  UINT8               *StringTable;
-  EFI_GUID            *Guid;
-  UINT16              *Name;
-  UINTN               VariableOffset;
-  UINT32              Attributes;
-  VOID                *InternalData;
-  VARIABLE_HEAD       *VariableHead;
-  UINTN               Offset;
-  UINT8               *PcdDb;
-  EFI_STATUS          Status;
-  UINTN               MaxSize;
-  UINTN               TmpTokenNumber;
+  BOOLEAN        IsPeiDb;
+  UINT32         LocalTokenNumber;
+  EFI_GUID       *GuidTable;
+  UINT8          *StringTable;
+  EFI_GUID       *Guid;
+  UINT16         *Name;
+  UINTN          VariableOffset;
+  UINT32         Attributes;
+  VOID           *InternalData;
+  VARIABLE_HEAD  *VariableHead;
+  UINTN          Offset;
+  UINT8          *PcdDb;
+  EFI_STATUS     Status;
+  UINTN          MaxSize;
+  UINTN          TmpTokenNumber;
 
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
@@ -1149,7 +1160,8 @@ SetWorker (
   // comparison.
   //
   if ((TokenNumber + 1 < mPeiNexTokenCount + 1) ||
-      (TokenNumber + 1 >= mPeiLocalTokenCount + 1 && TokenNumber + 1 < (mPeiLocalTokenCount + mDxeNexTokenCount + 1))) {
+      ((TokenNumber + 1 >= mPeiLocalTokenCount + 1) && (TokenNumber + 1 < (mPeiLocalTokenCount + mDxeNexTokenCount + 1))))
+  {
     InvokeCallbackOnSet (0, NULL, TokenNumber + 1, Data, *Size);
   }
 
@@ -1163,20 +1175,19 @@ SetWorker (
   // between UINTN and 0 . So we add 1 in each size of the
   // comparison.
   //
-  IsPeiDb = (BOOLEAN) ((TokenNumber + 1 < mPeiLocalTokenCount + 1) ? TRUE : FALSE);
+  IsPeiDb = (BOOLEAN)((TokenNumber + 1 < mPeiLocalTokenCount + 1) ? TRUE : FALSE);
 
   LocalTokenNumber = GetLocalTokenNumber (IsPeiDb, TokenNumber + 1);
 
   Offset = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
 
-  PcdDb = IsPeiDb ? ((UINT8 *) mPcdDatabase.PeiDb) : ((UINT8 *) mPcdDatabase.DxeDb);
+  PcdDb = IsPeiDb ? ((UINT8 *)mPcdDatabase.PeiDb) : ((UINT8 *)mPcdDatabase.DxeDb);
 
   if (IsPeiDb) {
-    StringTable = (UINT8 *) ((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->StringTableOffset);
+    StringTable = (UINT8 *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->StringTableOffset);
   } else {
-    StringTable = (UINT8 *) ((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->StringTableOffset);
+    StringTable = (UINT8 *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->StringTableOffset);
   }
-
 
   InternalData = PcdDb + Offset;
 
@@ -1193,6 +1204,7 @@ SetWorker (
       } else {
         Status = EFI_INVALID_PARAMETER;
       }
+
       break;
 
     case PCD_TYPE_HII|PCD_TYPE_STRING:
@@ -1205,18 +1217,18 @@ SetWorker (
       }
 
       if (IsPeiDb) {
-        GuidTable = (EFI_GUID *) ((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->GuidTableOffset);
+        GuidTable = (EFI_GUID *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->GuidTableOffset);
       } else {
-        GuidTable = (EFI_GUID *) ((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->GuidTableOffset);
+        GuidTable = (EFI_GUID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->GuidTableOffset);
       }
 
-      VariableHead = (VARIABLE_HEAD *) (PcdDb + Offset);
+      VariableHead = (VARIABLE_HEAD *)(PcdDb + Offset);
 
-      Guid = GuidTable + VariableHead->GuidTableIndex;
-      Name = (UINT16*) (StringTable + VariableHead->StringIndex);
+      Guid           = GuidTable + VariableHead->GuidTableIndex;
+      Name           = (UINT16 *)(StringTable + VariableHead->StringIndex);
       VariableOffset = VariableHead->Offset;
-      Attributes = VariableHead->Attributes;
-      Status = SetHiiVariable (Guid, Name, Attributes, Data, *Size, VariableOffset);
+      Attributes     = VariableHead->Attributes;
+      Status         = SetHiiVariable (Guid, Name, Attributes, Data, *Size, VariableOffset);
       break;
 
     case PCD_TYPE_DATA:
@@ -1227,25 +1239,26 @@ SetWorker (
         } else {
           Status = EFI_INVALID_PARAMETER;
         }
+
         break;
       }
 
       Status = EFI_SUCCESS;
       switch (*Size) {
-        case sizeof(UINT8):
-          *((UINT8 *) InternalData) = *((UINT8 *) Data);
+        case sizeof (UINT8):
+          *((UINT8 *)InternalData) = *((UINT8 *)Data);
           break;
 
-        case sizeof(UINT16):
-          *((UINT16 *) InternalData) = *((UINT16 *) Data);
+        case sizeof (UINT16):
+          *((UINT16 *)InternalData) = *((UINT16 *)Data);
           break;
 
-        case sizeof(UINT32):
-          *((UINT32 *) InternalData) = *((UINT32 *) Data);
+        case sizeof (UINT32):
+          *((UINT32 *)InternalData) = *((UINT32 *)Data);
           break;
 
-        case sizeof(UINT64):
-          *((UINT64 *) InternalData) = *((UINT64 *) Data);
+        case sizeof (UINT64):
+          *((UINT64 *)InternalData) = *((UINT64 *)Data);
           break;
 
         default:
@@ -1253,13 +1266,14 @@ SetWorker (
           Status = EFI_NOT_FOUND;
           break;
       }
+
       break;
 
     default:
       ASSERT (FALSE);
       Status = EFI_NOT_FOUND;
       break;
-    }
+  }
 
   EfiReleaseLock (&mPcdDatabaseLock);
 
@@ -1278,12 +1292,12 @@ SetWorker (
 **/
 VOID *
 ExGetWorker (
-  IN CONST EFI_GUID         *Guid,
-  IN UINTN                  ExTokenNumber,
-  IN UINTN                  GetSize
+  IN CONST EFI_GUID  *Guid,
+  IN UINTN           ExTokenNumber,
+  IN UINTN           GetSize
   )
 {
-  return GetWorker(GetExPcdTokenNumber (Guid, (UINT32) ExTokenNumber), GetSize);
+  return GetWorker (GetExPcdTokenNumber (Guid, (UINT32)ExTokenNumber), GetSize);
 }
 
 /**
@@ -1299,10 +1313,10 @@ ExGetWorker (
 **/
 EFI_STATUS
 ExSetValueWorker (
-  IN          UINTN                ExTokenNumber,
-  IN          CONST EFI_GUID       *Guid,
-  IN          VOID                 *Data,
-  IN          UINTN                SetSize
+  IN          UINTN           ExTokenNumber,
+  IN          CONST EFI_GUID  *Guid,
+  IN          VOID            *Data,
+  IN          UINTN           SetSize
   )
 {
   return ExSetWorker (ExTokenNumber, Guid, Data, &SetSize, FALSE);
@@ -1328,21 +1342,20 @@ ExSetValueWorker (
 **/
 EFI_STATUS
 ExSetWorker (
-  IN          UINTN                ExTokenNumber,
-  IN          CONST EFI_GUID       *Guid,
-  IN          VOID                 *Data,
-  IN OUT      UINTN                *SetSize,
-  IN          BOOLEAN              PtrType
+  IN          UINTN           ExTokenNumber,
+  IN          CONST EFI_GUID  *Guid,
+  IN          VOID            *Data,
+  IN OUT      UINTN           *SetSize,
+  IN          BOOLEAN         PtrType
   )
 {
-  UINTN                   TokenNumber;
+  UINTN  TokenNumber;
 
-  TokenNumber = GetExPcdTokenNumber (Guid, (UINT32) ExTokenNumber);
+  TokenNumber = GetExPcdTokenNumber (Guid, (UINT32)ExTokenNumber);
 
-  InvokeCallbackOnSet ((UINT32) ExTokenNumber, Guid, TokenNumber, Data, *SetSize);
+  InvokeCallbackOnSet ((UINT32)ExTokenNumber, Guid, TokenNumber, Data, *SetSize);
 
   return SetWorker (TokenNumber, Data, SetSize, PtrType);
-
 }
 
 /**
@@ -1356,26 +1369,26 @@ ExSetWorker (
 **/
 VOID
 GetVariableSizeAndDataFromHiiPcd (
-  IN EFI_GUID               *VariableGuid,
-  IN UINT16                 *VariableName,
-  OUT UINTN                 *VariableSize,
-  OUT VOID                  *VariableData OPTIONAL
+  IN EFI_GUID  *VariableGuid,
+  IN UINT16    *VariableName,
+  OUT UINTN    *VariableSize,
+  OUT VOID     *VariableData OPTIONAL
   )
 {
-  BOOLEAN                   IsPeiDb;
-  PCD_DATABASE_INIT         *Database;
-  UINTN                     TokenNumber;
-  UINT32                    LocalTokenNumber;
-  UINTN                     Offset;
-  EFI_GUID                  *GuidTable;
-  UINT8                     *StringTable;
-  VARIABLE_HEAD             *VariableHead;
-  EFI_GUID                  *Guid;
-  UINT16                    *Name;
-  UINTN                     PcdDataSize;
-  UINTN                     Size;
-  UINT8                     *VaraiableDefaultBuffer;
-  STRING_HEAD               StringTableIdx;
+  BOOLEAN            IsPeiDb;
+  PCD_DATABASE_INIT  *Database;
+  UINTN              TokenNumber;
+  UINT32             LocalTokenNumber;
+  UINTN              Offset;
+  EFI_GUID           *GuidTable;
+  UINT8              *StringTable;
+  VARIABLE_HEAD      *VariableHead;
+  EFI_GUID           *Guid;
+  UINT16             *Name;
+  UINTN              PcdDataSize;
+  UINTN              Size;
+  UINT8              *VaraiableDefaultBuffer;
+  STRING_HEAD        StringTableIdx;
 
   *VariableSize = 0;
 
@@ -1383,40 +1396,42 @@ GetVariableSizeAndDataFromHiiPcd (
   // Go through PCD database to find out DynamicHii PCDs.
   //
   for (TokenNumber = 1; TokenNumber <= mPcdTotalTokenCount; TokenNumber++) {
-    IsPeiDb = (BOOLEAN) ((TokenNumber + 1 < mPeiLocalTokenCount + 1) ? TRUE : FALSE);
-    Database = IsPeiDb ? mPcdDatabase.PeiDb: mPcdDatabase.DxeDb;
+    IsPeiDb          = (BOOLEAN)((TokenNumber + 1 < mPeiLocalTokenCount + 1) ? TRUE : FALSE);
+    Database         = IsPeiDb ? mPcdDatabase.PeiDb : mPcdDatabase.DxeDb;
     LocalTokenNumber = GetLocalTokenNumber (IsPeiDb, TokenNumber);
     if ((LocalTokenNumber & PCD_TYPE_HII) != 0) {
       //
       // Get the Variable Guid and Name pointer.
       //
-      Offset = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
-      VariableHead = (VARIABLE_HEAD *) ((UINT8 *) Database + Offset);
-      StringTable = (UINT8 *) ((UINT8 *) Database + Database->StringTableOffset);
-      GuidTable = (EFI_GUID *) ((UINT8 *) Database + Database->GuidTableOffset);
-      Guid = GuidTable + VariableHead->GuidTableIndex;
-      Name = (UINT16*) (StringTable + VariableHead->StringIndex);
+      Offset       = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
+      VariableHead = (VARIABLE_HEAD *)((UINT8 *)Database + Offset);
+      StringTable  = (UINT8 *)((UINT8 *)Database + Database->StringTableOffset);
+      GuidTable    = (EFI_GUID *)((UINT8 *)Database + Database->GuidTableOffset);
+      Guid         = GuidTable + VariableHead->GuidTableIndex;
+      Name         = (UINT16 *)(StringTable + VariableHead->StringIndex);
       if (CompareGuid (VariableGuid, Guid) && (StrCmp (VariableName, Name) == 0)) {
         //
         // It is the matched DynamicHii PCD.
         //
         PcdDataSize = DxePcdGetSize (TokenNumber);
-        Size = VariableHead->Offset + PcdDataSize;
+        Size        = VariableHead->Offset + PcdDataSize;
         if (Size > *VariableSize) {
           *VariableSize = Size;
         }
+
         if (VariableData != NULL) {
           if ((LocalTokenNumber & PCD_TYPE_ALL_SET) == (PCD_TYPE_HII|PCD_TYPE_STRING)) {
             //
             // If a HII type PCD's datum type is VOID*, the DefaultValueOffset is the index of
             // string array in string table.
             //
-            StringTableIdx = *(STRING_HEAD *) ((UINT8 *) Database + VariableHead->DefaultValueOffset);
-            VaraiableDefaultBuffer = (UINT8 *) (StringTable + StringTableIdx);
+            StringTableIdx         = *(STRING_HEAD *)((UINT8 *)Database + VariableHead->DefaultValueOffset);
+            VaraiableDefaultBuffer = (UINT8 *)(StringTable + StringTableIdx);
           } else {
-            VaraiableDefaultBuffer = (UINT8 *) Database + VariableHead->DefaultValueOffset;
+            VaraiableDefaultBuffer = (UINT8 *)Database + VariableHead->DefaultValueOffset;
           }
-          CopyMem ((UINT8 *) VariableData + VariableHead->Offset, VaraiableDefaultBuffer, PcdDataSize);
+
+          CopyMem ((UINT8 *)VariableData + VariableHead->Offset, VaraiableDefaultBuffer, PcdDataSize);
         }
       }
     }
@@ -1441,12 +1456,12 @@ GetVariableSizeAndDataFromHiiPcd (
 **/
 EFI_STATUS
 SetHiiVariable (
-  IN  EFI_GUID     *VariableGuid,
-  IN  UINT16       *VariableName,
-  IN  UINT32       SetAttributes,
-  IN  CONST VOID   *Data,
-  IN  UINTN        DataSize,
-  IN  UINTN        Offset
+  IN  EFI_GUID    *VariableGuid,
+  IN  UINT16      *VariableName,
+  IN  UINT32      SetAttributes,
+  IN  CONST VOID  *Data,
+  IN  UINTN       DataSize,
+  IN  UINTN       Offset
   )
 {
   UINTN       Size;
@@ -1455,19 +1470,19 @@ SetHiiVariable (
   UINT32      Attribute;
   UINTN       SetSize;
 
-  Size = 0;
+  Size    = 0;
   SetSize = 0;
 
   //
   // Try to get original variable size information.
   //
   Status = gRT->GetVariable (
-    (UINT16 *)VariableName,
-    VariableGuid,
-    NULL,
-    &Size,
-    NULL
-    );
+                  (UINT16 *)VariableName,
+                  VariableGuid,
+                  NULL,
+                  &Size,
+                  NULL
+                  );
 
   if (Status == EFI_BUFFER_TOO_SMALL) {
     //
@@ -1478,16 +1493,17 @@ SetHiiVariable (
     } else {
       SetSize = DataSize + Offset;
     }
+
     Buffer = AllocatePool (SetSize);
     ASSERT (Buffer != NULL);
 
     Status = gRT->GetVariable (
-      VariableName,
-      VariableGuid,
-      &Attribute,
-      &Size,
-      Buffer
-      );
+                    VariableName,
+                    VariableGuid,
+                    &Attribute,
+                    &Size,
+                    Buffer
+                    );
 
     ASSERT_EFI_ERROR (Status);
 
@@ -1498,12 +1514,12 @@ SetHiiVariable (
     }
 
     Status = gRT->SetVariable (
-              VariableName,
-              VariableGuid,
-              SetAttributes,
-              SetSize,
-              Buffer
-              );
+                    VariableName,
+                    VariableGuid,
+                    SetAttributes,
+                    SetSize,
+                    Buffer
+                    );
 
     FreePool (Buffer);
     return Status;
@@ -1530,12 +1546,12 @@ SetHiiVariable (
     }
 
     Status = gRT->SetVariable (
-              VariableName,
-              VariableGuid,
-              SetAttributes,
-              Size,
-              Buffer
-              );
+                    VariableName,
+                    VariableGuid,
+                    SetAttributes,
+                    Size,
+                    Buffer
+                    );
 
     FreePool (Buffer);
     return Status;
@@ -1562,39 +1578,39 @@ SetHiiVariable (
 **/
 UINTN
 GetExPcdTokenNumber (
-  IN CONST EFI_GUID             *Guid,
-  IN UINT32                     ExTokenNumber
+  IN CONST EFI_GUID  *Guid,
+  IN UINT32          ExTokenNumber
   )
 {
-  UINT32              Index;
-  DYNAMICEX_MAPPING   *ExMap;
-  EFI_GUID            *GuidTable;
-  EFI_GUID            *MatchGuid;
-  UINTN               MatchGuidIdx;
+  UINT32             Index;
+  DYNAMICEX_MAPPING  *ExMap;
+  EFI_GUID           *GuidTable;
+  EFI_GUID           *MatchGuid;
+  UINTN              MatchGuidIdx;
 
   if (!mPeiDatabaseEmpty) {
-    ExMap       = (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->ExMapTableOffset);
-    GuidTable   = (EFI_GUID *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->GuidTableOffset);
+    ExMap     = (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->ExMapTableOffset);
+    GuidTable = (EFI_GUID *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->GuidTableOffset);
 
-    MatchGuid   = ScanGuid (GuidTable, mPeiGuidTableSize, Guid);
+    MatchGuid = ScanGuid (GuidTable, mPeiGuidTableSize, Guid);
 
     if (MatchGuid != NULL) {
-
       MatchGuidIdx = MatchGuid - GuidTable;
 
       for (Index = 0; Index < mPcdDatabase.PeiDb->ExTokenCount; Index++) {
         if ((ExTokenNumber == ExMap[Index].ExTokenNumber) &&
-            (MatchGuidIdx == ExMap[Index].ExGuidIndex)) {
-            return ExMap[Index].TokenNumber;
+            (MatchGuidIdx == ExMap[Index].ExGuidIndex))
+        {
+          return ExMap[Index].TokenNumber;
         }
       }
     }
   }
 
-  ExMap       = (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->ExMapTableOffset);
-  GuidTable   = (EFI_GUID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->GuidTableOffset);
+  ExMap     = (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->ExMapTableOffset);
+  GuidTable = (EFI_GUID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->GuidTableOffset);
 
-  MatchGuid   = ScanGuid (GuidTable, mDxeGuidTableSize, Guid);
+  MatchGuid = ScanGuid (GuidTable, mDxeGuidTableSize, Guid);
   //
   // We need to ASSERT here. If GUID can't be found in GuidTable, this is a
   // error in the BUILD system.
@@ -1605,11 +1621,13 @@ GetExPcdTokenNumber (
 
   for (Index = 0; Index < mPcdDatabase.DxeDb->ExTokenCount; Index++) {
     if ((ExTokenNumber == ExMap[Index].ExTokenNumber) &&
-         (MatchGuidIdx == ExMap[Index].ExGuidIndex)) {
-        return ExMap[Index].TokenNumber;
+        (MatchGuidIdx == ExMap[Index].ExGuidIndex))
+    {
+      return ExMap[Index].TokenNumber;
     }
   }
 
+  DEBUG ((DEBUG_ERROR, "%a: Failed to find PCD with GUID: %g and token number: %d\n", __FUNCTION__, Guid, ExTokenNumber));
   ASSERT (FALSE);
 
   return 0;
@@ -1626,14 +1644,14 @@ GetExPcdTokenNumber (
 **/
 UINTN
 GetSizeTableIndex (
-  IN    UINTN             LocalTokenNumberTableIdx,
-  IN    BOOLEAN           IsPeiDb
+  IN    UINTN    LocalTokenNumberTableIdx,
+  IN    BOOLEAN  IsPeiDb
   )
 {
-  UINT32 *LocalTokenNumberTable;
-  UINTN  LocalTokenNumber;
-  UINTN  Index;
-  UINTN  SizeTableIdx;
+  UINT32  *LocalTokenNumberTable;
+  UINTN   LocalTokenNumber;
+  UINTN   Index;
+  UINTN   SizeTableIdx;
 
   if (IsPeiDb) {
     LocalTokenNumberTable = (UINT32 *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->LocalTokenNumberTableOffset);
@@ -1643,7 +1661,7 @@ GetSizeTableIndex (
 
   SizeTableIdx = 0;
 
-  for (Index = 0; Index < LocalTokenNumberTableIdx; Index ++) {
+  for (Index = 0; Index < LocalTokenNumberTableIdx; Index++) {
     LocalTokenNumber = LocalTokenNumberTable[Index];
 
     if ((LocalTokenNumber & PCD_DATUM_TYPE_ALL_SET) == PCD_DATUM_TYPE_POINTER) {
@@ -1652,23 +1670,22 @@ GetSizeTableIndex (
       // PCD entry.
       //
       if ((LocalTokenNumber & PCD_TYPE_VPD) != 0) {
-          //
-          // We have only two entry for VPD enabled PCD entry:
-          // 1) MAX Size.
-          // 2) Current Size
-          // Current size is equal to MAX size.
-          //
-          SizeTableIdx += 2;
+        //
+        // We have only two entry for VPD enabled PCD entry:
+        // 1) MAX Size.
+        // 2) Current Size
+        // Current size is equal to MAX size.
+        //
+        SizeTableIdx += 2;
       } else {
-          //
-          // We have only two entry for Non-Sku enabled PCD entry:
-          // 1) MAX SIZE
-          // 2) Current Size
-          //
-          SizeTableIdx += 2;
+        //
+        // We have only two entry for Non-Sku enabled PCD entry:
+        // 1) MAX SIZE
+        // 2) Current Size
+        //
+        SizeTableIdx += 2;
       }
     }
-
   }
 
   return SizeTableIdx;
@@ -1685,29 +1702,28 @@ GetSizeTableIndex (
 **/
 UINTN
 GetPtrTypeSize (
-  IN    UINTN             LocalTokenNumberTableIdx,
-  OUT   UINTN             *MaxSize
+  IN    UINTN  LocalTokenNumberTableIdx,
+  OUT   UINTN  *MaxSize
   )
 {
-  INTN        SizeTableIdx;
-  UINTN       LocalTokenNumber;
-  SIZE_INFO   *SizeTable;
-  BOOLEAN     IsPeiDb;
-  UINT32      *LocalTokenNumberTable;
+  INTN       SizeTableIdx;
+  UINTN      LocalTokenNumber;
+  SIZE_INFO  *SizeTable;
+  BOOLEAN    IsPeiDb;
+  UINT32     *LocalTokenNumberTable;
 
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the
   // comparison.
-  IsPeiDb = (BOOLEAN) (LocalTokenNumberTableIdx + 1 < mPeiLocalTokenCount + 1);
-
+  IsPeiDb = (BOOLEAN)(LocalTokenNumberTableIdx + 1 < mPeiLocalTokenCount + 1);
 
   if (IsPeiDb) {
     LocalTokenNumberTable = (UINT32 *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->LocalTokenNumberTableOffset);
-    SizeTable = (SIZE_INFO *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->SizeTableOffset);
+    SizeTable             = (SIZE_INFO *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->SizeTableOffset);
   } else {
     LocalTokenNumberTableIdx -= mPeiLocalTokenCount;
-    LocalTokenNumberTable = (UINT32 *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->LocalTokenNumberTableOffset);
-    SizeTable = (SIZE_INFO *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->SizeTableOffset);
+    LocalTokenNumberTable     = (UINT32 *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->LocalTokenNumberTableOffset);
+    SizeTable                 = (SIZE_INFO *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->SizeTableOffset);
   }
 
   LocalTokenNumber = LocalTokenNumberTable[LocalTokenNumberTableIdx];
@@ -1722,20 +1738,20 @@ GetPtrTypeSize (
   // PCD entry.
   //
   if ((LocalTokenNumber & PCD_TYPE_VPD) != 0) {
-      //
-      // We have only two entry for VPD enabled PCD entry:
-      // 1) MAX Size.
-      // 2) Current Size
-      // We consider current size is equal to MAX size.
-      //
-      return *MaxSize;
+    //
+    // We have only two entry for VPD enabled PCD entry:
+    // 1) MAX Size.
+    // 2) Current Size
+    // We consider current size is equal to MAX size.
+    //
+    return *MaxSize;
   } else {
-      //
-      // We have only two entry for Non-Sku enabled PCD entry:
-      // 1) MAX SIZE
-      // 2) Current Size
-      //
-      return SizeTable[SizeTableIdx + 1];
+    //
+    // We have only two entry for Non-Sku enabled PCD entry:
+    // 1) MAX SIZE
+    // 2) Current Size
+    //
+    return SizeTable[SizeTableIdx + 1];
   }
 }
 
@@ -1751,31 +1767,31 @@ GetPtrTypeSize (
 **/
 BOOLEAN
 SetPtrTypeSize (
-  IN          UINTN             LocalTokenNumberTableIdx,
-  IN    OUT   UINTN             *CurrentSize
+  IN          UINTN  LocalTokenNumberTableIdx,
+  IN    OUT   UINTN  *CurrentSize
   )
 {
-  INTN        SizeTableIdx;
-  UINTN       LocalTokenNumber;
-  SIZE_INFO   *SizeTable;
-  UINTN       MaxSize;
-  BOOLEAN     IsPeiDb;
-  UINT32      *LocalTokenNumberTable;
+  INTN       SizeTableIdx;
+  UINTN      LocalTokenNumber;
+  SIZE_INFO  *SizeTable;
+  UINTN      MaxSize;
+  BOOLEAN    IsPeiDb;
+  UINT32     *LocalTokenNumberTable;
 
   //
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the
   // comparison.
   //
-  IsPeiDb = (BOOLEAN) (LocalTokenNumberTableIdx + 1 < mPeiLocalTokenCount + 1);
+  IsPeiDb = (BOOLEAN)(LocalTokenNumberTableIdx + 1 < mPeiLocalTokenCount + 1);
 
   if (IsPeiDb) {
     LocalTokenNumberTable = (UINT32 *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->LocalTokenNumberTableOffset);
-    SizeTable = (SIZE_INFO *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->SizeTableOffset);
+    SizeTable             = (SIZE_INFO *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->SizeTableOffset);
   } else {
     LocalTokenNumberTableIdx -= mPeiLocalTokenCount;
-    LocalTokenNumberTable = (UINT32 *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->LocalTokenNumberTableOffset);
-    SizeTable = (SIZE_INFO *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->SizeTableOffset);
+    LocalTokenNumberTable     = (UINT32 *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->LocalTokenNumberTableOffset);
+    SizeTable                 = (SIZE_INFO *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->SizeTableOffset);
   }
 
   LocalTokenNumber = LocalTokenNumberTable[LocalTokenNumberTableIdx];
@@ -1790,16 +1806,17 @@ SetPtrTypeSize (
   // PCD entry.
   //
   if ((LocalTokenNumber & PCD_TYPE_VPD) != 0) {
-      //
-      // We shouldn't come here as we don't support SET for VPD
-      //
-      ASSERT (FALSE);
-      return FALSE;
+    //
+    // We shouldn't come here as we don't support SET for VPD
+    //
+    ASSERT (FALSE);
+    return FALSE;
   } else {
     if ((*CurrentSize > MaxSize) ||
-      (*CurrentSize == MAX_ADDRESS)) {
-       *CurrentSize = MaxSize;
-       return FALSE;
+        (*CurrentSize == MAX_ADDRESS))
+    {
+      *CurrentSize = MaxSize;
+      return FALSE;
     }
 
     //
@@ -1807,7 +1824,7 @@ SetPtrTypeSize (
     // 1) MAX SIZE
     // 2) Current Size
     //
-    SizeTable[SizeTableIdx + 1] = (SIZE_INFO) *CurrentSize;
+    SizeTable[SizeTableIdx + 1] = (SIZE_INFO)*CurrentSize;
     return TRUE;
   }
 }
@@ -1822,24 +1839,24 @@ SetPtrTypeSize (
 **/
 VOID
 VariableLockDynamicHiiPcd (
-  IN BOOLEAN                        IsPeiDb,
-  IN EDKII_VARIABLE_LOCK_PROTOCOL   *VariableLock
+  IN BOOLEAN                       IsPeiDb,
+  IN EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock
   )
 {
-  EFI_STATUS                Status;
-  PCD_DATABASE_INIT         *Database;
-  UINT32                    LocalTokenCount;
-  UINTN                     TokenNumber;
-  UINT32                    LocalTokenNumber;
-  UINTN                     Offset;
-  EFI_GUID                  *GuidTable;
-  UINT8                     *StringTable;
-  VARIABLE_HEAD             *VariableHead;
-  EFI_GUID                  *Guid;
-  UINT16                    *Name;
+  EFI_STATUS         Status;
+  PCD_DATABASE_INIT  *Database;
+  UINT32             LocalTokenCount;
+  UINTN              TokenNumber;
+  UINT32             LocalTokenNumber;
+  UINTN              Offset;
+  EFI_GUID           *GuidTable;
+  UINT8              *StringTable;
+  VARIABLE_HEAD      *VariableHead;
+  EFI_GUID           *Guid;
+  UINT16             *Name;
 
-  Database = IsPeiDb ? mPcdDatabase.PeiDb: mPcdDatabase.DxeDb;
-  LocalTokenCount = IsPeiDb ? mPeiLocalTokenCount: mDxeLocalTokenCount;
+  Database        = IsPeiDb ? mPcdDatabase.PeiDb : mPcdDatabase.DxeDb;
+  LocalTokenCount = IsPeiDb ? mPeiLocalTokenCount : mDxeLocalTokenCount;
 
   //
   // Go through PCD database to find out DynamicHii PCDs.
@@ -1850,9 +1867,10 @@ VariableLockDynamicHiiPcd (
     } else {
       LocalTokenNumber = GetLocalTokenNumber (FALSE, TokenNumber + mPeiLocalTokenCount);
     }
+
     if ((LocalTokenNumber & PCD_TYPE_HII) != 0) {
-      Offset = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
-      VariableHead = (VARIABLE_HEAD *) ((UINT8 *) Database + Offset);
+      Offset       = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
+      VariableHead = (VARIABLE_HEAD *)((UINT8 *)Database + Offset);
       //
       // Why not to set property by VarCheckProtocol with Attributes and Property directly here?
       // It is because that set property by VarCheckProtocol will indicate the variable to
@@ -1863,11 +1881,11 @@ VariableLockDynamicHiiPcd (
         //
         // DynamicHii PCD with RO property set in *.dsc.
         //
-        StringTable = (UINT8 *) ((UINT8 *) Database + Database->StringTableOffset);
-        GuidTable = (EFI_GUID *) ((UINT8 *) Database + Database->GuidTableOffset);
-        Guid = GuidTable + VariableHead->GuidTableIndex;
-        Name = (UINT16*) (StringTable + VariableHead->StringIndex);
-        Status = VariableLock->RequestToLock (VariableLock, Name, Guid);
+        StringTable = (UINT8 *)((UINT8 *)Database + Database->StringTableOffset);
+        GuidTable   = (EFI_GUID *)((UINT8 *)Database + Database->GuidTableOffset);
+        Guid        = GuidTable + VariableHead->GuidTableIndex;
+        Name        = (UINT16 *)(StringTable + VariableHead->StringIndex);
+        Status      = VariableLock->RequestToLock (VariableLock, Name, Guid);
         ASSERT_EFI_ERROR (Status);
       }
     }
@@ -1885,17 +1903,16 @@ VariableLockDynamicHiiPcd (
 VOID
 EFIAPI
 VariableLockCallBack (
-  IN EFI_EVENT          Event,
-  IN VOID               *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   EFI_STATUS                    Status;
   EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock;
 
-  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
+  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLock);
   if (!EFI_ERROR (Status)) {
     VariableLockDynamicHiiPcd (TRUE, VariableLock);
     VariableLockDynamicHiiPcd (FALSE, VariableLock);
   }
 }
-

@@ -1,0 +1,67 @@
+## @file  PrmPkg.dec
+# This package provides support for the Platform Runtime Mechanism (PRM).
+#
+# The following key elements of PRM are maintained in this package:
+#
+# 1. PRM interfaces - Comprised of interfaces shared with the operating system such as ACPI table structures
+#                     in addition to internal firmware interfaces such as protocols and library interfaces.
+#
+# 2. PRM generic drivers - EDK II drivers that implement generic functionality such that a platform can quickly
+#                          and reliably adopt PRM.
+#
+# 3. PRM module - An independently updatable PE/COFF binary that conforms to the unique requirements of a PRM module.
+#                 PRM modules expose functions for operating system invocation referred to as PRM handlers.
+#
+# 4. PRM handler - A function in a PRM module. The function is identified through PRM interfaces in the OS by a GUID.
+#
+# Copyright (c) Microsoft Corporation<BR>
+## SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = PrmPkg
+  PACKAGE_UNI_FILE               = PrmPkg.uni
+  PACKAGE_GUID                   = 3D22F66E-9090-46CE-B260-1836070AFA5E
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+  Include
+
+[Guids]
+  gPrmPkgTokenSpaceGuid = { 0x46f56acc, 0x600b, 0x450f, { 0xa5, 0x9c, 0x3a, 0x1a, 0x4a, 0xd4, 0x35, 0x3e }}
+  gPrmHiiGuid = { 0xee4cd885, 0xd104, 0x4056, { 0x84, 0xba, 0x46, 0x18, 0x82, 0xa7, 0x2a, 0x18 }}
+
+[LibraryClasses]
+  ## @libraryclass Provides a general abstraction for PRM context buffer management
+  #
+  PrmContextBufferLib|Include/Library/PrmContextBufferLib.h
+
+  ## @libraryclass Provides functionality to discover PRM modules installed by platform firmware
+  #
+  PrmModuleDiscoveryLib|Include/Library/PrmModuleDiscoveryLib.h
+
+  ## @libraryclass Provides additional PE/COFF functionality needed to support the Platform Runtime Mechanism (PRM) loader driver.
+  #
+  PrmPeCoffLib|Include/Library/PrmPeCoffLib.h
+
+[Protocols]
+  ## PRM Configuration Protocol
+  #
+  gPrmConfigProtocolGuid = { 0x4e5b4fea, 0x936a, 0x45bc, { 0xac, 0x6a, 0x2f, 0x8f, 0x14, 0xa6, 0xc2, 0x9e }}
+
+[PcdsFixedAtBuild]
+  ## Flash base address of a PRM firmware volume
+  gPrmPkgTokenSpaceGuid.PcdFlashFvPrmBase|0x00000000|UINT32|0x00000001
+
+  ## Size in bytes of a PRM firmware volume
+  gPrmPkgTokenSpaceGuid.PcdFlashFvPrmSize|0x00000000|UINT32|0x00000002
+
+  ## Print PRM handler execution time in PrmInfo
+  #
+  #  Provides an option to disable usage of a timer library to record PRM handler
+  #  execution time. In most cases, the platform should provide a valid TimerLib
+  #  instance that can be used when the application is built with that package to
+  #  report PRM handler execution time in the application. If such a TimerLib
+  #  instance is not available, set this PCD to FALSE in the package DSC file.
+  gPrmPkgTokenSpaceGuid.PcdPrmInfoPrintHandlerExecutionTime|TRUE|BOOLEAN|0x00000003

@@ -17,7 +17,7 @@
   PI_SPECIFICATION_VERSION       = 0x00010032
   ENTRY_POINT                    = StandaloneMmMain
 
-#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 ARM
 
 [Sources]
   StandaloneMmCore.c
@@ -76,6 +76,14 @@
   gEfiEventExitBootServicesGuid
   gEfiEventReadyToBootGuid
 
+#
+# This configuration fails for CLANGPDB, which does not support PIE in the GCC
+# sense. Such however is required for ARM family StandaloneMmCore
+# self-relocation, and thus the CLANGPDB toolchain is unsupported for ARM and
+# AARCH64 for this module.
+#
 [BuildOptions]
-  GCC:*_*_*_CC_FLAGS = -fpie
-  GCC:*_*_*_DLINK_FLAGS = -Wl,-z,text,-Bsymbolic,-pie
+  GCC:*_*_ARM_CC_FLAGS = -fpie
+  GCC:*_*_ARM_DLINK_FLAGS = -Wl,-z,text,-Bsymbolic,-pie
+  GCC:*_*_AARCH64_CC_FLAGS = -fpie
+  GCC:*_*_AARCH64_DLINK_FLAGS = -Wl,-z,text,-Bsymbolic,-pie

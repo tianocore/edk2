@@ -26,6 +26,7 @@
 #include <Library/PciLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/QemuFwCfgS3Lib.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Ppi/MasterBootMode.h>
@@ -35,7 +36,7 @@
 #include "Platform.h"
 #include "Cmos.h"
 
-EFI_MEMORY_TYPE_INFORMATION mDefaultMemoryTypeInformation[] = {
+EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
   { EfiACPIMemoryNVS,       0x004 },
   { EfiACPIReclaimMemory,   0x008 },
   { EfiReservedMemoryType,  0x004 },
@@ -46,8 +47,7 @@ EFI_MEMORY_TYPE_INFORMATION mDefaultMemoryTypeInformation[] = {
   { EfiMaxMemoryType,       0x000 }
 };
 
-
-EFI_PEI_PPI_DESCRIPTOR   mPpiBootMode[] = {
+EFI_PEI_PPI_DESCRIPTOR  mPpiBootMode[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
     &gEfiPeiMasterBootModePpiGuid,
@@ -55,24 +55,22 @@ EFI_PEI_PPI_DESCRIPTOR   mPpiBootMode[] = {
   }
 };
 
+UINT16  mHostBridgeDevId;
 
-UINT16 mHostBridgeDevId;
-
-EFI_BOOT_MODE mBootMode = BOOT_WITH_FULL_CONFIGURATION;
-
+EFI_BOOT_MODE  mBootMode = BOOT_WITH_FULL_CONFIGURATION;
 
 VOID
 AddIoMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  UINT64                MemorySize
   )
 {
   BuildResourceDescriptorHob (
     EFI_RESOURCE_MEMORY_MAPPED_IO,
-      EFI_RESOURCE_ATTRIBUTE_PRESENT     |
-      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_TESTED,
+    EFI_RESOURCE_ATTRIBUTE_PRESENT     |
+    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+    EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+    EFI_RESOURCE_ATTRIBUTE_TESTED,
     MemoryBase,
     MemorySize
     );
@@ -80,23 +78,23 @@ AddIoMemoryBaseSizeHob (
 
 VOID
 AddReservedMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize,
-  BOOLEAN                     Cacheable
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  UINT64                MemorySize,
+  BOOLEAN               Cacheable
   )
 {
   BuildResourceDescriptorHob (
     EFI_RESOURCE_MEMORY_RESERVED,
-      EFI_RESOURCE_ATTRIBUTE_PRESENT     |
-      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-      (Cacheable ?
-       EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
-       EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
-       EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE :
-       0
-       ) |
-      EFI_RESOURCE_ATTRIBUTE_TESTED,
+    EFI_RESOURCE_ATTRIBUTE_PRESENT     |
+    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+    EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+    (Cacheable ?
+     EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+     EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+     EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE :
+     0
+    ) |
+    EFI_RESOURCE_ATTRIBUTE_TESTED,
     MemoryBase,
     MemorySize
     );
@@ -104,64 +102,64 @@ AddReservedMemoryBaseSizeHob (
 
 VOID
 AddReservedMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  EFI_PHYSICAL_ADDRESS        MemoryLimit,
-  BOOLEAN                     Cacheable
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  EFI_PHYSICAL_ADDRESS  MemoryLimit,
+  BOOLEAN               Cacheable
   )
 {
-  AddReservedMemoryBaseSizeHob (MemoryBase,
-    (UINT64)(MemoryLimit - MemoryBase), Cacheable);
+  AddReservedMemoryBaseSizeHob (
+    MemoryBase,
+    (UINT64)(MemoryLimit - MemoryBase),
+    Cacheable
+    );
 }
 
 VOID
 AddIoMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  EFI_PHYSICAL_ADDRESS        MemoryLimit
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  EFI_PHYSICAL_ADDRESS  MemoryLimit
   )
 {
   AddIoMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
 }
 
-
 VOID
 AddMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  UINT64                MemorySize
   )
 {
   BuildResourceDescriptorHob (
     EFI_RESOURCE_SYSTEM_MEMORY,
-      EFI_RESOURCE_ATTRIBUTE_PRESENT |
-      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
-      EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_TESTED,
+    EFI_RESOURCE_ATTRIBUTE_PRESENT |
+    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+    EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+    EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+    EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+    EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
+    EFI_RESOURCE_ATTRIBUTE_TESTED,
     MemoryBase,
     MemorySize
     );
 }
 
-
 VOID
 AddMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  EFI_PHYSICAL_ADDRESS        MemoryLimit
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  EFI_PHYSICAL_ADDRESS  MemoryLimit
   )
 {
   AddMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
 }
-
 
 VOID
 MemMapInitialization (
   VOID
   )
 {
-  UINT64        PciIoBase;
-  UINT64        PciIoSize;
-  RETURN_STATUS PcdStatus;
+  UINT64         PciIoBase;
+  UINT64         PciIoSize;
+  RETURN_STATUS  PcdStatus;
 
   PciIoBase = 0xC000;
   PciIoSize = 0x4000;
@@ -172,7 +170,7 @@ MemMapInitialization (
   BuildGuidDataHob (
     &gEfiMemoryTypeInformationGuid,
     mDefaultMemoryTypeInformation,
-    sizeof(mDefaultMemoryTypeInformation)
+    sizeof (mDefaultMemoryTypeInformation)
     );
 
   //
@@ -202,8 +200,8 @@ PciExBarInitialization (
   )
 {
   union {
-    UINT64 Uint64;
-    UINT32 Uint32[2];
+    UINT64    Uint64;
+    UINT32    Uint32[2];
   } PciExBarBase;
 
   //
@@ -242,13 +240,13 @@ MiscInitialization (
   VOID
   )
 {
-  UINTN         PmCmd;
-  UINTN         Pmba;
-  UINT32        PmbaAndVal;
-  UINT32        PmbaOrVal;
-  UINTN         AcpiCtlReg;
-  UINT8         AcpiEnBit;
-  RETURN_STATUS PcdStatus;
+  UINTN          PmCmd;
+  UINTN          Pmba;
+  UINT32         PmbaAndVal;
+  UINT32         PmbaOrVal;
+  UINTN          AcpiCtlReg;
+  UINT8          AcpiEnBit;
+  RETURN_STATUS  PcdStatus;
 
   //
   // Disable A20 Mask
@@ -289,11 +287,17 @@ MiscInitialization (
         //
         return;
       }
-      DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
-        __FUNCTION__, mHostBridgeDevId));
+
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+        __FUNCTION__,
+        mHostBridgeDevId
+        ));
       ASSERT (FALSE);
       return;
   }
+
   PcdStatus = PcdSet16S (PcdOvmfHostBridgePciDevId, mHostBridgeDevId);
   ASSERT_RETURN_ERROR (PcdStatus);
 
@@ -336,17 +340,17 @@ MiscInitialization (
   }
 }
 
-
 VOID
 BootModeInitialization (
   VOID
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   if (CmosRead8 (0xF) == 0xFE) {
     mBootMode = BOOT_ON_S3_RESUME;
   }
+
   CmosWrite8 (0xF, 0x00);
 
   Status = PeiServicesSetBootMode (mBootMode);
@@ -356,13 +360,12 @@ BootModeInitialization (
   ASSERT_EFI_ERROR (Status);
 }
 
-
 VOID
 ReserveEmuVariableNvStore (
   )
 {
-  EFI_PHYSICAL_ADDRESS VariableStore;
-  RETURN_STATUS        PcdStatus;
+  EFI_PHYSICAL_ADDRESS  VariableStore;
+  RETURN_STATUS         PcdStatus;
 
   //
   // Allocate storage for NV variables early on so it will be
@@ -372,25 +375,25 @@ ReserveEmuVariableNvStore (
   //
   VariableStore =
     (EFI_PHYSICAL_ADDRESS)(UINTN)
-      AllocateRuntimePages (
-        EFI_SIZE_TO_PAGES (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize))
-        );
-  DEBUG ((DEBUG_INFO,
-          "Reserved variable store memory: 0x%lX; size: %dkb\n",
-          VariableStore,
-          (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)) / 1024
-        ));
+    AllocateRuntimePages (
+      EFI_SIZE_TO_PAGES (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize))
+      );
+  DEBUG ((
+    DEBUG_INFO,
+    "Reserved variable store memory: 0x%lX; size: %dkb\n",
+    VariableStore,
+    (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)) / 1024
+    ));
   PcdStatus = PcdSet64S (PcdEmuVariableNvStoreReserved, VariableStore);
   ASSERT_RETURN_ERROR (PcdStatus);
 }
-
 
 VOID
 DebugDumpCmos (
   VOID
   )
 {
-  UINT32 Loop;
+  UINT32  Loop;
 
   DEBUG ((DEBUG_INFO, "CMOS:\n"));
 
@@ -398,14 +401,13 @@ DebugDumpCmos (
     if ((Loop % 0x10) == 0) {
       DEBUG ((DEBUG_INFO, "%02x:", Loop));
     }
+
     DEBUG ((DEBUG_INFO, " %02x", CmosRead8 (Loop)));
     if ((Loop % 0x10) == 0xf) {
       DEBUG ((DEBUG_INFO, "\n"));
     }
   }
 }
-
-
 
 /**
   Perform Platform PEI initialization.
@@ -423,6 +425,8 @@ InitializeXenPlatform (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
+  EFI_STATUS  Status;
+
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
 
   DebugDumpCmos ();
@@ -431,6 +435,16 @@ InitializeXenPlatform (
     DEBUG ((DEBUG_ERROR, "ERROR: Xen isn't detected\n"));
     ASSERT (FALSE);
     CpuDeadLoop ();
+  }
+
+  //
+  // This S3 conditional test is mainly for HVM Direct Kernel Boot since
+  // QEMU fwcfg isn't really supported other than that.
+  //
+  if (QemuFwCfgS3Enabled ()) {
+    DEBUG ((DEBUG_INFO, "S3 support was detected on QEMU\n"));
+    Status = PcdSetBoolS (PcdAcpiS3Enable, TRUE);
+    ASSERT_EFI_ERROR (Status);
   }
 
   XenConnect ();
@@ -447,7 +461,6 @@ InitializeXenPlatform (
 
   InitializeRamRegions ();
 
-  InitializeXen ();
   CalibrateLapicTimer ();
 
   if (mBootMode != BOOT_ON_S3_RESUME) {

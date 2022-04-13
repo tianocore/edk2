@@ -34,20 +34,20 @@ Module Name:
 #include "Platform.h"
 #include "Cmos.h"
 
-UINT8 mPhysMemAddressWidth;
+UINT8  mPhysMemAddressWidth;
 
-STATIC UINT32 mS3AcpiReservedMemoryBase;
-STATIC UINT32 mS3AcpiReservedMemorySize;
+STATIC UINT32  mS3AcpiReservedMemoryBase;
+STATIC UINT32  mS3AcpiReservedMemorySize;
 
-STATIC UINT16 mQ35TsegMbytes;
+STATIC UINT16  mQ35TsegMbytes;
 
 VOID
 Q35TsegMbytesInitialization (
   VOID
   )
 {
-  UINT16        ExtendedTsegMbytes;
-  RETURN_STATUS PcdStatus;
+  UINT16         ExtendedTsegMbytes;
+  RETURN_STATUS  PcdStatus;
 
   if (mHostBridgeDevId != INTEL_Q35_MCH_DEVICE_ID) {
     DEBUG ((
@@ -99,16 +99,16 @@ Q35TsegMbytesInitialization (
 STATIC
 UINT64
 GetHighestSystemMemoryAddress (
-  BOOLEAN       Below4gb
+  BOOLEAN  Below4gb
   )
 {
-  EFI_E820_ENTRY64    *E820Map;
-  UINT32              E820EntriesCount;
-  EFI_E820_ENTRY64    *Entry;
-  EFI_STATUS          Status;
-  UINT32              Loop;
-  UINT64              HighestAddress;
-  UINT64              EntryEnd;
+  EFI_E820_ENTRY64  *E820Map;
+  UINT32            E820EntriesCount;
+  EFI_E820_ENTRY64  *Entry;
+  EFI_STATUS        Status;
+  UINT32            Loop;
+  UINT64            HighestAddress;
+  UINT64            EntryEnd;
 
   HighestAddress = 0;
 
@@ -116,12 +116,12 @@ GetHighestSystemMemoryAddress (
   ASSERT_EFI_ERROR (Status);
 
   for (Loop = 0; Loop < E820EntriesCount; Loop++) {
-    Entry = E820Map + Loop;
+    Entry    = E820Map + Loop;
     EntryEnd = Entry->BaseAddr + Entry->Length;
 
-    if (Entry->Type == EfiAcpiAddressRangeMemory &&
-        EntryEnd > HighestAddress) {
-
+    if ((Entry->Type == EfiAcpiAddressRangeMemory) &&
+        (EntryEnd > HighestAddress))
+    {
       if (Below4gb && (EntryEnd <= BASE_4GB)) {
         HighestAddress = EntryEnd;
       } else if (!Below4gb && (EntryEnd >= BASE_4GB)) {
@@ -141,8 +141,8 @@ GetSystemMemorySizeBelow4gb (
   VOID
   )
 {
-  UINT8 Cmos0x34;
-  UINT8 Cmos0x35;
+  UINT8  Cmos0x34;
+  UINT8  Cmos0x35;
 
   //
   // In PVH case, there is no CMOS, we have to calculate the memory size
@@ -154,7 +154,7 @@ GetSystemMemorySizeBelow4gb (
     HighestAddress = GetHighestSystemMemoryAddress (TRUE);
     ASSERT (HighestAddress > 0 && HighestAddress <= BASE_4GB);
 
-    return HighestAddress;
+    return (UINT32)HighestAddress;
   }
 
   //
@@ -166,10 +166,10 @@ GetSystemMemorySizeBelow4gb (
   //   into the calculation to get the total memory size.
   //
 
-  Cmos0x34 = (UINT8) CmosRead8 (0x34);
-  Cmos0x35 = (UINT8) CmosRead8 (0x35);
+  Cmos0x34 = (UINT8)CmosRead8 (0x34);
+  Cmos0x35 = (UINT8)CmosRead8 (0x35);
 
-  return (UINT32) (((UINTN)((Cmos0x35 << 8) + Cmos0x34) << 16) + SIZE_16MB);
+  return (UINT32)(((UINTN)((Cmos0x35 << 8) + Cmos0x34) << 16) + SIZE_16MB);
 }
 
 /**
@@ -180,12 +180,12 @@ AddressWidthInitialization (
   VOID
   )
 {
-  UINT32 RegEax;
+  UINT32  RegEax;
 
   AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
   if (RegEax >= 0x80000008) {
     AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-    mPhysMemAddressWidth = (UINT8) RegEax;
+    mPhysMemAddressWidth = (UINT8)RegEax;
   } else {
     mPhysMemAddressWidth = 36;
   }
@@ -208,21 +208,22 @@ GetPeiMemoryCap (
   VOID
   )
 {
-  BOOLEAN Page1GSupport;
-  UINT32  RegEax;
-  UINT32  RegEdx;
-  UINT32  Pml4Entries;
-  UINT32  PdpEntries;
-  UINTN   TotalPages;
+  BOOLEAN  Page1GSupport;
+  UINT32   RegEax;
+  UINT32   RegEdx;
+  UINT32   Pml4Entries;
+  UINT32   PdpEntries;
+  UINTN    TotalPages;
 
   //
   // If DXE is 32-bit, then just return the traditional 64 MB cap.
   //
-#ifdef MDE_CPU_IA32
+ #ifdef MDE_CPU_IA32
   if (!FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     return SIZE_64MB;
   }
-#endif
+
+ #endif
 
   //
   // Dependent on physical address width, PEI memory allocations can be
@@ -243,7 +244,7 @@ GetPeiMemoryCap (
 
   if (mPhysMemAddressWidth <= 39) {
     Pml4Entries = 1;
-    PdpEntries = 1 << (mPhysMemAddressWidth - 30);
+    PdpEntries  = 1 << (mPhysMemAddressWidth - 30);
     ASSERT (PdpEntries <= 0x200);
   } else {
     Pml4Entries = 1 << (mPhysMemAddressWidth - 39);
@@ -252,7 +253,7 @@ GetPeiMemoryCap (
   }
 
   TotalPages = Page1GSupport ? Pml4Entries + 1 :
-                               (PdpEntries + 1) * Pml4Entries + 1;
+               (PdpEntries + 1) * Pml4Entries + 1;
   ASSERT (TotalPages <= 0x40201);
 
   //
@@ -262,7 +263,6 @@ GetPeiMemoryCap (
   //
   return (UINT32)(EFI_PAGES_TO_SIZE (TotalPages) + SIZE_64MB);
 }
-
 
 /**
   Publish PEI core memory
@@ -275,11 +275,11 @@ PublishPeiMemory (
   VOID
   )
 {
-  EFI_STATUS                  Status;
-  EFI_PHYSICAL_ADDRESS        MemoryBase;
-  UINT64                      MemorySize;
-  UINT32                      LowerMemorySize;
-  UINT32                      PeiMemoryCap;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  MemoryBase;
+  UINT64                MemorySize;
+  UINT32                LowerMemorySize;
+  UINT32                PeiMemoryCap;
 
   LowerMemorySize = GetSystemMemorySizeBelow4gb ();
 
@@ -288,8 +288,13 @@ PublishPeiMemory (
     MemorySize = mS3AcpiReservedMemorySize;
   } else {
     PeiMemoryCap = GetPeiMemoryCap ();
-    DEBUG ((DEBUG_INFO, "%a: mPhysMemAddressWidth=%d PeiMemoryCap=%u KB\n",
-      __FUNCTION__, mPhysMemAddressWidth, PeiMemoryCap >> 10));
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: mPhysMemAddressWidth=%d PeiMemoryCap=%u KB\n",
+      __FUNCTION__,
+      mPhysMemAddressWidth,
+      PeiMemoryCap >> 10
+      ));
 
     //
     // Determine the range of memory to use during PEI
@@ -306,12 +311,11 @@ PublishPeiMemory (
   //
   // Publish this memory to the PEI Core
   //
-  Status = PublishSystemMemory(MemoryBase, MemorySize);
+  Status = PublishSystemMemory (MemoryBase, MemorySize);
   ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
-
 
 /**
   Publish system RAM and reserve memory regions
@@ -336,12 +340,12 @@ InitializeRamRegions (
     // such that they would overlap the LockBox storage.
     //
     ZeroMem (
-      (VOID*)(UINTN) PcdGet32 (PcdOvmfLockBoxStorageBase),
-      (UINTN) PcdGet32 (PcdOvmfLockBoxStorageSize)
+      (VOID *)(UINTN)PcdGet32 (PcdOvmfLockBoxStorageBase),
+      (UINTN)PcdGet32 (PcdOvmfLockBoxStorageSize)
       );
     BuildMemoryAllocationHob (
-      (EFI_PHYSICAL_ADDRESS)(UINTN) PcdGet32 (PcdOvmfLockBoxStorageBase),
-      (UINT64)(UINTN) PcdGet32 (PcdOvmfLockBoxStorageSize),
+      (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfLockBoxStorageBase),
+      (UINT64)(UINTN)PcdGet32 (PcdOvmfLockBoxStorageSize),
       EfiBootServicesData
       );
   }

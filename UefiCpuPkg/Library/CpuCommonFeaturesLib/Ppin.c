@@ -20,10 +20,10 @@
 VOID *
 EFIAPI
 PpinGetConfigData (
-  IN UINTN               NumberOfProcessors
+  IN UINTN  NumberOfProcessors
   )
 {
-  VOID          *ConfigData;
+  VOID  *ConfigData;
 
   ConfigData = AllocateZeroPool (sizeof (MSR_IVY_BRIDGE_PPIN_CTL_REGISTER) * NumberOfProcessors);
   ASSERT (ConfigData != NULL);
@@ -55,8 +55,8 @@ PpinSupport (
   IN VOID                              *ConfigData  OPTIONAL
   )
 {
-  MSR_IVY_BRIDGE_PLATFORM_INFO_1_REGISTER    PlatformInfo;
-  MSR_IVY_BRIDGE_PPIN_CTL_REGISTER           *MsrPpinCtrl;
+  MSR_IVY_BRIDGE_PLATFORM_INFO_1_REGISTER  PlatformInfo;
+  MSR_IVY_BRIDGE_PPIN_CTL_REGISTER         *MsrPpinCtrl;
 
   if ((CpuInfo->DisplayFamily == 0x06) &&
       ((CpuInfo->DisplayModel == 0x3E) ||      // Xeon E5 V2
@@ -65,13 +65,14 @@ PpinSupport (
        (CpuInfo->DisplayModel == 0x55) ||      // Xeon Processor Scalable
        (CpuInfo->DisplayModel == 0x57) ||      // Xeon Phi processor 3200, 5200, 7200 series.
        (CpuInfo->DisplayModel == 0x85)         // Future Xeon phi processor
-     )) {
+      ))
+  {
     //
     // Check whether platform support this feature.
     //
     PlatformInfo.Uint64 = AsmReadMsr64 (MSR_IVY_BRIDGE_PLATFORM_INFO_1);
     if (PlatformInfo.Bits.PPIN_CAP != 0) {
-      MsrPpinCtrl = (MSR_IVY_BRIDGE_PPIN_CTL_REGISTER *) ConfigData;
+      MsrPpinCtrl = (MSR_IVY_BRIDGE_PPIN_CTL_REGISTER *)ConfigData;
       ASSERT (MsrPpinCtrl != NULL);
       MsrPpinCtrl[ProcessorNumber].Uint64 = AsmReadMsr64 (MSR_IVY_BRIDGE_PPIN_CTL);
       return TRUE;
@@ -108,13 +109,13 @@ EFIAPI
 PpinInitialize (
   IN UINTN                             ProcessorNumber,
   IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
-  IN VOID                              *ConfigData,  OPTIONAL
+  IN VOID                              *ConfigData   OPTIONAL,
   IN BOOLEAN                           State
   )
 {
-  MSR_IVY_BRIDGE_PPIN_CTL_REGISTER     *MsrPpinCtrl;
+  MSR_IVY_BRIDGE_PPIN_CTL_REGISTER  *MsrPpinCtrl;
 
-  MsrPpinCtrl = (MSR_IVY_BRIDGE_PPIN_CTL_REGISTER *) ConfigData;
+  MsrPpinCtrl = (MSR_IVY_BRIDGE_PPIN_CTL_REGISTER *)ConfigData;
   ASSERT (MsrPpinCtrl != NULL);
 
   //
@@ -130,10 +131,10 @@ PpinInitialize (
   // Support function already check the processor which support PPIN feature, so this function not need
   // to check the processor again.
   //
-  // The scope of the MSR_IVY_BRIDGE_PPIN_CTL is package level, only program MSR_IVY_BRIDGE_PPIN_CTL for
-  // thread 0 core 0 in each package.
+  // The scope of the MSR_IVY_BRIDGE_PPIN_CTL is package level, only program MSR_IVY_BRIDGE_PPIN_CTL
+  // once for each package.
   //
-  if ((CpuInfo->ProcessorInfo.Location.Thread != 0) || (CpuInfo->ProcessorInfo.Location.Core != 0)) {
+  if ((CpuInfo->First.Thread == 0) || (CpuInfo->First.Core == 0)) {
     return RETURN_SUCCESS;
   }
 
@@ -143,14 +144,14 @@ PpinInitialize (
     // According to SDM, once Enable_PPIN is set, attempt to write 1 to LockOut will cause #GP.
     //
     MsrPpinCtrl[ProcessorNumber].Bits.Enable_PPIN = 1;
-    MsrPpinCtrl[ProcessorNumber].Bits.LockOut = 0;
+    MsrPpinCtrl[ProcessorNumber].Bits.LockOut     = 0;
   } else {
     //
     // Disable and Lock.
     // According to SDM, writing 1 to LockOut is permitted only if Enable_PPIN is clear.
     //
     MsrPpinCtrl[ProcessorNumber].Bits.Enable_PPIN = 0;
-    MsrPpinCtrl[ProcessorNumber].Bits.LockOut = 1;
+    MsrPpinCtrl[ProcessorNumber].Bits.LockOut     = 1;
   }
 
   CPU_REGISTER_TABLE_WRITE64 (

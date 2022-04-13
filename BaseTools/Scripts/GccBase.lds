@@ -74,6 +74,5 @@ SECTIONS {
     *(.dynamic)
     *(.hash .gnu.hash)
     *(.comment)
-    *(COMMON)
   }
 }

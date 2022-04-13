@@ -9,15 +9,15 @@
 
 #include "TcpMain.h"
 
-UINT16                        mTcp4RandomPort;
-UINT16                        mTcp6RandomPort;
+UINT16  mTcp4RandomPort;
+UINT16  mTcp6RandomPort;
 
-TCP_HEARTBEAT_TIMER           mTcpTimer = {
+TCP_HEARTBEAT_TIMER  mTcpTimer = {
   NULL,
   0
 };
 
-EFI_TCP4_PROTOCOL             gTcp4ProtocolTemplate = {
+EFI_TCP4_PROTOCOL  gTcp4ProtocolTemplate = {
   Tcp4GetModeData,
   Tcp4Configure,
   Tcp4Routes,
@@ -30,7 +30,7 @@ EFI_TCP4_PROTOCOL             gTcp4ProtocolTemplate = {
   Tcp4Poll
 };
 
-EFI_TCP6_PROTOCOL             gTcp6ProtocolTemplate = {
+EFI_TCP6_PROTOCOL  gTcp6ProtocolTemplate = {
   Tcp6GetModeData,
   Tcp6Configure,
   Tcp6Connect,
@@ -42,7 +42,7 @@ EFI_TCP6_PROTOCOL             gTcp6ProtocolTemplate = {
   Tcp6Poll
 };
 
-SOCK_INIT_DATA                mTcpDefaultSockData = {
+SOCK_INIT_DATA  mTcpDefaultSockData = {
   SockStream,
   SO_CLOSED,
   NULL,
@@ -60,7 +60,7 @@ SOCK_INIT_DATA                mTcpDefaultSockData = {
   NULL,
 };
 
-EFI_DRIVER_BINDING_PROTOCOL   gTcp4DriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gTcp4DriverBinding = {
   Tcp4DriverBindingSupported,
   Tcp4DriverBindingStart,
   Tcp4DriverBindingStop,
@@ -69,7 +69,7 @@ EFI_DRIVER_BINDING_PROTOCOL   gTcp4DriverBinding = {
   NULL
 };
 
-EFI_DRIVER_BINDING_PROTOCOL   gTcp6DriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gTcp6DriverBinding = {
   Tcp6DriverBindingSupported,
   Tcp6DriverBindingStart,
   Tcp6DriverBindingStop,
@@ -82,7 +82,6 @@ EFI_SERVICE_BINDING_PROTOCOL  gTcpServiceBinding = {
   TcpServiceBindingCreateChild,
   TcpServiceBindingDestroyChild
 };
-
 
 /**
   Create and start the heartbeat timer for the TCP driver.
@@ -101,7 +100,6 @@ TcpCreateTimer (
   Status = EFI_SUCCESS;
 
   if (mTcpTimer.RefCnt == 0) {
-
     Status = gBS->CreateEvent (
                     EVT_TIMER | EVT_NOTIFY_SIGNAL,
                     TPL_NOTIFY,
@@ -110,17 +108,15 @@ TcpCreateTimer (
                     &mTcpTimer.TimerEvent
                     );
     if (!EFI_ERROR (Status)) {
-
       Status = gBS->SetTimer (
                       mTcpTimer.TimerEvent,
                       TimerPeriodic,
-                      (UINT64) (TICKS_PER_SECOND / TCP_TICK_HZ)
+                      (UINT64)(TICKS_PER_SECOND / TCP_TICK_HZ)
                       );
     }
   }
 
   if (!EFI_ERROR (Status)) {
-
     mTcpTimer.RefCnt++;
   }
 
@@ -209,7 +205,7 @@ TcpDriverEntryPoint (
   //
   Seed            = NetRandomInitSeed ();
   mTcpGlobalIss   = NET_RANDOM (Seed) % mTcpGlobalIss;
-  mTcp4RandomPort = (UINT16) (TCP_PORT_KNOWN + (NET_RANDOM (Seed) % TCP_PORT_KNOWN));
+  mTcp4RandomPort = (UINT16)(TCP_PORT_KNOWN + (NET_RANDOM (Seed) % TCP_PORT_KNOWN));
   mTcp6RandomPort = mTcp4RandomPort;
 
   return EFI_SUCCESS;
@@ -233,11 +229,11 @@ TcpCreateService (
   IN UINT8       IpVersion
   )
 {
-  EFI_STATUS         Status;
-  EFI_GUID           *IpServiceBindingGuid;
-  EFI_GUID           *TcpServiceBindingGuid;
-  TCP_SERVICE_DATA   *TcpServiceData;
-  IP_IO_OPEN_DATA    OpenData;
+  EFI_STATUS        Status;
+  EFI_GUID          *IpServiceBindingGuid;
+  EFI_GUID          *TcpServiceBindingGuid;
+  TCP_SERVICE_DATA  *TcpServiceData;
+  IP_IO_OPEN_DATA   OpenData;
 
   if (IpVersion == IP_VERSION_4) {
     IpServiceBindingGuid  = &gEfiIp4ServiceBindingProtocolGuid;
@@ -279,10 +275,10 @@ TcpCreateService (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  TcpServiceData->Signature            = TCP_DRIVER_SIGNATURE;
-  TcpServiceData->ControllerHandle     = Controller;
-  TcpServiceData->DriverBindingHandle  = Image;
-  TcpServiceData->IpVersion            = IpVersion;
+  TcpServiceData->Signature           = TCP_DRIVER_SIGNATURE;
+  TcpServiceData->ControllerHandle    = Controller;
+  TcpServiceData->DriverBindingHandle = Image;
+  TcpServiceData->IpVersion           = IpVersion;
   CopyMem (
     &TcpServiceData->ServiceBinding,
     &gTcpServiceBinding,
@@ -294,7 +290,6 @@ TcpCreateService (
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_ERROR;
   }
-
 
   InitializeListHead (&TcpServiceData->SocketList);
   ZeroMem (&OpenData, sizeof (IP_IO_OPEN_DATA));
@@ -315,8 +310,8 @@ TcpCreateService (
     OpenData.IpConfigData.Ip6CfgData.DefaultProtocol = EFI_IP_PROTO_TCP;
   }
 
-  OpenData.PktRcvdNotify  = TcpRxCallback;
-  Status                  = IpIoOpen (TcpServiceData->IpIo, &OpenData);
+  OpenData.PktRcvdNotify = TcpRxCallback;
+  Status                 = IpIoOpen (TcpServiceData->IpIo, &OpenData);
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
@@ -365,8 +360,8 @@ ON_ERROR:
 EFI_STATUS
 EFIAPI
 TcpDestroyChildEntryInHandleBuffer (
-  IN LIST_ENTRY         *Entry,
-  IN VOID               *Context
+  IN LIST_ENTRY  *Entry,
+  IN VOID        *Context
   )
 {
   SOCKET                        *Sock;
@@ -374,14 +369,14 @@ TcpDestroyChildEntryInHandleBuffer (
   UINTN                         NumberOfChildren;
   EFI_HANDLE                    *ChildHandleBuffer;
 
-  if (Entry == NULL || Context == NULL) {
+  if ((Entry == NULL) || (Context == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Sock = NET_LIST_USER_STRUCT_S (Entry, SOCKET, Link, SOCK_SIGNATURE);
-  ServiceBinding    = ((TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->ServiceBinding;
-  NumberOfChildren  = ((TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->NumberOfChildren;
-  ChildHandleBuffer = ((TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->ChildHandleBuffer;
+  Sock              = NET_LIST_USER_STRUCT_S (Entry, SOCKET, Link, SOCK_SIGNATURE);
+  ServiceBinding    = ((TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *)Context)->ServiceBinding;
+  NumberOfChildren  = ((TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *)Context)->NumberOfChildren;
+  ChildHandleBuffer = ((TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *)Context)->ChildHandleBuffer;
 
   if (!NetIsInHandleBuffer (Sock->SockHandle, NumberOfChildren, ChildHandleBuffer)) {
     return EFI_SUCCESS;
@@ -411,17 +406,17 @@ TcpDestroyService (
   IN EFI_HANDLE  Controller,
   IN EFI_HANDLE  ImageHandle,
   IN UINTN       NumberOfChildren,
-  IN EFI_HANDLE  *ChildHandleBuffer, OPTIONAL
+  IN EFI_HANDLE  *ChildHandleBuffer  OPTIONAL,
   IN UINT8       IpVersion
   )
 {
-  EFI_HANDLE                    NicHandle;
-  EFI_GUID                      *IpProtocolGuid;
-  EFI_GUID                      *ServiceBindingGuid;
-  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
-  TCP_SERVICE_DATA              *TcpServiceData;
-  EFI_STATUS                    Status;
-  LIST_ENTRY                    *List;
+  EFI_HANDLE                               NicHandle;
+  EFI_GUID                                 *IpProtocolGuid;
+  EFI_GUID                                 *ServiceBindingGuid;
+  EFI_SERVICE_BINDING_PROTOCOL             *ServiceBinding;
+  TCP_SERVICE_DATA                         *TcpServiceData;
+  EFI_STATUS                               Status;
+  LIST_ENTRY                               *List;
   TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT  Context;
 
   ASSERT ((IpVersion == IP_VERSION_4) || (IpVersion == IP_VERSION_6));
@@ -442,7 +437,7 @@ TcpDestroyService (
   Status = gBS->OpenProtocol (
                   NicHandle,
                   ServiceBindingGuid,
-                  (VOID **) &ServiceBinding,
+                  (VOID **)&ServiceBinding,
                   ImageHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -454,16 +449,16 @@ TcpDestroyService (
   TcpServiceData = TCP_SERVICE_FROM_THIS (ServiceBinding);
 
   if (NumberOfChildren != 0) {
-    List = &TcpServiceData->SocketList;
-    Context.ServiceBinding = ServiceBinding;
-    Context.NumberOfChildren = NumberOfChildren;
+    List                      = &TcpServiceData->SocketList;
+    Context.ServiceBinding    = ServiceBinding;
+    Context.NumberOfChildren  = NumberOfChildren;
     Context.ChildHandleBuffer = ChildHandleBuffer;
-    Status = NetDestroyLinkList (
-               List,
-               TcpDestroyChildEntryInHandleBuffer,
-               &Context,
-               NULL
-               );
+    Status                    = NetDestroyLinkList (
+                                  List,
+                                  TcpDestroyChildEntryInHandleBuffer,
+                                  &Context,
+                                  NULL
+                                  );
   } else if (IsListEmpty (&TcpServiceData->SocketList)) {
     //
     // Uninstall TCP servicebinding protocol
@@ -758,7 +753,7 @@ TcpCreateSocketCallback (
     IpProtocolGuid = &gEfiIp6ProtocolGuid;
   }
 
-  TcpServiceData = ((TCP_PROTO_DATA *) This->ProtoReserved)->TcpService;
+  TcpServiceData = ((TCP_PROTO_DATA *)This->ProtoReserved)->TcpService;
 
   //
   // Open the default IP protocol of IP_IO BY_DRIVER.
@@ -781,7 +776,7 @@ TcpCreateSocketCallback (
   Status = gBS->OpenProtocol (
                   TcpServiceData->ControllerHandle,
                   &gEfiDevicePathProtocolGuid,
-                  (VOID **) &This->ParentDevicePath,
+                  (VOID **)&This->ParentDevicePath,
                   TcpServiceData->DriverBindingHandle,
                   This->SockHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -825,7 +820,7 @@ TcpDestroySocketCallback (
     IpProtocolGuid = &gEfiIp6ProtocolGuid;
   }
 
-  TcpServiceData = ((TCP_PROTO_DATA *) This->ProtoReserved)->TcpService;
+  TcpServiceData = ((TCP_PROTO_DATA *)This->ProtoReserved)->TcpService;
 
   //
   // Remove this node from the list.
@@ -876,7 +871,7 @@ TcpServiceBindingCreateChild (
   EFI_STATUS        Status;
   EFI_TPL           OldTpl;
 
-  if (NULL == This || NULL == ChildHandle) {
+  if ((NULL == This) || (NULL == ChildHandle)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -905,8 +900,8 @@ TcpServiceBindingCreateChild (
   Sock = SockCreateChild (&mTcpDefaultSockData);
   if (NULL == Sock) {
     DEBUG (
-      (EFI_D_ERROR,
-      "TcpDriverBindingCreateChild: No resource to create a Tcp Child\n")
+      (DEBUG_ERROR,
+       "TcpDriverBindingCreateChild: No resource to create a Tcp Child\n")
       );
 
     Status = EFI_OUT_OF_RESOURCES;
@@ -914,7 +909,7 @@ TcpServiceBindingCreateChild (
     *ChildHandle = Sock->SockHandle;
   }
 
-  mTcpDefaultSockData.ProtoData  = NULL;
+  mTcpDefaultSockData.ProtoData = NULL;
 
   gBS->RestoreTPL (OldTpl);
   return Status;
@@ -949,7 +944,7 @@ TcpServiceBindingDestroyChild (
   VOID        *Tcp;
   SOCKET      *Sock;
 
-  if (NULL == This || NULL == ChildHandle) {
+  if ((NULL == This) || (NULL == ChildHandle)) {
     return EFI_INVALID_PARAMETER;
   }
 

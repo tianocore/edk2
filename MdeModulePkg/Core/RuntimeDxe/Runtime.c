@@ -45,20 +45,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Global Variables
 //
-EFI_MEMORY_DESCRIPTOR         *mVirtualMap                = NULL;
-UINTN                         mVirtualMapDescriptorSize;
-UINTN                         mVirtualMapMaxIndex;
-VOID                          *mMyImageBase;
+EFI_MEMORY_DESCRIPTOR  *mVirtualMap = NULL;
+UINTN                  mVirtualMapDescriptorSize;
+UINTN                  mVirtualMapMaxIndex;
+VOID                   *mMyImageBase;
 
 //
 // The handle onto which the Runtime Architectural Protocol instance is installed
 //
-EFI_HANDLE                    mRuntimeHandle = NULL;
+EFI_HANDLE  mRuntimeHandle = NULL;
 
 //
 // The Runtime Architectural Protocol instance produced by this driver
 //
-EFI_RUNTIME_ARCH_PROTOCOL     mRuntime = {
+EFI_RUNTIME_ARCH_PROTOCOL  mRuntime = {
   INITIALIZE_LIST_HEAD_VARIABLE (mRuntime.ImageHead),
   INITIALIZE_LIST_HEAD_VARIABLE (mRuntime.EventHead),
 
@@ -79,6 +79,7 @@ EFI_RUNTIME_ARCH_PROTOCOL     mRuntime = {
 //
 // Worker Functions
 //
+
 /**
 
   Calculate the 32-bit CRC in a EFI table using the Runtime Drivers
@@ -97,10 +98,10 @@ RuntimeDriverCalculateEfiHdrCrc (
 {
   UINT32  Crc;
 
-  Hdr->CRC32  = 0;
+  Hdr->CRC32 = 0;
 
-  Crc         = 0;
-  RuntimeDriverCalculateCrc32 ((UINT8 *) Hdr, Hdr->HeaderSize, &Crc);
+  Crc = 0;
+  RuntimeDriverCalculateCrc32 ((UINT8 *)Hdr, Hdr->HeaderSize, &Crc);
   Hdr->CRC32 = Crc;
 }
 
@@ -126,10 +127,10 @@ RuntimeDriverConvertPointer (
   IN OUT VOID   **ConvertAddress
   )
 {
-  UINTN                 Address;
-  UINT64                VirtEndOfRange;
-  EFI_MEMORY_DESCRIPTOR *VirtEntry;
-  UINTN                 Index;
+  UINTN                  Address;
+  UINT64                 VirtEndOfRange;
+  EFI_MEMORY_DESCRIPTOR  *VirtEntry;
+  UINTN                  Index;
 
   //
   // Make sure ConvertAddress is a valid pointer
@@ -137,10 +138,11 @@ RuntimeDriverConvertPointer (
   if (ConvertAddress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Get the address to convert
   //
-  Address = (UINTN) *ConvertAddress;
+  Address = (UINTN)*ConvertAddress;
 
   //
   // If this is a null pointer, return if it's allowed
@@ -161,16 +163,16 @@ RuntimeDriverConvertPointer (
     //  platforms. If you get this ASSERT remove the UINTN and do a 64-bit
     //  multiply.
     //
-    ASSERT (((UINTN) VirtEntry->NumberOfPages < 0xffffffff) || (sizeof (UINTN) > 4));
+    ASSERT (((UINTN)VirtEntry->NumberOfPages < 0xffffffff) || (sizeof (UINTN) > 4));
 
     if ((VirtEntry->Attribute & EFI_MEMORY_RUNTIME) == EFI_MEMORY_RUNTIME) {
       if (Address >= VirtEntry->PhysicalStart) {
-        VirtEndOfRange = VirtEntry->PhysicalStart + (((UINTN) VirtEntry->NumberOfPages) * EFI_PAGE_SIZE);
+        VirtEndOfRange = VirtEntry->PhysicalStart + (((UINTN)VirtEntry->NumberOfPages) * EFI_PAGE_SIZE);
         if (Address < VirtEndOfRange) {
           //
           // Compute new address
           //
-          *ConvertAddress = (VOID *) (Address - (UINTN) VirtEntry->PhysicalStart + (UINTN) VirtEntry->VirtualStart);
+          *ConvertAddress = (VOID *)(Address - (UINTN)VirtEntry->PhysicalStart + (UINTN)VirtEntry->VirtualStart);
           return EFI_SUCCESS;
         }
       }
@@ -200,7 +202,7 @@ RuntimeDriverConvertPointer (
 **/
 EFI_STATUS
 RuntimeDriverConvertInternalPointer (
-  IN OUT VOID   **ConvertAddress
+  IN OUT VOID  **ConvertAddress
   )
 {
   return RuntimeDriverConvertPointer (0x0, ConvertAddress);
@@ -236,11 +238,11 @@ RuntimeDriverSetVirtualAddressMap (
   IN EFI_MEMORY_DESCRIPTOR  *VirtualMap
   )
 {
-  EFI_STATUS                    Status;
-  EFI_RUNTIME_EVENT_ENTRY       *RuntimeEvent;
-  EFI_RUNTIME_IMAGE_ENTRY       *RuntimeImage;
-  LIST_ENTRY                    *Link;
-  EFI_PHYSICAL_ADDRESS          VirtImageBase;
+  EFI_STATUS               Status;
+  EFI_RUNTIME_EVENT_ENTRY  *RuntimeEvent;
+  EFI_RUNTIME_IMAGE_ENTRY  *RuntimeImage;
+  LIST_ENTRY               *Link;
+  EFI_PHYSICAL_ADDRESS     VirtImageBase;
 
   //
   // Can only switch to virtual addresses once the memory map is locked down,
@@ -249,12 +251,14 @@ RuntimeDriverSetVirtualAddressMap (
   if (!mRuntime.AtRuntime || mRuntime.VirtualMode) {
     return EFI_UNSUPPORTED;
   }
+
   //
   // Only understand the original descriptor format
   //
-  if (DescriptorVersion != EFI_MEMORY_DESCRIPTOR_VERSION || DescriptorSize < sizeof (EFI_MEMORY_DESCRIPTOR)) {
+  if ((DescriptorVersion != EFI_MEMORY_DESCRIPTOR_VERSION) || (DescriptorSize < sizeof (EFI_MEMORY_DESCRIPTOR))) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // We are now committed to go to virtual mode, so lets get to it!
   //
@@ -294,7 +298,7 @@ RuntimeDriverSetVirtualAddressMap (
       // we need an explicit cast here.
       //
       RuntimeEvent->NotifyFunction (
-                      (EFI_EVENT) RuntimeEvent->Event,
+                      (EFI_EVENT)RuntimeEvent->Event,
                       RuntimeEvent->NotifyContext
                       );
     }
@@ -309,19 +313,18 @@ RuntimeDriverSetVirtualAddressMap (
     // We don't want to relocate our selves, as we only run in physical mode.
     //
     if (mMyImageBase != RuntimeImage->ImageBase) {
-
-      VirtImageBase = (EFI_PHYSICAL_ADDRESS) (UINTN) RuntimeImage->ImageBase;
-      Status  = RuntimeDriverConvertPointer (0, (VOID **) &VirtImageBase);
+      VirtImageBase = (EFI_PHYSICAL_ADDRESS)(UINTN)RuntimeImage->ImageBase;
+      Status        = RuntimeDriverConvertPointer (0, (VOID **)&VirtImageBase);
       ASSERT_EFI_ERROR (Status);
 
       PeCoffLoaderRelocateImageForRuntime (
-        (EFI_PHYSICAL_ADDRESS) (UINTN) RuntimeImage->ImageBase,
+        (EFI_PHYSICAL_ADDRESS)(UINTN)RuntimeImage->ImageBase,
         VirtImageBase,
-        (UINTN) RuntimeImage->ImageSize,
+        (UINTN)RuntimeImage->ImageSize,
         RuntimeImage->RelocationData
         );
 
-      InvalidateInstructionCacheRange (RuntimeImage->ImageBase, (UINTN) RuntimeImage->ImageSize);
+      InvalidateInstructionCacheRange (RuntimeImage->ImageBase, (UINTN)RuntimeImage->ImageSize);
     }
   }
 
@@ -329,18 +332,18 @@ RuntimeDriverSetVirtualAddressMap (
   // Convert all the Runtime Services except ConvertPointer() and SetVirtualAddressMap()
   // and recompute the CRC-32
   //
-  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->GetTime);
-  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->SetTime);
-  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->GetWakeupTime);
-  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->SetWakeupTime);
-  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->ResetSystem);
-  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->GetNextHighMonotonicCount);
-  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->GetVariable);
-  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->SetVariable);
-  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->GetNextVariableName);
-  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->QueryVariableInfo);
-  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->UpdateCapsule);
-  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->QueryCapsuleCapabilities);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gRT->GetTime);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gRT->SetTime);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gRT->GetWakeupTime);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gRT->SetWakeupTime);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gRT->ResetSystem);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gRT->GetNextHighMonotonicCount);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gRT->GetVariable);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gRT->SetVariable);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gRT->GetNextVariableName);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gRT->QueryVariableInfo);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gRT->UpdateCapsule);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gRT->QueryCapsuleCapabilities);
   RuntimeDriverCalculateEfiHdrCrc (&gRT->Hdr);
 
   //
@@ -350,9 +353,9 @@ RuntimeDriverSetVirtualAddressMap (
   //
   // Convert the runtime fields of the EFI System Table and recompute the CRC-32
   //
-  RuntimeDriverConvertInternalPointer ((VOID **) &gST->FirmwareVendor);
-  RuntimeDriverConvertInternalPointer ((VOID **) &gST->ConfigurationTable);
-  RuntimeDriverConvertInternalPointer ((VOID **) &gST->RuntimeServices);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gST->FirmwareVendor);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gST->ConfigurationTable);
+  RuntimeDriverConvertInternalPointer ((VOID **)&gST->RuntimeServices);
   RuntimeDriverCalculateEfiHdrCrc (&gST->Hdr);
 
   //
@@ -362,7 +365,8 @@ RuntimeDriverSetVirtualAddressMap (
   //
   // mVirtualMap is only valid during SetVirtualAddressMap() call
   //
-  mVirtualMap = NULL;
+  mVirtualMap         = NULL;
+  mVirtualMapMaxIndex = 0;
 
   return EFI_SUCCESS;
 }
@@ -383,12 +387,12 @@ RuntimeDriverSetVirtualAddressMap (
 EFI_STATUS
 EFIAPI
 RuntimeDriverInitialize (
-  IN EFI_HANDLE                            ImageHandle,
-  IN EFI_SYSTEM_TABLE                      *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                Status;
-  EFI_LOADED_IMAGE_PROTOCOL *MyLoadedImage;
+  EFI_STATUS                 Status;
+  EFI_LOADED_IMAGE_PROTOCOL  *MyLoadedImage;
 
   //
   // This image needs to be excluded from relocation for virtual mode, so cache
@@ -397,7 +401,7 @@ RuntimeDriverInitialize (
   Status = gBS->HandleProtocol (
                   ImageHandle,
                   &gEfiLoadedImageProtocolGuid,
-                  (VOID**)&MyLoadedImage
+                  (VOID **)&MyLoadedImage
                   );
   ASSERT_EFI_ERROR (Status);
   mMyImageBase = MyLoadedImage->ImageBase;

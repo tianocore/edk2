@@ -20,7 +20,7 @@ from linecache import getlines
 from io import BytesIO
 
 import Common.LongFilePathOs as os
-from Common.TargetTxtClassObject import TargetTxtDict
+from Common.TargetTxtClassObject import TargetTxtDict,gDefaultTargetTxtFile
 from Common.DataType import *
 import Common.GlobalData as GlobalData
 from Common import EdkLogger
@@ -153,7 +153,7 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
             FdfFilename = GenFdsGlobalVariable.ReplaceWorkspaceMacro(FdfFilename)
 
             if FdfFilename[0:2] == '..':
-                FdfFilename = os.path.realpath(FdfFilename)
+                FdfFilename = os.path.abspath(FdfFilename)
             if not os.path.isabs(FdfFilename):
                 FdfFilename = mws.join(GenFdsGlobalVariable.WorkSpaceDir, FdfFilename)
             if not os.path.exists(FdfFilename):
@@ -175,7 +175,7 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
             ActivePlatform = GenFdsGlobalVariable.ReplaceWorkspaceMacro(ActivePlatform)
 
             if ActivePlatform[0:2] == '..':
-                ActivePlatform = os.path.realpath(ActivePlatform)
+                ActivePlatform = os.path.abspath(ActivePlatform)
 
             if not os.path.isabs (ActivePlatform):
                 ActivePlatform = mws.join(GenFdsGlobalVariable.WorkSpaceDir, ActivePlatform)
@@ -207,7 +207,7 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
         GenFdsGlobalVariable.ConfDir = ConfDirectoryPath
         if not GlobalData.gConfDirectory:
             GlobalData.gConfDirectory = GenFdsGlobalVariable.ConfDir
-        BuildConfigurationFile = os.path.normpath(os.path.join(ConfDirectoryPath, "target.txt"))
+        BuildConfigurationFile = os.path.normpath(os.path.join(ConfDirectoryPath, gDefaultTargetTxtFile))
         if os.path.isfile(BuildConfigurationFile) == True:
             # if no build target given in command line, get it from target.txt
             TargetObj = TargetTxtDict()
@@ -299,7 +299,7 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
         for Key in GenFdsGlobalVariable.OutputDirDict:
             OutputDir = GenFdsGlobalVariable.OutputDirDict[Key]
             if OutputDir[0:2] == '..':
-                OutputDir = os.path.realpath(OutputDir)
+                OutputDir = os.path.abspath(OutputDir)
 
             if OutputDir[1] != ':':
                 OutputDir = os.path.join (GenFdsGlobalVariable.WorkSpaceDir, OutputDir)

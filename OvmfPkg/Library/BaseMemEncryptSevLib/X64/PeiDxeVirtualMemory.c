@@ -17,14 +17,15 @@
 #include <Register/Cpuid.h>
 
 #include "VirtualMemory.h"
+#include "SnpPageStateChange.h"
 
-STATIC BOOLEAN mAddressEncMaskChecked = FALSE;
-STATIC UINT64  mAddressEncMask;
-STATIC PAGE_TABLE_POOL   *mPageTablePool = NULL;
+STATIC BOOLEAN          mAddressEncMaskChecked = FALSE;
+STATIC UINT64           mAddressEncMask;
+STATIC PAGE_TABLE_POOL  *mPageTablePool = NULL;
 
 typedef enum {
-   SetCBit,
-   ClearCBit
+  SetCBit,
+  ClearCBit
 } MAP_RANGE_MODE;
 
 /**
@@ -39,7 +40,7 @@ InternalGetMemEncryptionAddressMask (
   VOID
   )
 {
-  UINT64                            EncryptionMask;
+  UINT64  EncryptionMask;
 
   if (mAddressEncMaskChecked) {
     return mAddressEncMask;
@@ -47,7 +48,7 @@ InternalGetMemEncryptionAddressMask (
 
   EncryptionMask = MemEncryptSevGetEncryptionMask ();
 
-  mAddressEncMask = EncryptionMask & PAGING_1G_ADDRESS_MASK_64;
+  mAddressEncMask        = EncryptionMask & PAGING_1G_ADDRESS_MASK_64;
   mAddressEncMaskChecked = TRUE;
 
   return mAddressEncMask;
@@ -74,18 +75,18 @@ InternalGetMemEncryptionAddressMask (
 STATIC
 BOOLEAN
 InitializePageTablePool (
-  IN  UINTN                           PoolPages
+  IN  UINTN  PoolPages
   )
 {
-  VOID                      *Buffer;
+  VOID  *Buffer;
 
   //
   // Always reserve at least PAGE_TABLE_POOL_UNIT_PAGES, including one page for
   // header.
   //
   PoolPages += 1;   // Add one page for header.
-  PoolPages = ((PoolPages - 1) / PAGE_TABLE_POOL_UNIT_PAGES + 1) *
-              PAGE_TABLE_POOL_UNIT_PAGES;
+  PoolPages  = ((PoolPages - 1) / PAGE_TABLE_POOL_UNIT_PAGES + 1) *
+               PAGE_TABLE_POOL_UNIT_PAGES;
   Buffer = AllocateAlignedPages (PoolPages, PAGE_TABLE_POOL_ALIGNMENT);
   if (Buffer == NULL) {
     DEBUG ((DEBUG_ERROR, "ERROR: Out of aligned pages\r\n"));
@@ -96,19 +97,19 @@ InitializePageTablePool (
   // Link all pools into a list for easier track later.
   //
   if (mPageTablePool == NULL) {
-    mPageTablePool = Buffer;
+    mPageTablePool           = Buffer;
     mPageTablePool->NextPool = mPageTablePool;
   } else {
     ((PAGE_TABLE_POOL *)Buffer)->NextPool = mPageTablePool->NextPool;
-    mPageTablePool->NextPool = Buffer;
-    mPageTablePool = Buffer;
+    mPageTablePool->NextPool              = Buffer;
+    mPageTablePool                        = Buffer;
   }
 
   //
   // Reserve one page for pool header.
   //
-  mPageTablePool->FreePages  = PoolPages - 1;
-  mPageTablePool->Offset = EFI_PAGES_TO_SIZE (1);
+  mPageTablePool->FreePages = PoolPages - 1;
+  mPageTablePool->Offset    = EFI_PAGES_TO_SIZE (1);
 
   return TRUE;
 }
@@ -134,10 +135,10 @@ STATIC
 VOID *
 EFIAPI
 AllocatePageTableMemory (
-  IN UINTN           Pages
+  IN UINTN  Pages
   )
 {
-  VOID                            *Buffer;
+  VOID  *Buffer;
 
   if (Pages == 0) {
     return NULL;
@@ -146,8 +147,9 @@ AllocatePageTableMemory (
   //
   // Renew the pool if necessary.
   //
-  if (mPageTablePool == NULL ||
-      Pages > mPageTablePool->FreePages) {
+  if ((mPageTablePool == NULL) ||
+      (Pages > mPageTablePool->FreePages))
+  {
     if (!InitializePageTablePool (Pages)) {
       return NULL;
     }
@@ -155,8 +157,8 @@ AllocatePageTableMemory (
 
   Buffer = (UINT8 *)mPageTablePool + mPageTablePool->Offset;
 
-  mPageTablePool->Offset     += EFI_PAGES_TO_SIZE (Pages);
-  mPageTablePool->FreePages  -= Pages;
+  mPageTablePool->Offset    += EFI_PAGES_TO_SIZE (Pages);
+  mPageTablePool->FreePages -= Pages;
 
   DEBUG ((
     DEBUG_VERBOSE,
@@ -169,7 +171,6 @@ AllocatePageTableMemory (
 
   return Buffer;
 }
-
 
 /**
   Split 2M page to 4K.
@@ -184,19 +185,19 @@ AllocatePageTableMemory (
 STATIC
 VOID
 Split2MPageTo4K (
-  IN        PHYSICAL_ADDRESS               PhysicalAddress,
-  IN  OUT   UINT64                        *PageEntry2M,
-  IN        PHYSICAL_ADDRESS               StackBase,
-  IN        UINTN                          StackSize
+  IN        PHYSICAL_ADDRESS  PhysicalAddress,
+  IN  OUT   UINT64            *PageEntry2M,
+  IN        PHYSICAL_ADDRESS  StackBase,
+  IN        UINTN             StackSize
   )
 {
-  PHYSICAL_ADDRESS                  PhysicalAddress4K;
-  UINTN                             IndexOfPageTableEntries;
-  PAGE_TABLE_4K_ENTRY               *PageTableEntry;
-  PAGE_TABLE_4K_ENTRY               *PageTableEntry1;
-  UINT64                            AddressEncMask;
+  PHYSICAL_ADDRESS     PhysicalAddress4K;
+  UINTN                IndexOfPageTableEntries;
+  PAGE_TABLE_4K_ENTRY  *PageTableEntry;
+  PAGE_TABLE_4K_ENTRY  *PageTableEntry1;
+  UINT64               AddressEncMask;
 
-  PageTableEntry = AllocatePageTableMemory(1);
+  PageTableEntry = AllocatePageTableMemory (1);
 
   PageTableEntry1 = PageTableEntry;
 
@@ -210,15 +211,17 @@ Split2MPageTo4K (
        IndexOfPageTableEntries < 512;
        (IndexOfPageTableEntries++,
         PageTableEntry++,
-        PhysicalAddress4K += SIZE_4KB)) {
+        PhysicalAddress4K += SIZE_4KB))
+  {
     //
     // Fill in the Page Table entries
     //
-    PageTableEntry->Uint64 = (UINT64) PhysicalAddress4K | AddressEncMask;
+    PageTableEntry->Uint64         = (UINT64)PhysicalAddress4K | AddressEncMask;
     PageTableEntry->Bits.ReadWrite = 1;
-    PageTableEntry->Bits.Present = 1;
+    PageTableEntry->Bits.Present   = 1;
     if ((PhysicalAddress4K >= StackBase) &&
-        (PhysicalAddress4K < StackBase + StackSize)) {
+        (PhysicalAddress4K < StackBase + StackSize))
+    {
       //
       // Set Nx bit for stack.
       //
@@ -244,9 +247,9 @@ Split2MPageTo4K (
 STATIC
 VOID
 SetPageTablePoolReadOnly (
-  IN  UINTN                             PageTableBase,
-  IN  EFI_PHYSICAL_ADDRESS              Address,
-  IN  BOOLEAN                           Level4Paging
+  IN  UINTN                 PageTableBase,
+  IN  EFI_PHYSICAL_ADDRESS  Address,
+  IN  BOOLEAN               Level4Paging
   )
 {
   UINTN                 Index;
@@ -286,12 +289,12 @@ SetPageTablePoolReadOnly (
   LevelSize[3] = SIZE_1GB;
   LevelSize[4] = SIZE_512GB;
 
-  AddressEncMask  = InternalGetMemEncryptionAddressMask();
-  PageTable       = (UINT64 *)(UINTN)PageTableBase;
-  PoolUnitSize    = PAGE_TABLE_POOL_UNIT_SIZE;
+  AddressEncMask = InternalGetMemEncryptionAddressMask ();
+  PageTable      = (UINT64 *)(UINTN)PageTableBase;
+  PoolUnitSize   = PAGE_TABLE_POOL_UNIT_SIZE;
 
   for (Level = (Level4Paging) ? 4 : 3; Level > 0; --Level) {
-    Index = ((UINTN)RShiftU64 (Address, LevelShift[Level]));
+    Index  = ((UINTN)RShiftU64 (Address, LevelShift[Level]));
     Index &= PAGING_PAE_INDEX_MASK;
 
     PageAttr = PageTable[Index];
@@ -319,14 +322,13 @@ SetPageTablePoolReadOnly (
           ASSERT (Index < EFI_PAGE_SIZE/sizeof (UINT64));
 
           PageTable[Index] &= ~(UINT64)IA32_PG_RW;
-          PoolUnitSize    -= LevelSize[Level];
+          PoolUnitSize     -= LevelSize[Level];
 
           ++Index;
         }
       }
 
       break;
-
     } else {
       //
       // The smaller granularity of page must be needed.
@@ -338,18 +340,20 @@ SetPageTablePoolReadOnly (
 
       PhysicalAddress = PageAttr & LevelMask[Level];
       for (EntryIndex = 0;
-            EntryIndex < EFI_PAGE_SIZE/sizeof (UINT64);
-            ++EntryIndex) {
+           EntryIndex < EFI_PAGE_SIZE/sizeof (UINT64);
+           ++EntryIndex)
+      {
         NewPageTable[EntryIndex] = PhysicalAddress  | AddressEncMask |
                                    IA32_PG_P | IA32_PG_RW;
         if (Level > 2) {
           NewPageTable[EntryIndex] |= IA32_PG_PS;
         }
+
         PhysicalAddress += LevelSize[Level - 1];
       }
 
       PageTable[Index] = (UINT64)(UINTN)NewPageTable | AddressEncMask |
-                                        IA32_PG_P | IA32_PG_RW;
+                         IA32_PG_P | IA32_PG_RW;
       PageTable = NewPageTable;
     }
   }
@@ -365,14 +369,14 @@ SetPageTablePoolReadOnly (
 STATIC
 VOID
 EnablePageTableProtection (
-  IN  UINTN     PageTableBase,
-  IN  BOOLEAN   Level4Paging
+  IN  UINTN    PageTableBase,
+  IN  BOOLEAN  Level4Paging
   )
 {
-  PAGE_TABLE_POOL         *HeadPool;
-  PAGE_TABLE_POOL         *Pool;
-  UINT64                  PoolSize;
-  EFI_PHYSICAL_ADDRESS    Address;
+  PAGE_TABLE_POOL       *HeadPool;
+  PAGE_TABLE_POOL       *Pool;
+  UINT64                PoolSize;
+  EFI_PHYSICAL_ADDRESS  Address;
 
   if (mPageTablePool == NULL) {
     return;
@@ -383,7 +387,7 @@ EnablePageTableProtection (
   // remember original one in advance.
   //
   HeadPool = mPageTablePool;
-  Pool = HeadPool;
+  Pool     = HeadPool;
   do {
     Address  = (EFI_PHYSICAL_ADDRESS)(UINTN)Pool;
     PoolSize = Pool->Offset + EFI_PAGES_TO_SIZE (Pool->FreePages);
@@ -394,16 +398,14 @@ EnablePageTableProtection (
     // the protection to them one by one.
     //
     while (PoolSize > 0) {
-      SetPageTablePoolReadOnly(PageTableBase, Address, Level4Paging);
-      Address   += PAGE_TABLE_POOL_UNIT_SIZE;
-      PoolSize  -= PAGE_TABLE_POOL_UNIT_SIZE;
+      SetPageTablePoolReadOnly (PageTableBase, Address, Level4Paging);
+      Address  += PAGE_TABLE_POOL_UNIT_SIZE;
+      PoolSize -= PAGE_TABLE_POOL_UNIT_SIZE;
     }
 
     Pool = Pool->NextPool;
   } while (Pool != HeadPool);
-
 }
-
 
 /**
   Split 1G page to 2M.
@@ -418,18 +420,18 @@ EnablePageTableProtection (
 STATIC
 VOID
 Split1GPageTo2M (
-  IN          PHYSICAL_ADDRESS               PhysicalAddress,
-  IN  OUT     UINT64                         *PageEntry1G,
-  IN          PHYSICAL_ADDRESS               StackBase,
-  IN          UINTN                          StackSize
+  IN          PHYSICAL_ADDRESS  PhysicalAddress,
+  IN  OUT     UINT64            *PageEntry1G,
+  IN          PHYSICAL_ADDRESS  StackBase,
+  IN          UINTN             StackSize
   )
 {
-  PHYSICAL_ADDRESS                  PhysicalAddress2M;
-  UINTN                             IndexOfPageDirectoryEntries;
-  PAGE_TABLE_ENTRY                  *PageDirectoryEntry;
-  UINT64                            AddressEncMask;
+  PHYSICAL_ADDRESS  PhysicalAddress2M;
+  UINTN             IndexOfPageDirectoryEntries;
+  PAGE_TABLE_ENTRY  *PageDirectoryEntry;
+  UINT64            AddressEncMask;
 
-  PageDirectoryEntry = AllocatePageTableMemory(1);
+  PageDirectoryEntry = AllocatePageTableMemory (1);
 
   AddressEncMask = InternalGetMemEncryptionAddressMask ();
   ASSERT (PageDirectoryEntry != NULL);
@@ -445,9 +447,11 @@ Split1GPageTo2M (
        IndexOfPageDirectoryEntries < 512;
        (IndexOfPageDirectoryEntries++,
         PageDirectoryEntry++,
-        PhysicalAddress2M += SIZE_2MB)) {
+        PhysicalAddress2M += SIZE_2MB))
+  {
     if ((PhysicalAddress2M < StackBase + StackSize) &&
-        ((PhysicalAddress2M + SIZE_2MB) > StackBase)) {
+        ((PhysicalAddress2M + SIZE_2MB) > StackBase))
+    {
       //
       // Need to split this 2M page that covers stack range.
       //
@@ -461,14 +465,13 @@ Split1GPageTo2M (
       //
       // Fill in the Page Directory entries
       //
-      PageDirectoryEntry->Uint64 = (UINT64) PhysicalAddress2M | AddressEncMask;
+      PageDirectoryEntry->Uint64         = (UINT64)PhysicalAddress2M | AddressEncMask;
       PageDirectoryEntry->Bits.ReadWrite = 1;
-      PageDirectoryEntry->Bits.Present = 1;
-      PageDirectoryEntry->Bits.MustBe1 = 1;
+      PageDirectoryEntry->Bits.Present   = 1;
+      PageDirectoryEntry->Bits.MustBe1   = 1;
     }
   }
 }
-
 
 /**
   Set or Clear the memory encryption bit
@@ -478,12 +481,12 @@ Split1GPageTo2M (
 
 **/
 STATIC VOID
-SetOrClearCBit(
-  IN   OUT     UINT64*            PageTablePointer,
-  IN           MAP_RANGE_MODE     Mode
+SetOrClearCBit (
+  IN   OUT     UINT64          *PageTablePointer,
+  IN           MAP_RANGE_MODE  Mode
   )
 {
-  UINT64      AddressEncMask;
+  UINT64  AddressEncMask;
 
   AddressEncMask = InternalGetMemEncryptionAddressMask ();
 
@@ -492,7 +495,6 @@ SetOrClearCBit(
   } else {
     *PageTablePointer &= ~AddressEncMask;
   }
-
 }
 
 /**
@@ -511,7 +513,6 @@ IsReadOnlyPageWriteProtected (
   return ((AsmReadCr0 () & BIT16) != 0);
 }
 
-
 /**
  Disable Write Protect on pages marked as read-only.
 **/
@@ -521,7 +522,7 @@ DisableReadOnlyPageWriteProtect (
   VOID
   )
 {
-  AsmWriteCr0 (AsmReadCr0() & ~BIT16);
+  AsmWriteCr0 (AsmReadCr0 () & ~BIT16);
 }
 
 /**
@@ -533,9 +534,122 @@ EnableReadOnlyPageWriteProtect (
   VOID
   )
 {
-  AsmWriteCr0 (AsmReadCr0() | BIT16);
+  AsmWriteCr0 (AsmReadCr0 () | BIT16);
 }
 
+RETURN_STATUS
+EFIAPI
+InternalMemEncryptSevCreateIdentityMap1G (
+  IN    PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN    PHYSICAL_ADDRESS  PhysicalAddress,
+  IN    UINTN             Length
+  )
+{
+  PAGE_MAP_AND_DIRECTORY_POINTER  *PageMapLevel4Entry;
+  PAGE_TABLE_1G_ENTRY             *PageDirectory1GEntry;
+  UINT64                          PgTableMask;
+  UINT64                          AddressEncMask;
+  BOOLEAN                         IsWpEnabled;
+  RETURN_STATUS                   Status;
+
+  //
+  // Set PageMapLevel4Entry to suppress incorrect compiler/analyzer warnings.
+  //
+  PageMapLevel4Entry = NULL;
+
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx\n",
+    gEfiCallerBaseName,
+    __FUNCTION__,
+    Cr3BaseAddress,
+    PhysicalAddress,
+    (UINT64)Length
+    ));
+
+  if (Length == 0) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  //
+  // Check if we have a valid memory encryption mask
+  //
+  AddressEncMask = InternalGetMemEncryptionAddressMask ();
+  if (!AddressEncMask) {
+    return RETURN_ACCESS_DENIED;
+  }
+
+  PgTableMask = AddressEncMask | EFI_PAGE_MASK;
+
+  //
+  // Make sure that the page table is changeable.
+  //
+  IsWpEnabled = IsReadOnlyPageWriteProtected ();
+  if (IsWpEnabled) {
+    DisableReadOnlyPageWriteProtect ();
+  }
+
+  Status = EFI_SUCCESS;
+
+  while (Length) {
+    //
+    // If Cr3BaseAddress is not specified then read the current CR3
+    //
+    if (Cr3BaseAddress == 0) {
+      Cr3BaseAddress = AsmReadCr3 ();
+    }
+
+    PageMapLevel4Entry  = (VOID *)(Cr3BaseAddress & ~PgTableMask);
+    PageMapLevel4Entry += PML4_OFFSET (PhysicalAddress);
+    if (!PageMapLevel4Entry->Bits.Present) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a:%a: bad PML4 for Physical=0x%Lx\n",
+        gEfiCallerBaseName,
+        __FUNCTION__,
+        PhysicalAddress
+        ));
+      Status = RETURN_NO_MAPPING;
+      goto Done;
+    }
+
+    PageDirectory1GEntry = (VOID *)(
+                                    (PageMapLevel4Entry->Bits.PageTableBaseAddress <<
+                                     12) & ~PgTableMask
+                                    );
+    PageDirectory1GEntry += PDP_OFFSET (PhysicalAddress);
+    if (!PageDirectory1GEntry->Bits.Present) {
+      PageDirectory1GEntry->Bits.Present    = 1;
+      PageDirectory1GEntry->Bits.MustBe1    = 1;
+      PageDirectory1GEntry->Bits.MustBeZero = 0;
+      PageDirectory1GEntry->Bits.ReadWrite  = 1;
+      PageDirectory1GEntry->Uint64         |= (UINT64)PhysicalAddress | AddressEncMask;
+    }
+
+    if (Length <= BIT30) {
+      Length = 0;
+    } else {
+      Length -= BIT30;
+    }
+
+    PhysicalAddress += BIT30;
+  }
+
+  //
+  // Flush TLB
+  //
+  CpuFlushTlb ();
+
+Done:
+  //
+  // Restore page table write protection, if any.
+  //
+  if (IsWpEnabled) {
+    EnableReadOnlyPageWriteProtect ();
+  }
+
+  return Status;
+}
 
 /**
   This function either sets or clears memory encryption bit for the memory
@@ -557,6 +671,7 @@ EnableReadOnlyPageWriteProtect (
   @param[in]  Mode                    Set or Clear mode
   @param[in]  CacheFlush              Flush the caches before applying the
                                       encryption mask
+  @param[in]  Mmio                    The physical address specified is Mmio
 
   @retval RETURN_SUCCESS              The attributes were cleared for the
                                       memory region.
@@ -568,23 +683,26 @@ STATIC
 RETURN_STATUS
 EFIAPI
 SetMemoryEncDec (
-  IN    PHYSICAL_ADDRESS         Cr3BaseAddress,
-  IN    PHYSICAL_ADDRESS         PhysicalAddress,
-  IN    UINTN                    Length,
-  IN    MAP_RANGE_MODE           Mode,
-  IN    BOOLEAN                  CacheFlush
+  IN    PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN    PHYSICAL_ADDRESS  PhysicalAddress,
+  IN    UINTN             Length,
+  IN    MAP_RANGE_MODE    Mode,
+  IN    BOOLEAN           CacheFlush,
+  IN    BOOLEAN           Mmio
   )
 {
-  PAGE_MAP_AND_DIRECTORY_POINTER *PageMapLevel4Entry;
-  PAGE_MAP_AND_DIRECTORY_POINTER *PageUpperDirectoryPointerEntry;
-  PAGE_MAP_AND_DIRECTORY_POINTER *PageDirectoryPointerEntry;
-  PAGE_TABLE_1G_ENTRY            *PageDirectory1GEntry;
-  PAGE_TABLE_ENTRY               *PageDirectory2MEntry;
-  PAGE_TABLE_4K_ENTRY            *PageTableEntry;
-  UINT64                         PgTableMask;
-  UINT64                         AddressEncMask;
-  BOOLEAN                        IsWpEnabled;
-  RETURN_STATUS                  Status;
+  PAGE_MAP_AND_DIRECTORY_POINTER  *PageMapLevel4Entry;
+  PAGE_MAP_AND_DIRECTORY_POINTER  *PageUpperDirectoryPointerEntry;
+  PAGE_MAP_AND_DIRECTORY_POINTER  *PageDirectoryPointerEntry;
+  PAGE_TABLE_1G_ENTRY             *PageDirectory1GEntry;
+  PAGE_TABLE_ENTRY                *PageDirectory2MEntry;
+  PHYSICAL_ADDRESS                OrigPhysicalAddress;
+  PAGE_TABLE_4K_ENTRY             *PageTableEntry;
+  UINT64                          PgTableMask;
+  UINT64                          AddressEncMask;
+  BOOLEAN                         IsWpEnabled;
+  UINTN                           OrigLength;
+  RETURN_STATUS                   Status;
 
   //
   // Set PageMapLevel4Entry to suppress incorrect compiler/analyzer warnings.
@@ -593,14 +711,15 @@ SetMemoryEncDec (
 
   DEBUG ((
     DEBUG_VERBOSE,
-    "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx Mode=%a CacheFlush=%u\n",
+    "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx Mode=%a CacheFlush=%u Mmio=%u\n",
     gEfiCallerBaseName,
     __FUNCTION__,
     Cr3BaseAddress,
     PhysicalAddress,
     (UINT64)Length,
     (Mode == SetCBit) ? "Encrypt" : "Decrypt",
-    (UINT32)CacheFlush
+    (UINT32)CacheFlush,
+    (UINT32)Mmio
     ));
 
   //
@@ -623,7 +742,7 @@ SetMemoryEncDec (
   // with correct C-bit
   //
   if (CacheFlush) {
-    WriteBackInvalidateDataCacheRange((VOID*) (UINTN)PhysicalAddress, Length);
+    WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)PhysicalAddress, Length);
   }
 
   //
@@ -636,17 +755,32 @@ SetMemoryEncDec (
 
   Status = EFI_SUCCESS;
 
-  while (Length != 0)
-  {
+  //
+  // To maintain the security gurantees we must set the page to shared in the RMP
+  // table before clearing the memory encryption mask from the current page table.
+  //
+  // The InternalSetPageState() is used for setting the page state in the RMP table.
+  //
+  if (!Mmio && (Mode == ClearCBit) && MemEncryptSevSnpIsEnabled ()) {
+    InternalSetPageState (PhysicalAddress, EFI_SIZE_TO_PAGES (Length), SevSnpPageShared, FALSE);
+  }
+
+  //
+  // Save the specified length and physical address (we need it later).
+  //
+  OrigLength          = Length;
+  OrigPhysicalAddress = PhysicalAddress;
+
+  while (Length != 0) {
     //
     // If Cr3BaseAddress is not specified then read the current CR3
     //
     if (Cr3BaseAddress == 0) {
-      Cr3BaseAddress = AsmReadCr3();
+      Cr3BaseAddress = AsmReadCr3 ();
     }
 
-    PageMapLevel4Entry = (VOID*) (Cr3BaseAddress & ~PgTableMask);
-    PageMapLevel4Entry += PML4_OFFSET(PhysicalAddress);
+    PageMapLevel4Entry  = (VOID *)(Cr3BaseAddress & ~PgTableMask);
+    PageMapLevel4Entry += PML4_OFFSET (PhysicalAddress);
     if (!PageMapLevel4Entry->Bits.Present) {
       DEBUG ((
         DEBUG_ERROR,
@@ -660,10 +794,10 @@ SetMemoryEncDec (
     }
 
     PageDirectory1GEntry = (VOID *)(
-                             (PageMapLevel4Entry->Bits.PageTableBaseAddress <<
-                              12) & ~PgTableMask
-                             );
-    PageDirectory1GEntry += PDP_OFFSET(PhysicalAddress);
+                                    (PageMapLevel4Entry->Bits.PageTableBaseAddress <<
+                                     12) & ~PgTableMask
+                                    );
+    PageDirectory1GEntry += PDP_OFFSET (PhysicalAddress);
     if (!PageDirectory1GEntry->Bits.Present) {
       DEBUG ((
         DEBUG_ERROR,
@@ -684,8 +818,8 @@ SetMemoryEncDec (
       // Valid 1GB page
       // If we have at least 1GB to go, we can just update this entry
       //
-      if ((PhysicalAddress & (BIT30 - 1)) == 0 && Length >= BIT30) {
-        SetOrClearCBit(&PageDirectory1GEntry->Uint64, Mode);
+      if (((PhysicalAddress & (BIT30 - 1)) == 0) && (Length >= BIT30)) {
+        SetOrClearCBit (&PageDirectory1GEntry->Uint64, Mode);
         DEBUG ((
           DEBUG_VERBOSE,
           "%a:%a: updated 1GB entry for Physical=0x%Lx\n",
@@ -694,7 +828,7 @@ SetMemoryEncDec (
           PhysicalAddress
           ));
         PhysicalAddress += BIT30;
-        Length -= BIT30;
+        Length          -= BIT30;
       } else {
         //
         // We must split the page
@@ -722,10 +856,10 @@ SetMemoryEncDec (
         (PAGE_MAP_AND_DIRECTORY_POINTER *)PageDirectory1GEntry;
       PageDirectory2MEntry =
         (VOID *)(
-          (PageUpperDirectoryPointerEntry->Bits.PageTableBaseAddress <<
-           12) & ~PgTableMask
-          );
-      PageDirectory2MEntry += PDE_OFFSET(PhysicalAddress);
+                 (PageUpperDirectoryPointerEntry->Bits.PageTableBaseAddress <<
+                  12) & ~PgTableMask
+                 );
+      PageDirectory2MEntry += PDE_OFFSET (PhysicalAddress);
       if (!PageDirectory2MEntry->Bits.Present) {
         DEBUG ((
           DEBUG_ERROR,
@@ -737,6 +871,7 @@ SetMemoryEncDec (
         Status = RETURN_NO_MAPPING;
         goto Done;
       }
+
       //
       // If the MustBe1 bit is not a 1, it's not a 2MB entry
       //
@@ -745,10 +880,10 @@ SetMemoryEncDec (
         // Valid 2MB page
         // If we have at least 2MB left to go, we can just update this entry
         //
-        if ((PhysicalAddress & (BIT21-1)) == 0 && Length >= BIT21) {
+        if (((PhysicalAddress & (BIT21-1)) == 0) && (Length >= BIT21)) {
           SetOrClearCBit (&PageDirectory2MEntry->Uint64, Mode);
           PhysicalAddress += BIT21;
-          Length -= BIT21;
+          Length          -= BIT21;
         } else {
           //
           // We must split up this page into 4K pages
@@ -773,10 +908,10 @@ SetMemoryEncDec (
           (PAGE_MAP_AND_DIRECTORY_POINTER *)PageDirectory2MEntry;
         PageTableEntry =
           (VOID *)(
-            (PageDirectoryPointerEntry->Bits.PageTableBaseAddress <<
-             12) & ~PgTableMask
-            );
-        PageTableEntry += PTE_OFFSET(PhysicalAddress);
+                   (PageDirectoryPointerEntry->Bits.PageTableBaseAddress <<
+                    12) & ~PgTableMask
+                   );
+        PageTableEntry += PTE_OFFSET (PhysicalAddress);
         if (!PageTableEntry->Bits.Present) {
           DEBUG ((
             DEBUG_ERROR,
@@ -788,9 +923,10 @@ SetMemoryEncDec (
           Status = RETURN_NO_MAPPING;
           goto Done;
         }
+
         SetOrClearCBit (&PageTableEntry->Uint64, Mode);
         PhysicalAddress += EFI_PAGE_SIZE;
-        Length -= EFI_PAGE_SIZE;
+        Length          -= EFI_PAGE_SIZE;
       }
     }
   }
@@ -806,7 +942,22 @@ SetMemoryEncDec (
   //
   // Flush TLB
   //
-  CpuFlushTlb();
+  CpuFlushTlb ();
+
+  //
+  // SEV-SNP requires that all the private pages (i.e pages mapped encrypted) must be
+  // added in the RMP table before the access.
+  //
+  // The InternalSetPageState() is used for setting the page state in the RMP table.
+  //
+  if ((Mode == SetCBit) && MemEncryptSevSnpIsEnabled ()) {
+    InternalSetPageState (
+      OrigPhysicalAddress,
+      EFI_SIZE_TO_PAGES (OrigLength),
+      SevSnpPagePrivate,
+      FALSE
+      );
+  }
 
 Done:
   //
@@ -828,8 +979,6 @@ Done:
   @param[in]  PhysicalAddress         The physical address that is the start
                                       address of a memory region.
   @param[in]  Length                  The length of memory region
-  @param[in]  Flush                   Flush the caches before applying the
-                                      encryption mask
 
   @retval RETURN_SUCCESS              The attributes were cleared for the
                                       memory region.
@@ -840,19 +989,18 @@ Done:
 RETURN_STATUS
 EFIAPI
 InternalMemEncryptSevSetMemoryDecrypted (
-  IN  PHYSICAL_ADDRESS        Cr3BaseAddress,
-  IN  PHYSICAL_ADDRESS        PhysicalAddress,
-  IN  UINTN                   Length,
-  IN  BOOLEAN                 Flush
+  IN  PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN  PHYSICAL_ADDRESS  PhysicalAddress,
+  IN  UINTN             Length
   )
 {
-
   return SetMemoryEncDec (
            Cr3BaseAddress,
            PhysicalAddress,
            Length,
            ClearCBit,
-           Flush
+           TRUE,
+           FALSE
            );
 }
 
@@ -865,8 +1013,6 @@ InternalMemEncryptSevSetMemoryDecrypted (
   @param[in]  PhysicalAddress         The physical address that is the start
                                       address of a memory region.
   @param[in]  Length                  The length of memory region
-  @param[in]  Flush                   Flush the caches before applying the
-                                      encryption mask
 
   @retval RETURN_SUCCESS              The attributes were set for the memory
                                       region.
@@ -877,10 +1023,9 @@ InternalMemEncryptSevSetMemoryDecrypted (
 RETURN_STATUS
 EFIAPI
 InternalMemEncryptSevSetMemoryEncrypted (
-  IN  PHYSICAL_ADDRESS        Cr3BaseAddress,
-  IN  PHYSICAL_ADDRESS        PhysicalAddress,
-  IN  UINTN                   Length,
-  IN  BOOLEAN                 Flush
+  IN  PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN  PHYSICAL_ADDRESS  PhysicalAddress,
+  IN  UINTN             Length
   )
 {
   return SetMemoryEncDec (
@@ -888,6 +1033,41 @@ InternalMemEncryptSevSetMemoryEncrypted (
            PhysicalAddress,
            Length,
            SetCBit,
-           Flush
+           TRUE,
+           FALSE
+           );
+}
+
+/**
+  This function clears memory encryption bit for the MMIO region specified by
+  PhysicalAddress and Length.
+
+  @param[in]  Cr3BaseAddress          Cr3 Base Address (if zero then use
+                                      current CR3)
+  @param[in]  PhysicalAddress         The physical address that is the start
+                                      address of a MMIO region.
+  @param[in]  Length                  The length of memory region
+
+  @retval RETURN_SUCCESS              The attributes were cleared for the
+                                      memory region.
+  @retval RETURN_INVALID_PARAMETER    Length is zero.
+  @retval RETURN_UNSUPPORTED          Clearing the memory encyrption attribute
+                                      is not supported
+**/
+RETURN_STATUS
+EFIAPI
+InternalMemEncryptSevClearMmioPageEncMask (
+  IN  PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN  PHYSICAL_ADDRESS  PhysicalAddress,
+  IN  UINTN             Length
+  )
+{
+  return SetMemoryEncDec (
+           Cr3BaseAddress,
+           PhysicalAddress,
+           Length,
+           ClearCBit,
+           FALSE,
+           TRUE
            );
 }

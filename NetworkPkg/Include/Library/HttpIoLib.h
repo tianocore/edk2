@@ -15,9 +15,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/HttpLib.h>
 #include <Library/NetLib.h>
 
-#define HTTP_IO_MAX_SEND_PAYLOAD                    1024
-#define HTTP_IO_CHUNK_SIZE_STRING_LEN               50
-#define HTTP_IO_CHUNKED_TRANSFER_CODING_DATA_LENGTH 256
+#define HTTP_IO_MAX_SEND_PAYLOAD                     1024
+#define HTTP_IO_CHUNK_SIZE_STRING_LEN                50
+#define HTTP_IO_CHUNKED_TRANSFER_CODING_DATA_LENGTH  256
 
 ///
 /// HTTP_IO_CALLBACK_EVENT
@@ -39,7 +39,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI * HTTP_IO_CALLBACK) (
+(EFIAPI *HTTP_IO_CALLBACK)(
   IN  HTTP_IO_CALLBACK_EVENT    EventType,
   IN  EFI_HTTP_MESSAGE          *Message,
   IN  VOID                      *Context
@@ -49,70 +49,70 @@ EFI_STATUS
 /// A wrapper structure to hold the received HTTP response data.
 ///
 typedef struct {
-  EFI_HTTP_RESPONSE_DATA      Response;
-  UINTN                       HeaderCount;
-  EFI_HTTP_HEADER             *Headers;
-  UINTN                       BodyLength;
-  CHAR8                       *Body;
-  EFI_STATUS                  Status;
+  EFI_HTTP_RESPONSE_DATA    Response;
+  UINTN                     HeaderCount;
+  EFI_HTTP_HEADER           *Headers;
+  UINTN                     BodyLength;
+  CHAR8                     *Body;
+  EFI_STATUS                Status;
 } HTTP_IO_RESPONSE_DATA;
 
 ///
 /// HTTP_IO configuration data for IPv4
 ///
 typedef struct {
-  EFI_HTTP_VERSION          HttpVersion;
-  UINT32                    RequestTimeOut;  ///< In milliseconds.
-  UINT32                    ResponseTimeOut; ///< In milliseconds.
-  BOOLEAN                   UseDefaultAddress;
-  EFI_IPv4_ADDRESS          LocalIp;
-  EFI_IPv4_ADDRESS          SubnetMask;
-  UINT16                    LocalPort;
+  EFI_HTTP_VERSION    HttpVersion;
+  UINT32              RequestTimeOut;        ///< In milliseconds.
+  UINT32              ResponseTimeOut;       ///< In milliseconds.
+  BOOLEAN             UseDefaultAddress;
+  EFI_IPv4_ADDRESS    LocalIp;
+  EFI_IPv4_ADDRESS    SubnetMask;
+  UINT16              LocalPort;
 } HTTP4_IO_CONFIG_DATA;
 
 ///
 /// HTTP_IO configuration data for IPv6
 ///
 typedef struct {
-  EFI_HTTP_VERSION          HttpVersion;
-  UINT32                    RequestTimeOut;  ///< In milliseconds.
-  BOOLEAN                   UseDefaultAddress;
-  EFI_IPv6_ADDRESS          LocalIp;
-  UINT16                    LocalPort;
+  EFI_HTTP_VERSION    HttpVersion;
+  UINT32              RequestTimeOut;        ///< In milliseconds.
+  BOOLEAN             UseDefaultAddress;
+  EFI_IPv6_ADDRESS    LocalIp;
+  UINT16              LocalPort;
 } HTTP6_IO_CONFIG_DATA;
 
 ///
 /// HTTP_IO configuration
 ///
 typedef union {
-  HTTP4_IO_CONFIG_DATA       Config4;
-  HTTP6_IO_CONFIG_DATA       Config6;
+  HTTP4_IO_CONFIG_DATA    Config4;
+  HTTP6_IO_CONFIG_DATA    Config6;
 } HTTP_IO_CONFIG_DATA;
 
 ///
 /// HTTP_IO wrapper of the EFI HTTP service.
 ///
 typedef struct {
-  UINT8                     IpVersion;
-  EFI_HANDLE                Image;
-  EFI_HANDLE                Controller;
-  EFI_HANDLE                Handle;
+  UINT8                IpVersion;
+  EFI_HANDLE           Image;
+  EFI_HANDLE           Controller;
+  EFI_HANDLE           Handle;
 
-  EFI_HTTP_PROTOCOL         *Http;
+  EFI_HTTP_PROTOCOL    *Http;
 
-  HTTP_IO_CALLBACK          Callback;
-  VOID                      *Context;
+  HTTP_IO_CALLBACK     Callback;
+  VOID                 *Context;
 
-  EFI_HTTP_TOKEN            ReqToken;
-  EFI_HTTP_MESSAGE          ReqMessage;
-  EFI_HTTP_TOKEN            RspToken;
-  EFI_HTTP_MESSAGE          RspMessage;
+  EFI_HTTP_TOKEN       ReqToken;
+  EFI_HTTP_MESSAGE     ReqMessage;
+  EFI_HTTP_TOKEN       RspToken;
+  EFI_HTTP_MESSAGE     RspMessage;
 
-  BOOLEAN                   IsTxDone;
-  BOOLEAN                   IsRxDone;
+  BOOLEAN              IsTxDone;
+  BOOLEAN              IsRxDone;
 
-  EFI_EVENT                 TimeoutEvent;
-  UINT32                    Timeout;
+  EFI_EVENT            TimeoutEvent;
+  UINT32               Timeout;
 } HTTP_IO;
 
 ///
@@ -140,9 +140,9 @@ typedef enum  {
 /// Chunk links for HTTP chunked transfer coding.
 ///
 typedef struct {
-  LIST_ENTRY  NextChunk;
-  UINTN       Length;
-  CHAR8       *Data;
+  LIST_ENTRY    NextChunk;
+  UINTN         Length;
+  CHAR8         *Data;
 } HTTP_IO_CHUNKS;
 
 /**
@@ -154,7 +154,7 @@ typedef struct {
 VOID
 EFIAPI
 HttpIoNotifyDpc (
-  IN VOID                *Context
+  IN VOID  *Context
   );
 
 /**
@@ -167,8 +167,8 @@ HttpIoNotifyDpc (
 VOID
 EFIAPI
 HttpIoNotify (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -179,7 +179,7 @@ HttpIoNotify (
 **/
 VOID
 HttpIoDestroyIo (
-  IN HTTP_IO                *HttpIo
+  IN HTTP_IO  *HttpIo
   );
 
 /**
@@ -205,13 +205,13 @@ HttpIoDestroyIo (
 **/
 EFI_STATUS
 HttpIoCreateIo (
-  IN EFI_HANDLE             Image,
-  IN EFI_HANDLE             Controller,
-  IN UINT8                  IpVersion,
-  IN HTTP_IO_CONFIG_DATA    *ConfigData,
-  IN HTTP_IO_CALLBACK       Callback,
-  IN VOID                   *Context,
-  OUT HTTP_IO               *HttpIo
+  IN EFI_HANDLE           Image,
+  IN EFI_HANDLE           Controller,
+  IN UINT8                IpVersion,
+  IN HTTP_IO_CONFIG_DATA  *ConfigData,
+  IN HTTP_IO_CALLBACK     Callback,
+  IN VOID                 *Context,
+  OUT HTTP_IO             *HttpIo
   );
 
 /**
@@ -234,9 +234,9 @@ HttpIoCreateIo (
 EFI_STATUS
 HttpIoSendRequest (
   IN  HTTP_IO                *HttpIo,
-  IN  EFI_HTTP_REQUEST_DATA  *Request,      OPTIONAL
+  IN  EFI_HTTP_REQUEST_DATA  *Request       OPTIONAL,
   IN  UINTN                  HeaderCount,
-  IN  EFI_HTTP_HEADER        *Headers,      OPTIONAL
+  IN  EFI_HTTP_HEADER        *Headers       OPTIONAL,
   IN  UINTN                  BodyLength,
   IN  VOID                   *Body          OPTIONAL
   );
@@ -258,9 +258,9 @@ HttpIoSendRequest (
 **/
 EFI_STATUS
 HttpIoRecvResponse (
-  IN      HTTP_IO                  *HttpIo,
-  IN      BOOLEAN                  RecvMsgHeader,
-  OUT     HTTP_IO_RESPONSE_DATA    *ResponseData
+  IN      HTTP_IO                *HttpIo,
+  IN      BOOLEAN                RecvMsgHeader,
+  OUT     HTTP_IO_RESPONSE_DATA  *ResponseData
   );
 
 /**
@@ -276,9 +276,9 @@ HttpIoRecvResponse (
 **/
 EFI_STATUS
 HttpIoGetContentLength (
-  IN     UINTN                HeaderCount,
-  IN     EFI_HTTP_HEADER      *Headers,
-  OUT    UINTN                *ContentLength
+  IN     UINTN            HeaderCount,
+  IN     EFI_HTTP_HEADER  *Headers,
+  OUT    UINTN            *ContentLength
   );
 
 /**
@@ -301,11 +301,11 @@ HttpIoGetContentLength (
 **/
 EFI_STATUS
 HttpIoGetChunkedTransferContent (
-  IN     HTTP_IO              *HttpIo,
-  IN     UINTN                HeaderCount,
-  IN     EFI_HTTP_HEADER      *Headers,
-  OUT    LIST_ENTRY           **ChunkListHead,
-  OUT    UINTN                *ContentLength
+  IN     HTTP_IO          *HttpIo,
+  IN     UINTN            HeaderCount,
+  IN     EFI_HTTP_HEADER  *Headers,
+  OUT    LIST_ENTRY       **ChunkListHead,
+  OUT    UINTN            *ContentLength
   );
 
 /**
@@ -321,8 +321,9 @@ HttpIoGetChunkedTransferContent (
 **/
 EFI_STATUS
 HttpIoSendChunkedTransfer (
-  IN  HTTP_IO                    *HttpIo,
-  IN  HTTP_IO_SEND_CHUNK_PROCESS *SendChunkProcess,
-  IN  EFI_HTTP_MESSAGE           *RequestMessage
-);
+  IN  HTTP_IO                     *HttpIo,
+  IN  HTTP_IO_SEND_CHUNK_PROCESS  *SendChunkProcess,
+  IN  EFI_HTTP_MESSAGE            *RequestMessage
+  );
+
 #endif

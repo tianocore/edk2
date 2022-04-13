@@ -22,19 +22,19 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Uefi.h>
 
-#define SYS_CODE64_SEL 0x38
+#define SYS_CODE64_SEL  0x38
 
-#define PAGE_TABLE_POOL_ALIGNMENT   BASE_2MB
-#define PAGE_TABLE_POOL_UNIT_SIZE   SIZE_2MB
+#define PAGE_TABLE_POOL_ALIGNMENT  BASE_2MB
+#define PAGE_TABLE_POOL_UNIT_SIZE  SIZE_2MB
 #define PAGE_TABLE_POOL_UNIT_PAGES  \
   EFI_SIZE_TO_PAGES (PAGE_TABLE_POOL_UNIT_SIZE)
 #define PAGE_TABLE_POOL_ALIGN_MASK  \
   (~(EFI_PHYSICAL_ADDRESS)(PAGE_TABLE_POOL_ALIGNMENT - 1))
 
 typedef struct {
-  VOID            *NextPool;
-  UINTN           Offset;
-  UINTN           FreePages;
+  VOID     *NextPool;
+  UINTN    Offset;
+  UINTN    FreePages;
 } PAGE_TABLE_POOL;
 
 /**
@@ -58,8 +58,6 @@ InternalGetMemEncryptionAddressMask (
   @param[in]  PhysicalAddress         The physical address that is the start
                                       address of a memory region.
   @param[in]  Length                  The length of memory region
-  @param[in]  Flush                   Flush the caches before applying the
-                                      encryption mask
 
   @retval RETURN_SUCCESS              The attributes were cleared for the
                                       memory region.
@@ -70,10 +68,9 @@ InternalGetMemEncryptionAddressMask (
 RETURN_STATUS
 EFIAPI
 InternalMemEncryptSevSetMemoryDecrypted (
-  IN  PHYSICAL_ADDRESS        Cr3BaseAddress,
-  IN  PHYSICAL_ADDRESS        PhysicalAddress,
-  IN  UINTN                   Length,
-  IN  BOOLEAN                 Flush
+  IN  PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN  PHYSICAL_ADDRESS  PhysicalAddress,
+  IN  UINTN             Length
   );
 
 /**
@@ -85,8 +82,6 @@ InternalMemEncryptSevSetMemoryDecrypted (
   @param[in]  PhysicalAddress         The physical address that is the start
                                       address of a memory region.
   @param[in]  Length                  The length of memory region
-  @param[in]  Flush                   Flush the caches before applying the
-                                      encryption mask
 
   @retval RETURN_SUCCESS              The attributes were set for the memory
                                       region.
@@ -97,10 +92,9 @@ InternalMemEncryptSevSetMemoryDecrypted (
 RETURN_STATUS
 EFIAPI
 InternalMemEncryptSevSetMemoryEncrypted (
-  IN  PHYSICAL_ADDRESS        Cr3BaseAddress,
-  IN  PHYSICAL_ADDRESS        PhysicalAddress,
-  IN  UINTN                   Length,
-  IN  BOOLEAN                 Flush
+  IN  PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN  PHYSICAL_ADDRESS  PhysicalAddress,
+  IN  UINTN             Length
   );
 
 /**
@@ -121,9 +115,57 @@ InternalMemEncryptSevSetMemoryEncrypted (
 MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE
 EFIAPI
 InternalMemEncryptSevGetAddressRangeState (
-  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
-  IN PHYSICAL_ADDRESS         BaseAddress,
-  IN UINTN                    Length
+  IN PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             Length
+  );
+
+/**
+  This function clears memory encryption bit for the MMIO region specified by
+  PhysicalAddress and Length.
+
+  @param[in]  Cr3BaseAddress          Cr3 Base Address (if zero then use
+                                      current CR3)
+  @param[in]  PhysicalAddress         The physical address that is the start
+                                      address of a MMIO region.
+  @param[in]  Length                  The length of memory region
+
+  @retval RETURN_SUCCESS              The attributes were cleared for the
+                                      memory region.
+  @retval RETURN_INVALID_PARAMETER    Length is zero.
+  @retval RETURN_UNSUPPORTED          Clearing the memory encyrption attribute
+                                      is not supported
+**/
+RETURN_STATUS
+EFIAPI
+InternalMemEncryptSevClearMmioPageEncMask (
+  IN  PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN  PHYSICAL_ADDRESS  PhysicalAddress,
+  IN  UINTN             Length
+  );
+
+/**
+  Create 1GB identity mapping for the specified virtual address range.
+
+  The function is preliminary used by the SEV-SNP page state change
+  APIs to build the page table required before issuing the PVALIDATE
+  instruction. The function must be removed after the EDK2 core is
+  enhanced to do the lazy validation.
+
+  @param[in]  Cr3BaseAddress          Cr3 Base Address (if zero then use
+                                      current CR3)
+  @param[in]  VirtualAddress          Virtual address
+  @param[in]  Length                  Length of virtual address range
+
+  @retval RETURN_INVALID_PARAMETER    Number of pages is zero.
+
+**/
+RETURN_STATUS
+EFIAPI
+InternalMemEncryptSevCreateIdentityMap1G (
+  IN    PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN    PHYSICAL_ADDRESS  PhysicalAddress,
+  IN    UINTN             Length
   );
 
 #endif

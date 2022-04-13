@@ -1,7 +1,7 @@
 /** @file
   Sample to provide TempRamInitParams data.
 
-  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -10,10 +10,10 @@
 #include <FspEas.h>
 
 typedef struct {
-  UINT32                      MicrocodeRegionBase;
-  UINT32                      MicrocodeRegionSize;
-  UINT32                      CodeRegionBase;
-  UINT32                      CodeRegionSize;
+  UINT32    MicrocodeRegionBase;
+  UINT32    MicrocodeRegionSize;
+  UINT32    CodeRegionBase;
+  UINT32    CodeRegionSize;
 } FSPT_CORE_UPD;
 
 typedef struct {
@@ -25,7 +25,7 @@ typedef struct {
   FSPT_CORE_UPD     FsptCoreUpd;
 } FSPT_UPD_CORE_DATA;
 
-GLOBAL_REMOVE_IF_UNREFERENCED CONST FSPT_UPD_CORE_DATA FsptUpdDataPtr = {
+GLOBAL_REMOVE_IF_UNREFERENCED CONST FSPT_UPD_CORE_DATA  FsptUpdDataPtr = {
   {
     0x4450555F54505346,
     //
@@ -33,8 +33,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST FSPT_UPD_CORE_DATA FsptUpdDataPtr = {
     //
     0x02,
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-    }
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
   },
   //
   // If platform does not support FSP spec 2.2 remove FSPT_ARCH_UPD structure.
@@ -52,10 +51,9 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST FSPT_UPD_CORE_DATA FsptUpdDataPtr = {
     }
   },
   {
-    ((UINT32)FixedPcdGet64 (PcdCpuMicrocodePatchAddress) + FixedPcdGet32 (PcdFlashMicrocodeOffset)),
-    ((UINT32)FixedPcdGet64 (PcdCpuMicrocodePatchRegionSize) - FixedPcdGet32 (PcdFlashMicrocodeOffset)),
+    FixedPcdGet32 (PcdCpuMicrocodePatchAddress),
+    FixedPcdGet32 (PcdCpuMicrocodePatchRegionSize),
     FixedPcdGet32 (PcdFlashCodeCacheAddress),
     FixedPcdGet32 (PcdFlashCodeCacheSize),
   }
 };
-

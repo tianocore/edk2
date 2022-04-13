@@ -21,22 +21,21 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8  IScsiHexString[] = "0123456789ABCDEFa
 **/
 VOID
 IScsiStrTrim (
-  IN OUT CHAR16   *Str,
-  IN     CHAR16   CharC
+  IN OUT CHAR16  *Str,
+  IN     CHAR16  CharC
   )
 {
   CHAR16  *Pointer1;
   CHAR16  *Pointer2;
 
   if (*Str == 0) {
-    return ;
+    return;
   }
 
   //
   // Trim off the leading and trailing characters c
   //
   for (Pointer1 = Str; (*Pointer1 != 0) && (*Pointer1 == CharC); Pointer1++) {
-    ;
   }
 
   Pointer2 = Str;
@@ -47,18 +46,18 @@ IScsiStrTrim (
     }
   } else {
     while (*Pointer1 != 0) {
-    *Pointer2 = *Pointer1;
-    Pointer1++;
-    Pointer2++;
+      *Pointer2 = *Pointer1;
+      Pointer1++;
+      Pointer2++;
     }
+
     *Pointer2 = 0;
   }
 
-
-  for (Pointer1 = Str + StrLen(Str) - 1; Pointer1 >= Str && *Pointer1 == CharC; Pointer1--) {
-    ;
+  for (Pointer1 = Str + StrLen (Str) - 1; Pointer1 >= Str && *Pointer1 == CharC; Pointer1--) {
   }
-  if  (Pointer1 !=  Str + StrLen(Str) - 1) {
+
+  if (Pointer1 !=  Str + StrLen (Str) - 1) {
     *(Pointer1 + 1) = 0;
   }
 }
@@ -101,9 +100,8 @@ IScsiGetSubnetMaskPrefixLength (
     Len++;
   }
 
-  return (UINT8) (32 - Len);
+  return (UINT8)(32 - Len);
 }
-
 
 /**
   Convert the hexadecimal encoded LUN string into the 64-bit LUN.
@@ -128,15 +126,15 @@ IScsiAsciiStrToLun (
 
   ZeroMem (Lun, 8);
   ZeroMem (TemStr, 2);
-  ZeroMem ((UINT8 *) Value, sizeof (Value));
+  ZeroMem ((UINT8 *)Value, sizeof (Value));
   SizeStr    = AsciiStrLen (Str);
   IndexValue = 0;
   IndexNum   = 0;
 
-  for (Index = 0; Index < SizeStr; Index ++) {
+  for (Index = 0; Index < SizeStr; Index++) {
     TemStr[0] = Str[Index];
-    TemValue = (UINT8) AsciiStrHexToUint64 (TemStr);
-    if (TemValue == 0 && TemStr[0] != '0') {
+    TemValue  = (UINT8)AsciiStrHexToUint64 (TemStr);
+    if ((TemValue == 0) && (TemStr[0] != '0')) {
       if ((TemStr[0] != '-') || (IndexNum == 0)) {
         //
         // Invalid Lun Char.
@@ -155,6 +153,7 @@ IScsiAsciiStrToLun (
         //
         return EFI_INVALID_PARAMETER;
       }
+
       //
       // Restart str index for the next lun value.
       //
@@ -172,11 +171,11 @@ IScsiAsciiStrToLun (
     //
     // Combine UINT16 value.
     //
-    Value[IndexValue] = (UINT16) ((Value[IndexValue] << 4) + TemValue);
+    Value[IndexValue] = (UINT16)((Value[IndexValue] << 4) + TemValue);
   }
 
-  for (Index = 0; Index <= IndexValue; Index ++) {
-    *((UINT16 *) &Lun[Index * 2]) =  HTONS (Value[Index]);
+  for (Index = 0; Index <= IndexValue; Index++) {
+    *((UINT16 *)&Lun[Index * 2]) =  HTONS (Value[Index]);
   }
 
   return EFI_SUCCESS;
@@ -201,26 +200,26 @@ IScsiLunToUnicodeStr (
   TempStr = Str;
 
   for (Index = 0; Index < 4; Index++) {
-
     if ((Lun[2 * Index] | Lun[2 * Index + 1]) == 0) {
       CopyMem (TempStr, L"0-", sizeof (L"0-"));
     } else {
-      TempStr[0]  = (CHAR16) IScsiHexString[Lun[2 * Index] >> 4];
-      TempStr[1]  = (CHAR16) IScsiHexString[Lun[2 * Index] & 0x0F];
-      TempStr[2]  = (CHAR16) IScsiHexString[Lun[2 * Index + 1] >> 4];
-      TempStr[3]  = (CHAR16) IScsiHexString[Lun[2 * Index + 1] & 0x0F];
-      TempStr[4]  = L'-';
-      TempStr[5]  = 0;
+      TempStr[0] = (CHAR16)IScsiHexString[Lun[2 * Index] >> 4];
+      TempStr[1] = (CHAR16)IScsiHexString[Lun[2 * Index] & 0x0F];
+      TempStr[2] = (CHAR16)IScsiHexString[Lun[2 * Index + 1] >> 4];
+      TempStr[3] = (CHAR16)IScsiHexString[Lun[2 * Index + 1] & 0x0F];
+      TempStr[4] = L'-';
+      TempStr[5] = 0;
 
       IScsiStrTrim (TempStr, L'0');
     }
 
     TempStr += StrLen (TempStr);
   }
+
   //
   // Remove the last '-'
   //
-  ASSERT (StrLen(Str) >= 1);
+  ASSERT (StrLen (Str) >= 1);
   Str[StrLen (Str) - 1] = 0;
 
   for (Index = StrLen (Str) - 1; Index > 1; Index = Index - 2) {
@@ -246,26 +245,24 @@ IScsiLunToUnicodeStr (
 **/
 EFI_STATUS
 IScsiAsciiStrToIp (
-  IN  CHAR8             *Str,
-  IN  UINT8             IpMode,
-  OUT EFI_IP_ADDRESS    *Ip
+  IN  CHAR8           *Str,
+  IN  UINT8           IpMode,
+  OUT EFI_IP_ADDRESS  *Ip
   )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS  Status;
 
-  if (IpMode == IP_MODE_IP4 || IpMode == IP_MODE_AUTOCONFIG_IP4) {
+  if ((IpMode == IP_MODE_IP4) || (IpMode == IP_MODE_AUTOCONFIG_IP4)) {
     return NetLibAsciiStrToIp4 (Str, &Ip->v4);
-
-  } else if (IpMode == IP_MODE_IP6 || IpMode == IP_MODE_AUTOCONFIG_IP6) {
+  } else if ((IpMode == IP_MODE_IP6) || (IpMode == IP_MODE_AUTOCONFIG_IP6)) {
     return NetLibAsciiStrToIp6 (Str, &Ip->v6);
-
   } else if (IpMode == IP_MODE_AUTOCONFIG) {
     Status = NetLibAsciiStrToIp4 (Str, &Ip->v4);
     if (!EFI_ERROR (Status)) {
       return Status;
     }
-    return NetLibAsciiStrToIp6 (Str, &Ip->v6);
 
+    return NetLibAsciiStrToIp6 (Str, &Ip->v6);
   }
 
   return EFI_INVALID_PARAMETER;
@@ -292,14 +289,14 @@ IScsiMacAddrToStr (
   CHAR16  *String;
 
   for (Index = 0; Index < Len; Index++) {
-    Str[3 * Index]      = (CHAR16) IScsiHexString[(Mac->Addr[Index] >> 4) & 0x0F];
-    Str[3 * Index + 1]  = (CHAR16) IScsiHexString[Mac->Addr[Index] & 0x0F];
-    Str[3 * Index + 2]  = L':';
+    Str[3 * Index]     = (CHAR16)IScsiHexString[(Mac->Addr[Index] >> 4) & 0x0F];
+    Str[3 * Index + 1] = (CHAR16)IScsiHexString[Mac->Addr[Index] & 0x0F];
+    Str[3 * Index + 2] = L':';
   }
 
-  String = &Str[3 * Index - 1] ;
+  String = &Str[3 * Index - 1];
   if (VlanId != 0) {
-    String += UnicodeSPrint (String, 6 * sizeof (CHAR16), L"\\%04x", (UINTN) VlanId);
+    String += UnicodeSPrint (String, 6 * sizeof (CHAR16), L"\\%04x", (UINTN)VlanId);
   }
 
   *String = L'\0';
@@ -316,29 +313,41 @@ IScsiMacAddrToStr (
   @retval EFI_SUCCESS          The binary data is converted to the hexadecimal string
                                and the length of the string is updated.
   @retval EFI_BUFFER_TOO_SMALL The string is too small.
+  @retval EFI_BAD_BUFFER_SIZE  BinLength is too large for hex encoding.
   @retval EFI_INVALID_PARAMETER The IP string is malformatted.
 
 **/
 EFI_STATUS
 IScsiBinToHex (
-  IN     UINT8  *BinBuffer,
-  IN     UINT32 BinLength,
-  IN OUT CHAR8  *HexStr,
-  IN OUT UINT32 *HexLength
+  IN     UINT8   *BinBuffer,
+  IN     UINT32  BinLength,
+  IN OUT CHAR8   *HexStr,
+  IN OUT UINT32  *HexLength
   )
 {
-  UINTN Index;
+  UINT32  HexLengthMin;
+  UINT32  HexLengthProvided;
+  UINT32  Index;
 
   if ((HexStr == NULL) || (BinBuffer == NULL) || (BinLength == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (((*HexLength) - 3) < BinLength * 2) {
-    *HexLength = BinLength * 2 + 3;
+  //
+  // Safely calculate: HexLengthMin := BinLength * 2 + 3.
+  //
+  if (RETURN_ERROR (SafeUint32Mult (BinLength, 2, &HexLengthMin)) ||
+      RETURN_ERROR (SafeUint32Add (HexLengthMin, 3, &HexLengthMin)))
+  {
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
+  HexLengthProvided = *HexLength;
+  *HexLength        = HexLengthMin;
+  if (HexLengthProvided < HexLengthMin) {
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  *HexLength = BinLength * 2 + 3;
   //
   // Prefix for Hex String.
   //
@@ -355,26 +364,31 @@ IScsiBinToHex (
   return EFI_SUCCESS;
 }
 
-
 /**
   Convert the hexadecimal string into a binary encoded buffer.
 
-  @param[in, out]  BinBuffer   The binary buffer.
-  @param[in, out]  BinLength   Length of the binary buffer.
-  @param[in]       HexStr      The hexadecimal string.
+  @param[in, out]  BinBuffer    The binary buffer.
+  @param[in, out]  BinLength    Length of the binary buffer.
+  @param[in]       HexStr       The hexadecimal string.
 
-  @retval EFI_SUCCESS          The hexadecimal string is converted into a binary
-                               encoded buffer.
-  @retval EFI_BUFFER_TOO_SMALL The binary buffer is too small to hold the converted data.
-
+  @retval EFI_SUCCESS           The hexadecimal string is converted into a
+                                binary encoded buffer.
+  @retval EFI_INVALID_PARAMETER Invalid hex encoding found in HexStr.
+  @retval EFI_BAD_BUFFER_SIZE   The length of HexStr is too large for decoding:
+                                the decoded size cannot be expressed in
+                                BinLength on output.
+  @retval EFI_BUFFER_TOO_SMALL  The binary buffer is too small to hold the
+                                converted data.
 **/
 EFI_STATUS
 IScsiHexToBin (
-  IN OUT UINT8  *BinBuffer,
-  IN OUT UINT32 *BinLength,
-  IN     CHAR8  *HexStr
+  IN OUT UINT8   *BinBuffer,
+  IN OUT UINT32  *BinLength,
+  IN     CHAR8   *HexStr
   )
 {
+  UINTN   BinLengthMin;
+  UINT32  BinLengthProvided;
   UINTN   Index;
   UINTN   Length;
   UINT8   Digit;
@@ -391,27 +405,46 @@ IScsiHexToBin (
 
   Length = AsciiStrLen (HexStr);
 
-  for (Index = 0; Index < Length; Index ++) {
+  //
+  // Reject an empty hex string; reject a stray nibble.
+  //
+  if ((Length == 0) || (Length % 2 != 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check if the caller provides enough room for the decoded blob.
+  //
+  BinLengthMin = Length / 2;
+  if (BinLengthMin > MAX_UINT32) {
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
+  BinLengthProvided = *BinLength;
+  *BinLength        = (UINT32)BinLengthMin;
+  if (BinLengthProvided < BinLengthMin) {
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  for (Index = 0; Index < Length; Index++) {
     TemStr[0] = HexStr[Index];
-    Digit = (UINT8) AsciiStrHexToUint64 (TemStr);
-    if (Digit == 0 && TemStr[0] != '0') {
+    Digit     = (UINT8)AsciiStrHexToUint64 (TemStr);
+    if ((Digit == 0) && (TemStr[0] != '0')) {
       //
-      // Invalid Lun Char.
+      // Invalid Hex Char.
       //
-      break;
+      return EFI_INVALID_PARAMETER;
     }
+
     if ((Index & 1) == 0) {
-      BinBuffer [Index/2] = Digit;
+      BinBuffer[Index/2] = Digit;
     } else {
-      BinBuffer [Index/2] = (UINT8) ((BinBuffer [Index/2] << 4) + Digit);
+      BinBuffer[Index/2] = (UINT8)((BinBuffer[Index/2] << 4) + Digit);
     }
   }
 
-  *BinLength = (UINT32) ((Index + 1)/2);
-
   return EFI_SUCCESS;
 }
-
 
 /**
   Convert the decimal-constant string or hex-constant string into a numerical value.
@@ -435,7 +468,6 @@ IScsiNetNtoi (
   return AsciiStrDecimalToUintn (Str);
 }
 
-
 /**
   Generate random numbers.
 
@@ -453,11 +485,10 @@ IScsiGenRandom (
 
   while (RandLength > 0) {
     Random  = NET_RANDOM (NetRandomInitSeed ());
-    *Rand++ = (UINT8) (Random);
+    *Rand++ = (UINT8)(Random);
     RandLength--;
   }
 }
-
 
 /**
   Check whether UNDI protocol supports IPv6.
@@ -472,22 +503,22 @@ IScsiGenRandom (
 **/
 EFI_STATUS
 IScsiCheckIpv6Support (
-  IN  EFI_HANDLE                   ControllerHandle,
-  IN  EFI_HANDLE                   Image,
-  OUT BOOLEAN                      *Ipv6Support
+  IN  EFI_HANDLE  ControllerHandle,
+  IN  EFI_HANDLE  Image,
+  OUT BOOLEAN     *Ipv6Support
   )
 {
-  EFI_HANDLE                       Handle;
-  EFI_ADAPTER_INFORMATION_PROTOCOL *Aip;
-  EFI_STATUS                       Status;
-  EFI_GUID                         *InfoTypesBuffer;
-  UINTN                            InfoTypeBufferCount;
-  UINTN                            TypeIndex;
-  BOOLEAN                          Supported;
-  VOID                             *InfoBlock;
-  UINTN                            InfoBlockSize;
+  EFI_HANDLE                        Handle;
+  EFI_ADAPTER_INFORMATION_PROTOCOL  *Aip;
+  EFI_STATUS                        Status;
+  EFI_GUID                          *InfoTypesBuffer;
+  UINTN                             InfoTypeBufferCount;
+  UINTN                             TypeIndex;
+  BOOLEAN                           Supported;
+  VOID                              *InfoBlock;
+  UINTN                             InfoBlockSize;
 
-  EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL *Nii;
+  EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL  *Nii;
 
   ASSERT (Ipv6Support != NULL);
 
@@ -497,7 +528,7 @@ IScsiCheckIpv6Support (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
-                  (VOID **) &Nii,
+                  (VOID **)&Nii,
                   Image,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -519,16 +550,16 @@ IScsiCheckIpv6Support (
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiAdapterInformationProtocolGuid,
-                  (VOID *) &Aip
+                  (VOID *)&Aip
                   );
-  if (EFI_ERROR (Status) || Aip == NULL) {
+  if (EFI_ERROR (Status) || (Aip == NULL)) {
     return EFI_NOT_FOUND;
   }
 
   InfoTypesBuffer     = NULL;
   InfoTypeBufferCount = 0;
-  Status = Aip->GetSupportedTypes (Aip, &InfoTypesBuffer, &InfoTypeBufferCount);
-  if (EFI_ERROR (Status) || InfoTypesBuffer == NULL) {
+  Status              = Aip->GetSupportedTypes (Aip, &InfoTypesBuffer, &InfoTypeBufferCount);
+  if (EFI_ERROR (Status) || (InfoTypesBuffer == NULL)) {
     FreePool (InfoTypesBuffer);
     return EFI_NOT_FOUND;
   }
@@ -551,13 +582,13 @@ IScsiCheckIpv6Support (
   //
   InfoBlock     = NULL;
   InfoBlockSize = 0;
-  Status = Aip->GetInformation (Aip, &gEfiAdapterInfoUndiIpv6SupportGuid, &InfoBlock, &InfoBlockSize);
-  if (EFI_ERROR (Status) || InfoBlock == NULL) {
+  Status        = Aip->GetInformation (Aip, &gEfiAdapterInfoUndiIpv6SupportGuid, &InfoBlock, &InfoBlockSize);
+  if (EFI_ERROR (Status) || (InfoBlock == NULL)) {
     FreePool (InfoBlock);
     return EFI_NOT_FOUND;
   }
 
-  *Ipv6Support = ((EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT *) InfoBlock)->Ipv6Support;
+  *Ipv6Support = ((EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT *)InfoBlock)->Ipv6Support;
   FreePool (InfoBlock);
 
   return EFI_SUCCESS;
@@ -580,12 +611,12 @@ IScsiAddNic (
   IN EFI_HANDLE  Image
   )
 {
-  EFI_STATUS                  Status;
-  ISCSI_NIC_INFO              *NicInfo;
-  LIST_ENTRY                  *Entry;
-  EFI_MAC_ADDRESS             MacAddr;
-  UINTN                       HwAddressSize;
-  UINT16                      VlanId;
+  EFI_STATUS       Status;
+  ISCSI_NIC_INFO   *NicInfo;
+  LIST_ENTRY       *Entry;
+  EFI_MAC_ADDRESS  MacAddr;
+  UINTN            HwAddressSize;
+  UINT16           VlanId;
 
   //
   // Get MAC address of this network device.
@@ -605,9 +636,10 @@ IScsiAddNic (
   //
   NET_LIST_FOR_EACH (Entry, &mPrivate->NicInfoList) {
     NicInfo = NET_LIST_USER_STRUCT (Entry, ISCSI_NIC_INFO, Link);
-    if (NicInfo->HwAddressSize == HwAddressSize &&
-        CompareMem (&NicInfo->PermanentAddress, MacAddr.Addr, HwAddressSize) == 0 &&
-        NicInfo->VlanId == VlanId) {
+    if ((NicInfo->HwAddressSize == HwAddressSize) &&
+        (CompareMem (&NicInfo->PermanentAddress, MacAddr.Addr, HwAddressSize) == 0) &&
+        (NicInfo->VlanId == VlanId))
+    {
       mPrivate->CurrentNic = NicInfo->NicIndex;
 
       //
@@ -639,10 +671,10 @@ IScsiAddNic (
   }
 
   CopyMem (&NicInfo->PermanentAddress, MacAddr.Addr, HwAddressSize);
-  NicInfo->HwAddressSize  = (UINT32) HwAddressSize;
-  NicInfo->VlanId         = VlanId;
-  NicInfo->NicIndex       = (UINT8) (mPrivate->MaxNic + 1);
-  mPrivate->MaxNic        = NicInfo->NicIndex;
+  NicInfo->HwAddressSize = (UINT32)HwAddressSize;
+  NicInfo->VlanId        = VlanId;
+  NicInfo->NicIndex      = (UINT8)(mPrivate->MaxNic + 1);
+  mPrivate->MaxNic       = NicInfo->NicIndex;
 
   //
   // Set IPv6 available flag.
@@ -673,7 +705,6 @@ IScsiAddNic (
   return EFI_SUCCESS;
 }
 
-
 /**
   Delete the recorded NIC info from global structure. Also delete corresponding
   attempts.
@@ -689,15 +720,15 @@ IScsiRemoveNic (
   IN EFI_HANDLE  Controller
   )
 {
-  EFI_STATUS                  Status;
-  ISCSI_NIC_INFO              *NicInfo;
-  LIST_ENTRY                  *Entry;
-  LIST_ENTRY                  *NextEntry;
-  ISCSI_ATTEMPT_CONFIG_NVDATA *AttemptConfigData;
-  ISCSI_NIC_INFO              *ThisNic;
-  EFI_MAC_ADDRESS             MacAddr;
-  UINTN                       HwAddressSize;
-  UINT16                      VlanId;
+  EFI_STATUS                   Status;
+  ISCSI_NIC_INFO               *NicInfo;
+  LIST_ENTRY                   *Entry;
+  LIST_ENTRY                   *NextEntry;
+  ISCSI_ATTEMPT_CONFIG_NVDATA  *AttemptConfigData;
+  ISCSI_NIC_INFO               *ThisNic;
+  EFI_MAC_ADDRESS              MacAddr;
+  UINTN                        HwAddressSize;
+  UINT16                       VlanId;
 
   //
   // Get MAC address of this network device.
@@ -719,10 +750,10 @@ IScsiRemoveNic (
 
   NET_LIST_FOR_EACH (Entry, &mPrivate->NicInfoList) {
     NicInfo = NET_LIST_USER_STRUCT (Entry, ISCSI_NIC_INFO, Link);
-    if (NicInfo->HwAddressSize == HwAddressSize &&
-        CompareMem (&NicInfo->PermanentAddress, MacAddr.Addr, HwAddressSize) == 0 &&
-        NicInfo->VlanId == VlanId) {
-
+    if ((NicInfo->HwAddressSize == HwAddressSize) &&
+        (CompareMem (&NicInfo->PermanentAddress, MacAddr.Addr, HwAddressSize) == 0) &&
+        (NicInfo->VlanId == VlanId))
+    {
       ThisNic = NicInfo;
       break;
     }
@@ -747,16 +778,15 @@ IScsiRemoveNic (
       RemoveEntryList (&AttemptConfigData->Link);
       mPrivate->AttemptCount--;
 
-      if (AttemptConfigData->SessionConfigData.Enabled == ISCSI_ENABLED_FOR_MPIO && mPrivate->MpioCount > 0) {
+      if ((AttemptConfigData->SessionConfigData.Enabled == ISCSI_ENABLED_FOR_MPIO) && (mPrivate->MpioCount > 0)) {
         if (--mPrivate->MpioCount == 0) {
           mPrivate->EnableMpio = FALSE;
         }
 
-        if (AttemptConfigData->AuthenticationType == ISCSI_AUTH_TYPE_KRB && mPrivate->Krb5MpioCount > 0) {
+        if ((AttemptConfigData->AuthenticationType == ISCSI_AUTH_TYPE_KRB) && (mPrivate->Krb5MpioCount > 0)) {
           mPrivate->Krb5MpioCount--;
         }
-
-      } else if (AttemptConfigData->SessionConfigData.Enabled == ISCSI_ENABLED && mPrivate->SinglePathCount > 0) {
+      } else if ((AttemptConfigData->SessionConfigData.Enabled == ISCSI_ENABLED) && (mPrivate->SinglePathCount > 0)) {
         mPrivate->SinglePathCount--;
 
         if (mPrivate->ValidSinglePathCount > 0) {
@@ -782,19 +812,19 @@ IScsiRemoveNic (
 **/
 EFI_STATUS
 IScsiCreateAttempts (
-  IN UINTN            AttemptNum
-)
+  IN UINTN  AttemptNum
+  )
 {
-  ISCSI_ATTEMPT_CONFIG_NVDATA   *AttemptConfigData;
-  ISCSI_SESSION_CONFIG_NVDATA   *ConfigData;
-  UINT8                         *AttemptConfigOrder;
-  UINTN                         AttemptConfigOrderSize;
-  UINT8                         *AttemptOrderTmp;
-  UINTN                         TotalNumber;
-  UINT8                         Index;
-  EFI_STATUS                    Status;
+  ISCSI_ATTEMPT_CONFIG_NVDATA  *AttemptConfigData;
+  ISCSI_SESSION_CONFIG_NVDATA  *ConfigData;
+  UINT8                        *AttemptConfigOrder;
+  UINTN                        AttemptConfigOrderSize;
+  UINT8                        *AttemptOrderTmp;
+  UINTN                        TotalNumber;
+  UINT8                        Index;
+  EFI_STATUS                   Status;
 
-  for (Index = 1; Index <= AttemptNum; Index ++) {
+  for (Index = 1; Index <= AttemptNum; Index++) {
     //
     // Get the initialized attempt order. This is used to essure creating attempts by order.
     //
@@ -808,6 +838,7 @@ IScsiCreateAttempts (
       Status = EFI_SUCCESS;
       break;
     }
+
     TotalNumber++;
 
     //
@@ -818,6 +849,7 @@ IScsiCreateAttempts (
       if (AttemptConfigOrder != NULL) {
         FreePool (AttemptConfigOrder);
       }
+
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -839,10 +871,14 @@ IScsiCreateAttempts (
                     );
     FreePool (AttemptConfigOrder);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR,
+      DEBUG ((
+        DEBUG_ERROR,
         "%a: Failed to set 'InitialAttemptOrder' with Guid (%g): "
         "%r\n",
-        __FUNCTION__, &gIScsiConfigGuid, Status));
+        __FUNCTION__,
+        &gIScsiConfigGuid,
+        Status
+        ));
       return Status;
     }
 
@@ -853,6 +889,7 @@ IScsiCreateAttempts (
     if (AttemptConfigData == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     ConfigData                    = &AttemptConfigData->SessionConfigData;
     ConfigData->TargetPort        = ISCSI_WELL_KNOWN_PORT;
     ConfigData->ConnectTimeout    = CONNECT_DEFAULT_TIMEOUT;
@@ -870,9 +907,9 @@ IScsiCreateAttempts (
     //
     UnicodeSPrint (
       mPrivate->PortString,
-      (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
+      (UINTN)ISCSI_NAME_IFR_MAX_SIZE,
       L"Attempt %d",
-      (UINTN) AttemptConfigData->AttemptConfigIndex
+      (UINTN)AttemptConfigData->AttemptConfigIndex
       );
     UnicodeStrToAsciiStrS (mPrivate->PortString, AttemptConfigData->AttemptName, ATTEMPT_NAME_SIZE);
 
@@ -885,10 +922,14 @@ IScsiCreateAttempts (
                     );
     FreePool (AttemptConfigData);
     if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_ERROR,
-          "%a: Failed to set variable (mPrivate->PortString) with Guid (%g): "
-          "%r\n",
-          __FUNCTION__, &gEfiIScsiInitiatorNameProtocolGuid, Status));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Failed to set variable (mPrivate->PortString) with Guid (%g): "
+        "%r\n",
+        __FUNCTION__,
+        &gEfiIScsiInitiatorNameProtocolGuid,
+        Status
+        ));
       return Status;
     }
   }
@@ -908,18 +949,18 @@ IScsiCreateAttempts (
 **/
 EFI_STATUS
 IScsiCreateKeywords (
-  IN UINTN            KeywordNum
-)
+  IN UINTN  KeywordNum
+  )
 {
-  VOID                          *StartOpCodeHandle;
-  EFI_IFR_GUID_LABEL            *StartLabel;
-  VOID                          *EndOpCodeHandle;
-  EFI_IFR_GUID_LABEL            *EndLabel;
-  UINTN                         Index;
-  EFI_STRING_ID                 StringToken;
-  CHAR16                        StringId[64];
-  CHAR16                        KeywordId[32];
-  EFI_STATUS                    Status;
+  VOID                *StartOpCodeHandle;
+  EFI_IFR_GUID_LABEL  *StartLabel;
+  VOID                *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL  *EndLabel;
+  UINTN               Index;
+  EFI_STRING_ID       StringToken;
+  CHAR16              StringId[64];
+  CHAR16              KeywordId[32];
+  EFI_STATUS          Status;
 
   Status = IScsiCreateOpCode (
              KEYWORD_ENTRY_LABEL,
@@ -932,7 +973,7 @@ IScsiCreateKeywords (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  for (Index = 1; Index <= KeywordNum; Index ++) {
+  for (Index = 1; Index <= KeywordNum; Index++) {
     //
     // Create iSCSIAttemptName Keyword.
     //
@@ -947,9 +988,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateStringOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_ATTEMPT_NAME_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_ATTEMPT_NAME_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_ATTEMPT_NAME_VAR_OFFSET + ATTEMPT_NAME_SIZE * (Index - 1) * sizeof (CHAR16)),
+      (UINT16)(ATTEMPT_ATTEMPT_NAME_VAR_OFFSET + ATTEMPT_NAME_SIZE * (Index - 1) * sizeof (CHAR16)),
       StringToken,
       StringToken,
       EFI_IFR_FLAG_READ_ONLY,
@@ -973,9 +1014,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateNumericOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_BOOTENABLE_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_BOOTENABLE_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_BOOTENABLE_VAR_OFFSET + (Index - 1)),
+      (UINT16)(ATTEMPT_BOOTENABLE_VAR_OFFSET + (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1000,9 +1041,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateNumericOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_ADDRESS_TYPE_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_ADDRESS_TYPE_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_ADDRESS_TYPE_VAR_OFFSET + (Index - 1)),
+      (UINT16)(ATTEMPT_ADDRESS_TYPE_VAR_OFFSET + (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1027,9 +1068,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateNumericOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_CONNECT_RETRY_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_CONNECT_RETRY_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_CONNECT_RETRY_VAR_OFFSET + (Index - 1)),
+      (UINT16)(ATTEMPT_CONNECT_RETRY_VAR_OFFSET + (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1054,9 +1095,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateNumericOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_CONNECT_TIMEOUT_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_CONNECT_TIMEOUT_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_CONNECT_TIMEOUT_VAR_OFFSET + 2 * (Index - 1)),
+      (UINT16)(ATTEMPT_CONNECT_TIMEOUT_VAR_OFFSET + 2 * (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1081,9 +1122,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateStringOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_ISID_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_ISID_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_ISID_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      (UINT16)(ATTEMPT_ISID_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
       StringToken,
       STRING_TOKEN (STR_ISCSI_ISID_HELP),
       0,
@@ -1106,19 +1147,19 @@ IScsiCreateKeywords (
     UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIInitiatorInfoViaDHCP:%d", Index);
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateNumericOpCode (
-    StartOpCodeHandle,
-    (EFI_QUESTION_ID) (ATTEMPT_INITIATOR_VIA_DHCP_QUESTION_ID + (Index - 1)),
-    CONFIGURATION_VARSTORE_ID,
-    (UINT16) (ATTEMPT_INITIATOR_VIA_DHCP_VAR_OFFSET + (Index - 1)),
-    StringToken,
-    StringToken,
-    0,
-    0,
-    0,
-    1,
-    0,
-    NULL
-    );
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID)(ATTEMPT_INITIATOR_VIA_DHCP_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16)(ATTEMPT_INITIATOR_VIA_DHCP_VAR_OFFSET + (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      0,
+      1,
+      0,
+      NULL
+      );
 
     //
     // Create iSCSIInitiatorIpAddress Keyword.
@@ -1134,9 +1175,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateStringOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_INITIATOR_IP_ADDRESS_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_INITIATOR_IP_ADDRESS_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_INITIATOR_IP_ADDRESS_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      (UINT16)(ATTEMPT_INITIATOR_IP_ADDRESS_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1160,9 +1201,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateStringOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_INITIATOR_NET_MASK_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_INITIATOR_NET_MASK_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_INITIATOR_NET_MASK_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      (UINT16)(ATTEMPT_INITIATOR_NET_MASK_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1186,9 +1227,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateStringOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_INITIATOR_GATE_WAY_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_INITIATOR_GATE_WAY_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_INITIATOR_GATE_WAY_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      (UINT16)(ATTEMPT_INITIATOR_GATE_WAY_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1211,19 +1252,19 @@ IScsiCreateKeywords (
     UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSITargetInfoViaDHCP:%d", Index);
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateNumericOpCode (
-    StartOpCodeHandle,
-    (EFI_QUESTION_ID) (ATTEMPT_TARGET_VIA_DHCP_QUESTION_ID + (Index - 1)),
-    CONFIGURATION_VARSTORE_ID,
-    (UINT16) (ATTEMPT_TARGET_VIA_DHCP_VAR_OFFSET + (Index - 1)),
-    StringToken,
-    StringToken,
-    0,
-    0,
-    0,
-    1,
-    0,
-    NULL
-    );
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID)(ATTEMPT_TARGET_VIA_DHCP_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16)(ATTEMPT_TARGET_VIA_DHCP_VAR_OFFSET + (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      0,
+      1,
+      0,
+      NULL
+      );
 
     //
     // Create iSCSITargetTcpPort Keyword.
@@ -1239,9 +1280,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateNumericOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_TARGET_TCP_PORT_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_TARGET_TCP_PORT_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_TARGET_TCP_PORT_VAR_OFFSET + 2 * (Index - 1)),
+      (UINT16)(ATTEMPT_TARGET_TCP_PORT_VAR_OFFSET + 2 * (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1266,9 +1307,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateStringOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_TARGET_NAME_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_TARGET_NAME_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_TARGET_NAME_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      (UINT16)(ATTEMPT_TARGET_NAME_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1292,9 +1333,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateStringOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_TARGET_IP_ADDRESS_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_TARGET_IP_ADDRESS_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_TARGET_IP_ADDRESS_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      (UINT16)(ATTEMPT_TARGET_IP_ADDRESS_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1318,9 +1359,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateStringOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_LUN_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_LUN_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_LUN_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      (UINT16)(ATTEMPT_LUN_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1343,19 +1384,19 @@ IScsiCreateKeywords (
     UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIAuthenticationMethod:%d", Index);
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateNumericOpCode (
-    StartOpCodeHandle,
-    (EFI_QUESTION_ID) (ATTEMPT_AUTHENTICATION_METHOD_QUESTION_ID + (Index - 1)),
-    CONFIGURATION_VARSTORE_ID,
-    (UINT16) (ATTEMPT_AUTHENTICATION_METHOD_VAR_OFFSET + (Index - 1)),
-    StringToken,
-    StringToken,
-    0,
-    0,
-    0,
-    1,
-    0,
-    NULL
-    );
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID)(ATTEMPT_AUTHENTICATION_METHOD_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16)(ATTEMPT_AUTHENTICATION_METHOD_VAR_OFFSET + (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      0,
+      1,
+      0,
+      NULL
+      );
 
     //
     // Create iSCSIChapType Keyword.
@@ -1370,19 +1411,19 @@ IScsiCreateKeywords (
     UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIChapType:%d", Index);
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateNumericOpCode (
-    StartOpCodeHandle,
-    (EFI_QUESTION_ID) (ATTEMPT_CHARTYPE_QUESTION_ID + (Index - 1)),
-    CONFIGURATION_VARSTORE_ID,
-    (UINT16) (ATTEMPT_CHARTYPE_VAR_OFFSET + (Index - 1)),
-    StringToken,
-    StringToken,
-    0,
-    0,
-    0,
-    1,
-    0,
-    NULL
-    );
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID)(ATTEMPT_CHARTYPE_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16)(ATTEMPT_CHARTYPE_VAR_OFFSET + (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      0,
+      1,
+      0,
+      NULL
+      );
 
     //
     // Create iSCSIChapUsername Keyword.
@@ -1398,9 +1439,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateStringOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_CHAR_USER_NAME_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_CHAR_USER_NAME_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_CHAR_USER_NAME_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      (UINT16)(ATTEMPT_CHAR_USER_NAME_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1424,9 +1465,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateStringOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_CHAR_SECRET_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_CHAR_SECRET_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_CHAR_SECRET_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      (UINT16)(ATTEMPT_CHAR_SECRET_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1450,9 +1491,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateStringOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_CHAR_REVERSE_USER_NAME_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_CHAR_REVERSE_USER_NAME_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_CHAR_REVERSE_USER_NAME_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      (UINT16)(ATTEMPT_CHAR_REVERSE_USER_NAME_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1476,9 +1517,9 @@ IScsiCreateKeywords (
     HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
     HiiCreateStringOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (ATTEMPT_CHAR_REVERSE_SECRET_QUESTION_ID + (Index - 1)),
+      (EFI_QUESTION_ID)(ATTEMPT_CHAR_REVERSE_SECRET_QUESTION_ID + (Index - 1)),
       CONFIGURATION_VARSTORE_ID,
-      (UINT16) (ATTEMPT_CHAR_REVERSE_SECRET_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      (UINT16)(ATTEMPT_CHAR_REVERSE_SECRET_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
       StringToken,
       StringToken,
       0,
@@ -1511,12 +1552,12 @@ IScsiCreateKeywords (
 VOID
 IScsiCleanAttemptVariable (
   IN   VOID
-)
+  )
 {
-  ISCSI_ATTEMPT_CONFIG_NVDATA   *AttemptConfigData;
-  UINT8                         *AttemptConfigOrder;
-  UINTN                         AttemptConfigOrderSize;
-  UINTN                         Index;
+  ISCSI_ATTEMPT_CONFIG_NVDATA  *AttemptConfigData;
+  UINT8                        *AttemptConfigOrder;
+  UINTN                        AttemptConfigOrderSize;
+  UINTN                        Index;
 
   //
   // Get the initialized attempt order.
@@ -1526,14 +1567,14 @@ IScsiCleanAttemptVariable (
                          &gIScsiConfigGuid,
                          &AttemptConfigOrderSize
                          );
-  if (AttemptConfigOrder == NULL || AttemptConfigOrderSize == 0) {
+  if ((AttemptConfigOrder == NULL) || (AttemptConfigOrderSize == 0)) {
     return;
   }
 
   for (Index = 1; Index < AttemptConfigOrderSize / sizeof (UINT8); Index++) {
     UnicodeSPrint (
       mPrivate->PortString,
-      (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
+      (UINTN)ISCSI_NAME_IFR_MAX_SIZE,
       L"Attempt %d",
       Index
       );
@@ -1541,7 +1582,7 @@ IScsiCleanAttemptVariable (
     GetVariable2 (
       mPrivate->PortString,
       &gEfiIScsiInitiatorNameProtocolGuid,
-      (VOID**)&AttemptConfigData,
+      (VOID **)&AttemptConfigData,
       NULL
       );
 
@@ -1555,6 +1596,7 @@ IScsiCleanAttemptVariable (
              );
     }
   }
+
   return;
 }
 
@@ -1568,11 +1610,11 @@ IScsiCleanAttemptVariable (
 **/
 ISCSI_NIC_INFO *
 IScsiGetNicInfoByIndex (
-  IN UINT8      NicIndex
+  IN UINT8  NicIndex
   )
 {
-  LIST_ENTRY        *Entry;
-  ISCSI_NIC_INFO    *NicInfo;
+  LIST_ENTRY      *Entry;
+  ISCSI_NIC_INFO  *NicInfo;
 
   NET_LIST_FOR_EACH (Entry, &mPrivate->NicInfoList) {
     NicInfo = NET_LIST_USER_STRUCT (Entry, ISCSI_NIC_INFO, Link);
@@ -1583,7 +1625,6 @@ IScsiGetNicInfoByIndex (
 
   return NULL;
 }
-
 
 /**
   Get the NIC's PCI location and return it according to the composited
@@ -1614,7 +1655,7 @@ IScsiGetNICPciLocation (
   Status = gBS->HandleProtocol (
                   Controller,
                   &gEfiDevicePathProtocolGuid,
-                  (VOID **) &DevicePath
+                  (VOID **)&DevicePath
                   );
   if (EFI_ERROR (Status)) {
     return 0;
@@ -1629,7 +1670,7 @@ IScsiGetNICPciLocation (
     return 0;
   }
 
-  Status = gBS->HandleProtocol (PciIoHandle, &gEfiPciIoProtocolGuid, (VOID **) &PciIo);
+  Status = gBS->HandleProtocol (PciIoHandle, &gEfiPciIoProtocolGuid, (VOID **)&PciIo);
   if (EFI_ERROR (Status)) {
     return 0;
   }
@@ -1639,9 +1680,8 @@ IScsiGetNICPciLocation (
     return 0;
   }
 
-  return (UINT16) ((*Bus << 8) | (*Device << 3) | *Function);
+  return (UINT16)((*Bus << 8) | (*Device << 3) | *Function);
 }
-
 
 /**
   Read the EFI variable (VendorGuid/Name) and return a dynamically allocated
@@ -1658,9 +1698,9 @@ IScsiGetNICPciLocation (
 **/
 VOID *
 IScsiGetVariableAndSize (
-  IN  CHAR16              *Name,
-  IN  EFI_GUID            *VendorGuid,
-  OUT UINTN               *VariableSize
+  IN  CHAR16    *Name,
+  IN  EFI_GUID  *VendorGuid,
+  OUT UINTN     *VariableSize
   )
 {
   EFI_STATUS  Status;
@@ -1672,8 +1712,8 @@ IScsiGetVariableAndSize (
   //
   // Pass in a zero size buffer to find the required buffer size.
   //
-  BufferSize  = 0;
-  Status      = gRT->GetVariable (Name, VendorGuid, NULL, &BufferSize, Buffer);
+  BufferSize = 0;
+  Status     = gRT->GetVariable (Name, VendorGuid, NULL, &BufferSize, Buffer);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     //
     // Allocate the buffer to return
@@ -1682,6 +1722,7 @@ IScsiGetVariableAndSize (
     if (Buffer == NULL) {
       return NULL;
     }
+
     //
     // Read variable into the allocated buffer.
     //
@@ -1694,7 +1735,6 @@ IScsiGetVariableAndSize (
   *VariableSize = BufferSize;
   return Buffer;
 }
-
 
 /**
   Create the iSCSI driver data.
@@ -1712,8 +1752,8 @@ IScsiCreateDriverData (
   IN EFI_HANDLE  Controller
   )
 {
-  ISCSI_DRIVER_DATA *Private;
-  EFI_STATUS        Status;
+  ISCSI_DRIVER_DATA  *Private;
+  EFI_STATUS         Status;
 
   Private = AllocateZeroPool (sizeof (ISCSI_DRIVER_DATA));
   if (Private == NULL) {
@@ -1743,7 +1783,7 @@ IScsiCreateDriverData (
   }
 
   Private->ExtScsiPassThruHandle = NULL;
-  CopyMem(&Private->IScsiExtScsiPassThru, &gIScsiExtScsiPassThruProtocolTemplate, sizeof(EFI_EXT_SCSI_PASS_THRU_PROTOCOL));
+  CopyMem (&Private->IScsiExtScsiPassThru, &gIScsiExtScsiPassThruProtocolTemplate, sizeof (EFI_EXT_SCSI_PASS_THRU_PROTOCOL));
 
   //
   // 0 is designated to the TargetId, so use another value for the AdapterId.
@@ -1755,7 +1795,6 @@ IScsiCreateDriverData (
 
   return Private;
 }
-
 
 /**
   Clean the iSCSI driver data.
@@ -1771,7 +1810,7 @@ IScsiCleanDriverData (
   IN ISCSI_DRIVER_DATA  *Private
   )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS  Status;
 
   Status = EFI_SUCCESS;
 
@@ -1826,24 +1865,24 @@ IScsiDhcpIsConfigured (
   IN UINT8       IpVersion
   )
 {
-  ISCSI_ATTEMPT_CONFIG_NVDATA *AttemptTmp;
-  UINT8                       *AttemptConfigOrder;
-  UINTN                       AttemptConfigOrderSize;
-  UINTN                       Index;
-  EFI_STATUS                  Status;
-  EFI_MAC_ADDRESS             MacAddr;
-  UINTN                       HwAddressSize;
-  UINT16                      VlanId;
-  CHAR16                      MacString[ISCSI_MAX_MAC_STRING_LEN];
-  CHAR16                      AttemptMacString[ISCSI_MAX_MAC_STRING_LEN];
-  CHAR16                      AttemptName[ISCSI_NAME_IFR_MAX_SIZE];
+  ISCSI_ATTEMPT_CONFIG_NVDATA  *AttemptTmp;
+  UINT8                        *AttemptConfigOrder;
+  UINTN                        AttemptConfigOrderSize;
+  UINTN                        Index;
+  EFI_STATUS                   Status;
+  EFI_MAC_ADDRESS              MacAddr;
+  UINTN                        HwAddressSize;
+  UINT16                       VlanId;
+  CHAR16                       MacString[ISCSI_MAX_MAC_STRING_LEN];
+  CHAR16                       AttemptMacString[ISCSI_MAX_MAC_STRING_LEN];
+  CHAR16                       AttemptName[ISCSI_NAME_IFR_MAX_SIZE];
 
   AttemptConfigOrder = IScsiGetVariableAndSize (
                          L"AttemptOrder",
                          &gIScsiConfigGuid,
                          &AttemptConfigOrderSize
                          );
-  if (AttemptConfigOrder == NULL || AttemptConfigOrderSize == 0) {
+  if ((AttemptConfigOrder == NULL) || (AttemptConfigOrderSize == 0)) {
     return FALSE;
   }
 
@@ -1851,29 +1890,30 @@ IScsiDhcpIsConfigured (
   // Get MAC address of this network device.
   //
   Status = NetLibGetMacAddress (Controller, &MacAddr, &HwAddressSize);
-  if(EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status)) {
     return FALSE;
   }
+
   //
   // Get VLAN ID of this network device.
   //
   VlanId = NetLibGetVlanId (Controller);
-  IScsiMacAddrToStr (&MacAddr, (UINT32) HwAddressSize, VlanId, MacString);
+  IScsiMacAddrToStr (&MacAddr, (UINT32)HwAddressSize, VlanId, MacString);
 
   for (Index = 0; Index < AttemptConfigOrderSize / sizeof (UINT8); Index++) {
     UnicodeSPrint (
       AttemptName,
-      (UINTN) 128,
+      (UINTN)128,
       L"Attempt %d",
-      (UINTN) AttemptConfigOrder[Index]
+      (UINTN)AttemptConfigOrder[Index]
       );
     Status = GetVariable2 (
                AttemptName,
                &gEfiIScsiInitiatorNameProtocolGuid,
-               (VOID**)&AttemptTmp,
+               (VOID **)&AttemptTmp,
                NULL
                );
-    if(AttemptTmp == NULL || EFI_ERROR (Status)) {
+    if ((AttemptTmp == NULL) || EFI_ERROR (Status)) {
       continue;
     }
 
@@ -1884,21 +1924,23 @@ IScsiDhcpIsConfigured (
       continue;
     }
 
-    if (AttemptTmp->SessionConfigData.IpMode != IP_MODE_AUTOCONFIG &&
-        AttemptTmp->SessionConfigData.IpMode != ((IpVersion == IP_VERSION_4) ? IP_MODE_IP4 : IP_MODE_IP6)) {
+    if ((AttemptTmp->SessionConfigData.IpMode != IP_MODE_AUTOCONFIG) &&
+        (AttemptTmp->SessionConfigData.IpMode != ((IpVersion == IP_VERSION_4) ? IP_MODE_IP4 : IP_MODE_IP6)))
+    {
       FreePool (AttemptTmp);
       continue;
     }
 
     AsciiStrToUnicodeStrS (AttemptTmp->MacString, AttemptMacString, sizeof (AttemptMacString) / sizeof (AttemptMacString[0]));
 
-    if (AttemptTmp->Actived == ISCSI_ACTIVE_DISABLED || StrCmp (MacString, AttemptMacString)) {
+    if ((AttemptTmp->Actived == ISCSI_ACTIVE_DISABLED) || StrCmp (MacString, AttemptMacString)) {
       continue;
     }
 
-    if(AttemptTmp->SessionConfigData.IpMode == IP_MODE_AUTOCONFIG ||
-       AttemptTmp->SessionConfigData.InitiatorInfoFromDhcp == TRUE ||
-       AttemptTmp->SessionConfigData.TargetInfoFromDhcp == TRUE) {
+    if ((AttemptTmp->SessionConfigData.IpMode == IP_MODE_AUTOCONFIG) ||
+        (AttemptTmp->SessionConfigData.InitiatorInfoFromDhcp == TRUE) ||
+        (AttemptTmp->SessionConfigData.TargetInfoFromDhcp == TRUE))
+    {
       FreePool (AttemptTmp);
       FreePool (AttemptConfigOrder);
       return TRUE;
@@ -1925,24 +1967,24 @@ IScsiDnsIsConfigured (
   IN EFI_HANDLE  Controller
   )
 {
-  ISCSI_ATTEMPT_CONFIG_NVDATA *AttemptTmp;
-  UINT8                       *AttemptConfigOrder;
-  UINTN                       AttemptConfigOrderSize;
-  UINTN                       Index;
-  EFI_STATUS                  Status;
-  EFI_MAC_ADDRESS             MacAddr;
-  UINTN                       HwAddressSize;
-  UINT16                      VlanId;
-  CHAR16                      AttemptMacString[ISCSI_MAX_MAC_STRING_LEN];
-  CHAR16                      MacString[ISCSI_MAX_MAC_STRING_LEN];
-  CHAR16                      AttemptName[ISCSI_NAME_IFR_MAX_SIZE];
+  ISCSI_ATTEMPT_CONFIG_NVDATA  *AttemptTmp;
+  UINT8                        *AttemptConfigOrder;
+  UINTN                        AttemptConfigOrderSize;
+  UINTN                        Index;
+  EFI_STATUS                   Status;
+  EFI_MAC_ADDRESS              MacAddr;
+  UINTN                        HwAddressSize;
+  UINT16                       VlanId;
+  CHAR16                       AttemptMacString[ISCSI_MAX_MAC_STRING_LEN];
+  CHAR16                       MacString[ISCSI_MAX_MAC_STRING_LEN];
+  CHAR16                       AttemptName[ISCSI_NAME_IFR_MAX_SIZE];
 
   AttemptConfigOrder = IScsiGetVariableAndSize (
                          L"AttemptOrder",
                          &gIScsiConfigGuid,
                          &AttemptConfigOrderSize
                          );
-  if (AttemptConfigOrder == NULL || AttemptConfigOrderSize == 0) {
+  if ((AttemptConfigOrder == NULL) || (AttemptConfigOrderSize == 0)) {
     return FALSE;
   }
 
@@ -1950,30 +1992,31 @@ IScsiDnsIsConfigured (
   // Get MAC address of this network device.
   //
   Status = NetLibGetMacAddress (Controller, &MacAddr, &HwAddressSize);
-  if(EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status)) {
     return FALSE;
   }
+
   //
   // Get VLAN ID of this network device.
   //
   VlanId = NetLibGetVlanId (Controller);
-  IScsiMacAddrToStr (&MacAddr, (UINT32) HwAddressSize, VlanId, MacString);
+  IScsiMacAddrToStr (&MacAddr, (UINT32)HwAddressSize, VlanId, MacString);
 
   for (Index = 0; Index < AttemptConfigOrderSize / sizeof (UINT8); Index++) {
     UnicodeSPrint (
       AttemptName,
-      (UINTN) 128,
+      (UINTN)128,
       L"Attempt %d",
-      (UINTN) AttemptConfigOrder[Index]
+      (UINTN)AttemptConfigOrder[Index]
       );
 
     Status = GetVariable2 (
                AttemptName,
                &gEfiIScsiInitiatorNameProtocolGuid,
-               (VOID**)&AttemptTmp,
+               (VOID **)&AttemptTmp,
                NULL
                );
-    if(AttemptTmp == NULL || EFI_ERROR (Status)) {
+    if ((AttemptTmp == NULL) || EFI_ERROR (Status)) {
       continue;
     }
 
@@ -1981,7 +2024,7 @@ IScsiDnsIsConfigured (
 
     AsciiStrToUnicodeStrS (AttemptTmp->MacString, AttemptMacString, sizeof (AttemptMacString) / sizeof (AttemptMacString[0]));
 
-    if (AttemptTmp->SessionConfigData.Enabled == ISCSI_DISABLED || StrCmp (MacString, AttemptMacString)) {
+    if ((AttemptTmp->SessionConfigData.Enabled == ISCSI_DISABLED) || StrCmp (MacString, AttemptMacString)) {
       FreePool (AttemptTmp);
       continue;
     }
@@ -1994,12 +2037,10 @@ IScsiDnsIsConfigured (
       FreePool (AttemptTmp);
       continue;
     }
-
   }
 
   FreePool (AttemptConfigOrder);
   return FALSE;
-
 }
 
 /**
@@ -2017,17 +2058,17 @@ IScsiGetConfigData (
   IN ISCSI_DRIVER_DATA  *Private
   )
 {
-  EFI_STATUS                  Status;
-  CHAR16                      MacString[ISCSI_MAX_MAC_STRING_LEN];
-  CHAR16                      AttemptMacString[ISCSI_MAX_MAC_STRING_LEN];
-  UINTN                       Index;
-  ISCSI_NIC_INFO              *NicInfo;
-  ISCSI_ATTEMPT_CONFIG_NVDATA *AttemptConfigData;
-  ISCSI_ATTEMPT_CONFIG_NVDATA *AttemptTmp;
-  UINT8                       *AttemptConfigOrder;
-  UINTN                       AttemptConfigOrderSize;
-  CHAR16                      IScsiMode[64];
-  CHAR16                      IpMode[64];
+  EFI_STATUS                   Status;
+  CHAR16                       MacString[ISCSI_MAX_MAC_STRING_LEN];
+  CHAR16                       AttemptMacString[ISCSI_MAX_MAC_STRING_LEN];
+  UINTN                        Index;
+  ISCSI_NIC_INFO               *NicInfo;
+  ISCSI_ATTEMPT_CONFIG_NVDATA  *AttemptConfigData;
+  ISCSI_ATTEMPT_CONFIG_NVDATA  *AttemptTmp;
+  UINT8                        *AttemptConfigOrder;
+  UINTN                        AttemptConfigOrderSize;
+  CHAR16                       IScsiMode[64];
+  CHAR16                       IpMode[64];
 
   //
   // There should be at least one attempt configured.
@@ -2037,19 +2078,19 @@ IScsiGetConfigData (
                          &gIScsiConfigGuid,
                          &AttemptConfigOrderSize
                          );
-  if (AttemptConfigOrder == NULL || AttemptConfigOrderSize == 0) {
+  if ((AttemptConfigOrder == NULL) || (AttemptConfigOrderSize == 0)) {
     return EFI_NOT_FOUND;
   }
 
   //
   // Get the iSCSI Initiator Name.
   //
-  mPrivate->InitiatorNameLength  = ISCSI_NAME_MAX_SIZE;
-  Status = gIScsiInitiatorName.Get (
-                                 &gIScsiInitiatorName,
-                                 &mPrivate->InitiatorNameLength,
-                                 mPrivate->InitiatorName
-                                 );
+  mPrivate->InitiatorNameLength = ISCSI_NAME_MAX_SIZE;
+  Status                        = gIScsiInitiatorName.Get (
+                                                        &gIScsiInitiatorName,
+                                                        &mPrivate->InitiatorNameLength,
+                                                        mPrivate->InitiatorName
+                                                        );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -2058,27 +2099,29 @@ IScsiGetConfigData (
   // Get the normal configuration.
   //
   for (Index = 0; Index < AttemptConfigOrderSize / sizeof (UINT8); Index++) {
-
     //
     // Check whether the attempt exists in AttemptConfig.
     //
     AttemptTmp = IScsiConfigGetAttemptByConfigIndex (AttemptConfigOrder[Index]);
-    if (AttemptTmp != NULL && AttemptTmp->SessionConfigData.Enabled == ISCSI_DISABLED) {
+    if ((AttemptTmp != NULL) && (AttemptTmp->SessionConfigData.Enabled == ISCSI_DISABLED)) {
       continue;
-    } else if (AttemptTmp != NULL && AttemptTmp->SessionConfigData.Enabled != ISCSI_DISABLED) {
+    } else if ((AttemptTmp != NULL) && (AttemptTmp->SessionConfigData.Enabled != ISCSI_DISABLED)) {
       //
       // Check the autoconfig path to see whether it should be retried.
       //
-      if (AttemptTmp->SessionConfigData.IpMode == IP_MODE_AUTOCONFIG &&
-          !AttemptTmp->AutoConfigureSuccess) {
+      if ((AttemptTmp->SessionConfigData.IpMode == IP_MODE_AUTOCONFIG) &&
+          !AttemptTmp->AutoConfigureSuccess)
+      {
         if (mPrivate->Ipv6Flag &&
-            AttemptTmp->AutoConfigureMode == IP_MODE_AUTOCONFIG_IP6) {
+            (AttemptTmp->AutoConfigureMode == IP_MODE_AUTOCONFIG_IP6))
+        {
           //
           // Autoconfigure for IP6 already attempted but failed. Do not try again.
           //
           continue;
         } else if (!mPrivate->Ipv6Flag &&
-                   AttemptTmp->AutoConfigureMode == IP_MODE_AUTOCONFIG_IP4) {
+                   (AttemptTmp->AutoConfigureMode == IP_MODE_AUTOCONFIG_IP4))
+        {
           //
           // Autoconfigure for IP4  already attempted but failed. Do not try again.
           //
@@ -2088,7 +2131,7 @@ IScsiGetConfigData (
           // Try another approach for this autoconfigure path.
           //
           AttemptTmp->AutoConfigureMode =
-            (UINT8) (mPrivate->Ipv6Flag ? IP_MODE_AUTOCONFIG_IP6 : IP_MODE_AUTOCONFIG_IP4);
+            (UINT8)(mPrivate->Ipv6Flag ? IP_MODE_AUTOCONFIG_IP6 : IP_MODE_AUTOCONFIG_IP4);
           AttemptTmp->SessionConfigData.InitiatorInfoFromDhcp = TRUE;
           AttemptTmp->SessionConfigData.TargetInfoFromDhcp    = TRUE;
           AttemptTmp->DhcpSuccess                             = FALSE;
@@ -2113,9 +2156,9 @@ IScsiGetConfigData (
           //
           UnicodeSPrint (
             mPrivate->PortString,
-            (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
+            (UINTN)ISCSI_NAME_IFR_MAX_SIZE,
             L"Attempt %d",
-            (UINTN) AttemptTmp->AttemptConfigIndex
+            (UINTN)AttemptTmp->AttemptConfigIndex
             );
 
           gRT->SetVariable (
@@ -2130,7 +2173,8 @@ IScsiGetConfigData (
         }
       } else if (AttemptTmp->SessionConfigData.InitiatorInfoFromDhcp &&
                  !AttemptTmp->ValidPath &&
-                 AttemptTmp->NicIndex == mPrivate->CurrentNic) {
+                 (AttemptTmp->NicIndex == mPrivate->CurrentNic))
+      {
         //
         // If the attempt associates with the current NIC, we can
         // get DHCP information for already added, but failed, attempt.
@@ -2153,9 +2197,9 @@ IScsiGetConfigData (
         //
         UnicodeSPrint (
           mPrivate->PortString,
-          (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
+          (UINTN)ISCSI_NAME_IFR_MAX_SIZE,
           L"Attempt %d",
-          (UINTN) AttemptTmp->AttemptConfigIndex
+          (UINTN)AttemptTmp->AttemptConfigIndex
           );
 
         gRT->SetVariable (
@@ -2167,7 +2211,6 @@ IScsiGetConfigData (
                );
 
         continue;
-
       } else {
         continue;
       }
@@ -2182,21 +2225,22 @@ IScsiGetConfigData (
     IScsiMacAddrToStr (&NicInfo->PermanentAddress, NicInfo->HwAddressSize, NicInfo->VlanId, MacString);
     UnicodeSPrint (
       mPrivate->PortString,
-      (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
+      (UINTN)ISCSI_NAME_IFR_MAX_SIZE,
       L"Attempt %d",
-      (UINTN) AttemptConfigOrder[Index]
+      (UINTN)AttemptConfigOrder[Index]
       );
 
     GetVariable2 (
       mPrivate->PortString,
       &gEfiIScsiInitiatorNameProtocolGuid,
-      (VOID**)&AttemptConfigData,
+      (VOID **)&AttemptConfigData,
       NULL
       );
     AsciiStrToUnicodeStrS (AttemptConfigData->MacString, AttemptMacString, sizeof (AttemptMacString) / sizeof (AttemptMacString[0]));
 
-    if (AttemptConfigData == NULL || AttemptConfigData->Actived == ISCSI_ACTIVE_DISABLED ||
-        StrCmp (MacString, AttemptMacString)) {
+    if ((AttemptConfigData == NULL) || (AttemptConfigData->Actived == ISCSI_ACTIVE_DISABLED) ||
+        StrCmp (MacString, AttemptMacString))
+    {
       continue;
     }
 
@@ -2204,7 +2248,7 @@ IScsiGetConfigData (
 
     AttemptConfigData->NicIndex      = NicInfo->NicIndex;
     AttemptConfigData->DhcpSuccess   = FALSE;
-    AttemptConfigData->ValidiBFTPath = (BOOLEAN) (mPrivate->EnableMpio ? TRUE : FALSE);
+    AttemptConfigData->ValidiBFTPath = (BOOLEAN)(mPrivate->EnableMpio ? TRUE : FALSE);
     AttemptConfigData->ValidPath     = FALSE;
 
     if (AttemptConfigData->SessionConfigData.IpMode == IP_MODE_AUTOCONFIG) {
@@ -2212,26 +2256,28 @@ IScsiGetConfigData (
       AttemptConfigData->SessionConfigData.TargetInfoFromDhcp    = TRUE;
 
       AttemptConfigData->AutoConfigureMode =
-        (UINT8) (mPrivate->Ipv6Flag ? IP_MODE_AUTOCONFIG_IP6 : IP_MODE_AUTOCONFIG_IP4);
+        (UINT8)(mPrivate->Ipv6Flag ? IP_MODE_AUTOCONFIG_IP6 : IP_MODE_AUTOCONFIG_IP4);
       AttemptConfigData->AutoConfigureSuccess = FALSE;
     }
 
     //
     // Get some information from dhcp server.
     //
-    if (AttemptConfigData->SessionConfigData.Enabled != ISCSI_DISABLED &&
-        AttemptConfigData->SessionConfigData.InitiatorInfoFromDhcp) {
-
+    if ((AttemptConfigData->SessionConfigData.Enabled != ISCSI_DISABLED) &&
+        AttemptConfigData->SessionConfigData.InitiatorInfoFromDhcp)
+    {
       if (!mPrivate->Ipv6Flag &&
-          (AttemptConfigData->SessionConfigData.IpMode == IP_MODE_IP4 ||
-           AttemptConfigData->AutoConfigureMode == IP_MODE_AUTOCONFIG_IP4)) {
+          ((AttemptConfigData->SessionConfigData.IpMode == IP_MODE_IP4) ||
+           (AttemptConfigData->AutoConfigureMode == IP_MODE_AUTOCONFIG_IP4)))
+      {
         Status = IScsiDoDhcp (Private->Image, Private->Controller, AttemptConfigData);
         if (!EFI_ERROR (Status)) {
           AttemptConfigData->DhcpSuccess = TRUE;
         }
       } else if (mPrivate->Ipv6Flag &&
-                (AttemptConfigData->SessionConfigData.IpMode == IP_MODE_IP6 ||
-                 AttemptConfigData->AutoConfigureMode == IP_MODE_AUTOCONFIG_IP6)) {
+                 ((AttemptConfigData->SessionConfigData.IpMode == IP_MODE_IP6) ||
+                  (AttemptConfigData->AutoConfigureMode == IP_MODE_AUTOCONFIG_IP6)))
+      {
         Status = IScsiDoDhcp6 (Private->Image, Private->Controller, AttemptConfigData);
         if (!EFI_ERROR (Status)) {
           AttemptConfigData->DhcpSuccess = TRUE;
@@ -2243,9 +2289,9 @@ IScsiGetConfigData (
       //
       UnicodeSPrint (
         mPrivate->PortString,
-        (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
+        (UINTN)ISCSI_NAME_IFR_MAX_SIZE,
         L"Attempt %d",
-        (UINTN) AttemptConfigData->AttemptConfigIndex
+        (UINTN)AttemptConfigData->AttemptConfigIndex
         );
 
       gRT->SetVariable (
@@ -2279,7 +2325,7 @@ IScsiGetConfigData (
 
     UnicodeSPrint (
       mPrivate->PortString,
-      (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
+      (UINTN)ISCSI_NAME_IFR_MAX_SIZE,
       L"MAC: %s, PFA: Bus %d | Dev %d | Func %d, iSCSI mode: %s, IP version: %s",
       MacString,
       NicInfo->BusNumber,
@@ -2344,12 +2390,12 @@ IScsiGetConfigData (
     if (mPrivate->SinglePathCount == 0) {
       return EFI_NOT_FOUND;
     }
+
     mPrivate->ValidSinglePathCount = mPrivate->SinglePathCount;
   }
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Get the device path of the iSCSI tcp connection and update it.
@@ -2362,7 +2408,7 @@ IScsiGetConfigData (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 IScsiGetTcpConnDevicePath (
-  IN ISCSI_SESSION      *Session
+  IN ISCSI_SESSION  *Session
   )
 {
   ISCSI_CONNECTION          *Conn;
@@ -2385,28 +2431,29 @@ IScsiGetTcpConnDevicePath (
   Status = gBS->HandleProtocol (
                   Conn->TcpIo.Handle,
                   &gEfiDevicePathProtocolGuid,
-                  (VOID **) &DevicePath
+                  (VOID **)&DevicePath
                   );
   if (EFI_ERROR (Status)) {
     return NULL;
   }
+
   //
   // Duplicate it.
   //
-  DevicePath  = DuplicateDevicePath (DevicePath);
+  DevicePath = DuplicateDevicePath (DevicePath);
   if (DevicePath == NULL) {
     return NULL;
   }
 
-  DPathNode   = (EFI_DEV_PATH *) DevicePath;
+  DPathNode = (EFI_DEV_PATH *)DevicePath;
 
   while (!IsDevicePathEnd (&DPathNode->DevPath)) {
     if (DevicePathType (&DPathNode->DevPath) == MESSAGING_DEVICE_PATH) {
-      if (!Conn->Ipv6Flag && DevicePathSubType (&DPathNode->DevPath) == MSG_IPv4_DP) {
-        DPathNode->Ipv4.LocalPort       = 0;
+      if (!Conn->Ipv6Flag && (DevicePathSubType (&DPathNode->DevPath) == MSG_IPv4_DP)) {
+        DPathNode->Ipv4.LocalPort = 0;
 
         DPathNode->Ipv4.StaticIpAddress =
-          (BOOLEAN) (!Session->ConfigData->SessionConfigData.InitiatorInfoFromDhcp);
+          (BOOLEAN)(!Session->ConfigData->SessionConfigData.InitiatorInfoFromDhcp);
 
         //
         //  Add a judgement here to support previous versions of IPv4_DEVICE_PATH.
@@ -2418,7 +2465,6 @@ IScsiGetTcpConnDevicePath (
         PathLen = DevicePathNodeLength (&DPathNode->Ipv4);
 
         if (PathLen == IP4_NODE_LEN_NEW_VERSIONS) {
-
           IP4_COPY_ADDRESS (
             &DPathNode->Ipv4.GatewayIpAddress,
             &Session->ConfigData->SessionConfigData.Gateway
@@ -2431,8 +2477,8 @@ IScsiGetTcpConnDevicePath (
         }
 
         break;
-      } else if (Conn->Ipv6Flag && DevicePathSubType (&DPathNode->DevPath) == MSG_IPv6_DP) {
-        DPathNode->Ipv6.LocalPort       = 0;
+      } else if (Conn->Ipv6Flag && (DevicePathSubType (&DPathNode->DevPath) == MSG_IPv6_DP)) {
+        DPathNode->Ipv6.LocalPort = 0;
 
         //
         //  Add a judgement here to support previous versions of IPv6_DEVICE_PATH.
@@ -2445,31 +2491,27 @@ IScsiGetTcpConnDevicePath (
         PathLen = DevicePathNodeLength (&DPathNode->Ipv6);
 
         if (PathLen == IP6_NODE_LEN_NEW_VERSIONS ) {
-
           DPathNode->Ipv6.IpAddressOrigin = 0;
           DPathNode->Ipv6.PrefixLength    = IP6_PREFIX_LENGTH;
           ZeroMem (&DPathNode->Ipv6.GatewayIpAddress, sizeof (EFI_IPv6_ADDRESS));
-        }
-        else if (PathLen == IP6_NODE_LEN_OLD_VERSIONS) {
-
+        } else if (PathLen == IP6_NODE_LEN_OLD_VERSIONS) {
           //
           //  StaticIPAddress is a field in old versions of IPv6_DEVICE_PATH, while ignored in new
           //  version. Set StaticIPAddress through its' offset in old IPv6_DEVICE_PATH.
           //
           *((UINT8 *)(&DPathNode->Ipv6) + IP6_OLD_IPADDRESS_OFFSET) =
-            (BOOLEAN) (!Session->ConfigData->SessionConfigData.InitiatorInfoFromDhcp);
+            (BOOLEAN)(!Session->ConfigData->SessionConfigData.InitiatorInfoFromDhcp);
         }
 
         break;
       }
     }
 
-    DPathNode = (EFI_DEV_PATH *) NextDevicePathNode (&DPathNode->DevPath);
+    DPathNode = (EFI_DEV_PATH *)NextDevicePathNode (&DPathNode->DevPath);
   }
 
   return DevicePath;
 }
-
 
 /**
   Abort the session when the transition from BS to RT is initiated.
@@ -2485,9 +2527,9 @@ IScsiOnExitBootService (
   IN VOID       *Context
   )
 {
-  ISCSI_DRIVER_DATA *Private;
+  ISCSI_DRIVER_DATA  *Private;
 
-  Private = (ISCSI_DRIVER_DATA *) Context;
+  Private = (ISCSI_DRIVER_DATA *)Context;
 
   gBS->CloseEvent (Private->ExitBootServiceEvent);
   Private->ExitBootServiceEvent = NULL;
@@ -2523,14 +2565,14 @@ IScsiOnExitBootService (
 EFI_STATUS
 EFIAPI
 IScsiTestManagedDevice (
-  IN  EFI_HANDLE       ControllerHandle,
-  IN  EFI_HANDLE       DriverBindingHandle,
-  IN  EFI_GUID         *ProtocolGuid
+  IN  EFI_HANDLE  ControllerHandle,
+  IN  EFI_HANDLE  DriverBindingHandle,
+  IN  EFI_GUID    *ProtocolGuid
   )
 {
-  EFI_STATUS     Status;
-  VOID           *ManagedInterface;
-  EFI_HANDLE     NicControllerHandle;
+  EFI_STATUS  Status;
+  VOID        *ManagedInterface;
+  EFI_HANDLE  NicControllerHandle;
 
   ASSERT (ProtocolGuid != NULL);
 
@@ -2541,7 +2583,7 @@ IScsiTestManagedDevice (
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  (EFI_GUID *) ProtocolGuid,
+                  (EFI_GUID *)ProtocolGuid,
                   &ManagedInterface,
                   DriverBindingHandle,
                   NicControllerHandle,
@@ -2550,7 +2592,7 @@ IScsiTestManagedDevice (
   if (!EFI_ERROR (Status)) {
     gBS->CloseProtocol (
            ControllerHandle,
-           (EFI_GUID *) ProtocolGuid,
+           (EFI_GUID *)ProtocolGuid,
            DriverBindingHandle,
            NicControllerHandle
            );

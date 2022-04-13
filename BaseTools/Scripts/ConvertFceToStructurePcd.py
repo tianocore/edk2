@@ -142,7 +142,7 @@ class parser_lst(object):
                       line.append(struct)
                       unparse.append(line)
                   else:
-                    if uint not in ['UINT8', 'UINT16', 'UINT32', 'UINT64']:
+                    if uint not in ['UINT8', 'UINT16', 'UINT32', 'UINT64', 'BOOLEAN']:
                       line = [offset, t_name, 0, uint]
                       line.append(struct)
                       unparse.append(line)
@@ -284,7 +284,15 @@ class Config(object):
         line=x.split('\n')[0]
         comment_list = value_re.findall(line) # the string \\... in "Q...." line
         comment_list[0] = comment_list[0].replace('//', '')
-        comment = comment_list[0].strip()
+        comment_ori = comment_list[0].strip()
+        comment = ""
+        for each in comment_ori:
+            if each != " " and "\x21" > each or each > "\x7E":
+                if bytes(each, 'utf-16') == b'\xff\xfe\xae\x00':
+                    each = '(R)'
+                else:
+                    each = ""
+            comment += each
         line=value_re.sub('',line) #delete \\... in "Q...." line
         list1=line.split(' ')
         value=self.value_parser(list1)
@@ -561,7 +569,7 @@ class mainprocess(object):
     for i in List:
       for j in i:
         tmp = j.split("|")
-        if (('L"' in j) and ("[" in j)) or (tmp[1].strip() == '{0x0, 0x0}'):
+        if (('L"' in j) and ("[" in j)) or (tmp[1].split("#")[0].strip() == '{0x0, 0x0}'):
           tmp[0] = tmp[0][:tmp[0].index('[')]
           List[List.index(i)][i.index(j)] = "|".join(tmp)
         else:

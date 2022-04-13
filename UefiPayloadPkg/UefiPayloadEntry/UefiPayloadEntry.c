@@ -1,36 +1,106 @@
 /** @file
 
-  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
+#include <Guid/MemoryTypeInformation.h>
 #include "UefiPayloadEntry.h"
+
+STATIC UINT32  mTopOfLowerUsableDram = 0;
+
+EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
+  { EfiACPIReclaimMemory,   FixedPcdGet32 (PcdMemoryTypeEfiACPIReclaimMemory)   },
+  { EfiACPIMemoryNVS,       FixedPcdGet32 (PcdMemoryTypeEfiACPIMemoryNVS)       },
+  { EfiReservedMemoryType,  FixedPcdGet32 (PcdMemoryTypeEfiReservedMemoryType)  },
+  { EfiRuntimeServicesData, FixedPcdGet32 (PcdMemoryTypeEfiRuntimeServicesData) },
+  { EfiRuntimeServicesCode, FixedPcdGet32 (PcdMemoryTypeEfiRuntimeServicesCode) },
+  { EfiMaxMemoryType,       0                                                   }
+};
+
+/**
+   Function to reserve memory below 4GB for EDKII Modules.
+
+   This causes the DXE to dispatch everything under 4GB and allows Operating
+   System's that require EFI_LOADED_IMAGE to be under 4GB to start.
+   e.g. Xen hypervisor used in Qubes.
+**/
+VOID
+ForceModulesBelow4G (
+  VOID
+  )
+{
+  DEBUG ((DEBUG_INFO, "Building hob to restrict memory resorces to below 4G.\n"));
+
+  //
+  // Create Memory Type Information HOB
+  //
+  BuildGuidDataHob (
+    &gEfiMemoryTypeInformationGuid,
+    mDefaultMemoryTypeInformation,
+    sizeof (mDefaultMemoryTypeInformation)
+    );
+}
 
 /**
    Callback function to build resource descriptor HOB
 
    This function build a HOB based on the memory map entry info.
+   It creates only EFI_RESOURCE_MEMORY_MAPPED_IO and EFI_RESOURCE_MEMORY_RESERVED
+   resources.
 
    @param MemoryMapEntry         Memory map entry info got from bootloader.
-   @param Params                 Not used for now.
+   @param Params                 A pointer to ACPI_BOARD_INFO.
 
-  @retval RETURN_SUCCESS        Successfully build a HOB.
+  @retval EFI_SUCCESS            Successfully build a HOB.
+  @retval EFI_INVALID_PARAMETER  Invalid parameter provided.
 **/
 EFI_STATUS
-MemInfoCallback (
-  IN MEMROY_MAP_ENTRY          *MemoryMapEntry,
-  IN VOID                      *Params
+MemInfoCallbackMmio (
+  IN MEMORY_MAP_ENTRY  *MemoryMapEntry,
+  IN VOID              *Params
   )
 {
   EFI_PHYSICAL_ADDRESS         Base;
   EFI_RESOURCE_TYPE            Type;
   UINT64                       Size;
   EFI_RESOURCE_ATTRIBUTE_TYPE  Attribue;
+  ACPI_BOARD_INFO              *AcpiBoardInfo;
 
-  Type    = (MemoryMapEntry->Type == 1) ? EFI_RESOURCE_SYSTEM_MEMORY : EFI_RESOURCE_MEMORY_RESERVED;
-  Base    = MemoryMapEntry->Base;
-  Size    = MemoryMapEntry->Size;
+  AcpiBoardInfo = (ACPI_BOARD_INFO *)Params;
+  if (AcpiBoardInfo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Skip types already handled in MemInfoCallback
+  //
+  if ((MemoryMapEntry->Type == E820_RAM) || (MemoryMapEntry->Type == E820_ACPI)) {
+    return EFI_SUCCESS;
+  }
+
+  if (MemoryMapEntry->Base == AcpiBoardInfo->PcieBaseAddress) {
+    //
+    // MMCONF is always MMIO
+    //
+    Type = EFI_RESOURCE_MEMORY_MAPPED_IO;
+  } else if (MemoryMapEntry->Base < mTopOfLowerUsableDram) {
+    //
+    // It's in DRAM and thus must be reserved
+    //
+    Type = EFI_RESOURCE_MEMORY_RESERVED;
+  } else if ((MemoryMapEntry->Base < 0x100000000ULL) && (MemoryMapEntry->Base >= mTopOfLowerUsableDram)) {
+    //
+    // It's not in DRAM, must be MMIO
+    //
+    Type = EFI_RESOURCE_MEMORY_MAPPED_IO;
+  } else {
+    Type = EFI_RESOURCE_MEMORY_RESERVED;
+  }
+
+  Base = MemoryMapEntry->Base;
+  Size = MemoryMapEntry->Size;
 
   Attribue = EFI_RESOURCE_ATTRIBUTE_PRESENT |
              EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
@@ -40,179 +110,141 @@ MemInfoCallback (
              EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
              EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE;
 
-  if (Base >= BASE_4GB ) {
-    // Remove tested attribute to avoid DXE core to dispatch driver to memory above 4GB
-    Attribue &= ~EFI_RESOURCE_ATTRIBUTE_TESTED;
+  BuildResourceDescriptorHob (Type, Attribue, (EFI_PHYSICAL_ADDRESS)Base, Size);
+  DEBUG ((DEBUG_INFO, "buildhob: base = 0x%lx, size = 0x%lx, type = 0x%x\n", Base, Size, Type));
+
+  if ((MemoryMapEntry->Type == E820_UNUSABLE) ||
+      (MemoryMapEntry->Type == E820_DISABLED))
+  {
+    BuildMemoryAllocationHob (Base, Size, EfiUnusableMemory);
+  } else if (MemoryMapEntry->Type == E820_PMEM) {
+    BuildMemoryAllocationHob (Base, Size, EfiPersistentMemory);
   }
 
-  BuildResourceDescriptorHob (Type, Attribue, (EFI_PHYSICAL_ADDRESS)Base, Size);
-  DEBUG ((DEBUG_INFO , "buildhob: base = 0x%lx, size = 0x%lx, type = 0x%x\n", Base, Size, Type));
-
-  return RETURN_SUCCESS;
+  return EFI_SUCCESS;
 }
-
-
 
 /**
-  Find the board related info from ACPI table
+   Callback function to find TOLUD (Top of Lower Usable DRAM)
 
-  @param  AcpiTableBase          ACPI table start address in memory
-  @param  AcpiBoardInfo          Pointer to the acpi board info strucutre
+   Estimate where TOLUD (Top of Lower Usable DRAM) resides. The exact position
+   would require platform specific code.
 
-  @retval RETURN_SUCCESS     Successfully find out all the required information.
-  @retval RETURN_NOT_FOUND   Failed to find the required info.
+   @param MemoryMapEntry         Memory map entry info got from bootloader.
+   @param Params                 Not used for now.
 
+  @retval EFI_SUCCESS            Successfully updated mTopOfLowerUsableDram.
 **/
-RETURN_STATUS
-ParseAcpiInfo (
-  IN   UINT64                                   AcpiTableBase,
-  OUT  ACPI_BOARD_INFO                          *AcpiBoardInfo
+EFI_STATUS
+FindToludCallback (
+  IN MEMORY_MAP_ENTRY  *MemoryMapEntry,
+  IN VOID              *Params
   )
 {
-  EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp;
-  EFI_ACPI_DESCRIPTION_HEADER                   *Rsdt;
-  UINT32                                        *Entry32;
-  UINTN                                         Entry32Num;
-  EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE     *Fadt;
-  EFI_ACPI_DESCRIPTION_HEADER                   *Xsdt;
-  UINT64                                        *Entry64;
-  UINTN                                         Entry64Num;
-  UINTN                                         Idx;
-  UINT32                                        *Signature;
-  EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER *MmCfgHdr;
-  EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE *MmCfgBase;
-
-  Rsdp = (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER *)(UINTN)AcpiTableBase;
-  DEBUG ((DEBUG_INFO, "Rsdp at 0x%p\n", Rsdp));
-  DEBUG ((DEBUG_INFO, "Rsdt at 0x%x, Xsdt at 0x%lx\n", Rsdp->RsdtAddress, Rsdp->XsdtAddress));
+  //
+  // This code assumes that the memory map on this x86 machine below 4GiB is continous
+  // until TOLUD. In addition it assumes that the bootloader provided memory tables have
+  // no "holes" and thus the first memory range not covered by e820 marks the end of
+  // usable DRAM. In addition it's assumed that every reserved memory region touching
+  // usable RAM is also covering DRAM, everything else that is marked reserved thus must be
+  // MMIO not detectable by bootloader/OS
+  //
 
   //
-  // Search Rsdt First
+  // Skip memory types not RAM or reserved
   //
-  Fadt     = NULL;
-  MmCfgHdr = NULL;
-  Rsdt     = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)(Rsdp->RsdtAddress);
-  if (Rsdt != NULL) {
-    Entry32  = (UINT32 *)(Rsdt + 1);
-    Entry32Num = (Rsdt->Length - sizeof(EFI_ACPI_DESCRIPTION_HEADER)) >> 2;
-    for (Idx = 0; Idx < Entry32Num; Idx++) {
-      Signature = (UINT32 *)(UINTN)Entry32[Idx];
-      if (*Signature == EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
-        Fadt = (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)Signature;
-        DEBUG ((DEBUG_INFO, "Found Fadt in Rsdt\n"));
-      }
+  if ((MemoryMapEntry->Type == E820_UNUSABLE) || (MemoryMapEntry->Type == E820_DISABLED) ||
+      (MemoryMapEntry->Type == E820_PMEM))
+  {
+    return EFI_SUCCESS;
+  }
 
-      if (*Signature == EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE) {
-        MmCfgHdr = (EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER *)Signature;
-        DEBUG ((DEBUG_INFO, "Found MM config address in Rsdt\n"));
-      }
+  //
+  // Skip resources above 4GiB
+  //
+  if ((MemoryMapEntry->Base + MemoryMapEntry->Size) > 0x100000000ULL) {
+    return EFI_SUCCESS;
+  }
 
-      if ((Fadt != NULL) && (MmCfgHdr != NULL)) {
-        goto Done;
-      }
+  if ((MemoryMapEntry->Type == E820_RAM) || (MemoryMapEntry->Type == E820_ACPI) ||
+      (MemoryMapEntry->Type == E820_NVS))
+  {
+    //
+    // It's usable DRAM. Update TOLUD.
+    //
+    if (mTopOfLowerUsableDram < (MemoryMapEntry->Base + MemoryMapEntry->Size)) {
+      mTopOfLowerUsableDram = (UINT32)(MemoryMapEntry->Base + MemoryMapEntry->Size);
     }
-  }
-
-  //
-  // Search Xsdt Second
-  //
-  Xsdt     = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)(Rsdp->XsdtAddress);
-  if (Xsdt != NULL) {
-    Entry64  = (UINT64 *)(Xsdt + 1);
-    Entry64Num = (Xsdt->Length - sizeof(EFI_ACPI_DESCRIPTION_HEADER)) >> 3;
-    for (Idx = 0; Idx < Entry64Num; Idx++) {
-      Signature = (UINT32 *)(UINTN)Entry64[Idx];
-      if (*Signature == EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
-        Fadt = (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)Signature;
-        DEBUG ((DEBUG_INFO, "Found Fadt in Xsdt\n"));
-      }
-
-      if (*Signature == EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE) {
-        MmCfgHdr = (EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER *)Signature;
-        DEBUG ((DEBUG_INFO, "Found MM config address in Xsdt\n"));
-      }
-
-      if ((Fadt != NULL) && (MmCfgHdr != NULL)) {
-        goto Done;
-      }
-    }
-  }
-
-  if (Fadt == NULL) {
-    return RETURN_NOT_FOUND;
-  }
-
-Done:
-
-  AcpiBoardInfo->PmCtrlRegBase   = Fadt->Pm1aCntBlk;
-  AcpiBoardInfo->PmTimerRegBase  = Fadt->PmTmrBlk;
-  AcpiBoardInfo->ResetRegAddress = Fadt->ResetReg.Address;
-  AcpiBoardInfo->ResetValue      = Fadt->ResetValue;
-  AcpiBoardInfo->PmEvtBase       = Fadt->Pm1aEvtBlk;
-  AcpiBoardInfo->PmGpeEnBase     = Fadt->Gpe0Blk + Fadt->Gpe0BlkLen / 2;
-
-  if (MmCfgHdr != NULL) {
-    MmCfgBase = (EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE *)((UINT8*) MmCfgHdr + sizeof (*MmCfgHdr));
-    AcpiBoardInfo->PcieBaseAddress = MmCfgBase->BaseAddress;
-    AcpiBoardInfo->PcieBaseSize = (MmCfgBase->EndBusNumber + 1 - MmCfgBase->StartBusNumber) * 4096 * 32 * 8;
   } else {
-    AcpiBoardInfo->PcieBaseAddress = 0;
-    AcpiBoardInfo->PcieBaseSize = 0;
+    //
+    // It might be 'reserved DRAM' or 'MMIO'.
+    //
+    // If it touches usable DRAM at Base assume it's DRAM as well,
+    // as it could be bootloader installed tables, TSEG, GTT, ...
+    //
+    if (mTopOfLowerUsableDram == MemoryMapEntry->Base) {
+      mTopOfLowerUsableDram = (UINT32)(MemoryMapEntry->Base + MemoryMapEntry->Size);
+    }
   }
-  DEBUG ((DEBUG_INFO, "PmCtrl  Reg 0x%lx\n",  AcpiBoardInfo->PmCtrlRegBase));
-  DEBUG ((DEBUG_INFO, "PmTimer Reg 0x%lx\n",  AcpiBoardInfo->PmTimerRegBase));
-  DEBUG ((DEBUG_INFO, "Reset   Reg 0x%lx\n",  AcpiBoardInfo->ResetRegAddress));
-  DEBUG ((DEBUG_INFO, "Reset   Value 0x%x\n", AcpiBoardInfo->ResetValue));
-  DEBUG ((DEBUG_INFO, "PmEvt   Reg 0x%lx\n",  AcpiBoardInfo->PmEvtBase));
-  DEBUG ((DEBUG_INFO, "PmGpeEn Reg 0x%lx\n",  AcpiBoardInfo->PmGpeEnBase));
-  DEBUG ((DEBUG_INFO, "PcieBaseAddr 0x%lx\n", AcpiBoardInfo->PcieBaseAddress));
-  DEBUG ((DEBUG_INFO, "PcieBaseSize 0x%lx\n", AcpiBoardInfo->PcieBaseSize));
+
+  return EFI_SUCCESS;
+}
+
+/**
+   Callback function to build resource descriptor HOB
+
+   This function build a HOB based on the memory map entry info.
+   Only add EFI_RESOURCE_SYSTEM_MEMORY.
+
+   @param MemoryMapEntry         Memory map entry info got from bootloader.
+   @param Params                 Not used for now.
+
+  @retval RETURN_SUCCESS        Successfully build a HOB.
+**/
+EFI_STATUS
+MemInfoCallback (
+  IN MEMORY_MAP_ENTRY  *MemoryMapEntry,
+  IN VOID              *Params
+  )
+{
+  EFI_PHYSICAL_ADDRESS         Base;
+  EFI_RESOURCE_TYPE            Type;
+  UINT64                       Size;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  Attribue;
 
   //
-  // Verify values for proper operation
+  // Skip everything not known to be usable DRAM.
+  // It will be added later.
   //
-  ASSERT(Fadt->Pm1aCntBlk != 0);
-  ASSERT(Fadt->PmTmrBlk != 0);
-  ASSERT(Fadt->ResetReg.Address != 0);
-  ASSERT(Fadt->Pm1aEvtBlk != 0);
-  ASSERT(Fadt->Gpe0Blk != 0);
+  if ((MemoryMapEntry->Type != E820_RAM) && (MemoryMapEntry->Type != E820_ACPI) &&
+      (MemoryMapEntry->Type != E820_NVS))
+  {
+    return RETURN_SUCCESS;
+  }
 
-  DEBUG_CODE_BEGIN ();
-    BOOLEAN    SciEnabled;
+  Type = EFI_RESOURCE_SYSTEM_MEMORY;
+  Base = MemoryMapEntry->Base;
+  Size = MemoryMapEntry->Size;
 
-    //
-    // Check the consistency of SCI enabling
-    //
+  Attribue = EFI_RESOURCE_ATTRIBUTE_PRESENT |
+             EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+             EFI_RESOURCE_ATTRIBUTE_TESTED |
+             EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+             EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+             EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+             EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE;
 
-    //
-    // Get SCI_EN value
-    //
-   if (Fadt->Pm1CntLen == 4) {
-      SciEnabled = (IoRead32 (Fadt->Pm1aCntBlk) & BIT0)? TRUE : FALSE;
-    } else {
-      //
-      // if (Pm1CntLen == 2), use 16 bit IO read;
-      // if (Pm1CntLen != 2 && Pm1CntLen != 4), use 16 bit IO read as a fallback
-      //
-      SciEnabled = (IoRead16 (Fadt->Pm1aCntBlk) & BIT0)? TRUE : FALSE;
-    }
+  BuildResourceDescriptorHob (Type, Attribue, (EFI_PHYSICAL_ADDRESS)Base, Size);
+  DEBUG ((DEBUG_INFO, "buildhob: base = 0x%lx, size = 0x%lx, type = 0x%x\n", Base, Size, Type));
 
-    if (!(Fadt->Flags & EFI_ACPI_5_0_HW_REDUCED_ACPI) &&
-        (Fadt->SmiCmd == 0) &&
-       !SciEnabled) {
-      //
-      // The ACPI enabling status is inconsistent: SCI is not enabled but ACPI
-      // table does not provide a means to enable it through FADT->SmiCmd
-      //
-      DEBUG ((DEBUG_ERROR, "ERROR: The ACPI enabling status is inconsistent: SCI is not"
-        " enabled but the ACPI table does not provide a means to enable it through FADT->SmiCmd."
-        " This may cause issues in OS.\n"));
-    }
-  DEBUG_CODE_END ();
+  if (MemoryMapEntry->Type == E820_ACPI) {
+    BuildMemoryAllocationHob (Base, Size, EfiACPIReclaimMemory);
+  } else if (MemoryMapEntry->Type == E820_NVS) {
+    BuildMemoryAllocationHob (Base, Size, EfiACPIMemoryNVS);
+  }
 
   return RETURN_SUCCESS;
 }
-
 
 /**
   It will build HOBs based on information from bootloaders.
@@ -225,21 +257,32 @@ BuildHobFromBl (
   VOID
   )
 {
-  EFI_STATUS                       Status;
-  SYSTEM_TABLE_INFO                SysTableInfo;
-  SYSTEM_TABLE_INFO                *NewSysTableInfo;
-  ACPI_BOARD_INFO                  AcpiBoardInfo;
-  ACPI_BOARD_INFO                  *NewAcpiBoardInfo;
-  EFI_PEI_GRAPHICS_INFO_HOB        GfxInfo;
-  EFI_PEI_GRAPHICS_INFO_HOB        *NewGfxInfo;
-  EFI_PEI_GRAPHICS_DEVICE_INFO_HOB GfxDeviceInfo;
-  EFI_PEI_GRAPHICS_DEVICE_INFO_HOB *NewGfxDeviceInfo;
+  EFI_STATUS                        Status;
+  ACPI_BOARD_INFO                   *AcpiBoardInfo;
+  EFI_PEI_GRAPHICS_INFO_HOB         GfxInfo;
+  EFI_PEI_GRAPHICS_INFO_HOB         *NewGfxInfo;
+  EFI_PEI_GRAPHICS_DEVICE_INFO_HOB  GfxDeviceInfo;
+  EFI_PEI_GRAPHICS_DEVICE_INFO_HOB  *NewGfxDeviceInfo;
+  UNIVERSAL_PAYLOAD_SMBIOS_TABLE    *SmBiosTableHob;
+  UNIVERSAL_PAYLOAD_ACPI_TABLE      *AcpiTableHob;
 
   //
-  // Parse memory info and build memory HOBs
+  // First find TOLUD
   //
+  DEBUG ((DEBUG_INFO, "Guessing Top of Lower Usable DRAM:\n"));
+  Status = ParseMemoryInfo (FindToludCallback, NULL);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  DEBUG ((DEBUG_INFO, "Assuming TOLUD = 0x%x\n", mTopOfLowerUsableDram));
+
+  //
+  // Parse memory info and build memory HOBs for Usable RAM
+  //
+  DEBUG ((DEBUG_INFO, "Building ResourceDescriptorHobs for usable memory:\n"));
   Status = ParseMemoryInfo (MemInfoCallback, NULL);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
@@ -254,7 +297,6 @@ BuildHobFromBl (
     DEBUG ((DEBUG_INFO, "Created graphics info hob\n"));
   }
 
-
   Status = ParseGfxDeviceInfo (&GfxDeviceInfo);
   if (!EFI_ERROR (Status)) {
     NewGfxDeviceInfo = BuildGuidHob (&gEfiGraphicsDeviceInfoHobGuid, sizeof (GfxDeviceInfo));
@@ -263,30 +305,53 @@ BuildHobFromBl (
     DEBUG ((DEBUG_INFO, "Created graphics device info hob\n"));
   }
 
+  //
+  // Creat SmBios table Hob
+  //
+  SmBiosTableHob = BuildGuidHob (&gUniversalPayloadSmbiosTableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
+  ASSERT (SmBiosTableHob != NULL);
+  SmBiosTableHob->Header.Revision = UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION;
+  SmBiosTableHob->Header.Length   = sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE);
+  DEBUG ((DEBUG_INFO, "Create smbios table gUniversalPayloadSmbiosTableGuid guid hob\n"));
+  Status = ParseSmbiosTable (SmBiosTableHob);
+  if (!EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "Detected Smbios Table at 0x%lx\n", SmBiosTableHob->SmBiosEntryPoint));
+  }
 
   //
-  // Create guid hob for system tables like acpi table and smbios table
+  // Creat ACPI table Hob
   //
-  Status = ParseSystemTable(&SysTableInfo);
-  ASSERT_EFI_ERROR (Status);
+  AcpiTableHob = BuildGuidHob (&gUniversalPayloadAcpiTableGuid, sizeof (UNIVERSAL_PAYLOAD_ACPI_TABLE));
+  ASSERT (AcpiTableHob != NULL);
+  AcpiTableHob->Header.Revision = UNIVERSAL_PAYLOAD_ACPI_TABLE_REVISION;
+  AcpiTableHob->Header.Length   = sizeof (UNIVERSAL_PAYLOAD_ACPI_TABLE);
+  DEBUG ((DEBUG_INFO, "Create ACPI table gUniversalPayloadAcpiTableGuid guid hob\n"));
+  Status = ParseAcpiTableInfo (AcpiTableHob);
   if (!EFI_ERROR (Status)) {
-    NewSysTableInfo = BuildGuidHob (&gUefiSystemTableInfoGuid, sizeof (SYSTEM_TABLE_INFO));
-    ASSERT (NewSysTableInfo != NULL);
-    CopyMem (NewSysTableInfo, &SysTableInfo, sizeof (SYSTEM_TABLE_INFO));
-    DEBUG ((DEBUG_INFO, "Detected Acpi Table at 0x%lx, length 0x%x\n", SysTableInfo.AcpiTableBase, SysTableInfo.AcpiTableSize));
-    DEBUG ((DEBUG_INFO, "Detected Smbios Table at 0x%lx, length 0x%x\n", SysTableInfo.SmbiosTableBase, SysTableInfo.SmbiosTableSize));
+    DEBUG ((DEBUG_INFO, "Detected ACPI Table at 0x%lx\n", AcpiTableHob->Rsdp));
   }
 
   //
   // Create guid hob for acpi board information
   //
-  Status = ParseAcpiInfo (SysTableInfo.AcpiTableBase, &AcpiBoardInfo);
-  ASSERT_EFI_ERROR (Status);
-  if (!EFI_ERROR (Status)) {
-    NewAcpiBoardInfo = BuildGuidHob (&gUefiAcpiBoardInfoGuid, sizeof (ACPI_BOARD_INFO));
-    ASSERT (NewAcpiBoardInfo != NULL);
-    CopyMem (NewAcpiBoardInfo, &AcpiBoardInfo, sizeof (ACPI_BOARD_INFO));
-    DEBUG ((DEBUG_INFO, "Create acpi board info guid hob\n"));
+  AcpiBoardInfo = BuildHobFromAcpi (AcpiTableHob->Rsdp);
+  ASSERT (AcpiBoardInfo != NULL);
+
+  //
+  // Parse memory info and build memory HOBs for reserved DRAM and MMIO
+  //
+  DEBUG ((DEBUG_INFO, "Building ResourceDescriptorHobs for reserved memory:\n"));
+  Status = ParseMemoryInfo (MemInfoCallbackMmio, AcpiBoardInfo);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Parse the misc info provided by bootloader
+  //
+  Status = ParseMiscInfo ();
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "Error when parsing misc info, Status = %r\n", Status));
   }
 
   //
@@ -301,7 +366,6 @@ BuildHobFromBl (
   return EFI_SUCCESS;
 }
 
-
 /**
   This function will build some generic HOBs that doesn't depend on information from bootloaders.
 
@@ -311,9 +375,9 @@ BuildGenericHob (
   VOID
   )
 {
-  UINT32                           RegEax;
-  UINT8                            PhysicalAddressBits;
-  EFI_RESOURCE_ATTRIBUTE_TYPE      ResourceAttribute;
+  UINT32                       RegEax;
+  UINT8                        PhysicalAddressBits;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute;
 
   // The UEFI payload FV
   BuildMemoryAllocationHob (PcdGet32 (PcdPayloadFdMemBase), PcdGet32 (PcdPayloadFdMemSize), EfiBootServicesData);
@@ -324,9 +388,9 @@ BuildGenericHob (
   AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
   if (RegEax >= 0x80000008) {
     AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-    PhysicalAddressBits = (UINT8) RegEax;
+    PhysicalAddressBits = (UINT8)RegEax;
   } else {
-    PhysicalAddressBits  = 36;
+    PhysicalAddressBits = 36;
   }
 
   BuildCpuHob (PhysicalAddressBits, 16);
@@ -335,42 +399,39 @@ BuildGenericHob (
   // Report Local APIC range, cause sbl HOB to be NULL, comment now
   //
   ResourceAttribute = (
-      EFI_RESOURCE_ATTRIBUTE_PRESENT |
-      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_TESTED
-  );
+                       EFI_RESOURCE_ATTRIBUTE_PRESENT |
+                       EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+                       EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+                       EFI_RESOURCE_ATTRIBUTE_TESTED
+                       );
   BuildResourceDescriptorHob (EFI_RESOURCE_MEMORY_MAPPED_IO, ResourceAttribute, 0xFEC80000, SIZE_512KB);
-  BuildMemoryAllocationHob ( 0xFEC80000, SIZE_512KB, EfiMemoryMappedIO);
-
+  BuildMemoryAllocationHob (0xFEC80000, SIZE_512KB, EfiMemoryMappedIO);
 }
-
 
 /**
   Entry point to the C language phase of UEFI payload.
+
+  @param[in]   BootloaderParameter    The starting address of bootloader parameter block.
 
   @retval      It will not return if SUCCESS, and return error when passing bootloader parameter.
 **/
 EFI_STATUS
 EFIAPI
-PayloadEntry (
-  IN UINTN                     BootloaderParameter
+_ModuleEntryPoint (
+  IN UINTN  BootloaderParameter
   )
 {
-  EFI_STATUS                    Status;
-  PHYSICAL_ADDRESS              DxeCoreEntryPoint;
-  EFI_HOB_HANDOFF_INFO_TABLE    *HandoffHobTable;
-  UINTN                         MemBase;
-  UINTN                         MemSize;
-  UINTN                         HobMemBase;
-  UINTN                         HobMemTop;
-  EFI_PEI_HOB_POINTERS          Hob;
+  EFI_STATUS                          Status;
+  PHYSICAL_ADDRESS                    DxeCoreEntryPoint;
+  UINTN                               MemBase;
+  UINTN                               HobMemBase;
+  UINTN                               HobMemTop;
+  EFI_PEI_HOB_POINTERS                Hob;
+  SERIAL_PORT_INFO                    SerialPortInfo;
+  UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *UniversalSerialPort;
 
-  // Call constructor for all libraries
-  ProcessLibraryConstructorList ();
-
-  DEBUG ((DEBUG_INFO, "GET_BOOTLOADER_PARAMETER() = 0x%lx\n", GET_BOOTLOADER_PARAMETER()));
-  DEBUG ((DEBUG_INFO, "sizeof(UINTN) = 0x%x\n", sizeof(UINTN)));
+  Status = PcdSet64S (PcdBootloaderParameter, BootloaderParameter);
+  ASSERT_EFI_ERROR (Status);
 
   // Initialize floating point operating environment to be compliant with UEFI spec.
   InitializeFloatingPointUnits ();
@@ -380,9 +441,26 @@ PayloadEntry (
   HobMemBase = ALIGN_VALUE (MemBase + PcdGet32 (PcdPayloadFdMemSize), SIZE_1MB);
   HobMemTop  = HobMemBase + FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
 
-  // DXE core assumes the memory below HOB region could be used, so include the FV region memory into HOB range.
-  MemSize    = HobMemTop - MemBase;
-  HandoffHobTable = HobConstructor ((VOID *)MemBase, MemSize, (VOID *)HobMemBase, (VOID *)HobMemTop);
+  HobConstructor ((VOID *)MemBase, (VOID *)HobMemTop, (VOID *)HobMemBase, (VOID *)HobMemTop);
+
+  //
+  // Build serial port info
+  //
+  Status = ParseSerialInfo (&SerialPortInfo);
+  if (!EFI_ERROR (Status)) {
+    UniversalSerialPort = BuildGuidHob (&gUniversalPayloadSerialPortInfoGuid, sizeof (UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO));
+    ASSERT (UniversalSerialPort != NULL);
+    UniversalSerialPort->Header.Revision = UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO_REVISION;
+    UniversalSerialPort->Header.Length   = sizeof (UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO);
+    UniversalSerialPort->UseMmio         = (SerialPortInfo.Type == 1) ? FALSE : TRUE;
+    UniversalSerialPort->RegisterBase    = SerialPortInfo.BaseAddr;
+    UniversalSerialPort->BaudRate        = SerialPortInfo.Baud;
+    UniversalSerialPort->RegisterStride  = (UINT8)SerialPortInfo.RegWidth;
+  }
+
+  // The library constructors might depend on serial port, so call it after serial port hob
+  ProcessLibraryConstructorList ();
+  DEBUG ((DEBUG_INFO, "sizeof(UINTN) = 0x%x\n", sizeof (UINTN)));
 
   // Build HOB based on information from Bootloader
   Status = BuildHobFromBl ();
@@ -394,6 +472,11 @@ PayloadEntry (
   // Build other HOBs required by DXE
   BuildGenericHob ();
 
+  // Create a HOB to make resources for EDKII modules below 4G
+  if (!FixedPcdGetBool (PcdDispatchModuleAbove4GMemory)) {
+    ForceModulesBelow4G ();
+  }
+
   // Load the DXE Core
   Status = LoadDxeCore (&DxeCoreEntryPoint);
   ASSERT_EFI_ERROR (Status);
@@ -404,9 +487,9 @@ PayloadEntry (
   // Mask off all legacy 8259 interrupt sources
   //
   IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0xFF);
-  IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE,  0xFF);
+  IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, 0xFF);
 
-  Hob.HandoffInformationTable = HandoffHobTable;
+  Hob.HandoffInformationTable = (EFI_HOB_HANDOFF_INFO_TABLE *)GetFirstHob (EFI_HOB_TYPE_HANDOFF);
   HandOffToDxeCore (DxeCoreEntryPoint, Hob);
 
   // Should not get here

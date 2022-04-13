@@ -16,14 +16,14 @@
   LIBRARY_CLASS                  = StandaloneMmMmuLib
   PI_SPECIFICATION_VERSION       = 0x00010032
 
-[Sources.AARCH64]
-  AArch64/ArmMmuStandaloneMmLib.c
+[Sources]
+  ArmMmuStandaloneMmLib.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
 
-[FeaturePcd.AARCH64]
+[FeaturePcd.ARM, FeaturePcd.AARCH64]
   gArmTokenSpaceGuid.PcdFfaEnable
 
 [LibraryClasses]

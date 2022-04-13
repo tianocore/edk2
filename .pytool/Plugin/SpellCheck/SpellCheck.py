@@ -37,12 +37,12 @@ class SpellCheck(ICiBuildPlugin):
     #
     # A package can remove any of these using IgnoreStandardPaths
     #
-    STANDARD_PLUGIN_DEFINED_PATHS = ["*.c", "*.h",
+    STANDARD_PLUGIN_DEFINED_PATHS = ("*.c", "*.h",
                                      "*.nasm", "*.asm", "*.masm", "*.s",
                                      "*.asl",
                                      "*.dsc", "*.dec", "*.fdf", "*.inf",
                                      "*.md", "*.txt"
-                                     ]
+                                     )
 
     def GetTestName(self, packagename: str, environment: VarDict) -> tuple:
         """ Provide the testcase name and classname for use in reporting
@@ -73,7 +73,7 @@ class SpellCheck(ICiBuildPlugin):
     def RunBuildPlugin(self, packagename, Edk2pathObj, pkgconfig, environment, PLM, PLMHelper, tc, output_stream=None):
         Errors = []
 
-        abs_pkg_path = Edk2pathObj.GetAbsolutePathOnThisSytemFromEdk2RelativePath(
+        abs_pkg_path = Edk2pathObj.GetAbsolutePathOnThisSystemFromEdk2RelativePath(
             packagename)
 
         if abs_pkg_path is None:
@@ -107,7 +107,8 @@ class SpellCheck(ICiBuildPlugin):
         version_aggregator.GetVersionAggregator().ReportVersion(
             "CSpell", cspell_version, version_aggregator.VersionTypes.INFO)
 
-        package_relative_paths_to_spell_check = SpellCheck.STANDARD_PLUGIN_DEFINED_PATHS
+        # copy the default as a list
+        package_relative_paths_to_spell_check = list(SpellCheck.STANDARD_PLUGIN_DEFINED_PATHS)
 
         #
         # Allow the ci.yaml to remove any of the above standard paths
@@ -133,7 +134,8 @@ class SpellCheck(ICiBuildPlugin):
         #
         relpath = os.path.relpath(abs_pkg_path)
         cpsell_paths = " ".join(
-            [f"{relpath}/**/{x}" for x in package_relative_paths_to_spell_check])
+            # Double quote each path to defer expansion to cspell parameters
+            [f'"{relpath}/**/{x}"' for x in package_relative_paths_to_spell_check])
 
         # Make the config file
         config_file_path = os.path.join(

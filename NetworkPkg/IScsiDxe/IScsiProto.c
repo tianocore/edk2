@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "IScsiImpl.h"
 
-UINT32 mDataSegPad = 0;
+UINT32  mDataSegPad = 0;
 
 /**
   Attach the iSCSI connection to the iSCSI session.
@@ -43,7 +43,6 @@ IScsiDetatchConnection (
   Conn->Session->NumConns--;
   Conn->Session = NULL;
 }
-
 
 /**
   Check the sequence number according to RFC3720.
@@ -80,7 +79,6 @@ IScsiCheckSN (
   }
 }
 
-
 /**
   Update the sequence numbers for the iSCSI command.
 
@@ -97,7 +95,7 @@ IScsiUpdateCmdSN (
   )
 {
   if (ISCSI_SEQ_LT (MaxCmdSN, ExpCmdSN - 1)) {
-    return ;
+    return;
   }
 
   if (ISCSI_SEQ_GT (MaxCmdSN, Session->MaxCmdSN)) {
@@ -108,7 +106,6 @@ IScsiUpdateCmdSN (
     Session->ExpCmdSN = ExpCmdSN;
   }
 }
-
 
 /**
   This function does the iSCSI connection login.
@@ -123,8 +120,8 @@ IScsiUpdateCmdSN (
 **/
 EFI_STATUS
 IScsiConnLogin (
-  IN OUT ISCSI_CONNECTION    *Conn,
-  IN     UINT16              Timeout
+  IN OUT ISCSI_CONNECTION  *Conn,
+  IN     UINT16            Timeout
   )
 {
   EFI_STATUS  Status;
@@ -171,7 +168,6 @@ IScsiConnLogin (
   return Status;
 }
 
-
 /**
   Reset the iSCSI connection.
 
@@ -186,7 +182,6 @@ IScsiConnReset (
   TcpIoReset (&Conn->TcpIo);
 }
 
-
 /**
   Create a TCP connection for the iSCSI session.
 
@@ -197,7 +192,7 @@ IScsiConnReset (
 **/
 ISCSI_CONNECTION *
 IScsiCreateConnection (
-  IN ISCSI_SESSION      *Session
+  IN ISCSI_SESSION  *Session
   )
 {
   ISCSI_DRIVER_DATA            *Private;
@@ -245,9 +240,9 @@ IScsiCreateConnection (
   //
   // Set the default connection-only parameters.
   //
-  Conn->MaxRecvDataSegmentLength  = DEFAULT_MAX_RECV_DATA_SEG_LEN;
-  Conn->HeaderDigest              = IScsiDigestNone;
-  Conn->DataDigest                = IScsiDigestNone;
+  Conn->MaxRecvDataSegmentLength = DEFAULT_MAX_RECV_DATA_SEG_LEN;
+  Conn->HeaderDigest             = IScsiDigestNone;
+  Conn->DataDigest               = IScsiDigestNone;
 
   if (NvData->DnsMode) {
     //
@@ -259,8 +254,8 @@ IScsiCreateConnection (
       Status = IScsiDns6 (Private->Image, Private->Controller, NvData);
     }
 
-    if (EFI_ERROR(Status)) {
-      DEBUG ((EFI_D_ERROR, "The configuration of Target address or DNS server address is invalid!\n"));
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "The configuration of Target address or DNS server address is invalid!\n"));
       FreePool (Conn);
       return NULL;
     }
@@ -292,7 +287,7 @@ IScsiCreateConnection (
   Status = TcpIoCreateSocket (
              Private->Image,
              Private->Controller,
-             (UINT8) (!Conn->Ipv6Flag ? TCP_VERSION_4: TCP_VERSION_6),
+             (UINT8)(!Conn->Ipv6Flag ? TCP_VERSION_4 : TCP_VERSION_6),
              &TcpIoConfig,
              &Conn->TcpIo
              );
@@ -304,7 +299,6 @@ IScsiCreateConnection (
 
   return Conn;
 }
-
 
 /**
   Destroy an iSCSI connection.
@@ -381,15 +375,16 @@ IScsiGetIp6NicInfo (
   }
 
   SubnetPrefixLength = 0;
-  RouteEntry = Ip6ModeData.RouteCount;
+  RouteEntry         = Ip6ModeData.RouteCount;
   for (Index = 0; Index < Ip6ModeData.RouteCount; Index++) {
     if (NetIp6IsNetEqual (TargetIp, &Ip6ModeData.RouteTable[Index].Destination, Ip6ModeData.RouteTable[Index].PrefixLength)) {
       if (SubnetPrefixLength < Ip6ModeData.RouteTable[Index].PrefixLength) {
         SubnetPrefixLength = Ip6ModeData.RouteTable[Index].PrefixLength;
-        RouteEntry = Index;
+        RouteEntry         = Index;
       }
     }
   }
+
   if (RouteEntry != Ip6ModeData.RouteCount) {
     IP6_COPY_ADDRESS (&NvData->Gateway, &Ip6ModeData.RouteTable[RouteEntry].Gateway);
   }
@@ -398,23 +393,48 @@ ON_EXIT:
   if (Ip6ModeData.AddressList != NULL) {
     FreePool (Ip6ModeData.AddressList);
   }
-  if (Ip6ModeData.GroupTable!= NULL) {
+
+  if (Ip6ModeData.GroupTable != NULL) {
     FreePool (Ip6ModeData.GroupTable);
   }
-  if (Ip6ModeData.RouteTable!= NULL) {
+
+  if (Ip6ModeData.RouteTable != NULL) {
     FreePool (Ip6ModeData.RouteTable);
   }
-  if (Ip6ModeData.NeighborCache!= NULL) {
+
+  if (Ip6ModeData.NeighborCache != NULL) {
     FreePool (Ip6ModeData.NeighborCache);
   }
-  if (Ip6ModeData.PrefixTable!= NULL) {
+
+  if (Ip6ModeData.PrefixTable != NULL) {
     FreePool (Ip6ModeData.PrefixTable);
   }
-  if (Ip6ModeData.IcmpTypeList!= NULL) {
+
+  if (Ip6ModeData.IcmpTypeList != NULL) {
     FreePool (Ip6ModeData.IcmpTypeList);
   }
 
   return Status;
+}
+
+/**
+  Re-set any stateful session-level authentication information that is used by
+  the leading login / leading connection.
+
+  (Note that this driver only supports a single connection per session -- see
+  ISCSI_MAX_CONNS_PER_SESSION.)
+
+  @param[in,out] Session  The iSCSI session.
+**/
+STATIC
+VOID
+IScsiSessionResetAuthData (
+  IN OUT ISCSI_SESSION  *Session
+  )
+{
+  if (Session->AuthType == ISCSI_AUTH_TYPE_CHAP) {
+    Session->AuthData.CHAP.Hash = NULL;
+  }
 }
 
 /**
@@ -470,6 +490,7 @@ IScsiSessionLogin (
     //
     // Login through the newly created connection.
     //
+    IScsiSessionResetAuthData (Session);
     Status = IScsiConnLogin (Conn, Session->ConfigData->SessionConfigData.ConnectTimeout);
     if (EFI_ERROR (Status)) {
       IScsiConnReset (Conn);
@@ -496,7 +517,7 @@ IScsiSessionLogin (
     Status = gBS->OpenProtocol (
                     Conn->TcpIo.Handle,
                     ProtocolGuid,
-                    (VOID **) &Tcp,
+                    (VOID **)&Tcp,
                     Session->Private->Image,
                     Session->Private->ExtScsiPassThruHandle,
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -511,7 +532,6 @@ IScsiSessionLogin (
 
   return Status;
 }
-
 
 /**
   Wait for IPsec negotiation, then try to login the iSCSI session again.
@@ -528,10 +548,9 @@ IScsiSessionReLogin (
   IN ISCSI_SESSION  *Session
   )
 {
-
-  EFI_STATUS                Status;
-  EFI_STATUS                TimerStatus;
-  EFI_EVENT                 Timer;
+  EFI_STATUS  Status;
+  EFI_STATUS  TimerStatus;
+  EFI_EVENT   Timer;
 
   Status = gBS->CreateEvent (EVT_TIMER, TPL_CALLBACK, NULL, NULL, &Timer);
   if (EFI_ERROR (Status)) {
@@ -550,19 +569,16 @@ IScsiSessionReLogin (
   }
 
   do {
-
     TimerStatus = gBS->CheckEvent (Timer);
 
     if (!EFI_ERROR (TimerStatus)) {
       Status = IScsiSessionLogin (Session);
     }
-
   } while (TimerStatus == EFI_NOT_READY);
 
   gBS->CloseEvent (Timer);
   return Status;
 }
-
 
 /**
   Build and send the iSCSI login request to the iSCSI target according to
@@ -591,6 +607,7 @@ IScsiSendLoginReq (
   if (Pdu == NULL) {
     return EFI_DEVICE_ERROR;
   }
+
   //
   // Send it to the iSCSI target.
   //
@@ -600,7 +617,6 @@ IScsiSendLoginReq (
 
   return Status;
 }
-
 
 /**
   Receive and process the iSCSI login response.
@@ -628,6 +644,7 @@ IScsiReceiveLoginRsp (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   ASSERT (Pdu != NULL);
 
   //
@@ -639,7 +656,6 @@ IScsiReceiveLoginRsp (
 
   return Status;
 }
-
 
 /**
   Add an iSCSI key-value pair as a string into the data segment of the Login Request PDU.
@@ -659,26 +675,27 @@ IScsiReceiveLoginRsp (
 **/
 EFI_STATUS
 IScsiAddKeyValuePair (
-  IN OUT NET_BUF      *Pdu,
-  IN CHAR8            *Key,
-  IN CHAR8            *Value
+  IN OUT NET_BUF  *Pdu,
+  IN CHAR8        *Key,
+  IN CHAR8        *Value
   )
 {
-  UINT32              DataSegLen;
-  UINT32              KeyLen;
-  UINT32              ValueLen;
-  UINT32              TotalLen;
-  ISCSI_LOGIN_REQUEST *LoginReq;
-  CHAR8               *Data;
+  UINT32               DataSegLen;
+  UINT32               KeyLen;
+  UINT32               ValueLen;
+  UINT32               TotalLen;
+  ISCSI_LOGIN_REQUEST  *LoginReq;
+  CHAR8                *Data;
 
-  LoginReq    = (ISCSI_LOGIN_REQUEST *) NetbufGetByte (Pdu, 0, NULL);
+  LoginReq = (ISCSI_LOGIN_REQUEST *)NetbufGetByte (Pdu, 0, NULL);
   if (LoginReq == NULL) {
     return EFI_PROTOCOL_ERROR;
   }
-  DataSegLen  = NTOH24 (LoginReq->DataSegmentLength);
 
-  KeyLen      = (UINT32) AsciiStrLen (Key);
-  ValueLen    = (UINT32) AsciiStrLen (Value);
+  DataSegLen = NTOH24 (LoginReq->DataSegmentLength);
+
+  KeyLen   = (UINT32)AsciiStrLen (Key);
+  ValueLen = (UINT32)AsciiStrLen (Value);
 
   //
   // 1 byte for the key value separator '=' and 1 byte for the null
@@ -689,10 +706,11 @@ IScsiAddKeyValuePair (
   //
   // Allocate the space for the key-value pair.
   //
-  Data = (CHAR8 *) NetbufAllocSpace (Pdu, TotalLen, NET_BUF_TAIL);
+  Data = (CHAR8 *)NetbufAllocSpace (Pdu, TotalLen, NET_BUF_TAIL);
   if (Data == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   //
   // Add the key.
   //
@@ -718,7 +736,6 @@ IScsiAddKeyValuePair (
   return EFI_SUCCESS;
 }
 
-
 /**
   Prepare the iSCSI login request to be sent according to the current login status.
 
@@ -733,23 +750,24 @@ IScsiPrepareLoginReq (
   IN OUT ISCSI_CONNECTION  *Conn
   )
 {
-  ISCSI_SESSION       *Session;
-  NET_BUF             *Nbuf;
-  ISCSI_LOGIN_REQUEST *LoginReq;
-  EFI_STATUS          Status;
+  ISCSI_SESSION        *Session;
+  NET_BUF              *Nbuf;
+  ISCSI_LOGIN_REQUEST  *LoginReq;
+  EFI_STATUS           Status;
 
   Session = Conn->Session;
 
-  Nbuf    = NetbufAlloc (sizeof (ISCSI_LOGIN_REQUEST) + DEFAULT_MAX_RECV_DATA_SEG_LEN);
+  Nbuf = NetbufAlloc (sizeof (ISCSI_LOGIN_REQUEST) + DEFAULT_MAX_RECV_DATA_SEG_LEN);
   if (Nbuf == NULL) {
     return NULL;
   }
 
-  LoginReq = (ISCSI_LOGIN_REQUEST *) NetbufAllocSpace (Nbuf, sizeof (ISCSI_LOGIN_REQUEST), NET_BUF_TAIL);
+  LoginReq = (ISCSI_LOGIN_REQUEST *)NetbufAllocSpace (Nbuf, sizeof (ISCSI_LOGIN_REQUEST), NET_BUF_TAIL);
   if (LoginReq == NULL) {
     NetbufFree (Nbuf);
     return NULL;
   }
+
   ZeroMem (LoginReq, sizeof (ISCSI_LOGIN_REQUEST));
 
   //
@@ -757,12 +775,12 @@ IScsiPrepareLoginReq (
   //
   ISCSI_SET_OPCODE (LoginReq, ISCSI_OPCODE_LOGIN_REQ, ISCSI_REQ_IMMEDIATE);
   ISCSI_SET_STAGES (LoginReq, Conn->CurrentStage, Conn->NextStage);
-  LoginReq->VersionMax        = ISCSI_VERSION_MAX;
-  LoginReq->VersionMin        = ISCSI_VERSION_MIN;
-  LoginReq->Tsih              = HTONS (Session->Tsih);
-  LoginReq->InitiatorTaskTag  = HTONL (Session->InitiatorTaskTag);
-  LoginReq->Cid               = HTONS (Conn->Cid);
-  LoginReq->CmdSN             = HTONL (Session->CmdSN);
+  LoginReq->VersionMax       = ISCSI_VERSION_MAX;
+  LoginReq->VersionMin       = ISCSI_VERSION_MIN;
+  LoginReq->Tsih             = HTONS (Session->Tsih);
+  LoginReq->InitiatorTaskTag = HTONL (Session->InitiatorTaskTag);
+  LoginReq->Cid              = HTONS (Conn->Cid);
+  LoginReq->CmdSN            = HTONL (Session->CmdSN);
 
   //
   // For the first Login Request on a connection this is ExpStatSN for the
@@ -784,34 +802,34 @@ IScsiPrepareLoginReq (
   Status = EFI_SUCCESS;
 
   switch (Conn->CurrentStage) {
-  case ISCSI_SECURITY_NEGOTIATION:
-    //
-    // Both none authentication and CHAP authentication share the CHAP path.
-    //
-    //
-    if (Session->AuthType != ISCSI_AUTH_TYPE_KRB) {
-      Status = IScsiCHAPToSendReq (Conn, Nbuf);
-    }
+    case ISCSI_SECURITY_NEGOTIATION:
+      //
+      // Both none authentication and CHAP authentication share the CHAP path.
+      //
+      //
+      if (Session->AuthType != ISCSI_AUTH_TYPE_KRB) {
+        Status = IScsiCHAPToSendReq (Conn, Nbuf);
+      }
 
-    break;
+      break;
 
-  case ISCSI_LOGIN_OPERATIONAL_NEGOTIATION:
-    //
-    // Only negotiate the parameter once.
-    //
-    if (!Conn->ParamNegotiated) {
-      IScsiFillOpParams (Conn, Nbuf);
-    }
+    case ISCSI_LOGIN_OPERATIONAL_NEGOTIATION:
+      //
+      // Only negotiate the parameter once.
+      //
+      if (!Conn->ParamNegotiated) {
+        IScsiFillOpParams (Conn, Nbuf);
+      }
 
-    ISCSI_SET_FLAG (LoginReq, ISCSI_LOGIN_REQ_PDU_FLAG_TRANSIT);
-    break;
+      ISCSI_SET_FLAG (LoginReq, ISCSI_LOGIN_REQ_PDU_FLAG_TRANSIT);
+      break;
 
-  default:
-    //
-    // An error occurs...
-    //
-    Status = EFI_DEVICE_ERROR;
-    break;
+    default:
+      //
+      // An error occurs...
+      //
+      Status = EFI_DEVICE_ERROR;
+      break;
   }
 
   if (EFI_ERROR (Status)) {
@@ -830,7 +848,6 @@ IScsiPrepareLoginReq (
 
   return Nbuf;
 }
-
 
 /**
   Process the iSCSI Login Response.
@@ -860,19 +877,21 @@ IScsiProcessLoginRsp (
   UINT8                 *DataSeg;
   UINT32                DataSegLen;
 
-  Status   = EFI_SUCCESS;
-  Session   = Conn->Session;
+  Status  = EFI_SUCCESS;
+  Session = Conn->Session;
 
-  LoginRsp  = (ISCSI_LOGIN_RESPONSE *) NetbufGetByte (Pdu, 0, NULL);
+  LoginRsp = (ISCSI_LOGIN_RESPONSE *)NetbufGetByte (Pdu, 0, NULL);
   if (LoginRsp == NULL) {
     return EFI_PROTOCOL_ERROR;
   }
+
   if (!ISCSI_CHECK_OPCODE (LoginRsp, ISCSI_OPCODE_LOGIN_RSP)) {
     //
     // It is not a Login Response.
     //
     return EFI_PROTOCOL_ERROR;
   }
+
   //
   // Get the data segment, if any.
   //
@@ -882,53 +901,57 @@ IScsiProcessLoginRsp (
   } else {
     DataSeg = NULL;
   }
+
   //
   // Check the status class in the login response PDU.
   //
   switch (LoginRsp->StatusClass) {
-  case ISCSI_LOGIN_STATUS_SUCCESS:
-    //
-    // Just break here; the response and the data segment will be processed later.
-    //
-    break;
+    case ISCSI_LOGIN_STATUS_SUCCESS:
+      //
+      // Just break here; the response and the data segment will be processed later.
+      //
+      break;
 
-  case ISCSI_LOGIN_STATUS_REDIRECTION:
-    //
-    // The target may be moved to a different address.
-    //
-    if (DataSeg == NULL) {
+    case ISCSI_LOGIN_STATUS_REDIRECTION:
+      //
+      // The target may be moved to a different address.
+      //
+      if (DataSeg == NULL) {
+        return EFI_PROTOCOL_ERROR;
+      }
+
+      //
+      // Process the TargetAddress key-value strings in the data segment to update the
+      // target address info.
+      //
+      Status = IScsiUpdateTargetAddress (Session, (CHAR8 *)DataSeg, DataSegLen);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      //
+      // Session will be restarted on this error status because the Target is
+      // redirected by this Login Response.
+      //
+      return EFI_MEDIA_CHANGED;
+
+    default:
+      //
+      // Initiator Error, Target Error, or any other undefined error code.
+      //
       return EFI_PROTOCOL_ERROR;
-    }
-    //
-    // Process the TargetAddress key-value strings in the data segment to update the
-    // target address info.
-    //
-    Status = IScsiUpdateTargetAddress (Session, (CHAR8 *) DataSeg, DataSegLen);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-    //
-    // Session will be restarted on this error status because the Target is
-    // redirected by this Login Response.
-    //
-    return EFI_MEDIA_CHANGED;
-
-  default:
-    //
-    // Initiator Error, Target Error, or any other undefined error code.
-    //
-    return EFI_PROTOCOL_ERROR;
   }
+
   //
   // The status is success; extract the wanted fields from the header segment.
   //
-  Transit                     = ISCSI_FLAG_ON (LoginRsp, ISCSI_LOGIN_RSP_PDU_FLAG_TRANSIT);
-  Continue                    = ISCSI_FLAG_ON (LoginRsp, ISCSI_LOGIN_RSP_PDU_FLAG_CONTINUE);
+  Transit  = ISCSI_FLAG_ON (LoginRsp, ISCSI_LOGIN_RSP_PDU_FLAG_TRANSIT);
+  Continue = ISCSI_FLAG_ON (LoginRsp, ISCSI_LOGIN_RSP_PDU_FLAG_CONTINUE);
 
-  CurrentStage                = ISCSI_GET_CURRENT_STAGE (LoginRsp);
-  NextStage                   = ISCSI_GET_NEXT_STAGE (LoginRsp);
+  CurrentStage = ISCSI_GET_CURRENT_STAGE (LoginRsp);
+  NextStage    = ISCSI_GET_NEXT_STAGE (LoginRsp);
 
-  LoginRsp->InitiatorTaskTag  = NTOHL (LoginRsp->InitiatorTaskTag);
+  LoginRsp->InitiatorTaskTag = NTOHL (LoginRsp->InitiatorTaskTag);
 
   if ((Transit && Continue) ||
       (CurrentStage != Conn->CurrentStage) ||
@@ -936,7 +959,8 @@ IScsiProcessLoginRsp (
       (Transit && (NextStage != Conn->NextStage)) ||
       (CompareMem (Session->Isid, LoginRsp->Isid, sizeof (LoginRsp->Isid)) != 0) ||
       (LoginRsp->InitiatorTaskTag != Session->InitiatorTaskTag)
-      ) {
+      )
+  {
     //
     // A Login Response with the C bit set to 1 MUST have the T bit set to 0.
     // The CSG in the Login Response MUST be the same with the I-end of this connection.
@@ -948,9 +972,9 @@ IScsiProcessLoginRsp (
     return EFI_PROTOCOL_ERROR;
   }
 
-  LoginRsp->StatSN    = NTOHL (LoginRsp->StatSN);
-  LoginRsp->ExpCmdSN  = NTOHL (LoginRsp->ExpCmdSN);
-  LoginRsp->MaxCmdSN  = NTOHL (LoginRsp->MaxCmdSN);
+  LoginRsp->StatSN   = NTOHL (LoginRsp->StatSN);
+  LoginRsp->ExpCmdSN = NTOHL (LoginRsp->ExpCmdSN);
+  LoginRsp->MaxCmdSN = NTOHL (LoginRsp->MaxCmdSN);
 
   if ((Conn->CurrentStage == ISCSI_SECURITY_NEGOTIATION) && (Conn->AuthStep == ISCSI_AUTH_INITIAL)) {
     //
@@ -982,6 +1006,7 @@ IScsiProcessLoginRsp (
       return Status;
     }
   }
+
   //
   // Trim off the header segment.
   //
@@ -1005,32 +1030,33 @@ IScsiProcessLoginRsp (
   }
 
   switch (CurrentStage) {
-  case ISCSI_SECURITY_NEGOTIATION:
-    //
-    // In security negotiation stage, let CHAP module handle it.
-    //
-    if (Session->AuthType != ISCSI_AUTH_TYPE_KRB) {
-      Status = IScsiCHAPOnRspReceived (Conn);
-    }
-    break;
+    case ISCSI_SECURITY_NEGOTIATION:
+      //
+      // In security negotiation stage, let CHAP module handle it.
+      //
+      if (Session->AuthType != ISCSI_AUTH_TYPE_KRB) {
+        Status = IScsiCHAPOnRspReceived (Conn);
+      }
 
-  case ISCSI_LOGIN_OPERATIONAL_NEGOTIATION:
-    //
-    // Response received with negotiation response on iSCSI parameters: check them.
-    //
-    Status = IScsiCheckOpParams (Conn);
-    if (!EFI_ERROR (Status)) {
-      Conn->ParamNegotiated = TRUE;
-    }
+      break;
 
-    break;
+    case ISCSI_LOGIN_OPERATIONAL_NEGOTIATION:
+      //
+      // Response received with negotiation response on iSCSI parameters: check them.
+      //
+      Status = IScsiCheckOpParams (Conn);
+      if (!EFI_ERROR (Status)) {
+        Conn->ParamNegotiated = TRUE;
+      }
 
-  default:
-    //
-    // Should never get here.
-    //
-    Status = EFI_PROTOCOL_ERROR;
-    break;
+      break;
+
+    default:
+      //
+      // Should never get here.
+      //
+      Status = EFI_PROTOCOL_ERROR;
+      break;
   }
 
   if (Transit && (Status == EFI_SUCCESS)) {
@@ -1049,6 +1075,7 @@ IScsiProcessLoginRsp (
       Session->Tsih = NTOHS (LoginRsp->Tsih);
     }
   }
+
   //
   // Flush the response(s) received.
   //
@@ -1056,7 +1083,6 @@ IScsiProcessLoginRsp (
 
   return Status;
 }
-
 
 /**
   Updated the target information according the data received in the iSCSI
@@ -1075,9 +1101,9 @@ IScsiProcessLoginRsp (
 **/
 EFI_STATUS
 IScsiUpdateTargetAddress (
-  IN OUT ISCSI_SESSION         *Session,
-  IN     CHAR8                 *Data,
-  IN     UINT32                Len
+  IN OUT ISCSI_SESSION  *Session,
+  IN     CHAR8          *Data,
+  IN     UINT32         Len
   )
 {
   LIST_ENTRY                   *KeyValueList;
@@ -1119,11 +1145,11 @@ IScsiUpdateTargetAddress (
         //
         TargetAddress++;
       }
-    } else if (*TargetAddress == ISCSI_REDIRECT_ADDR_START_DELIMITER){
+    } else if (*TargetAddress == ISCSI_REDIRECT_ADDR_START_DELIMITER) {
       //
       // The domainname of the target is presented in a bracketed IPv6 address format.
       //
-      TargetAddress ++;
+      TargetAddress++;
       IpStr = TargetAddress;
       while ((*TargetAddress != '\0') && (*TargetAddress != ISCSI_REDIRECT_ADDR_END_DELIMITER)) {
         //
@@ -1137,8 +1163,7 @@ IScsiUpdateTargetAddress (
       }
 
       *TargetAddress = '\0';
-      TargetAddress ++;
-
+      TargetAddress++;
     } else {
       //
       // The domainname of the target is presented in the format of a DNS host name.
@@ -1148,6 +1173,7 @@ IScsiUpdateTargetAddress (
       while ((*TargetAddress != '\0') && (*TargetAddress != ':') && (*TargetAddress != ',')) {
         TargetAddress++;
       }
+
       NvData->DnsMode = TRUE;
     }
 
@@ -1171,7 +1197,7 @@ IScsiUpdateTargetAddress (
       if (Number > 0xFFFF) {
         continue;
       } else {
-        NvData->TargetPort = (UINT16) Number;
+        NvData->TargetPort = (UINT16)Number;
       }
     } else {
       //
@@ -1199,9 +1225,10 @@ IScsiUpdateTargetAddress (
       // Target address is expressed as URL format, just save it and
       // do DNS resolution when creating a TCP connection.
       //
-      if (AsciiStrSize (IpStr) > sizeof (Session->ConfigData->SessionConfigData.TargetUrl)){
+      if (AsciiStrSize (IpStr) > sizeof (Session->ConfigData->SessionConfigData.TargetUrl)) {
         return EFI_INVALID_PARAMETER;
       }
+
       CopyMem (&Session->ConfigData->SessionConfigData.TargetUrl, IpStr, AsciiStrSize (IpStr));
     } else {
       Status = IScsiAsciiStrToIp (
@@ -1224,7 +1251,6 @@ IScsiUpdateTargetAddress (
   return Status;
 }
 
-
 /**
   The callback function to free the net buffer list.
 
@@ -1234,15 +1260,14 @@ IScsiUpdateTargetAddress (
 VOID
 EFIAPI
 IScsiFreeNbufList (
-  VOID *Arg
+  VOID  *Arg
   )
 {
   ASSERT (Arg != NULL);
 
-  NetbufFreeList ((LIST_ENTRY *) Arg);
+  NetbufFreeList ((LIST_ENTRY *)Arg);
   FreePool (Arg);
 }
-
 
 /**
   The callback function called in NetBufFree; it does nothing.
@@ -1253,11 +1278,10 @@ IScsiFreeNbufList (
 VOID
 EFIAPI
 IScsiNbufExtFree (
-  VOID *Arg
+  VOID  *Arg
   )
 {
 }
-
 
 /**
   Receive an iSCSI response PDU. An iSCSI response PDU contains an iSCSI PDU header and
@@ -1281,25 +1305,25 @@ IScsiNbufExtFree (
 **/
 EFI_STATUS
 IScsiReceivePdu (
-  IN ISCSI_CONNECTION                      *Conn,
-  OUT NET_BUF                              **Pdu,
-  IN ISCSI_IN_BUFFER_CONTEXT               *Context, OPTIONAL
-  IN BOOLEAN                               HeaderDigest,
-  IN BOOLEAN                               DataDigest,
-  IN EFI_EVENT                             TimeoutEvent OPTIONAL
+  IN ISCSI_CONNECTION         *Conn,
+  OUT NET_BUF                 **Pdu,
+  IN ISCSI_IN_BUFFER_CONTEXT  *Context  OPTIONAL,
+  IN BOOLEAN                  HeaderDigest,
+  IN BOOLEAN                  DataDigest,
+  IN EFI_EVENT                TimeoutEvent OPTIONAL
   )
 {
-  LIST_ENTRY      *NbufList;
-  UINT32          Len;
-  NET_BUF         *PduHdr;
-  UINT8           *Header;
-  EFI_STATUS      Status;
-  UINT32          PadLen;
-  UINT32          InDataOffset;
-  NET_FRAGMENT    Fragment[2];
-  UINT32          FragmentCount;
-  NET_BUF         *DataSeg;
-  UINT32          PadAndCRC32[2];
+  LIST_ENTRY    *NbufList;
+  UINT32        Len;
+  NET_BUF       *PduHdr;
+  UINT8         *Header;
+  EFI_STATUS    Status;
+  UINT32        PadLen;
+  UINT32        InDataOffset;
+  NET_FRAGMENT  Fragment[2];
+  UINT32        FragmentCount;
+  NET_BUF       *DataSeg;
+  UINT32        PadAndCRC32[2];
 
   NbufList = AllocatePool (sizeof (LIST_ENTRY));
   if (NbufList == NULL) {
@@ -1311,8 +1335,8 @@ IScsiReceivePdu (
   //
   // The header digest will be received together with the PDU header, if exists.
   //
-  Len     = sizeof (ISCSI_BASIC_HEADER) + (HeaderDigest ? sizeof (UINT32) : 0);
-  PduHdr  = NetbufAlloc (Len);
+  Len    = sizeof (ISCSI_BASIC_HEADER) + (HeaderDigest ? sizeof (UINT32) : 0);
+  PduHdr = NetbufAlloc (Len);
   if (PduHdr == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
@@ -1323,6 +1347,7 @@ IScsiReceivePdu (
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
+
   InsertTailList (NbufList, &PduHdr->List);
 
   //
@@ -1351,72 +1376,73 @@ IScsiReceivePdu (
     //
     goto FORM_PDU;
   }
+
   //
   // Get the length of the padding bytes of the data segment.
   //
   PadLen = ISCSI_GET_PAD_LEN (Len);
 
   switch (ISCSI_GET_OPCODE (Header)) {
-  case ISCSI_OPCODE_SCSI_DATA_IN:
-    //
-    // To reduce memory copy overhead, try to use the buffer described by Context
-    // if the PDU is an iSCSI SCSI data.
-    //
-    InDataOffset = ISCSI_GET_BUFFER_OFFSET (Header);
-    if ((Context == NULL) || ((InDataOffset + Len) > Context->InDataLen)) {
+    case ISCSI_OPCODE_SCSI_DATA_IN:
+      //
+      // To reduce memory copy overhead, try to use the buffer described by Context
+      // if the PDU is an iSCSI SCSI data.
+      //
+      InDataOffset = ISCSI_GET_BUFFER_OFFSET (Header);
+      if ((Context == NULL) || ((InDataOffset + Len) > Context->InDataLen)) {
+        Status = EFI_PROTOCOL_ERROR;
+        goto ON_EXIT;
+      }
+
+      Fragment[0].Len  = Len;
+      Fragment[0].Bulk = Context->InData + InDataOffset;
+
+      if (DataDigest || (PadLen != 0)) {
+        //
+        // The data segment is padded. Use two fragments to receive it:
+        // the first to receive the useful data; the second to receive the padding.
+        //
+        Fragment[1].Len  = PadLen + (DataDigest ? sizeof (UINT32) : 0);
+        Fragment[1].Bulk = (UINT8 *)PadAndCRC32 + (4 - PadLen);
+
+        FragmentCount = 2;
+      } else {
+        FragmentCount = 1;
+      }
+
+      DataSeg = NetbufFromExt (&Fragment[0], FragmentCount, 0, 0, IScsiNbufExtFree, NULL);
+      if (DataSeg == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto ON_EXIT;
+      }
+
+      break;
+
+    case ISCSI_OPCODE_SCSI_RSP:
+    case ISCSI_OPCODE_NOP_IN:
+    case ISCSI_OPCODE_LOGIN_RSP:
+    case ISCSI_OPCODE_TEXT_RSP:
+    case ISCSI_OPCODE_ASYNC_MSG:
+    case ISCSI_OPCODE_REJECT:
+    case ISCSI_OPCODE_VENDOR_T0:
+    case ISCSI_OPCODE_VENDOR_T1:
+    case ISCSI_OPCODE_VENDOR_T2:
+      //
+      // Allocate buffer to receive the data segment.
+      //
+      Len    += PadLen + (DataDigest ? sizeof (UINT32) : 0);
+      DataSeg = NetbufAlloc (Len);
+      if (DataSeg == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto ON_EXIT;
+      }
+
+      NetbufAllocSpace (DataSeg, Len, NET_BUF_TAIL);
+      break;
+
+    default:
       Status = EFI_PROTOCOL_ERROR;
       goto ON_EXIT;
-    }
-
-    Fragment[0].Len   = Len;
-    Fragment[0].Bulk  = Context->InData + InDataOffset;
-
-    if (DataDigest || (PadLen != 0)) {
-      //
-      // The data segment is padded. Use two fragments to receive it:
-      // the first to receive the useful data; the second to receive the padding.
-      //
-      Fragment[1].Len   = PadLen + (DataDigest ? sizeof (UINT32) : 0);
-      Fragment[1].Bulk  = (UINT8 *)PadAndCRC32 + (4 - PadLen);
-
-      FragmentCount     = 2;
-    } else {
-      FragmentCount = 1;
-    }
-
-    DataSeg = NetbufFromExt (&Fragment[0], FragmentCount, 0, 0, IScsiNbufExtFree, NULL);
-    if (DataSeg == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-      goto ON_EXIT;
-    }
-
-    break;
-
-  case ISCSI_OPCODE_SCSI_RSP:
-  case ISCSI_OPCODE_NOP_IN:
-  case ISCSI_OPCODE_LOGIN_RSP:
-  case ISCSI_OPCODE_TEXT_RSP:
-  case ISCSI_OPCODE_ASYNC_MSG:
-  case ISCSI_OPCODE_REJECT:
-  case ISCSI_OPCODE_VENDOR_T0:
-  case ISCSI_OPCODE_VENDOR_T1:
-  case ISCSI_OPCODE_VENDOR_T2:
-    //
-    // Allocate buffer to receive the data segment.
-    //
-    Len += PadLen + (DataDigest ? sizeof (UINT32) : 0);
-    DataSeg = NetbufAlloc (Len);
-    if (DataSeg == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-      goto ON_EXIT;
-    }
-
-    NetbufAllocSpace (DataSeg, Len, NET_BUF_TAIL);
-    break;
-
-  default:
-    Status = EFI_PROTOCOL_ERROR;
-    goto ON_EXIT;
   }
 
   InsertTailList (NbufList, &DataSeg->List);
@@ -1465,7 +1491,6 @@ ON_EXIT:
   return Status;
 }
 
-
 /**
   Check and get the result of the parameter negotiation.
 
@@ -1481,25 +1506,25 @@ IScsiCheckOpParams (
   IN OUT ISCSI_CONNECTION  *Conn
   )
 {
-  EFI_STATUS      Status;
-  LIST_ENTRY      *KeyValueList;
-  CHAR8           *Data;
-  UINT32          Len;
-  ISCSI_SESSION   *Session;
-  CHAR8           *Value;
-  UINTN           NumericValue;
+  EFI_STATUS     Status;
+  LIST_ENTRY     *KeyValueList;
+  CHAR8          *Data;
+  UINT32         Len;
+  ISCSI_SESSION  *Session;
+  CHAR8          *Value;
+  UINTN          NumericValue;
 
   ASSERT (Conn->RspQue.BufNum != 0);
 
   Session = Conn->Session;
 
-  Len     = Conn->RspQue.BufSize;
-  Data    = AllocatePool (Len);
+  Len  = Conn->RspQue.BufSize;
+  Data = AllocatePool (Len);
   if (Data == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NetbufQueCopy (&Conn->RspQue, 0, Len, (UINT8 *) Data);
+  NetbufQueCopy (&Conn->RspQue, 0, Len, (UINT8 *)Data);
 
   Status = EFI_PROTOCOL_ERROR;
 
@@ -1511,6 +1536,7 @@ IScsiCheckOpParams (
     FreePool (Data);
     return Status;
   }
+
   //
   // HeaderDigest
   //
@@ -1528,6 +1554,7 @@ IScsiCheckOpParams (
   } else {
     goto ON_ERROR;
   }
+
   //
   // DataDigest
   //
@@ -1545,6 +1572,7 @@ IScsiCheckOpParams (
   } else {
     goto ON_ERROR;
   }
+
   //
   // ErrorRecoveryLevel: result function is Minimum.
   //
@@ -1558,7 +1586,7 @@ IScsiCheckOpParams (
     goto ON_ERROR;
   }
 
-  Session->ErrorRecoveryLevel = (UINT8) MIN (Session->ErrorRecoveryLevel, NumericValue);
+  Session->ErrorRecoveryLevel = (UINT8)MIN (Session->ErrorRecoveryLevel, NumericValue);
 
   //
   // InitialR2T: result function is OR.
@@ -1569,7 +1597,7 @@ IScsiCheckOpParams (
       goto ON_ERROR;
     }
 
-    Session->InitialR2T = (BOOLEAN) (AsciiStrCmp (Value, "Yes") == 0);
+    Session->InitialR2T = (BOOLEAN)(AsciiStrCmp (Value, "Yes") == 0);
   }
 
   //
@@ -1580,15 +1608,16 @@ IScsiCheckOpParams (
     goto ON_ERROR;
   }
 
-  Session->ImmediateData = (BOOLEAN) (Session->ImmediateData && (BOOLEAN) (AsciiStrCmp (Value, "Yes") == 0));
+  Session->ImmediateData = (BOOLEAN)(Session->ImmediateData && (BOOLEAN)(AsciiStrCmp (Value, "Yes") == 0));
 
   //
   // MaxRecvDataSegmentLength is declarative.
   //
   Value = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_MAX_RECV_DATA_SEGMENT_LENGTH);
   if (Value != NULL) {
-    Conn->MaxRecvDataSegmentLength = (UINT32) IScsiNetNtoi (Value);
+    Conn->MaxRecvDataSegmentLength = (UINT32)IScsiNetNtoi (Value);
   }
+
   //
   // MaxBurstLength: result function is Minimum.
   //
@@ -1598,7 +1627,7 @@ IScsiCheckOpParams (
   }
 
   NumericValue            = IScsiNetNtoi (Value);
-  Session->MaxBurstLength = (UINT32) MIN (Session->MaxBurstLength, NumericValue);
+  Session->MaxBurstLength = (UINT32)MIN (Session->MaxBurstLength, NumericValue);
 
   //
   // FirstBurstLength: result function is Minimum. Irrelevant when InitialR2T=Yes and
@@ -1611,7 +1640,7 @@ IScsiCheckOpParams (
     }
 
     NumericValue              = IScsiNetNtoi (Value);
-    Session->FirstBurstLength = (UINT32) MIN (Session->FirstBurstLength, NumericValue);
+    Session->FirstBurstLength = (UINT32)MIN (Session->FirstBurstLength, NumericValue);
   }
 
   //
@@ -1627,7 +1656,7 @@ IScsiCheckOpParams (
     goto ON_ERROR;
   }
 
-  Session->MaxConnections = (UINT32) MIN (Session->MaxConnections, NumericValue);
+  Session->MaxConnections = (UINT32)MIN (Session->MaxConnections, NumericValue);
 
   //
   // DataPDUInOrder: result function is OR.
@@ -1638,7 +1667,7 @@ IScsiCheckOpParams (
       goto ON_ERROR;
     }
 
-    Session->DataPDUInOrder = (BOOLEAN) (AsciiStrCmp (Value, "Yes") == 0);
+    Session->DataPDUInOrder = (BOOLEAN)(AsciiStrCmp (Value, "Yes") == 0);
   }
 
   //
@@ -1650,7 +1679,7 @@ IScsiCheckOpParams (
       goto ON_ERROR;
     }
 
-    Session->DataSequenceInOrder = (BOOLEAN) (AsciiStrCmp (Value, "Yes") == 0);
+    Session->DataSequenceInOrder = (BOOLEAN)(AsciiStrCmp (Value, "Yes") == 0);
   }
 
   //
@@ -1667,8 +1696,9 @@ IScsiCheckOpParams (
   } else if (NumericValue > 3600) {
     goto ON_ERROR;
   } else {
-    Session->DefaultTime2Wait = (UINT32) MAX (Session->DefaultTime2Wait, NumericValue);
+    Session->DefaultTime2Wait = (UINT32)MAX (Session->DefaultTime2Wait, NumericValue);
   }
+
   //
   // DefaultTime2Retain: result function is Minimum.
   //
@@ -1683,8 +1713,9 @@ IScsiCheckOpParams (
   } else if (NumericValue > 3600) {
     goto ON_ERROR;
   } else {
-    Session->DefaultTime2Retain = (UINT32) MIN (Session->DefaultTime2Retain, NumericValue);
+    Session->DefaultTime2Retain = (UINT32)MIN (Session->DefaultTime2Retain, NumericValue);
   }
+
   //
   // MaxOutstandingR2T: result function is Minimum.
   //
@@ -1698,7 +1729,7 @@ IScsiCheckOpParams (
     goto ON_ERROR;
   }
 
-  Session->MaxOutstandingR2T = (UINT16) MIN (Session->MaxOutstandingR2T, NumericValue);
+  Session->MaxOutstandingR2T = (UINT16)MIN (Session->MaxOutstandingR2T, NumericValue);
 
   //
   // Remove declarative key-value pairs, if any.
@@ -1706,7 +1737,6 @@ IScsiCheckOpParams (
   IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_SESSION_TYPE);
   IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_TARGET_ALIAS);
   IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_TARGET_PORTAL_GROUP_TAG);
-
 
   //
   // Remove the key-value that may not needed for result function is OR.
@@ -1738,7 +1768,6 @@ ON_ERROR:
   return Status;
 }
 
-
 /**
   Fill the operational parameters.
 
@@ -1752,8 +1781,8 @@ IScsiFillOpParams (
   IN OUT NET_BUF           *Pdu
   )
 {
-  ISCSI_SESSION *Session;
-  CHAR8         Value[256];
+  ISCSI_SESSION  *Session;
+  CHAR8          Value[256];
 
   Session = Conn->Session;
 
@@ -1800,7 +1829,6 @@ IScsiFillOpParams (
   IScsiAddKeyValuePair (Pdu, ISCSI_KEY_MAX_OUTSTANDING_R2T, Value);
 }
 
-
 /**
   Pad the iSCSI AHS or data segment to an integer number of 4 byte words.
 
@@ -1813,8 +1841,8 @@ IScsiFillOpParams (
 **/
 EFI_STATUS
 IScsiPadSegment (
-  IN OUT NET_BUF      *Pdu,
-  IN     UINT32       Len
+  IN OUT NET_BUF  *Pdu,
+  IN     UINT32   Len
   )
 {
   UINT32  PadLen;
@@ -1834,7 +1862,6 @@ IScsiPadSegment (
   return EFI_SUCCESS;
 }
 
-
 /**
   Build a key-value list from the data segment.
 
@@ -1847,8 +1874,8 @@ IScsiPadSegment (
 **/
 LIST_ENTRY *
 IScsiBuildKeyValueList (
-  IN CHAR8  *Data,
-  IN UINT32 Len
+  IN CHAR8   *Data,
+  IN UINT32  Len
   )
 {
   LIST_ENTRY            *ListHead;
@@ -1888,10 +1915,10 @@ IScsiBuildKeyValueList (
 
     KeyValuePair->Value = Data;
 
-    InsertTailList (ListHead, &KeyValuePair->List);;
+    InsertTailList (ListHead, &KeyValuePair->List);
 
     Data += AsciiStrLen (KeyValuePair->Value) + 1;
-    Len -= (UINT32) AsciiStrLen (KeyValuePair->Value) + 1;
+    Len  -= (UINT32)AsciiStrLen (KeyValuePair->Value) + 1;
   }
 
   return ListHead;
@@ -1902,7 +1929,6 @@ ON_ERROR:
 
   return NULL;
 }
-
 
 /**
   Get the value string by the key name from the key-value list. If found,
@@ -1917,8 +1943,8 @@ ON_ERROR:
 **/
 CHAR8 *
 IScsiGetValueByKeyFromList (
-  IN OUT LIST_ENTRY     *KeyValueList,
-  IN     CHAR8          *Key
+  IN OUT LIST_ENTRY  *KeyValueList,
+  IN     CHAR8       *Key
   )
 {
   LIST_ENTRY            *Entry;
@@ -1942,7 +1968,6 @@ IScsiGetValueByKeyFromList (
   return Value;
 }
 
-
 /**
   Free the key-value list.
 
@@ -1951,22 +1976,21 @@ IScsiGetValueByKeyFromList (
 **/
 VOID
 IScsiFreeKeyValueList (
-  IN LIST_ENTRY      *KeyValueList
+  IN LIST_ENTRY  *KeyValueList
   )
 {
   LIST_ENTRY            *Entry;
   ISCSI_KEY_VALUE_PAIR  *KeyValuePair;
 
   while (!IsListEmpty (KeyValueList)) {
-    Entry         = NetListRemoveHead (KeyValueList);
-    KeyValuePair  = NET_LIST_USER_STRUCT (Entry, ISCSI_KEY_VALUE_PAIR, List);
+    Entry        = NetListRemoveHead (KeyValueList);
+    KeyValuePair = NET_LIST_USER_STRUCT (Entry, ISCSI_KEY_VALUE_PAIR, List);
 
     FreePool (KeyValuePair);
   }
 
   FreePool (KeyValueList);
 }
-
 
 /**
   Normalize the iSCSI name according to RFC.
@@ -1980,18 +2004,18 @@ IScsiFreeKeyValueList (
 **/
 EFI_STATUS
 IScsiNormalizeName (
-  IN OUT CHAR8      *Name,
-  IN     UINTN      Len
+  IN OUT CHAR8  *Name,
+  IN     UINTN  Len
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   for (Index = 0; Index < Len; Index++) {
     if (NET_IS_UPPER_CASE_CHAR (Name[Index])) {
       //
       // Convert the upper-case characters to lower-case ones.
       //
-      Name[Index] = (CHAR8) (Name[Index] - 'A' + 'a');
+      Name[Index] = (CHAR8)(Name[Index] - 'A' + 'a');
     }
 
     if (!NET_IS_LOWER_CASE_CHAR (Name[Index]) &&
@@ -1999,7 +2023,8 @@ IScsiNormalizeName (
         (Name[Index] != '-') &&
         (Name[Index] != '.') &&
         (Name[Index] != ':')
-        ) {
+        )
+    {
       //
       // ASCII dash, dot, colon lower-case characters and digit characters
       // are allowed.
@@ -2018,7 +2043,6 @@ IScsiNormalizeName (
   return EFI_SUCCESS;
 }
 
-
 /**
   Create an iSCSI task control block.
 
@@ -2036,8 +2060,8 @@ IScsiNewTcb (
   OUT ISCSI_TCB         **Tcb
   )
 {
-  ISCSI_SESSION *Session;
-  ISCSI_TCB     *NewTcb;
+  ISCSI_SESSION  *Session;
+  ISCSI_TCB      *NewTcb;
 
   ASSERT (Tcb != NULL);
 
@@ -2054,10 +2078,10 @@ IScsiNewTcb (
 
   InitializeListHead (&NewTcb->Link);
 
-  NewTcb->SoFarInOrder      = TRUE;
-  NewTcb->InitiatorTaskTag  = Session->InitiatorTaskTag;
-  NewTcb->CmdSN             = Session->CmdSN;
-  NewTcb->Conn              = Conn;
+  NewTcb->SoFarInOrder     = TRUE;
+  NewTcb->InitiatorTaskTag = Session->InitiatorTaskTag;
+  NewTcb->CmdSN            = Session->CmdSN;
+  NewTcb->Conn             = Conn;
 
   InsertTailList (&Session->TcbList, &NewTcb->Link);
 
@@ -2071,7 +2095,6 @@ IScsiNewTcb (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Delete the tcb from the connection and destroy it.
@@ -2088,7 +2111,6 @@ IScsiDelTcb (
 
   FreePool (Tcb);
 }
-
 
 /**
   Create a data segment, pad it, and calculate the CRC if needed.
@@ -2112,15 +2134,15 @@ IScsiNewDataSegment (
   UINT32        PadLen;
   NET_BUF       *DataSeg;
 
-  Fragment[0].Len   = Len;
-  Fragment[0].Bulk  = Data;
+  Fragment[0].Len  = Len;
+  Fragment[0].Bulk = Data;
 
-  PadLen            = ISCSI_GET_PAD_LEN (Len);
+  PadLen = ISCSI_GET_PAD_LEN (Len);
   if (PadLen != 0) {
-    Fragment[1].Len   = PadLen;
-    Fragment[1].Bulk  = (UINT8 *) &mDataSegPad;
+    Fragment[1].Len  = PadLen;
+    Fragment[1].Bulk = (UINT8 *)&mDataSegPad;
 
-    FragmentCount     = 2;
+    FragmentCount = 2;
   } else {
     FragmentCount = 1;
   }
@@ -2129,7 +2151,6 @@ IScsiNewDataSegment (
 
   return DataSeg;
 }
-
 
 /**
   Create a iSCSI SCSI command PDU to encapsulate the command issued
@@ -2145,9 +2166,9 @@ IScsiNewDataSegment (
 **/
 NET_BUF *
 IScsiNewScsiCmdPdu (
-  IN EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet,
-  IN UINT64                                     Lun,
-  IN ISCSI_TCB                                  *Tcb
+  IN EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet,
+  IN UINT64                                      Lun,
+  IN ISCSI_TCB                                   *Tcb
   )
 {
   LIST_ENTRY                      *NbufList;
@@ -2176,7 +2197,7 @@ IScsiNewScsiCmdPdu (
     //
     // The CDB exceeds 16 bytes. An extended CDB AHS is required.
     //
-    AHSLength = (UINT8) (AHSLength + ISCSI_ROUNDUP (Packet->CdbLength - 16) + sizeof (ISCSI_ADDITIONAL_HEADER));
+    AHSLength = (UINT8)(AHSLength + ISCSI_ROUNDUP (Packet->CdbLength - 16) + sizeof (ISCSI_ADDITIONAL_HEADER));
   }
 
   Length    = sizeof (SCSI_COMMAND) + AHSLength;
@@ -2185,12 +2206,13 @@ IScsiNewScsiCmdPdu (
     return NULL;
   }
 
-  ScsiCmd = (SCSI_COMMAND *) NetbufAllocSpace (PduHeader, Length, NET_BUF_TAIL);
+  ScsiCmd = (SCSI_COMMAND *)NetbufAllocSpace (PduHeader, Length, NET_BUF_TAIL);
   if (ScsiCmd == NULL) {
     NetbufFree (PduHeader);
     return NULL;
   }
-  Header  = (ISCSI_ADDITIONAL_HEADER *) (ScsiCmd + 1);
+
+  Header = (ISCSI_ADDITIONAL_HEADER *)(ScsiCmd + 1);
 
   ZeroMem (ScsiCmd, Length);
 
@@ -2201,31 +2223,31 @@ IScsiNewScsiCmdPdu (
   // Set the READ/WRITE flags according to the IO type of this request.
   //
   switch (Packet->DataDirection) {
-  case DataIn:
-    ISCSI_SET_FLAG (ScsiCmd, SCSI_CMD_PDU_FLAG_READ);
-    ScsiCmd->ExpDataXferLength = NTOHL (Packet->InTransferLength);
-    break;
+    case DataIn:
+      ISCSI_SET_FLAG (ScsiCmd, SCSI_CMD_PDU_FLAG_READ);
+      ScsiCmd->ExpDataXferLength = NTOHL (Packet->InTransferLength);
+      break;
 
-  case DataOut:
-    ISCSI_SET_FLAG (ScsiCmd, SCSI_CMD_PDU_FLAG_WRITE);
-    ScsiCmd->ExpDataXferLength = NTOHL (Packet->OutTransferLength);
-    break;
+    case DataOut:
+      ISCSI_SET_FLAG (ScsiCmd, SCSI_CMD_PDU_FLAG_WRITE);
+      ScsiCmd->ExpDataXferLength = NTOHL (Packet->OutTransferLength);
+      break;
 
-  case DataBi:
-    ISCSI_SET_FLAG (ScsiCmd, SCSI_CMD_PDU_FLAG_READ | SCSI_CMD_PDU_FLAG_WRITE);
-    ScsiCmd->ExpDataXferLength = NTOHL (Packet->OutTransferLength);
+    case DataBi:
+      ISCSI_SET_FLAG (ScsiCmd, SCSI_CMD_PDU_FLAG_READ | SCSI_CMD_PDU_FLAG_WRITE);
+      ScsiCmd->ExpDataXferLength = NTOHL (Packet->OutTransferLength);
 
-    //
-    // Fill the bidirectional expected read data length AHS.
-    //
-    BiExpReadDataLenAHS                     = (ISCSI_BI_EXP_READ_DATA_LEN_AHS *) Header;
-    Header = (ISCSI_ADDITIONAL_HEADER *) (BiExpReadDataLenAHS + 1);
+      //
+      // Fill the bidirectional expected read data length AHS.
+      //
+      BiExpReadDataLenAHS = (ISCSI_BI_EXP_READ_DATA_LEN_AHS *)Header;
+      Header              = (ISCSI_ADDITIONAL_HEADER *)(BiExpReadDataLenAHS + 1);
 
-    BiExpReadDataLenAHS->Length = NTOHS (5);
-    BiExpReadDataLenAHS->Type = ISCSI_AHS_TYPE_BI_EXP_READ_DATA_LEN;
-    BiExpReadDataLenAHS->ExpReadDataLength = NTOHL (Packet->InTransferLength);
+      BiExpReadDataLenAHS->Length            = NTOHS (5);
+      BiExpReadDataLenAHS->Type              = ISCSI_AHS_TYPE_BI_EXP_READ_DATA_LEN;
+      BiExpReadDataLenAHS->ExpReadDataLength = NTOHL (Packet->InTransferLength);
 
-    break;
+      break;
   }
 
   ScsiCmd->TotalAHSLength = AHSLength;
@@ -2237,15 +2259,15 @@ IScsiNewScsiCmdPdu (
   CopyMem (ScsiCmd->Cdb, Packet->Cdb, sizeof (ScsiCmd->Cdb));
 
   if (Packet->CdbLength > 16) {
-    Header->Length  = NTOHS ((UINT16) (Packet->CdbLength - 15));
-    Header->Type    = ISCSI_AHS_TYPE_EXT_CDB;
+    Header->Length = NTOHS ((UINT16)(Packet->CdbLength - 15));
+    Header->Type   = ISCSI_AHS_TYPE_EXT_CDB;
 
-    CopyMem (Header + 1, (UINT8 *) Packet->Cdb + 16, Packet->CdbLength - 16);
+    CopyMem (Header + 1, (UINT8 *)Packet->Cdb + 16, Packet->CdbLength - 16);
   }
 
-  Pdu               = PduHeader;
-  Session           = Tcb->Conn->Session;
-  ImmediateDataLen  = 0;
+  Pdu              = PduHeader;
+  Session          = Tcb->Conn->Session;
+  ImmediateDataLen = 0;
 
   if (Session->ImmediateData && (Packet->OutTransferLength != 0)) {
     //
@@ -2253,8 +2275,8 @@ IScsiNewScsiCmdPdu (
     // data is the minimum of FirstBurstLength, the data length to be xfered, and
     // the MaxRecvdataSegmentLength on this connection.
     //
-    ImmediateDataLen  = MIN (Session->FirstBurstLength, Packet->OutTransferLength);
-    ImmediateDataLen  = MIN (ImmediateDataLen, Tcb->Conn->MaxRecvDataSegmentLength);
+    ImmediateDataLen = MIN (Session->FirstBurstLength, Packet->OutTransferLength);
+    ImmediateDataLen = MIN (ImmediateDataLen, Tcb->Conn->MaxRecvDataSegmentLength);
 
     //
     // Update the data segment length in the PDU header.
@@ -2264,7 +2286,7 @@ IScsiNewScsiCmdPdu (
     //
     // Create the data segment.
     //
-    DataSeg = IScsiNewDataSegment ((UINT8 *) Packet->OutDataBuffer, ImmediateDataLen, FALSE);
+    DataSeg = IScsiNewDataSegment ((UINT8 *)Packet->OutDataBuffer, ImmediateDataLen, FALSE);
     if (DataSeg == NULL) {
       NetbufFree (PduHeader);
       Pdu = NULL;
@@ -2293,7 +2315,8 @@ IScsiNewScsiCmdPdu (
   if (Session->InitialR2T ||
       (ImmediateDataLen == Session->FirstBurstLength) ||
       (ImmediateDataLen == Packet->OutTransferLength)
-      ) {
+      )
+  {
     //
     // Unsolicited data out sequence is not allowed,
     // or FirstBustLength data is already sent out by immediate data,
@@ -2308,7 +2331,6 @@ ON_EXIT:
 
   return Pdu;
 }
-
 
 /**
   Create a new iSCSI SCSI Data Out PDU.
@@ -2332,12 +2354,12 @@ IScsiNewDataOutPdu (
   IN UINT64     Lun
   )
 {
-  LIST_ENTRY          *NbufList;
-  NET_BUF             *PduHdr;
-  NET_BUF             *DataSeg;
-  NET_BUF             *Pdu;
-  ISCSI_SCSI_DATA_OUT *DataOutHdr;
-  ISCSI_XFER_CONTEXT  *XferContext;
+  LIST_ENTRY           *NbufList;
+  NET_BUF              *PduHdr;
+  NET_BUF              *DataSeg;
+  NET_BUF              *Pdu;
+  ISCSI_SCSI_DATA_OUT  *DataOutHdr;
+  ISCSI_XFER_CONTEXT   *XferContext;
 
   NbufList = AllocatePool (sizeof (LIST_ENTRY));
   if (NbufList == NULL) {
@@ -2354,16 +2376,18 @@ IScsiNewDataOutPdu (
     FreePool (NbufList);
     return NULL;
   }
+
   //
   // Insert the BHS into the buffer list.
   //
   InsertTailList (NbufList, &PduHdr->List);
 
-  DataOutHdr  = (ISCSI_SCSI_DATA_OUT *) NetbufAllocSpace (PduHdr, sizeof (ISCSI_SCSI_DATA_OUT), NET_BUF_TAIL);
+  DataOutHdr = (ISCSI_SCSI_DATA_OUT *)NetbufAllocSpace (PduHdr, sizeof (ISCSI_SCSI_DATA_OUT), NET_BUF_TAIL);
   if (DataOutHdr == NULL) {
     IScsiFreeNbufList (NbufList);
     return NULL;
   }
+
   XferContext = &Tcb->XferContext;
 
   ZeroMem (DataOutHdr, sizeof (ISCSI_SCSI_DATA_OUT));
@@ -2383,6 +2407,7 @@ IScsiNewDataOutPdu (
   if (XferContext->TargetTransferTag != ISCSI_RESERVED_TAG) {
     CopyMem (&DataOutHdr->Lun, &Lun, sizeof (DataOutHdr->Lun));
   }
+
   //
   // Build the data segment for this Data Out PDU.
   //
@@ -2391,6 +2416,7 @@ IScsiNewDataOutPdu (
     IScsiFreeNbufList (NbufList);
     return NULL;
   }
+
   //
   // Put the data segment into the buffer list and combine it with the BHS
   // into a full Data Out PDU.
@@ -2403,7 +2429,6 @@ IScsiNewDataOutPdu (
 
   return Pdu;
 }
-
 
 /**
   Generate a consecutive sequence of iSCSI SCSI Data Out PDUs.
@@ -2465,11 +2490,12 @@ IScsiGenerateDataOutPduSequence (
     //
     // Update the context and DataSN.
     //
-    Data += DataLen;
-    XferContext->Offset += DataLen;
+    Data                       += DataLen;
+    XferContext->Offset        += DataLen;
     XferContext->DesiredLength -= DataLen;
     DataSN++;
   }
+
   //
   // Set the F bit for the last data out PDU in this sequence.
   //
@@ -2506,10 +2532,10 @@ IScsiSendDataOutPduSequence (
   IN ISCSI_TCB  *Tcb
   )
 {
-  LIST_ENTRY      *DataOutPduList;
-  LIST_ENTRY      *Entry;
-  NET_BUF         *Pdu;
-  EFI_STATUS      Status;
+  LIST_ENTRY  *DataOutPduList;
+  LIST_ENTRY  *Entry;
+  NET_BUF     *Pdu;
+  EFI_STATUS  Status;
 
   //
   // Generate the Data Out PDU sequence.
@@ -2525,7 +2551,7 @@ IScsiSendDataOutPduSequence (
   // Send the Data Out PDU's one by one.
   //
   NET_LIST_FOR_EACH (Entry, DataOutPduList) {
-    Pdu     = NET_LIST_USER_STRUCT (Entry, NET_BUF, List);
+    Pdu = NET_LIST_USER_STRUCT (Entry, NET_BUF, List);
 
     Status = TcpIoTransmit (&Tcb->Conn->TcpIo, Pdu);
 
@@ -2538,7 +2564,6 @@ IScsiSendDataOutPduSequence (
 
   return Status;
 }
-
 
 /**
   Process the received iSCSI SCSI Data In PDU.
@@ -2564,7 +2589,7 @@ IScsiOnDataInRcvd (
   ISCSI_SCSI_DATA_IN  *DataInHdr;
   EFI_STATUS          Status;
 
-  DataInHdr                   = (ISCSI_SCSI_DATA_IN *) NetbufGetByte (Pdu, 0, NULL);
+  DataInHdr = (ISCSI_SCSI_DATA_IN *)NetbufGetByte (Pdu, 0, NULL);
   if (DataInHdr == NULL) {
     return EFI_PROTOCOL_ERROR;
   }
@@ -2585,6 +2610,7 @@ IScsiOnDataInRcvd (
   if (DataInHdr->InitiatorTaskTag != Tcb->InitiatorTaskTag) {
     return EFI_PROTOCOL_ERROR;
   }
+
   //
   // Update the command related sequence numbers.
   //
@@ -2606,6 +2632,7 @@ IScsiOnDataInRcvd (
       //
       return EFI_PROTOCOL_ERROR;
     }
+
     //
     // S bit is on, the StatSN is valid.
     //
@@ -2619,7 +2646,7 @@ IScsiOnDataInRcvd (
 
     if (ISCSI_FLAG_ON (DataInHdr, SCSI_RSP_PDU_FLAG_OVERFLOW)) {
       Packet->InTransferLength += NTOHL (DataInHdr->ResidualCount);
-      Status = EFI_BAD_BUFFER_SIZE;
+      Status                    = EFI_BAD_BUFFER_SIZE;
     }
 
     if (ISCSI_FLAG_ON (DataInHdr, SCSI_RSP_PDU_FLAG_UNDERFLOW)) {
@@ -2629,7 +2656,6 @@ IScsiOnDataInRcvd (
 
   return Status;
 }
-
 
 /**
   Process the received iSCSI R2T PDU.
@@ -2652,26 +2678,27 @@ IScsiOnR2TRcvd (
   IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
   )
 {
-  ISCSI_READY_TO_TRANSFER *R2THdr;
-  EFI_STATUS              Status;
-  ISCSI_XFER_CONTEXT      *XferContext;
-  UINT8                   *Data;
+  ISCSI_READY_TO_TRANSFER  *R2THdr;
+  EFI_STATUS               Status;
+  ISCSI_XFER_CONTEXT       *XferContext;
+  UINT8                    *Data;
 
-  R2THdr = (ISCSI_READY_TO_TRANSFER *) NetbufGetByte (Pdu, 0, NULL);
+  R2THdr = (ISCSI_READY_TO_TRANSFER *)NetbufGetByte (Pdu, 0, NULL);
   if (R2THdr == NULL) {
     return EFI_PROTOCOL_ERROR;
   }
 
-  R2THdr->InitiatorTaskTag = NTOHL (R2THdr->InitiatorTaskTag);
-  R2THdr->TargetTransferTag = NTOHL (R2THdr->TargetTransferTag);
-  R2THdr->StatSN = NTOHL (R2THdr->StatSN);
-  R2THdr->R2TSeqNum = NTOHL (R2THdr->R2TSeqNum);
-  R2THdr->BufferOffset = NTOHL (R2THdr->BufferOffset);
+  R2THdr->InitiatorTaskTag          = NTOHL (R2THdr->InitiatorTaskTag);
+  R2THdr->TargetTransferTag         = NTOHL (R2THdr->TargetTransferTag);
+  R2THdr->StatSN                    = NTOHL (R2THdr->StatSN);
+  R2THdr->R2TSeqNum                 = NTOHL (R2THdr->R2TSeqNum);
+  R2THdr->BufferOffset              = NTOHL (R2THdr->BufferOffset);
   R2THdr->DesiredDataTransferLength = NTOHL (R2THdr->DesiredDataTransferLength);
 
   if ((R2THdr->InitiatorTaskTag != Tcb->InitiatorTaskTag) || !ISCSI_SEQ_EQ (R2THdr->StatSN, Tcb->Conn->ExpStatSN)) {
-    return EFI_PROTOCOL_ERROR;;
+    return EFI_PROTOCOL_ERROR;
   }
+
   //
   // Check the sequence number.
   //
@@ -2680,25 +2707,26 @@ IScsiOnR2TRcvd (
     return Status;
   }
 
-  XferContext                     = &Tcb->XferContext;
-  XferContext->TargetTransferTag  = R2THdr->TargetTransferTag;
-  XferContext->Offset             = R2THdr->BufferOffset;
-  XferContext->DesiredLength      = R2THdr->DesiredDataTransferLength;
+  XferContext                    = &Tcb->XferContext;
+  XferContext->TargetTransferTag = R2THdr->TargetTransferTag;
+  XferContext->Offset            = R2THdr->BufferOffset;
+  XferContext->DesiredLength     = R2THdr->DesiredDataTransferLength;
 
   if (((XferContext->Offset + XferContext->DesiredLength) > Packet->OutTransferLength) ||
       (XferContext->DesiredLength > Tcb->Conn->Session->MaxBurstLength)
-      ) {
+      )
+  {
     return EFI_PROTOCOL_ERROR;
   }
+
   //
   // Send the data solicited by this R2T.
   //
-  Data    = (UINT8 *) Packet->OutDataBuffer + XferContext->Offset;
-  Status  = IScsiSendDataOutPduSequence (Data, Lun, Tcb);
+  Data   = (UINT8 *)Packet->OutDataBuffer + XferContext->Offset;
+  Status = IScsiSendDataOutPduSequence (Data, Lun, Tcb);
 
   return Status;
 }
-
 
 /**
   Process the received iSCSI SCSI Response PDU.
@@ -2725,28 +2753,28 @@ IScsiOnScsiRspRcvd (
   EFI_STATUS        Status;
   UINT32            DataSegLen;
 
-  ScsiRspHdr                    = (SCSI_RESPONSE *) NetbufGetByte (Pdu, 0, NULL);
+  ScsiRspHdr = (SCSI_RESPONSE *)NetbufGetByte (Pdu, 0, NULL);
   if (ScsiRspHdr == NULL) {
     return EFI_PROTOCOL_ERROR;
   }
 
-  ScsiRspHdr->InitiatorTaskTag  = NTOHL (ScsiRspHdr->InitiatorTaskTag);
+  ScsiRspHdr->InitiatorTaskTag = NTOHL (ScsiRspHdr->InitiatorTaskTag);
   if (ScsiRspHdr->InitiatorTaskTag != Tcb->InitiatorTaskTag) {
     return EFI_PROTOCOL_ERROR;
   }
 
-  ScsiRspHdr->StatSN  = NTOHL (ScsiRspHdr->StatSN);
+  ScsiRspHdr->StatSN = NTOHL (ScsiRspHdr->StatSN);
 
-  Status              = IScsiCheckSN (&Tcb->Conn->ExpStatSN, ScsiRspHdr->StatSN);
+  Status = IScsiCheckSN (&Tcb->Conn->ExpStatSN, ScsiRspHdr->StatSN);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  ScsiRspHdr->MaxCmdSN  = NTOHL (ScsiRspHdr->MaxCmdSN);
-  ScsiRspHdr->ExpCmdSN  = NTOHL (ScsiRspHdr->ExpCmdSN);
+  ScsiRspHdr->MaxCmdSN = NTOHL (ScsiRspHdr->MaxCmdSN);
+  ScsiRspHdr->ExpCmdSN = NTOHL (ScsiRspHdr->ExpCmdSN);
   IScsiUpdateCmdSN (Tcb->Conn->Session, ScsiRspHdr->MaxCmdSN, ScsiRspHdr->ExpCmdSN);
 
-  Tcb->StatusXferd          = TRUE;
+  Tcb->StatusXferd = TRUE;
 
   Packet->HostAdapterStatus = ScsiRspHdr->Response;
   if (Packet->HostAdapterStatus != ISCSI_SERVICE_RSP_COMMAND_COMPLETE_AT_TARGET) {
@@ -2757,13 +2785,14 @@ IScsiOnScsiRspRcvd (
 
   if (ISCSI_FLAG_ON (ScsiRspHdr, SCSI_RSP_PDU_FLAG_BI_READ_OVERFLOW | SCSI_RSP_PDU_FLAG_BI_READ_UNDERFLOW) ||
       ISCSI_FLAG_ON (ScsiRspHdr, SCSI_RSP_PDU_FLAG_OVERFLOW | SCSI_RSP_PDU_FLAG_UNDERFLOW)
-        ) {
+      )
+  {
     return EFI_PROTOCOL_ERROR;
   }
 
   if (ISCSI_FLAG_ON (ScsiRspHdr, SCSI_RSP_PDU_FLAG_BI_READ_OVERFLOW)) {
     Packet->InTransferLength += NTOHL (ScsiRspHdr->BiReadResidualCount);
-    Status = EFI_BAD_BUFFER_SIZE;
+    Status                    = EFI_BAD_BUFFER_SIZE;
   }
 
   if (ISCSI_FLAG_ON (ScsiRspHdr, SCSI_RSP_PDU_FLAG_BI_READ_UNDERFLOW)) {
@@ -2790,14 +2819,14 @@ IScsiOnScsiRspRcvd (
 
   DataSegLen = ISCSI_GET_DATASEG_LEN (ScsiRspHdr);
   if (DataSegLen != 0) {
-    SenseData               = (ISCSI_SENSE_DATA *) NetbufGetByte (Pdu, sizeof (SCSI_RESPONSE), NULL);
+    SenseData = (ISCSI_SENSE_DATA *)NetbufGetByte (Pdu, sizeof (SCSI_RESPONSE), NULL);
     if (SenseData == NULL) {
       return EFI_PROTOCOL_ERROR;
     }
 
-    SenseData->Length       = NTOHS (SenseData->Length);
+    SenseData->Length = NTOHS (SenseData->Length);
 
-    Packet->SenseDataLength = (UINT8) MIN (SenseData->Length, Packet->SenseDataLength);
+    Packet->SenseDataLength = (UINT8)MIN (SenseData->Length, Packet->SenseDataLength);
     if (Packet->SenseDataLength != 0) {
       CopyMem (Packet->SenseData, &SenseData->Data[0], Packet->SenseDataLength);
     }
@@ -2807,7 +2836,6 @@ IScsiOnScsiRspRcvd (
 
   return Status;
 }
-
 
 /**
   Process the received NOP In PDU.
@@ -2829,14 +2857,14 @@ IScsiOnNopInRcvd (
   ISCSI_NOP_IN  *NopInHdr;
   EFI_STATUS    Status;
 
-  NopInHdr            = (ISCSI_NOP_IN *) NetbufGetByte (Pdu, 0, NULL);
+  NopInHdr = (ISCSI_NOP_IN *)NetbufGetByte (Pdu, 0, NULL);
   if (NopInHdr == NULL) {
     return EFI_PROTOCOL_ERROR;
   }
 
-  NopInHdr->StatSN    = NTOHL (NopInHdr->StatSN);
-  NopInHdr->ExpCmdSN  = NTOHL (NopInHdr->ExpCmdSN);
-  NopInHdr->MaxCmdSN  = NTOHL (NopInHdr->MaxCmdSN);
+  NopInHdr->StatSN   = NTOHL (NopInHdr->StatSN);
+  NopInHdr->ExpCmdSN = NTOHL (NopInHdr->ExpCmdSN);
+  NopInHdr->MaxCmdSN = NTOHL (NopInHdr->MaxCmdSN);
 
   if (NopInHdr->InitiatorTaskTag == ISCSI_RESERVED_TAG) {
     if (NopInHdr->StatSN != Tcb->Conn->ExpStatSN) {
@@ -2853,7 +2881,6 @@ IScsiOnNopInRcvd (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Execute the SCSI command issued through the EXT SCSI PASS THRU protocol.
@@ -2881,25 +2908,25 @@ IScsiExecuteScsiCommand (
   IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
   )
 {
-  EFI_STATUS              Status;
-  ISCSI_DRIVER_DATA       *Private;
-  ISCSI_SESSION           *Session;
-  EFI_EVENT               TimeoutEvent;
-  ISCSI_CONNECTION        *Conn;
-  ISCSI_TCB               *Tcb;
-  NET_BUF                 *Pdu;
-  ISCSI_XFER_CONTEXT      *XferContext;
-  UINT8                   *Data;
-  ISCSI_IN_BUFFER_CONTEXT InBufferContext;
-  UINT64                  Timeout;
-  UINT8                   *PduHdr;
+  EFI_STATUS               Status;
+  ISCSI_DRIVER_DATA        *Private;
+  ISCSI_SESSION            *Session;
+  EFI_EVENT                TimeoutEvent;
+  ISCSI_CONNECTION         *Conn;
+  ISCSI_TCB                *Tcb;
+  NET_BUF                  *Pdu;
+  ISCSI_XFER_CONTEXT       *XferContext;
+  UINT8                    *Data;
+  ISCSI_IN_BUFFER_CONTEXT  InBufferContext;
+  UINT64                   Timeout;
+  UINT8                    *PduHdr;
 
-  Private       = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (PassThru);
-  Session       = Private->Session;
-  Status        = EFI_SUCCESS;
-  Tcb           = NULL;
-  TimeoutEvent  = NULL;
-  Timeout       = 0;
+  Private      = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (PassThru);
+  Session      = Private->Session;
+  Status       = EFI_SUCCESS;
+  Tcb          = NULL;
+  TimeoutEvent = NULL;
+  Timeout      = 0;
 
   if (Session->State != SESSION_STATE_LOGGED_IN) {
     Status = EFI_DEVICE_ERROR;
@@ -2921,6 +2948,7 @@ IScsiExecuteScsiCommand (
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
+
   //
   // Encapsulate the SCSI request packet into an iSCSI SCSI Command PDU.
   //
@@ -2930,13 +2958,14 @@ IScsiExecuteScsiCommand (
     goto ON_EXIT;
   }
 
-  XferContext         = &Tcb->XferContext;
-  PduHdr              = NetbufGetByte (Pdu, 0, NULL);
+  XferContext = &Tcb->XferContext;
+  PduHdr      = NetbufGetByte (Pdu, 0, NULL);
   if (PduHdr == NULL) {
     Status = EFI_PROTOCOL_ERROR;
     NetbufFree (Pdu);
     goto ON_EXIT;
   }
+
   XferContext->Offset = ISCSI_GET_DATASEG_LEN (PduHdr);
 
   //
@@ -2953,25 +2982,26 @@ IScsiExecuteScsiCommand (
   if (!Session->InitialR2T &&
       (XferContext->Offset < Session->FirstBurstLength) &&
       (XferContext->Offset < Packet->OutTransferLength)
-      ) {
+      )
+  {
     //
     // Unsolicited Data-Out sequence is allowed. There is remaining SCSI
     // OUT data, and the limit of FirstBurstLength is not reached.
     //
     XferContext->TargetTransferTag = ISCSI_RESERVED_TAG;
-    XferContext->DesiredLength = MIN (
-                                   Session->FirstBurstLength,
-                                   Packet->OutTransferLength - XferContext->Offset
-                                   );
+    XferContext->DesiredLength     = MIN (
+                                       Session->FirstBurstLength,
+                                       Packet->OutTransferLength - XferContext->Offset
+                                       );
 
-    Data    = (UINT8 *) Packet->OutDataBuffer + XferContext->Offset;
-    Status  = IScsiSendDataOutPduSequence (Data, Lun, Tcb);
+    Data   = (UINT8 *)Packet->OutDataBuffer + XferContext->Offset;
+    Status = IScsiSendDataOutPduSequence (Data, Lun, Tcb);
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }
   }
 
-  InBufferContext.InData    = (UINT8 *) Packet->InDataBuffer;
+  InBufferContext.InData    = (UINT8 *)Packet->InDataBuffer;
   InBufferContext.InDataLen = Packet->InTransferLength;
 
   while (!Tcb->StatusXferd) {
@@ -3001,34 +3031,35 @@ IScsiExecuteScsiCommand (
       NetbufFree (Pdu);
       goto ON_EXIT;
     }
+
     switch (ISCSI_GET_OPCODE (PduHdr)) {
-    case ISCSI_OPCODE_SCSI_DATA_IN:
-      Status = IScsiOnDataInRcvd (Pdu, Tcb, Packet);
-      break;
+      case ISCSI_OPCODE_SCSI_DATA_IN:
+        Status = IScsiOnDataInRcvd (Pdu, Tcb, Packet);
+        break;
 
-    case ISCSI_OPCODE_R2T:
-      Status = IScsiOnR2TRcvd (Pdu, Tcb, Lun, Packet);
-      break;
+      case ISCSI_OPCODE_R2T:
+        Status = IScsiOnR2TRcvd (Pdu, Tcb, Lun, Packet);
+        break;
 
-    case ISCSI_OPCODE_SCSI_RSP:
-      Status = IScsiOnScsiRspRcvd (Pdu, Tcb, Packet);
-      break;
+      case ISCSI_OPCODE_SCSI_RSP:
+        Status = IScsiOnScsiRspRcvd (Pdu, Tcb, Packet);
+        break;
 
-    case ISCSI_OPCODE_NOP_IN:
-      Status = IScsiOnNopInRcvd (Pdu, Tcb);
-      break;
+      case ISCSI_OPCODE_NOP_IN:
+        Status = IScsiOnNopInRcvd (Pdu, Tcb);
+        break;
 
-    case ISCSI_OPCODE_VENDOR_T0:
-    case ISCSI_OPCODE_VENDOR_T1:
-    case ISCSI_OPCODE_VENDOR_T2:
-      //
-      // These messages are vendor specific. Skip them.
-      //
-      break;
+      case ISCSI_OPCODE_VENDOR_T0:
+      case ISCSI_OPCODE_VENDOR_T1:
+      case ISCSI_OPCODE_VENDOR_T2:
+        //
+        // These messages are vendor specific. Skip them.
+        //
+        break;
 
-    default:
-      Status = EFI_PROTOCOL_ERROR;
-      break;
+      default:
+        Status = EFI_PROTOCOL_ERROR;
+        break;
     }
 
     NetbufFree (Pdu);
@@ -3051,7 +3082,6 @@ ON_EXIT:
   return Status;
 }
 
-
 /**
   Reinstate the session on some error.
 
@@ -3066,7 +3096,7 @@ IScsiSessionReinstatement (
   IN ISCSI_SESSION  *Session
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   ASSERT (Session->State != SESSION_STATE_FREE);
 
@@ -3084,7 +3114,6 @@ IScsiSessionReinstatement (
   return Status;
 }
 
-
 /**
   Initialize some session parameters before login.
 
@@ -3099,18 +3128,18 @@ IScsiSessionInit (
   )
 {
   if (!Recovery) {
-    Session->Signature  = ISCSI_SESSION_SIGNATURE;
-    Session->State      = SESSION_STATE_FREE;
+    Session->Signature = ISCSI_SESSION_SIGNATURE;
+    Session->State     = SESSION_STATE_FREE;
 
     InitializeListHead (&Session->Conns);
     InitializeListHead (&Session->TcbList);
   }
 
-  Session->Tsih                 = 0;
+  Session->Tsih = 0;
 
-  Session->CmdSN                = 1;
-  Session->InitiatorTaskTag     = 1;
-  Session->NextCid              = 1;
+  Session->CmdSN            = 1;
+  Session->InitiatorTaskTag = 1;
+  Session->NextCid          = 1;
 
   Session->TargetPortalGroupTag = 0;
   Session->MaxConnections       = ISCSI_MAX_CONNS_PER_SESSION;
@@ -3125,7 +3154,6 @@ IScsiSessionInit (
   Session->DataSequenceInOrder  = TRUE;
   Session->ErrorRecoveryLevel   = 0;
 }
-
 
 /**
   Abort the iSCSI session. That is, reset all the connection(s), and free the
@@ -3143,7 +3171,7 @@ IScsiSessionAbort (
   EFI_GUID          *ProtocolGuid;
 
   if (Session->State != SESSION_STATE_LOGGED_IN) {
-    return ;
+    return;
   }
 
   ASSERT (!IsListEmpty (&Session->Conns));
@@ -3176,5 +3204,5 @@ IScsiSessionAbort (
 
   Session->State = SESSION_STATE_FAILED;
 
-  return ;
+  return;
 }

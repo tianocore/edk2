@@ -6,7 +6,6 @@
 
 **/
 
-
 #include "InternalHiiLib.h"
 
 /**
@@ -30,7 +29,7 @@
 CHAR8 *
 EFIAPI
 HiiGetSupportedLanguages (
-  IN EFI_HII_HANDLE           HiiHandle
+  IN EFI_HII_HANDLE  HiiHandle
   )
 {
   EFI_STATUS  Status;
@@ -44,7 +43,7 @@ HiiGetSupportedLanguages (
   // Retrieve the size required for the supported languages buffer.
   //
   LanguageSize = 0;
-  Status = gHiiString->GetLanguages (gHiiString, HiiHandle, &TempSupportedLanguages, &LanguageSize);
+  Status       = gHiiString->GetLanguages (gHiiString, HiiHandle, &TempSupportedLanguages, &LanguageSize);
 
   //
   // If GetLanguages() returns EFI_SUCCESS for a zero size,
@@ -87,4 +86,3 @@ HiiGetSupportedLanguages (
   //
   return SupportedLanguages;
 }
-

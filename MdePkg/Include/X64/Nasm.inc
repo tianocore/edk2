@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2019 - 2021, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Abstract:
@@ -9,28 +9,20 @@
 ;
 ;------------------------------------------------------------------------------
 
-%macro SAVEPREVSSP     0
-    DB 0xF3, 0x0F, 0x01, 0xEA
+;
+; Macro for the PVALIDATE instruction, defined in AMD APM volume 3.
+; NASM feature request URL: https://bugzilla.nasm.us/show_bug.cgi?id=3392753
+;
+%macro PVALIDATE       0
+    DB 0xF2, 0x0F, 0x01, 0xFF
 %endmacro
 
-%macro CLRSSBSY_RAX    0
-    DB 0xF3, 0x0F, 0xAE, 0x30
-%endmacro
-
-%macro RSTORSSP_RAX    0
-    DB 0xF3, 0x0F, 0x01, 0x28
-%endmacro
-
-%macro SETSSBSY        0
-    DB 0xF3, 0x0F, 0x01, 0xE8
-%endmacro
-
-%macro READSSP_RAX     0
-    DB 0xF3, 0x48, 0x0F, 0x1E, 0xC8
-%endmacro
-
-%macro INCSSP_RAX      0
-    DB 0xF3, 0x48, 0x0F, 0xAE, 0xE8
+;
+; Macro for the RMPADJUST instruction, defined in AMD APM volume 3.
+; NASM feature request URL: https://bugzilla.nasm.us/show_bug.cgi?id=3392754
+;
+%macro RMPADJUST       0
+    DB 0xF3, 0x0F, 0x01, 0xFE
 %endmacro
 
 ; NASM provides built-in macros STRUC and ENDSTRUC for structure definition.

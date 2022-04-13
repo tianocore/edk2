@@ -28,21 +28,24 @@ ResetShutdown (
   VOID
   )
 {
-  UINT16 AcpiPmBaseAddress;
-  UINT16 HostBridgeDevId;
+  UINT16  AcpiPmBaseAddress;
+  UINT16  HostBridgeDevId;
 
   AcpiPmBaseAddress = 0;
-  HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
+  HostBridgeDevId   = PciRead16 (OVMF_HOSTBRIDGE_DID);
   switch (HostBridgeDevId) {
-  case INTEL_82441_DEVICE_ID:
-    AcpiPmBaseAddress = PIIX4_PMBA_VALUE;
-    break;
-  case INTEL_Q35_MCH_DEVICE_ID:
-    AcpiPmBaseAddress = ICH9_PMBASE_VALUE;
-    break;
-  default:
-    ASSERT (FALSE);
-    CpuDeadLoop ();
+    case INTEL_82441_DEVICE_ID:
+      AcpiPmBaseAddress = PIIX4_PMBA_VALUE;
+      break;
+    case INTEL_Q35_MCH_DEVICE_ID:
+      AcpiPmBaseAddress = ICH9_PMBASE_VALUE;
+      break;
+    case CLOUDHV_DEVICE_ID:
+      IoWrite8 (CLOUDHV_ACPI_SHUTDOWN_IO_ADDRESS, 5 << 2 | 1 << 5);
+      CpuDeadLoop ();
+    default:
+      ASSERT (FALSE);
+      CpuDeadLoop ();
   }
 
   IoBitFieldWrite16 (AcpiPmBaseAddress + 4, 10, 13, 0);

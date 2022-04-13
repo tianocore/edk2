@@ -1,0 +1,16 @@
+// /** @file
+// Provides the capability to intialize Secure Boot default variables
+//
+// Module which initializes Secure boot default variables.
+//
+// Copyright (c) 2021, ARM Ltd. All rights reserved.<BR>
+// Copyright (c) 2021, Semihalf All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Module which initializes Secure boot default variables"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module reads embedded keys and initializes Secure Boot default variables."

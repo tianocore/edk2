@@ -24,8 +24,8 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlInitializeNodeHeader (
-  IN  AML_NODE_HEADER   * Node,
-  IN  EAML_NODE_TYPE      NodeType
+  IN  AML_NODE_HEADER  *Node,
+  IN  EAML_NODE_TYPE   NodeType
   )
 {
   if (Node == NULL) {
@@ -35,7 +35,7 @@ AmlInitializeNodeHeader (
 
   InitializeListHead (&Node->Link);
 
-  Node->Parent = NULL;
+  Node->Parent   = NULL;
   Node->NodeType = NodeType;
 
   return EFI_SUCCESS;
@@ -55,7 +55,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlDeleteRootNode (
-  IN  AML_ROOT_NODE  * RootNode
+  IN  AML_ROOT_NODE  *RootNode
   )
 {
   if (!IS_AML_ROOT_NODE (RootNode)) {
@@ -79,7 +79,9 @@ AmlDeleteRootNode (
 
   @param  [in]  SdtHeader       Pointer to an ACPI DSDT/SSDT header to copy
                                 the data from.
-  @param  [out] NewRootNodePtr  The created AML_ROOT_NODE.
+  @param  [out] NewRootNodePtr  If success, contains the created
+                                AML_ROOT_NODE.
+                                Otherwise reset to NULL.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -88,18 +90,21 @@ AmlDeleteRootNode (
 EFI_STATUS
 EFIAPI
 AmlCreateRootNode (
-  IN  CONST EFI_ACPI_DESCRIPTION_HEADER   * SdtHeader,
-  OUT       AML_ROOT_NODE                ** NewRootNodePtr
+  IN  CONST EFI_ACPI_DESCRIPTION_HEADER  *SdtHeader,
+  OUT       AML_ROOT_NODE                **NewRootNodePtr
   )
 {
-  EFI_STATUS        Status;
-  AML_ROOT_NODE   * RootNode;
+  EFI_STATUS     Status;
+  AML_ROOT_NODE  *RootNode;
 
   if ((SdtHeader == NULL) ||
-      (NewRootNodePtr == NULL)) {
+      (NewRootNodePtr == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
+
+  *NewRootNodePtr = NULL;
 
   RootNode = AllocateZeroPool (sizeof (AML_ROOT_NODE));
   if (RootNode == NULL) {
@@ -145,7 +150,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlDeleteObjectNode (
-  IN  AML_OBJECT_NODE   * ObjectNode
+  IN  AML_OBJECT_NODE  *ObjectNode
   )
 {
   if (!IS_AML_OBJECT_NODE (ObjectNode)) {
@@ -163,7 +168,9 @@ AmlDeleteObjectNode (
   @param  [in]  PkgLength         PkgLength of the node if the AmlByteEncoding
                                   has the PkgLen attribute.
                                   0 otherwise.
-  @param  [out] NewObjectNodePtr  The created AML_OBJECT_NODE.
+  @param  [out] NewObjectNodePtr  If success, contains the created
+                                  AML_OBJECT_NODE.
+                                  Otherwise reset to NULL.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -172,19 +179,22 @@ AmlDeleteObjectNode (
 EFI_STATUS
 EFIAPI
 AmlCreateObjectNode (
-  IN  CONST  AML_BYTE_ENCODING   * AmlByteEncoding,
-  IN         UINT32                PkgLength,
-  OUT        AML_OBJECT_NODE    ** NewObjectNodePtr
+  IN  CONST  AML_BYTE_ENCODING  *AmlByteEncoding,
+  IN         UINT32             PkgLength,
+  OUT        AML_OBJECT_NODE    **NewObjectNodePtr
   )
 {
-  EFI_STATUS            Status;
-  AML_OBJECT_NODE     * ObjectNode;
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *ObjectNode;
 
   if ((AmlByteEncoding == NULL)  ||
-      (NewObjectNodePtr == NULL)) {
+      (NewObjectNodePtr == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
+
+  *NewObjectNodePtr = NULL;
 
   ObjectNode = AllocateZeroPool (sizeof (AML_OBJECT_NODE));
   if (ObjectNode == NULL) {
@@ -204,7 +214,7 @@ AmlCreateObjectNode (
   // ObjectNode->FixedArgs[...] is already initialised to NULL as the
   // ObjectNode is Zero allocated.
   ObjectNode->AmlByteEncoding = AmlByteEncoding;
-  ObjectNode->PkgLen = PkgLength;
+  ObjectNode->PkgLen          = PkgLength;
 
   *NewObjectNodePtr = ObjectNode;
 
@@ -226,7 +236,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlDeleteDataNode (
-  IN  AML_DATA_NODE   * DataNode
+  IN  AML_DATA_NODE  *DataNode
   )
 {
   if (!IS_AML_DATA_NODE (DataNode)) {
@@ -252,7 +262,9 @@ AmlDeleteDataNode (
                                 this node. Data is copied from there.
   @param  [in]  DataSize        Number of bytes to consider at the address
                                 pointed by Data.
-  @param  [out] NewDataNodePtr  The created AML_DATA_NODE.
+  @param  [out] NewDataNodePtr  If success, contains the created
+                                AML_DATA_NODE.
+                                Otherwise reset to NULL.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -261,14 +273,14 @@ AmlDeleteDataNode (
 EFI_STATUS
 EFIAPI
 AmlCreateDataNode (
-  IN        EAML_NODE_DATA_TYPE     DataType,
-  IN  CONST UINT8                 * Data,
-  IN        UINT32                  DataSize,
-  OUT       AML_DATA_NODE        ** NewDataNodePtr
+  IN        EAML_NODE_DATA_TYPE  DataType,
+  IN  CONST UINT8                *Data,
+  IN        UINT32               DataSize,
+  OUT       AML_DATA_NODE        **NewDataNodePtr
   )
 {
-  EFI_STATUS        Status;
-  AML_DATA_NODE   * DataNode;
+  EFI_STATUS     Status;
+  AML_DATA_NODE  *DataNode;
 
   // A data node must not be created for certain data types.
   if ((DataType == EAmlNodeDataTypeNone)       ||
@@ -279,10 +291,13 @@ AmlCreateDataNode (
       (DataType == EAmlNodeDataTypeReserved5)  ||
       (Data == NULL)                           ||
       (DataSize == 0)                          ||
-      (NewDataNodePtr == NULL)) {
+      (NewDataNodePtr == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
+
+  *NewDataNodePtr = NULL;
 
   DataNode = AllocateZeroPool (sizeof (AML_DATA_NODE));
   if (DataNode == NULL) {
@@ -305,7 +320,7 @@ AmlCreateDataNode (
   }
 
   DataNode->DataType = DataType;
-  DataNode->Size = DataSize;
+  DataNode->Size     = DataSize;
 
   *NewDataNodePtr = DataNode;
 
@@ -322,17 +337,18 @@ AmlCreateDataNode (
 EFI_STATUS
 EFIAPI
 AmlDeleteNode (
-  IN  AML_NODE_HEADER   * Node
+  IN  AML_NODE_HEADER  *Node
   )
 {
-  EFI_STATUS          Status;
-  EAML_PARSE_INDEX    Index;
+  EFI_STATUS        Status;
+  EAML_PARSE_INDEX  Index;
 
   // Check that the node being deleted is unlinked.
   // When removing the node, its parent and list are reset
   // with InitializeListHead. Thus it must be empty.
   if (!IS_AML_NODE_VALID (Node) ||
-      !AML_NODE_IS_DETACHED (Node)) {
+      !AML_NODE_IS_DETACHED (Node))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -346,10 +362,11 @@ AmlDeleteNode (
         return EFI_INVALID_PARAMETER;
       }
 
-      Status = AmlDeleteRootNode ((AML_ROOT_NODE*)Node);
+      Status = AmlDeleteRootNode ((AML_ROOT_NODE *)Node);
       if (EFI_ERROR (Status)) {
         ASSERT (0);
       }
+
       break;
     }
 
@@ -363,25 +380,27 @@ AmlDeleteNode (
 
       // Check the fixed argument list has been cleaned.
       for (Index = EAmlParseIndexTerm0; Index < EAmlParseIndexMax; Index++) {
-        if (((AML_OBJECT_NODE*)Node)->FixedArgs[Index] != NULL) {
+        if (((AML_OBJECT_NODE *)Node)->FixedArgs[Index] != NULL) {
           ASSERT (0);
           return EFI_INVALID_PARAMETER;
         }
       }
 
-      Status = AmlDeleteObjectNode ((AML_OBJECT_NODE*)Node);
+      Status = AmlDeleteObjectNode ((AML_OBJECT_NODE *)Node);
       if (EFI_ERROR (Status)) {
         ASSERT (0);
       }
+
       break;
     }
 
     case EAmlNodeData:
     {
-      Status = AmlDeleteDataNode ((AML_DATA_NODE*)Node);
+      Status = AmlDeleteDataNode ((AML_DATA_NODE *)Node);
       if (EFI_ERROR (Status)) {
         ASSERT (0);
       }
+
       break;
     }
 
@@ -409,12 +428,13 @@ AmlDeleteNode (
 BOOLEAN
 EFIAPI
 AmlNodeHasAttribute (
-  IN  CONST AML_OBJECT_NODE   * ObjectNode,
-  IN        AML_OP_ATTRIBUTE    Attribute
+  IN  CONST AML_OBJECT_NODE   *ObjectNode,
+  IN        AML_OP_ATTRIBUTE  Attribute
   )
 {
   if (!IS_AML_OBJECT_NODE (ObjectNode) ||
-      (ObjectNode->AmlByteEncoding == NULL)) {
+      (ObjectNode->AmlByteEncoding == NULL))
+  {
     return FALSE;
   }
 
@@ -435,21 +455,22 @@ AmlNodeHasAttribute (
 BOOLEAN
 EFIAPI
 AmlNodeCompareOpCode (
-  IN  CONST  AML_OBJECT_NODE  * ObjectNode,
-  IN         UINT8              OpCode,
-  IN         UINT8              SubOpCode
+  IN  CONST  AML_OBJECT_NODE  *ObjectNode,
+  IN         UINT8            OpCode,
+  IN         UINT8            SubOpCode
   )
 {
   if (!IS_AML_OBJECT_NODE (ObjectNode) ||
-      (ObjectNode->AmlByteEncoding == NULL)) {
+      (ObjectNode->AmlByteEncoding == NULL))
+  {
     return FALSE;
   }
 
   ASSERT (AmlIsOpCodeValid (OpCode, SubOpCode));
 
   return ((ObjectNode->AmlByteEncoding->OpCode == OpCode) &&
-           (ObjectNode->AmlByteEncoding->SubOpCode == SubOpCode)) ?
-           TRUE : FALSE;
+          (ObjectNode->AmlByteEncoding->SubOpCode == SubOpCode)) ?
+         TRUE : FALSE;
 }
 
 /** Check whether a Node is an integer node.
@@ -468,13 +489,14 @@ AmlNodeCompareOpCode (
 BOOLEAN
 EFIAPI
 IsIntegerNode (
-  IN  AML_OBJECT_NODE   * Node
+  IN  AML_OBJECT_NODE  *Node
   )
 {
-  UINT8   OpCode;
+  UINT8  OpCode;
 
   if (!IS_AML_OBJECT_NODE (Node)  ||
-      (Node->AmlByteEncoding == NULL)) {
+      (Node->AmlByteEncoding == NULL))
+  {
     return FALSE;
   }
 
@@ -483,7 +505,8 @@ IsIntegerNode (
   if ((OpCode != AML_BYTE_PREFIX)   &&
       (OpCode != AML_WORD_PREFIX)   &&
       (OpCode != AML_DWORD_PREFIX)  &&
-      (OpCode != AML_QWORD_PREFIX)) {
+      (OpCode != AML_QWORD_PREFIX))
+  {
     return FALSE;
   }
 
@@ -503,13 +526,14 @@ IsIntegerNode (
 BOOLEAN
 EFIAPI
 IsSpecialIntegerNode (
-  IN  AML_OBJECT_NODE   * Node
+  IN  AML_OBJECT_NODE  *Node
   )
 {
-  UINT8   OpCode;
+  UINT8  OpCode;
 
   if (!IS_AML_OBJECT_NODE (Node)  ||
-      (Node->AmlByteEncoding == NULL)) {
+      (Node->AmlByteEncoding == NULL))
+  {
     return FALSE;
   }
 
@@ -517,7 +541,8 @@ IsSpecialIntegerNode (
 
   if ((OpCode != AML_ZERO_OP) &&
       (OpCode != AML_ONE_OP)  &&
-      (OpCode != AML_ONES_OP)) {
+      (OpCode != AML_ONES_OP))
+  {
     return FALSE;
   }
 
@@ -543,10 +568,10 @@ IsSpecialIntegerNode (
 BOOLEAN
 EFIAPI
 AmlIsMethodDefinitionNode (
-  IN  CONST AML_OBJECT_NODE   * Node
+  IN  CONST AML_OBJECT_NODE  *Node
   )
 {
-  AML_DATA_NODE   * ObjectType;
+  AML_DATA_NODE  *ObjectType;
 
   // Node is checked to be an object node aswell.
   if (AmlNodeCompareOpCode (Node, AML_METHOD_OP, 0)) {
@@ -557,14 +582,15 @@ AmlIsMethodDefinitionNode (
     // ExternalOp := 0x15
     // ObjectType := ByteData
     // ArgumentCount := ByteData (0 - 7)
-    ObjectType = (AML_DATA_NODE*)AmlGetFixedArgument (
-                                   (AML_OBJECT_NODE*)Node,
-                                   EAmlParseIndexTerm1
-                                   );
+    ObjectType = (AML_DATA_NODE *)AmlGetFixedArgument (
+                                    (AML_OBJECT_NODE *)Node,
+                                    EAmlParseIndexTerm1
+                                    );
     if (IS_AML_DATA_NODE (ObjectType)                   &&
         (ObjectType->DataType == EAmlNodeDataTypeUInt)  &&
-        ((ObjectType->Size == 1))) {
-      if (*((UINT8*)ObjectType->Buffer) == (UINT8)EAmlObjTypeMethodObj) {
+        ((ObjectType->Size == 1)))
+    {
+      if (*((UINT8 *)ObjectType->Buffer) == (UINT8)EAmlObjTypeMethodObj) {
         // The external definition is a method.
         return TRUE;
       } else {
@@ -593,15 +619,16 @@ AmlIsMethodDefinitionNode (
 **/
 EFI_STATUS
 AmlNodeGetNameIndex (
-  IN  CONST AML_OBJECT_NODE     * ObjectNode,
-  OUT       EAML_PARSE_INDEX    * Index
+  IN  CONST AML_OBJECT_NODE   *ObjectNode,
+  OUT       EAML_PARSE_INDEX  *Index
   )
 {
-  EAML_PARSE_INDEX    NameIndex;
+  EAML_PARSE_INDEX  NameIndex;
 
   if (!AmlNodeHasAttribute (ObjectNode, AML_IN_NAMESPACE)   ||
       (ObjectNode->AmlByteEncoding == NULL)                 ||
-      (Index == NULL)) {
+      (Index == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -609,7 +636,8 @@ AmlNodeGetNameIndex (
   NameIndex = ObjectNode->AmlByteEncoding->NameIndex;
 
   if ((NameIndex > ObjectNode->AmlByteEncoding->MaxIndex)   ||
-      (ObjectNode->AmlByteEncoding->Format[NameIndex] != EAmlName)) {
+      (ObjectNode->AmlByteEncoding->Format[NameIndex] != EAmlName))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -633,12 +661,12 @@ AmlNodeGetNameIndex (
 CHAR8 *
 EFIAPI
 AmlNodeGetName (
-  IN  CONST AML_OBJECT_NODE   * ObjectNode
+  IN  CONST AML_OBJECT_NODE  *ObjectNode
   )
 {
-  EFI_STATUS          Status;
-  EAML_PARSE_INDEX    NameIndex;
-  AML_DATA_NODE     * DataNode;
+  EFI_STATUS        Status;
+  EAML_PARSE_INDEX  NameIndex;
+  AML_DATA_NODE     *DataNode;
 
   if (!AmlNodeHasAttribute (ObjectNode, AML_IN_NAMESPACE)) {
     ASSERT (0);
@@ -653,10 +681,11 @@ AmlNodeGetName (
   }
 
   // The name is stored in a Data node.
-  DataNode = (AML_DATA_NODE*)ObjectNode->FixedArgs[NameIndex];
+  DataNode = (AML_DATA_NODE *)ObjectNode->FixedArgs[NameIndex];
   if (IS_AML_DATA_NODE (DataNode) &&
-      (DataNode->DataType == EAmlNodeDataTypeNameString)) {
-    return (CHAR8*)DataNode->Buffer;
+      (DataNode->DataType == EAmlNodeDataTypeNameString))
+  {
+    return (CHAR8 *)DataNode->Buffer;
   }
 
   /* Return NULL if no name is found.

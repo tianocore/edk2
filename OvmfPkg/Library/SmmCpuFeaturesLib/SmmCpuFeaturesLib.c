@@ -25,7 +25,7 @@
 //
 // EFER register LMA bit
 //
-#define LMA BIT10
+#define LMA  BIT10
 
 /**
   The constructor function
@@ -88,9 +88,9 @@ SmmCpuFeaturesInitializeProcessor (
   // Configure SMBASE.
   //
   CpuState = (QEMU_SMRAM_SAVE_STATE_MAP *)(UINTN)(
-                                            SMM_DEFAULT_SMBASE +
-                                            SMRAM_SAVE_STATE_MAP_OFFSET
-                                            );
+                                                  SMM_DEFAULT_SMBASE +
+                                                  SMRAM_SAVE_STATE_MAP_OFFSET
+                                                  );
   if ((CpuState->x86.SMMRevId & 0xFFFF) == 0) {
     CpuState->x86.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
   } else {
@@ -142,13 +142,13 @@ SmmCpuFeaturesHookReturnFromSmm (
   IN UINT64                NewInstructionPointer
   )
 {
-  UINT64                      OriginalInstructionPointer;
-  QEMU_SMRAM_SAVE_STATE_MAP   *CpuSaveState;
+  UINT64                     OriginalInstructionPointer;
+  QEMU_SMRAM_SAVE_STATE_MAP  *CpuSaveState;
 
   CpuSaveState = (QEMU_SMRAM_SAVE_STATE_MAP *)CpuState;
   if ((CpuSaveState->x86.SMMRevId & 0xFFFF) == 0) {
     OriginalInstructionPointer = (UINT64)CpuSaveState->x86._EIP;
-    CpuSaveState->x86._EIP = (UINT32)NewInstructionPointer;
+    CpuSaveState->x86._EIP     = (UINT32)NewInstructionPointer;
     //
     // Clear the auto HALT restart flag so the RSM instruction returns
     // program control to the instruction following the HLT instruction.
@@ -163,6 +163,7 @@ SmmCpuFeaturesHookReturnFromSmm (
     } else {
       CpuSaveState->x64._RIP = (UINT32)NewInstructionPointer;
     }
+
     //
     // Clear the auto HALT restart flag so the RSM instruction returns
     // program control to the instruction following the HLT instruction.
@@ -171,10 +172,11 @@ SmmCpuFeaturesHookReturnFromSmm (
       CpuSaveState->x64.AutoHALTRestart &= ~BIT0;
     }
   }
+
   return OriginalInstructionPointer;
 }
 
-STATIC CPU_HOT_EJECT_DATA *mCpuHotEjectData = NULL;
+STATIC CPU_HOT_EJECT_DATA  *mCpuHotEjectData = NULL;
 
 /**
   Initialize mCpuHotEjectData if PcdCpuMaxLogicalProcessorNumber > 1.
@@ -208,7 +210,8 @@ InitCpuHotEjectData (
 
   if (RETURN_ERROR (SafeUintnMult (MaxNumberOfCpus, sizeof (UINT64), &Size)) ||
       RETURN_ERROR (SafeUintnAdd (Size, sizeof (*mCpuHotEjectData), &Size)) ||
-      RETURN_ERROR (SafeUintnAdd (Size, sizeof (UINT64) - 1, &Size))) {
+      RETURN_ERROR (SafeUintnAdd (Size, sizeof (UINT64) - 1, &Size)))
+  {
     DEBUG ((DEBUG_ERROR, "%a: invalid CPU_HOT_EJECT_DATA\n", __FUNCTION__));
     goto Fatal;
   }
@@ -219,11 +222,13 @@ InitCpuHotEjectData (
     goto Fatal;
   }
 
-  mCpuHotEjectData->Handler = NULL;
+  mCpuHotEjectData->Handler     = NULL;
   mCpuHotEjectData->ArrayLength = MaxNumberOfCpus;
 
-  mCpuHotEjectData->QemuSelectorMap = ALIGN_POINTER (mCpuHotEjectData + 1,
-                                        sizeof (UINT64));
+  mCpuHotEjectData->QemuSelectorMap = ALIGN_POINTER (
+                                        mCpuHotEjectData + 1,
+                                        sizeof (UINT64)
+                                        );
   //
   // We use mCpuHotEjectData->QemuSelectorMap to map
   // ProcessorNum -> QemuSelector. Initialize to invalid values.
@@ -235,8 +240,10 @@ InitCpuHotEjectData (
   //
   // Expose address of CPU Hot eject Data structure
   //
-  PcdStatus = PcdSet64S (PcdCpuHotEjectDataAddress,
-                (UINTN)(VOID *)mCpuHotEjectData);
+  PcdStatus = PcdSet64S (
+                PcdCpuHotEjectDataAddress,
+                (UINTN)(VOID *)mCpuHotEjectData
+                );
   ASSERT_RETURN_ERROR (PcdStatus);
 
   return;
@@ -258,10 +265,9 @@ SmmCpuFeaturesSmmRelocationComplete (
   VOID
   )
 {
-  EFI_STATUS Status;
-  UINTN      MapPagesBase;
-  UINTN      MapPagesCount;
-
+  EFI_STATUS  Status;
+  UINTN       MapPagesBase;
+  UINTN       MapPagesCount;
 
   InitCpuHotEjectData ();
 
@@ -283,12 +289,15 @@ SmmCpuFeaturesSmmRelocationComplete (
   Status = MemEncryptSevSetPageEncMask (
              0,             // Cr3BaseAddress -- use current CR3
              MapPagesBase,  // BaseAddress
-             MapPagesCount, // NumPages
-             TRUE           // Flush
+             MapPagesCount  // NumPages
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: MemEncryptSevSetPageEncMask(): %r\n",
-      __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: MemEncryptSevSetPageEncMask(): %r\n",
+      __FUNCTION__,
+      Status
+      ));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
@@ -459,7 +468,7 @@ SmmCpuFeaturesRendezvousExit (
   //
 
   if (mCpuHotEjectData != NULL) {
-    CPU_HOT_EJECT_HANDLER Handler;
+    CPU_HOT_EJECT_HANDLER  Handler;
 
     //
     // As the comment above mentions, mCpuHotEjectData->Handler might be
@@ -478,7 +487,7 @@ SmmCpuFeaturesRendezvousExit (
     // ordered-after the AllCpusInSync loop by using a MemoryFence() with
     // acquire semantics.
     //
-    MemoryFence();
+    MemoryFence ();
 
     Handler = mCpuHotEjectData->Handler;
 
@@ -565,21 +574,21 @@ SmmCpuFeaturesSetSmmRegister (
 /// Macro used to simplify the lookup table entries of type
 /// CPU_SMM_SAVE_STATE_LOOKUP_ENTRY
 ///
-#define SMM_CPU_OFFSET(Field) OFFSET_OF (QEMU_SMRAM_SAVE_STATE_MAP, Field)
+#define SMM_CPU_OFFSET(Field)  OFFSET_OF (QEMU_SMRAM_SAVE_STATE_MAP, Field)
 
 ///
 /// Macro used to simplify the lookup table entries of type
 /// CPU_SMM_SAVE_STATE_REGISTER_RANGE
 ///
-#define SMM_REGISTER_RANGE(Start, End) { Start, End, End - Start + 1 }
+#define SMM_REGISTER_RANGE(Start, End)  { Start, End, End - Start + 1 }
 
 ///
 /// Structure used to describe a range of registers
 ///
 typedef struct {
-  EFI_SMM_SAVE_STATE_REGISTER  Start;
-  EFI_SMM_SAVE_STATE_REGISTER  End;
-  UINTN                        Length;
+  EFI_SMM_SAVE_STATE_REGISTER    Start;
+  EFI_SMM_SAVE_STATE_REGISTER    End;
+  UINTN                          Length;
 } CPU_SMM_SAVE_STATE_REGISTER_RANGE;
 
 ///
@@ -587,22 +596,22 @@ typedef struct {
 /// associated with each supported EFI_SMM_SAVE_STATE_REGISTER value
 ///
 
-#define SMM_SAVE_STATE_REGISTER_FIRST_INDEX             1
+#define SMM_SAVE_STATE_REGISTER_FIRST_INDEX  1
 
 typedef struct {
-  UINT8   Width32;
-  UINT8   Width64;
-  UINT16  Offset32;
-  UINT16  Offset64Lo;
-  UINT16  Offset64Hi;
-  BOOLEAN Writeable;
+  UINT8      Width32;
+  UINT8      Width64;
+  UINT16     Offset32;
+  UINT16     Offset64Lo;
+  UINT16     Offset64Hi;
+  BOOLEAN    Writeable;
 } CPU_SMM_SAVE_STATE_LOOKUP_ENTRY;
 
 ///
 /// Table used by GetRegisterIndex() to convert an EFI_SMM_SAVE_STATE_REGISTER
 /// value to an index into a table of type CPU_SMM_SAVE_STATE_LOOKUP_ENTRY
 ///
-STATIC CONST CPU_SMM_SAVE_STATE_REGISTER_RANGE mSmmCpuRegisterRanges[] = {
+STATIC CONST CPU_SMM_SAVE_STATE_REGISTER_RANGE  mSmmCpuRegisterRanges[] = {
   SMM_REGISTER_RANGE (
     EFI_SMM_SAVE_STATE_REGISTER_GDTBASE,
     EFI_SMM_SAVE_STATE_REGISTER_LDTINFO
@@ -615,14 +624,14 @@ STATIC CONST CPU_SMM_SAVE_STATE_REGISTER_RANGE mSmmCpuRegisterRanges[] = {
     EFI_SMM_SAVE_STATE_REGISTER_RFLAGS,
     EFI_SMM_SAVE_STATE_REGISTER_CR4
     ),
-  { (EFI_SMM_SAVE_STATE_REGISTER)0, (EFI_SMM_SAVE_STATE_REGISTER)0, 0 }
+  { (EFI_SMM_SAVE_STATE_REGISTER)0,     (EFI_SMM_SAVE_STATE_REGISTER)0,0 }
 };
 
 ///
 /// Lookup table used to retrieve the widths and offsets associated with each
 /// supported EFI_SMM_SAVE_STATE_REGISTER value
 ///
-STATIC CONST CPU_SMM_SAVE_STATE_LOOKUP_ENTRY mSmmCpuWidthOffset[] = {
+STATIC CONST CPU_SMM_SAVE_STATE_LOOKUP_ENTRY  mSmmCpuWidthOffset[] = {
   {
     0,                                    // Width32
     0,                                    // Width64
@@ -1002,13 +1011,17 @@ GetRegisterIndex (
 
   for (Index = 0, Offset = SMM_SAVE_STATE_REGISTER_FIRST_INDEX;
        mSmmCpuRegisterRanges[Index].Length != 0;
-       Index++) {
-    if (Register >= mSmmCpuRegisterRanges[Index].Start &&
-        Register <= mSmmCpuRegisterRanges[Index].End) {
+       Index++)
+  {
+    if ((Register >= mSmmCpuRegisterRanges[Index].Start) &&
+        (Register <= mSmmCpuRegisterRanges[Index].End))
+    {
       return Register - mSmmCpuRegisterRanges[Index].Start + Offset;
     }
+
     Offset += mSmmCpuRegisterRanges[Index].Length;
   }
+
   return 0;
 }
 
@@ -1038,10 +1051,10 @@ GetRegisterIndex (
 STATIC
 EFI_STATUS
 ReadSaveStateRegisterByIndex (
-  IN UINTN   CpuIndex,
-  IN UINTN   RegisterIndex,
-  IN UINTN   Width,
-  OUT VOID   *Buffer
+  IN UINTN  CpuIndex,
+  IN UINTN  RegisterIndex,
+  IN UINTN  Width,
+  OUT VOID  *Buffer
   )
 {
   QEMU_SMRAM_SAVE_STATE_MAP  *CpuSaveState;
@@ -1068,7 +1081,7 @@ ReadSaveStateRegisterByIndex (
     //
     // Write return buffer
     //
-    ASSERT(CpuSaveState != NULL);
+    ASSERT (CpuSaveState != NULL);
     CopyMem (
       Buffer,
       (UINT8 *)CpuSaveState + mSmmCpuWidthOffset[RegisterIndex].Offset32,
@@ -1110,6 +1123,7 @@ ReadSaveStateRegisterByIndex (
         );
     }
   }
+
   return EFI_SUCCESS;
 }
 
@@ -1140,7 +1154,7 @@ SmmCpuFeaturesReadSaveStateRegister (
   OUT VOID                         *Buffer
   )
 {
-  UINTN                       RegisterIndex;
+  UINTN                      RegisterIndex;
   QEMU_SMRAM_SAVE_STATE_MAP  *CpuSaveState;
 
   //
@@ -1216,7 +1230,7 @@ SmmCpuFeaturesWriteSaveStateRegister (
   IN CONST VOID                   *Buffer
   )
 {
-  UINTN                       RegisterIndex;
+  UINTN                      RegisterIndex;
   QEMU_SMRAM_SAVE_STATE_MAP  *CpuSaveState;
 
   //
@@ -1273,6 +1287,7 @@ SmmCpuFeaturesWriteSaveStateRegister (
     if (Width > mSmmCpuWidthOffset[RegisterIndex].Width32) {
       return EFI_INVALID_PARAMETER;
     }
+
     //
     // Write SMM State register
     //
@@ -1318,6 +1333,7 @@ SmmCpuFeaturesWriteSaveStateRegister (
         );
     }
   }
+
   return EFI_SUCCESS;
 }
 
@@ -1358,9 +1374,8 @@ SmmCpuFeaturesCompleteSmmReadyToLock (
 VOID *
 EFIAPI
 SmmCpuFeaturesAllocatePageTableMemory (
-  IN UINTN           Pages
+  IN UINTN  Pages
   )
 {
   return NULL;
 }
-

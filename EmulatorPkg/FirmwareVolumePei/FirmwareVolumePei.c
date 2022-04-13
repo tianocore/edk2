@@ -18,9 +18,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 PeimInitializeFirmwareVolumePei (
-  IN       EFI_PEI_FILE_HANDLE       FileHandle,
-  IN CONST EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
   )
+
 /*++
 
 Routine Description:
@@ -44,17 +45,17 @@ Returns:
   UINT64                      FdSize;
   UINTN                       Index;
 
-  DEBUG ((EFI_D_ERROR, "Unix Firmware Volume PEIM Loaded\n"));
+  DEBUG ((DEBUG_ERROR, "Unix Firmware Volume PEIM Loaded\n"));
 
   //
   // Get the Fwh Information PPI
   //
   Status = PeiServicesLocatePpi (
-              &gEmuThunkPpiGuid,  // GUID
-              0,                  // INSTANCE
-              &PpiDescriptor,     // EFI_PEI_PPI_DESCRIPTOR
-              (VOID **)&Thunk     // PPI
-              );
+             &gEmuThunkPpiGuid,   // GUID
+             0,                   // INSTANCE
+             &PpiDescriptor,      // EFI_PEI_PPI_DESCRIPTOR
+             (VOID **)&Thunk      // PPI
+             );
   ASSERT_EFI_ERROR (Status);
 
   Index = 0;
@@ -67,7 +68,7 @@ Returns:
       //
       // Assume the FD starts with an FV header
       //
-      FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) FdBase;
+      FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FdBase;
 
       //
       // Make an FV Hob for the first FV in the FD
@@ -85,19 +86,19 @@ Returns:
           (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE),
           FdBase,
           (
-            FvHeader->FvLength +
-            PcdGet32 (PcdFlashNvStorageVariableSize) +
-            PcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
-            PcdGet32 (PcdFlashNvStorageFtwSpareSize) +
-            PcdGet32 (PcdEmuFlashNvStorageEventLogSize)
+           FvHeader->FvLength +
+           PcdGet32 (PcdFlashNvStorageVariableSize) +
+           PcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
+           PcdGet32 (PcdFlashNvStorageFtwSpareSize) +
+           PcdGet32 (PcdEmuFlashNvStorageEventLogSize)
           )
-        );
+          );
 
         //
         // Hard code the address of the spare block and variable services.
         //  Assume it's a hard coded offset from FV0 in FD0.
         //
-        FdSize  =
+        FdSize =
           PcdGet32 (PcdFlashNvStorageVariableSize) +
           PcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
           PcdGet32 (PcdFlashNvStorageFtwSpareSize) +

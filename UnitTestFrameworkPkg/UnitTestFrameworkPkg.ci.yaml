@@ -15,10 +15,13 @@
         ##     "<ErrorID>", "<KeyWord>"
         ## ]
         "ExceptionList": [
+            "9005", "@MRT",
+            "7007", "_UNIT_TEST_FAILURE_TYPE_STRING"
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
-            "Library/CmockaLib/cmocka"
+            "Library/CmockaLib/cmocka",
+            "Library/UnitTestLib/RunTestsCmocka.c"
         ]
     },
     ## options defined .pytool/Plugin/CompilerPlugin
@@ -86,6 +89,7 @@
             "pytool",
             "pytools",
             "NOFAILURE",
+            "cmockery",
             "DHAVE", # build flag for cmocka in the INF
             "corthon",      # Contact GitHub account in Readme
             "mdkinney",     # Contact GitHub account in Readme

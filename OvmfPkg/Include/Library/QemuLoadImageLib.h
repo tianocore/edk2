@@ -37,7 +37,7 @@
 EFI_STATUS
 EFIAPI
 QemuLoadKernelImage (
-  OUT EFI_HANDLE          *ImageHandle
+  OUT EFI_HANDLE  *ImageHandle
   );
 
 /**
@@ -59,7 +59,7 @@ QemuLoadKernelImage (
 EFI_STATUS
 EFIAPI
 QemuStartKernelImage (
-  IN  OUT EFI_HANDLE          *ImageHandle
+  IN  OUT EFI_HANDLE  *ImageHandle
   );
 
 /**
@@ -78,7 +78,7 @@ QemuStartKernelImage (
 EFI_STATUS
 EFIAPI
 QemuUnloadKernelImage (
-  IN  EFI_HANDLE          ImageHandle
+  IN  EFI_HANDLE  ImageHandle
   );
 
 #endif

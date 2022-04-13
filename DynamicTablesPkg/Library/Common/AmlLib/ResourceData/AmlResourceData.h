@@ -58,19 +58,19 @@ typedef UINT8 AML_RD_HEADER;
 
   @ingroup ResourceDataStructures
 */
-#define AML_RD_SMALL_SIZE_MASK    (0x7U)
+#define AML_RD_SMALL_SIZE_MASK  (0x7U)
 
 /** Mask for the small resource data ID.
 
   @ingroup ResourceDataStructures
 */
-#define AML_RD_SMALL_ID_MASK      (0xFU << 3)
+#define AML_RD_SMALL_ID_MASK  (0xFU << 3)
 
 /** Mask for the large resource data ID.
 
   @ingroup ResourceDataStructures
 */
-#define AML_RD_LARGE_ID_MASK      (0x7FU)
+#define AML_RD_LARGE_ID_MASK  (0x7FU)
 
 /**
   @defgroup ResourceDataApis Resource data APIs
@@ -133,8 +133,8 @@ typedef UINT8 AML_RD_HEADER;
 BOOLEAN
 EFIAPI
 AmlRdCompareDescId (
-  IN  CONST AML_RD_HEADER   * Header,
-  IN        AML_RD_HEADER     DescriptorId
+  IN  CONST AML_RD_HEADER  *Header,
+  IN        AML_RD_HEADER  DescriptorId
   );
 
 /** Get the descriptor Id of the resource data.
@@ -151,7 +151,7 @@ AmlRdCompareDescId (
 AML_RD_HEADER
 EFIAPI
 AmlRdGetDescId (
-  IN  CONST AML_RD_HEADER   * Header
+  IN  CONST AML_RD_HEADER  *Header
   );
 
 /** Get the size of a resource data element.
@@ -168,7 +168,28 @@ AmlRdGetDescId (
 UINT32
 EFIAPI
 AmlRdGetSize (
-  IN  CONST AML_RD_HEADER   * Header
+  IN  CONST AML_RD_HEADER  *Header
+  );
+
+/** Set the Checksum of an EndTag resource data.
+
+  ACPI 6.4, s6.4.2.9 "End Tag":
+  "This checksum is generated such that adding it to the sum of all the data
+  bytes will produce a zero sum."
+  "If the checksum field is zero, the resource data is treated as if the
+  checksum operation succeeded. Configuration proceeds normally."
+
+  @param  [in]  Header     Pointer to the first byte of a resource data.
+  @param  [in]  CheckSum   Checksum value to set.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlRdSetEndTagChecksum (
+  IN  CONST AML_RD_HEADER  *Header,
+  IN        UINT8          CheckSum
   );
 
 #endif // AML_RESOURCE_DATA_H_

@@ -1,12 +1,12 @@
-/**@file
+/** @file
    Head file for BDS Platform specific code
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _PLATFORM_BOOT_MANAGER_H
-#define _PLATFORM_BOOT_MANAGER_H
+#ifndef PLATFORM_BOOT_MANAGER_H_
+#define PLATFORM_BOOT_MANAGER_H_
 
 #include <PiDxe.h>
 #include <Protocol/LoadedImage.h>
@@ -29,8 +29,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/SmmAccess2.h>
 
 typedef struct {
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  UINTN                     ConnectType;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  UINTN                       ConnectType;
 } PLATFORM_CONSOLE_CONNECT_ENTRY;
 
 extern PLATFORM_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
@@ -42,42 +42,42 @@ extern PLATFORM_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
     { END_DEVICE_PATH_LENGTH, 0 },\
   }
 
-#define CONSOLE_OUT BIT0
-#define CONSOLE_IN  BIT1
-#define STD_ERROR   BIT2
+#define CONSOLE_OUT  BIT0
+#define CONSOLE_IN   BIT1
+#define STD_ERROR    BIT2
 
-#define CLASS_HID           3
-#define SUBCLASS_BOOT       1
-#define PROTOCOL_KEYBOARD   1
+#define CLASS_HID          3
+#define SUBCLASS_BOOT      1
+#define PROTOCOL_KEYBOARD  1
 
 typedef struct {
-  USB_CLASS_DEVICE_PATH           UsbClass;
-  EFI_DEVICE_PATH_PROTOCOL        End;
+  USB_CLASS_DEVICE_PATH       UsbClass;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } USB_CLASS_FORMAT_DEVICE_PATH;
 
 typedef struct {
-  VENDOR_DEVICE_PATH  VendorDevicePath;
-  UINT32              Instance;
+  VENDOR_DEVICE_PATH    VendorDevicePath;
+  UINT32                Instance;
 } WIN_NT_VENDOR_DEVICE_PATH_NODE;
 
 //
 // Below is the platform console device path
 //
 typedef struct {
-  VENDOR_DEVICE_PATH              NtBus;
-  WIN_NT_VENDOR_DEVICE_PATH_NODE  SerialDevice;
-  UART_DEVICE_PATH                Uart;
-  VENDOR_DEVICE_PATH              TerminalType;
-  EFI_DEVICE_PATH_PROTOCOL        End;
+  VENDOR_DEVICE_PATH                NtBus;
+  WIN_NT_VENDOR_DEVICE_PATH_NODE    SerialDevice;
+  UART_DEVICE_PATH                  Uart;
+  VENDOR_DEVICE_PATH                TerminalType;
+  EFI_DEVICE_PATH_PROTOCOL          End;
 } NT_ISA_SERIAL_DEVICE_PATH;
 
 typedef struct {
-  VENDOR_DEVICE_PATH              NtBus;
-  WIN_NT_VENDOR_DEVICE_PATH_NODE  NtGopDevice;
-  EFI_DEVICE_PATH_PROTOCOL        End;
+  VENDOR_DEVICE_PATH                NtBus;
+  WIN_NT_VENDOR_DEVICE_PATH_NODE    NtGopDevice;
+  EFI_DEVICE_PATH_PROTOCOL          End;
 } NT_PLATFORM_GOP_DEVICE_PATH;
 
-extern USB_CLASS_FORMAT_DEVICE_PATH              gUsbClassKeyboardDevicePath;
+extern USB_CLASS_FORMAT_DEVICE_PATH  gUsbClassKeyboardDevicePath;
 
 /**
   Use SystemTable Conout to stop video based Simple Text Out consoles from going
@@ -92,7 +92,7 @@ extern USB_CLASS_FORMAT_DEVICE_PATH              gUsbClassKeyboardDevicePath;
 EFI_STATUS
 PlatformBootManagerEnableQuietBoot (
   IN  EFI_GUID  *LogoFile
-);
+  );
 
 /**
   Use SystemTable Conout to turn on video based Simple Text Out consoles. The
@@ -104,7 +104,7 @@ PlatformBootManagerEnableQuietBoot (
 EFI_STATUS
 PlatformBootManagerDisableQuietBoot (
   VOID
-);
+  );
 
 /**
   Show progress bar with title above it. It only works in Graphics mode.
@@ -121,12 +121,12 @@ PlatformBootManagerDisableQuietBoot (
 **/
 EFI_STATUS
 PlatformBootManagerShowProgress (
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleForeground,
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleBackground,
-  IN CHAR16                        *Title,
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL ProgressColor,
-  IN UINTN                         Progress,
-  IN UINTN                         PreviousValue
-);
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  TitleForeground,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  TitleBackground,
+  IN CHAR16                         *Title,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  ProgressColor,
+  IN UINTN                          Progress,
+  IN UINTN                          PreviousValue
+  );
 
 #endif // _PLATFORM_BOOT_MANAGER_H

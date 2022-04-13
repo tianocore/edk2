@@ -63,3 +63,8 @@ DEFINE DECOMP_SCRATCH_BASE_MASK      = 0xFFF00000
 DEFINE DECOMP_SCRATCH_BASE           = (($(DECOMP_SCRATCH_BASE_UNALIGNED) + $(DECOMP_SCRATCH_BASE_ALIGNMENT)) & $(DECOMP_SCRATCH_BASE_MASK))
 
 SET gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDecompressionScratchEnd = $(DECOMP_SCRATCH_BASE) + $(DECOMP_SCRATCH_SIZE)
+
+#
+# The range of pages that should be pre-validated during the SEC phase when SEV-SNP is active in the guest VM.
+SET gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedStart = $(MEMFD_BASE_ADDRESS) + gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
+SET gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedEnd = $(DECOMP_SCRATCH_BASE) + $(DECOMP_SCRATCH_SIZE)

@@ -22,17 +22,23 @@
 #
 
 [Sources.IA32]
+  Ia32/AmdSev.c
   Ia32/MpFuncs.nasm
+  MpLibTdxNull.c
 
 [Sources.X64]
+  X64/AmdSev.c
   X64/MpFuncs.nasm
+  MpLibTdx.c
 
 [Sources.common]
+  AmdSev.c
   MpEqu.inc
   PeiMpLib.c
   MpLib.c
   MpLib.h
   Microcode.c
+  MpIntelTdx.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -62,9 +68,10 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize         ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode                       ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate                   ## SOMETIMES_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled                      ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase                   ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures              ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                       ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr       ## CONSUMES
 
 [Ppis]
   gEdkiiPeiShadowMicrocodePpiGuid        ## SOMETIMES_CONSUMES

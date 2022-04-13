@@ -40,18 +40,19 @@ EFI_LOCK  mMmCommunicationLock;
 STATIC
 EFI_STATUS
 InternalMmCommunicate (
-  IN OUT VOID             *CommBuffer,
-  IN OUT UINTN            *CommSize
+  IN OUT VOID   *CommBuffer,
+  IN OUT UINTN  *CommSize
   )
 {
-  EFI_STATUS    Status;
-  if (CommBuffer == NULL || CommSize == NULL) {
+  EFI_STATUS  Status;
+
+  if ((CommBuffer == NULL) || (CommSize == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
   Status = mMmCommunication->Communicate (mMmCommunication, CommBuffer, CommBuffer, CommSize);
   return Status;
 }
-
 
 /**
   This API function disables the variable policy enforcement. If it's
@@ -84,23 +85,22 @@ ProtocolDisableVariablePolicy (
   AcquireLockOnlyAtBootTime (&mMmCommunicationLock);
 
   // Set up the MM communication.
-  BufferSize    = mMmCommunicationBufferSize;
-  CommHeader    = mMmCommunicationBuffer;
-  PolicyHeader  = (VAR_CHECK_POLICY_COMM_HEADER*)&CommHeader->Data;
-  CopyGuid( &CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid );
-  CommHeader->MessageLength = BufferSize;
+  BufferSize   = mMmCommunicationBufferSize;
+  CommHeader   = mMmCommunicationBuffer;
+  PolicyHeader = (VAR_CHECK_POLICY_COMM_HEADER *)&CommHeader->Data;
+  CopyGuid (&CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid);
+  CommHeader->MessageLength = BufferSize - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
   PolicyHeader->Signature   = VAR_CHECK_POLICY_COMM_SIG;
   PolicyHeader->Revision    = VAR_CHECK_POLICY_COMM_REVISION;
   PolicyHeader->Command     = VAR_CHECK_POLICY_COMMAND_DISABLE;
 
   Status = InternalMmCommunicate (CommHeader, &BufferSize);
-  DEBUG(( DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status ));
+  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status));
 
   ReleaseLockOnlyAtBootTime (&mMmCommunicationLock);
 
-  return (EFI_ERROR( Status )) ? Status : PolicyHeader->Result;
+  return (EFI_ERROR (Status)) ? Status : PolicyHeader->Result;
 }
-
 
 /**
   This API function returns whether or not the policy engine is
@@ -117,14 +117,14 @@ STATIC
 EFI_STATUS
 EFIAPI
 ProtocolIsVariablePolicyEnabled (
-  OUT BOOLEAN     *State
+  OUT BOOLEAN  *State
   )
 {
-  EFI_STATUS                                Status;
-  EFI_MM_COMMUNICATE_HEADER                 *CommHeader;
-  VAR_CHECK_POLICY_COMM_HEADER              *PolicyHeader;
-  VAR_CHECK_POLICY_COMM_IS_ENABLED_PARAMS   *CommandParams;
-  UINTN                                     BufferSize;
+  EFI_STATUS                               Status;
+  EFI_MM_COMMUNICATE_HEADER                *CommHeader;
+  VAR_CHECK_POLICY_COMM_HEADER             *PolicyHeader;
+  VAR_CHECK_POLICY_COMM_IS_ENABLED_PARAMS  *CommandParams;
+  UINTN                                    BufferSize;
 
   if (State == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -135,18 +135,18 @@ ProtocolIsVariablePolicyEnabled (
   // Set up the MM communication.
   BufferSize    = mMmCommunicationBufferSize;
   CommHeader    = mMmCommunicationBuffer;
-  PolicyHeader  = (VAR_CHECK_POLICY_COMM_HEADER*)&CommHeader->Data;
-  CommandParams = (VAR_CHECK_POLICY_COMM_IS_ENABLED_PARAMS*)(PolicyHeader + 1);
-  CopyGuid( &CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid );
-  CommHeader->MessageLength = BufferSize;
+  PolicyHeader  = (VAR_CHECK_POLICY_COMM_HEADER *)&CommHeader->Data;
+  CommandParams = (VAR_CHECK_POLICY_COMM_IS_ENABLED_PARAMS *)(PolicyHeader + 1);
+  CopyGuid (&CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid);
+  CommHeader->MessageLength = BufferSize - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
   PolicyHeader->Signature   = VAR_CHECK_POLICY_COMM_SIG;
   PolicyHeader->Revision    = VAR_CHECK_POLICY_COMM_REVISION;
   PolicyHeader->Command     = VAR_CHECK_POLICY_COMMAND_IS_ENABLED;
 
   Status = InternalMmCommunicate (CommHeader, &BufferSize);
-  DEBUG(( DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status ));
+  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status));
 
-  if (!EFI_ERROR( Status )) {
+  if (!EFI_ERROR (Status)) {
     Status = PolicyHeader->Result;
     *State = CommandParams->State;
   }
@@ -155,7 +155,6 @@ ProtocolIsVariablePolicyEnabled (
 
   return Status;
 }
-
 
 /**
   This API function validates and registers a new policy with
@@ -176,15 +175,15 @@ STATIC
 EFI_STATUS
 EFIAPI
 ProtocolRegisterVariablePolicy (
-  IN CONST VARIABLE_POLICY_ENTRY    *NewPolicy
+  IN CONST VARIABLE_POLICY_ENTRY  *NewPolicy
   )
 {
-  EFI_STATUS                                Status;
-  EFI_MM_COMMUNICATE_HEADER                 *CommHeader;
-  VAR_CHECK_POLICY_COMM_HEADER              *PolicyHeader;
-  VOID                                      *PolicyBuffer;
-  UINTN                                     BufferSize;
-  UINTN                                     RequiredSize;
+  EFI_STATUS                    Status;
+  EFI_MM_COMMUNICATE_HEADER     *CommHeader;
+  VAR_CHECK_POLICY_COMM_HEADER  *PolicyHeader;
+  VOID                          *PolicyBuffer;
+  UINTN                         BufferSize;
+  UINTN                         RequiredSize;
 
   if (NewPolicy == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -192,38 +191,43 @@ ProtocolRegisterVariablePolicy (
 
   // First, make sure that the required size does not exceed the capabilities
   // of the MmCommunication buffer.
-  RequiredSize = OFFSET_OF(EFI_MM_COMMUNICATE_HEADER, Data) + sizeof(VAR_CHECK_POLICY_COMM_HEADER);
-  Status = SafeUintnAdd( RequiredSize, NewPolicy->Size, &RequiredSize );
-  if (EFI_ERROR( Status ) || RequiredSize > mMmCommunicationBufferSize) {
-    DEBUG(( DEBUG_ERROR, "%a - Policy too large for buffer! %r, %d > %d \n", __FUNCTION__,
-            Status, RequiredSize, mMmCommunicationBufferSize ));
+  RequiredSize = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + sizeof (VAR_CHECK_POLICY_COMM_HEADER);
+  Status       = SafeUintnAdd (RequiredSize, NewPolicy->Size, &RequiredSize);
+  if (EFI_ERROR (Status) || (RequiredSize > mMmCommunicationBufferSize)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a - Policy too large for buffer! %r, %d > %d \n",
+      __FUNCTION__,
+      Status,
+      RequiredSize,
+      mMmCommunicationBufferSize
+      ));
     return EFI_OUT_OF_RESOURCES;
   }
 
   AcquireLockOnlyAtBootTime (&mMmCommunicationLock);
 
   // Set up the MM communication.
-  BufferSize    = mMmCommunicationBufferSize;
-  CommHeader    = mMmCommunicationBuffer;
-  PolicyHeader  = (VAR_CHECK_POLICY_COMM_HEADER*)&CommHeader->Data;
-  PolicyBuffer  = (VOID*)(PolicyHeader + 1);
-  CopyGuid( &CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid );
-  CommHeader->MessageLength = BufferSize;
+  BufferSize   = mMmCommunicationBufferSize;
+  CommHeader   = mMmCommunicationBuffer;
+  PolicyHeader = (VAR_CHECK_POLICY_COMM_HEADER *)&CommHeader->Data;
+  PolicyBuffer = (VOID *)(PolicyHeader + 1);
+  CopyGuid (&CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid);
+  CommHeader->MessageLength = BufferSize - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
   PolicyHeader->Signature   = VAR_CHECK_POLICY_COMM_SIG;
   PolicyHeader->Revision    = VAR_CHECK_POLICY_COMM_REVISION;
   PolicyHeader->Command     = VAR_CHECK_POLICY_COMMAND_REGISTER;
 
   // Copy the policy into place. This copy is safe because we've already tested above.
-  CopyMem( PolicyBuffer, NewPolicy, NewPolicy->Size );
+  CopyMem (PolicyBuffer, NewPolicy, NewPolicy->Size);
 
   Status = InternalMmCommunicate (CommHeader, &BufferSize);
-  DEBUG(( DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status ));
+  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status));
 
   ReleaseLockOnlyAtBootTime (&mMmCommunicationLock);
 
-  return (EFI_ERROR( Status )) ? Status : PolicyHeader->Result;
+  return (EFI_ERROR (Status)) ? Status : PolicyHeader->Result;
 }
-
 
 /**
   This helper function takes care of the overhead of formatting, sending, and interpreting
@@ -243,30 +247,30 @@ ProtocolRegisterVariablePolicy (
 STATIC
 EFI_STATUS
 DumpVariablePolicyHelper (
-  IN  UINT32        PageRequested,
-  OUT UINT32        *TotalSize,
-  OUT UINT32        *PageSize,
-  OUT BOOLEAN       *HasMore,
-  OUT UINT8         **Buffer
+  IN  UINT32   PageRequested,
+  OUT UINT32   *TotalSize,
+  OUT UINT32   *PageSize,
+  OUT BOOLEAN  *HasMore,
+  OUT UINT8    **Buffer
   )
 {
-  EFI_STATUS                              Status;
-  EFI_MM_COMMUNICATE_HEADER               *CommHeader;
-  VAR_CHECK_POLICY_COMM_HEADER            *PolicyHeader;
-  VAR_CHECK_POLICY_COMM_DUMP_PARAMS       *CommandParams;
-  UINTN                                   BufferSize;
+  EFI_STATUS                         Status;
+  EFI_MM_COMMUNICATE_HEADER          *CommHeader;
+  VAR_CHECK_POLICY_COMM_HEADER       *PolicyHeader;
+  VAR_CHECK_POLICY_COMM_DUMP_PARAMS  *CommandParams;
+  UINTN                              BufferSize;
 
-  if (TotalSize == NULL || PageSize == NULL || HasMore == NULL || Buffer == NULL) {
+  if ((TotalSize == NULL) || (PageSize == NULL) || (HasMore == NULL) || (Buffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   // Set up the MM communication.
   BufferSize    = mMmCommunicationBufferSize;
   CommHeader    = mMmCommunicationBuffer;
-  PolicyHeader  = (VAR_CHECK_POLICY_COMM_HEADER*)&CommHeader->Data;
-  CommandParams = (VAR_CHECK_POLICY_COMM_DUMP_PARAMS*)(PolicyHeader + 1);
-  CopyGuid( &CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid );
-  CommHeader->MessageLength = BufferSize;
+  PolicyHeader  = (VAR_CHECK_POLICY_COMM_HEADER *)&CommHeader->Data;
+  CommandParams = (VAR_CHECK_POLICY_COMM_DUMP_PARAMS *)(PolicyHeader + 1);
+  CopyGuid (&CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid);
+  CommHeader->MessageLength = BufferSize - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
   PolicyHeader->Signature   = VAR_CHECK_POLICY_COMM_SIG;
   PolicyHeader->Revision    = VAR_CHECK_POLICY_COMM_REVISION;
   PolicyHeader->Command     = VAR_CHECK_POLICY_COMMAND_DUMP;
@@ -274,19 +278,18 @@ DumpVariablePolicyHelper (
   CommandParams->PageRequested = PageRequested;
 
   Status = InternalMmCommunicate (CommHeader, &BufferSize);
-  DEBUG(( DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status ));
+  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status));
 
-  if (!EFI_ERROR( Status )) {
-    Status = PolicyHeader->Result;
+  if (!EFI_ERROR (Status)) {
+    Status     = PolicyHeader->Result;
     *TotalSize = CommandParams->TotalSize;
-    *PageSize = CommandParams->PageSize;
-    *HasMore = CommandParams->HasMore;
-    *Buffer = (UINT8*)(CommandParams + 1);
+    *PageSize  = CommandParams->PageSize;
+    *HasMore   = CommandParams->HasMore;
+    *Buffer    = (UINT8 *)(CommandParams + 1);
   }
 
   return Status;
 }
-
 
 /**
   This API function will dump the entire contents of the variable policy table.
@@ -307,19 +310,19 @@ STATIC
 EFI_STATUS
 EFIAPI
 ProtocolDumpVariablePolicy (
-  OUT UINT8             *Policy OPTIONAL,
-  IN OUT UINT32         *Size
+  OUT UINT8      *Policy OPTIONAL,
+  IN OUT UINT32  *Size
   )
 {
-  EFI_STATUS    Status;
-  UINT8         *Source;
-  UINT8         *Destination;
-  UINT32        PolicySize;
-  UINT32        PageSize;
-  BOOLEAN       HasMore;
-  UINT32        PageIndex;
+  EFI_STATUS  Status;
+  UINT8       *Source;
+  UINT8       *Destination;
+  UINT32      PolicySize;
+  UINT32      PageSize;
+  BOOLEAN     HasMore;
+  UINT32      PageIndex;
 
-  if (Size == NULL || (*Size > 0 && Policy == NULL)) {
+  if ((Size == NULL) || ((*Size > 0) && (Policy == NULL))) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -330,16 +333,16 @@ ProtocolDumpVariablePolicy (
     // First, we must check the zero page to determine the buffer size and
     // reset the internal state.
     PolicySize = 0;
-    PageSize = 0;
-    HasMore = FALSE;
-    Status = DumpVariablePolicyHelper (0, &PolicySize, &PageSize, &HasMore, &Source);
+    PageSize   = 0;
+    HasMore    = FALSE;
+    Status     = DumpVariablePolicyHelper (0, &PolicySize, &PageSize, &HasMore, &Source);
     if (EFI_ERROR (Status)) {
       break;
     }
 
     // If we're good, we can at least check the required size now.
     if (*Size < PolicySize) {
-      *Size = PolicySize;
+      *Size  = PolicySize;
       Status = EFI_BUFFER_TOO_SMALL;
       break;
     }
@@ -367,7 +370,6 @@ ProtocolDumpVariablePolicy (
   return Status;
 }
 
-
 /**
   This API function locks the interface so that no more policy updates
   can be performed or changes made to the enforcement until the next boot.
@@ -391,23 +393,22 @@ ProtocolLockVariablePolicy (
   AcquireLockOnlyAtBootTime (&mMmCommunicationLock);
 
   // Set up the MM communication.
-  BufferSize    = mMmCommunicationBufferSize;
-  CommHeader    = mMmCommunicationBuffer;
-  PolicyHeader  = (VAR_CHECK_POLICY_COMM_HEADER*)&CommHeader->Data;
-  CopyGuid( &CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid );
-  CommHeader->MessageLength = BufferSize;
+  BufferSize   = mMmCommunicationBufferSize;
+  CommHeader   = mMmCommunicationBuffer;
+  PolicyHeader = (VAR_CHECK_POLICY_COMM_HEADER *)&CommHeader->Data;
+  CopyGuid (&CommHeader->HeaderGuid, &gVarCheckPolicyLibMmiHandlerGuid);
+  CommHeader->MessageLength = BufferSize - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
   PolicyHeader->Signature   = VAR_CHECK_POLICY_COMM_SIG;
   PolicyHeader->Revision    = VAR_CHECK_POLICY_COMM_REVISION;
   PolicyHeader->Command     = VAR_CHECK_POLICY_COMMAND_LOCK;
 
   Status = InternalMmCommunicate (CommHeader, &BufferSize);
-  DEBUG(( DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status ));
+  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status));
 
   ReleaseLockOnlyAtBootTime (&mMmCommunicationLock);
 
-  return (EFI_ERROR( Status )) ? Status : PolicyHeader->Result;
+  return (EFI_ERROR (Status)) ? Status : PolicyHeader->Result;
 }
-
 
 /**
   This helper function locates the shared comm buffer and assigns it to input pointers.
@@ -424,23 +425,23 @@ ProtocolLockVariablePolicy (
 STATIC
 EFI_STATUS
 InitMmCommonCommBuffer (
-  IN OUT  UINTN       *BufferSize,
-  OUT     VOID        **LocatedBuffer
+  IN OUT  UINTN  *BufferSize,
+  OUT     VOID   **LocatedBuffer
   )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
 
   Status = EFI_SUCCESS;
 
   // Make sure that we're working with good pointers.
-  if (BufferSize == NULL || LocatedBuffer == NULL) {
+  if ((BufferSize == NULL) || (LocatedBuffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   // Allocate the runtime memory for the comm buffer.
   *LocatedBuffer = AllocateRuntimePool (*BufferSize);
   if (*LocatedBuffer == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
+    Status      = EFI_OUT_OF_RESOURCES;
     *BufferSize = 0;
   }
 
@@ -448,7 +449,6 @@ InitMmCommonCommBuffer (
 
   return Status;
 }
-
 
 /**
   Convert internal pointer addresses to virtual addresses.
@@ -461,14 +461,13 @@ STATIC
 VOID
 EFIAPI
 VariablePolicyVirtualAddressCallback (
-  IN  EFI_EVENT   Event,
-  IN  VOID        *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   )
 {
   EfiConvertPointer (0, (VOID **)&mMmCommunication);
   EfiConvertPointer (0, (VOID **)&mMmCommunicationBuffer);
 }
-
 
 /**
   The driver's entry point.
@@ -483,34 +482,34 @@ VariablePolicyVirtualAddressCallback (
 EFI_STATUS
 EFIAPI
 VariablePolicySmmDxeMain (
-  IN    EFI_HANDLE                  ImageHandle,
-  IN    EFI_SYSTEM_TABLE            *SystemTable
+  IN    EFI_HANDLE        ImageHandle,
+  IN    EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS              Status;
-  BOOLEAN                 ProtocolInstalled;
-  BOOLEAN                 VirtualAddressChangeRegistered;
-  EFI_EVENT               VirtualAddressChangeEvent;
+  EFI_STATUS  Status;
+  BOOLEAN     ProtocolInstalled;
+  BOOLEAN     VirtualAddressChangeRegistered;
+  EFI_EVENT   VirtualAddressChangeEvent;
 
-  Status = EFI_SUCCESS;
-  ProtocolInstalled = FALSE;
+  Status                         = EFI_SUCCESS;
+  ProtocolInstalled              = FALSE;
   VirtualAddressChangeRegistered = FALSE;
 
   // Update the minimum buffer size.
   mMmCommunicationBufferSize = VAR_CHECK_POLICY_MM_COMM_BUFFER_SIZE;
   // Locate the shared comm buffer to use for sending MM commands.
-  Status = InitMmCommonCommBuffer( &mMmCommunicationBufferSize, &mMmCommunicationBuffer );
-  if (EFI_ERROR( Status )) {
-    DEBUG((DEBUG_ERROR, "%a - Failed to locate a viable MM comm buffer! %r\n", __FUNCTION__, Status));
-    ASSERT_EFI_ERROR( Status );
+  Status = InitMmCommonCommBuffer (&mMmCommunicationBufferSize, &mMmCommunicationBuffer);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - Failed to locate a viable MM comm buffer! %r\n", __FUNCTION__, Status));
+    ASSERT_EFI_ERROR (Status);
     return Status;
   }
 
   // Locate the MmCommunication protocol.
-  Status = gBS->LocateProtocol( &gEfiMmCommunication2ProtocolGuid, NULL, (VOID**)&mMmCommunication );
-  if (EFI_ERROR( Status )) {
-    DEBUG((DEBUG_ERROR, "%a - Failed to locate MmCommunication protocol! %r\n", __FUNCTION__, Status));
-    ASSERT_EFI_ERROR( Status );
+  Status = gBS->LocateProtocol (&gEfiMmCommunication2ProtocolGuid, NULL, (VOID **)&mMmCommunication);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - Failed to locate MmCommunication protocol! %r\n", __FUNCTION__, Status));
+    ASSERT_EFI_ERROR (Status);
     return Status;
   }
 
@@ -523,14 +522,16 @@ VariablePolicySmmDxeMain (
   mVariablePolicyProtocol.LockVariablePolicy      = ProtocolLockVariablePolicy;
 
   // Register all the protocols and return the status.
-  Status = gBS->InstallMultipleProtocolInterfaces( &ImageHandle,
-                                                   &gEdkiiVariablePolicyProtocolGuid, &mVariablePolicyProtocol,
-                                                   NULL );
-  if (EFI_ERROR( Status )) {
-    DEBUG(( DEBUG_ERROR, "%a - Failed to install protocol! %r\n", __FUNCTION__, Status ));
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &ImageHandle,
+                  &gEdkiiVariablePolicyProtocolGuid,
+                  &mVariablePolicyProtocol,
+                  NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - Failed to install protocol! %r\n", __FUNCTION__, Status));
     goto Exit;
-  }
-  else {
+  } else {
     ProtocolInstalled = TRUE;
   }
 
@@ -541,31 +542,32 @@ VariablePolicySmmDxeMain (
 
   //
   // Register a VirtualAddressChange callback for the MmComm protocol and Comm buffer.
-  Status = gBS->CreateEventEx (EVT_NOTIFY_SIGNAL,
-                                TPL_NOTIFY,
-                                VariablePolicyVirtualAddressCallback,
-                                NULL,
-                                &gEfiEventVirtualAddressChangeGuid,
-                                &VirtualAddressChangeEvent);
-  if (EFI_ERROR( Status )) {
-    DEBUG(( DEBUG_ERROR, "%a - Failed to create VirtualAddressChange event! %r\n", __FUNCTION__, Status ));
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  VariablePolicyVirtualAddressCallback,
+                  NULL,
+                  &gEfiEventVirtualAddressChangeGuid,
+                  &VirtualAddressChangeEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - Failed to create VirtualAddressChange event! %r\n", __FUNCTION__, Status));
     goto Exit;
-  }
-  else {
+  } else {
     VirtualAddressChangeRegistered = TRUE;
   }
-
 
 Exit:
   //
   // If we're about to return a failed status (and unload this driver), we must first undo anything that
   // has been successfully done.
-  if (EFI_ERROR( Status )) {
+  if (EFI_ERROR (Status)) {
     if (ProtocolInstalled) {
-      gBS->UninstallProtocolInterface( &ImageHandle, &gEdkiiVariablePolicyProtocolGuid, &mVariablePolicyProtocol );
+      gBS->UninstallProtocolInterface (&ImageHandle, &gEdkiiVariablePolicyProtocolGuid, &mVariablePolicyProtocol);
     }
+
     if (VirtualAddressChangeRegistered) {
-      gBS->CloseEvent( VirtualAddressChangeEvent );
+      gBS->CloseEvent (VirtualAddressChangeEvent);
     }
   }
 

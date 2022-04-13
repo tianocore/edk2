@@ -48,7 +48,8 @@
         "DscPath": "UefiCpuPkg.dsc",
         "IgnoreInf": [
             "UefiCpuPkg/ResetVector/FixupVtf/Vtf.inf",
-            "UefiCpuPkg/ResetVector/Vtf0/Vtf0.inf"
+            "UefiCpuPkg/ResetVector/Vtf0/Vtf0.inf",
+            "UefiCpuPkg/ResetVector/Vtf0/Bin/ResetVector1G.inf"
         ]
     },
     "HostUnitTestDscCompleteCheck": {

@@ -27,10 +27,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 VarCheckRegisterSetVariableCheckHandler (
-  IN VAR_CHECK_SET_VARIABLE_CHECK_HANDLER   Handler
+  IN VAR_CHECK_SET_VARIABLE_CHECK_HANDLER  Handler
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
   Status = VarCheckLibRegisterSetVariableCheckHandler (Handler);
@@ -57,12 +57,12 @@ VarCheckRegisterSetVariableCheckHandler (
 EFI_STATUS
 EFIAPI
 VarCheckVariablePropertySet (
-  IN CHAR16                         *Name,
-  IN EFI_GUID                       *Guid,
-  IN VAR_CHECK_VARIABLE_PROPERTY    *VariableProperty
+  IN CHAR16                       *Name,
+  IN EFI_GUID                     *Guid,
+  IN VAR_CHECK_VARIABLE_PROPERTY  *VariableProperty
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
   Status = VarCheckLibVariablePropertySet (Name, Guid, VariableProperty);
@@ -86,12 +86,12 @@ VarCheckVariablePropertySet (
 EFI_STATUS
 EFIAPI
 VarCheckVariablePropertyGet (
-  IN CHAR16                         *Name,
-  IN EFI_GUID                       *Guid,
-  OUT VAR_CHECK_VARIABLE_PROPERTY   *VariableProperty
+  IN CHAR16                        *Name,
+  IN EFI_GUID                      *Guid,
+  OUT VAR_CHECK_VARIABLE_PROPERTY  *VariableProperty
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
   Status = VarCheckLibVariablePropertyGet (Name, Guid, VariableProperty);
@@ -99,4 +99,3 @@ VarCheckVariablePropertyGet (
 
   return Status;
 }
-

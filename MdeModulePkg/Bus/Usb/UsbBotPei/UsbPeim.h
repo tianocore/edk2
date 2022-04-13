@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _PEI_USB_PEIM_H_
 #define _PEI_USB_PEIM_H_
 
-
 #include <PiPei.h>
 
 #include <Ppi/UsbIo.h>

@@ -227,7 +227,7 @@ if NOT exist %CONF_PATH% (
 ) else (
   if defined RECONFIG (
     echo.
-    echo  Over-writing the files in the CONF_PATH directory
+    echo  Overwriting the files in the CONF_PATH directory
     echo  using the default template files
     echo.
   )
@@ -240,7 +240,7 @@ if NOT exist %CONF_PATH%\target.txt (
   )
   copy %EDK_TOOLS_PATH%\Conf\target.template %CONF_PATH%\target.txt > nul
 ) else (
-  if defined RECONFIG echo over-write ... target.template to %CONF_PATH%\target.txt
+  if defined RECONFIG echo overwrite ... target.template to %CONF_PATH%\target.txt
   if defined RECONFIG copy /Y %EDK_TOOLS_PATH%\Conf\target.template %CONF_PATH%\target.txt > nul
 )
 
@@ -251,7 +251,7 @@ if NOT exist %CONF_PATH%\tools_def.txt (
   )
   copy %EDK_TOOLS_PATH%\Conf\tools_def.template %CONF_PATH%\tools_def.txt > nul
 ) else (
-  if defined RECONFIG echo over-write ... tools_def.template to %CONF_PATH%\tools_def.txt
+  if defined RECONFIG echo overwrite ... tools_def.template to %CONF_PATH%\tools_def.txt
   if defined RECONFIG copy /Y %EDK_TOOLS_PATH%\Conf\tools_def.template %CONF_PATH%\tools_def.txt > nul
 )
 
@@ -299,7 +299,6 @@ IF NOT EXIST "%EDK_TOOLS_BIN%\GenFfs.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\GenFv.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\GenFw.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\GenSec.exe" goto check_c_tools
-IF NOT EXIST "%EDK_TOOLS_BIN%\Split.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\TianoCompress.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\VfrCompile.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\VolInfo.exe" goto check_c_tools
@@ -402,6 +401,8 @@ goto end
   if %ERRORLEVEL% EQU 0 (
     goto use_pip_basetools
   ) else (
+    REM reset ERRORLEVEL
+    type nul>nul
     goto use_builtin_basetools
   )
 

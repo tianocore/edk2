@@ -17,7 +17,6 @@ Abstract:
 #ifndef _WIN_GOP_H_
 #define _WIN_GOP_H_
 
-
 #include "WinHost.h"
 
 #include <Protocol/EmuIoThunk.h>
@@ -39,86 +38,84 @@ Abstract:
 // The value is 1 if the ALT key is down while the key is pressed/released;
 // it is 0 if the WM_SYSKEYDOWN message is posted to the active window
 // because no window has the keyboard focus.
-#define GOP_EXTENDED_KEY         (0x1 << 24)
-#define GOP_ALT_KEY_PRESSED      (0x1 << 29)
+#define GOP_EXTENDED_KEY     (0x1 << 24)
+#define GOP_ALT_KEY_PRESSED  (0x1 << 29)
 
-#define KEYBOARD_TIMER_INTERVAL         200000  // 0.02s
+#define KEYBOARD_TIMER_INTERVAL  200000         // 0.02s
 
-#define MAX_Q 256
+#define MAX_Q  256
 
 typedef struct {
-  UINTN             Front;
-  UINTN             Rear;
-  EFI_KEY_DATA      Q[MAX_Q];
-  CRITICAL_SECTION  Cs;
+  UINTN               Front;
+  UINTN               Rear;
+  EFI_KEY_DATA        Q[MAX_Q];
+  CRITICAL_SECTION    Cs;
 } GOP_QUEUE_FIXED;
 
-#define WIN_NT_GOP_CLASS_NAME       L"WinNtGopWindow"
-
+#define WIN_NT_GOP_CLASS_NAME  L"WinNtGopWindow"
 
 typedef struct {
-  UINT64                        Signature;
-  EMU_GRAPHICS_WINDOW_PROTOCOL  GraphicsWindowIo;
+  UINT64                                              Signature;
+  EMU_GRAPHICS_WINDOW_PROTOCOL                        GraphicsWindowIo;
 
   //
   // GOP Private Data knowing when to start hardware
   //
-  BOOLEAN                       HardwareNeedsStarting;
+  BOOLEAN                                             HardwareNeedsStarting;
 
-  CHAR16                        *WindowName;
-  CHAR16                        Buffer[160];
+  CHAR16                                              *WindowName;
+  CHAR16                                              Buffer[160];
 
-  HANDLE                        ThreadInited; // Semaphore
-  HANDLE                        ThreadHandle; // Thread
-  DWORD                         ThreadId;
+  HANDLE                                              ThreadInited; // Semaphore
+  HANDLE                                              ThreadHandle; // Thread
+  DWORD                                               ThreadId;
 
-  HWND                          WindowHandle;
-  WNDCLASSEX                    WindowsClass;
+  HWND                                                WindowHandle;
+  WNDCLASSEX                                          WindowsClass;
 
-  UINT32                        Width;
-  UINT32                        Height;
+  UINT32                                              Width;
+  UINT32                                              Height;
   //
   // This screen is used to redraw the screen when windows events happen. It's
   // updated in the main thread and displayed in the windows thread.
   //
-  BITMAPV4HEADER                *VirtualScreenInfo;
+  BITMAPV4HEADER                                      *VirtualScreenInfo;
 
-  FRAME_BUFFER_CONFIGURE        *FrameBufferConfigure;
+  FRAME_BUFFER_CONFIGURE                              *FrameBufferConfigure;
 
   //
   // Keyboard Queue used by Simple Text In.
   // QueueForRead:   WinProc thread adds, and main thread removes.
   //
-  GOP_QUEUE_FIXED               QueueForRead;
+  GOP_QUEUE_FIXED                                     QueueForRead;
 
   EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK    MakeRegisterdKeyCallback;
   EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK    BreakRegisterdKeyCallback;
   VOID                                                *RegisterdKeyCallbackContext;
 
-  EFI_KEY_STATE                     KeyState;
-  BOOLEAN                           LeftShift;
-  BOOLEAN                           RightShift;
-  BOOLEAN                           LeftAlt;
-  BOOLEAN                           RightAlt;
-  BOOLEAN                           LeftCtrl;
-  BOOLEAN                           RightCtrl;
-  BOOLEAN                           LeftLogo;
-  BOOLEAN                           RightLogo;
-  BOOLEAN                           Menu;
-  BOOLEAN                           SysReq;
-  BOOLEAN                           NumLock;
-  BOOLEAN                           ScrollLock;
-  BOOLEAN                           CapsLock;
-  BOOLEAN                           IsPartialKeySupport;
-  INT32                             PointerPreviousX;
-  INT32                             PointerPreviousY;
-  BOOLEAN                           PointerStateChanged;
-  EFI_SIMPLE_POINTER_STATE          PointerState;
+  EFI_KEY_STATE                                       KeyState;
+  BOOLEAN                                             LeftShift;
+  BOOLEAN                                             RightShift;
+  BOOLEAN                                             LeftAlt;
+  BOOLEAN                                             RightAlt;
+  BOOLEAN                                             LeftCtrl;
+  BOOLEAN                                             RightCtrl;
+  BOOLEAN                                             LeftLogo;
+  BOOLEAN                                             RightLogo;
+  BOOLEAN                                             Menu;
+  BOOLEAN                                             SysReq;
+  BOOLEAN                                             NumLock;
+  BOOLEAN                                             ScrollLock;
+  BOOLEAN                                             CapsLock;
+  BOOLEAN                                             IsPartialKeySupport;
+  INT32                                               PointerPreviousX;
+  INT32                                               PointerPreviousY;
+  BOOLEAN                                             PointerStateChanged;
+  EFI_SIMPLE_POINTER_STATE                            PointerState;
 } GRAPHICS_PRIVATE_DATA;
 #define GRAPHICS_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('g', 'f', 'x', 'd')
 #define GRAPHICS_PRIVATE_DATA_FROM_THIS(a)  \
          CR(a, GRAPHICS_PRIVATE_DATA, GraphicsWindowIo, GRAPHICS_PRIVATE_DATA_SIGNATURE)
-
 
 //
 // Gop Hardware abstraction internal worker functions
@@ -135,8 +132,8 @@ typedef struct {
 **/
 EFI_STATUS
 GopPrivateAddKey (
-  IN  GRAPHICS_PRIVATE_DATA    *Private,
-  IN  EFI_INPUT_KEY            Key
+  IN  GRAPHICS_PRIVATE_DATA  *Private,
+  IN  EFI_INPUT_KEY          Key
   );
 
 EFI_STATUS
@@ -149,29 +146,29 @@ WinNtWndGetKey (
 EFI_STATUS
 EFIAPI
 WinNtWndCheckKey (
-  IN  EMU_GRAPHICS_WINDOW_PROTOCOL *GraphicsIo
+  IN  EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsIo
   );
 
 EFI_STATUS
 EFIAPI
 WinNtWndKeySetState (
-  IN EMU_GRAPHICS_WINDOW_PROTOCOL   *GraphicsIo,
-  IN EFI_KEY_TOGGLE_STATE           *KeyToggleState
+  IN EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsIo,
+  IN EFI_KEY_TOGGLE_STATE          *KeyToggleState
   );
 
 EFI_STATUS
 EFIAPI
 WinNtWndRegisterKeyNotify (
-  IN EMU_GRAPHICS_WINDOW_PROTOCOL                        *GraphicsIo,
-  IN EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK    MakeCallBack,
-  IN EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK    BreakCallBack,
-  IN VOID                                                *Context
+  IN EMU_GRAPHICS_WINDOW_PROTOCOL                      *GraphicsIo,
+  IN EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK  MakeCallBack,
+  IN EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK  BreakCallBack,
+  IN VOID                                              *Context
   );
 
 EFI_STATUS
 EFIAPI
 WinNtWndCheckPointer (
-  IN  EMU_GRAPHICS_WINDOW_PROTOCOL *GraphicsIo
+  IN  EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsIo
   );
 
 EFI_STATUS
@@ -180,12 +177,12 @@ WinNtWndGetPointerState (
   IN  EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsIo,
   IN  EFI_SIMPLE_POINTER_STATE      *State
   );
+
 EFI_STATUS
 GopPrivateCreateQ (
-  IN  GRAPHICS_PRIVATE_DATA    *Private,
-  IN GOP_QUEUE_FIXED           *Queue
+  IN  GRAPHICS_PRIVATE_DATA  *Private,
+  IN GOP_QUEUE_FIXED         *Queue
   );
-
 
 /**
   TODO: Add function description
@@ -197,8 +194,8 @@ GopPrivateCreateQ (
 **/
 EFI_STATUS
 GopPrivateDestroyQ (
-  IN  GRAPHICS_PRIVATE_DATA    *Private,
-  IN GOP_QUEUE_FIXED           *Queue
+  IN  GRAPHICS_PRIVATE_DATA  *Private,
+  IN GOP_QUEUE_FIXED         *Queue
   );
-#endif
 
+#endif

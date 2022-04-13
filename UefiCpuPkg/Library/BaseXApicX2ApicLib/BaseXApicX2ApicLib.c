@@ -23,10 +23,154 @@
 #include <Library/TimerLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiCpuLib.h>
+#include <IndustryStandard/Tdx.h>
 
 //
 // Library internal functions
 //
+
+/**
+  Some MSRs in TDX are accessed via TdCall.
+  Some are directly read/write from/to CPU.
+
+  @param  MsrIndex  Index of the MSR
+  @retval TRUE      MSR accessed via TdCall.
+  @retval FALSE     MSR accessed not via TdCall.
+
+**/
+BOOLEAN
+AccessMsrTdxCall (
+  IN UINT32  MsrIndex
+  )
+{
+  if (!TdIsEnabled ()) {
+    return FALSE;
+  }
+
+  switch (MsrIndex) {
+    case MSR_IA32_X2APIC_TPR:
+    case MSR_IA32_X2APIC_PPR:
+    case MSR_IA32_X2APIC_EOI:
+    case MSR_IA32_X2APIC_ISR0:
+    case MSR_IA32_X2APIC_ISR1:
+    case MSR_IA32_X2APIC_ISR2:
+    case MSR_IA32_X2APIC_ISR3:
+    case MSR_IA32_X2APIC_ISR4:
+    case MSR_IA32_X2APIC_ISR5:
+    case MSR_IA32_X2APIC_ISR6:
+    case MSR_IA32_X2APIC_ISR7:
+    case MSR_IA32_X2APIC_TMR0:
+    case MSR_IA32_X2APIC_TMR1:
+    case MSR_IA32_X2APIC_TMR2:
+    case MSR_IA32_X2APIC_TMR3:
+    case MSR_IA32_X2APIC_TMR4:
+    case MSR_IA32_X2APIC_TMR5:
+    case MSR_IA32_X2APIC_TMR6:
+    case MSR_IA32_X2APIC_TMR7:
+    case MSR_IA32_X2APIC_IRR0:
+    case MSR_IA32_X2APIC_IRR1:
+    case MSR_IA32_X2APIC_IRR2:
+    case MSR_IA32_X2APIC_IRR3:
+    case MSR_IA32_X2APIC_IRR4:
+    case MSR_IA32_X2APIC_IRR5:
+    case MSR_IA32_X2APIC_IRR6:
+    case MSR_IA32_X2APIC_IRR7:
+      return FALSE;
+    default:
+      break;
+  }
+
+  return TRUE;
+}
+
+/**
+  Read MSR value.
+
+  @param  MsrIndex  Index of the MSR to read
+  @retval 64-bit    Value of MSR.
+
+**/
+UINT64
+LocalApicReadMsrReg64 (
+  IN UINT32  MsrIndex
+  )
+{
+  UINT64  Val;
+  UINT64  Status;
+
+  if (AccessMsrTdxCall (MsrIndex)) {
+    Status = TdVmCall (TDVMCALL_RDMSR, (UINT64)MsrIndex, 0, 0, 0, &Val);
+    if (Status != 0) {
+      TdVmCall (TDVMCALL_HALT, 0, 0, 0, 0, 0);
+    }
+  } else {
+    Val = AsmReadMsr64 (MsrIndex);
+  }
+
+  return Val;
+}
+
+/**
+  Write to MSR.
+
+  @param  MsrIndex  Index of the MSR to write to
+  @param  Value     Value to be written to the MSR
+
+  @return Value
+
+**/
+UINT64
+LocalApicWriteMsrReg64 (
+  IN UINT32  MsrIndex,
+  IN UINT64  Value
+  )
+{
+  UINT64  Status;
+
+  if (AccessMsrTdxCall (MsrIndex)) {
+    Status = TdVmCall (TDVMCALL_WRMSR, (UINT64)MsrIndex, Value, 0, 0, 0);
+    if (Status != 0) {
+      TdVmCall (TDVMCALL_HALT, 0, 0, 0, 0, 0);
+    }
+  } else {
+    AsmWriteMsr64 (MsrIndex, Value);
+  }
+
+  return Value;
+}
+
+/**
+  Read MSR value.
+
+  @param  MsrIndex  Index of the MSR to read
+  @retval 32-bit    Value of MSR.
+
+**/
+UINT32
+LocalApicReadMsrReg32 (
+  IN UINT32  MsrIndex
+  )
+{
+  return (UINT32)LocalApicReadMsrReg64 (MsrIndex);
+}
+
+/**
+  Write to MSR.
+
+  @param  MsrIndex  Index of the MSR to write to
+  @param  Value     Value to be written to the MSR
+
+  @return Value
+
+**/
+UINT32
+LocalApicWriteMsrReg32 (
+  IN UINT32  MsrIndex,
+  IN UINT32  Value
+  )
+{
+  return (UINT32)LocalApicWriteMsrReg64 (MsrIndex, Value);
+}
 
 /**
   Determine if the CPU supports the Local APIC Base Address MSR.
@@ -45,13 +189,14 @@ LocalApicBaseAddressMsrSupported (
 
   AsmCpuid (1, &RegEax, NULL, NULL, NULL);
   FamilyId = BitFieldRead32 (RegEax, 8, 11);
-  if (FamilyId == 0x04 || FamilyId == 0x05) {
+  if ((FamilyId == 0x04) || (FamilyId == 0x05)) {
     //
     // CPUs with a FamilyId of 0x04 or 0x05 do not support the
     // Local APIC Base Address MSR
     //
     return FALSE;
   }
+
   return TRUE;
 }
 
@@ -77,10 +222,10 @@ GetLocalApicBaseAddress (
     return PcdGet32 (PcdCpuLocalApicBaseAddress);
   }
 
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+  ApicBaseMsr.Uint64 = LocalApicReadMsrReg64 (MSR_IA32_APIC_BASE);
 
-  return (UINTN)(LShiftU64 ((UINT64) ApicBaseMsr.Bits.ApicBaseHi, 32)) +
-           (((UINTN)ApicBaseMsr.Bits.ApicBase) << 12);
+  return (UINTN)(LShiftU64 ((UINT64)ApicBaseMsr.Bits.ApicBaseHi, 32)) +
+         (((UINTN)ApicBaseMsr.Bits.ApicBase) << 12);
 }
 
 /**
@@ -94,7 +239,7 @@ GetLocalApicBaseAddress (
 VOID
 EFIAPI
 SetLocalApicBaseAddress (
-  IN UINTN                BaseAddress
+  IN UINTN  BaseAddress
   )
 {
   MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
@@ -108,12 +253,12 @@ SetLocalApicBaseAddress (
     return;
   }
 
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+  ApicBaseMsr.Uint64 = LocalApicReadMsrReg64 (MSR_IA32_APIC_BASE);
 
-  ApicBaseMsr.Bits.ApicBase   = (UINT32) (BaseAddress >> 12);
-  ApicBaseMsr.Bits.ApicBaseHi = (UINT32) (RShiftU64((UINT64) BaseAddress, 32));
+  ApicBaseMsr.Bits.ApicBase   = (UINT32)(BaseAddress >> 12);
+  ApicBaseMsr.Bits.ApicBaseHi = (UINT32)(RShiftU64 ((UINT64)BaseAddress, 32));
 
-  AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
+  LocalApicWriteMsrReg64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
 }
 
 /**
@@ -135,12 +280,12 @@ ReadLocalApicReg (
   IN UINTN  MmioOffset
   )
 {
-  UINT32 MsrIndex;
+  UINT32  MsrIndex;
 
   ASSERT ((MmioOffset & 0xf) == 0);
 
   if (GetApicMode () == LOCAL_APIC_MODE_XAPIC) {
-    return MmioRead32 (GetLocalApicBaseAddress() + MmioOffset);
+    return MmioRead32 (GetLocalApicBaseAddress () + MmioOffset);
   } else {
     //
     // DFR is not supported in x2APIC mode.
@@ -153,7 +298,7 @@ ReadLocalApicReg (
     ASSERT (MmioOffset != XAPIC_ICR_HIGH_OFFSET);
 
     MsrIndex = (UINT32)(MmioOffset >> 4) + X2APIC_MSR_BASE_ADDRESS;
-    return AsmReadMsr32 (MsrIndex);
+    return LocalApicReadMsrReg32 (MsrIndex);
   }
 }
 
@@ -174,16 +319,16 @@ ReadLocalApicReg (
 VOID
 EFIAPI
 WriteLocalApicReg (
-  IN UINTN  MmioOffset,
-  IN UINT32 Value
+  IN UINTN   MmioOffset,
+  IN UINT32  Value
   )
 {
-  UINT32 MsrIndex;
+  UINT32  MsrIndex;
 
   ASSERT ((MmioOffset & 0xf) == 0);
 
   if (GetApicMode () == LOCAL_APIC_MODE_XAPIC) {
-    MmioWrite32 (GetLocalApicBaseAddress() + MmioOffset, Value);
+    MmioWrite32 (GetLocalApicBaseAddress () + MmioOffset, Value);
   } else {
     //
     // DFR is not supported in x2APIC mode.
@@ -202,7 +347,7 @@ WriteLocalApicReg (
     // Use memory fence here to force the serializing semantics to be consisent with xAPIC mode.
     //
     MemoryFence ();
-    AsmWriteMsr32 (MsrIndex, Value);
+    LocalApicWriteMsrReg32 (MsrIndex, Value);
   }
 }
 
@@ -216,15 +361,15 @@ WriteLocalApicReg (
 **/
 VOID
 SendIpi (
-  IN UINT32          IcrLow,
-  IN UINT32          ApicId
+  IN UINT32  IcrLow,
+  IN UINT32  ApicId
   )
 {
-  UINT64             MsrValue;
-  LOCAL_APIC_ICR_LOW IcrLowReg;
-  UINTN              LocalApciBaseAddress;
-  UINT32             IcrHigh;
-  BOOLEAN            InterruptState;
+  UINT64              MsrValue;
+  LOCAL_APIC_ICR_LOW  IcrLowReg;
+  UINTN               LocalApciBaseAddress;
+  UINT32              IcrHigh;
+  BOOLEAN             InterruptState;
 
   //
   // Legacy APIC or X2APIC?
@@ -237,7 +382,7 @@ SendIpi (
     //
     // Get base address of this LAPIC
     //
-    LocalApciBaseAddress = GetLocalApicBaseAddress();
+    LocalApciBaseAddress = GetLocalApicBaseAddress ();
 
     //
     // Save existing contents of ICR high 32 bits
@@ -271,13 +416,12 @@ SendIpi (
     MmioWrite32 (LocalApciBaseAddress + XAPIC_ICR_HIGH_OFFSET, IcrHigh);
 
     SetInterruptState (InterruptState);
-
   } else {
     //
     // For x2APIC, A single MSR write to the Interrupt Command Register is required for dispatching an
     // interrupt in x2APIC mode.
     //
-    MsrValue = LShiftU64 ((UINT64) ApicId, 32) | IcrLow;
+    MsrValue = LShiftU64 ((UINT64)ApicId, 32) | IcrLow;
     AsmWriteMsr64 (X2APIC_MSR_ICR_ADDRESS, MsrValue);
   }
 }
@@ -309,7 +453,7 @@ GetApicMode (
     return LOCAL_APIC_MODE_XAPIC;
   }
 
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+  ApicBaseMsr.Uint64 = LocalApicReadMsrReg64 (MSR_IA32_APIC_BASE);
   //
   // Local APIC should have been enabled
   //
@@ -354,9 +498,9 @@ SetApicMode (
       case LOCAL_APIC_MODE_XAPIC:
         break;
       case LOCAL_APIC_MODE_X2APIC:
-        ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+        ApicBaseMsr.Uint64    = LocalApicReadMsrReg64 (MSR_IA32_APIC_BASE);
         ApicBaseMsr.Bits.EXTD = 1;
-        AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
+        LocalApicWriteMsrReg64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
         break;
       default:
         ASSERT (FALSE);
@@ -368,9 +512,9 @@ SetApicMode (
         //  Transition from x2APIC mode to xAPIC mode is a two-step process:
         //    x2APIC -> Local APIC disabled -> xAPIC
         //
-        ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+        ApicBaseMsr.Uint64    = AsmReadMsr64 (MSR_IA32_APIC_BASE);
         ApicBaseMsr.Bits.EXTD = 0;
-        ApicBaseMsr.Bits.EN = 0;
+        ApicBaseMsr.Bits.EN   = 0;
         AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
         ApicBaseMsr.Bits.EN = 1;
         AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
@@ -398,9 +542,9 @@ GetInitialApicId (
   VOID
   )
 {
-  UINT32 ApicId;
-  UINT32 MaxCpuIdIndex;
-  UINT32 RegEbx;
+  UINT32  ApicId;
+  UINT32  MaxCpuIdIndex;
+  UINT32  RegEbx;
 
   if (GetApicMode () == LOCAL_APIC_MODE_XAPIC) {
     //
@@ -419,6 +563,7 @@ GetInitialApicId (
         return ApicId;
       }
     }
+
     AsmCpuid (CPUID_VERSION_INFO, NULL, &RegEbx, NULL, NULL);
     return RegEbx >> 24;
   } else {
@@ -437,8 +582,8 @@ GetApicId (
   VOID
   )
 {
-  UINT32 ApicId;
-  UINT32 InitApicId;
+  UINT32  ApicId;
+  UINT32  InitApicId;
 
   ApicId = ReadLocalApicReg (XAPIC_ID_OFFSET);
   if (GetApicMode () == LOCAL_APIC_MODE_XAPIC) {
@@ -473,16 +618,16 @@ GetApicVersion (
 VOID
 EFIAPI
 SendFixedIpi (
-  IN UINT32          ApicId,
-  IN UINT8           Vector
+  IN UINT32  ApicId,
+  IN UINT8   Vector
   )
 {
-  LOCAL_APIC_ICR_LOW IcrLow;
+  LOCAL_APIC_ICR_LOW  IcrLow;
 
-  IcrLow.Uint32 = 0;
+  IcrLow.Uint32            = 0;
   IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_FIXED;
-  IcrLow.Bits.Level = 1;
-  IcrLow.Bits.Vector = Vector;
+  IcrLow.Bits.Level        = 1;
+  IcrLow.Bits.Vector       = Vector;
   SendIpi (IcrLow.Uint32, ApicId);
 }
 
@@ -496,16 +641,16 @@ SendFixedIpi (
 VOID
 EFIAPI
 SendFixedIpiAllExcludingSelf (
-  IN UINT8           Vector
+  IN UINT8  Vector
   )
 {
-  LOCAL_APIC_ICR_LOW IcrLow;
+  LOCAL_APIC_ICR_LOW  IcrLow;
 
-  IcrLow.Uint32 = 0;
-  IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_FIXED;
-  IcrLow.Bits.Level = 1;
+  IcrLow.Uint32                    = 0;
+  IcrLow.Bits.DeliveryMode         = LOCAL_APIC_DELIVERY_MODE_FIXED;
+  IcrLow.Bits.Level                = 1;
   IcrLow.Bits.DestinationShorthand = LOCAL_APIC_DESTINATION_SHORTHAND_ALL_EXCLUDING_SELF;
-  IcrLow.Bits.Vector = Vector;
+  IcrLow.Bits.Vector               = Vector;
   SendIpi (IcrLow.Uint32, 0);
 }
 
@@ -519,14 +664,14 @@ SendFixedIpiAllExcludingSelf (
 VOID
 EFIAPI
 SendSmiIpi (
-  IN UINT32          ApicId
+  IN UINT32  ApicId
   )
 {
-  LOCAL_APIC_ICR_LOW IcrLow;
+  LOCAL_APIC_ICR_LOW  IcrLow;
 
-  IcrLow.Uint32 = 0;
+  IcrLow.Uint32            = 0;
   IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_SMI;
-  IcrLow.Bits.Level = 1;
+  IcrLow.Bits.Level        = 1;
   SendIpi (IcrLow.Uint32, ApicId);
 }
 
@@ -541,11 +686,11 @@ SendSmiIpiAllExcludingSelf (
   VOID
   )
 {
-  LOCAL_APIC_ICR_LOW IcrLow;
+  LOCAL_APIC_ICR_LOW  IcrLow;
 
-  IcrLow.Uint32 = 0;
-  IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_SMI;
-  IcrLow.Bits.Level = 1;
+  IcrLow.Uint32                    = 0;
+  IcrLow.Bits.DeliveryMode         = LOCAL_APIC_DELIVERY_MODE_SMI;
+  IcrLow.Bits.Level                = 1;
   IcrLow.Bits.DestinationShorthand = LOCAL_APIC_DESTINATION_SHORTHAND_ALL_EXCLUDING_SELF;
   SendIpi (IcrLow.Uint32, 0);
 }
@@ -560,14 +705,14 @@ SendSmiIpiAllExcludingSelf (
 VOID
 EFIAPI
 SendInitIpi (
-  IN UINT32          ApicId
+  IN UINT32  ApicId
   )
 {
-  LOCAL_APIC_ICR_LOW IcrLow;
+  LOCAL_APIC_ICR_LOW  IcrLow;
 
-  IcrLow.Uint32 = 0;
+  IcrLow.Uint32            = 0;
   IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_INIT;
-  IcrLow.Bits.Level = 1;
+  IcrLow.Bits.Level        = 1;
   SendIpi (IcrLow.Uint32, ApicId);
 }
 
@@ -582,11 +727,11 @@ SendInitIpiAllExcludingSelf (
   VOID
   )
 {
-  LOCAL_APIC_ICR_LOW IcrLow;
+  LOCAL_APIC_ICR_LOW  IcrLow;
 
-  IcrLow.Uint32 = 0;
-  IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_INIT;
-  IcrLow.Bits.Level = 1;
+  IcrLow.Uint32                    = 0;
+  IcrLow.Bits.DeliveryMode         = LOCAL_APIC_DELIVERY_MODE_INIT;
+  IcrLow.Bits.Level                = 1;
   IcrLow.Bits.DestinationShorthand = LOCAL_APIC_DESTINATION_SHORTHAND_ALL_EXCLUDING_SELF;
   SendIpi (IcrLow.Uint32, 0);
 }
@@ -606,21 +751,21 @@ SendInitIpiAllExcludingSelf (
 VOID
 EFIAPI
 SendInitSipiSipi (
-  IN UINT32          ApicId,
-  IN UINT32          StartupRoutine
+  IN UINT32  ApicId,
+  IN UINT32  StartupRoutine
   )
 {
-  LOCAL_APIC_ICR_LOW IcrLow;
+  LOCAL_APIC_ICR_LOW  IcrLow;
 
   ASSERT (StartupRoutine < 0x100000);
   ASSERT ((StartupRoutine & 0xfff) == 0);
 
   SendInitIpi (ApicId);
-  MicroSecondDelay (PcdGet32(PcdCpuInitIpiDelayInMicroSeconds));
-  IcrLow.Uint32 = 0;
-  IcrLow.Bits.Vector = (StartupRoutine >> 12);
+  MicroSecondDelay (PcdGet32 (PcdCpuInitIpiDelayInMicroSeconds));
+  IcrLow.Uint32            = 0;
+  IcrLow.Bits.Vector       = (StartupRoutine >> 12);
   IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_STARTUP;
-  IcrLow.Bits.Level = 1;
+  IcrLow.Bits.Level        = 1;
   SendIpi (IcrLow.Uint32, ApicId);
   if (!StandardSignatureIsAuthenticAMD ()) {
     MicroSecondDelay (200);
@@ -642,20 +787,20 @@ SendInitSipiSipi (
 VOID
 EFIAPI
 SendInitSipiSipiAllExcludingSelf (
-  IN UINT32          StartupRoutine
+  IN UINT32  StartupRoutine
   )
 {
-  LOCAL_APIC_ICR_LOW IcrLow;
+  LOCAL_APIC_ICR_LOW  IcrLow;
 
   ASSERT (StartupRoutine < 0x100000);
   ASSERT ((StartupRoutine & 0xfff) == 0);
 
   SendInitIpiAllExcludingSelf ();
-  MicroSecondDelay (PcdGet32(PcdCpuInitIpiDelayInMicroSeconds));
-  IcrLow.Uint32 = 0;
-  IcrLow.Bits.Vector = (StartupRoutine >> 12);
-  IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_STARTUP;
-  IcrLow.Bits.Level = 1;
+  MicroSecondDelay (PcdGet32 (PcdCpuInitIpiDelayInMicroSeconds));
+  IcrLow.Uint32                    = 0;
+  IcrLow.Bits.Vector               = (StartupRoutine >> 12);
+  IcrLow.Bits.DeliveryMode         = LOCAL_APIC_DELIVERY_MODE_STARTUP;
+  IcrLow.Bits.Level                = 1;
   IcrLow.Bits.DestinationShorthand = LOCAL_APIC_DESTINATION_SHORTHAND_ALL_EXCLUDING_SELF;
   SendIpi (IcrLow.Uint32, 0);
   if (!StandardSignatureIsAuthenticAMD ()) {
@@ -711,13 +856,13 @@ ProgramVirtualWireMode (
   VOID
   )
 {
-  LOCAL_APIC_SVR      Svr;
-  LOCAL_APIC_LVT_LINT Lint;
+  LOCAL_APIC_SVR       Svr;
+  LOCAL_APIC_LVT_LINT  Lint;
 
   //
   // Enable the APIC via SVR and set the spurious interrupt to use Int 00F.
   //
-  Svr.Uint32 = ReadLocalApicReg (XAPIC_SPURIOUS_VECTOR_OFFSET);
+  Svr.Uint32              = ReadLocalApicReg (XAPIC_SPURIOUS_VECTOR_OFFSET);
   Svr.Bits.SpuriousVector = 0xf;
   Svr.Bits.SoftwareEnable = 1;
   WriteLocalApicReg (XAPIC_SPURIOUS_VECTOR_OFFSET, Svr.Uint32);
@@ -725,21 +870,21 @@ ProgramVirtualWireMode (
   //
   // Program the LINT0 vector entry as ExtInt. Not masked, edge, active high.
   //
-  Lint.Uint32 = ReadLocalApicReg (XAPIC_LVT_LINT0_OFFSET);
-  Lint.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_EXTINT;
+  Lint.Uint32                = ReadLocalApicReg (XAPIC_LVT_LINT0_OFFSET);
+  Lint.Bits.DeliveryMode     = LOCAL_APIC_DELIVERY_MODE_EXTINT;
   Lint.Bits.InputPinPolarity = 0;
-  Lint.Bits.TriggerMode = 0;
-  Lint.Bits.Mask = 0;
+  Lint.Bits.TriggerMode      = 0;
+  Lint.Bits.Mask             = 0;
   WriteLocalApicReg (XAPIC_LVT_LINT0_OFFSET, Lint.Uint32);
 
   //
   // Program the LINT0 vector entry as NMI. Not masked, edge, active high.
   //
-  Lint.Uint32 = ReadLocalApicReg (XAPIC_LVT_LINT1_OFFSET);
-  Lint.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_NMI;
+  Lint.Uint32                = ReadLocalApicReg (XAPIC_LVT_LINT1_OFFSET);
+  Lint.Bits.DeliveryMode     = LOCAL_APIC_DELIVERY_MODE_NMI;
   Lint.Bits.InputPinPolarity = 0;
-  Lint.Bits.TriggerMode = 0;
-  Lint.Bits.Mask = 0;
+  Lint.Bits.TriggerMode      = 0;
+  Lint.Bits.Mask             = 0;
   WriteLocalApicReg (XAPIC_LVT_LINT1_OFFSET, Lint.Uint32);
 }
 
@@ -754,13 +899,13 @@ DisableLvtInterrupts (
   VOID
   )
 {
-  LOCAL_APIC_LVT_LINT LvtLint;
+  LOCAL_APIC_LVT_LINT  LvtLint;
 
-  LvtLint.Uint32 = ReadLocalApicReg (XAPIC_LVT_LINT0_OFFSET);
+  LvtLint.Uint32    = ReadLocalApicReg (XAPIC_LVT_LINT0_OFFSET);
   LvtLint.Bits.Mask = 1;
   WriteLocalApicReg (XAPIC_LVT_LINT0_OFFSET, LvtLint.Uint32);
 
-  LvtLint.Uint32 = ReadLocalApicReg (XAPIC_LVT_LINT1_OFFSET);
+  LvtLint.Uint32    = ReadLocalApicReg (XAPIC_LVT_LINT1_OFFSET);
   LvtLint.Bits.Mask = 1;
   WriteLocalApicReg (XAPIC_LVT_LINT1_OFFSET, LvtLint.Uint32);
 }
@@ -807,32 +952,27 @@ GetApicTimerCurrentCount (
 VOID
 EFIAPI
 InitializeApicTimer (
-  IN UINTN   DivideValue,
-  IN UINT32  InitCount,
-  IN BOOLEAN PeriodicMode,
-  IN UINT8   Vector
+  IN UINTN    DivideValue,
+  IN UINT32   InitCount,
+  IN BOOLEAN  PeriodicMode,
+  IN UINT8    Vector
   )
 {
-  LOCAL_APIC_DCR       Dcr;
-  LOCAL_APIC_LVT_TIMER LvtTimer;
-  UINT32               Divisor;
+  LOCAL_APIC_DCR        Dcr;
+  LOCAL_APIC_LVT_TIMER  LvtTimer;
+  UINT32                Divisor;
 
   //
   // Ensure local APIC is in software-enabled state.
   //
   InitializeLocalApicSoftwareEnable (TRUE);
 
-  //
-  // Program init-count register.
-  //
-  WriteLocalApicReg (XAPIC_TIMER_INIT_COUNT_OFFSET, InitCount);
-
   if (DivideValue != 0) {
     ASSERT (DivideValue <= 128);
-    ASSERT (DivideValue == GetPowerOfTwo32((UINT32)DivideValue));
+    ASSERT (DivideValue == GetPowerOfTwo32 ((UINT32)DivideValue));
     Divisor = (UINT32)((HighBitSet32 ((UINT32)DivideValue) - 1) & 0x7);
 
-    Dcr.Uint32 = ReadLocalApicReg (XAPIC_TIMER_DIVIDE_CONFIGURATION_OFFSET);
+    Dcr.Uint32            = ReadLocalApicReg (XAPIC_TIMER_DIVIDE_CONFIGURATION_OFFSET);
     Dcr.Bits.DivideValue1 = (Divisor & 0x3);
     Dcr.Bits.DivideValue2 = (Divisor >> 2);
     WriteLocalApicReg (XAPIC_TIMER_DIVIDE_CONFIGURATION_OFFSET, Dcr.Uint32);
@@ -847,9 +987,15 @@ InitializeApicTimer (
   } else {
     LvtTimer.Bits.TimerMode = 0;
   }
-  LvtTimer.Bits.Mask = 0;
+
+  LvtTimer.Bits.Mask   = 0;
   LvtTimer.Bits.Vector = Vector;
   WriteLocalApicReg (XAPIC_LVT_TIMER_OFFSET, LvtTimer.Uint32);
+
+  //
+  // Program init-count register.
+  //
+  WriteLocalApicReg (XAPIC_TIMER_INIT_COUNT_OFFSET, InitCount);
 }
 
 /**
@@ -869,25 +1015,25 @@ GetApicTimerState (
   OUT UINT8    *Vector  OPTIONAL
   )
 {
-  UINT32 Divisor;
-  LOCAL_APIC_DCR Dcr;
-  LOCAL_APIC_LVT_TIMER LvtTimer;
+  UINT32                Divisor;
+  LOCAL_APIC_DCR        Dcr;
+  LOCAL_APIC_LVT_TIMER  LvtTimer;
 
   //
   // Check the APIC Software Enable/Disable bit (bit 8) in Spurious-Interrupt
   // Vector Register.
   // This bit will be 1, if local APIC is software enabled.
   //
-  ASSERT ((ReadLocalApicReg(XAPIC_SPURIOUS_VECTOR_OFFSET) & BIT8) != 0);
+  ASSERT ((ReadLocalApicReg (XAPIC_SPURIOUS_VECTOR_OFFSET) & BIT8) != 0);
 
   if (DivideValue != NULL) {
-    Dcr.Uint32 = ReadLocalApicReg (XAPIC_TIMER_DIVIDE_CONFIGURATION_OFFSET);
-    Divisor = Dcr.Bits.DivideValue1 | (Dcr.Bits.DivideValue2 << 2);
-    Divisor = (Divisor + 1) & 0x7;
+    Dcr.Uint32   = ReadLocalApicReg (XAPIC_TIMER_DIVIDE_CONFIGURATION_OFFSET);
+    Divisor      = Dcr.Bits.DivideValue1 | (Dcr.Bits.DivideValue2 << 2);
+    Divisor      = (Divisor + 1) & 0x7;
     *DivideValue = ((UINTN)1) << Divisor;
   }
 
-  if (PeriodicMode != NULL || Vector != NULL) {
+  if ((PeriodicMode != NULL) || (Vector != NULL)) {
     LvtTimer.Uint32 = ReadLocalApicReg (XAPIC_LVT_TIMER_OFFSET);
     if (PeriodicMode != NULL) {
       if (LvtTimer.Bits.TimerMode == 1) {
@@ -896,8 +1042,9 @@ GetApicTimerState (
         *PeriodicMode = FALSE;
       }
     }
+
     if (Vector != NULL) {
-      *Vector = (UINT8) LvtTimer.Bits.Vector;
+      *Vector = (UINT8)LvtTimer.Bits.Vector;
     }
   }
 }
@@ -911,9 +1058,9 @@ EnableApicTimerInterrupt (
   VOID
   )
 {
-  LOCAL_APIC_LVT_TIMER LvtTimer;
+  LOCAL_APIC_LVT_TIMER  LvtTimer;
 
-  LvtTimer.Uint32 = ReadLocalApicReg (XAPIC_LVT_TIMER_OFFSET);
+  LvtTimer.Uint32    = ReadLocalApicReg (XAPIC_LVT_TIMER_OFFSET);
   LvtTimer.Bits.Mask = 0;
   WriteLocalApicReg (XAPIC_LVT_TIMER_OFFSET, LvtTimer.Uint32);
 }
@@ -927,9 +1074,9 @@ DisableApicTimerInterrupt (
   VOID
   )
 {
-  LOCAL_APIC_LVT_TIMER LvtTimer;
+  LOCAL_APIC_LVT_TIMER  LvtTimer;
 
-  LvtTimer.Uint32 = ReadLocalApicReg (XAPIC_LVT_TIMER_OFFSET);
+  LvtTimer.Uint32    = ReadLocalApicReg (XAPIC_LVT_TIMER_OFFSET);
   LvtTimer.Bits.Mask = 1;
   WriteLocalApicReg (XAPIC_LVT_TIMER_OFFSET, LvtTimer.Uint32);
 }
@@ -946,7 +1093,7 @@ GetApicTimerInterruptState (
   VOID
   )
 {
-  LOCAL_APIC_LVT_TIMER LvtTimer;
+  LOCAL_APIC_LVT_TIMER  LvtTimer;
 
   LvtTimer.Uint32 = ReadLocalApicReg (XAPIC_LVT_TIMER_OFFSET);
   return (BOOLEAN)(LvtTimer.Bits.Mask == 0);
@@ -1039,6 +1186,7 @@ GetApicMsiValue (
       MsiData.Bits.Level = 1;
     }
   }
+
   return MsiData.Uint64;
 }
 
@@ -1090,12 +1238,15 @@ GetProcessorLocationByApicId (
     if (Thread != NULL) {
       *Thread = 0;
     }
+
     if (Core != NULL) {
       *Core = 0;
     }
+
     if (Package != NULL) {
       *Package = 0;
     }
+
     return;
   }
 
@@ -1103,7 +1254,7 @@ GetProcessorLocationByApicId (
   // Assume three-level mapping of APIC ID: Package|Core|Thread.
   //
   ThreadBits = 0;
-  CoreBits = 0;
+  CoreBits   = 0;
 
   //
   // Get max index of CPUID
@@ -1117,7 +1268,7 @@ GetProcessorLocationByApicId (
   //
   TopologyLeafSupported = FALSE;
   if (MaxStandardCpuIdIndex >= CPUID_EXTENDED_TOPOLOGY) {
-    AsmCpuidEx(
+    AsmCpuidEx (
       CPUID_EXTENDED_TOPOLOGY,
       0,
       &ExtendedTopologyEax.Uint32,
@@ -1160,6 +1311,7 @@ GetProcessorLocationByApicId (
           CoreBits = ExtendedTopologyEax.Bits.ApicIdShift - ThreadBits;
           break;
         }
+
         SubIndex++;
       } while (LevelType != CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_INVALID);
     }
@@ -1180,7 +1332,7 @@ GetProcessorLocationByApicId (
     //
     // Check for topology extensions on AMD processor
     //
-    if (StandardSignatureIsAuthenticAMD()) {
+    if (StandardSignatureIsAuthenticAMD ()) {
       if (MaxExtendedCpuIdIndex >= CPUID_AMD_PROCESSOR_TOPOLOGY) {
         AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, &AmdExtendedCpuSigEcx.Uint32, NULL);
         if (AmdExtendedCpuSigEcx.Bits.TopologyExtensions != 0) {
@@ -1197,8 +1349,7 @@ GetProcessorLocationByApicId (
           MaxCoresPerPackage = MaxLogicProcessorsPerPackage / (AmdProcessorTopologyEbx.Bits.ThreadsPerCore + 1);
         }
       }
-    }
-    else {
+    } else {
       //
       // Extract core count based on CACHE information
       //
@@ -1210,16 +1361,18 @@ GetProcessorLocationByApicId (
       }
     }
 
-    ThreadBits = (UINTN)(HighBitSet32(MaxLogicProcessorsPerPackage / MaxCoresPerPackage - 1) + 1);
-    CoreBits = (UINTN)(HighBitSet32(MaxCoresPerPackage - 1) + 1);
+    ThreadBits = (UINTN)(HighBitSet32 (MaxLogicProcessorsPerPackage / MaxCoresPerPackage - 1) + 1);
+    CoreBits   = (UINTN)(HighBitSet32 (MaxCoresPerPackage - 1) + 1);
   }
 
   if (Thread != NULL) {
     *Thread = InitialApicId & ((1 << ThreadBits) - 1);
   }
+
   if (Core != NULL) {
     *Core = (InitialApicId >> ThreadBits) & ((1 << CoreBits) - 1);
   }
+
   if (Package != NULL) {
     *Package = (InitialApicId >> (ThreadBits + CoreBits));
   }
@@ -1253,13 +1406,13 @@ GetProcessorLocation2ByApicId (
   OUT UINT32  *Thread   OPTIONAL
   )
 {
-  CPUID_EXTENDED_TOPOLOGY_EAX         ExtendedTopologyEax;
-  CPUID_EXTENDED_TOPOLOGY_ECX         ExtendedTopologyEcx;
-  UINT32                              MaxStandardCpuIdIndex;
-  UINT32                              Index;
-  UINTN                               LevelType;
-  UINT32                              Bits[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE + 2];
-  UINT32                              *Location[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE + 2];
+  CPUID_EXTENDED_TOPOLOGY_EAX  ExtendedTopologyEax;
+  CPUID_EXTENDED_TOPOLOGY_ECX  ExtendedTopologyEcx;
+  UINT32                       MaxStandardCpuIdIndex;
+  UINT32                       Index;
+  UINTN                        LevelType;
+  UINT32                       Bits[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE + 2];
+  UINT32                       *Location[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE + 2];
 
   for (LevelType = 0; LevelType < ARRAY_SIZE (Bits); LevelType++) {
     Bits[LevelType] = 0;
@@ -1273,12 +1426,15 @@ GetProcessorLocation2ByApicId (
     if (Die != NULL) {
       *Die = 0;
     }
+
     if (Tile != NULL) {
       *Tile = 0;
     }
+
     if (Module != NULL) {
       *Module = 0;
     }
+
     GetProcessorLocationByApicId (InitialApicId, Package, Core, Thread);
     return;
   }
@@ -1288,7 +1444,7 @@ GetProcessorLocation2ByApicId (
   // is the preferred mechanism for enumerating topology.
   //
   for (Index = 0; ; Index++) {
-    AsmCpuidEx(
+    AsmCpuidEx (
       CPUID_V2_EXTENDED_TOPOLOGY,
       Index,
       &ExtendedTopologyEax.Uint32,
@@ -1306,6 +1462,7 @@ GetProcessorLocation2ByApicId (
     if (LevelType == CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_INVALID) {
       break;
     }
+
     ASSERT (LevelType < ARRAY_SIZE (Bits));
     Bits[LevelType] = ExtendedTopologyEax.Bits.ApicIdShift;
   }
@@ -1321,18 +1478,19 @@ GetProcessorLocation2ByApicId (
   }
 
   Location[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE + 1] = Package;
-  Location[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE    ] = Die;
-  Location[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_TILE   ] = Tile;
-  Location[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_MODULE ] = Module;
-  Location[CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_CORE   ]    = Core;
-  Location[CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_SMT    ]    = Thread;
+  Location[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE]     = Die;
+  Location[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_TILE]    = Tile;
+  Location[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_MODULE]  = Module;
+  Location[CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_CORE]       = Core;
+  Location[CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_SMT]        = Thread;
 
   Bits[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE + 1] = 32;
 
   for ( LevelType = CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_SMT
-      ; LevelType <= CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE + 1
-      ; LevelType ++
-      ) {
+        ; LevelType <= CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE + 1
+        ; LevelType++
+        )
+  {
     if (Location[LevelType] != NULL) {
       //
       // Bits[i] holds the number of bits to shift right on x2APIC ID to get a unique

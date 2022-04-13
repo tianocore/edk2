@@ -23,6 +23,7 @@
 
 [Sources]
   BdsPlatform.c
+  QemuKernel.c
   PlatformData.c
   BdsPlatform.h
 
@@ -46,6 +47,7 @@
   BootLogoLib
   DevicePathLib
   PciLib
+  QemuLoadImageLib
   UefiLib
   PlatformBmPrintScLib
   Tcg2PhysicalPresenceLib

@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "HttpBootDxe.h"
 
-
 /**
   Get the Nic handle using any child handle in the IPv4 stack.
 
@@ -21,10 +20,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_HANDLE
 HttpBootGetNicByIp4Children (
-  IN EFI_HANDLE                 ControllerHandle
+  IN EFI_HANDLE  ControllerHandle
   )
 {
-  EFI_HANDLE                    NicHandle;
+  EFI_HANDLE  NicHandle;
 
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiHttpProtocolGuid);
   if (NicHandle == NULL) {
@@ -48,10 +47,11 @@ HttpBootGetNicByIp4Children (
 **/
 EFI_HANDLE
 HttpBootGetNicByIp6Children (
-  IN EFI_HANDLE                 ControllerHandle
+  IN EFI_HANDLE  ControllerHandle
   )
 {
-  EFI_HANDLE                    NicHandle;
+  EFI_HANDLE  NicHandle;
+
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiHttpProtocolGuid);
   if (NicHandle == NULL) {
     NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiDhcp6ProtocolGuid);
@@ -73,17 +73,17 @@ HttpBootGetNicByIp6Children (
 **/
 VOID
 HttpBootUintnToAscDecWithFormat (
-  IN UINTN                       Number,
-  IN UINT8                       *Buffer,
-  IN INTN                        Length
+  IN UINTN  Number,
+  IN UINT8  *Buffer,
+  IN INTN   Length
   )
 {
-  UINTN                          Remainder;
+  UINTN  Remainder;
 
-  for (; Length > 0; Length--) {
-    Remainder      = Number % 10;
-    Number        /= 10;
-    Buffer[Length - 1] = (UINT8) ('0' + Remainder);
+  for ( ; Length > 0; Length--) {
+    Remainder          = Number % 10;
+    Number            /= 10;
+    Buffer[Length - 1] = (UINT8)('0' + Remainder);
   }
 }
 
@@ -95,10 +95,10 @@ HttpBootUintnToAscDecWithFormat (
 **/
 VOID
 HttpBootShowIp4Addr (
-  IN EFI_IPv4_ADDRESS   *Ip
+  IN EFI_IPv4_ADDRESS  *Ip
   )
 {
-  UINTN                 Index;
+  UINTN  Index;
 
   for (Index = 0; Index < 4; Index++) {
     AsciiPrint ("%d", Ip->Addr[Index]);
@@ -116,23 +116,25 @@ HttpBootShowIp4Addr (
 **/
 VOID
 HttpBootShowIp6Addr (
-  IN EFI_IPv6_ADDRESS   *Ip
+  IN EFI_IPv6_ADDRESS  *Ip
   )
 {
-  UINTN                 Index;
+  UINTN  Index;
 
   for (Index = 0; Index < 16; Index++) {
-
     if (Ip->Addr[Index] != 0) {
       AsciiPrint ("%x", Ip->Addr[Index]);
     }
+
     Index++;
     if (Index > 15) {
       return;
     }
+
     if (((Ip->Addr[Index] & 0xf0) == 0) && (Ip->Addr[Index - 1] != 0)) {
       AsciiPrint ("0");
     }
+
     AsciiPrint ("%x", Ip->Addr[Index]);
     if (Index < 15) {
       AsciiPrint (":");
@@ -148,142 +150,141 @@ HttpBootShowIp6Addr (
 **/
 VOID
 HttpBootPrintErrorMessage (
-  EFI_HTTP_STATUS_CODE            StatusCode
+  EFI_HTTP_STATUS_CODE  StatusCode
   )
 {
   AsciiPrint ("\n");
 
   switch (StatusCode) {
-  case HTTP_STATUS_300_MULTIPLE_CHOICES:
-    AsciiPrint ("\n  Redirection: 300 Multiple Choices");
-    break;
+    case HTTP_STATUS_300_MULTIPLE_CHOICES:
+      AsciiPrint ("\n  Redirection: 300 Multiple Choices");
+      break;
 
-  case HTTP_STATUS_301_MOVED_PERMANENTLY:
-    AsciiPrint ("\n  Redirection: 301 Moved Permanently");
-    break;
+    case HTTP_STATUS_301_MOVED_PERMANENTLY:
+      AsciiPrint ("\n  Redirection: 301 Moved Permanently");
+      break;
 
-  case HTTP_STATUS_302_FOUND:
-    AsciiPrint ("\n  Redirection: 302 Found");
-    break;
+    case HTTP_STATUS_302_FOUND:
+      AsciiPrint ("\n  Redirection: 302 Found");
+      break;
 
-  case HTTP_STATUS_303_SEE_OTHER:
-    AsciiPrint ("\n  Redirection: 303 See Other");
-    break;
+    case HTTP_STATUS_303_SEE_OTHER:
+      AsciiPrint ("\n  Redirection: 303 See Other");
+      break;
 
-  case HTTP_STATUS_304_NOT_MODIFIED:
-    AsciiPrint ("\n  Redirection: 304 Not Modified");
-    break;
+    case HTTP_STATUS_304_NOT_MODIFIED:
+      AsciiPrint ("\n  Redirection: 304 Not Modified");
+      break;
 
-  case HTTP_STATUS_305_USE_PROXY:
-    AsciiPrint ("\n  Redirection: 305 Use Proxy");
-    break;
+    case HTTP_STATUS_305_USE_PROXY:
+      AsciiPrint ("\n  Redirection: 305 Use Proxy");
+      break;
 
-  case HTTP_STATUS_307_TEMPORARY_REDIRECT:
-    AsciiPrint ("\n  Redirection: 307 Temporary Redirect");
-    break;
+    case HTTP_STATUS_307_TEMPORARY_REDIRECT:
+      AsciiPrint ("\n  Redirection: 307 Temporary Redirect");
+      break;
 
-  case HTTP_STATUS_308_PERMANENT_REDIRECT:
-    AsciiPrint ("\n  Redirection: 308 Permanent Redirect");
-    break;
+    case HTTP_STATUS_308_PERMANENT_REDIRECT:
+      AsciiPrint ("\n  Redirection: 308 Permanent Redirect");
+      break;
 
-  case HTTP_STATUS_400_BAD_REQUEST:
-    AsciiPrint ("\n  Client Error: 400 Bad Request");
-    break;
+    case HTTP_STATUS_400_BAD_REQUEST:
+      AsciiPrint ("\n  Client Error: 400 Bad Request");
+      break;
 
-  case HTTP_STATUS_401_UNAUTHORIZED:
-    AsciiPrint ("\n  Client Error: 401 Unauthorized");
-    break;
+    case HTTP_STATUS_401_UNAUTHORIZED:
+      AsciiPrint ("\n  Client Error: 401 Unauthorized");
+      break;
 
-  case HTTP_STATUS_402_PAYMENT_REQUIRED:
-    AsciiPrint ("\n  Client Error: 402 Payment Required");
-    break;
+    case HTTP_STATUS_402_PAYMENT_REQUIRED:
+      AsciiPrint ("\n  Client Error: 402 Payment Required");
+      break;
 
-  case HTTP_STATUS_403_FORBIDDEN:
-    AsciiPrint ("\n  Client Error: 403 Forbidden");
-    break;
+    case HTTP_STATUS_403_FORBIDDEN:
+      AsciiPrint ("\n  Client Error: 403 Forbidden");
+      break;
 
-  case HTTP_STATUS_404_NOT_FOUND:
-    AsciiPrint ("\n  Client Error: 404 Not Found");
-    break;
+    case HTTP_STATUS_404_NOT_FOUND:
+      AsciiPrint ("\n  Client Error: 404 Not Found");
+      break;
 
-  case HTTP_STATUS_405_METHOD_NOT_ALLOWED:
-    AsciiPrint ("\n  Client Error: 405 Method Not Allowed");
-    break;
+    case HTTP_STATUS_405_METHOD_NOT_ALLOWED:
+      AsciiPrint ("\n  Client Error: 405 Method Not Allowed");
+      break;
 
-  case HTTP_STATUS_406_NOT_ACCEPTABLE:
-    AsciiPrint ("\n  Client Error: 406 Not Acceptable");
-    break;
+    case HTTP_STATUS_406_NOT_ACCEPTABLE:
+      AsciiPrint ("\n  Client Error: 406 Not Acceptable");
+      break;
 
-  case HTTP_STATUS_407_PROXY_AUTHENTICATION_REQUIRED:
-    AsciiPrint ("\n  Client Error: 407 Proxy Authentication Required");
-    break;
+    case HTTP_STATUS_407_PROXY_AUTHENTICATION_REQUIRED:
+      AsciiPrint ("\n  Client Error: 407 Proxy Authentication Required");
+      break;
 
-  case HTTP_STATUS_408_REQUEST_TIME_OUT:
-    AsciiPrint ("\n  Client Error: 408 Request Timeout");
-    break;
+    case HTTP_STATUS_408_REQUEST_TIME_OUT:
+      AsciiPrint ("\n  Client Error: 408 Request Timeout");
+      break;
 
-  case HTTP_STATUS_409_CONFLICT:
-    AsciiPrint ("\n  Client Error: 409 Conflict");
-    break;
+    case HTTP_STATUS_409_CONFLICT:
+      AsciiPrint ("\n  Client Error: 409 Conflict");
+      break;
 
-  case HTTP_STATUS_410_GONE:
-    AsciiPrint ("\n  Client Error: 410 Gone");
-    break;
+    case HTTP_STATUS_410_GONE:
+      AsciiPrint ("\n  Client Error: 410 Gone");
+      break;
 
-  case HTTP_STATUS_411_LENGTH_REQUIRED:
-    AsciiPrint ("\n  Client Error: 411 Length Required");
-    break;
+    case HTTP_STATUS_411_LENGTH_REQUIRED:
+      AsciiPrint ("\n  Client Error: 411 Length Required");
+      break;
 
-  case HTTP_STATUS_412_PRECONDITION_FAILED:
-    AsciiPrint ("\n  Client Error: 412 Precondition Failed");
-    break;
+    case HTTP_STATUS_412_PRECONDITION_FAILED:
+      AsciiPrint ("\n  Client Error: 412 Precondition Failed");
+      break;
 
-  case HTTP_STATUS_413_REQUEST_ENTITY_TOO_LARGE:
-    AsciiPrint ("\n  Client Error: 413 Request Entity Too Large");
-    break;
+    case HTTP_STATUS_413_REQUEST_ENTITY_TOO_LARGE:
+      AsciiPrint ("\n  Client Error: 413 Request Entity Too Large");
+      break;
 
-  case HTTP_STATUS_414_REQUEST_URI_TOO_LARGE:
-    AsciiPrint ("\n  Client Error: 414 Request URI Too Long");
-    break;
+    case HTTP_STATUS_414_REQUEST_URI_TOO_LARGE:
+      AsciiPrint ("\n  Client Error: 414 Request URI Too Long");
+      break;
 
-  case HTTP_STATUS_415_UNSUPPORTED_MEDIA_TYPE:
-    AsciiPrint ("\n  Client Error: 415 Unsupported Media Type");
-    break;
+    case HTTP_STATUS_415_UNSUPPORTED_MEDIA_TYPE:
+      AsciiPrint ("\n  Client Error: 415 Unsupported Media Type");
+      break;
 
-  case HTTP_STATUS_416_REQUESTED_RANGE_NOT_SATISFIED:
-    AsciiPrint ("\n  Client Error: 416 Requested Range Not Satisfiable");
-    break;
+    case HTTP_STATUS_416_REQUESTED_RANGE_NOT_SATISFIED:
+      AsciiPrint ("\n  Client Error: 416 Requested Range Not Satisfiable");
+      break;
 
-  case HTTP_STATUS_417_EXPECTATION_FAILED:
-    AsciiPrint ("\n  Client Error: 417 Expectation Failed");
-    break;
+    case HTTP_STATUS_417_EXPECTATION_FAILED:
+      AsciiPrint ("\n  Client Error: 417 Expectation Failed");
+      break;
 
-  case HTTP_STATUS_500_INTERNAL_SERVER_ERROR:
-    AsciiPrint ("\n  Server Error: 500 Internal Server Error");
-    break;
+    case HTTP_STATUS_500_INTERNAL_SERVER_ERROR:
+      AsciiPrint ("\n  Server Error: 500 Internal Server Error");
+      break;
 
-  case HTTP_STATUS_501_NOT_IMPLEMENTED:
-    AsciiPrint ("\n  Server Error: 501 Not Implemented");
-    break;
+    case HTTP_STATUS_501_NOT_IMPLEMENTED:
+      AsciiPrint ("\n  Server Error: 501 Not Implemented");
+      break;
 
-  case HTTP_STATUS_502_BAD_GATEWAY:
-    AsciiPrint ("\n  Server Error: 502 Bad Gateway");
-    break;
+    case HTTP_STATUS_502_BAD_GATEWAY:
+      AsciiPrint ("\n  Server Error: 502 Bad Gateway");
+      break;
 
-  case HTTP_STATUS_503_SERVICE_UNAVAILABLE:
-    AsciiPrint ("\n  Server Error: 503 Service Unavailable");
-    break;
+    case HTTP_STATUS_503_SERVICE_UNAVAILABLE:
+      AsciiPrint ("\n  Server Error: 503 Service Unavailable");
+      break;
 
-  case HTTP_STATUS_504_GATEWAY_TIME_OUT:
-    AsciiPrint ("\n  Server Error: 504 Gateway Timeout");
-    break;
+    case HTTP_STATUS_504_GATEWAY_TIME_OUT:
+      AsciiPrint ("\n  Server Error: 504 Gateway Timeout");
+      break;
 
-  case HTTP_STATUS_505_HTTP_VERSION_NOT_SUPPORTED:
-    AsciiPrint ("\n  Server Error: 505 HTTP Version Not Supported");
-    break;
+    case HTTP_STATUS_505_HTTP_VERSION_NOT_SUPPORTED:
+      AsciiPrint ("\n  Server Error: 505 HTTP Version Not Supported");
+      break;
 
-  default: ;
-
+    default:;
   }
 }
 
@@ -297,11 +298,11 @@ HttpBootPrintErrorMessage (
 VOID
 EFIAPI
 HttpBootCommonNotify (
-  IN EFI_EVENT           Event,
-  IN VOID                *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  *((BOOLEAN *) Context) = TRUE;
+  *((BOOLEAN *)Context) = TRUE;
 }
 
 /**
@@ -317,38 +318,38 @@ HttpBootCommonNotify (
 **/
 EFI_STATUS
 HttpBootDns (
-  IN     HTTP_BOOT_PRIVATE_DATA   *Private,
-  IN     CHAR16                   *HostName,
-     OUT EFI_IPv6_ADDRESS         *IpAddress
+  IN     HTTP_BOOT_PRIVATE_DATA  *Private,
+  IN     CHAR16                  *HostName,
+  OUT EFI_IPv6_ADDRESS           *IpAddress
   )
 {
-  EFI_STATUS                      Status;
-  EFI_DNS6_PROTOCOL               *Dns6;
-  EFI_DNS6_CONFIG_DATA            Dns6ConfigData;
-  EFI_DNS6_COMPLETION_TOKEN       Token;
-  EFI_HANDLE                      Dns6Handle;
-  EFI_IP6_CONFIG_PROTOCOL         *Ip6Config;
-  EFI_IPv6_ADDRESS                *DnsServerList;
-  UINTN                           DnsServerListCount;
-  UINTN                           DataSize;
-  BOOLEAN                         IsDone;
+  EFI_STATUS                 Status;
+  EFI_DNS6_PROTOCOL          *Dns6;
+  EFI_DNS6_CONFIG_DATA       Dns6ConfigData;
+  EFI_DNS6_COMPLETION_TOKEN  Token;
+  EFI_HANDLE                 Dns6Handle;
+  EFI_IP6_CONFIG_PROTOCOL    *Ip6Config;
+  EFI_IPv6_ADDRESS           *DnsServerList;
+  UINTN                      DnsServerListCount;
+  UINTN                      DataSize;
+  BOOLEAN                    IsDone;
 
-  DnsServerList       = NULL;
-  DnsServerListCount  = 0;
-  Dns6                = NULL;
-  Dns6Handle          = NULL;
+  DnsServerList      = NULL;
+  DnsServerListCount = 0;
+  Dns6               = NULL;
+  Dns6Handle         = NULL;
   ZeroMem (&Token, sizeof (EFI_DNS6_COMPLETION_TOKEN));
 
   //
   // Get DNS server list from EFI IPv6 Configuration protocol.
   //
-  Status = gBS->HandleProtocol (Private->Controller, &gEfiIp6ConfigProtocolGuid, (VOID **) &Ip6Config);
+  Status = gBS->HandleProtocol (Private->Controller, &gEfiIp6ConfigProtocolGuid, (VOID **)&Ip6Config);
   if (!EFI_ERROR (Status)) {
     //
     // Get the required size.
     //
     DataSize = 0;
-    Status = Ip6Config->GetData (Ip6Config, Ip6ConfigDataTypeDnsServer, &DataSize, NULL);
+    Status   = Ip6Config->GetData (Ip6Config, Ip6ConfigDataTypeDnsServer, &DataSize, NULL);
     if (Status == EFI_BUFFER_TOO_SMALL) {
       DnsServerList = AllocatePool (DataSize);
       if (DnsServerList == NULL) {
@@ -364,6 +365,7 @@ HttpBootDns (
       }
     }
   }
+
   //
   // Create a DNSv6 child instance and get the protocol.
   //
@@ -380,7 +382,7 @@ HttpBootDns (
   Status = gBS->OpenProtocol (
                   Dns6Handle,
                   &gEfiDns6ProtocolGuid,
-                  (VOID **) &Dns6,
+                  (VOID **)&Dns6,
                   Private->Ip6Nic->ImageHandle,
                   Private->Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -397,11 +399,11 @@ HttpBootDns (
   Dns6ConfigData.DnsServerList  = DnsServerList;
   Dns6ConfigData.EnableDnsCache = TRUE;
   Dns6ConfigData.Protocol       = EFI_IP_PROTO_UDP;
-  IP6_COPY_ADDRESS (&Dns6ConfigData.StationIp,&Private->StationIp.v6);
+  IP6_COPY_ADDRESS (&Dns6ConfigData.StationIp, &Private->StationIp.v6);
   Status = Dns6->Configure (
-                    Dns6,
-                    &Dns6ConfigData
-                    );
+                   Dns6,
+                   &Dns6ConfigData
+                   );
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
@@ -443,25 +445,30 @@ HttpBootDns (
       Status = EFI_DEVICE_ERROR;
       goto Exit;
     }
-    if (Token.RspData.H2AData->IpCount == 0 || Token.RspData.H2AData->IpList == NULL) {
+
+    if ((Token.RspData.H2AData->IpCount == 0) || (Token.RspData.H2AData->IpList == NULL)) {
       Status = EFI_DEVICE_ERROR;
       goto Exit;
     }
+
     //
     // We just return the first IPv6 address from DNS protocol.
     //
     IP6_COPY_ADDRESS (IpAddress, Token.RspData.H2AData->IpList);
     Status = EFI_SUCCESS;
   }
+
 Exit:
 
   if (Token.Event != NULL) {
     gBS->CloseEvent (Token.Event);
   }
+
   if (Token.RspData.H2AData != NULL) {
     if (Token.RspData.H2AData->IpList != NULL) {
       FreePool (Token.RspData.H2AData->IpList);
     }
+
     FreePool (Token.RspData.H2AData);
   }
 
@@ -504,11 +511,11 @@ Exit:
 **/
 EFI_STATUS
 HttpBootCheckUriScheme (
-  IN      CHAR8                  *Uri
+  IN      CHAR8  *Uri
   )
 {
-  UINTN                Index;
-  EFI_STATUS           Status;
+  UINTN       Index;
+  EFI_STATUS  Status;
 
   Status = EFI_SUCCESS;
 
@@ -519,7 +526,8 @@ HttpBootCheckUriScheme (
     if (Uri[Index] == ':') {
       break;
     }
-    if (Uri[Index] >= 'A' && Uri[Index] <= 'Z') {
+
+    if ((Uri[Index] >= 'A') && (Uri[Index] <= 'Z')) {
       Uri[Index] -= (CHAR8)('A' - 'a');
     }
   }
@@ -528,7 +536,7 @@ HttpBootCheckUriScheme (
   // Return EFI_INVALID_PARAMETER if the URI is not HTTP or HTTPS.
   //
   if ((AsciiStrnCmp (Uri, "http://", 7) != 0) && (AsciiStrnCmp (Uri, "https://", 8) != 0)) {
-    DEBUG ((EFI_D_ERROR, "HttpBootCheckUriScheme: Invalid Uri.\n"));
+    DEBUG ((DEBUG_ERROR, "HttpBootCheckUriScheme: Invalid Uri.\n"));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -536,7 +544,7 @@ HttpBootCheckUriScheme (
   // HTTP is disabled, return EFI_ACCESS_DENIED if the URI is HTTP.
   //
   if (!PcdGetBool (PcdAllowHttpConnections) && (AsciiStrnCmp (Uri, "http://", 7) == 0)) {
-    DEBUG ((EFI_D_ERROR, "HttpBootCheckUriScheme: HTTP is disabled.\n"));
+    DEBUG ((DEBUG_ERROR, "HttpBootCheckUriScheme: HTTP is disabled.\n"));
     return EFI_ACCESS_DENIED;
   }
 
@@ -557,8 +565,8 @@ HttpBootCheckUriScheme (
 **/
 EFI_STATUS
 HttpBootParseFilePath (
-  IN     EFI_DEVICE_PATH_PROTOCOL     *FilePath,
-     OUT CHAR8                        **UriAddress
+  IN     EFI_DEVICE_PATH_PROTOCOL  *FilePath,
+  OUT CHAR8                        **UriAddress
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
@@ -578,28 +586,32 @@ HttpBootParseFilePath (
   TempDevicePath = FilePath;
   while (!IsDevicePathEnd (TempDevicePath)) {
     if ((DevicePathType (TempDevicePath) == MESSAGING_DEVICE_PATH) &&
-        (DevicePathSubType (TempDevicePath) == MSG_URI_DP)) {
-      UriDevicePath = (URI_DEVICE_PATH*) TempDevicePath;
+        (DevicePathSubType (TempDevicePath) == MSG_URI_DP))
+    {
+      UriDevicePath = (URI_DEVICE_PATH *)TempDevicePath;
       //
       // UEFI Spec doesn't require the URI to be a NULL-terminated string
       // So we allocate a new buffer and always append a '\0' to it.
       //
-      UriStrLength = DevicePathNodeLength (UriDevicePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
+      UriStrLength = DevicePathNodeLength (UriDevicePath) - sizeof (EFI_DEVICE_PATH_PROTOCOL);
       if (UriStrLength == 0) {
         //
         // return a NULL UriAddress if it's a empty URI device path node.
         //
         break;
       }
+
       Uri = AllocatePool (UriStrLength + 1);
       if (Uri == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
-      CopyMem (Uri, UriDevicePath->Uri, DevicePathNodeLength (UriDevicePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL));
-      Uri[DevicePathNodeLength (UriDevicePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL)] = '\0';
+
+      CopyMem (Uri, UriDevicePath->Uri, DevicePathNodeLength (UriDevicePath) - sizeof (EFI_DEVICE_PATH_PROTOCOL));
+      Uri[DevicePathNodeLength (UriDevicePath) - sizeof (EFI_DEVICE_PATH_PROTOCOL)] = '\0';
 
       *UriAddress = Uri;
     }
+
     TempDevicePath = NextDevicePathNode (TempDevicePath);
   }
 
@@ -625,23 +637,23 @@ HttpBootParseFilePath (
 **/
 EFI_STATUS
 HttpBootCheckImageType (
-  IN      CHAR8                  *Uri,
-  IN      VOID                   *UriParser,
-  IN      UINTN                  HeaderCount,
-  IN      EFI_HTTP_HEADER        *Headers,
-     OUT  HTTP_BOOT_IMAGE_TYPE   *ImageType
+  IN      CHAR8              *Uri,
+  IN      VOID               *UriParser,
+  IN      UINTN              HeaderCount,
+  IN      EFI_HTTP_HEADER    *Headers,
+  OUT  HTTP_BOOT_IMAGE_TYPE  *ImageType
   )
 {
-  EFI_STATUS            Status;
-  EFI_HTTP_HEADER       *Header;
-  CHAR8                 *FilePath;
-  CHAR8                 *FilePost;
+  EFI_STATUS       Status;
+  EFI_HTTP_HEADER  *Header;
+  CHAR8            *FilePath;
+  CHAR8            *FilePost;
 
-  if (Uri == NULL || UriParser == NULL || ImageType == NULL) {
+  if ((Uri == NULL) || (UriParser == NULL) || (ImageType == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (HeaderCount != 0 && Headers == NULL) {
+  if ((HeaderCount != 0) && (Headers == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -681,11 +693,11 @@ HttpBootCheckImageType (
   }
 
   FilePost = FilePath + AsciiStrLen (FilePath) - 4;
-  if (AsciiStrCmp (FilePost, ".efi") == 0) {
+  if (AsciiStriCmp (FilePost, ".efi") == 0) {
     *ImageType = ImageTypeEfi;
-  } else if (AsciiStrCmp (FilePost, ".iso") == 0) {
+  } else if (AsciiStriCmp (FilePost, ".iso") == 0) {
     *ImageType = ImageTypeVirtualCd;
-  } else if (AsciiStrCmp (FilePost, ".img") == 0) {
+  } else if (AsciiStriCmp (FilePost, ".img") == 0) {
     *ImageType = ImageTypeVirtualDisk;
   } else {
     *ImageType = ImageTypeMax;
@@ -712,24 +724,24 @@ HttpBootCheckImageType (
 **/
 EFI_STATUS
 HttpBootRegisterRamDisk (
-  IN  HTTP_BOOT_PRIVATE_DATA       *Private,
-  IN  UINTN                        BufferSize,
-  IN  VOID                         *Buffer,
-  IN  HTTP_BOOT_IMAGE_TYPE         ImageType
+  IN  HTTP_BOOT_PRIVATE_DATA  *Private,
+  IN  UINTN                   BufferSize,
+  IN  VOID                    *Buffer,
+  IN  HTTP_BOOT_IMAGE_TYPE    ImageType
   )
 {
-  EFI_RAM_DISK_PROTOCOL      *RamDisk;
-  EFI_STATUS                 Status;
-  EFI_DEVICE_PATH_PROTOCOL   *DevicePath;
-  EFI_GUID                   *RamDiskType;
+  EFI_RAM_DISK_PROTOCOL     *RamDisk;
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  EFI_GUID                  *RamDiskType;
 
   ASSERT (Private != NULL);
   ASSERT (Buffer != NULL);
   ASSERT (BufferSize != 0);
 
-  Status = gBS->LocateProtocol (&gEfiRamDiskProtocolGuid, NULL, (VOID**) &RamDisk);
+  Status = gBS->LocateProtocol (&gEfiRamDiskProtocolGuid, NULL, (VOID **)&RamDisk);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "HTTP Boot: Couldn't find the RAM Disk protocol - %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "HTTP Boot: Couldn't find the RAM Disk protocol - %r\n", Status));
     return Status;
   }
 
@@ -742,14 +754,14 @@ HttpBootRegisterRamDisk (
   }
 
   Status = RamDisk->Register (
-             (UINTN)Buffer,
-             (UINT64)BufferSize,
-             RamDiskType,
-             Private->UsingIpv6 ? Private->Ip6Nic->DevicePath : Private->Ip4Nic->DevicePath,
-             &DevicePath
-             );
+                      (UINTN)Buffer,
+                      (UINT64)BufferSize,
+                      RamDiskType,
+                      Private->UsingIpv6 ? Private->Ip6Nic->DevicePath : Private->Ip4Nic->DevicePath,
+                      &DevicePath
+                      );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "HTTP Boot: Failed to register RAM Disk - %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "HTTP Boot: Failed to register RAM Disk - %r\n", Status));
   }
 
   return Status;
@@ -765,13 +777,14 @@ HttpBootRegisterRamDisk (
 **/
 BOOLEAN
 HttpBootIsHttpRedirectStatusCode (
-  IN   EFI_HTTP_STATUS_CODE        StatusCode
+  IN   EFI_HTTP_STATUS_CODE  StatusCode
   )
 {
-  if (StatusCode == HTTP_STATUS_301_MOVED_PERMANENTLY ||
-      StatusCode == HTTP_STATUS_302_FOUND ||
-      StatusCode == HTTP_STATUS_307_TEMPORARY_REDIRECT ||
-      StatusCode == HTTP_STATUS_308_PERMANENT_REDIRECT) {
+  if ((StatusCode == HTTP_STATUS_301_MOVED_PERMANENTLY) ||
+      (StatusCode == HTTP_STATUS_302_FOUND) ||
+      (StatusCode == HTTP_STATUS_307_TEMPORARY_REDIRECT) ||
+      (StatusCode == HTTP_STATUS_308_PERMANENT_REDIRECT))
+  {
     return TRUE;
   }
 

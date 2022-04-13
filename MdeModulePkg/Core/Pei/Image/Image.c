@@ -1,20 +1,18 @@
 /** @file
   Pei Core Load Image Support
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "PeiMain.h"
 
-
-EFI_PEI_LOAD_FILE_PPI   mPeiLoadImagePpi = {
+EFI_PEI_LOAD_FILE_PPI  mPeiLoadImagePpi = {
   PeiLoadImageLoadImageWrapper
 };
 
-
-EFI_PEI_PPI_DESCRIPTOR     gPpiLoadFilePpiList = {
+EFI_PEI_PPI_DESCRIPTOR  gPpiLoadFilePpiList = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiLoadFilePpiGuid,
   &mPeiLoadImagePpi
@@ -36,17 +34,17 @@ EFI_PEI_PPI_DESCRIPTOR     gPpiLoadFilePpiList = {
 EFI_STATUS
 EFIAPI
 PeiImageRead (
-  IN     VOID    *FileHandle,
-  IN     UINTN   FileOffset,
-  IN     UINTN   *ReadSize,
-  OUT    VOID    *Buffer
+  IN     VOID   *FileHandle,
+  IN     UINTN  FileOffset,
+  IN     UINTN  *ReadSize,
+  OUT    VOID   *Buffer
   )
 {
-  CHAR8 *Destination8;
-  CHAR8 *Source8;
+  CHAR8  *Destination8;
+  CHAR8  *Source8;
 
-  Destination8  = Buffer;
-  Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);
+  Destination8 = Buffer;
+  Source8      = (CHAR8 *)((UINTN)FileHandle + FileOffset);
   if (Destination8 != Source8) {
     CopyMem (Destination8, Source8, *ReadSize);
   }
@@ -68,59 +66,61 @@ PeiImageRead (
 **/
 EFI_STATUS
 CheckAndMarkFixLoadingMemoryUsageBitMap (
-  IN  PEI_CORE_INSTANCE             *Private,
-  IN  EFI_PHYSICAL_ADDRESS          ImageBase,
-  IN  UINT32                        ImageSize
+  IN  PEI_CORE_INSTANCE     *Private,
+  IN  EFI_PHYSICAL_ADDRESS  ImageBase,
+  IN  UINT32                ImageSize
   )
 {
-   UINT32                             DxeCodePageNumber;
-   UINT64                             ReservedCodeSize;
-   EFI_PHYSICAL_ADDRESS               PeiCodeBase;
-   UINT32                             BaseOffsetPageNumber;
-   UINT32                             TopOffsetPageNumber;
-   UINT32                             Index;
-   UINT64                             *MemoryUsageBitMap;
+  UINT32                DxeCodePageNumber;
+  UINT64                ReservedCodeSize;
+  EFI_PHYSICAL_ADDRESS  PeiCodeBase;
+  UINT32                BaseOffsetPageNumber;
+  UINT32                TopOffsetPageNumber;
+  UINT32                Index;
+  UINT64                *MemoryUsageBitMap;
 
+  //
+  // The reserved code range includes RuntimeCodePage range, Boot time code range and PEI code range.
+  //
+  DxeCodePageNumber  = PcdGet32 (PcdLoadFixAddressBootTimeCodePageNumber);
+  DxeCodePageNumber += PcdGet32 (PcdLoadFixAddressRuntimeCodePageNumber);
+  ReservedCodeSize   = EFI_PAGES_TO_SIZE (DxeCodePageNumber + PcdGet32 (PcdLoadFixAddressPeiCodePageNumber));
+  PeiCodeBase        = Private->LoadModuleAtFixAddressTopAddress - ReservedCodeSize;
 
-   //
-   // The reserved code range includes RuntimeCodePage range, Boot time code range and PEI code range.
-   //
-   DxeCodePageNumber = PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber);
-   DxeCodePageNumber += PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber);
-   ReservedCodeSize  = EFI_PAGES_TO_SIZE(DxeCodePageNumber + PcdGet32(PcdLoadFixAddressPeiCodePageNumber));
-   PeiCodeBase       = Private->LoadModuleAtFixAddressTopAddress - ReservedCodeSize;
+  //
+  // Test the memory range for loading the image in the PEI code range.
+  //
+  if (((Private->LoadModuleAtFixAddressTopAddress - EFI_PAGES_TO_SIZE (DxeCodePageNumber)) < (ImageBase + ImageSize)) ||
+      (PeiCodeBase > ImageBase))
+  {
+    return EFI_NOT_FOUND;
+  }
 
-   //
-   // Test the memory range for loading the image in the PEI code range.
-   //
-   if ((Private->LoadModuleAtFixAddressTopAddress - EFI_PAGES_TO_SIZE(DxeCodePageNumber)) < (ImageBase + ImageSize) ||
-       (PeiCodeBase > ImageBase)) {
-     return EFI_NOT_FOUND;
-   }
+  //
+  // Test if the memory is available or not.
+  //
+  MemoryUsageBitMap    = Private->PeiCodeMemoryRangeUsageBitMap;
+  BaseOffsetPageNumber = EFI_SIZE_TO_PAGES ((UINT32)(ImageBase - PeiCodeBase));
+  TopOffsetPageNumber  = EFI_SIZE_TO_PAGES ((UINT32)(ImageBase + ImageSize - PeiCodeBase));
+  for (Index = BaseOffsetPageNumber; Index < TopOffsetPageNumber; Index++) {
+    if ((MemoryUsageBitMap[Index / 64] & LShiftU64 (1, (Index % 64))) != 0) {
+      //
+      // This page is already used.
+      //
+      return EFI_NOT_FOUND;
+    }
+  }
 
-   //
-   // Test if the memory is available or not.
-   //
-   MemoryUsageBitMap    = Private->PeiCodeMemoryRangeUsageBitMap;
-   BaseOffsetPageNumber = EFI_SIZE_TO_PAGES((UINT32)(ImageBase - PeiCodeBase));
-   TopOffsetPageNumber  = EFI_SIZE_TO_PAGES((UINT32)(ImageBase + ImageSize - PeiCodeBase));
-   for (Index = BaseOffsetPageNumber; Index < TopOffsetPageNumber; Index ++) {
-     if ((MemoryUsageBitMap[Index / 64] & LShiftU64(1, (Index % 64))) != 0) {
-       //
-       // This page is already used.
-       //
-       return EFI_NOT_FOUND;
-     }
-   }
+  //
+  // Being here means the memory range is available.  So mark the bits for the memory range
+  //
+  for (Index = BaseOffsetPageNumber; Index < TopOffsetPageNumber; Index++) {
+    MemoryUsageBitMap[Index / 64] |= LShiftU64 (1, (Index % 64));
+  }
 
-   //
-   // Being here means the memory range is available.  So mark the bits for the memory range
-   //
-   for (Index = BaseOffsetPageNumber; Index < TopOffsetPageNumber; Index ++) {
-     MemoryUsageBitMap[Index / 64] |= LShiftU64(1, (Index % 64));
-   }
-   return  EFI_SUCCESS;
+  return EFI_SUCCESS;
 }
+
 /**
 
   Get the fixed loading address from image header assigned by build tool. This function only be called
@@ -135,109 +135,114 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
 
 **/
 EFI_STATUS
-GetPeCoffImageFixLoadingAssignedAddress(
+GetPeCoffImageFixLoadingAssignedAddress (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext,
   IN     PEI_CORE_INSTANCE             *Private
   )
 {
-   UINTN                              SectionHeaderOffset;
-   EFI_STATUS                         Status;
-   EFI_IMAGE_SECTION_HEADER           SectionHeader;
-   EFI_IMAGE_OPTIONAL_HEADER_UNION    *ImgHdr;
-   EFI_PHYSICAL_ADDRESS               FixLoadingAddress;
-   UINT16                             Index;
-   UINTN                              Size;
-   UINT16                             NumberOfSections;
-   UINT64                             ValueInSectionHeader;
+  UINTN                            SectionHeaderOffset;
+  EFI_STATUS                       Status;
+  EFI_IMAGE_SECTION_HEADER         SectionHeader;
+  EFI_IMAGE_OPTIONAL_HEADER_UNION  *ImgHdr;
+  EFI_PHYSICAL_ADDRESS             FixLoadingAddress;
+  UINT16                           Index;
+  UINTN                            Size;
+  UINT16                           NumberOfSections;
+  UINT64                           ValueInSectionHeader;
 
+  FixLoadingAddress = 0;
+  Status            = EFI_NOT_FOUND;
 
-   FixLoadingAddress = 0;
-   Status = EFI_NOT_FOUND;
+  //
+  // Get PeHeader pointer
+  //
+  ImgHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((CHAR8 *)ImageContext->Handle + ImageContext->PeCoffHeaderOffset);
+  if (ImageContext->IsTeImage) {
+    //
+    // for TE image, the fix loading address is saved in first section header that doesn't point
+    // to code section.
+    //
+    SectionHeaderOffset = sizeof (EFI_TE_IMAGE_HEADER);
+    NumberOfSections    = ImgHdr->Te.NumberOfSections;
+  } else {
+    SectionHeaderOffset = ImageContext->PeCoffHeaderOffset +
+                          sizeof (UINT32) +
+                          sizeof (EFI_IMAGE_FILE_HEADER) +
+                          ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader;
+    NumberOfSections = ImgHdr->Pe32.FileHeader.NumberOfSections;
+  }
 
-   //
-   // Get PeHeader pointer
-   //
-   ImgHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((CHAR8* )ImageContext->Handle + ImageContext->PeCoffHeaderOffset);
-   if (ImageContext->IsTeImage) {
-     //
-     // for TE image, the fix loading address is saved in first section header that doesn't point
-     // to code section.
-     //
-     SectionHeaderOffset = sizeof (EFI_TE_IMAGE_HEADER);
-     NumberOfSections = ImgHdr->Te.NumberOfSections;
-   } else {
-     SectionHeaderOffset = ImageContext->PeCoffHeaderOffset +
-                           sizeof (UINT32) +
-                           sizeof (EFI_IMAGE_FILE_HEADER) +
-                           ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader;
-      NumberOfSections = ImgHdr->Pe32.FileHeader.NumberOfSections;
-   }
-   //
-   // Get base address from the first section header that doesn't point to code section.
-   //
-   for (Index = 0; Index < NumberOfSections; Index++) {
-     //
-     // Read section header from file
-     //
-     Size = sizeof (EFI_IMAGE_SECTION_HEADER);
-     Status = ImageContext->ImageRead (
-                              ImageContext->Handle,
-                              SectionHeaderOffset,
-                              &Size,
-                              &SectionHeader
-                              );
-     if (EFI_ERROR (Status)) {
-       return Status;
-     }
+  //
+  // Get base address from the first section header that doesn't point to code section.
+  //
+  for (Index = 0; Index < NumberOfSections; Index++) {
+    //
+    // Read section header from file
+    //
+    Size   = sizeof (EFI_IMAGE_SECTION_HEADER);
+    Status = ImageContext->ImageRead (
+                             ImageContext->Handle,
+                             SectionHeaderOffset,
+                             &Size,
+                             &SectionHeader
+                             );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
-     Status = EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
 
-     if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_CNT_CODE) == 0) {
-       //
-       // Build tool will save the address in PointerToRelocations & PointerToLineNumbers fields in the first section header
-       // that doesn't point to code section in image header, as well as ImageBase field of image header. A notable thing is
-       // that for PEIM, the value in ImageBase field may not be equal to the value in PointerToRelocations & PointerToLineNumbers because
-       // for XIP PEIM, ImageBase field holds the image base address running on the Flash. And PointerToRelocations & PointerToLineNumbers
-       // hold the image base address when it is shadow to the memory. And there is an assumption that when the feature is enabled, if a
-       // module is assigned a loading address by tools, PointerToRelocations & PointerToLineNumbers fields should NOT be Zero, or
-       // else, these 2 fields should be set to Zero
-       //
-       ValueInSectionHeader = ReadUnaligned64((UINT64*)&SectionHeader.PointerToRelocations);
-       if (ValueInSectionHeader != 0) {
-         //
-         // Found first section header that doesn't point to code section.
-         //
-         if ((INT64)PcdGet64(PcdLoadModuleAtFixAddressEnable) > 0) {
-           //
-           // When LMFA feature is configured as Load Module at Fixed Absolute Address mode, PointerToRelocations & PointerToLineNumbers field
-           // hold the absolute address of image base running in memory
-           //
-           FixLoadingAddress = ValueInSectionHeader;
-         } else {
-           //
-           // When LMFA feature is configured as Load Module at Fixed offset mode, PointerToRelocations & PointerToLineNumbers field
-           // hold the offset relative to a platform-specific top address.
-           //
-           FixLoadingAddress = (EFI_PHYSICAL_ADDRESS)(Private->LoadModuleAtFixAddressTopAddress + (INT64)ValueInSectionHeader);
-         }
-         //
-         // Check if the memory range is available.
-         //
-         Status = CheckAndMarkFixLoadingMemoryUsageBitMap (Private, FixLoadingAddress, (UINT32) ImageContext->ImageSize);
-         if (!EFI_ERROR(Status)) {
-           //
-           // The assigned address is valid. Return the specified loading address
-           //
-           ImageContext->ImageAddress = FixLoadingAddress;
-         }
-       }
-       break;
-     }
-     SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
-   }
-   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address 0x%11p. Status= %r \n", (VOID *)(UINTN)FixLoadingAddress, Status));
-   return Status;
+    if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_CNT_CODE) == 0) {
+      //
+      // Build tool will save the address in PointerToRelocations & PointerToLineNumbers fields in the first section header
+      // that doesn't point to code section in image header, as well as ImageBase field of image header. A notable thing is
+      // that for PEIM, the value in ImageBase field may not be equal to the value in PointerToRelocations & PointerToLineNumbers because
+      // for XIP PEIM, ImageBase field holds the image base address running on the Flash. And PointerToRelocations & PointerToLineNumbers
+      // hold the image base address when it is shadow to the memory. And there is an assumption that when the feature is enabled, if a
+      // module is assigned a loading address by tools, PointerToRelocations & PointerToLineNumbers fields should NOT be Zero, or
+      // else, these 2 fields should be set to Zero
+      //
+      ValueInSectionHeader = ReadUnaligned64 ((UINT64 *)&SectionHeader.PointerToRelocations);
+      if (ValueInSectionHeader != 0) {
+        //
+        // Found first section header that doesn't point to code section.
+        //
+        if ((INT64)PcdGet64 (PcdLoadModuleAtFixAddressEnable) > 0) {
+          //
+          // When LMFA feature is configured as Load Module at Fixed Absolute Address mode, PointerToRelocations & PointerToLineNumbers field
+          // hold the absolute address of image base running in memory
+          //
+          FixLoadingAddress = ValueInSectionHeader;
+        } else {
+          //
+          // When LMFA feature is configured as Load Module at Fixed offset mode, PointerToRelocations & PointerToLineNumbers field
+          // hold the offset relative to a platform-specific top address.
+          //
+          FixLoadingAddress = (EFI_PHYSICAL_ADDRESS)(Private->LoadModuleAtFixAddressTopAddress + (INT64)ValueInSectionHeader);
+        }
+
+        //
+        // Check if the memory range is available.
+        //
+        Status = CheckAndMarkFixLoadingMemoryUsageBitMap (Private, FixLoadingAddress, (UINT32)ImageContext->ImageSize);
+        if (!EFI_ERROR (Status)) {
+          //
+          // The assigned address is valid. Return the specified loading address
+          //
+          ImageContext->ImageAddress = FixLoadingAddress;
+        }
+      }
+
+      break;
+    }
+
+    SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
+  }
+
+  DEBUG ((DEBUG_INFO|DEBUG_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address 0x%11p. Status= %r \n", (VOID *)(UINTN)FixLoadingAddress, Status));
+  return Status;
 }
+
 /**
 
   Loads and relocates a PE/COFF image into memory.
@@ -258,30 +263,30 @@ GetPeCoffImageFixLoadingAssignedAddress(
 **/
 EFI_STATUS
 LoadAndRelocatePeCoffImage (
-  IN  EFI_PEI_FILE_HANDLE                       FileHandle,
-  IN  VOID                                      *Pe32Data,
-  OUT EFI_PHYSICAL_ADDRESS                      *ImageAddress,
-  OUT UINT64                                    *ImageSize,
-  OUT EFI_PHYSICAL_ADDRESS                      *EntryPoint
+  IN  EFI_PEI_FILE_HANDLE   FileHandle,
+  IN  VOID                  *Pe32Data,
+  OUT EFI_PHYSICAL_ADDRESS  *ImageAddress,
+  OUT UINT64                *ImageSize,
+  OUT EFI_PHYSICAL_ADDRESS  *EntryPoint
   )
 {
-  EFI_STATUS                            Status;
-  PE_COFF_LOADER_IMAGE_CONTEXT          ImageContext;
-  PEI_CORE_INSTANCE                     *Private;
-  UINT64                                AlignImageSize;
-  BOOLEAN                               IsXipImage;
-  EFI_STATUS                            ReturnStatus;
-  BOOLEAN                               IsS3Boot;
-  BOOLEAN                               IsPeiModule;
-  BOOLEAN                               IsRegisterForShadow;
-  EFI_FV_FILE_INFO                      FileInfo;
+  EFI_STATUS                    Status;
+  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
+  PEI_CORE_INSTANCE             *Private;
+  UINT64                        AlignImageSize;
+  BOOLEAN                       IsXipImage;
+  EFI_STATUS                    ReturnStatus;
+  BOOLEAN                       IsS3Boot;
+  BOOLEAN                       IsPeiModule;
+  BOOLEAN                       IsRegisterForShadow;
+  EFI_FV_FILE_INFO              FileInfo;
 
   Private = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
 
   ReturnStatus = EFI_SUCCESS;
   IsXipImage   = FALSE;
   ZeroMem (&ImageContext, sizeof (ImageContext));
-  ImageContext.Handle = Pe32Data;
+  ImageContext.Handle    = Pe32Data;
   ImageContext.ImageRead = PeiImageRead;
 
   Status = PeCoffLoaderGetImageInfo (&ImageContext);
@@ -296,16 +301,18 @@ LoadAndRelocatePeCoffImage (
   if (Private->HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) {
     IsS3Boot = TRUE;
   }
+
   IsRegisterForShadow = FALSE;
-  if ((Private->CurrentFileHandle == FileHandle)
-    && (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPeimCount] == PEIM_STATE_REGISTER_FOR_SHADOW)) {
+  if (  (Private->CurrentFileHandle == FileHandle)
+     && (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPeimCount] == PEIM_STATE_REGISTER_FOR_SHADOW))
+  {
     IsRegisterForShadow = TRUE;
   }
 
   //
   // XIP image that ImageAddress is same to Image handle.
   //
-  if (ImageContext.ImageAddress == (EFI_PHYSICAL_ADDRESS)(UINTN) Pe32Data) {
+  if (ImageContext.ImageAddress == (EFI_PHYSICAL_ADDRESS)(UINTN)Pe32Data) {
     IsXipImage = TRUE;
   }
 
@@ -319,9 +326,10 @@ LoadAndRelocatePeCoffImage (
   // Check whether the file type is PEI module.
   //
   IsPeiModule = FALSE;
-  if (FileInfo.FileType == EFI_FV_FILETYPE_PEI_CORE ||
-      FileInfo.FileType == EFI_FV_FILETYPE_PEIM ||
-      FileInfo.FileType == EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER) {
+  if ((FileInfo.FileType == EFI_FV_FILETYPE_PEI_CORE) ||
+      (FileInfo.FileType == EFI_FV_FILETYPE_PEIM) ||
+      (FileInfo.FileType == EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER))
+  {
     IsPeiModule = TRUE;
   }
 
@@ -332,14 +340,15 @@ LoadAndRelocatePeCoffImage (
       ((!IsPeiModule) || PcdGetBool (PcdMigrateTemporaryRamFirmwareVolumes) ||
        (!IsS3Boot && (PcdGetBool (PcdShadowPeimOnBoot) || IsRegisterForShadow)) ||
        (IsS3Boot && PcdGetBool (PcdShadowPeimOnS3Boot)))
-     ) {
-    DEBUG ((EFI_D_INFO|EFI_D_LOAD, "The image at 0x%08x without reloc section can't be loaded into memory\n", (UINTN) Pe32Data));
+      )
+  {
+    DEBUG ((DEBUG_INFO|DEBUG_LOAD, "The image at 0x%08x without reloc section can't be loaded into memory\n", (UINTN)Pe32Data));
   }
 
   //
   // Set default base address to current image address.
   //
-  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) Pe32Data;
+  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)Pe32Data;
 
   //
   // Allocate Memory for the image when memory is ready, and image is relocatable.
@@ -350,12 +359,13 @@ LoadAndRelocatePeCoffImage (
       ((!IsPeiModule) || PcdGetBool (PcdMigrateTemporaryRamFirmwareVolumes) ||
        (!IsS3Boot && (PcdGetBool (PcdShadowPeimOnBoot) || IsRegisterForShadow)) ||
        (IsS3Boot && PcdGetBool (PcdShadowPeimOnS3Boot)))
-     ) {
+      )
+  {
     //
     // Allocate more buffer to avoid buffer overflow.
     //
     if (ImageContext.IsTeImage) {
-      AlignImageSize = ImageContext.ImageSize + ((EFI_TE_IMAGE_HEADER *) Pe32Data)->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER);
+      AlignImageSize = ImageContext.ImageSize + ((EFI_TE_IMAGE_HEADER *)Pe32Data)->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER);
     } else {
       AlignImageSize = ImageContext.ImageSize;
     }
@@ -364,38 +374,44 @@ LoadAndRelocatePeCoffImage (
       AlignImageSize += ImageContext.SectionAlignment;
     }
 
-    if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0 && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
-      Status = GetPeCoffImageFixLoadingAssignedAddress(&ImageContext, Private);
-      if (EFI_ERROR (Status)){
-        DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED ERROR: Failed to load module at fixed address. \n"));
+    if ((PcdGet64 (PcdLoadModuleAtFixAddressEnable) != 0) && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
+      Status = GetPeCoffImageFixLoadingAssignedAddress (&ImageContext, Private);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_INFO|DEBUG_LOAD, "LOADING MODULE FIXED ERROR: Failed to load module at fixed address. \n"));
         //
         // The PEIM is not assigned valid address, try to allocate page to load it.
         //
-        Status = PeiServicesAllocatePages (EfiBootServicesCode,
-                                           EFI_SIZE_TO_PAGES ((UINT32) AlignImageSize),
-                                           &ImageContext.ImageAddress);
+        Status = PeiServicesAllocatePages (
+                   EfiBootServicesCode,
+                   EFI_SIZE_TO_PAGES ((UINT32)AlignImageSize),
+                   &ImageContext.ImageAddress
+                   );
       }
     } else {
-      Status = PeiServicesAllocatePages (EfiBootServicesCode,
-                                         EFI_SIZE_TO_PAGES ((UINT32) AlignImageSize),
-                                         &ImageContext.ImageAddress);
+      Status = PeiServicesAllocatePages (
+                 EfiBootServicesCode,
+                 EFI_SIZE_TO_PAGES ((UINT32)AlignImageSize),
+                 &ImageContext.ImageAddress
+                 );
     }
+
     if (!EFI_ERROR (Status)) {
       //
       // Adjust the Image Address to make sure it is section alignment.
       //
       if (ImageContext.SectionAlignment > EFI_PAGE_SIZE) {
         ImageContext.ImageAddress =
-            (ImageContext.ImageAddress + ImageContext.SectionAlignment - 1) &
-            ~((UINTN)ImageContext.SectionAlignment - 1);
+          (ImageContext.ImageAddress + ImageContext.SectionAlignment - 1) &
+          ~((UINTN)ImageContext.SectionAlignment - 1);
       }
+
       //
       // Fix alignment requirement when Load IPF TeImage into memory.
       // Skip the reserved space for the stripped PeHeader when load TeImage into memory.
       //
       if (ImageContext.IsTeImage) {
         ImageContext.ImageAddress = ImageContext.ImageAddress +
-                                    ((EFI_TE_IMAGE_HEADER *) Pe32Data)->StrippedSize -
+                                    ((EFI_TE_IMAGE_HEADER *)Pe32Data)->StrippedSize -
                                     sizeof (EFI_TE_IMAGE_HEADER);
       }
     } else {
@@ -406,8 +422,8 @@ LoadAndRelocatePeCoffImage (
         //
         // XIP image can still be invoked.
         //
-        ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) Pe32Data;
-        ReturnStatus = EFI_WARN_BUFFER_TOO_SMALL;
+        ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)Pe32Data;
+        ReturnStatus              = EFI_WARN_BUFFER_TOO_SMALL;
       } else {
         //
         // Non XIP image can't be loaded because no enough memory is allocated.
@@ -424,10 +440,12 @@ LoadAndRelocatePeCoffImage (
   Status = PeCoffLoaderLoadImage (&ImageContext);
   if (EFI_ERROR (Status)) {
     if (ImageContext.ImageError == IMAGE_ERROR_INVALID_SECTION_ALIGNMENT) {
-      DEBUG ((DEBUG_ERROR, "PEIM Image Address 0x%11p doesn't meet with section alignment 0x%x.\n", (VOID*)(UINTN)ImageContext.ImageAddress, ImageContext.SectionAlignment));
+      DEBUG ((DEBUG_ERROR, "PEIM Image Address 0x%11p doesn't meet with section alignment 0x%x.\n", (VOID *)(UINTN)ImageContext.ImageAddress, ImageContext.SectionAlignment));
     }
+
     return Status;
   }
+
   //
   // Relocate the image in our new buffer
   //
@@ -439,7 +457,7 @@ LoadAndRelocatePeCoffImage (
   //
   // Flush the instruction cache so the image data is written before we execute it
   //
-  if (ImageContext.ImageAddress != (EFI_PHYSICAL_ADDRESS)(UINTN) Pe32Data) {
+  if (ImageContext.ImageAddress != (EFI_PHYSICAL_ADDRESS)(UINTN)Pe32Data) {
     InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
   }
 
@@ -462,15 +480,15 @@ LoadAndRelocatePeCoffImage (
 **/
 EFI_STATUS
 LoadAndRelocatePeCoffImageInPlace (
-  IN  VOID    *Pe32Data,
-  IN  VOID    *ImageAddress
+  IN  VOID  *Pe32Data,
+  IN  VOID  *ImageAddress
   )
 {
-  EFI_STATUS                      Status;
-  PE_COFF_LOADER_IMAGE_CONTEXT    ImageContext;
+  EFI_STATUS                    Status;
+  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
 
   ZeroMem (&ImageContext, sizeof (ImageContext));
-  ImageContext.Handle = Pe32Data;
+  ImageContext.Handle    = Pe32Data;
   ImageContext.ImageRead = PeiImageRead;
 
   Status = PeCoffLoaderGetImageInfo (&ImageContext);
@@ -479,7 +497,7 @@ LoadAndRelocatePeCoffImageInPlace (
     return Status;
   }
 
-  ImageContext.ImageAddress   = (PHYSICAL_ADDRESS)(UINTN) ImageAddress;
+  ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)ImageAddress;
 
   //
   // Load the image in place
@@ -502,7 +520,7 @@ LoadAndRelocatePeCoffImageInPlace (
   //
   // Flush the instruction cache so the image data is written before we execute it
   //
-  if (ImageContext.ImageAddress != (EFI_PHYSICAL_ADDRESS)(UINTN) Pe32Data) {
+  if (ImageContext.ImageAddress != (EFI_PHYSICAL_ADDRESS)(UINTN)Pe32Data) {
     InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
   }
 
@@ -525,10 +543,10 @@ PeiGetPe32Data (
   OUT    VOID                 **Pe32Data
   )
 {
-  EFI_STATUS                  Status;
-  EFI_SECTION_TYPE            SearchType1;
-  EFI_SECTION_TYPE            SearchType2;
-  UINT32                      AuthenticationState;
+  EFI_STATUS        Status;
+  EFI_SECTION_TYPE  SearchType1;
+  EFI_SECTION_TYPE  SearchType2;
+  UINT32            AuthenticationState;
 
   *Pe32Data = NULL;
 
@@ -563,6 +581,7 @@ PeiGetPe32Data (
                &AuthenticationState
                );
   }
+
   return Status;
 }
 
@@ -588,22 +607,22 @@ PeiGetPe32Data (
 **/
 EFI_STATUS
 PeiLoadImageLoadImage (
-  IN     CONST EFI_PEI_SERVICES       **PeiServices,
-  IN     EFI_PEI_FILE_HANDLE          FileHandle,
-  OUT    EFI_PHYSICAL_ADDRESS         *ImageAddressArg,  OPTIONAL
-  OUT    UINT64                       *ImageSizeArg,     OPTIONAL
-  OUT    EFI_PHYSICAL_ADDRESS         *EntryPoint,
-  OUT    UINT32                       *AuthenticationState
+  IN     CONST EFI_PEI_SERVICES  **PeiServices,
+  IN     EFI_PEI_FILE_HANDLE     FileHandle,
+  OUT    EFI_PHYSICAL_ADDRESS    *ImageAddressArg   OPTIONAL,
+  OUT    UINT64                  *ImageSizeArg      OPTIONAL,
+  OUT    EFI_PHYSICAL_ADDRESS    *EntryPoint,
+  OUT    UINT32                  *AuthenticationState
   )
 {
-  EFI_STATUS                  Status;
-  VOID                        *Pe32Data;
-  EFI_PHYSICAL_ADDRESS        ImageAddress;
-  UINT64                      ImageSize;
-  EFI_PHYSICAL_ADDRESS        ImageEntryPoint;
-  UINT16                      Machine;
-  EFI_SECTION_TYPE            SearchType1;
-  EFI_SECTION_TYPE            SearchType2;
+  EFI_STATUS            Status;
+  VOID                  *Pe32Data;
+  EFI_PHYSICAL_ADDRESS  ImageAddress;
+  UINT64                ImageSize;
+  EFI_PHYSICAL_ADDRESS  ImageEntryPoint;
+  UINT16                Machine;
+  EFI_SECTION_TYPE      SearchType1;
+  EFI_SECTION_TYPE      SearchType2;
 
   *EntryPoint          = 0;
   ImageSize            = 0;
@@ -654,15 +673,12 @@ PeiLoadImageLoadImage (
   // If memory is installed, perform the shadow operations
   //
   Status = LoadAndRelocatePeCoffImage (
-    FileHandle,
-    Pe32Data,
-    &ImageAddress,
-    &ImageSize,
-    &ImageEntryPoint
-  );
-
-  ASSERT_EFI_ERROR (Status);
-
+             FileHandle,
+             Pe32Data,
+             &ImageAddress,
+             &ImageSize,
+             &ImageEntryPoint
+             );
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -671,7 +687,7 @@ PeiLoadImageLoadImage (
   //
   // Got the entry point from the loaded Pe32Data
   //
-  Pe32Data    = (VOID *) ((UINTN) ImageAddress);
+  Pe32Data    = (VOID *)((UINTN)ImageAddress);
   *EntryPoint = ImageEntryPoint;
 
   Machine = PeCoffLoaderGetMachineType (Pe32Data);
@@ -691,70 +707,69 @@ PeiLoadImageLoadImage (
   }
 
   DEBUG_CODE_BEGIN ();
-    CHAR8                              *AsciiString;
-    CHAR8                              EfiFileName[512];
-    INT32                              Index;
-    INT32                              StartIndex;
+  CHAR8  *AsciiString;
+  CHAR8  EfiFileName[512];
+  INT32  Index;
+  INT32  StartIndex;
 
+  //
+  // Print debug message: Loading PEIM at 0x12345678 EntryPoint=0x12345688 Driver.efi
+  //
+  if (Machine != EFI_IMAGE_MACHINE_IA64) {
+    DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Loading PEIM at 0x%11p EntryPoint=0x%11p ", (VOID *)(UINTN)ImageAddress, (VOID *)(UINTN)*EntryPoint));
+  } else {
     //
-    // Print debug message: Loading PEIM at 0x12345678 EntryPoint=0x12345688 Driver.efi
+    // For IPF Image, the real entry point should be print.
     //
-    if (Machine != EFI_IMAGE_MACHINE_IA64) {
-      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading PEIM at 0x%11p EntryPoint=0x%11p ", (VOID *)(UINTN)ImageAddress, (VOID *)(UINTN)*EntryPoint));
-    } else {
-      //
-      // For IPF Image, the real entry point should be print.
-      //
-      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading PEIM at 0x%11p EntryPoint=0x%11p ", (VOID *)(UINTN)ImageAddress, (VOID *)(UINTN)(*(UINT64 *)(UINTN)*EntryPoint)));
+    DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Loading PEIM at 0x%11p EntryPoint=0x%11p ", (VOID *)(UINTN)ImageAddress, (VOID *)(UINTN)(*(UINT64 *)(UINTN)*EntryPoint)));
+  }
+
+  //
+  // Print Module Name by PeImage PDB file name.
+  //
+  AsciiString = PeCoffLoaderGetPdbPointer (Pe32Data);
+
+  if (AsciiString != NULL) {
+    StartIndex = 0;
+    for (Index = 0; AsciiString[Index] != 0; Index++) {
+      if ((AsciiString[Index] == '\\') || (AsciiString[Index] == '/')) {
+        StartIndex = Index + 1;
+      }
     }
 
     //
-    // Print Module Name by PeImage PDB file name.
+    // Copy the PDB file name to our temporary string, and replace .pdb with .efi
+    // The PDB file name is limited in the range of 0~511.
+    // If the length is bigger than 511, trim the redundant characters to avoid overflow in array boundary.
     //
-    AsciiString = PeCoffLoaderGetPdbPointer (Pe32Data);
-
-    if (AsciiString != NULL) {
-      StartIndex = 0;
-      for (Index = 0; AsciiString[Index] != 0; Index++) {
-        if (AsciiString[Index] == '\\' || AsciiString[Index] == '/') {
-          StartIndex = Index + 1;
-        }
+    for (Index = 0; Index < sizeof (EfiFileName) - 4; Index++) {
+      EfiFileName[Index] = AsciiString[Index + StartIndex];
+      if (EfiFileName[Index] == 0) {
+        EfiFileName[Index] = '.';
       }
 
-      //
-      // Copy the PDB file name to our temporary string, and replace .pdb with .efi
-      // The PDB file name is limited in the range of 0~511.
-      // If the length is bigger than 511, trim the redundant characters to avoid overflow in array boundary.
-      //
-      for (Index = 0; Index < sizeof (EfiFileName) - 4; Index++) {
-        EfiFileName[Index] = AsciiString[Index + StartIndex];
-        if (EfiFileName[Index] == 0) {
-          EfiFileName[Index] = '.';
-        }
-        if (EfiFileName[Index] == '.') {
-          EfiFileName[Index + 1] = 'e';
-          EfiFileName[Index + 2] = 'f';
-          EfiFileName[Index + 3] = 'i';
-          EfiFileName[Index + 4] = 0;
-          break;
-        }
+      if (EfiFileName[Index] == '.') {
+        EfiFileName[Index + 1] = 'e';
+        EfiFileName[Index + 2] = 'f';
+        EfiFileName[Index + 3] = 'i';
+        EfiFileName[Index + 4] = 0;
+        break;
       }
-
-      if (Index == sizeof (EfiFileName) - 4) {
-        EfiFileName[Index] = 0;
-      }
-
-      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "%a", EfiFileName));
     }
+
+    if (Index == sizeof (EfiFileName) - 4) {
+      EfiFileName[Index] = 0;
+    }
+
+    DEBUG ((DEBUG_INFO | DEBUG_LOAD, "%a", EfiFileName));
+  }
 
   DEBUG_CODE_END ();
 
-  DEBUG ((EFI_D_INFO | EFI_D_LOAD, "\n"));
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "\n"));
 
   return EFI_SUCCESS;
-
 }
-
 
 /**
   The wrapper function of PeiLoadImageLoadImage().
@@ -774,8 +789,8 @@ EFIAPI
 PeiLoadImageLoadImageWrapper (
   IN     CONST EFI_PEI_LOAD_FILE_PPI  *This,
   IN     EFI_PEI_FILE_HANDLE          FileHandle,
-  OUT    EFI_PHYSICAL_ADDRESS         *ImageAddressArg,  OPTIONAL
-  OUT    UINT64                       *ImageSizeArg,     OPTIONAL
+  OUT    EFI_PHYSICAL_ADDRESS         *ImageAddressArg   OPTIONAL,
+  OUT    UINT64                       *ImageSizeArg      OPTIONAL,
   OUT    EFI_PHYSICAL_ADDRESS         *EntryPoint,
   OUT    UINT32                       *AuthenticationState
   )
@@ -814,7 +829,7 @@ RelocationIsStrip (
     //
     // DOS image header is present, so read the PE header after the DOS image header.
     //
-    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN) Pe32Data + (UINTN) ((DosHdr->e_lfanew) & 0x0ffff));
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN)Pe32Data + (UINTN)((DosHdr->e_lfanew) & 0x0ffff));
   } else {
     //
     // DOS image header is not present, so PE header is at the image base.
@@ -839,7 +854,7 @@ RelocationIsStrip (
     } else {
       return FALSE;
     }
-  } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE)  {
+  } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
     if ((Hdr.Pe32->FileHeader.Characteristics & EFI_IMAGE_FILE_RELOCS_STRIPPED) != 0) {
       return TRUE;
     } else {
@@ -868,20 +883,20 @@ RelocationIsStrip (
 **/
 EFI_STATUS
 PeiLoadImage (
-  IN     CONST EFI_PEI_SERVICES       **PeiServices,
-  IN     EFI_PEI_FILE_HANDLE          FileHandle,
-  IN     UINT8                        PeimState,
-  OUT    EFI_PHYSICAL_ADDRESS         *EntryPoint,
-  OUT    UINT32                       *AuthenticationState
+  IN     CONST EFI_PEI_SERVICES  **PeiServices,
+  IN     EFI_PEI_FILE_HANDLE     FileHandle,
+  IN     UINT8                   PeimState,
+  OUT    EFI_PHYSICAL_ADDRESS    *EntryPoint,
+  OUT    UINT32                  *AuthenticationState
   )
 {
-  EFI_STATUS              PpiStatus;
-  EFI_STATUS              Status;
-  UINTN                   Index;
-  EFI_PEI_LOAD_FILE_PPI   *LoadFile;
-  EFI_PHYSICAL_ADDRESS    ImageAddress;
-  UINT64                  ImageSize;
-  BOOLEAN                 IsStrip;
+  EFI_STATUS             PpiStatus;
+  EFI_STATUS             Status;
+  UINTN                  Index;
+  EFI_PEI_LOAD_FILE_PPI  *LoadFile;
+  EFI_PHYSICAL_ADDRESS   ImageAddress;
+  UINT64                 ImageSize;
+  BOOLEAN                IsStrip;
 
   IsStrip = FALSE;
   //
@@ -898,19 +913,19 @@ PeiLoadImage (
                   );
     if (!EFI_ERROR (PpiStatus)) {
       Status = LoadFile->LoadFile (
-                          LoadFile,
-                          FileHandle,
-                          &ImageAddress,
-                          &ImageSize,
-                          EntryPoint,
-                          AuthenticationState
-                          );
-      if (!EFI_ERROR (Status) || Status == EFI_WARN_BUFFER_TOO_SMALL) {
+                           LoadFile,
+                           FileHandle,
+                           &ImageAddress,
+                           &ImageSize,
+                           EntryPoint,
+                           AuthenticationState
+                           );
+      if (!EFI_ERROR (Status) || (Status == EFI_WARN_BUFFER_TOO_SMALL)) {
         //
         // The shadowed PEIM must be relocatable.
         //
         if (PeimState == PEIM_STATE_REGISTER_FOR_SHADOW) {
-          IsStrip = RelocationIsStrip ((VOID *) (UINTN) ImageAddress);
+          IsStrip = RelocationIsStrip ((VOID *)(UINTN)ImageAddress);
           ASSERT (!IsStrip);
           if (IsStrip) {
             return EFI_UNSUPPORTED;
@@ -920,19 +935,20 @@ PeiLoadImage (
         //
         // The image to be started must have the machine type supported by PeiCore.
         //
-        ASSERT (EFI_IMAGE_MACHINE_TYPE_SUPPORTED (PeCoffLoaderGetMachineType ((VOID *) (UINTN) ImageAddress)));
-        if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (PeCoffLoaderGetMachineType ((VOID *) (UINTN) ImageAddress))) {
+        ASSERT (EFI_IMAGE_MACHINE_TYPE_SUPPORTED (PeCoffLoaderGetMachineType ((VOID *)(UINTN)ImageAddress)));
+        if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (PeCoffLoaderGetMachineType ((VOID *)(UINTN)ImageAddress))) {
           return EFI_UNSUPPORTED;
         }
+
         return EFI_SUCCESS;
       }
     }
+
     Index++;
   } while (!EFI_ERROR (PpiStatus));
 
   return PpiStatus;
 }
-
 
 /**
 
@@ -945,8 +961,8 @@ PeiLoadImage (
 **/
 VOID
 InitializeImageServices (
-  IN  PEI_CORE_INSTANCE   *PrivateData,
-  IN  PEI_CORE_INSTANCE   *OldCoreData
+  IN  PEI_CORE_INSTANCE  *PrivateData,
+  IN  PEI_CORE_INSTANCE  *OldCoreData
   )
 {
   if (OldCoreData == NULL) {
@@ -964,7 +980,3 @@ InitializeImageServices (
     PeiServicesReInstallPpi (PrivateData->XipLoadFile, &gPpiLoadFilePpiList);
   }
 }
-
-
-
-

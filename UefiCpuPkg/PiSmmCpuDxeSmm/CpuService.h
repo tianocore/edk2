@@ -38,9 +38,9 @@ typedef enum {
 EFI_STATUS
 EFIAPI
 SmmGetProcessorInfo (
-  IN CONST EFI_SMM_CPU_SERVICE_PROTOCOL *This,
-  IN       UINTN                        ProcessorNumber,
-  OUT      EFI_PROCESSOR_INFORMATION    *ProcessorInfoBuffer
+  IN CONST EFI_SMM_CPU_SERVICE_PROTOCOL  *This,
+  IN       UINTN                         ProcessorNumber,
+  OUT      EFI_PROCESSOR_INFORMATION     *ProcessorInfoBuffer
   );
 
 /**
@@ -57,8 +57,8 @@ SmmGetProcessorInfo (
 EFI_STATUS
 EFIAPI
 SmmSwitchBsp (
-  IN CONST EFI_SMM_CPU_SERVICE_PROTOCOL *This,
-  IN       UINTN                        ProcessorNumber
+  IN CONST EFI_SMM_CPU_SERVICE_PROTOCOL  *This,
+  IN       UINTN                         ProcessorNumber
   );
 
 /**
@@ -115,8 +115,8 @@ SmmRemoveProcessor (
 EFI_STATUS
 EFIAPI
 SmmWhoAmI (
-  IN CONST EFI_SMM_CPU_SERVICE_PROTOCOL *This,
-  OUT      UINTN                        *ProcessorNumber
+  IN CONST EFI_SMM_CPU_SERVICE_PROTOCOL  *This,
+  OUT      UINTN                         *ProcessorNumber
   );
 
 /**

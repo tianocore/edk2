@@ -8,16 +8,16 @@
 
 #include "PiSmmCore.h"
 
-#define IS_SMRAM_PROFILE_ENABLED ((PcdGet8 (PcdMemoryProfilePropertyMask) & BIT1) != 0)
-#define IS_UEFI_MEMORY_PROFILE_ENABLED ((PcdGet8 (PcdMemoryProfilePropertyMask) & BIT0) != 0)
+#define IS_SMRAM_PROFILE_ENABLED        ((PcdGet8 (PcdMemoryProfilePropertyMask) & BIT1) != 0)
+#define IS_UEFI_MEMORY_PROFILE_ENABLED  ((PcdGet8 (PcdMemoryProfilePropertyMask) & BIT0) != 0)
 
 #define GET_OCCUPIED_SIZE(ActualSize, Alignment) \
   ((ActualSize) + (((Alignment) - ((ActualSize) & ((Alignment) - 1))) & ((Alignment) - 1)))
 
 typedef struct {
-  UINT32                        Signature;
-  MEMORY_PROFILE_CONTEXT        Context;
-  LIST_ENTRY                    *DriverInfoList;
+  UINT32                    Signature;
+  MEMORY_PROFILE_CONTEXT    Context;
+  LIST_ENTRY                *DriverInfoList;
 } MEMORY_PROFILE_CONTEXT_DATA;
 
 typedef struct {
@@ -29,10 +29,10 @@ typedef struct {
 } MEMORY_PROFILE_DRIVER_INFO_DATA;
 
 typedef struct {
-  UINT32                        Signature;
-  MEMORY_PROFILE_ALLOC_INFO     AllocInfo;
-  CHAR8                         *ActionString;
-  LIST_ENTRY                    Link;
+  UINT32                       Signature;
+  MEMORY_PROFILE_ALLOC_INFO    AllocInfo;
+  CHAR8                        *ActionString;
+  LIST_ENTRY                   Link;
 } MEMORY_PROFILE_ALLOC_INFO_DATA;
 
 //
@@ -40,7 +40,7 @@ typedef struct {
 //
 #define SMRAM_INFO_DUMP_PAGE_THRESHOLD  4
 
-GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_FREE_MEMORY mSmramFreeMemory = {
+GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_FREE_MEMORY  mSmramFreeMemory = {
   {
     MEMORY_PROFILE_FREE_MEMORY_SIGNATURE,
     sizeof (MEMORY_PROFILE_FREE_MEMORY),
@@ -50,8 +50,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_FREE_MEMORY mSmramFreeMemory = {
   0
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED LIST_ENTRY  mImageQueue = INITIALIZE_LIST_HEAD_VARIABLE (mImageQueue);
-GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_CONTEXT_DATA mSmramProfileContext = {
+GLOBAL_REMOVE_IF_UNREFERENCED LIST_ENTRY                   mImageQueue          = INITIALIZE_LIST_HEAD_VARIABLE (mImageQueue);
+GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_CONTEXT_DATA  mSmramProfileContext = {
   MEMORY_PROFILE_CONTEXT_SIGNATURE,
   {
     {
@@ -61,21 +61,21 @@ GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_CONTEXT_DATA mSmramProfileContext =
     },
     0,
     0,
-    {0},
-    {0},
+    { 0 },
+    { 0 },
     0,
     0,
     0
   },
   &mImageQueue,
 };
-GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_CONTEXT_DATA *mSmramProfileContextPtr = NULL;
+GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_CONTEXT_DATA  *mSmramProfileContextPtr = NULL;
 
-GLOBAL_REMOVE_IF_UNREFERENCED BOOLEAN mSmramReadyToLock;
-GLOBAL_REMOVE_IF_UNREFERENCED BOOLEAN mSmramProfileGettingStatus = FALSE;
-GLOBAL_REMOVE_IF_UNREFERENCED BOOLEAN mSmramProfileRecordingEnable = MEMORY_PROFILE_RECORDING_DISABLE;
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_DEVICE_PATH_PROTOCOL *mSmramProfileDriverPath;
-GLOBAL_REMOVE_IF_UNREFERENCED UINTN                    mSmramProfileDriverPathSize;
+GLOBAL_REMOVE_IF_UNREFERENCED BOOLEAN                   mSmramReadyToLock;
+GLOBAL_REMOVE_IF_UNREFERENCED BOOLEAN                   mSmramProfileGettingStatus   = FALSE;
+GLOBAL_REMOVE_IF_UNREFERENCED BOOLEAN                   mSmramProfileRecordingEnable = MEMORY_PROFILE_RECORDING_DISABLE;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_DEVICE_PATH_PROTOCOL  *mSmramProfileDriverPath;
+GLOBAL_REMOVE_IF_UNREFERENCED UINTN                     mSmramProfileDriverPathSize;
 
 /**
   Dump SMRAM information.
@@ -105,7 +105,7 @@ EFIAPI
 SmramProfileProtocolGetData (
   IN     EDKII_SMM_MEMORY_PROFILE_PROTOCOL  *This,
   IN OUT UINT64                             *ProfileSize,
-     OUT VOID                               *ProfileBuffer
+  OUT VOID                                  *ProfileBuffer
   );
 
 /**
@@ -226,7 +226,7 @@ SmramProfileProtocolRecord (
   IN CHAR8                              *ActionString OPTIONAL
   );
 
-GLOBAL_REMOVE_IF_UNREFERENCED EDKII_SMM_MEMORY_PROFILE_PROTOCOL mSmmProfileProtocol = {
+GLOBAL_REMOVE_IF_UNREFERENCED EDKII_SMM_MEMORY_PROFILE_PROTOCOL  mSmmProfileProtocol = {
   SmramProfileProtocolGetData,
   SmramProfileProtocolRegisterImage,
   SmramProfileProtocolUnregisterImage,
@@ -269,22 +269,22 @@ InternalPeCoffGetSubsystem (
 
   ASSERT (Pe32Data != NULL);
 
-  DosHdr = (EFI_IMAGE_DOS_HEADER *) Pe32Data;
+  DosHdr = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
   if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
     //
     // DOS image header is present, so read the PE header after the DOS image header.
     //
-    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *) ((UINTN) Pe32Data + (UINTN) ((DosHdr->e_lfanew) & 0x0ffff));
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN)Pe32Data + (UINTN)((DosHdr->e_lfanew) & 0x0ffff));
   } else {
     //
     // DOS image header is not present, so PE header is at the image base.
     //
-    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *) Pe32Data;
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)Pe32Data;
   }
 
   if (Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
     return Hdr.Te->Subsystem;
-  } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE)  {
+  } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
     Magic = Hdr.Pe32->OptionalHeader.Magic;
     if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       return Hdr.Pe32->OptionalHeader.Subsystem;
@@ -319,23 +319,23 @@ InternalPeCoffGetEntryPoint (
   OUT VOID  **EntryPoint
   )
 {
-  EFI_IMAGE_DOS_HEADER                  *DosHdr;
-  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr;
+  EFI_IMAGE_DOS_HEADER                 *DosHdr;
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
 
   ASSERT (Pe32Data   != NULL);
   ASSERT (EntryPoint != NULL);
 
-  DosHdr = (EFI_IMAGE_DOS_HEADER *) Pe32Data;
+  DosHdr = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
   if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
     //
     // DOS image header is present, so read the PE header after the DOS image header.
     //
-    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *) ((UINTN) Pe32Data + (UINTN) ((DosHdr->e_lfanew) & 0x0ffff));
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN)Pe32Data + (UINTN)((DosHdr->e_lfanew) & 0x0ffff));
   } else {
     //
     // DOS image header is not present, so PE header is at the image base.
     //
-    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *) Pe32Data;
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)Pe32Data;
   }
 
   //
@@ -343,10 +343,10 @@ InternalPeCoffGetEntryPoint (
   // AddressOfEntryPoint is common for PE32 & PE32+
   //
   if (Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
-    *EntryPoint = (VOID *) ((UINTN) Pe32Data + (UINTN) (Hdr.Te->AddressOfEntryPoint & 0x0ffffffff) + sizeof (EFI_TE_IMAGE_HEADER) - Hdr.Te->StrippedSize);
+    *EntryPoint = (VOID *)((UINTN)Pe32Data + (UINTN)(Hdr.Te->AddressOfEntryPoint & 0x0ffffffff) + sizeof (EFI_TE_IMAGE_HEADER) - Hdr.Te->StrippedSize);
     return RETURN_SUCCESS;
   } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
-    *EntryPoint = (VOID *) ((UINTN) Pe32Data + (UINTN) (Hdr.Pe32->OptionalHeader.AddressOfEntryPoint & 0x0ffffffff));
+    *EntryPoint = (VOID *)((UINTN)Pe32Data + (UINTN)(Hdr.Pe32->OptionalHeader.AddressOfEntryPoint & 0x0ffffffff));
     return RETURN_SUCCESS;
   }
 
@@ -369,30 +369,30 @@ InternalPeCoffGetEntryPoint (
 **/
 MEMORY_PROFILE_DRIVER_INFO_DATA *
 BuildDriverInfo (
-  IN MEMORY_PROFILE_CONTEXT_DATA    *ContextData,
-  IN EFI_GUID                       *FileName,
-  IN PHYSICAL_ADDRESS               ImageBase,
-  IN UINT64                         ImageSize,
-  IN PHYSICAL_ADDRESS               EntryPoint,
-  IN UINT16                         ImageSubsystem,
-  IN EFI_FV_FILETYPE                FileType
+  IN MEMORY_PROFILE_CONTEXT_DATA  *ContextData,
+  IN EFI_GUID                     *FileName,
+  IN PHYSICAL_ADDRESS             ImageBase,
+  IN UINT64                       ImageSize,
+  IN PHYSICAL_ADDRESS             EntryPoint,
+  IN UINT16                       ImageSubsystem,
+  IN EFI_FV_FILETYPE              FileType
   )
 {
-  EFI_STATUS                        Status;
-  MEMORY_PROFILE_DRIVER_INFO        *DriverInfo;
-  MEMORY_PROFILE_DRIVER_INFO_DATA   *DriverInfoData;
-  VOID                              *EntryPointInImage;
-  CHAR8                             *PdbString;
-  UINTN                             PdbSize;
-  UINTN                             PdbOccupiedSize;
+  EFI_STATUS                       Status;
+  MEMORY_PROFILE_DRIVER_INFO       *DriverInfo;
+  MEMORY_PROFILE_DRIVER_INFO_DATA  *DriverInfoData;
+  VOID                             *EntryPointInImage;
+  CHAR8                            *PdbString;
+  UINTN                            PdbSize;
+  UINTN                            PdbOccupiedSize;
 
-  PdbSize = 0;
+  PdbSize         = 0;
   PdbOccupiedSize = 0;
-  PdbString = NULL;
+  PdbString       = NULL;
   if (ImageBase != 0) {
-    PdbString = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageBase);
+    PdbString = PeCoffLoaderGetPdbPointer ((VOID *)(UINTN)ImageBase);
     if (PdbString != NULL) {
-      PdbSize = AsciiStrSize (PdbString);
+      PdbSize         = AsciiStrSize (PdbString);
       PdbOccupiedSize = GET_OCCUPIED_SIZE (PdbSize, sizeof (UINT64));
     }
   }
@@ -403,53 +403,56 @@ BuildDriverInfo (
   Status = SmmInternalAllocatePool (
              EfiRuntimeServicesData,
              sizeof (*DriverInfoData) + sizeof (LIST_ENTRY) + PdbSize,
-             (VOID **) &DriverInfoData
+             (VOID **)&DriverInfoData
              );
   if (EFI_ERROR (Status)) {
     return NULL;
   }
+
   ASSERT (DriverInfoData != NULL);
 
   ZeroMem (DriverInfoData, sizeof (*DriverInfoData));
 
-  DriverInfo = &DriverInfoData->DriverInfo;
-  DriverInfoData->Signature = MEMORY_PROFILE_DRIVER_INFO_SIGNATURE;
+  DriverInfo                   = &DriverInfoData->DriverInfo;
+  DriverInfoData->Signature    = MEMORY_PROFILE_DRIVER_INFO_SIGNATURE;
   DriverInfo->Header.Signature = MEMORY_PROFILE_DRIVER_INFO_SIGNATURE;
-  DriverInfo->Header.Length = (UINT16) (sizeof (MEMORY_PROFILE_DRIVER_INFO) + PdbOccupiedSize);
-  DriverInfo->Header.Revision = MEMORY_PROFILE_DRIVER_INFO_REVISION;
+  DriverInfo->Header.Length    = (UINT16)(sizeof (MEMORY_PROFILE_DRIVER_INFO) + PdbOccupiedSize);
+  DriverInfo->Header.Revision  = MEMORY_PROFILE_DRIVER_INFO_REVISION;
   if (FileName != NULL) {
     CopyMem (&DriverInfo->FileName, FileName, sizeof (EFI_GUID));
   }
-  DriverInfo->ImageBase = ImageBase;
-  DriverInfo->ImageSize = ImageSize;
-  DriverInfo->EntryPoint = EntryPoint;
+
+  DriverInfo->ImageBase      = ImageBase;
+  DriverInfo->ImageSize      = ImageSize;
+  DriverInfo->EntryPoint     = EntryPoint;
   DriverInfo->ImageSubsystem = ImageSubsystem;
   if ((EntryPoint != 0) && ((EntryPoint < ImageBase) || (EntryPoint >= (ImageBase + ImageSize)))) {
     //
     // If the EntryPoint is not in the range of image buffer, it should come from emulation environment.
     // So patch ImageBuffer here to align the EntryPoint.
     //
-    Status = InternalPeCoffGetEntryPoint ((VOID *) (UINTN) ImageBase, &EntryPointInImage);
+    Status = InternalPeCoffGetEntryPoint ((VOID *)(UINTN)ImageBase, &EntryPointInImage);
     ASSERT_EFI_ERROR (Status);
-    DriverInfo->ImageBase = ImageBase + EntryPoint - (PHYSICAL_ADDRESS) (UINTN) EntryPointInImage;
+    DriverInfo->ImageBase = ImageBase + EntryPoint - (PHYSICAL_ADDRESS)(UINTN)EntryPointInImage;
   }
-  DriverInfo->FileType = FileType;
-  DriverInfoData->AllocInfoList = (LIST_ENTRY *) (DriverInfoData + 1);
+
+  DriverInfo->FileType          = FileType;
+  DriverInfoData->AllocInfoList = (LIST_ENTRY *)(DriverInfoData + 1);
   InitializeListHead (DriverInfoData->AllocInfoList);
-  DriverInfo->CurrentUsage = 0;
-  DriverInfo->PeakUsage = 0;
+  DriverInfo->CurrentUsage     = 0;
+  DriverInfo->PeakUsage        = 0;
   DriverInfo->AllocRecordCount = 0;
   if (PdbSize != 0) {
-    DriverInfo->PdbStringOffset = (UINT16) sizeof (MEMORY_PROFILE_DRIVER_INFO);
-    DriverInfoData->PdbString = (CHAR8 *) (DriverInfoData->AllocInfoList + 1);
+    DriverInfo->PdbStringOffset = (UINT16)sizeof (MEMORY_PROFILE_DRIVER_INFO);
+    DriverInfoData->PdbString   = (CHAR8 *)(DriverInfoData->AllocInfoList + 1);
     CopyMem (DriverInfoData->PdbString, PdbString, PdbSize);
   } else {
     DriverInfo->PdbStringOffset = 0;
-    DriverInfoData->PdbString = NULL;
+    DriverInfoData->PdbString   = NULL;
   }
 
   InsertTailList (ContextData->DriverInfoList, &DriverInfoData->Link);
-  ContextData->Context.ImageCount ++;
+  ContextData->Context.ImageCount++;
   ContextData->Context.TotalImageSize += DriverInfo->ImageSize;
 
   return DriverInfoData;
@@ -466,28 +469,27 @@ BuildDriverInfo (
 **/
 VOID
 RegisterImageToDxe (
-  IN EFI_GUID                       *FileName,
-  IN PHYSICAL_ADDRESS               ImageBase,
-  IN UINT64                         ImageSize,
-  IN EFI_FV_FILETYPE                FileType
+  IN EFI_GUID          *FileName,
+  IN PHYSICAL_ADDRESS  ImageBase,
+  IN UINT64            ImageSize,
+  IN EFI_FV_FILETYPE   FileType
   )
 {
-  EFI_STATUS                        Status;
-  EDKII_MEMORY_PROFILE_PROTOCOL     *ProfileProtocol;
-  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FilePath;
-  UINT8                             TempBuffer[sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH) + sizeof (EFI_DEVICE_PATH_PROTOCOL)];
+  EFI_STATUS                         Status;
+  EDKII_MEMORY_PROFILE_PROTOCOL      *ProfileProtocol;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FilePath;
+  UINT8                              TempBuffer[sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH) + sizeof (EFI_DEVICE_PATH_PROTOCOL)];
 
   if (IS_UEFI_MEMORY_PROFILE_ENABLED) {
-
     FilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)TempBuffer;
-    Status = gBS->LocateProtocol (&gEdkiiMemoryProfileGuid, NULL, (VOID **) &ProfileProtocol);
+    Status   = gBS->LocateProtocol (&gEdkiiMemoryProfileGuid, NULL, (VOID **)&ProfileProtocol);
     if (!EFI_ERROR (Status)) {
       EfiInitializeFwVolDevicepathNode (FilePath, FileName);
       SetDevicePathEndNode (FilePath + 1);
 
       Status = ProfileProtocol->RegisterImage (
                                   ProfileProtocol,
-                                  (EFI_DEVICE_PATH_PROTOCOL *) FilePath,
+                                  (EFI_DEVICE_PATH_PROTOCOL *)FilePath,
                                   ImageBase,
                                   ImageSize,
                                   FileType
@@ -506,27 +508,26 @@ RegisterImageToDxe (
 **/
 VOID
 UnregisterImageFromDxe (
-  IN EFI_GUID                       *FileName,
-  IN PHYSICAL_ADDRESS               ImageBase,
-  IN UINT64                         ImageSize
+  IN EFI_GUID          *FileName,
+  IN PHYSICAL_ADDRESS  ImageBase,
+  IN UINT64            ImageSize
   )
 {
-  EFI_STATUS                        Status;
-  EDKII_MEMORY_PROFILE_PROTOCOL     *ProfileProtocol;
-  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FilePath;
-  UINT8                             TempBuffer[sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH) + sizeof (EFI_DEVICE_PATH_PROTOCOL)];
+  EFI_STATUS                         Status;
+  EDKII_MEMORY_PROFILE_PROTOCOL      *ProfileProtocol;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FilePath;
+  UINT8                              TempBuffer[sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH) + sizeof (EFI_DEVICE_PATH_PROTOCOL)];
 
   if (IS_UEFI_MEMORY_PROFILE_ENABLED) {
-
     FilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)TempBuffer;
-    Status = gBS->LocateProtocol (&gEdkiiMemoryProfileGuid, NULL, (VOID *) &ProfileProtocol);
+    Status   = gBS->LocateProtocol (&gEdkiiMemoryProfileGuid, NULL, (VOID *)&ProfileProtocol);
     if (!EFI_ERROR (Status)) {
       EfiInitializeFwVolDevicepathNode (FilePath, FileName);
       SetDevicePathEndNode (FilePath + 1);
 
       Status = ProfileProtocol->UnregisterImage (
                                   ProfileProtocol,
-                                  (EFI_DEVICE_PATH_PROTOCOL *) FilePath,
+                                  (EFI_DEVICE_PATH_PROTOCOL *)FilePath,
                                   ImageBase,
                                   ImageSize
                                   );
@@ -545,13 +546,13 @@ UnregisterImageFromDxe (
 **/
 BOOLEAN
 NeedRecordThisDriver (
-  IN EFI_DEVICE_PATH_PROTOCOL       *DriverFilePath
+  IN EFI_DEVICE_PATH_PROTOCOL  *DriverFilePath
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL    *TmpDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL    *DevicePathInstance;
-  UINTN                       DevicePathSize;
-  UINTN                       FilePathSize;
+  EFI_DEVICE_PATH_PROTOCOL  *TmpDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePathInstance;
+  UINTN                     DevicePathSize;
+  UINTN                     FilePathSize;
 
   if (!IsDevicePathValid (mSmramProfileDriverPath, mSmramProfileDriverPathSize)) {
     //
@@ -563,7 +564,7 @@ NeedRecordThisDriver (
   //
   // Record FilePath without end node.
   //
-  FilePathSize = GetDevicePathSize (DriverFilePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
+  FilePathSize = GetDevicePathSize (DriverFilePath) - sizeof (EFI_DEVICE_PATH_PROTOCOL);
 
   DevicePathInstance = mSmramProfileDriverPath;
   do {
@@ -580,14 +581,15 @@ NeedRecordThisDriver (
     //
     DevicePathSize = (UINTN)TmpDevicePath - (UINTN)DevicePathInstance;
     if ((FilePathSize == DevicePathSize) &&
-        (CompareMem (DriverFilePath, DevicePathInstance, DevicePathSize) == 0)) {
+        (CompareMem (DriverFilePath, DevicePathInstance, DevicePathSize) == 0))
+    {
       return TRUE;
     }
 
     //
     // Get next instance
     //
-    DevicePathInstance = (EFI_DEVICE_PATH_PROTOCOL *)((UINTN)DevicePathInstance + DevicePathSize + DevicePathNodeLength(TmpDevicePath));
+    DevicePathInstance = (EFI_DEVICE_PATH_PROTOCOL *)((UINTN)DevicePathInstance + DevicePathSize + DevicePathNodeLength (TmpDevicePath));
   } while (DevicePathSubType (TmpDevicePath) != END_ENTIRE_DEVICE_PATH_SUBTYPE);
 
   return FALSE;
@@ -604,30 +606,30 @@ NeedRecordThisDriver (
 **/
 BOOLEAN
 RegisterSmmCore (
-  IN MEMORY_PROFILE_CONTEXT_DATA    *ContextData
+  IN MEMORY_PROFILE_CONTEXT_DATA  *ContextData
   )
 {
-  MEMORY_PROFILE_DRIVER_INFO_DATA   *DriverInfoData;
-  PHYSICAL_ADDRESS                  ImageBase;
-  UINT8                             TempBuffer[sizeof(MEDIA_FW_VOL_FILEPATH_DEVICE_PATH) + sizeof(EFI_DEVICE_PATH_PROTOCOL)];
-  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FilePath;
+  MEMORY_PROFILE_DRIVER_INFO_DATA    *DriverInfoData;
+  PHYSICAL_ADDRESS                   ImageBase;
+  UINT8                              TempBuffer[sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH) + sizeof (EFI_DEVICE_PATH_PROTOCOL)];
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FilePath;
 
-  FilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) TempBuffer;
+  FilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)TempBuffer;
   EfiInitializeFwVolDevicepathNode (FilePath, &gEfiCallerIdGuid);
   SetDevicePathEndNode (FilePath + 1);
 
-  if (!NeedRecordThisDriver ((EFI_DEVICE_PATH_PROTOCOL *) FilePath)) {
+  if (!NeedRecordThisDriver ((EFI_DEVICE_PATH_PROTOCOL *)FilePath)) {
     return FALSE;
   }
 
-  ImageBase = gSmmCorePrivate->PiSmmCoreImageBase;
+  ImageBase      = gSmmCorePrivate->PiSmmCoreImageBase;
   DriverInfoData = BuildDriverInfo (
                      ContextData,
                      &gEfiCallerIdGuid,
                      ImageBase,
                      gSmmCorePrivate->PiSmmCoreImageSize,
                      gSmmCorePrivate->PiSmmCoreEntryPoint,
-                     InternalPeCoffGetSubsystem ((VOID *) (UINTN) ImageBase),
+                     InternalPeCoffGetSubsystem ((VOID *)(UINTN)ImageBase),
                      EFI_FV_FILETYPE_SMM_CORE
                      );
   if (DriverInfoData == NULL) {
@@ -646,7 +648,7 @@ SmramProfileInit (
   VOID
   )
 {
-  MEMORY_PROFILE_CONTEXT_DATA *SmramProfileContext;
+  MEMORY_PROFILE_CONTEXT_DATA  *SmramProfileContext;
 
   RegisterImageToDxe (
     &gEfiCallerIdGuid,
@@ -670,13 +672,14 @@ SmramProfileInit (
   } else {
     mSmramProfileRecordingEnable = MEMORY_PROFILE_RECORDING_ENABLE;
   }
+
   mSmramProfileDriverPathSize = PcdGetSize (PcdMemoryProfileDriverPath);
-  mSmramProfileDriverPath = AllocateCopyPool (mSmramProfileDriverPathSize, PcdGetPtr (PcdMemoryProfileDriverPath));
-  mSmramProfileContextPtr = &mSmramProfileContext;
+  mSmramProfileDriverPath     = AllocateCopyPool (mSmramProfileDriverPathSize, PcdGetPtr (PcdMemoryProfileDriverPath));
+  mSmramProfileContextPtr     = &mSmramProfileContext;
 
   RegisterSmmCore (&mSmramProfileContext);
 
-  DEBUG ((EFI_D_INFO, "SmramProfileInit SmramProfileContext - 0x%x\n", &mSmramProfileContext));
+  DEBUG ((DEBUG_INFO, "SmramProfileInit SmramProfileContext - 0x%x\n", &mSmramProfileContext));
 }
 
 /**
@@ -688,8 +691,8 @@ SmramProfileInstallProtocol (
   VOID
   )
 {
-  EFI_HANDLE    Handle;
-  EFI_STATUS    Status;
+  EFI_HANDLE  Handle;
+  EFI_STATUS  Status;
 
   if (!IS_SMRAM_PROFILE_ENABLED) {
     return;
@@ -715,21 +718,22 @@ SmramProfileInstallProtocol (
 **/
 EFI_GUID *
 GetFileNameFromFilePath (
-  IN EFI_DEVICE_PATH_PROTOCOL   *FilePath
+  IN EFI_DEVICE_PATH_PROTOCOL  *FilePath
   )
 {
-  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH     *ThisFilePath;
-  EFI_GUID                              *FileName;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *ThisFilePath;
+  EFI_GUID                           *FileName;
 
   FileName = NULL;
   if (FilePath != NULL) {
-    ThisFilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) FilePath;
+    ThisFilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)FilePath;
     while (!IsDevicePathEnd (ThisFilePath)) {
       FileName = EfiGetNameGuidFromFwVolDevicePathNode (ThisFilePath);
       if (FileName != NULL) {
         break;
       }
-      ThisFilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) NextDevicePathNode (ThisFilePath);
+
+      ThisFilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)NextDevicePathNode (ThisFilePath);
     }
   }
 
@@ -750,14 +754,14 @@ GetFileNameFromFilePath (
 **/
 EFI_STATUS
 RegisterSmramProfileImage (
-  IN EFI_SMM_DRIVER_ENTRY   *DriverEntry,
-  IN BOOLEAN                RegisterToDxe
+  IN EFI_SMM_DRIVER_ENTRY  *DriverEntry,
+  IN BOOLEAN               RegisterToDxe
   )
 {
-  MEMORY_PROFILE_CONTEXT_DATA       *ContextData;
-  MEMORY_PROFILE_DRIVER_INFO_DATA   *DriverInfoData;
-  UINT8                             TempBuffer[sizeof(MEDIA_FW_VOL_FILEPATH_DEVICE_PATH) + sizeof(EFI_DEVICE_PATH_PROTOCOL)];
-  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FilePath;
+  MEMORY_PROFILE_CONTEXT_DATA        *ContextData;
+  MEMORY_PROFILE_DRIVER_INFO_DATA    *DriverInfoData;
+  UINT8                              TempBuffer[sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH) + sizeof (EFI_DEVICE_PATH_PROTOCOL)];
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FilePath;
 
   if (RegisterToDxe) {
     RegisterImageToDxe (
@@ -772,11 +776,11 @@ RegisterSmramProfileImage (
     return EFI_UNSUPPORTED;
   }
 
-  FilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) TempBuffer;
+  FilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)TempBuffer;
   EfiInitializeFwVolDevicepathNode (FilePath, &DriverEntry->FileName);
   SetDevicePathEndNode (FilePath + 1);
 
-  if (!NeedRecordThisDriver ((EFI_DEVICE_PATH_PROTOCOL *) FilePath)) {
+  if (!NeedRecordThisDriver ((EFI_DEVICE_PATH_PROTOCOL *)FilePath)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -791,7 +795,7 @@ RegisterSmramProfileImage (
                      DriverEntry->ImageBuffer,
                      EFI_PAGES_TO_SIZE (DriverEntry->NumberOfPage),
                      DriverEntry->ImageEntryPoint,
-                     InternalPeCoffGetSubsystem ((VOID *) (UINTN) DriverEntry->ImageBuffer),
+                     InternalPeCoffGetSubsystem ((VOID *)(UINTN)DriverEntry->ImageBuffer),
                      EFI_FV_FILETYPE_SMM
                      );
   if (DriverInfoData == NULL) {
@@ -813,21 +817,22 @@ RegisterSmramProfileImage (
 **/
 MEMORY_PROFILE_DRIVER_INFO_DATA *
 GetMemoryProfileDriverInfoByFileNameAndAddress (
-  IN MEMORY_PROFILE_CONTEXT_DATA    *ContextData,
-  IN EFI_GUID                       *FileName,
-  IN PHYSICAL_ADDRESS               Address
+  IN MEMORY_PROFILE_CONTEXT_DATA  *ContextData,
+  IN EFI_GUID                     *FileName,
+  IN PHYSICAL_ADDRESS             Address
   )
 {
-  MEMORY_PROFILE_DRIVER_INFO        *DriverInfo;
-  MEMORY_PROFILE_DRIVER_INFO_DATA   *DriverInfoData;
-  LIST_ENTRY                        *DriverLink;
-  LIST_ENTRY                        *DriverInfoList;
+  MEMORY_PROFILE_DRIVER_INFO       *DriverInfo;
+  MEMORY_PROFILE_DRIVER_INFO_DATA  *DriverInfoData;
+  LIST_ENTRY                       *DriverLink;
+  LIST_ENTRY                       *DriverInfoList;
 
   DriverInfoList = ContextData->DriverInfoList;
 
   for (DriverLink = DriverInfoList->ForwardLink;
        DriverLink != DriverInfoList;
-       DriverLink = DriverLink->ForwardLink) {
+       DriverLink = DriverLink->ForwardLink)
+  {
     DriverInfoData = CR (
                        DriverLink,
                        MEMORY_PROFILE_DRIVER_INFO_DATA,
@@ -837,7 +842,8 @@ GetMemoryProfileDriverInfoByFileNameAndAddress (
     DriverInfo = &DriverInfoData->DriverInfo;
     if ((CompareGuid (&DriverInfo->FileName, FileName)) &&
         (Address >= DriverInfo->ImageBase) &&
-        (Address < (DriverInfo->ImageBase + DriverInfo->ImageSize))) {
+        (Address < (DriverInfo->ImageBase + DriverInfo->ImageSize)))
+    {
       return DriverInfoData;
     }
   }
@@ -857,20 +863,21 @@ GetMemoryProfileDriverInfoByFileNameAndAddress (
 **/
 MEMORY_PROFILE_DRIVER_INFO_DATA *
 GetMemoryProfileDriverInfoFromAddress (
-  IN MEMORY_PROFILE_CONTEXT_DATA    *ContextData,
-  IN PHYSICAL_ADDRESS               Address
+  IN MEMORY_PROFILE_CONTEXT_DATA  *ContextData,
+  IN PHYSICAL_ADDRESS             Address
   )
 {
-  MEMORY_PROFILE_DRIVER_INFO        *DriverInfo;
-  MEMORY_PROFILE_DRIVER_INFO_DATA   *DriverInfoData;
-  LIST_ENTRY                        *DriverLink;
-  LIST_ENTRY                        *DriverInfoList;
+  MEMORY_PROFILE_DRIVER_INFO       *DriverInfo;
+  MEMORY_PROFILE_DRIVER_INFO_DATA  *DriverInfoData;
+  LIST_ENTRY                       *DriverLink;
+  LIST_ENTRY                       *DriverInfoList;
 
   DriverInfoList = ContextData->DriverInfoList;
 
   for (DriverLink = DriverInfoList->ForwardLink;
        DriverLink != DriverInfoList;
-       DriverLink = DriverLink->ForwardLink) {
+       DriverLink = DriverLink->ForwardLink)
+  {
     DriverInfoData = CR (
                        DriverLink,
                        MEMORY_PROFILE_DRIVER_INFO_DATA,
@@ -879,7 +886,8 @@ GetMemoryProfileDriverInfoFromAddress (
                        );
     DriverInfo = &DriverInfoData->DriverInfo;
     if ((Address >= DriverInfo->ImageBase) &&
-        (Address < (DriverInfo->ImageBase + DriverInfo->ImageSize))) {
+        (Address < (DriverInfo->ImageBase + DriverInfo->ImageSize)))
+    {
       return DriverInfoData;
     }
   }
@@ -905,14 +913,14 @@ UnregisterSmramProfileImage (
   IN BOOLEAN               UnregisterFromDxe
   )
 {
-  EFI_STATUS                        Status;
-  MEMORY_PROFILE_CONTEXT_DATA       *ContextData;
-  MEMORY_PROFILE_DRIVER_INFO_DATA   *DriverInfoData;
-  EFI_GUID                          *FileName;
-  PHYSICAL_ADDRESS                  ImageAddress;
-  VOID                              *EntryPointInImage;
-  UINT8                             TempBuffer[sizeof(MEDIA_FW_VOL_FILEPATH_DEVICE_PATH) + sizeof(EFI_DEVICE_PATH_PROTOCOL)];
-  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FilePath;
+  EFI_STATUS                         Status;
+  MEMORY_PROFILE_CONTEXT_DATA        *ContextData;
+  MEMORY_PROFILE_DRIVER_INFO_DATA    *DriverInfoData;
+  EFI_GUID                           *FileName;
+  PHYSICAL_ADDRESS                   ImageAddress;
+  VOID                               *EntryPointInImage;
+  UINT8                              TempBuffer[sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH) + sizeof (EFI_DEVICE_PATH_PROTOCOL)];
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FilePath;
 
   if (UnregisterFromDxe) {
     UnregisterImageFromDxe (
@@ -926,11 +934,11 @@ UnregisterSmramProfileImage (
     return EFI_UNSUPPORTED;
   }
 
-  FilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) TempBuffer;
+  FilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)TempBuffer;
   EfiInitializeFwVolDevicepathNode (FilePath, &DriverEntry->FileName);
   SetDevicePathEndNode (FilePath + 1);
 
-  if (!NeedRecordThisDriver ((EFI_DEVICE_PATH_PROTOCOL *) FilePath)) {
+  if (!NeedRecordThisDriver ((EFI_DEVICE_PATH_PROTOCOL *)FilePath)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -940,23 +948,26 @@ UnregisterSmramProfileImage (
   }
 
   DriverInfoData = NULL;
-  FileName = &DriverEntry->FileName;
-  ImageAddress = DriverEntry->ImageBuffer;
+  FileName       = &DriverEntry->FileName;
+  ImageAddress   = DriverEntry->ImageBuffer;
   if ((DriverEntry->ImageEntryPoint < ImageAddress) || (DriverEntry->ImageEntryPoint >= (ImageAddress + EFI_PAGES_TO_SIZE (DriverEntry->NumberOfPage)))) {
     //
     // If the EntryPoint is not in the range of image buffer, it should come from emulation environment.
     // So patch ImageAddress here to align the EntryPoint.
     //
-    Status = InternalPeCoffGetEntryPoint ((VOID *) (UINTN) ImageAddress, &EntryPointInImage);
+    Status = InternalPeCoffGetEntryPoint ((VOID *)(UINTN)ImageAddress, &EntryPointInImage);
     ASSERT_EFI_ERROR (Status);
-    ImageAddress = ImageAddress + (UINTN) DriverEntry->ImageEntryPoint - (UINTN) EntryPointInImage;
+    ImageAddress = ImageAddress + (UINTN)DriverEntry->ImageEntryPoint - (UINTN)EntryPointInImage;
   }
+
   if (FileName != NULL) {
     DriverInfoData = GetMemoryProfileDriverInfoByFileNameAndAddress (ContextData, FileName, ImageAddress);
   }
+
   if (DriverInfoData == NULL) {
     DriverInfoData = GetMemoryProfileDriverInfoFromAddress (ContextData, ImageAddress);
   }
+
   if (DriverInfoData == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -964,11 +975,11 @@ UnregisterSmramProfileImage (
   ContextData->Context.TotalImageSize -= DriverInfoData->DriverInfo.ImageSize;
 
   // Keep the ImageBase for RVA calculation in Application.
-  //DriverInfoData->DriverInfo.ImageBase = 0;
+  // DriverInfoData->DriverInfo.ImageBase = 0;
   DriverInfoData->DriverInfo.ImageSize = 0;
 
   if (DriverInfoData->DriverInfo.PeakUsage == 0) {
-    ContextData->Context.ImageCount --;
+    ContextData->Context.ImageCount--;
     RemoveEntryList (&DriverInfoData->Link);
     //
     // Use SmmInternalFreePool() that will not update profile for this FreePool action.
@@ -991,13 +1002,14 @@ UnregisterSmramProfileImage (
 **/
 BOOLEAN
 SmmCoreNeedRecordProfile (
-  IN EFI_MEMORY_TYPE    MemoryType
+  IN EFI_MEMORY_TYPE  MemoryType
   )
 {
-  UINT64 TestBit;
+  UINT64  TestBit;
 
-  if (MemoryType != EfiRuntimeServicesCode &&
-      MemoryType != EfiRuntimeServicesData) {
+  if ((MemoryType != EfiRuntimeServicesCode) &&
+      (MemoryType != EfiRuntimeServicesData))
+  {
     return FALSE;
   }
 
@@ -1023,7 +1035,7 @@ SmmCoreNeedRecordProfile (
 **/
 EFI_MEMORY_TYPE
 GetProfileMemoryIndex (
-  IN EFI_MEMORY_TYPE    MemoryType
+  IN EFI_MEMORY_TYPE  MemoryType
   )
 {
   return MemoryType;
@@ -1040,17 +1052,18 @@ SmramProfileUpdateFreePages (
   IN MEMORY_PROFILE_CONTEXT_DATA  *ContextData
   )
 {
-  LIST_ENTRY                      *Node;
-  FREE_PAGE_LIST                  *Pages;
-  LIST_ENTRY                      *FreePageList;
-  UINTN                           NumberOfPages;
+  LIST_ENTRY      *Node;
+  FREE_PAGE_LIST  *Pages;
+  LIST_ENTRY      *FreePageList;
+  UINTN           NumberOfPages;
 
   NumberOfPages = 0;
-  FreePageList = &mSmmMemoryMap;
+  FreePageList  = &mSmmMemoryMap;
   for (Node = FreePageList->BackLink;
        Node != FreePageList;
-       Node = Node->BackLink) {
-    Pages = BASE_CR (Node, FREE_PAGE_LIST, Link);
+       Node = Node->BackLink)
+  {
+    Pages          = BASE_CR (Node, FREE_PAGE_LIST, Link);
     NumberOfPages += Pages->NumberOfPages;
   }
 
@@ -1087,17 +1100,17 @@ SmmCoreUpdateProfileAllocate (
   IN CHAR8                  *ActionString OPTIONAL
   )
 {
-  EFI_STATUS                        Status;
-  MEMORY_PROFILE_CONTEXT            *Context;
-  MEMORY_PROFILE_DRIVER_INFO        *DriverInfo;
-  MEMORY_PROFILE_ALLOC_INFO         *AllocInfo;
-  MEMORY_PROFILE_CONTEXT_DATA       *ContextData;
-  MEMORY_PROFILE_DRIVER_INFO_DATA   *DriverInfoData;
-  MEMORY_PROFILE_ALLOC_INFO_DATA    *AllocInfoData;
-  EFI_MEMORY_TYPE                   ProfileMemoryIndex;
-  MEMORY_PROFILE_ACTION             BasicAction;
-  UINTN                             ActionStringSize;
-  UINTN                             ActionStringOccupiedSize;
+  EFI_STATUS                       Status;
+  MEMORY_PROFILE_CONTEXT           *Context;
+  MEMORY_PROFILE_DRIVER_INFO       *DriverInfo;
+  MEMORY_PROFILE_ALLOC_INFO        *AllocInfo;
+  MEMORY_PROFILE_CONTEXT_DATA      *ContextData;
+  MEMORY_PROFILE_DRIVER_INFO_DATA  *DriverInfoData;
+  MEMORY_PROFILE_ALLOC_INFO_DATA   *AllocInfoData;
+  EFI_MEMORY_TYPE                  ProfileMemoryIndex;
+  MEMORY_PROFILE_ACTION            BasicAction;
+  UINTN                            ActionStringSize;
+  UINTN                            ActionStringOccupiedSize;
 
   BasicAction = Action & MEMORY_PROFILE_ACTION_BASIC_MASK;
 
@@ -1111,10 +1124,10 @@ SmmCoreUpdateProfileAllocate (
     return EFI_UNSUPPORTED;
   }
 
-  ActionStringSize = 0;
+  ActionStringSize         = 0;
   ActionStringOccupiedSize = 0;
   if (ActionString != NULL) {
-    ActionStringSize = AsciiStrSize (ActionString);
+    ActionStringSize         = AsciiStrSize (ActionString);
     ActionStringOccupiedSize = GET_OCCUPIED_SIZE (ActionStringSize, sizeof (UINT64));
   }
 
@@ -1122,48 +1135,49 @@ SmmCoreUpdateProfileAllocate (
   // Use SmmInternalAllocatePool() that will not update profile for this AllocatePool action.
   //
   AllocInfoData = NULL;
-  Status = SmmInternalAllocatePool (
-             EfiRuntimeServicesData,
-             sizeof (*AllocInfoData) + ActionStringSize,
-             (VOID **) &AllocInfoData
-             );
+  Status        = SmmInternalAllocatePool (
+                    EfiRuntimeServicesData,
+                    sizeof (*AllocInfoData) + ActionStringSize,
+                    (VOID **)&AllocInfoData
+                    );
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   ASSERT (AllocInfoData != NULL);
 
   //
   // Only update SequenceCount if and only if it is basic action.
   //
   if (Action == BasicAction) {
-    ContextData->Context.SequenceCount ++;
+    ContextData->Context.SequenceCount++;
   }
 
-  AllocInfo = &AllocInfoData->AllocInfo;
-  AllocInfoData->Signature      = MEMORY_PROFILE_ALLOC_INFO_SIGNATURE;
-  AllocInfo->Header.Signature   = MEMORY_PROFILE_ALLOC_INFO_SIGNATURE;
-  AllocInfo->Header.Length      = (UINT16) (sizeof (MEMORY_PROFILE_ALLOC_INFO) + ActionStringOccupiedSize);
-  AllocInfo->Header.Revision    = MEMORY_PROFILE_ALLOC_INFO_REVISION;
-  AllocInfo->CallerAddress      = CallerAddress;
-  AllocInfo->SequenceId         = ContextData->Context.SequenceCount;
-  AllocInfo->Action             = Action;
-  AllocInfo->MemoryType         = MemoryType;
-  AllocInfo->Buffer             = (PHYSICAL_ADDRESS) (UINTN) Buffer;
-  AllocInfo->Size               = Size;
+  AllocInfo                   = &AllocInfoData->AllocInfo;
+  AllocInfoData->Signature    = MEMORY_PROFILE_ALLOC_INFO_SIGNATURE;
+  AllocInfo->Header.Signature = MEMORY_PROFILE_ALLOC_INFO_SIGNATURE;
+  AllocInfo->Header.Length    = (UINT16)(sizeof (MEMORY_PROFILE_ALLOC_INFO) + ActionStringOccupiedSize);
+  AllocInfo->Header.Revision  = MEMORY_PROFILE_ALLOC_INFO_REVISION;
+  AllocInfo->CallerAddress    = CallerAddress;
+  AllocInfo->SequenceId       = ContextData->Context.SequenceCount;
+  AllocInfo->Action           = Action;
+  AllocInfo->MemoryType       = MemoryType;
+  AllocInfo->Buffer           = (PHYSICAL_ADDRESS)(UINTN)Buffer;
+  AllocInfo->Size             = Size;
   if (ActionString != NULL) {
-    AllocInfo->ActionStringOffset = (UINT16) sizeof (MEMORY_PROFILE_ALLOC_INFO);
-    AllocInfoData->ActionString = (CHAR8 *) (AllocInfoData + 1);
+    AllocInfo->ActionStringOffset = (UINT16)sizeof (MEMORY_PROFILE_ALLOC_INFO);
+    AllocInfoData->ActionString   = (CHAR8 *)(AllocInfoData + 1);
     CopyMem (AllocInfoData->ActionString, ActionString, ActionStringSize);
   } else {
     AllocInfo->ActionStringOffset = 0;
-    AllocInfoData->ActionString = NULL;
+    AllocInfoData->ActionString   = NULL;
   }
 
   InsertTailList (DriverInfoData->AllocInfoList, &AllocInfoData->Link);
 
-  Context = &ContextData->Context;
+  Context    = &ContextData->Context;
   DriverInfo = &DriverInfoData->DriverInfo;
-  DriverInfo->AllocRecordCount ++;
+  DriverInfo->AllocRecordCount++;
 
   //
   // Update summary if and only if it is basic action.
@@ -1175,6 +1189,7 @@ SmmCoreUpdateProfileAllocate (
     if (DriverInfo->PeakUsage < DriverInfo->CurrentUsage) {
       DriverInfo->PeakUsage = DriverInfo->CurrentUsage;
     }
+
     DriverInfo->CurrentUsageByType[ProfileMemoryIndex] += Size;
     if (DriverInfo->PeakUsageByType[ProfileMemoryIndex] < DriverInfo->CurrentUsageByType[ProfileMemoryIndex]) {
       DriverInfo->PeakUsageByType[ProfileMemoryIndex] = DriverInfo->CurrentUsageByType[ProfileMemoryIndex];
@@ -1184,6 +1199,7 @@ SmmCoreUpdateProfileAllocate (
     if (Context->PeakTotalUsage < Context->CurrentTotalUsage) {
       Context->PeakTotalUsage = Context->CurrentTotalUsage;
     }
+
     Context->CurrentTotalUsageByType[ProfileMemoryIndex] += Size;
     if (Context->PeakTotalUsageByType[ProfileMemoryIndex] < Context->CurrentTotalUsageByType[ProfileMemoryIndex]) {
       Context->PeakTotalUsageByType[ProfileMemoryIndex] = Context->CurrentTotalUsageByType[ProfileMemoryIndex];
@@ -1207,22 +1223,23 @@ SmmCoreUpdateProfileAllocate (
 **/
 MEMORY_PROFILE_ALLOC_INFO_DATA *
 GetMemoryProfileAllocInfoFromAddress (
-  IN MEMORY_PROFILE_DRIVER_INFO_DATA    *DriverInfoData,
-  IN MEMORY_PROFILE_ACTION              BasicAction,
-  IN UINTN                              Size,
-  IN VOID                               *Buffer
+  IN MEMORY_PROFILE_DRIVER_INFO_DATA  *DriverInfoData,
+  IN MEMORY_PROFILE_ACTION            BasicAction,
+  IN UINTN                            Size,
+  IN VOID                             *Buffer
   )
 {
-  LIST_ENTRY                        *AllocInfoList;
-  LIST_ENTRY                        *AllocLink;
-  MEMORY_PROFILE_ALLOC_INFO         *AllocInfo;
-  MEMORY_PROFILE_ALLOC_INFO_DATA    *AllocInfoData;
+  LIST_ENTRY                      *AllocInfoList;
+  LIST_ENTRY                      *AllocLink;
+  MEMORY_PROFILE_ALLOC_INFO       *AllocInfo;
+  MEMORY_PROFILE_ALLOC_INFO_DATA  *AllocInfoData;
 
   AllocInfoList = DriverInfoData->AllocInfoList;
 
   for (AllocLink = AllocInfoList->ForwardLink;
        AllocLink != AllocInfoList;
-       AllocLink = AllocLink->ForwardLink) {
+       AllocLink = AllocLink->ForwardLink)
+  {
     AllocInfoData = CR (
                       AllocLink,
                       MEMORY_PROFILE_ALLOC_INFO_DATA,
@@ -1233,17 +1250,21 @@ GetMemoryProfileAllocInfoFromAddress (
     if ((AllocInfo->Action & MEMORY_PROFILE_ACTION_BASIC_MASK) != BasicAction) {
       continue;
     }
+
     switch (BasicAction) {
       case MemoryProfileActionAllocatePages:
-        if ((AllocInfo->Buffer <= (PHYSICAL_ADDRESS) (UINTN) Buffer) &&
-            ((AllocInfo->Buffer + AllocInfo->Size) >= ((PHYSICAL_ADDRESS) (UINTN) Buffer + Size))) {
+        if ((AllocInfo->Buffer <= (PHYSICAL_ADDRESS)(UINTN)Buffer) &&
+            ((AllocInfo->Buffer + AllocInfo->Size) >= ((PHYSICAL_ADDRESS)(UINTN)Buffer + Size)))
+        {
           return AllocInfoData;
         }
+
         break;
       case MemoryProfileActionAllocatePool:
-        if (AllocInfo->Buffer == (PHYSICAL_ADDRESS) (UINTN) Buffer) {
+        if (AllocInfo->Buffer == (PHYSICAL_ADDRESS)(UINTN)Buffer) {
           return AllocInfoData;
         }
+
         break;
       default:
         ASSERT (FALSE);
@@ -1306,7 +1327,7 @@ SmmCoreUpdateProfileFree (
   // Need use do-while loop to find all possible record,
   // because one address might be recorded multiple times.
   //
-  Found = FALSE;
+  Found         = FALSE;
   AllocInfoData = NULL;
   do {
     if (DriverInfoData != NULL) {
@@ -1323,6 +1344,7 @@ SmmCoreUpdateProfileFree (
           break;
       }
     }
+
     if (AllocInfoData == NULL) {
       //
       // Legal case, because driver A might free memory allocated by driver B, by some protocol.
@@ -1331,7 +1353,8 @@ SmmCoreUpdateProfileFree (
 
       for (DriverLink = DriverInfoList->ForwardLink;
            DriverLink != DriverInfoList;
-           DriverLink = DriverLink->ForwardLink) {
+           DriverLink = DriverLink->ForwardLink)
+      {
         ThisDriverInfoData = CR (
                                DriverLink,
                                MEMORY_PROFILE_DRIVER_INFO_DATA,
@@ -1350,6 +1373,7 @@ SmmCoreUpdateProfileFree (
             AllocInfoData = NULL;
             break;
         }
+
         if (AllocInfoData != NULL) {
           DriverInfoData = ThisDriverInfoData;
           break;
@@ -1374,44 +1398,45 @@ SmmCoreUpdateProfileFree (
 
     Found = TRUE;
 
-    Context = &ContextData->Context;
+    Context    = &ContextData->Context;
     DriverInfo = &DriverInfoData->DriverInfo;
-    AllocInfo = &AllocInfoData->AllocInfo;
+    AllocInfo  = &AllocInfoData->AllocInfo;
 
-    DriverInfo->AllocRecordCount --;
+    DriverInfo->AllocRecordCount--;
     //
     // Update summary if and only if it is basic action.
     //
     if (AllocInfo->Action == (AllocInfo->Action & MEMORY_PROFILE_ACTION_BASIC_MASK)) {
       ProfileMemoryIndex = GetProfileMemoryIndex (AllocInfo->MemoryType);
 
-      Context->CurrentTotalUsage -= AllocInfo->Size;
+      Context->CurrentTotalUsage                           -= AllocInfo->Size;
       Context->CurrentTotalUsageByType[ProfileMemoryIndex] -= AllocInfo->Size;
 
-      DriverInfo->CurrentUsage -= AllocInfo->Size;
+      DriverInfo->CurrentUsage                           -= AllocInfo->Size;
       DriverInfo->CurrentUsageByType[ProfileMemoryIndex] -= AllocInfo->Size;
     }
 
     RemoveEntryList (&AllocInfoData->Link);
 
     if (BasicAction == MemoryProfileActionFreePages) {
-      if (AllocInfo->Buffer != (PHYSICAL_ADDRESS) (UINTN) Buffer) {
+      if (AllocInfo->Buffer != (PHYSICAL_ADDRESS)(UINTN)Buffer) {
         SmmCoreUpdateProfileAllocate (
           AllocInfo->CallerAddress,
           AllocInfo->Action,
           AllocInfo->MemoryType,
-          (UINTN) ((PHYSICAL_ADDRESS) (UINTN) Buffer - AllocInfo->Buffer),
-          (VOID *) (UINTN) AllocInfo->Buffer,
+          (UINTN)((PHYSICAL_ADDRESS)(UINTN)Buffer - AllocInfo->Buffer),
+          (VOID *)(UINTN)AllocInfo->Buffer,
           AllocInfoData->ActionString
           );
       }
-      if (AllocInfo->Buffer + AllocInfo->Size != ((PHYSICAL_ADDRESS) (UINTN) Buffer + Size)) {
+
+      if (AllocInfo->Buffer + AllocInfo->Size != ((PHYSICAL_ADDRESS)(UINTN)Buffer + Size)) {
         SmmCoreUpdateProfileAllocate (
           AllocInfo->CallerAddress,
           AllocInfo->Action,
           AllocInfo->MemoryType,
-          (UINTN) ((AllocInfo->Buffer + AllocInfo->Size) - ((PHYSICAL_ADDRESS) (UINTN) Buffer + Size)),
-          (VOID *) ((UINTN) Buffer + Size),
+          (UINTN)((AllocInfo->Buffer + AllocInfo->Size) - ((PHYSICAL_ADDRESS)(UINTN)Buffer + Size)),
+          (VOID *)((UINTN)Buffer + Size),
           AllocInfoData->ActionString
           );
       }
@@ -1457,9 +1482,9 @@ SmmCoreUpdateProfile (
   IN CHAR8                  *ActionString OPTIONAL
   )
 {
-  EFI_STATUS                    Status;
-  MEMORY_PROFILE_CONTEXT_DATA   *ContextData;
-  MEMORY_PROFILE_ACTION         BasicAction;
+  EFI_STATUS                   Status;
+  MEMORY_PROFILE_CONTEXT_DATA  *ContextData;
+  MEMORY_PROFILE_ACTION        BasicAction;
 
   if (!IS_SMRAM_PROFILE_ENABLED) {
     return EFI_UNSUPPORTED;
@@ -1530,7 +1555,7 @@ SmramProfileReadyToLock (
     return;
   }
 
-  DEBUG ((EFI_D_INFO, "SmramProfileReadyToLock\n"));
+  DEBUG ((DEBUG_INFO, "SmramProfileReadyToLock\n"));
   mSmramReadyToLock = TRUE;
 }
 
@@ -1547,21 +1572,21 @@ SmramProfileGetDataSize (
   VOID
   )
 {
-  MEMORY_PROFILE_CONTEXT_DATA       *ContextData;
-  MEMORY_PROFILE_DRIVER_INFO_DATA   *DriverInfoData;
-  MEMORY_PROFILE_ALLOC_INFO_DATA    *AllocInfoData;
-  LIST_ENTRY                        *DriverInfoList;
-  LIST_ENTRY                        *DriverLink;
-  LIST_ENTRY                        *AllocInfoList;
-  LIST_ENTRY                        *AllocLink;
-  UINTN                             TotalSize;
-  LIST_ENTRY                        *Node;
-  LIST_ENTRY                        *FreePageList;
-  LIST_ENTRY                        *FreePoolList;
-  FREE_POOL_HEADER                  *Pool;
-  UINTN                             PoolListIndex;
-  UINTN                             Index;
-  UINTN                             SmmPoolTypeIndex;
+  MEMORY_PROFILE_CONTEXT_DATA      *ContextData;
+  MEMORY_PROFILE_DRIVER_INFO_DATA  *DriverInfoData;
+  MEMORY_PROFILE_ALLOC_INFO_DATA   *AllocInfoData;
+  LIST_ENTRY                       *DriverInfoList;
+  LIST_ENTRY                       *DriverLink;
+  LIST_ENTRY                       *AllocInfoList;
+  LIST_ENTRY                       *AllocLink;
+  UINTN                            TotalSize;
+  LIST_ENTRY                       *Node;
+  LIST_ENTRY                       *FreePageList;
+  LIST_ENTRY                       *FreePoolList;
+  FREE_POOL_HEADER                 *Pool;
+  UINTN                            PoolListIndex;
+  UINTN                            Index;
+  UINTN                            SmmPoolTypeIndex;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
@@ -1573,19 +1598,21 @@ SmramProfileGetDataSize (
   DriverInfoList = ContextData->DriverInfoList;
   for (DriverLink = DriverInfoList->ForwardLink;
        DriverLink != DriverInfoList;
-       DriverLink = DriverLink->ForwardLink) {
+       DriverLink = DriverLink->ForwardLink)
+  {
     DriverInfoData = CR (
-                   DriverLink,
-                   MEMORY_PROFILE_DRIVER_INFO_DATA,
-                   Link,
-                   MEMORY_PROFILE_DRIVER_INFO_SIGNATURE
-                   );
+                       DriverLink,
+                       MEMORY_PROFILE_DRIVER_INFO_DATA,
+                       Link,
+                       MEMORY_PROFILE_DRIVER_INFO_SIGNATURE
+                       );
     TotalSize += DriverInfoData->DriverInfo.Header.Length;
 
     AllocInfoList = DriverInfoData->AllocInfoList;
     for (AllocLink = AllocInfoList->ForwardLink;
          AllocLink != AllocInfoList;
-         AllocLink = AllocLink->ForwardLink) {
+         AllocLink = AllocLink->ForwardLink)
+    {
       AllocInfoData = CR (
                         AllocLink,
                         MEMORY_PROFILE_ALLOC_INFO_DATA,
@@ -1596,20 +1623,22 @@ SmramProfileGetDataSize (
     }
   }
 
-
-  Index = 0;
+  Index        = 0;
   FreePageList = &mSmmMemoryMap;
   for (Node = FreePageList->BackLink;
        Node != FreePageList;
-       Node = Node->BackLink) {
+       Node = Node->BackLink)
+  {
     Index++;
   }
+
   for (SmmPoolTypeIndex = 0; SmmPoolTypeIndex < SmmPoolTypeMax; SmmPoolTypeIndex++) {
     for (PoolListIndex = 0; PoolListIndex < MAX_POOL_INDEX; PoolListIndex++) {
       FreePoolList = &mSmmPoolLists[SmmPoolTypeIndex][PoolListIndex];
       for (Node = FreePoolList->BackLink;
            Node != FreePoolList;
-           Node = Node->BackLink) {
+           Node = Node->BackLink)
+      {
         Pool = BASE_CR (Node, FREE_POOL_HEADER, Link);
         if (Pool->Header.Available) {
           Index++;
@@ -1636,9 +1665,9 @@ SmramProfileGetDataSize (
 **/
 VOID
 SmramProfileCopyData (
-  OUT VOID      *ProfileBuffer,
-  IN OUT UINT64 *ProfileSize,
-  IN OUT UINT64 *ProfileOffset
+  OUT VOID       *ProfileBuffer,
+  IN OUT UINT64  *ProfileSize,
+  IN OUT UINT64  *ProfileOffset
   )
 {
   MEMORY_PROFILE_CONTEXT           *Context;
@@ -1647,50 +1676,52 @@ SmramProfileCopyData (
   MEMORY_PROFILE_CONTEXT_DATA      *ContextData;
   MEMORY_PROFILE_DRIVER_INFO_DATA  *DriverInfoData;
   MEMORY_PROFILE_ALLOC_INFO_DATA   *AllocInfoData;
-  LIST_ENTRY                      *DriverInfoList;
-  LIST_ENTRY                      *DriverLink;
-  LIST_ENTRY                      *AllocInfoList;
-  LIST_ENTRY                      *AllocLink;
-  LIST_ENTRY                      *Node;
-  FREE_PAGE_LIST                  *Pages;
-  LIST_ENTRY                      *FreePageList;
-  LIST_ENTRY                      *FreePoolList;
-  FREE_POOL_HEADER                *Pool;
-  UINTN                           PoolListIndex;
-  UINT32                          Index;
-  MEMORY_PROFILE_FREE_MEMORY      *FreeMemory;
-  MEMORY_PROFILE_MEMORY_RANGE     *MemoryRange;
-  MEMORY_PROFILE_DESCRIPTOR       *MemoryProfileDescriptor;
-  UINT64                          Offset;
-  UINT64                          RemainingSize;
-  UINTN                           PdbSize;
-  UINTN                           ActionStringSize;
-  UINTN                           SmmPoolTypeIndex;
+  LIST_ENTRY                       *DriverInfoList;
+  LIST_ENTRY                       *DriverLink;
+  LIST_ENTRY                       *AllocInfoList;
+  LIST_ENTRY                       *AllocLink;
+  LIST_ENTRY                       *Node;
+  FREE_PAGE_LIST                   *Pages;
+  LIST_ENTRY                       *FreePageList;
+  LIST_ENTRY                       *FreePoolList;
+  FREE_POOL_HEADER                 *Pool;
+  UINTN                            PoolListIndex;
+  UINT32                           Index;
+  MEMORY_PROFILE_FREE_MEMORY       *FreeMemory;
+  MEMORY_PROFILE_MEMORY_RANGE      *MemoryRange;
+  MEMORY_PROFILE_DESCRIPTOR        *MemoryProfileDescriptor;
+  UINT64                           Offset;
+  UINT64                           RemainingSize;
+  UINTN                            PdbSize;
+  UINTN                            ActionStringSize;
+  UINTN                            SmmPoolTypeIndex;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
-    return ;
+    return;
   }
 
   RemainingSize = *ProfileSize;
-  Offset = 0;
+  Offset        = 0;
 
   if (*ProfileOffset < sizeof (MEMORY_PROFILE_CONTEXT)) {
     if (RemainingSize >= sizeof (MEMORY_PROFILE_CONTEXT)) {
       Context = ProfileBuffer;
       CopyMem (Context, &ContextData->Context, sizeof (MEMORY_PROFILE_CONTEXT));
       RemainingSize -= sizeof (MEMORY_PROFILE_CONTEXT);
-      ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_CONTEXT);
+      ProfileBuffer  = (UINT8 *)ProfileBuffer + sizeof (MEMORY_PROFILE_CONTEXT);
     } else {
       goto Done;
     }
   }
+
   Offset += sizeof (MEMORY_PROFILE_CONTEXT);
 
   DriverInfoList = ContextData->DriverInfoList;
   for (DriverLink = DriverInfoList->ForwardLink;
        DriverLink != DriverInfoList;
-       DriverLink = DriverLink->ForwardLink) {
+       DriverLink = DriverLink->ForwardLink)
+  {
     DriverInfoData = CR (
                        DriverLink,
                        MEMORY_PROFILE_DRIVER_INFO_DATA,
@@ -1703,20 +1734,23 @@ SmramProfileCopyData (
         CopyMem (DriverInfo, &DriverInfoData->DriverInfo, sizeof (MEMORY_PROFILE_DRIVER_INFO));
         if (DriverInfo->PdbStringOffset != 0) {
           PdbSize = AsciiStrSize (DriverInfoData->PdbString);
-          CopyMem ((VOID *) ((UINTN) DriverInfo + DriverInfo->PdbStringOffset), DriverInfoData->PdbString, PdbSize);
+          CopyMem ((VOID *)((UINTN)DriverInfo + DriverInfo->PdbStringOffset), DriverInfoData->PdbString, PdbSize);
         }
+
         RemainingSize -= DriverInfo->Header.Length;
-        ProfileBuffer = (UINT8 *) ProfileBuffer + DriverInfo->Header.Length;
+        ProfileBuffer  = (UINT8 *)ProfileBuffer + DriverInfo->Header.Length;
       } else {
         goto Done;
       }
     }
+
     Offset += DriverInfoData->DriverInfo.Header.Length;
 
     AllocInfoList = DriverInfoData->AllocInfoList;
     for (AllocLink = AllocInfoList->ForwardLink;
          AllocLink != AllocInfoList;
-         AllocLink = AllocLink->ForwardLink) {
+         AllocLink = AllocLink->ForwardLink)
+    {
       AllocInfoData = CR (
                         AllocLink,
                         MEMORY_PROFILE_ALLOC_INFO_DATA,
@@ -1729,36 +1763,40 @@ SmramProfileCopyData (
           CopyMem (AllocInfo, &AllocInfoData->AllocInfo, sizeof (MEMORY_PROFILE_ALLOC_INFO));
           if (AllocInfo->ActionStringOffset) {
             ActionStringSize = AsciiStrSize (AllocInfoData->ActionString);
-            CopyMem ((VOID *) ((UINTN) AllocInfo + AllocInfo->ActionStringOffset), AllocInfoData->ActionString, ActionStringSize);
+            CopyMem ((VOID *)((UINTN)AllocInfo + AllocInfo->ActionStringOffset), AllocInfoData->ActionString, ActionStringSize);
           }
+
           RemainingSize -= AllocInfo->Header.Length;
-          ProfileBuffer = (UINT8 *) ProfileBuffer + AllocInfo->Header.Length;
+          ProfileBuffer  = (UINT8 *)ProfileBuffer + AllocInfo->Header.Length;
         } else {
           goto Done;
         }
       }
+
       Offset += AllocInfoData->AllocInfo.Header.Length;
     }
   }
-
 
   if (*ProfileOffset < (Offset + sizeof (MEMORY_PROFILE_FREE_MEMORY))) {
     if (RemainingSize >= sizeof (MEMORY_PROFILE_FREE_MEMORY)) {
       FreeMemory = ProfileBuffer;
       CopyMem (FreeMemory, &mSmramFreeMemory, sizeof (MEMORY_PROFILE_FREE_MEMORY));
-      Index = 0;
+      Index        = 0;
       FreePageList = &mSmmMemoryMap;
       for (Node = FreePageList->BackLink;
            Node != FreePageList;
-           Node = Node->BackLink) {
+           Node = Node->BackLink)
+      {
         Index++;
       }
+
       for (SmmPoolTypeIndex = 0; SmmPoolTypeIndex < SmmPoolTypeMax; SmmPoolTypeIndex++) {
         for (PoolListIndex = 0; PoolListIndex < MAX_POOL_INDEX; PoolListIndex++) {
           FreePoolList = &mSmmPoolLists[SmmPoolTypeIndex][MAX_POOL_INDEX - PoolListIndex - 1];
           for (Node = FreePoolList->BackLink;
                Node != FreePoolList;
-               Node = Node->BackLink) {
+               Node = Node->BackLink)
+          {
             Pool = BASE_CR (Node, FREE_POOL_HEADER, Link);
             if (Pool->Header.Available) {
               Index++;
@@ -1766,60 +1804,67 @@ SmramProfileCopyData (
           }
         }
       }
+
       FreeMemory->FreeMemoryEntryCount = Index;
 
       RemainingSize -= sizeof (MEMORY_PROFILE_FREE_MEMORY);
-      ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_FREE_MEMORY);
+      ProfileBuffer  = (UINT8 *)ProfileBuffer + sizeof (MEMORY_PROFILE_FREE_MEMORY);
     } else {
       goto Done;
     }
   }
-  Offset += sizeof (MEMORY_PROFILE_FREE_MEMORY);
+
+  Offset      += sizeof (MEMORY_PROFILE_FREE_MEMORY);
   FreePageList = &mSmmMemoryMap;
   for (Node = FreePageList->BackLink;
        Node != FreePageList;
-       Node = Node->BackLink) {
+       Node = Node->BackLink)
+  {
     if (*ProfileOffset < (Offset + sizeof (MEMORY_PROFILE_DESCRIPTOR))) {
       if (RemainingSize >= sizeof (MEMORY_PROFILE_DESCRIPTOR)) {
-        Pages = BASE_CR (Node, FREE_PAGE_LIST, Link);
-        MemoryProfileDescriptor = ProfileBuffer;
+        Pages                                     = BASE_CR (Node, FREE_PAGE_LIST, Link);
+        MemoryProfileDescriptor                   = ProfileBuffer;
         MemoryProfileDescriptor->Header.Signature = MEMORY_PROFILE_DESCRIPTOR_SIGNATURE;
-        MemoryProfileDescriptor->Header.Length = sizeof (MEMORY_PROFILE_DESCRIPTOR);
-        MemoryProfileDescriptor->Header.Revision = MEMORY_PROFILE_DESCRIPTOR_REVISION;
-        MemoryProfileDescriptor->Address = (PHYSICAL_ADDRESS) (UINTN) Pages;
-        MemoryProfileDescriptor->Size = EFI_PAGES_TO_SIZE (Pages->NumberOfPages);
+        MemoryProfileDescriptor->Header.Length    = sizeof (MEMORY_PROFILE_DESCRIPTOR);
+        MemoryProfileDescriptor->Header.Revision  = MEMORY_PROFILE_DESCRIPTOR_REVISION;
+        MemoryProfileDescriptor->Address          = (PHYSICAL_ADDRESS)(UINTN)Pages;
+        MemoryProfileDescriptor->Size             = EFI_PAGES_TO_SIZE (Pages->NumberOfPages);
 
         RemainingSize -= sizeof (MEMORY_PROFILE_DESCRIPTOR);
-        ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_DESCRIPTOR);
+        ProfileBuffer  = (UINT8 *)ProfileBuffer + sizeof (MEMORY_PROFILE_DESCRIPTOR);
       } else {
         goto Done;
       }
     }
+
     Offset += sizeof (MEMORY_PROFILE_DESCRIPTOR);
   }
+
   for (SmmPoolTypeIndex = 0; SmmPoolTypeIndex < SmmPoolTypeMax; SmmPoolTypeIndex++) {
     for (PoolListIndex = 0; PoolListIndex < MAX_POOL_INDEX; PoolListIndex++) {
       FreePoolList = &mSmmPoolLists[SmmPoolTypeIndex][MAX_POOL_INDEX - PoolListIndex - 1];
       for (Node = FreePoolList->BackLink;
            Node != FreePoolList;
-           Node = Node->BackLink) {
+           Node = Node->BackLink)
+      {
         Pool = BASE_CR (Node, FREE_POOL_HEADER, Link);
         if (Pool->Header.Available) {
           if (*ProfileOffset < (Offset + sizeof (MEMORY_PROFILE_DESCRIPTOR))) {
             if (RemainingSize >= sizeof (MEMORY_PROFILE_DESCRIPTOR)) {
-              MemoryProfileDescriptor = ProfileBuffer;
+              MemoryProfileDescriptor                   = ProfileBuffer;
               MemoryProfileDescriptor->Header.Signature = MEMORY_PROFILE_DESCRIPTOR_SIGNATURE;
-              MemoryProfileDescriptor->Header.Length = sizeof (MEMORY_PROFILE_DESCRIPTOR);
-              MemoryProfileDescriptor->Header.Revision = MEMORY_PROFILE_DESCRIPTOR_REVISION;
-              MemoryProfileDescriptor->Address = (PHYSICAL_ADDRESS) (UINTN) Pool;
-              MemoryProfileDescriptor->Size = Pool->Header.Size;
+              MemoryProfileDescriptor->Header.Length    = sizeof (MEMORY_PROFILE_DESCRIPTOR);
+              MemoryProfileDescriptor->Header.Revision  = MEMORY_PROFILE_DESCRIPTOR_REVISION;
+              MemoryProfileDescriptor->Address          = (PHYSICAL_ADDRESS)(UINTN)Pool;
+              MemoryProfileDescriptor->Size             = Pool->Header.Size;
 
               RemainingSize -= sizeof (MEMORY_PROFILE_DESCRIPTOR);
-              ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_DESCRIPTOR);
+              ProfileBuffer  = (UINT8 *)ProfileBuffer + sizeof (MEMORY_PROFILE_DESCRIPTOR);
             } else {
               goto Done;
             }
           }
+
           Offset += sizeof (MEMORY_PROFILE_DESCRIPTOR);
         }
       }
@@ -1828,35 +1873,37 @@ SmramProfileCopyData (
 
   if (*ProfileOffset < (Offset + sizeof (MEMORY_PROFILE_MEMORY_RANGE))) {
     if (RemainingSize >= sizeof (MEMORY_PROFILE_MEMORY_RANGE)) {
-      MemoryRange = ProfileBuffer;
+      MemoryRange                   = ProfileBuffer;
       MemoryRange->Header.Signature = MEMORY_PROFILE_MEMORY_RANGE_SIGNATURE;
-      MemoryRange->Header.Length = sizeof (MEMORY_PROFILE_MEMORY_RANGE);
-      MemoryRange->Header.Revision = MEMORY_PROFILE_MEMORY_RANGE_REVISION;
-      MemoryRange->MemoryRangeCount = (UINT32) mFullSmramRangeCount;
+      MemoryRange->Header.Length    = sizeof (MEMORY_PROFILE_MEMORY_RANGE);
+      MemoryRange->Header.Revision  = MEMORY_PROFILE_MEMORY_RANGE_REVISION;
+      MemoryRange->MemoryRangeCount = (UINT32)mFullSmramRangeCount;
 
       RemainingSize -= sizeof (MEMORY_PROFILE_MEMORY_RANGE);
-      ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_MEMORY_RANGE);
+      ProfileBuffer  = (UINT8 *)ProfileBuffer + sizeof (MEMORY_PROFILE_MEMORY_RANGE);
     } else {
       goto Done;
     }
   }
+
   Offset += sizeof (MEMORY_PROFILE_MEMORY_RANGE);
   for (Index = 0; Index < mFullSmramRangeCount; Index++) {
     if (*ProfileOffset < (Offset + sizeof (MEMORY_PROFILE_DESCRIPTOR))) {
       if (RemainingSize >= sizeof (MEMORY_PROFILE_DESCRIPTOR)) {
-        MemoryProfileDescriptor = ProfileBuffer;
+        MemoryProfileDescriptor                   = ProfileBuffer;
         MemoryProfileDescriptor->Header.Signature = MEMORY_PROFILE_DESCRIPTOR_SIGNATURE;
-        MemoryProfileDescriptor->Header.Length = sizeof (MEMORY_PROFILE_DESCRIPTOR);
-        MemoryProfileDescriptor->Header.Revision = MEMORY_PROFILE_DESCRIPTOR_REVISION;
-        MemoryProfileDescriptor->Address = mFullSmramRanges[Index].PhysicalStart;
-        MemoryProfileDescriptor->Size = mFullSmramRanges[Index].PhysicalSize;
+        MemoryProfileDescriptor->Header.Length    = sizeof (MEMORY_PROFILE_DESCRIPTOR);
+        MemoryProfileDescriptor->Header.Revision  = MEMORY_PROFILE_DESCRIPTOR_REVISION;
+        MemoryProfileDescriptor->Address          = mFullSmramRanges[Index].PhysicalStart;
+        MemoryProfileDescriptor->Size             = mFullSmramRanges[Index].PhysicalSize;
 
         RemainingSize -= sizeof (MEMORY_PROFILE_DESCRIPTOR);
-        ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_DESCRIPTOR);
+        ProfileBuffer  = (UINT8 *)ProfileBuffer + sizeof (MEMORY_PROFILE_DESCRIPTOR);
       } else {
         goto Done;
       }
     }
+
     Offset += sizeof (MEMORY_PROFILE_DESCRIPTOR);
   }
 
@@ -1890,26 +1937,26 @@ EFIAPI
 SmramProfileProtocolGetData (
   IN     EDKII_SMM_MEMORY_PROFILE_PROTOCOL  *This,
   IN OUT UINT64                             *ProfileSize,
-     OUT VOID                               *ProfileBuffer
+  OUT VOID                                  *ProfileBuffer
   )
 {
-  UINT64                                Size;
-  UINT64                                Offset;
-  MEMORY_PROFILE_CONTEXT_DATA           *ContextData;
-  BOOLEAN                               SmramProfileGettingStatus;
+  UINT64                       Size;
+  UINT64                       Offset;
+  MEMORY_PROFILE_CONTEXT_DATA  *ContextData;
+  BOOLEAN                      SmramProfileGettingStatus;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
     return EFI_UNSUPPORTED;
   }
 
-  SmramProfileGettingStatus = mSmramProfileGettingStatus;
+  SmramProfileGettingStatus  = mSmramProfileGettingStatus;
   mSmramProfileGettingStatus = TRUE;
 
   Size = SmramProfileGetDataSize ();
 
   if (*ProfileSize < Size) {
-    *ProfileSize = Size;
+    *ProfileSize               = Size;
     mSmramProfileGettingStatus = SmramProfileGettingStatus;
     return EFI_BUFFER_TOO_SMALL;
   }
@@ -1947,21 +1994,22 @@ SmramProfileProtocolRegisterImage (
   IN EFI_FV_FILETYPE                    FileType
   )
 {
-  EFI_STATUS                        Status;
-  EFI_SMM_DRIVER_ENTRY              DriverEntry;
-  VOID                              *EntryPointInImage;
-  EFI_GUID                          *Name;
+  EFI_STATUS            Status;
+  EFI_SMM_DRIVER_ENTRY  DriverEntry;
+  VOID                  *EntryPointInImage;
+  EFI_GUID              *Name;
 
   ZeroMem (&DriverEntry, sizeof (DriverEntry));
   Name = GetFileNameFromFilePath (FilePath);
   if (Name != NULL) {
     CopyMem (&DriverEntry.FileName, Name, sizeof (EFI_GUID));
   }
-  DriverEntry.ImageBuffer = ImageBase;
-  DriverEntry.NumberOfPage = EFI_SIZE_TO_PAGES ((UINTN) ImageSize);
-  Status = InternalPeCoffGetEntryPoint ((VOID *) (UINTN) DriverEntry.ImageBuffer, &EntryPointInImage);
+
+  DriverEntry.ImageBuffer  = ImageBase;
+  DriverEntry.NumberOfPage = EFI_SIZE_TO_PAGES ((UINTN)ImageSize);
+  Status                   = InternalPeCoffGetEntryPoint ((VOID *)(UINTN)DriverEntry.ImageBuffer, &EntryPointInImage);
   ASSERT_EFI_ERROR (Status);
-  DriverEntry.ImageEntryPoint = (PHYSICAL_ADDRESS) (UINTN) EntryPointInImage;
+  DriverEntry.ImageEntryPoint = (PHYSICAL_ADDRESS)(UINTN)EntryPointInImage;
 
   return RegisterSmramProfileImage (&DriverEntry, FALSE);
 }
@@ -1989,21 +2037,22 @@ SmramProfileProtocolUnregisterImage (
   IN UINT64                             ImageSize
   )
 {
-  EFI_STATUS                        Status;
-  EFI_SMM_DRIVER_ENTRY              DriverEntry;
-  VOID                              *EntryPointInImage;
-  EFI_GUID                          *Name;
+  EFI_STATUS            Status;
+  EFI_SMM_DRIVER_ENTRY  DriverEntry;
+  VOID                  *EntryPointInImage;
+  EFI_GUID              *Name;
 
   ZeroMem (&DriverEntry, sizeof (DriverEntry));
   Name = GetFileNameFromFilePath (FilePath);
   if (Name != NULL) {
     CopyMem (&DriverEntry.FileName, Name, sizeof (EFI_GUID));
   }
-  DriverEntry.ImageBuffer = ImageBase;
-  DriverEntry.NumberOfPage = EFI_SIZE_TO_PAGES ((UINTN) ImageSize);
-  Status = InternalPeCoffGetEntryPoint ((VOID *) (UINTN) DriverEntry.ImageBuffer, &EntryPointInImage);
+
+  DriverEntry.ImageBuffer  = ImageBase;
+  DriverEntry.NumberOfPage = EFI_SIZE_TO_PAGES ((UINTN)ImageSize);
+  Status                   = InternalPeCoffGetEntryPoint ((VOID *)(UINTN)DriverEntry.ImageBuffer, &EntryPointInImage);
   ASSERT_EFI_ERROR (Status);
-  DriverEntry.ImageEntryPoint = (PHYSICAL_ADDRESS) (UINTN) EntryPointInImage;
+  DriverEntry.ImageEntryPoint = (PHYSICAL_ADDRESS)(UINTN)EntryPointInImage;
 
   return UnregisterSmramProfileImage (&DriverEntry, FALSE);
 }
@@ -2026,7 +2075,7 @@ SmramProfileProtocolGetRecordingState (
   OUT BOOLEAN                           *RecordingState
   )
 {
-  MEMORY_PROFILE_CONTEXT_DATA           *ContextData;
+  MEMORY_PROFILE_CONTEXT_DATA  *ContextData;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
@@ -2036,6 +2085,7 @@ SmramProfileProtocolGetRecordingState (
   if (RecordingState == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   *RecordingState = mSmramProfileRecordingEnable;
   return EFI_SUCCESS;
 }
@@ -2057,7 +2107,7 @@ SmramProfileProtocolSetRecordingState (
   IN BOOLEAN                            RecordingState
   )
 {
-  MEMORY_PROFILE_CONTEXT_DATA           *ContextData;
+  MEMORY_PROFILE_CONTEXT_DATA  *ContextData;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
@@ -2114,21 +2164,21 @@ SmramProfileProtocolRecord (
 **/
 VOID
 SmramProfileHandlerGetInfo (
-  IN SMRAM_PROFILE_PARAMETER_GET_PROFILE_INFO   *SmramProfileParameterGetInfo
+  IN SMRAM_PROFILE_PARAMETER_GET_PROFILE_INFO  *SmramProfileParameterGetInfo
   )
 {
-  MEMORY_PROFILE_CONTEXT_DATA   *ContextData;
-  BOOLEAN                       SmramProfileGettingStatus;
+  MEMORY_PROFILE_CONTEXT_DATA  *ContextData;
+  BOOLEAN                      SmramProfileGettingStatus;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
-    return ;
+    return;
   }
 
-  SmramProfileGettingStatus = mSmramProfileGettingStatus;
+  SmramProfileGettingStatus  = mSmramProfileGettingStatus;
   mSmramProfileGettingStatus = TRUE;
 
-  SmramProfileParameterGetInfo->ProfileSize = SmramProfileGetDataSize();
+  SmramProfileParameterGetInfo->ProfileSize         = SmramProfileGetDataSize ();
   SmramProfileParameterGetInfo->Header.ReturnStatus = 0;
 
   mSmramProfileGettingStatus = SmramProfileGettingStatus;
@@ -2142,7 +2192,7 @@ SmramProfileHandlerGetInfo (
 **/
 VOID
 SmramProfileHandlerGetData (
-  IN SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA   *SmramProfileParameterGetData
+  IN SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA  *SmramProfileParameterGetData
   )
 {
   UINT64                                    ProfileSize;
@@ -2153,36 +2203,35 @@ SmramProfileHandlerGetData (
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
-    return ;
+    return;
   }
 
-  SmramProfileGettingStatus = mSmramProfileGettingStatus;
+  SmramProfileGettingStatus  = mSmramProfileGettingStatus;
   mSmramProfileGettingStatus = TRUE;
-
 
   CopyMem (&SmramProfileGetData, SmramProfileParameterGetData, sizeof (SmramProfileGetData));
 
-  ProfileSize = SmramProfileGetDataSize();
+  ProfileSize = SmramProfileGetDataSize ();
 
   //
   // Sanity check
   //
-  if (!SmmIsBufferOutsideSmmValid ((UINTN) SmramProfileGetData.ProfileBuffer, (UINTN) ProfileSize)) {
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetData: SMM ProfileBuffer in SMRAM or overflow!\n"));
-    SmramProfileParameterGetData->ProfileSize = ProfileSize;
-    SmramProfileParameterGetData->Header.ReturnStatus = (UINT64) (INT64) (INTN) EFI_ACCESS_DENIED;
+  if (!SmmIsBufferOutsideSmmValid ((UINTN)SmramProfileGetData.ProfileBuffer, (UINTN)ProfileSize)) {
+    DEBUG ((DEBUG_ERROR, "SmramProfileHandlerGetData: SMM ProfileBuffer in SMRAM or overflow!\n"));
+    SmramProfileParameterGetData->ProfileSize         = ProfileSize;
+    SmramProfileParameterGetData->Header.ReturnStatus = (UINT64)(INT64)(INTN)EFI_ACCESS_DENIED;
     goto Done;
   }
 
   if (SmramProfileGetData.ProfileSize < ProfileSize) {
-    SmramProfileParameterGetData->ProfileSize = ProfileSize;
-    SmramProfileParameterGetData->Header.ReturnStatus = (UINT64) (INT64) (INTN) EFI_BUFFER_TOO_SMALL;
+    SmramProfileParameterGetData->ProfileSize         = ProfileSize;
+    SmramProfileParameterGetData->Header.ReturnStatus = (UINT64)(INT64)(INTN)EFI_BUFFER_TOO_SMALL;
     goto Done;
   }
 
   ProfileOffset = 0;
-  SmramProfileCopyData ((VOID *) (UINTN) SmramProfileGetData.ProfileBuffer, &ProfileSize, &ProfileOffset);
-  SmramProfileParameterGetData->ProfileSize = ProfileSize;
+  SmramProfileCopyData ((VOID *)(UINTN)SmramProfileGetData.ProfileBuffer, &ProfileSize, &ProfileOffset);
+  SmramProfileParameterGetData->ProfileSize         = ProfileSize;
   SmramProfileParameterGetData->Header.ReturnStatus = 0;
 
 Done:
@@ -2197,97 +2246,38 @@ Done:
 **/
 VOID
 SmramProfileHandlerGetDataByOffset (
-  IN SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET     *SmramProfileParameterGetDataByOffset
+  IN SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET  *SmramProfileParameterGetDataByOffset
   )
 {
-  SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET    SmramProfileGetDataByOffset;
-  MEMORY_PROFILE_CONTEXT_DATA                           *ContextData;
-  BOOLEAN                                               SmramProfileGettingStatus;
+  SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET  SmramProfileGetDataByOffset;
+  MEMORY_PROFILE_CONTEXT_DATA                         *ContextData;
+  BOOLEAN                                             SmramProfileGettingStatus;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
-    return ;
+    return;
   }
 
-  SmramProfileGettingStatus = mSmramProfileGettingStatus;
+  SmramProfileGettingStatus  = mSmramProfileGettingStatus;
   mSmramProfileGettingStatus = TRUE;
-
 
   CopyMem (&SmramProfileGetDataByOffset, SmramProfileParameterGetDataByOffset, sizeof (SmramProfileGetDataByOffset));
 
   //
   // Sanity check
   //
-  if (!SmmIsBufferOutsideSmmValid ((UINTN) SmramProfileGetDataByOffset.ProfileBuffer, (UINTN) SmramProfileGetDataByOffset.ProfileSize)) {
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetDataByOffset: SMM ProfileBuffer in SMRAM or overflow!\n"));
-    SmramProfileParameterGetDataByOffset->Header.ReturnStatus = (UINT64) (INT64) (INTN) EFI_ACCESS_DENIED;
+  if (!SmmIsBufferOutsideSmmValid ((UINTN)SmramProfileGetDataByOffset.ProfileBuffer, (UINTN)SmramProfileGetDataByOffset.ProfileSize)) {
+    DEBUG ((DEBUG_ERROR, "SmramProfileHandlerGetDataByOffset: SMM ProfileBuffer in SMRAM or overflow!\n"));
+    SmramProfileParameterGetDataByOffset->Header.ReturnStatus = (UINT64)(INT64)(INTN)EFI_ACCESS_DENIED;
     goto Done;
   }
 
-  SmramProfileCopyData ((VOID *) (UINTN) SmramProfileGetDataByOffset.ProfileBuffer, &SmramProfileGetDataByOffset.ProfileSize, &SmramProfileGetDataByOffset.ProfileOffset);
+  SmramProfileCopyData ((VOID *)(UINTN)SmramProfileGetDataByOffset.ProfileBuffer, &SmramProfileGetDataByOffset.ProfileSize, &SmramProfileGetDataByOffset.ProfileOffset);
   CopyMem (SmramProfileParameterGetDataByOffset, &SmramProfileGetDataByOffset, sizeof (SmramProfileGetDataByOffset));
   SmramProfileParameterGetDataByOffset->Header.ReturnStatus = 0;
 
 Done:
   mSmramProfileGettingStatus = SmramProfileGettingStatus;
-}
-
-/**
-  SMRAM profile handler to register SMM image.
-
-  @param SmramProfileParameterRegisterImage The parameter of SMM profile register image.
-
-**/
-VOID
-SmramProfileHandlerRegisterImage (
-  IN SMRAM_PROFILE_PARAMETER_REGISTER_IMAGE *SmramProfileParameterRegisterImage
-  )
-{
-  EFI_STATUS                        Status;
-  EFI_SMM_DRIVER_ENTRY              DriverEntry;
-  VOID                              *EntryPointInImage;
-
-  ZeroMem (&DriverEntry, sizeof (DriverEntry));
-  CopyMem (&DriverEntry.FileName, &SmramProfileParameterRegisterImage->FileName, sizeof(EFI_GUID));
-  DriverEntry.ImageBuffer = SmramProfileParameterRegisterImage->ImageBuffer;
-  DriverEntry.NumberOfPage = (UINTN) SmramProfileParameterRegisterImage->NumberOfPage;
-  Status = InternalPeCoffGetEntryPoint ((VOID *) (UINTN) DriverEntry.ImageBuffer, &EntryPointInImage);
-  ASSERT_EFI_ERROR (Status);
-  DriverEntry.ImageEntryPoint = (PHYSICAL_ADDRESS) (UINTN) EntryPointInImage;
-
-  Status = RegisterSmramProfileImage (&DriverEntry, FALSE);
-  if (!EFI_ERROR (Status)) {
-    SmramProfileParameterRegisterImage->Header.ReturnStatus = 0;
-  }
-}
-
-/**
-  SMRAM profile handler to unregister SMM image.
-
-  @param SmramProfileParameterUnregisterImage The parameter of SMM profile unregister image.
-
-**/
-VOID
-SmramProfileHandlerUnregisterImage (
-  IN SMRAM_PROFILE_PARAMETER_UNREGISTER_IMAGE *SmramProfileParameterUnregisterImage
-  )
-{
-  EFI_STATUS                        Status;
-  EFI_SMM_DRIVER_ENTRY              DriverEntry;
-  VOID                              *EntryPointInImage;
-
-  ZeroMem (&DriverEntry, sizeof (DriverEntry));
-  CopyMem (&DriverEntry.FileName, &SmramProfileParameterUnregisterImage->FileName, sizeof (EFI_GUID));
-  DriverEntry.ImageBuffer = SmramProfileParameterUnregisterImage->ImageBuffer;
-  DriverEntry.NumberOfPage = (UINTN) SmramProfileParameterUnregisterImage->NumberOfPage;
-  Status = InternalPeCoffGetEntryPoint ((VOID *) (UINTN) DriverEntry.ImageBuffer, &EntryPointInImage);
-  ASSERT_EFI_ERROR (Status);
-  DriverEntry.ImageEntryPoint = (PHYSICAL_ADDRESS) (UINTN) EntryPointInImage;
-
-  Status = UnregisterSmramProfileImage (&DriverEntry, FALSE);
-  if (!EFI_ERROR (Status)) {
-    SmramProfileParameterUnregisterImage->Header.ReturnStatus = 0;
-  }
 }
 
 /**
@@ -2319,109 +2309,101 @@ SmramProfileHandler (
   UINTN                                    TempCommBufferSize;
   SMRAM_PROFILE_PARAMETER_RECORDING_STATE  *ParameterRecordingState;
 
-  DEBUG ((EFI_D_ERROR, "SmramProfileHandler Enter\n"));
+  DEBUG ((DEBUG_ERROR, "SmramProfileHandler Enter\n"));
 
   //
   // If input is invalid, stop processing this SMI
   //
-  if (CommBuffer == NULL || CommBufferSize == NULL) {
+  if ((CommBuffer == NULL) || (CommBufferSize == NULL)) {
     return EFI_SUCCESS;
   }
 
   TempCommBufferSize = *CommBufferSize;
 
   if (TempCommBufferSize < sizeof (SMRAM_PROFILE_PARAMETER_HEADER)) {
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
+    DEBUG ((DEBUG_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
     return EFI_SUCCESS;
   }
 
   if (mSmramReadyToLock && !SmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer in SMRAM or overflow!\n"));
+    DEBUG ((DEBUG_ERROR, "SmramProfileHandler: SMM communication buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
 
-  SmramProfileParameterHeader = (SMRAM_PROFILE_PARAMETER_HEADER *) ((UINTN) CommBuffer);
+  SmramProfileParameterHeader = (SMRAM_PROFILE_PARAMETER_HEADER *)((UINTN)CommBuffer);
 
   SmramProfileParameterHeader->ReturnStatus = (UINT64)-1;
 
   if (GetSmramProfileContext () == NULL) {
-    SmramProfileParameterHeader->ReturnStatus = (UINT64) (INT64) (INTN) EFI_UNSUPPORTED;
+    SmramProfileParameterHeader->ReturnStatus = (UINT64)(INT64)(INTN)EFI_UNSUPPORTED;
     return EFI_SUCCESS;
   }
 
   switch (SmramProfileParameterHeader->Command) {
-  case SMRAM_PROFILE_COMMAND_GET_PROFILE_INFO:
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetInfo\n"));
-    if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_INFO)) {
-      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
-      return EFI_SUCCESS;
-    }
-    SmramProfileHandlerGetInfo ((SMRAM_PROFILE_PARAMETER_GET_PROFILE_INFO *) (UINTN) CommBuffer);
-    break;
-  case SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA:
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetData\n"));
-    if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA)) {
-      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
-      return EFI_SUCCESS;
-    }
-    SmramProfileHandlerGetData ((SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA *) (UINTN) CommBuffer);
-    break;
-  case SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA_BY_OFFSET:
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetDataByOffset\n"));
-    if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET)) {
-      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
-      return EFI_SUCCESS;
-    }
-    SmramProfileHandlerGetDataByOffset ((SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET *) (UINTN) CommBuffer);
-    break;
-  case SMRAM_PROFILE_COMMAND_REGISTER_IMAGE:
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerRegisterImage\n"));
-    if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_REGISTER_IMAGE)) {
-      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
-      return EFI_SUCCESS;
-    }
-    if (mSmramReadyToLock) {
-      return EFI_SUCCESS;
-    }
-    SmramProfileHandlerRegisterImage ((SMRAM_PROFILE_PARAMETER_REGISTER_IMAGE *) (UINTN) CommBuffer);
-    break;
-  case SMRAM_PROFILE_COMMAND_UNREGISTER_IMAGE:
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerUnregisterImage\n"));
-    if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_UNREGISTER_IMAGE)) {
-      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
-      return EFI_SUCCESS;
-    }
-    if (mSmramReadyToLock) {
-      return EFI_SUCCESS;
-    }
-    SmramProfileHandlerUnregisterImage ((SMRAM_PROFILE_PARAMETER_UNREGISTER_IMAGE *) (UINTN) CommBuffer);
-    break;
-  case SMRAM_PROFILE_COMMAND_GET_RECORDING_STATE:
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetRecordingState\n"));
-    if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_RECORDING_STATE)) {
-      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
-      return EFI_SUCCESS;
-    }
-    ParameterRecordingState = (SMRAM_PROFILE_PARAMETER_RECORDING_STATE *) (UINTN) CommBuffer;
-    ParameterRecordingState->RecordingState = mSmramProfileRecordingEnable;
-    ParameterRecordingState->Header.ReturnStatus = 0;
-    break;
-  case SMRAM_PROFILE_COMMAND_SET_RECORDING_STATE:
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerSetRecordingState\n"));
-    if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_RECORDING_STATE)) {
-      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
-      return EFI_SUCCESS;
-    }
-    ParameterRecordingState = (SMRAM_PROFILE_PARAMETER_RECORDING_STATE *) (UINTN) CommBuffer;
-    mSmramProfileRecordingEnable = ParameterRecordingState->RecordingState;
-    ParameterRecordingState->Header.ReturnStatus = 0;
-    break;
+    case SMRAM_PROFILE_COMMAND_GET_PROFILE_INFO:
+      DEBUG ((DEBUG_ERROR, "SmramProfileHandlerGetInfo\n"));
+      if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_INFO)) {
+        DEBUG ((DEBUG_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
+        return EFI_SUCCESS;
+      }
 
-  default:
-    break;
+      SmramProfileHandlerGetInfo ((SMRAM_PROFILE_PARAMETER_GET_PROFILE_INFO *)(UINTN)CommBuffer);
+      break;
+    case SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA:
+      DEBUG ((DEBUG_ERROR, "SmramProfileHandlerGetData\n"));
+      if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA)) {
+        DEBUG ((DEBUG_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
+        return EFI_SUCCESS;
+      }
+
+      SmramProfileHandlerGetData ((SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA *)(UINTN)CommBuffer);
+      break;
+    case SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA_BY_OFFSET:
+      DEBUG ((DEBUG_ERROR, "SmramProfileHandlerGetDataByOffset\n"));
+      if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET)) {
+        DEBUG ((DEBUG_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
+        return EFI_SUCCESS;
+      }
+
+      SmramProfileHandlerGetDataByOffset ((SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET *)(UINTN)CommBuffer);
+      break;
+    case SMRAM_PROFILE_COMMAND_GET_RECORDING_STATE:
+      DEBUG ((DEBUG_ERROR, "SmramProfileHandlerGetRecordingState\n"));
+      if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_RECORDING_STATE)) {
+        DEBUG ((DEBUG_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
+        return EFI_SUCCESS;
+      }
+
+      ParameterRecordingState                      = (SMRAM_PROFILE_PARAMETER_RECORDING_STATE *)(UINTN)CommBuffer;
+      ParameterRecordingState->RecordingState      = mSmramProfileRecordingEnable;
+      ParameterRecordingState->Header.ReturnStatus = 0;
+      break;
+    case SMRAM_PROFILE_COMMAND_SET_RECORDING_STATE:
+      DEBUG ((DEBUG_ERROR, "SmramProfileHandlerSetRecordingState\n"));
+      if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_RECORDING_STATE)) {
+        DEBUG ((DEBUG_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
+        return EFI_SUCCESS;
+      }
+
+      ParameterRecordingState                      = (SMRAM_PROFILE_PARAMETER_RECORDING_STATE *)(UINTN)CommBuffer;
+      mSmramProfileRecordingEnable                 = ParameterRecordingState->RecordingState;
+      ParameterRecordingState->Header.ReturnStatus = 0;
+      break;
+
+    //
+    // Below 2 commands have been deprecated. They may not be (re-)used.
+    //
+    case SMRAM_PROFILE_COMMAND_DEPRECATED1:
+    case SMRAM_PROFILE_COMMAND_DEPRECATED2:
+      ASSERT (FALSE);
+    //
+    // Fall-through to the default (unrecognized command) case.
+    //
+    default:
+      break;
   }
 
-  DEBUG ((EFI_D_ERROR, "SmramProfileHandler Exit\n"));
+  DEBUG ((DEBUG_ERROR, "SmramProfileHandler Exit\n"));
 
   return EFI_SUCCESS;
 }
@@ -2435,8 +2417,8 @@ RegisterSmramProfileHandler (
   VOID
   )
 {
-  EFI_STATUS    Status;
-  EFI_HANDLE    DispatchHandle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  DispatchHandle;
 
   if (!IS_SMRAM_PROFILE_ENABLED) {
     return;
@@ -2461,32 +2443,32 @@ DumpSmramRange (
   VOID
   )
 {
-  UINTN                         Index;
-  MEMORY_PROFILE_CONTEXT_DATA   *ContextData;
-  BOOLEAN                       SmramProfileGettingStatus;
+  UINTN                        Index;
+  MEMORY_PROFILE_CONTEXT_DATA  *ContextData;
+  BOOLEAN                      SmramProfileGettingStatus;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
-    return ;
+    return;
   }
 
-  SmramProfileGettingStatus = mSmramProfileGettingStatus;
+  SmramProfileGettingStatus  = mSmramProfileGettingStatus;
   mSmramProfileGettingStatus = TRUE;
 
-  DEBUG ((EFI_D_INFO, "FullSmramRange address - 0x%08x\n", mFullSmramRanges));
+  DEBUG ((DEBUG_INFO, "FullSmramRange address - 0x%08x\n", mFullSmramRanges));
 
-  DEBUG ((EFI_D_INFO, "======= SmramProfile begin =======\n"));
+  DEBUG ((DEBUG_INFO, "======= SmramProfile begin =======\n"));
 
-  DEBUG ((EFI_D_INFO, "FullSmramRange:\n"));
+  DEBUG ((DEBUG_INFO, "FullSmramRange:\n"));
   for (Index = 0; Index < mFullSmramRangeCount; Index++) {
-    DEBUG ((EFI_D_INFO, "  FullSmramRange (0x%x)\n", Index));
-    DEBUG ((EFI_D_INFO, "    PhysicalStart      - 0x%016lx\n", mFullSmramRanges[Index].PhysicalStart));
-    DEBUG ((EFI_D_INFO, "    CpuStart           - 0x%016lx\n", mFullSmramRanges[Index].CpuStart));
-    DEBUG ((EFI_D_INFO, "    PhysicalSize       - 0x%016lx\n", mFullSmramRanges[Index].PhysicalSize));
-    DEBUG ((EFI_D_INFO, "    RegionState        - 0x%016lx\n", mFullSmramRanges[Index].RegionState));
+    DEBUG ((DEBUG_INFO, "  FullSmramRange (0x%x)\n", Index));
+    DEBUG ((DEBUG_INFO, "    PhysicalStart      - 0x%016lx\n", mFullSmramRanges[Index].PhysicalStart));
+    DEBUG ((DEBUG_INFO, "    CpuStart           - 0x%016lx\n", mFullSmramRanges[Index].CpuStart));
+    DEBUG ((DEBUG_INFO, "    PhysicalSize       - 0x%016lx\n", mFullSmramRanges[Index].PhysicalSize));
+    DEBUG ((DEBUG_INFO, "    RegionState        - 0x%016lx\n", mFullSmramRanges[Index].RegionState));
   }
 
-  DEBUG ((EFI_D_INFO, "======= SmramProfile end =======\n"));
+  DEBUG ((DEBUG_INFO, "======= SmramProfile end =======\n"));
 
   mSmramProfileGettingStatus = SmramProfileGettingStatus;
 }
@@ -2500,35 +2482,36 @@ DumpFreePagesList (
   VOID
   )
 {
-  LIST_ENTRY                    *FreePageList;
-  LIST_ENTRY                    *Node;
-  FREE_PAGE_LIST                *Pages;
-  UINTN                         Index;
-  MEMORY_PROFILE_CONTEXT_DATA   *ContextData;
-  BOOLEAN                       SmramProfileGettingStatus;
+  LIST_ENTRY                   *FreePageList;
+  LIST_ENTRY                   *Node;
+  FREE_PAGE_LIST               *Pages;
+  UINTN                        Index;
+  MEMORY_PROFILE_CONTEXT_DATA  *ContextData;
+  BOOLEAN                      SmramProfileGettingStatus;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
-    return ;
+    return;
   }
 
-  SmramProfileGettingStatus = mSmramProfileGettingStatus;
+  SmramProfileGettingStatus  = mSmramProfileGettingStatus;
   mSmramProfileGettingStatus = TRUE;
 
-  DEBUG ((EFI_D_INFO, "======= SmramProfile begin =======\n"));
+  DEBUG ((DEBUG_INFO, "======= SmramProfile begin =======\n"));
 
-  DEBUG ((EFI_D_INFO, "FreePagesList:\n"));
+  DEBUG ((DEBUG_INFO, "FreePagesList:\n"));
   FreePageList = &mSmmMemoryMap;
   for (Node = FreePageList->BackLink, Index = 0;
        Node != FreePageList;
-       Node = Node->BackLink, Index++) {
+       Node = Node->BackLink, Index++)
+  {
     Pages = BASE_CR (Node, FREE_PAGE_LIST, Link);
-    DEBUG ((EFI_D_INFO, "  Index - 0x%x\n", Index));
-    DEBUG ((EFI_D_INFO, "    PhysicalStart - 0x%016lx\n", (PHYSICAL_ADDRESS) (UINTN) Pages));
-    DEBUG ((EFI_D_INFO, "    NumberOfPages - 0x%08x\n", Pages->NumberOfPages));
+    DEBUG ((DEBUG_INFO, "  Index - 0x%x\n", Index));
+    DEBUG ((DEBUG_INFO, "    PhysicalStart - 0x%016lx\n", (PHYSICAL_ADDRESS)(UINTN)Pages));
+    DEBUG ((DEBUG_INFO, "    NumberOfPages - 0x%08x\n", Pages->NumberOfPages));
   }
 
-  DEBUG ((EFI_D_INFO, "======= SmramProfile end =======\n"));
+  DEBUG ((DEBUG_INFO, "======= SmramProfile end =======\n"));
 
   mSmramProfileGettingStatus = SmramProfileGettingStatus;
 }
@@ -2542,21 +2525,21 @@ DumpFreePoolList (
   VOID
   )
 {
-  LIST_ENTRY                    *FreePoolList;
-  LIST_ENTRY                    *Node;
-  FREE_POOL_HEADER              *Pool;
-  UINTN                         Index;
-  UINTN                         PoolListIndex;
-  MEMORY_PROFILE_CONTEXT_DATA   *ContextData;
-  BOOLEAN                       SmramProfileGettingStatus;
-  UINTN                         SmmPoolTypeIndex;
+  LIST_ENTRY                   *FreePoolList;
+  LIST_ENTRY                   *Node;
+  FREE_POOL_HEADER             *Pool;
+  UINTN                        Index;
+  UINTN                        PoolListIndex;
+  MEMORY_PROFILE_CONTEXT_DATA  *ContextData;
+  BOOLEAN                      SmramProfileGettingStatus;
+  UINTN                        SmmPoolTypeIndex;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
-    return ;
+    return;
   }
 
-  SmramProfileGettingStatus = mSmramProfileGettingStatus;
+  SmramProfileGettingStatus  = mSmramProfileGettingStatus;
   mSmramProfileGettingStatus = TRUE;
 
   DEBUG ((DEBUG_INFO, "======= SmramProfile begin =======\n"));
@@ -2567,10 +2550,11 @@ DumpFreePoolList (
       FreePoolList = &mSmmPoolLists[SmmPoolTypeIndex][PoolListIndex];
       for (Node = FreePoolList->BackLink, Index = 0;
            Node != FreePoolList;
-           Node = Node->BackLink, Index++) {
+           Node = Node->BackLink, Index++)
+      {
         Pool = BASE_CR (Node, FREE_POOL_HEADER, Link);
         DEBUG ((DEBUG_INFO, "  Index - 0x%x\n", Index));
-        DEBUG ((DEBUG_INFO, "    PhysicalStart - 0x%016lx\n", (PHYSICAL_ADDRESS) (UINTN) Pool));
+        DEBUG ((DEBUG_INFO, "    PhysicalStart - 0x%016lx\n", (PHYSICAL_ADDRESS)(UINTN)Pool));
         DEBUG ((DEBUG_INFO, "    Size          - 0x%08x\n", Pool->Header.Size));
         DEBUG ((DEBUG_INFO, "    Available     - 0x%02x\n", Pool->Header.Available));
       }
@@ -2582,7 +2566,7 @@ DumpFreePoolList (
   mSmramProfileGettingStatus = SmramProfileGettingStatus;
 }
 
-GLOBAL_REMOVE_IF_UNREFERENCED CHAR8 *mSmmActionString[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED CHAR8  *mSmmActionString[] = {
   "SmmUnknown",
   "gSmst->SmmAllocatePages",
   "gSmst->SmmFreePages",
@@ -2591,42 +2575,42 @@ GLOBAL_REMOVE_IF_UNREFERENCED CHAR8 *mSmmActionString[] = {
 };
 
 typedef struct {
-  MEMORY_PROFILE_ACTION  Action;
-  CHAR8                 *String;
+  MEMORY_PROFILE_ACTION    Action;
+  CHAR8                    *String;
 } ACTION_STRING;
 
-GLOBAL_REMOVE_IF_UNREFERENCED ACTION_STRING mExtActionString[] = {
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_PAGES,                    "Lib:AllocatePages"},
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_PAGES,            "Lib:AllocateRuntimePages"},
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RESERVED_PAGES,           "Lib:AllocateReservedPages"},
-  {MEMORY_PROFILE_ACTION_LIB_FREE_PAGES,                        "Lib:FreePages"},
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_ALIGNED_PAGES,            "Lib:AllocateAlignedPages"},
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_ALIGNED_RUNTIME_PAGES,    "Lib:AllocateAlignedRuntimePages"},
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_ALIGNED_RESERVED_PAGES,   "Lib:AllocateAlignedReservedPages"},
-  {MEMORY_PROFILE_ACTION_LIB_FREE_ALIGNED_PAGES,                "Lib:FreeAlignedPages"},
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_POOL,                     "Lib:AllocatePool"},
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_POOL,             "Lib:AllocateRuntimePool"},
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RESERVED_POOL,            "Lib:AllocateReservedPool"},
-  {MEMORY_PROFILE_ACTION_LIB_FREE_POOL,                         "Lib:FreePool"},
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_ZERO_POOL,                "Lib:AllocateZeroPool"},
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_ZERO_POOL,        "Lib:AllocateRuntimeZeroPool"},
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RESERVED_ZERO_POOL,       "Lib:AllocateReservedZeroPool"},
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_COPY_POOL,                "Lib:AllocateCopyPool"},
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_COPY_POOL,        "Lib:AllocateRuntimeCopyPool"},
-  {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RESERVED_COPY_POOL,       "Lib:AllocateReservedCopyPool"},
-  {MEMORY_PROFILE_ACTION_LIB_REALLOCATE_POOL,                   "Lib:ReallocatePool"},
-  {MEMORY_PROFILE_ACTION_LIB_REALLOCATE_RUNTIME_POOL,           "Lib:ReallocateRuntimePool"},
-  {MEMORY_PROFILE_ACTION_LIB_REALLOCATE_RESERVED_POOL,          "Lib:ReallocateReservedPool"},
+GLOBAL_REMOVE_IF_UNREFERENCED ACTION_STRING  mExtActionString[] = {
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_PAGES,                  "Lib:AllocatePages"                },
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_PAGES,          "Lib:AllocateRuntimePages"         },
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RESERVED_PAGES,         "Lib:AllocateReservedPages"        },
+  { MEMORY_PROFILE_ACTION_LIB_FREE_PAGES,                      "Lib:FreePages"                    },
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_ALIGNED_PAGES,          "Lib:AllocateAlignedPages"         },
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_ALIGNED_RUNTIME_PAGES,  "Lib:AllocateAlignedRuntimePages"  },
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_ALIGNED_RESERVED_PAGES, "Lib:AllocateAlignedReservedPages" },
+  { MEMORY_PROFILE_ACTION_LIB_FREE_ALIGNED_PAGES,              "Lib:FreeAlignedPages"             },
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_POOL,                   "Lib:AllocatePool"                 },
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_POOL,           "Lib:AllocateRuntimePool"          },
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RESERVED_POOL,          "Lib:AllocateReservedPool"         },
+  { MEMORY_PROFILE_ACTION_LIB_FREE_POOL,                       "Lib:FreePool"                     },
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_ZERO_POOL,              "Lib:AllocateZeroPool"             },
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_ZERO_POOL,      "Lib:AllocateRuntimeZeroPool"      },
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RESERVED_ZERO_POOL,     "Lib:AllocateReservedZeroPool"     },
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_COPY_POOL,              "Lib:AllocateCopyPool"             },
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_COPY_POOL,      "Lib:AllocateRuntimeCopyPool"      },
+  { MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RESERVED_COPY_POOL,     "Lib:AllocateReservedCopyPool"     },
+  { MEMORY_PROFILE_ACTION_LIB_REALLOCATE_POOL,                 "Lib:ReallocatePool"               },
+  { MEMORY_PROFILE_ACTION_LIB_REALLOCATE_RUNTIME_POOL,         "Lib:ReallocateRuntimePool"        },
+  { MEMORY_PROFILE_ACTION_LIB_REALLOCATE_RESERVED_POOL,        "Lib:ReallocateReservedPool"       },
 };
 
 typedef struct {
-  EFI_MEMORY_TYPE   MemoryType;
-  CHAR8             *MemoryTypeStr;
+  EFI_MEMORY_TYPE    MemoryType;
+  CHAR8              *MemoryTypeStr;
 } PROFILE_MEMORY_TYPE_STRING;
 
-GLOBAL_REMOVE_IF_UNREFERENCED PROFILE_MEMORY_TYPE_STRING mMemoryTypeString[] = {
-  {EfiRuntimeServicesCode, "EfiRuntimeServicesCode"},
-  {EfiRuntimeServicesData, "EfiRuntimeServicesData"}
+GLOBAL_REMOVE_IF_UNREFERENCED PROFILE_MEMORY_TYPE_STRING  mMemoryTypeString[] = {
+  { EfiRuntimeServicesCode, "EfiRuntimeServicesCode" },
+  { EfiRuntimeServicesData, "EfiRuntimeServicesData" }
 };
 
 /**
@@ -2639,10 +2623,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED PROFILE_MEMORY_TYPE_STRING mMemoryTypeString[] = {
 **/
 CHAR8 *
 ProfileMemoryTypeToStr (
-  IN EFI_MEMORY_TYPE    MemoryType
+  IN EFI_MEMORY_TYPE  MemoryType
   )
 {
-  UINTN     Index;
+  UINTN  Index;
+
   for (Index = 0; Index < ARRAY_SIZE (mMemoryTypeString); Index++) {
     if (mMemoryTypeString[Index].MemoryType == MemoryType) {
       return mMemoryTypeString[Index].MemoryTypeStr;
@@ -2665,16 +2650,17 @@ ProfileActionToStr (
   IN MEMORY_PROFILE_ACTION  Action
   )
 {
-  UINTN     Index;
-  UINTN     ActionStringCount;
-  CHAR8     **ActionString;
+  UINTN  Index;
+  UINTN  ActionStringCount;
+  CHAR8  **ActionString;
 
-  ActionString = mSmmActionString;
+  ActionString      = mSmmActionString;
   ActionStringCount = ARRAY_SIZE (mSmmActionString);
 
-  if ((UINTN) (UINT32) Action < ActionStringCount) {
+  if ((UINTN)(UINT32)Action < ActionStringCount) {
     return ActionString[Action];
   }
+
   for (Index = 0; Index < ARRAY_SIZE (mExtActionString); Index++) {
     if (mExtActionString[Index].Action == Action) {
       return mExtActionString[Index].String;
@@ -2693,105 +2679,112 @@ DumpSmramProfile (
   VOID
   )
 {
-  MEMORY_PROFILE_CONTEXT            *Context;
-  MEMORY_PROFILE_DRIVER_INFO        *DriverInfo;
-  MEMORY_PROFILE_ALLOC_INFO         *AllocInfo;
-  MEMORY_PROFILE_CONTEXT_DATA       *ContextData;
-  MEMORY_PROFILE_DRIVER_INFO_DATA   *DriverInfoData;
-  MEMORY_PROFILE_ALLOC_INFO_DATA    *AllocInfoData;
-  LIST_ENTRY                        *SmramDriverInfoList;
-  UINTN                             DriverIndex;
-  LIST_ENTRY                        *DriverLink;
-  LIST_ENTRY                        *AllocInfoList;
-  UINTN                             AllocIndex;
-  LIST_ENTRY                        *AllocLink;
-  BOOLEAN                           SmramProfileGettingStatus;
-  UINTN                             TypeIndex;
+  MEMORY_PROFILE_CONTEXT           *Context;
+  MEMORY_PROFILE_DRIVER_INFO       *DriverInfo;
+  MEMORY_PROFILE_ALLOC_INFO        *AllocInfo;
+  MEMORY_PROFILE_CONTEXT_DATA      *ContextData;
+  MEMORY_PROFILE_DRIVER_INFO_DATA  *DriverInfoData;
+  MEMORY_PROFILE_ALLOC_INFO_DATA   *AllocInfoData;
+  LIST_ENTRY                       *SmramDriverInfoList;
+  UINTN                            DriverIndex;
+  LIST_ENTRY                       *DriverLink;
+  LIST_ENTRY                       *AllocInfoList;
+  UINTN                            AllocIndex;
+  LIST_ENTRY                       *AllocLink;
+  BOOLEAN                          SmramProfileGettingStatus;
+  UINTN                            TypeIndex;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
-    return ;
+    return;
   }
 
-  SmramProfileGettingStatus = mSmramProfileGettingStatus;
+  SmramProfileGettingStatus  = mSmramProfileGettingStatus;
   mSmramProfileGettingStatus = TRUE;
 
   Context = &ContextData->Context;
-  DEBUG ((EFI_D_INFO, "======= SmramProfile begin =======\n"));
-  DEBUG ((EFI_D_INFO, "MEMORY_PROFILE_CONTEXT\n"));
+  DEBUG ((DEBUG_INFO, "======= SmramProfile begin =======\n"));
+  DEBUG ((DEBUG_INFO, "MEMORY_PROFILE_CONTEXT\n"));
 
-  DEBUG ((EFI_D_INFO, "  CurrentTotalUsage     - 0x%016lx\n", Context->CurrentTotalUsage));
-  DEBUG ((EFI_D_INFO, "  PeakTotalUsage        - 0x%016lx\n", Context->PeakTotalUsage));
+  DEBUG ((DEBUG_INFO, "  CurrentTotalUsage     - 0x%016lx\n", Context->CurrentTotalUsage));
+  DEBUG ((DEBUG_INFO, "  PeakTotalUsage        - 0x%016lx\n", Context->PeakTotalUsage));
   for (TypeIndex = 0; TypeIndex < sizeof (Context->CurrentTotalUsageByType) / sizeof (Context->CurrentTotalUsageByType[0]); TypeIndex++) {
     if ((Context->CurrentTotalUsageByType[TypeIndex] != 0) ||
-        (Context->PeakTotalUsageByType[TypeIndex] != 0)) {
-      DEBUG ((EFI_D_INFO, "  CurrentTotalUsage[0x%02x]  - 0x%016lx (%a)\n", TypeIndex, Context->CurrentTotalUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
-      DEBUG ((EFI_D_INFO, "  PeakTotalUsage[0x%02x]     - 0x%016lx (%a)\n", TypeIndex, Context->PeakTotalUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
+        (Context->PeakTotalUsageByType[TypeIndex] != 0))
+    {
+      DEBUG ((DEBUG_INFO, "  CurrentTotalUsage[0x%02x]  - 0x%016lx (%a)\n", TypeIndex, Context->CurrentTotalUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
+      DEBUG ((DEBUG_INFO, "  PeakTotalUsage[0x%02x]     - 0x%016lx (%a)\n", TypeIndex, Context->PeakTotalUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
     }
   }
-  DEBUG ((EFI_D_INFO, "  TotalImageSize        - 0x%016lx\n", Context->TotalImageSize));
-  DEBUG ((EFI_D_INFO, "  ImageCount            - 0x%08x\n", Context->ImageCount));
-  DEBUG ((EFI_D_INFO, "  SequenceCount         - 0x%08x\n", Context->SequenceCount));
+
+  DEBUG ((DEBUG_INFO, "  TotalImageSize        - 0x%016lx\n", Context->TotalImageSize));
+  DEBUG ((DEBUG_INFO, "  ImageCount            - 0x%08x\n", Context->ImageCount));
+  DEBUG ((DEBUG_INFO, "  SequenceCount         - 0x%08x\n", Context->SequenceCount));
 
   SmramDriverInfoList = ContextData->DriverInfoList;
   for (DriverLink = SmramDriverInfoList->ForwardLink, DriverIndex = 0;
        DriverLink != SmramDriverInfoList;
-       DriverLink = DriverLink->ForwardLink, DriverIndex++) {
+       DriverLink = DriverLink->ForwardLink, DriverIndex++)
+  {
     DriverInfoData = CR (
-                   DriverLink,
-                   MEMORY_PROFILE_DRIVER_INFO_DATA,
-                   Link,
-                   MEMORY_PROFILE_DRIVER_INFO_SIGNATURE
-                   );
+                       DriverLink,
+                       MEMORY_PROFILE_DRIVER_INFO_DATA,
+                       Link,
+                       MEMORY_PROFILE_DRIVER_INFO_SIGNATURE
+                       );
     DriverInfo = &DriverInfoData->DriverInfo;
-    DEBUG ((EFI_D_INFO, "  MEMORY_PROFILE_DRIVER_INFO (0x%x)\n", DriverIndex));
-    DEBUG ((EFI_D_INFO, "    FileName            - %g\n", &DriverInfo->FileName));
-    DEBUG ((EFI_D_INFO, "    ImageBase           - 0x%016lx\n", DriverInfo->ImageBase));
-    DEBUG ((EFI_D_INFO, "    ImageSize           - 0x%016lx\n", DriverInfo->ImageSize));
-    DEBUG ((EFI_D_INFO, "    EntryPoint          - 0x%016lx\n", DriverInfo->EntryPoint));
-    DEBUG ((EFI_D_INFO, "    ImageSubsystem      - 0x%04x\n", DriverInfo->ImageSubsystem));
-    DEBUG ((EFI_D_INFO, "    FileType            - 0x%02x\n", DriverInfo->FileType));
-    DEBUG ((EFI_D_INFO, "    CurrentUsage        - 0x%016lx\n", DriverInfo->CurrentUsage));
-    DEBUG ((EFI_D_INFO, "    PeakUsage           - 0x%016lx\n", DriverInfo->PeakUsage));
+    DEBUG ((DEBUG_INFO, "  MEMORY_PROFILE_DRIVER_INFO (0x%x)\n", DriverIndex));
+    DEBUG ((DEBUG_INFO, "    FileName            - %g\n", &DriverInfo->FileName));
+    DEBUG ((DEBUG_INFO, "    ImageBase           - 0x%016lx\n", DriverInfo->ImageBase));
+    DEBUG ((DEBUG_INFO, "    ImageSize           - 0x%016lx\n", DriverInfo->ImageSize));
+    DEBUG ((DEBUG_INFO, "    EntryPoint          - 0x%016lx\n", DriverInfo->EntryPoint));
+    DEBUG ((DEBUG_INFO, "    ImageSubsystem      - 0x%04x\n", DriverInfo->ImageSubsystem));
+    DEBUG ((DEBUG_INFO, "    FileType            - 0x%02x\n", DriverInfo->FileType));
+    DEBUG ((DEBUG_INFO, "    CurrentUsage        - 0x%016lx\n", DriverInfo->CurrentUsage));
+    DEBUG ((DEBUG_INFO, "    PeakUsage           - 0x%016lx\n", DriverInfo->PeakUsage));
     for (TypeIndex = 0; TypeIndex < sizeof (DriverInfo->CurrentUsageByType) / sizeof (DriverInfo->CurrentUsageByType[0]); TypeIndex++) {
       if ((DriverInfo->CurrentUsageByType[TypeIndex] != 0) ||
-          (DriverInfo->PeakUsageByType[TypeIndex] != 0)) {
-        DEBUG ((EFI_D_INFO, "    CurrentUsage[0x%02x]     - 0x%016lx (%a)\n", TypeIndex, DriverInfo->CurrentUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
-        DEBUG ((EFI_D_INFO, "    PeakUsage[0x%02x]        - 0x%016lx (%a)\n", TypeIndex, DriverInfo->PeakUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
+          (DriverInfo->PeakUsageByType[TypeIndex] != 0))
+      {
+        DEBUG ((DEBUG_INFO, "    CurrentUsage[0x%02x]     - 0x%016lx (%a)\n", TypeIndex, DriverInfo->CurrentUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
+        DEBUG ((DEBUG_INFO, "    PeakUsage[0x%02x]        - 0x%016lx (%a)\n", TypeIndex, DriverInfo->PeakUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
       }
     }
-    DEBUG ((EFI_D_INFO, "    AllocRecordCount    - 0x%08x\n", DriverInfo->AllocRecordCount));
+
+    DEBUG ((DEBUG_INFO, "    AllocRecordCount    - 0x%08x\n", DriverInfo->AllocRecordCount));
 
     AllocInfoList = DriverInfoData->AllocInfoList;
     for (AllocLink = AllocInfoList->ForwardLink, AllocIndex = 0;
          AllocLink != AllocInfoList;
-         AllocLink = AllocLink->ForwardLink, AllocIndex++) {
+         AllocLink = AllocLink->ForwardLink, AllocIndex++)
+    {
       AllocInfoData = CR (
-                     AllocLink,
-                     MEMORY_PROFILE_ALLOC_INFO_DATA,
-                     Link,
-                     MEMORY_PROFILE_ALLOC_INFO_SIGNATURE
-                     );
+                        AllocLink,
+                        MEMORY_PROFILE_ALLOC_INFO_DATA,
+                        Link,
+                        MEMORY_PROFILE_ALLOC_INFO_SIGNATURE
+                        );
       AllocInfo = &AllocInfoData->AllocInfo;
-      DEBUG ((EFI_D_INFO, "    MEMORY_PROFILE_ALLOC_INFO (0x%x)\n", AllocIndex));
-      DEBUG ((EFI_D_INFO, "      CallerAddress  - 0x%016lx (Offset: 0x%08x)\n", AllocInfo->CallerAddress, AllocInfo->CallerAddress - DriverInfo->ImageBase));
-      DEBUG ((EFI_D_INFO, "      SequenceId     - 0x%08x\n", AllocInfo->SequenceId));
+      DEBUG ((DEBUG_INFO, "    MEMORY_PROFILE_ALLOC_INFO (0x%x)\n", AllocIndex));
+      DEBUG ((DEBUG_INFO, "      CallerAddress  - 0x%016lx (Offset: 0x%08x)\n", AllocInfo->CallerAddress, AllocInfo->CallerAddress - DriverInfo->ImageBase));
+      DEBUG ((DEBUG_INFO, "      SequenceId     - 0x%08x\n", AllocInfo->SequenceId));
       if ((AllocInfo->Action & MEMORY_PROFILE_ACTION_USER_DEFINED_MASK) != 0) {
         if (AllocInfoData->ActionString != NULL) {
-          DEBUG ((EFI_D_INFO, "      Action         - 0x%08x (%a)\n", AllocInfo->Action, AllocInfoData->ActionString));
+          DEBUG ((DEBUG_INFO, "      Action         - 0x%08x (%a)\n", AllocInfo->Action, AllocInfoData->ActionString));
         } else {
-          DEBUG ((EFI_D_INFO, "      Action         - 0x%08x (UserDefined-0x%08x)\n", AllocInfo->Action, AllocInfo->Action));
+          DEBUG ((DEBUG_INFO, "      Action         - 0x%08x (UserDefined-0x%08x)\n", AllocInfo->Action, AllocInfo->Action));
         }
       } else {
-        DEBUG ((EFI_D_INFO, "      Action         - 0x%08x (%a)\n", AllocInfo->Action, ProfileActionToStr (AllocInfo->Action)));
+        DEBUG ((DEBUG_INFO, "      Action         - 0x%08x (%a)\n", AllocInfo->Action, ProfileActionToStr (AllocInfo->Action)));
       }
-      DEBUG ((EFI_D_INFO, "      MemoryType     - 0x%08x (%a)\n", AllocInfo->MemoryType, ProfileMemoryTypeToStr (AllocInfo->MemoryType)));
-      DEBUG ((EFI_D_INFO, "      Buffer         - 0x%016lx\n", AllocInfo->Buffer));
-      DEBUG ((EFI_D_INFO, "      Size           - 0x%016lx\n", AllocInfo->Size));
+
+      DEBUG ((DEBUG_INFO, "      MemoryType     - 0x%08x (%a)\n", AllocInfo->MemoryType, ProfileMemoryTypeToStr (AllocInfo->MemoryType)));
+      DEBUG ((DEBUG_INFO, "      Buffer         - 0x%016lx\n", AllocInfo->Buffer));
+      DEBUG ((DEBUG_INFO, "      Size           - 0x%016lx\n", AllocInfo->Size));
     }
   }
 
-  DEBUG ((EFI_D_INFO, "======= SmramProfile end =======\n"));
+  DEBUG ((DEBUG_INFO, "======= SmramProfile end =======\n"));
 
   mSmramProfileGettingStatus = SmramProfileGettingStatus;
 }
@@ -2805,13 +2798,13 @@ DumpSmramInfo (
   VOID
   )
 {
-  DEBUG_CODE (
-    if (IS_SMRAM_PROFILE_ENABLED) {
-      DumpSmramProfile ();
-      DumpFreePagesList ();
-      DumpFreePoolList ();
-      DumpSmramRange ();
-    }
-  );
-}
+  DEBUG_CODE_BEGIN ();
+  if (IS_SMRAM_PROFILE_ENABLED) {
+    DumpSmramProfile ();
+    DumpFreePagesList ();
+    DumpFreePoolList ();
+    DumpSmramRange ();
+  }
 
+  DEBUG_CODE_END ();
+}

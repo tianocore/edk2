@@ -3,7 +3,7 @@
   register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
   notify to call FspSiliconInit API.
 
-  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -37,8 +37,8 @@
 #include <FspEas.h>
 #include <FspStatusCode.h>
 
-extern EFI_PEI_NOTIFY_DESCRIPTOR mS3EndOfPeiNotifyDesc;
-extern EFI_GUID                  gFspHobGuid;
+extern EFI_PEI_NOTIFY_DESCRIPTOR  mS3EndOfPeiNotifyDesc;
+extern EFI_GUID                   gFspHobGuid;
 
 /**
   This function handles S3 resume task at the end of PEI.
@@ -52,13 +52,13 @@ extern EFI_GUID                  gFspHobGuid;
 **/
 EFI_STATUS
 EFIAPI
-S3EndOfPeiNotify(
-  IN EFI_PEI_SERVICES          **PeiServices,
-  IN EFI_PEI_NOTIFY_DESCRIPTOR *NotifyDesc,
-  IN VOID                      *Ppi
+S3EndOfPeiNotify (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDesc,
+  IN VOID                       *Ppi
   );
 
-EFI_PEI_NOTIFY_DESCRIPTOR mS3EndOfPeiNotifyDesc = {
+EFI_PEI_NOTIFY_DESCRIPTOR  mS3EndOfPeiNotifyDesc = {
   (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiEndOfPeiSignalPpiGuid,
   S3EndOfPeiNotify
@@ -76,50 +76,50 @@ EFI_PEI_NOTIFY_DESCRIPTOR mS3EndOfPeiNotifyDesc = {
 **/
 EFI_STATUS
 EFIAPI
-S3EndOfPeiNotify(
-  IN EFI_PEI_SERVICES          **PeiServices,
-  IN EFI_PEI_NOTIFY_DESCRIPTOR *NotifyDesc,
-  IN VOID                      *Ppi
+S3EndOfPeiNotify (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDesc,
+  IN VOID                       *Ppi
   )
 {
-  NOTIFY_PHASE_PARAMS NotifyPhaseParams;
-  EFI_STATUS          Status;
+  NOTIFY_PHASE_PARAMS  NotifyPhaseParams;
+  EFI_STATUS           Status;
 
-  DEBUG((DEBUG_INFO, "S3EndOfPeiNotify enter\n"));
+  DEBUG ((DEBUG_INFO, "S3EndOfPeiNotify enter\n"));
 
   NotifyPhaseParams.Phase = EnumInitPhaseAfterPciEnumeration;
-  Status = CallFspNotifyPhase (&NotifyPhaseParams);
-  DEBUG((DEBUG_INFO, "FSP S3NotifyPhase AfterPciEnumeration status: 0x%x\n", Status));
+  Status                  = CallFspNotifyPhase (&NotifyPhaseParams);
+  DEBUG ((DEBUG_INFO, "FSP S3NotifyPhase AfterPciEnumeration status: 0x%x\n", Status));
 
   //
   // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
-    DEBUG((DEBUG_INFO, "FSP S3NotifyPhase AfterPciEnumeration requested reset 0x%x\n", Status));
+    DEBUG ((DEBUG_INFO, "FSP S3NotifyPhase AfterPciEnumeration requested reset 0x%x\n", Status));
     CallFspWrapperResetSystem ((UINT32)Status);
   }
 
   NotifyPhaseParams.Phase = EnumInitPhaseReadyToBoot;
-  Status = CallFspNotifyPhase (&NotifyPhaseParams);
-  DEBUG((DEBUG_INFO, "FSP S3NotifyPhase ReadyToBoot status: 0x%x\n", Status));
+  Status                  = CallFspNotifyPhase (&NotifyPhaseParams);
+  DEBUG ((DEBUG_INFO, "FSP S3NotifyPhase ReadyToBoot status: 0x%x\n", Status));
 
   //
   // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
-    DEBUG((DEBUG_INFO, "FSP S3NotifyPhase ReadyToBoot requested reset 0x%x\n", Status));
+    DEBUG ((DEBUG_INFO, "FSP S3NotifyPhase ReadyToBoot requested reset 0x%x\n", Status));
     CallFspWrapperResetSystem ((UINT32)Status);
   }
 
   NotifyPhaseParams.Phase = EnumInitPhaseEndOfFirmware;
-  Status = CallFspNotifyPhase (&NotifyPhaseParams);
-  DEBUG((DEBUG_INFO, "FSP S3NotifyPhase EndOfFirmware status: 0x%x\n", Status));
+  Status                  = CallFspNotifyPhase (&NotifyPhaseParams);
+  DEBUG ((DEBUG_INFO, "FSP S3NotifyPhase EndOfFirmware status: 0x%x\n", Status));
 
   //
   // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
-    DEBUG((DEBUG_INFO, "FSP S3NotifyPhase EndOfFirmware requested reset 0x%x\n", Status));
+    DEBUG ((DEBUG_INFO, "FSP S3NotifyPhase EndOfFirmware requested reset 0x%x\n", Status));
     CallFspWrapperResetSystem ((UINT32)Status);
   }
 
@@ -138,16 +138,16 @@ S3EndOfPeiNotify(
 EFI_STATUS
 EFIAPI
 FspSiliconInitDoneGetFspHobList (
-  IN  CONST EFI_PEI_SERVICES         **PeiServices,
-  IN  FSP_SILICON_INIT_DONE_PPI      *This,
-  OUT VOID                           **FspHobList
+  IN  CONST EFI_PEI_SERVICES     **PeiServices,
+  IN  FSP_SILICON_INIT_DONE_PPI  *This,
+  OUT VOID                       **FspHobList
   );
 
-FSP_SILICON_INIT_DONE_PPI mFspSiliconInitDonePpi = {
+FSP_SILICON_INIT_DONE_PPI  mFspSiliconInitDonePpi = {
   FspSiliconInitDoneGetFspHobList
 };
 
-EFI_PEI_PPI_DESCRIPTOR            mPeiFspSiliconInitDonePpi = {
+EFI_PEI_PPI_DESCRIPTOR  mPeiFspSiliconInitDonePpi = {
   EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
   &gFspSiliconInitDonePpiGuid,
   &mFspSiliconInitDonePpi
@@ -165,19 +165,37 @@ EFI_PEI_PPI_DESCRIPTOR            mPeiFspSiliconInitDonePpi = {
 EFI_STATUS
 EFIAPI
 FspSiliconInitDoneGetFspHobList (
-  IN  CONST EFI_PEI_SERVICES         **PeiServices,
-  IN  FSP_SILICON_INIT_DONE_PPI      *This,
-  OUT VOID                           **FspHobList
+  IN  CONST EFI_PEI_SERVICES     **PeiServices,
+  IN  FSP_SILICON_INIT_DONE_PPI  *This,
+  OUT VOID                       **FspHobList
   )
 {
-  EFI_HOB_GUID_TYPE                  *GuidHob;
+  EFI_HOB_GUID_TYPE  *GuidHob;
 
   GuidHob = GetFirstGuidHob (&gFspHobGuid);
   if (GuidHob != NULL) {
-    *FspHobList = *(VOID **)GET_GUID_HOB_DATA(GuidHob);
+    *FspHobList = *(VOID **)GET_GUID_HOB_DATA (GuidHob);
     return EFI_SUCCESS;
   } else {
     return EFI_NOT_FOUND;
+  }
+}
+
+/**
+  Get the FSP S UPD Data address
+
+  @return FSP-S UPD Data Address
+**/
+
+UINTN
+GetFspsUpdDataAddress (
+  VOID
+  )
+{
+  if (PcdGet64 (PcdFspsUpdDataAddress64) != 0) {
+    return (UINTN) PcdGet64 (PcdFspsUpdDataAddress64);
+  } else {
+    return (UINTN) PcdGet32 (PcdFspsUpdDataAddress);
   }
 }
 
@@ -194,9 +212,9 @@ FspSiliconInitDoneGetFspHobList (
 EFI_STATUS
 EFIAPI
 FspsWrapperEndOfPeiNotify (
-  IN EFI_PEI_SERVICES          **PeiServices,
-  IN EFI_PEI_NOTIFY_DESCRIPTOR *NotifyDesc,
-  IN VOID                      *Ppi
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDesc,
+  IN VOID                       *Ppi
   )
 {
   EFI_STATUS  Status;
@@ -213,12 +231,12 @@ FspsWrapperEndOfPeiNotify (
   // Install FspSiliconInitDonePpi so that any other driver can consume this info.
   //
   Status = PeiServicesInstallPpi (&mPeiFspSiliconInitDonePpi);
-  ASSERT_EFI_ERROR(Status);
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
 
-EFI_PEI_NOTIFY_DESCRIPTOR mFspsWrapperEndOfPeiNotifyDesc = {
+EFI_PEI_NOTIFY_DESCRIPTOR  mFspsWrapperEndOfPeiNotifyDesc = {
   (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiEndOfPeiSignalPpiGuid,
   FspsWrapperEndOfPeiNotify
@@ -237,12 +255,12 @@ EFI_PEI_NOTIFY_DESCRIPTOR mFspsWrapperEndOfPeiNotifyDesc = {
 EFI_STATUS
 EFIAPI
 PeiMemoryDiscoveredNotify (
-  IN EFI_PEI_SERVICES          **PeiServices,
-  IN EFI_PEI_NOTIFY_DESCRIPTOR *NotifyDesc,
-  IN VOID                      *Ppi
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDesc,
+  IN VOID                       *Ppi
   );
 
-EFI_PEI_NOTIFY_DESCRIPTOR mPeiMemoryDiscoveredNotifyDesc = {
+EFI_PEI_NOTIFY_DESCRIPTOR  mPeiMemoryDiscoveredNotifyDesc = {
   (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiMemoryDiscoveredPpiGuid,
   PeiMemoryDiscoveredNotify
@@ -261,18 +279,18 @@ EFI_PEI_NOTIFY_DESCRIPTOR mPeiMemoryDiscoveredNotifyDesc = {
 EFI_STATUS
 EFIAPI
 PeiMemoryDiscoveredNotify (
-  IN EFI_PEI_SERVICES          **PeiServices,
-  IN EFI_PEI_NOTIFY_DESCRIPTOR *NotifyDesc,
-  IN VOID                      *Ppi
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDesc,
+  IN VOID                       *Ppi
   )
 {
-  FSP_INFO_HEADER           *FspsHeaderPtr;
-  UINT64                    TimeStampCounterStart;
-  EFI_STATUS                Status;
-  VOID                      *FspHobListPtr;
-  EFI_HOB_GUID_TYPE         *GuidHob;
-  FSPS_UPD_COMMON           *FspsUpdDataPtr;
-  UINTN                     *SourceData;
+  FSP_INFO_HEADER    *FspsHeaderPtr;
+  UINT64             TimeStampCounterStart;
+  EFI_STATUS         Status;
+  VOID               *FspHobListPtr;
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  FSPS_UPD_COMMON    *FspsUpdDataPtr;
+  UINTN              *SourceData;
 
   DEBUG ((DEBUG_INFO, "PeiMemoryDiscoveredNotify enter\n"));
   FspsUpdDataPtr = NULL;
@@ -283,7 +301,7 @@ PeiMemoryDiscoveredNotify (
     return EFI_DEVICE_ERROR;
   }
 
-  if (PcdGet32 (PcdFspsUpdDataAddress) == 0 && (FspsHeaderPtr->CfgRegionSize != 0) && (FspsHeaderPtr->CfgRegionOffset != 0)) {
+  if ((GetFspsUpdDataAddress () == 0) && (FspsHeaderPtr->CfgRegionSize != 0) && (FspsHeaderPtr->CfgRegionOffset != 0)) {
     //
     // Copy default FSP-S UPD data from Flash
     //
@@ -292,30 +310,31 @@ PeiMemoryDiscoveredNotify (
     SourceData = (UINTN *)((UINTN)FspsHeaderPtr->ImageBase + (UINTN)FspsHeaderPtr->CfgRegionOffset);
     CopyMem (FspsUpdDataPtr, SourceData, (UINTN)FspsHeaderPtr->CfgRegionSize);
   } else {
-    FspsUpdDataPtr = (FSPS_UPD_COMMON *)PcdGet32 (PcdFspsUpdDataAddress);
+    FspsUpdDataPtr = (FSPS_UPD_COMMON *) GetFspsUpdDataAddress();
     ASSERT (FspsUpdDataPtr != NULL);
   }
 
   UpdateFspsUpdData ((VOID *)FspsUpdDataPtr);
 
   TimeStampCounterStart = AsmReadTsc ();
-  PERF_START_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_SILICON_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
+  PERF_START_EX (&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_SILICON_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
   Status = CallFspSiliconInit ((VOID *)FspsUpdDataPtr);
-  PERF_END_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_SILICON_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
+  PERF_END_EX (&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_SILICON_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
   DEBUG ((DEBUG_INFO, "Total time spent executing FspSiliconInitApi: %d millisecond\n", DivU64x32 (GetTimeInNanoSecond (AsmReadTsc () - TimeStampCounterStart), 1000000)));
 
   //
   // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
-    DEBUG((DEBUG_INFO, "FspSiliconInitApi requested reset 0x%x\n", Status));
+    DEBUG ((DEBUG_INFO, "FspSiliconInitApi requested reset 0x%x\n", Status));
     CallFspWrapperResetSystem ((UINT32)Status);
   }
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "ERROR - Failed to execute FspSiliconInitApi(), Status = %r\n", Status));
   }
-  DEBUG((DEBUG_INFO, "FspSiliconInit status: 0x%x\n", Status));
+
+  DEBUG ((DEBUG_INFO, "FspSiliconInit status: 0x%x\n", Status));
   ASSERT_EFI_ERROR (Status);
 
   Status = TestFspSiliconInitApiOutput ((VOID *)NULL);
@@ -336,7 +355,7 @@ PeiMemoryDiscoveredNotify (
   // Install FspSiliconInitDonePpi so that any other driver can consume this info.
   //
   Status = PeiServicesInstallPpi (&mPeiFspSiliconInitDonePpi);
-  ASSERT_EFI_ERROR(Status);
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
@@ -351,8 +370,8 @@ FspsWrapperInitApiMode (
   VOID
   )
 {
-  EFI_STATUS           Status;
-  EFI_BOOT_MODE        BootMode;
+  EFI_STATUS     Status;
+  EFI_BOOT_MODE  BootMode;
 
   //
   // Register MemoryDiscovered Notify to run FspSiliconInit
@@ -382,18 +401,18 @@ FspsWrapperInitDispatchMode (
   VOID
   )
 {
-  EFI_STATUS                                            Status;
-  EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_PPI *MeasurementExcludedFvPpi;
-  EFI_PEI_PPI_DESCRIPTOR                                *MeasurementExcludedPpiList;
+  EFI_STATUS                                             Status;
+  EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_PPI  *MeasurementExcludedFvPpi;
+  EFI_PEI_PPI_DESCRIPTOR                                 *MeasurementExcludedPpiList;
 
-  MeasurementExcludedFvPpi = AllocatePool (sizeof(*MeasurementExcludedFvPpi));
-  ASSERT(MeasurementExcludedFvPpi != NULL);
-  MeasurementExcludedFvPpi->Count = 1;
-  MeasurementExcludedFvPpi->Fv[0].FvBase = PcdGet32 (PcdFspsBaseAddress);
-  MeasurementExcludedFvPpi->Fv[0].FvLength = ((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) PcdGet32 (PcdFspsBaseAddress))->FvLength;
+  MeasurementExcludedFvPpi = AllocatePool (sizeof (*MeasurementExcludedFvPpi));
+  ASSERT (MeasurementExcludedFvPpi != NULL);
+  MeasurementExcludedFvPpi->Count          = 1;
+  MeasurementExcludedFvPpi->Fv[0].FvBase   = PcdGet32 (PcdFspsBaseAddress);
+  MeasurementExcludedFvPpi->Fv[0].FvLength = ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspsBaseAddress))->FvLength;
 
-  MeasurementExcludedPpiList = AllocatePool (sizeof(*MeasurementExcludedPpiList));
-  ASSERT(MeasurementExcludedPpiList != NULL);
+  MeasurementExcludedPpiList = AllocatePool (sizeof (*MeasurementExcludedPpiList));
+  ASSERT (MeasurementExcludedPpiList != NULL);
   MeasurementExcludedPpiList->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
   MeasurementExcludedPpiList->Guid  = &gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid;
   MeasurementExcludedPpiList->Ppi   = MeasurementExcludedFvPpi;
@@ -406,8 +425,8 @@ FspsWrapperInitDispatchMode (
   //
   PeiServicesInstallFvInfoPpi (
     NULL,
-    (VOID *)(UINTN) PcdGet32 (PcdFspsBaseAddress),
-    (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) PcdGet32 (PcdFspsBaseAddress))->FvLength,
+    (VOID *)(UINTN)PcdGet32 (PcdFspsBaseAddress),
+    (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspsBaseAddress))->FvLength,
     NULL,
     NULL
     );
@@ -432,12 +451,12 @@ FspsWrapperInitDispatchMode (
 EFI_STATUS
 EFIAPI
 TcgPpiNotify (
-  IN EFI_PEI_SERVICES          **PeiServices,
-  IN EFI_PEI_NOTIFY_DESCRIPTOR *NotifyDesc,
-  IN VOID                      *Ppi
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDesc,
+  IN VOID                       *Ppi
   );
 
-EFI_PEI_NOTIFY_DESCRIPTOR mTcgPpiNotifyDesc = {
+EFI_PEI_NOTIFY_DESCRIPTOR  mTcgPpiNotifyDesc = {
   (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEdkiiTcgPpiGuid,
   TcgPpiNotify
@@ -456,20 +475,24 @@ EFI_PEI_NOTIFY_DESCRIPTOR mTcgPpiNotifyDesc = {
 EFI_STATUS
 EFIAPI
 TcgPpiNotify (
-  IN EFI_PEI_SERVICES          **PeiServices,
-  IN EFI_PEI_NOTIFY_DESCRIPTOR *NotifyDesc,
-  IN VOID                      *Ppi
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDesc,
+  IN VOID                       *Ppi
   )
 {
-  UINT32                    FspMeasureMask;
+  UINT32  FspMeasureMask;
 
   DEBUG ((DEBUG_INFO, "TcgPpiNotify FSPS\n"));
 
   FspMeasureMask = PcdGet32 (PcdFspMeasurementConfig);
 
   if ((FspMeasureMask & FSP_MEASURE_FSPS) != 0) {
-    MeasureFspFirmwareBlob (0, "FSPS", PcdGet32(PcdFspsBaseAddress),
-                            (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) PcdGet32 (PcdFspsBaseAddress))->FvLength);
+    MeasureFspFirmwareBlob (
+      0,
+      "FSPS",
+      PcdGet32 (PcdFspsBaseAddress),
+      (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspsBaseAddress))->FvLength
+      );
   }
 
   return EFI_SUCCESS;

@@ -17,7 +17,7 @@
 //
 // Static (possibly build generated) Chassis Manufacturer data.
 //
-SMBIOS_MISC_TABLE_DATA(SMBIOS_TABLE_TYPE2, MiscBaseBoardManufacturer) = {
+SMBIOS_MISC_TABLE_DATA (SMBIOS_TABLE_TYPE2, MiscBaseBoardManufacturer) = {
   {                                                       // Hdr
     EFI_SMBIOS_TYPE_BASEBOARD_INFORMATION,                // Type,
     0,                                                    // Length,

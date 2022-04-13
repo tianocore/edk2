@@ -32,10 +32,10 @@
 **/
 typedef
 EFI_STATUS
-(EFIAPI * ARM_MP_CORE_INFO_GET) (
+(EFIAPI *ARM_MP_CORE_INFO_GET)(
   OUT UINTN                   *ArmCoreCount,
   OUT ARM_CORE_INFO           **ArmCoreTable
-);
+  );
 
 ///
 /// This service abstracts the ability to migrate contents of the platform early memory store.
@@ -43,10 +43,10 @@ EFI_STATUS
 ///       This PPI was optional.
 ///
 typedef struct {
-  ARM_MP_CORE_INFO_GET   GetMpCoreInfo;
+  ARM_MP_CORE_INFO_GET    GetMpCoreInfo;
 } ARM_MP_CORE_INFO_PPI;
 
-extern EFI_GUID gArmMpCoreInfoPpiGuid;
-extern EFI_GUID gArmMpCoreInfoGuid;
+extern EFI_GUID  gArmMpCoreInfoPpiGuid;
+extern EFI_GUID  gArmMpCoreInfoGuid;
 
 #endif // ARM_MP_CORE_INFO_PPI_H_

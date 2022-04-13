@@ -12,8 +12,6 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
-#include <Library/QemuFwCfgLib.h>
-#include <Library/QemuFwCfgS3Lib.h>
 #include <Protocol/LockBox.h>
 #include <LockBoxLib.h>
 
@@ -31,17 +29,17 @@
 STATIC
 VOID *
 AllocateMemoryBelow4G (
-  IN EFI_MEMORY_TYPE    MemoryType,
-  IN UINTN              Size
+  IN EFI_MEMORY_TYPE  MemoryType,
+  IN UINTN            Size
   )
 {
   UINTN                 Pages;
   EFI_PHYSICAL_ADDRESS  Address;
   EFI_STATUS            Status;
-  VOID*                 Buffer;
+  VOID                  *Buffer;
   UINTN                 AllocRemaining;
 
-  Pages = EFI_SIZE_TO_PAGES (Size);
+  Pages   = EFI_SIZE_TO_PAGES (Size);
   Address = 0xffffffff;
 
   //
@@ -51,35 +49,34 @@ AllocateMemoryBelow4G (
   // allocations, and use these to allocate memory for small buffers.
   //
   ASSERT (mLockBoxGlobal->Signature == LOCK_BOX_GLOBAL_SIGNATURE);
-  if ((UINTN) mLockBoxGlobal->SubPageRemaining >= Size) {
-    Buffer = (VOID*)(UINTN) mLockBoxGlobal->SubPageBuffer;
-    mLockBoxGlobal->SubPageBuffer += (UINT32) Size;
-    mLockBoxGlobal->SubPageRemaining -= (UINT32) Size;
+  if ((UINTN)mLockBoxGlobal->SubPageRemaining >= Size) {
+    Buffer                            = (VOID *)(UINTN)mLockBoxGlobal->SubPageBuffer;
+    mLockBoxGlobal->SubPageBuffer    += (UINT32)Size;
+    mLockBoxGlobal->SubPageRemaining -= (UINT32)Size;
     return Buffer;
   }
 
-  Status  = gBS->AllocatePages (
-                   AllocateMaxAddress,
-                   MemoryType,
-                   Pages,
-                   &Address
-                   );
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  MemoryType,
+                  Pages,
+                  &Address
+                  );
   if (EFI_ERROR (Status)) {
     return NULL;
   }
 
-  Buffer = (VOID *) (UINTN) Address;
+  Buffer = (VOID *)(UINTN)Address;
   ZeroMem (Buffer, EFI_PAGES_TO_SIZE (Pages));
 
   AllocRemaining = EFI_PAGES_TO_SIZE (Pages) - Size;
-  if (AllocRemaining > (UINTN) mLockBoxGlobal->SubPageRemaining) {
-    mLockBoxGlobal->SubPageBuffer = (UINT32) (Address + Size);
-    mLockBoxGlobal->SubPageRemaining = (UINT32) AllocRemaining;
+  if (AllocRemaining > (UINTN)mLockBoxGlobal->SubPageRemaining) {
+    mLockBoxGlobal->SubPageBuffer    = (UINT32)(Address + Size);
+    mLockBoxGlobal->SubPageRemaining = (UINT32)AllocRemaining;
   }
 
   return Buffer;
 }
-
 
 /**
   Allocates a buffer of type EfiACPIMemoryNVS.
@@ -104,7 +101,6 @@ AllocateAcpiNvsPool (
   return AllocateMemoryBelow4G (EfiACPIMemoryNVS, AllocationSize);
 }
 
-
 EFI_STATUS
 EFIAPI
 LockBoxDxeLibInitialize (
@@ -112,12 +108,12 @@ LockBoxDxeLibInitialize (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS    Status;
-  VOID          *Interface;
+  EFI_STATUS  Status;
+  VOID        *Interface;
 
   Status = LockBoxLibInitialize ();
   if (!EFI_ERROR (Status)) {
-    if (QemuFwCfgS3Enabled ()) {
+    if (PcdGetBool (PcdAcpiS3Enable)) {
       //
       // When S3 enabled, the first driver run with this library linked will
       // have this library constructor to install LockBox protocol on the

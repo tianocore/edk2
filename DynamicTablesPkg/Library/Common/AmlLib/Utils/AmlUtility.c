@@ -1,7 +1,7 @@
 /** @file
   AML Utility.
 
-  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -22,21 +22,21 @@
 EFI_STATUS
 EFIAPI
 AcpiPlatformChecksum (
-  IN  EFI_ACPI_DESCRIPTION_HEADER  * AcpiTable
+  IN  EFI_ACPI_DESCRIPTION_HEADER  *AcpiTable
   )
 {
-  UINT8   * Ptr;
-  UINT8     Sum;
-  UINT32    Size;
+  UINT8   *Ptr;
+  UINT8   Sum;
+  UINT32  Size;
 
   if (AcpiTable == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  Ptr = (UINT8*)AcpiTable;
+  Ptr  = (UINT8 *)AcpiTable;
   Size = AcpiTable->Length;
-  Sum = 0;
+  Sum  = 0;
 
   // Set the checksum field to 0 first.
   AcpiTable->Checksum = 0;
@@ -76,70 +76,78 @@ STATIC
 BOOLEAN
 EFIAPI
 AmlComputeSizeCallback (
-  IN      AML_NODE_HEADER  * Node,
-  IN  OUT VOID             * Context,
-  IN  OUT EFI_STATUS       * Status   OPTIONAL
+  IN      AML_NODE_HEADER  *Node,
+  IN  OUT VOID             *Context,
+  IN  OUT EFI_STATUS       *Status   OPTIONAL
   )
 {
-  UINT32                    Size;
-  EAML_PARSE_INDEX          IndexPtr;
-  CONST AML_OBJECT_NODE   * ParentNode;
+  UINT32                 Size;
+  EAML_PARSE_INDEX       IndexPtr;
+  CONST AML_OBJECT_NODE  *ParentNode;
 
   if (!IS_AML_NODE_VALID (Node) ||
-      (Context == NULL)) {
+      (Context == NULL))
+  {
     ASSERT (0);
     if (Status != NULL) {
       *Status = EFI_INVALID_PARAMETER;
     }
+
     return FALSE;
   }
 
   // Ignore the second fixed argument of method invocation nodes
   // as the information stored there (the argument count) is not in the
   // ACPI specification.
-  ParentNode = (CONST AML_OBJECT_NODE*)AmlGetParent (Node);
+  ParentNode = (CONST AML_OBJECT_NODE *)AmlGetParent (Node);
   if (IS_AML_OBJECT_NODE (ParentNode)                             &&
       AmlNodeCompareOpCode (ParentNode, AML_METHOD_INVOC_OP, 0)   &&
-      AmlIsNodeFixedArgument (Node, &IndexPtr)) {
+      AmlIsNodeFixedArgument (Node, &IndexPtr))
+  {
     if (IndexPtr == EAmlParseIndexTerm1) {
       if (Status != NULL) {
         *Status = EFI_SUCCESS;
       }
+
       return TRUE;
     }
   }
 
-  Size = *((UINT32*)Context);
+  Size = *((UINT32 *)Context);
 
   if (IS_AML_DATA_NODE (Node)) {
-    Size += ((AML_DATA_NODE*)Node)->Size;
+    Size += ((AML_DATA_NODE *)Node)->Size;
   } else if (IS_AML_OBJECT_NODE (Node)  &&
              !AmlNodeHasAttribute (
-                (CONST AML_OBJECT_NODE*)Node,
-                AML_IS_PSEUDO_OPCODE)) {
+                (CONST AML_OBJECT_NODE *)Node,
+                AML_IS_PSEUDO_OPCODE
+                ))
+  {
     // Ignore pseudo-opcodes as they are not part of the
     // ACPI specification.
 
-    Size += (((AML_OBJECT_NODE*)Node)->AmlByteEncoding->OpCode ==
-               AML_EXT_OP) ? 2 : 1;
+    Size += (((AML_OBJECT_NODE *)Node)->AmlByteEncoding->OpCode ==
+             AML_EXT_OP) ? 2 : 1;
 
     // Add the size of the PkgLen.
     if (AmlNodeHasAttribute (
-          (AML_OBJECT_NODE*)Node,
-          AML_HAS_PKG_LENGTH)) {
-      Size += AmlComputePkgLengthWidth (((AML_OBJECT_NODE*)Node)->PkgLen);
+          (AML_OBJECT_NODE *)Node,
+          AML_HAS_PKG_LENGTH
+          ))
+    {
+      Size += AmlComputePkgLengthWidth (((AML_OBJECT_NODE *)Node)->PkgLen);
     }
   }
 
   // Check for overflow.
   // The root node has a null size, thus the strict comparison.
-  if (*((UINT32*)Context) > Size) {
+  if (*((UINT32 *)Context) > Size) {
     ASSERT (0);
     *Status = EFI_INVALID_PARAMETER;
     return FALSE;
   }
 
-  *((UINT32*)Context) = Size;
+  *((UINT32 *)Context) = Size;
 
   if (Status != NULL) {
     *Status = EFI_SUCCESS;
@@ -159,14 +167,15 @@ AmlComputeSizeCallback (
 EFI_STATUS
 EFIAPI
 AmlComputeSize (
-  IN      CONST AML_NODE_HEADER   * Node,
-  IN  OUT       UINT32            * Size
+  IN      CONST AML_NODE_HEADER  *Node,
+  IN  OUT       UINT32           *Size
   )
 {
   EFI_STATUS  Status;
 
   if (!IS_AML_NODE_VALID (Node) ||
-      (Size == NULL)) {
+      (Size == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -174,9 +183,9 @@ AmlComputeSize (
   *Size = 0;
 
   AmlEnumTree (
-    (AML_NODE_HEADER*)Node,
+    (AML_NODE_HEADER *)Node,
     AmlComputeSizeCallback,
-    (VOID*)Size,
+    (VOID *)Size,
     &Status
     );
 
@@ -192,19 +201,19 @@ AmlComputeSize (
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 AmlNodeGetIntegerValue (
-  IN  AML_OBJECT_NODE   * Node,
-  OUT UINT64            * Value
+  IN  AML_OBJECT_NODE  *Node,
+  OUT UINT64           *Value
   )
 {
-  AML_DATA_NODE  * DataNode;
+  AML_DATA_NODE  *DataNode;
 
   if ((!IsIntegerNode (Node)            &&
        !IsSpecialIntegerNode (Node))    ||
-      (Value == NULL)) {
+      (Value == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -220,13 +229,15 @@ AmlNodeGetIntegerValue (
       ASSERT (0);
       return EFI_INVALID_PARAMETER;
     }
+
     return EFI_SUCCESS;
   }
 
   // For integer nodes, the value is in the first fixed argument.
-  DataNode = (AML_DATA_NODE*)Node->FixedArgs[EAmlParseIndexTerm0];
+  DataNode = (AML_DATA_NODE *)Node->FixedArgs[EAmlParseIndexTerm0];
   if (!IS_AML_DATA_NODE (DataNode) ||
-      (DataNode->DataType != EAmlNodeDataTypeUInt)) {
+      (DataNode->DataType != EAmlNodeDataTypeUInt))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -234,22 +245,22 @@ AmlNodeGetIntegerValue (
   switch (DataNode->Size) {
     case 1:
     {
-      *Value = *((UINT8*)(DataNode->Buffer));
+      *Value = *((UINT8 *)(DataNode->Buffer));
       break;
     }
     case 2:
     {
-      *Value = *((UINT16*)(DataNode->Buffer));
+      *Value = *((UINT16 *)(DataNode->Buffer));
       break;
     }
     case 4:
     {
-      *Value = *((UINT32*)(DataNode->Buffer));
+      *Value = *((UINT32 *)(DataNode->Buffer));
       break;
     }
     case 8:
     {
-      *Value = *((UINT64*)(DataNode->Buffer));
+      *Value = *((UINT64 *)(DataNode->Buffer));
       break;
     }
     default:
@@ -275,14 +286,14 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlUnwindSpecialInteger (
-  IN  AML_OBJECT_NODE   * Node
+  IN  AML_OBJECT_NODE  *Node
   )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
 
-  AML_DATA_NODE             * NewDataNode;
-  UINT8                       Value;
-  CONST AML_BYTE_ENCODING   * ByteEncoding;
+  AML_DATA_NODE            *NewDataNode;
+  UINT8                    Value;
+  CONST AML_BYTE_ENCODING  *ByteEncoding;
 
   if (!IsSpecialIntegerNode (Node)) {
     ASSERT (0);
@@ -301,11 +312,11 @@ AmlUnwindSpecialInteger (
   }
 
   Status = AmlCreateDataNode (
-              EAmlNodeDataTypeUInt,
-              &Value,
-              sizeof (UINT8),
-              (AML_DATA_NODE**)&NewDataNode
-              );
+             EAmlNodeDataTypeUInt,
+             &Value,
+             sizeof (UINT8),
+             (AML_DATA_NODE **)&NewDataNode
+             );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -324,10 +335,10 @@ AmlUnwindSpecialInteger (
 
   // Add the data node as the first fixed argument of the ByteOp object.
   Status = AmlSetFixedArgument (
-              (AML_OBJECT_NODE*)Node,
-              EAmlParseIndexTerm0,
-              (AML_NODE_HEADER*)NewDataNode
-              );
+             (AML_OBJECT_NODE *)Node,
+             EAmlParseIndexTerm0,
+             (AML_NODE_HEADER *)NewDataNode
+             );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     goto error_handler;
@@ -336,7 +347,7 @@ AmlUnwindSpecialInteger (
   return Status;
 
 error_handler:
-  AmlDeleteTree ((AML_NODE_HEADER*)NewDataNode);
+  AmlDeleteTree ((AML_NODE_HEADER *)NewDataNode);
   return Status;
 }
 
@@ -361,20 +372,21 @@ error_handler:
 EFI_STATUS
 EFIAPI
 AmlNodeSetIntegerValue (
-  IN  AML_OBJECT_NODE   * Node,
-  IN  UINT64              NewValue,
-  OUT INT8              * ValueWidthDiff
+  IN  AML_OBJECT_NODE  *Node,
+  IN  UINT64           NewValue,
+  OUT INT8             *ValueWidthDiff
   )
 {
-  EFI_STATUS        Status;
-  AML_DATA_NODE   * DataNode;
+  EFI_STATUS     Status;
+  AML_DATA_NODE  *DataNode;
 
-  UINT8             NewOpCode;
-  UINT8             NumberOfBytes;
+  UINT8  NewOpCode;
+  UINT8  NumberOfBytes;
 
   if ((!IsIntegerNode (Node)            &&
        !IsSpecialIntegerNode (Node))    ||
-      (ValueWidthDiff == NULL)) {
+      (ValueWidthDiff == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -397,6 +409,7 @@ AmlNodeSetIntegerValue (
           ASSERT (0);
           return Status;
         }
+
         // The AmlUnwindSpecialInteger functions converts a special integer
         // node to a UInt8/Byte data node. Thus, the size increments by one:
         // special integer are encoded as one byte (the opcode only) while byte
@@ -407,9 +420,10 @@ AmlNodeSetIntegerValue (
   } // IsSpecialIntegerNode (Node)
 
   // For integer nodes, the value is in the first fixed argument.
-  DataNode = (AML_DATA_NODE*)Node->FixedArgs[EAmlParseIndexTerm0];
+  DataNode = (AML_DATA_NODE *)Node->FixedArgs[EAmlParseIndexTerm0];
   if (!IS_AML_DATA_NODE (DataNode) ||
-      (DataNode->DataType != EAmlNodeDataTypeUInt)) {
+      (DataNode->DataType != EAmlNodeDataTypeUInt))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -417,7 +431,7 @@ AmlNodeSetIntegerValue (
   // The value can be encoded with a special 0 or 1 OpCode.
   // The AML_ONES_OP is not handled.
   if (NewValue <= 1) {
-    NewOpCode = (NewValue == 0) ? AML_ZERO_OP : AML_ONE_OP;
+    NewOpCode             = (NewValue == 0) ? AML_ZERO_OP : AML_ONE_OP;
     Node->AmlByteEncoding = AmlGetByteEncodingByOpCode (NewOpCode, 0);
 
     // The value is encoded with a AML_ZERO_OP or AML_ONE_OP.
@@ -426,9 +440,9 @@ AmlNodeSetIntegerValue (
     *ValueWidthDiff = -((INT8)DataNode->Size);
 
     // Detach and free the DataNode containing the integer value.
-    DataNode->NodeHeader.Parent = NULL;
+    DataNode->NodeHeader.Parent          = NULL;
     Node->FixedArgs[EAmlParseIndexTerm0] = NULL;
-    Status = AmlDeleteNode ((AML_NODE_HEADER*)DataNode);
+    Status                               = AmlDeleteNode ((AML_NODE_HEADER *)DataNode);
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       return Status;
@@ -440,19 +454,19 @@ AmlNodeSetIntegerValue (
   // Check the number of bits needed to represent the value.
   if (NewValue > MAX_UINT32) {
     // Value is 64 bits.
-    NewOpCode = AML_QWORD_PREFIX;
+    NewOpCode     = AML_QWORD_PREFIX;
     NumberOfBytes = 8;
   } else if (NewValue > MAX_UINT16) {
     // Value is 32 bits.
-    NewOpCode = AML_DWORD_PREFIX;
+    NewOpCode     = AML_DWORD_PREFIX;
     NumberOfBytes = 4;
   } else if (NewValue > MAX_UINT8) {
     // Value is 16 bits.
-    NewOpCode = AML_WORD_PREFIX;
+    NewOpCode     = AML_WORD_PREFIX;
     NumberOfBytes = 2;
   } else {
     // Value is 8 bits.
-    NewOpCode = AML_BYTE_PREFIX;
+    NewOpCode     = AML_BYTE_PREFIX;
     NumberOfBytes = 1;
   }
 
@@ -474,6 +488,7 @@ AmlNodeSetIntegerValue (
       ASSERT (0);
       return EFI_OUT_OF_RESOURCES;
     }
+
     DataNode->Size = NumberOfBytes;
   }
 
@@ -505,14 +520,14 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlNodeUpdateIntegerValue (
-  IN  AML_OBJECT_NODE       * IntegerNode,
-  IN  BOOLEAN                 IsIncrement,
-  IN  UINT64                  Diff,
-  OUT INT8                  * ValueWidthDiff
+  IN  AML_OBJECT_NODE  *IntegerNode,
+  IN  BOOLEAN          IsIncrement,
+  IN  UINT64           Diff,
+  OUT INT8             *ValueWidthDiff
   )
 {
-  EFI_STATUS       Status;
-  UINT64           Value;
+  EFI_STATUS  Status;
+  UINT64      Value;
 
   if (ValueWidthDiff == NULL) {
     ASSERT (0);
@@ -529,7 +544,8 @@ AmlNodeUpdateIntegerValue (
 
   // Check for UINT64 over/underflow.
   if ((IsIncrement && (Value > (MAX_UINT64 - Diff))) ||
-      (!IsIncrement && (Value < Diff))) {
+      (!IsIncrement && (Value < Diff)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -571,29 +587,30 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlPropagateSize (
-  IN  AML_NODE_HEADER   * Node,
-  IN  BOOLEAN             IsIncrement,
-  IN  UINT32            * Diff
+  IN  AML_NODE_HEADER  *Node,
+  IN  BOOLEAN          IsIncrement,
+  IN  UINT32           *Diff
   )
 {
-  EFI_STATUS         Status;
-  AML_OBJECT_NODE  * ObjectNode;
-  AML_NODE_HEADER  * ParentNode;
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *ObjectNode;
+  AML_NODE_HEADER  *ParentNode;
 
-  UINT32             Value;
-  UINT32             InitialPkgLenWidth;
-  UINT32             NewPkgLenWidth;
-  UINT32             ReComputedPkgLenWidth;
-  INT8               FieldWidthChange;
+  UINT32  Value;
+  UINT32  InitialPkgLenWidth;
+  UINT32  NewPkgLenWidth;
+  UINT32  ReComputedPkgLenWidth;
+  INT8    FieldWidthChange;
 
   if (!IS_AML_OBJECT_NODE (Node) &&
-      !IS_AML_ROOT_NODE (Node)) {
+      !IS_AML_ROOT_NODE (Node))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   if (IS_AML_OBJECT_NODE (Node)) {
-    ObjectNode = (AML_OBJECT_NODE*)Node;
+    ObjectNode = (AML_OBJECT_NODE *)Node;
 
     // For BufferOp, the buffer size is stored in BufferSize. Therefore,
     // BufferOp needs special handling to update the BufferSize.
@@ -607,10 +624,10 @@ AmlPropagateSize (
       // (can be a BYTE, WORD, DWORD or QWORD).
       // BufferSize is an object node.
       Status = AmlNodeUpdateIntegerValue (
-                 (AML_OBJECT_NODE*)AmlGetFixedArgument (
-                                     ObjectNode,
-                                     EAmlParseIndexTerm0
-                                     ),
+                 (AML_OBJECT_NODE *)AmlGetFixedArgument (
+                                      ObjectNode,
+                                      EAmlParseIndexTerm0
+                                      ),
                  IsIncrement,
                  (UINT64)(*Diff),
                  &FieldWidthChange
@@ -625,7 +642,8 @@ AmlPropagateSize (
       if ((IsIncrement              &&
            (FieldWidthChange < 0))  ||
           (!IsIncrement             &&
-           (FieldWidthChange > 0))) {
+           (FieldWidthChange > 0)))
+      {
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
       }
@@ -648,13 +666,14 @@ AmlPropagateSize (
       // Subtract the size of the PkgLen encoding. The size of the PkgLen
       // encoding must be computed after having updated Value.
       InitialPkgLenWidth = AmlComputePkgLengthWidth (Value);
-      Value -= InitialPkgLenWidth;
+      Value             -= InitialPkgLenWidth;
 
       // Check for an over/underflows.
       // PkgLen is a 28 bit value, cf 20.2.4 Package Length Encoding
       // i.e. the maximum value is (2^28 - 1) = ((BIT0 << 28) - 1).
       if ((IsIncrement && ((((BIT0 << 28) - 1) - Value) < *Diff))   ||
-          (!IsIncrement && (Value < *Diff))) {
+          (!IsIncrement && (Value < *Diff)))
+      {
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
       }
@@ -683,7 +702,8 @@ AmlPropagateSize (
       ReComputedPkgLenWidth = AmlComputePkgLengthWidth (Value);
       if (ReComputedPkgLenWidth != NewPkgLenWidth) {
         if ((ReComputedPkgLenWidth != 0)   &&
-            (ReComputedPkgLenWidth < 4)) {
+            (ReComputedPkgLenWidth < 4))
+        {
           // No need to recompute the PkgLen since a new threshold cannot
           // be reached by incrementing the value by one.
           Value += 1;
@@ -694,8 +714,8 @@ AmlPropagateSize (
       }
 
       *Diff += (InitialPkgLenWidth > ReComputedPkgLenWidth) ?
-                 (InitialPkgLenWidth - ReComputedPkgLenWidth) :
-                 (ReComputedPkgLenWidth - InitialPkgLenWidth);
+               (InitialPkgLenWidth - ReComputedPkgLenWidth) :
+               (ReComputedPkgLenWidth - InitialPkgLenWidth);
       ObjectNode->PkgLen = Value;
     } // PkgLen update.
 
@@ -703,7 +723,7 @@ AmlPropagateSize (
     // there is no root node at the top of the tree. Stop
     // propagating the new size when finding a root node
     // OR when a NULL parent is found.
-    ParentNode = AmlGetParent ((AML_NODE_HEADER*)Node);
+    ParentNode = AmlGetParent ((AML_NODE_HEADER *)Node);
     if (ParentNode != NULL) {
       // Propagate the size up the tree.
       Status = AmlPropagateSize (
@@ -716,14 +736,14 @@ AmlPropagateSize (
         return Status;
       }
     }
-
   } else if (IS_AML_ROOT_NODE (Node)) {
     // Update the length field in the SDT header.
-    Value = ((AML_ROOT_NODE*)Node)->SdtHeader->Length;
+    Value = ((AML_ROOT_NODE *)Node)->SdtHeader->Length;
 
     // Check for an over/underflows.
     if ((IsIncrement && (Value > (MAX_UINT32 - *Diff))) ||
-        (!IsIncrement && (Value < *Diff))) {
+        (!IsIncrement && (Value < *Diff)))
+    {
       ASSERT (0);
       return EFI_INVALID_PARAMETER;
     }
@@ -735,7 +755,7 @@ AmlPropagateSize (
       Value -= *Diff;
     }
 
-    ((AML_ROOT_NODE*)Node)->SdtHeader->Length = Value;
+    ((AML_ROOT_NODE *)Node)->SdtHeader->Length = Value;
   }
 
   return EFI_SUCCESS;
@@ -763,21 +783,22 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlPropagateNodeCount (
-  IN  AML_OBJECT_NODE   * ObjectNode,
-  IN  BOOLEAN             IsIncrement,
-  IN  UINT8               NodeCount,
-  OUT INT8              * FieldWidthChange
+  IN  AML_OBJECT_NODE  *ObjectNode,
+  IN  BOOLEAN          IsIncrement,
+  IN  UINT8            NodeCount,
+  OUT INT8             *FieldWidthChange
   )
 {
-  EFI_STATUS         Status;
+  EFI_STATUS  Status;
 
-  AML_NODE_HEADER  * NodeCountArg;
-  UINT8              CurrNodeCount;
+  AML_NODE_HEADER  *NodeCountArg;
+  UINT8            CurrNodeCount;
 
   // Currently there is no use case where (NodeCount > 1).
   if (!IS_AML_OBJECT_NODE (ObjectNode)  ||
       (FieldWidthChange == NULL)        ||
-      (NodeCount > 1)) {
+      (NodeCount > 1))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -798,25 +819,26 @@ AmlPropagateNodeCount (
     // in the package. It is an UINT8.
 
     // Check for over/underflow.
-    CurrNodeCount = *(((AML_DATA_NODE*)NodeCountArg)->Buffer);
+    CurrNodeCount = *(((AML_DATA_NODE *)NodeCountArg)->Buffer);
     if ((IsIncrement && (CurrNodeCount == MAX_UINT8)) ||
-        (!IsIncrement && (CurrNodeCount == 0))) {
+        (!IsIncrement && (CurrNodeCount == 0)))
+    {
       ASSERT (0);
       return EFI_INVALID_PARAMETER;
     }
 
     // Update the node count in the DataNode.
-    CurrNodeCount = IsIncrement ? (CurrNodeCount + 1) : (CurrNodeCount - 1);
-    *(((AML_DATA_NODE*)NodeCountArg)->Buffer) =  CurrNodeCount;
+    CurrNodeCount                              = IsIncrement ? (CurrNodeCount + 1) : (CurrNodeCount - 1);
+    *(((AML_DATA_NODE *)NodeCountArg)->Buffer) =  CurrNodeCount;
   } else if (AmlNodeCompareOpCode (ObjectNode, AML_VAR_PACKAGE_OP, 0)) {
     // First fixed argument of PackageOp stores the number of elements
     // in the package. It is an integer (can be a BYTE, WORD, DWORD, QWORD).
     Status = AmlNodeUpdateIntegerValue (
-                (AML_OBJECT_NODE*)NodeCountArg,
-                IsIncrement,
-                NodeCount,
-                FieldWidthChange
-                );
+               (AML_OBJECT_NODE *)NodeCountArg,
+               IsIncrement,
+               NodeCount,
+               FieldWidthChange
+               );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       return Status;
@@ -846,10 +868,10 @@ AmlPropagateNodeCount (
 EFI_STATUS
 EFIAPI
 AmlPropagateInformation (
-  IN  AML_NODE_HEADER   * Node,
-  IN  BOOLEAN             IsIncrement,
-  IN  UINT32              Diff,
-  IN  UINT8               NodeCount
+  IN  AML_NODE_HEADER  *Node,
+  IN  BOOLEAN          IsIncrement,
+  IN  UINT32           Diff,
+  IN  UINT8            NodeCount
   )
 {
   EFI_STATUS  Status;
@@ -858,7 +880,8 @@ AmlPropagateInformation (
   // Currently there is no use case where (NodeCount > 1).
   if ((!IS_AML_ROOT_NODE (Node)     &&
        !IS_AML_OBJECT_NODE (Node))  ||
-      (NodeCount > 1)) {
+      (NodeCount > 1))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -866,9 +889,10 @@ AmlPropagateInformation (
   // Propagate the node count first as it may change the number of bytes
   // needed to store the node count, and then impact FieldWidthChange.
   if ((NodeCount != 0) &&
-      IS_AML_OBJECT_NODE (Node)) {
+      IS_AML_OBJECT_NODE (Node))
+  {
     Status = AmlPropagateNodeCount (
-               (AML_OBJECT_NODE*)Node,
+               (AML_OBJECT_NODE *)Node,
                IsIncrement,
                NodeCount,
                &FieldWidthChange
@@ -882,14 +906,16 @@ AmlPropagateInformation (
     // Maximum change is between UINT8/UINT64: 8 bytes.
     if ((ABS (FieldWidthChange) > 8)                          ||
         (IsIncrement                                          &&
-          ((FieldWidthChange < 0)                             ||
-           ((Diff + (UINT8)FieldWidthChange) > MAX_UINT32)))  ||
+         ((FieldWidthChange < 0)                             ||
+          ((Diff + (UINT8)FieldWidthChange) > MAX_UINT32)))  ||
         (!IsIncrement                                         &&
-          ((FieldWidthChange > 0)                             ||
-           (Diff < (UINT32)ABS (FieldWidthChange))))) {
+         ((FieldWidthChange > 0)                             ||
+          (Diff < (UINT32)ABS (FieldWidthChange)))))
+    {
       ASSERT (0);
       return EFI_INVALID_PARAMETER;
     }
+
     Diff = (UINT32)(Diff + (UINT8)ABS (FieldWidthChange));
   }
 
@@ -903,4 +929,83 @@ AmlPropagateInformation (
   }
 
   return EFI_SUCCESS;
+}
+
+/** Find and set the EndTag's Checksum of a list of Resource Data elements.
+
+  Lists of Resource Data elements end with an EndTag (most of the time). This
+  function finds the EndTag (if present) in a list of Resource Data elements
+  and sets the checksum.
+
+  ACPI 6.4, s6.4.2.9 "End Tag":
+  "This checksum is generated such that adding it to the sum of all the data
+  bytes will produce a zero sum."
+  "If the checksum field is zero, the resource data is treated as if the
+  checksum operation succeeded. Configuration proceeds normally."
+
+  To avoid re-computing checksums, if a new resource data elements is
+  added/removed/modified in a list of resource data elements, the AmlLib
+  resets the checksum to 0.
+
+  @param [in]  BufferOpNode   Node having a list of Resource Data elements.
+  @param [in]  CheckSum       CheckSum to store in the EndTag.
+                              To ignore/avoid computing the checksum,
+                              give 0.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No EndTag found.
+**/
+EFI_STATUS
+EFIAPI
+AmlSetRdListCheckSum (
+  IN  AML_OBJECT_NODE  *BufferOpNode,
+  IN  UINT8            CheckSum
+  )
+{
+  EFI_STATUS     Status;
+  AML_DATA_NODE  *LastRdNode;
+  AML_RD_HEADER  RdDataType;
+
+  if (!AmlNodeCompareOpCode (BufferOpNode, AML_BUFFER_OP, 0)) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Get the last Resource data node in the variable list of
+  // argument of the BufferOp node.
+  LastRdNode = (AML_DATA_NODE *)AmlGetPreviousVariableArgument (
+                                  (AML_NODE_HEADER *)BufferOpNode,
+                                  NULL
+                                  );
+  if ((LastRdNode == NULL)             ||
+      !IS_AML_DATA_NODE (LastRdNode)   ||
+      (LastRdNode->DataType != EAmlNodeDataTypeResourceData))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlGetResourceDataType (LastRdNode, &RdDataType);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // Check the LastRdNode is an EndTag.
+  // It is possible to have only one Resource Data in a BufferOp with
+  // no EndTag. Return EFI_NOT_FOUND is such case.
+  if (!AmlRdCompareDescId (
+         &RdDataType,
+         AML_RD_BUILD_SMALL_DESC_ID (ACPI_SMALL_END_TAG_DESCRIPTOR_NAME)
+         ))
+  {
+    ASSERT (0);
+    return EFI_NOT_FOUND;
+  }
+
+  Status = AmlRdSetEndTagChecksum (LastRdNode->Buffer, CheckSum);
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
 }

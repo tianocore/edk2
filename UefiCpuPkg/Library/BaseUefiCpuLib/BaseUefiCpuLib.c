@@ -4,6 +4,7 @@
   The library routines are UEFI specification compliant.
 
   Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
+  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -35,4 +36,46 @@ StandardSignatureIsAuthenticAMD (
   return (RegEbx == CPUID_SIGNATURE_AUTHENTIC_AMD_EBX &&
           RegEcx == CPUID_SIGNATURE_AUTHENTIC_AMD_ECX &&
           RegEdx == CPUID_SIGNATURE_AUTHENTIC_AMD_EDX);
+}
+
+/**
+  Return the 32bit CPU family and model value.
+
+  @return CPUID[01h].EAX with Processor Type and Stepping ID cleared.
+**/
+UINT32
+EFIAPI
+GetCpuFamilyModel (
+  VOID
+  )
+{
+  CPUID_VERSION_INFO_EAX  Eax;
+
+  AsmCpuid (CPUID_VERSION_INFO, &Eax.Uint32, NULL, NULL, NULL);
+
+  //
+  // Mask other fields than Family and Model.
+  //
+  Eax.Bits.SteppingId    = 0;
+  Eax.Bits.ProcessorType = 0;
+  Eax.Bits.Reserved1     = 0;
+  Eax.Bits.Reserved2     = 0;
+  return Eax.Uint32;
+}
+
+/**
+  Return the CPU stepping ID.
+  @return CPU stepping ID value in CPUID[01h].EAX.
+**/
+UINT8
+EFIAPI
+GetCpuSteppingId (
+  VOID
+  )
+{
+  CPUID_VERSION_INFO_EAX  Eax;
+
+  AsmCpuid (CPUID_VERSION_INFO, &Eax.Uint32, NULL, NULL, NULL);
+
+  return (UINT8)Eax.Bits.SteppingId;
 }

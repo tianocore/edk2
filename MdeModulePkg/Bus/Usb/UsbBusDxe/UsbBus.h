@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _EFI_USB_BUS_H_
 #define _EFI_USB_BUS_H_
 
-
 #include <Uefi.h>
 
 #include <Protocol/Usb2HostController.h>
@@ -28,14 +27,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/ReportStatusCodeLib.h>
 
-
 #include <IndustryStandard/Usb.h>
 
 typedef struct _USB_DEVICE     USB_DEVICE;
 typedef struct _USB_INTERFACE  USB_INTERFACE;
 typedef struct _USB_BUS        USB_BUS;
 typedef struct _USB_HUB_API    USB_HUB_API;
-
 
 #include "UsbUtility.h"
 #include "UsbDesc.h"
@@ -46,19 +43,19 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 // USB bus timeout experience values
 //
 
-#define USB_MAX_LANG_ID           16
-#define USB_MAX_INTERFACE         16
-#define USB_MAX_DEVICES           128
+#define USB_MAX_LANG_ID    16
+#define USB_MAX_INTERFACE  16
+#define USB_MAX_DEVICES    128
 
-#define USB_BUS_1_MILLISECOND     1000
+#define USB_BUS_1_MILLISECOND  1000
 
 //
 // Roothub and hub's polling interval, set by experience,
 // The unit of roothub is 100us, means 100ms as interval, and
 // the unit of hub is 1ms, means 64ms as interval.
 //
-#define USB_ROOTHUB_POLL_INTERVAL (100 * 10000U)
-#define USB_HUB_POLL_INTERVAL     64
+#define USB_ROOTHUB_POLL_INTERVAL  (100 * 10000U)
+#define USB_HUB_POLL_INTERVAL      64
 
 //
 // Wait for port stable to work, refers to specification
@@ -69,13 +66,13 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 //
 // Wait for port statue reg change, set by experience
 //
-#define USB_WAIT_PORT_STS_CHANGE_STALL (100)
+#define USB_WAIT_PORT_STS_CHANGE_STALL  (100)
 
 //
 // Wait for set device address, refers to specification
 // [USB20-9.2.6.3, it says 2ms]
 //
-#define USB_SET_DEVICE_ADDRESS_STALL   (2 * USB_BUS_1_MILLISECOND)
+#define USB_SET_DEVICE_ADDRESS_STALL  (2 * USB_BUS_1_MILLISECOND)
 
 //
 // Wait for retry max packet size, set by experience
@@ -86,7 +83,7 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 // Wait for hub port power-on, refers to specification
 // [USB20-11.23.2]
 //
-#define USB_SET_PORT_POWER_STALL       (2 * USB_BUS_1_MILLISECOND)
+#define USB_SET_PORT_POWER_STALL  (2 * USB_BUS_1_MILLISECOND)
 
 //
 // Wait for port reset, refers to specification
@@ -103,7 +100,7 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 // Wait for port recovery to accept SetAddress, refers to specification
 // [USB20-7.1.7.5, it says 10 ms for TRSTRCY]
 //
-#define USB_SET_PORT_RECOVERY_STALL    (10 * USB_BUS_1_MILLISECOND)
+#define USB_SET_PORT_RECOVERY_STALL  (10 * USB_BUS_1_MILLISECOND)
 
 //
 // Wait for clear roothub port reset, set by experience
@@ -113,7 +110,7 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 //
 // Wait for set roothub port enable, set by experience
 //
-#define USB_SET_ROOT_PORT_ENABLE_STALL (20 * USB_BUS_1_MILLISECOND)
+#define USB_SET_ROOT_PORT_ENABLE_STALL  (20 * USB_BUS_1_MILLISECOND)
 
 //
 // Send general device request timeout.
@@ -122,7 +119,7 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 // 50 milliseconds.  We use a value of 500 milliseconds to work
 // around slower hubs and devices.
 //
-#define USB_GENERAL_DEVICE_REQUEST_TIMEOUT 500
+#define USB_GENERAL_DEVICE_REQUEST_TIMEOUT  500
 
 //
 // Send clear feature request timeout, set by experience
@@ -133,13 +130,13 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 // Bus raises TPL to TPL_NOTIFY to serialize all its operations
 // to protect shared data structures.
 //
-#define  USB_BUS_TPL               TPL_NOTIFY
+#define  USB_BUS_TPL  TPL_NOTIFY
 
-#define  USB_INTERFACE_SIGNATURE   SIGNATURE_32 ('U', 'S', 'B', 'I')
-#define  USB_BUS_SIGNATURE         SIGNATURE_32 ('U', 'S', 'B', 'B')
+#define  USB_INTERFACE_SIGNATURE  SIGNATURE_32 ('U', 'S', 'B', 'I')
+#define  USB_BUS_SIGNATURE        SIGNATURE_32 ('U', 'S', 'B', 'B')
 
-#define USB_BIT(a)                  ((UINTN)(1 << (a)))
-#define USB_BIT_IS_SET(Data, Bit)   ((BOOLEAN)(((Data) & (Bit)) == (Bit)))
+#define USB_BIT(a)                 ((UINTN)(1 << (a)))
+#define USB_BIT_IS_SET(Data, Bit)  ((BOOLEAN)(((Data) & (Bit)) == (Bit)))
 
 #define USB_INTERFACE_FROM_USBIO(a) \
           CR(a, USB_INTERFACE, UsbIo, USB_INTERFACE_SIGNATURE)
@@ -153,113 +150,112 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 // gEfiCallerIdGuid will be used as its protocol guid.
 //
 typedef struct _EFI_USB_BUS_PROTOCOL {
-  UINT64                    Reserved;
+  UINT64    Reserved;
 } EFI_USB_BUS_PROTOCOL;
-
 
 //
 // Stands for the real USB device. Each device may
 // has several separately working interfaces.
 //
 struct _USB_DEVICE {
-  USB_BUS                   *Bus;
+  USB_BUS                               *Bus;
 
   //
   // Configuration information
   //
-  UINT8                     Speed;
-  UINT8                     Address;
-  UINT32                    MaxPacket0;
+  UINT8                                 Speed;
+  UINT8                                 Address;
+  UINT32                                MaxPacket0;
 
   //
   // The device's descriptors and its configuration
   //
-  USB_DEVICE_DESC           *DevDesc;
-  USB_CONFIG_DESC           *ActiveConfig;
+  USB_DEVICE_DESC                       *DevDesc;
+  USB_CONFIG_DESC                       *ActiveConfig;
 
-  UINT16                    LangId [USB_MAX_LANG_ID];
-  UINT16                    TotalLangId;
+  UINT16                                LangId[USB_MAX_LANG_ID];
+  UINT16                                TotalLangId;
 
-  UINT8                     NumOfInterface;
-  USB_INTERFACE             *Interfaces [USB_MAX_INTERFACE];
+  UINT8                                 NumOfInterface;
+  USB_INTERFACE                         *Interfaces[USB_MAX_INTERFACE];
 
   //
   // Parent child relationship
   //
-  EFI_USB2_HC_TRANSACTION_TRANSLATOR Translator;
+  EFI_USB2_HC_TRANSACTION_TRANSLATOR    Translator;
 
-  UINT8                     ParentAddr;
-  USB_INTERFACE             *ParentIf;
-  UINT8                     ParentPort;       // Start at 0
-  UINT8                     Tier;
-  BOOLEAN                   DisconnectFail;
+  UINT8                                 ParentAddr;
+  USB_INTERFACE                         *ParentIf;
+  UINT8                                 ParentPort; // Start at 0
+  UINT8                                 Tier;
+  BOOLEAN                               DisconnectFail;
 };
 
 //
 // Stands for different functions of USB device
 //
 struct _USB_INTERFACE {
-  UINTN                     Signature;
-  USB_DEVICE                *Device;
-  USB_INTERFACE_DESC        *IfDesc;
-  USB_INTERFACE_SETTING     *IfSetting;
+  UINTN                       Signature;
+  USB_DEVICE                  *Device;
+  USB_INTERFACE_DESC          *IfDesc;
+  USB_INTERFACE_SETTING       *IfSetting;
 
   //
   // Handles and protocols
   //
-  EFI_HANDLE                Handle;
-  EFI_USB_IO_PROTOCOL       UsbIo;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  BOOLEAN                   IsManaged;
+  EFI_HANDLE                  Handle;
+  EFI_USB_IO_PROTOCOL         UsbIo;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  BOOLEAN                     IsManaged;
 
   //
   // Hub device special data
   //
-  BOOLEAN                   IsHub;
-  USB_HUB_API               *HubApi;
-  UINT8                     NumOfPort;
-  EFI_EVENT                 HubNotify;
+  BOOLEAN                     IsHub;
+  USB_HUB_API                 *HubApi;
+  UINT8                       NumOfPort;
+  EFI_EVENT                   HubNotify;
 
   //
   // Data used only by normal hub devices
   //
-  USB_ENDPOINT_DESC         *HubEp;
-  UINT8                     *ChangeMap;
+  USB_ENDPOINT_DESC           *HubEp;
+  UINT8                       *ChangeMap;
 
   //
   // Data used only by root hub to hand over device to
   // companion UHCI driver if low/full speed devices are
   // connected to EHCI.
   //
-  UINT8                     MaxSpeed;
+  UINT8                       MaxSpeed;
 };
 
 //
 // Stands for the current USB Bus
 //
 struct _USB_BUS {
-  UINTN                     Signature;
-  EFI_USB_BUS_PROTOCOL      BusId;
+  UINTN                       Signature;
+  EFI_USB_BUS_PROTOCOL        BusId;
 
   //
   // Managed USB host controller
   //
-  EFI_HANDLE                HostHandle;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  EFI_USB2_HC_PROTOCOL      *Usb2Hc;
-  EFI_USB_HC_PROTOCOL       *UsbHc;
+  EFI_HANDLE                  HostHandle;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  EFI_USB2_HC_PROTOCOL        *Usb2Hc;
+  EFI_USB_HC_PROTOCOL         *UsbHc;
 
   //
   // Recorded the max supported usb devices.
   // XHCI can support up to 255 devices.
   // EHCI/UHCI/OHCI supports up to 127 devices.
   //
-  UINT32                    MaxDevices;
+  UINT32                      MaxDevices;
   //
   // An array of device that is on the bus. Devices[0] is
   // for root hub. Device with address i is at Devices[i].
   //
-  USB_DEVICE                *Devices[256];
+  USB_DEVICE                  *Devices[256];
 
   //
   // USB Bus driver need to control the recursive connect policy of the bus, only those wanted
@@ -269,35 +265,34 @@ struct _USB_BUS {
   // every wanted child device is stored in a item of the WantedUsbIoDPList, whose structure is
   // DEVICE_PATH_LIST_ITEM
   //
-  LIST_ENTRY                WantedUsbIoDPList;
-
+  LIST_ENTRY    WantedUsbIoDPList;
 };
 
 //
 // USB Hub Api
 //
-struct _USB_HUB_API{
-  USB_HUB_INIT                Init;
-  USB_HUB_GET_PORT_STATUS     GetPortStatus;
-  USB_HUB_CLEAR_PORT_CHANGE   ClearPortChange;
-  USB_HUB_SET_PORT_FEATURE    SetPortFeature;
-  USB_HUB_CLEAR_PORT_FEATURE  ClearPortFeature;
-  USB_HUB_RESET_PORT          ResetPort;
-  USB_HUB_RELEASE             Release;
+struct _USB_HUB_API {
+  USB_HUB_INIT                  Init;
+  USB_HUB_GET_PORT_STATUS       GetPortStatus;
+  USB_HUB_CLEAR_PORT_CHANGE     ClearPortChange;
+  USB_HUB_SET_PORT_FEATURE      SetPortFeature;
+  USB_HUB_CLEAR_PORT_FEATURE    ClearPortFeature;
+  USB_HUB_RESET_PORT            ResetPort;
+  USB_HUB_RELEASE               Release;
 };
 
-#define USB_US_LAND_ID   0x0409
+#define USB_US_LAND_ID  0x0409
 
-#define DEVICE_PATH_LIST_ITEM_SIGNATURE     SIGNATURE_32('d','p','l','i')
-typedef struct _DEVICE_PATH_LIST_ITEM{
-  UINTN                                 Signature;
-  LIST_ENTRY                            Link;
-  EFI_DEVICE_PATH_PROTOCOL              *DevicePath;
+#define DEVICE_PATH_LIST_ITEM_SIGNATURE  SIGNATURE_32('d','p','l','i')
+typedef struct _DEVICE_PATH_LIST_ITEM {
+  UINTN                       Signature;
+  LIST_ENTRY                  Link;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
 } DEVICE_PATH_LIST_ITEM;
 
 typedef struct {
-  USB_CLASS_DEVICE_PATH           UsbClass;
-  EFI_DEVICE_PATH_PROTOCOL        End;
+  USB_CLASS_DEVICE_PATH       UsbClass;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } USB_CLASS_FORMAT_DEVICE_PATH;
 
 /**
@@ -312,7 +307,7 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 UsbBusFreeUsbDPList (
-  IN     LIST_ENTRY                                 *UsbIoDPList
+  IN     LIST_ENTRY  *UsbIoDPList
   );
 
 /**
@@ -329,8 +324,8 @@ UsbBusFreeUsbDPList (
 EFI_STATUS
 EFIAPI
 UsbBusAddWantedUsbIoDP (
-  IN EFI_USB_BUS_PROTOCOL         *UsbBusId,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  IN EFI_USB_BUS_PROTOCOL      *UsbBusId,
+  IN EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath
   );
 
 /**
@@ -346,8 +341,8 @@ UsbBusAddWantedUsbIoDP (
 BOOLEAN
 EFIAPI
 UsbBusIsWantedUsbIO (
-  IN USB_BUS                 *Bus,
-  IN USB_INTERFACE           *UsbIf
+  IN USB_BUS        *Bus,
+  IN USB_INTERFACE  *UsbIf
   );
 
 /**
@@ -363,7 +358,7 @@ UsbBusIsWantedUsbIO (
 EFI_STATUS
 EFIAPI
 UsbBusRecursivelyConnectWantedUsbIo (
-  IN EFI_USB_BUS_PROTOCOL         *UsbBusId
+  IN EFI_USB_BUS_PROTOCOL  *UsbBusId
   );
 
 /**
@@ -392,8 +387,8 @@ UsbIoControlTransfer (
   IN  EFI_USB_DEVICE_REQUEST  *Request,
   IN  EFI_USB_DATA_DIRECTION  Direction,
   IN  UINT32                  Timeout,
-  IN  OUT VOID                *Data,      OPTIONAL
-  IN  UINTN                   DataLength, OPTIONAL
+  IN  OUT VOID                *Data       OPTIONAL,
+  IN  UINTN                   DataLength  OPTIONAL,
   OUT UINT32                  *UsbStatus
   );
 
@@ -416,12 +411,12 @@ UsbIoControlTransfer (
 EFI_STATUS
 EFIAPI
 UsbIoBulkTransfer (
-  IN  EFI_USB_IO_PROTOCOL *This,
-  IN  UINT8               Endpoint,
-  IN  OUT VOID            *Data,
-  IN  OUT UINTN           *DataLength,
-  IN  UINTN               Timeout,
-  OUT UINT32              *UsbStatus
+  IN  EFI_USB_IO_PROTOCOL  *This,
+  IN  UINT8                Endpoint,
+  IN  OUT VOID             *Data,
+  IN  OUT UINTN            *DataLength,
+  IN  UINTN                Timeout,
+  OUT UINT32               *UsbStatus
   );
 
 /**
@@ -443,12 +438,12 @@ UsbIoBulkTransfer (
 EFI_STATUS
 EFIAPI
 UsbIoSyncInterruptTransfer (
-  IN  EFI_USB_IO_PROTOCOL *This,
-  IN  UINT8               Endpoint,
-  IN  OUT VOID            *Data,
-  IN  OUT UINTN           *DataLength,
-  IN  UINTN               Timeout,
-  OUT UINT32              *UsbStatus
+  IN  EFI_USB_IO_PROTOCOL  *This,
+  IN  UINT8                Endpoint,
+  IN  OUT VOID             *Data,
+  IN  OUT UINTN            *DataLength,
+  IN  UINTN                Timeout,
+  OUT UINT32               *UsbStatus
   );
 
 /**
@@ -477,9 +472,9 @@ UsbIoAsyncInterruptTransfer (
   IN EFI_USB_IO_PROTOCOL              *This,
   IN UINT8                            Endpoint,
   IN BOOLEAN                          IsNewTransfer,
-  IN UINTN                            PollInterval,       OPTIONAL
-  IN UINTN                            DataLength,         OPTIONAL
-  IN EFI_ASYNC_USB_TRANSFER_CALLBACK  Callback,           OPTIONAL
+  IN UINTN                            PollInterval        OPTIONAL,
+  IN UINTN                            DataLength          OPTIONAL,
+  IN EFI_ASYNC_USB_TRANSFER_CALLBACK  Callback            OPTIONAL,
   IN VOID                             *Context            OPTIONAL
   );
 
@@ -498,11 +493,11 @@ UsbIoAsyncInterruptTransfer (
 EFI_STATUS
 EFIAPI
 UsbIoIsochronousTransfer (
-  IN  EFI_USB_IO_PROTOCOL *This,
-  IN  UINT8               DeviceEndpoint,
-  IN  OUT VOID            *Data,
-  IN  UINTN               DataLength,
-  OUT UINT32              *Status
+  IN  EFI_USB_IO_PROTOCOL  *This,
+  IN  UINT8                DeviceEndpoint,
+  IN  OUT VOID             *Data,
+  IN  UINTN                DataLength,
+  OUT UINT32               *Status
   );
 
 /**
@@ -543,8 +538,8 @@ UsbIoAsyncIsochronousTransfer (
 EFI_STATUS
 EFIAPI
 UsbIoGetDeviceDescriptor (
-  IN  EFI_USB_IO_PROTOCOL       *This,
-  OUT EFI_USB_DEVICE_DESCRIPTOR *Descriptor
+  IN  EFI_USB_IO_PROTOCOL        *This,
+  OUT EFI_USB_DEVICE_DESCRIPTOR  *Descriptor
   );
 
 /**
@@ -561,8 +556,8 @@ UsbIoGetDeviceDescriptor (
 EFI_STATUS
 EFIAPI
 UsbIoGetActiveConfigDescriptor (
-  IN  EFI_USB_IO_PROTOCOL       *This,
-  OUT EFI_USB_CONFIG_DESCRIPTOR *Descriptor
+  IN  EFI_USB_IO_PROTOCOL        *This,
+  OUT EFI_USB_CONFIG_DESCRIPTOR  *Descriptor
   );
 
 /**
@@ -597,9 +592,9 @@ UsbIoGetInterfaceDescriptor (
 EFI_STATUS
 EFIAPI
 UsbIoGetEndpointDescriptor (
-  IN  EFI_USB_IO_PROTOCOL         *This,
-  IN  UINT8                       Index,
-  OUT EFI_USB_ENDPOINT_DESCRIPTOR *Descriptor
+  IN  EFI_USB_IO_PROTOCOL          *This,
+  IN  UINT8                        Index,
+  OUT EFI_USB_ENDPOINT_DESCRIPTOR  *Descriptor
   );
 
 /**
@@ -615,9 +610,9 @@ UsbIoGetEndpointDescriptor (
 EFI_STATUS
 EFIAPI
 UsbIoGetSupportedLanguages (
-  IN  EFI_USB_IO_PROTOCOL *This,
-  OUT UINT16              **LangIDTable,
-  OUT UINT16              *TableSize
+  IN  EFI_USB_IO_PROTOCOL  *This,
+  OUT UINT16               **LangIDTable,
+  OUT UINT16               *TableSize
   );
 
 /**
@@ -635,10 +630,10 @@ UsbIoGetSupportedLanguages (
 EFI_STATUS
 EFIAPI
 UsbIoGetStringDescriptor (
-  IN  EFI_USB_IO_PROTOCOL   *This,
-  IN  UINT16                LangID,
-  IN  UINT8                 StringIndex,
-  OUT CHAR16                **String
+  IN  EFI_USB_IO_PROTOCOL  *This,
+  IN  UINT16               LangID,
+  IN  UINT8                StringIndex,
+  OUT CHAR16               **String
   );
 
 /**
@@ -690,8 +685,8 @@ UsbBusBuildProtocol (
 EFI_STATUS
 EFIAPI
 UsbBusDriverEntryPoint (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
 /**
@@ -756,9 +751,9 @@ UsbBusControllerDriverStop (
   IN EFI_HANDLE                   *ChildHandleBuffer
   );
 
-extern EFI_USB_IO_PROTOCOL            mUsbIoProtocol;
-extern EFI_DRIVER_BINDING_PROTOCOL    mUsbBusDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL    mUsbBusComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL   mUsbBusComponentName2;
+extern EFI_USB_IO_PROTOCOL           mUsbIoProtocol;
+extern EFI_DRIVER_BINDING_PROTOCOL   mUsbBusDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   mUsbBusComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  mUsbBusComponentName2;
 
 #endif

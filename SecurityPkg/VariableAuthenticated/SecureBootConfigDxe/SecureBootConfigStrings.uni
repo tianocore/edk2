@@ -21,6 +21,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #string STR_SECURE_BOOT_PROMPT             #language en-US "Attempt Secure Boot"
 #string STR_SECURE_BOOT_HELP               #language en-US "Enable/Disable the Secure Boot feature after platform reset"
 
+#string STR_SECURE_RESET_TO_DEFAULTS_HELP  #language en-US "Enroll keys with data from default variables"
+#string STR_SECURE_RESET_TO_DEFAULTS       #language en-US "Reset Secure Boot Keys"
+#string STR_RESET_TO_DEFAULTS_POPUP        #language en-US "Secure Boot Keys & databases will be initialized from defaults.\n Are you sure?"
+
 #string STR_SECURE_BOOT_ENROLL_SIGNATURE   #language en-US "Enroll Signature"
 #string STR_SECURE_BOOT_DELETE_SIGNATURE   #language en-US "Delete Signature"
 #string STR_SECURE_BOOT_DELETE_LIST_FORM   #language en-US "Delete Signature List Form"

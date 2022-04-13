@@ -10,12 +10,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Sec.h"
 
-
-
-EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI mSecTemporaryRamSupportPpi = {
+EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI  mSecTemporaryRamSupportPpi = {
   SecTemporaryRamSupport
 };
-
 
 EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {
   {
@@ -24,8 +21,6 @@ EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {
     &mSecTemporaryRamSupportPpi
   }
 };
-
-
 
 /**
   The entry point of PE/COFF Image for the PEI Core, that has been hijacked by this
@@ -62,8 +57,8 @@ EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {
 VOID
 EFIAPI
 _ModuleEntryPoint (
-  IN EFI_SEC_PEI_HAND_OFF   *SecCoreData,
-  IN EFI_PEI_PPI_DESCRIPTOR *PpiList
+  IN EFI_SEC_PEI_HAND_OFF    *SecCoreData,
+  IN EFI_PEI_PPI_DESCRIPTOR  *PpiList
   )
 {
   EFI_STATUS                Status;
@@ -77,10 +72,10 @@ _ModuleEntryPoint (
   UINTN                     Index;
   EFI_PEI_PPI_DESCRIPTOR    PpiArray[10];
 
-  EMU_MAGIC_PAGE()->PpiList = PpiList;
+  EMU_MAGIC_PAGE ()->PpiList = PpiList;
   ProcessLibraryConstructorList ();
 
-  DEBUG ((EFI_D_ERROR, "SEC Has Started\n"));
+  DEBUG ((DEBUG_ERROR, "SEC Has Started\n"));
 
   //
   // Add Our PPIs to the list
@@ -99,12 +94,12 @@ _ModuleEntryPoint (
   // Keep everything on a good alignment
   SecReseveredMemorySize = ALIGN_VALUE (SecReseveredMemorySize, CPU_STACK_ALIGNMENT);
 
-#if 0
+ #if 0
   // Tell the PEI Core to not use our buffer in temp RAM
-  SecPpiList = (EFI_PEI_PPI_DESCRIPTOR *)SecCoreData->PeiTemporaryRamBase;
-  SecCoreData->PeiTemporaryRamBase = (VOID *)((UINTN)SecCoreData->PeiTemporaryRamBase + SecReseveredMemorySize);
+  SecPpiList                        = (EFI_PEI_PPI_DESCRIPTOR *)SecCoreData->PeiTemporaryRamBase;
+  SecCoreData->PeiTemporaryRamBase  = (VOID *)((UINTN)SecCoreData->PeiTemporaryRamBase + SecReseveredMemorySize);
   SecCoreData->PeiTemporaryRamSize -= SecReseveredMemorySize;
-#else
+ #else
   //
   // When I subtrack from SecCoreData->PeiTemporaryRamBase PEI Core crashes? Either there is a bug
   // or I don't understand temp RAM correctly?
@@ -112,7 +107,7 @@ _ModuleEntryPoint (
 
   SecPpiList = &PpiArray[0];
   ASSERT (sizeof (PpiArray) >= SecReseveredMemorySize);
-#endif
+ #endif
   // Copy existing list, and append our entries.
   CopyMem (SecPpiList, PpiList, sizeof (EFI_PEI_PPI_DESCRIPTOR) * Index);
   CopyMem (&SecPpiList[Index], gPrivateDispatchTable, sizeof (gPrivateDispatchTable));
@@ -120,7 +115,7 @@ _ModuleEntryPoint (
   // Find PEI Core and transfer control
   VolumeHandle = (EFI_PEI_FV_HANDLE)(UINTN)SecCoreData->BootFirmwareVolumeBase;
   FileHandle   = NULL;
-  Status = PeiServicesFfsFindNextFile (EFI_FV_FILETYPE_PEI_CORE, VolumeHandle, &FileHandle);
+  Status       = PeiServicesFfsFindNextFile (EFI_FV_FILETYPE_PEI_CORE, VolumeHandle, &FileHandle);
   ASSERT_EFI_ERROR (Status);
 
   Status = PeiServicesFfsFindSectionData (EFI_SECTION_PE32, FileHandle, &PeCoffImage);
@@ -136,5 +131,3 @@ _ModuleEntryPoint (
   ASSERT (FALSE);
   return;
 }
-
-

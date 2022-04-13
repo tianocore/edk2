@@ -29,23 +29,23 @@
 //
 // The bit map definition for Mtftp6 extension options.
 //
-#define MTFTP6_OPT_BLKSIZE_BIT        0x01
-#define MTFTP6_OPT_TIMEOUT_BIT        0x02
-#define MTFTP6_OPT_TSIZE_BIT          0x04
-#define MTFTP6_OPT_MCAST_BIT          0x08
-#define MTFTP6_OPT_WINDOWSIZE_BIT     0X10
+#define MTFTP6_OPT_BLKSIZE_BIT     0x01
+#define MTFTP6_OPT_TIMEOUT_BIT     0x02
+#define MTFTP6_OPT_TSIZE_BIT       0x04
+#define MTFTP6_OPT_MCAST_BIT       0x08
+#define MTFTP6_OPT_WINDOWSIZE_BIT  0X10
 
-extern CHAR8 *mMtftp6SupportedOptions[MTFTP6_SUPPORTED_OPTIONS_NUM];
+extern CHAR8  *mMtftp6SupportedOptions[MTFTP6_SUPPORTED_OPTIONS_NUM];
 
 typedef struct {
-  UINT16                    BlkSize;
-  UINT16                    WindowSize;
-  UINT8                     Timeout;
-  UINT32                    Tsize;
-  EFI_IPv6_ADDRESS          McastIp;
-  UINT16                    McastPort;
-  BOOLEAN                   IsMaster;
-  UINT32                    BitMap;
+  UINT16              BlkSize;
+  UINT16              WindowSize;
+  UINT8               Timeout;
+  UINT32              Tsize;
+  EFI_IPv6_ADDRESS    McastIp;
+  UINT16              McastPort;
+  BOOLEAN             IsMaster;
+  UINT32              BitMap;
 } MTFTP6_EXT_OPTION_INFO;
 
 /**
@@ -60,10 +60,9 @@ typedef struct {
 **/
 EFI_STATUS
 Mtftp6ParseMcastOption (
-  IN UINT8                  *Str,
-  IN MTFTP6_EXT_OPTION_INFO *ExtInfo
+  IN UINT8                   *Str,
+  IN MTFTP6_EXT_OPTION_INFO  *ExtInfo
   );
-
 
 /**
   Parse the MTFTP6 extension options.
@@ -82,13 +81,12 @@ Mtftp6ParseMcastOption (
 **/
 EFI_STATUS
 Mtftp6ParseExtensionOption (
-  IN EFI_MTFTP6_OPTION        *Options,
-  IN UINT32                   Count,
-  IN BOOLEAN                  IsRequest,
-  IN UINT16                   Operation,
-  IN MTFTP6_EXT_OPTION_INFO   *ExtInfo
+  IN EFI_MTFTP6_OPTION       *Options,
+  IN UINT32                  Count,
+  IN BOOLEAN                 IsRequest,
+  IN UINT16                  Operation,
+  IN MTFTP6_EXT_OPTION_INFO  *ExtInfo
   );
-
 
 /**
   Go through the packet to fill the options array with the start
@@ -109,12 +107,11 @@ Mtftp6ParseExtensionOption (
 **/
 EFI_STATUS
 Mtftp6ParsePacketOption (
-  IN     EFI_MTFTP6_PACKET     *Packet,
-  IN     UINT32                PacketLen,
-  IN OUT UINT32                *Count,
-  IN     EFI_MTFTP6_OPTION     *Options          OPTIONAL
+  IN     EFI_MTFTP6_PACKET  *Packet,
+  IN     UINT32             PacketLen,
+  IN OUT UINT32             *Count,
+  IN     EFI_MTFTP6_OPTION  *Options          OPTIONAL
   );
-
 
 /**
   Go through the packet, generate option list array and fill it
@@ -137,10 +134,10 @@ Mtftp6ParsePacketOption (
 **/
 EFI_STATUS
 Mtftp6ParseStart (
-  IN     EFI_MTFTP6_PACKET      *Packet,
-  IN     UINT32                 PacketLen,
-  IN OUT UINT32                 *OptionCount,
-     OUT EFI_MTFTP6_OPTION      **OptionList          OPTIONAL
+  IN     EFI_MTFTP6_PACKET  *Packet,
+  IN     UINT32             PacketLen,
+  IN OUT UINT32             *OptionCount,
+  OUT EFI_MTFTP6_OPTION     **OptionList          OPTIONAL
   );
 
 #endif

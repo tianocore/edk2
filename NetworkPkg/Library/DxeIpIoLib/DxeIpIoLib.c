@@ -18,7 +18,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DpcLib.h>
 
-
 GLOBAL_REMOVE_IF_UNREFERENCED LIST_ENTRY  mActiveIpIoList = {
   &mActiveIpIoList,
   &mActiveIpIoList
@@ -31,8 +30,12 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_IP4_CONFIG_DATA  mIp4IoDefaultIpConfigData = {
   FALSE,
   FALSE,
   FALSE,
-  {{0, 0, 0, 0}},
-  {{0, 0, 0, 0}},
+  {
+    { 0,           0,  0, 0 }
+  },
+  {
+    { 0,           0,  0, 0 }
+  },
   0,
   255,
   FALSE,
@@ -46,8 +49,12 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_IP6_CONFIG_DATA  mIp6IoDefaultIpConfigData = {
   FALSE,
   TRUE,
   FALSE,
-  {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
-  {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+  {
+    { 0,           0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+  },
+  {
+    { 0,           0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+  },
   0,
   255,
   0,
@@ -56,31 +63,30 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_IP6_CONFIG_DATA  mIp6IoDefaultIpConfigData = {
 };
 
 GLOBAL_REMOVE_IF_UNREFERENCED ICMP_ERROR_INFO  mIcmpErrMap[10] = {
-  {FALSE, TRUE }, // ICMP_ERR_UNREACH_NET
-  {FALSE, TRUE }, // ICMP_ERR_UNREACH_HOST
-  {TRUE,  TRUE }, // ICMP_ERR_UNREACH_PROTOCOL
-  {TRUE,  TRUE }, // ICMP_ERR_UNREACH_PORT
-  {TRUE,  TRUE }, // ICMP_ERR_MSGSIZE
-  {FALSE, TRUE }, // ICMP_ERR_UNREACH_SRCFAIL
-  {FALSE, TRUE }, // ICMP_ERR_TIMXCEED_INTRANS
-  {FALSE, TRUE }, // ICMP_ERR_TIMEXCEED_REASS
-  {FALSE, FALSE}, // ICMP_ERR_QUENCH
-  {FALSE, TRUE }  // ICMP_ERR_PARAMPROB
+  { FALSE, TRUE  }, // ICMP_ERR_UNREACH_NET
+  { FALSE, TRUE  }, // ICMP_ERR_UNREACH_HOST
+  { TRUE,  TRUE  }, // ICMP_ERR_UNREACH_PROTOCOL
+  { TRUE,  TRUE  }, // ICMP_ERR_UNREACH_PORT
+  { TRUE,  TRUE  }, // ICMP_ERR_MSGSIZE
+  { FALSE, TRUE  }, // ICMP_ERR_UNREACH_SRCFAIL
+  { FALSE, TRUE  }, // ICMP_ERR_TIMXCEED_INTRANS
+  { FALSE, TRUE  }, // ICMP_ERR_TIMEXCEED_REASS
+  { FALSE, FALSE }, // ICMP_ERR_QUENCH
+  { FALSE, TRUE  } // ICMP_ERR_PARAMPROB
 };
 
 GLOBAL_REMOVE_IF_UNREFERENCED ICMP_ERROR_INFO  mIcmp6ErrMap[10] = {
-  {FALSE, TRUE}, // ICMP6_ERR_UNREACH_NET
-  {FALSE, TRUE}, // ICMP6_ERR_UNREACH_HOST
-  {TRUE,  TRUE}, // ICMP6_ERR_UNREACH_PROTOCOL
-  {TRUE,  TRUE}, // ICMP6_ERR_UNREACH_PORT
-  {TRUE,  TRUE}, // ICMP6_ERR_PACKAGE_TOOBIG
-  {FALSE, TRUE}, // ICMP6_ERR_TIMXCEED_HOPLIMIT
-  {FALSE, TRUE}, // ICMP6_ERR_TIMXCEED_REASS
-  {FALSE, TRUE}, // ICMP6_ERR_PARAMPROB_HEADER
-  {FALSE, TRUE}, // ICMP6_ERR_PARAMPROB_NEXHEADER
-  {FALSE, TRUE}  // ICMP6_ERR_PARAMPROB_IPV6OPTION
+  { FALSE, TRUE }, // ICMP6_ERR_UNREACH_NET
+  { FALSE, TRUE }, // ICMP6_ERR_UNREACH_HOST
+  { TRUE,  TRUE }, // ICMP6_ERR_UNREACH_PROTOCOL
+  { TRUE,  TRUE }, // ICMP6_ERR_UNREACH_PORT
+  { TRUE,  TRUE }, // ICMP6_ERR_PACKAGE_TOOBIG
+  { FALSE, TRUE }, // ICMP6_ERR_TIMXCEED_HOPLIMIT
+  { FALSE, TRUE }, // ICMP6_ERR_TIMXCEED_REASS
+  { FALSE, TRUE }, // ICMP6_ERR_PARAMPROB_HEADER
+  { FALSE, TRUE }, // ICMP6_ERR_PARAMPROB_NEXHEADER
+  { FALSE, TRUE }  // ICMP6_ERR_PARAMPROB_IPV6OPTION
 };
-
 
 /**
   Notify function for IP transmit token.
@@ -91,9 +97,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED ICMP_ERROR_INFO  mIcmp6ErrMap[10] = {
 VOID
 EFIAPI
 IpIoTransmitHandlerDpc (
-  IN VOID      *Context
+  IN VOID  *Context
   );
-
 
 /**
   Notify function for IP transmit token.
@@ -105,10 +110,9 @@ IpIoTransmitHandlerDpc (
 VOID
 EFIAPI
 IpIoTransmitHandler (
-  IN EFI_EVENT Event,
-  IN VOID      *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
-
 
 /**
   This function create an IP child ,open the IP protocol, and return the opened
@@ -143,7 +147,7 @@ IpIoCreateIpChildOpenProtocol (
   if (IpVersion == IP_VERSION_4) {
     ServiceBindingGuid = &gEfiIp4ServiceBindingProtocolGuid;
     IpProtocolGuid     = &gEfiIp4ProtocolGuid;
-  } else if (IpVersion == IP_VERSION_6){
+  } else if (IpVersion == IP_VERSION_6) {
     ServiceBindingGuid = &gEfiIp6ServiceBindingProtocolGuid;
     IpProtocolGuid     = &gEfiIp6ProtocolGuid;
   } else {
@@ -188,7 +192,6 @@ IpIoCreateIpChildOpenProtocol (
 
   return Status;
 }
-
 
 /**
   This function close the previously opened IP protocol and destroy the IP child.
@@ -265,9 +268,9 @@ IpIoCloseProtocolDestroyIpChild (
 **/
 EFI_STATUS
 IpIoIcmpv4Handler (
-  IN     IP_IO                *IpIo,
-  IN OUT NET_BUF              *Pkt,
-  IN     EFI_NET_SESSION_DATA *Session
+  IN     IP_IO                 *IpIo,
+  IN OUT NET_BUF               *Pkt,
+  IN     EFI_NET_SESSION_DATA  *Session
   )
 {
   IP4_ICMP_ERROR_HEAD  *IcmpHdr;
@@ -291,10 +294,9 @@ IpIoIcmpv4Handler (
   }
 
   IcmpHdr = NET_PROTO_HDR (Pkt, IP4_ICMP_ERROR_HEAD);
-  IpHdr   = (EFI_IP4_HEADER *) (&IcmpHdr->IpHead);
+  IpHdr   = (EFI_IP4_HEADER *)(&IcmpHdr->IpHead);
 
   if (Pkt->TotalSize < ICMP_ERRLEN (IpHdr)) {
-
     return EFI_ABORTED;
   }
 
@@ -305,80 +307,80 @@ IpIoIcmpv4Handler (
   // Analyze the ICMP Error in this ICMP pkt
   //
   switch (Type) {
-  case ICMP_TYPE_UNREACH:
-    switch (Code) {
-    case ICMP_CODE_UNREACH_NET:
-    case ICMP_CODE_UNREACH_HOST:
-    case ICMP_CODE_UNREACH_PROTOCOL:
-    case ICMP_CODE_UNREACH_PORT:
-    case ICMP_CODE_UNREACH_SRCFAIL:
-      IcmpErr = (UINT8) (ICMP_ERR_UNREACH_NET + Code);
+    case ICMP_TYPE_UNREACH:
+      switch (Code) {
+        case ICMP_CODE_UNREACH_NET:
+        case ICMP_CODE_UNREACH_HOST:
+        case ICMP_CODE_UNREACH_PROTOCOL:
+        case ICMP_CODE_UNREACH_PORT:
+        case ICMP_CODE_UNREACH_SRCFAIL:
+          IcmpErr = (UINT8)(ICMP_ERR_UNREACH_NET + Code);
+
+          break;
+
+        case ICMP_CODE_UNREACH_NEEDFRAG:
+          IcmpErr = ICMP_ERR_MSGSIZE;
+
+          break;
+
+        case ICMP_CODE_UNREACH_NET_UNKNOWN:
+        case ICMP_CODE_UNREACH_NET_PROHIB:
+        case ICMP_CODE_UNREACH_TOSNET:
+          IcmpErr = ICMP_ERR_UNREACH_NET;
+
+          break;
+
+        case ICMP_CODE_UNREACH_HOST_UNKNOWN:
+        case ICMP_CODE_UNREACH_ISOLATED:
+        case ICMP_CODE_UNREACH_HOST_PROHIB:
+        case ICMP_CODE_UNREACH_TOSHOST:
+          IcmpErr = ICMP_ERR_UNREACH_HOST;
+
+          break;
+
+        default:
+          return EFI_ABORTED;
+      }
 
       break;
 
-    case ICMP_CODE_UNREACH_NEEDFRAG:
-      IcmpErr = ICMP_ERR_MSGSIZE;
+    case ICMP_TYPE_TIMXCEED:
+      if (Code > 1) {
+        return EFI_ABORTED;
+      }
+
+      IcmpErr = (UINT8)(Code + ICMP_ERR_TIMXCEED_INTRANS);
 
       break;
 
-    case ICMP_CODE_UNREACH_NET_UNKNOWN:
-    case ICMP_CODE_UNREACH_NET_PROHIB:
-    case ICMP_CODE_UNREACH_TOSNET:
-      IcmpErr = ICMP_ERR_UNREACH_NET;
+    case ICMP_TYPE_PARAMPROB:
+      if (Code > 1) {
+        return EFI_ABORTED;
+      }
+
+      IcmpErr = ICMP_ERR_PARAMPROB;
 
       break;
 
-    case ICMP_CODE_UNREACH_HOST_UNKNOWN:
-    case ICMP_CODE_UNREACH_ISOLATED:
-    case ICMP_CODE_UNREACH_HOST_PROHIB:
-    case ICMP_CODE_UNREACH_TOSHOST:
-      IcmpErr = ICMP_ERR_UNREACH_HOST;
+    case ICMP_TYPE_SOURCEQUENCH:
+      if (Code != 0) {
+        return EFI_ABORTED;
+      }
+
+      IcmpErr = ICMP_ERR_QUENCH;
 
       break;
 
     default:
       return EFI_ABORTED;
-    }
-
-    break;
-
-  case ICMP_TYPE_TIMXCEED:
-    if (Code > 1) {
-      return EFI_ABORTED;
-    }
-
-    IcmpErr = (UINT8) (Code + ICMP_ERR_TIMXCEED_INTRANS);
-
-    break;
-
-  case ICMP_TYPE_PARAMPROB:
-    if (Code > 1) {
-      return EFI_ABORTED;
-    }
-
-    IcmpErr = ICMP_ERR_PARAMPROB;
-
-    break;
-
-  case ICMP_TYPE_SOURCEQUENCH:
-    if (Code != 0) {
-      return EFI_ABORTED;
-    }
-
-    IcmpErr = ICMP_ERR_QUENCH;
-
-    break;
-
-  default:
-    return EFI_ABORTED;
   }
 
   //
   // Notify user the ICMP pkt only containing payload except
   // IP and ICMP header
   //
-  PayLoadHdr = (UINT8 *) ((UINT8 *) IpHdr + EFI_IP4_HEADER_LEN (IpHdr));
-  TrimBytes  = (UINT32) (PayLoadHdr - (UINT8 *) IcmpHdr);
+  PayLoadHdr = (UINT8 *)((UINT8 *)IpHdr + EFI_IP4_HEADER_LEN (IpHdr));
+  TrimBytes  = (UINT32)(PayLoadHdr - (UINT8 *)IcmpHdr);
 
   NetbufTrim (Pkt, TrimBytes, TRUE);
 
@@ -407,9 +409,9 @@ IpIoIcmpv4Handler (
 **/
 EFI_STATUS
 IpIoIcmpv6Handler (
-  IN     IP_IO                *IpIo,
-  IN OUT NET_BUF              *Pkt,
-  IN     EFI_NET_SESSION_DATA *Session
+  IN     IP_IO                 *IpIo,
+  IN OUT NET_BUF               *Pkt,
+  IN     EFI_NET_SESSION_DATA  *Session
   )
 {
   IP6_ICMP_ERROR_HEAD  *IcmpHdr;
@@ -431,7 +433,6 @@ IpIoIcmpv6Handler (
   // Check the ICMPv6 packet length.
   //
   if (Pkt->TotalSize < sizeof (IP6_ICMP_ERROR_HEAD)) {
-
     return EFI_ABORTED;
   }
 
@@ -443,112 +444,112 @@ IpIoIcmpv6Handler (
   // Analyze the ICMPv6 Error in this ICMPv6 packet
   //
   switch (Type) {
-  case ICMP_V6_DEST_UNREACHABLE:
-    switch (Code) {
-    case ICMP_V6_NO_ROUTE_TO_DEST:
-    case ICMP_V6_BEYOND_SCOPE:
-    case ICMP_V6_ROUTE_REJECTED:
-      IcmpErr = ICMP6_ERR_UNREACH_NET;
+    case ICMP_V6_DEST_UNREACHABLE:
+      switch (Code) {
+        case ICMP_V6_NO_ROUTE_TO_DEST:
+        case ICMP_V6_BEYOND_SCOPE:
+        case ICMP_V6_ROUTE_REJECTED:
+          IcmpErr = ICMP6_ERR_UNREACH_NET;
+
+          break;
+
+        case ICMP_V6_COMM_PROHIBITED:
+        case ICMP_V6_ADDR_UNREACHABLE:
+        case ICMP_V6_SOURCE_ADDR_FAILED:
+          IcmpErr = ICMP6_ERR_UNREACH_HOST;
+
+          break;
+
+        case ICMP_V6_PORT_UNREACHABLE:
+          IcmpErr = ICMP6_ERR_UNREACH_PORT;
+
+          break;
+
+        default:
+          return EFI_ABORTED;
+      }
 
       break;
 
-    case ICMP_V6_COMM_PROHIBITED:
-    case ICMP_V6_ADDR_UNREACHABLE:
-    case ICMP_V6_SOURCE_ADDR_FAILED:
-      IcmpErr = ICMP6_ERR_UNREACH_HOST;
+    case ICMP_V6_PACKET_TOO_BIG:
+      if (Code >= 1) {
+        return EFI_ABORTED;
+      }
+
+      IcmpErr = ICMP6_ERR_PACKAGE_TOOBIG;
 
       break;
 
-    case ICMP_V6_PORT_UNREACHABLE:
-      IcmpErr = ICMP6_ERR_UNREACH_PORT;
+    case ICMP_V6_TIME_EXCEEDED:
+      if (Code > 1) {
+        return EFI_ABORTED;
+      }
+
+      IcmpErr = (UINT8)(ICMP6_ERR_TIMXCEED_HOPLIMIT + Code);
 
       break;
 
-     default:
-      return EFI_ABORTED;
-    }
+    case ICMP_V6_PARAMETER_PROBLEM:
+      if (Code > 3) {
+        return EFI_ABORTED;
+      }
 
-    break;
-
-  case ICMP_V6_PACKET_TOO_BIG:
-    if (Code >= 1) {
-      return EFI_ABORTED;
-    }
-
-    IcmpErr = ICMP6_ERR_PACKAGE_TOOBIG;
-
-    break;
-
-  case ICMP_V6_TIME_EXCEEDED:
-    if (Code > 1) {
-      return EFI_ABORTED;
-    }
-
-    IcmpErr = (UINT8) (ICMP6_ERR_TIMXCEED_HOPLIMIT + Code);
-
-    break;
-
-  case ICMP_V6_PARAMETER_PROBLEM:
-    if (Code > 3) {
-      return EFI_ABORTED;
-    }
-
-    IcmpErr = (UINT8) (ICMP6_ERR_PARAMPROB_HEADER + Code);
-
-    break;
-
-   default:
-
-     return EFI_ABORTED;
-   }
-
-  //
-  // Notify user the ICMPv6 packet only containing payload except
-  // IPv6 basic header, extension header and ICMP header
-  //
-
-  IpHdr      = (EFI_IP6_HEADER *) (&IcmpHdr->IpHead);
-  NextHeader = IpHdr->NextHeader;
-  PayLoadHdr = (UINT8 *) ((UINT8 *) IcmpHdr + sizeof (IP6_ICMP_ERROR_HEAD));
-  Flag       = TRUE;
-
-  do {
-    switch (NextHeader) {
-    case EFI_IP_PROTO_UDP:
-    case EFI_IP_PROTO_TCP:
-    case EFI_IP_PROTO_ICMP:
-    case IP6_NO_NEXT_HEADER:
-      Flag = FALSE;
-
-      break;
-
-    case IP6_HOP_BY_HOP:
-    case IP6_DESTINATION:
-      //
-      // The Hdr Ext Len is 8-bit unsigned integer in 8-octet units, not including
-      // the first 8 octets.
-      //
-      NextHeader = *(PayLoadHdr);
-      PayLoadHdr = (UINT8 *) (PayLoadHdr + (*(PayLoadHdr + 1) + 1) * 8);
-
-      break;
-
-    case IP6_FRAGMENT:
-      //
-      // The Fragment Header Length is 8 octets.
-      //
-      NextHeader = *(PayLoadHdr);
-      PayLoadHdr = (UINT8 *) (PayLoadHdr + 8);
+      IcmpErr = (UINT8)(ICMP6_ERR_PARAMPROB_HEADER + Code);
 
       break;
 
     default:
 
       return EFI_ABORTED;
+  }
+
+  //
+  // Notify user the ICMPv6 packet only containing payload except
+  // IPv6 basic header, extension header and ICMP header
+  //
+
+  IpHdr      = (EFI_IP6_HEADER *)(&IcmpHdr->IpHead);
+  NextHeader = IpHdr->NextHeader;
+  PayLoadHdr = (UINT8 *)((UINT8 *)IcmpHdr + sizeof (IP6_ICMP_ERROR_HEAD));
+  Flag       = TRUE;
+
+  do {
+    switch (NextHeader) {
+      case EFI_IP_PROTO_UDP:
+      case EFI_IP_PROTO_TCP:
+      case EFI_IP_PROTO_ICMP:
+      case IP6_NO_NEXT_HEADER:
+        Flag = FALSE;
+
+        break;
+
+      case IP6_HOP_BY_HOP:
+      case IP6_DESTINATION:
+        //
+        // The Hdr Ext Len is 8-bit unsigned integer in 8-octet units, not including
+        // the first 8 octets.
+        //
+        NextHeader = *(PayLoadHdr);
+        PayLoadHdr = (UINT8 *)(PayLoadHdr + (*(PayLoadHdr + 1) + 1) * 8);
+
+        break;
+
+      case IP6_FRAGMENT:
+        //
+        // The Fragment Header Length is 8 octets.
+        //
+        NextHeader = *(PayLoadHdr);
+        PayLoadHdr = (UINT8 *)(PayLoadHdr + 8);
+
+        break;
+
+      default:
+
+        return EFI_ABORTED;
     }
   } while (Flag);
 
-  TrimBytes = (UINT32) (PayLoadHdr - (UINT8 *) IcmpHdr);
+  TrimBytes = (UINT32)(PayLoadHdr - (UINT8 *)IcmpHdr);
 
   NetbufTrim (Pkt, TrimBytes, TRUE);
 
@@ -577,26 +578,19 @@ IpIoIcmpv6Handler (
 **/
 EFI_STATUS
 IpIoIcmpHandler (
-  IN     IP_IO                *IpIo,
-  IN OUT NET_BUF              *Pkt,
-  IN     EFI_NET_SESSION_DATA *Session
+  IN     IP_IO                 *IpIo,
+  IN OUT NET_BUF               *Pkt,
+  IN     EFI_NET_SESSION_DATA  *Session
   )
 {
-
   if (IpIo->IpVersion == IP_VERSION_4) {
-
     return IpIoIcmpv4Handler (IpIo, Pkt, Session);
-
   } else if (IpIo->IpVersion == IP_VERSION_6) {
-
     return IpIoIcmpv6Handler (IpIo, Pkt, Session);
-
   } else {
-
     return EFI_UNSUPPORTED;
   }
 }
-
 
 /**
   Free function for receive token of IP_IO. It is used to
@@ -612,9 +606,8 @@ IpIoExtFree (
   IN VOID  *Event
   )
 {
-  gBS->SignalEvent ((EFI_EVENT) Event);
+  gBS->SignalEvent ((EFI_EVENT)Event);
 }
-
 
 /**
   Create a send entry to wrap a packet before sending
@@ -634,24 +627,24 @@ IpIoExtFree (
 **/
 IP_IO_SEND_ENTRY *
 IpIoCreateSndEntry (
-  IN OUT IP_IO             *IpIo,
-  IN OUT NET_BUF           *Pkt,
-  IN     IP_IO_IP_PROTOCOL Sender,
-  IN     VOID              *Context    OPTIONAL,
-  IN     VOID              *NotifyData OPTIONAL,
-  IN     EFI_IP_ADDRESS    *Dest       OPTIONAL,
-  IN     IP_IO_OVERRIDE    *Override
+  IN OUT IP_IO              *IpIo,
+  IN OUT NET_BUF            *Pkt,
+  IN     IP_IO_IP_PROTOCOL  Sender,
+  IN     VOID               *Context    OPTIONAL,
+  IN     VOID               *NotifyData OPTIONAL,
+  IN     EFI_IP_ADDRESS     *Dest       OPTIONAL,
+  IN     IP_IO_OVERRIDE     *Override
   )
 {
-  IP_IO_SEND_ENTRY          *SndEntry;
-  EFI_EVENT                 Event;
-  EFI_STATUS                Status;
-  NET_FRAGMENT              *ExtFragment;
-  UINT32                    FragmentCount;
-  IP_IO_OVERRIDE            *OverrideData;
-  IP_IO_IP_TX_DATA          *TxData;
-  EFI_IP4_TRANSMIT_DATA     *Ip4TxData;
-  EFI_IP6_TRANSMIT_DATA     *Ip6TxData;
+  IP_IO_SEND_ENTRY       *SndEntry;
+  EFI_EVENT              Event;
+  EFI_STATUS             Status;
+  NET_FRAGMENT           *ExtFragment;
+  UINT32                 FragmentCount;
+  IP_IO_OVERRIDE         *OverrideData;
+  IP_IO_IP_TX_DATA       *TxData;
+  EFI_IP4_TRANSMIT_DATA  *Ip4TxData;
+  EFI_IP6_TRANSMIT_DATA  *Ip6TxData;
 
   if ((IpIo->IpVersion != IP_VERSION_4) && (IpIo->IpVersion != IP_VERSION_6)) {
     return NULL;
@@ -685,9 +678,9 @@ IpIoCreateSndEntry (
   //
   // Allocate resource for TxData
   //
-  TxData = (IP_IO_IP_TX_DATA *) AllocatePool (
-    sizeof (IP_IO_IP_TX_DATA) + sizeof (NET_FRAGMENT) * (FragmentCount - 1)
-    );
+  TxData = (IP_IO_IP_TX_DATA *)AllocatePool (
+                                 sizeof (IP_IO_IP_TX_DATA) + sizeof (NET_FRAGMENT) * (FragmentCount - 1)
+                                 );
 
   if (NULL == TxData) {
     goto ON_ERROR;
@@ -697,19 +690,17 @@ IpIoCreateSndEntry (
   // Build a fragment table to contain the fragments in the packet.
   //
   if (IpIo->IpVersion == IP_VERSION_4) {
-    ExtFragment = (NET_FRAGMENT *) TxData->Ip4TxData.FragmentTable;
+    ExtFragment = (NET_FRAGMENT *)TxData->Ip4TxData.FragmentTable;
   } else {
-    ExtFragment = (NET_FRAGMENT *) TxData->Ip6TxData.FragmentTable;
+    ExtFragment = (NET_FRAGMENT *)TxData->Ip6TxData.FragmentTable;
   }
 
   NetbufBuildExt (Pkt, ExtFragment, &FragmentCount);
-
 
   //
   // Allocate resource for OverrideData if needed
   //
   if (NULL != Override) {
-
     OverrideData = AllocateCopyPool (sizeof (IP_IO_OVERRIDE), Override);
     if (NULL == OverrideData) {
       goto ON_ERROR;
@@ -720,7 +711,6 @@ IpIoCreateSndEntry (
   // Set other fields of TxData except the fragment table
   //
   if (IpIo->IpVersion == IP_VERSION_4) {
-
     Ip4TxData = &TxData->Ip4TxData;
 
     IP4_COPY_ADDRESS (&Ip4TxData->DestinationAddress, Dest);
@@ -737,7 +727,6 @@ IpIoCreateSndEntry (
     SndEntry->SndToken.Ip4Token.Event         = Event;
     SndEntry->SndToken.Ip4Token.Packet.TxData = Ip4TxData;
   } else {
-
     Ip6TxData = &TxData->Ip6TxData;
 
     if (Dest != NULL) {
@@ -762,12 +751,12 @@ IpIoCreateSndEntry (
   //
   // Set the fields of SndEntry
   //
-  SndEntry->IpIo        = IpIo;
-  SndEntry->Ip          = Sender;
-  SndEntry->Context     = Context;
-  SndEntry->NotifyData  = NotifyData;
+  SndEntry->IpIo       = IpIo;
+  SndEntry->Ip         = Sender;
+  SndEntry->Context    = Context;
+  SndEntry->NotifyData = NotifyData;
 
-  SndEntry->Pkt         = Pkt;
+  SndEntry->Pkt = Pkt;
   NET_GET_REF (Pkt);
 
   InsertTailList (&IpIo->PendingSndList, &SndEntry->Entry);
@@ -795,7 +784,6 @@ ON_ERROR:
   return NULL;
 }
 
-
 /**
   Destroy the SndEntry.
 
@@ -814,15 +802,15 @@ IpIoDestroySndEntry (
   IP_IO_OVERRIDE    *Override;
 
   if (SndEntry->IpIo->IpVersion == IP_VERSION_4) {
-    Event              = SndEntry->SndToken.Ip4Token.Event;
-    TxData             = (IP_IO_IP_TX_DATA *) SndEntry->SndToken.Ip4Token.Packet.TxData;
-    Override           = (IP_IO_OVERRIDE *) TxData->Ip4TxData.OverrideData;
+    Event    = SndEntry->SndToken.Ip4Token.Event;
+    TxData   = (IP_IO_IP_TX_DATA *)SndEntry->SndToken.Ip4Token.Packet.TxData;
+    Override = (IP_IO_OVERRIDE *)TxData->Ip4TxData.OverrideData;
   } else if (SndEntry->IpIo->IpVersion == IP_VERSION_6) {
-    Event              = SndEntry->SndToken.Ip6Token.Event;
-    TxData             = (IP_IO_IP_TX_DATA *) SndEntry->SndToken.Ip6Token.Packet.TxData;
-    Override           = (IP_IO_OVERRIDE *) TxData->Ip6TxData.OverrideData;
+    Event    = SndEntry->SndToken.Ip6Token.Event;
+    TxData   = (IP_IO_IP_TX_DATA *)SndEntry->SndToken.Ip6Token.Packet.TxData;
+    Override = (IP_IO_OVERRIDE *)TxData->Ip6TxData.OverrideData;
   } else {
-    return ;
+    return;
   }
 
   gBS->CloseEvent (Event);
@@ -840,7 +828,6 @@ IpIoDestroySndEntry (
   FreePool (SndEntry);
 }
 
-
 /**
   Notify function for IP transmit token.
 
@@ -850,23 +837,23 @@ IpIoDestroySndEntry (
 VOID
 EFIAPI
 IpIoTransmitHandlerDpc (
-  IN VOID      *Context
+  IN VOID  *Context
   )
 {
   IP_IO             *IpIo;
   IP_IO_SEND_ENTRY  *SndEntry;
   EFI_STATUS        Status;
 
-  SndEntry  = (IP_IO_SEND_ENTRY *) Context;
+  SndEntry = (IP_IO_SEND_ENTRY *)Context;
 
-  IpIo      = SndEntry->IpIo;
+  IpIo = SndEntry->IpIo;
 
   if (IpIo->IpVersion == IP_VERSION_4) {
     Status = SndEntry->SndToken.Ip4Token.Status;
-  } else if (IpIo->IpVersion == IP_VERSION_6){
+  } else if (IpIo->IpVersion == IP_VERSION_6) {
     Status = SndEntry->SndToken.Ip6Token.Status;
   } else {
-    return ;
+    return;
   }
 
   if ((IpIo->PktSentNotify != NULL) && (SndEntry->NotifyData != NULL)) {
@@ -881,7 +868,6 @@ IpIoTransmitHandlerDpc (
   IpIoDestroySndEntry (SndEntry);
 }
 
-
 /**
   Notify function for IP transmit token.
 
@@ -892,8 +878,8 @@ IpIoTransmitHandlerDpc (
 VOID
 EFIAPI
 IpIoTransmitHandler (
-  IN EFI_EVENT Event,
-  IN VOID      *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   //
@@ -901,7 +887,6 @@ IpIoTransmitHandler (
   //
   QueueDpc (TPL_CALLBACK, IpIoTransmitHandlerDpc, Context);
 }
-
 
 /**
   The dummy handler for the dummy IP receive token.
@@ -912,17 +897,17 @@ IpIoTransmitHandler (
 VOID
 EFIAPI
 IpIoDummyHandlerDpc (
-  IN VOID      *Context
+  IN VOID  *Context
   )
 {
-  IP_IO_IP_INFO             *IpInfo;
-  EFI_STATUS                 Status;
-  EFI_EVENT                  RecycleEvent;
+  IP_IO_IP_INFO  *IpInfo;
+  EFI_STATUS     Status;
+  EFI_EVENT      RecycleEvent;
 
-  IpInfo      = (IP_IO_IP_INFO *) Context;
+  IpInfo = (IP_IO_IP_INFO *)Context;
 
   if ((IpInfo->IpVersion != IP_VERSION_4) && (IpInfo->IpVersion != IP_VERSION_6)) {
-    return ;
+    return;
   }
 
   RecycleEvent = NULL;
@@ -940,8 +925,6 @@ IpIoDummyHandlerDpc (
       RecycleEvent = IpInfo->DummyRcvToken.Ip6Token.Packet.RxData->RecycleSignal;
     }
   }
-
-
 
   if (EFI_ABORTED == Status) {
     //
@@ -973,7 +956,6 @@ IpIoDummyHandlerDpc (
   }
 }
 
-
 /**
   This function add IpIoDummyHandlerDpc to the end of the DPC queue.
 
@@ -984,8 +966,8 @@ IpIoDummyHandlerDpc (
 VOID
 EFIAPI
 IpIoDummyHandler (
-  IN EFI_EVENT Event,
-  IN VOID      *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   //
@@ -993,7 +975,6 @@ IpIoDummyHandler (
   //
   QueueDpc (TPL_CALLBACK, IpIoDummyHandlerDpc, Context);
 }
-
 
 /**
   Notify function for the IP receive token, used to process
@@ -1005,7 +986,7 @@ IpIoDummyHandler (
 VOID
 EFIAPI
 IpIoListenHandlerDpc (
-  IN VOID      *Context
+  IN VOID  *Context
   )
 {
   IP_IO                 *IpIo;
@@ -1014,14 +995,14 @@ IpIoListenHandlerDpc (
   EFI_NET_SESSION_DATA  Session;
   NET_BUF               *Pkt;
 
-  IpIo = (IP_IO *) Context;
+  IpIo = (IP_IO *)Context;
 
   if (IpIo->IpVersion == IP_VERSION_4) {
     Status = IpIo->RcvToken.Ip4Token.Status;
-    RxData = (IP_IO_IP_RX_DATA *) IpIo->RcvToken.Ip4Token.Packet.RxData;
+    RxData = (IP_IO_IP_RX_DATA *)IpIo->RcvToken.Ip4Token.Packet.RxData;
   } else if (IpIo->IpVersion == IP_VERSION_6) {
     Status = IpIo->RcvToken.Ip6Token.Status;
-    RxData = (IP_IO_IP_RX_DATA *) IpIo->RcvToken.Ip6Token.Packet.RxData;
+    RxData = (IP_IO_IP_RX_DATA *)IpIo->RcvToken.Ip6Token.Packet.RxData;
   } else {
     return;
   }
@@ -1064,10 +1045,12 @@ IpIoListenHandlerDpc (
       //
       goto CleanUp;
     }
+
     if ((EFI_IP4 (RxData->Ip4RxData.Header->SourceAddress) != 0) &&
         (IpIo->SubnetMask != 0) &&
-        IP4_NET_EQUAL (IpIo->StationIp, EFI_NTOHL (((EFI_IP4_RECEIVE_DATA *) RxData)->Header->SourceAddress), IpIo->SubnetMask) &&
-        !NetIp4IsUnicast (EFI_NTOHL (((EFI_IP4_RECEIVE_DATA *) RxData)->Header->SourceAddress), IpIo->SubnetMask)) {
+        IP4_NET_EQUAL (IpIo->StationIp, EFI_NTOHL (((EFI_IP4_RECEIVE_DATA *)RxData)->Header->SourceAddress), IpIo->SubnetMask) &&
+        !NetIp4IsUnicast (EFI_NTOHL (((EFI_IP4_RECEIVE_DATA *)RxData)->Header->SourceAddress), IpIo->SubnetMask))
+    {
       //
       // The source address doesn't match StationIp and it's not a unicast IP address, discard it.
       //
@@ -1090,7 +1073,7 @@ IpIoListenHandlerDpc (
     // Create a netbuffer representing IPv4 packet
     //
     Pkt = NetbufFromExt (
-            (NET_FRAGMENT *) RxData->Ip4RxData.FragmentTable,
+            (NET_FRAGMENT *)RxData->Ip4RxData.FragmentTable,
             RxData->Ip4RxData.FragmentCount,
             0,
             0,
@@ -1111,7 +1094,7 @@ IpIoListenHandlerDpc (
     Session.IpVersion      = IP_VERSION_4;
   } else {
     ASSERT (RxData->Ip6RxData.Header != NULL);
-    if (!NetIp6IsValidUnicast(&RxData->Ip6RxData.Header->SourceAddress)) {
+    if (!NetIp6IsValidUnicast (&RxData->Ip6RxData.Header->SourceAddress)) {
       goto CleanUp;
     }
 
@@ -1131,7 +1114,7 @@ IpIoListenHandlerDpc (
     // Create a netbuffer representing IPv6 packet
     //
     Pkt = NetbufFromExt (
-            (NET_FRAGMENT *) RxData->Ip6RxData.FragmentTable,
+            (NET_FRAGMENT *)RxData->Ip6RxData.FragmentTable,
             RxData->Ip6RxData.FragmentCount,
             0,
             0,
@@ -1148,12 +1131,12 @@ IpIoListenHandlerDpc (
     CopyMem (
       &Session.Source,
       &RxData->Ip6RxData.Header->SourceAddress,
-      sizeof(EFI_IPv6_ADDRESS)
+      sizeof (EFI_IPv6_ADDRESS)
       );
     CopyMem (
       &Session.Dest,
       &RxData->Ip6RxData.Header->DestinationAddress,
-      sizeof(EFI_IPv6_ADDRESS)
+      sizeof (EFI_IPv6_ADDRESS)
       );
     Session.IpHdr.Ip6Hdr = RxData->Ip6RxData.Header;
     Session.IpHdrLen     = RxData->Ip6RxData.HeaderLength;
@@ -1161,7 +1144,6 @@ IpIoListenHandlerDpc (
   }
 
   if (EFI_SUCCESS == Status) {
-
     IpIo->PktRcvdNotify (EFI_SUCCESS, 0, &Session, Pkt, IpIo->RcvdContext);
   } else {
     //
@@ -1177,7 +1159,7 @@ IpIoListenHandlerDpc (
 
 CleanUp:
 
-  if (IpIo->IpVersion == IP_VERSION_4){
+  if (IpIo->IpVersion == IP_VERSION_4) {
     gBS->SignalEvent (RxData->Ip4RxData.RecycleSignal);
   } else {
     gBS->SignalEvent (RxData->Ip6RxData.RecycleSignal);
@@ -1185,7 +1167,7 @@ CleanUp:
 
 Resume:
 
-  if (IpIo->IpVersion == IP_VERSION_4){
+  if (IpIo->IpVersion == IP_VERSION_4) {
     IpIo->Ip.Ip4->Receive (IpIo->Ip.Ip4, &(IpIo->RcvToken.Ip4Token));
   } else {
     IpIo->Ip.Ip6->Receive (IpIo->Ip.Ip6, &(IpIo->RcvToken.Ip6Token));
@@ -1202,8 +1184,8 @@ Resume:
 VOID
 EFIAPI
 IpIoListenHandler (
-  IN EFI_EVENT Event,
-  IN VOID      *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   //
@@ -1211,7 +1193,6 @@ IpIoListenHandler (
   //
   QueueDpc (TPL_CALLBACK, IpIoListenHandlerDpc, Context);
 }
-
 
 /**
   Create a new IP_IO instance.
@@ -1234,9 +1215,9 @@ IpIoListenHandler (
 IP_IO *
 EFIAPI
 IpIoCreate (
-  IN EFI_HANDLE Image,
-  IN EFI_HANDLE Controller,
-  IN UINT8      IpVersion
+  IN EFI_HANDLE  Image,
+  IN EFI_HANDLE  Controller,
+  IN UINT8       IpVersion
   )
 {
   EFI_STATUS  Status;
@@ -1252,10 +1233,10 @@ IpIoCreate (
 
   InitializeListHead (&(IpIo->PendingSndList));
   InitializeListHead (&(IpIo->IpList));
-  IpIo->Controller  = Controller;
-  IpIo->Image       = Image;
-  IpIo->IpVersion   = IpVersion;
-  Event             = NULL;
+  IpIo->Controller = Controller;
+  IpIo->Image      = Image;
+  IpIo->IpVersion  = IpVersion;
+  Event            = NULL;
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
@@ -1282,7 +1263,7 @@ IpIoCreate (
              Image,
              &IpIo->ChildHandle,
              IpVersion,
-             (VOID **) & (IpIo->Ip)
+             (VOID **)&(IpIo->Ip)
              );
   if (EFI_ERROR (Status)) {
     goto ReleaseIpIo;
@@ -1300,7 +1281,6 @@ ReleaseIpIo:
 
   return NULL;
 }
-
 
 /**
   Open an IP_IO instance for use.
@@ -1328,14 +1308,14 @@ ReleaseIpIo:
 EFI_STATUS
 EFIAPI
 IpIoOpen (
-  IN OUT IP_IO           *IpIo,
-  IN     IP_IO_OPEN_DATA *OpenData
+  IN OUT IP_IO            *IpIo,
+  IN     IP_IO_OPEN_DATA  *OpenData
   )
 {
-  EFI_STATUS        Status;
-  UINT8             IpVersion;
+  EFI_STATUS  Status;
+  UINT8       IpVersion;
 
-  if (IpIo == NULL || OpenData == NULL) {
+  if ((IpIo == NULL) || (OpenData == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1350,7 +1330,7 @@ IpIoOpen (
   //
   // configure ip
   //
-  if (IpVersion == IP_VERSION_4){
+  if (IpVersion == IP_VERSION_4) {
     //
     // RawData mode is no supported.
     //
@@ -1360,7 +1340,7 @@ IpIoOpen (
     }
 
     if (!OpenData->IpConfigData.Ip4CfgData.UseDefaultAddress) {
-      IpIo->StationIp = EFI_NTOHL (OpenData->IpConfigData.Ip4CfgData.StationAddress);
+      IpIo->StationIp  = EFI_NTOHL (OpenData->IpConfigData.Ip4CfgData.StationAddress);
       IpIo->SubnetMask = EFI_NTOHL (OpenData->IpConfigData.Ip4CfgData.SubnetMask);
     }
 
@@ -1369,7 +1349,6 @@ IpIoOpen (
                              &OpenData->IpConfigData.Ip4CfgData
                              );
   } else {
-
     Status = IpIo->Ip.Ip6->Configure (
                              IpIo->Ip.Ip6,
                              &OpenData->IpConfigData.Ip6CfgData
@@ -1385,7 +1364,7 @@ IpIoOpen (
   // @bug (0.0.0.0, 0.0.0.0, 0.0.0.0). Delete this statement if Ip modified
   // @bug its code
   //
-  if (IpVersion == IP_VERSION_4){
+  if (IpVersion == IP_VERSION_4) {
     Status = IpIo->Ip.Ip4->Routes (
                              IpIo->Ip.Ip4,
                              TRUE,
@@ -1402,10 +1381,10 @@ IpIoOpen (
   IpIo->PktRcvdNotify = OpenData->PktRcvdNotify;
   IpIo->PktSentNotify = OpenData->PktSentNotify;
 
-  IpIo->RcvdContext   = OpenData->RcvdContext;
-  IpIo->SndContext    = OpenData->SndContext;
+  IpIo->RcvdContext = OpenData->RcvdContext;
+  IpIo->SndContext  = OpenData->SndContext;
 
-  if (IpVersion == IP_VERSION_4){
+  if (IpVersion == IP_VERSION_4) {
     IpIo->Protocol = OpenData->IpConfigData.Ip4CfgData.DefaultProtocol;
 
     //
@@ -1419,14 +1398,12 @@ IpIoOpen (
       IpIo->Ip.Ip4->Configure (IpIo->Ip.Ip4, NULL);
       return Status;
     }
-
   } else {
-
     IpIo->Protocol = OpenData->IpConfigData.Ip6CfgData.DefaultProtocol;
-    Status = IpIo->Ip.Ip6->Receive (
-                             IpIo->Ip.Ip6,
-                             &(IpIo->RcvToken.Ip6Token)
-                             );
+    Status         = IpIo->Ip.Ip6->Receive (
+                                     IpIo->Ip.Ip6,
+                                     &(IpIo->RcvToken.Ip6Token)
+                                     );
     if (EFI_ERROR (Status)) {
       IpIo->Ip.Ip6->Configure (IpIo->Ip.Ip6, NULL);
       return Status;
@@ -1438,7 +1415,6 @@ IpIoOpen (
 
   return Status;
 }
-
 
 /**
   Stop an IP_IO instance.
@@ -1458,12 +1434,12 @@ IpIoOpen (
 EFI_STATUS
 EFIAPI
 IpIoStop (
-  IN OUT IP_IO *IpIo
+  IN OUT IP_IO  *IpIo
   )
 {
-  EFI_STATUS        Status;
-  IP_IO_IP_INFO     *IpInfo;
-  UINT8             IpVersion;
+  EFI_STATUS     Status;
+  IP_IO_IP_INFO  *IpInfo;
+  UINT8          IpVersion;
 
   if (IpIo == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1490,6 +1466,7 @@ IpIoStop (
   } else {
     Status = IpIo->Ip.Ip6->Configure (IpIo->Ip.Ip6, NULL);
   }
+
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1514,7 +1491,7 @@ IpIoStop (
   //
   // Close the receive event.
   //
-  if (IpVersion == IP_VERSION_4){
+  if (IpVersion == IP_VERSION_4) {
     gBS->CloseEvent (IpIo->RcvToken.Ip4Token.Event);
   } else {
     gBS->CloseEvent (IpIo->RcvToken.Ip6Token.Event);
@@ -1522,7 +1499,6 @@ IpIoStop (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Destroy an IP_IO instance.
@@ -1540,10 +1516,10 @@ IpIoStop (
 EFI_STATUS
 EFIAPI
 IpIoDestroy (
-  IN OUT IP_IO *IpIo
+  IN OUT IP_IO  *IpIo
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   //
   // Stop the IpIo.
@@ -1570,7 +1546,6 @@ IpIoDestroy (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Send out an IP packet.
@@ -1601,18 +1576,18 @@ IpIoDestroy (
 EFI_STATUS
 EFIAPI
 IpIoSend (
-  IN OUT IP_IO          *IpIo,
-  IN OUT NET_BUF        *Pkt,
-  IN     IP_IO_IP_INFO  *Sender        OPTIONAL,
-  IN     VOID           *Context       OPTIONAL,
-  IN     VOID           *NotifyData    OPTIONAL,
-  IN     EFI_IP_ADDRESS *Dest          OPTIONAL,
-  IN     IP_IO_OVERRIDE *OverrideData  OPTIONAL
+  IN OUT IP_IO           *IpIo,
+  IN OUT NET_BUF         *Pkt,
+  IN     IP_IO_IP_INFO   *Sender        OPTIONAL,
+  IN     VOID            *Context       OPTIONAL,
+  IN     VOID            *NotifyData    OPTIONAL,
+  IN     EFI_IP_ADDRESS  *Dest          OPTIONAL,
+  IN     IP_IO_OVERRIDE  *OverrideData  OPTIONAL
   )
 {
-  EFI_STATUS        Status;
-  IP_IO_IP_PROTOCOL Ip;
-  IP_IO_SEND_ENTRY  *SndEntry;
+  EFI_STATUS         Status;
+  IP_IO_IP_PROTOCOL  Ip;
+  IP_IO_SEND_ENTRY   *SndEntry;
 
   if ((IpIo == NULL) || (Pkt == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1639,7 +1614,7 @@ IpIoSend (
   //
   // Send this Packet
   //
-  if (IpIo->IpVersion == IP_VERSION_4){
+  if (IpIo->IpVersion == IP_VERSION_4) {
     Status = Ip.Ip4->Transmit (
                        Ip.Ip4,
                        &SndEntry->SndToken.Ip4Token
@@ -1658,7 +1633,6 @@ IpIoSend (
   return Status;
 }
 
-
 /**
   Cancel the IP transmit token which wraps this Packet.
 
@@ -1676,18 +1650,16 @@ IpIoCancelTxToken (
   IN VOID   *Packet
   )
 {
-  LIST_ENTRY        *Node;
-  IP_IO_SEND_ENTRY  *SndEntry;
-  IP_IO_IP_PROTOCOL Ip;
+  LIST_ENTRY         *Node;
+  IP_IO_SEND_ENTRY   *SndEntry;
+  IP_IO_IP_PROTOCOL  Ip;
 
   ASSERT ((IpIo != NULL) && (Packet != NULL));
 
   NET_LIST_FOR_EACH (Node, &IpIo->PendingSndList) {
-
     SndEntry = NET_LIST_USER_STRUCT (Node, IP_IO_SEND_ENTRY, Entry);
 
     if (SndEntry->Pkt == Packet) {
-
       Ip = SndEntry->Ip;
 
       if (IpIo->IpVersion == IP_VERSION_4) {
@@ -1705,9 +1677,7 @@ IpIoCancelTxToken (
       break;
     }
   }
-
 }
-
 
 /**
   Add a new IP instance for sending data.
@@ -1763,7 +1733,7 @@ IpIoAddIp (
              IpIo->Image,
              &IpInfo->ChildHandle,
              IpInfo->IpVersion,
-             (VOID **) &IpInfo->Ip
+             (VOID **)&IpInfo->Ip
              );
   if (EFI_ERROR (Status)) {
     goto ReleaseIpInfo;
@@ -1812,7 +1782,6 @@ ReleaseIpInfo:
   return NULL;
 }
 
-
 /**
   Configure the IP instance of this IpInfo and start the receiving if IpConfigData
   is not NULL.
@@ -1835,8 +1804,8 @@ ReleaseIpInfo:
 EFI_STATUS
 EFIAPI
 IpIoConfigIp (
-  IN OUT IP_IO_IP_INFO        *IpInfo,
-  IN OUT VOID                 *IpConfigData OPTIONAL
+  IN OUT IP_IO_IP_INFO  *IpInfo,
+  IN OUT VOID           *IpConfigData OPTIONAL
   )
 {
   EFI_STATUS         Status;
@@ -1874,8 +1843,7 @@ IpIoConfigIp (
 
   if (IpConfigData != NULL) {
     if (IpInfo->IpVersion == IP_VERSION_4) {
-
-      if (((EFI_IP4_CONFIG_DATA *) IpConfigData)->UseDefaultAddress) {
+      if (((EFI_IP4_CONFIG_DATA *)IpConfigData)->UseDefaultAddress) {
         Status = Ip.Ip4->GetModeData (
                            Ip.Ip4,
                            &Ip4ModeData,
@@ -1887,18 +1855,18 @@ IpIoConfigIp (
           return Status;
         }
 
-        IP4_COPY_ADDRESS (&((EFI_IP4_CONFIG_DATA*) IpConfigData)->StationAddress, &Ip4ModeData.ConfigData.StationAddress);
-        IP4_COPY_ADDRESS (&((EFI_IP4_CONFIG_DATA*) IpConfigData)->SubnetMask, &Ip4ModeData.ConfigData.SubnetMask);
+        IP4_COPY_ADDRESS (&((EFI_IP4_CONFIG_DATA *)IpConfigData)->StationAddress, &Ip4ModeData.ConfigData.StationAddress);
+        IP4_COPY_ADDRESS (&((EFI_IP4_CONFIG_DATA *)IpConfigData)->SubnetMask, &Ip4ModeData.ConfigData.SubnetMask);
       }
 
       CopyMem (
         &IpInfo->Addr.Addr,
-        &((EFI_IP4_CONFIG_DATA *) IpConfigData)->StationAddress,
+        &((EFI_IP4_CONFIG_DATA *)IpConfigData)->StationAddress,
         sizeof (IP4_ADDR)
         );
       CopyMem (
         &IpInfo->PreMask.SubnetMask,
-        &((EFI_IP4_CONFIG_DATA *) IpConfigData)->SubnetMask,
+        &((EFI_IP4_CONFIG_DATA *)IpConfigData)->SubnetMask,
         sizeof (IP4_ADDR)
         );
 
@@ -1923,7 +1891,7 @@ IpIoConfigIp (
 
       if (Ip6ModeData.IsConfigured) {
         CopyMem (
-          &((EFI_IP6_CONFIG_DATA *) IpConfigData)->StationAddress,
+          &((EFI_IP6_CONFIG_DATA *)IpConfigData)->StationAddress,
           &Ip6ModeData.ConfigData.StationAddress,
           sizeof (EFI_IPv6_ADDRESS)
           );
@@ -1951,7 +1919,6 @@ IpIoConfigIp (
         if (Ip6ModeData.IcmpTypeList != NULL) {
           FreePool (Ip6ModeData.IcmpTypeList);
         }
-
       } else {
         Status = EFI_NO_MAPPING;
         return Status;
@@ -1982,7 +1949,6 @@ IpIoConfigIp (
   return Status;
 }
 
-
 /**
   Destroy an IP instance maintained in IpIo->IpList for
   sending purpose.
@@ -2000,14 +1966,13 @@ IpIoConfigIp (
 VOID
 EFIAPI
 IpIoRemoveIp (
-  IN IP_IO            *IpIo,
-  IN IP_IO_IP_INFO    *IpInfo
+  IN IP_IO          *IpIo,
+  IN IP_IO_IP_INFO  *IpInfo
   )
 {
+  UINT8  IpVersion;
 
-  UINT8               IpVersion;
-
-  if (IpIo == NULL || IpInfo == NULL) {
+  if ((IpIo == NULL) || (IpInfo == NULL)) {
     return;
   }
 
@@ -2016,7 +1981,6 @@ IpIoRemoveIp (
   NET_PUT_REF (IpInfo);
 
   if (IpInfo->RefCnt > 0) {
-
     return;
   }
 
@@ -2026,7 +1990,7 @@ IpIoRemoveIp (
 
   RemoveEntryList (&IpInfo->Entry);
 
-  if (IpVersion == IP_VERSION_4){
+  if (IpVersion == IP_VERSION_4) {
     IpInfo->Ip.Ip4->Configure (
                       IpInfo->Ip.Ip4,
                       NULL
@@ -2039,9 +2003,7 @@ IpIoRemoveIp (
       );
 
     gBS->CloseEvent (IpInfo->DummyRcvToken.Ip4Token.Event);
-
   } else {
-
     IpInfo->Ip.Ip6->Configure (
                       IpInfo->Ip.Ip6,
                       NULL
@@ -2059,7 +2021,6 @@ IpIoRemoveIp (
 
   FreePool (IpInfo);
 }
-
 
 /**
   Find the first IP protocol maintained in IpIo whose local
@@ -2085,12 +2046,12 @@ IpIoFindSender (
   IN     EFI_IP_ADDRESS  *Src
   )
 {
-  LIST_ENTRY      *IpIoEntry;
-  IP_IO           *IpIoPtr;
-  LIST_ENTRY      *IpInfoEntry;
-  IP_IO_IP_INFO   *IpInfo;
+  LIST_ENTRY     *IpIoEntry;
+  IP_IO          *IpIoPtr;
+  LIST_ENTRY     *IpInfoEntry;
+  IP_IO_IP_INFO  *IpInfo;
 
-  if (IpIo == NULL || Src == NULL) {
+  if ((IpIo == NULL) || (Src == NULL)) {
     return NULL;
   }
 
@@ -2107,15 +2068,12 @@ IpIoFindSender (
 
     NET_LIST_FOR_EACH (IpInfoEntry, &IpIoPtr->IpList) {
       IpInfo = NET_LIST_USER_STRUCT (IpInfoEntry, IP_IO_IP_INFO, Entry);
-      if (IpInfo->IpVersion == IP_VERSION_4){
-
+      if (IpInfo->IpVersion == IP_VERSION_4) {
         if (EFI_IP4_EQUAL (&IpInfo->Addr.v4, &Src->v4)) {
           *IpIo = IpIoPtr;
           return IpInfo;
         }
-
       } else {
-
         if (EFI_IP6_EQUAL (&IpInfo->Addr.v6, &Src->v6)) {
           *IpIo = IpIoPtr;
           return IpInfo;
@@ -2129,7 +2087,6 @@ IpIoFindSender (
   //
   return NULL;
 }
-
 
 /**
   Get the ICMP error map information.
@@ -2150,10 +2107,10 @@ IpIoFindSender (
 EFI_STATUS
 EFIAPI
 IpIoGetIcmpErrStatus (
-  IN  UINT8       IcmpError,
-  IN  UINT8       IpVersion,
-  OUT BOOLEAN     *IsHard  OPTIONAL,
-  OUT BOOLEAN     *Notify  OPTIONAL
+  IN  UINT8    IcmpError,
+  IN  UINT8    IpVersion,
+  OUT BOOLEAN  *IsHard  OPTIONAL,
+  OUT BOOLEAN  *Notify  OPTIONAL
   )
 {
   if (IpVersion == IP_VERSION_4 ) {
@@ -2168,33 +2125,31 @@ IpIoGetIcmpErrStatus (
     }
 
     switch (IcmpError) {
-    case ICMP_ERR_UNREACH_NET:
-      return  EFI_NETWORK_UNREACHABLE;
+      case ICMP_ERR_UNREACH_NET:
+        return EFI_NETWORK_UNREACHABLE;
 
-    case ICMP_ERR_TIMXCEED_INTRANS:
-    case ICMP_ERR_TIMXCEED_REASS:
-    case ICMP_ERR_UNREACH_HOST:
-      return  EFI_HOST_UNREACHABLE;
+      case ICMP_ERR_TIMXCEED_INTRANS:
+      case ICMP_ERR_TIMXCEED_REASS:
+      case ICMP_ERR_UNREACH_HOST:
+        return EFI_HOST_UNREACHABLE;
 
-    case ICMP_ERR_UNREACH_PROTOCOL:
-      return  EFI_PROTOCOL_UNREACHABLE;
+      case ICMP_ERR_UNREACH_PROTOCOL:
+        return EFI_PROTOCOL_UNREACHABLE;
 
-    case ICMP_ERR_UNREACH_PORT:
-      return  EFI_PORT_UNREACHABLE;
+      case ICMP_ERR_UNREACH_PORT:
+        return EFI_PORT_UNREACHABLE;
 
-    case ICMP_ERR_MSGSIZE:
-    case ICMP_ERR_UNREACH_SRCFAIL:
-    case ICMP_ERR_QUENCH:
-    case ICMP_ERR_PARAMPROB:
-      return  EFI_ICMP_ERROR;
+      case ICMP_ERR_MSGSIZE:
+      case ICMP_ERR_UNREACH_SRCFAIL:
+      case ICMP_ERR_QUENCH:
+      case ICMP_ERR_PARAMPROB:
+        return EFI_ICMP_ERROR;
 
-    default:
-      ASSERT (FALSE);
-      return EFI_UNSUPPORTED;
+      default:
+        ASSERT (FALSE);
+        return EFI_UNSUPPORTED;
     }
-
   } else if (IpVersion == IP_VERSION_6) {
-
     ASSERT (IcmpError <= ICMP6_ERR_PARAMPROB_IPV6OPTION);
 
     if (IsHard != NULL) {
@@ -2206,31 +2161,30 @@ IpIoGetIcmpErrStatus (
     }
 
     switch (IcmpError) {
-    case ICMP6_ERR_UNREACH_NET:
-      return EFI_NETWORK_UNREACHABLE;
+      case ICMP6_ERR_UNREACH_NET:
+        return EFI_NETWORK_UNREACHABLE;
 
-    case ICMP6_ERR_UNREACH_HOST:
-    case ICMP6_ERR_TIMXCEED_HOPLIMIT:
-    case ICMP6_ERR_TIMXCEED_REASS:
-      return EFI_HOST_UNREACHABLE;
+      case ICMP6_ERR_UNREACH_HOST:
+      case ICMP6_ERR_TIMXCEED_HOPLIMIT:
+      case ICMP6_ERR_TIMXCEED_REASS:
+        return EFI_HOST_UNREACHABLE;
 
-    case ICMP6_ERR_UNREACH_PROTOCOL:
-      return EFI_PROTOCOL_UNREACHABLE;
+      case ICMP6_ERR_UNREACH_PROTOCOL:
+        return EFI_PROTOCOL_UNREACHABLE;
 
-    case ICMP6_ERR_UNREACH_PORT:
-      return EFI_PORT_UNREACHABLE;
+      case ICMP6_ERR_UNREACH_PORT:
+        return EFI_PORT_UNREACHABLE;
 
-    case ICMP6_ERR_PACKAGE_TOOBIG:
-    case ICMP6_ERR_PARAMPROB_HEADER:
-    case ICMP6_ERR_PARAMPROB_NEXHEADER:
-    case ICMP6_ERR_PARAMPROB_IPV6OPTION:
-      return EFI_ICMP_ERROR;
+      case ICMP6_ERR_PACKAGE_TOOBIG:
+      case ICMP6_ERR_PARAMPROB_HEADER:
+      case ICMP6_ERR_PARAMPROB_NEXHEADER:
+      case ICMP6_ERR_PARAMPROB_IPV6OPTION:
+        return EFI_ICMP_ERROR;
 
-    default:
-      ASSERT (FALSE);
-      return EFI_UNSUPPORTED;
+      default:
+        ASSERT (FALSE);
+        return EFI_UNSUPPORTED;
     }
-
   } else {
     //
     // Should never be here
@@ -2239,7 +2193,6 @@ IpIoGetIcmpErrStatus (
     return EFI_UNSUPPORTED;
   }
 }
-
 
 /**
   Refresh the remote peer's Neighbor Cache entries.
@@ -2288,4 +2241,3 @@ IpIoRefreshNeighbor (
 
   return Ip->Neighbors (Ip, FALSE, &Neighbor->v6, NULL, Timeout, TRUE);
 }
-

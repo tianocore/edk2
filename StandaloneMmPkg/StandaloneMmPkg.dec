@@ -29,10 +29,10 @@
   ##                 MM Memory Operation.
   MemLib|Include/Library/StandaloneMmMemLib.h
 
-[LibraryClasses.AArch64]
+[LibraryClasses.AArch64, LibraryClasses.ARM]
   ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint for
-  ##                 AArch64.
-  StandaloneMmCoreEntryPoint|Include/Library/AArch64/StandaloneMmCoreEntryPoint.h
+  ##                 AArch64 and ARM.
+  StandaloneMmCoreEntryPoint|Include/Library/Arm/StandaloneMmCoreEntryPoint.h
 
 [Guids]
   gStandaloneMmPkgTokenSpaceGuid           = { 0x18fe7632, 0xf5c8, 0x4e63, { 0x8d, 0xe8, 0x17, 0xa5, 0x5c, 0x59, 0x13, 0xbd }}

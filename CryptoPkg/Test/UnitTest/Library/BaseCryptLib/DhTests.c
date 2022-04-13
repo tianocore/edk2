@@ -8,13 +8,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "TestBaseCryptLib.h"
 
-VOID    *mDh1;
-VOID    *mDh2;
+VOID  *mDh1;
+VOID  *mDh2;
 
 UNIT_TEST_STATUS
 EFIAPI
 TestVerifyDhPreReq (
-  UNIT_TEST_CONTEXT           Context
+  UNIT_TEST_CONTEXT  Context
   )
 {
   mDh1 = DhNew ();
@@ -33,13 +33,14 @@ TestVerifyDhPreReq (
 VOID
 EFIAPI
 TestVerifyDhCleanUp (
-  UNIT_TEST_CONTEXT           Context
+  UNIT_TEST_CONTEXT  Context
   )
 {
   if (mDh1 != NULL) {
     DhFree (mDh1);
     mDh1 = NULL;
   }
+
   if (mDh2 != NULL) {
     DhFree (mDh2);
     mDh2 = NULL;
@@ -49,19 +50,19 @@ TestVerifyDhCleanUp (
 UNIT_TEST_STATUS
 EFIAPI
 TestVerifyDhGenerateKey (
-  UNIT_TEST_CONTEXT           Context
+  UNIT_TEST_CONTEXT  Context
   )
 {
-  UINT8   Prime[64];
-  UINT8   PublicKey1[64];
-  UINTN   PublicKey1Length;
-  UINT8   PublicKey2[64];
-  UINTN   PublicKey2Length;
-  UINT8   Key1[64];
-  UINTN   Key1Length;
-  UINT8   Key2[64];
-  UINTN   Key2Length;
-  BOOLEAN Status;
+  UINT8    Prime[512];
+  UINT8    PublicKey1[64];
+  UINTN    PublicKey1Length;
+  UINT8    PublicKey2[64];
+  UINTN    PublicKey2Length;
+  UINT8    Key1[64];
+  UINTN    Key1Length;
+  UINT8    Key2[64];
+  UINTN    Key2Length;
+  BOOLEAN  Status;
 
   //
   // Initialize Key Length
@@ -71,10 +72,10 @@ TestVerifyDhGenerateKey (
   Key1Length       = sizeof (Key1);
   Key2Length       = sizeof (Key2);
 
-  Status = DhGenerateParameter (mDh1, 2, 64, Prime);
+  Status = DhGenerateParameter (mDh1, 2, sizeof (Prime), Prime);
   UT_ASSERT_TRUE (Status);
 
-  Status = DhSetParameter (mDh2, 2, 64, Prime);
+  Status = DhSetParameter (mDh2, 2, sizeof (Prime), Prime);
   UT_ASSERT_TRUE (Status);
 
   Status = DhGenerateKey (mDh1, PublicKey1, &PublicKey1Length);
@@ -96,11 +97,11 @@ TestVerifyDhGenerateKey (
   return UNIT_TEST_PASSED;
 }
 
-TEST_DESC mDhTest[] = {
-    //
-    // -----Description--------------------------------Class---------------------Function----------------Pre-----------------Post------------Context
-    //
-    {"TestVerifyDhGenerateKey()",        "CryptoPkg.BaseCryptLib.Dh",   TestVerifyDhGenerateKey,  TestVerifyDhPreReq, TestVerifyDhCleanUp, NULL},
+TEST_DESC  mDhTest[] = {
+  //
+  // -----Description--------------------------------Class---------------------Function----------------Pre-----------------Post------------Context
+  //
+  { "TestVerifyDhGenerateKey()", "CryptoPkg.BaseCryptLib.Dh", TestVerifyDhGenerateKey, TestVerifyDhPreReq, TestVerifyDhCleanUp, NULL },
 };
 
-UINTN mDhTestNum = ARRAY_SIZE(mDhTest);
+UINTN  mDhTestNum = ARRAY_SIZE (mDhTest);

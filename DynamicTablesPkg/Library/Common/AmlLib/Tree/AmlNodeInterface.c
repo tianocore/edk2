@@ -25,7 +25,7 @@
 EAML_NODE_TYPE
 EFIAPI
 AmlGetNodeType (
-  IN  AML_NODE_HEADER   * Node
+  IN  AML_NODE_HEADER  *Node
   )
 {
   if (!IS_AML_NODE_VALID (Node)) {
@@ -48,12 +48,13 @@ AmlGetNodeType (
 EFI_STATUS
 EFIAPI
 AmlGetRootNodeInfo (
-  IN  AML_ROOT_NODE                 * RootNode,
-  OUT EFI_ACPI_DESCRIPTION_HEADER   * SdtHeaderBuffer
+  IN  AML_ROOT_NODE                *RootNode,
+  OUT EFI_ACPI_DESCRIPTION_HEADER  *SdtHeaderBuffer
   )
 {
   if (!IS_AML_ROOT_NODE (RootNode)  ||
-      (SdtHeaderBuffer == NULL)) {
+      (SdtHeaderBuffer == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -94,11 +95,11 @@ AmlGetRootNodeInfo (
 EFI_STATUS
 EFIAPI
 AmlGetObjectNodeInfo (
-  IN  AML_OBJECT_NODE   * ObjectNode,
-  OUT UINT8             * OpCode,           OPTIONAL
-  OUT UINT8             * SubOpCode,        OPTIONAL
-  OUT UINT32            * PkgLen,           OPTIONAL
-  OUT BOOLEAN           * IsNameSpaceNode   OPTIONAL
+  IN  AML_OBJECT_NODE  *ObjectNode,
+  OUT UINT8            *OpCode            OPTIONAL,
+  OUT UINT8            *SubOpCode         OPTIONAL,
+  OUT UINT32           *PkgLen            OPTIONAL,
+  OUT BOOLEAN          *IsNameSpaceNode   OPTIONAL
   )
 {
   if (!IS_AML_OBJECT_NODE (ObjectNode)) {
@@ -109,12 +110,15 @@ AmlGetObjectNodeInfo (
   if (OpCode != NULL) {
     *OpCode = ObjectNode->AmlByteEncoding->OpCode;
   }
+
   if (SubOpCode != NULL) {
     *SubOpCode = ObjectNode->AmlByteEncoding->SubOpCode;
   }
+
   if (PkgLen != NULL) {
     *PkgLen = ObjectNode->PkgLen;
   }
+
   if (IsNameSpaceNode != NULL) {
     *IsNameSpaceNode = AmlNodeHasAttribute (ObjectNode, AML_IN_NAMESPACE);
   }
@@ -131,11 +135,12 @@ AmlGetObjectNodeInfo (
 **/
 UINT8
 AmlGetFixedArgumentCount (
-  IN  AML_OBJECT_NODE   * Node
+  IN  AML_OBJECT_NODE  *Node
   )
 {
   if (IS_AML_OBJECT_NODE (Node) &&
-      (Node->AmlByteEncoding != NULL)) {
+      (Node->AmlByteEncoding != NULL))
+  {
     return (UINT8)Node->AmlByteEncoding->MaxIndex;
   }
 
@@ -154,12 +159,13 @@ AmlGetFixedArgumentCount (
 EFI_STATUS
 EFIAPI
 AmlGetNodeDataType (
-  IN  AML_DATA_NODE       * DataNode,
-  OUT EAML_NODE_DATA_TYPE * DataType
+  IN  AML_DATA_NODE        *DataNode,
+  OUT EAML_NODE_DATA_TYPE  *DataType
   )
 {
   if (!IS_AML_DATA_NODE (DataNode)  ||
-      (DataType == NULL)) {
+      (DataType == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -187,13 +193,14 @@ AmlGetNodeDataType (
 EFI_STATUS
 EFIAPI
 AmlGetResourceDataType (
-  IN  AML_DATA_NODE   * DataNode,
-  OUT AML_RD_HEADER   * ResourceDataType
+  IN  AML_DATA_NODE  *DataNode,
+  OUT AML_RD_HEADER  *ResourceDataType
   )
 {
   if (!IS_AML_DATA_NODE (DataNode)  ||
       (ResourceDataType == NULL)    ||
-      (DataNode->DataType != EAmlNodeDataTypeResourceData)) {
+      (DataNode->DataType != EAmlNodeDataTypeResourceData))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -227,19 +234,21 @@ AmlGetResourceDataType (
 EFI_STATUS
 EFIAPI
 AmlGetDataNodeBuffer (
-  IN      AML_DATA_NODE   * DataNode,
-      OUT UINT8           * Buffer,       OPTIONAL
-  IN  OUT UINT32          * BufferSize
+  IN      AML_DATA_NODE  *DataNode,
+  OUT UINT8              *Buffer        OPTIONAL,
+  IN  OUT UINT32         *BufferSize
   )
 {
   if (!IS_AML_DATA_NODE (DataNode) ||
-      (BufferSize == NULL)) {
+      (BufferSize == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   if ((*BufferSize >= DataNode->Size)  &&
-      (Buffer != NULL)) {
+      (Buffer != NULL))
+  {
     CopyMem (Buffer, DataNode->Buffer, DataNode->Size);
   }
 
@@ -263,8 +272,8 @@ AmlGetDataNodeBuffer (
 EFI_STATUS
 EFIAPI
 AmlUpdateRootNode (
-  IN        AML_ROOT_NODE                 * RootNode,
-  IN  CONST EFI_ACPI_DESCRIPTION_HEADER   * SdtHeader
+  IN        AML_ROOT_NODE                *RootNode,
+  IN  CONST EFI_ACPI_DESCRIPTION_HEADER  *SdtHeader
   )
 {
   EFI_STATUS  Status;
@@ -275,7 +284,8 @@ AmlUpdateRootNode (
       ((SdtHeader->Signature !=
         EFI_ACPI_6_3_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE) &&
        (SdtHeader->Signature !=
-        EFI_ACPI_6_3_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE))) {
+        EFI_ACPI_6_3_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -287,14 +297,14 @@ AmlUpdateRootNode (
     );
 
   // Update the Length field.
-  Status = AmlComputeSize ((AML_NODE_HEADER*)RootNode, &Length);
+  Status = AmlComputeSize ((AML_NODE_HEADER *)RootNode, &Length);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
   }
 
   RootNode->SdtHeader->Length = Length +
-                                  (UINT32)sizeof (EFI_ACPI_DESCRIPTION_HEADER);
+                                (UINT32)sizeof (EFI_ACPI_DESCRIPTION_HEADER);
 
   return Status;
 }
@@ -323,18 +333,19 @@ AmlUpdateRootNode (
 EFI_STATUS
 EFIAPI
 AmlUpdateInteger (
-  IN  AML_OBJECT_NODE   * IntegerOpNode,
-  IN  UINT64              NewInteger
+  IN  AML_OBJECT_NODE  *IntegerOpNode,
+  IN  UINT64           NewInteger
   )
 {
-  EFI_STATUS   Status;
+  EFI_STATUS  Status;
 
-  INT8         ValueWidthDiff;
+  INT8  ValueWidthDiff;
 
   if (!IS_AML_OBJECT_NODE (IntegerOpNode)     ||
       (!IsIntegerNode (IntegerOpNode)         &&
        !IsSpecialIntegerNode (IntegerOpNode)) ||
-      AmlNodeCompareOpCode (IntegerOpNode, AML_ONES_OP, 0)) {
+      AmlNodeCompareOpCode (IntegerOpNode, AML_ONES_OP, 0))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -349,7 +360,7 @@ AmlUpdateInteger (
   if (ValueWidthDiff != 0) {
     // Propagate the information.
     Status = AmlPropagateInformation (
-               (AML_NODE_HEADER*)IntegerOpNode,
+               (AML_NODE_HEADER *)IntegerOpNode,
                (ValueWidthDiff > 0) ? TRUE : FALSE,
                ABS (ValueWidthDiff),
                0
@@ -380,28 +391,29 @@ AmlUpdateInteger (
 EFI_STATUS
 EFIAPI
 AmlUpdateDataNode (
-  IN  AML_DATA_NODE         * DataNode,
-  IN  EAML_NODE_DATA_TYPE     DataType,
-  IN  UINT8                 * Buffer,
-  IN  UINT32                  Size
+  IN  AML_DATA_NODE        *DataNode,
+  IN  EAML_NODE_DATA_TYPE  DataType,
+  IN  UINT8                *Buffer,
+  IN  UINT32               Size
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
-  UINT32                  ExpectedSize;
-  AML_OBJECT_NODE       * ParentNode;
-  EAML_NODE_DATA_TYPE     ExpectedArgType;
-  EAML_PARSE_INDEX        Index;
+  UINT32               ExpectedSize;
+  AML_OBJECT_NODE      *ParentNode;
+  EAML_NODE_DATA_TYPE  ExpectedArgType;
+  EAML_PARSE_INDEX     Index;
 
   if (!IS_AML_DATA_NODE (DataNode)      ||
       (DataType > EAmlNodeDataTypeMax)  ||
       (Buffer == NULL)                  ||
-      (Size == 0)) {
+      (Size == 0))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  ParentNode = (AML_OBJECT_NODE*)AmlGetParent ((AML_NODE_HEADER*)DataNode);
+  ParentNode = (AML_OBJECT_NODE *)AmlGetParent ((AML_NODE_HEADER *)DataNode);
   if (!IS_AML_OBJECT_NODE (ParentNode)) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
@@ -419,7 +431,8 @@ AmlUpdateDataNode (
       (((ExpectedArgType != EAmlNodeDataTypeRaw)            &&
         (ExpectedArgType != EAmlNodeDataTypeResourceData))  ||
        ((DataType != EAmlNodeDataTypeRaw)                   &&
-        (DataType != EAmlNodeDataTypeResourceData)))) {
+        (DataType != EAmlNodeDataTypeResourceData))))
+  {
     ASSERT (0);
     return EFI_UNSUPPORTED;
   }
@@ -430,12 +443,14 @@ AmlUpdateDataNode (
     {
       // Check the name contained in the Buffer is an AML name
       // with the right size.
-      Status = AmlGetNameStringSize ((CONST CHAR8*)Buffer, &ExpectedSize);
+      Status = AmlGetNameStringSize ((CONST CHAR8 *)Buffer, &ExpectedSize);
       if (EFI_ERROR (Status)  ||
-          (Size != ExpectedSize)) {
+          (Size != ExpectedSize))
+      {
         ASSERT (0);
         return Status;
       }
+
       break;
     }
     case EAmlNodeDataTypeString:
@@ -450,6 +465,7 @@ AmlUpdateDataNode (
           ASSERT (0);
           return EFI_INVALID_PARAMETER;
         }
+
         ExpectedSize++;
       }
 
@@ -457,13 +473,15 @@ AmlUpdateDataNode (
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
       }
+
       break;
     }
     case EAmlNodeDataTypeUInt:
     {
-      if (AmlIsNodeFixedArgument ((CONST AML_NODE_HEADER*)DataNode, &Index)) {
+      if (AmlIsNodeFixedArgument ((CONST AML_NODE_HEADER *)DataNode, &Index)) {
         if ((ParentNode->AmlByteEncoding == NULL) ||
-            (ParentNode->AmlByteEncoding->Format == NULL)) {
+            (ParentNode->AmlByteEncoding->Format == NULL))
+        {
           ASSERT (0);
           return EFI_INVALID_PARAMETER;
         }
@@ -472,11 +490,13 @@ AmlUpdateDataNode (
         // E.g. for PackageOp the first fixed argument is of type EAmlUInt8
         // and represents the count of elements. This type cannot be changed.
         if ((ParentNode->AmlByteEncoding->Format[Index] != EAmlObject) &&
-            (DataNode->Size != Size)) {
+            (DataNode->Size != Size))
+        {
           ASSERT (0);
           return EFI_UNSUPPORTED;
         }
       }
+
       break;
     }
     case EAmlNodeDataTypeRaw:
@@ -486,6 +506,7 @@ AmlUpdateDataNode (
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
       }
+
       break;
     }
     case EAmlNodeDataTypeResourceData:
@@ -495,7 +516,8 @@ AmlUpdateDataNode (
       // Large resource data must be at least as long as the header
       // of a large resource data.
       if (AML_RD_IS_LARGE (Buffer)  &&
-          (Size < sizeof (ACPI_LARGE_RESOURCE_HEADER))) {
+          (Size < sizeof (ACPI_LARGE_RESOURCE_HEADER)))
+      {
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
       }
@@ -513,6 +535,13 @@ AmlUpdateDataNode (
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
       }
+
+      Status = AmlSetRdListCheckSum (ParentNode, 0);
+      if (EFI_ERROR (Status)) {
+        ASSERT (0);
+        return Status;
+      }
+
       break;
     }
     case EAmlNodeDataTypeFieldPkgLen:
@@ -522,6 +551,7 @@ AmlUpdateDataNode (
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
       }
+
       break;
     }
     // None and reserved types.
@@ -540,8 +570,8 @@ AmlUpdateDataNode (
                DataNode->NodeHeader.Parent,
                (Size > DataNode->Size) ? TRUE : FALSE,
                (Size > DataNode->Size) ?
-                (Size - DataNode->Size) :
-                (DataNode->Size - Size),
+               (Size - DataNode->Size) :
+               (DataNode->Size - Size),
                0
                );
     if (EFI_ERROR (Status)) {
@@ -557,6 +587,7 @@ AmlUpdateDataNode (
       ASSERT (0);
       return EFI_OUT_OF_RESOURCES;
     }
+
     DataNode->Size = Size;
   }
 

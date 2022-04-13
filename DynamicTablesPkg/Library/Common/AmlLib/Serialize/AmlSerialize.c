@@ -38,29 +38,30 @@ STATIC
 BOOLEAN
 EFIAPI
 AmlSerializeNodeCallback (
-  IN       AML_NODE_HEADER   * Node,
-  IN  OUT  VOID              * Context,    OPTIONAL
-  IN  OUT  EFI_STATUS        * Status      OPTIONAL
+  IN       AML_NODE_HEADER  *Node,
+  IN  OUT  VOID             *Context     OPTIONAL,
+  IN  OUT  EFI_STATUS       *Status      OPTIONAL
   )
 {
-  EFI_STATUS                Status1;
+  EFI_STATUS  Status1;
 
-  CONST AML_DATA_NODE     * DataNode;
-  CONST AML_OBJECT_NODE   * ObjectNode;
-  AML_STREAM              * FStream;
+  CONST AML_DATA_NODE    *DataNode;
+  CONST AML_OBJECT_NODE  *ObjectNode;
+  AML_STREAM             *FStream;
 
   // Bytes needed to store OpCode[1] + SubOpcode[1] + MaxPkgLen[4] = 6 bytes.
-  UINT8                     ObjectNodeInfoArray[6];
-  UINT32                    Index;
-  BOOLEAN                   ContinueEnum;
+  UINT8    ObjectNodeInfoArray[6];
+  UINT32   Index;
+  BOOLEAN  ContinueEnum;
 
-  CONST AML_OBJECT_NODE   * ParentNode;
-  EAML_PARSE_INDEX          IndexPtr;
+  CONST AML_OBJECT_NODE  *ParentNode;
+  EAML_PARSE_INDEX       IndexPtr;
 
   if (!IS_AML_NODE_VALID (Node)   ||
-      (Context == NULL)) {
+      (Context == NULL))
+  {
     ASSERT (0);
-    Status1 = EFI_INVALID_PARAMETER;
+    Status1      = EFI_INVALID_PARAMETER;
     ContinueEnum = FALSE;
     goto error_handler;
   }
@@ -68,44 +69,47 @@ AmlSerializeNodeCallback (
   // Ignore the second fixed argument of method invocation nodes
   // as the information stored there (the argument count) is not in the
   // ACPI specification.
-  ParentNode = (CONST AML_OBJECT_NODE*)AmlGetParent ((AML_NODE_HEADER*)Node);
+  ParentNode = (CONST AML_OBJECT_NODE *)AmlGetParent ((AML_NODE_HEADER *)Node);
   if (IS_AML_OBJECT_NODE (ParentNode)                             &&
       AmlNodeCompareOpCode (ParentNode, AML_METHOD_INVOC_OP, 0)   &&
-      AmlIsNodeFixedArgument (Node, &IndexPtr)) {
+      AmlIsNodeFixedArgument (Node, &IndexPtr))
+  {
     if (IndexPtr == EAmlParseIndexTerm1) {
       if (Status != NULL) {
         *Status = EFI_SUCCESS;
       }
+
       return TRUE;
     }
   }
 
-  Status1 = EFI_SUCCESS;
+  Status1      = EFI_SUCCESS;
   ContinueEnum = TRUE;
-  FStream = (AML_STREAM*)Context;
+  FStream      = (AML_STREAM *)Context;
 
   if (IS_AML_DATA_NODE (Node)) {
     // Copy the content of the Buffer for a DataNode.
-    DataNode = (AML_DATA_NODE*)Node;
-    Status1 = AmlStreamWrite (
-                FStream,
-                DataNode->Buffer,
-                DataNode->Size
-                );
+    DataNode = (AML_DATA_NODE *)Node;
+    Status1  = AmlStreamWrite (
+                 FStream,
+                 DataNode->Buffer,
+                 DataNode->Size
+                 );
     if (EFI_ERROR (Status1)) {
       ASSERT (0);
       ContinueEnum = FALSE;
       goto error_handler;
     }
-
   } else if (IS_AML_OBJECT_NODE (Node)  &&
              !AmlNodeHasAttribute (
-                (CONST AML_OBJECT_NODE*)Node,
-                AML_IS_PSEUDO_OPCODE)) {
+                (CONST AML_OBJECT_NODE *)Node,
+                AML_IS_PSEUDO_OPCODE
+                ))
+  {
     // Ignore pseudo-opcodes as they are not part of the
     // ACPI specification.
 
-    ObjectNode = (AML_OBJECT_NODE*)Node;
+    ObjectNode = (AML_OBJECT_NODE *)Node;
 
     Index = 0;
     // Copy the opcode(s).
@@ -138,6 +142,7 @@ error_handler:
   if (Status != NULL) {
     *Status = Status1;
   }
+
   return ContinueEnum;
 }
 
@@ -169,26 +174,27 @@ error_handler:
 EFI_STATUS
 EFIAPI
 AmlSerializeTree (
-  IN      AML_ROOT_NODE   * RootNode,
-  IN      UINT8           * Buffer,     OPTIONAL
-  IN  OUT UINT32          * BufferSize
+  IN      AML_ROOT_NODE  *RootNode,
+  IN      UINT8          *Buffer      OPTIONAL,
+  IN  OUT UINT32         *BufferSize
   )
 {
-  EFI_STATUS    Status;
-  AML_STREAM    FStream;
-  UINT32        TableSize;
+  EFI_STATUS  Status;
+  AML_STREAM  FStream;
+  UINT32      TableSize;
 
   if (!IS_AML_ROOT_NODE (RootNode) ||
-      (BufferSize == NULL)) {
+      (BufferSize == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   // Compute the total size of the AML blob.
   Status = AmlComputeSize (
-              (CONST AML_NODE_HEADER*)RootNode,
-              &TableSize
-              );
+             (CONST AML_NODE_HEADER *)RootNode,
+             &TableSize
+             );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -226,7 +232,7 @@ AmlSerializeTree (
   // Serialize the header.
   Status = AmlStreamWrite (
              &FStream,
-             (UINT8*)RootNode->SdtHeader,
+             (UINT8 *)RootNode->SdtHeader,
              sizeof (EFI_ACPI_DESCRIPTION_HEADER)
              );
   if (EFI_ERROR (Status)) {
@@ -236,9 +242,9 @@ AmlSerializeTree (
 
   Status = EFI_SUCCESS;
   AmlEnumTree (
-    (AML_NODE_HEADER*)RootNode,
+    (AML_NODE_HEADER *)RootNode,
     AmlSerializeNodeCallback,
-    (VOID*)&FStream,
+    (VOID *)&FStream,
     &Status
     );
   if (EFI_ERROR (Status)) {
@@ -247,7 +253,7 @@ AmlSerializeTree (
   }
 
   // Update the checksum.
-  return AcpiPlatformChecksum ((EFI_ACPI_DESCRIPTION_HEADER*)Buffer);
+  return AcpiPlatformChecksum ((EFI_ACPI_DESCRIPTION_HEADER *)Buffer);
 }
 
 /** Serialize an AML definition block.
@@ -267,23 +273,24 @@ AmlSerializeTree (
 EFI_STATUS
 EFIAPI
 AmlSerializeDefinitionBlock (
-  IN  AML_ROOT_NODE                   * RootNode,
-  OUT EFI_ACPI_DESCRIPTION_HEADER    ** Table
+  IN  AML_ROOT_NODE                *RootNode,
+  OUT EFI_ACPI_DESCRIPTION_HEADER  **Table
   )
 {
-  EFI_STATUS    Status;
-  UINT8       * TableBuffer;
-  UINT32        TableSize;
+  EFI_STATUS  Status;
+  UINT8       *TableBuffer;
+  UINT32      TableSize;
 
   if (!IS_AML_ROOT_NODE (RootNode) ||
-      (Table == NULL)) {
+      (Table == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  *Table = NULL;
+  *Table      = NULL;
   TableBuffer = NULL;
-  TableSize = 0;
+  TableSize   = 0;
 
   // Get the size of the SSDT table.
   Status = AmlSerializeTree (
@@ -296,7 +303,7 @@ AmlSerializeDefinitionBlock (
     return Status;
   }
 
-  TableBuffer = (UINT8*)AllocateZeroPool (TableSize);
+  TableBuffer = (UINT8 *)AllocateZeroPool (TableSize);
   if (TableBuffer == NULL) {
     DEBUG ((
       DEBUG_ERROR,
@@ -317,7 +324,7 @@ AmlSerializeDefinitionBlock (
     ASSERT (0);
   } else {
     // Save the allocated Table buffer in the table list
-    *Table = (EFI_ACPI_DESCRIPTION_HEADER*)TableBuffer;
+    *Table = (EFI_ACPI_DESCRIPTION_HEADER *)TableBuffer;
   }
 
   return Status;

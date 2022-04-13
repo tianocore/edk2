@@ -17,17 +17,18 @@
 **/
 VOID
 DumpCpuFeatureMask (
-  IN UINT8               *FeatureMask,
-  IN UINT32              BitMaskSize
+  IN UINT8   *FeatureMask,
+  IN UINT32  BitMaskSize
   )
 {
-  UINTN                  Index;
-  UINT8                  *Data8;
+  UINTN  Index;
+  UINT8  *Data8;
 
-  Data8       = (UINT8 *) FeatureMask;
+  Data8 = (UINT8 *)FeatureMask;
   for (Index = 0; Index < BitMaskSize; Index++) {
     DEBUG ((DEBUG_INFO, " %02x ", *Data8++));
   }
+
   DEBUG ((DEBUG_INFO, "\n"));
 }
 
@@ -44,7 +45,6 @@ DumpCpuFeature (
   IN UINT32              BitMaskSize
   )
 {
-
   if (CpuFeature->FeatureName != NULL) {
     DEBUG ((DEBUG_INFO, "FeatureName: %a\n", CpuFeature->FeatureName));
   } else {
@@ -64,8 +64,8 @@ DumpCpuFeature (
 **/
 BOOLEAN
 IsBitMaskMatchCheck (
-  IN UINT8        *FeatureMask,
-  IN UINT8        *DependentBitMask
+  IN UINT8  *FeatureMask,
+  IN UINT8  *DependentBitMask
   )
 {
   UINTN              Index;
@@ -82,6 +82,7 @@ IsBitMaskMatchCheck (
       return TRUE;
     }
   }
+
   return FALSE;
 }
 
@@ -98,14 +99,14 @@ IsBitMaskMatchCheck (
 **/
 BOOLEAN
 FindSpecifyFeature (
-  IN LIST_ENTRY              *FeatureList,
-  IN LIST_ENTRY              *CurrentEntry,
-  IN BOOLEAN                 SearchFormer,
-  IN UINT8                   *FeatureMask
+  IN LIST_ENTRY  *FeatureList,
+  IN LIST_ENTRY  *CurrentEntry,
+  IN BOOLEAN     SearchFormer,
+  IN UINT8       *FeatureMask
   )
 {
-  CPU_FEATURES_ENTRY         *CpuFeature;
-  LIST_ENTRY                 *NextEntry;
+  CPU_FEATURES_ENTRY  *CpuFeature;
+  LIST_ENTRY          *NextEntry;
 
   //
   // Check whether exist the not neighborhood entry first.
@@ -165,9 +166,9 @@ FindSpecifyFeature (
 **/
 CPU_FEATURE_DEPENDENCE_TYPE
 DetectFeatureScope (
-  IN CPU_FEATURES_ENTRY         *CpuFeature,
-  IN BOOLEAN                    Before,
-  IN UINT8                      *NextCpuFeatureMask
+  IN CPU_FEATURES_ENTRY  *CpuFeature,
+  IN BOOLEAN             Before,
+  IN UINT8               *NextCpuFeatureMask
   )
 {
   //
@@ -185,17 +186,20 @@ DetectFeatureScope (
 
   if (Before) {
     if ((CpuFeature->PackageBeforeFeatureBitMask != NULL) &&
-        IsBitMaskMatchCheck (NextCpuFeatureMask, CpuFeature->PackageBeforeFeatureBitMask)) {
+        IsBitMaskMatchCheck (NextCpuFeatureMask, CpuFeature->PackageBeforeFeatureBitMask))
+    {
       return PackageDepType;
     }
 
     if ((CpuFeature->CoreBeforeFeatureBitMask != NULL) &&
-        IsBitMaskMatchCheck (NextCpuFeatureMask, CpuFeature->CoreBeforeFeatureBitMask)) {
+        IsBitMaskMatchCheck (NextCpuFeatureMask, CpuFeature->CoreBeforeFeatureBitMask))
+    {
       return CoreDepType;
     }
 
     if ((CpuFeature->ThreadBeforeFeatureBitMask != NULL) &&
-        IsBitMaskMatchCheck (NextCpuFeatureMask, CpuFeature->ThreadBeforeFeatureBitMask)) {
+        IsBitMaskMatchCheck (NextCpuFeatureMask, CpuFeature->ThreadBeforeFeatureBitMask))
+    {
       return ThreadDepType;
     }
 
@@ -203,17 +207,20 @@ DetectFeatureScope (
   }
 
   if ((CpuFeature->PackageAfterFeatureBitMask != NULL) &&
-      IsBitMaskMatchCheck (NextCpuFeatureMask, CpuFeature->PackageAfterFeatureBitMask)) {
+      IsBitMaskMatchCheck (NextCpuFeatureMask, CpuFeature->PackageAfterFeatureBitMask))
+  {
     return PackageDepType;
   }
 
   if ((CpuFeature->CoreAfterFeatureBitMask != NULL) &&
-      IsBitMaskMatchCheck (NextCpuFeatureMask, CpuFeature->CoreAfterFeatureBitMask)) {
+      IsBitMaskMatchCheck (NextCpuFeatureMask, CpuFeature->CoreAfterFeatureBitMask))
+  {
     return CoreDepType;
   }
 
   if ((CpuFeature->ThreadAfterFeatureBitMask != NULL) &&
-      IsBitMaskMatchCheck (NextCpuFeatureMask, CpuFeature->ThreadAfterFeatureBitMask)) {
+      IsBitMaskMatchCheck (NextCpuFeatureMask, CpuFeature->ThreadAfterFeatureBitMask))
+  {
     return ThreadDepType;
   }
 
@@ -231,24 +238,27 @@ DetectFeatureScope (
 **/
 CPU_FEATURE_DEPENDENCE_TYPE
 DetectNoneNeighborhoodFeatureScope (
-  IN CPU_FEATURES_ENTRY         *CpuFeature,
-  IN BOOLEAN                    Before,
-  IN LIST_ENTRY                 *FeatureList
+  IN CPU_FEATURES_ENTRY  *CpuFeature,
+  IN BOOLEAN             Before,
+  IN LIST_ENTRY          *FeatureList
   )
 {
   if (Before) {
     if ((CpuFeature->PackageBeforeFeatureBitMask != NULL) &&
-        FindSpecifyFeature(FeatureList, &CpuFeature->Link, FALSE, CpuFeature->PackageBeforeFeatureBitMask)) {
+        FindSpecifyFeature (FeatureList, &CpuFeature->Link, FALSE, CpuFeature->PackageBeforeFeatureBitMask))
+    {
       return PackageDepType;
     }
 
     if ((CpuFeature->CoreBeforeFeatureBitMask != NULL) &&
-        FindSpecifyFeature(FeatureList, &CpuFeature->Link, FALSE, CpuFeature->CoreBeforeFeatureBitMask)) {
+        FindSpecifyFeature (FeatureList, &CpuFeature->Link, FALSE, CpuFeature->CoreBeforeFeatureBitMask))
+    {
       return CoreDepType;
     }
 
     if ((CpuFeature->ThreadBeforeFeatureBitMask != NULL) &&
-        FindSpecifyFeature(FeatureList, &CpuFeature->Link, FALSE, CpuFeature->ThreadBeforeFeatureBitMask)) {
+        FindSpecifyFeature (FeatureList, &CpuFeature->Link, FALSE, CpuFeature->ThreadBeforeFeatureBitMask))
+    {
       return ThreadDepType;
     }
 
@@ -256,17 +266,20 @@ DetectNoneNeighborhoodFeatureScope (
   }
 
   if ((CpuFeature->PackageAfterFeatureBitMask != NULL) &&
-      FindSpecifyFeature(FeatureList, &CpuFeature->Link, TRUE, CpuFeature->PackageAfterFeatureBitMask)) {
+      FindSpecifyFeature (FeatureList, &CpuFeature->Link, TRUE, CpuFeature->PackageAfterFeatureBitMask))
+  {
     return PackageDepType;
   }
 
   if ((CpuFeature->CoreAfterFeatureBitMask != NULL) &&
-      FindSpecifyFeature(FeatureList, &CpuFeature->Link, TRUE, CpuFeature->CoreAfterFeatureBitMask)) {
+      FindSpecifyFeature (FeatureList, &CpuFeature->Link, TRUE, CpuFeature->CoreAfterFeatureBitMask))
+  {
     return CoreDepType;
   }
 
   if ((CpuFeature->ThreadAfterFeatureBitMask != NULL) &&
-      FindSpecifyFeature(FeatureList, &CpuFeature->Link, TRUE, CpuFeature->ThreadAfterFeatureBitMask)) {
+      FindSpecifyFeature (FeatureList, &CpuFeature->Link, TRUE, CpuFeature->ThreadAfterFeatureBitMask))
+  {
     return ThreadDepType;
   }
 
@@ -294,17 +307,17 @@ DetectNoneNeighborhoodFeatureScope (
 **/
 BOOLEAN
 AdjustFeaturesDependence (
-  IN OUT CPU_FEATURES_ENTRY         *PreviousFeature,
-  IN OUT CPU_FEATURES_ENTRY         *CurrentFeature,
-  IN     CPU_FEATURES_ENTRY         *FindFeature,
-  IN     BOOLEAN                    Before
+  IN OUT CPU_FEATURES_ENTRY  *PreviousFeature,
+  IN OUT CPU_FEATURES_ENTRY  *CurrentFeature,
+  IN     CPU_FEATURES_ENTRY  *FindFeature,
+  IN     BOOLEAN             Before
   )
 {
-  CPU_FEATURE_DEPENDENCE_TYPE            PreDependType;
-  CPU_FEATURE_DEPENDENCE_TYPE            CurrentDependType;
+  CPU_FEATURE_DEPENDENCE_TYPE  PreDependType;
+  CPU_FEATURE_DEPENDENCE_TYPE  CurrentDependType;
 
-  PreDependType     = DetectFeatureScope(PreviousFeature, Before, FindFeature->FeatureMask);
-  CurrentDependType = DetectFeatureScope(CurrentFeature, Before, FindFeature->FeatureMask);
+  PreDependType     = DetectFeatureScope (PreviousFeature, Before, FindFeature->FeatureMask);
+  CurrentDependType = DetectFeatureScope (CurrentFeature, Before, FindFeature->FeatureMask);
 
   //
   // If previous feature has no dependence with the find featue.
@@ -336,16 +349,16 @@ AdjustFeaturesDependence (
 **/
 VOID
 AdjustEntry (
-  IN      LIST_ENTRY                *FeatureList,
-  IN OUT  LIST_ENTRY                *FindEntry,
-  IN OUT  LIST_ENTRY                *CurrentEntry,
-  IN      BOOLEAN                   Before
+  IN      LIST_ENTRY  *FeatureList,
+  IN OUT  LIST_ENTRY  *FindEntry,
+  IN OUT  LIST_ENTRY  *CurrentEntry,
+  IN      BOOLEAN     Before
   )
 {
-  LIST_ENTRY                *PreviousEntry;
-  CPU_FEATURES_ENTRY        *PreviousFeature;
-  CPU_FEATURES_ENTRY        *CurrentFeature;
-  CPU_FEATURES_ENTRY        *FindFeature;
+  LIST_ENTRY          *PreviousEntry;
+  CPU_FEATURES_ENTRY  *PreviousFeature;
+  CPU_FEATURES_ENTRY  *CurrentFeature;
+  CPU_FEATURES_ENTRY  *FindFeature;
 
   //
   // For CPU feature which has core or package type dependence, later code need to insert
@@ -363,11 +376,10 @@ AdjustEntry (
   if (Before) {
     PreviousEntry = GetPreviousNode (FeatureList, FindEntry);
   } else {
-
     PreviousEntry = GetNextNode (FeatureList, FindEntry);
   }
 
-  CurrentFeature  = CPU_FEATURE_ENTRY_FROM_LINK (CurrentEntry);
+  CurrentFeature = CPU_FEATURE_ENTRY_FROM_LINK (CurrentEntry);
   RemoveEntryList (CurrentEntry);
 
   if (IsNull (FeatureList, PreviousEntry)) {
@@ -407,7 +419,6 @@ AdjustEntry (
   }
 }
 
-
 /**
   Checks and adjusts current CPU features per dependency relationship.
 
@@ -419,14 +430,14 @@ AdjustEntry (
 **/
 BOOLEAN
 InsertToBeforeEntry (
-  IN LIST_ENTRY              *FeatureList,
-  IN LIST_ENTRY              *CurrentEntry,
-  IN UINT8                   *FeatureMask
+  IN LIST_ENTRY  *FeatureList,
+  IN LIST_ENTRY  *CurrentEntry,
+  IN UINT8       *FeatureMask
   )
 {
-  LIST_ENTRY                 *CheckEntry;
-  CPU_FEATURES_ENTRY         *CheckFeature;
-  BOOLEAN                    Swapped;
+  LIST_ENTRY          *CheckEntry;
+  CPU_FEATURES_ENTRY  *CheckFeature;
+  BOOLEAN             Swapped;
 
   Swapped = FALSE;
 
@@ -441,6 +452,7 @@ InsertToBeforeEntry (
       Swapped = TRUE;
       break;
     }
+
     CheckEntry = CheckEntry->ForwardLink;
   }
 
@@ -458,14 +470,14 @@ InsertToBeforeEntry (
 **/
 BOOLEAN
 InsertToAfterEntry (
-  IN LIST_ENTRY              *FeatureList,
-  IN LIST_ENTRY              *CurrentEntry,
-  IN UINT8                   *FeatureMask
+  IN LIST_ENTRY  *FeatureList,
+  IN LIST_ENTRY  *CurrentEntry,
+  IN UINT8       *FeatureMask
   )
 {
-  LIST_ENTRY                 *CheckEntry;
-  CPU_FEATURES_ENTRY         *CheckFeature;
-  BOOLEAN                    Swapped;
+  LIST_ENTRY          *CheckEntry;
+  CPU_FEATURES_ENTRY  *CheckFeature;
+  BOOLEAN             Swapped;
 
   Swapped = FALSE;
 
@@ -480,6 +492,7 @@ InsertToAfterEntry (
       Swapped = TRUE;
       break;
     }
+
     CheckEntry = CheckEntry->ForwardLink;
   }
 
@@ -493,22 +506,22 @@ InsertToAfterEntry (
 **/
 VOID
 CheckCpuFeaturesDependency (
-  IN LIST_ENTRY              *FeatureList
+  IN LIST_ENTRY  *FeatureList
   )
 {
-  LIST_ENTRY                 *CurrentEntry;
-  CPU_FEATURES_ENTRY         *CpuFeature;
-  LIST_ENTRY                 *CheckEntry;
-  CPU_FEATURES_ENTRY         *CheckFeature;
-  BOOLEAN                    Swapped;
-  LIST_ENTRY                 *TempEntry;
-  LIST_ENTRY                 *NextEntry;
+  LIST_ENTRY          *CurrentEntry;
+  CPU_FEATURES_ENTRY  *CpuFeature;
+  LIST_ENTRY          *CheckEntry;
+  CPU_FEATURES_ENTRY  *CheckFeature;
+  BOOLEAN             Swapped;
+  LIST_ENTRY          *TempEntry;
+  LIST_ENTRY          *NextEntry;
 
   CurrentEntry = GetFirstNode (FeatureList);
   while (!IsNull (FeatureList, CurrentEntry)) {
-    Swapped = FALSE;
+    Swapped    = FALSE;
     CpuFeature = CPU_FEATURE_ENTRY_FROM_LINK (CurrentEntry);
-    NextEntry = CurrentEntry->ForwardLink;
+    NextEntry  = CurrentEntry->ForwardLink;
     if (CpuFeature->BeforeAll) {
       //
       // Check all features dispatched before this entry
@@ -526,8 +539,10 @@ CheckCpuFeaturesDependency (
           Swapped = TRUE;
           break;
         }
+
         CheckEntry = CheckEntry->ForwardLink;
       }
+
       if (Swapped) {
         CurrentEntry = NextEntry;
         continue;
@@ -550,11 +565,13 @@ CheckCpuFeaturesDependency (
           RemoveEntryList (CurrentEntry);
           InsertHeadList (CheckEntry, CurrentEntry);
           CurrentEntry = TempEntry;
-          Swapped = TRUE;
+          Swapped      = TRUE;
           break;
         }
+
         CheckEntry = CheckEntry->ForwardLink;
       }
+
       if (Swapped) {
         CurrentEntry = NextEntry;
         continue;
@@ -622,18 +639,18 @@ CheckCpuFeaturesDependency (
 **/
 RETURN_STATUS
 RegisterCpuFeatureWorker (
-  IN CPU_FEATURES_DATA       *CpuFeaturesData,
-  IN CPU_FEATURES_ENTRY      *CpuFeature
+  IN CPU_FEATURES_DATA   *CpuFeaturesData,
+  IN CPU_FEATURES_ENTRY  *CpuFeature
   )
 {
-  EFI_STATUS                 Status;
-  CPU_FEATURES_ENTRY         *CpuFeatureEntry;
-  LIST_ENTRY                 *Entry;
-  BOOLEAN                    FeatureExist;
+  EFI_STATUS          Status;
+  CPU_FEATURES_ENTRY  *CpuFeatureEntry;
+  LIST_ENTRY          *Entry;
+  BOOLEAN             FeatureExist;
 
-  FeatureExist = FALSE;
+  FeatureExist    = FALSE;
   CpuFeatureEntry = NULL;
-  Entry = GetFirstNode (&CpuFeaturesData->FeatureList);
+  Entry           = GetFirstNode (&CpuFeaturesData->FeatureList);
   while (!IsNull (&CpuFeaturesData->FeatureList, Entry)) {
     CpuFeatureEntry = CPU_FEATURE_ENTRY_FROM_LINK (Entry);
     if (CompareMem (CpuFeature->FeatureMask, CpuFeatureEntry->FeatureMask, CpuFeaturesData->BitMaskSize) == 0) {
@@ -643,6 +660,7 @@ RegisterCpuFeatureWorker (
       FeatureExist = TRUE;
       break;
     }
+
     Entry = Entry->ForwardLink;
   }
 
@@ -661,55 +679,71 @@ RegisterCpuFeatureWorker (
     if (CpuFeature->GetConfigDataFunc != NULL) {
       CpuFeatureEntry->GetConfigDataFunc = CpuFeature->GetConfigDataFunc;
     }
+
     if (CpuFeature->SupportFunc != NULL) {
       CpuFeatureEntry->SupportFunc = CpuFeature->SupportFunc;
     }
+
     if (CpuFeature->InitializeFunc != NULL) {
       CpuFeatureEntry->InitializeFunc = CpuFeature->InitializeFunc;
     }
+
     if (CpuFeature->FeatureName != NULL) {
       if (CpuFeatureEntry->FeatureName == NULL) {
         CpuFeatureEntry->FeatureName = AllocatePool (CPU_FEATURE_NAME_SIZE);
         ASSERT (CpuFeatureEntry->FeatureName != NULL);
       }
+
       Status = AsciiStrCpyS (CpuFeatureEntry->FeatureName, CPU_FEATURE_NAME_SIZE, CpuFeature->FeatureName);
       ASSERT_EFI_ERROR (Status);
       FreePool (CpuFeature->FeatureName);
     }
+
     if (CpuFeature->ThreadBeforeFeatureBitMask != NULL) {
       if (CpuFeatureEntry->ThreadBeforeFeatureBitMask != NULL) {
         FreePool (CpuFeatureEntry->ThreadBeforeFeatureBitMask);
       }
+
       CpuFeatureEntry->ThreadBeforeFeatureBitMask = CpuFeature->ThreadBeforeFeatureBitMask;
     }
+
     if (CpuFeature->ThreadAfterFeatureBitMask != NULL) {
       if (CpuFeatureEntry->ThreadAfterFeatureBitMask != NULL) {
         FreePool (CpuFeatureEntry->ThreadAfterFeatureBitMask);
       }
+
       CpuFeatureEntry->ThreadAfterFeatureBitMask = CpuFeature->ThreadAfterFeatureBitMask;
     }
+
     if (CpuFeature->CoreBeforeFeatureBitMask != NULL) {
       if (CpuFeatureEntry->CoreBeforeFeatureBitMask != NULL) {
         FreePool (CpuFeatureEntry->CoreBeforeFeatureBitMask);
       }
+
       CpuFeatureEntry->CoreBeforeFeatureBitMask = CpuFeature->CoreBeforeFeatureBitMask;
     }
+
     if (CpuFeature->CoreAfterFeatureBitMask != NULL) {
       if (CpuFeatureEntry->CoreAfterFeatureBitMask != NULL) {
         FreePool (CpuFeatureEntry->CoreAfterFeatureBitMask);
       }
+
       CpuFeatureEntry->CoreAfterFeatureBitMask = CpuFeature->CoreAfterFeatureBitMask;
     }
+
     if (CpuFeature->PackageBeforeFeatureBitMask != NULL) {
       if (CpuFeatureEntry->PackageBeforeFeatureBitMask != NULL) {
         FreePool (CpuFeatureEntry->PackageBeforeFeatureBitMask);
       }
+
       CpuFeatureEntry->PackageBeforeFeatureBitMask = CpuFeature->PackageBeforeFeatureBitMask;
     }
+
     if (CpuFeature->PackageAfterFeatureBitMask != NULL) {
       if (CpuFeatureEntry->PackageAfterFeatureBitMask != NULL) {
         FreePool (CpuFeatureEntry->PackageAfterFeatureBitMask);
       }
+
       CpuFeatureEntry->PackageAfterFeatureBitMask = CpuFeature->PackageAfterFeatureBitMask;
     }
 
@@ -719,6 +753,7 @@ RegisterCpuFeatureWorker (
     FreePool (CpuFeature->FeatureMask);
     FreePool (CpuFeature);
   }
+
   //
   // Verify CPU features dependency can change CPU feature order
   //
@@ -735,12 +770,12 @@ RegisterCpuFeatureWorker (
 **/
 VOID
 SetCpuFeaturesBitMask (
-  IN UINT8               **FeaturesBitMask,
-  IN UINT32              Feature,
-  IN UINTN               BitMaskSize
+  IN UINT8   **FeaturesBitMask,
+  IN UINT32  Feature,
+  IN UINTN   BitMaskSize
   )
 {
-  UINT8                  *CpuFeaturesBitMask;
+  UINT8  *CpuFeaturesBitMask;
 
   ASSERT (FeaturesBitMask != NULL);
   CpuFeaturesBitMask = *FeaturesBitMask;
@@ -751,7 +786,7 @@ SetCpuFeaturesBitMask (
   }
 
   CpuFeaturesBitMask  += (Feature / 8);
-  *CpuFeaturesBitMask |= (UINT8) (1 << (Feature % 8));
+  *CpuFeaturesBitMask |= (UINT8)(1 << (Feature % 8));
 }
 
 /**
@@ -803,27 +838,27 @@ SetCpuFeaturesBitMask (
 RETURN_STATUS
 EFIAPI
 RegisterCpuFeature (
-  IN CHAR8                             *FeatureName,       OPTIONAL
-  IN CPU_FEATURE_GET_CONFIG_DATA       GetConfigDataFunc,  OPTIONAL
-  IN CPU_FEATURE_SUPPORT               SupportFunc,        OPTIONAL
-  IN CPU_FEATURE_INITIALIZE            InitializeFunc,     OPTIONAL
+  IN CHAR8                        *FeatureName        OPTIONAL,
+  IN CPU_FEATURE_GET_CONFIG_DATA  GetConfigDataFunc   OPTIONAL,
+  IN CPU_FEATURE_SUPPORT          SupportFunc         OPTIONAL,
+  IN CPU_FEATURE_INITIALIZE       InitializeFunc      OPTIONAL,
   ...
   )
 {
-  EFI_STATUS                 Status;
-  VA_LIST                    Marker;
-  UINT32                     Feature;
-  CPU_FEATURES_ENTRY         *CpuFeature;
-  UINT8                      *FeatureMask;
-  UINT8                      *ThreadBeforeFeatureBitMask;
-  UINT8                      *ThreadAfterFeatureBitMask;
-  UINT8                      *CoreBeforeFeatureBitMask;
-  UINT8                      *CoreAfterFeatureBitMask;
-  UINT8                      *PackageBeforeFeatureBitMask;
-  UINT8                      *PackageAfterFeatureBitMask;
-  BOOLEAN                    BeforeAll;
-  BOOLEAN                    AfterAll;
-  CPU_FEATURES_DATA          *CpuFeaturesData;
+  EFI_STATUS          Status;
+  VA_LIST             Marker;
+  UINT32              Feature;
+  CPU_FEATURES_ENTRY  *CpuFeature;
+  UINT8               *FeatureMask;
+  UINT8               *ThreadBeforeFeatureBitMask;
+  UINT8               *ThreadAfterFeatureBitMask;
+  UINT8               *CoreBeforeFeatureBitMask;
+  UINT8               *CoreAfterFeatureBitMask;
+  UINT8               *PackageBeforeFeatureBitMask;
+  UINT8               *PackageAfterFeatureBitMask;
+  BOOLEAN             BeforeAll;
+  BOOLEAN             AfterAll;
+  CPU_FEATURES_DATA   *CpuFeaturesData;
 
   FeatureMask                 = NULL;
   ThreadBeforeFeatureBitMask  = NULL;
@@ -832,8 +867,8 @@ RegisterCpuFeature (
   CoreAfterFeatureBitMask     = NULL;
   PackageBeforeFeatureBitMask = NULL;
   PackageAfterFeatureBitMask  = NULL;
-  BeforeAll            = FALSE;
-  AfterAll             = FALSE;
+  BeforeAll                   = FALSE;
+  AfterAll                    = FALSE;
 
   CpuFeaturesData = GetCpuFeaturesData ();
   if (CpuFeaturesData->FeaturesCount == 0) {
@@ -844,7 +879,7 @@ RegisterCpuFeature (
     //
     ASSERT (PcdGetSize (PcdCpuFeaturesSetting) == PcdGetSize (PcdCpuFeaturesCapability));
     ASSERT (PcdGetSize (PcdCpuFeaturesSetting) == PcdGetSize (PcdCpuFeaturesSupport));
-    CpuFeaturesData->BitMaskSize = (UINT32) PcdGetSize (PcdCpuFeaturesSetting);
+    CpuFeaturesData->BitMaskSize = (UINT32)PcdGetSize (PcdCpuFeaturesSetting);
   }
 
   VA_START (Marker, InitializeFunc);
@@ -853,19 +888,27 @@ RegisterCpuFeature (
     //
     // It's invalid to require a feature is before AND after all other features.
     //
-    ASSERT ((Feature & (CPU_FEATURE_BEFORE_ALL | CPU_FEATURE_AFTER_ALL))
-                    != (CPU_FEATURE_BEFORE_ALL | CPU_FEATURE_AFTER_ALL));
+    ASSERT (
+      (Feature & (CPU_FEATURE_BEFORE_ALL | CPU_FEATURE_AFTER_ALL))
+      != (CPU_FEATURE_BEFORE_ALL | CPU_FEATURE_AFTER_ALL)
+      );
 
     //
     // It's invalid to require feature A is before AND after before feature B,
     // either in thread level, core level or package level.
     //
-    ASSERT ((Feature & (CPU_FEATURE_THREAD_BEFORE | CPU_FEATURE_THREAD_AFTER))
-                    != (CPU_FEATURE_THREAD_BEFORE | CPU_FEATURE_THREAD_AFTER));
-    ASSERT ((Feature & (CPU_FEATURE_CORE_BEFORE | CPU_FEATURE_CORE_AFTER))
-                    != (CPU_FEATURE_CORE_BEFORE | CPU_FEATURE_CORE_AFTER));
-    ASSERT ((Feature & (CPU_FEATURE_PACKAGE_BEFORE | CPU_FEATURE_PACKAGE_AFTER))
-                    != (CPU_FEATURE_PACKAGE_BEFORE | CPU_FEATURE_PACKAGE_AFTER));
+    ASSERT (
+      (Feature & (CPU_FEATURE_THREAD_BEFORE | CPU_FEATURE_THREAD_AFTER))
+      != (CPU_FEATURE_THREAD_BEFORE | CPU_FEATURE_THREAD_AFTER)
+      );
+    ASSERT (
+      (Feature & (CPU_FEATURE_CORE_BEFORE | CPU_FEATURE_CORE_AFTER))
+      != (CPU_FEATURE_CORE_BEFORE | CPU_FEATURE_CORE_AFTER)
+      );
+    ASSERT (
+      (Feature & (CPU_FEATURE_PACKAGE_BEFORE | CPU_FEATURE_PACKAGE_AFTER))
+      != (CPU_FEATURE_PACKAGE_BEFORE | CPU_FEATURE_PACKAGE_AFTER)
+      );
     if (Feature < CPU_FEATURE_THREAD_BEFORE) {
       BeforeAll = ((Feature & CPU_FEATURE_BEFORE_ALL) != 0) ? TRUE : FALSE;
       AfterAll  = ((Feature & CPU_FEATURE_AFTER_ALL) != 0) ? TRUE : FALSE;
@@ -885,8 +928,10 @@ RegisterCpuFeature (
     } else if ((Feature & CPU_FEATURE_PACKAGE_AFTER) != 0) {
       SetCpuFeaturesBitMask (&PackageAfterFeatureBitMask, Feature & ~CPU_FEATURE_PACKAGE_AFTER, CpuFeaturesData->BitMaskSize);
     }
+
     Feature = VA_ARG (Marker, UINT32);
   }
+
   VA_END (Marker);
 
   CpuFeature = AllocateZeroPool (sizeof (CPU_FEATURES_ENTRY));
@@ -905,7 +950,7 @@ RegisterCpuFeature (
   CpuFeature->SupportFunc                 = SupportFunc;
   CpuFeature->InitializeFunc              = InitializeFunc;
   if (FeatureName != NULL) {
-    CpuFeature->FeatureName          = AllocatePool (CPU_FEATURE_NAME_SIZE);
+    CpuFeature->FeatureName = AllocatePool (CPU_FEATURE_NAME_SIZE);
     ASSERT (CpuFeature->FeatureName != NULL);
     Status = AsciiStrCpyS (CpuFeature->FeatureName, CPU_FEATURE_NAME_SIZE, FeatureName);
     ASSERT_EFI_ERROR (Status);
@@ -927,18 +972,18 @@ GetAcpiCpuData (
   VOID
   )
 {
-  EFI_STATUS                           Status;
-  UINTN                                NumberOfCpus;
-  UINTN                                NumberOfEnabledProcessors;
-  ACPI_CPU_DATA                        *AcpiCpuData;
-  UINTN                                TableSize;
-  CPU_REGISTER_TABLE                   *RegisterTable;
-  UINTN                                Index;
-  EFI_PROCESSOR_INFORMATION            ProcessorInfoBuffer;
+  EFI_STATUS                 Status;
+  UINTN                      NumberOfCpus;
+  UINTN                      NumberOfEnabledProcessors;
+  ACPI_CPU_DATA              *AcpiCpuData;
+  UINTN                      TableSize;
+  CPU_REGISTER_TABLE         *RegisterTable;
+  UINTN                      Index;
+  EFI_PROCESSOR_INFORMATION  ProcessorInfoBuffer;
 
-  AcpiCpuData = (ACPI_CPU_DATA *) (UINTN) PcdGet64 (PcdCpuS3DataAddress);
+  AcpiCpuData = (ACPI_CPU_DATA *)(UINTN)PcdGet64 (PcdCpuS3DataAddress);
   if (AcpiCpuData == NULL) {
-    AcpiCpuData  = AllocatePages (EFI_SIZE_TO_PAGES (sizeof (ACPI_CPU_DATA)));
+    AcpiCpuData = AllocatePages (EFI_SIZE_TO_PAGES (sizeof (ACPI_CPU_DATA)));
     ASSERT (AcpiCpuData != NULL);
     ZeroMem (AcpiCpuData, sizeof (ACPI_CPU_DATA));
 
@@ -952,14 +997,15 @@ GetAcpiCpuData (
     AcpiCpuData->NumberOfCpus = (UINT32)NumberOfCpus;
   }
 
-  if (AcpiCpuData->RegisterTable == 0 ||
-      AcpiCpuData->PreSmmInitRegisterTable == 0) {
+  if ((AcpiCpuData->CpuFeatureInitData.RegisterTable == 0) ||
+      (AcpiCpuData->CpuFeatureInitData.PreSmmInitRegisterTable == 0))
+  {
     //
     // Allocate buffer for empty RegisterTable and PreSmmInitRegisterTable for all CPUs
     //
-    NumberOfCpus = AcpiCpuData->NumberOfCpus;
-    TableSize = 2 * NumberOfCpus * sizeof (CPU_REGISTER_TABLE);
-    RegisterTable  = AllocatePages (EFI_SIZE_TO_PAGES (TableSize));
+    NumberOfCpus  = AcpiCpuData->NumberOfCpus;
+    TableSize     = 2 * NumberOfCpus * sizeof (CPU_REGISTER_TABLE);
+    RegisterTable = AllocatePages (EFI_SIZE_TO_PAGES (TableSize));
     ASSERT (RegisterTable != NULL);
 
     for (Index = 0; Index < NumberOfCpus; Index++) {
@@ -976,11 +1022,13 @@ GetAcpiCpuData (
       RegisterTable[NumberOfCpus + Index].AllocatedSize      = 0;
       RegisterTable[NumberOfCpus + Index].RegisterTableEntry = 0;
     }
-    if (AcpiCpuData->RegisterTable == 0) {
-      AcpiCpuData->RegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTable;
+
+    if (AcpiCpuData->CpuFeatureInitData.RegisterTable == 0) {
+      AcpiCpuData->CpuFeatureInitData.RegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTable;
     }
-    if (AcpiCpuData->PreSmmInitRegisterTable == 0) {
-      AcpiCpuData->PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)(RegisterTable + NumberOfCpus);
+
+    if (AcpiCpuData->CpuFeatureInitData.PreSmmInitRegisterTable == 0) {
+      AcpiCpuData->CpuFeatureInitData.PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)(RegisterTable + NumberOfCpus);
     }
   }
 
@@ -995,14 +1043,14 @@ GetAcpiCpuData (
 STATIC
 VOID
 EnlargeRegisterTable (
-  IN OUT CPU_REGISTER_TABLE            *RegisterTable
+  IN OUT CPU_REGISTER_TABLE  *RegisterTable
   )
 {
   EFI_PHYSICAL_ADDRESS  Address;
   UINTN                 UsedPages;
 
   UsedPages = RegisterTable->AllocatedSize / EFI_PAGE_SIZE;
-  Address  = (UINTN)AllocatePages (UsedPages + 1);
+  Address   = (UINTN)AllocatePages (UsedPages + 1);
   ASSERT (Address != 0);
 
   //
@@ -1011,8 +1059,8 @@ EnlargeRegisterTable (
   //
   if (RegisterTable->AllocatedSize > 0) {
     CopyMem (
-      (VOID *) (UINTN) Address,
-      (VOID *) (UINTN) RegisterTable->RegisterTableEntry,
+      (VOID *)(UINTN)Address,
+      (VOID *)(UINTN)RegisterTable->RegisterTableEntry,
       RegisterTable->AllocatedSize
       );
 
@@ -1045,27 +1093,27 @@ EnlargeRegisterTable (
 **/
 VOID
 CpuRegisterTableWriteWorker (
-  IN BOOLEAN                 PreSmmFlag,
-  IN UINTN                   ProcessorNumber,
-  IN REGISTER_TYPE           RegisterType,
-  IN UINT64                  Index,
-  IN UINT8                   ValidBitStart,
-  IN UINT8                   ValidBitLength,
-  IN UINT64                  Value,
-  IN BOOLEAN                 TestThenWrite
+  IN BOOLEAN        PreSmmFlag,
+  IN UINTN          ProcessorNumber,
+  IN REGISTER_TYPE  RegisterType,
+  IN UINT64         Index,
+  IN UINT8          ValidBitStart,
+  IN UINT8          ValidBitLength,
+  IN UINT64         Value,
+  IN BOOLEAN        TestThenWrite
   )
 {
-  CPU_FEATURES_DATA        *CpuFeaturesData;
-  ACPI_CPU_DATA            *AcpiCpuData;
-  CPU_REGISTER_TABLE       *RegisterTable;
-  CPU_REGISTER_TABLE_ENTRY *RegisterTableEntry;
+  CPU_FEATURES_DATA         *CpuFeaturesData;
+  ACPI_CPU_DATA             *AcpiCpuData;
+  CPU_REGISTER_TABLE        *RegisterTable;
+  CPU_REGISTER_TABLE_ENTRY  *RegisterTableEntry;
 
   CpuFeaturesData = GetCpuFeaturesData ();
   if (CpuFeaturesData->RegisterTable == NULL) {
     AcpiCpuData = GetAcpiCpuData ();
-    ASSERT ((AcpiCpuData != NULL) && (AcpiCpuData->RegisterTable != 0));
-    CpuFeaturesData->RegisterTable = (CPU_REGISTER_TABLE *) (UINTN) AcpiCpuData->RegisterTable;
-    CpuFeaturesData->PreSmmRegisterTable = (CPU_REGISTER_TABLE *) (UINTN) AcpiCpuData->PreSmmInitRegisterTable;
+    ASSERT ((AcpiCpuData != NULL) && (AcpiCpuData->CpuFeatureInitData.RegisterTable != 0));
+    CpuFeaturesData->RegisterTable       = (CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->CpuFeatureInitData.RegisterTable;
+    CpuFeaturesData->PreSmmRegisterTable = (CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->CpuFeatureInitData.PreSmmInitRegisterTable;
   }
 
   if (PreSmmFlag) {
@@ -1081,10 +1129,10 @@ CpuRegisterTableWriteWorker (
   //
   // Append entry in the register table.
   //
-  RegisterTableEntry = (CPU_REGISTER_TABLE_ENTRY *) (UINTN) RegisterTable->RegisterTableEntry;
+  RegisterTableEntry                                            = (CPU_REGISTER_TABLE_ENTRY *)(UINTN)RegisterTable->RegisterTableEntry;
   RegisterTableEntry[RegisterTable->TableLength].RegisterType   = RegisterType;
-  RegisterTableEntry[RegisterTable->TableLength].Index          = (UINT32) Index;
-  RegisterTableEntry[RegisterTable->TableLength].HighIndex      = (UINT32) RShiftU64 (Index, 32);
+  RegisterTableEntry[RegisterTable->TableLength].Index          = (UINT32)Index;
+  RegisterTableEntry[RegisterTable->TableLength].HighIndex      = (UINT32)RShiftU64 (Index, 32);
   RegisterTableEntry[RegisterTable->TableLength].ValidBitStart  = ValidBitStart;
   RegisterTableEntry[RegisterTable->TableLength].ValidBitLength = ValidBitLength;
   RegisterTableEntry[RegisterTable->TableLength].Value          = Value;
@@ -1110,18 +1158,18 @@ CpuRegisterTableWriteWorker (
 VOID
 EFIAPI
 CpuRegisterTableWrite (
-  IN UINTN               ProcessorNumber,
-  IN REGISTER_TYPE       RegisterType,
-  IN UINT64              Index,
-  IN UINT64              ValueMask,
-  IN UINT64              Value
+  IN UINTN          ProcessorNumber,
+  IN REGISTER_TYPE  RegisterType,
+  IN UINT64         Index,
+  IN UINT64         ValueMask,
+  IN UINT64         Value
   )
 {
-  UINT8                   Start;
-  UINT8                   End;
-  UINT8                   Length;
+  UINT8  Start;
+  UINT8  End;
+  UINT8  Length;
 
-  Start  = (UINT8)LowBitSet64  (ValueMask);
+  Start  = (UINT8)LowBitSet64 (ValueMask);
   End    = (UINT8)HighBitSet64 (ValueMask);
   Length = End - Start + 1;
   CpuRegisterTableWriteWorker (FALSE, ProcessorNumber, RegisterType, Index, Start, Length, Value, FALSE);
@@ -1144,18 +1192,18 @@ CpuRegisterTableWrite (
 VOID
 EFIAPI
 CpuRegisterTableTestThenWrite (
-  IN UINTN               ProcessorNumber,
-  IN REGISTER_TYPE       RegisterType,
-  IN UINT64              Index,
-  IN UINT64              ValueMask,
-  IN UINT64              Value
+  IN UINTN          ProcessorNumber,
+  IN REGISTER_TYPE  RegisterType,
+  IN UINT64         Index,
+  IN UINT64         ValueMask,
+  IN UINT64         Value
   )
 {
-  UINT8                   Start;
-  UINT8                   End;
-  UINT8                   Length;
+  UINT8  Start;
+  UINT8  End;
+  UINT8  Length;
 
-  Start  = (UINT8)LowBitSet64  (ValueMask);
+  Start  = (UINT8)LowBitSet64 (ValueMask);
   End    = (UINT8)HighBitSet64 (ValueMask);
   Length = End - Start + 1;
   CpuRegisterTableWriteWorker (FALSE, ProcessorNumber, RegisterType, Index, Start, Length, Value, TRUE);
@@ -1178,18 +1226,18 @@ CpuRegisterTableTestThenWrite (
 VOID
 EFIAPI
 PreSmmCpuRegisterTableWrite (
-  IN UINTN               ProcessorNumber,
-  IN REGISTER_TYPE       RegisterType,
-  IN UINT64              Index,
-  IN UINT64              ValueMask,
-  IN UINT64              Value
+  IN UINTN          ProcessorNumber,
+  IN REGISTER_TYPE  RegisterType,
+  IN UINT64         Index,
+  IN UINT64         ValueMask,
+  IN UINT64         Value
   )
 {
   UINT8  Start;
   UINT8  End;
   UINT8  Length;
 
-  Start  = (UINT8)LowBitSet64  (ValueMask);
+  Start  = (UINT8)LowBitSet64 (ValueMask);
   End    = (UINT8)HighBitSet64 (ValueMask);
   Length = End - Start + 1;
   CpuRegisterTableWriteWorker (TRUE, ProcessorNumber, RegisterType, Index, Start, Length, Value, FALSE);
@@ -1208,14 +1256,15 @@ PreSmmCpuRegisterTableWrite (
 **/
 BOOLEAN
 IsCpuFeatureSetInCpuPcd (
-  IN UINT8               *CpuBitMask,
-  IN UINTN               CpuBitMaskSize,
-  IN UINT32              Feature
+  IN UINT8   *CpuBitMask,
+  IN UINTN   CpuBitMaskSize,
+  IN UINT32  Feature
   )
 {
   if ((Feature >> 3) >= CpuBitMaskSize) {
     return FALSE;
   }
+
   return ((*(CpuBitMask + (Feature >> 3)) & (1 << (Feature & 0x07))) != 0);
 }
 
@@ -1236,7 +1285,7 @@ IsCpuFeatureSetInCpuPcd (
 BOOLEAN
 EFIAPI
 IsCpuFeatureSupported (
-  IN UINT32              Feature
+  IN UINT32  Feature
   )
 {
   return IsCpuFeatureSetInCpuPcd (
@@ -1260,7 +1309,7 @@ IsCpuFeatureSupported (
 BOOLEAN
 EFIAPI
 IsCpuFeatureInSetting (
-  IN UINT32              Feature
+  IN UINT32  Feature
   )
 {
   return IsCpuFeatureSetInCpuPcd (
@@ -1280,12 +1329,11 @@ IsCpuFeatureInSetting (
 VOID
 EFIAPI
 SwitchBspAfterFeaturesInitialize (
-  IN UINTN               ProcessorNumber
+  IN UINTN  ProcessorNumber
   )
 {
-  CPU_FEATURES_DATA      *CpuFeaturesData;
+  CPU_FEATURES_DATA  *CpuFeaturesData;
 
-  CpuFeaturesData = GetCpuFeaturesData ();
+  CpuFeaturesData            = GetCpuFeaturesData ();
   CpuFeaturesData->BspNumber = ProcessorNumber;
 }
-

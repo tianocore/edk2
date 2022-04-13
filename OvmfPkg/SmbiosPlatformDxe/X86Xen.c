@@ -8,12 +8,14 @@
 
 **/
 
-#include "SmbiosPlatformDxe.h"
-#include <Library/HobLib.h>
-#include <Guid/XenInfo.h>
+#include <Library/BaseLib.h> // AsciiStrnCmp()
+#include <Library/HobLib.h>  // GetFirstGuidHob()
+#include <Pi/PiHob.h>        // EFI_HOB_GUID_TYPE
 
-#define XEN_SMBIOS_PHYSICAL_ADDRESS       0x000EB000
-#define XEN_SMBIOS_PHYSICAL_END           0x000F0000
+#include "XenSmbiosPlatformDxe.h"
+
+#define XEN_SMBIOS_PHYSICAL_ADDRESS  0x000EB000
+#define XEN_SMBIOS_PHYSICAL_END      0x000F0000
 
 /**
   Validates the SMBIOS entry point structure
@@ -30,17 +32,17 @@ IsEntryPointStructureValid (
   IN SMBIOS_TABLE_ENTRY_POINT  *EntryPointStructure
   )
 {
-  UINTN                     Index;
-  UINT8                     Length;
-  UINT8                     Checksum;
-  UINT8                     *BytePtr;
+  UINTN  Index;
+  UINT8  Length;
+  UINT8  Checksum;
+  UINT8  *BytePtr;
 
-  BytePtr = (UINT8*) EntryPointStructure;
-  Length = EntryPointStructure->EntryPointLength;
+  BytePtr  = (UINT8 *)EntryPointStructure;
+  Length   = EntryPointStructure->EntryPointLength;
   Checksum = 0;
 
   for (Index = 0; Index < Length; Index++) {
-    Checksum = Checksum + (UINT8) BytePtr[Index];
+    Checksum = Checksum + (UINT8)BytePtr[Index];
   }
 
   if (Checksum != 0) {
@@ -73,18 +75,17 @@ GetXenSmbiosTables (
     return NULL;
   }
 
-  for (XenSmbiosPtr = (UINT8*)(UINTN) XEN_SMBIOS_PHYSICAL_ADDRESS;
-       XenSmbiosPtr < (UINT8*)(UINTN) XEN_SMBIOS_PHYSICAL_END;
-       XenSmbiosPtr += 0x10) {
+  for (XenSmbiosPtr = (UINT8 *)(UINTN)XEN_SMBIOS_PHYSICAL_ADDRESS;
+       XenSmbiosPtr < (UINT8 *)(UINTN)XEN_SMBIOS_PHYSICAL_END;
+       XenSmbiosPtr += 0x10)
+  {
+    XenSmbiosEntryPointStructure = (SMBIOS_TABLE_ENTRY_POINT *)XenSmbiosPtr;
 
-    XenSmbiosEntryPointStructure = (SMBIOS_TABLE_ENTRY_POINT *) XenSmbiosPtr;
-
-    if (!AsciiStrnCmp ((CHAR8 *) XenSmbiosEntryPointStructure->AnchorString, "_SM_", 4) &&
-        !AsciiStrnCmp ((CHAR8 *) XenSmbiosEntryPointStructure->IntermediateAnchorString, "_DMI_", 5) &&
-        IsEntryPointStructureValid (XenSmbiosEntryPointStructure)) {
-
+    if (!AsciiStrnCmp ((CHAR8 *)XenSmbiosEntryPointStructure->AnchorString, "_SM_", 4) &&
+        !AsciiStrnCmp ((CHAR8 *)XenSmbiosEntryPointStructure->IntermediateAnchorString, "_DMI_", 5) &&
+        IsEntryPointStructureValid (XenSmbiosEntryPointStructure))
+    {
       return XenSmbiosEntryPointStructure;
-
     }
   }
 

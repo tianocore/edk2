@@ -24,12 +24,12 @@
 
 VOID
 InstallProtocolInterfaces (
-  IN EFI_FW_VOL_BLOCK_DEVICE *FvbDevice
+  IN EFI_FW_VOL_BLOCK_DEVICE  *FvbDevice
   )
 {
-  EFI_STATUS                         Status;
-  EFI_HANDLE                         FwbHandle;
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL *OldFwbInterface;
+  EFI_STATUS                          Status;
+  EFI_HANDLE                          FwbHandle;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *OldFwbInterface;
 
   ASSERT (!FeaturePcdGet (PcdSmmSmramRequire));
 
@@ -37,8 +37,11 @@ InstallProtocolInterfaces (
   // Find a handle with a matching device path that has supports FW Block
   // protocol
   //
-  Status = gBS->LocateDevicePath (&gEfiFirmwareVolumeBlockProtocolGuid,
-                  &FvbDevice->DevicePath, &FwbHandle);
+  Status = gBS->LocateDevicePath (
+                  &gEfiFirmwareVolumeBlockProtocolGuid,
+                  &FvbDevice->DevicePath,
+                  &FwbHandle
+                  );
   if (EFI_ERROR (Status)) {
     //
     // LocateDevicePath fails so install a new interface and device path
@@ -61,7 +64,7 @@ InstallProtocolInterfaces (
     Status = gBS->HandleProtocol (
                     FwbHandle,
                     &gEfiFirmwareVolumeBlockProtocolGuid,
-                    (VOID**)&OldFwbInterface
+                    (VOID **)&OldFwbInterface
                     );
     ASSERT_EFI_ERROR (Status);
 
@@ -81,14 +84,14 @@ InstallProtocolInterfaces (
   }
 }
 
-
 STATIC
 VOID
 EFIAPI
 FvbVirtualAddressChangeEvent (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
+
 /*++
 
   Routine Description:
@@ -107,39 +110,38 @@ FvbVirtualAddressChangeEvent (
 
 --*/
 {
-  EFI_FW_VOL_INSTANCE *FwhInstance;
-  UINTN               Index;
+  EFI_FW_VOL_INSTANCE  *FwhInstance;
+  UINTN                Index;
 
   FwhInstance = mFvbModuleGlobal->FvInstance;
-  EfiConvertPointer (0x0, (VOID **) &mFvbModuleGlobal->FvInstance);
+  EfiConvertPointer (0x0, (VOID **)&mFvbModuleGlobal->FvInstance);
 
   //
   // Convert the base address of all the instances
   //
-  Index       = 0;
+  Index = 0;
   while (Index < mFvbModuleGlobal->NumFv) {
-    EfiConvertPointer (0x0, (VOID **) &FwhInstance->FvBase);
+    EfiConvertPointer (0x0, (VOID **)&FwhInstance->FvBase);
     FwhInstance = (EFI_FW_VOL_INSTANCE *)
-      (
-        (UINTN) ((UINT8 *) FwhInstance) +
-        FwhInstance->VolumeHeader.HeaderLength +
-        (sizeof (EFI_FW_VOL_INSTANCE) - sizeof (EFI_FIRMWARE_VOLUME_HEADER))
-      );
+                  (
+                   (UINTN)((UINT8 *)FwhInstance) +
+                   FwhInstance->VolumeHeader.HeaderLength +
+                   (sizeof (EFI_FW_VOL_INSTANCE) - sizeof (EFI_FIRMWARE_VOLUME_HEADER))
+                  );
     Index++;
   }
 
-  EfiConvertPointer (0x0, (VOID **) &mFvbModuleGlobal);
+  EfiConvertPointer (0x0, (VOID **)&mFvbModuleGlobal);
   QemuFlashConvertPointers ();
 }
-
 
 VOID
 InstallVirtualAddressChangeHandler (
   VOID
   )
 {
-  EFI_STATUS Status;
-  EFI_EVENT  VirtualAddressChangeEvent;
+  EFI_STATUS  Status;
+  EFI_EVENT   VirtualAddressChangeEvent;
 
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
@@ -154,12 +156,12 @@ InstallVirtualAddressChangeHandler (
 
 EFI_STATUS
 MarkIoMemoryRangeForRuntimeAccess (
-  IN EFI_PHYSICAL_ADDRESS                BaseAddress,
-  IN UINTN                               Length
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN                 Length
   )
 {
-  EFI_STATUS                          Status;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR     GcdDescriptor;
+  EFI_STATUS                       Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  GcdDescriptor;
 
   //
   // Mark flash region as runtime memory
@@ -205,11 +207,10 @@ MarkIoMemoryRangeForRuntimeAccess (
   // memory range.
   //
   if (MemEncryptSevIsEnabled ()) {
-    Status = MemEncryptSevClearPageEncMask (
+    Status = MemEncryptSevClearMmioPageEncMask (
                0,
                BaseAddress,
-               EFI_SIZE_TO_PAGES (Length),
-               FALSE
+               EFI_SIZE_TO_PAGES (Length)
                );
     ASSERT_EFI_ERROR (Status);
   }
@@ -222,24 +223,24 @@ SetPcdFlashNvStorageBaseAddresses (
   VOID
   )
 {
-  RETURN_STATUS PcdStatus;
+  RETURN_STATUS  PcdStatus;
 
   //
   // Set several PCD values to point to flash
   //
   PcdStatus = PcdSet64S (
-    PcdFlashNvStorageVariableBase64,
-    (UINTN) PcdGet32 (PcdOvmfFlashNvStorageVariableBase)
-    );
+                PcdFlashNvStorageVariableBase64,
+                (UINTN)PcdGet32 (PcdOvmfFlashNvStorageVariableBase)
+                );
   ASSERT_RETURN_ERROR (PcdStatus);
   PcdStatus = PcdSet32S (
-    PcdFlashNvStorageFtwWorkingBase,
-    PcdGet32 (PcdOvmfFlashNvStorageFtwWorkingBase)
-    );
+                PcdFlashNvStorageFtwWorkingBase,
+                PcdGet32 (PcdOvmfFlashNvStorageFtwWorkingBase)
+                );
   ASSERT_RETURN_ERROR (PcdStatus);
   PcdStatus = PcdSet32S (
-    PcdFlashNvStorageFtwSpareBase,
-    PcdGet32 (PcdOvmfFlashNvStorageFtwSpareBase)
-    );
+                PcdFlashNvStorageFtwSpareBase,
+                PcdGet32 (PcdOvmfFlashNvStorageFtwSpareBase)
+                );
   ASSERT_RETURN_ERROR (PcdStatus);
 }

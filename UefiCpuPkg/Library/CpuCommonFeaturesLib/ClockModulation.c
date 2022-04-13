@@ -9,8 +9,8 @@
 #include "CpuCommonFeatures.h"
 
 typedef struct  {
-  CPUID_THERMAL_POWER_MANAGEMENT_EAX  ThermalPowerManagementEax;
-  MSR_IA32_CLOCK_MODULATION_REGISTER  ClockModulation;
+  CPUID_THERMAL_POWER_MANAGEMENT_EAX    ThermalPowerManagementEax;
+  MSR_IA32_CLOCK_MODULATION_REGISTER    ClockModulation;
 } CLOCK_MODULATION_CONFIG_DATA;
 
 /**
@@ -28,7 +28,7 @@ ClockModulationGetConfigData (
   IN UINTN  NumberOfProcessors
   )
 {
-  UINT32    *ConfigData;
+  UINT32  *ConfigData;
 
   ConfigData = AllocateZeroPool (sizeof (CLOCK_MODULATION_CONFIG_DATA) * NumberOfProcessors);
   ASSERT (ConfigData != NULL);
@@ -59,10 +59,10 @@ ClockModulationSupport (
   IN VOID                              *ConfigData  OPTIONAL
   )
 {
-  CLOCK_MODULATION_CONFIG_DATA         *CmConfigData;
+  CLOCK_MODULATION_CONFIG_DATA  *CmConfigData;
 
   if (CpuInfo->CpuIdVersionInfoEdx.Bits.ACPI == 1) {
-    CmConfigData = (CLOCK_MODULATION_CONFIG_DATA *) ConfigData;
+    CmConfigData = (CLOCK_MODULATION_CONFIG_DATA *)ConfigData;
     ASSERT (CmConfigData != NULL);
     AsmCpuid (
       CPUID_THERMAL_POWER_MANAGEMENT,
@@ -74,6 +74,7 @@ ClockModulationSupport (
     CmConfigData[ProcessorNumber].ClockModulation.Uint64 = AsmReadMsr64 (MSR_IA32_CLOCK_MODULATION);
     return TRUE;
   }
+
   return FALSE;
 }
 
@@ -99,19 +100,19 @@ EFIAPI
 ClockModulationInitialize (
   IN UINTN                             ProcessorNumber,
   IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
-  IN VOID                              *ConfigData,  OPTIONAL
+  IN VOID                              *ConfigData   OPTIONAL,
   IN BOOLEAN                           State
   )
 {
-  CLOCK_MODULATION_CONFIG_DATA         *CmConfigData;
-  MSR_IA32_CLOCK_MODULATION_REGISTER   *ClockModulation;
+  CLOCK_MODULATION_CONFIG_DATA        *CmConfigData;
+  MSR_IA32_CLOCK_MODULATION_REGISTER  *ClockModulation;
 
-  CmConfigData = (CLOCK_MODULATION_CONFIG_DATA *) ConfigData;
+  CmConfigData = (CLOCK_MODULATION_CONFIG_DATA *)ConfigData;
   ASSERT (CmConfigData != NULL);
   ClockModulation = &CmConfigData[ProcessorNumber].ClockModulation;
 
   if (State) {
-    ClockModulation->Bits.OnDemandClockModulationEnable = 1;
+    ClockModulation->Bits.OnDemandClockModulationEnable    = 1;
     ClockModulation->Bits.OnDemandClockModulationDutyCycle = PcdGet8 (PcdCpuClockModulationDutyCycle) >> 1;
     if (CmConfigData[ProcessorNumber].ThermalPowerManagementEax.Bits.ECMD == 1) {
       ClockModulation->Bits.ExtendedOnDemandClockModulationDutyCycle = PcdGet8 (PcdCpuClockModulationDutyCycle) & BIT0;

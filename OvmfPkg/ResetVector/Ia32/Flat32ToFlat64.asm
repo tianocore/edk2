@@ -21,6 +21,17 @@ Transition32FlatTo64Flat:
     bts     eax, 5                      ; enable PAE
     mov     cr4, eax
 
+    ;
+    ; In TDX LME has already been set. So we're done and jump to enable
+    ; paging directly if Tdx is enabled.
+    ; EBX is cleared because in the later it will be used to check if
+    ; the second step of the SEV-ES mitigation is to be performed.
+    ;
+    xor     ebx, ebx
+    OneTimeCall IsTdxEnabled
+    test    eax, eax
+    jnz     EnablePaging
+
     mov     ecx, 0xc0000080
     rdmsr
     bts     eax, 8                      ; set LME
@@ -31,7 +42,8 @@ Transition32FlatTo64Flat:
     ;
     xor     ebx, ebx
 
-    cmp     byte[SEV_ES_WORK_AREA], 0
+    mov     ecx, 1
+    bt      [SEV_ES_WORK_AREA_STATUS_MSR], ecx
     jz      EnablePaging
 
     ;

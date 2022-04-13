@@ -1,0 +1,28 @@
+## @file
+# UEFI Boot Services Table Library implementation.
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeHobListLibNull
+  MODULE_TYPE                    = BASE
+  FILE_GUID                      = 060876c2-0e4e-4c63-8996-6af3710cfa64
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DxeHobListLib
+  CONSTRUCTOR                    = DxeHobListLibNullConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[Sources]
+  DxeHobListLibNull.c

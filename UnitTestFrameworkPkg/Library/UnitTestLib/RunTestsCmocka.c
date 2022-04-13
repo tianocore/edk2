@@ -38,7 +38,7 @@ UNIT_TEST_SUITE  *mActiveUnitTestSuite = NULL;
 
 void
 CmockaUnitTestFunctionRunner (
-  void **state
+  void  **state
   )
 {
   UNIT_TEST            *UnitTest;
@@ -52,16 +52,16 @@ CmockaUnitTestFunctionRunner (
   if (UnitTest->RunTest == NULL) {
     UnitTest->Result = UNIT_TEST_SKIPPED;
   } else {
-    UnitTest->Result = UNIT_TEST_RUNNING;
+    UnitTest->Result       = UNIT_TEST_RUNNING;
     Framework->CurrentTest = UnitTest;
-    UnitTest->Result = UnitTest->RunTest (UnitTest->Context);
+    UnitTest->Result       = UnitTest->RunTest (UnitTest->Context);
     Framework->CurrentTest = NULL;
   }
 }
 
 int
 CmockaUnitTestSetupFunctionRunner (
-  void **state
+  void  **state
   )
 {
   UNIT_TEST            *UnitTest;
@@ -78,7 +78,7 @@ CmockaUnitTestSetupFunctionRunner (
   }
 
   Framework->CurrentTest = UnitTest;
-  Result = UnitTest->Prerequisite (UnitTest->Context);
+  Result                 = UnitTest->Prerequisite (UnitTest->Context);
   Framework->CurrentTest = NULL;
 
   //
@@ -89,7 +89,7 @@ CmockaUnitTestSetupFunctionRunner (
 
 int
 CmockaUnitTestTeardownFunctionRunner (
-  void **state
+  void  **state
   )
 {
   UNIT_TEST            *UnitTest;
@@ -112,10 +112,10 @@ CmockaUnitTestTeardownFunctionRunner (
   // stdout and stderr in their xml format
   //
   if (UnitTest->Log != NULL) {
-    print_message("UnitTest: %s - %s\n", UnitTest->Name, UnitTest->Description);
-    print_message("Log Output Start\n");
-    print_message("%s", UnitTest->Log);
-    print_message("Log Output End\n");
+    print_message ("UnitTest: %s - %s\n", UnitTest->Name, UnitTest->Description);
+    print_message ("Log Output Start\n");
+    print_message ("%s", UnitTest->Log);
+    print_message ("Log Output End\n");
   }
 
   //
@@ -126,12 +126,13 @@ CmockaUnitTestTeardownFunctionRunner (
 
 int
 CmockaUnitTestSuiteSetupFunctionRunner (
-  void **state
+  void  **state
   )
 {
   if (mActiveUnitTestSuite == NULL) {
     return -1;
   }
+
   if (mActiveUnitTestSuite->Setup == NULL) {
     return 0;
   }
@@ -145,12 +146,13 @@ CmockaUnitTestSuiteSetupFunctionRunner (
 
 int
 CmockaUnitTestSuiteTeardownFunctionRunner (
-  void **state
+  void  **state
   )
 {
   if (mActiveUnitTestSuite == NULL) {
     return -1;
   }
+
   if (mActiveUnitTestSuite->Teardown == NULL) {
     return 0;
   }
@@ -173,7 +175,7 @@ RunTestSuite (
   struct CMUnitTest     *Tests;
   UINTN                 Index;
 
-  TestEntry       = NULL;
+  TestEntry = NULL;
 
   if (Suite == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -195,7 +197,8 @@ RunTestSuite (
   Index = 0;
   for (TestEntry = (UNIT_TEST_LIST_ENTRY *)GetFirstNode (&(Suite->TestCaseList));
        (LIST_ENTRY *)TestEntry != &(Suite->TestCaseList);
-       TestEntry = (UNIT_TEST_LIST_ENTRY *)GetNextNode (&(Suite->TestCaseList), (LIST_ENTRY *)TestEntry)) {
+       TestEntry = (UNIT_TEST_LIST_ENTRY *)GetNextNode (&(Suite->TestCaseList), (LIST_ENTRY *)TestEntry))
+  {
     UnitTest                   = &TestEntry->UT;
     Tests[Index].name          = UnitTest->Description;
     Tests[Index].test_func     = CmockaUnitTestFunctionRunner;
@@ -204,6 +207,7 @@ RunTestSuite (
     Tests[Index].initial_state = UnitTest;
     Index++;
   }
+
   ASSERT (Index == Suite->NumTests);
 
   //
@@ -254,17 +258,18 @@ RunAllTestSuites (
     return EFI_INVALID_PARAMETER;
   }
 
-  DEBUG((DEBUG_VERBOSE, "---------------------------------------------------------\n"));
-  DEBUG((DEBUG_VERBOSE, "------------     RUNNING ALL TEST SUITES   --------------\n"));
-  DEBUG((DEBUG_VERBOSE, "---------------------------------------------------------\n"));
+  DEBUG ((DEBUG_VERBOSE, "---------------------------------------------------------\n"));
+  DEBUG ((DEBUG_VERBOSE, "------------     RUNNING ALL TEST SUITES   --------------\n"));
+  DEBUG ((DEBUG_VERBOSE, "---------------------------------------------------------\n"));
   mFrameworkHandle = FrameworkHandle;
 
   //
   // Iterate all suites
   //
   for (Suite = (UNIT_TEST_SUITE_LIST_ENTRY *)GetFirstNode (&Framework->TestSuiteList);
-    (LIST_ENTRY *)Suite != &Framework->TestSuiteList;
-    Suite = (UNIT_TEST_SUITE_LIST_ENTRY *)GetNextNode (&Framework->TestSuiteList, (LIST_ENTRY *)Suite)) {
+       (LIST_ENTRY *)Suite != &Framework->TestSuiteList;
+       Suite = (UNIT_TEST_SUITE_LIST_ENTRY *)GetNextNode (&Framework->TestSuiteList, (LIST_ENTRY *)Suite))
+  {
     Status = RunTestSuite (&(Suite->UTS));
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Test Suite Failed with Error.  %r\n", Status));

@@ -5,7 +5,7 @@ UEFI Redfish EDK2 solution is an efficient and secure solution for the end-users
 
 Below are the block diagrams of UEFI Redfish EDK2 Implementation. ***[EDK2 Redfish Foundation[1]](#[0])*** in the lower part of the figure refers to the EDK2 Redfish Foundation, which provides the fundamental EDK2 drivers to communicate with Redfish service ***([[19]](#[0]) in the above figure)***. The Redfish service could be implemented in BMC to manage the system, or on the network for managing multiple systems.
 
-***[EDK2 Redfish Client[2]](#[0])*** in the upper part of the figure refers to the EDK2 Redfish client, which is the EDK2 Redfish application used to configure platform configurations by consuming the Redfish properties. The EDK2 Redfish client can also provision the UEFI platform-owned Redfish properties, consume and update Redfish properties as well. The ***[EDK2 Redfish Feature DXE Drivers [17]](#[0])*** is the next project after EDK2 Redfish Foundation. Each EDK2 Redfish Feature DXE Driver is designed to communicate with the particular Redfish data model defined in the Redfish schema *(e.g. Edk2RedfishBiosDxe driver manipulates the properties defined in Redfish BIOS data model)*.
+***[EDK2 Redfish Client[2]](#[0])*** in the upper part of the figure refers to the EDK2 Redfish client, which is the EDK2 Redfish application used to configure platform configurations by consuming the Redfish properties. The EDK2 Redfish client can also provision the UEFI platform-owned Redfish properties, consume and update Redfish properties as well. The ***[EDK2 Redfish Feature DXE Drivers [17]](https://github.com/tianocore/edk2-staging/blob/edk2-redfish-client/RedfishClientPkg/Readme.md)*** is the project under development in EDK2 staging repository. Each EDK2 Redfish Feature DXE Driver is designed to communicate with the particular Redfish data model defined in the Redfish schema *(e.g. Edk2RedfishBiosDxe driver manipulates the properties defined in Redfish BIOS data model)*.
 
 ## <a name="[0]">EDK2 Redfish Implementation Diagrams</a>
 ![UEFI Redfish Implementation](https://github.com/tianocore/edk2/blob/master/RedfishPkg/Documents/Media/RedfishDriverStack.svg?raw=true)
@@ -78,7 +78,9 @@ The library is incorporated with RedfishLib ***[[13]](#[0])*** to encode and dec
 
    2. Enable below macros in EmulatorPkg.dsc
    ```C
+  NETWORK_SNP_ENABLE = TRUE
   NETWORK_HTTP_ENABLE = TRUE
+  NETWORK_IP6_ENABLE = TRUE
   SECURE_BOOT_ENABLE = TRUE
   REDFISH_ENABLE = TRUE
    ```
@@ -95,6 +97,20 @@ The library is incorporated with RedfishLib ***[[13]](#[0])*** to encode and dec
    - Execute the EFI shell command "ifconfig -l" under EFI shell and look for MAC address information, then assign the MAC address to below PCD.
    ```c
    gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExServiceDevicePath.DevicePath|{DEVICE_PATH("MAC(000000000000,0x1)")}
+   ```
+
+   - Assign the network adapter instaleld on the host (working machine) that will be emulated as the network interface in edk2 Emulator.
+
+   ```c
+    #
+    # For Windows based host, use a number to refer to network adapter
+    #
+    gEmulatorPkgTokenSpaceGuid.PcdEmuNetworkInterface|L"1"
+    or
+    #
+    # For Linux based host, use the device name of network adapter
+    #
+    gEmulatorPkgTokenSpaceGuid.PcdEmuNetworkInterface|L"en0"
    ```
 
    5. Configure the Redfish service on the EDK2 Emulator platform

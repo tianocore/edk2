@@ -29,7 +29,7 @@ EBP/RBP - Pointer to the start of the Boot Firmware Volume
 === HOW TO BUILD VTF0 ===
 
 Dependencies:
-* Python 2.5~2.7
+* Python 3 or newer
 * Nasm 2.03 or newer
 
 To rebuild the VTF0 binaries:

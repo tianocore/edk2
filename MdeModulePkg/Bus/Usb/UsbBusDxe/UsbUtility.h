@@ -24,12 +24,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 UsbHcGetCapability (
-  IN  USB_BUS             *UsbBus,
-  OUT UINT8               *MaxSpeed,
-  OUT UINT8               *NumOfPort,
-  OUT UINT8               *Is64BitCapable
+  IN  USB_BUS  *UsbBus,
+  OUT UINT8    *MaxSpeed,
+  OUT UINT8    *NumOfPort,
+  OUT UINT8    *Is64BitCapable
   );
-
 
 /**
   Get the root hub port state.
@@ -44,9 +43,9 @@ UsbHcGetCapability (
 **/
 EFI_STATUS
 UsbHcGetRootHubPortStatus (
-  IN  USB_BUS             *UsbBus,
-  IN  UINT8               PortIndex,
-  OUT EFI_USB_PORT_STATUS *PortStatus
+  IN  USB_BUS              *UsbBus,
+  IN  UINT8                PortIndex,
+  OUT EFI_USB_PORT_STATUS  *PortStatus
   );
 
 /**
@@ -62,9 +61,9 @@ UsbHcGetRootHubPortStatus (
 **/
 EFI_STATUS
 UsbHcSetRootHubPortFeature (
-  IN USB_BUS              *UsbBus,
-  IN UINT8                PortIndex,
-  IN EFI_USB_PORT_FEATURE Feature
+  IN USB_BUS               *UsbBus,
+  IN UINT8                 PortIndex,
+  IN EFI_USB_PORT_FEATURE  Feature
   );
 
 /**
@@ -80,9 +79,9 @@ UsbHcSetRootHubPortFeature (
 **/
 EFI_STATUS
 UsbHcClearRootHubPortFeature (
-  IN USB_BUS              *UsbBus,
-  IN UINT8                PortIndex,
-  IN EFI_USB_PORT_FEATURE Feature
+  IN USB_BUS               *UsbBus,
+  IN UINT8                 PortIndex,
+  IN EFI_USB_PORT_FEATURE  Feature
   );
 
 /**
@@ -149,7 +148,7 @@ UsbHcBulkTransfer (
   IN  UINT8                               DevSpeed,
   IN  UINTN                               MaxPacket,
   IN  UINT8                               BufferNum,
-  IN  OUT VOID                            *Data[EFI_USB_MAX_BULK_BUFFER_NUM],
+  IN  OUT VOID                            *Data[],
   IN  OUT UINTN                           *DataLength,
   IN  OUT UINT8                           *DataToggle,
   IN  UINTN                               TimeOut,
@@ -231,7 +230,6 @@ UsbHcSyncInterruptTransfer (
   OUT UINT32                              *UsbResult
   );
 
-
 /**
   Open the USB host controller protocol BY_CHILD.
 
@@ -243,8 +241,8 @@ UsbHcSyncInterruptTransfer (
 **/
 EFI_STATUS
 UsbOpenHostProtoByChild (
-  IN USB_BUS              *Bus,
-  IN EFI_HANDLE           Child
+  IN USB_BUS     *Bus,
+  IN EFI_HANDLE  Child
   );
 
 /**
@@ -258,8 +256,8 @@ UsbOpenHostProtoByChild (
 **/
 VOID
 UsbCloseHostProtoByChild (
-  IN USB_BUS              *Bus,
-  IN EFI_HANDLE           Child
+  IN USB_BUS     *Bus,
+  IN EFI_HANDLE  Child
   );
 
 /**

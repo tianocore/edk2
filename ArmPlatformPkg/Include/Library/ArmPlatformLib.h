@@ -32,7 +32,7 @@
 **/
 UINTN
 ArmPlatformGetCorePosition (
-  IN UINTN MpId
+  IN UINTN  MpId
   );
 
 /**
@@ -47,7 +47,7 @@ ArmPlatformGetCorePosition (
 **/
 UINTN
 ArmPlatformIsPrimaryCore (
-  IN UINTN MpId
+  IN UINTN  MpId
   );
 
 /**
@@ -102,7 +102,7 @@ ArmPlatformPeiBootAction (
 **/
 RETURN_STATUS
 ArmPlatformInitialize (
-  IN  UINTN                     MpId
+  IN  UINTN  MpId
   );
 
 /**
@@ -117,7 +117,7 @@ ArmPlatformInitialize (
 **/
 VOID
 ArmPlatformGetVirtualMemoryMap (
-  OUT ARM_MEMORY_REGION_DESCRIPTOR** VirtualMemoryMap
+  OUT ARM_MEMORY_REGION_DESCRIPTOR  **VirtualMemoryMap
   );
 
 /**

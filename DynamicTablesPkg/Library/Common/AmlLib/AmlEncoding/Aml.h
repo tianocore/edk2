@@ -2,7 +2,7 @@
   AML grammar definitions.
 
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
-  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -15,9 +15,9 @@
 #include <IndustryStandard/AcpiAml.h>
 
 #if !defined (MDEPKG_NDEBUG)
-#define AML_OPCODE_DEF(str, OpCode) str, OpCode
+#define AML_OPCODE_DEF(str, OpCode)  str, OpCode
 #else
-#define AML_OPCODE_DEF(str, OpCode) OpCode
+#define AML_OPCODE_DEF(str, OpCode)  OpCode
 #endif // MDEPKG_NDEBUG
 
 /** AML types.
@@ -31,7 +31,7 @@
   These are internal types.
 */
 typedef enum EAmlParseFormat {
-  EAmlNone   = 0,     ///< No data expected.
+  EAmlNone = 0,       ///< No data expected.
   EAmlUInt8,          ///< One byte value evaluated as a UINT8.
   EAmlUInt16,         ///< Two byte value evaluated as a UINT16.
   EAmlUInt32,         ///< Four byte value evaluated as a UINT32.
@@ -61,46 +61,46 @@ typedef UINT32 AML_OP_ATTRIBUTE;
 /** A PkgLength is expected between the OpCode/SubOpCode couple and the first
     fixed argument of the object.
 */
-#define AML_HAS_PKG_LENGTH      0x00001U
+#define AML_HAS_PKG_LENGTH  0x00001U
 
 /** The object's OpCode is actually a character. Encodings with this attribute
     don't describe objects. The dual/multi name prefix have this attribute,
     indicating the start of a longer NameString.
 */
-#define AML_IS_NAME_CHAR        0x00002U
+#define AML_IS_NAME_CHAR  0x00002U
 
 /** A variable list of arguments is following the last fixed argument. Each
     argument is evaluated as an EAmlObject.
 */
-#define AML_HAS_CHILD_OBJ       0x00004U
+#define AML_HAS_CHILD_OBJ  0x00004U
 
 /** This is a sub-type of a variable list of arguments. It can only be
     found in buffer objects. A ByteList is either a list of
     bytes or a list of resource data elements. Resource data elements
     have specific opcodes.
 */
-#define AML_HAS_BYTE_LIST       0x00008U
+#define AML_HAS_BYTE_LIST  0x00008U
 
 /** This is a sub-type of a variable list of arguments. It can only be
     found in Fields, IndexFields and BankFields.
     A FieldList is made of FieldElements. FieldElements have specific opcodes.
 */
-#define AML_HAS_FIELD_LIST      0x00010U
+#define AML_HAS_FIELD_LIST  0x00010U
 
 /** This object node is a field element. Its opcode is to be fetched from
     the field encoding table.
 */
-#define AML_IS_FIELD_ELEMENT    0x00020U
+#define AML_IS_FIELD_ELEMENT  0x00020U
 
 /** The object has a name and which is part of the AML namespace. The name
     can be found in the fixed argument list at the NameIndex.
 */
-#define AML_IN_NAMESPACE        0x10000U
+#define AML_IN_NAMESPACE  0x10000U
 
 /** Some OpCodes have been created in this library. They are called
     pseudo opcodes and must stay internal to this library.
 */
-#define AML_IS_PSEUDO_OPCODE    0x20000U
+#define AML_IS_PSEUDO_OPCODE  0x20000U
 
 /** Encoding of an AML object.
 
@@ -112,37 +112,37 @@ typedef UINT32 AML_OP_ATTRIBUTE;
   Cf. ACPI 6.3 specification, s20.2.
 */
 typedef struct _AML_BYTE_ENCODING {
-// Enable this field for debug.
-#if !defined (MDEPKG_NDEBUG)
+  // Enable this field for debug.
+ #if !defined (MDEPKG_NDEBUG)
   /// String field allowing to print the AML object.
-  CONST CHAR8         * Str;
-#endif // MDEPKG_NDEBUG
+  CONST CHAR8         *Str;
+ #endif // MDEPKG_NDEBUG
 
   /// OpCode of the AML object.
-  UINT8                 OpCode;
+  UINT8               OpCode;
 
   /// SubOpCode of the AML object.
   /// The SubOpcode field has a valid value when the OpCode is 0x5B,
   /// otherwise this field must be zero.
   /// For field objects, the SubOpCode is not used.
-  UINT8                 SubOpCode;
+  UINT8               SubOpCode;
 
   /// Number of fixed arguments for the AML statement represented
   /// by the OpCode & SubOpcode.
   /// Maximum is 6 for AML objects.
   /// Maximum is 3 for field objects.
-  EAML_PARSE_INDEX      MaxIndex;
+  EAML_PARSE_INDEX    MaxIndex;
 
   /// If the encoding has the AML_IN_NAMESPACE attribute (cf Attribute
   /// field below), indicate where to find the name in the fixed list
   /// of arguments.
-  EAML_PARSE_INDEX      NameIndex;
+  EAML_PARSE_INDEX    NameIndex;
 
   /// Type of each fixed argument.
-  AML_PARSE_FORMAT      Format[EAmlParseIndexMax];
+  AML_PARSE_FORMAT    Format[EAmlParseIndexMax];
 
   /// Additional information on the AML object.
-  AML_OP_ATTRIBUTE      Attribute;
+  AML_OP_ATTRIBUTE    Attribute;
 } AML_BYTE_ENCODING;
 
 /** Get the AML_BYTE_ENCODING entry in the AML encoding table.
@@ -160,7 +160,7 @@ CONST
 AML_BYTE_ENCODING *
 EFIAPI
 AmlGetByteEncoding (
-  IN  CONST UINT8   * Buffer
+  IN  CONST UINT8  *Buffer
   );
 
 /** Get the AML_BYTE_ENCODING entry in the AML encoding table
@@ -176,8 +176,8 @@ CONST
 AML_BYTE_ENCODING *
 EFIAPI
 AmlGetByteEncodingByOpCode (
-  IN  UINT8   OpCode,
-  IN  UINT8   SubOpCode
+  IN  UINT8  OpCode,
+  IN  UINT8  SubOpCode
   );
 
 /** Get the AML_BYTE_ENCODING entry in the field encoding table.
@@ -195,7 +195,7 @@ CONST
 AML_BYTE_ENCODING *
 EFIAPI
 AmlGetFieldEncoding (
-  IN  CONST UINT8   * Buffer
+  IN  CONST UINT8  *Buffer
   );
 
 /** Get the AML_BYTE_ENCODING entry in the field encoding table
@@ -212,12 +212,13 @@ CONST
 AML_BYTE_ENCODING *
 EFIAPI
 AmlGetFieldEncodingByOpCode (
-  IN  UINT8   OpCode,
-  IN  UINT8   SubOpCode
+  IN  UINT8  OpCode,
+  IN  UINT8  SubOpCode
   );
 
 // Enable this function for debug.
 #if !defined (MDEPKG_NDEBUG)
+
 /** Look for an OpCode/SubOpCode couple in the AML grammar,
     and return a corresponding string.
 
@@ -230,8 +231,8 @@ AmlGetFieldEncodingByOpCode (
 CONST
 CHAR8 *
 AmlGetOpCodeStr (
-  IN  UINT8   OpCode,
-  IN  UINT8   SubOpCode
+  IN  UINT8  OpCode,
+  IN  UINT8  SubOpCode
   );
 
 /** Look for an OpCode/SubOpCode couple in the AML field element grammar,
@@ -246,9 +247,10 @@ AmlGetOpCodeStr (
 CONST
 CHAR8 *
 AmlGetFieldOpCodeStr (
-  IN  UINT8   OpCode,
-  IN  UINT8   SubOpCode
+  IN  UINT8  OpCode,
+  IN  UINT8  SubOpCode
   );
+
 #endif // MDEPKG_NDEBUG
 
 /** Check whether the OpCode/SubOpcode couple is a valid entry
@@ -263,8 +265,8 @@ AmlGetFieldOpCodeStr (
 BOOLEAN
 EFIAPI
 AmlIsOpCodeValid (
-  IN  UINT8   OpCode,
-  IN  UINT8   SubOpCode
+  IN  UINT8  OpCode,
+  IN  UINT8  SubOpCode
   );
 
 /** Convert an AML_PARSE_FORMAT to its corresponding EAML_NODE_DATA_TYPE.
@@ -292,8 +294,8 @@ AmlTypeToNodeDataType (
 UINT32
 EFIAPI
 AmlGetPkgLength (
-  IN  CONST UINT8   * Buffer,
-  OUT       UINT32  * PkgLength
+  IN  CONST UINT8   *Buffer,
+  OUT       UINT32  *PkgLength
   );
 
 /** Convert the Length to the AML PkgLen encoding,
@@ -308,8 +310,8 @@ AmlGetPkgLength (
 UINT8
 EFIAPI
 AmlSetPkgLength (
-  IN  UINT32    Length,
-  OUT UINT8   * Buffer
+  IN  UINT32  Length,
+  OUT UINT8   *Buffer
   );
 
 /** Compute the number of bytes required to write a package length.
@@ -326,5 +328,49 @@ AmlComputePkgLengthWidth (
   IN  UINT32  Length
   );
 
-#endif // AML_H_
+/** Given a length, compute the value of a PkgLen.
 
+  In AML, some object have a PkgLen, telling the size of the AML object.
+  It can be encoded in 1 to 4 bytes. The bytes used to encode the PkgLen is
+  itself counted in the PkgLen value.
+  This means that if an AML object sees its size increment/decrement,
+  the number of bytes used to encode the PkgLen value can itself
+  increment/decrement.
+
+  For instance, the AML encoding of a DeviceOp is:
+    DefDevice := DeviceOp PkgLength NameString TermList
+  If:
+   - sizeof (NameString) = 4 (the name is "DEV0" for instance);
+   - sizeof (TermList) = (2^6-6)
+  then the PkgLen is encoded on 1 byte. Indeed, its value is:
+    sizeof (PkgLen) + sizeof (NameString) + sizeof (TermList) =
+    sizeof (PkgLen) + 4 + (2^6-6)
+  So:
+    PkgLen = sizeof (PkgLen) + (2^6-2)
+
+  The input arguments Length and PkgLen represent, for the DefDevice:
+    DefDevice := DeviceOp PkgLength NameString TermList
+                                    |------Length-----|
+                          |--------*PgkLength---------|
+
+  @param  [in]  Length  The length to encode as a PkgLen.
+                        Length cannot exceed 2^28 - 4 (4 bytes for the
+                        PkgLen encoding).
+                        The size of the PkgLen encoding bytes should not be
+                        counted in this length value.
+  @param  [out] PkgLen  If success, contains the value of the PkgLen,
+                        ready to encode in the PkgLen format.
+                        This value takes into account the size of PkgLen
+                        encoding.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlComputePkgLength (
+  IN  UINT32  Length,
+  OUT UINT32  *PkgLen
+  );
+
+#endif // AML_H_

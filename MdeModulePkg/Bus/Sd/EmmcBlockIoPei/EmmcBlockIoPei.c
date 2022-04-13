@@ -10,7 +10,7 @@
 //
 // Template for EMMC HC Slot Data.
 //
-EMMC_PEIM_HC_SLOT   gEmmcHcSlotTemplate = {
+EMMC_PEIM_HC_SLOT  gEmmcHcSlotTemplate = {
   EMMC_PEIM_SLOT_SIG,             // Signature
   {                               // Media
     {
@@ -97,7 +97,7 @@ EMMC_PEIM_HC_SLOT   gEmmcHcSlotTemplate = {
     0,
   },
   {                               // ExtCsd
-    {0},
+    { 0 },
   },
   TRUE,                           // SectorAddressing
   NULL                            // Private
@@ -106,7 +106,7 @@ EMMC_PEIM_HC_SLOT   gEmmcHcSlotTemplate = {
 //
 // Template for EMMC HC Private Data.
 //
-EMMC_PEIM_HC_PRIVATE_DATA gEmmcHcPrivateTemplate = {
+EMMC_PEIM_HC_PRIVATE_DATA  gEmmcHcPrivateTemplate = {
   EMMC_PEIM_SIG,                  // Signature
   NULL,                           // Pool
   {                               // BlkIoPpi
@@ -158,6 +158,7 @@ EMMC_PEIM_HC_PRIVATE_DATA gEmmcHcPrivateTemplate = {
   0,                              // SlotNum
   0                               // TotalBlkIoDevices
 };
+
 /**
   Gets the count of block I/O devices that one specific block driver detects.
 
@@ -185,9 +186,9 @@ EmmcBlockIoPeimGetDeviceNo (
   OUT UINTN                          *NumberBlockDevices
   )
 {
-  EMMC_PEIM_HC_PRIVATE_DATA   *Private;
+  EMMC_PEIM_HC_PRIVATE_DATA  *Private;
 
-  Private = GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS (This);
+  Private             = GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS (This);
   *NumberBlockDevices = Private->TotalBlkIoDevices;
   return EFI_SUCCESS;
 }
@@ -242,11 +243,11 @@ EmmcBlockIoPeimGetMediaInfo (
   OUT EFI_PEI_BLOCK_IO_MEDIA         *MediaInfo
   )
 {
-  EMMC_PEIM_HC_PRIVATE_DATA          *Private;
-  UINT8                              SlotNum;
-  UINT8                              MediaNum;
-  UINT8                              Location;
-  BOOLEAN                            Found;
+  EMMC_PEIM_HC_PRIVATE_DATA  *Private;
+  UINT8                      SlotNum;
+  UINT8                      MediaNum;
+  UINT8                      Location;
+  BOOLEAN                    Found;
 
   Found   = FALSE;
   Private = GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS (This);
@@ -259,12 +260,13 @@ EmmcBlockIoPeimGetMediaInfo (
   MediaNum = 0;
   for (SlotNum = 0; SlotNum < Private->SlotNum; SlotNum++) {
     for (MediaNum = 0; MediaNum < Private->Slot[SlotNum].MediaNum; MediaNum++) {
-      Location ++;
+      Location++;
       if (Location == DeviceIndex) {
         Found = TRUE;
         break;
       }
     }
+
     if (Found) {
       break;
     }
@@ -323,17 +325,17 @@ EmmcBlockIoPeimReadBlocks (
   OUT VOID                           *Buffer
   )
 {
-  EFI_STATUS                         Status;
-  UINT32                             BlockSize;
-  UINTN                              NumberOfBlocks;
-  EMMC_PEIM_HC_PRIVATE_DATA          *Private;
-  UINT8                              SlotNum;
-  UINT8                              MediaNum;
-  UINT8                              Location;
-  UINT8                              PartitionConfig;
-  UINTN                              Remaining;
-  UINT32                             MaxBlock;
-  BOOLEAN                            Found;
+  EFI_STATUS                 Status;
+  UINT32                     BlockSize;
+  UINTN                      NumberOfBlocks;
+  EMMC_PEIM_HC_PRIVATE_DATA  *Private;
+  UINT8                      SlotNum;
+  UINT8                      MediaNum;
+  UINT8                      Location;
+  UINT8                      PartitionConfig;
+  UINTN                      Remaining;
+  UINT32                     MaxBlock;
+  BOOLEAN                    Found;
 
   Status  = EFI_SUCCESS;
   Found   = FALSE;
@@ -358,12 +360,13 @@ EmmcBlockIoPeimReadBlocks (
   MediaNum = 0;
   for (SlotNum = 0; SlotNum < Private->SlotNum; SlotNum++) {
     for (MediaNum = 0; MediaNum < Private->Slot[SlotNum].MediaNum; MediaNum++) {
-      Location ++;
+      Location++;
       if (Location == DeviceIndex) {
         Found = TRUE;
         break;
       }
     }
+
     if (Found) {
       break;
     }
@@ -385,20 +388,22 @@ EmmcBlockIoPeimReadBlocks (
   //
   PartitionConfig = Private->Slot[SlotNum].ExtCsd.PartitionConfig;
   if ((PartitionConfig & 0x7) != Private->Slot[SlotNum].PartitionType[MediaNum]) {
-    PartitionConfig &= (UINT8)~0x7;
+    PartitionConfig &= (UINT8) ~0x7;
     PartitionConfig |= Private->Slot[SlotNum].PartitionType[MediaNum];
-    Status = EmmcPeimSwitch (
-               &Private->Slot[SlotNum],
-               0x3,
-               OFFSET_OF (EMMC_EXT_CSD, PartitionConfig),
-               PartitionConfig,
-               0x0
-               );
+    Status           = EmmcPeimSwitch (
+                         &Private->Slot[SlotNum],
+                         0x3,
+                         OFFSET_OF (EMMC_EXT_CSD, PartitionConfig),
+                         PartitionConfig,
+                         0x0
+                         );
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     Private->Slot[SlotNum].ExtCsd.PartitionConfig = PartitionConfig;
   }
+
   //
   // Start to execute data transfer. The max block number in single cmd is 65535 blocks.
   //
@@ -418,15 +423,16 @@ EmmcBlockIoPeimReadBlocks (
     }
 
     BufferSize = NumberOfBlocks * BlockSize;
-    Status = EmmcPeimRwMultiBlocks (&Private->Slot[SlotNum], StartLBA, BlockSize, Buffer, BufferSize, TRUE);
+    Status     = EmmcPeimRwMultiBlocks (&Private->Slot[SlotNum], StartLBA, BlockSize, Buffer, BufferSize, TRUE);
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
     StartLBA  += NumberOfBlocks;
-    Buffer     = (UINT8*)Buffer + BufferSize;
+    Buffer     = (UINT8 *)Buffer + BufferSize;
     Remaining -= NumberOfBlocks;
   }
+
   return Status;
 }
 
@@ -452,14 +458,14 @@ EmmcBlockIoPeimReadBlocks (
 EFI_STATUS
 EFIAPI
 EmmcBlockIoPeimGetDeviceNo2 (
-  IN  EFI_PEI_SERVICES               **PeiServices,
-  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
-  OUT UINTN                          *NumberBlockDevices
+  IN  EFI_PEI_SERVICES                **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *This,
+  OUT UINTN                           *NumberBlockDevices
   )
 {
-  EMMC_PEIM_HC_PRIVATE_DATA   *Private;
+  EMMC_PEIM_HC_PRIVATE_DATA  *Private;
 
-  Private = GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
+  Private             = GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
   *NumberBlockDevices = Private->TotalBlkIoDevices;
 
   return EFI_SUCCESS;
@@ -509,29 +515,29 @@ EmmcBlockIoPeimGetDeviceNo2 (
 EFI_STATUS
 EFIAPI
 EmmcBlockIoPeimGetMediaInfo2 (
-  IN  EFI_PEI_SERVICES               **PeiServices,
-  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
-  IN  UINTN                          DeviceIndex,
-  OUT EFI_PEI_BLOCK_IO2_MEDIA        *MediaInfo
+  IN  EFI_PEI_SERVICES                **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *This,
+  IN  UINTN                           DeviceIndex,
+  OUT EFI_PEI_BLOCK_IO2_MEDIA         *MediaInfo
   )
 {
-  EFI_STATUS                         Status;
-  EMMC_PEIM_HC_PRIVATE_DATA          *Private;
-  EFI_PEI_BLOCK_IO_MEDIA             Media;
-  UINT8                              SlotNum;
-  UINT8                              MediaNum;
-  UINT8                              Location;
-  BOOLEAN                            Found;
+  EFI_STATUS                 Status;
+  EMMC_PEIM_HC_PRIVATE_DATA  *Private;
+  EFI_PEI_BLOCK_IO_MEDIA     Media;
+  UINT8                      SlotNum;
+  UINT8                      MediaNum;
+  UINT8                      Location;
+  BOOLEAN                    Found;
 
   Found   = FALSE;
   Private = GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
 
-  Status  = EmmcBlockIoPeimGetMediaInfo (
-              PeiServices,
-              &Private->BlkIoPpi,
-              DeviceIndex,
-              &Media
-              );
+  Status = EmmcBlockIoPeimGetMediaInfo (
+             PeiServices,
+             &Private->BlkIoPpi,
+             DeviceIndex,
+             &Media
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -540,12 +546,13 @@ EmmcBlockIoPeimGetMediaInfo2 (
   MediaNum = 0;
   for (SlotNum = 0; SlotNum < Private->SlotNum; SlotNum++) {
     for (MediaNum = 0; MediaNum < Private->Slot[SlotNum].MediaNum; MediaNum++) {
-      Location ++;
+      Location++;
       if (Location == DeviceIndex) {
         Found = TRUE;
         break;
       }
     }
+
     if (Found) {
       break;
     }
@@ -592,28 +599,28 @@ EmmcBlockIoPeimGetMediaInfo2 (
 EFI_STATUS
 EFIAPI
 EmmcBlockIoPeimReadBlocks2 (
-  IN  EFI_PEI_SERVICES               **PeiServices,
-  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
-  IN  UINTN                          DeviceIndex,
-  IN  EFI_PEI_LBA                    StartLBA,
-  IN  UINTN                          BufferSize,
-  OUT VOID                           *Buffer
+  IN  EFI_PEI_SERVICES                **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *This,
+  IN  UINTN                           DeviceIndex,
+  IN  EFI_PEI_LBA                     StartLBA,
+  IN  UINTN                           BufferSize,
+  OUT VOID                            *Buffer
   )
 {
-  EFI_STATUS                         Status;
-  EMMC_PEIM_HC_PRIVATE_DATA          *Private;
+  EFI_STATUS                 Status;
+  EMMC_PEIM_HC_PRIVATE_DATA  *Private;
 
-  Status    = EFI_SUCCESS;
-  Private   = GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
+  Status  = EFI_SUCCESS;
+  Private = GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
 
-  Status  = EmmcBlockIoPeimReadBlocks (
-              PeiServices,
-              &Private->BlkIoPpi,
-              DeviceIndex,
-              StartLBA,
-              BufferSize,
-              Buffer
-              );
+  Status = EmmcBlockIoPeimReadBlocks (
+             PeiServices,
+             &Private->BlkIoPpi,
+             DeviceIndex,
+             StartLBA,
+             BufferSize,
+             Buffer
+             );
   return Status;
 }
 
@@ -636,7 +643,7 @@ EmmcBlockIoPeimEndOfPei (
   IN VOID                       *Ppi
   )
 {
-  EMMC_PEIM_HC_PRIVATE_DATA       *Private;
+  EMMC_PEIM_HC_PRIVATE_DATA  *Private;
 
   Private = GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY (NotifyDescriptor);
 
@@ -660,26 +667,26 @@ EmmcBlockIoPeimEndOfPei (
 EFI_STATUS
 EFIAPI
 InitializeEmmcBlockIoPeim (
-  IN EFI_PEI_FILE_HANDLE        FileHandle,
-  IN CONST EFI_PEI_SERVICES     **PeiServices
+  IN EFI_PEI_FILE_HANDLE     FileHandle,
+  IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
-  EFI_STATUS                       Status;
-  EMMC_PEIM_HC_PRIVATE_DATA        *Private;
-  EDKII_SD_MMC_HOST_CONTROLLER_PPI *SdMmcHcPpi;
-  UINT32                           Index;
-  UINT32                           PartitionIndex;
-  UINTN                            *MmioBase;
-  UINT8                            BarNum;
-  UINT8                            SlotNum;
-  UINT8                            MediaNum;
-  UINT8                            Controller;
-  UINT64                           Capacity;
-  EMMC_EXT_CSD                     *ExtCsd;
-  EMMC_HC_SLOT_CAP                 Capability;
-  EMMC_PEIM_HC_SLOT                *Slot;
-  UINT32                           SecCount;
-  UINT32                           GpSizeMult;
+  EFI_STATUS                        Status;
+  EMMC_PEIM_HC_PRIVATE_DATA         *Private;
+  EDKII_SD_MMC_HOST_CONTROLLER_PPI  *SdMmcHcPpi;
+  UINT32                            Index;
+  UINT32                            PartitionIndex;
+  UINTN                             *MmioBase;
+  UINT8                             BarNum;
+  UINT8                             SlotNum;
+  UINT8                             MediaNum;
+  UINT8                             Controller;
+  UINT64                            Capacity;
+  EMMC_EXT_CSD                      *ExtCsd;
+  EMMC_HC_SLOT_CAP                  Capability;
+  EMMC_PEIM_HC_SLOT                 *Slot;
+  UINT32                            SecCount;
+  UINT32                            GpSizeMult;
 
   //
   // Shadow this PEIM to run from memory
@@ -695,7 +702,7 @@ InitializeEmmcBlockIoPeim (
              &gEdkiiPeiSdMmcHostControllerPpiGuid,
              0,
              NULL,
-             (VOID **) &SdMmcHcPpi
+             (VOID **)&SdMmcHcPpi
              );
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
@@ -724,8 +731,9 @@ InitializeEmmcBlockIoPeim (
       Status = EFI_OUT_OF_RESOURCES;
       break;
     }
-    Private->BlkIoPpiList.Ppi  = (VOID*)&Private->BlkIoPpi;
-    Private->BlkIo2PpiList.Ppi = (VOID*)&Private->BlkIo2Ppi;
+
+    Private->BlkIoPpiList.Ppi  = (VOID *)&Private->BlkIoPpi;
+    Private->BlkIo2PpiList.Ppi = (VOID *)&Private->BlkIo2Ppi;
     //
     // Initialize the memory pool which will be used in all transactions.
     //
@@ -740,8 +748,9 @@ InitializeEmmcBlockIoPeim (
       if (EFI_ERROR (Status)) {
         continue;
       }
+
       if (Capability.SlotType != 0x1) {
-        DEBUG ((EFI_D_INFO, "The slot at 0x%x is not embedded slot type\n", MmioBase[Index]));
+        DEBUG ((DEBUG_INFO, "The slot at 0x%x is not embedded slot type\n", MmioBase[Index]));
         Status = EFI_UNSUPPORTED;
         continue;
       }
@@ -750,10 +759,12 @@ InitializeEmmcBlockIoPeim (
       if (EFI_ERROR (Status)) {
         continue;
       }
+
       Status = EmmcPeimHcCardDetect (MmioBase[Index]);
       if (EFI_ERROR (Status)) {
         continue;
       }
+
       Status = EmmcPeimHcInitHost (MmioBase[Index]);
       if (EFI_ERROR (Status)) {
         continue;
@@ -773,12 +784,13 @@ InitializeEmmcBlockIoPeim (
 
       ExtCsd = &Slot->ExtCsd;
       if (ExtCsd->ExtCsdRev < 5) {
-        DEBUG ((EFI_D_ERROR, "The EMMC device version is too low, we don't support!!!\n"));
+        DEBUG ((DEBUG_ERROR, "The EMMC device version is too low, we don't support!!!\n"));
         Status = EFI_UNSUPPORTED;
         continue;
       }
+
       if ((ExtCsd->PartitioningSupport & BIT0) != BIT0) {
-        DEBUG ((EFI_D_ERROR, "The EMMC device doesn't support Partition Feature!!!\n"));
+        DEBUG ((DEBUG_ERROR, "The EMMC device doesn't support Partition Feature!!!\n"));
         Status = EFI_UNSUPPORTED;
         continue;
       }
@@ -786,7 +798,7 @@ InitializeEmmcBlockIoPeim (
       for (PartitionIndex = 0; PartitionIndex < EMMC_PEIM_MAX_PARTITIONS; PartitionIndex++) {
         switch (PartitionIndex) {
           case EmmcPartitionUserData:
-            SecCount = *(UINT32*)&ExtCsd->SecCount;
+            SecCount = *(UINT32 *)&ExtCsd->SecCount;
             Capacity = MultU64x32 ((UINT64)SecCount, 0x200);
             break;
           case EmmcPartitionBoot1:
@@ -798,19 +810,19 @@ InitializeEmmcBlockIoPeim (
             break;
           case EmmcPartitionGP1:
             GpSizeMult = (ExtCsd->GpSizeMult[0] | (ExtCsd->GpSizeMult[1] << 8) | (ExtCsd->GpSizeMult[2] << 16));
-            Capacity = MultU64x32 (MultU64x32 (MultU64x32 ((UINT64)GpSizeMult, ExtCsd->HcWpGrpSize), ExtCsd->HcEraseGrpSize), SIZE_512KB);
+            Capacity   = MultU64x32 (MultU64x32 (MultU64x32 ((UINT64)GpSizeMult, ExtCsd->HcWpGrpSize), ExtCsd->HcEraseGrpSize), SIZE_512KB);
             break;
           case EmmcPartitionGP2:
             GpSizeMult = (ExtCsd->GpSizeMult[3] | (ExtCsd->GpSizeMult[4] << 8) | (ExtCsd->GpSizeMult[5] << 16));
-            Capacity = MultU64x32 (MultU64x32 (MultU64x32 ((UINT64)GpSizeMult, ExtCsd->HcWpGrpSize), ExtCsd->HcEraseGrpSize), SIZE_512KB);
+            Capacity   = MultU64x32 (MultU64x32 (MultU64x32 ((UINT64)GpSizeMult, ExtCsd->HcWpGrpSize), ExtCsd->HcEraseGrpSize), SIZE_512KB);
             break;
           case EmmcPartitionGP3:
             GpSizeMult = (ExtCsd->GpSizeMult[6] | (ExtCsd->GpSizeMult[7] << 8) | (ExtCsd->GpSizeMult[8] << 16));
-            Capacity = MultU64x32 (MultU64x32 (MultU64x32 ((UINT64)GpSizeMult, ExtCsd->HcWpGrpSize), ExtCsd->HcEraseGrpSize), SIZE_512KB);
+            Capacity   = MultU64x32 (MultU64x32 (MultU64x32 ((UINT64)GpSizeMult, ExtCsd->HcWpGrpSize), ExtCsd->HcEraseGrpSize), SIZE_512KB);
             break;
           case EmmcPartitionGP4:
             GpSizeMult = (ExtCsd->GpSizeMult[9] | (ExtCsd->GpSizeMult[10] << 8) | (ExtCsd->GpSizeMult[11] << 16));
-            Capacity = MultU64x32 (MultU64x32 (MultU64x32 ((UINT64)GpSizeMult, ExtCsd->HcWpGrpSize), ExtCsd->HcEraseGrpSize), SIZE_512KB);
+            Capacity   = MultU64x32 (MultU64x32 (MultU64x32 ((UINT64)GpSizeMult, ExtCsd->HcWpGrpSize), ExtCsd->HcEraseGrpSize), SIZE_512KB);
             break;
           default:
             ASSERT (FALSE);
@@ -820,13 +832,15 @@ InitializeEmmcBlockIoPeim (
         MediaNum = Slot->MediaNum;
         if (Capacity != 0) {
           Slot->Media[MediaNum].LastBlock = DivU64x32 (Capacity, Slot->Media[MediaNum].BlockSize) - 1;
-          Slot->PartitionType[MediaNum] = PartitionIndex;
+          Slot->PartitionType[MediaNum]   = PartitionIndex;
           Private->TotalBlkIoDevices++;
           Slot->MediaNum++;
         }
       }
+
       Private->SlotNum++;
     }
+
     Controller++;
 
     if (!EFI_ERROR (Status)) {

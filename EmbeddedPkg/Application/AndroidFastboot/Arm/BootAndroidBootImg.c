@@ -18,12 +18,12 @@
 // Device Path representing an image in memory
 #pragma pack(1)
 typedef struct {
-  MEMMAP_DEVICE_PATH                      Node1;
-  EFI_DEVICE_PATH_PROTOCOL                End;
+  MEMMAP_DEVICE_PATH          Node1;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } MEMORY_DEVICE_PATH;
 #pragma pack()
 
-STATIC CONST MEMORY_DEVICE_PATH MemoryDevicePathTemplate =
+STATIC CONST MEMORY_DEVICE_PATH  MemoryDevicePathTemplate =
 {
   {
     {
@@ -44,7 +44,6 @@ STATIC CONST MEMORY_DEVICE_PATH MemoryDevicePathTemplate =
   } // End
 };
 
-
 /**
   Start an EFI Application from a Device Path
 
@@ -59,19 +58,25 @@ STATIC CONST MEMORY_DEVICE_PATH MemoryDevicePathTemplate =
 STATIC
 EFI_STATUS
 StartEfiApplication (
-  IN EFI_HANDLE                  ParentImageHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL    *DevicePath,
-  IN UINTN                       LoadOptionsSize,
-  IN VOID*                       LoadOptions
+  IN EFI_HANDLE                ParentImageHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN UINTN                     LoadOptionsSize,
+  IN VOID                      *LoadOptions
   )
 {
-  EFI_STATUS                   Status;
-  EFI_HANDLE                   ImageHandle;
-  EFI_LOADED_IMAGE_PROTOCOL*   LoadedImage;
+  EFI_STATUS                 Status;
+  EFI_HANDLE                 ImageHandle;
+  EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage;
 
   // Load the image from the device path with Boot Services function
-  Status = gBS->LoadImage (TRUE, ParentImageHandle, DevicePath, NULL, 0,
-                  &ImageHandle);
+  Status = gBS->LoadImage (
+                  TRUE,
+                  ParentImageHandle,
+                  DevicePath,
+                  NULL,
+                  0,
+                  &ImageHandle
+                  );
   if (EFI_ERROR (Status)) {
     //
     // With EFI_SECURITY_VIOLATION retval, the Image was loaded and an ImageHandle was created
@@ -82,19 +87,23 @@ StartEfiApplication (
     if (Status == EFI_SECURITY_VIOLATION) {
       gBS->UnloadImage (ImageHandle);
     }
+
     return Status;
   }
 
   // Passed LoadOptions to the EFI Application
   if (LoadOptionsSize != 0) {
-    Status = gBS->HandleProtocol (ImageHandle, &gEfiLoadedImageProtocolGuid,
-                    (VOID **) &LoadedImage);
+    Status = gBS->HandleProtocol (
+                    ImageHandle,
+                    &gEfiLoadedImageProtocolGuid,
+                    (VOID **)&LoadedImage
+                    );
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
-    LoadedImage->LoadOptionsSize  = LoadOptionsSize;
-    LoadedImage->LoadOptions      = LoadOptions;
+    LoadedImage->LoadOptionsSize = LoadOptionsSize;
+    LoadedImage->LoadOptions     = LoadOptions;
   }
 
   // Before calling the image, enable the Watchdog Timer for  the 5 Minute period
@@ -109,27 +118,27 @@ StartEfiApplication (
 
 EFI_STATUS
 BootAndroidBootImg (
-  IN UINTN    BufferSize,
-  IN VOID    *Buffer
+  IN UINTN  BufferSize,
+  IN VOID   *Buffer
   )
 {
-  EFI_STATUS                          Status;
-  CHAR8                               KernelArgs[ANDROID_BOOTIMG_KERNEL_ARGS_SIZE];
-  VOID                               *Kernel;
-  UINTN                               KernelSize;
-  VOID                               *Ramdisk;
-  UINTN                               RamdiskSize;
-  MEMORY_DEVICE_PATH                  KernelDevicePath;
-  CHAR16                              *LoadOptions, *NewLoadOptions;
+  EFI_STATUS          Status;
+  CHAR8               KernelArgs[ANDROID_BOOTIMG_KERNEL_ARGS_SIZE];
+  VOID                *Kernel;
+  UINTN               KernelSize;
+  VOID                *Ramdisk;
+  UINTN               RamdiskSize;
+  MEMORY_DEVICE_PATH  KernelDevicePath;
+  CHAR16              *LoadOptions, *NewLoadOptions;
 
   Status = ParseAndroidBootImg (
-            Buffer,
-            &Kernel,
-            &KernelSize,
-            &Ramdisk,
-            &RamdiskSize,
-            KernelArgs
-            );
+             Buffer,
+             &Kernel,
+             &KernelSize,
+             &Ramdisk,
+             &RamdiskSize,
+             KernelArgs
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -138,8 +147,8 @@ BootAndroidBootImg (
 
   // Have to cast to UINTN before casting to EFI_PHYSICAL_ADDRESS in order to
   // appease GCC.
-  KernelDevicePath.Node1.StartingAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) Kernel;
-  KernelDevicePath.Node1.EndingAddress   = (EFI_PHYSICAL_ADDRESS)(UINTN) Kernel + KernelSize;
+  KernelDevicePath.Node1.StartingAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)Kernel;
+  KernelDevicePath.Node1.EndingAddress   = (EFI_PHYSICAL_ADDRESS)(UINTN)Kernel + KernelSize;
 
   // Initialize Linux command line
   LoadOptions = CatSPrint (NULL, L"%a", KernelArgs);
@@ -148,28 +157,35 @@ BootAndroidBootImg (
   }
 
   if (RamdiskSize != 0) {
-    NewLoadOptions = CatSPrint (LoadOptions, L" initrd=0x%x,0x%x",
-                       (UINTN)Ramdisk, RamdiskSize);
+    NewLoadOptions = CatSPrint (
+                       LoadOptions,
+                       L" initrd=0x%x,0x%x",
+                       (UINTN)Ramdisk,
+                       RamdiskSize
+                       );
     FreePool (LoadOptions);
     if (NewLoadOptions == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     LoadOptions = NewLoadOptions;
   }
 
-  Status = StartEfiApplication (gImageHandle,
-             (EFI_DEVICE_PATH_PROTOCOL *) &KernelDevicePath,
+  Status = StartEfiApplication (
+             gImageHandle,
+             (EFI_DEVICE_PATH_PROTOCOL *)&KernelDevicePath,
              StrSize (LoadOptions),
-             LoadOptions);
+             LoadOptions
+             );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Couldn't Boot Linux: %d\n", Status));
+    DEBUG ((DEBUG_ERROR, "Couldn't Boot Linux: %d\n", Status));
     Status = EFI_DEVICE_ERROR;
     goto FreeLoadOptions;
   }
 
   // If we got here we do a confused face because BootLinuxFdt returned,
   // reporting success.
-  DEBUG ((EFI_D_ERROR, "WARNING: BdsBootLinuxFdt returned EFI_SUCCESS.\n"));
+  DEBUG ((DEBUG_ERROR, "WARNING: BdsBootLinuxFdt returned EFI_SUCCESS.\n"));
   return EFI_SUCCESS;
 
 FreeLoadOptions:

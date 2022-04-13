@@ -11,7 +11,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/PlatformFlashAccessLib.h>
 
-UINT64 mInternalFdAddress;
+UINT64  mInternalFdAddress;
 
 /**
   Perform flash write operation with progress indicator.  The start and end
@@ -51,7 +51,7 @@ PerformFlashWriteWithProgress (
   IN FLASH_ADDRESS_TYPE                             FlashAddressType,
   IN VOID                                           *Buffer,
   IN UINTN                                          Length,
-  IN EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress,        OPTIONAL
+  IN EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress         OPTIONAL,
   IN UINTN                                          StartPercentage,
   IN UINTN                                          EndPercentage
   )
@@ -59,7 +59,8 @@ PerformFlashWriteWithProgress (
   if (FlashAddressType == FlashAddressTypeRelativeAddress) {
     FlashAddress = FlashAddress + mInternalFdAddress;
   }
-  CopyMem((VOID *)(UINTN)(FlashAddress), Buffer, Length);
+
+  CopyMem ((VOID *)(UINTN)(FlashAddress), Buffer, Length);
   return EFI_SUCCESS;
 }
 
@@ -80,11 +81,11 @@ PerformFlashWriteWithProgress (
 EFI_STATUS
 EFIAPI
 PerformFlashWrite (
-  IN PLATFORM_FIRMWARE_TYPE       FirmwareType,
-  IN EFI_PHYSICAL_ADDRESS         FlashAddress,
-  IN FLASH_ADDRESS_TYPE           FlashAddressType,
-  IN VOID                         *Buffer,
-  IN UINTN                        Length
+  IN PLATFORM_FIRMWARE_TYPE  FirmwareType,
+  IN EFI_PHYSICAL_ADDRESS    FlashAddress,
+  IN FLASH_ADDRESS_TYPE      FlashAddressType,
+  IN VOID                    *Buffer,
+  IN UINTN                   Length
   )
 {
   return PerformFlashWriteWithProgress (
@@ -98,4 +99,3 @@ PerformFlashWrite (
            0
            );
 }
-

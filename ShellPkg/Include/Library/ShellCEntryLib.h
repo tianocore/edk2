@@ -26,9 +26,8 @@
 INTN
 EFIAPI
 ShellAppMain (
-  IN UINTN Argc,
-  IN CHAR16 **Argv
+  IN UINTN   Argc,
+  IN CHAR16  **Argv
   );
 
 #endif
-

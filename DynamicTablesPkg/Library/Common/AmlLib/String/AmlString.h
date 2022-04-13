@@ -42,9 +42,9 @@
 BOOLEAN
 EFIAPI
 AmlIsNameString (
-  IN  UINT32    Root,
-  IN  UINT32    ParentPrefix,
-  IN  UINT32    SegCount
+  IN  UINT32  Root,
+  IN  UINT32  ParentPrefix,
+  IN  UINT32  SegCount
   );
 
 /** Copy bytes from SrcBuffer to DstBuffer and convert to upper case.
@@ -63,10 +63,10 @@ AmlIsNameString (
 EFI_STATUS
 EFIAPI
 AmlUpperCaseMemCpyS (
-  OUT       CHAR8   * DstBuffer,
-  IN        UINT32    MaxDstBufferSize,
-  IN  CONST CHAR8   * SrcBuffer,
-  IN        UINT32    Count
+  OUT       CHAR8   *DstBuffer,
+  IN        UINT32  MaxDstBufferSize,
+  IN  CONST CHAR8   *SrcBuffer,
+  IN        UINT32  Count
   );
 
 /** Check whether Buffer is a root path ('\').
@@ -82,7 +82,7 @@ AmlUpperCaseMemCpyS (
 BOOLEAN
 EFIAPI
 AmlIsRootPath (
-  IN  CONST  CHAR8  * Buffer
+  IN  CONST  CHAR8  *Buffer
   );
 
 /** Check whether Ch is an ASL/AML LeadName.
@@ -103,7 +103,7 @@ AmlIsRootPath (
 BOOLEAN
 EFIAPI
 AmlIsLeadNameChar (
-  IN  CHAR8   Ch
+  IN  CHAR8  Ch
   );
 
 /** Check whether Ch is an ASL/AML NameChar.
@@ -145,8 +145,8 @@ AmlIsNameChar (
 BOOLEAN
 EFIAPI
 AslIsNameSeg (
-  IN  CONST  CHAR8    * AslBuffer,
-  OUT        UINT32   * Size
+  IN  CONST  CHAR8   *AslBuffer,
+  OUT        UINT32  *Size
   );
 
 /** Check whether AmlBuffer is an AML NameSeg.
@@ -162,7 +162,7 @@ AslIsNameSeg (
 BOOLEAN
 EFIAPI
 AmlIsNameSeg (
-  IN  CONST  CHAR8    * AmlBuffer
+  IN  CONST  CHAR8  *AmlBuffer
   );
 
 /** Parse an ASL NameString/path.
@@ -185,10 +185,10 @@ AmlIsNameSeg (
 EFI_STATUS
 EFIAPI
 AslParseNameStringInfo (
-  IN  CONST CHAR8     * Buffer,
-  OUT       UINT32    * Root,
-  OUT       UINT32    * ParentPrefix,
-  OUT       UINT32    * SegCount
+  IN  CONST CHAR8   *Buffer,
+  OUT       UINT32  *Root,
+  OUT       UINT32  *ParentPrefix,
+  OUT       UINT32  *SegCount
   );
 
 /** Parse an AML NameString/path.
@@ -212,10 +212,10 @@ AslParseNameStringInfo (
 EFI_STATUS
 EFIAPI
 AmlParseNameStringInfo (
-  IN  CONST CHAR8   * Buffer,
-  OUT       UINT32  * Root,
-  OUT       UINT32  * ParentPrefix,
-  OUT       UINT32  * SegCount
+  IN  CONST CHAR8   *Buffer,
+  OUT       UINT32  *Root,
+  OUT       UINT32  *ParentPrefix,
+  OUT       UINT32  *SegCount
   );
 
 /** Compute the ASL NameString/path size from NameString
@@ -233,9 +233,9 @@ AmlParseNameStringInfo (
 UINT32
 EFIAPI
 AslComputeNameStringSize (
-  IN  UINT32    Root,
-  IN  UINT32    ParentPrefix,
-  IN  UINT32    SegCount
+  IN  UINT32  Root,
+  IN  UINT32  ParentPrefix,
+  IN  UINT32  SegCount
   );
 
 /** Compute the AML NameString/path size from NameString
@@ -253,9 +253,9 @@ AslComputeNameStringSize (
 UINT32
 EFIAPI
 AmlComputeNameStringSize (
-  IN  UINT32    Root,
-  IN  UINT32    ParentPrefix,
-  IN  UINT32    SegCount
+  IN  UINT32  Root,
+  IN  UINT32  ParentPrefix,
+  IN  UINT32  SegCount
   );
 
 /** Get the ASL NameString/path size.
@@ -269,8 +269,8 @@ AmlComputeNameStringSize (
 EFI_STATUS
 EFIAPI
 AslGetNameStringSize (
-  IN  CONST CHAR8   * AslPath,
-  OUT       UINT32  * AslPathSizePtr
+  IN  CONST CHAR8   *AslPath,
+  OUT       UINT32  *AslPathSizePtr
   );
 
 /** Get the AML NameString/path size.
@@ -284,8 +284,8 @@ AslGetNameStringSize (
 EFI_STATUS
 EFIAPI
 AmlGetNameStringSize (
-  IN   CONST  CHAR8   * AmlPath,
-  OUT         UINT32  * AmlPathSizePtr
+  IN   CONST  CHAR8   *AmlPath,
+  OUT         UINT32  *AmlPathSizePtr
   );
 
 /** Convert an ASL NameString/path to an AML NameString/path.
@@ -302,8 +302,8 @@ AmlGetNameStringSize (
 EFI_STATUS
 EFIAPI
 ConvertAslNameToAmlName (
-  IN  CONST  CHAR8   * AslPath,
-  OUT        CHAR8  ** OutAmlPath
+  IN  CONST  CHAR8  *AslPath,
+  OUT        CHAR8  **OutAmlPath
   );
 
 /** Convert an AML NameString/path to an ASL NameString/path.
@@ -320,8 +320,8 @@ ConvertAslNameToAmlName (
 EFI_STATUS
 EFIAPI
 ConvertAmlNameToAslName (
-  IN  CONST CHAR8     * AmlPath,
-  OUT       CHAR8    ** OutAslPath
+  IN  CONST CHAR8  *AmlPath,
+  OUT       CHAR8  **OutAslPath
   );
 
 /** Compare two ASL NameStrings.
@@ -335,8 +335,8 @@ ConvertAmlNameToAslName (
 BOOLEAN
 EFIAPI
 AslCompareNameString (
-  IN  CONST CHAR8 *   AslName1,
-  IN  CONST CHAR8 *   AslName2
+  IN  CONST CHAR8  *AslName1,
+  IN  CONST CHAR8  *AslName2
   );
 
 /** Compare two AML NameStrings.
@@ -350,8 +350,8 @@ AslCompareNameString (
 BOOLEAN
 EFIAPI
 AmlCompareNameString (
-  IN  CONST CHAR8 *   AmlName1,
-  IN  CONST CHAR8 *   AmlName2
+  IN  CONST CHAR8  *AmlName1,
+  IN  CONST CHAR8  *AmlName2
   );
 
 /** Compare an AML NameString and an ASL NameString.
@@ -371,8 +371,8 @@ AmlCompareNameString (
 BOOLEAN
 EFIAPI
 CompareAmlWithAslNameString (
-  IN  CONST CHAR8 *   AmlName1,
-  IN  CONST CHAR8 *   AslName2
+  IN  CONST CHAR8  *AmlName1,
+  IN  CONST CHAR8  *AslName2
   );
 
 /** Given an AmlPath, return the address of the first NameSeg.
@@ -393,9 +393,9 @@ CONST
 CHAR8 *
 EFIAPI
 AmlGetFirstNameSeg (
-  IN  CONST  CHAR8    * AmlPath,
-  IN         UINT32     Root,
-  IN         UINT32     ParentPrefix
+  IN  CONST  CHAR8   *AmlPath,
+  IN         UINT32  Root,
+  IN         UINT32  ParentPrefix
   );
 
 #endif // AML_STRING_H_

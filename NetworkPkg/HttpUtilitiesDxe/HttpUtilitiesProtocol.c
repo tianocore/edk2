@@ -9,11 +9,10 @@
 
 #include "HttpUtilitiesDxe.h"
 
-EFI_HTTP_UTILITIES_PROTOCOL mHttpUtilitiesProtocol = {
+EFI_HTTP_UTILITIES_PROTOCOL  mHttpUtilitiesProtocol = {
   HttpUtilitiesBuild,
   HttpUtilitiesParse
 };
-
 
 /**
   Create HTTP header based on a combination of seed header, fields
@@ -50,28 +49,28 @@ EFI_HTTP_UTILITIES_PROTOCOL mHttpUtilitiesProtocol = {
 EFI_STATUS
 EFIAPI
 HttpUtilitiesBuild (
-  IN     EFI_HTTP_UTILITIES_PROTOCOL *This,
-  IN     UINTN                       SeedMessageSize,
-  IN     VOID                        *SeedMessage, OPTIONAL
-  IN     UINTN                       DeleteCount,
-  IN     CHAR8                       *DeleteList[], OPTIONAL
-  IN     UINTN                       AppendCount,
-  IN     EFI_HTTP_HEADER             *AppendList[], OPTIONAL
-     OUT UINTN                       *NewMessageSize,
-     OUT VOID                        **NewMessage
+  IN     EFI_HTTP_UTILITIES_PROTOCOL  *This,
+  IN     UINTN                        SeedMessageSize,
+  IN     VOID                         *SeedMessage  OPTIONAL,
+  IN     UINTN                        DeleteCount,
+  IN     CHAR8                        *DeleteList[]  OPTIONAL,
+  IN     UINTN                        AppendCount,
+  IN     EFI_HTTP_HEADER              *AppendList[]  OPTIONAL,
+  OUT UINTN                           *NewMessageSize,
+  OUT VOID                            **NewMessage
   )
 {
-  EFI_STATUS                Status;
-  EFI_HTTP_HEADER           *SeedHeaderFields;
-  UINTN                     SeedFieldCount;
-  UINTN                     Index;
-  EFI_HTTP_HEADER           *TempHeaderFields;
-  UINTN                     TempFieldCount;
-  EFI_HTTP_HEADER           *NewHeaderFields;
-  UINTN                     NewFieldCount;
-  EFI_HTTP_HEADER           *HttpHeader;
-  UINTN                     StrLength;
-  UINT8                     *NewMessagePtr;
+  EFI_STATUS       Status;
+  EFI_HTTP_HEADER  *SeedHeaderFields;
+  UINTN            SeedFieldCount;
+  UINTN            Index;
+  EFI_HTTP_HEADER  *TempHeaderFields;
+  UINTN            TempFieldCount;
+  EFI_HTTP_HEADER  *NewHeaderFields;
+  UINTN            NewFieldCount;
+  EFI_HTTP_HEADER  *HttpHeader;
+  UINTN            StrLength;
+  UINT8            *NewMessagePtr;
 
   SeedHeaderFields = NULL;
   SeedFieldCount   = 0;
@@ -80,11 +79,11 @@ HttpUtilitiesBuild (
   NewHeaderFields  = NULL;
   NewFieldCount    = 0;
 
-  HttpHeader       = NULL;
-  StrLength        = 0;
-  NewMessagePtr    = NULL;
-  *NewMessageSize  = 0;
-  Status           = EFI_SUCCESS;
+  HttpHeader      = NULL;
+  StrLength       = 0;
+  NewMessagePtr   = NULL;
+  *NewMessageSize = 0;
+  Status          = EFI_SUCCESS;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -106,8 +105,8 @@ HttpUtilitiesBuild (
   //
   // Handle DeleteList
   //
-  if (SeedFieldCount != 0 && DeleteCount != 0) {
-    TempHeaderFields = AllocateZeroPool (SeedFieldCount * sizeof(EFI_HTTP_HEADER));
+  if ((SeedFieldCount != 0) && (DeleteCount != 0)) {
+    TempHeaderFields = AllocateZeroPool (SeedFieldCount * sizeof (EFI_HTTP_HEADER));
     if (TempHeaderFields == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_EXIT;
@@ -117,7 +116,7 @@ HttpUtilitiesBuild (
       //
       // Check whether each SeedHeaderFields member is in DeleteList
       //
-      if (HttpIsValidHttpHeader( DeleteList, DeleteCount, SeedHeaderFields[Index].FieldName)) {
+      if (HttpIsValidHttpHeader (DeleteList, DeleteCount, SeedHeaderFields[Index].FieldName)) {
         Status = HttpSetFieldNameAndValue (
                    &TempHeaderFields[TempFieldCount],
                    SeedHeaderFields[Index].FieldName,
@@ -126,12 +125,13 @@ HttpUtilitiesBuild (
         if (EFI_ERROR (Status)) {
           goto ON_EXIT;
         }
+
         TempFieldCount++;
       }
     }
   } else {
     TempHeaderFields = SeedHeaderFields;
-    TempFieldCount = SeedFieldCount;
+    TempFieldCount   = SeedFieldCount;
   }
 
   //
@@ -176,6 +176,7 @@ HttpUtilitiesBuild (
       if (EFI_ERROR (Status)) {
         goto ON_EXIT;
       }
+
       NewFieldCount++;
     }
   }
@@ -186,19 +187,20 @@ HttpUtilitiesBuild (
   for (Index = 0; Index < NewFieldCount; Index++) {
     HttpHeader = &NewHeaderFields[Index];
 
-    StrLength = AsciiStrLen (HttpHeader->FieldName);
+    StrLength        = AsciiStrLen (HttpHeader->FieldName);
     *NewMessageSize += StrLength;
 
-    StrLength = sizeof(": ") - 1;
+    StrLength        = sizeof (": ") - 1;
     *NewMessageSize += StrLength;
 
-    StrLength = AsciiStrLen (HttpHeader->FieldValue);
+    StrLength        = AsciiStrLen (HttpHeader->FieldValue);
     *NewMessageSize += StrLength;
 
-    StrLength = sizeof("\r\n") - 1;
+    StrLength        = sizeof ("\r\n") - 1;
     *NewMessageSize += StrLength;
   }
-  StrLength = sizeof("\r\n") - 1;
+
+  StrLength        = sizeof ("\r\n") - 1;
   *NewMessageSize += StrLength;
 
   *NewMessage = AllocateZeroPool (*NewMessageSize);
@@ -216,7 +218,7 @@ HttpUtilitiesBuild (
     CopyMem (NewMessagePtr, HttpHeader->FieldName, StrLength);
     NewMessagePtr += StrLength;
 
-    StrLength = sizeof(": ") - 1;
+    StrLength = sizeof (": ") - 1;
     CopyMem (NewMessagePtr, ": ", StrLength);
     NewMessagePtr += StrLength;
 
@@ -224,11 +226,12 @@ HttpUtilitiesBuild (
     CopyMem (NewMessagePtr, HttpHeader->FieldValue, StrLength);
     NewMessagePtr += StrLength;
 
-    StrLength = sizeof("\r\n") - 1;
+    StrLength = sizeof ("\r\n") - 1;
     CopyMem (NewMessagePtr, "\r\n", StrLength);
     NewMessagePtr += StrLength;
   }
-  StrLength = sizeof("\r\n") - 1;
+
+  StrLength = sizeof ("\r\n") - 1;
   CopyMem (NewMessagePtr, "\r\n", StrLength);
   NewMessagePtr += StrLength;
 
@@ -239,20 +242,19 @@ HttpUtilitiesBuild (
   //
 ON_EXIT:
   if (SeedHeaderFields != NULL) {
-    HttpFreeHeaderFields(SeedHeaderFields, SeedFieldCount);
+    HttpFreeHeaderFields (SeedHeaderFields, SeedFieldCount);
   }
 
   if (TempHeaderFields != NULL) {
-    HttpFreeHeaderFields(TempHeaderFields, TempFieldCount);
+    HttpFreeHeaderFields (TempHeaderFields, TempFieldCount);
   }
 
   if (NewHeaderFields != NULL) {
-    HttpFreeHeaderFields(NewHeaderFields, NewFieldCount);
+    HttpFreeHeaderFields (NewHeaderFields, NewFieldCount);
   }
 
   return Status;
 }
-
 
 /**
   Parses HTTP header and produces an array of key/value pairs.
@@ -285,14 +287,14 @@ HttpUtilitiesParse (
   OUT UINTN                        *FieldCount
   )
 {
-  EFI_STATUS                Status;
-  CHAR8                     *TempHttpMessage;
-  CHAR8                     *Token;
-  CHAR8                     *NextToken;
-  CHAR8                     *FieldName;
-  CHAR8                     *FieldValue;
-  UINTN                     Index;
-  UINTN                     HttpBufferSize;
+  EFI_STATUS  Status;
+  CHAR8       *TempHttpMessage;
+  CHAR8       *Token;
+  CHAR8       *NextToken;
+  CHAR8       *FieldName;
+  CHAR8       *FieldValue;
+  UINTN       Index;
+  UINTN       HttpBufferSize;
 
   Status          = EFI_SUCCESS;
   TempHttpMessage = NULL;
@@ -302,14 +304,14 @@ HttpUtilitiesParse (
   FieldValue      = NULL;
   Index           = 0;
 
-  if (This == NULL || HttpMessage == NULL || HeaderFields == NULL || FieldCount == NULL) {
+  if ((This == NULL) || (HttpMessage == NULL) || (HeaderFields == NULL) || (FieldCount == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
   // Append the http response string along with a Null-terminator.
   //
-  HttpBufferSize = HttpMessageSize + 1;
+  HttpBufferSize  = HttpMessageSize + 1;
   TempHttpMessage = AllocatePool (HttpBufferSize);
   if (TempHttpMessage == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -322,13 +324,13 @@ HttpUtilitiesParse (
   // Get header number
   //
   *FieldCount = 0;
-  Token = TempHttpMessage;
+  Token       = TempHttpMessage;
   while (TRUE) {
-    FieldName     = NULL;
-    FieldValue    = NULL;
-    NextToken = HttpGetFieldNameAndValue (Token, &FieldName, &FieldValue);
-    Token     = NextToken;
-    if (FieldName == NULL || FieldValue == NULL) {
+    FieldName  = NULL;
+    FieldValue = NULL;
+    NextToken  = HttpGetFieldNameAndValue (Token, &FieldName, &FieldValue);
+    Token      = NextToken;
+    if ((FieldName == NULL) || (FieldValue == NULL)) {
       break;
     }
 
@@ -343,10 +345,10 @@ HttpUtilitiesParse (
   //
   // Allocate buffer for header
   //
-  *HeaderFields = AllocateZeroPool ((*FieldCount) * sizeof(EFI_HTTP_HEADER));
+  *HeaderFields = AllocateZeroPool ((*FieldCount) * sizeof (EFI_HTTP_HEADER));
   if (*HeaderFields == NULL) {
     *FieldCount = 0;
-    Status = EFI_OUT_OF_RESOURCES;
+    Status      = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
 
@@ -357,11 +359,11 @@ HttpUtilitiesParse (
   //
   Token = TempHttpMessage;
   while (Index < *FieldCount) {
-    FieldName     = NULL;
-    FieldValue    = NULL;
-    NextToken = HttpGetFieldNameAndValue (Token, &FieldName, &FieldValue);
-    Token     = NextToken;
-    if (FieldName == NULL || FieldValue == NULL) {
+    FieldName  = NULL;
+    FieldValue = NULL;
+    NextToken  = HttpGetFieldNameAndValue (Token, &FieldName, &FieldValue);
+    Token      = NextToken;
+    if ((FieldName == NULL) || (FieldValue == NULL)) {
       break;
     }
 

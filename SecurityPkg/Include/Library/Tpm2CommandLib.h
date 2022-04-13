@@ -1,7 +1,7 @@
 /** @file
   This library is used by other modules to send TPM2 command.
 
-Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2021, Intel Corporation. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -26,8 +26,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 Tpm2HashSequenceStart (
-  IN TPMI_ALG_HASH   HashAlg,
-  OUT TPMI_DH_OBJECT *SequenceHandle
+  IN TPMI_ALG_HASH    HashAlg,
+  OUT TPMI_DH_OBJECT  *SequenceHandle
   );
 
 /**
@@ -44,8 +44,8 @@ Tpm2HashSequenceStart (
 EFI_STATUS
 EFIAPI
 Tpm2SequenceUpdate (
-  IN TPMI_DH_OBJECT   SequenceHandle,
-  IN TPM2B_MAX_BUFFER *Buffer
+  IN TPMI_DH_OBJECT    SequenceHandle,
+  IN TPM2B_MAX_BUFFER  *Buffer
   );
 
 /**
@@ -65,10 +65,10 @@ Tpm2SequenceUpdate (
 EFI_STATUS
 EFIAPI
 Tpm2EventSequenceComplete (
-  IN TPMI_DH_PCR         PcrHandle,
-  IN TPMI_DH_OBJECT      SequenceHandle,
-  IN TPM2B_MAX_BUFFER    *Buffer,
-  OUT TPML_DIGEST_VALUES *Results
+  IN TPMI_DH_PCR          PcrHandle,
+  IN TPMI_DH_OBJECT       SequenceHandle,
+  IN TPM2B_MAX_BUFFER     *Buffer,
+  OUT TPML_DIGEST_VALUES  *Results
   );
 
 /**
@@ -84,9 +84,9 @@ Tpm2EventSequenceComplete (
 EFI_STATUS
 EFIAPI
 Tpm2SequenceComplete (
-  IN TPMI_DH_OBJECT      SequenceHandle,
-  IN TPM2B_MAX_BUFFER    *Buffer,
-  OUT TPM2B_DIGEST       *Result
+  IN TPMI_DH_OBJECT    SequenceHandle,
+  IN TPM2B_MAX_BUFFER  *Buffer,
+  OUT TPM2B_DIGEST     *Result
   );
 
 /**
@@ -100,7 +100,7 @@ Tpm2SequenceComplete (
 EFI_STATUS
 EFIAPI
 Tpm2Startup (
-  IN      TPM_SU             StartupType
+  IN      TPM_SU  StartupType
   );
 
 /**
@@ -114,7 +114,7 @@ Tpm2Startup (
 EFI_STATUS
 EFIAPI
 Tpm2Shutdown (
-  IN      TPM_SU             ShutdownType
+  IN      TPM_SU  ShutdownType
   );
 
 /**
@@ -131,7 +131,7 @@ Tpm2Shutdown (
 EFI_STATUS
 EFIAPI
 Tpm2SelfTest (
-  IN TPMI_YES_NO          FullTest
+  IN TPMI_YES_NO  FullTest
   );
 
 /**
@@ -149,10 +149,10 @@ Tpm2SelfTest (
 EFI_STATUS
 EFIAPI
 Tpm2SetPrimaryPolicy (
-  IN  TPMI_RH_HIERARCHY_AUTH    AuthHandle,
-  IN  TPMS_AUTH_COMMAND         *AuthSession,
-  IN  TPM2B_DIGEST              *AuthPolicy,
-  IN  TPMI_ALG_HASH             HashAlg
+  IN  TPMI_RH_HIERARCHY_AUTH  AuthHandle,
+  IN  TPMS_AUTH_COMMAND       *AuthSession,
+  IN  TPM2B_DIGEST            *AuthPolicy,
+  IN  TPMI_ALG_HASH           HashAlg
   );
 
 /**
@@ -167,8 +167,8 @@ Tpm2SetPrimaryPolicy (
 EFI_STATUS
 EFIAPI
 Tpm2Clear (
-  IN TPMI_RH_CLEAR             AuthHandle,
-  IN TPMS_AUTH_COMMAND         *AuthSession OPTIONAL
+  IN TPMI_RH_CLEAR      AuthHandle,
+  IN TPMS_AUTH_COMMAND  *AuthSession OPTIONAL
   );
 
 /**
@@ -185,9 +185,9 @@ Tpm2Clear (
 EFI_STATUS
 EFIAPI
 Tpm2ClearControl (
-  IN TPMI_RH_CLEAR             AuthHandle,
-  IN TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
-  IN TPMI_YES_NO               Disable
+  IN TPMI_RH_CLEAR      AuthHandle,
+  IN TPMS_AUTH_COMMAND  *AuthSession  OPTIONAL,
+  IN TPMI_YES_NO        Disable
   );
 
 /**
@@ -204,9 +204,9 @@ Tpm2ClearControl (
 EFI_STATUS
 EFIAPI
 Tpm2HierarchyChangeAuth (
-  IN TPMI_RH_HIERARCHY_AUTH    AuthHandle,
-  IN TPMS_AUTH_COMMAND         *AuthSession,
-  IN TPM2B_AUTH                *NewAuth
+  IN TPMI_RH_HIERARCHY_AUTH  AuthHandle,
+  IN TPMS_AUTH_COMMAND       *AuthSession,
+  IN TPM2B_AUTH              *NewAuth
   );
 
 /**
@@ -222,8 +222,8 @@ Tpm2HierarchyChangeAuth (
 EFI_STATUS
 EFIAPI
 Tpm2ChangeEPS (
-  IN TPMI_RH_PLATFORM          AuthHandle,
-  IN TPMS_AUTH_COMMAND         *AuthSession
+  IN TPMI_RH_PLATFORM   AuthHandle,
+  IN TPMS_AUTH_COMMAND  *AuthSession
   );
 
 /**
@@ -239,8 +239,8 @@ Tpm2ChangeEPS (
 EFI_STATUS
 EFIAPI
 Tpm2ChangePPS (
-  IN TPMI_RH_PLATFORM          AuthHandle,
-  IN TPMS_AUTH_COMMAND         *AuthSession
+  IN TPMI_RH_PLATFORM   AuthHandle,
+  IN TPMS_AUTH_COMMAND  *AuthSession
   );
 
 /**
@@ -258,10 +258,10 @@ Tpm2ChangePPS (
 EFI_STATUS
 EFIAPI
 Tpm2HierarchyControl (
-  IN TPMI_RH_HIERARCHY         AuthHandle,
-  IN TPMS_AUTH_COMMAND         *AuthSession,
-  IN TPMI_RH_HIERARCHY         Hierarchy,
-  IN TPMI_YES_NO               State
+  IN TPMI_RH_HIERARCHY  AuthHandle,
+  IN TPMS_AUTH_COMMAND  *AuthSession,
+  IN TPMI_RH_HIERARCHY  Hierarchy,
+  IN TPMI_YES_NO        State
   );
 
 /**
@@ -277,8 +277,8 @@ Tpm2HierarchyControl (
 EFI_STATUS
 EFIAPI
 Tpm2DictionaryAttackLockReset (
-  IN  TPMI_RH_LOCKOUT           LockHandle,
-  IN  TPMS_AUTH_COMMAND         *AuthSession
+  IN  TPMI_RH_LOCKOUT    LockHandle,
+  IN  TPMS_AUTH_COMMAND  *AuthSession
   );
 
 /**
@@ -297,11 +297,11 @@ Tpm2DictionaryAttackLockReset (
 EFI_STATUS
 EFIAPI
 Tpm2DictionaryAttackParameters (
-  IN  TPMI_RH_LOCKOUT           LockHandle,
-  IN  TPMS_AUTH_COMMAND         *AuthSession,
-  IN  UINT32                    NewMaxTries,
-  IN  UINT32                    NewRecoveryTime,
-  IN  UINT32                    LockoutRecovery
+  IN  TPMI_RH_LOCKOUT    LockHandle,
+  IN  TPMS_AUTH_COMMAND  *AuthSession,
+  IN  UINT32             NewMaxTries,
+  IN  UINT32             NewRecoveryTime,
+  IN  UINT32             LockoutRecovery
   );
 
 /**
@@ -317,9 +317,9 @@ Tpm2DictionaryAttackParameters (
 EFI_STATUS
 EFIAPI
 Tpm2NvReadPublic (
-  IN      TPMI_RH_NV_INDEX          NvIndex,
-  OUT     TPM2B_NV_PUBLIC           *NvPublic,
-  OUT     TPM2B_NAME                *NvName
+  IN      TPMI_RH_NV_INDEX  NvIndex,
+  OUT     TPM2B_NV_PUBLIC   *NvPublic,
+  OUT     TPM2B_NAME        *NvName
   );
 
 /**
@@ -339,10 +339,10 @@ Tpm2NvReadPublic (
 EFI_STATUS
 EFIAPI
 Tpm2NvDefineSpace (
-  IN      TPMI_RH_PROVISION         AuthHandle,
-  IN      TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
-  IN      TPM2B_AUTH                *Auth,
-  IN      TPM2B_NV_PUBLIC           *NvPublic
+  IN      TPMI_RH_PROVISION  AuthHandle,
+  IN      TPMS_AUTH_COMMAND  *AuthSession  OPTIONAL,
+  IN      TPM2B_AUTH         *Auth,
+  IN      TPM2B_NV_PUBLIC    *NvPublic
   );
 
 /**
@@ -359,9 +359,9 @@ Tpm2NvDefineSpace (
 EFI_STATUS
 EFIAPI
 Tpm2NvUndefineSpace (
-  IN      TPMI_RH_PROVISION         AuthHandle,
-  IN      TPMI_RH_NV_INDEX          NvIndex,
-  IN      TPMS_AUTH_COMMAND         *AuthSession OPTIONAL
+  IN      TPMI_RH_PROVISION  AuthHandle,
+  IN      TPMI_RH_NV_INDEX   NvIndex,
+  IN      TPMS_AUTH_COMMAND  *AuthSession OPTIONAL
   );
 
 /**
@@ -381,12 +381,12 @@ Tpm2NvUndefineSpace (
 EFI_STATUS
 EFIAPI
 Tpm2NvRead (
-  IN      TPMI_RH_NV_AUTH           AuthHandle,
-  IN      TPMI_RH_NV_INDEX          NvIndex,
-  IN      TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
-  IN      UINT16                    Size,
-  IN      UINT16                    Offset,
-  IN OUT  TPM2B_MAX_BUFFER          *OutData
+  IN      TPMI_RH_NV_AUTH    AuthHandle,
+  IN      TPMI_RH_NV_INDEX   NvIndex,
+  IN      TPMS_AUTH_COMMAND  *AuthSession  OPTIONAL,
+  IN      UINT16             Size,
+  IN      UINT16             Offset,
+  IN OUT  TPM2B_MAX_BUFFER   *OutData
   );
 
 /**
@@ -405,11 +405,11 @@ Tpm2NvRead (
 EFI_STATUS
 EFIAPI
 Tpm2NvWrite (
-  IN      TPMI_RH_NV_AUTH           AuthHandle,
-  IN      TPMI_RH_NV_INDEX          NvIndex,
-  IN      TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
-  IN      TPM2B_MAX_BUFFER          *InData,
-  IN      UINT16                    Offset
+  IN      TPMI_RH_NV_AUTH    AuthHandle,
+  IN      TPMI_RH_NV_INDEX   NvIndex,
+  IN      TPMS_AUTH_COMMAND  *AuthSession  OPTIONAL,
+  IN      TPM2B_MAX_BUFFER   *InData,
+  IN      UINT16             Offset
   );
 
 /**
@@ -426,9 +426,9 @@ Tpm2NvWrite (
 EFI_STATUS
 EFIAPI
 Tpm2NvReadLock (
-  IN      TPMI_RH_NV_AUTH           AuthHandle,
-  IN      TPMI_RH_NV_INDEX          NvIndex,
-  IN      TPMS_AUTH_COMMAND         *AuthSession OPTIONAL
+  IN      TPMI_RH_NV_AUTH    AuthHandle,
+  IN      TPMI_RH_NV_INDEX   NvIndex,
+  IN      TPMS_AUTH_COMMAND  *AuthSession OPTIONAL
   );
 
 /**
@@ -445,9 +445,9 @@ Tpm2NvReadLock (
 EFI_STATUS
 EFIAPI
 Tpm2NvWriteLock (
-  IN      TPMI_RH_NV_AUTH           AuthHandle,
-  IN      TPMI_RH_NV_INDEX          NvIndex,
-  IN      TPMS_AUTH_COMMAND         *AuthSession OPTIONAL
+  IN      TPMI_RH_NV_AUTH    AuthHandle,
+  IN      TPMI_RH_NV_INDEX   NvIndex,
+  IN      TPMS_AUTH_COMMAND  *AuthSession OPTIONAL
   );
 
 /**
@@ -463,8 +463,8 @@ Tpm2NvWriteLock (
 EFI_STATUS
 EFIAPI
 Tpm2NvGlobalWriteLock (
-  IN      TPMI_RH_PROVISION         AuthHandle,
-  IN      TPMS_AUTH_COMMAND         *AuthSession OPTIONAL
+  IN      TPMI_RH_PROVISION  AuthHandle,
+  IN      TPMS_AUTH_COMMAND  *AuthSession OPTIONAL
   );
 
 /**
@@ -481,8 +481,8 @@ Tpm2NvGlobalWriteLock (
 EFI_STATUS
 EFIAPI
 Tpm2PcrExtend (
-  IN      TPMI_DH_PCR               PcrHandle,
-  IN      TPML_DIGEST_VALUES        *Digests
+  IN      TPMI_DH_PCR         PcrHandle,
+  IN      TPML_DIGEST_VALUES  *Digests
   );
 
 /**
@@ -503,9 +503,9 @@ Tpm2PcrExtend (
 EFI_STATUS
 EFIAPI
 Tpm2PcrEvent (
-  IN      TPMI_DH_PCR               PcrHandle,
-  IN      TPM2B_EVENT               *EventData,
-     OUT  TPML_DIGEST_VALUES        *Digests
+  IN      TPMI_DH_PCR         PcrHandle,
+  IN      TPM2B_EVENT         *EventData,
+  OUT     TPML_DIGEST_VALUES  *Digests
   );
 
 /**
@@ -522,10 +522,10 @@ Tpm2PcrEvent (
 EFI_STATUS
 EFIAPI
 Tpm2PcrRead (
-  IN      TPML_PCR_SELECTION        *PcrSelectionIn,
-     OUT  UINT32                    *PcrUpdateCounter,
-     OUT  TPML_PCR_SELECTION        *PcrSelectionOut,
-     OUT  TPML_DIGEST               *PcrValues
+  IN   TPML_PCR_SELECTION  *PcrSelectionIn,
+  OUT  UINT32              *PcrUpdateCounter,
+  OUT  TPML_PCR_SELECTION  *PcrSelectionOut,
+  OUT  TPML_DIGEST         *PcrValues
   );
 
 /**
@@ -545,13 +545,13 @@ Tpm2PcrRead (
 EFI_STATUS
 EFIAPI
 Tpm2PcrAllocate (
-  IN  TPMI_RH_PLATFORM          AuthHandle,
-  IN  TPMS_AUTH_COMMAND         *AuthSession,
-  IN  TPML_PCR_SELECTION        *PcrAllocation,
-  OUT TPMI_YES_NO               *AllocationSuccess,
-  OUT UINT32                    *MaxPCR,
-  OUT UINT32                    *SizeNeeded,
-  OUT UINT32                    *SizeAvailable
+  IN  TPMI_RH_PLATFORM    AuthHandle,
+  IN  TPMS_AUTH_COMMAND   *AuthSession,
+  IN  TPML_PCR_SELECTION  *PcrAllocation,
+  OUT TPMI_YES_NO         *AllocationSuccess,
+  OUT UINT32              *MaxPCR,
+  OUT UINT32              *SizeNeeded,
+  OUT UINT32              *SizeAvailable
   );
 
 /**
@@ -566,9 +566,9 @@ Tpm2PcrAllocate (
 EFI_STATUS
 EFIAPI
 Tpm2PcrAllocateBanks (
-  IN TPM2B_AUTH                *PlatformAuth,  OPTIONAL
-  IN UINT32                    SupportedPCRBanks,
-  IN UINT32                    PCRBanks
+  IN TPM2B_AUTH  *PlatformAuth   OPTIONAL,
+  IN UINT32      SupportedPCRBanks,
+  IN UINT32      PCRBanks
   );
 
 /**
@@ -599,11 +599,11 @@ Tpm2PcrAllocateBanks (
 EFI_STATUS
 EFIAPI
 Tpm2GetCapability (
-  IN      TPM_CAP                   Capability,
-  IN      UINT32                    Property,
-  IN      UINT32                    PropertyCount,
-  OUT     TPMI_YES_NO               *MoreData,
-  OUT     TPMS_CAPABILITY_DATA      *CapabilityData
+  IN      TPM_CAP               Capability,
+  IN      UINT32                Property,
+  IN      UINT32                PropertyCount,
+  OUT     TPMI_YES_NO           *MoreData,
+  OUT     TPMS_CAPABILITY_DATA  *CapabilityData
   );
 
 /**
@@ -619,7 +619,7 @@ Tpm2GetCapability (
 EFI_STATUS
 EFIAPI
 Tpm2GetCapabilityFamily (
-  OUT     CHAR8                     *Family
+  OUT     CHAR8  *Family
   );
 
 /**
@@ -635,7 +635,7 @@ Tpm2GetCapabilityFamily (
 EFI_STATUS
 EFIAPI
 Tpm2GetCapabilityManufactureID (
-  OUT     UINT32                    *ManufactureId
+  OUT     UINT32  *ManufactureId
   );
 
 /**
@@ -652,8 +652,8 @@ Tpm2GetCapabilityManufactureID (
 EFI_STATUS
 EFIAPI
 Tpm2GetCapabilityFirmwareVersion (
-  OUT     UINT32                    *FirmwareVersion1,
-  OUT     UINT32                    *FirmwareVersion2
+  OUT     UINT32  *FirmwareVersion1,
+  OUT     UINT32  *FirmwareVersion2
   );
 
 /**
@@ -670,8 +670,8 @@ Tpm2GetCapabilityFirmwareVersion (
 EFI_STATUS
 EFIAPI
 Tpm2GetCapabilityMaxCommandResponseSize (
-  OUT UINT32                    *MaxCommandSize,
-  OUT UINT32                    *MaxResponseSize
+  OUT UINT32  *MaxCommandSize,
+  OUT UINT32  *MaxResponseSize
   );
 
 /**
@@ -688,7 +688,7 @@ Tpm2GetCapabilityMaxCommandResponseSize (
 EFI_STATUS
 EFIAPI
 Tpm2GetCapabilitySupportedAlg (
-  OUT TPML_ALG_PROPERTY      *AlgList
+  OUT TPML_ALG_PROPERTY  *AlgList
   );
 
 /**
@@ -704,7 +704,7 @@ Tpm2GetCapabilitySupportedAlg (
 EFI_STATUS
 EFIAPI
 Tpm2GetCapabilityLockoutCounter (
-  OUT     UINT32                    *LockoutCounter
+  OUT     UINT32  *LockoutCounter
   );
 
 /**
@@ -720,7 +720,7 @@ Tpm2GetCapabilityLockoutCounter (
 EFI_STATUS
 EFIAPI
 Tpm2GetCapabilityLockoutInterval (
-  OUT     UINT32                    *LockoutInterval
+  OUT     UINT32  *LockoutInterval
   );
 
 /**
@@ -737,7 +737,7 @@ Tpm2GetCapabilityLockoutInterval (
 EFI_STATUS
 EFIAPI
 Tpm2GetCapabilityInputBufferSize (
-  OUT     UINT32                    *InputBufferSize
+  OUT     UINT32  *InputBufferSize
   );
 
 /**
@@ -753,7 +753,7 @@ Tpm2GetCapabilityInputBufferSize (
 EFI_STATUS
 EFIAPI
 Tpm2GetCapabilityPcrs (
-  OUT TPML_PCR_SELECTION      *Pcrs
+  OUT TPML_PCR_SELECTION  *Pcrs
   );
 
 /**
@@ -769,9 +769,9 @@ Tpm2GetCapabilityPcrs (
 **/
 EFI_STATUS
 EFIAPI
-Tpm2GetCapabilitySupportedAndActivePcrs(
-  OUT UINT32                            *TpmHashAlgorithmBitmap,
-  OUT UINT32                            *ActivePcrBanks
+Tpm2GetCapabilitySupportedAndActivePcrs (
+  OUT UINT32  *TpmHashAlgorithmBitmap,
+  OUT UINT32  *ActivePcrBanks
   );
 
 /**
@@ -787,7 +787,7 @@ Tpm2GetCapabilitySupportedAndActivePcrs(
 EFI_STATUS
 EFIAPI
 Tpm2GetCapabilityAlgorithmSet (
-  OUT     UINT32      *AlgorithmSet
+  OUT     UINT32  *AlgorithmSet
   );
 
 /**
@@ -802,8 +802,8 @@ Tpm2GetCapabilityAlgorithmSet (
 EFI_STATUS
 EFIAPI
 Tpm2GetCapabilityIsCommandImplemented (
-  IN      TPM_CC      Command,
-  OUT     BOOLEAN     *IsCmdImpl
+  IN      TPM_CC   Command,
+  OUT     BOOLEAN  *IsCmdImpl
   );
 
 /**
@@ -817,7 +817,7 @@ Tpm2GetCapabilityIsCommandImplemented (
 EFI_STATUS
 EFIAPI
 Tpm2TestParms (
-  IN  TPMT_PUBLIC_PARMS           *Parameters
+  IN  TPMT_PUBLIC_PARMS  *Parameters
   );
 
 /**
@@ -835,9 +835,9 @@ Tpm2TestParms (
 EFI_STATUS
 EFIAPI
 Tpm2SetAlgorithmSet (
-  IN  TPMI_RH_PLATFORM          AuthHandle,
-  IN  TPMS_AUTH_COMMAND         *AuthSession,
-  IN  UINT32                    AlgorithmSet
+  IN  TPMI_RH_PLATFORM   AuthHandle,
+  IN  TPMS_AUTH_COMMAND  *AuthSession,
+  IN  UINT32             AlgorithmSet
   );
 
 /**
@@ -860,15 +860,15 @@ Tpm2SetAlgorithmSet (
 EFI_STATUS
 EFIAPI
 Tpm2StartAuthSession (
-  IN      TPMI_DH_OBJECT            TpmKey,
-  IN      TPMI_DH_ENTITY            Bind,
-  IN      TPM2B_NONCE               *NonceCaller,
-  IN      TPM2B_ENCRYPTED_SECRET    *Salt,
-  IN      TPM_SE                    SessionType,
-  IN      TPMT_SYM_DEF              *Symmetric,
-  IN      TPMI_ALG_HASH             AuthHash,
-     OUT  TPMI_SH_AUTH_SESSION      *SessionHandle,
-     OUT  TPM2B_NONCE               *NonceTPM
+  IN      TPMI_DH_OBJECT          TpmKey,
+  IN      TPMI_DH_ENTITY          Bind,
+  IN      TPM2B_NONCE             *NonceCaller,
+  IN      TPM2B_ENCRYPTED_SECRET  *Salt,
+  IN      TPM_SE                  SessionType,
+  IN      TPMT_SYM_DEF            *Symmetric,
+  IN      TPMI_ALG_HASH           AuthHash,
+  OUT  TPMI_SH_AUTH_SESSION       *SessionHandle,
+  OUT  TPM2B_NONCE                *NonceTPM
   );
 
 /**
@@ -882,7 +882,7 @@ Tpm2StartAuthSession (
 EFI_STATUS
 EFIAPI
 Tpm2FlushContext (
-  IN      TPMI_DH_CONTEXT           FlushHandle
+  IN      TPMI_DH_CONTEXT  FlushHandle
   );
 
 /**
@@ -906,15 +906,15 @@ Tpm2FlushContext (
 EFI_STATUS
 EFIAPI
 Tpm2PolicySecret (
-  IN      TPMI_DH_ENTITY            AuthHandle,
-  IN      TPMI_SH_POLICY            PolicySession,
-  IN      TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
-  IN      TPM2B_NONCE               *NonceTPM,
-  IN      TPM2B_DIGEST              *CpHashA,
-  IN      TPM2B_NONCE               *PolicyRef,
-  IN      INT32                     Expiration,
-  OUT     TPM2B_TIMEOUT             *Timeout,
-  OUT     TPMT_TK_AUTH              *PolicyTicket
+  IN      TPMI_DH_ENTITY     AuthHandle,
+  IN      TPMI_SH_POLICY     PolicySession,
+  IN      TPMS_AUTH_COMMAND  *AuthSession  OPTIONAL,
+  IN      TPM2B_NONCE        *NonceTPM,
+  IN      TPM2B_DIGEST       *CpHashA,
+  IN      TPM2B_NONCE        *PolicyRef,
+  IN      INT32              Expiration,
+  OUT     TPM2B_TIMEOUT      *Timeout,
+  OUT     TPMT_TK_AUTH       *PolicyTicket
   );
 
 /**
@@ -932,8 +932,8 @@ Tpm2PolicySecret (
 EFI_STATUS
 EFIAPI
 Tpm2PolicyOR (
-  IN TPMI_SH_POLICY           PolicySession,
-  IN TPML_DIGEST              *HashList
+  IN TPMI_SH_POLICY  PolicySession,
+  IN TPML_DIGEST     *HashList
   );
 
 /**
@@ -948,8 +948,8 @@ Tpm2PolicyOR (
 EFI_STATUS
 EFIAPI
 Tpm2PolicyCommandCode (
-  IN      TPMI_SH_POLICY            PolicySession,
-  IN      TPM_CC                    Code
+  IN      TPMI_SH_POLICY  PolicySession,
+  IN      TPM_CC          Code
   );
 
 /**
@@ -965,8 +965,8 @@ Tpm2PolicyCommandCode (
 EFI_STATUS
 EFIAPI
 Tpm2PolicyGetDigest (
-  IN      TPMI_SH_POLICY            PolicySession,
-     OUT  TPM2B_DIGEST              *PolicyHash
+  IN      TPMI_SH_POLICY  PolicySession,
+  OUT  TPM2B_DIGEST       *PolicyHash
   );
 
 /**
@@ -983,10 +983,10 @@ Tpm2PolicyGetDigest (
 EFI_STATUS
 EFIAPI
 Tpm2ReadPublic (
-  IN  TPMI_DH_OBJECT            ObjectHandle,
-  OUT TPM2B_PUBLIC              *OutPublic,
-  OUT TPM2B_NAME                *Name,
-  OUT TPM2B_NAME                *QualifiedName
+  IN  TPMI_DH_OBJECT  ObjectHandle,
+  OUT TPM2B_PUBLIC    *OutPublic,
+  OUT TPM2B_NAME      *Name,
+  OUT TPM2B_NAME      *QualifiedName
   );
 
 //
@@ -1004,8 +1004,8 @@ Tpm2ReadPublic (
 UINT32
 EFIAPI
 CopyAuthSessionCommand (
-  IN      TPMS_AUTH_COMMAND         *AuthSessionIn, OPTIONAL
-  OUT     UINT8                     *AuthSessionOut
+  IN      TPMS_AUTH_COMMAND  *AuthSessionIn  OPTIONAL,
+  OUT     UINT8              *AuthSessionOut
   );
 
 /**
@@ -1019,8 +1019,8 @@ CopyAuthSessionCommand (
 UINT32
 EFIAPI
 CopyAuthSessionResponse (
-  IN      UINT8                      *AuthSessionIn,
-  OUT     TPMS_AUTH_RESPONSE         *AuthSessionOut OPTIONAL
+  IN      UINT8               *AuthSessionIn,
+  OUT     TPMS_AUTH_RESPONSE  *AuthSessionOut OPTIONAL
   );
 
 /**
@@ -1033,7 +1033,7 @@ CopyAuthSessionResponse (
 UINT16
 EFIAPI
 GetHashSizeFromAlgo (
-  IN TPMI_ALG_HASH    HashAlgo
+  IN TPMI_ALG_HASH  HashAlgo
   );
 
 /**
@@ -1046,7 +1046,7 @@ GetHashSizeFromAlgo (
 UINT32
 EFIAPI
 GetHashMaskFromAlgo (
-  IN TPMI_ALG_HASH     HashAlgo
+  IN TPMI_ALG_HASH  HashAlgo
   );
 
 /**
@@ -1060,7 +1060,7 @@ GetHashMaskFromAlgo (
 **/
 BOOLEAN
 EFIAPI
-IsHashAlgSupportedInHashAlgorithmMask(
+IsHashAlgSupportedInHashAlgorithmMask (
   IN TPMI_ALG_HASH  HashAlg,
   IN UINT32         HashAlgorithmMask
   );
@@ -1076,10 +1076,10 @@ IsHashAlgSupportedInHashAlgorithmMask(
 **/
 VOID *
 EFIAPI
-CopyDigestListToBuffer(
-  IN OUT VOID                       *Buffer,
-  IN TPML_DIGEST_VALUES             *DigestList,
-  IN UINT32                         HashAlgorithmMask
+CopyDigestListToBuffer (
+  IN OUT VOID            *Buffer,
+  IN TPML_DIGEST_VALUES  *DigestList,
+  IN UINT32              HashAlgorithmMask
   );
 
 /**
@@ -1091,8 +1091,8 @@ CopyDigestListToBuffer(
 **/
 UINT32
 EFIAPI
-GetDigestListSize(
-  IN TPML_DIGEST_VALUES             *DigestList
+GetDigestListSize (
+  IN TPML_DIGEST_VALUES  *DigestList
   );
 
 /**
@@ -1107,10 +1107,27 @@ GetDigestListSize(
 **/
 EFI_STATUS
 EFIAPI
-GetDigestFromDigestList(
-  IN TPMI_ALG_HASH      HashAlg,
-  IN TPML_DIGEST_VALUES *DigestList,
-  OUT VOID              *Digest
+GetDigestFromDigestList (
+  IN TPMI_ALG_HASH       HashAlg,
+  IN TPML_DIGEST_VALUES  *DigestList,
+  OUT VOID               *Digest
+  );
+
+/**
+   This function will query the TPM to determine which hashing algorithms and
+   get the digests of all active and supported PCR banks of a specific PCR register.
+
+   @param[in]     PcrHandle     The index of the PCR register to be read.
+   @param[out]    HashList      List of digests from PCR register being read.
+
+   @retval EFI_SUCCESS           The Pcr was read successfully.
+   @retval EFI_DEVICE_ERROR      The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2PcrReadForActiveBank (
+  IN      TPMI_DH_PCR  PcrHandle,
+  OUT     TPML_DIGEST  *HashList
   );
 
 #endif

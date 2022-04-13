@@ -11,7 +11,7 @@
 
 EDKII_SD_MMC_HOST_CONTROLLER_PPI  mSdMmcHostControllerPpi = { GetSdMmcHcMmioBar };
 
-EFI_PEI_PPI_DESCRIPTOR   mPpiList = {
+EFI_PEI_PPI_DESCRIPTOR  mPpiList = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEdkiiPeiSdMmcHostControllerPpiGuid,
   &mSdMmcHostControllerPpi
@@ -34,10 +34,10 @@ EFI_PEI_PPI_DESCRIPTOR   mPpiList = {
 EFI_STATUS
 EFIAPI
 GetSdMmcHcMmioBar (
-  IN     EDKII_SD_MMC_HOST_CONTROLLER_PPI *This,
-  IN     UINT8                            ControllerId,
-  IN OUT UINTN                            **MmioBar,
-     OUT UINT8                            *BarNum
+  IN     EDKII_SD_MMC_HOST_CONTROLLER_PPI  *This,
+  IN     UINT8                             ControllerId,
+  IN OUT UINTN                             **MmioBar,
+  OUT UINT8                                *BarNum
   )
 {
   SD_MMC_HC_PEI_PRIVATE_DATA  *Private;
@@ -70,26 +70,26 @@ GetSdMmcHcMmioBar (
 EFI_STATUS
 EFIAPI
 InitializeSdMmcHcPeim (
-  IN EFI_PEI_FILE_HANDLE       FileHandle,
-  IN CONST EFI_PEI_SERVICES    **PeiServices
+  IN EFI_PEI_FILE_HANDLE     FileHandle,
+  IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
-  EFI_BOOT_MODE                BootMode;
-  EFI_STATUS                   Status;
-  UINT16                       Bus;
-  UINT16                       Device;
-  UINT16                       Function;
-  UINT32                       Size;
-  UINT64                       MmioSize;
-  UINT8                        SubClass;
-  UINT8                        BaseClass;
-  UINT8                        SlotInfo;
-  UINT8                        SlotNum;
-  UINT8                        FirstBar;
-  UINT8                        Index;
-  UINT8                        Slot;
-  UINT32                       BarAddr;
-  SD_MMC_HC_PEI_PRIVATE_DATA   *Private;
+  EFI_BOOT_MODE               BootMode;
+  EFI_STATUS                  Status;
+  UINT16                      Bus;
+  UINT16                      Device;
+  UINT16                      Function;
+  UINT32                      Size;
+  UINT64                      MmioSize;
+  UINT8                       SubClass;
+  UINT8                       BaseClass;
+  UINT8                       SlotInfo;
+  UINT8                       SlotNum;
+  UINT8                       FirstBar;
+  UINT8                       Index;
+  UINT8                       Slot;
+  UINT32                      BarAddr;
+  SD_MMC_HC_PEI_PRIVATE_DATA  *Private;
 
   //
   // Shadow this PEIM to run from memory
@@ -106,9 +106,9 @@ InitializeSdMmcHcPeim (
     return EFI_SUCCESS;
   }
 
-  Private = (SD_MMC_HC_PEI_PRIVATE_DATA *) AllocateZeroPool (sizeof (SD_MMC_HC_PEI_PRIVATE_DATA));
+  Private = (SD_MMC_HC_PEI_PRIVATE_DATA *)AllocateZeroPool (sizeof (SD_MMC_HC_PEI_PRIVATE_DATA));
   if (Private == NULL) {
-    DEBUG ((EFI_D_ERROR, "Failed to allocate memory for SD_MMC_HC_PEI_PRIVATE_DATA! \n"));
+    DEBUG ((DEBUG_ERROR, "Failed to allocate memory for SD_MMC_HC_PEI_PRIVATE_DATA! \n"));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -129,15 +129,15 @@ InitializeSdMmcHcPeim (
           // Get the SD/MMC Pci host controller's Slot Info.
           //
           SlotInfo = PciRead8 (PCI_LIB_ADDRESS (Bus, Device, Function, SD_MMC_HC_PEI_SLOT_OFFSET));
-          FirstBar = (*(SD_MMC_HC_PEI_SLOT_INFO*)&SlotInfo).FirstBar;
-          SlotNum  = (*(SD_MMC_HC_PEI_SLOT_INFO*)&SlotInfo).SlotNum + 1;
+          FirstBar = (*(SD_MMC_HC_PEI_SLOT_INFO *)&SlotInfo).FirstBar;
+          SlotNum  = (*(SD_MMC_HC_PEI_SLOT_INFO *)&SlotInfo).SlotNum + 1;
           ASSERT ((FirstBar + SlotNum) < MAX_SD_MMC_SLOTS);
 
           for (Index = 0, Slot = FirstBar; Slot < (FirstBar + SlotNum); Index++, Slot++) {
             //
             // Get the SD/MMC Pci host controller's MMIO region size.
             //
-            PciAnd16 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_COMMAND_OFFSET), (UINT16)~(EFI_PCI_COMMAND_BUS_MASTER | EFI_PCI_COMMAND_MEMORY_SPACE));
+            PciAnd16 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_COMMAND_OFFSET), (UINT16) ~(EFI_PCI_COMMAND_BUS_MASTER | EFI_PCI_COMMAND_MEMORY_SPACE));
             PciWrite32 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_BASE_ADDRESSREG_OFFSET + 4 * Slot), 0xFFFFFFFF);
             Size = PciRead32 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_BASE_ADDRESSREG_OFFSET + 4 * Slot));
 
@@ -153,8 +153,8 @@ InitializeSdMmcHcPeim (
                 // Memory space: anywhere in 64 bit address space
                 //
                 MmioSize = Size & 0xFFFFFFF0;
-                PciWrite32 (PCI_LIB_ADDRESS(Bus, Device, Function, PCI_BASE_ADDRESSREG_OFFSET + 4), 0xFFFFFFFF);
-                Size = PciRead32 (PCI_LIB_ADDRESS(Bus, Device, Function, PCI_BASE_ADDRESSREG_OFFSET + 4));
+                PciWrite32 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_BASE_ADDRESSREG_OFFSET + 4), 0xFFFFFFFF);
+                Size = PciRead32 (PCI_LIB_ADDRESS (Bus, Device, Function, PCI_BASE_ADDRESSREG_OFFSET + 4));
                 //
                 // Fix the length to support some spefic 64 bit BAR
                 //
@@ -162,7 +162,7 @@ InitializeSdMmcHcPeim (
                 //
                 // Calculate the size of 64bit bar
                 //
-                MmioSize  |= LShiftU64 ((UINT64) Size, 32);
+                MmioSize |= LShiftU64 ((UINT64)Size, 32);
                 MmioSize  = (~(MmioSize)) + 1;
                 //
                 // Clean the high 32bits of this 64bit BAR to 0 as we only allow a 32bit BAR.
@@ -175,7 +175,8 @@ InitializeSdMmcHcPeim (
                 //
                 ASSERT (FALSE);
                 continue;
-            };
+            }
+
             //
             // Assign resource to the SdMmc Pci host controller's MMIO BAR.
             // Enable the SdMmc Pci host controller by setting BME and MSE bits of PCI_CMD register.
@@ -187,8 +188,9 @@ InitializeSdMmcHcPeim (
             //
             Private->MmioBar[Private->TotalSdMmcHcs].SlotNum++;
             Private->MmioBar[Private->TotalSdMmcHcs].MmioBarAddr[Index] = BarAddr;
-            BarAddr += (UINT32)MmioSize;
+            BarAddr                                                    += (UINT32)MmioSize;
           }
+
           Private->TotalSdMmcHcs++;
           ASSERT (Private->TotalSdMmcHcs < MAX_SD_MMC_HCS);
         }

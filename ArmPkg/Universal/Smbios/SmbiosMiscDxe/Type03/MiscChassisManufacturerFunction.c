@@ -35,30 +35,29 @@
   @retval EFI_OUT_OF_RESOURCES       Failed to allocate required memory.
 
 **/
-SMBIOS_MISC_TABLE_FUNCTION(MiscChassisManufacturer)
-{
-  CHAR8                           *OptionalStrStart;
-  CHAR8                           *StrStart;
-  UINT8                           *SkuNumberField;
-  UINTN                           RecordLength;
-  UINTN                           ManuStrLen;
-  UINTN                           VerStrLen;
-  UINTN                           AssertTagStrLen;
-  UINTN                           SerialNumStrLen;
-  UINTN                           ChaNumStrLen;
-  EFI_STRING                      Manufacturer;
-  EFI_STRING                      Version;
-  EFI_STRING                      SerialNumber;
-  EFI_STRING                      AssertTag;
-  EFI_STRING                      ChassisSkuNumber;
-  EFI_STRING_ID                   TokenToGet;
-  SMBIOS_TABLE_TYPE3              *SmbiosRecord;
-  SMBIOS_TABLE_TYPE3              *InputData;
-  EFI_STATUS                      Status;
+SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
+  CHAR8               *OptionalStrStart;
+  CHAR8               *StrStart;
+  UINT8               *SkuNumberField;
+  UINTN               RecordLength;
+  UINTN               ManuStrLen;
+  UINTN               VerStrLen;
+  UINTN               AssertTagStrLen;
+  UINTN               SerialNumStrLen;
+  UINTN               ChaNumStrLen;
+  EFI_STRING          Manufacturer;
+  EFI_STRING          Version;
+  EFI_STRING          SerialNumber;
+  EFI_STRING          AssertTag;
+  EFI_STRING          ChassisSkuNumber;
+  EFI_STRING_ID       TokenToGet;
+  SMBIOS_TABLE_TYPE3  *SmbiosRecord;
+  SMBIOS_TABLE_TYPE3  *InputData;
+  EFI_STATUS          Status;
 
-  UINT8                           ContainedElementCount;
-  CONTAINED_ELEMENT               ContainedElements;
-  UINT8                           ExtendLength;
+  UINT8              ContainedElementCount;
+  CONTAINED_ELEMENT  ContainedElements;
+  UINT8              ExtendLength;
 
   ExtendLength = 0;
 
@@ -97,28 +96,28 @@ SMBIOS_MISC_TABLE_FUNCTION(MiscChassisManufacturer)
     SkuNumberType03
     );
 
-  TokenToGet = STRING_TOKEN (STR_MISC_CHASSIS_MANUFACTURER);
+  TokenToGet   = STRING_TOKEN (STR_MISC_CHASSIS_MANUFACTURER);
   Manufacturer = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
-  ManuStrLen = StrLen (Manufacturer);
+  ManuStrLen   = StrLen (Manufacturer);
 
   TokenToGet = STRING_TOKEN (STR_MISC_CHASSIS_VERSION);
-  Version = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
-  VerStrLen = StrLen (Version);
+  Version    = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
+  VerStrLen  = StrLen (Version);
 
-  TokenToGet = STRING_TOKEN (STR_MISC_CHASSIS_SERIAL_NUMBER);
-  SerialNumber = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
+  TokenToGet      = STRING_TOKEN (STR_MISC_CHASSIS_SERIAL_NUMBER);
+  SerialNumber    = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
   SerialNumStrLen = StrLen (SerialNumber);
 
-  TokenToGet = STRING_TOKEN (STR_MISC_CHASSIS_ASSET_TAG);
-  AssertTag = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
+  TokenToGet      = STRING_TOKEN (STR_MISC_CHASSIS_ASSET_TAG);
+  AssertTag       = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
   AssertTagStrLen = StrLen (AssertTag);
 
-  TokenToGet = STRING_TOKEN (STR_MISC_CHASSIS_SKU_NUMBER);
+  TokenToGet       = STRING_TOKEN (STR_MISC_CHASSIS_SKU_NUMBER);
   ChassisSkuNumber = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
-  ChaNumStrLen = StrLen (ChassisSkuNumber);
+  ChaNumStrLen     = StrLen (ChassisSkuNumber);
 
   ContainedElementCount = InputData->ContainedElementCount;
-  ExtendLength = ContainedElementCount * sizeof (CONTAINED_ELEMENT);
+  ExtendLength          = ContainedElementCount * sizeof (CONTAINED_ELEMENT);
 
   //
   // Two zeros following the last string.
@@ -142,11 +141,11 @@ SMBIOS_MISC_TABLE_FUNCTION(MiscChassisManufacturer)
 
   SmbiosRecord->Type = OemGetChassisType ();
 
-  //ContainedElements
+  // ContainedElements
   ASSERT (ContainedElementCount < 2);
   (VOID)CopyMem (SmbiosRecord + 1, &ContainedElements, ExtendLength);
 
-  //ChassisSkuNumber
+  // ChassisSkuNumber
   SkuNumberField = (UINT8 *)SmbiosRecord +
                    sizeof (SMBIOS_TABLE_TYPE3) -
                    sizeof (CONTAINED_ELEMENT) + ExtendLength;
@@ -154,7 +153,7 @@ SMBIOS_MISC_TABLE_FUNCTION(MiscChassisManufacturer)
   *SkuNumberField = 5;
 
   OptionalStrStart = (CHAR8 *)((UINT8 *)SmbiosRecord + sizeof (SMBIOS_TABLE_TYPE3) +
-                                        ExtendLength + 1);
+                               ExtendLength + 1);
   UnicodeStrToAsciiStrS (Manufacturer, OptionalStrStart, ManuStrLen + 1);
   StrStart = OptionalStrStart + ManuStrLen + 1;
   UnicodeStrToAsciiStrS (Version, StrStart, VerStrLen + 1);
@@ -165,20 +164,25 @@ SMBIOS_MISC_TABLE_FUNCTION(MiscChassisManufacturer)
   StrStart += AssertTagStrLen + 1;
   UnicodeStrToAsciiStrS (ChassisSkuNumber, StrStart, ChaNumStrLen + 1);
 
-  SmbiosRecord->BootupState = OemGetChassisBootupState ();
-  SmbiosRecord->PowerSupplyState = OemGetChassisPowerSupplyState ();
-  SmbiosRecord->ThermalState = OemGetChassisThermalState ();
-  SmbiosRecord->SecurityStatus = OemGetChassisSecurityStatus ();
-  SmbiosRecord->Height = OemGetChassisHeight ();
+  SmbiosRecord->BootupState        = OemGetChassisBootupState ();
+  SmbiosRecord->PowerSupplyState   = OemGetChassisPowerSupplyState ();
+  SmbiosRecord->ThermalState       = OemGetChassisThermalState ();
+  SmbiosRecord->SecurityStatus     = OemGetChassisSecurityStatus ();
+  SmbiosRecord->Height             = OemGetChassisHeight ();
   SmbiosRecord->NumberofPowerCords = OemGetChassisNumPowerCords ();
 
   //
   // Now we have got the full smbios record, call smbios protocol to add this record.
   //
-  Status = SmbiosMiscAddRecord ((UINT8*)SmbiosRecord, NULL);
+  Status = SmbiosMiscAddRecord ((UINT8 *)SmbiosRecord, NULL);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "[%a]:[%dL] Smbios Type03 Table Log Failed! %r \n",
-            __FUNCTION__, __LINE__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "[%a]:[%dL] Smbios Type03 Table Log Failed! %r \n",
+      __FUNCTION__,
+      DEBUG_LINE_NUMBER,
+      Status
+      ));
   }
 
   FreePool (SmbiosRecord);

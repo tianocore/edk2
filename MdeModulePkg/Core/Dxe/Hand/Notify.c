@@ -19,21 +19,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 CoreNotifyProtocolEntry (
-  IN PROTOCOL_ENTRY   *ProtEntry
+  IN PROTOCOL_ENTRY  *ProtEntry
   )
 {
-  PROTOCOL_NOTIFY     *ProtNotify;
-  LIST_ENTRY          *Link;
+  PROTOCOL_NOTIFY  *ProtNotify;
+  LIST_ENTRY       *Link;
 
   ASSERT_LOCKED (&gProtocolDatabaseLock);
 
-  for (Link=ProtEntry->Notify.ForwardLink; Link != &ProtEntry->Notify; Link=Link->ForwardLink) {
-    ProtNotify = CR(Link, PROTOCOL_NOTIFY, Link, PROTOCOL_NOTIFY_SIGNATURE);
+  for (Link = ProtEntry->Notify.ForwardLink; Link != &ProtEntry->Notify; Link = Link->ForwardLink) {
+    ProtNotify = CR (Link, PROTOCOL_NOTIFY, Link, PROTOCOL_NOTIFY_SIGNATURE);
     CoreSignalEvent (ProtNotify->Event);
   }
 }
-
-
 
 /**
   Removes Protocol from the protocol list (but not the handle list).
@@ -47,9 +45,9 @@ CoreNotifyProtocolEntry (
 **/
 PROTOCOL_INTERFACE *
 CoreRemoveInterfaceFromProtocol (
-  IN IHANDLE        *Handle,
-  IN EFI_GUID       *Protocol,
-  IN VOID           *Interface
+  IN IHANDLE   *Handle,
+  IN EFI_GUID  *Protocol,
+  IN VOID      *Interface
   )
 {
   PROTOCOL_INTERFACE  *Prot;
@@ -61,14 +59,13 @@ CoreRemoveInterfaceFromProtocol (
 
   Prot = CoreFindProtocolInterface (Handle, Protocol, Interface);
   if (Prot != NULL) {
-
     ProtEntry = Prot->Protocol;
 
     //
     // If there's a protocol notify location pointing to this entry, back it up one
     //
-    for(Link = ProtEntry->Notify.ForwardLink; Link != &ProtEntry->Notify; Link=Link->ForwardLink) {
-      ProtNotify = CR(Link, PROTOCOL_NOTIFY, Link, PROTOCOL_NOTIFY_SIGNATURE);
+    for (Link = ProtEntry->Notify.ForwardLink; Link != &ProtEntry->Notify; Link = Link->ForwardLink) {
+      ProtNotify = CR (Link, PROTOCOL_NOTIFY, Link, PROTOCOL_NOTIFY_SIGNATURE);
 
       if (ProtNotify->Position == &Prot->ByProtocol) {
         ProtNotify->Position = Prot->ByProtocol.BackLink;
@@ -83,7 +80,6 @@ CoreRemoveInterfaceFromProtocol (
 
   return Prot;
 }
-
 
 /**
   Add a new protocol notification record for the request protocol.
@@ -101,16 +97,16 @@ CoreRemoveInterfaceFromProtocol (
 EFI_STATUS
 EFIAPI
 CoreRegisterProtocolNotify (
-  IN EFI_GUID       *Protocol,
-  IN EFI_EVENT      Event,
-  OUT  VOID         **Registration
+  IN EFI_GUID   *Protocol,
+  IN EFI_EVENT  Event,
+  OUT  VOID     **Registration
   )
 {
-  PROTOCOL_ENTRY    *ProtEntry;
-  PROTOCOL_NOTIFY   *ProtNotify;
-  EFI_STATUS        Status;
+  PROTOCOL_ENTRY   *ProtEntry;
+  PROTOCOL_NOTIFY  *ProtNotify;
+  EFI_STATUS       Status;
 
-  if ((Protocol == NULL) || (Event == NULL) || (Registration == NULL))  {
+  if ((Protocol == NULL) || (Event == NULL) || (Registration == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -124,16 +120,15 @@ CoreRegisterProtocolNotify (
 
   ProtEntry = CoreFindProtocolEntry (Protocol, TRUE);
   if (ProtEntry != NULL) {
-
     //
     // Allocate a new notification record
     //
-    ProtNotify = AllocatePool (sizeof(PROTOCOL_NOTIFY));
+    ProtNotify = AllocatePool (sizeof (PROTOCOL_NOTIFY));
     if (ProtNotify != NULL) {
       ((IEVENT *)Event)->ExFlag |= EVT_EXFLAG_EVENT_PROTOCOL_NOTIFICATION;
-      ProtNotify->Signature = PROTOCOL_NOTIFY_SIGNATURE;
-      ProtNotify->Protocol = ProtEntry;
-      ProtNotify->Event = Event;
+      ProtNotify->Signature      = PROTOCOL_NOTIFY_SIGNATURE;
+      ProtNotify->Protocol       = ProtEntry;
+      ProtNotify->Event          = Event;
       //
       // start at the begining
       //
@@ -153,12 +148,11 @@ CoreRegisterProtocolNotify (
   Status = EFI_OUT_OF_RESOURCES;
   if (ProtNotify != NULL) {
     *Registration = ProtNotify;
-    Status = EFI_SUCCESS;
+    Status        = EFI_SUCCESS;
   }
 
   return Status;
 }
-
 
 /**
   Reinstall a protocol interface on a device handle.  The OldInterface for Protocol is replaced by the NewInterface.
@@ -177,33 +171,32 @@ CoreRegisterProtocolNotify (
 EFI_STATUS
 EFIAPI
 CoreReinstallProtocolInterface (
-  IN EFI_HANDLE     UserHandle,
-  IN EFI_GUID       *Protocol,
-  IN VOID           *OldInterface,
-  IN VOID           *NewInterface
+  IN EFI_HANDLE  UserHandle,
+  IN EFI_GUID    *Protocol,
+  IN VOID        *OldInterface,
+  IN VOID        *NewInterface
   )
 {
-  EFI_STATUS                Status;
-  IHANDLE                   *Handle;
-  PROTOCOL_INTERFACE        *Prot;
-  PROTOCOL_ENTRY            *ProtEntry;
-
-  Status = CoreValidateHandle (UserHandle);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  EFI_STATUS          Status;
+  IHANDLE             *Handle;
+  PROTOCOL_INTERFACE  *Prot;
+  PROTOCOL_ENTRY      *ProtEntry;
 
   if (Protocol == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-
-  Handle = (IHANDLE *) UserHandle;
 
   //
   // Lock the protocol database
   //
   CoreAcquireProtocolLock ();
 
+  Status = CoreValidateHandle (UserHandle);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  Handle = (IHANDLE *)UserHandle;
   //
   // Check that Protocol exists on UserHandle, and Interface matches the interface in the database
   //

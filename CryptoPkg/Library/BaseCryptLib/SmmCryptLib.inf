@@ -10,7 +10,7 @@
 #  RSA external functions, PKCS#7 SignedData sign functions, Diffie-Hellman functions, and
 #  authenticode signature verification functions are not supported in this instance.
 #
-#  Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2022, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -37,7 +37,11 @@
   Hash/CryptSha1.c
   Hash/CryptSha256.c
   Hash/CryptSm3.c
-  Hash/CryptSha512Null.c
+  Hash/CryptSha512.c
+  Hash/CryptSha3.c
+  Hash/CryptXkcp.c
+  Hash/CryptCShake256.c
+  Hash/CryptParallelHash.c
   Hmac/CryptHmacSha256.c
   Kdf/CryptHkdfNull.c
   Cipher/CryptAes.c
@@ -53,6 +57,8 @@
   Pk/CryptX509.c
   Pk/CryptAuthenticodeNull.c
   Pk/CryptTsNull.c
+  Pk/CryptRsaPss.c
+  Pk/CryptRsaPssSignNull.c
   Pem/CryptPem.c
 
   SysCall/CrtWrapper.c
@@ -83,6 +89,8 @@
   OpensslLib
   IntrinsicLib
   PrintLib
+  MmServicesTableLib
+  SynchronizationLib
 
 #
 # Remove these [BuildOptions] after this library is cleaned up

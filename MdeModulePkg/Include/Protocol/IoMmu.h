@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef __IOMMU_H__
 #define __IOMMU_H__
 
@@ -21,14 +20,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Forward reference for pure ANSI compatability
 //
-typedef struct _EDKII_IOMMU_PROTOCOL  EDKII_IOMMU_PROTOCOL;
+typedef struct _EDKII_IOMMU_PROTOCOL EDKII_IOMMU_PROTOCOL;
 
 //
 // Revision The revision to which the IOMMU interface adheres.
 //          All future revisions must be backwards compatible.
 //          If a future version is not back wards compatible it is not the same GUID.
 //
-#define EDKII_IOMMU_PROTOCOL_REVISION 0x00010000
+#define EDKII_IOMMU_PROTOCOL_REVISION  0x00010000
 
 //
 // IOMMU Access for SetAttribute
@@ -80,13 +79,13 @@ typedef enum {
 // IOMMU attribute for AllocateBuffer
 // Any undefined bits are reserved and must be zero.
 //
-#define EDKII_IOMMU_ATTRIBUTE_MEMORY_WRITE_COMBINE        0x0080
-#define EDKII_IOMMU_ATTRIBUTE_MEMORY_CACHED               0x0800
-#define EDKII_IOMMU_ATTRIBUTE_DUAL_ADDRESS_CYCLE          0x8000
+#define EDKII_IOMMU_ATTRIBUTE_MEMORY_WRITE_COMBINE  0x0080
+#define EDKII_IOMMU_ATTRIBUTE_MEMORY_CACHED         0x0800
+#define EDKII_IOMMU_ATTRIBUTE_DUAL_ADDRESS_CYCLE    0x8000
 
-#define EDKII_IOMMU_ATTRIBUTE_VALID_FOR_ALLOCATE_BUFFER   (EDKII_IOMMU_ATTRIBUTE_MEMORY_WRITE_COMBINE | EDKII_IOMMU_ATTRIBUTE_MEMORY_CACHED | EDKII_IOMMU_ATTRIBUTE_DUAL_ADDRESS_CYCLE)
+#define EDKII_IOMMU_ATTRIBUTE_VALID_FOR_ALLOCATE_BUFFER  (EDKII_IOMMU_ATTRIBUTE_MEMORY_WRITE_COMBINE | EDKII_IOMMU_ATTRIBUTE_MEMORY_CACHED | EDKII_IOMMU_ATTRIBUTE_DUAL_ADDRESS_CYCLE)
 
-#define EDKII_IOMMU_ATTRIBUTE_INVALID_FOR_ALLOCATE_BUFFER (~EDKII_IOMMU_ATTRIBUTE_VALID_FOR_ALLOCATE_BUFFER)
+#define EDKII_IOMMU_ATTRIBUTE_INVALID_FOR_ALLOCATE_BUFFER  (~EDKII_IOMMU_ATTRIBUTE_VALID_FOR_ALLOCATE_BUFFER)
 
 /**
   Set IOMMU attribute for a system memory.
@@ -237,17 +236,17 @@ EFI_STATUS
 /// IOMMU Protocol structure.
 ///
 struct _EDKII_IOMMU_PROTOCOL {
-  UINT64                              Revision;
-  EDKII_IOMMU_SET_ATTRIBUTE           SetAttribute;
-  EDKII_IOMMU_MAP                     Map;
-  EDKII_IOMMU_UNMAP                   Unmap;
-  EDKII_IOMMU_ALLOCATE_BUFFER         AllocateBuffer;
-  EDKII_IOMMU_FREE_BUFFER             FreeBuffer;
+  UINT64                         Revision;
+  EDKII_IOMMU_SET_ATTRIBUTE      SetAttribute;
+  EDKII_IOMMU_MAP                Map;
+  EDKII_IOMMU_UNMAP              Unmap;
+  EDKII_IOMMU_ALLOCATE_BUFFER    AllocateBuffer;
+  EDKII_IOMMU_FREE_BUFFER        FreeBuffer;
 };
 
 ///
 /// IOMMU Protocol GUID variable.
 ///
-extern EFI_GUID gEdkiiIoMmuProtocolGuid;
+extern EFI_GUID  gEdkiiIoMmuProtocolGuid;
 
 #endif

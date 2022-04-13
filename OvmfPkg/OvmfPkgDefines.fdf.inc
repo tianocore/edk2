@@ -9,6 +9,7 @@
 ##
 
 DEFINE BLOCK_SIZE        = 0x1000
+DEFINE VARS_OFFSET       = 0
 
 #
 # A firmware binary built with FD_SIZE_IN_KB=1024, and a firmware binary built
@@ -81,6 +82,20 @@ SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize = $(BLOCK_SIZ
 
 SET gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageFtwSpareBase = gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageFtwWorkingBase + gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
 SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize = $(VARS_SPARE_SIZE)
+
+# The OVMF WorkArea contains a fixed size header followed by the actual data.
+# The size of header is accessed through a fixed PCD in the reset vector code.
+# The value need to be kept in sync with the any changes to the Confidential
+# Computing Work Area header defined in the Include/WorkArea.h
+SET gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader  = 4
+
+SET gUefiOvmfPkgTokenSpaceGuid.PcdCfvBase           = $(FW_BASE_ADDRESS)
+SET gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataOffset  = $(VARS_OFFSET)
+SET gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize    = $(VARS_SIZE)
+
+SET gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase           = $(CODE_BASE_ADDRESS)
+SET gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataOffset  = $(VARS_SIZE)
+SET gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataSize    = $(CODE_SIZE)
 
 !if $(SMM_REQUIRE) == TRUE
 SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64 = gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase

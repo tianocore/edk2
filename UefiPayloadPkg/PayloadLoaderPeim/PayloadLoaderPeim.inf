@@ -1,0 +1,59 @@
+## @file
+#  Produce LoadFile PPI for payload loading.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PayloadLoaderPeim
+  FILE_GUID                      = D071A3B4-3EC1-40C5-BEF8-D0BD4A2446F0
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializePayloadLoaderPeim
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  PayloadLoaderPeim.c
+  ElfLib.h
+  ElfLib/ElfLibInternal.h
+  ElfLib/ElfCommon.h
+  ElfLib/Elf32.h
+  ElfLib/Elf64.h
+  ElfLib/ElfLibInternal.h
+  ElfLib/ElfLib.c
+  ElfLib/Elf32Lib.c
+  ElfLib/Elf64Lib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  PeiServicesLib
+  HobLib
+  BaseLib
+  PeimEntryPoint
+  DebugLib
+
+[Ppis]
+  gEfiPeiLoadFilePpiGuid                 ## PRODUCES
+
+[Guids]
+  gUniversalPayloadExtraDataGuid         ## PRODUCES
+
+[Depex]
+  TRUE

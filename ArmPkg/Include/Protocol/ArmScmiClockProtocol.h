@@ -14,11 +14,11 @@
 
 #include <Protocol/ArmScmi.h>
 
-#define ARM_SCMI_CLOCK_PROTOCOL_GUID { \
+#define ARM_SCMI_CLOCK_PROTOCOL_GUID  {\
   0x91ce67a8, 0xe0aa, 0x4012, {0xb9, 0x9f, 0xb6, 0xfc, 0xf3, 0x4, 0x8e, 0xaa} \
   }
 
-extern EFI_GUID gArmScmiClockProtocolGuid;
+extern EFI_GUID  gArmScmiClockProtocolGuid;
 
 // Message Type for clock management protocol.
 typedef enum {
@@ -35,21 +35,21 @@ typedef enum {
 } SCMI_CLOCK_RATE_FORMAT;
 
 // Clock management protocol version.
-#define SCMI_CLOCK_PROTOCOL_VERSION 0x10000
+#define SCMI_CLOCK_PROTOCOL_VERSION  0x10000
 
-#define SCMI_CLOCK_PROTOCOL_PENDING_ASYNC_RATES_MASK      0xFFU
-#define SCMI_CLOCK_PROTOCOL_PENDING_ASYNC_RATES_SHIFT     16
-#define SCMI_CLOCK_PROTOCOL_NUM_CLOCKS_MASK               0xFFFFU
+#define SCMI_CLOCK_PROTOCOL_PENDING_ASYNC_RATES_MASK   0xFFU
+#define SCMI_CLOCK_PROTOCOL_PENDING_ASYNC_RATES_SHIFT  16
+#define SCMI_CLOCK_PROTOCOL_NUM_CLOCKS_MASK            0xFFFFU
 
 /** Total number of pending asynchronous clock rates changes
   supported by the SCP, Attr Bits[23:16]
 */
-#define SCMI_CLOCK_PROTOCOL_MAX_ASYNC_CLK_RATES(Attr) (                       \
+#define SCMI_CLOCK_PROTOCOL_MAX_ASYNC_CLK_RATES(Attr)  (                      \
                   (Attr >> SCMI_CLOCK_PROTOCOL_PENDING_ASYNC_RATES_SHIFT) &&  \
                    SCMI_CLOCK_PROTOCOL_PENDING_ASYNC_RATES_MASK)
 
 // Total of clock devices supported by the SCP, Attr Bits[15:0]
-#define SCMI_CLOCK_PROTOCOL_TOTAL_CLKS(Attr) (Attr & SCMI_CLOCK_PROTOCOL_NUM_CLOCKS_MASK)
+#define SCMI_CLOCK_PROTOCOL_TOTAL_CLKS(Attr)  (Attr & SCMI_CLOCK_PROTOCOL_NUM_CLOCKS_MASK)
 
 #pragma pack(1)
 
@@ -57,18 +57,18 @@ typedef enum {
    either Rate or Min/Max/Step triplet is valid.
 */
 typedef struct {
-  UINT64 Min;
-  UINT64 Max;
-  UINT64 Step;
+  UINT64    Min;
+  UINT64    Max;
+  UINT64    Step;
 } SCMI_CLOCK_RATE_CONTINUOUS;
 
 typedef struct {
-  UINT64 Rate;
+  UINT64    Rate;
 } SCMI_CLOCK_RATE_DISCRETE;
 
 typedef union {
-  SCMI_CLOCK_RATE_CONTINUOUS ContinuousRate;
-  SCMI_CLOCK_RATE_DISCRETE DiscreteRate;
+  SCMI_CLOCK_RATE_CONTINUOUS    ContinuousRate;
+  SCMI_CLOCK_RATE_DISCRETE      DiscreteRate;
 } SCMI_CLOCK_RATE;
 
 #pragma pack()
@@ -89,7 +89,7 @@ typedef struct _SCMI_CLOCK_PROTOCOL SCMI_CLOCK_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_CLOCK_GET_VERSION) (
+(EFIAPI *SCMI_CLOCK_GET_VERSION)(
   IN  SCMI_CLOCK_PROTOCOL  *This,
   OUT UINT32               *Version
   );
@@ -107,7 +107,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_CLOCK_GET_TOTAL_CLOCKS) (
+(EFIAPI *SCMI_CLOCK_GET_TOTAL_CLOCKS)(
   IN  SCMI_CLOCK_PROTOCOL  *This,
   OUT UINT32               *TotalClocks
   );
@@ -127,7 +127,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_CLOCK_GET_CLOCK_ATTRIBUTES) (
+(EFIAPI *SCMI_CLOCK_GET_CLOCK_ATTRIBUTES)(
   IN  SCMI_CLOCK_PROTOCOL  *This,
   IN  UINT32               ClockId,
   OUT BOOLEAN              *Enabled,
@@ -159,7 +159,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_CLOCK_DESCRIBE_RATES) (
+(EFIAPI *SCMI_CLOCK_DESCRIBE_RATES)(
   IN     SCMI_CLOCK_PROTOCOL     *This,
   IN     UINT32                   ClockId,
   OUT    SCMI_CLOCK_RATE_FORMAT  *Format,
@@ -181,7 +181,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_CLOCK_RATE_GET) (
+(EFIAPI *SCMI_CLOCK_RATE_GET)(
   IN  SCMI_CLOCK_PROTOCOL  *This,
   IN  UINT32               ClockId,
   OUT UINT64               *Rate
@@ -199,20 +199,19 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_CLOCK_RATE_SET) (
+(EFIAPI *SCMI_CLOCK_RATE_SET)(
   IN SCMI_CLOCK_PROTOCOL  *This,
   IN UINT32               ClockId,
   IN UINT64               Rate
   );
 
 typedef struct _SCMI_CLOCK_PROTOCOL {
-  SCMI_CLOCK_GET_VERSION GetVersion;
-  SCMI_CLOCK_GET_TOTAL_CLOCKS GetTotalClocks;
-  SCMI_CLOCK_GET_CLOCK_ATTRIBUTES GetClockAttributes;
-  SCMI_CLOCK_DESCRIBE_RATES DescribeRates;
-  SCMI_CLOCK_RATE_GET RateGet;
-  SCMI_CLOCK_RATE_SET RateSet;
+  SCMI_CLOCK_GET_VERSION             GetVersion;
+  SCMI_CLOCK_GET_TOTAL_CLOCKS        GetTotalClocks;
+  SCMI_CLOCK_GET_CLOCK_ATTRIBUTES    GetClockAttributes;
+  SCMI_CLOCK_DESCRIBE_RATES          DescribeRates;
+  SCMI_CLOCK_RATE_GET                RateGet;
+  SCMI_CLOCK_RATE_SET                RateSet;
 } SCMI_CLOCK_PROTOCOL;
 
 #endif /* ARM_SCMI_CLOCK_PROTOCOL_H_ */
-

@@ -34,8 +34,26 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "FvLib.h"
 #include "PeCoffLib.h"
 
-#define ARMT_UNCONDITIONAL_JUMP_INSTRUCTION       0xEB000000
 #define ARM64_UNCONDITIONAL_JUMP_INSTRUCTION      0x14000000
+
+/*
+ * Arm instruction to jump to Fv entry instruction in Arm or Thumb mode.
+ * From ARM Arch Ref Manual versions b/c/d, section A8.8.25 BL, BLX (immediate)
+ * BLX (encoding A2) branches to offset in Thumb instruction set mode.
+ * BL (encoding A1) branches to offset in Arm instruction set mode.
+ */
+#define ARM_JUMP_OFFSET_MAX        0xffffff
+#define ARM_JUMP_TO_ARM(Offset)    (0xeb000000 | ((Offset - 8) >> 2))
+
+#define _ARM_JUMP_TO_THUMB(Imm32)  (0xfa000000 | \
+                                    (((Imm32) & (1 << 1)) << (24 - 1)) | \
+                                    (((Imm32) >> 2) & 0x7fffff))
+#define ARM_JUMP_TO_THUMB(Offset)  _ARM_JUMP_TO_THUMB((Offset) - 8)
+
+/*
+ * Arm instruction to return from exception (MOVS PC, LR)
+ */
+#define ARM_RETURN_FROM_EXCEPTION  0xE1B0F07E
 
 BOOLEAN mArm = FALSE;
 BOOLEAN mRiscV = FALSE;
@@ -2203,23 +2221,25 @@ Returns:
     // if we found an SEC core entry point then generate a branch instruction
     // to it and populate a debugger SWI entry as well
     if (UpdateVectorSec) {
+      UINT32                    EntryOffset;
 
       VerboseMsg("UpdateArmResetVectorIfNeeded updating ARM SEC vector");
 
-      // B SecEntryPoint - signed_immed_24 part +/-32MB offset
-      // on ARM, the PC is always 8 ahead, so we're not really jumping from the base address, but from base address + 8
-      ResetVector[0] = (INT32)(SecCoreEntryAddress - FvInfo->BaseAddress - 8) >> 2;
+      EntryOffset = (INT32)(SecCoreEntryAddress - FvInfo->BaseAddress);
 
-      if (ResetVector[0] > 0x00FFFFFF) {
-        Error(NULL, 0, 3000, "Invalid", "SEC Entry point must be within 32MB of the start of the FV");
+      if (EntryOffset > ARM_JUMP_OFFSET_MAX) {
+          Error(NULL, 0, 3000, "Invalid", "SEC Entry point offset above 1MB of the start of the FV");
         return EFI_ABORTED;
       }
 
-      // Add opcode for an unconditional branch with no link. i.e.: " B SecEntryPoint"
-      ResetVector[0] |= ARMT_UNCONDITIONAL_JUMP_INSTRUCTION;
+      if ((SecCoreEntryAddress & 1) != 0) {
+        ResetVector[0] = ARM_JUMP_TO_THUMB(EntryOffset);
+      } else {
+        ResetVector[0] = ARM_JUMP_TO_ARM(EntryOffset);
+      }
 
       // SWI handler movs   pc,lr. Just in case a debugger uses SWI
-      ResetVector[2] = 0xE1B0F07E;
+      ResetVector[2] = ARM_RETURN_FROM_EXCEPTION;
 
       // Place holder to support a common interrupt handler from ROM.
       // Currently not supported. For this to be used the reset vector would not be in this FV

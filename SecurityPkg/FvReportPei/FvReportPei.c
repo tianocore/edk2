@@ -8,10 +8,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "FvReportPei.h"
 
-STATIC CONST HASH_ALG_INFO mHashAlgInfo[] = {
-  {TPM_ALG_SHA256, SHA256_DIGEST_SIZE, Sha256Init, Sha256Update, Sha256Final, Sha256HashAll}, // 000B
-  {TPM_ALG_SHA384, SHA384_DIGEST_SIZE, Sha384Init, Sha384Update, Sha384Final, Sha384HashAll}, // 000C
-  {TPM_ALG_SHA512, SHA512_DIGEST_SIZE, Sha512Init, Sha512Update, Sha512Final, Sha512HashAll}, // 000D
+STATIC CONST HASH_ALG_INFO  mHashAlgInfo[] = {
+  { TPM_ALG_SHA256, SHA256_DIGEST_SIZE, Sha256Init, Sha256Update, Sha256Final, Sha256HashAll }, // 000B
+  { TPM_ALG_SHA384, SHA384_DIGEST_SIZE, Sha384Init, Sha384Update, Sha384Final, Sha384HashAll }, // 000C
+  { TPM_ALG_SHA512, SHA512_DIGEST_SIZE, Sha512Init, Sha512Update, Sha512Final, Sha512HashAll }, // 000D
 };
 
 /**
@@ -26,10 +26,10 @@ STATIC
 CONST
 HASH_ALG_INFO *
 FindHashAlgInfo (
-  IN UINT16         HashAlgId
+  IN UINT16  HashAlgId
   )
 {
-  UINTN             Index;
+  UINTN  Index;
 
   for (Index = 0; Index < ARRAY_SIZE (mHashAlgInfo); ++Index) {
     if (mHashAlgInfo[Index].HashAlgId == HashAlgId) {
@@ -53,18 +53,18 @@ FindHashAlgInfo (
 STATIC
 VOID
 InstallPreHashFvPpi (
-  IN VOID           *FvBuffer,
-  IN UINTN          FvLength,
-  IN UINT16         HashAlgoId,
-  IN UINT16         HashSize,
-  IN UINT8          *HashValue
+  IN VOID    *FvBuffer,
+  IN UINTN   FvLength,
+  IN UINT16  HashAlgoId,
+  IN UINT16  HashSize,
+  IN UINT8   *HashValue
   )
 {
-  EFI_STATUS                                        Status;
-  EFI_PEI_PPI_DESCRIPTOR                            *FvInfoPpiDescriptor;
-  EDKII_PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV_PPI   *PreHashedFvPpi;
-  UINTN                                             PpiSize;
-  HASH_INFO                                         *HashInfo;
+  EFI_STATUS                                       Status;
+  EFI_PEI_PPI_DESCRIPTOR                           *FvInfoPpiDescriptor;
+  EDKII_PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV_PPI  *PreHashedFvPpi;
+  UINTN                                            PpiSize;
+  HASH_INFO                                        *HashInfo;
 
   PpiSize = sizeof (EDKII_PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV_PPI)
             + sizeof (HASH_INFO)
@@ -73,13 +73,13 @@ InstallPreHashFvPpi (
   PreHashedFvPpi = AllocatePool (PpiSize);
   ASSERT (PreHashedFvPpi != NULL);
 
-  PreHashedFvPpi->FvBase    = (UINT32)(UINTN)FvBuffer;
-  PreHashedFvPpi->FvLength  = (UINT32)FvLength;
-  PreHashedFvPpi->Count     = 1;
+  PreHashedFvPpi->FvBase   = (UINT32)(UINTN)FvBuffer;
+  PreHashedFvPpi->FvLength = (UINT32)FvLength;
+  PreHashedFvPpi->Count    = 1;
 
-  HashInfo = HASH_INFO_PTR (PreHashedFvPpi);
+  HashInfo             = HASH_INFO_PTR (PreHashedFvPpi);
   HashInfo->HashAlgoId = HashAlgoId;
-  HashInfo->HashSize = HashSize;
+  HashInfo->HashSize   = HashSize;
   CopyMem (HASH_VALUE_PTR (HashInfo), HashValue, HashSize);
 
   FvInfoPpiDescriptor = AllocatePool (sizeof (EFI_PEI_PPI_DESCRIPTOR));
@@ -87,7 +87,7 @@ InstallPreHashFvPpi (
 
   FvInfoPpiDescriptor->Guid  = &gEdkiiPeiFirmwareVolumeInfoPrehashedFvPpiGuid;
   FvInfoPpiDescriptor->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
-  FvInfoPpiDescriptor->Ppi   = (VOID *) PreHashedFvPpi;
+  FvInfoPpiDescriptor->Ppi   = (VOID *)PreHashedFvPpi;
 
   Status = PeiServicesInstallPpi (FvInfoPpiDescriptor);
   ASSERT_EFI_ERROR (Status);
@@ -108,30 +108,35 @@ InstallPreHashFvPpi (
 STATIC
 EFI_STATUS
 VerifyHashedFv (
-  IN FV_HASH_INFO         *HashInfo,
-  IN HASHED_FV_INFO       *FvInfo,
-  IN UINTN                FvNumber,
-  IN EFI_BOOT_MODE        BootMode
+  IN FV_HASH_INFO    *HashInfo,
+  IN HASHED_FV_INFO  *FvInfo,
+  IN UINTN           FvNumber,
+  IN EFI_BOOT_MODE   BootMode
   )
 {
-  UINTN                 FvIndex;
-  CONST HASH_ALG_INFO   *AlgInfo;
-  UINT8                 *HashValue;
-  UINT8                 *FvHashValue;
-  VOID                  *FvBuffer;
-  EFI_STATUS            Status;
+  UINTN                FvIndex;
+  CONST HASH_ALG_INFO  *AlgInfo;
+  UINT8                *HashValue;
+  UINT8                *FvHashValue;
+  VOID                 *FvBuffer;
+  EFI_STATUS           Status;
 
-  if (HashInfo == NULL ||
-      HashInfo->HashSize == 0 ||
-      HashInfo->HashAlgoId == TPM_ALG_NULL) {
+  if ((HashInfo == NULL) ||
+      (HashInfo->HashSize == 0) ||
+      (HashInfo->HashAlgoId == TPM_ALG_NULL))
+  {
     DEBUG ((DEBUG_INFO, "Bypass FV hash verification\r\n"));
     return EFI_SUCCESS;
   }
 
   AlgInfo = FindHashAlgInfo (HashInfo->HashAlgoId);
-  if (AlgInfo == NULL || AlgInfo->HashSize != HashInfo->HashSize) {
-    DEBUG ((DEBUG_ERROR, "Unsupported or wrong hash algorithm: %04X (size=%d)\r\n",
-            HashInfo->HashAlgoId, HashInfo->HashSize));
+  if ((AlgInfo == NULL) || (AlgInfo->HashSize != HashInfo->HashSize)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Unsupported or wrong hash algorithm: %04X (size=%d)\r\n",
+      HashInfo->HashAlgoId,
+      HashInfo->HashSize
+      ));
     return EFI_UNSUPPORTED;
   }
 
@@ -150,17 +155,24 @@ VerifyHashedFv (
   FvHashValue = HashValue;
   for (FvIndex = 0; FvIndex < FvNumber; ++FvIndex) {
     //
-    // FV must be meant for verified boot and/or measured boot.
+    // Not meant for verified boot and/or measured boot?
     //
-    ASSERT ((FvInfo[FvIndex].Flag & HASHED_FV_FLAG_VERIFIED_BOOT) != 0 ||
-            (FvInfo[FvIndex].Flag & HASHED_FV_FLAG_MEASURED_BOOT) != 0);
+    if (((FvInfo[FvIndex].Flag & HASHED_FV_FLAG_VERIFIED_BOOT) == 0) &&
+        ((FvInfo[FvIndex].Flag & HASHED_FV_FLAG_MEASURED_BOOT) == 0))
+    {
+      continue;
+    }
 
     //
     // Skip any FV not meant for current boot mode.
     //
     if ((FvInfo[FvIndex].Flag & HASHED_FV_FLAG_SKIP_BOOT_MODE (BootMode)) != 0) {
-      DEBUG ((DEBUG_INFO, "Skip FV[%016lX] for boot mode[%d]\r\n",
-              FvInfo[FvIndex].Base, BootMode));
+      DEBUG ((
+        DEBUG_INFO,
+        "Skip FV[%016lX] for boot mode[%d]\r\n",
+        FvInfo[FvIndex].Base,
+        BootMode
+        ));
       continue;
     }
 
@@ -178,7 +190,7 @@ VerifyHashedFv (
     //
     // Copy FV to permanent memory to avoid potential TOC/TOU.
     //
-    FvBuffer = AllocatePages (EFI_SIZE_TO_PAGES((UINTN)FvInfo[FvIndex].Length));
+    FvBuffer = AllocatePages (EFI_SIZE_TO_PAGES ((UINTN)FvInfo[FvIndex].Length));
     ASSERT (FvBuffer != NULL);
     CopyMem (FvBuffer, (CONST VOID *)(UINTN)FvInfo[FvIndex].Base, (UINTN)FvInfo[FvIndex].Length);
 
@@ -216,9 +228,10 @@ VerifyHashedFv (
   //
   // Check final hash for all FVs.
   //
-  if (FvHashValue == HashValue ||
+  if ((FvHashValue == HashValue) ||
       (AlgInfo->HashAll (HashValue, FvHashValue - HashValue, FvHashValue) &&
-       CompareMem (HashInfo->Hash, FvHashValue, AlgInfo->HashSize) == 0)) {
+       (CompareMem (HashInfo->Hash, FvHashValue, AlgInfo->HashSize) == 0)))
+  {
     Status = EFI_SUCCESS;
   } else {
     Status = EFI_VOLUME_CORRUPTED;
@@ -238,10 +251,10 @@ Done:
 STATIC
 VOID
 ReportHashedFv (
-  IN HASHED_FV_INFO       *FvInfo
+  IN HASHED_FV_INFO  *FvInfo
   )
 {
-  CONST EFI_GUID    *FvFormat;
+  CONST EFI_GUID  *FvFormat;
 
   if ((FvInfo->Flag & HASHED_FV_FLAG_REPORT_FV_HOB) != 0) {
     //
@@ -291,7 +304,7 @@ GetHashInfo (
   IN EFI_BOOT_MODE                                      BootMode
   )
 {
-  FV_HASH_INFO            *HashInfo;
+  FV_HASH_INFO  *HashInfo;
 
   if ((StoredHashFvPpi->HashInfo.HashFlag & FV_HASH_FLAG_BOOT_MODE (BootMode)) != 0) {
     HashInfo = &StoredHashFvPpi->HashInfo;
@@ -318,38 +331,43 @@ GetHashInfo (
 STATIC
 EFI_STATUS
 CheckStoredHashFv (
-  IN CONST EFI_PEI_SERVICES           **PeiServices,
-  IN EFI_BOOT_MODE                    BootMode
+  IN CONST EFI_PEI_SERVICES  **PeiServices,
+  IN EFI_BOOT_MODE           BootMode
   )
 {
-  EFI_STATUS                                            Status;
-  EDKII_PEI_FIRMWARE_VOLUME_INFO_STORED_HASH_FV_PPI     *StoredHashFvPpi;
-  FV_HASH_INFO                                          *HashInfo;
-  UINTN                                                 FvIndex;
+  EFI_STATUS                                         Status;
+  EDKII_PEI_FIRMWARE_VOLUME_INFO_STORED_HASH_FV_PPI  *StoredHashFvPpi;
+  FV_HASH_INFO                                       *HashInfo;
+  UINTN                                              FvIndex;
 
   //
   // Check pre-hashed FV list
   //
   StoredHashFvPpi = NULL;
-  Status = PeiServicesLocatePpi (
-             &gEdkiiPeiFirmwareVolumeInfoStoredHashFvPpiGuid,
-             0,
-             NULL,
-             (VOID**)&StoredHashFvPpi
-             );
-  if (!EFI_ERROR(Status) && StoredHashFvPpi != NULL && StoredHashFvPpi->FvNumber > 0) {
-
+  Status          = PeiServicesLocatePpi (
+                      &gEdkiiPeiFirmwareVolumeInfoStoredHashFvPpiGuid,
+                      0,
+                      NULL,
+                      (VOID **)&StoredHashFvPpi
+                      );
+  if (!EFI_ERROR (Status) && (StoredHashFvPpi != NULL) && (StoredHashFvPpi->FvNumber > 0)) {
     HashInfo = GetHashInfo (StoredHashFvPpi, BootMode);
-    Status = VerifyHashedFv (HashInfo, StoredHashFvPpi->FvInfo,
-                             StoredHashFvPpi->FvNumber, BootMode);
+    Status   = VerifyHashedFv (
+                 HashInfo,
+                 StoredHashFvPpi->FvInfo,
+                 StoredHashFvPpi->FvNumber,
+                 BootMode
+                 );
     if (!EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "OBB verification passed (%r)\r\n", Status));
 
       //
       // Report the FVs to PEI core and/or DXE core.
       //
       for (FvIndex = 0; FvIndex < StoredHashFvPpi->FvNumber; ++FvIndex) {
         if ((StoredHashFvPpi->FvInfo[FvIndex].Flag
-             & HASHED_FV_FLAG_SKIP_BOOT_MODE (BootMode)) == 0) {
+             & HASHED_FV_FLAG_SKIP_BOOT_MODE (BootMode)) == 0)
+        {
           ReportHashedFv (&StoredHashFvPpi->FvInfo[FvIndex]);
         }
       }
@@ -358,9 +376,7 @@ CheckStoredHashFv (
         EFI_PROGRESS_CODE,
         PcdGet32 (PcdStatusCodeFvVerificationPass)
         );
-
     } else {
-
       DEBUG ((DEBUG_ERROR, "ERROR: Failed to verify OBB FVs (%r)\r\n", Status));
 
       REPORT_STATUS_CODE_EX (
@@ -374,11 +390,8 @@ CheckStoredHashFv (
         );
 
       ASSERT_EFI_ERROR (Status);
-
     }
-
   } else {
-
     DEBUG ((DEBUG_ERROR, "ERROR: No/invalid StoredHashFvPpi located\r\n"));
 
     ASSERT_EFI_ERROR (Status);
@@ -406,8 +419,8 @@ FvReportEntryPoint (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS           Status;
-  EFI_BOOT_MODE        BootMode;
+  EFI_STATUS     Status;
+  EFI_BOOT_MODE  BootMode;
 
   Status = PeiServicesGetBootMode (&BootMode);
   ASSERT_EFI_ERROR (Status);

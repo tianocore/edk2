@@ -1,7 +1,7 @@
 ## @file
 #  Instance of BaseCache.
 #
-#  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -15,7 +15,7 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = CacheLib
 
-[Sources.IA32]
+[Sources]
   CacheLib.c
   CacheLibInternal.h
 

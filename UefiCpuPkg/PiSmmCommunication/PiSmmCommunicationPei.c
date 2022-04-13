@@ -86,14 +86,14 @@ typedef struct {
 } EFI_SMM_SYSTEM_TABLE2_64;
 
 typedef struct {
-  EFI_GUID                          VendorGuid;
-  UINT64                            VendorTable;
+  EFI_GUID    VendorGuid;
+  UINT64      VendorTable;
 } EFI_CONFIGURATION_TABLE64;
 #endif
 
 #if defined (MDE_CPU_X64)
-typedef EFI_SMM_SYSTEM_TABLE2 EFI_SMM_SYSTEM_TABLE2_64;
-typedef EFI_CONFIGURATION_TABLE EFI_CONFIGURATION_TABLE64;
+typedef EFI_SMM_SYSTEM_TABLE2    EFI_SMM_SYSTEM_TABLE2_64;
+typedef EFI_CONFIGURATION_TABLE  EFI_CONFIGURATION_TABLE64;
 #endif
 
 /**
@@ -113,14 +113,14 @@ typedef EFI_CONFIGURATION_TABLE EFI_CONFIGURATION_TABLE64;
 EFI_STATUS
 EFIAPI
 Communicate (
-  IN CONST EFI_PEI_SMM_COMMUNICATION_PPI   *This,
-  IN OUT VOID                              *CommBuffer,
-  IN OUT UINTN                             *CommSize
+  IN CONST EFI_PEI_SMM_COMMUNICATION_PPI  *This,
+  IN OUT VOID                             *CommBuffer,
+  IN OUT UINTN                            *CommSize
   );
 
-EFI_PEI_SMM_COMMUNICATION_PPI      mSmmCommunicationPpi = { Communicate };
+EFI_PEI_SMM_COMMUNICATION_PPI  mSmmCommunicationPpi = { Communicate };
 
-EFI_PEI_PPI_DESCRIPTOR mPpiList = {
+EFI_PEI_PPI_DESCRIPTOR  mPpiList = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiSmmCommunicationPpiGuid,
   &mSmmCommunicationPpi
@@ -136,8 +136,8 @@ GetCommunicationContext (
   VOID
   )
 {
-  EFI_HOB_GUID_TYPE                *GuidHob;
-  EFI_SMM_COMMUNICATION_CONTEXT    *SmmCommunicationContext;
+  EFI_HOB_GUID_TYPE              *GuidHob;
+  EFI_SMM_COMMUNICATION_CONTEXT  *SmmCommunicationContext;
 
   GuidHob = GetFirstGuidHob (&gEfiPeiSmmCommunicationPpiGuid);
   ASSERT (GuidHob != NULL);
@@ -154,20 +154,20 @@ GetCommunicationContext (
 **/
 VOID
 SetCommunicationContext (
-  IN EFI_SMM_COMMUNICATION_CONTEXT    *SmmCommunicationContext
+  IN EFI_SMM_COMMUNICATION_CONTEXT  *SmmCommunicationContext
   )
 {
-  EFI_PEI_HOB_POINTERS             Hob;
-  UINTN                            BufferSize;
+  EFI_PEI_HOB_POINTERS  Hob;
+  UINTN                 BufferSize;
 
   BufferSize = sizeof (*SmmCommunicationContext);
-  Hob.Raw = BuildGuidHob (
-              &gEfiPeiSmmCommunicationPpiGuid,
-              BufferSize
-              );
+  Hob.Raw    = BuildGuidHob (
+                 &gEfiPeiSmmCommunicationPpiGuid,
+                 BufferSize
+                 );
   ASSERT (Hob.Raw);
 
-  CopyMem ((VOID *)Hob.Raw, SmmCommunicationContext, sizeof(*SmmCommunicationContext));
+  CopyMem ((VOID *)Hob.Raw, SmmCommunicationContext, sizeof (*SmmCommunicationContext));
 }
 
 /**
@@ -181,42 +181,44 @@ SetCommunicationContext (
 **/
 VOID *
 InternalSmstGetVendorTableByGuid (
-  IN UINT64                                        Signature,
-  IN EFI_SMM_SYSTEM_TABLE2                         *Smst,
-  IN EFI_GUID                                      *VendorGuid
+  IN UINT64                 Signature,
+  IN EFI_SMM_SYSTEM_TABLE2  *Smst,
+  IN EFI_GUID               *VendorGuid
   )
 {
-  EFI_CONFIGURATION_TABLE                       *SmmConfigurationTable;
-  UINTN                                         NumberOfTableEntries;
-  UINTN                                         Index;
-  EFI_SMM_SYSTEM_TABLE2_64                      *Smst64;
-  EFI_CONFIGURATION_TABLE64                     *SmmConfigurationTable64;
+  EFI_CONFIGURATION_TABLE    *SmmConfigurationTable;
+  UINTN                      NumberOfTableEntries;
+  UINTN                      Index;
+  EFI_SMM_SYSTEM_TABLE2_64   *Smst64;
+  EFI_CONFIGURATION_TABLE64  *SmmConfigurationTable64;
 
-  if ((sizeof(UINTN) == sizeof(UINT32)) && (Signature == SMM_S3_RESUME_SMM_64)) {
+  if ((sizeof (UINTN) == sizeof (UINT32)) && (Signature == SMM_S3_RESUME_SMM_64)) {
     //
     // 32 PEI + 64 DXE
     //
     Smst64 = (EFI_SMM_SYSTEM_TABLE2_64 *)Smst;
-    DEBUG ((EFI_D_INFO, "InitCommunicationContext - SmmConfigurationTable: %x\n", Smst64->SmmConfigurationTable));
-    DEBUG ((EFI_D_INFO, "InitCommunicationContext - NumberOfTableEntries: %x\n", Smst64->NumberOfTableEntries));
+    DEBUG ((DEBUG_INFO, "InitCommunicationContext - SmmConfigurationTable: %x\n", Smst64->SmmConfigurationTable));
+    DEBUG ((DEBUG_INFO, "InitCommunicationContext - NumberOfTableEntries: %x\n", Smst64->NumberOfTableEntries));
     SmmConfigurationTable64 = (EFI_CONFIGURATION_TABLE64 *)(UINTN)Smst64->SmmConfigurationTable;
-    NumberOfTableEntries = (UINTN)Smst64->NumberOfTableEntries;
+    NumberOfTableEntries    = (UINTN)Smst64->NumberOfTableEntries;
     for (Index = 0; Index < NumberOfTableEntries; Index++) {
       if (CompareGuid (&SmmConfigurationTable64[Index].VendorGuid, VendorGuid)) {
         return (VOID *)(UINTN)SmmConfigurationTable64[Index].VendorTable;
       }
     }
+
     return NULL;
   } else {
-    DEBUG ((EFI_D_INFO, "InitCommunicationContext - SmmConfigurationTable: %x\n", Smst->SmmConfigurationTable));
-    DEBUG ((EFI_D_INFO, "InitCommunicationContext - NumberOfTableEntries: %x\n", Smst->NumberOfTableEntries));
+    DEBUG ((DEBUG_INFO, "InitCommunicationContext - SmmConfigurationTable: %x\n", Smst->SmmConfigurationTable));
+    DEBUG ((DEBUG_INFO, "InitCommunicationContext - NumberOfTableEntries: %x\n", Smst->NumberOfTableEntries));
     SmmConfigurationTable = Smst->SmmConfigurationTable;
-    NumberOfTableEntries = Smst->NumberOfTableEntries;
+    NumberOfTableEntries  = Smst->NumberOfTableEntries;
     for (Index = 0; Index < NumberOfTableEntries; Index++) {
       if (CompareGuid (&SmmConfigurationTable[Index].VendorGuid, VendorGuid)) {
         return (VOID *)SmmConfigurationTable[Index].VendorTable;
       }
     }
+
     return NULL;
   }
 }
@@ -229,18 +231,18 @@ InitCommunicationContext (
   VOID
   )
 {
-  EFI_SMRAM_DESCRIPTOR                          *SmramDescriptor;
-  SMM_S3_RESUME_STATE                           *SmmS3ResumeState;
-  VOID                                          *GuidHob;
-  EFI_SMM_COMMUNICATION_CONTEXT                 *SmmCommunicationContext;
+  EFI_SMRAM_DESCRIPTOR           *SmramDescriptor;
+  SMM_S3_RESUME_STATE            *SmmS3ResumeState;
+  VOID                           *GuidHob;
+  EFI_SMM_COMMUNICATION_CONTEXT  *SmmCommunicationContext;
 
   GuidHob = GetFirstGuidHob (&gEfiAcpiVariableGuid);
   ASSERT (GuidHob != NULL);
-  SmramDescriptor = (EFI_SMRAM_DESCRIPTOR *) GET_GUID_HOB_DATA (GuidHob);
+  SmramDescriptor  = (EFI_SMRAM_DESCRIPTOR *)GET_GUID_HOB_DATA (GuidHob);
   SmmS3ResumeState = (SMM_S3_RESUME_STATE *)(UINTN)SmramDescriptor->CpuStart;
 
-  DEBUG ((EFI_D_INFO, "InitCommunicationContext - SmmS3ResumeState: %x\n", SmmS3ResumeState));
-  DEBUG ((EFI_D_INFO, "InitCommunicationContext - Smst: %x\n", SmmS3ResumeState->Smst));
+  DEBUG ((DEBUG_INFO, "InitCommunicationContext - SmmS3ResumeState: %x\n", SmmS3ResumeState));
+  DEBUG ((DEBUG_INFO, "InitCommunicationContext - Smst: %x\n", SmmS3ResumeState->Smst));
 
   SmmCommunicationContext = (EFI_SMM_COMMUNICATION_CONTEXT *)InternalSmstGetVendorTableByGuid (
                                                                SmmS3ResumeState->Signature,
@@ -251,7 +253,7 @@ InitCommunicationContext (
 
   SetCommunicationContext (SmmCommunicationContext);
 
-  return ;
+  return;
 }
 
 /**
@@ -271,19 +273,19 @@ InitCommunicationContext (
 EFI_STATUS
 EFIAPI
 Communicate (
-  IN CONST EFI_PEI_SMM_COMMUNICATION_PPI   *This,
-  IN OUT VOID                              *CommBuffer,
-  IN OUT UINTN                             *CommSize
+  IN CONST EFI_PEI_SMM_COMMUNICATION_PPI  *This,
+  IN OUT VOID                             *CommBuffer,
+  IN OUT UINTN                            *CommSize
   )
 {
-  EFI_STATUS                       Status;
-  PEI_SMM_CONTROL_PPI              *SmmControl;
-  PEI_SMM_ACCESS_PPI               *SmmAccess;
-  UINT8                            SmiCommand;
-  UINTN                            Size;
-  EFI_SMM_COMMUNICATION_CONTEXT    *SmmCommunicationContext;
+  EFI_STATUS                     Status;
+  PEI_SMM_CONTROL_PPI            *SmmControl;
+  PEI_SMM_ACCESS_PPI             *SmmAccess;
+  UINT8                          SmiCommand;
+  UINTN                          Size;
+  EFI_SMM_COMMUNICATION_CONTEXT  *SmmCommunicationContext;
 
-  DEBUG ((EFI_D_INFO, "PiSmmCommunicationPei Communicate Enter\n"));
+  DEBUG ((DEBUG_INFO, "PiSmmCommunicationPei Communicate Enter\n"));
 
   if (CommBuffer == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -316,32 +318,32 @@ Communicate (
   // Check SMRAM locked, it should be done after SMRAM lock.
   //
   if (!SmmAccess->LockState) {
-    DEBUG ((EFI_D_INFO, "PiSmmCommunicationPei LockState - %x\n", (UINTN)SmmAccess->LockState));
+    DEBUG ((DEBUG_INFO, "PiSmmCommunicationPei LockState - %x\n", (UINTN)SmmAccess->LockState));
     return EFI_NOT_STARTED;
   }
 
   SmmCommunicationContext = GetCommunicationContext ();
-  DEBUG ((EFI_D_INFO, "PiSmmCommunicationPei BufferPtrAddress - 0x%016lx, BufferPtr: 0x%016lx\n", SmmCommunicationContext->BufferPtrAddress, *(EFI_PHYSICAL_ADDRESS *)(UINTN)SmmCommunicationContext->BufferPtrAddress));
+  DEBUG ((DEBUG_INFO, "PiSmmCommunicationPei BufferPtrAddress - 0x%016lx, BufferPtr: 0x%016lx\n", SmmCommunicationContext->BufferPtrAddress, *(EFI_PHYSICAL_ADDRESS *)(UINTN)SmmCommunicationContext->BufferPtrAddress));
 
   //
   // No need to check if BufferPtr is 0, because it is in PEI phase.
   //
   *(EFI_PHYSICAL_ADDRESS *)(UINTN)SmmCommunicationContext->BufferPtrAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)CommBuffer;
-  DEBUG ((EFI_D_INFO, "PiSmmCommunicationPei CommBuffer - %x\n", (UINTN)CommBuffer));
+  DEBUG ((DEBUG_INFO, "PiSmmCommunicationPei CommBuffer - %x\n", (UINTN)CommBuffer));
 
   //
   // Send command
   //
   SmiCommand = (UINT8)SmmCommunicationContext->SwSmiNumber;
-  Size = sizeof(SmiCommand);
-  Status = SmmControl->Trigger (
-                         (EFI_PEI_SERVICES **)GetPeiServicesTablePointer (),
-                         SmmControl,
-                         (INT8 *)&SmiCommand,
-                         &Size,
-                         FALSE,
-                         0
-                         );
+  Size       = sizeof (SmiCommand);
+  Status     = SmmControl->Trigger (
+                             (EFI_PEI_SERVICES **)GetPeiServicesTablePointer (),
+                             SmmControl,
+                             (INT8 *)&SmiCommand,
+                             &Size,
+                             FALSE,
+                             0
+                             );
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -349,7 +351,7 @@ Communicate (
   //
   *(EFI_PHYSICAL_ADDRESS *)(UINTN)SmmCommunicationContext->BufferPtrAddress = 0;
 
-  DEBUG ((EFI_D_INFO, "PiSmmCommunicationPei Communicate Exit\n"));
+  DEBUG ((DEBUG_INFO, "PiSmmCommunicationPei Communicate Exit\n"));
 
   return EFI_SUCCESS;
 }
@@ -366,14 +368,14 @@ Communicate (
 EFI_STATUS
 EFIAPI
 PiSmmCommunicationPeiEntryPoint (
-  IN EFI_PEI_FILE_HANDLE       FileHandle,
-  IN CONST EFI_PEI_SERVICES    **PeiServices
+  IN EFI_PEI_FILE_HANDLE     FileHandle,
+  IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
-  EFI_STATUS                      Status;
-  PEI_SMM_ACCESS_PPI              *SmmAccess;
-  EFI_BOOT_MODE                   BootMode;
-  UINTN                           Index;
+  EFI_STATUS          Status;
+  PEI_SMM_ACCESS_PPI  *SmmAccess;
+  EFI_BOOT_MODE       BootMode;
+  UINTN               Index;
 
   BootMode = GetBootModeHob ();
   if (BootMode != BOOT_ON_S3_RESUME) {
@@ -394,7 +396,7 @@ PiSmmCommunicationPeiEntryPoint (
   // Check SMRAM locked, it should be done before SMRAM lock.
   //
   if (SmmAccess->LockState) {
-    DEBUG ((EFI_D_INFO, "PiSmmCommunicationPei LockState - %x\n", (UINTN)SmmAccess->LockState));
+    DEBUG ((DEBUG_INFO, "PiSmmCommunicationPei LockState - %x\n", (UINTN)SmmAccess->LockState));
     return EFI_ACCESS_DENIED;
   }
 

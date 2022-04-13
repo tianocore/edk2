@@ -7,11 +7,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "ScsiBus.h"
 
-
-EFI_DRIVER_BINDING_PROTOCOL gSCSIBusDriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gSCSIBusDriverBinding = {
   SCSIBusDriverBindingSupported,
   SCSIBusDriverBindingStart,
   SCSIBusDriverBindingStop,
@@ -80,8 +78,8 @@ NotifyFunction (
 **/
 VOID *
 AllocateAlignedBuffer (
-  IN SCSI_IO_DEV              *ScsiIoDevice,
-  IN UINTN                    BufferSize
+  IN SCSI_IO_DEV  *ScsiIoDevice,
+  IN UINTN        BufferSize
   )
 {
   return AllocateAlignedPages (EFI_SIZE_TO_PAGES (BufferSize), ScsiIoDevice->ScsiIo.IoAlign);
@@ -99,8 +97,8 @@ AllocateAlignedBuffer (
 **/
 VOID
 FreeAlignedBuffer (
-  IN VOID                     *Buffer,
-  IN UINTN                    BufferSize
+  IN VOID   *Buffer,
+  IN UINTN  BufferSize
   )
 {
   if (Buffer != NULL) {
@@ -120,12 +118,12 @@ FreeAlignedBuffer (
 **/
 EFI_STATUS
 EFIAPI
-InitializeScsiBus(
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+InitializeScsiBus (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   //
   // Install driver model protocol(s).
@@ -142,7 +140,6 @@ InitializeScsiBus(
 
   return Status;
 }
-
 
 /**
   Test to see if this driver supports ControllerHandle.
@@ -171,12 +168,12 @@ SCSIBusDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS                      Status;
-  EFI_SCSI_PASS_THRU_PROTOCOL     *PassThru;
-  EFI_EXT_SCSI_PASS_THRU_PROTOCOL *ExtPassThru;
-  UINT64                          Lun;
-  UINT8                           *TargetId;
-  SCSI_TARGET_ID                  ScsiTargetId;
+  EFI_STATUS                       Status;
+  EFI_SCSI_PASS_THRU_PROTOCOL      *PassThru;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *ExtPassThru;
+  UINT64                           Lun;
+  UINT8                            *TargetId;
+  SCSI_TARGET_ID                   ScsiTargetId;
 
   TargetId = &ScsiTargetId.ScsiId.ExtScsi[0];
   SetMem (TargetId, TARGET_MAX_BYTES, 0xFF);
@@ -197,7 +194,7 @@ SCSIBusDriverBindingSupported (
 
   if (Status == EFI_ALREADY_STARTED) {
     return EFI_SUCCESS;
-  } else if (!EFI_ERROR(Status)) {
+  } else if (!EFI_ERROR (Status)) {
     //
     // Check if RemainingDevicePath is NULL or the End of Device Path Node,
     // if yes, return EFI_SUCCESS.
@@ -227,7 +224,7 @@ SCSIBusDriverBindingSupported (
              This->DriverBindingHandle,
              Controller
              );
-      if (!EFI_ERROR(Status)) {
+      if (!EFI_ERROR (Status)) {
         return EFI_SUCCESS;
       }
     }
@@ -271,7 +268,6 @@ SCSIBusDriverBindingSupported (
   return Status;
 }
 
-
 /**
   Start this driver on ControllerHandle.
 
@@ -299,20 +295,20 @@ SCSIBusDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  UINT64                                Lun;
-  UINT8                                 *TargetId;
-  BOOLEAN                               ScanOtherPuns;
-  BOOLEAN                               FromFirstTarget;
-  BOOLEAN                               ExtScsiSupport;
-  EFI_STATUS                            Status;
-  EFI_STATUS                            DevicePathStatus;
-  EFI_STATUS                            PassThruStatus;
-  SCSI_BUS_DEVICE                       *ScsiBusDev;
-  SCSI_TARGET_ID                        ScsiTargetId;
-  EFI_DEVICE_PATH_PROTOCOL              *ParentDevicePath;
-  EFI_SCSI_PASS_THRU_PROTOCOL           *ScsiInterface;
-  EFI_EXT_SCSI_PASS_THRU_PROTOCOL       *ExtScsiInterface;
-  EFI_SCSI_BUS_PROTOCOL                 *BusIdentify;
+  UINT64                           Lun;
+  UINT8                            *TargetId;
+  BOOLEAN                          ScanOtherPuns;
+  BOOLEAN                          FromFirstTarget;
+  BOOLEAN                          ExtScsiSupport;
+  EFI_STATUS                       Status;
+  EFI_STATUS                       DevicePathStatus;
+  EFI_STATUS                       PassThruStatus;
+  SCSI_BUS_DEVICE                  *ScsiBusDev;
+  SCSI_TARGET_ID                   ScsiTargetId;
+  EFI_DEVICE_PATH_PROTOCOL         *ParentDevicePath;
+  EFI_SCSI_PASS_THRU_PROTOCOL      *ScsiInterface;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *ExtScsiInterface;
+  EFI_SCSI_BUS_PROTOCOL            *BusIdentify;
 
   TargetId        = NULL;
   ScanOtherPuns   = TRUE;
@@ -326,7 +322,7 @@ SCSIBusDriverBindingStart (
   DevicePathStatus = gBS->OpenProtocol (
                             Controller,
                             &gEfiDevicePathProtocolGuid,
-                            (VOID **) &ParentDevicePath,
+                            (VOID **)&ParentDevicePath,
                             This->DriverBindingHandle,
                             Controller,
                             EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -352,7 +348,7 @@ SCSIBusDriverBindingStart (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiExtScsiPassThruProtocolGuid,
-                  (VOID **) &ExtScsiInterface,
+                  (VOID **)&ExtScsiInterface,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -360,11 +356,11 @@ SCSIBusDriverBindingStart (
   //
   // Fail to open UEFI ExtendPassThru Protocol, then try to open EFI PassThru Protocol instead.
   //
-  if (EFI_ERROR(Status) && (Status != EFI_ALREADY_STARTED)) {
+  if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
     Status = gBS->OpenProtocol (
                     Controller,
                     &gEfiScsiPassThruProtocolGuid,
-                    (VOID **) &ScsiInterface,
+                    (VOID **)&ScsiInterface,
                     This->DriverBindingHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -373,7 +369,7 @@ SCSIBusDriverBindingStart (
     // Fail to open EFI PassThru Protocol, Close the DevicePathProtocol if it is opened by this time.
     //
     if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
-      if (!EFI_ERROR(DevicePathStatus)) {
+      if (!EFI_ERROR (DevicePathStatus)) {
         gBS->CloseProtocol (
                Controller,
                &gEfiDevicePathProtocolGuid,
@@ -381,6 +377,7 @@ SCSIBusDriverBindingStart (
                Controller
                );
       }
+
       return Status;
     }
   } else {
@@ -393,7 +390,7 @@ SCSIBusDriverBindingStart (
     PassThruStatus = gBS->OpenProtocol (
                             Controller,
                             &gEfiScsiPassThruProtocolGuid,
-                            (VOID **) &ScsiInterface,
+                            (VOID **)&ScsiInterface,
                             This->DriverBindingHandle,
                             Controller,
                             EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -406,18 +403,19 @@ SCSIBusDriverBindingStart (
     // on this handle for this time. Then construct Host controller private data.
     //
     ScsiBusDev = NULL;
-    ScsiBusDev = AllocateZeroPool(sizeof(SCSI_BUS_DEVICE));
+    ScsiBusDev = AllocateZeroPool (sizeof (SCSI_BUS_DEVICE));
     if (ScsiBusDev == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto ErrorExit;
     }
-    ScsiBusDev->Signature        = SCSI_BUS_DEVICE_SIGNATURE;
-    ScsiBusDev->ExtScsiSupport   = ExtScsiSupport;
-    ScsiBusDev->DevicePath       = ParentDevicePath;
+
+    ScsiBusDev->Signature      = SCSI_BUS_DEVICE_SIGNATURE;
+    ScsiBusDev->ExtScsiSupport = ExtScsiSupport;
+    ScsiBusDev->DevicePath     = ParentDevicePath;
     if (ScsiBusDev->ExtScsiSupport) {
       ScsiBusDev->ExtScsiInterface = ExtScsiInterface;
     } else {
-      ScsiBusDev->ScsiInterface    = ScsiInterface;
+      ScsiBusDev->ScsiInterface = ScsiInterface;
     }
 
     //
@@ -442,7 +440,7 @@ SCSIBusDriverBindingStart (
     Status = gBS->OpenProtocol (
                     Controller,
                     &gEfiCallerIdGuid,
-                    (VOID **) &BusIdentify,
+                    (VOID **)&BusIdentify,
                     This->DriverBindingHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -451,6 +449,7 @@ SCSIBusDriverBindingStart (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     ScsiBusDev = SCSI_BUS_CONTROLLER_DEVICE_FROM_THIS (BusIdentify);
   }
 
@@ -463,7 +462,7 @@ SCSIBusDriverBindingStart (
     ParentDevicePath
     );
 
-  Lun  = 0;
+  Lun = 0;
   if (RemainingDevicePath == NULL) {
     //
     // If RemainingDevicePath is NULL,
@@ -492,7 +491,7 @@ SCSIBusDriverBindingStart (
     ScanOtherPuns = FALSE;
   }
 
-  while(ScanOtherPuns) {
+  while (ScanOtherPuns) {
     if (FromFirstTarget) {
       //
       // Remaining Device Path is NULL, scan all the possible Puns in the
@@ -503,6 +502,7 @@ SCSIBusDriverBindingStart (
       } else {
         Status = ScsiBusDev->ScsiInterface->GetNextDevice (ScsiBusDev->ScsiInterface, &ScsiTargetId.ScsiId.Scsi, &Lun);
       }
+
       if (EFI_ERROR (Status)) {
         //
         // no legal Pun and Lun found any more
@@ -512,6 +512,7 @@ SCSIBusDriverBindingStart (
     } else {
       ScanOtherPuns = FALSE;
     }
+
     //
     // Avoid creating handle for the host adapter.
     //
@@ -524,12 +525,14 @@ SCSIBusDriverBindingStart (
         continue;
       }
     }
+
     //
     // Scan for the scsi device, if it attaches to the scsi bus,
     // then create handle and install scsi i/o protocol.
     //
     Status = ScsiScanCreateDevice (This, Controller, &ScsiTargetId, Lun, ScsiBusDev);
   }
+
   return EFI_SUCCESS;
 
 ErrorExit:
@@ -561,6 +564,7 @@ ErrorExit:
            Controller
            );
   }
+
   return Status;
 }
 
@@ -586,20 +590,20 @@ ErrorExit:
 EFI_STATUS
 EFIAPI
 SCSIBusDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN  EFI_HANDLE                      Controller,
-  IN  UINTN                           NumberOfChildren,
-  IN  EFI_HANDLE                      *ChildHandleBuffer
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   Controller,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_STATUS                  Status;
-  BOOLEAN                     AllChildrenStopped;
-  UINTN                       Index;
-  EFI_SCSI_IO_PROTOCOL        *ScsiIo;
-  SCSI_IO_DEV                 *ScsiIoDevice;
-  VOID                        *ScsiPassThru;
-  EFI_SCSI_BUS_PROTOCOL       *Scsidentifier;
-  SCSI_BUS_DEVICE             *ScsiBusDev;
+  EFI_STATUS             Status;
+  BOOLEAN                AllChildrenStopped;
+  UINTN                  Index;
+  EFI_SCSI_IO_PROTOCOL   *ScsiIo;
+  SCSI_IO_DEV            *ScsiIoDevice;
+  VOID                   *ScsiPassThru;
+  EFI_SCSI_BUS_PROTOCOL  *Scsidentifier;
+  SCSI_BUS_DEVICE        *ScsiBusDev;
 
   if (NumberOfChildren == 0) {
     //
@@ -608,7 +612,7 @@ SCSIBusDriverBindingStop (
     Status = gBS->OpenProtocol (
                     Controller,
                     &gEfiCallerIdGuid,
-                    (VOID **) &Scsidentifier,
+                    (VOID **)&Scsidentifier,
                     This->DriverBindingHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -675,11 +679,10 @@ SCSIBusDriverBindingStop (
   AllChildrenStopped = TRUE;
 
   for (Index = 0; Index < NumberOfChildren; Index++) {
-
     Status = gBS->OpenProtocol (
                     ChildHandleBuffer[Index],
                     &gEfiScsiIoProtocolGuid,
-                    (VOID **) &ScsiIo,
+                    (VOID **)&ScsiIo,
                     This->DriverBindingHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -700,7 +703,6 @@ SCSIBusDriverBindingStop (
                       This->DriverBindingHandle,
                       ChildHandleBuffer[Index]
                       );
-
     } else {
       Status = gBS->CloseProtocol (
                       Controller,
@@ -751,7 +753,6 @@ SCSIBusDriverBindingStop (
   return EFI_SUCCESS;
 }
 
-
 /**
   Retrieves the device type information of the SCSI Controller.
 
@@ -766,21 +767,20 @@ SCSIBusDriverBindingStop (
 EFI_STATUS
 EFIAPI
 ScsiGetDeviceType (
-  IN  EFI_SCSI_IO_PROTOCOL     *This,
-  OUT UINT8                    *DeviceType
+  IN  EFI_SCSI_IO_PROTOCOL  *This,
+  OUT UINT8                 *DeviceType
   )
 {
-  SCSI_IO_DEV *ScsiIoDevice;
+  SCSI_IO_DEV  *ScsiIoDevice;
 
   if (DeviceType == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  ScsiIoDevice  = SCSI_IO_DEV_FROM_THIS (This);
-  *DeviceType   = ScsiIoDevice->ScsiDeviceType;
+  ScsiIoDevice = SCSI_IO_DEV_FROM_THIS (This);
+  *DeviceType  = ScsiIoDevice->ScsiDeviceType;
   return EFI_SUCCESS;
 }
-
 
 /**
   Retrieves the device location in the SCSI channel.
@@ -798,22 +798,22 @@ ScsiGetDeviceType (
 EFI_STATUS
 EFIAPI
 ScsiGetDeviceLocation (
-  IN  EFI_SCSI_IO_PROTOCOL    *This,
-  IN OUT UINT8                **Target,
-  OUT UINT64                  *Lun
+  IN  EFI_SCSI_IO_PROTOCOL  *This,
+  IN OUT UINT8              **Target,
+  OUT UINT64                *Lun
   )
 {
-  SCSI_IO_DEV *ScsiIoDevice;
+  SCSI_IO_DEV  *ScsiIoDevice;
 
-  if (Target == NULL || Lun == NULL) {
+  if ((Target == NULL) || (Lun == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   ScsiIoDevice = SCSI_IO_DEV_FROM_THIS (This);
 
-  CopyMem (*Target,&ScsiIoDevice->Pun, TARGET_MAX_BYTES);
+  CopyMem (*Target, &ScsiIoDevice->Pun, TARGET_MAX_BYTES);
 
-  *Lun         = ScsiIoDevice->Lun;
+  *Lun = ScsiIoDevice->Lun;
 
   return EFI_SUCCESS;
 }
@@ -833,10 +833,10 @@ ScsiGetDeviceLocation (
 EFI_STATUS
 EFIAPI
 ScsiResetBus (
-  IN  EFI_SCSI_IO_PROTOCOL     *This
+  IN  EFI_SCSI_IO_PROTOCOL  *This
   )
 {
-  SCSI_IO_DEV *ScsiIoDevice;
+  SCSI_IO_DEV  *ScsiIoDevice;
 
   ScsiIoDevice = SCSI_IO_DEV_FROM_THIS (This);
 
@@ -849,13 +849,12 @@ ScsiResetBus (
     ScsiIoDevice->ScsiBusDeviceData->DevicePath
     );
 
-  if (ScsiIoDevice->ExtScsiSupport){
+  if (ScsiIoDevice->ExtScsiSupport) {
     return ScsiIoDevice->ExtScsiPassThru->ResetChannel (ScsiIoDevice->ExtScsiPassThru);
   } else {
     return ScsiIoDevice->ScsiPassThru->ResetChannel (ScsiIoDevice->ScsiPassThru);
   }
 }
-
 
 /**
   Resets the SCSI Controller that the device handle specifies.
@@ -871,7 +870,7 @@ ScsiResetBus (
 EFI_STATUS
 EFIAPI
 ScsiResetDevice (
-  IN  EFI_SCSI_IO_PROTOCOL     *This
+  IN  EFI_SCSI_IO_PROTOCOL  *This
   )
 {
   SCSI_IO_DEV  *ScsiIoDevice;
@@ -888,24 +887,22 @@ ScsiResetDevice (
     ScsiIoDevice->ScsiBusDeviceData->DevicePath
     );
 
-  CopyMem (Target,&ScsiIoDevice->Pun, TARGET_MAX_BYTES);
-
+  CopyMem (Target, &ScsiIoDevice->Pun, TARGET_MAX_BYTES);
 
   if (ScsiIoDevice->ExtScsiSupport) {
     return ScsiIoDevice->ExtScsiPassThru->ResetTargetLun (
-                                        ScsiIoDevice->ExtScsiPassThru,
-                                        Target,
-                                        ScsiIoDevice->Lun
-                                          );
+                                            ScsiIoDevice->ExtScsiPassThru,
+                                            Target,
+                                            ScsiIoDevice->Lun
+                                            );
   } else {
     return ScsiIoDevice->ScsiPassThru->ResetTarget (
-                                          ScsiIoDevice->ScsiPassThru,
-                                          ScsiIoDevice->Pun.ScsiId.Scsi,
-                                          ScsiIoDevice->Lun
-                                            );
+                                         ScsiIoDevice->ScsiPassThru,
+                                         ScsiIoDevice->Pun.ScsiId.Scsi,
+                                         ScsiIoDevice->Lun
+                                         );
   }
 }
-
 
 /**
   Sends a SCSI Request Packet to the SCSI Controller for execution.
@@ -957,9 +954,9 @@ ScsiResetDevice (
 EFI_STATUS
 EFIAPI
 ScsiExecuteSCSICommand (
-  IN     EFI_SCSI_IO_PROTOCOL                     *This,
-  IN OUT EFI_SCSI_IO_SCSI_REQUEST_PACKET          *Packet,
-  IN     EFI_EVENT                                Event  OPTIONAL
+  IN     EFI_SCSI_IO_PROTOCOL             *This,
+  IN OUT EFI_SCSI_IO_SCSI_REQUEST_PACKET  *Packet,
+  IN     EFI_EVENT                        Event  OPTIONAL
   )
 {
   SCSI_IO_DEV                                 *ScsiIoDevice;
@@ -975,11 +972,11 @@ ScsiExecuteSCSICommand (
     return EFI_INVALID_PARAMETER;
   }
 
-  ScsiIoDevice  = SCSI_IO_DEV_FROM_THIS (This);
-  CopyMem (Target,&ScsiIoDevice->Pun, TARGET_MAX_BYTES);
+  ScsiIoDevice = SCSI_IO_DEV_FROM_THIS (This);
+  CopyMem (Target, &ScsiIoDevice->Pun, TARGET_MAX_BYTES);
 
   if (ScsiIoDevice->ExtScsiSupport) {
-    ExtRequestPacket = (EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *) Packet;
+    ExtRequestPacket = (EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *)Packet;
 
     if (((ScsiIoDevice->ExtScsiPassThru->Mode->Attributes & EFI_SCSI_PASS_THRU_ATTRIBUTES_NONBLOCKIO) != 0) && (Event !=  NULL)) {
       Status = ScsiIoDevice->ExtScsiPassThru->PassThru (
@@ -1001,7 +998,7 @@ ScsiExecuteSCSICommand (
                                                 ExtRequestPacket,
                                                 NULL
                                                 );
-      if ((!EFI_ERROR(Status)) && (Event != NULL)) {
+      if ((!EFI_ERROR (Status)) && (Event != NULL)) {
         //
         // Signal Event to tell caller to pick up the SCSI IO packet if the
         // PassThru() succeeds.
@@ -1010,8 +1007,7 @@ ScsiExecuteSCSICommand (
       }
     }
   } else {
-
-    mWorkingBuffer = AllocatePool (sizeof(EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET));
+    mWorkingBuffer = AllocatePool (sizeof (EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET));
 
     if (mWorkingBuffer == NULL) {
       return EFI_DEVICE_ERROR;
@@ -1020,67 +1016,66 @@ ScsiExecuteSCSICommand (
     //
     // Convert package into EFI1.0, EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET.
     //
-    Status = ScsiioToPassThruPacket(Packet, (EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET*)mWorkingBuffer);
-    if (EFI_ERROR(Status)) {
-      FreePool(mWorkingBuffer);
+    Status = ScsiioToPassThruPacket (Packet, (EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *)mWorkingBuffer);
+    if (EFI_ERROR (Status)) {
+      FreePool (mWorkingBuffer);
       return Status;
     }
 
     if (((ScsiIoDevice->ScsiPassThru->Mode->Attributes & EFI_SCSI_PASS_THRU_ATTRIBUTES_NONBLOCKIO) != 0) && (Event !=  NULL)) {
-      EventData.Data1 = (VOID*)Packet;
+      EventData.Data1 = (VOID *)Packet;
       EventData.Data2 = Event;
       //
       // Create Event
       //
       Status = gBS->CreateEvent (
-                       EVT_NOTIFY_SIGNAL,
-                       TPL_NOTIFY,
-                       NotifyFunction,
-                       &EventData,
-                       &PacketEvent
-                       );
-      if (EFI_ERROR(Status)) {
-        FreePool(mWorkingBuffer);
+                      EVT_NOTIFY_SIGNAL,
+                      TPL_NOTIFY,
+                      NotifyFunction,
+                      &EventData,
+                      &PacketEvent
+                      );
+      if (EFI_ERROR (Status)) {
+        FreePool (mWorkingBuffer);
         return Status;
       }
 
       Status = ScsiIoDevice->ScsiPassThru->PassThru (
-                                          ScsiIoDevice->ScsiPassThru,
-                                          ScsiIoDevice->Pun.ScsiId.Scsi,
-                                          ScsiIoDevice->Lun,
-                                          mWorkingBuffer,
-                                          PacketEvent
-                                          );
+                                             ScsiIoDevice->ScsiPassThru,
+                                             ScsiIoDevice->Pun.ScsiId.Scsi,
+                                             ScsiIoDevice->Lun,
+                                             mWorkingBuffer,
+                                             PacketEvent
+                                             );
 
-      if (EFI_ERROR(Status)) {
-        FreePool(mWorkingBuffer);
-        gBS->CloseEvent(PacketEvent);
+      if (EFI_ERROR (Status)) {
+        FreePool (mWorkingBuffer);
+        gBS->CloseEvent (PacketEvent);
         return Status;
       }
-
     } else {
       //
       // If there's no event or SCSI Device doesn't support NON-BLOCKING, just convert
       // EFI1.0 PassThru packet back to UEFI2.0 SCSI IO Packet.
       //
       Status = ScsiIoDevice->ScsiPassThru->PassThru (
-                                          ScsiIoDevice->ScsiPassThru,
-                                          ScsiIoDevice->Pun.ScsiId.Scsi,
-                                          ScsiIoDevice->Lun,
-                                          mWorkingBuffer,
-                                          NULL
-                                          );
-      if (EFI_ERROR(Status)) {
-        FreePool(mWorkingBuffer);
+                                             ScsiIoDevice->ScsiPassThru,
+                                             ScsiIoDevice->Pun.ScsiId.Scsi,
+                                             ScsiIoDevice->Lun,
+                                             mWorkingBuffer,
+                                             NULL
+                                             );
+      if (EFI_ERROR (Status)) {
+        FreePool (mWorkingBuffer);
         return Status;
       }
 
-      PassThruToScsiioPacket((EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET*)mWorkingBuffer,Packet);
+      PassThruToScsiioPacket ((EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *)mWorkingBuffer, Packet);
       //
       // After converting EFI1.0 PassThru Packet back to UEFI2.0 SCSI IO Packet,
       // free mWorkingBuffer.
       //
-      FreePool(mWorkingBuffer);
+      FreePool (mWorkingBuffer);
 
       //
       // Signal Event to tell caller to pick up the SCSI IO Packet.
@@ -1090,9 +1085,9 @@ ScsiExecuteSCSICommand (
       }
     }
   }
+
   return Status;
 }
-
 
 /**
   Scan SCSI Bus to discover the device, and attach ScsiIoProtocol to it.
@@ -1111,11 +1106,11 @@ ScsiExecuteSCSICommand (
 EFI_STATUS
 EFIAPI
 ScsiScanCreateDevice (
-  IN     EFI_DRIVER_BINDING_PROTOCOL   *This,
-  IN     EFI_HANDLE                    Controller,
-  IN     SCSI_TARGET_ID                *TargetId,
-  IN     UINT64                        Lun,
-  IN OUT SCSI_BUS_DEVICE               *ScsiBusDev
+  IN     EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN     EFI_HANDLE                   Controller,
+  IN     SCSI_TARGET_ID               *TargetId,
+  IN     UINT64                       Lun,
+  IN OUT SCSI_BUS_DEVICE              *ScsiBusDev
   )
 {
   EFI_STATUS                Status;
@@ -1123,7 +1118,7 @@ ScsiScanCreateDevice (
   EFI_DEVICE_PATH_PROTOCOL  *ScsiDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath;
-  EFI_HANDLE                 DeviceHandle;
+  EFI_HANDLE                DeviceHandle;
 
   DevicePath          = NULL;
   RemainingDevicePath = NULL;
@@ -1133,7 +1128,7 @@ ScsiScanCreateDevice (
   //
   // Build Device Path
   //
-  if (ScsiBusDev->ExtScsiSupport){
+  if (ScsiBusDev->ExtScsiSupport) {
     Status = ScsiBusDev->ExtScsiInterface->BuildDevicePath (
                                              ScsiBusDev->ExtScsiInterface,
                                              &TargetId->ScsiId.ExtScsi[0],
@@ -1149,7 +1144,7 @@ ScsiScanCreateDevice (
                                           );
   }
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
@@ -1163,10 +1158,10 @@ ScsiScanCreateDevice (
     goto ErrorExit;
   }
 
-  DeviceHandle = NULL;
+  DeviceHandle        = NULL;
   RemainingDevicePath = DevicePath;
-  Status = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &RemainingDevicePath, &DeviceHandle);
-  if (!EFI_ERROR (Status) && (DeviceHandle != NULL) && IsDevicePathEnd(RemainingDevicePath)) {
+  Status              = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &RemainingDevicePath, &DeviceHandle);
+  if (!EFI_ERROR (Status) && (DeviceHandle != NULL) && IsDevicePathEnd (RemainingDevicePath)) {
     //
     // The device has been started, directly return to fast boot.
     //
@@ -1180,20 +1175,19 @@ ScsiScanCreateDevice (
     goto ErrorExit;
   }
 
-  ScsiIoDevice->Signature                 = SCSI_IO_DEV_SIGNATURE;
-  ScsiIoDevice->ScsiBusDeviceData         = ScsiBusDev;
-  CopyMem(&ScsiIoDevice->Pun, TargetId, TARGET_MAX_BYTES);
-  ScsiIoDevice->Lun                       = Lun;
+  ScsiIoDevice->Signature         = SCSI_IO_DEV_SIGNATURE;
+  ScsiIoDevice->ScsiBusDeviceData = ScsiBusDev;
+  CopyMem (&ScsiIoDevice->Pun, TargetId, TARGET_MAX_BYTES);
+  ScsiIoDevice->Lun = Lun;
 
   if (ScsiBusDev->ExtScsiSupport) {
-    ScsiIoDevice->ExtScsiPassThru         = ScsiBusDev->ExtScsiInterface;
-    ScsiIoDevice->ExtScsiSupport          = TRUE;
-    ScsiIoDevice->ScsiIo.IoAlign          = ScsiIoDevice->ExtScsiPassThru->Mode->IoAlign;
-
+    ScsiIoDevice->ExtScsiPassThru = ScsiBusDev->ExtScsiInterface;
+    ScsiIoDevice->ExtScsiSupport  = TRUE;
+    ScsiIoDevice->ScsiIo.IoAlign  = ScsiIoDevice->ExtScsiPassThru->Mode->IoAlign;
   } else {
-    ScsiIoDevice->ScsiPassThru            = ScsiBusDev->ScsiInterface;
-    ScsiIoDevice->ExtScsiSupport          = FALSE;
-    ScsiIoDevice->ScsiIo.IoAlign          = ScsiIoDevice->ScsiPassThru->Mode->IoAlign;
+    ScsiIoDevice->ScsiPassThru   = ScsiBusDev->ScsiInterface;
+    ScsiIoDevice->ExtScsiSupport = FALSE;
+    ScsiIoDevice->ScsiIo.IoAlign = ScsiIoDevice->ScsiPassThru->Mode->IoAlign;
   }
 
   ScsiIoDevice->ScsiIo.GetDeviceType      = ScsiGetDeviceType;
@@ -1233,22 +1227,23 @@ ScsiScanCreateDevice (
       gBS->OpenProtocol (
              Controller,
              &gEfiExtScsiPassThruProtocolGuid,
-             (VOID **) &(ScsiBusDev->ExtScsiInterface),
+             (VOID **)&(ScsiBusDev->ExtScsiInterface),
              This->DriverBindingHandle,
              ScsiIoDevice->Handle,
              EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
              );
-     } else {
+    } else {
       gBS->OpenProtocol (
              Controller,
              &gEfiScsiPassThruProtocolGuid,
-             (VOID **) &(ScsiBusDev->ScsiInterface),
+             (VOID **)&(ScsiBusDev->ScsiInterface),
              This->DriverBindingHandle,
              ScsiIoDevice->Handle,
              EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
              );
-     }
+    }
   }
+
   return EFI_SUCCESS;
 
 ErrorExit:
@@ -1271,7 +1266,6 @@ ErrorExit:
   return Status;
 }
 
-
 /**
   Discovery SCSI Device
 
@@ -1283,19 +1277,19 @@ ErrorExit:
 **/
 BOOLEAN
 DiscoverScsiDevice (
-  IN OUT  SCSI_IO_DEV   *ScsiIoDevice
+  IN OUT  SCSI_IO_DEV  *ScsiIoDevice
   )
 {
-  EFI_STATUS            Status;
-  UINT32                InquiryDataLength;
-  UINT8                 SenseDataLength;
-  UINT8                 HostAdapterStatus;
-  UINT8                 TargetStatus;
-  EFI_SCSI_INQUIRY_DATA *InquiryData;
-  EFI_SCSI_SENSE_DATA   *SenseData;
-  UINT8                 MaxRetry;
-  UINT8                 Index;
-  BOOLEAN               ScsiDeviceFound;
+  EFI_STATUS             Status;
+  UINT32                 InquiryDataLength;
+  UINT8                  SenseDataLength;
+  UINT8                  HostAdapterStatus;
+  UINT8                  TargetStatus;
+  EFI_SCSI_INQUIRY_DATA  *InquiryData;
+  EFI_SCSI_SENSE_DATA    *SenseData;
+  UINT8                  MaxRetry;
+  UINT8                  Index;
+  BOOLEAN                ScsiDeviceFound;
 
   HostAdapterStatus = 0;
   TargetStatus      = 0;
@@ -1327,29 +1321,33 @@ DiscoverScsiDevice (
   MaxRetry = 2;
   for (Index = 0; Index < MaxRetry; Index++) {
     Status = ScsiInquiryCommand (
-              &ScsiIoDevice->ScsiIo,
-              SCSI_BUS_TIMEOUT,
-              SenseData,
-              &SenseDataLength,
-              &HostAdapterStatus,
-              &TargetStatus,
-              (VOID *) InquiryData,
-              &InquiryDataLength,
-              FALSE
-              );
+               &ScsiIoDevice->ScsiIo,
+               SCSI_BUS_TIMEOUT,
+               SenseData,
+               &SenseDataLength,
+               &HostAdapterStatus,
+               &TargetStatus,
+               (VOID *)InquiryData,
+               &InquiryDataLength,
+               FALSE
+               );
     if (!EFI_ERROR (Status)) {
       if ((HostAdapterStatus == EFI_SCSI_IO_STATUS_HOST_ADAPTER_OK) &&
           (TargetStatus == EFI_SCSI_IO_STATUS_TARGET_CHECK_CONDITION) &&
           (SenseData->Error_Code == 0x70) &&
-          (SenseData->Sense_Key == EFI_SCSI_SK_ILLEGAL_REQUEST)) {
+          (SenseData->Sense_Key == EFI_SCSI_SK_ILLEGAL_REQUEST))
+      {
         ScsiDeviceFound = FALSE;
         goto Done;
       }
+
       break;
     }
+
     if ((Status == EFI_BAD_BUFFER_SIZE) ||
         (Status == EFI_INVALID_PARAMETER) ||
-        (Status == EFI_UNSUPPORTED)) {
+        (Status == EFI_UNSUPPORTED))
+    {
       ScsiDeviceFound = FALSE;
       goto Done;
     }
@@ -1369,7 +1367,8 @@ DiscoverScsiDevice (
   }
 
   if ((InquiryData->Peripheral_Type >= EFI_SCSI_TYPE_RESERVED_LOW) &&
-      (InquiryData->Peripheral_Type <= EFI_SCSI_TYPE_RESERVED_HIGH)) {
+      (InquiryData->Peripheral_Type <= EFI_SCSI_TYPE_RESERVED_HIGH))
+  {
     ScsiDeviceFound = FALSE;
     goto Done;
   }
@@ -1385,7 +1384,7 @@ DiscoverScsiDevice (
     //
     // ANSI-approved version
     //
-    ScsiIoDevice->ScsiVersion = (UINT8) (InquiryData->Version & 0x07);
+    ScsiIoDevice->ScsiVersion = (UINT8)(InquiryData->Version & 0x07);
   }
 
   ScsiDeviceFound = TRUE;
@@ -1396,7 +1395,6 @@ Done:
 
   return ScsiDeviceFound;
 }
-
 
 /**
   Convert EFI_SCSI_IO_SCSI_REQUEST_PACKET packet to EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET packet.
@@ -1413,7 +1411,7 @@ ScsiioToPassThruPacket (
   )
 {
   //
-  //EFI 1.10 doesn't support Bi-Direction Command.
+  // EFI 1.10 doesn't support Bi-Direction Command.
   //
   if (Packet->DataDirection == EFI_SCSI_IO_DATA_DIRECTION_BIDIRECTIONAL) {
     return EFI_UNSUPPORTED;
@@ -1431,15 +1429,15 @@ ScsiioToPassThruPacket (
   CommandPacket->SenseDataLength   = Packet->SenseDataLength;
 
   if (Packet->DataDirection == EFI_SCSI_IO_DATA_DIRECTION_READ) {
-    CommandPacket->DataBuffer = Packet->InDataBuffer;
+    CommandPacket->DataBuffer     = Packet->InDataBuffer;
     CommandPacket->TransferLength = Packet->InTransferLength;
   } else if (Packet->DataDirection == EFI_SCSI_IO_DATA_DIRECTION_WRITE) {
-    CommandPacket->DataBuffer = Packet->OutDataBuffer;
+    CommandPacket->DataBuffer     = Packet->OutDataBuffer;
     CommandPacket->TransferLength = Packet->OutTransferLength;
   }
+
   return EFI_SUCCESS;
 }
-
 
 /**
   Convert EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET packet to EFI_SCSI_IO_SCSI_REQUEST_PACKET packet.
@@ -1465,10 +1463,10 @@ PassThruToScsiioPacket (
   Packet->SenseDataLength   = ScsiPacket->SenseDataLength;
 
   if (ScsiPacket->DataDirection == EFI_SCSI_IO_DATA_DIRECTION_READ) {
-    Packet->InDataBuffer = ScsiPacket->DataBuffer;
+    Packet->InDataBuffer     = ScsiPacket->DataBuffer;
     Packet->InTransferLength = ScsiPacket->TransferLength;
   } else if (Packet->DataDirection == EFI_SCSI_IO_DATA_DIRECTION_WRITE) {
-    Packet->OutDataBuffer = ScsiPacket->DataBuffer;
+    Packet->OutDataBuffer     = ScsiPacket->DataBuffer;
     Packet->OutTransferLength = ScsiPacket->TransferLength;
   }
 
@@ -1490,31 +1488,30 @@ NotifyFunction (
   IN  VOID       *Context
   )
 {
-  EFI_SCSI_IO_SCSI_REQUEST_PACKET          *Packet;
-  EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET   *ScsiPacket;
-  EFI_EVENT                                CallerEvent;
-  SCSI_EVENT_DATA                          *PassData;
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET         *Packet;
+  EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *ScsiPacket;
+  EFI_EVENT                               CallerEvent;
+  SCSI_EVENT_DATA                         *PassData;
 
-  PassData = (SCSI_EVENT_DATA*)Context;
-  Packet  = (EFI_SCSI_IO_SCSI_REQUEST_PACKET *)PassData->Data1;
-  ScsiPacket =  (EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET*)mWorkingBuffer;
+  PassData   = (SCSI_EVENT_DATA *)Context;
+  Packet     = (EFI_SCSI_IO_SCSI_REQUEST_PACKET *)PassData->Data1;
+  ScsiPacket =  (EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *)mWorkingBuffer;
 
   //
   // Convert EFI1.0 PassThru packet to UEFI2.0 SCSI IO Packet.
   //
-  PassThruToScsiioPacket(ScsiPacket, Packet);
+  PassThruToScsiioPacket (ScsiPacket, Packet);
 
   //
   // After converting EFI1.0 PassThru Packet back to UEFI2.0 SCSI IO Packet,
   // free mWorkingBuffer.
   //
-  gBS->FreePool(mWorkingBuffer);
+  gBS->FreePool (mWorkingBuffer);
 
   //
   // Signal Event to tell caller to pick up UEFI2.0 SCSI IO Packet.
   //
   CallerEvent = PassData->Data2;
-  gBS->CloseEvent(Event);
-  gBS->SignalEvent(CallerEvent);
+  gBS->CloseEvent (Event);
+  gBS->SignalEvent (CallerEvent);
 }
-

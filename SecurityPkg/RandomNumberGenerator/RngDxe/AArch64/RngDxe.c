@@ -52,13 +52,13 @@
 EFI_STATUS
 EFIAPI
 RngGetRNG (
-  IN EFI_RNG_PROTOCOL            *This,
-  IN EFI_RNG_ALGORITHM           *RNGAlgorithm, OPTIONAL
-  IN UINTN                       RNGValueLength,
-  OUT UINT8                      *RNGValue
+  IN EFI_RNG_PROTOCOL   *This,
+  IN EFI_RNG_ALGORITHM  *RNGAlgorithm  OPTIONAL,
+  IN UINTN              RNGValueLength,
+  OUT UINT8             *RNGValue
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   if ((RNGValueLength == 0) || (RNGValue == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -103,12 +103,12 @@ RngGetRNG (
 UINTN
 EFIAPI
 ArchGetSupportedRngAlgorithms (
-  IN OUT UINTN                     *RNGAlgorithmListSize,
-  OUT    EFI_RNG_ALGORITHM         *RNGAlgorithmList
+  IN OUT UINTN              *RNGAlgorithmListSize,
+  OUT    EFI_RNG_ALGORITHM  *RNGAlgorithmList
   )
 {
-  UINTN RequiredSize;
-  EFI_RNG_ALGORITHM *CpuRngSupportedAlgorithm;
+  UINTN              RequiredSize;
+  EFI_RNG_ALGORITHM  *CpuRngSupportedAlgorithm;
 
   RequiredSize = sizeof (EFI_RNG_ALGORITHM);
 
@@ -119,7 +119,7 @@ ArchGetSupportedRngAlgorithms (
 
   CpuRngSupportedAlgorithm = PcdGetPtr (PcdCpuRngSupportedAlgorithm);
 
-  CopyMem(&RNGAlgorithmList[0], CpuRngSupportedAlgorithm, sizeof (EFI_RNG_ALGORITHM));
+  CopyMem (&RNGAlgorithmList[0], CpuRngSupportedAlgorithm, sizeof (EFI_RNG_ALGORITHM));
 
   *RNGAlgorithmListSize = RequiredSize;
   return EFI_SUCCESS;

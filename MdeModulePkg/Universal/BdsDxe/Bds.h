@@ -17,7 +17,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Protocol/Bds.h>
 #include <Protocol/LoadedImage.h>
-#include <Protocol/VariableLock.h>
 #include <Protocol/DeferredImageLoad.h>
 
 #include <Library/UefiDriverEntryPoint.h>
@@ -38,15 +37,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PlatformBootManagerLib.h>
 
 #if !defined (EFI_REMOVABLE_MEDIA_FILE_NAME)
-    #if defined (MDE_CPU_EBC)
-        //
-        // Uefi specification only defines the default boot file name for IA32, X64
-        // and IPF processor, so need define boot file name for EBC architecture here.
-        //
-        #define EFI_REMOVABLE_MEDIA_FILE_NAME L"\\EFI\\BOOT\\BOOTEBC.EFI"
-    #else
-        #error "Can not determine the default boot file name for unknown processor type!"
-    #endif
+  #if defined (MDE_CPU_EBC)
+//
+// Uefi specification only defines the default boot file name for IA32, X64
+// and IPF processor, so need define boot file name for EBC architecture here.
+//
+#define EFI_REMOVABLE_MEDIA_FILE_NAME  L"\\EFI\\BOOT\\BOOTEBC.EFI"
+  #else
+    #error "Can not determine the default boot file name for unknown processor type!"
+  #endif
 #endif
 
 /**
@@ -60,7 +59,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 VOID
 EFIAPI
 BdsEntry (
-  IN  EFI_BDS_ARCH_PROTOCOL *This
+  IN  EFI_BDS_ARCH_PROTOCOL  *This
   );
 
 /**
@@ -98,11 +97,11 @@ BdsEntry (
 **/
 EFI_STATUS
 BdsDxeSetVariableAndReportStatusCodeOnError (
-  IN CHAR16     *VariableName,
-  IN EFI_GUID   *VendorGuid,
-  IN UINT32     Attributes,
-  IN UINTN      DataSize,
-  IN VOID       *Data
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid,
+  IN UINT32    Attributes,
+  IN UINTN     DataSize,
+  IN VOID      *Data
   );
 
 #endif

@@ -6,7 +6,6 @@
 
 **/
 
-
 #ifndef __PLATFORM_FLASH_ACCESS_LIB_H__
 #define __PLATFORM_FLASH_ACCESS_LIB_H__
 
@@ -43,11 +42,11 @@ typedef enum {
 EFI_STATUS
 EFIAPI
 PerformFlashWrite (
-  IN PLATFORM_FIRMWARE_TYPE       FirmwareType,
-  IN EFI_PHYSICAL_ADDRESS         FlashAddress,
-  IN FLASH_ADDRESS_TYPE           FlashAddressType,
-  IN VOID                         *Buffer,
-  IN UINTN                        Length
+  IN PLATFORM_FIRMWARE_TYPE  FirmwareType,
+  IN EFI_PHYSICAL_ADDRESS    FlashAddress,
+  IN FLASH_ADDRESS_TYPE      FlashAddressType,
+  IN VOID                    *Buffer,
+  IN UINTN                   Length
   );
 
 /**
@@ -88,7 +87,7 @@ PerformFlashWriteWithProgress (
   IN FLASH_ADDRESS_TYPE                             FlashAddressType,
   IN VOID                                           *Buffer,
   IN UINTN                                          Length,
-  IN EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress,        OPTIONAL
+  IN EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress         OPTIONAL,
   IN UINTN                                          StartPercentage,
   IN UINTN                                          EndPercentage
   );

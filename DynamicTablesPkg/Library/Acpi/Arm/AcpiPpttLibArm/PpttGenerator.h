@@ -21,30 +21,30 @@
 /// Cache parameters allowed by the architecture with
 /// ARMv8.3-CCIDX (Cache extended number of sets)
 /// Derived from CCSIDR_EL1 when ID_AA64MMFR2_EL1.CCIDX==0001
-#define PPTT_ARM_CCIDX_CACHE_NUMBER_OF_SETS_MAX       (1 << 24)
-#define PPTT_ARM_CCIDX_CACHE_ASSOCIATIVITY_MAX        (1 << 21)
+#define PPTT_ARM_CCIDX_CACHE_NUMBER_OF_SETS_MAX  (1 << 24)
+#define PPTT_ARM_CCIDX_CACHE_ASSOCIATIVITY_MAX   (1 << 21)
 
 /// Cache parameters allowed by the architecture without
 /// ARMv8.3-CCIDX (Cache extended number of sets)
 /// Derived from CCSIDR_EL1 when ID_AA64MMFR2_EL1.CCIDX==0000
-#define PPTT_ARM_CACHE_NUMBER_OF_SETS_MAX             (1 << 15)
-#define PPTT_ARM_CACHE_ASSOCIATIVITY_MAX              (1 << 10)
+#define PPTT_ARM_CACHE_NUMBER_OF_SETS_MAX  (1 << 15)
+#define PPTT_ARM_CACHE_ASSOCIATIVITY_MAX   (1 << 10)
 
 /// Common cache parameters
 /// Derived from CCSIDR_EL1
 /// The LineSize is represented by bits 2:0
 /// (Log2(Number of bytes in cache line)) - 4 is used to represent
 /// the LineSize bits.
-#define PPTT_ARM_CACHE_LINE_SIZE_MAX                  (1 << 11)
-#define PPTT_ARM_CACHE_LINE_SIZE_MIN                  (1 << 4)
+#define PPTT_ARM_CACHE_LINE_SIZE_MAX  (1 << 11)
+#define PPTT_ARM_CACHE_LINE_SIZE_MIN  (1 << 4)
 
 /// Test if the given Processor Hierarchy Info object has the 'Node is a Leaf'
 /// flag set
-#define IS_PROC_NODE_LEAF(Node) ((Node->Flags & BIT3) != 0)
+#define IS_PROC_NODE_LEAF(Node)  ((Node->Flags & BIT3) != 0)
 
 /// Test if the given Processor Hierarchy Info object has the 'ACPI Processor
 /// ID valid' flag set
-#define IS_ACPI_PROC_ID_VALID(Node) ((Node->Flags & BIT1) != 0)
+#define IS_ACPI_PROC_ID_VALID(Node)  ((Node->Flags & BIT1) != 0)
 
 /**
   The GET_SIZE_OF_PPTT_STRUCTS macro expands to a function that is used to
@@ -90,10 +90,10 @@
   @param [in]       CmObjectType    Data type of the CM nodes in NodesToIndex.
 **/
 #define GET_SIZE_OF_PPTT_STRUCTS(                                             \
-  PpttObjName,                                                                \
-  PpttObjSize,                                                                \
-  CmObjectType                                                                \
-)                                                                             \
+                                                                              PpttObjName,                                                                \
+                                                                              PpttObjSize,                                                                \
+                                                                              CmObjectType                                                                \
+                                                                              )                                                                             \
 STATIC                                                                        \
 UINT32                                                                        \
 GetSizeof##PpttObjName (                                                      \
@@ -148,7 +148,7 @@ typedef struct PpttNodeIndexer {
   /// Unique identifier for the node
   CM_OBJECT_TOKEN           Token;
   /// Pointer to the CM object being indexed
-  VOID                    * Object;
+  VOID                      *Object;
   /// Offset from the start of the PPTT table to the PPTT structure which is
   /// represented by Object
   UINT32                    Offset;
@@ -159,29 +159,25 @@ typedef struct PpttNodeIndexer {
   /// Indexer element in the processor and cache topology
   /// e.g For a hardware thread the TopologyParent would point to a CPU node
   ///     For a L1 cache the TopologyParent would point to a L2 cache
-  struct PpttNodeIndexer  * TopologyParent;
+  struct PpttNodeIndexer    *TopologyParent;
 } PPTT_NODE_INDEXER;
 
 typedef struct AcpiPpttGenerator {
   /// ACPI Table generator header
-  ACPI_TABLE_GENERATOR  Header;
+  ACPI_TABLE_GENERATOR    Header;
   /// PPTT structure count
-  UINT32                ProcTopologyStructCount;
+  UINT32                  ProcTopologyStructCount;
   /// Count of Processor Hierarchy Nodes
-  UINT32                ProcHierarchyNodeCount;
+  UINT32                  ProcHierarchyNodeCount;
   /// Count of Cache Structures
-  UINT32                CacheStructCount;
-  /// Count of Id Structures
-  UINT32                IdStructCount;
+  UINT32                  CacheStructCount;
   /// List of indexed CM objects for PPTT generation
-  PPTT_NODE_INDEXER   * NodeIndexer;
+  PPTT_NODE_INDEXER       *NodeIndexer;
   /// Pointer to the start of Processor Hierarchy nodes in
   /// the Node Indexer array
-  PPTT_NODE_INDEXER   * ProcHierarchyNodeIndexedList;
+  PPTT_NODE_INDEXER       *ProcHierarchyNodeIndexedList;
   /// Pointer to the start of Cache Structures in the Node Indexer array
-  PPTT_NODE_INDEXER   * CacheStructIndexedList;
-  /// Pointer to the start of Id Structures in the Node Indexer array
-  PPTT_NODE_INDEXER   * IdStructIndexedList;
+  PPTT_NODE_INDEXER       *CacheStructIndexedList;
 } ACPI_PPTT_GENERATOR;
 
 #pragma pack()

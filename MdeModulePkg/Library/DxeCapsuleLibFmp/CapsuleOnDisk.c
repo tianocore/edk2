@@ -18,7 +18,7 @@
 **/
 BOOLEAN
 IsCapsuleNameCapsule (
-  IN EFI_CAPSULE_HEADER         *CapsuleHeader
+  IN EFI_CAPSULE_HEADER  *CapsuleHeader
   );
 
 /**
@@ -37,16 +37,16 @@ IsCapsuleNameCapsule (
 **/
 EFI_PHYSICAL_ADDRESS *
 ValidateCapsuleNameCapsuleIntegrity (
-  IN  EFI_CAPSULE_HEADER            *CapsuleHeader,
-  OUT UINTN                         *CapsuleNameNum
+  IN  EFI_CAPSULE_HEADER  *CapsuleHeader,
+  OUT UINTN               *CapsuleNameNum
   )
 {
-  UINT8                    *CapsuleNamePtr;
-  UINT8                    *CapsuleNameBufStart;
-  UINT8                    *CapsuleNameBufEnd;
-  UINTN                    Index;
-  UINTN                    StringSize;
-  EFI_PHYSICAL_ADDRESS     *CapsuleNameBuf;
+  UINT8                 *CapsuleNamePtr;
+  UINT8                 *CapsuleNameBufStart;
+  UINT8                 *CapsuleNameBufEnd;
+  UINTN                 Index;
+  UINTN                 StringSize;
+  EFI_PHYSICAL_ADDRESS  *CapsuleNameBuf;
 
   if (!IsCapsuleNameCapsule (CapsuleHeader)) {
     return NULL;
@@ -59,14 +59,14 @@ ValidateCapsuleNameCapsuleIntegrity (
     return NULL;
   }
 
-  *CapsuleNameNum = 0;
-  Index = 0;
-  CapsuleNameBufStart = (UINT8 *) CapsuleHeader + CapsuleHeader->HeaderSize;
+  *CapsuleNameNum     = 0;
+  Index               = 0;
+  CapsuleNameBufStart = (UINT8 *)CapsuleHeader + CapsuleHeader->HeaderSize;
 
   //
   // If strings are not aligned on a 16-bit boundary, reallocate memory for it.
   //
-  if (((UINTN) CapsuleNameBufStart & BIT0) != 0) {
+  if (((UINTN)CapsuleNameBufStart & BIT0) != 0) {
     CapsuleNameBufStart = AllocateCopyPool (CapsuleHeader->CapsuleImageSize - CapsuleHeader->HeaderSize, CapsuleNameBufStart);
     if (CapsuleNameBufStart == NULL) {
       return NULL;
@@ -77,9 +77,9 @@ ValidateCapsuleNameCapsuleIntegrity (
 
   CapsuleNamePtr = CapsuleNameBufStart;
   while (CapsuleNamePtr < CapsuleNameBufEnd) {
-    StringSize= StrnSizeS ((CHAR16 *) CapsuleNamePtr, (CapsuleNameBufEnd - CapsuleNamePtr)/sizeof(CHAR16));
+    StringSize      = StrnSizeS ((CHAR16 *)CapsuleNamePtr, (CapsuleNameBufEnd - CapsuleNamePtr)/sizeof (CHAR16));
     CapsuleNamePtr += StringSize;
-    (*CapsuleNameNum) ++;
+    (*CapsuleNameNum)++;
   }
 
   //
@@ -89,6 +89,7 @@ ValidateCapsuleNameCapsuleIntegrity (
     if (CapsuleNameBufStart != (UINT8 *)CapsuleHeader + CapsuleHeader->HeaderSize) {
       FreePool (CapsuleNameBufStart);
     }
+
     return NULL;
   }
 
@@ -97,15 +98,16 @@ ValidateCapsuleNameCapsuleIntegrity (
     if (CapsuleNameBufStart != (UINT8 *)CapsuleHeader + CapsuleHeader->HeaderSize) {
       FreePool (CapsuleNameBufStart);
     }
+
     return NULL;
   }
 
   CapsuleNamePtr = CapsuleNameBufStart;
   while (CapsuleNamePtr < CapsuleNameBufEnd) {
-    StringSize= StrnSizeS ((CHAR16 *) CapsuleNamePtr, (CapsuleNameBufEnd - CapsuleNamePtr)/sizeof(CHAR16));
-    CapsuleNameBuf[Index] = (EFI_PHYSICAL_ADDRESS)(UINTN) CapsuleNamePtr;
-    CapsuleNamePtr += StringSize;
-    Index ++;
+    StringSize            = StrnSizeS ((CHAR16 *)CapsuleNamePtr, (CapsuleNameBufEnd - CapsuleNamePtr)/sizeof (CHAR16));
+    CapsuleNameBuf[Index] = (EFI_PHYSICAL_ADDRESS)(UINTN)CapsuleNamePtr;
+    CapsuleNamePtr       += StringSize;
+    Index++;
   }
 
   return CapsuleNameBuf;
@@ -122,13 +124,13 @@ ValidateCapsuleNameCapsuleIntegrity (
 static
 CHAR16 *
 UpperCaseString (
-  IN CHAR16 *Str
+  IN CHAR16  *Str
   )
 {
   CHAR16  *Cptr;
 
   for (Cptr = Str; *Cptr != L'\0'; Cptr++) {
-    if (L'a' <= *Cptr && *Cptr <= L'z') {
+    if ((L'a' <= *Cptr) && (*Cptr <= L'z')) {
       *Cptr = *Cptr - L'a' + L'A';
     }
   }
@@ -148,18 +150,19 @@ UpperCaseString (
 static
 VOID
 GetSubStringBeforePeriod (
-  IN  CHAR16 *Str,
-  OUT CHAR16 *SubStr,
-  OUT UINTN  *SubStrLen
+  IN  CHAR16  *Str,
+  OUT CHAR16  *SubStr,
+  OUT UINTN   *SubStrLen
   )
 {
-  UINTN Index;
+  UINTN  Index;
+
   for (Index = 0; Str[Index] != L'.' && Str[Index] != L'\0'; Index++) {
     SubStr[Index] = Str[Index];
   }
 
   SubStr[Index] = L'\0';
-  *SubStrLen = Index;
+  *SubStrLen    = Index;
 }
 
 /**
@@ -173,16 +176,17 @@ GetSubStringBeforePeriod (
 static
 VOID
 PadStrInTail (
-  IN CHAR16   *StrBuf,
-  IN UINTN    PadLen,
-  IN CHAR16   Character
+  IN CHAR16  *StrBuf,
+  IN UINTN   PadLen,
+  IN CHAR16  Character
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
-  for (Index = 0; StrBuf[Index] != L'\0'; Index++);
+  for (Index = 0; StrBuf[Index] != L'\0'; Index++) {
+  }
 
-  while(PadLen != 0) {
+  while (PadLen != 0) {
     StrBuf[Index] = Character;
     Index++;
     PadLen--;
@@ -208,26 +212,27 @@ SplitFileNameExtension (
   OUT CHAR16  *FileNameExtension
   )
 {
-  UINTN Index;
-  UINTN StringLen;
+  UINTN  Index;
+  UINTN  StringLen;
 
-  StringLen = StrnLenS(FileName, MAX_FILE_NAME_SIZE);
-  for (Index = StringLen; Index > 0 && FileName[Index] != L'.'; Index--);
+  StringLen = StrnLenS (FileName, MAX_FILE_NAME_SIZE);
+  for (Index = StringLen; Index > 0 && FileName[Index] != L'.'; Index--) {
+  }
 
   //
   // No period exists. No FileName Extension
   //
-  if (Index == 0 && FileName[Index] != L'.') {
+  if ((Index == 0) && (FileName[Index] != L'.')) {
     FileNameExtension[0] = L'\0';
-    Index = StringLen;
+    Index                = StringLen;
   } else {
-    StrCpyS(FileNameExtension, MAX_FILE_NAME_SIZE, &FileName[Index+1]);
+    StrCpyS (FileNameExtension, MAX_FILE_NAME_SIZE, &FileName[Index+1]);
   }
 
   //
   // Copy First file name
   //
-  StrnCpyS(FileNameFirst, MAX_FILE_NAME_SIZE, FileName, Index);
+  StrnCpyS (FileNameFirst, MAX_FILE_NAME_SIZE, FileName, Index);
   FileNameFirst[Index] = L'\0';
 }
 
@@ -243,51 +248,51 @@ SplitFileNameExtension (
 
 **/
 EFI_STATUS
-GetBootOptionInOrder(
-  OUT EFI_BOOT_MANAGER_LOAD_OPTION **OptionBuf,
-  OUT UINTN                        *OptionCount
+GetBootOptionInOrder (
+  OUT EFI_BOOT_MANAGER_LOAD_OPTION  **OptionBuf,
+  OUT UINTN                         *OptionCount
   )
 {
-  EFI_STATUS                   Status;
-  UINTN                        DataSize;
-  UINT16                       BootNext;
-  CHAR16                       BootOptionName[20];
-  EFI_BOOT_MANAGER_LOAD_OPTION *BootOrderOptionBuf;
-  UINTN                        BootOrderCount;
-  EFI_BOOT_MANAGER_LOAD_OPTION BootNextOptionEntry;
-  UINTN                        BootNextCount;
-  EFI_BOOT_MANAGER_LOAD_OPTION *TempBuf;
+  EFI_STATUS                    Status;
+  UINTN                         DataSize;
+  UINT16                        BootNext;
+  CHAR16                        BootOptionName[20];
+  EFI_BOOT_MANAGER_LOAD_OPTION  *BootOrderOptionBuf;
+  UINTN                         BootOrderCount;
+  EFI_BOOT_MANAGER_LOAD_OPTION  BootNextOptionEntry;
+  UINTN                         BootNextCount;
+  EFI_BOOT_MANAGER_LOAD_OPTION  *TempBuf;
 
-  BootOrderOptionBuf  = NULL;
-  TempBuf             = NULL;
-  BootNextCount       = 0;
-  BootOrderCount      = 0;
-  *OptionBuf          = NULL;
-  *OptionCount        = 0;
+  BootOrderOptionBuf = NULL;
+  TempBuf            = NULL;
+  BootNextCount      = 0;
+  BootOrderCount     = 0;
+  *OptionBuf         = NULL;
+  *OptionCount       = 0;
 
   //
   // First Get BootOption from "BootNext"
   //
-  DataSize = sizeof(BootNext);
-  Status = gRT->GetVariable (
-                  EFI_BOOT_NEXT_VARIABLE_NAME,
-                  &gEfiGlobalVariableGuid,
-                  NULL,
-                  &DataSize,
-                  (VOID *)&BootNext
-                  );
+  DataSize = sizeof (BootNext);
+  Status   = gRT->GetVariable (
+                    EFI_BOOT_NEXT_VARIABLE_NAME,
+                    &gEfiGlobalVariableGuid,
+                    NULL,
+                    &DataSize,
+                    (VOID *)&BootNext
+                    );
   //
   // BootNext variable is a single UINT16
   //
-  if (!EFI_ERROR(Status) && DataSize == sizeof(UINT16)) {
+  if (!EFI_ERROR (Status) && (DataSize == sizeof (UINT16))) {
     //
     // Add the boot next boot option
     //
     UnicodeSPrint (BootOptionName, sizeof (BootOptionName), L"Boot%04x", BootNext);
-    ZeroMem(&BootNextOptionEntry, sizeof(EFI_BOOT_MANAGER_LOAD_OPTION));
+    ZeroMem (&BootNextOptionEntry, sizeof (EFI_BOOT_MANAGER_LOAD_OPTION));
     Status = EfiBootManagerVariableToLoadOption (BootOptionName, &BootNextOptionEntry);
 
-    if (!EFI_ERROR(Status)) {
+    if (!EFI_ERROR (Status)) {
       BootNextCount = 1;
     }
   }
@@ -296,31 +301,31 @@ GetBootOptionInOrder(
   // Second get BootOption from "BootOrder"
   //
   BootOrderOptionBuf = EfiBootManagerGetLoadOptions (&BootOrderCount, LoadOptionTypeBoot);
-  if (BootNextCount == 0 && BootOrderCount == 0) {
+  if ((BootNextCount == 0) && (BootOrderCount == 0)) {
     return EFI_NOT_FOUND;
   }
 
   //
   // At least one BootOption is found
   //
-  TempBuf = AllocatePool(sizeof(EFI_BOOT_MANAGER_LOAD_OPTION) * (BootNextCount + BootOrderCount));
+  TempBuf = AllocatePool (sizeof (EFI_BOOT_MANAGER_LOAD_OPTION) * (BootNextCount + BootOrderCount));
   if (TempBuf != NULL) {
     if (BootNextCount == 1) {
-      CopyMem(TempBuf, &BootNextOptionEntry, sizeof(EFI_BOOT_MANAGER_LOAD_OPTION));
+      CopyMem (TempBuf, &BootNextOptionEntry, sizeof (EFI_BOOT_MANAGER_LOAD_OPTION));
     }
 
     if (BootOrderCount > 0) {
-      CopyMem(TempBuf + BootNextCount, BootOrderOptionBuf, sizeof(EFI_BOOT_MANAGER_LOAD_OPTION) * BootOrderCount);
+      CopyMem (TempBuf + BootNextCount, BootOrderOptionBuf, sizeof (EFI_BOOT_MANAGER_LOAD_OPTION) * BootOrderCount);
     }
 
     *OptionBuf   = TempBuf;
     *OptionCount = BootNextCount + BootOrderCount;
-    Status = EFI_SUCCESS;
+    Status       = EFI_SUCCESS;
   } else {
     Status = EFI_OUT_OF_RESOURCES;
   }
 
-  FreePool(BootOrderOptionBuf);
+  FreePool (BootOrderOptionBuf);
 
   return Status;
 }
@@ -335,9 +340,9 @@ GetBootOptionInOrder(
 
 **/
 EFI_STATUS
-GetBootOptionByNumber(
-  IN  UINT16                       Number,
-  OUT EFI_BOOT_MANAGER_LOAD_OPTION **OptionBuf
+GetBootOptionByNumber (
+  IN  UINT16                        Number,
+  OUT EFI_BOOT_MANAGER_LOAD_OPTION  **OptionBuf
   )
 {
   EFI_STATUS                    Status;
@@ -372,16 +377,16 @@ GetBootOptionByNumber(
 
 **/
 EFI_STATUS
-GetEfiSysPartitionFromDevPath(
-  IN EFI_DEVICE_PATH_PROTOCOL         *DevicePath,
-  OUT EFI_HANDLE                      *FsHandle
+GetEfiSysPartitionFromDevPath (
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  OUT EFI_HANDLE               *FsHandle
   )
 {
-  EFI_STATUS                      Status;
-  EFI_DEVICE_PATH_PROTOCOL        *TempDevicePath;
-  HARDDRIVE_DEVICE_PATH           *Hd;
-  EFI_HANDLE                      Handle;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *Fs;
+  EFI_STATUS                       Status;
+  EFI_DEVICE_PATH_PROTOCOL         *TempDevicePath;
+  HARDDRIVE_DEVICE_PATH            *Hd;
+  EFI_HANDLE                       Handle;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *Fs;
 
   //
   // Check if the device path contains GPT node
@@ -389,12 +394,14 @@ GetEfiSysPartitionFromDevPath(
   TempDevicePath = DevicePath;
   while (!IsDevicePathEnd (TempDevicePath)) {
     if ((DevicePathType (TempDevicePath) == MEDIA_DEVICE_PATH) &&
-       (DevicePathSubType (TempDevicePath) == MEDIA_HARDDRIVE_DP)) {
+        (DevicePathSubType (TempDevicePath) == MEDIA_HARDDRIVE_DP))
+    {
       Hd = (HARDDRIVE_DEVICE_PATH *)TempDevicePath;
       if (Hd->MBRType == MBR_TYPE_EFI_PARTITION_TABLE_HEADER) {
         break;
       }
     }
+
     TempDevicePath = NextDevicePathNode (TempDevicePath);
   }
 
@@ -407,9 +414,9 @@ GetEfiSysPartitionFromDevPath(
     //
     // Search for simple file system on this handler
     //
-    if (!EFI_ERROR(Status)) {
-      Status = gBS->HandleProtocol(Handle, &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);
-      if (!EFI_ERROR(Status)) {
+    if (!EFI_ERROR (Status)) {
+      Status = gBS->HandleProtocol (Handle, &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);
+      if (!EFI_ERROR (Status)) {
         *FsHandle = Handle;
         return EFI_SUCCESS;
       }
@@ -437,33 +444,33 @@ GetEfiSysPartitionFromDevPath(
 
 **/
 EFI_STATUS
-GetEfiSysPartitionFromActiveBootOption(
-  IN UINTN                             MaxRetry,
-  IN OUT UINT16                        **LoadOptionNumber,
-  OUT EFI_HANDLE                       *FsHandle
+GetEfiSysPartitionFromActiveBootOption (
+  IN UINTN        MaxRetry,
+  IN OUT UINT16   **LoadOptionNumber,
+  OUT EFI_HANDLE  *FsHandle
   )
 {
-  EFI_STATUS                   Status;
-  EFI_BOOT_MANAGER_LOAD_OPTION *BootOptionBuf;
-  UINTN                        BootOptionNum;
-  UINTN                        Index;
-  EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
-  EFI_DEVICE_PATH_PROTOCOL     *CurFullPath;
-  EFI_DEVICE_PATH_PROTOCOL     *PreFullPath;
+  EFI_STATUS                    Status;
+  EFI_BOOT_MANAGER_LOAD_OPTION  *BootOptionBuf;
+  UINTN                         BootOptionNum;
+  UINTN                         Index;
+  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL      *CurFullPath;
+  EFI_DEVICE_PATH_PROTOCOL      *PreFullPath;
 
-  *FsHandle = NULL;
+  *FsHandle   = NULL;
   CurFullPath = NULL;
 
   if (*LoadOptionNumber != NULL) {
     BootOptionNum = 1;
-    Status = GetBootOptionByNumber(**LoadOptionNumber, &BootOptionBuf);
-    if (EFI_ERROR(Status)) {
+    Status        = GetBootOptionByNumber (**LoadOptionNumber, &BootOptionBuf);
+    if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "GetBootOptionByIndex Failed %x! No BootOption available for connection\n", Status));
       return Status;
     }
   } else {
-    Status = GetBootOptionInOrder(&BootOptionBuf, &BootOptionNum);
-    if (EFI_ERROR(Status)) {
+    Status = GetBootOptionInOrder (&BootOptionBuf, &BootOptionNum);
+    if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "GetBootOptionInOrder Failed %x! No BootOption available for connection\n", Status));
       return Status;
     }
@@ -479,27 +486,29 @@ GetEfiSysPartitionFromActiveBootOption(
     //
     // Get the boot option from the link list
     //
-    DevicePath  = BootOptionBuf[Index].FilePath;
+    DevicePath = BootOptionBuf[Index].FilePath;
 
     //
     // Skip inactive or legacy boot options
     //
-    if ((BootOptionBuf[Index].Attributes & LOAD_OPTION_ACTIVE) == 0 ||
-        DevicePathType (DevicePath) == BBS_DEVICE_PATH) {
+    if (((BootOptionBuf[Index].Attributes & LOAD_OPTION_ACTIVE) == 0) ||
+        (DevicePathType (DevicePath) == BBS_DEVICE_PATH))
+    {
       continue;
     }
 
-    DEBUG_CODE (
-      CHAR16 *DevicePathStr;
+    DEBUG_CODE_BEGIN ();
+    CHAR16  *DevicePathStr;
 
-      DevicePathStr = ConvertDevicePathToText(DevicePath, TRUE, TRUE);
-      if (DevicePathStr != NULL){
-        DEBUG((DEBUG_INFO, "Try BootOption %s\n", DevicePathStr));
-        FreePool(DevicePathStr);
-      } else {
-        DEBUG((DEBUG_INFO, "DevicePathToStr failed\n"));
-      }
-    );
+    DevicePathStr = ConvertDevicePathToText (DevicePath, TRUE, TRUE);
+    if (DevicePathStr != NULL) {
+      DEBUG ((DEBUG_INFO, "Try BootOption %s\n", DevicePathStr));
+      FreePool (DevicePathStr);
+    } else {
+      DEBUG ((DEBUG_INFO, "DevicePathToStr failed\n"));
+    }
+
+    DEBUG_CODE_END ();
 
     CurFullPath = NULL;
     //
@@ -507,7 +516,7 @@ GetEfiSysPartitionFromActiveBootOption(
     //
     do {
       PreFullPath = CurFullPath;
-      CurFullPath = EfiBootManagerGetNextLoadOptionDevicePath(DevicePath, CurFullPath);
+      CurFullPath = EfiBootManagerGetNextLoadOptionDevicePath (DevicePath, CurFullPath);
 
       if (PreFullPath != NULL) {
         FreePool (PreFullPath);
@@ -521,15 +530,16 @@ GetEfiSysPartitionFromActiveBootOption(
         break;
       }
 
-      DEBUG_CODE (
-        CHAR16 *DevicePathStr1;
+      DEBUG_CODE_BEGIN ();
+      CHAR16  *DevicePathStr1;
 
-        DevicePathStr1 = ConvertDevicePathToText(CurFullPath, TRUE, TRUE);
-        if (DevicePathStr1 != NULL){
-          DEBUG((DEBUG_INFO, "Full device path %s\n", DevicePathStr1));
-          FreePool(DevicePathStr1);
-        }
-      );
+      DevicePathStr1 = ConvertDevicePathToText (CurFullPath, TRUE, TRUE);
+      if (DevicePathStr1 != NULL) {
+        DEBUG ((DEBUG_INFO, "Full device path %s\n", DevicePathStr1));
+        FreePool (DevicePathStr1);
+      }
+
+      DEBUG_CODE_END ();
 
       //
       // Make sure the boot option device path connected.
@@ -537,44 +547,44 @@ GetEfiSysPartitionFromActiveBootOption(
       // FullDevice could contain extra directory & file info. So don't check connection status here.
       //
       EfiBootManagerConnectDevicePath (CurFullPath, NULL);
-      Status = GetEfiSysPartitionFromDevPath(CurFullPath, FsHandle);
+      Status = GetEfiSysPartitionFromDevPath (CurFullPath, FsHandle);
 
       //
       // Some relocation device like USB need more time to get enumerated
       //
-      while (EFI_ERROR(Status) && MaxRetry > 0) {
-        EfiBootManagerConnectDevicePath(CurFullPath, NULL);
+      while (EFI_ERROR (Status) && MaxRetry > 0) {
+        EfiBootManagerConnectDevicePath (CurFullPath, NULL);
 
         //
         // Search for EFI system partition protocol on full device path in Boot Option
         //
-        Status = GetEfiSysPartitionFromDevPath(CurFullPath, FsHandle);
-        if (!EFI_ERROR(Status)) {
+        Status = GetEfiSysPartitionFromDevPath (CurFullPath, FsHandle);
+        if (!EFI_ERROR (Status)) {
           break;
         }
-        DEBUG((DEBUG_ERROR, "GetEfiSysPartitionFromDevPath Loop %x\n", Status));
+
+        DEBUG ((DEBUG_ERROR, "GetEfiSysPartitionFromDevPath Loop %x\n", Status));
         //
         // Stall 100ms if connection failed to ensure USB stack is ready
         //
-        gBS->Stall(100000);
-        MaxRetry --;
+        gBS->Stall (100000);
+        MaxRetry--;
       }
-    } while(EFI_ERROR(Status));
+    } while (EFI_ERROR (Status));
 
     //
     // Find a qualified Simple File System
     //
-    if (!EFI_ERROR(Status)) {
+    if (!EFI_ERROR (Status)) {
       break;
     }
-
   }
 
   //
   // Return the OptionNumber of the boot option where EFI system partition is got from
   //
   if (*LoadOptionNumber == NULL) {
-    *LoadOptionNumber = AllocateCopyPool (sizeof(UINT16), (UINT16 *) &BootOptionBuf[Index].OptionNumber);
+    *LoadOptionNumber = AllocateCopyPool (sizeof (UINT16), (UINT16 *)&BootOptionBuf[Index].OptionNumber);
     if (*LoadOptionNumber == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
     }
@@ -587,21 +597,23 @@ GetEfiSysPartitionFromActiveBootOption(
     Status = EFI_NOT_FOUND;
   }
 
-  DEBUG_CODE (
-    CHAR16 *DevicePathStr2;
-    if (*FsHandle != NULL) {
-      DevicePathStr2 = ConvertDevicePathToText(CurFullPath, TRUE, TRUE);
-      if (DevicePathStr2 != NULL){
-        DEBUG((DEBUG_INFO, "Found Active EFI System Partion on %s\n", DevicePathStr2));
-        FreePool(DevicePathStr2);
-      }
-    } else {
-      DEBUG((DEBUG_INFO, "Failed to found Active EFI System Partion\n"));
+  DEBUG_CODE_BEGIN ();
+  CHAR16  *DevicePathStr2;
+
+  if (*FsHandle != NULL) {
+    DevicePathStr2 = ConvertDevicePathToText (CurFullPath, TRUE, TRUE);
+    if (DevicePathStr2 != NULL) {
+      DEBUG ((DEBUG_INFO, "Found Active EFI System Partion on %s\n", DevicePathStr2));
+      FreePool (DevicePathStr2);
     }
-  );
+  } else {
+    DEBUG ((DEBUG_INFO, "Failed to found Active EFI System Partion\n"));
+  }
+
+  DEBUG_CODE_END ();
 
   if (CurFullPath != NULL) {
-    FreePool(CurFullPath);
+    FreePool (CurFullPath);
   }
 
   //
@@ -609,23 +621,22 @@ GetEfiSysPartitionFromActiveBootOption(
   //
   for (Index = 0; Index < BootOptionNum; Index++) {
     if (BootOptionBuf[Index].Description != NULL) {
-      FreePool(BootOptionBuf[Index].Description);
+      FreePool (BootOptionBuf[Index].Description);
     }
 
     if (BootOptionBuf[Index].FilePath != NULL) {
-      FreePool(BootOptionBuf[Index].FilePath);
+      FreePool (BootOptionBuf[Index].FilePath);
     }
 
     if (BootOptionBuf[Index].OptionalData != NULL) {
-      FreePool(BootOptionBuf[Index].OptionalData);
+      FreePool (BootOptionBuf[Index].OptionalData);
     }
   }
 
-  FreePool(BootOptionBuf);
+  FreePool (BootOptionBuf);
 
   return Status;
 }
-
 
 /**
   This routine is called to get all file infos with in a given dir & with given file attribute, the file info is listed in
@@ -640,31 +651,31 @@ GetEfiSysPartitionFromActiveBootOption(
 
 **/
 EFI_STATUS
-GetFileInfoListInAlphabetFromDir(
+GetFileInfoListInAlphabetFromDir (
   IN EFI_FILE_HANDLE  Dir,
   IN UINT64           FileAttr,
   OUT LIST_ENTRY      *FileInfoList,
   OUT UINTN           *FileNum
   )
 {
-  EFI_STATUS        Status;
-  FILE_INFO_ENTRY   *NewFileInfoEntry;
-  FILE_INFO_ENTRY   *TempFileInfoEntry;
-  EFI_FILE_INFO     *FileInfo;
-  CHAR16            *NewFileName;
-  CHAR16            *ListedFileName;
-  CHAR16            *NewFileNameExtension;
-  CHAR16            *ListedFileNameExtension;
-  CHAR16            *TempNewSubStr;
-  CHAR16            *TempListedSubStr;
-  LIST_ENTRY        *Link;
-  BOOLEAN           NoFile;
-  UINTN             FileCount;
-  UINTN             IndexNew;
-  UINTN             IndexListed;
-  UINTN             NewSubStrLen;
-  UINTN             ListedSubStrLen;
-  INTN              SubStrCmpResult;
+  EFI_STATUS       Status;
+  FILE_INFO_ENTRY  *NewFileInfoEntry;
+  FILE_INFO_ENTRY  *TempFileInfoEntry;
+  EFI_FILE_INFO    *FileInfo;
+  CHAR16           *NewFileName;
+  CHAR16           *ListedFileName;
+  CHAR16           *NewFileNameExtension;
+  CHAR16           *ListedFileNameExtension;
+  CHAR16           *TempNewSubStr;
+  CHAR16           *TempListedSubStr;
+  LIST_ENTRY       *Link;
+  BOOLEAN          NoFile;
+  UINTN            FileCount;
+  UINTN            IndexNew;
+  UINTN            IndexListed;
+  UINTN            NewSubStrLen;
+  UINTN            ListedSubStrLen;
+  INTN             SubStrCmpResult;
 
   Status                  = EFI_SUCCESS;
   NewFileName             = NULL;
@@ -677,20 +688,21 @@ GetFileInfoListInAlphabetFromDir(
   NoFile                  = FALSE;
   FileCount               = 0;
 
-  InitializeListHead(FileInfoList);
+  InitializeListHead (FileInfoList);
 
-  TempNewSubStr           = (CHAR16 *) AllocateZeroPool(MAX_FILE_NAME_SIZE);
-  TempListedSubStr        = (CHAR16 *) AllocateZeroPool(MAX_FILE_NAME_SIZE);
+  TempNewSubStr    = (CHAR16 *)AllocateZeroPool (MAX_FILE_NAME_SIZE);
+  TempListedSubStr = (CHAR16 *)AllocateZeroPool (MAX_FILE_NAME_SIZE);
 
-  if (TempNewSubStr == NULL || TempListedSubStr == NULL ) {
+  if ((TempNewSubStr == NULL) || (TempListedSubStr == NULL)) {
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
   }
 
-  for ( Status = FileHandleFindFirstFile(Dir, &FileInfo)
-      ; !EFI_ERROR(Status) && !NoFile
-      ; Status = FileHandleFindNextFile(Dir, FileInfo, &NoFile)
-    ){
+  for ( Status = FileHandleFindFirstFile (Dir, &FileInfo)
+        ; !EFI_ERROR (Status) && !NoFile
+        ; Status = FileHandleFindNextFile (Dir, FileInfo, &NoFile)
+        )
+  {
     if (FileInfo == NULL) {
       goto EXIT;
     }
@@ -703,31 +715,33 @@ GetFileInfoListInAlphabetFromDir(
     }
 
     NewFileInfoEntry = NULL;
-    NewFileInfoEntry = (FILE_INFO_ENTRY*)AllocateZeroPool(sizeof(FILE_INFO_ENTRY));
+    NewFileInfoEntry = (FILE_INFO_ENTRY *)AllocateZeroPool (sizeof (FILE_INFO_ENTRY));
     if (NewFileInfoEntry == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto EXIT;
     }
+
     NewFileInfoEntry->Signature = FILE_INFO_SIGNATURE;
-    NewFileInfoEntry->FileInfo  = AllocateCopyPool((UINTN) FileInfo->Size, FileInfo);
+    NewFileInfoEntry->FileInfo  = AllocateCopyPool ((UINTN)FileInfo->Size, FileInfo);
     if (NewFileInfoEntry->FileInfo == NULL) {
-      FreePool(NewFileInfoEntry);
+      FreePool (NewFileInfoEntry);
       Status = EFI_OUT_OF_RESOURCES;
       goto EXIT;
     }
 
-    NewFileInfoEntry->FileNameFirstPart  = (CHAR16 *) AllocateZeroPool(MAX_FILE_NAME_SIZE);
+    NewFileInfoEntry->FileNameFirstPart = (CHAR16 *)AllocateZeroPool (MAX_FILE_NAME_SIZE);
     if (NewFileInfoEntry->FileNameFirstPart == NULL) {
-      FreePool(NewFileInfoEntry->FileInfo);
-      FreePool(NewFileInfoEntry);
+      FreePool (NewFileInfoEntry->FileInfo);
+      FreePool (NewFileInfoEntry);
       Status = EFI_OUT_OF_RESOURCES;
       goto EXIT;
     }
-    NewFileInfoEntry->FileNameSecondPart = (CHAR16 *) AllocateZeroPool(MAX_FILE_NAME_SIZE);
+
+    NewFileInfoEntry->FileNameSecondPart = (CHAR16 *)AllocateZeroPool (MAX_FILE_NAME_SIZE);
     if (NewFileInfoEntry->FileNameSecondPart == NULL) {
-      FreePool(NewFileInfoEntry->FileInfo);
-      FreePool(NewFileInfoEntry->FileNameFirstPart);
-      FreePool(NewFileInfoEntry);
+      FreePool (NewFileInfoEntry->FileInfo);
+      FreePool (NewFileInfoEntry->FileNameFirstPart);
+      FreePool (NewFileInfoEntry);
       Status = EFI_OUT_OF_RESOURCES;
       goto EXIT;
     }
@@ -738,9 +752,9 @@ GetFileInfoListInAlphabetFromDir(
     //
     NewFileName          = NewFileInfoEntry->FileNameFirstPart;
     NewFileNameExtension = NewFileInfoEntry->FileNameSecondPart;
-    SplitFileNameExtension(FileInfo->FileName, NewFileName, NewFileNameExtension);
-    UpperCaseString(NewFileName);
-    UpperCaseString(NewFileNameExtension);
+    SplitFileNameExtension (FileInfo->FileName, NewFileName, NewFileNameExtension);
+    UpperCaseString (NewFileName);
+    UpperCaseString (NewFileNameExtension);
 
     //
     // Insert capsule file in alphabetical ordered list
@@ -749,7 +763,7 @@ GetFileInfoListInAlphabetFromDir(
       //
       // Get the FileInfo from the link list
       //
-      TempFileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
+      TempFileInfoEntry       = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
       ListedFileName          = TempFileInfoEntry->FileNameFirstPart;
       ListedFileNameExtension = TempFileInfoEntry->FileNameSecondPart;
 
@@ -758,25 +772,25 @@ GetFileInfoListInAlphabetFromDir(
       //
       IndexListed = 0;
       IndexNew    = 0;
-      while (TRUE){
+      while (TRUE) {
         //
         // First compare each substrings in NewFileName & ListedFileName between periods
         //
-        GetSubStringBeforePeriod(&NewFileName[IndexNew], TempNewSubStr, &NewSubStrLen);
-        GetSubStringBeforePeriod(&ListedFileName[IndexListed], TempListedSubStr, &ListedSubStrLen);
+        GetSubStringBeforePeriod (&NewFileName[IndexNew], TempNewSubStr, &NewSubStrLen);
+        GetSubStringBeforePeriod (&ListedFileName[IndexListed], TempListedSubStr, &ListedSubStrLen);
         if (NewSubStrLen > ListedSubStrLen) {
           //
           // Substr in NewFileName is longer. Pad tail with SPACE
           //
-          PadStrInTail(TempListedSubStr, NewSubStrLen - ListedSubStrLen, L' ');
-        } else if (NewSubStrLen < ListedSubStrLen){
+          PadStrInTail (TempListedSubStr, NewSubStrLen - ListedSubStrLen, L' ');
+        } else if (NewSubStrLen < ListedSubStrLen) {
           //
           // Substr in ListedFileName is longer. Pad tail with SPACE
           //
-          PadStrInTail(TempNewSubStr, ListedSubStrLen - NewSubStrLen, L' ');
+          PadStrInTail (TempNewSubStr, ListedSubStrLen - NewSubStrLen, L' ');
         }
 
-        SubStrCmpResult = StrnCmp(TempNewSubStr, TempListedSubStr, MAX_FILE_NAME_LEN);
+        SubStrCmpResult = StrnCmp (TempNewSubStr, TempListedSubStr, MAX_FILE_NAME_LEN);
         if (SubStrCmpResult != 0) {
           break;
         }
@@ -789,7 +803,7 @@ GetFileInfoListInAlphabetFromDir(
         //
         // Reach File First Name end
         //
-        if (NewFileName[IndexNew] == L'\0' || ListedFileName[IndexListed] == L'\0') {
+        if ((NewFileName[IndexNew] == L'\0') || (ListedFileName[IndexListed] == L'\0')) {
           break;
         }
 
@@ -812,7 +826,7 @@ GetFileInfoListInAlphabetFromDir(
         //   2. if NewFileName is shorter than ListedFileName
         //
         if (NewFileName[IndexNew] == L'\0') {
-          if (ListedFileName[IndexListed] != L'\0' || (StrnCmp(NewFileNameExtension, ListedFileNameExtension, MAX_FILE_NAME_LEN) < 0)) {
+          if ((ListedFileName[IndexListed] != L'\0') || (StrnCmp (NewFileNameExtension, ListedFileNameExtension, MAX_FILE_NAME_LEN) < 0)) {
             break;
           }
         }
@@ -829,7 +843,7 @@ GetFileInfoListInAlphabetFromDir(
     // else
     //    Insert at the tail of this list (Link = FileInfoList)
     //
-    InsertTailList(Link, &NewFileInfoEntry->Link);
+    InsertTailList (Link, &NewFileInfoEntry->Link);
 
     FileCount++;
   }
@@ -839,31 +853,31 @@ GetFileInfoListInAlphabetFromDir(
 EXIT:
 
   if (TempNewSubStr != NULL) {
-    FreePool(TempNewSubStr);
+    FreePool (TempNewSubStr);
   }
 
   if (TempListedSubStr != NULL) {
-    FreePool(TempListedSubStr);
+    FreePool (TempListedSubStr);
   }
 
-  if (EFI_ERROR(Status)) {
-    while(!IsListEmpty(FileInfoList)) {
+  if (EFI_ERROR (Status)) {
+    while (!IsListEmpty (FileInfoList)) {
       Link = FileInfoList->ForwardLink;
-      RemoveEntryList(Link);
+      RemoveEntryList (Link);
 
       TempFileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
 
-      FreePool(TempFileInfoEntry->FileInfo);
-      FreePool(TempFileInfoEntry->FileNameFirstPart);
-      FreePool(TempFileInfoEntry->FileNameSecondPart);
-      FreePool(TempFileInfoEntry);
+      FreePool (TempFileInfoEntry->FileInfo);
+      FreePool (TempFileInfoEntry->FileNameFirstPart);
+      FreePool (TempFileInfoEntry->FileNameSecondPart);
+      FreePool (TempFileInfoEntry);
     }
+
     *FileNum = 0;
   }
 
   return Status;
 }
-
 
 /**
   This routine is called to get all qualified image from file from an given directory
@@ -879,38 +893,38 @@ EXIT:
 
 **/
 EFI_STATUS
-GetFileImageInAlphabetFromDir(
-  IN EFI_FILE_HANDLE   Dir,
-  IN UINT64            FileAttr,
-  OUT IMAGE_INFO       **FilePtr,
-  OUT UINTN            *FileNum
+GetFileImageInAlphabetFromDir (
+  IN EFI_FILE_HANDLE  Dir,
+  IN UINT64           FileAttr,
+  OUT IMAGE_INFO      **FilePtr,
+  OUT UINTN           *FileNum
   )
 {
-  EFI_STATUS            Status;
-  LIST_ENTRY            *Link;
-  EFI_FILE_HANDLE       FileHandle;
-  FILE_INFO_ENTRY       *FileInfoEntry;
-  EFI_FILE_INFO         *FileInfo;
-  UINTN                 FileCount;
-  IMAGE_INFO            *TempFilePtrBuf;
-  UINTN                 Size;
-  LIST_ENTRY            FileInfoList;
+  EFI_STATUS       Status;
+  LIST_ENTRY       *Link;
+  EFI_FILE_HANDLE  FileHandle;
+  FILE_INFO_ENTRY  *FileInfoEntry;
+  EFI_FILE_INFO    *FileInfo;
+  UINTN            FileCount;
+  IMAGE_INFO       *TempFilePtrBuf;
+  UINTN            Size;
+  LIST_ENTRY       FileInfoList;
 
-  FileHandle       = NULL;
-  FileCount        = 0;
-  TempFilePtrBuf   = NULL;
-  *FilePtr         = NULL;
+  FileHandle     = NULL;
+  FileCount      = 0;
+  TempFilePtrBuf = NULL;
+  *FilePtr       = NULL;
 
   //
   // Get file list in Dir in alphabetical order
   //
-  Status = GetFileInfoListInAlphabetFromDir(
+  Status = GetFileInfoListInAlphabetFromDir (
              Dir,
              FileAttr,
              &FileInfoList,
              &FileCount
              );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "GetFileInfoListInAlphabetFromDir Failed!\n"));
     goto EXIT;
   }
@@ -921,7 +935,7 @@ GetFileImageInAlphabetFromDir(
     goto EXIT;
   }
 
-  TempFilePtrBuf = (IMAGE_INFO *)AllocateZeroPool(sizeof(IMAGE_INFO) * FileCount);
+  TempFilePtrBuf = (IMAGE_INFO *)AllocateZeroPool (sizeof (IMAGE_INFO) * FileCount);
   if (TempFilePtrBuf == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
@@ -938,65 +952,67 @@ GetFileImageInAlphabetFromDir(
     FileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
     FileInfo      = FileInfoEntry->FileInfo;
 
-    Status = Dir->Open(
+    Status = Dir->Open (
                     Dir,
                     &FileHandle,
                     FileInfo->FileName,
                     EFI_FILE_MODE_READ,
                     0
                     );
-    if (EFI_ERROR(Status)){
+    if (EFI_ERROR (Status)) {
       continue;
     }
 
-    Size = (UINTN)FileInfo->FileSize;
-    TempFilePtrBuf[FileCount].ImageAddress = AllocateZeroPool(Size);
+    Size                                   = (UINTN)FileInfo->FileSize;
+    TempFilePtrBuf[FileCount].ImageAddress = AllocateZeroPool (Size);
     if (TempFilePtrBuf[FileCount].ImageAddress == NULL) {
-      DEBUG((DEBUG_ERROR, "Fail to allocate memory for capsule. Stop processing the rest.\n"));
+      DEBUG ((DEBUG_ERROR, "Fail to allocate memory for capsule. Stop processing the rest.\n"));
       break;
     }
 
-    Status = FileHandle->Read(
+    Status = FileHandle->Read (
                            FileHandle,
                            &Size,
                            TempFilePtrBuf[FileCount].ImageAddress
                            );
 
-    FileHandle->Close(FileHandle);
+    FileHandle->Close (FileHandle);
 
     //
     // Skip read error file
     //
-    if (EFI_ERROR(Status) || Size != (UINTN)FileInfo->FileSize) {
+    if (EFI_ERROR (Status) || (Size != (UINTN)FileInfo->FileSize)) {
       //
       // Remove this error file info accordingly
       // & move Link to BackLink
       //
-      Link = RemoveEntryList(Link);
+      Link = RemoveEntryList (Link);
       Link = Link->BackLink;
 
-      FreePool(FileInfoEntry->FileInfo);
-      FreePool(FileInfoEntry->FileNameFirstPart);
-      FreePool(FileInfoEntry->FileNameSecondPart);
-      FreePool(FileInfoEntry);
+      FreePool (FileInfoEntry->FileInfo);
+      FreePool (FileInfoEntry->FileNameFirstPart);
+      FreePool (FileInfoEntry->FileNameSecondPart);
+      FreePool (FileInfoEntry);
 
-      FreePool(TempFilePtrBuf[FileCount].ImageAddress);
+      FreePool (TempFilePtrBuf[FileCount].ImageAddress);
       TempFilePtrBuf[FileCount].ImageAddress = NULL;
       TempFilePtrBuf[FileCount].FileInfo     = NULL;
 
       continue;
     }
+
     TempFilePtrBuf[FileCount].FileInfo = FileInfo;
     FileCount++;
   }
 
-  DEBUG_CODE (
-    for (Link = FileInfoList.ForwardLink; Link != &FileInfoList; Link = Link->ForwardLink) {
-      FileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
-      FileInfo      = FileInfoEntry->FileInfo;
-      DEBUG((DEBUG_INFO, "Successfully read capsule file %s from disk.\n", FileInfo->FileName));
-    }
-  );
+  DEBUG_CODE_BEGIN ();
+  for (Link = FileInfoList.ForwardLink; Link != &FileInfoList; Link = Link->ForwardLink) {
+    FileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
+    FileInfo      = FileInfoEntry->FileInfo;
+    DEBUG ((DEBUG_INFO, "Successfully read capsule file %s from disk.\n", FileInfo->FileName));
+  }
+
+  DEBUG_CODE_END ();
 
 EXIT:
 
@@ -1006,15 +1022,15 @@ EXIT:
   //
   // FileInfo will be freed by Calller
   //
-  while(!IsListEmpty(&FileInfoList)) {
+  while (!IsListEmpty (&FileInfoList)) {
     Link = FileInfoList.ForwardLink;
-    RemoveEntryList(Link);
+    RemoveEntryList (Link);
 
     FileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
 
-    FreePool(FileInfoEntry->FileNameFirstPart);
-    FreePool(FileInfoEntry->FileNameSecondPart);
-    FreePool(FileInfoEntry);
+    FreePool (FileInfoEntry->FileNameFirstPart);
+    FreePool (FileInfoEntry->FileNameSecondPart);
+    FreePool (FileInfoEntry);
   }
 
   return Status;
@@ -1030,31 +1046,31 @@ EXIT:
 
 **/
 EFI_STATUS
-RemoveFileFromDir(
-  IN EFI_FILE_HANDLE   Dir,
-  IN UINT64            FileAttr
+RemoveFileFromDir (
+  IN EFI_FILE_HANDLE  Dir,
+  IN UINT64           FileAttr
   )
 {
-  EFI_STATUS        Status;
-  LIST_ENTRY        *Link;
-  LIST_ENTRY        FileInfoList;
-  EFI_FILE_HANDLE   FileHandle;
-  FILE_INFO_ENTRY   *FileInfoEntry;
-  EFI_FILE_INFO     *FileInfo;
-  UINTN             FileCount;
+  EFI_STATUS       Status;
+  LIST_ENTRY       *Link;
+  LIST_ENTRY       FileInfoList;
+  EFI_FILE_HANDLE  FileHandle;
+  FILE_INFO_ENTRY  *FileInfoEntry;
+  EFI_FILE_INFO    *FileInfo;
+  UINTN            FileCount;
 
   FileHandle = NULL;
 
   //
   // Get file list in Dir in alphabetical order
   //
-  Status = GetFileInfoListInAlphabetFromDir(
+  Status = GetFileInfoListInAlphabetFromDir (
              Dir,
              FileAttr,
              &FileInfoList,
              &FileCount
              );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "GetFileInfoListInAlphabetFromDir Failed!\n"));
     goto EXIT;
   }
@@ -1075,30 +1091,30 @@ RemoveFileFromDir(
     FileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
     FileInfo      = FileInfoEntry->FileInfo;
 
-    Status = Dir->Open(
+    Status = Dir->Open (
                     Dir,
                     &FileHandle,
                     FileInfo->FileName,
                     EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
                     0
                     );
-    if (EFI_ERROR(Status)){
+    if (EFI_ERROR (Status)) {
       continue;
     }
 
-    Status = FileHandle->Delete(FileHandle);
+    Status = FileHandle->Delete (FileHandle);
   }
 
 EXIT:
 
-  while(!IsListEmpty(&FileInfoList)) {
+  while (!IsListEmpty (&FileInfoList)) {
     Link = FileInfoList.ForwardLink;
-    RemoveEntryList(Link);
+    RemoveEntryList (Link);
 
     FileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
 
-    FreePool(FileInfoEntry->FileInfo);
-    FreePool(FileInfoEntry);
+    FreePool (FileInfoEntry->FileInfo);
+    FreePool (FileInfoEntry);
   }
 
   return Status;
@@ -1119,12 +1135,12 @@ EXIT:
 
 **/
 EFI_STATUS
-GetAllCapsuleOnDisk(
-  IN  UINTN                            MaxRetry,
-  OUT IMAGE_INFO                       **CapsulePtr,
-  OUT UINTN                            *CapsuleNum,
-  OUT EFI_HANDLE                       *FsHandle,
-  OUT UINT16                            *LoadOptionNumber
+GetAllCapsuleOnDisk (
+  IN  UINTN       MaxRetry,
+  OUT IMAGE_INFO  **CapsulePtr,
+  OUT UINTN       *CapsuleNum,
+  OUT EFI_HANDLE  *FsHandle,
+  OUT UINT16      *LoadOptionNumber
   )
 {
   EFI_STATUS                       Status;
@@ -1136,52 +1152,53 @@ GetAllCapsuleOnDisk(
   TempOptionNumber = NULL;
   *CapsuleNum      = 0;
 
-  Status = GetEfiSysPartitionFromActiveBootOption(MaxRetry, &TempOptionNumber, FsHandle);
-  if (EFI_ERROR(Status)) {
+  Status = GetEfiSysPartitionFromActiveBootOption (MaxRetry, &TempOptionNumber, FsHandle);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = gBS->HandleProtocol(*FsHandle, &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);
-  if (EFI_ERROR(Status)) {
+  Status = gBS->HandleProtocol (*FsHandle, &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = Fs->OpenVolume(Fs, &RootDir);
-  if (EFI_ERROR(Status)) {
+  Status = Fs->OpenVolume (Fs, &RootDir);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = RootDir->Open(
+  Status = RootDir->Open (
                       RootDir,
                       &FileDir,
                       EFI_CAPSULE_FILE_DIRECTORY,
                       EFI_FILE_MODE_READ,
                       0
                       );
-  if (EFI_ERROR(Status)) {
-    DEBUG((DEBUG_ERROR, "CodLibGetAllCapsuleOnDisk fail to open RootDir!\n"));
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "CodLibGetAllCapsuleOnDisk fail to open RootDir!\n"));
     RootDir->Close (RootDir);
     return Status;
   }
+
   RootDir->Close (RootDir);
 
   //
   // Only Load files with EFI_FILE_SYSTEM or EFI_FILE_ARCHIVE attribute
   // ignore EFI_FILE_READ_ONLY, EFI_FILE_HIDDEN, EFI_FILE_RESERVED, EFI_FILE_DIRECTORY
   //
-  Status = GetFileImageInAlphabetFromDir(
+  Status = GetFileImageInAlphabetFromDir (
              FileDir,
              EFI_FILE_SYSTEM | EFI_FILE_ARCHIVE,
              CapsulePtr,
              CapsuleNum
              );
-  DEBUG((DEBUG_INFO, "GetFileImageInAlphabetFromDir status %x\n", Status));
+  DEBUG ((DEBUG_INFO, "GetFileImageInAlphabetFromDir status %x\n", Status));
 
   //
   // Always remove file to avoid deadloop in capsule process
   //
-  Status = RemoveFileFromDir(FileDir, EFI_FILE_SYSTEM | EFI_FILE_ARCHIVE);
-  DEBUG((DEBUG_INFO, "RemoveFileFromDir status %x\n", Status));
+  Status = RemoveFileFromDir (FileDir, EFI_FILE_SYSTEM | EFI_FILE_ARCHIVE);
+  DEBUG ((DEBUG_INFO, "RemoveFileFromDir status %x\n", Status));
 
   FileDir->Close (FileDir);
 
@@ -1205,10 +1222,10 @@ GetAllCapsuleOnDisk(
 **/
 EFI_STATUS
 BuildGatherList (
-  IN VOID                          **CapsuleBuffer,
-  IN UINTN                         *CapsuleSize,
-  IN UINTN                         CapsuleNum,
-  OUT EFI_CAPSULE_BLOCK_DESCRIPTOR **BlockDescriptors
+  IN VOID                           **CapsuleBuffer,
+  IN UINTN                          *CapsuleSize,
+  IN UINTN                          CapsuleNum,
+  OUT EFI_CAPSULE_BLOCK_DESCRIPTOR  **BlockDescriptors
   )
 {
   EFI_STATUS                    Status;
@@ -1225,13 +1242,13 @@ BuildGatherList (
     //
     // Allocate memory for the descriptors.
     //
-    BlockDescriptors1  = AllocateZeroPool (2 * sizeof (EFI_CAPSULE_BLOCK_DESCRIPTOR));
+    BlockDescriptors1 = AllocateZeroPool (2 * sizeof (EFI_CAPSULE_BLOCK_DESCRIPTOR));
     if (BlockDescriptors1 == NULL) {
       DEBUG ((DEBUG_ERROR, "BuildGatherList: failed to allocate memory for descriptors\n"));
       Status = EFI_OUT_OF_RESOURCES;
       goto ERREXIT;
     } else {
-      DEBUG ((DEBUG_INFO, "BuildGatherList: creating capsule descriptors at 0x%X\n", (UINTN) BlockDescriptors1));
+      DEBUG ((DEBUG_INFO, "BuildGatherList: creating capsule descriptors at 0x%X\n", (UINTN)BlockDescriptors1));
     }
 
     //
@@ -1242,15 +1259,15 @@ BuildGatherList (
     }
 
     if (BlockDescriptorPre != NULL) {
-      BlockDescriptorPre->Union.ContinuationPointer = (UINTN) BlockDescriptors1;
-      BlockDescriptorPre->Length = 0;
+      BlockDescriptorPre->Union.ContinuationPointer = (UINTN)BlockDescriptors1;
+      BlockDescriptorPre->Length                    = 0;
     }
 
-    BlockDescriptors1->Union.DataBlock = (UINTN) CapsuleBuffer[Index];
-    BlockDescriptors1->Length = CapsuleSize[Index];
+    BlockDescriptors1->Union.DataBlock = (UINTN)CapsuleBuffer[Index];
+    BlockDescriptors1->Length          = CapsuleSize[Index];
 
     BlockDescriptorPre = BlockDescriptors1 + 1;
-    BlockDescriptors1 = NULL;
+    BlockDescriptors1  = NULL;
   }
 
   //
@@ -1258,8 +1275,8 @@ BuildGatherList (
   //
   if (BlockDescriptorPre != NULL) {
     BlockDescriptorPre->Union.ContinuationPointer = (UINTN)NULL;
-    BlockDescriptorPre->Length = 0;
-    *BlockDescriptors = BlockDescriptorsHeader;
+    BlockDescriptorPre->Length                    = 0;
+    *BlockDescriptors                             = BlockDescriptorsHeader;
   }
 
   return EFI_SUCCESS;
@@ -1282,34 +1299,34 @@ ERREXIT:
 **/
 BOOLEAN
 EFIAPI
-CoDCheckCapsuleOnDiskFlag(
+CoDCheckCapsuleOnDiskFlag (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  UINT64                OsIndication;
-  UINTN                 DataSize;
+  EFI_STATUS  Status;
+  UINT64      OsIndication;
+  UINTN       DataSize;
 
   //
   // Check File Capsule Delivery Supported Flag in OsIndication variable
   //
   OsIndication = 0;
-  DataSize     = sizeof(UINT64);
-  Status = gRT->GetVariable (
-                  EFI_OS_INDICATIONS_VARIABLE_NAME,
-                  &gEfiGlobalVariableGuid,
-                  NULL,
-                  &DataSize,
-                  &OsIndication
-                  );
-  if (!EFI_ERROR(Status) &&
-      (OsIndication & EFI_OS_INDICATIONS_FILE_CAPSULE_DELIVERY_SUPPORTED) != 0) {
+  DataSize     = sizeof (UINT64);
+  Status       = gRT->GetVariable (
+                        EFI_OS_INDICATIONS_VARIABLE_NAME,
+                        &gEfiGlobalVariableGuid,
+                        NULL,
+                        &DataSize,
+                        &OsIndication
+                        );
+  if (!EFI_ERROR (Status) &&
+      ((OsIndication & EFI_OS_INDICATIONS_FILE_CAPSULE_DELIVERY_SUPPORTED) != 0))
+  {
     return TRUE;
   }
 
   return FALSE;
 }
-
 
 /**
   This routine is called to clear CapsuleOnDisk flags including OsIndications and BootNext variable.
@@ -1319,40 +1336,41 @@ CoDCheckCapsuleOnDiskFlag(
 **/
 EFI_STATUS
 EFIAPI
-CoDClearCapsuleOnDiskFlag(
+CoDClearCapsuleOnDiskFlag (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  UINT64                OsIndication;
-  UINTN                 DataSize;
+  EFI_STATUS  Status;
+  UINT64      OsIndication;
+  UINTN       DataSize;
 
   //
   // Reset File Capsule Delivery Supported Flag in OsIndication variable
   //
   OsIndication = 0;
-  DataSize = sizeof(UINT64);
-  Status = gRT->GetVariable (
-                  EFI_OS_INDICATIONS_VARIABLE_NAME,
-                  &gEfiGlobalVariableGuid,
-                  NULL,
-                  &DataSize,
-                  &OsIndication
-                  );
-  if (EFI_ERROR(Status) ||
-      (OsIndication & EFI_OS_INDICATIONS_FILE_CAPSULE_DELIVERY_SUPPORTED) == 0) {
+  DataSize     = sizeof (UINT64);
+  Status       = gRT->GetVariable (
+                        EFI_OS_INDICATIONS_VARIABLE_NAME,
+                        &gEfiGlobalVariableGuid,
+                        NULL,
+                        &DataSize,
+                        &OsIndication
+                        );
+  if (EFI_ERROR (Status) ||
+      ((OsIndication & EFI_OS_INDICATIONS_FILE_CAPSULE_DELIVERY_SUPPORTED) == 0))
+  {
     return Status;
   }
 
   OsIndication &= ~((UINT64)EFI_OS_INDICATIONS_FILE_CAPSULE_DELIVERY_SUPPORTED);
-  Status = gRT->SetVariable (
-                  EFI_OS_INDICATIONS_VARIABLE_NAME,
-                  &gEfiGlobalVariableGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                  sizeof(UINT64),
-                  &OsIndication
-                  );
-  ASSERT(!EFI_ERROR(Status));
+  Status        = gRT->SetVariable (
+                         EFI_OS_INDICATIONS_VARIABLE_NAME,
+                         &gEfiGlobalVariableGuid,
+                         EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                         sizeof (UINT64),
+                         &OsIndication
+                         );
+  ASSERT (!EFI_ERROR (Status));
 
   //
   // Delete BootNext variable. Capsule Process may reset system, so can't rely on Bds to clear this variable
@@ -1377,7 +1395,7 @@ CoDClearCapsuleOnDiskFlag(
 
 **/
 EFI_STATUS
-CoDClearCapsuleRelocationInfo(
+CoDClearCapsuleRelocationInfo (
   VOID
   )
 {
@@ -1408,32 +1426,32 @@ CoDClearCapsuleRelocationInfo(
 
 **/
 EFI_STATUS
-RelocateCapsuleToDisk(
-  UINTN     MaxRetry
+RelocateCapsuleToDisk (
+  UINTN  MaxRetry
   )
 {
-  EFI_STATUS                      Status;
-  UINTN                           CapsuleOnDiskNum;
-  UINTN                           Index;
-  UINTN                           DataSize;
-  UINT64                          TotalImageSize;
-  UINT64                          TotalImageNameSize;
-  IMAGE_INFO                      *CapsuleOnDiskBuf;
-  EFI_HANDLE                      Handle;
-  EFI_HANDLE                      TempHandle;
-  EFI_HANDLE                      *HandleBuffer;
-  UINTN                           NumberOfHandles;
-  EFI_BLOCK_IO_PROTOCOL           *BlockIo;
-  UINT8                           *CapsuleDataBuf;
-  UINT8                           *CapsulePtr;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *Fs;
-  EFI_FILE_HANDLE                 RootDir;
-  EFI_FILE_HANDLE                 TempCodFile;
-  UINT64                          TempCodFileSize;
-  EFI_DEVICE_PATH                 *TempDevicePath;
-  BOOLEAN                         RelocationInfo;
-  UINT16                          LoadOptionNumber;
-  EFI_CAPSULE_HEADER              FileNameCapsuleHeader;
+  EFI_STATUS                       Status;
+  UINTN                            CapsuleOnDiskNum;
+  UINTN                            Index;
+  UINTN                            DataSize;
+  UINT64                           TotalImageSize;
+  UINT64                           TotalImageNameSize;
+  IMAGE_INFO                       *CapsuleOnDiskBuf;
+  EFI_HANDLE                       Handle;
+  EFI_HANDLE                       TempHandle;
+  EFI_HANDLE                       *HandleBuffer;
+  UINTN                            NumberOfHandles;
+  EFI_BLOCK_IO_PROTOCOL            *BlockIo;
+  UINT8                            *CapsuleDataBuf;
+  UINT8                            *CapsulePtr;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *Fs;
+  EFI_FILE_HANDLE                  RootDir;
+  EFI_FILE_HANDLE                  TempCodFile;
+  UINT64                           TempCodFileSize;
+  EFI_DEVICE_PATH                  *TempDevicePath;
+  BOOLEAN                          RelocationInfo;
+  UINT16                           LoadOptionNumber;
+  EFI_CAPSULE_HEADER               FileNameCapsuleHeader;
 
   RootDir          = NULL;
   TempCodFile      = NULL;
@@ -1447,8 +1465,8 @@ RelocateCapsuleToDisk(
   //
   // 1. Load all Capsule On Disks in to memory
   //
-  Status = GetAllCapsuleOnDisk(MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, &LoadOptionNumber);
-  if (EFI_ERROR(Status) || CapsuleOnDiskNum == 0 || CapsuleOnDiskBuf == NULL) {
+  Status = GetAllCapsuleOnDisk (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, &LoadOptionNumber);
+  if (EFI_ERROR (Status) || (CapsuleOnDiskNum == 0) || (CapsuleOnDiskBuf == NULL)) {
     DEBUG ((DEBUG_INFO, "RelocateCapsule: GetAllCapsuleOnDisk Status - 0x%x\n", Status));
     return EFI_NOT_FOUND;
   }
@@ -1458,9 +1476,9 @@ RelocateCapsuleToDisk(
   // If no platform special device path specified or the device path is invalid, use the EFI system partition where
   // stores the capsules as relocation device.
   //
-  if (IsDevicePathValid ((EFI_DEVICE_PATH *)PcdGetPtr(PcdCodRelocationDevPath), PcdGetSize(PcdCodRelocationDevPath))) {
-    Status = EfiBootManagerConnectDevicePath ((EFI_DEVICE_PATH *)PcdGetPtr(PcdCodRelocationDevPath), &TempHandle);
-    if (EFI_ERROR(Status)) {
+  if (IsDevicePathValid ((EFI_DEVICE_PATH *)PcdGetPtr (PcdCodRelocationDevPath), PcdGetSize (PcdCodRelocationDevPath))) {
+    Status = EfiBootManagerConnectDevicePath ((EFI_DEVICE_PATH *)PcdGetPtr (PcdCodRelocationDevPath), &TempHandle);
+    if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "RelocateCapsule: EfiBootManagerConnectDevicePath Status - 0x%x\n", Status));
       goto EXIT;
     }
@@ -1469,14 +1487,14 @@ RelocateCapsuleToDisk(
     // Connect all the child handle. Partition & FAT drivers are allowed in this case
     //
     gBS->ConnectController (TempHandle, NULL, NULL, TRUE);
-    Status = gBS->LocateHandleBuffer(
+    Status = gBS->LocateHandleBuffer (
                     ByProtocol,
                     &gEfiSimpleFileSystemProtocolGuid,
                     NULL,
                     &NumberOfHandles,
                     &HandleBuffer
                     );
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "RelocateCapsule: LocateHandleBuffer Status - 0x%x\n", Status));
       goto EXIT;
     }
@@ -1485,19 +1503,19 @@ RelocateCapsuleToDisk(
     // Find first Simple File System Handle which can match PcdCodRelocationDevPath
     //
     for (Index = 0; Index < NumberOfHandles; Index++) {
-      Status = gBS->HandleProtocol(HandleBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID **)&TempDevicePath);
-      if (EFI_ERROR(Status)) {
+      Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID **)&TempDevicePath);
+      if (EFI_ERROR (Status)) {
         continue;
       }
 
-      DataSize = GetDevicePathSize((EFI_DEVICE_PATH *)PcdGetPtr(PcdCodRelocationDevPath)) - sizeof(EFI_DEVICE_PATH);
-      if (0 == CompareMem((EFI_DEVICE_PATH *)PcdGetPtr(PcdCodRelocationDevPath), TempDevicePath, DataSize)) {
+      DataSize = GetDevicePathSize ((EFI_DEVICE_PATH *)PcdGetPtr (PcdCodRelocationDevPath)) - sizeof (EFI_DEVICE_PATH);
+      if (0 == CompareMem ((EFI_DEVICE_PATH *)PcdGetPtr (PcdCodRelocationDevPath), TempDevicePath, DataSize)) {
         Handle = HandleBuffer[Index];
         break;
       }
     }
 
-    FreePool(HandleBuffer);
+    FreePool (HandleBuffer);
 
     if (Index == NumberOfHandles) {
       DEBUG ((DEBUG_ERROR, "RelocateCapsule: No simple file system protocol found.\n"));
@@ -1505,14 +1523,14 @@ RelocateCapsuleToDisk(
     }
   }
 
-  Status = gBS->HandleProtocol(Handle, &gEfiBlockIoProtocolGuid, (VOID **)&BlockIo);
-  if (EFI_ERROR(Status) || BlockIo->Media->ReadOnly) {
-    DEBUG((DEBUG_ERROR, "Fail to find Capsule on Disk relocation BlockIo device or device is ReadOnly!\n"));
+  Status = gBS->HandleProtocol (Handle, &gEfiBlockIoProtocolGuid, (VOID **)&BlockIo);
+  if (EFI_ERROR (Status) || BlockIo->Media->ReadOnly) {
+    DEBUG ((DEBUG_ERROR, "Fail to find Capsule on Disk relocation BlockIo device or device is ReadOnly!\n"));
     goto EXIT;
   }
 
-  Status = gBS->HandleProtocol(Handle, &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);
-  if (EFI_ERROR(Status)) {
+  Status = gBS->HandleProtocol (Handle, &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);
+  if (EFI_ERROR (Status)) {
     goto EXIT;
   }
 
@@ -1530,40 +1548,41 @@ RelocateCapsuleToDisk(
       goto EXIT;
     }
 
-    if (MAX_ADDRESS - (UINTN)TotalImageNameSize <= StrSize(CapsuleOnDiskBuf[Index].FileInfo->FileName)) {
+    if (MAX_ADDRESS - (UINTN)TotalImageNameSize <= StrSize (CapsuleOnDiskBuf[Index].FileInfo->FileName)) {
       Status = EFI_INVALID_PARAMETER;
       goto EXIT;
     }
 
     TotalImageSize     += CapsuleOnDiskBuf[Index].FileInfo->FileSize;
-    TotalImageNameSize += StrSize(CapsuleOnDiskBuf[Index].FileInfo->FileName);
-    DEBUG((DEBUG_INFO, "RelocateCapsule: %x Size %x\n",CapsuleOnDiskBuf[Index].FileInfo->FileName, CapsuleOnDiskBuf[Index].FileInfo->FileSize));
+    TotalImageNameSize += StrSize (CapsuleOnDiskBuf[Index].FileInfo->FileName);
+    DEBUG ((DEBUG_INFO, "RelocateCapsule: %x Size %x\n", CapsuleOnDiskBuf[Index].FileInfo->FileName, CapsuleOnDiskBuf[Index].FileInfo->FileSize));
   }
 
-  DEBUG((DEBUG_INFO, "RelocateCapsule: TotalImageSize %x\n", TotalImageSize));
-  DEBUG((DEBUG_INFO, "RelocateCapsule: TotalImageNameSize %x\n", TotalImageNameSize));
+  DEBUG ((DEBUG_INFO, "RelocateCapsule: TotalImageSize %x\n", TotalImageSize));
+  DEBUG ((DEBUG_INFO, "RelocateCapsule: TotalImageNameSize %x\n", TotalImageNameSize));
 
-  if (MAX_ADDRESS - (UINTN)TotalImageNameSize <= sizeof(UINT64) * 2 ||
-      MAX_ADDRESS - (UINTN)TotalImageSize <= (UINTN)TotalImageNameSize + sizeof(UINT64) * 2) {
+  if ((MAX_ADDRESS - (UINTN)TotalImageNameSize <= sizeof (UINT64) * 2) ||
+      (MAX_ADDRESS - (UINTN)TotalImageSize <= (UINTN)TotalImageNameSize + sizeof (UINT64) * 2))
+  {
     Status = EFI_INVALID_PARAMETER;
     goto EXIT;
   }
 
-  TempCodFileSize = sizeof(UINT64) + TotalImageSize + sizeof(EFI_CAPSULE_HEADER) + TotalImageNameSize;
+  TempCodFileSize = sizeof (UINT64) + TotalImageSize + sizeof (EFI_CAPSULE_HEADER) + TotalImageNameSize;
 
   //
   // Check if CapsuleTotalSize. There could be reminder, so use LastBlock number directly
   //
-  if (DivU64x32(TempCodFileSize, BlockIo->Media->BlockSize) > BlockIo->Media->LastBlock) {
-    DEBUG((DEBUG_ERROR, "RelocateCapsule: Relocation device isn't big enough to hold all Capsule on Disk!\n"));
-    DEBUG((DEBUG_ERROR, "TotalImageSize = %x\n", TotalImageSize));
-    DEBUG((DEBUG_ERROR, "TotalImageNameSize = %x\n", TotalImageNameSize));
-    DEBUG((DEBUG_ERROR, "RelocationDev BlockSize = %x LastBlock = %x\n", BlockIo->Media->BlockSize, BlockIo->Media->LastBlock));
+  if (DivU64x32 (TempCodFileSize, BlockIo->Media->BlockSize) > BlockIo->Media->LastBlock) {
+    DEBUG ((DEBUG_ERROR, "RelocateCapsule: Relocation device isn't big enough to hold all Capsule on Disk!\n"));
+    DEBUG ((DEBUG_ERROR, "TotalImageSize = %x\n", TotalImageSize));
+    DEBUG ((DEBUG_ERROR, "TotalImageNameSize = %x\n", TotalImageNameSize));
+    DEBUG ((DEBUG_ERROR, "RelocationDev BlockSize = %x LastBlock = %x\n", BlockIo->Media->BlockSize, BlockIo->Media->LastBlock));
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
   }
 
-  CapsuleDataBuf = AllocatePool((UINTN) TempCodFileSize);
+  CapsuleDataBuf = AllocatePool ((UINTN)TempCodFileSize);
   if (CapsuleDataBuf == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
@@ -1572,79 +1591,80 @@ RelocateCapsuleToDisk(
   //
   // First UINT64 reserved for total image size, including capsule name capsule.
   //
-  *(UINT64 *) CapsuleDataBuf = TotalImageSize + sizeof(EFI_CAPSULE_HEADER) + TotalImageNameSize;
+  *(UINT64 *)CapsuleDataBuf = TotalImageSize + sizeof (EFI_CAPSULE_HEADER) + TotalImageNameSize;
 
   //
   // Line up all the Capsule on Disk and write to relocation disk at one time. It could save some time in disk write
   //
-  for (Index = 0, CapsulePtr = CapsuleDataBuf + sizeof(UINT64); Index < CapsuleOnDiskNum; Index++) {
-    CopyMem(CapsulePtr, CapsuleOnDiskBuf[Index].ImageAddress, (UINTN) CapsuleOnDiskBuf[Index].FileInfo->FileSize);
+  for (Index = 0, CapsulePtr = CapsuleDataBuf + sizeof (UINT64); Index < CapsuleOnDiskNum; Index++) {
+    CopyMem (CapsulePtr, CapsuleOnDiskBuf[Index].ImageAddress, (UINTN)CapsuleOnDiskBuf[Index].FileInfo->FileSize);
     CapsulePtr += CapsuleOnDiskBuf[Index].FileInfo->FileSize;
   }
 
   //
   // Line the capsule header for capsule name capsule.
   //
-  CopyGuid(&FileNameCapsuleHeader.CapsuleGuid, &gEdkiiCapsuleOnDiskNameGuid);
-  FileNameCapsuleHeader.CapsuleImageSize = (UINT32) TotalImageNameSize + sizeof(EFI_CAPSULE_HEADER);
+  CopyGuid (&FileNameCapsuleHeader.CapsuleGuid, &gEdkiiCapsuleOnDiskNameGuid);
+  FileNameCapsuleHeader.CapsuleImageSize = (UINT32)TotalImageNameSize + sizeof (EFI_CAPSULE_HEADER);
   FileNameCapsuleHeader.Flags            = CAPSULE_FLAGS_PERSIST_ACROSS_RESET;
-  FileNameCapsuleHeader.HeaderSize       = sizeof(EFI_CAPSULE_HEADER);
-  CopyMem(CapsulePtr, &FileNameCapsuleHeader, FileNameCapsuleHeader.HeaderSize);
+  FileNameCapsuleHeader.HeaderSize       = sizeof (EFI_CAPSULE_HEADER);
+  CopyMem (CapsulePtr, &FileNameCapsuleHeader, FileNameCapsuleHeader.HeaderSize);
   CapsulePtr += FileNameCapsuleHeader.HeaderSize;
 
   //
   // Line up all the Capsule file names.
   //
   for (Index = 0; Index < CapsuleOnDiskNum; Index++) {
-    CopyMem(CapsulePtr, CapsuleOnDiskBuf[Index].FileInfo->FileName, StrSize(CapsuleOnDiskBuf[Index].FileInfo->FileName));
-    CapsulePtr += StrSize(CapsuleOnDiskBuf[Index].FileInfo->FileName);
+    CopyMem (CapsulePtr, CapsuleOnDiskBuf[Index].FileInfo->FileName, StrSize (CapsuleOnDiskBuf[Index].FileInfo->FileName));
+    CapsulePtr += StrSize (CapsuleOnDiskBuf[Index].FileInfo->FileName);
   }
 
   //
   // 5. Flash all Capsules on Disk to TempCoD.tmp under RootDir
   //
-  Status = Fs->OpenVolume(Fs, &RootDir);
-  if (EFI_ERROR(Status)) {
-    DEBUG((DEBUG_ERROR, "RelocateCapsule: OpenVolume error. %x\n", Status));
+  Status = Fs->OpenVolume (Fs, &RootDir);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "RelocateCapsule: OpenVolume error. %x\n", Status));
     goto EXIT;
   }
 
-  Status = RootDir->Open(
+  Status = RootDir->Open (
                       RootDir,
                       &TempCodFile,
-                      (CHAR16 *)PcdGetPtr(PcdCoDRelocationFileName),
+                      (CHAR16 *)PcdGetPtr (PcdCoDRelocationFileName),
                       EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
                       0
                       );
-  if (!EFI_ERROR(Status)) {
+  if (!EFI_ERROR (Status)) {
     //
     // Error handling code to prevent malicious code to hold this file to block capsule on disk
     //
-    TempCodFile->Delete(TempCodFile);
+    TempCodFile->Delete (TempCodFile);
   }
-  Status = RootDir->Open(
+
+  Status = RootDir->Open (
                       RootDir,
                       &TempCodFile,
-                      (CHAR16 *)PcdGetPtr(PcdCoDRelocationFileName),
+                      (CHAR16 *)PcdGetPtr (PcdCoDRelocationFileName),
                       EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE,
                       0
                       );
-  if (EFI_ERROR(Status)) {
-    DEBUG((DEBUG_ERROR, "RelocateCapsule: Open TemCoD.tmp error. %x\n", Status));
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "RelocateCapsule: Open TemCoD.tmp error. %x\n", Status));
     goto EXIT;
   }
 
   //
   // Always write at the begining of TempCap file
   //
-  DataSize = (UINTN) TempCodFileSize;
-  Status = TempCodFile->Write(
-                          TempCodFile,
-                          &DataSize,
-                          CapsuleDataBuf
-                          );
-  if (EFI_ERROR(Status)) {
-    DEBUG((DEBUG_ERROR, "RelocateCapsule: Write TemCoD.tmp error. %x\n", Status));
+  DataSize = (UINTN)TempCodFileSize;
+  Status   = TempCodFile->Write (
+                            TempCodFile,
+                            &DataSize,
+                            CapsuleDataBuf
+                            );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "RelocateCapsule: Write TemCoD.tmp error. %x\n", Status));
     goto EXIT;
   }
 
@@ -1658,30 +1678,30 @@ RelocateCapsuleToDisk(
   // It is used in next reboot by TCB
   //
   RelocationInfo = TRUE;
-  Status = gRT->SetVariable(
-                   COD_RELOCATION_INFO_VAR_NAME,
-                   &gEfiCapsuleVendorGuid,
-                   EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                   sizeof (BOOLEAN),
-                   &RelocationInfo
-                   );
+  Status         = gRT->SetVariable (
+                          COD_RELOCATION_INFO_VAR_NAME,
+                          &gEfiCapsuleVendorGuid,
+                          EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                          sizeof (BOOLEAN),
+                          &RelocationInfo
+                          );
   //
   // Save the LoadOptionNumber of the boot option, where the capsule is relocated,
   // into "CodRelocationLoadOption" var. It is used in next reboot after capsule is
   // updated out of TCB to remove the TempCoDFile.
   //
-  Status = gRT->SetVariable(
-                   COD_RELOCATION_LOAD_OPTION_VAR_NAME,
-                   &gEfiCapsuleVendorGuid,
-                   EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                   sizeof (UINT16),
-                   &LoadOptionNumber
-                   );
+  Status = gRT->SetVariable (
+                  COD_RELOCATION_LOAD_OPTION_VAR_NAME,
+                  &gEfiCapsuleVendorGuid,
+                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                  sizeof (UINT16),
+                  &LoadOptionNumber
+                  );
 
 EXIT:
 
   if (CapsuleDataBuf != NULL) {
-    FreePool(CapsuleDataBuf);
+    FreePool (CapsuleDataBuf);
   }
 
   if (CapsuleOnDiskBuf != NULL) {
@@ -1689,14 +1709,15 @@ EXIT:
     // Free resources allocated by CodLibGetAllCapsuleOnDisk
     //
     for (Index = 0; Index < CapsuleOnDiskNum; Index++ ) {
-      FreePool(CapsuleOnDiskBuf[Index].ImageAddress);
-      FreePool(CapsuleOnDiskBuf[Index].FileInfo);
+      FreePool (CapsuleOnDiskBuf[Index].ImageAddress);
+      FreePool (CapsuleOnDiskBuf[Index].FileInfo);
     }
-    FreePool(CapsuleOnDiskBuf);
+
+    FreePool (CapsuleOnDiskBuf);
   }
 
   if (TempCodFile != NULL) {
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       TempCodFile->Delete (TempCodFile);
     } else {
       TempCodFile->Close (TempCodFile);
@@ -1724,7 +1745,7 @@ EXIT:
 **/
 EFI_STATUS
 RelocateCapsuleToRam (
-  UINTN    MaxRetry
+  UINTN  MaxRetry
   )
 {
   EFI_STATUS                    Status;
@@ -1739,6 +1760,7 @@ RelocateCapsuleToRam (
   UINT8                         *StringBuf;
   UINTN                         StringSize;
   UINTN                         TotalStringSize;
+  UINTN                         CapsulesToProcess;
 
   CapsuleOnDiskBuf = NULL;
   BlockDescriptors = NULL;
@@ -1751,7 +1773,7 @@ RelocateCapsuleToRam (
   // 1. Load all Capsule On Disks into memory
   //
   Status = GetAllCapsuleOnDisk (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, NULL);
-  if (EFI_ERROR (Status) || CapsuleOnDiskNum == 0 || CapsuleOnDiskBuf == NULL) {
+  if (EFI_ERROR (Status) || (CapsuleOnDiskNum == 0) || (CapsuleOnDiskBuf == NULL)) {
     DEBUG ((DEBUG_ERROR, "GetAllCapsuleOnDisk Status - 0x%x\n", Status));
     return EFI_NOT_FOUND;
   }
@@ -1773,10 +1795,18 @@ RelocateCapsuleToRam (
   }
 
   for (Index = 0; Index < CapsuleOnDiskNum; Index++) {
-    CapsuleBuffer[Index] = (VOID *)(UINTN) CapsuleOnDiskBuf[Index].ImageAddress;
-    CapsuleSize[Index] = (UINTN) CapsuleOnDiskBuf[Index].FileInfo->FileSize;
-    TotalStringSize += StrSize (CapsuleOnDiskBuf[Index].FileInfo->FileName);
+    CapsuleBuffer[Index] = (VOID *)(UINTN)CapsuleOnDiskBuf[Index].ImageAddress;
+    CapsuleSize[Index]   = (UINTN)CapsuleOnDiskBuf[Index].FileInfo->FileSize;
+    TotalStringSize     += StrSize (CapsuleOnDiskBuf[Index].FileInfo->FileName);
   }
+
+  // If Persist Across Reset isn't supported, skip the file name strings capsule
+  if (!FeaturePcdGet (PcdSupportUpdateCapsuleReset)) {
+    CapsulesToProcess = CapsuleOnDiskNum;
+    goto BuildGather;
+  }
+
+  CapsulesToProcess = CapsuleOnDiskNum + 1;
 
   FileNameCapsule = AllocateZeroPool (sizeof (EFI_CAPSULE_HEADER) + TotalStringSize);
   if (FileNameCapsule == NULL) {
@@ -1786,36 +1816,44 @@ RelocateCapsuleToRam (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  FileNameCapsule->CapsuleImageSize = (UINT32) (sizeof (EFI_CAPSULE_HEADER) + TotalStringSize);
-  FileNameCapsule->Flags = CAPSULE_FLAGS_PERSIST_ACROSS_RESET;
-  FileNameCapsule->HeaderSize = sizeof (EFI_CAPSULE_HEADER);
+  FileNameCapsule->CapsuleImageSize = (UINT32)(sizeof (EFI_CAPSULE_HEADER) + TotalStringSize);
+  FileNameCapsule->Flags            = CAPSULE_FLAGS_PERSIST_ACROSS_RESET;
+  FileNameCapsule->HeaderSize       = sizeof (EFI_CAPSULE_HEADER);
   CopyGuid (&(FileNameCapsule->CapsuleGuid), &gEdkiiCapsuleOnDiskNameGuid);
 
   StringBuf = (UINT8 *)FileNameCapsule + FileNameCapsule->HeaderSize;
-  for (Index = 0; Index < CapsuleOnDiskNum; Index ++) {
+  for (Index = 0; Index < CapsuleOnDiskNum; Index++) {
     StringSize = StrSize (CapsuleOnDiskBuf[Index].FileInfo->FileName);
     CopyMem (StringBuf, CapsuleOnDiskBuf[Index].FileInfo->FileName, StringSize);
     StringBuf += StringSize;
   }
 
   CapsuleBuffer[CapsuleOnDiskNum] = FileNameCapsule;
-  CapsuleSize[CapsuleOnDiskNum] = TotalStringSize + sizeof (EFI_CAPSULE_HEADER);
+  CapsuleSize[CapsuleOnDiskNum]   = TotalStringSize + sizeof (EFI_CAPSULE_HEADER);
 
   //
   // 3. Build Gather list for the capsules
   //
-  Status = BuildGatherList (CapsuleBuffer, CapsuleSize, CapsuleOnDiskNum + 1, &BlockDescriptors);
-  if (EFI_ERROR (Status) || BlockDescriptors == NULL) {
+BuildGather:
+  Status = BuildGatherList (CapsuleBuffer, CapsuleSize, CapsulesToProcess, &BlockDescriptors);
+  if (EFI_ERROR (Status) || (BlockDescriptors == NULL)) {
     FreePool (CapsuleBuffer);
     FreePool (CapsuleSize);
-    FreePool (FileNameCapsule);
+    if (FileNameCapsule != NULL) {
+      FreePool (FileNameCapsule);
+    }
+
     return EFI_OUT_OF_RESOURCES;
   }
 
   //
   // 4. Call UpdateCapsule() service
   //
-  Status = gRT->UpdateCapsule((EFI_CAPSULE_HEADER **) CapsuleBuffer, CapsuleOnDiskNum + 1, (UINTN) BlockDescriptors);
+  Status = gRT->UpdateCapsule (
+                  (EFI_CAPSULE_HEADER **)CapsuleBuffer,
+                  CapsulesToProcess,
+                  (UINTN)BlockDescriptors
+                  );
 
   return Status;
 }
@@ -1844,8 +1882,8 @@ RelocateCapsuleToRam (
 **/
 EFI_STATUS
 EFIAPI
-CoDRelocateCapsule(
-  UINTN     MaxRetry
+CoDRelocateCapsule (
+  UINTN  MaxRetry
   )
 {
   if (!PcdGetBool (PcdCapsuleOnDiskSupport)) {
@@ -1864,7 +1902,7 @@ CoDRelocateCapsule(
     DEBUG ((DEBUG_INFO, "Capsule In Ram is supported, call gRT->UpdateCapsule().\n"));
     return RelocateCapsuleToRam (MaxRetry);
   } else {
-    DEBUG ((DEBUG_INFO, "Reallcoate all Capsule on Disks to %s in RootDir.\n", (CHAR16 *)PcdGetPtr(PcdCoDRelocationFileName)));
+    DEBUG ((DEBUG_INFO, "Reallcoate all Capsule on Disks to %s in RootDir.\n", (CHAR16 *)PcdGetPtr (PcdCoDRelocationFileName)));
     return RelocateCapsuleToDisk (MaxRetry);
   }
 }
@@ -1883,7 +1921,7 @@ CoDRelocateCapsule(
 EFI_STATUS
 EFIAPI
 CoDRemoveTempFile (
-  UINTN    MaxRetry
+  UINTN  MaxRetry
   )
 {
   EFI_STATUS                       Status;
@@ -1896,9 +1934,9 @@ CoDRemoveTempFile (
 
   RootDir     = NULL;
   TempCodFile = NULL;
-  DataSize    = sizeof(UINT16);
+  DataSize    = sizeof (UINT16);
 
-  LoadOptionNumber = AllocatePool (sizeof(UINT16));
+  LoadOptionNumber = AllocatePool (sizeof (UINT16));
   if (LoadOptionNumber == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1913,54 +1951,54 @@ CoDRemoveTempFile (
                   &DataSize,
                   (VOID *)LoadOptionNumber
                   );
-  if (EFI_ERROR(Status) || DataSize != sizeof(UINT16)) {
+  if (EFI_ERROR (Status) || (DataSize != sizeof (UINT16))) {
     goto EXIT;
   }
 
   //
   // Get the EFI file system from the boot option where the capsules are relocated
   //
-  Status = GetEfiSysPartitionFromActiveBootOption(MaxRetry, &LoadOptionNumber, &FsHandle);
-  if (EFI_ERROR(Status)) {
+  Status = GetEfiSysPartitionFromActiveBootOption (MaxRetry, &LoadOptionNumber, &FsHandle);
+  if (EFI_ERROR (Status)) {
     goto EXIT;
   }
 
-  Status = gBS->HandleProtocol(FsHandle, &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);
-  if (EFI_ERROR(Status)) {
+  Status = gBS->HandleProtocol (FsHandle, &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);
+  if (EFI_ERROR (Status)) {
     goto EXIT;
   }
 
-  Status = Fs->OpenVolume(Fs, &RootDir);
-  if (EFI_ERROR(Status)) {
+  Status = Fs->OpenVolume (Fs, &RootDir);
+  if (EFI_ERROR (Status)) {
     goto EXIT;
   }
 
   //
   // Delete the TempCoDFile
   //
-  Status = RootDir->Open(
+  Status = RootDir->Open (
                       RootDir,
                       &TempCodFile,
-                      (CHAR16 *)PcdGetPtr(PcdCoDRelocationFileName),
+                      (CHAR16 *)PcdGetPtr (PcdCoDRelocationFileName),
                       EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
                       0
                       );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     goto EXIT;
   }
 
-  TempCodFile->Delete(TempCodFile);
+  TempCodFile->Delete (TempCodFile);
 
   //
   // Clear "CoDRelocationLoadOption" variable
   //
   Status = gRT->SetVariable (
-             COD_RELOCATION_LOAD_OPTION_VAR_NAME,
-             &gEfiCapsuleVendorGuid,
-             0,
-             0,
-             NULL
-             );
+                  COD_RELOCATION_LOAD_OPTION_VAR_NAME,
+                  &gEfiCapsuleVendorGuid,
+                  0,
+                  0,
+                  NULL
+                  );
 
 EXIT:
   if (LoadOptionNumber != NULL) {
@@ -1968,7 +2006,7 @@ EXIT:
   }
 
   if (RootDir != NULL) {
-    RootDir->Close(RootDir);
+    RootDir->Close (RootDir);
   }
 
   return Status;

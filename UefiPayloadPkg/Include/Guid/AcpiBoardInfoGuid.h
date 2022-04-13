@@ -6,25 +6,25 @@
 
 **/
 
-#ifndef __ACPI_BOARD_INFO_GUID_H__
-#define __ACPI_BOARD_INFO_GUID_H__
+#ifndef ACPI_BOARD_INFO_GUID_H_
+#define ACPI_BOARD_INFO_GUID_H_
 
 ///
 /// Board information GUID
 ///
-extern EFI_GUID gUefiAcpiBoardInfoGuid;
+extern EFI_GUID  gUefiAcpiBoardInfoGuid;
 
 typedef struct {
-  UINT8              Revision;
-  UINT8              Reserved0[2];
-  UINT8              ResetValue;
-  UINT64             PmEvtBase;
-  UINT64             PmGpeEnBase;
-  UINT64             PmCtrlRegBase;
-  UINT64             PmTimerRegBase;
-  UINT64             ResetRegAddress;
-  UINT64             PcieBaseAddress;
-  UINT64             PcieBaseSize;
+  UINT8     Revision;
+  UINT8     Reserved0[2];
+  UINT8     ResetValue;
+  UINT64    PmEvtBase;
+  UINT64    PmGpeEnBase;
+  UINT64    PmCtrlRegBase;
+  UINT64    PmTimerRegBase;
+  UINT64    ResetRegAddress;
+  UINT64    PcieBaseAddress;
+  UINT64    PcieBaseSize;
 } ACPI_BOARD_INFO;
 
 #endif

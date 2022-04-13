@@ -32,25 +32,26 @@ EFI_TCG_PROTOCOL  *mTcgProtocol = NULL;
 EFI_STATUS
 EFIAPI
 Tpm12SubmitCommand (
-  IN UINT32            InputParameterBlockSize,
-  IN UINT8             *InputParameterBlock,
-  IN OUT UINT32        *OutputParameterBlockSize,
-  IN UINT8             *OutputParameterBlock
+  IN UINT32      InputParameterBlockSize,
+  IN UINT8       *InputParameterBlock,
+  IN OUT UINT32  *OutputParameterBlockSize,
+  IN UINT8       *OutputParameterBlock
   )
 {
-  EFI_STATUS                Status;
-  TPM_RSP_COMMAND_HDR       *Header;
+  EFI_STATUS           Status;
+  TPM_RSP_COMMAND_HDR  *Header;
 
   if (mTcgProtocol == NULL) {
-    Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **) &mTcgProtocol);
+    Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **)&mTcgProtocol);
     if (EFI_ERROR (Status)) {
       //
       // TCG protocol is not installed. So, TPM12 is not present.
       //
-      DEBUG ((EFI_D_ERROR, "Tpm12SubmitCommand - TCG - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Tpm12SubmitCommand - TCG - %r\n", Status));
       return EFI_NOT_FOUND;
     }
   }
+
   //
   // Assume when TCG Protocol is ready, RequestUseTpm already done.
   //
@@ -64,7 +65,8 @@ Tpm12SubmitCommand (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  Header = (TPM_RSP_COMMAND_HDR *)OutputParameterBlock;
+
+  Header                    = (TPM_RSP_COMMAND_HDR *)OutputParameterBlock;
   *OutputParameterBlockSize = SwapBytes32 (Header->paramSize);
 
   return EFI_SUCCESS;
@@ -83,18 +85,19 @@ Tpm12RequestUseTpm (
   VOID
   )
 {
-  EFI_STATUS   Status;
+  EFI_STATUS  Status;
 
   if (mTcgProtocol == NULL) {
-    Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **) &mTcgProtocol);
+    Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **)&mTcgProtocol);
     if (EFI_ERROR (Status)) {
       //
       // TCG protocol is not installed. So, TPM12 is not present.
       //
-      DEBUG ((EFI_D_ERROR, "Tpm12RequestUseTpm - TCG - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Tpm12RequestUseTpm - TCG - %r\n", Status));
       return EFI_NOT_FOUND;
     }
   }
+
   //
   // Assume when TCG Protocol is ready, RequestUseTpm already done.
   //

@@ -23,6 +23,9 @@
   ##  @libraryclass  Access bhyve's firmware control interface.
   BhyveFwCtlLib|Include/Library/BhyveFwCtlLib.h
 
+  ##  @libraryclass  Verify blobs read from the VMM
+  BlobVerifierLib|Include/Library/BlobVerifierLib.h
+
   ##  @libraryclass  Loads and boots a Linux kernel image
   #
   LoadLinuxLib|Include/Library/LoadLinuxLib.h
@@ -30,6 +33,10 @@
   ##  @libraryclass  Declares helper functions for Secure Encrypted
   #                  Virtualization (SEV) guests.
   MemEncryptSevLib|Include/Library/MemEncryptSevLib.h
+
+  ##  @libraryclass  Declares helper functions for TDX guests.
+  #
+  MemEncryptTdxLib|Include/Library/MemEncryptTdxLib.h
 
   ##  @libraryclass  Save and restore variables using a file
   #
@@ -106,6 +113,18 @@
   #
   XenPlatformLib|Include/Library/XenPlatformLib.h
 
+  ##  @libraryclass  TdxMailboxLib
+  #
+  TdxMailboxLib|Include/Library/TdxMailboxLib.h
+
+  ##  @libraryclass  PlatformInitLib
+  #
+  PlatformInitLib|Include/Library/PlatformInitLib.h
+
+  ##  @libraryclass  PeilessStartupLib
+  #
+  PeilessStartupLib|Include/Library/PeilessStartupLib.h
+
 [Guids]
   gUefiOvmfPkgTokenSpaceGuid            = {0x93bb96af, 0xb9f2, 0x4eb8, {0x94, 0x62, 0xe0, 0xba, 0x74, 0x56, 0x42, 0x36}}
   gEfiXenInfoGuid                       = {0xd3b46f3b, 0xd441, 0x1244, {0x9a, 0x12, 0x0, 0x12, 0x27, 0x3f, 0xc1, 0x4d}}
@@ -118,10 +137,11 @@
   gMicrosoftVendorGuid                  = {0x77fa9abd, 0x0359, 0x4d32, {0xbd, 0x60, 0x28, 0xf4, 0xe7, 0x8f, 0x78, 0x4b}}
   gEfiLegacyBiosGuid                    = {0x2E3044AC, 0x879F, 0x490F, {0x97, 0x60, 0xBB, 0xDF, 0xAF, 0x69, 0x5F, 0x50}}
   gEfiLegacyDevOrderVariableGuid        = {0xa56074db, 0x65fe, 0x45f7, {0xbd, 0x21, 0x2d, 0x2b, 0xdd, 0x8e, 0x96, 0x52}}
-  gLinuxEfiInitrdMediaGuid              = {0x5568e427, 0x68fc, 0x4f3d, {0xac, 0x74, 0xca, 0x55, 0x52, 0x31, 0xcc, 0x68}}
   gQemuKernelLoaderFsMediaGuid          = {0x1428f772, 0xb64a, 0x441e, {0xb8, 0xc3, 0x9e, 0xbd, 0xd7, 0xf8, 0x93, 0xc7}}
   gGrubFileGuid                         = {0xb5ae312c, 0xbc8a, 0x43b1, {0x9c, 0x62, 0xeb, 0xb8, 0x26, 0xdd, 0x5d, 0x07}}
   gConfidentialComputingSecretGuid      = {0xadf956ad, 0xe98c, 0x484c, {0xae, 0x11, 0xb5, 0x1c, 0x7d, 0x33, 0x64, 0x47}}
+  gConfidentialComputingSevSnpBlobGuid  = {0x067b1f5f, 0xcf26, 0x44c5, {0x85, 0x54, 0x93, 0xd7, 0x77, 0x91, 0x2d, 0x42}}
+  gUefiOvmfPkgPlatformInfoGuid          = {0xdec9b486, 0x1f16, 0x47c7, {0x8f, 0x68, 0xdf, 0x1a, 0x41, 0x88, 0x8b, 0xa5}}
 
 [Ppis]
   # PPI whose presence in the PPI database signals that the TPM base address
@@ -146,6 +166,7 @@
   gEfiLegacyInterruptProtocolGuid       = {0x31ce593d, 0x108a, 0x485d, {0xad, 0xb2, 0x78, 0xf2, 0x1f, 0x29, 0x66, 0xbe}}
   gEfiVgaMiniPortProtocolGuid           = {0xc7735a2f, 0x88f5, 0x4882, {0xae, 0x63, 0xfa, 0xac, 0x8c, 0x8b, 0x86, 0xb3}}
   gOvmfLoadedX86LinuxKernelProtocolGuid = {0xa3edc05d, 0xb618, 0x4ff6, {0x95, 0x52, 0x76, 0xd7, 0x88, 0x63, 0x43, 0xc8}}
+  gQemuAcpiTableNotifyProtocolGuid      = {0x928939b2, 0x4235, 0x462f, {0x95, 0x80, 0xf6, 0xa2, 0xb2, 0xc2, 0x1a, 0x4f}}
 
 [PcdsFixedAtBuild]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|0x0|UINT32|0
@@ -321,6 +342,54 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretBase|0x0|UINT32|0x42
   gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretSize|0x0|UINT32|0x43
 
+  ## The base address and size of a hash table confirming allowed
+  #  parameters to be passed in via the Qemu firmware configuration
+  #  device
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableBase|0x0|UINT32|0x47
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableSize|0x0|UINT32|0x48
+
+  ## The base address and size of the work area used during the SEC
+  # phase by the SEV and TDX supports.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase|0|UINT32|0x49
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize|0|UINT32|0x50
+
+  ## The work area contains a fixed size header in the Include/WorkArea.h.
+  # The size of this header is used early boot, and is provided through
+  # a fixed PCD. It need to be kept in sync with any changes to the
+  # header definition.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader|4|UINT32|0x51
+
+  ## The base address and size of the TDX Cfv base and size.
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvBase|0|UINT32|0x52
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataOffset|0|UINT32|0x53
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize|0|UINT32|0x54
+
+  ## The base address and size of the TDX Bfv base and size.
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase|0|UINT32|0x55
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataOffset|0|UINT32|0x56
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataSize|0|UINT32|0x57
+
+  ## The base address and size of the SEV-SNP Secrets Area that contains
+  #  the VM platform communication key used to send and recieve the
+  #  messages to the PSP. If this is set in the .fdf, the platform
+  #  is responsible to reserve this area from DXE phase overwrites.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase|0|UINT32|0x58
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize|0|UINT32|0x59
+
+  ## The base address and size of a CPUID Area that contains the hypervisor
+  #  provided CPUID results. In the case of SEV-SNP, the CPUID results are
+  #  filtered by the SEV-SNP firmware. If this is set in the .fdf, the
+  #  platform is responsible to reserve this area from DXE phase overwrites.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase|0|UINT32|0x60
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize|0|UINT32|0x61
+
+  ## The range of memory that is validated by the SEC phase.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedStart|0|UINT32|0x62
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedEnd|0|UINT32|0x63
+
+  ## The Tdx accept page size. 0x1000(4k),0x200000(2M)
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize|0x200000|UINT32|0x65
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
@@ -359,6 +428,13 @@
   ## This PCD adds a communication channel between OVMF's SmmCpuFeaturesLib
   #  instance in PiSmmCpuDxeSmm, and CpuHotplugSmm.
   gUefiOvmfPkgTokenSpaceGuid.PcdCpuHotEjectDataAddress|0|UINT64|0x46
+
+  ## This PCD tracks where PcdVideo{Horizontal,Vertical}Resolution
+  #  values are coming from.
+  #    0 - unset (defaults from platform dsc)
+  #    1 - set from PlatformConfig
+  #    2 - set by GOP Driver.
+  gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource|0|UINT8|0x64
 
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c

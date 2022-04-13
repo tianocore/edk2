@@ -11,7 +11,7 @@
 
   FpdtSmiHandler() will receive untrusted input and do basic validation.
 
-  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2021, Intel Corporation. All rights reserved.<BR>
   Copyright (c), Microsoft Corporation.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -19,26 +19,7 @@
 
 #include <PiSmm.h>
 
-#include <Library/SmmMemLib.h>
 #include "FirmwarePerformanceCommon.h"
-
-/**
-  This function is an abstraction layer for implementation specific Mm buffer validation routine.
-
-  @param Buffer  The buffer start address to be checked.
-  @param Length  The buffer length to be checked.
-
-  @retval TRUE  This buffer is valid per processor architecture and not overlap with SMRAM.
-  @retval FALSE This buffer is not valid per processor architecture or overlap with SMRAM.
-**/
-BOOLEAN
-IsBufferOutsideMmValid (
-  IN EFI_PHYSICAL_ADDRESS  Buffer,
-  IN UINT64                Length
-  )
-{
-  return SmmIsBufferOutsideSmmValid (Buffer, Length);
-}
 
 /**
   The module Entry Point of the Firmware Performance Data Table MM driver.
@@ -53,8 +34,8 @@ IsBufferOutsideMmValid (
 EFI_STATUS
 EFIAPI
 FirmwarePerformanceSmmEntryPoint (
-  IN EFI_HANDLE          ImageHandle,
-  IN EFI_SYSTEM_TABLE    *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return FirmwarePerformanceCommonEntryPoint ();

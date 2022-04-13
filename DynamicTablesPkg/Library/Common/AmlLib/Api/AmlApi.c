@@ -1,7 +1,7 @@
 /** @file
   AML Api.
 
-  Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2020 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -39,21 +39,22 @@
 EFI_STATUS
 EFIAPI
 AmlDeviceOpUpdateName (
-  IN  AML_OBJECT_NODE_HANDLE    DeviceOpNode,
-  IN  CHAR8                   * NewNameString
+  IN  AML_OBJECT_NODE_HANDLE  DeviceOpNode,
+  IN  CHAR8                   *NewNameString
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
-  AML_DATA_NODE_HANDLE    DeviceNameDataNode;
-  CHAR8                 * NewAmlNameString;
-  UINT32                  NewAmlNameStringSize;
+  AML_DATA_NODE_HANDLE  DeviceNameDataNode;
+  CHAR8                 *NewAmlNameString;
+  UINT32                NewAmlNameStringSize;
 
   // Check the input node is an object node.
   if ((DeviceOpNode == NULL)                                              ||
       (AmlGetNodeType ((AML_NODE_HANDLE)DeviceOpNode) != EAmlNodeObject)  ||
       (!AmlNodeHasOpCode (DeviceOpNode, AML_EXT_OP, AML_EXT_DEVICE_OP))   ||
-      (NewNameString == NULL)) {
+      (NewNameString == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -66,7 +67,8 @@ AmlDeviceOpUpdateName (
                                                );
   if ((DeviceNameDataNode == NULL)                                            ||
       (AmlGetNodeType ((AML_NODE_HANDLE)DeviceNameDataNode) != EAmlNodeData)  ||
-      (!AmlNodeHasDataType (DeviceNameDataNode, EAmlNodeDataTypeNameString))) {
+      (!AmlNodeHasDataType (DeviceNameDataNode, EAmlNodeDataTypeNameString)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -87,7 +89,7 @@ AmlDeviceOpUpdateName (
   Status = AmlUpdateDataNode (
              DeviceNameDataNode,
              EAmlNodeDataTypeNameString,
-             (UINT8*)NewAmlNameString,
+             (UINT8 *)NewAmlNameString,
              NewAmlNameStringSize
              );
   ASSERT_EFI_ERROR (Status);
@@ -124,7 +126,8 @@ AmlNameOpUpdateInteger (
 
   if ((NameOpNode == NULL)                                             ||
       (AmlGetNodeType ((AML_NODE_HANDLE)NameOpNode) != EAmlNodeObject) ||
-      (!AmlNodeHasOpCode (NameOpNode, AML_NAME_OP, 0))) {
+      (!AmlNodeHasOpCode (NameOpNode, AML_NAME_OP, 0)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -138,7 +141,8 @@ AmlNameOpUpdateInteger (
                                             EAmlParseIndexTerm1
                                             );
   if ((IntegerOpNode == NULL)  ||
-      (AmlGetNodeType ((AML_NODE_HANDLE)IntegerOpNode) != EAmlNodeObject)) {
+      (AmlGetNodeType ((AML_NODE_HANDLE)IntegerOpNode) != EAmlNodeObject))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -170,8 +174,8 @@ AmlNameOpUpdateInteger (
 EFI_STATUS
 EFIAPI
 AmlNameOpUpdateString (
-  IN        AML_OBJECT_NODE_HANDLE    NameOpNode,
-  IN  CONST CHAR8                   * NewName
+  IN        AML_OBJECT_NODE_HANDLE  NameOpNode,
+  IN  CONST CHAR8                   *NewName
   )
 {
   EFI_STATUS              Status;
@@ -180,7 +184,8 @@ AmlNameOpUpdateString (
 
   if ((NameOpNode == NULL)                                             ||
       (AmlGetNodeType ((AML_NODE_HANDLE)NameOpNode) != EAmlNodeObject) ||
-      (!AmlNodeHasOpCode (NameOpNode, AML_NAME_OP, 0))) {
+      (!AmlNodeHasOpCode (NameOpNode, AML_NAME_OP, 0)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -193,7 +198,8 @@ AmlNameOpUpdateString (
                                            EAmlParseIndexTerm1
                                            );
   if ((StringOpNode == NULL)  ||
-      (AmlGetNodeType ((AML_NODE_HANDLE)StringOpNode) != EAmlNodeObject)) {
+      (AmlGetNodeType ((AML_NODE_HANDLE)StringOpNode) != EAmlNodeObject))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -205,7 +211,8 @@ AmlNameOpUpdateString (
                                            EAmlParseIndexTerm0
                                            );
   if ((StringDataNode == NULL)  ||
-      (AmlGetNodeType ((AML_NODE_HANDLE)StringDataNode) != EAmlNodeData)) {
+      (AmlGetNodeType ((AML_NODE_HANDLE)StringDataNode) != EAmlNodeData))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -214,7 +221,7 @@ AmlNameOpUpdateString (
   Status = AmlUpdateDataNode (
              StringDataNode,
              EAmlNodeDataTypeString,
-             (UINT8*)NewName,
+             (UINT8 *)NewName,
              (UINT32)AsciiStrLen (NewName) + 1
              );
   ASSERT_EFI_ERROR (Status);
@@ -222,7 +229,7 @@ AmlNameOpUpdateString (
   return Status;
 }
 
-/** Get the first Resource Data element contained in a "_CRS" object.
+/** Get the first Resource Data element contained in a named object.
 
   In the following ASL code, the function will return the Resource Data
   node corresponding to the "QWordMemory ()" ASL macro.
@@ -233,51 +240,51 @@ AmlNameOpUpdateString (
   )
 
   Note:
-   - The "_CRS" object must be declared using ASL "Name (Declare Named Object)".
-   - "_CRS" declared using ASL "Method (Declare Control Method)" is not
-     supported.
+  "_CRS" names defined as methods are not handled by this function.
+  They must be defined as names, using the "Name ()" statement.
 
-  @param  [in] NameOpCrsNode  NameOp object node defining a "_CRS" object.
-                              Must have an OpCode=AML_NAME_OP, SubOpCode=0.
-                              NameOp object nodes are defined in ASL
-                              using the "Name ()" function.
-  @param  [out] OutRdNode     Pointer to the first Resource Data element of
-                              the "_CRS" object. A Resource Data element
-                              is stored in a data node.
+  @param  [in] NameOpNode   NameOp object node defining a named object.
+                            Must have an OpCode=AML_NAME_OP, SubOpCode=0.
+                            NameOp object nodes are defined in ASL
+                            using the "Name ()" function.
+  @param  [out] OutRdNode   Pointer to the first Resource Data element of
+                            the named object. A Resource Data element
+                            is stored in a data node.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
 **/
 EFI_STATUS
 EFIAPI
-AmlNameOpCrsGetFirstRdNode (
-  IN  AML_OBJECT_NODE_HANDLE   NameOpCrsNode,
-  OUT AML_DATA_NODE_HANDLE   * OutRdNode
+AmlNameOpGetFirstRdNode (
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode,
+  OUT AML_DATA_NODE_HANDLE    *OutRdNode
   )
 {
   AML_OBJECT_NODE_HANDLE  BufferOpNode;
   AML_DATA_NODE_HANDLE    FirstRdNode;
 
-  if ((NameOpCrsNode == NULL)                                              ||
-      (AmlGetNodeType ((AML_NODE_HANDLE)NameOpCrsNode) != EAmlNodeObject)  ||
-      (!AmlNodeHasOpCode (NameOpCrsNode, AML_NAME_OP, 0))                  ||
-      (!AmlNameOpCompareName (NameOpCrsNode, "_CRS"))                      ||
-      (OutRdNode == NULL)) {
+  if ((NameOpNode == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)NameOpNode) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (NameOpNode, AML_NAME_OP, 0))                  ||
+      (OutRdNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   *OutRdNode = NULL;
 
-  // Get the _CRS value which is represented as a BufferOp object node
-  // which is the 2nd fixed argument (i.e. index 1).
+  // Get the value of the variable which is represented as a BufferOp object
+  // node which is the 2nd fixed argument (i.e. index 1).
   BufferOpNode = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
-                                           NameOpCrsNode,
+                                           NameOpNode,
                                            EAmlParseIndexTerm1
                                            );
   if ((BufferOpNode == NULL)                                             ||
       (AmlGetNodeType ((AML_NODE_HANDLE)BufferOpNode) != EAmlNodeObject) ||
-      (!AmlNodeHasOpCode (BufferOpNode, AML_BUFFER_OP, 0))) {
+      (!AmlNodeHasOpCode (BufferOpNode, AML_BUFFER_OP, 0)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -290,7 +297,8 @@ AmlNameOpCrsGetFirstRdNode (
                                         );
   if ((FirstRdNode == NULL)                                            ||
       (AmlGetNodeType ((AML_NODE_HANDLE)FirstRdNode) != EAmlNodeData)  ||
-      (!AmlNodeHasDataType (FirstRdNode, EAmlNodeDataTypeResourceData))) {
+      (!AmlNodeHasDataType (FirstRdNode, EAmlNodeDataTypeResourceData)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -310,11 +318,181 @@ AmlNameOpCrsGetFirstRdNode (
     }
   )
 
+  Note:
+  "_CRS" names defined as methods are not handled by this function.
+  They must be defined as names, using the "Name ()" statement.
+
+  @param  [in]  CurrRdNode   Pointer to the current Resource Data element of
+                             the named object.
+  @param  [out] OutRdNode    Pointer to the Resource Data element following
+                             the CurrRdNode.
+                             Contain a NULL pointer if CurrRdNode is the
+                             last Resource Data element in the list.
+                             The "End Tag" is not considered as a resource
+                             data element and is not returned.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlNameOpGetNextRdNode (
+  IN  AML_DATA_NODE_HANDLE  CurrRdNode,
+  OUT AML_DATA_NODE_HANDLE  *OutRdNode
+  )
+{
+  AML_OBJECT_NODE_HANDLE  NameOpNode;
+  AML_OBJECT_NODE_HANDLE  BufferOpNode;
+
+  if ((CurrRdNode == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)CurrRdNode) != EAmlNodeData)    ||
+      (!AmlNodeHasDataType (CurrRdNode, EAmlNodeDataTypeResourceData))  ||
+      (OutRdNode == NULL))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *OutRdNode = NULL;
+
+  // The parent of the CurrRdNode must be a BufferOp node.
+  BufferOpNode = (AML_OBJECT_NODE_HANDLE)AmlGetParent (
+                                           (AML_NODE_HANDLE)CurrRdNode
+                                           );
+  if ((BufferOpNode == NULL)  ||
+      (!AmlNodeHasOpCode (BufferOpNode, AML_BUFFER_OP, 0)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // The parent of the BufferOpNode must be a NameOp node.
+  NameOpNode = (AML_OBJECT_NODE_HANDLE)AmlGetParent (
+                                         (AML_NODE_HANDLE)BufferOpNode
+                                         );
+  if ((NameOpNode == NULL)  ||
+      (!AmlNodeHasOpCode (NameOpNode, AML_NAME_OP, 0)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *OutRdNode = (AML_DATA_NODE_HANDLE)AmlGetNextVariableArgument (
+                                       (AML_NODE_HANDLE)BufferOpNode,
+                                       (AML_NODE_HANDLE)CurrRdNode
+                                       );
+
+  // If the Resource Data is an End Tag, return NULL.
+  if (AmlNodeHasRdDataType (
+        *OutRdNode,
+        AML_RD_BUILD_SMALL_DESC_ID (ACPI_SMALL_END_TAG_DESCRIPTOR_NAME)
+        ))
+  {
+    *OutRdNode = NULL;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/** Attach a node in an AML tree.
+
+  The node will be added as the last statement of the ParentNode.
+  E.g.:
+  ASL code corresponding to NewNode:
+  Name (_UID, 0)
+
+  ASL code corresponding to ParentNode:
+  Device (PCI0) {
+    Name(_HID, EISAID("PNP0A08"))
+  }
+
+  "AmlAttachNode (ParentNode, NewNode)" will result in:
+  ASL code:
+  Device (PCI0) {
+    Name(_HID, EISAID("PNP0A08"))
+    Name (_UID, 0)
+  }
+
+  @param  [in]  ParentNode  Pointer to the parent node.
+                            Must be a root or an object node.
+  @param  [in]  NewNode     Pointer to the node to add.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlAttachNode (
+  IN  AML_NODE_HANDLE  ParentNode,
+  IN  AML_NODE_HANDLE  NewNode
+  )
+{
+  return AmlVarListAddTail (ParentNode, NewNode);
+}
+
+// DEPRECATED APIS
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
+
+/** DEPRECATED API
+
+  Get the first Resource Data element contained in a "_CRS" object.
+
+  In the following ASL code, the function will return the Resource Data
+  node corresponding to the "QWordMemory ()" ASL macro.
+  Name (_CRS, ResourceTemplate() {
+      QWordMemory (...) {...},
+      Interrupt (...) {...}
+    }
+  )
+
+  Note:
+   - The "_CRS" object must be declared using ASL "Name (Declare Named Object)".
+   - "_CRS" declared using ASL "Method (Declare Control Method)" is not
+     supported.
+
+  @ingroup UserApis
+
+  @param  [in] NameOpCrsNode  NameOp object node defining a "_CRS" object.
+                              Must have an OpCode=AML_NAME_OP, SubOpCode=0.
+                              NameOp object nodes are defined in ASL
+                              using the "Name ()" function.
+  @param  [out] OutRdNode     Pointer to the first Resource Data element of
+                              the "_CRS" object. A Resource Data element
+                              is stored in a data node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlNameOpCrsGetFirstRdNode (
+  IN  AML_OBJECT_NODE_HANDLE  NameOpCrsNode,
+  OUT AML_DATA_NODE_HANDLE    *OutRdNode
+  )
+{
+  return AmlNameOpGetFirstRdNode (NameOpCrsNode, OutRdNode);
+}
+
+/** DEPRECATED API
+
+  Get the Resource Data element following the CurrRdNode Resource Data.
+
+  In the following ASL code, if CurrRdNode corresponds to the first
+  "QWordMemory ()" ASL macro, the function will return the Resource Data
+  node corresponding to the "Interrupt ()" ASL macro.
+  Name (_CRS, ResourceTemplate() {
+      QwordMemory (...) {...},
+      Interrupt (...) {...}
+    }
+  )
+
   The CurrRdNode Resource Data node must be defined in an object named "_CRS"
   and defined by a "Name ()" ASL function.
 
+  @ingroup UserApis
+
   @param  [in]  CurrRdNode   Pointer to the current Resource Data element of
-                             the "_CRS" object.
+                             the "_CRS" variable.
   @param  [out] OutRdNode    Pointer to the Resource Data element following
                              the CurrRdNode.
                              Contain a NULL pointer if CurrRdNode is the
@@ -328,55 +506,11 @@ AmlNameOpCrsGetFirstRdNode (
 EFI_STATUS
 EFIAPI
 AmlNameOpCrsGetNextRdNode (
-  IN  AML_DATA_NODE_HANDLE    CurrRdNode,
-  OUT AML_DATA_NODE_HANDLE  * OutRdNode
+  IN  AML_DATA_NODE_HANDLE  CurrRdNode,
+  OUT AML_DATA_NODE_HANDLE  *OutRdNode
   )
 {
-  AML_OBJECT_NODE_HANDLE     NameOpCrsNode;
-  AML_OBJECT_NODE_HANDLE     BufferOpNode;
-
-  if ((CurrRdNode == NULL)                                              ||
-      (AmlGetNodeType ((AML_NODE_HANDLE)CurrRdNode) != EAmlNodeData)    ||
-      (!AmlNodeHasDataType (CurrRdNode, EAmlNodeDataTypeResourceData))  ||
-      (OutRdNode == NULL)) {
-    ASSERT (0);
-    return EFI_INVALID_PARAMETER;
-  }
-
-  *OutRdNode = NULL;
-
-  // The parent of the CurrRdNode must be a BufferOp node.
-  BufferOpNode = (AML_OBJECT_NODE_HANDLE)AmlGetParent (
-                                           (AML_NODE_HANDLE)CurrRdNode
-                                           );
-  if ((BufferOpNode == NULL)  ||
-      (!AmlNodeHasOpCode (BufferOpNode, AML_BUFFER_OP, 0))) {
-    ASSERT (0);
-    return EFI_INVALID_PARAMETER;
-  }
-
-  // The parent of the BufferOpNode must be a NameOp node.
-  NameOpCrsNode = (AML_OBJECT_NODE_HANDLE)AmlGetParent (
-                                            (AML_NODE_HANDLE)BufferOpNode
-                                            );
-  if ((NameOpCrsNode == NULL)                             ||
-      (!AmlNodeHasOpCode (NameOpCrsNode, AML_NAME_OP, 0)) ||
-      (!AmlNameOpCompareName (NameOpCrsNode, "_CRS"))) {
-    ASSERT (0);
-    return EFI_INVALID_PARAMETER;
-  }
-
-  *OutRdNode = (AML_DATA_NODE_HANDLE)AmlGetNextVariableArgument (
-                                       (AML_NODE_HANDLE)BufferOpNode,
-                                       (AML_NODE_HANDLE)CurrRdNode
-                                       );
-
-  // If the Resource Data is an End Tag, return NULL.
-  if (AmlNodeHasRdDataType (
-        *OutRdNode,
-        AML_RD_BUILD_SMALL_DESC_ID (ACPI_SMALL_END_TAG_DESCRIPTOR_NAME))) {
-    *OutRdNode = NULL;
-  }
-
-  return EFI_SUCCESS;
+  return AmlNameOpGetNextRdNode (CurrRdNode, OutRdNode);
 }
+
+#endif // DISABLE_NEW_DEPRECATED_INTERFACES

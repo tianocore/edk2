@@ -18,15 +18,15 @@
 EFI_STATUS
 EFIAPI
 InitializeXenIoPvhDxe (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  VOID          *Allocation;
-  EFI_STATUS    Status;
-  EFI_HANDLE    XenIoHandle;
+  VOID        *Allocation;
+  EFI_STATUS  Status;
+  EFI_HANDLE  XenIoHandle;
 
-  Allocation = NULL;
+  Allocation  = NULL;
   XenIoHandle = NULL;
 
   if (!XenPvhDetected ()) {
@@ -39,7 +39,7 @@ InitializeXenIoPvhDxe (
     goto Error;
   }
 
-  Status = XenIoMmioInstall (&XenIoHandle, (UINTN) Allocation);
+  Status = XenIoMmioInstall (&XenIoHandle, (UINTN)Allocation);
   if (EFI_ERROR (Status)) {
     goto Error;
   }
@@ -50,5 +50,6 @@ Error:
   if (Allocation != NULL) {
     FreePages (Allocation, FixedPcdGet32 (PcdXenGrantFrames));
   }
+
   return Status;
 }

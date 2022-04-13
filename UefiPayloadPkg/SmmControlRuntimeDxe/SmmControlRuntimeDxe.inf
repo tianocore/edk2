@@ -1,0 +1,50 @@
+## @file
+# SMM Control runtime DXE Module
+#
+# Provides the ability to generate a software SMI.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmControlRuntimeDxe
+  FILE_GUID                      = C3099578-F815-4a96-84A3-FC593760181D
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SmmControlEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmmControlRuntimeDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  DebugLib
+  UefiBootServicesTableLib
+  UefiRuntimeLib
+  PcdLib
+  IoLib
+  HobLib
+
+[Guids]
+  gSmmRegisterInfoGuid
+  gEfiEventVirtualAddressChangeGuid
+
+[Protocols]
+  gEfiSmmControl2ProtocolGuid             ## PRODUCES
+
+[Depex]
+  TRUE

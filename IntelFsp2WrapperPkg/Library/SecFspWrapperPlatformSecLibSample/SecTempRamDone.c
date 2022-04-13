@@ -23,21 +23,21 @@ SecPlatformDisableTemporaryMemory (
   VOID
   )
 {
-  EFI_STATUS                Status;
-  VOID                      *TempRamExitParam;
-  FSP_INFO_HEADER           *FspHeader;
+  EFI_STATUS       Status;
+  VOID             *TempRamExitParam;
+  FSP_INFO_HEADER  *FspHeader;
 
-  FspHeader = FspFindFspHeader (PcdGet32(PcdFspmBaseAddress));
+  FspHeader = FspFindFspHeader (PcdGet32 (PcdFspmBaseAddress));
   if (FspHeader == NULL) {
-    return ;
+    return;
   }
 
-  DEBUG((DEBUG_INFO, "SecPlatformDisableTemporaryMemory enter\n"));
+  DEBUG ((DEBUG_INFO, "SecPlatformDisableTemporaryMemory enter\n"));
 
   TempRamExitParam = UpdateTempRamExitParam ();
-  Status = CallTempRamExit (TempRamExitParam);
-  DEBUG((DEBUG_INFO, "TempRamExit status: 0x%x\n", Status));
-  ASSERT_EFI_ERROR(Status);
+  Status           = CallTempRamExit (TempRamExitParam);
+  DEBUG ((DEBUG_INFO, "TempRamExit status: 0x%x\n", Status));
+  ASSERT_EFI_ERROR (Status);
 
-  return ;
+  return;
 }

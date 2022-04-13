@@ -23,11 +23,12 @@
 AML_NODE_HEADER *
 EFIAPI
 AmlGetParent (
-  IN  AML_NODE_HEADER   * Node
+  IN  AML_NODE_HEADER  *Node
   )
 {
   if (IS_AML_DATA_NODE (Node) ||
-      IS_AML_OBJECT_NODE (Node)) {
+      IS_AML_OBJECT_NODE (Node))
+  {
     return Node->Parent;
   }
 
@@ -45,7 +46,7 @@ AmlGetParent (
 AML_ROOT_NODE *
 EFIAPI
 AmlGetRootNode (
-  IN  CONST AML_NODE_HEADER   * Node
+  IN  CONST AML_NODE_HEADER  *Node
   )
 {
   if (!IS_AML_NODE_VALID (Node)) {
@@ -60,7 +61,8 @@ AmlGetRootNode (
       return NULL;
     }
   }
-  return (AML_ROOT_NODE*)Node;
+
+  return (AML_ROOT_NODE *)Node;
 }
 
 /** Get the node at the input Index in the fixed argument list of the input
@@ -77,8 +79,8 @@ AmlGetRootNode (
 AML_NODE_HEADER *
 EFIAPI
 AmlGetFixedArgument (
-  IN  AML_OBJECT_NODE     * ObjectNode,
-  IN  EAML_PARSE_INDEX      Index
+  IN  AML_OBJECT_NODE   *ObjectNode,
+  IN  EAML_PARSE_INDEX  Index
   )
 {
   if (IS_AML_OBJECT_NODE (ObjectNode)) {
@@ -106,23 +108,24 @@ AmlGetFixedArgument (
 BOOLEAN
 EFIAPI
 AmlIsNodeFixedArgument (
-  IN  CONST  AML_NODE_HEADER     * Node,
-  OUT        EAML_PARSE_INDEX    * IndexPtr
+  IN  CONST  AML_NODE_HEADER   *Node,
+  OUT        EAML_PARSE_INDEX  *IndexPtr
   )
 {
-  AML_NODE_HEADER         * ParentNode;
+  AML_NODE_HEADER  *ParentNode;
 
-  EAML_PARSE_INDEX        Index;
-  EAML_PARSE_INDEX        MaxIndex;
+  EAML_PARSE_INDEX  Index;
+  EAML_PARSE_INDEX  MaxIndex;
 
   if ((IndexPtr == NULL)               ||
       (!IS_AML_DATA_NODE (Node)        &&
-       !IS_AML_OBJECT_NODE (Node))) {
+       !IS_AML_OBJECT_NODE (Node)))
+  {
     ASSERT (0);
     return FALSE;
   }
 
-  ParentNode = AmlGetParent ((AML_NODE_HEADER*)Node);
+  ParentNode = AmlGetParent ((AML_NODE_HEADER *)Node);
   if (IS_AML_ROOT_NODE (ParentNode)) {
     return FALSE;
   } else if (IS_AML_DATA_NODE (ParentNode)) {
@@ -133,10 +136,10 @@ AmlIsNodeFixedArgument (
 
   // Check whether the Node is in the fixed argument list.
   MaxIndex = (EAML_PARSE_INDEX)AmlGetFixedArgumentCount (
-                                 (AML_OBJECT_NODE*)ParentNode
+                                 (AML_OBJECT_NODE *)ParentNode
                                  );
   for (Index = EAmlParseIndexTerm0; Index < MaxIndex; Index++) {
-    if (AmlGetFixedArgument ((AML_OBJECT_NODE*)ParentNode, Index) == Node) {
+    if (AmlGetFixedArgument ((AML_OBJECT_NODE *)ParentNode, Index) == Node) {
       *IndexPtr = Index;
       return TRUE;
     }
@@ -163,21 +166,22 @@ AmlIsNodeFixedArgument (
 EFI_STATUS
 EFIAPI
 AmlSetFixedArgument (
-  IN  AML_OBJECT_NODE   * ObjectNode,
-  IN  EAML_PARSE_INDEX    Index,
-  IN  AML_NODE_HEADER   * NewNode
+  IN  AML_OBJECT_NODE   *ObjectNode,
+  IN  EAML_PARSE_INDEX  Index,
+  IN  AML_NODE_HEADER   *NewNode
   )
 {
   if (IS_AML_OBJECT_NODE (ObjectNode)                                     &&
       (Index <= (EAML_PARSE_INDEX)AmlGetFixedArgumentCount (ObjectNode))  &&
       ((NewNode == NULL)                                                  ||
        IS_AML_OBJECT_NODE (NewNode)                                       ||
-       IS_AML_DATA_NODE (NewNode))) {
+       IS_AML_DATA_NODE (NewNode)))
+  {
     ObjectNode->FixedArgs[Index] = NewNode;
 
     // If NewNode is a data node or an object node, set its parent.
     if (NewNode != NULL) {
-      NewNode->Parent = (AML_NODE_HEADER*)ObjectNode;
+      NewNode->Parent = (AML_NODE_HEADER *)ObjectNode;
     }
 
     return EFI_SUCCESS;
@@ -199,14 +203,15 @@ AmlSetFixedArgument (
 LIST_ENTRY *
 EFIAPI
 AmlNodeGetVariableArgList (
-  IN  CONST AML_NODE_HEADER   * Node
+  IN  CONST AML_NODE_HEADER  *Node
   )
 {
   if (IS_AML_ROOT_NODE (Node)) {
-    return &(((AML_ROOT_NODE*)Node)->VariableArgs);
+    return &(((AML_ROOT_NODE *)Node)->VariableArgs);
   } else if (IS_AML_OBJECT_NODE (Node)) {
-    return &(((AML_OBJECT_NODE*)Node)->VariableArgs);
+    return &(((AML_OBJECT_NODE *)Node)->VariableArgs);
   }
+
   return NULL;
 }
 
@@ -226,22 +231,24 @@ AmlNodeGetVariableArgList (
 EFI_STATUS
 EFIAPI
 AmlRemoveNodeFromVarArgList (
-  IN  AML_NODE_HEADER   * Node
+  IN  AML_NODE_HEADER  *Node
   )
 {
-  EFI_STATUS          Status;
-  AML_NODE_HEADER   * ParentNode;
-  UINT32              Size;
+  EFI_STATUS       Status;
+  AML_NODE_HEADER  *ParentNode;
+  UINT32           Size;
 
   if ((!IS_AML_DATA_NODE (Node) &&
-       !IS_AML_OBJECT_NODE (Node))) {
+       !IS_AML_OBJECT_NODE (Node)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   ParentNode = AmlGetParent (Node);
   if (!IS_AML_ROOT_NODE (ParentNode)  &&
-      !IS_AML_OBJECT_NODE (ParentNode)) {
+      !IS_AML_OBJECT_NODE (ParentNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -249,7 +256,9 @@ AmlRemoveNodeFromVarArgList (
   // Check the node is in its parent variable list of arguments.
   if (!IsNodeInList (
          AmlNodeGetVariableArgList (ParentNode),
-         &Node->Link)) {
+         &Node->Link
+         ))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -289,7 +298,7 @@ AmlRemoveNodeFromVarArgList (
 EFI_STATUS
 EFIAPI
 AmlDetachNode (
-  IN  AML_NODE_HEADER   * Node
+  IN  AML_NODE_HEADER  *Node
   )
 {
   return AmlRemoveNodeFromVarArgList (Node);
@@ -308,13 +317,13 @@ AmlDetachNode (
 EFI_STATUS
 EFIAPI
 AmlVarListAddHead (
-  IN  AML_NODE_HEADER  * ParentNode,
-  IN  AML_NODE_HEADER  * NewNode
+  IN  AML_NODE_HEADER  *ParentNode,
+  IN  AML_NODE_HEADER  *NewNode
   )
 {
-  EFI_STATUS    Status;
-  UINT32        NewSize;
-  LIST_ENTRY  * ChildrenList;
+  EFI_STATUS  Status;
+  UINT32      NewSize;
+  LIST_ENTRY  *ChildrenList;
 
   // Check arguments and that NewNode is not already attached to a tree.
   // ParentNode != Data Node AND NewNode != Root Node AND NewNode != attached.
@@ -322,7 +331,8 @@ AmlVarListAddHead (
        !IS_AML_OBJECT_NODE (ParentNode))  ||
       (!IS_AML_DATA_NODE (NewNode)        &&
        !IS_AML_OBJECT_NODE (NewNode))     ||
-      !AML_NODE_IS_DETACHED (NewNode)) {
+      !AML_NODE_IS_DETACHED (NewNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -367,11 +377,11 @@ AmlVarListAddHead (
 EFI_STATUS
 EFIAPI
 AmlVarListAddTailInternal (
-  IN  AML_NODE_HEADER  * ParentNode,
-  IN  AML_NODE_HEADER  * NewNode
+  IN  AML_NODE_HEADER  *ParentNode,
+  IN  AML_NODE_HEADER  *NewNode
   )
 {
-  LIST_ENTRY  * ChildrenList;
+  LIST_ENTRY  *ChildrenList;
 
   // Check arguments and that NewNode is not already attached to a tree.
   // ParentNode != Data Node AND NewNode != Root Node AND NewNode != attached.
@@ -379,7 +389,8 @@ AmlVarListAddTailInternal (
        !IS_AML_OBJECT_NODE (ParentNode))  ||
       (!IS_AML_DATA_NODE (NewNode)        &&
        !IS_AML_OBJECT_NODE (NewNode))     ||
-      !AML_NODE_IS_DETACHED (NewNode)) {
+      !AML_NODE_IS_DETACHED (NewNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -410,8 +421,8 @@ AmlVarListAddTailInternal (
 EFI_STATUS
 EFIAPI
 AmlVarListAddTail (
-  IN  AML_NODE_HEADER   * ParentNode,
-  IN  AML_NODE_HEADER   * NewNode
+  IN  AML_NODE_HEADER  *ParentNode,
+  IN  AML_NODE_HEADER  *NewNode
   )
 {
   EFI_STATUS  Status;
@@ -451,25 +462,27 @@ AmlVarListAddTail (
 EFI_STATUS
 EFIAPI
 AmlVarListAddBefore (
-  IN  AML_NODE_HEADER  * Node,
-  IN  AML_NODE_HEADER  * NewNode
+  IN  AML_NODE_HEADER  *Node,
+  IN  AML_NODE_HEADER  *NewNode
   )
 {
-  EFI_STATUS         Status;
-  AML_NODE_HEADER  * ParentNode;
-  UINT32             NewSize;
+  EFI_STATUS       Status;
+  AML_NODE_HEADER  *ParentNode;
+  UINT32           NewSize;
 
   // Check arguments and that NewNode is not already attached to a tree.
   if ((!IS_AML_DATA_NODE (NewNode)        &&
        !IS_AML_OBJECT_NODE (NewNode))     ||
-      !AML_NODE_IS_DETACHED (NewNode)) {
+      !AML_NODE_IS_DETACHED (NewNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   ParentNode = AmlGetParent (Node);
   if (!IS_AML_ROOT_NODE (ParentNode)    &&
-      !IS_AML_OBJECT_NODE (ParentNode)) {
+      !IS_AML_OBJECT_NODE (ParentNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -505,25 +518,27 @@ AmlVarListAddBefore (
 EFI_STATUS
 EFIAPI
 AmlVarListAddAfter (
-  IN  AML_NODE_HEADER   * Node,
-  IN  AML_NODE_HEADER   * NewNode
+  IN  AML_NODE_HEADER  *Node,
+  IN  AML_NODE_HEADER  *NewNode
   )
 {
-  EFI_STATUS          Status;
-  AML_NODE_HEADER   * ParentNode;
-  UINT32              NewSize;
+  EFI_STATUS       Status;
+  AML_NODE_HEADER  *ParentNode;
+  UINT32           NewSize;
 
   // Check arguments and that NewNode is not already attached to a tree.
   if ((!IS_AML_DATA_NODE (NewNode)        &&
        !IS_AML_OBJECT_NODE (NewNode))     ||
-      !AML_NODE_IS_DETACHED (NewNode)) {
+      !AML_NODE_IS_DETACHED (NewNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   ParentNode = AmlGetParent (Node);
   if (!IS_AML_ROOT_NODE (ParentNode)    &&
-      !IS_AML_OBJECT_NODE (ParentNode)) {
+      !IS_AML_OBJECT_NODE (ParentNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -561,71 +576,56 @@ AmlVarListAddAfter (
 EFI_STATUS
 EFIAPI
 AmlAppendRdNode (
-  IN  AML_OBJECT_NODE   * BufferOpNode,
-  IN  AML_DATA_NODE     * NewRdNode
+  IN  AML_OBJECT_NODE  *BufferOpNode,
+  IN  AML_DATA_NODE    *NewRdNode
   )
 {
-  EFI_STATUS        Status;
-  AML_DATA_NODE   * CurrRdNode;
-  AML_RD_HEADER     RdDataType;
+  EFI_STATUS     Status;
+  AML_DATA_NODE  *LastRdNode;
 
   if (!AmlNodeCompareOpCode (BufferOpNode, AML_BUFFER_OP, 0)  ||
       !IS_AML_DATA_NODE (NewRdNode)                           ||
-      (NewRdNode->DataType != EAmlNodeDataTypeResourceData)) {
+      (NewRdNode->DataType != EAmlNodeDataTypeResourceData))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  // Get the first Resource data node in the variable list of
-  // argument of the BufferOp node.
-  CurrRdNode = (AML_DATA_NODE*)AmlGetNextVariableArgument (
-                                 (AML_NODE_HEADER*)BufferOpNode,
-                                 NULL
-                                 );
-  if ((CurrRdNode == NULL)             ||
-      !IS_AML_DATA_NODE (CurrRdNode)   ||
-      (CurrRdNode->DataType != EAmlNodeDataTypeResourceData)) {
+  // To avoid re-computing checksums, if a new resource data elements is
+  // added/removed/modified in a list of resource data elements, the AmlLib
+  // resets the checksum to 0.
+  // It is possible to have only one Resource Data in a BufferOp with
+  // no EndTag, but it should not be possible to add a new Resource Data
+  // in the list in this case.
+  Status = AmlSetRdListCheckSum (BufferOpNode, 0);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // Get the last Resource data node in the variable list of argument of the
+  // BufferOp node. This must be an EndTag, otherwise setting the checksum
+  // would have failed.
+  LastRdNode = (AML_DATA_NODE *)AmlGetPreviousVariableArgument (
+                                  (AML_NODE_HEADER *)BufferOpNode,
+                                  NULL
+                                  );
+  if ((LastRdNode == NULL)             ||
+      !IS_AML_DATA_NODE (LastRdNode)   ||
+      (LastRdNode->DataType != EAmlNodeDataTypeResourceData))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  // Iterate through the Resource Data nodes to find the End Tag.
-  while (TRUE) {
-    Status = AmlGetResourceDataType (CurrRdNode, &RdDataType);
-    if (EFI_ERROR (Status)) {
-      ASSERT (0);
-      return Status;
-    }
-
-    // If the Resource Data is an End Tag,
-    // add the new node before and return.
-    if (AmlRdCompareDescId (
-          &RdDataType,
-          AML_RD_BUILD_SMALL_DESC_ID (ACPI_SMALL_END_TAG_DESCRIPTOR_NAME))) {
-      Status = AmlVarListAddBefore (
-                 (AML_NODE_HEADER*)CurrRdNode,
-                 (AML_NODE_HEADER*)NewRdNode)
-                 ;
-      if (EFI_ERROR (Status)) {
-        ASSERT (0);
-      }
-      return Status;
-    }
-
-    // Get the next Resource Data node.
-    // If this was the last node and no End Tag was found, return error.
-    // It is possible to have only one Resource Data in a BufferOp,
-    // but it should not be possible to add a new Resource Data in the list
-    // in this case.
-    CurrRdNode = (AML_DATA_NODE*)AmlGetSiblingVariableArgument (
-                                   (AML_NODE_HEADER*)CurrRdNode
-                                   );
-    if (!IS_AML_DATA_NODE (CurrRdNode)  ||
-        (CurrRdNode->DataType != EAmlNodeDataTypeResourceData)) {
-      ASSERT (0);
-      return EFI_INVALID_PARAMETER;
-    }
-  } // while
+  // Add NewRdNode before the EndTag.
+  Status = AmlVarListAddBefore (
+             (AML_NODE_HEADER *)LastRdNode,
+             (AML_NODE_HEADER *)NewRdNode
+             )
+  ;
+  ASSERT_EFI_ERROR (Status);
+  return Status;
 }
 
 /** Replace the fixed argument at the Index of the ParentNode with the NewNode.
@@ -646,23 +646,24 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlReplaceFixedArgument (
-  IN  AML_OBJECT_NODE      * ParentNode,
-  IN  EAML_PARSE_INDEX       Index,
-  IN  AML_NODE_HEADER      * NewNode
+  IN  AML_OBJECT_NODE   *ParentNode,
+  IN  EAML_PARSE_INDEX  Index,
+  IN  AML_NODE_HEADER   *NewNode
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
-  AML_NODE_HEADER       * OldNode;
-  UINT32                  NewSize;
-  UINT32                  OldSize;
-  AML_PARSE_FORMAT        FixedArgType;
+  AML_NODE_HEADER   *OldNode;
+  UINT32            NewSize;
+  UINT32            OldSize;
+  AML_PARSE_FORMAT  FixedArgType;
 
   // Check arguments and that NewNode is not already attached to a tree.
   if (!IS_AML_OBJECT_NODE (ParentNode)  ||
       (!IS_AML_DATA_NODE (NewNode)      &&
        !IS_AML_OBJECT_NODE (NewNode))   ||
-      !AML_NODE_IS_DETACHED (NewNode)) {
+      !AML_NODE_IS_DETACHED (NewNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -675,11 +676,14 @@ AmlReplaceFixedArgument (
       // A FieldPkgLen can only have a parent node with the
       // AML_IS_FIELD_ELEMENT flag.
       if (!AmlNodeHasAttribute (
-             (AML_OBJECT_NODE*)ParentNode,
-             AML_HAS_FIELD_LIST)) {
+             (AML_OBJECT_NODE *)ParentNode,
+             AML_HAS_FIELD_LIST
+             ))
+      {
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
       }
+
       // Fall through.
     }
 
@@ -694,11 +698,13 @@ AmlReplaceFixedArgument (
       // data node of the same type.
       // Note: This condition might be too strict, but safer.
       if (!IS_AML_DATA_NODE (NewNode) ||
-          (((AML_DATA_NODE*)NewNode)->DataType !=
-            AmlTypeToNodeDataType (FixedArgType))) {
+          (((AML_DATA_NODE *)NewNode)->DataType !=
+           AmlTypeToNodeDataType (FixedArgType)))
+      {
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
       }
+
       break;
     }
 
@@ -751,11 +757,11 @@ AmlReplaceFixedArgument (
 
   // Propagate the new information.
   Status = AmlPropagateInformation (
-            (AML_NODE_HEADER*)ParentNode,
-            (NewSize > OldSize) ? TRUE : FALSE,
-            (NewSize > OldSize) ? (NewSize - OldSize) : (OldSize - NewSize),
-            0
-            );
+             (AML_NODE_HEADER *)ParentNode,
+             (NewSize > OldSize) ? TRUE : FALSE,
+             (NewSize > OldSize) ? (NewSize - OldSize) : (OldSize - NewSize),
+             0
+             );
   ASSERT_EFI_ERROR (Status);
 
   return Status;
@@ -778,18 +784,18 @@ AmlReplaceFixedArgument (
 EFI_STATUS
 EFIAPI
 AmlReplaceVariableArgument (
-  IN  AML_NODE_HEADER   * OldNode,
-  IN  AML_NODE_HEADER   * NewNode
+  IN  AML_NODE_HEADER  *OldNode,
+  IN  AML_NODE_HEADER  *NewNode
   )
 {
-  EFI_STATUS          Status;
-  UINT32              NewSize;
-  UINT32              OldSize;
-  EAML_PARSE_INDEX    Index;
+  EFI_STATUS        Status;
+  UINT32            NewSize;
+  UINT32            OldSize;
+  EAML_PARSE_INDEX  Index;
 
-  AML_DATA_NODE     * NewDataNode;
-  AML_NODE_HEADER   * ParentNode;
-  LIST_ENTRY        * NextLink;
+  AML_DATA_NODE    *NewDataNode;
+  AML_NODE_HEADER  *ParentNode;
+  LIST_ENTRY       *NextLink;
 
   // Check arguments, that NewNode is not already attached to a tree,
   // and that OldNode is attached and not in a fixed list of arguments.
@@ -799,19 +805,21 @@ AmlReplaceVariableArgument (
        !IS_AML_OBJECT_NODE (NewNode))   ||
       !AML_NODE_IS_DETACHED (NewNode)   ||
       AML_NODE_IS_DETACHED (OldNode)    ||
-      AmlIsNodeFixedArgument (OldNode, &Index)) {
+      AmlIsNodeFixedArgument (OldNode, &Index))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   ParentNode = AmlGetParent (OldNode);
-    if (!IS_AML_ROOT_NODE (ParentNode)    &&
-        !IS_AML_OBJECT_NODE (ParentNode)) {
+  if (!IS_AML_ROOT_NODE (ParentNode)    &&
+      !IS_AML_OBJECT_NODE (ParentNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  NewDataNode = (AML_DATA_NODE*)NewNode;
+  NewDataNode = (AML_DATA_NODE *)NewNode;
 
   // Check attributes if the parent node is an object node.
   if (IS_AML_OBJECT_NODE (ParentNode)) {
@@ -819,21 +827,26 @@ AmlReplaceVariableArgument (
     // data node or an object node. This has already been checked. So,
     // check for other cases.
 
-    if (AmlNodeHasAttribute ((AML_OBJECT_NODE*)ParentNode, AML_HAS_BYTE_LIST)) {
+    if (AmlNodeHasAttribute ((AML_OBJECT_NODE *)ParentNode, AML_HAS_BYTE_LIST)) {
       if (!IS_AML_DATA_NODE (NewNode)                       ||
           ((NewDataNode->DataType != EAmlNodeDataTypeRaw)   &&
-           (NewDataNode->DataType != EAmlNodeDataTypeResourceData))) {
+           (NewDataNode->DataType != EAmlNodeDataTypeResourceData)))
+      {
         // A child node of a node with the BYTE_LIST flag must be a data node,
         // containing raw data or a resource data.
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
       }
     } else if (AmlNodeHasAttribute (
-                (AML_OBJECT_NODE*)ParentNode,
-                AML_HAS_FIELD_LIST)) {
+                 (AML_OBJECT_NODE *)ParentNode,
+                 AML_HAS_FIELD_LIST
+                 ))
+    {
       if (!AmlNodeHasAttribute (
-             (CONST AML_OBJECT_NODE*)NewNode,
-              AML_IS_FIELD_ELEMENT)) {
+             (CONST AML_OBJECT_NODE *)NewNode,
+             AML_IS_FIELD_ELEMENT
+             ))
+      {
         // A child node of a node with the FIELD_LIST flag must be an object
         // node with AML_IS_FIELD_ELEMENT flag.
         ASSERT (0);
@@ -900,20 +913,21 @@ AmlReplaceVariableArgument (
 EFI_STATUS
 EFIAPI
 AmlReplaceArgument (
-  IN  AML_NODE_HEADER   * OldNode,
-  IN  AML_NODE_HEADER   * NewNode
+  IN  AML_NODE_HEADER  *OldNode,
+  IN  AML_NODE_HEADER  *NewNode
   )
 {
-  EFI_STATUS            Status;
-  AML_NODE_HEADER     * ParentNode;
-  EAML_PARSE_INDEX      Index;
+  EFI_STATUS        Status;
+  AML_NODE_HEADER   *ParentNode;
+  EAML_PARSE_INDEX  Index;
 
   // Check arguments and that NewNode is not already attached to a tree.
   if ((!IS_AML_DATA_NODE (OldNode)      &&
        !IS_AML_OBJECT_NODE (OldNode))   ||
       (!IS_AML_DATA_NODE (NewNode)      &&
        !IS_AML_OBJECT_NODE (NewNode))   ||
-      !AML_NODE_IS_DETACHED (NewNode)) {
+      !AML_NODE_IS_DETACHED (NewNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -921,7 +935,8 @@ AmlReplaceArgument (
   // ParentNode can be a root node or an object node.
   ParentNode = AmlGetParent (OldNode);
   if (!IS_AML_ROOT_NODE (ParentNode)  &&
-      !IS_AML_OBJECT_NODE (ParentNode)) {
+      !IS_AML_OBJECT_NODE (ParentNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -929,7 +944,7 @@ AmlReplaceArgument (
   if (AmlIsNodeFixedArgument (OldNode, &Index)) {
     // OldNode is in its parent's fixed argument list at the Index.
     Status = AmlReplaceFixedArgument (
-               (AML_OBJECT_NODE*)ParentNode,
+               (AML_OBJECT_NODE *)ParentNode,
                Index,
                NewNode
                );
@@ -960,18 +975,18 @@ AmlReplaceArgument (
 EFI_STATUS
 EFIAPI
 AmlDeleteTree (
-  IN  AML_NODE_HEADER  * Node
+  IN  AML_NODE_HEADER  *Node
   )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS  Status;
 
-  EAML_PARSE_INDEX      Index;
-  EAML_PARSE_INDEX      MaxIndex;
+  EAML_PARSE_INDEX  Index;
+  EAML_PARSE_INDEX  MaxIndex;
 
-  AML_NODE_HEADER     * Arg;
-  LIST_ENTRY          * StartLink;
-  LIST_ENTRY          * CurrentLink;
-  LIST_ENTRY          * NextLink;
+  AML_NODE_HEADER  *Arg;
+  LIST_ENTRY       *StartLink;
+  LIST_ENTRY       *CurrentLink;
+  LIST_ENTRY       *NextLink;
 
   // Check that the node being deleted is unlinked.
   // When removing the node, its parent pointer and
@@ -979,7 +994,8 @@ AmlDeleteTree (
   // InitializeListHead. Thus it must be detached
   // from the tree to avoid memory leaks.
   if (!IS_AML_NODE_VALID (Node)  ||
-      !AML_NODE_IS_DETACHED (Node)) {
+      !AML_NODE_IS_DETACHED (Node))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -988,10 +1004,10 @@ AmlDeleteTree (
   //    Iterate through the fixed list of arguments.
   if (IS_AML_OBJECT_NODE (Node)) {
     MaxIndex = (EAML_PARSE_INDEX)AmlGetFixedArgumentCount (
-                                   (AML_OBJECT_NODE*)Node
+                                   (AML_OBJECT_NODE *)Node
                                    );
     for (Index = EAmlParseIndexTerm0; Index < MaxIndex; Index++) {
-      Arg = AmlGetFixedArgument ((AML_OBJECT_NODE*)Node, Index);
+      Arg = AmlGetFixedArgument ((AML_OBJECT_NODE *)Node, Index);
       if (Arg == NULL) {
         // A fixed argument is missing. The tree is inconsistent.
         // Note: During CodeGeneration, the fixed arguments should be set
@@ -1004,7 +1020,7 @@ AmlDeleteTree (
 
       // Remove the node from the fixed argument list.
       Arg->Parent = NULL;
-      Status = AmlSetFixedArgument ((AML_OBJECT_NODE*)Node, Index, NULL);
+      Status      = AmlSetFixedArgument ((AML_OBJECT_NODE *)Node, Index, NULL);
       if (EFI_ERROR (Status)) {
         ASSERT (0);
         return Status;
@@ -1029,9 +1045,9 @@ AmlDeleteTree (
       // Unlink the node from the tree.
       NextLink = RemoveEntryList (CurrentLink);
       InitializeListHead (CurrentLink);
-      ((AML_NODE_HEADER*)CurrentLink)->Parent = NULL;
+      ((AML_NODE_HEADER *)CurrentLink)->Parent = NULL;
 
-      Status = AmlDeleteTree ((AML_NODE_HEADER*)CurrentLink);
+      Status = AmlDeleteTree ((AML_NODE_HEADER *)CurrentLink);
       if (EFI_ERROR (Status)) {
         ASSERT (0);
         return Status;

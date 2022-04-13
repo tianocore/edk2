@@ -26,74 +26,73 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 PxeIp2Mac (
-  IN SNP_DRIVER          *Snp,
-  IN BOOLEAN             IPv6,
-  IN EFI_IP_ADDRESS      *IP,
-  IN OUT EFI_MAC_ADDRESS *MAC
+  IN SNP_DRIVER           *Snp,
+  IN BOOLEAN              IPv6,
+  IN EFI_IP_ADDRESS       *IP,
+  IN OUT EFI_MAC_ADDRESS  *MAC
   )
 {
-  PXE_CPB_MCAST_IP_TO_MAC *Cpb;
-  PXE_DB_MCAST_IP_TO_MAC  *Db;
+  PXE_CPB_MCAST_IP_TO_MAC  *Cpb;
+  PXE_DB_MCAST_IP_TO_MAC   *Db;
 
-  Cpb                 = Snp->Cpb;
-  Db                  = Snp->Db;
-  Snp->Cdb.OpCode     = PXE_OPCODE_MCAST_IP_TO_MAC;
-  Snp->Cdb.OpFlags    = (UINT16) (IPv6 ? PXE_OPFLAGS_MCAST_IPV6_TO_MAC : PXE_OPFLAGS_MCAST_IPV4_TO_MAC);
-  Snp->Cdb.CPBsize    = (UINT16) sizeof (PXE_CPB_MCAST_IP_TO_MAC);
-  Snp->Cdb.DBsize     = (UINT16) sizeof (PXE_DB_MCAST_IP_TO_MAC);
+  Cpb              = Snp->Cpb;
+  Db               = Snp->Db;
+  Snp->Cdb.OpCode  = PXE_OPCODE_MCAST_IP_TO_MAC;
+  Snp->Cdb.OpFlags = (UINT16)(IPv6 ? PXE_OPFLAGS_MCAST_IPV6_TO_MAC : PXE_OPFLAGS_MCAST_IPV4_TO_MAC);
+  Snp->Cdb.CPBsize = (UINT16)sizeof (PXE_CPB_MCAST_IP_TO_MAC);
+  Snp->Cdb.DBsize  = (UINT16)sizeof (PXE_DB_MCAST_IP_TO_MAC);
 
-  Snp->Cdb.CPBaddr    = (UINT64)(UINTN) Cpb;
-  Snp->Cdb.DBaddr     = (UINT64)(UINTN) Db;
+  Snp->Cdb.CPBaddr = (UINT64)(UINTN)Cpb;
+  Snp->Cdb.DBaddr  = (UINT64)(UINTN)Db;
 
-  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum      = Snp->IfNum;
-  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum     = Snp->IfNum;
+  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   CopyMem (&Cpb->IP, IP, sizeof (PXE_IP_ADDR));
 
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nSnp->undi.mcast_ip_to_mac()  "));
+  DEBUG ((DEBUG_NET, "\nSnp->undi.mcast_ip_to_mac()  "));
 
-  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
 
   switch (Snp->Cdb.StatCode) {
-  case PXE_STATCODE_SUCCESS:
-    break;
+    case PXE_STATCODE_SUCCESS:
+      break;
 
-  case PXE_STATCODE_INVALID_CPB:
-    return EFI_INVALID_PARAMETER;
+    case PXE_STATCODE_INVALID_CPB:
+      return EFI_INVALID_PARAMETER;
 
-  case PXE_STATCODE_UNSUPPORTED:
-    DEBUG (
-      (EFI_D_NET,
-      "\nSnp->undi.mcast_ip_to_mac()  %xh:%xh\n",
-      Snp->Cdb.StatFlags,
-      Snp->Cdb.StatCode)
-      );
-    return EFI_UNSUPPORTED;
+    case PXE_STATCODE_UNSUPPORTED:
+      DEBUG (
+        (DEBUG_NET,
+         "\nSnp->undi.mcast_ip_to_mac()  %xh:%xh\n",
+         Snp->Cdb.StatFlags,
+         Snp->Cdb.StatCode)
+        );
+      return EFI_UNSUPPORTED;
 
-  default:
-    //
-    // UNDI command failed.  Return EFI_DEVICE_ERROR
-    // to caller.
-    //
-    DEBUG (
-      (EFI_D_NET,
-      "\nSnp->undi.mcast_ip_to_mac()  %xh:%xh\n",
-      Snp->Cdb.StatFlags,
-      Snp->Cdb.StatCode)
-      );
+    default:
+      //
+      // UNDI command failed.  Return EFI_DEVICE_ERROR
+      // to caller.
+      //
+      DEBUG (
+        (DEBUG_NET,
+         "\nSnp->undi.mcast_ip_to_mac()  %xh:%xh\n",
+         Snp->Cdb.StatFlags,
+         Snp->Cdb.StatCode)
+        );
 
-    return EFI_DEVICE_ERROR;
+      return EFI_DEVICE_ERROR;
   }
 
   CopyMem (MAC, &Db->MAC, sizeof (PXE_MAC_ADDR));
   return EFI_SUCCESS;
 }
-
 
 /**
   Converts a multicast IP address to a multicast HW MAC address.
@@ -126,10 +125,10 @@ PxeIp2Mac (
 EFI_STATUS
 EFIAPI
 SnpUndi32McastIpToMac (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
-  IN BOOLEAN                     IPv6,
-  IN EFI_IP_ADDRESS              *IP,
-  OUT EFI_MAC_ADDRESS            *MAC
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                      IPv6,
+  IN EFI_IP_ADDRESS               *IP,
+  OUT EFI_MAC_ADDRESS             *MAC
   )
 {
   SNP_DRIVER  *Snp;
@@ -143,7 +142,7 @@ SnpUndi32McastIpToMac (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (IP == NULL || MAC == NULL) {
+  if ((IP == NULL) || (MAC == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -152,16 +151,16 @@ SnpUndi32McastIpToMac (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   switch (Snp->Mode.State) {
-  case EfiSimpleNetworkInitialized:
-    break;
+    case EfiSimpleNetworkInitialized:
+      break;
 
-  case EfiSimpleNetworkStopped:
-    Status = EFI_NOT_STARTED;
-    goto ON_EXIT;
+    case EfiSimpleNetworkStopped:
+      Status = EFI_NOT_STARTED;
+      goto ON_EXIT;
 
-  default:
-    Status = EFI_DEVICE_ERROR;
-    goto ON_EXIT;
+    default:
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
   }
 
   Status = PxeIp2Mac (Snp, IPv6, IP, MAC);

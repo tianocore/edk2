@@ -21,9 +21,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 GetEsrtEntry (
-  IN  EFI_GUID              *FwClass,
-  IN  UINTN                 Attribute,
-  OUT EFI_SYSTEM_RESOURCE_ENTRY *Entry
+  IN  EFI_GUID                   *FwClass,
+  IN  UINTN                      Attribute,
+  OUT EFI_SYSTEM_RESOURCE_ENTRY  *Entry
   )
 {
   EFI_STATUS                 Status;
@@ -47,25 +47,25 @@ GetEsrtEntry (
   Status = GetVariable2 (
              VariableName,
              &gEfiCallerIdGuid,
-             (VOID **) &EsrtRepository,
+             (VOID **)&EsrtRepository,
              &RepositorySize
              );
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     goto EXIT;
   }
 
-  if (RepositorySize % sizeof(EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
-    DEBUG((EFI_D_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
+  if (RepositorySize % sizeof (EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
+    DEBUG ((DEBUG_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
     Status = EFI_ABORTED;
     goto EXIT;
   }
 
   Status  = EFI_NOT_FOUND;
-  EsrtNum = RepositorySize/sizeof(EFI_SYSTEM_RESOURCE_ENTRY);
+  EsrtNum = RepositorySize/sizeof (EFI_SYSTEM_RESOURCE_ENTRY);
   for (Index = 0; Index < EsrtNum; Index++) {
-    if (CompareGuid(FwClass, &EsrtRepository[Index].FwClass)) {
-      CopyMem(Entry, &EsrtRepository[Index], sizeof(EFI_SYSTEM_RESOURCE_ENTRY));
+    if (CompareGuid (FwClass, &EsrtRepository[Index].FwClass)) {
+      CopyMem (Entry, &EsrtRepository[Index], sizeof (EFI_SYSTEM_RESOURCE_ENTRY));
       Status = EFI_SUCCESS;
       break;
     }
@@ -73,7 +73,7 @@ GetEsrtEntry (
 
 EXIT:
   if (EsrtRepository != NULL) {
-    FreePool(EsrtRepository);
+    FreePool (EsrtRepository);
   }
 
   return Status;
@@ -89,9 +89,9 @@ EXIT:
 
 **/
 EFI_STATUS
-InsertEsrtEntry(
-  IN EFI_SYSTEM_RESOURCE_ENTRY *Entry,
-  UINTN                        Attribute
+InsertEsrtEntry (
+  IN EFI_SYSTEM_RESOURCE_ENTRY  *Entry,
+  UINTN                         Attribute
   )
 {
   EFI_STATUS                 Status;
@@ -115,7 +115,7 @@ InsertEsrtEntry(
   Status = GetVariable2 (
              VariableName,
              &gEfiCallerIdGuid,
-             (VOID **) &EsrtRepository,
+             (VOID **)&EsrtRepository,
              &RepositorySize
              );
 
@@ -123,32 +123,31 @@ InsertEsrtEntry(
     //
     // If not exist, create new Esrt cache repository
     //
-    Status = gRT->SetVariable(
+    Status = gRT->SetVariable (
                     VariableName,
                     &gEfiCallerIdGuid,
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                    sizeof(EFI_SYSTEM_RESOURCE_ENTRY),
+                    sizeof (EFI_SYSTEM_RESOURCE_ENTRY),
                     Entry
                     );
     return Status;
-
   } else if (Status == EFI_SUCCESS) {
     //
     // if exist, update Esrt cache repository
     //
-    if (RepositorySize % sizeof(EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
-      DEBUG((EFI_D_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
+    if (RepositorySize % sizeof (EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
+      DEBUG ((DEBUG_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
       //
       // Repository is corrupt. Clear Repository before insert new entry
       //
-      Status = gRT->SetVariable(
+      Status = gRT->SetVariable (
                       VariableName,
                       &gEfiCallerIdGuid,
                       EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
                       0,
                       EsrtRepository
                       );
-      FreePool(EsrtRepository);
+      FreePool (EsrtRepository);
       RepositorySize = 0;
       EsrtRepository = NULL;
     }
@@ -156,39 +155,41 @@ InsertEsrtEntry(
     //
     // Check Repository size constraint
     //
-    if ((Attribute == ESRT_FROM_FMP && RepositorySize >= PcdGet32(PcdMaxFmpEsrtCacheNum) * sizeof(EFI_SYSTEM_RESOURCE_ENTRY))
-      ||(Attribute == ESRT_FROM_NONFMP && RepositorySize >= PcdGet32(PcdMaxNonFmpEsrtCacheNum) * sizeof(EFI_SYSTEM_RESOURCE_ENTRY)) ) {
+    if (  ((Attribute == ESRT_FROM_FMP) && (RepositorySize >= PcdGet32 (PcdMaxFmpEsrtCacheNum) * sizeof (EFI_SYSTEM_RESOURCE_ENTRY)))
+       || ((Attribute == ESRT_FROM_NONFMP) && (RepositorySize >= PcdGet32 (PcdMaxNonFmpEsrtCacheNum) * sizeof (EFI_SYSTEM_RESOURCE_ENTRY))))
+    {
       Status = EFI_OUT_OF_RESOURCES;
       goto EXIT;
     }
 
-    EsrtRepositoryNew = AllocatePool(RepositorySize + sizeof(EFI_SYSTEM_RESOURCE_ENTRY));
+    EsrtRepositoryNew = AllocatePool (RepositorySize + sizeof (EFI_SYSTEM_RESOURCE_ENTRY));
     if (EsrtRepositoryNew == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto EXIT;
     }
 
-    if (RepositorySize != 0 && EsrtRepository != NULL) {
-      CopyMem(EsrtRepositoryNew, EsrtRepository, RepositorySize);
+    if ((RepositorySize != 0) && (EsrtRepository != NULL)) {
+      CopyMem (EsrtRepositoryNew, EsrtRepository, RepositorySize);
     }
-    CopyMem((UINT8 *)EsrtRepositoryNew + RepositorySize, Entry, sizeof(EFI_SYSTEM_RESOURCE_ENTRY));
 
-    Status = gRT->SetVariable(
+    CopyMem ((UINT8 *)EsrtRepositoryNew + RepositorySize, Entry, sizeof (EFI_SYSTEM_RESOURCE_ENTRY));
+
+    Status = gRT->SetVariable (
                     VariableName,
                     &gEfiCallerIdGuid,
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                    RepositorySize + sizeof(EFI_SYSTEM_RESOURCE_ENTRY),
+                    RepositorySize + sizeof (EFI_SYSTEM_RESOURCE_ENTRY),
                     EsrtRepositoryNew
                     );
   }
 
 EXIT:
   if (EsrtRepository != NULL) {
-    FreePool(EsrtRepository);
+    FreePool (EsrtRepository);
   }
 
   if (EsrtRepositoryNew != NULL) {
-    FreePool(EsrtRepositoryNew);
+    FreePool (EsrtRepositoryNew);
   }
 
   return Status;
@@ -205,9 +206,9 @@ EXIT:
 
 **/
 EFI_STATUS
-DeleteEsrtEntry(
-  IN  EFI_GUID        *FwClass,
-  IN  UINTN           Attribute
+DeleteEsrtEntry (
+  IN  EFI_GUID  *FwClass,
+  IN  UINTN     Attribute
   )
 {
   EFI_STATUS                 Status;
@@ -231,11 +232,11 @@ DeleteEsrtEntry(
   Status = GetVariable2 (
              VariableName,
              &gEfiCallerIdGuid,
-             (VOID **) &EsrtRepository,
+             (VOID **)&EsrtRepository,
              &RepositorySize
              );
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     goto EXIT;
   }
 
@@ -244,12 +245,12 @@ DeleteEsrtEntry(
     goto EXIT;
   }
 
-  if ((RepositorySize % sizeof(EFI_SYSTEM_RESOURCE_ENTRY)) != 0) {
-    DEBUG((EFI_D_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
+  if ((RepositorySize % sizeof (EFI_SYSTEM_RESOURCE_ENTRY)) != 0) {
+    DEBUG ((DEBUG_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
     //
     // Repository is corrupt. Clear Repository before insert new entry
     //
-    Status = gRT->SetVariable(
+    Status = gRT->SetVariable (
                     VariableName,
                     &gEfiCallerIdGuid,
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
@@ -259,28 +260,28 @@ DeleteEsrtEntry(
     goto EXIT;
   }
 
-  Status = EFI_NOT_FOUND;
-  EsrtNum = RepositorySize/sizeof(EFI_SYSTEM_RESOURCE_ENTRY);
+  Status  = EFI_NOT_FOUND;
+  EsrtNum = RepositorySize/sizeof (EFI_SYSTEM_RESOURCE_ENTRY);
   for (Index = 0; Index < EsrtNum; Index++) {
     //
     // Delete Esrt entry if it is found in repository
     //
-    if (CompareGuid(FwClass, &EsrtRepository[Index].FwClass)) {
+    if (CompareGuid (FwClass, &EsrtRepository[Index].FwClass)) {
       //
       // If delete Esrt entry is not at the rail
       //
       if (Index < EsrtNum - 1) {
-        CopyMem(&EsrtRepository[Index], &EsrtRepository[Index + 1], (EsrtNum - Index - 1) * sizeof(EFI_SYSTEM_RESOURCE_ENTRY));
+        CopyMem (&EsrtRepository[Index], &EsrtRepository[Index + 1], (EsrtNum - Index - 1) * sizeof (EFI_SYSTEM_RESOURCE_ENTRY));
       }
 
       //
       // Update New Repository
       //
-      Status = gRT->SetVariable(
+      Status = gRT->SetVariable (
                       VariableName,
                       &gEfiCallerIdGuid,
                       EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                      (EsrtNum - 1) * sizeof(EFI_SYSTEM_RESOURCE_ENTRY),
+                      (EsrtNum - 1) * sizeof (EFI_SYSTEM_RESOURCE_ENTRY),
                       EsrtRepository
                       );
       break;
@@ -289,11 +290,10 @@ DeleteEsrtEntry(
 
 EXIT:
   if (EsrtRepository != NULL) {
-    FreePool(EsrtRepository);
+    FreePool (EsrtRepository);
   }
 
   return Status;
-
 }
 
 /**
@@ -307,9 +307,9 @@ EXIT:
 
 **/
 EFI_STATUS
-UpdateEsrtEntry(
-  IN EFI_SYSTEM_RESOURCE_ENTRY *Entry,
-  UINTN                        Attribute
+UpdateEsrtEntry (
+  IN EFI_SYSTEM_RESOURCE_ENTRY  *Entry,
+  UINTN                         Attribute
   )
 {
   EFI_STATUS                 Status;
@@ -319,7 +319,7 @@ UpdateEsrtEntry(
   UINTN                      Index;
   UINTN                      EsrtNum;
 
-  EsrtRepository    = NULL;
+  EsrtRepository = NULL;
 
   //
   // Get Esrt index buffer
@@ -333,7 +333,7 @@ UpdateEsrtEntry(
   Status = GetVariable2 (
              VariableName,
              &gEfiCallerIdGuid,
-             (VOID **) &EsrtRepository,
+             (VOID **)&EsrtRepository,
              &RepositorySize
              );
 
@@ -342,16 +342,16 @@ UpdateEsrtEntry(
     goto EXIT;
   }
 
-  if (!EFI_ERROR(Status)) {
+  if (!EFI_ERROR (Status)) {
     //
     // if exist, update Esrt cache repository
     //
-    if (RepositorySize % sizeof(EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
-      DEBUG((EFI_D_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
+    if (RepositorySize % sizeof (EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
+      DEBUG ((DEBUG_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
       //
       // Repository is corrupt. Clear Repository before insert new entry
       //
-      Status = gRT->SetVariable(
+      Status = gRT->SetVariable (
                       VariableName,
                       &gEfiCallerIdGuid,
                       EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
@@ -362,19 +362,18 @@ UpdateEsrtEntry(
       goto EXIT;
     }
 
-    Status = EFI_NOT_FOUND;
-    EsrtNum = RepositorySize/sizeof(EFI_SYSTEM_RESOURCE_ENTRY);
+    Status  = EFI_NOT_FOUND;
+    EsrtNum = RepositorySize/sizeof (EFI_SYSTEM_RESOURCE_ENTRY);
     for (Index = 0; Index < EsrtNum; Index++) {
       //
       // Update Esrt entry if it is found in repository
       //
-      if (CompareGuid(&Entry->FwClass, &EsrtRepository[Index].FwClass)) {
-
-        CopyMem(&EsrtRepository[Index], Entry, sizeof(EFI_SYSTEM_RESOURCE_ENTRY));
+      if (CompareGuid (&Entry->FwClass, &EsrtRepository[Index].FwClass)) {
+        CopyMem (&EsrtRepository[Index], Entry, sizeof (EFI_SYSTEM_RESOURCE_ENTRY));
         //
         // Update New Repository
         //
-        Status = gRT->SetVariable(
+        Status = gRT->SetVariable (
                         VariableName,
                         &gEfiCallerIdGuid,
                         EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
@@ -388,7 +387,7 @@ UpdateEsrtEntry(
 
 EXIT:
   if (EsrtRepository != NULL) {
-    FreePool(EsrtRepository);
+    FreePool (EsrtRepository);
   }
 
   return Status;
@@ -404,18 +403,18 @@ EXIT:
 **/
 BOOLEAN
 IsSystemFmp (
-  IN EFI_FIRMWARE_IMAGE_DESCRIPTOR   *FmpImageInfo
+  IN EFI_FIRMWARE_IMAGE_DESCRIPTOR  *FmpImageInfo
   )
 {
-  GUID      *Guid;
-  UINTN     Count;
-  UINTN     Index;
+  GUID   *Guid;
+  UINTN  Count;
+  UINTN  Index;
 
-  Guid = PcdGetPtr(PcdSystemFmpCapsuleImageTypeIdGuid);
-  Count = PcdGetSize(PcdSystemFmpCapsuleImageTypeIdGuid)/sizeof(GUID);
+  Guid  = PcdGetPtr (PcdSystemFmpCapsuleImageTypeIdGuid);
+  Count = PcdGetSize (PcdSystemFmpCapsuleImageTypeIdGuid)/sizeof (GUID);
 
   for (Index = 0; Index < Count; Index++, Guid++) {
-    if (CompareGuid(&FmpImageInfo->ImageTypeId, Guid)) {
+    if (CompareGuid (&FmpImageInfo->ImageTypeId, Guid)) {
       return TRUE;
     }
   }
@@ -433,18 +432,19 @@ IsSystemFmp (
 **/
 VOID
 SetEsrtEntryFromFmpInfo (
-  IN OUT EFI_SYSTEM_RESOURCE_ENTRY   *EsrtEntry,
-  IN EFI_FIRMWARE_IMAGE_DESCRIPTOR   *FmpImageInfo,
-  IN UINT32                          DescriptorVersion
+  IN OUT EFI_SYSTEM_RESOURCE_ENTRY  *EsrtEntry,
+  IN EFI_FIRMWARE_IMAGE_DESCRIPTOR  *FmpImageInfo,
+  IN UINT32                         DescriptorVersion
   )
 {
-  EsrtEntry->FwVersion                = FmpImageInfo->Version;
-  EsrtEntry->FwClass                  = FmpImageInfo->ImageTypeId;
-  if (IsSystemFmp(FmpImageInfo)) {
-    EsrtEntry->FwType                   = ESRT_FW_TYPE_SYSTEMFIRMWARE;
+  EsrtEntry->FwVersion = FmpImageInfo->Version;
+  EsrtEntry->FwClass   = FmpImageInfo->ImageTypeId;
+  if (IsSystemFmp (FmpImageInfo)) {
+    EsrtEntry->FwType = ESRT_FW_TYPE_SYSTEMFIRMWARE;
   } else {
-    EsrtEntry->FwType                   = ESRT_FW_TYPE_DEVICEFIRMWARE;
+    EsrtEntry->FwType = ESRT_FW_TYPE_DEVICEFIRMWARE;
   }
+
   EsrtEntry->LowestSupportedFwVersion = 0;
   EsrtEntry->CapsuleFlags             = 0;
   EsrtEntry->LastAttemptVersion       = 0;
@@ -468,8 +468,9 @@ SetEsrtEntryFromFmpInfo (
   //
   // Set capsule customized flag
   //
-  if ((FmpImageInfo->AttributesSupported & IMAGE_ATTRIBUTE_RESET_REQUIRED) != 0
-   && (FmpImageInfo->AttributesSetting & IMAGE_ATTRIBUTE_RESET_REQUIRED) != 0) {
-    EsrtEntry->CapsuleFlags = PcdGet16(PcdSystemRebootAfterCapsuleProcessFlag);
+  if (  ((FmpImageInfo->AttributesSupported & IMAGE_ATTRIBUTE_RESET_REQUIRED) != 0)
+     && ((FmpImageInfo->AttributesSetting & IMAGE_ATTRIBUTE_RESET_REQUIRED) != 0))
+  {
+    EsrtEntry->CapsuleFlags = PcdGet16 (PcdSystemRebootAfterCapsuleProcessFlag);
   }
 }

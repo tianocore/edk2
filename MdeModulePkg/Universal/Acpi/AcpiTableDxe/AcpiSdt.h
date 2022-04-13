@@ -16,7 +16,7 @@
 //
 // ACPI Notify Linked List Signature.
 //
-#define EFI_ACPI_NOTIFY_LIST_SIGNATURE SIGNATURE_32 ('E', 'A', 'N', 'L')
+#define EFI_ACPI_NOTIFY_LIST_SIGNATURE  SIGNATURE_32 ('E', 'A', 'N', 'L')
 
 //
 // ACPI Notify List Entry definition.
@@ -26,9 +26,9 @@
 //  Notification is the callback function.
 //
 typedef struct {
-  UINT32                   Signature;
-  LIST_ENTRY               Link;
-  EFI_ACPI_NOTIFICATION_FN Notification;
+  UINT32                      Signature;
+  LIST_ENTRY                  Link;
+  EFI_ACPI_NOTIFICATION_FN    Notification;
 } EFI_ACPI_NOTIFY_LIST;
 
 //
@@ -36,13 +36,13 @@ typedef struct {
 //
 #define EFI_ACPI_NOTIFY_LIST_FROM_LINK(_link)  CR (_link, EFI_ACPI_NOTIFY_LIST, Link, EFI_ACPI_NOTIFY_LIST_SIGNATURE)
 
-typedef struct _AML_BYTE_ENCODING AML_BYTE_ENCODING;
-typedef struct _EFI_AML_NODE_LIST EFI_AML_NODE_LIST;
+typedef struct _AML_BYTE_ENCODING  AML_BYTE_ENCODING;
+typedef struct _EFI_AML_NODE_LIST  EFI_AML_NODE_LIST;
 
 //
 // AML Node Linked List Signature.
 //
-#define EFI_AML_NODE_LIST_SIGNATURE SIGNATURE_32 ('E', 'A', 'M', 'L')
+#define EFI_AML_NODE_LIST_SIGNATURE  SIGNATURE_32 ('E', 'A', 'M', 'L')
 
 //
 // AML Node Linked List Entry definition.
@@ -56,17 +56,16 @@ typedef struct _EFI_AML_NODE_LIST EFI_AML_NODE_LIST;
 //  Size is the total size of this ACPI node buffer.
 //  Children is the children linked list of this node.
 //
-#define AML_NAME_SEG_SIZE  4
 
 struct _EFI_AML_NODE_LIST {
-  UINT32                  Signature;
-  UINT8                   Name[AML_NAME_SEG_SIZE];
-  UINT8                   *Buffer;
-  UINTN                   Size;
-  LIST_ENTRY              Link;
-  LIST_ENTRY              Children;
-  EFI_AML_NODE_LIST       *Parent;
-  AML_BYTE_ENCODING       *AmlByteEncoding;
+  UINT32               Signature;
+  UINT8                Name[AML_NAME_SEG_SIZE];
+  UINT8                *Buffer;
+  UINTN                Size;
+  LIST_ENTRY           Link;
+  LIST_ENTRY           Children;
+  EFI_AML_NODE_LIST    *Parent;
+  AML_BYTE_ENCODING    *AmlByteEncoding;
 };
 
 //
@@ -77,8 +76,8 @@ struct _EFI_AML_NODE_LIST {
 //
 // AML Handle Signature.
 //
-#define EFI_AML_HANDLE_SIGNATURE SIGNATURE_32 ('E', 'A', 'H', 'S')
-#define EFI_AML_ROOT_HANDLE_SIGNATURE SIGNATURE_32 ('E', 'A', 'R', 'H')
+#define EFI_AML_HANDLE_SIGNATURE       SIGNATURE_32 ('E', 'A', 'H', 'S')
+#define EFI_AML_ROOT_HANDLE_SIGNATURE  SIGNATURE_32 ('E', 'A', 'R', 'H')
 
 //
 // AML Handle Entry definition.
@@ -89,50 +88,50 @@ struct _EFI_AML_NODE_LIST {
 //  Size is the total size of this ACPI node buffer.
 //
 typedef struct {
-  UINT32                  Signature;
-  UINT8                   *Buffer;
-  UINTN                   Size;
-  AML_BYTE_ENCODING       *AmlByteEncoding;
-  BOOLEAN                 Modified;
+  UINT32               Signature;
+  UINT8                *Buffer;
+  UINTN                Size;
+  AML_BYTE_ENCODING    *AmlByteEncoding;
+  BOOLEAN              Modified;
 } EFI_AML_HANDLE;
 
 typedef UINT32 AML_OP_PARSE_INDEX;
 
-#define AML_OP_PARSE_INDEX_GET_OPCODE     0
-#define AML_OP_PARSE_INDEX_GET_TERM1      1
-#define AML_OP_PARSE_INDEX_GET_TERM2      2
-#define AML_OP_PARSE_INDEX_GET_TERM3      3
-#define AML_OP_PARSE_INDEX_GET_TERM4      4
-#define AML_OP_PARSE_INDEX_GET_TERM5      5
-#define AML_OP_PARSE_INDEX_GET_TERM6      6
-#define AML_OP_PARSE_INDEX_GET_SIZE       (AML_OP_PARSE_INDEX)-1
+#define AML_OP_PARSE_INDEX_GET_OPCODE  0
+#define AML_OP_PARSE_INDEX_GET_TERM1   1
+#define AML_OP_PARSE_INDEX_GET_TERM2   2
+#define AML_OP_PARSE_INDEX_GET_TERM3   3
+#define AML_OP_PARSE_INDEX_GET_TERM4   4
+#define AML_OP_PARSE_INDEX_GET_TERM5   5
+#define AML_OP_PARSE_INDEX_GET_TERM6   6
+#define AML_OP_PARSE_INDEX_GET_SIZE    (AML_OP_PARSE_INDEX)-1
 
 typedef UINT32 AML_OP_PARSE_FORMAT;
-#define AML_NONE         0
-#define AML_OPCODE       1
-#define AML_UINT8        2
-#define AML_UINT16       3
-#define AML_UINT32       4
-#define AML_UINT64       5
-#define AML_NAME         6
-#define AML_STRING       7
-#define AML_OBJECT       8
+#define AML_NONE    0
+#define AML_OPCODE  1
+#define AML_UINT8   2
+#define AML_UINT16  3
+#define AML_UINT32  4
+#define AML_UINT64  5
+#define AML_NAME    6
+#define AML_STRING  7
+#define AML_OBJECT  8
 
 typedef UINT32 AML_OP_ATTRIBUTE;
-#define AML_HAS_PKG_LENGTH       0x1     // It is ACPI attribute - if OpCode has PkgLength
-#define AML_IS_NAME_CHAR         0x2     // It is ACPI attribute - if this is NameChar
-#define AML_HAS_CHILD_OBJ        0x4     // it is ACPI attribute - if OpCode has Child Object.
-#define AML_IN_NAMESPACE         0x10000 // It is UEFI SDT attribute - if OpCode will be in NameSpace
+#define AML_HAS_PKG_LENGTH  0x1          // It is ACPI attribute - if OpCode has PkgLength
+#define AML_IS_NAME_CHAR    0x2          // It is ACPI attribute - if this is NameChar
+#define AML_HAS_CHILD_OBJ   0x4          // it is ACPI attribute - if OpCode has Child Object.
+#define AML_IN_NAMESPACE    0x10000      // It is UEFI SDT attribute - if OpCode will be in NameSpace
                                          // NOTE; Not all OBJECT will be in NameSpace
                                          // For example, BankField | CreateBitField | CreateByteField | CreateDWordField |
                                          //   CreateField | CreateQWordField | CreateWordField | Field | IndexField.
 
 struct _AML_BYTE_ENCODING {
-  UINT8                      OpCode;
-  UINT8                      SubOpCode;
-  AML_OP_PARSE_INDEX         MaxIndex;
-  AML_OP_PARSE_FORMAT        Format[6];
-  AML_OP_ATTRIBUTE           Attribute;
+  UINT8                  OpCode;
+  UINT8                  SubOpCode;
+  AML_OP_PARSE_INDEX     MaxIndex;
+  AML_OP_PARSE_FORMAT    Format[6];
+  AML_OP_ATTRIBUTE       Attribute;
 };
 
 //
@@ -168,10 +167,10 @@ struct _AML_BYTE_ENCODING {
 EFI_STATUS
 EFIAPI
 GetAcpiTable2 (
-  IN  UINTN                               Index,
-  OUT EFI_ACPI_SDT_HEADER                 **Table,
-  OUT EFI_ACPI_TABLE_VERSION              *Version,
-  OUT UINTN                               *TableKey
+  IN  UINTN                   Index,
+  OUT EFI_ACPI_SDT_HEADER     **Table,
+  OUT EFI_ACPI_TABLE_VERSION  *Version,
+  OUT UINTN                   *TableKey
   );
 
 /**
@@ -191,8 +190,8 @@ GetAcpiTable2 (
 EFI_STATUS
 EFIAPI
 RegisterNotify (
-  IN BOOLEAN                    Register,
-  IN EFI_ACPI_NOTIFICATION_FN   Notification
+  IN BOOLEAN                   Register,
+  IN EFI_ACPI_NOTIFICATION_FN  Notification
   );
 
 /**
@@ -207,8 +206,8 @@ RegisterNotify (
 EFI_STATUS
 EFIAPI
 OpenSdt (
-  IN    UINTN           TableKey,
-  OUT   EFI_ACPI_HANDLE *Handle
+  IN    UINTN            TableKey,
+  OUT   EFI_ACPI_HANDLE  *Handle
   );
 
 /**
@@ -225,8 +224,8 @@ OpenSdt (
 EFI_STATUS
 EFIAPI
 Open (
-  IN    VOID            *Buffer,
-  OUT   EFI_ACPI_HANDLE *Handle
+  IN    VOID             *Buffer,
+  OUT   EFI_ACPI_HANDLE  *Handle
   );
 
 /**
@@ -240,7 +239,7 @@ Open (
 EFI_STATUS
 EFIAPI
 Close (
-  IN EFI_ACPI_HANDLE Handle
+  IN EFI_ACPI_HANDLE  Handle
   );
 
 /**
@@ -285,10 +284,10 @@ GetOption (
 EFI_STATUS
 EFIAPI
 SetOption (
-  IN        EFI_ACPI_HANDLE Handle,
-  IN        UINTN           Index,
-  IN CONST  VOID            *Data,
-  IN        UINTN           DataSize
+  IN        EFI_ACPI_HANDLE  Handle,
+  IN        UINTN            Index,
+  IN CONST  VOID             *Data,
+  IN        UINTN            DataSize
   );
 
 /**
@@ -305,8 +304,8 @@ SetOption (
 EFI_STATUS
 EFIAPI
 GetChild (
-  IN EFI_ACPI_HANDLE        ParentHandle,
-  IN OUT EFI_ACPI_HANDLE    *Handle
+  IN EFI_ACPI_HANDLE      ParentHandle,
+  IN OUT EFI_ACPI_HANDLE  *Handle
   );
 
 /**
@@ -323,9 +322,9 @@ GetChild (
 EFI_STATUS
 EFIAPI
 FindPath (
-  IN    EFI_ACPI_HANDLE HandleIn,
-  IN    VOID            *AcpiPath,
-  OUT   EFI_ACPI_HANDLE *HandleOut
+  IN    EFI_ACPI_HANDLE  HandleIn,
+  IN    VOID             *AcpiPath,
+  OUT   EFI_ACPI_HANDLE  *HandleOut
   );
 
 //
@@ -346,9 +345,9 @@ FindPath (
 **/
 EFI_STATUS
 SdtOpenEx (
-  IN    VOID            *Buffer,
-  IN    UINTN           BufferSize,
-  OUT   EFI_ACPI_HANDLE *Handle
+  IN    VOID             *Buffer,
+  IN    UINTN            BufferSize,
+  OUT   EFI_ACPI_HANDLE  *Handle
   );
 
 //
@@ -366,8 +365,8 @@ SdtOpenEx (
 **/
 EFI_STATUS
 AmlGetNameStringSize (
-  IN  UINT8              *Buffer,
-  OUT UINTN              *BufferSize
+  IN  UINT8  *Buffer,
+  OUT UINTN  *BufferSize
   );
 
 /**
@@ -380,8 +379,8 @@ AmlGetNameStringSize (
 **/
 UINTN
 AmlGetPkgLength (
-  IN UINT8              *Buffer,
-  OUT UINTN             *PkgLength
+  IN UINT8   *Buffer,
+  OUT UINTN  *PkgLength
   );
 
 /**
@@ -405,7 +404,7 @@ AmlTypeToAcpiType (
 **/
 AML_BYTE_ENCODING *
 AmlSearchByOpByte (
-  IN UINT8                *OpByteBuffer
+  IN UINT8  *OpByteBuffer
   );
 
 /**
@@ -419,9 +418,9 @@ AmlSearchByOpByte (
 **/
 UINTN
 AmlGetObjectSize (
-  IN AML_BYTE_ENCODING   *AmlByteEncoding,
-  IN UINT8               *Buffer,
-  IN UINTN               MaxBufferSize
+  IN AML_BYTE_ENCODING  *AmlByteEncoding,
+  IN UINT8              *Buffer,
+  IN UINTN              MaxBufferSize
   );
 
 /**
@@ -433,7 +432,7 @@ AmlGetObjectSize (
 **/
 CHAR8 *
 AmlGetObjectName (
-  IN EFI_AML_HANDLE      *AmlHandle
+  IN EFI_AML_HANDLE  *AmlHandle
   );
 
 /**
@@ -452,11 +451,11 @@ AmlGetObjectName (
 **/
 EFI_STATUS
 AmlParseOptionHandleCommon (
-  IN EFI_AML_HANDLE      *AmlHandle,
-  IN AML_OP_PARSE_INDEX  Index,
-  OUT EFI_ACPI_DATA_TYPE *DataType,
-  OUT VOID               **Data,
-  OUT UINTN              *DataSize
+  IN EFI_AML_HANDLE       *AmlHandle,
+  IN AML_OP_PARSE_INDEX   Index,
+  OUT EFI_ACPI_DATA_TYPE  *DataType,
+  OUT VOID                **Data,
+  OUT UINTN               *DataSize
   );
 
 /**
@@ -470,8 +469,8 @@ AmlParseOptionHandleCommon (
 **/
 EFI_STATUS
 AmlGetOffsetAfterLastOption (
-  IN EFI_AML_HANDLE         *AmlHandle,
-  OUT UINT8                 **Buffer
+  IN EFI_AML_HANDLE  *AmlHandle,
+  OUT UINT8          **Buffer
   );
 
 /**
@@ -487,9 +486,9 @@ AmlGetOffsetAfterLastOption (
 **/
 EFI_STATUS
 AmlGetChildFromRoot (
-  IN EFI_AML_HANDLE         *AmlParentHandle,
-  IN EFI_AML_HANDLE         *AmlHandle,
-  OUT VOID                  **Buffer
+  IN EFI_AML_HANDLE  *AmlParentHandle,
+  IN EFI_AML_HANDLE  *AmlHandle,
+  OUT VOID           **Buffer
   );
 
 /**
@@ -505,9 +504,9 @@ AmlGetChildFromRoot (
 **/
 EFI_STATUS
 AmlGetChildFromNonRoot (
-  IN EFI_AML_HANDLE         *AmlParentHandle,
-  IN EFI_AML_HANDLE         *AmlHandle,
-  OUT VOID                  **Buffer
+  IN EFI_AML_HANDLE  *AmlParentHandle,
+  IN EFI_AML_HANDLE  *AmlHandle,
+  OUT VOID           **Buffer
   );
 
 /**
@@ -520,7 +519,7 @@ AmlGetChildFromNonRoot (
 **/
 UINT8 *
 AmlNameFromAslName (
-  IN UINT8 *AslPath
+  IN UINT8  *AslPath
   );
 
 /**
@@ -551,7 +550,7 @@ AmlFindPath (
 **/
 VOID
 AmlPrintNameString (
-  IN UINT8              *Buffer
+  IN UINT8  *Buffer
   );
 
 /**
@@ -561,7 +560,7 @@ AmlPrintNameString (
 **/
 VOID
 AmlPrintNameSeg (
-  IN UINT8              *Buffer
+  IN UINT8  *Buffer
   );
 
 /**
@@ -574,7 +573,7 @@ AmlPrintNameSeg (
 **/
 BOOLEAN
 AmlIsRootPath (
-  IN UINT8              *Buffer
+  IN UINT8  *Buffer
   );
 
 #endif

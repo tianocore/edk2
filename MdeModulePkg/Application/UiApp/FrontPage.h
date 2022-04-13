@@ -18,24 +18,23 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 extern UINT8  FrontPageVfrBin[];
 
-extern EFI_FORM_BROWSER2_PROTOCOL      *gFormBrowser2;
+extern EFI_FORM_BROWSER2_PROTOCOL  *gFormBrowser2;
 
-
-#define SMBIOS_TYPE4_CPU_SOCKET_POPULATED BIT6
+#define SMBIOS_TYPE4_CPU_SOCKET_POPULATED  BIT6
 
 //
 // This is the VFR compiler generated header file which defines the
 // string identifiers.
 //
-#define PRINTABLE_LANGUAGE_NAME_STRING_ID     0x0001
+#define PRINTABLE_LANGUAGE_NAME_STRING_ID  0x0001
 
 //
 // These are defined as the same with vfr file
 //
-#define FRONT_PAGE_FORM_ID             0x1000
+#define FRONT_PAGE_FORM_ID  0x1000
 
-#define LABEL_FRANTPAGE_INFORMATION    0x1000
-#define LABEL_END                      0xffff
+#define LABEL_FRONTPAGE_INFORMATION  0x1000
+#define LABEL_END                    0xffff
 
 #define FRONT_PAGE_FORMSET_GUID \
   { \
@@ -45,21 +44,20 @@ extern EFI_FORM_BROWSER2_PROTOCOL      *gFormBrowser2;
 #define FRONT_PAGE_CALLBACK_DATA_SIGNATURE  SIGNATURE_32 ('F', 'P', 'C', 'B')
 
 typedef struct {
-  UINTN                           Signature;
+  UINTN                             Signature;
 
   //
   // HII relative handles
   //
-  EFI_HII_HANDLE                  HiiHandle;
-  EFI_HANDLE                      DriverHandle;
-  EFI_STRING_ID                   *LanguageToken;
+  EFI_HII_HANDLE                    HiiHandle;
+  EFI_HANDLE                        DriverHandle;
+  EFI_STRING_ID                     *LanguageToken;
 
   //
   // Produced protocols
   //
-  EFI_HII_CONFIG_ACCESS_PROTOCOL  ConfigAccess;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL    ConfigAccess;
 } FRONT_PAGE_CALLBACK_DATA;
-
 
 #define EFI_FP_CALLBACK_DATA_FROM_THIS(a) \
   CR (a, \
@@ -93,10 +91,10 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 FakeExtractConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Request,
-  OUT EFI_STRING                             *Progress,
-  OUT EFI_STRING                             *Results
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Request,
+  OUT EFI_STRING                            *Progress,
+  OUT EFI_STRING                            *Results
   );
 
 /**
@@ -118,9 +116,9 @@ FakeExtractConfig (
 EFI_STATUS
 EFIAPI
 FakeRouteConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Configuration,
-  OUT EFI_STRING                             *Progress
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Configuration,
+  OUT EFI_STRING                            *Progress
   );
 
 /**
@@ -144,12 +142,12 @@ FakeRouteConfig (
 EFI_STATUS
 EFIAPI
 FrontPageCallback (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  EFI_BROWSER_ACTION                     Action,
-  IN  EFI_QUESTION_ID                        QuestionId,
-  IN  UINT8                                  Type,
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  EFI_BROWSER_ACTION                    Action,
+  IN  EFI_QUESTION_ID                       QuestionId,
+  IN  UINT8                                 Type,
+  IN  EFI_IFR_TYPE_VALUE                    *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   );
 
 /**
@@ -177,9 +175,9 @@ InitializeFrontPage (
 **/
 EFI_STATUS
 GetProducerString (
-  IN      EFI_GUID                  *ProducerGuid,
-  IN      EFI_STRING_ID             Token,
-  OUT     CHAR16                    **String
+  IN      EFI_GUID       *ProducerGuid,
+  IN      EFI_STRING_ID  Token,
+  OUT     CHAR16         **String
   );
 
 /**
@@ -192,7 +190,7 @@ GetProducerString (
 VOID
 EFIAPI
 UiEntry (
-  IN BOOLEAN                      ConnectAllHappened
+  IN BOOLEAN  ConnectAllHappened
   );
 
 /**
@@ -206,8 +204,7 @@ UiEntry (
 **/
 CHAR16 *
 ExtractDevicePathFromHiiHandle (
-  IN      EFI_HII_HANDLE      Handle
+  IN      EFI_HII_HANDLE  Handle
   );
 
 #endif // _FRONT_PAGE_H_
-

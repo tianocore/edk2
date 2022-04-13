@@ -8,9 +8,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "TcgConfigImpl.h"
 
-CHAR16                          mTcgStorageName[] = L"TCG_CONFIGURATION";
+CHAR16  mTcgStorageName[] = L"TCG_CONFIGURATION";
 
-TCG_CONFIG_PRIVATE_DATA         mTcgConfigPrivateDateTemplate = {
+TCG_CONFIG_PRIVATE_DATA  mTcgConfigPrivateDateTemplate = {
   TCG_CONFIG_PRIVATE_DATA_SIGNATURE,
   {
     TcgExtractConfig,
@@ -19,14 +19,14 @@ TCG_CONFIG_PRIVATE_DATA         mTcgConfigPrivateDateTemplate = {
   }
 };
 
-HII_VENDOR_DEVICE_PATH          mTcgHiiVendorDevicePath = {
+HII_VENDOR_DEVICE_PATH  mTcgHiiVendorDevicePath = {
   {
     {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
       {
-        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+        (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
     TCG_CONFIG_FORM_SET_GUID
@@ -35,8 +35,8 @@ HII_VENDOR_DEVICE_PATH          mTcgHiiVendorDevicePath = {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
     {
-      (UINT8) (END_DEVICE_PATH_LENGTH),
-      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+      (UINT8)(END_DEVICE_PATH_LENGTH),
+      (UINT8)((END_DEVICE_PATH_LENGTH) >> 8)
     }
   }
 };
@@ -55,16 +55,16 @@ HII_VENDOR_DEVICE_PATH          mTcgHiiVendorDevicePath = {
 **/
 EFI_STATUS
 GetTpmState (
-  IN  EFI_TCG_PROTOCOL          *TcgProtocol,
-  OUT BOOLEAN                   *TpmEnable,  OPTIONAL
-  OUT BOOLEAN                   *TpmActivate OPTIONAL
+  IN  EFI_TCG_PROTOCOL  *TcgProtocol,
+  OUT BOOLEAN           *TpmEnable   OPTIONAL,
+  OUT BOOLEAN           *TpmActivate OPTIONAL
   )
 {
-  EFI_STATUS                    Status;
-  TPM_RSP_COMMAND_HDR           *TpmRsp;
-  UINT32                        TpmSendSize;
-  TPM_PERMANENT_FLAGS           *TpmPermanentFlags;
-  UINT8                         CmdBuf[64];
+  EFI_STATUS           Status;
+  TPM_RSP_COMMAND_HDR  *TpmRsp;
+  UINT32               TpmSendSize;
+  TPM_PERMANENT_FLAGS  *TpmPermanentFlags;
+  UINT8                CmdBuf[64];
 
   ASSERT (TcgProtocol != NULL);
 
@@ -73,13 +73,13 @@ GetTpmState (
   //
   if ((TpmEnable != NULL) || (TpmActivate != NULL)) {
     TpmSendSize           = sizeof (TPM_RQU_COMMAND_HDR) + sizeof (UINT32) * 3;
-    *(UINT16*)&CmdBuf[0]  = SwapBytes16 (TPM_TAG_RQU_COMMAND);
-    *(UINT32*)&CmdBuf[2]  = SwapBytes32 (TpmSendSize);
-    *(UINT32*)&CmdBuf[6]  = SwapBytes32 (TPM_ORD_GetCapability);
+    *(UINT16 *)&CmdBuf[0] = SwapBytes16 (TPM_TAG_RQU_COMMAND);
+    *(UINT32 *)&CmdBuf[2] = SwapBytes32 (TpmSendSize);
+    *(UINT32 *)&CmdBuf[6] = SwapBytes32 (TPM_ORD_GetCapability);
 
-    *(UINT32*)&CmdBuf[10] = SwapBytes32 (TPM_CAP_FLAG);
-    *(UINT32*)&CmdBuf[14] = SwapBytes32 (sizeof (TPM_CAP_FLAG_PERMANENT));
-    *(UINT32*)&CmdBuf[18] = SwapBytes32 (TPM_CAP_FLAG_PERMANENT);
+    *(UINT32 *)&CmdBuf[10] = SwapBytes32 (TPM_CAP_FLAG);
+    *(UINT32 *)&CmdBuf[14] = SwapBytes32 (sizeof (TPM_CAP_FLAG_PERMANENT));
+    *(UINT32 *)&CmdBuf[18] = SwapBytes32 (TPM_CAP_FLAG_PERMANENT);
 
     Status = TcgProtocol->PassThroughToTpm (
                             TcgProtocol,
@@ -88,12 +88,12 @@ GetTpmState (
                             sizeof (CmdBuf),
                             CmdBuf
                             );
-    TpmRsp = (TPM_RSP_COMMAND_HDR *) &CmdBuf[0];
+    TpmRsp = (TPM_RSP_COMMAND_HDR *)&CmdBuf[0];
     if (EFI_ERROR (Status) || (TpmRsp->tag != SwapBytes16 (TPM_TAG_RSP_COMMAND)) || (TpmRsp->returnCode != 0)) {
       return EFI_DEVICE_ERROR;
     }
 
-    TpmPermanentFlags = (TPM_PERMANENT_FLAGS *) &CmdBuf[sizeof (TPM_RSP_COMMAND_HDR) + sizeof (UINT32)];
+    TpmPermanentFlags = (TPM_PERMANENT_FLAGS *)&CmdBuf[sizeof (TPM_RSP_COMMAND_HDR) + sizeof (UINT32)];
 
     if (TpmEnable != NULL) {
       *TpmEnable = (BOOLEAN) !TpmPermanentFlags->disable;
@@ -136,22 +136,22 @@ GetTpmState (
 EFI_STATUS
 EFIAPI
 TcgExtractConfig (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL        *This,
-  IN CONST EFI_STRING                            Request,
-       OUT EFI_STRING                            *Progress,
-       OUT EFI_STRING                            *Results
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN CONST EFI_STRING                      Request,
+  OUT EFI_STRING                           *Progress,
+  OUT EFI_STRING                           *Results
   )
 {
-  EFI_STATUS                 Status;
-  TCG_CONFIG_PRIVATE_DATA    *PrivateData;
-  EFI_STRING                 ConfigRequestHdr;
-  EFI_STRING                 ConfigRequest;
-  BOOLEAN                    AllocatedRequest;
-  UINTN                      Size;
-  BOOLEAN                    TpmEnable;
-  BOOLEAN                    TpmActivate;
+  EFI_STATUS               Status;
+  TCG_CONFIG_PRIVATE_DATA  *PrivateData;
+  EFI_STRING               ConfigRequestHdr;
+  EFI_STRING               ConfigRequest;
+  BOOLEAN                  AllocatedRequest;
+  UINTN                    Size;
+  BOOLEAN                  TpmEnable;
+  BOOLEAN                  TpmActivate;
 
-  if (Progress == NULL || Results == NULL) {
+  if ((Progress == NULL) || (Results == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -193,8 +193,8 @@ TcgExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&gTcgConfigFormSetGuid, mTcgStorageName, PrivateData->DriverHandle);
-    Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-    ConfigRequest = AllocateZeroPool (Size);
+    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest    = AllocateZeroPool (Size);
     ASSERT (ConfigRequest != NULL);
     AllocatedRequest = TRUE;
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, sizeof (TCG_CONFIGURATION));
@@ -204,7 +204,7 @@ TcgExtractConfig (
   Status = gHiiConfigRouting->BlockToConfig (
                                 gHiiConfigRouting,
                                 ConfigRequest,
-                                (UINT8 *) PrivateData->Configuration,
+                                (UINT8 *)PrivateData->Configuration,
                                 sizeof (TCG_CONFIGURATION),
                                 Results,
                                 Progress
@@ -215,6 +215,7 @@ TcgExtractConfig (
   if (AllocatedRequest) {
     FreePool (ConfigRequest);
   }
+
   //
   // Set Progress string to the original request string.
   //
@@ -248,16 +249,16 @@ TcgExtractConfig (
 EFI_STATUS
 EFIAPI
 TcgRouteConfig (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL      *This,
-  IN CONST EFI_STRING                          Configuration,
-       OUT EFI_STRING                          *Progress
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN CONST EFI_STRING                      Configuration,
+  OUT EFI_STRING                           *Progress
   )
 {
-  EFI_STATUS                       Status;
-  UINTN                            BufferSize;
-  TCG_CONFIGURATION                TcgConfiguration;
+  EFI_STATUS         Status;
+  UINTN              BufferSize;
+  TCG_CONFIGURATION  TcgConfiguration;
 
-  if (Configuration == NULL || Progress == NULL) {
+  if ((Configuration == NULL) || (Progress == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -270,13 +271,13 @@ TcgRouteConfig (
   // Convert <ConfigResp> to buffer data by helper function ConfigToBlock()
   //
   BufferSize = sizeof (TCG_CONFIGURATION);
-  Status = gHiiConfigRouting->ConfigToBlock (
-                                gHiiConfigRouting,
-                                Configuration,
-                                (UINT8 *) &TcgConfiguration,
-                                &BufferSize,
-                                Progress
-                                );
+  Status     = gHiiConfigRouting->ConfigToBlock (
+                                    gHiiConfigRouting,
+                                    Configuration,
+                                    (UINT8 *)&TcgConfiguration,
+                                    &BufferSize,
+                                    Progress
+                                    );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -295,37 +296,37 @@ TcgRouteConfig (
 **/
 EFI_STATUS
 SavePpRequest (
-  IN UINT8                         PpRequest
+  IN UINT8  PpRequest
   )
 {
-  EFI_STATUS                       Status;
-  UINTN                            DataSize;
-  EFI_PHYSICAL_PRESENCE            PpData;
+  EFI_STATUS             Status;
+  UINTN                  DataSize;
+  EFI_PHYSICAL_PRESENCE  PpData;
 
   //
   // Save TPM command to variable.
   //
   DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
-  Status = gRT->GetVariable (
-                  PHYSICAL_PRESENCE_VARIABLE,
-                  &gEfiPhysicalPresenceGuid,
-                  NULL,
-                  &DataSize,
-                  &PpData
-                  );
+  Status   = gRT->GetVariable (
+                    PHYSICAL_PRESENCE_VARIABLE,
+                    &gEfiPhysicalPresenceGuid,
+                    NULL,
+                    &DataSize,
+                    &PpData
+                    );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   PpData.PPRequest = PpRequest;
-  Status = gRT->SetVariable (
-                  PHYSICAL_PRESENCE_VARIABLE,
-                  &gEfiPhysicalPresenceGuid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                  DataSize,
-                  &PpData
-                  );
-  if (EFI_ERROR(Status)) {
+  Status           = gRT->SetVariable (
+                            PHYSICAL_PRESENCE_VARIABLE,
+                            &gEfiPhysicalPresenceGuid,
+                            EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                            DataSize,
+                            &PpData
+                            );
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
@@ -357,16 +358,16 @@ SavePpRequest (
 EFI_STATUS
 EFIAPI
 TcgCallback (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL      *This,
-  IN     EFI_BROWSER_ACTION                    Action,
-  IN     EFI_QUESTION_ID                       QuestionId,
-  IN     UINT8                                 Type,
-  IN     EFI_IFR_TYPE_VALUE                    *Value,
-     OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN     EFI_BROWSER_ACTION                Action,
+  IN     EFI_QUESTION_ID                   QuestionId,
+  IN     UINT8                             Type,
+  IN     EFI_IFR_TYPE_VALUE                *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST           *ActionRequest
   )
 {
-  TCG_CONFIG_PRIVATE_DATA    *PrivateData;
-  CHAR16                     State[32];
+  TCG_CONFIG_PRIVATE_DATA  *PrivateData;
+  CHAR16                   State[32];
 
   if ((This == NULL) || (Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -374,7 +375,6 @@ TcgCallback (
 
   if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
     if (QuestionId == KEY_TPM_ACTION) {
-
       PrivateData = TCG_CONFIG_PRIVATE_DATA_FROM_THIS (This);
       UnicodeSPrint (
         State,
@@ -385,6 +385,7 @@ TcgCallback (
         );
       HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TPM_STATE_CONTENT), State, NULL);
     }
+
     return EFI_SUCCESS;
   }
 
@@ -420,14 +421,14 @@ InstallTcgConfigForm (
 
   DriverHandle = NULL;
   ConfigAccess = &PrivateData->ConfigAccess;
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &DriverHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  &mTcgHiiVendorDevicePath,
-                  &gEfiHiiConfigAccessProtocolGuid,
-                  ConfigAccess,
-                  NULL
-                  );
+  Status       = gBS->InstallMultipleProtocolInterfaces (
+                        &DriverHandle,
+                        &gEfiDevicePathProtocolGuid,
+                        &mTcgHiiVendorDevicePath,
+                        &gEfiHiiConfigAccessProtocolGuid,
+                        ConfigAccess,
+                        NULL
+                        );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -470,7 +471,7 @@ InstallTcgConfigForm (
 **/
 VOID
 UninstallTcgConfigForm (
-  IN OUT TCG_CONFIG_PRIVATE_DATA    *PrivateData
+  IN OUT TCG_CONFIG_PRIVATE_DATA  *PrivateData
   )
 {
   //
@@ -497,7 +498,8 @@ UninstallTcgConfigForm (
   }
 
   if (PrivateData->Configuration != NULL) {
-    FreePool(PrivateData->Configuration);
+    FreePool (PrivateData->Configuration);
   }
+
   FreePool (PrivateData);
 }

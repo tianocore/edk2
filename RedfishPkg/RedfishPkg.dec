@@ -60,7 +60,7 @@
   #   CRT library is currently used by edk2 JsonLib (open source
   #   jansson project) and edk2 RedfishLib (libredfish open source
   #   project).
-  RedfishCrtLib|PrivateInclude/Library/RedfishCrtLib.h
+  RedfishCrtLib|Include/Library/RedfishCrtLib.h
 
   ##  @libraryclass Redfish Helper Library
   #   Library provides Redfish helper functions.

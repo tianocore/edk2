@@ -25,6 +25,7 @@
   DynamicTablesPkg/DynamicTablesPkg.dec
 
 [LibraryClasses]
+  AcpiHelperLib
   AmlLib
   BaseLib
 

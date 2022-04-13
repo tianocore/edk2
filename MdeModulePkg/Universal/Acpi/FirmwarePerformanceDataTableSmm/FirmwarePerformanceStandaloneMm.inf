@@ -4,7 +4,7 @@
 #  This module registers report status code listener to collect performance data
 #  for SMM boot performance records and S3 Suspend Performance Record.
 #
-#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) Microsoft Corporation.
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -53,10 +53,8 @@
 
 [Guids]
   ## SOMETIMES_PRODUCES   ## UNDEFINED # SaveLockBox
-  ## PRODUCES             ## UNDEFINED # SmiHandlerRegister
   ## SOMETIMES_CONSUMES   ## UNDEFINED # StatusCode Data
   gEfiFirmwarePerformanceGuid
-  gEdkiiFpdtExtendedFirmwarePerformanceGuid  ## SOMETIMES_PRODUCES ## UNDEFINED # StatusCode Data
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeS3SuspendStart  ## CONSUMES

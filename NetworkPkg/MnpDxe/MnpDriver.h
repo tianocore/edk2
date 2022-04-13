@@ -35,56 +35,56 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Global Variables
 //
-extern  EFI_DRIVER_BINDING_PROTOCOL gMnpDriverBinding;
+extern  EFI_DRIVER_BINDING_PROTOCOL  gMnpDriverBinding;
 
 typedef struct {
-  UINT32                        Signature;
+  UINT32                         Signature;
 
-  EFI_HANDLE                    ControllerHandle;
-  EFI_HANDLE                    ImageHandle;
+  EFI_HANDLE                     ControllerHandle;
+  EFI_HANDLE                     ImageHandle;
 
-  EFI_VLAN_CONFIG_PROTOCOL      VlanConfig;
-  UINTN                         NumberOfVlan;
-  CHAR16                        *MacString;
-  EFI_SIMPLE_NETWORK_PROTOCOL   *Snp;
+  EFI_VLAN_CONFIG_PROTOCOL       VlanConfig;
+  UINTN                          NumberOfVlan;
+  CHAR16                         *MacString;
+  EFI_SIMPLE_NETWORK_PROTOCOL    *Snp;
 
   //
   // List of MNP_SERVICE_DATA
   //
-  LIST_ENTRY                    ServiceList;
+  LIST_ENTRY                     ServiceList;
   //
   // Number of configured MNP Service Binding child
   //
-  UINTN                         ConfiguredChildrenNumber;
+  UINTN                          ConfiguredChildrenNumber;
 
-  LIST_ENTRY                    GroupAddressList;
-  UINT32                        GroupAddressCount;
+  LIST_ENTRY                     GroupAddressList;
+  UINT32                         GroupAddressCount;
 
-  LIST_ENTRY                    FreeTxBufList;
-  LIST_ENTRY                    AllTxBufList;
-  UINT32                        TxBufCount;
+  LIST_ENTRY                     FreeTxBufList;
+  LIST_ENTRY                     AllTxBufList;
+  UINT32                         TxBufCount;
 
-  NET_BUF_QUEUE                 FreeNbufQue;
-  INTN                          NbufCnt;
+  NET_BUF_QUEUE                  FreeNbufQue;
+  INTN                           NbufCnt;
 
-  EFI_EVENT                     PollTimer;
-  BOOLEAN                       EnableSystemPoll;
+  EFI_EVENT                      PollTimer;
+  BOOLEAN                        EnableSystemPoll;
 
-  EFI_EVENT                     TimeoutCheckTimer;
-  EFI_EVENT                     MediaDetectTimer;
+  EFI_EVENT                      TimeoutCheckTimer;
+  EFI_EVENT                      MediaDetectTimer;
 
-  UINT32                        UnicastCount;
-  UINT32                        BroadcastCount;
-  UINT32                        MulticastCount;
-  UINT32                        PromiscuousCount;
+  UINT32                         UnicastCount;
+  UINT32                         BroadcastCount;
+  UINT32                         MulticastCount;
+  UINT32                         PromiscuousCount;
 
   //
   // The size of the data buffer in the MNP_PACKET_BUFFER used to
   // store a packet.
   //
-  UINT32                        BufferLength;
-  UINT32                        PaddingSize;
-  NET_BUF                       *RxNbufCache;
+  UINT32                         BufferLength;
+  UINT32                         PaddingSize;
+  NET_BUF                        *RxNbufCache;
 } MNP_DEVICE_DATA;
 
 #define MNP_DEVICE_DATA_FROM_THIS(a) \
@@ -98,24 +98,23 @@ typedef struct {
 #define MNP_SERVICE_DATA_SIGNATURE  SIGNATURE_32 ('M', 'n', 'p', 'S')
 
 typedef struct {
-  UINT32                        Signature;
+  UINT32                          Signature;
 
-  LIST_ENTRY                    Link;
+  LIST_ENTRY                      Link;
 
-  MNP_DEVICE_DATA               *MnpDeviceData;
-  EFI_HANDLE                    ServiceHandle;
-  EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
-  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
+  MNP_DEVICE_DATA                 *MnpDeviceData;
+  EFI_HANDLE                      ServiceHandle;
+  EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
+  EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
 
-  LIST_ENTRY                    ChildrenList;
-  UINTN                         ChildrenNumber;
+  LIST_ENTRY                      ChildrenList;
+  UINTN                           ChildrenNumber;
 
-  UINT32                        Mtu;
+  UINT32                          Mtu;
 
-  UINT16                        VlanId;
-  UINT8                         Priority;
+  UINT16                          VlanId;
+  UINT8                           Priority;
 } MNP_SERVICE_DATA;
-
 
 #define MNP_SERVICE_DATA_FROM_THIS(a) \
   CR ( \
@@ -132,7 +131,6 @@ typedef struct {
   Link, \
   MNP_SERVICE_DATA_SIGNATURE \
   )
-
 
 /**
   Test to see if this driver supports ControllerHandle. This service
@@ -155,9 +153,9 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 MnpDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN EFI_HANDLE                      ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath OPTIONAL
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   );
 
 /**
@@ -181,11 +179,10 @@ MnpDriverBindingSupported (
 EFI_STATUS
 EFIAPI
 MnpDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN EFI_HANDLE                      ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath OPTIONAL
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   );
-
 
 /**
   Stop this driver on ControllerHandle. This service is called by the
@@ -208,10 +205,10 @@ MnpDriverBindingStart (
 EFI_STATUS
 EFIAPI
 MnpDriverBindingStop (
-  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN EFI_HANDLE                      ControllerHandle,
-  IN UINTN                           NumberOfChildren,
-  IN EFI_HANDLE                      *ChildHandleBuffer OPTIONAL
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   );
 
 /**
@@ -233,8 +230,8 @@ MnpDriverBindingStop (
 EFI_STATUS
 EFIAPI
 MnpServiceBindingCreateChild (
-  IN     EFI_SERVICE_BINDING_PROTOCOL    *This,
-  IN OUT EFI_HANDLE                      *ChildHandle
+  IN     EFI_SERVICE_BINDING_PROTOCOL  *This,
+  IN OUT EFI_HANDLE                    *ChildHandle
   );
 
 /**
@@ -261,8 +258,8 @@ MnpServiceBindingCreateChild (
 EFI_STATUS
 EFIAPI
 MnpServiceBindingDestroyChild (
-  IN EFI_SERVICE_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                      ChildHandle
+  IN EFI_SERVICE_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                    ChildHandle
   );
 
 #endif

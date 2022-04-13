@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -55,9 +56,8 @@ EFIAPI
 Mtftp4ComponentNameGetDriverName (
   IN     EFI_COMPONENT_NAME_PROTOCOL  *This,
   IN     CHAR8                        *Language,
-     OUT CHAR16                       **DriverName
+  OUT CHAR16                          **DriverName
   );
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -130,13 +130,12 @@ Mtftp4ComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 Mtftp4ComponentNameGetControllerName (
-  IN     EFI_COMPONENT_NAME_PROTOCOL               *This,
-  IN     EFI_HANDLE                                ControllerHandle,
-  IN     EFI_HANDLE                                ChildHandle        OPTIONAL,
-  IN     CHAR8                                     *Language,
-     OUT CHAR16                                    **ControllerName
+  IN     EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN     EFI_HANDLE                   ControllerHandle,
+  IN     EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN     CHAR8                        *Language,
+  OUT CHAR16                          **ControllerName
   );
-
 
 ///
 /// EFI Component Name Protocol
@@ -150,14 +149,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gMtftp4ComponentName 
 ///
 /// EFI Component Name 2 Protocol
 ///
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gMtftp4ComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) Mtftp4ComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) Mtftp4ComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gMtftp4ComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)Mtftp4ComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)Mtftp4ComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mMtftp4DriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mMtftp4DriverNameTable[] = {
   {
     "eng;en",
     L"MTFTP4 Network Service"
@@ -168,7 +166,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mMtftp4DriverNameTable[] 
   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE *gMtftp4ControllerNameTable = NULL;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  *gMtftp4ControllerNameTable = NULL;
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -214,7 +212,7 @@ EFIAPI
 Mtftp4ComponentNameGetDriverName (
   IN     EFI_COMPONENT_NAME_PROTOCOL  *This,
   IN     CHAR8                        *Language,
-     OUT CHAR16                       **DriverName
+  OUT CHAR16                          **DriverName
   )
 {
   return LookupUnicodeString2 (
@@ -238,12 +236,12 @@ Mtftp4ComponentNameGetDriverName (
 **/
 EFI_STATUS
 UpdateName (
-  IN   EFI_MTFTP4_PROTOCOL             *Mtftp4
+  IN   EFI_MTFTP4_PROTOCOL  *Mtftp4
   )
 {
-  EFI_STATUS                       Status;
-  CHAR16                           HandleName[80];
-  EFI_MTFTP4_MODE_DATA             ModeData;
+  EFI_STATUS            Status;
+  CHAR16                HandleName[80];
+  EFI_MTFTP4_MODE_DATA  ModeData;
 
   if (Mtftp4 == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -258,7 +256,9 @@ UpdateName (
     return Status;
   }
 
-  UnicodeSPrint (HandleName, sizeof (HandleName),
+  UnicodeSPrint (
+    HandleName,
+    sizeof (HandleName),
     L"MTFTPv4 (ServerIp=%d.%d.%d.%d, ServerPort=%d)",
     ModeData.ConfigData.ServerIp.Addr[0],
     ModeData.ConfigData.ServerIp.Addr[1],
@@ -363,15 +363,15 @@ UpdateName (
 EFI_STATUS
 EFIAPI
 Mtftp4ComponentNameGetControllerName (
-  IN     EFI_COMPONENT_NAME_PROTOCOL               *This,
-  IN     EFI_HANDLE                                ControllerHandle,
-  IN     EFI_HANDLE                                ChildHandle        OPTIONAL,
-  IN     CHAR8                                     *Language,
-     OUT CHAR16                                    **ControllerName
+  IN     EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN     EFI_HANDLE                   ControllerHandle,
+  IN     EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN     CHAR8                        *Language,
+  OUT CHAR16                          **ControllerName
   )
 {
-  EFI_STATUS                    Status;
-  EFI_MTFTP4_PROTOCOL           *Mtftp4;
+  EFI_STATUS           Status;
+  EFI_MTFTP4_PROTOCOL  *Mtftp4;
 
   //
   // Only provide names for child handles.

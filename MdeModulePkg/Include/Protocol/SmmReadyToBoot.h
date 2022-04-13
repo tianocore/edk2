@@ -18,6 +18,6 @@
     0x6e057ecf, 0xfa99, 0x4f39, { 0x95, 0xbc, 0x59, 0xf9, 0x92, 0x1d, 0x17, 0xe4 } \
   }
 
-extern EFI_GUID gEdkiiSmmReadyToBootProtocolGuid;
+extern EFI_GUID  gEdkiiSmmReadyToBootProtocolGuid;
 
 #endif

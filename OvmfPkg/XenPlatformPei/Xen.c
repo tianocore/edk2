@@ -37,17 +37,17 @@
 #include "Platform.h"
 #include "Xen.h"
 
-STATIC UINT32 mXenLeaf = 0;
+STATIC UINT32  mXenLeaf = 0;
 
-EFI_XEN_INFO mXenInfo;
+EFI_XEN_INFO  mXenInfo;
 
 //
 // Location of the firmware info struct setup by hvmloader.
 // Only the E820 table is used by OVMF.
 //
-EFI_XEN_OVMF_INFO *mXenHvmloaderInfo;
-STATIC EFI_E820_ENTRY64 mE820Entries[128];
-STATIC UINT32 mE820EntriesCount;
+EFI_XEN_OVMF_INFO        *mXenHvmloaderInfo;
+STATIC EFI_E820_ENTRY64  mE820Entries[128];
+STATIC UINT32            mE820EntriesCount;
 
 /**
   Returns E820 map provided by Xen
@@ -59,23 +59,23 @@ STATIC UINT32 mE820EntriesCount;
 **/
 EFI_STATUS
 XenGetE820Map (
-  EFI_E820_ENTRY64 **Entries,
-  UINT32 *Count
+  EFI_E820_ENTRY64  **Entries,
+  UINT32            *Count
   )
 {
-  INTN ReturnCode;
-  xen_memory_map_t Parameters;
-  UINTN LoopIndex;
-  UINTN Index;
-  EFI_E820_ENTRY64 TmpEntry;
+  INTN              ReturnCode;
+  xen_memory_map_t  Parameters;
+  UINTN             LoopIndex;
+  UINTN             Index;
+  EFI_E820_ENTRY64  TmpEntry;
 
   //
   // Get E820 produced by hvmloader
   //
   if (mXenHvmloaderInfo != NULL) {
     ASSERT (mXenHvmloaderInfo->E820 < MAX_ADDRESS);
-    *Entries = (EFI_E820_ENTRY64 *)(UINTN) mXenHvmloaderInfo->E820;
-    *Count = mXenHvmloaderInfo->E820EntriesCount;
+    *Entries = (EFI_E820_ENTRY64 *)(UINTN)mXenHvmloaderInfo->E820;
+    *Count   = mXenHvmloaderInfo->E820EntriesCount;
 
     return EFI_SUCCESS;
   }
@@ -86,7 +86,7 @@ XenGetE820Map (
 
   if (mE820EntriesCount > 0) {
     *Entries = mE820Entries;
-    *Count = mE820EntriesCount;
+    *Count   = mE820EntriesCount;
     return EFI_SUCCESS;
   }
 
@@ -105,14 +105,14 @@ XenGetE820Map (
   for (LoopIndex = 1; LoopIndex < mE820EntriesCount; LoopIndex++) {
     for (Index = LoopIndex; Index < mE820EntriesCount; Index++) {
       if (mE820Entries[Index - 1].BaseAddr > mE820Entries[Index].BaseAddr) {
-        TmpEntry = mE820Entries[Index];
-        mE820Entries[Index] = mE820Entries[Index - 1];
+        TmpEntry                = mE820Entries[Index];
+        mE820Entries[Index]     = mE820Entries[Index - 1];
         mE820Entries[Index - 1] = TmpEntry;
       }
     }
   }
 
-  *Count = mE820EntriesCount;
+  *Count   = mE820EntriesCount;
   *Entries = mE820Entries;
 
   return EFI_SUCCESS;
@@ -128,14 +128,14 @@ EFI_STATUS
 XenConnect (
   )
 {
-  UINT32 Index;
-  UINT32 TransferReg;
-  UINT32 TransferPages;
-  UINT32 XenVersion;
-  EFI_XEN_OVMF_INFO *Info;
-  CHAR8 Sig[sizeof (Info->Signature) + 1];
-  UINT32 *PVHResetVectorData;
-  RETURN_STATUS Status;
+  UINT32             Index;
+  UINT32             TransferReg;
+  UINT32             TransferPages;
+  UINT32             XenVersion;
+  EFI_XEN_OVMF_INFO  *Info;
+  CHAR8              Sig[sizeof (Info->Signature) + 1];
+  UINT32             *PVHResetVectorData;
+  RETURN_STATUS      Status;
 
   ASSERT (mXenLeaf != 0);
 
@@ -150,9 +150,11 @@ XenConnect (
   }
 
   for (Index = 0; Index < TransferPages; Index++) {
-    AsmWriteMsr64 (TransferReg,
-                   (UINTN) mXenInfo.HyperPages +
-                   (Index << EFI_PAGE_SHIFT) + Index);
+    AsmWriteMsr64 (
+      TransferReg,
+      (UINTN)mXenInfo.HyperPages +
+      (Index << EFI_PAGE_SHIFT) + Index
+      );
   }
 
   //
@@ -160,8 +162,12 @@ XenConnect (
   //
 
   AsmCpuid (mXenLeaf + 1, &XenVersion, NULL, NULL, NULL);
-  DEBUG ((DEBUG_ERROR, "Detected Xen version %d.%d\n",
-          XenVersion >> 16, XenVersion & 0xFFFF));
+  DEBUG ((
+    DEBUG_ERROR,
+    "Detected Xen version %d.%d\n",
+    XenVersion >> 16,
+    XenVersion & 0xFFFF
+    ));
   mXenInfo.VersionMajor = (UINT16)(XenVersion >> 16);
   mXenInfo.VersionMinor = (UINT16)(XenVersion & 0xFFFF);
 
@@ -169,12 +175,16 @@ XenConnect (
   // Check if there are information left by hvmloader
   //
 
-  Info = (EFI_XEN_OVMF_INFO *)(UINTN) OVMF_INFO_PHYSICAL_ADDRESS;
+  Info = (EFI_XEN_OVMF_INFO *)(UINTN)OVMF_INFO_PHYSICAL_ADDRESS;
   //
   // Copy the signature, and make it null-terminated.
   //
-  AsciiStrnCpyS (Sig, sizeof (Sig), (CHAR8 *) &Info->Signature,
-    sizeof (Info->Signature));
+  AsciiStrnCpyS (
+    Sig,
+    sizeof (Sig),
+    (CHAR8 *)&Info->Signature,
+    sizeof (Info->Signature)
+    );
   if (AsciiStrCmp (Sig, "XenHVMOVMF") == 0) {
     mXenHvmloaderInfo = Info;
   } else {
@@ -188,14 +198,14 @@ XenConnect (
   // booted via the PVH entry point.
   //
 
-  PVHResetVectorData = (VOID *)(UINTN) PcdGet32 (PcdXenPvhStartOfDayStructPtr);
+  PVHResetVectorData = (VOID *)(UINTN)PcdGet32 (PcdXenPvhStartOfDayStructPtr);
   //
   // That magic value is written in XenResetVector/Ia32/XenPVHMain.asm
   //
   if (PVHResetVectorData[1] == SIGNATURE_32 ('X', 'P', 'V', 'H')) {
-    struct hvm_start_info *HVMStartInfo;
+    struct hvm_start_info  *HVMStartInfo;
 
-    HVMStartInfo = (VOID *)(UINTN) PVHResetVectorData[0];
+    HVMStartInfo = (VOID *)(UINTN)PVHResetVectorData[0];
     if (HVMStartInfo->magic == XEN_HVM_START_MAGIC_VALUE) {
       ASSERT (HVMStartInfo->rsdp_paddr != 0);
       if (HVMStartInfo->rsdp_paddr != 0) {
@@ -207,7 +217,7 @@ XenConnect (
   BuildGuidDataHob (
     &gEfiXenInfoGuid,
     &mXenInfo,
-    sizeof(mXenInfo)
+    sizeof (mXenInfo)
     );
 
   //
@@ -232,7 +242,7 @@ XenDetect (
   VOID
   )
 {
-  UINT8 Signature[13];
+  UINT8  Signature[13];
 
   if (mXenLeaf != 0) {
     return TRUE;
@@ -240,13 +250,15 @@ XenDetect (
 
   Signature[12] = '\0';
   for (mXenLeaf = 0x40000000; mXenLeaf < 0x40010000; mXenLeaf += 0x100) {
-    AsmCpuid (mXenLeaf,
-              NULL,
-              (UINT32 *) &Signature[0],
-              (UINT32 *) &Signature[4],
-              (UINT32 *) &Signature[8]);
+    AsmCpuid (
+      mXenLeaf,
+      NULL,
+      (UINT32 *)&Signature[0],
+      (UINT32 *)&Signature[4],
+      (UINT32 *)&Signature[8]
+      );
 
-    if (!AsciiStrCmp ((CHAR8 *) Signature, "XenVMMXenVMM")) {
+    if (!AsciiStrCmp ((CHAR8 *)Signature, "XenVMMXenVMM")) {
       return TRUE;
     }
   }
@@ -281,14 +293,13 @@ XenPublishRamRegions (
   VOID
   )
 {
-  EFI_E820_ENTRY64      *E820Map;
-  UINT32                E820EntriesCount;
-  EFI_STATUS            Status;
-  EFI_E820_ENTRY64      *Entry;
-  UINTN                 Index;
-  UINT64                LapicBase;
-  UINT64                LapicEnd;
-
+  EFI_E820_ENTRY64  *E820Map;
+  UINT32            E820EntriesCount;
+  EFI_STATUS        Status;
+  EFI_E820_ENTRY64  *Entry;
+  UINTN             Index;
+  UINT64            LapicBase;
+  UINT64            LapicEnd;
 
   DEBUG ((DEBUG_INFO, "Using memory map provided by Xen\n"));
 
@@ -296,7 +307,7 @@ XenPublishRamRegions (
   // Parse RAM in E820 map
   //
   E820EntriesCount = 0;
-  Status = XenGetE820Map (&E820Map, &E820EntriesCount);
+  Status           = XenGetE820Map (&E820Map, &E820EntriesCount);
   ASSERT_EFI_ERROR (Status);
 
   AddMemoryBaseSizeHob (0, 0xA0000);
@@ -306,14 +317,14 @@ XenPublishRamRegions (
   AddReservedMemoryBaseSizeHob (0xA0000, BASE_1MB - 0xA0000, TRUE);
 
   LapicBase = PcdGet32 (PcdCpuLocalApicBaseAddress);
-  LapicEnd = LapicBase + SIZE_1MB;
+  LapicEnd  = LapicBase + SIZE_1MB;
   AddIoMemoryRangeHob (LapicBase, LapicEnd);
 
   for (Index = 0; Index < E820EntriesCount; Index++) {
-    UINT64 Base;
-    UINT64 End;
-    UINT64 ReservedBase;
-    UINT64 ReservedEnd;
+    UINT64  Base;
+    UINT64  End;
+    UINT64  ReservedBase;
+    UINT64  ReservedEnd;
 
     Entry = &E820Map[Index];
 
@@ -321,7 +332,7 @@ XenPublishRamRegions (
     // Round up the start address, and round down the end address.
     //
     Base = ALIGN_VALUE (Entry->BaseAddr, (UINT64)EFI_PAGE_SIZE);
-    End = (Entry->BaseAddr + Entry->Length) & ~(UINT64)EFI_PAGE_MASK;
+    End  = (Entry->BaseAddr + Entry->Length) & ~(UINT64)EFI_PAGE_MASK;
 
     //
     // Ignore the first 1MB, this is handled before the loop.
@@ -329,72 +340,53 @@ XenPublishRamRegions (
     if (Base < BASE_1MB) {
       Base = BASE_1MB;
     }
+
     if (Base >= End) {
       continue;
     }
 
     switch (Entry->Type) {
-    case EfiAcpiAddressRangeMemory:
-      AddMemoryRangeHob (Base, End);
-      break;
-    case EfiAcpiAddressRangeACPI:
-      AddReservedMemoryRangeHob (Base, End, FALSE);
-      break;
-    case EfiAcpiAddressRangeReserved:
-      //
-      // hvmloader marks a range that overlaps with the local APIC memory
-      // mapped region as reserved, but CpuDxe wants it as mapped IO. We
-      // have already added it as mapped IO, so skip it here.
-      //
+      case EfiAcpiAddressRangeMemory:
+        AddMemoryRangeHob (Base, End);
+        break;
+      case EfiAcpiAddressRangeACPI:
+        AddReservedMemoryRangeHob (Base, End, FALSE);
+        break;
+      case EfiAcpiAddressRangeReserved:
+        //
+        // hvmloader marks a range that overlaps with the local APIC memory
+        // mapped region as reserved, but CpuDxe wants it as mapped IO. We
+        // have already added it as mapped IO, so skip it here.
+        //
 
-      //
-      // add LAPIC predecessor range, if any
-      //
-      ReservedBase = Base;
-      ReservedEnd = MIN (End, LapicBase);
-      if (ReservedBase < ReservedEnd) {
-        AddReservedMemoryRangeHob (ReservedBase, ReservedEnd, FALSE);
-      }
+        //
+        // add LAPIC predecessor range, if any
+        //
+        ReservedBase = Base;
+        ReservedEnd  = MIN (End, LapicBase);
+        if (ReservedBase < ReservedEnd) {
+          AddReservedMemoryRangeHob (ReservedBase, ReservedEnd, FALSE);
+        }
 
-      //
-      // add LAPIC successor range, if any
-      //
-      ReservedBase = MAX (Base, LapicEnd);
-      ReservedEnd = End;
-      if (ReservedBase < ReservedEnd) {
-        AddReservedMemoryRangeHob (ReservedBase, ReservedEnd, FALSE);
-      }
-      break;
-    default:
-      break;
+        //
+        // add LAPIC successor range, if any
+        //
+        ReservedBase = MAX (Base, LapicEnd);
+        ReservedEnd  = End;
+        if (ReservedBase < ReservedEnd) {
+          AddReservedMemoryRangeHob (ReservedBase, ReservedEnd, FALSE);
+        }
+
+        break;
+      default:
+        break;
     }
   }
 }
 
-
-/**
-  Perform Xen PEI initialization.
-
-  @return EFI_SUCCESS     Xen initialized successfully
-  @return EFI_NOT_FOUND   Not running under Xen
-
-**/
-EFI_STATUS
-InitializeXen (
-  VOID
-  )
-{
-  RETURN_STATUS PcdStatus;
-
-  PcdStatus = PcdSetBoolS (PcdPciDisableBusEnumeration, TRUE);
-  ASSERT_RETURN_ERROR (PcdStatus);
-
-  return EFI_SUCCESS;
-}
-
 EFI_STATUS
 PhysicalAddressIdentityMapping (
-  IN EFI_PHYSICAL_ADDRESS   AddressToMap
+  IN EFI_PHYSICAL_ADDRESS  AddressToMap
   )
 {
   INTN                            Index;
@@ -405,7 +397,7 @@ PhysicalAddressIdentityMapping (
 
   // L4 / Top level Page Directory Pointers
 
-  L4 = (VOID*)(UINTN)PcdGet32 (PcdOvmfSecPageTablesBase);
+  L4    = (VOID *)(UINTN)PcdGet32 (PcdOvmfSecPageTablesBase);
   Index = PML4_OFFSET (AddressToMap);
 
   if (!L4[Index].Bits.Present) {
@@ -416,15 +408,15 @@ PhysicalAddressIdentityMapping (
 
     ZeroMem (L3, EFI_PAGE_SIZE);
 
-    L4[Index].Bits.ReadWrite = 1;
-    L4[Index].Bits.Accessed = 1;
+    L4[Index].Bits.ReadWrite            = 1;
+    L4[Index].Bits.Accessed             = 1;
     L4[Index].Bits.PageTableBaseAddress = (EFI_PHYSICAL_ADDRESS)L3 >> 12;
-    L4[Index].Bits.Present = 1;
+    L4[Index].Bits.Present              = 1;
   }
 
   // L3 / Next level Page Directory Pointers
 
-  L3 = (VOID*)(EFI_PHYSICAL_ADDRESS)(L4[Index].Bits.PageTableBaseAddress << 12);
+  L3    = (VOID *)(EFI_PHYSICAL_ADDRESS)(L4[Index].Bits.PageTableBaseAddress << 12);
   Index = PDP_OFFSET (AddressToMap);
 
   if (!L3[Index].Bits.Present) {
@@ -435,24 +427,24 @@ PhysicalAddressIdentityMapping (
 
     ZeroMem (PageTable, EFI_PAGE_SIZE);
 
-    L3[Index].Bits.ReadWrite = 1;
-    L3[Index].Bits.Accessed = 1;
+    L3[Index].Bits.ReadWrite            = 1;
+    L3[Index].Bits.Accessed             = 1;
     L3[Index].Bits.PageTableBaseAddress = (EFI_PHYSICAL_ADDRESS)PageTable >> 12;
-    L3[Index].Bits.Present = 1;
+    L3[Index].Bits.Present              = 1;
   }
 
   // L2 / Page Table Entries
 
-  PageTable = (VOID*)(EFI_PHYSICAL_ADDRESS)(L3[Index].Bits.PageTableBaseAddress << 12);
-  Index = PDE_OFFSET (AddressToMap);
+  PageTable = (VOID *)(EFI_PHYSICAL_ADDRESS)(L3[Index].Bits.PageTableBaseAddress << 12);
+  Index     = PDE_OFFSET (AddressToMap);
 
   if (!PageTable[Index].Bits.Present) {
-    PageTable[Index].Bits.ReadWrite = 1;
-    PageTable[Index].Bits.Accessed = 1;
-    PageTable[Index].Bits.Dirty = 1;
-    PageTable[Index].Bits.MustBe1 = 1;
+    PageTable[Index].Bits.ReadWrite            = 1;
+    PageTable[Index].Bits.Accessed             = 1;
+    PageTable[Index].Bits.Dirty                = 1;
+    PageTable[Index].Bits.MustBe1              = 1;
     PageTable[Index].Bits.PageTableBaseAddress = AddressToMap >> 21;
-    PageTable[Index].Bits.Present = 1;
+    PageTable[Index].Bits.Present              = 1;
   }
 
   CpuFlushTlb ();
@@ -463,7 +455,7 @@ PhysicalAddressIdentityMapping (
 STATIC
 EFI_STATUS
 MapSharedInfoPage (
-  IN VOID *PagePtr
+  IN VOID  *PagePtr
   )
 {
   xen_add_to_physmap_t  Parameters;
@@ -471,81 +463,85 @@ MapSharedInfoPage (
 
   Parameters.domid = DOMID_SELF;
   Parameters.space = XENMAPSPACE_shared_info;
-  Parameters.idx = 0;
-  Parameters.gpfn = (UINTN)PagePtr >> EFI_PAGE_SHIFT;
-  ReturnCode = XenHypercallMemoryOp (XENMEM_add_to_physmap, &Parameters);
+  Parameters.idx   = 0;
+  Parameters.gpfn  = (UINTN)PagePtr >> EFI_PAGE_SHIFT;
+  ReturnCode       = XenHypercallMemoryOp (XENMEM_add_to_physmap, &Parameters);
   if (ReturnCode != 0) {
     return EFI_NO_MAPPING;
   }
+
   return EFI_SUCCESS;
 }
 
 STATIC
 VOID
 UnmapXenPage (
-  IN VOID *PagePtr
+  IN VOID  *PagePtr
   )
 {
-  xen_remove_from_physmap_t Parameters;
-  INTN                      ReturnCode;
+  xen_remove_from_physmap_t  Parameters;
+  INTN                       ReturnCode;
 
   Parameters.domid = DOMID_SELF;
-  Parameters.gpfn = (UINTN)PagePtr >> EFI_PAGE_SHIFT;
-  ReturnCode = XenHypercallMemoryOp (XENMEM_remove_from_physmap, &Parameters);
+  Parameters.gpfn  = (UINTN)PagePtr >> EFI_PAGE_SHIFT;
+  ReturnCode       = XenHypercallMemoryOp (XENMEM_remove_from_physmap, &Parameters);
   ASSERT (ReturnCode == 0);
 }
-
 
 STATIC
 UINT64
 GetCpuFreq (
-  IN XEN_VCPU_TIME_INFO *VcpuTime
+  IN XEN_VCPU_TIME_INFO  *VcpuTime
   )
 {
-  UINT32 Version;
-  UINT32 TscToSystemMultiplier;
-  INT8   TscShift;
-  UINT64 CpuFreq;
+  UINT32  Version;
+  UINT32  TscToSystemMultiplier;
+  INT8    TscShift;
+  UINT64  CpuFreq;
 
   do {
     Version = VcpuTime->Version;
     MemoryFence ();
     TscToSystemMultiplier = VcpuTime->TscToSystemMultiplier;
-    TscShift = VcpuTime->TscShift;
+    TscShift              = VcpuTime->TscShift;
     MemoryFence ();
   } while (((Version & 1) != 0) && (Version != VcpuTime->Version));
 
   CpuFreq = DivU64x32 (LShiftU64 (1000000000ULL, 32), TscToSystemMultiplier);
   if (TscShift >= 0) {
-      CpuFreq = RShiftU64 (CpuFreq, TscShift);
+    CpuFreq = RShiftU64 (CpuFreq, TscShift);
   } else {
-      CpuFreq = LShiftU64 (CpuFreq, -TscShift);
+    CpuFreq = LShiftU64 (CpuFreq, -TscShift);
   }
+
   return CpuFreq;
 }
 
 STATIC
 VOID
 XenDelay (
-  IN XEN_VCPU_TIME_INFO *VcpuTimeInfo,
-  IN UINT64             DelayNs
+  IN XEN_VCPU_TIME_INFO  *VcpuTimeInfo,
+  IN UINT64              DelayNs
   )
 {
-  UINT64        Tick;
-  UINT64        CpuFreq;
-  UINT64        Delay;
-  UINT64        DelayTick;
-  UINT64        NewTick;
-  RETURN_STATUS Status;
+  UINT64         Tick;
+  UINT64         CpuFreq;
+  UINT64         Delay;
+  UINT64         DelayTick;
+  UINT64         NewTick;
+  RETURN_STATUS  Status;
 
   Tick = AsmReadTsc ();
 
   CpuFreq = GetCpuFreq (VcpuTimeInfo);
-  Status = SafeUint64Mult (DelayNs, CpuFreq, &Delay);
+  Status  = SafeUint64Mult (DelayNs, CpuFreq, &Delay);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR,
+    DEBUG ((
+      DEBUG_ERROR,
       "XenDelay (%lu ns): delay too big in relation to CPU freq %lu Hz\n",
-      DelayNs, CpuFreq));
+      DelayNs,
+      CpuFreq
+      ));
     ASSERT_EFI_ERROR (Status);
     CpuDeadLoop ();
   }
@@ -571,7 +567,6 @@ XenDelay (
   }
 }
 
-
 /**
   Calculate the frequency of the Local Apic Timer
 **/
@@ -580,29 +575,33 @@ CalibrateLapicTimer (
   VOID
   )
 {
-  XEN_SHARED_INFO       *SharedInfo;
-  XEN_VCPU_TIME_INFO    *VcpuTimeInfo;
-  UINT32                TimerTick, TimerTick2, DiffTimer;
-  UINT64                TscTick, TscTick2;
-  UINT64                Freq;
-  UINT64                Dividend;
-  EFI_STATUS            Status;
+  XEN_SHARED_INFO     *SharedInfo;
+  XEN_VCPU_TIME_INFO  *VcpuTimeInfo;
+  UINT32              TimerTick, TimerTick2, DiffTimer;
+  UINT64              TscTick, TscTick2;
+  UINT64              Freq;
+  UINT64              Dividend;
+  EFI_STATUS          Status;
 
-
-  SharedInfo = (VOID*)((1ULL << mPhysMemAddressWidth) - EFI_PAGE_SIZE);
-  Status = PhysicalAddressIdentityMapping ((EFI_PHYSICAL_ADDRESS)SharedInfo);
+  SharedInfo = (VOID *)((UINTN)PcdGet32 (PcdCpuLocalApicBaseAddress) + SIZE_1MB);
+  Status     = PhysicalAddressIdentityMapping ((EFI_PHYSICAL_ADDRESS)SharedInfo);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR,
+    DEBUG ((
+      DEBUG_ERROR,
       "Failed to add page table entry for Xen shared info page: %r\n",
-      Status));
+      Status
+      ));
     ASSERT_EFI_ERROR (Status);
     return;
   }
 
   Status = MapSharedInfoPage (SharedInfo);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Failed to map Xen's shared info page: %r\n",
-      Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "Failed to map Xen's shared info page: %r\n",
+      Status
+      ));
     ASSERT_EFI_ERROR (Status);
     return;
   }
@@ -613,18 +612,21 @@ CalibrateLapicTimer (
   DisableApicTimerInterrupt ();
 
   TimerTick = GetApicTimerCurrentCount ();
-  TscTick = AsmReadTsc ();
+  TscTick   = AsmReadTsc ();
   XenDelay (VcpuTimeInfo, 1000000ULL);
   TimerTick2 = GetApicTimerCurrentCount ();
-  TscTick2 = AsmReadTsc ();
-
+  TscTick2   = AsmReadTsc ();
 
   DiffTimer = TimerTick - TimerTick2;
-  Status = SafeUint64Mult (GetCpuFreq (VcpuTimeInfo), DiffTimer, &Dividend);
+  Status    = SafeUint64Mult (GetCpuFreq (VcpuTimeInfo), DiffTimer, &Dividend);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "overflow while calculating APIC frequency\n"));
-    DEBUG ((DEBUG_ERROR, "CPU freq: %lu Hz; APIC timer tick count for 1 ms: %u\n",
-      GetCpuFreq (VcpuTimeInfo), DiffTimer));
+    DEBUG ((
+      DEBUG_ERROR,
+      "CPU freq: %lu Hz; APIC timer tick count for 1 ms: %u\n",
+      GetCpuFreq (VcpuTimeInfo),
+      DiffTimer
+      ));
     ASSERT_EFI_ERROR (Status);
     CpuDeadLoop ();
   }

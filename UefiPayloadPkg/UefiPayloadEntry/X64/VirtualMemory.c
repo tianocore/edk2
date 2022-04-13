@@ -15,7 +15,7 @@
     2) IA-32 Intel(R) Architecture Software Developer's Manual Volume 2:Instruction Set Reference, Intel
     3) IA-32 Intel(R) Architecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
 
-Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -35,7 +35,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Global variable to keep track current available memory used as page table.
 //
-PAGE_TABLE_POOL   *mPageTablePool = NULL;
+PAGE_TABLE_POOL  *mPageTablePool = NULL;
 
 /**
   Clear legacy memory located at the first 4K-page, if available.
@@ -48,39 +48,50 @@ PAGE_TABLE_POOL   *mPageTablePool = NULL;
 **/
 VOID
 ClearFirst4KPage (
-  IN  VOID *HobStart
+  IN  VOID  *HobStart
   )
 {
-  EFI_PEI_HOB_POINTERS          RscHob;
-  EFI_PEI_HOB_POINTERS          MemHob;
-  BOOLEAN                       DoClear;
+  EFI_PEI_HOB_POINTERS  RscHob;
+  EFI_PEI_HOB_POINTERS  MemHob;
+  BOOLEAN               DoClear;
 
   RscHob.Raw = HobStart;
   MemHob.Raw = HobStart;
-  DoClear = FALSE;
+  DoClear    = FALSE;
 
   //
   // Check if page 0 exists and free
   //
-  while ((RscHob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR,
-                                   RscHob.Raw)) != NULL) {
-    if (RscHob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY &&
-        RscHob.ResourceDescriptor->PhysicalStart == 0) {
+  while ((RscHob.Raw = GetNextHob (
+                         EFI_HOB_TYPE_RESOURCE_DESCRIPTOR,
+                         RscHob.Raw
+                         )) != NULL)
+  {
+    if ((RscHob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
+        (RscHob.ResourceDescriptor->PhysicalStart == 0))
+    {
       DoClear = TRUE;
       //
       // Make sure memory at 0-4095 has not been allocated.
       //
-      while ((MemHob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION,
-                                       MemHob.Raw)) != NULL) {
+      while ((MemHob.Raw = GetNextHob (
+                             EFI_HOB_TYPE_MEMORY_ALLOCATION,
+                             MemHob.Raw
+                             )) != NULL)
+      {
         if (MemHob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress
-            < EFI_PAGE_SIZE) {
+            < EFI_PAGE_SIZE)
+        {
           DoClear = FALSE;
           break;
         }
+
         MemHob.Raw = GET_NEXT_HOB (MemHob);
       }
+
       break;
     }
+
     RscHob.Raw = GET_NEXT_HOB (RscHob);
   }
 
@@ -119,9 +130,9 @@ IsExecuteDisableBitAvailable (
   VOID
   )
 {
-  UINT32            RegEax;
-  UINT32            RegEdx;
-  BOOLEAN           Available;
+  UINT32   RegEax;
+  UINT32   RegEdx;
+  BOOLEAN  Available;
 
   Available = FALSE;
   AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
@@ -172,9 +183,9 @@ EnableExecuteDisableBit (
   VOID
   )
 {
-  UINT64           MsrRegisters;
+  UINT64  MsrRegisters;
 
-  MsrRegisters = AsmReadMsr64 (0xC0000080);
+  MsrRegisters  = AsmReadMsr64 (0xC0000080);
   MsrRegisters |= BIT11;
   AsmWriteMsr64 (0xC0000080, MsrRegisters);
 }
@@ -195,20 +206,20 @@ EnableExecuteDisableBit (
 **/
 BOOLEAN
 ToSplitPageTable (
-  IN EFI_PHYSICAL_ADDRESS               Address,
-  IN UINTN                              Size,
-  IN EFI_PHYSICAL_ADDRESS               StackBase,
-  IN UINTN                              StackSize,
-  IN EFI_PHYSICAL_ADDRESS               GhcbBase,
-  IN UINTN                              GhcbSize
+  IN EFI_PHYSICAL_ADDRESS  Address,
+  IN UINTN                 Size,
+  IN EFI_PHYSICAL_ADDRESS  StackBase,
+  IN UINTN                 StackSize,
+  IN EFI_PHYSICAL_ADDRESS  GhcbBase,
+  IN UINTN                 GhcbSize
   )
 {
-  if (IsNullDetectionEnabled () && Address == 0) {
+  if (IsNullDetectionEnabled () && (Address == 0)) {
     return TRUE;
   }
 
   if (PcdGetBool (PcdCpuStackGuard)) {
-    if (StackBase >= Address && StackBase < (Address + Size)) {
+    if ((StackBase >= Address) && (StackBase < (Address + Size))) {
       return TRUE;
     }
   }
@@ -227,6 +238,7 @@ ToSplitPageTable (
 
   return FALSE;
 }
+
 /**
   Initialize a buffer pool for page table use only.
 
@@ -246,18 +258,18 @@ ToSplitPageTable (
 **/
 BOOLEAN
 InitializePageTablePool (
-  IN UINTN           PoolPages
+  IN UINTN  PoolPages
   )
 {
-  VOID          *Buffer;
+  VOID  *Buffer;
 
   //
   // Always reserve at least PAGE_TABLE_POOL_UNIT_PAGES, including one page for
   // header.
   //
   PoolPages += 1;   // Add one page for header.
-  PoolPages = ((PoolPages - 1) / PAGE_TABLE_POOL_UNIT_PAGES + 1) *
-              PAGE_TABLE_POOL_UNIT_PAGES;
+  PoolPages  = ((PoolPages - 1) / PAGE_TABLE_POOL_UNIT_PAGES + 1) *
+               PAGE_TABLE_POOL_UNIT_PAGES;
   Buffer = AllocateAlignedPages (PoolPages, PAGE_TABLE_POOL_ALIGNMENT);
   if (Buffer == NULL) {
     DEBUG ((DEBUG_ERROR, "ERROR: Out of aligned pages\r\n"));
@@ -268,19 +280,19 @@ InitializePageTablePool (
   // Link all pools into a list for easier track later.
   //
   if (mPageTablePool == NULL) {
-    mPageTablePool = Buffer;
+    mPageTablePool           = Buffer;
     mPageTablePool->NextPool = mPageTablePool;
   } else {
     ((PAGE_TABLE_POOL *)Buffer)->NextPool = mPageTablePool->NextPool;
-    mPageTablePool->NextPool = Buffer;
-    mPageTablePool = Buffer;
+    mPageTablePool->NextPool              = Buffer;
+    mPageTablePool                        = Buffer;
   }
 
   //
   // Reserve one page for pool header.
   //
-  mPageTablePool->FreePages  = PoolPages - 1;
-  mPageTablePool->Offset = EFI_PAGES_TO_SIZE (1);
+  mPageTablePool->FreePages = PoolPages - 1;
+  mPageTablePool->Offset    = EFI_PAGES_TO_SIZE (1);
 
   return TRUE;
 }
@@ -304,10 +316,10 @@ InitializePageTablePool (
 **/
 VOID *
 AllocatePageTableMemory (
-  IN UINTN           Pages
+  IN UINTN  Pages
   )
 {
-  VOID          *Buffer;
+  VOID  *Buffer;
 
   if (Pages == 0) {
     return NULL;
@@ -316,8 +328,9 @@ AllocatePageTableMemory (
   //
   // Renew the pool if necessary.
   //
-  if (mPageTablePool == NULL ||
-      Pages > mPageTablePool->FreePages) {
+  if ((mPageTablePool == NULL) ||
+      (Pages > mPageTablePool->FreePages))
+  {
     if (!InitializePageTablePool (Pages)) {
       return NULL;
     }
@@ -325,8 +338,8 @@ AllocatePageTableMemory (
 
   Buffer = (UINT8 *)mPageTablePool + mPageTablePool->Offset;
 
-  mPageTablePool->Offset     += EFI_PAGES_TO_SIZE (Pages);
-  mPageTablePool->FreePages  -= Pages;
+  mPageTablePool->Offset    += EFI_PAGES_TO_SIZE (Pages);
+  mPageTablePool->FreePages -= Pages;
 
   return Buffer;
 }
@@ -344,18 +357,18 @@ AllocatePageTableMemory (
 **/
 VOID
 Split2MPageTo4K (
-  IN EFI_PHYSICAL_ADDRESS               PhysicalAddress,
-  IN OUT UINT64                         *PageEntry2M,
-  IN EFI_PHYSICAL_ADDRESS               StackBase,
-  IN UINTN                              StackSize,
-  IN EFI_PHYSICAL_ADDRESS               GhcbBase,
-  IN UINTN                              GhcbSize
+  IN EFI_PHYSICAL_ADDRESS  PhysicalAddress,
+  IN OUT UINT64            *PageEntry2M,
+  IN EFI_PHYSICAL_ADDRESS  StackBase,
+  IN UINTN                 StackSize,
+  IN EFI_PHYSICAL_ADDRESS  GhcbBase,
+  IN UINTN                 GhcbSize
   )
 {
-  EFI_PHYSICAL_ADDRESS                  PhysicalAddress4K;
-  UINTN                                 IndexOfPageTableEntries;
-  PAGE_TABLE_4K_ENTRY                   *PageTableEntry;
-  UINT64                                AddressEncMask;
+  EFI_PHYSICAL_ADDRESS  PhysicalAddress4K;
+  UINTN                 IndexOfPageTableEntries;
+  PAGE_TABLE_4K_ENTRY   *PageTableEntry;
+  UINT64                AddressEncMask;
 
   //
   // Make sure AddressEncMask is contained to smallest supported address field
@@ -368,14 +381,14 @@ Split2MPageTo4K (
   //
   // Fill in 2M page entry.
   //
-  *PageEntry2M = (UINT64) (UINTN) PageTableEntry | AddressEncMask | IA32_PG_P | IA32_PG_RW;
+  *PageEntry2M = (UINT64)(UINTN)PageTableEntry | AddressEncMask | IA32_PG_P | IA32_PG_RW;
 
   PhysicalAddress4K = PhysicalAddress;
   for (IndexOfPageTableEntries = 0; IndexOfPageTableEntries < 512; IndexOfPageTableEntries++, PageTableEntry++, PhysicalAddress4K += SIZE_4KB) {
     //
     // Fill in the Page Table entries
     //
-    PageTableEntry->Uint64 = (UINT64) PhysicalAddress4K;
+    PageTableEntry->Uint64 = (UINT64)PhysicalAddress4K;
 
     //
     // The GHCB range consists of two pages per CPU, the GHCB and a
@@ -383,24 +396,28 @@ Split2MPageTo4K (
     // unencrypted page while the per-CPU variable page needs to be
     // mapped encrypted. These pages alternate in assignment.
     //
-    if ((GhcbBase == 0)
-        || (PhysicalAddress4K < GhcbBase)
-        || (PhysicalAddress4K >= GhcbBase + GhcbSize)
-        || (((PhysicalAddress4K - GhcbBase) & SIZE_4KB) != 0)) {
+    if (  (GhcbBase == 0)
+       || (PhysicalAddress4K < GhcbBase)
+       || (PhysicalAddress4K >= GhcbBase + GhcbSize)
+       || (((PhysicalAddress4K - GhcbBase) & SIZE_4KB) != 0))
+    {
       PageTableEntry->Uint64 |= AddressEncMask;
     }
+
     PageTableEntry->Bits.ReadWrite = 1;
 
-    if ((IsNullDetectionEnabled () && PhysicalAddress4K == 0) ||
-        (PcdGetBool (PcdCpuStackGuard) && PhysicalAddress4K == StackBase)) {
+    if ((IsNullDetectionEnabled () && (PhysicalAddress4K == 0)) ||
+        (PcdGetBool (PcdCpuStackGuard) && (PhysicalAddress4K == StackBase)))
+    {
       PageTableEntry->Bits.Present = 0;
     } else {
       PageTableEntry->Bits.Present = 1;
     }
 
-    if (PcdGetBool (PcdSetNxForStack)
-        && (PhysicalAddress4K >= StackBase)
-        && (PhysicalAddress4K < StackBase + StackSize)) {
+    if (  PcdGetBool (PcdSetNxForStack)
+       && (PhysicalAddress4K >= StackBase)
+       && (PhysicalAddress4K < StackBase + StackSize))
+    {
       //
       // Set Nx bit for stack.
       //
@@ -422,18 +439,18 @@ Split2MPageTo4K (
 **/
 VOID
 Split1GPageTo2M (
-  IN EFI_PHYSICAL_ADDRESS               PhysicalAddress,
-  IN OUT UINT64                         *PageEntry1G,
-  IN EFI_PHYSICAL_ADDRESS               StackBase,
-  IN UINTN                              StackSize,
-  IN EFI_PHYSICAL_ADDRESS               GhcbBase,
-  IN UINTN                              GhcbSize
+  IN EFI_PHYSICAL_ADDRESS  PhysicalAddress,
+  IN OUT UINT64            *PageEntry1G,
+  IN EFI_PHYSICAL_ADDRESS  StackBase,
+  IN UINTN                 StackSize,
+  IN EFI_PHYSICAL_ADDRESS  GhcbBase,
+  IN UINTN                 GhcbSize
   )
 {
-  EFI_PHYSICAL_ADDRESS                  PhysicalAddress2M;
-  UINTN                                 IndexOfPageDirectoryEntries;
-  PAGE_TABLE_ENTRY                      *PageDirectoryEntry;
-  UINT64                                AddressEncMask;
+  EFI_PHYSICAL_ADDRESS  PhysicalAddress2M;
+  UINTN                 IndexOfPageDirectoryEntries;
+  PAGE_TABLE_ENTRY      *PageDirectoryEntry;
+  UINT64                AddressEncMask;
 
   //
   // Make sure AddressEncMask is contained to smallest supported address field
@@ -446,7 +463,7 @@ Split1GPageTo2M (
   //
   // Fill in 1G page entry.
   //
-  *PageEntry1G = (UINT64) (UINTN) PageDirectoryEntry | AddressEncMask | IA32_PG_P | IA32_PG_RW;
+  *PageEntry1G = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask | IA32_PG_P | IA32_PG_RW;
 
   PhysicalAddress2M = PhysicalAddress;
   for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PhysicalAddress2M += SIZE_2MB) {
@@ -454,15 +471,15 @@ Split1GPageTo2M (
       //
       // Need to split this 2M page that covers NULL or stack range.
       //
-      Split2MPageTo4K (PhysicalAddress2M, (UINT64 *) PageDirectoryEntry, StackBase, StackSize, GhcbBase, GhcbSize);
+      Split2MPageTo4K (PhysicalAddress2M, (UINT64 *)PageDirectoryEntry, StackBase, StackSize, GhcbBase, GhcbSize);
     } else {
       //
       // Fill in the Page Directory entries
       //
-      PageDirectoryEntry->Uint64 = (UINT64) PhysicalAddress2M | AddressEncMask;
+      PageDirectoryEntry->Uint64         = (UINT64)PhysicalAddress2M | AddressEncMask;
       PageDirectoryEntry->Bits.ReadWrite = 1;
-      PageDirectoryEntry->Bits.Present = 1;
-      PageDirectoryEntry->Bits.MustBe1 = 1;
+      PageDirectoryEntry->Bits.Present   = 1;
+      PageDirectoryEntry->Bits.MustBe1   = 1;
     }
   }
 }
@@ -477,9 +494,9 @@ Split1GPageTo2M (
 **/
 VOID
 SetPageTablePoolReadOnly (
-  IN  UINTN                             PageTableBase,
-  IN  EFI_PHYSICAL_ADDRESS              Address,
-  IN  BOOLEAN                           Level4Paging
+  IN  UINTN                 PageTableBase,
+  IN  EFI_PHYSICAL_ADDRESS  Address,
+  IN  BOOLEAN               Level4Paging
   )
 {
   UINTN                 Index;
@@ -519,13 +536,13 @@ SetPageTablePoolReadOnly (
   LevelSize[3] = SIZE_1GB;
   LevelSize[4] = SIZE_512GB;
 
-  AddressEncMask  = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) &
-                    PAGING_1G_ADDRESS_MASK_64;
-  PageTable       = (UINT64 *)(UINTN)PageTableBase;
-  PoolUnitSize    = PAGE_TABLE_POOL_UNIT_SIZE;
+  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) &
+                   PAGING_1G_ADDRESS_MASK_64;
+  PageTable    = (UINT64 *)(UINTN)PageTableBase;
+  PoolUnitSize = PAGE_TABLE_POOL_UNIT_SIZE;
 
   for (Level = (Level4Paging) ? 4 : 3; Level > 0; --Level) {
-    Index = ((UINTN)RShiftU64 (Address, LevelShift[Level]));
+    Index  = ((UINTN)RShiftU64 (Address, LevelShift[Level]));
     Index &= PAGING_PAE_INDEX_MASK;
 
     PageAttr = PageTable[Index];
@@ -553,14 +570,13 @@ SetPageTablePoolReadOnly (
           ASSERT (Index < EFI_PAGE_SIZE/sizeof (UINT64));
 
           PageTable[Index] &= ~(UINT64)IA32_PG_RW;
-          PoolUnitSize    -= LevelSize[Level];
+          PoolUnitSize     -= LevelSize[Level];
 
           ++Index;
         }
       }
 
       break;
-
     } else {
       //
       // The smaller granularity of page must be needed.
@@ -572,18 +588,20 @@ SetPageTablePoolReadOnly (
 
       PhysicalAddress = PageAttr & LevelMask[Level];
       for (EntryIndex = 0;
-            EntryIndex < EFI_PAGE_SIZE/sizeof (UINT64);
-            ++EntryIndex) {
+           EntryIndex < EFI_PAGE_SIZE/sizeof (UINT64);
+           ++EntryIndex)
+      {
         NewPageTable[EntryIndex] = PhysicalAddress  | AddressEncMask |
                                    IA32_PG_P | IA32_PG_RW;
         if (Level > 2) {
           NewPageTable[EntryIndex] |= IA32_PG_PS;
         }
+
         PhysicalAddress += LevelSize[Level - 1];
       }
 
       PageTable[Index] = (UINT64)(UINTN)NewPageTable | AddressEncMask |
-                                        IA32_PG_P | IA32_PG_RW;
+                         IA32_PG_P | IA32_PG_RW;
       PageTable = NewPageTable;
     }
   }
@@ -598,14 +616,14 @@ SetPageTablePoolReadOnly (
 **/
 VOID
 EnablePageTableProtection (
-  IN  UINTN     PageTableBase,
-  IN  BOOLEAN   Level4Paging
+  IN  UINTN    PageTableBase,
+  IN  BOOLEAN  Level4Paging
   )
 {
-  PAGE_TABLE_POOL         *HeadPool;
-  PAGE_TABLE_POOL         *Pool;
-  UINT64                  PoolSize;
-  EFI_PHYSICAL_ADDRESS    Address;
+  PAGE_TABLE_POOL       *HeadPool;
+  PAGE_TABLE_POOL       *Pool;
+  UINT64                PoolSize;
+  EFI_PHYSICAL_ADDRESS  Address;
 
   if (mPageTablePool == NULL) {
     return;
@@ -615,14 +633,14 @@ EnablePageTableProtection (
   // Disable write protection, because we need to mark page table to be write
   // protected.
   //
-  AsmWriteCr0 (AsmReadCr0() & ~CR0_WP);
+  AsmWriteCr0 (AsmReadCr0 () & ~CR0_WP);
 
   //
   // SetPageTablePoolReadOnly might update mPageTablePool. It's safer to
   // remember original one in advance.
   //
   HeadPool = mPageTablePool;
-  Pool = HeadPool;
+  Pool     = HeadPool;
   do {
     Address  = (EFI_PHYSICAL_ADDRESS)(UINTN)Pool;
     PoolSize = Pool->Offset + EFI_PAGES_TO_SIZE (Pool->FreePages);
@@ -633,9 +651,9 @@ EnablePageTableProtection (
     // protection to them one by one.
     //
     while (PoolSize > 0) {
-      SetPageTablePoolReadOnly(PageTableBase, Address, Level4Paging);
-      Address   += PAGE_TABLE_POOL_UNIT_SIZE;
-      PoolSize  -= PAGE_TABLE_POOL_UNIT_SIZE;
+      SetPageTablePoolReadOnly (PageTableBase, Address, Level4Paging);
+      Address  += PAGE_TABLE_POOL_UNIT_SIZE;
+      PoolSize -= PAGE_TABLE_POOL_UNIT_SIZE;
     }
 
     Pool = Pool->NextPool;
@@ -644,7 +662,7 @@ EnablePageTableProtection (
   //
   // Enable write protection, after page table attribute updated.
   //
-  AsmWriteCr0 (AsmReadCr0() | CR0_WP);
+  AsmWriteCr0 (AsmReadCr0 () | CR0_WP);
 }
 
 /**
@@ -661,37 +679,36 @@ EnablePageTableProtection (
 **/
 UINTN
 CreateIdentityMappingPageTables (
-  IN EFI_PHYSICAL_ADDRESS   StackBase,
-  IN UINTN                  StackSize,
-  IN EFI_PHYSICAL_ADDRESS   GhcbBase,
-  IN UINTN                  GhcbSize
+  IN EFI_PHYSICAL_ADDRESS  StackBase,
+  IN UINTN                 StackSize,
+  IN EFI_PHYSICAL_ADDRESS  GhcbBase,
+  IN UINTN                 GhcbSize
   )
 {
-  UINT32                                        RegEax;
-  CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX   EcxFlags;
-  UINT32                                        RegEdx;
-  UINT8                                         PhysicalAddressBits;
-  EFI_PHYSICAL_ADDRESS                          PageAddress;
-  UINTN                                         IndexOfPml5Entries;
-  UINTN                                         IndexOfPml4Entries;
-  UINTN                                         IndexOfPdpEntries;
-  UINTN                                         IndexOfPageDirectoryEntries;
-  UINT32                                        NumberOfPml5EntriesNeeded;
-  UINT32                                        NumberOfPml4EntriesNeeded;
-  UINT32                                        NumberOfPdpEntriesNeeded;
-  PAGE_MAP_AND_DIRECTORY_POINTER                *PageMapLevel5Entry;
-  PAGE_MAP_AND_DIRECTORY_POINTER                *PageMapLevel4Entry;
-  PAGE_MAP_AND_DIRECTORY_POINTER                *PageMap;
-  PAGE_MAP_AND_DIRECTORY_POINTER                *PageDirectoryPointerEntry;
-  PAGE_TABLE_ENTRY                              *PageDirectoryEntry;
-  UINTN                                         TotalPagesNum;
-  UINTN                                         BigPageAddress;
-  VOID                                          *Hob;
-  BOOLEAN                                       Page5LevelSupport;
-  BOOLEAN                                       Page1GSupport;
-  PAGE_TABLE_1G_ENTRY                           *PageDirectory1GEntry;
-  UINT64                                        AddressEncMask;
-  IA32_CR4                                      Cr4;
+  UINT32                          RegEax;
+  UINT32                          RegEdx;
+  UINT8                           PhysicalAddressBits;
+  EFI_PHYSICAL_ADDRESS            PageAddress;
+  UINTN                           IndexOfPml5Entries;
+  UINTN                           IndexOfPml4Entries;
+  UINTN                           IndexOfPdpEntries;
+  UINTN                           IndexOfPageDirectoryEntries;
+  UINT32                          NumberOfPml5EntriesNeeded;
+  UINT32                          NumberOfPml4EntriesNeeded;
+  UINT32                          NumberOfPdpEntriesNeeded;
+  PAGE_MAP_AND_DIRECTORY_POINTER  *PageMapLevel5Entry;
+  PAGE_MAP_AND_DIRECTORY_POINTER  *PageMapLevel4Entry;
+  PAGE_MAP_AND_DIRECTORY_POINTER  *PageMap;
+  PAGE_MAP_AND_DIRECTORY_POINTER  *PageDirectoryPointerEntry;
+  PAGE_TABLE_ENTRY                *PageDirectoryEntry;
+  UINTN                           TotalPagesNum;
+  UINTN                           BigPageAddress;
+  VOID                            *Hob;
+  BOOLEAN                         Enable5LevelPaging;
+  BOOLEAN                         Page1GSupport;
+  PAGE_TABLE_1G_ENTRY             *PageDirectory1GEntry;
+  UINT64                          AddressEncMask;
+  IA32_CR4                        Cr4;
 
   //
   // Set PageMapLevel5Entry to suppress incorrect compiler/analyzer warnings
@@ -704,7 +721,7 @@ CreateIdentityMappingPageTables (
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   Page1GSupport = FALSE;
-  if (PcdGetBool(PcdUse1GPageTable)) {
+  if (PcdGetBool (PcdUse1GPageTable)) {
     AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
     if (RegEax >= 0x80000001) {
       AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
@@ -719,29 +736,27 @@ CreateIdentityMappingPageTables (
   //
   Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
   if (Hob != NULL) {
-    PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
+    PhysicalAddressBits = ((EFI_HOB_CPU *)Hob)->SizeOfMemorySpace;
   } else {
     AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
     if (RegEax >= 0x80000008) {
       AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-      PhysicalAddressBits = (UINT8) RegEax;
+      PhysicalAddressBits = (UINT8)RegEax;
     } else {
       PhysicalAddressBits = 36;
     }
   }
 
-  Page5LevelSupport = FALSE;
-  if (PcdGetBool (PcdUse5LevelPageTable)) {
-    AsmCpuidEx (
-      CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS, CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO, NULL,
-      &EcxFlags.Uint32, NULL, NULL
-      );
-    if (EcxFlags.Bits.FiveLevelPage != 0) {
-      Page5LevelSupport = TRUE;
-    }
-  }
+  //
+  // Check CR4.LA57[bit12] to determin whether 5-Level Paging is enabled.
+  // Because this code runs at both IA-32e (64bit) mode and legacy protected (32bit) mode,
+  // below logic inherits the 5-level paging setting from bootloader in IA-32e mode
+  // and uses 4-level paging in legacy protected mode.
+  //
+  Cr4.UintN          = AsmReadCr4 ();
+  Enable5LevelPaging = (BOOLEAN)(Cr4.Bits.LA57 == 1);
 
-  DEBUG ((DEBUG_INFO, "AddressBits=%u 5LevelPaging=%u 1GPage=%u\n", PhysicalAddressBits, Page5LevelSupport, Page1GSupport));
+  DEBUG ((DEBUG_INFO, "PayloadEntry: AddressBits=%u 5LevelPaging=%u 1GPage=%u\n", PhysicalAddressBits, Enable5LevelPaging, Page1GSupport));
 
   //
   // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses
@@ -749,7 +764,7 @@ CreateIdentityMappingPageTables (
   //  due to either unsupported by HW, or disabled by PCD.
   //
   ASSERT (PhysicalAddressBits <= 52);
-  if (!Page5LevelSupport && PhysicalAddressBits > 48) {
+  if (!Enable5LevelPaging && (PhysicalAddressBits > 48)) {
     PhysicalAddressBits = 48;
   }
 
@@ -758,19 +773,19 @@ CreateIdentityMappingPageTables (
   //
   NumberOfPml5EntriesNeeded = 1;
   if (PhysicalAddressBits > 48) {
-    NumberOfPml5EntriesNeeded = (UINT32) LShiftU64 (1, PhysicalAddressBits - 48);
-    PhysicalAddressBits = 48;
+    NumberOfPml5EntriesNeeded = (UINT32)LShiftU64 (1, PhysicalAddressBits - 48);
+    PhysicalAddressBits       = 48;
   }
 
   NumberOfPml4EntriesNeeded = 1;
   if (PhysicalAddressBits > 39) {
-    NumberOfPml4EntriesNeeded = (UINT32) LShiftU64 (1, PhysicalAddressBits - 39);
-    PhysicalAddressBits = 39;
+    NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, PhysicalAddressBits - 39);
+    PhysicalAddressBits       = 39;
   }
 
   NumberOfPdpEntriesNeeded = 1;
   ASSERT (PhysicalAddressBits > 30);
-  NumberOfPdpEntriesNeeded = (UINT32) LShiftU64 (1, PhysicalAddressBits - 30);
+  NumberOfPdpEntriesNeeded = (UINT32)LShiftU64 (1, PhysicalAddressBits - 30);
 
   //
   // Pre-allocate big pages to avoid later allocations.
@@ -784,116 +799,125 @@ CreateIdentityMappingPageTables (
   //
   // Substract the one page occupied by PML5 entries if 5-Level Paging is disabled.
   //
-  if (!Page5LevelSupport) {
+  if (!Enable5LevelPaging) {
     TotalPagesNum--;
   }
 
-  DEBUG ((DEBUG_INFO, "Pml5=%u Pml4=%u Pdp=%u TotalPage=%Lu\n",
-    NumberOfPml5EntriesNeeded, NumberOfPml4EntriesNeeded,
-    NumberOfPdpEntriesNeeded, (UINT64)TotalPagesNum));
+  DEBUG ((
+    DEBUG_INFO,
+    "Pml5=%u Pml4=%u Pdp=%u TotalPage=%Lu\n",
+    NumberOfPml5EntriesNeeded,
+    NumberOfPml4EntriesNeeded,
+    NumberOfPdpEntriesNeeded,
+    (UINT64)TotalPagesNum
+    ));
 
-  BigPageAddress = (UINTN) AllocatePageTableMemory (TotalPagesNum);
+  BigPageAddress = (UINTN)AllocatePageTableMemory (TotalPagesNum);
   ASSERT (BigPageAddress != 0);
 
   //
   // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
   //
-  PageMap         = (VOID *) BigPageAddress;
-  if (Page5LevelSupport) {
+  PageMap = (VOID *)BigPageAddress;
+  if (Enable5LevelPaging) {
     //
     // By architecture only one PageMapLevel5 exists - so lets allocate storage for it.
     //
     PageMapLevel5Entry = PageMap;
     BigPageAddress    += SIZE_4KB;
   }
-  PageAddress        = 0;
+
+  PageAddress = 0;
 
   for ( IndexOfPml5Entries = 0
-      ; IndexOfPml5Entries < NumberOfPml5EntriesNeeded
-      ; IndexOfPml5Entries++) {
+        ; IndexOfPml5Entries < NumberOfPml5EntriesNeeded
+        ; IndexOfPml5Entries++)
+  {
     //
     // Each PML5 entry points to a page of PML4 entires.
     // So lets allocate space for them and fill them in in the IndexOfPml4Entries loop.
     // When 5-Level Paging is disabled, below allocation happens only once.
     //
-    PageMapLevel4Entry = (VOID *) BigPageAddress;
+    PageMapLevel4Entry = (VOID *)BigPageAddress;
     BigPageAddress    += SIZE_4KB;
 
-    if (Page5LevelSupport) {
+    if (Enable5LevelPaging) {
       //
       // Make a PML5 Entry
       //
-      PageMapLevel5Entry->Uint64 = (UINT64) (UINTN) PageMapLevel4Entry | AddressEncMask;
+      PageMapLevel5Entry->Uint64         = (UINT64)(UINTN)PageMapLevel4Entry | AddressEncMask;
       PageMapLevel5Entry->Bits.ReadWrite = 1;
       PageMapLevel5Entry->Bits.Present   = 1;
       PageMapLevel5Entry++;
     }
 
     for ( IndexOfPml4Entries = 0
-        ; IndexOfPml4Entries < (NumberOfPml5EntriesNeeded == 1 ? NumberOfPml4EntriesNeeded : 512)
-        ; IndexOfPml4Entries++, PageMapLevel4Entry++) {
+          ; IndexOfPml4Entries < (NumberOfPml5EntriesNeeded == 1 ? NumberOfPml4EntriesNeeded : 512)
+          ; IndexOfPml4Entries++, PageMapLevel4Entry++)
+    {
       //
       // Each PML4 entry points to a page of Page Directory Pointer entires.
       // So lets allocate space for them and fill them in in the IndexOfPdpEntries loop.
       //
-      PageDirectoryPointerEntry = (VOID *) BigPageAddress;
-      BigPageAddress += SIZE_4KB;
+      PageDirectoryPointerEntry = (VOID *)BigPageAddress;
+      BigPageAddress           += SIZE_4KB;
 
       //
       // Make a PML4 Entry
       //
-      PageMapLevel4Entry->Uint64 = (UINT64)(UINTN)PageDirectoryPointerEntry | AddressEncMask;
+      PageMapLevel4Entry->Uint64         = (UINT64)(UINTN)PageDirectoryPointerEntry | AddressEncMask;
       PageMapLevel4Entry->Bits.ReadWrite = 1;
-      PageMapLevel4Entry->Bits.Present = 1;
+      PageMapLevel4Entry->Bits.Present   = 1;
 
       if (Page1GSupport) {
-        PageDirectory1GEntry = (VOID *) PageDirectoryPointerEntry;
+        PageDirectory1GEntry = (VOID *)PageDirectoryPointerEntry;
 
         for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
           if (ToSplitPageTable (PageAddress, SIZE_1GB, StackBase, StackSize, GhcbBase, GhcbSize)) {
-            Split1GPageTo2M (PageAddress, (UINT64 *) PageDirectory1GEntry, StackBase, StackSize, GhcbBase, GhcbSize);
+            Split1GPageTo2M (PageAddress, (UINT64 *)PageDirectory1GEntry, StackBase, StackSize, GhcbBase, GhcbSize);
           } else {
             //
             // Fill in the Page Directory entries
             //
-            PageDirectory1GEntry->Uint64 = (UINT64)PageAddress | AddressEncMask;
+            PageDirectory1GEntry->Uint64         = (UINT64)PageAddress | AddressEncMask;
             PageDirectory1GEntry->Bits.ReadWrite = 1;
-            PageDirectory1GEntry->Bits.Present = 1;
-            PageDirectory1GEntry->Bits.MustBe1 = 1;
+            PageDirectory1GEntry->Bits.Present   = 1;
+            PageDirectory1GEntry->Bits.MustBe1   = 1;
           }
         }
       } else {
         for ( IndexOfPdpEntries = 0
-            ; IndexOfPdpEntries < (NumberOfPml4EntriesNeeded == 1 ? NumberOfPdpEntriesNeeded : 512)
-            ; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
+              ; IndexOfPdpEntries < (NumberOfPml4EntriesNeeded == 1 ? NumberOfPdpEntriesNeeded : 512)
+              ; IndexOfPdpEntries++, PageDirectoryPointerEntry++)
+        {
           //
           // Each Directory Pointer entries points to a page of Page Directory entires.
           // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
           //
-          PageDirectoryEntry = (VOID *) BigPageAddress;
-          BigPageAddress += SIZE_4KB;
+          PageDirectoryEntry = (VOID *)BigPageAddress;
+          BigPageAddress    += SIZE_4KB;
 
           //
           // Fill in a Page Directory Pointer Entries
           //
-          PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask;
+          PageDirectoryPointerEntry->Uint64         = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask;
           PageDirectoryPointerEntry->Bits.ReadWrite = 1;
-          PageDirectoryPointerEntry->Bits.Present = 1;
+          PageDirectoryPointerEntry->Bits.Present   = 1;
 
           for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
             if (ToSplitPageTable (PageAddress, SIZE_2MB, StackBase, StackSize, GhcbBase, GhcbSize)) {
               //
               // Need to split this 2M page that covers NULL or stack range.
               //
-              Split2MPageTo4K (PageAddress, (UINT64 *) PageDirectoryEntry, StackBase, StackSize, GhcbBase, GhcbSize);
+              Split2MPageTo4K (PageAddress, (UINT64 *)PageDirectoryEntry, StackBase, StackSize, GhcbBase, GhcbSize);
             } else {
               //
               // Fill in the Page Directory entries
               //
-              PageDirectoryEntry->Uint64 = (UINT64)PageAddress | AddressEncMask;
+              PageDirectoryEntry->Uint64         = (UINT64)PageAddress | AddressEncMask;
               PageDirectoryEntry->Bits.ReadWrite = 1;
-              PageDirectoryEntry->Bits.Present = 1;
-              PageDirectoryEntry->Bits.MustBe1 = 1;
+              PageDirectoryEntry->Bits.Present   = 1;
+              PageDirectoryEntry->Bits.MustBe1   = 1;
             }
           }
         }
@@ -901,7 +925,7 @@ CreateIdentityMappingPageTables (
         //
         // Fill with null entry for unused PDPTE
         //
-        ZeroMem (PageDirectoryPointerEntry, (512 - IndexOfPdpEntries) * sizeof(PAGE_MAP_AND_DIRECTORY_POINTER));
+        ZeroMem (PageDirectoryPointerEntry, (512 - IndexOfPdpEntries) * sizeof (PAGE_MAP_AND_DIRECTORY_POINTER));
       }
     }
 
@@ -911,10 +935,7 @@ CreateIdentityMappingPageTables (
     ZeroMem (PageMapLevel4Entry, (512 - IndexOfPml4Entries) * sizeof (PAGE_MAP_AND_DIRECTORY_POINTER));
   }
 
-  if (Page5LevelSupport) {
-    Cr4.UintN = AsmReadCr4 ();
-    Cr4.Bits.LA57 = 1;
-    AsmWriteCr4 (Cr4.UintN);
+  if (Enable5LevelPaging) {
     //
     // For the PML5 entries we are not using fill in a null entry.
     //
@@ -936,4 +957,3 @@ CreateIdentityMappingPageTables (
 
   return (UINTN)PageMap;
 }
-

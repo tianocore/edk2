@@ -16,7 +16,7 @@ EFI_HANDLE  mHandle = NULL;
 //
 // SMM CPU I/O Protocol instance
 //
-EFI_SMM_CPU_IO2_PROTOCOL mSmmCpuIo2 = {
+EFI_SMM_CPU_IO2_PROTOCOL  mSmmCpuIo2 = {
   {
     CpuMemoryServiceRead,
     CpuMemoryServiceWrite
@@ -30,7 +30,7 @@ EFI_SMM_CPU_IO2_PROTOCOL mSmmCpuIo2 = {
 //
 // Lookup table for increment values based on transfer widths
 //
-UINT8 mStride[] = {
+UINT8  mStride[] = {
   1, // SMM_IO_UINT8
   2, // SMM_IO_UINT16
   4, // SMM_IO_UINT32
@@ -112,6 +112,7 @@ CpuIoCheckParameter (
     if (MaxCount < (Count - 1)) {
       return EFI_UNSUPPORTED;
     }
+
     if (Address > LShiftU64 (MaxCount - Count + 1, Width)) {
       return EFI_UNSUPPORTED;
     }
@@ -184,6 +185,7 @@ CpuMemoryServiceRead (
       *((UINT64 *)Uint8Buffer) = MmioRead64 ((UINTN)Address);
     }
   }
+
   return EFI_SUCCESS;
 }
 
@@ -244,6 +246,7 @@ CpuMemoryServiceWrite (
       MmioWrite64 ((UINTN)Address, *((UINT64 *)Uint8Buffer));
     }
   }
+
   return EFI_SUCCESS;
 }
 

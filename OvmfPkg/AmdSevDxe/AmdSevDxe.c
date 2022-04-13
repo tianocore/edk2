@@ -17,13 +17,25 @@
 #include <Library/DxeServicesTableLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Guid/ConfidentialComputingSevSnpBlob.h>
 #include <Library/PcdLib.h>
+
+STATIC CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION  mSnpBootDxeTable = {
+  SIGNATURE_32 ('A',                                    'M', 'D', 'E'),
+  1,
+  0,
+  (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfSnpSecretsBase),
+  FixedPcdGet32 (PcdOvmfSnpSecretsSize),
+  (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfCpuidBase),
+  FixedPcdGet32 (PcdOvmfCpuidSize),
+};
 
 EFI_STATUS
 EFIAPI
 AmdSevDxeEntryPoint (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS                       Status;
@@ -48,16 +60,16 @@ AmdSevDxeEntryPoint (
   Status = gDS->GetMemorySpaceMap (&NumEntries, &AllDescMap);
   if (!EFI_ERROR (Status)) {
     for (Index = 0; Index < NumEntries; Index++) {
-      CONST EFI_GCD_MEMORY_SPACE_DESCRIPTOR *Desc;
+      CONST EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *Desc;
 
       Desc = &AllDescMap[Index];
-      if (Desc->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo ||
-          Desc->GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
-        Status = MemEncryptSevClearPageEncMask (
+      if ((Desc->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) ||
+          (Desc->GcdMemoryType == EfiGcdMemoryTypeNonExistent))
+      {
+        Status = MemEncryptSevClearMmioPageEncMask (
                    0,
                    Desc->BaseAddress,
-                   EFI_SIZE_TO_PAGES (Desc->Length),
-                   FALSE
+                   EFI_SIZE_TO_PAGES (Desc->Length)
                    );
         ASSERT_EFI_ERROR (Status);
       }
@@ -73,11 +85,10 @@ AmdSevDxeEntryPoint (
   // the range.
   //
   if (PcdGet16 (PcdOvmfHostBridgePciDevId) == INTEL_Q35_MCH_DEVICE_ID) {
-    Status = MemEncryptSevClearPageEncMask (
+    Status = MemEncryptSevClearMmioPageEncMask (
                0,
                FixedPcdGet64 (PcdPciExpressBaseAddress),
-               EFI_SIZE_TO_PAGES (SIZE_256MB),
-               FALSE
+               EFI_SIZE_TO_PAGES (SIZE_256MB)
                );
 
     ASSERT_EFI_ERROR (Status);
@@ -103,8 +114,8 @@ AmdSevDxeEntryPoint (
   // is completed (See OvmfPkg/Library/SmmCpuFeaturesLib/SmmCpuFeaturesLib.c).
   //
   if (FeaturePcdGet (PcdSmmSmramRequire)) {
-    UINTN MapPagesBase;
-    UINTN MapPagesCount;
+    UINTN  MapPagesBase;
+    UINTN  MapPagesCount;
 
     Status = MemEncryptSevLocateInitialSmramSaveStateMapPages (
                &MapPagesBase,
@@ -122,15 +133,29 @@ AmdSevDxeEntryPoint (
     Status = MemEncryptSevClearPageEncMask (
                0,             // Cr3BaseAddress -- use current CR3
                MapPagesBase,  // BaseAddress
-               MapPagesCount, // NumPages
-               TRUE           // Flush
+               MapPagesCount  // NumPages
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: MemEncryptSevClearPageEncMask(): %r\n",
-        __FUNCTION__, Status));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: MemEncryptSevClearPageEncMask(): %r\n",
+        __FUNCTION__,
+        Status
+        ));
       ASSERT (FALSE);
       CpuDeadLoop ();
     }
+  }
+
+  //
+  // If its SEV-SNP active guest then install the CONFIDENTIAL_COMPUTING_SEV_SNP_BLOB.
+  // It contains the location for both the Secrets and CPUID page.
+  //
+  if (MemEncryptSevSnpIsEnabled ()) {
+    return gBS->InstallConfigurationTable (
+                  &gConfidentialComputingSevSnpBlobGuid,
+                  &mSnpBootDxeTable
+                  );
   }
 
   return EFI_SUCCESS;

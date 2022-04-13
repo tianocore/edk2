@@ -1,0 +1,51 @@
+## @file
+#  PCH SMM SMI Software dispatch module.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PchSmiDispatchSmm
+  FILE_GUID                      = 60F343E3-2AE2-4AA7-B01E-BF9BD5C04A3B
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = PchSmiDispatchEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  PchSmiDispatchSmm.c
+  PchSmiDispatchSmm.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  MemoryAllocationLib
+  DebugLib
+  UefiBootServicesTableLib
+  SmmServicesTableLib
+  BaseLib
+  IoLib
+  HobLib
+
+[Protocols]
+  gEfiSmmCpuProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmmSwDispatch2ProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
+
+[Guids]
+  gSmmRegisterInfoGuid
+
+[Depex]
+  gEfiSmmCpuProtocolGuid

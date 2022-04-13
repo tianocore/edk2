@@ -1,7 +1,7 @@
 /** @file
 SMM CPU Service protocol definition.
 
-Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -44,7 +44,7 @@ typedef struct _EFI_SMM_CPU_SERVICE_PROTOCOL EFI_SMM_CPU_SERVICE_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_SMM_GET_PROCESSOR_INFO) (
+(EFIAPI *EFI_SMM_GET_PROCESSOR_INFO)(
   IN CONST EFI_SMM_CPU_SERVICE_PROTOCOL *This,
   IN       UINTN                        ProcessorNumber,
   OUT      EFI_PROCESSOR_INFORMATION    *ProcessorInfoBuffer
@@ -82,7 +82,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_SMM_SWITCH_BSP) (
+(EFIAPI *EFI_SMM_SWITCH_BSP)(
   IN CONST EFI_SMM_CPU_SERVICE_PROTOCOL *This,
   IN       UINTN                        ProcessorNumber
   );
@@ -106,7 +106,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_ADD_PROCESSOR) (
+(EFIAPI *EFI_SMM_ADD_PROCESSOR)(
   IN CONST EFI_SMM_CPU_SERVICE_PROTOCOL  *This,
   IN       UINT64                        ProcessorId,
   OUT      UINTN                         *ProcessorNumber
@@ -128,7 +128,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_REMOVE_PROCESSOR) (
+(EFIAPI *EFI_SMM_REMOVE_PROCESSOR)(
   IN CONST EFI_SMM_CPU_SERVICE_PROTOCOL  *This,
   IN       UINTN                         ProcessorNumber
   );
@@ -156,7 +156,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_SMM_WHOAMI) (
+(EFIAPI *EFI_SMM_WHOAMI)(
   IN CONST EFI_SMM_CPU_SERVICE_PROTOCOL *This,
   OUT      UINTN                        *ProcessorNumber
   );
@@ -180,7 +180,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_REGISTER_EXCEPTION_HANDLER) (
+(EFIAPI *EFI_SMM_REGISTER_EXCEPTION_HANDLER)(
   IN EFI_SMM_CPU_SERVICE_PROTOCOL  *This,
   IN EFI_EXCEPTION_TYPE            ExceptionType,
   IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
@@ -190,14 +190,48 @@ EFI_STATUS
 //  This protocol provides CPU services from SMM.
 //
 struct _EFI_SMM_CPU_SERVICE_PROTOCOL {
-  EFI_SMM_GET_PROCESSOR_INFO          GetProcessorInfo;
-  EFI_SMM_SWITCH_BSP                  SwitchBsp;
-  EFI_SMM_ADD_PROCESSOR               AddProcessor;
-  EFI_SMM_REMOVE_PROCESSOR            RemoveProcessor;
-  EFI_SMM_WHOAMI                      WhoAmI;
-  EFI_SMM_REGISTER_EXCEPTION_HANDLER  RegisterExceptionHandler;
+  EFI_SMM_GET_PROCESSOR_INFO            GetProcessorInfo;
+  EFI_SMM_SWITCH_BSP                    SwitchBsp;
+  EFI_SMM_ADD_PROCESSOR                 AddProcessor;
+  EFI_SMM_REMOVE_PROCESSOR              RemoveProcessor;
+  EFI_SMM_WHOAMI                        WhoAmI;
+  EFI_SMM_REGISTER_EXCEPTION_HANDLER    RegisterExceptionHandler;
 };
 
-extern EFI_GUID gEfiSmmCpuServiceProtocolGuid;
+extern EFI_GUID  gEfiSmmCpuServiceProtocolGuid;
+
+//
+//  EDKII_SMM_CPU_RENDEZVOUS_PROTOCOL provide SMM CPU
+//  rendezvous service support.
+//
+#define EDKII_SMM_CPU_RENDEZVOUS_PROTOCOL_GUID \
+  { \
+    0xaa00d50b, 0x4911, 0x428f, { 0xb9, 0x1a, 0xa5, 0x9d, 0xdb, 0x13, 0xe2, 0x4c } \
+  }
+
+typedef struct _EDKII_SMM_CPU_RENDEZVOUS_PROTOCOL EDKII_SMM_CPU_RENDEZVOUS_PROTOCOL;
+
+/**
+  Wait for all APs to arrive SMM mode in given timeout constraint.
+
+  @param[in]  This                  A pointer to the EDKII_SMM_CPU_RENDEZVOUS_PROTOCOL instance.
+  @param[in]  BlockingMode          Block or non-block mode.
+
+  @retval EFI_SUCCESS               All APs have arrived SMM mode except SMI disabled APs.
+  @retval EFI_TIMEOUT               There are APs not in SMM mode in given timeout constraint.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_WAIT_FOR_ALL_PROCESSOR)(
+  IN  EDKII_SMM_CPU_RENDEZVOUS_PROTOCOL  *This,
+  IN  BOOLEAN                            BlockingMode
+  );
+
+struct _EDKII_SMM_CPU_RENDEZVOUS_PROTOCOL {
+  EDKII_WAIT_FOR_ALL_PROCESSOR    WaitForAllProcessor;
+};
+
+extern EFI_GUID  gEdkiiSmmCpuRendezvousProtocolGuid;
 
 #endif

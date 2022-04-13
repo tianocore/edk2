@@ -17,19 +17,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // bit maps.
 //
 USB_CHANGE_FEATURE_MAP  mHubFeatureMap[] = {
-  {USB_PORT_STAT_C_CONNECTION,  EfiUsbPortConnectChange},
-  {USB_PORT_STAT_C_ENABLE,      EfiUsbPortEnableChange},
-  {USB_PORT_STAT_C_SUSPEND,     EfiUsbPortSuspendChange},
-  {USB_PORT_STAT_C_OVERCURRENT, EfiUsbPortOverCurrentChange},
-  {USB_PORT_STAT_C_RESET,       EfiUsbPortResetChange}
+  { USB_PORT_STAT_C_CONNECTION,  EfiUsbPortConnectChange     },
+  { USB_PORT_STAT_C_ENABLE,      EfiUsbPortEnableChange      },
+  { USB_PORT_STAT_C_SUSPEND,     EfiUsbPortSuspendChange     },
+  { USB_PORT_STAT_C_OVERCURRENT, EfiUsbPortOverCurrentChange },
+  { USB_PORT_STAT_C_RESET,       EfiUsbPortResetChange       }
 };
 
 USB_CHANGE_FEATURE_MAP  mRootHubFeatureMap[] = {
-  {USB_PORT_STAT_C_CONNECTION,  EfiUsbPortConnectChange},
-  {USB_PORT_STAT_C_ENABLE,      EfiUsbPortEnableChange},
-  {USB_PORT_STAT_C_SUSPEND,     EfiUsbPortSuspendChange},
-  {USB_PORT_STAT_C_OVERCURRENT, EfiUsbPortOverCurrentChange},
-  {USB_PORT_STAT_C_RESET,       EfiUsbPortResetChange},
+  { USB_PORT_STAT_C_CONNECTION,  EfiUsbPortConnectChange     },
+  { USB_PORT_STAT_C_ENABLE,      EfiUsbPortEnableChange      },
+  { USB_PORT_STAT_C_SUSPEND,     EfiUsbPortSuspendChange     },
+  { USB_PORT_STAT_C_OVERCURRENT, EfiUsbPortOverCurrentChange },
+  { USB_PORT_STAT_C_RESET,       EfiUsbPortResetChange       },
 };
 
 //
@@ -37,6 +37,7 @@ USB_CHANGE_FEATURE_MAP  mRootHubFeatureMap[] = {
 // is related to an interface, these requests are sent
 // to the control endpoint of the device.
 //
+
 /**
   USB hub control transfer to set the hub depth.
 
@@ -49,11 +50,11 @@ USB_CHANGE_FEATURE_MAP  mRootHubFeatureMap[] = {
 **/
 EFI_STATUS
 UsbHubCtrlSetHubDepth (
-  IN  USB_DEVICE          *HubDev,
-  IN  UINT16              Depth
+  IN  USB_DEVICE  *HubDev,
+  IN  UINT16      Depth
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   Status = UsbCtrlRequest (
              HubDev,
@@ -82,11 +83,11 @@ UsbHubCtrlSetHubDepth (
 **/
 EFI_STATUS
 UsbHubCtrlClearHubFeature (
-  IN USB_DEVICE           *HubDev,
-  IN UINT16               Feature
+  IN USB_DEVICE  *HubDev,
+  IN UINT16      Feature
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   Status = UsbCtrlRequest (
              HubDev,
@@ -103,7 +104,6 @@ UsbHubCtrlClearHubFeature (
   return Status;
 }
 
-
 /**
   Clear the feature of the device's port.
 
@@ -117,12 +117,12 @@ UsbHubCtrlClearHubFeature (
 **/
 EFI_STATUS
 UsbHubCtrlClearPortFeature (
-  IN USB_DEVICE           *HubDev,
-  IN UINT8                Port,
-  IN UINT16               Feature
+  IN USB_DEVICE  *HubDev,
+  IN UINT8       Port,
+  IN UINT16      Feature
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   //
   // In USB bus, all the port index starts from 0. But HUB
@@ -135,14 +135,13 @@ UsbHubCtrlClearPortFeature (
              USB_HUB_TARGET_PORT,
              USB_HUB_REQ_CLEAR_FEATURE,
              Feature,
-             (UINT16) (Port + 1),
+             (UINT16)(Port + 1),
              NULL,
              0
              );
 
   return Status;
 }
-
 
 /**
   Clear the transaction translate buffer if full/low
@@ -163,21 +162,21 @@ UsbHubCtrlClearPortFeature (
 **/
 EFI_STATUS
 UsbHubCtrlClearTTBuffer (
-  IN USB_DEVICE           *HubDev,
-  IN UINT8                Port,
-  IN UINT16               DevAddr,
-  IN UINT16               EpNum,
-  IN UINT16               EpType
+  IN USB_DEVICE  *HubDev,
+  IN UINT8       Port,
+  IN UINT16      DevAddr,
+  IN UINT16      EpNum,
+  IN UINT16      EpType
   )
 {
-  EFI_STATUS              Status;
-  UINT16                  Value;
+  EFI_STATUS  Status;
+  UINT16      Value;
 
   //
   // Check USB2.0 spec page 424 for wValue's encoding
   //
-  Value = (UINT16) ((EpNum & 0x0F) | (DevAddr << 4) |
-          ((EpType & 0x03) << 11) | ((EpNum & 0x80) << 15));
+  Value = (UINT16)((EpNum & 0x0F) | (DevAddr << 4) |
+                   ((EpType & 0x03) << 11) | ((EpNum & 0x80) << 15));
 
   Status = UsbCtrlRequest (
              HubDev,
@@ -186,7 +185,7 @@ UsbHubCtrlClearTTBuffer (
              USB_HUB_TARGET_PORT,
              USB_HUB_REQ_CLEAR_TT,
              Value,
-             (UINT16) (Port + 1),
+             (UINT16)(Port + 1),
              NULL,
              0
              );
@@ -207,13 +206,13 @@ UsbHubCtrlClearTTBuffer (
 **/
 EFI_STATUS
 UsbHubCtrlGetHubDesc (
-  IN  USB_DEVICE          *HubDev,
-  OUT VOID                *Buf,
-  IN  UINTN               Len
+  IN  USB_DEVICE  *HubDev,
+  OUT VOID        *Buf,
+  IN  UINTN       Len
   )
 {
-  EFI_STATUS              Status;
-  UINT8                   DescType;
+  EFI_STATUS  Status;
+  UINT8       DescType;
 
   DescType = (HubDev->Speed == EFI_USB_SPEED_SUPER) ?
              USB_DESC_TYPE_HUB_SUPER_SPEED :
@@ -225,7 +224,7 @@ UsbHubCtrlGetHubDesc (
              USB_REQ_TYPE_CLASS,
              USB_HUB_TARGET_HUB,
              USB_HUB_REQ_GET_DESC,
-             (UINT16) (DescType << 8),
+             (UINT16)(DescType << 8),
              0,
              Buf,
              Len
@@ -233,7 +232,6 @@ UsbHubCtrlGetHubDesc (
 
   return Status;
 }
-
 
 /**
   Usb hub control transfer to get the hub status.
@@ -247,11 +245,11 @@ UsbHubCtrlGetHubDesc (
 **/
 EFI_STATUS
 UsbHubCtrlGetHubStatus (
-  IN  USB_DEVICE          *HubDev,
-  OUT UINT32              *State
+  IN  USB_DEVICE  *HubDev,
+  OUT UINT32      *State
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   Status = UsbCtrlRequest (
              HubDev,
@@ -267,7 +265,6 @@ UsbHubCtrlGetHubStatus (
 
   return Status;
 }
-
 
 /**
   Usb hub control transfer to get the port status.
@@ -282,12 +279,12 @@ UsbHubCtrlGetHubStatus (
 **/
 EFI_STATUS
 UsbHubCtrlGetPortStatus (
-  IN  USB_DEVICE          *HubDev,
-  IN  UINT8               Port,
-  OUT VOID                *State
+  IN  USB_DEVICE  *HubDev,
+  IN  UINT8       Port,
+  OUT VOID        *State
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   //
   // In USB bus, all the port index starts from 0. But HUB
@@ -302,14 +299,13 @@ UsbHubCtrlGetPortStatus (
              USB_HUB_TARGET_PORT,
              USB_HUB_REQ_GET_STATUS,
              0,
-             (UINT16) (Port + 1),
+             (UINT16)(Port + 1),
              State,
              4
              );
 
   return Status;
 }
-
 
 /**
   Usb hub control transfer to set the port feature.
@@ -324,12 +320,12 @@ UsbHubCtrlGetPortStatus (
 **/
 EFI_STATUS
 UsbHubCtrlSetPortFeature (
-  IN USB_DEVICE           *HubDev,
-  IN UINT8                Port,
-  IN UINT8                Feature
+  IN USB_DEVICE  *HubDev,
+  IN UINT8       Port,
+  IN UINT8       Feature
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   //
   // In USB bus, all the port index starts from 0. But HUB
@@ -342,14 +338,13 @@ UsbHubCtrlSetPortFeature (
              USB_HUB_TARGET_PORT,
              USB_HUB_REQ_SET_FEATURE,
              Feature,
-             (UINT16) (Port + 1),
+             (UINT16)(Port + 1),
              NULL,
              0
              );
 
   return Status;
 }
-
 
 /**
   Read the whole usb hub descriptor. It is necessary
@@ -369,7 +364,7 @@ UsbHubReadDesc (
   OUT EFI_USB_HUB_DESCRIPTOR  *HubDesc
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   //
   // First get the hub descriptor length
@@ -386,8 +381,6 @@ UsbHubReadDesc (
   return UsbHubCtrlGetHubDesc (HubDev, HubDesc, HubDesc->Length);
 }
 
-
-
 /**
   Ack the hub change bits. If these bits are not ACKed, Hub will
   always return changed bit map from its interrupt endpoint.
@@ -400,13 +393,13 @@ UsbHubReadDesc (
 **/
 EFI_STATUS
 UsbHubAckHubStatus (
-  IN  USB_DEVICE         *HubDev
+  IN  USB_DEVICE  *HubDev
   )
 {
-  EFI_USB_PORT_STATUS     HubState;
-  EFI_STATUS              Status;
+  EFI_USB_PORT_STATUS  HubState;
+  EFI_STATUS           Status;
 
-  Status = UsbHubCtrlGetHubStatus (HubDev, (UINT32 *) &HubState);
+  Status = UsbHubCtrlGetHubStatus (HubDev, (UINT32 *)&HubState);
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -423,7 +416,6 @@ UsbHubAckHubStatus (
   return EFI_SUCCESS;
 }
 
-
 /**
   Test whether the interface is a hub interface.
 
@@ -435,7 +427,7 @@ UsbHubAckHubStatus (
 **/
 BOOLEAN
 UsbIsHubInterface (
-  IN USB_INTERFACE        *UsbIf
+  IN USB_INTERFACE  *UsbIf
   )
 {
   EFI_USB_INTERFACE_DESCRIPTOR  *Setting;
@@ -447,14 +439,13 @@ UsbIsHubInterface (
   Setting = &UsbIf->IfSetting->Desc;
 
   if ((Setting->InterfaceClass == USB_HUB_CLASS_CODE) &&
-      (Setting->InterfaceSubClass == USB_HUB_SUBCLASS_CODE)) {
-
+      (Setting->InterfaceSubClass == USB_HUB_SUBCLASS_CODE))
+  {
     return TRUE;
   }
 
   return FALSE;
 }
-
 
 /**
   The callback function to the USB hub status change
@@ -473,20 +464,20 @@ UsbIsHubInterface (
 EFI_STATUS
 EFIAPI
 UsbOnHubInterrupt (
-  IN  VOID                *Data,
-  IN  UINTN               DataLength,
-  IN  VOID                *Context,
-  IN  UINT32              Result
+  IN  VOID    *Data,
+  IN  UINTN   DataLength,
+  IN  VOID    *Context,
+  IN  UINT32  Result
   )
 {
-  USB_INTERFACE               *HubIf;
-  EFI_USB_IO_PROTOCOL         *UsbIo;
-  EFI_USB_ENDPOINT_DESCRIPTOR *EpDesc;
-  EFI_STATUS                  Status;
+  USB_INTERFACE                *HubIf;
+  EFI_USB_IO_PROTOCOL          *UsbIo;
+  EFI_USB_ENDPOINT_DESCRIPTOR  *EpDesc;
+  EFI_STATUS                   Status;
 
-  HubIf   = (USB_INTERFACE *) Context;
-  UsbIo   = &(HubIf->UsbIo);
-  EpDesc  = &(HubIf->HubEp->Desc);
+  HubIf  = (USB_INTERFACE *)Context;
+  UsbIo  = &(HubIf->UsbIo);
+  EpDesc = &(HubIf->HubEp->Desc);
 
   if (Result != EFI_USB_NOERROR) {
     //
@@ -516,7 +507,7 @@ UsbOnHubInterrupt (
                       );
 
     if (EFI_ERROR (Status)) {
-      DEBUG (( EFI_D_ERROR, "UsbOnHubInterrupt: failed to remove async transfer - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "UsbOnHubInterrupt: failed to remove async transfer - %r\n", Status));
       return Status;
     }
 
@@ -531,7 +522,7 @@ UsbOnHubInterrupt (
                       );
 
     if (EFI_ERROR (Status)) {
-      DEBUG (( EFI_D_ERROR, "UsbOnHubInterrupt: failed to submit new async transfer - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "UsbOnHubInterrupt: failed to submit new async transfer - %r\n", Status));
     }
 
     return Status;
@@ -559,9 +550,6 @@ UsbOnHubInterrupt (
   return EFI_SUCCESS;
 }
 
-
-
-
 /**
   Initialize the device for a non-root hub.
 
@@ -573,7 +561,7 @@ UsbOnHubInterrupt (
 **/
 EFI_STATUS
 UsbHubInit (
-  IN USB_INTERFACE        *HubIf
+  IN USB_INTERFACE  *HubIf
   )
 {
   UINT8                   HubDescBuffer[256];
@@ -590,11 +578,11 @@ UsbHubInit (
   //
   // Locate the interrupt endpoint for port change map
   //
-  HubIf->IsHub  = FALSE;
-  Setting       = HubIf->IfSetting;
-  HubDev        = HubIf->Device;
-  EpDesc        = NULL;
-  NumEndpoints  = Setting->Desc.NumEndpoints;
+  HubIf->IsHub = FALSE;
+  Setting      = HubIf->IfSetting;
+  HubDev       = HubIf->Device;
+  EpDesc       = NULL;
+  NumEndpoints = Setting->Desc.NumEndpoints;
 
   for (Index = 0; Index < NumEndpoints; Index++) {
     ASSERT ((Setting->Endpoints != NULL) && (Setting->Endpoints[Index] != NULL));
@@ -602,13 +590,14 @@ UsbHubInit (
     EpDesc = Setting->Endpoints[Index];
 
     if (USB_BIT_IS_SET (EpDesc->Desc.EndpointAddress, USB_ENDPOINT_DIR_IN) &&
-       (USB_ENDPOINT_TYPE (&EpDesc->Desc) == USB_ENDPOINT_INTERRUPT)) {
+        (USB_ENDPOINT_TYPE (&EpDesc->Desc) == USB_ENDPOINT_INTERRUPT))
+    {
       break;
     }
   }
 
   if (Index == NumEndpoints) {
-    DEBUG (( EFI_D_ERROR, "UsbHubInit: no interrupt endpoint found for hub %d\n", HubDev->Address));
+    DEBUG ((DEBUG_ERROR, "UsbHubInit: no interrupt endpoint found for hub %d\n", HubDev->Address));
     return EFI_DEVICE_ERROR;
   }
 
@@ -616,17 +605,17 @@ UsbHubInit (
   // The length field of descriptor is UINT8 type, so the buffer
   // with 256 bytes is enough to hold the descriptor data.
   //
-  HubDesc = (EFI_USB_HUB_DESCRIPTOR *) HubDescBuffer;
-  Status = UsbHubReadDesc (HubDev, HubDesc);
+  HubDesc = (EFI_USB_HUB_DESCRIPTOR *)HubDescBuffer;
+  Status  = UsbHubReadDesc (HubDev, HubDesc);
 
   if (EFI_ERROR (Status)) {
-    DEBUG (( EFI_D_ERROR, "UsbHubInit: failed to read HUB descriptor %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbHubInit: failed to read HUB descriptor %r\n", Status));
     return Status;
   }
 
   HubIf->NumOfPort = HubDesc->NumPorts;
 
-  DEBUG (( EFI_D_INFO, "UsbHubInit: hub %d has %d ports\n", HubDev->Address,HubIf->NumOfPort));
+  DEBUG ((DEBUG_INFO, "UsbHubInit: hub %d has %d ports\n", HubDev->Address, HubIf->NumOfPort));
 
   //
   // OK, set IsHub to TRUE. Now usb bus can handle this device
@@ -640,7 +629,7 @@ UsbHubInit (
 
   if (HubIf->Device->Speed == EFI_USB_SPEED_SUPER) {
     Depth = (UINT16)(HubIf->Device->Tier - 1);
-    DEBUG ((EFI_D_INFO, "UsbHubInit: Set Hub Depth as 0x%x\n", Depth));
+    DEBUG ((DEBUG_INFO, "UsbHubInit: Set Hub Depth as 0x%x\n", Depth));
     UsbHubCtrlSetHubDepth (HubIf->Device, Depth);
 
     for (Index = 0; Index < HubDesc->NumPorts; Index++) {
@@ -652,7 +641,7 @@ UsbHubInit (
     // for both gang/individual powered hubs.
     //
     for (Index = 0; Index < HubDesc->NumPorts; Index++) {
-      UsbHubCtrlSetPortFeature (HubIf->Device, Index, (EFI_USB_PORT_FEATURE) USB_HUB_PORT_POWER);
+      UsbHubCtrlSetPortFeature (HubIf->Device, Index, (EFI_USB_PORT_FEATURE)USB_HUB_PORT_POWER);
     }
 
     //
@@ -661,6 +650,7 @@ UsbHubInit (
     if (HubDesc->PwrOn2PwrGood > 0) {
       gBS->Stall (HubDesc->PwrOn2PwrGood * USB_SET_PORT_POWER_STALL);
     }
+
     UsbHubAckHubStatus (HubIf->Device);
   }
 
@@ -676,8 +666,12 @@ UsbHubInit (
                   );
 
   if (EFI_ERROR (Status)) {
-    DEBUG (( EFI_D_ERROR, "UsbHubInit: failed to create signal for hub %d - %r\n",
-                HubDev->Address, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "UsbHubInit: failed to create signal for hub %d - %r\n",
+      HubDev->Address,
+      Status
+      ));
 
     return Status;
   }
@@ -701,8 +695,12 @@ UsbHubInit (
                     );
 
   if (EFI_ERROR (Status)) {
-    DEBUG (( EFI_D_ERROR, "UsbHubInit: failed to queue interrupt transfer for hub %d - %r\n",
-                HubDev->Address, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "UsbHubInit: failed to queue interrupt transfer for hub %d - %r\n",
+      HubDev->Address,
+      Status
+      ));
 
     gBS->CloseEvent (HubIf->HubNotify);
     HubIf->HubNotify = NULL;
@@ -710,11 +708,9 @@ UsbHubInit (
     return Status;
   }
 
-  DEBUG (( EFI_D_INFO, "UsbHubInit: hub %d initialized\n", HubDev->Address));
+  DEBUG ((DEBUG_INFO, "UsbHubInit: hub %d initialized\n", HubDev->Address));
   return Status;
 }
-
-
 
 /**
   Get the port status. This function is required to
@@ -732,19 +728,17 @@ UsbHubInit (
 **/
 EFI_STATUS
 UsbHubGetPortStatus (
-  IN  USB_INTERFACE       *HubIf,
-  IN  UINT8               Port,
-  OUT EFI_USB_PORT_STATUS *PortState
+  IN  USB_INTERFACE        *HubIf,
+  IN  UINT8                Port,
+  OUT EFI_USB_PORT_STATUS  *PortState
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
-  Status  = UsbHubCtrlGetPortStatus (HubIf->Device, Port, PortState);
+  Status = UsbHubCtrlGetPortStatus (HubIf->Device, Port, PortState);
 
   return Status;
 }
-
-
 
 /**
   Clear the port change status.
@@ -755,8 +749,8 @@ UsbHubGetPortStatus (
 **/
 VOID
 UsbHubClearPortChange (
-  IN USB_INTERFACE        *HubIf,
-  IN UINT8                Port
+  IN USB_INTERFACE  *HubIf,
+  IN UINT8          Port
   )
 {
   EFI_USB_PORT_STATUS     PortState;
@@ -780,12 +774,10 @@ UsbHubClearPortChange (
     Map = &mHubFeatureMap[Index];
 
     if (USB_BIT_IS_SET (PortState.PortChangeStatus, Map->ChangedBit)) {
-      UsbHubCtrlClearPortFeature (HubIf->Device, Port, (UINT16) Map->Feature);
+      UsbHubCtrlClearPortFeature (HubIf->Device, Port, (UINT16)Map->Feature);
     }
   }
 }
-
-
 
 /**
   Function to set the port feature for non-root hub.
@@ -800,18 +792,17 @@ UsbHubClearPortChange (
 **/
 EFI_STATUS
 UsbHubSetPortFeature (
-  IN USB_INTERFACE        *HubIf,
-  IN UINT8                Port,
-  IN EFI_USB_PORT_FEATURE Feature
+  IN USB_INTERFACE         *HubIf,
+  IN UINT8                 Port,
+  IN EFI_USB_PORT_FEATURE  Feature
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
-  Status = UsbHubCtrlSetPortFeature (HubIf->Device, Port, (UINT8) Feature);
+  Status = UsbHubCtrlSetPortFeature (HubIf->Device, Port, (UINT8)Feature);
 
   return Status;
 }
-
 
 /**
   Interface function to clear the port feature for non-root hub.
@@ -826,18 +817,17 @@ UsbHubSetPortFeature (
 **/
 EFI_STATUS
 UsbHubClearPortFeature (
-  IN USB_INTERFACE        *HubIf,
-  IN UINT8                Port,
-  IN EFI_USB_PORT_FEATURE Feature
+  IN USB_INTERFACE         *HubIf,
+  IN UINT8                 Port,
+  IN EFI_USB_PORT_FEATURE  Feature
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
-  Status = UsbHubCtrlClearPortFeature (HubIf->Device, Port, (UINT8) Feature);
+  Status = UsbHubCtrlClearPortFeature (HubIf->Device, Port, (UINT8)Feature);
 
   return Status;
 }
-
 
 /**
   Interface function to reset the port.
@@ -852,15 +842,15 @@ UsbHubClearPortFeature (
 **/
 EFI_STATUS
 UsbHubResetPort (
-  IN USB_INTERFACE        *HubIf,
-  IN UINT8                Port
+  IN USB_INTERFACE  *HubIf,
+  IN UINT8          Port
   )
 {
-  EFI_USB_PORT_STATUS     PortState;
-  UINTN                   Index;
-  EFI_STATUS              Status;
+  EFI_USB_PORT_STATUS  PortState;
+  UINTN                Index;
+  EFI_STATUS           Status;
 
-  Status  = UsbHubSetPortFeature (HubIf, Port, (EFI_USB_PORT_FEATURE) USB_HUB_PORT_RESET);
+  Status = UsbHubSetPortFeature (HubIf, Port, (EFI_USB_PORT_FEATURE)USB_HUB_PORT_RESET);
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -885,7 +875,8 @@ UsbHubResetPort (
     }
 
     if (!EFI_ERROR (Status) &&
-        USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_RESET)) {
+        USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_RESET))
+    {
       gBS->Stall (USB_SET_PORT_RECOVERY_STALL);
       return EFI_SUCCESS;
     }
@@ -895,7 +886,6 @@ UsbHubResetPort (
 
   return EFI_TIMEOUT;
 }
-
 
 /**
   Release the hub's control of the interface.
@@ -907,11 +897,11 @@ UsbHubResetPort (
 **/
 EFI_STATUS
 UsbHubRelease (
-  IN USB_INTERFACE        *HubIf
+  IN USB_INTERFACE  *HubIf
   )
 {
-  EFI_USB_IO_PROTOCOL     *UsbIo;
-  EFI_STATUS              Status;
+  EFI_USB_IO_PROTOCOL  *UsbIo;
+  EFI_STATUS           Status;
 
   UsbIo  = &HubIf->UsbIo;
   Status = UsbIo->UsbAsyncInterruptTransfer (
@@ -930,16 +920,14 @@ UsbHubRelease (
 
   gBS->CloseEvent (HubIf->HubNotify);
 
-  HubIf->IsHub      = FALSE;
-  HubIf->HubApi     = NULL;
-  HubIf->HubEp      = NULL;
-  HubIf->HubNotify  = NULL;
+  HubIf->IsHub     = FALSE;
+  HubIf->HubApi    = NULL;
+  HubIf->HubEp     = NULL;
+  HubIf->HubNotify = NULL;
 
-  DEBUG (( EFI_D_INFO, "UsbHubRelease: hub device %d released\n", HubIf->Device->Address));
+  DEBUG ((DEBUG_INFO, "UsbHubRelease: hub device %d released\n", HubIf->Device->Address));
   return EFI_SUCCESS;
 }
-
-
 
 /**
   Initialize the interface for root hub.
@@ -952,13 +940,13 @@ UsbHubRelease (
 **/
 EFI_STATUS
 UsbRootHubInit (
-  IN USB_INTERFACE        *HubIf
+  IN USB_INTERFACE  *HubIf
   )
 {
-  EFI_STATUS              Status;
-  UINT8                   MaxSpeed;
-  UINT8                   NumOfPort;
-  UINT8                   Support64;
+  EFI_STATUS  Status;
+  UINT8       MaxSpeed;
+  UINT8       NumOfPort;
+  UINT8       Support64;
 
   Status = UsbHcGetCapability (HubIf->Device->Bus, &MaxSpeed, &NumOfPort, &Support64);
 
@@ -966,15 +954,20 @@ UsbRootHubInit (
     return Status;
   }
 
-  DEBUG (( EFI_D_INFO, "UsbRootHubInit: root hub %p - max speed %d, %d ports\n",
-              HubIf, MaxSpeed, NumOfPort));
+  DEBUG ((
+    DEBUG_INFO,
+    "UsbRootHubInit: root hub %p - max speed %d, %d ports\n",
+    HubIf,
+    MaxSpeed,
+    NumOfPort
+    ));
 
-  HubIf->IsHub      = TRUE;
-  HubIf->HubApi     = &mUsbRootHubApi;
-  HubIf->HubEp      = NULL;
-  HubIf->MaxSpeed   = MaxSpeed;
-  HubIf->NumOfPort  = NumOfPort;
-  HubIf->HubNotify  = NULL;
+  HubIf->IsHub     = TRUE;
+  HubIf->HubApi    = &mUsbRootHubApi;
+  HubIf->HubEp     = NULL;
+  HubIf->MaxSpeed  = MaxSpeed;
+  HubIf->NumOfPort = NumOfPort;
+  HubIf->HubNotify = NULL;
 
   //
   // Create a timer to poll root hub ports periodically
@@ -1010,7 +1003,6 @@ UsbRootHubInit (
   return Status;
 }
 
-
 /**
   Get the port status. This function is required to
   ACK the port change bits although it will return
@@ -1027,20 +1019,19 @@ UsbRootHubInit (
 **/
 EFI_STATUS
 UsbRootHubGetPortStatus (
-  IN  USB_INTERFACE       *HubIf,
-  IN  UINT8               Port,
-  OUT EFI_USB_PORT_STATUS *PortState
+  IN  USB_INTERFACE        *HubIf,
+  IN  UINT8                Port,
+  OUT EFI_USB_PORT_STATUS  *PortState
   )
 {
-  USB_BUS                 *Bus;
-  EFI_STATUS              Status;
+  USB_BUS     *Bus;
+  EFI_STATUS  Status;
 
-  Bus     = HubIf->Device->Bus;
-  Status  = UsbHcGetRootHubPortStatus (Bus, Port, PortState);
+  Bus    = HubIf->Device->Bus;
+  Status = UsbHcGetRootHubPortStatus (Bus, Port, PortState);
 
   return Status;
 }
-
 
 /**
   Clear the port change status.
@@ -1051,8 +1042,8 @@ UsbRootHubGetPortStatus (
 **/
 VOID
 UsbRootHubClearPortChange (
-  IN USB_INTERFACE        *HubIf,
-  IN UINT8                Port
+  IN USB_INTERFACE  *HubIf,
+  IN UINT8          Port
   )
 {
   EFI_USB_PORT_STATUS     PortState;
@@ -1076,11 +1067,10 @@ UsbRootHubClearPortChange (
     Map = &mRootHubFeatureMap[Index];
 
     if (USB_BIT_IS_SET (PortState.PortChangeStatus, Map->ChangedBit)) {
-      UsbHcClearRootHubPortFeature (HubIf->Device->Bus, Port, (EFI_USB_PORT_FEATURE) Map->Feature);
+      UsbHcClearRootHubPortFeature (HubIf->Device->Bus, Port, (EFI_USB_PORT_FEATURE)Map->Feature);
     }
   }
 }
-
 
 /**
   Set the root hub port feature.
@@ -1095,18 +1085,17 @@ UsbRootHubClearPortChange (
 **/
 EFI_STATUS
 UsbRootHubSetPortFeature (
-  IN USB_INTERFACE        *HubIf,
-  IN UINT8                Port,
-  IN EFI_USB_PORT_FEATURE Feature
+  IN USB_INTERFACE         *HubIf,
+  IN UINT8                 Port,
+  IN EFI_USB_PORT_FEATURE  Feature
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
-  Status  = UsbHcSetRootHubPortFeature (HubIf->Device->Bus, Port, Feature);
+  Status = UsbHcSetRootHubPortFeature (HubIf->Device->Bus, Port, Feature);
 
   return Status;
 }
-
 
 /**
   Clear the root hub port feature.
@@ -1121,18 +1110,17 @@ UsbRootHubSetPortFeature (
 **/
 EFI_STATUS
 UsbRootHubClearPortFeature (
-  IN USB_INTERFACE        *HubIf,
-  IN UINT8                Port,
-  IN EFI_USB_PORT_FEATURE Feature
+  IN USB_INTERFACE         *HubIf,
+  IN UINT8                 Port,
+  IN EFI_USB_PORT_FEATURE  Feature
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
-  Status  = UsbHcClearRootHubPortFeature (HubIf->Device->Bus, Port, Feature);
+  Status = UsbHcClearRootHubPortFeature (HubIf->Device->Bus, Port, Feature);
 
   return Status;
 }
-
 
 /**
   Interface function to reset the root hub port.
@@ -1149,26 +1137,26 @@ UsbRootHubClearPortFeature (
 **/
 EFI_STATUS
 UsbRootHubResetPort (
-  IN USB_INTERFACE        *RootIf,
-  IN UINT8                Port
+  IN USB_INTERFACE  *RootIf,
+  IN UINT8          Port
   )
 {
-  USB_BUS                 *Bus;
-  EFI_STATUS              Status;
-  EFI_USB_PORT_STATUS     PortState;
-  UINTN                   Index;
+  USB_BUS              *Bus;
+  EFI_STATUS           Status;
+  EFI_USB_PORT_STATUS  PortState;
+  UINTN                Index;
 
   //
   // Notice: although EHCI requires that ENABLED bit be cleared
   // when reset the port, we don't need to care that here. It
   // should be handled in the EHCI driver.
   //
-  Bus     = RootIf->Device->Bus;
+  Bus = RootIf->Device->Bus;
 
-  Status  = UsbHcSetRootHubPortFeature (Bus, Port, EfiUsbPortReset);
+  Status = UsbHcSetRootHubPortFeature (Bus, Port, EfiUsbPortReset);
 
   if (EFI_ERROR (Status)) {
-    DEBUG (( EFI_D_ERROR, "UsbRootHubResetPort: failed to start reset on port %d\n", Port));
+    DEBUG ((DEBUG_ERROR, "UsbRootHubResetPort: failed to start reset on port %d\n", Port));
     return Status;
   }
 
@@ -1181,7 +1169,7 @@ UsbRootHubResetPort (
   Status = UsbHcClearRootHubPortFeature (Bus, Port, EfiUsbPortReset);
 
   if (EFI_ERROR (Status)) {
-    DEBUG (( EFI_D_ERROR, "UsbRootHubResetPort: failed to clear reset on port %d\n", Port));
+    DEBUG ((DEBUG_ERROR, "UsbRootHubResetPort: failed to clear reset on port %d\n", Port));
     return Status;
   }
 
@@ -1208,7 +1196,7 @@ UsbRootHubResetPort (
   }
 
   if (Index == USB_WAIT_PORT_STS_CHANGE_LOOP) {
-    DEBUG ((EFI_D_ERROR, "UsbRootHubResetPort: reset not finished in time on port %d\n", Port));
+    DEBUG ((DEBUG_ERROR, "UsbRootHubResetPort: reset not finished in time on port %d\n", Port));
     return EFI_TIMEOUT;
   }
 
@@ -1220,17 +1208,15 @@ UsbRootHubResetPort (
     // automatically enable the port, we need to enable it manually.
     //
     if (RootIf->MaxSpeed == EFI_USB_SPEED_HIGH) {
-      DEBUG (( EFI_D_ERROR, "UsbRootHubResetPort: release low/full speed device (%d) to UHCI\n", Port));
+      DEBUG ((DEBUG_ERROR, "UsbRootHubResetPort: release low/full speed device (%d) to UHCI\n", Port));
 
       UsbRootHubSetPortFeature (RootIf, Port, EfiUsbPortOwner);
       return EFI_NOT_FOUND;
-
     } else {
-
       Status = UsbRootHubSetPortFeature (RootIf, Port, EfiUsbPortEnable);
 
       if (EFI_ERROR (Status)) {
-        DEBUG (( EFI_D_ERROR, "UsbRootHubResetPort: failed to enable port %d for UHCI\n", Port));
+        DEBUG ((DEBUG_ERROR, "UsbRootHubResetPort: failed to enable port %d for UHCI\n", Port));
         return Status;
       }
 
@@ -1240,7 +1226,6 @@ UsbRootHubResetPort (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Release the root hub's control of the interface.
@@ -1253,10 +1238,10 @@ UsbRootHubResetPort (
 **/
 EFI_STATUS
 UsbRootHubRelease (
-  IN USB_INTERFACE        *HubIf
+  IN USB_INTERFACE  *HubIf
   )
 {
-  DEBUG (( EFI_D_INFO, "UsbRootHubRelease: root hub released for hub %p\n", HubIf));
+  DEBUG ((DEBUG_INFO, "UsbRootHubRelease: root hub released for hub %p\n", HubIf));
 
   gBS->SetTimer (HubIf->HubNotify, TimerCancel, USB_ROOTHUB_POLL_INTERVAL);
   gBS->CloseEvent (HubIf->HubNotify);
@@ -1264,7 +1249,7 @@ UsbRootHubRelease (
   return EFI_SUCCESS;
 }
 
-USB_HUB_API mUsbHubApi = {
+USB_HUB_API  mUsbHubApi = {
   UsbHubInit,
   UsbHubGetPortStatus,
   UsbHubClearPortChange,
@@ -1274,7 +1259,7 @@ USB_HUB_API mUsbHubApi = {
   UsbHubRelease
 };
 
-USB_HUB_API mUsbRootHubApi = {
+USB_HUB_API  mUsbRootHubApi = {
   UsbRootHubInit,
   UsbRootHubGetPortStatus,
   UsbRootHubClearPortChange,

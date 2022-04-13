@@ -51,12 +51,12 @@
 EFI_STATUS
 EFIAPI
 FpdtStatusCodeListenerPei (
-  IN CONST  EFI_PEI_SERVICES        **PeiServices,
-  IN        EFI_STATUS_CODE_TYPE    CodeType,
-  IN        EFI_STATUS_CODE_VALUE   Value,
-  IN        UINT32                  Instance,
-  IN CONST  EFI_GUID                *CallerId,
-  IN CONST  EFI_STATUS_CODE_DATA    *Data
+  IN CONST  EFI_PEI_SERVICES       **PeiServices,
+  IN        EFI_STATUS_CODE_TYPE   CodeType,
+  IN        EFI_STATUS_CODE_VALUE  Value,
+  IN        UINT32                 Instance,
+  IN CONST  EFI_GUID               *CallerId,
+  IN CONST  EFI_STATUS_CODE_DATA   *Data
   )
 {
   EFI_STATUS                           Status;
@@ -80,7 +80,8 @@ FpdtStatusCodeListenerPei (
   // Check whether status code is what we are interested in.
   //
   if (((CodeType & EFI_STATUS_CODE_TYPE_MASK) != EFI_PROGRESS_CODE) ||
-      (Value != (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_PC_OS_WAKE))) {
+      (Value != (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_PC_OS_WAKE)))
+  {
     return EFI_UNSUPPORTED;
   }
 
@@ -93,17 +94,18 @@ FpdtStatusCodeListenerPei (
   // Update S3 Resume Performance Record.
   //
   S3PerformanceTablePointer = 0;
-  VarSize = sizeof (EFI_PHYSICAL_ADDRESS);
-  Status = RestoreLockBox (&gFirmwarePerformanceS3PointerGuid, &S3PerformanceTablePointer, &VarSize);
+  VarSize                   = sizeof (EFI_PHYSICAL_ADDRESS);
+  Status                    = RestoreLockBox (&gFirmwarePerformanceS3PointerGuid, &S3PerformanceTablePointer, &VarSize);
   ASSERT_EFI_ERROR (Status);
 
-  AcpiS3PerformanceTable = (S3_PERFORMANCE_TABLE *) (UINTN) S3PerformanceTablePointer;
+  AcpiS3PerformanceTable = (S3_PERFORMANCE_TABLE *)(UINTN)S3PerformanceTablePointer;
   ASSERT (AcpiS3PerformanceTable != NULL);
   if (AcpiS3PerformanceTable->Header.Signature != EFI_ACPI_5_0_FPDT_S3_PERFORMANCE_TABLE_SIGNATURE) {
-    DEBUG ((EFI_D_ERROR, "FPDT S3 performance data in ACPI memory get corrupted\n"));
+    DEBUG ((DEBUG_ERROR, "FPDT S3 performance data in ACPI memory get corrupted\n"));
     return EFI_ABORTED;
   }
-  AcpiS3ResumeRecord = &AcpiS3PerformanceTable->S3Resume;
+
+  AcpiS3ResumeRecord             = &AcpiS3PerformanceTable->S3Resume;
   AcpiS3ResumeRecord->FullResume = CurrentTime;
   //
   // Calculate average S3 resume time.
@@ -112,15 +114,15 @@ FpdtStatusCodeListenerPei (
   AcpiS3ResumeRecord->ResumeCount++;
   AcpiS3ResumeRecord->AverageResume = DivU64x32 (S3ResumeTotal + AcpiS3ResumeRecord->FullResume, AcpiS3ResumeRecord->ResumeCount);
 
-  DEBUG ((EFI_D_INFO, "FPDT: S3 Resume Performance - ResumeCount   = %d\n", AcpiS3ResumeRecord->ResumeCount));
-  DEBUG ((EFI_D_INFO, "FPDT: S3 Resume Performance - FullResume    = %ld\n", AcpiS3ResumeRecord->FullResume));
-  DEBUG ((EFI_D_INFO, "FPDT: S3 Resume Performance - AverageResume = %ld\n", AcpiS3ResumeRecord->AverageResume));
+  DEBUG ((DEBUG_INFO, "FPDT: S3 Resume Performance - ResumeCount   = %d\n", AcpiS3ResumeRecord->ResumeCount));
+  DEBUG ((DEBUG_INFO, "FPDT: S3 Resume Performance - FullResume    = %ld\n", AcpiS3ResumeRecord->FullResume));
+  DEBUG ((DEBUG_INFO, "FPDT: S3 Resume Performance - AverageResume = %ld\n", AcpiS3ResumeRecord->AverageResume));
 
   //
   // Update S3 Suspend Performance Record.
   //
   AcpiS3SuspendRecord = &AcpiS3PerformanceTable->S3Suspend;
-  VarSize = sizeof (EFI_ACPI_5_0_FPDT_S3_SUSPEND_RECORD);
+  VarSize             = sizeof (EFI_ACPI_5_0_FPDT_S3_SUSPEND_RECORD);
   ZeroMem (&S3SuspendRecord, sizeof (EFI_ACPI_5_0_FPDT_S3_SUSPEND_RECORD));
   Status = RestoreLockBox (
              &gEfiFirmwarePerformanceGuid,
@@ -132,14 +134,14 @@ FpdtStatusCodeListenerPei (
   AcpiS3SuspendRecord->SuspendStart = S3SuspendRecord.SuspendStart;
   AcpiS3SuspendRecord->SuspendEnd   = S3SuspendRecord.SuspendEnd;
 
-  DEBUG ((EFI_D_INFO, "FPDT: S3 Suspend Performance - SuspendStart = %ld\n", AcpiS3SuspendRecord->SuspendStart));
-  DEBUG ((EFI_D_INFO, "FPDT: S3 Suspend Performance - SuspendEnd   = %ld\n", AcpiS3SuspendRecord->SuspendEnd));
+  DEBUG ((DEBUG_INFO, "FPDT: S3 Suspend Performance - SuspendStart = %ld\n", AcpiS3SuspendRecord->SuspendStart));
+  DEBUG ((DEBUG_INFO, "FPDT: S3 Suspend Performance - SuspendEnd   = %ld\n", AcpiS3SuspendRecord->SuspendEnd));
 
   Status = PeiServicesLocatePpi (
              &gEfiPeiReadOnlyVariable2PpiGuid,
              0,
              NULL,
-             (VOID **) &VariableServices
+             (VOID **)&VariableServices
              );
   ASSERT_EFI_ERROR (Status);
 
@@ -147,27 +149,28 @@ FpdtStatusCodeListenerPei (
   // Update S3 boot records into the basic boot performance table.
   //
   VarSize = sizeof (PerformanceVariable);
-  Status = VariableServices->GetVariable (
-                               VariableServices,
-                               EFI_FIRMWARE_PERFORMANCE_VARIABLE_NAME,
-                               &gEfiFirmwarePerformanceGuid,
-                               NULL,
-                               &VarSize,
-                               &PerformanceVariable
-                               );
+  Status  = VariableServices->GetVariable (
+                                VariableServices,
+                                EFI_FIRMWARE_PERFORMANCE_VARIABLE_NAME,
+                                &gEfiFirmwarePerformanceGuid,
+                                NULL,
+                                &VarSize,
+                                &PerformanceVariable
+                                );
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  BootPerformanceTable = (UINT8*) (UINTN) PerformanceVariable.BootPerformanceTablePointer;
+
+  BootPerformanceTable = (UINT8 *)(UINTN)PerformanceVariable.BootPerformanceTablePointer;
 
   //
   // Dump PEI boot records
   //
   FirmwarePerformanceTablePtr = (BootPerformanceTable + sizeof (BOOT_PERFORMANCE_TABLE));
-  GuidHob   = GetFirstGuidHob (&gEdkiiFpdtExtendedFirmwarePerformanceGuid);
+  GuidHob                     = GetFirstGuidHob (&gEdkiiFpdtExtendedFirmwarePerformanceGuid);
   while (GuidHob != NULL) {
     FirmwarePerformanceData = GET_GUID_HOB_DATA (GuidHob);
-    PeiPerformanceLogHeader = (FPDT_PEI_EXT_PERF_HEADER *) FirmwarePerformanceData;
+    PeiPerformanceLogHeader = (FPDT_PEI_EXT_PERF_HEADER *)FirmwarePerformanceData;
 
     CopyMem (FirmwarePerformanceTablePtr, FirmwarePerformanceData + sizeof (FPDT_PEI_EXT_PERF_HEADER), (UINTN)(PeiPerformanceLogHeader->SizeOfAllEntries));
 
@@ -179,7 +182,7 @@ FpdtStatusCodeListenerPei (
   //
   // Update Table length.
   //
-  ((BOOT_PERFORMANCE_TABLE *) BootPerformanceTable)->Header.Length = (UINT32)((UINTN)FirmwarePerformanceTablePtr - (UINTN)BootPerformanceTable);
+  ((BOOT_PERFORMANCE_TABLE *)BootPerformanceTable)->Header.Length = (UINT32)((UINTN)FirmwarePerformanceTablePtr - (UINTN)BootPerformanceTable);
 
   return EFI_SUCCESS;
 }
@@ -213,7 +216,7 @@ FirmwarePerformancePeiEntryPoint (
                &gEfiPeiRscHandlerPpiGuid,
                0,
                NULL,
-               (VOID **) &RscHandler
+               (VOID **)&RscHandler
                );
     ASSERT_EFI_ERROR (Status);
 

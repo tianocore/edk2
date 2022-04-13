@@ -19,10 +19,10 @@ EFI_HANDLE  mNewHandle = NULL;
 //
 // The times of calling UpdateCapsule ()
 //
-UINTN       mTimes      = 0;
+UINTN  mTimes = 0;
 
-UINT32      mMaxSizePopulateCapsule     = 0;
-UINT32      mMaxSizeNonPopulateCapsule  = 0;
+UINT32  mMaxSizePopulateCapsule    = 0;
+UINT32  mMaxSizeNonPopulateCapsule = 0;
 
 /**
   Passes capsules to the firmware with both virtual and physical mapping. Depending on the intended
@@ -58,24 +58,24 @@ UINT32      mMaxSizeNonPopulateCapsule  = 0;
 EFI_STATUS
 EFIAPI
 UpdateCapsule (
-  IN EFI_CAPSULE_HEADER      **CapsuleHeaderArray,
-  IN UINTN                   CapsuleCount,
-  IN EFI_PHYSICAL_ADDRESS    ScatterGatherList OPTIONAL
+  IN EFI_CAPSULE_HEADER    **CapsuleHeaderArray,
+  IN UINTN                 CapsuleCount,
+  IN EFI_PHYSICAL_ADDRESS  ScatterGatherList OPTIONAL
   )
 {
-  UINTN                     ArrayNumber;
-  EFI_STATUS                Status;
-  EFI_CAPSULE_HEADER        *CapsuleHeader;
-  BOOLEAN                   NeedReset;
-  BOOLEAN                   InitiateReset;
-  CHAR16                    CapsuleVarName[30];
-  CHAR16                    *TempVarName;
+  UINTN               ArrayNumber;
+  EFI_STATUS          Status;
+  EFI_CAPSULE_HEADER  *CapsuleHeader;
+  BOOLEAN             NeedReset;
+  BOOLEAN             InitiateReset;
+  CHAR16              CapsuleVarName[30];
+  CHAR16              *TempVarName;
 
   //
   // Check if platform support Capsule In RAM or not.
   // Platform could choose to drop CapsulePei/CapsuleX64 and do not support Capsule In RAM.
   //
-  if (!PcdGetBool(PcdCapsuleInRamSupport)) {
+  if (!PcdGetBool (PcdCapsuleInRamSupport)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -100,6 +100,7 @@ UpdateCapsule (
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
       return EFI_INVALID_PARAMETER;
     }
+
     //
     // A capsule which has the CAPSULE_FLAGS_INITIATE_RESET flag must have
     // CAPSULE_FLAGS_PERSIST_ACROSS_RESET set in its header as well.
@@ -111,9 +112,10 @@ UpdateCapsule (
     //
     // Check FMP capsule flag
     //
-    if (CompareGuid(&CapsuleHeader->CapsuleGuid, &gEfiFmpCapsuleGuid)
-     && (CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) != 0 ) {
-       return EFI_INVALID_PARAMETER;
+    if (  CompareGuid (&CapsuleHeader->CapsuleGuid, &gEfiFmpCapsuleGuid)
+       && ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) != 0))
+    {
+      return EFI_INVALID_PARAMETER;
     }
 
     //
@@ -121,7 +123,7 @@ UpdateCapsule (
     //
     if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
       Status = SupportCapsuleImage (CapsuleHeader);
-      if (EFI_ERROR(Status)) {
+      if (EFI_ERROR (Status)) {
         return Status;
       }
     }
@@ -131,7 +133,7 @@ UpdateCapsule (
   // Walk through all capsules, record whether there is a capsule needs reset
   // or initiate reset. And then process capsules which has no reset flag directly.
   //
-  for (ArrayNumber = 0; ArrayNumber < CapsuleCount ; ArrayNumber++) {
+  for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
     //
     // Here should be in the boot-time for non-reset capsule image
@@ -141,9 +143,10 @@ UpdateCapsule (
       if (EfiAtRuntime () && !FeaturePcdGet (PcdSupportProcessCapsuleAtRuntime)) {
         Status = EFI_OUT_OF_RESOURCES;
       } else {
-        Status = ProcessCapsuleImage(CapsuleHeader);
+        Status = ProcessCapsuleImage (CapsuleHeader);
       }
-      if (EFI_ERROR(Status)) {
+
+      if (EFI_ERROR (Status)) {
         return Status;
       }
     } else {
@@ -166,7 +169,7 @@ UpdateCapsule (
   // ScatterGatherList is only referenced if the capsules are defined to persist across
   // system reset.
   //
-  if (ScatterGatherList == (EFI_PHYSICAL_ADDRESS) (UINTN) NULL) {
+  if (ScatterGatherList == (EFI_PHYSICAL_ADDRESS)(UINTN)NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -183,7 +186,7 @@ UpdateCapsule (
   // Construct variable name CapsuleUpdateData, CapsuleUpdateData1, CapsuleUpdateData2...
   // if user calls UpdateCapsule multiple times.
   //
-  StrCpyS (CapsuleVarName, sizeof(CapsuleVarName)/sizeof(CHAR16), EFI_CAPSULE_VARIABLE_NAME);
+  StrCpyS (CapsuleVarName, sizeof (CapsuleVarName)/sizeof (CHAR16), EFI_CAPSULE_VARIABLE_NAME);
   TempVarName = CapsuleVarName + StrLen (CapsuleVarName);
   if (mTimes > 0) {
     UnicodeValueToStringS (
@@ -205,22 +208,23 @@ UpdateCapsule (
              &gEfiCapsuleVendorGuid,
              EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
              sizeof (UINTN),
-             (VOID *) &ScatterGatherList
+             (VOID *)&ScatterGatherList
              );
   if (!EFI_ERROR (Status)) {
-     //
-     // Variable has been set successfully, increase variable index.
-     //
-     mTimes++;
-     if(InitiateReset) {
-       //
-       // Firmware that encounters a capsule which has the CAPSULE_FLAGS_INITIATE_RESET Flag set in its header
-       // will initiate a reset of the platform which is compatible with the passed-in capsule request and will
-       // not return back to the caller.
-       //
-       EfiResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
-     }
+    //
+    // Variable has been set successfully, increase variable index.
+    //
+    mTimes++;
+    if (InitiateReset) {
+      //
+      // Firmware that encounters a capsule which has the CAPSULE_FLAGS_INITIATE_RESET Flag set in its header
+      // will initiate a reset of the platform which is compatible with the passed-in capsule request and will
+      // not return back to the caller.
+      //
+      EfiResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+    }
   }
+
   return Status;
 }
 
@@ -248,16 +252,16 @@ UpdateCapsule (
 EFI_STATUS
 EFIAPI
 QueryCapsuleCapabilities (
-  IN  EFI_CAPSULE_HEADER   **CapsuleHeaderArray,
-  IN  UINTN                CapsuleCount,
-  OUT UINT64               *MaxiumCapsuleSize,
-  OUT EFI_RESET_TYPE       *ResetType
+  IN  EFI_CAPSULE_HEADER  **CapsuleHeaderArray,
+  IN  UINTN               CapsuleCount,
+  OUT UINT64              *MaxiumCapsuleSize,
+  OUT EFI_RESET_TYPE      *ResetType
   )
 {
-  EFI_STATUS                Status;
-  UINTN                     ArrayNumber;
-  EFI_CAPSULE_HEADER        *CapsuleHeader;
-  BOOLEAN                   NeedReset;
+  EFI_STATUS          Status;
+  UINTN               ArrayNumber;
+  EFI_CAPSULE_HEADER  *CapsuleHeader;
+  BOOLEAN             NeedReset;
 
   //
   // Capsule Count can't be less than one.
@@ -269,7 +273,7 @@ QueryCapsuleCapabilities (
   //
   // Check whether input parameter is valid
   //
-  if ((MaxiumCapsuleSize == NULL) ||(ResetType == NULL)) {
+  if ((MaxiumCapsuleSize == NULL) || (ResetType == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -285,6 +289,7 @@ QueryCapsuleCapabilities (
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
       return EFI_INVALID_PARAMETER;
     }
+
     //
     // A capsule which has the CAPSULE_FLAGS_INITIATE_RESET flag must have
     // CAPSULE_FLAGS_PERSIST_ACROSS_RESET set in its header as well.
@@ -296,9 +301,10 @@ QueryCapsuleCapabilities (
     //
     // Check FMP capsule flag
     //
-    if (CompareGuid(&CapsuleHeader->CapsuleGuid, &gEfiFmpCapsuleGuid)
-     && (CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) != 0 ) {
-       return EFI_INVALID_PARAMETER;
+    if (  CompareGuid (&CapsuleHeader->CapsuleGuid, &gEfiFmpCapsuleGuid)
+       && ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) != 0))
+    {
+      return EFI_INVALID_PARAMETER;
     }
 
     //
@@ -306,7 +312,7 @@ QueryCapsuleCapabilities (
     //
     if ((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) {
       Status = SupportCapsuleImage (CapsuleHeader);
-      if (EFI_ERROR(Status)) {
+      if (EFI_ERROR (Status)) {
         return Status;
       }
     }
@@ -315,7 +321,7 @@ QueryCapsuleCapabilities (
   //
   // Find out whether there is any capsule defined to persist across system reset.
   //
-  for (ArrayNumber = 0; ArrayNumber < CapsuleCount ; ArrayNumber++) {
+  for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
     if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {
       NeedReset = TRUE;
@@ -325,24 +331,24 @@ QueryCapsuleCapabilities (
 
   if (NeedReset) {
     //
-    //Check if the platform supports update capsule across a system reset
+    // Check if the platform supports update capsule across a system reset
     //
     if (!IsPersistAcrossResetCapsuleSupported ()) {
       return EFI_UNSUPPORTED;
     }
-    *ResetType = EfiResetWarm;
-    *MaxiumCapsuleSize = (UINT64) mMaxSizePopulateCapsule;
+
+    *ResetType         = EfiResetWarm;
+    *MaxiumCapsuleSize = (UINT64)mMaxSizePopulateCapsule;
   } else {
     //
     // For non-reset capsule image.
     //
-    *ResetType = EfiResetCold;
-    *MaxiumCapsuleSize = (UINT64) mMaxSizeNonPopulateCapsule;
+    *ResetType         = EfiResetCold;
+    *MaxiumCapsuleSize = (UINT64)mMaxSizeNonPopulateCapsule;
   }
 
   return EFI_SUCCESS;
 }
-
 
 /**
 
@@ -357,14 +363,14 @@ QueryCapsuleCapabilities (
 EFI_STATUS
 EFIAPI
 CapsuleServiceInitialize (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
 
-  mMaxSizePopulateCapsule = PcdGet32(PcdMaxSizePopulateCapsule);
-  mMaxSizeNonPopulateCapsule = PcdGet32(PcdMaxSizeNonPopulateCapsule);
+  mMaxSizePopulateCapsule    = PcdGet32 (PcdMaxSizePopulateCapsule);
+  mMaxSizeNonPopulateCapsule = PcdGet32 (PcdMaxSizeNonPopulateCapsule);
 
   //
   // When PEI phase is IA32, DXE phase is X64, it is possible that capsule data are
@@ -378,8 +384,8 @@ CapsuleServiceInitialize (
   //
   // Install capsule runtime services into UEFI runtime service tables.
   //
-  gRT->UpdateCapsule                    = UpdateCapsule;
-  gRT->QueryCapsuleCapabilities         = QueryCapsuleCapabilities;
+  gRT->UpdateCapsule            = UpdateCapsule;
+  gRT->QueryCapsuleCapabilities = QueryCapsuleCapabilities;
 
   //
   // Install the Capsule Architectural Protocol on a new handle

@@ -97,7 +97,6 @@ GET_OBJECT_LIST (
   CM_ARM_DEVICE_HANDLE_PCI
   );
 
-
 /** Return the PCI Device information in BDF format
 
     PCI Bus Number - Max 256 busses (Bits 15:8 of BDF)
@@ -111,11 +110,12 @@ GET_OBJECT_LIST (
 STATIC
 UINT16
 GetBdf (
-  IN CONST CM_ARM_DEVICE_HANDLE_PCI  * DeviceHandlePci
+  IN CONST CM_ARM_DEVICE_HANDLE_PCI  *DeviceHandlePci
   )
 {
-  UINT16 Bdf;
-  Bdf = (UINT16)DeviceHandlePci->BusNumber << 8;
+  UINT16  Bdf;
+
+  Bdf  = (UINT16)DeviceHandlePci->BusNumber << 8;
   Bdf |= (DeviceHandlePci->DeviceNumber & 0x1F) << 3;
   Bdf |= DeviceHandlePci->FunctionNumber & 0x7;
   return Bdf;
@@ -136,35 +136,36 @@ GetBdf (
 STATIC
 EFI_STATUS
 AddGICCAffinity (
-  IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         * CONST CfgMgrProtocol,
-  IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER * CONST Srat,
+  IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
+  IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,
   IN CONST UINT32                                               GicCAffOffset,
-  IN CONST CM_ARM_GICC_INFO                             *       GicCInfo,
+  IN CONST CM_ARM_GICC_INFO                                     *GicCInfo,
   IN       UINT32                                               GicCCount
   )
 {
-  EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE        * GicCAff;
+  EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE  *GicCAff;
 
   ASSERT (Srat != NULL);
   ASSERT (GicCInfo != NULL);
 
-  GicCAff = (EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE *)((UINT8*)Srat +
-                    GicCAffOffset);
+  GicCAff = (EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE *)((UINT8 *)Srat +
+                                                     GicCAffOffset);
 
   while (GicCCount-- != 0) {
     DEBUG ((DEBUG_INFO, "SRAT: GicCAff = 0x%p\n", GicCAff));
 
-    GicCAff->Type = EFI_ACPI_6_3_GICC_AFFINITY;
-    GicCAff->Length = sizeof (EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE);
-    GicCAff->ProximityDomain = GicCInfo->ProximityDomain;
+    GicCAff->Type             = EFI_ACPI_6_3_GICC_AFFINITY;
+    GicCAff->Length           = sizeof (EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE);
+    GicCAff->ProximityDomain  = GicCInfo->ProximityDomain;
     GicCAff->AcpiProcessorUid = GicCInfo->AcpiProcessorUid;
-    GicCAff->Flags = GicCInfo->AffinityFlags;
-    GicCAff->ClockDomain = GicCInfo->ClockDomain;
+    GicCAff->Flags            = GicCInfo->AffinityFlags;
+    GicCAff->ClockDomain      = GicCInfo->ClockDomain;
 
     // Next
     GicCAff++;
     GicCInfo++;
   }// while
+
   return EFI_SUCCESS;
 }
 
@@ -183,35 +184,36 @@ AddGICCAffinity (
 STATIC
 EFI_STATUS
 AddGICItsAffinity (
-  IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         * CONST CfgMgrProtocol,
-  IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER * CONST Srat,
+  IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
+  IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,
   IN CONST UINT32                                               GicItsAffOffset,
-  IN CONST CM_ARM_GIC_ITS_INFO                          *       GicItsInfo,
+  IN CONST CM_ARM_GIC_ITS_INFO                                  *GicItsInfo,
   IN       UINT32                                               GicItsCount
   )
 {
-  EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE     * GicItsAff;
+  EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE  *GicItsAff;
 
   ASSERT (Srat != NULL);
   ASSERT (GicItsInfo != NULL);
 
-  GicItsAff = (EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE *)((UINT8*)Srat +
-                    GicItsAffOffset);
+  GicItsAff = (EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE *)((UINT8 *)Srat +
+                                                          GicItsAffOffset);
 
   while (GicItsCount-- != 0) {
     DEBUG ((DEBUG_INFO, "SRAT: GicItsAff = 0x%p\n", GicItsAff));
 
-    GicItsAff->Type = EFI_ACPI_6_3_GIC_ITS_AFFINITY;
-    GicItsAff->Length = sizeof (EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE);
+    GicItsAff->Type            = EFI_ACPI_6_3_GIC_ITS_AFFINITY;
+    GicItsAff->Length          = sizeof (EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE);
     GicItsAff->ProximityDomain = GicItsInfo->ProximityDomain;
-    GicItsAff->Reserved[0] = EFI_ACPI_RESERVED_BYTE;
-    GicItsAff->Reserved[1] = EFI_ACPI_RESERVED_BYTE;
-    GicItsAff->ItsId = GicItsInfo->GicItsId;
+    GicItsAff->Reserved[0]     = EFI_ACPI_RESERVED_BYTE;
+    GicItsAff->Reserved[1]     = EFI_ACPI_RESERVED_BYTE;
+    GicItsAff->ItsId           = GicItsInfo->GicItsId;
 
     // Next
     GicItsAff++;
     GicItsInfo++;
   }// while
+
   return EFI_SUCCESS;
 }
 
@@ -230,43 +232,43 @@ AddGICItsAffinity (
 STATIC
 EFI_STATUS
 AddMemoryAffinity (
-  IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         * CONST CfgMgrProtocol,
-  IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER * CONST Srat,
+  IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
+  IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,
   IN CONST UINT32                                               MemAffOffset,
-  IN CONST CM_ARM_MEMORY_AFFINITY_INFO                  *       MemAffInfo,
+  IN CONST CM_ARM_MEMORY_AFFINITY_INFO                          *MemAffInfo,
   IN       UINT32                                               MemAffCount
   )
 {
-  EFI_ACPI_6_3_MEMORY_AFFINITY_STRUCTURE      * MemAff;
+  EFI_ACPI_6_3_MEMORY_AFFINITY_STRUCTURE  *MemAff;
 
   ASSERT (Srat != NULL);
   ASSERT (MemAffInfo != NULL);
 
-  MemAff = (EFI_ACPI_6_3_MEMORY_AFFINITY_STRUCTURE *)((UINT8*)Srat +
-              MemAffOffset);
+  MemAff = (EFI_ACPI_6_3_MEMORY_AFFINITY_STRUCTURE *)((UINT8 *)Srat +
+                                                      MemAffOffset);
 
   while (MemAffCount-- != 0) {
     DEBUG ((DEBUG_INFO, "SRAT: MemAff = 0x%p\n", MemAff));
 
-    MemAff->Type = EFI_ACPI_6_3_MEMORY_AFFINITY;
-    MemAff->Length = sizeof (EFI_ACPI_6_3_MEMORY_AFFINITY_STRUCTURE);
+    MemAff->Type            = EFI_ACPI_6_3_MEMORY_AFFINITY;
+    MemAff->Length          = sizeof (EFI_ACPI_6_3_MEMORY_AFFINITY_STRUCTURE);
     MemAff->ProximityDomain = MemAffInfo->ProximityDomain;
-    MemAff->Reserved1 = EFI_ACPI_RESERVED_WORD;
-    MemAff->AddressBaseLow = (UINT32)(MemAffInfo->BaseAddress & MAX_UINT32);
+    MemAff->Reserved1       = EFI_ACPI_RESERVED_WORD;
+    MemAff->AddressBaseLow  = (UINT32)(MemAffInfo->BaseAddress & MAX_UINT32);
     MemAff->AddressBaseHigh = (UINT32)(MemAffInfo->BaseAddress >> 32);
-    MemAff->LengthLow = (UINT32)(MemAffInfo->Length & MAX_UINT32);
-    MemAff->LengthHigh = (UINT32)(MemAffInfo->Length >> 32);
-    MemAff->Reserved2 = EFI_ACPI_RESERVED_DWORD;
-    MemAff->Flags = MemAffInfo->Flags;
-    MemAff->Reserved3 = EFI_ACPI_RESERVED_QWORD;
+    MemAff->LengthLow       = (UINT32)(MemAffInfo->Length & MAX_UINT32);
+    MemAff->LengthHigh      = (UINT32)(MemAffInfo->Length >> 32);
+    MemAff->Reserved2       = EFI_ACPI_RESERVED_DWORD;
+    MemAff->Flags           = MemAffInfo->Flags;
+    MemAff->Reserved3       = EFI_ACPI_RESERVED_QWORD;
 
     // Next
     MemAff++;
     MemAffInfo++;
   }// while
+
   return EFI_SUCCESS;
 }
-
 
 /** Add the Generic Initiator Affinity Structures in the SRAT Table.
 
@@ -290,34 +292,34 @@ AddMemoryAffinity (
 STATIC
 EFI_STATUS
 AddGenericInitiatorAffinity (
-  IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         * CONST CfgMgrProtocol,
-  IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER * CONST Srat,
+  IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
+  IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,
   IN CONST UINT32                                               GenInitAffOff,
-  IN CONST CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO       *       GenInitAffInfo,
+  IN CONST CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO               *GenInitAffInfo,
   IN       UINT32                                               GenInitAffCount
   )
 {
-  EFI_STATUS                                               Status;
-  EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY_STRUCTURE      * GenInitAff;
-  CM_ARM_DEVICE_HANDLE_ACPI                              * DeviceHandleAcpi;
-  CM_ARM_DEVICE_HANDLE_PCI                               * DeviceHandlePci;
-  UINT32                                                   DeviceHandleCount;
+  EFI_STATUS                                         Status;
+  EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY_STRUCTURE  *GenInitAff;
+  CM_ARM_DEVICE_HANDLE_ACPI                          *DeviceHandleAcpi;
+  CM_ARM_DEVICE_HANDLE_PCI                           *DeviceHandlePci;
+  UINT32                                             DeviceHandleCount;
 
   ASSERT (Srat != NULL);
   ASSERT (GenInitAffInfo != NULL);
 
   GenInitAff = (EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY_STRUCTURE *)(
-                  (UINT8*)Srat + GenInitAffOff);
+                                                                     (UINT8 *)Srat + GenInitAffOff);
 
   while (GenInitAffCount-- != 0) {
     DEBUG ((DEBUG_INFO, "SRAT: GenInitAff = 0x%p\n", GenInitAff));
 
-    GenInitAff->Type = EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY;
+    GenInitAff->Type   = EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY;
     GenInitAff->Length =
       sizeof (EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY_STRUCTURE);
-    GenInitAff->Reserved1 = EFI_ACPI_RESERVED_WORD;
+    GenInitAff->Reserved1        = EFI_ACPI_RESERVED_WORD;
     GenInitAff->DeviceHandleType = GenInitAffInfo->DeviceHandleType;
-    GenInitAff->ProximityDomain = GenInitAffInfo->ProximityDomain;
+    GenInitAff->ProximityDomain  = GenInitAffInfo->ProximityDomain;
 
     if (GenInitAffInfo->DeviceHandleToken == CM_NULL_TOKEN) {
       DEBUG ((
@@ -351,14 +353,15 @@ AddGenericInitiatorAffinity (
       ASSERT (DeviceHandleCount == 1);
 
       // Populate the ACPI device handle information.
-      GenInitAff->DeviceHandle.Acpi.AcpiHid = DeviceHandleAcpi->Hid;
-      GenInitAff->DeviceHandle.Acpi.AcpiUid = DeviceHandleAcpi->Uid;
+      GenInitAff->DeviceHandle.Acpi.AcpiHid     = DeviceHandleAcpi->Hid;
+      GenInitAff->DeviceHandle.Acpi.AcpiUid     = DeviceHandleAcpi->Uid;
       GenInitAff->DeviceHandle.Acpi.Reserved[0] = EFI_ACPI_RESERVED_BYTE;
       GenInitAff->DeviceHandle.Acpi.Reserved[1] = EFI_ACPI_RESERVED_BYTE;
       GenInitAff->DeviceHandle.Acpi.Reserved[2] = EFI_ACPI_RESERVED_BYTE;
       GenInitAff->DeviceHandle.Acpi.Reserved[3] = EFI_ACPI_RESERVED_BYTE;
     } else if (GenInitAffInfo->DeviceHandleType ==
-               EFI_ACPI_6_3_PCI_DEVICE_HANDLE) {
+               EFI_ACPI_6_3_PCI_DEVICE_HANDLE)
+    {
       Status = GetEArmObjDeviceHandlePci (
                  CfgMgrProtocol,
                  GenInitAffInfo->DeviceHandleToken,
@@ -381,19 +384,19 @@ AddGenericInitiatorAffinity (
       ASSERT (DeviceHandleCount == 1);
 
       // Populate the ACPI device handle information.
-      GenInitAff->DeviceHandle.Pci.PciSegment = DeviceHandlePci->SegmentNumber;
+      GenInitAff->DeviceHandle.Pci.PciSegment   = DeviceHandlePci->SegmentNumber;
       GenInitAff->DeviceHandle.Pci.PciBdfNumber = GetBdf (DeviceHandlePci);
 
-      GenInitAff->DeviceHandle.Pci.Reserved[0] = EFI_ACPI_RESERVED_BYTE;
-      GenInitAff->DeviceHandle.Pci.Reserved[1] = EFI_ACPI_RESERVED_BYTE;
-      GenInitAff->DeviceHandle.Pci.Reserved[2] = EFI_ACPI_RESERVED_BYTE;
-      GenInitAff->DeviceHandle.Pci.Reserved[3] = EFI_ACPI_RESERVED_BYTE;
-      GenInitAff->DeviceHandle.Pci.Reserved[4] = EFI_ACPI_RESERVED_BYTE;
-      GenInitAff->DeviceHandle.Pci.Reserved[5] = EFI_ACPI_RESERVED_BYTE;
-      GenInitAff->DeviceHandle.Pci.Reserved[6] = EFI_ACPI_RESERVED_BYTE;
-      GenInitAff->DeviceHandle.Pci.Reserved[7] = EFI_ACPI_RESERVED_BYTE;
-      GenInitAff->DeviceHandle.Pci.Reserved[8] = EFI_ACPI_RESERVED_BYTE;
-      GenInitAff->DeviceHandle.Pci.Reserved[9] = EFI_ACPI_RESERVED_BYTE;
+      GenInitAff->DeviceHandle.Pci.Reserved[0]  = EFI_ACPI_RESERVED_BYTE;
+      GenInitAff->DeviceHandle.Pci.Reserved[1]  = EFI_ACPI_RESERVED_BYTE;
+      GenInitAff->DeviceHandle.Pci.Reserved[2]  = EFI_ACPI_RESERVED_BYTE;
+      GenInitAff->DeviceHandle.Pci.Reserved[3]  = EFI_ACPI_RESERVED_BYTE;
+      GenInitAff->DeviceHandle.Pci.Reserved[4]  = EFI_ACPI_RESERVED_BYTE;
+      GenInitAff->DeviceHandle.Pci.Reserved[5]  = EFI_ACPI_RESERVED_BYTE;
+      GenInitAff->DeviceHandle.Pci.Reserved[6]  = EFI_ACPI_RESERVED_BYTE;
+      GenInitAff->DeviceHandle.Pci.Reserved[7]  = EFI_ACPI_RESERVED_BYTE;
+      GenInitAff->DeviceHandle.Pci.Reserved[8]  = EFI_ACPI_RESERVED_BYTE;
+      GenInitAff->DeviceHandle.Pci.Reserved[9]  = EFI_ACPI_RESERVED_BYTE;
       GenInitAff->DeviceHandle.Pci.Reserved[10] = EFI_ACPI_RESERVED_BYTE;
       GenInitAff->DeviceHandle.Pci.Reserved[11] = EFI_ACPI_RESERVED_BYTE;
     } else {
@@ -405,7 +408,7 @@ AddGenericInitiatorAffinity (
       return EFI_INVALID_PARAMETER;
     }
 
-    GenInitAff->Flags = GenInitAffInfo->Flags;
+    GenInitAff->Flags        = GenInitAffInfo->Flags;
     GenInitAff->Reserved2[0] = EFI_ACPI_RESERVED_BYTE;
     GenInitAff->Reserved2[1] = EFI_ACPI_RESERVED_BYTE;
 
@@ -413,6 +416,7 @@ AddGenericInitiatorAffinity (
     GenInitAff++;
     GenInitAffInfo++;
   }// while
+
   return EFI_SUCCESS;
 }
 
@@ -443,10 +447,10 @@ STATIC
 EFI_STATUS
 EFIAPI
 BuildSratTable (
-  IN  CONST ACPI_TABLE_GENERATOR                  * CONST This,
-  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER          ** CONST Table
+  IN  CONST ACPI_TABLE_GENERATOR                  *CONST  This,
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
   EFI_STATUS  Status;
@@ -456,17 +460,17 @@ BuildSratTable (
   UINT32      MemAffCount;
   UINT32      GenInitiatorAffCount;
 
-  UINT32      GicCAffOffset;
-  UINT32      GicItsAffOffset;
-  UINT32      MemAffOffset;
-  UINT32      GenInitiatorAffOffset;
+  UINT32  GicCAffOffset;
+  UINT32  GicItsAffOffset;
+  UINT32  MemAffOffset;
+  UINT32  GenInitiatorAffOffset;
 
-  CM_ARM_GICC_INFO                        * GicCInfo;
-  CM_ARM_GIC_ITS_INFO                     * GicItsInfo;
-  CM_ARM_MEMORY_AFFINITY_INFO             * MemAffInfo;
-  CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO  * GenInitiatorAffInfo;
+  CM_ARM_GICC_INFO                        *GicCInfo;
+  CM_ARM_GIC_ITS_INFO                     *GicItsInfo;
+  CM_ARM_MEMORY_AFFINITY_INFO             *MemAffInfo;
+  CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO  *GenInitiatorAffInfo;
 
-  EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER * Srat;
+  EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER  *Srat;
 
   ASSERT (
     (This != NULL) &&
@@ -478,7 +482,8 @@ BuildSratTable (
     );
 
   if ((AcpiTableInfo->AcpiTableRevision < This->MinAcpiTableRevision) ||
-      (AcpiTableInfo->AcpiTableRevision > This->AcpiTableRevision)) {
+      (AcpiTableInfo->AcpiTableRevision > This->AcpiTableRevision))
+  {
     DEBUG ((
       DEBUG_ERROR,
       "ERROR: SRAT: Requested table revision = %d is not supported. "
@@ -567,28 +572,28 @@ BuildSratTable (
   TableSize = sizeof (EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER);
 
   GicCAffOffset = TableSize;
-  TableSize += (sizeof (EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE) * GicCCount);
+  TableSize    += (sizeof (EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE) * GicCCount);
 
   if (GicItsCount != 0) {
     GicItsAffOffset = TableSize;
-    TableSize += (sizeof (EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE) *
-                    GicItsCount);
+    TableSize      += (sizeof (EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE) *
+                       GicItsCount);
   }
 
   if (MemAffCount != 0) {
     MemAffOffset = TableSize;
-    TableSize += (sizeof (EFI_ACPI_6_3_MEMORY_AFFINITY_STRUCTURE) *
+    TableSize   += (sizeof (EFI_ACPI_6_3_MEMORY_AFFINITY_STRUCTURE) *
                     MemAffCount);
   }
 
   if (GenInitiatorAffCount != 0) {
     GenInitiatorAffOffset = TableSize;
-    TableSize += (sizeof (EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY_STRUCTURE) *
-                    GenInitiatorAffCount);
+    TableSize            += (sizeof (EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY_STRUCTURE) *
+                             GenInitiatorAffCount);
   }
 
   // Allocate the Buffer for SRAT table
-  *Table = (EFI_ACPI_DESCRIPTION_HEADER*)AllocateZeroPool (TableSize);
+  *Table = (EFI_ACPI_DESCRIPTION_HEADER *)AllocateZeroPool (TableSize);
   if (*Table == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     DEBUG ((
@@ -601,7 +606,7 @@ BuildSratTable (
     goto error_handler;
   }
 
-  Srat = (EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER*)*Table;
+  Srat = (EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *)*Table;
 
   DEBUG ((
     DEBUG_INFO,
@@ -649,12 +654,12 @@ BuildSratTable (
 
   if (GicItsCount != 0) {
     Status = AddGICItsAffinity (
-              CfgMgrProtocol,
-              Srat,
-              GicItsAffOffset,
-              GicItsInfo,
-              GicItsCount
-              );
+               CfgMgrProtocol,
+               Srat,
+               GicItsAffOffset,
+               GicItsInfo,
+               GicItsCount
+               );
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
@@ -667,12 +672,12 @@ BuildSratTable (
 
   if (MemAffCount != 0) {
     Status = AddMemoryAffinity (
-              CfgMgrProtocol,
-              Srat,
-              MemAffOffset,
-              MemAffInfo,
-              MemAffCount
-              );
+               CfgMgrProtocol,
+               Srat,
+               MemAffOffset,
+               MemAffInfo,
+               MemAffCount
+               );
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
@@ -685,12 +690,12 @@ BuildSratTable (
 
   if (GenInitiatorAffCount != 0) {
     Status = AddGenericInitiatorAffinity (
-              CfgMgrProtocol,
-              Srat,
-              GenInitiatorAffOffset,
-              GenInitiatorAffInfo,
-              GenInitiatorAffCount
-              );
+               CfgMgrProtocol,
+               Srat,
+               GenInitiatorAffOffset,
+               GenInitiatorAffInfo,
+               GenInitiatorAffCount
+               );
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
@@ -728,10 +733,10 @@ error_handler:
 STATIC
 EFI_STATUS
 FreeSratTableResources (
-  IN      CONST ACPI_TABLE_GENERATOR                  * CONST This,
-  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
-  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  IN OUT        EFI_ACPI_DESCRIPTION_HEADER          ** CONST Table
+  IN      CONST ACPI_TABLE_GENERATOR                  *CONST  This,
+  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN OUT        EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
   ASSERT (
@@ -755,13 +760,13 @@ FreeSratTableResources (
 
 /** The SRAT Table Generator revision.
 */
-#define SRAT_GENERATOR_REVISION CREATE_REVISION (1, 0)
+#define SRAT_GENERATOR_REVISION  CREATE_REVISION (1, 0)
 
 /** The interface for the SRAT Table Generator.
 */
 STATIC
 CONST
-ACPI_TABLE_GENERATOR SratGenerator = {
+ACPI_TABLE_GENERATOR  SratGenerator = {
   // Generator ID
   CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdSrat),
   // Generator Description
@@ -800,11 +805,12 @@ ACPI_TABLE_GENERATOR SratGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiSratLibConstructor (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *  SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
+
   Status = RegisterAcpiTableGenerator (&SratGenerator);
   DEBUG ((DEBUG_INFO, "SRAT: Register Generator. Status = %r\n", Status));
   ASSERT_EFI_ERROR (Status);
@@ -823,11 +829,12 @@ AcpiSratLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiSratLibDestructor (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *  SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
+
   Status = DeregisterAcpiTableGenerator (&SratGenerator);
   DEBUG ((DEBUG_INFO, "SRAT: Deregister Generator. Status = %r\n", Status));
   ASSERT_EFI_ERROR (Status);

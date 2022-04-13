@@ -13,7 +13,6 @@
 #include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
 
-
 /**
   Publish PEI & DXE (Decompressed) Memory based FVs to let PEI
   and DXE know about them.
@@ -26,7 +25,7 @@ PeiFvInitialization (
   VOID
   )
 {
-  BOOLEAN SecureS3Needed;
+  BOOLEAN  SecureS3Needed;
 
   DEBUG ((DEBUG_INFO, "Platform PEI Firmware Volume Initialization\n"));
 
@@ -38,7 +37,7 @@ PeiFvInitialization (
   BuildMemoryAllocationHob (
     PcdGet32 (PcdOvmfPeiMemFvBase),
     PcdGet32 (PcdOvmfPeiMemFvSize),
-    mS3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
+    mPlatformInfoHob.S3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
     );
 
   //
@@ -46,7 +45,7 @@ PeiFvInitialization (
   //
   BuildFvHob (PcdGet32 (PcdOvmfDxeMemFvBase), PcdGet32 (PcdOvmfDxeMemFvSize));
 
-  SecureS3Needed = mS3Supported && FeaturePcdGet (PcdSmmSmramRequire);
+  SecureS3Needed = mPlatformInfoHob.S3Supported && mPlatformInfoHob.SmmSmramRequire;
 
   //
   // Create a memory allocation HOB for the DXE FV.
@@ -67,7 +66,7 @@ PeiFvInitialization (
   // of DXEFV, so let's keep away the OS from there too.
   //
   if (SecureS3Needed) {
-    UINT32 DxeMemFvEnd;
+    UINT32  DxeMemFvEnd;
 
     DxeMemFvEnd = PcdGet32 (PcdOvmfDxeMemFvBase) +
                   PcdGet32 (PcdOvmfDxeMemFvSize);
@@ -83,7 +82,7 @@ PeiFvInitialization (
   //
   PeiServicesInstallFvInfoPpi (
     NULL,
-    (VOID *)(UINTN) PcdGet32 (PcdOvmfDxeMemFvBase),
+    (VOID *)(UINTN)PcdGet32 (PcdOvmfDxeMemFvBase),
     PcdGet32 (PcdOvmfDxeMemFvSize),
     NULL,
     NULL
@@ -91,4 +90,3 @@ PeiFvInitialization (
 
   return EFI_SUCCESS;
 }
-

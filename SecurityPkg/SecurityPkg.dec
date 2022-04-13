@@ -68,6 +68,10 @@
   #
   Tcg2PhysicalPresenceLib|Include/Library/Tcg2PhysicalPresenceLib.h
 
+  ##  @libraryclass  Handle TPM 2.0 platform hierarchy configuration
+  #
+  TpmPlatformHierarchyLib|Include/Library/TpmPlatformHierarchyLib.h
+
   ## @libraryclass  Provides interfaces about TCG storage generic command.
   #
   TcgStorageCoreLib|Include/Library/TcgStorageCoreLib.h
@@ -87,6 +91,14 @@
   ## @libraryclass  Provides interfaces about firmware TPM measurement.
   #
   TcgEventLogRecordLib|Include/Library/TcgEventLogRecordLib.h
+
+  ## @libraryclass  Provides helper functions related to creation/removal Secure Boot variables.
+  #
+  SecureBootVariableLib|Include/Library/SecureBootVariableLib.h
+
+  ## @libraryclass  Provides support to enroll Secure Boot keys.
+  #
+  SecureBootVariableProvisionLib|Include/Library/SecureBootVariableProvisionLib.h
 [Guids]
   ## Security package token space guid.
   # Include/Guid/SecurityPkgTokenSpace.h
@@ -190,6 +202,20 @@
   ## GUID used to enforce loading order between Tcg2Acpi and Tcg2Smm
   gTcg2MmSwSmiRegisteredGuid         = { 0x9d4548b9, 0xa48d, 0x4db4, { 0x9a, 0x68, 0x32, 0xc5, 0x13, 0x9e, 0x20, 0x18 } }
 
+  ## GUID used to specify section with default PK content
+  gDefaultPKFileGuid                 = { 0x85254ea7, 0x4759, 0x4fc4, { 0x82, 0xd4, 0x5e, 0xed, 0x5f, 0xb0, 0xa4, 0xa0 } }
+
+  ## GUID used to specify section with default KEK content
+  gDefaultKEKFileGuid                = { 0x6f64916e, 0x9f7a, 0x4c35, { 0xb9, 0x52, 0xcd, 0x04, 0x1e, 0xfb, 0x05, 0xa3 } }
+
+  ## GUID used to specify section with default db content
+  gDefaultdbFileGuid                 = { 0xc491d352, 0x7623, 0x4843, { 0xac, 0xcc, 0x27, 0x91, 0xa7, 0x57, 0x44, 0x21 } }
+
+  ## GUID used to specify section with default dbx content
+  gDefaultdbxFileGuid                = { 0x5740766a, 0x718e, 0x4dc0, { 0x99, 0x35, 0xc3, 0x6f, 0x7d, 0x3f, 0x88, 0x4f } }
+
+  ## GUID used to specify section with default dbt content
+  gDefaultdbtFileGuid                = { 0x36c513ee, 0xa338, 0x4976, { 0xa0, 0xfb, 0x6d, 0xdb, 0xa3, 0xda, 0xfe, 0x87 } }
 
 [Ppis]
   ## The PPI GUID for that TPM physical presence should be locked.
@@ -319,6 +345,12 @@
   #   FALSE - The platform operator is not physically present.<BR>
   # @Prompt Physical presence of the platform operator.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPhysicalPresence|TRUE|BOOLEAN|0x00010001
+
+  ## Indicates whether the TPM2 platform hierarchy will be disabled by using
+  #  a random password or by disabling the hierarchy
+  #   TRUE  - A random password will be used
+  #   FALSE - The hierarchy will be disabled
+  gEfiSecurityPkgTokenSpaceGuid.PcdRandomizePlatformHierarchy|TRUE|BOOLEAN|0x00010024
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Indicates whether TPM physical presence is locked during platform initialization.

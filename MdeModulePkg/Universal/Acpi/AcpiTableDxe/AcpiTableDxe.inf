@@ -4,7 +4,7 @@
 #  This driver initializes ACPI tables (Rsdp, Rsdt and Xsdt) and produces UEFI/PI
 #  services to install/uninstall/manage ACPI tables.
 #
-#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -51,10 +51,12 @@
   DebugLib
   BaseLib
   PcdLib
+  HobLib
 
 [Guids]
-  gEfiAcpi10TableGuid                           ## PRODUCES ## SystemTable
-  gEfiAcpiTableGuid                             ## PRODUCES ## SystemTable
+  gEfiAcpi10TableGuid                           ## PRODUCES           ## SystemTable
+  gEfiAcpiTableGuid                             ## PRODUCES           ## SystemTable
+  gUniversalPayloadAcpiTableGuid                ## SOMETIMES_CONSUMES ## HOB
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol  ## CONSUMES

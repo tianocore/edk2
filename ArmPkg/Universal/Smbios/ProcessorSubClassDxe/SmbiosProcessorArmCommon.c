@@ -2,16 +2,17 @@
   Functions for processor information common to ARM and AARCH64.
 
   Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
+  Copyright (c) 2021, Ampere Computing LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <Uefi.h>
+#include <IndustryStandard/ArmCache.h>
 #include <IndustryStandard/ArmStdSmc.h>
 #include <IndustryStandard/SmBios.h>
 #include <Library/ArmLib.h>
-#include <Library/ArmLib/ArmLibPrivate.h>
 #include <Library/ArmSmcLib.h>
 #include <Library/BaseMemoryLib.h>
 
@@ -26,9 +27,9 @@ SmbiosProcessorGetMaxCacheLevel (
   VOID
   )
 {
-  CLIDR_DATA Clidr;
-  UINT8      CacheLevel;
-  UINT8      MaxCacheLevel;
+  CLIDR_DATA  Clidr;
+  UINT8       CacheLevel;
+  UINT8       MaxCacheLevel;
 
   MaxCacheLevel = 0;
 
@@ -58,12 +59,12 @@ SmbiosProcessorGetMaxCacheLevel (
 **/
 BOOLEAN
 SmbiosProcessorHasSeparateCaches (
-  UINT8 CacheLevel
+  UINT8  CacheLevel
   )
 {
-  CLIDR_CACHE_TYPE CacheType;
-  CLIDR_DATA       Clidr;
-  BOOLEAN          SeparateCaches;
+  CLIDR_CACHE_TYPE  CacheType;
+  CLIDR_DATA        Clidr;
+  BOOLEAN           SeparateCaches;
 
   SeparateCaches = FALSE;
 
@@ -87,22 +88,18 @@ HasSmcArm64SocId (
   VOID
   )
 {
-  ARM_SMC_ARGS                   Args;
-  INT32                          SmcCallStatus;
-  BOOLEAN                        Arm64SocIdSupported;
+  INT32    SmcCallStatus;
+  BOOLEAN  Arm64SocIdSupported;
+  UINTN    SmcParam;
 
   Arm64SocIdSupported = FALSE;
 
-  Args.Arg0 = SMCCC_VERSION;
-  ArmCallSmc (&Args);
-  SmcCallStatus = (INT32)Args.Arg0;
+  SmcCallStatus = ArmCallSmc0 (SMCCC_VERSION, NULL, NULL, NULL);
 
-  if (SmcCallStatus < 0 || (SmcCallStatus >> 16) >= 1) {
-    Args.Arg0 = SMCCC_ARCH_FEATURES;
-    Args.Arg1 = SMCCC_ARCH_SOC_ID;
-    ArmCallSmc (&Args);
-
-    if (Args.Arg0 >= 0) {
+  if ((SmcCallStatus < 0) || ((SmcCallStatus >> 16) >= 1)) {
+    SmcParam      = SMCCC_ARCH_SOC_ID;
+    SmcCallStatus = ArmCallSmc1 (SMCCC_ARCH_FEATURES, &SmcParam, NULL, NULL);
+    if (SmcCallStatus >= 0) {
       Arm64SocIdSupported = TRUE;
     }
   }
@@ -120,34 +117,30 @@ HasSmcArm64SocId (
 **/
 EFI_STATUS
 SmbiosGetSmcArm64SocId (
-  OUT INT32 *Jep106Code,
-  OUT INT32 *SocRevision
+  OUT INT32  *Jep106Code,
+  OUT INT32  *SocRevision
   )
 {
-  ARM_SMC_ARGS  Args;
-  INT32         SmcCallStatus;
-  EFI_STATUS    Status;
+  INT32       SmcCallStatus;
+  EFI_STATUS  Status;
+  UINTN       SmcParam;
 
   Status = EFI_SUCCESS;
 
-  Args.Arg0 = SMCCC_ARCH_SOC_ID;
-  Args.Arg1 = 0;
-  ArmCallSmc (&Args);
-  SmcCallStatus = (INT32)Args.Arg0;
+  SmcParam      = 0;
+  SmcCallStatus = ArmCallSmc1 (SMCCC_ARCH_SOC_ID, &SmcParam, NULL, NULL);
 
   if (SmcCallStatus >= 0) {
-    *Jep106Code = (INT32)Args.Arg0;
+    *Jep106Code = (INT32)SmcParam;
   } else {
     Status = EFI_UNSUPPORTED;
   }
 
-  Args.Arg0 = SMCCC_ARCH_SOC_ID;
-  Args.Arg1 = 1;
-  ArmCallSmc (&Args);
-  SmcCallStatus = (INT32)Args.Arg0;
+  SmcParam      = 1;
+  SmcCallStatus = ArmCallSmc1 (SMCCC_ARCH_SOC_ID, &SmcParam, NULL, NULL);
 
   if (SmcCallStatus >= 0) {
-    *SocRevision = (INT32)Args.Arg0;
+    *SocRevision = (INT32)SmcParam;
   } else {
     Status = EFI_UNSUPPORTED;
   }
@@ -165,13 +158,13 @@ SmbiosGetProcessorId (
   VOID
   )
 {
-  INT32  Jep106Code;
-  INT32  SocRevision;
-  UINT64 ProcessorId;
+  INT32   Jep106Code;
+  INT32   SocRevision;
+  UINT64  ProcessorId;
 
   if (HasSmcArm64SocId ()) {
     SmbiosGetSmcArm64SocId (&Jep106Code, &SocRevision);
-    ProcessorId = ((UINT64)Jep106Code << 32) | SocRevision;
+    ProcessorId = ((UINT64)SocRevision << 32) | Jep106Code;
   } else {
     ProcessorId = ArmReadMidr ();
   }
@@ -212,15 +205,15 @@ SmbiosGetProcessorFamily2 (
   VOID
   )
 {
-  UINTN  MainIdRegister;
-  UINT16 ProcessorFamily2;
+  UINTN   MainIdRegister;
+  UINT16  ProcessorFamily2;
 
   MainIdRegister = ArmReadMidr ();
 
   if (((MainIdRegister >> 16) & 0xF) < 8) {
     ProcessorFamily2 = ProcessorFamilyARM;
   } else {
-    if (sizeof (VOID*) == 4) {
+    if (sizeof (VOID *) == 4) {
       ProcessorFamily2 = ProcessorFamilyARMv7;
     } else {
       ProcessorFamily2 = ProcessorFamilyARMv8;
@@ -239,7 +232,7 @@ SmbiosGetProcessorCharacteristics (
   VOID
   )
 {
-  PROCESSOR_CHARACTERISTIC_FLAGS Characteristics;
+  PROCESSOR_CHARACTERISTIC_FLAGS  Characteristics;
 
   ZeroMem (&Characteristics, sizeof (Characteristics));
 

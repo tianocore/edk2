@@ -10,7 +10,6 @@
 
 #include "PxeBcImpl.h"
 
-
 /**
   Display the string of the boot item.
 
@@ -22,26 +21,25 @@
 **/
 VOID
 PxeBcDisplayBootItem (
-  IN UINT8                 *Str,
-  IN UINT8                 Len
+  IN UINT8  *Str,
+  IN UINT8  Len
   )
 {
-  UINT8                    Tmp;
+  UINT8  Tmp;
 
   //
   // Cut off the chars behind 70th.
   //
-  Len       = (UINT8) MIN (PXEBC_DISPLAY_MAX_LINE, Len);
-  Tmp       = Str[Len];
-  Str[Len]  = 0;
+  Len      = (UINT8)MIN (PXEBC_DISPLAY_MAX_LINE, Len);
+  Tmp      = Str[Len];
+  Str[Len] = 0;
   AsciiPrint ("%a \n", Str);
 
   //
   // Restore the original 70th char.
   //
-  Str[Len]  = Tmp;
+  Str[Len] = Tmp;
 }
-
 
 /**
   Select and maintain the boot prompt if needed.
@@ -57,22 +55,22 @@ PxeBcDisplayBootItem (
 **/
 EFI_STATUS
 PxeBcSelectBootPrompt (
-  IN PXEBC_PRIVATE_DATA      *Private
+  IN PXEBC_PRIVATE_DATA  *Private
   )
 {
-  PXEBC_DHCP_PACKET_CACHE    *Cache;
-  PXEBC_VENDOR_OPTION        *VendorOpt;
-  EFI_PXE_BASE_CODE_MODE     *Mode;
-  EFI_EVENT                  TimeoutEvent;
-  EFI_EVENT                  DescendEvent;
-  EFI_INPUT_KEY              InputKey;
-  EFI_STATUS                 Status;
-  UINT32                     OfferType;
-  UINT8                      Timeout;
-  UINT8                      *Prompt;
-  UINT8                      PromptLen;
-  INT32                      SecCol;
-  INT32                      SecRow;
+  PXEBC_DHCP_PACKET_CACHE  *Cache;
+  PXEBC_VENDOR_OPTION      *VendorOpt;
+  EFI_PXE_BASE_CODE_MODE   *Mode;
+  EFI_EVENT                TimeoutEvent;
+  EFI_EVENT                DescendEvent;
+  EFI_INPUT_KEY            InputKey;
+  EFI_STATUS               Status;
+  UINT32                   OfferType;
+  UINT8                    Timeout;
+  UINT8                    *Prompt;
+  UINT8                    PromptLen;
+  INT32                    SecCol;
+  INT32                    SecRow;
 
   TimeoutEvent = NULL;
   DescendEvent = NULL;
@@ -83,7 +81,7 @@ PxeBcSelectBootPrompt (
   //
   // Only DhcpPxe10 and ProxyPxe10 offer needs boot prompt.
   //
-  if (OfferType != PxeOfferTypeProxyPxe10 && OfferType != PxeOfferTypeDhcpPxe10) {
+  if ((OfferType != PxeOfferTypeProxyPxe10) && (OfferType != PxeOfferTypeDhcpPxe10)) {
     return EFI_NOT_FOUND;
   }
 
@@ -100,7 +98,8 @@ PxeBcSelectBootPrompt (
   //   - a boot file name has been presented in the initial DHCP or ProxyDHCP offer packet.
   //
   if (IS_DISABLE_PROMPT_MENU (VendorOpt->DiscoverCtrl) &&
-      Cache->Dhcp4.OptList[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL) {
+      (Cache->Dhcp4.OptList[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL))
+  {
     return EFI_ABORTED;
   }
 
@@ -110,7 +109,7 @@ PxeBcSelectBootPrompt (
 
   Timeout   = VendorOpt->MenuPrompt->Timeout;
   Prompt    = VendorOpt->MenuPrompt->Prompt;
-  PromptLen = (UINT8) (VendorOpt->MenuPromptLen - 1);
+  PromptLen = (UINT8)(VendorOpt->MenuPromptLen - 1);
 
   //
   // The valid scope of Timeout refers to PXE2.1 spec.
@@ -118,6 +117,7 @@ PxeBcSelectBootPrompt (
   if (Timeout == 0) {
     return EFI_TIMEOUT;
   }
+
   if (Timeout == 255) {
     return EFI_SUCCESS;
   }
@@ -185,46 +185,43 @@ PxeBcSelectBootPrompt (
       gST->ConOut->SetCursorPosition (gST->ConOut, SecCol + PromptLen, SecRow);
       AsciiPrint ("(%d) ", Timeout--);
     }
+
     if (gST->ConIn->ReadKeyStroke (gST->ConIn, &InputKey) == EFI_NOT_READY) {
       gBS->Stall (10 * TICKS_PER_MS);
       continue;
     }
+
     //
     // Parse the input key by user.
     // If <F8> or <Ctrl> + <M> is pressed, return success to display the boot menu.
     //
     if (InputKey.ScanCode == 0) {
-
       switch (InputKey.UnicodeChar) {
+        case CTRL ('c'):
+          Status = EFI_ABORTED;
+          break;
 
-      case CTRL ('c'):
-        Status = EFI_ABORTED;
-        break;
+        case CTRL ('m'):
+        case 'm':
+        case 'M':
+          Status = EFI_SUCCESS;
+          break;
 
-      case CTRL ('m'):
-      case 'm':
-      case 'M':
-        Status = EFI_SUCCESS;
-        break;
-
-      default:
-        continue;
+        default:
+          continue;
       }
-
     } else {
-
       switch (InputKey.ScanCode) {
+        case SCAN_F8:
+          Status = EFI_SUCCESS;
+          break;
 
-      case SCAN_F8:
-        Status = EFI_SUCCESS;
-        break;
+        case SCAN_ESC:
+          Status = EFI_ABORTED;
+          break;
 
-      case SCAN_ESC:
-        Status = EFI_ABORTED;
-        break;
-
-      default:
-        continue;
+        default:
+          continue;
       }
     }
 
@@ -234,19 +231,19 @@ PxeBcSelectBootPrompt (
   //
   // Reset the cursor on the screen.
   //
-  gST->ConOut->SetCursorPosition (gST->ConOut, 0 , SecRow + 1);
+  gST->ConOut->SetCursorPosition (gST->ConOut, 0, SecRow + 1);
 
 ON_EXIT:
   if (DescendEvent != NULL) {
     gBS->CloseEvent (DescendEvent);
   }
+
   if (TimeoutEvent != NULL) {
     gBS->CloseEvent (TimeoutEvent);
   }
 
   return Status;
 }
-
 
 /**
   Select the boot menu by user's input.
@@ -262,26 +259,26 @@ ON_EXIT:
 **/
 EFI_STATUS
 PxeBcSelectBootMenu (
-  IN  PXEBC_PRIVATE_DATA              *Private,
-  OUT UINT16                          *Type,
-  IN  BOOLEAN                         UseDefaultItem
+  IN  PXEBC_PRIVATE_DATA  *Private,
+  OUT UINT16              *Type,
+  IN  BOOLEAN             UseDefaultItem
   )
 {
-  EFI_PXE_BASE_CODE_MODE     *Mode;
-  PXEBC_DHCP_PACKET_CACHE    *Cache;
-  PXEBC_VENDOR_OPTION        *VendorOpt;
-  EFI_INPUT_KEY              InputKey;
-  UINT32                     OfferType;
-  UINT8                      MenuSize;
-  UINT8                      MenuNum;
-  INT32                      TopRow;
-  UINT16                     Select;
-  UINT16                     LastSelect;
-  UINT8                      Index;
-  BOOLEAN                    Finish;
-  CHAR8                      Blank[PXEBC_DISPLAY_MAX_LINE];
-  PXEBC_BOOT_MENU_ENTRY      *MenuItem;
-  PXEBC_BOOT_MENU_ENTRY      *MenuArray[PXEBC_MENU_MAX_NUM];
+  EFI_PXE_BASE_CODE_MODE   *Mode;
+  PXEBC_DHCP_PACKET_CACHE  *Cache;
+  PXEBC_VENDOR_OPTION      *VendorOpt;
+  EFI_INPUT_KEY            InputKey;
+  UINT32                   OfferType;
+  UINT8                    MenuSize;
+  UINT8                    MenuNum;
+  INT32                    TopRow;
+  UINT16                   Select;
+  UINT16                   LastSelect;
+  UINT8                    Index;
+  BOOLEAN                  Finish;
+  CHAR8                    Blank[PXEBC_DISPLAY_MAX_LINE];
+  PXEBC_BOOT_MENU_ENTRY    *MenuItem;
+  PXEBC_BOOT_MENU_ENTRY    *MenuArray[PXEBC_MENU_MAX_NUM];
 
   Finish    = FALSE;
   Select    = 0;
@@ -305,10 +302,10 @@ PxeBcSelectBootMenu (
   //
   // Display the boot menu on the screen.
   //
-  SetMem (Blank, sizeof(Blank), ' ');
+  SetMem (Blank, sizeof (Blank), ' ');
 
-  MenuSize  = VendorOpt->BootMenuLen;
-  MenuItem  = VendorOpt->BootMenu;
+  MenuSize = VendorOpt->BootMenuLen;
+  MenuItem = VendorOpt->BootMenu;
 
   if (MenuSize == 0) {
     return EFI_DEVICE_ERROR;
@@ -316,9 +313,9 @@ PxeBcSelectBootMenu (
 
   while (MenuSize > 0 && Index < PXEBC_MENU_MAX_NUM) {
     ASSERT (MenuItem != NULL);
-    MenuArray[Index]  = MenuItem;
-    MenuSize          = (UINT8) (MenuSize - (MenuItem->DescLen + 3));
-    MenuItem          = (PXEBC_BOOT_MENU_ENTRY *) ((UINT8 *) MenuItem + MenuItem->DescLen + 3);
+    MenuArray[Index] = MenuItem;
+    MenuSize         = (UINT8)(MenuSize - (MenuItem->DescLen + 3));
+    MenuItem         = (PXEBC_BOOT_MENU_ENTRY *)((UINT8 *)MenuItem + MenuItem->DescLen + 3);
     Index++;
   }
 
@@ -361,60 +358,62 @@ PxeBcSelectBootMenu (
 
     if (InputKey.ScanCode == 0) {
       switch (InputKey.UnicodeChar) {
-      case CTRL ('c'):
-        InputKey.ScanCode = SCAN_ESC;
-        break;
+        case CTRL ('c'):
+          InputKey.ScanCode = SCAN_ESC;
+          break;
 
-      case CTRL ('j'):  /* linefeed */
-      case CTRL ('m'):  /* return */
-        Finish = TRUE;
-        break;
+        case CTRL ('j'): /* linefeed */
+        case CTRL ('m'): /* return */
+          Finish = TRUE;
+          break;
 
-      case CTRL ('i'):  /* tab */
-      case ' ':
-      case 'd':
-      case 'D':
-        InputKey.ScanCode = SCAN_DOWN;
-        break;
+        case CTRL ('i'): /* tab */
+        case ' ':
+        case 'd':
+        case 'D':
+          InputKey.ScanCode = SCAN_DOWN;
+          break;
 
-      case CTRL ('h'):  /* backspace */
-      case 'u':
-      case 'U':
-        InputKey.ScanCode = SCAN_UP;
-        break;
+        case CTRL ('h'): /* backspace */
+        case 'u':
+        case 'U':
+          InputKey.ScanCode = SCAN_UP;
+          break;
 
-      default:
-        InputKey.ScanCode = 0;
+        default:
+          InputKey.ScanCode = 0;
       }
     }
 
     switch (InputKey.ScanCode) {
-    case SCAN_LEFT:
-    case SCAN_UP:
-      if (Select != 0) {
-        Select--;
-      }
-      break;
+      case SCAN_LEFT:
+      case SCAN_UP:
+        if (Select != 0) {
+          Select--;
+        }
 
-    case SCAN_DOWN:
-    case SCAN_RIGHT:
-      if (++Select == MenuNum) {
-        Select--;
-      }
-      break;
+        break;
 
-    case SCAN_PAGE_UP:
-    case SCAN_HOME:
-      Select = 0;
-      break;
+      case SCAN_DOWN:
+      case SCAN_RIGHT:
+        if (++Select == MenuNum) {
+          Select--;
+        }
 
-    case SCAN_PAGE_DOWN:
-    case SCAN_END:
-      Select = (UINT16) (MenuNum - 1);
-      break;
+        break;
 
-    case SCAN_ESC:
-      return EFI_ABORTED;
+      case SCAN_PAGE_UP:
+      case SCAN_HOME:
+        Select = 0;
+        break;
+
+      case SCAN_PAGE_DOWN:
+      case SCAN_END:
+        Select = (UINT16)(MenuNum - 1);
+        break;
+
+      case SCAN_ESC:
+        return EFI_ABORTED;
     }
 
     //
@@ -441,7 +440,6 @@ PxeBcSelectBootMenu (
   return EFI_SUCCESS;
 }
 
-
 /**
   Parse out the boot information from the last Dhcp4 reply packet.
 
@@ -454,8 +452,8 @@ PxeBcSelectBootMenu (
 **/
 EFI_STATUS
 PxeBcDhcp4BootInfo (
-  IN OUT PXEBC_PRIVATE_DATA   *Private,
-     OUT UINT64               *BufferSize
+  IN OUT PXEBC_PRIVATE_DATA  *Private,
+  OUT UINT64                 *BufferSize
   )
 {
   EFI_PXE_BASE_CODE_PROTOCOL  *PxeBc;
@@ -506,7 +504,7 @@ PxeBcDhcp4BootInfo (
   VendorOpt = &Cache4->VendorOpt;
   if (IS_DISABLE_PROMPT_MENU (VendorOpt->DiscoverCtrl) && IS_VALID_BOOT_SERVERS (VendorOpt->BitMap)) {
     Entry = VendorOpt->BootSvr;
-    if (VendorOpt->BootSvrLen >= sizeof (PXEBC_BOOT_SVR_ENTRY) && Entry->IpCnt > 0) {
+    if ((VendorOpt->BootSvrLen >= sizeof (PXEBC_BOOT_SVR_ENTRY)) && (Entry->IpCnt > 0)) {
       CopyMem (
         &Private->ServerIp,
         &Entry->IpAddr[0],
@@ -514,6 +512,7 @@ PxeBcDhcp4BootInfo (
         );
     }
   }
+
   if (Private->ServerIp.Addr[0] == 0) {
     //
     // ServerIp.Addr[0] equals zero means we failed to get IP address from boot server list.
@@ -525,6 +524,7 @@ PxeBcDhcp4BootInfo (
       sizeof (EFI_IPv4_ADDRESS)
       );
   }
+
   if (Private->ServerIp.Addr[0] == 0) {
     //
     // Still failed , use the IP address from option 54.
@@ -546,7 +546,7 @@ PxeBcDhcp4BootInfo (
     // Parse the boot file size by option.
     //
     CopyMem (&Value, Cache4->OptList[PXEBC_DHCP4_TAG_INDEX_BOOTFILE_LEN]->Data, sizeof (Value));
-    Value       = NTOHS (Value);
+    Value = NTOHS (Value);
     //
     // The field of boot file size is 512 bytes in unit.
     //
@@ -572,7 +572,7 @@ PxeBcDhcp4BootInfo (
   //
   // Save the value of boot file size.
   //
-  Private->BootFileSize = (UINTN) *BufferSize;
+  Private->BootFileSize = (UINTN)*BufferSize;
 
   //
   // Display all the information: boot server address, boot file name and boot file size.
@@ -584,7 +584,6 @@ PxeBcDhcp4BootInfo (
 
   return Status;
 }
-
 
 /**
   Parse out the boot information from the last Dhcp6 reply packet.
@@ -599,8 +598,8 @@ PxeBcDhcp4BootInfo (
 **/
 EFI_STATUS
 PxeBcDhcp6BootInfo (
-  IN OUT PXEBC_PRIVATE_DATA   *Private,
-     OUT UINT64               *BufferSize
+  IN OUT PXEBC_PRIVATE_DATA  *Private,
+  OUT UINT64                 *BufferSize
   )
 {
   EFI_PXE_BASE_CODE_PROTOCOL  *PxeBc;
@@ -648,7 +647,6 @@ PxeBcDhcp6BootInfo (
     return Status;
   }
 
-
   //
   // Parse (m)tftp server ip address and bootfile name.
   //
@@ -656,7 +654,7 @@ PxeBcDhcp6BootInfo (
              Private,
              &Private->BootFileName,
              &Private->ServerIp.v6,
-             (CHAR8 *) (Cache6->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_URL]->Data),
+             (CHAR8 *)(Cache6->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_URL]->Data),
              NTOHS (Cache6->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_URL]->OpLen)
              );
   if (EFI_ERROR (Status)) {
@@ -670,10 +668,11 @@ PxeBcDhcp6BootInfo (
     //
     // Parse it out if have the boot file parameter option.
     //
-    Status = PxeBcExtractBootFileParam ((CHAR8 *) Cache6->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_PARAM]->Data, &Value);
+    Status = PxeBcExtractBootFileParam ((CHAR8 *)Cache6->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_PARAM]->Data, &Value);
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     //
     // The field of boot file size is 512 bytes in unit.
     //
@@ -699,7 +698,7 @@ PxeBcDhcp6BootInfo (
   //
   // Save the value of boot file size.
   //
-  Private->BootFileSize = (UINTN) *BufferSize;
+  Private->BootFileSize = (UINTN)*BufferSize;
 
   //
   // Display all the information: boot server address, boot file name and boot file size.
@@ -711,7 +710,6 @@ PxeBcDhcp6BootInfo (
 
   return Status;
 }
-
 
 /**
   Extract the discover information and boot server entry from the
@@ -732,17 +730,17 @@ PxeBcExtractDiscoverInfo (
   IN     PXEBC_PRIVATE_DATA               *Private,
   IN     UINT16                           Type,
   IN OUT EFI_PXE_BASE_CODE_DISCOVER_INFO  **DiscoverInfo,
-     OUT PXEBC_BOOT_SVR_ENTRY             **BootEntry,
-     OUT EFI_PXE_BASE_CODE_SRVLIST        **SrvList
+  OUT PXEBC_BOOT_SVR_ENTRY                **BootEntry,
+  OUT EFI_PXE_BASE_CODE_SRVLIST           **SrvList
   )
 {
-  EFI_PXE_BASE_CODE_MODE          *Mode;
-  PXEBC_DHCP4_PACKET_CACHE        *Cache4;
-  PXEBC_VENDOR_OPTION             *VendorOpt;
-  PXEBC_BOOT_SVR_ENTRY            *Entry;
-  BOOLEAN                         IsFound;
-  EFI_PXE_BASE_CODE_DISCOVER_INFO *Info;
-  UINT16                          Index;
+  EFI_PXE_BASE_CODE_MODE           *Mode;
+  PXEBC_DHCP4_PACKET_CACHE         *Cache4;
+  PXEBC_VENDOR_OPTION              *VendorOpt;
+  PXEBC_BOOT_SVR_ENTRY             *Entry;
+  BOOLEAN                          IsFound;
+  EFI_PXE_BASE_CODE_DISCOVER_INFO  *Info;
+  UINT16                           Index;
 
   Mode = Private->PxeBc.Mode;
   Info = *DiscoverInfo;
@@ -759,7 +757,7 @@ PxeBcExtractDiscoverInfo (
     //
     CopyMem (&Info->SrvList[0].IpAddr, &Private->ServerIp, sizeof (EFI_IP_ADDRESS));
 
-    *SrvList  = Info->SrvList;
+    *SrvList = Info->SrvList;
   } else {
     Entry     = NULL;
     IsFound   = FALSE;
@@ -778,8 +776,8 @@ PxeBcExtractDiscoverInfo (
     //
     Info->UseMCast    = (BOOLEAN) !IS_DISABLE_MCAST_DISCOVER (VendorOpt->DiscoverCtrl);
     Info->UseBCast    = (BOOLEAN) !IS_DISABLE_BCAST_DISCOVER (VendorOpt->DiscoverCtrl);
-    Info->MustUseList = (BOOLEAN) IS_ENABLE_USE_SERVER_LIST (VendorOpt->DiscoverCtrl);
-    Info->UseUCast    = (BOOLEAN) IS_VALID_BOOT_SERVERS (VendorOpt->BitMap);
+    Info->MustUseList = (BOOLEAN)IS_ENABLE_USE_SERVER_LIST (VendorOpt->DiscoverCtrl);
+    Info->UseUCast    = (BOOLEAN)IS_VALID_BOOT_SERVERS (VendorOpt->BitMap);
 
     if (Info->UseMCast) {
       //
@@ -793,11 +791,12 @@ PxeBcExtractDiscoverInfo (
     if (Info->UseUCast) {
       Entry = VendorOpt->BootSvr;
 
-      while (((UINT8) (Entry - VendorOpt->BootSvr)) < VendorOpt->BootSvrLen) {
+      while (((UINT8)(Entry - VendorOpt->BootSvr)) < VendorOpt->BootSvrLen) {
         if (Entry->Type == HTONS (Type)) {
           IsFound = TRUE;
           break;
         }
+
         Entry = GET_NEXT_BOOT_SVR_ENTRY (Entry);
       }
 
@@ -811,6 +810,7 @@ PxeBcExtractDiscoverInfo (
         if (*DiscoverInfo == NULL) {
           return EFI_OUT_OF_RESOURCES;
         }
+
         CopyMem (*DiscoverInfo, Info, sizeof (*Info));
         Info = *DiscoverInfo;
       }
@@ -818,7 +818,7 @@ PxeBcExtractDiscoverInfo (
       for (Index = 0; Index < Info->IpCnt; Index++) {
         CopyMem (&Info->SrvList[Index].IpAddr, &Entry->IpAddr[Index], sizeof (EFI_IPv4_ADDRESS));
         Info->SrvList[Index].AcceptAnyResponse = !Info->MustUseList;
-        Info->SrvList[Index].Type = NTOHS (Entry->Type);
+        Info->SrvList[Index].Type              = NTOHS (Entry->Type);
       }
     }
 
@@ -828,7 +828,6 @@ PxeBcExtractDiscoverInfo (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Build the discover packet and send out for boot server.
@@ -849,13 +848,13 @@ PxeBcExtractDiscoverInfo (
 **/
 EFI_STATUS
 PxeBcDiscoverBootServer (
-  IN  PXEBC_PRIVATE_DATA                *Private,
-  IN  UINT16                            Type,
-  IN  UINT16                            *Layer,
-  IN  BOOLEAN                           UseBis,
-  IN  EFI_IP_ADDRESS                    *DestIp,
-  IN  UINT16                            IpCount,
-  IN  EFI_PXE_BASE_CODE_SRVLIST         *SrvList
+  IN  PXEBC_PRIVATE_DATA         *Private,
+  IN  UINT16                     Type,
+  IN  UINT16                     *Layer,
+  IN  BOOLEAN                    UseBis,
+  IN  EFI_IP_ADDRESS             *DestIp,
+  IN  UINT16                     IpCount,
+  IN  EFI_PXE_BASE_CODE_SRVLIST  *SrvList
   )
 {
   if (Private->PxeBc.Mode->UsingIpv6) {
@@ -879,7 +878,6 @@ PxeBcDiscoverBootServer (
   }
 }
 
-
 /**
   Discover all the boot information for boot file.
 
@@ -894,8 +892,8 @@ PxeBcDiscoverBootServer (
 **/
 EFI_STATUS
 PxeBcDiscoverBootFile (
-  IN OUT PXEBC_PRIVATE_DATA   *Private,
-     OUT UINT64               *BufferSize
+  IN OUT PXEBC_PRIVATE_DATA  *Private,
+  OUT UINT64                 *BufferSize
   )
 {
   EFI_PXE_BASE_CODE_PROTOCOL  *PxeBc;
@@ -937,7 +935,6 @@ PxeBcDiscoverBootFile (
   }
 
   if (!EFI_ERROR (Status)) {
-
     if (Type == EFI_PXE_BASE_CODE_BOOT_TYPE_BOOTSTRAP) {
       //
       // Local boot(PXE bootstrap server) need abort
@@ -949,7 +946,7 @@ PxeBcDiscoverBootFile (
     // Start to discover the boot server to get (m)tftp server ip address, bootfile
     // name and bootfile size.
     //
-    UseBis = (BOOLEAN) (Mode->BisSupported && Mode->BisDetected);
+    UseBis = (BOOLEAN)(Mode->BisSupported && Mode->BisDetected);
     Status = PxeBc->Discover (PxeBc, Type, &Layer, UseBis, NULL);
     if (EFI_ERROR (Status)) {
       return Status;
@@ -973,6 +970,7 @@ PxeBcDiscoverBootFile (
           Private->PxeReply.Dhcp4.Packet.Ack.Length
           );
       }
+
       Mode->ProxyOfferReceived = TRUE;
     }
   }
@@ -989,7 +987,6 @@ PxeBcDiscoverBootFile (
   return Status;
 }
 
-
 /**
   Install PxeBaseCodeCallbackProtocol if not installed before.
 
@@ -1002,8 +999,8 @@ PxeBcDiscoverBootFile (
 **/
 EFI_STATUS
 PxeBcInstallCallback (
-  IN OUT PXEBC_PRIVATE_DATA   *Private,
-     OUT BOOLEAN              *NewMakeCallback
+  IN OUT PXEBC_PRIVATE_DATA  *Private,
+  OUT BOOLEAN                *NewMakeCallback
   )
 {
   EFI_PXE_BASE_CODE_PROTOCOL  *PxeBc;
@@ -1016,10 +1013,9 @@ PxeBcInstallCallback (
   Status = gBS->HandleProtocol (
                   Private->Mode.UsingIpv6 ? Private->Ip6Nic->Controller : Private->Ip4Nic->Controller,
                   &gEfiPxeBaseCodeCallbackProtocolGuid,
-                  (VOID **) &Private->PxeBcCallback
+                  (VOID **)&Private->PxeBcCallback
                   );
   if (Status == EFI_UNSUPPORTED) {
-
     CopyMem (
       &Private->LoadFileCallback,
       &gPxeBcCallBackTemplate,
@@ -1036,7 +1032,7 @@ PxeBcInstallCallback (
                     &Private->LoadFileCallback
                     );
 
-    (*NewMakeCallback) = (BOOLEAN) (Status == EFI_SUCCESS);
+    (*NewMakeCallback) = (BOOLEAN)(Status == EFI_SUCCESS);
 
     Status = PxeBc->SetParameters (PxeBc, NULL, NULL, NULL, NULL, NewMakeCallback);
     if (EFI_ERROR (Status)) {
@@ -1048,7 +1044,6 @@ PxeBcInstallCallback (
   return EFI_SUCCESS;
 }
 
-
 /**
   Uninstall PxeBaseCodeCallbackProtocol.
 
@@ -1059,28 +1054,26 @@ PxeBcInstallCallback (
 **/
 VOID
 PxeBcUninstallCallback (
-  IN PXEBC_PRIVATE_DATA        *Private,
-  IN BOOLEAN                   NewMakeCallback
+  IN PXEBC_PRIVATE_DATA  *Private,
+  IN BOOLEAN             NewMakeCallback
   )
 {
-  EFI_PXE_BASE_CODE_PROTOCOL   *PxeBc;
+  EFI_PXE_BASE_CODE_PROTOCOL  *PxeBc;
 
   PxeBc = &Private->PxeBc;
 
   if (NewMakeCallback) {
-
     NewMakeCallback = FALSE;
 
     PxeBc->SetParameters (PxeBc, NULL, NULL, NULL, NULL, &NewMakeCallback);
 
     gBS->UninstallProtocolInterface (
-          Private->Mode.UsingIpv6 ? Private->Ip6Nic->Controller : Private->Ip4Nic->Controller,
-          &gEfiPxeBaseCodeCallbackProtocolGuid,
-          &Private->LoadFileCallback
-          );
+           Private->Mode.UsingIpv6 ? Private->Ip6Nic->Controller : Private->Ip4Nic->Controller,
+           &gEfiPxeBaseCodeCallbackProtocolGuid,
+           &Private->LoadFileCallback
+           );
   }
 }
-
 
 /**
   Download one of boot file in the list, and it's special for IPv6.
@@ -1098,15 +1091,15 @@ PxeBcUninstallCallback (
 **/
 EFI_STATUS
 PxeBcReadBootFileList (
-  IN     PXEBC_PRIVATE_DATA           *Private,
-  IN OUT UINT64                       *BufferSize,
-  IN     VOID                         *Buffer           OPTIONAL
+  IN     PXEBC_PRIVATE_DATA  *Private,
+  IN OUT UINT64              *BufferSize,
+  IN     VOID                *Buffer           OPTIONAL
   )
 {
-  EFI_STATUS                          Status;
-  EFI_PXE_BASE_CODE_PROTOCOL          *PxeBc;
+  EFI_STATUS                  Status;
+  EFI_PXE_BASE_CODE_PROTOCOL  *PxeBc;
 
-  PxeBc        = &Private->PxeBc;
+  PxeBc = &Private->PxeBc;
 
   //
   // Try to download the boot file if everything is ready.
@@ -1124,15 +1117,12 @@ PxeBcReadBootFileList (
                       NULL,
                       FALSE
                       );
-
-
   } else {
-    Status      = EFI_BUFFER_TOO_SMALL;
+    Status = EFI_BUFFER_TOO_SMALL;
   }
 
   return Status;
 }
-
 
 /**
   Load boot file into user buffer.
@@ -1150,17 +1140,17 @@ PxeBcReadBootFileList (
 **/
 EFI_STATUS
 PxeBcLoadBootFile (
-  IN     PXEBC_PRIVATE_DATA           *Private,
-  IN OUT UINTN                        *BufferSize,
-  IN     VOID                         *Buffer         OPTIONAL
+  IN     PXEBC_PRIVATE_DATA  *Private,
+  IN OUT UINTN               *BufferSize,
+  IN     VOID                *Buffer         OPTIONAL
   )
 {
-  BOOLEAN                             NewMakeCallback;
-  UINT64                              RequiredSize;
-  UINT64                              CurrentSize;
-  EFI_STATUS                          Status;
-  EFI_PXE_BASE_CODE_PROTOCOL          *PxeBc;
-  EFI_PXE_BASE_CODE_MODE              *PxeBcMode;
+  BOOLEAN                     NewMakeCallback;
+  UINT64                      RequiredSize;
+  UINT64                      CurrentSize;
+  EFI_STATUS                  Status;
+  EFI_PXE_BASE_CODE_PROTOCOL  *PxeBc;
+  EFI_PXE_BASE_CODE_MODE      *PxeBcMode;
 
   NewMakeCallback = FALSE;
   PxeBc           = &Private->PxeBc;
@@ -1172,7 +1162,7 @@ PxeBcLoadBootFile (
   // Install pxebc callback protocol if hasn't been installed yet.
   //
   Status = PxeBcInstallCallback (Private, &NewMakeCallback);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
@@ -1195,7 +1185,7 @@ PxeBcLoadBootFile (
       //
       // Get the right buffer size of the bootfile required.
       //
-      if (CurrentSize < RequiredSize || Buffer == NULL) {
+      if ((CurrentSize < RequiredSize) || (Buffer == NULL)) {
         //
         // It's buffer too small if the size of user buffer is smaller than the required.
         //
@@ -1203,8 +1193,9 @@ PxeBcLoadBootFile (
         Status      = EFI_BUFFER_TOO_SMALL;
         goto ON_EXIT;
       }
+
       CurrentSize = RequiredSize;
-    } else if (RequiredSize == 0 && PxeBcMode->UsingIpv6) {
+    } else if ((RequiredSize == 0) && PxeBcMode->UsingIpv6) {
       //
       // Try to download another bootfile in list if failed to get the filesize of the last one.
       // It's special for the case of IPv6.
@@ -1212,7 +1203,7 @@ PxeBcLoadBootFile (
       Status = PxeBcReadBootFileList (Private, &CurrentSize, Buffer);
       goto ON_EXIT;
     }
-  } else if (CurrentSize < Private->BootFileSize || Buffer == NULL ) {
+  } else if ((CurrentSize < Private->BootFileSize) || (Buffer == NULL)) {
     //
     // It's buffer too small if the size of user buffer is smaller than the required.
     //
@@ -1247,13 +1238,13 @@ PxeBcLoadBootFile (
   }
 
 ON_EXIT:
-  *BufferSize = (UINTN) CurrentSize;
-  PxeBcUninstallCallback(Private, NewMakeCallback);
+  *BufferSize = (UINTN)CurrentSize;
+  PxeBcUninstallCallback (Private, NewMakeCallback);
 
   if (Status == EFI_SUCCESS) {
     AsciiPrint ("\n  NBP file downloaded successfully.\n");
     return EFI_SUCCESS;
-  } else if (Status == EFI_BUFFER_TOO_SMALL && Buffer != NULL) {
+  } else if ((Status == EFI_BUFFER_TOO_SMALL) && (Buffer != NULL)) {
     AsciiPrint ("\n  PXE-E05: Buffer size is smaller than the requested file.\n");
   } else if (Status == EFI_DEVICE_ERROR) {
     AsciiPrint ("\n  PXE-E07: Network device error.\n");
@@ -1279,4 +1270,3 @@ ON_EXIT:
 
   return Status;
 }
-

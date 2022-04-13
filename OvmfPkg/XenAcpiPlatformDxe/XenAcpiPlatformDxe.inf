@@ -1,0 +1,45 @@
+## @file
+#  OVMF ACPI Platform Driver for Xen guests
+#
+#  Copyright (C) 2021, Red Hat, Inc.
+#  Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XenAcpiPlatform
+  FILE_GUID                      = fa0a48ac-767d-4c88-b70c-ec54c8b900c4
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = AcpiPlatformEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  AcpiPlatform.c
+  AcpiPlatform.h
+  EntryPoint.c
+  Xen.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  XenPlatformLib
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+
+[Depex]
+  gEfiAcpiTableProtocolGuid

@@ -25,7 +25,7 @@ AesGetContextSize (
   // AES uses different key contexts for encryption and decryption, so here memory
   // for 2 copies of AES_KEY is allocated.
   //
-  return (UINTN) (2 * sizeof (AES_KEY));
+  return (UINTN)(2 * sizeof (AES_KEY));
 }
 
 /**
@@ -61,20 +61,22 @@ AesInit (
   //
   // Check input parameters.
   //
-  if (AesContext == NULL || Key == NULL || (KeyLength != 128 && KeyLength != 192 && KeyLength != 256)) {
+  if ((AesContext == NULL) || (Key == NULL) || ((KeyLength != 128) && (KeyLength != 192) && (KeyLength != 256))) {
     return FALSE;
   }
 
   //
   // Initialize AES encryption & decryption key schedule.
   //
-  AesKey = (AES_KEY *) AesContext;
-  if (AES_set_encrypt_key (Key, (UINT32) KeyLength, AesKey) != 0) {
+  AesKey = (AES_KEY *)AesContext;
+  if (AES_set_encrypt_key (Key, (UINT32)KeyLength, AesKey) != 0) {
     return FALSE;
   }
-  if (AES_set_decrypt_key (Key, (UINT32) KeyLength, AesKey + 1) != 0) {
+
+  if (AES_set_decrypt_key (Key, (UINT32)KeyLength, AesKey + 1) != 0) {
     return FALSE;
   }
+
   return TRUE;
 }
 
@@ -121,21 +123,21 @@ AesCbcEncrypt (
   //
   // Check input parameters.
   //
-  if (AesContext == NULL || Input == NULL || (InputSize % AES_BLOCK_SIZE) != 0) {
+  if ((AesContext == NULL) || (Input == NULL) || ((InputSize % AES_BLOCK_SIZE) != 0)) {
     return FALSE;
   }
 
-  if (Ivec == NULL || Output == NULL || InputSize > INT_MAX) {
+  if ((Ivec == NULL) || (Output == NULL) || (InputSize > INT_MAX)) {
     return FALSE;
   }
 
-  AesKey = (AES_KEY *) AesContext;
+  AesKey = (AES_KEY *)AesContext;
   CopyMem (IvecBuffer, Ivec, AES_BLOCK_SIZE);
 
   //
   // Perform AES data encryption with CBC mode
   //
-  AES_cbc_encrypt (Input, Output, (UINT32) InputSize, AesKey, IvecBuffer, AES_ENCRYPT);
+  AES_cbc_encrypt (Input, Output, (UINT32)InputSize, AesKey, IvecBuffer, AES_ENCRYPT);
 
   return TRUE;
 }
@@ -183,21 +185,21 @@ AesCbcDecrypt (
   //
   // Check input parameters.
   //
-  if (AesContext == NULL || Input == NULL || (InputSize % AES_BLOCK_SIZE) != 0) {
+  if ((AesContext == NULL) || (Input == NULL) || ((InputSize % AES_BLOCK_SIZE) != 0)) {
     return FALSE;
   }
 
-  if (Ivec == NULL || Output == NULL || InputSize > INT_MAX) {
+  if ((Ivec == NULL) || (Output == NULL) || (InputSize > INT_MAX)) {
     return FALSE;
   }
 
-  AesKey = (AES_KEY *) AesContext;
+  AesKey = (AES_KEY *)AesContext;
   CopyMem (IvecBuffer, Ivec, AES_BLOCK_SIZE);
 
   //
   // Perform AES data decryption with CBC mode
   //
-  AES_cbc_encrypt (Input, Output, (UINT32) InputSize, AesKey + 1, IvecBuffer, AES_DECRYPT);
+  AES_cbc_encrypt (Input, Output, (UINT32)InputSize, AesKey + 1, IvecBuffer, AES_DECRYPT);
 
   return TRUE;
 }

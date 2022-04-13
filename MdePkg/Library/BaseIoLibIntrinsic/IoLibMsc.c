@@ -13,21 +13,50 @@
 
 **/
 
-
-
 #include "BaseIoLibIntrinsicInternal.h"
+#include "IoLibTdx.h"
 
 //
 // Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics.
 //
 
-int            _inp (unsigned short port);
-unsigned short _inpw (unsigned short port);
-unsigned long  _inpd (unsigned short port);
-int            _outp (unsigned short port, int databyte );
-unsigned short _outpw (unsigned short port, unsigned short dataword );
-unsigned long  _outpd (unsigned short port, unsigned long dataword );
-void          _ReadWriteBarrier (void);
+int
+_inp (
+  unsigned short  port
+  );
+
+unsigned short
+_inpw (
+  unsigned short  port
+  );
+
+unsigned long
+_inpd (
+  unsigned short  port
+  );
+
+int
+_outp (
+  unsigned short  port,
+  int             databyte
+  );
+
+unsigned short
+_outpw (
+  unsigned short  port,
+  unsigned short  dataword
+  );
+
+unsigned long
+_outpd (
+  unsigned short  port,
+  unsigned long   dataword
+  );
+
+void
+_ReadWriteBarrier (
+  void
+  );
 
 #pragma intrinsic(_inp)
 #pragma intrinsic(_inpw)
@@ -54,6 +83,8 @@ void          _ReadWriteBarrier (void);
 
   If 8-bit I/O port operations are not supported, then ASSERT().
 
+  For Td guest TDVMCALL_IO is invoked to read I/O port.
+
   @param  Port  The I/O port to read.
 
   @return The value read.
@@ -62,18 +93,23 @@ void          _ReadWriteBarrier (void);
 UINT8
 EFIAPI
 IoRead8 (
-  IN      UINTN                     Port
+  IN      UINTN  Port
   )
 {
-  UINT8                             Value;
-  BOOLEAN                           Flag;
+  UINT8    Value;
+  BOOLEAN  Flag;
 
   Flag = FilterBeforeIoRead (FilterWidth8, Port, &Value);
   if (Flag) {
-    _ReadWriteBarrier ();
-    Value = (UINT8)_inp ((UINT16)Port);
-    _ReadWriteBarrier ();
+    if (IsTdxGuest ()) {
+      Value = TdIoRead8 (Port);
+    } else {
+      _ReadWriteBarrier ();
+      Value = (UINT8)_inp ((UINT16)Port);
+      _ReadWriteBarrier ();
+    }
   }
+
   FilterAfterIoRead (FilterWidth8, Port, &Value);
 
   return Value;
@@ -88,6 +124,8 @@ IoRead8 (
 
   If 8-bit I/O port operations are not supported, then ASSERT().
 
+  For Td guest TDVMCALL_IO is invoked to write I/O port.
+
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
@@ -97,18 +135,23 @@ IoRead8 (
 UINT8
 EFIAPI
 IoWrite8 (
-  IN      UINTN                     Port,
-  IN      UINT8                     Value
+  IN      UINTN  Port,
+  IN      UINT8  Value
   )
 {
-  BOOLEAN                           Flag;
+  BOOLEAN  Flag;
 
-  Flag = FilterBeforeIoWrite(FilterWidth8, Port, &Value);
+  Flag = FilterBeforeIoWrite (FilterWidth8, Port, &Value);
   if (Flag) {
-    _ReadWriteBarrier ();
-    (UINT8)_outp ((UINT16)Port, Value);
-    _ReadWriteBarrier ();
+    if (IsTdxGuest ()) {
+      TdIoWrite8 (Port, Value);
+    } else {
+      _ReadWriteBarrier ();
+      (UINT8)_outp ((UINT16)Port, Value);
+      _ReadWriteBarrier ();
+    }
   }
+
   FilterAfterIoWrite (FilterWidth8, Port, &Value);
 
   return Value;
@@ -124,6 +167,8 @@ IoWrite8 (
   If 16-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 16-bit boundary, then ASSERT().
 
+  For Td guest TDVMCALL_IO is invoked to read I/O port.
+
   @param  Port  The I/O port to read.
 
   @return The value read.
@@ -132,20 +177,25 @@ IoWrite8 (
 UINT16
 EFIAPI
 IoRead16 (
-  IN      UINTN                     Port
+  IN      UINTN  Port
   )
 {
-  UINT16                            Value;
-  BOOLEAN                           Flag;
+  UINT16   Value;
+  BOOLEAN  Flag;
 
   ASSERT ((Port & 1) == 0);
 
   Flag = FilterBeforeIoRead (FilterWidth16, Port, &Value);
   if (Flag) {
-    _ReadWriteBarrier ();
-    Value = _inpw ((UINT16)Port);
-    _ReadWriteBarrier ();
+    if (IsTdxGuest ()) {
+      Value = TdIoRead16 (Port);
+    } else {
+      _ReadWriteBarrier ();
+      Value = _inpw ((UINT16)Port);
+      _ReadWriteBarrier ();
+    }
   }
+
   FilterBeforeIoRead (FilterWidth16, Port, &Value);
 
   return Value;
@@ -161,6 +211,8 @@ IoRead16 (
   If 16-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 16-bit boundary, then ASSERT().
 
+  For Td guest TDVMCALL_IO is invoked to write I/O port.
+
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
@@ -170,20 +222,25 @@ IoRead16 (
 UINT16
 EFIAPI
 IoWrite16 (
-  IN      UINTN                     Port,
-  IN      UINT16                    Value
+  IN      UINTN   Port,
+  IN      UINT16  Value
   )
 {
-  BOOLEAN                           Flag;
+  BOOLEAN  Flag;
 
   ASSERT ((Port & 1) == 0);
 
-  Flag = FilterBeforeIoWrite(FilterWidth16, Port, &Value);
+  Flag = FilterBeforeIoWrite (FilterWidth16, Port, &Value);
   if (Flag) {
-    _ReadWriteBarrier ();
-    _outpw ((UINT16)Port, Value);
-    _ReadWriteBarrier ();
+    if (IsTdxGuest ()) {
+      TdIoWrite16 (Port, Value);
+    } else {
+      _ReadWriteBarrier ();
+      _outpw ((UINT16)Port, Value);
+      _ReadWriteBarrier ();
+    }
   }
+
   FilterAfterIoWrite (FilterWidth16, Port, &Value);
 
   return Value;
@@ -199,6 +256,8 @@ IoWrite16 (
   If 32-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 32-bit boundary, then ASSERT().
 
+  For Td guest TDVMCALL_IO is invoked to read I/O port.
+
   @param  Port  The I/O port to read.
 
   @return The value read.
@@ -207,20 +266,25 @@ IoWrite16 (
 UINT32
 EFIAPI
 IoRead32 (
-  IN      UINTN                     Port
+  IN      UINTN  Port
   )
 {
-  UINT32                            Value;
-  BOOLEAN                           Flag;
+  UINT32   Value;
+  BOOLEAN  Flag;
 
   ASSERT ((Port & 3) == 0);
 
-  Flag = FilterBeforeIoRead(FilterWidth32, Port, &Value);
+  Flag = FilterBeforeIoRead (FilterWidth32, Port, &Value);
   if (Flag) {
-    _ReadWriteBarrier ();
-    Value = _inpd ((UINT16)Port);
-    _ReadWriteBarrier ();
+    if (IsTdxGuest ()) {
+      Value = TdIoRead32 (Port);
+    } else {
+      _ReadWriteBarrier ();
+      Value = _inpd ((UINT16)Port);
+      _ReadWriteBarrier ();
+    }
   }
+
   FilterAfterIoRead (FilterWidth32, Port, &Value);
 
   return Value;
@@ -236,6 +300,8 @@ IoRead32 (
   If 32-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 32-bit boundary, then ASSERT().
 
+  For Td guest TDVMCALL_IO is invoked to write I/O port.
+
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
@@ -245,20 +311,25 @@ IoRead32 (
 UINT32
 EFIAPI
 IoWrite32 (
-  IN      UINTN                     Port,
-  IN      UINT32                    Value
+  IN      UINTN   Port,
+  IN      UINT32  Value
   )
 {
-  BOOLEAN                           Flag;
+  BOOLEAN  Flag;
 
   ASSERT ((Port & 3) == 0);
 
-  Flag = FilterBeforeIoWrite(FilterWidth32, Port, &Value);
+  Flag = FilterBeforeIoWrite (FilterWidth32, Port, &Value);
   if (Flag) {
-    _ReadWriteBarrier ();
-    _outpd ((UINT16)Port, Value);
-    _ReadWriteBarrier ();
+    if (IsTdxGuest ()) {
+      TdIoWrite32 (Port, Value);
+    } else {
+      _ReadWriteBarrier ();
+      _outpd ((UINT16)Port, Value);
+      _ReadWriteBarrier ();
+    }
   }
+
   FilterAfterIoWrite (FilterWidth32, Port, &Value);
 
   return Value;

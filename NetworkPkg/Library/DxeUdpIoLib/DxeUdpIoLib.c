@@ -18,7 +18,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/DpcLib.h>
 
-
 /**
   Free a UDP_TX_TOKEN. The TX event is closed.
 
@@ -27,10 +26,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 UdpIoFreeTxToken (
-  IN UDP_TX_TOKEN           *TxToken
+  IN UDP_TX_TOKEN  *TxToken
   )
 {
-
   if (TxToken->UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
     gBS->CloseEvent (TxToken->Token.Udp4.Event);
   } else if (TxToken->UdpIo->UdpVersion == UDP_IO_UDP6_VERSION) {
@@ -50,7 +48,7 @@ UdpIoFreeTxToken (
 **/
 VOID
 UdpIoFreeRxToken (
-  IN UDP_RX_TOKEN           *RxToken
+  IN UDP_RX_TOKEN  *RxToken
   )
 {
   if (RxToken->UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
@@ -76,15 +74,17 @@ UdpIoFreeRxToken (
 VOID
 EFIAPI
 UdpIoOnDgramSentDpc (
-  IN VOID                   *Context
+  IN VOID  *Context
   )
 {
-  UDP_TX_TOKEN              *TxToken;
+  UDP_TX_TOKEN  *TxToken;
 
-  TxToken = (UDP_TX_TOKEN *) Context;
+  TxToken = (UDP_TX_TOKEN *)Context;
   ASSERT (TxToken->Signature == UDP_IO_TX_SIGNATURE);
-  ASSERT ((TxToken->UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
-          (TxToken->UdpIo->UdpVersion == UDP_IO_UDP6_VERSION));
+  ASSERT (
+    (TxToken->UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
+    (TxToken->UdpIo->UdpVersion == UDP_IO_UDP6_VERSION)
+    );
 
   RemoveEntryList (&TxToken->Link);
 
@@ -107,8 +107,8 @@ UdpIoOnDgramSentDpc (
 VOID
 EFIAPI
 UdpIoOnDgramSent (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   //
@@ -126,12 +126,12 @@ UdpIoOnDgramSent (
 VOID
 EFIAPI
 UdpIoRecycleDgram (
-  IN VOID                   *Context
+  IN VOID  *Context
   )
 {
-  UDP_RX_TOKEN              *RxToken;
+  UDP_RX_TOKEN  *RxToken;
 
-  RxToken = (UDP_RX_TOKEN *) Context;
+  RxToken = (UDP_RX_TOKEN *)Context;
 
   if (RxToken->UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
     gBS->SignalEvent (RxToken->Token.Udp4.Packet.RxData->RecycleSignal);
@@ -156,26 +156,30 @@ UdpIoRecycleDgram (
 VOID
 EFIAPI
 UdpIoOnDgramRcvdDpc (
-  IN VOID                   *Context
+  IN VOID  *Context
   )
 {
-  EFI_STATUS                Status;
-  VOID                      *Token;
-  VOID                      *RxData;
-  VOID                      *Session;
-  UDP_RX_TOKEN              *RxToken;
-  UDP_END_POINT             EndPoint;
-  NET_BUF                   *Netbuf;
+  EFI_STATUS     Status;
+  VOID           *Token;
+  VOID           *RxData;
+  VOID           *Session;
+  UDP_RX_TOKEN   *RxToken;
+  UDP_END_POINT  EndPoint;
+  NET_BUF        *Netbuf;
 
-  RxToken = (UDP_RX_TOKEN *) Context;
+  RxToken = (UDP_RX_TOKEN *)Context;
 
-  ZeroMem (&EndPoint, sizeof(UDP_END_POINT));
+  ZeroMem (&EndPoint, sizeof (UDP_END_POINT));
 
-  ASSERT ((RxToken->Signature == UDP_IO_RX_SIGNATURE) &&
-          (RxToken == RxToken->UdpIo->RecvRequest));
+  ASSERT (
+    (RxToken->Signature == UDP_IO_RX_SIGNATURE) &&
+    (RxToken == RxToken->UdpIo->RecvRequest)
+    );
 
-  ASSERT ((RxToken->UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
-          (RxToken->UdpIo->UdpVersion == UDP_IO_UDP6_VERSION));
+  ASSERT (
+    (RxToken->UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
+    (RxToken->UdpIo->UdpVersion == UDP_IO_UDP6_VERSION)
+    );
 
   //
   // Clear the receive request first in case that the caller
@@ -185,15 +189,15 @@ UdpIoOnDgramRcvdDpc (
 
   if (RxToken->UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
     Token  = &RxToken->Token.Udp4;
-    RxData = ((EFI_UDP4_COMPLETION_TOKEN *) Token)->Packet.RxData;
-    Status = ((EFI_UDP4_COMPLETION_TOKEN *) Token)->Status;
+    RxData = ((EFI_UDP4_COMPLETION_TOKEN *)Token)->Packet.RxData;
+    Status = ((EFI_UDP4_COMPLETION_TOKEN *)Token)->Status;
   } else {
     Token  = &RxToken->Token.Udp6;
-    RxData = ((EFI_UDP6_COMPLETION_TOKEN *) Token)->Packet.RxData;
-    Status = ((EFI_UDP6_COMPLETION_TOKEN *) Token)->Status;
+    RxData = ((EFI_UDP6_COMPLETION_TOKEN *)Token)->Packet.RxData;
+    Status = ((EFI_UDP6_COMPLETION_TOKEN *)Token)->Status;
   }
 
-  if (EFI_ERROR (Status) || RxData == NULL) {
+  if (EFI_ERROR (Status) || (RxData == NULL)) {
     if (Status != EFI_ABORTED) {
       //
       // Invoke the CallBack only if the reception is not actively aborted.
@@ -209,7 +213,7 @@ UdpIoOnDgramRcvdDpc (
   // Build a NET_BUF from the UDP receive data, then deliver it up.
   //
   if (RxToken->UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
-    if (((EFI_UDP4_RECEIVE_DATA *) RxData)->DataLength == 0) {
+    if (((EFI_UDP4_RECEIVE_DATA *)RxData)->DataLength == 0) {
       //
       // Discard zero length data payload packet.
       //
@@ -217,42 +221,42 @@ UdpIoOnDgramRcvdDpc (
     }
 
     Netbuf = NetbufFromExt (
-               (NET_FRAGMENT *)((EFI_UDP4_RECEIVE_DATA *) RxData)->FragmentTable,
-               ((EFI_UDP4_RECEIVE_DATA *) RxData)->FragmentCount,
+               (NET_FRAGMENT *)((EFI_UDP4_RECEIVE_DATA *)RxData)->FragmentTable,
+               ((EFI_UDP4_RECEIVE_DATA *)RxData)->FragmentCount,
                0,
-               (UINT32) RxToken->HeadLen,
+               (UINT32)RxToken->HeadLen,
                UdpIoRecycleDgram,
                RxToken
                );
 
     if (Netbuf == NULL) {
-      gBS->SignalEvent (((EFI_UDP4_RECEIVE_DATA *) RxData)->RecycleSignal);
+      gBS->SignalEvent (((EFI_UDP4_RECEIVE_DATA *)RxData)->RecycleSignal);
       RxToken->CallBack (NULL, NULL, EFI_OUT_OF_RESOURCES, RxToken->Context);
 
       UdpIoFreeRxToken (RxToken);
       return;
     }
 
-    Session             = &((EFI_UDP4_RECEIVE_DATA *) RxData)->UdpSession;
-    EndPoint.LocalPort  = ((EFI_UDP4_SESSION_DATA *) Session)->DestinationPort;
-    EndPoint.RemotePort = ((EFI_UDP4_SESSION_DATA *) Session)->SourcePort;
+    Session             = &((EFI_UDP4_RECEIVE_DATA *)RxData)->UdpSession;
+    EndPoint.LocalPort  = ((EFI_UDP4_SESSION_DATA *)Session)->DestinationPort;
+    EndPoint.RemotePort = ((EFI_UDP4_SESSION_DATA *)Session)->SourcePort;
 
     CopyMem (
       &EndPoint.LocalAddr,
-      &((EFI_UDP4_SESSION_DATA *) Session)->DestinationAddress,
+      &((EFI_UDP4_SESSION_DATA *)Session)->DestinationAddress,
       sizeof (EFI_IPv4_ADDRESS)
       );
 
     CopyMem (
       &EndPoint.RemoteAddr,
-      &((EFI_UDP4_SESSION_DATA *) Session)->SourceAddress,
+      &((EFI_UDP4_SESSION_DATA *)Session)->SourceAddress,
       sizeof (EFI_IPv4_ADDRESS)
       );
 
     EndPoint.LocalAddr.Addr[0]  = NTOHL (EndPoint.LocalAddr.Addr[0]);
     EndPoint.RemoteAddr.Addr[0] = NTOHL (EndPoint.RemoteAddr.Addr[0]);
   } else {
-    if (((EFI_UDP6_RECEIVE_DATA *) RxData)->DataLength == 0) {
+    if (((EFI_UDP6_RECEIVE_DATA *)RxData)->DataLength == 0) {
       //
       // Discard zero length data payload packet.
       //
@@ -260,35 +264,35 @@ UdpIoOnDgramRcvdDpc (
     }
 
     Netbuf = NetbufFromExt (
-               (NET_FRAGMENT *)((EFI_UDP6_RECEIVE_DATA *) RxData)->FragmentTable,
-               ((EFI_UDP6_RECEIVE_DATA *) RxData)->FragmentCount,
+               (NET_FRAGMENT *)((EFI_UDP6_RECEIVE_DATA *)RxData)->FragmentTable,
+               ((EFI_UDP6_RECEIVE_DATA *)RxData)->FragmentCount,
                0,
-               (UINT32) RxToken->HeadLen,
+               (UINT32)RxToken->HeadLen,
                UdpIoRecycleDgram,
                RxToken
                );
 
     if (Netbuf == NULL) {
-      gBS->SignalEvent (((EFI_UDP6_RECEIVE_DATA *) RxData)->RecycleSignal);
+      gBS->SignalEvent (((EFI_UDP6_RECEIVE_DATA *)RxData)->RecycleSignal);
       RxToken->CallBack (NULL, NULL, EFI_OUT_OF_RESOURCES, RxToken->Context);
 
       UdpIoFreeRxToken (RxToken);
       return;
     }
 
-    Session             = &((EFI_UDP6_RECEIVE_DATA *) RxData)->UdpSession;
-    EndPoint.LocalPort  = ((EFI_UDP6_SESSION_DATA *) Session)->DestinationPort;
-    EndPoint.RemotePort = ((EFI_UDP6_SESSION_DATA *) Session)->SourcePort;
+    Session             = &((EFI_UDP6_RECEIVE_DATA *)RxData)->UdpSession;
+    EndPoint.LocalPort  = ((EFI_UDP6_SESSION_DATA *)Session)->DestinationPort;
+    EndPoint.RemotePort = ((EFI_UDP6_SESSION_DATA *)Session)->SourcePort;
 
     CopyMem (
       &EndPoint.LocalAddr,
-      &((EFI_UDP6_SESSION_DATA *) Session)->DestinationAddress,
+      &((EFI_UDP6_SESSION_DATA *)Session)->DestinationAddress,
       sizeof (EFI_IPv6_ADDRESS)
       );
 
     CopyMem (
       &EndPoint.RemoteAddr,
-      &((EFI_UDP6_SESSION_DATA *) Session)->SourceAddress,
+      &((EFI_UDP6_SESSION_DATA *)Session)->SourceAddress,
       sizeof (EFI_IPv6_ADDRESS)
       );
 
@@ -301,10 +305,10 @@ UdpIoOnDgramRcvdDpc (
 
 Resume:
   if (RxToken->UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
-    gBS->SignalEvent (((EFI_UDP4_RECEIVE_DATA *) RxData)->RecycleSignal);
+    gBS->SignalEvent (((EFI_UDP4_RECEIVE_DATA *)RxData)->RecycleSignal);
     RxToken->UdpIo->Protocol.Udp4->Receive (RxToken->UdpIo->Protocol.Udp4, &RxToken->Token.Udp4);
   } else {
-    gBS->SignalEvent (((EFI_UDP6_RECEIVE_DATA *) RxData)->RecycleSignal);
+    gBS->SignalEvent (((EFI_UDP6_RECEIVE_DATA *)RxData)->RecycleSignal);
     RxToken->UdpIo->Protocol.Udp6->Receive (RxToken->UdpIo->Protocol.Udp6, &RxToken->Token.Udp6);
   }
 }
@@ -319,8 +323,8 @@ Resume:
 VOID
 EFIAPI
 UdpIoOnDgramRcvd (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   //
@@ -342,17 +346,19 @@ UdpIoOnDgramRcvd (
 **/
 UDP_RX_TOKEN *
 UdpIoCreateRxToken (
-  IN UDP_IO                 *UdpIo,
-  IN UDP_IO_CALLBACK        CallBack,
-  IN VOID                   *Context,
-  IN UINT32                 HeadLen
+  IN UDP_IO           *UdpIo,
+  IN UDP_IO_CALLBACK  CallBack,
+  IN VOID             *Context,
+  IN UINT32           HeadLen
   )
 {
-  UDP_RX_TOKEN              *Token;
-  EFI_STATUS                Status;
+  UDP_RX_TOKEN  *Token;
+  EFI_STATUS    Status;
 
-  ASSERT ((UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
-          (UdpIo->UdpVersion == UDP_IO_UDP6_VERSION));
+  ASSERT (
+    (UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
+    (UdpIo->UdpVersion == UDP_IO_UDP6_VERSION)
+    );
 
   Token = AllocatePool (sizeof (UDP_RX_TOKEN));
 
@@ -360,14 +366,13 @@ UdpIoCreateRxToken (
     return NULL;
   }
 
-  Token->Signature              = UDP_IO_RX_SIGNATURE;
-  Token->UdpIo                  = UdpIo;
-  Token->CallBack               = CallBack;
-  Token->Context                = Context;
-  Token->HeadLen                = HeadLen;
+  Token->Signature = UDP_IO_RX_SIGNATURE;
+  Token->UdpIo     = UdpIo;
+  Token->CallBack  = CallBack;
+  Token->Context   = Context;
+  Token->HeadLen   = HeadLen;
 
   if (UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
-
     Token->Token.Udp4.Status        = EFI_NOT_READY;
     Token->Token.Udp4.Packet.RxData = NULL;
 
@@ -378,8 +383,7 @@ UdpIoCreateRxToken (
                     Token,
                     &Token->Token.Udp4.Event
                     );
-    } else {
-
+  } else {
     Token->Token.Udp6.Status        = EFI_NOT_READY;
     Token->Token.Udp6.Packet.RxData = NULL;
 
@@ -391,7 +395,6 @@ UdpIoCreateRxToken (
                     &Token->Token.Udp6.Event
                     );
   }
-
 
   if (EFI_ERROR (Status)) {
     FreePool (Token);
@@ -420,25 +423,27 @@ UdpIoCreateRxToken (
 **/
 UDP_TX_TOKEN *
 UdpIoCreateTxToken (
-  IN UDP_IO                 *UdpIo,
-  IN NET_BUF                *Packet,
-  IN UDP_END_POINT          *EndPoint OPTIONAL,
-  IN EFI_IP_ADDRESS         *Gateway  OPTIONAL,
-  IN UDP_IO_CALLBACK        CallBack,
-  IN VOID                   *Context
+  IN UDP_IO           *UdpIo,
+  IN NET_BUF          *Packet,
+  IN UDP_END_POINT    *EndPoint OPTIONAL,
+  IN EFI_IP_ADDRESS   *Gateway  OPTIONAL,
+  IN UDP_IO_CALLBACK  CallBack,
+  IN VOID             *Context
   )
 {
-  UDP_TX_TOKEN              *TxToken;
-  VOID                      *Token;
-  VOID                      *Data;
-  EFI_STATUS                Status;
-  UINT32                    Count;
-  UINTN                     Size;
-  IP4_ADDR                  Ip;
+  UDP_TX_TOKEN  *TxToken;
+  VOID          *Token;
+  VOID          *Data;
+  EFI_STATUS    Status;
+  UINT32        Count;
+  UINTN         Size;
+  IP4_ADDR      Ip;
 
   ASSERT (Packet != NULL);
-  ASSERT ((UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
-          (UdpIo->UdpVersion == UDP_IO_UDP6_VERSION));
+  ASSERT (
+    (UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
+    (UdpIo->UdpVersion == UDP_IO_UDP6_VERSION)
+    );
 
   if (UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
     Size = sizeof (UDP_TX_TOKEN) + sizeof (EFI_UDP4_FRAGMENT_DATA) * (Packet->BlockOpNum - 1);
@@ -455,24 +460,23 @@ UdpIoCreateTxToken (
   TxToken->Signature = UDP_IO_TX_SIGNATURE;
   InitializeListHead (&TxToken->Link);
 
-  TxToken->UdpIo     = UdpIo;
-  TxToken->CallBack  = CallBack;
-  TxToken->Packet    = Packet;
-  TxToken->Context   = Context;
+  TxToken->UdpIo    = UdpIo;
+  TxToken->CallBack = CallBack;
+  TxToken->Packet   = Packet;
+  TxToken->Context  = Context;
 
-  Token              = &(TxToken->Token);
-  Count              = Packet->BlockOpNum;
+  Token = &(TxToken->Token);
+  Count = Packet->BlockOpNum;
 
   if (UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
-
-    ((EFI_UDP4_COMPLETION_TOKEN *) Token)->Status = EFI_NOT_READY;
+    ((EFI_UDP4_COMPLETION_TOKEN *)Token)->Status = EFI_NOT_READY;
 
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_SIGNAL,
                     TPL_NOTIFY,
                     UdpIoOnDgramSent,
                     TxToken,
-                    &((EFI_UDP4_COMPLETION_TOKEN *) Token)->Event
+                    &((EFI_UDP4_COMPLETION_TOKEN *)Token)->Event
                     );
 
     if (EFI_ERROR (Status)) {
@@ -480,20 +484,20 @@ UdpIoCreateTxToken (
       return NULL;
     }
 
-    Data = &(TxToken->Data.Udp4);
-    ((EFI_UDP4_COMPLETION_TOKEN *) Token)->Packet.TxData = Data;
+    Data                                                = &(TxToken->Data.Udp4);
+    ((EFI_UDP4_COMPLETION_TOKEN *)Token)->Packet.TxData = Data;
 
-    ((EFI_UDP4_TRANSMIT_DATA *) Data)->UdpSessionData    = NULL;
-    ((EFI_UDP4_TRANSMIT_DATA *) Data)->GatewayAddress    = NULL;
-    ((EFI_UDP4_TRANSMIT_DATA *) Data)->DataLength        = Packet->TotalSize;
+    ((EFI_UDP4_TRANSMIT_DATA *)Data)->UdpSessionData = NULL;
+    ((EFI_UDP4_TRANSMIT_DATA *)Data)->GatewayAddress = NULL;
+    ((EFI_UDP4_TRANSMIT_DATA *)Data)->DataLength     = Packet->TotalSize;
 
     NetbufBuildExt (
       Packet,
-      (NET_FRAGMENT *)((EFI_UDP4_TRANSMIT_DATA *) Data)->FragmentTable,
+      (NET_FRAGMENT *)((EFI_UDP4_TRANSMIT_DATA *)Data)->FragmentTable,
       &Count
       );
 
-    ((EFI_UDP4_TRANSMIT_DATA *) Data)->FragmentCount     = Count;
+    ((EFI_UDP4_TRANSMIT_DATA *)Data)->FragmentCount = Count;
 
     if (EndPoint != NULL) {
       Ip = HTONL (EndPoint->LocalAddr.Addr[0]);
@@ -510,27 +514,25 @@ UdpIoCreateTxToken (
         sizeof (EFI_IPv4_ADDRESS)
         );
 
-      TxToken->Session.Udp4.SourcePort                   = EndPoint->LocalPort;
-      TxToken->Session.Udp4.DestinationPort              = EndPoint->RemotePort;
-      ((EFI_UDP4_TRANSMIT_DATA *) Data)->UdpSessionData  = &(TxToken->Session.Udp4);
+      TxToken->Session.Udp4.SourcePort                 = EndPoint->LocalPort;
+      TxToken->Session.Udp4.DestinationPort            = EndPoint->RemotePort;
+      ((EFI_UDP4_TRANSMIT_DATA *)Data)->UdpSessionData = &(TxToken->Session.Udp4);
     }
 
-    if (Gateway != NULL && (Gateway->Addr[0] != 0)) {
+    if ((Gateway != NULL) && (Gateway->Addr[0] != 0)) {
       Ip = HTONL (Gateway->Addr[0]);
       CopyMem (&TxToken->Gateway, &Ip, sizeof (EFI_IPv4_ADDRESS));
-      ((EFI_UDP4_TRANSMIT_DATA *) Data)->GatewayAddress = &TxToken->Gateway;
+      ((EFI_UDP4_TRANSMIT_DATA *)Data)->GatewayAddress = &TxToken->Gateway;
     }
-
   } else {
-
-    ((EFI_UDP6_COMPLETION_TOKEN *) Token)->Status = EFI_NOT_READY;
+    ((EFI_UDP6_COMPLETION_TOKEN *)Token)->Status = EFI_NOT_READY;
 
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_SIGNAL,
                     TPL_NOTIFY,
                     UdpIoOnDgramSent,
                     TxToken,
-                    &((EFI_UDP6_COMPLETION_TOKEN *) Token)->Event
+                    &((EFI_UDP6_COMPLETION_TOKEN *)Token)->Event
                     );
 
     if (EFI_ERROR (Status)) {
@@ -538,35 +540,35 @@ UdpIoCreateTxToken (
       return NULL;
     }
 
-    Data = &(TxToken->Data.Udp6);
-    ((EFI_UDP6_COMPLETION_TOKEN *) Token)->Packet.TxData  = Data;
-    ((EFI_UDP6_TRANSMIT_DATA *) Data)->UdpSessionData     = NULL;
-    ((EFI_UDP6_TRANSMIT_DATA *) Data)->DataLength         = Packet->TotalSize;
+    Data                                                = &(TxToken->Data.Udp6);
+    ((EFI_UDP6_COMPLETION_TOKEN *)Token)->Packet.TxData = Data;
+    ((EFI_UDP6_TRANSMIT_DATA *)Data)->UdpSessionData    = NULL;
+    ((EFI_UDP6_TRANSMIT_DATA *)Data)->DataLength        = Packet->TotalSize;
 
     NetbufBuildExt (
       Packet,
-      (NET_FRAGMENT *)((EFI_UDP6_TRANSMIT_DATA *) Data)->FragmentTable,
+      (NET_FRAGMENT *)((EFI_UDP6_TRANSMIT_DATA *)Data)->FragmentTable,
       &Count
       );
 
-    ((EFI_UDP6_TRANSMIT_DATA *) Data)->FragmentCount      = Count;
+    ((EFI_UDP6_TRANSMIT_DATA *)Data)->FragmentCount = Count;
 
     if (EndPoint != NULL) {
       CopyMem (
         &TxToken->Session.Udp6.SourceAddress,
         &EndPoint->LocalAddr.v6,
-        sizeof(EFI_IPv6_ADDRESS)
+        sizeof (EFI_IPv6_ADDRESS)
         );
 
       CopyMem (
         &TxToken->Session.Udp6.DestinationAddress,
         &EndPoint->RemoteAddr.v6,
-        sizeof(EFI_IPv6_ADDRESS)
+        sizeof (EFI_IPv6_ADDRESS)
         );
 
-      TxToken->Session.Udp6.SourcePort                   = EndPoint->LocalPort;
-      TxToken->Session.Udp6.DestinationPort              = EndPoint->RemotePort;
-      ((EFI_UDP6_TRANSMIT_DATA *) Data)->UdpSessionData  = &(TxToken->Session.Udp6);
+      TxToken->Session.Udp6.SourcePort                 = EndPoint->LocalPort;
+      TxToken->Session.Udp6.DestinationPort            = EndPoint->RemotePort;
+      ((EFI_UDP6_TRANSMIT_DATA *)Data)->UdpSessionData = &(TxToken->Session.Udp6);
     }
   }
 
@@ -598,15 +600,15 @@ UdpIoCreateTxToken (
 UDP_IO *
 EFIAPI
 UdpIoCreateIo (
-  IN  EFI_HANDLE            Controller,
-  IN  EFI_HANDLE            ImageHandle,
-  IN  UDP_IO_CONFIG         Configure,
-  IN  UINT8                 UdpVersion,
-  IN  VOID                  *Context
+  IN  EFI_HANDLE     Controller,
+  IN  EFI_HANDLE     ImageHandle,
+  IN  UDP_IO_CONFIG  Configure,
+  IN  UINT8          UdpVersion,
+  IN  VOID           *Context
   )
 {
-  UDP_IO                    *UdpIo;
-  EFI_STATUS                Status;
+  UDP_IO      *UdpIo;
+  EFI_STATUS  Status;
 
   ASSERT (Configure != NULL);
   ASSERT ((UdpVersion == UDP_IO_UDP4_VERSION) || (UdpVersion == UDP_IO_UDP6_VERSION));
@@ -617,17 +619,17 @@ UdpIoCreateIo (
     return NULL;
   }
 
-  UdpIo->UdpVersion   = UdpVersion;
-  UdpIo->Signature    = UDP_IO_SIGNATURE;
+  UdpIo->UdpVersion = UdpVersion;
+  UdpIo->Signature  = UDP_IO_SIGNATURE;
   InitializeListHead (&UdpIo->Link);
-  UdpIo->RefCnt       = 1;
+  UdpIo->RefCnt = 1;
 
-  UdpIo->Controller   = Controller;
-  UdpIo->Image        = ImageHandle;
+  UdpIo->Controller = Controller;
+  UdpIo->Image      = ImageHandle;
 
   InitializeListHead (&UdpIo->SentDatagram);
-  UdpIo->RecvRequest  = NULL;
-  UdpIo->UdpHandle    = NULL;
+  UdpIo->RecvRequest = NULL;
+  UdpIo->UdpHandle   = NULL;
 
   if (UdpVersion == UDP_IO_UDP4_VERSION) {
     //
@@ -647,7 +649,7 @@ UdpIoCreateIo (
     Status = gBS->OpenProtocol (
                     UdpIo->UdpHandle,
                     &gEfiUdp4ProtocolGuid,
-                    (VOID **) &UdpIo->Protocol.Udp4,
+                    (VOID **)&UdpIo->Protocol.Udp4,
                     ImageHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -672,9 +674,7 @@ UdpIoCreateIo (
     if (EFI_ERROR (Status)) {
       goto CLOSE_PROTOCOL;
     }
-
   } else {
-
     Status = NetLibCreateServiceChild (
                Controller,
                ImageHandle,
@@ -689,7 +689,7 @@ UdpIoCreateIo (
     Status = gBS->OpenProtocol (
                     UdpIo->UdpHandle,
                     &gEfiUdp6ProtocolGuid,
-                    (VOID **) &UdpIo->Protocol.Udp6,
+                    (VOID **)&UdpIo->Protocol.Udp6,
                     ImageHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -763,24 +763,25 @@ FREE_MEM:
 VOID
 EFIAPI
 UdpIoCancelDgrams (
-  IN UDP_IO                 *UdpIo,
-  IN EFI_STATUS             IoStatus,
-  IN UDP_IO_TO_CANCEL       ToCancel,        OPTIONAL
-  IN VOID                   *Context         OPTIONAL
+  IN UDP_IO            *UdpIo,
+  IN EFI_STATUS        IoStatus,
+  IN UDP_IO_TO_CANCEL  ToCancel         OPTIONAL,
+  IN VOID              *Context         OPTIONAL
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  UDP_TX_TOKEN              *TxToken;
+  LIST_ENTRY    *Entry;
+  LIST_ENTRY    *Next;
+  UDP_TX_TOKEN  *TxToken;
 
-  ASSERT ((UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
-          (UdpIo->UdpVersion == UDP_IO_UDP6_VERSION));
+  ASSERT (
+    (UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
+    (UdpIo->UdpVersion == UDP_IO_UDP6_VERSION)
+    );
 
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &UdpIo->SentDatagram) {
     TxToken = NET_LIST_USER_STRUCT (Entry, UDP_TX_TOKEN, Link);
 
     if ((ToCancel == NULL) || (ToCancel (TxToken, Context))) {
-
       if (UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
         UdpIo->Protocol.Udp4->Cancel (UdpIo->Protocol.Udp4, &TxToken->Token.Udp4);
       } else {
@@ -806,14 +807,16 @@ UdpIoCancelDgrams (
 EFI_STATUS
 EFIAPI
 UdpIoFreeIo (
-  IN  UDP_IO           *UdpIo
+  IN  UDP_IO  *UdpIo
   )
 {
-  EFI_STATUS           Status;
-  UDP_RX_TOKEN         *RxToken;
+  EFI_STATUS    Status;
+  UDP_RX_TOKEN  *RxToken;
 
-  ASSERT ((UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
-          (UdpIo->UdpVersion == UDP_IO_UDP6_VERSION));
+  ASSERT (
+    (UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
+    (UdpIo->UdpVersion == UDP_IO_UDP6_VERSION)
+    );
 
   //
   // Cancel all the sent datagram and receive requests. The
@@ -826,7 +829,6 @@ UdpIoFreeIo (
   UdpIoCancelDgrams (UdpIo, EFI_ABORTED, NULL, NULL);
 
   if (UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
-
     if ((RxToken = UdpIo->RecvRequest) != NULL) {
       Status = UdpIo->Protocol.Udp4->Cancel (UdpIo->Protocol.Udp4, &RxToken->Token.Udp4);
       if (EFI_ERROR (Status)) {
@@ -856,9 +858,7 @@ UdpIoFreeIo (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-
   } else {
-
     if ((RxToken = UdpIo->RecvRequest) != NULL) {
       Status = UdpIo->Protocol.Udp6->Cancel (UdpIo->Protocol.Udp6, &RxToken->Token.Udp6);
       if (EFI_ERROR (Status)) {
@@ -870,11 +870,11 @@ UdpIoFreeIo (
     // Close then destroy the Udp6 child
     //
     Status = gBS->CloseProtocol (
-               UdpIo->UdpHandle,
-               &gEfiUdp6ProtocolGuid,
-               UdpIo->Image,
-               UdpIo->Controller
-               );
+                    UdpIo->UdpHandle,
+                    &gEfiUdp6ProtocolGuid,
+                    UdpIo->Image,
+                    UdpIo->Controller
+                    );
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -890,14 +890,13 @@ UdpIoFreeIo (
     }
   }
 
-  if (!IsListEmpty(&UdpIo->Link)) {
+  if (!IsListEmpty (&UdpIo->Link)) {
     RemoveEntryList (&UdpIo->Link);
   }
 
   FreePool (UdpIo);
   return EFI_SUCCESS;
 }
-
 
 /**
   Clean up the UDP_IO without freeing it. The function is called when
@@ -914,13 +913,15 @@ UdpIoFreeIo (
 VOID
 EFIAPI
 UdpIoCleanIo (
-  IN  UDP_IO                *UdpIo
+  IN  UDP_IO  *UdpIo
   )
 {
-  UDP_RX_TOKEN              *RxToken;
+  UDP_RX_TOKEN  *RxToken;
 
-  ASSERT ((UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
-          (UdpIo->UdpVersion == UDP_IO_UDP6_VERSION));
+  ASSERT (
+    (UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
+    (UdpIo->UdpVersion == UDP_IO_UDP6_VERSION)
+    );
 
   //
   // Cancel all the sent datagram and receive requests.
@@ -933,7 +934,6 @@ UdpIoCleanIo (
     }
 
     UdpIo->Protocol.Udp4->Configure (UdpIo->Protocol.Udp4, NULL);
-
   } else {
     if ((RxToken = UdpIo->RecvRequest) != NULL) {
       UdpIo->Protocol.Udp6->Cancel (UdpIo->Protocol.Udp6, &RxToken->Token.Udp6);
@@ -969,19 +969,21 @@ UdpIoCleanIo (
 EFI_STATUS
 EFIAPI
 UdpIoSendDatagram (
-  IN  UDP_IO                *UdpIo,
-  IN  NET_BUF               *Packet,
-  IN  UDP_END_POINT         *EndPoint OPTIONAL,
-  IN  EFI_IP_ADDRESS        *Gateway  OPTIONAL,
-  IN  UDP_IO_CALLBACK       CallBack,
-  IN  VOID                  *Context
+  IN  UDP_IO           *UdpIo,
+  IN  NET_BUF          *Packet,
+  IN  UDP_END_POINT    *EndPoint OPTIONAL,
+  IN  EFI_IP_ADDRESS   *Gateway  OPTIONAL,
+  IN  UDP_IO_CALLBACK  CallBack,
+  IN  VOID             *Context
   )
 {
-  UDP_TX_TOKEN              *TxToken;
-  EFI_STATUS                Status;
+  UDP_TX_TOKEN  *TxToken;
+  EFI_STATUS    Status;
 
-  ASSERT ((UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
-          (UdpIo->UdpVersion == UDP_IO_UDP6_VERSION));
+  ASSERT (
+    (UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
+    (UdpIo->UdpVersion == UDP_IO_UDP6_VERSION)
+    );
 
   TxToken = UdpIoCreateTxToken (UdpIo, Packet, EndPoint, Gateway, CallBack, Context);
 
@@ -1010,7 +1012,6 @@ UdpIoSendDatagram (
   return EFI_SUCCESS;
 }
 
-
 /**
   The select function to cancel a single sent datagram.
 
@@ -1023,13 +1024,13 @@ UdpIoSendDatagram (
 BOOLEAN
 EFIAPI
 UdpIoCancelSingleDgram (
-  IN UDP_TX_TOKEN           *Token,
-  IN VOID                   *Context
+  IN UDP_TX_TOKEN  *Token,
+  IN VOID          *Context
   )
 {
-  NET_BUF                   *Packet;
+  NET_BUF  *Packet;
 
-  Packet = (NET_BUF *) Context;
+  Packet = (NET_BUF *)Context;
 
   if (Token->Packet == Packet) {
     return TRUE;
@@ -1048,8 +1049,8 @@ UdpIoCancelSingleDgram (
 VOID
 EFIAPI
 UdpIoCancelSentDatagram (
-  IN  UDP_IO                *UdpIo,
-  IN  NET_BUF               *Packet
+  IN  UDP_IO   *UdpIo,
+  IN  NET_BUF  *Packet
   )
 {
   UdpIoCancelDgrams (UdpIo, EFI_ABORTED, UdpIoCancelSingleDgram, Packet);
@@ -1081,17 +1082,19 @@ UdpIoCancelSentDatagram (
 EFI_STATUS
 EFIAPI
 UdpIoRecvDatagram (
-  IN  UDP_IO                *UdpIo,
-  IN  UDP_IO_CALLBACK       CallBack,
-  IN  VOID                  *Context,
-  IN  UINT32                HeadLen
+  IN  UDP_IO           *UdpIo,
+  IN  UDP_IO_CALLBACK  CallBack,
+  IN  VOID             *Context,
+  IN  UINT32           HeadLen
   )
 {
-  UDP_RX_TOKEN              *RxToken;
-  EFI_STATUS                Status;
+  UDP_RX_TOKEN  *RxToken;
+  EFI_STATUS    Status;
 
-  ASSERT ((UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
-          (UdpIo->UdpVersion == UDP_IO_UDP6_VERSION));
+  ASSERT (
+    (UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
+    (UdpIo->UdpVersion == UDP_IO_UDP6_VERSION)
+    );
 
   if (UdpIo->RecvRequest != NULL) {
     return EFI_ALREADY_STARTED;

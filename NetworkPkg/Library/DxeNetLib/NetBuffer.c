@@ -14,7 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-
 /**
   Allocate and build up the sketch for a NET_BUF.
 
@@ -31,12 +30,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 NET_BUF *
 NetbufAllocStruct (
-  IN UINT32                 BlockNum,
-  IN UINT32                 BlockOpNum
+  IN UINT32  BlockNum,
+  IN UINT32  BlockOpNum
   )
 {
-  NET_BUF                   *Nbuf;
-  NET_VECTOR                *Vector;
+  NET_BUF     *Nbuf;
+  NET_VECTOR  *Vector;
 
   ASSERT (BlockOpNum >= 1);
 
@@ -49,9 +48,9 @@ NetbufAllocStruct (
     return NULL;
   }
 
-  Nbuf->Signature           = NET_BUF_SIGNATURE;
-  Nbuf->RefCnt              = 1;
-  Nbuf->BlockOpNum          = BlockOpNum;
+  Nbuf->Signature  = NET_BUF_SIGNATURE;
+  Nbuf->RefCnt     = 1;
+  Nbuf->BlockOpNum = BlockOpNum;
   InitializeListHead (&Nbuf->List);
 
   if (BlockNum != 0) {
@@ -75,7 +74,6 @@ FreeNbuf:
   return NULL;
 }
 
-
 /**
   Allocate a single block NET_BUF. Upon allocation, all the
   free space is in the tail room.
@@ -89,12 +87,12 @@ FreeNbuf:
 NET_BUF  *
 EFIAPI
 NetbufAlloc (
-  IN UINT32                 Len
+  IN UINT32  Len
   )
 {
-  NET_BUF                   *Nbuf;
-  NET_VECTOR                *Vector;
-  UINT8                     *Bulk;
+  NET_BUF     *Nbuf;
+  NET_VECTOR  *Vector;
+  UINT8       *Bulk;
 
   ASSERT (Len > 0);
 
@@ -110,18 +108,18 @@ NetbufAlloc (
     goto FreeNBuf;
   }
 
-  Vector = Nbuf->Vector;
-  Vector->Len                 = Len;
+  Vector      = Nbuf->Vector;
+  Vector->Len = Len;
 
-  Vector->Block[0].Bulk       = Bulk;
-  Vector->Block[0].Len        = Len;
+  Vector->Block[0].Bulk = Bulk;
+  Vector->Block[0].Len  = Len;
 
-  Nbuf->BlockOp[0].BlockHead  = Bulk;
-  Nbuf->BlockOp[0].BlockTail  = Bulk + Len;
+  Nbuf->BlockOp[0].BlockHead = Bulk;
+  Nbuf->BlockOp[0].BlockTail = Bulk + Len;
 
-  Nbuf->BlockOp[0].Head       = Bulk;
-  Nbuf->BlockOp[0].Tail       = Bulk;
-  Nbuf->BlockOp[0].Size       = 0;
+  Nbuf->BlockOp[0].Head = Bulk;
+  Nbuf->BlockOp[0].Tail = Bulk;
+  Nbuf->BlockOp[0].Size = 0;
 
   return Nbuf;
 
@@ -142,10 +140,10 @@ FreeNBuf:
 **/
 VOID
 NetbufFreeVector (
-  IN NET_VECTOR             *Vector
+  IN NET_VECTOR  *Vector
   )
 {
-  UINT32                    Index;
+  UINT32  Index;
 
   ASSERT (Vector != NULL);
   NET_CHECK_SIGNATURE (Vector, NET_VECTOR_SIGNATURE);
@@ -168,7 +166,6 @@ NetbufFreeVector (
     }
 
     Vector->Free (Vector->Arg);
-
   } else {
     //
     // Free each memory block associated with the Vector
@@ -180,7 +177,6 @@ NetbufFreeVector (
 
   FreePool (Vector);
 }
-
 
 /**
   Free the net buffer and its associated NET_VECTOR.
@@ -197,7 +193,7 @@ NetbufFreeVector (
 VOID
 EFIAPI
 NetbufFree (
-  IN NET_BUF                *Nbuf
+  IN NET_BUF  *Nbuf
   )
 {
   ASSERT (Nbuf != NULL);
@@ -216,7 +212,6 @@ NetbufFree (
   }
 }
 
-
 /**
   Create a copy of the net buffer that shares the associated net vector.
 
@@ -232,10 +227,10 @@ NetbufFree (
 NET_BUF *
 EFIAPI
 NetbufClone (
-  IN NET_BUF                *Nbuf
+  IN NET_BUF  *Nbuf
   )
 {
-  NET_BUF                   *Clone;
+  NET_BUF  *Clone;
 
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
 
@@ -245,12 +240,12 @@ NetbufClone (
     return NULL;
   }
 
-  Clone->Signature  = NET_BUF_SIGNATURE;
-  Clone->RefCnt     = 1;
+  Clone->Signature = NET_BUF_SIGNATURE;
+  Clone->RefCnt    = 1;
   InitializeListHead (&Clone->List);
 
-  Clone->Ip   = Nbuf->Ip;
-  Clone->Tcp  = Nbuf->Tcp;
+  Clone->Ip  = Nbuf->Ip;
+  Clone->Tcp = Nbuf->Tcp;
 
   CopyMem (Clone->ProtoData, Nbuf->ProtoData, NET_PROTO_DATA);
 
@@ -263,7 +258,6 @@ NetbufClone (
 
   return Clone;
 }
-
 
 /**
   Create a duplicated copy of the net buffer with data copied and HeadSpace
@@ -284,12 +278,12 @@ NetbufClone (
 NET_BUF  *
 EFIAPI
 NetbufDuplicate (
-  IN NET_BUF                *Nbuf,
-  IN OUT NET_BUF            *Duplicate        OPTIONAL,
-  IN UINT32                 HeadSpace
+  IN NET_BUF      *Nbuf,
+  IN OUT NET_BUF  *Duplicate        OPTIONAL,
+  IN UINT32       HeadSpace
   )
 {
-  UINT8                     *Dst;
+  UINT8  *Dst;
 
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
 
@@ -314,7 +308,6 @@ NetbufDuplicate (
   return Duplicate;
 }
 
-
 /**
   Free a list of net buffers.
 
@@ -324,12 +317,12 @@ NetbufDuplicate (
 VOID
 EFIAPI
 NetbufFreeList (
-  IN OUT LIST_ENTRY         *Head
+  IN OUT LIST_ENTRY  *Head
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  NET_BUF                   *Nbuf;
+  LIST_ENTRY  *Entry;
+  LIST_ENTRY  *Next;
+  NET_BUF     *Nbuf;
 
   Entry = Head->ForwardLink;
 
@@ -343,7 +336,6 @@ NetbufFreeList (
 
   ASSERT (IsListEmpty (Head));
 }
-
 
 /**
   Get the index of NET_BLOCK_OP that contains the byte at Offset in the net
@@ -365,14 +357,14 @@ NetbufFreeList (
 UINT8  *
 EFIAPI
 NetbufGetByte (
-  IN  NET_BUF               *Nbuf,
-  IN  UINT32                Offset,
-  OUT UINT32                *Index  OPTIONAL
+  IN  NET_BUF  *Nbuf,
+  IN  UINT32   Offset,
+  OUT UINT32   *Index  OPTIONAL
   )
 {
-  NET_BLOCK_OP              *BlockOp;
-  UINT32                    Loop;
-  UINT32                    Len;
+  NET_BLOCK_OP  *BlockOp;
+  UINT32        Loop;
+  UINT32        Len;
 
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
 
@@ -384,7 +376,6 @@ NetbufGetByte (
   Len     = 0;
 
   for (Loop = 0; Loop < Nbuf->BlockOpNum; Loop++) {
-
     if (Len + BlockOp[Loop].Size <= Offset) {
       Len += BlockOp[Loop].Size;
       continue;
@@ -399,8 +390,6 @@ NetbufGetByte (
 
   return NULL;
 }
-
-
 
 /**
   Set the NET_BLOCK and corresponding NET_BLOCK_OP in the net buffer and
@@ -419,31 +408,29 @@ NetbufGetByte (
 **/
 VOID
 NetbufSetBlock (
-  IN OUT NET_BUF            *Nbuf,
-  IN UINT8                  *Bulk,
-  IN UINT32                 Len,
-  IN UINT32                 Index
+  IN OUT NET_BUF  *Nbuf,
+  IN UINT8        *Bulk,
+  IN UINT32       Len,
+  IN UINT32       Index
   )
 {
-  NET_BLOCK_OP              *BlockOp;
-  NET_BLOCK                 *Block;
+  NET_BLOCK_OP  *BlockOp;
+  NET_BLOCK     *Block;
 
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
   NET_CHECK_SIGNATURE (Nbuf->Vector, NET_VECTOR_SIGNATURE);
   ASSERT (Index < Nbuf->BlockOpNum);
 
-  Block               = &(Nbuf->Vector->Block[Index]);
-  BlockOp             = &(Nbuf->BlockOp[Index]);
-  Block->Len          = Len;
-  Block->Bulk         = Bulk;
-  BlockOp->BlockHead  = Bulk;
-  BlockOp->BlockTail  = Bulk + Len;
-  BlockOp->Head       = Bulk;
-  BlockOp->Tail       = Bulk + Len;
-  BlockOp->Size       = Len;
+  Block              = &(Nbuf->Vector->Block[Index]);
+  BlockOp            = &(Nbuf->BlockOp[Index]);
+  Block->Len         = Len;
+  Block->Bulk        = Bulk;
+  BlockOp->BlockHead = Bulk;
+  BlockOp->BlockTail = Bulk + Len;
+  BlockOp->Head      = Bulk;
+  BlockOp->Tail      = Bulk + Len;
+  BlockOp->Size      = Len;
 }
-
-
 
 /**
   Set the NET_BLOCK_OP in the net buffer. The corresponding NET_BLOCK
@@ -461,25 +448,24 @@ NetbufSetBlock (
 **/
 VOID
 NetbufSetBlockOp (
-  IN OUT NET_BUF            *Nbuf,
-  IN UINT8                  *Bulk,
-  IN UINT32                 Len,
-  IN UINT32                 Index
+  IN OUT NET_BUF  *Nbuf,
+  IN UINT8        *Bulk,
+  IN UINT32       Len,
+  IN UINT32       Index
   )
 {
-  NET_BLOCK_OP              *BlockOp;
+  NET_BLOCK_OP  *BlockOp;
 
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
   ASSERT (Index < Nbuf->BlockOpNum);
 
-  BlockOp             = &(Nbuf->BlockOp[Index]);
-  BlockOp->BlockHead  = Bulk;
-  BlockOp->BlockTail  = Bulk + Len;
-  BlockOp->Head       = Bulk;
-  BlockOp->Tail       = Bulk + Len;
-  BlockOp->Size       = Len;
+  BlockOp            = &(Nbuf->BlockOp[Index]);
+  BlockOp->BlockHead = Bulk;
+  BlockOp->BlockTail = Bulk + Len;
+  BlockOp->Head      = Bulk;
+  BlockOp->Tail      = Bulk + Len;
+  BlockOp->Size      = Len;
 }
-
 
 /**
   Helper function for NetbufGetFragment. NetbufGetFragment may allocate the
@@ -493,15 +479,14 @@ NetbufSetBlockOp (
 VOID
 EFIAPI
 NetbufGetFragmentFree (
-  IN VOID                   *Arg
+  IN VOID  *Arg
   )
 {
-  NET_VECTOR                *Vector;
+  NET_VECTOR  *Vector;
 
   Vector = (NET_VECTOR *)Arg;
   NetbufFreeVector (Vector);
 }
-
 
 /**
   Create a NET_BUF structure which contains Len byte data of Nbuf starting from
@@ -523,25 +508,25 @@ NetbufGetFragmentFree (
 NET_BUF  *
 EFIAPI
 NetbufGetFragment (
-  IN NET_BUF                *Nbuf,
-  IN UINT32                 Offset,
-  IN UINT32                 Len,
-  IN UINT32                 HeadSpace
+  IN NET_BUF  *Nbuf,
+  IN UINT32   Offset,
+  IN UINT32   Len,
+  IN UINT32   HeadSpace
   )
 {
-  NET_BUF                   *Child;
-  NET_VECTOR                *Vector;
-  NET_BLOCK_OP              *BlockOp;
-  UINT32                    CurBlockOp;
-  UINT32                    BlockOpNum;
-  UINT8                     *FirstBulk;
-  UINT32                    Index;
-  UINT32                    First;
-  UINT32                    Last;
-  UINT32                    FirstSkip;
-  UINT32                    FirstLen;
-  UINT32                    LastLen;
-  UINT32                    Cur;
+  NET_BUF       *Child;
+  NET_VECTOR    *Vector;
+  NET_BLOCK_OP  *BlockOp;
+  UINT32        CurBlockOp;
+  UINT32        BlockOpNum;
+  UINT8         *FirstBulk;
+  UINT32        Index;
+  UINT32        First;
+  UINT32        Last;
+  UINT32        FirstSkip;
+  UINT32        FirstLen;
+  UINT32        LastLen;
+  UINT32        Cur;
 
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
 
@@ -573,14 +558,14 @@ NetbufGetFragment (
   FirstSkip = Offset - Cur;
   FirstLen  = BlockOp[Index].Size - FirstSkip;
 
-  Last      = 0;
-  LastLen   = 0;
+  Last    = 0;
+  LastLen = 0;
 
   if (Len > FirstLen) {
     Cur += BlockOp[Index].Size;
     Index++;
 
-    for (; Index < Nbuf->BlockOpNum; Index++) {
+    for ( ; Index < Nbuf->BlockOpNum; Index++) {
       if (Offset + Len <= Cur + BlockOp[Index].Size) {
         Last    = Index;
         LastLen = Offset + Len - Cur;
@@ -589,7 +574,6 @@ NetbufGetFragment (
 
       Cur += BlockOp[Index].Size;
     }
-
   } else {
     Last     = First;
     LastLen  = Len;
@@ -618,20 +602,19 @@ NetbufGetFragment (
       goto FreeChild;
     }
 
-    Vector        = Child->Vector;
-    Vector->Free  = NetbufGetFragmentFree;
-    Vector->Arg   = Nbuf->Vector;
-    Vector->Flag  = NET_VECTOR_OWN_FIRST;
-    Vector->Len   = HeadSpace;
+    Vector       = Child->Vector;
+    Vector->Free = NetbufGetFragmentFree;
+    Vector->Arg  = Nbuf->Vector;
+    Vector->Flag = NET_VECTOR_OWN_FIRST;
+    Vector->Len  = HeadSpace;
 
     //
     // Reserve the head space in the first block
     //
     NetbufSetBlock (Child, FirstBulk, HeadSpace, 0);
     Child->BlockOp[0].Head += HeadSpace;
-    Child->BlockOp[0].Size =  0;
+    Child->BlockOp[0].Size  =  0;
     CurBlockOp++;
-
   } else {
     Child = NetbufAllocStruct (0, BlockOpNum);
 
@@ -683,8 +666,6 @@ FreeChild:
   return NULL;
 }
 
-
-
 /**
   Build a NET_BUF from external blocks.
 
@@ -710,41 +691,41 @@ FreeChild:
 NET_BUF  *
 EFIAPI
 NetbufFromExt (
-  IN NET_FRAGMENT           *ExtFragment,
-  IN UINT32                 ExtNum,
-  IN UINT32                 HeadSpace,
-  IN UINT32                 HeadLen,
-  IN NET_VECTOR_EXT_FREE    ExtFree,
-  IN VOID                   *Arg          OPTIONAL
+  IN NET_FRAGMENT         *ExtFragment,
+  IN UINT32               ExtNum,
+  IN UINT32               HeadSpace,
+  IN UINT32               HeadLen,
+  IN NET_VECTOR_EXT_FREE  ExtFree,
+  IN VOID                 *Arg          OPTIONAL
   )
 {
-  NET_BUF                   *Nbuf;
-  NET_VECTOR                *Vector;
-  NET_FRAGMENT              SavedFragment;
-  UINT32                    SavedIndex;
-  UINT32                    TotalLen;
-  UINT32                    BlockNum;
-  UINT8                     *FirstBlock;
-  UINT32                    FirstBlockLen;
-  UINT8                     *Header;
-  UINT32                    CurBlock;
-  UINT32                    Index;
-  UINT32                    Len;
-  UINT32                    Copied;
+  NET_BUF       *Nbuf;
+  NET_VECTOR    *Vector;
+  NET_FRAGMENT  SavedFragment;
+  UINT32        SavedIndex;
+  UINT32        TotalLen;
+  UINT32        BlockNum;
+  UINT8         *FirstBlock;
+  UINT32        FirstBlockLen;
+  UINT8         *Header;
+  UINT32        CurBlock;
+  UINT32        Index;
+  UINT32        Len;
+  UINT32        Copied;
 
   ASSERT ((ExtFragment != NULL) && (ExtNum > 0) && (ExtFree != NULL));
 
   SavedFragment.Bulk = NULL;
   SavedFragment.Len  = 0;
 
-  FirstBlockLen  = 0;
-  FirstBlock     = NULL;
-  BlockNum       = ExtNum;
-  Index          = 0;
-  TotalLen       = 0;
-  SavedIndex     = 0;
-  Len            = 0;
-  Copied         = 0;
+  FirstBlockLen = 0;
+  FirstBlock    = NULL;
+  BlockNum      = ExtNum;
+  Index         = 0;
+  TotalLen      = 0;
+  SavedIndex    = 0;
+  Len           = 0;
+  Copied        = 0;
 
   //
   // No need to consolidate the header if the first block is
@@ -783,10 +764,10 @@ NetbufFromExt (
       if (Len >= ExtFragment[Index].Len) {
         CopyMem (Header, ExtFragment[Index].Bulk, ExtFragment[Index].Len);
 
-        Copied    += ExtFragment[Index].Len;
-        Len       -= ExtFragment[Index].Len;
-        Header    += ExtFragment[Index].Len;
-        TotalLen  += ExtFragment[Index].Len;
+        Copied   += ExtFragment[Index].Len;
+        Len      -= ExtFragment[Index].Len;
+        Header   += ExtFragment[Index].Len;
+        TotalLen += ExtFragment[Index].Len;
         BlockNum--;
 
         if (Len == 0) {
@@ -797,12 +778,11 @@ NetbufFromExt (
           Index++;
           break;
         }
-
       } else {
         CopyMem (Header, ExtFragment[Index].Bulk, Len);
 
-        Copied    += Len;
-        TotalLen  += Len;
+        Copied   += Len;
+        TotalLen += Len;
 
         //
         // Adjust the block structure to exclude the data copied,
@@ -811,8 +791,8 @@ NetbufFromExt (
         // holds since we don't aggreate the header if the first block
         // is bigger enough that the header is continuous
         //
-        SavedIndex    = Index;
-        SavedFragment = ExtFragment[Index];
+        SavedIndex               = Index;
+        SavedFragment            = ExtFragment[Index];
         ExtFragment[Index].Bulk += Len;
         ExtFragment[Index].Len  -= Len;
         break;
@@ -840,12 +820,12 @@ NetbufFromExt (
   if (FirstBlockLen != 0) {
     NetbufSetBlock (Nbuf, FirstBlock, HeadSpace + Copied, 0);
     Nbuf->BlockOp[0].Head += HeadSpace;
-    Nbuf->BlockOp[0].Size =  Copied;
+    Nbuf->BlockOp[0].Size  =  Copied;
 
     CurBlock++;
   }
 
-  for (; Index < ExtNum; Index++) {
+  for ( ; Index < ExtNum; Index++) {
     NetbufSetBlock (Nbuf, ExtFragment[Index].Bulk, ExtFragment[Index].Len, CurBlock);
     TotalLen += ExtFragment[Index].Len;
     CurBlock++;
@@ -864,9 +844,9 @@ FreeFirstBlock:
   if (FirstBlock != NULL) {
     FreePool (FirstBlock);
   }
+
   return NULL;
 }
-
 
 /**
   Build a fragment table to contain the fragments in the net buffer. This is the
@@ -884,13 +864,13 @@ FreeFirstBlock:
 EFI_STATUS
 EFIAPI
 NetbufBuildExt (
-  IN NET_BUF                *Nbuf,
-  IN OUT NET_FRAGMENT       *ExtFragment,
-  IN OUT UINT32             *ExtNum
+  IN NET_BUF           *Nbuf,
+  IN OUT NET_FRAGMENT  *ExtFragment,
+  IN OUT UINT32        *ExtNum
   )
 {
-  UINT32                    Index;
-  UINT32                    Current;
+  UINT32  Index;
+  UINT32  Current;
 
   Current = 0;
 
@@ -912,7 +892,6 @@ NetbufBuildExt (
   return EFI_SUCCESS;
 }
 
-
 /**
   Build a net buffer from a list of net buffers.
 
@@ -933,22 +912,22 @@ NetbufBuildExt (
 NET_BUF  *
 EFIAPI
 NetbufFromBufList (
-  IN LIST_ENTRY             *BufList,
-  IN UINT32                 HeadSpace,
-  IN UINT32                 HeaderLen,
-  IN NET_VECTOR_EXT_FREE    ExtFree,
-  IN VOID                   *Arg              OPTIONAL
+  IN LIST_ENTRY           *BufList,
+  IN UINT32               HeadSpace,
+  IN UINT32               HeaderLen,
+  IN NET_VECTOR_EXT_FREE  ExtFree,
+  IN VOID                 *Arg              OPTIONAL
   )
 {
-  NET_FRAGMENT              *Fragment;
-  UINT32                    FragmentNum;
-  LIST_ENTRY                *Entry;
-  NET_BUF                   *Nbuf;
-  UINT32                    Index;
-  UINT32                    Current;
+  NET_FRAGMENT  *Fragment;
+  UINT32        FragmentNum;
+  LIST_ENTRY    *Entry;
+  NET_BUF       *Nbuf;
+  UINT32        Index;
+  UINT32        Current;
 
   //
-  //Compute how many blocks are there
+  // Compute how many blocks are there
   //
   FragmentNum = 0;
 
@@ -959,7 +938,7 @@ NetbufFromBufList (
   }
 
   //
-  //Allocate and copy block points
+  // Allocate and copy block points
   //
   Fragment = AllocatePool (sizeof (NET_FRAGMENT) * FragmentNum);
 
@@ -988,7 +967,6 @@ NetbufFromBufList (
   return Nbuf;
 }
 
-
 /**
   Reserve some space in the header room of the net buffer.
 
@@ -1004,8 +982,8 @@ NetbufFromBufList (
 VOID
 EFIAPI
 NetbufReserve (
-  IN OUT NET_BUF            *Nbuf,
-  IN UINT32                 Len
+  IN OUT NET_BUF  *Nbuf,
+  IN UINT32       Len
   )
 {
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
@@ -1020,7 +998,6 @@ NetbufReserve (
   ASSERT (Nbuf->BlockOp[0].Tail <= Nbuf->BlockOp[0].BlockTail);
 }
 
-
 /**
   Allocate Len bytes of space from the header or tail of the buffer.
 
@@ -1033,17 +1010,17 @@ NetbufReserve (
                               or NULL if there is no sufficient space.
 
 **/
-UINT8*
+UINT8 *
 EFIAPI
 NetbufAllocSpace (
-  IN OUT NET_BUF            *Nbuf,
-  IN UINT32                 Len,
-  IN BOOLEAN                FromHead
+  IN OUT NET_BUF  *Nbuf,
+  IN UINT32       Len,
+  IN BOOLEAN      FromHead
   )
 {
-  NET_BLOCK_OP              *BlockOp;
-  UINT32                    Index;
-  UINT8                     *SavedTail;
+  NET_BLOCK_OP  *BlockOp;
+  UINT32        Index;
+  UINT8         *SavedTail;
 
   Index = 0;
 
@@ -1063,7 +1040,7 @@ NetbufAllocSpace (
     } else {
       NetbufGetByte (Nbuf, 0, &Index);
 
-      if ((Index != 0) && (NET_HEADSPACE(&(Nbuf->BlockOp[Index])) < Len)) {
+      if ((Index != 0) && (NET_HEADSPACE (&(Nbuf->BlockOp[Index])) < Len)) {
         Index--;
       }
     }
@@ -1079,7 +1056,6 @@ NetbufAllocSpace (
     Nbuf->TotalSize += Len;
 
     return BlockOp->Head;
-
   } else {
     //
     // Allocate some space from the tail. If the buffer is empty,
@@ -1091,9 +1067,9 @@ NetbufAllocSpace (
     } else {
       NetbufGetByte (Nbuf, Nbuf->TotalSize - 1, &Index);
 
-      if ((NET_TAILSPACE(&(Nbuf->BlockOp[Index])) < Len) &&
-          (Index < Nbuf->BlockOpNum - 1)) {
-
+      if ((NET_TAILSPACE (&(Nbuf->BlockOp[Index])) < Len) &&
+          (Index < Nbuf->BlockOpNum - 1))
+      {
         Index++;
       }
     }
@@ -1104,7 +1080,7 @@ NetbufAllocSpace (
       return NULL;
     }
 
-    SavedTail       = BlockOp->Tail;
+    SavedTail = BlockOp->Tail;
 
     BlockOp->Tail   += Len;
     BlockOp->Size   += Len;
@@ -1113,7 +1089,6 @@ NetbufAllocSpace (
     return SavedTail;
   }
 }
-
 
 /**
   Trim a single NET_BLOCK by Len bytes from the header or tail.
@@ -1126,9 +1101,9 @@ NetbufAllocSpace (
 **/
 VOID
 NetblockTrim (
-  IN OUT NET_BLOCK_OP       *BlockOp,
-  IN UINT32                 Len,
-  IN BOOLEAN                FromHead
+  IN OUT NET_BLOCK_OP  *BlockOp,
+  IN UINT32            Len,
+  IN BOOLEAN           FromHead
   )
 {
   ASSERT ((BlockOp != NULL) && (BlockOp->Size >= Len));
@@ -1141,7 +1116,6 @@ NetblockTrim (
     BlockOp->Tail -= Len;
   }
 }
-
 
 /**
   Trim Len bytes from the header or tail of the net buffer.
@@ -1158,18 +1132,18 @@ NetblockTrim (
 UINT32
 EFIAPI
 NetbufTrim (
-  IN OUT NET_BUF            *Nbuf,
-  IN UINT32                 Len,
-  IN BOOLEAN                FromHead
+  IN OUT NET_BUF  *Nbuf,
+  IN UINT32       Len,
+  IN BOOLEAN      FromHead
   )
 {
-  NET_BLOCK_OP              *BlockOp;
-  UINT32                    Index;
-  UINT32                    Trimmed;
+  NET_BLOCK_OP  *BlockOp;
+  UINT32        Index;
+  UINT32        Trimmed;
 
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
 
-  if (Len == 0 || Nbuf->TotalSize == 0) {
+  if ((Len == 0) || (Nbuf->TotalSize == 0)) {
     return 0;
   }
 
@@ -1190,7 +1164,7 @@ NetbufTrim (
   Index   = (FromHead ? 0 : Nbuf->BlockOpNum - 1);
   BlockOp = Nbuf->BlockOp;
 
-  for (;;) {
+  for ( ; ;) {
     if (BlockOp[Index].Size == 0) {
       Index += (FromHead ? 1 : -1);
       continue;
@@ -1212,7 +1186,6 @@ NetbufTrim (
   return Trimmed;
 }
 
-
 /**
   Copy Len bytes of data from the specific offset of the net buffer to the
   destination memory.
@@ -1231,18 +1204,18 @@ NetbufTrim (
 UINT32
 EFIAPI
 NetbufCopy (
-  IN NET_BUF                *Nbuf,
-  IN UINT32                 Offset,
-  IN UINT32                 Len,
-  IN UINT8                  *Dest
+  IN NET_BUF  *Nbuf,
+  IN UINT32   Offset,
+  IN UINT32   Len,
+  IN UINT8    *Dest
   )
 {
-  NET_BLOCK_OP              *BlockOp;
-  UINT32                    Skip;
-  UINT32                    Left;
-  UINT32                    Copied;
-  UINT32                    Index;
-  UINT32                    Cur;
+  NET_BLOCK_OP  *BlockOp;
+  UINT32        Skip;
+  UINT32        Left;
+  UINT32        Copied;
+  UINT32        Index;
+  UINT32        Cur;
 
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
   ASSERT (Dest);
@@ -1283,8 +1256,8 @@ NetbufCopy (
   // Offset - Cur is the number of bytes before first byte to
   // to copy in the current block.
   //
-  Skip  = Offset - Cur;
-  Left  = BlockOp[Index].Size - Skip;
+  Skip = Offset - Cur;
+  Left = BlockOp[Index].Size - Skip;
 
   if (Len <= Left) {
     CopyMem (Dest, BlockOp[Index].Head + Skip, Len);
@@ -1299,13 +1272,13 @@ NetbufCopy (
 
   Index++;
 
-  for (; Index < Nbuf->BlockOpNum; Index++) {
+  for ( ; Index < Nbuf->BlockOpNum; Index++) {
     if (Len > BlockOp[Index].Size) {
       Len    -= BlockOp[Index].Size;
       Copied += BlockOp[Index].Size;
 
       CopyMem (Dest, BlockOp[Index].Head, BlockOp[Index].Size);
-      Dest   += BlockOp[Index].Size;
+      Dest += BlockOp[Index].Size;
     } else {
       Copied += Len;
       CopyMem (Dest, BlockOp[Index].Head, Len);
@@ -1316,7 +1289,6 @@ NetbufCopy (
   return Copied;
 }
 
-
 /**
   Initiate the net buffer queue.
 
@@ -1326,18 +1298,17 @@ NetbufCopy (
 VOID
 EFIAPI
 NetbufQueInit (
-  IN OUT NET_BUF_QUEUE          *NbufQue
+  IN OUT NET_BUF_QUEUE  *NbufQue
   )
 {
-  NbufQue->Signature  = NET_QUE_SIGNATURE;
-  NbufQue->RefCnt     = 1;
+  NbufQue->Signature = NET_QUE_SIGNATURE;
+  NbufQue->RefCnt    = 1;
   InitializeListHead (&NbufQue->List);
 
   InitializeListHead (&NbufQue->BufList);
-  NbufQue->BufSize  = 0;
-  NbufQue->BufNum   = 0;
+  NbufQue->BufSize = 0;
+  NbufQue->BufNum  = 0;
 }
-
 
 /**
   Allocate and initialize a net buffer queue.
@@ -1352,7 +1323,7 @@ NetbufQueAlloc (
   VOID
   )
 {
-  NET_BUF_QUEUE             *NbufQue;
+  NET_BUF_QUEUE  *NbufQue;
 
   NbufQue = AllocatePool (sizeof (NET_BUF_QUEUE));
   if (NbufQue == NULL) {
@@ -1363,7 +1334,6 @@ NetbufQueAlloc (
 
   return NbufQue;
 }
-
 
 /**
   Free a net buffer queue.
@@ -1378,7 +1348,7 @@ NetbufQueAlloc (
 VOID
 EFIAPI
 NetbufQueFree (
-  IN NET_BUF_QUEUE          *NbufQue
+  IN NET_BUF_QUEUE  *NbufQue
   )
 {
   ASSERT (NbufQue != NULL);
@@ -1392,7 +1362,6 @@ NetbufQueFree (
   }
 }
 
-
 /**
   Append a net buffer to the net buffer queue.
 
@@ -1403,8 +1372,8 @@ NetbufQueFree (
 VOID
 EFIAPI
 NetbufQueAppend (
-  IN OUT NET_BUF_QUEUE          *NbufQue,
-  IN OUT NET_BUF                *Nbuf
+  IN OUT NET_BUF_QUEUE  *NbufQue,
+  IN OUT NET_BUF        *Nbuf
   )
 {
   NET_CHECK_SIGNATURE (NbufQue, NET_QUE_SIGNATURE);
@@ -1415,7 +1384,6 @@ NetbufQueAppend (
   NbufQue->BufSize += Nbuf->TotalSize;
   NbufQue->BufNum++;
 }
-
 
 /**
   Remove a net buffer from the head in the specific queue and return it.
@@ -1429,10 +1397,10 @@ NetbufQueAppend (
 NET_BUF  *
 EFIAPI
 NetbufQueRemove (
-  IN OUT NET_BUF_QUEUE          *NbufQue
+  IN OUT NET_BUF_QUEUE  *NbufQue
   )
 {
-  NET_BUF                   *First;
+  NET_BUF  *First;
 
   NET_CHECK_SIGNATURE (NbufQue, NET_QUE_SIGNATURE);
 
@@ -1448,7 +1416,6 @@ NetbufQueRemove (
   NbufQue->BufNum--;
   return First;
 }
-
 
 /**
   Copy Len bytes of data from the net buffer queue at the specific offset to the
@@ -1469,18 +1436,18 @@ NetbufQueRemove (
 UINT32
 EFIAPI
 NetbufQueCopy (
-  IN NET_BUF_QUEUE          *NbufQue,
-  IN UINT32                 Offset,
-  IN UINT32                 Len,
-  OUT UINT8                 *Dest
+  IN NET_BUF_QUEUE  *NbufQue,
+  IN UINT32         Offset,
+  IN UINT32         Len,
+  OUT UINT8         *Dest
   )
 {
-  LIST_ENTRY                *Entry;
-  NET_BUF                   *Nbuf;
-  UINT32                    Skip;
-  UINT32                    Left;
-  UINT32                    Cur;
-  UINT32                    Copied;
+  LIST_ENTRY  *Entry;
+  NET_BUF     *Nbuf;
+  UINT32      Skip;
+  UINT32      Left;
+  UINT32      Cur;
+  UINT32      Copied;
 
   NET_CHECK_SIGNATURE (NbufQue, NET_QUE_SIGNATURE);
   ASSERT (Dest != NULL);
@@ -1496,8 +1463,8 @@ NetbufQueCopy (
   //
   // skip to the Offset
   //
-  Cur   = 0;
-  Nbuf  = NULL;
+  Cur  = 0;
+  Nbuf = NULL;
 
   NET_LIST_FOR_EACH (Entry, &NbufQue->BufList) {
     Nbuf = NET_LIST_USER_STRUCT (Entry, NET_BUF, List);
@@ -1514,8 +1481,8 @@ NetbufQueCopy (
   //
   // Copy the data in the first buffer.
   //
-  Skip  = Offset - Cur;
-  Left  = Nbuf->TotalSize - Skip;
+  Skip = Offset - Cur;
+  Left = Nbuf->TotalSize - Skip;
 
   if (Len < Left) {
     return NetbufCopy (Nbuf, Skip, Len, Dest);
@@ -1535,12 +1502,11 @@ NetbufQueCopy (
     Nbuf = NET_LIST_USER_STRUCT (Entry, NET_BUF, List);
 
     if (Len > Nbuf->TotalSize) {
-      Len -= Nbuf->TotalSize;
+      Len    -= Nbuf->TotalSize;
       Copied += Nbuf->TotalSize;
 
       NetbufCopy (Nbuf, 0, Nbuf->TotalSize, Dest);
       Dest += Nbuf->TotalSize;
-
     } else {
       NetbufCopy (Nbuf, 0, Len, Dest);
       Copied += Len;
@@ -1552,7 +1518,6 @@ NetbufQueCopy (
 
   return Copied;
 }
-
 
 /**
   Trim Len bytes of data from the buffer queue and free any net buffer
@@ -1570,14 +1535,14 @@ NetbufQueCopy (
 UINT32
 EFIAPI
 NetbufQueTrim (
-  IN OUT NET_BUF_QUEUE      *NbufQue,
-  IN UINT32                 Len
+  IN OUT NET_BUF_QUEUE  *NbufQue,
+  IN UINT32             Len
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  NET_BUF                   *Nbuf;
-  UINT32                    Trimmed;
+  LIST_ENTRY  *Entry;
+  LIST_ENTRY  *Next;
+  NET_BUF     *Nbuf;
+  UINT32      Trimmed;
 
   NET_CHECK_SIGNATURE (NbufQue, NET_QUE_SIGNATURE);
 
@@ -1590,14 +1555,14 @@ NetbufQueTrim (
   }
 
   NbufQue->BufSize -= Len;
-  Trimmed = 0;
+  Trimmed           = 0;
 
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &NbufQue->BufList) {
     Nbuf = NET_LIST_USER_STRUCT (Entry, NET_BUF, List);
 
     if (Len >= Nbuf->TotalSize) {
       Trimmed += Nbuf->TotalSize;
-      Len -= Nbuf->TotalSize;
+      Len     -= Nbuf->TotalSize;
 
       RemoveEntryList (Entry);
       NetbufFree (Nbuf);
@@ -1607,7 +1572,6 @@ NetbufQueTrim (
       if (Len == 0) {
         break;
       }
-
     } else {
       Trimmed += NetbufTrim (Nbuf, Len, NET_BUF_HEAD);
       break;
@@ -1616,7 +1580,6 @@ NetbufQueTrim (
 
   return Trimmed;
 }
-
 
 /**
   Flush the net buffer queue.
@@ -1627,17 +1590,16 @@ NetbufQueTrim (
 VOID
 EFIAPI
 NetbufQueFlush (
-  IN OUT NET_BUF_QUEUE          *NbufQue
+  IN OUT NET_BUF_QUEUE  *NbufQue
   )
 {
   NET_CHECK_SIGNATURE (NbufQue, NET_QUE_SIGNATURE);
 
   NetbufFreeList (&NbufQue->BufList);
 
-  NbufQue->BufNum   = 0;
-  NbufQue->BufSize  = 0;
+  NbufQue->BufNum  = 0;
+  NbufQue->BufSize = 0;
 }
-
 
 /**
   Compute the checksum for a bulk of data.
@@ -1651,11 +1613,11 @@ NetbufQueFlush (
 UINT16
 EFIAPI
 NetblockChecksum (
-  IN UINT8                  *Bulk,
-  IN UINT32                 Len
+  IN UINT8   *Bulk,
+  IN UINT32  Len
   )
 {
-  register UINT32           Sum;
+  register UINT32  Sum;
 
   Sum = 0;
 
@@ -1667,9 +1629,9 @@ NetblockChecksum (
   }
 
   while (Len > 1) {
-    Sum += *(UINT16 *) Bulk;
+    Sum  += *(UINT16 *)Bulk;
     Bulk += 2;
-    Len -= 2;
+    Len  -= 2;
   }
 
   //
@@ -1677,12 +1639,10 @@ NetblockChecksum (
   //
   while ((Sum >> 16) != 0) {
     Sum = (Sum & 0xffff) + (Sum >> 16);
-
   }
 
-  return (UINT16) Sum;
+  return (UINT16)Sum;
 }
-
 
 /**
   Add two checksums.
@@ -1696,11 +1656,11 @@ NetblockChecksum (
 UINT16
 EFIAPI
 NetAddChecksum (
-  IN UINT16                 Checksum1,
-  IN UINT16                 Checksum2
+  IN UINT16  Checksum1,
+  IN UINT16  Checksum2
   )
 {
-  UINT32                    Sum;
+  UINT32  Sum;
 
   Sum = Checksum1 + Checksum2;
 
@@ -1709,12 +1669,10 @@ NetAddChecksum (
   //
   if ((Sum >> 16) != 0) {
     Sum = (Sum & 0xffff) + 1;
-
   }
 
-  return (UINT16) Sum;
+  return (UINT16)Sum;
 }
-
 
 /**
   Compute the checksum for a NET_BUF.
@@ -1727,20 +1685,20 @@ NetAddChecksum (
 UINT16
 EFIAPI
 NetbufChecksum (
-  IN NET_BUF                *Nbuf
+  IN NET_BUF  *Nbuf
   )
 {
-  NET_BLOCK_OP              *BlockOp;
-  UINT32                    Offset;
-  UINT16                    TotalSum;
-  UINT16                    BlockSum;
-  UINT32                    Index;
+  NET_BLOCK_OP  *BlockOp;
+  UINT32        Offset;
+  UINT16        TotalSum;
+  UINT16        BlockSum;
+  UINT32        Index;
 
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
 
-  TotalSum  = 0;
-  Offset    = 0;
-  BlockOp   = Nbuf->BlockOp;
+  TotalSum = 0;
+  Offset   = 0;
+  BlockOp  = Nbuf->BlockOp;
 
   for (Index = 0; Index < Nbuf->BlockOpNum; Index++) {
     if (BlockOp[Index].Size == 0) {
@@ -1764,7 +1722,6 @@ NetbufChecksum (
   return TotalSum;
 }
 
-
 /**
   Compute the checksum for TCP/UDP pseudo header.
 
@@ -1781,25 +1738,25 @@ NetbufChecksum (
 UINT16
 EFIAPI
 NetPseudoHeadChecksum (
-  IN IP4_ADDR               Src,
-  IN IP4_ADDR               Dst,
-  IN UINT8                  Proto,
-  IN UINT16                 Len
+  IN IP4_ADDR  Src,
+  IN IP4_ADDR  Dst,
+  IN UINT8     Proto,
+  IN UINT16    Len
   )
 {
-  NET_PSEUDO_HDR            Hdr;
+  NET_PSEUDO_HDR  Hdr;
 
   //
   // Zero the memory to relieve align problems
   //
   ZeroMem (&Hdr, sizeof (Hdr));
 
-  Hdr.SrcIp     = Src;
-  Hdr.DstIp     = Dst;
-  Hdr.Protocol  = Proto;
-  Hdr.Len       = HTONS (Len);
+  Hdr.SrcIp    = Src;
+  Hdr.DstIp    = Dst;
+  Hdr.Protocol = Proto;
+  Hdr.Len      = HTONS (Len);
 
-  return NetblockChecksum ((UINT8 *) &Hdr, sizeof (Hdr));
+  return NetblockChecksum ((UINT8 *)&Hdr, sizeof (Hdr));
 }
 
 /**
@@ -1818,13 +1775,13 @@ NetPseudoHeadChecksum (
 UINT16
 EFIAPI
 NetIp6PseudoHeadChecksum (
-  IN EFI_IPv6_ADDRESS       *Src,
-  IN EFI_IPv6_ADDRESS       *Dst,
-  IN UINT8                  NextHeader,
-  IN UINT32                 Len
+  IN EFI_IPv6_ADDRESS  *Src,
+  IN EFI_IPv6_ADDRESS  *Dst,
+  IN UINT8             NextHeader,
+  IN UINT32            Len
   )
 {
-  NET_IP6_PSEUDO_HDR        Hdr;
+  NET_IP6_PSEUDO_HDR  Hdr;
 
   //
   // Zero the memory to relieve align problems
@@ -1837,7 +1794,7 @@ NetIp6PseudoHeadChecksum (
   Hdr.NextHeader = NextHeader;
   Hdr.Len        = HTONL (Len);
 
-  return NetblockChecksum ((UINT8 *) &Hdr, sizeof (Hdr));
+  return NetblockChecksum ((UINT8 *)&Hdr, sizeof (Hdr));
 }
 
 /**
@@ -1853,7 +1810,7 @@ NetIp6PseudoHeadChecksum (
 **/
 VOID
 NetIpSecNetbufFree (
-  NET_BUF   *Nbuf
+  NET_BUF  *Nbuf
   )
 {
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
@@ -1862,7 +1819,6 @@ NetIpSecNetbufFree (
   Nbuf->RefCnt--;
 
   if (Nbuf->RefCnt == 0) {
-
     //
     // Update Vector only when NBuf is to be released. That is,
     // all the sharing of Nbuf increse Vector's RefCnt by one
@@ -1883,8 +1839,8 @@ NetIpSecNetbufFree (
     if ((Nbuf->Vector->Flag & NET_VECTOR_OWN_FIRST) != 0) {
       FreePool (Nbuf->Vector->Block[0].Bulk);
     }
+
     FreePool (Nbuf->Vector);
     FreePool (Nbuf);
   }
 }
-

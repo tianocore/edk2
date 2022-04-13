@@ -13,46 +13,46 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // to the UEFI protocol's port state (change).
 //
 USB_PORT_STATE_MAP  mUsbPortStateMap[] = {
-  {XHC_PORTSC_CCS,   USB_PORT_STAT_CONNECTION},
-  {XHC_PORTSC_PED,   USB_PORT_STAT_ENABLE},
-  {XHC_PORTSC_OCA,   USB_PORT_STAT_OVERCURRENT},
-  {XHC_PORTSC_RESET, USB_PORT_STAT_RESET}
+  { XHC_PORTSC_CCS,   USB_PORT_STAT_CONNECTION  },
+  { XHC_PORTSC_PED,   USB_PORT_STAT_ENABLE      },
+  { XHC_PORTSC_OCA,   USB_PORT_STAT_OVERCURRENT },
+  { XHC_PORTSC_RESET, USB_PORT_STAT_RESET       }
 };
 
 USB_PORT_STATE_MAP  mUsbPortChangeMap[] = {
-  {XHC_PORTSC_CSC, USB_PORT_STAT_C_CONNECTION},
-  {XHC_PORTSC_PEC, USB_PORT_STAT_C_ENABLE},
-  {XHC_PORTSC_OCC, USB_PORT_STAT_C_OVERCURRENT},
-  {XHC_PORTSC_PRC, USB_PORT_STAT_C_RESET}
+  { XHC_PORTSC_CSC, USB_PORT_STAT_C_CONNECTION  },
+  { XHC_PORTSC_PEC, USB_PORT_STAT_C_ENABLE      },
+  { XHC_PORTSC_OCC, USB_PORT_STAT_C_OVERCURRENT },
+  { XHC_PORTSC_PRC, USB_PORT_STAT_C_RESET       }
 };
 
-USB_CLEAR_PORT_MAP mUsbClearPortChangeMap[] = {
-  {XHC_PORTSC_CSC, EfiUsbPortConnectChange},
-  {XHC_PORTSC_PEC, EfiUsbPortEnableChange},
-  {XHC_PORTSC_OCC, EfiUsbPortOverCurrentChange},
-  {XHC_PORTSC_PRC, EfiUsbPortResetChange}
+USB_CLEAR_PORT_MAP  mUsbClearPortChangeMap[] = {
+  { XHC_PORTSC_CSC, EfiUsbPortConnectChange     },
+  { XHC_PORTSC_PEC, EfiUsbPortEnableChange      },
+  { XHC_PORTSC_OCC, EfiUsbPortOverCurrentChange },
+  { XHC_PORTSC_PRC, EfiUsbPortResetChange       }
 };
 
 USB_PORT_STATE_MAP  mUsbHubPortStateMap[] = {
-  {XHC_HUB_PORTSC_CCS,   USB_PORT_STAT_CONNECTION},
-  {XHC_HUB_PORTSC_PED,   USB_PORT_STAT_ENABLE},
-  {XHC_HUB_PORTSC_OCA,   USB_PORT_STAT_OVERCURRENT},
-  {XHC_HUB_PORTSC_RESET, USB_PORT_STAT_RESET}
+  { XHC_HUB_PORTSC_CCS,   USB_PORT_STAT_CONNECTION  },
+  { XHC_HUB_PORTSC_PED,   USB_PORT_STAT_ENABLE      },
+  { XHC_HUB_PORTSC_OCA,   USB_PORT_STAT_OVERCURRENT },
+  { XHC_HUB_PORTSC_RESET, USB_PORT_STAT_RESET       }
 };
 
 USB_PORT_STATE_MAP  mUsbHubPortChangeMap[] = {
-  {XHC_HUB_PORTSC_CSC, USB_PORT_STAT_C_CONNECTION},
-  {XHC_HUB_PORTSC_PEC, USB_PORT_STAT_C_ENABLE},
-  {XHC_HUB_PORTSC_OCC, USB_PORT_STAT_C_OVERCURRENT},
-  {XHC_HUB_PORTSC_PRC, USB_PORT_STAT_C_RESET}
+  { XHC_HUB_PORTSC_CSC, USB_PORT_STAT_C_CONNECTION  },
+  { XHC_HUB_PORTSC_PEC, USB_PORT_STAT_C_ENABLE      },
+  { XHC_HUB_PORTSC_OCC, USB_PORT_STAT_C_OVERCURRENT },
+  { XHC_HUB_PORTSC_PRC, USB_PORT_STAT_C_RESET       }
 };
 
-USB_CLEAR_PORT_MAP mUsbHubClearPortChangeMap[] = {
-  {XHC_HUB_PORTSC_CSC, EfiUsbPortConnectChange},
-  {XHC_HUB_PORTSC_PEC, EfiUsbPortEnableChange},
-  {XHC_HUB_PORTSC_OCC, EfiUsbPortOverCurrentChange},
-  {XHC_HUB_PORTSC_PRC, EfiUsbPortResetChange},
-  {XHC_HUB_PORTSC_BHRC, Usb3PortBHPortResetChange}
+USB_CLEAR_PORT_MAP  mUsbHubClearPortChangeMap[] = {
+  { XHC_HUB_PORTSC_CSC,  EfiUsbPortConnectChange     },
+  { XHC_HUB_PORTSC_PEC,  EfiUsbPortEnableChange      },
+  { XHC_HUB_PORTSC_OCC,  EfiUsbPortOverCurrentChange },
+  { XHC_HUB_PORTSC_PRC,  EfiUsbPortResetChange       },
+  { XHC_HUB_PORTSC_BHRC, Usb3PortBHPortResetChange   }
 };
 
 EFI_DRIVER_BINDING_PROTOCOL  gXhciDriverBinding = {
@@ -67,7 +67,7 @@ EFI_DRIVER_BINDING_PROTOCOL  gXhciDriverBinding = {
 //
 // Template for Xhci's Usb2 Host Controller Protocol Instance.
 //
-EFI_USB2_HC_PROTOCOL gXhciUsb2HcTemplate = {
+EFI_USB2_HC_PROTOCOL  gXhciUsb2HcTemplate = {
   XhcGetCapability,
   XhcReset,
   XhcGetState,
@@ -114,19 +114,18 @@ XhcGetCapability (
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl          = gBS->RaiseTPL (XHC_TPL);
+  OldTpl = gBS->RaiseTPL (XHC_TPL);
 
   Xhc             = XHC_FROM_THIS (This);
   *MaxSpeed       = EFI_USB_SPEED_SUPER;
-  *PortNumber     = (UINT8) (Xhc->HcSParams1.Data.MaxPorts);
-  *Is64BitCapable = (UINT8) Xhc->Support64BitDma;
-  DEBUG ((EFI_D_INFO, "XhcGetCapability: %d ports, 64 bit %d\n", *PortNumber, *Is64BitCapable));
+  *PortNumber     = (UINT8)(Xhc->HcSParams1.Data.MaxPorts);
+  *Is64BitCapable = (UINT8)Xhc->Support64BitDma;
+  DEBUG ((DEBUG_INFO, "XhcGetCapability: %d ports, 64 bit %d\n", *PortNumber, *Is64BitCapable));
 
   gBS->RestoreTPL (OldTpl);
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Provides software reset for the USB host controller.
@@ -168,60 +167,62 @@ XhcReset (
   OldTpl = gBS->RaiseTPL (XHC_TPL);
 
   switch (Attributes) {
-  case EFI_USB_HC_RESET_GLOBAL:
-  //
-  // Flow through, same behavior as Host Controller Reset
-  //
-  case EFI_USB_HC_RESET_HOST_CONTROLLER:
-    if ((Xhc->DebugCapSupOffset != 0xFFFFFFFF) && ((XhcReadExtCapReg (Xhc, Xhc->DebugCapSupOffset) & 0xFF) == XHC_CAP_USB_DEBUG) &&
-        ((XhcReadExtCapReg (Xhc, Xhc->DebugCapSupOffset + XHC_DC_DCCTRL) & BIT0) != 0)) {
-      Status = EFI_SUCCESS;
-      goto ON_EXIT;
-    }
+    case EFI_USB_HC_RESET_GLOBAL:
     //
-    // Host Controller must be Halt when Reset it
+    // Flow through, same behavior as Host Controller Reset
     //
-    if (!XhcIsHalt (Xhc)) {
-      Status = XhcHaltHC (Xhc, XHC_GENERIC_TIMEOUT);
-
-      if (EFI_ERROR (Status)) {
-        Status = EFI_DEVICE_ERROR;
+    case EFI_USB_HC_RESET_HOST_CONTROLLER:
+      if ((Xhc->DebugCapSupOffset != 0xFFFFFFFF) && ((XhcReadExtCapReg (Xhc, Xhc->DebugCapSupOffset) & 0xFF) == XHC_CAP_USB_DEBUG) &&
+          ((XhcReadExtCapReg (Xhc, Xhc->DebugCapSupOffset + XHC_DC_DCCTRL) & BIT0) != 0))
+      {
+        Status = EFI_SUCCESS;
         goto ON_EXIT;
       }
-    }
 
-    Status = XhcResetHC (Xhc, XHC_RESET_TIMEOUT);
-    ASSERT (!(XHC_REG_BIT_IS_SET (Xhc, XHC_USBSTS_OFFSET, XHC_USBSTS_CNR)));
+      //
+      // Host Controller must be Halt when Reset it
+      //
+      if (!XhcIsHalt (Xhc)) {
+        Status = XhcHaltHC (Xhc, XHC_GENERIC_TIMEOUT);
 
-    if (EFI_ERROR (Status)) {
-      goto ON_EXIT;
-    }
-    //
-    // Clean up the asynchronous transfers, currently only
-    // interrupt supports asynchronous operation.
-    //
-    XhciDelAllAsyncIntTransfers (Xhc);
-    XhcFreeSched (Xhc);
+        if (EFI_ERROR (Status)) {
+          Status = EFI_DEVICE_ERROR;
+          goto ON_EXIT;
+        }
+      }
 
-    XhcInitSched (Xhc);
-    break;
+      Status = XhcResetHC (Xhc, XHC_RESET_TIMEOUT);
+      ASSERT (!(XHC_REG_BIT_IS_SET (Xhc, XHC_USBSTS_OFFSET, XHC_USBSTS_CNR)));
 
-  case EFI_USB_HC_RESET_GLOBAL_WITH_DEBUG:
-  case EFI_USB_HC_RESET_HOST_WITH_DEBUG:
-    Status = EFI_UNSUPPORTED;
-    break;
+      if (EFI_ERROR (Status)) {
+        goto ON_EXIT;
+      }
 
-  default:
-    Status = EFI_INVALID_PARAMETER;
+      //
+      // Clean up the asynchronous transfers, currently only
+      // interrupt supports asynchronous operation.
+      //
+      XhciDelAllAsyncIntTransfers (Xhc);
+      XhcFreeSched (Xhc);
+
+      XhcInitSched (Xhc);
+      break;
+
+    case EFI_USB_HC_RESET_GLOBAL_WITH_DEBUG:
+    case EFI_USB_HC_RESET_HOST_WITH_DEBUG:
+      Status = EFI_UNSUPPORTED;
+      break;
+
+    default:
+      Status = EFI_INVALID_PARAMETER;
   }
 
 ON_EXIT:
-  DEBUG ((EFI_D_INFO, "XhcReset: status %r\n", Status));
+  DEBUG ((DEBUG_INFO, "XhcReset: status %r\n", Status));
   gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
-
 
 /**
   Retrieve the current state of the USB host controller.
@@ -252,7 +253,7 @@ XhcGetState (
 
   OldTpl = gBS->RaiseTPL (XHC_TPL);
 
-  Xhc    = XHC_FROM_THIS (This);
+  Xhc = XHC_FROM_THIS (This);
 
   if (XHC_REG_BIT_IS_SET (Xhc, XHC_USBSTS_OFFSET, XHC_USBSTS_HALT)) {
     *State = EfiUsbHcStateHalt;
@@ -260,7 +261,7 @@ XhcGetState (
     *State = EfiUsbHcStateOperational;
   }
 
-  DEBUG ((EFI_D_INFO, "XhcGetState: current state %d\n", *State));
+  DEBUG ((DEBUG_INFO, "XhcGetState: current state %d\n", *State));
   gBS->RestoreTPL (OldTpl);
 
   return EFI_SUCCESS;
@@ -285,10 +286,10 @@ XhcSetState (
   IN EFI_USB_HC_STATE      State
   )
 {
-  USB_XHCI_INSTANCE   *Xhc;
-  EFI_STATUS          Status;
-  EFI_USB_HC_STATE    CurState;
-  EFI_TPL             OldTpl;
+  USB_XHCI_INSTANCE  *Xhc;
+  EFI_STATUS         Status;
+  EFI_USB_HC_STATE   CurState;
+  EFI_TPL            OldTpl;
 
   Status = XhcGetState (This, &CurState);
 
@@ -302,41 +303,41 @@ XhcSetState (
 
   OldTpl = gBS->RaiseTPL (XHC_TPL);
 
-  Xhc    = XHC_FROM_THIS (This);
+  Xhc = XHC_FROM_THIS (This);
 
   switch (State) {
-  case EfiUsbHcStateHalt:
-    Status = XhcHaltHC (Xhc, XHC_GENERIC_TIMEOUT);
-    break;
-
-  case EfiUsbHcStateOperational:
-    if (XHC_REG_BIT_IS_SET (Xhc, XHC_USBSTS_OFFSET, XHC_USBSTS_HSE)) {
-      Status = EFI_DEVICE_ERROR;
+    case EfiUsbHcStateHalt:
+      Status = XhcHaltHC (Xhc, XHC_GENERIC_TIMEOUT);
       break;
-    }
 
-    //
-    // Software must not write a one to this field unless the host controller
-    // is in the Halted state. Doing so will yield undefined results.
-    // refers to Spec[XHCI1.0-2.3.1]
-    //
-    if (!XHC_REG_BIT_IS_SET (Xhc, XHC_USBSTS_OFFSET, XHC_USBSTS_HALT)) {
-      Status = EFI_DEVICE_ERROR;
+    case EfiUsbHcStateOperational:
+      if (XHC_REG_BIT_IS_SET (Xhc, XHC_USBSTS_OFFSET, XHC_USBSTS_HSE)) {
+        Status = EFI_DEVICE_ERROR;
+        break;
+      }
+
+      //
+      // Software must not write a one to this field unless the host controller
+      // is in the Halted state. Doing so will yield undefined results.
+      // refers to Spec[XHCI1.0-2.3.1]
+      //
+      if (!XHC_REG_BIT_IS_SET (Xhc, XHC_USBSTS_OFFSET, XHC_USBSTS_HALT)) {
+        Status = EFI_DEVICE_ERROR;
+        break;
+      }
+
+      Status = XhcRunHC (Xhc, XHC_GENERIC_TIMEOUT);
       break;
-    }
 
-    Status = XhcRunHC (Xhc, XHC_GENERIC_TIMEOUT);
-    break;
+    case EfiUsbHcStateSuspend:
+      Status = EFI_UNSUPPORTED;
+      break;
 
-  case EfiUsbHcStateSuspend:
-    Status = EFI_UNSUPPORTED;
-    break;
-
-  default:
-    Status = EFI_INVALID_PARAMETER;
+    default:
+      Status = EFI_INVALID_PARAMETER;
   }
 
-  DEBUG ((EFI_D_INFO, "XhcSetState: status %r\n", Status));
+  DEBUG ((DEBUG_INFO, "XhcSetState: status %r\n", Status));
   gBS->RestoreTPL (OldTpl);
 
   return Status;
@@ -364,15 +365,15 @@ XhcGetRootHubPortStatus (
   OUT EFI_USB_PORT_STATUS   *PortStatus
   )
 {
-  USB_XHCI_INSTANCE       *Xhc;
-  UINT32                  Offset;
-  UINT32                  State;
-  UINT32                  TotalPort;
-  UINTN                   Index;
-  UINTN                   MapSize;
-  EFI_STATUS              Status;
-  USB_DEV_ROUTE           ParentRouteChart;
-  EFI_TPL                 OldTpl;
+  USB_XHCI_INSTANCE  *Xhc;
+  UINT32             Offset;
+  UINT32             State;
+  UINT32             TotalPort;
+  UINTN              Index;
+  UINTN              MapSize;
+  EFI_STATUS         Status;
+  USB_DEV_ROUTE      ParentRouteChart;
+  EFI_TPL            OldTpl;
 
   if (PortStatus == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -380,8 +381,8 @@ XhcGetRootHubPortStatus (
 
   OldTpl = gBS->RaiseTPL (XHC_TPL);
 
-  Xhc       = XHC_FROM_THIS (This);
-  Status    = EFI_SUCCESS;
+  Xhc    = XHC_FROM_THIS (This);
+  Status = EFI_SUCCESS;
 
   TotalPort = Xhc->HcSParams1.Data.MaxPorts;
 
@@ -390,7 +391,7 @@ XhcGetRootHubPortStatus (
     goto ON_EXIT;
   }
 
-  Offset                       = (UINT32) (XHC_PORTSC_OFFSET + (0x10 * PortNumber));
+  Offset                       = (UINT32)(XHC_PORTSC_OFFSET + (0x10 * PortNumber));
   PortStatus->PortStatus       = 0;
   PortStatus->PortChangeStatus = 0;
 
@@ -401,21 +402,21 @@ XhcGetRootHubPortStatus (
   // bit 10~13 of the root port status register identifies the speed of the attached device.
   //
   switch ((State & XHC_PORTSC_PS) >> 10) {
-  case 2:
-    PortStatus->PortStatus |= USB_PORT_STAT_LOW_SPEED;
-    break;
+    case 2:
+      PortStatus->PortStatus |= USB_PORT_STAT_LOW_SPEED;
+      break;
 
-  case 3:
-    PortStatus->PortStatus |= USB_PORT_STAT_HIGH_SPEED;
-    break;
+    case 3:
+      PortStatus->PortStatus |= USB_PORT_STAT_HIGH_SPEED;
+      break;
 
-  case 4:
-  case 5:
-    PortStatus->PortStatus |= USB_PORT_STAT_SUPER_SPEED;
-    break;
+    case 4:
+    case 5:
+      PortStatus->PortStatus |= USB_PORT_STAT_SUPER_SPEED;
+      break;
 
-  default:
-    break;
+    default:
+      break;
   }
 
   //
@@ -425,9 +426,10 @@ XhcGetRootHubPortStatus (
 
   for (Index = 0; Index < MapSize; Index++) {
     if (XHC_BIT_IS_SET (State, mUsbPortStateMap[Index].HwState)) {
-      PortStatus->PortStatus = (UINT16) (PortStatus->PortStatus | mUsbPortStateMap[Index].UefiState);
+      PortStatus->PortStatus = (UINT16)(PortStatus->PortStatus | mUsbPortStateMap[Index].UefiState);
     }
   }
+
   //
   // Bit5~8 reflects its current link state.
   //
@@ -439,7 +441,7 @@ XhcGetRootHubPortStatus (
 
   for (Index = 0; Index < MapSize; Index++) {
     if (XHC_BIT_IS_SET (State, mUsbPortChangeMap[Index].HwState)) {
-      PortStatus->PortChangeStatus = (UINT16) (PortStatus->PortChangeStatus | mUsbPortChangeMap[Index].UefiState);
+      PortStatus->PortChangeStatus = (UINT16)(PortStatus->PortChangeStatus | mUsbPortChangeMap[Index].UefiState);
     }
   }
 
@@ -463,7 +465,6 @@ ON_EXIT:
   return Status;
 }
 
-
 /**
   Sets a feature for the specified root hub port.
 
@@ -484,12 +485,12 @@ XhcSetRootHubPortFeature (
   IN EFI_USB_PORT_FEATURE  PortFeature
   )
 {
-  USB_XHCI_INSTANCE       *Xhc;
-  UINT32                  Offset;
-  UINT32                  State;
-  UINT32                  TotalPort;
-  EFI_STATUS              Status;
-  EFI_TPL                 OldTpl;
+  USB_XHCI_INSTANCE  *Xhc;
+  UINT32             Offset;
+  UINT32             State;
+  UINT32             TotalPort;
+  EFI_STATUS         Status;
+  EFI_TPL            OldTpl;
 
   OldTpl = gBS->RaiseTPL (XHC_TPL);
 
@@ -503,80 +504,79 @@ XhcSetRootHubPortFeature (
     goto ON_EXIT;
   }
 
-  Offset = (UINT32) (XHC_PORTSC_OFFSET + (0x10 * PortNumber));
+  Offset = (UINT32)(XHC_PORTSC_OFFSET + (0x10 * PortNumber));
   State  = XhcReadOpReg (Xhc, Offset);
 
   //
   // Mask off the port status change bits, these bits are
   // write clean bit
   //
-  State &= ~ (BIT1 | BIT17 | BIT18 | BIT19 | BIT20 | BIT21 | BIT22 | BIT23);
+  State &= ~(BIT1 | BIT17 | BIT18 | BIT19 | BIT20 | BIT21 | BIT22 | BIT23);
 
   switch (PortFeature) {
-  case EfiUsbPortEnable:
-    //
-    // Ports may only be enabled by the xHC. Software cannot enable a port by writing a '1' to this flag.
-    // A port may be disabled by software writing a '1' to this flag.
-    //
-    Status = EFI_SUCCESS;
-    break;
+    case EfiUsbPortEnable:
+      //
+      // Ports may only be enabled by the xHC. Software cannot enable a port by writing a '1' to this flag.
+      // A port may be disabled by software writing a '1' to this flag.
+      //
+      Status = EFI_SUCCESS;
+      break;
 
-  case EfiUsbPortSuspend:
-    State |= XHC_PORTSC_LWS;
-    XhcWriteOpReg (Xhc, Offset, State);
-    State &= ~XHC_PORTSC_PLS;
-    State |= (3 << 5) ;
-    XhcWriteOpReg (Xhc, Offset, State);
-    break;
+    case EfiUsbPortSuspend:
+      State |= XHC_PORTSC_LWS;
+      XhcWriteOpReg (Xhc, Offset, State);
+      State &= ~XHC_PORTSC_PLS;
+      State |= (3 << 5);
+      XhcWriteOpReg (Xhc, Offset, State);
+      break;
 
-  case EfiUsbPortReset:
-    DEBUG ((EFI_D_INFO, "XhcUsbPortReset!\n"));
-    //
-    // Make sure Host Controller not halt before reset it
-    //
-    if (XhcIsHalt (Xhc)) {
-      Status = XhcRunHC (Xhc, XHC_GENERIC_TIMEOUT);
+    case EfiUsbPortReset:
+      DEBUG ((DEBUG_INFO, "XhcUsbPortReset!\n"));
+      //
+      // Make sure Host Controller not halt before reset it
+      //
+      if (XhcIsHalt (Xhc)) {
+        Status = XhcRunHC (Xhc, XHC_GENERIC_TIMEOUT);
 
-      if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_INFO, "XhcSetRootHubPortFeature :failed to start HC - %r\n", Status));
-        break;
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_INFO, "XhcSetRootHubPortFeature :failed to start HC - %r\n", Status));
+          break;
+        }
       }
-    }
 
-    //
-    // 4.3.1 Resetting a Root Hub Port
-    // 1) Write the PORTSC register with the Port Reset (PR) bit set to '1'.
-    //
-    State |= XHC_PORTSC_RESET;
-    XhcWriteOpReg (Xhc, Offset, State);
-    XhcWaitOpRegBit(Xhc, Offset, XHC_PORTSC_PRC, TRUE, XHC_GENERIC_TIMEOUT);
-    break;
+      //
+      // 4.3.1 Resetting a Root Hub Port
+      // 1) Write the PORTSC register with the Port Reset (PR) bit set to '1'.
+      //
+      State |= XHC_PORTSC_RESET;
+      XhcWriteOpReg (Xhc, Offset, State);
+      XhcWaitOpRegBit (Xhc, Offset, XHC_PORTSC_PRC, TRUE, XHC_GENERIC_TIMEOUT);
+      break;
 
-  case EfiUsbPortPower:
-    //
-    // Not supported, ignore the operation
-    //
-    Status = EFI_SUCCESS;
-    break;
+    case EfiUsbPortPower:
+      //
+      // Not supported, ignore the operation
+      //
+      Status = EFI_SUCCESS;
+      break;
 
-  case EfiUsbPortOwner:
-    //
-    // XHCI root hub port don't has the owner bit, ignore the operation
-    //
-    Status = EFI_SUCCESS;
-    break;
+    case EfiUsbPortOwner:
+      //
+      // XHCI root hub port don't has the owner bit, ignore the operation
+      //
+      Status = EFI_SUCCESS;
+      break;
 
-  default:
-    Status = EFI_INVALID_PARAMETER;
+    default:
+      Status = EFI_INVALID_PARAMETER;
   }
 
 ON_EXIT:
-  DEBUG ((EFI_D_INFO, "XhcSetRootHubPortFeature: status %r\n", Status));
+  DEBUG ((DEBUG_INFO, "XhcSetRootHubPortFeature: status %r\n", Status));
   gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
-
 
 /**
   Clears a feature for the specified root hub port.
@@ -601,17 +601,17 @@ XhcClearRootHubPortFeature (
   IN EFI_USB_PORT_FEATURE  PortFeature
   )
 {
-  USB_XHCI_INSTANCE       *Xhc;
-  UINT32                  Offset;
-  UINT32                  State;
-  UINT32                  TotalPort;
-  EFI_STATUS              Status;
-  EFI_TPL                 OldTpl;
+  USB_XHCI_INSTANCE  *Xhc;
+  UINT32             Offset;
+  UINT32             State;
+  UINT32             TotalPort;
+  EFI_STATUS         Status;
+  EFI_TPL            OldTpl;
 
   OldTpl = gBS->RaiseTPL (XHC_TPL);
 
-  Xhc       = XHC_FROM_THIS (This);
-  Status    = EFI_SUCCESS;
+  Xhc    = XHC_FROM_THIS (This);
+  Status = EFI_SUCCESS;
 
   TotalPort = (Xhc->HcSParams1.Data.MaxPorts);
 
@@ -627,86 +627,86 @@ XhcClearRootHubPortFeature (
   // write clean bit
   //
   State  = XhcReadOpReg (Xhc, Offset);
-  State &= ~ (BIT1 | BIT17 | BIT18 | BIT19 | BIT20 | BIT21 | BIT22 | BIT23);
+  State &= ~(BIT1 | BIT17 | BIT18 | BIT19 | BIT20 | BIT21 | BIT22 | BIT23);
 
   switch (PortFeature) {
-  case EfiUsbPortEnable:
-    //
-    // Ports may only be enabled by the xHC. Software cannot enable a port by writing a '1' to this flag.
-    // A port may be disabled by software writing a '1' to this flag.
-    //
-    State |= XHC_PORTSC_PED;
-    State &= ~XHC_PORTSC_RESET;
-    XhcWriteOpReg (Xhc, Offset, State);
-    break;
+    case EfiUsbPortEnable:
+      //
+      // Ports may only be enabled by the xHC. Software cannot enable a port by writing a '1' to this flag.
+      // A port may be disabled by software writing a '1' to this flag.
+      //
+      State |= XHC_PORTSC_PED;
+      State &= ~XHC_PORTSC_RESET;
+      XhcWriteOpReg (Xhc, Offset, State);
+      break;
 
-  case EfiUsbPortSuspend:
-    State |= XHC_PORTSC_LWS;
-    XhcWriteOpReg (Xhc, Offset, State);
-    State &= ~XHC_PORTSC_PLS;
-    XhcWriteOpReg (Xhc, Offset, State);
-    break;
+    case EfiUsbPortSuspend:
+      State |= XHC_PORTSC_LWS;
+      XhcWriteOpReg (Xhc, Offset, State);
+      State &= ~XHC_PORTSC_PLS;
+      XhcWriteOpReg (Xhc, Offset, State);
+      break;
 
-  case EfiUsbPortReset:
-    //
-    // PORTSC_RESET BIT(4) bit is RW1S attribute, which means Write-1-to-set status:
-    // Register bits indicate status when read, a clear bit may be set by
-    // writing a '1'. Writing a '0' to RW1S bits has no effect.
-    //
-    break;
+    case EfiUsbPortReset:
+      //
+      // PORTSC_RESET BIT(4) bit is RW1S attribute, which means Write-1-to-set status:
+      // Register bits indicate status when read, a clear bit may be set by
+      // writing a '1'. Writing a '0' to RW1S bits has no effect.
+      //
+      break;
 
-  case EfiUsbPortOwner:
-    //
-    // XHCI root hub port don't has the owner bit, ignore the operation
-    //
-    break;
+    case EfiUsbPortOwner:
+      //
+      // XHCI root hub port don't has the owner bit, ignore the operation
+      //
+      break;
 
-  case EfiUsbPortConnectChange:
-    //
-    // Clear connect status change
-    //
-    State |= XHC_PORTSC_CSC;
-    XhcWriteOpReg (Xhc, Offset, State);
-    break;
+    case EfiUsbPortConnectChange:
+      //
+      // Clear connect status change
+      //
+      State |= XHC_PORTSC_CSC;
+      XhcWriteOpReg (Xhc, Offset, State);
+      break;
 
-  case EfiUsbPortEnableChange:
-    //
-    // Clear enable status change
-    //
-    State |= XHC_PORTSC_PEC;
-    XhcWriteOpReg (Xhc, Offset, State);
-    break;
+    case EfiUsbPortEnableChange:
+      //
+      // Clear enable status change
+      //
+      State |= XHC_PORTSC_PEC;
+      XhcWriteOpReg (Xhc, Offset, State);
+      break;
 
-  case EfiUsbPortOverCurrentChange:
-    //
-    // Clear PortOverCurrent change
-    //
-    State |= XHC_PORTSC_OCC;
-    XhcWriteOpReg (Xhc, Offset, State);
-    break;
+    case EfiUsbPortOverCurrentChange:
+      //
+      // Clear PortOverCurrent change
+      //
+      State |= XHC_PORTSC_OCC;
+      XhcWriteOpReg (Xhc, Offset, State);
+      break;
 
-  case EfiUsbPortResetChange:
-    //
-    // Clear Port Reset change
-    //
-    State |= XHC_PORTSC_PRC;
-    XhcWriteOpReg (Xhc, Offset, State);
-    break;
+    case EfiUsbPortResetChange:
+      //
+      // Clear Port Reset change
+      //
+      State |= XHC_PORTSC_PRC;
+      XhcWriteOpReg (Xhc, Offset, State);
+      break;
 
-  case EfiUsbPortPower:
-  case EfiUsbPortSuspendChange:
-    //
-    // Not supported or not related operation
-    //
-    break;
+    case EfiUsbPortPower:
+    case EfiUsbPortSuspendChange:
+      //
+      // Not supported or not related operation
+      //
+      break;
 
-  default:
-    Status = EFI_INVALID_PARAMETER;
-    break;
+    default:
+      Status = EFI_INVALID_PARAMETER;
+      break;
   }
 
 ON_EXIT:
-  DEBUG ((EFI_D_INFO, "XhcClearRootHubPortFeature: status %r\n", Status));
+  DEBUG ((DEBUG_INFO, "XhcClearRootHubPortFeature: status %r\n", Status));
   gBS->RestoreTPL (OldTpl);
 
   return Status;
@@ -737,22 +737,22 @@ ON_EXIT:
 **/
 EFI_STATUS
 XhcTransfer (
-  IN     USB_XHCI_INSTANCE                   *Xhc,
-  IN     UINT8                               DeviceAddress,
-  IN     UINT8                               EndPointAddress,
-  IN     UINT8                               DeviceSpeed,
-  IN     UINTN                               MaximumPacketLength,
-  IN     UINTN                               Type,
-  IN     EFI_USB_DEVICE_REQUEST              *Request,
-  IN OUT VOID                                *Data,
-  IN OUT UINTN                               *DataLength,
-  IN     UINTN                               Timeout,
-  OUT    UINT32                              *TransferResult
+  IN     USB_XHCI_INSTANCE       *Xhc,
+  IN     UINT8                   DeviceAddress,
+  IN     UINT8                   EndPointAddress,
+  IN     UINT8                   DeviceSpeed,
+  IN     UINTN                   MaximumPacketLength,
+  IN     UINTN                   Type,
+  IN     EFI_USB_DEVICE_REQUEST  *Request,
+  IN OUT VOID                    *Data,
+  IN OUT UINTN                   *DataLength,
+  IN     UINTN                   Timeout,
+  OUT    UINT32                  *TransferResult
   )
 {
-  EFI_STATUS              Status;
-  EFI_STATUS              RecoveryStatus;
-  URB                     *Urb;
+  EFI_STATUS  Status;
+  EFI_STATUS  RecoveryStatus;
+  URB         *Urb;
 
   ASSERT ((Type == XHC_CTRL_TRANSFER) || (Type == XHC_BULK_TRANSFER) || (Type == XHC_INT_TRANSFER_SYNC));
   Urb = XhcCreateUrb (
@@ -780,7 +780,7 @@ XhcTransfer (
     //
     // The transfer timed out. Abort the transfer by dequeueing of the TD.
     //
-    RecoveryStatus = XhcDequeueTrbFromEndpoint(Xhc, Urb);
+    RecoveryStatus = XhcDequeueTrbFromEndpoint (Xhc, Urb);
     if (RecoveryStatus == EFI_ALREADY_STARTED) {
       //
       // The URB is finished just before stopping endpoint.
@@ -789,8 +789,8 @@ XhcTransfer (
       ASSERT (Urb->Result == EFI_USB_NOERROR);
       Status = EFI_SUCCESS;
       DEBUG ((DEBUG_ERROR, "XhcTransfer[Type=%d]: pending URB is finished, Length = %d.\n", Type, Urb->Completed));
-    } else if (EFI_ERROR(RecoveryStatus)) {
-      DEBUG((DEBUG_ERROR, "XhcTransfer[Type=%d]: XhcDequeueTrbFromEndpoint failed!\n", Type));
+    } else if (EFI_ERROR (RecoveryStatus)) {
+      DEBUG ((DEBUG_ERROR, "XhcTransfer[Type=%d]: XhcDequeueTrbFromEndpoint failed!\n", Type));
     }
   }
 
@@ -799,7 +799,7 @@ XhcTransfer (
 
   if ((*TransferResult == EFI_USB_ERR_STALL) || (*TransferResult == EFI_USB_ERR_BABBLE)) {
     ASSERT (Status == EFI_DEVICE_ERROR);
-    RecoveryStatus = XhcRecoverHaltedEndpoint(Xhc, Urb);
+    RecoveryStatus = XhcRecoverHaltedEndpoint (Xhc, Urb);
     if (EFI_ERROR (RecoveryStatus)) {
       DEBUG ((DEBUG_ERROR, "XhcTransfer[Type=%d]: XhcRecoverHaltedEndpoint failed!\n", Type));
     }
@@ -876,24 +876,28 @@ XhcControlTransfer (
 
   if ((TransferDirection != EfiUsbDataIn) &&
       (TransferDirection != EfiUsbDataOut) &&
-      (TransferDirection != EfiUsbNoData)) {
+      (TransferDirection != EfiUsbNoData))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
   if ((TransferDirection == EfiUsbNoData) &&
-      ((Data != NULL) || (*DataLength != 0))) {
+      ((Data != NULL) || (*DataLength != 0)))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
   if ((TransferDirection != EfiUsbNoData) &&
-     ((Data == NULL) || (*DataLength == 0))) {
+      ((Data == NULL) || (*DataLength == 0)))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
   if ((MaximumPacketLength != 8)  && (MaximumPacketLength != 16) &&
       (MaximumPacketLength != 32) && (MaximumPacketLength != 64) &&
       (MaximumPacketLength != 512)
-      ) {
+      )
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -907,14 +911,14 @@ XhcControlTransfer (
 
   OldTpl = gBS->RaiseTPL (XHC_TPL);
 
-  Xhc             = XHC_FROM_THIS (This);
+  Xhc = XHC_FROM_THIS (This);
 
   Status          = EFI_DEVICE_ERROR;
   *TransferResult = EFI_USB_ERR_SYSTEM;
   Len             = 0;
 
   if (XhcIsHalt (Xhc) || XhcIsSysError (Xhc)) {
-    DEBUG ((EFI_D_ERROR, "XhcControlTransfer: HC halted at entrance\n"));
+    DEBUG ((DEBUG_ERROR, "XhcControlTransfer: HC halted at entrance\n"));
     goto ON_EXIT;
   }
 
@@ -931,7 +935,8 @@ XhcControlTransfer (
   // According to XHCI 1.0 spec, the Set_Address request is replaced by XHCI's Address_Device cmd.
   //
   if ((Request->Request     == USB_REQ_SET_ADDRESS) &&
-      (Request->RequestType == USB_REQUEST_TYPE (EfiUsbNoData, USB_REQ_TYPE_STANDARD, USB_TARGET_DEVICE))) {
+      (Request->RequestType == USB_REQUEST_TYPE (EfiUsbNoData, USB_REQ_TYPE_STANDARD, USB_TARGET_DEVICE)))
+  {
     //
     // Reset the BusDevAddr field of all disabled entries in UsbDevContext array firstly.
     // This way is used to clean the history to avoid using wrong device address by XhcAsyncInterruptTransfer().
@@ -939,7 +944,8 @@ XhcControlTransfer (
     for (Index = 0; Index < 255; Index++) {
       if (!Xhc->UsbDevContext[Index + 1].Enabled &&
           (Xhc->UsbDevContext[Index + 1].SlotId == 0) &&
-          (Xhc->UsbDevContext[Index + 1].BusDevAddr == (UINT8)Request->Value)) {
+          (Xhc->UsbDevContext[Index + 1].BusDevAddr == (UINT8)Request->Value))
+      {
         Xhc->UsbDevContext[Index + 1].BusDevAddr = 0;
       }
     }
@@ -948,6 +954,7 @@ XhcControlTransfer (
       Status = EFI_DEVICE_ERROR;
       goto ON_EXIT;
     }
+
     //
     // The actual device address has been assigned by XHCI during initializing the device slot.
     // So we just need establish the mapping relationship between the device address requested from UsbBus
@@ -955,7 +962,7 @@ XhcControlTransfer (
     // can find out the actual device address by it.
     //
     Xhc->UsbDevContext[SlotId].BusDevAddr = (UINT8)Request->Value;
-    Status = EFI_SUCCESS;
+    Status                                = EFI_SUCCESS;
     goto ON_EXIT;
   }
 
@@ -966,20 +973,20 @@ XhcControlTransfer (
   // endpoint is bidirectional. XhcCreateUrb expects this
   // combination of Ep addr and its direction.
   //
-  Endpoint = (UINT8) (0 | ((TransferDirection == EfiUsbDataIn) ? 0x80 : 0));
-  Status = XhcTransfer (
-             Xhc,
-             DeviceAddress,
-             Endpoint,
-             DeviceSpeed,
-             MaximumPacketLength,
-             XHC_CTRL_TRANSFER,
-             Request,
-             Data,
-             DataLength,
-             Timeout,
-             TransferResult
-             );
+  Endpoint = (UINT8)(0 | ((TransferDirection == EfiUsbDataIn) ? 0x80 : 0));
+  Status   = XhcTransfer (
+               Xhc,
+               DeviceAddress,
+               Endpoint,
+               DeviceSpeed,
+               MaximumPacketLength,
+               XHC_CTRL_TRANSFER,
+               Request,
+               Data,
+               DataLength,
+               Timeout,
+               TransferResult
+               );
 
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
@@ -992,28 +999,30 @@ XhcControlTransfer (
   //
   if ((Request->Request     == USB_REQ_GET_DESCRIPTOR) &&
       ((Request->RequestType == USB_REQUEST_TYPE (EfiUsbDataIn, USB_REQ_TYPE_STANDARD, USB_TARGET_DEVICE)) ||
-      ((Request->RequestType == USB_REQUEST_TYPE (EfiUsbDataIn, USB_REQ_TYPE_CLASS, USB_TARGET_DEVICE))))) {
+       ((Request->RequestType == USB_REQUEST_TYPE (EfiUsbDataIn, USB_REQ_TYPE_CLASS, USB_TARGET_DEVICE)))))
+  {
     DescriptorType = (UINT8)(Request->Value >> 8);
     if ((DescriptorType == USB_DESC_TYPE_DEVICE) && ((*DataLength == sizeof (EFI_USB_DEVICE_DESCRIPTOR)) || ((DeviceSpeed == EFI_USB_SPEED_FULL) && (*DataLength == 8)))) {
-        ASSERT (Data != NULL);
+      ASSERT (Data != NULL);
+      //
+      // Store a copy of device scriptor as hub device need this info to configure endpoint.
+      //
+      CopyMem (&Xhc->UsbDevContext[SlotId].DevDesc, Data, *DataLength);
+      if (Xhc->UsbDevContext[SlotId].DevDesc.BcdUSB >= 0x0300) {
         //
-        // Store a copy of device scriptor as hub device need this info to configure endpoint.
+        // If it's a usb3.0 device, then its max packet size is a 2^n.
         //
-        CopyMem (&Xhc->UsbDevContext[SlotId].DevDesc, Data, *DataLength);
-        if (Xhc->UsbDevContext[SlotId].DevDesc.BcdUSB >= 0x0300) {
-          //
-          // If it's a usb3.0 device, then its max packet size is a 2^n.
-          //
-          MaxPacket0 = 1 << Xhc->UsbDevContext[SlotId].DevDesc.MaxPacketSize0;
-        } else {
-          MaxPacket0 = Xhc->UsbDevContext[SlotId].DevDesc.MaxPacketSize0;
-        }
-        Xhc->UsbDevContext[SlotId].ConfDesc = AllocateZeroPool (Xhc->UsbDevContext[SlotId].DevDesc.NumConfigurations * sizeof (EFI_USB_CONFIG_DESCRIPTOR *));
-        if (Xhc->HcCParams.Data.Csz == 0) {
-          Status = XhcEvaluateContext (Xhc, SlotId, MaxPacket0);
-        } else {
-          Status = XhcEvaluateContext64 (Xhc, SlotId, MaxPacket0);
-        }
+        MaxPacket0 = 1 << Xhc->UsbDevContext[SlotId].DevDesc.MaxPacketSize0;
+      } else {
+        MaxPacket0 = Xhc->UsbDevContext[SlotId].DevDesc.MaxPacketSize0;
+      }
+
+      Xhc->UsbDevContext[SlotId].ConfDesc = AllocateZeroPool (Xhc->UsbDevContext[SlotId].DevDesc.NumConfigurations * sizeof (EFI_USB_CONFIG_DESCRIPTOR *));
+      if (Xhc->HcCParams.Data.Csz == 0) {
+        Status = XhcEvaluateContext (Xhc, SlotId, MaxPacket0);
+      } else {
+        Status = XhcEvaluateContext64 (Xhc, SlotId, MaxPacket0);
+      }
     } else if (DescriptorType == USB_DESC_TYPE_CONFIG) {
       ASSERT (Data != NULL);
       if (*DataLength == ((UINT16 *)Data)[1]) {
@@ -1022,7 +1031,7 @@ XhcControlTransfer (
         //
         Index = (UINT8)Request->Value;
         ASSERT (Index < Xhc->UsbDevContext[SlotId].DevDesc.NumConfigurations);
-        Xhc->UsbDevContext[SlotId].ConfDesc[Index] = AllocateZeroPool(*DataLength);
+        Xhc->UsbDevContext[SlotId].ConfDesc[Index] = AllocateZeroPool (*DataLength);
         CopyMem (Xhc->UsbDevContext[SlotId].ConfDesc[Index], Data, *DataLength);
         //
         // Default to use AlternateSetting 0 for all interfaces.
@@ -1030,7 +1039,8 @@ XhcControlTransfer (
         Xhc->UsbDevContext[SlotId].ActiveAlternateSetting = AllocateZeroPool (Xhc->UsbDevContext[SlotId].ConfDesc[Index]->NumInterfaces * sizeof (UINT8));
       }
     } else if (((DescriptorType == USB_DESC_TYPE_HUB) ||
-               (DescriptorType == USB_DESC_TYPE_HUB_SUPER_SPEED)) && (*DataLength > 2)) {
+                (DescriptorType == USB_DESC_TYPE_HUB_SUPER_SPEED)) && (*DataLength > 2))
+    {
       ASSERT (Data != NULL);
       HubDesc = (EFI_USB_HUB_DESCRIPTOR *)Data;
       ASSERT (HubDesc->NumPorts <= 15);
@@ -1043,7 +1053,7 @@ XhcControlTransfer (
         // Don't support multi-TT feature for super speed hub now.
         //
         MTT = 0;
-        DEBUG ((EFI_D_ERROR, "XHCI: Don't support multi-TT feature for Hub now. (force to disable MTT)\n"));
+        DEBUG ((DEBUG_ERROR, "XHCI: Don't support multi-TT feature for Hub now. (force to disable MTT)\n"));
       } else {
         MTT = 0;
       }
@@ -1055,7 +1065,8 @@ XhcControlTransfer (
       }
     }
   } else if ((Request->Request     == USB_REQ_SET_CONFIG) &&
-             (Request->RequestType == USB_REQUEST_TYPE (EfiUsbNoData, USB_REQ_TYPE_STANDARD, USB_TARGET_DEVICE))) {
+             (Request->RequestType == USB_REQUEST_TYPE (EfiUsbNoData, USB_REQ_TYPE_STANDARD, USB_TARGET_DEVICE)))
+  {
     //
     // Hook Set_Config request from UsbBus as we need configure device endpoint.
     //
@@ -1066,17 +1077,19 @@ XhcControlTransfer (
         } else {
           Status = XhcSetConfigCmd64 (Xhc, SlotId, DeviceSpeed, Xhc->UsbDevContext[SlotId].ConfDesc[Index]);
         }
+
         break;
       }
     }
   } else if ((Request->Request     == USB_REQ_SET_INTERFACE) &&
-             (Request->RequestType == USB_REQUEST_TYPE (EfiUsbNoData, USB_REQ_TYPE_STANDARD, USB_TARGET_INTERFACE))) {
+             (Request->RequestType == USB_REQUEST_TYPE (EfiUsbNoData, USB_REQ_TYPE_STANDARD, USB_TARGET_INTERFACE)))
+  {
     //
     // Hook Set_Interface request from UsbBus as we need configure interface setting.
     // Request->Value indicates AlterlateSetting to set
     // Request->Index indicates Interface to set
     //
-    if (Xhc->UsbDevContext[SlotId].ActiveAlternateSetting[(UINT8) Request->Index] != (UINT8) Request->Value) {
+    if (Xhc->UsbDevContext[SlotId].ActiveAlternateSetting[(UINT8)Request->Index] != (UINT8)Request->Value) {
       if (Xhc->HcCParams.Data.Csz == 0) {
         Status = XhcSetInterface (Xhc, SlotId, DeviceSpeed, Xhc->UsbDevContext[SlotId].ConfDesc[Xhc->UsbDevContext[SlotId].ActiveConfiguration - 1], Request);
       } else {
@@ -1084,7 +1097,8 @@ XhcControlTransfer (
       }
     }
   } else if ((Request->Request     == USB_REQ_GET_STATUS) &&
-             (Request->RequestType == USB_REQUEST_TYPE (EfiUsbDataIn, USB_REQ_TYPE_CLASS, USB_TARGET_OTHER))) {
+             (Request->RequestType == USB_REQUEST_TYPE (EfiUsbDataIn, USB_REQ_TYPE_CLASS, USB_TARGET_OTHER)))
+  {
     ASSERT (Data != NULL);
     //
     // Hook Get_Status request from UsbBus to keep track of the port status change.
@@ -1117,14 +1131,14 @@ XhcControlTransfer (
     MapSize = sizeof (mUsbHubPortStateMap) / sizeof (USB_PORT_STATE_MAP);
     for (Index = 0; Index < MapSize; Index++) {
       if (XHC_BIT_IS_SET (State, mUsbHubPortStateMap[Index].HwState)) {
-        PortStatus.PortStatus = (UINT16) (PortStatus.PortStatus | mUsbHubPortStateMap[Index].UefiState);
+        PortStatus.PortStatus = (UINT16)(PortStatus.PortStatus | mUsbHubPortStateMap[Index].UefiState);
       }
     }
 
     MapSize = sizeof (mUsbHubPortChangeMap) / sizeof (USB_PORT_STATE_MAP);
     for (Index = 0; Index < MapSize; Index++) {
       if (XHC_BIT_IS_SET (State, mUsbHubPortChangeMap[Index].HwState)) {
-        PortStatus.PortChangeStatus = (UINT16) (PortStatus.PortChangeStatus | mUsbHubPortChangeMap[Index].UefiState);
+        PortStatus.PortChangeStatus = (UINT16)(PortStatus.PortChangeStatus | mUsbHubPortChangeMap[Index].UefiState);
       }
     }
 
@@ -1133,11 +1147,11 @@ XhcControlTransfer (
     for (Index = 0; Index < MapSize; Index++) {
       if (XHC_BIT_IS_SET (State, mUsbHubClearPortChangeMap[Index].HwState)) {
         ZeroMem (&ClearPortRequest, sizeof (EFI_USB_DEVICE_REQUEST));
-        ClearPortRequest.RequestType  = USB_REQUEST_TYPE (EfiUsbNoData, USB_REQ_TYPE_CLASS, USB_TARGET_OTHER);
-        ClearPortRequest.Request      = (UINT8) USB_REQ_CLEAR_FEATURE;
-        ClearPortRequest.Value        = mUsbHubClearPortChangeMap[Index].Selector;
-        ClearPortRequest.Index        = Request->Index;
-        ClearPortRequest.Length       = 0;
+        ClearPortRequest.RequestType = USB_REQUEST_TYPE (EfiUsbNoData, USB_REQ_TYPE_CLASS, USB_TARGET_OTHER);
+        ClearPortRequest.Request     = (UINT8)USB_REQ_CLEAR_FEATURE;
+        ClearPortRequest.Value       = mUsbHubClearPortChangeMap[Index].Selector;
+        ClearPortRequest.Index       = Request->Index;
+        ClearPortRequest.Length      = 0;
 
         XhcControlTransfer (
           This,
@@ -1157,19 +1171,18 @@ XhcControlTransfer (
 
     XhcPollPortStatusChange (Xhc, Xhc->UsbDevContext[SlotId].RouteString, (UINT8)Request->Index, &PortStatus);
 
-    *(UINT32 *)Data = *(UINT32*)&PortStatus;
+    *(UINT32 *)Data = *(UINT32 *)&PortStatus;
   }
 
 ON_EXIT:
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcControlTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
+    DEBUG ((DEBUG_ERROR, "XhcControlTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
   }
 
   gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
-
 
 /**
   Submits bulk transfer to a bulk endpoint of a USB device.
@@ -1218,16 +1231,17 @@ XhcBulkTransfer (
   OUT    UINT32                              *TransferResult
   )
 {
-  USB_XHCI_INSTANCE       *Xhc;
-  UINT8                   SlotId;
-  EFI_STATUS              Status;
-  EFI_TPL                 OldTpl;
+  USB_XHCI_INSTANCE  *Xhc;
+  UINT8              SlotId;
+  EFI_STATUS         Status;
+  EFI_TPL            OldTpl;
 
   //
   // Validate the parameters
   //
   if ((DataLength == NULL) || (*DataLength == 0) ||
-      (Data == NULL) || (Data[0] == NULL) || (TransferResult == NULL)) {
+      (Data == NULL) || (Data[0] == NULL) || (TransferResult == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1238,19 +1252,20 @@ XhcBulkTransfer (
   if ((DeviceSpeed == EFI_USB_SPEED_LOW) ||
       ((DeviceSpeed == EFI_USB_SPEED_FULL) && (MaximumPacketLength > 64)) ||
       ((EFI_USB_SPEED_HIGH == DeviceSpeed) && (MaximumPacketLength > 512)) ||
-      ((EFI_USB_SPEED_SUPER == DeviceSpeed) && (MaximumPacketLength > 1024))) {
+      ((EFI_USB_SPEED_SUPER == DeviceSpeed) && (MaximumPacketLength > 1024)))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
   OldTpl = gBS->RaiseTPL (XHC_TPL);
 
-  Xhc             = XHC_FROM_THIS (This);
+  Xhc = XHC_FROM_THIS (This);
 
   *TransferResult = EFI_USB_ERR_SYSTEM;
   Status          = EFI_DEVICE_ERROR;
 
   if (XhcIsHalt (Xhc) || XhcIsSysError (Xhc)) {
-    DEBUG ((EFI_D_ERROR, "XhcBulkTransfer: HC is halted\n"));
+    DEBUG ((DEBUG_ERROR, "XhcBulkTransfer: HC is halted\n"));
     goto ON_EXIT;
   }
 
@@ -1282,8 +1297,9 @@ XhcBulkTransfer (
 
 ON_EXIT:
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcBulkTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
+    DEBUG ((DEBUG_ERROR, "XhcBulkTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
   }
+
   gBS->RestoreTPL (OldTpl);
 
   return Status;
@@ -1335,12 +1351,12 @@ XhcAsyncInterruptTransfer (
   IN     VOID                                *Context OPTIONAL
   )
 {
-  USB_XHCI_INSTANCE       *Xhc;
-  URB                     *Urb;
-  EFI_STATUS              Status;
-  UINT8                   SlotId;
-  UINT8                   Index;
-  EFI_TPL                 OldTpl;
+  USB_XHCI_INSTANCE  *Xhc;
+  URB                *Urb;
+  EFI_STATUS         Status;
+  UINT8              SlotId;
+  UINT8              Index;
+  EFI_TPL            OldTpl;
 
   //
   // Validate parameters
@@ -1365,7 +1381,7 @@ XhcAsyncInterruptTransfer (
 
   OldTpl = gBS->RaiseTPL (XHC_TPL);
 
-  Xhc    = XHC_FROM_THIS (This);
+  Xhc = XHC_FROM_THIS (This);
 
   //
   // Delete Async interrupt transfer request.
@@ -1386,14 +1402,14 @@ XhcAsyncInterruptTransfer (
     }
 
     Status = XhciDelAsyncIntTransfer (Xhc, DeviceAddress, EndPointAddress);
-    DEBUG ((EFI_D_INFO, "XhcAsyncInterruptTransfer: remove old transfer for addr %d, Status = %r\n", DeviceAddress, Status));
+    DEBUG ((DEBUG_INFO, "XhcAsyncInterruptTransfer: remove old transfer for addr %d, Status = %r\n", DeviceAddress, Status));
     goto ON_EXIT;
   }
 
   Status = EFI_SUCCESS;
 
   if (XhcIsHalt (Xhc) || XhcIsSysError (Xhc)) {
-    DEBUG ((EFI_D_ERROR, "XhcAsyncInterruptTransfer: HC is halt\n"));
+    DEBUG ((DEBUG_ERROR, "XhcAsyncInterruptTransfer: HC is halt\n"));
     Status = EFI_DEVICE_ERROR;
     goto ON_EXIT;
   }
@@ -1432,7 +1448,6 @@ ON_EXIT:
 
   return Status;
 }
-
 
 /**
   Submits synchronous interrupt transfer to an interrupt endpoint
@@ -1477,16 +1492,17 @@ XhcSyncInterruptTransfer (
   OUT    UINT32                              *TransferResult
   )
 {
-  USB_XHCI_INSTANCE       *Xhc;
-  UINT8                   SlotId;
-  EFI_STATUS              Status;
-  EFI_TPL                 OldTpl;
+  USB_XHCI_INSTANCE  *Xhc;
+  UINT8              SlotId;
+  EFI_STATUS         Status;
+  EFI_TPL            OldTpl;
 
   //
   // Validates parameters
   //
   if ((DataLength == NULL) || (*DataLength == 0) ||
-      (Data == NULL) || (TransferResult == NULL)) {
+      (Data == NULL) || (TransferResult == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1496,19 +1512,20 @@ XhcSyncInterruptTransfer (
 
   if (((DeviceSpeed == EFI_USB_SPEED_LOW) && (MaximumPacketLength != 8))  ||
       ((DeviceSpeed == EFI_USB_SPEED_FULL) && (MaximumPacketLength > 64)) ||
-      ((DeviceSpeed == EFI_USB_SPEED_HIGH) && (MaximumPacketLength > 3072))) {
+      ((DeviceSpeed == EFI_USB_SPEED_HIGH) && (MaximumPacketLength > 3072)))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
   OldTpl = gBS->RaiseTPL (XHC_TPL);
 
-  Xhc     = XHC_FROM_THIS (This);
+  Xhc = XHC_FROM_THIS (This);
 
   *TransferResult = EFI_USB_ERR_SYSTEM;
   Status          = EFI_DEVICE_ERROR;
 
   if (XhcIsHalt (Xhc) || XhcIsSysError (Xhc)) {
-    DEBUG ((EFI_D_ERROR, "EhcSyncInterruptTransfer: HC is halt\n"));
+    DEBUG ((DEBUG_ERROR, "EhcSyncInterruptTransfer: HC is halt\n"));
     goto ON_EXIT;
   }
 
@@ -1536,13 +1553,13 @@ XhcSyncInterruptTransfer (
 
 ON_EXIT:
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcSyncInterruptTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
+    DEBUG ((DEBUG_ERROR, "XhcSyncInterruptTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
   }
+
   gBS->RestoreTPL (OldTpl);
 
   return Status;
 }
-
 
 /**
   Submits isochronous transfer to a target USB device.
@@ -1582,7 +1599,6 @@ XhcIsochronousTransfer (
 {
   return EFI_UNSUPPORTED;
 }
-
 
 /**
   Submits Async isochronous transfer to a target USB device.
@@ -1639,8 +1655,8 @@ XhcAsyncIsochronousTransfer (
 EFI_STATUS
 EFIAPI
 XhcDriverEntryPoint (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return EfiLibInstallDriverBindingComponentName2 (
@@ -1652,7 +1668,6 @@ XhcDriverEntryPoint (
            &gXhciComponentName2
            );
 }
-
 
 /**
   Test to see if this driver supports ControllerHandle. Any
@@ -1670,14 +1685,14 @@ XhcDriverEntryPoint (
 EFI_STATUS
 EFIAPI
 XhcDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS              Status;
-  EFI_PCI_IO_PROTOCOL     *PciIo;
-  USB_CLASSC              UsbClassCReg;
+  EFI_STATUS           Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  USB_CLASSC           UsbClassCReg;
 
   //
   // Test whether there is PCI IO Protocol attached on the controller handle.
@@ -1685,7 +1700,7 @@ XhcDriverBindingSupported (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiPciIoProtocolGuid,
-                  (VOID **) &PciIo,
+                  (VOID **)&PciIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -1713,7 +1728,8 @@ XhcDriverBindingSupported (
   //
   if ((UsbClassCReg.BaseCode != PCI_CLASS_SERIAL) ||
       (UsbClassCReg.SubClassCode != PCI_CLASS_SERIAL_USB) ||
-      (UsbClassCReg.ProgInterface != PCI_IF_XHCI)) {
+      (UsbClassCReg.ProgInterface != PCI_IF_XHCI))
+  {
     Status = EFI_UNSUPPORTED;
   }
 
@@ -1739,18 +1755,18 @@ ON_EXIT:
           otherwise NULL.
 
 **/
-USB_XHCI_INSTANCE*
+USB_XHCI_INSTANCE *
 XhcCreateUsbHc (
   IN EFI_PCI_IO_PROTOCOL       *PciIo,
   IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
   IN UINT64                    OriginalPciAttributes
   )
 {
-  USB_XHCI_INSTANCE       *Xhc;
-  EFI_STATUS              Status;
-  UINT32                  PageSize;
-  UINT16                  ExtCapReg;
-  UINT8                   ReleaseNumber;
+  USB_XHCI_INSTANCE  *Xhc;
+  EFI_STATUS         Status;
+  UINT32             PageSize;
+  UINT16             ExtCapReg;
+  UINT8              ReleaseNumber;
 
   Xhc = AllocateZeroPool (sizeof (USB_XHCI_INSTANCE));
 
@@ -1797,22 +1813,22 @@ XhcCreateUsbHc (
   // This xHC supports a page size of 2^(n+12) if bit n is Set. For example,
   // if bit 0 is Set, the xHC supports 4k byte page sizes.
   //
-  PageSize      = XhcReadOpReg(Xhc, XHC_PAGESIZE_OFFSET) & XHC_PAGESIZE_MASK;
-  Xhc->PageSize = 1 << (HighBitSet32(PageSize) + 12);
+  PageSize      = XhcReadOpReg (Xhc, XHC_PAGESIZE_OFFSET) & XHC_PAGESIZE_MASK;
+  Xhc->PageSize = 1 << (HighBitSet32 (PageSize) + 12);
 
-  ExtCapReg            = (UINT16) (Xhc->HcCParams.Data.ExtCapReg);
-  Xhc->ExtCapRegBase   = ExtCapReg << 2;
-  Xhc->UsbLegSupOffset = XhcGetCapabilityAddr (Xhc, XHC_CAP_USB_LEGACY);
+  ExtCapReg              = (UINT16)(Xhc->HcCParams.Data.ExtCapReg);
+  Xhc->ExtCapRegBase     = ExtCapReg << 2;
+  Xhc->UsbLegSupOffset   = XhcGetCapabilityAddr (Xhc, XHC_CAP_USB_LEGACY);
   Xhc->DebugCapSupOffset = XhcGetCapabilityAddr (Xhc, XHC_CAP_USB_DEBUG);
 
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: Capability length 0x%x\n", Xhc->CapLength));
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: HcSParams1 0x%x\n", Xhc->HcSParams1));
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: HcSParams2 0x%x\n", Xhc->HcSParams2));
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: HcCParams 0x%x\n", Xhc->HcCParams));
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: DBOff 0x%x\n", Xhc->DBOff));
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: RTSOff 0x%x\n", Xhc->RTSOff));
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: UsbLegSupOffset 0x%x\n", Xhc->UsbLegSupOffset));
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: DebugCapSupOffset 0x%x\n", Xhc->DebugCapSupOffset));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: Capability length 0x%x\n", Xhc->CapLength));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: HcSParams1 0x%x\n", Xhc->HcSParams1));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: HcSParams2 0x%x\n", Xhc->HcSParams2));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: HcCParams 0x%x\n", Xhc->HcCParams));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: DBOff 0x%x\n", Xhc->DBOff));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: RTSOff 0x%x\n", Xhc->RTSOff));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: UsbLegSupOffset 0x%x\n", Xhc->UsbLegSupOffset));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: DebugCapSupOffset 0x%x\n", Xhc->DebugCapSupOffset));
 
   //
   // Create AsyncRequest Polling Timer
@@ -1854,7 +1870,7 @@ XhcExitBootService (
   USB_XHCI_INSTANCE    *Xhc;
   EFI_PCI_IO_PROTOCOL  *PciIo;
 
-  Xhc = (USB_XHCI_INSTANCE*) Context;
+  Xhc   = (USB_XHCI_INSTANCE *)Context;
   PciIo = Xhc->PciIo;
 
   //
@@ -1874,11 +1890,11 @@ XhcExitBootService (
   // Restore original PCI attributes
   //
   PciIo->Attributes (
-                  PciIo,
-                  EfiPciIoAttributeOperationSet,
-                  Xhc->OriginalPciAttributes,
-                  NULL
-                  );
+           PciIo,
+           EfiPciIoAttributeOperationSet,
+           Xhc->OriginalPciAttributes,
+           NULL
+           );
 }
 
 /**
@@ -1897,17 +1913,17 @@ XhcExitBootService (
 EFI_STATUS
 EFIAPI
 XhcDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS              Status;
-  EFI_PCI_IO_PROTOCOL     *PciIo;
-  UINT64                  Supports;
-  UINT64                  OriginalPciAttributes;
-  BOOLEAN                 PciAttributesSaved;
-  USB_XHCI_INSTANCE       *Xhc;
+  EFI_STATUS                Status;
+  EFI_PCI_IO_PROTOCOL       *PciIo;
+  UINT64                    Supports;
+  UINT64                    OriginalPciAttributes;
+  BOOLEAN                   PciAttributesSaved;
+  USB_XHCI_INSTANCE         *Xhc;
   EFI_DEVICE_PATH_PROTOCOL  *HcDevicePath;
 
   //
@@ -1916,7 +1932,7 @@ XhcDriverBindingStart (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiPciIoProtocolGuid,
-                  (VOID **) &PciIo,
+                  (VOID **)&PciIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -1930,14 +1946,14 @@ XhcDriverBindingStart (
   // Open Device Path Protocol for on USB host controller
   //
   HcDevicePath = NULL;
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **) &HcDevicePath,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
+  Status       = gBS->OpenProtocol (
+                        Controller,
+                        &gEfiDevicePathProtocolGuid,
+                        (VOID **)&HcDevicePath,
+                        This->DriverBindingHandle,
+                        Controller,
+                        EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                        );
 
   PciAttributesSaved = FALSE;
   //
@@ -1953,6 +1969,7 @@ XhcDriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto CLOSE_PCIIO;
   }
+
   PciAttributesSaved = TRUE;
 
   Status = PciIo->Attributes (
@@ -1963,16 +1980,16 @@ XhcDriverBindingStart (
                     );
   if (!EFI_ERROR (Status)) {
     Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
-    Status = PciIo->Attributes (
-                      PciIo,
-                      EfiPciIoAttributeOperationEnable,
-                      Supports,
-                      NULL
-                      );
+    Status    = PciIo->Attributes (
+                         PciIo,
+                         EfiPciIoAttributeOperationEnable,
+                         Supports,
+                         NULL
+                         );
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcDriverBindingStart: failed to enable controller\n"));
+    DEBUG ((DEBUG_ERROR, "XhcDriverBindingStart: failed to enable controller\n"));
     goto CLOSE_PCIIO;
   }
 
@@ -1982,7 +1999,7 @@ XhcDriverBindingStart (
   Xhc = XhcCreateUsbHc (PciIo, HcDevicePath, OriginalPciAttributes);
 
   if (Xhc == NULL) {
-    DEBUG ((EFI_D_ERROR, "XhcDriverBindingStart: failed to create USB2_HC\n"));
+    DEBUG ((DEBUG_ERROR, "XhcDriverBindingStart: failed to create USB2_HC\n"));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -2000,9 +2017,13 @@ XhcDriverBindingStart (
     if (!EFI_ERROR (Status)) {
       Xhc->Support64BitDma = TRUE;
     } else {
-      DEBUG ((EFI_D_WARN,
+      DEBUG ((
+        DEBUG_WARN,
         "%a: failed to enable 64-bit DMA on 64-bit capable controller @ %p (%r)\n",
-        __FUNCTION__, Controller, Status));
+        __FUNCTION__,
+        Controller,
+        Status
+        ));
     }
   }
 
@@ -2025,14 +2046,14 @@ XhcDriverBindingStart (
   //
   // Start the Host Controller
   //
-  XhcRunHC(Xhc, XHC_GENERIC_TIMEOUT);
+  XhcRunHC (Xhc, XHC_GENERIC_TIMEOUT);
 
   //
   // Start the asynchronous interrupt monitor
   //
   Status = gBS->SetTimer (Xhc->PollTimer, TimerPeriodic, XHC_ASYNC_TIMER_INTERVAL);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcDriverBindingStart: failed to start async interrupt monitor\n"));
+    DEBUG ((DEBUG_ERROR, "XhcDriverBindingStart: failed to start async interrupt monitor\n"));
     XhcHaltHC (Xhc, XHC_GENERIC_TIMEOUT);
     goto FREE_POOL;
   }
@@ -2078,11 +2099,11 @@ XhcDriverBindingStart (
                   &Xhc->Usb2Hc
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcDriverBindingStart: failed to install USB2_HC Protocol\n"));
+    DEBUG ((DEBUG_ERROR, "XhcDriverBindingStart: failed to install USB2_HC Protocol\n"));
     goto FREE_POOL;
   }
 
-  DEBUG ((EFI_D_INFO, "XhcDriverBindingStart: XHCI started for controller @ %x\n", Controller));
+  DEBUG ((DEBUG_INFO, "XhcDriverBindingStart: XHCI started for controller @ %x\n", Controller));
   return EFI_SUCCESS;
 
 FREE_POOL:
@@ -2096,11 +2117,11 @@ CLOSE_PCIIO:
     // Restore original PCI attributes
     //
     PciIo->Attributes (
-                    PciIo,
-                    EfiPciIoAttributeOperationSet,
-                    OriginalPciAttributes,
-                    NULL
-                    );
+             PciIo,
+             EfiPciIoAttributeOperationSet,
+             OriginalPciAttributes,
+             NULL
+             );
   }
 
   gBS->CloseProtocol (
@@ -2112,7 +2133,6 @@ CLOSE_PCIIO:
 
   return Status;
 }
-
 
 /**
   Stop this driver on ControllerHandle. Support stopping any child handles
@@ -2130,10 +2150,10 @@ CLOSE_PCIIO:
 EFI_STATUS
 EFIAPI
 XhcDriverBindingStop (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  Controller,
-  IN UINTN                       NumberOfChildren,
-  IN EFI_HANDLE                  *ChildHandleBuffer
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer
   )
 {
   EFI_STATUS            Status;
@@ -2150,7 +2170,7 @@ XhcDriverBindingStop (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiUsb2HcProtocolGuid,
-                  (VOID **) &Usb2Hc,
+                  (VOID **)&Usb2Hc,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -2185,9 +2205,11 @@ XhcDriverBindingStop (
   //
   for (Index = 0; Index < 255; Index++) {
     if (!Xhc->UsbDevContext[Index + 1].Enabled ||
-        (Xhc->UsbDevContext[Index + 1].SlotId == 0)) {
+        (Xhc->UsbDevContext[Index + 1].SlotId == 0))
+    {
       continue;
     }
+
     if (Xhc->HcCParams.Data.Csz == 0) {
       XhcDisableSlotCmd (Xhc, Xhc->UsbDevContext[Index + 1].SlotId);
     } else {
@@ -2233,4 +2255,3 @@ XhcDriverBindingStop (
 
   return EFI_SUCCESS;
 }
-

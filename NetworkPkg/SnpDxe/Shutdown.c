@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Snp.h"
 
-
 /**
   Call UNDI to shut down the interface.
 
@@ -20,35 +19,36 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 PxeShutdown (
-  IN SNP_DRIVER *Snp
+  IN SNP_DRIVER  *Snp
   )
 {
-  Snp->Cdb.OpCode     = PXE_OPCODE_SHUTDOWN;
-  Snp->Cdb.OpFlags    = PXE_OPFLAGS_NOT_USED;
-  Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.DBsize     = PXE_DBSIZE_NOT_USED;
-  Snp->Cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
-  Snp->Cdb.DBaddr     = PXE_DBADDR_NOT_USED;
-  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum      = Snp->IfNum;
-  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.OpCode    = PXE_OPCODE_SHUTDOWN;
+  Snp->Cdb.OpFlags   = PXE_OPFLAGS_NOT_USED;
+  Snp->Cdb.CPBsize   = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb.DBsize    = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb.CPBaddr   = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb.DBaddr    = PXE_DBADDR_NOT_USED;
+  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum     = Snp->IfNum;
+  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.shutdown()  "));
+  DEBUG ((DEBUG_NET, "\nsnp->undi.shutdown()  "));
 
-  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
 
   if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     //
     // UNDI could not be shutdown. Return UNDI error.
     //
-    DEBUG ((EFI_D_WARN, "\nsnp->undi.shutdown()  %xh:%xh\n", Snp->Cdb.StatFlags, Snp->Cdb.StatCode));
+    DEBUG ((DEBUG_WARN, "\nsnp->undi.shutdown()  %xh:%xh\n", Snp->Cdb.StatFlags, Snp->Cdb.StatCode));
 
     return EFI_DEVICE_ERROR;
   }
+
   //
   // Free allocated memory.
   //
@@ -56,16 +56,15 @@ PxeShutdown (
     Snp->PciIo->FreeBuffer (
                   Snp->PciIo,
                   SNP_MEM_PAGES (Snp->TxRxBufferSize),
-                  (VOID *) Snp->TxRxBuffer
+                  (VOID *)Snp->TxRxBuffer
                   );
   }
 
-  Snp->TxRxBuffer      = NULL;
-  Snp->TxRxBufferSize  = 0;
+  Snp->TxRxBuffer     = NULL;
+  Snp->TxRxBufferSize = 0;
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Resets a network adapter and leaves it in a state that is safe for another
@@ -89,7 +88,7 @@ PxeShutdown (
 EFI_STATUS
 EFIAPI
 SnpUndi32Shutdown (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This
   )
 {
   SNP_DRIVER  *Snp;
@@ -111,25 +110,25 @@ SnpUndi32Shutdown (
   // Return error if the SNP is not initialized.
   //
   switch (Snp->Mode.State) {
-  case EfiSimpleNetworkInitialized:
-    break;
+    case EfiSimpleNetworkInitialized:
+      break;
 
-  case EfiSimpleNetworkStopped:
-    Status = EFI_NOT_STARTED;
-    goto ON_EXIT;
+    case EfiSimpleNetworkStopped:
+      Status = EFI_NOT_STARTED;
+      goto ON_EXIT;
 
-  default:
-    Status = EFI_DEVICE_ERROR;
-    goto ON_EXIT;
+    default:
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
   }
 
-  Status                          = PxeShutdown (Snp);
+  Status = PxeShutdown (Snp);
 
-  Snp->Mode.State                 = EfiSimpleNetworkStarted;
-  Snp->Mode.ReceiveFilterSetting  = 0;
+  Snp->Mode.State                = EfiSimpleNetworkStarted;
+  Snp->Mode.ReceiveFilterSetting = 0;
 
-  Snp->Mode.MCastFilterCount      = 0;
-  Snp->Mode.ReceiveFilterSetting  = 0;
+  Snp->Mode.MCastFilterCount     = 0;
+  Snp->Mode.ReceiveFilterSetting = 0;
   ZeroMem (Snp->Mode.MCastFilter, sizeof Snp->Mode.MCastFilter);
   CopyMem (
     &Snp->Mode.CurrentAddress,

@@ -23,10 +23,10 @@
 
 #include <Protocol/VariableLock.h>
 
-#define UNIT_TEST_NAME        "VarPol/VarLock Shim Unit Test"
-#define UNIT_TEST_VERSION     "1.0"
+#define UNIT_TEST_NAME     "VarPol/VarLock Shim Unit Test"
+#define UNIT_TEST_VERSION  "1.0"
 
-///=== CODE UNDER TEST ===========================================================================
+/// === CODE UNDER TEST ===========================================================================
 
 EFI_STATUS
 EFIAPI
@@ -36,41 +36,41 @@ VariableLockRequestToLock (
   IN       EFI_GUID                      *VendorGuid
   );
 
-///=== TEST DATA ==================================================================================
+/// === TEST DATA ==================================================================================
 
 //
 // Test GUID 1 {F955BA2D-4A2C-480C-BFD1-3CC522610592}
 //
 EFI_GUID  mTestGuid1 = {
-  0xf955ba2d, 0x4a2c, 0x480c, {0xbf, 0xd1, 0x3c, 0xc5, 0x22, 0x61, 0x5, 0x92}
+  0xf955ba2d, 0x4a2c, 0x480c, { 0xbf, 0xd1, 0x3c, 0xc5, 0x22, 0x61, 0x5, 0x92 }
 };
 
 //
 // Test GUID 2 {2DEA799E-5E73-43B9-870E-C945CE82AF3A}
 //
 EFI_GUID  mTestGuid2 = {
-  0x2dea799e, 0x5e73, 0x43b9, {0x87, 0xe, 0xc9, 0x45, 0xce, 0x82, 0xaf, 0x3a}
+  0x2dea799e, 0x5e73, 0x43b9, { 0x87, 0xe, 0xc9, 0x45, 0xce, 0x82, 0xaf, 0x3a }
 };
 
 //
 // Test GUID 3 {698A2BFD-A616-482D-B88C-7100BD6682A9}
 //
 EFI_GUID  mTestGuid3 = {
-  0x698a2bfd, 0xa616, 0x482d, {0xb8, 0x8c, 0x71, 0x0, 0xbd, 0x66, 0x82, 0xa9}
+  0x698a2bfd, 0xa616, 0x482d, { 0xb8, 0x8c, 0x71, 0x0, 0xbd, 0x66, 0x82, 0xa9 }
 };
 
-#define TEST_VAR_1_NAME              L"TestVar1"
-#define TEST_VAR_2_NAME              L"TestVar2"
-#define TEST_VAR_3_NAME              L"TestVar3"
+#define TEST_VAR_1_NAME  L"TestVar1"
+#define TEST_VAR_2_NAME  L"TestVar2"
+#define TEST_VAR_3_NAME  L"TestVar3"
 
 #define TEST_POLICY_ATTRIBUTES_NULL  0
 #define TEST_POLICY_MIN_SIZE_NULL    0
 #define TEST_POLICY_MAX_SIZE_NULL    MAX_UINT32
 
-#define TEST_POLICY_MIN_SIZE_10      10
-#define TEST_POLICY_MAX_SIZE_200     200
+#define TEST_POLICY_MIN_SIZE_10   10
+#define TEST_POLICY_MAX_SIZE_200  200
 
-///=== HELPER FUNCTIONS ===========================================================================
+/// === HELPER FUNCTIONS ===========================================================================
 
 /**
   Mocked version of GetVariable, for testing.
@@ -86,7 +86,7 @@ EFIAPI
 StubGetVariableNull (
   IN     CHAR16    *VariableName,
   IN     EFI_GUID  *VendorGuid,
-  OUT    UINT32    *Attributes,  OPTIONAL
+  OUT    UINT32    *Attributes   OPTIONAL,
   IN OUT UINTN     *DataSize,
   OUT    VOID      *Data         OPTIONAL
   )
@@ -100,15 +100,16 @@ StubGetVariableNull (
   check_expected_ptr (VendorGuid);
   check_expected_ptr (DataSize);
 
-  MockedAttr     = (UINT32)mock();
-  MockedDataSize = (UINTN)mock();
-  MockedData     = (VOID*)(UINTN)mock();
-  MockedReturn   = (EFI_STATUS)mock();
+  MockedAttr     = (UINT32)mock ();
+  MockedDataSize = (UINTN)mock ();
+  MockedData     = (VOID *)(UINTN)mock ();
+  MockedReturn   = (EFI_STATUS)mock ();
 
   if (Attributes != NULL) {
     *Attributes = MockedAttr;
   }
-  if (Data != NULL && !EFI_ERROR (MockedReturn)) {
+
+  if ((Data != NULL) && !EFI_ERROR (MockedReturn)) {
     CopyMem (Data, MockedData, MockedDataSize);
   }
 
@@ -152,12 +153,12 @@ LibCleanup (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
-  DeinitVariablePolicyLib();
+  DeinitVariablePolicyLib ();
 }
 
-///=== TEST CASES =================================================================================
+/// === TEST CASES =================================================================================
 
-///===== SHIM SUITE ===========================================================
+/// ===== SHIM SUITE ===========================================================
 
 /**
   Test Case that locks a single variable using the Variable Lock Protocol.
@@ -257,38 +258,40 @@ LockingALockedVariableShouldSucceed (
 UNIT_TEST_STATUS
 EFIAPI
 LockingAnUnlockedVariableShouldFail (
-  IN UNIT_TEST_CONTEXT      Context
+  IN UNIT_TEST_CONTEXT  Context
   )
 {
-  EFI_STATUS                Status;
-  VARIABLE_POLICY_ENTRY     *NewEntry;
+  EFI_STATUS             Status;
+  VARIABLE_POLICY_ENTRY  *NewEntry;
 
   // Create a variable policy that locks the variable.
-  Status = CreateVarStateVariablePolicy (&mTestGuid1,
-                                         TEST_VAR_1_NAME,
-                                         TEST_POLICY_MIN_SIZE_NULL,
-                                         TEST_POLICY_MAX_SIZE_200,
-                                         TEST_POLICY_ATTRIBUTES_NULL,
-                                         TEST_POLICY_ATTRIBUTES_NULL,
-                                         &mTestGuid2,
-                                         1,
-                                         TEST_VAR_2_NAME,
-                                         &NewEntry);
+  Status = CreateVarStateVariablePolicy (
+             &mTestGuid1,
+             TEST_VAR_1_NAME,
+             TEST_POLICY_MIN_SIZE_NULL,
+             TEST_POLICY_MAX_SIZE_200,
+             TEST_POLICY_ATTRIBUTES_NULL,
+             TEST_POLICY_ATTRIBUTES_NULL,
+             &mTestGuid2,
+             1,
+             TEST_VAR_2_NAME,
+             &NewEntry
+             );
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   // Register the new policy.
   Status = RegisterVariablePolicy (NewEntry);
 
- // Configure the stub to not care about parameters. We're testing errors.
-  expect_any_always( StubGetVariableNull, VariableName );
-  expect_any_always( StubGetVariableNull, VendorGuid );
-  expect_any_always( StubGetVariableNull, DataSize );
+  // Configure the stub to not care about parameters. We're testing errors.
+  expect_any_always (StubGetVariableNull, VariableName);
+  expect_any_always (StubGetVariableNull, VendorGuid);
+  expect_any_always (StubGetVariableNull, DataSize);
 
   // With a policy, make sure that writes still work, since the variable doesn't exist.
-  will_return( StubGetVariableNull, TEST_POLICY_ATTRIBUTES_NULL );    // Attributes
-  will_return( StubGetVariableNull, 0 );                              // Size
-  will_return( StubGetVariableNull, NULL );                           // DataPtr
-  will_return( StubGetVariableNull, EFI_NOT_FOUND);                   // Status
+  will_return (StubGetVariableNull, TEST_POLICY_ATTRIBUTES_NULL);     // Attributes
+  will_return (StubGetVariableNull, 0);                               // Size
+  will_return (StubGetVariableNull, (UINTN)NULL);                     // DataPtr
+  will_return (StubGetVariableNull, EFI_NOT_FOUND);                   // Status
 
   Status = VariableLockRequestToLock (NULL, TEST_VAR_1_NAME, &mTestGuid1);
   UT_ASSERT_TRUE (EFI_ERROR (Status));
@@ -310,40 +313,42 @@ LockingAnUnlockedVariableShouldFail (
 UNIT_TEST_STATUS
 EFIAPI
 LockingALockedVariableWithMatchingDataShouldSucceed (
-  IN UNIT_TEST_CONTEXT      Context
+  IN UNIT_TEST_CONTEXT  Context
   )
 {
-  EFI_STATUS                Status;
-  VARIABLE_POLICY_ENTRY     *NewEntry;
-  UINT8                     Data;
+  EFI_STATUS             Status;
+  VARIABLE_POLICY_ENTRY  *NewEntry;
+  UINT8                  Data;
 
   // Create a variable policy that locks the variable.
-  Status = CreateVarStateVariablePolicy (&mTestGuid1,
-                                         TEST_VAR_1_NAME,
-                                         TEST_POLICY_MIN_SIZE_NULL,
-                                         TEST_POLICY_MAX_SIZE_200,
-                                         TEST_POLICY_ATTRIBUTES_NULL,
-                                         TEST_POLICY_ATTRIBUTES_NULL,
-                                         &mTestGuid2,
-                                         1,
-                                         TEST_VAR_2_NAME,
-                                         &NewEntry);
+  Status = CreateVarStateVariablePolicy (
+             &mTestGuid1,
+             TEST_VAR_1_NAME,
+             TEST_POLICY_MIN_SIZE_NULL,
+             TEST_POLICY_MAX_SIZE_200,
+             TEST_POLICY_ATTRIBUTES_NULL,
+             TEST_POLICY_ATTRIBUTES_NULL,
+             &mTestGuid2,
+             1,
+             TEST_VAR_2_NAME,
+             &NewEntry
+             );
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   // Register the new policy.
   Status = RegisterVariablePolicy (NewEntry);
 
- // Configure the stub to not care about parameters. We're testing errors.
-  expect_any_always( StubGetVariableNull, VariableName );
-  expect_any_always( StubGetVariableNull, VendorGuid );
-  expect_any_always( StubGetVariableNull, DataSize );
+  // Configure the stub to not care about parameters. We're testing errors.
+  expect_any_always (StubGetVariableNull, VariableName);
+  expect_any_always (StubGetVariableNull, VendorGuid);
+  expect_any_always (StubGetVariableNull, DataSize);
 
   // With a policy, make sure that writes still work, since the variable doesn't exist.
   Data = 1;
-  will_return( StubGetVariableNull, TEST_POLICY_ATTRIBUTES_NULL );    // Attributes
-  will_return( StubGetVariableNull, sizeof (Data) );                  // Size
-  will_return( StubGetVariableNull, &Data );                          // DataPtr
-  will_return( StubGetVariableNull, EFI_SUCCESS);                     // Status
+  will_return (StubGetVariableNull, TEST_POLICY_ATTRIBUTES_NULL);     // Attributes
+  will_return (StubGetVariableNull, sizeof (Data));                   // Size
+  will_return (StubGetVariableNull, (UINTN)&Data);                    // DataPtr
+  will_return (StubGetVariableNull, EFI_SUCCESS);                     // Status
 
   Status = VariableLockRequestToLock (NULL, TEST_VAR_1_NAME, &mTestGuid1);
   UT_ASSERT_TRUE (!EFI_ERROR (Status));
@@ -365,40 +370,42 @@ LockingALockedVariableWithMatchingDataShouldSucceed (
 UNIT_TEST_STATUS
 EFIAPI
 LockingALockedVariableWithNonMatchingDataShouldFail (
-  IN UNIT_TEST_CONTEXT      Context
+  IN UNIT_TEST_CONTEXT  Context
   )
 {
-  EFI_STATUS                Status;
-  VARIABLE_POLICY_ENTRY     *NewEntry;
-  UINT8                     Data;
+  EFI_STATUS             Status;
+  VARIABLE_POLICY_ENTRY  *NewEntry;
+  UINT8                  Data;
 
   // Create a variable policy that locks the variable.
-  Status = CreateVarStateVariablePolicy (&mTestGuid1,
-                                         TEST_VAR_1_NAME,
-                                         TEST_POLICY_MIN_SIZE_NULL,
-                                         TEST_POLICY_MAX_SIZE_200,
-                                         TEST_POLICY_ATTRIBUTES_NULL,
-                                         TEST_POLICY_ATTRIBUTES_NULL,
-                                         &mTestGuid2,
-                                         1,
-                                         TEST_VAR_2_NAME,
-                                         &NewEntry);
+  Status = CreateVarStateVariablePolicy (
+             &mTestGuid1,
+             TEST_VAR_1_NAME,
+             TEST_POLICY_MIN_SIZE_NULL,
+             TEST_POLICY_MAX_SIZE_200,
+             TEST_POLICY_ATTRIBUTES_NULL,
+             TEST_POLICY_ATTRIBUTES_NULL,
+             &mTestGuid2,
+             1,
+             TEST_VAR_2_NAME,
+             &NewEntry
+             );
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   // Register the new policy.
   Status = RegisterVariablePolicy (NewEntry);
 
- // Configure the stub to not care about parameters. We're testing errors.
-  expect_any_always( StubGetVariableNull, VariableName );
-  expect_any_always( StubGetVariableNull, VendorGuid );
-  expect_any_always( StubGetVariableNull, DataSize );
+  // Configure the stub to not care about parameters. We're testing errors.
+  expect_any_always (StubGetVariableNull, VariableName);
+  expect_any_always (StubGetVariableNull, VendorGuid);
+  expect_any_always (StubGetVariableNull, DataSize);
 
   // With a policy, make sure that writes still work, since the variable doesn't exist.
   Data = 2;
-  will_return( StubGetVariableNull, TEST_POLICY_ATTRIBUTES_NULL );    // Attributes
-  will_return( StubGetVariableNull, sizeof (Data) );                  // Size
-  will_return( StubGetVariableNull, &Data );                          // DataPtr
-  will_return( StubGetVariableNull, EFI_SUCCESS);                     // Status
+  will_return (StubGetVariableNull, TEST_POLICY_ATTRIBUTES_NULL);     // Attributes
+  will_return (StubGetVariableNull, sizeof (Data));                   // Size
+  will_return (StubGetVariableNull, (UINTN)&Data);                    // DataPtr
+  will_return (StubGetVariableNull, EFI_SUCCESS);                     // Status
 
   Status = VariableLockRequestToLock (NULL, TEST_VAR_1_NAME, &mTestGuid1);
   UT_ASSERT_TRUE (EFI_ERROR (Status));
@@ -419,27 +426,29 @@ LockingALockedVariableWithNonMatchingDataShouldFail (
 UNIT_TEST_STATUS
 EFIAPI
 SettingPolicyForALockedVariableShouldFail (
-  IN UNIT_TEST_CONTEXT      Context
+  IN UNIT_TEST_CONTEXT  Context
   )
 {
-  EFI_STATUS                Status;
-  VARIABLE_POLICY_ENTRY     *NewEntry;
+  EFI_STATUS             Status;
+  VARIABLE_POLICY_ENTRY  *NewEntry;
 
   // Lock the variable.
   Status = VariableLockRequestToLock (NULL, TEST_VAR_1_NAME, &mTestGuid1);
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   // Create a variable policy that locks the variable.
-  Status = CreateVarStateVariablePolicy (&mTestGuid1,
-                                         TEST_VAR_1_NAME,
-                                         TEST_POLICY_MIN_SIZE_NULL,
-                                         TEST_POLICY_MAX_SIZE_200,
-                                         TEST_POLICY_ATTRIBUTES_NULL,
-                                         TEST_POLICY_ATTRIBUTES_NULL,
-                                         &mTestGuid2,
-                                         1,
-                                         TEST_VAR_2_NAME,
-                                         &NewEntry);
+  Status = CreateVarStateVariablePolicy (
+             &mTestGuid1,
+             TEST_VAR_1_NAME,
+             TEST_POLICY_MIN_SIZE_NULL,
+             TEST_POLICY_MAX_SIZE_200,
+             TEST_POLICY_ATTRIBUTES_NULL,
+             TEST_POLICY_ATTRIBUTES_NULL,
+             &mTestGuid2,
+             1,
+             TEST_VAR_2_NAME,
+             &NewEntry
+             );
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   // Register the new policy.
@@ -483,48 +492,81 @@ UnitTestMain (
   // Add all test suites and tests.
   //
   Status = CreateUnitTestSuite (
-             &ShimTests, Framework,
-             "Variable Lock Shim Tests", "VarPolicy.VarLockShim", NULL, NULL
+             &ShimTests,
+             Framework,
+             "Variable Lock Shim Tests",
+             "VarPolicy.VarLockShim",
+             NULL,
+             NULL
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed in CreateUnitTestSuite for ShimTests\n"));
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
   }
+
   AddTestCase (
     ShimTests,
-    "Locking a variable with no matching policies should always work", "EmptyPolicies",
-    LockingWithoutAnyPoliciesShouldSucceed, LibInitMocked, LibCleanup, NULL
+    "Locking a variable with no matching policies should always work",
+    "EmptyPolicies",
+    LockingWithoutAnyPoliciesShouldSucceed,
+    LibInitMocked,
+    LibCleanup,
+    NULL
     );
   AddTestCase (
     ShimTests,
-    "Locking a variable twice should always work", "DoubleLock",
-    LockingTwiceShouldSucceed, LibInitMocked, LibCleanup, NULL
+    "Locking a variable twice should always work",
+    "DoubleLock",
+    LockingTwiceShouldSucceed,
+    LibInitMocked,
+    LibCleanup,
+    NULL
     );
   AddTestCase (
     ShimTests,
-    "Locking a variable that's already locked by another policy should work", "LockAfterPolicy",
-    LockingALockedVariableShouldSucceed, LibInitMocked, LibCleanup, NULL
+    "Locking a variable that's already locked by another policy should work",
+    "LockAfterPolicy",
+    LockingALockedVariableShouldSucceed,
+    LibInitMocked,
+    LibCleanup,
+    NULL
     );
   AddTestCase (
     ShimTests,
-    "Locking a variable that already has an unlocked policy should fail", "LockAfterUnlockedPolicy",
-    LockingAnUnlockedVariableShouldFail, LibInitMocked, LibCleanup, NULL
+    "Locking a variable that already has an unlocked policy should fail",
+    "LockAfterUnlockedPolicy",
+    LockingAnUnlockedVariableShouldFail,
+    LibInitMocked,
+    LibCleanup,
+    NULL
     );
   AddTestCase (
     ShimTests,
-    "Locking a variable that already has an locked policy should succeed", "LockAfterLockedPolicyMatchingData",
-    LockingALockedVariableWithMatchingDataShouldSucceed, LibInitMocked, LibCleanup, NULL
+    "Locking a variable that already has an locked policy should succeed",
+    "LockAfterLockedPolicyMatchingData",
+    LockingALockedVariableWithMatchingDataShouldSucceed,
+    LibInitMocked,
+    LibCleanup,
+    NULL
     );
   AddTestCase (
     ShimTests,
-    "Locking a variable that already has an locked policy with matching data should succeed", "LockAfterLockedPolicyNonMatchingData",
-    LockingALockedVariableWithNonMatchingDataShouldFail, LibInitMocked, LibCleanup, NULL
+    "Locking a variable that already has an locked policy with matching data should succeed",
+    "LockAfterLockedPolicyNonMatchingData",
+    LockingALockedVariableWithNonMatchingDataShouldFail,
+    LibInitMocked,
+    LibCleanup,
+    NULL
     );
   AddTestCase (
     ShimTests,
-    "Adding a policy for a variable that has previously been locked should always fail", "SetPolicyAfterLock",
-    SettingPolicyForALockedVariableShouldFail, LibInitMocked, LibCleanup, NULL
+    "Adding a policy for a variable that has previously been locked should always fail",
+    "SetPolicyAfterLock",
+    SettingPolicyForALockedVariableShouldFail,
+    LibInitMocked,
+    LibCleanup,
+    NULL
     );
 
   //
@@ -543,7 +585,7 @@ EXIT:
 ///
 /// Avoid ECC error for function name that starts with lower case letter
 ///
-#define Main main
+#define Main  main
 
 /**
   Standard POSIX C entry point for host based unit test execution.

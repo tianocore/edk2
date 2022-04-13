@@ -11,10 +11,10 @@ http://www.tianocore.org/ovmf/
 
 Current capabilities:
 * IA32 and X64 architectures
-* QEMU (0.10.0 or later)
+* QEMU (version 1.7.1 or later, with 1.7 or later machine types)
   - Video, keyboard, IDE, CD-ROM, serial
   - Runs UEFI shell
-  - Optional NIC support.  Requires QEMU (0.12.2 or later)
+  - Optional NIC support.
 * UEFI Linux boots
 * UEFI Windows 8 boots
 * UEFI Windows 7 & Windows 2008 Server boot (see important notes below!)
@@ -59,11 +59,10 @@ https://github.com/tianocore/tianocore.github.io/wiki/How%20to%20build%20OVMF
 
 === RUNNING OVMF on QEMU ===
 
-* QEMU 0.12.2 or later is required.
-* Be sure to use qemu-system-x86_64, if you are using and X64 firmware.
+* Be sure to use qemu-system-x86_64, if you are using an X64 firmware.
   (qemu-system-x86_64 works for the IA32 firmware as well, of course.)
 * Use OVMF for QEMU firmware (3 options available)
-  - Option 1: QEMU 1.6 or newer; Use QEMU -pflash parameter
+  - Option 1: Use QEMU -pflash parameter
     * QEMU/OVMF will use emulated flash, and fully support UEFI variables
     * Run qemu with: -pflash path/to/OVMF.fd
     * Note that this option is required for running SecureBoot-enabled builds
@@ -184,41 +183,15 @@ DISCOVER message at startup, the boot process may take approx. 3 seconds
 longer.)
 
 * For each NIC emulated by qemu, a GPLv2 licensed UEFI driver is available from
-  the iPXE project. The qemu source distribution, starting with version 1.5,
-  contains prebuilt binaries of these drivers (and of course allows one to
-  rebuild them from source as well). This is the recommended set of drivers.
+  the iPXE project. The qemu source distribution contains prebuilt binaries of
+  these drivers (and of course allows one to rebuild them from source as well).
+  This is the recommended set of drivers.
 
 * Use the qemu -netdev and -device options, or the legacy -net option, to
   enable NIC support: <http://wiki.qemu.org/Documentation/Networking>.
 
-* For a qemu >= 1.5 binary running *without* any "-M machine" option where
-  "machine" would identify a < qemu-1.5 configuration (for example: "-M
-  pc-i440fx-1.4" or "-M pc-0.13"), the iPXE drivers are automatically available
-  to and configured for OVMF in the default qemu installation.
-
-* For a qemu binary in [0.13, 1.5), or a qemu >= 1.5 binary with an "-M
-  machine" option where "machine" selects a < qemu-1.5 configuration:
-
-  - download a >= 1.5.0-rc1 source tarball from <http://wiki.qemu.org/Download>,
-
-  - extract the following iPXE driver files from the tarball and install them
-    in a location that is accessible to qemu processes (this may depend on your
-    SELinux configuration, for example):
-
-    qemu-VERSION/pc-bios/efi-e1000.rom
-    qemu-VERSION/pc-bios/efi-ne2k_pci.rom
-    qemu-VERSION/pc-bios/efi-pcnet.rom
-    qemu-VERSION/pc-bios/efi-rtl8139.rom
-    qemu-VERSION/pc-bios/efi-virtio.rom
-
-  - extend the NIC's -device option on the qemu command line with a matching
-    "romfile=" optarg:
-
-    -device e1000,...,romfile=/full/path/to/efi-e1000.rom
-    -device ne2k_pci,...,romfile=/full/path/to/efi-ne2k_pci.rom
-    -device pcnet,...,romfile=/full/path/to/efi-pcnet.rom
-    -device rtl8139,...,romfile=/full/path/to/efi-rtl8139.rom
-    -device virtio-net-pci,...,romfile=/full/path/to/efi-virtio.rom
+* The iPXE drivers are automatically available to and configured for OVMF in
+  the default qemu installation.
 
 * Independently of the iPXE NIC drivers, the default OVMF build provides a
   basic virtio-net driver, located in OvmfPkg/VirtioNetDxe.

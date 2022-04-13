@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "IScsiImpl.h"
 
-
 /**
   Extract the Root Path option and get the required target information.
 
@@ -27,46 +26,47 @@ EFI_STATUS
 IScsiDhcpExtractRootPath (
   IN      CHAR8                        *RootPath,
   IN      UINT8                        Length,
-  IN OUT  ISCSI_ATTEMPT_CONFIG_NVDATA *ConfigData
+  IN OUT  ISCSI_ATTEMPT_CONFIG_NVDATA  *ConfigData
   )
 {
-  EFI_STATUS                  Status;
-  UINT8                       IScsiRootPathIdLen;
-  CHAR8                       *TmpStr;
-  ISCSI_ROOT_PATH_FIELD       Fields[RP_FIELD_IDX_MAX];
-  ISCSI_ROOT_PATH_FIELD       *Field;
-  UINT32                      FieldIndex;
-  UINT8                       Index;
-  ISCSI_SESSION_CONFIG_NVDATA *ConfigNvData;
-  EFI_IP_ADDRESS              Ip;
-  UINT8                       IpMode;
+  EFI_STATUS                   Status;
+  UINT8                        IScsiRootPathIdLen;
+  CHAR8                        *TmpStr;
+  ISCSI_ROOT_PATH_FIELD        Fields[RP_FIELD_IDX_MAX];
+  ISCSI_ROOT_PATH_FIELD        *Field;
+  UINT32                       FieldIndex;
+  UINT8                        Index;
+  ISCSI_SESSION_CONFIG_NVDATA  *ConfigNvData;
+  EFI_IP_ADDRESS               Ip;
+  UINT8                        IpMode;
 
   ConfigNvData = &ConfigData->SessionConfigData;
 
   //
   // "iscsi:"<servername>":"<protocol>":"<port>":"<LUN>":"<targetname>
   //
-  IScsiRootPathIdLen = (UINT8) AsciiStrLen (ISCSI_ROOT_PATH_ID);
+  IScsiRootPathIdLen = (UINT8)AsciiStrLen (ISCSI_ROOT_PATH_ID);
 
   if ((Length <= IScsiRootPathIdLen) || (CompareMem (RootPath, ISCSI_ROOT_PATH_ID, IScsiRootPathIdLen) != 0)) {
     return EFI_NOT_FOUND;
   }
+
   //
   // Skip the iSCSI RootPath ID "iscsi:".
   //
   RootPath += IScsiRootPathIdLen;
-  Length  = (UINT8) (Length - IScsiRootPathIdLen);
+  Length    = (UINT8)(Length - IScsiRootPathIdLen);
 
-  TmpStr  = (CHAR8 *) AllocatePool (Length + 1);
+  TmpStr = (CHAR8 *)AllocatePool (Length + 1);
   if (TmpStr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   CopyMem (TmpStr, RootPath, Length);
-  TmpStr[Length]  = '\0';
+  TmpStr[Length] = '\0';
 
-  Index           = 0;
-  FieldIndex      = RP_FIELD_IDX_SERVERNAME;
+  Index      = 0;
+  FieldIndex = RP_FIELD_IDX_SERVERNAME;
   ZeroMem (&Fields[0], sizeof (Fields));
 
   //
@@ -88,7 +88,7 @@ IScsiDhcpExtractRootPath (
       }
 
       if (Fields[FieldIndex].Str != NULL) {
-        Fields[FieldIndex].Len = (UINT8) AsciiStrLen (Fields[FieldIndex].Str);
+        Fields[FieldIndex].Len = (UINT8)AsciiStrLen (Fields[FieldIndex].Str);
       }
     }
   }
@@ -101,15 +101,16 @@ IScsiDhcpExtractRootPath (
   if ((Fields[RP_FIELD_IDX_SERVERNAME].Str == NULL) ||
       (Fields[RP_FIELD_IDX_TARGETNAME].Str == NULL) ||
       (Fields[RP_FIELD_IDX_PROTOCOL].Len > 1)
-      ) {
-
+      )
+  {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
+
   //
   // Get the IP address of the target.
   //
-  Field   = &Fields[RP_FIELD_IDX_SERVERNAME];
+  Field = &Fields[RP_FIELD_IDX_SERVERNAME];
 
   if (ConfigNvData->IpMode < IP_MODE_AUTOCONFIG) {
     IpMode = ConfigNvData->IpMode;
@@ -125,11 +126,12 @@ IScsiDhcpExtractRootPath (
     if ((Field->Len + 2) > sizeof (ConfigNvData->TargetUrl)) {
       return EFI_INVALID_PARAMETER;
     }
+
     CopyMem (&ConfigNvData->TargetUrl, Field->Str, Field->Len);
     ConfigNvData->TargetUrl[Field->Len + 1] = '\0';
   } else {
     ConfigNvData->DnsMode = FALSE;
-    ZeroMem(ConfigNvData->TargetUrl, sizeof (ConfigNvData->TargetUrl));
+    ZeroMem (ConfigNvData->TargetUrl, sizeof (ConfigNvData->TargetUrl));
     Status = IScsiAsciiStrToIp (Field->Str, IpMode, &Ip);
     CopyMem (&ConfigNvData->TargetIp, &Ip, sizeof (EFI_IP_ADDRESS));
 
@@ -137,6 +139,7 @@ IScsiDhcpExtractRootPath (
       goto ON_EXIT;
     }
   }
+
   //
   // Check the protocol type.
   //
@@ -145,15 +148,17 @@ IScsiDhcpExtractRootPath (
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
+
   //
   // Get the port of the iSCSI target.
   //
   Field = &Fields[RP_FIELD_IDX_PORT];
   if (Field->Str != NULL) {
-    ConfigNvData->TargetPort = (UINT16) AsciiStrDecimalToUintn (Field->Str);
+    ConfigNvData->TargetPort = (UINT16)AsciiStrDecimalToUintn (Field->Str);
   } else {
     ConfigNvData->TargetPort = ISCSI_WELL_KNOWN_PORT;
   }
+
   //
   // Get the LUN.
   //
@@ -166,6 +171,7 @@ IScsiDhcpExtractRootPath (
   } else {
     ZeroMem (ConfigNvData->BootLun, sizeof (ConfigNvData->BootLun));
   }
+
   //
   // Get the target iSCSI Name.
   //
@@ -175,6 +181,7 @@ IScsiDhcpExtractRootPath (
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
+
   //
   // Validate the iSCSI name.
   //
@@ -216,14 +223,14 @@ IScsiDhcpSelectOffer (
   IN  VOID                *Context,
   IN  EFI_DHCP4_STATE     CurrentState,
   IN  EFI_DHCP4_EVENT     Dhcp4Event,
-  IN  EFI_DHCP4_PACKET    *Packet, OPTIONAL
+  IN  EFI_DHCP4_PACKET    *Packet  OPTIONAL,
   OUT EFI_DHCP4_PACKET    **NewPacket OPTIONAL
   )
 {
-  EFI_STATUS              Status;
-  UINT32                  OptionCount;
-  EFI_DHCP4_PACKET_OPTION **OptionList;
-  UINT32                  Index;
+  EFI_STATUS               Status;
+  UINT32                   OptionCount;
+  EFI_DHCP4_PACKET_OPTION  **OptionList;
+  UINT32                   Index;
 
   if ((Dhcp4Event != Dhcp4RcvdOffer) && (Dhcp4Event != Dhcp4SelectOffer)) {
     return EFI_SUCCESS;
@@ -231,7 +238,7 @@ IScsiDhcpSelectOffer (
 
   OptionCount = 0;
 
-  Status      = This->Parse (This, Packet, &OptionCount, NULL);
+  Status = This->Parse (This, Packet, &OptionCount, NULL);
   if (Status != EFI_BUFFER_TOO_SMALL) {
     return EFI_NOT_READY;
   }
@@ -253,9 +260,9 @@ IScsiDhcpSelectOffer (
     }
 
     Status = IScsiDhcpExtractRootPath (
-               (CHAR8 *) &OptionList[Index]->Data[0],
+               (CHAR8 *)&OptionList[Index]->Data[0],
                OptionList[Index]->Length,
-               (ISCSI_ATTEMPT_CONFIG_NVDATA *) Context
+               (ISCSI_ATTEMPT_CONFIG_NVDATA *)Context
                );
 
     break;
@@ -285,16 +292,16 @@ IScsiDhcpSelectOffer (
 **/
 EFI_STATUS
 IScsiParseDhcpAck (
-  IN     EFI_DHCP4_PROTOCOL          *Dhcp4,
-  IN OUT ISCSI_ATTEMPT_CONFIG_NVDATA *ConfigData
+  IN     EFI_DHCP4_PROTOCOL           *Dhcp4,
+  IN OUT ISCSI_ATTEMPT_CONFIG_NVDATA  *ConfigData
   )
 {
-  EFI_STATUS                    Status;
-  EFI_DHCP4_MODE_DATA           Dhcp4ModeData;
-  UINT32                        OptionCount;
-  EFI_DHCP4_PACKET_OPTION       **OptionList;
-  UINT32                        Index;
-  ISCSI_SESSION_CONFIG_NVDATA   *NvData;
+  EFI_STATUS                   Status;
+  EFI_DHCP4_MODE_DATA          Dhcp4ModeData;
+  UINT32                       OptionCount;
+  EFI_DHCP4_PACKET_OPTION      **OptionList;
+  UINT32                       Index;
+  ISCSI_SESSION_CONFIG_NVDATA  *NvData;
 
   Status = Dhcp4->GetModeData (Dhcp4, &Dhcp4ModeData);
   if (EFI_ERROR (Status)) {
@@ -314,7 +321,7 @@ IScsiParseDhcpAck (
   OptionCount = 0;
   OptionList  = NULL;
 
-  Status      = Dhcp4->Parse (Dhcp4, Dhcp4ModeData.ReplyPacket, &OptionCount, OptionList);
+  Status = Dhcp4->Parse (Dhcp4, Dhcp4ModeData.ReplyPacket, &OptionCount, OptionList);
   if (Status != EFI_BUFFER_TOO_SMALL) {
     return EFI_DEVICE_ERROR;
   }
@@ -335,11 +342,11 @@ IScsiParseDhcpAck (
     // Get DNS server addresses and DHCP server address from this offer.
     //
     if (OptionList[Index]->OpCode == DHCP4_TAG_DNS_SERVER) {
-
       if (((OptionList[Index]->Length & 0x3) != 0) || (OptionList[Index]->Length == 0)) {
         Status = EFI_INVALID_PARAMETER;
         break;
       }
+
       //
       // Primary DNS server address.
       //
@@ -377,32 +384,32 @@ IScsiParseDhcpAck (
 **/
 EFI_STATUS
 IScsiSetIp4Policy (
-  IN EFI_IP4_CONFIG2_PROTOCOL        *Ip4Config2
+  IN EFI_IP4_CONFIG2_PROTOCOL  *Ip4Config2
   )
 {
-  EFI_IP4_CONFIG2_POLICY          Policy;
-  EFI_STATUS                      Status;
-  UINTN                           DataSize;
+  EFI_IP4_CONFIG2_POLICY  Policy;
+  EFI_STATUS              Status;
+  UINTN                   DataSize;
 
   DataSize = sizeof (EFI_IP4_CONFIG2_POLICY);
-  Status = Ip4Config2->GetData (
-                         Ip4Config2,
-                         Ip4Config2DataTypePolicy,
-                         &DataSize,
-                         &Policy
-                         );
+  Status   = Ip4Config2->GetData (
+                           Ip4Config2,
+                           Ip4Config2DataTypePolicy,
+                           &DataSize,
+                           &Policy
+                           );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   if (Policy != Ip4Config2PolicyStatic) {
     Policy = Ip4Config2PolicyStatic;
-    Status= Ip4Config2->SetData (
-                          Ip4Config2,
-                          Ip4Config2DataTypePolicy,
-                          sizeof (EFI_IP4_CONFIG2_POLICY),
-                          &Policy
-                          );
+    Status = Ip4Config2->SetData (
+                           Ip4Config2,
+                           Ip4Config2DataTypePolicy,
+                           sizeof (EFI_IP4_CONFIG2_POLICY),
+                           &Policy
+                           );
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -426,19 +433,19 @@ IScsiSetIp4Policy (
 **/
 EFI_STATUS
 IScsiDoDhcp (
-  IN     EFI_HANDLE                  Image,
-  IN     EFI_HANDLE                  Controller,
-  IN OUT ISCSI_ATTEMPT_CONFIG_NVDATA *ConfigData
+  IN     EFI_HANDLE                   Image,
+  IN     EFI_HANDLE                   Controller,
+  IN OUT ISCSI_ATTEMPT_CONFIG_NVDATA  *ConfigData
   )
 {
-  EFI_HANDLE                    Dhcp4Handle;
-  EFI_IP4_CONFIG2_PROTOCOL      *Ip4Config2;
-  EFI_DHCP4_PROTOCOL            *Dhcp4;
-  EFI_STATUS                    Status;
-  EFI_DHCP4_PACKET_OPTION       *ParaList;
-  EFI_DHCP4_CONFIG_DATA         Dhcp4ConfigData;
-  ISCSI_SESSION_CONFIG_NVDATA   *NvData;
-  EFI_STATUS                    MediaStatus;
+  EFI_HANDLE                   Dhcp4Handle;
+  EFI_IP4_CONFIG2_PROTOCOL     *Ip4Config2;
+  EFI_DHCP4_PROTOCOL           *Dhcp4;
+  EFI_STATUS                   Status;
+  EFI_DHCP4_PACKET_OPTION      *ParaList;
+  EFI_DHCP4_CONFIG_DATA        Dhcp4ConfigData;
+  ISCSI_SESSION_CONFIG_NVDATA  *NvData;
+  EFI_STATUS                   MediaStatus;
 
   Dhcp4Handle = NULL;
   Ip4Config2  = NULL;
@@ -450,7 +457,7 @@ IScsiDoDhcp (
   //
   MediaStatus = EFI_SUCCESS;
   NetLibDetectMediaWaitTimeout (Controller, ISCSI_CHECK_MEDIA_GET_DHCP_WAITING_TIME, &MediaStatus);
-  if (MediaStatus!= EFI_SUCCESS) {
+  if (MediaStatus != EFI_SUCCESS) {
     AsciiPrint ("\n  Error: Could not detect network connection.\n");
     return EFI_NO_MEDIA;
   }
@@ -462,7 +469,7 @@ IScsiDoDhcp (
   // will not be in the right state for the iSCSI to start a new round D.O.R.A.
   // So, we need to switch its policy to static.
   //
-  Status = gBS->HandleProtocol (Controller, &gEfiIp4Config2ProtocolGuid, (VOID **) &Ip4Config2);
+  Status = gBS->HandleProtocol (Controller, &gEfiIp4Config2ProtocolGuid, (VOID **)&Ip4Config2);
   if (!EFI_ERROR (Status)) {
     Status = IScsiSetIp4Policy (Ip4Config2);
     if (EFI_ERROR (Status)) {
@@ -486,7 +493,7 @@ IScsiDoDhcp (
   Status = gBS->OpenProtocol (
                   Dhcp4Handle,
                   &gEfiDhcp4ProtocolGuid,
-                  (VOID **) &Dhcp4,
+                  (VOID **)&Dhcp4,
                   Image,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -495,7 +502,7 @@ IScsiDoDhcp (
     goto ON_EXIT;
   }
 
-  NvData   = &ConfigData->SessionConfigData;
+  NvData = &ConfigData->SessionConfigData;
 
   ParaList = AllocatePool (sizeof (EFI_DHCP4_PACKET_OPTION) + 3);
   if (ParaList == NULL) {
@@ -507,7 +514,7 @@ IScsiDoDhcp (
   // Ask the server to reply with Netmask, Router, DNS, and RootPath options.
   //
   ParaList->OpCode  = DHCP4_TAG_PARA_LIST;
-  ParaList->Length  = (UINT8) (NvData->TargetInfoFromDhcp ? 4 : 3);
+  ParaList->Length  = (UINT8)(NvData->TargetInfoFromDhcp ? 4 : 3);
   ParaList->Data[0] = DHCP4_TAG_NETMASK;
   ParaList->Data[1] = DHCP4_TAG_ROUTER;
   ParaList->Data[2] = DHCP4_TAG_DNS_SERVER;
@@ -534,6 +541,7 @@ IScsiDoDhcp (
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
+
   //
   // Parse the ACK to get required information.
   //

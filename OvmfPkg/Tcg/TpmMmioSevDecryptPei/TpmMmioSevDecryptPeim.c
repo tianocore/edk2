@@ -7,7 +7,6 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-
 #include <PiPei.h>
 
 #include <Library/DebugLib.h>
@@ -36,8 +35,8 @@ TpmMmioSevDecryptPeimEntryPoint (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  RETURN_STATUS                   DecryptStatus;
-  EFI_STATUS                      Status;
+  RETURN_STATUS  DecryptStatus;
+  EFI_STATUS     Status;
 
   DEBUG ((DEBUG_INFO, "%a\n", __FUNCTION__));
 
@@ -58,21 +57,24 @@ TpmMmioSevDecryptPeimEntryPoint (
   // termination in this scenario, mark the range unencrypted ahead of access.
   //
   if (MemEncryptSevEsIsEnabled ()) {
-    DEBUG ((DEBUG_INFO,
+    DEBUG ((
+      DEBUG_INFO,
       "%a: mapping TPM MMIO address range unencrypted\n",
-      __FUNCTION__));
+      __FUNCTION__
+      ));
 
-    DecryptStatus = MemEncryptSevClearPageEncMask (
+    DecryptStatus = MemEncryptSevClearMmioPageEncMask (
                       0,
                       FixedPcdGet64 (PcdTpmBaseAddress),
-                      EFI_SIZE_TO_PAGES ((UINTN) 0x5000),
-                      FALSE
+                      EFI_SIZE_TO_PAGES ((UINTN)0x5000)
                       );
 
     if (RETURN_ERROR (DecryptStatus)) {
-      DEBUG ((DEBUG_ERROR,
+      DEBUG ((
+        DEBUG_ERROR,
         "%a: failed to map TPM MMIO address range unencrypted\n",
-        __FUNCTION__));
+        __FUNCTION__
+        ));
       ASSERT_RETURN_ERROR (DecryptStatus);
     }
   }

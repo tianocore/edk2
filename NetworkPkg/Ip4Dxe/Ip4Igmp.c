@@ -14,7 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 UINT32  mRouteAlertOption = 0x00000494;
 
-
 /**
   Init the IGMP control data of the IP4 service instance, configure
   MNP to receive ALL SYSTEM multicast.
@@ -28,7 +27,7 @@ UINT32  mRouteAlertOption = 0x00000494;
 **/
 EFI_STATUS
 Ip4InitIgmp (
-  IN OUT IP4_SERVICE            *IpSb
+  IN OUT IP4_SERVICE  *IpSb
   )
 {
   IGMP_SERVICE_DATA             *IgmpCtrl;
@@ -41,13 +40,13 @@ Ip4InitIgmp (
   //
   // Configure MNP to receive ALL_SYSTEM multicast
   //
-  Group    = AllocatePool (sizeof (IGMP_GROUP));
+  Group = AllocatePool (sizeof (IGMP_GROUP));
 
   if (Group == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Mnp               = IpSb->Mnp;
+  Mnp = IpSb->Mnp;
 
   Group->Address    = IP4_ALLSYSTEM_ADDRESS;
   Group->RefCnt     = 1;
@@ -74,7 +73,6 @@ ON_ERROR:
   return Status;
 }
 
-
 /**
   Find the IGMP_GROUP structure which contains the status of multicast
   group Address in this IGMP control block
@@ -89,12 +87,12 @@ ON_ERROR:
 **/
 IGMP_GROUP *
 Ip4FindGroup (
-  IN IGMP_SERVICE_DATA      *IgmpCtrl,
-  IN IP4_ADDR               Address
+  IN IGMP_SERVICE_DATA  *IgmpCtrl,
+  IN IP4_ADDR           Address
   )
 {
-  LIST_ENTRY                *Entry;
-  IGMP_GROUP                *Group;
+  LIST_ENTRY  *Entry;
+  IGMP_GROUP  *Group;
 
   NET_LIST_FOR_EACH (Entry, &IgmpCtrl->Groups) {
     Group = NET_LIST_USER_STRUCT (Entry, IGMP_GROUP, Link);
@@ -106,7 +104,6 @@ Ip4FindGroup (
 
   return NULL;
 }
-
 
 /**
   Count the number of IP4 multicast groups that are mapped to the
@@ -122,13 +119,13 @@ Ip4FindGroup (
 **/
 INTN
 Ip4FindMac (
-  IN IGMP_SERVICE_DATA      *IgmpCtrl,
-  IN EFI_MAC_ADDRESS        *Mac
+  IN IGMP_SERVICE_DATA  *IgmpCtrl,
+  IN EFI_MAC_ADDRESS    *Mac
   )
 {
-  LIST_ENTRY                *Entry;
-  IGMP_GROUP                *Group;
-  INTN                      Count;
+  LIST_ENTRY  *Entry;
+  IGMP_GROUP  *Group;
+  INTN        Count;
 
   Count = 0;
 
@@ -142,7 +139,6 @@ Ip4FindMac (
 
   return Count;
 }
-
 
 /**
   Send an IGMP protocol message to the Dst, such as IGMP v1 membership report.
@@ -161,15 +157,15 @@ Ip4FindMac (
 **/
 EFI_STATUS
 Ip4SendIgmpMessage (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_ADDR               Dst,
-  IN UINT8                  Type,
-  IN IP4_ADDR               Group
+  IN IP4_SERVICE  *IpSb,
+  IN IP4_ADDR     Dst,
+  IN UINT8        Type,
+  IN IP4_ADDR     Group
   )
 {
-  IP4_HEAD                  Head;
-  NET_BUF                   *Packet;
-  IGMP_HEAD                 *Igmp;
+  IP4_HEAD   Head;
+  NET_BUF    *Packet;
+  IGMP_HEAD  *Igmp;
 
   //
   // Allocate a net buffer to hold the message
@@ -185,7 +181,7 @@ Ip4SendIgmpMessage (
   //
   NetbufReserve (Packet, IP4_MAX_HEADLEN);
 
-  Igmp = (IGMP_HEAD *) NetbufAllocSpace (Packet, sizeof (IGMP_HEAD), FALSE);
+  Igmp = (IGMP_HEAD *)NetbufAllocSpace (Packet, sizeof (IGMP_HEAD), FALSE);
   if (Igmp == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -194,28 +190,27 @@ Ip4SendIgmpMessage (
   Igmp->MaxRespTime = 0;
   Igmp->Checksum    = 0;
   Igmp->Group       = HTONL (Group);
-  Igmp->Checksum    = (UINT16) (~NetblockChecksum ((UINT8 *) Igmp, sizeof (IGMP_HEAD)));
+  Igmp->Checksum    = (UINT16)(~NetblockChecksum ((UINT8 *)Igmp, sizeof (IGMP_HEAD)));
 
-  Head.Tos          = 0;
-  Head.Protocol     = IP4_PROTO_IGMP;
-  Head.Ttl          = 1;
-  Head.Fragment     = 0;
-  Head.Dst          = Dst;
-  Head.Src          = IP4_ALLZERO_ADDRESS;
+  Head.Tos      = 0;
+  Head.Protocol = IP4_PROTO_IGMP;
+  Head.Ttl      = 1;
+  Head.Fragment = 0;
+  Head.Dst      = Dst;
+  Head.Src      = IP4_ALLZERO_ADDRESS;
 
   return Ip4Output (
            IpSb,
            NULL,
            Packet,
            &Head,
-           (UINT8 *) &mRouteAlertOption,
+           (UINT8 *)&mRouteAlertOption,
            sizeof (UINT32),
            IP4_ALLZERO_ADDRESS,
            Ip4SysPacketSent,
            NULL
            );
 }
-
 
 /**
   Send an IGMP membership report. Depends on whether the server is
@@ -232,8 +227,8 @@ Ip4SendIgmpMessage (
 **/
 EFI_STATUS
 Ip4SendIgmpReport (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_ADDR               Group
+  IN IP4_SERVICE  *IpSb,
+  IN IP4_ADDR     Group
   )
 {
   if (IpSb->IgmpCtrl.Igmpv1QuerySeen != 0) {
@@ -242,7 +237,6 @@ Ip4SendIgmpReport (
     return Ip4SendIgmpMessage (IpSb, Group, IGMP_V2_MEMBERSHIP_REPORT, Group);
   }
 }
-
 
 /**
   Join the multicast group on behalf of this IP4 child
@@ -257,8 +251,8 @@ Ip4SendIgmpReport (
 **/
 EFI_STATUS
 Ip4JoinGroup (
-  IN IP4_PROTOCOL           *IpInstance,
-  IN IP4_ADDR               Address
+  IN IP4_PROTOCOL  *IpInstance,
+  IN IP4_ADDR      Address
   )
 {
   EFI_MANAGED_NETWORK_PROTOCOL  *Mnp;
@@ -267,15 +261,15 @@ Ip4JoinGroup (
   IGMP_GROUP                    *Group;
   EFI_STATUS                    Status;
 
-  IpSb      = IpInstance->Service;
-  IgmpCtrl  = &IpSb->IgmpCtrl;
-  Mnp       = IpSb->Mnp;
+  IpSb     = IpInstance->Service;
+  IgmpCtrl = &IpSb->IgmpCtrl;
+  Mnp      = IpSb->Mnp;
 
   //
   // If the IP service already is a member in the group, just
   // increase the reference count and return.
   //
-  Group     = Ip4FindGroup (IgmpCtrl, Address);
+  Group = Ip4FindGroup (IgmpCtrl, Address);
 
   if (Group != NULL) {
     Group->RefCnt++;
@@ -323,7 +317,6 @@ ON_ERROR:
   return Status;
 }
 
-
 /**
   Leave the IP4 multicast group on behalf of IpInstance.
 
@@ -338,8 +331,8 @@ ON_ERROR:
 **/
 EFI_STATUS
 Ip4LeaveGroup (
-  IN IP4_PROTOCOL           *IpInstance,
-  IN IP4_ADDR               Address
+  IN IP4_PROTOCOL  *IpInstance,
+  IN IP4_ADDR      Address
   )
 {
   EFI_MANAGED_NETWORK_PROTOCOL  *Mnp;
@@ -348,11 +341,11 @@ Ip4LeaveGroup (
   IGMP_GROUP                    *Group;
   EFI_STATUS                    Status;
 
-  IpSb      = IpInstance->Service;
-  IgmpCtrl  = &IpSb->IgmpCtrl;
-  Mnp       = IpSb->Mnp;
+  IpSb     = IpInstance->Service;
+  IgmpCtrl = &IpSb->IgmpCtrl;
+  Mnp      = IpSb->Mnp;
 
-  Group     = Ip4FindGroup (IgmpCtrl, Address);
+  Group = Ip4FindGroup (IgmpCtrl, Address);
 
   if (Group == NULL) {
     return EFI_NOT_FOUND;
@@ -383,7 +376,7 @@ Ip4LeaveGroup (
   // Send a leave report if the membership is reported by us
   // and we are talking IGMPv2.
   //
-  if (Group->ReportByUs && IgmpCtrl->Igmpv1QuerySeen == 0) {
+  if (Group->ReportByUs && (IgmpCtrl->Igmpv1QuerySeen == 0)) {
     Ip4SendIgmpMessage (IpSb, IP4_ALLROUTER_ADDRESS, IGMP_LEAVE_GROUP, Group->Address);
   }
 
@@ -392,7 +385,6 @@ Ip4LeaveGroup (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Handle the received IGMP message for the IP4 service instance.
@@ -407,16 +399,16 @@ Ip4LeaveGroup (
 **/
 EFI_STATUS
 Ip4IgmpHandle (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_HEAD               *Head,
-  IN NET_BUF                *Packet
+  IN IP4_SERVICE  *IpSb,
+  IN IP4_HEAD     *Head,
+  IN NET_BUF      *Packet
   )
 {
-  IGMP_SERVICE_DATA         *IgmpCtrl;
-  IGMP_HEAD                 Igmp;
-  IGMP_GROUP                *Group;
-  IP4_ADDR                  Address;
-  LIST_ENTRY                *Entry;
+  IGMP_SERVICE_DATA  *IgmpCtrl;
+  IGMP_HEAD          Igmp;
+  IGMP_GROUP         *Group;
+  IP4_ADDR           Address;
+  LIST_ENTRY         *Entry;
 
   IgmpCtrl = &IpSb->IgmpCtrl;
 
@@ -436,64 +428,63 @@ Ip4IgmpHandle (
   NetbufCopy (Packet, 0, sizeof (IGMP_HEAD), (UINT8 *)&Igmp);
 
   switch (Igmp.Type) {
-  case IGMP_MEMBERSHIP_QUERY:
-    //
-    // If MaxRespTime is zero, it is most likely that we are
-    // talking to a V1 router
-    //
-    if (Igmp.MaxRespTime == 0) {
-      IgmpCtrl->Igmpv1QuerySeen = IGMP_V1ROUTER_PRESENT;
-      Igmp.MaxRespTime          = 100;
-    }
-
-    //
-    // Igmp is ticking once per second but MaxRespTime is in
-    // the unit of 100ms.
-    //
-    Igmp.MaxRespTime /= 10;
-    Address = NTOHL (Igmp.Group);
-
-    if (Address == IP4_ALLSYSTEM_ADDRESS) {
-      break;
-    }
-
-    NET_LIST_FOR_EACH (Entry, &IgmpCtrl->Groups) {
-      Group = NET_LIST_USER_STRUCT (Entry, IGMP_GROUP, Link);
+    case IGMP_MEMBERSHIP_QUERY:
+      //
+      // If MaxRespTime is zero, it is most likely that we are
+      // talking to a V1 router
+      //
+      if (Igmp.MaxRespTime == 0) {
+        IgmpCtrl->Igmpv1QuerySeen = IGMP_V1ROUTER_PRESENT;
+        Igmp.MaxRespTime          = 100;
+      }
 
       //
-      // If address is all zero, all the memberships will be reported.
-      // otherwise only one is reported.
+      // Igmp is ticking once per second but MaxRespTime is in
+      // the unit of 100ms.
       //
-      if ((Address == IP4_ALLZERO_ADDRESS) || (Address == Group->Address)) {
+      Igmp.MaxRespTime /= 10;
+      Address           = NTOHL (Igmp.Group);
+
+      if (Address == IP4_ALLSYSTEM_ADDRESS) {
+        break;
+      }
+
+      NET_LIST_FOR_EACH (Entry, &IgmpCtrl->Groups) {
+        Group = NET_LIST_USER_STRUCT (Entry, IGMP_GROUP, Link);
+
         //
-        // If the timer is pending, only update it if the time left
-        // is longer than the MaxRespTime. TODO: randomize the DelayTime.
+        // If address is all zero, all the memberships will be reported.
+        // otherwise only one is reported.
         //
-        if ((Group->DelayTime == 0) || (Group->DelayTime > Igmp.MaxRespTime)) {
-          Group->DelayTime = MAX (1, Igmp.MaxRespTime);
+        if ((Address == IP4_ALLZERO_ADDRESS) || (Address == Group->Address)) {
+          //
+          // If the timer is pending, only update it if the time left
+          // is longer than the MaxRespTime. TODO: randomize the DelayTime.
+          //
+          if ((Group->DelayTime == 0) || (Group->DelayTime > Igmp.MaxRespTime)) {
+            Group->DelayTime = MAX (1, Igmp.MaxRespTime);
+          }
         }
       }
-    }
 
-    break;
+      break;
 
-  case IGMP_V1_MEMBERSHIP_REPORT:
-  case IGMP_V2_MEMBERSHIP_REPORT:
-    Address = NTOHL (Igmp.Group);
-    Group   = Ip4FindGroup (IgmpCtrl, Address);
+    case IGMP_V1_MEMBERSHIP_REPORT:
+    case IGMP_V2_MEMBERSHIP_REPORT:
+      Address = NTOHL (Igmp.Group);
+      Group   = Ip4FindGroup (IgmpCtrl, Address);
 
-    if ((Group != NULL) && (Group->DelayTime > 0)) {
-      Group->DelayTime  = 0;
-      Group->ReportByUs = FALSE;
-    }
+      if ((Group != NULL) && (Group->DelayTime > 0)) {
+        Group->DelayTime  = 0;
+        Group->ReportByUs = FALSE;
+      }
 
-    break;
+      break;
   }
 
   NetbufFree (Packet);
   return EFI_SUCCESS;
 }
-
 
 /**
   The periodical timer function for IGMP. It does the following
@@ -508,12 +499,12 @@ Ip4IgmpHandle (
 **/
 VOID
 Ip4IgmpTicking (
-  IN IP4_SERVICE            *IpSb
+  IN IP4_SERVICE  *IpSb
   )
 {
-  IGMP_SERVICE_DATA         *IgmpCtrl;
-  LIST_ENTRY                *Entry;
-  IGMP_GROUP                *Group;
+  IGMP_SERVICE_DATA  *IgmpCtrl;
+  LIST_ENTRY         *Entry;
+  IGMP_GROUP         *Group;
 
   IgmpCtrl = &IpSb->IgmpCtrl;
 
@@ -539,7 +530,6 @@ Ip4IgmpTicking (
   }
 }
 
-
 /**
   Add a group address to the array of group addresses.
   The caller should make sure that no duplicated address
@@ -557,12 +547,12 @@ Ip4IgmpTicking (
 **/
 IP4_ADDR *
 Ip4CombineGroups (
-  IN  IP4_ADDR              *Source,
-  IN  UINT32                Count,
-  IN  IP4_ADDR              Addr
+  IN  IP4_ADDR  *Source,
+  IN  UINT32    Count,
+  IN  IP4_ADDR  Addr
   )
 {
-  IP4_ADDR                  *Groups;
+  IP4_ADDR  *Groups;
 
   Groups = AllocatePool (sizeof (IP4_ADDR) * (Count + 1));
 
@@ -575,7 +565,6 @@ Ip4CombineGroups (
 
   return Groups;
 }
-
 
 /**
   Remove a group address from the array of group addresses.
@@ -593,12 +582,12 @@ Ip4CombineGroups (
 **/
 INTN
 Ip4RemoveGroupAddr (
-  IN OUT IP4_ADDR               *Groups,
-  IN     UINT32                 Count,
-  IN     IP4_ADDR               Addr
+  IN OUT IP4_ADDR  *Groups,
+  IN     UINT32    Count,
+  IN     IP4_ADDR  Addr
   )
 {
-  UINT32                    Index;
+  UINT32  Index;
 
   for (Index = 0; Index < Count; Index++) {
     if (Groups[Index] == Addr) {

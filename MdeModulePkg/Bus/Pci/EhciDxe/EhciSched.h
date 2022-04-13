@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _EFI_EHCI_SCHED_H_
 #define _EFI_EHCI_SCHED_H_
 
-
 /**
   Initialize the schedule data structure such as frame list.
 
@@ -22,9 +21,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 EhcInitSched (
-  IN USB2_HC_DEV          *Ehc
+  IN USB2_HC_DEV  *Ehc
   );
-
 
 /**
   Free the schedule data. It may be partially initialized.
@@ -34,9 +32,8 @@ EhcInitSched (
 **/
 VOID
 EhcFreeSched (
-  IN USB2_HC_DEV          *Ehc
+  IN USB2_HC_DEV  *Ehc
   );
-
 
 /**
   Link the queue head to the asynchronous schedule list.
@@ -51,10 +48,9 @@ EhcFreeSched (
 **/
 VOID
 EhcLinkQhToAsync (
-  IN USB2_HC_DEV          *Ehc,
-  IN EHC_QH               *Qh
+  IN USB2_HC_DEV  *Ehc,
+  IN EHC_QH       *Qh
   );
-
 
 /**
   Unlink a queue head from the asynchronous schedule list.
@@ -66,10 +62,9 @@ EhcLinkQhToAsync (
 **/
 VOID
 EhcUnlinkQhFromAsync (
-  IN USB2_HC_DEV          *Ehc,
-  IN EHC_QH               *Qh
+  IN USB2_HC_DEV  *Ehc,
+  IN EHC_QH       *Qh
   );
-
 
 /**
   Link a queue head for interrupt transfer to the periodic
@@ -82,10 +77,9 @@ EhcUnlinkQhFromAsync (
 **/
 VOID
 EhcLinkQhToPeriod (
-  IN USB2_HC_DEV          *Ehc,
-  IN EHC_QH               *Qh
+  IN USB2_HC_DEV  *Ehc,
+  IN EHC_QH       *Qh
   );
-
 
 /**
   Unlink an interrupt queue head from the periodic
@@ -97,11 +91,9 @@ EhcLinkQhToPeriod (
 **/
 VOID
 EhcUnlinkQhFromPeriod (
-  IN USB2_HC_DEV          *Ehc,
-  IN EHC_QH               *Qh
+  IN USB2_HC_DEV  *Ehc,
+  IN EHC_QH       *Qh
   );
-
-
 
 /**
   Execute the transfer by polling the URB. This is a synchronous operation.
@@ -117,11 +109,10 @@ EhcUnlinkQhFromPeriod (
 **/
 EFI_STATUS
 EhcExecTransfer (
-  IN  USB2_HC_DEV         *Ehc,
-  IN  URB                 *Urb,
-  IN  UINTN               TimeOut
+  IN  USB2_HC_DEV  *Ehc,
+  IN  URB          *Urb,
+  IN  UINTN        TimeOut
   );
-
 
 /**
   Delete a single asynchronous interrupt transfer for
@@ -138,12 +129,11 @@ EhcExecTransfer (
 **/
 EFI_STATUS
 EhciDelAsyncIntTransfer (
-  IN  USB2_HC_DEV         *Ehc,
-  IN  UINT8               DevAddr,
-  IN  UINT8               EpNum,
-  OUT UINT8               *DataToggle
+  IN  USB2_HC_DEV  *Ehc,
+  IN  UINT8        DevAddr,
+  IN  UINT8        EpNum,
+  OUT UINT8        *DataToggle
   );
-
 
 /**
   Remove all the asynchronous interrutp transfers.
@@ -153,7 +143,7 @@ EhciDelAsyncIntTransfer (
 **/
 VOID
 EhciDelAllAsyncIntTransfers (
-  IN USB2_HC_DEV          *Ehc
+  IN USB2_HC_DEV  *Ehc
   );
 
 /**
@@ -177,17 +167,17 @@ EhciDelAllAsyncIntTransfers (
 **/
 URB *
 EhciInsertAsyncIntTransfer (
-  IN USB2_HC_DEV                        *Ehc,
-  IN UINT8                              DevAddr,
-  IN UINT8                              EpAddr,
-  IN UINT8                              DevSpeed,
-  IN UINT8                              Toggle,
-  IN UINTN                              MaxPacket,
-  IN EFI_USB2_HC_TRANSACTION_TRANSLATOR *Hub,
-  IN UINTN                              DataLen,
-  IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
-  IN VOID                               *Context,
-  IN UINTN                              Interval
+  IN USB2_HC_DEV                         *Ehc,
+  IN UINT8                               DevAddr,
+  IN UINT8                               EpAddr,
+  IN UINT8                               DevSpeed,
+  IN UINT8                               Toggle,
+  IN UINTN                               MaxPacket,
+  IN EFI_USB2_HC_TRANSACTION_TRANSLATOR  *Hub,
+  IN UINTN                               DataLen,
+  IN EFI_ASYNC_USB_TRANSFER_CALLBACK     Callback,
+  IN VOID                                *Context,
+  IN UINTN                               Interval
   );
 
 /**
@@ -200,8 +190,8 @@ EhciInsertAsyncIntTransfer (
 VOID
 EFIAPI
 EhcMonitorAsyncRequests (
-  IN EFI_EVENT            Event,
-  IN VOID                 *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 #endif

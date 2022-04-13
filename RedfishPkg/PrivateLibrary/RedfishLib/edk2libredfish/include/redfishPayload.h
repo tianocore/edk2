@@ -14,26 +14,93 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef LIBREDFISH_REDFISH_PAYLOAD_H_
 #define LIBREDFISH_REDFISH_PAYLOAD_H_
 
-#include <PrivateInclude/Library/RedfishCrtLib.h>
+#include <Include/Library/RedfishCrtLib.h>
 
 #include <jansson.h>
 #include <redfishService.h>
 #include <redpath.h>
 
-redfishPayload* createRedfishPayload(json_t* value, redfishService* service);
-redfishPayload* getPayloadByNodeName(redfishPayload* payload, const char* nodeName, EFI_HTTP_STATUS_CODE** StatusCode);
-redfishPayload* getPayloadByIndex(redfishPayload* payload, size_t index, EFI_HTTP_STATUS_CODE** StatusCode);
-redfishPayload* getPayloadForPath(redfishPayload* payload, redPathNode* redpath, EFI_HTTP_STATUS_CODE** StatusCode);
-redfishPayload* getPayloadForPathString(redfishPayload* payload, const char* string, EFI_HTTP_STATUS_CODE** StatusCode);
-redfishPayload* patchPayload(redfishPayload* target, redfishPayload* payload, EFI_HTTP_STATUS_CODE** StatusCode);
-redfishPayload* postContentToPayload(redfishPayload* target, const char* data, size_t dataSize, const char* contentType, EFI_HTTP_STATUS_CODE** StatusCode);
-redfishPayload* postPayload(redfishPayload* target, redfishPayload* payload, EFI_HTTP_STATUS_CODE** StatusCode);
-void            cleanupPayload(redfishPayload* payload);
-bool            isPayloadCollection (redfishPayload *Payload);
-size_t          getCollectionSize(redfishPayload* payload);
-redfishPayload* getPayloadByIndex (redfishPayload* payload, size_t index, EFI_HTTP_STATUS_CODE** StatusCode);
+redfishPayload *
+createRedfishPayload (
+  json_t          *value,
+  redfishService  *service
+  );
+
+redfishPayload *
+getPayloadByNodeName (
+  redfishPayload        *payload,
+  const char            *nodeName,
+  EFI_HTTP_STATUS_CODE  **StatusCode
+  );
+
+redfishPayload *
+getPayloadByIndex (
+  redfishPayload        *payload,
+  size_t                index,
+  EFI_HTTP_STATUS_CODE  **StatusCode
+  );
+
+redfishPayload *
+getPayloadForPath (
+  redfishPayload        *payload,
+  redPathNode           *redpath,
+  EFI_HTTP_STATUS_CODE  **StatusCode
+  );
+
+redfishPayload *
+getPayloadForPathString (
+  redfishPayload        *payload,
+  const char            *string,
+  EFI_HTTP_STATUS_CODE  **StatusCode
+  );
+
+redfishPayload *
+patchPayload (
+  redfishPayload        *target,
+  redfishPayload        *payload,
+  EFI_HTTP_STATUS_CODE  **StatusCode
+  );
+
+redfishPayload *
+postContentToPayload (
+  redfishPayload        *target,
+  const char            *data,
+  size_t                dataSize,
+  const char            *contentType,
+  EFI_HTTP_STATUS_CODE  **StatusCode
+  );
+
+redfishPayload *
+postPayload (
+  redfishPayload        *target,
+  redfishPayload        *payload,
+  EFI_HTTP_STATUS_CODE  **StatusCode
+  );
+
+void
+cleanupPayload (
+  redfishPayload  *payload
+  );
+
+bool
+isPayloadCollection (
+  redfishPayload  *Payload
+  );
+
+size_t
+getCollectionSize (
+  redfishPayload  *payload
+  );
+
+redfishPayload *
+getPayloadByIndex (
+  redfishPayload        *payload,
+  size_t                index,
+  EFI_HTTP_STATUS_CODE  **StatusCode
+  );
 
 #endif

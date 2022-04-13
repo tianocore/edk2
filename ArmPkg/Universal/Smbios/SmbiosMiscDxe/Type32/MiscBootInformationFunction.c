@@ -33,11 +33,10 @@
   @retval EFI_OUT_OF_RESOURCES       Failed to allocate required memory.
 
 **/
-SMBIOS_MISC_TABLE_FUNCTION(MiscBootInformation)
-{
-  EFI_STATUS                         Status;
-  SMBIOS_TABLE_TYPE32                *SmbiosRecord;
-  SMBIOS_TABLE_TYPE32                *InputData;
+SMBIOS_MISC_TABLE_FUNCTION (MiscBootInformation) {
+  EFI_STATUS           Status;
+  SMBIOS_TABLE_TYPE32  *SmbiosRecord;
+  SMBIOS_TABLE_TYPE32  *InputData;
 
   //
   // First check for invalid parameters.
@@ -65,10 +64,15 @@ SMBIOS_MISC_TABLE_FUNCTION(MiscBootInformation)
   //
   // Now we have got the full smbios record, call smbios protocol to add this record.
   //
-  Status = SmbiosMiscAddRecord ((UINT8*)SmbiosRecord, NULL);
+  Status = SmbiosMiscAddRecord ((UINT8 *)SmbiosRecord, NULL);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "[%a]:[%dL] Smbios Type32 Table Log Failed! %r \n",
-            __FUNCTION__, __LINE__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "[%a]:[%dL] Smbios Type32 Table Log Failed! %r \n",
+      __FUNCTION__,
+      DEBUG_LINE_NUMBER,
+      Status
+      ));
   }
 
   FreePool (SmbiosRecord);

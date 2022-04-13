@@ -38,7 +38,7 @@ B. HOW TO BUILD
    > edksetup.bat
 
    For pure X64 build:
-   > build -a x64 -p UefiPayloadPkg\UefiPayloadPkg.dsc -b <BuildType> -t <ToolChain>
+   > build -a X64 -p UefiPayloadPkg\UefiPayloadPkg.dsc -b <BuildType> -t <ToolChain>
      -D BOOTLOADER=<Bootloader>
 
    For X64 build with IA32 entry point:
@@ -69,6 +69,8 @@ C. HOW TO INTEGRATE INTO COREBOOT
 4. If the graphics console is required in UEFI payload, enable framebuffer initialization in coreboot.
    This could be done by enabling native graphics or using VGA BIOS option rom.
 5. Build the coreboot firmware image.
+6. If meet build error "E: Not a usable UEFI firmware volume.", please update Coreboot source tree
+   to the latest, or refer https://review.coreboot.org/c/coreboot/+/57296
 
 ================================================================================
 D. HOW TO INTEGRATE INTO SLIM BOOTLOADER

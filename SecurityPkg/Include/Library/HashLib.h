@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Uefi.h>
 #include <Protocol/Hash.h>
 #include <IndustryStandard/Tpm20.h>
-typedef UINTN  HASH_HANDLE;
+typedef UINTN HASH_HANDLE;
 
 /**
   Start hash sequence.
@@ -27,7 +27,7 @@ typedef UINTN  HASH_HANDLE;
 EFI_STATUS
 EFIAPI
 HashStart (
-  OUT HASH_HANDLE    *HashHandle
+  OUT HASH_HANDLE  *HashHandle
   );
 
 /**
@@ -42,9 +42,9 @@ HashStart (
 EFI_STATUS
 EFIAPI
 HashUpdate (
-  IN HASH_HANDLE    HashHandle,
-  IN VOID           *DataToHash,
-  IN UINTN          DataToHashLen
+  IN HASH_HANDLE  HashHandle,
+  IN VOID         *DataToHash,
+  IN UINTN        DataToHashLen
   );
 
 /**
@@ -61,11 +61,11 @@ HashUpdate (
 EFI_STATUS
 EFIAPI
 HashCompleteAndExtend (
-  IN HASH_HANDLE         HashHandle,
-  IN TPMI_DH_PCR         PcrIndex,
-  IN VOID                *DataToHash,
-  IN UINTN               DataToHashLen,
-  OUT TPML_DIGEST_VALUES *DigestList
+  IN HASH_HANDLE          HashHandle,
+  IN TPMI_DH_PCR          PcrIndex,
+  IN VOID                 *DataToHash,
+  IN UINTN                DataToHashLen,
+  OUT TPML_DIGEST_VALUES  *DigestList
   );
 
 /**
@@ -81,10 +81,10 @@ HashCompleteAndExtend (
 EFI_STATUS
 EFIAPI
 HashAndExtend (
-  IN TPMI_DH_PCR                    PcrIndex,
-  IN VOID                           *DataToHash,
-  IN UINTN                          DataToHashLen,
-  OUT TPML_DIGEST_VALUES            *DigestList
+  IN TPMI_DH_PCR          PcrIndex,
+  IN VOID                 *DataToHash,
+  IN UINTN                DataToHashLen,
+  OUT TPML_DIGEST_VALUES  *DigestList
   );
 
 /**
@@ -97,7 +97,7 @@ HashAndExtend (
 **/
 typedef
 EFI_STATUS
-(EFIAPI *HASH_INIT) (
+(EFIAPI *HASH_INIT)(
   OUT HASH_HANDLE    *HashHandle
   );
 
@@ -112,7 +112,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *HASH_UPDATE) (
+(EFIAPI *HASH_UPDATE)(
   IN HASH_HANDLE    HashHandle,
   IN VOID           *DataToHash,
   IN UINTN          DataToHashLen
@@ -128,7 +128,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *HASH_FINAL) (
+(EFIAPI *HASH_FINAL)(
   IN HASH_HANDLE         HashHandle,
   OUT TPML_DIGEST_VALUES *DigestList
   );
@@ -143,10 +143,10 @@ EFI_STATUS
   }
 
 typedef struct {
-  EFI_GUID                           HashGuid;
-  HASH_INIT                          HashInit;
-  HASH_UPDATE                        HashUpdate;
-  HASH_FINAL                         HashFinal;
+  EFI_GUID       HashGuid;
+  HASH_INIT      HashInit;
+  HASH_UPDATE    HashUpdate;
+  HASH_FINAL     HashFinal;
 } HASH_INTERFACE;
 
 /**
@@ -161,7 +161,7 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 RegisterHashInterfaceLib (
-  IN HASH_INTERFACE   *HashInterface
+  IN HASH_INTERFACE  *HashInterface
   );
 
 #endif

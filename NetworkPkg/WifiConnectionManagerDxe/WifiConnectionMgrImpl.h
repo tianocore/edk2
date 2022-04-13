@@ -24,7 +24,7 @@
 **/
 EFI_STATUS
 WifiMgrStartScan (
-  IN      WIFI_MGR_DEVICE_DATA        *Nic
+  IN      WIFI_MGR_DEVICE_DATA  *Nic
   );
 
 /**
@@ -61,8 +61,8 @@ WifiMgrGetLinkState (
 **/
 EFI_STATUS
 WifiMgrConnectToNetwork (
-  IN    WIFI_MGR_DEVICE_DATA              *Nic,
-  IN    WIFI_MGR_NETWORK_PROFILE          *Profile
+  IN    WIFI_MGR_DEVICE_DATA      *Nic,
+  IN    WIFI_MGR_NETWORK_PROFILE  *Profile
   );
 
 /**
@@ -78,7 +78,7 @@ WifiMgrConnectToNetwork (
 **/
 EFI_STATUS
 WifiMgrDisconnectToNetwork (
-  IN    WIFI_MGR_DEVICE_DATA              *Nic
+  IN    WIFI_MGR_DEVICE_DATA  *Nic
   );
 
 /**
@@ -92,8 +92,8 @@ WifiMgrDisconnectToNetwork (
 VOID
 EFIAPI
 WifiMgrOnTimerTick (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 #endif

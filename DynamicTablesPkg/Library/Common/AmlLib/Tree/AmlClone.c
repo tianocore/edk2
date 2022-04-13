@@ -27,52 +27,51 @@
 EFI_STATUS
 EFIAPI
 AmlCloneNode (
-  IN  AML_NODE_HEADER   * Node,
-  OUT AML_NODE_HEADER  ** ClonedNode
+  IN  AML_NODE_HEADER  *Node,
+  OUT AML_NODE_HEADER  **ClonedNode
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
-  AML_OBJECT_NODE       * ObjectNode;
-  AML_DATA_NODE         * DataNode;
-  AML_ROOT_NODE         * RootNode;
+  AML_OBJECT_NODE  *ObjectNode;
+  AML_DATA_NODE    *DataNode;
+  AML_ROOT_NODE    *RootNode;
 
   if (!IS_AML_NODE_VALID (Node) ||
-      (ClonedNode == NULL)) {
+      (ClonedNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  *ClonedNode = NULL;
-
   if (IS_AML_DATA_NODE (Node)) {
-    DataNode = (AML_DATA_NODE*)Node;
-    Status = AmlCreateDataNode (
-                DataNode->DataType,
-                DataNode->Buffer,
-                DataNode->Size,
-                (AML_DATA_NODE**)ClonedNode
-                );
+    DataNode = (AML_DATA_NODE *)Node;
+    Status   = AmlCreateDataNode (
+                 DataNode->DataType,
+                 DataNode->Buffer,
+                 DataNode->Size,
+                 (AML_DATA_NODE **)ClonedNode
+                 );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
     }
   } else if (IS_AML_OBJECT_NODE (Node)) {
-    ObjectNode = (AML_OBJECT_NODE*)Node;
+    ObjectNode = (AML_OBJECT_NODE *)Node;
 
     Status = AmlCreateObjectNode (
-                ObjectNode->AmlByteEncoding,
-                ObjectNode->PkgLen,
-                (AML_OBJECT_NODE**)ClonedNode
-                );
+               ObjectNode->AmlByteEncoding,
+               ObjectNode->PkgLen,
+               (AML_OBJECT_NODE **)ClonedNode
+               );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
     }
   } else if (IS_AML_ROOT_NODE (Node)) {
-    RootNode = (AML_ROOT_NODE*)Node;
+    RootNode = (AML_ROOT_NODE *)Node;
 
     Status = AmlCreateRootNode (
                RootNode->SdtHeader,
-               (AML_ROOT_NODE**)ClonedNode
+               (AML_ROOT_NODE **)ClonedNode
                );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
@@ -101,24 +100,25 @@ AmlCloneNode (
 EFI_STATUS
 EFIAPI
 AmlCloneTree (
-  IN  AML_NODE_HEADER   * Node,
-  OUT AML_NODE_HEADER  ** ClonedNode
+  IN  AML_NODE_HEADER  *Node,
+  OUT AML_NODE_HEADER  **ClonedNode
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
-  AML_NODE_HEADER       * HeadNode;
-  AML_NODE_HEADER       * ClonedChildNode;
-  AML_NODE_HEADER       * FixedArgNode;
+  AML_NODE_HEADER  *HeadNode;
+  AML_NODE_HEADER  *ClonedChildNode;
+  AML_NODE_HEADER  *FixedArgNode;
 
-  EAML_PARSE_INDEX        Index;
-  EAML_PARSE_INDEX        MaxIndex;
+  EAML_PARSE_INDEX  Index;
+  EAML_PARSE_INDEX  MaxIndex;
 
-  LIST_ENTRY            * StartLink;
-  LIST_ENTRY            * CurrentLink;
+  LIST_ENTRY  *StartLink;
+  LIST_ENTRY  *CurrentLink;
 
   if (!IS_AML_NODE_VALID (Node) ||
-      (ClonedNode == NULL)) {
+      (ClonedNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -131,10 +131,10 @@ AmlCloneTree (
 
   // Clone the fixed arguments and bind them to their parent.
   MaxIndex = (EAML_PARSE_INDEX)AmlGetFixedArgumentCount (
-                                 (AML_OBJECT_NODE*)Node
+                                 (AML_OBJECT_NODE *)Node
                                  );
   for (Index = EAmlParseIndexTerm0; Index < MaxIndex; Index++) {
-    FixedArgNode = AmlGetFixedArgument ((AML_OBJECT_NODE*)Node, Index);
+    FixedArgNode = AmlGetFixedArgument ((AML_OBJECT_NODE *)Node, Index);
     if (FixedArgNode == NULL) {
       Status = EFI_INVALID_PARAMETER;
       ASSERT (0);
@@ -153,7 +153,7 @@ AmlCloneTree (
 
     // Bind child.
     Status = AmlSetFixedArgument (
-               (AML_OBJECT_NODE*)HeadNode,
+               (AML_OBJECT_NODE *)HeadNode,
                Index,
                ClonedChildNode
                );
@@ -170,7 +170,7 @@ AmlCloneTree (
     CurrentLink = StartLink->ForwardLink;
     while (CurrentLink != StartLink) {
       // Clone child.
-      Status = AmlCloneTree ((AML_NODE_HEADER*)CurrentLink, &ClonedChildNode);
+      Status = AmlCloneTree ((AML_NODE_HEADER *)CurrentLink, &ClonedChildNode);
       if (EFI_ERROR (Status)) {
         ASSERT (0);
         goto error_handler;

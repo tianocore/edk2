@@ -14,7 +14,7 @@
 //
 // SdDxe Driver Binding Protocol Instance
 //
-EFI_DRIVER_BINDING_PROTOCOL gSdDxeDriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gSdDxeDriverBinding = {
   SdDxeDriverBindingSupported,
   SdDxeDriverBindingStart,
   SdDxeDriverBindingStop,
@@ -26,7 +26,7 @@ EFI_DRIVER_BINDING_PROTOCOL gSdDxeDriverBinding = {
 //
 // Template for SD_DEVICE data structure.
 //
-SD_DEVICE mSdDeviceTemplate = {
+SD_DEVICE  mSdDeviceTemplate = {
   SD_DEVICE_SIGNATURE,         // Signature
   NULL,                        // Handle
   NULL,                        // DevicePath
@@ -99,41 +99,42 @@ DumpCsd (
   IN SD_CSD  *Csd
   )
 {
-  SD_CSD2 *Csd2;
+  SD_CSD2  *Csd2;
 
-  DEBUG((DEBUG_INFO, "== Dump Sd Csd Register==\n"));
-  DEBUG((DEBUG_INFO, "  CSD structure                    0x%x\n", Csd->CsdStructure));
-  DEBUG((DEBUG_INFO, "  Data read access-time 1          0x%x\n", Csd->Taac));
-  DEBUG((DEBUG_INFO, "  Data read access-time 2          0x%x\n", Csd->Nsac));
-  DEBUG((DEBUG_INFO, "  Max. bus clock frequency         0x%x\n", Csd->TranSpeed));
-  DEBUG((DEBUG_INFO, "  Device command classes           0x%x\n", Csd->Ccc));
-  DEBUG((DEBUG_INFO, "  Max. read data block length      0x%x\n", Csd->ReadBlLen));
-  DEBUG((DEBUG_INFO, "  Partial blocks for read allowed  0x%x\n", Csd->ReadBlPartial));
-  DEBUG((DEBUG_INFO, "  Write block misalignment         0x%x\n", Csd->WriteBlkMisalign));
-  DEBUG((DEBUG_INFO, "  Read block misalignment          0x%x\n", Csd->ReadBlkMisalign));
-  DEBUG((DEBUG_INFO, "  DSR implemented                  0x%x\n", Csd->DsrImp));
+  DEBUG ((DEBUG_INFO, "== Dump Sd Csd Register==\n"));
+  DEBUG ((DEBUG_INFO, "  CSD structure                    0x%x\n", Csd->CsdStructure));
+  DEBUG ((DEBUG_INFO, "  Data read access-time 1          0x%x\n", Csd->Taac));
+  DEBUG ((DEBUG_INFO, "  Data read access-time 2          0x%x\n", Csd->Nsac));
+  DEBUG ((DEBUG_INFO, "  Max. bus clock frequency         0x%x\n", Csd->TranSpeed));
+  DEBUG ((DEBUG_INFO, "  Device command classes           0x%x\n", Csd->Ccc));
+  DEBUG ((DEBUG_INFO, "  Max. read data block length      0x%x\n", Csd->ReadBlLen));
+  DEBUG ((DEBUG_INFO, "  Partial blocks for read allowed  0x%x\n", Csd->ReadBlPartial));
+  DEBUG ((DEBUG_INFO, "  Write block misalignment         0x%x\n", Csd->WriteBlkMisalign));
+  DEBUG ((DEBUG_INFO, "  Read block misalignment          0x%x\n", Csd->ReadBlkMisalign));
+  DEBUG ((DEBUG_INFO, "  DSR implemented                  0x%x\n", Csd->DsrImp));
   if (Csd->CsdStructure == 0) {
-    DEBUG((DEBUG_INFO, "  Device size                      0x%x\n", Csd->CSizeLow | (Csd->CSizeHigh << 2)));
-    DEBUG((DEBUG_INFO, "  Max. read current @ VDD min      0x%x\n", Csd->VddRCurrMin));
-    DEBUG((DEBUG_INFO, "  Max. read current @ VDD max      0x%x\n", Csd->VddRCurrMax));
-    DEBUG((DEBUG_INFO, "  Max. write current @ VDD min     0x%x\n", Csd->VddWCurrMin));
-    DEBUG((DEBUG_INFO, "  Max. write current @ VDD max     0x%x\n", Csd->VddWCurrMax));
+    DEBUG ((DEBUG_INFO, "  Device size                      0x%x\n", Csd->CSizeLow | (Csd->CSizeHigh << 2)));
+    DEBUG ((DEBUG_INFO, "  Max. read current @ VDD min      0x%x\n", Csd->VddRCurrMin));
+    DEBUG ((DEBUG_INFO, "  Max. read current @ VDD max      0x%x\n", Csd->VddRCurrMax));
+    DEBUG ((DEBUG_INFO, "  Max. write current @ VDD min     0x%x\n", Csd->VddWCurrMin));
+    DEBUG ((DEBUG_INFO, "  Max. write current @ VDD max     0x%x\n", Csd->VddWCurrMax));
   } else {
-    Csd2 = (SD_CSD2*)(VOID*)Csd;
-    DEBUG((DEBUG_INFO, "  Device size                      0x%x\n", Csd2->CSizeLow | (Csd->CSizeHigh << 16)));
+    Csd2 = (SD_CSD2 *)(VOID *)Csd;
+    DEBUG ((DEBUG_INFO, "  Device size                      0x%x\n", Csd2->CSizeLow | (Csd->CSizeHigh << 16)));
   }
-  DEBUG((DEBUG_INFO, "  Erase sector size                0x%x\n", Csd->SectorSize));
-  DEBUG((DEBUG_INFO, "  Erase single block enable        0x%x\n", Csd->EraseBlkEn));
-  DEBUG((DEBUG_INFO, "  Write protect group size         0x%x\n", Csd->WpGrpSize));
-  DEBUG((DEBUG_INFO, "  Write protect group enable       0x%x\n", Csd->WpGrpEnable));
-  DEBUG((DEBUG_INFO, "  Write speed factor               0x%x\n", Csd->R2WFactor));
-  DEBUG((DEBUG_INFO, "  Max. write data block length     0x%x\n", Csd->WriteBlLen));
-  DEBUG((DEBUG_INFO, "  Partial blocks for write allowed 0x%x\n", Csd->WriteBlPartial));
-  DEBUG((DEBUG_INFO, "  File format group                0x%x\n", Csd->FileFormatGrp));
-  DEBUG((DEBUG_INFO, "  Copy flag (OTP)                  0x%x\n", Csd->Copy));
-  DEBUG((DEBUG_INFO, "  Permanent write protection       0x%x\n", Csd->PermWriteProtect));
-  DEBUG((DEBUG_INFO, "  Temporary write protection       0x%x\n", Csd->TmpWriteProtect));
-  DEBUG((DEBUG_INFO, "  File format                      0x%x\n", Csd->FileFormat));
+
+  DEBUG ((DEBUG_INFO, "  Erase sector size                0x%x\n", Csd->SectorSize));
+  DEBUG ((DEBUG_INFO, "  Erase single block enable        0x%x\n", Csd->EraseBlkEn));
+  DEBUG ((DEBUG_INFO, "  Write protect group size         0x%x\n", Csd->WpGrpSize));
+  DEBUG ((DEBUG_INFO, "  Write protect group enable       0x%x\n", Csd->WpGrpEnable));
+  DEBUG ((DEBUG_INFO, "  Write speed factor               0x%x\n", Csd->R2WFactor));
+  DEBUG ((DEBUG_INFO, "  Max. write data block length     0x%x\n", Csd->WriteBlLen));
+  DEBUG ((DEBUG_INFO, "  Partial blocks for write allowed 0x%x\n", Csd->WriteBlPartial));
+  DEBUG ((DEBUG_INFO, "  File format group                0x%x\n", Csd->FileFormatGrp));
+  DEBUG ((DEBUG_INFO, "  Copy flag (OTP)                  0x%x\n", Csd->Copy));
+  DEBUG ((DEBUG_INFO, "  Permanent write protection       0x%x\n", Csd->PermWriteProtect));
+  DEBUG ((DEBUG_INFO, "  Temporary write protection       0x%x\n", Csd->TmpWriteProtect));
+  DEBUG ((DEBUG_INFO, "  File format                      0x%x\n", Csd->FileFormat));
 
   return EFI_SUCCESS;
 }
@@ -149,8 +150,8 @@ DumpCsd (
 **/
 EFI_STATUS
 GetSdModelName (
-  IN OUT SD_DEVICE         *Device,
-  IN     SD_CID            *Cid
+  IN OUT SD_DEVICE  *Device,
+  IN     SD_CID     *Cid
   )
 {
   CHAR8  String[SD_MODEL_NAME_MAX_LEN];
@@ -178,19 +179,19 @@ GetSdModelName (
 **/
 EFI_STATUS
 DiscoverUserArea (
-  IN SD_DEVICE             *Device
+  IN SD_DEVICE  *Device
   )
 {
-  EFI_STATUS                        Status;
-  SD_CSD                            *Csd;
-  SD_CSD2                           *Csd2;
-  SD_CID                            *Cid;
-  UINT64                            Capacity;
-  UINT32                            DevStatus;
-  UINT16                            Rca;
-  UINT32                            CSize;
-  UINT32                            CSizeMul;
-  UINT32                            ReadBlLen;
+  EFI_STATUS  Status;
+  SD_CSD      *Csd;
+  SD_CSD2     *Csd2;
+  SD_CID      *Cid;
+  UINT64      Capacity;
+  UINT32      DevStatus;
+  UINT16      Rca;
+  UINT32      CSize;
+  UINT32      CSizeMul;
+  UINT32      ReadBlLen;
 
   //
   // Deselect the device to force it enter stby mode.
@@ -201,7 +202,7 @@ DiscoverUserArea (
 
   Status = SdSetRca (Device, &Rca);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "DiscoverUserArea(): Assign new Rca = 0x%x fails with %r\n", Rca, Status));
+    DEBUG ((DEBUG_ERROR, "DiscoverUserArea(): Assign new Rca = 0x%x fails with %r\n", Rca, Status));
     return Status;
   }
 
@@ -210,6 +211,7 @@ DiscoverUserArea (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   DumpCsd (Csd);
 
   Cid    = &Device->Cid;
@@ -217,11 +219,12 @@ DiscoverUserArea (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   GetSdModelName (Device, Cid);
 
   Status = SdSelect (Device, Rca);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "DiscoverUserArea(): Reselect the device 0x%x fails with %r\n", Rca, Status));
+    DEBUG ((DEBUG_ERROR, "DiscoverUserArea(): Reselect the device 0x%x fails with %r\n", Rca, Status));
     return Status;
   }
 
@@ -232,15 +235,15 @@ DiscoverUserArea (
 
   if (Csd->CsdStructure == 0) {
     Device->SectorAddressing = FALSE;
-    CSize     = (Csd->CSizeHigh << 2 | Csd->CSizeLow) + 1;
-    CSizeMul  = (1 << (Csd->CSizeMul + 2));
-    ReadBlLen = (1 << (Csd->ReadBlLen));
-    Capacity  = MultU64x32 (MultU64x32 ((UINT64)CSize, CSizeMul), ReadBlLen);
+    CSize                    = (Csd->CSizeHigh << 2 | Csd->CSizeLow) + 1;
+    CSizeMul                 = (1 << (Csd->CSizeMul + 2));
+    ReadBlLen                = (1 << (Csd->ReadBlLen));
+    Capacity                 = MultU64x32 (MultU64x32 ((UINT64)CSize, CSizeMul), ReadBlLen);
   } else {
     Device->SectorAddressing = TRUE;
-    Csd2      = (SD_CSD2*)(VOID*)Csd;
-    CSize     = (Csd2->CSizeHigh << 16 | Csd2->CSizeLow) + 1;
-    Capacity  = MultU64x32 ((UINT64)CSize, SIZE_512KB);
+    Csd2                     = (SD_CSD2 *)(VOID *)Csd;
+    CSize                    = (Csd2->CSizeHigh << 16 | Csd2->CSizeLow) + 1;
+    Capacity                 = MultU64x32 ((UINT64)CSize, SIZE_512KB);
   }
 
   Device->BlockIo.Media               = &Device->BlockMedia;
@@ -279,23 +282,23 @@ DiscoverUserArea (
 EFI_STATUS
 EFIAPI
 DiscoverSdDevice (
-  IN  SD_DRIVER_PRIVATE_DATA      *Private,
-  IN  UINT8                       Slot
+  IN  SD_DRIVER_PRIVATE_DATA  *Private,
+  IN  UINT8                   Slot
   )
 {
-  EFI_STATUS                      Status;
-  SD_DEVICE                       *Device;
-  EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
-  EFI_DEVICE_PATH_PROTOCOL        *NewDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath;
-  EFI_HANDLE                      DeviceHandle;
-  EFI_SD_MMC_PASS_THRU_PROTOCOL   *PassThru;
+  EFI_STATUS                     Status;
+  SD_DEVICE                      *Device;
+  EFI_DEVICE_PATH_PROTOCOL       *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL       *NewDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath;
+  EFI_HANDLE                     DeviceHandle;
+  EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru;
 
   Device              = NULL;
   DevicePath          = NULL;
   NewDevicePath       = NULL;
   RemainingDevicePath = NULL;
-  PassThru = Private->PassThru;
+  PassThru            = Private->PassThru;
 
   //
   // Build Device Path
@@ -305,7 +308,7 @@ DiscoverSdDevice (
                        Slot,
                        &DevicePath
                        );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
@@ -324,10 +327,10 @@ DiscoverSdDevice (
     goto Error;
   }
 
-  DeviceHandle = NULL;
+  DeviceHandle        = NULL;
   RemainingDevicePath = NewDevicePath;
-  Status = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &RemainingDevicePath, &DeviceHandle);
-  if (!EFI_ERROR (Status) && (DeviceHandle != NULL) && IsDevicePathEnd(RemainingDevicePath)) {
+  Status              = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &RemainingDevicePath, &DeviceHandle);
+  if (!EFI_ERROR (Status) && (DeviceHandle != NULL) && IsDevicePathEnd (RemainingDevicePath)) {
     //
     // The device has been started, directly return to fast boot.
     //
@@ -353,7 +356,7 @@ DiscoverSdDevice (
   // Expose user area in the Sd memory card to upper layer.
   //
   Status = DiscoverUserArea (Device);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     goto Error;
   }
 
@@ -392,7 +395,7 @@ DiscoverSdDevice (
     gBS->OpenProtocol (
            Private->Controller,
            &gEfiSdMmcPassThruProtocolGuid,
-           (VOID **) &(Private->PassThru),
+           (VOID **)&(Private->PassThru),
            Private->DriverBindingHandle,
            Device->Handle,
            EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -458,15 +461,15 @@ Error:
 EFI_STATUS
 EFIAPI
 SdDxeDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL   *This,
-  IN EFI_HANDLE                    Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS                       Status;
-  EFI_DEVICE_PATH_PROTOCOL         *ParentDevicePath;
-  EFI_SD_MMC_PASS_THRU_PROTOCOL    *PassThru;
-  UINT8                            Slot;
+  EFI_STATUS                     Status;
+  EFI_DEVICE_PATH_PROTOCOL       *ParentDevicePath;
+  EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru;
+  UINT8                          Slot;
 
   //
   // Test EFI_SD_MMC_PASS_THRU_PROTOCOL on the controller handle.
@@ -474,7 +477,7 @@ SdDxeDriverBindingSupported (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiSdMmcPassThruProtocolGuid,
-                  (VOID**) &PassThru,
+                  (VOID **)&PassThru,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -523,7 +526,7 @@ SdDxeDriverBindingSupported (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiDevicePathProtocolGuid,
-                  (VOID **) &ParentDevicePath,
+                  (VOID **)&ParentDevicePath,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -569,27 +572,27 @@ SdDxeDriverBindingSupported (
 EFI_STATUS
 EFIAPI
 SdDxeDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL   *This,
-  IN EFI_HANDLE                    Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS                       Status;
-  EFI_SD_MMC_PASS_THRU_PROTOCOL    *PassThru;
-  EFI_DEVICE_PATH_PROTOCOL         *ParentDevicePath;
-  SD_DRIVER_PRIVATE_DATA           *Private;
-  UINT8                            Slot;
+  EFI_STATUS                     Status;
+  EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru;
+  EFI_DEVICE_PATH_PROTOCOL       *ParentDevicePath;
+  SD_DRIVER_PRIVATE_DATA         *Private;
+  UINT8                          Slot;
 
   Private  = NULL;
   PassThru = NULL;
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiSdMmcPassThruProtocolGuid,
-                  (VOID **) &PassThru,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
+  Status   = gBS->OpenProtocol (
+                    Controller,
+                    &gEfiSdMmcPassThruProtocolGuid,
+                    (VOID **)&PassThru,
+                    This->DriverBindingHandle,
+                    Controller,
+                    EFI_OPEN_PROTOCOL_BY_DRIVER
+                    );
   if ((EFI_ERROR (Status)) && (Status != EFI_ALREADY_STARTED)) {
     return Status;
   }
@@ -607,7 +610,7 @@ SdDxeDriverBindingStart (
     Status = gBS->OpenProtocol (
                     Controller,
                     &gEfiDevicePathProtocolGuid,
-                    (VOID **) &ParentDevicePath,
+                    (VOID **)&ParentDevicePath,
                     This->DriverBindingHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -631,7 +634,7 @@ SdDxeDriverBindingStart (
     Status = gBS->OpenProtocol (
                     Controller,
                     &gEfiCallerIdGuid,
-                    (VOID **) &Private,
+                    (VOID **)&Private,
                     This->DriverBindingHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -676,14 +679,15 @@ Error:
 
     if (Private != NULL) {
       gBS->UninstallMultipleProtocolInterfaces (
-           Controller,
-           &gEfiCallerIdGuid,
-           Private,
-           NULL
-           );
+             Controller,
+             &gEfiCallerIdGuid,
+             Private,
+             NULL
+             );
       FreePool (Private);
     }
   }
+
   return Status;
 }
 
@@ -716,30 +720,30 @@ Error:
 EFI_STATUS
 EFIAPI
 SdDxeDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN  EFI_HANDLE                      Controller,
-  IN  UINTN                           NumberOfChildren,
-  IN  EFI_HANDLE                      *ChildHandleBuffer
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   Controller,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_STATUS                          Status;
-  BOOLEAN                             AllChildrenStopped;
-  UINTN                               Index;
-  SD_DRIVER_PRIVATE_DATA              *Private;
-  SD_DEVICE                           *Device;
-  EFI_SD_MMC_PASS_THRU_PROTOCOL       *PassThru;
-  EFI_BLOCK_IO2_PROTOCOL              *BlockIo2;
-  EFI_BLOCK_IO_PROTOCOL               *BlockIo;
-  LIST_ENTRY                          *Link;
-  LIST_ENTRY                          *NextLink;
-  SD_REQUEST                          *Request;
-  EFI_TPL                             OldTpl;
+  EFI_STATUS                     Status;
+  BOOLEAN                        AllChildrenStopped;
+  UINTN                          Index;
+  SD_DRIVER_PRIVATE_DATA         *Private;
+  SD_DEVICE                      *Device;
+  EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru;
+  EFI_BLOCK_IO2_PROTOCOL         *BlockIo2;
+  EFI_BLOCK_IO_PROTOCOL          *BlockIo;
+  LIST_ENTRY                     *Link;
+  LIST_ENTRY                     *NextLink;
+  SD_REQUEST                     *Request;
+  EFI_TPL                        OldTpl;
 
   if (NumberOfChildren == 0) {
     Status = gBS->OpenProtocol (
                     Controller,
                     &gEfiCallerIdGuid,
-                    (VOID **) &Private,
+                    (VOID **)&Private,
                     This->DriverBindingHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -749,16 +753,16 @@ SdDxeDriverBindingStop (
     }
 
     gBS->UninstallProtocolInterface (
-          Controller,
-          &gEfiCallerIdGuid,
-          Private
-          );
+           Controller,
+           &gEfiCallerIdGuid,
+           Private
+           );
     gBS->CloseProtocol (
-          Controller,
-          &gEfiSdMmcPassThruProtocolGuid,
-          This->DriverBindingHandle,
-          Controller
-          );
+           Controller,
+           &gEfiSdMmcPassThruProtocolGuid,
+           This->DriverBindingHandle,
+           Controller
+           );
 
     FreePool (Private);
 
@@ -770,19 +774,19 @@ SdDxeDriverBindingStop (
   for (Index = 0; Index < NumberOfChildren; Index++) {
     BlockIo  = NULL;
     BlockIo2 = NULL;
-    Status = gBS->OpenProtocol (
-                    ChildHandleBuffer[Index],
-                    &gEfiBlockIoProtocolGuid,
-                    (VOID **) &BlockIo,
-                    This->DriverBindingHandle,
-                    Controller,
-                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                    );
+    Status   = gBS->OpenProtocol (
+                      ChildHandleBuffer[Index],
+                      &gEfiBlockIoProtocolGuid,
+                      (VOID **)&BlockIo,
+                      This->DriverBindingHandle,
+                      Controller,
+                      EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                      );
     if (EFI_ERROR (Status)) {
       Status = gBS->OpenProtocol (
                       ChildHandleBuffer[Index],
                       &gEfiBlockIo2ProtocolGuid,
-                      (VOID **) &BlockIo2,
+                      (VOID **)&BlockIo2,
                       This->DriverBindingHandle,
                       Controller,
                       EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -806,7 +810,8 @@ SdDxeDriverBindingStop (
     OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     for (Link = GetFirstNode (&Device->Queue);
          !IsNull (&Device->Queue, Link);
-         Link = NextLink) {
+         Link = NextLink)
+    {
       NextLink = GetNextNode (&Device->Queue, Link);
       RemoveEntryList (Link);
 
@@ -821,6 +826,7 @@ SdDxeDriverBindingStop (
 
       FreePool (Request);
     }
+
     gBS->RestoreTPL (OldTpl);
 
     //
@@ -849,14 +855,14 @@ SdDxeDriverBindingStop (
                     );
     if (EFI_ERROR (Status)) {
       AllChildrenStopped = FALSE;
-        gBS->OpenProtocol (
-               Controller,
-               &gEfiSdMmcPassThruProtocolGuid,
-               (VOID **)&PassThru,
-               This->DriverBindingHandle,
-               ChildHandleBuffer[Index],
-               EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
-               );
+      gBS->OpenProtocol (
+             Controller,
+             &gEfiSdMmcPassThruProtocolGuid,
+             (VOID **)&PassThru,
+             This->DriverBindingHandle,
+             ChildHandleBuffer[Index],
+             EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+             );
     } else {
       FreePool (Device->DevicePath);
       FreeUnicodeStringTable (Device->ControllerNameTable);
@@ -884,11 +890,11 @@ SdDxeDriverBindingStop (
 EFI_STATUS
 EFIAPI
 InitializeSdDxe (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   //
   // Install driver model protocol(s).
@@ -905,4 +911,3 @@ InitializeSdDxe (
 
   return Status;
 }
-

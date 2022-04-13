@@ -22,11 +22,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 FatAllocateIFile (
-  IN FAT_OFILE    *OFile,
-  OUT FAT_IFILE   **PtrIFile
+  IN FAT_OFILE   *OFile,
+  OUT FAT_IFILE  **PtrIFile
   )
 {
-  FAT_IFILE *IFile;
+  FAT_IFILE  *IFile;
 
   ASSERT_VOLUME_LOCKED (OFile->Volume);
 
@@ -83,11 +83,11 @@ FatAllocateIFile (
 **/
 EFI_STATUS
 FatOFileOpen (
-  IN  FAT_OFILE            *OFile,
-  OUT FAT_IFILE            **NewIFile,
-  IN  CHAR16               *FileName,
-  IN  UINT64               OpenMode,
-  IN  UINT8                Attributes
+  IN  FAT_OFILE  *OFile,
+  OUT FAT_IFILE  **NewIFile,
+  IN  CHAR16     *FileName,
+  IN  UINT64     OpenMode,
+  IN  UINT8      Attributes
   )
 {
   FAT_VOLUME  *Volume;
@@ -100,10 +100,11 @@ FatOFileOpen (
   DirEnt = NULL;
   Volume = OFile->Volume;
   ASSERT_VOLUME_LOCKED (Volume);
-  WriteMode = (BOOLEAN) (OpenMode & EFI_FILE_MODE_WRITE);
+  WriteMode = (BOOLEAN)(OpenMode & EFI_FILE_MODE_WRITE);
   if (Volume->ReadOnly && WriteMode) {
     return EFI_WRITE_PROTECTED;
   }
+
   //
   // Verify the source file handle isn't in an error state
   //
@@ -111,6 +112,7 @@ FatOFileOpen (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Get new OFile for the file
   //
@@ -150,14 +152,16 @@ FatOFileOpen (
       }
     }
   }
+
   //
   // If the file's attribute is read only, and the open is for
   // read-write, then the access is denied.
   //
   FileAttributes = OFile->DirEnt->Entry.Attributes;
-  if ((FileAttributes & EFI_FILE_READ_ONLY) != 0 && (FileAttributes & FAT_ATTRIBUTE_DIRECTORY) == 0 && WriteMode) {
+  if (((FileAttributes & EFI_FILE_READ_ONLY) != 0) && ((FileAttributes & FAT_ATTRIBUTE_DIRECTORY) == 0) && WriteMode) {
     return EFI_ACCESS_DENIED;
   }
+
   //
   // Create an open instance of the OFile
   //
@@ -166,9 +170,9 @@ FatOFileOpen (
     return Status;
   }
 
-  (*NewIFile)->ReadOnly = (BOOLEAN)!WriteMode;
+  (*NewIFile)->ReadOnly = (BOOLEAN) !WriteMode;
 
-  DEBUG ((EFI_D_INFO, "FSOpen: Open '%S' %r\n", FileName, Status));
+  DEBUG ((DEBUG_INFO, "FSOpen: Open '%S' %r\n", FileName, Status));
   return FatOFileFlush (OFile);
 }
 
@@ -194,12 +198,12 @@ FatOFileOpen (
 EFI_STATUS
 EFIAPI
 FatOpenEx (
-  IN  EFI_FILE_PROTOCOL       *FHand,
-  OUT EFI_FILE_PROTOCOL       **NewHandle,
-  IN  CHAR16                  *FileName,
-  IN  UINT64                  OpenMode,
-  IN  UINT64                  Attributes,
-  IN OUT EFI_FILE_IO_TOKEN    *Token
+  IN  EFI_FILE_PROTOCOL     *FHand,
+  OUT EFI_FILE_PROTOCOL     **NewHandle,
+  IN  CHAR16                *FileName,
+  IN  UINT64                OpenMode,
+  IN  UINT64                Attributes,
+  IN OUT EFI_FILE_IO_TOKEN  *Token
   )
 {
   FAT_IFILE   *IFile;
@@ -214,23 +218,24 @@ FatOpenEx (
   if (FileName == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Check for a valid mode
   //
   switch (OpenMode) {
-  case EFI_FILE_MODE_READ:
-  case EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE:
-  case EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE:
-    break;
+    case EFI_FILE_MODE_READ:
+    case EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE:
+    case EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE:
+      break;
 
-  default:
-    return EFI_INVALID_PARAMETER;
+    default:
+      return EFI_INVALID_PARAMETER;
   }
 
   //
   // Check for valid Attributes for file creation case.
   //
-  if (((OpenMode & EFI_FILE_MODE_CREATE) != 0) && (Attributes & (EFI_FILE_READ_ONLY | (~EFI_FILE_VALID_ATTR))) != 0) {
+  if (((OpenMode & EFI_FILE_MODE_CREATE) != 0) && ((Attributes & (EFI_FILE_READ_ONLY | (~EFI_FILE_VALID_ATTR))) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -248,6 +253,7 @@ FatOpenEx (
     if (FHand->Revision < EFI_FILE_PROTOCOL_REVISION2) {
       return EFI_UNSUPPORTED;
     }
+
     Task = FatCreateTask (IFile, Token);
     if (Task == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -262,7 +268,7 @@ FatOpenEx (
   //
   // Open the file
   //
-  Status = FatOFileOpen (OFile, &NewIFile, FileName, OpenMode, (UINT8) Attributes);
+  Status = FatOFileOpen (OFile, &NewIFile, FileName, OpenMode, (UINT8)Attributes);
 
   //
   // If the file was opened, return the handle to the caller
@@ -270,6 +276,7 @@ FatOpenEx (
   if (!EFI_ERROR (Status)) {
     *NewHandle = &NewIFile->Handle;
   }
+
   //
   // Unlock
   //
@@ -309,11 +316,11 @@ FatOpenEx (
 EFI_STATUS
 EFIAPI
 FatOpen (
-  IN  EFI_FILE_PROTOCOL   *FHand,
-  OUT EFI_FILE_PROTOCOL   **NewHandle,
-  IN  CHAR16              *FileName,
-  IN  UINT64              OpenMode,
-  IN  UINT64              Attributes
+  IN  EFI_FILE_PROTOCOL  *FHand,
+  OUT EFI_FILE_PROTOCOL  **NewHandle,
+  IN  CHAR16             *FileName,
+  IN  UINT64             OpenMode,
+  IN  UINT64             Attributes
   )
 {
   return FatOpenEx (FHand, NewHandle, FileName, OpenMode, Attributes, NULL);

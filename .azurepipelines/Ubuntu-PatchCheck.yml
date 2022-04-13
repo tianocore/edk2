@@ -27,7 +27,7 @@ steps:
 
 - task: UsePythonVersion@0
   inputs:
-    versionSpec: '3.7.x'
+    versionSpec: '3.8.x'
     architecture: 'x64'
 
 - script: |

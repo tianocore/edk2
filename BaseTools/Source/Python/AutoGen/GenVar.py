@@ -15,10 +15,12 @@ from Common.VariableAttributes import VariableAttributes
 from Common.Misc import *
 import collections
 import Common.DataType as DataType
+import Common.GlobalData as GlobalData
 
 var_info = collections.namedtuple("uefi_var", "pcdindex,pcdname,defaultstoragename,skuname,var_name, var_guid, var_offset,var_attribute,pcd_default_value, default_value, data_type,PcdDscLine,StructurePcd")
 NvStorageHeaderSize = 28
 VariableHeaderSize = 32
+AuthenticatedVariableHeaderSize = 60
 
 class VariableMgr(object):
     def __init__(self, DefaultStoreMap, SkuIdMap):
@@ -170,14 +172,22 @@ class VariableMgr(object):
             DataBuffer = VariableMgr.AlignData(var_name_buffer + default_data)
 
             data_size = len(DataBuffer)
-            offset += VariableHeaderSize + len(default_info.var_name.split(","))
+            if GlobalData.gCommandLineDefines.get(TAB_DSC_DEFINES_VPD_AUTHENTICATED_VARIABLE_STORE,"FALSE").upper() == "TRUE":
+                offset += AuthenticatedVariableHeaderSize + len(default_info.var_name.split(","))
+            else:
+                offset += VariableHeaderSize + len(default_info.var_name.split(","))
             var_data_offset[default_info.pcdindex] = offset
             offset += data_size - len(default_info.var_name.split(","))
-
-            var_header_buffer = VariableMgr.PACK_VARIABLE_HEADER(var_attr_value, len(default_info.var_name.split(",")), len (default_data), vendorguid)
+            if GlobalData.gCommandLineDefines.get(TAB_DSC_DEFINES_VPD_AUTHENTICATED_VARIABLE_STORE,"FALSE").upper() == "TRUE":
+                var_header_buffer = VariableMgr.PACK_AUTHENTICATED_VARIABLE_HEADER(var_attr_value, len(default_info.var_name.split(",")), len (default_data), vendorguid)
+            else:
+                var_header_buffer = VariableMgr.PACK_VARIABLE_HEADER(var_attr_value, len(default_info.var_name.split(",")), len (default_data), vendorguid)
             NvStoreDataBuffer += (var_header_buffer + DataBuffer)
 
-        variable_storage_header_buffer = VariableMgr.PACK_VARIABLE_STORE_HEADER(len(NvStoreDataBuffer) + 28)
+        if GlobalData.gCommandLineDefines.get(TAB_DSC_DEFINES_VPD_AUTHENTICATED_VARIABLE_STORE,"FALSE").upper() == "TRUE":
+            variable_storage_header_buffer = VariableMgr.PACK_AUTHENTICATED_VARIABLE_STORE_HEADER(len(NvStoreDataBuffer) + 28)
+        else:
+            variable_storage_header_buffer = VariableMgr.PACK_VARIABLE_STORE_HEADER(len(NvStoreDataBuffer) + 28)
 
         nv_default_part = VariableMgr.AlignData(VariableMgr.PACK_DEFAULT_DATA(0, 0, VariableMgr.unpack_data(variable_storage_header_buffer+NvStoreDataBuffer)), 8)
 
@@ -252,6 +262,20 @@ class VariableMgr(object):
 
         return GuidBuffer + SizeBuffer + FormatBuffer + StateBuffer + reservedBuffer
 
+    def PACK_AUTHENTICATED_VARIABLE_STORE_HEADER(size):
+        #Signature: gEfiAuthenticatedVariableGuid
+        Guid = "{ 0xaaf32c78, 0x947b, 0x439a, { 0xa1, 0x80, 0x2e, 0x14, 0x4e, 0xc3, 0x77, 0x92 }}"
+        Guid = GuidStructureStringToGuidString(Guid)
+        GuidBuffer = PackGUID(Guid.split('-'))
+
+        SizeBuffer = pack('=L', size)
+        FormatBuffer = pack('=B', 0x5A)
+        StateBuffer = pack('=B', 0xFE)
+        reservedBuffer = pack('=H', 0)
+        reservedBuffer += pack('=L', 0)
+
+        return GuidBuffer + SizeBuffer + FormatBuffer + StateBuffer + reservedBuffer
+
     @staticmethod
     def PACK_NV_STORE_DEFAULT_HEADER(size, maxsize):
         Signature = pack('=B', ord('N'))
@@ -272,6 +296,37 @@ class VariableMgr(object):
         Buffer += pack('=B', 0)     # pack reserved
 
         Buffer += pack('=L', attribute)
+        Buffer += pack('=L', namesize)
+        Buffer += pack('=L', datasize)
+
+        Buffer += PackGUID(vendorguid)
+
+        return Buffer
+
+    @staticmethod
+    def PACK_AUTHENTICATED_VARIABLE_HEADER(attribute, namesize, datasize, vendorguid):
+
+        Buffer = pack('=H', 0x55AA)    # pack StartID
+        Buffer += pack('=B', 0x3F)     # pack State
+        Buffer += pack('=B', 0)        # pack reserved
+
+        Buffer += pack('=L', attribute)
+
+        Buffer += pack('=Q', 0)        # pack MonotonicCount
+        Buffer += pack('=HBBBBBBLhBB', # pack TimeStamp
+                         0,            # UINT16 Year
+                         0,            # UINT8  Month
+                         0,            # UINT8  Day
+                         0,            # UINT8  Hour
+                         0,            # UINT8  Minute
+                         0,            # UINT8  Second
+                         0,            # UINT8  Pad1
+                         0,            # UINT32 Nanosecond
+                         0,            # INT16  TimeZone
+                         0,            # UINT8  Daylight
+                         0)            # UINT8  Pad2
+        Buffer += pack('=L', 0)        # pack PubKeyIndex
+
         Buffer += pack('=L', namesize)
         Buffer += pack('=L', datasize)
 

@@ -1,7 +1,7 @@
 /** @file
   Library used for sorting routines.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved. <BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -19,7 +19,7 @@
 #include <Library/SortLib.h>
 #include <Library/DevicePathLib.h>
 
-STATIC EFI_UNICODE_COLLATION_PROTOCOL   *mUnicodeCollation = NULL;
+STATIC EFI_UNICODE_COLLATION_PROTOCOL  *mUnicodeCollation = NULL;
 
 #define USL_FREE_NON_NULL(Pointer)  \
 {                                     \
@@ -29,115 +29,6 @@ STATIC EFI_UNICODE_COLLATION_PROTOCOL   *mUnicodeCollation = NULL;
   }                                   \
 }
 
-/**
-  Worker function for QuickSorting.  This function is identical to PerformQuickSort,
-  except that is uses the pre-allocated buffer so the in place sorting does not need to
-  allocate and free buffers constantly.
-
-  Each element must be equal sized.
-
-  if BufferToSort is NULL, then ASSERT.
-  if CompareFunction is NULL, then ASSERT.
-  if Buffer is NULL, then ASSERT.
-
-  if Count is < 2 then perform no action.
-  if Size is < 1 then perform no action.
-
-  @param[in, out] BufferToSort   on call a Buffer of (possibly sorted) elements
-                                 on return a buffer of sorted elements
-  @param[in] Count               the number of elements in the buffer to sort
-  @param[in] ElementSize         Size of an element in bytes
-  @param[in] CompareFunction     The function to call to perform the comparison
-                                 of any 2 elements
-  @param[in] Buffer              Buffer of size ElementSize for use in swapping
-**/
-VOID
-EFIAPI
-QuickSortWorker (
-  IN OUT VOID                           *BufferToSort,
-  IN CONST UINTN                        Count,
-  IN CONST UINTN                        ElementSize,
-  IN       SORT_COMPARE                 CompareFunction,
-  IN VOID                               *Buffer
-  )
-{
-  VOID        *Pivot;
-  UINTN       LoopCount;
-  UINTN       NextSwapLocation;
-
-  ASSERT(BufferToSort     != NULL);
-  ASSERT(CompareFunction  != NULL);
-  ASSERT(Buffer  != NULL);
-
-  if ( Count < 2
-    || ElementSize  < 1
-   ){
-    return;
-  }
-
-  NextSwapLocation = 0;
-
-  //
-  // pick a pivot (we choose last element)
-  //
-  Pivot = ((UINT8*)BufferToSort+((Count-1)*ElementSize));
-
-  //
-  // Now get the pivot such that all on "left" are below it
-  // and everything "right" are above it
-  //
-  for ( LoopCount = 0
-      ; LoopCount < Count -1
-      ; LoopCount++
-     ){
-    //
-    // if the element is less than the pivot
-    //
-    if (CompareFunction((VOID*)((UINT8*)BufferToSort+((LoopCount)*ElementSize)),Pivot) <= 0){
-      //
-      // swap
-      //
-      CopyMem (Buffer, (UINT8*)BufferToSort+(NextSwapLocation*ElementSize), ElementSize);
-      CopyMem ((UINT8*)BufferToSort+(NextSwapLocation*ElementSize), (UINT8*)BufferToSort+((LoopCount)*ElementSize), ElementSize);
-      CopyMem ((UINT8*)BufferToSort+((LoopCount)*ElementSize), Buffer, ElementSize);
-
-      //
-      // increment NextSwapLocation
-      //
-      NextSwapLocation++;
-    }
-  }
-  //
-  // swap pivot to it's final position (NextSwapLocaiton)
-  //
-  CopyMem (Buffer, Pivot, ElementSize);
-  CopyMem (Pivot, (UINT8*)BufferToSort+(NextSwapLocation*ElementSize), ElementSize);
-  CopyMem ((UINT8*)BufferToSort+(NextSwapLocation*ElementSize), Buffer, ElementSize);
-
-  //
-  // Now recurse on 2 paritial lists.  neither of these will have the 'pivot' element
-  // IE list is sorted left half, pivot element, sorted right half...
-  //
-  if (NextSwapLocation >= 2) {
-    QuickSortWorker(
-      BufferToSort,
-      NextSwapLocation,
-      ElementSize,
-      CompareFunction,
-      Buffer);
-  }
-
-  if ((Count - NextSwapLocation - 1) >= 2) {
-    QuickSortWorker(
-      (UINT8 *)BufferToSort + (NextSwapLocation+1) * ElementSize,
-      Count - NextSwapLocation - 1,
-      ElementSize,
-      CompareFunction,
-      Buffer);
-  }
-
-  return;
-}
 /**
   Function to perform a Quick Sort alogrithm on a buffer of comparable elements.
 
@@ -159,28 +50,29 @@ QuickSortWorker (
 VOID
 EFIAPI
 PerformQuickSort (
-  IN OUT VOID                           *BufferToSort,
-  IN CONST UINTN                        Count,
-  IN CONST UINTN                        ElementSize,
-  IN       SORT_COMPARE                 CompareFunction
+  IN OUT VOID            *BufferToSort,
+  IN CONST UINTN         Count,
+  IN CONST UINTN         ElementSize,
+  IN       SORT_COMPARE  CompareFunction
   )
 {
   VOID  *Buffer;
 
-  ASSERT(BufferToSort     != NULL);
-  ASSERT(CompareFunction  != NULL);
+  ASSERT (BufferToSort     != NULL);
+  ASSERT (CompareFunction  != NULL);
 
-  Buffer = AllocateZeroPool(ElementSize);
-  ASSERT(Buffer != NULL);
+  Buffer = AllocateZeroPool (ElementSize);
+  ASSERT (Buffer != NULL);
 
-  QuickSortWorker(
+  QuickSort (
     BufferToSort,
     Count,
     ElementSize,
     CompareFunction,
-    Buffer);
+    Buffer
+    );
 
-  FreePool(Buffer);
+  FreePool (Buffer);
   return;
 }
 
@@ -197,8 +89,8 @@ PerformQuickSort (
 INTN
 EFIAPI
 DevicePathCompare (
-  IN  CONST VOID             *Buffer1,
-  IN  CONST VOID             *Buffer2
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath1;
@@ -208,8 +100,8 @@ DevicePathCompare (
   EFI_STATUS                Status;
   INTN                      RetVal;
 
-  DevicePath1 = *(EFI_DEVICE_PATH_PROTOCOL**)Buffer1;
-  DevicePath2 = *(EFI_DEVICE_PATH_PROTOCOL**)Buffer2;
+  DevicePath1 = *(EFI_DEVICE_PATH_PROTOCOL **)Buffer1;
+  DevicePath2 = *(EFI_DEVICE_PATH_PROTOCOL **)Buffer2;
 
   if (DevicePath1 == NULL) {
     if (DevicePath2 == NULL) {
@@ -224,37 +116,41 @@ DevicePathCompare (
   }
 
   if (mUnicodeCollation == NULL) {
-    Status = gBS->LocateProtocol(
-      &gEfiUnicodeCollation2ProtocolGuid,
-      NULL,
-      (VOID**)&mUnicodeCollation);
+    Status = gBS->LocateProtocol (
+                    &gEfiUnicodeCollation2ProtocolGuid,
+                    NULL,
+                    (VOID **)&mUnicodeCollation
+                    );
 
-    ASSERT_EFI_ERROR(Status);
+    ASSERT_EFI_ERROR (Status);
   }
 
-  TextPath1 = ConvertDevicePathToText(
-    DevicePath1,
-    FALSE,
-    FALSE);
+  TextPath1 = ConvertDevicePathToText (
+                DevicePath1,
+                FALSE,
+                FALSE
+                );
 
-  TextPath2 = ConvertDevicePathToText(
-    DevicePath2,
-    FALSE,
-    FALSE);
+  TextPath2 = ConvertDevicePathToText (
+                DevicePath2,
+                FALSE,
+                FALSE
+                );
 
   if (TextPath1 == NULL) {
     RetVal = -1;
   } else if (TextPath2 == NULL) {
     RetVal = 1;
   } else {
-    RetVal = mUnicodeCollation->StriColl(
-      mUnicodeCollation,
-      TextPath1,
-      TextPath2);
+    RetVal = mUnicodeCollation->StriColl (
+                                  mUnicodeCollation,
+                                  TextPath1,
+                                  TextPath2
+                                  );
   }
 
-  USL_FREE_NON_NULL(TextPath1);
-  USL_FREE_NON_NULL(TextPath2);
+  USL_FREE_NON_NULL (TextPath1);
+  USL_FREE_NON_NULL (TextPath2);
 
   return (RetVal);
 }
@@ -272,26 +168,28 @@ DevicePathCompare (
 INTN
 EFIAPI
 StringNoCaseCompare (
-  IN  CONST VOID             *Buffer1,
-  IN  CONST VOID             *Buffer2
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
   )
 {
-  EFI_STATUS                Status;
-  if (mUnicodeCollation == NULL) {
-    Status = gBS->LocateProtocol(
-      &gEfiUnicodeCollation2ProtocolGuid,
-      NULL,
-      (VOID**)&mUnicodeCollation);
+  EFI_STATUS  Status;
 
-    ASSERT_EFI_ERROR(Status);
+  if (mUnicodeCollation == NULL) {
+    Status = gBS->LocateProtocol (
+                    &gEfiUnicodeCollation2ProtocolGuid,
+                    NULL,
+                    (VOID **)&mUnicodeCollation
+                    );
+
+    ASSERT_EFI_ERROR (Status);
   }
 
-  return (mUnicodeCollation->StriColl(
-    mUnicodeCollation,
-    *(CHAR16**)Buffer1,
-    *(CHAR16**)Buffer2));
+  return (mUnicodeCollation->StriColl (
+                               mUnicodeCollation,
+                               *(CHAR16 **)Buffer1,
+                               *(CHAR16 **)Buffer2
+                               ));
 }
-
 
 /**
   Function to compare 2 strings.
@@ -306,11 +204,12 @@ StringNoCaseCompare (
 INTN
 EFIAPI
 StringCompare (
-  IN  CONST VOID                *Buffer1,
-  IN  CONST VOID                *Buffer2
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
   )
 {
-  return (StrCmp(
-    *(CHAR16**)Buffer1,
-    *(CHAR16**)Buffer2));
+  return (StrCmp (
+            *(CHAR16 **)Buffer1,
+            *(CHAR16 **)Buffer2
+            ));
 }

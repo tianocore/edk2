@@ -6,18 +6,18 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef _XEN_XENBUS_XENBUSB_H
 #define _XEN_XENBUS_XENBUSB_H
 
 #include "XenBusDxe.h"
 
-#define XENBUS_DEVICE_PATH_TYPE_VBD 0x1
+#define XENBUS_DEVICE_PATH_TYPE_VBD  0x1
 struct _XENBUS_DEVICE_PATH {
-  VENDOR_DEVICE_PATH  Vendor;
-  UINT8               Type;
-  UINT16              DeviceId;
+  VENDOR_DEVICE_PATH    Vendor;
+  UINT8                 Type;
+  UINT16                DeviceId;
 };
-
 
 /**
   Perform XenBus bus enumeration and install protocol for children.
@@ -32,7 +32,7 @@ struct _XENBUS_DEVICE_PATH {
 **/
 XENSTORE_STATUS
 XenBusEnumerateBus (
-  XENBUS_DEVICE *Dev
+  XENBUS_DEVICE  *Dev
   );
 
 #endif /* _XEN_XENBUS_XENBUSB_H */

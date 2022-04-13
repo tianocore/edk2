@@ -78,7 +78,7 @@ EFI_DEBUG_MASK_PROTOCOL  mDebugMaskProtocol = {
 /// This variable prevents the EFI Variable Services from being called fort
 /// every DEBUG() macro.
 ///
-BOOLEAN           mGlobalErrorLevelInitialized = FALSE;
+BOOLEAN  mGlobalErrorLevelInitialized = FALSE;
 
 ///
 /// Global variable that contains the current debug error level mask for the
@@ -90,7 +90,7 @@ BOOLEAN           mGlobalErrorLevelInitialized = FALSE;
 /// Debug Mask Protocol SetDebugMask() service is called, then that overrides
 /// the PcdDebugPrintErrorLevel and the EFI Variable setting.
 ///
-UINT32            mDebugPrintErrorLevel        = 0;
+UINT32  mDebugPrintErrorLevel = 0;
 
 ///
 /// Global variable that is used to cache a pointer to the EFI System Table
@@ -98,7 +98,7 @@ UINT32            mDebugPrintErrorLevel        = 0;
 /// the global debug print error level mask value.  The UefiBootServicesTableLib
 /// is not used to prevent a circular dependency between these libraries.
 ///
-EFI_SYSTEM_TABLE  *mSystemTable                         = NULL;
+EFI_SYSTEM_TABLE  *mSystemTable = NULL;
 
 /**
   The constructor function caches the PCI Express Base Address and creates a
@@ -118,7 +118,7 @@ DxeDebugPrintErrorLevelLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
 
   //
   // Initialize the error level mask from PCD setting.
@@ -129,11 +129,12 @@ DxeDebugPrintErrorLevelLibConstructor (
   // Install Debug Mask Protocol onto ImageHandle
   //
   mSystemTable = SystemTable;
-  Status = SystemTable->BootServices->InstallMultipleProtocolInterfaces (
-                                        &ImageHandle,
-                                        &gEfiDebugMaskProtocolGuid, &mDebugMaskProtocol,
-                                        NULL
-                                        );
+  Status       = SystemTable->BootServices->InstallMultipleProtocolInterfaces (
+                                              &ImageHandle,
+                                              &gEfiDebugMaskProtocolGuid,
+                                              &mDebugMaskProtocol,
+                                              NULL
+                                              );
 
   //
   // Attempt to retrieve the global debug print error level mask from the EFI Variable
@@ -170,7 +171,8 @@ DxeDebugPrintErrorLevelLibDestructor (
   //
   return SystemTable->BootServices->UninstallMultipleProtocolInterfaces (
                                       ImageHandle,
-                                      &gEfiDebugMaskProtocolGuid, &mDebugMaskProtocol,
+                                      &gEfiDebugMaskProtocolGuid,
+                                      &mDebugMaskProtocol,
                                       NULL
                                       );
 }
@@ -219,14 +221,14 @@ GetDebugPrintErrorLevel (
       // Attempt to retrieve the global debug print error level mask from the
       // EFI Variable
       //
-      Size = sizeof (GlobalErrorLevel);
+      Size   = sizeof (GlobalErrorLevel);
       Status = mSystemTable->RuntimeServices->GetVariable (
-                                       DEBUG_MASK_VARIABLE_NAME,
-                                       &gEfiGenericVariableGuid,
-                                       NULL,
-                                       &Size,
-                                       &GlobalErrorLevel
-                                       );
+                                                DEBUG_MASK_VARIABLE_NAME,
+                                                &gEfiGenericVariableGuid,
+                                                NULL,
+                                                &Size,
+                                                &GlobalErrorLevel
+                                                );
       if (Status != EFI_NOT_AVAILABLE_YET) {
         //
         // If EFI Variable Services are available, then set a flag so the EFI
@@ -248,7 +250,7 @@ GetDebugPrintErrorLevel (
         Hob = GetFirstGuidHob (&gEfiGenericVariableGuid);
         if (Hob != NULL) {
           if (GET_GUID_HOB_DATA_SIZE (Hob) == sizeof (UINT32)) {
-            mDebugPrintErrorLevel = *(UINT32 *)GET_GUID_HOB_DATA (Hob);
+            mDebugPrintErrorLevel        = *(UINT32 *)GET_GUID_HOB_DATA (Hob);
             mGlobalErrorLevelInitialized = TRUE;
           }
         }
@@ -296,25 +298,26 @@ SetDebugPrintErrorLevel (
       // Attempt to store the global debug print error level mask in an EFI Variable
       //
       GlobalErrorLevel = (UINTN)ErrorLevel;
-      Size = sizeof (GlobalErrorLevel);
-      Status = mSystemTable->RuntimeServices->SetVariable (
-                                       DEBUG_MASK_VARIABLE_NAME,
-                                       &gEfiGenericVariableGuid,
-                                       (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS),
-                                       Size,
-                                       &GlobalErrorLevel
-                                       );
+      Size             = sizeof (GlobalErrorLevel);
+      Status           = mSystemTable->RuntimeServices->SetVariable (
+                                                          DEBUG_MASK_VARIABLE_NAME,
+                                                          &gEfiGenericVariableGuid,
+                                                          (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS),
+                                                          Size,
+                                                          &GlobalErrorLevel
+                                                          );
       if (!EFI_ERROR (Status)) {
         //
         // If the EFI Variable was updated, then update the mask value for this
         // module and return TRUE.
         //
         mGlobalErrorLevelInitialized = TRUE;
-        mDebugPrintErrorLevel = ErrorLevel;
+        mDebugPrintErrorLevel        = ErrorLevel;
         return TRUE;
       }
     }
   }
+
   //
   // Return FALSE since the EFI Variable could not be updated.
   //

@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 InitializePciIoInstance (
-  IN PCI_IO_DEVICE               *PciIoDevice
+  IN PCI_IO_DEVICE  *PciIoDevice
   );
 
 /**
@@ -37,12 +37,12 @@ InitializePciIoInstance (
 **/
 EFI_STATUS
 PciIoVerifyBarAccess (
-  IN PCI_IO_DEVICE                   *PciIoDevice,
-  IN UINT8                           BarIndex,
-  IN PCI_BAR_TYPE                    Type,
-  IN IN EFI_PCI_IO_PROTOCOL_WIDTH    Width,
-  IN IN UINTN                        Count,
-  IN UINT64                          *Offset
+  IN PCI_IO_DEVICE                 *PciIoDevice,
+  IN UINT8                         BarIndex,
+  IN PCI_BAR_TYPE                  Type,
+  IN IN EFI_PCI_IO_PROTOCOL_WIDTH  Width,
+  IN IN UINTN                      Count,
+  IN UINT64                        *Offset
   );
 
 /**
@@ -347,13 +347,13 @@ PciIoConfigWrite (
 EFI_STATUS
 EFIAPI
 PciIoCopyMem (
-  IN EFI_PCI_IO_PROTOCOL              *This,
-  IN     EFI_PCI_IO_PROTOCOL_WIDTH    Width,
-  IN     UINT8                        DestBarIndex,
-  IN     UINT64                       DestOffset,
-  IN     UINT8                        SrcBarIndex,
-  IN     UINT64                       SrcOffset,
-  IN     UINTN                        Count
+  IN EFI_PCI_IO_PROTOCOL            *This,
+  IN     EFI_PCI_IO_PROTOCOL_WIDTH  Width,
+  IN     UINT8                      DestBarIndex,
+  IN     UINT64                     DestOffset,
+  IN     UINT8                      SrcBarIndex,
+  IN     UINT64                     SrcOffset,
+  IN     UINTN                      Count
   );
 
 /**
@@ -426,12 +426,12 @@ PciIoUnmap (
 EFI_STATUS
 EFIAPI
 PciIoAllocateBuffer (
-  IN  EFI_PCI_IO_PROTOCOL   *This,
-  IN  EFI_ALLOCATE_TYPE     Type,
-  IN  EFI_MEMORY_TYPE       MemoryType,
-  IN  UINTN                 Pages,
-  OUT VOID                  **HostAddress,
-  IN  UINT64                Attributes
+  IN  EFI_PCI_IO_PROTOCOL  *This,
+  IN  EFI_ALLOCATE_TYPE    Type,
+  IN  EFI_MEMORY_TYPE      MemoryType,
+  IN  UINTN                Pages,
+  OUT VOID                 **HostAddress,
+  IN  UINT64               Attributes
   );
 
 /**
@@ -449,9 +449,9 @@ PciIoAllocateBuffer (
 EFI_STATUS
 EFIAPI
 PciIoFreeBuffer (
-  IN  EFI_PCI_IO_PROTOCOL   *This,
-  IN  UINTN                 Pages,
-  IN  VOID                  *HostAddress
+  IN  EFI_PCI_IO_PROTOCOL  *This,
+  IN  UINTN                Pages,
+  IN  VOID                 *HostAddress
   );
 
 /**
@@ -508,9 +508,9 @@ PciIoGetLocation (
 **/
 BOOLEAN
 CheckBarType (
-  IN PCI_IO_DEVICE          *PciIoDevice,
-  IN UINT8                  BarIndex,
-  IN PCI_BAR_TYPE           BarType
+  IN PCI_IO_DEVICE  *PciIoDevice,
+  IN UINT8          BarIndex,
+  IN PCI_BAR_TYPE   BarType
   );
 
 /**
@@ -569,7 +569,7 @@ SupportPaletteSnoopAttributes (
 EFI_STATUS
 EFIAPI
 PciIoAttributes (
-  IN EFI_PCI_IO_PROTOCOL                       * This,
+  IN EFI_PCI_IO_PROTOCOL                       *This,
   IN  EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION  Operation,
   IN  UINT64                                   Attributes,
   OUT UINT64                                   *Result OPTIONAL
@@ -600,10 +600,10 @@ PciIoAttributes (
 EFI_STATUS
 EFIAPI
 PciIoGetBarAttributes (
-  IN EFI_PCI_IO_PROTOCOL             * This,
-  IN  UINT8                          BarIndex,
-  OUT UINT64                         *Supports, OPTIONAL
-  OUT VOID                           **Resources OPTIONAL
+  IN EFI_PCI_IO_PROTOCOL  *This,
+  IN  UINT8               BarIndex,
+  OUT UINT64              *Supports  OPTIONAL,
+  OUT VOID                **Resources OPTIONAL
   );
 
 /**
@@ -633,13 +633,12 @@ PciIoGetBarAttributes (
 EFI_STATUS
 EFIAPI
 PciIoSetBarAttributes (
-  IN EFI_PCI_IO_PROTOCOL              *This,
-  IN     UINT64                       Attributes,
-  IN     UINT8                        BarIndex,
-  IN OUT UINT64                       *Offset,
-  IN OUT UINT64                       *Length
+  IN EFI_PCI_IO_PROTOCOL  *This,
+  IN     UINT64           Attributes,
+  IN     UINT8            BarIndex,
+  IN OUT UINT64           *Offset,
+  IN OUT UINT64           *Length
   );
-
 
 /**
   Test whether two Pci devices has same parent bridge.
@@ -653,8 +652,8 @@ PciIoSetBarAttributes (
 **/
 BOOLEAN
 PciDevicesOnTheSamePath (
-  IN PCI_IO_DEVICE        *PciDevice1,
-  IN PCI_IO_DEVICE        *PciDevice2
+  IN PCI_IO_DEVICE  *PciDevice1,
+  IN PCI_IO_DEVICE  *PciDevice2
   );
 
 #endif

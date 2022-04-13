@@ -25,10 +25,10 @@
  * FASTBOOT_PLATFORM_PROTOCOL to implement the Android Fastboot protocol.
  */
 
-STATIC FASTBOOT_TRANSPORT_PROTOCOL *mTransport;
-STATIC FASTBOOT_PLATFORM_PROTOCOL  *mPlatform;
+STATIC FASTBOOT_TRANSPORT_PROTOCOL  *mTransport;
+STATIC FASTBOOT_PLATFORM_PROTOCOL   *mPlatform;
 
-STATIC EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *mTextOut;
+STATIC EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *mTextOut;
 
 typedef enum {
   ExpectCmdState,
@@ -36,45 +36,45 @@ typedef enum {
   FastbootStateMax
 } ANDROID_FASTBOOT_STATE;
 
-STATIC ANDROID_FASTBOOT_STATE mState = ExpectCmdState;
+STATIC ANDROID_FASTBOOT_STATE  mState = ExpectCmdState;
 
 // When in ExpectDataState, the number of bytes of data to expect:
-STATIC UINT64 mNumDataBytes;
+STATIC UINT64  mNumDataBytes;
 // .. and the number of bytes so far received this data phase
-STATIC UINT64 mBytesReceivedSoFar;
+STATIC UINT64  mBytesReceivedSoFar;
 // .. and the buffer to save data into
-STATIC UINT8 *mDataBuffer = NULL;
+STATIC UINT8  *mDataBuffer = NULL;
 
 // Event notify functions, from which gBS->Exit shouldn't be called, can signal
 // this event when the application should exit
-STATIC EFI_EVENT mFinishedEvent;
+STATIC EFI_EVENT  mFinishedEvent;
 
-STATIC EFI_EVENT mFatalSendErrorEvent;
+STATIC EFI_EVENT  mFatalSendErrorEvent;
 
 // This macro uses sizeof - only use it on arrays (i.e. string literals)
-#define SEND_LITERAL(Str) mTransport->Send (                  \
+#define SEND_LITERAL(Str)            mTransport->Send (       \
                                         sizeof (Str) - 1,     \
                                         Str,                  \
                                         &mFatalSendErrorEvent \
                                         )
-#define MATCH_CMD_LITERAL(Cmd, Buf) !AsciiStrnCmp (Cmd, Buf, sizeof (Cmd) - 1)
+#define MATCH_CMD_LITERAL(Cmd, Buf)  !AsciiStrnCmp (Cmd, Buf, sizeof (Cmd) - 1)
 
-#define IS_LOWERCASE_ASCII(Char) (Char >= 'a' && Char <= 'z')
+#define IS_LOWERCASE_ASCII(Char)  (Char >= 'a' && Char <= 'z')
 
-#define FASTBOOT_STRING_MAX_LENGTH  256
-#define FASTBOOT_COMMAND_MAX_LENGTH 64
+#define FASTBOOT_STRING_MAX_LENGTH   256
+#define FASTBOOT_COMMAND_MAX_LENGTH  64
 
 STATIC
 VOID
 HandleGetVar (
-  IN CHAR8 *CmdArg
+  IN CHAR8  *CmdArg
   )
 {
-  CHAR8      Response[FASTBOOT_COMMAND_MAX_LENGTH + 1] = "OKAY";
-  EFI_STATUS Status;
+  CHAR8       Response[FASTBOOT_COMMAND_MAX_LENGTH + 1] = "OKAY";
+  EFI_STATUS  Status;
 
   // Respond to getvar:version with 0.4 (version of Fastboot protocol)
-  if (!AsciiStrnCmp ("version", CmdArg, sizeof ("version") - 1 )) {
+  if (!AsciiStrnCmp ("version", CmdArg, sizeof ("version") - 1)) {
     SEND_LITERAL ("OKAY" ANDROID_FASTBOOT_VERSION);
   } else {
     // All other variables are assumed to be platform specific
@@ -90,11 +90,11 @@ HandleGetVar (
 STATIC
 VOID
 HandleDownload (
-  IN CHAR8 *NumBytesString
+  IN CHAR8  *NumBytesString
   )
 {
-  CHAR8       Response[13];
-  CHAR16      OutputString[FASTBOOT_STRING_MAX_LENGTH];
+  CHAR8   Response[13];
+  CHAR16  OutputString[FASTBOOT_STRING_MAX_LENGTH];
 
   // Argument is 8-character ASCII string hex representation of number of bytes
   // that will be sent in the data phase.
@@ -122,11 +122,15 @@ HandleDownload (
     SEND_LITERAL ("FAILNot enough memory");
   } else {
     ZeroMem (Response, sizeof Response);
-    AsciiSPrint (Response, sizeof Response, "DATA%x",
-      (UINT32)mNumDataBytes);
+    AsciiSPrint (
+      Response,
+      sizeof Response,
+      "DATA%x",
+      (UINT32)mNumDataBytes
+      );
     mTransport->Send (sizeof Response - 1, Response, &mFatalSendErrorEvent);
 
-    mState = ExpectDataState;
+    mState              = ExpectDataState;
     mBytesReceivedSoFar = 0;
   }
 }
@@ -134,7 +138,7 @@ HandleDownload (
 STATIC
 VOID
 HandleFlash (
-  IN CHAR8 *PartitionName
+  IN CHAR8  *PartitionName
   )
 {
   EFI_STATUS  Status;
@@ -161,7 +165,7 @@ HandleFlash (
   } else if (EFI_ERROR (Status)) {
     SEND_LITERAL ("FAILError flashing partition.");
     mTextOut->OutputString (mTextOut, L"Error flashing partition.\r\n");
-    DEBUG ((EFI_D_ERROR, "Couldn't flash image:  %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Couldn't flash image:  %r\n", Status));
   } else {
     mTextOut->OutputString (mTextOut, L"Done.\r\n");
     SEND_LITERAL ("OKAY");
@@ -171,7 +175,7 @@ HandleFlash (
 STATIC
 VOID
 HandleErase (
-  IN CHAR8 *PartitionName
+  IN CHAR8  *PartitionName
   )
 {
   EFI_STATUS  Status;
@@ -184,7 +188,7 @@ HandleErase (
   Status = mPlatform->ErasePartition (PartitionName);
   if (EFI_ERROR (Status)) {
     SEND_LITERAL ("FAILCheck device console.");
-    DEBUG ((EFI_D_ERROR, "Couldn't erase image:  %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Couldn't erase image:  %r\n", Status));
   } else {
     SEND_LITERAL ("OKAY");
   }
@@ -196,7 +200,7 @@ HandleBoot (
   VOID
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   mTextOut->OutputString (mTextOut, L"Booting downloaded image\r\n");
 
@@ -212,15 +216,16 @@ HandleBoot (
 
   Status = BootAndroidBootImg (mNumDataBytes, mDataBuffer);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Failed to boot downloaded image: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Failed to boot downloaded image: %r\n", Status));
   }
+
   // We shouldn't get here
 }
 
 STATIC
 VOID
 HandleOemCommand (
-  IN CHAR8 *Command
+  IN CHAR8  *Command
   )
 {
   EFI_STATUS  Status;
@@ -241,10 +246,10 @@ STATIC
 VOID
 AcceptCmd (
   IN        UINTN  Size,
-  IN  CONST CHAR8 *Data
+  IN  CONST CHAR8  *Data
   )
 {
-  CHAR8       Command[FASTBOOT_COMMAND_MAX_LENGTH + 1];
+  CHAR8  Command[FASTBOOT_COMMAND_MAX_LENGTH + 1];
 
   // Max command size is 64 bytes
   if (Size > FASTBOOT_COMMAND_MAX_LENGTH) {
@@ -282,17 +287,18 @@ AcceptCmd (
       // Here we just reboot normally.
       SEND_LITERAL ("INFOreboot-bootloader not supported, rebooting normally.");
     }
+
     SEND_LITERAL ("OKAY");
     gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
 
     // Shouldn't get here
-    DEBUG ((EFI_D_ERROR, "Fastboot: gRT->ResetSystem didn't work\n"));
+    DEBUG ((DEBUG_ERROR, "Fastboot: gRT->ResetSystem didn't work\n"));
   } else if (MATCH_CMD_LITERAL ("powerdown", Command)) {
     SEND_LITERAL ("OKAY");
     gRT->ResetSystem (EfiResetShutdown, EFI_SUCCESS, 0, NULL);
 
     // Shouldn't get here
-    DEBUG ((EFI_D_ERROR, "Fastboot: gRT->ResetSystem didn't work\n"));
+    DEBUG ((DEBUG_ERROR, "Fastboot: gRT->ResetSystem didn't work\n"));
   } else if (MATCH_CMD_LITERAL ("oem", Command)) {
     // The "oem" command isn't in the specification, but it was observed in the
     // wild, followed by a space, followed by the actual command.
@@ -313,12 +319,12 @@ STATIC
 VOID
 AcceptData (
   IN  UINTN  Size,
-  IN  VOID  *Data
+  IN  VOID   *Data
   )
 {
-  UINT32 RemainingBytes = mNumDataBytes - mBytesReceivedSoFar;
-  CHAR16 OutputString[FASTBOOT_STRING_MAX_LENGTH];
-  STATIC UINTN Count = 0;
+  UINT32        RemainingBytes = mNumDataBytes - mBytesReceivedSoFar;
+  CHAR16        OutputString[FASTBOOT_STRING_MAX_LENGTH];
+  STATIC UINTN  Count = 0;
 
   // Protocol doesn't say anything about sending extra data so just ignore it.
   if (Size > RemainingBytes) {
@@ -331,7 +337,7 @@ AcceptData (
 
   // Show download progress. Don't do it for every packet  as outputting text
   // might be time consuming - do it on the last packet and on every 32nd packet
-  if ((Count++ % 32) == 0 || Size == RemainingBytes) {
+  if (((Count++ % 32) == 0) || (Size == RemainingBytes)) {
     // (Note no newline in format string - it will overwrite the line each time)
     UnicodeSPrint (
       OutputString,
@@ -363,23 +369,24 @@ STATIC
 VOID
 DataReady (
   IN EFI_EVENT  Event,
-  IN VOID      *Context
+  IN VOID       *Context
   )
 {
   UINTN       Size;
-  VOID       *Data;
+  VOID        *Data;
   EFI_STATUS  Status;
 
   do {
     Status = mTransport->Receive (&Size, &Data);
     if (!EFI_ERROR (Status)) {
       if (mState == ExpectCmdState) {
-        AcceptCmd (Size, (CHAR8 *) Data);
+        AcceptCmd (Size, (CHAR8 *)Data);
       } else if (mState == ExpectDataState) {
         AcceptData (Size, Data);
       } else {
         ASSERT (FALSE);
       }
+
       FreePool (Data);
     }
   } while (!EFI_ERROR (Status));
@@ -401,7 +408,7 @@ STATIC
 VOID
 FatalErrorNotify (
   IN EFI_EVENT  Event,
-  IN VOID      *Context
+  IN VOID       *Context
   )
 {
   mTextOut->OutputString (mTextOut, L"Fatal error sending command response. Exiting.\r\n");
@@ -411,59 +418,61 @@ FatalErrorNotify (
 EFI_STATUS
 EFIAPI
 FastbootAppEntryPoint (
-  IN EFI_HANDLE                            ImageHandle,
-  IN EFI_SYSTEM_TABLE                      *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS                      Status;
   EFI_EVENT                       ReceiveEvent;
   EFI_EVENT                       WaitEventArray[2];
   UINTN                           EventIndex;
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL *TextIn;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *TextIn;
   EFI_INPUT_KEY                   Key;
 
   mDataBuffer = NULL;
 
   Status = gBS->LocateProtocol (
-    &gAndroidFastbootTransportProtocolGuid,
-    NULL,
-    (VOID **) &mTransport
-    );
+                  &gAndroidFastbootTransportProtocolGuid,
+                  NULL,
+                  (VOID **)&mTransport
+                  );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fastboot: Couldn't open Fastboot Transport Protocol: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Fastboot: Couldn't open Fastboot Transport Protocol: %r\n", Status));
     return Status;
   }
 
-  Status = gBS->LocateProtocol (&gAndroidFastbootPlatformProtocolGuid, NULL, (VOID **) &mPlatform);
+  Status = gBS->LocateProtocol (&gAndroidFastbootPlatformProtocolGuid, NULL, (VOID **)&mPlatform);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fastboot: Couldn't open Fastboot Platform Protocol: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Fastboot: Couldn't open Fastboot Platform Protocol: %r\n", Status));
     return Status;
   }
 
   Status = mPlatform->Init ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fastboot: Couldn't initialise Fastboot Platform Protocol: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Fastboot: Couldn't initialise Fastboot Platform Protocol: %r\n", Status));
     return Status;
   }
 
-  Status = gBS->LocateProtocol (&gEfiSimpleTextOutProtocolGuid, NULL, (VOID **) &mTextOut);
+  Status = gBS->LocateProtocol (&gEfiSimpleTextOutProtocolGuid, NULL, (VOID **)&mTextOut);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR,
-      "Fastboot: Couldn't open Text Output Protocol: %r\n", Status
+    DEBUG ((
+      DEBUG_ERROR,
+      "Fastboot: Couldn't open Text Output Protocol: %r\n",
+      Status
       ));
     return Status;
   }
 
-  Status = gBS->LocateProtocol (&gEfiSimpleTextInProtocolGuid, NULL, (VOID **) &TextIn);
+  Status = gBS->LocateProtocol (&gEfiSimpleTextInProtocolGuid, NULL, (VOID **)&TextIn);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fastboot: Couldn't open Text Input Protocol: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Fastboot: Couldn't open Text Input Protocol: %r\n", Status));
     return Status;
   }
 
   // Disable watchdog
   Status = gBS->SetWatchdogTimer (0, 0x10000, 0, NULL);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fastboot: Couldn't disable watchdog timer: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Fastboot: Couldn't disable watchdog timer: %r\n", Status));
   }
 
   // Create event for receipt of data from the host
@@ -483,27 +492,28 @@ FastbootAppEntryPoint (
   // Create event to pass to FASTBOOT_TRANSPORT_PROTOCOL.Send, signalling a
   // fatal error
   Status = gBS->CreateEvent (
-                 EVT_NOTIFY_SIGNAL,
-                 TPL_CALLBACK,
-                 FatalErrorNotify,
-                 NULL,
-                 &mFatalSendErrorEvent
-                 );
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  FatalErrorNotify,
+                  NULL,
+                  &mFatalSendErrorEvent
+                  );
   ASSERT_EFI_ERROR (Status);
-
 
   // Start listening for data
   Status = mTransport->Start (
-    ReceiveEvent
-    );
+                         ReceiveEvent
+                         );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fastboot: Couldn't start transport: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Fastboot: Couldn't start transport: %r\n", Status));
     return Status;
   }
 
   // Talk to the user
-  mTextOut->OutputString (mTextOut,
-      L"Android Fastboot mode - version " ANDROID_FASTBOOT_VERSION ". Press RETURN or SPACE key to quit.\r\n");
+  mTextOut->OutputString (
+              mTextOut,
+              L"Android Fastboot mode - version " ANDROID_FASTBOOT_VERSION ". Press RETURN or SPACE key to quit.\r\n"
+              );
 
   // Quit when the user presses any key, or mFinishedEvent is signalled
   WaitEventArray[0] = mFinishedEvent;
@@ -513,7 +523,8 @@ FastbootAppEntryPoint (
     Status = TextIn->ReadKeyStroke (gST->ConIn, &Key);
     if (Key.ScanCode == SCAN_NULL) {
       if ((Key.UnicodeChar == CHAR_CARRIAGE_RETURN) ||
-          (Key.UnicodeChar == L' ')) {
+          (Key.UnicodeChar == L' '))
+      {
         break;
       }
     }
@@ -521,8 +532,9 @@ FastbootAppEntryPoint (
 
   mTransport->Stop ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Warning: Fastboot Transport Stop: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Warning: Fastboot Transport Stop: %r\n", Status));
   }
+
   mPlatform->UnInit ();
 
   return EFI_SUCCESS;

@@ -9,21 +9,21 @@
 
 #include "ResetSystem.h"
 
-GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 *mResetTypeStr[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED CHAR16  *mResetTypeStr[] = {
   L"Cold", L"Warm", L"Shutdown", L"PlatformSpecific"
 };
 
-EFI_PEI_RESET2_PPI mPpiReset2 = {
+EFI_PEI_RESET2_PPI  mPpiReset2 = {
   ResetSystem2
 };
 
-EFI_GUID                *mProcessingOrder[] = {
+EFI_GUID  *mProcessingOrder[] = {
   &gEdkiiPlatformSpecificResetFilterPpiGuid,
   &gEdkiiPlatformSpecificResetNotificationPpiGuid,
   &gEdkiiPlatformSpecificResetHandlerPpiGuid
 };
 
-RESET_FILTER_INSTANCE   mResetFilter = {
+RESET_FILTER_INSTANCE  mResetFilter = {
   {
     RegisterResetNotify,
     UnregisterResetNotify
@@ -31,7 +31,7 @@ RESET_FILTER_INSTANCE   mResetFilter = {
   &gEdkiiPlatformSpecificResetFilterPpiGuid
 };
 
-RESET_FILTER_INSTANCE   mResetNotification = {
+RESET_FILTER_INSTANCE  mResetNotification = {
   {
     RegisterResetNotify,
     UnregisterResetNotify
@@ -39,7 +39,7 @@ RESET_FILTER_INSTANCE   mResetNotification = {
   &gEdkiiPlatformSpecificResetNotificationPpiGuid
 };
 
-RESET_FILTER_INSTANCE   mResetHandler = {
+RESET_FILTER_INSTANCE  mResetHandler = {
   {
     RegisterResetNotify,
     UnregisterResetNotify
@@ -47,7 +47,7 @@ RESET_FILTER_INSTANCE   mResetHandler = {
   &gEdkiiPlatformSpecificResetHandlerPpiGuid
 };
 
-EFI_PEI_PPI_DESCRIPTOR mPpiListReset[] = {
+EFI_PEI_PPI_DESCRIPTOR  mPpiListReset[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEfiPeiReset2PpiGuid,
@@ -94,24 +94,25 @@ EFI_PEI_PPI_DESCRIPTOR mPpiListReset[] = {
 EFI_STATUS
 EFIAPI
 RegisterResetNotify (
-  IN EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PPI *This,
-  IN EFI_RESET_SYSTEM                         ResetFunction
+  IN EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PPI  *This,
+  IN EFI_RESET_SYSTEM                          ResetFunction
   )
 {
-  RESET_FILTER_INSTANCE                       *ResetFilter;
-  RESET_FILTER_LIST                           *List;
-  VOID                                        *Hob;
-  UINTN                                       Index;
+  RESET_FILTER_INSTANCE  *ResetFilter;
+  RESET_FILTER_LIST      *List;
+  VOID                   *Hob;
+  UINTN                  Index;
 
   if (ResetFunction == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  ResetFilter = (RESET_FILTER_INSTANCE *) This;
-  ASSERT (CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetFilterPpiGuid) ||
-          CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetNotificationPpiGuid) ||
-          CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetHandlerPpiGuid)
-          );
+  ResetFilter = (RESET_FILTER_INSTANCE *)This;
+  ASSERT (
+    CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetFilterPpiGuid) ||
+    CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetNotificationPpiGuid) ||
+    CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetHandlerPpiGuid)
+    );
 
   Hob = GetFirstGuidHob (ResetFilter->Guid);
   if (Hob == NULL) {
@@ -125,6 +126,7 @@ RegisterResetNotify (
     if (List == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     List->Signature = RESET_FILTER_LIST_SIGNATURE;
     List->Count     = PcdGet32 (PcdMaximumPeiResetNotifies);
     ZeroMem (List->ResetFilters, sizeof (EFI_RESET_SYSTEM) * List->Count);
@@ -141,6 +143,7 @@ RegisterResetNotify (
         break;
       }
     }
+
     if (Index != List->Count) {
       return EFI_ALREADY_STARTED;
     }
@@ -157,6 +160,7 @@ RegisterResetNotify (
     if (Index == List->Count) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     List->ResetFilters[Index] = ResetFunction;
     return EFI_SUCCESS;
   }
@@ -180,25 +184,25 @@ RegisterResetNotify (
 EFI_STATUS
 EFIAPI
 UnregisterResetNotify (
-  IN EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PPI *This,
-  IN EFI_RESET_SYSTEM                         ResetFunction
+  IN EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PPI  *This,
+  IN EFI_RESET_SYSTEM                          ResetFunction
   )
 {
-
-  RESET_FILTER_INSTANCE                       *ResetFilter;
-  RESET_FILTER_LIST                           *List;
-  VOID                                        *Hob;
-  UINTN                                       Index;
+  RESET_FILTER_INSTANCE  *ResetFilter;
+  RESET_FILTER_LIST      *List;
+  VOID                   *Hob;
+  UINTN                  Index;
 
   if (ResetFunction == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   ResetFilter = (RESET_FILTER_INSTANCE *)This;
-  ASSERT (CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetFilterPpiGuid) ||
+  ASSERT (
+    CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetFilterPpiGuid) ||
     CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetNotificationPpiGuid) ||
     CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetHandlerPpiGuid)
-  );
+    );
 
   Hob = GetFirstGuidHob (ResetFilter->Guid);
   if (Hob == NULL) {
@@ -220,7 +224,6 @@ UnregisterResetNotify (
   List->ResetFilters[Index] = NULL;
   return EFI_SUCCESS;
 }
-
 
 /**
   The PEIM's entry point.
@@ -273,29 +276,30 @@ InitializeResetSystem (
 VOID
 EFIAPI
 ResetSystem2 (
-  IN EFI_RESET_TYPE   ResetType,
-  IN EFI_STATUS       ResetStatus,
-  IN UINTN            DataSize,
-  IN VOID             *ResetData OPTIONAL
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
   )
 {
-  VOID                *Hob;
-  UINTN               Index;
-  RESET_FILTER_LIST   *List;
-  UINTN               OrderIndex;
-  UINT8               RecursionDepth;
-  UINT8               *RecursionDepthPointer;
+  VOID               *Hob;
+  UINTN              Index;
+  RESET_FILTER_LIST  *List;
+  UINTN              OrderIndex;
+  UINT8              RecursionDepth;
+  UINT8              *RecursionDepthPointer;
 
   //
   // The recursion depth is stored in GUIDed HOB using gEfiCallerIdGuid.
   //
   Hob = GetFirstGuidHob (&gEfiCallerIdGuid);
   if (Hob == NULL) {
-    RecursionDepth = 0;
+    RecursionDepth        = 0;
     RecursionDepthPointer = BuildGuidDataHob (&gEfiCallerIdGuid, &RecursionDepth, sizeof (RecursionDepth));
   } else {
     RecursionDepthPointer = (UINT8 *)GET_GUID_HOB_DATA (Hob);
   }
+
   //
   // Only do REPORT_STATUS_CODE() on first call to ResetSystem()
   //
@@ -324,7 +328,7 @@ ResetSystem2 (
 
         for (Index = 0; Index < List->Count; Index++) {
           if (List->ResetFilters[Index] != NULL) {
-            List->ResetFilters[Index] (ResetType, ResetStatus, DataSize, ResetData);
+            List->ResetFilters[Index](ResetType, ResetStatus, DataSize, ResetData);
           }
         }
       }
@@ -335,24 +339,24 @@ ResetSystem2 (
   }
 
   switch (ResetType) {
-  case EfiResetWarm:
-    ResetWarm ();
-    break;
+    case EfiResetWarm:
+      ResetWarm ();
+      break;
 
- case EfiResetCold:
-    ResetCold ();
-    break;
+    case EfiResetCold:
+      ResetCold ();
+      break;
 
-  case EfiResetShutdown:
-    ResetShutdown ();
-    return ;
+    case EfiResetShutdown:
+      ResetShutdown ();
+      return;
 
-  case EfiResetPlatformSpecific:
-    ResetPlatformSpecific (DataSize, ResetData);
-    return;
+    case EfiResetPlatformSpecific:
+      ResetPlatformSpecific (DataSize, ResetData);
+      return;
 
-  default:
-    return ;
+    default:
+      return;
   }
 
   //

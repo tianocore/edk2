@@ -23,7 +23,6 @@
 
 #include "SmbiosMisc.h"
 
-
 /**
   This function makes boot time changes to the contents of the
   MiscBaseBoardManufacturer (Type 2) record.
@@ -36,35 +35,34 @@
   @retval EFI_OUT_OF_RESOURCES       Failed to allocate required memory.
 
 **/
-SMBIOS_MISC_TABLE_FUNCTION(MiscBaseBoardManufacturer)
-{
-  CHAR8                             *OptionalStrStart;
-  CHAR8                             *StrStart;
-  UINTN                             RecordLength;
-  UINTN                             ManuStrLen;
-  UINTN                             ProductNameStrLen;
-  UINTN                             VerStrLen;
-  UINTN                             SerialNumStrLen;
-  UINTN                             AssetTagStrLen;
-  UINTN                             ChassisLocaStrLen;
-  UINTN                             HandleCount;
-  UINT16                            *HandleArray;
-  CHAR16                            *BaseBoardManufacturer;
-  CHAR16                            *BaseBoardProductName;
-  CHAR16                            *Version;
-  EFI_STRING                        SerialNumber;
-  EFI_STRING                        AssetTag;
-  EFI_STRING                        ChassisLocation;
-  EFI_STRING_ID                     TokenToGet;
-  SMBIOS_TABLE_TYPE2                *SmbiosRecord;
-  SMBIOS_TABLE_TYPE2                *InputData;
-  EFI_STATUS                        Status;
+SMBIOS_MISC_TABLE_FUNCTION (MiscBaseBoardManufacturer) {
+  CHAR8               *OptionalStrStart;
+  CHAR8               *StrStart;
+  UINTN               RecordLength;
+  UINTN               ManuStrLen;
+  UINTN               ProductNameStrLen;
+  UINTN               VerStrLen;
+  UINTN               SerialNumStrLen;
+  UINTN               AssetTagStrLen;
+  UINTN               ChassisLocaStrLen;
+  UINTN               HandleCount;
+  UINT16              *HandleArray;
+  CHAR16              *BaseBoardManufacturer;
+  CHAR16              *BaseBoardProductName;
+  CHAR16              *Version;
+  EFI_STRING          SerialNumber;
+  EFI_STRING          AssetTag;
+  EFI_STRING          ChassisLocation;
+  EFI_STRING_ID       TokenToGet;
+  SMBIOS_TABLE_TYPE2  *SmbiosRecord;
+  SMBIOS_TABLE_TYPE2  *InputData;
+  EFI_STATUS          Status;
 
-  EFI_STRING_ID                     TokenToUpdate;
+  EFI_STRING_ID  TokenToUpdate;
 
   HandleCount = 0;
   HandleArray = NULL;
-  InputData = NULL;
+  InputData   = NULL;
 
   //
   // First check for invalid parameters.
@@ -73,73 +71,97 @@ SMBIOS_MISC_TABLE_FUNCTION(MiscBaseBoardManufacturer)
     return EFI_INVALID_PARAMETER;
   }
 
-  InputData = (SMBIOS_TABLE_TYPE2*)RecordData;
+  InputData = (SMBIOS_TABLE_TYPE2 *)RecordData;
 
-  BaseBoardManufacturer = (CHAR16 *) PcdGetPtr (PcdBaseBoardManufacturer);
+  BaseBoardManufacturer = (CHAR16 *)PcdGetPtr (PcdBaseBoardManufacturer);
   if (StrLen (BaseBoardManufacturer) > 0) {
     TokenToUpdate = STRING_TOKEN (STR_MISC_BASE_BOARD_MANUFACTURER);
     HiiSetString (mSmbiosMiscHiiHandle, TokenToUpdate, BaseBoardManufacturer, NULL);
+  } else {
+    OemUpdateSmbiosInfo (
+      mSmbiosMiscHiiHandle,
+      STRING_TOKEN (STR_MISC_BASE_BOARD_MANUFACTURER),
+      BoardManufacturerType02
+      );
   }
 
-  BaseBoardProductName = (CHAR16 *) PcdGetPtr (PcdBaseBoardProductName);
+  BaseBoardProductName = (CHAR16 *)PcdGetPtr (PcdBaseBoardProductName);
   if (StrLen (BaseBoardProductName) > 0) {
     TokenToUpdate = STRING_TOKEN (STR_MISC_BASE_BOARD_PRODUCT_NAME);
     HiiSetString (mSmbiosMiscHiiHandle, TokenToUpdate, BaseBoardProductName, NULL);
+  } else {
+    OemUpdateSmbiosInfo (
+      mSmbiosMiscHiiHandle,
+      STRING_TOKEN (STR_MISC_BASE_BOARD_PRODUCT_NAME),
+      ProductNameType02
+      );
   }
 
-  Version = (CHAR16 *) PcdGetPtr (PcdBaseBoardVersion);
+  Version = (CHAR16 *)PcdGetPtr (PcdBaseBoardVersion);
   if (StrLen (Version) > 0) {
     TokenToUpdate = STRING_TOKEN (STR_MISC_BASE_BOARD_VERSION);
     HiiSetString (mSmbiosMiscHiiHandle, TokenToUpdate, Version, NULL);
+  } else {
+    OemUpdateSmbiosInfo (
+      mSmbiosMiscHiiHandle,
+      STRING_TOKEN (STR_MISC_BASE_BOARD_VERSION),
+      VersionType02
+      );
   }
 
-  OemUpdateSmbiosInfo (mSmbiosMiscHiiHandle,
+  OemUpdateSmbiosInfo (
+    mSmbiosMiscHiiHandle,
     STRING_TOKEN (STR_MISC_BASE_BOARD_ASSET_TAG),
     AssertTagType02
     );
-  OemUpdateSmbiosInfo (mSmbiosMiscHiiHandle,
+  OemUpdateSmbiosInfo (
+    mSmbiosMiscHiiHandle,
     STRING_TOKEN (STR_MISC_BASE_BOARD_SERIAL_NUMBER),
     SerialNumberType02
     );
-  OemUpdateSmbiosInfo (mSmbiosMiscHiiHandle,
+  OemUpdateSmbiosInfo (
+    mSmbiosMiscHiiHandle,
     STRING_TOKEN (STR_MISC_BASE_BOARD_MANUFACTURER),
     BoardManufacturerType02
     );
-  OemUpdateSmbiosInfo (mSmbiosMiscHiiHandle,
+  OemUpdateSmbiosInfo (
+    mSmbiosMiscHiiHandle,
     STRING_TOKEN (STR_MISC_BASE_BOARD_SERIAL_NUMBER),
     SerialNumberType02
     );
-  OemUpdateSmbiosInfo (mSmbiosMiscHiiHandle,
+  OemUpdateSmbiosInfo (
+    mSmbiosMiscHiiHandle,
     STRING_TOKEN (STR_MISC_BASE_BOARD_SKU_NUMBER),
     SerialNumberType02
     );
-  OemUpdateSmbiosInfo (mSmbiosMiscHiiHandle,
+  OemUpdateSmbiosInfo (
+    mSmbiosMiscHiiHandle,
     STRING_TOKEN (STR_MISC_BASE_BOARD_CHASSIS_LOCATION),
     ChassisLocationType02
     );
 
-  TokenToGet = STRING_TOKEN (STR_MISC_BASE_BOARD_MANUFACTURER);
+  TokenToGet            = STRING_TOKEN (STR_MISC_BASE_BOARD_MANUFACTURER);
   BaseBoardManufacturer = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
-  ManuStrLen = StrLen (BaseBoardManufacturer);
+  ManuStrLen            = StrLen (BaseBoardManufacturer);
 
-  TokenToGet = STRING_TOKEN (STR_MISC_BASE_BOARD_PRODUCT_NAME);
+  TokenToGet           = STRING_TOKEN (STR_MISC_BASE_BOARD_PRODUCT_NAME);
   BaseBoardProductName = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
-  ProductNameStrLen = StrLen (BaseBoardProductName);
+  ProductNameStrLen    = StrLen (BaseBoardProductName);
 
   TokenToGet = STRING_TOKEN (STR_MISC_BASE_BOARD_VERSION);
-  Version = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
-  VerStrLen = StrLen (Version);
+  Version    = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
+  VerStrLen  = StrLen (Version);
 
-  TokenToGet = STRING_TOKEN (STR_MISC_BASE_BOARD_SERIAL_NUMBER);
-  SerialNumber = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
+  TokenToGet      = STRING_TOKEN (STR_MISC_BASE_BOARD_SERIAL_NUMBER);
+  SerialNumber    = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
   SerialNumStrLen = StrLen (SerialNumber);
 
-  TokenToGet = STRING_TOKEN (STR_MISC_BASE_BOARD_ASSET_TAG);
-  AssetTag = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
+  TokenToGet     = STRING_TOKEN (STR_MISC_BASE_BOARD_ASSET_TAG);
+  AssetTag       = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
   AssetTagStrLen = StrLen (AssetTag);
 
-  TokenToGet = STRING_TOKEN (STR_MISC_BASE_BOARD_CHASSIS_LOCATION);
-  ChassisLocation = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
+  TokenToGet        = STRING_TOKEN (STR_MISC_BASE_BOARD_CHASSIS_LOCATION);
+  ChassisLocation   = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
   ChassisLocaStrLen = StrLen (ChassisLocation);
 
   //
@@ -159,14 +181,17 @@ SMBIOS_MISC_TABLE_FUNCTION(MiscBaseBoardManufacturer)
   }
 
   (VOID)CopyMem (SmbiosRecord, InputData, sizeof (SMBIOS_TABLE_TYPE2));
-  SmbiosRecord->Hdr.Length        = sizeof (SMBIOS_TABLE_TYPE2);
+  SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE2);
 
   //
   //  Update Contained objects Handle
   //
   SmbiosRecord->NumberOfContainedObjectHandles = 0;
-  SmbiosMiscGetLinkTypeHandle (EFI_SMBIOS_TYPE_SYSTEM_ENCLOSURE, &HandleArray,
-                               &HandleCount);
+  SmbiosMiscGetLinkTypeHandle (
+    EFI_SMBIOS_TYPE_SYSTEM_ENCLOSURE,
+    &HandleArray,
+    &HandleCount
+    );
   // It's assumed there's at most a single chassis
   ASSERT (HandleCount < 2);
   if (HandleCount > 0) {
@@ -195,8 +220,13 @@ SMBIOS_MISC_TABLE_FUNCTION(MiscBaseBoardManufacturer)
 
   Status = SmbiosMiscAddRecord ((UINT8 *)SmbiosRecord, NULL);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "[%a]:[%dL] Smbios Type02 Table Log Failed! %r \n",
-            __FUNCTION__, __LINE__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "[%a]:[%dL] Smbios Type02 Table Log Failed! %r \n",
+      __FUNCTION__,
+      DEBUG_LINE_NUMBER,
+      Status
+      ));
   }
 
   FreePool (SmbiosRecord);

@@ -42,7 +42,7 @@ EFIAPI
 CheckFmpDependency (
   IN  EFI_GUID                ImageTypeId,
   IN  UINT32                  Version,
-  IN  EFI_FIRMWARE_IMAGE_DEP  *Dependencies,    OPTIONAL
+  IN  EFI_FIRMWARE_IMAGE_DEP  *Dependencies     OPTIONAL,
   IN  UINT32                  DependenciesSize,
   OUT UINT32                  *LastAttemptStatus OPTIONAL
   )
@@ -64,82 +64,82 @@ CheckFmpDependency (
   UINTN                             FmpVersionsCount;
   BOOLEAN                           IsSatisfied;
 
-  LocalLastAttemptStatus  = LAST_ATTEMPT_STATUS_SUCCESS;
-  FmpImageInfoBuf         = NULL;
-  DescriptorVer           = NULL;
-  DescriptorSize          = NULL;
-  NumberOfFmpInstance     = 0;
-  FmpVersions             = NULL;
-  FmpVersionsCount        = 0;
-  IsSatisfied             = TRUE;
-  PackageVersionName      = NULL;
+  LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
+  FmpImageInfoBuf        = NULL;
+  DescriptorVer          = NULL;
+  DescriptorSize         = NULL;
+  NumberOfFmpInstance    = 0;
+  FmpVersions            = NULL;
+  FmpVersionsCount       = 0;
+  IsSatisfied            = TRUE;
+  PackageVersionName     = NULL;
 
   //
   // Get ImageDescriptors of all FMP instances, and archive them for dependency evaluation.
   //
   Status = gBS->LocateHandleBuffer (
-                ByProtocol,
-                &gEfiFirmwareManagementProtocolGuid,
-                NULL,
-                &NumberOfFmpInstance,
-                &HandleBuffer
-                );
+                  ByProtocol,
+                  &gEfiFirmwareManagementProtocolGuid,
+                  NULL,
+                  &NumberOfFmpInstance,
+                  &HandleBuffer
+                  );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "CheckFmpDependency: Get Firmware Management Protocol failed. (%r)", Status));
-    IsSatisfied = FALSE;
+    IsSatisfied            = FALSE;
     LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DEPENDENCY_CHECK_LIB_ERROR_FMP_PROTOCOL_NOT_FOUND;
     goto cleanup;
   }
 
-  FmpImageInfoBuf = AllocateZeroPool (sizeof(EFI_FIRMWARE_IMAGE_DESCRIPTOR *) * NumberOfFmpInstance);
+  FmpImageInfoBuf = AllocateZeroPool (sizeof (EFI_FIRMWARE_IMAGE_DESCRIPTOR *) * NumberOfFmpInstance);
   if (FmpImageInfoBuf == NULL) {
-    IsSatisfied = FALSE;
+    IsSatisfied            = FALSE;
     LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DEPENDENCY_CHECK_LIB_ERROR_MEM_ALLOC_FMP_INFO_BUFFER_FAILED;
     goto cleanup;
   }
 
-  DescriptorVer = AllocateZeroPool (sizeof(UINT32) * NumberOfFmpInstance);
+  DescriptorVer = AllocateZeroPool (sizeof (UINT32) * NumberOfFmpInstance);
   if (DescriptorVer == NULL ) {
-    IsSatisfied = FALSE;
+    IsSatisfied            = FALSE;
     LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DEPENDENCY_CHECK_LIB_ERROR_MEM_ALLOC_DESC_VER_BUFFER_FAILED;
     goto cleanup;
   }
 
-  DescriptorSize = AllocateZeroPool (sizeof(UINTN) * NumberOfFmpInstance);
+  DescriptorSize = AllocateZeroPool (sizeof (UINTN) * NumberOfFmpInstance);
   if (DescriptorSize == NULL ) {
-    IsSatisfied = FALSE;
+    IsSatisfied            = FALSE;
     LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DEPENDENCY_CHECK_LIB_ERROR_MEM_ALLOC_DESC_SIZE_BUFFER_FAILED;
     goto cleanup;
   }
 
-  FmpVersions = AllocateZeroPool (sizeof(FMP_DEPEX_CHECK_VERSION_DATA) * NumberOfFmpInstance);
+  FmpVersions = AllocateZeroPool (sizeof (FMP_DEPEX_CHECK_VERSION_DATA) * NumberOfFmpInstance);
   if (FmpVersions == NULL) {
-    IsSatisfied = FALSE;
+    IsSatisfied            = FALSE;
     LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DEPENDENCY_CHECK_LIB_ERROR_MEM_ALLOC_FMP_VER_BUFFER_FAILED;
     goto cleanup;
   }
 
-  for (Index = 0; Index < NumberOfFmpInstance; Index ++) {
+  for (Index = 0; Index < NumberOfFmpInstance; Index++) {
     Status = gBS->HandleProtocol (
                     HandleBuffer[Index],
                     &gEfiFirmwareManagementProtocolGuid,
-                    (VOID **) &Fmp
+                    (VOID **)&Fmp
                     );
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       continue;
     }
 
     ImageInfoSize = 0;
-    Status = Fmp->GetImageInfo (
-                    Fmp,
-                    &ImageInfoSize,
-                    NULL,
-                    NULL,
-                    NULL,
-                    NULL,
-                    NULL,
-                    NULL
-                    );
+    Status        = Fmp->GetImageInfo (
+                           Fmp,
+                           &ImageInfoSize,
+                           NULL,
+                           NULL,
+                           NULL,
+                           NULL,
+                           NULL,
+                           NULL
+                           );
     if (Status != EFI_BUFFER_TOO_SMALL) {
       continue;
     }
@@ -159,7 +159,7 @@ CheckFmpDependency (
                     &PackageVersion,              // PackageVersion
                     &PackageVersionName           // PackageVersionName
                     );
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       FreePool (FmpImageInfoBuf[Index]);
       FmpImageInfoBuf[Index] = NULL;
       continue;
@@ -172,7 +172,7 @@ CheckFmpDependency (
 
     CopyGuid (&FmpVersions[FmpVersionsCount].ImageTypeId, &FmpImageInfoBuf[Index]->ImageTypeId);
     FmpVersions[FmpVersionsCount].Version = FmpImageInfoBuf[Index]->Version;
-    FmpVersionsCount ++;
+    FmpVersionsCount++;
   }
 
   //
@@ -189,11 +189,12 @@ CheckFmpDependency (
 
 cleanup:
   if (FmpImageInfoBuf != NULL) {
-    for (Index = 0; Index < NumberOfFmpInstance; Index ++) {
+    for (Index = 0; Index < NumberOfFmpInstance; Index++) {
       if (FmpImageInfoBuf[Index] != NULL) {
         FreePool (FmpImageInfoBuf[Index]);
       }
     }
+
     FreePool (FmpImageInfoBuf);
   }
 

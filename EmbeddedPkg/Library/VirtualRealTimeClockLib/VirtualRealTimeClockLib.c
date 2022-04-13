@@ -4,7 +4,7 @@
  *
  *  Coypright (c) 2019, Pete Batard <pete@akeo.ie>
  *  Copyright (c) 2018, Andrei Warkentin <andrey.warkentin@gmail.com>
- *  Copyright (c) 2011-2014, ARM Ltd. All rights reserved.
+ *  Copyright (c) 2011-2021, ARM Ltd. All rights reserved.
  *  Copyright (c) 2008-2010, Apple Inc. All rights reserved.
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *
@@ -23,9 +23,9 @@
 #include <Library/TimeBaseLib.h>
 #include <Library/UefiRuntimeLib.h>
 
-STATIC CONST CHAR16  mEpochVariableName[]     = L"RtcEpochSeconds";
-STATIC CONST CHAR16  mTimeZoneVariableName[]  = L"RtcTimeZone";
-STATIC CONST CHAR16  mDaylightVariableName[]  = L"RtcDaylight";
+STATIC CONST CHAR16  mEpochVariableName[]    = L"RtcEpochSeconds";
+STATIC CONST CHAR16  mTimeZoneVariableName[] = L"RtcTimeZone";
+STATIC CONST CHAR16  mDaylightVariableName[] = L"RtcDaylight";
 
 /**
    Returns the current time and date information, and the time-keeping capabilities
@@ -67,19 +67,19 @@ LibGetTime (
   }
 
   // Get the epoch time from non-volatile storage
-  Size = sizeof (UINTN);
+  Size         = sizeof (UINTN);
   EpochSeconds = 0;
-  Status = EfiGetVariable (
-             (CHAR16 *)mEpochVariableName,
-             &gEfiCallerIdGuid,
-             NULL,
-             &Size,
-             (VOID *)&EpochSeconds
-             );
+  Status       = EfiGetVariable (
+                   (CHAR16 *)mEpochVariableName,
+                   &gEfiCallerIdGuid,
+                   NULL,
+                   &Size,
+                   (VOID *)&EpochSeconds
+                   );
   // Fall back to compilation-time epoch if not set
   if (EFI_ERROR (Status)) {
-    ASSERT(Status != EFI_INVALID_PARAMETER);
-    ASSERT(Status != EFI_BUFFER_TOO_SMALL);
+    ASSERT (Status != EFI_INVALID_PARAMETER);
+    ASSERT (Status != EFI_BUFFER_TOO_SMALL);
     //
     // The following is intended to produce a compilation error on build
     // environments where BUILD_EPOCH can not be set from inline shell.
@@ -96,16 +96,17 @@ LibGetTime (
     EfiSetVariable (
       (CHAR16 *)mEpochVariableName,
       &gEfiCallerIdGuid,
-      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
       sizeof (EpochSeconds),
       &EpochSeconds
       );
   }
-  Counter = GetPerformanceCounter ();
+
+  Counter       = GetPerformanceCounter ();
   EpochSeconds += DivU64x64Remainder (Counter, Freq, &Remainder);
 
   // Get the current time zone information from non-volatile storage
-  Size = sizeof (TimeZone);
+  Size   = sizeof (TimeZone);
   Status = EfiGetVariable (
              (CHAR16 *)mTimeZoneVariableName,
              &gEfiCallerIdGuid,
@@ -115,8 +116,8 @@ LibGetTime (
              );
 
   if (EFI_ERROR (Status)) {
-    ASSERT(Status != EFI_INVALID_PARAMETER);
-    ASSERT(Status != EFI_BUFFER_TOO_SMALL);
+    ASSERT (Status != EFI_INVALID_PARAMETER);
+    ASSERT (Status != EFI_BUFFER_TOO_SMALL);
 
     if (Status != EFI_NOT_FOUND) {
       return Status;
@@ -146,8 +147,9 @@ LibGetTime (
     Time->TimeZone = TimeZone;
 
     // Check TimeZone bounds: -1440 to 1440 or 2047
-    if (((Time->TimeZone < -1440) || (Time->TimeZone > 1440))
-        && (Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE)) {
+    if (  ((Time->TimeZone < -1440) || (Time->TimeZone > 1440))
+       && (Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE))
+    {
       Time->TimeZone = EFI_UNSPECIFIED_TIMEZONE;
     }
 
@@ -158,18 +160,18 @@ LibGetTime (
   }
 
   // Get the current daylight information from non-volatile storage
-  Size = sizeof (Daylight);
+  Size   = sizeof (Daylight);
   Status = EfiGetVariable (
              (CHAR16 *)mDaylightVariableName,
              &gEfiCallerIdGuid,
              NULL,
              &Size,
              (VOID *)&Daylight
-           );
+             );
 
   if (EFI_ERROR (Status)) {
-    ASSERT(Status != EFI_INVALID_PARAMETER);
-    ASSERT(Status != EFI_BUFFER_TOO_SMALL);
+    ASSERT (Status != EFI_INVALID_PARAMETER);
+    ASSERT (Status != EFI_BUFFER_TOO_SMALL);
 
     if (Status != EFI_NOT_FOUND) {
       return Status;
@@ -253,14 +255,16 @@ LibSetTime (
   EpochSeconds = EfiTimeToEpoch (Time);
 
   // Adjust for the correct time zone, i.e. convert to UTC time zone
-  if ((Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE)
-      && (EpochSeconds > Time->TimeZone * SEC_PER_MIN)) {
+  if (  (Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE)
+     && (EpochSeconds > Time->TimeZone * SEC_PER_MIN))
+  {
     EpochSeconds -= Time->TimeZone * SEC_PER_MIN;
   }
 
   // Adjust for the correct period
-  if (((Time->Daylight & EFI_TIME_IN_DAYLIGHT) == EFI_TIME_IN_DAYLIGHT)
-      && (EpochSeconds > SEC_PER_HOUR)) {
+  if (  ((Time->Daylight & EFI_TIME_IN_DAYLIGHT) == EFI_TIME_IN_DAYLIGHT)
+     && (EpochSeconds > SEC_PER_HOUR))
+  {
     // Convert to un-adjusted time, i.e. fall back one hour
     EpochSeconds -= SEC_PER_HOUR;
   }
@@ -300,9 +304,9 @@ LibSetTime (
              (CHAR16 *)mDaylightVariableName,
              &gEfiCallerIdGuid,
              EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-             sizeof(Time->Daylight),
+             sizeof (Time->Daylight),
              (VOID *)&(Time->Daylight)
-           );
+             );
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
@@ -324,7 +328,7 @@ LibSetTime (
     DEBUG ((
       DEBUG_ERROR,
       "LibSetTime: Failed to save %s variable to non-volatile storage, Status = %r\n",
-      mDaylightVariableName,
+      mEpochVariableName,
       Status
       ));
     return Status;

@@ -20,29 +20,29 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/SmmUsbDispatch2.h>
 
 typedef struct {
-  UINT32                       Signature;
-  UINT32                       Length;
-  UINT32                       Revision;
-  UINT8                        Reserved[4];
+  UINT32    Signature;
+  UINT32    Length;
+  UINT32    Revision;
+  UINT8     Reserved[4];
 } SMM_CORE_DATABASE_COMMON_HEADER;
 
-#define SMM_CORE_IMAGE_DATABASE_SIGNATURE SIGNATURE_32 ('S','C','I','D')
-#define SMM_CORE_IMAGE_DATABASE_REVISION  0x0001
+#define SMM_CORE_IMAGE_DATABASE_SIGNATURE  SIGNATURE_32 ('S','C','I','D')
+#define SMM_CORE_IMAGE_DATABASE_REVISION   0x0001
 
 typedef struct {
-  SMM_CORE_DATABASE_COMMON_HEADER     Header;
-  EFI_GUID                            FileGuid;
-  PHYSICAL_ADDRESS                    EntryPoint;
-  PHYSICAL_ADDRESS                    ImageBase;
-  UINT64                              ImageSize;
-  UINT32                              ImageRef;
-  UINT16                              PdbStringOffset;
-  UINT8                               Reserved[2];
-//CHAR8                               PdbString[];
+  SMM_CORE_DATABASE_COMMON_HEADER    Header;
+  EFI_GUID                           FileGuid;
+  PHYSICAL_ADDRESS                   EntryPoint;
+  PHYSICAL_ADDRESS                   ImageBase;
+  UINT64                             ImageSize;
+  UINT32                             ImageRef;
+  UINT16                             PdbStringOffset;
+  UINT8                              Reserved[2];
+  // CHAR8                               PdbString[];
 } SMM_CORE_IMAGE_DATABASE_STRUCTURE;
 
-#define SMM_CORE_SMI_DATABASE_SIGNATURE SIGNATURE_32 ('S','C','S','D')
-#define SMM_CORE_SMI_DATABASE_REVISION  0x0001
+#define SMM_CORE_SMI_DATABASE_SIGNATURE  SIGNATURE_32 ('S','C','S','D')
+#define SMM_CORE_SMI_DATABASE_REVISION   0x0001
 
 typedef enum {
   SmmCoreSmiHandlerCategoryRootHandler,
@@ -68,32 +68,32 @@ typedef enum {
 //   Other:                                     GUID specific
 
 typedef struct {
-  EFI_USB_SMI_TYPE          Type;
-  UINT32                    DevicePathSize;
-//UINT8                     DevicePath[DevicePathSize];
+  EFI_USB_SMI_TYPE    Type;
+  UINT32              DevicePathSize;
+  // UINT8                     DevicePath[DevicePathSize];
 } SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT;
 
 typedef struct {
-  UINT64                    SwSmiInputValue;
+  UINT64    SwSmiInputValue;
 } SMI_HANDLER_PROFILE_SW_REGISTER_CONTEXT;
 
 typedef struct {
-  UINT32                Length;
-  UINT32                ImageRef;
-  PHYSICAL_ADDRESS      CallerAddr;
-  PHYSICAL_ADDRESS      Handler;
-  UINT16                ContextBufferOffset;
-  UINT8                 Reserved[2];
-  UINT32                ContextBufferSize;
-//UINT8                 ContextBuffer[];
+  UINT32              Length;
+  UINT32              ImageRef;
+  PHYSICAL_ADDRESS    CallerAddr;
+  PHYSICAL_ADDRESS    Handler;
+  UINT16              ContextBufferOffset;
+  UINT8               Reserved[2];
+  UINT32              ContextBufferSize;
+  // UINT8                 ContextBuffer[];
 } SMM_CORE_SMI_HANDLER_STRUCTURE;
 
 typedef struct {
-  SMM_CORE_DATABASE_COMMON_HEADER     Header;
-  EFI_GUID                            HandlerType;
-  UINT32                              HandlerCategory;
-  UINT32                              HandlerCount;
-//SMM_CORE_SMI_HANDLER_STRUCTURE      Handler[HandlerCount];
+  SMM_CORE_DATABASE_COMMON_HEADER    Header;
+  EFI_GUID                           HandlerType;
+  UINT32                             HandlerCategory;
+  UINT32                             HandlerCount;
+  // SMM_CORE_SMI_HANDLER_STRUCTURE      Handler[HandlerCount];
 } SMM_CORE_SMI_DATABASE_STRUCTURE;
 
 //
@@ -105,18 +105,16 @@ typedef struct {
 // +-------------------------------------+
 //
 
-
-
 //
 // SMM_CORE dump command
 //
-#define SMI_HANDLER_PROFILE_COMMAND_GET_INFO           0x1
-#define SMI_HANDLER_PROFILE_COMMAND_GET_DATA_BY_OFFSET 0x2
+#define SMI_HANDLER_PROFILE_COMMAND_GET_INFO            0x1
+#define SMI_HANDLER_PROFILE_COMMAND_GET_DATA_BY_OFFSET  0x2
 
 typedef struct {
-  UINT32                            Command;
-  UINT32                            DataLength;
-  UINT64                            ReturnStatus;
+  UINT32    Command;
+  UINT32    DataLength;
+  UINT64    ReturnStatus;
 } SMI_HANDLER_PROFILE_PARAMETER_HEADER;
 
 typedef struct {
@@ -139,11 +137,11 @@ typedef struct {
   UINT64                                  DataOffset;
 } SMI_HANDLER_PROFILE_PARAMETER_GET_DATA_BY_OFFSET;
 
-#define SMI_HANDLER_PROFILE_GUID {0x49174342, 0x7108, 0x409b, {0x8b, 0xbe, 0x65, 0xfd, 0xa8, 0x53, 0x89, 0xf5}}
+#define SMI_HANDLER_PROFILE_GUID  {0x49174342, 0x7108, 0x409b, {0x8b, 0xbe, 0x65, 0xfd, 0xa8, 0x53, 0x89, 0xf5}}
 
-extern EFI_GUID gSmiHandlerProfileGuid;
+extern EFI_GUID  gSmiHandlerProfileGuid;
 
-typedef struct _SMI_HANDLER_PROFILE_PROTOCOL  SMI_HANDLER_PROFILE_PROTOCOL;
+typedef struct _SMI_HANDLER_PROFILE_PROTOCOL SMI_HANDLER_PROFILE_PROTOCOL;
 
 /**
   This function is called by SmmChildDispatcher module to report
@@ -167,12 +165,12 @@ typedef struct _SMI_HANDLER_PROFILE_PROTOCOL  SMI_HANDLER_PROFILE_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI  *SMI_HANDLER_PROFILE_REGISTER_HANDLER) (
+(EFIAPI  *SMI_HANDLER_PROFILE_REGISTER_HANDLER)(
   IN SMI_HANDLER_PROFILE_PROTOCOL   *This,
   IN EFI_GUID                       *HandlerGuid,
   IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler,
   IN PHYSICAL_ADDRESS               CallerAddress,
-  IN VOID                           *Context, OPTIONAL
+  IN VOID                           *Context  OPTIONAL,
   IN UINTN                          ContextSize OPTIONAL
   );
 
@@ -195,17 +193,17 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI  *SMI_HANDLER_PROFILE_UNREGISTER_HANDLER) (
+(EFIAPI  *SMI_HANDLER_PROFILE_UNREGISTER_HANDLER)(
   IN SMI_HANDLER_PROFILE_PROTOCOL   *This,
   IN EFI_GUID                       *HandlerGuid,
   IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler,
-  IN VOID                           *Context, OPTIONAL
+  IN VOID                           *Context  OPTIONAL,
   IN UINTN                          ContextSize OPTIONAL
   );
 
 struct _SMI_HANDLER_PROFILE_PROTOCOL {
-  SMI_HANDLER_PROFILE_REGISTER_HANDLER     RegisterHandler;
-  SMI_HANDLER_PROFILE_UNREGISTER_HANDLER   UnregisterHandler;
+  SMI_HANDLER_PROFILE_REGISTER_HANDLER      RegisterHandler;
+  SMI_HANDLER_PROFILE_UNREGISTER_HANDLER    UnregisterHandler;
 };
 
 #endif

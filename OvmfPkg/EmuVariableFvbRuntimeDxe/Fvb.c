@@ -36,13 +36,13 @@
 //
 // This is needed for runtime variable access.
 //
-EFI_EVENT   mEmuVarsFvbAddrChangeEvent = NULL;
+EFI_EVENT  mEmuVarsFvbAddrChangeEvent = NULL;
 
 //
 // This is the single instance supported by this driver.  It
 // supports the FVB and Device Path protocols.
 //
-EFI_FW_VOL_BLOCK_DEVICE mEmuVarsFvb = {
+EFI_FW_VOL_BLOCK_DEVICE  mEmuVarsFvb = {
   FVB_DEVICE_SIGNATURE,
   {     // DevicePath
     {
@@ -67,9 +67,9 @@ EFI_FW_VOL_BLOCK_DEVICE mEmuVarsFvb = {
       }
     }
   },
-  NULL, // BufferPtr
+  NULL,               // BufferPtr
   EMU_FVB_BLOCK_SIZE, // BlockSize
-  EMU_FVB_SIZE, // Size
+  EMU_FVB_SIZE,       // Size
   {     // FwVolBlockInstance
     FvbProtocolGetAttributes,
     FvbProtocolSetAttributes,
@@ -81,7 +81,6 @@ EFI_FW_VOL_BLOCK_DEVICE mEmuVarsFvb = {
     NULL
   },
 };
-
 
 /**
   Notification function of EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE.
@@ -96,13 +95,12 @@ EFI_FW_VOL_BLOCK_DEVICE mEmuVarsFvb = {
 VOID
 EFIAPI
 FvbVirtualAddressChangeEvent (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   EfiConvertPointer (0x0, &mEmuVarsFvb.BufferPtr);
 }
-
 
 //
 // FVB protocol APIs
@@ -128,19 +126,18 @@ FvbVirtualAddressChangeEvent (
 EFI_STATUS
 EFIAPI
 FvbProtocolGetPhysicalAddress (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
-  OUT       EFI_PHYSICAL_ADDRESS                *Address
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
+  OUT       EFI_PHYSICAL_ADDRESS                 *Address
   )
 {
-  EFI_FW_VOL_BLOCK_DEVICE *FvbDevice;
+  EFI_FW_VOL_BLOCK_DEVICE  *FvbDevice;
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
-  *Address = (EFI_PHYSICAL_ADDRESS)(UINTN) FvbDevice->BufferPtr;
+  *Address = (EFI_PHYSICAL_ADDRESS)(UINTN)FvbDevice->BufferPtr;
 
   return EFI_SUCCESS;
 }
-
 
 /**
   The GetBlockSize() function retrieves the size of the requested
@@ -171,13 +168,13 @@ FvbProtocolGetPhysicalAddress (
 EFI_STATUS
 EFIAPI
 FvbProtocolGetBlockSize (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
-  IN        EFI_LBA                             Lba,
-  OUT       UINTN                               *BlockSize,
-  OUT       UINTN                               *NumberOfBlocks
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
+  IN        EFI_LBA                              Lba,
+  OUT       UINTN                                *BlockSize,
+  OUT       UINTN                                *NumberOfBlocks
   )
 {
-  EFI_FW_VOL_BLOCK_DEVICE *FvbDevice;
+  EFI_FW_VOL_BLOCK_DEVICE  *FvbDevice;
 
   if (Lba >= EMU_FVB_NUM_TOTAL_BLOCKS) {
     return EFI_INVALID_PARAMETER;
@@ -185,12 +182,11 @@ FvbProtocolGetBlockSize (
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
-  *BlockSize = FvbDevice->BlockSize;
+  *BlockSize      = FvbDevice->BlockSize;
   *NumberOfBlocks = (UINTN)(EMU_FVB_NUM_TOTAL_BLOCKS - Lba);
 
   return EFI_SUCCESS;
 }
-
 
 /**
   The GetAttributes() function retrieves the attributes and
@@ -210,22 +206,21 @@ FvbProtocolGetBlockSize (
 EFI_STATUS
 EFIAPI
 FvbProtocolGetAttributes (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
-  OUT       EFI_FVB_ATTRIBUTES_2                *Attributes
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
+  OUT       EFI_FVB_ATTRIBUTES_2                 *Attributes
   )
 {
   *Attributes =
-    (EFI_FVB_ATTRIBUTES_2) (
-      EFI_FVB2_READ_ENABLED_CAP |
-      EFI_FVB2_READ_STATUS |
-      EFI_FVB2_WRITE_ENABLED_CAP |
-      EFI_FVB2_WRITE_STATUS |
-      EFI_FVB2_ERASE_POLARITY
-      );
+    (EFI_FVB_ATTRIBUTES_2)(
+                           EFI_FVB2_READ_ENABLED_CAP |
+                           EFI_FVB2_READ_STATUS |
+                           EFI_FVB2_WRITE_ENABLED_CAP |
+                           EFI_FVB2_WRITE_STATUS |
+                           EFI_FVB2_ERASE_POLARITY
+                           );
 
   return EFI_SUCCESS;
 }
-
 
 /**
   The SetAttributes() function sets configurable firmware volume
@@ -252,13 +247,12 @@ FvbProtocolGetAttributes (
 EFI_STATUS
 EFIAPI
 FvbProtocolSetAttributes (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
-  IN OUT    EFI_FVB_ATTRIBUTES_2                *Attributes
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
+  IN OUT    EFI_FVB_ATTRIBUTES_2                 *Attributes
   )
 {
   return EFI_ACCESS_DENIED;
 }
-
 
 /**
   Erases and initializes a firmware volume block.
@@ -311,16 +305,16 @@ FvbProtocolSetAttributes (
 EFI_STATUS
 EFIAPI
 FvbProtocolEraseBlocks (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
   ...
   )
 {
-  EFI_FW_VOL_BLOCK_DEVICE *FvbDevice;
-  VA_LIST                 Args;
-  EFI_LBA                 StartingLba;
-  UINTN                   NumOfLba;
-  UINT8                   *ErasePtr;
-  UINTN                   EraseSize;
+  EFI_FW_VOL_BLOCK_DEVICE  *FvbDevice;
+  VA_LIST                  Args;
+  EFI_LBA                  StartingLba;
+  UINTN                    NumOfLba;
+  UINT8                    *ErasePtr;
+  UINTN                    EraseSize;
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
@@ -333,14 +327,17 @@ FvbProtocolEraseBlocks (
     if (StartingLba == EFI_LBA_LIST_TERMINATOR) {
       break;
     }
+
     NumOfLba = VA_ARG (Args, UINTN);
 
-    if (StartingLba > EMU_FVB_NUM_TOTAL_BLOCKS ||
-        NumOfLba > EMU_FVB_NUM_TOTAL_BLOCKS - StartingLba) {
+    if ((StartingLba > EMU_FVB_NUM_TOTAL_BLOCKS) ||
+        (NumOfLba > EMU_FVB_NUM_TOTAL_BLOCKS - StartingLba))
+    {
       VA_END (Args);
       return EFI_INVALID_PARAMETER;
     }
   } while (1);
+
   VA_END (Args);
 
   //
@@ -352,14 +349,16 @@ FvbProtocolEraseBlocks (
     if (StartingLba == EFI_LBA_LIST_TERMINATOR) {
       break;
     }
+
     NumOfLba = VA_ARG (Args, UINTN);
 
-    ErasePtr = FvbDevice->BufferPtr;
+    ErasePtr  = FvbDevice->BufferPtr;
     ErasePtr += (UINTN)StartingLba * FvbDevice->BlockSize;
     EraseSize = NumOfLba * FvbDevice->BlockSize;
 
     SetMem (ErasePtr, EraseSize, ERASED_UINT8);
   } while (1);
+
   VA_END (Args);
 
   //
@@ -371,7 +370,6 @@ FvbProtocolEraseBlocks (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Writes the specified number of bytes from the input buffer to the block.
@@ -435,31 +433,32 @@ FvbProtocolEraseBlocks (
 EFI_STATUS
 EFIAPI
 FvbProtocolWrite (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
-  IN        EFI_LBA                             Lba,
-  IN        UINTN                               Offset,
-  IN OUT    UINTN                               *NumBytes,
-  IN        UINT8                               *Buffer
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
+  IN        EFI_LBA                              Lba,
+  IN        UINTN                                Offset,
+  IN OUT    UINTN                                *NumBytes,
+  IN        UINT8                                *Buffer
   )
 {
-  EFI_FW_VOL_BLOCK_DEVICE *FvbDevice;
-  UINT8                   *FvbDataPtr;
-  EFI_STATUS              Status;
+  EFI_FW_VOL_BLOCK_DEVICE  *FvbDevice;
+  UINT8                    *FvbDataPtr;
+  EFI_STATUS               Status;
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
-  if (Lba >= EMU_FVB_NUM_TOTAL_BLOCKS ||
-      Offset > FvbDevice->BlockSize) {
+  if ((Lba >= EMU_FVB_NUM_TOTAL_BLOCKS) ||
+      (Offset > FvbDevice->BlockSize))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
   Status = EFI_SUCCESS;
   if (*NumBytes > FvbDevice->BlockSize - Offset) {
     *NumBytes = FvbDevice->BlockSize - Offset;
-    Status = EFI_BAD_BUFFER_SIZE;
+    Status    = EFI_BAD_BUFFER_SIZE;
   }
 
-  FvbDataPtr = FvbDevice->BufferPtr;
+  FvbDataPtr  = FvbDevice->BufferPtr;
   FvbDataPtr += (UINTN)Lba * FvbDevice->BlockSize;
   FvbDataPtr += Offset;
 
@@ -467,7 +466,6 @@ FvbProtocolWrite (
   PlatformFvbDataWritten (This, Lba, Offset, *NumBytes, Buffer);
   return Status;
 }
-
 
 /**
   Reads the specified number of bytes into a buffer from the specified block.
@@ -519,31 +517,32 @@ FvbProtocolWrite (
 EFI_STATUS
 EFIAPI
 FvbProtocolRead (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
-  IN        EFI_LBA                             Lba,
-  IN        UINTN                               Offset,
-  IN OUT    UINTN                               *NumBytes,
-  IN OUT    UINT8                               *Buffer
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
+  IN        EFI_LBA                              Lba,
+  IN        UINTN                                Offset,
+  IN OUT    UINTN                                *NumBytes,
+  IN OUT    UINT8                                *Buffer
   )
 {
-  EFI_FW_VOL_BLOCK_DEVICE *FvbDevice;
-  UINT8                   *FvbDataPtr;
-  EFI_STATUS              Status;
+  EFI_FW_VOL_BLOCK_DEVICE  *FvbDevice;
+  UINT8                    *FvbDataPtr;
+  EFI_STATUS               Status;
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
-  if (Lba >= EMU_FVB_NUM_TOTAL_BLOCKS ||
-      Offset > FvbDevice->BlockSize) {
+  if ((Lba >= EMU_FVB_NUM_TOTAL_BLOCKS) ||
+      (Offset > FvbDevice->BlockSize))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
   Status = EFI_SUCCESS;
   if (*NumBytes > FvbDevice->BlockSize - Offset) {
     *NumBytes = FvbDevice->BlockSize - Offset;
-    Status = EFI_BAD_BUFFER_SIZE;
+    Status    = EFI_BAD_BUFFER_SIZE;
   }
 
-  FvbDataPtr = FvbDevice->BufferPtr;
+  FvbDataPtr  = FvbDevice->BufferPtr;
   FvbDataPtr += (UINTN)Lba * FvbDevice->BlockSize;
   FvbDataPtr += Offset;
 
@@ -551,7 +550,6 @@ FvbProtocolRead (
   PlatformFvbDataRead (This, Lba, Offset, *NumBytes, Buffer);
   return Status;
 }
-
 
 /**
   Check the integrity of firmware volume header.
@@ -564,7 +562,7 @@ FvbProtocolRead (
 **/
 EFI_STATUS
 ValidateFvHeader (
-  IN EFI_FIRMWARE_VOLUME_HEADER   *FwVolHeader
+  IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader
   )
 {
   UINT16  Checksum;
@@ -578,14 +576,16 @@ ValidateFvHeader (
       (FwVolHeader->Signature != EFI_FVH_SIGNATURE) ||
       (FwVolHeader->FvLength != EMU_FVB_SIZE) ||
       (FwVolHeader->HeaderLength != EMU_FV_HEADER_LENGTH)
-      ) {
+      )
+  {
     DEBUG ((DEBUG_INFO, "EMU Variable FVB: Basic FV headers were invalid\n"));
     return EFI_NOT_FOUND;
   }
+
   //
   // Verify the header checksum
   //
-  Checksum = CalculateSum16((VOID*) FwVolHeader, FwVolHeader->HeaderLength);
+  Checksum = CalculateSum16 ((VOID *)FwVolHeader, FwVolHeader->HeaderLength);
 
   if (Checksum != 0) {
     DEBUG ((DEBUG_INFO, "EMU Variable FVB: FV checksum was invalid\n"));
@@ -594,7 +594,6 @@ ValidateFvHeader (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Initializes the FV Header and Variable Store Header
@@ -605,13 +604,13 @@ ValidateFvHeader (
 **/
 VOID
 InitializeFvAndVariableStoreHeaders (
-  IN  VOID   *Ptr
+  IN  VOID  *Ptr
   )
 {
   //
   // Templates for authenticated variable FV header
   //
-  STATIC FVB_FV_HDR_AND_VARS_TEMPLATE FvAndAuthenticatedVarTemplate = {
+  STATIC FVB_FV_HDR_AND_VARS_TEMPLATE  FvAndAuthenticatedVarTemplate = {
     { // EFI_FIRMWARE_VOLUME_HEADER FvHdr;
       // UINT8                     ZeroVector[16];
       { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -638,7 +637,7 @@ InitializeFvAndVariableStoreHeaders (
       0,
 
       // UINT8                     Reserved[1];
-      {0},
+      { 0 },
 
       // UINT8                     Revision;
       EFI_FVH_REVISION,
@@ -647,20 +646,20 @@ InitializeFvAndVariableStoreHeaders (
       {
         {
           EMU_FVB_NUM_TOTAL_BLOCKS, // UINT32 NumBlocks;
-          EMU_FVB_BLOCK_SIZE  // UINT32 Length;
+          EMU_FVB_BLOCK_SIZE        // UINT32 Length;
         }
       }
     },
     // EFI_FV_BLOCK_MAP_ENTRY     EndBlockMap;
     { 0, 0 }, // End of block map
     { // VARIABLE_STORE_HEADER      VarHdr;
-        // EFI_GUID  Signature;     // need authenticated variables for secure boot
-        EFI_AUTHENTICATED_VARIABLE_GUID,
+      // EFI_GUID  Signature;     // need authenticated variables for secure boot
+      EFI_AUTHENTICATED_VARIABLE_GUID,
 
       // UINT32  Size;
       (
-        FixedPcdGet32 (PcdFlashNvStorageVariableSize) -
-        OFFSET_OF (FVB_FV_HDR_AND_VARS_TEMPLATE, VarHdr)
+       FixedPcdGet32 (PcdFlashNvStorageVariableSize) -
+       OFFSET_OF (FVB_FV_HDR_AND_VARS_TEMPLATE, VarHdr)
       ),
 
       // UINT8   Format;
@@ -691,7 +690,7 @@ InitializeFvAndVariableStoreHeaders (
   //
   // Update the checksum for the FV header
   //
-  Fv = (EFI_FIRMWARE_VOLUME_HEADER*) Ptr;
+  Fv           = (EFI_FIRMWARE_VOLUME_HEADER *)Ptr;
   Fv->Checksum = CalculateCheckSum16 (Ptr, Fv->HeaderLength);
 }
 
@@ -707,38 +706,44 @@ InitializeFvAndVariableStoreHeaders (
 EFI_STATUS
 EFIAPI
 FvbInitialize (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                          Status;
-  VOID                                *Ptr;
-  VOID                                *SubPtr;
-  BOOLEAN                             Initialize;
-  EFI_HANDLE                          Handle;
-  EFI_PHYSICAL_ADDRESS                Address;
-  RETURN_STATUS                       PcdStatus;
+  EFI_STATUS            Status;
+  VOID                  *Ptr;
+  VOID                  *SubPtr;
+  BOOLEAN               Initialize;
+  EFI_HANDLE            Handle;
+  EFI_PHYSICAL_ADDRESS  Address;
+  RETURN_STATUS         PcdStatus;
 
   DEBUG ((DEBUG_INFO, "EMU Variable FVB Started\n"));
 
   //
   // Verify that the PCD's are set correctly.
   //
-  ASSERT (FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) %
-          EMU_FVB_BLOCK_SIZE == 0);
+  ASSERT (
+    FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) %
+    EMU_FVB_BLOCK_SIZE == 0
+    );
   if (
-       (PcdGet32 (PcdFlashNvStorageVariableSize) +
-        PcdGet32 (PcdFlashNvStorageFtwWorkingSize)
-       ) >
-       EMU_FVB_NUM_SPARE_BLOCKS * EMU_FVB_BLOCK_SIZE
-     ) {
+      (PcdGet32 (PcdFlashNvStorageVariableSize) +
+       PcdGet32 (PcdFlashNvStorageFtwWorkingSize)
+      ) >
+      EMU_FVB_NUM_SPARE_BLOCKS * EMU_FVB_BLOCK_SIZE
+      )
+  {
     DEBUG ((DEBUG_ERROR, "EMU Variable invalid PCD sizes\n"));
     return EFI_INVALID_PARAMETER;
   }
 
   if (PcdGet64 (PcdFlashNvStorageVariableBase64) != 0) {
-    DEBUG ((DEBUG_INFO, "Disabling EMU Variable FVB since "
-                        "flash variables appear to be supported.\n"));
+    DEBUG ((
+      DEBUG_INFO,
+      "Disabling EMU Variable FVB since "
+      "flash variables appear to be supported.\n"
+      ));
     return EFI_ABORTED;
   }
 
@@ -752,7 +757,7 @@ FvbInitialize (
   //
   Initialize = TRUE;
   if (PcdGet64 (PcdEmuVariableNvStoreReserved) != 0) {
-    Ptr = (VOID*)(UINTN) PcdGet64 (PcdEmuVariableNvStoreReserved);
+    Ptr = (VOID *)(UINTN)PcdGet64 (PcdEmuVariableNvStoreReserved);
     DEBUG ((
       DEBUG_INFO,
       "EMU Variable FVB: Using pre-reserved block at %p\n",
@@ -776,32 +781,37 @@ FvbInitialize (
     SetMem (Ptr, EMU_FVB_SIZE, ERASED_UINT8);
     InitializeFvAndVariableStoreHeaders (Ptr);
   }
-  PcdStatus = PcdSet64S (PcdFlashNvStorageVariableBase64, (UINT32)(UINTN) Ptr);
+
+  PcdStatus = PcdSet64S (PcdFlashNvStorageVariableBase64, (UINTN)Ptr);
   ASSERT_RETURN_ERROR (PcdStatus);
 
   //
   // Initialize the Fault Tolerant Write data area
   //
-  SubPtr = (VOID*) ((UINT8*) Ptr + PcdGet32 (PcdFlashNvStorageVariableSize));
-  PcdStatus = PcdSet32S (PcdFlashNvStorageFtwWorkingBase,
-                (UINT32)(UINTN) SubPtr);
+  SubPtr    = (VOID *)((UINT8 *)Ptr + PcdGet32 (PcdFlashNvStorageVariableSize));
+  PcdStatus = PcdSet64S (
+                PcdFlashNvStorageFtwWorkingBase64,
+                (UINTN)SubPtr
+                );
   ASSERT_RETURN_ERROR (PcdStatus);
 
   //
   // Initialize the Fault Tolerant Write spare block
   //
-  SubPtr = (VOID*) ((UINT8*) Ptr +
+  SubPtr = (VOID *)((UINT8 *)Ptr +
                     EMU_FVB_NUM_SPARE_BLOCKS * EMU_FVB_BLOCK_SIZE);
-  PcdStatus = PcdSet32S (PcdFlashNvStorageFtwSpareBase,
-                (UINT32)(UINTN) SubPtr);
+  PcdStatus = PcdSet64S (
+                PcdFlashNvStorageFtwSpareBase64,
+                (UINTN)SubPtr
+                );
   ASSERT_RETURN_ERROR (PcdStatus);
 
   //
   // Setup FVB device path
   //
-  Address = (EFI_PHYSICAL_ADDRESS)(UINTN) Ptr;
+  Address                                              = (EFI_PHYSICAL_ADDRESS)(UINTN)Ptr;
   mEmuVarsFvb.DevicePath.MemMapDevPath.StartingAddress = Address;
-  mEmuVarsFvb.DevicePath.MemMapDevPath.EndingAddress = Address + EMU_FVB_SIZE - 1;
+  mEmuVarsFvb.DevicePath.MemMapDevPath.EndingAddress   = Address + EMU_FVB_SIZE - 1;
 
   //
   // Install the protocols
@@ -833,5 +843,3 @@ FvbInitialize (
 
   return EFI_SUCCESS;
 }
-
-

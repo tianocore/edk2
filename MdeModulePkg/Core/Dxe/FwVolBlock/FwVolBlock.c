@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "DxeMain.h"
 #include "FwVolBlock.h"
 
-FV_MEMMAP_DEVICE_PATH mFvMemmapDevicePathTemplate = {
+FV_MEMMAP_DEVICE_PATH  mFvMemmapDevicePathTemplate = {
   {
     {
       HARDWARE_DEVICE_PATH,
@@ -23,8 +23,8 @@ FV_MEMMAP_DEVICE_PATH mFvMemmapDevicePathTemplate = {
       }
     },
     EfiMemoryMappedIO,
-    (EFI_PHYSICAL_ADDRESS) 0,
-    (EFI_PHYSICAL_ADDRESS) 0,
+    (EFI_PHYSICAL_ADDRESS)0,
+    (EFI_PHYSICAL_ADDRESS)0,
   },
   {
     END_DEVICE_PATH_TYPE,
@@ -36,7 +36,7 @@ FV_MEMMAP_DEVICE_PATH mFvMemmapDevicePathTemplate = {
   }
 };
 
-FV_PIWG_DEVICE_PATH mFvPIWGDevicePathTemplate = {
+FV_PIWG_DEVICE_PATH  mFvPIWGDevicePathTemplate = {
   {
     {
       MEDIA_DEVICE_PATH,
@@ -79,8 +79,6 @@ EFI_FW_VOL_BLOCK_DEVICE  mFwVolBlock = {
   0
 };
 
-
-
 /**
   Retrieves Volume attributes.  No polarity translations are done.
 
@@ -97,7 +95,7 @@ FwVolBlockGetAttributes (
   OUT       EFI_FVB_ATTRIBUTES_2                *Attributes
   )
 {
-  EFI_FW_VOL_BLOCK_DEVICE               *FvbDevice;
+  EFI_FW_VOL_BLOCK_DEVICE  *FvbDevice;
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
@@ -108,8 +106,6 @@ FwVolBlockGetAttributes (
 
   return EFI_SUCCESS;
 }
-
-
 
 /**
   Modifies the current settings of the firmware volume according to the input parameter.
@@ -133,8 +129,6 @@ FwVolBlockSetAttributes (
 {
   return EFI_UNSUPPORTED;
 }
-
-
 
 /**
   The EraseBlock() function erases one or more blocks as denoted by the
@@ -162,14 +156,12 @@ FwVolBlockSetAttributes (
 EFI_STATUS
 EFIAPI
 FwVolBlockEraseBlock (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
+  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
   ...
   )
 {
   return EFI_UNSUPPORTED;
 }
-
-
 
 /**
   Read the specified number of bytes from the block to the input buffer.
@@ -194,19 +186,19 @@ FwVolBlockEraseBlock (
 EFI_STATUS
 EFIAPI
 FwVolBlockReadBlock (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL   *This,
-  IN CONST  EFI_LBA                              Lba,
-  IN CONST  UINTN                                Offset,
-  IN OUT    UINTN                                *NumBytes,
-  IN OUT    UINT8                                *Buffer
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_LBA                             Lba,
+  IN CONST  UINTN                               Offset,
+  IN OUT    UINTN                               *NumBytes,
+  IN OUT    UINT8                               *Buffer
   )
 {
-  EFI_FW_VOL_BLOCK_DEVICE               *FvbDevice;
-  EFI_FIRMWARE_VOLUME_HEADER            *FwVolHeader;
-  UINT8                                 *LbaOffset;
-  UINTN                                 LbaStart;
-  UINTN                                 NumOfBytesRead;
-  UINTN                                 LbaIndex;
+  EFI_FW_VOL_BLOCK_DEVICE     *FvbDevice;
+  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
+  UINT8                       *LbaOffset;
+  UINTN                       LbaStart;
+  UINTN                       NumOfBytesRead;
+  UINTN                       LbaIndex;
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
@@ -217,7 +209,7 @@ FwVolBlockReadBlock (
     return EFI_ACCESS_DENIED;
   }
 
-  LbaIndex = (UINTN) Lba;
+  LbaIndex = (UINTN)Lba;
   if (LbaIndex >= FvbDevice->NumBlocks) {
     //
     // Invalid Lba, read nothing.
@@ -242,9 +234,9 @@ FwVolBlockReadBlock (
     NumOfBytesRead = FvbDevice->LbaCache[LbaIndex].Length - Offset;
   }
 
-  LbaStart = FvbDevice->LbaCache[LbaIndex].Base;
-  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)((UINTN) FvbDevice->BaseAddress);
-  LbaOffset = (UINT8 *) FwVolHeader + LbaStart + Offset;
+  LbaStart    = FvbDevice->LbaCache[LbaIndex].Base;
+  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)((UINTN)FvbDevice->BaseAddress);
+  LbaOffset   = (UINT8 *)FwVolHeader + LbaStart + Offset;
 
   //
   // Perform read operation
@@ -258,8 +250,6 @@ FwVolBlockReadBlock (
   *NumBytes = NumOfBytesRead;
   return EFI_BAD_BUFFER_SIZE;
 }
-
-
 
 /**
   Writes the specified number of bytes from the input buffer to the block.
@@ -288,17 +278,15 @@ FwVolBlockReadBlock (
 EFI_STATUS
 EFIAPI
 FwVolBlockWriteBlock (
-  IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL   *This,
-  IN     EFI_LBA                              Lba,
-  IN     UINTN                                Offset,
-  IN OUT UINTN                                *NumBytes,
-  IN     UINT8                                *Buffer
+  IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN     EFI_LBA                             Lba,
+  IN     UINTN                               Offset,
+  IN OUT UINTN                               *NumBytes,
+  IN     UINT8                               *Buffer
   )
 {
   return EFI_UNSUPPORTED;
 }
-
-
 
 /**
   Get Fvb's base address.
@@ -317,7 +305,7 @@ FwVolBlockGetPhysicalAddress (
   OUT       EFI_PHYSICAL_ADDRESS                *Address
   )
 {
-  EFI_FW_VOL_BLOCK_DEVICE               *FvbDevice;
+  EFI_FW_VOL_BLOCK_DEVICE  *FvbDevice;
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
@@ -328,8 +316,6 @@ FwVolBlockGetPhysicalAddress (
 
   return EFI_UNSUPPORTED;
 }
-
-
 
 /**
   Retrieves the size in bytes of a specific block within a firmware volume.
@@ -357,10 +343,10 @@ FwVolBlockGetBlockSize (
   IN OUT    UINTN                               *NumberOfBlocks
   )
 {
-  UINTN                                 TotalBlocks;
-  EFI_FW_VOL_BLOCK_DEVICE               *FvbDevice;
-  EFI_FV_BLOCK_MAP_ENTRY                *PtrBlockMapEntry;
-  EFI_FIRMWARE_VOLUME_HEADER            *FwVolHeader;
+  UINTN                       TotalBlocks;
+  EFI_FW_VOL_BLOCK_DEVICE     *FvbDevice;
+  EFI_FV_BLOCK_MAP_ENTRY      *PtrBlockMapEntry;
+  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
 
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
@@ -379,7 +365,7 @@ FwVolBlockGetBlockSize (
   // Search the block map for the given block
   //
   TotalBlocks = 0;
-  while ((PtrBlockMapEntry->NumBlocks != 0) || (PtrBlockMapEntry->Length !=0 )) {
+  while ((PtrBlockMapEntry->NumBlocks != 0) || (PtrBlockMapEntry->Length != 0)) {
     TotalBlocks += PtrBlockMapEntry->NumBlocks;
     if (Lba < TotalBlocks) {
       //
@@ -391,7 +377,7 @@ FwVolBlockGetBlockSize (
     PtrBlockMapEntry++;
   }
 
-  *BlockSize = PtrBlockMapEntry->Length;
+  *BlockSize      = PtrBlockMapEntry->Length;
   *NumberOfBlocks = TotalBlocks - (UINTN)Lba;
 
   return EFI_SUCCESS;
@@ -408,14 +394,14 @@ FwVolBlockGetBlockSize (
 **/
 UINT32
 GetFvbAuthenticationStatus (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *FvbProtocol
+  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvbProtocol
   )
 {
-  EFI_FW_VOL_BLOCK_DEVICE   *FvbDevice;
-  UINT32                    AuthenticationStatus;
+  EFI_FW_VOL_BLOCK_DEVICE  *FvbDevice;
+  UINT32                   AuthenticationStatus;
 
   AuthenticationStatus = 0;
-  FvbDevice = BASE_CR (FvbProtocol, EFI_FW_VOL_BLOCK_DEVICE, FwVolBlockInstance);
+  FvbDevice            = BASE_CR (FvbProtocol, EFI_FW_VOL_BLOCK_DEVICE, FwVolBlockInstance);
   if (FvbDevice->Signature == FVB_DEVICE_SIGNATURE) {
     AuthenticationStatus = FvbDevice->AuthenticationStatus;
   }
@@ -444,24 +430,24 @@ GetFvbAuthenticationStatus (
 **/
 EFI_STATUS
 ProduceFVBProtocolOnBuffer (
-  IN EFI_PHYSICAL_ADDRESS   BaseAddress,
-  IN UINT64                 Length,
-  IN EFI_HANDLE             ParentHandle,
-  IN UINT32                 AuthenticationStatus,
-  OUT EFI_HANDLE            *FvProtocol  OPTIONAL
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT64                Length,
+  IN EFI_HANDLE            ParentHandle,
+  IN UINT32                AuthenticationStatus,
+  OUT EFI_HANDLE           *FvProtocol  OPTIONAL
   )
 {
-  EFI_STATUS                    Status;
-  EFI_FW_VOL_BLOCK_DEVICE       *FvbDev;
-  EFI_FIRMWARE_VOLUME_HEADER    *FwVolHeader;
-  UINTN                         BlockIndex;
-  UINTN                         BlockIndex2;
-  UINTN                         LinearOffset;
-  UINT32                        FvAlignment;
-  EFI_FV_BLOCK_MAP_ENTRY        *PtrBlockMapEntry;
+  EFI_STATUS                  Status;
+  EFI_FW_VOL_BLOCK_DEVICE     *FvbDev;
+  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
+  UINTN                       BlockIndex;
+  UINTN                       BlockIndex2;
+  UINTN                       LinearOffset;
+  UINT32                      FvAlignment;
+  EFI_FV_BLOCK_MAP_ENTRY      *PtrBlockMapEntry;
 
   FvAlignment = 0;
-  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN) BaseAddress;
+  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)BaseAddress;
   //
   // Validate FV Header, if not as expected, return
   //
@@ -485,6 +471,7 @@ ProduceFVBProtocolOnBuffer (
     if (FvAlignment < 8) {
       FvAlignment = 8;
     }
+
     if ((UINTN)BaseAddress % FvAlignment != 0) {
       //
       // FvImage buffer is not at its required alignment.
@@ -508,10 +495,10 @@ ProduceFVBProtocolOnBuffer (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  FvbDev->BaseAddress   = BaseAddress;
-  FvbDev->FvbAttributes = FwVolHeader->Attributes;
+  FvbDev->BaseAddress                     = BaseAddress;
+  FvbDev->FvbAttributes                   = FwVolHeader->Attributes;
   FvbDev->FwVolBlockInstance.ParentHandle = ParentHandle;
-  FvbDev->AuthenticationStatus = AuthenticationStatus;
+  FvbDev->AuthenticationStatus            = AuthenticationStatus;
 
   //
   // Init the block caching fields of the device
@@ -520,7 +507,8 @@ ProduceFVBProtocolOnBuffer (
   FvbDev->NumBlocks = 0;
   for (PtrBlockMapEntry = FwVolHeader->BlockMap;
        PtrBlockMapEntry->NumBlocks != 0;
-       PtrBlockMapEntry++) {
+       PtrBlockMapEntry++)
+  {
     FvbDev->NumBlocks += PtrBlockMapEntry->NumBlocks;
   }
 
@@ -531,6 +519,7 @@ ProduceFVBProtocolOnBuffer (
     CoreFreePool (FvbDev);
     return EFI_OUT_OF_RESOURCES;
   }
+
   FvbDev->LbaCache = AllocatePool (FvbDev->NumBlocks * sizeof (LBA_CACHE));
   if (FvbDev->LbaCache == NULL) {
     CoreFreePool (FvbDev);
@@ -540,14 +529,15 @@ ProduceFVBProtocolOnBuffer (
   //
   // Last, fill in the cache with the linear address of the blocks
   //
-  BlockIndex = 0;
+  BlockIndex   = 0;
   LinearOffset = 0;
   for (PtrBlockMapEntry = FwVolHeader->BlockMap;
-       PtrBlockMapEntry->NumBlocks != 0; PtrBlockMapEntry++) {
+       PtrBlockMapEntry->NumBlocks != 0; PtrBlockMapEntry++)
+  {
     for (BlockIndex2 = 0; BlockIndex2 < PtrBlockMapEntry->NumBlocks; BlockIndex2++) {
-      FvbDev->LbaCache[BlockIndex].Base = LinearOffset;
+      FvbDev->LbaCache[BlockIndex].Base   = LinearOffset;
       FvbDev->LbaCache[BlockIndex].Length = PtrBlockMapEntry->Length;
-      LinearOffset += PtrBlockMapEntry->Length;
+      LinearOffset                       += PtrBlockMapEntry->Length;
       BlockIndex++;
     }
   }
@@ -559,22 +549,24 @@ ProduceFVBProtocolOnBuffer (
     //
     // FV does not contains extension header, then produce MEMMAP_DEVICE_PATH
     //
-    FvbDev->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) AllocateCopyPool (sizeof (FV_MEMMAP_DEVICE_PATH), &mFvMemmapDevicePathTemplate);
+    FvbDev->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)AllocateCopyPool (sizeof (FV_MEMMAP_DEVICE_PATH), &mFvMemmapDevicePathTemplate);
     if (FvbDev->DevicePath == NULL) {
       FreePool (FvbDev);
       return EFI_OUT_OF_RESOURCES;
     }
-    ((FV_MEMMAP_DEVICE_PATH *) FvbDev->DevicePath)->MemMapDevPath.StartingAddress = BaseAddress;
-    ((FV_MEMMAP_DEVICE_PATH *) FvbDev->DevicePath)->MemMapDevPath.EndingAddress   = BaseAddress + FwVolHeader->FvLength - 1;
+
+    ((FV_MEMMAP_DEVICE_PATH *)FvbDev->DevicePath)->MemMapDevPath.StartingAddress = BaseAddress;
+    ((FV_MEMMAP_DEVICE_PATH *)FvbDev->DevicePath)->MemMapDevPath.EndingAddress   = BaseAddress + FwVolHeader->FvLength - 1;
   } else {
     //
     // FV contains extension header, then produce MEDIA_FW_VOL_DEVICE_PATH
     //
-    FvbDev->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) AllocateCopyPool (sizeof (FV_PIWG_DEVICE_PATH), &mFvPIWGDevicePathTemplate);
+    FvbDev->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)AllocateCopyPool (sizeof (FV_PIWG_DEVICE_PATH), &mFvPIWGDevicePathTemplate);
     if (FvbDev->DevicePath == NULL) {
       FreePool (FvbDev);
       return EFI_OUT_OF_RESOURCES;
     }
+
     CopyGuid (
       &((FV_PIWG_DEVICE_PATH *)FvbDev->DevicePath)->FvDevPath.FvName,
       (GUID *)(UINTN)(BaseAddress + FwVolHeader->ExtHeaderOffset)
@@ -587,8 +579,10 @@ ProduceFVBProtocolOnBuffer (
   //
   Status = CoreInstallMultipleProtocolInterfaces (
              &FvbDev->Handle,
-             &gEfiFirmwareVolumeBlockProtocolGuid,     &FvbDev->FwVolBlockInstance,
-             &gEfiDevicePathProtocolGuid,              FvbDev->DevicePath,
+             &gEfiFirmwareVolumeBlockProtocolGuid,
+             &FvbDev->FwVolBlockInstance,
+             &gEfiDevicePathProtocolGuid,
+             FvbDev->DevicePath,
              NULL
              );
 
@@ -601,8 +595,6 @@ ProduceFVBProtocolOnBuffer (
 
   return Status;
 }
-
-
 
 /**
   This routine consumes FV hobs and produces instances of FW_VOL_BLOCK_PROTOCOL as appropriate.
@@ -617,13 +609,13 @@ ProduceFVBProtocolOnBuffer (
 EFI_STATUS
 EFIAPI
 FwVolBlockDriverInit (
-  IN EFI_HANDLE                 ImageHandle,
-  IN EFI_SYSTEM_TABLE           *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_PEI_HOB_POINTERS          FvHob;
-  EFI_PEI_HOB_POINTERS          Fv3Hob;
-  UINT32                        AuthenticationStatus;
+  EFI_PEI_HOB_POINTERS  FvHob;
+  EFI_PEI_HOB_POINTERS  Fv3Hob;
+  UINT32                AuthenticationStatus;
 
   //
   // Core Needs Firmware Volumes to function
@@ -637,12 +629,15 @@ FwVolBlockDriverInit (
     Fv3Hob.Raw = GetHobList ();
     while ((Fv3Hob.Raw = GetNextHob (EFI_HOB_TYPE_FV3, Fv3Hob.Raw)) != NULL) {
       if ((Fv3Hob.FirmwareVolume3->BaseAddress == FvHob.FirmwareVolume->BaseAddress) &&
-          (Fv3Hob.FirmwareVolume3->Length == FvHob.FirmwareVolume->Length)) {
+          (Fv3Hob.FirmwareVolume3->Length == FvHob.FirmwareVolume->Length))
+      {
         AuthenticationStatus = Fv3Hob.FirmwareVolume3->AuthenticationStatus;
         break;
       }
+
       Fv3Hob.Raw = GET_NEXT_HOB (Fv3Hob);
     }
+
     //
     // Produce an FVB protocol for it
     //
@@ -652,8 +647,6 @@ FwVolBlockDriverInit (
 
   return EFI_SUCCESS;
 }
-
-
 
 /**
   This DXE service routine is used to process a firmware volume. In
@@ -679,22 +672,22 @@ FwVolBlockDriverInit (
 EFI_STATUS
 EFIAPI
 CoreProcessFirmwareVolume (
-  IN VOID                             *FvHeader,
-  IN UINTN                            Size,
-  OUT EFI_HANDLE                      *FVProtocolHandle
+  IN VOID         *FvHeader,
+  IN UINTN        Size,
+  OUT EFI_HANDLE  *FVProtocolHandle
   )
 {
   VOID        *Ptr;
   EFI_STATUS  Status;
 
   *FVProtocolHandle = NULL;
-  Status = ProduceFVBProtocolOnBuffer (
-            (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
-            (UINT64)Size,
-            NULL,
-            0,
-            FVProtocolHandle
-            );
+  Status            = ProduceFVBProtocolOnBuffer (
+                        (EFI_PHYSICAL_ADDRESS)(UINTN)FvHeader,
+                        (UINT64)Size,
+                        NULL,
+                        0,
+                        FVProtocolHandle
+                        );
   //
   // Since in our implementation we use register-protocol-notify to put a
   // FV protocol on the FVB protocol handle, we can't directly verify that
@@ -703,17 +696,16 @@ CoreProcessFirmwareVolume (
   // well. Otherwise we have to assume that the volume was corrupted
   // somehow.
   //
-  if (!EFI_ERROR(Status)) {
+  if (!EFI_ERROR (Status)) {
     ASSERT (*FVProtocolHandle != NULL);
-    Ptr = NULL;
-    Status = CoreHandleProtocol (*FVProtocolHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **) &Ptr);
-    if (EFI_ERROR(Status) || (Ptr == NULL)) {
+    Ptr    = NULL;
+    Status = CoreHandleProtocol (*FVProtocolHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **)&Ptr);
+    if (EFI_ERROR (Status) || (Ptr == NULL)) {
       return EFI_VOLUME_CORRUPTED;
     }
+
     return EFI_SUCCESS;
   }
+
   return Status;
 }
-
-
-

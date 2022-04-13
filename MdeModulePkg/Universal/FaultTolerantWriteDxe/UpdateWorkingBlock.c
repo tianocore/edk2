@@ -7,10 +7,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "FaultTolerantWrite.h"
 
-EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER mWorkingBlockHeader = {ZERO_GUID, 0, 0, 0, 0, {0, 0, 0}, 0};
+EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER  mWorkingBlockHeader = { ZERO_GUID, 0, 0, 0, 0, { 0, 0, 0 }, 0 };
 
 /**
   Initialize a local work space header.
@@ -56,11 +55,13 @@ InitializeLocalWorkSpaceHeader (
   //
   // Calculate the Crc of woking block header
   //
-  mWorkingBlockHeader.Crc = FtwCalculateCrc32 (&mWorkingBlockHeader,
-                              sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER));
+  mWorkingBlockHeader.Crc = FtwCalculateCrc32 (
+                              &mWorkingBlockHeader,
+                              sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER)
+                              );
 
-  mWorkingBlockHeader.WorkingBlockValid    = FTW_VALID_STATE;
-  mWorkingBlockHeader.WorkingBlockInvalid  = FTW_INVALID_STATE;
+  mWorkingBlockHeader.WorkingBlockValid   = FTW_VALID_STATE;
+  mWorkingBlockHeader.WorkingBlockInvalid = FTW_INVALID_STATE;
 }
 
 /**
@@ -75,7 +76,7 @@ InitializeLocalWorkSpaceHeader (
 **/
 BOOLEAN
 IsValidWorkSpace (
-  IN EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *WorkingHeader
+  IN EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER  *WorkingHeader
   )
 {
   if (WorkingHeader == NULL) {
@@ -86,7 +87,7 @@ IsValidWorkSpace (
     return TRUE;
   }
 
-  DEBUG ((EFI_D_INFO, "Ftw: Work block header check mismatch\n"));
+  DEBUG ((DEBUG_INFO, "Ftw: Work block header check mismatch\n"));
   return FALSE;
 }
 
@@ -101,7 +102,7 @@ IsValidWorkSpace (
 **/
 EFI_STATUS
 InitWorkSpaceHeader (
-  IN EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *WorkingHeader
+  IN EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER  *WorkingHeader
   )
 {
   if (WorkingHeader == NULL) {
@@ -129,17 +130,17 @@ InitWorkSpaceHeader (
 **/
 EFI_STATUS
 ReadWorkSpaceData (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL *FvBlock,
-  IN UINTN                              BlockSize,
-  IN EFI_LBA                            Lba,
-  IN UINTN                              Offset,
-  IN UINTN                              Length,
-  OUT UINT8                             *Buffer
+  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock,
+  IN UINTN                               BlockSize,
+  IN EFI_LBA                             Lba,
+  IN UINTN                               Offset,
+  IN UINTN                               Length,
+  OUT UINT8                              *Buffer
   )
 {
-  EFI_STATUS            Status;
-  UINT8                 *Ptr;
-  UINTN                 MyLength;
+  EFI_STATUS  Status;
+  UINT8       *Ptr;
+  UINTN       MyLength;
 
   //
   // Calculate the real Offset and Lba to write.
@@ -167,9 +168,10 @@ ReadWorkSpaceData (
     if (EFI_ERROR (Status)) {
       return EFI_ABORTED;
     }
-    Offset = 0;
+
+    Offset  = 0;
     Length -= MyLength;
-    Ptr += MyLength;
+    Ptr    += MyLength;
     Lba++;
   }
 
@@ -192,17 +194,17 @@ ReadWorkSpaceData (
 **/
 EFI_STATUS
 WriteWorkSpaceData (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL *FvBlock,
-  IN UINTN                              BlockSize,
-  IN EFI_LBA                            Lba,
-  IN UINTN                              Offset,
-  IN UINTN                              Length,
-  IN UINT8                              *Buffer
+  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvBlock,
+  IN UINTN                               BlockSize,
+  IN EFI_LBA                             Lba,
+  IN UINTN                               Offset,
+  IN UINTN                               Length,
+  IN UINT8                               *Buffer
   )
 {
-  EFI_STATUS            Status;
-  UINT8                 *Ptr;
-  UINTN                 MyLength;
+  EFI_STATUS  Status;
+  UINT8       *Ptr;
+  UINTN       MyLength;
 
   //
   // Calculate the real Offset and Lba to write.
@@ -230,11 +232,13 @@ WriteWorkSpaceData (
     if (EFI_ERROR (Status)) {
       return EFI_ABORTED;
     }
-    Offset = 0;
+
+    Offset  = 0;
     Length -= MyLength;
-    Ptr += MyLength;
+    Ptr    += MyLength;
     Lba++;
   }
+
   return EFI_SUCCESS;
 }
 
@@ -252,8 +256,8 @@ WorkSpaceRefresh (
   IN EFI_FTW_DEVICE  *FtwDevice
   )
 {
-  EFI_STATUS                      Status;
-  UINTN                           RemainingSpaceSize;
+  EFI_STATUS  Status;
+  UINTN       RemainingSpaceSize;
 
   //
   // Initialize WorkSpace as FTW_ERASED_BYTE
@@ -278,31 +282,33 @@ WorkSpaceRefresh (
   if (EFI_ERROR (Status)) {
     return EFI_ABORTED;
   }
+
   //
   // Refresh the FtwLastWriteHeader
   //
   Status = FtwGetLastWriteHeader (
-            FtwDevice->FtwWorkSpaceHeader,
-            FtwDevice->FtwWorkSpaceSize,
-            &FtwDevice->FtwLastWriteHeader
-            );
-  RemainingSpaceSize = FtwDevice->FtwWorkSpaceSize - ((UINTN) FtwDevice->FtwLastWriteHeader - (UINTN) FtwDevice->FtwWorkSpace);
-  DEBUG ((EFI_D_INFO, "Ftw: Remaining work space size - %x\n", RemainingSpaceSize));
+             FtwDevice->FtwWorkSpaceHeader,
+             FtwDevice->FtwWorkSpaceSize,
+             &FtwDevice->FtwLastWriteHeader
+             );
+  RemainingSpaceSize = FtwDevice->FtwWorkSpaceSize - ((UINTN)FtwDevice->FtwLastWriteHeader - (UINTN)FtwDevice->FtwWorkSpace);
+  DEBUG ((DEBUG_INFO, "Ftw: Remaining work space size - %x\n", RemainingSpaceSize));
   //
   // If FtwGetLastWriteHeader() returns error, or the remaining space size is even not enough to contain
   // one EFI_FAULT_TOLERANT_WRITE_HEADER + one EFI_FAULT_TOLERANT_WRITE_RECORD(It will cause that the header
   // pointed by FtwDevice->FtwLastWriteHeader or record pointed by FtwDevice->FtwLastWriteRecord may contain invalid data),
   // it needs to reclaim work space.
   //
-  if (EFI_ERROR (Status) || RemainingSpaceSize < sizeof (EFI_FAULT_TOLERANT_WRITE_HEADER) + sizeof (EFI_FAULT_TOLERANT_WRITE_RECORD)) {
+  if (EFI_ERROR (Status) || (RemainingSpaceSize < sizeof (EFI_FAULT_TOLERANT_WRITE_HEADER) + sizeof (EFI_FAULT_TOLERANT_WRITE_RECORD))) {
     //
     // reclaim work space in working block.
     //
     Status = FtwReclaimWorkSpace (FtwDevice, TRUE);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Ftw: Reclaim workspace - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Ftw: Reclaim workspace - %r\n", Status));
       return EFI_ABORTED;
     }
+
     //
     // Read from working block again
     //
@@ -319,21 +325,22 @@ WorkSpaceRefresh (
     }
 
     Status = FtwGetLastWriteHeader (
-              FtwDevice->FtwWorkSpaceHeader,
-              FtwDevice->FtwWorkSpaceSize,
-              &FtwDevice->FtwLastWriteHeader
-              );
+               FtwDevice->FtwWorkSpaceHeader,
+               FtwDevice->FtwWorkSpaceSize,
+               &FtwDevice->FtwLastWriteHeader
+               );
     if (EFI_ERROR (Status)) {
       return EFI_ABORTED;
     }
   }
+
   //
   // Refresh the FtwLastWriteRecord
   //
   Status = FtwGetLastWriteRecord (
-            FtwDevice->FtwLastWriteHeader,
-            &FtwDevice->FtwLastWriteRecord
-            );
+             FtwDevice->FtwLastWriteHeader,
+             &FtwDevice->FtwLastWriteRecord
+             );
   if (EFI_ERROR (Status)) {
     return EFI_ABORTED;
   }
@@ -358,19 +365,19 @@ FtwReclaimWorkSpace (
   IN BOOLEAN         PreserveRecord
   )
 {
-  EFI_STATUS                              Status;
-  UINTN                                   Length;
-  EFI_FAULT_TOLERANT_WRITE_HEADER         *Header;
-  UINT8                                   *TempBuffer;
-  UINTN                                   TempBufferSize;
-  UINTN                                   SpareBufferSize;
-  UINT8                                   *SpareBuffer;
-  EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *WorkingBlockHeader;
-  UINTN                                   Index;
-  UINT8                                   *Ptr;
-  EFI_LBA                                 WorkSpaceLbaOffset;
+  EFI_STATUS                               Status;
+  UINTN                                    Length;
+  EFI_FAULT_TOLERANT_WRITE_HEADER          *Header;
+  UINT8                                    *TempBuffer;
+  UINTN                                    TempBufferSize;
+  UINTN                                    SpareBufferSize;
+  UINT8                                    *SpareBuffer;
+  EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER  *WorkingBlockHeader;
+  UINTN                                    Index;
+  UINT8                                    *Ptr;
+  EFI_LBA                                  WorkSpaceLbaOffset;
 
-  DEBUG ((EFI_D_INFO, "Ftw: start to reclaim work space\n"));
+  DEBUG ((DEBUG_INFO, "Ftw: start to reclaim work space\n"));
 
   WorkSpaceLbaOffset = FtwDevice->FtwWorkSpaceLba - FtwDevice->FtwWorkBlockLba;
 
@@ -387,12 +394,12 @@ FtwReclaimWorkSpace (
   for (Index = 0; Index < FtwDevice->NumberOfWorkBlock; Index += 1) {
     Length = FtwDevice->WorkBlockSize;
     Status = FtwDevice->FtwFvBlock->Read (
-                                          FtwDevice->FtwFvBlock,
-                                          FtwDevice->FtwWorkBlockLba + Index,
-                                          0,
-                                          &Length,
-                                          Ptr
-                                          );
+                                      FtwDevice->FtwFvBlock,
+                                      FtwDevice->FtwWorkBlockLba + Index,
+                                      0,
+                                      &Length,
+                                      Ptr
+                                      );
     if (EFI_ERROR (Status)) {
       FreePool (TempBuffer);
       return EFI_ABORTED;
@@ -400,11 +407,12 @@ FtwReclaimWorkSpace (
 
     Ptr += Length;
   }
+
   //
   // Clean up the workspace, remove all the completed records.
   //
   Ptr = TempBuffer +
-        (UINTN) WorkSpaceLbaOffset * FtwDevice->WorkBlockSize +
+        (UINTN)WorkSpaceLbaOffset * FtwDevice->WorkBlockSize +
         FtwDevice->FtwWorkSpaceBase;
 
   //
@@ -459,9 +467,9 @@ FtwReclaimWorkSpace (
   //
   // Set the WorkingBlockValid and WorkingBlockInvalid as INVALID
   //
-  WorkingBlockHeader                      = (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *) (TempBuffer +
-                                            (UINTN) WorkSpaceLbaOffset * FtwDevice->WorkBlockSize +
-                                            FtwDevice->FtwWorkSpaceBase);
+  WorkingBlockHeader = (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *)(TempBuffer +
+                                                                   (UINTN)WorkSpaceLbaOffset * FtwDevice->WorkBlockSize +
+                                                                   FtwDevice->FtwWorkSpaceBase);
   WorkingBlockHeader->WorkingBlockValid   = FTW_INVALID_STATE;
   WorkingBlockHeader->WorkingBlockInvalid = FTW_INVALID_STATE;
 
@@ -494,38 +502,42 @@ FtwReclaimWorkSpace (
 
     Ptr += Length;
   }
+
   //
   // Write the memory buffer to spare block
   //
-  Status  = FtwEraseSpareBlock (FtwDevice);
+  Status = FtwEraseSpareBlock (FtwDevice);
   if (EFI_ERROR (Status)) {
     FreePool (TempBuffer);
     FreePool (SpareBuffer);
     return EFI_ABORTED;
   }
-  Ptr     = TempBuffer;
+
+  Ptr = TempBuffer;
   for (Index = 0; TempBufferSize > 0; Index += 1) {
     if (TempBufferSize > FtwDevice->SpareBlockSize) {
       Length = FtwDevice->SpareBlockSize;
     } else {
       Length = TempBufferSize;
     }
+
     Status = FtwDevice->FtwBackupFvb->Write (
-                                            FtwDevice->FtwBackupFvb,
-                                            FtwDevice->FtwSpareLba + Index,
-                                            0,
-                                            &Length,
-                                            Ptr
-                                            );
+                                        FtwDevice->FtwBackupFvb,
+                                        FtwDevice->FtwSpareLba + Index,
+                                        0,
+                                        &Length,
+                                        Ptr
+                                        );
     if (EFI_ERROR (Status)) {
       FreePool (TempBuffer);
       FreePool (SpareBuffer);
       return EFI_ABORTED;
     }
 
-    Ptr += Length;
+    Ptr            += Length;
     TempBufferSize -= Length;
   }
+
   //
   // Free TempBuffer
   //
@@ -535,16 +547,17 @@ FtwReclaimWorkSpace (
   // Set the WorkingBlockValid in spare block
   //
   Status = FtwUpdateFvState (
-            FtwDevice->FtwBackupFvb,
-            FtwDevice->SpareBlockSize,
-            FtwDevice->FtwSpareLba + FtwDevice->FtwWorkSpaceLbaInSpare,
-            FtwDevice->FtwWorkSpaceBaseInSpare + sizeof (EFI_GUID) + sizeof (UINT32),
-            WORKING_BLOCK_VALID
-            );
+             FtwDevice->FtwBackupFvb,
+             FtwDevice->SpareBlockSize,
+             FtwDevice->FtwSpareLba + FtwDevice->FtwWorkSpaceLbaInSpare,
+             FtwDevice->FtwWorkSpaceBaseInSpare + sizeof (EFI_GUID) + sizeof (UINT32),
+             WORKING_BLOCK_VALID
+             );
   if (EFI_ERROR (Status)) {
     FreePool (SpareBuffer);
     return EFI_ABORTED;
   }
+
   //
   // Before erase the working block, set WorkingBlockInvalid in working block.
   //
@@ -552,12 +565,12 @@ FtwReclaimWorkSpace (
   //                          WorkingBlockInvalid);
   //
   Status = FtwUpdateFvState (
-            FtwDevice->FtwFvBlock,
-            FtwDevice->WorkBlockSize,
-            FtwDevice->FtwWorkSpaceLba,
-            FtwDevice->FtwWorkSpaceBase + sizeof (EFI_GUID) + sizeof (UINT32),
-            WORKING_BLOCK_INVALID
-            );
+             FtwDevice->FtwFvBlock,
+             FtwDevice->WorkBlockSize,
+             FtwDevice->FtwWorkSpaceLba,
+             FtwDevice->FtwWorkSpaceBase + sizeof (EFI_GUID) + sizeof (UINT32),
+             WORKING_BLOCK_INVALID
+             );
   if (EFI_ERROR (Status)) {
     FreePool (SpareBuffer);
     return EFI_ABORTED;
@@ -573,15 +586,17 @@ FtwReclaimWorkSpace (
     FreePool (SpareBuffer);
     return Status;
   }
+
   //
   // Restore spare backup buffer into spare block , if no failure happened during FtwWrite.
   //
-  Status  = FtwEraseSpareBlock (FtwDevice);
+  Status = FtwEraseSpareBlock (FtwDevice);
   if (EFI_ERROR (Status)) {
     FreePool (SpareBuffer);
     return EFI_ABORTED;
   }
-  Ptr     = SpareBuffer;
+
+  Ptr = SpareBuffer;
   for (Index = 0; Index < FtwDevice->NumberOfSpareBlock; Index += 1) {
     Length = FtwDevice->SpareBlockSize;
     Status = FtwDevice->FtwBackupFvb->Write (
@@ -601,7 +616,7 @@ FtwReclaimWorkSpace (
 
   FreePool (SpareBuffer);
 
-  DEBUG ((EFI_D_INFO, "Ftw: reclaim work space successfully\n"));
+  DEBUG ((DEBUG_INFO, "Ftw: reclaim work space successfully\n"));
 
   return EFI_SUCCESS;
 }

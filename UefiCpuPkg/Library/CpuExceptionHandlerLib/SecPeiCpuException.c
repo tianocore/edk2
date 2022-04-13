@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/VmgExitLib.h>
 #include "CpuExceptionCommon.h"
 
-CONST UINTN    mDoFarReturnFlag  = 0;
+CONST UINTN  mDoFarReturnFlag = 0;
 
 /**
   Common exception handler.
@@ -21,26 +21,51 @@ CONST UINTN    mDoFarReturnFlag  = 0;
 VOID
 EFIAPI
 CommonExceptionHandler (
-  IN EFI_EXCEPTION_TYPE   ExceptionType,
-  IN EFI_SYSTEM_CONTEXT   SystemContext
+  IN EFI_EXCEPTION_TYPE  ExceptionType,
+  IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  if (ExceptionType == VC_EXCEPTION) {
-    EFI_STATUS  Status;
-    //
-    // #VC needs to be handled immediately upon enabling exception handling
-    // and therefore can't use the RegisterCpuInterruptHandler() interface
-    // (which isn't supported under Sec and Pei anyway).
-    //
-    // Handle the #VC:
-    //   On EFI_SUCCESS - Exception has been handled, return
-    //   On other       - ExceptionType contains (possibly new) exception
-    //                    value
-    //
-    Status = VmgExitHandleVc (&ExceptionType, SystemContext);
-    if (!EFI_ERROR (Status)) {
-      return;
-    }
+  EFI_STATUS  Status;
+
+  switch (ExceptionType) {
+    case VC_EXCEPTION:
+      //
+      // #VC needs to be handled immediately upon enabling exception handling
+      // and therefore can't use the RegisterCpuInterruptHandler() interface
+      // (which isn't supported under Sec and Pei anyway).
+      //
+      // Handle the #VC:
+      //   On EFI_SUCCESS - Exception has been handled, return
+      //   On other       - ExceptionType contains (possibly new) exception
+      //                    value
+      //
+      Status = VmgExitHandleVc (&ExceptionType, SystemContext);
+      if (!EFI_ERROR (Status)) {
+        return;
+      }
+
+      break;
+
+    case VE_EXCEPTION:
+      //
+      // #VE needs to be handled immediately upon enabling exception handling
+      // and therefore can't use the RegisterCpuInterruptHandler() interface
+      // (which isn't supported under Sec and Pei anyway).
+      //
+      // Handle the #VE:
+      //   On EFI_SUCCESS - Exception has been handled, return
+      //   On other       - ExceptionType contains (possibly new) exception
+      //                    value
+      //
+      Status = VmTdExitHandleVe (&ExceptionType, SystemContext);
+      if (!EFI_ERROR (Status)) {
+        return;
+      }
+
+      break;
+
+    default:
+      break;
   }
 
   //
@@ -79,26 +104,27 @@ CommonExceptionHandler (
 EFI_STATUS
 EFIAPI
 InitializeCpuExceptionHandlers (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
   )
 {
-  EFI_STATUS                       Status;
-  RESERVED_VECTORS_DATA            ReservedVectorData[CPU_EXCEPTION_NUM];
-  IA32_DESCRIPTOR                  IdtDescriptor;
-  UINTN                            IdtEntryCount;
-  UINT16                           CodeSegment;
-  EXCEPTION_HANDLER_TEMPLATE_MAP   TemplateMap;
-  IA32_IDT_GATE_DESCRIPTOR         *IdtTable;
-  UINTN                            Index;
-  UINTN                            InterruptHandler;
+  EFI_STATUS                      Status;
+  RESERVED_VECTORS_DATA           ReservedVectorData[CPU_EXCEPTION_NUM];
+  IA32_DESCRIPTOR                 IdtDescriptor;
+  UINTN                           IdtEntryCount;
+  UINT16                          CodeSegment;
+  EXCEPTION_HANDLER_TEMPLATE_MAP  TemplateMap;
+  IA32_IDT_GATE_DESCRIPTOR        *IdtTable;
+  UINTN                           Index;
+  UINTN                           InterruptHandler;
 
   if (VectorInfo != NULL) {
-    SetMem ((VOID *) ReservedVectorData, sizeof (RESERVED_VECTORS_DATA) * CPU_EXCEPTION_NUM, 0xff);
+    SetMem ((VOID *)ReservedVectorData, sizeof (RESERVED_VECTORS_DATA) * CPU_EXCEPTION_NUM, 0xff);
     Status = ReadAndVerifyVectorInfo (VectorInfo, ReservedVectorData, CPU_EXCEPTION_NUM);
     if (EFI_ERROR (Status)) {
       return EFI_INVALID_PARAMETER;
     }
   }
+
   //
   // Read IDT descriptor and calculate IDT size
   //
@@ -110,6 +136,7 @@ InitializeCpuExceptionHandlers (
     //
     IdtEntryCount = CPU_EXCEPTION_NUM;
   }
+
   //
   // Use current CS as the segment selector of interrupt gate in IDT
   //
@@ -117,7 +144,7 @@ InitializeCpuExceptionHandlers (
 
   AsmGetTemplateAddressMap (&TemplateMap);
   IdtTable = (IA32_IDT_GATE_DESCRIPTOR *)IdtDescriptor.Base;
-  for (Index = 0; Index < IdtEntryCount; Index ++) {
+  for (Index = 0; Index < IdtEntryCount; Index++) {
     IdtTable[Index].Bits.Selector = CodeSegment;
     //
     // Check reserved vectors attributes if has, only EFI_VECTOR_HANDOFF_DO_NOT_HOOK
@@ -128,12 +155,14 @@ InitializeCpuExceptionHandlers (
         continue;
       }
     }
+
     //
     // Update IDT entry
     //
     InterruptHandler = TemplateMap.ExceptionStart + Index * TemplateMap.ExceptionStubHeaderSize;
     ArchUpdateIdtEntry (&IdtTable[Index], InterruptHandler);
   }
+
   return EFI_SUCCESS;
 }
 
@@ -156,7 +185,7 @@ InitializeCpuExceptionHandlers (
 EFI_STATUS
 EFIAPI
 InitializeCpuInterruptHandlers (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
   )
 {
   return EFI_UNSUPPORTED;
@@ -188,8 +217,8 @@ InitializeCpuInterruptHandlers (
 EFI_STATUS
 EFIAPI
 RegisterCpuInterruptHandler (
-  IN EFI_EXCEPTION_TYPE            InterruptType,
-  IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
+  IN EFI_EXCEPTION_TYPE         InterruptType,
+  IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler
   )
 {
   return EFI_UNSUPPORTED;
@@ -220,8 +249,8 @@ RegisterCpuInterruptHandler (
 EFI_STATUS
 EFIAPI
 InitializeCpuExceptionHandlersEx (
-  IN EFI_VECTOR_HANDOFF_INFO            *VectorInfo OPTIONAL,
-  IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL,
+  IN CPU_EXCEPTION_INIT_DATA  *InitData OPTIONAL
   )
 {
   return InitializeCpuExceptionHandlers (VectorInfo);

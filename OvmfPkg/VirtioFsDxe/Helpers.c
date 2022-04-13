@@ -29,12 +29,12 @@
 STATIC
 EFI_STATUS
 VirtioFsReadConfig (
-  IN  VIRTIO_DEVICE_PROTOCOL *Virtio,
-  OUT VIRTIO_FS_CONFIG       *Config
+  IN  VIRTIO_DEVICE_PROTOCOL  *Virtio,
+  OUT VIRTIO_FS_CONFIG        *Config
   )
 {
-  UINTN      Idx;
-  EFI_STATUS Status;
+  UINTN       Idx;
+  EFI_STATUS  Status;
 
   for (Idx = 0; Idx < VIRTIO_FS_TAG_BYTES; Idx++) {
     Status = Virtio->ReadDevice (
@@ -78,15 +78,15 @@ VirtioFsReadConfig (
 **/
 EFI_STATUS
 VirtioFsInit (
-  IN OUT VIRTIO_FS *VirtioFs
+  IN OUT VIRTIO_FS  *VirtioFs
   )
 {
-  UINT8            NextDevStat;
-  EFI_STATUS       Status;
-  UINT64           Features;
-  VIRTIO_FS_CONFIG Config;
-  UINTN            Idx;
-  UINT64           RingBaseShift;
+  UINT8             NextDevStat;
+  EFI_STATUS        Status;
+  UINT64            Features;
+  VIRTIO_FS_CONFIG  Config;
+  UINTN             Idx;
+  UINT64            RingBaseShift;
 
   //
   // Execute virtio-v1.1-cs01-87fa6b5d8155, 3.1.1 Driver Requirements: Device
@@ -95,7 +95,7 @@ VirtioFsInit (
   // 1. Reset the device.
   //
   NextDevStat = 0;
-  Status = VirtioFs->Virtio->SetDeviceStatus (VirtioFs->Virtio, NextDevStat);
+  Status      = VirtioFs->Virtio->SetDeviceStatus (VirtioFs->Virtio, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
@@ -104,7 +104,7 @@ VirtioFsInit (
   // 2. Set the ACKNOWLEDGE status bit [...]
   //
   NextDevStat |= VSTAT_ACK;
-  Status = VirtioFs->Virtio->SetDeviceStatus (VirtioFs->Virtio, NextDevStat);
+  Status       = VirtioFs->Virtio->SetDeviceStatus (VirtioFs->Virtio, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
@@ -113,7 +113,7 @@ VirtioFsInit (
   // 3. Set the DRIVER status bit [...]
   //
   NextDevStat |= VSTAT_DRIVER;
-  Status = VirtioFs->Virtio->SetDeviceStatus (VirtioFs->Virtio, NextDevStat);
+  Status       = VirtioFs->Virtio->SetDeviceStatus (VirtioFs->Virtio, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
@@ -125,10 +125,12 @@ VirtioFsInit (
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
+
   if ((Features & VIRTIO_F_VERSION_1) == 0) {
     Status = EFI_UNSUPPORTED;
     goto Failed;
   }
+
   //
   // No device-specific feature bits have been defined in file "virtio-fs.tex"
   // of the virtio spec at <https://github.com/oasis-tcs/virtio-spec.git>, as
@@ -163,12 +165,14 @@ VirtioFsInit (
   // original label.
   //
   for (Idx = 0; Idx < VIRTIO_FS_TAG_BYTES && Config.Tag[Idx] != '\0'; Idx++) {
-    if (Config.Tag[Idx] < 0x20 || Config.Tag[Idx] > 0x7E) {
+    if ((Config.Tag[Idx] < 0x20) || (Config.Tag[Idx] > 0x7E)) {
       Status = EFI_UNSUPPORTED;
       goto Failed;
     }
+
     VirtioFs->Label[Idx] = Config.Tag[Idx];
   }
+
   VirtioFs->Label[Idx] = L'\0';
 
   //
@@ -184,16 +188,22 @@ VirtioFsInit (
   // queue at once. We'll need two descriptors per request, as a minimum --
   // request header, response header.
   //
-  Status = VirtioFs->Virtio->SetQueueSel (VirtioFs->Virtio,
-                               VIRTIO_FS_REQUEST_QUEUE);
+  Status = VirtioFs->Virtio->SetQueueSel (
+                               VirtioFs->Virtio,
+                               VIRTIO_FS_REQUEST_QUEUE
+                               );
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
-  Status = VirtioFs->Virtio->GetQueueNumMax (VirtioFs->Virtio,
-                               &VirtioFs->QueueSize);
+
+  Status = VirtioFs->Virtio->GetQueueNumMax (
+                               VirtioFs->Virtio,
+                               &VirtioFs->QueueSize
+                               );
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
+
   if (VirtioFs->QueueSize < 2) {
     Status = EFI_UNSUPPORTED;
     goto Failed;
@@ -202,20 +212,30 @@ VirtioFsInit (
   //
   // 7.d. [...] population of virtqueues [...]
   //
-  Status = VirtioRingInit (VirtioFs->Virtio, VirtioFs->QueueSize,
-             &VirtioFs->Ring);
+  Status = VirtioRingInit (
+             VirtioFs->Virtio,
+             VirtioFs->QueueSize,
+             &VirtioFs->Ring
+             );
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
 
-  Status = VirtioRingMap (VirtioFs->Virtio, &VirtioFs->Ring, &RingBaseShift,
-             &VirtioFs->RingMap);
+  Status = VirtioRingMap (
+             VirtioFs->Virtio,
+             &VirtioFs->Ring,
+             &RingBaseShift,
+             &VirtioFs->RingMap
+             );
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
   }
 
-  Status = VirtioFs->Virtio->SetQueueAddress (VirtioFs->Virtio,
-                               &VirtioFs->Ring, RingBaseShift);
+  Status = VirtioFs->Virtio->SetQueueAddress (
+                               VirtioFs->Virtio,
+                               &VirtioFs->Ring,
+                               RingBaseShift
+                               );
   if (EFI_ERROR (Status)) {
     goto UnmapQueue;
   }
@@ -224,7 +244,7 @@ VirtioFsInit (
   // 8. Set the DRIVER_OK status bit.
   //
   NextDevStat |= VSTAT_DRIVER_OK;
-  Status = VirtioFs->Virtio->SetDeviceStatus (VirtioFs->Virtio, NextDevStat);
+  Status       = VirtioFs->Virtio->SetDeviceStatus (VirtioFs->Virtio, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto UnmapQueue;
   }
@@ -262,7 +282,7 @@ Failed:
 **/
 VOID
 VirtioFsUninit (
-  IN OUT VIRTIO_FS *VirtioFs
+  IN OUT VIRTIO_FS  *VirtioFs
   )
 {
   //
@@ -290,15 +310,20 @@ VirtioFsUninit (
 VOID
 EFIAPI
 VirtioFsExitBoot (
-  IN EFI_EVENT ExitBootEvent,
-  IN VOID      *VirtioFsAsVoid
+  IN EFI_EVENT  ExitBootEvent,
+  IN VOID       *VirtioFsAsVoid
   )
 {
-  VIRTIO_FS *VirtioFs;
+  VIRTIO_FS  *VirtioFs;
 
   VirtioFs = VirtioFsAsVoid;
-  DEBUG ((DEBUG_VERBOSE, "%a: VirtioFs=0x%p Label=\"%s\"\n", __FUNCTION__,
-    VirtioFsAsVoid, VirtioFs->Label));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: VirtioFs=0x%p Label=\"%s\"\n",
+    __FUNCTION__,
+    VirtioFsAsVoid,
+    VirtioFs->Label
+    ));
   VirtioFs->Virtio->SetDeviceStatus (VirtioFs->Virtio, 0);
 }
 
@@ -371,14 +396,14 @@ VirtioFsExitBoot (
 **/
 EFI_STATUS
 VirtioFsSgListsValidate (
-  IN     VIRTIO_FS                     *VirtioFs,
-  IN OUT VIRTIO_FS_SCATTER_GATHER_LIST *RequestSgList,
-  IN OUT VIRTIO_FS_SCATTER_GATHER_LIST *ResponseSgList OPTIONAL
+  IN     VIRTIO_FS                      *VirtioFs,
+  IN OUT VIRTIO_FS_SCATTER_GATHER_LIST  *RequestSgList,
+  IN OUT VIRTIO_FS_SCATTER_GATHER_LIST  *ResponseSgList OPTIONAL
   )
 {
-  VIRTIO_FS_SCATTER_GATHER_LIST *SgListParam[2];
-  UINT16                        DescriptorsNeeded;
-  UINTN                         ListId;
+  VIRTIO_FS_SCATTER_GATHER_LIST  *SgListParam[2];
+  UINT16                         DescriptorsNeeded;
+  UINTN                          ListId;
 
   if (RequestSgList == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -389,42 +414,47 @@ VirtioFsSgListsValidate (
 
   DescriptorsNeeded = 0;
   for (ListId = 0; ListId < ARRAY_SIZE (SgListParam); ListId++) {
-    VIRTIO_FS_SCATTER_GATHER_LIST *SgList;
-    UINT32                        SgListTotalSize;
-    UINTN                         IoVecIdx;
+    VIRTIO_FS_SCATTER_GATHER_LIST  *SgList;
+    UINT32                         SgListTotalSize;
+    UINTN                          IoVecIdx;
 
     SgList = SgListParam[ListId];
     if (SgList == NULL) {
       continue;
     }
+
     //
     // Sanity-check SgList -- it must provide at least one IO Vector.
     //
-    if (SgList->IoVec == NULL || SgList->NumVec == 0) {
+    if ((SgList->IoVec == NULL) || (SgList->NumVec == 0)) {
       return EFI_INVALID_PARAMETER;
     }
+
     //
     // Make sure that, for each IO Vector in this SgList, a virtio descriptor
     // can be added to the virtio queue, after the other descriptors added
     // previously.
     //
-    if (SgList->NumVec > (UINTN)(MAX_UINT16 - DescriptorsNeeded) ||
-        DescriptorsNeeded + SgList->NumVec > VirtioFs->QueueSize) {
+    if ((SgList->NumVec > (UINTN)(MAX_UINT16 - DescriptorsNeeded)) ||
+        (DescriptorsNeeded + SgList->NumVec > VirtioFs->QueueSize))
+    {
       return EFI_UNSUPPORTED;
     }
+
     DescriptorsNeeded += (UINT16)SgList->NumVec;
 
     SgListTotalSize = 0;
     for (IoVecIdx = 0; IoVecIdx < SgList->NumVec; IoVecIdx++) {
-      VIRTIO_FS_IO_VECTOR *IoVec;
+      VIRTIO_FS_IO_VECTOR  *IoVec;
 
       IoVec = &SgList->IoVec[IoVecIdx];
       //
       // Sanity-check this IoVec -- it must describe a non-empty buffer.
       //
-      if (IoVec->Buffer == NULL || IoVec->Size == 0) {
+      if ((IoVec->Buffer == NULL) || (IoVec->Size == 0)) {
         return EFI_INVALID_PARAMETER;
       }
+
       //
       // Make sure the cumulative size of all IO Vectors in this SgList remains
       // expressible as a UINT32.
@@ -432,6 +462,7 @@ VirtioFsSgListsValidate (
       if (IoVec->Size > MAX_UINT32 - SgListTotalSize) {
         return EFI_UNSUPPORTED;
       }
+
       SgListTotalSize += (UINT32)IoVec->Size;
 
       //
@@ -505,22 +536,22 @@ VirtioFsSgListsValidate (
 **/
 EFI_STATUS
 VirtioFsSgListsSubmit (
-  IN OUT VIRTIO_FS                     *VirtioFs,
-  IN OUT VIRTIO_FS_SCATTER_GATHER_LIST *RequestSgList,
-  IN OUT VIRTIO_FS_SCATTER_GATHER_LIST *ResponseSgList OPTIONAL
+  IN OUT VIRTIO_FS                      *VirtioFs,
+  IN OUT VIRTIO_FS_SCATTER_GATHER_LIST  *RequestSgList,
+  IN OUT VIRTIO_FS_SCATTER_GATHER_LIST  *ResponseSgList OPTIONAL
   )
 {
-  VIRTIO_FS_SCATTER_GATHER_LIST *SgListParam[2];
-  VIRTIO_MAP_OPERATION          SgListVirtioMapOp[ARRAY_SIZE (SgListParam)];
-  UINT16                        SgListDescriptorFlag[ARRAY_SIZE (SgListParam)];
-  UINTN                         ListId;
-  VIRTIO_FS_SCATTER_GATHER_LIST *SgList;
-  UINTN                         IoVecIdx;
-  VIRTIO_FS_IO_VECTOR           *IoVec;
-  EFI_STATUS                    Status;
-  DESC_INDICES                  Indices;
-  UINT32                        TotalBytesWrittenByDevice;
-  UINT32                        BytesPermittedForWrite;
+  VIRTIO_FS_SCATTER_GATHER_LIST  *SgListParam[2];
+  VIRTIO_MAP_OPERATION           SgListVirtioMapOp[ARRAY_SIZE (SgListParam)];
+  UINT16                         SgListDescriptorFlag[ARRAY_SIZE (SgListParam)];
+  UINTN                          ListId;
+  VIRTIO_FS_SCATTER_GATHER_LIST  *SgList;
+  UINTN                          IoVecIdx;
+  VIRTIO_FS_IO_VECTOR            *IoVec;
+  EFI_STATUS                     Status;
+  DESC_INDICES                   Indices;
+  UINT32                         TotalBytesWrittenByDevice;
+  UINT32                         BytesPermittedForWrite;
 
   SgListParam[0]          = RequestSgList;
   SgListVirtioMapOp[0]    = VirtioOperationBusMasterRead;
@@ -538,6 +569,7 @@ VirtioFsSgListsSubmit (
     if (SgList == NULL) {
       continue;
     }
+
     for (IoVecIdx = 0; IoVecIdx < SgList->NumVec; IoVecIdx++) {
       IoVec = &SgList->IoVec[IoVecIdx];
       //
@@ -554,6 +586,7 @@ VirtioFsSgListsSubmit (
       if (EFI_ERROR (Status)) {
         goto Unmap;
       }
+
       IoVec->Mapped = TRUE;
     }
   }
@@ -567,18 +600,21 @@ VirtioFsSgListsSubmit (
     if (SgList == NULL) {
       continue;
     }
+
     for (IoVecIdx = 0; IoVecIdx < SgList->NumVec; IoVecIdx++) {
-      UINT16 NextFlag;
+      UINT16  NextFlag;
 
       IoVec = &SgList->IoVec[IoVecIdx];
       //
       // Set VRING_DESC_F_NEXT on all except the very last descriptor.
       //
       NextFlag = VRING_DESC_F_NEXT;
-      if (ListId == ARRAY_SIZE (SgListParam) - 1 &&
-          IoVecIdx == SgList->NumVec - 1) {
+      if ((ListId == ARRAY_SIZE (SgListParam) - 1) &&
+          (IoVecIdx == SgList->NumVec - 1))
+      {
         NextFlag = 0;
       }
+
       VirtioAppendDesc (
         &VirtioFs->Ring,
         IoVec->MappedAddress,
@@ -592,8 +628,13 @@ VirtioFsSgListsSubmit (
   //
   // Submit the descriptor chain.
   //
-  Status = VirtioFlush (VirtioFs->Virtio, VIRTIO_FS_REQUEST_QUEUE,
-             &VirtioFs->Ring, &Indices, &TotalBytesWrittenByDevice);
+  Status = VirtioFlush (
+             VirtioFs->Virtio,
+             VIRTIO_FS_REQUEST_QUEUE,
+             &VirtioFs->Ring,
+             &Indices,
+             &TotalBytesWrittenByDevice
+             );
   if (EFI_ERROR (Status)) {
     goto Unmap;
   }
@@ -607,6 +648,7 @@ VirtioFsSgListsSubmit (
   } else {
     BytesPermittedForWrite = ResponseSgList->TotalSize;
   }
+
   if (TotalBytesWrittenByDevice > BytesPermittedForWrite) {
     Status = EFI_DEVICE_ERROR;
     goto Unmap;
@@ -620,6 +662,7 @@ VirtioFsSgListsSubmit (
     if (SgList == NULL) {
       continue;
     }
+
     for (IoVecIdx = 0; IoVecIdx < SgList->NumVec; IoVecIdx++) {
       IoVec = &SgList->IoVec[IoVecIdx];
       if (SgListVirtioMapOp[ListId] == VirtioOperationBusMasterRead) {
@@ -636,8 +679,10 @@ VirtioFsSgListsSubmit (
         // across all device-writeable descriptors, in the order they were
         // chained on the ring.
         //
-        IoVec->Transferred = MIN ((UINTN)TotalBytesWrittenByDevice,
-                               IoVec->Size);
+        IoVec->Transferred = MIN (
+                               (UINTN)TotalBytesWrittenByDevice,
+                               IoVec->Size
+                               );
         TotalBytesWrittenByDevice -= (UINT32)IoVec->Transferred;
       }
     }
@@ -664,9 +709,10 @@ Unmap:
     if (SgList == NULL) {
       continue;
     }
+
     IoVecIdx = SgList->NumVec;
     while (IoVecIdx > 0) {
-      EFI_STATUS UnmapStatus;
+      EFI_STATUS  UnmapStatus;
 
       --IoVecIdx;
       IoVec = &SgList->IoVec[IoVecIdx];
@@ -676,8 +722,11 @@ Unmap:
       if (!IoVec->Mapped) {
         continue;
       }
-      UnmapStatus = VirtioFs->Virtio->UnmapSharedBuffer (VirtioFs->Virtio,
-                                        IoVec->Mapping);
+
+      UnmapStatus = VirtioFs->Virtio->UnmapSharedBuffer (
+                                        VirtioFs->Virtio,
+                                        IoVec->Mapping
+                                        );
       //
       // Re-set the following fields to the values they initially got from
       // VirtioFsSgListsValidate() -- the above unmapping attempt is considered
@@ -740,7 +789,7 @@ Unmap:
 EFI_STATUS
 VirtioFsFuseNewRequest (
   IN OUT VIRTIO_FS              *VirtioFs,
-     OUT VIRTIO_FS_FUSE_REQUEST *Request,
+  OUT VIRTIO_FS_FUSE_REQUEST    *Request,
   IN     UINT32                 RequestSize,
   IN     VIRTIO_FS_FUSE_OPCODE  Opcode,
   IN     UINT64                 NodeId
@@ -822,15 +871,15 @@ VirtioFsFuseNewRequest (
 **/
 EFI_STATUS
 VirtioFsFuseCheckResponse (
-  IN  VIRTIO_FS_SCATTER_GATHER_LIST *ResponseSgList,
-  IN  UINT64                        RequestId,
-  OUT UINTN                         *TailBufferFill
+  IN  VIRTIO_FS_SCATTER_GATHER_LIST  *ResponseSgList,
+  IN  UINT64                         RequestId,
+  OUT UINTN                          *TailBufferFill
   )
 {
-  UINTN                   NumFixedSizeVec;
-  VIRTIO_FS_FUSE_RESPONSE *CommonResp;
-  UINT32                  TotalTransferred;
-  UINTN                   Idx;
+  UINTN                    NumFixedSizeVec;
+  VIRTIO_FS_FUSE_RESPONSE  *CommonResp;
+  UINT32                   TotalTransferred;
+  UINTN                    Idx;
 
   //
   // Ensured by VirtioFsSgListsValidate().
@@ -851,6 +900,7 @@ VirtioFsFuseCheckResponse (
     if (ResponseSgList->NumVec == 1) {
       return EFI_INVALID_PARAMETER;
     }
+
     NumFixedSizeVec = ResponseSgList->NumVec - 1;
   }
 
@@ -861,6 +911,7 @@ VirtioFsFuseCheckResponse (
   if (ResponseSgList->IoVec[0].Size != sizeof *CommonResp) {
     return EFI_INVALID_PARAMETER;
   }
+
   if (ResponseSgList->IoVec[0].Transferred != ResponseSgList->IoVec[0].Size) {
     return EFI_PROTOCOL_ERROR;
   }
@@ -869,7 +920,7 @@ VirtioFsFuseCheckResponse (
   // FUSE must report the same number of bytes, written by the Virtio
   // Filesystem device, as the virtio transport does.
   //
-  CommonResp = ResponseSgList->IoVec[0].Buffer;
+  CommonResp       = ResponseSgList->IoVec[0].Buffer;
   TotalTransferred = 0;
   for (Idx = 0; Idx < ResponseSgList->NumVec; Idx++) {
     //
@@ -878,6 +929,7 @@ VirtioFsFuseCheckResponse (
     //
     TotalTransferred += (UINT32)ResponseSgList->IoVec[Idx].Transferred;
   }
+
   if (CommonResp->Len != TotalTransferred) {
     return EFI_PROTOCOL_ERROR;
   }
@@ -905,7 +957,8 @@ VirtioFsFuseCheckResponse (
   ASSERT (NumFixedSizeVec >= 1);
   for (Idx = 1; Idx < NumFixedSizeVec; Idx++) {
     if (ResponseSgList->IoVec[Idx].Transferred !=
-        ResponseSgList->IoVec[Idx].Size) {
+        ResponseSgList->IoVec[Idx].Size)
+    {
       return EFI_PROTOCOL_ERROR;
     }
   }
@@ -936,185 +989,185 @@ VirtioFsFuseCheckResponse (
 **/
 EFI_STATUS
 VirtioFsErrnoToEfiStatus (
-  IN INT32 Errno
+  IN INT32  Errno
   )
 {
   switch (Errno) {
-  case   -1: // EPERM               Operation not permitted
-    return EFI_SECURITY_VIOLATION;
+    case   -1:// EPERM               Operation not permitted
+      return EFI_SECURITY_VIOLATION;
 
-  case   -2: // ENOENT              No such file or directory
-  case   -3: // ESRCH               No such process
-  case   -6: // ENXIO               No such device or address
-  case  -10: // ECHILD              No child processes
-  case  -19: // ENODEV              No such device
-  case  -49: // EUNATCH             Protocol driver not attached
-  case  -65: // ENOPKG              Package not installed
-  case  -79: // ELIBACC             Can not access a needed shared library
-  case -126: // ENOKEY              Required key not available
-    return EFI_NOT_FOUND;
+    case   -2: // ENOENT              No such file or directory
+    case   -3: // ESRCH               No such process
+    case   -6: // ENXIO               No such device or address
+    case  -10: // ECHILD              No child processes
+    case  -19: // ENODEV              No such device
+    case  -49: // EUNATCH             Protocol driver not attached
+    case  -65: // ENOPKG              Package not installed
+    case  -79: // ELIBACC             Can not access a needed shared library
+    case -126: // ENOKEY              Required key not available
+      return EFI_NOT_FOUND;
 
-  case   -4: // EINTR               Interrupted system call
-  case  -11: // EAGAIN, EWOULDBLOCK Resource temporarily unavailable
-  case  -16: // EBUSY               Device or resource busy
-  case  -26: // ETXTBSY             Text file busy
-  case  -35: // EDEADLK, EDEADLOCK  Resource deadlock avoided
-  case  -39: // ENOTEMPTY           Directory not empty
-  case  -42: // ENOMSG              No message of desired type
-  case  -61: // ENODATA             No data available
-  case  -85: // ERESTART            Interrupted system call should be restarted
-    return EFI_NOT_READY;
+    case   -4: // EINTR               Interrupted system call
+    case  -11: // EAGAIN, EWOULDBLOCK Resource temporarily unavailable
+    case  -16: // EBUSY               Device or resource busy
+    case  -26: // ETXTBSY             Text file busy
+    case  -35: // EDEADLK, EDEADLOCK  Resource deadlock avoided
+    case  -39: // ENOTEMPTY           Directory not empty
+    case  -42: // ENOMSG              No message of desired type
+    case  -61: // ENODATA             No data available
+    case  -85: // ERESTART            Interrupted system call should be restarted
+      return EFI_NOT_READY;
 
-  case   -5: // EIO                 Input/output error
-  case  -45: // EL2NSYNC            Level 2 not synchronized
-  case  -46: // EL3HLT              Level 3 halted
-  case  -47: // EL3RST              Level 3 reset
-  case  -51: // EL2HLT              Level 2 halted
-  case -121: // EREMOTEIO           Remote I/O error
-  case -133: // EHWPOISON           Memory page has hardware error
-    return EFI_DEVICE_ERROR;
+    case   -5: // EIO                 Input/output error
+    case  -45: // EL2NSYNC            Level 2 not synchronized
+    case  -46: // EL3HLT              Level 3 halted
+    case  -47: // EL3RST              Level 3 reset
+    case  -51: // EL2HLT              Level 2 halted
+    case -121: // EREMOTEIO           Remote I/O error
+    case -133: // EHWPOISON           Memory page has hardware error
+      return EFI_DEVICE_ERROR;
 
-  case   -7: // E2BIG               Argument list too long
-  case  -36: // ENAMETOOLONG        File name too long
-  case  -90: // EMSGSIZE            Message too long
-    return EFI_BAD_BUFFER_SIZE;
+    case   -7: // E2BIG               Argument list too long
+    case  -36: // ENAMETOOLONG        File name too long
+    case  -90: // EMSGSIZE            Message too long
+      return EFI_BAD_BUFFER_SIZE;
 
-  case   -8: // ENOEXEC             Exec format error
-  case  -15: // ENOTBLK             Block device required
-  case  -18: // EXDEV               Invalid cross-device link
-  case  -20: // ENOTDIR             Not a directory
-  case  -21: // EISDIR              Is a directory
-  case  -25: // ENOTTY              Inappropriate ioctl for device
-  case  -27: // EFBIG               File too large
-  case  -29: // ESPIPE              Illegal seek
-  case  -38: // ENOSYS              Function not implemented
-  case  -59: // EBFONT              Bad font file format
-  case  -60: // ENOSTR              Device not a stream
-  case  -83: // ELIBEXEC            Cannot exec a shared library directly
-  case  -88: // ENOTSOCK            Socket operation on non-socket
-  case  -91: // EPROTOTYPE          Protocol wrong type for socket
-  case  -92: // ENOPROTOOPT         Protocol not available
-  case  -93: // EPROTONOSUPPORT     Protocol not supported
-  case  -94: // ESOCKTNOSUPPORT     Socket type not supported
-  case  -95: // ENOTSUP, EOPNOTSUPP Operation not supported
-  case  -96: // EPFNOSUPPORT        Protocol family not supported
-  case  -97: // EAFNOSUPPORT        Address family not supported by protocol
-  case  -99: // EADDRNOTAVAIL       Cannot assign requested address
-  case -118: // ENOTNAM             Not a XENIX named type file
-  case -120: // EISNAM              Is a named type file
-  case -124: // EMEDIUMTYPE         Wrong medium type
-    return EFI_UNSUPPORTED;
+    case   -8: // ENOEXEC             Exec format error
+    case  -15: // ENOTBLK             Block device required
+    case  -18: // EXDEV               Invalid cross-device link
+    case  -20: // ENOTDIR             Not a directory
+    case  -21: // EISDIR              Is a directory
+    case  -25: // ENOTTY              Inappropriate ioctl for device
+    case  -27: // EFBIG               File too large
+    case  -29: // ESPIPE              Illegal seek
+    case  -38: // ENOSYS              Function not implemented
+    case  -59: // EBFONT              Bad font file format
+    case  -60: // ENOSTR              Device not a stream
+    case  -83: // ELIBEXEC            Cannot exec a shared library directly
+    case  -88: // ENOTSOCK            Socket operation on non-socket
+    case  -91: // EPROTOTYPE          Protocol wrong type for socket
+    case  -92: // ENOPROTOOPT         Protocol not available
+    case  -93: // EPROTONOSUPPORT     Protocol not supported
+    case  -94: // ESOCKTNOSUPPORT     Socket type not supported
+    case  -95: // ENOTSUP, EOPNOTSUPP Operation not supported
+    case  -96: // EPFNOSUPPORT        Protocol family not supported
+    case  -97: // EAFNOSUPPORT        Address family not supported by protocol
+    case  -99: // EADDRNOTAVAIL       Cannot assign requested address
+    case -118: // ENOTNAM             Not a XENIX named type file
+    case -120: // EISNAM              Is a named type file
+    case -124: // EMEDIUMTYPE         Wrong medium type
+      return EFI_UNSUPPORTED;
 
-  case   -9: // EBADF               Bad file descriptor
-  case  -14: // EFAULT              Bad address
-  case  -44: // ECHRNG              Channel number out of range
-  case  -48: // ELNRNG              Link number out of range
-  case  -53: // EBADR               Invalid request descriptor
-  case  -56: // EBADRQC             Invalid request code
-  case  -57: // EBADSLT             Invalid slot
-  case  -76: // ENOTUNIQ            Name not unique on network
-  case  -84: // EILSEQ        Invalid or incomplete multibyte or wide character
-    return EFI_NO_MAPPING;
+    case   -9: // EBADF               Bad file descriptor
+    case  -14: // EFAULT              Bad address
+    case  -44: // ECHRNG              Channel number out of range
+    case  -48: // ELNRNG              Link number out of range
+    case  -53: // EBADR               Invalid request descriptor
+    case  -56: // EBADRQC             Invalid request code
+    case  -57: // EBADSLT             Invalid slot
+    case  -76: // ENOTUNIQ            Name not unique on network
+    case  -84: // EILSEQ        Invalid or incomplete multibyte or wide character
+      return EFI_NO_MAPPING;
 
-  case  -12: // ENOMEM              Cannot allocate memory
-  case  -23: // ENFILE              Too many open files in system
-  case  -24: // EMFILE              Too many open files
-  case  -31: // EMLINK              Too many links
-  case  -37: // ENOLCK              No locks available
-  case  -40: // ELOOP               Too many levels of symbolic links
-  case  -50: // ENOCSI              No CSI structure available
-  case  -55: // ENOANO              No anode
-  case  -63: // ENOSR               Out of streams resources
-  case  -82: // ELIBMAX         Attempting to link in too many shared libraries
-  case  -87: // EUSERS              Too many users
-  case -105: // ENOBUFS             No buffer space available
-  case -109: // ETOOMANYREFS        Too many references: cannot splice
-  case -119: // ENAVAIL             No XENIX semaphores available
-  case -122: // EDQUOT              Disk quota exceeded
-    return EFI_OUT_OF_RESOURCES;
+    case  -12: // ENOMEM              Cannot allocate memory
+    case  -23: // ENFILE              Too many open files in system
+    case  -24: // EMFILE              Too many open files
+    case  -31: // EMLINK              Too many links
+    case  -37: // ENOLCK              No locks available
+    case  -40: // ELOOP               Too many levels of symbolic links
+    case  -50: // ENOCSI              No CSI structure available
+    case  -55: // ENOANO              No anode
+    case  -63: // ENOSR               Out of streams resources
+    case  -82: // ELIBMAX         Attempting to link in too many shared libraries
+    case  -87: // EUSERS              Too many users
+    case -105: // ENOBUFS             No buffer space available
+    case -109: // ETOOMANYREFS        Too many references: cannot splice
+    case -119: // ENAVAIL             No XENIX semaphores available
+    case -122: // EDQUOT              Disk quota exceeded
+      return EFI_OUT_OF_RESOURCES;
 
-  case  -13: // EACCES              Permission denied
-    return EFI_ACCESS_DENIED;
+    case  -13:// EACCES              Permission denied
+      return EFI_ACCESS_DENIED;
 
-  case  -17: // EEXIST              File exists
-  case  -98: // EADDRINUSE          Address already in use
-  case -106: // EISCONN             Transport endpoint is already connected
-  case -114: // EALREADY            Operation already in progress
-  case -115: // EINPROGRESS         Operation now in progress
-    return EFI_ALREADY_STARTED;
+    case  -17: // EEXIST              File exists
+    case  -98: // EADDRINUSE          Address already in use
+    case -106: // EISCONN             Transport endpoint is already connected
+    case -114: // EALREADY            Operation already in progress
+    case -115: // EINPROGRESS         Operation now in progress
+      return EFI_ALREADY_STARTED;
 
-  case  -22: // EINVAL              Invalid argument
-  case  -33: // EDOM                Numerical argument out of domain
-    return EFI_INVALID_PARAMETER;
+    case  -22: // EINVAL              Invalid argument
+    case  -33: // EDOM                Numerical argument out of domain
+      return EFI_INVALID_PARAMETER;
 
-  case  -28: // ENOSPC              No space left on device
-  case  -54: // EXFULL              Exchange full
-    return EFI_VOLUME_FULL;
+    case  -28: // ENOSPC              No space left on device
+    case  -54: // EXFULL              Exchange full
+      return EFI_VOLUME_FULL;
 
-  case  -30: // EROFS               Read-only file system
-    return EFI_WRITE_PROTECTED;
+    case  -30:// EROFS               Read-only file system
+      return EFI_WRITE_PROTECTED;
 
-  case  -32: // EPIPE               Broken pipe
-  case  -43: // EIDRM               Identifier removed
-  case  -67: // ENOLINK             Link has been severed
-  case  -68: // EADV                Advertise error
-  case  -69: // ESRMNT              Srmount error
-  case  -70: // ECOMM               Communication error on send
-  case  -73: // EDOTDOT             RFS specific error
-  case  -78: // EREMCHG             Remote address changed
-  case  -86: // ESTRPIPE            Streams pipe error
-  case -102: // ENETRESET           Network dropped connection on reset
-  case -103: // ECONNABORTED        Software caused connection abort
-  case -104: // ECONNRESET          Connection reset by peer
-  case -116: // ESTALE              Stale file handle
-  case -125: // ECANCELED           Operation canceled
-  case -128: // EKEYREVOKED         Key has been revoked
-  case -129: // EKEYREJECTED        Key was rejected by service
-  case -130: // EOWNERDEAD          Owner died
-  case -131: // ENOTRECOVERABLE     State not recoverable
-    return EFI_ABORTED;
+    case  -32: // EPIPE               Broken pipe
+    case  -43: // EIDRM               Identifier removed
+    case  -67: // ENOLINK             Link has been severed
+    case  -68: // EADV                Advertise error
+    case  -69: // ESRMNT              Srmount error
+    case  -70: // ECOMM               Communication error on send
+    case  -73: // EDOTDOT             RFS specific error
+    case  -78: // EREMCHG             Remote address changed
+    case  -86: // ESTRPIPE            Streams pipe error
+    case -102: // ENETRESET           Network dropped connection on reset
+    case -103: // ECONNABORTED        Software caused connection abort
+    case -104: // ECONNRESET          Connection reset by peer
+    case -116: // ESTALE              Stale file handle
+    case -125: // ECANCELED           Operation canceled
+    case -128: // EKEYREVOKED         Key has been revoked
+    case -129: // EKEYREJECTED        Key was rejected by service
+    case -130: // EOWNERDEAD          Owner died
+    case -131: // ENOTRECOVERABLE     State not recoverable
+      return EFI_ABORTED;
 
-  case  -34: // ERANGE              Numerical result out of range
-  case  -75: // EOVERFLOW           Value too large for defined data type
-    return EFI_BUFFER_TOO_SMALL;
+    case  -34: // ERANGE              Numerical result out of range
+    case  -75: // EOVERFLOW           Value too large for defined data type
+      return EFI_BUFFER_TOO_SMALL;
 
-  case  -52: // EBADE               Invalid exchange
-  case -108: // ESHUTDOWN         Cannot send after transport endpoint shutdown
-  case -111: // ECONNREFUSED        Connection refused
-    return EFI_END_OF_FILE;
+    case  -52: // EBADE               Invalid exchange
+    case -108: // ESHUTDOWN         Cannot send after transport endpoint shutdown
+    case -111: // ECONNREFUSED        Connection refused
+      return EFI_END_OF_FILE;
 
-  case  -62: // ETIME               Timer expired
-  case -110: // ETIMEDOUT           Connection timed out
-  case -127: // EKEYEXPIRED         Key has expired
-    return EFI_TIMEOUT;
+    case  -62: // ETIME               Timer expired
+    case -110: // ETIMEDOUT           Connection timed out
+    case -127: // EKEYEXPIRED         Key has expired
+      return EFI_TIMEOUT;
 
-  case  -64: // ENONET              Machine is not on the network
-  case  -66: // EREMOTE             Object is remote
-  case  -72: // EMULTIHOP           Multihop attempted
-  case -100: // ENETDOWN            Network is down
-  case -101: // ENETUNREACH         Network is unreachable
-  case -112: // EHOSTDOWN           Host is down
-  case -113: // EHOSTUNREACH        No route to host
-  case -123: // ENOMEDIUM           No medium found
-  case -132: // ERFKILL             Operation not possible due to RF-kill
-    return EFI_NO_MEDIA;
+    case  -64: // ENONET              Machine is not on the network
+    case  -66: // EREMOTE             Object is remote
+    case  -72: // EMULTIHOP           Multihop attempted
+    case -100: // ENETDOWN            Network is down
+    case -101: // ENETUNREACH         Network is unreachable
+    case -112: // EHOSTDOWN           Host is down
+    case -113: // EHOSTUNREACH        No route to host
+    case -123: // ENOMEDIUM           No medium found
+    case -132: // ERFKILL             Operation not possible due to RF-kill
+      return EFI_NO_MEDIA;
 
-  case  -71: // EPROTO              Protocol error
-    return EFI_PROTOCOL_ERROR;
+    case  -71:// EPROTO              Protocol error
+      return EFI_PROTOCOL_ERROR;
 
-  case  -74: // EBADMSG             Bad message
-  case  -77: // EBADFD              File descriptor in bad state
-  case  -80: // ELIBBAD             Accessing a corrupted shared library
-  case  -81: // ELIBSCN             .lib section in a.out corrupted
-  case -117: // EUCLEAN             Structure needs cleaning
-    return EFI_VOLUME_CORRUPTED;
+    case  -74: // EBADMSG             Bad message
+    case  -77: // EBADFD              File descriptor in bad state
+    case  -80: // ELIBBAD             Accessing a corrupted shared library
+    case  -81: // ELIBSCN             .lib section in a.out corrupted
+    case -117: // EUCLEAN             Structure needs cleaning
+      return EFI_VOLUME_CORRUPTED;
 
-  case  -89: // EDESTADDRREQ        Destination address required
-  case -107: // ENOTCONN            Transport endpoint is not connected
-    return EFI_NOT_STARTED;
+    case  -89: // EDESTADDRREQ        Destination address required
+    case -107: // ENOTCONN            Transport endpoint is not connected
+      return EFI_NOT_STARTED;
 
-  default:
-    break;
+    default:
+      break;
   }
 
   return EFI_DEVICE_ERROR;
@@ -1151,8 +1204,8 @@ typedef enum {
 STATIC
 VOID
 ParserStripSlash (
-  IN     CHAR8 *Buffer,
-  IN OUT UINTN *Position
+  IN     CHAR8  *Buffer,
+  IN OUT UINTN  *Position
   )
 {
   ASSERT (*Position >= 1);
@@ -1160,6 +1213,7 @@ ParserStripSlash (
   if (*Position == 1) {
     return;
   }
+
   (*Position)--;
 }
 
@@ -1182,10 +1236,10 @@ ParserStripSlash (
 STATIC
 VOID
 ParserCopy (
-     OUT CHAR8 *Buffer,
-  IN OUT UINTN *Position,
-  IN     UINTN Size,
-  IN     CHAR8 Char8
+  OUT CHAR8     *Buffer,
+  IN OUT UINTN  *Position,
+  IN     UINTN  Size,
+  IN     CHAR8  Char8
   )
 {
   ASSERT (*Position < Size);
@@ -1209,8 +1263,8 @@ ParserCopy (
 STATIC
 VOID
 ParserRewindDot (
-  IN     CHAR8 *Buffer,
-  IN OUT UINTN *Position
+  IN     CHAR8  *Buffer,
+  IN OUT UINTN  *Position
   )
 {
   ASSERT (*Position >= 2);
@@ -1252,9 +1306,9 @@ ParserRewindDot (
 STATIC
 VOID
 ParserRewindDotDot (
-  IN     CHAR8   *Buffer,
-  IN OUT UINTN   *Position,
-     OUT BOOLEAN *RootEscape
+  IN     CHAR8  *Buffer,
+  IN OUT UINTN  *Position,
+  OUT BOOLEAN   *RootEscape
 
   )
 {
@@ -1283,6 +1337,7 @@ ParserRewindDotDot (
     ASSERT (*Position > 0);
     (*Position)--;
   } while (Buffer[*Position] != '/');
+
   (*Position)++;
 }
 
@@ -1349,19 +1404,19 @@ EFI_STATUS
 VirtioFsAppendPath (
   IN     CHAR8   *LhsPath8,
   IN     CHAR16  *RhsPath16,
-     OUT CHAR8   **ResultPath8,
-     OUT BOOLEAN *RootEscape
+  OUT CHAR8      **ResultPath8,
+  OUT BOOLEAN    *RootEscape
   )
 {
-  UINTN        RhsLen;
-  CHAR8        *RhsPath8;
-  UINTN        Idx;
-  EFI_STATUS   Status;
-  UINTN        SizeToSanitize;
-  CHAR8        *BufferToSanitize;
-  CHAR8        *SanitizedBuffer;
-  PARSER_STATE State;
-  UINTN        SanitizedPosition;
+  UINTN         RhsLen;
+  CHAR8         *RhsPath8;
+  UINTN         Idx;
+  EFI_STATUS    Status;
+  UINTN         SizeToSanitize;
+  CHAR8         *BufferToSanitize;
+  CHAR8         *SanitizedBuffer;
+  PARSER_STATE  State;
+  UINTN         SanitizedPosition;
 
   //
   // Appending an empty pathname is not allowed.
@@ -1370,6 +1425,7 @@ VirtioFsAppendPath (
   if (RhsLen == 0) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Enforce length restriction on RhsPath16.
   //
@@ -1388,14 +1444,18 @@ VirtioFsAppendPath (
   if (RhsPath8 == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   for (Idx = 0; RhsPath16[Idx] != L'\0'; Idx++) {
-    if (RhsPath16[Idx] < 0x20 || RhsPath16[Idx] > 0x7E ||
-        RhsPath16[Idx] == L'/') {
+    if ((RhsPath16[Idx] < 0x20) || (RhsPath16[Idx] > 0x7E) ||
+        (RhsPath16[Idx] == L'/'))
+    {
       Status = EFI_UNSUPPORTED;
       goto FreeRhsPath8;
     }
+
     RhsPath8[Idx] = (CHAR8)((RhsPath16[Idx] == L'\\') ? L'/' : RhsPath16[Idx]);
   }
+
   RhsPath8[Idx++] = '\0';
 
   //
@@ -1412,22 +1472,23 @@ VirtioFsAppendPath (
     // If the right hand side path is absolute, then it is not appended to the
     // left hand side path -- it *replaces* the left hand side path.
     //
-    SizeToSanitize = RhsLen + 1;
+    SizeToSanitize   = RhsLen + 1;
     BufferToSanitize = RhsPath8;
   } else {
     //
     // If the right hand side path is relative, then it is appended (naively)
     // to the left hand side.
     //
-    UINTN LhsLen;
+    UINTN  LhsLen;
 
-    LhsLen = AsciiStrLen (LhsPath8);
-    SizeToSanitize = LhsLen + 1 + RhsLen + 1;
+    LhsLen           = AsciiStrLen (LhsPath8);
+    SizeToSanitize   = LhsLen + 1 + RhsLen + 1;
     BufferToSanitize = AllocatePool (SizeToSanitize);
     if (BufferToSanitize == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto FreeRhsPath8;
     }
+
     CopyMem (BufferToSanitize, LhsPath8, LhsLen);
     BufferToSanitize[LhsLen] = '/';
     CopyMem (BufferToSanitize + LhsLen + 1, RhsPath8, RhsLen + 1);
@@ -1451,113 +1512,117 @@ VirtioFsAppendPath (
   State             = ParserInit;
   SanitizedPosition = 0;
   do {
-    CHAR8 Chr8;
+    CHAR8  Chr8;
 
     ASSERT (Idx < SizeToSanitize);
     Chr8 = BufferToSanitize[Idx++];
 
     switch (State) {
-    case ParserInit: // just starting
-      ASSERT (Chr8 == '/');
-      ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
-      State = ParserSlash;
-      break;
-
-    case ParserSlash: // slash(es) seen
-      switch (Chr8) {
-      case '\0':
-        ParserStripSlash (SanitizedBuffer, &SanitizedPosition);
-        ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
-        State = ParserEnd;
-        break;
-      case '/':
-        //
-        // skip & stay in same state
-        //
-        break;
-      case '.':
-        ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
-        State = ParserDot;
-        break;
-      default:
-        ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
-        State = ParserNormal;
-        break;
-      }
-      break;
-
-    case ParserDot: // one dot seen since last slash
-      switch (Chr8) {
-      case '\0':
-        ParserRewindDot (SanitizedBuffer, &SanitizedPosition);
-        ParserStripSlash (SanitizedBuffer, &SanitizedPosition);
-        ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
-        State = ParserEnd;
-        break;
-      case '/':
-        ParserRewindDot (SanitizedBuffer, &SanitizedPosition);
-        State = ParserSlash;
-        break;
-      case '.':
-        ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
-        State = ParserDotDot;
-        break;
-      default:
-        ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
-        State = ParserNormal;
-        break;
-      }
-      break;
-
-    case ParserDotDot: // two dots seen since last slash
-      switch (Chr8) {
-      case '\0':
-        ParserRewindDotDot (SanitizedBuffer, &SanitizedPosition, RootEscape);
-        ParserStripSlash (SanitizedBuffer, &SanitizedPosition);
-        ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
-        State = ParserEnd;
-        break;
-      case '/':
-        ParserRewindDotDot (SanitizedBuffer, &SanitizedPosition, RootEscape);
-        State = ParserSlash;
-        break;
-      case '.':
-        //
-        // fall through
-        //
-      default:
-        ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
-        State = ParserNormal;
-        break;
-      }
-      break;
-
-    case ParserNormal: // a different sequence seen
-      switch (Chr8) {
-      case '\0':
-        ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
-        State = ParserEnd;
-        break;
-      case '/':
+      case ParserInit: // just starting
+        ASSERT (Chr8 == '/');
         ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
         State = ParserSlash;
         break;
-      case '.':
-        //
-        // fall through
-        //
-      default:
-        //
-        // copy and stay in same state
-        //
-        ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
-        break;
-      }
-      break;
 
-    default:
-      ASSERT (FALSE);
-      break;
+      case ParserSlash: // slash(es) seen
+        switch (Chr8) {
+          case '\0':
+            ParserStripSlash (SanitizedBuffer, &SanitizedPosition);
+            ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
+            State = ParserEnd;
+            break;
+          case '/':
+            //
+            // skip & stay in same state
+            //
+            break;
+          case '.':
+            ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
+            State = ParserDot;
+            break;
+          default:
+            ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
+            State = ParserNormal;
+            break;
+        }
+
+        break;
+
+      case ParserDot: // one dot seen since last slash
+        switch (Chr8) {
+          case '\0':
+            ParserRewindDot (SanitizedBuffer, &SanitizedPosition);
+            ParserStripSlash (SanitizedBuffer, &SanitizedPosition);
+            ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
+            State = ParserEnd;
+            break;
+          case '/':
+            ParserRewindDot (SanitizedBuffer, &SanitizedPosition);
+            State = ParserSlash;
+            break;
+          case '.':
+            ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
+            State = ParserDotDot;
+            break;
+          default:
+            ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
+            State = ParserNormal;
+            break;
+        }
+
+        break;
+
+      case ParserDotDot: // two dots seen since last slash
+        switch (Chr8) {
+          case '\0':
+            ParserRewindDotDot (SanitizedBuffer, &SanitizedPosition, RootEscape);
+            ParserStripSlash (SanitizedBuffer, &SanitizedPosition);
+            ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
+            State = ParserEnd;
+            break;
+          case '/':
+            ParserRewindDotDot (SanitizedBuffer, &SanitizedPosition, RootEscape);
+            State = ParserSlash;
+            break;
+          case '.':
+          //
+          // fall through
+          //
+          default:
+            ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
+            State = ParserNormal;
+            break;
+        }
+
+        break;
+
+      case ParserNormal: // a different sequence seen
+        switch (Chr8) {
+          case '\0':
+            ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
+            State = ParserEnd;
+            break;
+          case '/':
+            ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
+            State = ParserSlash;
+            break;
+          case '.':
+          //
+          // fall through
+          //
+          default:
+            //
+            // copy and stay in same state
+            //
+            ParserCopy (SanitizedBuffer, &SanitizedPosition, SizeToSanitize, Chr8);
+            break;
+        }
+
+        break;
+
+      default:
+        ASSERT (FALSE);
+        break;
     }
   } while (State != ParserEnd);
 
@@ -1634,16 +1699,16 @@ FreeRhsPath8:
 **/
 EFI_STATUS
 VirtioFsLookupMostSpecificParentDir (
-  IN OUT VIRTIO_FS *VirtioFs,
-  IN OUT CHAR8     *Path,
-     OUT UINT64    *DirNodeId,
-     OUT CHAR8     **LastComponent
+  IN OUT VIRTIO_FS  *VirtioFs,
+  IN OUT CHAR8      *Path,
+  OUT UINT64        *DirNodeId,
+  OUT CHAR8         **LastComponent
   )
 {
-  UINT64     ParentDirNodeId;
-  CHAR8      *Slash;
-  EFI_STATUS Status;
-  UINT64     NextDirNodeId;
+  UINT64      ParentDirNodeId;
+  CHAR8       *Slash;
+  EFI_STATUS  Status;
+  UINT64      NextDirNodeId;
 
   if (AsciiStrCmp (Path, "/") == 0) {
     return EFI_INVALID_PARAMETER;
@@ -1651,10 +1716,10 @@ VirtioFsLookupMostSpecificParentDir (
 
   ParentDirNodeId = VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID;
   Slash           = Path;
-  for (;;) {
-    CHAR8                              *NextSlash;
-    VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE FuseAttr;
-    EFI_FILE_INFO                      FileInfo;
+  for ( ; ;) {
+    CHAR8                               *NextSlash;
+    VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE  FuseAttr;
+    EFI_FILE_INFO                       FileInfo;
 
     //
     // Find the slash (if any) that terminates the next pathname component.
@@ -1670,8 +1735,13 @@ VirtioFsLookupMostSpecificParentDir (
     // up.
     //
     *NextSlash = '\0';
-    Status = VirtioFsFuseLookup (VirtioFs, ParentDirNodeId, Slash + 1,
-               &NextDirNodeId, &FuseAttr);
+    Status     = VirtioFsFuseLookup (
+                   VirtioFs,
+                   ParentDirNodeId,
+                   Slash + 1,
+                   &NextDirNodeId,
+                   &FuseAttr
+                   );
     *NextSlash = '/';
 
     //
@@ -1696,6 +1766,7 @@ VirtioFsLookupMostSpecificParentDir (
     if (EFI_ERROR (Status)) {
       goto ForgetNextDirNodeId;
     }
+
     if ((FileInfo.Attribute & EFI_FILE_DIRECTORY) == 0) {
       Status = EFI_ACCESS_DENIED;
       goto ForgetNextDirNodeId;
@@ -1751,14 +1822,14 @@ ForgetNextDirNodeId:
 EFI_STATUS
 VirtioFsGetBasename (
   IN     CHAR8  *Path,
-     OUT CHAR16 *Basename     OPTIONAL,
+  OUT CHAR16    *Basename     OPTIONAL,
   IN OUT UINTN  *BasenameSize
   )
 {
-  UINTN AllocSize;
-  UINTN LastComponent;
-  UINTN Idx;
-  UINTN PathSize;
+  UINTN  AllocSize;
+  UINTN  LastComponent;
+  UINTN  Idx;
+  UINTN  PathSize;
 
   AllocSize = *BasenameSize;
 
@@ -1768,6 +1839,7 @@ VirtioFsGetBasename (
       LastComponent = Idx;
     }
   }
+
   PathSize = Idx + 1;
   ASSERT (LastComponent < MAX_UINTN);
   LastComponent++;
@@ -1780,6 +1852,7 @@ VirtioFsGetBasename (
   for (Idx = LastComponent; Idx < PathSize; Idx++) {
     Basename[Idx - LastComponent] = Path[Idx];
   }
+
   return EFI_SUCCESS;
 }
 
@@ -1845,8 +1918,8 @@ EFI_STATUS
 VirtioFsComposeRenameDestination (
   IN     CHAR8   *LhsPath8,
   IN     CHAR16  *RhsPath16,
-     OUT CHAR8   **ResultPath8,
-     OUT BOOLEAN *RootEscape
+  OUT CHAR8      **ResultPath8,
+  OUT BOOLEAN    *RootEscape
   )
 {
   //
@@ -1854,13 +1927,13 @@ VirtioFsComposeRenameDestination (
   // excluding terminating NULs. Sizes are expressed as byte counts, including
   // the bytes taken up by terminating NULs.
   //
-  UINTN      RhsLen;
-  UINTN      LhsBasename16Size;
-  EFI_STATUS Status;
-  UINTN      LhsBasenameLen;
-  UINTN      DestSuffix16Size;
-  CHAR16     *DestSuffix16;
-  CHAR8      *DestPrefix8;
+  UINTN       RhsLen;
+  UINTN       LhsBasename16Size;
+  EFI_STATUS  Status;
+  UINTN       LhsBasenameLen;
+  UINTN       DestSuffix16Size;
+  CHAR16      *DestSuffix16;
+  CHAR8       *DestPrefix8;
 
   //
   // An empty destination operand for the rename/move operation is not allowed.
@@ -1869,6 +1942,7 @@ VirtioFsComposeRenameDestination (
   if (RhsLen == 0) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Enforce length restriction on RhsPath16.
   //
@@ -1880,7 +1954,7 @@ VirtioFsComposeRenameDestination (
   // Determine the length of the basename of LhsPath8.
   //
   LhsBasename16Size = 0;
-  Status = VirtioFsGetBasename (LhsPath8, NULL, &LhsBasename16Size);
+  Status            = VirtioFsGetBasename (LhsPath8, NULL, &LhsBasename16Size);
   ASSERT (Status == EFI_BUFFER_TOO_SMALL);
   ASSERT (LhsBasename16Size >= sizeof (CHAR16));
   ASSERT (LhsBasename16Size % sizeof (CHAR16) == 0);
@@ -1900,20 +1974,24 @@ VirtioFsComposeRenameDestination (
     // Append the basename of LhsPath8 as a CHAR16 string to RhsPath16.
     //
     DestSuffix16Size = RhsLen * sizeof (CHAR16) + LhsBasename16Size;
-    DestSuffix16 = AllocatePool (DestSuffix16Size);
+    DestSuffix16     = AllocatePool (DestSuffix16Size);
     if (DestSuffix16 == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     CopyMem (DestSuffix16, RhsPath16, RhsLen * sizeof (CHAR16));
-    Status = VirtioFsGetBasename (LhsPath8, DestSuffix16 + RhsLen,
-               &LhsBasename16Size);
+    Status = VirtioFsGetBasename (
+               LhsPath8,
+               DestSuffix16 + RhsLen,
+               &LhsBasename16Size
+               );
     ASSERT_EFI_ERROR (Status);
   } else {
     //
     // Just create a copy of RhsPath16.
     //
     DestSuffix16Size = (RhsLen + 1) * sizeof (CHAR16);
-    DestSuffix16 = AllocateCopyPool (DestSuffix16Size, RhsPath16);
+    DestSuffix16     = AllocateCopyPool (DestSuffix16Size, RhsPath16);
     if (DestSuffix16 == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -1935,8 +2013,8 @@ VirtioFsComposeRenameDestination (
       goto FreeDestSuffix16;
     }
   } else {
-    UINTN LhsLen;
-    UINTN DestPrefixLen;
+    UINTN  LhsLen;
+    UINTN  DestPrefixLen;
 
     //
     // Strip the basename of LhsPath8.
@@ -1951,11 +2029,13 @@ VirtioFsComposeRenameDestination (
     if (DestPrefixLen > 1) {
       DestPrefixLen--;
     }
+
     DestPrefix8 = AllocatePool (DestPrefixLen + 1);
     if (DestPrefix8 == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto FreeDestSuffix16;
     }
+
     CopyMem (DestPrefix8, LhsPath8, DestPrefixLen);
     DestPrefix8[DestPrefixLen] = '\0';
   }
@@ -1964,8 +2044,12 @@ VirtioFsComposeRenameDestination (
   // Now combine DestPrefix8 and DestSuffix16 into the final canonical
   // pathname.
   //
-  Status = VirtioFsAppendPath (DestPrefix8, DestSuffix16, ResultPath8,
-             RootEscape);
+  Status = VirtioFsAppendPath (
+             DestPrefix8,
+             DestSuffix16,
+             ResultPath8,
+             RootEscape
+             );
 
   FreePool (DestPrefix8);
   //
@@ -2004,13 +2088,13 @@ FreeDestSuffix16:
 **/
 EFI_STATUS
 VirtioFsFuseAttrToEfiFileInfo (
-  IN     VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE *FuseAttr,
-     OUT EFI_FILE_INFO                      *FileInfo
+  IN     VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE  *FuseAttr,
+  OUT EFI_FILE_INFO                          *FileInfo
   )
 {
-  UINT64   EpochTime[3];
-  EFI_TIME *ConvertedTime[ARRAY_SIZE (EpochTime)];
-  UINTN    Idx;
+  UINT64    EpochTime[3];
+  EFI_TIME  *ConvertedTime[ARRAY_SIZE (EpochTime)];
+  UINTN     Idx;
 
   FileInfo->FileSize = FuseAttr->Size;
 
@@ -2020,6 +2104,7 @@ VirtioFsFuseAttrToEfiFileInfo (
   if (FuseAttr->Blocks >= BIT55) {
     return EFI_UNSUPPORTED;
   }
+
   FileInfo->PhysicalSize = LShiftU64 (FuseAttr->Blocks, 9);
 
   //
@@ -2041,6 +2126,7 @@ VirtioFsFuseAttrToEfiFileInfo (
     if (EpochTime[Idx] > MAX_UINTN) {
       return EFI_UNSUPPORTED;
     }
+
     //
     // Set the following fields in the converted time: Year, Month, Day, Hour,
     // Minute, Second, Nanosecond.
@@ -2063,32 +2149,34 @@ VirtioFsFuseAttrToEfiFileInfo (
   // Set the attributes.
   //
   switch (FuseAttr->Mode & VIRTIO_FS_FUSE_MODE_TYPE_MASK) {
-  case VIRTIO_FS_FUSE_MODE_TYPE_DIR:
-    FileInfo->Attribute = EFI_FILE_DIRECTORY;
-    break;
-  case VIRTIO_FS_FUSE_MODE_TYPE_REG:
-    FileInfo->Attribute = 0;
-    break;
-  default:
-    //
-    // Other file types are not supported.
-    //
-    return EFI_UNSUPPORTED;
+    case VIRTIO_FS_FUSE_MODE_TYPE_DIR:
+      FileInfo->Attribute = EFI_FILE_DIRECTORY;
+      break;
+    case VIRTIO_FS_FUSE_MODE_TYPE_REG:
+      FileInfo->Attribute = 0;
+      break;
+    default:
+      //
+      // Other file types are not supported.
+      //
+      return EFI_UNSUPPORTED;
   }
+
   //
   // Report the regular file or directory as read-only if all classes lack
   // write permission.
   //
   if ((FuseAttr->Mode & (VIRTIO_FS_FUSE_MODE_PERM_WUSR |
                          VIRTIO_FS_FUSE_MODE_PERM_WGRP |
-                         VIRTIO_FS_FUSE_MODE_PERM_WOTH)) == 0) {
+                         VIRTIO_FS_FUSE_MODE_PERM_WOTH)) == 0)
+  {
     FileInfo->Attribute |= EFI_FILE_READ_ONLY;
   }
 
   //
   // A hard link count greater than 1 is not supported for regular files.
   //
-  if ((FileInfo->Attribute & EFI_FILE_DIRECTORY) == 0 && FuseAttr->Nlink > 1) {
+  if (((FileInfo->Attribute & EFI_FILE_DIRECTORY) == 0) && (FuseAttr->Nlink > 1)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -2129,19 +2217,20 @@ VirtioFsFuseAttrToEfiFileInfo (
 **/
 EFI_STATUS
 VirtioFsFuseDirentPlusToEfiFileInfo (
-  IN     VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE *FuseDirent,
-  IN OUT EFI_FILE_INFO                      *FileInfo
+  IN     VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE  *FuseDirent,
+  IN OUT EFI_FILE_INFO                       *FileInfo
   )
 {
-  UINTN  DirentSize;
-  UINTN  FileInfoSize;
-  UINT8  *DirentName;
-  UINT32 Idx;
+  UINTN   DirentSize;
+  UINTN   FileInfoSize;
+  UINT8   *DirentName;
+  UINT32  Idx;
 
   DirentSize = VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE_SIZE (FuseDirent->Namelen);
   if (DirentSize == 0) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // We're now safe from overflow in the calculation below.
   //
@@ -2156,15 +2245,18 @@ VirtioFsFuseDirentPlusToEfiFileInfo (
   //
   DirentName = (UINT8 *)(FuseDirent + 1);
   for (Idx = 0; Idx < FuseDirent->Namelen; Idx++) {
-    UINT8 NameByte;
+    UINT8  NameByte;
 
     NameByte = DirentName[Idx];
-    if (NameByte < 0x20 || NameByte > 0x7E ||
-        NameByte == '/' || NameByte == '\\') {
+    if ((NameByte < 0x20) || (NameByte > 0x7E) ||
+        (NameByte == '/') || (NameByte == '\\'))
+    {
       return EFI_UNSUPPORTED;
     }
+
     FileInfo->FileName[Idx] = (CHAR16)NameByte;
   }
+
   FileInfo->FileName[Idx++] = L'\0';
   //
   // Set the (possibly reduced) size.
@@ -2196,22 +2288,23 @@ VirtioFsFuseDirentPlusToEfiFileInfo (
 **/
 VOID
 VirtioFsGetFuseSizeUpdate (
-  IN     EFI_FILE_INFO *Info,
-  IN     EFI_FILE_INFO *NewInfo,
-     OUT BOOLEAN       *Update,
-     OUT UINT64        *Size
+  IN     EFI_FILE_INFO  *Info,
+  IN     EFI_FILE_INFO  *NewInfo,
+  OUT BOOLEAN           *Update,
+  OUT UINT64            *Size
   )
 {
-  BOOLEAN IsDirectory;
+  BOOLEAN  IsDirectory;
 
   IsDirectory = (BOOLEAN)((Info->Attribute & EFI_FILE_DIRECTORY) != 0);
 
-  if (IsDirectory || Info->FileSize == NewInfo->FileSize) {
+  if (IsDirectory || (Info->FileSize == NewInfo->FileSize)) {
     *Update = FALSE;
     return;
   }
+
   *Update = TRUE;
-  *Size = NewInfo->FileSize;
+  *Size   = NewInfo->FileSize;
 }
 
 /**
@@ -2260,20 +2353,20 @@ VirtioFsGetFuseSizeUpdate (
 **/
 EFI_STATUS
 VirtioFsGetFuseTimeUpdates (
-  IN     EFI_FILE_INFO *Info,
-  IN     EFI_FILE_INFO *NewInfo,
-     OUT BOOLEAN       *UpdateAtime,
-     OUT BOOLEAN       *UpdateMtime,
-     OUT UINT64        *Atime,
-     OUT UINT64        *Mtime
+  IN     EFI_FILE_INFO  *Info,
+  IN     EFI_FILE_INFO  *NewInfo,
+  OUT BOOLEAN           *UpdateAtime,
+  OUT BOOLEAN           *UpdateMtime,
+  OUT UINT64            *Atime,
+  OUT UINT64            *Mtime
   )
 {
-  EFI_TIME              *Time[3];
-  EFI_TIME              *NewTime[ARRAY_SIZE (Time)];
-  UINTN                 Idx;
-  STATIC CONST EFI_TIME ZeroTime = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  BOOLEAN               Change[ARRAY_SIZE (Time)];
-  UINT64                Seconds[ARRAY_SIZE (Time)];
+  EFI_TIME               *Time[3];
+  EFI_TIME               *NewTime[ARRAY_SIZE (Time)];
+  UINTN                  Idx;
+  STATIC CONST EFI_TIME  ZeroTime = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  BOOLEAN                Change[ARRAY_SIZE (Time)];
+  UINT64                 Seconds[ARRAY_SIZE (Time)];
 
   Time[0]    = &Info->CreateTime;
   Time[1]    = &Info->LastAccessTime;
@@ -2288,14 +2381,16 @@ VirtioFsGetFuseTimeUpdates (
   // changed, calculate the seconds since the Epoch.
   //
   for (Idx = 0; Idx < ARRAY_SIZE (Time); Idx++) {
-    if (CompareMem (NewTime[Idx], &ZeroTime, sizeof (EFI_TIME)) == 0 ||
-        CompareMem (NewTime[Idx], Time[Idx], sizeof (EFI_TIME)) == 0) {
+    if ((CompareMem (NewTime[Idx], &ZeroTime, sizeof (EFI_TIME)) == 0) ||
+        (CompareMem (NewTime[Idx], Time[Idx], sizeof (EFI_TIME)) == 0))
+    {
       Change[Idx] = FALSE;
     } else {
       if (!IsTimeValid (NewTime[Idx])) {
         return EFI_INVALID_PARAMETER;
       }
-      Change[Idx] = TRUE;
+
+      Change[Idx]  = TRUE;
       Seconds[Idx] = EfiTimeToEpoch (NewTime[Idx]);
     }
   }
@@ -2307,7 +2402,7 @@ VirtioFsGetFuseTimeUpdates (
   // last modification time. If changes are requested for both, but to
   // different timestamps, we reject the request.
   //
-  if (Change[0] && Change[2] && Seconds[0] != Seconds[2]) {
+  if (Change[0] && Change[2] && (Seconds[0] != Seconds[2])) {
     return EFI_ACCESS_DENIED;
   }
 
@@ -2316,15 +2411,17 @@ VirtioFsGetFuseTimeUpdates (
 
   if (Change[0]) {
     *UpdateMtime = TRUE;
-    *Mtime = Seconds[0];
+    *Mtime       = Seconds[0];
   }
+
   if (Change[1]) {
     *UpdateAtime = TRUE;
-    *Atime = Seconds[1];
+    *Atime       = Seconds[1];
   }
+
   if (Change[2]) {
     *UpdateMtime = TRUE;
-    *Mtime = Seconds[2];
+    *Mtime       = Seconds[2];
   }
 
   return EFI_SUCCESS;
@@ -2360,16 +2457,16 @@ VirtioFsGetFuseTimeUpdates (
 **/
 EFI_STATUS
 VirtioFsGetFuseModeUpdate (
-  IN     EFI_FILE_INFO *Info,
-  IN     EFI_FILE_INFO *NewInfo,
-     OUT BOOLEAN       *Update,
-     OUT UINT32        *Mode
-     )
+  IN     EFI_FILE_INFO  *Info,
+  IN     EFI_FILE_INFO  *NewInfo,
+  OUT BOOLEAN           *Update,
+  OUT UINT32            *Mode
+  )
 {
-  UINT64  Toggle;
-  BOOLEAN IsDirectory;
-  BOOLEAN IsWriteable;
-  BOOLEAN WillBeWriteable;
+  UINT64   Toggle;
+  BOOLEAN  IsDirectory;
+  BOOLEAN  IsWriteable;
+  BOOLEAN  WillBeWriteable;
 
   Toggle = Info->Attribute ^ NewInfo->Attribute;
   if ((Toggle & ~EFI_FILE_VALID_ATTR) != 0) {
@@ -2378,6 +2475,7 @@ VirtioFsGetFuseModeUpdate (
     //
     return EFI_ACCESS_DENIED;
   }
+
   if ((Toggle & EFI_FILE_DIRECTORY) != 0) {
     //
     // EFI_FILE_DIRECTORY cannot be toggled.
@@ -2421,6 +2519,7 @@ VirtioFsGetFuseModeUpdate (
                VIRTIO_FS_FUSE_MODE_PERM_ROTH);
     }
   }
+
   *Update = TRUE;
   return EFI_SUCCESS;
 }

@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Host.h"
 
-
 /**
   Transfers control to a function starting with a new stack.
 
@@ -34,8 +33,8 @@ VOID
 EFIAPI
 PeiSwitchStacks (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1   OPTIONAL,
+  IN      VOID                      *Context2   OPTIONAL,
   IN      VOID                      *NewStack
   )
 {
@@ -49,20 +48,16 @@ PeiSwitchStacks (
   //
   ASSERT (((UINTN)NewStack & (CPU_STACK_ALIGNMENT - 1)) == 0);
 
-  JumpBuffer.Eip = (UINTN)EntryPoint;
-  JumpBuffer.Esp = (UINTN)NewStack - sizeof (VOID*);
-  JumpBuffer.Esp -= sizeof (Context1) + sizeof (Context2);
-  ((VOID**)JumpBuffer.Esp)[1] = Context1;
-  ((VOID**)JumpBuffer.Esp)[2] = Context2;
+  JumpBuffer.Eip               = (UINTN)EntryPoint;
+  JumpBuffer.Esp               = (UINTN)NewStack - sizeof (VOID *);
+  JumpBuffer.Esp              -= sizeof (Context1) + sizeof (Context2);
+  ((VOID **)JumpBuffer.Esp)[1] = Context1;
+  ((VOID **)JumpBuffer.Esp)[2] = Context2;
 
   LongJump (&JumpBuffer, (UINTN)-1);
-
 
   //
   // PeiSwitchStacks () will never return
   //
   ASSERT (FALSE);
 }
-
-
-

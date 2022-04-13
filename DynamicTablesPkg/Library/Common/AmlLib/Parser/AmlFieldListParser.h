@@ -69,9 +69,9 @@
 EFI_STATUS
 EFIAPI
 AmlParseFieldList (
-  IN  AML_OBJECT_NODE   * FieldNode,
-  IN  AML_STREAM        * FStream,
-  IN  LIST_ENTRY        * NameSpaceRefList
+  IN  AML_OBJECT_NODE  *FieldNode,
+  IN  AML_STREAM       *FStream,
+  IN  LIST_ENTRY       *NameSpaceRefList
   );
 
 #endif // AML_FIELD_LIST_PARSER_H_
