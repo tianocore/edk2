@@ -10,6 +10,7 @@
 #include <Include/IndustryStandard/Tdx.h>
 #include <Library/TdxLib.h>
 #include <Register/Intel/Cpuid.h>
+#include <Library/CcProbeLib.h>
 #include "IoLibTdx.h"
 
 // Size of TDVMCALL Access, including IO and MMIO
@@ -21,9 +22,6 @@
 // Direction of TDVMCALL Access, including IO and MMIO
 #define TDVMCALL_ACCESS_READ   0
 #define TDVMCALL_ACCESS_WRITE  1
-
-BOOLEAN  mTdxEnabled = FALSE;
-BOOLEAN  mTdxProbed  = FALSE;
 
 /**
   Check if it is Tdx guest.
@@ -38,14 +36,7 @@ IsTdxGuest (
   VOID
   )
 {
-  if (mTdxProbed) {
-    return mTdxEnabled;
-  }
-
-  mTdxEnabled = TdIsEnabled ();
-  mTdxProbed  = TRUE;
-
-  return mTdxEnabled;
+  return CcProbe () == CCGuestTypeIntelTdx;
 }
 
 /**
