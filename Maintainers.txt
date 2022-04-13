@@ -620,6 +620,7 @@ S: Maintained
 UnitTestFrameworkPkg
 F: UnitTestFrameworkPkg/
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 R: Sean Brogan <sean.brogan@microsoft.com> [spbrogan]
 R: Bret Barkelew <Bret.Barkelew@microsoft.com> [corthon]
 S: Maintained
