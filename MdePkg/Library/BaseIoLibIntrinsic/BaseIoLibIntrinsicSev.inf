@@ -55,6 +55,7 @@
   DebugLib
   BaseLib
   RegisterFilterLib
+  TdProbeLib
 
 [LibraryClasses.X64]
   TdxLib
