@@ -53,7 +53,7 @@ def RunCommand(cmd):
 def BuildUniversalPayload(Args, MacroList):
     BuildTarget = Args.Target
     ToolChain = Args.ToolChain
-    Quiet = Args.Quiet
+    Quiet     = "--quiet"  if Args.Quiet else ""
     BuildArch = "X64" if Args.Arch == 'X64' else "IA32 -a X64"
     ElfToolChain = 'CLANGDWARF'
 
@@ -121,7 +121,7 @@ def main():
     parser.add_argument('-a', '--Arch', choices=['IA32', 'X64'], help='Specify the ARCH for payload entry module. Default build X64 image.', default ='X64')
     parser.add_argument("-D", "--Macro", action="append", default=["UNIVERSAL_PAYLOAD=TRUE"])
     parser.add_argument('-i', '--ImageId', type=str, help='Specify payload ID (16 bytes maximal).', default ='UEFI')
-    parser.add_argument('-q', '--Quiet')
+    parser.add_argument('-q', '--Quiet', action='store_true', help='Disable all build messages except FATAL ERRORS.')
     MacroList = {}
     args = parser.parse_args()
     if args.Macro is not None:
