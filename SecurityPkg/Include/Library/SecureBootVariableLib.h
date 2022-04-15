@@ -44,6 +44,19 @@ GetSetupMode (
   );
 
 /**
+  Helper function to quickly determine whether SecureBoot is enabled.
+
+  @retval     TRUE    SecureBoot is verifiably enabled.
+  @retval     FALSE   SecureBoot is either disabled or an error prevented checking.
+
+**/
+BOOLEAN
+EFIAPI
+IsSecureBootEnabled (
+  VOID
+  );
+
+/**
   Create a EFI Signature List with data supplied from input argument.
   The input certificates from KeyInfo parameter should be DER-encoded
   format.
@@ -159,6 +172,62 @@ EFI_STATUS
 EFIAPI
 DeletePlatformKey (
   VOID
+  );
+
+/**
+  This function will delete the secure boot keys, thus
+  disabling secure boot.
+
+  @return EFI_SUCCESS or underlying failure code.
+**/
+EFI_STATUS
+EFIAPI
+DeleteSecureBootVariables (
+  VOID
+  );
+
+/**
+  A helper function to take in a variable payload, wrap it in the
+  proper authenticated variable structure, and install it in the
+  EFI variable space.
+
+  @param[in]  VariableName  The name of the key/database.
+  @param[in]  VendorGuid    The namespace (ie. vendor GUID) of the variable
+  @param[in]  DataSize      Size parameter for target secure boot variable.
+  @param[in]  Data          Pointer to signature list formatted secure boot variable content.
+
+  @retval EFI_SUCCESS              The enrollment for authenticated variable was successful.
+  @retval EFI_OUT_OF_RESOURCES     There are not enough memory resources to create time based payload.
+  @retval EFI_INVALID_PARAMETER    The parameter is invalid.
+  @retval Others                   Unexpected error happens.
+**/
+EFI_STATUS
+EFIAPI
+EnrollFromInput (
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid,
+  IN UINTN     DataSize,
+  IN VOID      *Data
+  );
+
+/**
+  Similar to DeleteSecureBootVariables, this function is used to unilaterally
+  force the state of related SB variables (db, dbx, dbt, KEK, PK, etc.) to be
+  the built-in, hardcoded default vars.
+
+  @param[in]  SecureBootPayload  Payload information for secure boot related keys.
+
+  @retval     EFI_SUCCESS               SecureBoot keys are now set to defaults.
+  @retval     EFI_ABORTED               SecureBoot keys are not empty. Please delete keys first
+                                        or follow standard methods of altering keys (ie. use the signing system).
+  @retval     EFI_SECURITY_VIOLATION    Failed to create the PK.
+  @retval     Others                    Something failed in one of the subfunctions.
+
+**/
+EFI_STATUS
+EFIAPI
+SetSecureBootVariablesToDefault (
+  IN  CONST SECURE_BOOT_PAYLOAD_INFO  *SecureBootPayload
   );
 
 #endif
