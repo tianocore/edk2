@@ -1,7 +1,7 @@
 ## @file
 #  Sample to provide FSP wrapper platform sec related function.
 #
-#  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -39,12 +39,17 @@
   SecGetPerformance.c
   SecTempRamDone.c
   PlatformInit.c
+  Fsp.h
 
 [Sources.IA32]
-  Ia32/Fsp.h
   Ia32/SecEntry.nasm
   Ia32/PeiCoreEntry.nasm
   Ia32/Stack.nasm
+
+[Sources.X64]
+  X64/SecEntry.nasm
+  X64/PeiCoreEntry.nasm
+  X64/Stack.nasm
 
 ################################################################################
 #

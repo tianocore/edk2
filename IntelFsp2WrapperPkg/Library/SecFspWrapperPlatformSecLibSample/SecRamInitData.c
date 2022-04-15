@@ -1,7 +1,7 @@
 /** @file
   Sample to provide TempRamInitParams data.
 
-  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -10,18 +10,20 @@
 #include <FspEas.h>
 
 typedef struct {
-  UINT32    MicrocodeRegionBase;
-  UINT32    MicrocodeRegionSize;
-  UINT32    CodeRegionBase;
-  UINT32    CodeRegionSize;
+  EFI_PHYSICAL_ADDRESS  MicrocodeRegionBase;
+  UINT64                MicrocodeRegionSize;
+  EFI_PHYSICAL_ADDRESS  CodeRegionBase;
+  UINT64                CodeRegionSize;
 } FSPT_CORE_UPD;
 
 typedef struct {
   FSP_UPD_HEADER    FspUpdHeader;
   //
-  // If platform does not support FSP spec 2.2 remove FSPT_ARCH_UPD structure.
+  // If FSP spec version < 2.2, remove FSPT_ARCH_UPD structure.
+  // Else If FSP spec version >= 2.2 and FSP spec version < 2.4, use FSPT_ARCH_UPD structure.
+  // Else, use FSPT_ARCH2_UPD structure.
   //
-  FSPT_ARCH_UPD     FsptArchUpd;
+  FSPT_ARCH2_UPD    FsptArchUpd;
   FSPT_CORE_UPD     FsptCoreUpd;
 } FSPT_UPD_CORE_DATA;
 
@@ -36,10 +38,12 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST FSPT_UPD_CORE_DATA  FsptUpdDataPtr = {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
   },
   //
-  // If platform does not support FSP spec 2.2 remove FSPT_ARCH_UPD structure.
+  // If FSP spec version < 2.2, remove FSPT_ARCH_UPD structure.
+  // Else If FSP spec version >= 2.2 and FSP spec version < 2.4, use FSPT_ARCH_UPD structure.
+  // Else, use FSPT_ARCH2_UPD structure.
   //
   {
-    0x01,
+    0x02,
     {
       0x00, 0x00, 0x00
     },
@@ -47,7 +51,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST FSPT_UPD_CORE_DATA  FsptUpdDataPtr = {
     0x00000000,
     {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     }
   },
   {
