@@ -1,6 +1,6 @@
 ## @ GenCfgOpt.py
 #
-# Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -1398,6 +1398,7 @@ EndList
         UpdConfigCheck = ['FSP_T', 'FSP_M', 'FSP_S']  # FSP_X_CONFIG, FSP_X_TEST_CONFIG, FSP_X_RESTRICTED_CONFIG
         UpdSignatureCheck = ['FSPT_UPD_SIGNATURE', 'FSPM_UPD_SIGNATURE', 'FSPS_UPD_SIGNATURE']
         ExcludedSpecificUpd = ['FSPT_ARCH_UPD', 'FSPM_ARCH_UPD', 'FSPS_ARCH_UPD']
+        ExcludedSpecificUpd1 = ['FSPT_ARCH2_UPD', 'FSPM_ARCH2_UPD', 'FSPS_ARCH2_UPD']
 
         IncLines = []
         if InputHeaderFile != '':
@@ -1452,7 +1453,7 @@ EndList
                 if Match:
                     StartIndex = Index - 1
                 Match = re.match("}\s([_A-Z0-9]+);", Line)
-                if Match and (UpdRegionCheck[item] in Match.group(1) or UpdConfigCheck[item] in Match.group(1)) and (ExcludedSpecificUpd[item] not in Match.group(1)):
+                if Match and (UpdRegionCheck[item] in Match.group(1) or UpdConfigCheck[item] in Match.group(1)) and (ExcludedSpecificUpd[item] not in Match.group(1)) and (ExcludedSpecificUpd1[item] not in Match.group(1)):
                     EndIndex = Index
                     StructStart.append(StartIndex)
                     StructEnd.append(EndIndex)
@@ -1695,7 +1696,7 @@ EndList
 
 
 def Usage():
-    print ("GenCfgOpt Version 0.56")
+    print ("GenCfgOpt Version 0.57")
     print ("Usage:")
     print ("    GenCfgOpt  UPDTXT  PlatformDscFile BuildFvDir                 [-D Macros]")
     print ("    GenCfgOpt  HEADER  PlatformDscFile BuildFvDir  InputHFile     [-D Macros]")

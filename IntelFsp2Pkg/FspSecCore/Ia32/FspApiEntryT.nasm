@@ -1,7 +1,7 @@
 ;; @file
 ;  Provide FSP API entry points.
 ;
-; Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;;
 
@@ -84,14 +84,38 @@ struc LoadMicrocodeParamsFsp22
     .FspUpdHeaderRevision:    resb    1
     .FspUpdHeaderReserved:    resb   23
     ; }
-    ; FSPT_ARCH_UPD{
-    .FsptArchUpd:             resd    8
+    ; FSPT_ARCH_UPD {
+    .FsptArchRevision:        resb    1
+    .FsptArchReserved:        resb    3
+    .FsptArchUpd:             resd    7
     ; }
     ; FSPT_CORE_UPD {
     .MicrocodeCodeAddr:       resd    1
     .MicrocodeCodeSize:       resd    1
     .CodeRegionBase:          resd    1
     .CodeRegionSize:          resd    1
+    ; }
+    .size:
+endstruc
+
+struc LoadMicrocodeParamsFsp24
+    ; FSP_UPD_HEADER {
+    .FspUpdHeaderSignature:   resd    2
+    .FspUpdHeaderRevision:    resb    1
+    .FspUpdHeaderReserved:    resb   23
+    ; }
+    ; FSPT_ARCH2_UPD {
+    .FsptArchRevision:        resb    1
+    .FsptArchReserved:        resb    3
+    .FsptArchLength:          resd    1
+    .FspDebugHandler          resq    1
+    .FsptArchUpd:             resd    4
+    ; }
+    ; FSPT_CORE_UPD {
+    .MicrocodeCodeAddr:       resq    1
+    .MicrocodeCodeSize:       resq    1
+    .CodeRegionBase:          resq    1
+    .CodeRegionSize:          resq    1
     ; }
     .size:
 endstruc
@@ -173,8 +197,8 @@ ASM_PFX(LoadMicrocodeDefault):
    ;   Beginning of microcode update region starts on paragraph boundary
 
    ;
-   ;
    ; Save return address to EBP
+   ;
    movd   ebp, mm7
 
    cmp    esp, 0
@@ -188,8 +212,12 @@ ASM_PFX(LoadMicrocodeDefault):
    ; and report error if size is less than 2k
    ; first check UPD header revision
    cmp    byte [esp + LoadMicrocodeParamsFsp22.FspUpdHeaderRevision], 2
-   jae    Fsp22UpdHeader
+   jb     Fsp20UpdHeader
+   cmp    byte [esp + LoadMicrocodeParamsFsp22.FsptArchRevision], 2
+   je     Fsp24UpdHeader
+   jmp    Fsp22UpdHeader
 
+Fsp20UpdHeader:
    ; UPD structure is compliant with FSP spec 2.0/2.1
    mov    eax, dword [esp + LoadMicrocodeParams.MicrocodeCodeSize]
    cmp    eax, 0
@@ -211,6 +239,19 @@ Fsp22UpdHeader:
    jl     ParamError
 
    mov    esi, dword [esp + LoadMicrocodeParamsFsp22.MicrocodeCodeAddr]
+   cmp    esi, 0
+   jnz    CheckMainHeader
+   jmp    ParamError
+
+Fsp24UpdHeader:
+   ; UPD structure is compliant with FSP spec 2.4
+   mov    eax, dword [esp + LoadMicrocodeParamsFsp24.MicrocodeCodeSize]
+   cmp    eax, 0
+   jz     Exit2
+   cmp    eax, 0800h
+   jl     ParamError
+
+   mov    esi, dword [esp + LoadMicrocodeParamsFsp24.MicrocodeCodeAddr]
    cmp    esi, 0
    jnz    CheckMainHeader
 
@@ -308,9 +349,13 @@ AdvanceFixedSize:
 
 CheckAddress:
    ; Check UPD header revision
-   cmp    byte [esp + LoadMicrocodeParamsFsp22.FspUpdHeaderRevision], 2
-   jae    Fsp22UpdHeader1
+   cmp   byte [esp + LoadMicrocodeParamsFsp22.FspUpdHeaderRevision], 2
+   jb     Fsp20UpdHeader1
+   cmp    byte [esp + LoadMicrocodeParamsFsp22.FsptArchRevision], 2
+   je     Fsp24UpdHeader1;
+   jmp    Fsp22UpdHeader1
 
+Fsp20UpdHeader1:
    ; UPD structure is compliant with FSP spec 2.0/2.1
    ; Is automatic size detection ?
    mov   eax, dword [esp + LoadMicrocodeParams.MicrocodeCodeSize]
@@ -336,6 +381,19 @@ Fsp22UpdHeader1:
    jae   Done        ;Jif address is outside of microcode region
    jmp   CheckMainHeader
 
+Fsp24UpdHeader1:
+   ; UPD structure is compliant with FSP spec 2.4
+   ; Is automatic size detection ?
+   mov   eax, dword [esp + LoadMicrocodeParamsFsp24.MicrocodeCodeSize]
+   cmp   eax, 0ffffffffh
+   jz    LoadMicrocodeDefault4
+
+   ; Address >= microcode region address + microcode region size?
+   add   eax, dword [esp + LoadMicrocodeParamsFsp24.MicrocodeCodeAddr]
+   cmp   esi, eax
+   jae   Done        ;Jif address is outside of microcode region
+   jmp   CheckMainHeader
+
 LoadMicrocodeDefault4:
    ; Is valid Microcode start point ?
    cmp   dword [esi + MicrocodeHdr.MicrocodeHdrVersion], 0ffffffffh
@@ -351,7 +409,7 @@ LoadCheck:
    mov   eax, 1
    cpuid
    mov   ecx, MSR_IA32_BIOS_SIGN_ID
-   rdmsr                         ; Get current microcode signature
+   rdmsr                        ; Get current microcode signature
 
    ; Verify this microcode update is not already loaded
    cmp   dword [esi + MicrocodeHdr.MicrocodeHdrRevision], edx
@@ -405,8 +463,12 @@ ASM_PFX(EstablishStackFsp):
 
   ; check UPD structure revision (edx + 8)
   cmp       byte [edx + LoadMicrocodeParamsFsp22.FspUpdHeaderRevision], 2
-  jae       Fsp22UpdHeader2
+  jb        Fsp20UpdHeader2
+  cmp       byte [esp + LoadMicrocodeParamsFsp22.FsptArchRevision], 2
+  je        Fsp24UpdHeader2
+  jmp       Fsp22UpdHeader2
 
+Fsp20UpdHeader2:
   ; UPD structure is compliant with FSP spec 2.0/2.1
   push      dword [edx + LoadMicrocodeParams.CodeRegionSize]     ; Code size       sizeof(FSPT_UPD_COMMON) + 12
   push      dword [edx + LoadMicrocodeParams.CodeRegionBase]     ; Code base       sizeof(FSPT_UPD_COMMON) + 8
@@ -420,6 +482,14 @@ Fsp22UpdHeader2:
   push      dword [edx + LoadMicrocodeParamsFsp22.CodeRegionBase]     ; Code base       sizeof(FSPT_UPD_COMMON) + 8
   push      dword [edx + LoadMicrocodeParamsFsp22.MicrocodeCodeSize]  ; Microcode size  sizeof(FSPT_UPD_COMMON) + 4
   push      dword [edx + LoadMicrocodeParamsFsp22.MicrocodeCodeAddr]  ; Microcode base  sizeof(FSPT_UPD_COMMON) + 0
+  jmp       ContinueAfterUpdPush
+
+Fsp24UpdHeader2:
+  ; UPD structure is compliant with FSP spec 2.4
+  push      dword [edx + LoadMicrocodeParamsFsp24.CodeRegionSize]     ; Code size       sizeof(FSPT_UPD_COMMON) + 24
+  push      dword [edx + LoadMicrocodeParamsFsp24.CodeRegionBase]     ; Code base       sizeof(FSPT_UPD_COMMON) + 16
+  push      dword [edx + LoadMicrocodeParamsFsp24.MicrocodeCodeSize]  ; Microcode size  sizeof(FSPT_UPD_COMMON) + 8
+  push      dword [edx + LoadMicrocodeParamsFsp24.MicrocodeCodeAddr]  ; Microcode base  sizeof(FSPT_UPD_COMMON) + 0
 
 ContinueAfterUpdPush:
   ;
@@ -517,13 +587,13 @@ ASM_PFX(TempRamInitApi):
   cmp       eax, 0
   jnz       TempRamInitExit
 
-  LXMMN      xmm6, eax, 3  ;Restore microcode status if no CAR init error from ECX-SLOT 3 in xmm6.
+  LXMMN     xmm6, eax, 3  ;Restore microcode status if no CAR init error from ECX-SLOT 3 in xmm6.
 
 TempRamInitExit:
-   mov      bl, al                  ; save al data in bl
-   mov      al, 07Fh                ; API exit postcode 7f
-   out      080h, al
-   mov      al, bl                  ; restore al data from bl
+  mov       bl, al                  ; save al data in bl
+  mov       al, 07Fh                ; API exit postcode 7f
+  out       080h, al
+  mov       al, bl                  ; restore al data from bl
 
   ;
   ; Load EBP, EBX, ESI, EDI & ESP from XMM7 & XMM6
