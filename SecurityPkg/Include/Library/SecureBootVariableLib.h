@@ -44,24 +44,29 @@ GetSetupMode (
   );
 
 /**
-  Create a EFI Signature List with data fetched from section specified as a argument.
-  Found keys are verified using RsaGetPublicKeyFromX509().
+  Create a EFI Signature List with data supplied from input argument.
+  The input certificates from KeyInfo parameter should be DER-encoded
+  format.
 
-  @param[in]        KeyFileGuid    A pointer to to the FFS filename GUID
   @param[out]       SigListsSize   A pointer to size of signature list
-  @param[out]       SigListsOut    a pointer to a callee-allocated buffer with signature lists
+  @param[out]       SigListOut     A pointer to a callee-allocated buffer with signature lists
+  @param[in]        KeyInfoCount   The number of certificate pointer and size pairs inside KeyInfo.
+  @param[in]        KeyInfo        A pointer to all certificates, in the format of DER-encoded,
+                                   to be concatenated into signature lists.
 
-  @retval EFI_SUCCESS              Create time based payload successfully.
+  @retval EFI_SUCCESS              Created signature list from payload successfully.
   @retval EFI_NOT_FOUND            Section with key has not been found.
-  @retval EFI_INVALID_PARAMETER    Embedded key has a wrong format.
+  @retval EFI_INVALID_PARAMETER    Embedded key has a wrong format or input pointers are NULL.
   @retval Others                   Unexpected error happens.
 
 --*/
 EFI_STATUS
-SecureBootFetchData (
-  IN  EFI_GUID            *KeyFileGuid,
-  OUT UINTN               *SigListsSize,
-  OUT EFI_SIGNATURE_LIST  **SigListOut
+EFIAPI
+SecureBootCreateDataFromInput (
+  OUT UINTN                               *SigListsSize,
+  OUT EFI_SIGNATURE_LIST                  **SigListOut,
+  IN  UINTN                               KeyInfoCount,
+  IN  CONST SECURE_BOOT_CERTIFICATE_INFO  *KeyInfo
   );
 
 /**
