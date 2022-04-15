@@ -10,10 +10,10 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 #include <Uefi.h>
+#include <UefiSecureBoot.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/AuthenticatedVariableFormat.h>
 #include <Guid/ImageAuthentication.h>
-#include <Library/BaseCryptLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -21,7 +21,6 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/SecureBootVariableLib.h>
-#include "Library/DxeServicesLib.h"
 
 // This time can be used when deleting variables, as it should be greater than any variable time.
 EFI_TIME  mMaxTimestamp = {
@@ -130,24 +129,29 @@ ConcatenateSigList (
 }
 
 /**
-  Create a EFI Signature List with data fetched from section specified as a argument.
-  Found keys are verified using RsaGetPublicKeyFromX509().
+  Create a EFI Signature List with data supplied from input argument.
+  The input certificates from KeyInfo parameter should be DER-encoded
+  format.
 
-  @param[in]        KeyFileGuid    A pointer to to the FFS filename GUID
   @param[out]       SigListsSize   A pointer to size of signature list
-  @param[out]       SigListsOut    a pointer to a callee-allocated buffer with signature lists
+  @param[out]       SigListOut     A pointer to a callee-allocated buffer with signature lists
+  @param[in]        KeyInfoCount   The number of certificate pointer and size pairs inside KeyInfo.
+  @param[in]        KeyInfo        A pointer to all certificates, in the format of DER-encoded,
+                                   to be concatenated into signature lists.
 
-  @retval EFI_SUCCESS              Create time based payload successfully.
+  @retval EFI_SUCCESS              Created signature list from payload successfully.
   @retval EFI_NOT_FOUND            Section with key has not been found.
-  @retval EFI_INVALID_PARAMETER    Embedded key has a wrong format.
+  @retval EFI_INVALID_PARAMETER    Embedded key has a wrong format or input pointers are NULL.
   @retval Others                   Unexpected error happens.
 
 **/
 EFI_STATUS
-SecureBootFetchData (
-  IN  EFI_GUID            *KeyFileGuid,
-  OUT UINTN               *SigListsSize,
-  OUT EFI_SIGNATURE_LIST  **SigListOut
+EFIAPI
+SecureBootCreateDataFromInput (
+  OUT UINTN                               *SigListsSize,
+  OUT EFI_SIGNATURE_LIST                  **SigListOut,
+  IN  UINTN                               KeyInfoCount,
+  IN  CONST SECURE_BOOT_CERTIFICATE_INFO  *KeyInfo
   )
 {
   EFI_SIGNATURE_LIST  *EfiSig;
@@ -155,35 +159,40 @@ SecureBootFetchData (
   EFI_SIGNATURE_LIST  *TmpEfiSig2;
   EFI_STATUS          Status;
   VOID                *Buffer;
-  VOID                *RsaPubKey;
   UINTN               Size;
+  UINTN               InputIndex;
   UINTN               KeyIndex;
 
+  if ((SigListOut == NULL) || (SigListsSize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((KeyInfoCount == 0) || (KeyInfo == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  InputIndex    = 0;
   KeyIndex      = 0;
   EfiSig        = NULL;
   *SigListsSize = 0;
-  while (1) {
-    Status = GetSectionFromAnyFv (
-               KeyFileGuid,
-               EFI_SECTION_RAW,
-               KeyIndex,
-               &Buffer,
-               &Size
-               );
-
-    if (Status == EFI_SUCCESS) {
-      RsaPubKey = NULL;
-      if (RsaGetPublicKeyFromX509 (Buffer, Size, &RsaPubKey) == FALSE) {
-        DEBUG ((DEBUG_ERROR, "%a: Invalid key format: %d\n", __FUNCTION__, KeyIndex));
+  while (InputIndex < KeyInfoCount) {
+    if (KeyInfo[InputIndex].Data != NULL) {
+      Size   = KeyInfo[InputIndex].DataSize;
+      Buffer = AllocateCopyPool (Size, KeyInfo[InputIndex].Data);
+      if (Buffer == NULL) {
         if (EfiSig != NULL) {
           FreePool (EfiSig);
         }
 
-        FreePool (Buffer);
-        return EFI_INVALID_PARAMETER;
+        return EFI_OUT_OF_RESOURCES;
       }
 
       Status = CreateSigList (Buffer, Size, &TmpEfiSig);
+
+      if (EFI_ERROR (Status)) {
+        FreePool (Buffer);
+        break;
+      }
 
       //
       // Concatenate lists if more than one section found
@@ -202,9 +211,7 @@ SecureBootFetchData (
       FreePool (Buffer);
     }
 
-    if (Status == EFI_NOT_FOUND) {
-      break;
-    }
+    InputIndex++;
   }
 
   if (KeyIndex == 0) {
