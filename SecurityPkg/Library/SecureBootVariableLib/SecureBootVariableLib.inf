@@ -38,6 +38,9 @@
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
+  PlatformPKProtectionLib
+  UefiLib
+  UefiRuntimeServicesTableLib
 
 [Guids]
   ## CONSUMES            ## Variable:L"SetupMode"
