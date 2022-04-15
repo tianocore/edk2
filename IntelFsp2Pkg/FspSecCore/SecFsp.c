@@ -130,7 +130,7 @@ FspGlobalDataInit (
   ZeroMem ((VOID *)PeiFspData, sizeof (FSP_GLOBAL_DATA));
 
   PeiFspData->Signature = FSP_GLOBAL_DATA_SIGNATURE;
-  PeiFspData->Version   = 0;
+  PeiFspData->Version   = FSP_GLOBAL_DATA_VERSION;
   PeiFspData->CoreStack = BootLoaderStack;
   PeiFspData->PerfIdx   = 2;
   PeiFspData->PerfSig   = FSP_PERFORMANCE_DATA_SIGNATURE;
