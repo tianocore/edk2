@@ -1,7 +1,7 @@
 /** @file
   Source file for FSP notify phase PEI module
 
-  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.
+  Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -112,6 +112,7 @@ WaitForNotify (
   @retval     EFI_OUT_OF_RESOURCES Insufficient resources to create database
 **/
 EFI_STATUS
+EFIAPI
 FspNotifyPhasePeimEntryPoint (
   IN       EFI_PEI_FILE_HANDLE  FileHandle,
   IN CONST EFI_PEI_SERVICES     **PeiServices
