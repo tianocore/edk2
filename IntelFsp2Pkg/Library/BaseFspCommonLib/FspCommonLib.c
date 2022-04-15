@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -38,7 +38,8 @@ typedef struct {
 } CONTEXT_STACK;
 
 //
-//   API return address           +0xB0
+//   API return address           +0xB8
+//   Reserved                     +0xB0
 //   push    API Parameter2       +0xA8
 //   push    API Parameter1       +0xA0
 //   push    FspInfoHeader        +0x98
@@ -54,6 +55,7 @@ typedef struct {
   UINT32    Flags[2];
   UINT64    FspInfoHeader;
   UINT64    ApiParam[2];
+  UINT64    Reserved;       // The reserved QWORD is needed for stack alignment in X64.
   UINT64    ApiRet;         // 64bit stack format is different from the 32bit one due to x64 calling convention
 } CONTEXT_STACK_64;
 
