@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -23,9 +23,11 @@
 #include <Library/UefiCpuLib.h>
 #include <FspEas.h>
 
-typedef VOID (*PEI_CORE_ENTRY) ( \
-  IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData, \
-  IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList \
+typedef
+VOID
+(EFIAPI *PEI_CORE_ENTRY) (
+  IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
+  IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList
   );
 
 typedef struct _SEC_IDT_TABLE {
@@ -51,8 +53,8 @@ typedef struct _SEC_IDT_TABLE {
 VOID
 EFIAPI
 SecSwitchStack (
-  IN UINT32  TemporaryMemoryBase,
-  IN UINT32  PermenentMemoryBase
+  IN UINTN  TemporaryMemoryBase,
+  IN UINTN  PermenentMemoryBase
   );
 
 /**
@@ -104,7 +106,7 @@ SecStartup (
   IN UINT32          TempRamBase,
   IN VOID            *BootFirmwareVolume,
   IN PEI_CORE_ENTRY  PeiCore,
-  IN UINT32          BootLoaderStack,
+  IN UINTN           BootLoaderStack,
   IN UINT32          ApiIdx
   );
 
@@ -127,9 +129,9 @@ ProcessLibraryConstructorList (
   @return  value of esp.
 
 **/
-UINT32
+UINTN
 EFIAPI
-AsmReadEsp (
+AsmReadStackPointer (
   VOID
   );
 

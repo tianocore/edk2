@@ -2,7 +2,7 @@
 ;  This is the code that goes from real-mode to protected mode.
 ;  It consumes the reset vector, configures the stack.
 ;
-; Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;;
 
@@ -16,7 +16,7 @@ SECTION .text
 
 %macro RET_ESI  0
 
-  movd    esi, mm7                      ; restore ESP from MM7
+  movd    esi, mm7                      ; restore EIP from MM7
   jmp     esi
 
 %endmacro

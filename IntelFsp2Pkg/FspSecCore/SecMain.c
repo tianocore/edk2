@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -54,7 +54,7 @@ SecStartup (
   IN UINT32          TempRamBase,
   IN VOID            *BootFirmwareVolume,
   IN PEI_CORE_ENTRY  PeiCore,
-  IN UINT32          BootLoaderStack,
+  IN UINTN           BootLoaderStack,
   IN UINT32          ApiIdx
   )
 {
@@ -233,7 +233,7 @@ SecTemporaryRamSupport (
   GetFspGlobalDataPointer ()->OnSeparateStack = 1;
 
   if (PcdGet8 (PcdFspHeapSizePercentage) == 0) {
-    CurrentStack = AsmReadEsp ();
+    CurrentStack = AsmReadStackPointer ();
     FspStackBase = (UINTN)GetFspEntryStack ();
 
     StackSize = FspStackBase - CurrentStack;
@@ -292,8 +292,8 @@ SecTemporaryRamSupport (
   // permanent memory.
   //
   SecSwitchStack (
-    (UINT32)(UINTN)OldStack,
-    (UINT32)(UINTN)NewStack
+    (UINTN)OldStack,
+    (UINTN)NewStack
     );
 
   return EFI_SUCCESS;
