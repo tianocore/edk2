@@ -3,7 +3,7 @@
   register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
   notify to call FspSiliconInit API.
 
-  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -71,7 +71,7 @@ PeiFspMemoryInit (
   UINT64           TimeStampCounterStart;
   VOID             *FspHobListPtr;
   VOID             *HobData;
-  FSPM_UPD_COMMON  *FspmUpdDataPtr;
+  VOID             *FspmUpdDataPtr;
   UINTN            *SourceData;
 
   DEBUG ((DEBUG_INFO, "PeiFspMemoryInit enter\n"));
@@ -89,7 +89,7 @@ PeiFspMemoryInit (
     //
     // Copy default FSP-M UPD data from Flash
     //
-    FspmUpdDataPtr = (FSPM_UPD_COMMON *)AllocateZeroPool ((UINTN)FspmHeaderPtr->CfgRegionSize);
+    FspmUpdDataPtr = AllocateZeroPool ((UINTN)FspmHeaderPtr->CfgRegionSize);
     ASSERT (FspmUpdDataPtr != NULL);
     SourceData = (UINTN *)((UINTN)FspmHeaderPtr->ImageBase + (UINTN)FspmHeaderPtr->CfgRegionOffset);
     CopyMem (FspmUpdDataPtr, SourceData, (UINTN)FspmHeaderPtr->CfgRegionSize);
@@ -97,17 +97,24 @@ PeiFspMemoryInit (
     //
     // External UPD is ready, get the buffer from PCD pointer.
     //
-    FspmUpdDataPtr = (FSPM_UPD_COMMON *) GetFspmUpdDataAddress();
+    FspmUpdDataPtr = (VOID *) GetFspmUpdDataAddress();
     ASSERT (FspmUpdDataPtr != NULL);
   }
 
   DEBUG ((DEBUG_INFO, "UpdateFspmUpdData enter\n"));
-  UpdateFspmUpdData ((VOID *)FspmUpdDataPtr);
-  DEBUG ((DEBUG_INFO, "  NvsBufferPtr        - 0x%x\n", FspmUpdDataPtr->FspmArchUpd.NvsBufferPtr));
-  DEBUG ((DEBUG_INFO, "  StackBase           - 0x%x\n", FspmUpdDataPtr->FspmArchUpd.StackBase));
-  DEBUG ((DEBUG_INFO, "  StackSize           - 0x%x\n", FspmUpdDataPtr->FspmArchUpd.StackSize));
-  DEBUG ((DEBUG_INFO, "  BootLoaderTolumSize - 0x%x\n", FspmUpdDataPtr->FspmArchUpd.BootLoaderTolumSize));
-  DEBUG ((DEBUG_INFO, "  BootMode            - 0x%x\n", FspmUpdDataPtr->FspmArchUpd.BootMode));
+  UpdateFspmUpdData (FspmUpdDataPtr);
+  if (((FSPM_UPD_COMMON *)FspmUpdDataPtr)->FspmArchUpd.Revision >= 3) {
+    DEBUG ((DEBUG_INFO, "  StackBase           - 0x%lx\n", ((FSPM_UPD_COMMON_FSP24 *)FspmUpdDataPtr)->FspmArchUpd.StackBase));
+    DEBUG ((DEBUG_INFO, "  StackSize           - 0x%lx\n", ((FSPM_UPD_COMMON_FSP24 *)FspmUpdDataPtr)->FspmArchUpd.StackSize));
+    DEBUG ((DEBUG_INFO, "  BootLoaderTolumSize - 0x%x\n", ((FSPM_UPD_COMMON_FSP24 *)FspmUpdDataPtr)->FspmArchUpd.BootLoaderTolumSize));
+    DEBUG ((DEBUG_INFO, "  BootMode            - 0x%x\n", ((FSPM_UPD_COMMON_FSP24 *)FspmUpdDataPtr)->FspmArchUpd.BootMode));
+  } else {
+    DEBUG ((DEBUG_INFO, "  NvsBufferPtr        - 0x%x\n", ((FSPM_UPD_COMMON *)FspmUpdDataPtr)->FspmArchUpd.NvsBufferPtr));
+    DEBUG ((DEBUG_INFO, "  StackBase           - 0x%x\n", ((FSPM_UPD_COMMON *)FspmUpdDataPtr)->FspmArchUpd.StackBase));
+    DEBUG ((DEBUG_INFO, "  StackSize           - 0x%x\n", ((FSPM_UPD_COMMON *)FspmUpdDataPtr)->FspmArchUpd.StackSize));
+    DEBUG ((DEBUG_INFO, "  BootLoaderTolumSize - 0x%x\n", ((FSPM_UPD_COMMON *)FspmUpdDataPtr)->FspmArchUpd.BootLoaderTolumSize));
+    DEBUG ((DEBUG_INFO, "  BootMode            - 0x%x\n", ((FSPM_UPD_COMMON *)FspmUpdDataPtr)->FspmArchUpd.BootMode));
+  }
   DEBUG ((DEBUG_INFO, "  HobListPtr          - 0x%x\n", &FspHobListPtr));
 
   TimeStampCounterStart = AsmReadTsc ();
