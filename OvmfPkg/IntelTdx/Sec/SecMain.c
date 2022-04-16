@@ -25,7 +25,7 @@
 #include <Library/CpuExceptionHandlerLib.h>
 #include <IndustryStandard/Tdx.h>
 #include <Library/PlatformInitLib.h>
-
+#include <Library/CcProbeLib.h>
 #include <Library/PeilessStartupLib.h>
 
 #define SEC_IDT_ENTRY_COUNT  34
@@ -61,7 +61,7 @@ SecCoreStartupWithStack (
   UINT32                Index;
   volatile UINT8        *Table;
 
-  if (TdIsEnabled ()) {
+  if (CcProbe () == CCGuestTypeIntelTdx) {
     //
     // For Td guests, the memory map info is in TdHobLib. It should be processed
     // first so that the memory is accepted. Otherwise access to the unaccepted
@@ -119,7 +119,7 @@ SecCoreStartupWithStack (
   //
   AsmWriteIdtr (&IdtDescriptor);
 
-  if (TdIsEnabled ()) {
+  if (CcProbe () == CCGuestTypeIntelTdx) {
     //
     // InitializeCpuExceptionHandlers () should be called in Td guests so that
     // #VE exceptions can be handled correctly.
