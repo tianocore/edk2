@@ -1211,7 +1211,7 @@
   #  This PCD is ignored if PcdSerialUseHardwareFlowControl is FALSE.<BR><BR>
   #   TRUE  - 16550 serial Tx operations will be blocked if DSR is not asserted.<BR>
   #   FALSE - 16550 serial Tx operations will not be blocked if DSR is not asserted.<BR>
-  # @Prompt Enable serial port cable detetion.
+  # @Prompt Enable serial port cable detection.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialDetectCable|FALSE|BOOLEAN|0x00020006
 
   ## Base address of 16550 serial port registers in MMIO or I/O space. Default is 0x3F8.
