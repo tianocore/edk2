@@ -976,6 +976,7 @@ class DscBuildData(PlatformBuildClassObject):
         if (TokenSpaceGuid + '.' + PcdCName) in GlobalData.gPlatformPcds:
             if GlobalData.gPlatformPcds[TokenSpaceGuid + '.' + PcdCName] != ValueList[Index]:
                 GlobalData.gPlatformPcds[TokenSpaceGuid + '.' + PcdCName] = ValueList[Index]
+            GlobalData.gPlatformFinalPcds[TokenSpaceGuid + '.' + PcdCName] = ValueList[Index]
         return ValueList
 
     def _FilterPcdBySkuUsage(self, Pcds):
