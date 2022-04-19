@@ -93,6 +93,9 @@
   IntrinsicLib
   PrintLib
 
+[FixedPcd]
+  gEfiCryptoPkgTokenSpaceGuid.PcdEcEnabled
+
 #
 # Remove these [BuildOptions] after this library is cleaned up
 #

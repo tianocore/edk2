@@ -582,7 +582,7 @@
 [LibraryClasses.ARM]
   ArmSoftFloatLib
 
-[Pcd]
+[FixedPcd]
   gEfiCryptoPkgTokenSpaceGuid.PcdEcEnabled      ## CONSUMES
 
 [BuildOptions]
