@@ -214,8 +214,8 @@ READ_LOCK_STATUS   = TRUE
 APRIORI DXE {
   INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
-  INF  OvmfPkg/TdxDxe/TdxDxe.inf
   INF  OvmfPkg/AmdSevDxe/AmdSevDxe.inf
+  INF  OvmfPkg/TdxDxe/TdxDxe.inf
 !if $(SMM_REQUIRE) == FALSE
   INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 !endif
