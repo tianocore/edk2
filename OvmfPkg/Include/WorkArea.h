@@ -10,14 +10,7 @@
 #ifndef __OVMF_WORK_AREA_H__
 #define __OVMF_WORK_AREA_H__
 
-//
-// Guest type for the work area
-//
-typedef enum {
-  GUEST_TYPE_NON_ENCRYPTED,
-  GUEST_TYPE_AMD_SEV,
-  GUEST_TYPE_INTEL_TDX,
-} GUEST_TYPE;
+#include <ConfidentialComputingGuestAttr.h>
 
 //
 // Confidential computing work area header definition. Any change
