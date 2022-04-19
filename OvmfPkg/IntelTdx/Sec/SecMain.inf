@@ -49,6 +49,7 @@
   CpuExceptionHandlerLib
   PeilessStartupLib
   PlatformInitLib
+  CcProbeLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
