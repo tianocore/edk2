@@ -317,7 +317,7 @@ class BuildRule:
     #   @param  LineIndex           The line number from which the parsing will begin
     #   @param  SupportedFamily     The list of supported tool chain families
     #
-    def __init__(self, File=None, Content=None, LineIndex=0, SupportedFamily=[TAB_COMPILER_MSFT, "INTEL", "GCC", "RVCT"]):
+    def __init__(self, File=None, Content=None, LineIndex=0, SupportedFamily=[TAB_COMPILER_MSFT, "INTEL", "GCC"]):
         self.RuleFile = File
         # Read build rules from file if it's not none
         if File is not None:

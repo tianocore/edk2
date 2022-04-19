@@ -85,12 +85,6 @@
   Arm/CompareMem.S    |GCC
   Arm/CompareGuid.S   |GCC
 
-  Arm/ScanMem.asm     |RVCT
-  Arm/SetMem.asm      |RVCT
-  Arm/CopyMem.asm     |RVCT
-  Arm/CompareMem.asm  |RVCT
-  Arm/CompareGuid.asm |RVCT
-
 [Sources.AARCH64]
   AArch64/ScanMem.S
   AArch64/SetMem.S
