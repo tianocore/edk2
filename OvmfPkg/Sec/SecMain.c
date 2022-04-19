@@ -28,6 +28,7 @@
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Ppi/TemporaryRamSupport.h>
 #include <Library/PlatformInitLib.h>
+#include <Library/CcProbeLib.h>
 #include "AmdSev.h"
 
 #define SEC_IDT_ENTRY_COUNT  34
@@ -738,7 +739,7 @@ SecCoreStartupWithStack (
   volatile UINT8        *Table;
 
  #if defined (TDX_GUEST_SUPPORTED)
-  if (TdIsEnabled ()) {
+  if (CcProbe () == CcGuestTypeIntelTdx) {
     //
     // For Td guests, the memory map info is in TdHobLib. It should be processed
     // first so that the memory is accepted. Otherwise access to the unaccepted
@@ -828,7 +829,7 @@ SecCoreStartupWithStack (
   }
 
  #if defined (TDX_GUEST_SUPPORTED)
-  if (TdIsEnabled ()) {
+  if (CcProbe () == CcGuestTypeIntelTdx) {
     //
     // InitializeCpuExceptionHandlers () should be called in Td guests so that
     // #VE exceptions can be handled correctly.
