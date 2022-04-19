@@ -967,7 +967,10 @@
   }
   OvmfPkg/IoMmuDxe/IoMmuDxe.inf
 
-  OvmfPkg/TdxDxe/TdxDxe.inf
+  OvmfPkg/TdxDxe/TdxDxe.inf {
+    <LibraryClasses>
+    PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
+  }
 
 !if $(SMM_REQUIRE) == TRUE
   OvmfPkg/SmmAccess/SmmAccess2Dxe.inf
