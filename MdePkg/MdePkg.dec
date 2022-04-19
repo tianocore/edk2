@@ -267,6 +267,11 @@
   #
   RegisterFilterLib|Include/Library/RegisterFilterLib.h
 
+  ##  @libraryclass  This library provides interfances to probe ConfidentialComputing guest type.
+  #
+  #
+  CcProbeLib|Include/Library/CcProbeLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
