@@ -36,7 +36,7 @@ GetSevEsWorkArea (
   //
   // If its not SEV guest then SevEsWorkArea is not valid.
   //
-  if ((WorkArea == NULL) || (WorkArea->Header.GuestType != GUEST_TYPE_AMD_SEV)) {
+  if ((WorkArea == NULL) || (WorkArea->Header.GuestType != CcGuestTypeAmdSev)) {
     return NULL;
   }
 
