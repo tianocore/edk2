@@ -562,6 +562,11 @@ class UncrustifyCheck(ICiBuildPlugin):
         self._formatted_file_error_count = len(formatted_files)
 
         if self._formatted_file_error_count > 0:
+            logging.error(
+                "Visit the following instructions to learn "
+                "how to find the detailed formatting errors in Azure "
+                "DevOps CI: "
+                "https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Code-Formatting#how-to-find-uncrustify-formatting-errors-in-continuous-integration-ci")
             self._tc.LogStdError("Files with formatting errors:\n")
 
             if self._output_file_diffs:
