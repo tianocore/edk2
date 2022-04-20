@@ -267,8 +267,8 @@ strcspn (
 
 char *
 strcpy (
-  char *restrict  strDest,
-  const char      *strSource
+  char        *strDest,
+  const char  *strSource
   )
 {
   AsciiStrCpyS (strDest, MAX_STRING_SIZE, strSource);

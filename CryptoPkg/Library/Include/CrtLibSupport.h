@@ -397,8 +397,8 @@ inet_pton   (
 
 char *
 strcpy (
-  char *restrict  strDest,
-  const char      *strSource
+  char        *strDest,
+  const char  *strSource
   );
 
 //
