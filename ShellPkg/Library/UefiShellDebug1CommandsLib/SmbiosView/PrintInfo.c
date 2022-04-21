@@ -635,6 +635,10 @@ SmbiosPrintStructure (
             ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DEV_FUNC_NUM), gShellDebug1HiiHandle, PeerGroupPtr[Index].DevFuncNum);
             ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DATA_BUS_WIDTH), gShellDebug1HiiHandle, PeerGroupPtr[Index].DataBusWidth);
           }
+
+          DisplaySystemSlotHeight (Struct->Type9->SlotHeight, Option);
+          DisplaySystemSlotPhysicalWidth (Struct->Type9->SlotPhysicalWidth, Option);
+          DisplaySystemSlotInformation (Struct->Type9->SlotInformation, Option);
         }
       }
 
@@ -2898,11 +2902,6 @@ DisplaySystemSlotId (
   IN UINT8   Option
   )
 {
-  //
-  // Display slot type first
-  //
-  DisplaySystemSlotType (SlotType, Option);
-
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_SLOT_ID), gShellDebug1HiiHandle);
   //
   // print option
