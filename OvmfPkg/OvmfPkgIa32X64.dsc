@@ -601,6 +601,8 @@
 !endif
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|1280
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|800
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|FALSE
   gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource|0
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0
