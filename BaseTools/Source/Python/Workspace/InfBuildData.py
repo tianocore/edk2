@@ -1054,17 +1054,20 @@ class InfBuildData(ModuleBuildClassObject):
             return True
         return False
     def CheckFeatureFlagPcd(self,Instance):
-        Pcds = {}
-        if GlobalData.gPlatformFinalPcds.get(self.Arch):
-            Pcds = GlobalData.gPlatformFinalPcds[self.Arch].copy()
+        Pcds = GlobalData.gPlatformFinalPcds.copy()
         if PcdPattern.search(Instance):
             PcdTuple = tuple(Instance.split('.')[::-1])
             if PcdTuple in self.Pcds:
-                if not (self.Pcds[PcdTuple].Type == 'FeatureFlag' or self.Pcds[PcdTuple].Type == 'FixedAtBuild') and Instance not in Pcds:
+                if not (self.Pcds[PcdTuple].Type == 'FeatureFlag' or self.Pcds[PcdTuple].Type == 'FixedAtBuild'):
                     EdkLogger.error('build', FORMAT_INVALID,
-                                    "\nit must be defined in a [PcdsFeatureFlag] or [PcdsFixedAtBuild] section of Dsc or Dec file or [FeaturePcd] or [FixedPcd] of Inf file",
+                                    "\nFeatureFlagPcd must be defined in a [PcdsFeatureFlag] or [PcdsFixedAtBuild] section of Dsc or Dec file",
                                     File=str(self), ExtraData=Instance)
-                Pcds[Instance] = self.Pcds[PcdTuple].DefaultValue
+                if not Instance in Pcds:
+                    Pcds[Instance] = self.Pcds[PcdTuple].DefaultValue
+            else: #if PcdTuple not in self.Pcds:
+                EdkLogger.error('build', FORMAT_INVALID,
+                                "\nFeatureFlagPcd must be defined in [FeaturePcd] or [FixedPcd] of Inf file",
+                                File=str(self), ExtraData=Instance)
             if Instance in Pcds:
                 if Pcds[Instance] == '0':
                     return False
