@@ -2,7 +2,7 @@
 
 ## Basic Status
 
-| Package              | Windows VS2019 (IA32/X64)| Ubuntu GCC (IA32/X64/ARM/AARCH64) | Known Issues |
+| Package              | Windows VS2022 (IA32/X64)| Ubuntu GCC (IA32/X64/ARM/AARCH64) | Known Issues |
 | :----                | :-----                   | :----                             | :---         |
 | ArmPkg               |                    | :heavy_check_mark: |
 | ArmPlatformPkg       |                    | :heavy_check_mark: |
@@ -41,7 +41,7 @@ located [here](https://github.com/tianocore/edk2-pytool-library) and
 [here](https://github.com/tianocore/edk2-pytool-extensions)).
 
 The primary execution flows can be found in the
-`.azurepipelines/Windows-VS2019.yml` and `.azurepipelines/Ubuntu-GCC5.yml`
+`.azurepipelines/Windows-VS2022.yml` and `.azurepipelines/Ubuntu-GCC5.yml`
 files. These YAML files are consumed by the Azure Dev Ops Build Pipeline and
 dictate what server resources should be used, how they should be configured, and
 what processes should be run on them. An overview of this schema can be found
@@ -86,7 +86,7 @@ that a few steps should be followed.  Details of EDKII Tools can be found in the
 
 1. A supported toolchain (others might work but this is what is tested and validated)
    * Windows 10:
-     * VS 2017 or VS 2019
+     * VS 2017, VS 2019 or VS 2022
      * Windows SDK (for rc)
      * Windows WDK (for capsules)
    * Ubuntu 18.04 or Fedora
