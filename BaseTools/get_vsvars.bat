@@ -10,6 +10,7 @@
 @echo off
 set SCRIPT_ERROR=0
 if "%1"=="" goto main
+if /I "%1"=="VS2022" goto VS2022Vars
 if /I "%1"=="VS2019" goto VS2019Vars
 if /I "%1"=="VS2017" goto VS2017Vars
 if /I "%1"=="VS2015" goto VS2015Vars
@@ -48,6 +49,23 @@ REM       (Or invoke the relevant vsvars32 file beforehand).
 
 :main
 if defined VCINSTALLDIR goto :done
+  :VS2022Vars
+  if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" (
+    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\BuildTools" (
+      call :set_vsvars "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 17,18
+    ) else (
+      call :set_vsvars "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -version 17,18
+    )
+  )
+  if exist "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" (
+    if exist "%ProgramFiles%\Microsoft Visual Studio\2022\BuildTools" (
+      call :set_vsvars "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 17,18
+    ) else (
+      call :set_vsvars "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -version 17,18
+    )
+  )
+  if /I "%1"=="VS2022" goto ToolNotInstall
+
   :VS2019Vars
   if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" (
     if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\BuildTools" (

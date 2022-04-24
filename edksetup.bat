@@ -145,6 +145,7 @@ if defined CYGWIN_HOME (
 :cygwin_done
 if /I "%1"=="Rebuild" shift
 if /I "%1"=="ForceRebuild" shift
+if /I "%1"=="VS2022" shift
 if /I "%1"=="VS2019" shift
 if /I "%1"=="VS2017" shift
 if /I "%1"=="VS2015" shift
@@ -154,7 +155,7 @@ if "%1"=="" goto end
 
 :Usage
   @echo.
-  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [Reconfig] [Rebuild] [ForceRebuild] [VS2019] [VS2017] [VS2015] [VS2013] [VS2012]"
+  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [Reconfig] [Rebuild] [ForceRebuild] [VS2022] [VS2019] [VS2017] [VS2015] [VS2013] [VS2012]"
   @echo.
   @echo         Reconfig       Reinstall target.txt, tools_def.txt and build_rule.txt.
   @echo         Rebuild        Perform incremental rebuild of BaseTools binaries.
@@ -164,6 +165,7 @@ if "%1"=="" goto end
   @echo         VS2015         Set the env for VS2015 build.
   @echo         VS2017         Set the env for VS2017 build.
   @echo         VS2019         Set the env for VS2019 build.
+  @echo         VS2022         Set the env for VS2022 build.
   @echo.
   @echo  Note that target.template, tools_def.template and build_rules.template
   @echo  will only be copied to target.txt, tools_def.txt and build_rule.txt
