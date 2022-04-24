@@ -1715,7 +1715,7 @@ NOOPT_VS2017_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 #   VS2019       - Microsoft Visual Studio 2019 with Intel ASL
 #   ASL          - Intel ACPI Source Language Compiler (iasl.exe)
 ####################################################################################
-#   VS2019           - Microsoft Visual Studio 2017 professional Edition with Intel ASL
+#   VS2019           - Microsoft Visual Studio 2019 professional Edition with Intel ASL
 *_VS2019_*_*_FAMILY        = MSFT
 *_VS2019_*_*_DLL           = DEF(VS2019_BIN_HOST)
 
@@ -1873,7 +1873,7 @@ NOOPT_VS2019_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 #   VS2022       - Microsoft Visual Studio 2022 with Intel ASL
 #   ASL          - Intel ACPI Source Language Compiler (iasl.exe)
 ####################################################################################
-#   VS2022           - Microsoft Visual Studio 2019 professional Edition with Intel ASL
+#   VS2022           - Microsoft Visual Studio 2022 professional Edition with Intel ASL
 *_VS2022_*_*_FAMILY        = MSFT
 *_VS2022_*_*_DLL           = DEF(VS2022_BIN_HOST)
 

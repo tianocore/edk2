@@ -1,5 +1,5 @@
 # @file WindowsVsToolChain.py
-# Plugin to configures paths for the VS2017 and VS2019 tool chain
+# Plugin to configures paths for the VS2017, VS2019 and VS2022 tool chain
 ##
 # This plugin works in conjuncture with the tools_def
 #
@@ -106,7 +106,7 @@ class WindowsVsToolChain(IUefiBuildPlugin):
         # VS160INSTALLPATH:  base install path on system to VC install dir.  Here you will find the VC folder, etc
         # VS160TOOLVER:      version number for the VC compiler tools
         # VS2019_PREFIX:     path to MSVC compiler folder with trailing slash (can be used instead of two vars above)
-        # VS2017_HOST:       set the host architecture to use for host tools, and host libs, etc
+        # VS2019_HOST:       set the host architecture to use for host tools, and host libs, etc
         elif thebuilder.env.GetValue("TOOL_CHAIN_TAG") == "VS2019":
 
             # check to see if host is configured
@@ -171,6 +171,79 @@ class WindowsVsToolChain(IUefiBuildPlugin):
             # now confirm it exists
             if not os.path.exists(shell_environment.GetEnvironment().get_shell_var("VS2019_PREFIX")):
                 self.Logger.error("Path for VS2019 toolchain is invalid")
+                return -2
+
+        #
+        # VS2022 - Follow VS2022 where there is potential for many versions of the tools.
+        # If a specific version is required then the user must set both env variables:
+        # VS170INSTALLPATH:  base install path on system to VC install dir.  Here you will find the VC folder, etc
+        # VS170TOOLVER:      version number for the VC compiler tools
+        # VS2022_PREFIX:     path to MSVC compiler folder with trailing slash (can be used instead of two vars above)
+        # VS2022_HOST:       set the host architecture to use for host tools, and host libs, etc
+        elif thebuilder.env.GetValue("TOOL_CHAIN_TAG") == "VS2022":
+
+            # check to see if host is configured
+            # HostType for VS2022 should be (defined in tools_def):
+            # x86   == 32bit Intel
+            # x64   == 64bit Intel
+            # arm   == 32bit Arm
+            # arm64 == 64bit Arm
+            #
+            HostType = shell_environment.GetEnvironment().get_shell_var("VS2022_HOST")
+            if HostType is not None:
+                HostType = HostType.lower()
+                self.Logger.info(
+                    f"HOST TYPE defined by environment.  Host Type is {HostType}")
+            else:
+                HostInfo = GetHostInfo()
+                if HostInfo.arch == "x86":
+                    if HostInfo.bit == "32":
+                        HostType = "x86"
+                    elif HostInfo.bit == "64":
+                        HostType = "x64"
+                else:
+                    raise NotImplementedError()
+
+            # VS2022_HOST options are not exactly the same as QueryVcVariables. This translates.
+            VC_HOST_ARCH_TRANSLATOR = {
+                "x86": "x86", "x64": "AMD64", "arm": "not supported", "arm64": "not supported"}
+
+            # check to see if full path already configured
+            if shell_environment.GetEnvironment().get_shell_var("VS2022_PREFIX") != None:
+                self.Logger.info("VS2022_PREFIX is already set.")
+
+            else:
+                install_path = self._get_vs_install_path(
+                    "VS2022".lower(), "VS170INSTALLPATH")
+                vc_ver = self._get_vc_version(install_path, "VS170TOOLVER")
+
+                if install_path is None or vc_ver is None:
+                    self.Logger.error(
+                        "Failed to configure environment for VS2022")
+                    return -1
+
+                version_aggregator.GetVersionAggregator().ReportVersion(
+                    "Visual Studio Install Path", install_path, version_aggregator.VersionTypes.INFO)
+                version_aggregator.GetVersionAggregator().ReportVersion(
+                    "VC Version", vc_ver, version_aggregator.VersionTypes.TOOL)
+
+                # make VS2022_PREFIX to align with tools_def.txt
+                prefix = os.path.join(install_path, "VC",
+                                      "Tools", "MSVC", vc_ver)
+                prefix = prefix + os.path.sep
+                shell_environment.GetEnvironment().set_shell_var("VS2022_PREFIX", prefix)
+                shell_environment.GetEnvironment().set_shell_var("VS2022_HOST", HostType)
+
+                shell_env = shell_environment.GetEnvironment()
+                # Use the tools lib to determine the correct values for the vars that interest us.
+                vs_vars = locate_tools.QueryVcVariables(
+                    interesting_keys, VC_HOST_ARCH_TRANSLATOR[HostType], vs_version="vs2022")
+                for (k, v) in vs_vars.items():
+                    shell_env.set_shell_var(k, v)
+
+            # now confirm it exists
+            if not os.path.exists(shell_environment.GetEnvironment().get_shell_var("VS2022_PREFIX")):
+                self.Logger.error("Path for VS2022 toolchain is invalid")
                 return -2
 
         return 0
