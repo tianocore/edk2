@@ -24,6 +24,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @param[in]  InData           Pointer to the content to be signed.
   @param[in]  InDataSize       Size of InData in bytes.
   @param[in]  SignCert         Pointer to signer's DER-encoded certificate to sign with.
+  @param[in]  SignCertSize     Size of signer's DER-encoded certificate to sign with.
   @param[in]  OtherCerts       Pointer to an optional additional set of certificates to
                                include in the PKCS#7 signedData (e.g. any intermediate
                                CAs in the chain).
@@ -42,7 +43,8 @@ Pkcs7Sign (
   IN   CONST UINT8  *KeyPassword,
   IN   UINT8        *InData,
   IN   UINTN        InDataSize,
-  IN   UINT8        *SignCert,
+  IN   CONST UINT8  *SignCert,
+  IN   UINTN        SignCertSize,
   IN   UINT8        *OtherCerts      OPTIONAL,
   OUT  UINT8        **SignedData,
   OUT  UINTN        *SignedDataSize
