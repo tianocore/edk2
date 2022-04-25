@@ -1540,6 +1540,12 @@ DisplayBiosCharacteristicsExt2 (
       if (BIT (byte2, 4) != 0) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_VIRTUAL_MACHINE), gShellDebug1HiiHandle);
       }
+      if (BIT (byte2, 5) != 0) {
+        ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_MCFG_SUPPORTED), gShellDebug1HiiHandle);
+      }
+      if (BIT (byte2, 6) != 0) {
+        ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_MCFG_ENABLED), gShellDebug1HiiHandle);
+      }
 
       if (BIT (byte2, 5) != 0) {
         ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_MCFG_SUPPORTED), gShellDebug1HiiHandle);
