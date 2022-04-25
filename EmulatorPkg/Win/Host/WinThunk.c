@@ -386,7 +386,7 @@ SecSetTimer (
     mMMTimerThreadID = timeSetEvent (
                          (UINT)TimerPeriod,
                          0,
-                         MMTimerThread,
+                         (LPTIMECALLBACK)MMTimerThread,
                          (DWORD_PTR)NULL,
                          TIME_PERIODIC | TIME_KILL_SYNCHRONOUS | TIME_CALLBACK_FUNCTION
                          );
