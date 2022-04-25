@@ -163,6 +163,8 @@
 #string STR_SMBIOSVIEW_PRINTINFO_ENABLE_TAR_CONT_DIST           #language en-US "Enable Targeted Content Distribution\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_UEFI_SPEC_SUPPORT              #language en-US "UEFI Specification is supported\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_VIRTUAL_MACHINE                #language en-US "The SMBIOS table describes a virtual machine\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_MCFG_SUPPORTED                 #language en-US "Manufacturing mode is supported\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_MCFG_ENABLED                   #language en-US "Manufacturing mode is enabled\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_BITS_RSVD_FOR_FUTURE           #language en-US " Bits %d:7 are reserved for future assignment\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_PROCESSOR_FAMILY               #language en-US "Processor Family: "
 #string STR_SMBIOSVIEW_PRINTINFO_OTHER                          #language en-US "Other\r\n"
