@@ -383,6 +383,11 @@ class GitDiffCheck:
                     #
                     self.force_crlf = False
                     self.force_notabs = False
+                if self.filename.endswith('.sln'):
+                    #
+                    # Solution (.sln) files have tabs by default
+                    #
+                    self.force_notabs = False
             elif len(line.rstrip()) != 0:
                 self.format_error("didn't find diff command")
             self.line_num += 1
