@@ -1541,6 +1541,14 @@ DisplayBiosCharacteristicsExt2 (
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_VIRTUAL_MACHINE), gShellDebug1HiiHandle);
       }
 
+      if (BIT (byte2, 5) != 0) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_MCFG_SUPPORTED), gShellDebug1HiiHandle);
+      }
+
+      if (BIT (byte2, 6) != 0) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_MCFG_ENABLED), gShellDebug1HiiHandle);
+      }
+
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BITS_RSVD_FOR_FUTURE), gShellDebug1HiiHandle, 5);
     } else {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BITS_RSVD_FOR_FUTURE), gShellDebug1HiiHandle, 3);
