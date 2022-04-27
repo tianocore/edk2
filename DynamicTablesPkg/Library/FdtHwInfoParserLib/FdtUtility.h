@@ -60,7 +60,7 @@
 #define SPI_OFFSET  (32U)
 #define DT_PPI_IRQ  (1U)
 #define DT_SPI_IRQ  (0U)
-#define DT_IRQ_IS_EDGE_TRIGGERED(x)  ((((x) & (BIT0 | BIT2)) != 0))
+#define DT_IRQ_IS_EDGE_TRIGGERED(x)  ((((x) & (BIT0 | BIT1)) != 0))
 #define DT_IRQ_IS_ACTIVE_LOW(x)      ((((x) & (BIT1 | BIT3)) != 0))
 #define IRQ_TYPE_OFFSET    (0U)
 #define IRQ_NUMBER_OFFSET  (1U)
