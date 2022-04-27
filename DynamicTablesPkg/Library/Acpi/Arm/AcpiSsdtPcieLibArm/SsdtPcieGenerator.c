@@ -449,7 +449,7 @@ GeneratePrt (
     if ((Index > 0)   &&
         (IrqMapInfo->IntcInterrupt.Interrupt >= 32)   &&
         (IrqMapInfo->IntcInterrupt.Interrupt < 1020)  &&
-        ((IrqMapInfo->IntcInterrupt.Flags & 0x3) != BIT0))
+        ((IrqMapInfo->IntcInterrupt.Flags & 0x3) != 0))
     {
       Status = EFI_INVALID_PARAMETER;
       ASSERT_EFI_ERROR (Status);
