@@ -43,7 +43,7 @@ ERR_IN_OPERAND          = 'Macro after IN operator can only be: $(FAMILY), $(ARC
 __ValidString = re.compile(r'[_a-zA-Z][_0-9a-zA-Z]*$')
 _ReLabel = re.compile('LABEL\((\w+)\)')
 _ReOffset = re.compile('OFFSET_OF\((\w+)\)')
-PcdPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*\.[_a-zA-Z][0-9A-Za-z_]*$')
+PcdPattern = re.compile(r'^[_a-zA-Z][0-9A-Za-z_]*\.[_a-zA-Z][0-9A-Za-z_]*$')
 
 ## SplitString
 #  Split string to list according double quote

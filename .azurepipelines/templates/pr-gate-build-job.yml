@@ -35,10 +35,10 @@ jobs:
         Build.Targets: 'RELEASE,NO-TARGET'
       TARGET_NETWORK:
         Build.Pkgs: 'NetworkPkg,RedfishPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_OTHER:
-        Build.Pkgs: 'PcAtChipsetPkg,ShellPkg,StandaloneMmPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+        Build.Pkgs: 'PcAtChipsetPkg,PrmPkg,ShellPkg,StandaloneMmPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_FMP_FAT_TEST:
         Build.Pkgs: 'FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
@@ -47,15 +47,15 @@ jobs:
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_SECURITY:
         Build.Pkgs: 'SecurityPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_UEFIPAYLOAD:
         Build.Pkgs: 'UefiPayloadPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_PLATFORMS:
         # For Platforms only check code. Leave it to Platform CI
         # to build them.
         Build.Pkgs: 'ArmVirtPkg,EmulatorPkg,OvmfPkg'
-        Build.Targets: 'NO-TARGET'
+        Build.Targets: 'NO-TARGET,NOOPT'
 
   workspace:
     clean: all

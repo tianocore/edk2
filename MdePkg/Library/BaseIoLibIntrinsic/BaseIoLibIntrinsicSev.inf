@@ -30,17 +30,22 @@
   IoLibMmioBuffer.c
   BaseIoLibIntrinsicInternal.h
   IoHighLevel.c
+  IoLibTdx.h
+  IoLibSev.h
 
 [Sources.IA32]
   IoLibGcc.c    | GCC
   IoLibMsc.c    | MSFT
   IoLib.c
+  IoLibInternalTdxNull.c
   Ia32/IoFifoSev.nasm
 
 [Sources.X64]
   IoLibGcc.c    | GCC
   IoLibMsc.c    | MSFT
   IoLib.c
+  IoLibInternalTdx.c
+  IoLibFifo.c
   X64/IoFifoSev.nasm
 
 [Packages]
@@ -50,4 +55,7 @@
   DebugLib
   BaseLib
   RegisterFilterLib
+  CcProbeLib
 
+[LibraryClasses.X64]
+  TdxLib
