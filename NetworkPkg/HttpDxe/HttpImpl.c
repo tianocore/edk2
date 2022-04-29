@@ -161,6 +161,7 @@ EfiHttpConfigure (
     HttpInstance->HttpVersion        = HttpConfigData->HttpVersion;
     HttpInstance->TimeOutMillisec    = HttpConfigData->TimeOutMillisec;
     HttpInstance->LocalAddressIsIPv6 = HttpConfigData->LocalAddressIsIPv6;
+    HttpInstance->ConnectionClose    = FALSE;
 
     if (HttpConfigData->LocalAddressIsIPv6) {
       CopyMem (
@@ -440,7 +441,8 @@ EfiHttpRequest (
       //
       ReConfigure = FALSE;
     } else {
-      if ((HttpInstance->RemotePort == RemotePort) &&
+      if ((HttpInstance->ConnectionClose == FALSE) &&
+          (HttpInstance->RemotePort == RemotePort) &&
           (AsciiStrCmp (HttpInstance->RemoteHost, HostName) == 0) &&
           (!HttpInstance->UseHttps || (HttpInstance->UseHttps &&
                                        !TlsConfigure &&
@@ -648,6 +650,8 @@ EfiHttpRequest (
       goto Error4;
     }
   }
+
+  HttpInstance->ConnectionClose = FALSE;
 
   //
   // Transmit the request message.
@@ -990,6 +994,7 @@ HttpResponseWorker (
   UINTN             HdrLen;
   NET_FRAGMENT      Fragment;
   UINT32            TimeoutValue;
+  UINTN             Index;
 
   if ((Wrap == NULL) || (Wrap->HttpInstance == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1101,6 +1106,14 @@ HttpResponseWorker (
     }
 
     //
+    // Check server's HTTP version.
+    //
+    if (AsciiStrnCmp (HttpHeaders, "HTTP/1.0", sizeof ("HTTP/1.0") - 1) == 0) {
+      DEBUG ((DEBUG_VERBOSE, "HTTP: Server version is 1.0. Setting Connection close.\n"));
+      HttpInstance->ConnectionClose = TRUE;
+    }
+
+    //
     // Search for Status Code.
     //
     StatusCodeStr = HttpHeaders + AsciiStrLen (HTTP_VERSION_STR) + 1;
@@ -1195,6 +1208,16 @@ HttpResponseWorker (
 
       FreePool (HttpHeaders);
       HttpHeaders = NULL;
+
+      for (Index = 0; Index < HttpMsg->HeaderCount; ++Index) {
+        if ((AsciiStriCmp ("Connection", HttpMsg->Headers[Index].FieldName) == 0) &&
+            (AsciiStriCmp ("close", HttpMsg->Headers[Index].FieldValue) == 0))
+        {
+          DEBUG ((DEBUG_VERBOSE, "Http: 'Connection: close' header received.\n"));
+          HttpInstance->ConnectionClose = TRUE;
+          break;
+        }
+      }
 
       //
       // Init message-body parser by header information.

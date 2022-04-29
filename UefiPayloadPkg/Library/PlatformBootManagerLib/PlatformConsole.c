@@ -109,7 +109,7 @@ EFI_DEVICE_PATH_PROTOCOL  *gPlatformRootBridges[] = {
   NULL
 };
 
-BOOLEAN  mDetectVgaOnly;
+BOOLEAN  mDetectDisplayOnly;
 
 /**
   Add IsaKeyboard to ConIn; add IsaSerial to ConOut, ConIn, ErrOut.
@@ -482,7 +482,7 @@ DetectAndPreparePlatformPciDevicePath (
                     );
   ASSERT_EFI_ERROR (Status);
 
-  if (!mDetectVgaOnly) {
+  if (!mDetectDisplayOnly) {
     //
     // Here we decide whether it is LPC Bridge
     //
@@ -515,14 +515,14 @@ DetectAndPreparePlatformPciDevicePath (
   }
 
   //
-  // Here we decide which VGA device to enable in PCI bus
+  // Enable all display devices
   //
-  if (IS_PCI_VGA (Pci)) {
+  if (IS_PCI_DISPLAY (Pci)) {
     //
     // Add them to ConOut.
     //
-    DEBUG ((DEBUG_INFO, "Found PCI VGA device\n"));
-    PreparePciVgaDevicePath (Handle);
+    DEBUG ((DEBUG_INFO, "Found PCI Display device\n"));
+    EfiBootManagerConnectVideoController (Handle);
     return EFI_SUCCESS;
   }
 
@@ -532,7 +532,7 @@ DetectAndPreparePlatformPciDevicePath (
 /**
   Do platform specific PCI Device check and add them to ConOut, ConIn, ErrOut
 
-  @param[in]  DetectVgaOnly - Only detect VGA device if it's TRUE.
+  @param[in]  DetectDisplayOnly - Only detect display device if it's TRUE.
 
   @retval EFI_SUCCESS - PCI Device check and Console variable update successfully.
   @retval EFI_STATUS - PCI Device check or Console variable update fail.
@@ -540,10 +540,10 @@ DetectAndPreparePlatformPciDevicePath (
 **/
 EFI_STATUS
 DetectAndPreparePlatformPciDevicePaths (
-  BOOLEAN  DetectVgaOnly
+  BOOLEAN  DetectDisplayOnly
   )
 {
-  mDetectVgaOnly = DetectVgaOnly;
+  mDetectDisplayOnly = DetectDisplayOnly;
 
   EfiBootManagerUpdateConsoleVariable (
     ConIn,

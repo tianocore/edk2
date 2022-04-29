@@ -13,6 +13,14 @@ OBJECTS = DevicePath.o UefiDevicePathLib.o DevicePathFromText.o  DevicePathUtili
 
 include $(MAKEROOT)/Makefiles/app.makefile
 
+GCCVERSION = $(shell gcc -dumpversion | awk -F'.' '{print $$1}')
+ifneq ("$(GCCVERSION)", "5")
+ifneq ($(CXX), llvm)
+# gcc 12 trips over device path handling
+BUILD_CFLAGS += -Wno-error=stringop-overflow
+endif
+endif
+
 LIBS = -lCommon
 ifeq ($(CYGWIN), CYGWIN)
   LIBS += -L/lib/e2fsprogs -luuid

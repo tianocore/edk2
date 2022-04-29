@@ -26,10 +26,11 @@
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 
-[Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
-
 [LibraryClasses]
   BaseLib
   PciLib
   IoLib
+  HobLib
+
+[Guids]
+  gUefiOvmfPkgPlatformInfoGuid                      ## CONSUMES

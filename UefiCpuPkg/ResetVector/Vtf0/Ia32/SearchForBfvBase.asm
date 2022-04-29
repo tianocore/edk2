@@ -2,7 +2,7 @@
 ; @file
 ; Search for the Boot Firmware Volume (BFV) base address
 ;
-; Copyright (c) 2008 - 2009, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2008 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ;------------------------------------------------------------------------------
@@ -32,7 +32,6 @@ BITS    32
 Flat32SearchForBfvBase:
 
     xor     eax, eax
-    mov     ecx, 3    ; 3: FFS3 GUID, 2: FFS2 GUID, 1: Not Found
 searchingForBfvHeaderLoop:
     ;
     ; We check for a firmware volume at every 4KB address in the top 16MB
@@ -40,21 +39,19 @@ searchingForBfvHeaderLoop:
     ;
     sub     eax, 0x1000
     cmp     eax, 0xff000000
-    jb      searchingForBfvWithOtherFfsGuid
-    cmp     ecx, 3
-    jne     searchingForFfs2Guid
+    jb      searchedForBfvHeaderButNotFound
 
     ;
     ; Check FFS3 GUID
     ;
     cmp     dword [eax + 0x10], FFS3_GUID_DWORD0
-    jne     searchingForBfvHeaderLoop
+    jne     searchingForFfs2Guid
     cmp     dword [eax + 0x14], FFS3_GUID_DWORD1
-    jne     searchingForBfvHeaderLoop
+    jne     searchingForFfs2Guid
     cmp     dword [eax + 0x18], FFS3_GUID_DWORD2
-    jne     searchingForBfvHeaderLoop
+    jne     searchingForFfs2Guid
     cmp     dword [eax + 0x1c], FFS3_GUID_DWORD3
-    jne     searchingForBfvHeaderLoop
+    jne     searchingForFfs2Guid
     jmp     checkingFvLength
 
 searchingForFfs2Guid:
@@ -81,12 +78,6 @@ checkingFvLength:
     jnz     searchingForBfvHeaderLoop
 
     jmp     searchedForBfvHeaderAndItWasFound
-
-searchingForBfvWithOtherFfsGuid:
-    xor     eax, eax
-    dec     ecx
-    cmp     ecx, 1
-    jne     searchingForBfvHeaderLoop
 
 searchedForBfvHeaderButNotFound:
     ;
