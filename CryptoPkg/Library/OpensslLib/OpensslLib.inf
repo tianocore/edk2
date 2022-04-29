@@ -421,6 +421,10 @@
   $(OPENSSL_PATH)/crypto/siphash/siphash.c
   $(OPENSSL_PATH)/crypto/siphash/siphash_ameth.c
   $(OPENSSL_PATH)/crypto/siphash/siphash_pmeth.c
+  $(OPENSSL_PATH)/crypto/sm2/sm2_crypt.c
+  $(OPENSSL_PATH)/crypto/sm2/sm2_err.c
+  $(OPENSSL_PATH)/crypto/sm2/sm2_pmeth.c
+  $(OPENSSL_PATH)/crypto/sm2/sm2_sign.c
   $(OPENSSL_PATH)/crypto/sm3/m_sm3.c
   $(OPENSSL_PATH)/crypto/sm3/sm3.c
   $(OPENSSL_PATH)/crypto/sm4/sm4.c
