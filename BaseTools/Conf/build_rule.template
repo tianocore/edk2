@@ -366,6 +366,8 @@
 
     <OutputFile>
         $(OUTPUT_DIR)(+)$(MODULE_NAME).efi
+        $(DEBUG_DIR)(+)$(MODULE_NAME).efi
+        $(OUTPUT_DIR)(+)$(MODULE_NAME).map
 
     <Command.MSFT, Command.INTEL, Command.RVCT, Command.CLANGPDB>
         "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)

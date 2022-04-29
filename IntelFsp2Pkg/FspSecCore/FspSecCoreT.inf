@@ -1,7 +1,7 @@
 ## @file
 #  Sec Core for FSP
 #
-#  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -17,16 +17,18 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32
+#  VALID_ARCHITECTURES           = IA32 X64
 #
-
-[Sources]
-
 
 [Sources.IA32]
   Ia32/Stack.nasm
   Ia32/FspApiEntryT.nasm
   Ia32/FspHelper.nasm
+
+[Sources.X64]
+  X64/Stack.nasm
+  X64/FspApiEntryT.nasm
+  X64/FspHelper.nasm
 
 [Binaries.Ia32]
   RAW|Vtf0/Bin/ResetVec.ia32.raw |GCC

@@ -1,0 +1,66 @@
+## @file
+# PrmInfo.inf
+#
+# Reports information about the PRM configuration currently loaded on the system.
+#
+# Copyright (C) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = PrmInfo
+  FILE_GUID                      = F26C503B-BD8E-4274-A80B-2C4E20FADA6E
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+  UEFI_HII_RESOURCE_SECTION      = TRUE
+  MODULE_UNI_FILE                = PrmInfo.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  PrmInfoStrings.uni
+  PrmInfo.h
+  PrmInfo.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ShellPkg/ShellPkg.dec
+  PrmPkg/PrmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HiiLib
+  MemoryAllocationLib
+  PcdLib
+  PrmContextBufferLib
+  PrmModuleDiscoveryLib
+  PrmPeCoffLib
+  ShellLib
+  TimerLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiHiiServicesLib
+  UefiLib
+
+[Pcd]
+   gPrmPkgTokenSpaceGuid.PcdPrmInfoPrintHandlerExecutionTime
+
+[Protocols]
+  gEfiHiiPackageListProtocolGuid    ## CONSUMES
+
+[Guids]
+  gPrmHiiGuid
+  gZeroGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PrmInfoExtra.uni

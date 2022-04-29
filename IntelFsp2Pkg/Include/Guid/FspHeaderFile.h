@@ -2,10 +2,12 @@
   Intel FSP Header File definition from Intel Firmware Support Package External
   Architecture Specification v2.0 and above.
 
-  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
+#include <Base.h>
 
 #ifndef __FSP_HEADER_FILE_H__
 #define __FSP_HEADER_FILE_H__
@@ -23,6 +25,12 @@
 #define OFFSET_IN_FSP_INFO_HEADER(x)  (UINT32)&((FSP_INFO_HEADER *)(UINTN)0)->x
 
 #define FSP_INFO_HEADER_SIGNATURE  SIGNATURE_32 ('F', 'S', 'P', 'H')
+
+#define IMAGE_ATTRIBUTE_GRAPHICS_SUPPORT      BIT0
+#define IMAGE_ATTRIBUTE_DISPATCH_MODE_SUPPORT BIT1
+#define IMAGE_ATTRIBUTE_64BIT_MODE_SUPPORT    BIT2
+#define FSP_IA32                              0
+#define FSP_X64                               1
 
 #pragma pack(1)
 
@@ -49,7 +57,7 @@ typedef struct {
   UINT8     SpecVersion;
   ///
   /// Byte 0x0B: Revision of the FSP Information Header.
-  ///            The Current value for this field is 0x6.
+  ///            The Current value for this field is 0x7.
   ///
   UINT8     HeaderRevision;
   ///
@@ -82,6 +90,10 @@ typedef struct {
   UINT32    ImageBase;
   ///
   /// Byte 0x20: Attribute for the FSP binary.
+  ///   Bit 0: Graphics Support - Set to 1 when FSP supports enabling Graphics Display.
+  ///   Bit 1: Dispatch Mode Support - Set to 1 when FSP supports the optional Dispatch Mode API defined in Section 7.2 and 9. This bit is only valid if FSP HeaderRevision is >= 4.
+  ///   Bit 2: 64-bit mode support - Set to 1 to indicate FSP supports 64-bit long mode interfaces. Set to 0 to indicate FSP supports 32-bit mode interfaces. This bit is only valid if FSP HeaderRevision is >= 7.
+  ///   Bits 15:3 - Reserved
   ///
   UINT16    ImageAttribute;
   ///

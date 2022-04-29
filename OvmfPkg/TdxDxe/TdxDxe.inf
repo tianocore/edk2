@@ -1,0 +1,68 @@
+#/** @file
+#
+#  Driver clears the encryption attribute from MMIO regions when TDX is enabled
+#
+#  Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = TdxDxe
+  FILE_GUID                      = E750224E-7BCE-40AF-B5BB-47E3611EB5C2
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TdxDxeEntryPoint
+
+[Sources]
+  TdxDxe.c
+  TdxAcpiTable.c
+  X64/ApRunLoop.nasm
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  MemoryAllocationLib
+  PcdLib
+  UefiDriverEntryPoint
+  TdxLib
+  HobLib
+  TdxMailboxLib
+  MemEncryptTdxLib
+
+[Depex]
+  TRUE
+
+[Guids]
+  gUefiOvmfPkgPlatformInfoGuid                      ## CONSUMES
+
+[Protocols]
+  gQemuAcpiTableNotifyProtocolGuid                 ## CONSUMES
+  gEfiAcpiSdtProtocolGuid                          ## CONSUMES
+  gEfiAcpiTableProtocolGuid                        ## CONSUMES
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciIoBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciIoSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Base
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack

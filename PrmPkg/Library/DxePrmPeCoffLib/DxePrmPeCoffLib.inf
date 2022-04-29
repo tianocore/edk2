@@ -1,0 +1,32 @@
+## @file
+#  PRM PE/COFF Library
+#
+#  Provides functionality to support additional PE/COFF functionality needed to use Platform Runtime Mechanism (PRM)
+#  modules.
+#
+#  Copyright (c) Microsoft Corporation
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x00010005
+  BASE_NAME           = DxePrmPeCoffLib
+  FILE_GUID           = 0B9AEEAC-D79A-46A5-A784-84BDBC6291B5
+  MODULE_TYPE         = DXE_DRIVER
+  VERSION_STRING      = 1.0
+  LIBRARY_CLASS       = PrmPeCoffLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
+
+[Sources]
+  DxePrmPeCoffLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  PrmPkg/PrmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PeCoffLib

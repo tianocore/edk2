@@ -1,7 +1,7 @@
 ;; @file
 ;  Provide FSP API entry points.
 ;
-; Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;;
 
@@ -28,6 +28,24 @@ struc FSPM_UPD_COMMON
     .BootLoaderTolumSize:     resd    1
     .BootMode:                resd    1
     .Reserved1:               resb    8
+    ; }
+    .size:
+endstruc
+
+struc FSPM_UPD_COMMON_FSP24
+    ; FSP_UPD_HEADER {
+    .FspUpdHeader:              resd  8
+    ; }
+    ; FSPM_ARCH2_UPD {
+    .Revision:                  resb  1
+    .Reserved:                  resb  3
+    .Length                     resd  1
+    .StackBase:                 resq  1
+    .StackSize:                 resq  1
+    .BootLoaderTolumSize:       resd  1
+    .BootMode:                  resd  1
+    .FspEventHandler            resq  1
+    .Reserved1:                 resb 24
     ; }
     .size:
 endstruc
@@ -124,12 +142,22 @@ ASM_PFX(FspApiCommonContinue):
   pop    eax
 
 FspStackSetup:
+  mov    ecx, [edx + FSPM_UPD_COMMON.Revision]
+  cmp    ecx, 3
+  jae    FspmUpdCommon2
+
   ;
   ; StackBase = temp memory base, StackSize = temp memory size
   ;
   mov    edi, [edx + FSPM_UPD_COMMON.StackBase]
   mov    ecx, [edx + FSPM_UPD_COMMON.StackSize]
+  jmp    ChkFspHeapSize
 
+FspmUpdCommon2:
+  mov    edi, [edx + FSPM_UPD_COMMON_FSP24.StackBase]
+  mov    ecx, [edx + FSPM_UPD_COMMON_FSP24.StackSize]
+
+ChkFspHeapSize:
   ;
   ; Keep using bootloader stack if heap size % is 0
   ;
@@ -219,7 +247,7 @@ exit:
 global ASM_PFX(FspPeiCoreEntryOff)
 ASM_PFX(FspPeiCoreEntryOff):
    ;
-   ; This value will be pached by the build script
+   ; This value will be patched by the build script
    ;
    DD    0x12345678
 

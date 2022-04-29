@@ -34,6 +34,10 @@
   #                  Virtualization (SEV) guests.
   MemEncryptSevLib|Include/Library/MemEncryptSevLib.h
 
+  ##  @libraryclass  Declares helper functions for TDX guests.
+  #
+  MemEncryptTdxLib|Include/Library/MemEncryptTdxLib.h
+
   ##  @libraryclass  Save and restore variables using a file
   #
   NvVarsFileLib|Include/Library/NvVarsFileLib.h
@@ -109,6 +113,18 @@
   #
   XenPlatformLib|Include/Library/XenPlatformLib.h
 
+  ##  @libraryclass  TdxMailboxLib
+  #
+  TdxMailboxLib|Include/Library/TdxMailboxLib.h
+
+  ##  @libraryclass  PlatformInitLib
+  #
+  PlatformInitLib|Include/Library/PlatformInitLib.h
+
+  ##  @libraryclass  PeilessStartupLib
+  #
+  PeilessStartupLib|Include/Library/PeilessStartupLib.h
+
 [Guids]
   gUefiOvmfPkgTokenSpaceGuid            = {0x93bb96af, 0xb9f2, 0x4eb8, {0x94, 0x62, 0xe0, 0xba, 0x74, 0x56, 0x42, 0x36}}
   gEfiXenInfoGuid                       = {0xd3b46f3b, 0xd441, 0x1244, {0x9a, 0x12, 0x0, 0x12, 0x27, 0x3f, 0xc1, 0x4d}}
@@ -125,6 +141,7 @@
   gGrubFileGuid                         = {0xb5ae312c, 0xbc8a, 0x43b1, {0x9c, 0x62, 0xeb, 0xb8, 0x26, 0xdd, 0x5d, 0x07}}
   gConfidentialComputingSecretGuid      = {0xadf956ad, 0xe98c, 0x484c, {0xae, 0x11, 0xb5, 0x1c, 0x7d, 0x33, 0x64, 0x47}}
   gConfidentialComputingSevSnpBlobGuid  = {0x067b1f5f, 0xcf26, 0x44c5, {0x85, 0x54, 0x93, 0xd7, 0x77, 0x91, 0x2d, 0x42}}
+  gUefiOvmfPkgPlatformInfoGuid          = {0xdec9b486, 0x1f16, 0x47c7, {0x8f, 0x68, 0xdf, 0x1a, 0x41, 0x88, 0x8b, 0xa5}}
 
 [Ppis]
   # PPI whose presence in the PPI database signals that the TPM base address
@@ -149,6 +166,7 @@
   gEfiLegacyInterruptProtocolGuid       = {0x31ce593d, 0x108a, 0x485d, {0xad, 0xb2, 0x78, 0xf2, 0x1f, 0x29, 0x66, 0xbe}}
   gEfiVgaMiniPortProtocolGuid           = {0xc7735a2f, 0x88f5, 0x4882, {0xae, 0x63, 0xfa, 0xac, 0x8c, 0x8b, 0x86, 0xb3}}
   gOvmfLoadedX86LinuxKernelProtocolGuid = {0xa3edc05d, 0xb618, 0x4ff6, {0x95, 0x52, 0x76, 0xd7, 0x88, 0x63, 0x43, 0xc8}}
+  gQemuAcpiTableNotifyProtocolGuid      = {0x928939b2, 0x4235, 0x462f, {0x95, 0x80, 0xf6, 0xa2, 0xb2, 0xc2, 0x1a, 0x4f}}
 
 [PcdsFixedAtBuild]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|0x0|UINT32|0
@@ -368,6 +386,9 @@
   ## The range of memory that is validated by the SEC phase.
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedStart|0|UINT32|0x62
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedEnd|0|UINT32|0x63
+
+  ## The Tdx accept page size. 0x1000(4k),0x200000(2M)
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize|0x200000|UINT32|0x65
 
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2

@@ -267,6 +267,11 @@
   #
   RegisterFilterLib|Include/Library/RegisterFilterLib.h
 
+  ##  @libraryclass  This library provides interfances to probe ConfidentialComputing guest type.
+  #
+  #
+  CcProbeLib|Include/Library/CcProbeLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
@@ -295,6 +300,9 @@
 
   ##  @libraryclass  Provides services to log the SMI handler registration.
   SmiHandlerProfileLib|Include/Library/SmiHandlerProfileLib.h
+
+  ##  @libraryclass  Provides function to support TDX processing.
+  TdxLib|Include/Library/TdxLib.h
 
 [Guids]
   #

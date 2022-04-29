@@ -14,11 +14,29 @@
 #include <Library/DebugLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <WorkArea.h>
 
 #include "QemuFwCfgLibInternal.h"
 
 STATIC BOOLEAN  mQemuFwCfgSupported = FALSE;
 STATIC BOOLEAN  mQemuFwCfgDmaSupported;
+
+/**
+  Check if it is Tdx guest
+
+  @retval    TRUE   It is Tdx guest
+  @retval    FALSE  It is not Tdx guest
+**/
+BOOLEAN
+QemuFwCfgIsTdxGuest (
+  VOID
+  )
+{
+  CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER  *CcWorkAreaHeader;
+
+  CcWorkAreaHeader = (CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER *)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+  return (CcWorkAreaHeader != NULL && CcWorkAreaHeader->GuestType == CcGuestTypeIntelTdx);
+}
 
 /**
   Returns a boolean indicating if the firmware configuration interface
@@ -81,6 +99,14 @@ QemuFwCfgInitialize (
     //
     if (MemEncryptSevIsEnabled ()) {
       DEBUG ((DEBUG_INFO, "SEV: QemuFwCfg fallback to IO Port interface.\n"));
+    } else if (QemuFwCfgIsTdxGuest ()) {
+      //
+      // If TDX is enabled then we do not support DMA operations in PEI phase.
+      // This is mainly because DMA in TDX guest requires using bounce buffer
+      // (which need to allocate dynamic memory and allocating a PAGE size'd
+      // buffer can be challenge in PEI phase)
+      //
+      DEBUG ((DEBUG_INFO, "TDX: QemuFwCfg fallback to IO Port interface.\n"));
     } else {
       mQemuFwCfgDmaSupported = TRUE;
       DEBUG ((DEBUG_INFO, "QemuFwCfg interface (DMA) is supported.\n"));
@@ -162,6 +188,12 @@ InternalQemuFwCfgDmaBytes (
   // not have reached here.
   //
   ASSERT (!MemEncryptSevIsEnabled ());
+
+  //
+  // TDX does not support DMA operations in PEI stage, we should
+  // not have reached here.
+  //
+  ASSERT (!QemuFwCfgIsTdxGuest ());
 
   Access.Control = SwapBytes32 (Control);
   Access.Length  = SwapBytes32 (Size);

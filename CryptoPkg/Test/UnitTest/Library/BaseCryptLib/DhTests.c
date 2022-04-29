@@ -53,7 +53,7 @@ TestVerifyDhGenerateKey (
   UNIT_TEST_CONTEXT  Context
   )
 {
-  UINT8    Prime[64];
+  UINT8    Prime[512];
   UINT8    PublicKey1[64];
   UINTN    PublicKey1Length;
   UINT8    PublicKey2[64];
@@ -72,10 +72,10 @@ TestVerifyDhGenerateKey (
   Key1Length       = sizeof (Key1);
   Key2Length       = sizeof (Key2);
 
-  Status = DhGenerateParameter (mDh1, 2, 64, Prime);
+  Status = DhGenerateParameter (mDh1, 2, sizeof (Prime), Prime);
   UT_ASSERT_TRUE (Status);
 
-  Status = DhSetParameter (mDh2, 2, 64, Prime);
+  Status = DhSetParameter (mDh2, 2, sizeof (Prime), Prime);
   UT_ASSERT_TRUE (Status);
 
   Status = DhGenerateKey (mDh1, PublicKey1, &PublicKey1Length);
