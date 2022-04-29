@@ -736,6 +736,10 @@ class InfParser(MetaFileParser):
     @ParseMacro
     def _SourceFileParser(self):
         TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT)
+        # Let TokenList[2] be TagName|ToolCode|FeatureFlag
+        if len(TokenList) > 3:
+            for extraToken in range(3, len(TokenList)):
+                TokenList[2] = TokenList[2] + '|' + TokenList[extraToken]
         self._ValueList[0:len(TokenList)] = TokenList
         Macros = self._Macros
         # For Acpi tables, remove macro like ' TABLE_NAME=Sata1'

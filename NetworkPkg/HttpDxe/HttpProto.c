@@ -1086,6 +1086,18 @@ HttpConfigureTcp4 (
   Tcp4Option->EnableNagle       = TRUE;
   Tcp4CfgData->ControlOption    = Tcp4Option;
 
+  if ((HttpInstance->State == HTTP_STATE_TCP_CONNECTED) ||
+      (HttpInstance->State == HTTP_STATE_TCP_CLOSED))
+  {
+    Status = HttpInstance->Tcp4->Configure (HttpInstance->Tcp4, NULL);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "HttpConfigureTcp4(NULL) - %r\n", Status));
+      return Status;
+    }
+
+    HttpInstance->State = HTTP_STATE_TCP_UNCONFIGED;
+  }
+
   Status = HttpInstance->Tcp4->Configure (HttpInstance->Tcp4, Tcp4CfgData);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "HttpConfigureTcp4 - %r\n", Status));
@@ -1155,6 +1167,18 @@ HttpConfigureTcp6 (
   Tcp6Option->KeepAliveTime     = HTTP_KEEP_ALIVE_TIME;
   Tcp6Option->KeepAliveInterval = HTTP_KEEP_ALIVE_INTERVAL;
   Tcp6Option->EnableNagle       = TRUE;
+
+  if ((HttpInstance->State == HTTP_STATE_TCP_CONNECTED) ||
+      (HttpInstance->State == HTTP_STATE_TCP_CLOSED))
+  {
+    Status = HttpInstance->Tcp6->Configure (HttpInstance->Tcp6, NULL);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "HttpConfigureTcp6(NULL) - %r\n", Status));
+      return Status;
+    }
+
+    HttpInstance->State = HTTP_STATE_TCP_UNCONFIGED;
+  }
 
   Status = HttpInstance->Tcp6->Configure (HttpInstance->Tcp6, Tcp6CfgData);
   if (EFI_ERROR (Status)) {
