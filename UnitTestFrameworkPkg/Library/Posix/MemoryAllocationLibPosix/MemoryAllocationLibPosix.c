@@ -538,7 +538,7 @@ ReallocatePool (
 {
   VOID  *NewBuffer;
 
-  NewBuffer = malloc (NewSize);
+  NewBuffer = calloc (1, NewSize);
   if ((NewBuffer != NULL) && (OldBuffer != NULL)) {
     memcpy (NewBuffer, OldBuffer, MIN (OldSize, NewSize));
   }
