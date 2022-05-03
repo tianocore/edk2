@@ -199,7 +199,6 @@
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
 
 [BuildOptions]
-  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu=7-A.security
   *_*_*_CC_FLAGS  = -DDISABLE_NEW_DEPRECATED_INTERFACES
 
 ################################################################################
