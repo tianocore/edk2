@@ -14,7 +14,6 @@
   LIBRARY_CLASS                  = ArmSmcLib
 
 [Sources.ARM]
-  Arm/ArmSmc.asm    | RVCT
   Arm/ArmSmc.S      | GCC
 
 [Sources.AARCH64]
@@ -26,6 +25,3 @@
 [Packages]
   MdePkg/MdePkg.dec
   ArmPkg/ArmPkg.dec
-
-[BuildOptions]
-  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu 7-A.security
