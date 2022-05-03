@@ -101,10 +101,6 @@
   #
   MSFT:*_*_*_CC_FLAGS = /wd4090
 
-  # -JCryptoPkg/Include : To disable the use of the system includes provided by RVCT
-  # --diag_remark=1     : Reduce severity of "#1-D: last line of file ends without a newline"
-  RVCT:*_*_ARM_CC_FLAGS = -JCryptoPkg/Include --diag_remark=1
-
   GCC:*_CLANG35_*_CC_FLAGS = -std=c99
   GCC:*_CLANG38_*_CC_FLAGS = -std=c99
   GCC:*_CLANGPDB_*_CC_FLAGS = -std=c99 -Wno-error=incompatible-pointer-types
