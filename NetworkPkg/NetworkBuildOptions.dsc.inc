@@ -6,7 +6,7 @@
 # feature test macros (eg., API deprecation macros) according to the flags described
 # in "NetworkDefines.dsc.inc".
 #
-# Supported tool chain families: "GCC", "INTEL", "MSFT", "RVCT".
+# Supported tool chain families: "GCC", "INTEL", "MSFT".
 #
 # Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 #
@@ -18,5 +18,4 @@
   MSFT:*_*_*_CC_FLAGS = /D ENABLE_MD5_DEPRECATED_INTERFACES
   INTEL:*_*_*_CC_FLAGS = /D ENABLE_MD5_DEPRECATED_INTERFACES
   GCC:*_*_*_CC_FLAGS = -D ENABLE_MD5_DEPRECATED_INTERFACES
-  RVCT:*_*_*_CC_FLAGS = -DENABLE_MD5_DEPRECATED_INTERFACES
 !endif
