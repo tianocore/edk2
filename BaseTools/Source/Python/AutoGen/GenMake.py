@@ -166,7 +166,7 @@ class BuildFile(object):
         GMAKE_FILETYPE :   "include"
     }
 
-    _INC_FLAG_ = {TAB_COMPILER_MSFT : "/I", "GCC" : "-I", "INTEL" : "-I", "RVCT" : "-I", "NASM" : "-I"}
+    _INC_FLAG_ = {TAB_COMPILER_MSFT : "/I", "GCC" : "-I", "INTEL" : "-I", "NASM" : "-I"}
 
     ## Constructor of BuildFile
     #
