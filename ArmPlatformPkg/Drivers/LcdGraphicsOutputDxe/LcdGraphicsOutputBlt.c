@@ -815,18 +815,6 @@ LcdGraphicsBlt (
   HorizontalResolution = This->Mode->Info->HorizontalResolution;
   VerticalResolution   = This->Mode->Info->VerticalResolution;
 
-  DEBUG ((
-    DEBUG_INFO,
-    "LcdGraphicsBlt (BltOperation:%d,DestX:%d,DestY:%d,Width:%d,Height:%d) res(%d,%d)\n",
-    BltOperation,
-    DestinationX,
-    DestinationY,
-    Width,
-    Height,
-    HorizontalResolution,
-    VerticalResolution
-    ));
-
   // Check we have reasonable parameters
   if ((Width == 0) || (Height == 0)) {
     DEBUG ((DEBUG_ERROR, "LcdGraphicsBlt: ERROR - Invalid dimension: Zero size area.\n"));
