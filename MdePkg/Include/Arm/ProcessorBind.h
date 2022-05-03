@@ -72,9 +72,9 @@
 #endif
 
 //
-// RVCT and MSFT don't support the __builtin_unreachable() macro
+// MSFT doesn't support the __builtin_unreachable() macro
 //
-#if defined (__ARMCC_VERSION) || defined (_MSC_EXTENSIONS)
+#if defined (_MSC_EXTENSIONS)
 #define UNREACHABLE()
 #endif
 
