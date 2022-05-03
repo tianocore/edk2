@@ -21,7 +21,6 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [Sources.ARM]
-  Arm/ArmPlatformStackLib.asm     | RVCT
   Arm/ArmPlatformStackLib.S       | GCC
 
 [Sources.AARCH64]
