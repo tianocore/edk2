@@ -47,8 +47,6 @@
   Ebc/CpuSleepFlushTlb.c
 
 [Sources.ARM]
-  Arm/CpuFlushTlb.asm | RVCT
-  Arm/CpuSleep.asm    | RVCT
   Arm/CpuFlushTlb.asm | MSFT
   Arm/CpuSleep.asm    | MSFT
   Arm/CpuFlushTlb.S   | GCC
