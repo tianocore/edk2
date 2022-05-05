@@ -817,6 +817,11 @@ UpdatePcdDatabase (
   //
   Index    = (mPcdDatabase.DxeDb->Length + 7) & (~7);
   SkuDelta = NULL;
+
+  if (Index == mDxePcdDbSize) {
+    return EFI_SUCCESS;
+  }
+
   while (Index < mDxePcdDbSize) {
     SkuDelta = (PCD_DATABASE_SKU_DELTA *)((UINT8 *)mDxePcdDbBinary + Index);
     if ((SkuDelta->SkuId == SkuId) && (SkuDelta->SkuIdCompared == 0)) {
