@@ -50,6 +50,8 @@
   gQemuAcpiTableNotifyProtocolGuid                 ## CONSUMES
   gEfiAcpiSdtProtocolGuid                          ## CONSUMES
   gEfiAcpiTableProtocolGuid                        ## CONSUMES
+  gEfiMpInitLibMpDepProtocolGuid
+  gEfiMpInitLibUpDepProtocolGuid
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdPciIoBase
