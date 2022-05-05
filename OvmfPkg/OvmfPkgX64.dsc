@@ -72,6 +72,12 @@
 !endif
 !endif
 
+DEFINE MP_CPU_PEI_GUID  = 3dd59561-e4ea-4846-b7c5-c7b74a061190
+DEFINE UP_CPU_PEI_GUID  = 280251c4-1d09-4035-9062-839acb5f18c1
+
+DEFINE MP_CPU_DXE_GUID  = 2d73044a-1df3-415d-b054-17fe05765c3c
+DEFINE UP_CPU_DXE_GUID  = 6490f1c5-ebcc-4665-8892-0075b9bb49b7
+
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
@@ -728,7 +734,24 @@
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   OvmfPkg/SmmAccess/SmmAccessPei.inf
 !endif
-  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
+
+  UefiCpuPkg/CpuMpPei/CpuMpPei.inf {
+    <Defines>
+      FILE_GUID = $(MP_CPU_PEI_GUID)
+
+    <LibraryClasses>
+      MpInitLib|UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
+      NULL|OvmfPkg/Library/MpInitLibDepLib/PeiMpInitLibMpDepLib.inf
+  }
+
+  UefiCpuPkg/CpuMpPei/CpuMpPei.inf {
+    <Defines>
+      FILE_GUID = $(UP_CPU_PEI_GUID)
+
+    <LibraryClasses>
+      MpInitLib|UefiCpuPkg/Library/MpInitLibUp/MpInitLibUp.inf
+      NULL|OvmfPkg/Library/MpInitLibDepLib/PeiMpInitLibUpDepLib.inf
+  }
 
 !include OvmfPkg/OvmfTpmComponentsPei.dsc.inc
 
@@ -760,7 +783,25 @@
 
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
-  UefiCpuPkg/CpuDxe/CpuDxe.inf
+
+  UefiCpuPkg/CpuDxe/CpuDxe.inf {
+    <Defines>
+      FILE_GUID = $(MP_CPU_DXE_GUID)
+
+    <LibraryClasses>
+      MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
+      NULL|OvmfPkg/Library/MpInitLibDepLib/DxeMpInitLibMpDepLib.inf
+  }
+
+  UefiCpuPkg/CpuDxe/CpuDxe.inf {
+    <Defines>
+      FILE_GUID = $(UP_CPU_DXE_GUID)
+
+    <LibraryClasses>
+      MpInitLib|UefiCpuPkg/Library/MpInitLibUp/MpInitLibUp.inf
+      NULL|OvmfPkg/Library/MpInitLibDepLib/DxeMpInitLibUpDepLib.inf
+  }
+
 !ifdef $(CSM_ENABLE)
   OvmfPkg/8259InterruptControllerDxe/8259.inf
   OvmfPkg/8254TimerDxe/8254Timer.inf
