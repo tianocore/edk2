@@ -9,11 +9,9 @@
 **/
 
 #include "MpLib.h"
-#include "MpIntelTdx.h"
 #include <Library/VmgExitLib.h>
 #include <Register/Amd/Fam17Msr.h>
 #include <Register/Amd/Ghcb.h>
-#include <ConfidentialComputingGuestAttr.h>
 
 EFI_GUID  mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
 
@@ -1805,10 +1803,6 @@ MpInitLibInitialize (
   UINTN                    BackupBufferAddr;
   UINTN                    ApIdtBase;
 
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    return EFI_SUCCESS;
-  }
-
   OldCpuMpData = GetCpuMpDataFromGuidedHob ();
   if (OldCpuMpData == NULL) {
     MaxLogicalProcessorNumber = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
@@ -2079,10 +2073,6 @@ MpInitLibGetProcessorInfo (
   CPU_INFO_IN_HOB  *CpuInfoInHob;
   UINTN            OriginalProcessorNumber;
 
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    return TdxMpInitLibGetProcessorInfo (ProcessorNumber, ProcessorInfoBuffer, HealthData);
-  }
-
   CpuMpData    = GetCpuMpData ();
   CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
 
@@ -2176,10 +2166,6 @@ SwitchBSPWorker (
   MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
   BOOLEAN                      OldInterruptState;
   BOOLEAN                      OldTimerInterruptState;
-
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    return EFI_UNSUPPORTED;
-  }
 
   //
   // Save and Disable Local APIC timer interrupt
@@ -2321,10 +2307,6 @@ EnableDisableApWorker (
   CPU_MP_DATA  *CpuMpData;
   UINTN        CallerNumber;
 
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    return EFI_UNSUPPORTED;
-  }
-
   CpuMpData = GetCpuMpData ();
 
   //
@@ -2385,11 +2367,6 @@ MpInitLibWhoAmI (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    *ProcessorNumber = 0;
-    return EFI_SUCCESS;
-  }
-
   CpuMpData = GetCpuMpData ();
 
   return GetProcessorNumber (CpuMpData, ProcessorNumber);
@@ -2428,15 +2405,11 @@ MpInitLibGetNumberOfProcessors (
   UINTN        EnabledProcessorNumber;
   UINTN        Index;
 
+  CpuMpData = GetCpuMpData ();
+
   if ((NumberOfProcessors == NULL) && (NumberOfEnabledProcessors == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    return TdxMpInitLibGetNumberOfProcessors (NumberOfProcessors, NumberOfEnabledProcessors);
-  }
-
-  CpuMpData = GetCpuMpData ();
 
   //
   // Check whether caller processor is BSP
@@ -2517,38 +2490,19 @@ StartupAllCPUsWorker (
   BOOLEAN      HasEnabledAp;
   CPU_STATE    ApState;
 
+  CpuMpData = GetCpuMpData ();
+
   if (FailedCpuList != NULL) {
     *FailedCpuList = NULL;
   }
 
-  Status = MpInitLibGetNumberOfProcessors (&ProcessorCount, NULL);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  if ((ProcessorCount == 1) && ExcludeBsp) {
+  if ((CpuMpData->CpuCount == 1) && ExcludeBsp) {
     return EFI_NOT_STARTED;
   }
 
   if (Procedure == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    //
-    // For Td guest ExcludeBsp must be FALSE. Otherwise it will return in above checks.
-    //
-    ASSERT (!ExcludeBsp);
-
-    //
-    // Start BSP.
-    //
-    Procedure (ProcedureArgument);
-
-    return EFI_SUCCESS;
-  }
-
-  CpuMpData = GetCpuMpData ();
 
   //
   // Check whether caller processor is BSP
@@ -2688,13 +2642,6 @@ StartupThisAPWorker (
   CPU_MP_DATA  *CpuMpData;
   CPU_AP_DATA  *CpuData;
   UINTN        CallerNumber;
-
-  //
-  // In Td guest, startup of AP is not supported in current stage.
-  //
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    return EFI_UNSUPPORTED;
-  }
 
   CpuMpData = GetCpuMpData ();
 
