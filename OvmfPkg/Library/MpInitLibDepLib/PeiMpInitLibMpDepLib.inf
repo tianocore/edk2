@@ -1,0 +1,27 @@
+## @file
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiMpInitLibMpDepLib
+  FILE_GUID                      = D14271DE-FBEA-4AAC-9633-7143DCD7C1C8
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+
+[LibraryClasses]
+  BaseLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Sources]
+  MpInitLibDepLib.c
+
+[Depex]
+  gEfiPeiMpInitLibMpDepPpiGuid
