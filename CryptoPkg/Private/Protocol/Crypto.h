@@ -13,6 +13,7 @@
 #include <Base.h>
 #include <Library/BaseCryptLib.h>
 #include <Library/PcdLib.h>
+#include <Library/TlsLib.h>
 
 ///
 /// The version of the EDK II Crypto Protocol.
@@ -3362,6 +3363,32 @@ EFI_STATUS
   );
 
 /**
+  Set the signature algorithm list to used by the TLS object.
+
+  This function sets the signature algorithms for use by a specified TLS object.
+
+  @param[in]  Tls                Pointer to a TLS object.
+  @param[in]  SignatureAlgoList  Array of UINT8 of signature algorithms. The array consists of
+                                 pairs of the hash algorithm and the signature algorithm as defined
+                                 in RFC 5246
+  @param[in]  SignatureAlgoNum   The length the SignatureAlgoList. Must be divisible by 2.
+
+  @retval  EFI_SUCCESS           The signature algorithm list was set successfully.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+  @retval  EFI_UNSUPPORTED       No supported TLS signature algorithm was found in SignatureAlgoList
+  @retval  EFI_OUT_OF_RESOURCES  Memory allocation failed.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_TLS_SET_CONFIGURATION)(
+  IN     VOID                     *Tls,
+  IN     EFI_TLS_CONFIG_TYPE      Type,
+  IN     UINT8                    *Data,
+  IN     UINTN                    DataSize
+  );
+
+/**
   Gets the CA-supplied certificate revocation list data set in the specified
   TLS object.
 
@@ -3656,6 +3683,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_TLS_SET_HOST_PUBLIC_CERT              TlsSetHostPublicCert;
   EDKII_CRYPTO_TLS_SET_HOST_PRIVATE_KEY              TlsSetHostPrivateKey;
   EDKII_CRYPTO_TLS_SET_CERT_REVOCATION_LIST          TlsSetCertRevocationList;
+  EDKII_CRYPTO_TLS_SET_CONFIGURATION                 TlsSetConfiguration;
   /// TLS Get
   EDKII_CRYPTO_TLS_GET_VERSION                       TlsGetVersion;
   EDKII_CRYPTO_TLS_GET_CONNECTION_END                TlsGetConnectionEnd;

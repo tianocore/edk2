@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "InternalTlsLib.h"
+#include <Library/TlsLib.h>
 
 /**
   Set a new TLS/SSL method for a particular TLS object.
@@ -286,6 +287,35 @@ EFIAPI
 TlsSetCertRevocationList (
   IN     VOID   *Data,
   IN     UINTN  DataSize
+  )
+{
+  ASSERT (FALSE);
+  return EFI_UNSUPPORTED;
+}
+
+/**
+  Configure the TLS object.
+
+  This function allows to configure the TLS object
+
+  @param[in]  Tls                Pointer to a TLS object.
+  @param[in]  Type               The type of the configuration.
+  @param[in]  Data               The data associated with the configuration type.
+  @param[in]  DataSize           The size of Data.
+
+  @retval  EFI_SUCCESS           The configuration was successful.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+  @retval  EFI_UNSUPPORTED       The configuration or configuration type are not supported
+  @retval  EFI_OUT_OF_RESOURCES  Memory allocation failed.
+
+**/
+EFI_STATUS
+EFIAPI
+TlsSetConfiguration (
+  IN     VOID                 *Tls,
+  IN     EFI_TLS_CONFIG_TYPE  Type,
+  IN     UINT8                *Data,
+  IN     UINTN                DataSize
   )
 {
   ASSERT (FALSE);
