@@ -101,6 +101,14 @@ TlsCtxNew (
   SSL_CTX_set_options (TlsCtx, SSL_OP_NO_SSLv3);
 
   //
+  // Do not allow cipher suites with
+  // - no encryption
+  // - low strength encryption
+  // - encryption strength not matching export strength
+  //
+  SSL_CTX_set_cipher_list (TlsCtx, "DEFAULT:!eNULL:!EXP:!LOW");
+
+  //
   // Treat as minimum accepted versions by setting the minimal bound.
   // Client can use higher TLS version if server supports it
   //

@@ -13,6 +13,7 @@
 #include <Base.h>
 #include <Library/BaseCryptLib.h>
 #include <Library/PcdLib.h>
+#include <Library/TlsLib.h>
 
 ///
 /// The version of the EDK II Crypto Protocol.
@@ -2868,6 +2869,25 @@ INTN
   );
 
 /**
+  Shutdown a TLS connection.
+
+  Shutdown the TLS connection without releasing the resources, meaning a new
+  connection can be started without calling TlsNew() and without setting
+  certificates etc.
+
+  @param[in]       Tls            Pointer to the TLS object to shutdown.
+
+  @retval EFI_SUCCESS             The TLS is shutdown successfully.
+  @retval EFI_INVALID_PARAMETER   Tls is NULL.
+  @retval EFI_PROTOCOL_ERROR      Some other error occurred.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_TLS_SHUTDOWN)(
+  IN     VOID                     *Tls
+  );
+
+/**
   Set a new TLS/SSL method for a particular TLS object.
 
   This function sets a new TLS/SSL method for a particular TLS object.
@@ -3362,6 +3382,61 @@ EFI_STATUS
   );
 
 /**
+  Derive keying material from a TLS connection.
+
+  This function exports keying material using the mechanism described in RFC
+  5705.
+
+  @param[in]      Tls          Pointer to the TLS object
+  @param[in]      Label        Description of the key for the PRF function
+  @param[in]      Context,     Optional context
+  @param[in]      ContextLen   The length of the context value in bytes
+  @param[out]     KeyBuffer    Buffer to hold the output of the TLS-PRF
+  @param[in]      KeyBufferLen The length of the KeyBuffer
+
+  @retval  EFI_SUCCESS             The operation succeeded.
+  @retval  EFI_INVALID_PARAMETER   The TLS object is invalid.
+  @retval  EFI_PROTOCOL_ERROR      Some other error occurred.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_TLS_EXPORT_KEY)(
+  IN     VOID                     *Tls,
+  IN     CONST VOID               *Label,
+  IN     CONST VOID               *Context,
+  IN     UINTN                    ContextLen,
+  OUT    VOID                     *KeyBuffer,
+  IN     UINTN                    KeyBufferLen
+  );
+
+/**
+  Set the signature algorithm list to used by the TLS object.
+
+  This function sets the signature algorithms for use by a specified TLS object.
+
+  @param[in]  Tls                Pointer to a TLS object.
+  @param[in]  SignatureAlgoList  Array of UINT8 of signature algorithms. The array consists of
+                                 pairs of the hash algorithm and the signature algorithm as defined
+                                 in RFC 5246
+  @param[in]  SignatureAlgoNum   The length the SignatureAlgoList. Must be divisible by 2.
+
+  @retval  EFI_SUCCESS           The signature algorithm list was set successfully.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+  @retval  EFI_UNSUPPORTED       No supported TLS signature algorithm was found in SignatureAlgoList
+  @retval  EFI_OUT_OF_RESOURCES  Memory allocation failed.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_TLS_SET_CONFIGURATION)(
+  IN     VOID                     *Tls,
+  IN     EFI_TLS_CONFIG_TYPE      Type,
+  IN     UINT8                    *Data,
+  IN     UINTN                    DataSize
+  );
+
+/**
   Gets the CA-supplied certificate revocation list data set in the specified
   TLS object.
 
@@ -3656,6 +3731,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_TLS_SET_HOST_PUBLIC_CERT              TlsSetHostPublicCert;
   EDKII_CRYPTO_TLS_SET_HOST_PRIVATE_KEY              TlsSetHostPrivateKey;
   EDKII_CRYPTO_TLS_SET_CERT_REVOCATION_LIST          TlsSetCertRevocationList;
+  EDKII_CRYPTO_TLS_SET_CONFIGURATION                 TlsSetConfiguration;
   /// TLS Get
   EDKII_CRYPTO_TLS_GET_VERSION                       TlsGetVersion;
   EDKII_CRYPTO_TLS_GET_CONNECTION_END                TlsGetConnectionEnd;
