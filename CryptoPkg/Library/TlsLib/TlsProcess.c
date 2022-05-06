@@ -461,3 +461,35 @@ TlsWrite (
   //
   return SSL_write (TlsConn->Ssl, Buffer, (UINT32)BufferSize);
 }
+
+/**
+  Shutdown a TLS connection.
+
+  Shutdown the TLS connection without releasing the resources, meaning a new
+  connection can be started without calling TlsNew() and without setting
+  certificates etc.
+
+  @param[in]       Tls            Pointer to the TLS object to shutdown.
+
+  @retval EFI_SUCCESS             The TLS is shutdown successfully.
+  @retval EFI_INVALID_PARAMETER   Tls is NULL.
+  @retval EFI_PROTOCOL_ERROR      Some other error occurred.
+**/
+EFI_STATUS
+EFIAPI
+TlsShutdown (
+  IN     VOID  *Tls
+  )
+{
+  TLS_CONNECTION  *TlsConn;
+
+  TlsConn = (TLS_CONNECTION *)Tls;
+
+  if ((TlsConn == NULL) || ((TlsConn->Ssl) == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  SSL_set_quiet_shutdown (TlsConn->Ssl, 1);
+  SSL_shutdown (TlsConn->Ssl);
+  return SSL_clear (TlsConn->Ssl) == 1 ? EFI_SUCCESS : EFI_PROTOCOL_ERROR;
+}
