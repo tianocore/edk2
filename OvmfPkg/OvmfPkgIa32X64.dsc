@@ -32,6 +32,7 @@
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE SMM_REQUIRE             = FALSE
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
+  DEFINE USE_CRYPTO_DRIVER       = TRUE
 
 !include OvmfPkg/OvmfTpmDefines.dsc.inc
 
@@ -703,6 +704,7 @@
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
 !include OvmfPkg/OvmfTpmComponentsPei.dsc.inc
+!include OvmfPkg/OvmfCryptoComponentsPei.dsc.inc
 
 [Components.X64]
   #
@@ -988,6 +990,8 @@
   }
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 
+!include OvmfPkg/OvmfCryptoComponentsSmm.dsc.inc
+
 !else
 
   #
@@ -1009,3 +1013,4 @@
   # TPM support
   #
 !include OvmfPkg/OvmfTpmComponentsDxe.dsc.inc
+!include OvmfPkg/OvmfCryptoComponentsDxe.dsc.inc
