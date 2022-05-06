@@ -189,6 +189,7 @@ INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 INF  FILE_GUID = $(UP_CPU_PEI_GUID) UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
 !include OvmfPkg/OvmfTpmPei.fdf.inc
+!include OvmfPkg/OvmfCryptoPei.fdf.inc
 
 ################################################################################
 
@@ -404,6 +405,7 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 # TPM support
 #
 !include OvmfPkg/OvmfTpmDxe.fdf.inc
+!include OvmfPkg/OvmfCryptoDxe.fdf.inc
 
 ################################################################################
 
