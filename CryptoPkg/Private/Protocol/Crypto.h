@@ -3092,6 +3092,7 @@ EFI_STATUS
   @param[in]  Data        Pointer to the data buffer of a PEM-encoded RSA
                           or PKCS#8 private key.
   @param[in]  DataSize    The size of data buffer in bytes.
+  @param[in]  Password    Pointer to private key password, set it to NULL if not used.
 
   @retval  EFI_SUCCESS     The operation succeeded.
   @retval  EFI_UNSUPPORTED This function is not supported.
@@ -3103,7 +3104,8 @@ EFI_STATUS
 (EFIAPI *EDKII_CRYPTO_TLS_SET_HOST_PRIVATE_KEY)(
   IN     VOID                     *Tls,
   IN     VOID                     *Data,
-  IN     UINTN                    DataSize
+  IN     UINTN                    DataSize,
+  IN     VOID                     *Password  OPTIONAL
   );
 
 /**
