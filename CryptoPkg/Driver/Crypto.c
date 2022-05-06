@@ -4136,6 +4136,7 @@ CryptoServiceTlsSetHostPublicCert (
   @param[in]  Data        Pointer to the data buffer of a PEM-encoded RSA
                           or PKCS#8 private key.
   @param[in]  DataSize    The size of data buffer in bytes.
+  @param[in]  Password    Pointer to private key password, set it to NULL if not used.
 
   @retval  EFI_SUCCESS     The operation succeeded.
   @retval  EFI_UNSUPPORTED This function is not supported.
@@ -4147,10 +4148,11 @@ EFIAPI
 CryptoServiceTlsSetHostPrivateKey (
   IN     VOID   *Tls,
   IN     VOID   *Data,
-  IN     UINTN  DataSize
+  IN     UINTN  DataSize,
+  IN     VOID   *Password  OPTIONAL
   )
 {
-  return CALL_BASECRYPTLIB (TlsSet.Services.HostPrivateKey, TlsSetHostPrivateKey, (Tls, Data, DataSize), EFI_UNSUPPORTED);
+  return CALL_BASECRYPTLIB (TlsSet.Services.HostPrivateKey, TlsSetHostPrivateKey, (Tls, Data, DataSize, Password), EFI_UNSUPPORTED);
 }
 
 /**
