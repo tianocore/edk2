@@ -95,5 +95,5 @@ struc MP_CPU_EXCHANGE_INFO
   .ExtTopoAvail:                 CTYPE_BOOLEAN 1
 endstruc
 
-MP_CPU_EXCHANGE_INFO_OFFSET equ (SwitchToRealProcEnd - RendezvousFunnelProcStart)
+MP_CPU_EXCHANGE_INFO_OFFSET equ (Flat32Start - RendezvousFunnelProcStart)
 %define MP_CPU_EXCHANGE_INFO_FIELD(Field) (MP_CPU_EXCHANGE_INFO_OFFSET + MP_CPU_EXCHANGE_INFO. %+ Field)

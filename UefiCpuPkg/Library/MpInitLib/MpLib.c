@@ -849,6 +849,30 @@ WaitApWakeup (
 }
 
 /**
+  Calculate the size of the reset vector.
+
+  @param[in]  AddressMap   The pointer to Address Map structure.
+  @param[out] SizeBelow1Mb Return the size of below 1MB memory for AP reset area.
+  @param[out] SizeAbove1Mb Return the size of abvoe 1MB memory for AP reset area.
+**/
+STATIC
+VOID
+GetApResetVectorSize (
+  IN  MP_ASSEMBLY_ADDRESS_MAP  *AddressMap,
+  OUT UINTN                    *SizeBelow1Mb OPTIONAL,
+  OUT UINTN                    *SizeAbove1Mb OPTIONAL
+  )
+{
+  if (SizeBelow1Mb != NULL) {
+    *SizeBelow1Mb = AddressMap->ModeTransitionOffset + sizeof (MP_CPU_EXCHANGE_INFO);
+  }
+
+  if (SizeAbove1Mb != NULL) {
+    *SizeAbove1Mb = AddressMap->RendezvousFunnelSize - AddressMap->ModeTransitionOffset;
+  }
+}
+
+/**
   This function will fill the exchange info structure.
 
   @param[in] CpuMpData          Pointer to CPU MP Data
@@ -935,21 +959,15 @@ FillExchangeInfoData (
   // Copy all 32-bit code and 64-bit code into memory with type of
   // EfiBootServicesCode to avoid page fault if NX memory protection is enabled.
   //
-  if (CpuMpData->WakeupBufferHigh != 0) {
-    Size = CpuMpData->AddressMap.RendezvousFunnelSize -
-           CpuMpData->AddressMap.ModeTransitionOffset;
-    CopyMem (
-      (VOID *)CpuMpData->WakeupBufferHigh,
-      CpuMpData->AddressMap.RendezvousFunnelAddress +
-      CpuMpData->AddressMap.ModeTransitionOffset,
-      Size
-      );
+  GetApResetVectorSize (&CpuMpData->AddressMap, NULL, &Size);
+  CopyMem (
+    (VOID *)CpuMpData->WakeupBufferHigh,
+    CpuMpData->AddressMap.RendezvousFunnelAddress +
+    CpuMpData->AddressMap.ModeTransitionOffset,
+    Size
+    );
 
-    ExchangeInfo->ModeTransitionMemory = (UINT32)CpuMpData->WakeupBufferHigh;
-  } else {
-    ExchangeInfo->ModeTransitionMemory = (UINT32)
-                                         (ExchangeInfo->BufferStart + CpuMpData->AddressMap.ModeTransitionOffset);
-  }
+  ExchangeInfo->ModeTransitionMemory = (UINT32)CpuMpData->WakeupBufferHigh;
 
   ExchangeInfo->ModeHighMemory = ExchangeInfo->ModeTransitionMemory +
                                  (UINT32)ExchangeInfo->ModeOffset -
@@ -990,7 +1008,7 @@ BackupAndPrepareWakeupBuffer (
   CopyMem (
     (VOID *)CpuMpData->WakeupBuffer,
     (VOID *)CpuMpData->AddressMap.RendezvousFunnelAddress,
-    CpuMpData->AddressMap.RendezvousFunnelSize
+    CpuMpData->BackupBufferSize - sizeof (MP_CPU_EXCHANGE_INFO)
     );
 }
 
@@ -1012,27 +1030,6 @@ RestoreWakeupBuffer (
 }
 
 /**
-  Calculate the size of the reset vector.
-
-  @param[in]  AddressMap  The pointer to Address Map structure.
-
-  @return                 Total amount of memory required for the AP reset area
-**/
-STATIC
-UINTN
-GetApResetVectorSize (
-  IN MP_ASSEMBLY_ADDRESS_MAP  *AddressMap
-  )
-{
-  UINTN  Size;
-
-  Size = AddressMap->RendezvousFunnelSize +
-         sizeof (MP_CPU_EXCHANGE_INFO);
-
-  return Size;
-}
-
-/**
   Allocate reset vector buffer.
 
   @param[in, out]  CpuMpData  The pointer to CPU MP Data structure.
@@ -1042,20 +1039,17 @@ AllocateResetVector (
   IN OUT CPU_MP_DATA  *CpuMpData
   )
 {
-  UINTN  ApResetVectorSize;
+  UINTN  ApResetVectorSizeBelow1Mb;
+  UINTN  ApResetVectorSizeAbove1Mb;
   UINTN  ApResetStackSize;
 
   if (CpuMpData->WakeupBuffer == (UINTN)-1) {
-    ApResetVectorSize = GetApResetVectorSize (&CpuMpData->AddressMap);
+    GetApResetVectorSize (&CpuMpData->AddressMap, &ApResetVectorSizeBelow1Mb, &ApResetVectorSizeAbove1Mb);
 
-    CpuMpData->WakeupBuffer      = GetWakeupBuffer (ApResetVectorSize);
+    CpuMpData->WakeupBuffer      = GetWakeupBuffer (ApResetVectorSizeBelow1Mb);
     CpuMpData->MpCpuExchangeInfo = (MP_CPU_EXCHANGE_INFO *)(UINTN)
-                                   (CpuMpData->WakeupBuffer +
-                                    CpuMpData->AddressMap.RendezvousFunnelSize);
-    CpuMpData->WakeupBufferHigh = AllocateCodeBuffer (
-                                    CpuMpData->AddressMap.RendezvousFunnelSize -
-                                    CpuMpData->AddressMap.ModeTransitionOffset
-                                    );
+                                   (CpuMpData->WakeupBuffer + ApResetVectorSizeBelow1Mb - sizeof (MP_CPU_EXCHANGE_INFO));
+    CpuMpData->WakeupBufferHigh = AllocateCodeBuffer (ApResetVectorSizeAbove1Mb);
     //
     // The AP reset stack is only used by SEV-ES guests. Do not allocate it
     // if SEV-ES is not enabled. An SEV-SNP guest is also considered
@@ -1794,7 +1788,7 @@ MpInitLibInitialize (
   UINT8                    ApLoopMode;
   UINT8                    *MonitorBuffer;
   UINTN                    Index;
-  UINTN                    ApResetVectorSize;
+  UINTN                    ApResetVectorSizeBelow1Mb;
   UINTN                    BackupBufferAddr;
   UINTN                    ApIdtBase;
 
@@ -1808,7 +1802,7 @@ MpInitLibInitialize (
   ASSERT (MaxLogicalProcessorNumber != 0);
 
   AsmGetAddressMap (&AddressMap);
-  ApResetVectorSize = GetApResetVectorSize (&AddressMap);
+  GetApResetVectorSize (&AddressMap, &ApResetVectorSizeBelow1Mb, NULL);
   ApStackSize       = PcdGet32 (PcdCpuApStackSize);
   ApLoopMode        = GetApLoopMode (&MonitorFilterSize);
 
@@ -1819,7 +1813,7 @@ MpInitLibInitialize (
 
   BufferSize  = ApStackSize * MaxLogicalProcessorNumber;
   BufferSize += MonitorFilterSize * MaxLogicalProcessorNumber;
-  BufferSize += ApResetVectorSize;
+  BufferSize += ApResetVectorSizeBelow1Mb;
   BufferSize  = ALIGN_VALUE (BufferSize, 8);
   BufferSize += VolatileRegisters.Idtr.Limit + 1;
   BufferSize += sizeof (CPU_MP_DATA);
@@ -1852,12 +1846,12 @@ MpInitLibInitialize (
   //
   MonitorBuffer               = (UINT8 *)(Buffer + ApStackSize * MaxLogicalProcessorNumber);
   BackupBufferAddr            = (UINTN)MonitorBuffer + MonitorFilterSize * MaxLogicalProcessorNumber;
-  ApIdtBase                   = ALIGN_VALUE (BackupBufferAddr + ApResetVectorSize, 8);
+  ApIdtBase                   = ALIGN_VALUE (BackupBufferAddr + ApResetVectorSizeBelow1Mb, 8);
   CpuMpData                   = (CPU_MP_DATA *)(ApIdtBase + VolatileRegisters.Idtr.Limit + 1);
   CpuMpData->Buffer           = Buffer;
   CpuMpData->CpuApStackSize   = ApStackSize;
   CpuMpData->BackupBuffer     = BackupBufferAddr;
-  CpuMpData->BackupBufferSize = ApResetVectorSize;
+  CpuMpData->BackupBufferSize = ApResetVectorSizeBelow1Mb;
   CpuMpData->WakeupBuffer     = (UINTN)-1;
   CpuMpData->CpuCount         = 1;
   CpuMpData->BspNumber        = 0;
