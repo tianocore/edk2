@@ -28,6 +28,7 @@
 #include <Library/LocalApicLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Ppi/TemporaryRamSupport.h>
+#include <Ppi/MpInitLibDep.h>
 #include <Library/PlatformInitLib.h>
 #include <Library/CcProbeLib.h>
 #include "AmdSev.h"
@@ -61,11 +62,29 @@ EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI  mTemporaryRamSupportPpi = {
   TemporaryRamMigration
 };
 
-EFI_PEI_PPI_DESCRIPTOR  mPrivateDispatchTable[] = {
+EFI_PEI_PPI_DESCRIPTOR  mPrivateDispatchTableMp[] = {
   {
-    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    (EFI_PEI_PPI_DESCRIPTOR_PPI),
     &gEfiTemporaryRamSupportPpiGuid,
     &mTemporaryRamSupportPpi
+  },
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiPeiMpInitLibMpDepPpiGuid,
+    NULL
+  },
+};
+
+EFI_PEI_PPI_DESCRIPTOR  mPrivateDispatchTableUp[] = {
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI),
+    &gEfiTemporaryRamSupportPpiGuid,
+    &mTemporaryRamSupportPpi
+  },
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiPeiMpInitLibUpDepPpiGuid,
+    NULL
   },
 };
 
@@ -936,6 +955,7 @@ SecStartupPhase2 (
   EFI_SEC_PEI_HAND_OFF        *SecCoreData;
   EFI_FIRMWARE_VOLUME_HEADER  *BootFv;
   EFI_PEI_CORE_ENTRY_POINT    PeiCoreEntryPoint;
+  EFI_PEI_PPI_DESCRIPTOR      *EfiPeiPpiDescriptor;
 
   SecCoreData = (EFI_SEC_PEI_HAND_OFF *)Context;
 
@@ -949,9 +969,19 @@ SecStartupPhase2 (
   SecCoreData->BootFirmwareVolumeSize = (UINTN)BootFv->FvLength;
 
   //
+  // Td guest is required to use the MpInitLibUp (unique-processor version).
+  // Other guests use the MpInitLib (multi-processor version).
+  //
+  if (CcProbe () == CcGuestTypeIntelTdx) {
+    EfiPeiPpiDescriptor = (EFI_PEI_PPI_DESCRIPTOR *)&mPrivateDispatchTableUp;
+  } else {
+    EfiPeiPpiDescriptor = (EFI_PEI_PPI_DESCRIPTOR *)&mPrivateDispatchTableMp;
+  }
+
+  //
   // Transfer the control to the PEI core
   //
-  (*PeiCoreEntryPoint)(SecCoreData, (EFI_PEI_PPI_DESCRIPTOR *)&mPrivateDispatchTable);
+  (*PeiCoreEntryPoint)(SecCoreData, EfiPeiPpiDescriptor);
 
   //
   // If we get here then the PEI Core returned, which is not recoverable.
