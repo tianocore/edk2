@@ -936,8 +936,7 @@ FillExchangeInfoData (
   // EfiBootServicesCode to avoid page fault if NX memory protection is enabled.
   //
   if (CpuMpData->WakeupBufferHigh != 0) {
-    Size = CpuMpData->AddressMap.RendezvousFunnelSize +
-           CpuMpData->AddressMap.SwitchToRealSize -
+    Size = CpuMpData->AddressMap.RendezvousFunnelSize -
            CpuMpData->AddressMap.ModeTransitionOffset;
     CopyMem (
       (VOID *)CpuMpData->WakeupBufferHigh,
@@ -991,8 +990,7 @@ BackupAndPrepareWakeupBuffer (
   CopyMem (
     (VOID *)CpuMpData->WakeupBuffer,
     (VOID *)CpuMpData->AddressMap.RendezvousFunnelAddress,
-    CpuMpData->AddressMap.RendezvousFunnelSize +
-    CpuMpData->AddressMap.SwitchToRealSize
+    CpuMpData->AddressMap.RendezvousFunnelSize
     );
 }
 
@@ -1029,7 +1027,6 @@ GetApResetVectorSize (
   UINTN  Size;
 
   Size = AddressMap->RendezvousFunnelSize +
-         AddressMap->SwitchToRealSize +
          sizeof (MP_CPU_EXCHANGE_INFO);
 
   return Size;
@@ -1054,11 +1051,9 @@ AllocateResetVector (
     CpuMpData->WakeupBuffer      = GetWakeupBuffer (ApResetVectorSize);
     CpuMpData->MpCpuExchangeInfo = (MP_CPU_EXCHANGE_INFO *)(UINTN)
                                    (CpuMpData->WakeupBuffer +
-                                    CpuMpData->AddressMap.RendezvousFunnelSize +
-                                    CpuMpData->AddressMap.SwitchToRealSize);
+                                    CpuMpData->AddressMap.RendezvousFunnelSize);
     CpuMpData->WakeupBufferHigh = AllocateCodeBuffer (
-                                    CpuMpData->AddressMap.RendezvousFunnelSize +
-                                    CpuMpData->AddressMap.SwitchToRealSize -
+                                    CpuMpData->AddressMap.RendezvousFunnelSize -
                                     CpuMpData->AddressMap.ModeTransitionOffset
                                     );
     //

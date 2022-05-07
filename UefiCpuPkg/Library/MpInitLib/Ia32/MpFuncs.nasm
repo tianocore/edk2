@@ -199,7 +199,6 @@ CProcedureInvoke:
     call       eax               ; Invoke C function
 
     jmp        $                 ; Never reach here
-RendezvousFunnelProcEnd:
 
 ;-------------------------------------------------------------------------------------
 ;SwitchToRealProc procedure follows.
@@ -208,6 +207,8 @@ RendezvousFunnelProcEnd:
 SwitchToRealProcStart:
     jmp        $                 ; Never reach here
 SwitchToRealProcEnd:
+
+RendezvousFunnelProcEnd:
 
 ;-------------------------------------------------------------------------------------
 ;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack, CountTofinish, Pm16CodeSegment, SevEsAPJumpTable, WakeupBuffer);
@@ -258,8 +259,6 @@ ASM_PFX(AsmGetAddressMap):
     mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncAddress], AsmRelocateApLoopStart
     mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncSize], AsmRelocateApLoopEnd - AsmRelocateApLoopStart
     mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.ModeTransitionOffset], Flat32Start - RendezvousFunnelProcStart
-    mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealSize], SwitchToRealProcEnd - SwitchToRealProcStart
-    mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealOffset], SwitchToRealProcStart - RendezvousFunnelProcStart
     mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealNoNxOffset], SwitchToRealProcStart - Flat32Start
     mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealPM16ModeOffset], 0
     mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealPM16ModeSize], 0

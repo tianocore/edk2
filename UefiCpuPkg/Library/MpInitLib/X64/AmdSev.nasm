@@ -198,3 +198,151 @@ RestoreGhcb:
 
 SevEsGetApicIdExit:
     OneTimeCallRet    SevEsGetApicId
+
+
+;-------------------------------------------------------------------------------------
+;SwitchToRealProc procedure follows.
+;ALSO THIS PROCEDURE IS EXECUTED BY APs TRANSITIONING TO 16 BIT MODE. HENCE THIS PROC
+;IS IN MACHINE CODE.
+;  SwitchToRealProc (UINTN BufferStart, UINT16 Code16, UINT16 Code32, UINTN StackStart)
+;  rcx - Buffer Start
+;  rdx - Code16 Selector Offset
+;  r8  - Code32 Selector Offset
+;  r9  - Stack Start
+;-------------------------------------------------------------------------------------
+SwitchToRealProcStart:
+BITS 64
+    cli
+
+    ;
+    ; Get RDX reset value before changing stacks since the
+    ; new stack won't be able to accomodate a #VC exception.
+    ;
+    push       rax
+    push       rbx
+    push       rcx
+    push       rdx
+
+    mov        rax, 1
+    cpuid
+    mov        rsi, rax                    ; Save off the reset value for RDX
+
+    pop        rdx
+    pop        rcx
+    pop        rbx
+    pop        rax
+
+    ;
+    ; Establish stack below 1MB
+    ;
+    mov        rsp, r9
+
+    ;
+    ; Push ultimate Reset Vector onto the stack
+    ;
+    mov        rax, rcx
+    shr        rax, 4
+    push       word 0x0002                 ; RFLAGS
+    push       ax                          ; CS
+    push       word 0x0000                 ; RIP
+    push       word 0x0000                 ; For alignment, will be discarded
+
+    ;
+    ; Get address of "16-bit operand size" label
+    ;
+    lea        rbx, [PM16Mode]
+
+    ;
+    ; Push addresses used to change to compatibility mode
+    ;
+    lea        rax, [CompatMode]
+    push       r8
+    push       rax
+
+    ;
+    ; Clear R8 - R15, for reset, before going into 32-bit mode
+    ;
+    xor        r8, r8
+    xor        r9, r9
+    xor        r10, r10
+    xor        r11, r11
+    xor        r12, r12
+    xor        r13, r13
+    xor        r14, r14
+    xor        r15, r15
+
+    ;
+    ; Far return into 32-bit mode
+    ;
+    retfq
+
+BITS 32
+CompatMode:
+    ;
+    ; Set up stack to prepare for exiting protected mode
+    ;
+    push       edx                         ; Code16 CS
+    push       ebx                         ; PM16Mode label address
+
+    ;
+    ; Disable paging
+    ;
+    mov        eax, cr0                    ; Read CR0
+    btr        eax, 31                     ; Set PG=0
+    mov        cr0, eax                    ; Write CR0
+
+    ;
+    ; Disable long mode
+    ;
+    mov        ecx, 0c0000080h             ; EFER MSR number
+    rdmsr                                  ; Read EFER
+    btr        eax, 8                      ; Set LME=0
+    wrmsr                                  ; Write EFER
+
+    ;
+    ; Disable PAE
+    ;
+    mov        eax, cr4                    ; Read CR4
+    btr        eax, 5                      ; Set PAE=0
+    mov        cr4, eax                    ; Write CR4
+
+    mov        edx, esi                    ; Restore RDX reset value
+
+    ;
+    ; Switch to 16-bit operand size
+    ;
+    retf
+
+BITS 16
+    ;
+    ; At entry to this label
+    ;   - RDX will have its reset value
+    ;   - On the top of the stack
+    ;     - Alignment data (two bytes) to be discarded
+    ;     - IP for Real Mode (two bytes)
+    ;     - CS for Real Mode (two bytes)
+    ;
+    ; This label is also used with AsmRelocateApLoop. During MP finalization,
+    ; the code from PM16Mode to SwitchToRealProcEnd is copied to the start of
+    ; the WakeupBuffer, allowing a parked AP to be booted by an OS.
+    ;
+PM16Mode:
+    mov        eax, cr0                    ; Read CR0
+    btr        eax, 0                      ; Set PE=0
+    mov        cr0, eax                    ; Write CR0
+
+    pop        ax                          ; Discard alignment data
+
+    ;
+    ; Clear registers (except RDX and RSP) before going into 16-bit mode
+    ;
+    xor        eax, eax
+    xor        ebx, ebx
+    xor        ecx, ecx
+    xor        esi, esi
+    xor        edi, edi
+    xor        ebp, ebp
+
+    iret
+
+SwitchToRealProcEnd:
