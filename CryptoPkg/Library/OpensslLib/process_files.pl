@@ -81,6 +81,19 @@ my $uefi_config;
 my $extension;
 my $arch;
 my @inf;
+#
+# Use PCD to conditionally enable certain openssl features.
+# $conditional_feature contains fetures_names:pcd_name pairs
+# of conditional features.
+# @conditional_feature_dir contains relative_path:pcd_name pairs
+# of conditional features in openssl, MUST correspond to the content
+# in $conditional_feature.
+#
+# Configure list [openssl_configuratio : new_define_list : new_file_list : pcd]
+# 1. no-ec : {NO_EC, NO_ECDH, NO_ECDSA, NO_TLS1_3, NO_SM2} : {/ec/, /sm2/} : PcdEcEnabled
+#
+my %conditional_feature = ("EC"=>"PcdEcEnabled", "ECDH"=>"PcdEcEnabled", "ECDSA"=>"PcdEcEnabled", "TLS1_3"=>"PcdEcEnabled", "SM2"=>"PcdEcEnabled");
+my %conditional_feature_dir = ("/ec/"=>"PcdEcEnabled", "/sm2/"=>"PcdEcEnabled");
 
 BEGIN {
     $inf_file = "OpensslLib.inf";
@@ -282,7 +295,13 @@ foreach my $product ((@{$unified_info{libraries}},
                 push @sslfilelist, '  $(OPENSSL_PATH)/' . $s . "\r\n";
                 next;
             }
-            push @cryptofilelist, '  $(OPENSSL_PATH)/' . $s . "\r\n";
+            push @cryptofilelist, '  $(OPENSSL_PATH)/' . $s;
+            foreach (keys(%conditional_feature_dir)) {
+                if ($s =~ $_) {
+                    push @cryptofilelist, '      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.' . $conditional_feature_dir{$_};
+                }
+            }
+            push @cryptofilelist, "\r\n";
         }
     }
 }
@@ -311,7 +330,13 @@ foreach (@headers){
     push @sslfilelist, '  $(OPENSSL_PATH)/' . $_ . "\r\n";
     next;
   }
-  push @cryptofilelist, '  $(OPENSSL_PATH)/' . $_ . "\r\n";
+  push @cryptofilelist, '  $(OPENSSL_PATH)/' . $_;
+  foreach my $conditional_key (keys(%conditional_feature_dir)) {
+    if ($_ =~ $conditional_key) {
+        push @cryptofilelist, '      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.' . $conditional_feature_dir{$conditional_key};
+    }
+  }
+  push @cryptofilelist, "\r\n";
 }
 
 
@@ -428,6 +453,44 @@ system(
     "> " . $OPENSSL_PATH . "/../../Include/crypto/dso_conf.h"
     ) == 0 ||
     die "Cannot copy dso_conf.h!";
+print "Done!\n";
+
+#
+# Add conditional feature to opensslconf.h
+#
+my $conf_file = "../Include/openssl/opensslconf.h";
+my @conf_raw = ();
+my @conditional_define = ();
+print "\n--> Updating $conf_file ... ";
+
+foreach my $feature_name (keys(%conditional_feature)) {
+    push @conditional_define, "#if !FixedPcdGetBool ($conditional_feature{$feature_name})\r\n";
+    push @conditional_define, "# ifndef OPENSSL_NO_$feature_name\r\n";
+    push @conditional_define, "#  define OPENSSL_NO_$feature_name\r\n";
+    push @conditional_define, "# endif\r\n#endif\r\n";
+}
+
+open( FD, "<" . $conf_file ) ||
+    die $conf_file;
+foreach (<FD>) {
+    # Insert conditional define to the begin of opensslconf.h
+    if ($_ =~ "#ifdef OPENSSL_ALGORITHM_DEFINES") {
+        push @conf_raw, @conditional_define;
+    }
+    push @conf_raw, $_;
+    if ($_ =~ "<openssl/opensslv.h>") {
+        push @conf_raw, "#include <Library/PcdLib.h>\r\n";
+    }
+}
+close(FD) ||
+    die $conf_file;
+
+open( FD, ">" . $conf_file ) ||
+    die $conf_file;
+print( FD @conf_raw ) ||
+    die $conf_file;
+close(FD) ||
+    die $conf_file;
 print "Done!\n";
 
 print "\nProcessing Files Done!\n";
