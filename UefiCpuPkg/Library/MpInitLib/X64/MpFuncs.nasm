@@ -35,8 +35,6 @@ SECTION .text
 ;ALSO THIS PROCEDURE IS EXECUTED BY APs ONLY ON 16 BIT MODE. HENCE THIS PROC
 ;IS IN MACHINE CODE.
 ;-------------------------------------------------------------------------------------
-global ASM_PFX(RendezvousFunnelProc)
-ASM_PFX(RendezvousFunnelProc):
 RendezvousFunnelProcStart:
 ; At this point CS = 0x(vv00) and ip= 0x0.
 ; Save BIST information to ebp firstly
@@ -279,8 +277,6 @@ RendezvousFunnelProcEnd:
 ;  r8  - Code32 Selector Offset
 ;  r9  - Stack Start
 ;-------------------------------------------------------------------------------------
-global ASM_PFX(SwitchToRealProc)
-ASM_PFX(SwitchToRealProc):
 SwitchToRealProcStart:
 BITS 64
     cli
@@ -421,8 +417,6 @@ SwitchToRealProcEnd:
 ;-------------------------------------------------------------------------------------
 ;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack, CountTofinish, Pm16CodeSegment, SevEsAPJumpTable, WakeupBuffer);
 ;-------------------------------------------------------------------------------------
-global ASM_PFX(AsmRelocateApLoop)
-ASM_PFX(AsmRelocateApLoop):
 AsmRelocateApLoopStart:
 BITS 64
     cmp        qword [rsp + 56], 0  ; SevEsAPJumpTable
@@ -594,11 +588,11 @@ AsmRelocateApLoopEnd:
 ;-------------------------------------------------------------------------------------
 global ASM_PFX(AsmGetAddressMap)
 ASM_PFX(AsmGetAddressMap):
-    lea        rax, [ASM_PFX(RendezvousFunnelProc)]
+    lea        rax, [RendezvousFunnelProcStart]
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RendezvousFunnelAddress], rax
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.ModeEntryOffset], LongModeStart - RendezvousFunnelProcStart
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RendezvousFunnelSize], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
-    lea        rax, [ASM_PFX(AsmRelocateApLoop)]
+    lea        rax, [AsmRelocateApLoopStart]
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncAddress], rax
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncSize], AsmRelocateApLoopEnd - AsmRelocateApLoopStart
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.ModeTransitionOffset], Flat32Start - RendezvousFunnelProcStart

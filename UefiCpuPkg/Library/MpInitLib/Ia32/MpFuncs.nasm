@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -24,8 +24,6 @@ SECTION .text
 ;ALSO THIS PROCEDURE IS EXECUTED BY APs ONLY ON 16 BIT MODE. HENCE THIS PROC
 ;IS IN MACHINE CODE.
 ;-------------------------------------------------------------------------------------
-global ASM_PFX(RendezvousFunnelProc)
-ASM_PFX(RendezvousFunnelProc):
 RendezvousFunnelProcStart:
 ; At this point CS = 0x(vv00) and ip= 0x0.
 BITS 16
@@ -207,8 +205,6 @@ RendezvousFunnelProcEnd:
 ;SwitchToRealProc procedure follows.
 ;NOT USED IN 32 BIT MODE.
 ;-------------------------------------------------------------------------------------
-global ASM_PFX(SwitchToRealProc)
-ASM_PFX(SwitchToRealProc):
 SwitchToRealProcStart:
     jmp        $                 ; Never reach here
 SwitchToRealProcEnd:
@@ -219,8 +215,6 @@ SwitchToRealProcEnd:
 ;  The last three parameters (Pm16CodeSegment, SevEsAPJumpTable and WakeupBuffer) are
 ;  specific to SEV-ES support and are not applicable on IA32.
 ;-------------------------------------------------------------------------------------
-global ASM_PFX(AsmRelocateApLoop)
-ASM_PFX(AsmRelocateApLoop):
 AsmRelocateApLoopStart:
     mov        eax, esp
     mov        esp, [eax + 16]     ; TopOfApStack
