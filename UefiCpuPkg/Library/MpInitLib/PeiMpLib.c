@@ -299,14 +299,19 @@ GetWakeupBuffer (
   @retval 0       Cannot find free memory below 4GB.
 **/
 UINTN
-GetModeTransitionBuffer (
+AllocateCodeBuffer (
   IN UINTN  BufferSize
   )
 {
-  //
-  // PEI phase doesn't need to do such transition. So simply return 0.
-  //
-  return 0;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  Address;
+
+  Status = PeiServicesAllocatePages (EfiBootServicesCode, EFI_SIZE_TO_PAGES (BufferSize), &Address);
+  if (EFI_ERROR (Status)) {
+    Address = 0;
+  }
+
+  return (UINTN)Address;
 }
 
 /**
