@@ -111,9 +111,9 @@ def BuildUniversalPayload(Args, MacroList):
     #
     # Copy the DXEFV as a section in elf format Universal Payload entry.
     #
-    remove_section = f"{LlvmObjcopyPath} -I {ObjCopyFlag} -O {ObjCopyFlag} --remove-section .upld_info --remove-section .upld.uefi_fv {EntryOutputDir}"
-    add_section    = f"{LlvmObjcopyPath} -I {ObjCopyFlag} -O {ObjCopyFlag} --add-section .upld_info={UpldInfoFile} --add-section .upld.uefi_fv={FvOutputDir} {EntryOutputDir}"
-    set_section    = f"{LlvmObjcopyPath} -I {ObjCopyFlag} -O {ObjCopyFlag} --set-section-alignment .upld.upld_info=16 --set-section-alignment .upld.uefi_fv=16 {EntryOutputDir}"
+    remove_section = f'"{LlvmObjcopyPath}" -I {ObjCopyFlag} -O {ObjCopyFlag} --remove-section .upld_info --remove-section .upld.uefi_fv {EntryOutputDir}'
+    add_section    = f'"{LlvmObjcopyPath}" -I {ObjCopyFlag} -O {ObjCopyFlag} --add-section .upld_info={UpldInfoFile} --add-section .upld.uefi_fv={FvOutputDir} {EntryOutputDir}'
+    set_section    = f'"{LlvmObjcopyPath}" -I {ObjCopyFlag} -O {ObjCopyFlag} --set-section-alignment .upld.upld_info=16 --set-section-alignment .upld.uefi_fv=16 {EntryOutputDir}'
     RunCommand(remove_section)
     RunCommand(add_section)
     RunCommand(set_section)
