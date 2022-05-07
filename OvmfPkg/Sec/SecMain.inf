@@ -59,6 +59,8 @@
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED
+  gEfiPeiMpInitLibMpDepPpiGuid
+  gEfiPeiMpInitLibUpDepPpiGuid
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
