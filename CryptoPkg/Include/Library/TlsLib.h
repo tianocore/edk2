@@ -9,6 +9,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __TLS_LIB_H__
 #define __TLS_LIB_H__
 
+///
+/// EFI_TLS_CONFIG_TYPE
+///
+typedef enum {
+  ///
+  /// Configure the allowed signature algorithms for the TLS context
+  ///
+  EfiTlsConfigSignatureAlgo,
+  ///
+  /// Configure the allowed elliptic curve for the TLS context
+  ///
+  EfiTlsConfigEcCurve,
+
+  EfiTlsConfigMaximum
+} EFI_TLS_CONFIG_TYPE;
+
 /**
   Initializes the OpenSSL library.
 
@@ -532,6 +548,31 @@ EFIAPI
 TlsSetCertRevocationList (
   IN     VOID   *Data,
   IN     UINTN  DataSize
+  );
+
+/**
+  Configure the TLS object.
+
+  This function allows to configure the TLS object
+
+  @param[in]  Tls                Pointer to a TLS object.
+  @param[in]  Type               The type of the configuration.
+  @param[in]  Data               The data associated with the configuration type.
+  @param[in]  DataSize           The size of Data.
+
+  @retval  EFI_SUCCESS           The configuration was successful.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+  @retval  EFI_UNSUPPORTED       The configuration or configuration type are not supported
+  @retval  EFI_OUT_OF_RESOURCES  Memory allocation failed.
+
+**/
+EFI_STATUS
+EFIAPI
+TlsSetConfiguration (
+  IN     VOID                 *Tls,
+  IN     EFI_TLS_CONFIG_TYPE  Type,
+  IN     UINT8                *Data,
+  IN     UINTN                DataSize
   );
 
 /**
