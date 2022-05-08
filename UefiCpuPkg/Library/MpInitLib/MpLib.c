@@ -955,18 +955,6 @@ FillExchangeInfoData (
     Size     -= sizeof (IA32_SEGMENT_DESCRIPTOR);
   }
 
-  //
-  // Copy all 32-bit code and 64-bit code into memory with type of
-  // EfiBootServicesCode to avoid page fault if NX memory protection is enabled.
-  //
-  GetApResetVectorSize (&CpuMpData->AddressMap, NULL, &Size);
-  CopyMem (
-    (VOID *)CpuMpData->WakeupBufferHigh,
-    CpuMpData->AddressMap.RendezvousFunnelAddress +
-    CpuMpData->AddressMap.ModeTransitionOffset,
-    Size
-    );
-
   ExchangeInfo->ModeTransitionMemory = (UINT32)CpuMpData->WakeupBufferHigh;
 
   ExchangeInfo->ModeHighMemory = ExchangeInfo->ModeTransitionMemory +
@@ -1035,21 +1023,24 @@ RestoreWakeupBuffer (
   @param[in, out]  CpuMpData  The pointer to CPU MP Data structure.
 **/
 VOID
-AllocateResetVector (
+AllocateResetVectorBelow1Mb (
   IN OUT CPU_MP_DATA  *CpuMpData
   )
 {
-  UINTN  ApResetVectorSizeBelow1Mb;
-  UINTN  ApResetVectorSizeAbove1Mb;
   UINTN  ApResetStackSize;
 
   if (CpuMpData->WakeupBuffer == (UINTN)-1) {
-    GetApResetVectorSize (&CpuMpData->AddressMap, &ApResetVectorSizeBelow1Mb, &ApResetVectorSizeAbove1Mb);
-
-    CpuMpData->WakeupBuffer      = GetWakeupBuffer (ApResetVectorSizeBelow1Mb);
+    CpuMpData->WakeupBuffer      = GetWakeupBuffer (CpuMpData->BackupBufferSize);
     CpuMpData->MpCpuExchangeInfo = (MP_CPU_EXCHANGE_INFO *)(UINTN)
-                                   (CpuMpData->WakeupBuffer + ApResetVectorSizeBelow1Mb - sizeof (MP_CPU_EXCHANGE_INFO));
-    CpuMpData->WakeupBufferHigh = AllocateCodeBuffer (ApResetVectorSizeAbove1Mb);
+                                   (CpuMpData->WakeupBuffer + CpuMpData->BackupBufferSize - sizeof (MP_CPU_EXCHANGE_INFO));
+    DEBUG ((
+      DEBUG_INFO,
+      "AP Vector: 16-bit = %p/%x, ExchangeInfo = %p/%x\n",
+      CpuMpData->WakeupBuffer,
+      CpuMpData->BackupBufferSize - sizeof (MP_CPU_EXCHANGE_INFO),
+      CpuMpData->MpCpuExchangeInfo,
+      sizeof (MP_CPU_EXCHANGE_INFO)
+      ));
     //
     // The AP reset stack is only used by SEV-ES guests. Do not allocate it
     // if SEV-ES is not enabled. An SEV-SNP guest is also considered
@@ -1148,7 +1139,7 @@ WakeUpAP (
       (CpuMpData->InitFlag   != ApInitDone))
   {
     ResetVectorRequired = TRUE;
-    AllocateResetVector (CpuMpData);
+    AllocateResetVectorBelow1Mb (CpuMpData);
     AllocateSevEsAPMemory (CpuMpData);
     FillExchangeInfoData (CpuMpData);
     SaveLocalApicTimerSetting (CpuMpData);
@@ -1789,6 +1780,7 @@ MpInitLibInitialize (
   UINT8                    *MonitorBuffer;
   UINTN                    Index;
   UINTN                    ApResetVectorSizeBelow1Mb;
+  UINTN                    ApResetVectorSizeAbove1Mb;
   UINTN                    BackupBufferAddr;
   UINTN                    ApIdtBase;
 
@@ -1802,9 +1794,9 @@ MpInitLibInitialize (
   ASSERT (MaxLogicalProcessorNumber != 0);
 
   AsmGetAddressMap (&AddressMap);
-  GetApResetVectorSize (&AddressMap, &ApResetVectorSizeBelow1Mb, NULL);
-  ApStackSize       = PcdGet32 (PcdCpuApStackSize);
-  ApLoopMode        = GetApLoopMode (&MonitorFilterSize);
+  GetApResetVectorSize (&AddressMap, &ApResetVectorSizeBelow1Mb, &ApResetVectorSizeAbove1Mb);
+  ApStackSize = PcdGet32 (PcdCpuApStackSize);
+  ApLoopMode  = GetApLoopMode (&MonitorFilterSize);
 
   //
   // Save BSP's Control registers for APs.
@@ -1912,6 +1904,19 @@ MpInitLibInitialize (
     CpuMpData->CpuData[Index].StartupApSignal =
       (UINT32 *)(MonitorBuffer + MonitorFilterSize * Index);
   }
+
+  //
+  // Copy all 32-bit code and 64-bit code into memory with type of
+  // EfiBootServicesCode to avoid page fault if NX memory protection is enabled.
+  //
+  CpuMpData->WakeupBufferHigh = AllocateCodeBuffer (ApResetVectorSizeAbove1Mb);
+  CopyMem (
+    (VOID *)CpuMpData->WakeupBufferHigh,
+    CpuMpData->AddressMap.RendezvousFunnelAddress +
+    CpuMpData->AddressMap.ModeTransitionOffset,
+    ApResetVectorSizeAbove1Mb
+    );
+  DEBUG ((DEBUG_INFO, "AP Vector: non-16-bit = %p/%x\n", CpuMpData->WakeupBufferHigh, ApResetVectorSizeAbove1Mb));
 
   //
   // Enable the local APIC for Virtual Wire Mode.
