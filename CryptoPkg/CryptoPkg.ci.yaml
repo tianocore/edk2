@@ -26,6 +26,8 @@
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
             "Library/OpensslLib/openssl",
+            "Library/Include/openssl",
+            "Library/Include/crypto",
             # The unit testing folder is not to be checked
             "Test/UnitTest",
             # This has OpenSSL interfaces that aren't UEFI spec compliant
@@ -89,5 +91,14 @@
         "ExtendWords": [],           # words to extend to the dictionary for this package
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
+    },
+
+    # options defined in .pytool/Plugin/UncrustifyCheck
+    "UncrustifyCheck": {
+        "IgnoreFiles": [
+            "opensslconf.h",
+            "dso_conf.h",
+            "opensslconf_generated.h",
+        ]
     }
 }
