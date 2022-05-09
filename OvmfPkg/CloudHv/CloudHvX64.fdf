@@ -11,7 +11,7 @@
 ################################################################################
 
 [Defines]
-!include OvmfPkg/OvmfPkgDefines.fdf.inc
+!include CloudHvDefines.fdf.inc
 
 #
 # This will allow the flash device image to be recognize as an ELF, with first
