@@ -38,9 +38,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0 \
   }
 
-#define gPciRootBridge \
-  PNPID_DEVICE_PATH_NODE(0x0A03)
-
 #define gPnp16550ComPort \
   PNPID_DEVICE_PATH_NODE(0x0501)
 
@@ -63,19 +60,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ACPI_HID_DEVICE_PATH  gPnpPs2KeyboardDeviceNode  = gPnpPs2Keyboard;
 ACPI_HID_DEVICE_PATH  gPnp16550ComPortDeviceNode = gPnp16550ComPort;
 VENDOR_DEVICE_PATH    gTerminalTypeDeviceNode    = gPcAnsiTerminal;
-
-//
-// Predefined platform root bridge
-//
-PLATFORM_ROOT_BRIDGE_DEVICE_PATH  gPlatformRootBridge0 = {
-  gPciRootBridge,
-  gEndEntire
-};
-
-EFI_DEVICE_PATH_PROTOCOL  *gPlatformRootBridges[] = {
-  (EFI_DEVICE_PATH_PROTOCOL *)&gPlatformRootBridge0,
-  NULL
-};
 
 BOOLEAN  mDetectDisplayOnly;
 
@@ -447,32 +431,24 @@ DetectAndPreparePlatformPciDevicePaths (
 }
 
 /**
-  The function will connect root bridge
+  The function will connect one root bridge
 
-   @return EFI_SUCCESS      Connect RootBridge successfully.
+  @param[in]  Handle     - The root bridge handle
+  @param[in]  Instance   - The instance of the root bridge
+
+  @return EFI_SUCCESS      Connect RootBridge successfully.
 
 **/
 EFI_STATUS
-ConnectRootBridge (
-  VOID
+EFIAPI
+ConnectOneRootBridge (
+  IN EFI_HANDLE  Handle,
+  IN VOID        *Instance
   )
 {
   EFI_STATUS  Status;
-  EFI_HANDLE  RootHandle;
 
-  //
-  // Make all the PCI_IO protocols on PCI Seg 0 show up
-  //
-  Status = gBS->LocateDevicePath (
-                  &gEfiDevicePathProtocolGuid,
-                  &gPlatformRootBridges[0],
-                  &RootHandle
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = gBS->ConnectController (RootHandle, NULL, NULL, FALSE);
+  Status = gBS->ConnectController (Handle, NULL, NULL, FALSE);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -491,7 +467,10 @@ PlatformConsoleInit (
   VOID
   )
 {
-  ConnectRootBridge ();
+  VisitAllInstancesOfProtocol (
+    &gEfiPciRootBridgeIoProtocolGuid,
+    ConnectOneRootBridge
+    );
 
   //
   // Do platform specific PCI Device check and add them to ConOut, ConIn, ErrOut
