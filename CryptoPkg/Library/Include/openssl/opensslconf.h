@@ -55,7 +55,7 @@ extern "C" {
 #ifndef OPENSSL_NO_DSA
 #define OPENSSL_NO_DSA
 #endif
-#if !FixedPcdGetBool (PcdEcEnabled)
+#if !FixedPcdGetBool (PcdOpensslEcEnabled)
   #ifndef OPENSSL_NO_EC
 #define OPENSSL_NO_EC
   #endif
