@@ -78,7 +78,7 @@
   IntrinsicLib
 
 [FixedPcd]
-  gEfiCryptoPkgTokenSpaceGuid.PcdEcEnabled
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
 
 #
 # Remove these [BuildOptions] after this library is cleaned up
