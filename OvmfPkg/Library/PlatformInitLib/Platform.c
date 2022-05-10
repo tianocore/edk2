@@ -314,7 +314,9 @@ PlatformMiscInitialization (
   //
   // Disable A20 Mask
   //
-  IoOr8 (0x92, BIT1);
+  if (PlatformInfoHob->HostBridgeDevId != CLOUDHV_DEVICE_ID) {
+    IoOr8 (0x92, BIT1);
+  }
 
   //
   // Build the CPU HOB with guest RAM size dependent address width and 16-bits
