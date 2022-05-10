@@ -976,6 +976,7 @@ class DscBuildData(PlatformBuildClassObject):
         if (TokenSpaceGuid + '.' + PcdCName) in GlobalData.gPlatformPcds:
             if GlobalData.gPlatformPcds[TokenSpaceGuid + '.' + PcdCName] != ValueList[Index]:
                 GlobalData.gPlatformPcds[TokenSpaceGuid + '.' + PcdCName] = ValueList[Index]
+            GlobalData.gPlatformFinalPcds[TokenSpaceGuid + '.' + PcdCName] = ValueList[Index]
         return ValueList
 
     def _FilterPcdBySkuUsage(self, Pcds):
@@ -1876,6 +1877,7 @@ class DscBuildData(PlatformBuildClassObject):
                     while '[' in FieldName and not Pcd.IsArray():
                         FieldName = FieldName.rsplit('[', 1)[0]
                         CApp = CApp + '  __FLEXIBLE_SIZE(*Size, %s, %s, %d); // From %s Line %d Value %s\n' % (Pcd.DatumType, FieldName.strip("."), Array_Index + 1, FieldList[FieldName_ori][1], FieldList[FieldName_ori][2], FieldList[FieldName_ori][0])
+        flexisbale_size_statement_cache = set()
         for skuname in Pcd.SkuOverrideValues:
             if skuname == TAB_COMMON:
                 continue
@@ -1888,6 +1890,10 @@ class DscBuildData(PlatformBuildClassObject):
                         if not FieldList:
                             continue
                         for FieldName in FieldList:
+                            fieldinfo = tuple(FieldList[FieldName])
+                            if fieldinfo in flexisbale_size_statement_cache:
+                                continue
+                            flexisbale_size_statement_cache.add(fieldinfo)
                             FieldName = "." + FieldName
                             IsArray = _IsFieldValueAnArray(FieldList[FieldName.strip(".")][0])
                             if IsArray and not (FieldList[FieldName.strip(".")][0].startswith('{GUID') and FieldList[FieldName.strip(".")][0].endswith('}')):

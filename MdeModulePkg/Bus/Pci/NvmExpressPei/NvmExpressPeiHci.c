@@ -571,7 +571,7 @@ NvmeControllerInit (
   // Read the controller Capabilities register and verify that the NVM command set is supported
   //
   NVME_GET_CAP (Private, &Private->Cap);
-  if (Private->Cap.Css != 0x01) {
+  if ((Private->Cap.Css & BIT0) == 0) {
     DEBUG ((DEBUG_ERROR, "%a: The NVME controller doesn't support NVMe command set.\n", __FUNCTION__));
     return EFI_UNSUPPORTED;
   }

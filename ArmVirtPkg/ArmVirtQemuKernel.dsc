@@ -238,6 +238,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|800
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|480
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0
 
   #
   # SMBIOS entry point version

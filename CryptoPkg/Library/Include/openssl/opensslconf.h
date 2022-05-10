@@ -9,7 +9,7 @@
  * in the file LICENSE in the source distribution or at
  * https://www.openssl.org/source/license.html
  */
-
+#include <Library/PcdLib.h>
 #include <openssl/opensslv.h>
 
 #ifdef  __cplusplus
@@ -55,8 +55,10 @@ extern "C" {
 #ifndef OPENSSL_NO_DSA
 #define OPENSSL_NO_DSA
 #endif
-#ifndef OPENSSL_NO_EC
+#if !FixedPcdGetBool (PcdEcEnabled)
+  #ifndef OPENSSL_NO_EC
 #define OPENSSL_NO_EC
+  #endif
 #endif
 #ifndef OPENSSL_NO_IDEA
 #define OPENSSL_NO_IDEA

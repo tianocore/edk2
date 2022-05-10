@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -48,7 +48,7 @@ FspGetExceptionHandler (
 VOID
 FspGlobalDataInit (
   IN OUT  FSP_GLOBAL_DATA  *PeiFspData,
-  IN UINT32                BootLoaderStack,
+  IN UINTN                 BootLoaderStack,
   IN UINT8                 ApiIdx
   );
 
@@ -61,7 +61,7 @@ FspGlobalDataInit (
 **/
 VOID
 FspDataPointerFixUp (
-  IN UINT32  OffsetGap
+  IN UINTN  OffsetGap
   );
 
 /**

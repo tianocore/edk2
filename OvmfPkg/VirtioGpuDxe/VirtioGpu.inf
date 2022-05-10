@@ -25,6 +25,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
@@ -43,3 +44,8 @@
   gEfiGraphicsOutputProtocolGuid ## BY_START
   gEfiPciIoProtocolGuid          ## TO_START
   gVirtioDeviceProtocolGuid      ## TO_START
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution

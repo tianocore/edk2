@@ -1,7 +1,7 @@
 ## @file
 # EFI/PI MdePkg Package
 #
-# Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2022, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 # (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 #
@@ -130,6 +130,8 @@
   MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
 
   MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
+  MdePkg/Library/CcProbeLibNull/CcProbeLibNull.inf
+  MdePkg/Library/SmmCpuRendezvousLibNull/SmmCpuRendezvousLibNull.inf
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   #
@@ -175,6 +177,7 @@
   MdePkg/Library/SmiHandlerProfileLibNull/SmiHandlerProfileLibNull.inf
   MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
   MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
+  MdePkg/Library/TdxLib/TdxLib.inf
 
 [Components.EBC]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf

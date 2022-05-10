@@ -47,7 +47,8 @@ ASM_PFX(Loader2PeiSwitchStack):
 ;------------------------------------------------------------------------------
 global ASM_PFX(FspSwitchStack)
 ASM_PFX(FspSwitchStack):
-    ; Save current contexts
+    ; Save current contexts. The format must align with CONTEXT_STACK_64.
+    push    rdx     ; Reserved QWORD for stack alignment
     push    rdx     ; ApiParam2
     push    rcx     ; ApiParam1
     push    rax     ; FspInfoHeader
@@ -67,6 +68,6 @@ ASM_PFX(FspSwitchStack):
     add     rsp, 16
     POPA_64
     popfq
-    add     rsp, 24 ; FspInfoHeader + ApiParam[2]
+    add     rsp, 32 ; FspInfoHeader + ApiParam[2] + Reserved QWORD
     ret
 

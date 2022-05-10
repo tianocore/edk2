@@ -18,6 +18,7 @@ gGlobalDefines = {}
 gPlatformDefines = {}
 # PCD name and value pair for fixed at build and feature flag
 gPlatformPcds = {}
+gPlatformFinalPcds = {}
 # PCDs with type that are not fixed at build and feature flag
 gPlatformOtherPcds = {}
 gActivePlatform = None

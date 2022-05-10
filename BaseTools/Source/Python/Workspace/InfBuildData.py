@@ -14,6 +14,7 @@ from types import *
 from .MetaFileParser import *
 from collections import OrderedDict
 from Workspace.BuildClassObject import ModuleBuildClassObject, LibraryClassObject, PcdClassObject
+from Common.Expression import ValueExpressionEx, PcdPattern
 
 ## Get Protocol value from given packages
 #
@@ -528,11 +529,17 @@ class InfBuildData(ModuleBuildClassObject):
         for Record in RecordList:
             LineNo = Record[-1]
             ToolChainFamily = Record[1]
-            TagName = Record[2]
-            ToolCode = Record[3]
-
+            # OptionsList := [TagName, ToolCode, FeatureFlag]
+            OptionsList = ['', '', '']
+            TokenList = GetSplitValueList(Record[2], TAB_VALUE_SPLIT)
+            for Index in range(len(TokenList)):
+                OptionsList[Index] = TokenList[Index]
+            if OptionsList[2]:
+                FeaturePcdExpression = self.CheckFeatureFlagPcd(OptionsList[2])
+                if not FeaturePcdExpression:
+                    continue
             File = PathClass(NormPath(Record[0], Macros), self._ModuleDir, '',
-                             '', False, self._Arch, ToolChainFamily, '', TagName, ToolCode)
+                             '', False, self._Arch, ToolChainFamily, '', OptionsList[0], OptionsList[1])
             # check the file validation
             ErrorCode, ErrorInfo = File.Validate()
             if ErrorCode != 0:
@@ -1046,6 +1053,46 @@ class InfBuildData(ModuleBuildClassObject):
         if (self.Binaries and not self.Sources) or GlobalData.gIgnoreSource:
             return True
         return False
+    def CheckFeatureFlagPcd(self,Instance):
+        Pcds = GlobalData.gPlatformFinalPcds.copy()
+        if PcdPattern.search(Instance):
+            PcdTuple = tuple(Instance.split('.')[::-1])
+            if PcdTuple in self.Pcds:
+                if not (self.Pcds[PcdTuple].Type == 'FeatureFlag' or self.Pcds[PcdTuple].Type == 'FixedAtBuild'):
+                    EdkLogger.error('build', FORMAT_INVALID,
+                                    "\nFeatureFlagPcd must be defined in a [PcdsFeatureFlag] or [PcdsFixedAtBuild] section of Dsc or Dec file",
+                                    File=str(self), ExtraData=Instance)
+                if not Instance in Pcds:
+                    Pcds[Instance] = self.Pcds[PcdTuple].DefaultValue
+            else: #if PcdTuple not in self.Pcds:
+                EdkLogger.error('build', FORMAT_INVALID,
+                                "\nFeatureFlagPcd must be defined in [FeaturePcd] or [FixedPcd] of Inf file",
+                                File=str(self), ExtraData=Instance)
+            if Instance in Pcds:
+                if Pcds[Instance] == '0':
+                    return False
+                elif Pcds[Instance] == '1':
+                    return True
+            try:
+                Value = ValueExpression(Instance, Pcds)()
+                if Value == True:
+                    return True
+                return False
+            except:
+                EdkLogger.warn('build', FORMAT_INVALID,"The FeatureFlagExpression cannot be evaluated", File=str(self), ExtraData=Instance)
+                return False
+        else:
+            for Name, Guid in self.Pcds:
+                if self.Pcds[(Name, Guid)].Type == 'FeatureFlag' or self.Pcds[(Name, Guid)].Type == 'FixedAtBuild':
+                    Pcds['%s.%s' % (Guid, Name)] = self.Pcds[(Name, Guid)].DefaultValue
+            try:
+                Value = ValueExpression(Instance, Pcds)()
+                if Value == True:
+                    return True
+                return False
+            except:
+                EdkLogger.warn('build', FORMAT_INVALID, "The FeatureFlagExpression cannot be evaluated", File=str(self), ExtraData=Instance)
+                return False
 def ExtendCopyDictionaryLists(CopyToDict, CopyFromDict):
     for Key in CopyFromDict:
         CopyToDict[Key].extend(CopyFromDict[Key])
