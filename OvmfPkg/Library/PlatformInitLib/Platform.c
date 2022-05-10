@@ -410,14 +410,17 @@ PlatformMaxCpuCountInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  UINT16  BootCpuCount;
+  UINT16  BootCpuCount = 0;
   UINT32  MaxCpuCount;
 
   //
   // Try to fetch the boot CPU count.
   //
-  QemuFwCfgSelectItem (QemuFwCfgItemSmpCpuCount);
-  BootCpuCount = QemuFwCfgRead16 ();
+  if (QemuFwCfgIsAvailable ()) {
+    QemuFwCfgSelectItem (QemuFwCfgItemSmpCpuCount);
+    BootCpuCount = QemuFwCfgRead16 ();
+  }
+
   if (BootCpuCount == 0) {
     //
     // QEMU doesn't report the boot CPU count. (BootCpuCount == 0) will let
