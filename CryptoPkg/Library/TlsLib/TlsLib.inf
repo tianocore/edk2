@@ -42,7 +42,7 @@
   SafeIntLib
 
 [FixedPcd]
-  gEfiCryptoPkgTokenSpaceGuid.PcdEcEnabled
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
 
 [BuildOptions]
   #
