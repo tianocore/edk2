@@ -11,7 +11,7 @@
           TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
 
         <PcdsFixedAtBuild>
-!include CryptoPkg/Driver/CryptoPcdMinDxeSmm.dsc.inc
+!include CryptoPkg/Driver/CryptoPcdMinSmmNoTls.dsc.inc
 
     }
 
