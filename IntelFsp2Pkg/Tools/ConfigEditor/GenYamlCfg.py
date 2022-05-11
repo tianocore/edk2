@@ -929,16 +929,24 @@ into %d bytes !" % (value_str, length))
                                                                       ]]:
                     tmp_list.append((op_val, op_str))
             else:
-                opt_list = item['option'].split(',')
+                if item['option'].find(';') != -1:
+                    opt_list = item['option'].split(';')
+                else:
+                    opt_list = re.split(', ', item['option'])
                 for option in opt_list:
                     option = option.strip()
                     try:
-                        (op_val, op_str) = option.split(':')
+                        if option.find(':') != -1:
+                            (op_val, op_str) = option.split(':')
+                        else:
+                            op_val = option
+                            op_str = option
                     except Exception:
-                        raise SystemExit("Exception: Invalide \
+                        raise SystemExit("Exception: Invalid \
 option format '%s' !" % option)
                     tmp_list.append((op_val, op_str))
         return tmp_list
+
 
     def get_page_title(self, page_id, top=None):
         if top is None:
