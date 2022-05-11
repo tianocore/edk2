@@ -593,6 +593,8 @@
 !endif
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|1280
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|800
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|FALSE
   gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource|0
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0
@@ -1005,3 +1007,6 @@
   #
 !include OvmfPkg/OvmfTpmComponentsDxe.dsc.inc
 
+!if $(LOAD_X64_ON_IA32_ENABLE) == TRUE
+  OvmfPkg/CompatImageLoaderDxe/CompatImageLoaderDxe.inf
+!endif

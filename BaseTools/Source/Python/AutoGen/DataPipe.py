@@ -169,3 +169,5 @@ class MemoryDataPipe(DataPipe):
         self.DataContainer = {"BinCacheDest":GlobalData.gBinCacheDest}
 
         self.DataContainer = {"EnableGenfdsMultiThread":GlobalData.gEnableGenfdsMultiThread}
+
+        self.DataContainer = {"gPlatformFinalPcds":GlobalData.gPlatformFinalPcds}

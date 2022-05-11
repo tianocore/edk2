@@ -151,6 +151,12 @@ struct VGPU_GOP_STRUCT {
   // BackingStore is non-NULL.
   //
   VOID                                    *BackingStoreMap;
+
+  //
+  // native display resolution
+  //
+  UINT32                                  NativeXRes;
+  UINT32                                  NativeYRes;
 };
 
 //
@@ -364,6 +370,12 @@ VirtioGpuResourceFlush (
   IN     UINT32    Width,
   IN     UINT32    Height,
   IN     UINT32    ResourceId
+  );
+
+EFI_STATUS
+VirtioGpuGetDisplayInfo (
+  IN OUT VGPU_DEV                        *VgpuDev,
+  volatile VIRTIO_GPU_RESP_DISPLAY_INFO  *Response
   );
 
 /**
