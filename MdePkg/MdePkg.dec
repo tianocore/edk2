@@ -2417,5 +2417,9 @@
   # @Prompt Memory encryption attribute
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0|UINT64|0x0000002e
 
+  ## This dynamic PCD indicates the location of the SEV-SNP secrets page.
+  # @Prompt SEV-SNP secrets page address
+  gEfiMdePkgTokenSpaceGuid.PcdSevSnpSecretsAddress|0|UINT64|0x0000002f
+
 [UserExtensions.TianoCore."ExtraFiles"]
   MdePkgExtra.uni
