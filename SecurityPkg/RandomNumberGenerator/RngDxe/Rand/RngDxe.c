@@ -26,6 +26,32 @@
 
 #include "RngDxeInternals.h"
 
+/** Allocate and initialize mAvailableAlgoArray with the available
+    Rng algorithms. Also update mAvailableAlgoArrayCount.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+GetAvailableAlgorithms (
+  VOID
+  )
+{
+  return EFI_SUCCESS;
+}
+
+/** Free mAvailableAlgoArray.
+**/
+VOID
+EFIAPI
+FreeAvailableAlgorithms (
+  VOID
+  )
+{
+  return;
+}
+
 /**
   Produces and returns an RNG value using either the default or specified RNG algorithm.
 
