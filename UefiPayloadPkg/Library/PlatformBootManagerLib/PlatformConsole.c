@@ -47,36 +47,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define gPnpPs2Keyboard \
   PNPID_DEVICE_PATH_NODE(0x0303)
 
-#define gUartVendor \
-  { \
-    { \
-      HARDWARE_DEVICE_PATH, \
-      HW_VENDOR_DP, \
-      { \
-        (UINT8) (sizeof (VENDOR_DEVICE_PATH)), \
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8) \
-      } \
-    }, \
-    EDKII_SERIAL_PORT_LIB_VENDOR_GUID \
-  }
-
-#define gUart \
-  { \
-    { \
-      MESSAGING_DEVICE_PATH, \
-      MSG_UART_DP, \
-      { \
-        (UINT8) (sizeof (UART_DEVICE_PATH)), \
-        (UINT8) ((sizeof (UART_DEVICE_PATH)) >> 8) \
-      } \
-    }, \
-    0, \
-    115200, \
-    8, \
-    1, \
-    1 \
-  }
-
 #define gPcAnsiTerminal \
   { \
     { \
@@ -92,9 +62,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 ACPI_HID_DEVICE_PATH  gPnpPs2KeyboardDeviceNode  = gPnpPs2Keyboard;
 ACPI_HID_DEVICE_PATH  gPnp16550ComPortDeviceNode = gPnp16550ComPort;
-UART_DEVICE_PATH      gUartDeviceNode            = gUart;
 VENDOR_DEVICE_PATH    gTerminalTypeDeviceNode    = gPcAnsiTerminal;
-VENDOR_DEVICE_PATH    gUartDeviceVendorNode      = gUartVendor;
 
 //
 // Predefined platform root bridge
@@ -112,13 +80,11 @@ EFI_DEVICE_PATH_PROTOCOL  *gPlatformRootBridges[] = {
 BOOLEAN  mDetectDisplayOnly;
 
 /**
-  Add IsaKeyboard to ConIn; add IsaSerial to ConOut, ConIn, ErrOut.
+  Add IsaKeyboard to ConIn.
 
   @param[in] DeviceHandle  Handle of the LPC Bridge device.
 
-  @retval EFI_SUCCESS  Console devices on the LPC bridge have been added to
-                       ConOut, ConIn, and ErrOut.
-
+  @retval EFI_SUCCESS  IsaKeyboard on the LPC bridge have been added to ConIn.
   @return              Error codes, due to EFI_DEVICE_PATH_PROTOCOL missing
                        from DeviceHandle.
 **/
@@ -129,7 +95,6 @@ PrepareLpcBridgeDevicePath (
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
 
   DevicePath = NULL;
   Status     = gBS->HandleProtocol (
@@ -141,26 +106,11 @@ PrepareLpcBridgeDevicePath (
     return Status;
   }
 
-  TempDevicePath = DevicePath;
-
   //
   // Register Keyboard
   //
   DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gPnpPs2KeyboardDeviceNode);
   EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
-
-  //
-  // Register COM1
-  //
-  DevicePath = TempDevicePath;
-  DevicePath = AppendDevicePathNode ((EFI_DEVICE_PATH_PROTOCOL *)NULL, (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceVendorNode);
-  DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode);
-  DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
-
-  EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
-  EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
-  EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
-
   return EFI_SUCCESS;
 }
 
@@ -292,43 +242,6 @@ PreparePciVgaDevicePath (
 }
 
 /**
-  Add PCI Serial to ConOut, ConIn, ErrOut.
-
-  @param[in]  DeviceHandle - Handle of PciIo protocol.
-
-  @retval EFI_SUCCESS  - PCI Serial is added to ConOut, ConIn, and ErrOut.
-  @retval EFI_STATUS   - No PCI Serial device is added.
-
-**/
-EFI_STATUS
-PreparePciSerialDevicePath (
-  IN EFI_HANDLE  DeviceHandle
-  )
-{
-  EFI_STATUS                Status;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-
-  DevicePath = NULL;
-  Status     = gBS->HandleProtocol (
-                      DeviceHandle,
-                      &gEfiDevicePathProtocolGuid,
-                      (VOID *)&DevicePath
-                      );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode);
-  DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
-
-  EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
-  EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
-  EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
-
-  return EFI_SUCCESS;
-}
-
-/**
   For every PCI instance execute a callback function.
 
   @param[in]  Id                 - The protocol GUID for callback
@@ -447,18 +360,6 @@ DetectAndPreparePlatformPciDevicePath (
       PrepareLpcBridgeDevicePath (Handle);
       return EFI_SUCCESS;
     }
-
-    //
-    // Here we decide which Serial device to enable in PCI bus
-    //
-    if (IS_PCI_16550SERIAL (&Pci)) {
-      //
-      // Add them to ConOut, ConIn, ErrOut.
-      //
-      DEBUG ((DEBUG_INFO, "Found PCI 16550 SERIAL device\n"));
-      PreparePciSerialDevicePath (Handle);
-      return EFI_SUCCESS;
-    }
   }
 
   //
@@ -473,6 +374,39 @@ DetectAndPreparePlatformPciDevicePath (
     return EFI_SUCCESS;
   }
 
+  return Status;
+}
+
+/**
+  For every Serial Io instance, add it to ConOut, ConIn, ErrOut.
+
+  @param[in]  Handle     - The Serial Io device handle
+  @param[in]  Instance   - The instance of the SerialIo protocol
+
+  @retval EFI_STATUS - Callback function failed.
+
+**/
+EFI_STATUS
+EFIAPI
+AddDevicePathForOneSerialIoInstance (
+  IN EFI_HANDLE  Handle,
+  IN VOID        *Instance
+  )
+{
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+
+  DevicePath = NULL;
+  Status     = gBS->HandleProtocol (
+                      Handle,
+                      &gEfiDevicePathProtocolGuid,
+                      (VOID *)&DevicePath
+                      );
+  DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
+
+  EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
   return Status;
 }
 
@@ -498,6 +432,11 @@ DetectAndPreparePlatformPciDevicePaths (
     ConIn,
     (EFI_DEVICE_PATH_PROTOCOL *)&gUsbClassKeyboardDevicePath,
     NULL
+    );
+
+  VisitAllInstancesOfProtocol (
+    &gEfiSerialIoProtocolGuid,
+    AddDevicePathForOneSerialIoInstance
     );
 
   Status = VisitAllInstancesOfProtocol (
@@ -552,11 +491,6 @@ PlatformConsoleInit (
   VOID
   )
 {
-  gUartDeviceNode.BaudRate = PcdGet64 (PcdUartDefaultBaudRate);
-  gUartDeviceNode.DataBits = PcdGet8 (PcdUartDefaultDataBits);
-  gUartDeviceNode.Parity   = PcdGet8 (PcdUartDefaultParity);
-  gUartDeviceNode.StopBits = PcdGet8 (PcdUartDefaultStopBits);
-
   ConnectRootBridge ();
 
   //
