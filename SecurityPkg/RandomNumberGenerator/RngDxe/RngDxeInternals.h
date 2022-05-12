@@ -12,6 +12,33 @@
 
 #include <Protocol/Rng.h>
 
+//
+// Array containing the validated Rng algorithm.
+// The entry with the lowest index will be the default algorithm.
+//
+extern UINTN              mAvailableAlgoArrayCount;
+extern EFI_RNG_ALGORITHM  *mAvailableAlgoArray;
+
+/** Allocate and initialize mAvailableAlgoArray with the available
+    Rng algorithms. Also update mAvailableAlgoArrayCount.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+GetAvailableAlgorithms (
+  VOID
+  );
+
+/** Free mAvailableAlgoArray.
+**/
+VOID
+EFIAPI
+FreeAvailableAlgorithms (
+  VOID
+  );
+
 /**
   Returns information about the random number generation implementation.
 

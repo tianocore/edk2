@@ -22,6 +22,7 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = RngDriverEntry
+  UNLOAD_IMAGE                   = RngDriverUnLoad
   MODULE_UNI_FILE                = RngDxe.uni
 
 #
