@@ -86,6 +86,9 @@ extern TEST_DESC  mOaepTest[];
 extern UINTN      mRsaPssTestNum;
 extern TEST_DESC  mRsaPssTest[];
 
+extern UINTN      mBnTestNum;
+extern TEST_DESC  mBnTest[];
+
 /** Creates a framework you can use */
 EFI_STATUS
 EFIAPI
