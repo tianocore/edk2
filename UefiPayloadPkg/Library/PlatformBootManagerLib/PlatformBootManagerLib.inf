@@ -60,6 +60,7 @@
   gEfiDxeSmmReadyToLockProtocolGuid
   gEfiSmmAccess2ProtocolGuid
   gUniversalPayloadPlatformBootManagerOverrideProtocolGuid
+  gEfiSerialIoProtocolGuid
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
