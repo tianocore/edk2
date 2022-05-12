@@ -15,6 +15,7 @@
 #include <Library/VmgExitLib.h>
 #include <Register/Amd/Fam17Msr.h>
 #include <Register/Amd/Ghcb.h>
+#include <AmdSevSnpSecretsPage.h>
 
 #include <Protocol/Timer.h>
 
@@ -215,6 +216,14 @@ GetSevEsAPMemory (
   ASSERT_EFI_ERROR (Status);
 
   DEBUG ((DEBUG_INFO, "Dxe: SevEsAPMemory = %lx\n", (UINTN)StartAddress));
+
+  if (ConfidentialComputingGuestHas (CCAttrAmdSevSnp)) {
+    SNP_SECRETS_PAGE  *Secrets = (SNP_SECRETS_PAGE *)(INTN)PcdGet64 (PcdSevSnpSecretsAddress);
+
+    Secrets->OsArea.ApJumpTablePa = (UINT64)(UINTN)StartAddress;
+
+    return (UINTN)StartAddress;
+  }
 
   //
   // Save the SevEsAPMemory as the AP jump table.

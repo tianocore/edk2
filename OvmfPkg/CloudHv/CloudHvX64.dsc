@@ -630,6 +630,9 @@
   # Set ConfidentialComputing defaults
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
 
+  # Set SEV-SNP Secrets page address default
+  gEfiMdePkgTokenSpaceGuid.PcdSevSnpSecretsAddress|0
+
 [PcdsDynamicHii]
 !include OvmfPkg/OvmfTpmPcdsHii.dsc.inc
 
