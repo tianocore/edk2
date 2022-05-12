@@ -27,8 +27,10 @@ STATIC CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION  mSnpBootDxeTable = {
   0,
   (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfSnpSecretsBase),
   FixedPcdGet32 (PcdOvmfSnpSecretsSize),
+  0,
   (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfCpuidBase),
   FixedPcdGet32 (PcdOvmfCpuidSize),
+  0,
 };
 
 EFI_STATUS
