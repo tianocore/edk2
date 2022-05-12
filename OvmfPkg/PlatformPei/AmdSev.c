@@ -408,6 +408,11 @@ AmdSevInitialize (
   //
   if (MemEncryptSevSnpIsEnabled ()) {
     PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrAmdSevSnp);
+    ASSERT_RETURN_ERROR (PcdStatus);
+    PcdStatus = PcdSet64S (
+                  PcdSevSnpSecretsAddress,
+                  (UINT64)(UINTN)PcdGet32 (PcdOvmfSnpSecretsBase)
+                  );
   } else if (MemEncryptSevEsIsEnabled ()) {
     PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrAmdSevEs);
   } else {
