@@ -613,6 +613,9 @@
   # Set ConfidentialComputing defaults
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
 
+  # Set SEV-SNP Secrets page address default
+  gEfiMdePkgTokenSpaceGuid.PcdSevSnpSecretsAddress|0
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform.

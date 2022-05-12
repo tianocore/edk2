@@ -80,3 +80,4 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                           ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr           ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdSevSnpSecretsAddress                     ## CONSUMES
