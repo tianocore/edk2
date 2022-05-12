@@ -333,7 +333,6 @@ PreparePciSerialDevicePath (
 
   @param[in]  Id                 - The protocol GUID for callback
   @param[in]  CallBackFunction   - The callback function
-  @param[in]  Context    - The context of the callback
 
   @retval EFI_STATUS - Callback function failed.
 
@@ -341,9 +340,8 @@ PreparePciSerialDevicePath (
 EFI_STATUS
 EFIAPI
 VisitAllInstancesOfProtocol (
-  IN EFI_GUID                    *Id,
-  IN PROTOCOL_INSTANCE_CALLBACK  CallBackFunction,
-  IN VOID                        *Context
+  IN EFI_GUID                           *Id,
+  IN SIMPLE_PROTOCOL_INSTANCE_CALLBACK  CallBackFunction
   )
 {
   EFI_STATUS  Status;
@@ -376,8 +374,7 @@ VisitAllInstancesOfProtocol (
 
     Status = (*CallBackFunction)(
   HandleBuffer[Index],
-  Instance,
-  Context
+  Instance
   );
   }
 
@@ -387,21 +384,21 @@ VisitAllInstancesOfProtocol (
 }
 
 /**
-  For every PCI instance execute a callback function.
+  Do platform specific PCI Device check and add them to
+  ConOut, ConIn, ErrOut.
 
-  @param[in]  Handle     - The PCI device handle
-  @param[in]  Instance   - The instance of the PciIo protocol
-  @param[in]  Context    - The context of the callback
+  @param[in]  Handle    - Handle of PCI device instance
+  @param[in]  Instance  - The instance of PCI device
 
-  @retval EFI_STATUS - Callback function failed.
+  @retval EFI_SUCCESS - PCI Device check and Console variable update successfully.
+  @retval EFI_STATUS - PCI Device check or Console variable update fail.
 
 **/
 EFI_STATUS
 EFIAPI
-VisitingAPciInstance (
+DetectAndPreparePlatformPciDevicePath (
   IN EFI_HANDLE  Handle,
-  IN VOID        *Instance,
-  IN VOID        *Context
+  IN VOID        *Instance
   )
 {
   EFI_STATUS           Status;
@@ -424,56 +421,6 @@ VisitingAPciInstance (
     return Status;
   }
 
-  return (*(VISIT_PCI_INSTANCE_CALLBACK)(UINTN)Context)(
-  Handle,
-  PciIo,
-  &Pci
-  );
-}
-
-/**
-  For every PCI instance execute a callback function.
-
-  @param[in]  CallBackFunction - Callback function pointer
-
-  @retval EFI_STATUS - Callback function failed.
-
-**/
-EFI_STATUS
-EFIAPI
-VisitAllPciInstances (
-  IN VISIT_PCI_INSTANCE_CALLBACK  CallBackFunction
-  )
-{
-  return VisitAllInstancesOfProtocol (
-           &gEfiPciIoProtocolGuid,
-           VisitingAPciInstance,
-           (VOID *)(UINTN)CallBackFunction
-           );
-}
-
-/**
-  Do platform specific PCI Device check and add them to
-  ConOut, ConIn, ErrOut.
-
-  @param[in]  Handle - Handle of PCI device instance
-  @param[in]  PciIo - PCI IO protocol instance
-  @param[in]  Pci - PCI Header register block
-
-  @retval EFI_SUCCESS - PCI Device check and Console variable update successfully.
-  @retval EFI_STATUS - PCI Device check or Console variable update fail.
-
-**/
-EFI_STATUS
-EFIAPI
-DetectAndPreparePlatformPciDevicePath (
-  IN EFI_HANDLE           Handle,
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN PCI_TYPE00           *Pci
-  )
-{
-  EFI_STATUS  Status;
-
   Status = PciIo->Attributes (
                     PciIo,
                     EfiPciIoAttributeOperationEnable,
@@ -486,9 +433,9 @@ DetectAndPreparePlatformPciDevicePath (
     //
     // Here we decide whether it is LPC Bridge
     //
-    if ((IS_PCI_LPC (Pci)) ||
-        ((IS_PCI_ISA_PDECODE (Pci)) &&
-         (Pci->Hdr.VendorId == 0x8086)
+    if ((IS_PCI_LPC (&Pci)) ||
+        ((IS_PCI_ISA_PDECODE (&Pci)) &&
+         (Pci.Hdr.VendorId == 0x8086)
         )
         )
     {
@@ -504,7 +451,7 @@ DetectAndPreparePlatformPciDevicePath (
     //
     // Here we decide which Serial device to enable in PCI bus
     //
-    if (IS_PCI_16550SERIAL (Pci)) {
+    if (IS_PCI_16550SERIAL (&Pci)) {
       //
       // Add them to ConOut, ConIn, ErrOut.
       //
@@ -517,7 +464,7 @@ DetectAndPreparePlatformPciDevicePath (
   //
   // Enable all display devices
   //
-  if (IS_PCI_DISPLAY (Pci)) {
+  if (IS_PCI_DISPLAY (&Pci)) {
     //
     // Add them to ConOut.
     //
@@ -543,6 +490,8 @@ DetectAndPreparePlatformPciDevicePaths (
   BOOLEAN  DetectDisplayOnly
   )
 {
+  EFI_STATUS  Status;
+
   mDetectDisplayOnly = DetectDisplayOnly;
 
   EfiBootManagerUpdateConsoleVariable (
@@ -551,7 +500,11 @@ DetectAndPreparePlatformPciDevicePaths (
     NULL
     );
 
-  return VisitAllPciInstances (DetectAndPreparePlatformPciDevicePath);
+  Status = VisitAllInstancesOfProtocol (
+             &gEfiPciIoProtocolGuid,
+             DetectAndPreparePlatformPciDevicePath
+             );
+  return Status;
 }
 
 /**

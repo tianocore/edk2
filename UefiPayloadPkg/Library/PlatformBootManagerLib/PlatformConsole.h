@@ -37,10 +37,9 @@ typedef struct {
 
 typedef
 EFI_STATUS
-(EFIAPI *PROTOCOL_INSTANCE_CALLBACK)(
+(EFIAPI *SIMPLE_PROTOCOL_INSTANCE_CALLBACK)(
   IN EFI_HANDLE            Handle,
-  IN VOID                 *Instance,
-  IN VOID                 *Context
+  IN VOID                 *Instance
   );
 
 /**
