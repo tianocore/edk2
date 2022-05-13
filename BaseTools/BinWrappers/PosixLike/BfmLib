@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+full_cmd=${BASH_SOURCE:-$0} # see http://mywiki.wooledge.org/BashFAQ/028 for a discussion of why $0 is not a good choice here
+dir=$(dirname "$full_cmd")
+cmd=${full_cmd##*/}
+
+if [ -n "$WORKSPACE" ] && [ -e "$WORKSPACE/Conf/BaseToolsCBinaries" ]
+then
+  exec "$WORKSPACE/Conf/BaseToolsCBinaries/$cmd"
+elif [ -n "$WORKSPACE" ] && [ -e "$EDK_TOOLS_PATH/Source/C" ]
+then
+  if [ ! -e "$EDK_TOOLS_PATH/Source/C/bin/$cmd" ]
+  then
+    echo "BaseTools C Tool binary was not found ($cmd)"
+    echo "You may need to run:"
+    echo "  make -C $EDK_TOOLS_PATH/Source/C"
+  else
+    exec "$EDK_TOOLS_PATH/Source/C/bin/$cmd" "$@"
+  fi
+elif [ -e "$dir/../../Source/C/bin/$cmd" ]
+then
+  exec "$dir/../../Source/C/bin/$cmd" "$@"
+else
+  echo "Unable to find the real '$cmd' to run"
+  echo "This message was printed by"
+  echo "  $0"
+  exit 127
+fi
+
