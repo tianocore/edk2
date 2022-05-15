@@ -160,6 +160,17 @@ jobs:
             # this build is for xen not qemu-kvm
             Run.Flags: "QEMU_SKIP=TRUE"
             Run: $(should_run)
+
+          INTELTDX_X64_DEBUG:
+            Build.File: "$(package)/PlatformCI/IntelTdxBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            # no storage supported by microvm build
+            # can't boot to uefi shell -> skip test
+            Run.Flags: "QEMU_SKIP=TRUE"
+            Run: $(should_run)
+
     workspace:
       clean: all
 
