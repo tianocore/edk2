@@ -27,6 +27,8 @@ typedef struct {
   UINT8 BlueRearPort;
   UINT8 InternalAudioConnection;
   UINT8 PxeBootCapability;
+  UINT8 PinkRearPort;
+  UINT8 VtxDisabled;
 } BOARD_SETTINGS;
 
 #define PRIMARY_VIDEO_ASPEED 0
