@@ -295,6 +295,11 @@ INF  OvmfPkg/EmuVariableFvbRuntimeDxe/Fvb.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 
+#
+# EFI_CC_MEASUREMENT_PROTOCOL
+#
+INF OvmfPkg/IntelTdx/TdTcg2Dxe/TdTcg2Dxe.inf
+
 ################################################################################
 
 [FV.FVMAIN_COMPACT]
