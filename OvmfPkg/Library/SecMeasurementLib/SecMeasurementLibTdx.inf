@@ -1,0 +1,30 @@
+#/** @file
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecMeasurementLibTdx
+  FILE_GUID                      = 3e3fc69d-e834-40e9-96ed-e1e721f41883
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SecMeasurementLib
+
+[Sources]
+  SecMeasurementLibTdx.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  CryptoPkg/CryptoPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[Guids]
+  gCcEventEntryHobGuid
+  gUefiOvmfPkgTokenSpaceGuid
+
+[LibraryClasses]
+  HashLib
