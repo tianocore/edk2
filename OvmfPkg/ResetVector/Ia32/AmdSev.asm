@@ -150,6 +150,8 @@ BITS    32
 SevEsUnexpectedRespTerminate:
     TerminateVmgExit    TERM_UNEXPECTED_RESP_CODE
 
+%ifdef ARCH_X64
+
 ; If SEV-ES is enabled then initialize and make the GHCB page shared
 SevClearPageEncMaskForGhcbPage:
     ; Check if SEV is enabled
@@ -208,6 +210,8 @@ GetSevCBitMaskAbove31:
 
 GetSevCBitMaskAbove31Exit:
     OneTimeCallRet GetSevCBitMaskAbove31
+
+%endif
 
 ; Check if Secure Encrypted Virtualization (SEV) features are enabled.
 ;
