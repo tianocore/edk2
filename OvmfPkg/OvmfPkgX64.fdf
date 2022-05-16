@@ -185,6 +185,7 @@ INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
 INF  OvmfPkg/SmmAccess/SmmAccessPei.inf
 !endif
 INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
+INF  FILE_GUID = $(UP_CPU_PEI_GUID) UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
 !include OvmfPkg/OvmfTpmPei.fdf.inc
 
@@ -214,7 +215,13 @@ READ_LOCK_STATUS   = TRUE
 APRIORI DXE {
   INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+  # AmdSevDxe must be loaded before TdxDxe. Because in SEV guest AmdSevDxe
+  # driver performs a MemEncryptSevClearMmioPageEncMask() call against the
+  # PcdPciExpressBaseAddress range to mark it shared/unencrypted.
+  # Otherwise #VC handler terminates the guest for trying to do MMIO to an
+  # encrypted region (Since the range has not been marked shared/unencrypted).
   INF  OvmfPkg/AmdSevDxe/AmdSevDxe.inf
+  INF  OvmfPkg/TdxDxe/TdxDxe.inf
 !if $(SMM_REQUIRE) == FALSE
   INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 !endif
@@ -232,10 +239,17 @@ INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 INF  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
-INF  OvmfPkg/8259InterruptControllerDxe/8259.inf
 INF  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
+
 INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
-INF  OvmfPkg/8254TimerDxe/8254Timer.inf
+INF  FILE_GUID = $(UP_CPU_DXE_GUID) UefiCpuPkg/CpuDxe/CpuDxe.inf
+
+!ifdef $(CSM_ENABLE)
+  INF  OvmfPkg/8259InterruptControllerDxe/8259.inf
+  INF  OvmfPkg/8254TimerDxe/8254Timer.inf
+!else
+  INF  OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
+!endif
 INF  OvmfPkg/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupport.inf
 INF  OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
 INF  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
@@ -317,6 +331,8 @@ INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
 INF  ShellPkg/Application/Shell/Shell.inf
 
 INF MdeModulePkg/Logo/LogoDxe.inf
+
+INF OvmfPkg/TdxDxe/TdxDxe.inf
 
 #
 # Network modules

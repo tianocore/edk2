@@ -1559,6 +1559,10 @@
   # @Prompt Maximum permitted FwVol section nesting depth (exclusive).
   gEfiMdeModulePkgTokenSpaceGuid.PcdFwVolDxeMaxEncapsulationDepth|0x10|UINT32|0x00000030
 
+  ## Indicates the default timeout value for SD/MMC Host Controller operations in microseconds.
+  # @Prompt SD/MMC Host Controller Operations Timeout (us).
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSdMmcGenericTimeoutValue|1000000|UINT32|0x00000031
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output would be at max column and max row.
@@ -2078,6 +2082,10 @@
   #   FALSE - PCIe Resizable BAR Capability is not supported.<BR>
   # @Prompt Enable PCIe Resizable BAR Capability support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport|FALSE|BOOLEAN|0x10000024
+
+  ## This PCD holds the shared bit mask for page table entries when Tdx is enabled.
+  # @Prompt The shared bit mask when Intel Tdx is enabled.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask|0x0|UINT64|0x10000025
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when

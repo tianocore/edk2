@@ -85,11 +85,10 @@ else:
 debugger = Debugger()
 
 # Initialisation commands
-ec = debugger.getExecutionContext(0)
+ec = debugger.getCurrentExecutionContext()
 ec.getExecutionService().stop()
-ec.getExecutionService().waitForStop()
 # in case the execution context reference is out of date
-ec = debugger.getExecutionContext(0)
+ec = debugger.getCurrentExecutionContext()
 
 try:
     armplatform_debugger = edk2_debugger.ArmPlatformDebugger(ec, report_file, regions, verbose)

@@ -23,11 +23,6 @@ EFI_EXCEPTION_TYPE_ENTRY  gExceptionType[] = {
   //  { EXCEPT_ARM_RESERVED,              GDB_SIGILL  }
 };
 
-// Shut up some annoying RVCT warnings
-#ifdef __CC_ARM
-  #pragma diag_suppress 1296
-#endif
-
 UINTN  gRegisterOffsets[] = {
   OFFSET_OF (EFI_SYSTEM_CONTEXT_ARM, R0),
   OFFSET_OF (EFI_SYSTEM_CONTEXT_ARM, R1),
@@ -72,11 +67,6 @@ UINTN  gRegisterOffsets[] = {
   0x00000FFF,                        // fps
   OFFSET_OF (EFI_SYSTEM_CONTEXT_ARM, CPSR)
 };
-
-// restore warnings for RVCT
-#ifdef __CC_ARM
-  #pragma diag_default 1296
-#endif
 
 /**
  Return the number of entries in the gExceptionType[]

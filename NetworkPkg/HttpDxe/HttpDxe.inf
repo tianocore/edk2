@@ -75,6 +75,8 @@
 [Pcd]
   gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections       ## CONSUMES
   gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout              ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpDnsRetryInterval       ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpDnsRetryCount          ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   HttpDxeExtra.uni

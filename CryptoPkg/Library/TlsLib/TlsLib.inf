@@ -41,6 +41,9 @@
   OpensslLib
   SafeIntLib
 
+[FixedPcd]
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+
 [BuildOptions]
   #
   # suppress the following warnings so we do not break the build with warnings-as-errors:

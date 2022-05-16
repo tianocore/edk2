@@ -2,6 +2,7 @@
 # CryptoPkg DSC file used to build host-based unit tests.
 #
 # Copyright (c) Microsoft Corporation.<BR>
+# Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -21,6 +22,9 @@
 [LibraryClasses]
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/UnitTestHostBaseCryptLib.inf
+  MmServicesTableLib|MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
+  SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
+  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
 
 [LibraryClasses.AARCH64, LibraryClasses.ARM]
   RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
@@ -39,4 +43,3 @@
   MSFT:*_*_*_CC_FLAGS  = /D ENABLE_MD5_DEPRECATED_INTERFACES
   INTEL:*_*_*_CC_FLAGS = /D ENABLE_MD5_DEPRECATED_INTERFACES
   GCC:*_*_*_CC_FLAGS   = -D ENABLE_MD5_DEPRECATED_INTERFACES
-  RVCT:*_*_*_CC_FLAGS  = -DENABLE_MD5_DEPRECATED_INTERFACES

@@ -69,7 +69,7 @@ Tianocore Stewards
 ------------------
 F: *
 M: Andrew Fish <afish@apple.com> [ajfish]
-M: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 
 Responsible Disclosure, Reporting Security Issues
@@ -86,7 +86,7 @@ UEFI Shell Binaries (ShellBinPkg.zip) from EDK II Releases:
 W: https://github.com/tianocore/edk2/releases/
 M: Ray Ni <ray.ni@intel.com> [niruiyu]                        (Ia32/X64)
 M: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]           (Ia32/X64)
-M: Leif Lindholm <leif@nuviainc.com> [leiflindholm]           (ARM/AArch64)
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]           (ARM/AArch64)
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel] (ARM/AArch64)
 
 EDK II Architectures:
@@ -94,7 +94,7 @@ EDK II Architectures:
 ARM, AARCH64
 F: */AArch64/
 F: */Arm/
-M: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 
 RISCV64
@@ -130,20 +130,21 @@ EDK II Packages:
 ArmPkg
 F: ArmPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
-M: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
+R: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 
 ArmPlatformPkg
 F: ArmPlatformPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPlatformPkg
-M: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 
 ArmVirtPkg
 F: ArmVirtPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
-R: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
+R: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 R: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 
@@ -169,7 +170,7 @@ F: CryptoPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 M: Jian J Wang <jian.j.wang@intel.com> [jwang36]
-R: Xiaoyu Lu <xiaoyux.lu@intel.com> [xiaoyuxlu]
+R: Xiaoyu Lu <xiaoyu1.lu@intel.com> [xiaoyuxlu]
 R: Guomin Jiang <guomin.jiang@intel.com> [guominjia]
 
 DynamicTablesPkg
@@ -181,7 +182,7 @@ M: Alexei Fedorov <Alexei.Fedorov@arm.com> [AlexeiFedorov]
 EmbeddedPkg
 F: EmbeddedPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
-M: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Abner Chang <abner.chang@hpe.com> [changab]
 R: Daniel Schaefer <daniel.schaefer@hpe.com> [JohnAZoidberg]
@@ -192,6 +193,11 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
 M: Andrew Fish <afish@apple.com> [ajfish]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 S: Maintained
+
+EmulatorPkg: Redfish-related modules
+F: EmulatorPkg/*Redfish*
+M: Abner Chang <abner.chang@hpe.com> [changab]
+R: Nickle Wang <nickle.wang@hpe.com> [nicklela]
 
 FatPkg
 F: FatPkg/
@@ -476,9 +482,9 @@ R: Tom Lendacky <thomas.lendacky@amd.com> [tlendacky]
 
 OvmfPkg: FDT related modules
 F: OvmfPkg/Fdt
-R: Leif Lindholm <leif@nuviainc.com>
-R: Gerd Hoffmann <kraxel@redhat.com>
-R: Abner Chang <abner.chang@hpe.com>
+R: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
+R: Abner Chang <abner.chang@hpe.com> [changab]
 
 OvmfPkg: LsiScsi driver
 F: OvmfPkg/LsiScsiDxe/
@@ -533,6 +539,14 @@ PcAtChipsetPkg
 F: PcAtChipsetPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/PcAtChipsetPkg
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
+
+PrmPkg
+F: PrmPkg/
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
+M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
+
+PrmPkg: ACPI related modules
+R: Ankit Sinha <ankit.sinha@intel.com> [ankit13s]
 
 RedfishPkg: Redfish related modules
 F: RedfishPkg/
@@ -600,11 +614,13 @@ M: Guo Dong <guo.dong@intel.com> [gdong1]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Maurice Ma <maurice.ma@intel.com> [mauricema]
 R: Benjamin You <benjamin.you@intel.com> [BenjaminYou]
+R: Sean Rhodes <sean@starlabs.systems>
 S: Maintained
 
 UnitTestFrameworkPkg
 F: UnitTestFrameworkPkg/
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 R: Sean Brogan <sean.brogan@microsoft.com> [spbrogan]
 R: Bret Barkelew <Bret.Barkelew@microsoft.com> [corthon]
 S: Maintained

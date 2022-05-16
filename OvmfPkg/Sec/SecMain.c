@@ -17,6 +17,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
+#include <Library/CpuLib.h>
 #include <Library/UefiCpuLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/IoLib.h>
@@ -26,9 +27,10 @@
 #include <Library/ExtractGuidedSectionLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
-
 #include <Ppi/TemporaryRamSupport.h>
-
+#include <Ppi/MpInitLibDep.h>
+#include <Library/PlatformInitLib.h>
+#include <Library/CcProbeLib.h>
 #include "AmdSev.h"
 
 #define SEC_IDT_ENTRY_COUNT  34
@@ -60,11 +62,29 @@ EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI  mTemporaryRamSupportPpi = {
   TemporaryRamMigration
 };
 
-EFI_PEI_PPI_DESCRIPTOR  mPrivateDispatchTable[] = {
+EFI_PEI_PPI_DESCRIPTOR  mPrivateDispatchTableMp[] = {
   {
-    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    (EFI_PEI_PPI_DESCRIPTOR_PPI),
     &gEfiTemporaryRamSupportPpiGuid,
     &mTemporaryRamSupportPpi
+  },
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiPeiMpInitLibMpDepPpiGuid,
+    NULL
+  },
+};
+
+EFI_PEI_PPI_DESCRIPTOR  mPrivateDispatchTableUp[] = {
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI),
+    &gEfiTemporaryRamSupportPpiGuid,
+    &mTemporaryRamSupportPpi
+  },
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiPeiMpInitLibUpDepPpiGuid,
+    NULL
   },
 };
 
@@ -738,6 +758,20 @@ SecCoreStartupWithStack (
   UINT32                Index;
   volatile UINT8        *Table;
 
+ #if defined (TDX_GUEST_SUPPORTED)
+  if (CcProbe () == CcGuestTypeIntelTdx) {
+    //
+    // For Td guests, the memory map info is in TdHobLib. It should be processed
+    // first so that the memory is accepted. Otherwise access to the unaccepted
+    // memory will trigger tripple fault.
+    //
+    if (ProcessTdxHobList () != EFI_SUCCESS) {
+      CpuDeadLoop ();
+    }
+  }
+
+ #endif
+
   //
   // To ensure SMM can't be compromised on S3 resume, we must force re-init of
   // the BaseExtractGuidedSectionLib. Since this is before library contructors
@@ -756,13 +790,19 @@ SecCoreStartupWithStack (
   // we use a loop rather than CopyMem.
   //
   IdtTableInStack.PeiService = NULL;
-  for (Index = 0; Index < SEC_IDT_ENTRY_COUNT; Index++) {
-    UINT8  *Src;
-    UINT8  *Dst;
-    UINTN  Byte;
 
-    Src = (UINT8 *)&mIdtEntryTemplate;
-    Dst = (UINT8 *)&IdtTableInStack.IdtTable[Index];
+  for (Index = 0; Index < SEC_IDT_ENTRY_COUNT; Index++) {
+    //
+    // Declare the local variables that actually move the data elements as
+    // volatile to prevent the optimizer from replacing this function with
+    // the intrinsic memcpy()
+    //
+    CONST UINT8     *Src;
+    volatile UINT8  *Dst;
+    UINTN           Byte;
+
+    Src = (CONST UINT8 *)&mIdtEntryTemplate;
+    Dst = (volatile UINT8 *)&IdtTableInStack.IdtTable[Index];
     for (Byte = 0; Byte < sizeof (mIdtEntryTemplate); Byte++) {
       Dst[Byte] = Src[Byte];
     }
@@ -807,6 +847,17 @@ SecCoreStartupWithStack (
     //
     AsmEnableCache ();
   }
+
+ #if defined (TDX_GUEST_SUPPORTED)
+  if (CcProbe () == CcGuestTypeIntelTdx) {
+    //
+    // InitializeCpuExceptionHandlers () should be called in Td guests so that
+    // #VE exceptions can be handled correctly.
+    //
+    InitializeCpuExceptionHandlers (NULL);
+  }
+
+ #endif
 
   DEBUG ((
     DEBUG_INFO,
@@ -904,6 +955,7 @@ SecStartupPhase2 (
   EFI_SEC_PEI_HAND_OFF        *SecCoreData;
   EFI_FIRMWARE_VOLUME_HEADER  *BootFv;
   EFI_PEI_CORE_ENTRY_POINT    PeiCoreEntryPoint;
+  EFI_PEI_PPI_DESCRIPTOR      *EfiPeiPpiDescriptor;
 
   SecCoreData = (EFI_SEC_PEI_HAND_OFF *)Context;
 
@@ -917,9 +969,19 @@ SecStartupPhase2 (
   SecCoreData->BootFirmwareVolumeSize = (UINTN)BootFv->FvLength;
 
   //
+  // Td guest is required to use the MpInitLibUp (unique-processor version).
+  // Other guests use the MpInitLib (multi-processor version).
+  //
+  if (CcProbe () == CcGuestTypeIntelTdx) {
+    EfiPeiPpiDescriptor = (EFI_PEI_PPI_DESCRIPTOR *)&mPrivateDispatchTableUp;
+  } else {
+    EfiPeiPpiDescriptor = (EFI_PEI_PPI_DESCRIPTOR *)&mPrivateDispatchTableMp;
+  }
+
+  //
   // Transfer the control to the PEI core
   //
-  (*PeiCoreEntryPoint)(SecCoreData, (EFI_PEI_PPI_DESCRIPTOR *)&mPrivateDispatchTable);
+  (*PeiCoreEntryPoint)(SecCoreData, EfiPeiPpiDescriptor);
 
   //
   // If we get here then the PEI Core returned, which is not recoverable.

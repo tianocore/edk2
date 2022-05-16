@@ -2,12 +2,14 @@
   ACPI parser
 
   Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
+  Copyright (c) 2022, AMD Incorporated. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <Uefi.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/BaseMemoryLib.h>
 #include "AcpiParser.h"
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
@@ -751,4 +753,190 @@ ParseAcpiHeader (
   *Revision  = AcpiHdrInfo.Revision;
 
   return BytesParsed;
+}
+
+/**
+  This function is used to parse an ACPI table bitfield buffer.
+
+  The ACPI table buffer is parsed using the ACPI table parser information
+  specified by a pointer to an array of ACPI_PARSER elements. This parser
+  function iterates through each item on the ACPI_PARSER array and logs the ACPI table bitfields.
+
+  This function can optionally be used to parse ACPI tables and fetch specific
+  field values. The ItemPtr member of the ACPI_PARSER structure (where used)
+  is updated by this parser function to point to the selected field data
+  (e.g. useful for variable length nested fields).
+
+  ItemPtr member of ACPI_PARSER is not supported with this function.
+
+  @param [in] Trace        Trace the ACPI fields TRUE else only parse the
+                           table.
+  @param [in] Indent       Number of spaces to indent the output.
+  @param [in] AsciiName    Optional pointer to an ASCII string that describes
+                           the table being parsed.
+  @param [in] Ptr          Pointer to the start of the buffer.
+  @param [in] Length       Length in bytes of the buffer pointed by Ptr.
+  @param [in] Parser       Pointer to an array of ACPI_PARSER structure that
+                           describes the table being parsed.
+  @param [in] ParserItems  Number of items in the ACPI_PARSER array.
+
+  @retval Number of bits parsed.
+**/
+UINT32
+EFIAPI
+ParseAcpiBitFields (
+  IN BOOLEAN            Trace,
+  IN UINT32             Indent,
+  IN CONST CHAR8        *AsciiName OPTIONAL,
+  IN UINT8              *Ptr,
+  IN UINT32             Length,
+  IN CONST ACPI_PARSER  *Parser,
+  IN UINT32             ParserItems
+  )
+{
+  UINT32   Index;
+  UINT32   Offset;
+  BOOLEAN  HighLight;
+  UINTN    OriginalAttribute;
+
+  UINT64  Data;
+  UINT64  BitsData;
+
+  if ((Length == 0) || (Length > 8)) {
+    IncrementErrorCount ();
+    Print (
+      L"\nERROR: Bitfield Length(%d) is zero or exceeding the 64 bit limit.\n",
+      Length
+      );
+    return 0;
+  }
+
+  //
+  // set local variables to suppress incorrect compiler/analyzer warnings
+  //
+  OriginalAttribute = 0;
+  Offset            = 0;
+
+  // Increment the Indent
+  gIndent += Indent;
+
+  CopyMem ((VOID *)&BitsData, (VOID *)Ptr, Length);
+  if (Trace && (AsciiName != NULL)) {
+    HighLight = GetColourHighlighting ();
+
+    if (HighLight) {
+      OriginalAttribute = gST->ConOut->Mode->Attribute;
+      gST->ConOut->SetAttribute (
+                     gST->ConOut,
+                     EFI_TEXT_ATTR (
+                       EFI_YELLOW,
+                       ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)
+                       )
+                     );
+    }
+
+    Print (
+      L"%*a%-*a :\n",
+      gIndent,
+      "",
+      (OUTPUT_FIELD_COLUMN_WIDTH - gIndent),
+      AsciiName
+      );
+    if (HighLight) {
+      gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
+    }
+  }
+
+  for (Index = 0; Index < ParserItems; Index++) {
+    if ((Offset + Parser[Index].Length) > (Length * 8)) {
+      // For fields outside the buffer length provided, reset any pointers
+      // which were supposed to be updated by this function call
+      if (Parser[Index].ItemPtr != NULL) {
+        *Parser[Index].ItemPtr = NULL;
+      }
+
+      // We don't parse past the end of the max length specified
+      continue;
+    }
+
+    if (Parser[Index].Length == 0) {
+      IncrementErrorCount ();
+      // don't parse the bitfield whose length is zero
+      Print (
+        L"\nERROR: %a: Cannot parse this field, Field Length = %d\n",
+        Parser[Index].Length
+        );
+      continue;
+    }
+
+    if (GetConsistencyChecking () &&
+        (Offset != Parser[Index].Offset))
+    {
+      IncrementErrorCount ();
+      Print (
+        L"\nERROR: %a: Offset Mismatch for %s\n"
+        L"CurrentOffset = %d FieldOffset = %d\n",
+        AsciiName,
+        Parser[Index].NameStr,
+        Offset,
+        Parser[Index].Offset
+        );
+    }
+
+    // extract Bitfield data for the current item
+    Data = RShiftU64 (BitsData, Parser[Index].Offset) & ~(LShiftU64 (~0ULL, Parser[Index].Length));
+
+    if (Trace) {
+      // if there is a Formatter function let the function handle
+      // the printing else if a Format is specified in the table use
+      // the Format for printing
+      PrintFieldName (2, Parser[Index].NameStr);
+      if (Parser[Index].PrintFormatter != NULL) {
+        Parser[Index].PrintFormatter (Parser[Index].Format, (UINT8 *)&Data);
+      } else if (Parser[Index].Format != NULL) {
+        // convert bit length to byte length
+        switch ((Parser[Index].Length + 7) >> 3) {
+          // print the data depends on byte size
+          case 1:
+            DumpUint8 (Parser[Index].Format, (UINT8 *)&Data);
+            break;
+          case 2:
+            DumpUint16 (Parser[Index].Format, (UINT8 *)&Data);
+            break;
+          case 3:
+          case 4:
+            DumpUint32 (Parser[Index].Format, (UINT8 *)&Data);
+            break;
+          case 5:
+          case 6:
+          case 7:
+          case 8:
+            DumpUint64 (Parser[Index].Format, (UINT8 *)&Data);
+            break;
+          default:
+            Print (
+              L"\nERROR: %a: CANNOT PARSE THIS FIELD, Field Length = %d\n",
+              AsciiName,
+              Parser[Index].Length
+              );
+        } // switch
+      }
+
+      // Validating only makes sense if we are tracing
+      // the parsed table entries, to report by table name.
+      if (GetConsistencyChecking () &&
+          (Parser[Index].FieldValidator != NULL))
+      {
+        Parser[Index].FieldValidator ((UINT8 *)&Data, Parser[Index].Context);
+      }
+
+      Print (L"\n");
+    } // if (Trace)
+
+    Offset += Parser[Index].Length;
+  } // for
+
+  // Decrement the Indent
+  gIndent -= Indent;
+  return Offset;
 }

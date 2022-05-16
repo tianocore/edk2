@@ -130,8 +130,6 @@ TlsSetVerify (
   ASSERT (FALSE);
 }
 
-// MU_CHANGE - Proposed fixes for TCBZ960, invalid domain name (CN) accepted. [BEGIN]
-
 /**
   Set the specified host name to be verified.
 
@@ -155,8 +153,6 @@ TlsSetVerifyHost (
   ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
-
-// MU_CHANGE - Proposed fixes for TCBZ960, invalid domain name (CN) accepted. [END]
 
 /**
   Sets a TLS/SSL session ID to be used during TLS/SSL connect.

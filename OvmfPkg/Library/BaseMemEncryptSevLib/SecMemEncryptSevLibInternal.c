@@ -18,7 +18,33 @@
 #include <Uefi/UefiBaseType.h>
 
 /**
-  Reads and sets the status of SEV features.
+   Read the workarea to determine whether SEV is enabled. If enabled,
+   then return the SevEsWorkArea pointer.
+
+  **/
+STATIC
+SEC_SEV_ES_WORK_AREA *
+EFIAPI
+GetSevEsWorkArea (
+  VOID
+  )
+{
+  OVMF_WORK_AREA  *WorkArea;
+
+  WorkArea = (OVMF_WORK_AREA *)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+
+  //
+  // If its not SEV guest then SevEsWorkArea is not valid.
+  //
+  if ((WorkArea == NULL) || (WorkArea->Header.GuestType != CcGuestTypeAmdSev)) {
+    return NULL;
+  }
+
+  return (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+}
+
+/**
+  Read the SEV Status MSR value from the workarea
 
   **/
 STATIC
@@ -28,38 +54,14 @@ InternalMemEncryptSevStatus (
   VOID
   )
 {
-  UINT32                            RegEax;
-  CPUID_MEMORY_ENCRYPTION_INFO_EAX  Eax;
-  BOOLEAN                           ReadSevMsr;
-  SEC_SEV_ES_WORK_AREA              *SevEsWorkArea;
+  SEC_SEV_ES_WORK_AREA  *SevEsWorkArea;
 
-  ReadSevMsr = FALSE;
-
-  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
-  if ((SevEsWorkArea != NULL) && (SevEsWorkArea->EncryptionMask != 0)) {
-    //
-    // The MSR has been read before, so it is safe to read it again and avoid
-    // having to validate the CPUID information.
-    //
-    ReadSevMsr = TRUE;
-  } else {
-    //
-    // Check if memory encryption leaf exist
-    //
-    AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
-    if (RegEax >= CPUID_MEMORY_ENCRYPTION_INFO) {
-      //
-      // CPUID Fn8000_001F[EAX] Bit 1 (Sev supported)
-      //
-      AsmCpuid (CPUID_MEMORY_ENCRYPTION_INFO, &Eax.Uint32, NULL, NULL, NULL);
-
-      if (Eax.Bits.SevBit) {
-        ReadSevMsr = TRUE;
-      }
-    }
+  SevEsWorkArea = GetSevEsWorkArea ();
+  if (SevEsWorkArea == NULL) {
+    return 0;
   }
 
-  return ReadSevMsr ? AsmReadMsr32 (MSR_SEV_STATUS) : 0;
+  return (UINT32)(UINTN)SevEsWorkArea->SevStatusMsrValue;
 }
 
 /**
@@ -130,22 +132,14 @@ MemEncryptSevGetEncryptionMask (
   VOID
   )
 {
-  CPUID_MEMORY_ENCRYPTION_INFO_EBX  Ebx;
-  SEC_SEV_ES_WORK_AREA              *SevEsWorkArea;
-  UINT64                            EncryptionMask;
+  SEC_SEV_ES_WORK_AREA  *SevEsWorkArea;
 
-  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
-  if (SevEsWorkArea != NULL) {
-    EncryptionMask = SevEsWorkArea->EncryptionMask;
-  } else {
-    //
-    // CPUID Fn8000_001F[EBX] Bit 0:5 (memory encryption bit position)
-    //
-    AsmCpuid (CPUID_MEMORY_ENCRYPTION_INFO, NULL, &Ebx.Uint32, NULL, NULL);
-    EncryptionMask = LShiftU64 (1, Ebx.Bits.PtePosBits);
+  SevEsWorkArea = GetSevEsWorkArea ();
+  if (SevEsWorkArea == NULL) {
+    return 0;
   }
 
-  return EncryptionMask;
+  return SevEsWorkArea->EncryptionMask;
 }
 
 /**

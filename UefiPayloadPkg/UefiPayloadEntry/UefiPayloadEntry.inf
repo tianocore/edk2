@@ -54,6 +54,7 @@
   HobLib
   PeCoffLib
   PlatformSupportLib
+  CpuLib
   UefiCpuLib
 
 [Guids]
@@ -86,8 +87,15 @@
   gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize
   gUefiPayloadPkgTokenSpaceGuid.PcdBootloaderParameter
   gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
+  gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS
+  gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
+  gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType
+  gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
+  gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
+
+  gUefiPayloadPkgTokenSpaceGuid.PcdDispatchModuleAbove4GMemory
 

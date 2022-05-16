@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -20,16 +20,17 @@
 
 
 **/
-UINT32
+UINTN
+EFIAPI
 SwapStack (
-  IN  UINT32  NewStack
+  IN  UINTN  NewStack
   )
 {
   FSP_GLOBAL_DATA  *FspData;
-  UINT32           OldStack;
+  UINTN            OldStack;
 
   FspData            = GetFspGlobalDataPointer ();
   OldStack           = FspData->CoreStack;
-  FspData->CoreStack = NewStack;
+  FspData->CoreStack = (UINTN) NewStack;
   return OldStack;
 }

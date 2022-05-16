@@ -199,6 +199,43 @@
   $(OPENSSL_PATH)/crypto/dso/dso_vms.c
   $(OPENSSL_PATH)/crypto/dso/dso_win32.c
   $(OPENSSL_PATH)/crypto/ebcdic.c
+  $(OPENSSL_PATH)/crypto/ec/curve25519.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/curve448/arch_32/f_impl.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/curve448/curve448.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/curve448/curve448_tables.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/curve448/eddsa.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/curve448/f_generic.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/curve448/scalar.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec2_oct.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec2_smpl.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec_ameth.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec_asn1.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec_check.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec_curve.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec_cvt.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec_err.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec_key.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec_kmeth.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec_lib.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec_mult.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec_oct.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec_pmeth.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ec_print.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ecdh_kdf.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ecdh_ossl.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ecdsa_ossl.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ecdsa_sign.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ecdsa_vrf.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/eck_prn.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ecp_mont.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ecp_nist.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ecp_nistp224.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ecp_nistp256.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ecp_nistp521.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ecp_nistputil.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ecp_oct.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ecp_smpl.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/ecx_meth.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
   $(OPENSSL_PATH)/crypto/err/err.c
   $(OPENSSL_PATH)/crypto/err/err_prn.c
   $(OPENSSL_PATH)/crypto/evp/bio_b64.c
@@ -384,6 +421,10 @@
   $(OPENSSL_PATH)/crypto/siphash/siphash.c
   $(OPENSSL_PATH)/crypto/siphash/siphash_ameth.c
   $(OPENSSL_PATH)/crypto/siphash/siphash_pmeth.c
+  $(OPENSSL_PATH)/crypto/sm2/sm2_crypt.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/sm2/sm2_err.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/sm2/sm2_pmeth.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/sm2/sm2_sign.c      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
   $(OPENSSL_PATH)/crypto/sm3/m_sm3.c
   $(OPENSSL_PATH)/crypto/sm3/sm3.c
   $(OPENSSL_PATH)/crypto/sm4/sm4.c
@@ -496,6 +537,15 @@
   $(OPENSSL_PATH)/crypto/conf/conf_local.h
   $(OPENSSL_PATH)/crypto/dh/dh_local.h
   $(OPENSSL_PATH)/crypto/dso/dso_local.h
+  $(OPENSSL_PATH)/crypto/ec/ec_local.h      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/curve448/curve448_local.h      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/curve448/curve448utils.h      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/curve448/ed448.h      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/curve448/field.h      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/curve448/point_448.h      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/curve448/word.h      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/curve448/arch_32/arch_intrinsics.h      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  $(OPENSSL_PATH)/crypto/ec/curve448/arch_32/f_impl.h      |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
   $(OPENSSL_PATH)/crypto/evp/evp_local.h
   $(OPENSSL_PATH)/crypto/hmac/hmac_local.h
   $(OPENSSL_PATH)/crypto/lhash/lhash_local.h
@@ -587,6 +637,9 @@
 [LibraryClasses.ARM]
   ArmSoftFloatLib
 
+[FixedPcd]
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled      ## CONSUMES
+
 [BuildOptions]
   #
   # Disables the following Visual Studio compiler warnings brought by openssl source,
@@ -645,7 +698,6 @@
   #    1: ignore "#1-D: last line of file ends without a newline"
   # 3017: <entity> may be used before being set (NOTE: This was fixed in OpenSSL 1.1 HEAD with
   #       commit d9b8b89bec4480de3a10bdaf9425db371c19145b, and can be dropped then.)
-  RVCT:*_*_ARM_CC_FLAGS     = $(OPENSSL_FLAGS) --library_interface=aeabi_clib99 --diag_suppress=1296,1295,550,1293,111,68,177,223,144,513,188,128,546,1,3017 -JCryptoPkg/Include
   XCODE:*_*_IA32_CC_FLAGS   = -mmmx -msse -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -w -std=c99 -Wno-error=uninitialized
   XCODE:*_*_X64_CC_FLAGS    = -mmmx -msse -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -w -std=c99 -Wno-error=uninitialized
 

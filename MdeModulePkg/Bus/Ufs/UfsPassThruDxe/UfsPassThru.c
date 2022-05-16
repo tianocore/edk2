@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -834,15 +834,17 @@ UfsPassThruDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS                          Status;
-  EDKII_UFS_HOST_CONTROLLER_PROTOCOL  *UfsHc;
-  UFS_PASS_THRU_PRIVATE_DATA          *Private;
-  UINTN                               UfsHcBase;
-  UINT32                              Index;
-  UFS_UNIT_DESC                       UnitDescriptor;
-  UFS_DEV_DESC                        DeviceDescriptor;
-  UINT32                              UnitDescriptorSize;
-  UINT32                              DeviceDescriptorSize;
+  EFI_STATUS                             Status;
+  EDKII_UFS_HOST_CONTROLLER_PROTOCOL     *UfsHc;
+  UFS_PASS_THRU_PRIVATE_DATA             *Private;
+  UINTN                                  UfsHcBase;
+  UINT32                                 Index;
+  UFS_UNIT_DESC                          UnitDescriptor;
+  UFS_DEV_DESC                           DeviceDescriptor;
+  UINT32                                 UnitDescriptorSize;
+  UINT32                                 DeviceDescriptorSize;
+  EDKII_UFS_CARD_REF_CLK_FREQ_ATTRIBUTE  Attributes;
+  UINT8                                  RefClkAttr;
 
   Status    = EFI_SUCCESS;
   UfsHc     = NULL;
@@ -932,6 +934,54 @@ UfsPassThruDriverBindingStart (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Device failed to finish initialization, Status = %r\n", Status));
     goto Error;
+  }
+
+  if ((mUfsHcPlatform != NULL) &&
+      ((mUfsHcPlatform->RefClkFreq == EdkiiUfsCardRefClkFreq19p2Mhz) ||
+       (mUfsHcPlatform->RefClkFreq == EdkiiUfsCardRefClkFreq26Mhz) ||
+       (mUfsHcPlatform->RefClkFreq == EdkiiUfsCardRefClkFreq38p4Mhz)))
+  {
+    RefClkAttr = UfsAttrRefClkFreq;
+    Attributes = EdkiiUfsCardRefClkFreqObsolete;
+    Status     = UfsRwAttributes (Private, TRUE, RefClkAttr, 0, 0, (UINT32 *)&Attributes);
+    if (!EFI_ERROR (Status)) {
+      if (Attributes != mUfsHcPlatform->RefClkFreq) {
+        Attributes = mUfsHcPlatform->RefClkFreq;
+        DEBUG (
+          (DEBUG_INFO,
+           "Setting bRefClkFreq attribute(%x) to %x\n  0 -> 19.2 Mhz\n  1 -> 26 Mhz\n  2 -> 38.4 Mhz\n  3 -> Obsolete\n",
+           RefClkAttr,
+           Attributes)
+          );
+        Status = UfsRwAttributes (Private, FALSE, RefClkAttr, 0, 0, (UINT32 *)&Attributes);
+        if (EFI_ERROR (Status)) {
+          DEBUG (
+            (DEBUG_ERROR,
+             "Failed to Change Reference Clock Attribute to %d, Status = %r \n",
+             mUfsHcPlatform->RefClkFreq,
+             Status)
+            );
+        }
+      }
+    } else {
+      DEBUG (
+        (DEBUG_ERROR,
+         "Failed to Read Reference Clock Attribute, Status = %r \n",
+         Status)
+        );
+    }
+  }
+
+  if ((mUfsHcPlatform != NULL) && (mUfsHcPlatform->Callback != NULL)) {
+    Status = mUfsHcPlatform->Callback (Private->Handle, EdkiiUfsHcPostLinkStartup, &Private->UfsHcDriverInterface);
+    if (EFI_ERROR (Status)) {
+      DEBUG (
+        (DEBUG_ERROR,
+         "Failure from platform driver during EdkiiUfsHcPostLinkStartup, Status = %r\n",
+         Status)
+        );
+      return Status;
+    }
   }
 
   //

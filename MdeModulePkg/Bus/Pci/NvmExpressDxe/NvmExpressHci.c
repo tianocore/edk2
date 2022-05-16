@@ -728,20 +728,9 @@ NvmeControllerInit (
   UINT8                Mn[41];
 
   //
-  // Save original PCI attributes and enable this controller.
+  // Enable this controller.
   //
   PciIo  = Private->PciIo;
-  Status = PciIo->Attributes (
-                    PciIo,
-                    EfiPciIoAttributeOperationGet,
-                    0,
-                    &Private->PciAttributes
-                    );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
   Status = PciIo->Attributes (
                     PciIo,
                     EfiPciIoAttributeOperationSupported,
@@ -765,19 +754,6 @@ NvmeControllerInit (
   }
 
   //
-  // Enable 64-bit DMA support in the PCI layer.
-  //
-  Status = PciIo->Attributes (
-                    PciIo,
-                    EfiPciIoAttributeOperationEnable,
-                    EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE,
-                    NULL
-                    );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "NvmeControllerInit: failed to enable 64-bit DMA (%r)\n", Status));
-  }
-
-  //
   // Read the Controller Capabilities register and verify that the NVM command set is supported
   //
   Status = ReadNvmeControllerCapabilities (Private, &Private->Cap);
@@ -785,7 +761,7 @@ NvmeControllerInit (
     return Status;
   }
 
-  if (Private->Cap.Css != 0x01) {
+  if ((Private->Cap.Css & BIT0) == 0) {
     DEBUG ((DEBUG_INFO, "NvmeControllerInit: the controller doesn't support NVMe command set\n"));
     return EFI_UNSUPPORTED;
   }

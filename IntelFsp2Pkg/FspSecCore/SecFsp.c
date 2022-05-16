@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -26,7 +26,7 @@ FspGetExceptionHandler (
   IA32_IDT_GATE_DESCRIPTOR  *IdtGateDescriptor;
   FSP_INFO_HEADER           *FspInfoHeader;
 
-  FspInfoHeader                      = (FSP_INFO_HEADER *)AsmGetFspInfoHeader ();
+  FspInfoHeader                      = (FSP_INFO_HEADER *)(UINTN)AsmGetFspInfoHeader ();
   ExceptionHandler                   = IdtEntryTemplate;
   IdtGateDescriptor                  = (IA32_IDT_GATE_DESCRIPTOR *)&ExceptionHandler;
   Entry                              = (IdtGateDescriptor->Bits.OffsetHigh << 16) | IdtGateDescriptor->Bits.OffsetLow;
@@ -115,7 +115,7 @@ SecGetPlatformData (
 VOID
 FspGlobalDataInit (
   IN OUT  FSP_GLOBAL_DATA  *PeiFspData,
-  IN UINT32                BootLoaderStack,
+  IN UINTN                 BootLoaderStack,
   IN UINT8                 ApiIdx
   )
 {
@@ -130,7 +130,7 @@ FspGlobalDataInit (
   ZeroMem ((VOID *)PeiFspData, sizeof (FSP_GLOBAL_DATA));
 
   PeiFspData->Signature = FSP_GLOBAL_DATA_SIGNATURE;
-  PeiFspData->Version   = 0;
+  PeiFspData->Version   = FSP_GLOBAL_DATA_VERSION;
   PeiFspData->CoreStack = BootLoaderStack;
   PeiFspData->PerfIdx   = 2;
   PeiFspData->PerfSig   = FSP_PERFORMANCE_DATA_SIGNATURE;
@@ -141,7 +141,7 @@ FspGlobalDataInit (
   // Get FSP Header offset
   // It may have multiple FVs, so look into the last one for FSP header
   //
-  PeiFspData->FspInfoHeader = (FSP_INFO_HEADER *)AsmGetFspInfoHeader ();
+  PeiFspData->FspInfoHeader = (FSP_INFO_HEADER *)(UINTN)AsmGetFspInfoHeader ();
   SecGetPlatformData (PeiFspData);
 
   //
@@ -154,7 +154,7 @@ FspGlobalDataInit (
   //
   FspmUpdDataPtr = (VOID *)GetFspApiParameter ();
   if (FspmUpdDataPtr == NULL) {
-    FspmUpdDataPtr = (VOID *)(PeiFspData->FspInfoHeader->ImageBase + PeiFspData->FspInfoHeader->CfgRegionOffset);
+    FspmUpdDataPtr = (VOID *)(UINTN)(PeiFspData->FspInfoHeader->ImageBase + PeiFspData->FspInfoHeader->CfgRegionOffset);
   }
 
   SetFspUpdDataPointer (FspmUpdDataPtr);
@@ -217,7 +217,7 @@ FspGlobalDataInit (
 **/
 VOID
 FspDataPointerFixUp (
-  IN UINT32  OffsetGap
+  IN UINTN  OffsetGap
   )
 {
   FSP_GLOBAL_DATA  *NewFspData;

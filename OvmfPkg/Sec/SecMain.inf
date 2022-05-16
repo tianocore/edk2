@@ -44,6 +44,7 @@
   BaseMemoryLib
   PeiServicesLib
   PcdLib
+  CpuLib
   UefiCpuLib
   DebugAgentLib
   IoLib
@@ -54,9 +55,12 @@
   LocalApicLib
   MemEncryptSevLib
   CpuExceptionHandlerLib
+  CcProbeLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED
+  gEfiPeiMpInitLibMpDepPpiGuid
+  gEfiPeiMpInitLibUpDepPpiGuid
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
@@ -77,6 +81,9 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedStart
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedEnd
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire

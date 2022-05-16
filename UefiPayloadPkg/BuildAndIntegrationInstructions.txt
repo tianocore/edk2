@@ -38,7 +38,7 @@ B. HOW TO BUILD
    > edksetup.bat
 
    For pure X64 build:
-   > build -a x64 -p UefiPayloadPkg\UefiPayloadPkg.dsc -b <BuildType> -t <ToolChain>
+   > build -a X64 -p UefiPayloadPkg\UefiPayloadPkg.dsc -b <BuildType> -t <ToolChain>
      -D BOOTLOADER=<Bootloader>
 
    For X64 build with IA32 entry point:

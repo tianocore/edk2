@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 #  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #  Portions copyright (c) 2011 - 2019, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
@@ -333,24 +333,6 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) from
 #                               https://acpica.org/downloads
-#   RVCT        -win-   Requires:
-#                             ARM C/C++ Compiler, 5.00
-#                        Optional:
-#                             Required to build EBC drivers:
-#                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
-#                             Required to build platforms or ACPI tables:
-#                               Microsoft ASL ACPI Compiler (asl.exe) v4.0.0 from
-#                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
-#                        Notes: Since this tool chain is obsolete, it doesn't enable the compiler option for included header file list generation,
-#                               and lose the incremental build capability.
-#   RVCTLINUX   -unix-   Requires:
-#                             ARM C/C++ Compiler, 5.00
-#                        Optional:
-#                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler from
-#                               https://acpica.org/downloads
-#                        Notes: Since this tool chain is obsolete, it doesn't enable the compiler option for included header file list generation,
-#                               and lose the incremental build capability.
 # * Commented out - All versions of VS2005 use the same standard install directory
 #
 ####################################################################################
@@ -361,15 +343,14 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #   MSFT           - Microsoft
 #   GCC            - GNU GCC
 #   INTEL          - INTEL
-#   RVCT           - ARM RealView Toolchain
 ####################################################################################
 ####################################################################################
 #
 # Other Supported Tools
 # =====================
 #   NASM -- http://www.nasm.us/
-#   - NASM 2.10 or later for use with the GCC toolchain family
-#   - NASM 2.12.01 or later for use with all other toolchain families
+#   - NASM 2.15.05 or later for use with the GCC toolchain family
+#   - NASM 2.15.05 or later for use with all other toolchain families
 #
 ####################################################################################
 ####################################################################################
@@ -1862,6 +1843,7 @@ NOOPT_VS2019_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 DEBUG_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)/$(MODULE_NAME).debug
 RELEASE_*_*_OBJCOPY_ADDDEBUGFLAG   =
 NOOPT_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)/$(MODULE_NAME).debug
+*_*_*_OBJCOPY_STRIPFLAG            = --strip-unneeded -R .eh_frame
 *_*_*_DTC_FLAGS                    = -H epapr
 *_*_*_DTCPP_PATH                   = DEF(DTCPP_BIN)
 *_*_*_DTC_PATH                     = DEF(DTC_BIN)
@@ -2496,7 +2478,7 @@ RELEASE_GCC5_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 DEFINE CLANG35_ARM_TARGET        = -target arm-linux-gnueabi
 DEFINE CLANG35_AARCH64_TARGET    = -target aarch64-linux-gnu
 
-DEFINE CLANG35_WARNING_OVERRIDES = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unknown-warning-option
+DEFINE CLANG35_WARNING_OVERRIDES = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable
 DEFINE CLANG35_ARM_CC_FLAGS      = DEF(GCC_ARM_CC_FLAGS) DEF(CLANG35_ARM_TARGET) DEF(CLANG35_WARNING_OVERRIDES)
 DEFINE CLANG35_AARCH64_CC_FLAGS  = DEF(GCC_AARCH64_CC_FLAGS) DEF(CLANG35_AARCH64_TARGET) -mcmodel=small DEF(CLANG35_WARNING_OVERRIDES)
 
@@ -2566,7 +2548,7 @@ DEFINE CLANG38_X64_PREFIX           = ENV(CLANG38_BIN)
 DEFINE CLANG38_IA32_TARGET          = -target i686-pc-linux-gnu
 DEFINE CLANG38_X64_TARGET           = -target x86_64-pc-linux-gnu
 
-DEFINE CLANG38_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option
+DEFINE CLANG38_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable
 DEFINE CLANG38_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANG38_WARNING_OVERRIDES) -fno-stack-protector -mms-bitfields -Wno-address -Wno-shift-negative-value -Wno-unknown-pragmas -Wno-incompatible-library-redeclaration -fno-asynchronous-unwind-tables -mno-sse -mno-mmx -msoft-float -mno-implicit-float  -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -funsigned-char -fno-ms-extensions -Wno-null-dereference
 
 ###########################
@@ -3010,144 +2992,6 @@ RELEASE_XCODE5_X64_ASM_FLAGS  = -arch x86_64
   DEBUG_XCODE5_X64_CC_FLAGS   = -target x86_64-pc-win32-macho -c -g -gdwarf -Os       -Wall -Werror -Wextra -include AutoGen.h -funsigned-char -fno-ms-extensions -fno-stack-protector -fno-builtin -fshort-wchar -mno-implicit-float -mms-bitfields -Wno-unused-parameter -Wno-missing-braces -Wno-missing-field-initializers -Wno-tautological-compare -Wno-sign-compare -Wno-varargs -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -D NO_MSABI_VA_FUNCS $(PLATFORM_FLAGS)
   NOOPT_XCODE5_X64_CC_FLAGS   = -target x86_64-pc-win32-macho -c -g -gdwarf -O0       -Wall -Werror -Wextra -include AutoGen.h -funsigned-char -fno-ms-extensions -fno-stack-protector -fno-builtin -fshort-wchar -mno-implicit-float -mms-bitfields -Wno-unused-parameter -Wno-missing-braces -Wno-missing-field-initializers -Wno-tautological-compare -Wno-sign-compare -Wno-varargs -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -D NO_MSABI_VA_FUNCS $(PLATFORM_FLAGS)
 RELEASE_XCODE5_X64_CC_FLAGS   = -target x86_64-pc-win32-macho -c    -Os       -Wall -Werror -Wextra -include AutoGen.h -funsigned-char -fno-ms-extensions -fno-stack-protector -fno-builtin -fshort-wchar -mno-implicit-float -mms-bitfields -Wno-unused-parameter -Wno-missing-braces -Wno-missing-field-initializers -Wno-tautological-compare -Wno-sign-compare -Wno-varargs -Wno-unused-const-variable -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -D NO_MSABI_VA_FUNCS $(PLATFORM_FLAGS)
-
-####################################################################################
-#
-# RVCT Common
-#
-####################################################################################
-
-DEFINE RVCT_ALL_ASM_FLAGS   = --diag_suppress=1786 --diag_error=warning --apcs /interwork
-DEFINE RVCT_ALL_CC_FLAGS    = --c90 --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --enum_is_int --preinclude AutoGen.h --diag_suppress=186,188,1,111,68 --diag_warning 167 --diag_error=warning --diag_style=ide --protect_stack
-DEFINE RVCT_ALL_DLINK_FLAGS = --no_scanlib --no_exceptions --datacompressor off --strict --symbols --diag_style=ide --no_legacyalign --scatter $(EDK_TOOLS_PATH)/Scripts/Rvct-Align32.sct
-
-####################################################################################
-#
-# ARM RealView Tools - Windows
-#
-####################################################################################
-#   RVCT         - Tools from ARM
-
-*_RVCT_*_*_FAMILY          = RVCT
-
-#
-# Use default values, or override in DSC file
-#
-*_RVCT_ARM_ARCHCC_FLAGS    = --thumb --fpu=softvfp
-*_RVCT_ARM_ARCHASM_FLAGS   =
-*_RVCT_ARM_ARCHDLINK_FLAGS =
-*_RVCT_ARM_PLATFORM_FLAGS  = --cpu 7-A
-
-  DEBUG_RVCT_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-RELEASE_RVCT_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-
-
-*_RVCT_ARM_ASM_FLAGS       = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_ASM_FLAGS)
-*_RVCT_ARM_PP_FLAGS        = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E --preinclude AutoGen.h
-*_RVCT_ARM_VFRPP_FLAGS     = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E  -DVFRCOMPILE --preinclude $(MODULE_NAME)StrDefs.h
-*_RVCT_ARM_MAKE_PATH       = nmake /NOLOGO
-*_RVCT_ARM_SLINK_FLAGS     = --partial -o
-  DEBUG_RVCT_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O1 -g
-RELEASE_RVCT_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --diag_suppress=550 DEF(RVCT_ALL_CC_FLAGS) -O2
-
-##################
-# ARM definitions
-##################
-*_RVCT_ARM_CC_PATH         = ENV(RVCT_TOOLS_PATH)armcc
-*_RVCT_ARM_SLINK_PATH      = ENV(RVCT_TOOLS_PATH)armlink
-*_RVCT_ARM_DLINK_PATH      = ENV(RVCT_TOOLS_PATH)armlink
-*_RVCT_ARM_ASM_PATH        = ENV(RVCT_TOOLS_PATH)armasm
-*_RVCT_ARM_PP_PATH         = ENV(RVCT_TOOLS_PATH)armcc
-*_RVCT_ARM_VFRPP_PATH      = ENV(RVCT_TOOLS_PATH)armcc
-*_RVCT_ARM_FROMELF_PATH    = ENV(RVCT_TOOLS_PATH)fromelf
-
-####################################################################################
-#
-# ARM RealView Tools - Linux
-#
-####################################################################################
-#   RVCTLINUX         - Tools from ARM in a Cygwin environment
-*_RVCTLINUX_*_*_FAMILY               = RVCT
-*_RVCTLINUX_*_*_BUILDRULEFAMILY      = RVCTLINUX
-
-*_RVCTLINUX_*_MAKE_PATH       = make
-
-#
-# Use default values, or override in DSC file
-#
-*_RVCTLINUX_ARM_ARCHCC_FLAGS    = --thumb --fpu=softvfp
-*_RVCTLINUX_ARM_ARCHASM_FLAGS   =
-*_RVCTLINUX_ARM_ARCHDLINK_FLAGS =
-*_RVCTLINUX_ARM_PLATFORM_FLAGS  = --cpu 7-A
-
-DEBUG_RVCTLINUX_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-RELEASE_RVCTLINUX_ARM_DLINK_FLAGS   = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-
-*_RVCTLINUX_ARM_ASM_FLAGS       = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_ASM_FLAGS)
-*_RVCTLINUX_ARM_PP_FLAGS        = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E
-*_RVCTLINUX_ARM_VFRPP_FLAGS     = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E  -DVFRCOMPILE --preinclude $(MODULE_NAME)StrDefs.h
-*_RVCTLINUX_ARM_SLINK_FLAGS     = --partial -o
-  DEBUG_RVCTLINUX_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O1 -g
-RELEASE_RVCTLINUX_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --diag_suppress=550 DEF(RVCT_ALL_CC_FLAGS) -O2
-
-##################
-# ARM definitions
-##################
-*_RVCTLINUX_ARM_CC_PATH         = ENV(RVCT_TOOLS_PATH)armcc
-*_RVCTLINUX_ARM_SLINK_PATH      = ENV(RVCT_TOOLS_PATH)armlink
-*_RVCTLINUX_ARM_DLINK_PATH      = ENV(RVCT_TOOLS_PATH)armlink
-*_RVCTLINUX_ARM_ASM_PATH        = ENV(RVCT_TOOLS_PATH)armasm
-*_RVCTLINUX_ARM_PP_PATH         = ENV(RVCT_TOOLS_PATH)armcc
-*_RVCTLINUX_ARM_VFRPP_PATH      = ENV(RVCT_TOOLS_PATH)armcc
-*_RVCTLINUX_ARM_FROMELF_PATH    = ENV(RVCT_TOOLS_PATH)fromelf
-
-####################################################################################
-#
-# ARM RealView Tools - Cygwin
-#
-####################################################################################
-#   ARMCYGWIN         - Tools from ARM in a Cygwin environment
-
-*_RVCTCYGWIN_*_*_FAMILY               = RVCT
-*_RVCTCYGWIN_*_*_BUILDRULEFAMILY      = RVCTCYGWIN
-
-*_RVCTCYGWIN_ARM_CCPATH_FLAG         = ENV(RVCT_TOOLS_PATH)armcc
-*_RVCTCYGWIN_ARM_SLINKPATH_FLAG      = ENV(RVCT_TOOLS_PATH)armlink
-*_RVCTCYGWIN_ARM_DLINKPATH_FLAG      = ENV(RVCT_TOOLS_PATH)armlink
-*_RVCTCYGWIN_ARM_ASMPATH_FLAG        = ENV(RVCT_TOOLS_PATH)armasm
-*_RVCTCYGWIN_ARM_PPPATH_FLAG         = ENV(RVCT_TOOLS_PATH)armcc
-*_RVCTCYGWIN_ARM_VFRPPPATH_FLAG      = ENV(RVCT_TOOLS_PATH)armcc
-*_RVCTCYGWIN_ARM_FROMELFPATH_FLAG    = ENV(RVCT_TOOLS_PATH)fromelf
-
-#
-# Use default values, or override in DSC file
-#
-*_RVCTCYGWIN_ARM_ARCHCC_FLAGS    = --thumb --fpu=softvfp
-*_RVCTCYGWIN_ARM_ARCHASM_FLAGS   =
-*_RVCTCYGWIN_ARM_ARCHDLINK_FLAGS =
-*_RVCTCYGWIN_ARM_PLATFORM_FLAGS  = --cpu 7-A
-
-  DEBUG_RVCTCYGWIN_ARM_DLINK_FLAGS     = "$(DLINKPATH_FLAG)" $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list `cygpath -m $(DEST_DIR_DEBUG)/$(BASE_NAME).map`
-RELEASE_RVCTCYGWIN_ARM_DLINK_FLAGS     = "$(DLINKPATH_FLAG)" $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list `cygpath -m $(DEST_DIR_DEBUG)/$(BASE_NAME).map`
-
-*_RVCTCYGWIN_ARM_ASM_FLAGS       = "$(ASMPATH_FLAG)" $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_ASM_FLAGS)
-*_RVCTCYGWIN_ARM_PP_FLAGS        = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E
-*_RVCTCYGWIN_ARM_VFRPP_FLAGS     = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E  -DVFRCOMPILE --preinclude `cygpath -m $(MODULE_NAME)StrDefs.h`
-*_RVCTCYGWIN_ARM_MAKE_PATH       = make
-*_RVCTCYGWIN_ARM_SLINK_FLAGS     = "$(SLINKPATH_FLAG)" --partial -o
-  DEBUG_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_CC_FLAGS) -O1 -g
-RELEASE_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --diag_suppress=550 DEF(RVCT_ALL_CC_FLAGS) -O2
-
-##################
-# ARM definitions
-##################
-*_RVCTCYGWIN_ARM_CC_PATH         = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
-*_RVCTCYGWIN_ARM_SLINK_PATH      = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
-*_RVCTCYGWIN_ARM_DLINK_PATH      = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
-*_RVCTCYGWIN_ARM_ASM_PATH        = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
-*_RVCTCYGWIN_ARM_PP_PATH         = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
-*_RVCTCYGWIN_ARM_VFRPP_PATH      = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
-*_RVCTCYGWIN_ARM_FROMELF_PATH    = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
 
 #################
 # ASM 16 linker definitions

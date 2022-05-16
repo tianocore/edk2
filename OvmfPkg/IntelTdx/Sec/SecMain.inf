@@ -1,0 +1,62 @@
+## @file
+#  SEC Driver
+#
+#  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecMain
+  FILE_GUID                      = 69d96630-eb64-4b33-8491-13a5cf023dcf
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SecMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  SecMain.c
+  X64/SecEntry.nasm
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  OvmfPkg/OvmfPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  PcdLib
+  UefiCpuLib
+  DebugAgentLib
+  IoLib
+  PeCoffLib
+  PeCoffGetEntryPointLib
+  PeCoffExtraActionLib
+  ExtractGuidedSectionLib
+  LocalApicLib
+  MemEncryptSevLib
+  CpuExceptionHandlerLib
+  PeilessStartupLib
+  PlatformInitLib
+  CcProbeLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
+  gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase

@@ -1,7 +1,7 @@
 /** @file
 Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
-Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -43,6 +43,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiLib.h>
 #include <Library/HobLib.h>
 #include <Library/LocalApicLib.h>
+#include <Library/CpuLib.h>
 #include <Library/UefiCpuLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Library/ReportStatusCodeLib.h>
@@ -428,6 +429,7 @@ typedef struct {
   volatile SMM_CPU_SYNC_MODE    EffectiveSyncMode;
   volatile BOOLEAN              SwitchBsp;
   volatile BOOLEAN              *CandidateBsp;
+  volatile BOOLEAN              AllApArrivedWithException;
   EFI_AP_PROCEDURE              StartupProcedure;
   VOID                          *StartupProcArgs;
 } SMM_DISPATCHER_MP_SYNC_DATA;
@@ -1485,6 +1487,32 @@ InitializeDataForMmMp (
 **/
 BOOLEAN
 IsRestrictedMemoryAccess (
+  VOID
+  );
+
+/**
+  Choose blocking or non-blocking mode to Wait for all APs.
+
+  @param[in]  This                  A pointer to the EDKII_SMM_CPU_RENDEZVOUS_PROTOCOL instance.
+  @param[in]  BlockingMode          Blocking or non-blocking mode.
+
+  @retval EFI_SUCCESS               All APs have arrived SMM mode except SMI disabled APs.
+  @retval EFI_TIMEOUT               There are APs not in SMM mode in given timeout constraint.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmCpuRendezvous (
+  IN  EDKII_SMM_CPU_RENDEZVOUS_PROTOCOL  *This,
+  IN  BOOLEAN                            BlockingMode
+  );
+
+/**
+  Insure when this function returns, no AP will execute normal mode code before entering SMM, except SMI disabled APs.
+
+**/
+VOID
+SmmWaitForApArrival (
   VOID
   );
 

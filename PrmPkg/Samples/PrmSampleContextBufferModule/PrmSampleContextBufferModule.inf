@@ -1,0 +1,44 @@
+## @file
+#  Sample PRM Driver
+#
+#  A sample PRM Module implementation. This PRM Module includes a PRM Module configuration library instance
+#  that applies the configuration for the PRM context data in the boot environment. A PRM handler
+#  is provided that accesses the context buffer resources and prints their value at OS runtime.
+#
+#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x00010005
+  BASE_NAME           = PrmSampleContextBufferModule
+  FILE_GUID           = 5A6CF42B-8BB4-472C-A233-5C4DC4033DC7
+  MODULE_TYPE         = DXE_RUNTIME_DRIVER
+  VERSION_STRING      = 1.0
+  ENTRY_POINT         = PrmSampleContextBufferModuleInit
+
+[Sources]
+  Include/StaticData.h
+  PrmSampleContextBufferModule.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  PrmPkg/PrmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PrintLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Depex]
+  TRUE
+
+[BuildOptions.common]
+  MSFT:*_*_*_DLINK_FLAGS  = /DLL /SUBSYSTEM:CONSOLE /VERSION:1.0
+  MSFT:*_*_*_GENFW_FLAGS = --keepoptionalheader

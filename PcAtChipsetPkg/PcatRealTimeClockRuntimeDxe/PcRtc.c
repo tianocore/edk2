@@ -270,13 +270,6 @@ PcRtcInit (
   Time.Year   = RtcRead (RTC_ADDRESS_YEAR);
 
   //
-  // Set RTC configuration after get original time
-  // The value of bit AIE should be reserved.
-  //
-  RegisterB.Data = FixedPcdGet8 (PcdInitialValueRtcRegisterB) | (RegisterB.Data & BIT5);
-  RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
-
-  //
   // Release RTC Lock.
   //
   if (!EfiAtRuntime ()) {
@@ -329,6 +322,13 @@ PcRtcInit (
     Time.TimeZone   = EFI_UNSPECIFIED_TIMEZONE;
     Time.Daylight   = 0;
   }
+
+  //
+  // Set RTC configuration after get original time
+  // The value of bit AIE should be reserved.
+  //
+  RegisterB.Data = FixedPcdGet8 (PcdInitialValueRtcRegisterB) | (RegisterB.Data & BIT5);
+  RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
 
   //
   // Reset time value according to new RTC configuration
@@ -995,13 +995,16 @@ ConvertRtcTimeToEfiTime (
   BOOLEAN  IsPM;
   UINT8    Century;
 
-  if ((Time->Hour & 0x80) != 0) {
-    IsPM = TRUE;
-  } else {
-    IsPM = FALSE;
-  }
+  // IsPM only makes sense for 12-hour format.
+  if (RegisterB.Bits.Mil == 0) {
+    if ((Time->Hour & 0x80) != 0) {
+      IsPM = TRUE;
+    } else {
+      IsPM = FALSE;
+    }
 
-  Time->Hour = (UINT8)(Time->Hour & 0x7f);
+    Time->Hour = (UINT8)(Time->Hour & 0x7f);
+  }
 
   if (RegisterB.Bits.Dm == 0) {
     Time->Year   = CheckAndConvertBcd8ToDecimal8 ((UINT8)Time->Year);

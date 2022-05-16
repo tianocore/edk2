@@ -18,6 +18,7 @@ from edk2toolext.environment.plugin_manager import PluginManager
 from edk2toolext.environment.plugintypes.ci_build_plugin import ICiBuildPlugin
 from edk2toolext.environment.plugintypes.uefi_helper_plugin import HelperFunctions
 from edk2toolext.environment.var_dict import VarDict
+from edk2toollib.gitignore_parser import parse_gitignore_lines
 from edk2toollib.log.junit_report_format import JunitReportTestCase
 from edk2toollib.uefi.edk2.path_utilities import Edk2Path
 from edk2toollib.utility_functions import  RunCmd
@@ -273,6 +274,24 @@ class UncrustifyCheck(ICiBuildPlugin):
             f"-c {self._app_config_file} -F {self._app_input_file_path} --if-changed --suffix {UncrustifyCheck.FORMATTED_FILE_EXTENSION}", outstream=output)
         self._app_output = output.getvalue().strip().splitlines()
 
+    def _get_files_ignored_in_config(self):
+        """"
+        Returns a function that returns true if a given file string path is ignored in the plugin configuration file and false otherwise.
+        """
+        ignored_files = []
+        if "IgnoreFiles" in self._package_config:
+            ignored_files = self._package_config["IgnoreFiles"]
+
+        # Pass "Package configuration file" as the source file path since
+        # the actual configuration file name is unknown to this plugin and
+        # this provides a generic description of the file that provided
+        # the ignore file content.
+        #
+        # This information is only used for reporting (not used here) and
+        # the ignore lines are being passed directly as they are given to
+        # this plugin.
+        return parse_gitignore_lines(ignored_files, "Package configuration file", self._abs_workspace_path)
+
     def _get_git_ignored_paths(self) -> List[str]:
         """"
         Returns a list of file absolute path strings to all files ignored in this git repository.
@@ -292,7 +311,12 @@ class UncrustifyCheck(ICiBuildPlugin):
                 f"An error occurred reading git ignore settings. This will prevent Uncrustify from running against the expected set of files.")
 
         # Note: This will potentially be a large list, but at least sorted
-        return outstream_buffer.getvalue().strip().splitlines()
+        rel_paths = outstream_buffer.getvalue().strip().splitlines()
+        abs_paths = []
+        for path in rel_paths:
+            abs_paths.append(
+                os.path.normpath(os.path.join(self._abs_workspace_path, path)))
+        return abs_paths
 
     def _get_git_submodule_paths(self) -> List[str]:
         """
@@ -421,7 +445,7 @@ class UncrustifyCheck(ICiBuildPlugin):
         """
         Initializes plugin environment information.
         """
-        self._abs_package_path = edk2_path.GetAbsolutePathOnThisSytemFromEdk2RelativePath(
+        self._abs_package_path = edk2_path.GetAbsolutePathOnThisSystemFromEdk2RelativePath(
             package_rel_path)
         self._abs_workspace_path = edk2_path.WorkspacePath
         self._package_config = package_config
@@ -460,6 +484,19 @@ class UncrustifyCheck(ICiBuildPlugin):
             self._abs_file_paths_to_format.extend(
                 [str(path.resolve()) for path in pathlib.Path(self._abs_package_path).rglob(path)])
 
+        # Remove files ignore in the plugin configuration file
+        plugin_ignored_files = list(filter(self._get_files_ignored_in_config(), self._abs_file_paths_to_format))
+
+        if plugin_ignored_files:
+            logging.info(
+                f"{self._package_name} file count before plugin ignore file exclusion: {len(self._abs_file_paths_to_format)}")
+            for path in plugin_ignored_files:
+                if path in self._abs_file_paths_to_format:
+                    logging.info(f"  File ignored in plugin config file: {path}")
+                    self._abs_file_paths_to_format.remove(path)
+            logging.info(
+                f"{self._package_name} file count after plugin ignore file exclusion: {len(self._abs_file_paths_to_format)}")
+
         if not "SkipGitExclusions" in self._package_config or not self._package_config["SkipGitExclusions"]:
             # Remove files ignored by git
             logging.info(
@@ -494,13 +531,13 @@ class UncrustifyCheck(ICiBuildPlugin):
         Initializes options that influence test case output.
         """
         self._audit_only_mode = False
-        self._output_file_diffs = False
+        self._output_file_diffs = True
 
         if "AuditOnly" in self._package_config and self._package_config["AuditOnly"]:
             self._audit_only_mode = True
 
-        if "OutputFileDiffs" in self._package_config and self._package_config["OutputFileDiffs"]:
-            self._output_file_diffs = True
+        if "OutputFileDiffs" in self._package_config and not self._package_config["OutputFileDiffs"]:
+            self._output_file_diffs = False
 
     def _log_uncrustify_app_info(self) -> None:
         """
@@ -525,6 +562,11 @@ class UncrustifyCheck(ICiBuildPlugin):
         self._formatted_file_error_count = len(formatted_files)
 
         if self._formatted_file_error_count > 0:
+            logging.error(
+                "Visit the following instructions to learn "
+                "how to find the detailed formatting errors in Azure "
+                "DevOps CI: "
+                "https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Code-Formatting#how-to-find-uncrustify-formatting-errors-in-continuous-integration-ci")
             self._tc.LogStdError("Files with formatting errors:\n")
 
             if self._output_file_diffs:

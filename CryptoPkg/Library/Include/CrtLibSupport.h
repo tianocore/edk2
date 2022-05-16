@@ -2,7 +2,7 @@
   Root include file of C runtime library to support building the third-party
   cryptographic library.
 
-Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define OPENSSLDIR  ""
 #define ENGINESDIR  ""
+#define MODULESDIR  ""
 
 #define MAX_STRING_SIZE  0x1000
 
@@ -79,8 +80,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EINVAL        22              /* Invalid argument */
 #define EAFNOSUPPORT  47              /* Address family not supported by protocol family */
 #define INT_MAX       0x7FFFFFFF      /* Maximum (signed) int value */
+#define INT_MIN       (-INT_MAX-1)    /* Minimum (signed) int value */
 #define LONG_MAX      0X7FFFFFFFL     /* max value for a long */
 #define LONG_MIN      (-LONG_MAX-1)   /* min value for a long */
+#define UINT_MAX      0xFFFFFFFF      /* Maximum unsigned int value */
 #define ULONG_MAX     0xFFFFFFFF      /* Maximum unsigned long value */
 #define CHAR_BIT      8               /* Number of bits in a char */
 
@@ -101,6 +104,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Basic types mapping
 //
 typedef UINTN   size_t;
+typedef UINTN   off_t;
 typedef UINTN   u_int;
 typedef INTN    ptrdiff_t;
 typedef INTN    ssize_t;
@@ -391,6 +395,12 @@ inet_pton   (
   void *
   );
 
+char *
+strcpy (
+  char        *strDest,
+  const char  *strSource
+  );
+
 //
 // Macros that directly map functions to BaseLib, BaseMemoryLib, and DebugLib functions
 //
@@ -400,11 +410,11 @@ inet_pton   (
 #define memcmp(buf1, buf2, count)           (int)(CompareMem(buf1,buf2,(UINTN)(count)))
 #define memmove(dest, source, count)        CopyMem(dest,source,(UINTN)(count))
 #define strlen(str)                         (size_t)(AsciiStrnLenS(str,MAX_STRING_SIZE))
-#define strcpy(strDest, strSource)          AsciiStrCpyS(strDest,MAX_STRING_SIZE,strSource)
 #define strncpy(strDest, strSource, count)  AsciiStrnCpyS(strDest,MAX_STRING_SIZE,strSource,(UINTN)count)
 #define strcat(strDest, strSource)          AsciiStrCatS(strDest,MAX_STRING_SIZE,strSource)
 #define strncmp(string1, string2, count)    (int)(AsciiStrnCmp(string1,string2,(UINTN)(count)))
 #define strcasecmp(str1, str2)              (int)AsciiStriCmp(str1,str2)
+#define strstr(s1, s2)                      AsciiStrStr(s1,s2)
 #define sprintf(buf, ...)                   AsciiSPrint(buf,MAX_STRING_SIZE,__VA_ARGS__)
 #define localtime(timer)                    NULL
 #define assert(expression)

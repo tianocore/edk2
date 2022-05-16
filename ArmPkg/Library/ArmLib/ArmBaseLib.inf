@@ -30,11 +30,6 @@
   Arm/ArmV7Support.S            | GCC
   Arm/ArmV7ArchTimerSupport.S   | GCC
 
-  Arm/ArmLibSupport.asm         | RVCT
-  Arm/ArmLibSupportV7.asm       | RVCT
-  Arm/ArmV7Support.asm          | RVCT
-  Arm/ArmV7ArchTimerSupport.asm | RVCT
-
 [Sources.AARCH64]
   AArch64/AArch64Lib.h
   AArch64/AArch64Lib.c

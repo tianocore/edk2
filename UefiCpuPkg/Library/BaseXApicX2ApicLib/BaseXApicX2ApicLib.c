@@ -22,11 +22,156 @@
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
 #include <Library/PcdLib.h>
+#include <Library/CpuLib.h>
 #include <Library/UefiCpuLib.h>
+#include <IndustryStandard/Tdx.h>
 
 //
 // Library internal functions
 //
+
+/**
+  Some MSRs in TDX are accessed via TdCall.
+  Some are directly read/write from/to CPU.
+
+  @param  MsrIndex  Index of the MSR
+  @retval TRUE      MSR accessed via TdCall.
+  @retval FALSE     MSR accessed not via TdCall.
+
+**/
+BOOLEAN
+AccessMsrTdxCall (
+  IN UINT32  MsrIndex
+  )
+{
+  if (!TdIsEnabled ()) {
+    return FALSE;
+  }
+
+  switch (MsrIndex) {
+    case MSR_IA32_X2APIC_TPR:
+    case MSR_IA32_X2APIC_PPR:
+    case MSR_IA32_X2APIC_EOI:
+    case MSR_IA32_X2APIC_ISR0:
+    case MSR_IA32_X2APIC_ISR1:
+    case MSR_IA32_X2APIC_ISR2:
+    case MSR_IA32_X2APIC_ISR3:
+    case MSR_IA32_X2APIC_ISR4:
+    case MSR_IA32_X2APIC_ISR5:
+    case MSR_IA32_X2APIC_ISR6:
+    case MSR_IA32_X2APIC_ISR7:
+    case MSR_IA32_X2APIC_TMR0:
+    case MSR_IA32_X2APIC_TMR1:
+    case MSR_IA32_X2APIC_TMR2:
+    case MSR_IA32_X2APIC_TMR3:
+    case MSR_IA32_X2APIC_TMR4:
+    case MSR_IA32_X2APIC_TMR5:
+    case MSR_IA32_X2APIC_TMR6:
+    case MSR_IA32_X2APIC_TMR7:
+    case MSR_IA32_X2APIC_IRR0:
+    case MSR_IA32_X2APIC_IRR1:
+    case MSR_IA32_X2APIC_IRR2:
+    case MSR_IA32_X2APIC_IRR3:
+    case MSR_IA32_X2APIC_IRR4:
+    case MSR_IA32_X2APIC_IRR5:
+    case MSR_IA32_X2APIC_IRR6:
+    case MSR_IA32_X2APIC_IRR7:
+      return FALSE;
+    default:
+      break;
+  }
+
+  return TRUE;
+}
+
+/**
+  Read MSR value.
+
+  @param  MsrIndex  Index of the MSR to read
+  @retval 64-bit    Value of MSR.
+
+**/
+UINT64
+LocalApicReadMsrReg64 (
+  IN UINT32  MsrIndex
+  )
+{
+  UINT64  Val;
+  UINT64  Status;
+
+  if (AccessMsrTdxCall (MsrIndex)) {
+    Status = TdVmCall (TDVMCALL_RDMSR, (UINT64)MsrIndex, 0, 0, 0, &Val);
+    if (Status != 0) {
+      TdVmCall (TDVMCALL_HALT, 0, 0, 0, 0, 0);
+    }
+  } else {
+    Val = AsmReadMsr64 (MsrIndex);
+  }
+
+  return Val;
+}
+
+/**
+  Write to MSR.
+
+  @param  MsrIndex  Index of the MSR to write to
+  @param  Value     Value to be written to the MSR
+
+  @return Value
+
+**/
+UINT64
+LocalApicWriteMsrReg64 (
+  IN UINT32  MsrIndex,
+  IN UINT64  Value
+  )
+{
+  UINT64  Status;
+
+  if (AccessMsrTdxCall (MsrIndex)) {
+    Status = TdVmCall (TDVMCALL_WRMSR, (UINT64)MsrIndex, Value, 0, 0, 0);
+    if (Status != 0) {
+      TdVmCall (TDVMCALL_HALT, 0, 0, 0, 0, 0);
+    }
+  } else {
+    AsmWriteMsr64 (MsrIndex, Value);
+  }
+
+  return Value;
+}
+
+/**
+  Read MSR value.
+
+  @param  MsrIndex  Index of the MSR to read
+  @retval 32-bit    Value of MSR.
+
+**/
+UINT32
+LocalApicReadMsrReg32 (
+  IN UINT32  MsrIndex
+  )
+{
+  return (UINT32)LocalApicReadMsrReg64 (MsrIndex);
+}
+
+/**
+  Write to MSR.
+
+  @param  MsrIndex  Index of the MSR to write to
+  @param  Value     Value to be written to the MSR
+
+  @return Value
+
+**/
+UINT32
+LocalApicWriteMsrReg32 (
+  IN UINT32  MsrIndex,
+  IN UINT32  Value
+  )
+{
+  return (UINT32)LocalApicWriteMsrReg64 (MsrIndex, Value);
+}
 
 /**
   Determine if the CPU supports the Local APIC Base Address MSR.
@@ -78,7 +223,7 @@ GetLocalApicBaseAddress (
     return PcdGet32 (PcdCpuLocalApicBaseAddress);
   }
 
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+  ApicBaseMsr.Uint64 = LocalApicReadMsrReg64 (MSR_IA32_APIC_BASE);
 
   return (UINTN)(LShiftU64 ((UINT64)ApicBaseMsr.Bits.ApicBaseHi, 32)) +
          (((UINTN)ApicBaseMsr.Bits.ApicBase) << 12);
@@ -109,12 +254,12 @@ SetLocalApicBaseAddress (
     return;
   }
 
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+  ApicBaseMsr.Uint64 = LocalApicReadMsrReg64 (MSR_IA32_APIC_BASE);
 
   ApicBaseMsr.Bits.ApicBase   = (UINT32)(BaseAddress >> 12);
   ApicBaseMsr.Bits.ApicBaseHi = (UINT32)(RShiftU64 ((UINT64)BaseAddress, 32));
 
-  AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
+  LocalApicWriteMsrReg64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
 }
 
 /**
@@ -154,7 +299,7 @@ ReadLocalApicReg (
     ASSERT (MmioOffset != XAPIC_ICR_HIGH_OFFSET);
 
     MsrIndex = (UINT32)(MmioOffset >> 4) + X2APIC_MSR_BASE_ADDRESS;
-    return AsmReadMsr32 (MsrIndex);
+    return LocalApicReadMsrReg32 (MsrIndex);
   }
 }
 
@@ -203,7 +348,7 @@ WriteLocalApicReg (
     // Use memory fence here to force the serializing semantics to be consisent with xAPIC mode.
     //
     MemoryFence ();
-    AsmWriteMsr32 (MsrIndex, Value);
+    LocalApicWriteMsrReg32 (MsrIndex, Value);
   }
 }
 
@@ -309,7 +454,7 @@ GetApicMode (
     return LOCAL_APIC_MODE_XAPIC;
   }
 
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+  ApicBaseMsr.Uint64 = LocalApicReadMsrReg64 (MSR_IA32_APIC_BASE);
   //
   // Local APIC should have been enabled
   //
@@ -354,9 +499,9 @@ SetApicMode (
       case LOCAL_APIC_MODE_XAPIC:
         break;
       case LOCAL_APIC_MODE_X2APIC:
-        ApicBaseMsr.Uint64    = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+        ApicBaseMsr.Uint64    = LocalApicReadMsrReg64 (MSR_IA32_APIC_BASE);
         ApicBaseMsr.Bits.EXTD = 1;
-        AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
+        LocalApicWriteMsrReg64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
         break;
       default:
         ASSERT (FALSE);
@@ -823,11 +968,6 @@ InitializeApicTimer (
   //
   InitializeLocalApicSoftwareEnable (TRUE);
 
-  //
-  // Program init-count register.
-  //
-  WriteLocalApicReg (XAPIC_TIMER_INIT_COUNT_OFFSET, InitCount);
-
   if (DivideValue != 0) {
     ASSERT (DivideValue <= 128);
     ASSERT (DivideValue == GetPowerOfTwo32 ((UINT32)DivideValue));
@@ -852,6 +992,11 @@ InitializeApicTimer (
   LvtTimer.Bits.Mask   = 0;
   LvtTimer.Bits.Vector = Vector;
   WriteLocalApicReg (XAPIC_LVT_TIMER_OFFSET, LvtTimer.Uint32);
+
+  //
+  // Program init-count register.
+  //
+  WriteLocalApicReg (XAPIC_TIMER_INIT_COUNT_OFFSET, InitCount);
 }
 
 /**

@@ -251,7 +251,7 @@ IsSevGuest (
 
   WorkArea = (OVMF_WORK_AREA *)FixedPcdGet32 (PcdOvmfWorkAreaBase);
 
-  return ((WorkArea != NULL) && (WorkArea->Header.GuestType == GUEST_TYPE_AMD_SEV));
+  return ((WorkArea != NULL) && (WorkArea->Header.GuestType == CcGuestTypeAmdSev));
 }
 
 /**
@@ -278,7 +278,7 @@ SevEsIsEnabled (
 
   SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
 
-  return (SevEsWorkArea->SevEsEnabled != 0);
+  return ((SevEsWorkArea->SevStatusMsrValue & BIT1) != 0);
 }
 
 /**

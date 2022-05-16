@@ -49,6 +49,7 @@
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiPciIoProtocolGuid                         # PROTOCOL SOMETIMES_CONSUMED
+  gQemuAcpiTableNotifyProtocolGuid              # PROTOCOL PRODUCES
 
 [Guids]
   gRootBridgesConnectedEventGroupGuid
@@ -56,6 +57,8 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtr
+  gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtrSize
 
 [Depex]
   gEfiAcpiTableProtocolGuid

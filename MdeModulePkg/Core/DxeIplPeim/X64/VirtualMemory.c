@@ -15,7 +15,7 @@
     2) IA-32 Intel(R) Architecture Software Developer's Manual Volume 2:Instruction Set Reference, Intel
     3) IA-32 Intel(R) Architecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -179,9 +179,11 @@ EnableExecuteDisableBit (
 {
   UINT64  MsrRegisters;
 
-  MsrRegisters  = AsmReadMsr64 (0xC0000080);
-  MsrRegisters |= BIT11;
-  AsmWriteMsr64 (0xC0000080, MsrRegisters);
+  MsrRegisters = AsmReadMsr64 (0xC0000080);
+  if ((MsrRegisters & BIT11) == 0) {
+    MsrRegisters |= BIT11;
+    AsmWriteMsr64 (0xC0000080, MsrRegisters);
+  }
 }
 
 /**
@@ -748,8 +750,8 @@ CreateIdentityMappingPageTables (
       CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS,
       CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO,
       NULL,
-      &EcxFlags.Uint32,
       NULL,
+      &EcxFlags.Uint32,
       NULL
       );
     if (EcxFlags.Bits.FiveLevelPage != 0) {

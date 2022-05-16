@@ -14,8 +14,8 @@
 !include OvmfPkg/OvmfPkgDefines.fdf.inc
 
 #
-# Build the variable store and the firmware code as one unified flash device
-# image.
+# This will allow the flash device image to be recognize as an ELF, with first
+# an ELF headers, then the firmware code.
 #
 [FD.CLOUDHV]
 BaseAddress   = $(FW_BASE_ADDRESS)
@@ -24,38 +24,17 @@ ErasePolarity = 1
 BlockSize     = $(BLOCK_SIZE)
 NumBlocks     = $(FW_BLOCKS)
 
-!include OvmfPkg/VarStore.fdf.inc
+#
+# Leaving 4kiB for the PVH ELF header. This is more than enough.
+#
+0x00000000|0x00001000
 
-$(VARS_SIZE)|$(FVMAIN_SIZE)
+!include CloudHvElfHeader.fdf.inc
+
+0x00001000|$(FVMAIN_SIZE)
 FV = FVMAIN_COMPACT
 
 $(SECFV_OFFSET)|$(SECFV_SIZE)
-FV = SECFV
-
-#
-# Build the variable store and the firmware code as separate flash device
-# images.
-#
-[FD.CLOUDHV_VARS]
-BaseAddress   = $(FW_BASE_ADDRESS)
-Size          = $(VARS_SIZE)
-ErasePolarity = 1
-BlockSize     = $(BLOCK_SIZE)
-NumBlocks     = $(VARS_BLOCKS)
-
-!include OvmfPkg/VarStore.fdf.inc
-
-[FD.CLOUDHV_CODE]
-BaseAddress   = $(CODE_BASE_ADDRESS)
-Size          = $(CODE_SIZE)
-ErasePolarity = 1
-BlockSize     = $(BLOCK_SIZE)
-NumBlocks     = $(CODE_BLOCKS)
-
-0x00000000|$(FVMAIN_SIZE)
-FV = FVMAIN_COMPACT
-
-$(FVMAIN_SIZE)|$(SECFV_SIZE)
 FV = SECFV
 
 ################################################################################
@@ -93,6 +72,9 @@ gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase|gUefiOvmfPkgTokenSpaceGuid.PcdO
 
 0x00E000|0x001000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize
+
+0x00F000|0x001000
+gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtr|gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtrSize
 
 0x010000|0x010000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
@@ -142,7 +124,7 @@ READ_LOCK_STATUS   = TRUE
 #
 INF  OvmfPkg/Sec/SecMain.inf
 
-INF  RuleOverride=RESET_VECTOR OvmfPkg/ResetVector/ResetVector.inf
+INF  RuleOverride=RESET_VECTOR OvmfPkg/XenResetVector/XenResetVector.inf
 
 ################################################################################
 [FV.PEIFV]
@@ -234,7 +216,7 @@ INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 INF  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
 INF  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
 INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
-INF  OvmfPkg/XenTimerDxe/XenTimerDxe.inf
+INF  OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
 INF  OvmfPkg/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupport.inf
 INF  OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
 INF  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
