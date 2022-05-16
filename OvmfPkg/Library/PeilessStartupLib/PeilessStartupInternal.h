@@ -52,4 +52,21 @@ EFIAPI
 ConstructSecHobList (
   );
 
+/**
+  Check the integrity of CFV data.
+
+  @param[in] TdxCfvBase - A pointer to CFV header
+  @param[in] TdxCfvSize - CFV data size
+
+  @retval  TRUE   - The CFV data is valid.
+  @retval  FALSE  - The CFV data is invalid.
+
+**/
+BOOLEAN
+EFIAPI
+TdxValidateCfv (
+  IN UINT8   *TdxCfvBase,
+  IN UINT32  TdxCfvSize
+  );
+
 #endif
