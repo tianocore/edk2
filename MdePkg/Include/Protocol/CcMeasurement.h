@@ -299,4 +299,25 @@ typedef struct {
 
 extern EFI_GUID  gEfiCcFinalEventsTableGuid;
 
+//
+// Define the CC Measure EventLog ACPI Table
+//
+#pragma pack(1)
+
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  EFI_CC_TYPE                    CcType;
+  UINT16                         Rsvd;
+  UINT64                         Laml;
+  UINT64                         Lasa;
+} EFI_CC_EVENTLOG_ACPI_TABLE;
+
+#pragma pack()
+
+//
+// Define the signature and revision of CC Measurement EventLog ACPI Table
+//
+#define EFI_CC_EVENTLOG_ACPI_TABLE_SIGNATURE  SIGNATURE_32('C', 'C', 'E', 'L')
+#define EFI_CC_EVENTLOG_ACPI_TABLE_REVISION   1
+
 #endif
