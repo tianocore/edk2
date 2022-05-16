@@ -109,6 +109,9 @@
 [LibraryClasses.ARM]
   ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
 
+[LibraryClasses.common.SEC]
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SecCryptLib.inf
+
 [LibraryClasses.common.PEIM]
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
@@ -236,6 +239,7 @@
 !if $(CRYPTO_SERVICES) == PACKAGE
 [Components]
   CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  CryptoPkg/Library/BaseCryptLib/SecCryptLib.inf
   CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
   CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
