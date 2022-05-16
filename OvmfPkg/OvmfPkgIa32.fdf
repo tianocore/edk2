@@ -76,6 +76,9 @@ gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase|gUefiOvmfPkgTokenSpaceGuid.
 0x007000|0x001000
 gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
 
+0x008000|0x001000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
+
 0x010000|0x010000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
 
@@ -86,6 +89,14 @@ FV = PEIFV
 0x100000|0xC00000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
 FV = DXEFV
+
+##########################################################################################
+# Set the SEV-ES specific work area PCDs (used for all forms of SEV since the
+# the SEV STATUS MSR is now saved in the work area)
+#
+SET gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase = $(MEMFD_BASE_ADDRESS) +  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase + gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader
+SET gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaSize = gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize - gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader
+##########################################################################################
 
 ################################################################################
 

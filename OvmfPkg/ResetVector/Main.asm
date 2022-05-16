@@ -76,6 +76,12 @@ SearchBfv:
 %ifdef ARCH_IA32
 
     ;
+    ; SEV support can be built and run using the Ia32/X64 split environment.
+    ; Set the OVMF/SEV work area as appropriate.
+    ;
+    OneTimeCall CheckSevFeatures
+
+    ;
     ; Restore initial EAX value into the EAX register
     ;
     mov     eax, esp
