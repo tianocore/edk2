@@ -72,6 +72,7 @@
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   SecureBootVariableLib|SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
   SecureBootVariableProvisionLib|SecurityPkg/Library/SecureBootVariableProvisionLib/SecureBootVariableProvisionLib.inf
+  TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
@@ -91,6 +92,12 @@
 
 [LibraryClasses.RISCV64]
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+
+[LibraryClasses.X64.SEC]
+  HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
+
+[LibraryClasses.X64.DXE_DRIVER]
+  HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
 
 [LibraryClasses.common.PEIM]
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
@@ -282,6 +289,9 @@
   # Random Number Generator
   #
   SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+
+[Components.X64]
+  SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
 
 [Components.IA32, Components.X64]
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
