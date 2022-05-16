@@ -581,7 +581,7 @@ CoreLoadPeImage (
   )
 {
   EFI_STATUS  Status;
-  BOOLEAN     DstBufAlocated;
+  BOOLEAN     DstBufAllocated;
   UINTN       Size;
 
   ZeroMem (&Image->ImageContext, sizeof (Image->ImageContext));
@@ -636,7 +636,7 @@ CoreLoadPeImage (
   //
   // Allocate memory of the correct memory type aligned on the required image boundary
   //
-  DstBufAlocated = FALSE;
+  DstBufAllocated = FALSE;
   if (DstBuffer == 0) {
     //
     // Allocate Destination Buffer as caller did not pass it in
@@ -702,7 +702,7 @@ CoreLoadPeImage (
       return Status;
     }
 
-    DstBufAlocated = TRUE;
+    DstBufAllocated = TRUE;
   } else {
     //
     // Caller provided the destination buffer
@@ -884,7 +884,7 @@ Done:
   // Free memory.
   //
 
-  if (DstBufAlocated) {
+  if (DstBufAllocated) {
     CoreFreePages (Image->ImageContext.ImageAddress, Image->NumberOfPages);
     Image->ImageContext.ImageAddress = 0;
     Image->ImageBasePage             = 0;
