@@ -82,20 +82,31 @@
             "Library/GoogleTestLib/googletest/**/*.*"  # not going to spell check a submodule
         ],
         "ExtendWords": [             # words to extend to the dictionary for this package
-            "testcase",
-            "testsuites",
-            "cmocka",
+            "assertnotefierror",
+            "assertnotnull",
+            "assertstatusequal",
             "buildmodule",
+            "cmocka",
+            "cmockery",
+            "corthon",        # Contact GitHub account in Readme
             "criterium",
+            "deadloop",
+            "devpath",
+            "DHAVE",          # build flag for cmocka in the INF
+            "expectassert",
+            "failuretype",
+            "gtest",          # file name in GoogleTestLib.inf
+            "mdkinney",       # Contact GitHub account in Readme
+            "NOFAILURE",
+            "notefierror",
+            "notequal",
             "pytool",
             "pytools",
-            "NOFAILURE",
-            "cmockery",
-            "DHAVE", # build flag for cmocka in the INF
-            "gtest", # file name in GoogleTestLib.inf
-            "corthon",      # Contact GitHub account in Readme
-            "mdkinney",     # Contact GitHub account in Readme
-            "spbrogan"      # Contact GitHub account in Readme
+            "spbrogan",       # Contact GitHub account in Readme
+            "statusequal",
+            "testcase",
+            "testfailuremsg",
+            "testsuites"
         ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)

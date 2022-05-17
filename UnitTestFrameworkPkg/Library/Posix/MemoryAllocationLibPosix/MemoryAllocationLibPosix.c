@@ -27,7 +27,7 @@
 ///
 typedef struct {
   UINT32    Signature;
-  VOID      *AllocatedBufffer;
+  VOID      *AllocatedBuffer;
   UINTN     TotalPages;
   VOID      *AlignedBuffer;
   UINTN     AlignedPages;
@@ -165,16 +165,16 @@ AllocateAlignedPages (
   //
   // We need reserve Alignment pages for PAGE_HEAD, as meta data.
   //
-  PageHead.Signature        = PAGE_HEAD_PRIVATE_SIGNATURE;
-  PageHead.TotalPages       = Pages + EFI_SIZE_TO_PAGES (Alignment) * 2;
-  PageHead.AlignedPages     = Pages;
-  PageHead.AllocatedBufffer = malloc (EFI_PAGES_TO_SIZE (PageHead.TotalPages));
-  if (PageHead.AllocatedBufffer == NULL) {
+  PageHead.Signature       = PAGE_HEAD_PRIVATE_SIGNATURE;
+  PageHead.TotalPages      = Pages + EFI_SIZE_TO_PAGES (Alignment) * 2;
+  PageHead.AlignedPages    = Pages;
+  PageHead.AllocatedBuffer = malloc (EFI_PAGES_TO_SIZE (PageHead.TotalPages));
+  if (PageHead.AllocatedBuffer == NULL) {
     return NULL;
   }
 
-  PageHead.AlignedBuffer = (VOID *)(((UINTN)PageHead.AllocatedBufffer + AlignmentMask) & ~AlignmentMask);
-  if ((UINTN)PageHead.AlignedBuffer - (UINTN)PageHead.AllocatedBufffer < sizeof (PAGE_HEAD)) {
+  PageHead.AlignedBuffer = (VOID *)(((UINTN)PageHead.AllocatedBuffer + AlignmentMask) & ~AlignmentMask);
+  if ((UINTN)PageHead.AlignedBuffer - (UINTN)PageHead.AllocatedBuffer < sizeof (PAGE_HEAD)) {
     PageHead.AlignedBuffer = (VOID *)((UINTN)PageHead.AlignedBuffer + Alignment);
   }
 
@@ -279,7 +279,7 @@ FreeAlignedPages (
   }
 
   PageHeadPtr->Signature = 0;
-  free (PageHeadPtr->AllocatedBufffer);
+  free (PageHeadPtr->AllocatedBuffer);
 }
 
 /**

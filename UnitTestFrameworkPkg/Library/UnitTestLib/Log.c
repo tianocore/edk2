@@ -1,5 +1,5 @@
 /**
-  Implemnet UnitTestLib log services
+  Implement UnitTestLib log services
 
   Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent

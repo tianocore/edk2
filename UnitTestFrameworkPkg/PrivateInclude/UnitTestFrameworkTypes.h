@@ -18,7 +18,7 @@
 #define UNIT_TEST_MAX_STRING_LENGTH  (120)
 
 ///
-/// The size of a firngerprint used to save/resume execution of a unit test
+/// The size of a fingerprint used to save/resume execution of a unit test
 /// framework.  This is the size of a CRC32 value which is 32-bit value.
 ///
 ///

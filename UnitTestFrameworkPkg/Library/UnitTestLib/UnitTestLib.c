@@ -215,7 +215,7 @@ InitUnitTestFramework (
   NewFramework = NULL;
 
   //
-  // First, check all pointers and make sure nothing's broked.
+  // First, check all pointers and make sure nothing is broken.
   //
   if ((FrameworkHandle == NULL) || (Title == NULL) ||
       (ShortTitle == NULL) || (VersionString == NULL))

@@ -19,7 +19,7 @@
 
   @retval EFI_SUCCESS      Boot device for next boot was set.
   @retval EFI_UNSUPPORTED  Setting the boot device for the next boot is not
-                           supportted.
+                           supported.
   @retval Other            Boot device for next boot can not be set.
 **/
 EFI_STATUS
