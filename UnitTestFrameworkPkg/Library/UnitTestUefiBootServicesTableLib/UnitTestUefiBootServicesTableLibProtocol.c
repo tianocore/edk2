@@ -723,7 +723,7 @@ UnitTestReinstallProtocolInterface (
 }
 
 /**
-  Uninstalls all instances of a protocol:interfacer from a handle.
+  Uninstalls all instances of a protocol from a handle.
   If the last protocol interface is remove from the handle, the
   handle is freed.
 

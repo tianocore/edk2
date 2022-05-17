@@ -149,7 +149,7 @@ IsAddressInMmram (
 /**
   Discovers all PRM Modules loaded during boot.
 
-  Each PRM Module discovered is placed into a linked list so the list can br processsed in the future.
+  Each PRM Module discovered is placed into a linked list so the list can br processed in the future.
 
   @param[out]   ModuleCount               An optional pointer parameter that, if provided, is set to the number
                                           of PRM modules discovered.

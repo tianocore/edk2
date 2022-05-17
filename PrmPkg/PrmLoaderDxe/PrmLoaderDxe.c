@@ -295,7 +295,7 @@ PublishPrmAcpiTable (
   time of this function invocation.
 
   The main responsibilities of the PRM Loader are executed from this function which include 3 phases:
-    1.) Disover PRM Modules - Find all PRM modules loaded during DXE dispatch and insert a PRM Module
+    1.) Discover PRM Modules - Find all PRM modules loaded during DXE dispatch and insert a PRM Module
         Context entry into a linked list to be handed off to phase 2.
     2.) Process PRM Modules - Build a GUID to PRM handler mapping for each module that is described in the
         PRM ACPI table so the OS can resolve a PRM Handler GUID to the corresponding PRM Handler physical address.

@@ -72,7 +72,7 @@ typedef struct {
 //
 // Todo: Revisit whether to use; currently both macros are not used
 //
-#define PRM_MODULE_INFORMATION_STRUCTURE(ModuleGuid, ModuleRevision, HandlerCount, PrmHanderInfoStructureArray)  {                      \
+#define PRM_MODULE_INFORMATION_STRUCTURE(ModuleGuid, ModuleRevision, HandlerCount, PrmHandlerInfoStructureArray)  {                     \
     {                                                                                                                                   \
       PRM_MODULE_INFORMATION_STRUCT_REVISION,                                                                                      /* UINT16    StructureRevision;   */                         \
       (OFFSET_OF (PRM_MODULE_INFORMATION_STRUCT, HandlerInfoStructure) + (HandlerCount * sizeof (PRM_HANDLER_INFORMATION_STRUCT))) /* UINT16    StructureLength;     */ \
@@ -80,7 +80,7 @@ typedef struct {
       ModuleRevision,                                                                                                              /* UINT16    ModuleRevision       */                         \
       HandlerCount,                                                                                                                /* UINT16    HandlerCount         */                         \
       OFFSET_OF (PRM_MODULE_INFORMATION_STRUCT, HandlerInfoOffset),                                                                /* UINT32    HandlerInfoOffset    */                         \
-      PrmHanderInfoStructureArray                                                                                                  /* PRM_HANDLER_INFORMATION_STRUCT HandlerInfoStructure */    \
+      PrmHandlerInfoStructureArray                                                                                                 /* PRM_HANDLER_INFORMATION_STRUCT HandlerInfoStructure */    \
     } \
   }
 

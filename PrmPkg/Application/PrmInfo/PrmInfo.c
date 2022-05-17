@@ -148,7 +148,7 @@ PrintMmioRuntimeRangeInfo (
   Gathers the PRM handler (and by extension module) information discovered on this system.
 
   This function must be called to build up the discovered context for other functions in the application. The
-  function will optionally print results as determed by the value of the PrintInformation parameter.
+  function will optionally print results as determined by the value of the PrintInformation parameter.
 
   @param[in] PrintInformation           Indicates whether to print information as discovered in the function.
 

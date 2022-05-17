@@ -354,7 +354,7 @@ UnitTestReinstallProtocolInterface (
   );
 
 /**
-  Uninstalls all instances of a protocol:interfacer from a handle.
+  Uninstalls all instances of a protocol from a handle.
   If the last protocol interface is remove from the handle, the
   handle is freed.
 
@@ -600,7 +600,7 @@ UnitTestExit (
   @retval EFI_SUCCESS             The image has been unloaded.
   @retval EFI_UNSUPPORTED         The image has been started, and does not support
                                   unload.
-  @retval EFI_INVALID_PARAMPETER  ImageHandle is not a valid image handle.
+  @retval EFI_INVALID_PARAMETER   ImageHandle is not a valid image handle.
 
 **/
 EFI_STATUS

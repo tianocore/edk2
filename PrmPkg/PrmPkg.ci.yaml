@@ -94,10 +94,19 @@
                                     # in matching files
         "ExtendWords": [            # words to extend to the dictionary for this package
           "buffe",                  # note: appears in buffer ascii dump in documentation
+          "dbgmsgid",
+          "devicepath",
           "iptor",                  # note: appears in buffer ascii dump in documentation
           "keepoptionalheader",
           "odule",                  # note: appears in buffer ascii dump in documentation
           "oemid",
+          "packagelist",
+          "pecoff",
+          "prmconfig",
+          "prmcontextbufferlib",
+          "prminfo",
+          "prmloader",
+          "prmmodulediscoverylib",
           "prmopreg",
           "prmpecofflib",
           "prmpkg",
