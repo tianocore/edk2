@@ -17,6 +17,6 @@ steps:
     #checkLatest: false # Optional
   condition: and(gt(variables.pkg_count, 0), succeeded())
 
-- script: npm install -g cspell
+- script: npm install -g cspell@5.20.0
   displayName: 'Install cspell npm'
   condition: and(gt(variables.pkg_count, 0), succeeded())
