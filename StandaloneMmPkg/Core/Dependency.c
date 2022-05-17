@@ -38,7 +38,7 @@ BOOLEAN  *mDepexEvaluationStackPointer = NULL;
 /**
   Grow size of the Depex stack
 
-  @retval EFI_SUCCESS           Stack successfully growed.
+  @retval EFI_SUCCESS           Stack successfully grew.
   @retval EFI_OUT_OF_RESOURCES  There is not enough system memory to grow the stack.
 
 **/

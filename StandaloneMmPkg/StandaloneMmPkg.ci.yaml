@@ -81,12 +81,20 @@
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors
                                      # in matching files
         "ExtendWords": [
+            "bootinformation",
             "Bsymbolic",
+            "bugbug",
+            "combineable",
+            "depexes",
             "FwVol",
+            "hoblist",
+            "imagehandle",
             "mpidr",
             "mstrict",
             "schedulable",
             "StandaloneMMCore",
+            "systemtable",
+            "uncacheable"
         ],           # words to extend to the dictionary for this package
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that
                                      # should be ignore

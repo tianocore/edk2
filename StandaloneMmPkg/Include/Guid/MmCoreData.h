@@ -70,7 +70,7 @@ typedef struct {
 
   ///
   /// The MM Foundation Entry Point.  The MM Core fills in this field when the
-  /// MM Core is initialized.  The MM IPL is responsbile for registering this entry
+  /// MM Core is initialized.  The MM IPL is responsible for registering this entry
   /// point with the MM Configuration Protocol.  The MM Configuration Protocol may
   /// not be available at the time the MM IPL and MM Core are started, so the MM IPL
   /// sets up a protocol notification on the MM Configuration Protocol and registers
