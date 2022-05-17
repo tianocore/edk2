@@ -178,6 +178,30 @@
             %endmacro
 
 ;
+; Upper half of YMM10 to save/restore RCX
+;
+;
+; Save RCX to YMM10[128:191]
+; Modified: XMM5 and YMM10
+;
+
+%macro SAVE_RCX     0
+            LYMMN   ymm10, xmm5, 1
+            SXMMN   xmm5, 0, rcx
+            SYMMN   ymm10, 1, xmm5
+            %endmacro
+
+;
+; Restore RCX from YMM10[128:191]
+; Modified: XMM5 and RCX
+;
+
+%macro LOAD_RCX     0
+            LYMMN   ymm10, xmm5, 1
+            movq    rcx,  xmm5
+            %endmacro
+
+;
 ; YMM7[128:191] for calling stack
 ; arg 1:Entry
 ; Modified: RSI, XMM5, YMM7
@@ -231,6 +255,7 @@ NextAddress:
             ; Use CpuId instruction (CPUID.01H:EDX.SSE[bit 25] = 1) to test
             ; whether the processor supports SSE instruction.
             ;
+            mov     r10, rcx
             mov     rax, 1
             cpuid
             bt      rdx, 25
@@ -241,6 +266,7 @@ NextAddress:
             ;
             bt      ecx, 19
             jnc     SseError
+            mov     rcx,  r10
 
             ;
             ; Set OSFXSR bit (bit #9) & OSXMMEXCPT bit (bit #10)
@@ -258,6 +284,7 @@ NextAddress:
             %endmacro
 
 %macro ENABLE_AVX   0
+            mov     r10, rcx
             mov     eax, 1
             cpuid
             and     ecx, 10000000h
@@ -280,5 +307,6 @@ EnableAvx:
             xgetbv                 ; result in edx:eax
             or      eax, 00000006h ; Set XCR0 bit #1 and bit #2 to enable SSE state and AVX state
             xsetbv
+            mov     rcx, r10
             %endmacro
 
