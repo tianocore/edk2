@@ -60,6 +60,10 @@
     "SpellCheck": {
         "ExtendWords": [
             "FMPSTATE",
+            "lastattemptstatus",
+            "lastattemptversion",
+            "lowestsupportedversion",
+            "updateable"
         ]
     },
     "Defines": {
