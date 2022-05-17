@@ -21,7 +21,7 @@
         "*.jpg"
     ],
     "minWordLength": 5,
-    "allowCompoundWords": false,
+    "allowCompoundWords": true,
     "maxNumberOfProblems": 200,
     "maxDuplicateProblems": 200,
     "ignoreWords": [
