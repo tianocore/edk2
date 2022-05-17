@@ -65,7 +65,7 @@ TlsConfigurationSetData (
       Status = TlsSetHostPublicCert (Instance->TlsConn, Data, DataSize);
       break;
     case EfiTlsConfigDataTypeHostPrivateKey:
-      Status = TlsSetHostPrivateKey (Instance->TlsConn, Data, DataSize);
+      Status = TlsSetHostPrivateKey (Instance->TlsConn, Data, DataSize, NULL);
       break;
     case EfiTlsConfigDataTypeCertRevocationList:
       Status = TlsSetCertRevocationList (Data, DataSize);
