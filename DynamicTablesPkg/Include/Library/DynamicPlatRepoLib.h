@@ -38,9 +38,9 @@ DynPlatRepoAddObject (
   OUT       CM_OBJECT_TOKEN                   *Token OPTIONAL
   );
 
-/** Finalise the dynamic repository.
+/** Finalize the dynamic repository.
 
-  Finalising means:
+  Finalizing means:
    - Preventing any further objects from being added.
    - Allowing to get objects from the dynamic repository
      (not possible before a call to this function).

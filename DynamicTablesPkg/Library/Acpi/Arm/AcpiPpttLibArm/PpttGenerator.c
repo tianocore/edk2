@@ -352,7 +352,7 @@ AddPrivateResources (
       return Status;
     }
 
-    // The Node indexer has the Processor hierarchy nodes at the begining
+    // The Node indexer has the Processor hierarchy nodes at the beginning
     // followed by the cache structs. Therefore we can skip the Processor
     // hierarchy nodes in the node indexer search.
     Status = GetPpttNodeReferencedByToken (

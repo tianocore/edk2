@@ -40,7 +40,7 @@ GetGicVersion (
 
 /** Gic dispatcher.
 
-  This disptacher populates the following structures:
+  This dispatcher populates the following structures:
    - CM_ARM_GICC_INFO
    - CM_ARM_GICD_INFO
    - CM_ARM_GIC_MSI_FRAME_INFO

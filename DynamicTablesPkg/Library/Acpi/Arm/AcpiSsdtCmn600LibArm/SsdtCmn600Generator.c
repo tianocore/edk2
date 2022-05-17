@@ -377,7 +377,7 @@ FixupCmn600Info (
     goto error_handler;
   }
 
-  // Serialise the definition block
+  // Serialize the definition block
   Status = AmlSerializeDefinitionBlock (
              RootNodeHandle,
              Table

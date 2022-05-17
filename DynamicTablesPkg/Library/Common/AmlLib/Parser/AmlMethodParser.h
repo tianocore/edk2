@@ -138,7 +138,7 @@ AmlAddNameSpaceReference (
   When computing the size of a tree or serializing it, the additional data is
   not taken into account (i.e. the MethodInvocationOp and the ArgumentCount).
 
-  Method invocation nodes have the AML_METHOD_INVOVATION attribute.
+  Method invocation nodes have the AML_METHOD_INVOCATION attribute.
 
   @param  [in]  NameSpaceRefNode          NameSpaceRef node pointing to the
                                           the definition of the invoked

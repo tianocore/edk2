@@ -14,7 +14,7 @@
 
 /** SerialPort dispatcher.
 
-  This disptacher populates the CM_ARM_SERIAL_PORT_INFO structure for
+  This dispatcher populates the CM_ARM_SERIAL_PORT_INFO structure for
   the following CM_OBJ_ID:
    - EArmObjSerialConsolePortInfo
    - EArmObjSerialDebugPortInfo

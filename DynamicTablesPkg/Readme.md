@@ -11,9 +11,9 @@ UEFI modules.
 
 # Feature Summary
 
-The dynamic tables framework is designed to generate standardised
+The dynamic tables framework is designed to generate standardized
 firmware tables that describe the hardware information at
-run-time. A goal of standardised firmware is to have a common
+run-time. A goal of standardized firmware is to have a common
 firmware for a platform capable of booting both Windows and Linux
 operating systems.
 
