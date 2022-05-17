@@ -51,15 +51,27 @@
     },
     "SpellCheck": {
         "ExtendWords": [
+            "bootable",
+            "caseflag",
+            "CDVOL",
+            "checklink",
+            "childlink",
+            "clustersize",
+            "controll",
+            "datacache",
+            "dircachelink",
+            "DMDEPKG",
             "ELTORITO",
+            "fatcache",
+            "fatfilesystem",
+            "fatname",
+            "FDISKed",
+            "FFFFFFFFL",
             "FHAND",
             "IFILE",
-            "OFILE",
-            "FDISKed",
             "Lfnbuffer",
-            "FFFFFFFFL",
-            "CDVOL",
-            "DMDEPKG"
+            "OFILE",
+            "zerobuffer"
         ]
     }
 }

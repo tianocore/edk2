@@ -580,7 +580,7 @@ FatWriteZeroPool (
   if (AppendedSize > FAT_MAX_ALLOCATE_SIZE) {
     //
     // If the appended size is larger, maybe we can not allocate the whole
-    // memory once. So if the growed size is larger than 10M, we just
+    // memory once. So if the grown size is larger than 10M, we just
     // allocate 10M memory (one healthy system should have 10M available
     // memory), and then write the zerobuffer to the file several times.
     //

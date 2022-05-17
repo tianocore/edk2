@@ -867,7 +867,7 @@ FatCleanupVolume (
 
   @param  OFile                 - The open file.
 
-  @retval EFI_SUCCESS           - Shrinked successfully.
+  @retval EFI_SUCCESS           - Shrunk successfully.
   @retval EFI_VOLUME_CORRUPTED  - There are errors in the file's clusters.
 
 **/
