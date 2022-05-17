@@ -202,7 +202,7 @@ THUMB_INSTRUCTIONS  gOpThumb[] = {
 };
 
 THUMB_INSTRUCTIONS  gOpThumb2[] = {
-  // Instruct  OpCode      OpCode Mask  Addressig Mode
+  // Instruct  OpCode      OpCode Mask  Addressing Mode
 
   { "ADR",    0xf2af0000, 0xfbff8000, ADR_THUMB2           }, // ADDR <Rd>, <label> ;Needs to go before ADDW
   { "CMN",    0xf1100f00, 0xfff08f00, CMN_THUMB2           }, // CMN <Rn>, #<const> ;Needs to go before ADD
@@ -648,7 +648,7 @@ DisassembleThumbInstruction (
           return;
 
         case DATA_CBZ:
-          // CB{N}Z <Rn>, <Lable>
+          // CB{N}Z <Rn>, <Label>
           Target = ((OpCode >> 2) & 0x3e) | (((OpCode & BIT9) == BIT9) ? BIT6 : 0);
           AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %08x", gReg[Rd], Pc + 4 + Target);
           return;

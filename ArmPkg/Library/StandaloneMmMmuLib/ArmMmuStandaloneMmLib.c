@@ -31,7 +31,7 @@
                                 return it contains the response parameters.
   @param [out]      RetVal      Pointer to return the response value.
 
-  @retval EFI_SUCCESS           Request successfull.
+  @retval EFI_SUCCESS           Request successful.
   @retval EFI_INVALID_PARAMETER A parameter is invalid.
   @retval EFI_NOT_READY         Callee is busy or not in a state to handle
                                 this request.
@@ -134,7 +134,7 @@ SendMemoryPermissionRequest (
   @param [in]   BaseAddress          Base address for the memory region.
   @param [out]  MemoryAttributes     Pointer to return the memory attributes.
 
-  @retval EFI_SUCCESS             Request successfull.
+  @retval EFI_SUCCESS             Request successful.
   @retval EFI_INVALID_PARAMETER   A parameter is invalid.
   @retval EFI_NOT_READY           Callee is busy or not in a state to handle
                                   this request.
@@ -193,7 +193,7 @@ GetMemoryPermissions (
   @param [in]  Length          Length of the memory region.
   @param [in]  Permissions     Memory access controls attributes.
 
-  @retval EFI_SUCCESS             Request successfull.
+  @retval EFI_SUCCESS             Request successful.
   @retval EFI_INVALID_PARAMETER   A parameter is invalid.
   @retval EFI_NOT_READY           Callee is busy or not in a state to handle
                                   this request.
