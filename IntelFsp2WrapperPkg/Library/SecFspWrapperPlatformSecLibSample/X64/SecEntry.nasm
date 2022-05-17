@@ -130,6 +130,9 @@ FspHeaderFound:
   mov     eax, dword [edi + FSP_HEADER_IMAGEBASE_OFFSET]
   add     eax, dword [edi + FSP_HEADER_TEMPRAMINIT_OFFSET]
 
+  ; Pass Fsp T Upd pointer as Input parameter
+  mov     rcx, ASM_PFX(FsptUpdDataPtr)
+
   ; Setup the hardcode stack
   mov     rsp, TempRamInitStack
 
@@ -167,5 +170,4 @@ FspApiFailed:
 align 10h
 TempRamInitStack:
     DQ  TempRamInitDone
-    DQ  ASM_PFX(FsptUpdDataPtr)         ; TempRamInitParams
 
