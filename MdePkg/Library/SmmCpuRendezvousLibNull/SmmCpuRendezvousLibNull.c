@@ -24,6 +24,5 @@ SmmWaitForAllProcessor (
   IN BOOLEAN  BlockingMode
   )
 {
-  ASSERT (FALSE);
   return EFI_SUCCESS;
 }
