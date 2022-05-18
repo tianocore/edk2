@@ -11,14 +11,14 @@
 
 CONST UINTN  mDoFarReturnFlag = 1;
 
-//
-// Spin lock for CPU information display
-//
-SPIN_LOCK  mDisplayMessageSpinLock;
-
 RESERVED_VECTORS_DATA      mReservedVectorsData[CPU_EXCEPTION_NUM];
 EFI_CPU_INTERRUPT_HANDLER  mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
-EXCEPTION_HANDLER_DATA     mExceptionHandlerData;
+EXCEPTION_HANDLER_DATA     mExceptionHandlerData = {
+  0,   // To be fixed
+  0,   // To be fixed
+  mReservedVectorsData,
+  mExternalInterruptHandlerTable
+};
 
 /**
   Common exception handler.
@@ -58,8 +58,6 @@ InitializeCpuExceptionHandlers (
   IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
   )
 {
-  mExceptionHandlerData.ReservedVectors          = mReservedVectorsData;
-  mExceptionHandlerData.ExternalInterruptHandler = mExternalInterruptHandlerTable;
   InitializeSpinLock (&mExceptionHandlerData.DisplayMessageSpinLock);
   return InitializeCpuExceptionHandlersWorker (VectorInfo, &mExceptionHandlerData);
 }
