@@ -1,7 +1,7 @@
 /** @file
   CPU DXE Module to produce CPU ARCH Protocol.
 
-  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -9,6 +9,8 @@
 #include "CpuDxe.h"
 #include "CpuMp.h"
 #include "CpuPageTable.h"
+
+#define CPU_INTERRUPT_NUM  256
 
 //
 // Global Variables
@@ -924,9 +926,12 @@ InitInterruptDescriptorTable (
   VOID
   )
 {
-  EFI_STATUS               Status;
-  EFI_VECTOR_HANDOFF_INFO  *VectorInfoList;
-  EFI_VECTOR_HANDOFF_INFO  *VectorInfo;
+  EFI_STATUS                Status;
+  EFI_VECTOR_HANDOFF_INFO   *VectorInfoList;
+  EFI_VECTOR_HANDOFF_INFO   *VectorInfo;
+  IA32_IDT_GATE_DESCRIPTOR  *IdtTable;
+  IA32_DESCRIPTOR           IdtDescriptor;
+  UINTN                     IdtEntryCount;
 
   VectorInfo = NULL;
   Status     = EfiGetSystemConfigurationTable (&gEfiVectorHandoffTableGuid, (VOID **)&VectorInfoList);
@@ -934,7 +939,25 @@ InitInterruptDescriptorTable (
     VectorInfo = VectorInfoList;
   }
 
-  Status = InitializeCpuInterruptHandlers (VectorInfo);
+  AsmReadIdtr (&IdtDescriptor);
+  IdtEntryCount = (IdtDescriptor.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR);
+  if (IdtEntryCount < CPU_INTERRUPT_NUM) {
+    //
+    // Increase Interrupt Descriptor Table and Copy the old IDT table in
+    //
+    IdtTable = AllocateZeroPool (sizeof (IA32_IDT_GATE_DESCRIPTOR) * CPU_INTERRUPT_NUM);
+    ASSERT (IdtTable != NULL);
+    CopyMem (IdtTable, (VOID *)IdtDescriptor.Base, sizeof (IA32_IDT_GATE_DESCRIPTOR) * IdtEntryCount);
+
+    //
+    // Load Interrupt Descriptor Table
+    //
+    IdtDescriptor.Base  = (UINTN)IdtTable;
+    IdtDescriptor.Limit = (UINT16)(sizeof (IA32_IDT_GATE_DESCRIPTOR) * CPU_INTERRUPT_NUM - 1);
+    AsmWriteIdtr (&IdtDescriptor);
+  }
+
+  Status = InitializeCpuExceptionHandlers (VectorInfo);
   ASSERT_EFI_ERROR (Status);
 }
 
