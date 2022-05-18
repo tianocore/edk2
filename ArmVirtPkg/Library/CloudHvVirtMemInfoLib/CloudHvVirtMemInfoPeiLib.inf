@@ -1,0 +1,47 @@
+## @file
+#  Cloud Hypervisor virtual memory map library.
+#
+#  Copyright (c) 2022, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = CloudHvVirtMemInfoPeiLib
+  FILE_GUID                      = c7ada233-d35b-49c3-aa51-e2b5cd80c910
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmVirtMemInfoLib|PEIM
+  CONSTRUCTOR                    = CloudHvVirtMemInfoPeiLibConstructor
+
+[Sources]
+  CloudHvVirtMemInfoLib.c
+  CloudHvVirtMemInfoLib.h
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseMemoryLib
+  DebugLib
+  FdtLib
+  MemoryAllocationLib
+  PcdLib
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdFdBaseAddress
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdFdSize
+  gArmTokenSpaceGuid.PcdFvSize
+  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
