@@ -1,7 +1,7 @@
 /** @file
   CPU Exception Library provides PEI/DXE/SMM CPU common exception handler.
 
-Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -261,31 +261,26 @@ InitializeCpuExceptionHandlersWorker (
   RESERVED_VECTORS_DATA           *ReservedVectors;
 
   ReservedVectors = ExceptionHandlerData->ReservedVectors;
-  SetMem ((VOID *)ReservedVectors, sizeof (RESERVED_VECTORS_DATA) * CPU_EXCEPTION_NUM, 0xff);
+  SetMem ((VOID *)ReservedVectors, sizeof (RESERVED_VECTORS_DATA) * ExceptionHandlerData->IdtEntryCount, 0xff);
   if (VectorInfo != NULL) {
-    Status = ReadAndVerifyVectorInfo (VectorInfo, ReservedVectors, CPU_EXCEPTION_NUM);
+    Status = ReadAndVerifyVectorInfo (VectorInfo, ReservedVectors, ExceptionHandlerData->IdtEntryCount);
     if (EFI_ERROR (Status)) {
       return EFI_INVALID_PARAMETER;
     }
   }
 
   //
-  // Read IDT descriptor and calculate IDT size
+  // Setup the exception handlers according to IDT size, but no more than
+  //   ExceptionHandlerData->IdtEntryCount (32 in PEI and SMM, 256 in DXE) handlers.
   //
   AsmReadIdtr (&IdtDescriptor);
-  IdtEntryCount = (IdtDescriptor.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR);
-  if (IdtEntryCount > CPU_EXCEPTION_NUM) {
-    //
-    // CPU exception library only setup CPU_EXCEPTION_NUM exception handler at most
-    //
-    IdtEntryCount = CPU_EXCEPTION_NUM;
-  }
+  IdtEntryCount                       = (IdtDescriptor.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR);
+  ExceptionHandlerData->IdtEntryCount = MIN (IdtEntryCount, ExceptionHandlerData->IdtEntryCount);
 
   IdtTable = (IA32_IDT_GATE_DESCRIPTOR *)IdtDescriptor.Base;
   AsmGetTemplateAddressMap (&TemplateMap);
   ASSERT (TemplateMap.ExceptionStubHeaderSize <= HOOKAFTER_STUB_SIZE);
 
-  ExceptionHandlerData->IdtEntryCount = IdtEntryCount;
   UpdateIdtTable (IdtTable, &TemplateMap, ExceptionHandlerData);
 
   return EFI_SUCCESS;
