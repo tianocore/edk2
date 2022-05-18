@@ -31,6 +31,8 @@ SECTION .text
 
 ALIGN   8
 
+; Generate 32 IDT vectors.
+; 32 IDT vectors are enough because interrupts (32+) are not enabled in SEC and PEI phase.
 AsmIdtVectorBegin:
 %assign Vector 0
 %rep  32

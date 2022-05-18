@@ -95,9 +95,6 @@ InitializeCpuInterruptHandlers (
   IA32_DESCRIPTOR                 IdtDescriptor;
   UINTN                           IdtEntryCount;
   EXCEPTION_HANDLER_TEMPLATE_MAP  TemplateMap;
-  UINTN                           Index;
-  UINTN                           InterruptEntry;
-  UINT8                           *InterruptEntryCode;
   RESERVED_VECTORS_DATA           *ReservedVectors;
   EFI_CPU_INTERRUPT_HANDLER       *ExternalInterruptHandler;
 
@@ -138,25 +135,6 @@ InitializeCpuInterruptHandlers (
   AsmGetTemplateAddressMap (&TemplateMap);
   ASSERT (TemplateMap.ExceptionStubHeaderSize <= HOOKAFTER_STUB_SIZE);
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesCode,
-                  TemplateMap.ExceptionStubHeaderSize * CPU_INTERRUPT_NUM,
-                  (VOID **)&InterruptEntryCode
-                  );
-  ASSERT (!EFI_ERROR (Status) && InterruptEntryCode != NULL);
-
-  InterruptEntry = (UINTN)InterruptEntryCode;
-  for (Index = 0; Index < CPU_INTERRUPT_NUM; Index++) {
-    CopyMem (
-      (VOID *)InterruptEntry,
-      (VOID *)TemplateMap.ExceptionStart,
-      TemplateMap.ExceptionStubHeaderSize
-      );
-    AsmVectorNumFixup ((VOID *)InterruptEntry, (UINT8)Index, (VOID *)TemplateMap.ExceptionStart);
-    InterruptEntry += TemplateMap.ExceptionStubHeaderSize;
-  }
-
-  TemplateMap.ExceptionStart                     = (UINTN)InterruptEntryCode;
   mExceptionHandlerData.IdtEntryCount            = CPU_INTERRUPT_NUM;
   mExceptionHandlerData.ReservedVectors          = ReservedVectors;
   mExceptionHandlerData.ExternalInterruptHandler = ExternalInterruptHandler;
