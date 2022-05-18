@@ -14,8 +14,8 @@
 
 CONST UINTN  mDoFarReturnFlag = 0;
 
-RESERVED_VECTORS_DATA      mReservedVectorsData[CPU_EXCEPTION_NUM];
-EFI_CPU_INTERRUPT_HANDLER  mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
+RESERVED_VECTORS_DATA      mReservedVectorsData[CPU_INTERRUPT_NUM];
+EFI_CPU_INTERRUPT_HANDLER  mExternalInterruptHandlerTable[CPU_INTERRUPT_NUM];
 EXCEPTION_HANDLER_DATA     mExceptionHandlerData = {
   0,   // To be fixed
   0,   // To be fixed
@@ -96,26 +96,14 @@ InitializeCpuInterruptHandlers (
   IA32_DESCRIPTOR                 IdtDescriptor;
   UINTN                           IdtEntryCount;
   EXCEPTION_HANDLER_TEMPLATE_MAP  TemplateMap;
-  RESERVED_VECTORS_DATA           *ReservedVectors;
-  EFI_CPU_INTERRUPT_HANDLER       *ExternalInterruptHandler;
 
-  Status = gBS->AllocatePool (
-                  EfiBootServicesCode,
-                  sizeof (RESERVED_VECTORS_DATA) * CPU_INTERRUPT_NUM,
-                  (VOID **)&ReservedVectors
-                  );
-  ASSERT (!EFI_ERROR (Status) && ReservedVectors != NULL);
-  SetMem ((VOID *)ReservedVectors, sizeof (RESERVED_VECTORS_DATA) * CPU_INTERRUPT_NUM, 0xff);
+  SetMem ((VOID *)mReservedVectorsData, sizeof (RESERVED_VECTORS_DATA) * CPU_INTERRUPT_NUM, 0xff);
   if (VectorInfo != NULL) {
-    Status = ReadAndVerifyVectorInfo (VectorInfo, ReservedVectors, CPU_INTERRUPT_NUM);
+    Status = ReadAndVerifyVectorInfo (VectorInfo, mReservedVectorsData, CPU_INTERRUPT_NUM);
     if (EFI_ERROR (Status)) {
-      FreePool (ReservedVectors);
       return EFI_INVALID_PARAMETER;
     }
   }
-
-  ExternalInterruptHandler = AllocateZeroPool (sizeof (EFI_CPU_INTERRUPT_HANDLER) * CPU_INTERRUPT_NUM);
-  ASSERT (ExternalInterruptHandler != NULL);
 
   //
   // Read IDT descriptor and calculate IDT size
@@ -137,8 +125,6 @@ InitializeCpuInterruptHandlers (
   ASSERT (TemplateMap.ExceptionStubHeaderSize <= HOOKAFTER_STUB_SIZE);
 
   mExceptionHandlerData.IdtEntryCount            = CPU_INTERRUPT_NUM;
-  mExceptionHandlerData.ReservedVectors          = ReservedVectors;
-  mExceptionHandlerData.ExternalInterruptHandler = ExternalInterruptHandler;
   InitializeSpinLock (&mExceptionHandlerData.DisplayMessageSpinLock);
 
   UpdateIdtTable (IdtTable, &TemplateMap, &mExceptionHandlerData);
