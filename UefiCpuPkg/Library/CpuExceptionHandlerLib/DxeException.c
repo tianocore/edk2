@@ -16,9 +16,12 @@ CONST UINTN  mDoFarReturnFlag = 0;
 
 RESERVED_VECTORS_DATA      mReservedVectorsData[CPU_EXCEPTION_NUM];
 EFI_CPU_INTERRUPT_HANDLER  mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
-UINTN                      mEnabledInterruptNum = 0;
-
-EXCEPTION_HANDLER_DATA  mExceptionHandlerData;
+EXCEPTION_HANDLER_DATA     mExceptionHandlerData = {
+  0,   // To be fixed
+  0,   // To be fixed
+  mReservedVectorsData,
+  mExternalInterruptHandlerTable
+};
 
 UINT8  mNewStack[CPU_STACK_SWITCH_EXCEPTION_NUMBER *
                  CPU_KNOWN_GOOD_STACK_SIZE];
@@ -62,8 +65,6 @@ InitializeCpuExceptionHandlers (
   IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
   )
 {
-  mExceptionHandlerData.ReservedVectors          = mReservedVectorsData;
-  mExceptionHandlerData.ExternalInterruptHandler = mExternalInterruptHandlerTable;
   InitializeSpinLock (&mExceptionHandlerData.DisplayMessageSpinLock);
   return InitializeCpuExceptionHandlersWorker (VectorInfo, &mExceptionHandlerData);
 }
