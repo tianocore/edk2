@@ -1099,7 +1099,7 @@ BdsEntry (
 
   UINT16 NextBootInt;
   BOOT_OVERRIDE OverrideBoot;
-  UINTN OverrideBootSize;
+  UINTN OverrideBootSize = sizeof(OverrideBoot);
   // Fetch Board Settings
   Status = gRT->GetVariable(BOARD_BOOT_OVERRIDE_NAME,
                             &gEfiBoardBootOverrideVariableGuid, NULL,
