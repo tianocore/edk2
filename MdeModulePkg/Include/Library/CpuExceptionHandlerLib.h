@@ -103,32 +103,20 @@ InitializeCpuExceptionHandlers (
   );
 
 /**
-  Initializes all CPU exceptions entries with optional extra initializations.
+  Setup separate stacks for certain exception handlers.
 
-  By default, this method should include all functionalities implemented by
-  InitializeCpuExceptionHandlers(), plus extra initialization works, if any.
-  This could be done by calling InitializeCpuExceptionHandlers() directly
-  in this method besides the extra works.
+  InitData is optional and processor arch dependent.
 
-  InitData is optional and its use and content are processor arch dependent.
-  The typical usage of it is to convey resources which have to be reserved
-  elsewhere and are necessary for the extra initializations of exception.
+  @param[in]  InitData      Pointer to data optional for information about how
+                            to assign stacks for certain exception handlers.
 
-  @param[in]  VectorInfo    Pointer to reserved vector list.
-  @param[in]  InitData      Pointer to data optional for extra initializations
-                            of exception.
-
-  @retval EFI_SUCCESS             The exceptions have been successfully
-                                  initialized.
-  @retval EFI_INVALID_PARAMETER   VectorInfo or InitData contains invalid
-                                  content.
+  @retval EFI_SUCCESS             The stacks are assigned successfully.
   @retval EFI_UNSUPPORTED         This function is not supported.
 
 **/
 EFI_STATUS
 EFIAPI
-InitializeCpuExceptionHandlersEx (
-  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL,
+InitializeSeparateExceptionStacks (
   IN CPU_EXCEPTION_INIT_DATA  *InitData OPTIONAL
   );
 
