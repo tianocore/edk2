@@ -150,57 +150,26 @@ InitializeCpuExceptionHandlers (
 }
 
 /**
-  Initializes all CPU exceptions entries with optional extra initializations.
+  Setup separate stacks for certain exception handlers.
 
-  By default, this method should include all functionalities implemented by
-  InitializeCpuExceptionHandlers(), plus extra initialization works, if any.
-  This could be done by calling InitializeCpuExceptionHandlers() directly
-  in this method besides the extra works.
+  InitData is optional and processor arch dependent.
 
-  InitData is optional and its use and content are processor arch dependent.
-  The typical usage of it is to convey resources which have to be reserved
-  elsewhere and are necessary for the extra initializations of exception.
+  @param[in]  InitData      Pointer to data optional for information about how
+                            to assign stacks for certain exception handlers.
 
-  @param[in]  VectorInfo    Pointer to reserved vector list.
-  @param[in]  InitData      Pointer to data optional for extra initializations
-                            of exception.
-
-  @retval EFI_SUCCESS             The exceptions have been successfully
-                                  initialized.
-  @retval EFI_INVALID_PARAMETER   VectorInfo or InitData contains invalid
-                                  content.
+  @retval EFI_SUCCESS             The stacks are assigned successfully.
+  @retval EFI_UNSUPPORTED         This function is not supported.
 
 **/
 EFI_STATUS
 EFIAPI
-InitializeCpuExceptionHandlersEx (
-  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL,
+InitializeSeparateExceptionStacks (
   IN CPU_EXCEPTION_INIT_DATA  *InitData OPTIONAL
   )
 {
-  EFI_STATUS  Status;
-
-  //
-  // To avoid repeat initialization of default handlers, the caller should pass
-  // an extended init data with InitDefaultHandlers set to FALSE. There's no
-  // need to call this method to just initialize default handlers. Call non-ex
-  // version instead; or this method must be implemented as a simple wrapper of
-  // non-ex version of it, if this version has to be called.
-  //
-  if ((InitData == NULL) || InitData->Ia32.InitDefaultHandlers) {
-    Status = InitializeCpuExceptionHandlers (VectorInfo);
-  } else {
-    Status = EFI_SUCCESS;
+  if (InitData == NULL) {
+    return EFI_UNSUPPORTED;
   }
 
-  if (!EFI_ERROR (Status)) {
-    //
-    // Initializing stack switch is only necessary for Stack Guard functionality.
-    //
-    if (PcdGetBool (PcdCpuStackGuard) && (InitData != NULL)) {
-      Status = ArchSetupExceptionStack (InitData);
-    }
-  }
-
-  return Status;
+  return ArchSetupExceptionStack (InitData);
 }
