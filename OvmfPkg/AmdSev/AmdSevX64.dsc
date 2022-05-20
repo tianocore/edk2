@@ -528,6 +528,9 @@
   # Set ConfidentialComputing defaults
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
 
+  # Set SEV-SNP Secrets page address default
+  gEfiMdePkgTokenSpaceGuid.PcdSevSnpSecretsAddress|0
+
 !include OvmfPkg/Include/Dsc/OvmfTpmPcds.dsc.inc
 
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
