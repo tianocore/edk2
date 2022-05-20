@@ -253,7 +253,7 @@ DxeMain (
     VectorInfoList = (EFI_VECTOR_HANDOFF_INFO *)(GET_GUID_HOB_DATA (GuidHob));
   }
 
-  Status = InitializeCpuExceptionHandlersEx (VectorInfoList, NULL);
+  Status = InitializeCpuExceptionHandlers (VectorInfoList);
   ASSERT_EFI_ERROR (Status);
 
   //

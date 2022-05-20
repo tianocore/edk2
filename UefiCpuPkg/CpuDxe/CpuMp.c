@@ -1,7 +1,7 @@
 /** @file
   CPU DXE Module to produce CPU MP Protocol.
 
-  Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -617,7 +617,7 @@ GetGdtr (
 /**
   Initializes CPU exceptions handlers for the sake of stack switch requirement.
 
-  This function is a wrapper of InitializeCpuExceptionHandlersEx. It's mainly
+  This function is a wrapper of InitializeSeparateExceptionStacks. It's mainly
   for the sake of AP's init because of EFI_AP_PROCEDURE API requirement.
 
   @param[in,out] Buffer  The pointer to private data buffer.
@@ -641,7 +641,7 @@ InitializeExceptionStackSwitchHandlers (
   AsmReadIdtr (&Idtr);
   EssData->Ia32.IdtTable     = (VOID *)Idtr.Base;
   EssData->Ia32.IdtTableSize = Idtr.Limit + 1;
-  Status                     = InitializeCpuExceptionHandlersEx (NULL, EssData);
+  Status                     = InitializeSeparateExceptionStacks (EssData);
   ASSERT_EFI_ERROR (Status);
 }
 
