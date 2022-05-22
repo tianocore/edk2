@@ -1,0 +1,24 @@
+## @file
+#
+#  Null implementation of the blob measurement library.
+#
+#  Copyright (C) 2022, Intel Corporation. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BlobMeasurementLibNull
+  FILE_GUID                      = fad119ff-8627-4661-a35f-920a6eeb2866
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BlobMeasurementLib
+
+[Sources]
+  BlobMeasurementLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
