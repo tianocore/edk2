@@ -794,6 +794,7 @@
   OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
     <LibraryClasses>
       NULL|OvmfPkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
+      NULL|OvmfPkg/Library/BlobMeasurementLibNull/BlobMeasurementLibNull.inf
   }
   OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
   OvmfPkg/Virtio10Dxe/Virtio10.inf

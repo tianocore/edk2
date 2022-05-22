@@ -382,6 +382,7 @@
   OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
     <LibraryClasses>
       NULL|OvmfPkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
+      NULL|OvmfPkg/Library/BlobMeasurementLibNull/BlobMeasurementLibNull.inf
   }
 
   #
