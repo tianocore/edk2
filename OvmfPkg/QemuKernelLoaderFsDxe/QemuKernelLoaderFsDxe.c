@@ -18,6 +18,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/BlobVerifierLib.h>
+#include <Library/BlobMeasurementLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -1072,6 +1073,18 @@ QemuKernelLoaderFsDxeEntrypoint (
                );
     if (EFI_ERROR (Status)) {
       goto FreeBlobs;
+    }
+
+    if ((CurrentBlob->Data > 0) && (CurrentBlob->Size > 0)) {
+      Status = MeasureKernelBlob (
+                 CurrentBlob->Name,
+                 sizeof (CurrentBlob->Name),
+                 CurrentBlob->Data,
+                 CurrentBlob->Size
+                 );
+      if (EFI_ERROR (Status)) {
+        goto FreeBlobs;
+      }
     }
 
     mTotalBlobBytes += CurrentBlob->Size;
