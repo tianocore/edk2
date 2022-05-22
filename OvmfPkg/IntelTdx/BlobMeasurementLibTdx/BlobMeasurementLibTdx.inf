@@ -1,0 +1,30 @@
+## @file
+#
+#  Copyright (C) 2022, Intel Corporation. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BlobMeasurementLibTdx
+  FILE_GUID                      = ac1a8997-9d91-47c4-b18a-dbe0d1a94fde
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BlobMeaurementLib
+
+[Sources]
+  BlobMeasurement.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+
+[Protocols]
+  gEfiCcMeasurementProtocolGuid
