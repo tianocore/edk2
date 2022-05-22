@@ -199,6 +199,13 @@ struct cb_forward {
   UINT64    forward;
 };
 
+struct cb_cbmem_ref {
+  UINT32    tag;
+  // Field contains size of this struct == 0x0010
+  UINT32    size;
+  UINT64    cbmem_addr;
+};
+
 #define CB_TAG_FRAMEBUFFER  0x0012
 struct cb_framebuffer {
   UINT32    tag;
@@ -229,7 +236,13 @@ struct cb_vdat {
 
 #define CB_TAG_TIMESTAMPS     0x0016
 #define CB_TAG_CBMEM_CONSOLE  0x0017
-#define CB_TAG_MRC_CACHE      0x0018
+struct cbmem_console {
+  UINT32    size;
+  UINT32    cursor;
+  UINT8     body[0];
+} __attribute__ ((packed));
+
+#define CB_TAG_MRC_CACHE  0x0018
 struct cb_cbmem_tab {
   UINT32    tag;
   UINT32    size;
