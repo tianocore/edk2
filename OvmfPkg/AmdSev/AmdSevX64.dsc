@@ -578,7 +578,7 @@
 
 !include OvmfPkg/OvmfTpmPcds.dsc.inc
 
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|100000000
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
 
 [PcdsDynamicHii]
 !include OvmfPkg/OvmfTpmPcdsHii.dsc.inc

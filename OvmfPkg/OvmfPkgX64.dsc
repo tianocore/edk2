@@ -684,7 +684,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
 
 !if $(CSM_ENABLE) == FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|100000000
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
 !endif
 
 [PcdsDynamicHii]
