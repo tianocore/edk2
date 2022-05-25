@@ -1,7 +1,7 @@
 /** @file
   Configuration Manager Object parser.
 
-  Copyright (c) 2021 - 2022, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2023, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -787,7 +787,7 @@ PrintOemId (
   )
 {
   DEBUG ((
-    DEBUG_ERROR,
+    DEBUG_INFO,
     (Format != NULL) ? Format : "%C%C%C%C%C%C",
     Ptr[0],
     Ptr[1],
@@ -855,7 +855,7 @@ PrintCmObjDesc (
     *RemainingSize -= Parser[Index].Length;
     if (*RemainingSize < 0) {
       DEBUG ((
-        DEBUG_ERROR,
+        DEBUG_INFO,
         "\nERROR: %a: Buffer overrun\n",
         Parser[Index].NameStr
         ));
@@ -865,11 +865,11 @@ PrintCmObjDesc (
 
     // Indentation
     for (IndentIndex = 0; IndentIndex < IndentLevel; IndentIndex++) {
-      DEBUG ((DEBUG_ERROR, "  "));
+      DEBUG ((DEBUG_INFO, "  "));
     }
 
     DEBUG ((
-      DEBUG_ERROR,
+      DEBUG_INFO,
       "%-*a :",
       OUTPUT_FIELD_COLUMN_WIDTH - 2 * IndentLevel,
       Parser[Index].NameStr
@@ -879,20 +879,20 @@ PrintCmObjDesc (
     } else if (Parser[Index].Format != NULL) {
       switch (Parser[Index].Length) {
         case 1:
-          DEBUG ((DEBUG_ERROR, Parser[Index].Format, *(UINT8 *)Data));
+          DEBUG ((DEBUG_INFO, Parser[Index].Format, *(UINT8 *)Data));
           break;
         case 2:
-          DEBUG ((DEBUG_ERROR, Parser[Index].Format, *(UINT16 *)Data));
+          DEBUG ((DEBUG_INFO, Parser[Index].Format, *(UINT16 *)Data));
           break;
         case 4:
-          DEBUG ((DEBUG_ERROR, Parser[Index].Format, *(UINT32 *)Data));
+          DEBUG ((DEBUG_INFO, Parser[Index].Format, *(UINT32 *)Data));
           break;
         case 8:
-          DEBUG ((DEBUG_ERROR, Parser[Index].Format, ReadUnaligned64 (Data)));
+          DEBUG ((DEBUG_INFO, Parser[Index].Format, ReadUnaligned64 (Data)));
           break;
         default:
           DEBUG ((
-            DEBUG_ERROR,
+            DEBUG_INFO,
             "\nERROR: %a: CANNOT PARSE THIS FIELD, Field Length = %d\n",
             Parser[Index].NameStr,
             Parser[Index].Length
@@ -901,7 +901,7 @@ PrintCmObjDesc (
     } else if (Parser[Index].SubObjParser != NULL) {
       SubStructSize = Parser[Index].Length;
 
-      DEBUG ((DEBUG_ERROR, "\n"));
+      DEBUG ((DEBUG_INFO, "\n"));
       PrintCmObjDesc (
         Data,
         Parser[Index].SubObjParser,
@@ -912,14 +912,14 @@ PrintCmObjDesc (
     } else {
       ASSERT (0);
       DEBUG ((
-        DEBUG_ERROR,
+        DEBUG_INFO,
         "\nERROR: %a: CANNOT PARSE THIS FIELD, Field Length = %d\n",
         Parser[Index].NameStr,
         Parser[Index].Length
         ));
     }
 
-    DEBUG ((DEBUG_ERROR, "\n"));
+    DEBUG ((DEBUG_INFO, "\n"));
     Data = (UINT8 *)Data + Parser[Index].Length;
   } // for
 }
@@ -978,7 +978,7 @@ ParseCmObjDesc (
 
   for (ObjIndex = 0; ObjIndex < ObjectCount; ObjIndex++) {
     DEBUG ((
-      DEBUG_ERROR,
+      DEBUG_INFO,
       "\n%-*a [%d/%d]:\n",
       OUTPUT_FIELD_COLUMN_WIDTH,
       ParserArray->ObjectName,
