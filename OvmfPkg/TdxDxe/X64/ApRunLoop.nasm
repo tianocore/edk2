@@ -83,7 +83,7 @@ AsmRelocateApMailBoxLoopEnd:
 ;-------------------------------------------------------------------------------------
 global ASM_PFX(AsmGetRelocationMap)
 ASM_PFX(AsmGetRelocationMap):
-    lea        rax, [ASM_PFX(AsmRelocateApMailBoxLoopStart)]
+    lea        rax, [AsmRelocateApMailBoxLoopStart]
     mov        qword [rcx], rax
     mov        qword [rcx +  8h], AsmRelocateApMailBoxLoopEnd - AsmRelocateApMailBoxLoopStart
     ret
