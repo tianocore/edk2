@@ -31,7 +31,7 @@ class UPLD_INFO_HEADER(LittleEndianStructure):
     def __init__(self):
         self.Identifier     =  b'PLDH'
         self.HeaderLength   = sizeof(UPLD_INFO_HEADER)
-        self.HeaderRevision = 0x0075
+        self.SpecRevision   = 0x0007
         self.Revision       = 0x0000010105
         self.ImageId        = b'UEFI'
         self.ProducerId     = b'INTEL'
