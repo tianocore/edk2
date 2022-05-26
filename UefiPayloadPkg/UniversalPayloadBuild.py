@@ -29,7 +29,7 @@ class UPLD_INFO_HEADER(LittleEndianStructure):
         ]
 
     def __init__(self):
-        self.Identifier     =  b'UPLD'
+        self.Identifier     =  b'PLDH'
         self.HeaderLength   = sizeof(UPLD_INFO_HEADER)
         self.HeaderRevision = 0x0075
         self.Revision       = 0x0000010105
