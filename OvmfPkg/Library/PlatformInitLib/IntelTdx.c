@@ -26,6 +26,32 @@
 #define ALIGNED_2MB_MASK                0x1fffff
 #define EFI_RESOURCE_MEMORY_UNACCEPTED  7
 
+UINT32                mTdxEfiBootModeList[] = {
+  BOOT_WITH_FULL_CONFIGURATION,
+  BOOT_WITH_MINIMAL_CONFIGURATION,
+  BOOT_ASSUMING_NO_CONFIGURATION_CHANGES,
+  BOOT_WITH_FULL_CONFIGURATION_PLUS_DIAGNOSTICS,
+  BOOT_WITH_DEFAULT_SETTINGS,
+  BOOT_ON_S4_RESUME,
+  BOOT_ON_S5_RESUME,
+  BOOT_WITH_MFG_MODE_SETTINGS,
+  BOOT_ON_S2_RESUME,
+  BOOT_ON_S3_RESUME,
+  BOOT_ON_FLASH_UPDATE,
+  BOOT_IN_RECOVERY_MODE
+};
+
+UINT32  mTdxEfiResourceTypeList[] = {
+  EFI_RESOURCE_SYSTEM_MEMORY,
+  EFI_RESOURCE_MEMORY_MAPPED_IO,
+  EFI_RESOURCE_IO,
+  EFI_RESOURCE_FIRMWARE_DEVICE,
+  EFI_RESOURCE_MEMORY_MAPPED_IO_PORT,
+  EFI_RESOURCE_MEMORY_RESERVED,
+  EFI_RESOURCE_IO_RESERVED,
+  EFI_RESOURCE_MEMORY_UNACCEPTED
+};
+
 /**
   This function will be called to accept pages. Only BSP accepts pages.
 
@@ -188,31 +214,6 @@ ValidateHobList (
   )
 {
   EFI_PEI_HOB_POINTERS  Hob;
-  UINT32                EFI_BOOT_MODE_LIST[] = {
-    BOOT_WITH_FULL_CONFIGURATION,
-    BOOT_WITH_MINIMAL_CONFIGURATION,
-    BOOT_ASSUMING_NO_CONFIGURATION_CHANGES,
-    BOOT_WITH_FULL_CONFIGURATION_PLUS_DIAGNOSTICS,
-    BOOT_WITH_DEFAULT_SETTINGS,
-    BOOT_ON_S4_RESUME,
-    BOOT_ON_S5_RESUME,
-    BOOT_WITH_MFG_MODE_SETTINGS,
-    BOOT_ON_S2_RESUME,
-    BOOT_ON_S3_RESUME,
-    BOOT_ON_FLASH_UPDATE,
-    BOOT_IN_RECOVERY_MODE
-  };
-
-  UINT32  EFI_RESOURCE_TYPE_LIST[] = {
-    EFI_RESOURCE_SYSTEM_MEMORY,
-    EFI_RESOURCE_MEMORY_MAPPED_IO,
-    EFI_RESOURCE_IO,
-    EFI_RESOURCE_FIRMWARE_DEVICE,
-    EFI_RESOURCE_MEMORY_MAPPED_IO_PORT,
-    EFI_RESOURCE_MEMORY_RESERVED,
-    EFI_RESOURCE_IO_RESERVED,
-    EFI_RESOURCE_MEMORY_UNACCEPTED
-  };
 
   if (VmmHobList == NULL) {
     DEBUG ((DEBUG_ERROR, "HOB: HOB data pointer is NULL\n"));
@@ -242,7 +243,7 @@ ValidateHobList (
           return FALSE;
         }
 
-        if (IsInValidList (Hob.HandoffInformationTable->BootMode, EFI_BOOT_MODE_LIST, ARRAY_SIZE (EFI_BOOT_MODE_LIST)) == FALSE) {
+        if (IsInValidList (Hob.HandoffInformationTable->BootMode, mTdxEfiBootModeList, ARRAY_SIZE (mTdxEfiBootModeList)) == FALSE) {
           DEBUG ((DEBUG_ERROR, "HOB: Unknow HandoffInformationTable BootMode type. Type: 0x%08x\n", Hob.HandoffInformationTable->BootMode));
           return FALSE;
         }
@@ -261,7 +262,7 @@ ValidateHobList (
           return FALSE;
         }
 
-        if (IsInValidList (Hob.ResourceDescriptor->ResourceType, EFI_RESOURCE_TYPE_LIST, ARRAY_SIZE (EFI_RESOURCE_TYPE_LIST)) == FALSE) {
+        if (IsInValidList (Hob.ResourceDescriptor->ResourceType, mTdxEfiResourceTypeList, ARRAY_SIZE (mTdxEfiResourceTypeList)) == FALSE) {
           DEBUG ((DEBUG_ERROR, "HOB: Unknow ResourceDescriptor ResourceType type. Type: 0x%08x\n", Hob.ResourceDescriptor->ResourceType));
           return FALSE;
         }
