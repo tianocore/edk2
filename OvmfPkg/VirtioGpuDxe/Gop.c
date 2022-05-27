@@ -509,7 +509,7 @@ GopSetMode (
   // Populate Mode and ModeInfo (mutable fields only).
   //
   VgpuGop->GopMode.Mode = ModeNumber;
-  VgpuGop->GopModeInfo  = *GopModeInfo;
+  CopyMem (&VgpuGop->GopModeInfo, GopModeInfo, sizeof (VgpuGop->GopModeInfo));
   FreePool (GopModeInfo);
   return EFI_SUCCESS;
 
