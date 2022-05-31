@@ -42,10 +42,11 @@ AsmRelocateApMailBoxLoopStart:
 
     mov         rax, TDVMCALL
     mov         rcx, TDVMCALL_EXPOSE_REGS_MASK
+    xor         r10, r10
     mov         r11, EXIT_REASON_CPUID
     mov         r12, 0xb
     tdcall
-    test        rax, rax
+    test        r10, r10
     jnz         Panic
     mov         r8, r15
 
