@@ -20,9 +20,8 @@
 #include <IndustryStandard/UefiTcgPlatform.h>
 #include <Library/PlatformInitLib.h>
 #include <OvmfPlatforms.h>
+#include <Pi/PrePiHob.h>
 #include "PeilessStartupInternal.h"
-
-#define EFI_RESOURCE_MEMORY_UNACCEPTED  7
 
 /**
  * Construct the HobList in SEC phase.
