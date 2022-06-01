@@ -21,6 +21,7 @@
 #include <Library/PlatformInitLib.h>
 #include <OvmfPlatforms.h>
 #include <Pi/PrePiHob.h>
+#include <WorkArea.h>
 #include "PeilessStartupInternal.h"
 
 /**
@@ -74,10 +75,13 @@ ConstructFwHobList (
   )
 {
   EFI_PEI_HOB_POINTERS  Hob;
+  EFI_PHYSICAL_ADDRESS  PhysicalStart;
   EFI_PHYSICAL_ADDRESS  PhysicalEnd;
   UINT64                ResourceLength;
   EFI_PHYSICAL_ADDRESS  LowMemoryStart;
   UINT64                LowMemoryLength;
+  UINT64                MaxAcceptedMemoryAddress;
+  TDX_WORK_AREA         *WorkArea;
 
   ASSERT (VmmHobList != NULL);
 
@@ -86,14 +90,31 @@ ConstructFwHobList (
   LowMemoryLength = 0;
   LowMemoryStart  = 0;
 
+  WorkArea = (TDX_WORK_AREA *)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+  ASSERT (WorkArea != NULL);
+  ASSERT (WorkArea->Header.GuestType == CcGuestTypeIntelTdx);
+  MaxAcceptedMemoryAddress = WorkArea->SecTdxWorkArea.MaxAcceptedMemoryAddress;
+  if (MaxAcceptedMemoryAddress == 0) {
+    MaxAcceptedMemoryAddress = MAX_UINT64;
+  }
+
   //
   // Parse the HOB list until end of list or matching type is found.
   //
   while (!END_OF_HOB_LIST (Hob)) {
     if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
+      if ((Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) && (Hob.ResourceDescriptor->PhysicalStart < MaxAcceptedMemoryAddress)) {
         PhysicalEnd    = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
         ResourceLength = Hob.ResourceDescriptor->ResourceLength;
+        PhysicalStart  = Hob.ResourceDescriptor->PhysicalStart;
+
+        if ((PhysicalEnd >= MaxAcceptedMemoryAddress) && (PhysicalStart < MaxAcceptedMemoryAddress)) {
+          //
+          // This memory region is split into 2 parts. The left part is accepted.
+          //
+          PhysicalEnd    = MaxAcceptedMemoryAddress;
+          ResourceLength = PhysicalEnd - PhysicalStart;
+        }
 
         if (PhysicalEnd <= BASE_4GB) {
           if (ResourceLength > LowMemoryLength) {
