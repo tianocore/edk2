@@ -52,6 +52,7 @@
   gEfiAcpiTableProtocolGuid                        ## CONSUMES
   gEfiMpInitLibMpDepProtocolGuid
   gEfiMpInitLibUpDepProtocolGuid
+  gEdkiiMemoryAcceptProtocolGuid
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdPciIoBase
@@ -69,3 +70,4 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize
