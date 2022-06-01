@@ -278,14 +278,6 @@ ClearSevEsWorkArea:
     mov     [SEV_ES_WORK_AREA_STATUS_MSR], eax
     mov     [SEV_ES_WORK_AREA_STATUS_MSR + 4], edx
 
-    ; Check for SEV-ES memory encryption feature:
-    ; CPUID  Fn8000_001F[EAX] - Bit 3
-    ;   CPUID raises a #VC exception if running as an SEV-ES guest
-    mov       eax, 0x8000001f
-    cpuid
-    bt        eax, 3
-    jnc       GetSevEncBit
-
     ; Check if SEV-ES is enabled
     ;  MSR_0xC0010131 - Bit 1 (SEV-ES enabled)
     mov       ecx, SEV_STATUS_MSR
