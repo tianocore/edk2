@@ -62,6 +62,11 @@
   #
   DEFINE UP_CPU_DXE_GUID  = 6490f1c5-ebcc-4665-8892-0075b9bb49b7
 
+  #
+  # Define the size of lazy accepted memory. The unit is MB.
+  #
+  DEFINE LAZY_ACCEPT_PARTIAL_MEM = 512
+
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
@@ -452,6 +457,9 @@
 
   # Point to the MdeModulePkg/Application/UiApp/UiApp.inf
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
+
+  # The partial memory size in Lazy accept
+  gUefiOvmfPkgTokenSpaceGuid.PcdLazyAcceptPartialMemorySize|$(LAZY_ACCEPT_PARTIAL_MEM)
 
 ################################################################################
 #
