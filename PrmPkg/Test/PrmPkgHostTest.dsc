@@ -37,3 +37,4 @@
   #
   PrmPkg/Library/DxePrmContextBufferLib/UnitTest/DxePrmContextBufferLibUnitTestHost.inf
   PrmPkg/Library/DxePrmModuleDiscoveryLib/UnitTest/DxePrmModuleDiscoveryLibUnitTestHost.inf
+# modified
