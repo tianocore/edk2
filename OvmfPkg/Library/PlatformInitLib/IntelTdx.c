@@ -7,6 +7,7 @@
 
 **/
 
+#include <Base.h>
 #include <PiPei.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -24,7 +25,8 @@
 #include <WorkArea.h>
 #include <ConfidentialComputingGuestAttr.h>
 
-#define ALIGNED_2MB_MASK                0x1fffff
+#define ALIGNED_2MB_MASK  0x1fffff
+#define MEGABYTE_SHIFT    20
 
 /**
   This function will be called to accept pages. Only BSP accepts pages.
@@ -375,10 +377,17 @@ ProcessHobList (
   EFI_STATUS            Status;
   EFI_PEI_HOB_POINTERS  Hob;
   EFI_PHYSICAL_ADDRESS  PhysicalEnd;
+  TDX_WORK_AREA         *WorkArea;
+  UINT64                ResourceLength;
+  UINT64                AccumulateAcceptedMemory;
+  UINT64                MaxAcceptedMemoryAddress;
 
   Status = EFI_SUCCESS;
   ASSERT (VmmHobList != NULL);
   Hob.Raw = (UINT8 *)VmmHobList;
+
+  AccumulateAcceptedMemory = 0;
+  MaxAcceptedMemoryAddress = 0;
 
   //
   // Parse the HOB list until end of list or matching type is found.
@@ -393,7 +402,16 @@ ProcessHobList (
         DEBUG ((DEBUG_INFO, "ResourceLength: 0x%llx\n", Hob.ResourceDescriptor->ResourceLength));
         DEBUG ((DEBUG_INFO, "Owner: %g\n\n", &Hob.ResourceDescriptor->Owner));
 
-        PhysicalEnd = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+        PhysicalEnd    = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+        ResourceLength = Hob.ResourceDescriptor->ResourceLength;
+
+        if (PhysicalEnd > SIZE_4GB) {
+          //
+          // In current stage, we only accept the memory under 4G
+          //
+          ResourceLength -= (PhysicalEnd - SIZE_4GB);
+          PhysicalEnd     = SIZE_4GB;
+        }
 
         Status = BspAcceptMemoryResourceRange (
                    Hob.ResourceDescriptor->PhysicalStart,
@@ -402,11 +420,24 @@ ProcessHobList (
         if (EFI_ERROR (Status)) {
           break;
         }
+
+        AccumulateAcceptedMemory += ResourceLength;
+        MaxAcceptedMemoryAddress  = PhysicalEnd;
       }
     }
 
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
+
+  //
+  // Record MaxAcceptedMemoryAddress in OvmfWorkArea.
+  // This information is useful later but in SEC phase we cannot use a global
+  // variable to pass this value. So it is stored in OvmfWorkarea.
+  //
+  WorkArea = (TDX_WORK_AREA *)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+  ASSERT (WorkArea != NULL);
+  ASSERT (WorkArea->Header.GuestType == CcGuestTypeIntelTdx);
+  WorkArea->SecTdxWorkArea.MaxAcceptedMemoryAddress = MaxAcceptedMemoryAddress;
 
   return Status;
 }
@@ -461,6 +492,74 @@ ProcessTdxHobList (
 }
 
 /**
+ * Build ResourceDescriptorHob for the unaccepted memory region.
+ * This memory region may be splitted into 2 parts because of lazy accept.
+ *
+ * @param Hob     Point to the EFI_HOB_RESOURCE_DESCRIPTOR
+ * @param MaxAcceptedMemoryAddress The max accepted memory address
+ * @return VOID
+ */
+VOID
+BuildResourceDescriptorHobForUnacceptedMemory (
+  IN EFI_HOB_RESOURCE_DESCRIPTOR  *Hob,
+  IN UINT64                       MaxAcceptedMemoryAddress
+  )
+{
+  EFI_PHYSICAL_ADDRESS         PhysicalStart;
+  EFI_PHYSICAL_ADDRESS         PhysicalEnd;
+  UINT64                       ResourceLength;
+  EFI_RESOURCE_TYPE            ResourceType;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute;
+  UINT64                       AcceptedResourceLength;
+
+  ASSERT (Hob->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED);
+
+  ResourceType      = EFI_RESOURCE_MEMORY_UNACCEPTED;
+  ResourceAttribute = Hob->ResourceAttribute;
+  PhysicalStart     = Hob->PhysicalStart;
+  ResourceLength    = Hob->ResourceLength;
+  PhysicalEnd       = PhysicalStart + ResourceLength;
+
+  if (PhysicalEnd <= MaxAcceptedMemoryAddress) {
+    //
+    // This memory region has been accepted.
+    //
+    ResourceType       = EFI_RESOURCE_SYSTEM_MEMORY;
+    ResourceAttribute |= (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_TESTED);
+  } else if (PhysicalStart >= MaxAcceptedMemoryAddress) {
+    //
+    // This memory region hasn't been accepted.
+    // So keep the ResourceType and ResourceAttribute unchange.
+    //
+  } else {
+    //
+    // This memory region is splitted into 2 parts:
+    // the accepted and unaccepted.
+    //
+    AcceptedResourceLength = MaxAcceptedMemoryAddress - Hob->PhysicalStart;
+
+    // We build the ResourceDescriptorHob for the accepted part.
+    // The unaccepted part will be build out side the if-else block.
+    BuildResourceDescriptorHob (
+      EFI_RESOURCE_SYSTEM_MEMORY,
+      ResourceAttribute | (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_TESTED),
+      Hob->PhysicalStart,
+      AcceptedResourceLength
+      );
+
+    PhysicalStart   = Hob->PhysicalStart + AcceptedResourceLength;
+    ResourceLength -= AcceptedResourceLength;
+  }
+
+  BuildResourceDescriptorHob (
+    ResourceType,
+    ResourceAttribute,
+    PhysicalStart,
+    ResourceLength
+    );
+}
+
+/**
   Transfer the incoming HobList for the TD to the final HobList for Dxe.
   The Hobs transferred in this function are ResourceDescriptor hob and
   MemoryAllocation hob.
@@ -477,6 +576,16 @@ TransferTdxHobList (
   EFI_PEI_HOB_POINTERS         Hob;
   EFI_RESOURCE_TYPE            ResourceType;
   EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute;
+  UINT64                       MaxAcceptedMemoryAddress;
+  TDX_WORK_AREA                *WorkArea;
+
+  WorkArea = (TDX_WORK_AREA *)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+  ASSERT (WorkArea != NULL);
+  ASSERT (WorkArea->Header.GuestType == CcGuestTypeIntelTdx);
+  MaxAcceptedMemoryAddress = WorkArea->SecTdxWorkArea.MaxAcceptedMemoryAddress;
+  if (MaxAcceptedMemoryAddress == 0) {
+    MaxAcceptedMemoryAddress = MAX_UINT64;
+  }
 
   //
   // PcdOvmfSecGhcbBase is used as the TD_HOB in Tdx guest.
@@ -489,16 +598,16 @@ TransferTdxHobList (
         ResourceAttribute = Hob.ResourceDescriptor->ResourceAttribute;
 
         if (ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) {
-          ResourceType       = EFI_RESOURCE_SYSTEM_MEMORY;
-          ResourceAttribute |= (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_TESTED);
+          BuildResourceDescriptorHobForUnacceptedMemory (Hob.ResourceDescriptor, MaxAcceptedMemoryAddress);
+        } else {
+          BuildResourceDescriptorHob (
+            ResourceType,
+            ResourceAttribute,
+            Hob.ResourceDescriptor->PhysicalStart,
+            Hob.ResourceDescriptor->ResourceLength
+            );
         }
 
-        BuildResourceDescriptorHob (
-          ResourceType,
-          ResourceAttribute,
-          Hob.ResourceDescriptor->PhysicalStart,
-          Hob.ResourceDescriptor->ResourceLength
-          );
         break;
       case EFI_HOB_TYPE_MEMORY_ALLOCATION:
         BuildMemoryAllocationHob (
