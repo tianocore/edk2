@@ -20,11 +20,11 @@
 #include <Library/PeiServicesLib.h>
 #include <Library/TdxLib.h>
 #include <Library/SynchronizationLib.h>
+#include <Pi/PrePiHob.h>
 #include <WorkArea.h>
 #include <ConfidentialComputingGuestAttr.h>
 
 #define ALIGNED_2MB_MASK                0x1fffff
-#define EFI_RESOURCE_MEMORY_UNACCEPTED  7
 
 /**
   This function will be called to accept pages. Only BSP accepts pages.
