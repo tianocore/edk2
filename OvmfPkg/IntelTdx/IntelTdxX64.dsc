@@ -766,3 +766,4 @@
       HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
       NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
   }
+#modified

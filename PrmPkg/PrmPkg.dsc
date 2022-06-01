@@ -158,3 +158,4 @@
 [BuildOptions]
 # Force deprecated interfaces off
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
+# modified
