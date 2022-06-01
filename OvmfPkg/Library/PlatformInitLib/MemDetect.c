@@ -42,6 +42,8 @@ Module Name:
 
 #include <Library/PlatformInitLib.h>
 
+#define MEGABYTE_SHIFT  20
+
 VOID
 EFIAPI
 PlatformQemuUc32BaseInitialization (
@@ -287,6 +289,31 @@ GetHighestSystemMemoryAddressFromPvhMemmap (
   }
 
   return HighestAddress;
+}
+
+UINT32
+EFIAPI
+PlatformAdjustSystemMemorySizeBelow4gbForLazyAccept (
+  IN UINT32  LowerMemorySize
+  )
+{
+ #ifdef MDE_CPU_X64
+  UINT64  LazyAcceptMemSize;
+
+  LazyAcceptMemSize = FixedPcdGet64 (PcdLazyAcceptPartialMemorySize);
+  //
+  // If specified accept size is not zero,
+  // transfer the size in megabyte to the number in byte.
+  //
+  if (LazyAcceptMemSize != 0) {
+    LazyAcceptMemSize <<= MEGABYTE_SHIFT;
+    if (LazyAcceptMemSize < LowerMemorySize) {
+      LowerMemorySize = (UINT32)(UINTN)LazyAcceptMemSize;
+    }
+  }
+
+ #endif
+  return LowerMemorySize;
 }
 
 UINT32
