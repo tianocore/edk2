@@ -279,6 +279,11 @@ PublishPeiMemory (
     LowerMemorySize -= mPlatformInfoHob.Q35TsegMbytes * SIZE_1MB;
   }
 
+  //
+  // Adjustment for Lazy accept because it may accept part of the memory.
+  //
+  LowerMemorySize = PlatformAdjustSystemMemorySizeBelow4gbForLazyAccept (LowerMemorySize);
+
   S3AcpiReservedMemoryBase = 0;
   S3AcpiReservedMemorySize = 0;
 

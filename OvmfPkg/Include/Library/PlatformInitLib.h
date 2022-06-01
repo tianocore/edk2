@@ -144,6 +144,12 @@ PlatformGetSystemMemorySizeBelow4gb (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
+UINT32
+EFIAPI
+PlatformAdjustSystemMemorySizeBelow4gbForLazyAccept (
+  IN UINT32  LowerMemorySize
+  );
+
 /**
   Initialize the PhysMemAddressWidth field in PlatformInfoHob based on guest RAM size.
 **/
