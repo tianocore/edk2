@@ -491,6 +491,42 @@ PlatformGetFirstNonAddress (
   return FirstNonAddress;
 }
 
+/*
+ * Use CPUID to figure physical address width.  Does *not* work
+ * reliable on qemu.  For historical reasons qemu returns phys-bits=40
+ * even in case the host machine supports less than that.
+ *
+ * qemu has a cpu property (host-phys-bits={on,off}) to change that
+ * and make sure guest phys-bits are not larger than host phys-bits.,
+ * but it is off by default.  Exception: microvm machine type
+ * hard-wires that property to on.
+ */
+VOID
+EFIAPI
+PlatformAddressWidthFromCpuid (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  UINT32  RegEax;
+
+  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+  if (RegEax >= 0x80000008) {
+    AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+    PlatformInfoHob->PhysMemAddressWidth = (UINT8)RegEax;
+  } else {
+    PlatformInfoHob->PhysMemAddressWidth = 36;
+  }
+
+  PlatformInfoHob->FirstNonAddress = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth);
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: cpuid: phys-bits is %d\n",
+    __FUNCTION__,
+    PlatformInfoHob->PhysMemAddressWidth
+    ));
+}
+
 /**
   Initialize the PhysMemAddressWidth field in PlatformInfoHob based on guest RAM size.
 **/
@@ -502,6 +538,11 @@ PlatformAddressWidthInitialization (
 {
   UINT64  FirstNonAddress;
   UINT8   PhysMemAddressWidth;
+
+  if (PlatformInfoHob->HostBridgeDevId == 0xffff /* microvm */) {
+    PlatformAddressWidthFromCpuid (PlatformInfoHob);
+    return;
+  }
 
   //
   // As guest-physical memory size grows, the permanent PEI RAM requirements
