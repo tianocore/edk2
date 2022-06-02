@@ -292,13 +292,8 @@ ProcessPciHost (
     }
   }
 
-  if ((*IoSize == 0) || (*Mmio32Size == 0)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: %a space empty\n",
-      __FUNCTION__,
-      (*IoSize == 0) ? "IO" : "MMIO32"
-      ));
+  if (*Mmio32Size == 0) {
+    DEBUG ((DEBUG_ERROR, "%a: MMIO32 space empty\n", __FUNCTION__));
     return EFI_PROTOCOL_ERROR;
   }
 
@@ -333,13 +328,15 @@ ProcessPciHost (
     return Status;
   }
 
-  //
-  // Map the MMIO window that provides I/O access - the PCI host bridge code
-  // is not aware of this translation and so it will only map the I/O view
-  // in the GCD I/O map.
-  //
-  Status = MapGcdMmioSpace (*IoBase + IoTranslation, *IoSize);
-  ASSERT_EFI_ERROR (Status);
+  if (*IoSize != 0) {
+    //
+    // Map the MMIO window that provides I/O access - the PCI host bridge code
+    // is not aware of this translation and so it will only map the I/O view
+    // in the GCD I/O map.
+    //
+    Status = MapGcdMmioSpace (*IoBase + IoTranslation, *IoSize);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   return Status;
 }
@@ -413,17 +410,21 @@ PciHostBridgeGetRootBridges (
 
   AllocationAttributes = EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM;
 
-  Io.Base   = IoBase;
-  Io.Limit  = IoBase + IoSize - 1;
+  if (IoSize != 0) {
+    Io.Base  = IoBase;
+    Io.Limit = IoBase + IoSize - 1;
+  } else {
+    Io.Base  = MAX_UINT64;
+    Io.Limit = 0;
+  }
+
   Mem.Base  = Mmio32Base;
   Mem.Limit = Mmio32Base + Mmio32Size - 1;
 
-  if (sizeof (UINTN) == sizeof (UINT64)) {
-    MemAbove4G.Base  = Mmio64Base;
-    MemAbove4G.Limit = Mmio64Base + Mmio64Size - 1;
-    if (Mmio64Size > 0) {
-      AllocationAttributes |= EFI_PCI_HOST_BRIDGE_MEM64_DECODE;
-    }
+  if ((sizeof (UINTN) == sizeof (UINT64)) && (Mmio64Size != 0)) {
+    MemAbove4G.Base       = Mmio64Base;
+    MemAbove4G.Limit      = Mmio64Base + Mmio64Size - 1;
+    AllocationAttributes |= EFI_PCI_HOST_BRIDGE_MEM64_DECODE;
   } else {
     //
     // UEFI mandates a 1:1 virtual-to-physical mapping, so on a 32-bit
