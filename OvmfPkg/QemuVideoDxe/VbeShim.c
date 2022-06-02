@@ -156,6 +156,8 @@ InstallVbeShim (
     case INTEL_Q35_MCH_DEVICE_ID:
       Pam1Address = DRAMC_REGISTER_Q35 (MCH_PAM1);
       break;
+    case MICROVM_PSEUDO_DEVICE_ID:
+      return;
     default:
       DEBUG ((
         DEBUG_ERROR,
