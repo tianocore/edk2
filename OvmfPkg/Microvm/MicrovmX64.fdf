@@ -32,32 +32,6 @@ FV = FVMAIN_COMPACT
 $(SECFV_OFFSET)|$(SECFV_SIZE)
 FV = SECFV
 
-#
-# Build the variable store and the firmware code as separate flash device
-# images.
-#
-[FD.MICROVM_VARS]
-BaseAddress   = $(FW_BASE_ADDRESS)
-Size          = $(VARS_SIZE)
-ErasePolarity = 1
-BlockSize     = $(BLOCK_SIZE)
-NumBlocks     = $(VARS_BLOCKS)
-
-!include OvmfPkg/VarStore.fdf.inc
-
-[FD.MICROVM_CODE]
-BaseAddress   = $(CODE_BASE_ADDRESS)
-Size          = $(CODE_SIZE)
-ErasePolarity = 1
-BlockSize     = $(BLOCK_SIZE)
-NumBlocks     = $(CODE_BLOCKS)
-
-0x00000000|$(FVMAIN_SIZE)
-FV = FVMAIN_COMPACT
-
-$(FVMAIN_SIZE)|$(SECFV_SIZE)
-FV = SECFV
-
 ################################################################################
 
 [FD.MEMFD]
