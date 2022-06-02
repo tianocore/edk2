@@ -357,12 +357,12 @@ InitializePlatform (
 
   S3Verification ();
   BootModeInitialization (&mPlatformInfoHob);
-  AddressWidthInitialization (&mPlatformInfoHob);
 
   //
   // Query Host Bridge DID
   //
   mPlatformInfoHob.HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
+  AddressWidthInitialization (&mPlatformInfoHob);
 
   MaxCpuCountInitialization (&mPlatformInfoHob);
 
