@@ -299,6 +299,48 @@ SmmCpuFeaturesInitializeProcessor (
 }
 
 /**
+  Called during the very first SMI into System Management Mode to initialize CPU features.
+  The package-scope register will only be programmed once for each package scope, which is
+  specified by PackageLevelProgram during the initialization. The currently executing CPU
+  is specified by CpuIndex and CpuIndex can be used to access information about the currently
+  executing CPU in the ProcessorInfo array and the CpuHotPlugData data structure.
+
+  @param[in] CpuIndex             The index of the CPU to initialize.  The value
+                                  must be between 0 and the NumberOfCpus field in
+                                  the System Management System Table (SMST).
+  @param[in] IsMonarch            TRUE if the CpuIndex is the index of the CPU that
+                                   was elected as monarch during System Management
+                                  Mode initialization.
+                                  FALSE if the CpuIndex is not the index of the CPU
+                                  that was elected as monarch during System
+                                  Management Mode initialization.
+  @param[in] PackageLevelProgram  TRUE if the CpuIndex is the index of the CPU that
+                                  was elected to do the package level register programming,
+                                  thus the package-scope register will be programmed
+                                  during System Management Mode initialization.
+                                  FALSE if the CpuIndex is not the index of the CPU
+                                  that was elected to do the package level register programming,
+                                  thus the package-scope register will not be programmed
+                                  during System Management Mode initialization.
+  @param[in] ProcessorInfo        Pointer to an array of EFI_PROCESSOR_INFORMATION
+                                  structures.  ProcessorInfo[CpuIndex] contains the
+                                  information for the currently executing CPU.
+  @param[in] CpuHotPlugData       Pointer to the CPU_HOT_PLUG_DATA structure that
+                                  contains the ApidId and SmBase arrays.
+**/
+VOID
+EFIAPI
+SmmCpuFeaturesInitializeProcessor2 (
+  IN UINTN                      CpuIndex,
+  IN BOOLEAN                    IsMonarch,
+  IN BOOLEAN                    PackageLevelProgram,
+  IN EFI_PROCESSOR_INFORMATION  *ProcessorInfo,
+  IN CPU_HOT_PLUG_DATA          *CpuHotPlugData
+  )
+{
+}
+
+/**
   This function updates the SMRAM save state on the currently executing CPU
   to resume execution at a specific address after an RSM instruction.  This
   function must evaluate the SMRAM save state to determine the execution mode
