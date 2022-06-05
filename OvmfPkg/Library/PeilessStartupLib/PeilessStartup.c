@@ -20,7 +20,6 @@
 #include <ConfidentialComputingGuestAttr.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <OvmfPlatforms.h>
-#include <Library/SecMeasurementLib.h>
 #include "PeilessStartupInternal.h"
 
 #define GET_GPAW_INIT_STATE(INFO)  ((UINT8) ((INFO) & 0x3f))
