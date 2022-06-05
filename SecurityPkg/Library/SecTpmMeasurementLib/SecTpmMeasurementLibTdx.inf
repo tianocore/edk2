@@ -1,0 +1,34 @@
+## @file
+#  Provides RTMR based measurement functions for Intel Tdx guest.
+#
+#  This library provides TpmMeasureAndLogData() in a TDX guest to measure and log data, and
+#  extend the measurement result into a specific RTMR.
+#
+# Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecTpmMeasurementLibTdx
+  FILE_GUID                      = 1aeb641c-0324-47bd-b29d-e59671fc4106
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TpmMeasurementLib|SEC
+
+[Sources]
+  SecTpmMeasurementLibTdx.c
+
+[Packages]
+  CryptoPkg/CryptoPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[Guids]
+  gCcEventEntryHobGuid
+
+[LibraryClasses]
+  BaseLib
+  HashLib

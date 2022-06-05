@@ -95,6 +95,7 @@
 
 [LibraryClasses.X64.SEC]
   HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
+  TpmMeasurementLib|SecurityPkg/Library/SecTpmMeasurementLib/SecTpmMeasurementLibTdx.inf
 
 [LibraryClasses.X64.DXE_DRIVER]
   HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
@@ -292,6 +293,7 @@
 
 [Components.X64]
   SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
+  SecurityPkg/Library/SecTpmMeasurementLib/SecTpmMeasurementLibTdx.inf
 
 [Components.IA32, Components.X64]
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
