@@ -29,6 +29,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
+#include <Library/DevicePathLib.h>
 
 //
 // Structure forward declarations
@@ -629,22 +630,6 @@ TrustTransferAtaDevice (
   IN     BOOLEAN                   IsTrustSend,
   IN     UINT64                    Timeout,
   OUT    UINTN                     *TransferLengthOut
-  );
-
-/**
-  Returns a pointer to the next node in a device path.
-
-  If Node is NULL, then ASSERT().
-
-  @param  Node    A pointer to a device path node data structure.
-
-  @return a pointer to the device path node that follows the device path node
-  specified by Node.
-
-**/
-EFI_DEVICE_PATH_PROTOCOL *
-NextDevicePathNode (
-  IN CONST VOID  *Node
   );
 
 /**
