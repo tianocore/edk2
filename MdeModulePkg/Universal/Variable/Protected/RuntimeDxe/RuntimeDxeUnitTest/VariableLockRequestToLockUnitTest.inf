@@ -1,0 +1,36 @@
+## @file
+# This is a host-based unit test for the VariableLockRequestToLock shim.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = VariableLockRequestToLockUnitTest
+  FILE_GUID           = A657FCD8-4A0D-46B4-8DC9-F089626383AD
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = HOST_APPLICATION
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  VariableLockRequestToLockUnitTest.c
+  ../VariableLockRequestToLock.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  UnitTestLib
+  DebugLib
+  VariablePolicyLib
+  VariablePolicyHelperLib
+  BaseMemoryLib
+  MemoryAllocationLib
