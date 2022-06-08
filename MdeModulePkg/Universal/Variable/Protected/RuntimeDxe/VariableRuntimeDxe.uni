@@ -1,0 +1,22 @@
+// /** @file
+// Provides variable service.
+//
+// This module installs variable arch protocol and variable write arch protocol to provide
+// variable services: SetVariable, GetVariable, GetNextVariableName and QueryVariableInfo.
+//
+// Caution: This module requires additional review when modified.
+// This driver will have external input - variable data.
+// This external input must be validated carefully to avoid security issues such as
+// buffer overflow or integer overflow.
+//
+// Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides variable service"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module installs variable arch protocol and variable write arch protocol to provide variable services: SetVariable, GetVariable, GetNextVariableName and QueryVariableInfo. Caution: This module requires additional review when modified. This driver will have external input - variable data. This external input must be validated carefully to avoid security issues such as buffer overflow or integer overflow."
+
