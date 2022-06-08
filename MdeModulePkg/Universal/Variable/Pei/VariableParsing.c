@@ -834,13 +834,7 @@ GetVariableInfo (
 
   Retrieve details of the variable next to given variable within VariableStore.
 
-  If VarInfo->Buffer is NULL, the first one in VariableStore is returned.
-
-  VariableStart and/or VariableEnd can be given optionally for the situation
-  in which the valid storage space is smaller than the VariableStore->Size.
-  This usually happens when PEI variable services make a compact variable
-  cache to save memory, which cannot make use VariableStore->Size to determine
-  the correct variable storage range.
+  If VariableInfo->StoreIndex is invalid, the first one in VariableStore is returned.
 
   @param[in,out] VariableInfo             Pointer to variable information.
 
