@@ -227,13 +227,7 @@ CompareWithValidVariable (
 
   Retrieve details of the variable next to given variable within VariableStore.
 
-  If VarInfo->Address is NULL, the first one in VariableStore is returned.
-
-  VariableStart and/or VariableEnd can be given optionally for the situation
-  in which the valid storage space is smaller than the VariableStore->Size.
-  This usually happens when PEI variable services make a compact variable
-  cache to save memory, which cannot make use VariableStore->Size to determine
-  the correct variable storage range.
+  If VariableInfo->StoreIndex is invalid, the first one in VariableStore is returned.
 
   @param[in,out] VariableInfo             Pointer to variable information.
 
@@ -250,28 +244,29 @@ GetNextVariableInfo (
 
 /**
 
-  Retrieve details about a variable and return them in VariableInfo->Header.
+  Retrieve details about a variable, given by VariableInfo->Buffer or
+  VariableInfo->Index, and pass the details back in VariableInfo->Header.
 
-  If VariableInfo->Address is given, this function will calculate its offset
-  relative to given variable storage via VariableStore; Otherwise, it will try
-  other internal variable storages or cached copies. It's assumed that, for all
-  copies of NV variable storage, all variables are stored in the same relative
-  position. If VariableInfo->Address is found in the range of any storage copies,
-  its offset relative to that storage should be the same in other copies.
+  This function is used to resolve the variable data structure into
+  VariableInfo->Header, for easier access later without revisiting the variable
+  data in variable store. If pointers in the structure of VariableInfo->Header
+  are not NULL, it's supposed that they are buffers passed in to hold a copy of
+  data of corresponding data fields in variable data structure. Otherwise, this
+  function simply returns pointers pointing to address of those data fields.
 
-  If VariableInfo->Offset is given (non-zero) but not VariableInfo->Address,
-  this function will return the variable memory address inside VariableStore,
-  if given, via VariableInfo->Address; Otherwise, the address of other storage
-  copies will be returned, if any.
+  The variable is specified by either VariableInfo->Index or VariableInfo->Buffer.
+  If VariableInfo->Index is given, this function finds the corresponding variable
+  first from variable storage according to the Index.
 
-  For a new variable whose offset has not been determined, a value of -1 as
-  VariableInfo->Offset should be passed to skip the offset calculation.
+  If both VariableInfo->Index and VariableInfo->Buffer are given, it's supposed
+  that VariableInfo->Buffer is a buffer passed in to hold a whole copy of
+  requested variable data to be returned.
 
   @param[in,out] VariableInfo             Pointer to variable information.
 
-  @retval EFI_INVALID_PARAMETER  VariableInfo is NULL or both VariableInfo->Address
-                                 and VariableInfo->Offset are NULL (0).
-  @retval EFI_NOT_FOUND          If given Address or Offset is out of range of
+  @retval EFI_INVALID_PARAMETER  VariableInfo is NULL or both VariableInfo->Buffer
+                                 and VariableInfo->Index are NULL (0).
+  @retval EFI_NOT_FOUND          If given Buffer or Index is out of range of
                                  any given or internal storage copies.
   @retval EFI_SUCCESS            Variable details are retrieved successfully.
 
