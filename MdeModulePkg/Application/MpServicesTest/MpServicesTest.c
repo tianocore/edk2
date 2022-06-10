@@ -15,7 +15,7 @@
 
 #define MAX_RANDOM_PROCESSOR_RETRIES  10
 
-#define AP_STARTUP_TEST_TIMEOUT_US  50000
+#define AP_STARTUP_TEST_TIMEOUT_US  300000
 #define INFINITE_TIMEOUT            0
 
 /** The procedure to run with the MP Services interface.
@@ -42,7 +42,8 @@ ApFunction (
 STATIC
 UINTN
 PrintProcessorInformation (
-  IN EFI_MP_SERVICES_PROTOCOL  *Mp
+  IN   EFI_MP_SERVICES_PROTOCOL  *Mp,
+  OUT  UINTN                     *BspIndex
   )
 {
   EFI_STATUS                 Status;
@@ -71,6 +72,10 @@ PrintProcessorInformation (
         CpuInfo.ProcessorId,
         (CpuInfo.StatusFlag & PROCESSOR_AS_BSP_BIT) ? L"BSP" : L"AP"
         );
+
+      if ((CpuInfo.StatusFlag & PROCESSOR_AS_BSP_BIT) && (BspIndex != NULL)) {
+        *BspIndex = Index;
+      }
 
       Print (L"%s | ", (CpuInfo.StatusFlag & PROCESSOR_ENABLED_BIT) ? L"Enabled" : L"Disabled");
       Print (L"%s\n", (CpuInfo.StatusFlag & PROCESSOR_HEALTH_STATUS_BIT) ? L"Healthy" : L"Faulted");
@@ -270,7 +275,7 @@ StartupAllAPsTests (
                  ApFunction,
                  TRUE,
                  NULL,
-                 Timeout,
+                 INFINITE_TIMEOUT,
                  NULL,
                  NULL
                  );
@@ -284,14 +289,16 @@ StartupAllAPsTests (
 
 /** Tests for the EnableDisableAP function.
 
-  @param Mp      The MP Services Protocol.
-  @param NumCpus The number of CPUs in the system.
+  @param Mp       The MP Services Protocol.
+  @param BspIndex Index of the BSP.
+  @param NumCpus  The number of CPUs in the system.
 
 **/
 STATIC
 VOID
 EnableDisableAPTests (
   IN EFI_MP_SERVICES_PROTOCOL  *Mp,
+  IN UINTN                     BspIndex,
   IN UINTN                     NumCpus
   )
 {
@@ -301,7 +308,12 @@ EnableDisableAPTests (
 
   HealthFlag = 0;
 
-  for (Index = 1; Index < NumCpus; Index++) {
+  for (Index = 0; Index < NumCpus; Index++) {
+    if (Index == BspIndex) {
+      Print (L"Skipping BSP Processor %d\n", Index);
+      continue;
+    }
+
     Print (L"Disabling Processor %d with HealthFlag faulted...", Index);
     Status = Mp->EnableDisableAP (Mp, Index, FALSE, &HealthFlag);
     if (EFI_ERROR (Status)) {
@@ -314,7 +326,11 @@ EnableDisableAPTests (
 
   HealthFlag = PROCESSOR_HEALTH_STATUS_BIT;
 
-  for (Index = 1; Index < NumCpus; Index++) {
+  for (Index = 0; Index < NumCpus; Index++) {
+    if (Index == BspIndex) {
+      Print (L"Skipping BSP Processor %d\n", Index);
+      continue;
+    }
     Print (L"Enabling Processor %d with HealthFlag healthy...", Index);
     Status = Mp->EnableDisableAP (Mp, Index, TRUE, &HealthFlag);
     if (EFI_ERROR (Status)) {
@@ -346,12 +362,11 @@ UefiMain (
 {
   EFI_STATUS                Status;
   EFI_MP_SERVICES_PROTOCOL  *Mp;
-  UINTN                     BspId;
+  UINTN                     CpuIndex;
+  UINTN                     BspIndex;
   UINTN                     NumCpus;
 
   WriteBackDataCacheRange (&ApFunction, 32);
-
-  BspId       = 0;
 
   Status = gBS->LocateProtocol (
                   &gEfiMpServiceProtocolGuid,
@@ -364,12 +379,12 @@ UefiMain (
   }
 
   Print (L"Exercising WhoAmI\n\n");
-  Status = Mp->WhoAmI (Mp, &BspId);
+  Status = Mp->WhoAmI (Mp, &CpuIndex);
   if (EFI_ERROR (Status)) {
     Print (L"WhoAmI failed: %r\n", Status);
     return Status;
   } else {
-    Print (L"WhoAmI: %016lx\n", BspId);
+    Print (L"WhoAmI: %016lx\n", CpuIndex);
   }
 
   Print (L"\n");
@@ -377,7 +392,7 @@ UefiMain (
     L"Exercising GetNumberOfProcessors and GetProcessorInformation with "
     L"CPU_V2_EXTENDED_TOPOLOGY\n\n"
     );
-  NumCpus = PrintProcessorInformation (Mp);
+  NumCpus = PrintProcessorInformation (Mp, &BspIndex);
   if (NumCpus < 2) {
     Print (L"UP system found. Not running further tests.\n");
     return EFI_INVALID_PARAMETER;
@@ -393,7 +408,7 @@ UefiMain (
 
   Print (L"\n");
   Print (L"Exercising EnableDisableAP:\n\n");
-  EnableDisableAPTests (Mp, NumCpus);
+  EnableDisableAPTests (Mp, BspIndex, NumCpus);
 
   return EFI_SUCCESS;
 }

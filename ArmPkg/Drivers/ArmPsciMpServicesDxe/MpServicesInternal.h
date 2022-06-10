@@ -50,6 +50,9 @@ typedef struct {
   EFI_EVENT                    CheckThisAPEvent;
   UINTN                        Timeout;
   UINTN                        TimeTaken;
+  VOID                         *Ttbr0;
+  UINTN                        Tcr;
+  UINTN                        Mair;
 } CPU_AP_DATA;
 
 //

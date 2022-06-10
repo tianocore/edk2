@@ -26,7 +26,7 @@
   APs to help test system memory in parallel with other device initialization.
   Diagnostics applications may also use this protocol for multi-processor.
 
-  Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
+  Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -34,6 +34,8 @@
 #include <PiDxe.h>
 
 #include <Library/ArmLib.h>
+#include <Library/ArmMmuLib.h>
+#include <Library/ArmPlatformLib.h>
 #include <Library/ArmSmcLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/CacheMaintenanceLib.h>
@@ -101,10 +103,15 @@ DispatchCpu (
   Args.Arg1 = gProcessorIDs[ProcessorIndex];
   Args.Arg2 = (UINTN)ApEntryPoint;
 
+  mCpuMpData.CpuData[ProcessorIndex].Tcr = ArmGetTCR ();
+  mCpuMpData.CpuData[ProcessorIndex].Mair = ArmGetMAIR ();
+  mCpuMpData.CpuData[ProcessorIndex].Ttbr0 = ArmGetTTBR0BaseAddress();
+  WriteBackDataCacheRange (&mCpuMpData.CpuData[ProcessorIndex], sizeof(CPU_AP_DATA));
+
   ArmCallSmc (&Args);
 
   if (Args.Arg0 != ARM_SMC_PSCI_RET_SUCCESS) {
-    DEBUG ((DEBUG_ERROR, "PSCI_CPU_ON call failed: %d", Args.Arg0));
+    DEBUG ((DEBUG_ERROR, "PSCI_CPU_ON call failed: %d\n", Args.Arg0));
     Status = EFI_DEVICE_ERROR;
   }
 
@@ -1240,12 +1247,10 @@ MpServicesInitialize (
   IN   CONST ARM_CORE_INFO  *CoreInfo
   )
 {
-  EFI_STATUS         Status;
-  UINTN              Index;
-  UINTN              MappingSize;
-  PHYSICAL_ADDRESS   MappingAddress;
-  VOID               *Mapping;
-  EFI_EVENT          ReadyToBootEvent;
+  EFI_STATUS  Status;
+  UINTN       Index;
+  EFI_EVENT   ReadyToBootEvent;
+  BOOLEAN     IsBsp;
 
   //
   // Clear the data structure area first.
@@ -1257,38 +1262,17 @@ MpServicesInitialize (
   mCpuMpData.NumberOfProcessors        = NumberOfProcessors;
   mCpuMpData.NumberOfEnabledProcessors = NumberOfProcessors;
 
-  MappingSize = mCpuMpData.NumberOfProcessors * sizeof (CPU_AP_DATA);
-  Status = DmaAllocateBuffer (
-             EfiBootServicesData,
-             EFI_SIZE_TO_PAGES (MappingSize),
-             (VOID **)&mCpuMpData.CpuData
-             );
-  if (Status != EFI_SUCCESS) {
-    ASSERT_EFI_ERROR (Status);
-    return Status;
-  }
+  mCpuMpData.CpuData = AllocateZeroPool (
+    mCpuMpData.NumberOfProcessors * sizeof (CPU_AP_DATA)
+    );
 
-  Status = DmaMap (
-             MapOperationBusMasterCommonBuffer,
-             mCpuMpData.CpuData,
-             &MappingSize,
-             &MappingAddress,
-             &Mapping);
-  if (Status != EFI_SUCCESS) {
-    ASSERT_EFI_ERROR (Status);
-    DmaFreeBuffer (
-      EFI_SIZE_TO_PAGES (MappingSize),
-      mCpuMpData.CpuData
-      );
-    return Status;
+  if (mCpuMpData.CpuData == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   /* Allocate one extra for the sentinel entry at the end */
   gProcessorIDs = AllocatePool ((mCpuMpData.NumberOfProcessors + 1) * sizeof (UINT64));
   ASSERT (gProcessorIDs != NULL);
-
-  FillInProcessorInformation (TRUE, CoreInfo[0].Mpidr, 0);
-  gProcessorIDs[0] = mCpuMpData.CpuData[0].Info.ProcessorId;
 
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
@@ -1305,8 +1289,13 @@ MpServicesInitialize (
                     );
   ASSERT (gApStacksBase != NULL);
 
-  for (Index = 1; Index < mCpuMpData.NumberOfProcessors; Index++) {
-    FillInProcessorInformation (FALSE, CoreInfo[Index].Mpidr, Index);
+  for (Index = 0; Index < mCpuMpData.NumberOfProcessors; Index++) {
+    if (GET_MPIDR_AFFINITY_BITS(ArmReadMpidr ()) == CoreInfo[Index].Mpidr) {
+      IsBsp = TRUE;
+    } else {
+      IsBsp = FALSE;
+    }
+    FillInProcessorInformation (IsBsp, CoreInfo[Index].Mpidr, Index);
 
     gProcessorIDs[Index] = mCpuMpData.CpuData[Index].Info.ProcessorId;
 
@@ -1385,7 +1374,7 @@ ArmPsciMpServicesDxeInitialize (
 
   MaxCpus = 1;
 
-  DEBUG ((DEBUG_INFO, "Starting MP services"));
+  DEBUG ((DEBUG_INFO, "Starting MP services\n"));
 
   Status = gBS->HandleProtocol (
                   ImageHandle,
@@ -1453,6 +1442,16 @@ ApProcedure (
   /* Fetch the user-supplied procedure and parameter to execute */
   UserApProcedure = mCpuMpData.CpuData[ProcessorIndex].Procedure;
   UserApParameter = mCpuMpData.CpuData[ProcessorIndex].Parameter;
+
+  // Configure the MMU and caches
+  ArmSetTCR (mCpuMpData.CpuData[ProcessorIndex].Tcr);
+  ArmSetTTBR0 (mCpuMpData.CpuData[ProcessorIndex].Ttbr0);
+  ArmSetMAIR (mCpuMpData.CpuData[ProcessorIndex].Mair);
+  ArmDisableAlignmentCheck ();
+  ArmEnableStackAlignmentCheck ();
+  ArmEnableInstructionCache ();
+  ArmEnableDataCache ();
+  ArmEnableMmu ();
 
   UserApProcedure (UserApParameter);
 
