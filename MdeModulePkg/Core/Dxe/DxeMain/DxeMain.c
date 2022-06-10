@@ -257,6 +257,14 @@ DxeMain (
   ASSERT_EFI_ERROR (Status);
 
   //
+  // Setup Stack Guard
+  //
+  if (PcdGetBool (PcdCpuStackGuard)) {
+    Status = InitializeSeparateExceptionStacks (NULL);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  //
   // Initialize Debug Agent to support source level debug in DXE phase
   //
   InitializeDebugAgent (DEBUG_AGENT_INIT_DXE_CORE, HobStart, NULL);
