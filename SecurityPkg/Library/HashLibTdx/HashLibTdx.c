@@ -186,7 +186,13 @@ RegisterHashInterfaceLib (
   IN HASH_INTERFACE  *HashInterface
   )
 {
-  ASSERT (TdIsEnabled ());
+  //
+  // HashLibTdx is designed for Tdx guest. So if it is not Tdx guest,
+  // return EFI_UNSUPPORTED.
+  //
+  if (!TdIsEnabled ()) {
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Only SHA384 is allowed.
