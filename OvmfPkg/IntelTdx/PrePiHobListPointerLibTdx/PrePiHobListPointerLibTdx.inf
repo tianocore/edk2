@@ -23,7 +23,7 @@
   UefiCpuPkg/UefiCpuPkg.dec
 
 [Pcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
 
 [LibraryClasses]
   PcdLib
