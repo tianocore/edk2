@@ -9,7 +9,7 @@
 
   PhysicalPresenceCallback() and MemoryClearCallback() will receive untrusted input and do some check.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -42,6 +42,7 @@ EFI_HANDLE                 mReadyToLockHandle;
                                     should still be called.
   @retval EFI_UNSUPPORTED           An unknown test function was requested.
   @retval EFI_ACCESS_DENIED         Part of the communication buffer lies in an invalid region.
+  @retval EFI_ABORTED               Fail to wait for all AP check in SMM.
 
 **/
 EFI_STATUS
@@ -76,6 +77,11 @@ TpmNvsCommunciate (
   if (!IsBufferOutsideMmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((DEBUG_ERROR, "[%a] - MM Communication buffer in invalid location!\n", __FUNCTION__));
     return EFI_ACCESS_DENIED;
+  }
+
+  if (EFI_ERROR (SmmWaitForAllProcessor (TRUE))) {
+    DEBUG ((DEBUG_ERROR, "TpmNvsCommunciate: fail to wait for all AP check in SMM!\n"));
+    return EFI_ABORTED;
   }
 
   //
@@ -116,7 +122,7 @@ TpmNvsCommunciate (
   @param[in, out] CommBufferSize  The size of the CommBuffer.
 
   @retval EFI_SUCCESS             The interrupt was handled successfully.
-
+  @retval EFI_ABORTED             Fail to wait for all AP check in SMM.
 **/
 EFI_STATUS
 EFIAPI
@@ -131,6 +137,11 @@ PhysicalPresenceCallback (
   UINT32  Response;
   UINT32  OperationRequest;
   UINT32  RequestParameter;
+
+  if (EFI_ERROR (SmmWaitForAllProcessor (TRUE))) {
+    DEBUG ((DEBUG_ERROR, "TpmPhysicalPresent: fail to wait for all AP check in SMM!\n"));
+    return EFI_ABORTED;
+  }
 
   if (mTcgNvs->PhysicalPresence.Parameter == TCG_ACPI_FUNCTION_RETURN_REQUEST_RESPONSE_TO_OS) {
     mTcgNvs->PhysicalPresence.ReturnCode = Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
@@ -173,6 +184,7 @@ PhysicalPresenceCallback (
   @param[in, out] CommBufferSize  The size of the CommBuffer.
 
   @retval EFI_SUCCESS             The interrupt was handled successfully.
+  @retval EFI_ABORTED             Fail to wait for all AP check in SMM.
 
 **/
 EFI_STATUS
@@ -215,6 +227,11 @@ MemoryClearCallback (
     mTcgNvs->MemoryClear.ReturnCode = MOR_REQUEST_GENERAL_FAILURE;
     DEBUG ((DEBUG_ERROR, "[TPM] MOR Parameter error! Parameter = %x\n", mTcgNvs->MemoryClear.Parameter));
     return EFI_SUCCESS;
+  }
+
+  if (EFI_ERROR (SmmWaitForAllProcessor (TRUE))) {
+    DEBUG ((DEBUG_ERROR, "TpmMemoryClear: fail to wait for all AP check in SMM!\n"));
+    return EFI_ABORTED;
   }
 
   DataSize = sizeof (UINT8);
