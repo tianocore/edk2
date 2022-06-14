@@ -34,6 +34,7 @@
 #include <Library/UefiRuntimeLib.h>
 #include <Library/PcdLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/SafeIntLib.h>
 
 #include "PiSmmCorePrivateData.h"
 
@@ -1354,6 +1355,7 @@ SmmSplitSmramEntry (
   @param[in] ReservedRangeToCompare     Pointer to EFI_SMM_RESERVED_SMRAM_REGION to compare.
 
   @retval TRUE  There is overlap.
+  @retval TRUE  Math error.
   @retval FALSE There is no overlap.
 
 **/
@@ -1366,8 +1368,12 @@ SmmIsSmramOverlap (
   UINT64  RangeToCompareEnd;
   UINT64  ReservedRangeToCompareEnd;
 
-  RangeToCompareEnd         = RangeToCompare->CpuStart + RangeToCompare->PhysicalSize;
-  ReservedRangeToCompareEnd = ReservedRangeToCompare->SmramReservedStart + ReservedRangeToCompare->SmramReservedSize;
+  // Prevents potential math over and underflows.
+  if (EFI_ERROR (SafeUint64Add ((UINT64)RangeToCompare->CpuStart, RangeToCompare->PhysicalSize, &RangeToCompareEnd)) ||
+      EFI_ERROR (SafeUint64Add ((UINT64)ReservedRangeToCompare->SmramReservedStart, ReservedRangeToCompare->SmramReservedSize, &ReservedRangeToCompareEnd)))
+  {
+    return TRUE;
+  }
 
   if ((RangeToCompare->CpuStart >= ReservedRangeToCompare->SmramReservedStart) &&
       (RangeToCompare->CpuStart < ReservedRangeToCompareEnd))

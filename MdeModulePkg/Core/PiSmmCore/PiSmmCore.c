@@ -610,6 +610,7 @@ SmmEndOfS3ResumeHandler (
   @param[in] Size2  Size of Buff2
 
   @retval TRUE      Buffers overlap in memory.
+  @retval TRUE      Math error.
   @retval FALSE     Buffer doesn't overlap.
 
 **/
@@ -621,11 +622,21 @@ InternalIsBufferOverlapped (
   IN UINTN  Size2
   )
 {
+  UINTN  End1;
+  UINTN  End2;
+
+  // Prevents potential math over and underflows.
+  if (EFI_ERROR (SafeUintnAdd ((UINTN)Buff1, Size1, &End1)) ||
+      EFI_ERROR (SafeUintnAdd ((UINTN)Buff2, Size2, &End2)))
+  {
+    return TRUE;
+  }
+
   //
   // If buff1's end is less than the start of buff2, then it's ok.
   // Also, if buff1's start is beyond buff2's end, then it's ok.
   //
-  if (((Buff1 + Size1) <= Buff2) || (Buff1 >= (Buff2 + Size2))) {
+  if ((End1 <= (UINTN)Buff2) || ((UINTN)Buff1 >= End2)) {
     return FALSE;
   }
 
@@ -699,7 +710,10 @@ SmmEntryPoint (
                        (UINT8 *)gSmmCorePrivate,
                        sizeof (*gSmmCorePrivate)
                        );
-      if (!SmmIsBufferOutsideSmmValid ((UINTN)CommunicationBuffer, BufferSize) || IsOverlapped) {
+      if (!SmmIsBufferOutsideSmmValid ((UINTN)CommunicationBuffer, BufferSize) ||
+          IsOverlapped ||
+          EFI_ERROR (SafeUintnSub (BufferSize, OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data), &BufferSize)))
+      {
         //
         // If CommunicationBuffer is not in valid address scope,
         // or there is overlap between gSmmCorePrivate and CommunicationBuffer,
@@ -709,13 +723,13 @@ SmmEntryPoint (
         gSmmCorePrivate->ReturnStatus        = EFI_ACCESS_DENIED;
       } else {
         CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)CommunicationBuffer;
-        BufferSize       -= OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
-        Status            = SmiManage (
-                              &CommunicateHeader->HeaderGuid,
-                              NULL,
-                              CommunicateHeader->Data,
-                              &BufferSize
-                              );
+        // BufferSize was updated by the SafeUintnSub() call above.
+        Status = SmiManage (
+                   &CommunicateHeader->HeaderGuid,
+                   NULL,
+                   CommunicateHeader->Data,
+                   &BufferSize
+                   );
         //
         // Update CommunicationBuffer, BufferSize and ReturnStatus
         // Communicate service finished, reset the pointer to CommBuffer to NULL

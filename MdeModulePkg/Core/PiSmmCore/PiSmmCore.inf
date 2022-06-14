@@ -60,6 +60,7 @@
   PerformanceLib
   HobLib
   SmmMemLib
+  SafeIntLib
 
 [Protocols]
   gEfiDxeSmmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister
