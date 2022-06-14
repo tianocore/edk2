@@ -221,6 +221,7 @@ InstallSMBusConfigLoader (
   UINT8                     Array[sizeof(BOARD_SETTINGS)];
   BOARD_BOOT_OVERRIDE       BoardBootOverride;
   BOOT_OVERRIDE             BootOverride;
+  RETURN_STATUS             PcdStatus;
 
   DEBUG ((DEBUG_INFO, "SMBusConfigLoader: InstallSMBusConfigLoader\n"));
 
@@ -249,8 +250,8 @@ InstallSMBusConfigLoader (
     CopyMem(&BoardSettings, Array, sizeof(BOARD_SETTINGS));
 
     DEBUG ((DEBUG_INFO, "SMBusConfigLoader: Board Settings:\n"));
-    DEBUG ((DEBUG_INFO, "SMBusConfigLoader: CRC: %08x - SecureBoot: %02x - PrimaryVideo: %02x\n",
-      BoardSettings.Signature, BoardSettings.SecureBoot, BoardSettings.PrimaryVideo));
+    DEBUG ((DEBUG_INFO, "SMBusConfigLoader: CRC: %08x - SecureBoot: %02x - PrimaryVideo: %02x - BIOS menu disabled: %02x\n",
+      BoardSettings.Signature, BoardSettings.SecureBoot, BoardSettings.PrimaryVideo, BoardSettings.MenuDisabled));
 
     CRC32Array = CalculateCrc32(&Array[sizeof(UINT32)], sizeof(BOARD_SETTINGS) - sizeof(UINT32));
     if (CRC32Array != BoardSettings.Signature)
@@ -261,6 +262,7 @@ InstallSMBusConfigLoader (
   if (EFI_ERROR(Status) || (CRC32Array != BoardSettings.Signature)) {
     BoardSettings.PrimaryVideo = 0;
     BoardSettings.SecureBoot = 1;
+    BoardSettings.MenuDisabled = 0;
   }
 
   /* Maximum of 5 milliseconds */
@@ -303,6 +305,12 @@ InstallSMBusConfigLoader (
         }
       }
     }
+  }
+  // Disable boot timeout if boot menu is disabled
+  if (BoardSettings.MenuDisabled == 1) {
+    PcdStatus = PcdSet16S (PcdPlatformBootTimeOut, 0);
+    ASSERT_RETURN_ERROR (PcdStatus);
+    DEBUG((DEBUG_INFO, "Boot menu disabled\n"));
   }
 
   // Set SecureBootEnable. Only affects SecureBootSetupDxe.

@@ -1171,7 +1171,9 @@ BdsEntry (
     // Execute Key####
     //
     PERF_INMODULE_BEGIN ("BdsWait");
-    BdsWait (HotkeyTriggered);
+    if (PcdGet16 (PcdPlatformBootTimeOut) != 0) {
+      BdsWait (HotkeyTriggered);
+    }
     PERF_INMODULE_END ("BdsWait");
     //
     // BdsReadKeys() can be removed after all keyboard drivers invoke callback in timer callback.

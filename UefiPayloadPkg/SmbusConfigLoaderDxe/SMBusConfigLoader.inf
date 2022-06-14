@@ -32,6 +32,9 @@
   UefiPayloadPkg/UefiPayloadPkg.dec
   SecurityPkg/SecurityPkg.dec
 
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+
 [Guids]
   gEfiBoardSettingsVariableGuid
   gEfiSecureBootEnableDisableGuid

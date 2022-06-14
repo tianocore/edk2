@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/Pci22.h>
 #include <Protocol/SmbusHc.h>
 #include <Guid/BoardSettingsGuid.h>
+#include <Library/PcdLib.h>
 
 #define BOARD_SETTINGS_OFFSET   0x1f00
 #define BOARD_BOOT_OVERRIDE_OFFSET 0x1640

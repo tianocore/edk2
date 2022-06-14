@@ -158,10 +158,12 @@ PlatformBootManagerBeforeConsole (
   //
   // Map Escape to Boot Manager Menu
   //
-  Escape.ScanCode    = SCAN_ESC;
-  Escape.UnicodeChar = CHAR_NULL;
-  EfiBootManagerGetBootManagerMenu (&BootOption);
-  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16) BootOption.OptionNumber, 0, &Escape, NULL);
+  if (PcdGet16 (PcdPlatformBootTimeOut) > 0) {
+    Escape.ScanCode    = SCAN_ESC;
+    Escape.UnicodeChar = CHAR_NULL;
+    EfiBootManagerGetBootManagerMenu (&BootOption);
+    EfiBootManagerAddKeyOptionVariable (NULL, (UINT16) BootOption.OptionNumber, 0, &Escape, NULL);
+  }
 
   //
   // Install ready to lock.
@@ -226,7 +228,9 @@ PlatformBootManagerAfterConsole (
   PlatformRegisterFvBootOption (PcdGetPtr (PcdiPXEFileIp4), L"iPXE Network boot IPv4", LOAD_OPTION_ACTIVE);
   PlatformRegisterFvBootOption (PcdGetPtr (PcdiPXEFileIp6), L"iPXE Network boot IPv6", LOAD_OPTION_ACTIVE);
 
-  Print (L"Pess ESC to enter Boot Manager Menu.\n");
+  if (PcdGet16 (PcdPlatformBootTimeOut) > 0) {
+    Print (L"Pess ESC to enter Boot Manager Menu.\n");
+  }
 }
 
 /**
