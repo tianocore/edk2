@@ -285,7 +285,7 @@ UsbHcBulkTransfer (
   IN  UINT8                               DevSpeed,
   IN  UINTN                               MaxPacket,
   IN  UINT8                               BufferNum,
-  IN  OUT VOID                            *Data[EFI_USB_MAX_BULK_BUFFER_NUM],
+  IN  OUT VOID                            *Data[],
   IN  OUT UINTN                           *DataLength,
   IN  OUT UINT8                           *DataToggle,
   IN  UINTN                               TimeOut,
