@@ -150,7 +150,9 @@ def GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolcha
                         EdkLogger.error("build", OPTION_MISSING,
                                         "Module type [%s] is not supported by library instance [%s]" \
                                         % (ModuleType, LibraryPath), File=FileName,
-                                        ExtraData="consumed by [%s]" % str(Module))
+                                        ExtraData="consumed by library instance [%s] which is consumed by module [%s]" \
+                                        % (str(M), str(Module))
+                                        )
                     else:
                         return []
 
