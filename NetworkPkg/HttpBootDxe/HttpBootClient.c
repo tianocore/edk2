@@ -1086,7 +1086,7 @@ HttpBootGetBootFile (
       "Basic",
       Private->AuthData
       );
-    
+
     Status = HttpIoSetHeader (
                HttpIoHeader,
                HTTP_HEADER_AUTHORIZATION,
