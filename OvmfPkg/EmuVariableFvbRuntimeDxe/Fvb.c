@@ -717,6 +717,8 @@ FvbInitialize (
   EFI_HANDLE            Handle;
   EFI_PHYSICAL_ADDRESS  Address;
   RETURN_STATUS         PcdStatus;
+  UINT8                 *CfvBase;
+  UINT32                CfvSize;
 
   DEBUG ((DEBUG_INFO, "EMU Variable FVB Started\n"));
 
@@ -773,6 +775,23 @@ FvbInitialize (
   }
 
   mEmuVarsFvb.BufferPtr = Ptr;
+
+  //
+  // In Tdx guest the VarNvStore content should be initialized by the Configuration FV (CFV).
+  // Integrity of the CFV has been validated by TdxValidateCfv (@PlatformInitLib)
+  //
+  if (TdIsEnabled ()) {
+    CfvBase = (UINT8 *)(UINTN)PcdGet32 (PcdCfvBase);
+    CfvSize = (UINT32)PcdGet32 (PcdCfvRawDataSize);
+
+    if (CfvSize > mEmuVarsFvb.Size) {
+      DEBUG ((DEBUG_ERROR, "Size of CFV is larger than the EMU Variable FVB.\n"));
+      ASSERT (FALSE);
+    } else {
+      CopyMem (Ptr, CfvBase, CfvSize);
+      Initialize = FALSE;
+    }
+  }
 
   //
   // Initialize the main FV header and variable store header
