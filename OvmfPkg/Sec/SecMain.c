@@ -768,6 +768,14 @@ SecCoreStartupWithStack (
     if (ProcessTdxHobList () != EFI_SUCCESS) {
       CpuDeadLoop ();
     }
+
+    //
+    // Config FV (Cfv) contains the configuration information and its integrity
+    // should be validated.
+    //
+    if (!TdxValidateCfv ((UINT8 *)(UINTN)FixedPcdGet32 (PcdCfvBase), FixedPcdGet32 (PcdCfvRawDataSize))) {
+      CpuDeadLoop ();
+    }
   }
 
  #endif
