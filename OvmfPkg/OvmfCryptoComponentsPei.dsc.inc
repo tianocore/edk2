@@ -13,6 +13,8 @@
 
         <PcdsFixedAtBuild>
 !include CryptoPkg/Driver/CryptoPcdMinPei.dsc.inc
+          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Sha384.Family     | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Sha512.Family     | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
 
     }
 

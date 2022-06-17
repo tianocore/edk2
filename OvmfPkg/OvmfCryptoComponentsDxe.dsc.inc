@@ -12,6 +12,11 @@
 
         <PcdsFixedAtBuild>
 !include CryptoPkg/Driver/CryptoPcdMinDxeSmm.dsc.inc
+!if $(TPM2_ENABLE) == TRUE
+          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Sha384.Family     | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+          gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Sha512.Family     | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+!endif
+
     }
 
 !endif
