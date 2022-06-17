@@ -1074,7 +1074,7 @@ HttpBootGetBootFile (
   if (Private->AuthData != NULL) {
     ASSERT (HttpIoHeader->MaxHeaderCount == 4);
 
-    if (Private->AuthScheme != NULL && CompareMem (Private->AuthScheme, "Basic", 5) != 0) {
+    if ((Private->AuthScheme != NULL) && (CompareMem (Private->AuthScheme, "Basic", 5) != 0)) {
       Status = EFI_UNSUPPORTED;
       goto ERROR_3;
     }
@@ -1145,7 +1145,7 @@ HttpBootGetBootFile (
     goto ERROR_4;
   }
 
-  Data = NULL;
+  Data   = NULL;
   Status = HttpIoRecvResponse (
              &Private->HttpIo,
              TRUE,
@@ -1156,8 +1156,9 @@ HttpBootGetBootFile (
       StatusCode = HttpIo->RspToken.Message->Data.Response->StatusCode;
       HttpBootPrintErrorMessage (StatusCode);
       Status = ResponseData->Status;
-      if (StatusCode == HTTP_STATUS_401_UNAUTHORIZED || \
-          StatusCode == HTTP_STATUS_407_PROXY_AUTHENTICATION_REQUIRED) {
+      if ((StatusCode == HTTP_STATUS_401_UNAUTHORIZED) || \
+          (StatusCode == HTTP_STATUS_407_PROXY_AUTHENTICATION_REQUIRED))
+      {
         //
         // Server indicates the user has to provide a user-id and password as a means of identification.
         //
@@ -1167,6 +1168,7 @@ HttpBootGetBootFile (
             Status = EFI_OUT_OF_RESOURCES;
             goto ERROR_4;
           }
+
           Status = Private->HttpBootCallback->Callback (
                                                 Private->HttpBootCallback,
                                                 HttpBootHttpAuthInfo,
@@ -1178,9 +1180,11 @@ HttpBootGetBootFile (
             if (Data != NULL) {
               FreePool (Data);
             }
+
             goto ERROR_5;
           }
-          Private->AuthData = (CHAR8 *) Data;
+
+          Private->AuthData = (CHAR8 *)Data;
         }
 
         HttpHeader = HttpFindHeader (
@@ -1193,6 +1197,7 @@ HttpBootGetBootFile (
           if (Private->AuthScheme == NULL) {
             return EFI_OUT_OF_RESOURCES;
           }
+
           CopyMem (Private->AuthScheme, HttpHeader->FieldValue, AsciiStrLen (HttpHeader->FieldValue));
         }
 

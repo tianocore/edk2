@@ -360,7 +360,7 @@ HttpBootLoadFile (
                NULL,
                &Private->ImageType
                );
-    if (Private->AuthData != NULL && Status == EFI_ACCESS_DENIED) {
+    if ((Private->AuthData != NULL) && (Status == EFI_ACCESS_DENIED)) {
       //
       // Try to use HTTP HEAD method again since the Authentication information is provided.
       //
@@ -371,7 +371,7 @@ HttpBootLoadFile (
                  NULL,
                  &Private->ImageType
                  );
-    } else if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
+    } else if ((EFI_ERROR (Status)) && (Status != EFI_BUFFER_TOO_SMALL)) {
       //
       // Failed to get file size by HEAD method, may be trunked encoding, try HTTP GET method.
       //
