@@ -2612,8 +2612,8 @@ def CheckFunctionHeaderConsistentWithDoxygenComment(FuncModifier, FuncHeader, Fu
 
 
             if Tag.find(ParamName) == -1 and ParamName != 'VOID' and ParamName != 'void':
-                ErrorMsgList.append('Line %d : in Comment, <%s> does NOT consistent with parameter name %s ' % (CommentStartLine, (TagPartList[0] + ' ' + TagPartList[1]).replace('\n', '').replace('\r', ''), ParamName))
-                PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'in Comment, <%s> does NOT consistent with parameter name %s ' % ((TagPartList[0] + ' ' + TagPartList[1]).replace('\n', '').replace('\r', ''), ParamName), TableName, CommentId)
+                ErrorMsgList.append('Line %d : in Comment, <%s> is NOT consistent with parameter name %s ' % (CommentStartLine, (TagPartList[0] + ' ' + TagPartList[1]).replace('\n', '').replace('\r', ''), ParamName))
+                PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'in Comment, <%s> is NOT consistent with parameter name %s ' % ((TagPartList[0] + ' ' + TagPartList[1]).replace('\n', '').replace('\r', ''), ParamName), TableName, CommentId)
             Index += 1
 
         if Index < ParamNumber:
