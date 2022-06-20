@@ -1,7 +1,7 @@
 /** @file
   The XHCI controller driver.
 
-Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1813,7 +1813,13 @@ XhcCreateUsbHc (
   // This xHC supports a page size of 2^(n+12) if bit n is Set. For example,
   // if bit 0 is Set, the xHC supports 4k byte page sizes.
   //
-  PageSize      = XhcReadOpReg (Xhc, XHC_PAGESIZE_OFFSET) & XHC_PAGESIZE_MASK;
+  PageSize = XhcReadOpReg (Xhc, XHC_PAGESIZE_OFFSET);
+  if ((PageSize & (~XHC_PAGESIZE_MASK)) != 0) {
+    DEBUG ((DEBUG_ERROR, "XhcCreateUsb3Hc: Reserved bits are not 0 for PageSize\n"));
+    goto ON_ERROR;
+  }
+
+  PageSize     &= XHC_PAGESIZE_MASK;
   Xhc->PageSize = 1 << (HighBitSet32 (PageSize) + 12);
 
   ExtCapReg              = (UINT16)(Xhc->HcCParams.Data.ExtCapReg);
