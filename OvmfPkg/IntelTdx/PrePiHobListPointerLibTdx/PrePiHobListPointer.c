@@ -27,7 +27,7 @@ PrePeiGetHobList (
 {
   TDX_WORK_AREA  *TdxWorkArea;
 
-  TdxWorkArea = (TDX_WORK_AREA *)(UINTN)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  TdxWorkArea = (TDX_WORK_AREA *)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase);
   ASSERT (TdxWorkArea != NULL);
   ASSERT (TdxWorkArea->SecTdxWorkArea.HobList != 0);
 
@@ -48,7 +48,7 @@ PrePeiSetHobList (
 {
   TDX_WORK_AREA  *TdxWorkArea;
 
-  TdxWorkArea = (TDX_WORK_AREA *)(UINTN)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  TdxWorkArea = (TDX_WORK_AREA *)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase);
   ASSERT (TdxWorkArea != NULL);
 
   TdxWorkArea->SecTdxWorkArea.HobList = (UINTN)HobList;
