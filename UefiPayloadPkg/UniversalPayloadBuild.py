@@ -82,6 +82,11 @@ def BuildUniversalPayload(Args, MacroList):
         print("- Failed - Please check if LLVM is installed or if CLANG_BIN is set correctly")
         sys.exit(1)
 
+    Pcds = ""
+    if (Args.pcd != None):
+        for PcdItem in Args.pcd:
+            Pcds += " --pcd {}".format (PcdItem)
+
     Defines = ""
     for key in MacroList:
         Defines +=" -D {0}={1}".format(key, MacroList[key])
@@ -90,12 +95,14 @@ def BuildUniversalPayload(Args, MacroList):
     # Building DXE core and DXE drivers as DXEFV.
     #
     BuildPayload = f"build -p {DscPath} -b {BuildTarget} -a X64 -t {ToolChain} -y {PayloadReportPath} {Quiet}"
+    BuildPayload += Pcds
     BuildPayload += Defines
     RunCommand(BuildPayload)
     #
     # Building Universal Payload entry.
     #
     BuildModule = f"build -p {DscPath} -b {BuildTarget} -a {BuildArch} -m {EntryModuleInf} -t {ElfToolChain} -y {ModuleReportPath} {Quiet}"
+    BuildModule += Pcds
     BuildModule += Defines
     RunCommand(BuildModule)
 
@@ -128,6 +135,7 @@ def main():
     parser.add_argument("-D", "--Macro", action="append", default=["UNIVERSAL_PAYLOAD=TRUE"])
     parser.add_argument('-i', '--ImageId', type=str, help='Specify payload ID (16 bytes maximal).', default ='UEFI')
     parser.add_argument('-q', '--Quiet', action='store_true', help='Disable all build messages except FATAL ERRORS.')
+    parser.add_argument("-p", "--pcd", action="append")
     MacroList = {}
     args = parser.parse_args()
     if args.Macro is not None:
