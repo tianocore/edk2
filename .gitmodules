@@ -20,3 +20,6 @@
 [submodule "RedfishPkg/Library/JsonLib/jansson"]
 	path = RedfishPkg/Library/JsonLib/jansson
 	url = https://github.com/akheron/jansson
+[submodule "UnitTestFrameworkPkg/Library/GoogleTestLib/googletest"]
+	path = UnitTestFrameworkPkg/Library/GoogleTestLib/googletest
+	url = https://github.com/google/googletest.git
