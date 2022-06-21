@@ -17,10 +17,13 @@
 
 [Includes]
   Library/CmockaLib/cmocka/include
+  Library/GoogleTestLib/googletest/googletest/include
+  Library/GoogleTestLib/googletest/googlemock/include
 
 [Includes.Common.Private]
   PrivateInclude
   Library/CmockaLib/cmocka/include/cmockery
+  Library/GoogleTestLib/googletest/googletest
 
 [LibraryClasses.Common.Private]
   ## @libraryclass Allows save and restore unit test internal state
