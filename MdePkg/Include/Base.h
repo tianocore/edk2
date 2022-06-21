@@ -309,7 +309,15 @@ struct _LIST_ENTRY {
 ///
 /// NULL pointer (VOID *)
 ///
+#if defined (__cplusplus)
+  #if defined (_MSC_EXTENSIONS)
+#define NULL  nullptr
+  #else
+#define NULL  __null
+  #endif
+#else
 #define NULL  ((VOID *) 0)
+#endif
 
 //
 // Null character
@@ -760,7 +768,7 @@ typedef UINTN *BASE_LIST;
 **/
 #ifdef MDE_CPU_EBC
 #define STATIC_ASSERT(Expression, Message)
-#elif defined (_MSC_EXTENSIONS)
+#elif defined (_MSC_EXTENSIONS) || defined (__cplusplus)
 #define STATIC_ASSERT  static_assert
 #else
 #define STATIC_ASSERT  _Static_assert
@@ -959,7 +967,7 @@ typedef UINTN RETURN_STATUS;
 ///
 /// The operation completed successfully.
 ///
-#define RETURN_SUCCESS  0
+#define RETURN_SUCCESS  (RETURN_STATUS)(0)
 
 ///
 /// The image failed to load.
