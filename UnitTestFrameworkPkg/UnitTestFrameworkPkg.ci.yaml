@@ -78,7 +78,8 @@
     "SpellCheck": {
         "AuditOnly": False,           # Fails test but run in AuditOnly mode to collect log
         "IgnoreFiles": [             # use gitignore syntax to ignore errors in matching files
-            "Library/CmockaLib/cmocka/**/*.*"  # not going to spell check a submodule
+            "Library/CmockaLib/cmocka/**/*.*",  # not going to spell check a submodule
+            "Library/GoogleTestLib/googletest/**/*.*"  # not going to spell check a submodule
         ],
         "ExtendWords": [             # words to extend to the dictionary for this package
             "testcase",
@@ -91,6 +92,7 @@
             "NOFAILURE",
             "cmockery",
             "DHAVE", # build flag for cmocka in the INF
+            "gtest", # file name in GoogleTestLib.inf
             "corthon",      # Contact GitHub account in Readme
             "mdkinney",     # Contact GitHub account in Readme
             "spbrogan"      # Contact GitHub account in Readme
