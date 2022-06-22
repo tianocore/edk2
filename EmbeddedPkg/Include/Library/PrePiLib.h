@@ -666,6 +666,25 @@ AllocatePages (
   );
 
 /**
+  Allocates one or more 4KB pages of type EfiRuntimeServicesData.
+
+  Allocates the number of 4KB pages of type EfiRuntimeServicesData and returns a pointer to the
+  allocated buffer.  The buffer returned is aligned on a 4KB boundary.  If Pages is 0, then NULL
+  is returned.  If there is not enough memory remaining to satisfy the request, then NULL is
+  returned.
+
+  @param  Pages                 The number of 4 KB pages to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+VOID *
+EFIAPI
+AllocateRuntimePages (
+  IN UINTN  Pages
+  );
+
+/**
   Allocates a buffer of type EfiBootServicesData.
 
   Allocates the number bytes specified by AllocationSize of type EfiBootServicesData and returns a
