@@ -99,3 +99,7 @@
 
   gUefiPayloadPkgTokenSpaceGuid.PcdDispatchModuleAbove4GMemory
 
+[BuildOptions]
+  GCC:*_CLANGDWARF_*_DLINK2_FLAGS == -Wl,--defsym=PECOFF_HEADER_SIZE=0x800000 -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/ClangBase.lds -O3 -fuse-ld=lld
+  GCC:*_GCC5_IA32_DLINK2_FLAGS == -Wl,--defsym=PECOFF_HEADER_SIZE=0x800000 -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/GccBase.lds -Wno-error -no-pie
+  GCC:*_COREBOOT_IA32_DLINK2_FLAGS == -Wl,--defsym=PECOFF_HEADER_SIZE=0x800000 -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/GccBase.lds -Wno-error -no-pie
