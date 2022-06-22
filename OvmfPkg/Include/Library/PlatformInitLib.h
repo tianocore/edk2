@@ -251,4 +251,38 @@ TdxValidateCfv (
   IN UINT32  TdxCfvSize
   );
 
+/**
+ Allocate storage for NV variables early on so it will be
+ at a consistent address.  Since VM memory is preserved
+ across reboots, this allows the NV variable storage to survive
+ a VM reboot.
+
+ *
+ * @retval VOID* The pointer to the storage for NV Variables
+ */
+VOID *
+EFIAPI
+PlatformReserveEmuVariableNvStore (
+  VOID
+  );
+
+/**
+ When OVMF is lauched with -bios parameter, UEFI variables will be
+ partially emulated, and non-volatile variables may lose their contents
+ after a reboot. This makes the secure boot feature not working.
+
+ This function is used to initialize the EmuVariableNvStore
+ with the conent in PcdOvmfFlashNvStorageVariableBase.
+
+ @param[in] EmuVariableNvStore      - A pointer to EmuVariableNvStore
+
+ @retval  EFI_SUCCESS   - Successfully init the EmuVariableNvStore
+ @retval  Others        - As the error code indicates
+ */
+EFI_STATUS
+EFIAPI
+PlatformInitEmuVariableNvStore (
+  IN VOID  *EmuVariableNvStore
+  );
+
 #endif // PLATFORM_INIT_LIB_H_

@@ -25,6 +25,7 @@
 #include <IndustryStandard/Pci22.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/QemuCpuHotplug.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgS3Lib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
@@ -575,4 +576,80 @@ PlatformMaxCpuCountInitialization (
 
   PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber  = MaxCpuCount;
   PlatformInfoHob->PcdCpuBootLogicalProcessorNumber = BootCpuCount;
+}
+
+/**
+ Allocate storage for NV variables early on so it will be
+ at a consistent address.  Since VM memory is preserved
+ across reboots, this allows the NV variable storage to survive
+ a VM reboot.
+
+ *
+ * @retval VOID* The pointer to the storage for NV Variables
+ */
+VOID *
+EFIAPI
+PlatformReserveEmuVariableNvStore (
+  VOID
+  )
+{
+  VOID    *VariableStore;
+  UINT32  VarStoreSize;
+
+  VarStoreSize = 2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize);
+  //
+  // Allocate storage for NV variables early on so it will be
+  // at a consistent address.  Since VM memory is preserved
+  // across reboots, this allows the NV variable storage to survive
+  // a VM reboot.
+  //
+  VariableStore =
+    AllocateRuntimePages (
+      EFI_SIZE_TO_PAGES (VarStoreSize)
+      );
+  DEBUG ((
+    DEBUG_INFO,
+    "Reserved variable store memory: 0x%p; size: %dkb\n",
+    VariableStore,
+    VarStoreSize / 1024
+    ));
+
+  return VariableStore;
+}
+
+/**
+ When OVMF is lauched with -bios parameter, UEFI variables will be
+ partially emulated, and non-volatile variables may lose their contents
+ after a reboot. This makes the secure boot feature not working.
+
+ This function is used to initialize the EmuVariableNvStore
+ with the conent in PcdOvmfFlashNvStorageVariableBase.
+
+ @param[in] EmuVariableNvStore      - A pointer to EmuVariableNvStore
+
+ @retval  EFI_SUCCESS   - Successfully init the EmuVariableNvStore
+ @retval  Others        - As the error code indicates
+ */
+EFI_STATUS
+EFIAPI
+PlatformInitEmuVariableNvStore (
+  IN VOID  *EmuVariableNvStore
+  )
+{
+  UINT8   *Base;
+  UINT32  Size;
+  UINT32  EmuVariableNvStoreSize;
+
+  EmuVariableNvStoreSize = 2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize);
+  if ((EmuVariableNvStore == NULL) || (EmuVariableNvStoreSize == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Base = (UINT8 *)(UINTN)PcdGet32 (PcdOvmfFlashNvStorageVariableBase);
+  Size = (UINT32)PcdGet32 (PcdFlashNvStorageVariableSize);
+  ASSERT (Size < EmuVariableNvStoreSize);
+
+  CopyMem (EmuVariableNvStore, Base, Size);
+
+  return EFI_SUCCESS;
 }
