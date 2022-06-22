@@ -42,6 +42,7 @@ InitializePlatform (
   )
 {
   UINT32  LowerMemorySize;
+  VOID    *VariableStore;
 
   DEBUG ((DEBUG_INFO, "InitializePlatform in Pei-less boot\n"));
   PlatformDebugDumpCmos ();
@@ -78,6 +79,12 @@ InitializePlatform (
     PlatformInfoHob->Uc32Size,
     LowerMemorySize
     ));
+
+  VariableStore                                  = PlatformReserveEmuVariableNvStore ();
+  PlatformInfoHob->PcdEmuVariableNvStoreReserved = (UINT64)(UINTN)VariableStore;
+ #ifdef SECURE_BOOT_FEATURE_ENABLED
+  PlatformInitEmuVariableNvStore (VariableStore);
+ #endif
 
   if (TdIsEnabled ()) {
     PlatformTdxPublishRamRegions ();
