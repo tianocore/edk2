@@ -64,6 +64,8 @@ SetPcdSettings (
     PlatformInfoHob->PcdCpuBootLogicalProcessorNumber
     ));
 
+  PcdSet64S (PcdEmuVariableNvStoreReserved, PlatformInfoHob->PcdEmuVariableNvStoreReserved);
+
   if (TdIsEnabled ()) {
     PcdStatus = PcdSet64S (PcdTdxSharedBitMask, TdSharedPageMask ());
     ASSERT_RETURN_ERROR (PcdStatus);
