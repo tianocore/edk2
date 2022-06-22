@@ -68,3 +68,4 @@
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
   gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
