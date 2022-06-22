@@ -1545,11 +1545,11 @@ BmExpandLoadFiles (
       HandleCount = 0;
     }
 
-    NullUriPath = (URI_DEVICE_PATH *) CreateDeviceNode (
-                               MESSAGING_DEVICE_PATH,
-                               MSG_URI_DP,
-                               (UINT16) (sizeof (URI_DEVICE_PATH))
-                               );
+    NullUriPath = (URI_DEVICE_PATH *)CreateDeviceNode (
+                                       MESSAGING_DEVICE_PATH,
+                                       MSG_URI_DP,
+                                       (UINT16)(sizeof (URI_DEVICE_PATH))
+                                       );
 
     for (Index = 0; Index < HandleCount; Index++) {
       if (BmMatchHttpBootDevicePath (DevicePathFromHandle (Handles[Index]), FilePath)) {
