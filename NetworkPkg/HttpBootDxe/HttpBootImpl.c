@@ -353,7 +353,7 @@ HttpBootLoadFile (
     //
     // Discover the information about the bootfile if we haven't.
     //
-    for (Index = 0; Index < 2;Index ++) {
+    for (Index = 0; Index < 2; Index++) {
       if (Index == 1) {
         Status = HttpBootConnectProxy (Private);
       }
