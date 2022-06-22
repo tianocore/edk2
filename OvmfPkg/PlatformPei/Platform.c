@@ -220,24 +220,13 @@ ReserveEmuVariableNvStore (
   EFI_PHYSICAL_ADDRESS  VariableStore;
   RETURN_STATUS         PcdStatus;
 
-  //
-  // Allocate storage for NV variables early on so it will be
-  // at a consistent address.  Since VM memory is preserved
-  // across reboots, this allows the NV variable storage to survive
-  // a VM reboot.
-  //
-  VariableStore =
-    (EFI_PHYSICAL_ADDRESS)(UINTN)
-    AllocateRuntimePages (
-      EFI_SIZE_TO_PAGES (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize))
-      );
-  DEBUG ((
-    DEBUG_INFO,
-    "Reserved variable store memory: 0x%lX; size: %dkb\n",
-    VariableStore,
-    (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)) / 1024
-    ));
-  PcdStatus = PcdSet64S (PcdEmuVariableNvStoreReserved, VariableStore);
+  VariableStore = (EFI_PHYSICAL_ADDRESS)(UINTN)PlatformReserveEmuVariableNvStore ();
+  PcdStatus     = PcdSet64S (PcdEmuVariableNvStoreReserved, VariableStore);
+
+ #ifdef SECURE_BOOT_FEATURE_ENABLED
+  PlatformInitEmuVariableNvStore ((VOID *)(UINTN)VariableStore);
+ #endif
+
   ASSERT_RETURN_ERROR (PcdStatus);
 }
 
