@@ -362,6 +362,7 @@ EfiHttpRequest (
           return EFI_OUT_OF_RESOURCES;
         }
       }
+
       EndPointUrl = (CHAR8 *)Request->EndPointUrl;
     }
 
@@ -645,7 +646,7 @@ EfiHttpRequest (
   }
 
   if (HttpInstance->Method == HttpMethodConnect) {
-    Status = HttpGenRequestMessage (HttpMsg, EndPointUrl , &RequestMsg, &RequestMsgSize);
+    Status = HttpGenRequestMessage (HttpMsg, EndPointUrl, &RequestMsg, &RequestMsgSize);
   } else {
     Status = HttpGenRequestMessage (HttpMsg, FileUrl, &RequestMsg, &RequestMsgSize);
   }

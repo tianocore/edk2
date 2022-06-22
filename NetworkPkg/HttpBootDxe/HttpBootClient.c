@@ -916,16 +916,16 @@ HttpBootConnectProxy (
   IN     HTTP_BOOT_PRIVATE_DATA  *Private
   )
 {
-  EFI_STATUS               Status;
-  EFI_HTTP_STATUS_CODE     StatusCode;
-  CHAR8                    *HostName;
-  EFI_HTTP_REQUEST_DATA    *RequestData;
-  HTTP_IO_RESPONSE_DATA    *ResponseData;
-  HTTP_IO                  *HttpIo;
-  HTTP_IO_HEADER           *HttpIoHeader;
-  CHAR16                   *Url;
-  CHAR16                   *EndPointUrl;
-  UINTN UrlSize;
+  EFI_STATUS             Status;
+  EFI_HTTP_STATUS_CODE   StatusCode;
+  CHAR8                  *HostName;
+  EFI_HTTP_REQUEST_DATA  *RequestData;
+  HTTP_IO_RESPONSE_DATA  *ResponseData;
+  HTTP_IO                *HttpIo;
+  HTTP_IO_HEADER         *HttpIoHeader;
+  CHAR16                 *Url;
+  CHAR16                 *EndPointUrl;
+  UINTN                  UrlSize;
 
   UrlSize = AsciiStrSize (Private->BootFileUri);
   Url     = AllocatePool (UrlSize * sizeof (CHAR16));
@@ -935,8 +935,8 @@ HttpBootConnectProxy (
 
   AsciiStrToUnicodeStrS (Private->BootFileUri, Url, UrlSize);
 
-  UrlSize = AsciiStrSize (Private->EndPointUri);
-  EndPointUrl     = AllocatePool (UrlSize * (sizeof (CHAR16)));
+  UrlSize     = AsciiStrSize (Private->EndPointUri);
+  EndPointUrl = AllocatePool (UrlSize * (sizeof (CHAR16)));
   if (EndPointUrl == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -962,11 +962,11 @@ HttpBootConnectProxy (
   // Add HTTP header field 1: Host (proxy)
   //
   HostName = Private->EndPointUri;
-  Status = HttpIoSetHeader (
-             HttpIoHeader,
-             HTTP_HEADER_HOST,
-             HostName
-             );
+  Status   = HttpIoSetHeader (
+               HttpIoHeader,
+               HTTP_HEADER_HOST,
+               HostName
+               );
   if (EFI_ERROR (Status)) {
     goto ERROR_3;
   }
@@ -992,8 +992,8 @@ HttpBootConnectProxy (
     goto ERROR_3;
   }
 
-  RequestData->Method = HttpMethodConnect;
-  RequestData->Url    = Url;
+  RequestData->Method      = HttpMethodConnect;
+  RequestData->Url         = Url;
   RequestData->EndPointUrl = EndPointUrl;
 
   //
@@ -1040,6 +1040,7 @@ HttpBootConnectProxy (
 
     goto ERROR_5;
   }
+
   return Status;
 
 ERROR_5:
@@ -1058,6 +1059,7 @@ ERROR_3:
   if (Url != NULL) {
     FreePool (Url);
   }
+
   return Status;
 }
 
@@ -1233,8 +1235,8 @@ HttpBootGetBootFile (
     goto ERROR_3;
   }
 
-  RequestData->Method = HeaderOnly ? HttpMethodHead : HttpMethodGet;
-  RequestData->Url    = Url;
+  RequestData->Method      = HeaderOnly ? HttpMethodHead : HttpMethodGet;
+  RequestData->Url         = Url;
   RequestData->EndPointUrl = NULL;
 
   //

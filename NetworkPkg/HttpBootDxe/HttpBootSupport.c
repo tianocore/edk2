@@ -579,8 +579,9 @@ HttpBootParseFilePath (
   if (FilePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  Uri = NULL;
-  *UriAddress = NULL;
+
+  Uri                 = NULL;
+  *UriAddress         = NULL;
   *EndPointUriAddress = NULL;
   //
   // Extract the URI address from the FilePath
@@ -602,9 +603,11 @@ HttpBootParseFilePath (
         //
         break;
       }
+
       if (Uri != NULL) {
         *EndPointUriAddress = Uri;
       }
+
       Uri = AllocatePool (UriStrLength + 1);
       if (Uri == NULL) {
         return EFI_OUT_OF_RESOURCES;
