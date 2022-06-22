@@ -558,6 +558,7 @@ HttpBootCheckUriScheme (
 
   @param[in]   FilePath         Pointer to the device path which contains a URI device path node.
   @param[out]  UriAddress       The URI address string extract from the device path.
+  @param[out]  EndPointUriAddress The URI address string for the endpoint host if UriAddress contains the address of a proxy server
 
   @retval EFI_SUCCESS            The URI string is returned.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
@@ -566,7 +567,8 @@ HttpBootCheckUriScheme (
 EFI_STATUS
 HttpBootParseFilePath (
   IN     EFI_DEVICE_PATH_PROTOCOL  *FilePath,
-  OUT CHAR8                        **UriAddress
+  OUT CHAR8                        **UriAddress,
+  OUT CHAR8                        **EndPointUriAddress
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
@@ -577,9 +579,9 @@ HttpBootParseFilePath (
   if (FilePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-
+  Uri = NULL;
   *UriAddress = NULL;
-
+  *EndPointUriAddress = NULL;
   //
   // Extract the URI address from the FilePath
   //
@@ -600,7 +602,9 @@ HttpBootParseFilePath (
         //
         break;
       }
-
+      if (Uri != NULL) {
+        *EndPointUriAddress = Uri;
+      }
       Uri = AllocatePool (UriStrLength + 1);
       if (Uri == NULL) {
         return EFI_OUT_OF_RESOURCES;

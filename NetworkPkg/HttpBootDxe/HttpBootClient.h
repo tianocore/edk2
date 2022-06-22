@@ -86,6 +86,21 @@ HttpBootCreateHttpIo (
   );
 
 /**
+  This function establishes a connection through a proxy server
+
+  @param[in]       Private         The pointer to the driver's private data.
+
+  @retval EFI_SUCCESS              Connection successful.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources
+  @retval Others                   Unexpected error happened.
+
+**/
+EFI_STATUS
+HttpBootConnectProxy (
+  IN     HTTP_BOOT_PRIVATE_DATA  *Private
+  );
+
+/**
   This function download the boot file by using UEFI HTTP protocol.
 
   @param[in]       Private         The pointer to the driver's private data.
@@ -106,6 +121,7 @@ HttpBootCreateHttpIo (
   @retval EFI_BUFFER_TOO_SMALL     The BufferSize is too small to read the current directory entry.
                                    BufferSize has been updated with the size needed to complete
                                    the request.
+  @retval EFI_ACCESS_DENIED        The server needs to authenticate the client.
   @retval Others                   Unexpected error happened.
 
 **/

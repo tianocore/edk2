@@ -243,6 +243,7 @@ EfiHttpRequest (
   BOOLEAN                TlsConfigure;
   CHAR8                  *RequestMsg;
   CHAR8                  *Url;
+  CHAR8                  *EndPointUrl;
   UINTN                  UrlLen;
   CHAR16                 *HostNameStr;
   HTTP_TOKEN_WRAP        *Wrap;
@@ -262,6 +263,7 @@ EfiHttpRequest (
   Wrap         = NULL;
   FileUrl      = NULL;
   TlsConfigure = FALSE;
+  EndPointUrl  = NULL;
 
   if ((This == NULL) || (Token == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -280,7 +282,7 @@ EfiHttpRequest (
   if ((Request != NULL) && (Request->Method != HttpMethodGet) &&
       (Request->Method != HttpMethodHead) && (Request->Method != HttpMethodDelete) &&
       (Request->Method != HttpMethodPut) && (Request->Method != HttpMethodPost) &&
-      (Request->Method != HttpMethodPatch))
+      (Request->Method != HttpMethodPatch) && (Request->Method != HttpMethodConnect))
   {
     return EFI_UNSUPPORTED;
   }
@@ -352,6 +354,16 @@ EfiHttpRequest (
     }
 
     UnicodeStrToAsciiStrS (Request->Url, Url, UrlLen);
+    if (Request->EndPointUrl != NULL) {
+      UrlLen = StrLen (Request->EndPointUrl) + 1;
+      if (UrlLen > HTTP_URL_BUFFER_LEN) {
+        EndPointUrl = AllocateZeroPool (UrlLen);
+        if (EndPointUrl == NULL) {
+          return EFI_OUT_OF_RESOURCES;
+        }
+      }
+      EndPointUrl = (CHAR8 *)Request->EndPointUrl;
+    }
 
     //
     // From the information in Url, the HTTP instance will
@@ -632,7 +644,11 @@ EfiHttpRequest (
     }
   }
 
-  Status = HttpGenRequestMessage (HttpMsg, FileUrl, &RequestMsg, &RequestMsgSize);
+  if (HttpInstance->Method == HttpMethodConnect) {
+    Status = HttpGenRequestMessage (HttpMsg, EndPointUrl , &RequestMsg, &RequestMsgSize);
+  } else {
+    Status = HttpGenRequestMessage (HttpMsg, FileUrl, &RequestMsg, &RequestMsgSize);
+  }
 
   if (EFI_ERROR (Status) || (NULL == RequestMsg)) {
     goto Error3;

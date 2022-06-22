@@ -191,6 +191,11 @@ typedef struct {
   /// is assumed. See RFC 3986 for more details on URI syntax.
   ///
   CHAR16             *Url;
+  ///
+  /// The URI of an endpoint host if the Url field contains the address of a proxy server.
+  /// This field will be NULL if a proxy server is not involved.
+  ///
+  CHAR16             *EndPointUrl;
 } EFI_HTTP_REQUEST_DATA;
 
 ///

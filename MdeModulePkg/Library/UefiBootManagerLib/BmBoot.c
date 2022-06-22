@@ -1513,7 +1513,9 @@ BmExpandLoadFiles (
   UINTN                     HandleCount;
   UINTN                     Index;
   EFI_DEVICE_PATH_PROTOCOL  *Node;
+  URI_DEVICE_PATH           *NullUriPath;
 
+  NullUriPath = NULL;
   //
   // Get file buffer from load file instance.
   //
@@ -1543,8 +1545,17 @@ BmExpandLoadFiles (
       HandleCount = 0;
     }
 
+    NullUriPath    = (URI_DEVICE_PATH *) CreateDeviceNode (
+                               MESSAGING_DEVICE_PATH,
+                               MSG_URI_DP,
+                               (UINT16) (sizeof (URI_DEVICE_PATH))
+                               );
+
     for (Index = 0; Index < HandleCount; Index++) {
       if (BmMatchHttpBootDevicePath (DevicePathFromHandle (Handles[Index]), FilePath)) {
+        Handle = Handles[Index];
+        break;
+      } else if (BmMatchHttpBootDevicePath (AppendDevicePathNode (DevicePathFromHandle (Handles[Index]), (EFI_DEVICE_PATH_PROTOCOL *) NullUriPath), FilePath)) {
         Handle = Handles[Index];
         break;
       }

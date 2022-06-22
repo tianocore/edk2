@@ -902,6 +902,166 @@ HttpBootGetBootFileCallback (
 }
 
 /**
+  This function establishes a connection through a proxy server
+
+  @param[in]       Private         The pointer to the driver's private data.
+
+  @retval EFI_SUCCESS              Connection successful.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources
+  @retval Others                   Unexpected error happened.
+
+**/
+EFI_STATUS
+HttpBootConnectProxy (
+  IN     HTTP_BOOT_PRIVATE_DATA  *Private
+  )
+{
+  EFI_STATUS               Status;
+  EFI_HTTP_STATUS_CODE     StatusCode;
+  CHAR8                    *HostName;
+  EFI_HTTP_REQUEST_DATA    *RequestData;
+  HTTP_IO_RESPONSE_DATA    *ResponseData;
+  HTTP_IO                  *HttpIo;
+  HTTP_IO_HEADER           *HttpIoHeader;
+  CHAR16                   *Url;
+  CHAR16                   *EndPointUrl;
+  UINTN UrlSize;
+
+  UrlSize = AsciiStrSize (Private->BootFileUri);
+  Url     = AllocatePool (UrlSize * sizeof (CHAR16));
+  if (Url == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  AsciiStrToUnicodeStrS (Private->BootFileUri, Url, UrlSize);
+
+  UrlSize = AsciiStrSize (Private->EndPointUri);
+  EndPointUrl     = AllocatePool (UrlSize * (sizeof (CHAR16)));
+  if (EndPointUrl == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  CopyMem (EndPointUrl, Private->EndPointUri, UrlSize);
+
+  //
+  // 2. Send HTTP request message.
+  //
+
+  //
+  // 2.1 Build HTTP header for the request, 2 header is needed to send a CONNECT method:
+  //       Host
+  //       User
+  //
+  HttpIoHeader = HttpIoCreateHeader (2);
+  if (HttpIoHeader == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ERROR_3;
+  }
+
+  //
+  // Add HTTP header field 1: Host (proxy)
+  //
+  HostName = Private->EndPointUri;
+  Status = HttpIoSetHeader (
+             HttpIoHeader,
+             HTTP_HEADER_HOST,
+             HostName
+             );
+  if (EFI_ERROR (Status)) {
+    goto ERROR_3;
+  }
+
+  //
+  // Add HTTP header field 2: User-Agent
+  //
+  Status = HttpIoSetHeader (
+             HttpIoHeader,
+             HTTP_HEADER_USER_AGENT,
+             HTTP_USER_AGENT_EFI_HTTP_BOOT
+             );
+  if (EFI_ERROR (Status)) {
+    goto ERROR_3;
+  }
+
+  //
+  // 2.2 Build the rest of HTTP request info.
+  //
+  RequestData = AllocatePool (sizeof (EFI_HTTP_REQUEST_DATA));
+  if (RequestData == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ERROR_3;
+  }
+
+  RequestData->Method = HttpMethodConnect;
+  RequestData->Url    = Url;
+  RequestData->EndPointUrl = EndPointUrl;
+
+  //
+  // 2.4 Send out the request to HTTP server.
+  //
+  HttpIo = &Private->HttpIo;
+  Status = HttpIoSendRequest (
+             HttpIo,
+             RequestData,
+             HttpIoHeader->HeaderCount,
+             HttpIoHeader->Headers,
+             0,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    goto ERROR_4;
+  }
+
+  //
+  // 3. Receive HTTP response message.
+  //
+
+  //
+  // 3.1 First step, use zero BodyLength to only receive the response headers.
+  //
+  ResponseData = AllocateZeroPool (sizeof (HTTP_IO_RESPONSE_DATA));
+  if (ResponseData == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ERROR_4;
+  }
+
+  Status = HttpIoRecvResponse (
+             &Private->HttpIo,
+             TRUE,
+             ResponseData
+             );
+
+  if (EFI_ERROR (Status) || EFI_ERROR (ResponseData->Status)) {
+    if (EFI_ERROR (ResponseData->Status)) {
+      StatusCode = HttpIo->RspToken.Message->Data.Response->StatusCode;
+      HttpBootPrintErrorMessage (StatusCode);
+      Status = ResponseData->Status;
+    }
+
+    goto ERROR_5;
+  }
+  return Status;
+
+ERROR_5:
+  if (ResponseData != NULL) {
+    FreePool (ResponseData);
+  }
+
+ERROR_4:
+  if (RequestData != NULL) {
+    FreePool (RequestData);
+  }
+
+ERROR_3:
+  HttpIoFreeHeader (HttpIoHeader);
+
+  if (Url != NULL) {
+    FreePool (Url);
+  }
+  return Status;
+}
+
+/**
   This function download the boot file by using UEFI HTTP protocol.
 
   @param[in]       Private         The pointer to the driver's private data.
@@ -922,6 +1082,7 @@ HttpBootGetBootFileCallback (
   @retval EFI_BUFFER_TOO_SMALL     The BufferSize is too small to read the current directory entry.
                                    BufferSize has been updated with the size needed to complete
                                    the request.
+  @retval EFI_ACCESS_DENIED        The server needs to authenticate the client.
   @retval Others                   Unexpected error happened.
 
 **/
@@ -1074,6 +1235,7 @@ HttpBootGetBootFile (
 
   RequestData->Method = HeaderOnly ? HttpMethodHead : HttpMethodGet;
   RequestData->Url    = Url;
+  RequestData->EndPointUrl = NULL;
 
   //
   // 2.3 Record the request info in a temp cache item.

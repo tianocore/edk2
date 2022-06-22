@@ -218,6 +218,12 @@ struct _HTTP_BOOT_PRIVATE_DATA {
   VOID                                         *FilePathUriParser;
 
   //
+  // URI string for the endpoint host if BootFileUri contains the path
+  // for a proxy server
+  //
+  CHAR8                                        *EndPointUri;
+
+  //
   // Cached HTTP data
   //
   LIST_ENTRY                                   CacheList;

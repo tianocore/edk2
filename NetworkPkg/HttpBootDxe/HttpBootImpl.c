@@ -116,8 +116,10 @@ HttpBootStart (
   UINTN       Index;
   EFI_STATUS  Status;
   CHAR8       *Uri;
+  CHAR8       *EndPointUri;
 
   Uri = NULL;
+  EndPointUri = NULL;
 
   if ((Private == NULL) || (FilePath == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -127,7 +129,7 @@ HttpBootStart (
   // Check the URI in the input FilePath, in order to see whether it is
   // required to boot from a new specified boot file.
   //
-  Status = HttpBootParseFilePath (FilePath, &Uri);
+  Status = HttpBootParseFilePath (FilePath, &Uri, &EndPointUri);
   if (EFI_ERROR (Status)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -187,6 +189,7 @@ HttpBootStart (
   // Record the specified URI and prepare the URI parser if needed.
   //
   Private->FilePathUri = Uri;
+  Private->EndPointUri = EndPointUri;
   if (Private->FilePathUri != NULL) {
     Status = HttpParseUrl (
                Private->FilePathUri,
@@ -306,6 +309,7 @@ HttpBootLoadFile (
   )
 {
   EFI_STATUS  Status;
+  UINT8       Index;
 
   if ((Private == NULL) || (ImageType == NULL) || (BufferSize == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -349,30 +353,37 @@ HttpBootLoadFile (
     //
     // Discover the information about the bootfile if we haven't.
     //
-
-    //
-    // Try to use HTTP HEAD method.
-    //
-    Status = HttpBootGetBootFile (
-               Private,
-               TRUE,
-               &Private->BootFileSize,
-               NULL,
-               &Private->ImageType
-               );
-    if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL)) {
+    for (Index = 0;  Index < 2; Index ++) {
+      if (Index == 1) {
+        Status = HttpBootConnectProxy (Private);
+      }
       //
-      // Failed to get file size by HEAD method, may be trunked encoding, try HTTP GET method.
+      // Try to use HTTP HEAD method.
       //
-      ASSERT (Private->BootFileSize == 0);
       Status = HttpBootGetBootFile (
                  Private,
-                 FALSE,
+                 TRUE,
                  &Private->BootFileSize,
                  NULL,
                  &Private->ImageType
                  );
-      if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL)) {
+      if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
+        //
+        // Failed to get file size by HEAD method, may be trunked encoding, try HTTP GET method.
+        //
+        ASSERT (Private->BootFileSize == 0);
+        Status = HttpBootGetBootFile (
+                   Private,
+                   FALSE,
+                   &Private->BootFileSize,
+                   NULL,
+                   &Private->ImageType
+                   );
+      }
+      if (Status == EFI_SUCCESS) {
+        break;
+      }
+      if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL) && (Index == 2)) {
         AsciiPrint ("\n  Error: Could not retrieve NBP file size from HTTP server.\n");
         goto ON_EXIT;
       }
