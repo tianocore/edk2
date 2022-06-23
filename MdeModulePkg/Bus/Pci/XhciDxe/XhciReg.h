@@ -25,8 +25,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define USB_HUB_CLASS_CODE     0x09
 #define USB_HUB_SUBCLASS_CODE  0x00
 
-#define XHC_CAP_USB_LEGACY  0x01
-#define XHC_CAP_USB_DEBUG   0x0A
+#define XHC_CAP_USB_LEGACY              0x01
+#define XHC_CAP_USB_DEBUG               0x0A
+#define XHC_CAP_USB_SUPPORTED_PROTOCOL  0x02
 
 // ============================================//
 //           XHCI register offset             //
@@ -73,6 +74,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define USBLEGSP_BIOS_SEMAPHORE  BIT16           // HC BIOS Owned Semaphore
 #define USBLEGSP_OS_SEMAPHORE    BIT24           // HC OS Owned Semaphore
+
+//
+// xHCI Supported Protocol Capability
+//
+#define XHC_SUPPORTED_PROTOCOL_DW0_MAJOR_REVISION_USB2  0x02
+#define XHC_SUPPORTED_PROTOCOL_DW0_MAJOR_REVISION_USB3  0x03
+#define XHC_SUPPORTED_PROTOCOL_NAME_STRING_OFFSET       0x04
+#define XHC_SUPPORTED_PROTOCOL_NAME_STRING_VALUE        0x20425355
+#define XHC_SUPPORTED_PROTOCOL_DW2_OFFSET               0x08
+#define XHC_SUPPORTED_PROTOCOL_PSI_OFFSET               0x10
+#define XHC_SUPPORTED_PROTOCOL_USB2_HIGH_SPEED_PSIM     480
+#define XHC_SUPPORTED_PROTOCOL_USB2_LOW_SPEED_PSIM      1500
 
 #pragma pack (1)
 typedef struct {
@@ -129,6 +142,52 @@ typedef union {
   UINT32       Dword;
   HCCPARAMS    Data;
 } XHC_HCCPARAMS;
+
+//
+// xHCI Supported Protocol Cabability
+//
+typedef struct {
+  UINT8    CapId;
+  UINT8    NextExtCapReg;
+  UINT8    RevMinor;
+  UINT8    RevMajor;
+} SUPPORTED_PROTOCOL_DW0;
+
+typedef union {
+  UINT32                    Dword;
+  SUPPORTED_PROTOCOL_DW0    Data;
+} XHC_SUPPORTED_PROTOCOL_DW0;
+
+typedef struct {
+  UINT32    NameString;
+} XHC_SUPPORTED_PROTOCOL_DW1;
+
+typedef struct {
+  UINT8     CompPortOffset;
+  UINT8     CompPortCount;
+  UINT16    ProtocolDef : 12;
+  UINT16    Psic        : 4;
+} SUPPORTED_PROTOCOL_DW2;
+
+typedef union {
+  UINT32                    Dword;
+  SUPPORTED_PROTOCOL_DW2    Data;
+} XHC_SUPPORTED_PROTOCOL_DW2;
+
+typedef struct {
+  UINT16    Psiv  : 4;
+  UINT16    Psie  : 2;
+  UINT16    Plt   : 2;
+  UINT16    Pfd   : 1;
+  UINT16    RsvdP : 5;
+  UINT16    Lp    : 2;
+  UINT16    Psim;
+} SUPPORTED_PROTOCOL_PROTOCOL_SPEED_ID;
+
+typedef union {
+  UINT32                                  Dword;
+  SUPPORTED_PROTOCOL_PROTOCOL_SPEED_ID    Data;
+} XHC_SUPPORTED_PROTOCOL_PROTOCOL_SPEED_ID;
 
 #pragma pack ()
 
@@ -544,6 +603,36 @@ UINT32
 XhcGetCapabilityAddr (
   IN USB_XHCI_INSTANCE  *Xhc,
   IN UINT8              CapId
+  );
+
+/**
+  Calculate the offset of the xHCI Supported Protocol Capability.
+
+  @param  Xhc           The XHCI Instance.
+  @param  MajorVersion  The USB Major Version in xHCI Support Protocol Capability Field
+
+  @return The offset of xHCI Supported Protocol capability register.
+
+**/
+UINT32
+XhcGetSupportedProtocolCapabilityAddr (
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              MajorVersion
+  );
+
+/**
+  Find SpeedField value match with Port Speed ID value.
+
+  @param  Xhc    The XHCI Instance.
+  @param  Speed  The Port Speed filed in USB PortSc register
+
+  @return The USB Port Speed.
+
+**/
+UINT16
+XhcCheckUsbPortSpeedUsedPsic (
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              Speed
   );
 
 #endif
