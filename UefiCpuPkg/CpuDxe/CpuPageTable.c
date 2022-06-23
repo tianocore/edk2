@@ -37,7 +37,9 @@
 #define IA32_PG_PMNT    BIT62
 #define IA32_PG_NX      BIT63
 
-#define PAGE_ATTRIBUTE_BITS  (IA32_PG_D | IA32_PG_A | IA32_PG_U | IA32_PG_RW | IA32_PG_P)
+#define PAGE_ATTRIBUTE_BITS             (IA32_PG_D | IA32_PG_A | IA32_PG_U | IA32_PG_RW | IA32_PG_P)
+#define PAGE_ATTRIBUTE_BITS_POST_SPLIT  (IA32_PG_RW | IA32_PG_P)
+
 //
 // Bits 1, 2, 5, 6 are reserved in the IA32 PAE PDPTE
 // X64 PAE PDPTE does not have such restriction
@@ -583,7 +585,7 @@ SplitPage (
         NewPageEntry[Index] = (BaseAddress + SIZE_4KB * Index) | AddressEncMask | ((*PageEntry) & PAGE_PROGATE_BITS);
       }
 
-      (*PageEntry) = (UINT64)(UINTN)NewPageEntry | AddressEncMask | ((*PageEntry) & PAGE_ATTRIBUTE_BITS);
+      (*PageEntry) = (UINT64)(UINTN)NewPageEntry | AddressEncMask | PAGE_ATTRIBUTE_BITS_POST_SPLIT;
       return RETURN_SUCCESS;
     } else {
       return RETURN_UNSUPPORTED;
@@ -606,7 +608,7 @@ SplitPage (
         NewPageEntry[Index] = (BaseAddress + SIZE_2MB * Index) | AddressEncMask | IA32_PG_PS | ((*PageEntry) & PAGE_PROGATE_BITS);
       }
 
-      (*PageEntry) = (UINT64)(UINTN)NewPageEntry | AddressEncMask | ((*PageEntry) & PAGE_ATTRIBUTE_BITS);
+      (*PageEntry) = (UINT64)(UINTN)NewPageEntry | AddressEncMask | PAGE_ATTRIBUTE_BITS_POST_SPLIT;
       return RETURN_SUCCESS;
     } else {
       return RETURN_UNSUPPORTED;
