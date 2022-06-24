@@ -17,5 +17,5 @@ jobs:
   parameters:
     tool_chain_tag: 'GCC5'
     vm_image: 'ubuntu-latest'
-    arch_list: "IA32,X64,ARM,AARCH64,RISCV64"
+    arch_list: "X64"
 
