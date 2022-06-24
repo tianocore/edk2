@@ -27,7 +27,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 ARM
 #
 
 [Sources.common]
@@ -40,7 +40,7 @@
   Rand/AesCore.c
   Rand/AesCore.h
 
-[Sources.AARCH64]
+[Sources.AARCH64, Sources.ARM]
   ArmRngDxe.c
   ArmTrng.c
 
@@ -48,6 +48,9 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   SecurityPkg/SecurityPkg.dec
+
+[Packages.AARCH64, Packages.ARM]
+  ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
   UefiLib
@@ -58,7 +61,7 @@
   TimerLib
   RngLib
 
-[LibraryClasses.AARCH64]
+[LibraryClasses.AARCH64, LibraryClasses.ARM]
   TrngLib
 
 [Guids]

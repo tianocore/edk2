@@ -22,6 +22,7 @@
 
 **/
 
+#include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -55,8 +56,9 @@ RngInitAvailableAlgoArray (
   UINT16  MajorRevision;
   UINT16  MinorRevision;
 
-  // Check RngGetBytes() before advertising PcdCpuRngSupportedAlgorithm.
-  if (!EFI_ERROR (RngGetBytes (sizeof (Rand), (UINT8 *)&Rand))) {
+ #ifdef MDE_CPU_AARCH64
+  // Check FEAT_RNG before advertising PcdCpuRngSupportedAlgorithm.
+  if (ArmHasRngExt ()) {
     CopyMem (
       &mAvailableAlgoArray[mAvailableAlgoArrayCount],
       PcdGetPtr (PcdCpuRngSupportedAlgorithm),
@@ -74,6 +76,8 @@ RngInitAvailableAlgoArray (
 
     DEBUG_CODE_END ();
   }
+
+ #endif
 
   // Raw algorithm (Trng)
   if (!EFI_ERROR (GetTrngVersion (&MajorRevision, &MinorRevision))) {
