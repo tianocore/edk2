@@ -1,13 +1,31 @@
 /** @file
   The Miscellaneous Routines for WiFi Connection Manager.
 
-  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "WifiConnectionMgrDxe.h"
+
+//
+//  STA AKM preference order
+//  REF: https://www.wi-fi.org/file/wpa3-specification
+//
+STATIC UINT32  mAKMSuitePreference[] = {
+  IEEE_80211_AKM_SUITE_8021X_SUITE_B192,            // AKM Suite 12
+  IEEE_80211_AKM_SUITE_8021X_SUITE_B,               // AKM Suite 11
+  IEEE_80211_AKM_SUITE_8021X_OR_PMKSA_SHA256,       // AKM Suite 5
+  IEEE_80211_AKM_SUITE_8021X_OR_PMKSA,              // AKM Suite 1
+
+  IEEE_80211_AKM_SUITE_SAE,                         // AKM Suite 8
+  IEEE_80211_AKM_SUITE_PSK_SHA256,                  // AKM Suite 6
+  IEEE_80211_AKM_SUITE_PSK,                         // AKM Suite 2
+
+  IEEE_80211_AKM_SUITE_OWE                          // AKM Suite 18
+};
+#define AKM_SUITE_PREFERENCE_COUNT  (sizeof (mAKMSuitePreference)  / sizeof (UINT32))
 
 /**
   Empty function for event process function.
@@ -340,7 +358,7 @@ WifiMgrCheckRSN (
   EFI_80211_AKM_SUITE_SELECTOR     *SupportedAKMSuites;
   EFI_80211_CIPHER_SUITE_SELECTOR  *SupportedSwCipherSuites;
   EFI_80211_CIPHER_SUITE_SELECTOR  *SupportedHwCipherSuites;
-  EFI_80211_SUITE_SELECTOR         *AKMSuite;
+  UINT32                           *AKMSuite;
   EFI_80211_SUITE_SELECTOR         *CipherSuite;
   UINT16                           AKMIndex;
   UINT16                           CipherIndex;
@@ -371,16 +389,27 @@ WifiMgrCheckRSN (
     return EFI_SUCCESS;
   }
 
-  for (AKMIndex = 0; AKMIndex < AKMList->AKMSuiteCount; AKMIndex++) {
-    AKMSuite = AKMList->AKMSuiteList + AKMIndex;
-    if (WifiMgrSupportAKMSuite (
-          SupportedAKMSuites->AKMSuiteCount,
-          (UINT32 *)SupportedAKMSuites->AKMSuiteList,
-          (UINT32 *)AKMSuite
-          ))
+  for (AKMIndex = 0; AKMIndex < AKM_SUITE_PREFERENCE_COUNT; AKMIndex++) {
+    AKMSuite = mAKMSuitePreference + AKMIndex;
+    if (WifiMgrSupportAKMSuite (AKMList->AKMSuiteCount, (UINT32 *)AKMList->AKMSuiteList, AKMSuite) &&
+        WifiMgrSupportAKMSuite (SupportedAKMSuites->AKMSuiteCount, (UINT32 *)SupportedAKMSuites->AKMSuiteList, AKMSuite))
     {
       if ((AKMSuiteSupported != NULL) && (CipherSuiteSupported != NULL)) {
         *AKMSuiteSupported = TRUE;
+      }
+
+      //
+      // OWE transition mode allow CipherSuiteCount is 0
+      //
+      if (CipherList->CipherSuiteCount == 0) {
+        *SecurityType = WifiMgrGetSecurityType ((UINT32 *)AKMSuite, NULL);
+        if (*SecurityType != SECURITY_TYPE_UNKNOWN) {
+          if ((AKMSuiteSupported != NULL) && (CipherSuiteSupported != NULL)) {
+            *CipherSuiteSupported = TRUE;
+          }
+
+          return EFI_SUCCESS;
+        }
       }
 
       for (CipherIndex = 0; CipherIndex < CipherList->CipherSuiteCount; CipherIndex++) {
@@ -450,6 +479,10 @@ WifiMgrGetSecurityType (
   IN  UINT32  *CipherSuite
   )
 {
+  if ((AKMSuite != NULL) && (*AKMSuite == IEEE_80211_AKM_SUITE_OWE)) {
+    return SECURITY_TYPE_NONE;
+  }
+
   if (CipherSuite == NULL) {
     if (AKMSuite == NULL) {
       return SECURITY_TYPE_NONE;
@@ -471,8 +504,10 @@ WifiMgrGetSecurityType (
       return SECURITY_TYPE_UNKNOWN;
     }
 
-    if ((*AKMSuite == IEEE_80211_AKM_SUITE_8021X_OR_PMKSA) ||
-        (*AKMSuite == IEEE_80211_AKM_SUITE_8021X_OR_PMKSA_SHA256))
+    if (*AKMSuite == IEEE_80211_AKM_SUITE_SAE) {
+      return SECURITY_TYPE_WPA3_PERSONAL;
+    } else if ((*AKMSuite == IEEE_80211_AKM_SUITE_8021X_OR_PMKSA) ||
+               (*AKMSuite == IEEE_80211_AKM_SUITE_8021X_OR_PMKSA_SHA256))
     {
       return SECURITY_TYPE_WPA2_ENTERPRISE;
     } else if ((*AKMSuite == IEEE_80211_AKM_SUITE_PSK) ||
@@ -495,6 +530,26 @@ WifiMgrGetSecurityType (
                (*AKMSuite == IEEE_80211_AKM_SUITE_PSK_SHA256))
     {
       return SECURITY_TYPE_WPA_PERSONAL;
+    } else {
+      return SECURITY_TYPE_UNKNOWN;
+    }
+  } else if (*CipherSuite == IEEE_80211_PAIRWISE_CIPHER_SUITE_GCMP) {
+    if (AKMSuite == NULL) {
+      return SECURITY_TYPE_UNKNOWN;
+    }
+
+    if (*AKMSuite == IEEE_80211_AKM_SUITE_8021X_SUITE_B) {
+      return SECURITY_TYPE_WPA3_ENTERPRISE;
+    } else {
+      return SECURITY_TYPE_UNKNOWN;
+    }
+  } else if (*CipherSuite == IEEE_80211_PAIRWISE_CIPHER_SUITE_GCMP256) {
+    if (AKMSuite == NULL) {
+      return SECURITY_TYPE_UNKNOWN;
+    }
+
+    if (*AKMSuite == IEEE_80211_AKM_SUITE_8021X_SUITE_B192) {
+      return SECURITY_TYPE_WPA3_ENTERPRISE;
     } else {
       return SECURITY_TYPE_UNKNOWN;
     }

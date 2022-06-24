@@ -1,7 +1,7 @@
 /** @file
   Define IFR NVData structures used by the WiFi Connection Manager.
 
-  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -119,8 +119,10 @@
 #define SECURITY_TYPE_WPA_PERSONAL     3
 #define SECURITY_TYPE_WPA2_PERSONAL    4
 #define SECURITY_TYPE_WEP              5
-#define SECURITY_TYPE_UNKNOWN          6
-#define SECURITY_TYPE_MAX              7
+#define SECURITY_TYPE_WPA3_PERSONAL    6
+#define SECURITY_TYPE_WPA3_ENTERPRISE  7
+#define SECURITY_TYPE_UNKNOWN          8
+#define SECURITY_TYPE_MAX              9
 
 #define EAP_AUTH_METHOD_TTLS  0
 #define EAP_AUTH_METHOD_PEAP  1

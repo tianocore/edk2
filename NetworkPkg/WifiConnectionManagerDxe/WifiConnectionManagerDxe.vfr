@@ -1,7 +1,7 @@
 /** @file
   Vfr files used in WiFi Connection Manager.
 
-  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -121,7 +121,8 @@ formset
         text   = STRING_TOKEN(STR_SECURITY_TYPE);          // TextTwo
 
 
-    suppressif NOT ideqval WIFI_MANAGER_IFR_NVDATA.SecurityType == SECURITY_TYPE_WPA2_PERSONAL;
+    suppressif NOT ideqval WIFI_MANAGER_IFR_NVDATA.SecurityType == SECURITY_TYPE_WPA2_PERSONAL
+      AND NOT ideqval WIFI_MANAGER_IFR_NVDATA.SecurityType == SECURITY_TYPE_WPA3_PERSONAL;
       password  varid    = WIFI_MANAGER_IFR_NVDATA.Password,
                 prompt   = STRING_TOKEN(STR_PASSWORD),
                 help     = STRING_TOKEN(STR_PASSWORD_HELP),
@@ -132,7 +133,8 @@ formset
       endpassword;
     endif;
 
-    suppressif NOT ideqval WIFI_MANAGER_IFR_NVDATA.SecurityType == SECURITY_TYPE_WPA2_ENTERPRISE;
+    suppressif NOT ideqval WIFI_MANAGER_IFR_NVDATA.SecurityType == SECURITY_TYPE_WPA2_ENTERPRISE
+      AND NOT ideqval WIFI_MANAGER_IFR_NVDATA.SecurityType == SECURITY_TYPE_WPA3_ENTERPRISE;
 
       oneof varid       = WIFI_MANAGER_IFR_NVDATA.EapAuthMethod,
             questionid  = KEY_EAP_AUTH_METHOD_CONNECT_NETWORK,

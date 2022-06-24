@@ -1,7 +1,7 @@
 /** @file
   The Hii functions for WiFi Connection Manager.
 
-  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -50,6 +50,8 @@ CHAR16  *mSecurityType[] = {
   L"WPA-Personal   ",
   L"WPA2-Personal  ",
   L"WEP            ",
+  L"WPA3-Personal  ",
+  L"WPA3-Enterprise",
   L"UnKnown        "
 };
 
@@ -269,6 +271,7 @@ WifiMgrGetStrAKMList (
   UINT8   Index;
   UINT16  AKMSuiteCount;
   CHAR16  *AKMListDisplay;
+  UINTN   Length;
 
   AKMListDisplay = NULL;
   if ((Profile == NULL) || (Profile->Network.AKMSuite == NULL)) {
@@ -278,23 +281,24 @@ WifiMgrGetStrAKMList (
   AKMSuiteCount = Profile->Network.AKMSuite->AKMSuiteCount;
   if (AKMSuiteCount != 0) {
     //
-    // Current AKM Suite is between 1-9
+    // Current AKM Suite is between 1-18
     //
-    AKMListDisplay = (CHAR16 *)AllocateZeroPool (sizeof (CHAR16) * (AKMSuiteCount * 2 + 1));
+    AKMListDisplay = (CHAR16 *)AllocateZeroPool (sizeof (CHAR16) * (AKMSuiteCount * 3 + 1));
+    Length         = 0;
     if (AKMListDisplay != NULL) {
       for (Index = 0; Index < AKMSuiteCount; Index++) {
         //
-        // The size of buffer should be 3 CHAR16 for Null-terminated Unicode string.
-        // The first char is the AKM Suite number, the second char is ' ', the third char is '\0'.
+        // The size of buffer should be 4 CHAR16 for Null-terminated Unicode string.
         //
         UnicodeSPrint (
-          AKMListDisplay + (Index * 2),
-          sizeof (CHAR16) * 3,
+          AKMListDisplay + Length,
+          sizeof (CHAR16) * 4,
           L"%d ",
           Profile->Network.AKMSuite->AKMSuiteList[Index].SuiteType
           );
+        Length = StrLen (AKMListDisplay + Length) + Length;
         if (Index == AKMSuiteCount - 1) {
-          *(AKMListDisplay + (Index * 2 + 1)) = L'\0';
+          *(AKMListDisplay + (Length - 1)) = L'\0';
         }
       }
     }
@@ -1461,7 +1465,9 @@ WifiMgrDxeHiiConfigAccessCallback (
           return EFI_OUT_OF_RESOURCES;
         }
 
-        if (IfrNvData->SecurityType == SECURITY_TYPE_WPA2_ENTERPRISE) {
+        if ((IfrNvData->SecurityType == SECURITY_TYPE_WPA2_ENTERPRISE) ||
+            (IfrNvData->SecurityType == SECURITY_TYPE_WPA3_ENTERPRISE))
+        {
           IfrNvData->EapAuthMethod       = Profile->EapAuthMethod;
           IfrNvData->EapSecondAuthMethod = Profile->EapSecondAuthMethod;
           StrCpyS (IfrNvData->EapIdentity, EAP_IDENTITY_SIZE, Profile->EapIdentity);
@@ -1529,7 +1535,9 @@ WifiMgrDxeHiiConfigAccessCallback (
         //
         // Restore User Config Data for Page recovery
         //
-        if (IfrNvData->SecurityType == SECURITY_TYPE_WPA2_ENTERPRISE) {
+        if ((IfrNvData->SecurityType == SECURITY_TYPE_WPA2_ENTERPRISE) ||
+            (IfrNvData->SecurityType == SECURITY_TYPE_WPA3_ENTERPRISE))
+        {
           Profile->EapAuthMethod       = IfrNvData->EapAuthMethod;
           Profile->EapSecondAuthMethod = IfrNvData->EapSecondAuthMethod;
           StrCpyS (Profile->EapIdentity, EAP_IDENTITY_SIZE, IfrNvData->EapIdentity);
@@ -1598,12 +1606,17 @@ WifiMgrDxeHiiConfigAccessCallback (
           // When this network is not currently connected, pend it to connect.
           //
           if (Profile->AKMSuiteSupported && Profile->CipherSuiteSupported) {
-            if ((Profile->SecurityType == SECURITY_TYPE_NONE) || (Profile->SecurityType == SECURITY_TYPE_WPA2_PERSONAL)) {
+            if ((Profile->SecurityType == SECURITY_TYPE_NONE) ||
+                (Profile->SecurityType == SECURITY_TYPE_WPA2_PERSONAL) ||
+                (Profile->SecurityType == SECURITY_TYPE_WPA3_PERSONAL))
+            {
               //
               // For Open network, connect directly.
               //
               ProfileToConnect = Profile;
-            } else if (Profile->SecurityType == SECURITY_TYPE_WPA2_ENTERPRISE) {
+            } else if ((Profile->SecurityType == SECURITY_TYPE_WPA2_ENTERPRISE) ||
+                       (Profile->SecurityType == SECURITY_TYPE_WPA3_ENTERPRISE))
+            {
               //
               // For WPA/WPA2-Enterprise network, conduct eap configuration first.
               // Only EAP-TLS, TTLS and PEAP is supported now!
