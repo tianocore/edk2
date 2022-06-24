@@ -1,7 +1,7 @@
 /** @file
   The Mac Connection2 Protocol adapter functions for WiFi Connection Manager.
 
-  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -848,6 +848,7 @@ WifiMgrPrepareConnection (
   if (AKMSuiteSupported && CipherSuiteSupported) {
     switch (SecurityType) {
       case SECURITY_TYPE_WPA2_PERSONAL:
+      case SECURITY_TYPE_WPA3_PERSONAL:
 
         Status = WifiMgrConfigPassword (Nic, Profile);
         if (EFI_ERROR (Status)) {
@@ -863,6 +864,7 @@ WifiMgrPrepareConnection (
         break;
 
       case SECURITY_TYPE_WPA2_ENTERPRISE:
+      case SECURITY_TYPE_WPA3_ENTERPRISE:
 
         Status = WifiMgrConfigEap (Nic, Profile);
         if (EFI_ERROR (Status)) {
