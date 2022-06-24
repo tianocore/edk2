@@ -292,7 +292,7 @@
   SecurityPkg/EnrollFromDefaultKeysApp/EnrollFromDefaultKeysApp.inf
   SecurityPkg/VariableAuthenticated/SecureBootDefaultKeysDxe/SecureBootDefaultKeysDxe.inf
 
-[Components.IA32, Components.X64, Components.AARCH64]
+[Components.IA32, Components.X64, Components.AARCH64, Components.ARM]
   #
   # Random Number Generator
   #
