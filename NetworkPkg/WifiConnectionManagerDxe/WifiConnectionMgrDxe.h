@@ -1,7 +1,7 @@
 /** @file
   The miscellaneous structure definitions for WiFi connection driver.
 
-  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -82,6 +82,8 @@ typedef enum {
   Ieee80211PairwiseCipherSuiteCCMP                = 4,
   Ieee80211PairwiseCipherSuiteWEP104              = 5,
   Ieee80211PairwiseCipherSuiteBIP                 = 6,
+  Ieee80211PairwiseCipherSuiteGCMP                = 8,
+  Ieee80211PairwiseCipherSuiteGCMP256             = 9,
   // ...
 } IEEE_80211_PAIRWISE_CIPHER_SUITE;
 
@@ -91,19 +93,29 @@ typedef enum {
 #define IEEE_80211_PAIRWISE_CIPHER_SUITE_CCMP       (OUI_IEEE_80211I | (Ieee80211PairwiseCipherSuiteCCMP << 24))
 #define IEEE_80211_PAIRWISE_CIPHER_SUITE_WEP104     (OUI_IEEE_80211I | (Ieee80211PairwiseCipherSuiteWEP104 << 24))
 #define IEEE_80211_PAIRWISE_CIPHER_SUITE_BIP        (OUI_IEEE_80211I | (Ieee80211PairwiseCipherSuiteBIP << 24))
+#define IEEE_80211_PAIRWISE_CIPHER_SUITE_GCMP       (OUI_IEEE_80211I | (Ieee80211PairwiseCipherSuiteGCMP << 24))
+#define IEEE_80211_PAIRWISE_CIPHER_SUITE_GCMP256    (OUI_IEEE_80211I | (Ieee80211PairwiseCipherSuiteGCMP256 << 24))
 
 typedef enum {
   Ieee80211AkmSuite8021XOrPMKSA       = 1,
   Ieee80211AkmSuitePSK                = 2,
   Ieee80211AkmSuite8021XOrPMKSASHA256 = 5,
-  Ieee80211AkmSuitePSKSHA256          = 6
-                                        // ...
+  Ieee80211AkmSuitePSKSHA256          = 6,
+  Ieee80211AkmSuiteSAE                = 8,
+  Ieee80211AkmSuite8021XSuiteB        = 11,
+  Ieee80211AkmSuite8021XSuiteB192     = 12,
+  Ieee80211AkmSuiteOWE                = 18,
+  // ...
 } IEEE_80211_AKM_SUITE;
 
 #define IEEE_80211_AKM_SUITE_8021X_OR_PMKSA         (OUI_IEEE_80211I | (Ieee80211AkmSuite8021XOrPMKSA << 24))
 #define IEEE_80211_AKM_SUITE_PSK                    (OUI_IEEE_80211I | (Ieee80211AkmSuitePSK << 24))
 #define IEEE_80211_AKM_SUITE_8021X_OR_PMKSA_SHA256  (OUI_IEEE_80211I | (Ieee80211AkmSuite8021XOrPMKSASHA256 << 24))
 #define IEEE_80211_AKM_SUITE_PSK_SHA256             (OUI_IEEE_80211I | (Ieee80211AkmSuitePSKSHA256 << 24))
+#define IEEE_80211_AKM_SUITE_SAE                    (OUI_IEEE_80211I | (Ieee80211AkmSuiteSAE << 24))
+#define IEEE_80211_AKM_SUITE_8021X_SUITE_B          (OUI_IEEE_80211I | (Ieee80211AkmSuite8021XSuiteB << 24))
+#define IEEE_80211_AKM_SUITE_8021X_SUITE_B192       (OUI_IEEE_80211I | (Ieee80211AkmSuite8021XSuiteB192 << 24))
+#define IEEE_80211_AKM_SUITE_OWE                    (OUI_IEEE_80211I | (Ieee80211AkmSuiteOWE << 24))
 
 //
 // Protocol instances
