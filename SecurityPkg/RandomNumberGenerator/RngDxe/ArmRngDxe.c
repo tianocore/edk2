@@ -58,6 +58,7 @@ GetAvailableAlgorithms (
     return EFI_OUT_OF_RESOURCES;
   }
 
+#ifdef MDE_CPU_AARCH64
   // Check RngGetBytes() before advertising PcdCpuRngSupportedAlgorithm.
   if (!EFI_ERROR (RngGetBytes (sizeof (DummyRand), (UINT8 *)&DummyRand))) {
     CopyMem (
@@ -77,6 +78,8 @@ GetAvailableAlgorithms (
 
     DEBUG_CODE_END ();
   }
+
+ #endif
 
   // Raw algorithm (Trng)
   if (!EFI_ERROR (GetTrngVersion (&MajorRevision, &MinorRevision))) {
