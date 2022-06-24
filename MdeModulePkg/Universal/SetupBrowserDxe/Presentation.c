@@ -2,7 +2,7 @@
 Utility functions for UI presentation.
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2015 - 2022 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -21,7 +21,6 @@ LIST_ENTRY                mRefreshEventList  = INITIALIZE_LIST_HEAD_VARIABLE (mR
 UINT16                    mCurFakeQestId;
 FORM_DISPLAY_ENGINE_FORM  gDisplayFormData;
 BOOLEAN                   mFinishRetrieveCall = FALSE;
-BOOLEAN                   mDynamicFormUpdated = FALSE;
 
 /**
   Check whether the ConfigAccess protocol is available.
@@ -1791,7 +1790,6 @@ FormUpdateNotify (
   )
 {
   mHiiPackageListUpdated = TRUE;
-  mDynamicFormUpdated    = TRUE;
 
   return EFI_SUCCESS;
 }
