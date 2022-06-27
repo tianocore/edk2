@@ -20,6 +20,10 @@
 
 [LibraryClasses]
   MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
+  CpuPageTableLib|UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/UnitTestHostBaseCryptLib.inf
+  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
 
 [PcdsPatchableInModule]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs|0
@@ -29,3 +33,8 @@
   # Build HOST_APPLICATION that tests the MtrrLib
   #
   UefiCpuPkg/Library/MtrrLib/UnitTest/MtrrLibUnitTestHost.inf
+
+  #
+  # Build HOST_APPLICATION that tests the CpuPageTableLib
+  #
+  UefiCpuPkg/Library/CpuPageTableLib/UnitTest/CpuPageTableLibUnitTestHost.inf
