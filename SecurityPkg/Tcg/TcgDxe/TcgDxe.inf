@@ -70,7 +70,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision       ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId         ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision   ## SOMETIMES_CONSUMES
-  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeSubClassTpmDevice   ## SOMETIMES_CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgLogAreaMinLen              ## CONSUMES
 
 [Depex]

@@ -593,7 +593,7 @@ Done:
     TcgData->BsCap.TPMPresentFlag = FALSE;
     REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      (PcdGet32 (PcdStatusCodeSubClassTpmDevice) | EFI_P_EC_INTERFACE_ERROR)
+      (BZ3966_EFI_PERIPHERAL_TPM | EFI_P_EC_INTERFACE_ERROR)
       );
     Status = EFI_DEVICE_ERROR;
   }
