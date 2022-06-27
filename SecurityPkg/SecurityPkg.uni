@@ -169,7 +169,7 @@
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdStatusCodeSubClassTpmDevice_PROMPT  #language en-US "Status Code for TPM device definitions"
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdStatusCodeSubClassTpmDevice_HELP  #language en-US "Progress Code for TPM device subclass definitions.<BR><BR>\n"
-                                                                                               "EFI_PERIPHERAL_TPM  = (EFI_PERIPHERAL | 0x000D0000) = 0x010D0000<BR>"
+                                                                                               "EFI_PERIPHERAL_TPM  = (EFI_PERIPHERAL | 0x000E0000) = 0x010E0000<BR>"
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdRsa2048Sha256PublicKeyBuffer_PROMPT  #language en-US "One or more SHA 256 Hashes of RSA 2048 bit public keys used to verify Recovery and Capsule Update images"
 
