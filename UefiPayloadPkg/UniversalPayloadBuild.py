@@ -111,6 +111,7 @@ def BuildUniversalPayload(Args, MacroList):
     #
     upld_info_hdr = UPLD_INFO_HEADER()
     upld_info_hdr.ImageId = Args.ImageId.encode()[:16]
+    upld_info_hdr.Attribute |= 1 if BuildTarget == "DEBUG" else 0
     fp = open(UpldInfoFile, 'wb')
     fp.write(bytearray(upld_info_hdr))
     fp.close()
