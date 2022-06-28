@@ -193,6 +193,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
         rs.append(RequiredSubmodule(
             "UnitTestFrameworkPkg/Library/CmockaLib/cmocka", False))
         rs.append(RequiredSubmodule(
+            "UnitTestFrameworkPkg/Library/GoogleTestLib/googletest", False))
+        rs.append(RequiredSubmodule(
             "MdeModulePkg/Universal/RegularExpressionDxe/oniguruma", False))
         rs.append(RequiredSubmodule(
             "MdeModulePkg/Library/BrotliCustomDecompressLib/brotli", False))
