@@ -25,6 +25,7 @@
 #include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DrbgLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/RngLib.h>
 #include <Library/DebugLib.h>
@@ -39,7 +40,7 @@
 // populated only once.
 // The valid entry with the lowest index will be the default algorithm.
 //
-#define RNG_AVAILABLE_ALGO_MAX  2
+#define RNG_AVAILABLE_ALGO_MAX  3
 STATIC BOOLEAN            mAvailableAlgoArrayInit = FALSE;
 STATIC UINTN              mAvailableAlgoArrayCount;
 STATIC EFI_RNG_ALGORITHM  mAvailableAlgoArray[RNG_AVAILABLE_ALGO_MAX];
@@ -87,9 +88,76 @@ RngInitAvailableAlgoArray (
       sizeof (EFI_RNG_ALGORITHM)
       );
     mAvailableAlgoArrayCount++;
+
+    // SP800-90 Ctr 256 bits Drbg.
+    // Arm implementation is based on the Trng.
+    CopyMem (
+      &mAvailableAlgoArray[mAvailableAlgoArrayCount],
+      &gEfiRngAlgorithmSp80090Ctr256Guid,
+      sizeof (EFI_RNG_ALGORITHM)
+      );
+    mAvailableAlgoArrayCount++;
   }
 
   mAvailableAlgoArrayInit = TRUE;
+}
+
+/** Produces and returns an RNG value using a specified Drbg algorithm.
+
+  @param[in]  DrbgMechanism     The Drbg mechanism to use.
+  @param[in]  RNGValueLength    The length in bytes of the memory buffer pointed to by
+                                RNGValue. The driver shall return exactly this numbers of bytes.
+  @param[out] RNGValue          A caller-allocated memory buffer filled by the driver with the
+                                resulting RNG value.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+RngGetDrbgVal (
+  IN  DRBG_MECHANISM  DrbgMechanism,
+  IN  UINTN           RNGValueLength,
+  OUT UINT8           *RNGValue
+  )
+{
+  EFI_STATUS   Status;
+  STATIC VOID  *DrbgHandle = NULL;
+
+  // Only instantiate once.
+  if (DrbgHandle == NULL) {
+    Status = DrbgInstantiateFn (
+               DrbgMechanism,
+               DrbgEntropyNoCondFn,
+               256,
+               FALSE,
+               NULL,
+               0,
+               &DrbgHandle
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
+  }
+
+  // Check overflow.
+  if (RNGValueLength > (MAX_UINTN >> 3)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = DrbgGenerateFn (
+             256,
+             FALSE,
+             NULL,
+             0,
+             RNGValueLength << 3,
+             RNGValue,
+             DrbgHandle
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  return Status;
 }
 
 /**
@@ -161,6 +229,11 @@ FoundAlgo:
   // Raw algorithm (Trng)
   if (CompareGuid (RNGAlgorithm, &gEfiRngAlgorithmRaw)) {
     return GenerateEntropy (RNGValueLength, RNGValue);
+  }
+
+  // SP800-90 Ctr 256 bits Drbg
+  if (CompareGuid (RNGAlgorithm, &gEfiRngAlgorithmSp80090Ctr256Guid)) {
+    return RngGetDrbgVal (DrbgMechansimCtr, RNGValueLength, RNGValue);
   }
 
   //

@@ -62,6 +62,8 @@
   RngLib
 
 [LibraryClasses.AARCH64, LibraryClasses.ARM]
+  ArmLib
+  DrbgLib
   TrngLib
 
 [Guids]
