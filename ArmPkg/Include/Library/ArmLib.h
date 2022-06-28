@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2016, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2022, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2020 - 2021, NUVIA Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -766,6 +766,16 @@ ArmHasGicSystemRegisters (
 BOOLEAN
 EFIAPI
 ArmHasCcidx (
+  VOID
+  );
+
+/** Check if FEAT_RNG extension is available.
+
+  @retval TRUE if FEAT_RNG extension is available.
+  @retval FALSE otherwise.
+**/
+BOOLEAN
+ArmHasRngExt (
   VOID
   );
 

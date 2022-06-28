@@ -11,6 +11,8 @@
 #ifndef AARCH64_LIB_H_
 #define AARCH64_LIB_H_
 
+#define ID_AA64ISAR0_EL1_RNDR_MASK  ((UINT64)0xF << 60U)
+
 typedef VOID (*AARCH64_CACHE_OPERATION)(
   UINTN
   );
