@@ -95,7 +95,9 @@
   ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
 
   # RngDxe dependencies
+  AesLib|MdePkg/Library/AesLibNull/AesLibNull.inf
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
+  DrbgLib|MdePkg/Library/DrbgLibNull/DrbgLibNull.inf
 
 [LibraryClasses.ARM]
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
