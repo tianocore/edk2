@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 #
 # Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2017, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2022, Arm Limited. All rights reserved.
 # Copyright (c) 2016, Linaro Limited. All rights reserved.
 # Copyright (c) 2020, NUVIA Inc. All rights reserved.
 #
@@ -480,6 +480,11 @@ ASM_FUNC(ArmReadCntHctl)
 // VOID ArmWriteCntHctl(UINT32 CntHctl)
 ASM_FUNC(ArmWriteCntHctl)
   msr   cnthctl_el2, x0
+  ret
+
+// UINTN ArmReadIdIsar0(VOID)
+ASM_FUNC(ArmReadIdIsar0)
+  mrs   x0, id_aa64isar0_el1
   ret
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
