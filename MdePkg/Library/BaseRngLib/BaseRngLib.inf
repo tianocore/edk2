@@ -37,10 +37,10 @@
   AArch64/Rndr.c
   AArch64/ArmRng.h
 
-  AArch64/ArmReadIdIsar0.S   | GCC
+  AArch64/ArmGetFeatRng.S    | GCC
   AArch64/ArmRng.S           | GCC
 
-  AArch64/ArmReadIdIsar0.asm | MSFT
+  AArch64/ArmGetFeatRng.asm  | MSFT
   AArch64/ArmRng.asm         | MSFT
 
 [Packages]

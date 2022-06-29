@@ -35,7 +35,7 @@ ArmRndr (
 **/
 UINT64
 EFIAPI
-ArmReadIdIsar0 (
+ArmGetFeatRng (
   VOID
   );
 
