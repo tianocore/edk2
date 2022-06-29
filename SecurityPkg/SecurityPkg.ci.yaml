@@ -31,6 +31,7 @@
     },
     "DependencyCheck": {
         "AcceptableDependencies": [
+            "ArmPkg/ArmPkg.dec",
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
             "SecurityPkg/SecurityPkg.dec",
