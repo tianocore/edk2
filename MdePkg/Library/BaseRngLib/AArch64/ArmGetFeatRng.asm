@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; ArmReadIdIsar0() for AArch64
+; ArmGetFeatRng() for AArch64
 ;
 ; Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
 ;
@@ -8,7 +8,7 @@
 ;
 ;------------------------------------------------------------------------------
 
-  EXPORT ArmReadIdIsar0
+  EXPORT ArmGetFeatRng
   AREA BaseLib_LowLevel, CODE, READONLY
 
 ;/**
@@ -19,11 +19,11 @@
 ;**/
 ;UINT64
 ;EFIAPI
-;ArmReadIdIsar0 (
+;ArmGetFeatRng (
 ;  VOID
 ;  );
 ;
-ArmReadIdIsar0
+ArmGetFeatRng
   mrs  x0, id_aa64isar0_el1 // Read ID_AA64ISAR0 Register
   ret
 

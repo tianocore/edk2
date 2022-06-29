@@ -47,7 +47,7 @@ BaseRngLibConstructor (
   // Determine RNDR support by examining bits 63:60 of the ISAR0 register returned by
   // MSR. A non-zero value indicates that the processor supports the RNDR instruction.
   //
-  Isar0 = ArmReadIdIsar0 ();
+  Isar0 = ArmGetFeatRng ();
   ASSERT ((Isar0 & RNDR_MASK) != 0);
 
   mRndrSupported = ((Isar0 & RNDR_MASK) != 0);
