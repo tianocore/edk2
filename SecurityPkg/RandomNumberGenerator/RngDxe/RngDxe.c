@@ -61,10 +61,6 @@ RngGetInfo (
 {
   EFI_STATUS  Status;
 
-  if ((This == NULL) || (RNGAlgorithmListSize == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   //
   // Return algorithm list supported by driver.
   //
