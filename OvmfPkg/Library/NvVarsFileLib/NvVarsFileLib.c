@@ -28,6 +28,12 @@ ConnectNvVarsToFileSystem (
   IN EFI_HANDLE  FsHandle
   )
 {
+ #ifdef SECURE_BOOT_FEATURE_ENABLED
+
+  return EFI_UNSUPPORTED;
+
+ #else
+
   EFI_STATUS  Status;
 
   //
@@ -46,6 +52,7 @@ ConnectNvVarsToFileSystem (
   }
 
   return Status;
+ #endif
 }
 
 /**
