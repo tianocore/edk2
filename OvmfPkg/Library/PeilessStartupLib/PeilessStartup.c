@@ -180,14 +180,6 @@ PeilessStartup (
     }
 
     //
-    // Validate Tdx CFV
-    //
-    if (!TdxValidateCfv (CfvBase, FixedPcdGet32 (PcdCfvRawDataSize))) {
-      ASSERT (FALSE);
-      CpuDeadLoop ();
-    }
-
-    //
     // Measure Tdx CFV
     //
     Status = MeasureFvImage ((EFI_PHYSICAL_ADDRESS)(UINTN)CfvBase, FixedPcdGet32 (PcdCfvRawDataSize), 1);
