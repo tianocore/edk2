@@ -25,10 +25,13 @@
 #include <IndustryStandard/Pci22.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/QemuCpuHotplug.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgS3Lib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/PciLib.h>
+#include <Guid/SystemNvDataGuid.h>
+#include <Guid/VariableFormat.h>
 #include <OvmfPlatforms.h>
 
 #include <Library/PlatformInitLib.h>
@@ -575,4 +578,239 @@ PlatformMaxCpuCountInitialization (
 
   PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber  = MaxCpuCount;
   PlatformInfoHob->PcdCpuBootLogicalProcessorNumber = BootCpuCount;
+}
+
+/**
+  Check padding data all bit should be 1.
+
+  @param[in] Buffer     - A pointer to buffer header
+  @param[in] BufferSize - Buffer size
+
+  @retval  TRUE   - The padding data is valid.
+  @retval  TRUE  - The padding data is invalid.
+
+**/
+BOOLEAN
+CheckPaddingData (
+  IN UINT8   *Buffer,
+  IN UINT32  BufferSize
+  )
+{
+  UINT32  index;
+
+  for (index = 0; index < BufferSize; index++) {
+    if (Buffer[index] != 0xFF) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+  Check the integrity of NvVarStore.
+
+  @param[in] NvVarStoreBase - A pointer to NvVarStore header
+  @param[in] NvVarStoreSize - NvVarStore size
+
+  @retval  TRUE   - The NvVarStore is valid.
+  @retval  FALSE  - The NvVarStore is invalid.
+
+**/
+BOOLEAN
+EFIAPI
+PlatformValidateNvVarStore (
+  IN UINT8   *NvVarStoreBase,
+  IN UINT32  NvVarStoreSize
+  )
+{
+  UINT16                         Checksum;
+  UINTN                          VariableBase;
+  UINT32                         VariableOffset;
+  UINT32                         VariableOffsetBeforeAlign;
+  EFI_FIRMWARE_VOLUME_HEADER     *NvVarStoreFvHeader;
+  VARIABLE_STORE_HEADER          *NvVarStoreHeader;
+  AUTHENTICATED_VARIABLE_HEADER  *VariableHeader;
+
+  static EFI_GUID  FvHdrGUID       = EFI_SYSTEM_NV_DATA_FV_GUID;
+  static EFI_GUID  VarStoreHdrGUID = EFI_AUTHENTICATED_VARIABLE_GUID;
+
+  VariableOffset = 0;
+
+  if (NvVarStoreBase == NULL) {
+    DEBUG ((DEBUG_ERROR, "NvVarStore pointer is NULL.\n"));
+    return FALSE;
+  }
+
+  //
+  // Verify the header zerovetor, filesystemguid,
+  // revision, signature, attributes, fvlength, checksum
+  // HeaderLength cannot be an odd number
+  //
+  NvVarStoreFvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)NvVarStoreBase;
+
+  if ((!IsZeroBuffer (NvVarStoreFvHeader->ZeroVector, 16)) ||
+      (!CompareGuid (&FvHdrGUID, &NvVarStoreFvHeader->FileSystemGuid)) ||
+      (NvVarStoreFvHeader->Signature != EFI_FVH_SIGNATURE) ||
+      (NvVarStoreFvHeader->Attributes != 0x4feff) ||
+      (NvVarStoreFvHeader->Revision != EFI_FVH_REVISION) ||
+      (NvVarStoreFvHeader->FvLength != NvVarStoreSize)
+      )
+  {
+    DEBUG ((DEBUG_ERROR, "NvVarStore FV headers were invalid.\n"));
+    return FALSE;
+  }
+
+  //
+  // Verify the header checksum
+  //
+  Checksum = CalculateSum16 ((VOID *)NvVarStoreFvHeader, NvVarStoreFvHeader->HeaderLength);
+
+  if (Checksum != 0) {
+    DEBUG ((DEBUG_ERROR, "NvVarStore FV checksum was invalid.\n"));
+    return FALSE;
+  }
+
+  //
+  // Verify the header signature, size, format, state
+  //
+  NvVarStoreHeader = (VARIABLE_STORE_HEADER *)(NvVarStoreBase + NvVarStoreFvHeader->HeaderLength);
+  if ((!CompareGuid (&VarStoreHdrGUID, &NvVarStoreHeader->Signature)) ||
+      (NvVarStoreHeader->Format != VARIABLE_STORE_FORMATTED) ||
+      (NvVarStoreHeader->State != VARIABLE_STORE_HEALTHY) ||
+      (NvVarStoreHeader->Size > (NvVarStoreFvHeader->FvLength - NvVarStoreFvHeader->HeaderLength)) ||
+      (NvVarStoreHeader->Size < sizeof (VARIABLE_STORE_HEADER))
+      )
+  {
+    DEBUG ((DEBUG_ERROR, "NvVarStore header signature/size/format/state were invalid.\n"));
+    return FALSE;
+  }
+
+  //
+  // Verify the header startId, state
+  // Verify data to the end
+  //
+  VariableBase = (UINTN)NvVarStoreBase + NvVarStoreFvHeader->HeaderLength + sizeof (VARIABLE_STORE_HEADER);
+  while (VariableOffset  < (NvVarStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER))) {
+    VariableHeader = (AUTHENTICATED_VARIABLE_HEADER *)(VariableBase + VariableOffset);
+    if (VariableHeader->StartId != VARIABLE_DATA) {
+      if (!CheckPaddingData ((UINT8 *)VariableHeader, NvVarStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER) - VariableOffset)) {
+        DEBUG ((DEBUG_ERROR, "NvVarStore variable header StartId was invalid.\n"));
+        return FALSE;
+      }
+
+      VariableOffset = NvVarStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER);
+    } else {
+      if (!((VariableHeader->State == VAR_IN_DELETED_TRANSITION) ||
+            (VariableHeader->State == VAR_DELETED) ||
+            (VariableHeader->State == VAR_HEADER_VALID_ONLY) ||
+            (VariableHeader->State == VAR_ADDED)))
+      {
+        DEBUG ((DEBUG_ERROR, "NvVarStore Variable header State was invalid.\n"));
+        return FALSE;
+      }
+
+      VariableOffset += sizeof (AUTHENTICATED_VARIABLE_HEADER) + VariableHeader->NameSize + VariableHeader->DataSize;
+      // Verify VariableOffset should be less than or equal NvVarStoreHeader->Size - sizeof(VARIABLE_STORE_HEADER)
+      if (VariableOffset > (NvVarStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER))) {
+        DEBUG ((DEBUG_ERROR, "NvVarStore Variable header VariableOffset was invalid.\n"));
+        return FALSE;
+      }
+
+      VariableOffsetBeforeAlign = VariableOffset;
+      // 4 byte align
+      VariableOffset = (VariableOffset  + 3) & (UINTN)(~3);
+
+      if (!CheckPaddingData ((UINT8 *)(VariableBase + VariableOffsetBeforeAlign), VariableOffset - VariableOffsetBeforeAlign)) {
+        DEBUG ((DEBUG_ERROR, "NvVarStore Variable header PaddingData was invalid.\n"));
+        return FALSE;
+      }
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+ Allocate storage for NV variables early on so it will be
+ at a consistent address.  Since VM memory is preserved
+ across reboots, this allows the NV variable storage to survive
+ a VM reboot.
+
+ *
+ * @retval VOID* The pointer to the storage for NV Variables
+ */
+VOID *
+EFIAPI
+PlatformReserveEmuVariableNvStore (
+  VOID
+  )
+{
+  VOID    *VariableStore;
+  UINT32  VarStoreSize;
+
+  VarStoreSize = 2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize);
+  //
+  // Allocate storage for NV variables early on so it will be
+  // at a consistent address.  Since VM memory is preserved
+  // across reboots, this allows the NV variable storage to survive
+  // a VM reboot.
+  //
+  VariableStore =
+    AllocateRuntimePages (
+      EFI_SIZE_TO_PAGES (VarStoreSize)
+      );
+  DEBUG ((
+    DEBUG_INFO,
+    "Reserved variable store memory: 0x%p; size: %dkb\n",
+    VariableStore,
+    VarStoreSize / 1024
+    ));
+
+  return VariableStore;
+}
+
+/**
+ When OVMF is lauched with -bios parameter, UEFI variables will be
+ partially emulated, and non-volatile variables may lose their contents
+ after a reboot. This makes the secure boot feature not working.
+
+ This function is used to initialize the EmuVariableNvStore
+ with the conent in PcdOvmfFlashNvStorageVariableBase.
+
+ @param[in] EmuVariableNvStore      - A pointer to EmuVariableNvStore
+
+ @retval  EFI_SUCCESS   - Successfully init the EmuVariableNvStore
+ @retval  Others        - As the error code indicates
+ */
+EFI_STATUS
+EFIAPI
+PlatformInitEmuVariableNvStore (
+  IN VOID  *EmuVariableNvStore
+  )
+{
+  UINT8   *Base;
+  UINT32  Size;
+  UINT32  EmuVariableNvStoreSize;
+
+  EmuVariableNvStoreSize = 2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize);
+  if ((EmuVariableNvStore == NULL) || (EmuVariableNvStoreSize == 0)) {
+    DEBUG ((DEBUG_ERROR, "Invalid EmuVariableNvStore parameter.\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Base = (UINT8 *)(UINTN)PcdGet32 (PcdOvmfFlashNvStorageVariableBase);
+  Size = (UINT32)PcdGet32 (PcdFlashNvStorageVariableSize);
+  ASSERT (Size < EmuVariableNvStoreSize);
+
+  if (!PlatformValidateNvVarStore (Base, PcdGet32 (PcdCfvRawDataSize))) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DEBUG ((DEBUG_INFO, "Init EmuVariableNvStore with the content in FlashNvStorage\n"));
+
+  CopyMem (EmuVariableNvStore, Base, Size);
+
+  return EFI_SUCCESS;
 }
