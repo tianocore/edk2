@@ -81,7 +81,9 @@
   HwInfoParserLib|DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
   DynamicPlatRepoLib|DynamicTablesPkg/Library/Common/DynamicPlatRepoLib/DynamicPlatRepoLib.inf
 
+  AesLib|ArmPkg/Library/ArmAesLib/ArmAesLib.inf
   ArmMonitorLib|ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
+  DrbgLib|MdePkg/Library/DrbgLib/DrbgLib.inf
   TrngLib|ArmPkg/Library/ArmFwTrngLib/ArmFwTrngLib.inf
 
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
