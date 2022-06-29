@@ -21,6 +21,7 @@
 
 [LibraryClasses]
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibBase.inf
 
 [Components]
   #
@@ -29,6 +30,7 @@
   MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibHost.inf
   MdePkg/Test/UnitTest/Library/BaseLib/BaseLibUnitTestsHost.inf
   MdePkg/Test/GoogleTest/Library/BaseSafeIntLib/GoogleTestBaseSafeIntLib.inf
+  MdePkg/Test/UnitTest/Library/DevicePathLib/TestDevicePathLibHost.inf
 
   #
   # Build HOST_APPLICATION Libraries
