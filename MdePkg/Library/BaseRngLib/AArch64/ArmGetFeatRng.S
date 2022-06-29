@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# ArmReadIdIsar0() for AArch64
+# ArmGetFeatRng() for AArch64
 #
 # Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
 #
@@ -10,7 +10,7 @@
 
 .text
 .p2align 2
-GCC_ASM_EXPORT(ArmReadIdIsar0)
+GCC_ASM_EXPORT(ArmGetFeatRng)
 
 #/**
 #  Reads the ID_AA64ISAR0 Register.
@@ -20,11 +20,11 @@ GCC_ASM_EXPORT(ArmReadIdIsar0)
 #**/
 #UINT64
 #EFIAPI
-#ArmReadIdIsar0 (
+#ArmGetFeatRng (
 #  VOID
 #  );
 #
-ASM_PFX(ArmReadIdIsar0):
+ASM_PFX(ArmGetFeatRng):
   mrs  x0, id_aa64isar0_el1 // Read ID_AA64ISAR0 Register
   ret
 
