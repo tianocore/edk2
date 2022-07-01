@@ -31,3 +31,4 @@
 [LibraryClasses]
   AcpiHelperLib
   BaseLib
+  MemoryAllocationLib
