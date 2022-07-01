@@ -60,7 +60,7 @@ TokenFixerItsGroup (
   )
 {
   ASSERT (CmObject != NULL);
-  ((CM_ARM_ITS_GROUP_NODE *)CmObject)->Token = Token;
+  ((CM_ARM_ITS_GROUP_NODE *)CmObject->Data)->Token = Token;
   return EFI_SUCCESS;
 }
 
