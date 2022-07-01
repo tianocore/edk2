@@ -64,6 +64,78 @@ TokenFixerItsGroup (
   return EFI_SUCCESS;
 }
 
+/** EArmObjNamedComponent token fixer.
+
+  CmObjectToken fixer function that updates the Tokens in the CmObjects.
+
+  @param [in]  CmObject    Pointer to the Configuration Manager Object.
+  @param [in]  Token       Token to be updated in the CmObject.
+
+  @retval EFI_SUCCESS           Success.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+  @retval EFI_UNSUPPORTED       Not supported.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+TokenFixerNamedComponentNode (
+  IN  CM_OBJ_DESCRIPTOR  *CmObject,
+  IN  CM_OBJECT_TOKEN    Token
+  )
+{
+  ASSERT (CmObject != NULL);
+  ((CM_ARM_NAMED_COMPONENT_NODE *)CmObject->Data)->Token = Token;
+  return EFI_SUCCESS;
+}
+
+/** EArmObjRootComplex token fixer.
+
+  CmObjectToken fixer function that updates the Tokens in the CmObjects.
+
+  @param [in]  CmObject    Pointer to the Configuration Manager Object.
+  @param [in]  Token       Token to be updated in the CmObject.
+
+  @retval EFI_SUCCESS           Success.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+  @retval EFI_UNSUPPORTED       Not supported.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+TokenFixerRootComplexNode (
+  IN  CM_OBJ_DESCRIPTOR  *CmObject,
+  IN  CM_OBJECT_TOKEN    Token
+  )
+{
+  ASSERT (CmObject != NULL);
+  ((CM_ARM_ROOT_COMPLEX_NODE *)CmObject->Data)->Token = Token;
+  return EFI_SUCCESS;
+}
+
+/** EArmObjSmmuV3 token fixer.
+
+  CmObjectToken fixer function that updates the Tokens in the CmObjects.
+
+  @param [in]  CmObject    Pointer to the Configuration Manager Object.
+  @param [in]  Token       Token to be updated in the CmObject.
+
+  @retval EFI_SUCCESS           Success.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+  @retval EFI_UNSUPPORTED       Not supported.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+TokenFixerSmmuV3Node (
+  IN  CM_OBJ_DESCRIPTOR  *CmObject,
+  IN  CM_OBJECT_TOKEN    Token
+  )
+{
+  ASSERT (CmObject != NULL);
+  ((CM_ARM_SMMUV3_NODE *)CmObject->Data)->Token = Token;
+  return EFI_SUCCESS;
+}
+
 /** TokenFixer functions table.
 
   A CmObj having a CM_OBJECT_TOKEN field might need to have its
@@ -90,10 +162,10 @@ CM_OBJECT_TOKEN_FIXER  TokenFixer[EArmObjMax] = {
   NULL,                             ///< 16 - Hypervisor Vendor Id
   NULL,                             ///< 17 - Fixed feature flags for FADT
   TokenFixerItsGroup,               ///< 18 - ITS Group
-  TokenFixerNotImplemented,         ///< 19 - Named Component
-  TokenFixerNotImplemented,         ///< 20 - Root Complex
+  TokenFixerNamedComponentNode,     ///< 19 - Named Component
+  TokenFixerRootComplexNode,        ///< 20 - Root Complex
   TokenFixerNotImplemented,         ///< 21 - SMMUv1 or SMMUv2
-  TokenFixerNotImplemented,         ///< 22 - SMMUv3
+  TokenFixerSmmuV3Node,             ///< 22 - SMMUv3
   TokenFixerNotImplemented,         ///< 23 - PMCG
   NULL,                             ///< 24 - GIC ITS Identifier Array
   NULL,                             ///< 25 - ID Mapping Array
