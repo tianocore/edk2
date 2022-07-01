@@ -366,10 +366,9 @@ ArmGicIsInterruptEnabled (
       FeaturePcdGet (PcdArmGicV3WithV2Legacy) ||
       SourceIsSpi (Source))
   {
-    Interrupts = ((MmioRead32 (
-                     GicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset)
-                     )
-                   & (1 << RegShift)) != 0);
+    Interrupts = MmioRead32 (
+                   GicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset)
+                   );
   } else {
     GicCpuRedistributorBase = GicGetCpuRedistributorBase (
                                 GicRedistributorBase,
