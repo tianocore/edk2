@@ -277,6 +277,14 @@ ArmDisableMmu (
 
 VOID
 EFIAPI
+ArmMmuSwitchTranslation (
+  IN UINT64  *TranslationBase,
+  IN UINT64  TCR,
+  IN UINT64  MAIR
+  );
+
+VOID
+EFIAPI
 ArmEnableCachesAndMmu (
   VOID
   );

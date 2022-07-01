@@ -114,6 +114,53 @@ ASM_FUNC(ArmDisableMmu)
    isb
    ret
 
+ASM_FUNC(ArmMmuSwitchTranslation)
+   EL1_OR_EL2_OR_EL3(x5)
+
+1: mrs     x3, sctlr_el1        // Read System Control Register EL1
+   and     x4, x3, #~CTRL_M_BIT // Clear MMU enable bit
+   msr     sctlr_el1, x4        // Write back
+   isb
+   msr     ttbr0_el1, x0
+   msr     tcr_el1, x1
+   msr     mair_el1, x2
+   isb
+   tlbi    vmalle1
+   dsb     nsh
+   isb
+   msr     sctlr_el1, x3        // Write back
+   isb
+   ret
+
+2: mrs     x3, sctlr_el2        // Read System Control Register EL2
+   and     x4, x3, #~CTRL_M_BIT // Clear MMU enable bit
+   msr     sctlr_el2, x4        // Write back
+   isb
+   msr     ttbr0_el2, x0
+   msr     tcr_el2, x1
+   msr     mair_el2, x2
+   isb
+   tlbi    alle2
+   dsb     nsh
+   isb
+   msr     sctlr_el2, x3        // Write back
+   isb
+   ret
+
+3: mrs     x3, sctlr_el3        // Read System Control Register EL3
+   and     x4, x3, #~CTRL_M_BIT // Clear MMU enable bit
+   msr     sctlr_el3, x4        // Write back
+   isb
+   msr     ttbr0_el3, x0
+   msr     tcr_el3, x1
+   msr     mair_el3, x2
+   isb
+   tlbi    alle3
+   dsb     nsh
+   isb
+   msr     sctlr_el3, x3        // Write back
+   isb
+   ret
 
 ASM_FUNC(ArmDisableCachesAndMmu)
    EL1_OR_EL2_OR_EL3(x1)
