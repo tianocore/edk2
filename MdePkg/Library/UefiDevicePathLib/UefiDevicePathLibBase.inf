@@ -16,10 +16,10 @@
   BASE_NAME                      = UefiDevicePathLib
   MODULE_UNI_FILE                = UefiDevicePathLib.uni
   FILE_GUID                      = D8E58437-44D3-4154-B7A7-EB794923EF12
-  MODULE_TYPE                    = MM_STANDALONE
+  MODULE_TYPE                    = BASE
   PI_SPECIFICATION_VERSION       = 0x00010032
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DevicePathLib | MM_STANDALONE MM_CORE_STANDALONE
+  LIBRARY_CLASS                  = DevicePathLib
 
 
 #
@@ -28,7 +28,7 @@
 
 [Sources]
   DevicePathUtilities.c
-  DevicePathUtilitiesStandaloneMm.c
+  DevicePathUtilitiesBase.c
   DevicePathToText.c
   DevicePathFromText.c
   UefiDevicePathLib.c
