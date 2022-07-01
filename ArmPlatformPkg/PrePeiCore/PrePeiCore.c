@@ -58,17 +58,19 @@ CEntryPoint (
   IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint
   )
 {
-  // Data Cache enabled on Primary core when MMU is enabled.
-  ArmDisableDataCache ();
-  // Invalidate instruction cache
-  ArmInvalidateInstructionCache ();
-  // Enable Instruction Caches on all cores.
-  ArmEnableInstructionCache ();
+  if (!ArmMmuEnabled ()) {
+    // Data Cache enabled on Primary core when MMU is enabled.
+    ArmDisableDataCache ();
+    // Invalidate instruction cache
+    ArmInvalidateInstructionCache ();
+    // Enable Instruction Caches on all cores.
+    ArmEnableInstructionCache ();
 
-  InvalidateDataCacheRange (
-    (VOID *)(UINTN)PcdGet64 (PcdCPUCoresStackBase),
-    PcdGet32 (PcdCPUCorePrimaryStackSize)
-    );
+    InvalidateDataCacheRange (
+      (VOID *)(UINTN)PcdGet64 (PcdCPUCoresStackBase),
+      PcdGet32 (PcdCPUCorePrimaryStackSize)
+      );
+  }
 
   //
   // Note: Doesn't have to Enable CPU interface in non-secure world,
