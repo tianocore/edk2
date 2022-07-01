@@ -320,23 +320,21 @@ UpdateRegionMapping (
   IN  UINT64  RegionStart,
   IN  UINT64  RegionLength,
   IN  UINT64  AttributeSetMask,
-  IN  UINT64  AttributeClearMask
+  IN  UINT64  AttributeClearMask,
+  IN  UINTN   T0SZ,
+  IN  UINT64  *Ttbr0
   )
 {
-  UINTN  T0SZ;
-
   if (((RegionStart | RegionLength) & EFI_PAGE_MASK) != 0) {
     return EFI_INVALID_PARAMETER;
   }
-
-  T0SZ = ArmGetTCR () & TCR_T0SZ_MASK;
 
   return UpdateRegionMappingRecursive (
            RegionStart,
            RegionStart + RegionLength,
            AttributeSetMask,
            AttributeClearMask,
-           ArmGetTTBR0BaseAddress (),
+           Ttbr0,
            GetRootTableLevel (T0SZ)
            );
 }
@@ -345,15 +343,16 @@ STATIC
 EFI_STATUS
 FillTranslationTable (
   IN  UINT64                        *RootTable,
-  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryRegion
+  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryRegion,
+  IN  UINTN                         T0SZ,
+  IN  UINT64                        *Ttbr0
   )
 {
   return UpdateRegionMapping (
            MemoryRegion->VirtualBase,
            MemoryRegion->Length,
            ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF,
-           0
-           );
+           0, T0SZ, Ttbr0);
 }
 
 STATIC
@@ -426,7 +425,9 @@ ArmSetMemoryAttributes (
            BaseAddress,
            Length,
            PageAttributes,
-           PageAttributeMask
+           PageAttributeMask,
+           ArmGetTCR () & TCR_T0SZ_MASK,
+           ArmGetTTBR0BaseAddress ()
            );
 }
 
@@ -439,7 +440,9 @@ SetMemoryRegionAttribute (
   IN  UINT64                BlockEntryMask
   )
 {
-  return UpdateRegionMapping (BaseAddress, Length, Attributes, BlockEntryMask);
+  return UpdateRegionMapping (BaseAddress, Length, Attributes, BlockEntryMask,
+                              ArmGetTCR () & TCR_T0SZ_MASK,
+                              ArmGetTTBR0BaseAddress ());
 }
 
 EFI_STATUS
@@ -525,6 +528,7 @@ ArmConfigureMmu (
   UINTN       T0SZ;
   UINTN       RootTableEntryCount;
   UINT64      TCR;
+  UINT64      MAIR;
   EFI_STATUS  Status;
 
   if (MemoryTable == NULL) {
@@ -620,22 +624,11 @@ ArmConfigureMmu (
          TCR_RGN_OUTER_WRITE_BACK_ALLOC |
          TCR_RGN_INNER_WRITE_BACK_ALLOC;
 
-  // Set TCR
-  ArmSetTCR (TCR);
-
   // Allocate pages for translation table
   TranslationTable = AllocatePages (1);
   if (TranslationTable == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-
-  //
-  // We set TTBR0 just after allocating the table to retrieve its location from
-  // the subsequent functions without needing to pass this value across the
-  // functions. The MMU is only enabled after the translation tables are
-  // populated.
-  //
-  ArmSetTTBR0 (TranslationTable);
 
   if (TranslationTableBase != NULL) {
     *TranslationTableBase = TranslationTable;
@@ -649,14 +642,18 @@ ArmConfigureMmu (
   // Make sure we are not inadvertently hitting in the caches
   // when populating the page tables.
   //
-  InvalidateDataCacheRange (
-    TranslationTable,
-    RootTableEntryCount * sizeof (UINT64)
-    );
+  if (!ArmMmuEnabled ()) {
+    InvalidateDataCacheRange (
+      TranslationTable,
+      RootTableEntryCount * sizeof (UINT64)
+      );
+  }
   ZeroMem (TranslationTable, RootTableEntryCount * sizeof (UINT64));
 
   while (MemoryTable->Length != 0) {
-    Status = FillTranslationTable (TranslationTable, MemoryTable);
+    Status = FillTranslationTable (TranslationTable, MemoryTable,
+                                   TCR & TCR_T0SZ_MASK,
+                                   TranslationTable);
     if (EFI_ERROR (Status)) {
       goto FreeTranslationTable;
     }
@@ -670,19 +667,25 @@ ArmConfigureMmu (
   // EFI_MEMORY_WT ==> MAIR_ATTR_NORMAL_MEMORY_WRITE_THROUGH
   // EFI_MEMORY_WB ==> MAIR_ATTR_NORMAL_MEMORY_WRITE_BACK
   //
-  ArmSetMAIR (
-    MAIR_ATTR (TT_ATTR_INDX_DEVICE_MEMORY, MAIR_ATTR_DEVICE_MEMORY)               |
-    MAIR_ATTR (TT_ATTR_INDX_MEMORY_NON_CACHEABLE, MAIR_ATTR_NORMAL_MEMORY_NON_CACHEABLE) |
-    MAIR_ATTR (TT_ATTR_INDX_MEMORY_WRITE_THROUGH, MAIR_ATTR_NORMAL_MEMORY_WRITE_THROUGH) |
-    MAIR_ATTR (TT_ATTR_INDX_MEMORY_WRITE_BACK, MAIR_ATTR_NORMAL_MEMORY_WRITE_BACK)
-    );
+  MAIR = MAIR_ATTR (TT_ATTR_INDX_DEVICE_MEMORY, MAIR_ATTR_DEVICE_MEMORY)                      |
+         MAIR_ATTR (TT_ATTR_INDX_MEMORY_NON_CACHEABLE, MAIR_ATTR_NORMAL_MEMORY_NON_CACHEABLE) |
+         MAIR_ATTR (TT_ATTR_INDX_MEMORY_WRITE_THROUGH, MAIR_ATTR_NORMAL_MEMORY_WRITE_THROUGH) |
+         MAIR_ATTR (TT_ATTR_INDX_MEMORY_WRITE_BACK, MAIR_ATTR_NORMAL_MEMORY_WRITE_BACK);
 
-  ArmDisableAlignmentCheck ();
-  ArmEnableStackAlignmentCheck ();
-  ArmEnableInstructionCache ();
-  ArmEnableDataCache ();
+  if (!ArmMmuEnabled ()) {
+    ArmDisableAlignmentCheck ();
+    ArmEnableStackAlignmentCheck ();
+    ArmEnableInstructionCache ();
+    ArmEnableDataCache ();
 
-  ArmEnableMmu ();
+    ArmSetTTBR0 (TranslationTable);
+    ArmSetTCR (TCR);
+    ArmSetMAIR (MAIR);
+
+    ArmEnableMmu ();
+  } else {
+    ArmMmuSwitchTranslation (TranslationTable, TCR, MAIR);
+  }
   return EFI_SUCCESS;
 
 FreeTranslationTable:
