@@ -64,8 +64,6 @@
   QemuFwCfgSimpleParserLib|OvmfPkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
   QemuLoadImageLib|OvmfPkg/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
 
-  ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
-
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
   NorFlashPlatformLib|ArmVirtPkg/Library/NorFlashQemuLib/NorFlashQemuLib.inf
 
@@ -93,6 +91,12 @@
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
 !endif
 
+[LibraryClasses.AARCH64]
+  ArmPlatformLib|ArmVirtPkg/Library/ArmPlatformLibQemu/ArmPlatformLibQemu.inf
+
+[LibraryClasses.ARM]
+  ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
+
 [LibraryClasses.common.PEIM]
   ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
 
@@ -113,6 +117,8 @@
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [BuildOptions]
+  GCC:*_*_AARCH64_CC_XIPFLAGS = -mno-strict-align
+
 !include NetworkPkg/NetworkBuildOptions.dsc.inc
 
 ################################################################################
@@ -311,7 +317,12 @@
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
   ArmPlatformPkg/PlatformPei/PlatformPeim.inf
-  ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
+  ArmVirtPkg/MemoryInitPei/MemoryInitPeim.inf {
+    <LibraryClasses>
+!if $(ARCH) == AARCH64
+      ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuPeiLib.inf
+!endif
+  }
   ArmPkg/Drivers/CpuPei/CpuPei.inf
 
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
