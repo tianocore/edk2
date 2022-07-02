@@ -59,7 +59,20 @@ ASM_FUNC(ArmReplaceLiveTranslationEntry)
   dsb   nsh
 
   EL1_OR_EL2_OR_EL3(x3)
-1:__replace_entry 1
+1:mrs   x8, ttbr0_el1
+  add   x9, x8, #0x1000        // advance to shadow page table
+  orr   x9, x9, #1 << 48       // use different ASID for shadow translations
+  msr   ttbr0_el1, x9
+  isb
+  str   x1, [x0]               // install the entry and make it observeable
+  dsb   ishst                  // to the page table walker
+  isb
+  lsr   x2, x2, #12
+  tlbi  vae1is, x2             // invalidate the updated entry
+  dsb   ish
+  isb
+  msr   ttbr0_el1, x8          // switch back to original translation
+  isb
   b     4f
 2:__replace_entry 2
   b     4f

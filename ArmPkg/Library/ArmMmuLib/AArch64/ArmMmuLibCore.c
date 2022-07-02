@@ -25,23 +25,31 @@ ArmMemoryAttributeToPageAttribute (
   IN ARM_MEMORY_REGION_ATTRIBUTES  Attributes
   )
 {
+  UINT64  NonGlobal;
+
+  if (ArmReadCurrentEL () == AARCH64_EL1) {
+    NonGlobal = TT_NG;
+  } else {
+    NonGlobal = 0;
+  }
+
   switch (Attributes) {
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_NONSHAREABLE:
     case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK_NONSHAREABLE:
-      return TT_ATTR_INDX_MEMORY_WRITE_BACK;
+      return TT_ATTR_INDX_MEMORY_WRITE_BACK | NonGlobal;
 
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
     case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK:
-      return TT_ATTR_INDX_MEMORY_WRITE_BACK | TT_SH_INNER_SHAREABLE;
+      return TT_ATTR_INDX_MEMORY_WRITE_BACK | TT_SH_INNER_SHAREABLE | NonGlobal;
 
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH:
     case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_THROUGH:
-      return TT_ATTR_INDX_MEMORY_WRITE_THROUGH | TT_SH_INNER_SHAREABLE;
+      return TT_ATTR_INDX_MEMORY_WRITE_THROUGH | TT_SH_INNER_SHAREABLE | NonGlobal;
 
     // Uncached and device mappings are treated as outer shareable by default,
     case ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED:
     case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_UNCACHED_UNBUFFERED:
-      return TT_ATTR_INDX_MEMORY_NON_CACHEABLE;
+      return TT_ATTR_INDX_MEMORY_NON_CACHEABLE | NonGlobal;
 
     default:
       ASSERT (0);
@@ -50,7 +58,7 @@ ArmMemoryAttributeToPageAttribute (
       if (ArmReadCurrentEL () == AARCH64_EL2) {
         return TT_ATTR_INDX_DEVICE_MEMORY | TT_XN_MASK;
       } else {
-        return TT_ATTR_INDX_DEVICE_MEMORY | TT_UXN_MASK | TT_PXN_MASK;
+        return TT_ATTR_INDX_DEVICE_MEMORY | TT_UXN_MASK | TT_PXN_MASK | TT_NG;
       }
   }
 }
@@ -203,7 +211,14 @@ UpdateRegionMappingRecursive (
     {
       ASSERT (Level < 3);
 
-      if (!IsTableEntry (*Entry, Level)) {
+      if (IsBlockEntry (*Entry, Level) && (AttributeClearMask == 0) &&
+          ((*Entry & TT_ATTRIBUTES_MASK) == AttributeSetMask))
+      {
+        // The existing block entry already covers the region we are
+        // trying to map with the correct attributes so no need to do
+        // anything here
+        continue;
+      } else if (!IsTableEntry (*Entry, Level)) {
         //
         // No table entry exists yet, so we need to allocate a page table
         // for the next level.
@@ -304,7 +319,8 @@ UpdateRegionMapping (
   IN  UINT64  RegionStart,
   IN  UINT64  RegionLength,
   IN  UINT64  AttributeSetMask,
-  IN  UINT64  AttributeClearMask
+  IN  UINT64  AttributeClearMask,
+  IN  UINT64  *RootTable
   )
 {
   UINTN  T0SZ;
@@ -320,7 +336,7 @@ UpdateRegionMapping (
            RegionStart + RegionLength,
            AttributeSetMask,
            AttributeClearMask,
-           ArmGetTTBR0BaseAddress (),
+           RootTable,
            GetRootTableLevel (T0SZ)
            );
 }
@@ -329,14 +345,26 @@ STATIC
 EFI_STATUS
 FillTranslationTable (
   IN  UINT64                        *RootTable,
-  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryRegion
+  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryRegion,
+  IN  BOOLEAN                       IsSecondary
   )
 {
+  //
+  // Omit non-memory mappings from the shadow page tables, which only need to
+  // cover system RAM.
+  //
+  if (IsSecondary &&
+      (MemoryRegion->Attributes != ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK))
+  {
+    return EFI_SUCCESS;
+  }
+
   return UpdateRegionMapping (
            MemoryRegion->VirtualBase,
            MemoryRegion->Length,
            ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF,
-           0
+           0,
+           RootTable
            );
 }
 
@@ -380,6 +408,10 @@ GcdAttributeToPageAttribute (
     PageAttributes |= TT_AP_NO_RO;
   }
 
+  if (ArmReadCurrentEL () == AARCH64_EL1) {
+    PageAttributes |= TT_NG;
+  }
+
   return PageAttributes | TT_AF;
 }
 
@@ -390,8 +422,9 @@ ArmSetMemoryAttributes (
   IN UINT64                Attributes
   )
 {
-  UINT64  PageAttributes;
-  UINT64  PageAttributeMask;
+  UINT64      PageAttributes;
+  UINT64      PageAttributeMask;
+  EFI_STATUS  Status;
 
   PageAttributes    = GcdAttributeToPageAttribute (Attributes);
   PageAttributeMask = 0;
@@ -404,13 +437,36 @@ ArmSetMemoryAttributes (
     PageAttributes   &= TT_AP_MASK | TT_UXN_MASK | TT_PXN_MASK;
     PageAttributeMask = ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_AP_MASK |
                           TT_PXN_MASK | TT_XN_MASK);
+  } else if ((ArmReadCurrentEL () == AARCH64_EL1) &&
+             ((PageAttributes & TT_ATTR_INDX_MASK) == TT_ATTR_INDX_MEMORY_WRITE_BACK))
+  {
+    //
+    // Update the shadow page tables if we are running at EL1 and are mapping
+    // memory. This is needed because we may be adding memory that may be used
+    // later on for allocating page tables, and these need to be shadowed as
+    // well so we can update them safely. Strip the attributes so we don't
+    // fragment the shadow page tables unnecessarily.  (Note that adding device
+    // memory here and stripping the XN attributes would be bad, as it could
+    // result in speculative instruction fetches from MMIO regions.)
+    //
+    Status = UpdateRegionMapping (
+               BaseAddress,
+               Length,
+               (PageAttributes & ~(TT_AP_MASK | TT_PXN_MASK | TT_UXN_MASK)) | TT_AP_NO_RW,
+               0,
+               ArmGetTTBR0BaseAddress () + EFI_PAGE_SIZE
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   return UpdateRegionMapping (
            BaseAddress,
            Length,
            PageAttributes,
-           PageAttributeMask
+           PageAttributeMask,
+           ArmGetTTBR0BaseAddress ()
            );
 }
 
@@ -423,7 +479,13 @@ SetMemoryRegionAttribute (
   IN  UINT64                BlockEntryMask
   )
 {
-  return UpdateRegionMapping (BaseAddress, Length, Attributes, BlockEntryMask);
+  return UpdateRegionMapping (
+           BaseAddress,
+           Length,
+           Attributes,
+           BlockEntryMask,
+           ArmGetTTBR0BaseAddress ()
+           );
 }
 
 EFI_STATUS
@@ -503,13 +565,15 @@ ArmConfigureMmu (
   OUT UINTN                         *TranslationTableSize OPTIONAL
   )
 {
-  VOID        *TranslationTable;
-  UINTN       MaxAddressBits;
-  UINT64      MaxAddress;
-  UINTN       T0SZ;
-  UINTN       RootTableEntryCount;
-  UINT64      TCR;
-  EFI_STATUS  Status;
+  UINT64                        *TranslationTable;
+  UINTN                         MaxAddressBits;
+  UINT64                        MaxAddress;
+  UINTN                         T0SZ;
+  UINTN                         RootTableEntryCount;
+  UINT64                        TCR;
+  EFI_STATUS                    Status;
+  ARM_MEMORY_REGION_DESCRIPTOR  *MemTab;
+  UINTN                         NumRootPages;
 
   if (MemoryTable == NULL) {
     ASSERT (MemoryTable != NULL);
@@ -538,6 +602,8 @@ ArmConfigureMmu (
     // Note: Bits 23 and 31 are reserved(RES1) bits in TCR_EL2
     TCR = T0SZ | (1UL << 31) | (1UL << 23) | TCR_TG0_4KB;
 
+    NumRootPages = 1;
+
     // Set the Physical Address Size using MaxAddress
     if (MaxAddress < SIZE_4GB) {
       TCR |= TCR_PS_4GB;
@@ -563,6 +629,8 @@ ArmConfigureMmu (
   } else if (ArmReadCurrentEL () == AARCH64_EL1) {
     // Due to Cortex-A57 erratum #822227 we must set TG1[1] == 1, regardless of EPD1.
     TCR = T0SZ | TCR_TG0_4KB | TCR_TG1_4KB | TCR_EPD1;
+
+    NumRootPages = 2;
 
     // Set the Physical Address Size using MaxAddress
     if (MaxAddress < SIZE_4GB) {
@@ -608,18 +676,10 @@ ArmConfigureMmu (
   ArmSetTCR (TCR);
 
   // Allocate pages for translation table
-  TranslationTable = AllocatePages (1);
+  TranslationTable = AllocatePages (NumRootPages);
   if (TranslationTable == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-
-  //
-  // We set TTBR0 just after allocating the table to retrieve its location from
-  // the subsequent functions without needing to pass this value across the
-  // functions. The MMU is only enabled after the translation tables are
-  // populated.
-  //
-  ArmSetTTBR0 (TranslationTable);
 
   if (TranslationTableBase != NULL) {
     *TranslationTableBase = TranslationTable;
@@ -637,15 +697,14 @@ ArmConfigureMmu (
     TranslationTable,
     RootTableEntryCount * sizeof (UINT64)
     );
+
   ZeroMem (TranslationTable, RootTableEntryCount * sizeof (UINT64));
 
-  while (MemoryTable->Length != 0) {
-    Status = FillTranslationTable (TranslationTable, MemoryTable);
+  for (MemTab = MemoryTable; MemTab->Length != 0; MemTab++) {
+    Status = FillTranslationTable (TranslationTable, MemTab, FALSE);
     if (EFI_ERROR (Status)) {
       goto FreeTranslationTable;
     }
-
-    MemoryTable++;
   }
 
   //
@@ -661,16 +720,41 @@ ArmConfigureMmu (
     MAIR_ATTR (TT_ATTR_INDX_MEMORY_WRITE_BACK, MAIR_ATTR_NORMAL_MEMORY_WRITE_BACK)
     );
 
+  ArmSetTTBR0 (TranslationTable);
+
   ArmDisableAlignmentCheck ();
   ArmEnableStackAlignmentCheck ();
   ArmEnableInstructionCache ();
   ArmEnableDataCache ();
 
   ArmEnableMmu ();
+
+  if (NumRootPages > 1) {
+    //
+    // Clone all memory ranges into the shadow page tables that we will use
+    // to temporarily switch to when manipulating live entries
+    //
+    ZeroMem (
+      TranslationTable + TT_ENTRY_COUNT,
+      RootTableEntryCount * sizeof (UINT64)
+      );
+
+    for (MemTab = MemoryTable; MemTab->Length != 0; MemTab++) {
+      Status = FillTranslationTable (
+                 TranslationTable + TT_ENTRY_COUNT,
+                 MemTab,
+                 TRUE
+                 );
+      if (EFI_ERROR (Status)) {
+        goto FreeTranslationTable;
+      }
+    }
+  }
+
   return EFI_SUCCESS;
 
 FreeTranslationTable:
-  FreePages (TranslationTable, 1);
+  FreePages (TranslationTable, NumRootPages);
   return Status;
 }
 

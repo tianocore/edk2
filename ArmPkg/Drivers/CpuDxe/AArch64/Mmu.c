@@ -313,6 +313,10 @@ EfiAttributeToArmAttribute (
     ArmAttributes |= TT_PXN_MASK;
   }
 
+  if (ArmReadCurrentEL () == AARCH64_EL1) {
+    ArmAttributes |= TT_NG;
+  }
+
   return ArmAttributes;
 }
 
