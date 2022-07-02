@@ -52,9 +52,10 @@ MemoryPeim (
 {
   EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttributes;
   UINT64                       SystemMemoryTop;
+  UINT64                       SplitBase;
 
   // Ensure PcdSystemMemorySize has been set
-  ASSERT (PcdGet64 (PcdSystemMemorySize) != 0);
+  ASSERT (PcdGet64 (PcdSystemMemorySize) >= SIZE_128MB);
 
   //
   // Now, the permanent memory has been installed, we can call AllocatePages()
@@ -65,16 +66,27 @@ MemoryPeim (
                         EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
                         EFI_RESOURCE_ATTRIBUTE_TESTED
                         );
+  BuildResourceDescriptorHob (
+    EFI_RESOURCE_SYSTEM_MEMORY,
+    ResourceAttributes,
+    PcdGet64 (PcdSystemMemoryBase),
+    SIZE_128MB
+    );
+
+  // Build Memory Allocation Hob
+  InitMmu ();
 
   SystemMemoryTop = PcdGet64 (PcdSystemMemoryBase) +
                     PcdGet64 (PcdSystemMemorySize);
+
+  SplitBase = PcdGet64 (PcdSystemMemoryBase) + SIZE_128MB;
 
   if (SystemMemoryTop - 1 > MAX_ALLOC_ADDRESS) {
     BuildResourceDescriptorHob (
       EFI_RESOURCE_SYSTEM_MEMORY,
       ResourceAttributes,
-      PcdGet64 (PcdSystemMemoryBase),
-      (UINT64)MAX_ALLOC_ADDRESS - PcdGet64 (PcdSystemMemoryBase) + 1
+      SplitBase,
+      (UINT64)MAX_ALLOC_ADDRESS - SplitBase + 1
       );
     BuildResourceDescriptorHob (
       EFI_RESOURCE_SYSTEM_MEMORY,
@@ -86,13 +98,10 @@ MemoryPeim (
     BuildResourceDescriptorHob (
       EFI_RESOURCE_SYSTEM_MEMORY,
       ResourceAttributes,
-      PcdGet64 (PcdSystemMemoryBase),
-      PcdGet64 (PcdSystemMemorySize)
+      SplitBase,
+      SystemMemoryTop - SplitBase
       );
   }
-
-  // Build Memory Allocation Hob
-  InitMmu ();
 
   if (FeaturePcdGet (PcdPrePiProduceMemoryTypeInformationHob)) {
     // Optional feature that helps prevent EFI memory map fragmentation.
