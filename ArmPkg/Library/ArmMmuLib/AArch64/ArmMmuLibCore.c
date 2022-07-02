@@ -689,14 +689,16 @@ ArmConfigureMmu (
     *TranslationTableSize = RootTableEntryCount * sizeof (UINT64);
   }
 
-  //
-  // Make sure we are not inadvertently hitting in the caches
-  // when populating the page tables.
-  //
-  InvalidateDataCacheRange (
-    TranslationTable,
-    RootTableEntryCount * sizeof (UINT64)
-    );
+  if (!ArmMmuEnabled ()) {
+    //
+    // Make sure we are not inadvertently hitting in the caches
+    // when populating the page tables.
+    //
+    InvalidateDataCacheRange (
+      TranslationTable,
+      RootTableEntryCount * sizeof (UINT64)
+      );
+  }
 
   ZeroMem (TranslationTable, RootTableEntryCount * sizeof (UINT64));
 
@@ -722,12 +724,14 @@ ArmConfigureMmu (
 
   ArmSetTTBR0 (TranslationTable);
 
-  ArmDisableAlignmentCheck ();
-  ArmEnableStackAlignmentCheck ();
-  ArmEnableInstructionCache ();
-  ArmEnableDataCache ();
+  if (!ArmMmuEnabled ()) {
+    ArmDisableAlignmentCheck ();
+    ArmEnableStackAlignmentCheck ();
+    ArmEnableInstructionCache ();
+    ArmEnableDataCache ();
 
-  ArmEnableMmu ();
+    ArmEnableMmu ();
+  }
 
   if (NumRootPages > 1) {
     //
