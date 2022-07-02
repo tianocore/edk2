@@ -357,6 +357,7 @@ UpdateRegionMapping (
   IN  UINT64   RegionLength,
   IN  UINT64   AttributeSetMask,
   IN  UINT64   AttributeClearMask,
+  IN  UINT64   *RootTable,
   IN  BOOLEAN  TableIsLive
   )
 {
@@ -373,7 +374,7 @@ UpdateRegionMapping (
            RegionStart + RegionLength,
            AttributeSetMask,
            AttributeClearMask,
-           ArmGetTTBR0BaseAddress (),
+           RootTable,
            GetRootTableLevel (T0SZ),
            TableIsLive
            );
@@ -391,6 +392,7 @@ FillTranslationTable (
            MemoryRegion->Length,
            ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF,
            0,
+           RootTable,
            FALSE
            );
 }
@@ -466,6 +468,7 @@ ArmSetMemoryAttributes (
            Length,
            PageAttributes,
            PageAttributeMask,
+           ArmGetTTBR0BaseAddress (),
            TRUE
            );
 }
@@ -484,6 +487,7 @@ SetMemoryRegionAttribute (
            Length,
            Attributes,
            BlockEntryMask,
+           ArmGetTTBR0BaseAddress (),
            TRUE
            );
 }
@@ -675,14 +679,6 @@ ArmConfigureMmu (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  //
-  // We set TTBR0 just after allocating the table to retrieve its location from
-  // the subsequent functions without needing to pass this value across the
-  // functions. The MMU is only enabled after the translation tables are
-  // populated.
-  //
-  ArmSetTTBR0 (TranslationTable);
-
   if (TranslationTableBase != NULL) {
     *TranslationTableBase = TranslationTable;
   }
@@ -691,14 +687,17 @@ ArmConfigureMmu (
     *TranslationTableSize = RootTableEntryCount * sizeof (UINT64);
   }
 
-  //
-  // Make sure we are not inadvertently hitting in the caches
-  // when populating the page tables.
-  //
-  InvalidateDataCacheRange (
-    TranslationTable,
-    RootTableEntryCount * sizeof (UINT64)
-    );
+  if (!ArmMmuEnabled ()) {
+    //
+    // Make sure we are not inadvertently hitting in the caches
+    // when populating the page tables.
+    //
+    InvalidateDataCacheRange (
+      TranslationTable,
+      RootTableEntryCount * sizeof (UINT64)
+      );
+  }
+
   ZeroMem (TranslationTable, RootTableEntryCount * sizeof (UINT64));
 
   while (MemoryTable->Length != 0) {
@@ -723,12 +722,17 @@ ArmConfigureMmu (
     MAIR_ATTR (TT_ATTR_INDX_MEMORY_WRITE_BACK, MAIR_ATTR_NORMAL_MEMORY_WRITE_BACK)
     );
 
-  ArmDisableAlignmentCheck ();
-  ArmEnableStackAlignmentCheck ();
-  ArmEnableInstructionCache ();
-  ArmEnableDataCache ();
+  ArmSetTTBR0 (TranslationTable);
 
-  ArmEnableMmu ();
+  if (!ArmMmuEnabled ()) {
+    ArmDisableAlignmentCheck ();
+    ArmEnableStackAlignmentCheck ();
+    ArmEnableInstructionCache ();
+    ArmEnableDataCache ();
+
+    ArmEnableMmu ();
+  }
+
   return EFI_SUCCESS;
 
 FreeTranslationTable:
