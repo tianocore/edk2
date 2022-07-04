@@ -504,8 +504,10 @@
   ## The PCD is used to specify the video vertical resolution of text setup.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|0
 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|31
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|100
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn|0
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseSize|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase|0
