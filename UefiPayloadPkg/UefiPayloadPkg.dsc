@@ -33,6 +33,8 @@
   DEFINE UNIVERSAL_PAYLOAD            = FALSE
   DEFINE SECURITY_STUB_ENABLE         = TRUE
   DEFINE SMM_SUPPORT                  = FALSE
+  DEFINE PCIE_BASE_ADDRESS            = 0
+  DEFINE PCIE_BASE_LENGTH             = 0
   DEFINE PLATFORM_BOOT_TIMEOUT        = 3
   DEFINE ABOVE_4G_MEMORY              = TRUE
   DEFINE BOOT_MANAGER_ESCAPE          = FALSE
@@ -506,8 +508,8 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|31
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|100
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseSize|0
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|$(PCIE_BASE_ADDRESS)
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseSize|$(PCIE_BASE_LENGTH)
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed|FALSE
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled|0
