@@ -218,16 +218,8 @@ ToSplitPageTable (
     return TRUE;
   }
 
-  if (PcdGetBool (PcdCpuStackGuard)) {
-    if ((StackBase >= Address) && (StackBase < (Address + Size))) {
-      return TRUE;
-    }
-  }
-
-  if (PcdGetBool (PcdSetNxForStack)) {
-    if ((Address < StackBase + StackSize) && ((Address + Size) > StackBase)) {
-      return TRUE;
-    }
+  if ((Address < StackBase + StackSize) && ((Address + Size) > StackBase)) {
+    return TRUE;
   }
 
   if (GhcbBase != 0) {

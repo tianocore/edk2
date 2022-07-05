@@ -1,7 +1,7 @@
 /** @file
   The XHCI controller driver.
 
-Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -399,24 +399,31 @@ XhcGetRootHubPortStatus (
 
   //
   // According to XHCI 1.1 spec November 2017,
-  // bit 10~13 of the root port status register identifies the speed of the attached device.
+  // Section 7.2 xHCI Support Protocol Capability
   //
-  switch ((State & XHC_PORTSC_PS) >> 10) {
-    case 2:
-      PortStatus->PortStatus |= USB_PORT_STAT_LOW_SPEED;
-      break;
+  PortStatus->PortStatus = XhcCheckUsbPortSpeedUsedPsic (Xhc, ((State & XHC_PORTSC_PS) >> 10));
+  if (PortStatus->PortStatus == 0) {
+    //
+    // According to XHCI 1.1 spec November 2017,
+    // bit 10~13 of the root port status register identifies the speed of the attached device.
+    //
+    switch ((State & XHC_PORTSC_PS) >> 10) {
+      case 2:
+        PortStatus->PortStatus |= USB_PORT_STAT_LOW_SPEED;
+        break;
 
-    case 3:
-      PortStatus->PortStatus |= USB_PORT_STAT_HIGH_SPEED;
-      break;
+      case 3:
+        PortStatus->PortStatus |= USB_PORT_STAT_HIGH_SPEED;
+        break;
 
-    case 4:
-    case 5:
-      PortStatus->PortStatus |= USB_PORT_STAT_SUPER_SPEED;
-      break;
+      case 4:
+      case 5:
+        PortStatus->PortStatus |= USB_PORT_STAT_SUPER_SPEED;
+        break;
 
-    default:
-      break;
+      default:
+        break;
+    }
   }
 
   //
@@ -1813,13 +1820,21 @@ XhcCreateUsbHc (
   // This xHC supports a page size of 2^(n+12) if bit n is Set. For example,
   // if bit 0 is Set, the xHC supports 4k byte page sizes.
   //
-  PageSize      = XhcReadOpReg (Xhc, XHC_PAGESIZE_OFFSET) & XHC_PAGESIZE_MASK;
+  PageSize = XhcReadOpReg (Xhc, XHC_PAGESIZE_OFFSET);
+  if ((PageSize & (~XHC_PAGESIZE_MASK)) != 0) {
+    DEBUG ((DEBUG_ERROR, "XhcCreateUsb3Hc: Reserved bits are not 0 for PageSize\n"));
+    goto ON_ERROR;
+  }
+
+  PageSize     &= XHC_PAGESIZE_MASK;
   Xhc->PageSize = 1 << (HighBitSet32 (PageSize) + 12);
 
   ExtCapReg              = (UINT16)(Xhc->HcCParams.Data.ExtCapReg);
   Xhc->ExtCapRegBase     = ExtCapReg << 2;
   Xhc->UsbLegSupOffset   = XhcGetCapabilityAddr (Xhc, XHC_CAP_USB_LEGACY);
   Xhc->DebugCapSupOffset = XhcGetCapabilityAddr (Xhc, XHC_CAP_USB_DEBUG);
+  Xhc->Usb2SupOffset     = XhcGetSupportedProtocolCapabilityAddr (Xhc, XHC_SUPPORTED_PROTOCOL_DW0_MAJOR_REVISION_USB2);
+  Xhc->Usb3SupOffset     = XhcGetSupportedProtocolCapabilityAddr (Xhc, XHC_SUPPORTED_PROTOCOL_DW0_MAJOR_REVISION_USB3);
 
   DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: Capability length 0x%x\n", Xhc->CapLength));
   DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: HcSParams1 0x%x\n", Xhc->HcSParams1));
@@ -1829,6 +1844,8 @@ XhcCreateUsbHc (
   DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: RTSOff 0x%x\n", Xhc->RTSOff));
   DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: UsbLegSupOffset 0x%x\n", Xhc->UsbLegSupOffset));
   DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: DebugCapSupOffset 0x%x\n", Xhc->DebugCapSupOffset));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: Usb2SupOffset 0x%x\n", Xhc->Usb2SupOffset));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: Usb3SupOffset 0x%x\n", Xhc->Usb3SupOffset));
 
   //
   // Create AsyncRequest Polling Timer
