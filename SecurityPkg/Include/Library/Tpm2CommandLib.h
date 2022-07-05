@@ -468,6 +468,27 @@ Tpm2NvGlobalWriteLock (
   );
 
 /**
+  This command extends a value to an area in NV memory that was previously defined by TPM2_NV_DefineSpace().
+
+  @param[in]  AuthHandle         the handle indicating the source of the authorization value.
+  @param[in]  NvIndex            The NV Index of the area to extend.
+  @param[in]  AuthSession        Auth Session context
+  @param[in]  InData             The data to extend.
+
+  @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
+  @retval EFI_NOT_FOUND          The command was returned successfully, but NvIndex is not found.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2NvExtend (
+  IN      TPMI_RH_NV_AUTH    AuthHandle,
+  IN      TPMI_RH_NV_INDEX   NvIndex,
+  IN      TPMS_AUTH_COMMAND  *AuthSession  OPTIONAL,
+  IN      TPM2B_MAX_BUFFER   *InData
+  );
+
+/**
   This command is used to cause an update to the indicated PCR.
   The digests parameter contains one or more tagged digest value identified by an algorithm ID.
   For each digest, the PCR associated with pcrHandle is Extended into the bank identified by the tag (hashAlg).
