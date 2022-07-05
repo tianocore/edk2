@@ -1159,6 +1159,13 @@ HttpBootGetBootFile (
       if ((StatusCode == HTTP_STATUS_401_UNAUTHORIZED) || \
           (StatusCode == HTTP_STATUS_407_PROXY_AUTHENTICATION_REQUIRED))
       {
+        if (Private->AuthData != NULL) {
+          FreePool (Private->AuthData);
+          Private->AuthData = NULL;
+          Status            = EFI_ACCESS_DENIED;
+          goto ERROR_4;
+        }
+
         //
         // Server indicates the user has to provide a user-id and password as a means of identification.
         //
