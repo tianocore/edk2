@@ -34,8 +34,12 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol  ## CONSUMES
+
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiAcpiSdtProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
 
   gEdkiiConfigurationManagerProtocolGuid        # PROTOCOL ALWAYS_CONSUMED
   gEdkiiDynamicTableFactoryProtocolGuid         # PROTOCOL ALWAYS_CONSUMED
