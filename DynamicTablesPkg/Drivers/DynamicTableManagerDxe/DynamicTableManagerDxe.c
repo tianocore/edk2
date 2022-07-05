@@ -11,6 +11,7 @@
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/AcpiTable.h>
+#include <Protocol/AcpiSystemDescriptionTable.h>
 
 // Module specific include files.
 #include <AcpiTableGenerator.h>
@@ -387,6 +388,57 @@ BuildAndInstallAcpiTable (
   return Status;
 }
 
+/**
+  This function uses the ACPI SDT protocol to locate an ACPI table.
+  It is really only useful for finding tables that only have a single instance,
+  e.g. FADT, FACS, MADT, etc.  It is not good for locating SSDT, etc.
+
+  @param[in] Signature           - Pointer to an ASCII string containing the OEM Table ID from the ACPI table header
+  @param[in, out] Table          - Updated with a pointer to the table
+  @param[in, out] Handle         - AcpiSupport protocol table handle for the table found
+
+  @retval EFI_SUCCESS            - The function completed successfully.
+**/
+STATIC
+EFI_STATUS
+LocateAcpiTableBySignature (
+  IN      UINT32                       Signature,
+  IN OUT  EFI_ACPI_DESCRIPTION_HEADER  **Table,
+  IN OUT  UINTN                        *Handle
+  )
+{
+  EFI_STATUS              Status;
+  INTN                    Index;
+  EFI_ACPI_TABLE_VERSION  Version;
+  EFI_ACPI_SDT_PROTOCOL   *AcpiSdt;
+
+  AcpiSdt = NULL;
+  Status  = gBS->LocateProtocol (&gEfiAcpiSdtProtocolGuid, NULL, (VOID **)&AcpiSdt);
+
+  if (EFI_ERROR (Status) || (AcpiSdt == NULL)) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Locate table with matching ID
+  //
+  Version = 0;
+  Index   = 0;
+  do {
+    Status = AcpiSdt->GetAcpiTable (Index, (EFI_ACPI_SDT_HEADER **)Table, &Version, Handle);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    Index++;
+  } while ((*Table)->Signature != Signature);
+
+  //
+  // If we found the table, there will be no error.
+  //
+  return Status;
+}
+
 /** The function checks if the Configuration Manager has provided the
     mandatory ACPI tables for installation.
 
@@ -411,6 +463,9 @@ VerifyMandatoryTablesArePresent (
   BOOLEAN     DsdtFound;
   BOOLEAN     Dbg2Found;
   BOOLEAN     SpcrFound;
+  UINTN       Handle;
+
+  EFI_ACPI_DESCRIPTION_HEADER  *DummyHeader;
 
   Status    = EFI_SUCCESS;
   FadtFound = FALSE;
@@ -447,32 +502,99 @@ VerifyMandatoryTablesArePresent (
   }
 
   // We need at least the FADT, MADT, GTDT and the DSDT tables to boot
-  if (!FadtFound) {
-    DEBUG ((DEBUG_ERROR, "ERROR: FADT Table not found\n"));
+  // But they also might be published already, so we can search from there
+  Handle = 0;
+  Status = LocateAcpiTableBySignature (
+             EFI_ACPI_6_2_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
+             &DummyHeader,
+             &Handle
+             );
+  if (EFI_ERROR (Status) && !FadtFound) {
+    DEBUG ((DEBUG_ERROR, "ERROR: FADT Table not found.\n"));
     Status = EFI_NOT_FOUND;
+  } else if (!EFI_ERROR (Status) && FadtFound) {
+    DEBUG ((DEBUG_ERROR, "ERROR: FADT Table found while already published.\n"));
+    Status = EFI_ALREADY_STARTED;
+  } else {
+    FadtFound = TRUE;
   }
 
-  if (!MadtFound) {
+  Handle = 0;
+  Status = LocateAcpiTableBySignature (
+             EFI_ACPI_6_2_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,
+             &DummyHeader,
+             &Handle
+             );
+  if (EFI_ERROR (Status) && !MadtFound) {
     DEBUG ((DEBUG_ERROR, "ERROR: MADT Table not found.\n"));
     Status = EFI_NOT_FOUND;
+  } else if (!EFI_ERROR (Status) && MadtFound) {
+    DEBUG ((DEBUG_ERROR, "ERROR: MADT Table found while already published.\n"));
+    Status = EFI_ALREADY_STARTED;
+  } else {
+    MadtFound = TRUE;
   }
 
-  if (!GtdtFound) {
+  Handle = 0;
+  Status = LocateAcpiTableBySignature (
+             EFI_ACPI_6_2_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,
+             &DummyHeader,
+             &Handle
+             );
+  if (EFI_ERROR (Status) && !GtdtFound) {
     DEBUG ((DEBUG_ERROR, "ERROR: GTDT Table not found.\n"));
     Status = EFI_NOT_FOUND;
+  } else if (!EFI_ERROR (Status) && GtdtFound) {
+    DEBUG ((DEBUG_ERROR, "ERROR: GTDT Table found while already published.\n"));
+    Status = EFI_ALREADY_STARTED;
+  } else {
+    GtdtFound = TRUE;
   }
 
-  if (!DsdtFound) {
+  Handle = 0;
+  Status = LocateAcpiTableBySignature (
+             EFI_ACPI_6_2_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
+             &DummyHeader,
+             &Handle
+             );
+  if (EFI_ERROR (Status) && !DsdtFound) {
     DEBUG ((DEBUG_ERROR, "ERROR: DSDT Table not found.\n"));
     Status = EFI_NOT_FOUND;
+  } else if (!EFI_ERROR (Status) && DsdtFound) {
+    DEBUG ((DEBUG_ERROR, "ERROR: DSDT Table found while already published.\n"));
+    Status = EFI_ALREADY_STARTED;
+  } else {
+    DsdtFound = TRUE;
   }
 
-  if (!Dbg2Found) {
+  Handle = 0;
+  Status = LocateAcpiTableBySignature (
+             EFI_ACPI_6_2_DEBUG_PORT_2_TABLE_SIGNATURE,
+             &DummyHeader,
+             &Handle
+             );
+  if (EFI_ERROR (Status) && !Dbg2Found) {
     DEBUG ((DEBUG_WARN, "WARNING: DBG2 Table not found.\n"));
+  } else if (!EFI_ERROR (Status) && Dbg2Found) {
+    DEBUG ((DEBUG_ERROR, "ERROR: DBG2 Table found while already published.\n"));
+    Status = EFI_ALREADY_STARTED;
+  } else {
+    Dbg2Found = TRUE;
   }
 
-  if (!SpcrFound) {
+  Handle = 0;
+  Status = LocateAcpiTableBySignature (
+             EFI_ACPI_6_2_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,
+             &DummyHeader,
+             &Handle
+             );
+  if (EFI_ERROR (Status) && !SpcrFound) {
     DEBUG ((DEBUG_WARN, "WARNING: SPCR Table not found.\n"));
+  } else if (!EFI_ERROR (Status) && SpcrFound) {
+    DEBUG ((DEBUG_ERROR, "ERROR: SPCR Table found while already published.\n"));
+    Status = EFI_ALREADY_STARTED;
+  } else {
+    SpcrFound = TRUE;
   }
 
   return Status;
@@ -500,11 +622,13 @@ ProcessAcpiTables (
   IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol
   )
 {
-  EFI_STATUS                  Status;
-  EFI_ACPI_TABLE_PROTOCOL     *AcpiTableProtocol;
-  CM_STD_OBJ_ACPI_TABLE_INFO  *AcpiTableInfo;
-  UINT32                      AcpiTableCount;
-  UINT32                      Idx;
+  EFI_STATUS                   Status;
+  EFI_ACPI_TABLE_PROTOCOL      *AcpiTableProtocol;
+  CM_STD_OBJ_ACPI_TABLE_INFO   *AcpiTableInfo;
+  UINT32                       AcpiTableCount;
+  UINT32                       Idx;
+  UINTN                        Handle;
+  EFI_ACPI_DESCRIPTION_HEADER  *DummyHeader;
 
   ASSERT (TableFactoryProtocol != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -570,29 +694,37 @@ ProcessAcpiTables (
   }
 
   // Add the FADT Table first.
-  for (Idx = 0; Idx < AcpiTableCount; Idx++) {
-    if (CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdFadt) ==
-        AcpiTableInfo[Idx].TableGeneratorId)
-    {
-      Status = BuildAndInstallAcpiTable (
-                 TableFactoryProtocol,
-                 CfgMgrProtocol,
-                 AcpiTableProtocol,
-                 &AcpiTableInfo[Idx]
-                 );
-      if (EFI_ERROR (Status)) {
-        DEBUG ((
-          DEBUG_ERROR,
-          "ERROR: Failed to find build and install ACPI FADT Table." \
-          " Status = %r\n",
-          Status
-          ));
-        return Status;
-      }
+  Status = LocateAcpiTableBySignature (
+             EFI_ACPI_6_2_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
+             &DummyHeader,
+             &Handle
+             );
+  if (EFI_ERROR (Status)) {
+    // FADT is not yet installed
+    for (Idx = 0; Idx < AcpiTableCount; Idx++) {
+      if (CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdFadt) ==
+          AcpiTableInfo[Idx].TableGeneratorId)
+      {
+        Status = BuildAndInstallAcpiTable (
+                   TableFactoryProtocol,
+                   CfgMgrProtocol,
+                   AcpiTableProtocol,
+                   &AcpiTableInfo[Idx]
+                   );
+        if (EFI_ERROR (Status)) {
+          DEBUG ((
+            DEBUG_ERROR,
+            "ERROR: Failed to find build and install ACPI FADT Table." \
+            " Status = %r\n",
+            Status
+            ));
+          return Status;
+        }
 
-      break;
-    }
-  } // for
+        break;
+      }
+    } // for
+  }
 
   // Add remaining ACPI Tables
   for (Idx = 0; Idx < AcpiTableCount; Idx++) {
