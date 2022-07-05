@@ -91,7 +91,7 @@ GetBistInfoFromPpi (
 {
   EFI_STATUS                            Status;
   EFI_SEC_PLATFORM_INFORMATION2_PPI     *SecPlatformInformation2Ppi;
-  EFI_SEC_PLATFORM_INFORMATION_RECORD2  *SecPlatformInformation2;
+  EFI_SEC_PLATFORM_INFORMATION_RECORD2  *SecPlatformInformationRecord2;
   UINT64                                InformationSize;
 
   Status = PeiServicesLocatePpi (
@@ -108,17 +108,17 @@ GetBistInfoFromPpi (
     //
     // Get the size of the sec platform information2(BSP/APs' BIST data)
     //
-    InformationSize         = 0;
-    SecPlatformInformation2 = NULL;
-    Status                  = SecPlatformInformation2Ppi->PlatformInformation2 (
-                                                            PeiServices,
-                                                            &InformationSize,
-                                                            SecPlatformInformation2
-                                                            );
+    InformationSize               = 0;
+    SecPlatformInformationRecord2 = NULL;
+    Status                        = SecPlatformInformation2Ppi->PlatformInformation2 (
+                                                                  PeiServices,
+                                                                  &InformationSize,
+                                                                  SecPlatformInformationRecord2
+                                                                  );
     if (Status == EFI_BUFFER_TOO_SMALL) {
       Status = PeiServicesAllocatePool (
                  (UINTN)InformationSize,
-                 (VOID **)&SecPlatformInformation2
+                 (VOID **)&SecPlatformInformationRecord2
                  );
       if (Status == EFI_SUCCESS) {
         //
@@ -127,10 +127,10 @@ GetBistInfoFromPpi (
         Status = SecPlatformInformation2Ppi->PlatformInformation2 (
                                                PeiServices,
                                                &InformationSize,
-                                               SecPlatformInformation2
+                                               SecPlatformInformationRecord2
                                                );
         if (Status == EFI_SUCCESS) {
-          *BistInformationData = SecPlatformInformation2;
+          *BistInformationData = SecPlatformInformationRecord2;
           if (BistInformationSize != NULL) {
             *BistInformationSize = InformationSize;
           }
@@ -160,7 +160,7 @@ CollectBistDataFromPpi (
 {
   EFI_STATUS                            Status;
   EFI_PEI_PPI_DESCRIPTOR                *SecInformationDescriptor;
-  EFI_SEC_PLATFORM_INFORMATION_RECORD2  *SecPlatformInformation2;
+  EFI_SEC_PLATFORM_INFORMATION_RECORD2  *SecPlatformInformationRecord2;
   EFI_SEC_PLATFORM_INFORMATION_RECORD   *SecPlatformInformation;
   UINTN                                 NumberOfData;
   EFI_SEC_PLATFORM_INFORMATION_CPU      *CpuInstance;
@@ -186,10 +186,10 @@ CollectBistDataFromPpi (
   ASSERT_EFI_ERROR (Status);
   PlatformInformationRecord2->NumberOfCpus = (UINT32)NumberOfProcessors;
 
-  SecPlatformInformation2 = NULL;
-  SecPlatformInformation  = NULL;
-  NumberOfData            = 0;
-  CpuInstance             = NULL;
+  SecPlatformInformationRecord2 = NULL;
+  SecPlatformInformation        = NULL;
+  NumberOfData                  = 0;
+  CpuInstance                   = NULL;
   //
   // Get BIST information from Sec Platform Information2 Ppi firstly
   //
@@ -197,15 +197,15 @@ CollectBistDataFromPpi (
              PeiServices,
              &gEfiSecPlatformInformation2PpiGuid,
              &SecInformationDescriptor,
-             (VOID *)&SecPlatformInformation2,
+             (VOID *)&SecPlatformInformationRecord2,
              NULL
              );
   if (Status == EFI_SUCCESS) {
     //
     // Sec Platform Information2 PPI includes BSP/APs' BIST information
     //
-    NumberOfData = SecPlatformInformation2->NumberOfCpus;
-    CpuInstance  = SecPlatformInformation2->CpuInstance;
+    NumberOfData = SecPlatformInformationRecord2->NumberOfCpus;
+    CpuInstance  = SecPlatformInformationRecord2->CpuInstance;
   } else {
     //
     // Otherwise, get BIST information from Sec Platform Information Ppi
@@ -274,7 +274,7 @@ CollectBistDataFromPpi (
     (UINTN)BistInformationSize
     );
 
-  if (SecPlatformInformation2 != NULL) {
+  if (SecPlatformInformationRecord2 != NULL) {
     if (NumberOfData < NumberOfProcessors) {
       //
       // Reinstall SecPlatformInformation2 PPI to include new BIST information
