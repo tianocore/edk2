@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -105,6 +105,14 @@ typedef struct CmAStdObjAcpiTableInfo {
   /// Generators shall populate this information using the revision of the
   /// Configuration Manager (CM_STD_OBJ_CONFIGURATION_MANAGER_INFO.Revision).
   UINT32    OemRevision;
+
+  /// The minor revision of an ACPI table if required by the table.
+  /// Note: If this field is not populated (has value of Zero), then the
+  /// Generators shall populate this information based on the latest minor
+  /// revision of the table that is supported by the generator.
+  /// e.g. This field can be used to specify the minor revision to be set
+  /// for the FADT table.
+  UINT8     MinorRevision;
 } CM_STD_OBJ_ACPI_TABLE_INFO;
 
 /** A structure used to describe the SMBIOS table generators to be invoked.
