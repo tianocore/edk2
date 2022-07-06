@@ -57,18 +57,17 @@ ALIGN   8
 AsmIdtVectorBegin:
 %assign Vector 0
 %rep  256
-    push    byte %[Vector]
+    push    strict dword %[Vector] ; This instruction pushes sign-extended 8-byte value on stack
     push    rax
-    mov     rax, strict qword 0 ;    mov     rax, ASM_PFX(CommonInterruptEntry)
+    mov     rax, strict qword 0    ; mov     rax, ASM_PFX(CommonInterruptEntry)
     jmp     rax
 %assign Vector Vector+1
 %endrep
 AsmIdtVectorEnd:
 
 HookAfterStubHeaderBegin:
-    db      0x6a        ; push
-@VectorNum:
-    db      0          ; 0 will be fixed
+    push    strict dword 0      ; 0 will be fixed
+VectorNum:
     push    rax
     mov     rax, strict qword 0 ;     mov     rax, HookAfterStubHeaderEnd
 JmpAbsoluteAddress:
@@ -478,6 +477,6 @@ ASM_PFX(AsmGetTemplateAddressMap):
 global ASM_PFX(AsmVectorNumFixup)
 ASM_PFX(AsmVectorNumFixup):
     mov     rax, rdx
-    mov     [rcx + (@VectorNum - HookAfterStubHeaderBegin)], al
+    mov     [rcx + (VectorNum - 4 - HookAfterStubHeaderBegin)], al
     ret
 

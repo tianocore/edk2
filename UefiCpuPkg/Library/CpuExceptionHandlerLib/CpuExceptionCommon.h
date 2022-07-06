@@ -22,7 +22,7 @@
 
 #define  CPU_EXCEPTION_NUM    32
 #define  CPU_INTERRUPT_NUM    256
-#define  HOOKAFTER_STUB_SIZE  16
+#define  HOOKAFTER_STUB_SIZE  18
 
 //
 // Exception Error Code of Page-Fault Exception
