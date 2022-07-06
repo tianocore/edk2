@@ -2,12 +2,12 @@
   DMA Remapping Reporting (DMAR) ACPI table definition from Intel(R)
   Virtualization Technology for Directed I/O (VT-D) Architecture Specification.
 
-  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
     - Intel(R) Virtualization Technology for Directed I/O (VT-D) Architecture
-      Specification v3.2, Dated October 2020.
+      Specification v4.0, Dated June 2022.
       https://software.intel.com/content/dam/develop/external/us/en/documents/vt-directed-io-spec.pdf
 
   @par Glossary:
@@ -41,6 +41,7 @@
 #define EFI_ACPI_DMAR_TYPE_RHSA  0x03
 #define EFI_ACPI_DMAR_TYPE_ANDD  0x04
 #define EFI_ACPI_DMAR_TYPE_SATC  0x05
+#define EFI_ACPI_DMAR_TYPE_SIDP  0x06
 ///@}
 
 ///
@@ -56,6 +57,12 @@
 #define EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_IOAPIC                 0x03
 #define EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_MSI_CAPABLE_HPET       0x04
 #define EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_ACPI_NAMESPACE_DEVICE  0x05
+
+#define EFI_ACPI_DEVICE_SCOPE_REQ_WO_PASID_NESTED_NOTALLOWED  BIT0
+#define EFI_ACPI_DEVICE_SCOPE_REQ_WO_PASID_PWSNP_NOTALLOWED   BIT1
+#define EFI_ACPI_DEVICE_SCOPE_REQ_WO_PASID_PGSNP_NOTALLOWED   BIT2
+#define EFI_ACPI_DEVICE_SCOPE_REQ_WO_PASID_ATC_HARDENED       BIT3
+#define EFI_ACPI_DEVICE_SCOPE_REQ_WO_PASID_ATC_REQUIRED       BIT4
 ///@}
 
 ///
@@ -83,11 +90,12 @@ typedef struct {
 /// Device Scope Structure is defined in section 8.3.1
 ///
 typedef struct {
-  UINT8     Type;
-  UINT8     Length;
-  UINT16    Reserved2;
-  UINT8     EnumerationId;
-  UINT8     StartBusNumber;
+  UINT8    Type;
+  UINT8    Length;
+  UINT8    Flags;
+  UINT8    Reserved;
+  UINT8    EnumerationId;
+  UINT8    StartBusNumber;
 } EFI_ACPI_DMAR_DEVICE_SCOPE_STRUCTURE_HEADER;
 
 /**
@@ -111,7 +119,14 @@ typedef struct {
     - Bits[7:1] Reserved.
   **/
   UINT8     Flags;
-  UINT8     Reserved;
+
+  /**
+    - Bits[3:0]: Indicates the size of the remapping hardware register set for
+                 this remapping unit. If the value in this field is N, the size
+                 of the register set is 2^N 4 KB pages
+    - Bits[7:4]: Reserved.
+  **/
+  UINT8     Size;
   ///
   /// The PCI Segment associated with this unit.
   ///
@@ -250,6 +265,20 @@ typedef struct {
 } EFI_ACPI_DMAR_SATC_HEADER;
 
 /**
+  SoC Integrated Device Property (SIDP) Reporting Structure is defined in
+  section 8.9.
+**/
+typedef struct {
+  EFI_ACPI_DMAR_STRUCTURE_HEADER    Header;
+
+  UINT16                            Reserved;
+  ///
+  /// The PCI Segment associated with this SIDP structure.
+  ///
+  UINT16                            SegmentNumber;
+} EFI_ACPI_DMAR_SIDP_HEADER;
+
+/**
   DMA Remapping Reporting Structure Header as defined in section 8.1
   This header will be followed by list of Remapping Structures listed below
     - DMA Remapping Hardware Unit Definition (DRHD)
@@ -258,6 +287,7 @@ typedef struct {
     - Remapping Hardware Static Affinity (RHSA)
     - ACPI Name-space Device Declaration (ANDD)
     - SoC Integrated Address Translation Cache reporting (SATC)
+    - SoC Integrated Device Property reporting (SIDP)
   These structure types must by reported in numerical order.
   i.e., All remapping structures of type 0 (DRHD) enumerated before remapping
   structures of type 1 (RMRR), and so forth.
