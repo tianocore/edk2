@@ -1,7 +1,7 @@
 /** @file
   FADT Table Generator
 
-  Copyright (c) 2017 - 2021, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -167,7 +167,7 @@ EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE  AcpiFadt = {
   // UINT16     ArmBootArch
   EFI_ACPI_6_4_ARM_PSCI_COMPLIANT,  // {Template}: ARM Boot Architecture Flags
   // UINT8      MinorRevision
-  EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION,
+  EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION, // {Template}
   // UINT64     XFirmwareCtrl
   0,
   // UINT64     XDsdt
@@ -544,6 +544,31 @@ BuildFadtTable (
       Status
       ));
     goto error_handler;
+  }
+
+  // Update the MinorRevision for the FADT table if it has been specified
+  // otherwise default to the latest FADT minor revision supported.
+  // Note:
+  // Bits 0-3 - The low order bits correspond to the minor version of the
+  //            specification version.
+  // Bits 4-7 - The high order bits correspond to the version of the ACPI
+  //            specification errata.
+  if (AcpiTableInfo->MinorRevision != 0) {
+    if (((AcpiTableInfo->MinorRevision & 0xF) >=
+         EFI_ACPI_6_2_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION) &&
+        ((AcpiTableInfo->MinorRevision & 0xF) <=
+         EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION))
+    {
+      AcpiFadt.MinorVersion = AcpiTableInfo->MinorRevision;
+    } else {
+      DEBUG ((
+        DEBUG_WARN,
+        "WARNING: FADT: Unsupported FADT Minor Revision 0x%x specified, " \
+        "defaulting to FADT Minor Revision 0x%x\n",
+        AcpiTableInfo->MinorRevision,
+        EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION
+        ));
+    }
   }
 
   // Update PmProfile Info
