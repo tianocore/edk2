@@ -34,7 +34,7 @@ ALIGN   8
 AsmIdtVectorBegin:
 %assign Vector 0
 %rep  256
-    push    byte %[Vector];
+    push    strict dword %[Vector];
     push    eax
     mov     eax, ASM_PFX(CommonInterruptEntry)
     jmp     eax
@@ -43,9 +43,8 @@ AsmIdtVectorBegin:
 AsmIdtVectorEnd:
 
 HookAfterStubBegin:
-    db      0x6a        ; push
+    push    strict dword 0  ; 0 will be fixed
 VectorNum:
-    db      0          ; 0 will be fixed
     push    eax
     mov     eax, HookAfterStubHeaderEnd
     jmp     eax
@@ -453,5 +452,5 @@ global ASM_PFX(AsmVectorNumFixup)
 ASM_PFX(AsmVectorNumFixup):
     mov     eax, dword [esp + 8]
     mov     ecx, [esp + 4]
-    mov     [ecx + (VectorNum - HookAfterStubBegin)], al
+    mov     [ecx + (VectorNum - 4 - HookAfterStubBegin)], al
     ret
