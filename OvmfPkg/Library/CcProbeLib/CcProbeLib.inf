@@ -12,7 +12,7 @@
   FILE_GUID                      = 05184ec9-abb0-4491-8584-e388639a7c48
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = CcProbeLib
+  LIBRARY_CLASS                  = CcProbeLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION
 
 [Sources]
   CcProbeLib.c
@@ -20,6 +20,3 @@
 [Packages]
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
-
-[Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase

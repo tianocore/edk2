@@ -7,8 +7,12 @@
 
 **/
 
+#include <Base.h>
+#include <Library/BaseLib.h>
 #include <Library/CcProbeLib.h>
-#include <WorkArea.h>
+
+STATIC UINT8    CcProbeGuestType = 0;
+STATIC BOOLEAN  CcProbed         = FALSE;
 
 /**
   Probe the ConfidentialComputing Guest type. See defition of
@@ -23,9 +27,21 @@ CcProbe (
   VOID
   )
 {
-  OVMF_WORK_AREA  *WorkArea;
+  if (CcProbed) {
+    return CcProbeGuestType;
+  }
 
-  WorkArea = (OVMF_WORK_AREA *)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+  if (TdIsEnabled ()) {
+    CcProbeGuestType = CcGuestTypeIntelTdx;
+  } else {
+    //
+    // SEV code should be added here to determine if it is CcGuestTypeAmdSev.
+    // Now we set CcProbeGuestType to CcGuestTypeNonEncrypted.
+    //
+    CcProbeGuestType = CcGuestTypeNonEncrypted;
+  }
 
-  return WorkArea != NULL ? WorkArea->Header.GuestType : CcGuestTypeNonEncrypted;
+  CcProbed = TRUE;
+
+  return CcProbeGuestType;
 }
