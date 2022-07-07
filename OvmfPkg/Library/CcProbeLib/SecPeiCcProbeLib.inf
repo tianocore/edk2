@@ -1,0 +1,25 @@
+## @file
+# CcProbeLib is used to probe Confidential Computing guest type.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecPeiCcProbeLib
+  FILE_GUID                      = 78eb7f2a-a42a-4b01-b160-5a05a0a52bac
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CcProbeLib|SEC PEIM PEI_CORE
+
+[Sources]
+  SecPeiCcProbeLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
