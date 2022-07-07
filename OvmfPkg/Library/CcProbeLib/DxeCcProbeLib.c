@@ -10,6 +10,9 @@
 #include <Library/CcProbeLib.h>
 #include <WorkArea.h>
 
+STATIC UINT8    mCcProbeGuestType = 0;
+STATIC BOOLEAN  mCcProbed         = FALSE;
+
 /**
   Probe the ConfidentialComputing Guest type. See defition of
   CC_GUEST_TYPE in <ConfidentialComputingGuestAttr.h>.
@@ -25,7 +28,11 @@ CcProbe (
 {
   OVMF_WORK_AREA  *WorkArea;
 
-  WorkArea = (OVMF_WORK_AREA *)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+  if (!mCcProbed) {
+    WorkArea          = (OVMF_WORK_AREA *)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+    mCcProbeGuestType = WorkArea != NULL ? WorkArea->Header.GuestType : CcGuestTypeNonEncrypted;
+    mCcProbed         = TRUE;
+  }
 
-  return WorkArea != NULL ? WorkArea->Header.GuestType : CcGuestTypeNonEncrypted;
+  return mCcProbeGuestType;
 }
