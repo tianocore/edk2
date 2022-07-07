@@ -603,6 +603,11 @@ GeneratePciCrs (
                    );
         break;
 
+      case PCI_SS_CONFIG:
+        // Do nothing
+        Status = EFI_SUCCESS;
+        break;
+
       default:
         Status = EFI_INVALID_PARAMETER;
     } // switch
