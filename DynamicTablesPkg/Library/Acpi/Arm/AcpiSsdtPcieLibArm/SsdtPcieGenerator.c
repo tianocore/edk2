@@ -824,7 +824,10 @@ GeneratePciDevice (
 
   // Write the name of the PCI device.
   CopyMem (AslName, "PCIx", AML_NAME_SEG_SIZE + 1);
-  AslName[AML_NAME_SEG_SIZE - 1] = AsciiFromHex (Uid);
+  AslName[AML_NAME_SEG_SIZE - 1] = AsciiFromHex (Uid & 0xF);
+  if (Uid > 0xF) {
+    AslName[AML_NAME_SEG_SIZE - 2] = AsciiFromHex ((Uid >> 4) & 0xF);
+  }
 
   // ASL: Device (PCIx) {}
   Status = AmlCodeGenDevice (AslName, ScopeNode, &PciNode);

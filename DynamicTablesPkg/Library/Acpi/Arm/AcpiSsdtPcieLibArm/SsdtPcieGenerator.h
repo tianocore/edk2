@@ -31,7 +31,7 @@
         Corresponding changes would be needed to support the Name and
         UID fields describing the Pci root complexes.
 */
-#define MAX_PCI_ROOT_COMPLEXES_SUPPORTED  16
+#define MAX_PCI_ROOT_COMPLEXES_SUPPORTED  256
 
 // _SB scope of the AML namespace.
 #define SB_SCOPE  "\\_SB_"
