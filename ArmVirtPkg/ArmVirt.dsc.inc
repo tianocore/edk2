@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011 - 2022, ARM Limited. All rights reserved.
+#  Copyright (c) 2011 - 2023, ARM Limited. All rights reserved.
 #  Copyright (c) 2014, Linaro Limited. All rights reserved.
 #  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.
 #  Copyright (c) Microsoft Corporation.
@@ -179,6 +179,8 @@
   UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
 
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
+
+  ArmCcaLib|ArmVirtPkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
 
 [LibraryClasses.common.SEC]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
