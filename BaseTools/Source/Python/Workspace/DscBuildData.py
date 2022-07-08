@@ -2932,7 +2932,7 @@ class DscBuildData(PlatformBuildClassObject):
             MakeApp = MakeApp + PcdMakefileEnd
             MakeApp = MakeApp + AppTarget % ("""\tcopy $(APPLICATION) $(APPFILE) /y """)
         else:
-            MakeApp = MakeApp + AppTarget % ("""\tcp $(APPLICATION) $(APPFILE) """)
+            MakeApp = MakeApp + AppTarget % ("""\tcp -p $(APPLICATION) $(APPFILE) """)
         MakeApp = MakeApp + '\n'
         IncludeFileFullPaths = []
         for includefile in IncludeFiles:
@@ -2955,7 +2955,7 @@ class DscBuildData(PlatformBuildClassObject):
         else:
             PcdValueCommonPath = os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "Source/C/Common/PcdValueCommon.c"))
             MakeApp = MakeApp + '%s/PcdValueCommon.c : %s\n' % (self.OutputPath, PcdValueCommonPath)
-            MakeApp = MakeApp + '\tcp -f %s %s/PcdValueCommon.c\n' % (PcdValueCommonPath, self.OutputPath)
+            MakeApp = MakeApp + '\tcp -p -f %s %s/PcdValueCommon.c\n' % (PcdValueCommonPath, self.OutputPath)
         MakeFileName = os.path.join(self.OutputPath, 'Makefile')
         MakeApp += "$(OBJECTS) : %s\n" % MakeFileName
         SaveFileOnChange(MakeFileName, MakeApp, False)
