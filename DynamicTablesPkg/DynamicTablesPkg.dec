@@ -30,6 +30,9 @@
   ##  @libraryclass  Defines a set of APIs to a hardware information parser.
   HwInfoParserLib|Include/Library/HwInfoParserLib.h
 
+  ##  @libraryclass Defines functions for customizing the generation of _OSC and slot info.
+  SsdtPcieSupportLib|Include/Library/SsdtPcieSupportLib.h
+
   ##  @libraryclass  Defines a set of methods for fixing up a SSDT Serial Port.
   SsdtSerialPortFixupLib|Include/Library/SsdtSerialPortFixupLib.h
 

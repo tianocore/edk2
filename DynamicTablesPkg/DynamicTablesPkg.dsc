@@ -41,6 +41,7 @@
 [Components.common]
   DynamicTablesPkg/Library/Common/AcpiHelperLib/AcpiHelperLib.inf
   DynamicTablesPkg/Library/Common/AmlLib/AmlLib.inf
+  DynamicTablesPkg/Library/Common/SsdtPcieSupportLib/SsdtPcieSupportLib.inf
   DynamicTablesPkg/Library/Common/SsdtSerialPortFixupLib/SsdtSerialPortFixupLib.inf
   DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
   DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
