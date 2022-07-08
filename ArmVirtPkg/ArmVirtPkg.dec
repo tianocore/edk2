@@ -26,6 +26,7 @@
   Include                        # Root include for the package
 
 [LibraryClasses]
+  ArmCcaLib|Include/Library/ArmCcaLib.h
   ArmCcaRsiLib|Include/Library/ArmCcaRsiLib.h
   ArmVirtMemInfoLib|Include/Library/ArmVirtMemInfoLib.h
 
