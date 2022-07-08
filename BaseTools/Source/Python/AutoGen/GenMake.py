@@ -120,7 +120,7 @@ class BuildFile(object):
         },
 
         POSIX_PLATFORM : {
-            "CP"    :   "cp -f",
+            "CP"    :   "cp -p -f",
             "MV"    :   "mv -f",
             "RM"    :   "rm -f",
             "MD"    :   "mkdir -p",
