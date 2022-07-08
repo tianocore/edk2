@@ -540,6 +540,7 @@ GeneratePciCrs (
   UINT32                       RefCount;
   CM_ARM_PCI_ADDRESS_MAP_INFO  *AddrMapInfo;
   AML_OBJECT_NODE_HANDLE       CrsNode;
+  BOOLEAN                      IsPosDecode;
 
   ASSERT (Generator != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -609,6 +610,11 @@ GeneratePciCrs (
     }
 
     Translation = (AddrMapInfo->CpuAddress != AddrMapInfo->PciAddress);
+    if (AddrMapInfo->CpuAddress >= AddrMapInfo->PciAddress) {
+      IsPosDecode = TRUE;
+    } else {
+      IsPosDecode = FALSE;
+    }
 
     switch (AddrMapInfo->SpaceCode) {
       case PCI_SS_IO:
@@ -616,12 +622,12 @@ GeneratePciCrs (
                    FALSE,
                    TRUE,
                    TRUE,
-                   TRUE,
+                   IsPosDecode,
                    3,
                    0,
                    AddrMapInfo->PciAddress,
                    AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1,
-                   Translation ? AddrMapInfo->CpuAddress : 0,
+                   Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0,
                    AddrMapInfo->AddressSize,
                    0,
                    NULL,
@@ -635,7 +641,7 @@ GeneratePciCrs (
       case PCI_SS_M32:
         Status = AmlCodeGenRdDWordMemory (
                    FALSE,
-                   TRUE,
+                   IsPosDecode,
                    TRUE,
                    TRUE,
                    TRUE,
@@ -643,7 +649,7 @@ GeneratePciCrs (
                    0,
                    AddrMapInfo->PciAddress,
                    AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1,
-                   Translation ? AddrMapInfo->CpuAddress : 0,
+                   Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0,
                    AddrMapInfo->AddressSize,
                    0,
                    NULL,
@@ -657,7 +663,7 @@ GeneratePciCrs (
       case PCI_SS_M64:
         Status = AmlCodeGenRdQWordMemory (
                    FALSE,
-                   TRUE,
+                   IsPosDecode,
                    TRUE,
                    TRUE,
                    TRUE,
@@ -665,7 +671,7 @@ GeneratePciCrs (
                    0,
                    AddrMapInfo->PciAddress,
                    AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1,
-                   Translation ? AddrMapInfo->CpuAddress : 0,
+                   Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0,
                    AddrMapInfo->AddressSize,
                    0,
                    NULL,
