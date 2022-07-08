@@ -633,6 +633,12 @@
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdVideoVerticalResolution_HELP  #language en-US "This PCD defines the video vertical resolution. If this PCD is set to 0 then video resolution would be at highest resolution."
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdConOutScaleFont_PROMPT  #language en-US "Console Output Scale Font"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdConOutScaleFont_HELP  #language en-US "This PCD determines if fonts are maximized in size for the current video resolution.<BR><BR>"
+                                                                                    "TRUE  - Fonts are scaled.<BR>\n"
+                                                                                    "FALSE - Fonts are not scaled (Default).<BR>"
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdLoadFixAddressPeiCodePageNumber_PROMPT  #language en-US "LMFA PEI code page number"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdLoadFixAddressPeiCodePageNumber_HELP  #language en-US "Specify memory size with page number for PEI code when Loading Module at Fixed Address feature is enabled. The value will be set by the build tool."
