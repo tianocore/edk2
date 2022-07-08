@@ -3887,6 +3887,416 @@ BOOLEAN
   OUT VOID *BnRes
   );
 
+/**
+  Initialize new opaque EcGroup object. This object represents an EC curve and
+  and is used for calculation within this group. This object should be freed
+  using EcGroupFree() function.
+
+  @param[in]  CryptoNid   Identifying number for the ECC curve (Defined in
+                          BaseCryptLib.h).
+
+  @retval EcGroup object  On success
+  @retval NULL            On failure
+**/
+typedef
+VOID *
+(EFIAPI *EDKII_CRYPTO_EC_GROUP_INIT)(
+  IN UINTN  CryptoNid
+  );
+
+/**
+  Get EC curve parameters. While elliptic curve equation is Y^2 mod P = (X^3 + AX + B) Mod P.
+  This function will set the provided Big Number objects  to the corresponding
+  values. The caller needs to make sure all the "out" BigNumber parameters
+  are properly initialized.
+
+  @param[in]  EcGroup    EC group object.
+  @param[out] BnPrime    Group prime number.
+  @param[out] BnA        A coefficient.
+  @param[out] BnB        B coefficient.
+  @param[in]  BnCtx      BN context.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_GROUP_GET_CURVE)(
+  IN CONST VOID *EcGroup,
+  OUT VOID *BnPrime,
+  OUT VOID *BnA,
+  OUT VOID *BnB,
+  IN VOID *BnCtx
+  );
+
+/**
+  Get EC group order.
+  This function will set the provided Big Number object to the corresponding
+  value. The caller needs to make sure that the "out" BigNumber parameter
+  is properly initialized.
+
+  @param[in]  EcGroup   EC group object
+  @param[out] BnOrder   Group prime number
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_GROUP_GET_ORDER)(
+  IN VOID *EcGroup,
+  OUT VOID *BnOrder
+  );
+
+/**
+  Free previously allocated EC group object using EcGroupInit()
+
+  @param[in]  EcGroup   EC group object to free
+**/
+typedef
+VOID
+(EFIAPI *EDKII_CRYPTO_EC_GROUP_FREE)(
+  IN VOID *EcGroup
+  );
+
+/**
+  Initialize new opaque EC Point object. This object represents an EC point
+  within the given EC group (curve).
+
+  @param[in]  EC Group, properly initialized using EcGroupInit()
+
+  @retval EC Point object  On success
+  @retval NULL             On failure
+**/
+typedef
+VOID *
+(EFIAPI *EDKII_CRYPTO_EC_POINT_INIT)(
+  IN CONST VOID *EcGroup
+  );
+
+/**
+  Free previously allocated EC Point object using EcPointInit()
+
+  @param[in]  EcPoint   EC Point to free
+  @param[in]  Clear     TRUE iff the memory should be cleared
+**/
+typedef
+VOID
+(EFIAPI *EDKII_CRYPTO_EC_POINT_DE_INIT)(
+  IN VOID *EcPoint,
+  IN BOOLEAN Clear
+  );
+
+/**
+  Get EC point affine (x,y) coordinates.
+  This function will set the provided Big Number objects to the corresponding
+  values. The caller needs to make sure all the "out" BigNumber parameters
+  are properly initialized.
+
+  @param[in]  EcGroup    EC group object
+  @param[in]  EcPoint    EC point object
+  @param[out] BnX        X coordinate
+  @param[out] BnY        Y coordinate
+  @param[in]  BnCtx      BN context, created with BigNumNewContext()
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_POINT_GET_AFFINE_COORDINATES)(
+  IN CONST VOID *EcGroup,
+  IN CONST VOID *EcPoint,
+  OUT VOID *BnX,
+  OUT VOID *BnY,
+  IN VOID *BnCtx
+  );
+
+/**
+  Set EC point affine (x,y) coordinates.
+
+  @param[in]  EcGroup    EC group object
+  @param[in]  EcPoint    EC point object
+  @param[in]  BnX        X coordinate
+  @param[in]  BnY        Y coordinate
+  @param[in]  BnCtx      BN context, created with BigNumNewContext()
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_POINT_SET_AFFINE_COORDINATES)(
+  IN CONST VOID *EcGroup,
+  IN VOID *EcPoint,
+  IN CONST VOID *BnX,
+  IN CONST VOID *BnY,
+  IN VOID *BnCtx
+  );
+
+/**
+  EC Point addition. EcPointResult = EcPointA + EcPointB
+
+  @param[in]  EcGroup          EC group object
+  @param[out] EcPointResult    EC point to hold the result. The point should
+                               be properly initialized.
+  @param[in]  EcPointA         EC Point
+  @param[in]  EcPointB         EC Point
+  @param[in]  BnCtx            BN context, created with BigNumNewContext()
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_POINT_ADD)(
+  IN CONST VOID *EcGroup,
+  OUT VOID *EcPointResult,
+  IN CONST VOID *EcPointA,
+  IN CONST VOID *EcPointB,
+  IN VOID *BnCtx
+  );
+
+/**
+  Variable EC point multiplication. EcPointResult = EcPoint * BnPScalar
+
+  @param[in]  EcGroup          EC group object
+  @param[out] EcPointResult    EC point to hold the result. The point should
+                               be properly initialized.
+  @param[in]  EcPoint          EC Point
+  @param[in]  BnPScalar        P Scalar
+  @param[in]  BnCtx            BN context, created with BigNumNewContext()
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_POINT_MUL)(
+  IN CONST VOID *EcGroup,
+  OUT VOID *EcPointResult,
+  IN CONST VOID *EcPoint,
+  IN CONST VOID *BnPScalar,
+  IN VOID *BnCtx
+  );
+
+/**
+  Calculate the inverse of the supplied EC point.
+
+  @param[in]     EcGroup   EC group object
+  @param[in,out] EcPoint   EC point to invert
+  @param[in]     BnCtx     BN context, created with BigNumNewContext()
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_POINT_INVERT)(
+  IN CONST VOID *EcGroup,
+  IN OUT VOID *EcPoint,
+  IN VOID *BnCtx
+  );
+
+/**
+  Check if the supplied point is on EC curve
+
+  @param[in]  EcGroup   EC group object
+  @param[in]  EcPoint   EC point to check
+  @param[in]  BnCtx     BN context, created with BigNumNewContext()
+
+  @retval TRUE           On curve
+  @retval FALSE          Otherwise
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_POINT_IS_ON_CURVE)(
+  IN CONST VOID *EcGroup,
+  IN CONST VOID *EcPoint,
+  IN VOID *BnCtx
+  );
+
+/**
+  Check if the supplied point is at infinity
+
+  @param[in]  EcGroup   EC group object
+  @param[in]  EcPoint   EC point to check
+  @param[in]  BnCtx     BN context, created with BigNumNewContext()
+
+  @retval TRUE          At infinity
+  @retval FALSE         Otherwise
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_POINT_IS_AT_INFINITY)(
+  IN CONST VOID *EcGroup,
+  IN CONST VOID *EcPoint
+  );
+
+/**
+  Check if EC points are equal
+
+  @param[in]  EcGroup   EC group object
+  @param[in]  EcPointA  EC point A
+  @param[in]  EcPointB  EC point B
+  @param[in]  BnCtx     BN context, created with BigNumNewContext()
+
+  @retval TRUE          A == B
+  @retval FALSE         Otherwise
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_POINT_EQUAL)(
+  IN CONST VOID *EcGroup,
+  IN CONST VOID *EcPointA,
+  IN CONST VOID *EcPointB,
+  IN VOID *BnCtx
+  );
+
+/**
+  Set EC point compressed coordinates. Points can be described in terms of
+  their compressed coordinates. For a point (x, y), for any given value for x
+  such that the point is on the curve there will only ever be two possible
+  values for y. Therefore, a point can be set using this function where BnX is
+  the x coordinate and YBit is a value 0 or 1 to identify which of the two
+  possible values for y should be used.
+
+  @param[in]  EcGroup    EC group object
+  @param[in]  EcPoint    EC Point
+  @param[in]  BnX        X coordinate
+  @param[in]  YBit       0 or 1 to identify which Y value is used
+  @param[in]  BnCtx      BN context, created with BigNumNewContext()
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_POINT_SET_COMPRESSED_COORDINATES)(
+  IN CONST VOID *EcGroup,
+  IN VOID *EcPoint,
+  IN CONST VOID *BnX,
+  IN UINT8 YBit,
+  IN VOID *BnCtx
+  );
+
+/**
+  Allocates and Initializes one Elliptic Curve Context for subsequent use
+  with the NID.
+
+  @param[in]  Nid cipher NID
+  @return     Pointer to the Elliptic Curve Context that has been initialized.
+              If the allocations fails, EcNewByNid() returns NULL.
+**/
+typedef
+VOID *
+(EFIAPI *EDKII_CRYPTO_EC_NEW_BY_NID)(
+  IN UINTN  Nid
+  );
+
+/**
+  Release the specified EC context.
+
+  @param[in]  EcContext  Pointer to the EC context to be released.
+**/
+typedef
+VOID
+(EFIAPI *EDKII_CRYPTO_EC_FREE)(
+  IN  VOID  *EcContext
+  );
+
+/**
+  Generates EC key and returns EC public key (X, Y), Please note, this function uses
+  pseudo random number generator. The caller must make sure RandomSeed()
+  function was properly called before.
+  The Ec context should be correctly initialized by EcNewByNid.
+  This function generates random secret, and computes the public key (X, Y), which is
+  returned via parameter Public, PublicSize.
+  X is the first half of Public with size being PublicSize / 2,
+  Y is the second half of Public with size being PublicSize / 2.
+  EC context is updated accordingly.
+  If the Public buffer is too small to hold the public X, Y, FALSE is returned and
+  PublicSize is set to the required buffer size to obtain the public X, Y.
+  For P-256, the PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+  If EcContext is NULL, then return FALSE.
+  If PublicSize is NULL, then return FALSE.
+  If PublicSize is large enough but Public is NULL, then return FALSE.
+  @param[in, out]  EcContext      Pointer to the EC context.
+  @param[out]      PublicKey      Pointer to t buffer to receive generated public X,Y.
+  @param[in, out]  PublicKeySize  On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
+  @retval TRUE   EC public X,Y generation succeeded.
+  @retval FALSE  EC public X,Y generation failed.
+  @retval FALSE  PublicKeySize is not large enough.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_GENERATE_KEY)(
+  IN OUT  VOID   *EcContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  );
+
+/**
+  Gets the public key component from the established EC context.
+  The Ec context should be correctly initialized by EcNewByNid, and successfully
+  generate key pair from EcGenerateKey().
+  For P-256, the PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+  @param[in, out]  EcContext      Pointer to EC context being set.
+  @param[out]      PublicKey      Pointer to t buffer to receive generated public X,Y.
+  @param[in, out]  PublicKeySize  On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
+  @retval  TRUE   EC key component was retrieved successfully.
+  @retval  FALSE  Invalid EC key component.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_GET_PUB_KEY)(
+  IN OUT  VOID   *EcContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  );
+
+/**
+  Computes exchanged common key.
+  Given peer's public key (X, Y), this function computes the exchanged common key,
+  based on its own context including value of curve parameter and random secret.
+  X is the first half of PeerPublic with size being PeerPublicSize / 2,
+  Y is the second half of PeerPublic with size being PeerPublicSize / 2.
+  If EcContext is NULL, then return FALSE.
+  If PeerPublic is NULL, then return FALSE.
+  If PeerPublicSize is 0, then return FALSE.
+  If Key is NULL, then return FALSE.
+  If KeySize is not large enough, then return FALSE.
+  For P-256, the PeerPublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PeerPublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PeerPublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+  @param[in, out]  EcContext          Pointer to the EC context.
+  @param[in]       PeerPublic         Pointer to the peer's public X,Y.
+  @param[in]       PeerPublicSize     Size of peer's public X,Y in bytes.
+  @param[in]       CompressFlag       Flag of PeerPublic is compressed or not.
+  @param[out]      Key                Pointer to the buffer to receive generated key.
+  @param[in, out]  KeySize            On input, the size of Key buffer in bytes.
+                                      On output, the size of data returned in Key buffer in bytes.
+  @retval TRUE   EC exchanged key generation succeeded.
+  @retval FALSE  EC exchanged key generation failed.
+  @retval FALSE  KeySize is not large enough.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_DH_COMPUTE_KEY)(
+  IN OUT  VOID         *EcContext,
+  IN      CONST UINT8  *PeerPublic,
+  IN      UINTN        PeerPublicSize,
+  IN      CONST INT32  *CompressFlag,
+  OUT     UINT8        *Key,
+  IN OUT  UINTN        *KeySize
+  );
+
 ///
 /// EDK II Crypto Protocol
 ///
@@ -4102,6 +4512,27 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_BIGNUM_CONTEXT_FREE                   BigNumContextFree;
   EDKII_CRYPTO_BIGNUM_SET_UINT                       BigNumSetUint;
   EDKII_CRYPTO_BIGNUM_ADD_MOD                        BigNumAddMod;
+  /// EC
+  EDKII_CRYPTO_EC_GROUP_INIT                          EcGroupInit;
+  EDKII_CRYPTO_EC_GROUP_GET_CURVE                     EcGroupGetCurve;
+  EDKII_CRYPTO_EC_GROUP_GET_ORDER                     EcGroupGetOrder;
+  EDKII_CRYPTO_EC_GROUP_FREE                          EcGroupFree;
+  EDKII_CRYPTO_EC_POINT_INIT                          EcPointInit;
+  EDKII_CRYPTO_EC_POINT_DE_INIT                       EcPointDeInit;
+  EDKII_CRYPTO_EC_POINT_GET_AFFINE_COORDINATES        EcPointGetAffineCoordinates;
+  EDKII_CRYPTO_EC_POINT_SET_AFFINE_COORDINATES        EcPointSetAffineCoordinates;
+  EDKII_CRYPTO_EC_POINT_ADD                           EcPointAdd;
+  EDKII_CRYPTO_EC_POINT_MUL                           EcPointMul;
+  EDKII_CRYPTO_EC_POINT_INVERT                        EcPointInvert;
+  EDKII_CRYPTO_EC_POINT_IS_ON_CURVE                   EcPointIsOnCurve;
+  EDKII_CRYPTO_EC_POINT_IS_AT_INFINITY                EcPointIsAtInfinity;
+  EDKII_CRYPTO_EC_POINT_EQUAL                         EcPointEqual;
+  EDKII_CRYPTO_EC_POINT_SET_COMPRESSED_COORDINATES    EcPointSetCompressedCoordinates;
+  EDKII_CRYPTO_EC_NEW_BY_NID                          EcNewByNid;
+  EDKII_CRYPTO_EC_FREE                                EcFree;
+  EDKII_CRYPTO_EC_GENERATE_KEY                        EcGenerateKey;
+  EDKII_CRYPTO_EC_GET_PUB_KEY                         EcGetPubKey;
+  EDKII_CRYPTO_EC_DH_COMPUTE_KEY                      EcDhComputeKey;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;
