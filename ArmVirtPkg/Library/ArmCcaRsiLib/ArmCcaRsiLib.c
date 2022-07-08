@@ -516,7 +516,10 @@ RsiHostCall (
     return RETURN_INVALID_PARAMETER;
   }
 
-  STATIC_ASSERT (sizeof (HOST_CALL_ARGS) == SIZE_4KB);
+  STATIC_ASSERT (
+    sizeof (HOST_CALL_ARGS) == SIZE_4KB,
+    "sizeof (HOST_CALL_ARGS) == SIZE_4KB"
+    );
 
   // Clear the reserved fields
   ZeroMem (&Args->Reserved1, sizeof (Args->Reserved1));
