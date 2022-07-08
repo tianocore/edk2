@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+//  Copyright (c) 2011-2023, Arm Limited. All rights reserved.
 //  Copyright (c) 2015-2016, Linaro Limited. All rights reserved.
 //
 //  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -25,6 +25,10 @@ ASM_FUNC(_ModuleEntryPoint)
   bl    ArmEnableVFP
 
   bl    ASM_PFX(DiscoverDramFromDt)
+
+  // Check if we are in a Realm and configure
+  // the System Memory as Protected RAM.
+  bl    ASM_PFX(ArmCcaConfigureSystemMemory)
 
   // Get ID of this CPU in Multicore system
   bl    ASM_PFX(ArmReadMpidr)
