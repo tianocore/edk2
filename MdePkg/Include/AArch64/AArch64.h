@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2011 - 2023, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -32,6 +32,7 @@
 // ID_AA64PFR0 - AArch64 Processor Feature Register 0 definitions
 #define AARCH64_PFR0_FP   (0xF << 16)
 #define AARCH64_PFR0_GIC  (0xF << 24)
+#define AARCH64_PFR0_RME  (0xFULL << 52)
 
 // ID_AA64DFR0 - AArch64 Debug Feature Register 0 definitions
 #define AARCH64_DFR0_TRACEVER  (0xFULL << 4)
