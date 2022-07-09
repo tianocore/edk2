@@ -8,7 +8,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "SecureBootConfigImpl.h"
+#include <UefiSecureBoot.h>
 #include <Protocol/HiiPopup.h>
+#include <Protocol/RealTimeClock.h>
 #include <Library/BaseCryptLib.h>
 #include <Library/SecureBootVariableLib.h>
 #include <Library/SecureBootVariableProvisionLib.h>
@@ -133,6 +135,51 @@ CloseEnrolledFile (
   }
 
   FileContext->FileType = UNKNOWN_FILE_TYPE;
+}
+
+/**
+  Helper function to populate an EFI_TIME instance.
+
+  @param[in] Time   FileContext cached in SecureBootConfig driver
+
+**/
+STATIC
+EFI_STATUS
+GetCurrentTime (
+  IN EFI_TIME  *Time
+  )
+{
+  EFI_STATUS  Status;
+  VOID        *TestPointer;
+
+  if (Time == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = gBS->LocateProtocol (&gEfiRealTimeClockArchProtocolGuid, NULL, &TestPointer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  ZeroMem (Time, sizeof (EFI_TIME));
+  Status = gRT->GetTime (Time, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a(), GetTime() failed, status = '%r'\n",
+      __FUNCTION__,
+      Status
+      ));
+    return Status;
+  }
+
+  Time->Pad1       = 0;
+  Time->Nanosecond = 0;
+  Time->TimeZone   = 0;
+  Time->Daylight   = 0;
+  Time->Pad2       = 0;
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -435,6 +482,7 @@ EnrollPlatformKey (
   UINT32              Attr;
   UINTN               DataSize;
   EFI_SIGNATURE_LIST  *PkCert;
+  EFI_TIME            Time;
 
   PkCert = NULL;
 
@@ -462,7 +510,13 @@ EnrollPlatformKey (
   Attr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS
          | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
   DataSize = PkCert->SignatureListSize;
-  Status   = CreateTimeBasedPayload (&DataSize, (UINT8 **)&PkCert);
+  Status   = GetCurrentTime (&Time);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Fail to fetch valid time data: %r", Status));
+    goto ON_EXIT;
+  }
+
+  Status = CreateTimeBasedPayload (&DataSize, (UINT8 **)&PkCert, &Time);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
     goto ON_EXIT;
@@ -521,6 +575,7 @@ EnrollRsa2048ToKek (
   UINTN               KekSigListSize;
   UINT8               *KeyBuffer;
   UINTN               KeyLenInBytes;
+  EFI_TIME            Time;
 
   Attr           = 0;
   DataSize       = 0;
@@ -607,7 +662,13 @@ EnrollRsa2048ToKek (
   //
   Attr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS
          | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
-  Status = CreateTimeBasedPayload (&KekSigListSize, (UINT8 **)&KekSigList);
+  Status = GetCurrentTime (&Time);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Fail to fetch valid time data: %r", Status));
+    goto ON_EXIT;
+  }
+
+  Status = CreateTimeBasedPayload (&KekSigListSize, (UINT8 **)&KekSigList, &Time);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
     goto ON_EXIT;
@@ -688,6 +749,7 @@ EnrollX509ToKek (
   UINTN               DataSize;
   UINTN               KekSigListSize;
   UINT32              Attr;
+  EFI_TIME            Time;
 
   X509Data       = NULL;
   X509DataSize   = 0;
@@ -734,7 +796,13 @@ EnrollX509ToKek (
   //
   Attr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS
          | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
-  Status = CreateTimeBasedPayload (&KekSigListSize, (UINT8 **)&KekSigList);
+  Status = GetCurrentTime (&Time);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Fail to fetch valid time data: %r", Status));
+    goto ON_EXIT;
+  }
+
+  Status = CreateTimeBasedPayload (&KekSigListSize, (UINT8 **)&KekSigList, &Time);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
     goto ON_EXIT;
@@ -860,6 +928,7 @@ EnrollX509toSigDB (
   UINTN               DataSize;
   UINTN               SigDBSize;
   UINT32              Attr;
+  EFI_TIME            Time;
 
   X509DataSize  = 0;
   SigDBSize     = 0;
@@ -909,7 +978,13 @@ EnrollX509toSigDB (
   //
   Attr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS
          | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
-  Status = CreateTimeBasedPayload (&SigDBSize, (UINT8 **)&Data);
+  Status = GetCurrentTime (&Time);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Fail to fetch valid time data: %r", Status));
+    goto ON_EXIT;
+  }
+
+  Status = CreateTimeBasedPayload (&SigDBSize, (UINT8 **)&Data, &Time);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
     goto ON_EXIT;
@@ -1320,6 +1395,7 @@ EnrollX509HashtoSigDB (
   UINT16              *FilePostFix;
   UINTN               NameLength;
   EFI_TIME            *Time;
+  EFI_TIME            NewTime;
 
   X509DataSize  = 0;
   DbSize        = 0;
@@ -1489,7 +1565,13 @@ EnrollX509HashtoSigDB (
     DataSize = DbSize;
   }
 
-  Status = CreateTimeBasedPayload (&DataSize, (UINT8 **)&Data);
+  Status = GetCurrentTime (&NewTime);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Fail to fetch valid time data: %r", Status));
+    goto ON_EXIT;
+  }
+
+  Status = CreateTimeBasedPayload (&DataSize, (UINT8 **)&Data, &NewTime);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
@@ -2168,6 +2250,7 @@ EnrollImageSignatureToSigDB (
   UINTN                      SigDBSize;
   UINT32                     Attr;
   WIN_CERTIFICATE_UEFI_GUID  *GuidCertData;
+  EFI_TIME                   Time;
 
   Data         = NULL;
   GuidCertData = NULL;
@@ -2266,7 +2349,13 @@ EnrollImageSignatureToSigDB (
 
   Attr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS
          | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
-  Status = CreateTimeBasedPayload (&SigDBSize, (UINT8 **)&Data);
+  Status = GetCurrentTime (&Time);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Fail to fetch valid time data: %r", Status));
+    goto ON_EXIT;
+  }
+
+  Status = CreateTimeBasedPayload (&SigDBSize, (UINT8 **)&Data, &Time);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
     goto ON_EXIT;
@@ -2608,6 +2697,7 @@ DeleteKeyExchangeKey (
   UINT32              KekDataSize;
   UINTN               DeleteKekIndex;
   UINTN               GuidIndex;
+  EFI_TIME            Time;
 
   Data           = NULL;
   OldData        = NULL;
@@ -2726,7 +2816,13 @@ DeleteKeyExchangeKey (
 
   DataSize = Offset;
   if ((Attr & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
-    Status = CreateTimeBasedPayload (&DataSize, &OldData);
+    Status = GetCurrentTime (&Time);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Fail to fetch valid time data: %r", Status));
+      goto ON_EXIT;
+    }
+
+    Status = CreateTimeBasedPayload (&DataSize, &OldData, &Time);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
       goto ON_EXIT;
@@ -2804,6 +2900,7 @@ DeleteSignature (
   BOOLEAN             IsItemFound;
   UINT32              ItemDataSize;
   UINTN               GuidIndex;
+  EFI_TIME            Time;
 
   Data     = NULL;
   OldData  = NULL;
@@ -2930,7 +3027,13 @@ DeleteSignature (
 
   DataSize = Offset;
   if ((Attr & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
-    Status = CreateTimeBasedPayload (&DataSize, &OldData);
+    Status = GetCurrentTime (&Time);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Fail to fetch valid time data: %r", Status));
+      goto ON_EXIT;
+    }
+
+    Status = CreateTimeBasedPayload (&DataSize, &OldData, &Time);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
       goto ON_EXIT;
@@ -2999,6 +3102,7 @@ DeleteSignatureEx (
   UINTN               Offset;
   UINT8               *VariableData;
   UINT8               *NewVariableData;
+  EFI_TIME            Time;
 
   Status           = EFI_SUCCESS;
   VariableAttr     = 0;
@@ -3119,7 +3223,13 @@ DeleteSignatureEx (
   }
 
   if ((VariableAttr & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
-    Status = CreateTimeBasedPayload (&VariableDataSize, &NewVariableData);
+    Status = GetCurrentTime (&Time);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Fail to fetch valid time data: %r", Status));
+      goto ON_EXIT;
+    }
+
+    Status = CreateTimeBasedPayload (&VariableDataSize, &NewVariableData, &Time);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
       goto ON_EXIT;

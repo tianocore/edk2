@@ -49,6 +49,7 @@ EFI_MM_COMMUNICATE_HEADER  **PerCpuGuidedEventContext = NULL;
 
 // Descriptor with whereabouts of memory used for communication with the normal world
 EFI_MMRAM_DESCRIPTOR  mNsCommBuffer;
+EFI_MMRAM_DESCRIPTOR  mSCommBuffer;
 
 MP_INFORMATION_HOB_DATA  *mMpInformationHobData;
 
@@ -58,6 +59,53 @@ EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig = {
 };
 
 STATIC EFI_MM_ENTRY_POINT  mMmEntryPoint = NULL;
+
+/**
+  Perform bounds check on the common buffer.
+
+  @param  [in] BufferAddr   Address of the common buffer.
+
+  @retval   EFI_SUCCESS             Success.
+  @retval   EFI_ACCESS_DENIED       Access not permitted.
+**/
+STATIC
+EFI_STATUS
+CheckBufferAddr (
+  IN UINTN  BufferAddr
+  )
+{
+  UINT64  NsCommBufferEnd;
+  UINT64  SCommBufferEnd;
+  UINT64  CommBufferEnd;
+
+  NsCommBufferEnd = mNsCommBuffer.PhysicalStart + mNsCommBuffer.PhysicalSize;
+  SCommBufferEnd  = mSCommBuffer.PhysicalStart + mSCommBuffer.PhysicalSize;
+
+  if ((BufferAddr >= mNsCommBuffer.PhysicalStart) &&
+      (BufferAddr < NsCommBufferEnd))
+  {
+    CommBufferEnd = NsCommBufferEnd;
+  } else if ((BufferAddr >= mSCommBuffer.PhysicalStart) &&
+             (BufferAddr < SCommBufferEnd))
+  {
+    CommBufferEnd = SCommBufferEnd;
+  } else {
+    return EFI_ACCESS_DENIED;
+  }
+
+  if ((CommBufferEnd - BufferAddr) < sizeof (EFI_MM_COMMUNICATE_HEADER)) {
+    return EFI_ACCESS_DENIED;
+  }
+
+  // perform bounds check.
+  if ((CommBufferEnd - BufferAddr - sizeof (EFI_MM_COMMUNICATE_HEADER)) <
+      ((EFI_MM_COMMUNICATE_HEADER *)BufferAddr)->MessageLength)
+  {
+    return EFI_ACCESS_DENIED;
+  }
+
+  return EFI_SUCCESS;
+}
 
 /**
   The PI Standalone MM entry point for the TF-A CPU driver.
@@ -95,7 +143,7 @@ PiMmStandaloneArmTfCpuDriverEntry (
   if ((ARM_SMC_ID_MM_COMMUNICATE != EventId) &&
       (ARM_SVC_ID_FFA_MSG_SEND_DIRECT_REQ != EventId))
   {
-    DEBUG ((DEBUG_INFO, "UnRecognized Event - 0x%x\n", EventId));
+    DEBUG ((DEBUG_ERROR, "UnRecognized Event - 0x%x\n", EventId));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -104,26 +152,15 @@ PiMmStandaloneArmTfCpuDriverEntry (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (NsCommBufferAddr < mNsCommBuffer.PhysicalStart) {
-    return EFI_ACCESS_DENIED;
-  }
-
-  if ((NsCommBufferAddr + sizeof (EFI_MM_COMMUNICATE_HEADER)) >=
-      (mNsCommBuffer.PhysicalStart + mNsCommBuffer.PhysicalSize))
-  {
-    return EFI_INVALID_PARAMETER;
+  Status = CheckBufferAddr (NsCommBufferAddr);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Check Buffer failed: %r\n", Status));
+    return Status;
   }
 
   // Find out the size of the buffer passed
   NsCommBufferSize = ((EFI_MM_COMMUNICATE_HEADER *)NsCommBufferAddr)->MessageLength +
                      sizeof (EFI_MM_COMMUNICATE_HEADER);
-
-  // perform bounds check.
-  if (NsCommBufferAddr + NsCommBufferSize >=
-      mNsCommBuffer.PhysicalStart + mNsCommBuffer.PhysicalSize)
-  {
-    return EFI_ACCESS_DENIED;
-  }
 
   GuidedEventContext = NULL;
   // Now that the secure world can see the normal world buffer, allocate
@@ -135,7 +172,7 @@ PiMmStandaloneArmTfCpuDriverEntry (
                     );
 
   if (Status != EFI_SUCCESS) {
-    DEBUG ((DEBUG_INFO, "Mem alloc failed - 0x%x\n", EventId));
+    DEBUG ((DEBUG_ERROR, "Mem alloc failed - 0x%x\n", EventId));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -158,7 +195,7 @@ PiMmStandaloneArmTfCpuDriverEntry (
   mMmst->CpuSaveState          = NULL;
 
   if (mMmEntryPoint == NULL) {
-    DEBUG ((DEBUG_INFO, "Mm Entry point Not Found\n"));
+    DEBUG ((DEBUG_ERROR, "Mm Entry point Not Found\n"));
     return EFI_UNSUPPORTED;
   }
 

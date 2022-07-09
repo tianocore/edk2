@@ -4,6 +4,7 @@
 #
 #  Copyright (c) 2021, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2021, Semihalf All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -31,15 +32,15 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   SecurityPkg/SecurityPkg.dec
-  CryptoPkg/CryptoPkg.dec
 
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
-  BaseCryptLib
-  DxeServicesLib
+  PlatformPKProtectionLib
+  UefiLib
+  UefiRuntimeServicesTableLib
 
 [Guids]
   ## CONSUMES            ## Variable:L"SetupMode"
@@ -68,12 +69,5 @@
   ## PRODUCES            ## Variable:L"CustomMode"
   gEfiCustomModeEnableGuid
 
-  gEfiCertTypeRsa2048Sha256Guid  ## CONSUMES
   gEfiCertX509Guid               ## CONSUMES
   gEfiCertPkcs7Guid              ## CONSUMES
-
-  gDefaultPKFileGuid
-  gDefaultKEKFileGuid
-  gDefaultdbFileGuid
-  gDefaultdbxFileGuid
-  gDefaultdbtFileGuid

@@ -1450,6 +1450,7 @@ typedef struct {
 #define EFI_ACPI_6_3_NFIT_NVDIMM_CONTROL_REGION_STRUCTURE_TYPE            4
 #define EFI_ACPI_6_3_NFIT_NVDIMM_BLOCK_DATA_WINDOW_REGION_STRUCTURE_TYPE  5
 #define EFI_ACPI_6_3_NFIT_FLUSH_HINT_ADDRESS_STRUCTURE_TYPE               6
+#define EFI_ACPI_6_3_NFIT_PLATFORM_CAPABILITIES_STRUCTURE_TYPE            7
 
 //
 // Definition for NFIT Structure Header
@@ -1601,6 +1602,22 @@ typedef struct {
   UINT8                              Reserved_10[6];
   // UINT64                                      FlushHintAddress[NumberOfFlushHintAddresses];
 } EFI_ACPI_6_3_NFIT_FLUSH_HINT_ADDRESS_STRUCTURE;
+
+//
+// Definition for Platform Capabilities Structure
+//
+typedef struct {
+  UINT16    Type;
+  UINT16    Length;
+  UINT8     HighestValidCapability;
+  UINT8     Reserved_5[3];
+  UINT32    Capabilities;
+  UINT8     Reserved_12[4];
+} EFI_ACPI_6_3_NFIT_PLATFORM_CAPABILITIES_STRUCTURE;
+
+#define EFI_ACPI_6_3_NFIT_PLATFORM_CAPABILITY_CPU_CACHE_FLUSH_TO_NVDIMM_DURABILITY_ON_POWER_LOSS          BIT0
+#define EFI_ACPI_6_3_NFIT_PLATFORM_CAPABILITY_MEMORY_CONTROLLER_FLUSH_TO_NVDIMM_DURABILITY_ON_POWER_LOSS  BIT1
+#define EFI_ACPI_6_3_NFIT_PLATFORM_CAPABILITY_BYTE_ADDRESSABLE_PERSISTENT_MEMORY_HARDWARE_MIRRORING       BIT2
 
 ///
 /// Secure DEVices Table (SDEV)
