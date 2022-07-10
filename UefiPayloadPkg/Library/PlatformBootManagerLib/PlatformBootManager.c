@@ -243,6 +243,8 @@ PlatformBootManagerAfterConsole (
 {
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Black;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL  White;
+  EDKII_PLATFORM_LOGO_PROTOCOL   *PlatformLogo;
+  EFI_STATUS                     Status;
 
   if (mUniversalPayloadPlatformBootManagerOverrideInstance != NULL) {
     mUniversalPayloadPlatformBootManagerOverrideInstance->AfterConsole ();
@@ -251,6 +253,13 @@ PlatformBootManagerAfterConsole (
 
   Black.Blue = Black.Green = Black.Red = Black.Reserved = 0;
   White.Blue = White.Green = White.Red = White.Reserved = 0xFF;
+
+  Status = gBS->LocateProtocol (&gEdkiiPlatformLogoProtocolGuid, NULL, (VOID **)&PlatformLogo);
+
+  if (!EFI_ERROR (Status)) {
+    gST->ConOut->ClearScreen (gST->ConOut);
+    BootLogoEnableLogo ();
+  }
 
   EfiBootManagerConnectAll ();
   EfiBootManagerRefreshAllBootOption ();

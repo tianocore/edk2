@@ -39,6 +39,7 @@
   UefiRuntimeServicesTableLib
   UefiLib
   UefiBootManagerLib
+  BootLogoLib
   PcdLib
   DxeServicesLib
   MemoryAllocationLib
