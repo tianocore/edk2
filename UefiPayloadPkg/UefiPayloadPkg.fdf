@@ -245,6 +245,10 @@ INF MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
 # ACPI Support
 #
 INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+!if $(BOOTSPLASH_IMAGE)
+INF  MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
+INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+!endif
 
 #
 # UEFI network modules
