@@ -32,6 +32,7 @@
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE SMM_REQUIRE             = FALSE
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
+  DEFINE SD_BOOT_ENABLE          = FALSE
 
 !include OvmfPkg/OvmfTpmDefines.dsc.inc
 
@@ -953,6 +954,10 @@
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
       gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|8000
   }
+!endif
+!if $(SD_BOOT_ENABLE) == TRUE
+  OvmfPkg/SdBootDxe/SdBoot.inf
+  OvmfPkg/SdBootDxe/SdBootConfig.inf
 !endif
 
 !if $(SECURE_BOOT_ENABLE) == TRUE

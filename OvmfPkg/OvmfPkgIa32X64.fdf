@@ -307,6 +307,10 @@ INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
 !if $(BUILD_SHELL) == TRUE
 INF  ShellPkg/Application/Shell/Shell.inf
 !endif
+!if $(SD_BOOT_ENABLE) == TRUE
+INF  OvmfPkg/SdBootDxe/SdBoot.inf
+INF  OvmfPkg/SdBootDxe/SdBootConfig.inf
+!endif
 
 INF MdeModulePkg/Logo/LogoDxe.inf
 
