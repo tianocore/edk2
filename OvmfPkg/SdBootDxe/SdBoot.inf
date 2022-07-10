@@ -1,0 +1,23 @@
+##  @file
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = SdBoot
+  FILE_GUID                      = 2b86cc73-1c22-4179-87aa-8e31fa8c867b # gSdBootFileGuid
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+
+[Packages]
+  OvmfPkg/OvmfPkg.dec
+
+[Binaries.X64]
+   PE32|/usr/lib/systemd/boot/efi/systemd-bootx64.efi|*
+
+[Binaries.AA64]
+   PE32|/usr/lib/systemd/boot/efi/systemd-bootaa64.efi|*
+
