@@ -292,7 +292,7 @@ RelocateElf32Dynamic (
     }
   }
 
-  if (RelaAddress == MAX_UINT64) {
+  if (RelaAddress == MAX_UINT32) {
     ASSERT (RelaCount     == 0);
     ASSERT (RelaEntrySize == 0);
     ASSERT (RelaSize      == 0);
