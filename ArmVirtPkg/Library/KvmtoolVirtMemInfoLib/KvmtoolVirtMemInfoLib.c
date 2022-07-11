@@ -1,14 +1,16 @@
 /** @file
   Kvmtool virtual memory map library.
 
-  Copyright (c) 2018 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2018 - 2023, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <Base.h>
+#include <Library/ArmCcaLib.h>
 #include <Library/ArmLib.h>
+#include <Library/ArmMmuLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -95,4 +97,39 @@ ArmVirtGetMemoryMap (
   ASSERT ((Idx + 1) <= MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS);
 
   *VirtualMemoryMap = VirtualMemoryTable;
+}
+
+/**
+  Configure the MMIO regions as shared with the VMM.
+
+  Set the protection attribute for the MMIO regions as Unprotected IPA.
+
+  @param[in]    IpaWidth  IPA width of the Realm.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_UNSUPPORTED        The execution context is not in a Realm.
+**/
+EFI_STATUS
+EFIAPI
+ArmCcaConfigureMmio (
+  IN UINT64  IpaWidth
+  )
+{
+  EFI_STATUS  Status;
+
+  if (!IsRealm ()) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  // Set the protection attribute for the Peripheral memory.
+  // Peripheral space before DRAM
+  Status = ArmCcaSetMemoryProtectAttribute (
+             0,
+             PcdGet64 (PcdSystemMemoryBase),
+             IpaWidth,
+             TRUE
+             );
+  ASSERT_EFI_ERROR (Status);
+  return Status;
 }
