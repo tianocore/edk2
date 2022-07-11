@@ -1084,7 +1084,9 @@ class InfBuildData(ModuleBuildClassObject):
         else:
             for Name, Guid in self.Pcds:
                 if self.Pcds[(Name, Guid)].Type == 'FeatureFlag' or self.Pcds[(Name, Guid)].Type == 'FixedAtBuild':
-                    Pcds['%s.%s' % (Guid, Name)] = self.Pcds[(Name, Guid)].DefaultValue
+                    PcdFullName = '%s.%s' % (Guid, Name);
+                    if not PcdFullName in Pcds:
+                        Pcds[PcdFullName] = self.Pcds[(Name, Guid)].DefaultValue
             try:
                 Value = ValueExpression(Instance, Pcds)()
                 if Value == True:
