@@ -9,6 +9,7 @@
 #include <PiPei.h>
 #include <Pi/PiBootMode.h>
 
+#include <Library/ArmCcaInitPeiLib.h>
 #include <Library/PeCoffLib.h>
 #include <Library/PrePiLib.h>
 #include <Library/PrintLib.h>
@@ -34,6 +35,7 @@ PrePiMain (
   CHAR8                       Buffer[100];
   UINTN                       CharCount;
   UINTN                       StacksSize;
+  RETURN_STATUS               RetStatus;
 
   // Initialize the architecture specific bits
   ArchInitialize ();
@@ -60,6 +62,12 @@ PrePiMain (
   // Initialize MMU and Memory HOBs (Resource Descriptor HOBs)
   Status = MemoryPeim (UefiMemoryBase, FixedPcdGet32 (PcdSystemMemoryUefiRegionSize));
   ASSERT_EFI_ERROR (Status);
+
+  // Perform the Arm CCA specific initialisations.
+  RetStatus = ArmCcaInitialize ();
+  if (RETURN_ERROR (RetStatus)) {
+    CpuDeadLoop ();
+  }
 
   // Initialize the Serial Port
   SerialPortInitialize ();
