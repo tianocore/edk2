@@ -14,6 +14,7 @@
 #include <Library/MemEncryptSevLib.h>
 
 #include "SnpPageStateChange.h"
+#include "VirtualMemory.h"
 
 /**
   Pre-validate the system RAM when SEV-SNP is enabled in the guest VM.
@@ -37,4 +38,38 @@ MemEncryptSevSnpPreValidateSystemRam (
   // All the pre-validation must be completed in the PEI phase.
   //
   ASSERT (FALSE);
+}
+
+/**
+  Accept pages system RAM when SEV-SNP is enabled in the guest VM.
+
+  @param[in]  BaseAddress             Base address
+  @param[in]  NumPages                Number of pages starting from the base address
+
+**/
+VOID
+EFIAPI
+MemEncryptSnpAcceptPages (
+  IN PHYSICAL_ADDRESS           BaseAddress,
+  IN UINTN                      NumPages
+  )
+{
+  EFI_STATUS Status;
+
+  if (!MemEncryptSevSnpIsEnabled ()) {
+    return;
+  }
+  if (BaseAddress >= SIZE_4GB) {
+    Status = InternalMemEncryptSevCreateIdentityMap1G (
+               0,
+               BaseAddress,
+               EFI_PAGES_TO_SIZE (NumPages)
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      CpuDeadLoop ();
+    }
+  }
+
+  InternalSetPageState (BaseAddress, NumPages, SevSnpPagePrivate, TRUE);
 }

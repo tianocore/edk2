@@ -10,6 +10,7 @@
 
 #include <Uefi/UefiBaseType.h>
 #include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
 
 #include "SnpPageStateChange.h"
@@ -79,4 +80,21 @@ MemEncryptSevSnpPreValidateSystemRam (
   }
 
   InternalSetPageState (BaseAddress, NumPages, SevSnpPagePrivate, TRUE);
+}
+
+/**
+  Accept pages system RAM when SEV-SNP is enabled in the guest VM.
+
+  @param[in]  BaseAddress             Base address
+  @param[in]  NumPages                Number of pages starting from the base address
+
+**/
+VOID
+EFIAPI
+MemEncryptSnpAcceptPages (
+  IN PHYSICAL_ADDRESS           BaseAddress,
+  IN UINTN                      NumPages
+  )
+{
+  ASSERT(FALSE);
 }

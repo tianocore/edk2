@@ -20,6 +20,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Guid/ConfidentialComputingSevSnpBlob.h>
 #include <Library/PcdLib.h>
+#include <Protocol/MemoryAccept.h>
 
 STATIC CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION  mSnpBootDxeTable = {
   SIGNATURE_32 ('A',                                    'M', 'D', 'E'),
@@ -29,6 +30,25 @@ STATIC CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION  mSnpBootDxeTable = {
   FixedPcdGet32 (PcdOvmfSnpSecretsSize),
   (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfCpuidBase),
   FixedPcdGet32 (PcdOvmfCpuidSize),
+};
+
+EFI_HANDLE mAmdSevDxeHandle = NULL;
+
+EFI_STATUS
+EFIAPI
+AmdSevMemoryAccept (
+  IN EFI_MEMORY_ACCEPT_PROTOCOL *This,
+  IN EFI_PHYSICAL_ADDRESS StartAddress,
+  IN UINTN Size
+)
+{
+  MemEncryptSnpAcceptPages (StartAddress, Size / SIZE_4KB);
+
+  return EFI_SUCCESS;
+}
+
+EFI_MEMORY_ACCEPT_PROTOCOL      mMemoryAcceptProtocol = {
+  AmdSevMemoryAccept
 };
 
 EFI_STATUS
@@ -145,6 +165,13 @@ AmdSevDxeEntryPoint (
       ASSERT (FALSE);
       CpuDeadLoop ();
     }
+  }
+
+  Status = gBS->InstallProtocolInterface (&mAmdSevDxeHandle,
+                  &gEfiMemoryAcceptProtocolGuid, EFI_NATIVE_INTERFACE,
+                  &mMemoryAcceptProtocol);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Install EfiMemoryAcceptProtocol failed.\n"));
   }
 
   //
