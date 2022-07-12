@@ -211,6 +211,7 @@ SecStartup (
 
   IdtTableInStack.PeiService = 0;
   for (Index = 0; Index < SEC_IDT_ENTRY_COUNT; Index++) {
+    ZeroMem ((VOID *)&IdtTableInStack.IdtTable[Index], sizeof (IA32_IDT_GATE_DESCRIPTOR));
     CopyMem ((VOID *)&IdtTableInStack.IdtTable[Index], (VOID *)&mIdtEntryTemplate, sizeof (UINT64));
   }
 

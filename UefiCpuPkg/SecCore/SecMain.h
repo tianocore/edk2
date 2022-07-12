@@ -43,8 +43,8 @@ typedef struct _SEC_IDT_TABLE {
   // Note: For IA32, only the 4 bytes immediately preceding IDT is used to store
   // EFI_PEI_SERVICES**
   //
-  UINT64    PeiService;
-  UINT64    IdtTable[SEC_IDT_ENTRY_COUNT];
+  UINT64                      PeiService;
+  IA32_IDT_GATE_DESCRIPTOR    IdtTable[SEC_IDT_ENTRY_COUNT];
 } SEC_IDT_TABLE;
 
 /**
