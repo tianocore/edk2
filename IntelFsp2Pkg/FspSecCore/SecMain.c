@@ -58,13 +58,13 @@ SecStartup (
   IN UINT32          ApiIdx
   )
 {
-  EFI_SEC_PEI_HAND_OFF  SecCoreData;
-  IA32_DESCRIPTOR       IdtDescriptor;
-  SEC_IDT_TABLE         IdtTableInStack;
-  UINT32                Index;
-  FSP_GLOBAL_DATA       PeiFspData;
-  UINT64                ExceptionHandler;
-  UINTN                 IdtSize;
+  EFI_SEC_PEI_HAND_OFF      SecCoreData;
+  IA32_DESCRIPTOR           IdtDescriptor;
+  SEC_IDT_TABLE             IdtTableInStack;
+  UINT32                    Index;
+  FSP_GLOBAL_DATA           PeiFspData;
+  IA32_IDT_GATE_DESCRIPTOR  ExceptionHandler;
+  UINTN                     IdtSize;
 
   //
   // Process all libraries constructor function linked to SecCore.
@@ -119,7 +119,7 @@ SecStartup (
   if (IdtDescriptor.Base == 0) {
     ExceptionHandler = FspGetExceptionHandler (mIdtEntryTemplate);
     for (Index = 0; Index < FixedPcdGet8 (PcdFspMaxInterruptSupported); Index++) {
-      CopyMem ((VOID *)&IdtTableInStack.IdtTable[Index], (VOID *)&ExceptionHandler, sizeof (UINT64));
+      CopyMem ((VOID *)&IdtTableInStack.IdtTable[Index], (VOID *)&ExceptionHandler, sizeof (IA32_IDT_GATE_DESCRIPTOR));
     }
 
     IdtSize = sizeof (IdtTableInStack.IdtTable);
