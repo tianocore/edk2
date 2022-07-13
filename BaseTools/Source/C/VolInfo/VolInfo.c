@@ -911,140 +911,134 @@ Returns:
     printf ("       EFI_FVB2_WRITE_LOCK_STATUS\n");
   }
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_1) {
+  switch (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT) {
+    case EFI_FVB2_ALIGNMENT_1:
     printf ("       EFI_FVB2_ALIGNMENT_1\n");
-  }
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_2) {
-    printf ("        EFI_FVB2_ALIGNMENT_2\n");
-  }
+    case EFI_FVB2_ALIGNMENT_2:
+    printf ("       EFI_FVB2_ALIGNMENT_2\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_4) {
-    printf ("        EFI_FVB2_ALIGNMENT_4\n");
-  }
+    case EFI_FVB2_ALIGNMENT_4:
+    printf ("       EFI_FVB2_ALIGNMENT_4\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_8) {
-    printf ("        EFI_FVB2_ALIGNMENT_8\n");
-  }
+    case EFI_FVB2_ALIGNMENT_8:
+    printf ("       EFI_FVB2_ALIGNMENT_8\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_16) {
-    printf ("        EFI_FVB2_ALIGNMENT_16\n");
-  }
+    case EFI_FVB2_ALIGNMENT_16:
+    printf ("       EFI_FVB2_ALIGNMENT_16\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_32) {
-    printf ("        EFI_FVB2_ALIGNMENT_32\n");
-  }
+    case EFI_FVB2_ALIGNMENT_32:
+    printf ("       EFI_FVB2_ALIGNMENT_32\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_64) {
-    printf ("        EFI_FVB2_ALIGNMENT_64\n");
-  }
+    case EFI_FVB2_ALIGNMENT_64:
+    printf ("       EFI_FVB2_ALIGNMENT_64\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_128) {
-    printf ("        EFI_FVB2_ALIGNMENT_128\n");
-  }
+    case EFI_FVB2_ALIGNMENT_128:
+    printf ("       EFI_FVB2_ALIGNMENT_128\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_256) {
-    printf ("        EFI_FVB2_ALIGNMENT_256\n");
-  }
+    case EFI_FVB2_ALIGNMENT_256:
+    printf ("       EFI_FVB2_ALIGNMENT_256\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_512) {
-    printf ("        EFI_FVB2_ALIGNMENT_512\n");
-  }
+    case EFI_FVB2_ALIGNMENT_512:
+    printf ("       EFI_FVB2_ALIGNMENT_512\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_1K) {
-    printf ("        EFI_FVB2_ALIGNMENT_1K\n");
-  }
+    case EFI_FVB2_ALIGNMENT_1K:
+    printf ("       EFI_FVB2_ALIGNMENT_1K\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_2K) {
-    printf ("        EFI_FVB2_ALIGNMENT_2K\n");
-  }
+    case EFI_FVB2_ALIGNMENT_2K:
+    printf ("       EFI_FVB2_ALIGNMENT_2K\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_4K) {
-    printf ("        EFI_FVB2_ALIGNMENT_4K\n");
-  }
+    case EFI_FVB2_ALIGNMENT_4K:
+    printf ("       EFI_FVB2_ALIGNMENT_4K\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_8K) {
-    printf ("        EFI_FVB2_ALIGNMENT_8K\n");
-  }
+    case EFI_FVB2_ALIGNMENT_8K:
+    printf ("       EFI_FVB2_ALIGNMENT_8K\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_16K) {
-    printf ("        EFI_FVB2_ALIGNMENT_16K\n");
-  }
+    case EFI_FVB2_ALIGNMENT_16K:
+    printf ("       EFI_FVB2_ALIGNMENT_16K\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_32K) {
-    printf ("        EFI_FVB2_ALIGNMENT_32K\n");
-  }
+    case EFI_FVB2_ALIGNMENT_32K:
+    printf ("       EFI_FVB2_ALIGNMENT_32K\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_64K) {
-    printf ("        EFI_FVB2_ALIGNMENT_64K\n");
-  }
+    case EFI_FVB2_ALIGNMENT_64K:
+    printf ("       EFI_FVB2_ALIGNMENT_64K\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_128K) {
-    printf ("        EFI_FVB2_ALIGNMENT_128K\n");
-  }
+    case EFI_FVB2_ALIGNMENT_128K:
+    printf ("       EFI_FVB2_ALIGNMENT_128K\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_256K) {
-    printf ("        EFI_FVB2_ALIGNMENT_256K\n");
-  }
+    case EFI_FVB2_ALIGNMENT_256K:
+    printf ("       EFI_FVB2_ALIGNMENT_256K\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_512K) {
-    printf ("        EFI_FVB2_ALIGNMENT_512K\n");
-  }
+    case EFI_FVB2_ALIGNMENT_512K:
+    printf ("       EFI_FVB2_ALIGNMENT_512K\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_1M) {
-    printf ("        EFI_FVB2_ALIGNMENT_1M\n");
-  }
+    case EFI_FVB2_ALIGNMENT_1M:
+    printf ("       EFI_FVB2_ALIGNMENT_1M\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_2M) {
-    printf ("        EFI_FVB2_ALIGNMENT_2M\n");
-  }
+    case EFI_FVB2_ALIGNMENT_2M:
+    printf ("       EFI_FVB2_ALIGNMENT_2M\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_4M) {
-    printf ("        EFI_FVB2_ALIGNMENT_4M\n");
-  }
+    case EFI_FVB2_ALIGNMENT_4M:
+    printf ("       EFI_FVB2_ALIGNMENT_4M\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_8M) {
-    printf ("        EFI_FVB2_ALIGNMENT_8M\n");
-  }
+    case EFI_FVB2_ALIGNMENT_8M:
+    printf ("       EFI_FVB2_ALIGNMENT_8M\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_16M) {
-    printf ("        EFI_FVB2_ALIGNMENT_16M\n");
-  }
+    case EFI_FVB2_ALIGNMENT_16M:
+    printf ("       EFI_FVB2_ALIGNMENT_16M\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_32M) {
-    printf ("        EFI_FVB2_ALIGNMENT_32M\n");
-  }
+    case EFI_FVB2_ALIGNMENT_32M:
+    printf ("       EFI_FVB2_ALIGNMENT_32M\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_64M) {
-    printf ("        EFI_FVB2_ALIGNMENT_64M\n");
-  }
+    case EFI_FVB2_ALIGNMENT_64M:
+    printf ("       EFI_FVB2_ALIGNMENT_64M\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_128M) {
-    printf ("        EFI_FVB2_ALIGNMENT_128M\n");
-  }
+    case EFI_FVB2_ALIGNMENT_128M:
+    printf ("       EFI_FVB2_ALIGNMENT_128M\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_64M) {
-    printf ("        EFI_FVB2_ALIGNMENT_64M\n");
-  }
+    case EFI_FVB2_ALIGNMENT_256M:
+    printf ("       EFI_FVB2_ALIGNMENT_256M\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_128M) {
-    printf ("        EFI_FVB2_ALIGNMENT_128M\n");
-  }
+    case EFI_FVB2_ALIGNMENT_512M:
+    printf ("       EFI_FVB2_ALIGNMENT_512M\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_256M) {
-    printf ("        EFI_FVB2_ALIGNMENT_256M\n");
-  }
+    case EFI_FVB2_ALIGNMENT_1G:
+    printf ("       EFI_FVB2_ALIGNMENT_1G\n");
+    break;
 
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_512M) {
-    printf ("        EFI_FVB2_ALIGNMENT_512M\n");
-  }
-
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_1G) {
-    printf ("        EFI_FVB2_ALIGNMENT_1G\n");
-  }
-
-  if (VolumeHeader.Attributes & EFI_FVB2_ALIGNMENT_2G) {
-    printf ("        EFI_FVB2_ALIGNMENT_2G\n");
+    case EFI_FVB2_ALIGNMENT_2G:
+    printf ("       EFI_FVB2_ALIGNMENT_2G\n");
+    break;
   }
 
 #endif
