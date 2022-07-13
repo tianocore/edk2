@@ -17,11 +17,6 @@
 #include <Library/OemHookStatusCodeLib.h>
 #include <Library/PcdLib.h>
 
-//
-// Define the maximum extended data size that is supported in the PEI phase
-//
-#define MAX_EXTENDED_DATA_SIZE  0x200
-
 /**
   Internal worker function that reports a status code through the PEI Status Code Service or
   OEM Hook Status Code Library.
