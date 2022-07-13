@@ -47,6 +47,7 @@
 #include <Protocol/SimpleNetwork.h>
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/EapConfiguration.h>
+#include <Protocol/WifiProfileSyncProtocol.h>
 
 //
 // Produced Protocols
@@ -74,6 +75,7 @@
 #define WIFI_MGR_DXE_VERSION  0xb
 
 #define OUI_IEEE_80211I  0xAC0F00
+#define MAX_WIFI_CONNETION_ATTEMPTS 3
 
 typedef enum {
   Ieee80211PairwiseCipherSuiteUseGroupCipherSuite = 0,
