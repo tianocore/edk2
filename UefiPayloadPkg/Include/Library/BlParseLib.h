@@ -17,6 +17,7 @@
 #include <Guid/AcpiBoardInfoGuid.h>
 #include <UniversalPayload/AcpiTable.h>
 #include <UniversalPayload/SmbiosTable.h>
+#include <Guid/TcgPhysicalPresenceGuid.h>
 
 #define GET_BOOTLOADER_PARAMETER()  PcdGet64 (PcdBootloaderParameter)
 
@@ -146,6 +147,22 @@ RETURN_STATUS
 EFIAPI
 ParseMiscInfo (
   VOID
+  );
+
+
+/**
+  Find the Tcg Physical Presence store information
+
+  @param  PPIInfo       Pointer to the TCG_PHYSICAL_PRESENCE_INFO structure
+
+  @retval RETURN_SUCCESS     Successfully find the SMM store buffer information.
+  @retval RETURN_NOT_FOUND   Failed to find the SMM store buffer information .
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseTPMPPIInfo (
+  OUT TCG_PHYSICAL_PRESENCE_INFO       *PPIInfo
   );
 
 #endif

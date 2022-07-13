@@ -1,0 +1,44 @@
+## @file
+# Returns the platform specific configuration for the QEMU PPI.
+#
+#  Caution: This module requires additional review when modified.
+#  This driver will have external input - variable.
+#  This external input must be validated carefully to avoid security issue.
+#
+# Copyright (C) 2018, Red Hat, Inc.
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tcg2PhysicalPresencePlatformLibUefipayload
+  FILE_GUID                      = F5967F4F-B53F-4669-91A5-A3DA0F30AF22
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tcg2PhysicalPresencePlatformLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[Sources]
+  DxeTcg2PhysicalPresencePlatformLib.c
+
+[LibraryClasses]
+  BlParseLib
+  HobLib
+  DebugLib
+  DxeServicesTableLib
+
+[Guids]
+  gEfiTcgPhysicalPresenceInfoHobGuid

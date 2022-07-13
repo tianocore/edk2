@@ -265,6 +265,8 @@ BuildHobFromBl (
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB  *NewGfxDeviceInfo;
   UNIVERSAL_PAYLOAD_SMBIOS_TABLE    *SmBiosTableHob;
   UNIVERSAL_PAYLOAD_ACPI_TABLE      *AcpiTableHob;
+  TCG_PHYSICAL_PRESENCE_INFO        PhysicalPresenceInfo;
+  TCG_PHYSICAL_PRESENCE_INFO        *NewPhysicalPresenceInfo;
 
   //
   // First find TOLUD
@@ -303,6 +305,17 @@ BuildHobFromBl (
     ASSERT (NewGfxDeviceInfo != NULL);
     CopyMem (NewGfxDeviceInfo, &GfxDeviceInfo, sizeof (GfxDeviceInfo));
     DEBUG ((DEBUG_INFO, "Created graphics device info hob\n"));
+  }
+
+  //
+  // Create guid hob for Tcg Physical Presence Interface
+  //
+  Status = ParseTPMPPIInfo (&PhysicalPresenceInfo);
+  if (!EFI_ERROR (Status)) {
+    NewPhysicalPresenceInfo = BuildGuidHob (&gEfiTcgPhysicalPresenceInfoHobGuid, sizeof (TCG_PHYSICAL_PRESENCE_INFO));
+    ASSERT (NewPhysicalPresenceInfo != NULL);
+    CopyMem (NewPhysicalPresenceInfo, &PhysicalPresenceInfo, sizeof (TCG_PHYSICAL_PRESENCE_INFO));
+    DEBUG ((DEBUG_INFO, "Created Tcg Physical Presence info hob\n"));
   }
 
   //
