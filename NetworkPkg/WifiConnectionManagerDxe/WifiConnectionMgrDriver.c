@@ -256,6 +256,7 @@ WifiMgrDxeDriverBindingStart (
       Status = EFI_OUT_OF_RESOURCES;
       goto ERROR1;
     }
+
     WiFiProfileSyncProtocol->WifiProfileSyncGetProfile (Nic->ConnectPendingNetwork, Nic->MacAddress);
     if (Nic->ConnectPendingNetwork != NULL) {
       Status = WifiMgrConnectToNetwork (Nic, Nic->ConnectPendingNetwork);
@@ -265,7 +266,6 @@ WifiMgrDxeDriverBindingStart (
     } else {
       goto ERROR1;
     }
-
   } else {
     //
     // Record the MAC address of the incoming NIC.

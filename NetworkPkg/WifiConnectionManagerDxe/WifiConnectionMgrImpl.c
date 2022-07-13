@@ -443,11 +443,11 @@ WifiMgrConfigPassword (
   Status = UnicodeStrToAsciiStrS (Profile->Password, (CHAR8 *)AsciiPassword, ((StrLen (Profile->Password) + 1) * sizeof (CHAR8)));
   if (!EFI_ERROR (Status)) {
     Status = Supplicant->SetData (
-                            Supplicant,
-                            EfiSupplicant80211PskPassword,
-                            AsciiPassword,
-                            (StrLen (Profile->Password) + 1) * sizeof (CHAR8)
-                            );
+                           Supplicant,
+                           EfiSupplicant80211PskPassword,
+                           AsciiPassword,
+                           (StrLen (Profile->Password) + 1) * sizeof (CHAR8)
+                           );
   }
 
   ZeroMem (AsciiPassword, AsciiStrLen ((CHAR8 *)AsciiPassword) + 1);
@@ -937,7 +937,7 @@ ConnectionRetry (
   Status = gBS->LocateProtocol (
                   &gEfiWiFi2ProtocolGuid,
                   NULL,
-                  (VOID**)&Wmp
+                  (VOID **)&Wmp
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -946,7 +946,7 @@ ConnectionRetry (
   Status = gBS->LocateProtocol (
                   &gEfiSupplicantProtocolGuid,
                   NULL,
-                  (VOID**)&Supplicant
+                  (VOID **)&Supplicant
                   );
   if (EFI_ERROR (Status)) {
     Supplicant = NULL;
@@ -955,7 +955,7 @@ ConnectionRetry (
   Status = gBS->LocateProtocol (
                   &gEfiEapConfigurationProtocolGuid,
                   NULL,
-                  (VOID**)&EapConfig
+                  (VOID **)&EapConfig
                   );
   if (EFI_ERROR (Status)) {
     EapConfig = NULL;
@@ -1009,9 +1009,11 @@ ConnectionRetry (
     if (Nic->ConnectPendingNetwork->Network.AKMSuite != NULL) {
       FreePool (Nic->ConnectPendingNetwork->Network.AKMSuite);
     }
+
     if (Nic->ConnectPendingNetwork->Network.CipherSuite != NULL) {
       FreePool (Nic->ConnectPendingNetwork->Network.CipherSuite);
     }
+
     FreePool (Nic->ConnectPendingNetwork);
   }
 
@@ -1034,6 +1036,7 @@ ERROR:
 
   return Status;
 }
+
 /**
   The callback function for connect operation.
 
