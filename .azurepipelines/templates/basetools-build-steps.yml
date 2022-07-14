@@ -11,7 +11,7 @@ parameters:
 
 steps:
 - ${{ if contains(parameters.tool_chain_tag, 'GCC') }}:
-  - bash: sudo apt-get update
+  - bash: sudo add-apt-repository ppa:jacob/virtualisation && sudo apt-get update
     displayName: Update apt
     condition: and(gt(variables.pkg_count, 0), succeeded())
 
