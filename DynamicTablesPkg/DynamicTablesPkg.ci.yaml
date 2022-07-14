@@ -108,6 +108,7 @@
            "lgreater",
            "lless",
            "MPIDR",
+           "PASID",
            "PERIPHBASE",
            "phandle",
            "pytool",
