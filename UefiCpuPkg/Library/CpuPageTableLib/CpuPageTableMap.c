@@ -360,7 +360,12 @@ PageTableLibMapInLevel (
   PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&ParentPagingEntry->Pnle);
   while (Offset < Length && Index < 512) {
     SubLength = MIN (Length - Offset, RegionStart + RegionLength - (LinearAddress + Offset));
-    if ((Level <= MaxLeafLevel) && (((LinearAddress + Offset) & RegionMask) == 0) && (SubLength == RegionLength)) {
+    if ((Level <= MaxLeafLevel) &&
+        (((LinearAddress + Offset) & RegionMask) == 0) &&
+        (((IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) & RegionMask) == 0) &&
+        (SubLength == RegionLength)
+        )
+    {
       //
       // Create one entry mapping the entire region (1G, 2M or 4K).
       //
