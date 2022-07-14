@@ -1,7 +1,7 @@
 ## @file
 #  UefiCpuPkg Package
 #
-#  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2022, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -62,6 +62,7 @@
   VmgExitLib|UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
   MicrocodeLib|UefiCpuPkg/Library/MicrocodeLib/MicrocodeLib.inf
   SmmCpuRendezvousLib|UefiCpuPkg/Library/SmmCpuRendezvousLib/SmmCpuRendezvousLib.inf
+  CpuPageTableLib|UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
 
 [LibraryClasses.common.SEC]
   PlatformSecLib|UefiCpuPkg/Library/PlatformSecLibNull/PlatformSecLibNull.inf
@@ -175,6 +176,7 @@
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
   UefiCpuPkg/ResetVector/Vtf0/Bin/ResetVector.inf
   UefiCpuPkg/Library/SmmCpuRendezvousLib/SmmCpuRendezvousLib.inf
+  UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES

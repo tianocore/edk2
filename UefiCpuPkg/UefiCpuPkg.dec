@@ -62,6 +62,9 @@
   ##  @libraryclass  Provides function for loading microcode.
   MicrocodeLib|Include/Library/MicrocodeLib.h
 
+  ##  @libraryclass  Provides function for manipulating x86 paging structures.
+  CpuPageTableLib|Include/Library/CpuPageTableLib.h
+
 [Guids]
   gUefiCpuPkgTokenSpaceGuid      = { 0xac05bf33, 0x995a, 0x4ed4, { 0xaa, 0xb8, 0xef, 0x7a, 0xe8, 0xf, 0x5c, 0xb0 }}
   gMsegSmramGuid                 = { 0x5802bce4, 0xeeee, 0x4e33, { 0xa1, 0x30, 0xeb, 0xad, 0x27, 0xf0, 0xe4, 0x39 }}
