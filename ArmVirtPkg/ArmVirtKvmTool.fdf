@@ -211,6 +211,16 @@ READ_LOCK_STATUS   = TRUE
   !include DynamicTablesPkg/DynamicTables.fdf.inc
 
   INF ArmVirtPkg/KvmtoolCfgMgrDxe/ConfigurationManagerDxe.inf
+
+  #
+  # Realm Aperture Management
+  #
+  INF ArmVirtPkg/RealmApertureManagementProtocolDxe/RealmApertureManagementProtocolDxe.inf
+
+  #
+  # IoMMU support for Arm CCA
+  #
+  INF ArmVirtPkg/ArmCcaIoMmuDxe/ArmCcaIoMmuDxe.inf
 !endif
 
   #
