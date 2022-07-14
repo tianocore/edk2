@@ -43,7 +43,7 @@
   Hash/CryptCShake256.c
   Hash/CryptParallelHash.c
   Hmac/CryptHmac.c
-  Kdf/CryptHkdfNull.c
+  Kdf/CryptHkdf.c
   Cipher/CryptAes.c
   Cipher/CryptAeadAesGcmNull.c
   Pk/CryptRsaBasic.c
