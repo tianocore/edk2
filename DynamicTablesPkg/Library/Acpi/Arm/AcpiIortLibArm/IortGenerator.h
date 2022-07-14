@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2018 - 2022, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -25,6 +25,9 @@ typedef struct IortNodeIndexer {
   VOID               *Object;
   /// Node offset from the start of the IORT table
   UINT32             Offset;
+
+  /// Unique identifier for the Node
+  UINT32             Identifier;
 } IORT_NODE_INDEXER;
 
 typedef struct AcpiIortGenerator {
