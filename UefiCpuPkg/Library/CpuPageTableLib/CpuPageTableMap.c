@@ -308,7 +308,7 @@ PageTableLibMapInLevel (
     //
     PleBAttribute.Uint64 = PageTableLibGetPleBMapAttribute (&ParentPagingEntry->PleB, &NopAttribute);
     if ((IA32_MAP_ATTRIBUTE_ATTRIBUTES (&PleBAttribute) & IA32_MAP_ATTRIBUTE_ATTRIBUTES (Mask))
-        == IA32_MAP_ATTRIBUTE_ATTRIBUTES (Attribute))
+        == (IA32_MAP_ATTRIBUTE_ATTRIBUTES (Attribute) & IA32_MAP_ATTRIBUTE_ATTRIBUTES (Mask)))
     {
       //
       // This function is called when the memory length is less than the region length of the parent level.
