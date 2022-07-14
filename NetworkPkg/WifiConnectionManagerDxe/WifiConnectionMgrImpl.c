@@ -991,7 +991,7 @@ ConnectionRetry (
     Nic->ConnectPendingNetwork = (WIFI_MGR_NETWORK_PROFILE *)AllocateZeroPool (sizeof (WIFI_MGR_NETWORK_PROFILE));
     if (Nic->ConnectPendingNetwork == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
-      DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to allocate memory for ConnectPendingNetwork"));
+      DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to allocate memory for ConnectPendingNetwork\n"));
       goto ERROR;
     }
 
@@ -1002,10 +1002,10 @@ ConnectionRetry (
         return Status;
       }
     } else {
-      DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to get WiFi profile with status %r", Status));
+      DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to get WiFi profile with status %r\n", Status));
     }
   } else {
-    DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to get Supported suites with status %r", Status));
+    DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to get Supported suites with status %r\n", Status));
   }
 
   if (Nic->ConnectPendingNetwork != NULL) {
