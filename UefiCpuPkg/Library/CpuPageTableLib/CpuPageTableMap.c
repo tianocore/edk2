@@ -467,6 +467,13 @@ PageTableMap (
     return RETURN_INVALID_PARAMETER;
   }
 
+  if ((LinearAddress % SIZE_4KB != 0) || (Length % SIZE_4KB != 0)) {
+    //
+    // LinearAddress and Length should be multiple of 4K.
+    //
+    return RETURN_INVALID_PARAMETER;
+  }
+
   if ((*BufferSize != 0) && (Buffer == NULL)) {
     return RETURN_INVALID_PARAMETER;
   }
