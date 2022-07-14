@@ -401,9 +401,18 @@
   #
   SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
-!if $(ARCH) == AARCH64
+[Components.AARCH64]
   #
   # ACPI Support
   #
   ArmVirtPkg/KvmtoolCfgMgrDxe/ConfigurationManagerDxe.inf
-!endif
+
+  #
+  # Realm Aperture Management
+  #
+  ArmVirtPkg/RealmApertureManagementProtocolDxe/RealmApertureManagementProtocolDxe.inf
+
+  #
+  # IoMMU support for Arm CCA
+  #
+  ArmVirtPkg/ArmCcaIoMmuDxe/ArmCcaIoMmuDxe.inf
