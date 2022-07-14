@@ -195,6 +195,16 @@ READ_LOCK_STATUS   = TRUE
   INF ArmVirtPkg/KvmtoolCfgMgrDxe/ConfigurationManagerDxe.inf
 
   #
+  # Realm Aperture Management
+  #
+  INF ArmVirtPkg/RealmApertureManagementProtocolDxe/RealmApertureManagementProtocolDxe.inf
+
+  #
+  # IoMMU support for Arm CCA
+  #
+  INF ArmVirtPkg/ArmCcaIoMmuDxe/ArmCcaIoMmuDxe.inf
+
+  #
   # TianoCore logo (splash screen)
   #
   INF MdeModulePkg/Logo/LogoDxe.inf
