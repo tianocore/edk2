@@ -2,7 +2,7 @@
 #  Cryptographic Library Package for UEFI Security Implementation.
 #  PEIM, DXE Driver, and SMM Driver with all crypto services enabled.
 #
-#  Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #  Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -239,6 +239,10 @@
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Rsa.Services.Free               | TRUE
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Rsa.Services.SetKey             | TRUE
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Pkcs.Services.Pkcs5HashPassword | TRUE
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Aes.Services.GetContextSize     | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Aes.Services.Init               | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Aes.Services.CbcEncrypt         | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Aes.Services.CbcDecrypt         | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
 !endif
 
 #
@@ -278,6 +282,7 @@
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Aes.Services.CbcDecrypt                  | TRUE
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.AeadAesGcm.Services.Encrypt              | TRUE
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.AeadAesGcm.Services.Decrypt              | TRUE
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Hkdf.Family                              | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
 !endif
 
 ###################################################################################################

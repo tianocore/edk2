@@ -207,15 +207,15 @@ also configured.
 | Sha512                          |     N      |     N     |      C      |      C      |      C       |      C      |        C        |
 | X509                            |     N      |     N     |             |             |      C       |      C      |        C        |
 | Tdes                            |     Y      |     Y     |             |             |              |             |                 |
-| Aes.GetContextSize              |     N      |     N     |             |             |      C       |      C      |        C        |
-| Aes.Init                        |     N      |     N     |             |             |      C       |      C      |        C        |
+| Aes.GetContextSize              |     N      |     N     |             |      C      |      C       |      C      |        C        |
+| Aes.Init                        |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Aes.EcbEncrypt                  |     Y      |     Y     |             |             |              |             |                 |
 | Aes.EcbDecrypt                  |     Y      |     Y     |             |             |              |             |                 |
-| Aes.CbcEncrypt                  |     N      |     N     |             |             |      C       |      C      |        C        |
-| Aes.CbcDecrypt                  |     N      |     N     |             |             |      C       |      C      |        C        |
+| Aes.CbcEncrypt                  |     N      |     N     |             |      C      |      C       |      C      |        C        |
+| Aes.CbcDecrypt                  |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Arc4                            |     Y      |     Y     |             |             |              |             |                 |
 | Sm3                             |     N      |     N     |             |      C      |      C       |      C      |        C        |
-| Hkdf                            |     N      |     N     |             |      C      |      C       |             |        C        |
+| Hkdf                            |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Tls                             |     N      |     N     |             |             |    C-Tls     |             |                 |
 | TlsSet                          |     N      |     N     |             |             |    C-Tls     |             |                 |
 | TlsGet                          |     N      |     N     |             |             |    C-Tls     |             |                 |
