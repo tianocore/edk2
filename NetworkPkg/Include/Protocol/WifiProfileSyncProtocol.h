@@ -78,4 +78,4 @@ typedef struct {
 **/
 #define  EFI_WIFI_PROFILE_SYNC_PROTOCOL_REVISION  1
 
-#endif // WIFI_PROFILE_SYNC_PROTOCOL_H_
+#endif

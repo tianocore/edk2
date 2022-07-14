@@ -915,7 +915,10 @@ WifiMgrPrepareConnection (
 }
 
 /**
-  Will reset NiC data, get profile from ProfileSync driver, and trigger another connection attempt.
+  Will reset NiC data, get profile from ProfileSync driver, and trigger
+  another connection attempt.
+
+  @param[in]  Profile             The target network profile to connect.
 
   @retval EFI_SUCCESS             The operation is completed.
   @retval other                   Operation failure.
