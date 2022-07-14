@@ -862,6 +862,122 @@ EfiLocateHiiProtocol (
   return Status;
 }
 
+VOID
+CheckForGraphicsModeSwitch (
+  IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This
+  )
+{
+  GRAPHICS_CONSOLE_DEV        *Private;
+  UINT32                      GopModeNumber;
+  UINT32                      HorizontalResolution;
+  UINT32                      VerticalResolution;
+  UINT32                      ColorDepth;
+  UINT32                      RefreshRate;
+  GRAPHICS_CONSOLE_MODE_DATA  *NewModeData;
+  UINTN                       MaxMode;
+  EFI_STATUS                  Status;
+  INT32                       PreferMode;
+  INT32                       Index;
+  UINTN                       Column;
+  UINTN                       Row;
+  UINTN                       DefaultColumn;
+  UINTN                       DefaultRow;
+
+  Private = GRAPHICS_CONSOLE_CON_OUT_DEV_FROM_THIS (This);
+
+  GopModeNumber = 0;
+  if (Private->GraphicsOutput != NULL) {
+    GopModeNumber        = Private->GraphicsOutput->Mode->Mode;
+    HorizontalResolution = Private->GraphicsOutput->Mode->Info->HorizontalResolution;
+    VerticalResolution   = Private->GraphicsOutput->Mode->Info->VerticalResolution;
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
+    Status = Private->UgaDraw->GetMode (
+                                 Private->UgaDraw,
+                                 &HorizontalResolution,
+                                 &VerticalResolution,
+                                 &ColorDepth,
+                                 &RefreshRate
+                                 );
+    if (EFI_ERROR (Status)) {
+      //
+      // Can not determine if a graphics mode change occurred
+      //
+      return;
+    }
+  }
+
+  if ((HorizontalResolution == Private->ModeData->GopWidth) &&
+      (VerticalResolution   == Private->ModeData->GopHeight))
+  {
+    //
+    // No graphics mode change detected
+    //
+    return;
+  }
+
+  //
+  // Initialize the mode which GraphicsConsole supports.
+  //
+  Status = InitializeGraphicsConsoleTextMode (
+             HorizontalResolution,
+             VerticalResolution,
+             GopModeNumber,
+             &MaxMode,
+             &NewModeData
+             );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  //
+  // Update mode data
+  //
+  if (Private->ModeData != NULL) {
+    FreePool (Private->ModeData);
+  }
+
+  Private->ModeData = NewModeData;
+
+  //
+  // Update the maximum number of modes
+  //
+  Private->SimpleTextOutputMode.MaxMode = (INT32)MaxMode;
+
+  //
+  // Initialize the Mode of graphics console devices
+  //
+  PreferMode    = -1;
+  DefaultColumn = PcdGet32 (PcdConOutColumn);
+  DefaultRow    = PcdGet32 (PcdConOutRow);
+  Column        = 0;
+  Row           = 0;
+  for (Index = 0; Index < (INT32)MaxMode; Index++) {
+    if ((DefaultColumn != 0) && (DefaultRow != 0)) {
+      if ((Private->ModeData[Index].Columns == DefaultColumn) &&
+          (Private->ModeData[Index].Rows == DefaultRow))
+      {
+        PreferMode = Index;
+        break;
+      }
+    } else {
+      if ((Private->ModeData[Index].Columns > Column) &&
+          (Private->ModeData[Index].Rows > Row))
+      {
+        Column     = Private->ModeData[Index].Columns;
+        Row        = Private->ModeData[Index].Rows;
+        PreferMode = Index;
+      }
+    }
+  }
+
+  //
+  // Set the preferred text mode.
+  //
+  Status = This->SetMode (This, (INT32)PreferMode);
+
+  DEBUG ((DEBUG_INFO, "Graphics Console Restarted, Mode: %d\n", PreferMode));
+}
+
 //
 // Body of the STO functions
 //
@@ -892,6 +1008,8 @@ GraphicsConsoleConOutReset (
   )
 {
   EFI_STATUS  Status;
+
+  CheckForGraphicsModeSwitch (This);
 
   Status = This->SetMode (This, 0);
   if (EFI_ERROR (Status)) {
@@ -950,6 +1068,8 @@ GraphicsConsoleConOutOutputString (
   UINTN                          Index;
   INT32                          OriginAttribute;
   EFI_TPL                        OldTpl;
+
+  CheckForGraphicsModeSwitch (This);
 
   if (This->Mode->Mode == -1) {
     //
@@ -1272,6 +1392,8 @@ GraphicsConsoleConOutQueryMode (
   EFI_STATUS            Status;
   EFI_TPL               OldTpl;
 
+  CheckForGraphicsModeSwitch (This);
+
   if (ModeNumber >= (UINTN)This->Mode->MaxMode) {
     return EFI_UNSUPPORTED;
   }
@@ -1327,6 +1449,8 @@ GraphicsConsoleConOutSetMode (
   UINT32                         ColorDepth;
   UINT32                         RefreshRate;
   EFI_TPL                        OldTpl;
+
+  CheckForGraphicsModeSwitch (This);
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
@@ -1514,6 +1638,8 @@ GraphicsConsoleConOutSetAttribute (
 {
   EFI_TPL  OldTpl;
 
+  CheckForGraphicsModeSwitch (This);
+
   if ((Attribute | 0x7F) != 0x7F) {
     return EFI_UNSUPPORTED;
   }
@@ -1562,6 +1688,8 @@ GraphicsConsoleConOutClearScreen (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Foreground;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Background;
   EFI_TPL                        OldTpl;
+
+  CheckForGraphicsModeSwitch (This);
 
   if (This->Mode->Mode == -1) {
     //
@@ -1650,6 +1778,8 @@ GraphicsConsoleConOutSetCursorPosition (
   EFI_STATUS                  Status;
   EFI_TPL                     OldTpl;
 
+  CheckForGraphicsModeSwitch (This);
+
   if (This->Mode->Mode == -1) {
     //
     // If current mode is not valid, return error.
@@ -1709,6 +1839,8 @@ GraphicsConsoleConOutEnableCursor (
   )
 {
   EFI_TPL  OldTpl;
+
+  CheckForGraphicsModeSwitch (This);
 
   if (This->Mode->Mode == -1) {
     //
