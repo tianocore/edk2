@@ -1,0 +1,21 @@
+/** @file
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#langdef en-US  "English"
+
+#string STR_FORM_SET_TITLE             #language en-US "systemd boot loader"
+#string STR_FORM_SET_TITLE_HELP        #language en-US "Press <Enter> to configure systemd boot loader."
+
+#string STR_MAIN_FORM_TITLE            #language en-US "systemd boot loader"
+#string STR_NULL_STRING                #language en-US ""
+
+#string STR_ADD_ENTRY_PROMPT           #language en-US "boot entry"
+#string STR_ADD_ENTRY_HELP             #language en-US "Add boot entry for systemd boot loader."
+
+#string STR_ADD_ENTRY_NO               #language en-US "no"
+#string STR_ADD_ENTRY_YES              #language en-US "yes"
+
+#string STR_RESET_STRING               #language en-US "Reset need for changes to take effect."

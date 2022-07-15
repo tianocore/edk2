@@ -1,0 +1,39 @@
+/** @file
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#include <Uefi/UefiMultiPhase.h>
+#include <Guid/HiiPlatformSetupFormset.h>
+
+#include "SdBootConfig.h"
+
+formset
+  guid      = SD_BOOT_CONFIG_FORMSET_GUID,
+  title     = STRING_TOKEN (STR_FORM_SET_TITLE),
+  help      = STRING_TOKEN (STR_FORM_SET_TITLE_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+efivarstore SD_BOOT_CONFIG_DATA,
+  attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+  name      = SdBootConfig,
+  guid      = SD_BOOT_CONFIG_FORMSET_GUID;
+
+form  formid = 0x1000,
+      title  = STRING_TOKEN (STR_MAIN_FORM_TITLE);
+
+oneof  varid = SdBootConfig.AddEntry,
+       prompt = STRING_TOKEN (STR_ADD_ENTRY_PROMPT),
+       help = STRING_TOKEN (STR_ADD_ENTRY_HELP),
+       flags = NUMERIC_SIZE_1 | INTERACTIVE | RESET_REQUIRED,
+option text = STRING_TOKEN (STR_ADD_ENTRY_NO), value = ADD_ENTRY_NO, flags = DEFAULT;
+option  text = STRING_TOKEN (STR_ADD_ENTRY_YES), value = ADD_ENTRY_YES, flags = 0;
+endoneof;
+
+subtitle  text = STRING_TOKEN (STR_NULL_STRING);
+subtitle  text = STRING_TOKEN (STR_RESET_STRING);
+
+endform;
+
+endformset;
