@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/HiiPackageList.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 
 typedef struct {
   EFI_IMAGE_ID                             ImageId;
@@ -51,12 +52,14 @@ GetImage (
   IN     EDKII_PLATFORM_LOGO_PROTOCOL        *This,
   IN OUT UINT32                              *Instance,
   OUT EFI_IMAGE_INPUT                        *Image,
+  EFI_GRAPHICS_OUTPUT_PROTOCOL               *GraphicsOutput,
   OUT EDKII_PLATFORM_LOGO_DISPLAY_ATTRIBUTE  *Attribute,
   OUT INTN                                   *OffsetX,
   OUT INTN                                   *OffsetY
   )
 {
-  UINT32  Current;
+  UINT32      Current;
+  EFI_STATUS  Status;
 
   if ((Instance == NULL) || (Image == NULL) ||
       (Attribute == NULL) || (OffsetX == NULL) || (OffsetY == NULL))
@@ -67,6 +70,29 @@ GetImage (
   Current = *Instance;
   if (Current >= ARRAY_SIZE (mLogos)) {
     return EFI_NOT_FOUND;
+  }
+
+  if (PcdGetBool (PcdFollowMicrosoftRecommended)) {
+    //
+    // Get current video resolution and text mode
+    //
+    Status = gBS->HandleProtocol (
+                    gST->ConsoleOutHandle,
+                    &gEfiGraphicsOutputProtocolGuid,
+                    (VOID **)&GraphicsOutput
+                    );
+    if (!EFI_ERROR (Status)) {
+      //
+      // Center of LOGO is in the vertical position 38.2% when PcdBootLogoOnlyEnable is TRUE
+      // Y = (VerticalResolution - LogoHeight) / 2
+      // Y' = VerticalResolution * 0.382 - LogoHeight * 0.5
+      // OffsetY + Y = Y'
+      // OffsetY = Y' - Y = -0.118 * VerticalResolution
+      //
+      *Attribute = EdkiiPlatformLogoDisplayAttributeCenter;
+      *OffsetX   = 0;
+      *OffsetY   = -118 * (INTN)GraphicsOutput->Mode->Info->VerticalResolution / 1000;
+    }
   }
 
   (*Instance)++;
