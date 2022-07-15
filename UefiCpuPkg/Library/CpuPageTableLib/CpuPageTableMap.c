@@ -183,18 +183,32 @@ PageTableLibSetPle (
 
   @param[in] Pnle      Pointer to IA32_PML5, IA32_PML4, IA32_PDPTE or IA32_PDE. All share the same structure definition.
   @param[in] Attribute The attribute of the page directory referenced by the non-leaf.
+  @param[in] Mask      The mask of the page directory referenced by the non-leaf.
 **/
 VOID
 PageTableLibSetPnle (
   IN IA32_PAGE_NON_LEAF_ENTRY  *Pnle,
-  IN IA32_MAP_ATTRIBUTE        *Attribute
+  IN IA32_MAP_ATTRIBUTE        *Attribute,
+  IN IA32_MAP_ATTRIBUTE        *Mask
   )
 {
-  Pnle->Bits.Present        = Attribute->Bits.Present;
-  Pnle->Bits.ReadWrite      = Attribute->Bits.ReadWrite;
-  Pnle->Bits.UserSupervisor = Attribute->Bits.UserSupervisor;
-  Pnle->Bits.Nx             = Attribute->Bits.Nx;
-  Pnle->Bits.Accessed       = 0;
+  if (Mask->Bits.Present) {
+    Pnle->Bits.Present = Attribute->Bits.Present;
+  }
+
+  if (Mask->Bits.ReadWrite) {
+    Pnle->Bits.ReadWrite = Attribute->Bits.ReadWrite;
+  }
+
+  if (Mask->Bits.UserSupervisor) {
+    Pnle->Bits.UserSupervisor = Attribute->Bits.UserSupervisor;
+  }
+
+  if (Mask->Bits.Nx) {
+    Pnle->Bits.Nx = Attribute->Bits.Nx;
+  }
+
+  Pnle->Bits.Accessed = 0;
 
   //
   // Set the attributes (WT, CD, A) to 0.
@@ -210,6 +224,7 @@ PageTableLibSetPnle (
   Update page table to map [LinearAddress, LinearAddress + Length) with specified attribute in the specified level.
 
   @param[in]      ParentPagingEntry The pointer to the page table entry to update.
+  @param[in]      ParentAttribute   The accumulated attribute of all parents' attribute.
   @param[in]      Modify            FALSE to indicate Buffer is not used and BufferSize is increased by the required buffer size.
   @param[in]      Buffer            The free buffer to be used for page table creation/updating.
                                     When Modify is TRUE, it's used from the end.
@@ -232,6 +247,7 @@ PageTableLibSetPnle (
 RETURN_STATUS
 PageTableLibMapInLevel (
   IN     IA32_PAGING_ENTRY   *ParentPagingEntry,
+  IN     IA32_MAP_ATTRIBUTE  *ParentAttribute,
   IN     BOOLEAN             Modify,
   IN     VOID                *Buffer,
   IN OUT INTN                *BufferSize,
@@ -259,6 +275,8 @@ PageTableLibMapInLevel (
   IA32_MAP_ATTRIBUTE  NopAttribute;
   BOOLEAN             CreateNew;
   IA32_PAGING_ENTRY   OneOfPagingEntry;
+  IA32_MAP_ATTRIBUTE  ChildAttribute;
+  IA32_MAP_ATTRIBUTE  ChildMask;
 
   ASSERT (Level != 0);
   ASSERT ((Attribute != NULL) && (Mask != NULL));
@@ -291,7 +309,7 @@ PageTableLibMapInLevel (
       //
       // Set default attribute bits for PML5E/PML4E/PDPTE/PDE.
       //
-      PageTableLibSetPnle (&ParentPagingEntry->Pnle, &NopAttribute);
+      PageTableLibSetPnle (&ParentPagingEntry->Pnle, &NopAttribute, &AllOneMask);
     } else {
       //
       // Just make sure Present and MustBeZero (PageSize) bits are accurate.
@@ -307,7 +325,7 @@ PageTableLibMapInLevel (
     // Use NOP attributes as the attribute of grand-parents because CPU will consider
     // the actual attributes of grand-parents when determing the memory type.
     //
-    PleBAttribute.Uint64 = PageTableLibGetPleBMapAttribute (&ParentPagingEntry->PleB, &NopAttribute);
+    PleBAttribute.Uint64 = PageTableLibGetPleBMapAttribute (&ParentPagingEntry->PleB, ParentAttribute);
     if ((IA32_MAP_ATTRIBUTE_ATTRIBUTES (&PleBAttribute) & IA32_MAP_ATTRIBUTE_ATTRIBUTES (Mask))
         == (IA32_MAP_ATTRIBUTE_ATTRIBUTES (Attribute) & IA32_MAP_ATTRIBUTE_ATTRIBUTES (Mask)))
     {
@@ -334,13 +352,84 @@ PageTableLibMapInLevel (
       // Note: Should NOT inherit the attributes from the original entry because a zero RW bit
       //       will make the entire region read-only even the child entries set the RW bit.
       //
-      PageTableLibSetPnle (&ParentPagingEntry->Pnle, &NopAttribute);
+      PageTableLibSetPnle (&ParentPagingEntry->Pnle, &NopAttribute, &AllOneMask);
 
       RegionLength = REGION_LENGTH (Level);
       PagingEntry  = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&ParentPagingEntry->Pnle);
       for (SubOffset = 0, Index = 0; Index < 512; Index++) {
         PagingEntry[Index].Uint64 = OneOfPagingEntry.Uint64 + SubOffset;
         SubOffset                += RegionLength;
+      }
+    }
+  } else {
+    //
+    // It's a non-leaf entry
+    //
+    ChildAttribute.Uint64 = 0;
+    ChildMask.Uint64      = 0;
+
+    //
+    // If the inheritable attributes in the parent entry conflicts with the requested attributes,
+    //   let the child entries take the parent attributes and
+    //   loosen the attribute in the parent entry
+    // E.g.: when PDPTE[0].ReadWrite = 0 but caller wants to map [0-2MB] as ReadWrite = 1 (PDE[0].ReadWrite = 1)
+    //            we need to change PDPTE[0].ReadWrite = 1 and let all PDE[0-255].ReadWrite = 0 in this step.
+    //       when PDPTE[0].Nx = 1 but caller wants to map [0-2MB] as Nx = 0 (PDT[0].Nx = 0)
+    //            we need to change PDPTE[0].Nx = 0 and let all PDE[0-255].Nx = 1 in this step.
+    if ((ParentPagingEntry->Pnle.Bits.Present == 0) && (Mask->Bits.Present == 1) && (Attribute->Bits.Present == 1)) {
+      if (Modify) {
+        ParentPagingEntry->Pnle.Bits.Present = 1;
+      }
+
+      ChildAttribute.Bits.Present = 0;
+      ChildMask.Bits.Present      = 1;
+    }
+
+    if ((ParentPagingEntry->Pnle.Bits.ReadWrite == 0) && (Mask->Bits.ReadWrite == 1) && (Attribute->Bits.ReadWrite == 1)) {
+      if (Modify) {
+        ParentPagingEntry->Pnle.Bits.ReadWrite = 1;
+      }
+
+      ChildAttribute.Bits.ReadWrite = 0;
+      ChildMask.Bits.ReadWrite      = 1;
+    }
+
+    if ((ParentPagingEntry->Pnle.Bits.UserSupervisor == 0) && (Mask->Bits.UserSupervisor == 1) && (Attribute->Bits.UserSupervisor == 1)) {
+      if (Modify) {
+        ParentPagingEntry->Pnle.Bits.UserSupervisor = 1;
+      }
+
+      ChildAttribute.Bits.UserSupervisor = 0;
+      ChildMask.Bits.UserSupervisor      = 1;
+    }
+
+    if ((ParentPagingEntry->Pnle.Bits.Nx == 1) && (Mask->Bits.Nx == 1) && (Attribute->Bits.Nx == 0)) {
+      if (Modify) {
+        ParentPagingEntry->Pnle.Bits.Nx = 0;
+      }
+
+      ChildAttribute.Bits.Nx = 1;
+      ChildMask.Bits.Nx      = 1;
+    }
+
+    if (ChildMask.Uint64 != 0) {
+      if (Modify) {
+        //
+        // Update child entries to use restrictive attribute inherited from parent.
+        // e.g.: Set PDE[0-255].ReadWrite = 0
+        //
+        PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&ParentPagingEntry->Pnle);
+        for (Index = 0; Index < 512; Index++) {
+          if (PagingEntry[Index].Pce.Present == 0) {
+            continue;
+          }
+
+          if (IsPle (&PagingEntry[Index], Level)) {
+            PageTableLibSetPle (Level - 1, &PagingEntry[Index], 0, &ChildAttribute, &ChildMask);
+          } else {
+            PageTableLibSetPnle (&PagingEntry[Index].Pnle, &ChildAttribute, &ChildMask);
+          }
+        }
       }
     }
   }
@@ -354,6 +443,8 @@ PageTableLibMapInLevel (
   RegionLength = LShiftU64 (1, BitStart);
   RegionMask   = RegionLength - 1;
   RegionStart  = (LinearAddress + Offset) & ~RegionMask;
+
+  ParentAttribute->Uint64 = PageTableLibGetPnleMapAttribute (&ParentPagingEntry->Pnle, ParentAttribute);
 
   //
   // Apply the attribute.
@@ -386,6 +477,7 @@ PageTableLibMapInLevel (
       //
       Status = PageTableLibMapInLevel (
                  CurrentPagingEntry,
+                 ParentAttribute,
                  Modify,
                  Buffer,
                  BufferSize,
@@ -449,12 +541,13 @@ PageTableMap (
   IN     IA32_MAP_ATTRIBUTE  *Mask
   )
 {
-  RETURN_STATUS      Status;
-  IA32_PAGING_ENTRY  TopPagingEntry;
-  INTN               RequiredSize;
-  UINT64             MaxLinearAddress;
-  UINTN              MaxLevel;
-  UINTN              MaxLeafLevel;
+  RETURN_STATUS       Status;
+  IA32_PAGING_ENTRY   TopPagingEntry;
+  INTN                RequiredSize;
+  UINT64              MaxLinearAddress;
+  UINTN               MaxLevel;
+  UINTN               MaxLeafLevel;
+  IA32_MAP_ATTRIBUTE  ParentAttribute;
 
   if ((PagingMode == Paging32bit) || (PagingMode == PagingPae) || (PagingMode >= PagingModeMax)) {
     //
@@ -499,8 +592,18 @@ PageTableMap (
 
   TopPagingEntry.Uintn = *PageTable;
   if (TopPagingEntry.Uintn != 0) {
-    TopPagingEntry.Pce.Present = 1;
+    TopPagingEntry.Pce.Present        = 1;
+    TopPagingEntry.Pce.ReadWrite      = 1;
+    TopPagingEntry.Pce.UserSupervisor = 1;
+    TopPagingEntry.Pce.Nx             = 0;
   }
+
+  ParentAttribute.Uint64                    = 0;
+  ParentAttribute.Bits.PageTableBaseAddress = 1;
+  ParentAttribute.Bits.Present              = 1;
+  ParentAttribute.Bits.ReadWrite            = 1;
+  ParentAttribute.Bits.UserSupervisor       = 1;
+  ParentAttribute.Bits.Nx                   = 0;
 
   //
   // Query the required buffer size without modifying the page table.
@@ -508,6 +611,7 @@ PageTableMap (
   RequiredSize = 0;
   Status       = PageTableLibMapInLevel (
                    &TopPagingEntry,
+                   &ParentAttribute,
                    FALSE,
                    NULL,
                    &RequiredSize,
@@ -537,8 +641,16 @@ PageTableMap (
   //
   // Update the page table when the supplied buffer is sufficient.
   //
+  ParentAttribute.Uint64                    = 0;
+  ParentAttribute.Bits.PageTableBaseAddress = 1;
+  ParentAttribute.Bits.Present              = 1;
+  ParentAttribute.Bits.ReadWrite            = 1;
+  ParentAttribute.Bits.UserSupervisor       = 1;
+  ParentAttribute.Bits.Nx                   = 0;
+
   Status = PageTableLibMapInLevel (
              &TopPagingEntry,
+             &ParentAttribute,
              TRUE,
              Buffer,
              (INTN *)BufferSize,
