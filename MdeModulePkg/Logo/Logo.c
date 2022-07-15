@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/HiiPackageList.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 
 typedef struct {
   EFI_IMAGE_ID                             ImageId;
@@ -67,6 +68,10 @@ GetImage (
   Current = *Instance;
   if (Current >= ARRAY_SIZE (mLogos)) {
     return EFI_NOT_FOUND;
+  }
+
+  if (FixedPcdGetBool (PcdFollowMicrosoftRecommended)) {
+    mLogos[Current].Attribute = EdkiiPlatformLogoDisplayAttributeMicrosoftRecommended;
   }
 
   (*Instance)++;

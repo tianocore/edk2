@@ -41,12 +41,16 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   DebugLib
+  PcdLib
 
 [Protocols]
   gEfiHiiDatabaseProtocolGuid        ## CONSUMES
   gEfiHiiImageExProtocolGuid         ## CONSUMES
   gEfiHiiPackageListProtocolGuid     ## PRODUCES CONSUMES
   gEdkiiPlatformLogoProtocolGuid     ## PRODUCES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFollowMicrosoftRecommended ## CONSUMES
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND

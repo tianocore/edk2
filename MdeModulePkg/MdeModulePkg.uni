@@ -1338,3 +1338,9 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPcieResizableBarSupport_HELP #language en-US "Indicates if the PCIe Resizable BAR Capability Supported.<BR><BR>\n"
                                                                                             "TRUE  - PCIe Resizable BAR Capability is supported.<BR>\n"
                                                                                             "FALSE - PCIe Resizable BAR Capability is not supported.<BR>"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFollowMicrosoftRecommended_PROMPT #language en-US "The position of the Boot Logo"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFollowMicrosoftRecommend_HELP   #language en-US "Sets the position of the Logo. When set to true, the Logo is positioned following the recommendations"
+                                                                                             " from Microsoft, 38.2% from the top of the screen."
+
