@@ -248,6 +248,7 @@ PageTableLibMapInLevel (
   UINTN               BitStart;
   UINTN               Index;
   IA32_PAGING_ENTRY   *PagingEntry;
+  IA32_PAGING_ENTRY   *CurrentPagingEntry;
   UINT64              RegionLength;
   UINT64              SubLength;
   UINT64              SubOffset;
@@ -359,18 +360,20 @@ PageTableLibMapInLevel (
   //
   PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&ParentPagingEntry->Pnle);
   while (Offset < Length && Index < 512) {
-    SubLength = MIN (Length - Offset, RegionStart + RegionLength - (LinearAddress + Offset));
+    CurrentPagingEntry = (!Modify && CreateNew) ? &OneOfPagingEntry : &PagingEntry[Index];
+    SubLength          = MIN (Length - Offset, RegionStart + RegionLength - (LinearAddress + Offset));
     if ((Level <= MaxLeafLevel) &&
         (((LinearAddress + Offset) & RegionMask) == 0) &&
         (((IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) & RegionMask) == 0) &&
-        (SubLength == RegionLength)
+        (SubLength == RegionLength) &&
+        ((CurrentPagingEntry->Pce.Present == 0) || IsPle (CurrentPagingEntry, Level))
         )
     {
       //
       // Create one entry mapping the entire region (1G, 2M or 4K).
       //
       if (Modify) {
-        PageTableLibSetPle (Level, &PagingEntry[Index], Offset, Attribute, Mask);
+        PageTableLibSetPle (Level, CurrentPagingEntry, Offset, Attribute, Mask);
       }
     } else {
       //
@@ -382,7 +385,7 @@ PageTableLibMapInLevel (
       //      but the length is SMALLER than the RegionLength.
       //
       Status = PageTableLibMapInLevel (
-                 (!Modify && CreateNew) ? &OneOfPagingEntry : &PagingEntry[Index],
+                 CurrentPagingEntry,
                  Modify,
                  Buffer,
                  BufferSize,
