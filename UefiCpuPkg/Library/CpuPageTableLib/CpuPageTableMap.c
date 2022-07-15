@@ -27,10 +27,7 @@ PageTableLibSetPte4K (
   )
 {
   if (Mask->Bits.PageTableBaseAddress) {
-    //
-    // Reset all attributes when the physical address is changed.
-    //
-    Pte4K->Uint64 = IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset;
+    Pte4K->Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (Pte4K->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_40);
   }
 
   if (Mask->Bits.Present) {
@@ -97,10 +94,7 @@ PageTableLibSetPleB (
   )
 {
   if (Mask->Bits.PageTableBaseAddress) {
-    //
-    // Reset all attributes when the physical address is changed.
-    //
-    PleB->Uint64 = IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset;
+    PleB->Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (PleB->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_39);
   }
 
   PleB->Bits.MustBeOne = 1;
@@ -277,6 +271,7 @@ PageTableLibMapInLevel (
   IA32_PAGING_ENTRY   OneOfPagingEntry;
   IA32_MAP_ATTRIBUTE  ChildAttribute;
   IA32_MAP_ATTRIBUTE  ChildMask;
+  IA32_MAP_ATTRIBUTE  CurrentMask;
 
   ASSERT (Level != 0);
   ASSERT ((Attribute != NULL) && (Mask != NULL));
@@ -464,7 +459,35 @@ PageTableLibMapInLevel (
       // Create one entry mapping the entire region (1G, 2M or 4K).
       //
       if (Modify) {
-        PageTableLibSetPle (Level, CurrentPagingEntry, Offset, Attribute, Mask);
+        //
+        // When the inheritable attributes in parent entry could override the child attributes,
+        // e.g.: Present/ReadWrite/UserSupervisor is 0 in parent entry, or
+        //       Nx is 1 in parent entry,
+        // we just skip setting any value to these attributes in child.
+        // We add assertion to make sure the requested settings don't conflict with parent attributes in this case.
+        //
+        CurrentMask.Uint64 = Mask->Uint64;
+        if (ParentAttribute->Bits.Present == 0) {
+          CurrentMask.Bits.Present = 0;
+          ASSERT (CreateNew || (Mask->Bits.Present == 0) || (Attribute->Bits.Present == 0));
+        }
+
+        if (ParentAttribute->Bits.ReadWrite == 0) {
+          CurrentMask.Bits.ReadWrite = 0;
+          ASSERT (CreateNew || (Mask->Bits.ReadWrite == 0) || (Attribute->Bits.ReadWrite == 0));
+        }
+
+        if (ParentAttribute->Bits.UserSupervisor == 0) {
+          CurrentMask.Bits.UserSupervisor = 0;
+          ASSERT (CreateNew || (Mask->Bits.UserSupervisor == 0) || (Attribute->Bits.UserSupervisor == 0));
+        }
+
+        if (ParentAttribute->Bits.Nx == 1) {
+          CurrentMask.Bits.Nx = 0;
+          ASSERT (CreateNew || (Mask->Bits.Nx == 0) || (Attribute->Bits.Nx == 1));
+        }
+
+        PageTableLibSetPle (Level, CurrentPagingEntry, Offset, Attribute, &CurrentMask);
       }
     } else {
       //
