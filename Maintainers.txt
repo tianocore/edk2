@@ -612,9 +612,7 @@ F: UefiPayloadPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiPayloadPkg
 M: Guo Dong <guo.dong@intel.com> [gdong1]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
-R: Maurice Ma <maurice.ma@intel.com> [mauricema]
-R: Benjamin You <benjamin.you@intel.com> [BenjaminYou]
-R: Sean Rhodes <sean@starlabs.systems>
+M: Sean Rhodes <sean@starlabs.systems>
 S: Maintained
 
 UnitTestFrameworkPkg
