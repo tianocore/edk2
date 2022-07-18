@@ -272,6 +272,7 @@ PageTableLibMapInLevel (
   IA32_MAP_ATTRIBUTE  ChildAttribute;
   IA32_MAP_ATTRIBUTE  ChildMask;
   IA32_MAP_ATTRIBUTE  CurrentMask;
+  IA32_MAP_ATTRIBUTE  LocalParentAttribute;
 
   ASSERT (Level != 0);
   ASSERT ((Attribute != NULL) && (Mask != NULL));
@@ -283,6 +284,9 @@ PageTableLibMapInLevel (
   NopAttribute.Bits.Present        = 1;
   NopAttribute.Bits.ReadWrite      = 1;
   NopAttribute.Bits.UserSupervisor = 1;
+
+  LocalParentAttribute.Uint64 = ParentAttribute->Uint64;
+  ParentAttribute             = &LocalParentAttribute;
 
   //
   // ParentPagingEntry ONLY is deferenced for checking Present and MustBeOne bits
@@ -420,7 +424,7 @@ PageTableLibMapInLevel (
           }
 
           if (IsPle (&PagingEntry[Index], Level)) {
-            PageTableLibSetPle (Level - 1, &PagingEntry[Index], 0, &ChildAttribute, &ChildMask);
+            PageTableLibSetPle (Level, &PagingEntry[Index], 0, &ChildAttribute, &ChildMask);
           } else {
             PageTableLibSetPnle (&PagingEntry[Index].Pnle, &ChildAttribute, &ChildMask);
           }
@@ -664,13 +668,6 @@ PageTableMap (
   //
   // Update the page table when the supplied buffer is sufficient.
   //
-  ParentAttribute.Uint64                    = 0;
-  ParentAttribute.Bits.PageTableBaseAddress = 1;
-  ParentAttribute.Bits.Present              = 1;
-  ParentAttribute.Bits.ReadWrite            = 1;
-  ParentAttribute.Bits.UserSupervisor       = 1;
-  ParentAttribute.Bits.Nx                   = 0;
-
   Status = PageTableLibMapInLevel (
              &TopPagingEntry,
              &ParentAttribute,
