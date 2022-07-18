@@ -30,9 +30,17 @@
   ComponentName.c
   ComponentName.h
   DriverBinding.h
+  FullMemoryFence.h
   XenPvBlkDxe.c
   XenPvBlkDxe.h
 
+[Sources.IA32]
+  X86GccFullMemoryFence.c | GCC
+  X86MsftFullMemoryFence.c | MSFT
+
+[Sources.X64]
+  X86GccFullMemoryFence.c | GCC
+  X86MsftFullMemoryFence.c | MSFT
 
 [LibraryClasses]
   UefiDriverEntryPoint

@@ -11,8 +11,9 @@
 #define __EFI_XEN_PV_BLK_DXE_H__
 
 #include <Uefi.h>
+#include "FullMemoryFence.h"
 
-#define xen_mb()   MemoryFence()
+#define xen_mb()   FullMemoryFence()
 #define xen_rmb()  MemoryFence()
 #define xen_wmb()  MemoryFence()
 
