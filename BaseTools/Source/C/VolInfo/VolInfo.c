@@ -1676,6 +1676,7 @@ Returns:
   CHAR8               *ToolInputFileName;
   CHAR8               *ToolOutputFileName;
   CHAR8               *UIFileName;
+  CHAR8               *VersionString;
 
   ParsedLength = 0;
   ToolInputFileName = NULL;
@@ -1816,8 +1817,14 @@ Returns:
       break;
 
     case EFI_SECTION_VERSION:
-      printf ("  Build Number:  0x%02X\n", *(UINT16 *)(Ptr + SectionHeaderLen));
-      printf ("  Version Strg:  %s\n", (char*) (Ptr + SectionHeaderLen + sizeof (UINT16)));
+      printf ("  Build Number:  0x%04X\n", *(UINT16 *)(Ptr + SectionHeaderLen));
+      VersionString = (CHAR8 *) malloc (UnicodeStrLen (((EFI_VERSION_SECTION *) Ptr)->VersionString) + 1);
+      if (VersionString == NULL) {
+        Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+        return EFI_OUT_OF_RESOURCES;
+      }
+      Unicode2AsciiString (((EFI_VERSION_SECTION *) Ptr)->VersionString, VersionString);
+      printf ("  Version String:  %s\n", VersionString);
       break;
 
     case EFI_SECTION_COMPRESSION:
