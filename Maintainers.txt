@@ -218,14 +218,14 @@ IntelFsp2Pkg
 F: IntelFsp2Pkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2Pkg
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
-R: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
+M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 
 IntelFsp2WrapperPkg
 F: IntelFsp2WrapperPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2WrapperPkg
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
-R: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
+M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 
 MdeModulePkg
