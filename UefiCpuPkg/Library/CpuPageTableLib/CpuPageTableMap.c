@@ -245,8 +245,8 @@ PageTableLibMapInLevel (
   IN     BOOLEAN             Modify,
   IN     VOID                *Buffer,
   IN OUT INTN                *BufferSize,
-  IN     UINTN               Level,
-  IN     UINTN               MaxLeafLevel,
+  IN     IA32_PAGE_LEVEL     Level,
+  IN     IA32_PAGE_LEVEL     MaxLeafLevel,
   IN     UINT64              LinearAddress,
   IN     UINT64              Length,
   IN     UINT64              Offset,
@@ -572,8 +572,8 @@ PageTableMap (
   IA32_PAGING_ENTRY   TopPagingEntry;
   INTN                RequiredSize;
   UINT64              MaxLinearAddress;
-  UINTN               MaxLevel;
-  UINTN               MaxLeafLevel;
+  IA32_PAGE_LEVEL     MaxLevel;
+  IA32_PAGE_LEVEL     MaxLeafLevel;
   IA32_MAP_ATTRIBUTE  ParentAttribute;
 
   if ((PagingMode == Paging32bit) || (PagingMode == PagingPae) || (PagingMode >= PagingModeMax)) {
@@ -606,8 +606,8 @@ PageTableMap (
     return RETURN_INVALID_PARAMETER;
   }
 
-  MaxLeafLevel     = (UINT8)PagingMode;
-  MaxLevel         = (UINT8)(PagingMode >> 8);
+  MaxLeafLevel     = (IA32_PAGE_LEVEL)(UINT8)PagingMode;
+  MaxLevel         = (IA32_PAGE_LEVEL)(UINT8)(PagingMode >> 8);
   MaxLinearAddress = LShiftU64 (1, 12 + MaxLevel * 9);
 
   if ((LinearAddress > MaxLinearAddress) || (Length > MaxLinearAddress - LinearAddress)) {
