@@ -20,6 +20,14 @@
 
 #define REGION_LENGTH(l)  LShiftU64 (1, (l) * 9 + 3)
 
+typedef enum {
+  Pte   = 1,
+  Pde   = 2,
+  Pdpte = 3,
+  Pml4  = 4,
+  Pml5  = 5
+} IA32_PAGE_LEVEL;
+
 typedef struct {
   UINT64    Present        : 1;       // 0 = Not present in memory, 1 = Present in memory
   UINT64    ReadWrite      : 1;       // 0 = Read-Only, 1= Read/Write
