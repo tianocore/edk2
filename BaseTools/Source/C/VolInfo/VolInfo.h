@@ -22,8 +22,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_DEP_END       0x08
 #define EFI_DEP_SOR       0x09
 
-#define EFI_SECTION_LAST_LEAF_SECTION_TYPE  0x1B
-#define EFI_SECTION_LAST_SECTION_TYPE       0x1B
+#define EFI_SECTION_LAST_LEAF_SECTION_TYPE  0x1C
+#define EFI_SECTION_LAST_SECTION_TYPE       0x1C
 
 #define OPENSSL_COMMAND_FORMAT_STRING       "%s sha1 -out %s %s"
 #define EXTRACT_COMMAND_FORMAT_STRING       "%s -d -o %s %s"
