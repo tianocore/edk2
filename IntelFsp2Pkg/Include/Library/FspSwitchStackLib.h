@@ -30,7 +30,7 @@
 
 
 **/
-UINT32
+EFI_STATUS
 EFIAPI
 Pei2LoaderSwitchStack (
   VOID
@@ -46,7 +46,7 @@ Pei2LoaderSwitchStack (
 
 
 **/
-UINT32
+EFI_STATUS
 EFIAPI
 Loader2PeiSwitchStack (
   VOID

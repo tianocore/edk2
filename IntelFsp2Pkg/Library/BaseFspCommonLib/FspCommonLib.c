@@ -200,13 +200,13 @@ SetFspCoreStackPointer (
   UINT32           StackContextLen;
 
   FspData         = GetFspGlobalDataPointer ();
-  StackContextLen = sizeof(CONTEXT_STACK) / sizeof(UINTN);
+  StackContextLen = sizeof (CONTEXT_STACK) / sizeof (UINTN);
 
   //
   // Reserve space for the ContinuationFunc two parameters
   //
-  OldStack = (UINTN *)FspData->CoreStack;
-  NewStack = (UINTN *)NewStackTop - StackContextLen - 2;
+  OldStack           = (UINTN *)FspData->CoreStack;
+  NewStack           = (UINTN *)NewStackTop - StackContextLen - 2;
   FspData->CoreStack = (UINTN)NewStack;
   while (StackContextLen-- != 0) {
     *NewStack++ = *OldStack++;
@@ -533,7 +533,7 @@ SetPhaseStatusCode (
 VOID
 EFIAPI
 FspApiReturnStatusReset (
-  IN UINT32  FspResetType
+  IN EFI_STATUS  FspResetType
   )
 {
   volatile BOOLEAN  LoopUntilReset;
@@ -546,7 +546,7 @@ FspApiReturnStatusReset (
     /// calls the FSP API without honoring the reset request by FSP
     ///
     do {
-      SetFspApiReturnStatus ((EFI_STATUS)FspResetType);
+      SetFspApiReturnStatus (FspResetType);
       Pei2LoaderSwitchStack ();
       DEBUG ((DEBUG_ERROR, "!!!ERROR: FSP has requested BootLoader for reset. But BootLoader has not honored the reset\n"));
       DEBUG ((DEBUG_ERROR, "!!!ERROR: Please add support in BootLoader to honor the reset request from FSP\n"));
