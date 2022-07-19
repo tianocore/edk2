@@ -184,6 +184,12 @@ struct _HTTP_BOOT_PRIVATE_DATA {
   UINT32                                       Percentage;
 
   //
+  // Data for the server to authenticate the client
+  //
+  CHAR8                                        *AuthData;
+  CHAR8                                        *AuthScheme;
+
+  //
   // HII callback info block
   //
   HTTP_BOOT_FORM_CALLBACK_INFO                 CallbackInfo;
