@@ -43,16 +43,15 @@ extern EFI_GUID  gFspHobGuid;
 
   @return FSP-M UPD Data Address
 **/
-
 UINTN
 GetFspmUpdDataAddress (
   VOID
   )
 {
   if (PcdGet64 (PcdFspmUpdDataAddress64) != 0) {
-    return (UINTN) PcdGet64 (PcdFspmUpdDataAddress64);
+    return (UINTN)PcdGet64 (PcdFspmUpdDataAddress64);
   } else {
-    return (UINTN) PcdGet32 (PcdFspmUpdDataAddress);
+    return (UINTN)PcdGet32 (PcdFspmUpdDataAddress);
   }
 }
 
@@ -97,7 +96,7 @@ PeiFspMemoryInit (
     //
     // External UPD is ready, get the buffer from PCD pointer.
     //
-    FspmUpdDataPtr = (VOID *) GetFspmUpdDataAddress();
+    FspmUpdDataPtr = (VOID *)GetFspmUpdDataAddress ();
     ASSERT (FspmUpdDataPtr != NULL);
   }
 
@@ -115,6 +114,7 @@ PeiFspMemoryInit (
     DEBUG ((DEBUG_INFO, "  BootLoaderTolumSize - 0x%x\n", ((FSPM_UPD_COMMON *)FspmUpdDataPtr)->FspmArchUpd.BootLoaderTolumSize));
     DEBUG ((DEBUG_INFO, "  BootMode            - 0x%x\n", ((FSPM_UPD_COMMON *)FspmUpdDataPtr)->FspmArchUpd.BootMode));
   }
+
   DEBUG ((DEBUG_INFO, "  HobListPtr          - 0x%x\n", &FspHobListPtr));
 
   TimeStampCounterStart = AsmReadTsc ();
@@ -129,7 +129,7 @@ PeiFspMemoryInit (
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
     DEBUG ((DEBUG_INFO, "FspMemoryInitApi requested reset 0x%x\n", Status));
-    CallFspWrapperResetSystem ((UINT32)Status);
+    CallFspWrapperResetSystem (Status);
   }
 
   if (EFI_ERROR (Status)) {
