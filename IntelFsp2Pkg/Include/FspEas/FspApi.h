@@ -614,4 +614,23 @@ EFI_STATUS
   IN FSP_MULTI_PHASE_PARAMS     *MultiPhaseSiInitParamPtr
   );
 
+/**
+  This FSP API initializes SMM and provide any OS runtime silicon services,
+  including Reliability, Availability, and Serviceability (RAS) features implemented by the CPU.
+
+  @param[in] FspiUpdDataPtr     Pointer to the FSPI_UPD data structure.
+                                If NULL, FSP will use the default parameters.
+
+  @retval EFI_SUCCESS                 FSP execution environment was initialized successfully.
+  @retval EFI_INVALID_PARAMETER       Input parameters are invalid.
+  @retval EFI_UNSUPPORTED             The FSP calling conditions were not met.
+  @retval EFI_DEVICE_ERROR            FSP initialization failed.
+  @retval FSP_STATUS_RESET_REQUIREDx  A reset is required. These status codes will not be returned during S3.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *FSP_SMM_INIT)(
+  IN VOID          *FspiUpdDataPtr
+  );
+
 #endif
