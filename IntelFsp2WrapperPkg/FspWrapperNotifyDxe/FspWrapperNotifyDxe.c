@@ -97,7 +97,7 @@ OnPciEnumerationComplete (
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
     DEBUG ((DEBUG_INFO, "FSP NotifyPhase AfterPciEnumeration requested reset 0x%x\n", Status));
-    CallFspWrapperResetSystem ((UINT32)Status);
+    CallFspWrapperResetSystem (Status);
   }
 
   if (Status != EFI_SUCCESS) {
@@ -140,7 +140,7 @@ OnReadyToBoot (
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
     DEBUG ((DEBUG_INFO, "FSP NotifyPhase ReadyToBoot requested reset 0x%x\n", Status));
-    CallFspWrapperResetSystem ((UINT32)Status);
+    CallFspWrapperResetSystem (Status);
   }
 
   if (Status != EFI_SUCCESS) {
@@ -184,7 +184,7 @@ OnEndOfFirmware (
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
     DEBUG ((DEBUG_INFO, "FSP NotifyPhase EndOfFirmware requested reset 0x%x\n", Status));
-    CallFspWrapperResetSystem ((UINT32)Status);
+    CallFspWrapperResetSystem (Status);
   }
 
   if (Status != EFI_SUCCESS) {
