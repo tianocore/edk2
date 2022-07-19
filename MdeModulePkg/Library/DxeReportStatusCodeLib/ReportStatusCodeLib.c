@@ -19,12 +19,6 @@
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
 
-//
-// Define the maximum extended data size that is supported when a status code is
-// reported at TPL_HIGH_LEVEL.
-//
-#define MAX_EXTENDED_DATA_SIZE  0x200
-
 EFI_STATUS_CODE_PROTOCOL  *mReportStatusCodeLibStatusCodeProtocol = NULL;
 
 /**
