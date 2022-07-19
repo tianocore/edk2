@@ -26,13 +26,13 @@
 
 #define FSP_INFO_HEADER_SIGNATURE  SIGNATURE_32 ('F', 'S', 'P', 'H')
 
-#define IMAGE_ATTRIBUTE_GRAPHICS_SUPPORT      BIT0
-#define IMAGE_ATTRIBUTE_DISPATCH_MODE_SUPPORT BIT1
-#define IMAGE_ATTRIBUTE_64BIT_MODE_SUPPORT    BIT2
-#define FSP_IA32                              0
-#define FSP_X64                               1
+#define IMAGE_ATTRIBUTE_GRAPHICS_SUPPORT       BIT0
+#define IMAGE_ATTRIBUTE_DISPATCH_MODE_SUPPORT  BIT1
+#define IMAGE_ATTRIBUTE_64BIT_MODE_SUPPORT     BIT2
+#define FSP_IA32                               0
+#define FSP_X64                                1
 
-#pragma pack(1)
+  #pragma pack(1)
 
 ///
 /// FSP Information Header as described in FSP v2.0 Spec section 5.1.1.
@@ -159,6 +159,14 @@ typedef struct {
   /// Byte 0x4E: Reserved4.
   ///
   UINT16    Reserved4;
+  ///
+  /// Byte 0x50: Offset for the API for the Multi-Phase memory initialization.
+  ///
+  UINT32    FspMultiPhaseMemInitEntryOffset;
+  ///
+  /// Byte 0x54: Offset for the API to initialize SMM.
+  ///
+  UINT32    FspSmmInitEntryOffset;
 } FSP_INFO_HEADER;
 
 ///
@@ -240,7 +248,7 @@ typedef struct {
   // UINT32  PatchData[];
 } FSP_PATCH_TABLE;
 
-#pragma pack()
+  #pragma pack()
 
 extern EFI_GUID  gFspHeaderFileGuid;
 

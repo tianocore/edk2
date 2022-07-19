@@ -71,6 +71,19 @@ FspApiCallingCheck (
         Status = EFI_INVALID_PARAMETER;
       }
     }
+  } else if (ApiIdx == FspSmmInitApiIndex) {
+    //
+    // FspSmmInitApiIndex check
+    //
+    if ((FspData == NULL) || ((UINTN)FspData == MAX_ADDRESS) || ((UINTN)FspData == MAX_UINT32)) {
+      Status = EFI_UNSUPPORTED;
+    } else {
+      if (FspData->Signature != FSP_GLOBAL_DATA_SIGNATURE) {
+        Status = EFI_UNSUPPORTED;
+      } else if (EFI_ERROR (FspUpdSignatureCheck (FspSmmInitApiIndex, ApiParam))) {
+        Status = EFI_INVALID_PARAMETER;
+      }
+    }
   } else {
     Status = EFI_UNSUPPORTED;
   }

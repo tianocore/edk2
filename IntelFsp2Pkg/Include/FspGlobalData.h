@@ -10,9 +10,9 @@
 
 #include <FspEas.h>
 
-#define FSP_IN_API_MODE         0
-#define FSP_IN_DISPATCH_MODE    1
-#define FSP_GLOBAL_DATA_VERSION 1
+#define FSP_IN_API_MODE          0
+#define FSP_IN_DISPATCH_MODE     1
+#define FSP_GLOBAL_DATA_VERSION  1
 
 #pragma pack(1)
 
@@ -24,16 +24,17 @@ typedef enum {
   TempRamExitApiIndex,
   FspSiliconInitApiIndex,
   FspMultiPhaseSiInitApiIndex,
+  FspSmmInitApiIndex,
   FspApiIndexMax
 } FSP_API_INDEX;
 
 typedef struct  {
-  VOID      *DataPtr;
-  UINTN     MicrocodeRegionBase;
-  UINTN     MicrocodeRegionSize;
-  UINTN     CodeRegionBase;
-  UINTN     CodeRegionSize;
-  UINTN     Reserved;
+  VOID     *DataPtr;
+  UINTN    MicrocodeRegionBase;
+  UINTN    MicrocodeRegionSize;
+  UINTN    CodeRegionBase;
+  UINTN    CodeRegionSize;
+  UINTN    Reserved;
 } FSP_PLAT_DATA;
 
 #define FSP_GLOBAL_DATA_SIGNATURE        SIGNATURE_32 ('F', 'S', 'P', 'D')
@@ -41,28 +42,28 @@ typedef struct  {
 #define FSP_PERFORMANCE_DATA_TIMER_MASK  0xFFFFFFFFFFFFFF
 
 typedef struct  {
-  UINT32             Signature;
-  UINT8              Version;
-  UINT8              Reserved1[3];
+  UINT32    Signature;
+  UINT8     Version;
+  UINT8     Reserved1[3];
   ///
   /// Offset 0x08
   ///
-  UINTN              CoreStack;
-  UINTN              Reserved2;
+  UINTN     CoreStack;
+  UINTN     Reserved2;
   ///
   /// IA32: Offset 0x10; X64: Offset 0x18
   ///
-  UINT32             StatusCode;
-  UINT8              ApiIdx;
+  UINT32    StatusCode;
+  UINT8     ApiIdx;
   ///
   /// 0: FSP in API mode; 1: FSP in DISPATCH mode
   ///
-  UINT8              FspMode;
-  UINT8              OnSeparateStack;
-  UINT8              Reserved3;
-  UINT32             NumberOfPhases;
-  UINT32             PhasesExecuted;
-  UINT32             Reserved4[8];
+  UINT8     FspMode;
+  UINT8     OnSeparateStack;
+  UINT8     Reserved3;
+  UINT32    NumberOfPhases;
+  UINT32    PhasesExecuted;
+  UINT32    Reserved4[8];
   ///
   /// IA32: Offset 0x40; X64: Offset 0x48
   /// Start of UINTN and pointer section
@@ -75,21 +76,23 @@ typedef struct  {
   VOID               *TempRamInitUpdPtr;
   VOID               *MemoryInitUpdPtr;
   VOID               *SiliconInitUpdPtr;
+  VOID               *SmmInitUpdPtr;
   ///
-  /// IA32: Offset 0x64; X64: Offset 0x90
+  /// IA32: Offset 0x68; X64: Offset 0x98
   /// To store function parameters pointer
   /// so it can be retrieved after stack switched.
   ///
   VOID               *FunctionParameterPtr;
   FSP_INFO_HEADER    *FspInfoHeader;
   VOID               *UpdDataPtr;
+  UINTN              Reserved5;
   ///
   /// End of UINTN and pointer section
   ///
-  UINT8              Reserved5[16];
+  UINT8              Reserved6[16];
   UINT32             PerfSig;
   UINT16             PerfLen;
-  UINT16             Reserved6;
+  UINT16             Reserved7;
   UINT32             PerfIdx;
   UINT64             PerfData[32];
 } FSP_GLOBAL_DATA;

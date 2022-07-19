@@ -21,7 +21,7 @@ extern ASM_PFX(FspApiCommon)
 ;----------------------------------------------------------------------------
 global ASM_PFX(NotifyPhaseApi)
 ASM_PFX(NotifyPhaseApi):
-  mov    eax,  2 ; FSP_API_INDEX.NotifyPhaseApiIndex
+  mov    rax,  2 ; FSP_API_INDEX.NotifyPhaseApiIndex
   jmp    ASM_PFX(FspApiCommon)
 
 ;----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ ASM_PFX(NotifyPhaseApi):
 ;----------------------------------------------------------------------------
 global ASM_PFX(FspSiliconInitApi)
 ASM_PFX(FspSiliconInitApi):
-  mov    eax,  5 ; FSP_API_INDEX.FspSiliconInitApiIndex
+  mov    rax,  5 ; FSP_API_INDEX.FspSiliconInitApiIndex
   jmp    ASM_PFX(FspApiCommon)
 
 ;----------------------------------------------------------------------------
