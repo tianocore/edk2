@@ -302,7 +302,7 @@ SetPhaseStatusCode (
 VOID
 EFIAPI
 FspApiReturnStatusReset (
-  IN UINT32  FspResetType
+  IN EFI_STATUS  FspResetType
   );
 
 #endif

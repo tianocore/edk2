@@ -11,19 +11,24 @@
 #define _FSP_API_H_
 
 #include <Pi/PiStatusCode.h>
+#include <Base.h>
 
 ///
 /// FSP Reset Status code
-/// These are defined in FSP EAS v2.0 section 11.2.2 - OEM Status Code
+/// These are defined in FSP EAS v2.4 section 13.2.2 - OEM Status Code
 /// @{
-#define FSP_STATUS_RESET_REQUIRED_COLD  0x40000001
-#define FSP_STATUS_RESET_REQUIRED_WARM  0x40000002
-#define FSP_STATUS_RESET_REQUIRED_3     0x40000003
-#define FSP_STATUS_RESET_REQUIRED_4     0x40000004
-#define FSP_STATUS_RESET_REQUIRED_5     0x40000005
-#define FSP_STATUS_RESET_REQUIRED_6     0x40000006
-#define FSP_STATUS_RESET_REQUIRED_7     0x40000007
-#define FSP_STATUS_RESET_REQUIRED_8     0x40000008
+
+#define ENCODE_RESET_REQUEST(ResetType)  \
+        ((EFI_STATUS)((MAX_BIT >> 1) | (ResetType)))
+#define FSP_STATUS_RESET_REQUIRED_COLD  ENCODE_RESET_REQUEST(1)
+#define FSP_STATUS_RESET_REQUIRED_WARM  ENCODE_RESET_REQUEST(2)
+#define FSP_STATUS_RESET_REQUIRED_3     ENCODE_RESET_REQUEST(3)
+#define FSP_STATUS_RESET_REQUIRED_4     ENCODE_RESET_REQUEST(4)
+#define FSP_STATUS_RESET_REQUIRED_5     ENCODE_RESET_REQUEST(5)
+#define FSP_STATUS_RESET_REQUIRED_6     ENCODE_RESET_REQUEST(6)
+#define FSP_STATUS_RESET_REQUIRED_7     ENCODE_RESET_REQUEST(7)
+#define FSP_STATUS_RESET_REQUIRED_8     ENCODE_RESET_REQUEST(8)
+#define FSP_STATUS_VARIABLE_REQUEST     ENCODE_RESET_REQUEST(10)
 /// @}
 
 ///
@@ -135,18 +140,18 @@ typedef struct {
   ///
   /// Revision of the structure is 2 for this version of the specification.
   ///
-  UINT8                Revision;
-  UINT8                Reserved[3];
+  UINT8                   Revision;
+  UINT8                   Reserved[3];
   ///
   /// Length of the structure in bytes. The current value for this field is 32.
   ///
-  UINT32               Length;
+  UINT32                  Length;
   ///
   /// FspDebugHandler Optional debug handler for the bootloader to receive debug messages
   /// occurring during FSP execution.
   ///
-  EFI_PHYSICAL_ADDRESS FspDebugHandler;
-  UINT8                Reserved1[16];
+  EFI_PHYSICAL_ADDRESS    FspDebugHandler;
+  UINT8                   Reserved1[16];
 } FSPT_ARCH2_UPD;
 
 ///
@@ -197,37 +202,37 @@ typedef struct {
   ///
   /// Revision of the structure is 3 for this version of the specification.
   ///
-  UINT8                Revision;
-  UINT8                Reserved[3];
+  UINT8                   Revision;
+  UINT8                   Reserved[3];
   ///
   /// Length of the structure in bytes. The current value for this field is 64.
   ///
-  UINT32               Length;
+  UINT32                  Length;
   ///
   /// Pointer to the temporary stack base address to be
   /// consumed inside FspMemoryInit() API.
   ///
-  EFI_PHYSICAL_ADDRESS StackBase;
+  EFI_PHYSICAL_ADDRESS    StackBase;
   ///
   /// Temporary stack size to be consumed inside
   /// FspMemoryInit() API.
   ///
-  UINT64               StackSize;
+  UINT64                  StackSize;
   ///
   /// Size of memory to be reserved by FSP below "top
   /// of low usable memory" for bootloader usage.
   ///
-  UINT32               BootLoaderTolumSize;
+  UINT32                  BootLoaderTolumSize;
   ///
   /// Current boot mode.
   ///
-  UINT32               BootMode;
+  UINT32                  BootMode;
   ///
   /// Optional event handler for the bootloader to be informed of events occurring during FSP execution.
   /// This value is only valid if Revision is >= 2.
   ///
-  EFI_PHYSICAL_ADDRESS FspEventHandler;
-  UINT8                Reserved1[24];
+  EFI_PHYSICAL_ADDRESS    FspEventHandler;
+  UINT8                   Reserved1[24];
 } FSPM_ARCH2_UPD;
 
 ///
@@ -266,18 +271,18 @@ typedef struct {
   ///
   /// Revision of the structure is 2 for this version of the specification.
   ///
-  UINT8                Revision;
-  UINT8                Reserved[3];
+  UINT8                   Revision;
+  UINT8                   Reserved[3];
   ///
   /// Length of the structure in bytes. The current value for this field is 32.
   ///
-  UINT32               Length;
+  UINT32                  Length;
   ///
   /// FspEventHandler Optional event handler for the bootloader to be informed of events
   /// occurring during FSP execution.
   ///
-  EFI_PHYSICAL_ADDRESS FspEventHandler;
-  UINT8                Reserved1[16];
+  EFI_PHYSICAL_ADDRESS    FspEventHandler;
+  UINT8                   Reserved1[16];
 } FSPS_ARCH2_UPD;
 
 ///
