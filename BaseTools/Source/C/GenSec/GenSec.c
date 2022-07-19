@@ -191,7 +191,7 @@ Returns:
                         as 0, tool get alignment value from SectionFile. It is\n\
                         specified in same order that the section file is input.\n");
   fprintf (stdout, "  --dummy dummyfile\n\
-                        compare dummpyfile with input_file to decide whether\n\
+                        compare dummyfile with input_file to decide whether\n\
                         need to set PROCESSING_REQUIRED attribute.\n");
   fprintf (stdout, "  -v, --verbose         Turn on verbose output with informational messages.\n");
   fprintf (stdout, "  -q, --quiet           Disable all messages except key message and fatal error\n");
