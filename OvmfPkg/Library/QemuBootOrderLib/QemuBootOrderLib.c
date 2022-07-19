@@ -1687,6 +1687,128 @@ FreeFwCfg:
 }
 
 /**
+  Write qemu boot order to uefi variables.
+
+  Attempt to retrieve the "bootorder" fw_cfg file from QEMU. Translate
+  the OpenFirmware device paths therein to UEFI device path fragments.
+
+  On Success store the device path in QemuBootOrderNNNN variables.
+**/
+VOID
+EFIAPI
+StoreQemuBootOrder (
+  VOID
+  )
+{
+  RETURN_STATUS         Status;
+  FIRMWARE_CONFIG_ITEM  FwCfgItem;
+  UINTN                 FwCfgSize;
+  CHAR8                 *FwCfg;
+  EFI_STATUS            EfiStatus;
+  EXTRA_ROOT_BUS_MAP    *ExtraPciRoots;
+  CONST CHAR8           *FwCfgPtr;
+  UINTN                 TranslatedSize;
+  CHAR16                Translated[TRANSLATION_OUTPUT_SIZE];
+  UINTN                 VariableIndex = 0;
+  CHAR16                VariableName[20];
+
+  Status = QemuFwCfgFindFile ("bootorder", &FwCfgItem, &FwCfgSize);
+  if (RETURN_ERROR (Status)) {
+    return;
+  }
+
+  if (FwCfgSize == 0) {
+    return;
+  }
+
+  FwCfg = AllocatePool (FwCfgSize);
+  if (FwCfg == NULL) {
+    return;
+  }
+
+  QemuFwCfgSelectItem (FwCfgItem);
+  QemuFwCfgReadBytes (FwCfgSize, FwCfg);
+  if (FwCfg[FwCfgSize - 1] != '\0') {
+    Status = RETURN_INVALID_PARAMETER;
+    goto FreeFwCfg;
+  }
+
+  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg:\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a\n", FwCfg));
+  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg: <end>\n", __FUNCTION__));
+
+  if (FeaturePcdGet (PcdQemuBootOrderPciTranslation)) {
+    EfiStatus = CreateExtraRootBusMap (&ExtraPciRoots);
+    if (EFI_ERROR (EfiStatus)) {
+      Status = (RETURN_STATUS)EfiStatus;
+      goto FreeFwCfg;
+    }
+  } else {
+    ExtraPciRoots = NULL;
+  }
+
+  //
+  // Translate each OpenFirmware path to a UEFI devpath prefix.
+  //
+  FwCfgPtr       = FwCfg;
+  TranslatedSize = ARRAY_SIZE (Translated);
+  Status         = TranslateOfwPath (
+                     &FwCfgPtr,
+                     ExtraPciRoots,
+                     Translated,
+                     &TranslatedSize
+                     );
+  while (!RETURN_ERROR (Status)) {
+    EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+
+    //
+    // Convert the UEFI devpath prefix to binary representation.
+    //
+    ASSERT (Translated[TranslatedSize] == L'\0');
+    DevicePath = ConvertTextToDevicePath (Translated);
+    if (DevicePath == NULL) {
+      Status = RETURN_OUT_OF_RESOURCES;
+      goto FreeExtraPciRoots;
+    }
+
+    UnicodeSPrint (
+      VariableName,
+      sizeof (VariableName),
+      L"QemuBootOrder%04d",
+      VariableIndex++
+      );
+    DEBUG ((DEBUG_INFO, "%a: %s = %s\n", __FUNCTION__, VariableName, Translated));
+    gRT->SetVariable (
+           VariableName,
+           &gQemuBootOrderGuid,
+           EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+           GetDevicePathSize (DevicePath),
+           DevicePath
+           );
+    FreePool (DevicePath);
+
+    //
+    // Move to the next OFW devpath.
+    //
+    TranslatedSize = ARRAY_SIZE (Translated);
+    Status         = TranslateOfwPath (
+                       &FwCfgPtr,
+                       ExtraPciRoots,
+                       Translated,
+                       &TranslatedSize
+                       );
+  }
+
+FreeExtraPciRoots:
+  if (ExtraPciRoots != NULL) {
+    DestroyExtraRootBusMap (ExtraPciRoots);
+  }
+
+FreeFwCfg:
+  FreePool (FwCfg);
+}
+
+/**
 
   Convert the UEFI DevicePath to full text representation with DevPathToText,
   then match the UEFI device path fragment in Translated against it.

@@ -1695,6 +1695,11 @@ PlatformBootManagerAfterConsole (
   PciAcpiInitialization ();
 
   //
+  // Write qemu bootorder to efi variables
+  //
+  StoreQemuBootOrder ();
+
+  //
   // Process QEMU's -kernel command line option
   //
   TryRunningQemuKernel ();
