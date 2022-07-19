@@ -55,7 +55,7 @@ FSP_HEADER_CFGREG_OFFSET     EQU   24h
 ;----------------------------------------------------------------------------
 global ASM_PFX(FspMemoryInitApi)
 ASM_PFX(FspMemoryInitApi):
-  mov    eax,  3 ; FSP_API_INDEX.FspMemoryInitApiIndex
+  mov    rax,  3 ; FSP_API_INDEX.FspMemoryInitApiIndex
   jmp    ASM_PFX(FspApiCommon)
 
 ;----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ ASM_PFX(FspMemoryInitApi):
 ;----------------------------------------------------------------------------
 global ASM_PFX(TempRamExitApi)
 ASM_PFX(TempRamExitApi):
-  mov    eax,  4 ; FSP_API_INDEX.TempRamExitApiIndex
+  mov    rax,  4 ; FSP_API_INDEX.TempRamExitApiIndex
   jmp    ASM_PFX(FspApiCommon)
 
 ;----------------------------------------------------------------------------
