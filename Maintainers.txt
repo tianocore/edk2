@@ -184,7 +184,7 @@ F: EmbeddedPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
 M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
-M: Abner Chang <abner.chang@hpe.com> [changab]
+M: Abner Chang <abner.chang@amd.com> [changab]
 R: Daniel Schaefer <daniel.schaefer@hpe.com> [JohnAZoidberg]
 
 EmulatorPkg
@@ -196,7 +196,7 @@ S: Maintained
 
 EmulatorPkg: Redfish-related modules
 F: EmulatorPkg/*Redfish*
-M: Abner Chang <abner.chang@hpe.com> [changab]
+M: Abner Chang <abner.chang@amd.com> [changab]
 R: Nickle Wang <nickle.wang@hpe.com> [nicklela]
 
 FatPkg
@@ -484,7 +484,7 @@ OvmfPkg: FDT related modules
 F: OvmfPkg/Fdt
 R: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
-R: Abner Chang <abner.chang@hpe.com> [changab]
+R: Abner Chang <abner.chang@amd.com> [changab]
 
 OvmfPkg: LsiScsi driver
 F: OvmfPkg/LsiScsiDxe/
@@ -550,7 +550,7 @@ R: Ankit Sinha <ankit.sinha@intel.com> [ankit13s]
 
 RedfishPkg: Redfish related modules
 F: RedfishPkg/
-M: Abner Chang <abner.chang@hpe.com> [changab]
+M: Abner Chang <abner.chang@amd.com> [changab]
 R: Nickle Wang <nickle.wang@hpe.com> [nicklela]
 
 SecurityPkg
