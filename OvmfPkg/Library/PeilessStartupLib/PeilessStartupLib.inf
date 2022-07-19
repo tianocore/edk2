@@ -29,8 +29,7 @@
   PeilessStartup.c
   Hob.c
   DxeLoad.c
-
-[Sources.X64]
+  IntelTdx.c
   X64/VirtualMemory.c
 
 [Packages]
@@ -39,6 +38,8 @@
   UefiCpuPkg/UefiCpuPkg.dec
   OvmfPkg/OvmfPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
+  CryptoPkg/CryptoPkg.dec
+  SecurityPkg/SecurityPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -56,6 +57,8 @@
   PrePiLib
   QemuFwCfgLib
   PlatformInitLib
+  HashLib
+  TpmMeasurementLib
 
 [Guids]
   gEfiHobMemoryAllocModuleGuid
@@ -63,6 +66,7 @@
   gUefiOvmfPkgPlatformInfoGuid
   gEfiMemoryTypeInformationGuid
   gPcdDataBaseHobGuid
+  gCcEventEntryHobGuid
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdCfvBase

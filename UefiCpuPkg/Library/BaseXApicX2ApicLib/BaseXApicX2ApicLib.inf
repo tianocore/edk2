@@ -38,6 +38,7 @@
   TimerLib
   IoLib
   PcdLib
+  CpuLib
   UefiCpuLib
 
 [Pcd]

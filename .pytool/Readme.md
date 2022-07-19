@@ -82,7 +82,7 @@ easily and consistently running locally and in a cloud ci environment.  To do
 that a few steps should be followed.  Details of EDKII Tools can be found in the
 [docs folder here](https://github.com/tianocore/edk2-pytool-extensions/tree/master/docs)
 
-### Prerequisets
+### Prerequisites
 
 1. A supported toolchain (others might work but this is what is tested and validated)
    * Windows 10:
@@ -95,7 +95,7 @@ that a few steps should be followed.  Details of EDKII Tools can be found in the
 2. Python 3.7.x or newer on path
 3. git on path
 4. Recommended to setup and activate a python virtual environment
-5. Install the requirements `pip install --upgrade pip-requirements.txt`
+5. Install the requirements `pip install --upgrade -r pip-requirements.txt`
 
 ### Running CI
 

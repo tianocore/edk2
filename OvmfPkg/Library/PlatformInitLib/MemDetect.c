@@ -27,6 +27,7 @@ Module Name:
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HardwareInfoLib.h>
 #include <Library/HobLib.h>
 #include <Library/IoLib.h>
 #include <Library/MemEncryptSevLib.h>
@@ -61,8 +62,8 @@ PlatformQemuUc32BaseInitialization (
     // [PcdPciExpressBaseAddress, 4GB) range require a very small number of
     // variable MTRRs (preferably 1 or 2).
     //
-    ASSERT (FixedPcdGet64 (PcdPciExpressBaseAddress) <= MAX_UINT32);
-    PlatformInfoHob->Uc32Base = (UINT32)FixedPcdGet64 (PcdPciExpressBaseAddress);
+    ASSERT (PcdGet64 (PcdPciExpressBaseAddress) <= MAX_UINT32);
+    PlatformInfoHob->Uc32Base = (UINT32)PcdGet64 (PcdPciExpressBaseAddress);
     return;
   }
 
@@ -491,6 +492,162 @@ PlatformGetFirstNonAddress (
   return FirstNonAddress;
 }
 
+/*
+ * Use CPUID to figure physical address width.  Does *not* work
+ * reliable on qemu.  For historical reasons qemu returns phys-bits=40
+ * even in case the host machine supports less than that.
+ *
+ * qemu has a cpu property (host-phys-bits={on,off}) to change that
+ * and make sure guest phys-bits are not larger than host phys-bits.,
+ * but it is off by default.  Exception: microvm machine type
+ * hard-wires that property to on.
+ */
+VOID
+EFIAPI
+PlatformAddressWidthFromCpuid (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  UINT32  RegEax;
+
+  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+  if (RegEax >= 0x80000008) {
+    AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+    PlatformInfoHob->PhysMemAddressWidth = (UINT8)RegEax;
+  } else {
+    PlatformInfoHob->PhysMemAddressWidth = 36;
+  }
+
+  PlatformInfoHob->FirstNonAddress = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth);
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: cpuid: phys-bits is %d\n",
+    __FUNCTION__,
+    PlatformInfoHob->PhysMemAddressWidth
+    ));
+}
+
+/**
+  Iterate over the PCI host bridges resources information optionally provided
+  in fw-cfg and find the highest address contained in the PCI MMIO windows. If
+  the information is found, return the exclusive end; one past the last usable
+  address.
+
+  @param[out] PciMmioAddressEnd Pointer to one-after End Address updated with
+                                information extracted from host-provided data
+                                or zero if no information available or an
+                                error happened
+
+  @retval EFI_SUCCESS               PCI information was read and the output
+                                    parameter updated with the last valid
+                                    address in the 64-bit MMIO range.
+  @retval EFI_INVALID_PARAMETER     Pointer parameter is invalid
+  @retval EFI_INCOMPATIBLE_VERSION  Hardware information found in fw-cfg
+                                    has an incompatible format
+  @retval EFI_UNSUPPORTED           Fw-cfg is not supported, thus host
+                                    provided information, if any, cannot be
+                                    read
+  @retval EFI_NOT_FOUND             No PCI host bridge information provided
+                                    by the host.
+**/
+STATIC
+EFI_STATUS
+PlatformScanHostProvided64BitPciMmioEnd (
+  OUT UINT64  *PciMmioAddressEnd
+  )
+{
+  EFI_STATUS            Status;
+  HOST_BRIDGE_INFO      HostBridge;
+  FIRMWARE_CONFIG_ITEM  FwCfgItem;
+  UINTN                 FwCfgSize;
+  UINTN                 FwCfgReadIndex;
+  UINTN                 ReadDataSize;
+  UINT64                Above4GMmioEnd;
+
+  if (PciMmioAddressEnd == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *PciMmioAddressEnd = 0;
+  Above4GMmioEnd     = 0;
+
+  Status = QemuFwCfgFindFile ("etc/hardware-info", &FwCfgItem, &FwCfgSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  QemuFwCfgSelectItem (FwCfgItem);
+
+  FwCfgReadIndex = 0;
+  while (FwCfgReadIndex < FwCfgSize) {
+    Status = QemuFwCfgReadNextHardwareInfoByType (
+               HardwareInfoTypeHostBridge,
+               sizeof (HostBridge),
+               FwCfgSize,
+               &HostBridge,
+               &ReadDataSize,
+               &FwCfgReadIndex
+               );
+
+    if (Status != EFI_SUCCESS) {
+      //
+      // No more data available to read in the file, break
+      // loop and finish process
+      //
+      break;
+    }
+
+    Status = HardwareInfoPciHostBridgeLastMmioAddress (
+               &HostBridge,
+               ReadDataSize,
+               TRUE,
+               &Above4GMmioEnd
+               );
+
+    if (Status != EFI_SUCCESS) {
+      //
+      // Error parsing MMIO apertures and extracting last MMIO
+      // address, reset PciMmioAddressEnd as if no information was
+      // found, to avoid moving forward with incomplete data, and
+      // bail out
+      //
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: ignoring malformed hardware information from fw_cfg\n",
+        __FUNCTION__
+        ));
+      *PciMmioAddressEnd = 0;
+      return Status;
+    }
+
+    if (Above4GMmioEnd > *PciMmioAddressEnd) {
+      *PciMmioAddressEnd = Above4GMmioEnd;
+    }
+  }
+
+  if (*PciMmioAddressEnd > 0) {
+    //
+    // Host-provided PCI information was found and a MMIO window end
+    // derived from it.
+    // Increase the End address by one to have the output pointing to
+    // one after the address in use (exclusive end).
+    //
+    *PciMmioAddressEnd += 1;
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: Pci64End=0x%Lx\n",
+      __FUNCTION__,
+      *PciMmioAddressEnd
+      ));
+
+    return EFI_SUCCESS;
+  }
+
+  return EFI_NOT_FOUND;
+}
+
 /**
   Initialize the PhysMemAddressWidth field in PlatformInfoHob based on guest RAM size.
 **/
@@ -500,16 +657,34 @@ PlatformAddressWidthInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  UINT64  FirstNonAddress;
-  UINT8   PhysMemAddressWidth;
+  UINT64      FirstNonAddress;
+  UINT8       PhysMemAddressWidth;
+  EFI_STATUS  Status;
+
+  if (PlatformInfoHob->HostBridgeDevId == 0xffff /* microvm */) {
+    PlatformAddressWidthFromCpuid (PlatformInfoHob);
+    return;
+  }
 
   //
-  // As guest-physical memory size grows, the permanent PEI RAM requirements
-  // are dominated by the identity-mapping page tables built by the DXE IPL.
-  // The DXL IPL keys off of the physical address bits advertized in the CPU
-  // HOB. To conserve memory, we calculate the minimum address width here.
+  // First scan host-provided hardware information to assess if the address
+  // space is already known. If so, guest must use those values.
   //
-  FirstNonAddress     = PlatformGetFirstNonAddress (PlatformInfoHob);
+  Status = PlatformScanHostProvided64BitPciMmioEnd (&FirstNonAddress);
+
+  if (EFI_ERROR (Status)) {
+    //
+    // If the host did not provide valid hardware information leading to a
+    // hard-defined 64-bit MMIO end, fold back to calculating the minimum range
+    // needed.
+    // As guest-physical memory size grows, the permanent PEI RAM requirements
+    // are dominated by the identity-mapping page tables built by the DXE IPL.
+    // The DXL IPL keys off of the physical address bits advertized in the CPU
+    // HOB. To conserve memory, we calculate the minimum address width here.
+    //
+    FirstNonAddress = PlatformGetFirstNonAddress (PlatformInfoHob);
+  }
+
   PhysMemAddressWidth = (UINT8)HighBitSet64 (FirstNonAddress);
 
   //

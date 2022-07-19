@@ -44,6 +44,7 @@
   BaseMemoryLib
   PeiServicesLib
   PcdLib
+  CpuLib
   UefiCpuLib
   DebugAgentLib
   IoLib
@@ -58,6 +59,8 @@
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED
+  gEfiPeiMpInitLibMpDepPpiGuid
+  gEfiPeiMpInitLibUpDepPpiGuid
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase

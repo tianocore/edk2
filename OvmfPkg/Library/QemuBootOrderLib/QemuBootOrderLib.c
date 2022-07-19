@@ -2233,6 +2233,11 @@ GetFrontPageTimeoutFromQemu (
 {
   FIRMWARE_CONFIG_ITEM  BootMenuWaitItem;
   UINTN                 BootMenuWaitSize;
+  UINT16                Timeout = PcdGet16 (PcdPlatformBootTimeOut);
+
+  if (!QemuFwCfgIsAvailable ()) {
+    return Timeout;
+  }
 
   QemuFwCfgSelectItem (QemuFwCfgItemBootMenu);
   if (QemuFwCfgRead16 () == 0) {
@@ -2257,9 +2262,6 @@ GetFrontPageTimeoutFromQemu (
     // return three seconds if the platform default would cause us to skip the
     // front page, and return the platform default otherwise.
     //
-    UINT16  Timeout;
-
-    Timeout = PcdGet16 (PcdPlatformBootTimeOut);
     if (Timeout == 0) {
       Timeout = 3;
     }

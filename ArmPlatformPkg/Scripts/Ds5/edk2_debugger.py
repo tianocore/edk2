@@ -222,4 +222,4 @@ class ArmPlatformDebugger:
             self.debug_info_table.load_all_symbols(self.verbose)
         except:
             # Debugger exception could be excepted if DRAM has not been initialized or if we have not started to run from DRAM yet
-            print "Note: no symbols have been found in System Memory (possible cause: the UEFI permanent memory has been installed yet)"
+            print "Note: no symbols have been found in System Memory (possible cause: the UEFI permanent memory has not been installed yet)"

@@ -23,6 +23,7 @@
 #include <Library/UefiLib.h>
 #include <Library/HobLib.h>
 #include <Protocol/Cpu.h>
+#include <Protocol/MpInitLibDepProtocols.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <ConfidentialComputingGuestAttr.h>
 #include <IndustryStandard/Tdx.h>
@@ -250,12 +251,31 @@ TdxDxeEntryPoint (
 
   if (!TdIsEnabled ()) {
     //
-    // If it is Non-Td guest, we're done.
+    // If it is Non-Td guest, we install gEfiMpInitLibMpDepProtocolGuid so that
+    // MpInitLib will be used in CpuDxe driver.
     //
+    gBS->InstallProtocolInterface (
+           &ImageHandle,
+           &gEfiMpInitLibMpDepProtocolGuid,
+           EFI_NATIVE_INTERFACE,
+           NULL
+           );
+
     return EFI_SUCCESS;
   }
 
   SetMmioSharedBit ();
+
+  //
+  // It is Td guest, we install gEfiMpInitLibUpDepProtocolGuid so that
+  // MpInitLibUp will be used in CpuDxe driver.
+  //
+  gBS->InstallProtocolInterface (
+         &ImageHandle,
+         &gEfiMpInitLibUpDepProtocolGuid,
+         EFI_NATIVE_INTERFACE,
+         NULL
+         );
 
   //
   // Call TDINFO to get actual number of cpus in domain

@@ -290,7 +290,7 @@ class UncrustifyCheck(ICiBuildPlugin):
         # This information is only used for reporting (not used here) and
         # the ignore lines are being passed directly as they are given to
         # this plugin.
-        return parse_gitignore_lines(ignored_files, "Package configuration file", self._abs_workspace_path)
+        return parse_gitignore_lines(ignored_files, "Package configuration file", self._abs_package_path)
 
     def _get_git_ignored_paths(self) -> List[str]:
         """"
@@ -562,6 +562,11 @@ class UncrustifyCheck(ICiBuildPlugin):
         self._formatted_file_error_count = len(formatted_files)
 
         if self._formatted_file_error_count > 0:
+            logging.error(
+                "Visit the following instructions to learn "
+                "how to find the detailed formatting errors in Azure "
+                "DevOps CI: "
+                "https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Code-Formatting#how-to-find-uncrustify-formatting-errors-in-continuous-integration-ci")
             self._tc.LogStdError("Files with formatting errors:\n")
 
             if self._output_file_diffs:

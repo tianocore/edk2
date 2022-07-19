@@ -128,8 +128,7 @@
     <Command.MSFT, Command.INTEL>
         "$(CC)" /Fo${dst} $(DEPS_FLAGS) $(CC_FLAGS) $(INC) ${src}
 
-    <Command.GCC, Command.RVCT>
-        # For RVCTCYGWIN CC_FLAGS must be first to work around pathing issues
+    <Command.GCC>
         "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) -c -o ${dst} $(INC) ${src}
 
     <Command.XCODE>
@@ -145,7 +144,7 @@
     <OutputFile>
         $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
 
-    <Command.GCC, Command.RVCT>
+    <Command.GCC>
         "$(CC)" $(CC_FLAGS) $(CC_XIPFLAGS) -c -o ${dst} $(INC) ${src}
 
 [C-Header-File]
@@ -157,7 +156,7 @@
     <Command>
 
 [Assembly-Code-File.COMMON.COMMON]
-    <InputFile.MSFT, InputFile.INTEL, InputFile.RVCT>
+    <InputFile.MSFT, InputFile.INTEL>
         ?.asm, ?.Asm, ?.ASM
 
     <InputFile.GCC>
@@ -175,16 +174,15 @@
         Trim --source-code --convert-hex --trim-long -o ${d_path}(+)${s_base}.iiii ${d_path}(+)${s_base}.ii
         "$(ASM)" /Fo${dst} $(ASM_FLAGS) /I${s_path} $(INC) ${d_path}(+)${s_base}.iiii
 
-    <Command.GCC, Command.RVCT>
+    <Command.GCC>
         Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
         "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
         Trim --trim-long --source-code -o ${d_path}(+)${s_base}.iiii ${d_path}(+)${s_base}.ii
-        # For RVCTCYGWIN ASM_FLAGS must be first to work around pathing issues
         "$(ASM)" $(ASM_FLAGS) -o ${dst} $(INC) ${d_path}(+)${s_base}.iiii
 
 [Assembly-Code-File.COMMON.ARM,Assembly-Code-File.COMMON.AARCH64]
     # Remove --convert-hex for ARM as it breaks MSFT assemblers
-    <InputFile.MSFT, InputFile.INTEL, InputFile.RVCT>
+    <InputFile.MSFT, InputFile.INTEL>
         ?.asm, ?.Asm, ?.ASM
 
     <InputFile.GCC>
@@ -208,11 +206,10 @@
         Trim --source-code --trim-long -o ${d_path}(+)${s_base}.iiii ${d_path}(+)${s_base}.ii
         "$(ASM)" /Fo${dst} $(ASM_FLAGS) /I${s_path} $(INC) ${d_path}(+)${s_base}.iiii
 
-    <Command.GCC, Command.RVCT>
+    <Command.GCC>
         Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
         "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
         Trim --trim-long --source-code -o ${d_path}(+)${s_base}.iiii ${d_path}(+)${s_base}.ii
-        # For RVCTCYGWIN ASM_FLAGS must be first to work around pathing issues
         "$(ASM)" $(ASM_FLAGS) -o ${dst} $(INC) ${d_path}(+)${s_base}.iiii
 
 [Nasm-Assembly-Code-File.COMMON.COMMON]
@@ -276,13 +273,6 @@
         $(RM) ${dst}
         "$(SLINK)" cr ${dst} $(SLINK_FLAGS) @$(OBJECT_FILES_LIST)
     
-    <Command.RVCT>
-        "$(SLINK)" $(SLINK_FLAGS) ${dst} --via $(OBJECT_FILES_LIST)
-    
-    <Command.RVCTCYGWIN>
-        # $(OBJECT_FILES_LIST) has wrong paths for cygwin
-        "$(SLINK)" $(SLINK_FLAGS) ${dst} $(OBJECT_FILES)
-
     <Command.XCODE>
         "$(SLINK)" $(SLINK_FLAGS) ${dst} -filelist $(OBJECT_FILES_LIST)
 
@@ -306,13 +296,6 @@
     <Command.GCC>
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(CC_FLAGS) $(DLINK2_FLAGS)
         "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
-
-    <Command.RVCT>
-        "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) --via $(STATIC_LIBRARY_FILES_LIST) $(DLINK2_FLAGS)
-
-    <Command.RVCTCYGWIN>
-        #$(STATIC_LIBRARY_FILES_LIST) has wrong paths for cygwin
-        "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) $(DLINK2_FLAGS)
 
     <Command.XCODE>
         "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) -filelist $(STATIC_LIBRARY_FILES_LIST)  $(DLINK2_FLAGS)
@@ -349,13 +332,6 @@
     <Command.GCC>
         "$(DLINK)" $(DLINK_FLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(DLINK2_FLAGS)
 
-    <Command.RVCT>
-        "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) --via $(STATIC_LIBRARY_FILES_LIST) $(DLINK2_FLAGS)
-
-    <Command.RVCTCYGWIN>
-        #$(STATIC_LIBRARY_FILES_LIST) has the wrong paths for cygwin
-        "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) $(DLINK2_FLAGS)
-
     <Command.XCODE>
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS)  $(DLINK_SPATH) -filelist $(STATIC_LIBRARY_FILES_LIST)  $(DLINK2_FLAGS)
       
@@ -366,8 +342,10 @@
 
     <OutputFile>
         $(OUTPUT_DIR)(+)$(MODULE_NAME).efi
+        $(DEBUG_DIR)(+)$(MODULE_NAME).efi
+        $(OUTPUT_DIR)(+)$(MODULE_NAME).map
 
-    <Command.MSFT, Command.INTEL, Command.RVCT, Command.CLANGPDB>
+    <Command.MSFT, Command.INTEL, Command.CLANGPDB>
         "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
         $(CP) ${dst} $(DEBUG_DIR)
         $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
@@ -659,7 +637,7 @@
     <OutputFile.MSFT, OutputFile.INTEL, OutputFile.GCC, OutputFile.CLANGPDB>
         $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.lib
 
-    <OutputFile.XCODE, OutputFile.RVCT>
+    <OutputFile.XCODE>
         $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
 
     <Command.MSFT, Command.INTEL, Command.CLANGPDB>
@@ -669,5 +647,5 @@
     <Command.GCC>
         "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiibinpackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
         "$(RC)" $(RC_FLAGS) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc ${dst}
-    <Command.XCODE, Command.RVCT, Command.CLANGGCC>
+    <Command.XCODE, Command.CLANGGCC>
         "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiibinpackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)

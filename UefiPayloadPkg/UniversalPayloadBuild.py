@@ -29,9 +29,9 @@ class UPLD_INFO_HEADER(LittleEndianStructure):
         ]
 
     def __init__(self):
-        self.Identifier     =  b'UPLD'
+        self.Identifier     =  b'PLDH'
         self.HeaderLength   = sizeof(UPLD_INFO_HEADER)
-        self.HeaderRevision = 0x0075
+        self.SpecRevision   = 0x0007
         self.Revision       = 0x0000010105
         self.ImageId        = b'UEFI'
         self.ProducerId     = b'INTEL'
@@ -54,14 +54,20 @@ def BuildUniversalPayload(Args, MacroList):
     BuildTarget = Args.Target
     ToolChain = Args.ToolChain
     Quiet     = "--quiet"  if Args.Quiet else ""
-    BuildArch = "X64" if Args.Arch == 'X64' else "IA32 -a X64"
     ElfToolChain = 'CLANGDWARF'
+    BuildDir     = os.path.join(os.environ['WORKSPACE'], os.path.normpath("Build/UefiPayloadPkgX64"))
+    if Args.Arch == 'X64':
+        BuildArch      = "X64"
+        ObjCopyFlag    = "elf64-x86-64"
+        EntryOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ElfToolChain), os.path.normpath("X64/UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry/DEBUG/UniversalPayloadEntry.dll"))
+    else:
+        BuildArch      = "IA32 -a X64"
+        ObjCopyFlag    = "elf32-i386"
+        EntryOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ElfToolChain), os.path.normpath("IA32/UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry/DEBUG/UniversalPayloadEntry.dll"))
 
     EntryModuleInf = os.path.normpath("UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf")
     DscPath = os.path.normpath("UefiPayloadPkg/UefiPayloadPkg.dsc")
-    BuildDir = os.path.join(os.environ['WORKSPACE'], os.path.normpath("Build/UefiPayloadPkgX64"))
-    FvOutputDir = os.path.join(BuildDir, f"{BuildTarget}_{ToolChain}", os.path.normpath("FV/DXEFV.Fv"))
-    EntryOutputDir = os.path.join(BuildDir, f"{BuildTarget}_{ElfToolChain}", os.path.normpath("X64/UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry/DEBUG/UniversalPayloadEntry.dll"))
+    FvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/DXEFV.Fv"))
     PayloadReportPath = os.path.join(BuildDir, "UefiUniversalPayload.txt")
     ModuleReportPath = os.path.join(BuildDir, "UefiUniversalPayloadEntry.txt")
     UpldInfoFile = os.path.join(BuildDir, "UniversalPayloadInfo.bin")
@@ -76,6 +82,11 @@ def BuildUniversalPayload(Args, MacroList):
         print("- Failed - Please check if LLVM is installed or if CLANG_BIN is set correctly")
         sys.exit(1)
 
+    Pcds = ""
+    if (Args.pcd != None):
+        for PcdItem in Args.pcd:
+            Pcds += " --pcd {}".format (PcdItem)
+
     Defines = ""
     for key in MacroList:
         Defines +=" -D {0}={1}".format(key, MacroList[key])
@@ -83,13 +94,15 @@ def BuildUniversalPayload(Args, MacroList):
     #
     # Building DXE core and DXE drivers as DXEFV.
     #
-    BuildPayload = f"build -p {DscPath} -b {BuildTarget} -a X64 -t {ToolChain} -y {PayloadReportPath} {Quiet}"
+    BuildPayload = "build -p {} -b {} -a X64 -t {} -y {} {}".format (DscPath, BuildTarget, ToolChain, PayloadReportPath, Quiet)
+    BuildPayload += Pcds
     BuildPayload += Defines
     RunCommand(BuildPayload)
     #
     # Building Universal Payload entry.
     #
-    BuildModule = f"build -p {DscPath} -b {BuildTarget} -a {BuildArch} -m {EntryModuleInf} -t {ElfToolChain} -y {ModuleReportPath} {Quiet}"
+    BuildModule = "build -p {} -b {} -a {} -m {} -t {} -y {} {}".format (DscPath, BuildTarget, BuildArch, EntryModuleInf, ElfToolChain, ModuleReportPath, Quiet)
+    BuildModule += Pcds
     BuildModule += Defines
     RunCommand(BuildModule)
 
@@ -98,6 +111,7 @@ def BuildUniversalPayload(Args, MacroList):
     #
     upld_info_hdr = UPLD_INFO_HEADER()
     upld_info_hdr.ImageId = Args.ImageId.encode()[:16]
+    upld_info_hdr.Attribute |= 1 if BuildTarget == "DEBUG" else 0
     fp = open(UpldInfoFile, 'wb')
     fp.write(bytearray(upld_info_hdr))
     fp.close()
@@ -105,9 +119,26 @@ def BuildUniversalPayload(Args, MacroList):
     #
     # Copy the DXEFV as a section in elf format Universal Payload entry.
     #
-    remove_section = '"%s" -I elf64-x86-64 -O elf64-x86-64 --remove-section .upld_info --remove-section .upld.uefi_fv %s'%(LlvmObjcopyPath, EntryOutputDir)
-    add_section    = '"%s" -I elf64-x86-64 -O elf64-x86-64 --add-section .upld_info=%s --add-section .upld.uefi_fv=%s %s'%(LlvmObjcopyPath, UpldInfoFile, FvOutputDir, EntryOutputDir)
-    set_section    = '"%s" -I elf64-x86-64 -O elf64-x86-64 --set-section-alignment .upld.upld_info=16 --set-section-alignment .upld.uefi_fv=16 %s'%(LlvmObjcopyPath, EntryOutputDir)
+    remove_section = '"{}" -I {} -O {} --remove-section .upld_info --remove-section .upld.uefi_fv {}'.format (
+                       LlvmObjcopyPath,
+                       ObjCopyFlag,
+                       ObjCopyFlag,
+                       EntryOutputDir
+                       )
+    add_section    = '"{}" -I {} -O {} --add-section .upld_info={} --add-section .upld.uefi_fv={} {}'.format (
+                       LlvmObjcopyPath,
+                       ObjCopyFlag,
+                       ObjCopyFlag,
+                       UpldInfoFile,
+                       FvOutputDir,
+                       EntryOutputDir
+                       )
+    set_section    = '"{}" -I {} -O {} --set-section-alignment .upld.upld_info=16 --set-section-alignment .upld.uefi_fv=16 {}'.format (
+                       LlvmObjcopyPath,
+                       ObjCopyFlag,
+                       ObjCopyFlag,
+                       EntryOutputDir
+                       )
     RunCommand(remove_section)
     RunCommand(add_section)
     RunCommand(set_section)
@@ -122,6 +153,7 @@ def main():
     parser.add_argument("-D", "--Macro", action="append", default=["UNIVERSAL_PAYLOAD=TRUE"])
     parser.add_argument('-i', '--ImageId', type=str, help='Specify payload ID (16 bytes maximal).', default ='UEFI')
     parser.add_argument('-q', '--Quiet', action='store_true', help='Disable all build messages except FATAL ERRORS.')
+    parser.add_argument("-p", "--pcd", action="append")
     MacroList = {}
     args = parser.parse_args()
     if args.Macro is not None:

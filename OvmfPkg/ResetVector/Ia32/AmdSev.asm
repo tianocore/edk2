@@ -150,6 +150,8 @@ BITS    32
 SevEsUnexpectedRespTerminate:
     TerminateVmgExit    TERM_UNEXPECTED_RESP_CODE
 
+%ifdef ARCH_X64
+
 ; If SEV-ES is enabled then initialize and make the GHCB page shared
 SevClearPageEncMaskForGhcbPage:
     ; Check if SEV is enabled
@@ -208,6 +210,8 @@ GetSevCBitMaskAbove31:
 
 GetSevCBitMaskAbove31Exit:
     OneTimeCallRet GetSevCBitMaskAbove31
+
+%endif
 
 ; Check if Secure Encrypted Virtualization (SEV) features are enabled.
 ;
@@ -273,14 +277,6 @@ ClearSevEsWorkArea:
     ; Save the SevStatus MSR value in the workarea
     mov     [SEV_ES_WORK_AREA_STATUS_MSR], eax
     mov     [SEV_ES_WORK_AREA_STATUS_MSR + 4], edx
-
-    ; Check for SEV-ES memory encryption feature:
-    ; CPUID  Fn8000_001F[EAX] - Bit 3
-    ;   CPUID raises a #VC exception if running as an SEV-ES guest
-    mov       eax, 0x8000001f
-    cpuid
-    bt        eax, 3
-    jnc       GetSevEncBit
 
     ; Check if SEV-ES is enabled
     ;  MSR_0xC0010131 - Bit 1 (SEV-ES enabled)

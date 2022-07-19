@@ -11,6 +11,41 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/BhyveFwCtlLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/QemuFwCfgLib.h>             // QemuFwCfgFindFile()
+
+STATIC
+EFI_STATUS
+EFIAPI
+BhyveGetCpuCount (
+  OUT UINT32  *CpuCount
+  )
+{
+  FIRMWARE_CONFIG_ITEM  Item;
+  UINTN                 Size;
+
+  if (QemuFwCfgIsAvailable ()) {
+    if (EFI_ERROR (QemuFwCfgFindFile ("opt/bhyve/hw.ncpu", &Item, &Size))) {
+      return EFI_NOT_FOUND;
+    } else if (Size != sizeof (*CpuCount)) {
+      return EFI_BAD_BUFFER_SIZE;
+    }
+
+    QemuFwCfgSelectItem (Item);
+    QemuFwCfgReadBytes (Size, CpuCount);
+
+    return EFI_SUCCESS;
+  }
+
+  //
+  // QemuFwCfg not available, try BhyveFwCtl.
+  //
+  Size = sizeof (*CpuCount);
+  if (BhyveFwCtlGet ("hw.ncpu", CpuCount, &Size) == RETURN_SUCCESS) {
+    return EFI_SUCCESS;
+  }
+
+  return EFI_UNSUPPORTED;
+}
 
 STATIC
 EFI_STATUS
@@ -23,7 +58,6 @@ BhyveInstallAcpiMadtTable (
   )
 {
   UINT32                                               CpuCount;
-  UINTN                                                cSize;
   UINTN                                                NewBufferSize;
   EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER  *Madt;
   EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC_STRUCTURE          *LocalApic;
@@ -36,9 +70,8 @@ BhyveInstallAcpiMadtTable (
   ASSERT (AcpiTableBufferSize >= sizeof (EFI_ACPI_DESCRIPTION_HEADER));
 
   // Query the host for the number of vCPUs
-  CpuCount = 0;
-  cSize    = sizeof (CpuCount);
-  if (BhyveFwCtlGet ("hw.ncpu", &CpuCount, &cSize) == RETURN_SUCCESS) {
+  Status = BhyveGetCpuCount (&CpuCount);
+  if (!EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "Retrieved CpuCount %d\n", CpuCount));
     ASSERT (CpuCount >= 1);
   } else {

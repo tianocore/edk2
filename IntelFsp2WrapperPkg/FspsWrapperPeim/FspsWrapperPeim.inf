@@ -38,6 +38,7 @@
   MemoryAllocationLib
   FspWrapperPlatformLib
   FspWrapperHobProcessLib
+  CpuLib
   UefiCpuLib
   PeCoffGetEntryPointLib
   PeCoffExtraActionLib

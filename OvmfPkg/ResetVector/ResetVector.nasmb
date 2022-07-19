@@ -47,7 +47,36 @@
 %include "Ia32/SearchForBfvBase.asm"
 %include "Ia32/SearchForSecEntry.asm"
 
-%define WORK_AREA_GUEST_TYPE (FixedPcdGet32 (PcdOvmfWorkAreaBase))
+%define WORK_AREA_GUEST_TYPE          (FixedPcdGet32 (PcdOvmfWorkAreaBase))
+%define PT_ADDR(Offset)               (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
+
+%define GHCB_PT_ADDR                  (FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase))
+%define GHCB_BASE                     (FixedPcdGet32 (PcdOvmfSecGhcbBase))
+%define GHCB_SIZE                     (FixedPcdGet32 (PcdOvmfSecGhcbSize))
+%define SEV_ES_WORK_AREA              (FixedPcdGet32 (PcdSevEsWorkAreaBase))
+%define SEV_ES_WORK_AREA_SIZE         25
+%define SEV_ES_WORK_AREA_STATUS_MSR   (FixedPcdGet32 (PcdSevEsWorkAreaBase))
+%define SEV_ES_WORK_AREA_RDRAND       (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 8)
+%define SEV_ES_WORK_AREA_ENC_MASK     (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 16)
+%define SEV_ES_WORK_AREA_RECEIVED_VC  (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 24)
+%define SEV_ES_VC_TOP_OF_STACK        (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + FixedPcdGet32 (PcdOvmfSecPeiTempRamSize))
+%define SEV_SNP_SECRETS_BASE          (FixedPcdGet32 (PcdOvmfSnpSecretsBase))
+%define SEV_SNP_SECRETS_SIZE          (FixedPcdGet32 (PcdOvmfSnpSecretsSize))
+%define CPUID_BASE                    (FixedPcdGet32 (PcdOvmfCpuidBase))
+%define CPUID_SIZE                    (FixedPcdGet32 (PcdOvmfCpuidSize))
+%define SNP_SEC_MEM_BASE_DESC_1       (FixedPcdGet32 (PcdOvmfSecPageTablesBase))
+%define SNP_SEC_MEM_SIZE_DESC_1       (FixedPcdGet32 (PcdOvmfSecGhcbBase) - SNP_SEC_MEM_BASE_DESC_1)
+;
+; The PcdOvmfSecGhcbBase reserves two GHCB pages. The first page is used
+; as GHCB shared page and second is used for bookkeeping to support the
+; nested GHCB in SEC phase. The bookkeeping page is mapped private. The VMM
+; does not need to validate the shared page but it need to validate the
+; bookkeeping page.
+;
+%define SNP_SEC_MEM_BASE_DESC_2       (GHCB_BASE + 0x1000)
+%define SNP_SEC_MEM_SIZE_DESC_2       (SEV_SNP_SECRETS_BASE - SNP_SEC_MEM_BASE_DESC_2)
+%define SNP_SEC_MEM_BASE_DESC_3       (CPUID_BASE + CPUID_SIZE)
+%define SNP_SEC_MEM_SIZE_DESC_3       (FixedPcdGet32 (PcdOvmfPeiMemFvBase) - SNP_SEC_MEM_BASE_DESC_3)
 
 %ifdef ARCH_X64
   #include <AutoGen.h>
@@ -94,43 +123,14 @@
   %define TDX_WORK_AREA_PGTBL_READY (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 4)
   %define TDX_WORK_AREA_GPAW        (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 8)
 
-  %define PT_ADDR(Offset) (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
-
-  %define GHCB_PT_ADDR (FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase))
-  %define GHCB_BASE (FixedPcdGet32 (PcdOvmfSecGhcbBase))
-  %define GHCB_SIZE (FixedPcdGet32 (PcdOvmfSecGhcbSize))
-  %define SEV_ES_WORK_AREA (FixedPcdGet32 (PcdSevEsWorkAreaBase))
-  %define SEV_ES_WORK_AREA_SIZE 25
-  %define SEV_ES_WORK_AREA_STATUS_MSR (FixedPcdGet32 (PcdSevEsWorkAreaBase))
-  %define SEV_ES_WORK_AREA_RDRAND (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 8)
-  %define SEV_ES_WORK_AREA_ENC_MASK (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 16)
-  %define SEV_ES_WORK_AREA_RECEIVED_VC (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 24)
-  %define SEV_ES_VC_TOP_OF_STACK (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + FixedPcdGet32 (PcdOvmfSecPeiTempRamSize))
-  %define SEV_SNP_SECRETS_BASE  (FixedPcdGet32 (PcdOvmfSnpSecretsBase))
-  %define SEV_SNP_SECRETS_SIZE  (FixedPcdGet32 (PcdOvmfSnpSecretsSize))
-  %define CPUID_BASE  (FixedPcdGet32 (PcdOvmfCpuidBase))
-  %define CPUID_SIZE  (FixedPcdGet32 (PcdOvmfCpuidSize))
-  %define SNP_SEC_MEM_BASE_DESC_1 (FixedPcdGet32 (PcdOvmfSecPageTablesBase))
-  %define SNP_SEC_MEM_SIZE_DESC_1 (FixedPcdGet32 (PcdOvmfSecGhcbBase) - SNP_SEC_MEM_BASE_DESC_1)
-  ;
-  ; The PcdOvmfSecGhcbBase reserves two GHCB pages. The first page is used
-  ; as GHCB shared page and second is used for bookkeeping to support the
-  ; nested GHCB in SEC phase. The bookkeeping page is mapped private. The VMM
-  ; does not need to validate the shared page but it need to validate the
-  ; bookkeeping page.
-  ;
-  %define SNP_SEC_MEM_BASE_DESC_2 (GHCB_BASE + 0x1000)
-  %define SNP_SEC_MEM_SIZE_DESC_2 (SEV_SNP_SECRETS_BASE - SNP_SEC_MEM_BASE_DESC_2)
-  %define SNP_SEC_MEM_BASE_DESC_3 (CPUID_BASE + CPUID_SIZE)
-  %define SNP_SEC_MEM_SIZE_DESC_3 (FixedPcdGet32 (PcdOvmfPeiMemFvBase) - SNP_SEC_MEM_BASE_DESC_3)
-
-%include "X64/IntelTdxMetadata.asm"
-%include "Ia32/Flat32ToFlat64.asm"
-%include "Ia32/AmdSev.asm"
-%include "Ia32/PageTables64.asm"
-%include "Ia32/IntelTdx.asm"
-%include "X64/OvmfSevMetadata.asm"
+  %include "X64/IntelTdxMetadata.asm"
+  %include "Ia32/Flat32ToFlat64.asm"
+  %include "Ia32/PageTables64.asm"
+  %include "Ia32/IntelTdx.asm"
+  %include "X64/OvmfSevMetadata.asm"
 %endif
+
+%include "Ia32/AmdSev.asm"
 
 %include "Ia16/Real16ToFlat32.asm"
 %include "Ia16/Init16.asm"

@@ -16,6 +16,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/HobLib.h>
+#include <Library/SafeIntLib.h>
+#include <Library/VariableFlashInfoLib.h>
 
 EFI_PEI_PPI_DESCRIPTOR  mPpiListVariable = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
@@ -212,25 +214,31 @@ PeimFaultTolerantWriteInitialize (
   EFI_PHYSICAL_ADDRESS                     SpareAreaAddress;
   UINTN                                    SpareAreaLength;
   EFI_PHYSICAL_ADDRESS                     WorkSpaceInSpareArea;
+  UINT64                                   Size;
   FAULT_TOLERANT_WRITE_LAST_WRITE_DATA     FtwLastWrite;
 
   FtwWorkingBlockHeader = NULL;
   FtwLastWriteHeader    = NULL;
   FtwLastWriteRecord    = NULL;
 
-  WorkSpaceAddress = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdFlashNvStorageFtwWorkingBase64);
-  if (WorkSpaceAddress == 0) {
-    WorkSpaceAddress = (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdFlashNvStorageFtwWorkingBase);
-  }
+  SpareAreaAddress = 0;
+  SpareAreaLength  = 0;
+  WorkSpaceAddress = 0;
+  WorkSpaceLength  = 0;
 
-  WorkSpaceLength = (UINTN)PcdGet32 (PcdFlashNvStorageFtwWorkingSize);
+  Status = GetVariableFlashFtwWorkingInfo (&WorkSpaceAddress, &Size);
+  ASSERT_EFI_ERROR (Status);
 
-  SpareAreaAddress = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdFlashNvStorageFtwSpareBase64);
-  if (SpareAreaAddress == 0) {
-    SpareAreaAddress = (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdFlashNvStorageFtwSpareBase);
-  }
+  Status = SafeUint64ToUintn (Size, &WorkSpaceLength);
+  // This driver currently assumes the size will be UINTN so assert the value is safe for now.
+  ASSERT_EFI_ERROR (Status);
 
-  SpareAreaLength = (UINTN)PcdGet32 (PcdFlashNvStorageFtwSpareSize);
+  Status = GetVariableFlashFtwSpareInfo (&SpareAreaAddress, &Size);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = SafeUint64ToUintn (Size, &SpareAreaLength);
+  // This driver currently assumes the size will be UINTN so assert the value is safe for now.
+  ASSERT_EFI_ERROR (Status);
 
   //
   // The address of FTW working base and spare base must not be 0.

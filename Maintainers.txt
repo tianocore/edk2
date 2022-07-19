@@ -218,14 +218,14 @@ IntelFsp2Pkg
 F: IntelFsp2Pkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2Pkg
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
-R: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
+M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 
 IntelFsp2WrapperPkg
 F: IntelFsp2WrapperPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2WrapperPkg
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
-R: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
+M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 
 MdeModulePkg
@@ -612,9 +612,7 @@ F: UefiPayloadPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiPayloadPkg
 M: Guo Dong <guo.dong@intel.com> [gdong1]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
-R: Maurice Ma <maurice.ma@intel.com> [mauricema]
-R: Benjamin You <benjamin.you@intel.com> [BenjaminYou]
-R: Sean Rhodes <sean@starlabs.systems>
+M: Sean Rhodes <sean@starlabs.systems>
 S: Maintained
 
 UnitTestFrameworkPkg

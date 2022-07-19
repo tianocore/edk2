@@ -33,7 +33,7 @@ ALIGN   8
 ;
 AsmIdtVectorBegin:
 %assign Vector 0
-%rep  32
+%rep  256
     push    byte %[Vector];
     push    eax
     mov     eax, ASM_PFX(CommonInterruptEntry)
@@ -439,7 +439,7 @@ ASM_PFX(AsmGetTemplateAddressMap):
 
     mov ebx, dword [ebp + 0x8]
     mov dword [ebx],      AsmIdtVectorBegin
-    mov dword [ebx + 0x4], (AsmIdtVectorEnd - AsmIdtVectorBegin) / 32
+    mov dword [ebx + 0x4], (AsmIdtVectorEnd - AsmIdtVectorBegin) / 256
     mov dword [ebx + 0x8], HookAfterStubBegin
 
     popad

@@ -37,6 +37,7 @@ typedef enum {
   //
   // - create/release a host-side 2D resource,
   //
+  VirtioGpuCmdGetDisplayInfo   = 0x0100,
   VirtioGpuCmdResourceCreate2d = 0x0101,
   VirtioGpuCmdResourceUnref    = 0x0102,
   //
@@ -64,7 +65,8 @@ typedef enum {
   //
   // Success code for all of the above commands.
   //
-  VirtioGpuRespOkNodata = 0x1100,
+  VirtioGpuRespOkNodata      = 0x1100,
+  VirtioGpuRespOkDisplayInfo = 0x1101,
 } VIRTIO_GPU_CONTROL_TYPE;
 
 //
@@ -205,6 +207,21 @@ typedef struct {
   UINT32                       ResourceId;
   UINT32                       Padding;
 } VIRTIO_GPU_RESOURCE_FLUSH;
+#pragma pack ()
+
+//
+// Response structure for VirtioGpuCmdGetDisplayInfo
+//
+#define VIRTIO_GPU_MAX_SCANOUTS  16
+#pragma pack (1)
+typedef struct {
+  VIRTIO_GPU_CONTROL_HEADER    Header;
+  struct {
+    VIRTIO_GPU_RECTANGLE    Rectangle;
+    UINT32                  Enabled;
+    UINT32                  Flags;
+  } Pmodes[VIRTIO_GPU_MAX_SCANOUTS];
+} VIRTIO_GPU_RESP_DISPLAY_INFO;
 #pragma pack ()
 
 #endif // _VIRTIO_GPU_H_

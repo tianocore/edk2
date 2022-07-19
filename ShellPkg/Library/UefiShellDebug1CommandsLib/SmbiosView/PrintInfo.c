@@ -635,6 +635,10 @@ SmbiosPrintStructure (
             ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DEV_FUNC_NUM), gShellDebug1HiiHandle, PeerGroupPtr[Index].DevFuncNum);
             ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DATA_BUS_WIDTH), gShellDebug1HiiHandle, PeerGroupPtr[Index].DataBusWidth);
           }
+
+          DisplaySystemSlotHeight (Struct->Type9->SlotHeight, Option);
+          DisplaySystemSlotPhysicalWidth (Struct->Type9->SlotPhysicalWidth, Option);
+          DisplaySystemSlotInformation (Struct->Type9->SlotInformation, Option);
         }
       }
 
@@ -1535,6 +1539,14 @@ DisplayBiosCharacteristicsExt2 (
 
       if (BIT (byte2, 4) != 0) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_VIRTUAL_MACHINE), gShellDebug1HiiHandle);
+      }
+
+      if (BIT (byte2, 5) != 0) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_MCFG_SUPPORTED), gShellDebug1HiiHandle);
+      }
+
+      if (BIT (byte2, 6) != 0) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_MCFG_ENABLED), gShellDebug1HiiHandle);
       }
 
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BITS_RSVD_FOR_FUTURE), gShellDebug1HiiHandle, 5);
@@ -2898,11 +2910,6 @@ DisplaySystemSlotId (
   IN UINT8   Option
   )
 {
-  //
-  // Display slot type first
-  //
-  DisplaySystemSlotType (SlotType, Option);
-
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_SLOT_ID), gShellDebug1HiiHandle);
   //
   // print option

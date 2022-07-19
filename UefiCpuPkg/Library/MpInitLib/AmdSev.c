@@ -110,11 +110,7 @@ MpInitLibSevEsAPReset (
   Code16 = GetProtectedMode16CS ();
   Code32 = GetProtectedMode32CS ();
 
-  if (CpuMpData->WakeupBufferHigh != 0) {
-    APResetFn = (AP_RESET *)(CpuMpData->WakeupBufferHigh + CpuMpData->AddressMap.SwitchToRealNoNxOffset);
-  } else {
-    APResetFn = (AP_RESET *)(CpuMpData->MpCpuExchangeInfo->BufferStart + CpuMpData->AddressMap.SwitchToRealOffset);
-  }
+  APResetFn = (AP_RESET *)(CpuMpData->WakeupBufferHigh + CpuMpData->AddressMap.SwitchToRealNoNxOffset);
 
   BufferStart = CpuMpData->MpCpuExchangeInfo->BufferStart;
   StackStart  = CpuMpData->SevEsAPResetStackStart -

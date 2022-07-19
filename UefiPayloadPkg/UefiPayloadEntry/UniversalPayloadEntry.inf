@@ -52,6 +52,7 @@
   IoLib
   HobLib
   PeCoffLib
+  CpuLib
   UefiCpuLib
 
 [Guids]

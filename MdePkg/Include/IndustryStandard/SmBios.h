@@ -1271,71 +1271,85 @@ typedef struct {
 /// System Slots - Slot Type
 ///
 typedef enum {
-  SlotTypeOther                          = 0x01,
-  SlotTypeUnknown                        = 0x02,
-  SlotTypeIsa                            = 0x03,
-  SlotTypeMca                            = 0x04,
-  SlotTypeEisa                           = 0x05,
-  SlotTypePci                            = 0x06,
-  SlotTypePcmcia                         = 0x07,
-  SlotTypeVlVesa                         = 0x08,
-  SlotTypeProprietary                    = 0x09,
-  SlotTypeProcessorCardSlot              = 0x0A,
-  SlotTypeProprietaryMemoryCardSlot      = 0x0B,
-  SlotTypeIORiserCardSlot                = 0x0C,
-  SlotTypeNuBus                          = 0x0D,
-  SlotTypePci66MhzCapable                = 0x0E,
-  SlotTypeAgp                            = 0x0F,
-  SlotTypeApg2X                          = 0x10,
-  SlotTypeAgp4X                          = 0x11,
-  SlotTypePciX                           = 0x12,
-  SlotTypeAgp8X                          = 0x13,
-  SlotTypeM2Socket1_DP                   = 0x14,
-  SlotTypeM2Socket1_SD                   = 0x15,
-  SlotTypeM2Socket2                      = 0x16,
-  SlotTypeM2Socket3                      = 0x17,
-  SlotTypeMxmTypeI                       = 0x18,
-  SlotTypeMxmTypeII                      = 0x19,
-  SlotTypeMxmTypeIIIStandard             = 0x1A,
-  SlotTypeMxmTypeIIIHe                   = 0x1B,
-  SlotTypeMxmTypeIV                      = 0x1C,
-  SlotTypeMxm30TypeA                     = 0x1D,
-  SlotTypeMxm30TypeB                     = 0x1E,
-  SlotTypePciExpressGen2Sff_8639         = 0x1F,
-  SlotTypePciExpressGen3Sff_8639         = 0x20,
-  SlotTypePciExpressMini52pinWithBSKO    = 0x21,    ///< PCI Express Mini 52-pin (CEM spec. 2.0) with bottom-side keep-outs.
-  SlotTypePciExpressMini52pinWithoutBSKO = 0x22,    ///< PCI Express Mini 52-pin (CEM spec. 2.0) without bottom-side keep-outs.
-  SlotTypePciExpressMini76pin            = 0x23,    ///< PCI Express Mini 76-pin (CEM spec. 2.0) Corresponds to Display-Mini card.
-  SlotTypeCXLFlexbus10                   = 0x30,
-  SlotTypePC98C20                        = 0xA0,
-  SlotTypePC98C24                        = 0xA1,
-  SlotTypePC98E                          = 0xA2,
-  SlotTypePC98LocalBus                   = 0xA3,
-  SlotTypePC98Card                       = 0xA4,
-  SlotTypePciExpress                     = 0xA5,
-  SlotTypePciExpressX1                   = 0xA6,
-  SlotTypePciExpressX2                   = 0xA7,
-  SlotTypePciExpressX4                   = 0xA8,
-  SlotTypePciExpressX8                   = 0xA9,
-  SlotTypePciExpressX16                  = 0xAA,
-  SlotTypePciExpressGen2                 = 0xAB,
-  SlotTypePciExpressGen2X1               = 0xAC,
-  SlotTypePciExpressGen2X2               = 0xAD,
-  SlotTypePciExpressGen2X4               = 0xAE,
-  SlotTypePciExpressGen2X8               = 0xAF,
-  SlotTypePciExpressGen2X16              = 0xB0,
-  SlotTypePciExpressGen3                 = 0xB1,
-  SlotTypePciExpressGen3X1               = 0xB2,
-  SlotTypePciExpressGen3X2               = 0xB3,
-  SlotTypePciExpressGen3X4               = 0xB4,
-  SlotTypePciExpressGen3X8               = 0xB5,
-  SlotTypePciExpressGen3X16              = 0xB6,
-  SlotTypePciExpressGen4                 = 0xB8,
-  SlotTypePciExpressGen4X1               = 0xB9,
-  SlotTypePciExpressGen4X2               = 0xBA,
-  SlotTypePciExpressGen4X4               = 0xBB,
-  SlotTypePciExpressGen4X8               = 0xBC,
-  SlotTypePciExpressGen4X16              = 0xBD
+  SlotTypeOther                                     = 0x01,
+  SlotTypeUnknown                                   = 0x02,
+  SlotTypeIsa                                       = 0x03,
+  SlotTypeMca                                       = 0x04,
+  SlotTypeEisa                                      = 0x05,
+  SlotTypePci                                       = 0x06,
+  SlotTypePcmcia                                    = 0x07,
+  SlotTypeVlVesa                                    = 0x08,
+  SlotTypeProprietary                               = 0x09,
+  SlotTypeProcessorCardSlot                         = 0x0A,
+  SlotTypeProprietaryMemoryCardSlot                 = 0x0B,
+  SlotTypeIORiserCardSlot                           = 0x0C,
+  SlotTypeNuBus                                     = 0x0D,
+  SlotTypePci66MhzCapable                           = 0x0E,
+  SlotTypeAgp                                       = 0x0F,
+  SlotTypeApg2X                                     = 0x10,
+  SlotTypeAgp4X                                     = 0x11,
+  SlotTypePciX                                      = 0x12,
+  SlotTypeAgp8X                                     = 0x13,
+  SlotTypeM2Socket1_DP                              = 0x14,
+  SlotTypeM2Socket1_SD                              = 0x15,
+  SlotTypeM2Socket2                                 = 0x16,
+  SlotTypeM2Socket3                                 = 0x17,
+  SlotTypeMxmTypeI                                  = 0x18,
+  SlotTypeMxmTypeII                                 = 0x19,
+  SlotTypeMxmTypeIIIStandard                        = 0x1A,
+  SlotTypeMxmTypeIIIHe                              = 0x1B,
+  SlotTypeMxmTypeIV                                 = 0x1C,
+  SlotTypeMxm30TypeA                                = 0x1D,
+  SlotTypeMxm30TypeB                                = 0x1E,
+  SlotTypePciExpressGen2Sff_8639                    = 0x1F,
+  SlotTypePciExpressGen3Sff_8639                    = 0x20,
+  SlotTypePciExpressMini52pinWithBSKO               = 0x21,    ///< PCI Express Mini 52-pin (CEM spec. 2.0) with bottom-side keep-outs.
+  SlotTypePciExpressMini52pinWithoutBSKO            = 0x22,    ///< PCI Express Mini 52-pin (CEM spec. 2.0) without bottom-side keep-outs.
+  SlotTypePciExpressMini76pin                       = 0x23,    ///< PCI Express Mini 76-pin (CEM spec. 2.0) Corresponds to Display-Mini card.
+  SlotTypePCIExpressGen4SFF_8639                    = 0x24,    ///< U.2
+  SlotTypePCIExpressGen5SFF_8639                    = 0x25,    ///< U.2
+  SlotTypeOCPNIC30SmallFormFactor                   = 0x26,    ///< SFF
+  SlotTypeOCPNIC30LargeFormFactor                   = 0x27,    ///< LFF
+  SlotTypeOCPNICPriorto30                           = 0x28,
+  SlotTypeCXLFlexbus10                              = 0x30,
+  SlotTypePC98C20                                   = 0xA0,
+  SlotTypePC98C24                                   = 0xA1,
+  SlotTypePC98E                                     = 0xA2,
+  SlotTypePC98LocalBus                              = 0xA3,
+  SlotTypePC98Card                                  = 0xA4,
+  SlotTypePciExpress                                = 0xA5,
+  SlotTypePciExpressX1                              = 0xA6,
+  SlotTypePciExpressX2                              = 0xA7,
+  SlotTypePciExpressX4                              = 0xA8,
+  SlotTypePciExpressX8                              = 0xA9,
+  SlotTypePciExpressX16                             = 0xAA,
+  SlotTypePciExpressGen2                            = 0xAB,
+  SlotTypePciExpressGen2X1                          = 0xAC,
+  SlotTypePciExpressGen2X2                          = 0xAD,
+  SlotTypePciExpressGen2X4                          = 0xAE,
+  SlotTypePciExpressGen2X8                          = 0xAF,
+  SlotTypePciExpressGen2X16                         = 0xB0,
+  SlotTypePciExpressGen3                            = 0xB1,
+  SlotTypePciExpressGen3X1                          = 0xB2,
+  SlotTypePciExpressGen3X2                          = 0xB3,
+  SlotTypePciExpressGen3X4                          = 0xB4,
+  SlotTypePciExpressGen3X8                          = 0xB5,
+  SlotTypePciExpressGen3X16                         = 0xB6,
+  SlotTypePciExpressGen4                            = 0xB8,
+  SlotTypePciExpressGen4X1                          = 0xB9,
+  SlotTypePciExpressGen4X2                          = 0xBA,
+  SlotTypePciExpressGen4X4                          = 0xBB,
+  SlotTypePciExpressGen4X8                          = 0xBC,
+  SlotTypePciExpressGen4X16                         = 0xBD,
+  SlotTypePCIExpressGen5                            = 0xBE,
+  SlotTypePCIExpressGen5X1                          = 0xBF,
+  SlotTypePCIExpressGen5X2                          = 0xC0,
+  SlotTypePCIExpressGen5X4                          = 0xC1,
+  SlotTypePCIExpressGen5X8                          = 0xC2,
+  SlotTypePCIExpressGen5X16                         = 0xC3,
+  SlotTypePCIExpressGen6andBeyond                   = 0xC4,
+  SlotTypeEnterpriseandDatacenter1UE1FormFactorSlot = 0xC5,
+  SlotTypeEnterpriseandDatacenter3E3FormFactorSlot  = 0xC6
 } MISC_SLOT_TYPE;
 
 ///
@@ -1357,6 +1371,39 @@ typedef enum {
   SlotDataBusWidth16X     = 0x0D,    ///< Or X16
   SlotDataBusWidth32X     = 0x0E     ///< Or X32
 } MISC_SLOT_DATA_BUS_WIDTH;
+
+///
+/// System Slots - Slot Physical Width.
+///
+typedef enum {
+  SlotPhysicalWidthOther   = 0x01,
+  SlotPhysicalWidthUnknown = 0x02,
+  SlotPhysicalWidth8Bit    = 0x03,
+  SlotPhysicalWidth16Bit   = 0x04,
+  SlotPhysicalWidth32Bit   = 0x05,
+  SlotPhysicalWidth64Bit   = 0x06,
+  SlotPhysicalWidth128Bit  = 0x07,
+  SlotPhysicalWidth1X      = 0x08,    ///< Or X1
+  SlotPhysicalWidth2X      = 0x09,    ///< Or X2
+  SlotPhysicalWidth4X      = 0x0A,    ///< Or X4
+  SlotPhysicalWidth8X      = 0x0B,    ///< Or X8
+  SlotPhysicalWidth12X     = 0x0C,    ///< Or X12
+  SlotPhysicalWidth16X     = 0x0D,    ///< Or X16
+  SlotPhysicalWidth32X     = 0x0E     ///< Or X32
+} MISC_SLOT_PHYSICAL_WIDTH;
+
+///
+/// System Slots - Slot Information.
+///
+typedef enum {
+  Others = 0x00,
+  Gen1   = 0x01,
+  Gen2   = 0x01,
+  Gen3   = 0x03,
+  Gen4   = 0x04,
+  Gen5   = 0x05,
+  Gen6   = 0x06
+} MISC_SLOT_INFORMATION;
 
 ///
 /// System Slots - Current Usage.

@@ -6,12 +6,14 @@
   (C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2021, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2021, Semihalf All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
+#include <Uefi.h>
+#include <UefiSecureBoot.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/AuthenticatedVariableFormat.h>
 #include <Guid/ImageAuthentication.h>
-#include <Library/BaseCryptLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -19,7 +21,40 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/SecureBootVariableLib.h>
-#include "Library/DxeServicesLib.h"
+#include <Library/PlatformPKProtectionLib.h>
+
+// This time can be used when deleting variables, as it should be greater than any variable time.
+EFI_TIME  mMaxTimestamp = {
+  0xFFFF,     // Year
+  0xFF,       // Month
+  0xFF,       // Day
+  0xFF,       // Hour
+  0xFF,       // Minute
+  0xFF,       // Second
+  0x00,
+  0x00000000, // Nanosecond
+  0,
+  0,
+  0x00
+};
+
+//
+// This epoch time is the date that is used when creating SecureBoot default variables.
+// NOTE: This is a placeholder date that doesn't correspond to anything else.
+//
+EFI_TIME  mDefaultPayloadTimestamp = {
+  1970, // Year (1970)
+  1,    // Month (Jan)
+  1,    // Day (1)
+  0,    // Hour
+  0,    // Minute
+  0,    // Second
+  0,    // Pad1
+  0,    // Nanosecond
+  0,    // Timezone (Dummy value)
+  0,    // Daylight (Dummy value)
+  0     // Pad2
+};
 
 /** Creates EFI Signature List structure.
 
@@ -113,24 +148,29 @@ ConcatenateSigList (
 }
 
 /**
-  Create a EFI Signature List with data fetched from section specified as a argument.
-  Found keys are verified using RsaGetPublicKeyFromX509().
+  Create a EFI Signature List with data supplied from input argument.
+  The input certificates from KeyInfo parameter should be DER-encoded
+  format.
 
-  @param[in]        KeyFileGuid    A pointer to to the FFS filename GUID
   @param[out]       SigListsSize   A pointer to size of signature list
-  @param[out]       SigListOut    a pointer to a callee-allocated buffer with signature lists
+  @param[out]       SigListOut     A pointer to a callee-allocated buffer with signature lists
+  @param[in]        KeyInfoCount   The number of certificate pointer and size pairs inside KeyInfo.
+  @param[in]        KeyInfo        A pointer to all certificates, in the format of DER-encoded,
+                                   to be concatenated into signature lists.
 
-  @retval EFI_SUCCESS              Create time based payload successfully.
+  @retval EFI_SUCCESS              Created signature list from payload successfully.
   @retval EFI_NOT_FOUND            Section with key has not been found.
-  @retval EFI_INVALID_PARAMETER    Embedded key has a wrong format.
+  @retval EFI_INVALID_PARAMETER    Embedded key has a wrong format or input pointers are NULL.
   @retval Others                   Unexpected error happens.
 
 **/
 EFI_STATUS
-SecureBootFetchData (
-  IN  EFI_GUID            *KeyFileGuid,
-  OUT UINTN               *SigListsSize,
-  OUT EFI_SIGNATURE_LIST  **SigListOut
+EFIAPI
+SecureBootCreateDataFromInput (
+  OUT UINTN                               *SigListsSize,
+  OUT EFI_SIGNATURE_LIST                  **SigListOut,
+  IN  UINTN                               KeyInfoCount,
+  IN  CONST SECURE_BOOT_CERTIFICATE_INFO  *KeyInfo
   )
 {
   EFI_SIGNATURE_LIST  *EfiSig;
@@ -138,35 +178,40 @@ SecureBootFetchData (
   EFI_SIGNATURE_LIST  *TmpEfiSig2;
   EFI_STATUS          Status;
   VOID                *Buffer;
-  VOID                *RsaPubKey;
   UINTN               Size;
+  UINTN               InputIndex;
   UINTN               KeyIndex;
 
+  if ((SigListOut == NULL) || (SigListsSize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((KeyInfoCount == 0) || (KeyInfo == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  InputIndex    = 0;
   KeyIndex      = 0;
   EfiSig        = NULL;
   *SigListsSize = 0;
-  while (1) {
-    Status = GetSectionFromAnyFv (
-               KeyFileGuid,
-               EFI_SECTION_RAW,
-               KeyIndex,
-               &Buffer,
-               &Size
-               );
-
-    if (Status == EFI_SUCCESS) {
-      RsaPubKey = NULL;
-      if (RsaGetPublicKeyFromX509 (Buffer, Size, &RsaPubKey) == FALSE) {
-        DEBUG ((DEBUG_ERROR, "%a: Invalid key format: %d\n", __FUNCTION__, KeyIndex));
+  while (InputIndex < KeyInfoCount) {
+    if (KeyInfo[InputIndex].Data != NULL) {
+      Size   = KeyInfo[InputIndex].DataSize;
+      Buffer = AllocateCopyPool (Size, KeyInfo[InputIndex].Data);
+      if (Buffer == NULL) {
         if (EfiSig != NULL) {
           FreePool (EfiSig);
         }
 
-        FreePool (Buffer);
-        return EFI_INVALID_PARAMETER;
+        return EFI_OUT_OF_RESOURCES;
       }
 
       Status = CreateSigList (Buffer, Size, &TmpEfiSig);
+
+      if (EFI_ERROR (Status)) {
+        FreePool (Buffer);
+        break;
+      }
 
       //
       // Concatenate lists if more than one section found
@@ -185,9 +230,7 @@ SecureBootFetchData (
       FreePool (Buffer);
     }
 
-    if (Status == EFI_NOT_FOUND) {
-      break;
-    }
+    InputIndex++;
   }
 
   if (KeyIndex == 0) {
@@ -210,28 +253,30 @@ SecureBootFetchData (
                                    pointer to NULL to wrap an empty payload.
                                    On output, Pointer to the new payload date buffer allocated from pool,
                                    it's caller's responsibility to free the memory when finish using it.
+  @param[in]        Time           Pointer to time information to created time based payload.
 
   @retval EFI_SUCCESS              Create time based payload successfully.
   @retval EFI_OUT_OF_RESOURCES     There are not enough memory resources to create time based payload.
   @retval EFI_INVALID_PARAMETER    The parameter is invalid.
   @retval Others                   Unexpected error happens.
 
-**/
+--*/
 EFI_STATUS
+EFIAPI
 CreateTimeBasedPayload (
-  IN OUT UINTN  *DataSize,
-  IN OUT UINT8  **Data
+  IN OUT UINTN     *DataSize,
+  IN OUT UINT8     **Data,
+  IN     EFI_TIME  *Time
   )
 {
-  EFI_STATUS                     Status;
   UINT8                          *NewData;
   UINT8                          *Payload;
   UINTN                          PayloadSize;
   EFI_VARIABLE_AUTHENTICATION_2  *DescriptorData;
   UINTN                          DescriptorSize;
-  EFI_TIME                       Time;
 
-  if ((Data == NULL) || (DataSize == NULL)) {
+  if ((Data == NULL) || (DataSize == NULL) || (Time == NULL)) {
+    DEBUG ((DEBUG_ERROR, "%a(), invalid arg\n", __FUNCTION__));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -247,6 +292,7 @@ CreateTimeBasedPayload (
   DescriptorSize = OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo) + OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData);
   NewData        = (UINT8 *)AllocateZeroPool (DescriptorSize + PayloadSize);
   if (NewData == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a() Out of resources.\n", __FUNCTION__));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -256,19 +302,7 @@ CreateTimeBasedPayload (
 
   DescriptorData = (EFI_VARIABLE_AUTHENTICATION_2 *)(NewData);
 
-  ZeroMem (&Time, sizeof (EFI_TIME));
-  Status = gRT->GetTime (&Time, NULL);
-  if (EFI_ERROR (Status)) {
-    FreePool (NewData);
-    return Status;
-  }
-
-  Time.Pad1       = 0;
-  Time.Nanosecond = 0;
-  Time.TimeZone   = 0;
-  Time.Daylight   = 0;
-  Time.Pad2       = 0;
-  CopyMem (&DescriptorData->TimeStamp, &Time, sizeof (EFI_TIME));
+  CopyMem (&DescriptorData->TimeStamp, Time, sizeof (EFI_TIME));
 
   DescriptorData->AuthInfo.Hdr.dwLength         = OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData);
   DescriptorData->AuthInfo.Hdr.wRevision        = 0x0200;
@@ -277,6 +311,7 @@ CreateTimeBasedPayload (
 
   if (Payload != NULL) {
     FreePool (Payload);
+    Payload = NULL;
   }
 
   *DataSize = DescriptorSize + PayloadSize;
@@ -296,6 +331,7 @@ CreateTimeBasedPayload (
 
 **/
 EFI_STATUS
+EFIAPI
 DeleteVariable (
   IN  CHAR16    *VariableName,
   IN  EFI_GUID  *VendorGuid
@@ -319,7 +355,7 @@ DeleteVariable (
   Attr     = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS
              | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
 
-  Status = CreateTimeBasedPayload (&DataSize, &Data);
+  Status = CreateTimeBasedPayload (&DataSize, &Data, &mMaxTimestamp);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
     return Status;
@@ -351,6 +387,7 @@ DeleteVariable (
 
 **/
 EFI_STATUS
+EFIAPI
 SetSecureBootMode (
   IN  UINT8  SecureBootMode
   )
@@ -393,6 +430,44 @@ GetSetupMode (
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Helper function to quickly determine whether SecureBoot is enabled.
+
+  @retval     TRUE    SecureBoot is verifiably enabled.
+  @retval     FALSE   SecureBoot is either disabled or an error prevented checking.
+
+**/
+BOOLEAN
+EFIAPI
+IsSecureBootEnabled (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  UINT8       *SecureBoot;
+
+  SecureBoot = NULL;
+
+  Status = GetEfiGlobalVariable2 (EFI_SECURE_BOOT_MODE_NAME, (VOID **)&SecureBoot, NULL);
+  //
+  // Skip verification if SecureBoot variable doesn't exist.
+  //
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Cannot check SecureBoot variable %r \n ", Status));
+    return FALSE;
+  }
+
+  //
+  // Skip verification if SecureBoot is disabled but not AuditMode
+  //
+  if (*SecureBoot == SECURE_BOOT_MODE_DISABLE) {
+    FreePool (SecureBoot);
+    return FALSE;
+  } else {
+    return TRUE;
+  }
 }
 
 /**
@@ -511,5 +586,313 @@ DeletePlatformKey (
              EFI_PLATFORM_KEY_NAME,
              &gEfiGlobalVariableGuid
              );
+  return Status;
+}
+
+/**
+  This function will delete the secure boot keys, thus
+  disabling secure boot.
+
+  @return EFI_SUCCESS or underlying failure code.
+**/
+EFI_STATUS
+EFIAPI
+DeleteSecureBootVariables (
+  VOID
+  )
+{
+  EFI_STATUS  Status, TempStatus;
+
+  DEBUG ((DEBUG_INFO, "%a - Attempting to delete the Secure Boot variables.\n", __FUNCTION__));
+
+  //
+  // Step 1: Notify that a PK update is coming shortly...
+  Status = DisablePKProtection ();
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - Failed to signal PK update start! %r\n", __FUNCTION__, Status));
+    // Classify this as a PK deletion error.
+    Status = EFI_ABORTED;
+  }
+
+  //
+  // Step 2: Attempt to delete the PK.
+  // Let's try to nuke the PK, why not...
+  if (!EFI_ERROR (Status)) {
+    Status = DeletePlatformKey ();
+    DEBUG ((DEBUG_INFO, "%a - PK Delete = %r\n", __FUNCTION__, Status));
+    // If the PK is not found, then our work here is done.
+    if (Status == EFI_NOT_FOUND) {
+      Status = EFI_SUCCESS;
+    }
+    // If any other error occurred, let's inform the caller that the PK delete in particular failed.
+    else if (EFI_ERROR (Status)) {
+      Status = EFI_ABORTED;
+    }
+  }
+
+  //
+  // Step 3: Attempt to delete remaining keys/databases...
+  // Now that the PK is deleted (assuming Status == EFI_SUCCESS) the system is in SETUP_MODE.
+  // Arguably we could leave these variables in place and let them be deleted by whoever wants to
+  // update all the SecureBoot variables. However, for cleanliness sake, let's try to
+  // get rid of them here.
+  if (!EFI_ERROR (Status)) {
+    //
+    // If any of THESE steps have an error, report the error but attempt to delete all keys.
+    // Using TempStatus will prevent an error from being trampled by an EFI_SUCCESS.
+    // Overwrite Status ONLY if TempStatus is an error.
+    //
+    // If the error is EFI_NOT_FOUND, we can safely ignore it since we were trying to delete
+    // the variables anyway.
+    //
+    TempStatus = DeleteKEK ();
+    DEBUG ((DEBUG_INFO, "%a - KEK Delete = %r\n", __FUNCTION__, TempStatus));
+    if (EFI_ERROR (TempStatus) && (TempStatus != EFI_NOT_FOUND)) {
+      Status = EFI_ACCESS_DENIED;
+    }
+
+    TempStatus = DeleteDb ();
+    DEBUG ((DEBUG_INFO, "%a - db Delete = %r\n", __FUNCTION__, TempStatus));
+    if (EFI_ERROR (TempStatus) && (TempStatus != EFI_NOT_FOUND)) {
+      Status = EFI_ACCESS_DENIED;
+    }
+
+    TempStatus = DeleteDbx ();
+    DEBUG ((DEBUG_INFO, "%a - dbx Delete = %r\n", __FUNCTION__, TempStatus));
+    if (EFI_ERROR (TempStatus) && (TempStatus != EFI_NOT_FOUND)) {
+      Status = EFI_ACCESS_DENIED;
+    }
+
+    TempStatus = DeleteDbt ();
+    DEBUG ((DEBUG_INFO, "%a - dbt Delete = %r\n", __FUNCTION__, TempStatus));
+    if (EFI_ERROR (TempStatus) && (TempStatus != EFI_NOT_FOUND)) {
+      Status = EFI_ACCESS_DENIED;
+    }
+  }
+
+  return Status;
+}// DeleteSecureBootVariables()
+
+/**
+  A helper function to take in a variable payload, wrap it in the
+  proper authenticated variable structure, and install it in the
+  EFI variable space.
+
+  @param[in]  VariableName  The name of the key/database.
+  @param[in]  VendorGuid    The namespace (ie. vendor GUID) of the variable
+  @param[in]  DataSize      Size parameter for target secure boot variable.
+  @param[in]  Data          Pointer to signature list formatted secure boot variable content.
+
+  @retval EFI_SUCCESS              The enrollment for authenticated variable was successful.
+  @retval EFI_OUT_OF_RESOURCES     There are not enough memory resources to create time based payload.
+  @retval EFI_INVALID_PARAMETER    The parameter is invalid.
+  @retval Others                   Unexpected error happens.
+**/
+EFI_STATUS
+EFIAPI
+EnrollFromInput (
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid,
+  IN UINTN     DataSize,
+  IN VOID      *Data
+  )
+{
+  VOID        *Payload;
+  UINTN       PayloadSize;
+  EFI_STATUS  Status;
+
+  Payload = NULL;
+
+  if ((VariableName == NULL) || (VendorGuid == 0)) {
+    DEBUG ((DEBUG_ERROR, "Input vendor variable invalid: %p and %p\n", VariableName, VendorGuid));
+    Status = EFI_INVALID_PARAMETER;
+    goto Exit;
+  }
+
+  if ((Data == NULL) || (DataSize == 0)) {
+    // You might as well just use DeleteVariable...
+    DEBUG ((DEBUG_ERROR, "Input argument invalid: %p: %x\n", Data, DataSize));
+    Status = EFI_INVALID_PARAMETER;
+    goto Exit;
+  }
+
+  // Bring in the noise...
+  PayloadSize = DataSize;
+  Payload     = AllocateZeroPool (DataSize);
+  // Bring in the funk...
+  if (Payload == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  } else {
+    CopyMem (Payload, Data, DataSize);
+  }
+
+  Status = CreateTimeBasedPayload (&PayloadSize, (UINT8 **)&Payload, &mDefaultPayloadTimestamp);
+  if (EFI_ERROR (Status) || (Payload == NULL)) {
+    DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r\n", Status));
+    Payload = NULL;
+    Status  = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
+
+  //
+  // Allocate memory for auth variable
+  //
+  Status = gRT->SetVariable (
+                  VariableName,
+                  VendorGuid,
+                  (EFI_VARIABLE_NON_VOLATILE |
+                   EFI_VARIABLE_BOOTSERVICE_ACCESS |
+                   EFI_VARIABLE_RUNTIME_ACCESS |
+                   EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS),
+                  PayloadSize,
+                  Payload
+                  );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "error: %a (\"%s\", %g): %r\n",
+      __FUNCTION__,
+      VariableName,
+      VendorGuid,
+      Status
+      ));
+  }
+
+Exit:
+  //
+  // Always Put Away Your Toys
+  // Payload will be reassigned by CreateTimeBasedPayload()...
+  if (Payload != NULL) {
+    FreePool (Payload);
+    Payload = NULL;
+  }
+
+  return Status;
+}
+
+/**
+  Similar to DeleteSecureBootVariables, this function is used to unilaterally
+  force the state of related SB variables (db, dbx, dbt, KEK, PK, etc.) to be
+  the built-in, hardcoded default vars.
+
+  @param[in]  SecureBootPayload  Payload information for secure boot related keys.
+
+  @retval     EFI_SUCCESS               SecureBoot keys are now set to defaults.
+  @retval     EFI_ABORTED               SecureBoot keys are not empty. Please delete keys first
+                                        or follow standard methods of altering keys (ie. use the signing system).
+  @retval     EFI_SECURITY_VIOLATION    Failed to create the PK.
+  @retval     Others                    Something failed in one of the subfunctions.
+
+**/
+EFI_STATUS
+EFIAPI
+SetSecureBootVariablesToDefault (
+  IN  CONST SECURE_BOOT_PAYLOAD_INFO  *SecureBootPayload
+  )
+{
+  EFI_STATUS  Status;
+  UINT8       *Data;
+  UINTN       DataSize;
+
+  DEBUG ((DEBUG_INFO, "%a() Entry\n", __FUNCTION__));
+
+  if (SecureBootPayload == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a - Invalid SecureBoot payload is supplied!\n", __FUNCTION__));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Right off the bat, if SecureBoot is currently enabled, bail.
+  if (IsSecureBootEnabled ()) {
+    DEBUG ((DEBUG_ERROR, "%a - Cannot set default keys while SecureBoot is enabled!\n", __FUNCTION__));
+    return EFI_ABORTED;
+  }
+
+  DEBUG ((DEBUG_INFO, "%a - Setting up key %s!\n", __FUNCTION__, SecureBootPayload->SecureBootKeyName));
+
+  //
+  // Start running down the list, creating variables in our wake.
+  // dbx is a good place to start.
+  Data     = (UINT8 *)SecureBootPayload->DbxPtr;
+  DataSize = SecureBootPayload->DbxSize;
+  Status   = EnrollFromInput (
+               EFI_IMAGE_SECURITY_DATABASE1,
+               &gEfiImageSecurityDatabaseGuid,
+               DataSize,
+               Data
+               );
+
+  // If that went well, try the db (make sure to pick the right one!).
+  if (!EFI_ERROR (Status)) {
+    Data     = (UINT8 *)SecureBootPayload->DbPtr;
+    DataSize = SecureBootPayload->DbSize;
+    Status   = EnrollFromInput (
+                 EFI_IMAGE_SECURITY_DATABASE,
+                 &gEfiImageSecurityDatabaseGuid,
+                 DataSize,
+                 Data
+                 );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DB %r!\n", __FUNCTION__, Status));
+    }
+  } else {
+    DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DBX %r!\n", __FUNCTION__, Status));
+  }
+
+  // Keep it going. Keep it going. dbt if supplied...
+  if (!EFI_ERROR (Status) && (SecureBootPayload->DbtPtr != NULL)) {
+    Data     = (UINT8 *)SecureBootPayload->DbtPtr;
+    DataSize = SecureBootPayload->DbtSize;
+    Status   = EnrollFromInput (
+                 EFI_IMAGE_SECURITY_DATABASE2,
+                 &gEfiImageSecurityDatabaseGuid,
+                 DataSize,
+                 Data
+                 );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DBT %r!\n", __FUNCTION__, Status));
+    }
+  }
+
+  // Keep it going. Keep it going. KEK...
+  if (!EFI_ERROR (Status)) {
+    Data     = (UINT8 *)SecureBootPayload->KekPtr;
+    DataSize = SecureBootPayload->KekSize;
+    Status   = EnrollFromInput (
+                 EFI_KEY_EXCHANGE_KEY_NAME,
+                 &gEfiGlobalVariableGuid,
+                 DataSize,
+                 Data
+                 );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll KEK %r!\n", __FUNCTION__, Status));
+    }
+  }
+
+  //
+  // Finally! The Big Daddy of them all.
+  // The PK!
+  //
+  if (!EFI_ERROR (Status)) {
+    //
+    // Finally, install the key.
+    Data     = (UINT8 *)SecureBootPayload->PkPtr;
+    DataSize = SecureBootPayload->PkSize;
+    Status   = EnrollFromInput (
+                 EFI_PLATFORM_KEY_NAME,
+                 &gEfiGlobalVariableGuid,
+                 DataSize,
+                 Data
+                 );
+
+    //
+    // Report PK creation errors.
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a - Failed to update the PK! - %r\n", __FUNCTION__, Status));
+      Status = EFI_SECURITY_VIOLATION;
+    }
+  }
+
   return Status;
 }

@@ -180,15 +180,7 @@
 [Sources.ARM]
   Arm/InternalSwitchStack.c
   Arm/Unaligned.c
-  Math64.c                   | RVCT
   Math64.c                   | MSFT
-
-  Arm/SwitchStack.asm        | RVCT
-  Arm/SetJumpLongJump.asm    | RVCT
-  Arm/CpuPause.asm           | RVCT
-  Arm/CpuBreakpoint.asm      | RVCT
-  Arm/MemoryFence.asm        | RVCT
-  Arm/SpeculationBarrier.S   | RVCT
 
   Arm/SwitchStack.asm        | MSFT
   Arm/SetJumpLongJump.asm    | MSFT
