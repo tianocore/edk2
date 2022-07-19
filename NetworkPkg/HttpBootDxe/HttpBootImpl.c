@@ -360,7 +360,18 @@ HttpBootLoadFile (
                NULL,
                &Private->ImageType
                );
-    if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL)) {
+    if ((Private->AuthData != NULL) && (Status == EFI_ACCESS_DENIED)) {
+      //
+      // Try to use HTTP HEAD method again since the Authentication information is provided.
+      //
+      Status = HttpBootGetBootFile (
+                 Private,
+                 TRUE,
+                 &Private->BootFileSize,
+                 NULL,
+                 &Private->ImageType
+                 );
+    } else if ((EFI_ERROR (Status)) && (Status != EFI_BUFFER_TOO_SMALL)) {
       //
       // Failed to get file size by HEAD method, may be trunked encoding, try HTTP GET method.
       //
@@ -487,6 +498,16 @@ HttpBootStop (
         HttpUrlFreeParser (Private->OfferBuffer[Index].Dhcp6.UriParser);
       }
     }
+  }
+
+  if (Private->AuthData != NULL) {
+    FreePool (Private->AuthData);
+    Private->AuthData = NULL;
+  }
+
+  if (Private->AuthScheme != NULL) {
+    FreePool (Private->AuthScheme);
+    Private->AuthScheme = NULL;
   }
 
   if (Private->DnsServerIp != NULL) {
