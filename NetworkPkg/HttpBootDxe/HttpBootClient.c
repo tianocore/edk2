@@ -922,6 +922,7 @@ HttpBootGetBootFileCallback (
   @retval EFI_BUFFER_TOO_SMALL     The BufferSize is too small to read the current directory entry.
                                    BufferSize has been updated with the size needed to complete
                                    the request.
+  @retval EFI_ACCESS_DENIED        The server needs to authenticate the client.
   @retval Others                   Unexpected error happened.
 
 **/
@@ -951,6 +952,9 @@ HttpBootGetBootFile (
   CHAR16                   *Url;
   BOOLEAN                  IdentityMode;
   UINTN                    ReceivedSize;
+  CHAR8                    BaseAuthValue[80];
+  EFI_HTTP_HEADER          *HttpHeader;
+  CHAR8                    *Data;
 
   ASSERT (Private != NULL);
   ASSERT (Private->HttpCreated);
@@ -1009,8 +1013,9 @@ HttpBootGetBootFile (
   //       Host
   //       Accept
   //       User-Agent
+  //       [Authorization]
   //
-  HttpIoHeader = HttpIoCreateHeader (3);
+  HttpIoHeader = HttpIoCreateHeader ((Private->AuthData != NULL) ? 4 : 3);
   if (HttpIoHeader == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ERROR_2;
@@ -1064,6 +1069,35 @@ HttpBootGetBootFile (
   }
 
   //
+  // Add HTTP header field 4: Authorization
+  //
+  if (Private->AuthData != NULL) {
+    ASSERT (HttpIoHeader->MaxHeaderCount == 4);
+
+    if ((Private->AuthScheme != NULL) && (CompareMem (Private->AuthScheme, "Basic", 5) != 0)) {
+      Status = EFI_UNSUPPORTED;
+      goto ERROR_3;
+    }
+
+    AsciiSPrint (
+      BaseAuthValue,
+      sizeof (BaseAuthValue),
+      "%a %a",
+      "Basic",
+      Private->AuthData
+      );
+
+    Status = HttpIoSetHeader (
+               HttpIoHeader,
+               HTTP_HEADER_AUTHORIZATION,
+               BaseAuthValue
+               );
+    if (EFI_ERROR (Status)) {
+      goto ERROR_3;
+    }
+  }
+
+  //
   // 2.2 Build the rest of HTTP request info.
   //
   RequestData = AllocatePool (sizeof (EFI_HTTP_REQUEST_DATA));
@@ -1111,6 +1145,7 @@ HttpBootGetBootFile (
     goto ERROR_4;
   }
 
+  Data   = NULL;
   Status = HttpIoRecvResponse (
              &Private->HttpIo,
              TRUE,
@@ -1121,6 +1156,68 @@ HttpBootGetBootFile (
       StatusCode = HttpIo->RspToken.Message->Data.Response->StatusCode;
       HttpBootPrintErrorMessage (StatusCode);
       Status = ResponseData->Status;
+      if ((StatusCode == HTTP_STATUS_401_UNAUTHORIZED) || \
+          (StatusCode == HTTP_STATUS_407_PROXY_AUTHENTICATION_REQUIRED))
+      {
+        if ((Private->AuthData != NULL) || (Private->AuthScheme != NULL)) {
+          if (Private->AuthData != NULL) {
+            FreePool (Private->AuthData);
+            Private->AuthData = NULL;
+          }
+
+          if (Private->AuthScheme != NULL) {
+            FreePool (Private->AuthScheme);
+            Private->AuthScheme = NULL;
+          }
+
+          Status = EFI_ACCESS_DENIED;
+          goto ERROR_4;
+        }
+
+        //
+        // Server indicates the user has to provide a user-id and password as a means of identification.
+        //
+        if (Private->HttpBootCallback != NULL) {
+          Data = AllocateZeroPool (sizeof (CHAR8) * HTTP_BOOT_AUTHENTICATION_INFO_MAX_LEN);
+          if (Data == NULL) {
+            Status = EFI_OUT_OF_RESOURCES;
+            goto ERROR_4;
+          }
+
+          Status = Private->HttpBootCallback->Callback (
+                                                Private->HttpBootCallback,
+                                                HttpBootHttpAuthInfo,
+                                                TRUE,
+                                                HTTP_BOOT_AUTHENTICATION_INFO_MAX_LEN,
+                                                Data
+                                                );
+          if (EFI_ERROR (Status)) {
+            if (Data != NULL) {
+              FreePool (Data);
+            }
+
+            goto ERROR_5;
+          }
+
+          Private->AuthData = (CHAR8 *)Data;
+        }
+
+        HttpHeader = HttpFindHeader (
+                       ResponseData->HeaderCount,
+                       ResponseData->Headers,
+                       HTTP_HEADER_WWW_AUTHENTICATE
+                       );
+        if (HttpHeader != NULL) {
+          Private->AuthScheme = AllocateZeroPool (AsciiStrLen (HttpHeader->FieldValue) + 1);
+          if (Private->AuthScheme == NULL) {
+            return EFI_OUT_OF_RESOURCES;
+          }
+
+          CopyMem (Private->AuthScheme, HttpHeader->FieldValue, AsciiStrLen (HttpHeader->FieldValue));
+        }
+
+        Status = EFI_ACCESS_DENIED;
+      }
     }
 
     goto ERROR_5;

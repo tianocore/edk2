@@ -205,6 +205,14 @@
 #define HTTP_HEADER_IF_NONE_MATCH  "If-None-Match"
 
 ///
+/// The WWW-Authenticate Response Header
+/// If a server receives a request for an access-protected object, and an
+/// acceptable Authorization header is not sent, the server responds with
+/// a "401 Unauthorized" status code, and a WWW-Authenticate header.
+///
+#define HTTP_HEADER_WWW_AUTHENTICATE  "WWW-Authenticate"
+
+///
 /// Authorization Request Header
 /// The Authorization field value consists of credentials
 /// containing the authentication information of the user agent for
