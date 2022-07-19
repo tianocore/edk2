@@ -121,6 +121,10 @@ Execute32BitCode (
   //
   AsmReadIdtr (&Idtr);
   Status = AsmExecute32BitCode (Function, Param1, Param2, &mGdt);
+  //
+  // Convert FSP Status code from 32bit to 64bit to match caller expectation.
+  //
+  Status = (Status & ~(BIT31 + BIT30)) | LShiftU64 (Status & (BIT31 + BIT30), 32);
   AsmWriteIdtr (&Idtr);
 
   return Status;
@@ -150,4 +154,3 @@ Execute64BitCode (
 
   return Status;
 }
-
