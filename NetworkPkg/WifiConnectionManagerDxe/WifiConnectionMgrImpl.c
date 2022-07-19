@@ -915,8 +915,9 @@ WifiMgrPrepareConnection (
 }
 
 /**
-  Will reset NiC data, get profile from ProfileSync driver, and trigger
-  another connection attempt.
+  Will reset NiC data, get profile from profile sync driver, and send for
+  another connection attempt.This function should not be called more than
+  3 times.
 
   @param[in]  WiFiProfileSyncProtocol  The target network profile to connect.
 

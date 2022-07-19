@@ -243,7 +243,7 @@ WifiMgrDxeDriverBindingStart (
   InitializeListHead (&Nic->ProfileList);
 
   //
-  // Supporting OCR WLAN with profile sharing protocol check
+  // WiFi profile sync protocol installation check for OS recovery flow.
   //
   Status = gBS->LocateProtocol (
                   &gEfiWiFiProfileSyncProtocolGuid,

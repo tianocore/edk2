@@ -11,9 +11,9 @@
 
 #include <WifiConnectionManagerDxe/WifiConnectionMgrConfig.h>
 
-//
-//  WiFi Profile Sync Protocol GUID variable.
-//
+///
+///  WiFi Profile Sync Protocol GUID variable.
+///
 extern EFI_GUID  gEfiWiFiProfileSyncProtocolGuid;
 
 /**
@@ -61,9 +61,9 @@ EFI_STATUS
   VOID
   );
 
-//
-//  WiFi Profile Sync Protocol structure.
-//
+///
+///  WiFi Profile Sync Protocol structure.
+///
 typedef struct {
   UINT32                    Revision;
   WIFI_SET_CONNECT_STATE    WifiProfileSyncSetConnectState;
@@ -78,4 +78,4 @@ typedef struct {
 **/
 #define  EFI_WIFI_PROFILE_SYNC_PROTOCOL_REVISION  1
 
-#endif // WIFI_PROFILE_SYNC_PROTOCOL_H_
+#endif /// WIFI_PROFILE_SYNC_PROTOCOL_H_
