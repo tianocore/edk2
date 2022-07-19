@@ -49,6 +49,7 @@
 [Guids]
   gEfiGlobalVariableGuid
   gVirtioMmioTransportGuid
+  gQemuBootOrderGuid
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation

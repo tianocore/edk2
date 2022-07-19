@@ -48,6 +48,20 @@ ConnectDevicesFromQemu (
   );
 
 /**
+  Write qemu boot order to uefi variables.
+
+  Attempt to retrieve the "bootorder" fw_cfg file from QEMU. Translate
+  the OpenFirmware device paths therein to UEFI device path fragments.
+
+  On Success store the device path in QemuBootOrderNNNN variables.
+**/
+VOID
+EFIAPI
+StoreQemuBootOrder (
+  VOID
+  );
+
+/**
 
   Set the boot order based on configuration retrieved from QEMU.
 
