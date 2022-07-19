@@ -2009,6 +2009,13 @@ Returns:
           );
         free (ExtractionTool);
 
+        if (!CompareGuid (
+               EfiGuid,
+               &gEfiCrc32GuidedSectionExtractionProtocolGuid
+               )
+           ) {
+          DataOffset -= 4;
+        }
         Status =
           PutFileImage (
             ToolInputFile,
