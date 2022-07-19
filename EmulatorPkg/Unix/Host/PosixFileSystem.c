@@ -1187,7 +1187,7 @@ PosixFileSetInfo (
   }
 
   OldFileName = malloc (AsciiStrSize (PrivateFile->FileName));
-  if (OldFileInfo == NULL) {
+  if (OldFileName == NULL) {
     goto Done;
   }
 
