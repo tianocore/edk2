@@ -531,7 +531,6 @@ F: OvmfPkg/XenIoPvhDxe/
 F: OvmfPkg/XenPlatformPei/
 F: OvmfPkg/XenPvBlkDxe/
 F: OvmfPkg/XenResetVector/
-F: OvmfPkg/XenTimerDxe/
 R: Anthony Perard <anthony.perard@citrix.com> [sheep]
 R: Julien Grall <julien@xen.org>
 
