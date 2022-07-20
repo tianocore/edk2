@@ -12,11 +12,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define HTTP_BOOT_CHECK_MEDIA_WAITING_TIME  EFI_TIMER_PERIOD_SECONDS(20)
 
 typedef enum {
-  GET_BOOT_FILE_HEAD,
-  GET_BOOT_FILE_GET,
-  CONNECT_TO_PROXY,
-  LOAD_BOOT_FILE,
-  GET_BOOT_FILE_ERROR
+  GetBootFileHead,
+  GetBootFileGet,
+  ConnectToProxy,
+  LoadBootFile,
+  GetBootFileError
 } GET_BOOT_FILE_STATE;
 
 /**

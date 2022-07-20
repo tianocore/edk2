@@ -313,15 +313,15 @@ HttpBootGetBootFileCaller (
   EFI_STATUS Status;
 
   if (Private->BootFileSize == 0) {
-    State = GET_BOOT_FILE_HEAD;
+    State = GetBootFileHead;
   } else {
-    State = LOAD_BOOT_FILE;
+    State = LoadBootFile;
   }
   ProxyConnected = 0;
 
   for (;;) {
     switch (State) {
-      case GET_BOOT_FILE_HEAD:
+      case GetBootFileHead:
         //
         // Try to use HTTP HEAD method.
         //
@@ -337,16 +337,16 @@ HttpBootGetBootFileCaller (
             //
             // Try to use HTTP HEAD method again since the Authentication information is provided.
             //
-            State = GET_BOOT_FILE_HEAD;
+            State = GetBootFileHead;
           } else {
-            State = GET_BOOT_FILE_GET;
+            State = GetBootFileGet;
           }
         } else {
-          State = LOAD_BOOT_FILE;
+          State = LoadBootFile;
         }
         break;
 
-      case GET_BOOT_FILE_GET:
+      case GetBootFileGet:
         //
         // Failed to get file size by HEAD method, may be trunked encoding, try HTTP GET method.
         //
@@ -360,26 +360,26 @@ HttpBootGetBootFileCaller (
                    );
         if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL)) {
           if ((!ProxyConnected) && (Private->EndPointUri != NULL)) {
-            State = CONNECT_TO_PROXY;
+            State = ConnectToProxy;
           } else {
-            State = GET_BOOT_FILE_ERROR;
+            State = GetBootFileError;
           }
         } else {
-          State = LOAD_BOOT_FILE;
-        }
-      break;
-
-      case CONNECT_TO_PROXY:
-        Status = HttpBootConnectProxy (Private);
-        if (Status == EFI_SUCCESS) {
-          ProxyConnected = 1;
-          State = GET_BOOT_FILE_HEAD;
-        } else {
-          State = GET_BOOT_FILE_ERROR;
+          State = LoadBootFile;
         }
         break;
 
-      case LOAD_BOOT_FILE:
+      case ConnectToProxy:
+        Status = HttpBootConnectProxy (Private);
+        if (Status == EFI_SUCCESS) {
+          ProxyConnected = 1;
+          State = GetBootFileHead;
+        } else {
+          State = GetBootFileError;
+        }
+        break;
+
+      case LoadBootFile:
         if (*BufferSize < Private->BootFileSize) {
           *BufferSize = Private->BootFileSize;
           *ImageType  = Private->ImageType;
@@ -399,7 +399,7 @@ HttpBootGetBootFileCaller (
                    );
         return Status;
 
-      case GET_BOOT_FILE_ERROR:
+      case GetBootFileError:
       default:
         AsciiPrint ("\n  Error: Could not retrieve NBP file size from HTTP server.\n");
         return Status;
