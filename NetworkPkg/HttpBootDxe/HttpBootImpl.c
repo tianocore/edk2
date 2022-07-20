@@ -306,20 +306,21 @@ HttpBootGetBootFileCaller (
   IN OUT UINTN                   *BufferSize,
   IN     VOID                    *Buffer        OPTIONAL,
   OUT HTTP_BOOT_IMAGE_TYPE       *ImageType
-)
+  )
 {
-  UINT8      State;
-  UINT8      ProxyConnected;
-  EFI_STATUS Status;
+  UINT8       State;
+  UINT8       ProxyConnected;
+  EFI_STATUS  Status;
 
   if (Private->BootFileSize == 0) {
     State = GetBootFileHead;
   } else {
     State = LoadBootFile;
   }
+
   ProxyConnected = 0;
 
-  for (;;) {
+  for ( ; ;) {
     switch (State) {
       case GetBootFileHead:
         //
@@ -332,7 +333,7 @@ HttpBootGetBootFileCaller (
                    NULL,
                    &Private->ImageType
                    );
-        if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
+        if ((EFI_ERROR (Status)) && (Status != EFI_BUFFER_TOO_SMALL)) {
           if ((Private->AuthData != NULL) && (Status == EFI_ACCESS_DENIED)) {
             //
             // Try to use HTTP HEAD method again since the Authentication information is provided.
@@ -344,6 +345,7 @@ HttpBootGetBootFileCaller (
         } else {
           State = LoadBootFile;
         }
+
         break;
 
       case GetBootFileGet:
@@ -367,16 +369,18 @@ HttpBootGetBootFileCaller (
         } else {
           State = LoadBootFile;
         }
+
         break;
 
       case ConnectToProxy:
         Status = HttpBootConnectProxy (Private);
         if (Status == EFI_SUCCESS) {
           ProxyConnected = 1;
-          State = GetBootFileHead;
+          State          = GetBootFileHead;
         } else {
           State = GetBootFileError;
         }
+
         break;
 
       case LoadBootFile:
