@@ -100,7 +100,7 @@ M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 RISCV64
 F: */RiscV64/
 M: Abner Chang <abner.chang@hpe.com> [changab]
-R: Daniel Schaefer <daniel.schaefer@hpe.com>
+R: Daniel Schaefer <daniel.schaefer@hpe.com> [JohnAZoidberg]
 
 EDK II Continuous Integration:
 ------------------------------
@@ -156,7 +156,7 @@ F: ArmVirtPkg/PrePi/
 F: ArmVirtPkg/XenAcpiPlatformDxe/
 F: ArmVirtPkg/XenPlatformHasAcpiDtDxe/
 F: ArmVirtPkg/XenioFdtDxe/
-R: Julien Grall <julien@xen.org>
+R: Julien Grall <julien@xen.org> [jgrall]
 
 BaseTools
 F: BaseTools/
@@ -371,7 +371,7 @@ MdeModulePkg: Pei Core
 F: MdeModulePkg/Core/Pei/
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
-R: Debkumar De <debkumar.de@intel.com>
+R: Debkumar De <debkumar.de@intel.com> [dde01]
 R: Harry Han <harry.han@intel.com>
 R: Catharine West <catharine.west@intel.com> [catharine-intl]
 
@@ -474,7 +474,7 @@ F: OvmfPkg/PlatformPei/AmdSev.c
 F: OvmfPkg/ResetVector/
 F: OvmfPkg/Sec/
 R: Brijesh Singh <brijesh.singh@amd.com> [codomania]
-R: Erdem Aktas <erdemaktas@google.com>
+R: Erdem Aktas <erdemaktas@google.com> [ruleof2]
 R: James Bottomley <jejb@linux.ibm.com> [jejb]
 R: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 R: Min Xu <min.m.xu@intel.com> [mxu9]
@@ -488,7 +488,7 @@ R: Abner Chang <abner.chang@amd.com> [changab]
 
 OvmfPkg: LsiScsi driver
 F: OvmfPkg/LsiScsiDxe/
-R: Gary Lin <gary.lin@hpe.com>
+R: Gary Lin <gary.lin@hpe.com> [lcp]
 
 OvmfPkg: MptScsi and PVSCSI driver
 F: OvmfPkg/MptScsiDxe/
@@ -532,7 +532,7 @@ F: OvmfPkg/XenPlatformPei/
 F: OvmfPkg/XenPvBlkDxe/
 F: OvmfPkg/XenResetVector/
 R: Anthony Perard <anthony.perard@citrix.com> [sheep]
-R: Julien Grall <julien@xen.org>
+R: Julien Grall <julien@xen.org> [jgrall]
 
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
@@ -602,7 +602,7 @@ R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 UefiCpuPkg: Sec related modules
 F: UefiCpuPkg/SecCore/
 F: UefiCpuPkg/ResetVector/
-R: Debkumar De <debkumar.de@intel.com>
+R: Debkumar De <debkumar.de@intel.com> [dde01]
 R: Harry Han <harry.han@intel.com>
 R: Catharine West <catharine.west@intel.com> [catharine-intl]
 
@@ -611,7 +611,7 @@ F: UefiPayloadPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiPayloadPkg
 M: Guo Dong <guo.dong@intel.com> [gdong1]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
-M: Sean Rhodes <sean@starlabs.systems>
+M: Sean Rhodes <sean@starlabs.systems> [Sean-StarLabs]
 S: Maintained
 
 UnitTestFrameworkPkg
