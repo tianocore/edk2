@@ -1806,10 +1806,18 @@ Returns:
       break;
 
     case EFI_SECTION_COMPATIBILITY16:
-    case EFI_SECTION_FREEFORM_SUBTYPE_GUID:
       //
       // Section does not contain any further header information.
       //
+      break;
+
+    case EFI_SECTION_FREEFORM_SUBTYPE_GUID:
+      printf ("  Guid:  ");
+      if (SectionHeaderLen == sizeof (EFI_COMMON_SECTION_HEADER))
+        PrintGuid (&((EFI_FREEFORM_SUBTYPE_GUID_SECTION *)Ptr)->SubTypeGuid);
+      else
+        PrintGuid (&((EFI_FREEFORM_SUBTYPE_GUID_SECTION2 *)Ptr)->SubTypeGuid);
+      printf ("\n");
       break;
 
     case EFI_SECTION_PEI_DEPEX:
