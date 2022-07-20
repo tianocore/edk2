@@ -372,7 +372,6 @@ F: MdeModulePkg/Core/Pei/
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Debkumar De <debkumar.de@intel.com> [dde01]
-R: Harry Han <harry.han@intel.com>
 R: Catharine West <catharine.west@intel.com> [catharine-intl]
 
 MdeModulePkg: Reset modules
@@ -603,7 +602,6 @@ UefiCpuPkg: Sec related modules
 F: UefiCpuPkg/SecCore/
 F: UefiCpuPkg/ResetVector/
 R: Debkumar De <debkumar.de@intel.com> [dde01]
-R: Harry Han <harry.han@intel.com>
 R: Catharine West <catharine.west@intel.com> [catharine-intl]
 
 UefiPayloadPkg
