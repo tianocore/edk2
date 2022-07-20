@@ -989,6 +989,155 @@ Returns:
 }
 
 EFI_STATUS
+GenSectionSubtypeGuidSection (
+  CHAR8    **InputFileName,
+  UINT32   *InputFileAlign,
+  UINT32   InputFileNum,
+  EFI_GUID *SubTypeGuid,
+  UINT8    **OutFileBuffer
+  )
+/*++
+
+Routine Description:
+
+  Generate a section of type EFI_SECTION_FREEFORM_SUBTYPE_GUID
+  The function won't validate the input file contents.
+  The utility will add section header to the file.
+
+Arguments:
+
+  InputFileName - Name of the input file.
+
+  InputFileAlign - Alignment required by the input file data.
+
+  InputFileNum - Number of input files. Should be 1 for this section.
+
+  SubTypeGuid - Specify vendor guid value.
+
+  OutFileBuffer   - Buffer pointer to Output file contents
+
+Returns:
+
+  EFI_SUCCESS on successful return
+  EFI_INVALID_PARAMETER if InputFileNum is less than 1
+  EFI_ABORTED if unable to open input file.
+  EFI_OUT_OF_RESOURCES  No resource to complete the operation.
+
+--*/
+{
+  UINT32                TotalLength;
+  UINT32                InputLength;
+  UINT32                Offset;
+  UINT8                 *FileBuffer;
+  EFI_STATUS            Status;
+  EFI_FREEFORM_SUBTYPE_GUID_SECTION  *SubtypeGuidSect;
+  EFI_FREEFORM_SUBTYPE_GUID_SECTION2  *SubtypeGuidSect2;
+
+
+  InputLength = 0;
+  Offset      = 0;
+  FileBuffer  = NULL;
+  TotalLength = 0;
+
+  if (InputFileNum > 1) {
+    Error (NULL, 0, 2000, "Invalid parameter", "more than one input file specified");
+    return STATUS_ERROR;
+  } else if (InputFileNum < 1) {
+    Error (NULL, 0, 2000, "Invalid parameter", "no input file specified");
+    return STATUS_ERROR;
+  }
+
+  //
+  // read all input file contents into a buffer
+  // first get the size of all file contents
+  //
+  Status = GetSectionContents (
+            InputFileName,
+            InputFileAlign,
+            InputFileNum,
+            FileBuffer,
+            &InputLength
+            );
+
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    Offset = sizeof (EFI_FREEFORM_SUBTYPE_GUID_SECTION);
+    if (InputLength + Offset >= MAX_SECTION_SIZE) {
+      Offset = sizeof (EFI_FREEFORM_SUBTYPE_GUID_SECTION2);
+    }
+    TotalLength = InputLength + Offset;
+
+    FileBuffer = (UINT8 *) malloc (InputLength + Offset);
+    if (FileBuffer == NULL) {
+      Error (NULL, 0, 4001, "Resource", "memory cannot be allocated");
+      return EFI_OUT_OF_RESOURCES;
+    }
+    //
+    // read all input file contents into a buffer
+    //
+    Status = GetSectionContents (
+              InputFileName,
+              InputFileAlign,
+              InputFileNum,
+              FileBuffer + Offset,
+              &InputLength
+              );
+  }
+
+  if (EFI_ERROR (Status)) {
+    if (FileBuffer != NULL) {
+      free (FileBuffer);
+    }
+    Error (NULL, 0, 0001, "Error opening file for reading", InputFileName[0]);
+    return Status;
+  }
+
+  if (InputLength == 0) {
+    if (FileBuffer != NULL) {
+      free (FileBuffer);
+    }
+    Error (NULL, 0, 2000, "Invalid parameter", "the size of input file %s can't be zero", InputFileName);
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // InputLength != 0, but FileBuffer == NULL means out of resources.
+  //
+  if (FileBuffer == NULL) {
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated");
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Now data is in FileBuffer + Offset
+  //
+  if (TotalLength >= MAX_SECTION_SIZE) {
+    SubtypeGuidSect2 = (EFI_FREEFORM_SUBTYPE_GUID_SECTION2 *) FileBuffer;
+    SubtypeGuidSect2->CommonHeader.Type     = EFI_SECTION_GUID_DEFINED;
+    SubtypeGuidSect2->CommonHeader.Size[0]  = (UINT8) 0xff;
+    SubtypeGuidSect2->CommonHeader.Size[1]  = (UINT8) 0xff;
+    SubtypeGuidSect2->CommonHeader.Size[2]  = (UINT8) 0xff;
+    SubtypeGuidSect2->CommonHeader.ExtendedSize = InputLength + sizeof (EFI_FREEFORM_SUBTYPE_GUID_SECTION2);
+    memcpy (&(SubtypeGuidSect2->SubTypeGuid), SubTypeGuid, sizeof (EFI_GUID));
+  } else {
+    SubtypeGuidSect = (EFI_FREEFORM_SUBTYPE_GUID_SECTION *) FileBuffer;
+    SubtypeGuidSect->CommonHeader.Type     = EFI_SECTION_FREEFORM_SUBTYPE_GUID;
+    SubtypeGuidSect->CommonHeader.Size[0]  = (UINT8) (TotalLength & 0xff);
+    SubtypeGuidSect->CommonHeader.Size[1]  = (UINT8) ((TotalLength & 0xff00) >> 8);
+    SubtypeGuidSect->CommonHeader.Size[2]  = (UINT8) ((TotalLength & 0xff0000) >> 16);
+    memcpy (&(SubtypeGuidSect->SubTypeGuid), SubTypeGuid, sizeof (EFI_GUID));
+  }
+
+  VerboseMsg ("the size of the created section file is %u bytes", (unsigned) TotalLength);
+
+  //
+  // Set OutFileBuffer
+  //
+  *OutFileBuffer = FileBuffer;
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
 FfsRebaseImageRead (
     IN      VOID    *FileHandle,
     IN      UINTN   FileOffset,
@@ -1591,12 +1740,20 @@ Returns:
   }
 
   //
-  // GuidValue is only required by Guided section.
+  // GuidValue is only required by Guided section and SubtypeGuid section.
   //
-  if ((SectType != EFI_SECTION_GUID_DEFINED) &&
+  if ((SectType != EFI_SECTION_GUID_DEFINED) && (SectType != EFI_SECTION_FREEFORM_SUBTYPE_GUID) &&
     (SectionName != NULL) &&
     (CompareGuid (&VendorGuid, &mZeroGuid) != 0)) {
     fprintf (stdout, "Warning: the input guid value is not required for this section type %s\n", SectionName);
+  }
+
+  //
+  // Check whether there is GUID for the SubtypeGuid section
+  //
+  if ((SectType == EFI_SECTION_FREEFORM_SUBTYPE_GUID) && (CompareGuid (&VendorGuid, &mZeroGuid) == 0)) {
+    Error (NULL, 0, 1001, "Missing options", "GUID");
+    goto Finish;
   }
 
   //
@@ -1663,6 +1820,16 @@ Returns:
               &VendorGuid,
               SectGuidAttribute,
               (UINT32) SectGuidHeaderLength,
+              &OutFileBuffer
+              );
+    break;
+
+  case EFI_SECTION_FREEFORM_SUBTYPE_GUID:
+    Status = GenSectionSubtypeGuidSection (
+              InputFileName,
+              InputFileAlign,
+              InputFileNum,
+              &VendorGuid,
               &OutFileBuffer
               );
     break;
