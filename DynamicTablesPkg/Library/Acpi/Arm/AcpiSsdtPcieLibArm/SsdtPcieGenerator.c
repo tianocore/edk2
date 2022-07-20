@@ -616,6 +616,167 @@ GeneratePciCrs (
   return Status;
 }
 
+/** Generate a Pci Resource Template to hold Address Space Info
+
+  @param [in]       PciNode       RootNode of the AML tree.
+  @param [in, out]  CrsNode       CRS node of the AML tree to populate.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid input parameter.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+PopulateBasicPciResObjects (
+  IN        AML_OBJECT_NODE_HANDLE  PciNode,
+  IN  OUT   AML_OBJECT_NODE_HANDLE  *CrsNode
+  )
+{
+  EFI_STATUS              Status;
+  UINT32                  EisaId;
+  AML_OBJECT_NODE_HANDLE  ResNode;
+
+  if (CrsNode == NULL) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // ASL: Device (PCIx) {}
+  Status = AmlCodeGenDevice ("RES0", PciNode, &ResNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // ASL: Name (_HID, EISAID ("PNP0C02"))
+  Status = AmlGetEisaIdFromString ("PNP0C02", &EisaId); /* PNP Motherboard Resources */
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlCodeGenNameInteger ("_HID", EisaId, ResNode, NULL);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // ASL: Name (_CRS, ResourceTemplate () {})
+  Status = AmlCodeGenNameResourceTemplate ("_CRS", ResNode, CrsNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  return Status;
+}
+
+/** Generate a Pci Resource Template to hold Address Space Info
+
+  @param [in]       Generator       The SSDT Pci generator.
+  @param [in]       CfgMgrProtocol  Pointer to the Configuration Manager
+                                    Protocol interface.
+  @param [in]       PciInfo         Pci device information.
+  @param [in, out]  PciNode         RootNode of the AML tree to populate.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GeneratePciRes (
+  IN            ACPI_PCI_GENERATOR                            *Generator,
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN      CONST CM_ARM_PCI_CONFIG_SPACE_INFO                  *PciInfo,
+  IN  OUT       AML_OBJECT_NODE_HANDLE                        PciNode
+  )
+{
+  EFI_STATUS                   Status;
+  AML_OBJECT_NODE_HANDLE       CrsNode;
+  BOOLEAN                      Translation;
+  UINT32                       Index;
+  CM_ARM_OBJ_REF               *RefInfo;
+  UINT32                       RefCount;
+  CM_ARM_PCI_ADDRESS_MAP_INFO  *AddrMapInfo;
+  BOOLEAN                      IsPosDecode;
+
+  // Get the array of CM_ARM_OBJ_REF referencing the
+  // CM_ARM_PCI_ADDRESS_MAP_INFO objects.
+  Status = GetEArmObjCmRef (
+             CfgMgrProtocol,
+             PciInfo->AddressMapToken,
+             &RefInfo,
+             &RefCount
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  for (Index = 0; Index < RefCount; Index++) {
+    // Get CM_ARM_PCI_ADDRESS_MAP_INFO structures one by one.
+    Status = GetEArmObjPciAddressMapInfo (
+               CfgMgrProtocol,
+               RefInfo[Index].ReferenceToken,
+               &AddrMapInfo,
+               NULL
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      return Status;
+    }
+
+    Translation = (AddrMapInfo->CpuAddress != AddrMapInfo->PciAddress);
+    if (AddrMapInfo->CpuAddress >= AddrMapInfo->PciAddress) {
+      IsPosDecode = TRUE;
+    } else {
+      IsPosDecode = FALSE;
+    }
+
+    switch (AddrMapInfo->SpaceCode) {
+      case PCI_SS_CONFIG:
+        Status = PopulateBasicPciResObjects (PciNode, &CrsNode);
+        if (EFI_ERROR (Status)) {
+          ASSERT (0);
+          break;
+        }
+
+        Status = AmlCodeGenRdQWordMemory (
+                   FALSE,
+                   IsPosDecode,
+                   TRUE,
+                   TRUE,
+                   FALSE, // non-cacheable
+                   TRUE,
+                   0,
+                   AddrMapInfo->PciAddress,
+                   AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1,
+                   Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0,
+                   AddrMapInfo->AddressSize,
+                   0,
+                   NULL,
+                   0,
+                   TRUE,
+                   CrsNode,
+                   NULL
+                   );
+        break;
+      default:
+        break;
+    } // switch
+
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      return Status;
+    }
+  }
+
+  return Status;
+}
+
 /** Generate a Pci device.
 
   @param [in]       Generator       The SSDT Pci generator.
@@ -702,9 +863,17 @@ GeneratePciDevice (
     return Status;
   }
 
+  // Add the PNP Motherboard Resources Device to reserve ECAM space
+  Status = GeneratePciRes (Generator, CfgMgrProtocol, PciInfo, PciNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
   // Add the template _OSC method.
   Status = AddOscMethod (PciInfo, PciNode);
   ASSERT_EFI_ERROR (Status);
+
   return Status;
 }
 
