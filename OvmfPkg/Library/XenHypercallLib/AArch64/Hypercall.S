@@ -11,8 +11,8 @@
 #include <IndustryStandard/Xen/arch-arm/xen.h>
 
   .text
-  .global   ASM_PFX(XenHypercall2)
-ASM_PFX(XenHypercall2):
+  .global   ASM_PFX(XenHypercall3)
+ASM_PFX(XenHypercall3):
   mov     x16, x0
   mov     x0, x1
   mov     x1, x2

@@ -86,5 +86,7 @@ XenHypercall2 (
 {
   ASSERT (HyperPage != NULL);
 
+  MissingInCode ();
+
   return __XenHypercall2 ((UINT8 *)HyperPage + HypercallID * 32, Arg1, Arg2);
 }
