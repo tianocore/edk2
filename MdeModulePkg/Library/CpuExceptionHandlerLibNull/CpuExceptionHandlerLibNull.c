@@ -83,20 +83,23 @@ DumpCpuContext (
 
 /**
   Setup separate stacks for certain exception handlers.
+  If the input Buffer and BufferSize are both NULL, use global variable if possible.
 
-  InitData is optional and processor arch dependent.
-
-  @param[in]  InitData      Pointer to data optional for information about how
-                            to assign stacks for certain exception handlers.
+  @param[in]       Buffer        Point to buffer used to separate exception stack.
+  @param[in, out]  BufferSize    On input, it indicates the byte size of Buffer.
+                                 If the size is not enough, the return status will
+                                 be EFI_BUFFER_TOO_SMALL, and output BufferSize
+                                 will be the size it needs.
 
   @retval EFI_SUCCESS             The stacks are assigned successfully.
   @retval EFI_UNSUPPORTED         This function is not supported.
-
+  @retval EFI_BUFFER_TOO_SMALL    This BufferSize is too small.
 **/
 EFI_STATUS
 EFIAPI
 InitializeSeparateExceptionStacks (
-  IN CPU_EXCEPTION_INIT_DATA  *InitData OPTIONAL
+  IN     VOID   *Buffer,
+  IN OUT UINTN  *BufferSize
   )
 {
   return EFI_UNSUPPORTED;
