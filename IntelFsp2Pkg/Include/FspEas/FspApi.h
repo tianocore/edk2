@@ -1,6 +1,6 @@
 /** @file
   Intel FSP API definition from Intel Firmware Support Package External
-  Architecture Specification v2.0 - v2.2
+  Architecture Specification v2.0 and above.
 
   Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -100,13 +100,14 @@ typedef struct {
   /// "XXXXXX_T" for FSP-T
   /// "XXXXXX_M" for FSP-M
   /// "XXXXXX_S" for FSP-S
+  /// "XXXXXX_I" for FSP-I
   /// Where XXXXXX is an unique signature
   ///
   UINT64    Signature;
   ///
   /// Revision of the Data structure.
-  ///   For FSP spec 2.0/2.1 value is 1.
-  ///   For FSP spec 2.2 value is 2.
+  ///   For FSP spec 2.0/2.1, this value is 1 and only FSPM_UPD having ARCH_UPD.
+  ///   For FSP spec 2.2 and above, this value is 2 and ARCH_UPD present in all UPD structures.
   ///
   UINT8     Revision;
   UINT8     Reserved[23];
@@ -134,7 +135,7 @@ typedef struct {
 } FSPT_ARCH_UPD;
 
 ///
-/// FSPT_ARCH2_UPD Configuration.
+/// FSPT_ARCH2_UPD Configuration for FSP 2.4 and above.
 ///
 typedef struct {
   ///
@@ -196,7 +197,7 @@ typedef struct {
 } FSPM_ARCH_UPD;
 
 ///
-/// FSPM_ARCH2_UPD Configuration.
+/// FSPM_ARCH2_UPD Configuration for FSP 2.4 and above.
 ///
 typedef struct {
   ///
@@ -208,6 +209,13 @@ typedef struct {
   /// Length of the structure in bytes. The current value for this field is 64.
   ///
   UINT32                  Length;
+  ///
+  /// Pointer to the non-volatile storage (NVS) data buffer.
+  /// If it is NULL it indicates the NVS data is not available.
+  /// This value is deprecated starting with v2.4 of the FSP specification,
+  /// and will be removed in an upcoming version of the FSP specification.
+  ///
+  EFI_PHYSICAL_ADDRESS    NvsBufferPtr;
   ///
   /// Pointer to the temporary stack base address to be
   /// consumed inside FspMemoryInit() API.
@@ -232,7 +240,7 @@ typedef struct {
   /// This value is only valid if Revision is >= 2.
   ///
   EFI_PHYSICAL_ADDRESS    FspEventHandler;
-  UINT8                   Reserved1[24];
+  UINT8                   Reserved1[16];
 } FSPM_ARCH2_UPD;
 
 ///
@@ -265,7 +273,7 @@ typedef struct {
 } FSPS_ARCH_UPD;
 
 ///
-/// FSPS_ARCH2_UPD Configuration.
+/// FSPS_ARCH2_UPD Configuration for FSP 2.4 and above.
 ///
 typedef struct {
   ///
@@ -284,6 +292,40 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS    FspEventHandler;
   UINT8                   Reserved1[16];
 } FSPS_ARCH2_UPD;
+
+///
+/// FSPI_ARCH_UPD Configuration.
+///
+typedef struct {
+  ///
+  /// Revision of the structure is 1 for this version of the specification.
+  ///
+  UINT8                   Revision;
+  UINT8                   Reserved[3];
+  ///
+  /// Length of the structure in bytes. The current value for this field is 64.
+  ///
+  UINT32                  Length;
+  ///
+  /// The physical memory-mapped base address of the bootloader SMM firmware volume (FV).
+  ///
+  EFI_PHYSICAL_ADDRESS    BootloaderSmmFvBaseAddress;
+  ///
+  /// The length in bytes of the bootloader SMM firmware volume (FV).
+  ///
+  UINT64                  BootloaderSmmFvLength;
+  ///
+  /// The physical memory-mapped base address of the bootloader SMM FV context data.
+  /// This data is provided to bootloader SMM drivers through a HOB by the FSP MM Foundation.
+  ///
+  EFI_PHYSICAL_ADDRESS    BootloaderSmmFvContextData;
+  ///
+  /// The length in bytes of the bootloader SMM FV context data.
+  /// This data is provided to bootloader SMM drivers through a HOB by the FSP MM Foundation.
+  ///
+  UINT16                  BootloaderSmmFvContextDataLength;
+  UINT8                   Reserved1[30];
+} FSPI_ARCH_UPD;
 
 ///
 /// FSPT_UPD_COMMON Configuration.
@@ -392,6 +434,21 @@ typedef struct {
   ///
   FSPS_ARCH2_UPD    FspsArchUpd;
 } FSPS_UPD_COMMON_FSP24;
+
+///
+/// FSPI_UPD_COMMON Configuration.
+///
+typedef struct {
+  ///
+  /// FSP_UPD_HEADER Configuration.
+  ///
+  FSP_UPD_HEADER    FspUpdHeader;
+
+  ///
+  /// FSPI_ARCH_UPD Configuration.
+  ///
+  FSPI_ARCH_UPD     FspiArchUpd;
+} FSPI_UPD_COMMON;
 
 ///
 /// Enumeration of FSP_INIT_PHASE for NOTIFY_PHASE.

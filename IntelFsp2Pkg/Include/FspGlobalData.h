@@ -12,7 +12,7 @@
 
 #define FSP_IN_API_MODE          0
 #define FSP_IN_DISPATCH_MODE     1
-#define FSP_GLOBAL_DATA_VERSION  1
+#define FSP_GLOBAL_DATA_VERSION  0x2
 
 #pragma pack(1)
 
