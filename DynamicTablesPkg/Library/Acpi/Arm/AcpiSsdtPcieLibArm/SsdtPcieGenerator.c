@@ -34,6 +34,9 @@
 
 #include "SsdtPcieGenerator.h"
 
+#define PCI_MAX_DEVICE_COUNT_PER_BUS       32
+#define PCI_MAX_FUNCTION_COUNT_PER_DEVICE  8
+
 /** ARM standard SSDT Pcie Table Generator.
 
 Requirements:
@@ -616,6 +619,130 @@ GeneratePciCrs (
   return Status;
 }
 
+/** Generate a RES0 device node to reserve PNP motherboard resources
+  for a given PCI node.
+
+  @param [in]   PciNode       Parent PCI node handle of the generated
+                              resource object.
+  @param [out]  CrsNode       CRS node of the AML tree to populate.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid input parameter.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GenerateMotherboardDevice (
+  IN  AML_OBJECT_NODE_HANDLE  PciNode,
+  OUT AML_OBJECT_NODE_HANDLE  *CrsNode
+  )
+{
+  EFI_STATUS              Status;
+  UINT32                  EisaId;
+  AML_OBJECT_NODE_HANDLE  ResNode;
+
+  if (CrsNode == NULL) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // ASL: Device (RES0) {}
+  Status = AmlCodeGenDevice ("RES0", PciNode, &ResNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // ASL: Name (_HID, EISAID ("PNP0C02"))
+  Status = AmlGetEisaIdFromString ("PNP0C02", &EisaId); /* PNP Motherboard Resources */
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlCodeGenNameInteger ("_HID", EisaId, ResNode, NULL);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // ASL: Name (_CRS, ResourceTemplate () {})
+  Status = AmlCodeGenNameResourceTemplate ("_CRS", ResNode, CrsNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  return Status;
+}
+
+/** Reserves ECAM space for PCI config space
+
+  @param [in]       Generator       The SSDT Pci generator.
+  @param [in]       CfgMgrProtocol  Pointer to the Configuration Manager
+                                    Protocol interface.
+  @param [in]       PciInfo         Pci device information.
+  @param [in, out]  PciNode         RootNode of the AML tree to populate.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+ReserveEcamSpace (
+  IN            ACPI_PCI_GENERATOR                            *Generator,
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN      CONST CM_ARM_PCI_CONFIG_SPACE_INFO                  *PciInfo,
+  IN  OUT       AML_OBJECT_NODE_HANDLE                        PciNode
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  CrsNode;
+  UINT64                  AddressMinimum;
+  UINT64                  AddressMaximum;
+
+  Status = GenerateMotherboardDevice (PciNode, &CrsNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  AddressMinimum = PciInfo->BaseAddress + (PciInfo->StartBusNumber *
+                                           PCI_MAX_DEVICE_COUNT_PER_BUS * PCI_MAX_FUNCTION_COUNT_PER_DEVICE * SIZE_4KB);
+  AddressMaximum = PciInfo->BaseAddress + ((PciInfo->EndBusNumber + 1) *
+                                           PCI_MAX_DEVICE_COUNT_PER_BUS * PCI_MAX_FUNCTION_COUNT_PER_DEVICE * SIZE_4KB) - 1;
+
+  Status = AmlCodeGenRdQWordMemory (
+             FALSE,
+             TRUE,
+             TRUE,
+             TRUE,
+             FALSE,  // non-cacheable
+             TRUE,
+             0,
+             AddressMinimum,
+             AddressMaximum,
+             0,  // no translation
+             AddressMaximum - AddressMinimum + 1,
+             0,
+             NULL,
+             0,
+             TRUE,
+             CrsNode,
+             NULL
+             );
+
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  return Status;
+}
+
 /** Generate a Pci device.
 
   @param [in]       Generator       The SSDT Pci generator.
@@ -702,9 +829,17 @@ GeneratePciDevice (
     return Status;
   }
 
+  // Add the PNP Motherboard Resources Device to reserve ECAM space
+  Status = ReserveEcamSpace (Generator, CfgMgrProtocol, PciInfo, PciNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
   // Add the template _OSC method.
   Status = AddOscMethod (PciInfo, PciNode);
   ASSERT_EFI_ERROR (Status);
+
   return Status;
 }
 
