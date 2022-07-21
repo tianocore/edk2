@@ -392,7 +392,7 @@ AppendSingleVariableToFile (
 /**
   Recursive function to display or delete variables.
 
-  This function will call itself to create a stack-based list of allt he variables to process,
+  This function will call itself to create a stack-based list of all the variables to process,
   then fromt he last to the first, they will do either printing or deleting.
 
   This is necessary since once a delete happens GetNextVariableName() will work.
