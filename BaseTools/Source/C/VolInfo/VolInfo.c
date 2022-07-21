@@ -51,15 +51,13 @@ EFI_GUID  gEfiCrc32GuidedSectionExtractionProtocolGuid = EFI_CRC32_GUIDED_SECTIO
 
 #define EFI_SECTION_ERROR EFIERR (100)
 
-#define MAX_BASENAME_LEN  60  // not good to hardcode, but let's be reasonable
-
 //
 // Structure to keep a list of guid-to-basenames
 //
 typedef struct _GUID_TO_BASENAME {
   struct _GUID_TO_BASENAME  *Next;
   INT8                      Guid[PRINTED_GUID_BUFFER_SIZE];
-  INT8                      BaseName[MAX_BASENAME_LEN];
+  INT8                      BaseName[MAX_LINE_LEN];
 } GUID_TO_BASENAME;
 
 static GUID_TO_BASENAME *mGuidBaseNameList = NULL;
