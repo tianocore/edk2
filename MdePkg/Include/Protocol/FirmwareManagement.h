@@ -135,6 +135,9 @@ typedef struct {
   /// present in version 3 or higher.
   ///
   UINT64                    HardwareInstance;
+  ///
+  /// Only present in version 4 or higher.
+  ///
   EFI_FIRMWARE_IMAGE_DEP    *Dependencies;
 } EFI_FIRMWARE_IMAGE_DESCRIPTOR;
 
