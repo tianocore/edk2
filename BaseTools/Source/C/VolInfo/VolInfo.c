@@ -43,6 +43,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 
 EFI_GUID  gEfiCrc32GuidedSectionExtractionProtocolGuid = EFI_CRC32_GUIDED_SECTION_EXTRACTION_PROTOCOL_GUID;
+EFI_GUID  gPeiAprioriFileNameGuid = { 0x1b45cc0a, 0x156a, 0x428a, { 0XAF, 0x62,  0x49, 0x86, 0x4d, 0xa0, 0xe6, 0xe6 }};
+EFI_GUID  gAprioriGuid = { 0xFC510EE7, 0xFFDC, 0x11D4, { 0xBD, 0x41, 0x00, 0x80, 0xC7, 0x3C, 0x88, 0x81 }};
 
 #define UTILITY_MAJOR_VERSION      1
 #define UTILITY_MINOR_VERSION      0
@@ -105,6 +107,12 @@ ReadHeader (
   IN FILE       *InputFile,
   OUT UINT32    *FvSize,
   OUT BOOLEAN   *ErasePolarity
+  );
+
+STATIC
+EFI_STATUS
+PrintAprioriFile (
+  EFI_FFS_FILE_HEADER         *FileHeader
   );
 
 STATIC
@@ -1085,6 +1093,53 @@ Returns:
 
 STATIC
 EFI_STATUS
+PrintAprioriFile (
+  EFI_FFS_FILE_HEADER         *FileHeader
+  )
+/*++
+
+Routine Description:
+
+  Print GUIDs from the APRIORI file
+
+Arguments:
+
+  FileHeader - The file header
+
+Returns:
+
+  EFI_SUCCESS       - The APRIORI file was parsed correctly
+  EFI_SECTION_ERROR - Problem with file parsing
+
+--*/
+{
+  UINT8               GuidBuffer[PRINTED_GUID_BUFFER_SIZE];
+  UINT32              HeaderSize;
+
+  HeaderSize = FvBufGetFfsHeaderSize (FileHeader);
+
+  if (FileHeader->Type != EFI_FV_FILETYPE_FREEFORM)
+    return EFI_SECTION_ERROR;
+
+  EFI_COMMON_SECTION_HEADER* SectionHeader = (EFI_COMMON_SECTION_HEADER *) ((UINTN) FileHeader + HeaderSize);
+  if (SectionHeader->Type != EFI_SECTION_RAW)
+    return EFI_SECTION_ERROR;
+
+  UINT32 SectionLength = GetSectionFileLength (SectionHeader);
+  EFI_GUID* FileName = (EFI_GUID *) ((UINT8 *) SectionHeader + sizeof (EFI_COMMON_SECTION_HEADER));
+  while (((UINT8 *) FileName) < ((UINT8 *) SectionHeader + SectionLength)) {
+    PrintGuidToBuffer (FileName, GuidBuffer, sizeof (GuidBuffer), TRUE);
+    printf ("%s  ", GuidBuffer);
+    PrintGuidName (GuidBuffer);
+    printf ("\n");
+    FileName++;
+  }
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
 PrintFileInfo (
   EFI_FIRMWARE_VOLUME_HEADER  *FvImage,
   EFI_FFS_FILE_HEADER         *FileHeader,
@@ -1337,6 +1392,25 @@ Returns:
       return EFI_ABORTED;
     }
     break;
+  }
+
+  if (!CompareGuid (
+       &FileHeader->Name,
+       &gPeiAprioriFileNameGuid
+       ))
+  {
+    printf("\n");
+    printf("PEI APRIORI FILE:\n");
+    return PrintAprioriFile (FileHeader);
+  }
+  if (!CompareGuid (
+       &FileHeader->Name,
+       &gAprioriGuid
+       ))
+  {
+    printf("\n");
+    printf("DXE APRIORI FILE:\n");
+    return PrintAprioriFile (FileHeader);
   }
 
   return EFI_SUCCESS;
