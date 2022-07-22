@@ -99,7 +99,9 @@ INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
 INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
 
+!if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
 INF CryptoPkg/Driver/CryptoDxe.inf
+!endif
 !if $(SECURITY_STUB_ENABLE) == TRUE
 INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 !endif
