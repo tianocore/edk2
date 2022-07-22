@@ -685,11 +685,11 @@ Returns:
     //
     // 0x17
     //
-    "EFI_SECTION_FIRMWARE_VOLUME_IMAGE ",
+    "EFI_SECTION_FIRMWARE_VOLUME_IMAGE",
     //
     // 0x18
     //
-    "EFI_SECTION_FREEFORM_SUBTYPE_GUID ",
+    "EFI_SECTION_FREEFORM_SUBTYPE_GUID",
     //
     // 0x19
     //
@@ -705,7 +705,7 @@ Returns:
     //
     // 0x1C
     //
-    "EFI_SECTION_SMM_DEPEX",
+    "EFI_SECTION_MM_DEPEX",
     //
     // 0x1C+
     //
@@ -1338,7 +1338,7 @@ Returns:
     break;
 
   case EFI_FV_FILETYPE_SMM:
-    printf ("EFI_FV_FILETYPE_SMM\n");
+    printf ("EFI_FV_FILETYPE_MM\n");
     break;
 
   case EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE:
@@ -1346,11 +1346,11 @@ Returns:
     break;
 
   case EFI_FV_FILETYPE_COMBINED_SMM_DXE:
-    printf ("EFI_FV_FILETYPE_COMBINED_SMM_DXE\n");
+    printf ("EFI_FV_FILETYPE_COMBINED_MM_DXE\n");
     break;
 
   case EFI_FV_FILETYPE_SMM_CORE:
-    printf ("EFI_FV_FILETYPE_SMM_CORE\n");
+    printf ("EFI_FV_FILETYPE_MM_CORE\n");
     break;
 
   case EFI_FV_FILETYPE_MM_STANDALONE:
