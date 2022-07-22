@@ -1,7 +1,7 @@
 /** @file
   Main file supporting the transition to PEI Core in Normal World for Versatile Express
 
-  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+  Copyright (c) 2011 - 2022, ARM Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -90,6 +90,10 @@ CEntryPoint (
 
   // If not primary Jump to Secondary Main
   if (ArmPlatformIsPrimaryCore (MpId)) {
+    // Invoke "ProcessLibraryConstructorList" to have all library constructors
+    // called.
+    ProcessLibraryConstructorList ();
+
     // Initialize the Debug Agent for Source Level Debugging
     InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);
     SaveAndSetDebugTimerInterrupt (TRUE);
