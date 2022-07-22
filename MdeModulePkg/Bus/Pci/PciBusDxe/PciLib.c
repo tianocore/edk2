@@ -1,7 +1,7 @@
 /** @file
   Internal library implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1528,6 +1528,7 @@ PciHostBridgeEnumerator (
   UINT8                              StartBusNumber;
   LIST_ENTRY                         RootBridgeList;
   LIST_ENTRY                         *Link;
+  EFI_STATUS                         RootBridgeEnumerationStatus;
 
   if (FeaturePcdGet (PcdPciBusHotplugDeviceSupport)) {
     InitializeHotPlugSupport ();
@@ -1545,7 +1546,8 @@ PciHostBridgeEnumerator (
   }
 
   DEBUG ((DEBUG_INFO, "PCI Bus First Scanning\n"));
-  RootBridgeHandle = NULL;
+  RootBridgeHandle            = NULL;
+  RootBridgeEnumerationStatus = EFI_SUCCESS;
   while (PciResAlloc->GetNextRootBridge (PciResAlloc, &RootBridgeHandle) == EFI_SUCCESS) {
     //
     // if a root bridge instance is found, create root bridge device for it
@@ -1572,7 +1574,7 @@ PciHostBridgeEnumerator (
     }
 
     if (EFI_ERROR (Status)) {
-      return Status;
+      RootBridgeEnumerationStatus = Status;
     }
   }
 
@@ -1580,6 +1582,10 @@ PciHostBridgeEnumerator (
   // Notify the bus allocation phase is finished for the first time
   //
   NotifyPhase (PciResAlloc, EfiPciHostBridgeEndBusAllocation);
+
+  if (EFI_ERROR (RootBridgeEnumerationStatus)) {
+    return RootBridgeEnumerationStatus;
+  }
 
   if ((gPciHotPlugInit != NULL) && FeaturePcdGet (PcdPciBusHotplugDeviceSupport)) {
     //
@@ -1659,7 +1665,7 @@ PciHostBridgeEnumerator (
 
       DestroyRootBridge (RootBridgeDev);
       if (EFI_ERROR (Status)) {
-        return Status;
+        RootBridgeEnumerationStatus = Status;
       }
     }
 
@@ -1667,6 +1673,10 @@ PciHostBridgeEnumerator (
     // Notify the bus allocation phase is to end for the 2nd time
     //
     NotifyPhase (PciResAlloc, EfiPciHostBridgeEndBusAllocation);
+
+    if (EFI_ERROR (RootBridgeEnumerationStatus)) {
+      return RootBridgeEnumerationStatus;
+    }
   }
 
   //
