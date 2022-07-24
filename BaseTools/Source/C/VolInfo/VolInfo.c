@@ -2,6 +2,7 @@
 The tool dumps the contents of a firmware volume
 
 Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2022, Konstantin Aladyshev <aladyshev22@gmail.com><BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
