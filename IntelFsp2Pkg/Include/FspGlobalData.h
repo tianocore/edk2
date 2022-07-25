@@ -12,7 +12,7 @@
 
 #define FSP_IN_API_MODE          0
 #define FSP_IN_DISPATCH_MODE     1
-#define FSP_GLOBAL_DATA_VERSION  0x2
+#define FSP_GLOBAL_DATA_VERSION  0x3
 
 #pragma pack(1)
 
@@ -25,6 +25,7 @@ typedef enum {
   FspSiliconInitApiIndex,
   FspMultiPhaseSiInitApiIndex,
   FspSmmInitApiIndex,
+  FspMultiPhaseMemInitApiIndex,
   FspApiIndexMax
 } FSP_API_INDEX;
 
@@ -82,6 +83,8 @@ typedef struct  {
   VOID               *FunctionParameterPtr;
   FSP_INFO_HEADER    *FspInfoHeader;
   VOID               *UpdDataPtr;
+  VOID               *FspHobListPtr;
+  VOID               *VariableRequestParameterPtr;
   ///
   /// End of UINTN and pointer section
   /// At this point, next field offset must be either *0h or *8h to
