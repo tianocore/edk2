@@ -2435,6 +2435,1438 @@ ShouldBeAbleToDumpThePolicyTableAfterDisabled (
   return UNIT_TEST_PASSED;
 }
 
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+InfoFailOnNullParameter (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  CHAR16                 *VariableName;
+  EFI_GUID               *VendorGuid;
+  VARIABLE_POLICY_ENTRY  PolicyEntry;
+
+  VariableName = NULL;
+  VendorGuid   = &mTestGuid1;
+
+  // Check that NULL VariableName pointer fails
+  UT_ASSERT_STATUS_EQUAL (GetVariablePolicyInfo (VariableName, VendorGuid, NULL, &PolicyEntry, NULL), EFI_INVALID_PARAMETER);
+
+  VariableName = TEST_VAR_1_NAME;
+
+  // Check that NULL VendorGuid pointer fails
+  VendorGuid = NULL;
+  UT_ASSERT_STATUS_EQUAL (GetVariablePolicyInfo (VariableName, VendorGuid, NULL, &PolicyEntry, NULL), EFI_INVALID_PARAMETER);
+
+  VendorGuid = &mTestGuid1;
+
+  // Check that NULL VariablePolicy pointer fails
+  UT_ASSERT_STATUS_EQUAL (GetVariablePolicyInfo (VariableName, VendorGuid, NULL, NULL, NULL), EFI_INVALID_PARAMETER);
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+LockStateInfoFailOnNullParameter (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  CHAR16                             *VariableName;
+  EFI_GUID                           *VendorGuid;
+  VARIABLE_LOCK_ON_VAR_STATE_POLICY  PolicyEntry;
+
+  VariableName = NULL;
+  VendorGuid   = &mTestGuid1;
+
+  // Check that NULL VariableName pointer fails
+  UT_ASSERT_STATUS_EQUAL (GetLockOnVariableStateVariablePolicyInfo (VariableName, VendorGuid, NULL, &PolicyEntry, NULL), EFI_INVALID_PARAMETER);
+
+  VariableName = TEST_VAR_1_NAME;
+
+  // Check that NULL VendorGuid pointer fails
+  VendorGuid = NULL;
+  UT_ASSERT_STATUS_EQUAL (GetLockOnVariableStateVariablePolicyInfo (VariableName, VendorGuid, NULL, &PolicyEntry, NULL), EFI_INVALID_PARAMETER);
+
+  VendorGuid = &mTestGuid1;
+
+  // Check that NULL VariablePolicy pointer fails
+  UT_ASSERT_STATUS_EQUAL (GetLockOnVariableStateVariablePolicyInfo (VariableName, VendorGuid, NULL, NULL, NULL), EFI_INVALID_PARAMETER);
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+InfoExpectBufferTooSmall (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UINTN                  NameBufferSize;
+  VARIABLE_POLICY_ENTRY  PolicyEntry;
+  CHAR16                 VariablePolicyVariableName[SIMPLE_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH];
+  CHAR16                 ComparisonVariablePolicyVariableName[SIMPLE_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH];
+
+  SIMPLE_VARIABLE_POLICY_ENTRY  TestPolicy = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      sizeof (VARIABLE_POLICY_ENTRY) + sizeof (TEST_VAR_1_NAME),
+      sizeof (VARIABLE_POLICY_ENTRY),
+      TEST_GUID_1,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_NO_LOCK
+    },
+    TEST_VAR_1_NAME
+  };
+
+  ZeroMem (VariablePolicyVariableName, sizeof (VariablePolicyVariableName));
+  ZeroMem (ComparisonVariablePolicyVariableName, sizeof (ComparisonVariablePolicyVariableName));
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&TestPolicy.Header));
+  NameBufferSize = 0;
+
+  // Try with a NULL variable policy name pointer
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (
+      TestPolicy.Name,
+      &mTestGuid1,
+      &NameBufferSize,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_BUFFER_TOO_SMALL
+    );
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_1_NAME, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_SIZE));
+
+  NameBufferSize = 0;
+
+  // Try with a non-NULL variable policy name pointer
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (
+      TestPolicy.Name,
+      &mTestGuid1,
+      &NameBufferSize,
+      &PolicyEntry,
+      VariablePolicyVariableName
+      ),
+    EFI_BUFFER_TOO_SMALL
+    );
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_1_NAME, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_SIZE));
+
+  // The name buffer should not have been modified getting the variable policy name size
+  UT_ASSERT_MEM_EQUAL (VariablePolicyVariableName, ComparisonVariablePolicyVariableName, sizeof (VariablePolicyVariableName));
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+LockStateInfoExpectBufferTooSmall (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UINTN                              NameBufferSize;
+  VARIABLE_LOCK_ON_VAR_STATE_POLICY  PolicyEntry;
+  CHAR16                             VariableLockVariableName[EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH];
+
+  EXPANDED_VARIABLE_POLICY_ENTRY  ValidationPolicyNoNameVarLockName = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      0,    // Will be populated by init helper.
+      0,    // Will be populated by init helper.
+      TEST_GUID_1,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_LOCK_ON_VAR_STATE
+    },
+    {
+      TEST_GUID_2,
+      1,            // Value
+      0             // Padding
+    },
+    L"",
+    L""
+  };
+
+  EXPANDED_VARIABLE_POLICY_ENTRY  ValidationPolicyVarNameVarLockName = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      0,    // Will be populated by init helper.
+      0,    // Will be populated by init helper.
+      TEST_GUID_2,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_LOCK_ON_VAR_STATE
+    },
+    {
+      TEST_GUID_3,
+      1,            // Value
+      0             // Padding
+    },
+    L"",
+    L""
+  };
+
+  // No variable policy name with lock on variable name (policy applies to namespace)
+  NameBufferSize = 0;
+  UT_ASSERT_TRUE (InitExpVarPolicyStrings (&ValidationPolicyNoNameVarLockName, NULL, TEST_VAR_2_NAME));
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&ValidationPolicyNoNameVarLockName.Header));
+
+  // Find variable policy based on vendor GUID
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      L"AnyName",
+      &mTestGuid1,
+      &NameBufferSize,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_BUFFER_TOO_SMALL
+    );
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_2_NAME, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_SIZE));
+
+  // Variable policy name with lock on variable name
+  NameBufferSize = 0;
+  UT_ASSERT_TRUE (InitExpVarPolicyStrings (&ValidationPolicyVarNameVarLockName, TEST_VAR_1_NAME, TEST_VAR_3_NAME));
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&ValidationPolicyVarNameVarLockName.Header));
+
+  // Verify finding by name is not found now that a specific name is provided
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      L"AnyName",
+      &mTestGuid2,
+      &NameBufferSize,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_NOT_FOUND
+    );
+  // NameBufferSize should not have been modified
+  UT_ASSERT_EQUAL (NameBufferSize, 0);
+
+  NameBufferSize = 0;
+  // Find variable policy based on variable name and vendor GUID
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      TEST_VAR_1_NAME,
+      &mTestGuid2,
+      &NameBufferSize,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_BUFFER_TOO_SMALL
+    );
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_3_NAME, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_SIZE));
+
+  NameBufferSize = 0;
+  // Find variable policy based on variable name and vendor GUID with variable name buffer given
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      TEST_VAR_1_NAME,
+      &mTestGuid2,
+      &NameBufferSize,
+      &PolicyEntry,
+      VariableLockVariableName
+      ),
+    EFI_BUFFER_TOO_SMALL
+    );
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_3_NAME, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_SIZE));
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+InfoSucceedIfZeroSizedNameBufferNotNeeded (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UINTN                  NameBufferSize;
+  VARIABLE_POLICY_ENTRY  PolicyEntry;
+  CHAR16                 VariablePolicyVariableName[SIMPLE_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH];
+  CHAR16                 ComparisonVariablePolicyVariableName[SIMPLE_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH];
+
+  SIMPLE_VARIABLE_POLICY_ENTRY  TestPolicy = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      sizeof (VARIABLE_POLICY_ENTRY),
+      sizeof (VARIABLE_POLICY_ENTRY),
+      TEST_GUID_1,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_NO_LOCK
+    },
+    L""
+  };
+
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&TestPolicy.Header));
+
+  // Try with no attempt to get name information
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (
+      TEST_VAR_1_NAME,
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_SUCCESS
+    );
+  // Policy entry should have been found
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &TestPolicy.Header, sizeof (PolicyEntry));
+
+  ZeroMem (VariablePolicyVariableName, sizeof (VariablePolicyVariableName));
+  ZeroMem (ComparisonVariablePolicyVariableName, sizeof (ComparisonVariablePolicyVariableName));
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // Try with valid pointers given to get name information
+  NameBufferSize = 0;
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (
+      TEST_VAR_1_NAME,
+      &mTestGuid1,
+      &NameBufferSize,
+      &PolicyEntry,
+      VariablePolicyVariableName
+      ),
+    EFI_SUCCESS
+    );
+  // Policy entry should have been found
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &TestPolicy.Header, sizeof (PolicyEntry));
+  // The name size should be zero to indicate that a name is not present
+  UT_ASSERT_EQUAL (NameBufferSize, 0);
+  // The name buffer should not have been modified (since a name is not actually present)
+  UT_ASSERT_MEM_EQUAL (VariablePolicyVariableName, ComparisonVariablePolicyVariableName, sizeof (VariablePolicyVariableName));
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+LockStateInfoSucceedIfZeroSizedNameBufferNotNeeded (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UINTN                              NameBufferSize;
+  VARIABLE_LOCK_ON_VAR_STATE_POLICY  PolicyEntry;
+  CHAR16                             VariablePolicyVariableName[SIMPLE_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH];
+  CHAR16                             ComparisonVariablePolicyVariableName[SIMPLE_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH];
+
+  EXPANDED_VARIABLE_POLICY_ENTRY  TestPolicy = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      0,
+      0,
+      TEST_GUID_1,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_LOCK_ON_VAR_STATE
+    },
+    {
+      TEST_GUID_2,
+      1,            // Value
+      0             // Padding
+    },
+    L"",
+    L""
+  };
+
+  UT_ASSERT_TRUE (InitExpVarPolicyStrings (&TestPolicy, NULL, L""));
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&TestPolicy.Header));
+
+  // Try with no attempt to get name information
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      L"AnyName",
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_SUCCESS
+    );
+  // Policy entry should have been found
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &TestPolicy.StatePolicy, sizeof (PolicyEntry));
+
+  ZeroMem (VariablePolicyVariableName, sizeof (VariablePolicyVariableName));
+  ZeroMem (ComparisonVariablePolicyVariableName, sizeof (ComparisonVariablePolicyVariableName));
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // Try with valid pointers given to get name information
+  NameBufferSize = 0;
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      L"AnyOtherName",
+      &mTestGuid1,
+      &NameBufferSize,
+      &PolicyEntry,
+      VariablePolicyVariableName
+      ),
+    EFI_BUFFER_TOO_SMALL
+    );
+  // Policy entry should have been found
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &TestPolicy.StatePolicy, sizeof (PolicyEntry));
+  // The name size should be zero to indicate that a name is not present
+  UT_ASSERT_EQUAL (NameBufferSize, sizeof (L""));
+  UT_ASSERT_MEM_EQUAL (VariablePolicyVariableName, ComparisonVariablePolicyVariableName, sizeof (VariablePolicyVariableName));
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+InfoDoubleCallWithSizeReturnedShouldPass (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UINTN                  NameBufferSize;
+  VARIABLE_POLICY_ENTRY  PolicyEntry;
+  CHAR16                 *NullNamePtr;
+  CHAR16                 VariablePolicyVariableName[SIMPLE_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH];
+  CHAR16                 ComparisonVariablePolicyVariableName[SIMPLE_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH];
+
+  SIMPLE_VARIABLE_POLICY_ENTRY  TestPolicy = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      sizeof (VARIABLE_POLICY_ENTRY) + sizeof (TEST_VAR_3_NAME),
+      sizeof (VARIABLE_POLICY_ENTRY),
+      TEST_GUID_3,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_NO_LOCK
+    },
+    TEST_VAR_3_NAME
+  };
+
+  ZeroMem (VariablePolicyVariableName, sizeof (VariablePolicyVariableName));
+  ZeroMem (ComparisonVariablePolicyVariableName, sizeof (ComparisonVariablePolicyVariableName));
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&TestPolicy.Header));
+
+  // Verify a NULL name pointer does not prevent the size from being returned
+  NameBufferSize = 0;
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (TestPolicy.Name, &mTestGuid3, &NameBufferSize, &PolicyEntry, NULL),
+    EFI_BUFFER_TOO_SMALL
+    );
+  // Verify size returned is what is expected
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_3_NAME, SIMPLE_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH));
+
+  // Verify the size is also returned with a non-NULL name pointer
+  NameBufferSize = 0;
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (TestPolicy.Name, &mTestGuid3, &NameBufferSize, &PolicyEntry, VariablePolicyVariableName),
+    EFI_BUFFER_TOO_SMALL
+    );
+  // Verify size returned is what is expected
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_3_NAME, SIMPLE_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH));
+  // Although the name was not copied, the policy should have been copied
+  UT_ASSERT_MEM_EQUAL (&TestPolicy.Header, &PolicyEntry, sizeof (PolicyEntry));
+  // Name should not have been modified (as buffer was too small)
+  UT_ASSERT_MEM_EQUAL (VariablePolicyVariableName, ComparisonVariablePolicyVariableName, sizeof (VariablePolicyVariableName));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // Call again with name size returned but no name pointer, the invalid name
+  // pointer should now be considered an invalid parameter
+  NullNamePtr = NULL;
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (
+      TestPolicy.Name,
+      &mTestGuid3,
+      &NameBufferSize,
+      &PolicyEntry,
+      NullNamePtr
+      ),
+    EFI_INVALID_PARAMETER
+    );
+  // Verify size was not modified to an unexpected value
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_3_NAME, SIMPLE_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH));
+  // The invalid parameter was related to the name, the policy should have still be retrievable
+  UT_ASSERT_MEM_EQUAL (&TestPolicy.Header, &PolicyEntry, sizeof (PolicyEntry));
+
+  // Call again with name size returned and a valid name pointer, it should work now
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (
+      TestPolicy.Name,
+      &mTestGuid3,
+      &NameBufferSize,
+      &PolicyEntry,
+      VariablePolicyVariableName
+      ),
+    EFI_SUCCESS
+    );
+  // Required name buffer size should have remained the same
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_3_NAME, SIMPLE_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH));
+  // Policy should have been copied again
+  UT_ASSERT_MEM_EQUAL (&TestPolicy.Header, &PolicyEntry, sizeof (PolicyEntry));
+  // Name should now be the name given to the policy
+  UT_ASSERT_MEM_EQUAL (
+    VariablePolicyVariableName,
+    TEST_VAR_3_NAME,
+    MIN (
+      StrnSizeS (VariablePolicyVariableName, SIMPLE_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH),
+      StrSize (TEST_VAR_3_NAME)
+      )
+    );
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+LockStateInfoDoubleCallWithSizeReturnedShouldPass (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UINTN                              NameBufferSize;
+  VARIABLE_LOCK_ON_VAR_STATE_POLICY  PolicyEntry;
+  CHAR16                             *NullNamePtr;
+  CHAR16                             VariableLockVariableName[EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH];
+  CHAR16                             ComparisonVariablePolicyVariableName[EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH];
+
+  EXPANDED_VARIABLE_POLICY_ENTRY  ValidationPolicyNoNameVarLockName = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      0,    // Will be populated by init helper.
+      0,    // Will be populated by init helper.
+      TEST_GUID_1,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_LOCK_ON_VAR_STATE
+    },
+    {
+      TEST_GUID_2,
+      1,            // Value
+      0             // Padding
+    },
+    L"",
+    L""
+  };
+
+  EXPANDED_VARIABLE_POLICY_ENTRY  ValidationPolicyVarNameVarLockName = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      0,    // Will be populated by init helper.
+      0,    // Will be populated by init helper.
+      TEST_GUID_2,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_LOCK_ON_VAR_STATE
+    },
+    {
+      TEST_GUID_3,
+      1,            // Value
+      0             // Padding
+    },
+    L"",
+    L""
+  };
+
+  ZeroMem (VariableLockVariableName, sizeof (VariableLockVariableName));
+  ZeroMem (ComparisonVariablePolicyVariableName, sizeof (ComparisonVariablePolicyVariableName));
+
+  // No variable policy name with lock on variable name (policy applies to namespace)
+  UT_ASSERT_TRUE (InitExpVarPolicyStrings (&ValidationPolicyNoNameVarLockName, NULL, TEST_VAR_2_NAME));
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&ValidationPolicyNoNameVarLockName.Header));
+
+  // Verify a NULL name pointer does not prevent the size from being returned
+  NameBufferSize = 0;
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (L"AnyName", &mTestGuid1, &NameBufferSize, &PolicyEntry, NULL),
+    EFI_BUFFER_TOO_SMALL
+    );
+  // Verify size returned is what is expected
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_2_NAME, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH));
+
+  // Verify the size is also returned with a non-NULL name pointer
+  NameBufferSize = 0;
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      L"AnyName",
+      &mTestGuid1,
+      &NameBufferSize,
+      &PolicyEntry,
+      VariableLockVariableName
+      ),
+    EFI_BUFFER_TOO_SMALL
+    );
+  // NameBufferSize should have been set to the variable name in the lock on var state policy
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_2_NAME, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_SIZE));
+  // Although the name was not copied, the policy should have been copied
+  UT_ASSERT_MEM_EQUAL (&ValidationPolicyNoNameVarLockName.StatePolicy, &PolicyEntry, sizeof (PolicyEntry));
+  // Name should not have been modified (as buffer was too small)
+  UT_ASSERT_MEM_EQUAL (VariableLockVariableName, ComparisonVariablePolicyVariableName, sizeof (VariableLockVariableName));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // Call again with name size returned but no name pointer, the invalid name
+  // pointer should now be considered an invalid parameter
+  NullNamePtr = NULL;
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      L"AnyName",
+      &mTestGuid1,
+      &NameBufferSize,
+      &PolicyEntry,
+      NullNamePtr
+      ),
+    EFI_INVALID_PARAMETER
+    );
+  // Verify size was not modified to an unexpected value
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_2_NAME, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_SIZE));
+  // The invalid parameter was related to the name, the policy should have still be retrievable
+  UT_ASSERT_MEM_EQUAL (&ValidationPolicyNoNameVarLockName.StatePolicy, &PolicyEntry, sizeof (PolicyEntry));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // Call again with name size returned and a valid name pointer, it should work now
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      L"AnyName",
+      &mTestGuid1,
+      &NameBufferSize,
+      &PolicyEntry,
+      VariableLockVariableName
+      ),
+    EFI_SUCCESS
+    );
+  // Required name buffer size should have remained the same
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_2_NAME, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_SIZE));
+  // Policy should have been copied again
+  UT_ASSERT_MEM_EQUAL (&ValidationPolicyNoNameVarLockName.StatePolicy, &PolicyEntry, sizeof (PolicyEntry));
+  // Name should now be the name given to the policy
+  UT_ASSERT_MEM_EQUAL (
+    VariableLockVariableName,
+    TEST_VAR_2_NAME,
+    MIN (
+      StrnSizeS (VariableLockVariableName, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_SIZE),
+      StrSize (TEST_VAR_2_NAME)
+      )
+    );
+
+  // Verify this works with a variable policy name present
+  UT_ASSERT_TRUE (InitExpVarPolicyStrings (&ValidationPolicyVarNameVarLockName, TEST_VAR_1_NAME, TEST_VAR_2_NAME));
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&ValidationPolicyVarNameVarLockName.Header));
+
+  // Reset the variable lock on var state variable name buffer
+  ZeroMem (VariableLockVariableName, sizeof (VariableLockVariableName));
+
+  // Verify the wrong policy name does not find the policy
+  NameBufferSize = 0;
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (L"AnyName", &mTestGuid2, &NameBufferSize, &PolicyEntry, NULL),
+    EFI_NOT_FOUND
+    );
+  // Verify size is not modified as a lock on var state policy was not found
+  UT_ASSERT_EQUAL (NameBufferSize, 0);
+
+  // Verify a NULL name pointer does not prevent the size from being returned
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (TEST_VAR_1_NAME, &mTestGuid2, &NameBufferSize, &PolicyEntry, NULL),
+    EFI_BUFFER_TOO_SMALL
+    );
+  // Verify size returned is what is expected
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_2_NAME, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_LENGTH));
+
+  // Verify the size is also returned with a non-NULL name pointer
+  NameBufferSize = 0;
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      TEST_VAR_1_NAME,
+      &mTestGuid2,
+      &NameBufferSize,
+      &PolicyEntry,
+      VariableLockVariableName
+      ),
+    EFI_BUFFER_TOO_SMALL
+    );
+  // NameBufferSize should have been set to the variable name in the lock on var state policy
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_2_NAME, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_SIZE));
+  // Although the name was not copied, the policy should have been copied
+  UT_ASSERT_MEM_EQUAL (&ValidationPolicyVarNameVarLockName.StatePolicy, &PolicyEntry, sizeof (PolicyEntry));
+  // Name should not have been modified (as buffer was too small)
+  UT_ASSERT_MEM_EQUAL (VariableLockVariableName, ComparisonVariablePolicyVariableName, sizeof (VariableLockVariableName));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // Call again with name size returned but no name pointer, the invalid name
+  // pointer should now be considered an invalid parameter
+  NullNamePtr = NULL;
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      TEST_VAR_1_NAME,
+      &mTestGuid2,
+      &NameBufferSize,
+      &PolicyEntry,
+      NullNamePtr
+      ),
+    EFI_INVALID_PARAMETER
+    );
+  // Verify size was not modified to an unexpected value
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_2_NAME, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_SIZE));
+  // The invalid parameter was related to the name, the policy should have still be retrievable
+  UT_ASSERT_MEM_EQUAL (&ValidationPolicyVarNameVarLockName.StatePolicy, &PolicyEntry, sizeof (PolicyEntry));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // Call again with name size returned and a valid name pointer, it should work now
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      TEST_VAR_1_NAME,
+      &mTestGuid2,
+      &NameBufferSize,
+      &PolicyEntry,
+      VariableLockVariableName
+      ),
+    EFI_SUCCESS
+    );
+  // Required name buffer size should have remained the same
+  UT_ASSERT_EQUAL (NameBufferSize, StrnSizeS (TEST_VAR_2_NAME, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_SIZE));
+  // Policy should have been copied again
+  UT_ASSERT_MEM_EQUAL (&ValidationPolicyVarNameVarLockName.StatePolicy, &PolicyEntry, sizeof (PolicyEntry));
+  // Name should now be the name given to the policy
+  UT_ASSERT_MEM_EQUAL (
+    VariableLockVariableName,
+    TEST_VAR_2_NAME,
+    MIN (
+      StrnSizeS (VariableLockVariableName, EXPANDED_VARIABLE_POLICY_ENTRY_VAR_NAME_SIZE),
+      StrSize (TEST_VAR_2_NAME)
+      )
+    );
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+InfoExpectNotReady (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VARIABLE_POLICY_ENTRY  PolicyEntry;
+  VARIABLE_POLICY_ENTRY  ComparisonPolicyEntry;
+
+  SIMPLE_VARIABLE_POLICY_ENTRY  TestPolicy = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      sizeof (VARIABLE_POLICY_ENTRY) + sizeof (TEST_VAR_1_NAME),
+      sizeof (VARIABLE_POLICY_ENTRY),
+      TEST_GUID_1,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_NO_LOCK
+    },
+    TEST_VAR_1_NAME
+  };
+
+  UT_ASSERT_STATUS_EQUAL (RegisterVariablePolicy (&TestPolicy.Header), EFI_NOT_READY);
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+  ZeroMem (&ComparisonPolicyEntry, sizeof (PolicyEntry));
+
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (
+      TEST_VAR_1_NAME,
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_NOT_READY
+    );
+  // Policy buffer should not have been modified
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &ComparisonPolicyEntry, sizeof (PolicyEntry));
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+LockStateInfoExpectNotReady (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VARIABLE_LOCK_ON_VAR_STATE_POLICY  PolicyEntry;
+  VARIABLE_LOCK_ON_VAR_STATE_POLICY  ComparisonPolicyEntry;
+
+  EXPANDED_VARIABLE_POLICY_ENTRY  TestPolicy = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      0,    // Will be populated by init helper.
+      0,    // Will be populated by init helper.
+      TEST_GUID_1,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_LOCK_ON_VAR_STATE
+    },
+    {
+      TEST_GUID_2,
+      1,            // Value
+      0             // Padding
+    },
+    L"",
+    L""
+  };
+
+  UT_ASSERT_TRUE (InitExpVarPolicyStrings (&TestPolicy, TEST_VAR_1_NAME, TEST_VAR_2_NAME));
+  UT_ASSERT_STATUS_EQUAL (RegisterVariablePolicy (&TestPolicy.Header), EFI_NOT_READY);
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+  ZeroMem (&ComparisonPolicyEntry, sizeof (PolicyEntry));
+
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      TEST_VAR_1_NAME,
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_NOT_READY
+    );
+  // Policy buffer should not have been modified
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &ComparisonPolicyEntry, sizeof (PolicyEntry));
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+InfoReturnPolicyWithVariablePolicyNameNotPresent (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VARIABLE_POLICY_ENTRY  PolicyEntry;
+
+  SIMPLE_VARIABLE_POLICY_ENTRY  TestPolicy = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      sizeof (VARIABLE_POLICY_ENTRY),
+      sizeof (VARIABLE_POLICY_ENTRY),
+      TEST_GUID_3,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_NO_LOCK
+    },
+    L""
+  };
+
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&TestPolicy.Header));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // Verify policy is returned without a name present after the policy structure
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (
+      L"AnyNameWillWork",
+      &mTestGuid3,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_SUCCESS
+    );
+  // Policy entry should have been found
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &TestPolicy.Header, sizeof (PolicyEntry));
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+LockStateInfoReturnPolicyWithVariablePolicyNameNotPresent (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VARIABLE_LOCK_ON_VAR_STATE_POLICY  PolicyEntry;
+
+  EXPANDED_VARIABLE_POLICY_ENTRY  TestPolicy = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      0,    // Will be populated by init helper.
+      0,    // Will be populated by init helper.
+      TEST_GUID_1,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_LOCK_ON_VAR_STATE
+    },
+    {
+      TEST_GUID_2,
+      1,            // Value
+      0             // Padding
+    },
+    L"",
+    L""
+  };
+
+  UT_ASSERT_TRUE (InitExpVarPolicyStrings (&TestPolicy, NULL, L""));
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&TestPolicy.Header));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // Verify policy is returned without a name present after the policy structure
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      L"AnyNameWillWork",
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_SUCCESS
+    );
+  // Policy entry should have been found
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &TestPolicy.StatePolicy, sizeof (PolicyEntry));
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+InfoReturnPolicyWithVariablePolicyNamePresent (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VARIABLE_POLICY_ENTRY  PolicyEntry;
+
+  SIMPLE_VARIABLE_POLICY_ENTRY  TestPolicy = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      sizeof (VARIABLE_POLICY_ENTRY) + sizeof (TEST_VAR_3_NAME),
+      sizeof (VARIABLE_POLICY_ENTRY),
+      TEST_GUID_3,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_NO_LOCK
+    },
+    TEST_VAR_3_NAME
+  };
+
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&TestPolicy.Header));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // Verify policy with a name should only match on the name
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (
+      L"AnyNameWillNotWork",
+      &mTestGuid3,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_NOT_FOUND
+    );
+
+  // Verify policy with a name should match on the name
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (
+      TEST_VAR_3_NAME,
+      &mTestGuid3,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_SUCCESS
+    );
+  // Policy entry should have been found
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &TestPolicy.Header, sizeof (PolicyEntry));
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+LockStateInfoReturnPolicyWithVariablePolicyNamePresent (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VARIABLE_LOCK_ON_VAR_STATE_POLICY  PolicyEntry;
+
+  EXPANDED_VARIABLE_POLICY_ENTRY  TestPolicy = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      0,    // Will be populated by init helper.
+      0,    // Will be populated by init helper.
+      TEST_GUID_1,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_LOCK_ON_VAR_STATE
+    },
+    {
+      TEST_GUID_2,
+      0,            // Value
+      0             // Padding
+    },
+    L"",
+    L""
+  };
+
+  UT_ASSERT_TRUE (InitExpVarPolicyStrings (&TestPolicy, TEST_VAR_1_NAME, L""));
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&TestPolicy.Header));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // Verify policy with a name should only match on the name
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      L"AnyNameWillNotWork",
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_NOT_FOUND
+    );
+
+  // Verify policy with a name should match on the name
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      TEST_VAR_1_NAME,
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_SUCCESS
+    );
+  // Policy entry should have been found
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &TestPolicy.StatePolicy, sizeof (PolicyEntry));
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+InfoExpectNotFound (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VARIABLE_POLICY_ENTRY  PolicyEntry;
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // This policy should not be found
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (
+      L"NameDoesNotMatter",
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_NOT_FOUND
+    );
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+LockStateInfoExpectNotFound (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VARIABLE_LOCK_ON_VAR_STATE_POLICY  PolicyEntry;
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // This policy should not be found
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      L"NameDoesNotMatter",
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_NOT_FOUND
+    );
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+LockStateInfoExpectNotFoundWrongPolicyType (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VARIABLE_LOCK_ON_VAR_STATE_POLICY  PolicyEntry;
+
+  SIMPLE_VARIABLE_POLICY_ENTRY  TestPolicy = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      sizeof (VARIABLE_POLICY_ENTRY) + sizeof (TEST_VAR_1_NAME),
+      sizeof (VARIABLE_POLICY_ENTRY),
+      TEST_GUID_1,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_LOCK_ON_CREATE
+    },
+    TEST_VAR_3_NAME
+  };
+
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&TestPolicy.Header));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // Although the policy exists, a lock on var state policy is needed (which it is not)
+  // so a policy should not be found.
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      TEST_VAR_1_NAME,
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_NOT_FOUND
+    );
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+InfoBestPolicyMatchWithMultipleOptions (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VARIABLE_POLICY_ENTRY  PolicyEntry;
+
+  SIMPLE_VARIABLE_POLICY_ENTRY  TestPolicyWorstMatch = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      sizeof (VARIABLE_POLICY_ENTRY),
+      sizeof (VARIABLE_POLICY_ENTRY),
+      TEST_GUID_1,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_NO_LOCK
+    },
+    L""
+  };
+
+  SIMPLE_VARIABLE_POLICY_ENTRY  TestPolicyBestMatch = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      sizeof (VARIABLE_POLICY_ENTRY) + sizeof (TEST_VAR_2_NAME),
+      sizeof (VARIABLE_POLICY_ENTRY),
+      TEST_GUID_1,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_NO_LOCK
+    },
+    TEST_VAR_2_NAME
+  };
+
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&TestPolicyWorstMatch.Header));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // With nothing else, the worst match should be found
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (
+      L"AnyNameWillWork",
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_SUCCESS
+    );
+  // Policy match should be good
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &TestPolicyWorstMatch.Header, sizeof (PolicyEntry));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&TestPolicyBestMatch.Header));
+
+  // This should still work returning the worst policy info
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (
+      L"AnyNameWillWork",
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_SUCCESS
+    );
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &TestPolicyWorstMatch.Header, sizeof (PolicyEntry));
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // Now, the best match should be found instead
+  UT_ASSERT_STATUS_EQUAL (
+    GetVariablePolicyInfo (
+      TEST_VAR_2_NAME,
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_SUCCESS
+    );
+  // Best policy entry info should have been returned
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &TestPolicyBestMatch.Header, sizeof (PolicyEntry));
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  Test Case.
+
+  @param[in]        Context
+
+  **/
+UNIT_TEST_STATUS
+EFIAPI
+LockStateInfoBestPolicyMatchWithMultipleOptions (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  VARIABLE_LOCK_ON_VAR_STATE_POLICY  PolicyEntry;
+
+  EXPANDED_VARIABLE_POLICY_ENTRY  TestPolicyWorstMatch = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      0,    // Will be populated by init helper.
+      0,    // Will be populated by init helper.
+      TEST_GUID_1,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_LOCK_ON_VAR_STATE
+    },
+    {
+      TEST_GUID_3,
+      0,            // Value
+      0             // Padding
+    },
+    L"",
+    L""
+  };
+
+  EXPANDED_VARIABLE_POLICY_ENTRY  TestPolicyBestMatch = {
+    {
+      VARIABLE_POLICY_ENTRY_REVISION,
+      0,    // Will be populated by init helper.
+      0,    // Will be populated by init helper.
+      TEST_GUID_1,
+      TEST_POLICY_MIN_SIZE_NULL,
+      TEST_POLICY_MAX_SIZE_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      TEST_POLICY_ATTRIBUTES_NULL,
+      VARIABLE_POLICY_TYPE_LOCK_ON_VAR_STATE
+    },
+    {
+      TEST_GUID_3,
+      0,            // Value
+      0             // Padding
+    },
+    L"",
+    L""
+  };
+
+  UT_ASSERT_TRUE (InitExpVarPolicyStrings (&TestPolicyWorstMatch, NULL, TEST_VAR_3_NAME));
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&TestPolicyWorstMatch.Header));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // With nothing else, the worst match should be found
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      L"AnyNameWillWork",
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_SUCCESS
+    );
+  // Policy match should be good
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &TestPolicyWorstMatch.StatePolicy, sizeof (PolicyEntry));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  UT_ASSERT_TRUE (InitExpVarPolicyStrings (&TestPolicyBestMatch, TEST_VAR_1_NAME, TEST_VAR_3_NAME));
+  UT_ASSERT_NOT_EFI_ERROR (RegisterVariablePolicy (&TestPolicyBestMatch.Header));
+
+  // This should still work returning the worst policy info
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      L"AnyNameWillWork",
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_SUCCESS
+    );
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &TestPolicyWorstMatch.StatePolicy, sizeof (PolicyEntry));
+
+  ZeroMem (&PolicyEntry, sizeof (PolicyEntry));
+
+  // Now, the best match should be found instead
+  UT_ASSERT_STATUS_EQUAL (
+    GetLockOnVariableStateVariablePolicyInfo (
+      TEST_VAR_1_NAME,
+      &mTestGuid1,
+      NULL,
+      &PolicyEntry,
+      NULL
+      ),
+    EFI_SUCCESS
+    );
+  // Best policy entry info should have been returned
+  UT_ASSERT_MEM_EQUAL (&PolicyEntry, &TestPolicyBestMatch.StatePolicy, sizeof (PolicyEntry));
+
+  return UNIT_TEST_PASSED;
+}
+
 /// === TEST ENGINE ================================================================================
 
 /**
@@ -2451,6 +3883,7 @@ UnitTestMain (
   UNIT_TEST_SUITE_HANDLE      ArchTests;
   UNIT_TEST_SUITE_HANDLE      PolicyTests;
   UNIT_TEST_SUITE_HANDLE      UtilityTests;
+  UNIT_TEST_SUITE_HANDLE      InfoTests;
 
  #ifdef INTERNAL_UNIT_TEST
   UNIT_TEST_SUITE_HANDLE  InternalTests;
@@ -2868,6 +4301,203 @@ UnitTestMain (
     "ShouldBeAbleToDumpThePolicyTableAfterDisabled",
     "VarPolicy.Utility.DumpTableAfterDisable",
     ShouldBeAbleToDumpThePolicyTableAfterDisabled,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  Status = CreateUnitTestSuite (&InfoTests, Framework, "Variable Policy Info Tests", "VarPolicy.Info", NULL, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed in CreateUnitTestSuite for InfoTests\n"));
+    Status = EFI_OUT_OF_RESOURCES;
+    goto EXIT;
+  }
+
+  AddTestCase (
+    InfoTests,
+    "A NULL pointer that is required should fail.",
+    "VarPolicy.Info.VarPolicy.FailOnNullParameter",
+    InfoFailOnNullParameter,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "A NULL pointer that is required should fail.",
+    "VarPolicy.Info.LockOnVarStateVarPolicy.FailOnNullParameter",
+    LockStateInfoFailOnNullParameter,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "A zero-sized buffer for a present variable policy name should return EFI_BUFFER_TOO_SMALL.",
+    "VarPolicy.Info.VarPolicy.ExpectBufferTooSmall",
+    InfoExpectBufferTooSmall,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "A zero-sized buffer for a present variable policy name should return EFI_BUFFER_TOO_SMALL.",
+    "VarPolicy.Info.LockOnVarStateVarPolicy.ExpectBufferTooSmall",
+    LockStateInfoExpectBufferTooSmall,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "A zero-sized name buffer for a non-present variable policy name should return EFI_SUCCESS.",
+    "VarPolicy.Info.VarPolicy.SucceedIfZeroSizedNameBufferNotNeeded",
+    InfoSucceedIfZeroSizedNameBufferNotNeeded,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "A zero-sized buffer for a non-present variable policy name should return EFI_SUCCESS.",
+    "VarPolicy.Info.LockOnVarStateVarPolicy.SucceedIfZeroSizedNameBufferNotNeeded",
+    LockStateInfoSucceedIfZeroSizedNameBufferNotNeeded,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "Calling twice, second time with first call buffer returned buffer size should work.",
+    "VarPolicy.Info.VarPolicy.DoubleCallWithSizeReturnedShouldPass",
+    InfoDoubleCallWithSizeReturnedShouldPass,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "Calling twice, second time with first call buffer returned buffer size should work.",
+    "VarPolicy.Info.LockOnVarStateVarPolicy.DoubleCallWithSizeReturnedShouldPass",
+    LockStateInfoDoubleCallWithSizeReturnedShouldPass,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "Calling before variable policy is initialized should return EFI_NOT_READY.",
+    "VarPolicy.Info.VarPolicy.ExpectNotReady",
+    InfoExpectNotReady,
+    NULL,
+    NULL,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "Calling before variable policy is initialized should return EFI_NOT_READY.",
+    "VarPolicy.Info.LockOnVarStateVarPolicy.ExpectNotReady",
+    LockStateInfoExpectNotReady,
+    NULL,
+    NULL,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "Policy info should be returned if not associated with a variable name.",
+    "VarPolicy.Info.VarPolicy.ReturnPolicyWithVariablePolicyNameNotPresent",
+    InfoReturnPolicyWithVariablePolicyNameNotPresent,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "Policy info should be returned if not associated with a variable name.",
+    "VarPolicy.Info.LockOnVarStateVarPolicy.ReturnPolicyWithVariablePolicyNameNotPresent",
+    LockStateInfoReturnPolicyWithVariablePolicyNameNotPresent,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "Policy info and policy variable name should be returned if associated with a variable name.",
+    "VarPolicy.Info.VarPolicy.ReturnPolicyWithVariablePolicyNamePresent",
+    InfoReturnPolicyWithVariablePolicyNamePresent,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "Policy info and policy variable name should be returned if associated with a variable name.",
+    "VarPolicy.Info.LockOnVarStateVarPolicy.ReturnPolicyWithVariablePolicyNamePresent",
+    LockStateInfoReturnPolicyWithVariablePolicyNamePresent,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "EFI_NOT_FOUND should be returned if policy is not present.",
+    "VarPolicy.Info.VarPolicy.ExpectNotFound",
+    InfoExpectNotFound,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "EFI_NOT_FOUND should be returned if policy is not present.",
+    "VarPolicy.Info.LockOnVarStateVarPolicy.ExpectNotFound",
+    LockStateInfoExpectNotFound,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "EFI_NOT_FOUND should be returned if policy is present but not Lock on Variable State type.",
+    "VarPolicy.Info.LockOnVarStateVarPolicy.ExpectNotFoundWrongPolicyType",
+    LockStateInfoExpectNotFoundWrongPolicyType,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "Best match policy should be returned if multiple matches are possible.",
+    "VarPolicy.Info.VarPolicy.BestPolicyMatchWithMultipleOptions",
+    InfoBestPolicyMatchWithMultipleOptions,
+    LibInitMocked,
+    LibCleanup,
+    NULL
+    );
+
+  AddTestCase (
+    InfoTests,
+    "Best match policy should be returned if multiple matches are possible.",
+    "VarPolicy.Info.LockOnVarStateVarPolicy.BestPolicyMatchWithMultipleOptions",
+    LockStateInfoBestPolicyMatchWithMultipleOptions,
     LibInitMocked,
     LibCleanup,
     NULL
