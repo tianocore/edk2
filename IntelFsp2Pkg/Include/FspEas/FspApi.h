@@ -487,9 +487,37 @@ typedef struct {
 /// Action definition for FspMultiPhaseSiInit API
 ///
 typedef enum {
-  EnumMultiPhaseGetNumberOfPhases = 0x0,
-  EnumMultiPhaseExecutePhase      = 0x1
+  EnumMultiPhaseGetNumberOfPhases       = 0x0,
+  EnumMultiPhaseExecutePhase            = 0x1,
+  EnumMultiPhaseGetVariableRequestInfo  = 0x2,
+  EnumMultiPhaseCompleteVariableRequest = 0x3
 } FSP_MULTI_PHASE_ACTION;
+
+typedef enum {
+  EnumFspVariableRequestGetVariable         = 0x0,
+  EnumFspVariableRequestGetNextVariableName = 0x1,
+  EnumFspVariableRequestSetVariable         = 0x2,
+  EnumFspVariableRequestQueryVariableInfo   = 0x3
+} FSP_VARIABLE_REQUEST_TYPE;
+
+#pragma pack(16)
+typedef struct {
+  IN     FSP_VARIABLE_REQUEST_TYPE    VariableRequest;
+  IN OUT CHAR16                       *VariableName;
+  IN OUT UINT64                       *VariableNameSize;
+  IN OUT EFI_GUID                     *VariableGuid;
+  IN OUT UINT32                       *Attributes;
+  IN OUT UINT64                       *DataSize;
+  IN OUT VOID                         *Data;
+  OUT    UINT64                       *MaximumVariableStorageSize;
+  OUT    UINT64                       *RemainingVariableStorageSize;
+  OUT    UINT64                       *MaximumVariableSize;
+} FSP_MULTI_PHASE_VARIABLE_REQUEST_INFO_PARAMS;
+
+typedef struct {
+  EFI_STATUS    VariableRequestStatus;
+} FSP_MULTI_PHASE_COMPLETE_VARIABLE_REQUEST_PARAMS;
+#pragma pack()
 
 ///
 /// Data structure returned by FSP when bootloader calling
@@ -594,7 +622,7 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED             The FSP calling conditions were not met.
   @retval EFI_DEVICE_ERROR            FSP initialization failed.
   @retval EFI_OUT_OF_RESOURCES        Stack range requested by FSP is not met.
-  @retval FSP_STATUS_RESET_REQUIREDx  A reset is reuired. These status codes will not be returned during S3.
+  @retval FSP_STATUS_RESET_REQUIREDx  A reset is required. These status codes will not be returned during S3.
 **/
 typedef
 EFI_STATUS
@@ -688,6 +716,36 @@ typedef
 EFI_STATUS
 (EFIAPI *FSP_SMM_INIT)(
   IN VOID          *FspiUpdDataPtr
+  );
+
+/**
+  This FSP API provides multi-phase memory and silicon initialization, which brings greater modularity to the existing
+  FspMemoryInit() and FspSiliconInit() API. Increased modularity is achieved by adding an extra API to FSP-M and FSP-S.
+  This allows the bootloader to add board specific initialization steps throughout the MemoryInit and SiliconInit flows as needed.
+  The FspMemoryInit() API is always called before FspMultiPhaseMemInit(); it is the first phase of memory initialization. Similarly,
+  the FspSiliconInit() API is always called before FspMultiPhaseSiInit(); it is the first phase of silicon initialization.
+  After the first phase, subsequent phases are invoked by calling the FspMultiPhaseMem/SiInit() API.
+  The FspMultiPhaseMemInit() API may only be called after the FspMemoryInit() API and before the FspSiliconInit() API;
+  or in the case that FSP-T is being used, before the TempRamExit() API. The FspMultiPhaseSiInit() API may only be called after
+  the FspSiliconInit() API and before NotifyPhase() API; or in the case that FSP-I is being used, before the FspSmmInit() API.
+  The multi-phase APIs may not be called at any other time.
+
+  @param[in,out] FSP_MULTI_PHASE_PARAMS   For action - EnumMultiPhaseGetNumberOfPhases:
+                                            FSP_MULTI_PHASE_PARAMS->MultiPhaseParamPtr will contain
+                                            how many phases supported by FSP.
+                                          For action - EnumMultiPhaseExecutePhase:
+                                            FSP_MULTI_PHASE_PARAMS->MultiPhaseParamPtr shall be NULL.
+  @retval EFI_SUCCESS                     FSP execution environment was initialized successfully.
+  @retval EFI_INVALID_PARAMETER           Input parameters are invalid.
+  @retval EFI_UNSUPPORTED                 The FSP calling conditions were not met.
+  @retval EFI_DEVICE_ERROR                FSP initialization failed.
+  @retval FSP_STATUS_RESET_REQUIRED_*     A reset is required. These status codes will not be returned during S3.
+  @retval FSP_STATUS_VARIABLE_REQUEST     A variable request has been made by FSP that needs boot loader handling.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *FSP_MULTI_PHASE_INIT)(
+  IN FSP_MULTI_PHASE_PARAMS     *MultiPhaseInitParamPtr
   );
 
 #endif

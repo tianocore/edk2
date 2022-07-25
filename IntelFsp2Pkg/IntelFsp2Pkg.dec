@@ -37,6 +37,9 @@
   ##  @libraryclass  Provides FSP platform sec related actions.
   FspSecPlatformLib|Include/Library/FspSecPlatformLib.h
 
+  ## @libraryclass  Provides FSP MultiPhase service functions.
+  FspMultiPhaseLib|Include/Library/FspMultiPhaseLib.h
+
 [Ppis]
   #
   # PPI to indicate FSP is ready to enter notify phase
@@ -112,5 +115,10 @@
   gIntelFsp2PkgTokenSpaceGuid.PcdFspPrivateTemporaryRamSize |0x00000000|UINT32|0x10000006
 
 [PcdsFixedAtBuild,PcdsDynamic,PcdsDynamicEx]
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspReservedMemoryLength |0x00100000|UINT32|0x46530000
-  gIntelFsp2PkgTokenSpaceGuid.PcdBootLoaderEntry         |0xFFFFFFE4|UINT32|0x46530100
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspReservedMemoryLength  |0x00100000|UINT32|0x46530000
+  gIntelFsp2PkgTokenSpaceGuid.PcdBootLoaderEntry          |0xFFFFFFE4|UINT32|0x46530100
+  #
+  # Different FSP Components may have different NumberOfPhases which can be defined
+  # by each FspSecCore module from DSC.
+  #
+  gIntelFsp2PkgTokenSpaceGuid.PcdMultiPhaseNumberOfPhases |0x00000000|UINT32|0x46530101
