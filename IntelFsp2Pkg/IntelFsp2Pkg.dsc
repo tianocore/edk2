@@ -45,6 +45,7 @@
   FspPlatformLib|IntelFsp2Pkg/Library/BaseFspPlatformLib/BaseFspPlatformLib.inf
   FspSwitchStackLib|IntelFsp2Pkg/Library/BaseFspSwitchStackLib/BaseFspSwitchStackLib.inf
   FspSecPlatformLib|IntelFsp2Pkg/Library/SecFspSecPlatformLibNull/SecFspSecPlatformLibNull.inf
+  FspMultiPhaseLib|IntelFsp2Pkg/Library/BaseFspMultiPhaseLib/BaseFspMultiPhaseLib.inf
 
 [LibraryClasses.common.PEIM]
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
@@ -64,12 +65,15 @@
   IntelFsp2Pkg/Library/BaseFspSwitchStackLib/BaseFspSwitchStackLib.inf
   IntelFsp2Pkg/Library/BaseDebugDeviceLibNull/BaseDebugDeviceLibNull.inf
   IntelFsp2Pkg/Library/SecFspSecPlatformLibNull/SecFspSecPlatformLibNull.inf
+  IntelFsp2Pkg/Library/BaseFspMultiPhaseLib/BaseFspMultiPhaseLib.inf
 
   IntelFsp2Pkg/FspSecCore/FspSecCoreT.inf
   IntelFsp2Pkg/FspSecCore/FspSecCoreM.inf
+  IntelFsp2Pkg/FspSecCore/Fsp24SecCoreM.inf
   IntelFsp2Pkg/FspSecCore/FspSecCoreS.inf
   IntelFsp2Pkg/FspSecCore/FspSecCoreI.inf
   IntelFsp2Pkg/FspSecCore/Fsp22SecCoreS.inf
+  IntelFsp2Pkg/FspSecCore/Fsp24SecCoreS.inf
   IntelFsp2Pkg/FspNotifyPhase/FspNotifyPhasePeim.inf
 
 [PcdsFixedAtBuild.common]
