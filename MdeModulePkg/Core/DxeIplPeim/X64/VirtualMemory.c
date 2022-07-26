@@ -626,12 +626,7 @@ EnablePageTableProtection (
   }
 
   //
-  // Disable write protection, because we need to mark page table to be write
-  // protected.
-  //
-  AsmWriteCr0 (AsmReadCr0 () & ~CR0_WP);
-
-  //
+  // No need to clear CR0.WP since PageTableBase has't been written to CR3 yet.
   // SetPageTablePoolReadOnly might update mPageTablePool. It's safer to
   // remember original one in advance.
   //
