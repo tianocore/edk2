@@ -489,12 +489,6 @@ OvmfPkg: LsiScsi driver
 F: OvmfPkg/LsiScsiDxe/
 R: Gary Lin <gary.lin@hpe.com> [lcp]
 
-OvmfPkg: MptScsi and PVSCSI driver
-F: OvmfPkg/MptScsiDxe/
-F: OvmfPkg/PvScsiDxe/
-R: Liran Alon <liran.alon@oracle.com>
-R: Nikita Leshenko <nikita.leshchenko@oracle.com>
-
 OvmfPkg: TCG- and TPM2-related modules
 F: OvmfPkg/Include/IndustryStandard/QemuTpm.h
 F: OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
