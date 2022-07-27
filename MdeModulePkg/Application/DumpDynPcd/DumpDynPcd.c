@@ -361,7 +361,7 @@ DumpPcdInfo (
         Uint8 = mPiPcd->Get8 (TokenSpace, TokenNumber);
       }
 
-      Print (L"  Token = 0x%08x - Type = %H%-17s%N - Size = 0x%x - Value = 0x%x\n", TokenNumber, RetString, PcdInfo->PcdSize, Uint8);
+      Print (L"  Token = 0x%08x - Type = %-17s - Size = 0x%x - Value = 0x%x\n", TokenNumber, RetString, PcdInfo->PcdSize, Uint8);
       break;
     case EFI_PCD_TYPE_16:
       if (TokenSpace == NULL) {
@@ -370,7 +370,7 @@ DumpPcdInfo (
         Uint16 = mPiPcd->Get16 (TokenSpace, TokenNumber);
       }
 
-      Print (L"  Token = 0x%08x - Type = %H%-17s%N - Size = 0x%x - Value = 0x%x\n", TokenNumber, RetString, PcdInfo->PcdSize, Uint16);
+      Print (L"  Token = 0x%08x - Type = %-17s - Size = 0x%x - Value = 0x%x\n", TokenNumber, RetString, PcdInfo->PcdSize, Uint16);
       break;
     case EFI_PCD_TYPE_32:
       if (TokenSpace == NULL) {
@@ -379,7 +379,7 @@ DumpPcdInfo (
         Uint32 = mPiPcd->Get32 (TokenSpace, TokenNumber);
       }
 
-      Print (L"  Token = 0x%08x - Type = %H%-17s%N - Size = 0x%x - Value = 0x%x\n", TokenNumber, RetString, PcdInfo->PcdSize, Uint32);
+      Print (L"  Token = 0x%08x - Type = %-17s - Size = 0x%x - Value = 0x%x\n", TokenNumber, RetString, PcdInfo->PcdSize, Uint32);
       break;
     case EFI_PCD_TYPE_64:
       if (TokenSpace == NULL) {
@@ -388,7 +388,7 @@ DumpPcdInfo (
         Uint64 = mPiPcd->Get64 (TokenSpace, TokenNumber);
       }
 
-      Print (L"  Token = 0x%08x - Type = %H%-17s%N - Size = 0x%x - Value = 0x%lx\n", TokenNumber, RetString, PcdInfo->PcdSize, Uint64);
+      Print (L"  Token = 0x%08x - Type = %-17s - Size = 0x%x - Value = 0x%lx\n", TokenNumber, RetString, PcdInfo->PcdSize, Uint64);
       break;
     case EFI_PCD_TYPE_BOOL:
       if (TokenSpace == NULL) {
@@ -397,7 +397,7 @@ DumpPcdInfo (
         Boolean = mPiPcd->GetBool (TokenSpace, TokenNumber);
       }
 
-      Print (L"  Token = 0x%08x - Type = %H%-17s%N - Size = 0x%x - Value = %a\n", TokenNumber, RetString, PcdInfo->PcdSize, Boolean ? "TRUE" : "FALSE");
+      Print (L"  Token = 0x%08x - Type = %-17s - Size = 0x%x - Value = %a\n", TokenNumber, RetString, PcdInfo->PcdSize, Boolean ? "TRUE" : "FALSE");
       break;
     case EFI_PCD_TYPE_PTR:
       if (TokenSpace == NULL) {
@@ -406,7 +406,7 @@ DumpPcdInfo (
         PcdData = mPiPcd->GetPtr (TokenSpace, TokenNumber);
       }
 
-      Print (L"  Token = 0x%08x - Type = %H%-17s%N - Size = 0x%x\n", TokenNumber, RetString, PcdInfo->PcdSize);
+      Print (L"  Token = 0x%08x - Type = %-17s - Size = 0x%x\n", TokenNumber, RetString, PcdInfo->PcdSize);
       DumpHex (2, 0, PcdInfo->PcdSize, PcdData);
       break;
     default:
@@ -509,7 +509,7 @@ ProcessPcd (
     //
     // The specified PCD is not found, print error.
     //
-    Print (L"%EError. %NNo matching PCD found: %s.\n", InputPcdName);
+    Print (L"Error. No matching PCD found: %s.\n", InputPcdName);
     return EFI_NOT_FOUND;
   }
 
@@ -548,25 +548,25 @@ DumpDynPcdMain (
 
   Status = gBS->LocateProtocol (&gEfiPcdProtocolGuid, NULL, (VOID **)&mPiPcd);
   if (EFI_ERROR (Status)) {
-    Print (L"DumpDynPcd: %EError. %NPI PCD protocol is not present.\n");
+    Print (L"DumpDynPcd: Error. PI PCD protocol is not present.\n");
     return Status;
   }
 
   Status = gBS->LocateProtocol (&gEfiGetPcdInfoProtocolGuid, NULL, (VOID **)&mPiPcdInfo);
   if (EFI_ERROR (Status)) {
-    Print (L"DumpDynPcd: %EError. %NPI PCD info protocol is not present.\n");
+    Print (L"DumpDynPcd: Error. PI PCD info protocol is not present.\n");
     return Status;
   }
 
   Status = gBS->LocateProtocol (&gPcdProtocolGuid, NULL, (VOID **)&mPcd);
   if (EFI_ERROR (Status)) {
-    Print (L"DumpDynPcd: %EError. %NPCD protocol is not present.\n");
+    Print (L"DumpDynPcd: Error. PCD protocol is not present.\n");
     return Status;
   }
 
   Status = gBS->LocateProtocol (&gGetPcdInfoProtocolGuid, NULL, (VOID **)&mPcdInfo);
   if (EFI_ERROR (Status)) {
-    Print (L"DumpDynPcd: %EError. %NPCD info protocol is not present.\n");
+    Print (L"DumpDynPcd: Error. PCD info protocol is not present.\n");
     return Status;
   }
 
@@ -575,13 +575,13 @@ DumpDynPcdMain (
   //
   Status = GetArg ();
   if (EFI_ERROR (Status)) {
-    Print (L"DumpDynPcd: %EError. %NThe input parameters are not recognized.\n");
+    Print (L"DumpDynPcd: Error. The input parameters are not recognized.\n");
     Status = EFI_INVALID_PARAMETER;
     return Status;
   }
 
   if (Argc > 2) {
-    Print (L"DumpDynPcd: %EError. %NToo many arguments specified.\n");
+    Print (L"DumpDynPcd: Error. Too many arguments specified.\n");
     Status = EFI_INVALID_PARAMETER;
     return Status;
   }
@@ -600,7 +600,7 @@ DumpDynPcdMain (
       goto Done;
     } else {
       if (StrStr (Argv[1], L"-") != NULL) {
-        Print (L"DumpDynPcd: %EError. %NThe argument '%B%s%N' is invalid.\n", Argv[1]);
+        Print (L"DumpDynPcd: Error. The argument '%s' is invalid.\n", Argv[1]);
         goto Done;
       }
     }
