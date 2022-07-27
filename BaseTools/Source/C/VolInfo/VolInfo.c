@@ -1903,7 +1903,9 @@ Returns:
         return EFI_SECTION_ERROR;
       }
 
+      printf ("/------------ Encapsulation section start -----------------\\\n");
       Status = ParseSection (UncompressedBuffer, UncompressedLength);
+      printf ("\\------------ Encapsulation section end -------------------/\n");
 
       if (CompressionType == EFI_STANDARD_COMPRESSION) {
         //
@@ -2022,6 +2024,7 @@ Returns:
           return EFI_SECTION_ERROR;
         }
 
+        printf ("/------------ Encapsulation section start -----------------\\\n");
         Status = ParseSection (
                   ToolOutputBuffer,
                   ToolOutputLength
@@ -2030,6 +2033,7 @@ Returns:
           Error (NULL, 0, 0003, "parse of decoded GUIDED section failed", NULL);
           return EFI_SECTION_ERROR;
         }
+        printf ("\\------------ Encapsulation section end -------------------/\n");
 
       //
       // Check for CRC32 sections which we can handle internally if needed.
@@ -2042,6 +2046,7 @@ Returns:
         //
         // CRC32 guided section
         //
+        printf ("/------------ Encapsulation section start -----------------\\\n");
         Status = ParseSection (
                   SectionBuffer + DataOffset,
                   BufferLength - DataOffset
@@ -2050,6 +2055,7 @@ Returns:
           Error (NULL, 0, 0003, "parse of CRC32 GUIDED section failed", NULL);
           return EFI_SECTION_ERROR;
         }
+        printf ("\\------------ Encapsulation section end -------------------/\n");
       } else {
         //
         // We don't know how to parse it now.
