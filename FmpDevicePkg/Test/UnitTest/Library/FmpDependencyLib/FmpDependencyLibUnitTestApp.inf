@@ -7,7 +7,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010006
-  BASE_NAME                      = FmpDependencyLibUnitTestsUefi
+  BASE_NAME                      = FmpDependencyLibUnitTestApp
   FILE_GUID                      = 8FF4C129-C2EF-445D-8658-9A342A1FCC4D
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
