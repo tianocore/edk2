@@ -38,16 +38,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define   SMM_CODE_ACCESS_CHK_BIT      BIT58
 
 //
-// Set default value to assume SMRR is not supported
-//
-BOOLEAN  mSmrrSupported = FALSE;
-
-//
-// Set default value to assume MSR_SMM_FEATURE_CONTROL is not supported
-//
-BOOLEAN  mSmmFeatureControlSupported = FALSE;
-
-//
 // Set default value to assume IA-32 Architectural MSRs are used
 //
 UINT32  mSmrrPhysBaseMsr = SMM_FEATURES_LIB_IA32_SMRR_PHYSBASE;
@@ -98,7 +88,7 @@ CpuFeaturesLibInitialization (
     // Check MTRR_CAP MSR bit 11 for SMRR support
     //
     if ((AsmReadMsr64 (SMM_FEATURES_LIB_IA32_MTRR_CAP) & BIT11) != 0) {
-      mSmrrSupported = TRUE;
+      ASSERT (FeaturePcdGet (PcdSmrrEnable));
     }
   }
 
@@ -111,7 +101,7 @@ CpuFeaturesLibInitialization (
   //
   if (FamilyId == 0x06) {
     if ((ModelId == 0x1C) || (ModelId == 0x26) || (ModelId == 0x27) || (ModelId == 0x35) || (ModelId == 0x36)) {
-      mSmrrSupported = FALSE;
+      ASSERT (!FeaturePcdGet (PcdSmrrEnable));
     }
   }
 
@@ -216,13 +206,12 @@ SmmCpuFeaturesInitializeProcessor (
   // accessing SMRR base/mask MSRs.  If Lock(BIT0) of MSR_FEATURE_CONTROL MSR(0x3A)
   // is set, then the MSR is locked and can not be modified.
   //
-  if (mSmrrSupported && (mSmrrPhysBaseMsr == SMM_FEATURES_LIB_IA32_CORE_SMRR_PHYSBASE)) {
+  if ((FeaturePcdGet (PcdSmrrEnable)) && (mSmrrPhysBaseMsr == SMM_FEATURES_LIB_IA32_CORE_SMRR_PHYSBASE)) {
     FeatureControl = AsmReadMsr64 (SMM_FEATURES_LIB_IA32_FEATURE_CONTROL);
     if ((FeatureControl & BIT3) == 0) {
+      ASSERT ((FeatureControl & BIT0) == 0);
       if ((FeatureControl & BIT0) == 0) {
         AsmWriteMsr64 (SMM_FEATURES_LIB_IA32_FEATURE_CONTROL, FeatureControl | BIT3);
-      } else {
-        mSmrrSupported = FALSE;
       }
     }
   }
@@ -234,7 +223,7 @@ SmmCpuFeaturesInitializeProcessor (
   // from SMRAM region.  If SMRR is enabled here, then the SMRAM region
   // is protected and the normal mode code execution will fail.
   //
-  if (mSmrrSupported) {
+  if (FeaturePcdGet (PcdSmrrEnable)) {
     //
     // SMRR size cannot be less than 4-KBytes
     // SMRR size must be of length 2^n
@@ -287,7 +276,7 @@ SmmCpuFeaturesInitializeProcessor (
       // Do not access this MSR unless the CPU supports the SmmRegFeatureControl
       //
       if ((AsmReadMsr64 (SMM_FEATURES_LIB_IA32_MCA_CAP) & SMM_CODE_ACCESS_CHK_BIT) != 0) {
-        mSmmFeatureControlSupported = TRUE;
+        ASSERT (FeaturePcdGet (PcdSmmFeatureControlEnable));
       }
     }
   }
@@ -383,7 +372,7 @@ SmmCpuFeaturesDisableSmrr (
   VOID
   )
 {
-  if (mSmrrSupported && mNeedConfigureMtrrs) {
+  if (FeaturePcdGet (PcdSmrrEnable) && mNeedConfigureMtrrs) {
     AsmWriteMsr64 (mSmrrPhysMaskMsr, AsmReadMsr64 (mSmrrPhysMaskMsr) & ~EFI_MSR_SMRR_PHYS_MASK_VALID);
   }
 }
@@ -398,7 +387,7 @@ SmmCpuFeaturesReenableSmrr (
   VOID
   )
 {
-  if (mSmrrSupported && mNeedConfigureMtrrs) {
+  if (FeaturePcdGet (PcdSmrrEnable) && mNeedConfigureMtrrs) {
     AsmWriteMsr64 (mSmrrPhysMaskMsr, AsmReadMsr64 (mSmrrPhysMaskMsr) | EFI_MSR_SMRR_PHYS_MASK_VALID);
   }
 }
@@ -419,7 +408,7 @@ SmmCpuFeaturesRendezvousEntry (
   //
   // If SMRR is supported and this is the first normal SMI, then enable SMRR
   //
-  if (mSmrrSupported && !mSmrrEnabled[CpuIndex]) {
+  if (FeaturePcdGet (PcdSmrrEnable) && !mSmrrEnabled[CpuIndex]) {
     AsmWriteMsr64 (mSmrrPhysMaskMsr, AsmReadMsr64 (mSmrrPhysMaskMsr) | EFI_MSR_SMRR_PHYS_MASK_VALID);
     mSmrrEnabled[CpuIndex] = TRUE;
   }
@@ -460,7 +449,7 @@ SmmCpuFeaturesIsSmmRegisterSupported (
   IN SMM_REG_NAME  RegName
   )
 {
-  if (mSmmFeatureControlSupported && (RegName == SmmRegFeatureControl)) {
+  if (FeaturePcdGet (PcdSmmFeatureControlEnable) && (RegName == SmmRegFeatureControl)) {
     return TRUE;
   }
 
@@ -486,7 +475,7 @@ SmmCpuFeaturesGetSmmRegister (
   IN SMM_REG_NAME  RegName
   )
 {
-  if (mSmmFeatureControlSupported && (RegName == SmmRegFeatureControl)) {
+  if (FeaturePcdGet (PcdSmmFeatureControlEnable) && (RegName == SmmRegFeatureControl)) {
     return AsmReadMsr64 (SMM_FEATURES_LIB_SMM_FEATURE_CONTROL);
   }
 
@@ -512,7 +501,7 @@ SmmCpuFeaturesSetSmmRegister (
   IN UINT64        Value
   )
 {
-  if (mSmmFeatureControlSupported && (RegName == SmmRegFeatureControl)) {
+  if (FeaturePcdGet (PcdSmmFeatureControlEnable) && (RegName == SmmRegFeatureControl)) {
     AsmWriteMsr64 (SMM_FEATURES_LIB_SMM_FEATURE_CONTROL, Value);
   }
 }

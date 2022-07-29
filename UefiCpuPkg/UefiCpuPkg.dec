@@ -158,6 +158,18 @@
   # @Prompt Lock SMM Feature Control MSR.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmFeatureControlMsrLock|TRUE|BOOLEAN|0x3213210B
 
+  ## Indicates if SMRR will be enabled.<BR><BR>
+  #   TRUE  - SMRR will be enabled.<BR>
+  #   FALSE - SMRR will not be enabled.<BR>
+  # @Prompt Enable SMRR.
+  gUefiCpuPkgTokenSpaceGuid.PcdSmrrEnable|TRUE|BOOLEAN|0x3213210D
+
+  ## Indicates if SmmFeatureControl will be enabled.<BR><BR>
+  #   TRUE  - SmmFeatureControl will be enabled.<BR>
+  #   FALSE - SmmFeatureControl will not be enabled.<BR>
+  # @Prompt Support SmmFeatureControl.
+  gUefiCpuPkgTokenSpaceGuid.PcdSmmFeatureControlEnable|TRUE|BOOLEAN|0x32132110
+
 [PcdsFixedAtBuild]
   ## List of exception vectors which need switching stack.
   #  This PCD will only take into effect if PcdCpuStackGuard is enabled.
