@@ -100,6 +100,18 @@
                                                                                            "TRUE  - locked.<BR>\n"
                                                                                            "FALSE - unlocked.<BR>"
 
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdSmrrEnable_PROMPT  #language en-US "Indicates if SMRR will be enabled."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdSmrrEnable_HELP  #language en-US "Indicates if SMRR will be enabled.<BR><BR>\n"
+                                                                                           "TRUE  - SMRR will be enabled.<BR>\n"
+                                                                                           "FALSE - SMRR will not be enabled.<BR>"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdSmmFeatureControlEnable_PROMPT  #language en-US "Indicates if SmmFeatureControl will be enabled."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdSmmFeatureControlEnable_HELP  #language en-US "Indicates if SmmFeatureControl will be enabled.<BR><BR>\n"
+                                                                                           "TRUE  - SmmFeatureControl will be enabled.<BR>\n"
+                                                                                           "FALSE - SmmFeatureControl will not be enabled.<BR>"
+
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdPeiTemporaryRamStackSize_PROMPT  #language en-US "Stack size in the temporary RAM"
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdPeiTemporaryRamStackSize_HELP  #language en-US "Specifies stack size in the temporary RAM. 0 means half of TemporaryRamSize."

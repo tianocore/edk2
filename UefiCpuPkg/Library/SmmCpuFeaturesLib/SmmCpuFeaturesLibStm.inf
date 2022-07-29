@@ -70,5 +70,9 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStmExceptionStackSize         ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard                    ## CONSUMES
 
+[FeaturePcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdSmrrEnable  ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdSmmFeatureControlEnable  ## CONSUMES
+
 [Depex]
   gEfiMpServiceProtocolGuid
