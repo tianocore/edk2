@@ -1301,7 +1301,7 @@ EndList
                elif '_S' in SignatureStr[6:6+2]:
                    TxtBody.append("#define FSPS_UPD_SIGNATURE               %s        /* '%s' */\n\n" % (Item['value'], SignatureStr))
                elif '_I' in SignatureStr[6:6+2]:
-                   if NoFSPI == True:
+                   if NoFSPI == False:
                        TxtBody.append("#define FSPI_UPD_SIGNATURE               %s        /* '%s' */\n\n" % (Item['value'], SignatureStr))
         TxtBody.append("\n")
 
