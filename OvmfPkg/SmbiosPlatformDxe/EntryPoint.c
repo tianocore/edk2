@@ -48,5 +48,16 @@ SmbiosTablePublishEntry (
     }
   }
 
+  //
+  // If Status still reads EFI_NOT_FOUND, either there are no drivers
+  // implementing EFI_SMBIOS_PROTOCOL, or none of the above codepaths ran. In
+  // the second case, call InstallAllStructures with NULL so that the default
+  // Type 0 (BIOS Information) structure is installed. In the first case,
+  // calling InstallAllStructures is harmless because it'll fail immediately.
+  //
+  if (Status == EFI_NOT_FOUND) {
+    Status = InstallAllStructures (NULL);
+  }
+
   return Status;
 }

@@ -93,12 +93,17 @@ SmbiosTableLength (
 /**
   Install all structures from the given SMBIOS structures block
 
+  Notice that the SMBIOS table address is optional. If it's not provided, this
+  function will function as if the first structure encountered is an
+  End-of-Table (Type 127). Importantly, in that case it will still install
+  mOvmfDefaultType0.
+
   @param  TableAddress         SMBIOS tables starting address
 
 **/
 EFI_STATUS
 InstallAllStructures (
-  IN UINT8  *TableAddress
+  IN UINT8  *TableAddress  OPTIONAL
   )
 {
   EFI_SMBIOS_PROTOCOL       *Smbios;
@@ -119,34 +124,36 @@ InstallAllStructures (
     return Status;
   }
 
-  SmbiosTable.Raw = TableAddress;
-  if (SmbiosTable.Raw == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   NeedSmbiosType0 = TRUE;
 
-  while (SmbiosTable.Hdr->Type != 127) {
-    //
-    // Log the SMBIOS data for this structure
-    //
-    SmbiosHandle = SmbiosTable.Hdr->Handle;
-    Status       = Smbios->Add (
-                             Smbios,
-                             NULL,
-                             &SmbiosHandle,
-                             (EFI_SMBIOS_TABLE_HEADER *)SmbiosTable.Raw
-                             );
-    ASSERT_EFI_ERROR (Status);
+  //
+  // If the TableAddress is NULL, that's not an error. Just don't try to loop
+  // over it.
+  //
+  SmbiosTable.Raw = TableAddress;
+  if (SmbiosTable.Raw != NULL) {
+    while (SmbiosTable.Hdr->Type != 127) {
+      //
+      // Log the SMBIOS data for this structure
+      //
+      SmbiosHandle = SmbiosTable.Hdr->Handle;
+      Status       = Smbios->Add (
+                               Smbios,
+                               NULL,
+                               &SmbiosHandle,
+                               (EFI_SMBIOS_TABLE_HEADER *)SmbiosTable.Raw
+                               );
+      ASSERT_EFI_ERROR (Status);
 
-    if (SmbiosTable.Hdr->Type == 0) {
-      NeedSmbiosType0 = FALSE;
+      if (SmbiosTable.Hdr->Type == 0) {
+        NeedSmbiosType0 = FALSE;
+      }
+
+      //
+      // Get the next structure address
+      //
+      SmbiosTable.Raw = (UINT8 *)(SmbiosTable.Raw + SmbiosTableLength (SmbiosTable));
     }
-
-    //
-    // Get the next structure address
-    //
-    SmbiosTable.Raw = (UINT8 *)(SmbiosTable.Raw + SmbiosTableLength (SmbiosTable));
   }
 
   if (NeedSmbiosType0) {
