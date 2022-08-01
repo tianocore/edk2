@@ -126,3 +126,86 @@ _Exit:
 
   return Status;
 }
+
+/**
+  Retrieve the EC Private Key from the password-protected PEM key data.
+
+  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize      Size of the PEM key data in bytes.
+  @param[in]  Password     NULL-terminated passphrase used for encrypted PEM key data.
+  @param[out] EcContext    Pointer to new-generated EC DSA context which contain the retrieved
+                           EC private key component. Use EcFree() function to free the
+                           resource.
+
+  If PemData is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
+
+  @retval  TRUE   EC Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+EcGetPrivateKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **EcContext
+  )
+{
+  BOOLEAN  Status;
+  BIO      *PemBio;
+
+  //
+  // Check input parameters.
+  //
+  if ((PemData == NULL) || (EcContext == NULL) || (PemSize > INT_MAX)) {
+    return FALSE;
+  }
+
+  //
+  // Add possible block-cipher descriptor for PEM data decryption.
+  // NOTE: Only support most popular ciphers AES for the encrypted PEM.
+  //
+  if (EVP_add_cipher (EVP_aes_128_cbc ()) == 0) {
+    return FALSE;
+  }
+
+  if (EVP_add_cipher (EVP_aes_192_cbc ()) == 0) {
+    return FALSE;
+  }
+
+  if (EVP_add_cipher (EVP_aes_256_cbc ()) == 0) {
+    return FALSE;
+  }
+
+  Status = FALSE;
+
+  //
+  // Read encrypted PEM Data.
+  //
+  PemBio = BIO_new (BIO_s_mem ());
+  if (PemBio == NULL) {
+    goto _Exit;
+  }
+
+  if (BIO_write (PemBio, PemData, (int)PemSize) <= 0) {
+    goto _Exit;
+  }
+
+  //
+  // Retrieve EC Private Key from encrypted PEM data.
+  //
+  *EcContext = PEM_read_bio_ECPrivateKey (PemBio, NULL, (pem_password_cb *)&PasswordCallback, (void *)Password);
+  if (*EcContext != NULL) {
+    Status = TRUE;
+  }
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  BIO_free (PemBio);
+
+  return Status;
+}
