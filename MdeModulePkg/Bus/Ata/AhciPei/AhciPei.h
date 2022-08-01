@@ -29,6 +29,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
+#include <Library/DevicePathLib.h>
 
 //
 // Structure forward declarations
@@ -355,6 +356,46 @@ extern UINT32  mMaxTransferBlockNumber[2];
 //
 
 /**
+  Callback for EDKII_ATA_AHCI_HOST_CONTROLLER_PPI installation.
+
+  @param[in] PeiServices         Pointer to PEI Services Table.
+  @param[in] NotifyDescriptor    Pointer to the descriptor for the Notification
+                                 event that caused this function to execute.
+  @param[in] Ppi                 Pointer to the PPI data associated with this function.
+
+  @retval EFI_SUCCESS            The function completes successfully
+  @retval Others                 Cannot initialize AHCI controller from given EDKII_ATA_AHCI_HOST_CONTROLLER_PPI
+
+**/
+EFI_STATUS
+EFIAPI
+AtaAhciHostControllerPpiInstallationCallback (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  );
+
+/**
+  Callback for EDKII_PCI_DEVICE_PPI installation.
+
+  @param[in] PeiServices         Pointer to PEI Services Table.
+  @param[in] NotifyDescriptor    Pointer to the descriptor for the Notification
+                                 event that caused this function to execute.
+  @param[in] Ppi                 Pointer to the PPI data associated with this function.
+
+  @retval EFI_SUCCESS            The function completes successfully
+  @retval Others                 Cannot initialize AHCI controller from given PCI_DEVICE_PPI
+
+**/
+EFI_STATUS
+EFIAPI
+AtaAhciPciDevicePpiInstallationCallback (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  );
+
+/**
   Allocates pages that are suitable for an OperationBusMasterCommonBuffer or
   OperationBusMasterCommonBuffer64 mapping.
 
@@ -629,22 +670,6 @@ TrustTransferAtaDevice (
   IN     BOOLEAN                   IsTrustSend,
   IN     UINT64                    Timeout,
   OUT    UINTN                     *TransferLengthOut
-  );
-
-/**
-  Returns a pointer to the next node in a device path.
-
-  If Node is NULL, then ASSERT().
-
-  @param  Node    A pointer to a device path node data structure.
-
-  @return a pointer to the device path node that follows the device path node
-  specified by Node.
-
-**/
-EFI_DEVICE_PATH_PROTOCOL *
-NextDevicePathNode (
-  IN CONST VOID  *Node
   );
 
 /**
