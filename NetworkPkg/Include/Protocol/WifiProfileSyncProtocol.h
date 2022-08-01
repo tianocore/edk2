@@ -1,5 +1,5 @@
 /** @file
-  Intel One Click Recovery WiFi Profile Sync Profile Protocol.
+  WiFi Profile Sync Profile Protocol.
 
   Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
 
@@ -17,11 +17,11 @@
 extern EFI_GUID  gEfiWiFiProfileSyncProtocolGuid;
 
 /**
-  Used by the WiFi connection manager to get the WiFi profile that ASF shared
-  and was stored in WiFi profile protocol. Aligns the ASF WiFi profile data to
-  the WCM profile structure.
+  Used by the WiFi connection manager driver to get the WiFi profile that ASF
+  supplied and was stored in WiFi profile sync protocol. Aligns the ASF WiFi
+  profile data structure to the WiFi connection manager profile data structure.
 
-  @param[in, out]  WcmProfile       WiFi Connection Manager profile structure
+  @param[in, out]  WcmProfile       WiFi connection manager profile structure
   @param[in, out]  MacAddress       MAC address from AMT saved to NiC MAC address
 
   @retval EFI_SUCCESS               Profiles returned
@@ -37,7 +37,7 @@ EFI_STATUS
   );
 
 /**
-  Sets the WiFi connection status recieved by the WiFiConnectionManager.
+  Sets the WiFi connection status recieved by the WiFi connection manager.
   Input as EFI_80211_CONNECT_NETWORK_RESULT_CODE then converted and stored
   as EFI_STATUS type.
 
@@ -50,7 +50,8 @@ VOID
   );
 
 /**
-  Retrieves the WiFi connection status when in either KVM OR OCR WLAN recovery.
+  Retrieves the WiFi connection status when in either KVM or One Click
+  Recovery WLAN boot flow.
 
   @retval EFI_SUCCESS               WiFi connection completed succesfully
   @retval Others                    Error Occurred
@@ -62,7 +63,7 @@ EFI_STATUS
   );
 
 ///
-///  WiFi Profile Sync Protocol structure.
+///  WiFi profile sync protocol structure.
 ///
 typedef struct {
   UINT32                    Revision;
@@ -72,10 +73,10 @@ typedef struct {
 } EFI_WIFI_PROFILE_SYNC_PROTOCOL;
 
 /**
-  Intel WiFi Profile Protocol revision number.
+  Intel WiFi profile sync protocol revision number.
 
   Revision 1:   Initial version
 **/
 #define  EFI_WIFI_PROFILE_SYNC_PROTOCOL_REVISION  1
 
-#endif /// WIFI_PROFILE_SYNC_PROTOCOL_H_
+#endif  ///  WIFI_PROFILE_SYNC_PROTOCOL_H_

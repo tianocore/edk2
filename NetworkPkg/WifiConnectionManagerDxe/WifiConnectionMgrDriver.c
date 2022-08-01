@@ -21,27 +21,27 @@ EFI_DRIVER_BINDING_PROTOCOL  gWifiMgrDxeDriverBinding = {
   NULL
 };
 
-//
-// The private global data for WiFi Connection Manager
-//
+///
+/// The private global data for WiFi Connection Manager
+///
 WIFI_MGR_PRIVATE_DATA  *mPrivate = NULL;
 
-//
-// The private guid to identify WiFi Connection Manager
-//
+///
+/// The private guid to identify WiFi Connection Manager
+///
 EFI_GUID  mEfiWifiMgrPrivateGuid = EFI_WIFIMGR_PRIVATE_GUID;
 
-//
-// The Hii config guids
-//
+///
+/// The Hii config guids
+///
 EFI_GUID  gWifiConfigFormSetGuid            = WIFI_CONNECTION_MANAGER_CONFIG_GUID;
 EFI_GUID  mWifiConfigNetworkListRefreshGuid = WIFI_CONFIG_NETWORK_LIST_REFRESH_GUID;
 EFI_GUID  mWifiConfigConnectFormRefreshGuid = WIFI_CONFIG_CONNECT_FORM_REFRESH_GUID;
 EFI_GUID  mWifiConfigMainFormRefreshGuid    = WIFI_CONFIG_MAIN_FORM_REFRESH_GUID;
 
-//
-// The counter of Wifi Connection
-//
+///
+/// The counter of Wifi Connection
+///
 extern UINT8  WifiConnectionCount;
 
 /**
@@ -109,9 +109,9 @@ WifiMgrDxeDriverBindingSupported (
     return EFI_ALREADY_STARTED;
   }
 
-  //
-  // Test for the wireless MAC connection 2 protocol
-  //
+  ///
+  /// Test for the wireless MAC connection 2 protocol
+  ///
   return gBS->OpenProtocol (
                 ControllerHandle,
                 &gEfiWiFi2ProtocolGuid,
@@ -177,9 +177,9 @@ WifiMgrDxeDriverBindingStart (
   WifiConnectionCount = 0;
   Nic                 = NULL;
 
-  //
-  // Open Protocols
-  //
+  ///
+  /// Open Protocols
+  ///
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiWiFi2ProtocolGuid,
@@ -216,9 +216,9 @@ WifiMgrDxeDriverBindingStart (
     EapConfig = NULL;
   }
 
-  //
-  // Initialize Nic device data
-  //
+  ///
+  /// Initialize Nic device data
+  ///
   Nic = AllocateZeroPool (sizeof (WIFI_MGR_DEVICE_DATA));
   if (Nic == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -234,7 +234,7 @@ WifiMgrDxeDriverBindingStart (
   Nic->EapConfig           = EapConfig;
   Nic->UserSelectedProfile = NULL;
   Nic->OneTimeScanRequest  = FALSE;
-  Nic->ScanTickTime        = WIFI_SCAN_FREQUENCY;   // Initialize the first scan
+  Nic->ScanTickTime        = WIFI_SCAN_FREQUENCY;   /// Initialize the first scan
 
   if (Nic->Supplicant != NULL) {
     WifiMgrGetSupportedSuites (Nic);
@@ -242,9 +242,9 @@ WifiMgrDxeDriverBindingStart (
 
   InitializeListHead (&Nic->ProfileList);
 
-  //
-  // WiFi profile sync protocol installation check for OS recovery flow.
-  //
+  ///
+  /// WiFi profile sync protocol installation check for OS recovery flow.
+  ///
   Status = gBS->LocateProtocol (
                   &gEfiWiFiProfileSyncProtocolGuid,
                   NULL,
@@ -268,9 +268,9 @@ WifiMgrDxeDriverBindingStart (
     }
 
   } else {
-    //
-    // Record the MAC address of the incoming NIC.
-    //
+    ///
+    /// Record the MAC address of the incoming NIC.
+    ///
     Status = NetLibGetMacAddress (
                ControllerHandle,
                (EFI_MAC_ADDRESS *)&Nic->MacAddress,
@@ -280,9 +280,9 @@ WifiMgrDxeDriverBindingStart (
       goto ERROR2;
     }
 
-    //
-    // Create and start the timer for the status check
-    //
+    ///
+    /// Create and start the timer for the status check
+    ///
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_SIGNAL | EVT_TIMER,
                     TPL_CALLBACK,
@@ -442,15 +442,15 @@ WifiMgrDxeDriverBindingStop (
     return EFI_DEVICE_ERROR;
   }
 
-  //
-  // Close Event
-  //
+  ///
+  /// Close Event
+  ///
   gBS->SetTimer (Nic->TickTimer, TimerCancel, 0);
   gBS->CloseEvent (Nic->TickTimer);
 
-  //
-  // Clean Supported Suites
-  //
+  ///
+  /// Clean Supported Suites
+  ///
   if (Nic->Supplicant != NULL) {
     if (Nic->SupportedSuites.SupportedAKMSuites != NULL) {
       FreePool (Nic->SupportedSuites.SupportedAKMSuites);
@@ -465,9 +465,9 @@ WifiMgrDxeDriverBindingStop (
     }
   }
 
-  //
-  // Close Protocols
-  //
+  ///
+  /// Close Protocols
+  ///
   Status = gBS->UninstallProtocolInterface (
                   ControllerHandle,
                   &mEfiWifiMgrPrivateGuid,
@@ -511,9 +511,9 @@ WifiMgrDxeDriverBindingStop (
     }
   }
 
-  //
-  // Remove this Nic from Nic list
-  //
+  ///
+  /// Remove this Nic from Nic list
+  ///
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Status = gBS->LocateProtocol (
@@ -573,9 +573,9 @@ WifiMgrDxeDriverEntryPoint (
     return Status;
   }
 
-  //
-  // Initialize the global private data structure.
-  //
+  ///
+  /// Initialize the global private data structure.
+  ///
   mPrivate = AllocateZeroPool (sizeof (WIFI_MGR_PRIVATE_DATA));
   if (mPrivate == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -590,9 +590,9 @@ WifiMgrDxeDriverEntryPoint (
   InitializeListHead (&mPrivate->HiddenNetworkList);
   mPrivate->HiddenNetworkCount = 0;
 
-  //
-  // Create events for page refresh
-  //
+  ///
+  /// Create events for page refresh
+  ///
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,
@@ -665,3 +665,4 @@ ERROR1:
 
   return Status;
 }
+
