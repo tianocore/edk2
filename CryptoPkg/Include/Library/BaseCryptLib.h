@@ -1450,6 +1450,49 @@ RsaPkcs1Sign (
   );
 
 /**
+  Carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme.
+
+  This function carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme defined in
+  RFC 8017.
+  Mask generation function is the same as the message digest algorithm.
+  If the Signature buffer is too small to hold the contents of signature, FALSE
+  is returned and SigSize is set to the required buffer size to obtain the signature.
+
+  If RsaContext is NULL, then return FALSE.
+  If Message is NULL, then return FALSE.
+  If MsgSize is zero or > INT_MAX, then return FALSE.
+  If DigestLen is NOT 32, 48 or 64, return FALSE.
+  If SaltLen is not equal to DigestLen, then return FALSE.
+  If SigSize is large enough but Signature is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      RsaContext   Pointer to RSA context for signature generation.
+  @param[in]      Message      Pointer to octet message to be signed.
+  @param[in]      MsgSize      Size of the message in bytes.
+  @param[in]      DigestLen    Length of the digest in bytes to be used for RSA signature operation.
+  @param[in]      SaltLen      Length of the salt in bytes to be used for PSS encoding.
+  @param[out]     Signature    Pointer to buffer to receive RSA PSS signature.
+  @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
+                               On output, the size of data returned in Signature buffer in bytes.
+
+  @retval  TRUE   Signature successfully generated in RSASSA-PSS.
+  @retval  FALSE  Signature generation failed.
+  @retval  FALSE  SigSize is too small.
+  @retval  FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+RsaPkcs1SignWithNid (
+  IN      VOID         *RsaContext,
+  IN      UINTN        HashNid,
+  IN      CONST UINT8  *MessageHash,
+  IN      UINTN        HashSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  );
+
+/**
   Verifies the RSA-SSA signature with EMSA-PKCS1-v1_5 encoding scheme defined in
   RSA PKCS#1.
 
@@ -1472,6 +1515,37 @@ BOOLEAN
 EFIAPI
 RsaPkcs1Verify (
   IN  VOID         *RsaContext,
+  IN  CONST UINT8  *MessageHash,
+  IN  UINTN        HashSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize
+  );
+
+/**
+  Verifies the RSA-SSA signature with EMSA-PKCS1-v1_5 encoding scheme defined in
+  RSA PKCS#1.
+
+  If RsaContext is NULL, then return FALSE.
+  If MessageHash is NULL, then return FALSE.
+  If Signature is NULL, then return FALSE.
+  If HashSize need match the HashNid. HashNid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
+
+  @param[in]  RsaContext   Pointer to RSA context for signature verification.
+  @param[in]  HashNid      hash NID
+  @param[in]  MessageHash  Pointer to octet message hash to be checked.
+  @param[in]  HashSize     Size of the message hash in bytes.
+  @param[in]  Signature    Pointer to RSA PKCS1-v1_5 signature to be verified.
+  @param[in]  SigSize      Size of signature in bytes.
+
+  @retval  TRUE   Valid signature encoded in PKCS1-v1_5.
+  @retval  FALSE  Invalid signature or invalid RSA context.
+
+**/
+BOOLEAN
+EFIAPI
+RsaPkcs1VerifyWithNid (
+  IN  VOID         *RsaContext,
+  IN  UINTN        HashNid,
   IN  CONST UINT8  *MessageHash,
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,
