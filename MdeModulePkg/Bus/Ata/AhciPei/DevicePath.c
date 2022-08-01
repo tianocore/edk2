@@ -39,50 +39,6 @@ EFI_DEVICE_PATH_PROTOCOL  mAhciEndDevicePathNodeTemplate = {
 };
 
 /**
-  Returns the 16-bit Length field of a device path node.
-
-  Returns the 16-bit Length field of the device path node specified by Node.
-  Node is not required to be aligned on a 16-bit boundary, so it is recommended
-  that a function such as ReadUnaligned16() be used to extract the contents of
-  the Length field.
-
-  If Node is NULL, then ASSERT().
-
-  @param  Node      A pointer to a device path node data structure.
-
-  @return The 16-bit Length field of the device path node specified by Node.
-
-**/
-UINTN
-DevicePathNodeLength (
-  IN CONST VOID  *Node
-  )
-{
-  ASSERT (Node != NULL);
-  return ReadUnaligned16 ((UINT16 *)&((EFI_DEVICE_PATH_PROTOCOL *)(Node))->Length[0]);
-}
-
-/**
-  Returns a pointer to the next node in a device path.
-
-  If Node is NULL, then ASSERT().
-
-  @param  Node    A pointer to a device path node data structure.
-
-  @return a pointer to the device path node that follows the device path node
-  specified by Node.
-
-**/
-EFI_DEVICE_PATH_PROTOCOL *
-NextDevicePathNode (
-  IN CONST VOID  *Node
-  )
-{
-  ASSERT (Node != NULL);
-  return (EFI_DEVICE_PATH_PROTOCOL *)((UINT8 *)(Node) + DevicePathNodeLength (Node));
-}
-
-/**
   Get the size of the current device path instance.
 
   @param[in]  DevicePath             A pointer to the EFI_DEVICE_PATH_PROTOCOL
