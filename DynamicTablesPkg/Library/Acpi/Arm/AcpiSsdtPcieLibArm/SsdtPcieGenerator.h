@@ -31,33 +31,12 @@
         Corresponding changes would be needed to support the Name and
         UID fields describing the Pci root complexes.
 */
-#define MAX_PCI_ROOT_COMPLEXES_SUPPORTED  16
+#define MAX_PCI_ROOT_COMPLEXES_SUPPORTED  256
 
 // _SB scope of the AML namespace.
 #define SB_SCOPE  "\\_SB_"
 
-/** C array containing the compiled AML template.
-    This symbol is defined in the auto generated C file
-    containing the AML bytecode array.
-*/
-extern CHAR8  ssdtpcieosctemplate_aml_code[];
-
 #pragma pack(1)
-
-/** Structure used to map integer to an index.
-*/
-typedef struct MappingTable {
-  /// Mapping table.
-  /// Contains the Index <-> integer mapping
-  UINT32    *Table;
-
-  /// Last used index of the Table.
-  /// Bound by MaxIndex.
-  UINT32    LastIndex;
-
-  /// Number of entries in the Table.
-  UINT32    MaxIndex;
-} MAPPING_TABLE;
 
 /** A structure holding the Pcie generator and additional private data.
 */

@@ -443,11 +443,11 @@ WifiMgrConfigPassword (
   Status = UnicodeStrToAsciiStrS (Profile->Password, (CHAR8 *)AsciiPassword, ((StrLen (Profile->Password) + 1) * sizeof (CHAR8)));
   if (!EFI_ERROR (Status)) {
     Status = Supplicant->SetData (
-                            Supplicant,
-                            EfiSupplicant80211PskPassword,
-                            AsciiPassword,
-                            (StrLen (Profile->Password) + 1) * sizeof (CHAR8)
-                            );
+                           Supplicant,
+                           EfiSupplicant80211PskPassword,
+                           AsciiPassword,
+                           (StrLen (Profile->Password) + 1) * sizeof (CHAR8)
+                           );
   }
 
   ZeroMem (AsciiPassword, AsciiStrLen ((CHAR8 *)AsciiPassword) + 1);
@@ -915,10 +915,14 @@ WifiMgrPrepareConnection (
 }
 
 /**
-  Will reset NiC data, get profile from ProfileSync driver, and trigger another connection attempt.
+  Will reset NiC data, get profile from profile sync driver, and send for
+  another connection attempt.This function should not be called more than
+  3 times.
 
-  @retval EFI_SUCCESS             The operation is completed.
-  @retval other                   Operation failure.
+  @param[in]  WiFiProfileSyncProtocol  The target network profile to connect.
+
+  @retval EFI_SUCCESS                  The operation is completed.
+  @retval other                        Operation failure.
 
 **/
 EFI_STATUS
@@ -937,7 +941,7 @@ ConnectionRetry (
   Status = gBS->LocateProtocol (
                   &gEfiWiFi2ProtocolGuid,
                   NULL,
-                  (VOID**)&Wmp
+                  (VOID **)&Wmp
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -946,7 +950,7 @@ ConnectionRetry (
   Status = gBS->LocateProtocol (
                   &gEfiSupplicantProtocolGuid,
                   NULL,
-                  (VOID**)&Supplicant
+                  (VOID **)&Supplicant
                   );
   if (EFI_ERROR (Status)) {
     Supplicant = NULL;
@@ -955,7 +959,7 @@ ConnectionRetry (
   Status = gBS->LocateProtocol (
                   &gEfiEapConfigurationProtocolGuid,
                   NULL,
-                  (VOID**)&EapConfig
+                  (VOID **)&EapConfig
                   );
   if (EFI_ERROR (Status)) {
     EapConfig = NULL;
@@ -988,7 +992,7 @@ ConnectionRetry (
     Nic->ConnectPendingNetwork = (WIFI_MGR_NETWORK_PROFILE *)AllocateZeroPool (sizeof (WIFI_MGR_NETWORK_PROFILE));
     if (Nic->ConnectPendingNetwork == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
-      DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to allocate memory for ConnectPendingNetwork"));
+      DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to allocate memory for ConnectPendingNetwork\n"));
       goto ERROR;
     }
 
@@ -999,19 +1003,21 @@ ConnectionRetry (
         return Status;
       }
     } else {
-      DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to get WiFi profile with status %r", Status));
+      DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to get WiFi profile with status %r\n", Status));
     }
   } else {
-    DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to get Supported suites with status %r", Status));
+    DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to get Supported suites with status %r\n", Status));
   }
 
   if (Nic->ConnectPendingNetwork != NULL) {
     if (Nic->ConnectPendingNetwork->Network.AKMSuite != NULL) {
       FreePool (Nic->ConnectPendingNetwork->Network.AKMSuite);
     }
+
     if (Nic->ConnectPendingNetwork->Network.CipherSuite != NULL) {
       FreePool (Nic->ConnectPendingNetwork->Network.CipherSuite);
     }
+
     FreePool (Nic->ConnectPendingNetwork);
   }
 
@@ -1034,6 +1040,7 @@ ERROR:
 
   return Status;
 }
+
 /**
   The callback function for connect operation.
 

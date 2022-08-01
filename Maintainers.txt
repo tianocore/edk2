@@ -184,7 +184,7 @@ F: EmbeddedPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
 M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
-M: Abner Chang <abner.chang@hpe.com> [changab]
+M: Abner Chang <abner.chang@amd.com> [changab]
 R: Daniel Schaefer <daniel.schaefer@hpe.com> [JohnAZoidberg]
 
 EmulatorPkg
@@ -196,7 +196,7 @@ S: Maintained
 
 EmulatorPkg: Redfish-related modules
 F: EmulatorPkg/*Redfish*
-M: Abner Chang <abner.chang@hpe.com> [changab]
+M: Abner Chang <abner.chang@amd.com> [changab]
 R: Nickle Wang <nickle.wang@hpe.com> [nicklela]
 
 FatPkg
@@ -218,14 +218,14 @@ IntelFsp2Pkg
 F: IntelFsp2Pkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2Pkg
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
-R: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
+M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 
 IntelFsp2WrapperPkg
 F: IntelFsp2WrapperPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2WrapperPkg
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
-R: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
+M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 
 MdeModulePkg
@@ -484,11 +484,11 @@ OvmfPkg: FDT related modules
 F: OvmfPkg/Fdt
 R: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
-R: Abner Chang <abner.chang@hpe.com> [changab]
+R: Abner Chang <abner.chang@amd.com> [changab]
 
 OvmfPkg: LsiScsi driver
 F: OvmfPkg/LsiScsiDxe/
-R: Gary Lin <glin@suse.com>
+R: Gary Lin <gary.lin@hpe.com>
 
 OvmfPkg: MptScsi and PVSCSI driver
 F: OvmfPkg/MptScsiDxe/
@@ -550,7 +550,7 @@ R: Ankit Sinha <ankit.sinha@intel.com> [ankit13s]
 
 RedfishPkg: Redfish related modules
 F: RedfishPkg/
-M: Abner Chang <abner.chang@hpe.com> [changab]
+M: Abner Chang <abner.chang@amd.com> [changab]
 R: Nickle Wang <nickle.wang@hpe.com> [nicklela]
 
 SecurityPkg
@@ -612,9 +612,7 @@ F: UefiPayloadPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiPayloadPkg
 M: Guo Dong <guo.dong@intel.com> [gdong1]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
-R: Maurice Ma <maurice.ma@intel.com> [mauricema]
-R: Benjamin You <benjamin.you@intel.com> [BenjaminYou]
-R: Sean Rhodes <sean@starlabs.systems>
+M: Sean Rhodes <sean@starlabs.systems>
 S: Maintained
 
 UnitTestFrameworkPkg

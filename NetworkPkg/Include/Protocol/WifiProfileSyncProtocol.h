@@ -6,14 +6,14 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _WIFI_PROFILE_SYNC_PROTOCOL_H_
-#define _WIFI_PROFILE_SYNC_PROTOCOL_H_
+#ifndef WIFI_PROFILE_SYNC_PROTOCOL_H_
+#define WIFI_PROFILE_SYNC_PROTOCOL_H_
 
 #include <WifiConnectionManagerDxe/WifiConnectionMgrConfig.h>
 
-//
-//  WiFi Profile Sync Protocol GUID variable.
-//
+///
+///  WiFi Profile Sync Protocol GUID variable.
+///
 extern EFI_GUID  gEfiWiFiProfileSyncProtocolGuid;
 
 /**
@@ -24,10 +24,10 @@ extern EFI_GUID  gEfiWiFiProfileSyncProtocolGuid;
   @param[in, out]  WcmProfile       WiFi Connection Manager profile structure
   @param[in, out]  MacAddress       MAC address from AMT saved to NiC MAC address
 
-  @return EFI_SUCCESS               Profiles returned
-  @return EFI_UNSUPPORTED           Profile protocol sharing not supported or enabled
-  @return EFI_NOT_FOUND             No profiles returned
-  @return Others                    Error Occurred
+  @retval EFI_SUCCESS               Profiles returned
+  @retval EFI_UNSUPPORTED           Profile protocol sharing not supported or enabled
+  @retval EFI_NOT_FOUND             No profiles returned
+  @retval Others                    Error Occurred
 **/
 typedef
 EFI_STATUS
@@ -52,8 +52,8 @@ VOID
 /**
   Retrieves the WiFi connection status when in either KVM OR OCR WLAN recovery.
 
-  @return EFI_SUCCESS               WiFi connection completed succesfully
-  @return Others                    Error Occurred
+  @retval EFI_SUCCESS               WiFi connection completed succesfully
+  @retval Others                    Error Occurred
 **/
 typedef
 EFI_STATUS
@@ -61,14 +61,14 @@ EFI_STATUS
   VOID
   );
 
-//
-//  WiFi Profile Sync Protocol structure.
-//
+///
+///  WiFi Profile Sync Protocol structure.
+///
 typedef struct {
-  UINT32                  Revision;
-  WIFI_SET_CONNECT_STATE  WifiProfileSyncSetConnectState;
-  WIFI_GET_CONNECT_STATE  WifiProfileSyncGetConnectState;
-  WIFI_PROFILE_GET        WifiProfileSyncGetProfile;
+  UINT32                    Revision;
+  WIFI_SET_CONNECT_STATE    WifiProfileSyncSetConnectState;
+  WIFI_GET_CONNECT_STATE    WifiProfileSyncGetConnectState;
+  WIFI_PROFILE_GET          WifiProfileSyncGetProfile;
 } EFI_WIFI_PROFILE_SYNC_PROTOCOL;
 
 /**
@@ -78,4 +78,4 @@ typedef struct {
 **/
 #define  EFI_WIFI_PROFILE_SYNC_PROTOCOL_REVISION  1
 
-#endif
+#endif /// WIFI_PROFILE_SYNC_PROTOCOL_H_

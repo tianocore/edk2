@@ -16,19 +16,20 @@
   @return                     FSP specific IDT gate descriptor.
 
 **/
-UINT64
+IA32_IDT_GATE_DESCRIPTOR
 FspGetExceptionHandler (
   IN  UINT64  IdtEntryTemplate
   )
 {
   UINT32                    Entry;
-  UINT64                    ExceptionHandler;
+  IA32_IDT_GATE_DESCRIPTOR  ExceptionHandler;
   IA32_IDT_GATE_DESCRIPTOR  *IdtGateDescriptor;
   FSP_INFO_HEADER           *FspInfoHeader;
 
+  ZeroMem ((VOID *)&ExceptionHandler, sizeof (IA32_IDT_GATE_DESCRIPTOR));
   FspInfoHeader                      = (FSP_INFO_HEADER *)(UINTN)AsmGetFspInfoHeader ();
-  ExceptionHandler                   = IdtEntryTemplate;
-  IdtGateDescriptor                  = (IA32_IDT_GATE_DESCRIPTOR *)&ExceptionHandler;
+  *(UINT64 *) &ExceptionHandler      = IdtEntryTemplate;
+  IdtGateDescriptor                  = &ExceptionHandler;
   Entry                              = (IdtGateDescriptor->Bits.OffsetHigh << 16) | IdtGateDescriptor->Bits.OffsetLow;
   Entry                              = FspInfoHeader->ImageBase + FspInfoHeader->ImageSize - (~Entry + 1);
   IdtGateDescriptor->Bits.OffsetHigh = (UINT16)(Entry >> 16);
@@ -200,11 +201,11 @@ FspGlobalDataInit (
     (PeiFspData->FspInfoHeader->ImageRevision >> 24) & 0xFF, \
     (PeiFspData->FspInfoHeader->ImageRevision >> 16) & 0xFF, \
     (PeiFspData->FspInfoHeader->HeaderRevision >= 6) ? \
-      (((PeiFspData->FspInfoHeader->ImageRevision >> 8) & 0xFF) | (PeiFspData->FspInfoHeader->ExtendedImageRevision & 0xFF00)) :\
-        ((PeiFspData->FspInfoHeader->ImageRevision >> 8) & 0xFF), \
+    (((PeiFspData->FspInfoHeader->ImageRevision >> 8) & 0xFF) | (PeiFspData->FspInfoHeader->ExtendedImageRevision & 0xFF00)) : \
+    ((PeiFspData->FspInfoHeader->ImageRevision >> 8) & 0xFF), \
     (PeiFspData->FspInfoHeader->HeaderRevision >= 6) ? \
-      ((PeiFspData->FspInfoHeader->ImageRevision & 0xFF) | ((PeiFspData->FspInfoHeader->ExtendedImageRevision & 0xFF) << 8)): \
-        (PeiFspData->FspInfoHeader->ImageRevision & 0xFF)
+    ((PeiFspData->FspInfoHeader->ImageRevision & 0xFF) | ((PeiFspData->FspInfoHeader->ExtendedImageRevision & 0xFF) << 8)) : \
+    (PeiFspData->FspInfoHeader->ImageRevision & 0xFF)
     ));
 }
 

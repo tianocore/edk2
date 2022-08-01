@@ -30,7 +30,7 @@
   @return                     FSP specific IDT gate descriptor.
 
 **/
-UINT64
+IA32_IDT_GATE_DESCRIPTOR
 FspGetExceptionHandler (
   IN  UINT64  IdtEntryTemplate
   );

@@ -243,7 +243,7 @@ WifiMgrDxeDriverBindingStart (
   InitializeListHead (&Nic->ProfileList);
 
   //
-  // Supporting OCR WLAN with profile sharing protocol check
+  // WiFi profile sync protocol installation check for OS recovery flow.
   //
   Status = gBS->LocateProtocol (
                   &gEfiWiFiProfileSyncProtocolGuid,
@@ -256,6 +256,7 @@ WifiMgrDxeDriverBindingStart (
       Status = EFI_OUT_OF_RESOURCES;
       goto ERROR1;
     }
+
     WiFiProfileSyncProtocol->WifiProfileSyncGetProfile (Nic->ConnectPendingNetwork, Nic->MacAddress);
     if (Nic->ConnectPendingNetwork != NULL) {
       Status = WifiMgrConnectToNetwork (Nic, Nic->ConnectPendingNetwork);
