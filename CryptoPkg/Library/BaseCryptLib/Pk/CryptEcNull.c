@@ -65,25 +65,41 @@ EcFree (
 }
 
 /**
-  Generates EC key.
+  Generates EC key and returns EC public key (X, Y).
+
+  This function generates random secret, and computes the public key (X, Y), which is
+  returned via parameter Public, PublicSize.
+  X is the first half of Public with size being PublicSize / 2,
+  Y is the second half of Public with size being PublicSize / 2.
+  EC context is updated accordingly.
+  If the Public buffer is too small to hold the public X, Y, FALSE is returned and
+  PublicSize is set to the required buffer size to obtain the public X, Y.
+
+  For P-256, the PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
 
   If EcContext is NULL, then return FALSE.
+  If PublicSize is NULL, then return FALSE.
+  If PublicSize is large enough but Public is NULL, then return FALSE.
 
   @param[in, out]  EcContext      Pointer to the EC context.
+  @param[out]      Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in, out]  PublicSize     On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
 
-  @retval TRUE   EC Key generation succeeded.
-  @retval FALSE  EC Key generation failed.
+  @retval TRUE   EC public X,Y generation succeeded.
+  @retval FALSE  EC public X,Y generation failed.
+  @retval FALSE  PublicSize is not large enough.
 
 **/
 BOOLEAN
 EFIAPI
 EcGenerateKey (
-  IN OUT  VOID  *EcContext
-  )
-{
-  ASSERT (FALSE);
-  return FALSE;
-}
+  IN OUT  VOID   *EcContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  );
 
 /**
   Validates key components of EC context.
@@ -194,10 +210,15 @@ EcComputeKey (
 
   If EcContext is NULL, then return FALSE.
   If MessageHash is NULL, then return FALSE.
-  If HashSize is not equal to the size of SHA-1 or SHA-256 digest, then return FALSE.
+  If HashSize need match the HashNid. HashNid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
   If SigSize is large enough but Signature is NULL, then return FALSE.
 
+  For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
+  For P-384, the SigSize is 96. First 48-byte is R, Second 48-byte is S.
+  For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
+
   @param[in]       EcContext    Pointer to EC context for signature generation.
+  @param[in]       HashNid      hash NID
   @param[in]       MessageHash  Pointer to octet message hash to be signed.
   @param[in]       HashSize     Size of the message hash in bytes.
   @param[out]      Signature    Pointer to buffer to receive EC-DSA signature.
@@ -213,15 +234,12 @@ BOOLEAN
 EFIAPI
 EcDsaSign (
   IN      VOID         *EcContext,
+  IN      UINTN        HashNid,
   IN      CONST UINT8  *MessageHash,
   IN      UINTN        HashSize,
   OUT     UINT8        *Signature,
   IN OUT  UINTN        *SigSize
-  )
-{
-  ASSERT (FALSE);
-  return FALSE;
-}
+  );
 
 /**
   Verifies the EC-DSA signature.
@@ -229,9 +247,14 @@ EcDsaSign (
   If EcContext is NULL, then return FALSE.
   If MessageHash is NULL, then return FALSE.
   If Signature is NULL, then return FALSE.
-  If HashSize is not equal to the size of SHA-1 or SHA-256 digest, then return FALSE.
+  If HashSize need match the HashNid. HashNid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
+
+  For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
+  For P-384, the SigSize is 96. First 48-byte is R, Second 48-byte is S.
+  For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
 
   @param[in]  EcContext    Pointer to EC context for signature verification.
+  @param[in]  HashNid      hash NID
   @param[in]  MessageHash  Pointer to octet message hash to be checked.
   @param[in]  HashSize     Size of the message hash in bytes.
   @param[in]  Signature    Pointer to EC-DSA signature to be verified.
@@ -245,12 +268,9 @@ BOOLEAN
 EFIAPI
 EcDsaVerify (
   IN  VOID         *EcContext,
+  IN  UINTN        HashNid,
   IN  CONST UINT8  *MessageHash,
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
-  )
-{
-  ASSERT (FALSE);
-  return FALSE;
-}
+  );

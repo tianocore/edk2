@@ -881,6 +881,7 @@ EcGetPublicKeyFromX509 (
   OUT  VOID         **EcContext
   )
 {
+ #if FixedPcdGetBool (PcdOpensslEcEnabled)
   BOOLEAN   Status;
   EVP_PKEY  *Pkey;
   X509      *X509Cert;
@@ -934,6 +935,9 @@ _Exit:
   }
 
   return Status;
+ #else
+  return FALSE;
+ #endif
 }
 
 /**
@@ -1699,16 +1703,16 @@ X509VerifyCertChain (
   IN UINTN        CertChainLength
   )
 {
-  UINT8    *TmpPtr;
-  UINTN    Length;
-  UINT32   Asn1Tag;
-  UINT32   ObjClass;
-  UINT8    *CurrentCert;
-  UINTN    CurrentCertLen;
-  UINT8    *PrecedingCert;
-  UINTN    PrecedingCertLen;
-  BOOLEAN  VerifyFlag;
-  INT32    Ret;
+  CONST UINT8  *TmpPtr;
+  UINTN        Length;
+  UINT32       Asn1Tag;
+  UINT32       ObjClass;
+  CONST UINT8  *CurrentCert;
+  UINTN        CurrentCertLen;
+  CONST UINT8  *PrecedingCert;
+  UINTN        PrecedingCertLen;
+  BOOLEAN      VerifyFlag;
+  INT32        Ret;
 
   PrecedingCert    = RootCert;
   PrecedingCertLen = RootCertLength;
@@ -1787,14 +1791,14 @@ X509GetCertFromCertChain (
   OUT UINTN        *CertLength
   )
 {
-  UINTN   Asn1Len;
-  INT32   CurrentIndex;
-  UINTN   CurrentCertLen;
-  UINT8   *CurrentCert;
-  UINT8   *TmpPtr;
-  INT32   Ret;
-  UINT32  Asn1Tag;
-  UINT32  ObjClass;
+  UINTN        Asn1Len;
+  INT32        CurrentIndex;
+  UINTN        CurrentCertLen;
+  CONST UINT8  *CurrentCert;
+  CONST UINT8  *TmpPtr;
+  INT32        Ret;
+  UINT32       Asn1Tag;
+  UINT32       ObjClass;
 
   //
   // Check input parameters.
