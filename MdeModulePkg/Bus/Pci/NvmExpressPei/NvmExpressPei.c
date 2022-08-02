@@ -264,7 +264,7 @@ NvmeInitPrivateData (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "%a: The device path is invalid for Controller %d.\n",
+      "%a: The device path is invalid.\n",
       __FUNCTION__
       ));
     return Status;

@@ -976,7 +976,7 @@ GetScatterGatherHeadEntries (
 
     if (EFI_ERROR (Status)) {
       if (Status != EFI_NOT_FOUND) {
-        DEBUG ((DEBUG_ERROR, "Unexpected error getting Capsule Update variable.  Status = %r\n"));
+        DEBUG ((DEBUG_ERROR, "Unexpected error getting Capsule Update variable.  Status = %r\n", Status));
       }
 
       break;

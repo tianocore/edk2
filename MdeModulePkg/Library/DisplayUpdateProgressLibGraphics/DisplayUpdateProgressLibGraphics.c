@@ -148,7 +148,7 @@ FindDim (
                   (VOID **)&BootLogo
                   );
   if ((BootLogo == NULL) || (EFI_ERROR (Status))) {
-    DEBUG ((DEBUG_ERROR, "Failed to locate gEdkiiBootLogo2ProtocolGuid.  No Progress bar support. \n", Status));
+    DEBUG ((DEBUG_ERROR, "Failed to locate gEdkiiBootLogo2ProtocolGuid Status = %r.  No Progress bar support. \n", Status));
     return;
   }
 
