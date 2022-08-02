@@ -361,7 +361,7 @@ PartitionCheckGptEntryArray (
 
     PrivateData->BlockDeviceCount++;
 
-    DEBUG ((DEBUG_INFO, "Find GPT Partition [0x%lx", PartitionEntryBuffer[Index].StartingLBA, BlockDevPtr->LastBlock));
+    DEBUG ((DEBUG_INFO, "Find GPT Partition [0x%lx", PartitionEntryBuffer[Index].StartingLBA));
     DEBUG ((DEBUG_INFO, ", 0x%lx]\n", BlockDevPtr->LastBlock));
     DEBUG ((DEBUG_INFO, "         BlockSize %x\n", BlockDevPtr->BlockSize));
   }
