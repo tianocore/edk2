@@ -263,12 +263,12 @@ Tcp6GetSubnetInfo (
 
   Status = Tcp6->GetModeData (Tcp6, NULL, NULL, &IpModedata, NULL, NULL);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Can't get IP mode data information\n"));
+    DEBUG ((DEBUG_ERROR, "%a: Can't get IP mode data information\n", __FUNCTION__));
     return Status;
   }
 
   if (IpModedata.AddressCount == 0) {
-    DEBUG ((DEBUG_INFO, "%a: No IPv6 address configured.\n"));
+    DEBUG ((DEBUG_INFO, "%a: No IPv6 address configured.\n", __FUNCTION__));
   }
 
   if (Instance->SubnetAddrInfoIPv6 != NULL) {
@@ -277,7 +277,7 @@ Tcp6GetSubnetInfo (
 
   Instance->SubnetAddrInfoIPv6 = AllocateZeroPool (IpModedata.AddressCount * sizeof (EFI_IP6_ADDRESS_INFO));
   if (Instance->SubnetAddrInfoIPv6 == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Failed to allocate memory fir IPv6 subnet address information\n"));
+    DEBUG ((DEBUG_ERROR, "%a: Failed to allocate memory for IPv6 subnet address information\n", __FUNCTION__));
     return EFI_OUT_OF_RESOURCES;
   }
 

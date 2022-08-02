@@ -224,7 +224,7 @@ ReSendRequest:;
     DEBUG ((DEBUG_INFO, "HTTP_STATUS_200_OK\n"));
 
     if (SendChunkProcess == HttpIoSendChunkHeaderZeroContent) {
-      DEBUG ((DEBUG_INFO, "This is chunk transfer, start to send all chunks.", ResponseData->Response.StatusCode));
+      DEBUG ((DEBUG_INFO, "This is chunk transfer, start to send all chunks."));
       SendChunkProcess++;
       goto ReSendRequest;
     }
