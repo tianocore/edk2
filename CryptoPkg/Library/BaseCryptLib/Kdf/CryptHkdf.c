@@ -29,48 +29,53 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 BOOLEAN
 HkdfMdExtractAndExpand (
-  IN   CONST EVP_MD *Md,
-  IN   CONST UINT8  *Key,
-  IN   UINTN        KeySize,
-  IN   CONST UINT8  *Salt,
-  IN   UINTN        SaltSize,
-  IN   CONST UINT8  *Info,
-  IN   UINTN        InfoSize,
-  OUT  UINT8        *Out,
-  IN   UINTN        OutSize
+  IN   CONST EVP_MD  *Md,
+  IN   CONST UINT8   *Key,
+  IN   UINTN         KeySize,
+  IN   CONST UINT8   *Salt,
+  IN   UINTN         SaltSize,
+  IN   CONST UINT8   *Info,
+  IN   UINTN         InfoSize,
+  OUT  UINT8         *Out,
+  IN   UINTN         OutSize
   )
 {
-  EVP_PKEY_CTX *pHkdfCtx;
-  BOOLEAN Result;
+  EVP_PKEY_CTX  *pHkdfCtx;
+  BOOLEAN       Result;
 
-  if (Key == NULL || Salt == NULL || Info == NULL || Out == NULL ||
-    KeySize > INT_MAX || SaltSize > INT_MAX || InfoSize > INT_MAX || OutSize > INT_MAX ) {
+  if ((Key == NULL) || (Salt == NULL) || (Info == NULL) || (Out == NULL) ||
+      (KeySize > INT_MAX) || (SaltSize > INT_MAX) || (InfoSize > INT_MAX) || (OutSize > INT_MAX))
+  {
     return FALSE;
   }
 
-  pHkdfCtx = EVP_PKEY_CTX_new_id(EVP_PKEY_HKDF, NULL);
+  pHkdfCtx = EVP_PKEY_CTX_new_id (EVP_PKEY_HKDF, NULL);
   if (pHkdfCtx == NULL) {
     return FALSE;
   }
 
-  Result = EVP_PKEY_derive_init(pHkdfCtx) > 0;
+  Result = EVP_PKEY_derive_init (pHkdfCtx) > 0;
   if (Result) {
-    Result = EVP_PKEY_CTX_set_hkdf_md(pHkdfCtx, Md) > 0;
-  }
-  if (Result) {
-    Result = EVP_PKEY_CTX_set1_hkdf_salt(pHkdfCtx, Salt, (UINT32)SaltSize) > 0;
-  }
-  if (Result) {
-    Result = EVP_PKEY_CTX_set1_hkdf_key(pHkdfCtx, Key, (UINT32)KeySize) > 0;
-  }
-  if (Result) {
-    Result = EVP_PKEY_CTX_add1_hkdf_info(pHkdfCtx, Info, (UINT32)InfoSize) > 0;
-  }
-  if (Result) {
-    Result = EVP_PKEY_derive(pHkdfCtx, Out, &OutSize) > 0;
+    Result = EVP_PKEY_CTX_set_hkdf_md (pHkdfCtx, Md) > 0;
   }
 
-  EVP_PKEY_CTX_free(pHkdfCtx);
+  if (Result) {
+    Result = EVP_PKEY_CTX_set1_hkdf_salt (pHkdfCtx, Salt, (UINT32)SaltSize) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_CTX_set1_hkdf_key (pHkdfCtx, Key, (UINT32)KeySize) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_CTX_add1_hkdf_info (pHkdfCtx, Info, (UINT32)InfoSize) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_derive (pHkdfCtx, Out, &OutSize) > 0;
+  }
+
+  EVP_PKEY_CTX_free (pHkdfCtx);
   pHkdfCtx = NULL;
   return Result;
 }
@@ -93,46 +98,51 @@ HkdfMdExtractAndExpand (
 BOOLEAN
 EFIAPI
 HkdfMdExpand (
-  IN   CONST EVP_MD *Md,
-  IN   CONST UINT8  *Prk,
-  IN   UINTN        PrkSize,
-  IN   CONST UINT8  *Info,
-  IN   UINTN        InfoSize,
-  OUT  UINT8        *Out,
-  IN   UINTN        OutSize
+  IN   CONST EVP_MD  *Md,
+  IN   CONST UINT8   *Prk,
+  IN   UINTN         PrkSize,
+  IN   CONST UINT8   *Info,
+  IN   UINTN         InfoSize,
+  OUT  UINT8         *Out,
+  IN   UINTN         OutSize
   )
 {
-  EVP_PKEY_CTX *pHkdfCtx;
-  BOOLEAN Result;
+  EVP_PKEY_CTX  *pHkdfCtx;
+  BOOLEAN       Result;
 
-  if (Prk == NULL || Info == NULL || Out == NULL ||
-    PrkSize > INT_MAX || InfoSize > INT_MAX || OutSize > INT_MAX ) {
+  if ((Prk == NULL) || (Info == NULL) || (Out == NULL) ||
+      (PrkSize > INT_MAX) || (InfoSize > INT_MAX) || (OutSize > INT_MAX))
+  {
     return FALSE;
   }
 
-  pHkdfCtx = EVP_PKEY_CTX_new_id(EVP_PKEY_HKDF, NULL);
+  pHkdfCtx = EVP_PKEY_CTX_new_id (EVP_PKEY_HKDF, NULL);
   if (pHkdfCtx == NULL) {
     return FALSE;
   }
 
-  Result = EVP_PKEY_derive_init(pHkdfCtx) > 0;
+  Result = EVP_PKEY_derive_init (pHkdfCtx) > 0;
   if (Result) {
-    Result = EVP_PKEY_CTX_set_hkdf_md(pHkdfCtx, Md) > 0;
-  }
-  if (Result) {
-    Result = EVP_PKEY_CTX_hkdf_mode(pHkdfCtx, EVP_PKEY_HKDEF_MODE_EXPAND_ONLY) > 0;
-  }
-  if (Result) {
-    Result = EVP_PKEY_CTX_set1_hkdf_key(pHkdfCtx, Prk, (UINT32)PrkSize) > 0;
-  }
-  if (Result) {
-    Result = EVP_PKEY_CTX_add1_hkdf_info(pHkdfCtx, Info, (UINT32)InfoSize) > 0;
-  }
-  if (Result) {
-    Result = EVP_PKEY_derive(pHkdfCtx, Out, &OutSize) > 0;
+    Result = EVP_PKEY_CTX_set_hkdf_md (pHkdfCtx, Md) > 0;
   }
 
-  EVP_PKEY_CTX_free(pHkdfCtx);
+  if (Result) {
+    Result = EVP_PKEY_CTX_hkdf_mode (pHkdfCtx, EVP_PKEY_HKDEF_MODE_EXPAND_ONLY) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_CTX_set1_hkdf_key (pHkdfCtx, Prk, (UINT32)PrkSize) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_CTX_add1_hkdf_info (pHkdfCtx, Info, (UINT32)InfoSize) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_derive (pHkdfCtx, Out, &OutSize) > 0;
+  }
+
+  EVP_PKEY_CTX_free (pHkdfCtx);
   pHkdfCtx = NULL;
   return Result;
 }
@@ -166,7 +176,7 @@ HkdfSha256ExtractAndExpand (
   IN   UINTN        OutSize
   )
 {
-  return HkdfMdExtractAndExpand (EVP_sha256(), Key, KeySize, Salt, SaltSize, Info, InfoSize, Out, OutSize);
+  return HkdfMdExtractAndExpand (EVP_sha256 (), Key, KeySize, Salt, SaltSize, Info, InfoSize, Out, OutSize);
 }
 
 /**
@@ -194,7 +204,7 @@ HkdfSha256Expand (
   IN   UINTN        OutSize
   )
 {
-  return HkdfMdExpand (EVP_sha256(), Prk, PrkSize, Info, InfoSize, Out, OutSize);
+  return HkdfMdExpand (EVP_sha256 (), Prk, PrkSize, Info, InfoSize, Out, OutSize);
 }
 
 /**
@@ -226,7 +236,7 @@ HkdfSha384ExtractAndExpand (
   IN   UINTN        OutSize
   )
 {
-  return HkdfMdExtractAndExpand (EVP_sha384(), Key, KeySize, Salt, SaltSize, Info, InfoSize, Out, OutSize);
+  return HkdfMdExtractAndExpand (EVP_sha384 (), Key, KeySize, Salt, SaltSize, Info, InfoSize, Out, OutSize);
 }
 
 /**
@@ -254,5 +264,5 @@ HkdfSha384Expand (
   IN   UINTN        OutSize
   )
 {
-  return HkdfMdExpand (EVP_sha384(), Prk, PrkSize, Info, InfoSize, Out, OutSize);
+  return HkdfMdExpand (EVP_sha384 (), Prk, PrkSize, Info, InfoSize, Out, OutSize);
 }

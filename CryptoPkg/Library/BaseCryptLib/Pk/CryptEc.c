@@ -91,8 +91,8 @@ EcFree (
   For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
 
   @param[in, out]  EcContext      Pointer to EC context being set.
-  @param[in]       Public         Pointer to the buffer to receive generated public X,Y.
-  @param[in]       PublicSize     The size of Public buffer in bytes.
+  @param[in]       PublicKey        Pointer to the buffer to receive generated public X,Y.
+  @param[in]       PublicKeySize    The size of Public buffer in bytes.
 
   @retval  TRUE   EC public key component was set successfully.
   @retval  FALSE  Invalid EC public key component.
@@ -191,8 +191,8 @@ Done:
   For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
 
   @param[in, out]  EcContext      Pointer to EC context being set.
-  @param[out]      Public         Pointer to the buffer to receive generated public X,Y.
-  @param[in, out]  PublicSize     On input, the size of Public buffer in bytes.
+  @param[out]      PublicKey         Pointer to the buffer to receive generated public X,Y.
+  @param[in, out]  PublicKeySize     On input, the size of Public buffer in bytes.
                                   On output, the size of data returned in Public buffer in bytes.
 
   @retval  TRUE   EC key component was retrieved successfully.

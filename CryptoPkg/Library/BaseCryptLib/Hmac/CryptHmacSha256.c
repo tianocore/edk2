@@ -225,7 +225,7 @@ HmacMdFinal (
   @param[in]   DataSize    Size of Data buffer in bytes.
   @param[in]   Key         Pointer to the user-supplied key.
   @param[in]   KeySize     Key size in bytes.
-  @param[out]  HashValue   Pointer to a buffer that receives the HMAC-MD digest
+  @param[out]  HmacValue   Pointer to a buffer that receives the HMAC-MD digest
                            value.
 
   @retval TRUE   HMAC-MD digest computation succeeded.
@@ -428,7 +428,7 @@ HmacSha256Final (
   @param[in]   DataSize    Size of Data buffer in bytes.
   @param[in]   Key         Pointer to the user-supplied key.
   @param[in]   KeySize     Key size in bytes.
-  @param[out]  HashValue   Pointer to a buffer that receives the HMAC-SHA256 digest
+  @param[out]  HmacValue   Pointer to a buffer that receives the HMAC-SHA256 digest
                            value (32 bytes).
 
   @retval TRUE   HMAC-SHA256 digest computation succeeded.
@@ -607,7 +607,7 @@ HmacSha384Final (
   @param[in]   DataSize    Size of Data buffer in bytes.
   @param[in]   Key         Pointer to the user-supplied key.
   @param[in]   KeySize     Key size in bytes.
-  @param[out]  HashValue   Pointer to a buffer that receives the HMAC-SHA384 digest
+  @param[out]  HmacValue   Pointer to a buffer that receives the HMAC-SHA384 digest
                            value (48 bytes).
 
   @retval TRUE   HMAC-SHA384 digest computation succeeded.

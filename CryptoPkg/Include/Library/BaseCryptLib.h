@@ -1137,7 +1137,7 @@ HmacSha256Final (
   @param[in]   DataSize    Size of Data buffer in bytes.
   @param[in]   Key         Pointer to the user-supplied key.
   @param[in]   KeySize     Key size in bytes.
-  @param[out]  HashValue   Pointer to a buffer that receives the HMAC-SHA256 digest
+  @param[out]  HmacValue   Pointer to a buffer that receives the HMAC-SHA256 digest
                            value (32 bytes).
 
   @retval TRUE   HMAC-SHA256 digest computation succeeded.
@@ -1295,7 +1295,7 @@ HmacSha384Final (
   @param[in]   DataSize    Size of Data buffer in bytes.
   @param[in]   Key         Pointer to the user-supplied key.
   @param[in]   KeySize     Key size in bytes.
-  @param[out]  HashValue   Pointer to a buffer that receives the HMAC-SHA384 digest
+  @param[out]  HmacValue   Pointer to a buffer that receives the HMAC-SHA384 digest
                            value (48 bytes).
 
   @retval TRUE   HMAC-SHA384 digest computation succeeded.
@@ -3217,8 +3217,8 @@ EcFree (
   For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
 
   @param[in, out]  EcContext      Pointer to EC context being set.
-  @param[in]       Public         Pointer to the buffer to receive generated public X,Y.
-  @param[in]       PublicSize     The size of Public buffer in bytes.
+  @param[in]       PublicKey         Pointer to the buffer to receive generated public X,Y.
+  @param[in]       PublicKeySize     The size of Public buffer in bytes.
 
   @retval  TRUE   EC public key component was set successfully.
   @retval  FALSE  Invalid EC public key component.
@@ -3240,8 +3240,8 @@ EcSetPubKey (
   For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
 
   @param[in, out]  EcContext      Pointer to EC context being set.
-  @param[out]      Public         Pointer to the buffer to receive generated public X,Y.
-  @param[in, out]  PublicSize     On input, the size of Public buffer in bytes.
+  @param[out]      PublicKey         Pointer to the buffer to receive generated public X,Y.
+  @param[in, out]  PublicKeySize     On input, the size of Public buffer in bytes.
                                   On output, the size of data returned in Public buffer in bytes.
 
   @retval  TRUE   EC key component was retrieved successfully.
