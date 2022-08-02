@@ -54,7 +54,7 @@ NorFlashBlockIoReadBlocks (
   Instance = INSTANCE_FROM_BLKIO_THIS (This);
   Media    = This->Media;
 
-  DEBUG ((DEBUG_BLKIO, "NorFlashBlockIoReadBlocks(MediaId=0x%x, Lba=%ld, BufferSize=0x%x bytes (%d kB), BufferPtr @ 0x%08x)\n", MediaId, Lba, BufferSizeInBytes, Buffer));
+  DEBUG ((DEBUG_BLKIO, "NorFlashBlockIoReadBlocks(MediaId=0x%x, Lba=%ld, BufferSize=0x%x bytes (%d kB), BufferPtr @ 0x%08x)\n", MediaId, Lba, BufferSizeInBytes, BufferSizeInBytes, Buffer));
 
   if (!Media) {
     Status = EFI_INVALID_PARAMETER;
@@ -89,7 +89,7 @@ NorFlashBlockIoWriteBlocks (
 
   Instance = INSTANCE_FROM_BLKIO_THIS (This);
 
-  DEBUG ((DEBUG_BLKIO, "NorFlashBlockIoWriteBlocks(MediaId=0x%x, Lba=%ld, BufferSize=0x%x bytes (%d kB), BufferPtr @ 0x%08x)\n", MediaId, Lba, BufferSizeInBytes, Buffer));
+  DEBUG ((DEBUG_BLKIO, "NorFlashBlockIoWriteBlocks(MediaId=0x%x, Lba=%ld, BufferSize=0x%x bytes, BufferPtr @ 0x%08x)\n", MediaId, Lba, BufferSizeInBytes, Buffer));
 
   if ( !This->Media->MediaPresent ) {
     Status = EFI_NO_MEDIA;
