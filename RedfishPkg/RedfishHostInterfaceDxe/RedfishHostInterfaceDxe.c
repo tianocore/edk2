@@ -119,7 +119,7 @@ RedfishCreateSmbiosTable42 (
     } else {
       NewProtocolRecords = ReallocatePool (CurrentProtocolsDataLength, NewProtocolsDataLength, (VOID *)ProtocolRecords);
       if (NewProtocolRecords == NULL) {
-        DEBUG ((DEBUG_ERROR, "%a: Fail to allocate memory for Redfish host interface protocol data."));
+        DEBUG ((DEBUG_ERROR, "%a: Fail to allocate memory for Redfish host interface protocol data.", __FUNCTION__));
         FreePool (ProtocolRecords);
         FreePool (ProtocolRecord);
         return EFI_OUT_OF_RESOURCES;
