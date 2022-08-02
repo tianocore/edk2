@@ -176,7 +176,7 @@ EXIT:
   // Sync PPRQ/PPRM from PP Variable if PP submission fails
   //
   if (ReturnCode != TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS) {
-    DEBUG ((DEBUG_ERROR, "[TPM2] Submit PP Request failure! Sync PPRQ/PPRM with PP variable.\n", Status));
+    DEBUG ((DEBUG_ERROR, "[TPM2] Submit PP Request failure! Sync PPRQ/PPRM with PP variable. Status = %r\n", Status));
     DataSize = sizeof (EFI_TCG2_PHYSICAL_PRESENCE);
     ZeroMem (&PpData, DataSize);
     Status = mTcg2PpSmmVariable->SmmGetVariable (
