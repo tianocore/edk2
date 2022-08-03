@@ -1075,7 +1075,7 @@ WifiMgrOnConnectFinished (
 
   ASSERT (ConfigToken->Token.ConnectNetworkToken != NULL);
 
-Status = gBS->LocateProtocol (&gEfiWiFiProfileSyncProtocolGuid, NULL, (VOID **)&WiFiProfileSyncProtocol);
+  Status = gBS->LocateProtocol (&gEfiWiFiProfileSyncProtocolGuid, NULL, (VOID **)&WiFiProfileSyncProtocol);
   if (!EFI_ERROR (Status)) {
     WiFiProfileSyncProtocol->WifiProfileSyncSetConnectState (ConfigToken->Token.ConnectNetworkToken->ResultCode);
     if ((WifiConnectionCount < MAX_WIFI_CONNETION_ATTEMPTS) &&

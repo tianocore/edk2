@@ -249,7 +249,7 @@ WifiMgrDxeDriverBindingStart (
                   &gEfiWiFiProfileSyncProtocolGuid,
                   NULL,
                   (VOID **)&WiFiProfileSyncProtocol
-                   );
+                  );
   if (!EFI_ERROR (Status)) {
     Nic->ConnectPendingNetwork = (WIFI_MGR_NETWORK_PROFILE *)AllocateZeroPool (sizeof (WIFI_MGR_NETWORK_PROFILE));
     if (Nic->ConnectPendingNetwork == NULL) {
@@ -266,16 +266,15 @@ WifiMgrDxeDriverBindingStart (
     } else {
       goto ERROR1;
     }
-
   } else {
     //
     // Record the MAC address of the incoming NIC.
     //
     Status = NetLibGetMacAddress (
-              ControllerHandle,
-              (EFI_MAC_ADDRESS *)&Nic->MacAddress,
-              &AddressSize
-              );
+               ControllerHandle,
+               (EFI_MAC_ADDRESS *)&Nic->MacAddress,
+               &AddressSize
+               );
     if (EFI_ERROR (Status)) {
       goto ERROR2;
     }
