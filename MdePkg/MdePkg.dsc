@@ -9,6 +9,8 @@
 #
 ##
 
+# Temp change
+
 [Defines]
   PLATFORM_NAME                  = Mde
   PLATFORM_GUID                  = 082F8BFC-0455-4859-AE3C-ECD64FB81642
