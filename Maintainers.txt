@@ -495,8 +495,8 @@ F: OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
 F: OvmfPkg/Library/Tcg2PhysicalPresenceLib*/
 F: OvmfPkg/PlatformPei/ClearCache.c
 F: OvmfPkg/Tcg/
-R: Marc-André Lureau <marcandre.lureau@redhat.com>
-R: Stefan Berger <stefanb@linux.ibm.com>
+R: Marc-André Lureau <marcandre.lureau@redhat.com> [elmarco]
+R: Stefan Berger <stefanb@linux.ibm.com> [stefanberger]
 
 OvmfPkg: Xen-related modules
 F: OvmfPkg/Include/Guid/XenBusRootDevice.h
