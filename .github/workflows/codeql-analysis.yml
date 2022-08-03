@@ -1,0 +1,87 @@
+# @file
+# GitHub Workflow CodeQL Analysis
+#
+# Copyright (c) Microsoft Corporation.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+name: "CodeQL"
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+    # types: [ labeled ]
+  # Todo: Add this when closer to final.
+  #
+  # schedule:
+  #   # https://crontab.guru/#20_23_*_*_4
+  #   - cron: '20 23 * * 4'
+
+jobs:
+  analyze:
+    # if: ${{ github.event.label.name == 'codeqltest' }}
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'cpp' ]
+        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
+        # Learn more about CodeQL language support at https://codeql.github.com/docs/codeql-overview/supported-languages-and-frameworks/
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+        queries: security-extended
+        # If you wish to specify custom queries, you can do so here or in a config file.
+        # By default, queries listed here will override any specified in a config file.
+        # Prefix the list here with "+" to use these queries and those in the config file.
+
+        # Details on CodeQL's query packs refer to : https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
+        # queries: security-extended,security-and-quality
+
+    - name: Install/Upgrade pip Modules
+      run: pip install -r pip-requirements.txt --upgrade
+
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v3
+      with:
+          node-version: 14.x
+
+    - name: Update apt
+      run: sudo apt-get update
+
+    - name: Install required tools
+      run: sudo apt-get install gcc g++ make uuid-dev
+
+    - name: Setup
+      run: stuart_setup -c .pytool/CISettings.py -t DEBUG -a IA32,X64 TOOL_CHAIN_TAG=GCC5
+
+    - name: Update
+      run: stuart_update -c .pytool/CISettings.py -t DEBUG -a IA32,X64 TOOL_CHAIN_TAG=GCC5
+
+    - name: Build Tools From Source
+      run: python BaseTools/Edk2ToolsBuild.py -t GCC5
+
+    - name: CI Build
+      run: stuart_ci_build -c .pytool/CISettings.py -t DEBUG -a IA32,X64 TOOL_CHAIN_TAG=GCC5
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
