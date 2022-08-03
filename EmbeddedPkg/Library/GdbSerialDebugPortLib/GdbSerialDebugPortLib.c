@@ -17,7 +17,7 @@
 #include <Protocol/DebugPort.h>
 
 EFI_DEBUGPORT_PROTOCOL  *gDebugPort = NULL;
-UINTN                   gTimeOut    = 0;
+UINT32                  gTimeOut    = 0;
 
 /**
   The constructor function initializes the UART.
