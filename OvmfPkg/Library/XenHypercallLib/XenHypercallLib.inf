@@ -42,7 +42,7 @@
   Arm/Hypercall.S
 
 [Sources.AARCH64]
-  Aarch64/Hypercall.S
+  AArch64/Hypercall.S
 
 [Sources]
   XenHypercall.c

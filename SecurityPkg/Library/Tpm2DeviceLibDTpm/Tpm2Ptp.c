@@ -33,6 +33,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #define TPMCMDBUFLENGTH  0x500
 
+//
+// Max retry count according to Spec TCG PC Client Device Driver Design Principles
+// for TPM2.0, Version 1.1, Revision 0.04, Section 7.2.1
+//
+#define RETRY_CNT_MAX  3
+
 /**
   Check whether TPM PTP register exist.
 
@@ -153,6 +159,7 @@ PtpCrbTpmCommand (
   UINT32      TpmOutSize;
   UINT16      Data16;
   UINT32      Data32;
+  UINT8       RetryCnt;
 
   DEBUG_CODE_BEGIN ();
   UINTN  DebugSize;
@@ -179,53 +186,76 @@ PtpCrbTpmCommand (
   DEBUG_CODE_END ();
   TpmOutSize = 0;
 
-  //
-  // STEP 0:
-  // if CapCRbIdelByPass == 0, enforce Idle state before sending command
-  //
-  if ((GetCachedIdleByPass () == 0) && ((MmioRead32 ((UINTN)&CrbReg->CrbControlStatus) & PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE) == 0)) {
+  RetryCnt = 0;
+  while (TRUE) {
+    //
+    // STEP 0:
+    // if CapCRbIdelByPass == 0, enforce Idle state before sending command
+    //
+    if ((GetCachedIdleByPass () == 0) && ((MmioRead32 ((UINTN)&CrbReg->CrbControlStatus) & PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE) == 0)) {
+      Status = PtpCrbWaitRegisterBits (
+                 &CrbReg->CrbControlStatus,
+                 PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE,
+                 0,
+                 PTP_TIMEOUT_C
+                 );
+      if (EFI_ERROR (Status)) {
+        RetryCnt++;
+        if (RetryCnt < RETRY_CNT_MAX) {
+          MmioWrite32 ((UINTN)&CrbReg->CrbControlRequest, PTP_CRB_CONTROL_AREA_REQUEST_GO_IDLE);
+          continue;
+        } else {
+          //
+          // Try to goIdle to recover TPM
+          //
+          Status = EFI_DEVICE_ERROR;
+          goto GoIdle_Exit;
+        }
+      }
+    }
+
+    //
+    // STEP 1:
+    // Ready is any time the TPM is ready to receive a command, following a write
+    // of 1 by software to Request.cmdReady, as indicated by the Status field
+    // being cleared to 0.
+    //
+    MmioWrite32 ((UINTN)&CrbReg->CrbControlRequest, PTP_CRB_CONTROL_AREA_REQUEST_COMMAND_READY);
     Status = PtpCrbWaitRegisterBits (
-               &CrbReg->CrbControlStatus,
-               PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE,
+               &CrbReg->CrbControlRequest,
                0,
+               PTP_CRB_CONTROL_AREA_REQUEST_COMMAND_READY,
                PTP_TIMEOUT_C
                );
     if (EFI_ERROR (Status)) {
-      //
-      // Try to goIdle to recover TPM
-      //
-      Status = EFI_DEVICE_ERROR;
-      goto GoIdle_Exit;
+      RetryCnt++;
+      if (RetryCnt < RETRY_CNT_MAX) {
+        MmioWrite32 ((UINTN)&CrbReg->CrbControlRequest, PTP_CRB_CONTROL_AREA_REQUEST_GO_IDLE);
+        continue;
+      } else {
+        Status = EFI_DEVICE_ERROR;
+        goto GoIdle_Exit;
+      }
     }
-  }
 
-  //
-  // STEP 1:
-  // Ready is any time the TPM is ready to receive a command, following a write
-  // of 1 by software to Request.cmdReady, as indicated by the Status field
-  // being cleared to 0.
-  //
-  MmioWrite32 ((UINTN)&CrbReg->CrbControlRequest, PTP_CRB_CONTROL_AREA_REQUEST_COMMAND_READY);
-  Status = PtpCrbWaitRegisterBits (
-             &CrbReg->CrbControlRequest,
-             0,
-             PTP_CRB_CONTROL_AREA_REQUEST_COMMAND_READY,
-             PTP_TIMEOUT_C
-             );
-  if (EFI_ERROR (Status)) {
-    Status = EFI_DEVICE_ERROR;
-    goto GoIdle_Exit;
-  }
+    Status = PtpCrbWaitRegisterBits (
+               &CrbReg->CrbControlStatus,
+               0,
+               PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE,
+               PTP_TIMEOUT_C
+               );
+    if (EFI_ERROR (Status)) {
+      RetryCnt++;
+      if (RetryCnt < RETRY_CNT_MAX) {
+        MmioWrite32 ((UINTN)&CrbReg->CrbControlRequest, PTP_CRB_CONTROL_AREA_REQUEST_GO_IDLE);
+        continue;
+      } else {
+        Status = EFI_DEVICE_ERROR;
+        goto GoIdle_Exit;
+      }
+    }
 
-  Status = PtpCrbWaitRegisterBits (
-             &CrbReg->CrbControlStatus,
-             0,
-             PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE,
-             PTP_TIMEOUT_C
-             );
-  if (EFI_ERROR (Status)) {
-    Status = EFI_DEVICE_ERROR;
-    goto GoIdle_Exit;
+    break;
   }
 
   //
