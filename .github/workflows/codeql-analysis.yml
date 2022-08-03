@@ -21,7 +21,7 @@ name: "CodeQL"
 
 on:
   pull_request:
-    branches: [ "master" ]
+    types: [ labeled ]
   # Todo: Add this when closer to final.
   #
   # schedule:
@@ -29,7 +29,14 @@ on:
   #   - cron: '20 23 * * 4'
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All environment variables:"
+      - run:  env
+
   analyze:
+    if: ${{ github.event.label.name == 'codeqltest' }}
     name: Analyze
     runs-on: ubuntu-latest
     permissions:
