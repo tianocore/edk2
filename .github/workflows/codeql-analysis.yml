@@ -37,9 +37,6 @@ jobs:
         # Learn more about CodeQL language support at https://codeql.github.com/docs/codeql-overview/supported-languages-and-frameworks/
 
     steps:
-    - run: echo "All environment variables:"
-    - run:  env
-
     - name: Checkout repository
       uses: actions/checkout@v3
 
@@ -55,16 +52,30 @@ jobs:
         # Details on CodeQL's query packs refer to : https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
         # queries: security-extended,security-and-quality
 
-    - name: 'Install/Upgrade pip modules'
+    - name: Install/Upgrade pip Modules
       run: pip install -r pip-requirements.txt --upgrade
 
-    - name: 'setup'
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v3
+      with:
+          node-version: 14.x
+
+    - name: Update apt
+      run: sudo apt-get update
+
+    - name: Install required tools
+      run: sudo apt-get install gcc g++ make uuid-dev
+
+    - name: Setup
       run: stuart_setup -c .pytool/CISettings.py -t DEBUG -a IA32,X64 TOOL_CHAIN_TAG=GCC5
 
-    - name: 'update'
+    - name: Update
       run: stuart_update -c .pytool/CISettings.py -t DEBUG -a IA32,X64 TOOL_CHAIN_TAG=GCC5
 
-    - name: 'build'
+    - name: Build Tools From Source
+      run: python BaseTools/Edk2ToolsBuild.py -t GCC5
+
+    - name: CI Build
       run: stuart_ci_build -c .pytool/CISettings.py -t DEBUG -a IA32,X64 TOOL_CHAIN_TAG=GCC5
 
     - name: Perform CodeQL Analysis
