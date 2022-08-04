@@ -154,6 +154,10 @@
   #
   VariablePolicyHelperLib|Include/Library/VariablePolicyHelperLib.h
 
+  ##  @libraryclass  Provides services to access UEFI variable flash information.
+  #
+  VariableFlashInfoLib|Include/Library/VariableFlashInfoLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -225,6 +229,10 @@
   ## Guid is defined for SMM variable module to notify SMM variable wrapper module when variable write service was ready.
   #  Include/Guid/SmmVariableCommon.h
   gSmmVariableWriteGuid  = { 0x93ba1826, 0xdffb, 0x45dd, { 0x82, 0xa7, 0xe7, 0xdc, 0xaa, 0x3b, 0xbd, 0xf3 }}
+
+  ## Guid of the variable flash information HOB.
+  #  Include/Guid/VariableFlashInfo.h
+  gVariableFlashInfoHobGuid = { 0x5d11c653, 0x8154, 0x4ac3, { 0xa8, 0xc2, 0xfb, 0xa2, 0x89, 0x20, 0xfc, 0x90 }}
 
   ## Performance protocol guid that also acts as the performance HOB guid and performance variable GUID
   #  Include/Guid/Performance.h

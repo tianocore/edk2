@@ -10,9 +10,9 @@
 
 #include <FspEas.h>
 
-#define FSP_IN_API_MODE         0
-#define FSP_IN_DISPATCH_MODE    1
-#define FSP_GLOBAL_DATA_VERSION 1
+#define FSP_IN_API_MODE          0
+#define FSP_IN_DISPATCH_MODE     1
+#define FSP_GLOBAL_DATA_VERSION  0x2
 
 #pragma pack(1)
 
@@ -24,16 +24,17 @@ typedef enum {
   TempRamExitApiIndex,
   FspSiliconInitApiIndex,
   FspMultiPhaseSiInitApiIndex,
+  FspSmmInitApiIndex,
   FspApiIndexMax
 } FSP_API_INDEX;
 
 typedef struct  {
-  VOID      *DataPtr;
-  UINTN     MicrocodeRegionBase;
-  UINTN     MicrocodeRegionSize;
-  UINTN     CodeRegionBase;
-  UINTN     CodeRegionSize;
-  UINTN     Reserved;
+  VOID     *DataPtr;
+  UINTN    MicrocodeRegionBase;
+  UINTN    MicrocodeRegionSize;
+  UINTN    CodeRegionBase;
+  UINTN    CodeRegionSize;
+  UINTN    Reserved;
 } FSP_PLAT_DATA;
 
 #define FSP_GLOBAL_DATA_SIGNATURE        SIGNATURE_32 ('F', 'S', 'P', 'D')
@@ -48,7 +49,7 @@ typedef struct  {
   /// Offset 0x08
   ///
   UINTN              CoreStack;
-  UINTN              Reserved2;
+  VOID               *SmmInitUpdPtr;
   ///
   /// IA32: Offset 0x10; X64: Offset 0x18
   ///
@@ -59,17 +60,15 @@ typedef struct  {
   ///
   UINT8              FspMode;
   UINT8              OnSeparateStack;
-  UINT8              Reserved3;
+  UINT8              Reserved2;
   UINT32             NumberOfPhases;
   UINT32             PhasesExecuted;
-  UINT32             Reserved4[8];
+  UINT32             Reserved3[8];
   ///
   /// IA32: Offset 0x40; X64: Offset 0x48
   /// Start of UINTN and pointer section
-  /// All UINTN and pointer members must be put in this section
-  /// except CoreStack and Reserved2. In addition, the number of
-  /// UINTN and pointer members must be even for natural alignment
-  /// in both IA32 and X64.
+  /// All UINTN and pointer members are put in this section
+  /// for maintaining natural alignment for both IA32 and X64 builds.
   ///
   FSP_PLAT_DATA      PlatformData;
   VOID               *TempRamInitUpdPtr;
@@ -85,12 +84,15 @@ typedef struct  {
   VOID               *UpdDataPtr;
   ///
   /// End of UINTN and pointer section
+  /// At this point, next field offset must be either *0h or *8h to
+  /// meet natural alignment requirement.
   ///
-  UINT8              Reserved5[16];
+  UINT8              Reserved4[16];
   UINT32             PerfSig;
   UINT16             PerfLen;
-  UINT16             Reserved6;
+  UINT16             Reserved5;
   UINT32             PerfIdx;
+  UINT32             Reserved6;
   UINT64             PerfData[32];
 } FSP_GLOBAL_DATA;
 

@@ -12,13 +12,16 @@
 
 #include <IndustryStandard/Acpi10.h>
 #include <IndustryStandard/Pci.h>
+#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/HardwareInfoLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PciHostBridgeUtilityLib.h>
 #include <Library/PciLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Protocol/PciHostBridgeResourceAllocation.h>
 
 #pragma pack(1)
 typedef struct {
@@ -189,7 +192,9 @@ PciHostBridgeUtilityUninitRootBridge (
 }
 
 /**
-  Utility function to return all the root bridge instances in an array.
+  Utility function to scan PCI root bridges and create instances for those
+  that are found not empty. Populate their resources from the default
+  provided parameters and return all the root bridge instances in an array.
 
   @param[out] Count                  The number of root bridge instances.
 
@@ -217,9 +222,9 @@ PciHostBridgeUtilityUninitRootBridge (
 
   @return                            All the root bridge instances in an array.
 **/
+STATIC
 PCI_ROOT_BRIDGE *
-EFIAPI
-PciHostBridgeUtilityGetRootBridges (
+PciHostBridgeUtilityGetRootBridgesBusScan (
   OUT UINTN                     *Count,
   IN  UINT64                    Attributes,
   IN  UINT64                    AllocationAttributes,
@@ -242,8 +247,6 @@ PciHostBridgeUtilityGetRootBridges (
   UINTN                 Initialized;
   UINTN                 LastRootBridgeNumber;
   UINTN                 RootBridgeNumber;
-
-  *Count = 0;
 
   if ((BusMin > BusMax) || (BusMax > PCI_MAX_BUS)) {
     DEBUG ((
@@ -401,6 +404,325 @@ FreeBridges:
 
   FreePool (Bridges);
   return NULL;
+}
+
+/**
+  Utility function to read root bridges information from host-provided fw-cfg
+  file and return them in an array.
+
+  @param[out] Count   The number of root bridge instances.
+
+  @return             All the root bridge instances in an array parsed from
+                      host-provided fw-cfg file (hardware-info).
+**/
+STATIC
+PCI_ROOT_BRIDGE *
+PciHostBridgeUtilityGetRootBridgesHostProvided (
+  OUT UINTN  *Count
+  )
+{
+  EFI_STATUS                Status;
+  FIRMWARE_CONFIG_ITEM      FwCfgItem;
+  UINTN                     FwCfgSize;
+  PCI_ROOT_BRIDGE           *Bridges;
+  UINTN                     Initialized;
+  UINTN                     LastRootBridgeNumber;
+  UINTN                     RootBridgeNumber;
+  UINTN                     PciHostBridgeCount;
+  UINT8                     *HardwareInfoBlob;
+  LIST_ENTRY                HwInfoList;
+  LIST_ENTRY                *HwLink;
+  HARDWARE_INFO             *HwInfo;
+  UINT64                    Attributes;
+  UINT64                    AllocationAttributes;
+  BOOLEAN                   DmaAbove4G;
+  BOOLEAN                   NoExtendedConfigSpace;
+  BOOLEAN                   CombineMemPMem;
+  PCI_ROOT_BRIDGE_APERTURE  Io;
+  PCI_ROOT_BRIDGE_APERTURE  Mem;
+  PCI_ROOT_BRIDGE_APERTURE  MemAbove4G;
+  PCI_ROOT_BRIDGE_APERTURE  PMem;
+  PCI_ROOT_BRIDGE_APERTURE  PMemAbove4G;
+
+  //
+  // Initialize the Hardware Info list head to start with an empty but valid
+  // list head.
+  //
+  InitializeListHead (&HwInfoList);
+  HardwareInfoBlob   =  NULL;
+  Initialized        = 0;
+  Bridges            = NULL;
+  PciHostBridgeCount = 0;
+
+  //
+  // Hypervisor can provide the specifications (resources) for one or more
+  // PCI host bridges. Such information comes through fw-cfg as part of
+  // the hardware-info file.
+  //
+  Status = QemuFwCfgFindFile ("etc/hardware-info", &FwCfgItem, &FwCfgSize);
+
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  HardwareInfoBlob = AllocatePool (FwCfgSize);
+
+  if (HardwareInfoBlob == NULL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to allocate memory for hardware resources info\n",
+      __FUNCTION__
+      ));
+    return NULL;
+  }
+
+  QemuFwCfgSelectItem (FwCfgItem);
+  QemuFwCfgReadBytes (FwCfgSize, HardwareInfoBlob);
+
+  //
+  // Create the list of hardware info devices filtering for PCI host
+  // bridges
+  //
+  Status = CreateHardwareInfoList (
+             HardwareInfoBlob,
+             FwCfgSize,
+             HardwareInfoTypeHostBridge,
+             &HwInfoList
+             );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to create hardware info list to retrieve host "
+      "bridges information from fw-cfg\n",
+      __FUNCTION__
+      ));
+
+    goto FreeBridges;
+  }
+
+  PciHostBridgeCount = GetHardwareInfoCountByType (
+                         &HwInfoList,
+                         HardwareInfoTypeHostBridge,
+                         sizeof (HOST_BRIDGE_INFO)
+                         );
+
+  if (PciHostBridgeCount == 0) {
+    goto FreeBridges;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: Host provided description for %Lu root bridges\n",
+    __FUNCTION__,
+    PciHostBridgeCount
+    ));
+
+  //
+  // Allocate the root bridges
+  //
+  Bridges = AllocatePool (((UINTN)PciHostBridgeCount) * sizeof *Bridges);
+  if (Bridges == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, EFI_OUT_OF_RESOURCES));
+    goto FreeBridges;
+  }
+
+  //
+  // If Host Bridges' specification was obtained from fw-cfg, the list
+  // contains information to populate all root bridges in the system
+  // including resources and attributes.
+  //
+  HwLink = GetFirstHardwareInfoByType (
+             &HwInfoList,
+             HardwareInfoTypeHostBridge,
+             sizeof (HOST_BRIDGE_INFO)
+             );
+
+  while (!EndOfHardwareInfoList (&HwInfoList, HwLink)) {
+    HwInfo = HARDWARE_INFO_FROM_LINK (HwLink);
+
+    Status = HardwareInfoPciHostBridgeGet (
+               HwInfo->Data.PciHostBridge,
+               (UINTN)HwInfo->Header.Size,
+               &RootBridgeNumber,
+               &LastRootBridgeNumber,
+               &Attributes,
+               &DmaAbove4G,
+               &NoExtendedConfigSpace,
+               &CombineMemPMem,
+               &Io,
+               &Mem,
+               &MemAbove4G,
+               &PMem,
+               &PMemAbove4G,
+               NULL
+               );
+
+    if (EFI_ERROR (Status)) {
+      goto FreeBridges;
+    }
+
+    if ((RootBridgeNumber > LastRootBridgeNumber) || (LastRootBridgeNumber > PCI_MAX_BUS)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: invalid bus range with BusMin %Lu and BusMax "
+        "%Lu\n",
+        __FUNCTION__,
+        (UINT64)RootBridgeNumber,
+        (UINT64)LastRootBridgeNumber
+        ));
+      goto FreeBridges;
+    }
+
+    AllocationAttributes = 0;
+    if (CombineMemPMem) {
+      AllocationAttributes |= EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM;
+    }
+
+    if ((MemAbove4G.Limit > MemAbove4G.Base) ||
+        (PMemAbove4G.Limit > PMemAbove4G.Base))
+    {
+      AllocationAttributes |= EFI_PCI_HOST_BRIDGE_MEM64_DECODE;
+    }
+
+    Status = PciHostBridgeUtilityInitRootBridge (
+               Attributes,
+               Attributes,
+               AllocationAttributes,
+               DmaAbove4G,
+               NoExtendedConfigSpace,
+               (UINT8)RootBridgeNumber,
+               (UINT8)LastRootBridgeNumber,
+               &Io,
+               &Mem,
+               &MemAbove4G,
+               &PMem,
+               &PMemAbove4G,
+               &Bridges[Initialized]
+               );
+
+    if (EFI_ERROR (Status)) {
+      goto FreeBridges;
+    }
+
+    ++Initialized;
+
+    HwLink = GetNextHardwareInfoByType (
+               &HwInfoList,
+               HwLink,
+               HardwareInfoTypeHostBridge,
+               sizeof (HOST_BRIDGE_INFO)
+               );
+  }
+
+  *Count = Initialized;
+
+  //
+  // If resources were allocated for host bridges info, release them
+  //
+  if (HardwareInfoBlob) {
+    FreePool (HardwareInfoBlob);
+  }
+
+  FreeHardwareInfoList (&HwInfoList);
+  return Bridges;
+
+FreeBridges:
+  while (Initialized > 0) {
+    --Initialized;
+    PciHostBridgeUtilityUninitRootBridge (&Bridges[Initialized]);
+  }
+
+  if (Bridges) {
+    FreePool (Bridges);
+  }
+
+  if (HardwareInfoBlob) {
+    FreePool (HardwareInfoBlob);
+  }
+
+  FreeHardwareInfoList (&HwInfoList);
+  return NULL;
+}
+
+/**
+  Utility function to return all the root bridge instances in an array.
+
+  @param[out] Count                  The number of root bridge instances.
+
+  @param[in]  Attributes             Initial attributes.
+
+  @param[in]  AllocAttributes        Allocation attributes.
+
+  @param[in]  DmaAbove4G             DMA above 4GB memory.
+
+  @param[in]  NoExtendedConfigSpace  No Extended Config Space.
+
+  @param[in]  BusMin                 Minimum Bus number, inclusive.
+
+  @param[in]  BusMax                 Maximum Bus number, inclusive.
+
+  @param[in]  Io                     IO aperture.
+
+  @param[in]  Mem                    MMIO aperture.
+
+  @param[in]  MemAbove4G             MMIO aperture above 4G.
+
+  @param[in]  PMem                   Prefetchable MMIO aperture.
+
+  @param[in]  PMemAbove4G            Prefetchable MMIO aperture above 4G.
+
+  @return                            All the root bridge instances in an array.
+**/
+PCI_ROOT_BRIDGE *
+EFIAPI
+PciHostBridgeUtilityGetRootBridges (
+  OUT UINTN                     *Count,
+  IN  UINT64                    Attributes,
+  IN  UINT64                    AllocationAttributes,
+  IN  BOOLEAN                   DmaAbove4G,
+  IN  BOOLEAN                   NoExtendedConfigSpace,
+  IN  UINTN                     BusMin,
+  IN  UINTN                     BusMax,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *Io,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *Mem,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *MemAbove4G,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *PMem,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *PMemAbove4G
+  )
+{
+  PCI_ROOT_BRIDGE  *Bridges;
+
+  *Count = 0;
+
+  //
+  // First attempt to get the host provided descriptions of the Root Bridges
+  // if available.
+  //
+  Bridges = PciHostBridgeUtilityGetRootBridgesHostProvided (Count);
+
+  //
+  // If host did not provide Root Bridge information, scan the buses and
+  // auto populate them with default resources.
+  //
+  if (Bridges == NULL) {
+    Bridges = PciHostBridgeUtilityGetRootBridgesBusScan (
+                Count,
+                Attributes,
+                AllocationAttributes,
+                DmaAbove4G,
+                NoExtendedConfigSpace,
+                BusMin,
+                BusMax,
+                Io,
+                Mem,
+                MemAbove4G,
+                PMem,
+                PMemAbove4G
+                );
+  }
+
+  return Bridges;
 }
 
 /**

@@ -1,0 +1,30 @@
+## @file
+# Ssdt PCIe Support Library.
+#
+#  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SsdtPcieSupportLib
+  FILE_GUID      = 510451a0-60b2-446c-b6bf-59cbe4a41782
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = SsdtPcieSupportLib
+
+[Sources]
+  SsdtPcieSupportLib.c
+  SsdtPcieSupportLibPrivate.h
+  SsdtPcieOscTemplate.asl
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  AcpiHelperLib
+  AmlLib
+  BaseLib

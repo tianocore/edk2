@@ -19,7 +19,6 @@
 [Sources]
   SsdtPcieGenerator.c
   SsdtPcieGenerator.h
-  SsdtPcieOscTemplate.asl
 
 [Packages]
   DynamicTablesPkg/DynamicTablesPkg.dec
@@ -30,3 +29,4 @@
   AcpiHelperLib
   AmlLib
   BaseLib
+  SsdtPcieSupportLib

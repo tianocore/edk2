@@ -36,7 +36,19 @@
   DEFINE PLATFORM_BOOT_TIMEOUT        = 3
   DEFINE ABOVE_4G_MEMORY              = TRUE
   DEFINE BOOT_MANAGER_ESCAPE          = FALSE
+  DEFINE ATA_ENABLE                   = TRUE
+  DEFINE SD_ENABLE                    = TRUE
+  DEFINE PS2_MOUSE_ENABLE             = TRUE
+  DEFINE CRYPTO_PROTOCOL_SUPPORT      = FALSE
   DEFINE SD_MMC_TIMEOUT               = 1000000
+  DEFINE USE_CBMEM_FOR_CONSOLE        = FALSE
+  DEFINE BOOTSPLASH_IMAGE             = FALSE
+
+  #
+  # NULL:    NullMemoryTestDxe
+  # GENERIC: GenericMemoryTestDxe
+  #
+  DEFINE MEMORY_TEST                  = NULL
   #
   # SBL:      UEFI payload for Slim Bootloader
   # COREBOOT: UEFI payload for coreboot
@@ -121,10 +133,11 @@
 
 [BuildOptions]
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
-  GCC:*_UNIXGCC_*_CC_FLAGS       = -DMDEPKG_NDEBUG
+!if $(USE_CBMEM_FOR_CONSOLE) == FALSE
   GCC:RELEASE_*_*_CC_FLAGS       = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS     = /D MDEPKG_NDEBUG
   MSFT:RELEASE_*_*_CC_FLAGS      = /D MDEPKG_NDEBUG
+!endif
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
@@ -180,8 +193,13 @@
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   DxeHobListLib|UefiPayloadPkg/Library/DxeHobListLib/DxeHobListLib.inf
+!if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
+  TlsLib|CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
+!else
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
+!endif
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
@@ -212,6 +230,7 @@
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
   UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
+  BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
 
@@ -231,8 +250,13 @@
   TimerLib|UefiPayloadPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
 !endif
   ResetSystemLib|UefiPayloadPkg/Library/ResetSystemLib/ResetSystemLib.inf
+!if $(USE_CBMEM_FOR_CONSOLE) == TRUE
+  SerialPortLib|UefiPayloadPkg/Library/CbSerialPortLib/CbSerialPortLib.inf
+  PlatformHookLib|MdeModulePkg/Library/BasePlatformHookLibNull/BasePlatformHookLibNull.inf
+!else
   SerialPortLib|MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
   PlatformHookLib|UefiPayloadPkg/Library/PlatformHookLib/PlatformHookLib.inf
+!endif
   PlatformBootManagerLib|UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   IoApicLib|PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
 
@@ -272,8 +296,15 @@
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
+  VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
   VmgExitLib|UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
+
+[LibraryClasses.common]
+!if $(BOOTSPLASH_IMAGE)
+  SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+  BmpSupportLib|MdeModulePkg/Library/BaseBmpSupportLib/BaseBmpSupportLib.inf
+!endif
 
 [LibraryClasses.common.SEC]
   HobLib|UefiPayloadPkg/Library/PayloadEntryHobLib/HobLib.inf
@@ -410,6 +441,33 @@
   gUefiPayloadPkgTokenSpaceGuid.PcdDispatchModuleAbove4GMemory|$(ABOVE_4G_MEMORY)
   gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape|$(BOOT_MANAGER_ESCAPE)
 
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1800000
+
+!if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.HmacSha256.Family                        | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Md5.Family                               | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Pkcs.Family                              | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Dh.Family                                | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Random.Family                            | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Rsa.Family                               | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Sha1.Family                              | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Sha256.Family                            | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Sha384.Family                            | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Sha512.Family                            | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.X509.Family                              | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Tdes.Family                              | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Aes.Services.GetContextSize              | TRUE
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Aes.Services.Init                        | TRUE
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Aes.Services.CbcEncrypt                  | TRUE
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Aes.Services.CbcDecrypt                  | TRUE
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Arc4.Family                              | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Sm3.Family                               | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Hkdf.Family                              | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Tls.Family                               | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.TlsSet.Family                            | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.TlsGet.Family                            | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+!endif
+
 [PcdsPatchableInModule.X64]
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister|$(RTC_INDEX_REGISTER)
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister|$(RTC_TARGET_REGISTER)
@@ -421,10 +479,18 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x7
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
-!if $(SOURCE_DEBUG_ENABLE)
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+!if $(USE_CBMEM_FOR_CONSOLE) == FALSE
+  !if $(SOURCE_DEBUG_ENABLE)
+    gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+  !else
+    gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
+  !endif
 !else
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
+  !if $(TARGET) == DEBUG
+    gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x07
+  !else
+    gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x03
+  !endif
 !endif
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule|$(MAX_SIZE_NON_POPULATE_CAPSULE)
   #
@@ -470,7 +536,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize
-!if $(TARGET) == DEBUG
+!if ($(TARGET) == DEBUG || $(USE_CBMEM_FOR_CONSOLE) == TRUE)
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE
 !else
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
@@ -559,6 +625,9 @@
 !endif
   UefiCpuPkg/CpuDxe/CpuDxe.inf
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+!if $(BOOTSPLASH_IMAGE)
+  MdeModulePkg/Logo/LogoDxe.inf
+!endif
   MdeModulePkg/Application/UiApp/UiApp.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/DeviceManagerUiLib/DeviceManagerUiLib.inf
@@ -594,7 +663,11 @@
   MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+!if $(MEMORY_TEST) == "GENERIC"
+  MdeModulePkg/Universal/MemoryTest/GenericMemoryTestDxe/GenericMemoryTestDxe.inf
+!elseif $(MEMORY_TEST) == "NULL"
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+!endif
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
@@ -612,6 +685,10 @@
   # ACPI Support
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+!if $(BOOTSPLASH_IMAGE)
+  MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
+  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+!endif
 
   #
   # PCI Support
@@ -629,8 +706,10 @@
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   FatPkg/EnhancedFatDxe/Fat.inf
+!if $(ATA_ENABLE) == TRUE
   MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+!endif
   MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
   MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
@@ -642,9 +721,11 @@
   #
   # SD/eMMC Support
   #
+!if $(SD_ENABLE) == TRUE
   MdeModulePkg/Bus/Pci/SdMmcPciHcDxe/SdMmcPciHcDxe.inf
   MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe.inf
   MdeModulePkg/Bus/Sd/SdDxe/SdDxe.inf
+!endif
 
   #
   # Usb Support
@@ -669,7 +750,9 @@
 !if $(PS2_KEYBOARD_ENABLE) == TRUE
   MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
 !endif
+!if $(PS2_MOUSE_ENABLE) == TRUE
   MdeModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
+!endif
 
   #
   # Console Support
@@ -717,6 +800,17 @@
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 !endif
 
+  #
+  # Misc
+  #
+!if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
+  CryptoPkg/Driver/CryptoDxe.inf {
+    <LibraryClasses>
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+      TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
+  }
+!endif
+
   #------------------------------
   #  Build the shell
   #------------------------------
@@ -740,12 +834,14 @@
       #  This should be FALSE for compiling the dynamic command.
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
   }
+!if $(PERFORMANCE_MEASUREMENT_ENABLE) == TRUE
   ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf {
     <PcdsFixedAtBuild>
       ## This flag is used to control initialization of the shell library
       #  This should be FALSE for compiling the dynamic command.
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
   }
+!endif
   ShellPkg/Application/Shell/Shell.inf {
     <PcdsFixedAtBuild>
       ## This flag is used to control initialization of the shell library

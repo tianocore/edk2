@@ -97,7 +97,8 @@ PcdMakefileEnd = '''
 
 AppTarget = '''
 all: $(APPFILE)
-$(APPFILE): $(OBJECTS)
+$(APPLICATION): $(OBJECTS)
+$(APPFILE): $(APPLICATION)
 %s
 '''
 
@@ -871,7 +872,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if ModuleType != TAB_COMMON and ModuleType not in SUP_MODULE_LIST:
                     EdkLogger.error('build', OPTION_UNKNOWN, "Unknown module type [%s]" % ModuleType,
                                     File=self.MetaFile, ExtraData=LibraryInstance, Line=LineNo)
-                LibraryClassDict[Arch, ModuleType, LibraryClass] = LibraryInstance
+                LibraryClassDict[ModuleType, Arch, LibraryClass] = LibraryInstance
                 if LibraryInstance not in self._LibraryInstances:
                     self._LibraryInstances.append(LibraryInstance)
 
@@ -880,7 +881,7 @@ class DscBuildData(PlatformBuildClassObject):
             for LibraryClass in LibraryClassSet:
                 # try all possible module types
                 for ModuleType in SUP_MODULE_LIST:
-                    LibraryInstance = LibraryClassDict[self._Arch, ModuleType, LibraryClass]
+                    LibraryInstance = LibraryClassDict[ModuleType, self._Arch, LibraryClass]
                     if LibraryInstance is None:
                         continue
                     self._LibraryClasses[LibraryClass, ModuleType] = LibraryInstance
@@ -2931,7 +2932,7 @@ class DscBuildData(PlatformBuildClassObject):
             MakeApp = MakeApp + PcdMakefileEnd
             MakeApp = MakeApp + AppTarget % ("""\tcopy $(APPLICATION) $(APPFILE) /y """)
         else:
-            MakeApp = MakeApp + AppTarget % ("""\tcp $(APPLICATION) $(APPFILE) """)
+            MakeApp = MakeApp + AppTarget % ("""\tcp -p $(APPLICATION) $(APPFILE) """)
         MakeApp = MakeApp + '\n'
         IncludeFileFullPaths = []
         for includefile in IncludeFiles:
@@ -2954,7 +2955,7 @@ class DscBuildData(PlatformBuildClassObject):
         else:
             PcdValueCommonPath = os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "Source/C/Common/PcdValueCommon.c"))
             MakeApp = MakeApp + '%s/PcdValueCommon.c : %s\n' % (self.OutputPath, PcdValueCommonPath)
-            MakeApp = MakeApp + '\tcp -f %s %s/PcdValueCommon.c\n' % (PcdValueCommonPath, self.OutputPath)
+            MakeApp = MakeApp + '\tcp -p -f %s %s/PcdValueCommon.c\n' % (PcdValueCommonPath, self.OutputPath)
         MakeFileName = os.path.join(self.OutputPath, 'Makefile')
         MakeApp += "$(OBJECTS) : %s\n" % MakeFileName
         SaveFileOnChange(MakeFileName, MakeApp, False)

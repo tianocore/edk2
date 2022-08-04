@@ -42,7 +42,7 @@
   Arm/Hypercall.S
 
 [Sources.AARCH64]
-  Aarch64/Hypercall.S
+  AArch64/Hypercall.S
 
 [Sources]
   XenHypercall.c
@@ -58,6 +58,3 @@
 
 [Guids.IA32, Guids.X64]
   gEfiXenInfoGuid
-
-[BuildOptions.ARM]
-  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A15

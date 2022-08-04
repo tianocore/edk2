@@ -53,21 +53,21 @@ SECTION .text
 
 ALIGN   8
 
+; Generate 256 IDT vectors.
 AsmIdtVectorBegin:
 %assign Vector 0
-%rep  32
-    push    byte %[Vector]
+%rep  256
+    push    strict dword %[Vector] ; This instruction pushes sign-extended 8-byte value on stack
     push    rax
-    mov     rax, strict qword 0 ;    mov     rax, ASM_PFX(CommonInterruptEntry)
+    mov     rax, strict qword 0    ; mov     rax, ASM_PFX(CommonInterruptEntry)
     jmp     rax
 %assign Vector Vector+1
 %endrep
 AsmIdtVectorEnd:
 
 HookAfterStubHeaderBegin:
-    db      0x6a        ; push
-@VectorNum:
-    db      0          ; 0 will be fixed
+    push    strict dword 0      ; 0 will be fixed
+VectorNum:
     push    rax
     mov     rax, strict qword 0 ;     mov     rax, HookAfterStubHeaderEnd
 JmpAbsoluteAddress:
@@ -453,16 +453,16 @@ global ASM_PFX(AsmGetTemplateAddressMap)
 ASM_PFX(AsmGetTemplateAddressMap):
     lea     rax, [AsmIdtVectorBegin]
     mov     qword [rcx], rax
-    mov     qword [rcx + 0x8],  (AsmIdtVectorEnd - AsmIdtVectorBegin) / 32
+    mov     qword [rcx + 0x8],  (AsmIdtVectorEnd - AsmIdtVectorBegin) / 256
     lea     rax, [HookAfterStubHeaderBegin]
     mov     qword [rcx + 0x10], rax
 
 ; Fix up CommonInterruptEntry address
     lea    rax, [ASM_PFX(CommonInterruptEntry)]
     lea    rcx, [AsmIdtVectorBegin]
-%rep  32
+%rep  256
     mov    qword [rcx + (JmpAbsoluteAddress - 8 - HookAfterStubHeaderBegin)], rax
-    add    rcx, (AsmIdtVectorEnd - AsmIdtVectorBegin) / 32
+    add    rcx, (AsmIdtVectorEnd - AsmIdtVectorBegin) / 256
 %endrep
 ; Fix up HookAfterStubHeaderEnd
     lea    rax, [HookAfterStubHeaderEnd]
@@ -477,6 +477,6 @@ ASM_PFX(AsmGetTemplateAddressMap):
 global ASM_PFX(AsmVectorNumFixup)
 ASM_PFX(AsmVectorNumFixup):
     mov     rax, rdx
-    mov     [rcx + (@VectorNum - HookAfterStubHeaderBegin)], al
+    mov     [rcx + (VectorNum - 4 - HookAfterStubHeaderBegin)], al
     ret
 

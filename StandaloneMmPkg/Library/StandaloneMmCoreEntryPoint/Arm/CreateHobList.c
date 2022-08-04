@@ -173,7 +173,7 @@ CreateHobListFromBootInfo (
   // Base and size of buffer shared with privileged Secure world software
   MmramRanges[1].PhysicalStart = PayloadBootInfo->SpSharedBufBase;
   MmramRanges[1].CpuStart      = PayloadBootInfo->SpSharedBufBase;
-  MmramRanges[1].PhysicalSize  = PayloadBootInfo->SpPcpuSharedBufSize * PayloadBootInfo->NumCpus;
+  MmramRanges[1].PhysicalSize  = PayloadBootInfo->SpSharedBufSize;
   MmramRanges[1].RegionState   = EFI_CACHEABLE | EFI_ALLOCATED;
 
   // Base and size of buffer used for synchronous communication with Normal

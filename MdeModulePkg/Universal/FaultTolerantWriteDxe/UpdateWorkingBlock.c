@@ -16,10 +16,13 @@ EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER  mWorkingBlockHeader = { ZERO_GUID, 0, 0
 
   Since Signature and WriteQueueSize have been known, Crc can be calculated out,
   then the work space header will be fixed.
+
+  @param[in]  WorkSpaceLength     Length in bytes of the FTW workspace area.
+
 **/
 VOID
 InitializeLocalWorkSpaceHeader (
-  VOID
+  IN  UINTN  WorkSpaceLength
   )
 {
   //
@@ -46,7 +49,7 @@ InitializeLocalWorkSpaceHeader (
     &gEdkiiWorkingBlockSignatureGuid,
     sizeof (EFI_GUID)
     );
-  mWorkingBlockHeader.WriteQueueSize = PcdGet32 (PcdFlashNvStorageFtwWorkingSize) - sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER);
+  mWorkingBlockHeader.WriteQueueSize = WorkSpaceLength - sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER);
 
   //
   // Crc is calculated with all the fields except Crc and STATE, so leave them as FTW_ERASED_BYTE.

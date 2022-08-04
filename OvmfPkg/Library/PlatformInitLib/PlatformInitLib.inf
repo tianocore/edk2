@@ -50,12 +50,15 @@
   MtrrLib
   PcdLib
   PciLib
+  PeiHardwareInfoLib
 
 [LibraryClasses.X64]
   TdxLib
 
-[FixedPcd]
+[Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+
+[FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase

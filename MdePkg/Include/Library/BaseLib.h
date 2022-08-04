@@ -4503,6 +4503,40 @@ CalculateCrc32 (
   IN  UINTN  Length
   );
 
+/**
+   Calculates the CRC16-ANSI checksum of the given buffer.
+
+   @param[in]      Buffer        Pointer to the buffer.
+   @param[in]      Length        Length of the buffer, in bytes.
+   @param[in]      InitialValue  Initial value of the CRC.
+
+   @return The CRC16-ANSI checksum.
+**/
+UINT16
+EFIAPI
+CalculateCrc16Ansi (
+  IN  CONST VOID  *Buffer,
+  IN  UINTN       Length,
+  IN  UINT16      InitialValue
+  );
+
+/**
+   Calculates the CRC32c checksum of the given buffer.
+
+   @param[in]      Buffer        Pointer to the buffer.
+   @param[in]      Length        Length of the buffer, in bytes.
+   @param[in]      InitialValue  Initial value of the CRC.
+
+   @return The CRC32c checksum.
+**/
+UINT32
+EFIAPI
+CalculateCrc32c (
+  IN CONST VOID  *Buffer,
+  IN UINTN       Length,
+  IN UINT32      InitialValue
+  );
+
 //
 // Base Library CPU Functions
 //
@@ -4512,7 +4546,6 @@ CalculateCrc32 (
 
   @param  Context1        Context1 parameter passed into SwitchStack().
   @param  Context2        Context2 parameter passed into SwitchStack().
-
 **/
 typedef
 VOID

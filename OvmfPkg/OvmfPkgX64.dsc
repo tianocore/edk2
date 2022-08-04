@@ -49,8 +49,8 @@
   #
   # Device drivers
   #
-  DEFINE PVSCSI_ENABLE           = TRUE
-  DEFINE MPT_SCSI_ENABLE         = TRUE
+  DEFINE PVSCSI_ENABLE           = FALSE
+  DEFINE MPT_SCSI_ENABLE         = FALSE
   DEFINE LSI_SCSI_ENABLE         = FALSE
 
   #
@@ -71,6 +71,12 @@
 !endif
 !endif
 !endif
+
+  #
+  # Define the FILE_GUID of CpuMpPei/CpuDxe for unique-processor version.
+  #
+  DEFINE UP_CPU_PEI_GUID  = 280251c4-1d09-4035-9062-839acb5f18c1
+  DEFINE UP_CPU_DXE_GUID  = 6490f1c5-ebcc-4665-8892-0075b9bb49b7
 
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
@@ -165,7 +171,6 @@
   PciCapLib|OvmfPkg/Library/BasePciCapLib/BasePciCapLib.inf
   PciCapPciSegmentLib|OvmfPkg/Library/BasePciCapPciSegmentLib/BasePciCapPciSegmentLib.inf
   PciCapPciIoLib|OvmfPkg/Library/UefiPciCapPciIoLib/UefiPciCapPciIoLib.inf
-  CcProbeLib|OvmfPkg/Library/CcProbeLib/CcProbeLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsicSev.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   SerialPortLib|PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
@@ -189,9 +194,14 @@
   LoadLinuxLib|OvmfPkg/Library/LoadLinuxLib/LoadLinuxLib.inf
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/DxeMemEncryptSevLib.inf
   MemEncryptTdxLib|OvmfPkg/Library/BaseMemEncryptTdxLib/BaseMemEncryptTdxLib.inf
+  PeiHardwareInfoLib|OvmfPkg/Library/HardwareInfoLib/PeiHardwareInfoLib.inf
+  DxeHardwareInfoLib|OvmfPkg/Library/HardwareInfoLib/DxeHardwareInfoLib.inf
 
 !if $(SMM_REQUIRE) == FALSE
   LockBoxLib|OvmfPkg/Library/LockBoxLib/LockBoxBaseLib.inf
+  CcProbeLib|OvmfPkg/Library/CcProbeLib/CcProbeLib.inf
+!else
+  CcProbeLib|MdePkg/Library/CcProbeLibNull/CcProbeLibNull.inf
 !endif
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
@@ -219,6 +229,7 @@
   PlatformSecureLib|OvmfPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
   AuthVariableLib|SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
   SecureBootVariableLib|SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
+  PlatformPKProtectionLib|SecurityPkg/Library/PlatformPKProtectionLibVarPolicy/PlatformPKProtectionLibVarPolicy.inf
   SecureBootVariableProvisionLib|SecurityPkg/Library/SecureBootVariableProvisionLib/SecureBootVariableProvisionLib.inf
 !else
   AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
@@ -226,6 +237,7 @@
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
+  VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
 
 
   #
@@ -319,8 +331,6 @@
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
   PlatformInitLib|OvmfPkg/Library/PlatformInitLib/PlatformInitLib.inf
 
-!include OvmfPkg/OvmfTpmLibsPeim.dsc.inc
-
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/PeiMemEncryptSevLib.inf
 
 [LibraryClasses.common.DXE_CORE]
@@ -407,8 +417,6 @@
   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
   QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/DxeQemuFwCfgS3LibFwCfg.inf
   QemuLoadImageLib|OvmfPkg/Library/X86QemuLoadImageLib/X86QemuLoadImageLib.inf
-
-!include OvmfPkg/OvmfTpmLibsDxe.dsc.inc
 
 [LibraryClasses.common.UEFI_APPLICATION]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
@@ -675,7 +683,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
 
 !if $(CSM_ENABLE) == FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|100000000
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
 !endif
 
 [PcdsDynamicHii]
@@ -728,7 +736,29 @@
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   OvmfPkg/SmmAccess/SmmAccessPei.inf
 !endif
-  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
+
+  UefiCpuPkg/CpuMpPei/CpuMpPei.inf {
+    <LibraryClasses>
+      #
+      # Directly use PeiMpInitLib. It depends on PeiMpInitLibMpDepLib which
+      # checks the PPI of gEfiPeiMpInitLibMpDepPpiGuid.
+      #
+      MpInitLib|UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
+      NULL|OvmfPkg/Library/MpInitLibDepLib/PeiMpInitLibMpDepLib.inf
+  }
+
+  UefiCpuPkg/CpuMpPei/CpuMpPei.inf {
+    <Defines>
+      FILE_GUID = $(UP_CPU_PEI_GUID)
+
+    <LibraryClasses>
+      #
+      # Directly use MpInitLibUp. It depends on PeiMpInitLibUpDepLib which
+      # checks the PPI of gEfiPeiMpInitLibUpDepPpiGuid.
+      #
+      MpInitLib|UefiCpuPkg/Library/MpInitLibUp/MpInitLibUp.inf
+      NULL|OvmfPkg/Library/MpInitLibDepLib/PeiMpInitLibUpDepLib.inf
+  }
 
 !include OvmfPkg/OvmfTpmComponentsPei.dsc.inc
 
@@ -760,7 +790,30 @@
 
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
-  UefiCpuPkg/CpuDxe/CpuDxe.inf
+
+  UefiCpuPkg/CpuDxe/CpuDxe.inf {
+    <LibraryClasses>
+      #
+      # Directly use DxeMpInitLib. It depends on DxeMpInitLibMpDepLib which
+      # checks the Protocol of gEfiMpInitLibMpDepProtocolGuid.
+      #
+      MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
+      NULL|OvmfPkg/Library/MpInitLibDepLib/DxeMpInitLibMpDepLib.inf
+  }
+
+  UefiCpuPkg/CpuDxe/CpuDxe.inf {
+    <Defines>
+      FILE_GUID = $(UP_CPU_DXE_GUID)
+
+    <LibraryClasses>
+      #
+      # Directly use MpInitLibUp. It depends on DxeMpInitLibUpDepLib which
+      # checks the Protocol of gEfiMpInitLibUpDepProtocolGuid.
+      #
+      MpInitLib|UefiCpuPkg/Library/MpInitLibUp/MpInitLibUp.inf
+      NULL|OvmfPkg/Library/MpInitLibDepLib/DxeMpInitLibUpDepLib.inf
+  }
+
 !ifdef $(CSM_ENABLE)
   OvmfPkg/8259InterruptControllerDxe/8259.inf
   OvmfPkg/8254TimerDxe/8254Timer.inf

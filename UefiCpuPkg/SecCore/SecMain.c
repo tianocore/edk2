@@ -167,6 +167,15 @@ SecStartup (
     EFI_SOFTWARE_SEC | EFI_SW_SEC_PC_ENTRY_POINT
     );
 
+  DEBUG ((
+    DEBUG_INFO,
+    "%a() TempRAM Base: 0x%x, TempRAM Size: 0x%x, BootFirmwareVolume 0x%x\n",
+    __FUNCTION__,
+    TempRamBase,
+    SizeOfRam,
+    BootFirmwareVolume
+    ));
+
   PeiStackSize = PcdGet32 (PcdPeiTemporaryRamStackSize);
   if (PeiStackSize == 0) {
     PeiStackSize = (SizeOfRam >> 1);
@@ -202,6 +211,7 @@ SecStartup (
 
   IdtTableInStack.PeiService = 0;
   for (Index = 0; Index < SEC_IDT_ENTRY_COUNT; Index++) {
+    ZeroMem ((VOID *)&IdtTableInStack.IdtTable[Index], sizeof (IA32_IDT_GATE_DESCRIPTOR));
     CopyMem ((VOID *)&IdtTableInStack.IdtTable[Index], (VOID *)&mIdtEntryTemplate, sizeof (UINT64));
   }
 
@@ -228,6 +238,20 @@ SecStartup (
   SecCoreData.PeiTemporaryRamSize    = SizeOfRam - PeiStackSize;
   SecCoreData.StackBase              = (VOID *)(UINTN)(TempRamBase + SecCoreData.PeiTemporaryRamSize);
   SecCoreData.StackSize              = PeiStackSize;
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a() BFV Base: 0x%x, BFV Size: 0x%x, TempRAM Base: 0x%x, TempRAM Size: 0x%x, PeiTempRamBase: 0x%x, PeiTempRamSize: 0x%x, StackBase: 0x%x, StackSize: 0x%x\n",
+    __FUNCTION__,
+    SecCoreData.BootFirmwareVolumeBase,
+    SecCoreData.BootFirmwareVolumeSize,
+    SecCoreData.TemporaryRamBase,
+    SecCoreData.TemporaryRamSize,
+    SecCoreData.PeiTemporaryRamBase,
+    SecCoreData.PeiTemporaryRamSize,
+    SecCoreData.StackBase,
+    SecCoreData.StackSize
+    ));
 
   //
   // Initialize Debug Agent to support source level debug in SEC/PEI phases before memory ready.
@@ -318,6 +342,13 @@ SecStartupPhase2 (
     }
   }
 
+  DEBUG ((
+    DEBUG_INFO,
+    "%a() PeiCoreEntryPoint: 0x%x\n",
+    __FUNCTION__,
+    PeiCoreEntryPoint
+    ));
+
   if (PpiList != NULL) {
     AllSecPpiList = (EFI_PEI_PPI_DESCRIPTOR *)SecCoreData->PeiTemporaryRamBase;
 
@@ -360,6 +391,13 @@ SecStartupPhase2 (
     //
     SecCoreData->PeiTemporaryRamBase  = (VOID *)(((UINTN)SecCoreData->PeiTemporaryRamBase + 7) & ~0x07);
     SecCoreData->PeiTemporaryRamSize &= ~(UINTN)0x07;
+    DEBUG ((
+      DEBUG_INFO,
+      "%a() PeiTemporaryRamBase: 0x%x, PeiTemporaryRamSize: 0x%x\n",
+      __FUNCTION__,
+      SecCoreData->PeiTemporaryRamBase,
+      SecCoreData->PeiTemporaryRamSize
+      ));
   } else {
     //
     // No addition PPI, PpiList directly point to the common PPI list.

@@ -26,7 +26,6 @@
 
 [Sources]
   BaseStackCheckGcc.c  | GCC
-  BaseStackCheckGcc.c  | RVCT
   BaseStackCheckNull.c | MSFT
 
 [Packages]

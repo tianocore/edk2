@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -27,8 +27,6 @@ struc MP_ASSEMBLY_ADDRESS_MAP
   .RelocateApLoopFuncAddress     CTYPE_UINTN 1
   .RelocateApLoopFuncSize        CTYPE_UINTN 1
   .ModeTransitionOffset          CTYPE_UINTN 1
-  .SwitchToRealSize              CTYPE_UINTN 1
-  .SwitchToRealOffset            CTYPE_UINTN 1
   .SwitchToRealNoNxOffset        CTYPE_UINTN 1
   .SwitchToRealPM16ModeOffset    CTYPE_UINTN 1
   .SwitchToRealPM16ModeSize      CTYPE_UINTN 1
@@ -97,5 +95,5 @@ struc MP_CPU_EXCHANGE_INFO
   .ExtTopoAvail:                 CTYPE_BOOLEAN 1
 endstruc
 
-MP_CPU_EXCHANGE_INFO_OFFSET equ (SwitchToRealProcEnd - RendezvousFunnelProcStart)
+MP_CPU_EXCHANGE_INFO_OFFSET equ (Flat32Start - RendezvousFunnelProcStart)
 %define MP_CPU_EXCHANGE_INFO_FIELD(Field) (MP_CPU_EXCHANGE_INFO_OFFSET + MP_CPU_EXCHANGE_INFO. %+ Field)

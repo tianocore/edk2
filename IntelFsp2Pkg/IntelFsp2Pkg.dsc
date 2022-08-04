@@ -68,6 +68,7 @@
   IntelFsp2Pkg/FspSecCore/FspSecCoreT.inf
   IntelFsp2Pkg/FspSecCore/FspSecCoreM.inf
   IntelFsp2Pkg/FspSecCore/FspSecCoreS.inf
+  IntelFsp2Pkg/FspSecCore/FspSecCoreI.inf
   IntelFsp2Pkg/FspSecCore/Fsp22SecCoreS.inf
   IntelFsp2Pkg/FspNotifyPhase/FspNotifyPhasePeim.inf
 

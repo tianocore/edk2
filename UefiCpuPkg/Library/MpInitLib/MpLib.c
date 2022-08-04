@@ -9,11 +9,9 @@
 **/
 
 #include "MpLib.h"
-#include "MpIntelTdx.h"
 #include <Library/VmgExitLib.h>
 #include <Register/Amd/Fam17Msr.h>
 #include <Register/Amd/Ghcb.h>
-#include <ConfidentialComputingGuestAttr.h>
 
 EFI_GUID  mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
 
@@ -851,6 +849,30 @@ WaitApWakeup (
 }
 
 /**
+  Calculate the size of the reset vector.
+
+  @param[in]  AddressMap   The pointer to Address Map structure.
+  @param[out] SizeBelow1Mb Return the size of below 1MB memory for AP reset area.
+  @param[out] SizeAbove1Mb Return the size of abvoe 1MB memory for AP reset area.
+**/
+STATIC
+VOID
+GetApResetVectorSize (
+  IN  MP_ASSEMBLY_ADDRESS_MAP  *AddressMap,
+  OUT UINTN                    *SizeBelow1Mb OPTIONAL,
+  OUT UINTN                    *SizeAbove1Mb OPTIONAL
+  )
+{
+  if (SizeBelow1Mb != NULL) {
+    *SizeBelow1Mb = AddressMap->ModeTransitionOffset + sizeof (MP_CPU_EXCHANGE_INFO);
+  }
+
+  if (SizeAbove1Mb != NULL) {
+    *SizeAbove1Mb = AddressMap->RendezvousFunnelSize - AddressMap->ModeTransitionOffset;
+  }
+}
+
+/**
   This function will fill the exchange info structure.
 
   @param[in] CpuMpData          Pointer to CPU MP Data
@@ -933,26 +955,7 @@ FillExchangeInfoData (
     Size     -= sizeof (IA32_SEGMENT_DESCRIPTOR);
   }
 
-  //
-  // Copy all 32-bit code and 64-bit code into memory with type of
-  // EfiBootServicesCode to avoid page fault if NX memory protection is enabled.
-  //
-  if (CpuMpData->WakeupBufferHigh != 0) {
-    Size = CpuMpData->AddressMap.RendezvousFunnelSize +
-           CpuMpData->AddressMap.SwitchToRealSize -
-           CpuMpData->AddressMap.ModeTransitionOffset;
-    CopyMem (
-      (VOID *)CpuMpData->WakeupBufferHigh,
-      CpuMpData->AddressMap.RendezvousFunnelAddress +
-      CpuMpData->AddressMap.ModeTransitionOffset,
-      Size
-      );
-
-    ExchangeInfo->ModeTransitionMemory = (UINT32)CpuMpData->WakeupBufferHigh;
-  } else {
-    ExchangeInfo->ModeTransitionMemory = (UINT32)
-                                         (ExchangeInfo->BufferStart + CpuMpData->AddressMap.ModeTransitionOffset);
-  }
+  ExchangeInfo->ModeTransitionMemory = (UINT32)CpuMpData->WakeupBufferHigh;
 
   ExchangeInfo->ModeHighMemory = ExchangeInfo->ModeTransitionMemory +
                                  (UINT32)ExchangeInfo->ModeOffset -
@@ -993,8 +996,7 @@ BackupAndPrepareWakeupBuffer (
   CopyMem (
     (VOID *)CpuMpData->WakeupBuffer,
     (VOID *)CpuMpData->AddressMap.RendezvousFunnelAddress,
-    CpuMpData->AddressMap.RendezvousFunnelSize +
-    CpuMpData->AddressMap.SwitchToRealSize
+    CpuMpData->BackupBufferSize - sizeof (MP_CPU_EXCHANGE_INFO)
     );
 }
 
@@ -1016,53 +1018,29 @@ RestoreWakeupBuffer (
 }
 
 /**
-  Calculate the size of the reset vector.
-
-  @param[in]  AddressMap  The pointer to Address Map structure.
-
-  @return                 Total amount of memory required for the AP reset area
-**/
-STATIC
-UINTN
-GetApResetVectorSize (
-  IN MP_ASSEMBLY_ADDRESS_MAP  *AddressMap
-  )
-{
-  UINTN  Size;
-
-  Size = AddressMap->RendezvousFunnelSize +
-         AddressMap->SwitchToRealSize +
-         sizeof (MP_CPU_EXCHANGE_INFO);
-
-  return Size;
-}
-
-/**
   Allocate reset vector buffer.
 
   @param[in, out]  CpuMpData  The pointer to CPU MP Data structure.
 **/
 VOID
-AllocateResetVector (
+AllocateResetVectorBelow1Mb (
   IN OUT CPU_MP_DATA  *CpuMpData
   )
 {
-  UINTN  ApResetVectorSize;
   UINTN  ApResetStackSize;
 
   if (CpuMpData->WakeupBuffer == (UINTN)-1) {
-    ApResetVectorSize = GetApResetVectorSize (&CpuMpData->AddressMap);
-
-    CpuMpData->WakeupBuffer      = GetWakeupBuffer (ApResetVectorSize);
+    CpuMpData->WakeupBuffer      = GetWakeupBuffer (CpuMpData->BackupBufferSize);
     CpuMpData->MpCpuExchangeInfo = (MP_CPU_EXCHANGE_INFO *)(UINTN)
-                                   (CpuMpData->WakeupBuffer +
-                                    CpuMpData->AddressMap.RendezvousFunnelSize +
-                                    CpuMpData->AddressMap.SwitchToRealSize);
-    CpuMpData->WakeupBufferHigh = GetModeTransitionBuffer (
-                                    CpuMpData->AddressMap.RendezvousFunnelSize +
-                                    CpuMpData->AddressMap.SwitchToRealSize -
-                                    CpuMpData->AddressMap.ModeTransitionOffset
-                                    );
+                                   (CpuMpData->WakeupBuffer + CpuMpData->BackupBufferSize - sizeof (MP_CPU_EXCHANGE_INFO));
+    DEBUG ((
+      DEBUG_INFO,
+      "AP Vector: 16-bit = %p/%x, ExchangeInfo = %p/%x\n",
+      CpuMpData->WakeupBuffer,
+      CpuMpData->BackupBufferSize - sizeof (MP_CPU_EXCHANGE_INFO),
+      CpuMpData->MpCpuExchangeInfo,
+      sizeof (MP_CPU_EXCHANGE_INFO)
+      ));
     //
     // The AP reset stack is only used by SEV-ES guests. Do not allocate it
     // if SEV-ES is not enabled. An SEV-SNP guest is also considered
@@ -1161,7 +1139,7 @@ WakeUpAP (
       (CpuMpData->InitFlag   != ApInitDone))
   {
     ResetVectorRequired = TRUE;
-    AllocateResetVector (CpuMpData);
+    AllocateResetVectorBelow1Mb (CpuMpData);
     AllocateSevEsAPMemory (CpuMpData);
     FillExchangeInfoData (CpuMpData);
     SaveLocalApicTimerSetting (CpuMpData);
@@ -1801,13 +1779,10 @@ MpInitLibInitialize (
   UINT8                    ApLoopMode;
   UINT8                    *MonitorBuffer;
   UINTN                    Index;
-  UINTN                    ApResetVectorSize;
+  UINTN                    ApResetVectorSizeBelow1Mb;
+  UINTN                    ApResetVectorSizeAbove1Mb;
   UINTN                    BackupBufferAddr;
   UINTN                    ApIdtBase;
-
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    return EFI_SUCCESS;
-  }
 
   OldCpuMpData = GetCpuMpDataFromGuidedHob ();
   if (OldCpuMpData == NULL) {
@@ -1819,9 +1794,9 @@ MpInitLibInitialize (
   ASSERT (MaxLogicalProcessorNumber != 0);
 
   AsmGetAddressMap (&AddressMap);
-  ApResetVectorSize = GetApResetVectorSize (&AddressMap);
-  ApStackSize       = PcdGet32 (PcdCpuApStackSize);
-  ApLoopMode        = GetApLoopMode (&MonitorFilterSize);
+  GetApResetVectorSize (&AddressMap, &ApResetVectorSizeBelow1Mb, &ApResetVectorSizeAbove1Mb);
+  ApStackSize = PcdGet32 (PcdCpuApStackSize);
+  ApLoopMode  = GetApLoopMode (&MonitorFilterSize);
 
   //
   // Save BSP's Control registers for APs.
@@ -1830,7 +1805,7 @@ MpInitLibInitialize (
 
   BufferSize  = ApStackSize * MaxLogicalProcessorNumber;
   BufferSize += MonitorFilterSize * MaxLogicalProcessorNumber;
-  BufferSize += ApResetVectorSize;
+  BufferSize += ApResetVectorSizeBelow1Mb;
   BufferSize  = ALIGN_VALUE (BufferSize, 8);
   BufferSize += VolatileRegisters.Idtr.Limit + 1;
   BufferSize += sizeof (CPU_MP_DATA);
@@ -1863,12 +1838,12 @@ MpInitLibInitialize (
   //
   MonitorBuffer               = (UINT8 *)(Buffer + ApStackSize * MaxLogicalProcessorNumber);
   BackupBufferAddr            = (UINTN)MonitorBuffer + MonitorFilterSize * MaxLogicalProcessorNumber;
-  ApIdtBase                   = ALIGN_VALUE (BackupBufferAddr + ApResetVectorSize, 8);
+  ApIdtBase                   = ALIGN_VALUE (BackupBufferAddr + ApResetVectorSizeBelow1Mb, 8);
   CpuMpData                   = (CPU_MP_DATA *)(ApIdtBase + VolatileRegisters.Idtr.Limit + 1);
   CpuMpData->Buffer           = Buffer;
   CpuMpData->CpuApStackSize   = ApStackSize;
   CpuMpData->BackupBuffer     = BackupBufferAddr;
-  CpuMpData->BackupBufferSize = ApResetVectorSize;
+  CpuMpData->BackupBufferSize = ApResetVectorSizeBelow1Mb;
   CpuMpData->WakeupBuffer     = (UINTN)-1;
   CpuMpData->CpuCount         = 1;
   CpuMpData->BspNumber        = 0;
@@ -1929,6 +1904,19 @@ MpInitLibInitialize (
     CpuMpData->CpuData[Index].StartupApSignal =
       (UINT32 *)(MonitorBuffer + MonitorFilterSize * Index);
   }
+
+  //
+  // Copy all 32-bit code and 64-bit code into memory with type of
+  // EfiBootServicesCode to avoid page fault if NX memory protection is enabled.
+  //
+  CpuMpData->WakeupBufferHigh = AllocateCodeBuffer (ApResetVectorSizeAbove1Mb);
+  CopyMem (
+    (VOID *)CpuMpData->WakeupBufferHigh,
+    CpuMpData->AddressMap.RendezvousFunnelAddress +
+    CpuMpData->AddressMap.ModeTransitionOffset,
+    ApResetVectorSizeAbove1Mb
+    );
+  DEBUG ((DEBUG_INFO, "AP Vector: non-16-bit = %p/%x\n", CpuMpData->WakeupBufferHigh, ApResetVectorSizeAbove1Mb));
 
   //
   // Enable the local APIC for Virtual Wire Mode.
@@ -2079,10 +2067,6 @@ MpInitLibGetProcessorInfo (
   CPU_INFO_IN_HOB  *CpuInfoInHob;
   UINTN            OriginalProcessorNumber;
 
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    return TdxMpInitLibGetProcessorInfo (ProcessorNumber, ProcessorInfoBuffer, HealthData);
-  }
-
   CpuMpData    = GetCpuMpData ();
   CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
 
@@ -2176,10 +2160,6 @@ SwitchBSPWorker (
   MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
   BOOLEAN                      OldInterruptState;
   BOOLEAN                      OldTimerInterruptState;
-
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    return EFI_UNSUPPORTED;
-  }
 
   //
   // Save and Disable Local APIC timer interrupt
@@ -2321,10 +2301,6 @@ EnableDisableApWorker (
   CPU_MP_DATA  *CpuMpData;
   UINTN        CallerNumber;
 
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    return EFI_UNSUPPORTED;
-  }
-
   CpuMpData = GetCpuMpData ();
 
   //
@@ -2385,11 +2361,6 @@ MpInitLibWhoAmI (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    *ProcessorNumber = 0;
-    return EFI_SUCCESS;
-  }
-
   CpuMpData = GetCpuMpData ();
 
   return GetProcessorNumber (CpuMpData, ProcessorNumber);
@@ -2428,15 +2399,11 @@ MpInitLibGetNumberOfProcessors (
   UINTN        EnabledProcessorNumber;
   UINTN        Index;
 
+  CpuMpData = GetCpuMpData ();
+
   if ((NumberOfProcessors == NULL) && (NumberOfEnabledProcessors == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    return TdxMpInitLibGetNumberOfProcessors (NumberOfProcessors, NumberOfEnabledProcessors);
-  }
-
-  CpuMpData = GetCpuMpData ();
 
   //
   // Check whether caller processor is BSP
@@ -2517,38 +2484,19 @@ StartupAllCPUsWorker (
   BOOLEAN      HasEnabledAp;
   CPU_STATE    ApState;
 
+  CpuMpData = GetCpuMpData ();
+
   if (FailedCpuList != NULL) {
     *FailedCpuList = NULL;
   }
 
-  Status = MpInitLibGetNumberOfProcessors (&ProcessorCount, NULL);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  if ((ProcessorCount == 1) && ExcludeBsp) {
+  if ((CpuMpData->CpuCount == 1) && ExcludeBsp) {
     return EFI_NOT_STARTED;
   }
 
   if (Procedure == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    //
-    // For Td guest ExcludeBsp must be FALSE. Otherwise it will return in above checks.
-    //
-    ASSERT (!ExcludeBsp);
-
-    //
-    // Start BSP.
-    //
-    Procedure (ProcedureArgument);
-
-    return EFI_SUCCESS;
-  }
-
-  CpuMpData = GetCpuMpData ();
 
   //
   // Check whether caller processor is BSP
@@ -2688,13 +2636,6 @@ StartupThisAPWorker (
   CPU_MP_DATA  *CpuMpData;
   CPU_AP_DATA  *CpuData;
   UINTN        CallerNumber;
-
-  //
-  // In Td guest, startup of AP is not supported in current stage.
-  //
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    return EFI_UNSUPPORTED;
-  }
 
   CpuMpData = GetCpuMpData ();
 

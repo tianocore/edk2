@@ -253,8 +253,16 @@ DxeMain (
     VectorInfoList = (EFI_VECTOR_HANDOFF_INFO *)(GET_GUID_HOB_DATA (GuidHob));
   }
 
-  Status = InitializeCpuExceptionHandlersEx (VectorInfoList, NULL);
+  Status = InitializeCpuExceptionHandlers (VectorInfoList);
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Setup Stack Guard
+  //
+  if (PcdGetBool (PcdCpuStackGuard)) {
+    Status = InitializeSeparateExceptionStacks (NULL);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // Initialize Debug Agent to support source level debug in DXE phase

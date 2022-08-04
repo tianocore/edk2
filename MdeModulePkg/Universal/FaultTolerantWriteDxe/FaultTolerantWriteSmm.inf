@@ -52,6 +52,8 @@
   ReportStatusCodeLib
   SmmMemLib
   BaseLib
+  SafeIntLib
+  VariableFlashInfoLib
 
 [Guids]
   #
@@ -73,14 +75,6 @@
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFullFtwServiceEnable    ## CONSUMES
-
-[Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase    ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64  ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize    ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase      ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64    ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize      ## CONSUMES
 
 #
 # gBS->CalculateCrc32() is consumed in EntryPoint.

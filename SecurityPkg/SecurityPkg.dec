@@ -99,6 +99,11 @@
   ## @libraryclass  Provides support to enroll Secure Boot keys.
   #
   SecureBootVariableProvisionLib|Include/Library/SecureBootVariableProvisionLib.h
+
+  ## @libraryclass  Provides support to manage variable 'PK' related protections.
+  #
+  PlatformPKProtectionLib|Include/Library/PlatformPKProtectionLib.h
+
 [Guids]
   ## Security package token space guid.
   # Include/Guid/SecurityPkgTokenSpace.h
@@ -135,6 +140,10 @@
   ## Hob GUID used to pass a TCG_PCR_EVENT_2 from a TPM2 PEIM to a TPM2 DXE Driver.
   ## Include/Guid/TcgEventHob.h
   gTcgEvent2EntryHobGuid             = { 0xd26c221e, 0x2430, 0x4c8a, { 0x91, 0x70, 0x3f, 0xcb, 0x45, 0x0, 0x41, 0x3f }}
+
+  ## Hob GUID used to pass a CC_EVENT from SEC to a CC DXE Driver.
+  ## Include/Guid/CcEventHob.h
+  gCcEventEntryHobGuid               = { 0x20f8fd36, 0x6d00, 0x40fb, { 0xb7, 0x04, 0xd1, 0x2c, 0x15, 0x3c, 0x62, 0xeb }}
 
   ## HOB GUID used to record TPM device error.
   #  Include/Guid/TcgEventHob.h

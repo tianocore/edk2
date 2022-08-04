@@ -106,6 +106,7 @@ StandaloneMmCpuInitialize (
   UINTN                            Index;
   UINTN                            ArraySize;
   VOID                             *HobStart;
+  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK   *MmramRangesHob;
 
   ASSERT (SystemTable != NULL);
   mMmst = SystemTable;
@@ -142,7 +143,7 @@ StandaloneMmCpuInitialize (
 
   // Bail out if the Hoblist could not be found
   if (Index >= mMmst->NumberOfTableEntries) {
-    DEBUG ((DEBUG_INFO, "Hoblist not found - 0x%x\n", Index));
+    DEBUG ((DEBUG_ERROR, "Hoblist not found - 0x%x\n", Index));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -157,7 +158,7 @@ StandaloneMmCpuInitialize (
              (VOID **)&CpuDriverEntryPointDesc
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "ArmTfCpuDriverEpDesc HOB data extraction failed - 0x%x\n", Status));
+    DEBUG ((DEBUG_ERROR, "ArmTfCpuDriverEpDesc HOB data extraction failed - 0x%x\n", Status));
     return Status;
   }
 
@@ -178,7 +179,7 @@ StandaloneMmCpuInitialize (
              (VOID **)&NsCommBufMmramRange
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "NsCommBufMmramRange HOB data extraction failed - 0x%x\n", Status));
+    DEBUG ((DEBUG_ERROR, "NsCommBufMmramRange HOB data extraction failed - 0x%x\n", Status));
     return Status;
   }
 
@@ -187,6 +188,26 @@ StandaloneMmCpuInitialize (
 
   CopyMem (&mNsCommBuffer, NsCommBufMmramRange, sizeof (EFI_MMRAM_DESCRIPTOR));
   DEBUG ((DEBUG_INFO, "mNsCommBuffer: 0x%016lx - 0x%lx\n", mNsCommBuffer.CpuStart, mNsCommBuffer.PhysicalSize));
+
+  Status = GetGuidedHobData (
+             HobStart,
+             &gEfiMmPeiMmramMemoryReserveGuid,
+             (VOID **)&MmramRangesHob
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "MmramRangesHob data extraction failed - 0x%x\n", Status));
+    return Status;
+  }
+
+  //
+  // As CreateHobListFromBootInfo(), the base and size of buffer shared with
+  // privileged Secure world software is in second one.
+  //
+  CopyMem (
+    &mSCommBuffer,
+    &MmramRangesHob->Descriptor[0] + 1,
+    sizeof (EFI_MMRAM_DESCRIPTOR)
+    );
 
   //
   // Extract the MP information from the Hoblist
@@ -197,7 +218,7 @@ StandaloneMmCpuInitialize (
              (VOID **)&MpInformationHobData
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "MpInformationHob extraction failed - 0x%x\n", Status));
+    DEBUG ((DEBUG_ERROR, "MpInformationHob extraction failed - 0x%x\n", Status));
     return Status;
   }
 
@@ -215,7 +236,7 @@ StandaloneMmCpuInitialize (
                     (VOID **)&mMpInformationHobData
                     );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "mMpInformationHobData mem alloc failed - 0x%x\n", Status));
+    DEBUG ((DEBUG_ERROR, "mMpInformationHobData mem alloc failed - 0x%x\n", Status));
     return Status;
   }
 
@@ -251,7 +272,7 @@ StandaloneMmCpuInitialize (
                     (VOID **)&PerCpuGuidedEventContext
                     );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "PerCpuGuidedEventContext mem alloc failed - 0x%x\n", Status));
+    DEBUG ((DEBUG_ERROR, "PerCpuGuidedEventContext mem alloc failed - 0x%x\n", Status));
     return Status;
   }
 

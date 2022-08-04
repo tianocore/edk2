@@ -987,22 +987,43 @@ InitFtwDevice (
   OUT EFI_FTW_DEVICE  **FtwData
   )
 {
-  EFI_FTW_DEVICE  *FtwDevice;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  WorkSpaceAddress;
+  UINT64                Size;
+  UINTN                 FtwWorkingSize;
+  EFI_FTW_DEVICE        *FtwDevice;
+
+  FtwWorkingSize = 0;
+
+  Status = GetVariableFlashFtwWorkingInfo (&WorkSpaceAddress, &Size);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = SafeUint64ToUintn (Size, &FtwWorkingSize);
+  // This driver currently assumes the size will be UINTN so assert the value is safe for now.
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Allocate private data of this driver,
   // Including the FtwWorkSpace[FTW_WORK_SPACE_SIZE].
   //
-  FtwDevice = AllocateZeroPool (sizeof (EFI_FTW_DEVICE) + PcdGet32 (PcdFlashNvStorageFtwWorkingSize));
+  FtwDevice = AllocateZeroPool (sizeof (EFI_FTW_DEVICE) + FtwWorkingSize);
   if (FtwDevice == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
+  FtwDevice->WorkSpaceAddress = WorkSpaceAddress;
+  FtwDevice->WorkSpaceLength  = FtwWorkingSize;
+
+  Status = GetVariableFlashFtwSpareInfo (&FtwDevice->SpareAreaAddress, &Size);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = SafeUint64ToUintn (Size, &FtwDevice->SpareAreaLength);
+  // This driver currently assumes the size will be UINTN so assert the value is safe for now.
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Initialize other parameters, and set WorkSpace as FTW_ERASED_BYTE.
   //
-  FtwDevice->WorkSpaceLength = (UINTN)PcdGet32 (PcdFlashNvStorageFtwWorkingSize);
-  FtwDevice->SpareAreaLength = (UINTN)PcdGet32 (PcdFlashNvStorageFtwSpareSize);
   if ((FtwDevice->WorkSpaceLength == 0) || (FtwDevice->SpareAreaLength == 0)) {
     DEBUG ((DEBUG_ERROR, "Ftw: Workspace or Spare block does not exist!\n"));
     FreePool (FtwDevice);
@@ -1014,16 +1035,6 @@ InitFtwDevice (
   FtwDevice->FtwBackupFvb    = NULL;
   FtwDevice->FtwWorkSpaceLba = (EFI_LBA)(-1);
   FtwDevice->FtwSpareLba     = (EFI_LBA)(-1);
-
-  FtwDevice->WorkSpaceAddress = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdFlashNvStorageFtwWorkingBase64);
-  if (FtwDevice->WorkSpaceAddress == 0) {
-    FtwDevice->WorkSpaceAddress = (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdFlashNvStorageFtwWorkingBase);
-  }
-
-  FtwDevice->SpareAreaAddress = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdFlashNvStorageFtwSpareBase64);
-  if (FtwDevice->SpareAreaAddress == 0) {
-    FtwDevice->SpareAreaAddress = (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdFlashNvStorageFtwSpareBase);
-  }
 
   *FtwData = FtwDevice;
   return EFI_SUCCESS;
@@ -1277,7 +1288,7 @@ InitFtwProtocol (
   FtwDevice->FtwLastWriteHeader = NULL;
   FtwDevice->FtwLastWriteRecord = NULL;
 
-  InitializeLocalWorkSpaceHeader ();
+  InitializeLocalWorkSpaceHeader (FtwDevice->WorkSpaceLength);
 
   //
   // Refresh the working space data from working block

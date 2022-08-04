@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _STATUS_CODE_DATA_TYPE_DEBUG_H_
 #define _STATUS_CODE_DATA_TYPE_DEBUG_H_
 
+#include <Pi/PiStatusCode.h>
+
 ///
 /// The Global ID used to identify a structure of type EFI_DEBUG_INFO.
 ///
@@ -21,7 +23,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// The maximum size of an EFI_DEBUG_INFO structure.
 ///
-#define EFI_STATUS_CODE_DATA_MAX_SIZE  200
+#define EFI_STATUS_CODE_DATA_MAX_SIZE  0x200
+
+///
+/// Define the maximum extended data size that is supported when a
+/// status code is reported.
+///
+#define MAX_EXTENDED_DATA_SIZE  (EFI_STATUS_CODE_DATA_MAX_SIZE + sizeof(EFI_STATUS_CODE_DATA))
 
 ///
 /// This structure contains the ErrorLevel passed into the DEBUG() macro, followed

@@ -1,11 +1,16 @@
 /** @file
   IORT table parser
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2022, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
-    - IO Remapping Table, Platform Design Document, Revision D, March 2018
+    - IO Remapping Table, Platform Design Document, Revision E.d, Feb 2022
+      (https://developer.arm.com/documentation/den0049/)
+
+  @par Glossary:
+    - Ref  - Reference
+    - Desc - Descriptor
 **/
 
 #include <IndustryStandard/IoRemappingTable.h>
@@ -23,6 +28,7 @@ STATIC CONST UINT32  *IortNodeOffset;
 
 STATIC CONST UINT8   *IortNodeType;
 STATIC CONST UINT16  *IortNodeLength;
+STATIC CONST UINT8   *IortNodeRevision;
 STATIC CONST UINT32  *IortIdMappingCount;
 STATIC CONST UINT32  *IortIdMappingOffset;
 
@@ -32,6 +38,9 @@ STATIC CONST UINT32  *PmuInterruptCount;
 STATIC CONST UINT32  *PmuInterruptOffset;
 
 STATIC CONST UINT32  *ItsCount;
+
+STATIC CONST UINT32  *RmrMemDescCount;
+STATIC CONST UINT32  *RmrMemDescOffset;
 
 /**
   This function validates the ID Mapping array count for the ITS node.
@@ -98,6 +107,52 @@ ValidateItsIdArrayReference (
 }
 
 /**
+  This function validates that the Physical Range address or length is not zero
+  and is 64K aligned.
+
+  @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Context Pointer to context specific information e.g. this
+                      could be a pointer to the ACPI table header.
+**/
+STATIC
+VOID
+EFIAPI
+ValidatePhysicalRange (
+  IN UINT8  *Ptr,
+  IN VOID   *Context
+  )
+{
+  UINT64  Value;
+
+  Value = *(UINT64 *)Ptr;
+  if ((Value == 0) || ((Value & (SIZE_64KB - 1)) != 0)) {
+    IncrementErrorCount ();
+    Print (L"\nERROR: Physical Range must be 64K aligned and cannot be zero.");
+  }
+}
+
+/**
+  This function validates that the RMR memory range descriptor count.
+
+  @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Context Pointer to context specific information e.g. this
+                      could be a pointer to the ACPI table header.
+**/
+STATIC
+VOID
+EFIAPI
+ValidateRmrMemDescCount (
+  IN UINT8  *Ptr,
+  IN VOID   *Context
+  )
+{
+  if (*(UINT32 *)Ptr == 0) {
+    IncrementErrorCount ();
+    Print (L"\nERROR: Memory Range Descriptor count must be >=1.");
+  }
+}
+
+/**
   Helper Macro for populating the IORT Node header in the ACPI_PARSER array.
 
   @param [out] ValidateIdMappingCount    Optional pointer to a function for
@@ -105,15 +160,15 @@ ValidateItsIdArrayReference (
   @param [out] ValidateIdArrayReference  Optional pointer to a function for
                                          validating the ID Array reference.
 **/
-#define PARSE_IORT_NODE_HEADER(ValidateIdMappingCount,                   \
-                               ValidateIdArrayReference)                 \
-  { L"Type", 1, 0, L"%d", NULL, (VOID**)&IortNodeType, NULL, NULL },     \
-  { L"Length", 2, 1, L"%d", NULL, (VOID**)&IortNodeLength, NULL, NULL }, \
-  { L"Revision", 1, 3, L"%d", NULL, NULL, NULL, NULL },                  \
-  { L"Reserved", 4, 4, L"0x%x", NULL, NULL, NULL, NULL },                \
-  { L"Number of ID mappings", 4, 8, L"%d", NULL,                         \
-    (VOID**)&IortIdMappingCount, ValidateIdMappingCount, NULL },         \
-  { L"Reference to ID Array", 4, 12, L"0x%x", NULL,                      \
+#define PARSE_IORT_NODE_HEADER(ValidateIdMappingCount,                        \
+                               ValidateIdArrayReference)                      \
+  { L"Type", 1, 0, L"%d", NULL, (VOID**)&IortNodeType, NULL, NULL },          \
+  { L"Length", 2, 1, L"%d", NULL, (VOID**)&IortNodeLength, NULL, NULL },      \
+  { L"Revision", 1, 3, L"%d", NULL, (VOID**)&IortNodeRevision, NULL, NULL },  \
+  { L"Identifier", 4, 4, L"0x%x", NULL, NULL, NULL, NULL },                   \
+  { L"Number of ID mappings", 4, 8, L"%d", NULL,                              \
+    (VOID**)&IortIdMappingCount, ValidateIdMappingCount, NULL },              \
+  { L"Reference to ID Array", 4, 12, L"0x%x", NULL,                           \
     (VOID**)&IortIdMappingOffset, ValidateIdArrayReference, NULL }
 
 /**
@@ -144,15 +199,15 @@ STATIC CONST ACPI_PARSER  IortNodeSmmuV1V2Parser[] = {
   { L"Span",                          8,    24,  L"0x%lx", NULL, NULL, NULL, NULL },
   { L"Model",                         4,    32,  L"%d",    NULL, NULL, NULL, NULL },
   { L"Flags",                         4,    36,  L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"Reference to Global Interrupt Array",4,    40,  L"0x%x",  NULL, NULL, NULL,
+  { L"Global Interrupt Array Ref",    4,    40,  L"0x%x",  NULL, NULL, NULL,
     NULL },
   { L"Number of context interrupts",  4,    44,  L"%d",    NULL,
     (VOID **)&InterruptContextCount,  NULL, NULL },
-  { L"Reference to Context Interrupt Array",4,    48,  L"0x%x",  NULL,
+  { L"Context Interrupt Array Ref",   4,    48,  L"0x%x",  NULL,
     (VOID **)&InterruptContextOffset, NULL, NULL },
   { L"Number of PMU Interrupts",      4,    52,  L"%d",    NULL,
     (VOID **)&PmuInterruptCount,      NULL, NULL },
-  { L"Reference to PMU Interrupt Array",4,    56,  L"0x%x",  NULL,
+  { L"PMU Interrupt Array Ref",       4,    56,  L"0x%x",  NULL,
     (VOID **)&PmuInterruptOffset,     NULL, NULL },
 
   // Interrupt Array
@@ -232,11 +287,13 @@ STATIC CONST ACPI_PARSER  IortNodeNamedComponentParser[] = {
 **/
 STATIC CONST ACPI_PARSER  IortNodeRootComplexParser[] = {
   PARSE_IORT_NODE_HEADER (NULL, NULL),
-  { L"Memory access properties",8,    16,  L"0x%lx",    NULL,       NULL, NULL, NULL },
-  { L"ATS Attribute",           4,    24,  L"0x%x",     NULL,       NULL, NULL, NULL },
-  { L"PCI Segment number",      4,    28,  L"0x%x",     NULL,       NULL, NULL, NULL },
-  { L"Memory access size limit",1,    32,  L"0x%x",     NULL,       NULL, NULL, NULL },
-  { L"Reserved",                3,    33,  L"%x %x %x", Dump3Chars, NULL, NULL, NULL }
+  { L"Memory access properties",8,    16,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"ATS Attribute",           4,    24,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"PCI Segment number",      4,    28,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Memory access size limit",1,    32,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"PASID capabilities",      2,    33,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Reserved",                1,    35,  L"%x",    NULL, NULL, NULL, NULL },
+  { L"Flags",                   4,    36,  L"0x%x",  NULL, NULL, NULL, NULL },
 };
 
 /**
@@ -248,6 +305,29 @@ STATIC CONST ACPI_PARSER  IortNodePmcgParser[] = {
   { L"Overflow interrupt GSIV",                       4,    24,  L"0x%x",  NULL, NULL, NULL, NULL },
   { L"Node reference",                                4,    28,  L"0x%x",  NULL, NULL, NULL, NULL },
   { L"Page 1 Base Address",                           8,    32,  L"0x%lx", NULL, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the IORT RMR node.
+**/
+STATIC CONST ACPI_PARSER  IortNodeRmrParser[] = {
+  PARSE_IORT_NODE_HEADER (NULL, NULL),
+  { L"Flags",                   4,                      16,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Memory Range Desc count", 4,                      20,  L"%d",   NULL,
+    (VOID **)&RmrMemDescCount,  ValidateRmrMemDescCount,NULL },
+  { L"Memory Range Desc Ref",   4,                      24,  L"0x%x", NULL,
+    (VOID **)&RmrMemDescOffset, NULL,                   NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the IORT RMR Memory Range Descriptor.
+**/
+STATIC CONST ACPI_PARSER  IortNodeRmrMemRangeDescParser[] = {
+  { L"Physical Range offset", 8, 0,  L"0x%lx", NULL, NULL, ValidatePhysicalRange,
+    NULL },
+  { L"Physical Range length", 8, 8,  L"0x%lx", NULL, NULL, ValidatePhysicalRange,
+    NULL },
+  { L"Reserved",              4, 16, L"0x%x",  NULL, NULL, NULL,                 NULL}
 };
 
 /**
@@ -605,8 +685,101 @@ DumpIortNodePmcg (
 }
 
 /**
+  This function parses the IORT RMR Node Memory Range Descriptor array.
+
+  @param [in] Ptr         Pointer to the start of the Memory Range Descriptor
+                          array.
+  @param [in] Length      Length of the buffer.
+  @param [in] DescCount   Memory Range Descriptor count.
+**/
+STATIC
+VOID
+DumpIortNodeRmrMemRangeDesc (
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN UINT32  DescCount
+  )
+{
+  UINT32  Index;
+  UINT32  Offset;
+  CHAR8   Buffer[40]; // Used for AsciiName param of ParseAcpi
+
+  Index  = 0;
+  Offset = 0;
+
+  while ((Index < DescCount) &&
+         (Offset < Length))
+  {
+    AsciiSPrint (
+      Buffer,
+      sizeof (Buffer),
+      "Mem range Descriptor [%d]",
+      Index
+      );
+    Offset += ParseAcpi (
+                TRUE,
+                4,
+                Buffer,
+                Ptr + Offset,
+                Length - Offset,
+                PARSER_PARAMS (IortNodeRmrMemRangeDescParser)
+                );
+    Index++;
+  }
+}
+
+/**
+  This function parses the IORT RMR node.
+
+  @param [in] Ptr            Pointer to the start of the buffer.
+  @param [in] Length         Length of the buffer.
+  @param [in] MappingCount   The ID Mapping count.
+  @param [in] MappingOffset  The offset of the ID Mapping array
+                             from the start of the IORT table.
+**/
+STATIC
+VOID
+DumpIortNodeRmr (
+  IN UINT8   *Ptr,
+  IN UINT16  Length,
+  IN UINT32  MappingCount,
+  IN UINT32  MappingOffset
+  )
+{
+  ParseAcpi (
+    TRUE,
+    2,
+    "RMR Node",
+    Ptr,
+    Length,
+    PARSER_PARAMS (IortNodeRmrParser)
+    );
+
+  if (*IortNodeRevision == EFI_ACPI_IORT_RMR_NODE_REVISION_02) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: RMR node Rev 2 (defined in IORT Rev E.c) must not be used."
+      L" IORT tabe Revision E.c is deprecated and must not be used.\n"
+      );
+  }
+
+  DumpIortNodeIdMappings (
+    Ptr + MappingOffset,
+    Length - MappingOffset,
+    MappingCount
+    );
+
+  DumpIortNodeRmrMemRangeDesc (
+    Ptr + (*RmrMemDescOffset),
+    Length - (*RmrMemDescOffset),
+    *RmrMemDescCount
+    );
+}
+
+/**
   This function parses the ACPI IORT table.
-  When trace is enabled this function parses the IORT table and traces the ACPI fields.
+  When trace is enabled this function parses the IORT table and traces the ACPI
+  fields.
 
   This function also parses the following nodes:
     - ITS Group
@@ -615,6 +788,7 @@ DumpIortNodePmcg (
     - SMMUv1/2
     - SMMUv3
     - PMCG
+    - RMR
 
   This function also performs validation of the ACPI table fields.
 
@@ -637,6 +811,22 @@ ParseAcpiIort (
   UINT8   *NodePtr;
 
   if (!Trace) {
+    return;
+  }
+
+  if ((AcpiTableRevision > EFI_ACPI_IO_REMAPPING_TABLE_REVISION_00) &&
+      (AcpiTableRevision < EFI_ACPI_IO_REMAPPING_TABLE_REVISION_05))
+  {
+    Print (
+      L"ERROR: Parsing not supported for IORT tabe Revision E, E.<a,b,c>.\n"
+      );
+    if (AcpiTableRevision == EFI_ACPI_IO_REMAPPING_TABLE_REVISION_04) {
+      IncrementErrorCount ();
+      Print (
+        L"ERROR: IORT tabe Revision E.c is deprecated and must not be used.\n"
+        );
+    }
+
     return;
   }
 
@@ -762,7 +952,14 @@ ParseAcpiIort (
           *IortIdMappingOffset
           );
         break;
-
+      case EFI_ACPI_IORT_TYPE_RMR:
+        DumpIortNodeRmr (
+          NodePtr,
+          *IortNodeLength,
+          *IortIdMappingCount,
+          *IortIdMappingOffset
+          );
+        break;
       default:
         IncrementErrorCount ();
         Print (L"ERROR: Unsupported IORT Node type = %d\n", *IortNodeType);

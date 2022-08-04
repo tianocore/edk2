@@ -32,7 +32,7 @@ import tempfile
 ## Mapping Makefile type
 gMakeTypeMap = {TAB_COMPILER_MSFT:"nmake", "GCC":"gmake"}
 #
-# Regular expression for finding Include Directories, the difference between MSFT and INTEL/GCC/RVCT
+# Regular expression for finding Include Directories, the difference between MSFT and INTEL/GCC
 # is the former use /I , the Latter used -I to specify include directories
 #
 gBuildOptIncludePatternMsft = re.compile(r"(?:.*?)/I[ \t]*([^ ]*)", re.MULTILINE | re.DOTALL)
@@ -684,12 +684,12 @@ class ModuleAutoGen(AutoGen):
     @cached_property
     def BuildOptionIncPathList(self):
         #
-        # Regular expression for finding Include Directories, the difference between MSFT and INTEL/GCC/RVCT
+        # Regular expression for finding Include Directories, the difference between MSFT and INTEL/GCC
         # is the former use /I , the Latter used -I to specify include directories
         #
         if self.PlatformInfo.ToolChainFamily in (TAB_COMPILER_MSFT):
             BuildOptIncludeRegEx = gBuildOptIncludePatternMsft
-        elif self.PlatformInfo.ToolChainFamily in ('INTEL', 'GCC', 'RVCT'):
+        elif self.PlatformInfo.ToolChainFamily in ('INTEL', 'GCC'):
             BuildOptIncludeRegEx = gBuildOptIncludePatternOther
         else:
             #
@@ -704,16 +704,7 @@ class ModuleAutoGen(AutoGen):
             except KeyError:
                 FlagOption = ''
 
-            if self.ToolChainFamily != 'RVCT':
-                IncPathList = [NormPath(Path, self.Macros) for Path in BuildOptIncludeRegEx.findall(FlagOption)]
-            else:
-                #
-                # RVCT may specify a list of directory seperated by commas
-                #
-                IncPathList = []
-                for Path in BuildOptIncludeRegEx.findall(FlagOption):
-                    PathList = GetSplitList(Path, TAB_COMMA_SPLIT)
-                    IncPathList.extend(NormPath(PathEntry, self.Macros) for PathEntry in PathList)
+            IncPathList = [NormPath(Path, self.Macros) for Path in BuildOptIncludeRegEx.findall(FlagOption)]
 
             #
             # EDK II modules must not reference header files outside of the packages they depend on or

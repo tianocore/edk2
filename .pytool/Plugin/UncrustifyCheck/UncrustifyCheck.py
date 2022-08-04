@@ -290,7 +290,7 @@ class UncrustifyCheck(ICiBuildPlugin):
         # This information is only used for reporting (not used here) and
         # the ignore lines are being passed directly as they are given to
         # this plugin.
-        return parse_gitignore_lines(ignored_files, "Package configuration file", self._abs_workspace_path)
+        return parse_gitignore_lines(ignored_files, "Package configuration file", self._abs_package_path)
 
     def _get_git_ignored_paths(self) -> List[str]:
         """"

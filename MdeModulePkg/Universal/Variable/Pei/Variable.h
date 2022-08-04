@@ -20,6 +20,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/SafeIntLib.h>
+#include <Library/VariableFlashInfoLib.h>
 
 #include <Guid/VariableFormat.h>
 #include <Guid/VariableIndexTable.h>
