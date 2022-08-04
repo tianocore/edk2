@@ -2107,6 +2107,8 @@ BuildIortTable (
   ASSERT (AcpiTableInfo->TableGeneratorId == This->GeneratorID);
   ASSERT (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature);
 
+  RmrNodeCount = 0;
+
   if ((AcpiTableInfo->AcpiTableRevision < This->MinAcpiTableRevision) ||
       (AcpiTableInfo->AcpiTableRevision > This->AcpiTableRevision))
   {
@@ -2714,7 +2716,10 @@ BuildIortTable (
     }
   }
 
-  if (RmrNodeCount > 0) {
+  if ((AcpiTableInfo->AcpiTableRevision >=
+       EFI_ACPI_IO_REMAPPING_TABLE_REVISION_05) &&
+      (RmrNodeCount > 0))
+  {
     Status = AddRmrNodes (
                This,
                CfgMgrProtocol,
