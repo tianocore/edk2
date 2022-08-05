@@ -526,6 +526,10 @@ SmmCommunicationCommunicate (
   CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)CommBuffer;
 
   if (CommSize == NULL) {
+    if (CommunicateHeader->MessageLength > MAX_UINTN - OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     TempCommSize = OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
   } else {
     TempCommSize = *CommSize;

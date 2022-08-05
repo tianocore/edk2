@@ -622,6 +622,14 @@ InternalIsBufferOverlapped (
   )
 {
   //
+  // If integer overflow when adding Buff1 to Size1, treat it as Overlap.
+  // Also, if integer overflow when adding Buff2 to Size2, treat it as Overlap.
+  //
+  if (((UINTN)Buff1 > MAX_UINTN - Size1) || ((UINTN)Buff2 > MAX_UINTN - Size2)) {
+    return TRUE;
+  }
+
+  //
   // If buff1's end is less than the start of buff2, then it's ok.
   // Also, if buff1's start is beyond buff2's end, then it's ok.
   //
@@ -703,7 +711,7 @@ SmmEntryPoint (
         //
         // If CommunicationBuffer is not in valid address scope,
         // or there is overlap between gSmmCorePrivate and CommunicationBuffer,
-        // return EFI_INVALID_PARAMETER
+        // return EFI_ACCESS_DENIED
         //
         gSmmCorePrivate->CommunicationBuffer = NULL;
         gSmmCorePrivate->ReturnStatus        = EFI_ACCESS_DENIED;
