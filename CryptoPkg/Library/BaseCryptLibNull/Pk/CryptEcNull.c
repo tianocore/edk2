@@ -472,6 +472,7 @@ EcGetPubKey (
   @param[in, out]  EcContext          Pointer to the EC context.
   @param[in]       PeerPublic         Pointer to the peer's public X,Y.
   @param[in]       PeerPublicSize     Size of peer's public X,Y in bytes.
+  @param[in]       CompressFlag       Flag of which Y used, set it to NULL if not compressed.
   @param[out]      Key                Pointer to the buffer to receive generated key.
   @param[in, out]  KeySize            On input, the size of Key buffer in bytes.
                                       On output, the size of data returned in Key buffer in bytes.

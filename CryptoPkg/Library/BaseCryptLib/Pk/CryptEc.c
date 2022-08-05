@@ -27,8 +27,8 @@
 STATIC
 INT32
 CryptoNidToOpensslNid (
-  IN UINTN CryptoNid
-)
+  IN UINTN  CryptoNid
+  )
 {
   INT32  Nid;
 
@@ -102,7 +102,7 @@ EcGroupGetCurve (
   IN VOID        *BnCtx
   )
 {
-  return (BOOLEAN) EC_GROUP_get_curve (EcGroup, BnPrime, BnA, BnB, BnCtx);
+  return (BOOLEAN)EC_GROUP_get_curve (EcGroup, BnPrime, BnA, BnB, BnCtx);
 }
 
 /**
@@ -124,7 +124,7 @@ EcGroupGetOrder (
   OUT VOID  *BnOrder
   )
 {
-  return (BOOLEAN) EC_GROUP_get_order (EcGroup, BnOrder, NULL);
+  return (BOOLEAN)EC_GROUP_get_order (EcGroup, BnOrder, NULL);
 }
 
 /**
@@ -204,7 +204,7 @@ EcPointGetAffineCoordinates (
   IN VOID        *BnCtx
   )
 {
-  return (BOOLEAN) EC_POINT_get_affine_coordinates (EcGroup, EcPoint, BnX, BnY, BnCtx);
+  return (BOOLEAN)EC_POINT_get_affine_coordinates (EcGroup, EcPoint, BnX, BnY, BnCtx);
 }
 
 /**
@@ -229,7 +229,7 @@ EcPointSetAffineCoordinates (
   IN VOID        *BnCtx
   )
 {
-  return (BOOLEAN) EC_POINT_set_affine_coordinates (EcGroup, EcPoint, BnX, BnY, BnCtx);
+  return (BOOLEAN)EC_POINT_set_affine_coordinates (EcGroup, EcPoint, BnX, BnY, BnCtx);
 }
 
 /**
@@ -255,7 +255,7 @@ EcPointAdd (
   IN VOID        *BnCtx
   )
 {
-  return (BOOLEAN) EC_POINT_add (EcGroup, EcPointResult, EcPointA, EcPointB, BnCtx);
+  return (BOOLEAN)EC_POINT_add (EcGroup, EcPointResult, EcPointA, EcPointB, BnCtx);
 }
 
 /**
@@ -281,7 +281,7 @@ EcPointMul (
   IN VOID        *BnCtx
   )
 {
-  return (BOOLEAN) EC_POINT_mul (EcGroup, EcPointResult, NULL, EcPoint, BnPScalar, BnCtx);
+  return (BOOLEAN)EC_POINT_mul (EcGroup, EcPointResult, NULL, EcPoint, BnPScalar, BnCtx);
 }
 
 /**
@@ -302,7 +302,7 @@ EcPointInvert (
   IN VOID        *BnCtx
   )
 {
-  return (BOOLEAN) EC_POINT_invert (EcGroup, EcPoint, BnCtx);
+  return (BOOLEAN)EC_POINT_invert (EcGroup, EcPoint, BnCtx);
 }
 
 /**
@@ -395,7 +395,7 @@ EcPointSetCompressedCoordinates (
   IN VOID        *BnCtx
   )
 {
-  return (BOOLEAN) EC_POINT_set_compressed_coordinates (EcGroup, EcPoint, BnX, YBit, BnCtx);
+  return (BOOLEAN)EC_POINT_set_compressed_coordinates (EcGroup, EcPoint, BnX, YBit, BnCtx);
 }
 
 // =====================================================================================
@@ -417,30 +417,30 @@ EcNewByNid (
   IN UINTN  Nid
   )
 {
-  EC_KEY   *EcKey;
-  EC_GROUP *Group;
-  INT32    OpenSslNid;
+  EC_KEY    *EcKey;
+  EC_GROUP  *Group;
+  INT32     OpenSslNid;
 
   OpenSslNid = CryptoNidToOpensslNid (Nid);
   if (OpenSslNid < 0) {
     return NULL;
   }
 
-  EcKey = EC_KEY_new();
-  Group = EC_GROUP_new_by_curve_name(OpenSslNid);
-  if (EcKey == NULL || Group == NULL) {
+  EcKey = EC_KEY_new ();
+  Group = EC_GROUP_new_by_curve_name (OpenSslNid);
+  if ((EcKey == NULL) || (Group == NULL)) {
     goto fail;
   }
 
-  if (EC_KEY_set_group(EcKey, Group) != 1) {
+  if (EC_KEY_set_group (EcKey, Group) != 1) {
     goto fail;
   }
 
-  EC_GROUP_free(Group);
+  EC_GROUP_free (Group);
   return (VOID *)EcKey;
 
 fail:
-  EC_GROUP_free(Group);
+  EC_GROUP_free (Group);
   EC_KEY_free (EcKey);
   return NULL;
 }
@@ -456,7 +456,7 @@ EcFree (
   IN  VOID  *EcContext
   )
 {
-  EC_KEY_free ((EC_KEY *) EcContext);
+  EC_KEY_free ((EC_KEY *)EcContext);
 }
 
 /**
@@ -493,26 +493,26 @@ EcGenerateKey (
   IN OUT  UINTN  *PublicKeySize
   )
 {
-  EC_KEY         *EcKey;
-  CONST EC_GROUP *Group;
-  CONST EC_POINT *EcPoint;
-  BOOLEAN        RetVal;
-  BIGNUM         *BnX;
-  BIGNUM         *BnY;
-  UINTN          HalfSize;
-  INTN           XSize;
-  INTN           YSize;
+  EC_KEY          *EcKey;
+  CONST EC_GROUP  *Group;
+  CONST EC_POINT  *EcPoint;
+  BOOLEAN         RetVal;
+  BIGNUM          *BnX;
+  BIGNUM          *BnY;
+  UINTN           HalfSize;
+  INTN            XSize;
+  INTN            YSize;
 
-  if (EcContext == NULL || PublicKeySize == NULL) {
+  if ((EcContext == NULL) || (PublicKeySize == NULL)) {
     return FALSE;
   }
 
-  if (PublicKey == NULL && *PublicKeySize != 0) {
+  if ((PublicKey == NULL) && (*PublicKeySize != 0)) {
     return FALSE;
   }
 
-  EcKey = (EC_KEY *)EcContext;
-  Group = EC_KEY_get0_group (EcKey);
+  EcKey    = (EC_KEY *)EcContext;
+  Group    = EC_KEY_get0_group (EcKey);
   HalfSize = (EC_GROUP_get_degree (Group) + 7) / 8;
 
   // Assume RAND_seed was called
@@ -524,6 +524,7 @@ EcGenerateKey (
     *PublicKeySize = HalfSize * 2;
     return FALSE;
   }
+
   *PublicKeySize = HalfSize * 2;
 
   EcPoint = EC_KEY_get0_public_key (EcKey);
@@ -532,9 +533,9 @@ EcGenerateKey (
   }
 
   RetVal = FALSE;
-  BnX = BN_new();
-  BnY = BN_new();
-  if (BnX == NULL || BnY == NULL) {
+  BnX    = BN_new ();
+  BnY    = BN_new ();
+  if ((BnX == NULL) || (BnY == NULL)) {
     goto fail;
   }
 
@@ -544,9 +545,10 @@ EcGenerateKey (
 
   XSize = BN_num_bytes (BnX);
   YSize = BN_num_bytes (BnY);
-  if (XSize <= 0 || YSize <= 0) {
+  if ((XSize <= 0) || (YSize <= 0)) {
     goto fail;
   }
+
   ASSERT ((UINTN)XSize <= HalfSize && (UINTN)YSize <= HalfSize);
 
   ZeroMem (PublicKey, *PublicKeySize);
@@ -583,31 +585,32 @@ EcGetPubKey (
   IN OUT  UINTN  *PublicKeySize
   )
 {
-  EC_KEY         *EcKey;
-  CONST EC_GROUP *Group;
-  CONST EC_POINT *EcPoint;
-  BIGNUM         *BnX;
-  BIGNUM         *BnY;
-  UINTN          HalfSize;
-  INTN           XSize;
-  INTN           YSize;
-  BOOLEAN        RetVal;
+  EC_KEY          *EcKey;
+  CONST EC_GROUP  *Group;
+  CONST EC_POINT  *EcPoint;
+  BIGNUM          *BnX;
+  BIGNUM          *BnY;
+  UINTN           HalfSize;
+  INTN            XSize;
+  INTN            YSize;
+  BOOLEAN         RetVal;
 
-  if (EcContext == NULL || PublicKeySize == NULL) {
+  if ((EcContext == NULL) || (PublicKeySize == NULL)) {
     return FALSE;
   }
 
-  if (PublicKey == NULL && *PublicKeySize != 0) {
+  if ((PublicKey == NULL) && (*PublicKeySize != 0)) {
     return FALSE;
   }
 
-  EcKey = (EC_KEY *)EcContext;
-  Group = EC_KEY_get0_group (EcKey);
+  EcKey    = (EC_KEY *)EcContext;
+  Group    = EC_KEY_get0_group (EcKey);
   HalfSize = (EC_GROUP_get_degree (Group) + 7) / 8;
   if (*PublicKeySize < HalfSize * 2) {
     *PublicKeySize = HalfSize * 2;
     return FALSE;
   }
+
   *PublicKeySize = HalfSize * 2;
 
   EcPoint = EC_KEY_get0_public_key (EcKey);
@@ -616,9 +619,9 @@ EcGetPubKey (
   }
 
   RetVal = FALSE;
-  BnX = BN_new();
-  BnY = BN_new();
-  if (BnX == NULL || BnY == NULL) {
+  BnX    = BN_new ();
+  BnY    = BN_new ();
+  if ((BnX == NULL) || (BnY == NULL)) {
     goto fail;
   }
 
@@ -628,9 +631,10 @@ EcGetPubKey (
 
   XSize = BN_num_bytes (BnX);
   YSize = BN_num_bytes (BnY);
-  if (XSize <= 0 || YSize <= 0) {
+  if ((XSize <= 0) || (YSize <= 0)) {
     goto fail;
   }
+
   ASSERT ((UINTN)XSize <= HalfSize && (UINTN)YSize <= HalfSize);
 
   if (PublicKey != NULL) {
@@ -665,7 +669,7 @@ fail:
   @param[in, out]  EcContext          Pointer to the EC context.
   @param[in]       PeerPublic         Pointer to the peer's public X,Y.
   @param[in]       PeerPublicSize     Size of peer's public X,Y in bytes.
-  @param[in]       CompressFlag       Flag of key is compressed or not.
+  @param[in]       CompressFlag       Flag of which Y used, set it to NULL if not compressed.
   @param[out]      Key                Pointer to the buffer to receive generated key.
   @param[in, out]  KeySize            On input, the size of Key buffer in bytes.
                                       On output, the size of data returned in Key buffer in bytes.
@@ -684,21 +688,21 @@ EcDhComputeKey (
   IN OUT  UINTN        *KeySize
   )
 {
-  EC_KEY         *EcKey;
-  EC_KEY         *PeerEcKey;
-  CONST EC_GROUP *Group;
-  BOOLEAN        RetVal;
-  BIGNUM         *BnX;
-  BIGNUM         *BnY;
-  EC_POINT       *Point;
-  INT32          OpenSslNid;
-  UINTN          HalfSize;
+  EC_KEY          *EcKey;
+  EC_KEY          *PeerEcKey;
+  CONST EC_GROUP  *Group;
+  BOOLEAN         RetVal;
+  BIGNUM          *BnX;
+  BIGNUM          *BnY;
+  EC_POINT        *Point;
+  INT32           OpenSslNid;
+  UINTN           HalfSize;
 
-  if (EcContext == NULL || PeerPublic == NULL || KeySize == NULL) {
+  if ((EcContext == NULL) || (PeerPublic == NULL) || (KeySize == NULL)) {
     return FALSE;
   }
 
-  if (Key == NULL && *KeySize != 0) {
+  if ((Key == NULL) && (*KeySize != 0)) {
     return FALSE;
   }
 
@@ -706,35 +710,39 @@ EcDhComputeKey (
     return FALSE;
   }
 
-  EcKey = (EC_KEY *) EcContext;
-  Group = EC_KEY_get0_group (EcKey);
+  EcKey    = (EC_KEY *)EcContext;
+  Group    = EC_KEY_get0_group (EcKey);
   HalfSize = (EC_GROUP_get_degree (Group) + 7) / 8;
-  if (CompressFlag == NULL && PeerPublicSize != HalfSize * 2) {
+  if ((CompressFlag == NULL) && (PeerPublicSize != HalfSize * 2)) {
     return FALSE;
   }
-  if (CompressFlag != NULL && PeerPublicSize != HalfSize) {
+
+  if ((CompressFlag != NULL) && (PeerPublicSize != HalfSize)) {
     return FALSE;
   }
+
   if (*KeySize < HalfSize) {
     *KeySize = HalfSize;
     return FALSE;
   }
+
   *KeySize = HalfSize;
 
   RetVal = FALSE;
-  Point = NULL;
-  BnX = BN_bin2bn (PeerPublic, (INT32) HalfSize, NULL);
-  BnY = NULL;
-  Point = EC_POINT_new (Group);
-  if (BnX == NULL || Point == NULL) {
+  Point  = NULL;
+  BnX    = BN_bin2bn (PeerPublic, (INT32)HalfSize, NULL);
+  BnY    = NULL;
+  Point  = EC_POINT_new (Group);
+  if ((BnX == NULL) || (Point == NULL)) {
     goto fail;
   }
 
   if (CompressFlag == NULL) {
-    BnY = BN_bin2bn (PeerPublic + HalfSize, (INT32) HalfSize, NULL);
+    BnY = BN_bin2bn (PeerPublic + HalfSize, (INT32)HalfSize, NULL);
     if (BnY == NULL) {
       goto fail;
     }
+
     if (EC_POINT_set_affine_coordinates (Group, Point, BnX, BnY, NULL) != 1) {
       goto fail;
     }
@@ -746,13 +754,15 @@ EcDhComputeKey (
 
   // Validate NIST ECDH public key
   OpenSslNid = EC_GROUP_get_curve_name (Group);
-  PeerEcKey = EC_KEY_new_by_curve_name (OpenSslNid);
+  PeerEcKey  = EC_KEY_new_by_curve_name (OpenSslNid);
   if (PeerEcKey == NULL) {
     goto fail;
   }
+
   if (EC_KEY_set_public_key (PeerEcKey, Point) != 1) {
     goto fail;
   }
+
   if (EC_KEY_check_key (PeerEcKey) != 1) {
     goto fail;
   }
@@ -766,7 +776,7 @@ EcDhComputeKey (
 fail:
   BN_free (BnX);
   BN_free (BnY);
-  EC_POINT_free(Point);
+  EC_POINT_free (Point);
   EC_KEY_free (PeerEcKey);
   return RetVal;
 }

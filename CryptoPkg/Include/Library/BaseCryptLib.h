@@ -14,12 +14,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Uefi/UefiBaseType.h>
 
-#define CRYPTO_NID_NULL        0x0000
+#define CRYPTO_NID_NULL  0x0000
 
 // Key Exchange
-#define CRYPTO_NID_SECP256R1           0x0204
-#define CRYPTO_NID_SECP384R1           0x0205
-#define CRYPTO_NID_SECP521R1           0x0206
+#define CRYPTO_NID_SECP256R1  0x0204
+#define CRYPTO_NID_SECP384R1  0x0205
+#define CRYPTO_NID_SECP521R1  0x0206
 
 ///
 /// MD5 digest size in bytes
@@ -3255,6 +3255,7 @@ EcGetPubKey (
   @param[in, out]  EcContext          Pointer to the EC context.
   @param[in]       PeerPublic         Pointer to the peer's public X,Y.
   @param[in]       PeerPublicSize     Size of peer's public X,Y in bytes.
+  @param[in]       CompressFlag       Flag of which Y used, set it to NULL if not compressed.
   @param[out]      Key                Pointer to the buffer to receive generated key.
   @param[in, out]  KeySize            On input, the size of Key buffer in bytes.
                                       On output, the size of data returned in Key buffer in bytes.

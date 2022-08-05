@@ -99,7 +99,7 @@ BigNumAdd (
   OUT VOID       *BnRes
   )
 {
-  return (BOOLEAN) BN_add (BnRes, BnA, BnB);
+  return (BOOLEAN)BN_add (BnRes, BnA, BnB);
 }
 
 /**
@@ -122,7 +122,7 @@ BigNumSub (
   OUT VOID       *BnRes
   )
 {
-  return (BOOLEAN) BN_sub (BnRes, BnA, BnB);
+  return (BOOLEAN)BN_sub (BnRes, BnA, BnB);
 }
 
 /**
@@ -145,15 +145,15 @@ BigNumMod (
   OUT VOID       *BnRes
   )
 {
-  BOOLEAN RetVal;
-  BN_CTX  *Ctx;
+  BOOLEAN  RetVal;
+  BN_CTX   *Ctx;
 
   Ctx = BN_CTX_new ();
   if (Ctx == NULL) {
     return FALSE;
   }
 
-  RetVal = (BOOLEAN) BN_mod (BnRes, BnA, BnB, Ctx);
+  RetVal = (BOOLEAN)BN_mod (BnRes, BnA, BnB, Ctx);
   BN_CTX_free (Ctx);
 
   return RetVal;
@@ -181,15 +181,15 @@ BigNumExpMod (
   OUT VOID       *BnRes
   )
 {
-  BOOLEAN RetVal;
-  BN_CTX  *Ctx;
+  BOOLEAN  RetVal;
+  BN_CTX   *Ctx;
 
   Ctx = BN_CTX_new ();
   if (Ctx == NULL) {
     return FALSE;
   }
 
-  RetVal = (BOOLEAN) BN_mod_exp (BnRes, BnA, BnP, BnM, Ctx);
+  RetVal = (BOOLEAN)BN_mod_exp (BnRes, BnA, BnP, BnM, Ctx);
 
   BN_CTX_free (Ctx);
   return RetVal;
@@ -215,8 +215,8 @@ BigNumInverseMod (
   OUT VOID       *BnRes
   )
 {
-  BOOLEAN RetVal;
-  BN_CTX  *Ctx;
+  BOOLEAN  RetVal;
+  BN_CTX   *Ctx;
 
   Ctx = BN_CTX_new ();
   if (Ctx == NULL) {
@@ -226,7 +226,7 @@ BigNumInverseMod (
   RetVal = FALSE;
   if (BN_mod_inverse (BnRes, BnA, BnM, Ctx) != NULL) {
     RetVal = TRUE;
-  };
+  }
 
   BN_CTX_free (Ctx);
   return RetVal;
@@ -238,7 +238,7 @@ BigNumInverseMod (
   by calling to BigNumInit() or BigNumFromBin() functions.
 
   @param[in]   BnA     Big number.
-  @param[in]   BnM     Big number.
+  @param[in]   BnB     Big number.
   @param[out]  BnRes   The result, such that BnA / BnB.
 
   @retval TRUE          On success.
@@ -252,15 +252,15 @@ BigNumDiv (
   OUT VOID       *BnRes
   )
 {
-  BOOLEAN RetVal;
-  BN_CTX  *Ctx;
+  BOOLEAN  RetVal;
+  BN_CTX   *Ctx;
 
   Ctx = BN_CTX_new ();
   if (Ctx == NULL) {
     return FALSE;
   }
 
-  RetVal = (BOOLEAN) BN_div (BnRes, NULL, BnA, BnB, Ctx);
+  RetVal = (BOOLEAN)BN_div (BnRes, NULL, BnA, BnB, Ctx);
   BN_CTX_free (Ctx);
 
   return RetVal;
@@ -288,15 +288,15 @@ BigNumMulMod (
   OUT VOID       *BnRes
   )
 {
-  BOOLEAN RetVal;
-  BN_CTX  *Ctx;
+  BOOLEAN  RetVal;
+  BN_CTX   *Ctx;
 
   Ctx = BN_CTX_new ();
   if (Ctx == NULL) {
     return FALSE;
   }
 
-  RetVal = (BOOLEAN) BN_mod_mul (BnRes, BnA, BnB, BnM, Ctx);
+  RetVal = (BOOLEAN)BN_mod_mul (BnRes, BnA, BnB, BnM, Ctx);
   BN_CTX_free (Ctx);
 
   return RetVal;
@@ -370,7 +370,7 @@ BigNumIsWord (
   IN UINTN       Num
   )
 {
-  return (BOOLEAN) BN_is_word (Bn, Num);
+  return (BOOLEAN)BN_is_word (Bn, Num);
 }
 
 /**
@@ -387,7 +387,7 @@ BigNumIsOdd (
   IN CONST VOID  *Bn
   )
 {
-  return (BOOLEAN) BN_is_odd (Bn);
+  return (BOOLEAN)BN_is_odd (Bn);
 }
 
 /**
@@ -444,7 +444,7 @@ BigNumRShift (
   OUT VOID       *BnRes
   )
 {
-  return (BOOLEAN) BN_rshift (BnRes, Bn, (INT32) N);
+  return (BOOLEAN)BN_rshift (BnRes, Bn, (INT32)N);
 }
 
 /**
@@ -483,15 +483,15 @@ BigNumSqrMod (
   OUT VOID       *BnRes
   )
 {
-  BOOLEAN RetVal;
-  BN_CTX  *Ctx;
+  BOOLEAN  RetVal;
+  BN_CTX   *Ctx;
 
   Ctx = BN_CTX_new ();
   if (Ctx == NULL) {
     return FALSE;
   }
 
-  RetVal = (BOOLEAN) BN_mod_sqr (BnRes, BnA, BnM, Ctx);
+  RetVal = (BOOLEAN)BN_mod_sqr (BnRes, BnA, BnM, Ctx);
   BN_CTX_free (Ctx);
 
   return RetVal;
@@ -543,7 +543,7 @@ BigNumSetUint (
   IN UINTN  Val
   )
 {
-  return (BOOLEAN) BN_set_word (Bn, Val);
+  return (BOOLEAN)BN_set_word (Bn, Val);
 }
 
 /**
@@ -566,15 +566,15 @@ BigNumAddMod (
   OUT VOID       *BnRes
   )
 {
-  BOOLEAN RetVal;
-  BN_CTX  *Ctx;
+  BOOLEAN  RetVal;
+  BN_CTX   *Ctx;
 
   Ctx = BN_CTX_new ();
   if (Ctx == NULL) {
     return FALSE;
   }
 
-  RetVal = (BOOLEAN) BN_mod_add (BnRes, BnA, BnB, BnM, Ctx);
+  RetVal = (BOOLEAN)BN_mod_add (BnRes, BnA, BnB, BnM, Ctx);
   BN_CTX_free (Ctx);
 
   return RetVal;

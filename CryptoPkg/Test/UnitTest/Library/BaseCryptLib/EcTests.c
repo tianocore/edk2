@@ -8,19 +8,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "TestBaseCryptLib.h"
 
-#define EC_CURVE_NUM_SUPPORTED 3
-UINTN  EcCurveList[EC_CURVE_NUM_SUPPORTED] = {CRYPTO_NID_SECP256R1, CRYPTO_NID_SECP384R1, CRYPTO_NID_SECP521R1};
-UINTN  EcKeyHalfSize[EC_CURVE_NUM_SUPPORTED] = {32, 48, 66};
+#define EC_CURVE_NUM_SUPPORTED  3
+UINTN  EcCurveList[EC_CURVE_NUM_SUPPORTED]   = { CRYPTO_NID_SECP256R1, CRYPTO_NID_SECP384R1, CRYPTO_NID_SECP521R1 };
+UINTN  EcKeyHalfSize[EC_CURVE_NUM_SUPPORTED] = { 32, 48, 66 };
 
-struct Generator
-{
-  UINT8 X[66];
-  UINT8 Y[66];
+struct Generator {
+  UINT8    X[66];
+  UINT8    Y[66];
 };
+
 // Generator points of all ec curve
-struct Generator EcCurveGenerator[EC_CURVE_NUM_SUPPORTED] =
+struct Generator  EcCurveGenerator[EC_CURVE_NUM_SUPPORTED] =
 {
-  //CRYPTO_NID_SECP256R1
+  // CRYPTO_NID_SECP256R1
   {
     { 0x6B, 0x17, 0xD1, 0xF2, 0xE1, 0x2C, 0x42, 0x47, 0xF8, 0xBC, 0xE6, 0xE5,
       0x63, 0xA4, 0x40, 0xF2, 0x77, 0x03, 0x7D, 0x81, 0x2D, 0xEB, 0x33, 0xA0,
@@ -30,7 +30,7 @@ struct Generator EcCurveGenerator[EC_CURVE_NUM_SUPPORTED] =
       0x7c, 0x0f, 0x9e, 0x16, 0x2b, 0xce, 0x33, 0x57, 0x6b, 0x31, 0x5e, 0xce,
       0xcb, 0xb6, 0x40, 0x68, 0x37, 0xbf, 0x51, 0xf5 }
   },
-  //CRYPTO_NID_SECP384R1
+  // CRYPTO_NID_SECP384R1
   {
     { 0xAA, 0x87, 0xCA, 0x22, 0xBE, 0x8B, 0x05, 0x37, 0x8E, 0xB1, 0xC7, 0x1E,
       0xF3, 0x20, 0xAD, 0x74, 0x6E, 0x1D, 0x3B, 0x62, 0x8B, 0xA7, 0x9B, 0x98,
@@ -42,7 +42,7 @@ struct Generator EcCurveGenerator[EC_CURVE_NUM_SUPPORTED] =
       0xe9, 0xda, 0x31, 0x13, 0xb5, 0xf0, 0xb8, 0xc0, 0x0a, 0x60, 0xb1, 0xce,
       0x1d, 0x7e, 0x81, 0x9d, 0x7a, 0x43, 0x1d, 0x7c, 0x90, 0xea, 0x0e, 0x5f }
   },
-  //CRYPTO_NID_SECP521R1
+  // CRYPTO_NID_SECP521R1
   {
     { 0x00, 0xC6, 0x85, 0x8E, 0x06, 0xB7, 0x04, 0x04, 0xE9, 0xCD, 0x9E, 0x3E,
       0xCB, 0x66, 0x23, 0x95, 0xB4, 0x42, 0x9C, 0x64, 0x81, 0x39, 0x05, 0x3F,
@@ -66,20 +66,21 @@ TestVerifyEcBasic (
   UNIT_TEST_CONTEXT  Context
   )
 {
-  VOID    *Group;
-  VOID    *Point1;
-  VOID    *Point2;
-  VOID    *PointRes;
-  VOID    *BnX;
-  VOID    *BnY;
-  VOID    *BnP;
-  VOID    *BnOrder;
-  UINTN   CurveCount;
-  BOOLEAN Status;
+  VOID     *Group;
+  VOID     *Point1;
+  VOID     *Point2;
+  VOID     *PointRes;
+  VOID     *BnX;
+  VOID     *BnY;
+  VOID     *BnP;
+  VOID     *BnOrder;
+  UINTN    CurveCount;
+  BOOLEAN  Status;
+
   //
   // Initialize BigNumbers
   //
-  BnP = BigNumInit ();
+  BnP     = BigNumInit ();
   BnOrder = BigNumInit ();
 
   for (CurveCount = 0; CurveCount < EC_CURVE_NUM_SUPPORTED; CurveCount++) {
@@ -91,12 +92,12 @@ TestVerifyEcBasic (
       return UNIT_TEST_ERROR_TEST_FAILED;
     }
 
-    Point1 = EcPointInit (Group);
-    Point2 = EcPointInit (Group);
+    Point1   = EcPointInit (Group);
+    Point2   = EcPointInit (Group);
     PointRes = EcPointInit (Group);
-    BnX = BigNumFromBin (EcCurveGenerator[CurveCount].X, EcKeyHalfSize[CurveCount]);
-    BnY = BigNumFromBin (EcCurveGenerator[CurveCount].Y, EcKeyHalfSize[CurveCount]);
-    if (Point1 == NULL || Point2 == NULL || PointRes == NULL || BnX == NULL || BnY == NULL) {
+    BnX      = BigNumFromBin (EcCurveGenerator[CurveCount].X, EcKeyHalfSize[CurveCount]);
+    BnY      = BigNumFromBin (EcCurveGenerator[CurveCount].Y, EcKeyHalfSize[CurveCount]);
+    if ((Point1 == NULL) || (Point2 == NULL) || (PointRes == NULL) || (BnX == NULL) || (BnY == NULL)) {
       return UNIT_TEST_ERROR_TEST_FAILED;
     }
 
@@ -106,7 +107,7 @@ TestVerifyEcBasic (
     Status = EcGroupGetOrder (Group, BnOrder);
     UT_ASSERT_TRUE (Status);
 
-    //Point G should on curve
+    // Point G should on curve
     Status = EcPointSetAffineCoordinates (Group, Point1, BnX, BnY, NULL);
     UT_ASSERT_TRUE (Status);
 
@@ -122,21 +123,21 @@ TestVerifyEcBasic (
     Status = EcPointIsAtInfinity (Group, Point1);
     UT_ASSERT_FALSE (Status);
 
-    //Point 2G should on curve
+    // Point 2G should on curve
     Status = EcPointAdd (Group, PointRes, Point1, Point1, NULL);
     UT_ASSERT_TRUE (Status);
 
     Status = EcPointIsOnCurve (Group, PointRes, NULL);
     UT_ASSERT_TRUE (Status);
 
-    //Point Order * G should at infinity
+    // Point Order * G should at infinity
     Status = EcPointMul (Group, PointRes, Point1, BnOrder, NULL);
     UT_ASSERT_TRUE (Status);
 
     Status = EcPointIsAtInfinity (Group, PointRes);
     UT_ASSERT_TRUE (Status);
 
-    //-(-G) == G
+    // -(-G) == G
     Status = EcPointInvert (Group, Point2, NULL);
     UT_ASSERT_TRUE (Status);
 
@@ -149,7 +150,7 @@ TestVerifyEcBasic (
     Status = EcPointEqual (Group, Point2, Point1, NULL);
     UT_ASSERT_TRUE (Status);
 
-    //Compress point test
+    // Compress point test
     Status = EcPointSetCompressedCoordinates (Group, Point1, BnX, 0, NULL);
     UT_ASSERT_TRUE (Status);
 
@@ -171,10 +172,10 @@ TestVerifyEcBasic (
     EcPointDeInit (PointRes, TRUE);
   }
 
-  BigNumFree(BnX, TRUE);
-  BigNumFree(BnY, TRUE);
-  BigNumFree(BnP, TRUE);
-  BigNumFree(BnOrder, TRUE);
+  BigNumFree (BnX, TRUE);
+  BigNumFree (BnY, TRUE);
+  BigNumFree (BnP, TRUE);
+  BigNumFree (BnOrder, TRUE);
   return UNIT_TEST_PASSED;
 }
 
@@ -184,18 +185,18 @@ TestVerifyEcDh (
   UNIT_TEST_CONTEXT  Context
   )
 {
-  VOID    *Ec1;
-  VOID    *Ec2;
-  UINT8   Public1[66 * 2];
-  UINTN   Public1Length;
-  UINT8   Public2[66 * 2];
-  UINTN   Public2Length;
-  UINT8   Key1[66];
-  UINTN   Key1Length;
-  UINT8   Key2[66];
-  UINTN   Key2Length;
-  UINTN   CurveCount;
-  BOOLEAN Status;
+  VOID     *Ec1;
+  VOID     *Ec2;
+  UINT8    Public1[66 * 2];
+  UINTN    Public1Length;
+  UINT8    Public2[66 * 2];
+  UINTN    Public2Length;
+  UINT8    Key1[66];
+  UINTN    Key1Length;
+  UINT8    Key2[66];
+  UINTN    Key2Length;
+  UINTN    CurveCount;
+  BOOLEAN  Status;
 
   for (CurveCount = 0; CurveCount < EC_CURVE_NUM_SUPPORTED; CurveCount++) {
     //
@@ -203,8 +204,8 @@ TestVerifyEcDh (
     //
     Public1Length = sizeof (Public1);
     Public2Length = sizeof (Public2);
-    Key1Length = sizeof (Key1);
-    Key2Length = sizeof (Key2);
+    Key1Length    = sizeof (Key1);
+    Key2Length    = sizeof (Key2);
     //
     // ECDH functions unit test
     //
