@@ -1,0 +1,66 @@
+## @file
+#  This module does the preload work for coreboot to load Universal Payload.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ShimLayer
+  FILE_GUID                      = 7B939555-9838-4D1E-BB63-A0F74E85C702
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  UniversalPayload.o
+  ShimLayer.c
+  ShimLayer.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  BaseLib
+  SerialPortLib
+  IoLib
+  BlParseLib
+  HobLib
+  UefiCpuLib
+  LzmaDecompressLib
+  ElfLoaderLib
+
+[Guids]
+  gEfiGraphicsInfoHobGuid
+  gEfiGraphicsDeviceInfoHobGuid
+  gUniversalPayloadSmbiosTableGuid
+  gUniversalPayloadAcpiTableGuid
+  gUniversalPayloadSerialPortInfoGuid
+  gUniversalPayloadExtraDataGuid
+  gUniversalPayloadPciRootBridgeInfoGuid
+  gUefiPayloadPkgTokenSpaceGuid
+
+[Pcd]
+  gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemBase
+  gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize
+  gUefiPayloadPkgTokenSpaceGuid.PcdBootloaderParameter
+  gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
+  gUefiPayloadPkgTokenSpaceGuid.PcdLinuxCommandLine
+
+[BuildOptions]
+  GCC:*_CLANGDWARF_*_DLINK2_FLAGS == -Wl,--defsym=PECOFF_HEADER_SIZE=0x800000 -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/ClangBase.lds -O3 -fuse-ld=lld
+  GCC:*_GCC5_IA32_DLINK2_FLAGS == -Wl,--defsym=PECOFF_HEADER_SIZE=0x800000 -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/GccBase.lds -Wno-error -no-pie
+  GCC:*_COREBOOT_IA32_DLINK2_FLAGS == -Wl,--defsym=PECOFF_HEADER_SIZE=0x800000 -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/GccBase.lds -Wno-error -no-pie
