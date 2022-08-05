@@ -136,7 +136,9 @@ BOOLEAN
 IsValidSmbios30Table (
   IN  VOID   *TableEntry,
   OUT VOID   **TableAddress,
-  OUT UINTN  *TableMaximumSize
+  OUT UINTN  *TableMaximumSize,
+  OUT UINT8  *MajorVersion,
+  OUT UINT8  *MinorVersion
   );
 
 /**
@@ -155,7 +157,9 @@ BOOLEAN
 IsValidSmbios20Table (
   IN  VOID   *TableEntry,
   OUT VOID   **TableAddress,
-  OUT UINTN  *TableMaximumSize
+  OUT UINTN  *TableMaximumSize,
+  OUT UINT8  *MajorVersion,
+  OUT UINT8  *MinorVersion
   );
 
 /**
@@ -174,7 +178,9 @@ BOOLEAN
 (*IS_SMBIOS_TABLE_VALID) (
   IN  VOID   *TableEntry,
   OUT VOID   **TableAddress,
-  OUT UINTN  *TableMaximumSize
+  OUT UINTN  *TableMaximumSize,
+  OUT UINT8  *MajorVersion,
+  OUT UINT8  *MinorVersion
   );
 typedef struct {
   EFI_GUID                 *Guid;
