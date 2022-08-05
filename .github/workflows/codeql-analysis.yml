@@ -9,9 +9,13 @@
 name: "CodeQL"
 
 on:
+  push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
+
     # types: [ labeled ]
   # Todo: Add this when closer to final.
   #
