@@ -38,6 +38,7 @@
   RsaPssTests.c
   ParallelhashTests.c
   BnTests.c
+  EcTests.c
 
 [Packages]
   MdePkg/MdePkg.dec
