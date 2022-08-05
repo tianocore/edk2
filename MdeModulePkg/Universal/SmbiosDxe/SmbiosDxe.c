@@ -1447,7 +1447,9 @@ BOOLEAN
 IsValidSmbios20Table (
   IN  VOID   *TableEntry,
   OUT VOID   **TableAddress,
-  OUT UINTN  *TableMaximumSize
+  OUT UINTN  *TableMaximumSize,
+  OUT UINT8  *MajorVersion,
+  OUT UINT8  *MinorVersion
   )
 {
   UINT8                     Checksum;
@@ -1478,6 +1480,9 @@ IsValidSmbios20Table (
   if (SmbiosTable->MajorVersion < 2) {
     return FALSE;
   }
+
+  *MajorVersion = SmbiosTable->MajorVersion;
+  *MinorVersion = SmbiosTable->MinorVersion;
 
   //
   // The whole struct check sum should be zero
@@ -1522,7 +1527,9 @@ BOOLEAN
 IsValidSmbios30Table (
   IN  VOID   *TableEntry,
   OUT VOID   **TableAddress,
-  OUT UINTN  *TableMaximumSize
+  OUT UINTN  *TableMaximumSize,
+  OUT UINT8  *MajorVersion,
+  OUT UINT8  *MinorVersion
   )
 {
   UINT8                         Checksum;
@@ -1541,6 +1548,9 @@ IsValidSmbios30Table (
   if (SmbiosTable->MajorVersion < 3) {
     return FALSE;
   }
+
+  *MajorVersion = SmbiosTable->MajorVersion;
+  *MinorVersion = SmbiosTable->MinorVersion;
 
   //
   // The whole struct check sum should be zero
@@ -1575,13 +1585,18 @@ EFI_STATUS
 ParseAndAddExistingSmbiosTable (
   IN EFI_HANDLE                ImageHandle,
   IN SMBIOS_STRUCTURE_POINTER  Smbios,
-  IN UINTN                     Length
+  IN UINTN                     Length,
+  IN UINT8                     MajorVersion,
+  IN UINT8                     MinorVersion
   )
 {
   EFI_STATUS                Status;
   CHAR8                     *String;
   EFI_SMBIOS_HANDLE         SmbiosHandle;
   SMBIOS_STRUCTURE_POINTER  SmbiosEnd;
+
+  mPrivateData.Smbios.MajorVersion = MajorVersion;
+  mPrivateData.Smbios.MinorVersion = MinorVersion;
 
   SmbiosEnd.Raw = Smbios.Raw + Length;
 
@@ -1692,8 +1707,13 @@ RetrieveSmbiosFromHob (
   UNIVERSAL_PAYLOAD_GENERIC_HEADER  *GenericHeader;
   VOID                              *TableAddress;
   UINTN                             TableMaximumSize;
+  UINT8                             MajorVersion;
+  UINT8                             MinorVersion;
 
   Status = EFI_NOT_FOUND;
+
+  MajorVersion = 0;
+  MinorVersion = 0;
 
   for (Index = 0; Index < ARRAY_SIZE (mIsSmbiosTableValid); Index++) {
     GuidHob = GetFirstGuidHob (mIsSmbiosTableValid[Index].Guid);
@@ -1709,9 +1729,9 @@ RetrieveSmbiosFromHob (
         //
         SmBiosTableAdress = (UNIVERSAL_PAYLOAD_SMBIOS_TABLE *)GET_GUID_HOB_DATA (GuidHob);
         if (GenericHeader->Length >= UNIVERSAL_PAYLOAD_SIZEOF_THROUGH_FIELD (UNIVERSAL_PAYLOAD_SMBIOS_TABLE, SmBiosEntryPoint)) {
-          if (mIsSmbiosTableValid[Index].IsValid ((VOID *)(UINTN)SmBiosTableAdress->SmBiosEntryPoint, &TableAddress, &TableMaximumSize)) {
+          if (mIsSmbiosTableValid[Index].IsValid ((VOID *)(UINTN)SmBiosTableAdress->SmBiosEntryPoint, &TableAddress, &TableMaximumSize, &MajorVersion, &MinorVersion)) {
             Smbios.Raw = TableAddress;
-            Status     = ParseAndAddExistingSmbiosTable (ImageHandle, Smbios, TableMaximumSize);
+            Status     = ParseAndAddExistingSmbiosTable (ImageHandle, Smbios, TableMaximumSize, MajorVersion, MinorVersion);
             if (EFI_ERROR (Status)) {
               DEBUG ((DEBUG_ERROR, "RetrieveSmbiosFromHob: Failed to parse preinstalled tables from Guid Hob\n"));
               Status = EFI_UNSUPPORTED;
