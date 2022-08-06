@@ -878,6 +878,11 @@ SmbiosPrintStructure (
         }
       }
 
+      if (AE_SMBIOS_VERSION (0x3, 0x3) && (Struct->Hdr->Length > 0x54)) {
+        PRINT_STRUCT_VALUE_H (Struct, Type17, ExtendedSpeed);
+        PRINT_STRUCT_VALUE_H (Struct, Type17, ExtendedConfiguredMemorySpeed);
+      }
+
       break;
 
     //
