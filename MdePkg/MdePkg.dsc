@@ -10,6 +10,7 @@
 ##
 
 # Temp change
+# Another temp change
 
 [Defines]
   PLATFORM_NAME                  = Mde
