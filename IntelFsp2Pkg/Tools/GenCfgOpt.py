@@ -959,13 +959,8 @@ EndList
             UpdTxtFile = ''
             FvDir = self._FvDir
             if GuidList[Index] not in self._MacroDict:
-                NoFSPI = False
-                if GuidList[Index] == 'FSP_I_UPD_TOOL_GUID':
-                    NoFSPI = True
-                    continue
-                else:
-                    self.Error = "%s definition is missing in DSC file" % (GuidList[Index])
-                    return 1
+                self.Error = "%s definition is missing in DSC file" % (GuidList[Index])
+                return 1
 
             if UpdTxtFile == '':
                 UpdTxtFile = os.path.join(FvDir, self._MacroDict[GuidList[Index]] + '.txt')
@@ -1301,8 +1296,7 @@ EndList
                elif '_S' in SignatureStr[6:6+2]:
                    TxtBody.append("#define FSPS_UPD_SIGNATURE               %s        /* '%s' */\n\n" % (Item['value'], SignatureStr))
                elif '_I' in SignatureStr[6:6+2]:
-                   if NoFSPI == True:
-                       TxtBody.append("#define FSPI_UPD_SIGNATURE               %s        /* '%s' */\n\n" % (Item['value'], SignatureStr))
+                   TxtBody.append("#define FSPI_UPD_SIGNATURE               %s        /* '%s' */\n\n" % (Item['value'], SignatureStr))
         TxtBody.append("\n")
 
         for Region in ['UPD']:
@@ -1708,7 +1702,7 @@ EndList
 
 
 def Usage():
-    print ("GenCfgOpt Version 0.59")
+    print ("GenCfgOpt Version 0.58")
     print ("Usage:")
     print ("    GenCfgOpt  UPDTXT  PlatformDscFile BuildFvDir                 [-D Macros]")
     print ("    GenCfgOpt  HEADER  PlatformDscFile BuildFvDir  InputHFile     [-D Macros]")
