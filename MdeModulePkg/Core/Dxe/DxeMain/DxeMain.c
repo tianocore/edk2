@@ -1,7 +1,7 @@
 /** @file
   DXE Core Main Entry Point
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -260,7 +260,7 @@ DxeMain (
   // Setup Stack Guard
   //
   if (PcdGetBool (PcdCpuStackGuard)) {
-    Status = InitializeSeparateExceptionStacks (NULL);
+    Status = InitializeSeparateExceptionStacks (NULL, NULL);
     ASSERT_EFI_ERROR (Status);
   }
 
