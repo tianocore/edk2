@@ -1,7 +1,7 @@
 /** @file
   IA32 CPU Exception Handler functons.
 
-  Copyright (c) 2012 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -132,16 +132,15 @@ ArchSetupExceptionStack (
   EXCEPTION_HANDLER_TEMPLATE_MAP  TemplateMap;
 
   if ((StackSwitchData == NULL) ||
-      (StackSwitchData->Ia32.Revision != CPU_EXCEPTION_INIT_DATA_REV) ||
-      (StackSwitchData->Ia32.KnownGoodStackTop == 0) ||
-      (StackSwitchData->Ia32.KnownGoodStackSize == 0) ||
-      (StackSwitchData->Ia32.StackSwitchExceptions == NULL) ||
-      (StackSwitchData->Ia32.StackSwitchExceptionNumber == 0) ||
-      (StackSwitchData->Ia32.StackSwitchExceptionNumber > CPU_EXCEPTION_NUM) ||
-      (StackSwitchData->Ia32.GdtTable == NULL) ||
-      (StackSwitchData->Ia32.IdtTable == NULL) ||
-      (StackSwitchData->Ia32.ExceptionTssDesc == NULL) ||
-      (StackSwitchData->Ia32.ExceptionTss == NULL))
+      (StackSwitchData->KnownGoodStackTop == 0) ||
+      (StackSwitchData->KnownGoodStackSize == 0) ||
+      (StackSwitchData->StackSwitchExceptions == NULL) ||
+      (StackSwitchData->StackSwitchExceptionNumber == 0) ||
+      (StackSwitchData->StackSwitchExceptionNumber > CPU_EXCEPTION_NUM) ||
+      (StackSwitchData->GdtTable == NULL) ||
+      (StackSwitchData->IdtTable == NULL) ||
+      (StackSwitchData->ExceptionTssDesc == NULL) ||
+      (StackSwitchData->ExceptionTss == NULL))
   {
     return EFI_INVALID_PARAMETER;
   }
@@ -151,16 +150,16 @@ ArchSetupExceptionStack (
   // one or newly allocated, has enough space to hold descriptors for exception
   // task-state segments.
   //
-  if (((UINTN)StackSwitchData->Ia32.GdtTable & (IA32_GDT_ALIGNMENT - 1)) != 0) {
+  if (((UINTN)StackSwitchData->GdtTable & (IA32_GDT_ALIGNMENT - 1)) != 0) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((UINTN)StackSwitchData->Ia32.ExceptionTssDesc < (UINTN)(StackSwitchData->Ia32.GdtTable)) {
+  if ((UINTN)StackSwitchData->ExceptionTssDesc < (UINTN)(StackSwitchData->GdtTable)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((UINTN)StackSwitchData->Ia32.ExceptionTssDesc + StackSwitchData->Ia32.ExceptionTssDescSize >
-      ((UINTN)(StackSwitchData->Ia32.GdtTable) + StackSwitchData->Ia32.GdtTableSize))
+  if ((UINTN)StackSwitchData->ExceptionTssDesc + StackSwitchData->ExceptionTssDescSize >
+      ((UINTN)(StackSwitchData->GdtTable) + StackSwitchData->GdtTableSize))
   {
     return EFI_INVALID_PARAMETER;
   }
@@ -169,20 +168,20 @@ ArchSetupExceptionStack (
   // We need one descriptor and one TSS for current task and every exception
   // specified.
   //
-  if (StackSwitchData->Ia32.ExceptionTssDescSize <
-      sizeof (IA32_TSS_DESCRIPTOR) * (StackSwitchData->Ia32.StackSwitchExceptionNumber + 1))
+  if (StackSwitchData->ExceptionTssDescSize <
+      sizeof (IA32_TSS_DESCRIPTOR) * (StackSwitchData->StackSwitchExceptionNumber + 1))
   {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (StackSwitchData->Ia32.ExceptionTssSize <
-      sizeof (IA32_TASK_STATE_SEGMENT) * (StackSwitchData->Ia32.StackSwitchExceptionNumber + 1))
+  if (StackSwitchData->ExceptionTssSize <
+      sizeof (IA32_TASK_STATE_SEGMENT) * (StackSwitchData->StackSwitchExceptionNumber + 1))
   {
     return EFI_INVALID_PARAMETER;
   }
 
-  TssDesc = StackSwitchData->Ia32.ExceptionTssDesc;
-  Tss     = StackSwitchData->Ia32.ExceptionTss;
+  TssDesc = StackSwitchData->ExceptionTssDesc;
+  Tss     = StackSwitchData->ExceptionTss;
 
   //
   // Initialize new GDT table and/or IDT table, if any
@@ -192,20 +191,20 @@ ArchSetupExceptionStack (
 
   GdtSize = (UINTN)TssDesc +
             sizeof (IA32_TSS_DESCRIPTOR) *
-            (StackSwitchData->Ia32.StackSwitchExceptionNumber + 1) -
-            (UINTN)(StackSwitchData->Ia32.GdtTable);
-  if ((UINTN)StackSwitchData->Ia32.GdtTable != Gdtr.Base) {
-    CopyMem (StackSwitchData->Ia32.GdtTable, (VOID *)Gdtr.Base, Gdtr.Limit + 1);
-    Gdtr.Base  = (UINTN)StackSwitchData->Ia32.GdtTable;
+            (StackSwitchData->StackSwitchExceptionNumber + 1) -
+            (UINTN)(StackSwitchData->GdtTable);
+  if ((UINTN)StackSwitchData->GdtTable != Gdtr.Base) {
+    CopyMem (StackSwitchData->GdtTable, (VOID *)Gdtr.Base, Gdtr.Limit + 1);
+    Gdtr.Base  = (UINTN)StackSwitchData->GdtTable;
     Gdtr.Limit = (UINT16)GdtSize - 1;
   }
 
-  if ((UINTN)StackSwitchData->Ia32.IdtTable != Idtr.Base) {
-    Idtr.Base = (UINTN)StackSwitchData->Ia32.IdtTable;
+  if ((UINTN)StackSwitchData->IdtTable != Idtr.Base) {
+    Idtr.Base = (UINTN)StackSwitchData->IdtTable;
   }
 
-  if (StackSwitchData->Ia32.IdtTableSize > 0) {
-    Idtr.Limit = (UINT16)(StackSwitchData->Ia32.IdtTableSize - 1);
+  if (StackSwitchData->IdtTableSize > 0) {
+    Idtr.Limit = (UINT16)(StackSwitchData->IdtTableSize - 1);
   }
 
   //
@@ -227,10 +226,10 @@ ArchSetupExceptionStack (
   // Fixup exception task descriptor and task-state segment
   //
   AsmGetTssTemplateMap (&TemplateMap);
-  StackTop = StackSwitchData->Ia32.KnownGoodStackTop - CPU_STACK_ALIGNMENT;
+  StackTop = StackSwitchData->KnownGoodStackTop - CPU_STACK_ALIGNMENT;
   StackTop = (UINTN)ALIGN_POINTER (StackTop, CPU_STACK_ALIGNMENT);
-  IdtTable = StackSwitchData->Ia32.IdtTable;
-  for (Index = 0; Index < StackSwitchData->Ia32.StackSwitchExceptionNumber; ++Index) {
+  IdtTable = StackSwitchData->IdtTable;
+  for (Index = 0; Index < StackSwitchData->StackSwitchExceptionNumber; ++Index) {
     TssDesc += 1;
     Tss     += 1;
 
@@ -251,7 +250,7 @@ ArchSetupExceptionStack (
     //
     // Fixup TSS
     //
-    Vector = StackSwitchData->Ia32.StackSwitchExceptions[Index];
+    Vector = StackSwitchData->StackSwitchExceptions[Index];
     if ((Vector >= CPU_EXCEPTION_NUM) ||
         (Vector >= (Idtr.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR)))
     {
@@ -271,7 +270,7 @@ ArchSetupExceptionStack (
     Tss->FS     = AsmReadFs ();
     Tss->GS     = AsmReadGs ();
 
-    StackTop -= StackSwitchData->Ia32.KnownGoodStackSize;
+    StackTop -= StackSwitchData->KnownGoodStackSize;
 
     //
     // Update IDT to use Task Gate for given exception
@@ -291,7 +290,7 @@ ArchSetupExceptionStack (
   //
   // Load current task
   //
-  AsmWriteTr ((UINT16)((UINTN)StackSwitchData->Ia32.ExceptionTssDesc - Gdtr.Base));
+  AsmWriteTr ((UINT16)((UINTN)StackSwitchData->ExceptionTssDesc - Gdtr.Base));
 
   //
   // Publish IDT
