@@ -1,7 +1,7 @@
 /** @file
   Common header file for CPU Exception Handler Library.
 
-  Copyright (c) 2012 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -48,6 +48,73 @@
   FixedPcdGet32 (PcdCpuKnownGoodStackSize)
 
 #define CPU_TSS_GDT_SIZE  (SIZE_2KB + CPU_TSS_DESC_SIZE + CPU_TSS_SIZE)
+
+#define CPU_EXCEPTION_INIT_DATA_REV  1
+
+typedef union {
+  struct {
+    //
+    // Revision number of this structure.
+    //
+    UINT32     Revision;
+    //
+    // The address of top of known good stack reserved for *ALL* exceptions
+    // listed in field StackSwitchExceptions.
+    //
+    UINTN      KnownGoodStackTop;
+    //
+    // The size of known good stack for *ONE* exception only.
+    //
+    UINTN      KnownGoodStackSize;
+    //
+    // Buffer of exception vector list for stack switch.
+    //
+    UINT8      *StackSwitchExceptions;
+    //
+    // Number of exception vectors in StackSwitchExceptions.
+    //
+    UINTN      StackSwitchExceptionNumber;
+    //
+    // Buffer of IDT table. It must be type of IA32_IDT_GATE_DESCRIPTOR.
+    // Normally there's no need to change IDT table size.
+    //
+    VOID       *IdtTable;
+    //
+    // Size of buffer for IdtTable.
+    //
+    UINTN      IdtTableSize;
+    //
+    // Buffer of GDT table. It must be type of IA32_SEGMENT_DESCRIPTOR.
+    //
+    VOID       *GdtTable;
+    //
+    // Size of buffer for GdtTable.
+    //
+    UINTN      GdtTableSize;
+    //
+    // Pointer to start address of descriptor of exception task gate in the
+    // GDT table. It must be type of IA32_TSS_DESCRIPTOR.
+    //
+    VOID       *ExceptionTssDesc;
+    //
+    // Size of buffer for ExceptionTssDesc.
+    //
+    UINTN      ExceptionTssDescSize;
+    //
+    // Buffer of task-state segment for exceptions. It must be type of
+    // IA32_TASK_STATE_SEGMENT.
+    //
+    VOID       *ExceptionTss;
+    //
+    // Size of buffer for ExceptionTss.
+    //
+    UINTN      ExceptionTssSize;
+    //
+    // Flag to indicate if default handlers should be initialized or not.
+    //
+    BOOLEAN    InitDefaultHandlers;
+  } Ia32, X64;
+} CPU_EXCEPTION_INIT_DATA;
 
 //
 // Record exception handler information
