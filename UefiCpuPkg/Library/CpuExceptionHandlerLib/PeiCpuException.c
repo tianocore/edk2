@@ -236,19 +236,18 @@ InitializeSeparateExceptionStacks (
   NewGdtTable = ALIGN_POINTER (StackTop, sizeof (IA32_TSS_DESCRIPTOR));
 
   AsmReadIdtr (&Idtr);
-  EssData.X64.Revision                   = CPU_EXCEPTION_INIT_DATA_REV;
-  EssData.X64.KnownGoodStackTop          = StackTop;
-  EssData.X64.KnownGoodStackSize         = CPU_KNOWN_GOOD_STACK_SIZE;
-  EssData.X64.StackSwitchExceptions      = CPU_STACK_SWITCH_EXCEPTION_LIST;
-  EssData.X64.StackSwitchExceptionNumber = CPU_STACK_SWITCH_EXCEPTION_NUMBER;
-  EssData.X64.IdtTable                   = (VOID *)Idtr.Base;
-  EssData.X64.IdtTableSize               = Idtr.Limit + 1;
-  EssData.X64.GdtTable                   = NewGdtTable;
-  EssData.X64.GdtTableSize               = CPU_TSS_DESC_SIZE + Gdtr.Limit + 1;
-  EssData.X64.ExceptionTssDesc           = NewGdtTable + Gdtr.Limit + 1;
-  EssData.X64.ExceptionTssDescSize       = CPU_TSS_DESC_SIZE;
-  EssData.X64.ExceptionTss               = NewGdtTable + Gdtr.Limit + 1 + CPU_TSS_DESC_SIZE;
-  EssData.X64.ExceptionTssSize           = CPU_TSS_SIZE;
+  EssData.KnownGoodStackTop          = StackTop;
+  EssData.KnownGoodStackSize         = CPU_KNOWN_GOOD_STACK_SIZE;
+  EssData.StackSwitchExceptions      = CPU_STACK_SWITCH_EXCEPTION_LIST;
+  EssData.StackSwitchExceptionNumber = CPU_STACK_SWITCH_EXCEPTION_NUMBER;
+  EssData.IdtTable                   = (VOID *)Idtr.Base;
+  EssData.IdtTableSize               = Idtr.Limit + 1;
+  EssData.GdtTable                   = NewGdtTable;
+  EssData.GdtTableSize               = CPU_TSS_DESC_SIZE + Gdtr.Limit + 1;
+  EssData.ExceptionTssDesc           = NewGdtTable + Gdtr.Limit + 1;
+  EssData.ExceptionTssDescSize       = CPU_TSS_DESC_SIZE;
+  EssData.ExceptionTss               = NewGdtTable + Gdtr.Limit + 1 + CPU_TSS_DESC_SIZE;
+  EssData.ExceptionTssSize           = CPU_TSS_SIZE;
 
   return ArchSetupExceptionStack (&EssData);
 }
