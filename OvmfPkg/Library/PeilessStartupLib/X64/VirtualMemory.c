@@ -19,12 +19,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/MemoryAllocationHob.h>
 #include <Register/Intel/Cpuid.h>
 #include <Library/PlatformInitLib.h>
+#include <WorkArea.h>
 #include "PageTables.h"
-
-//
-// Global variable to keep track current available memory used as page table.
-//
-PAGE_TABLE_POOL  *mPageTablePool = NULL;
 
 UINTN  mLevelShift[5] = {
   0,
@@ -49,6 +45,32 @@ UINT64  mLevelSize[5] = {
   SIZE_1GB,
   SIZE_512GB
 };
+
+PAGE_TABLE_POOL *
+GetPageTablePool (
+  VOID
+  )
+{
+  TDX_WORK_AREA  *TdxWorkArea;
+
+  TdxWorkArea = (TDX_WORK_AREA *)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+  ASSERT (TdxWorkArea != NULL);
+
+  return (PAGE_TABLE_POOL *)TdxWorkArea->SecTdxWorkArea.PageTablePool;
+}
+
+VOID
+SetPageTablePool (
+  VOID  *PageTablePool
+  )
+{
+  TDX_WORK_AREA  *TdxWorkArea;
+
+  TdxWorkArea = (TDX_WORK_AREA *)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+  ASSERT (TdxWorkArea != NULL);
+
+  TdxWorkArea->SecTdxWorkArea.PageTablePool = (UINT64)(UINTN)PageTablePool;
+}
 
 BOOLEAN
 IsSetNxForStack (
@@ -283,7 +305,10 @@ InitializePageTablePool (
   IN UINTN  PoolPages
   )
 {
-  VOID  *Buffer;
+  VOID             *Buffer;
+  PAGE_TABLE_POOL  *PageTablePool;
+
+  PageTablePool = GetPageTablePool ();
 
   DEBUG ((DEBUG_INFO, "InitializePageTablePool PoolPages=%d\n", PoolPages));
 
@@ -303,20 +328,21 @@ InitializePageTablePool (
   //
   // Link all pools into a list for easier track later.
   //
-  if (mPageTablePool == NULL) {
-    mPageTablePool           = Buffer;
-    mPageTablePool->NextPool = mPageTablePool;
+  if (PageTablePool == NULL) {
+    PageTablePool           = Buffer;
+    PageTablePool->NextPool = PageTablePool;
+    SetPageTablePool (PageTablePool);
   } else {
-    ((PAGE_TABLE_POOL *)Buffer)->NextPool = mPageTablePool->NextPool;
-    mPageTablePool->NextPool              = Buffer;
-    mPageTablePool                        = Buffer;
+    ((PAGE_TABLE_POOL *)Buffer)->NextPool = PageTablePool->NextPool;
+    PageTablePool->NextPool               = Buffer;
+    PageTablePool                         = Buffer;
   }
 
   //
   // Reserve one page for pool header.
   //
-  mPageTablePool->FreePages = PoolPages - 1;
-  mPageTablePool->Offset    = EFI_PAGES_TO_SIZE (1);
+  PageTablePool->FreePages = PoolPages - 1;
+  PageTablePool->Offset    = EFI_PAGES_TO_SIZE (1);
 
   return TRUE;
 }
@@ -343,28 +369,33 @@ AllocatePageTableMemory (
   IN UINTN  Pages
   )
 {
-  VOID  *Buffer;
+  VOID             *Buffer;
+  PAGE_TABLE_POOL  *PageTablePool;
 
   if (Pages == 0) {
     return NULL;
   }
 
-  DEBUG ((DEBUG_INFO, "AllocatePageTableMemory. mPageTablePool=%p, Pages=%d\n", mPageTablePool, Pages));
+  PageTablePool = GetPageTablePool ();
+
+  DEBUG ((DEBUG_INFO, "AllocatePageTableMemory. PageTablePool=%p, Pages=%d\n", PageTablePool, Pages));
   //
   // Renew the pool if necessary.
   //
-  if ((mPageTablePool == NULL) ||
-      (Pages > mPageTablePool->FreePages))
+  if ((PageTablePool == NULL) ||
+      (Pages > PageTablePool->FreePages))
   {
     if (!InitializePageTablePool (Pages)) {
       return NULL;
+    } else {
+      PageTablePool = GetPageTablePool ();
     }
   }
 
-  Buffer = (UINT8 *)mPageTablePool + mPageTablePool->Offset;
+  Buffer = (UINT8 *)PageTablePool + PageTablePool->Offset;
 
-  mPageTablePool->Offset    += EFI_PAGES_TO_SIZE (Pages);
-  mPageTablePool->FreePages -= Pages;
+  PageTablePool->Offset    += EFI_PAGES_TO_SIZE (Pages);
+  PageTablePool->FreePages -= Pages;
 
   DEBUG ((
     DEBUG_INFO,
@@ -618,10 +649,13 @@ EnablePageTableProtection (
   PAGE_TABLE_POOL       *Pool;
   UINT64                PoolSize;
   EFI_PHYSICAL_ADDRESS  Address;
+  PAGE_TABLE_POOL       *PageTablePool;
 
   DEBUG ((DEBUG_INFO, "EnablePageTableProtection\n"));
 
-  if (mPageTablePool == NULL) {
+  PageTablePool = GetPageTablePool ();
+
+  if (PageTablePool == NULL) {
     return;
   }
 
@@ -632,10 +666,10 @@ EnablePageTableProtection (
   AsmWriteCr0 (AsmReadCr0 () & ~CR0_WP);
 
   //
-  // SetPageTablePoolReadOnly might update mPageTablePool. It's safer to
+  // SetPageTablePoolReadOnly might update PageTablePool. It's safer to
   // remember original one in advance.
   //
-  HeadPool = mPageTablePool;
+  HeadPool = PageTablePool;
   Pool     = HeadPool;
   do {
     Address  = (EFI_PHYSICAL_ADDRESS)(UINTN)Pool;

@@ -71,6 +71,7 @@ typedef struct _SEC_TDX_WORK_AREA {
   UINT32    PageTableReady;
   UINT32    Gpaw;
   UINT64    HobList;
+  UINT64    PageTablePool;
 } SEC_TDX_WORK_AREA;
 
 typedef struct _TDX_WORK_AREA {
