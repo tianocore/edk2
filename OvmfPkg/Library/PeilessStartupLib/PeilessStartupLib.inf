@@ -88,3 +88,4 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
