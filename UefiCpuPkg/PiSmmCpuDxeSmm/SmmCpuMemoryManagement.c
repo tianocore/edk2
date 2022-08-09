@@ -32,7 +32,8 @@ PAGE_ATTRIBUTE_TABLE  mPageAttributeTable[] = {
   { Page1G, SIZE_1GB, PAGING_1G_ADDRESS_MASK_64 },
 };
 
-UINTN  mInternalCr3;
+UINTN    mInternalCr3;
+BOOLEAN  mIsShadowStack = FALSE;
 
 /**
   Set the internal page table base address.
@@ -249,7 +250,7 @@ ConvertPageEntryAttribute (
   if ((Attributes & EFI_MEMORY_RO) != 0) {
     if (IsSet) {
       NewPageEntry &= ~(UINT64)IA32_PG_RW;
-      if (mInternalCr3 != 0) {
+      if (mIsShadowStack) {
         // Environment setup
         // ReadOnly page need set Dirty bit for shadow stack
         NewPageEntry |= IA32_PG_D;
@@ -734,10 +735,11 @@ SetShadowStack (
   EFI_STATUS  Status;
 
   SetPageTableBase (Cr3);
-
-  Status = SmmSetMemoryAttributes (BaseAddress, Length, EFI_MEMORY_RO);
+  mIsShadowStack = TRUE;
+  Status         = SmmSetMemoryAttributes (BaseAddress, Length, EFI_MEMORY_RO);
 
   SetPageTableBase (0);
+  mIsShadowStack = FALSE;
 
   return Status;
 }
