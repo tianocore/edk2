@@ -86,7 +86,7 @@ GetS3MemoryInfo (
 VOID
 EFIAPI
 CallFspWrapperResetSystem (
-  IN EFI_STATUS  FspStatusResetType
+  IN UINT32  FspStatusResetType
   )
 {
   //
