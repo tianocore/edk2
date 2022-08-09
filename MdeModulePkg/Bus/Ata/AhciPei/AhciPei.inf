@@ -50,13 +50,11 @@
   TimerLib
   LockBoxLib
   PeimEntryPoint
-  DevicePathLib
 
 [Ppis]
   gEdkiiPeiAtaAhciHostControllerPpiGuid          ## CONSUMES
   gEdkiiIoMmuPpiGuid                             ## CONSUMES
   gEfiEndOfPeiSignalPpiGuid                      ## CONSUMES
-  gEdkiiPeiPciDevicePpiGuid                      ## CONSUMES
   gEdkiiPeiAtaPassThruPpiGuid                    ## SOMETIMES_PRODUCES
   gEfiPeiVirtualBlockIoPpiGuid                   ## SOMETIMES_PRODUCES
   gEfiPeiVirtualBlockIo2PpiGuid                  ## SOMETIMES_PRODUCES
@@ -67,7 +65,8 @@
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND
-  gEfiPeiMasterBootModePpiGuid
+  gEfiPeiMasterBootModePpiGuid AND
+  gEdkiiPeiAtaAhciHostControllerPpiGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   AhciPeiExtra.uni
