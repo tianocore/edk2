@@ -264,7 +264,7 @@ extern UINTN                 mMaxNumberOfCpus;
 extern UINTN                 mNumberOfCpus;
 extern EFI_SMM_CPU_PROTOCOL  mSmmCpu;
 extern EFI_MM_MP_PROTOCOL    mSmmMp;
-extern UINTN                 mInternalCr3;
+extern BOOLEAN               m5LevelPagingNeeded;
 
 ///
 /// The mode of the CPU at the time an SMI occurs
@@ -682,7 +682,6 @@ SmmBlockingStartupThisAp (
 
 **/
 EFI_STATUS
-EFIAPI
 SmmSetMemoryAttributes (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length,
@@ -712,7 +711,6 @@ SmmSetMemoryAttributes (
 
 **/
 EFI_STATUS
-EFIAPI
 SmmClearMemoryAttributes (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length,
@@ -958,21 +956,11 @@ SetPageTableAttributes (
   );
 
 /**
-  Get page table base address and the depth of the page table.
-
-  @param[out] Base        Page table base address.
-  @param[out] FiveLevels  TRUE means 5 level paging. FALSE means 4 level paging.
-**/
-VOID
-GetPageTable (
-  OUT UINTN    *Base,
-  OUT BOOLEAN  *FiveLevels OPTIONAL
-  );
-
-/**
   This function sets the attributes for the memory region specified by BaseAddress and
   Length from their current attributes to the attributes specified by Attributes.
 
+  @param[in]   PageTableBase    The page table base.
+  @param[in]   EnablePML5Paging If PML5 paging is enabled.
   @param[in]   BaseAddress      The physical address that is the start address of a memory region.
   @param[in]   Length           The size in bytes of the memory region.
   @param[in]   Attributes       The bit mask of attributes to set for the memory region.
@@ -993,8 +981,9 @@ GetPageTable (
 
 **/
 EFI_STATUS
-EFIAPI
 SmmSetMemoryAttributesEx (
+  IN  UINTN                 PageTableBase,
+  IN  BOOLEAN               EnablePML5Paging,
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length,
   IN  UINT64                Attributes,
@@ -1005,6 +994,8 @@ SmmSetMemoryAttributesEx (
   This function clears the attributes for the memory region specified by BaseAddress and
   Length from their current attributes to the attributes specified by Attributes.
 
+  @param[in]   PageTableBase    The page table base.
+  @param[in]   EnablePML5Paging If PML5 paging is enabled.
   @param[in]   BaseAddress      The physical address that is the start address of a memory region.
   @param[in]   Length           The size in bytes of the memory region.
   @param[in]   Attributes       The bit mask of attributes to clear for the memory region.
@@ -1025,8 +1016,9 @@ SmmSetMemoryAttributesEx (
 
 **/
 EFI_STATUS
-EFIAPI
 SmmClearMemoryAttributesEx (
+  IN  UINTN                 PageTableBase,
+  IN  BOOLEAN               EnablePML5Paging,
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length,
   IN  UINT64                Attributes,
