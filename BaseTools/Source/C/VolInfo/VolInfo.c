@@ -1796,18 +1796,28 @@ Returns:
       break;
 
     case EFI_SECTION_FIRMWARE_VOLUME_IMAGE:
+      printf ("/------------ Firmware Volume section start ---------------\\\n");
       Status = PrintFvInfo (Ptr + SectionHeaderLen, TRUE);
       if (EFI_ERROR (Status)) {
         Error (NULL, 0, 0003, "printing of FV section contents failed", NULL);
         return EFI_SECTION_ERROR;
       }
+      printf ("\\------------ Firmware Volume section end -----------------/\n");
       break;
 
     case EFI_SECTION_COMPATIBILITY16:
-    case EFI_SECTION_FREEFORM_SUBTYPE_GUID:
       //
       // Section does not contain any further header information.
       //
+      break;
+
+    case EFI_SECTION_FREEFORM_SUBTYPE_GUID:
+      printf ("  Guid:  ");
+      if (SectionHeaderLen == sizeof (EFI_COMMON_SECTION_HEADER))
+        PrintGuid (&((EFI_FREEFORM_SUBTYPE_GUID_SECTION *)Ptr)->SubTypeGuid);
+      else
+        PrintGuid (&((EFI_FREEFORM_SUBTYPE_GUID_SECTION2 *)Ptr)->SubTypeGuid);
+      printf ("\n");
       break;
 
     case EFI_SECTION_PEI_DEPEX:
