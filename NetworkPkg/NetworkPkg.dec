@@ -91,6 +91,9 @@
   ## Include/Protocol/HttpCallback.h
   gEdkiiHttpCallbackProtocolGuid  = {0x611114f1, 0xa37b, 0x4468, {0xa4, 0x36, 0x5b, 0xdd, 0xa1, 0x6a, 0xa2, 0x40}}
 
+  ## Include/Protocol/WiFiProfileSyncProtocol.h
+  gEdkiiWiFiProfileSyncProtocolGuid = {0x399a2b8a, 0xc267, 0x44aa, {0x9a, 0xb4, 0x30, 0x58, 0x8c, 0xd2, 0x2d, 0xcc}}
+
 [PcdsFixedAtBuild]
   ## The max attempt number will be created by iSCSI driver.
   # @Prompt Max attempt number.

@@ -19,6 +19,8 @@ EFI_EAP_TYPE  mEapSecondAuthMethod[] = {
   EFI_EAP_TYPE_MSCHAPV2
 };
 
+UINT8  mWifiConnectionCount = 0;
+
 /**
   The callback function for scan operation. This function updates networks
   according to the latest scan result, and trigger UI refresh.
@@ -424,18 +426,26 @@ WifiMgrConfigPassword (
     return EFI_NOT_FOUND;
   }
 
-  AsciiPassword = AllocateZeroPool ((StrLen (Profile->Password) + 1) * sizeof (UINT8));
+  if (StrLen (Profile->Password) >= PASSWORD_STORAGE_SIZE) {
+    ASSERT (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  AsciiPassword = AllocateZeroPool ((StrLen (Profile->Password) + 1) * sizeof (CHAR8));
   if (AsciiPassword == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  UnicodeStrToAsciiStrS (Profile->Password, (CHAR8 *)AsciiPassword, PASSWORD_STORAGE_SIZE);
-  Status = Supplicant->SetData (
-                         Supplicant,
-                         EfiSupplicant80211PskPassword,
-                         AsciiPassword,
-                         (StrLen (Profile->Password) + 1) * sizeof (UINT8)
-                         );
+  Status = UnicodeStrToAsciiStrS (Profile->Password, (CHAR8 *)AsciiPassword, (StrLen (Profile->Password) + 1));
+  if (!EFI_ERROR (Status)) {
+    Status = Supplicant->SetData (
+                           Supplicant,
+                           EfiSupplicant80211PskPassword,
+                           AsciiPassword,
+                           (StrLen (Profile->Password) + 1) * sizeof (CHAR8)
+                           );
+  }
+
   ZeroMem (AsciiPassword, AsciiStrLen ((CHAR8 *)AsciiPassword) + 1);
   FreePool (AsciiPassword);
 
@@ -465,19 +475,20 @@ WifiMgrConfigEap (
   IN    WIFI_MGR_NETWORK_PROFILE  *Profile
   )
 {
-  EFI_STATUS                      Status;
-  EFI_EAP_CONFIGURATION_PROTOCOL  *EapConfig;
-  EFI_EAP_TYPE                    EapAuthMethod;
-  EFI_EAP_TYPE                    EapSecondAuthMethod;
-  EFI_EAP_TYPE                    *AuthMethodList;
-  CHAR8                           *Identity;
-  UINTN                           IdentitySize;
-  CHAR16                          *Password;
-  UINTN                           PasswordSize;
-  UINTN                           EncryptPasswordLen;
-  CHAR8                           *AsciiEncryptPassword;
-  UINTN                           AuthMethodListSize;
-  UINTN                           Index;
+  EFI_STATUS                        Status;
+  EDKII_WIFI_PROFILE_SYNC_PROTOCOL  *WiFiProfileSyncProtocol;
+  EFI_EAP_CONFIGURATION_PROTOCOL    *EapConfig;
+  EFI_EAP_TYPE                      EapAuthMethod;
+  EFI_EAP_TYPE                      EapSecondAuthMethod;
+  EFI_EAP_TYPE                      *AuthMethodList;
+  CHAR8                             *Identity;
+  UINTN                             IdentitySize;
+  CHAR16                            *Password;
+  UINTN                             PasswordSize;
+  UINTN                             EncryptPasswordLen;
+  CHAR8                             *AsciiEncryptPassword;
+  UINTN                             AuthMethodListSize;
+  UINTN                             Index;
 
   if ((Nic == NULL) || (Nic->EapConfig == NULL) || (Profile == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -567,7 +578,13 @@ WifiMgrConfigEap (
       return EFI_OUT_OF_RESOURCES;
     }
 
-    UnicodeStrToAsciiStrS (Profile->EapIdentity, Identity, IdentitySize);
+    Status = gBS->LocateProtocol (&gEdkiiWiFiProfileSyncProtocolGuid, NULL, (VOID **)&WiFiProfileSyncProtocol);
+    if (!EFI_ERROR (Status)) {
+      CopyMem (Identity, &Profile->EapIdentity, IdentitySize);
+    } else {
+      UnicodeStrToAsciiStrS (Profile->EapIdentity, Identity, IdentitySize);
+    }
+
     Status = EapConfig->SetData (
                           EapConfig,
                           EFI_EAP_TYPE_IDENTITY,
@@ -893,6 +910,133 @@ WifiMgrPrepareConnection (
 }
 
 /**
+  Will reset NiC data, get profile from profile sync driver, and send for
+  another connection attempt.This function should not be called more than
+  3 times.
+
+  @param[in]  WiFiProfileSyncProtocol  The target network profile to connect.
+
+  @retval EFI_SUCCESS                  The operation is completed.
+  @retval other                        Operation failure.
+
+**/
+EFI_STATUS
+ConnectionRetry (
+  IN   EDKII_WIFI_PROFILE_SYNC_PROTOCOL  *WiFiProfileSyncProtocol
+  )
+{
+  EFI_STATUS                               Status;
+  WIFI_MGR_DEVICE_DATA                     *Nic;
+  EFI_WIRELESS_MAC_CONNECTION_II_PROTOCOL  *Wmp;
+  EFI_SUPPLICANT_PROTOCOL                  *Supplicant;
+  EFI_EAP_CONFIGURATION_PROTOCOL           *EapConfig;
+
+  Nic = NULL;
+
+  Status = gBS->LocateProtocol (
+                  &gEfiWiFi2ProtocolGuid,
+                  NULL,
+                  (VOID **)&Wmp
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = gBS->LocateProtocol (
+                  &gEfiSupplicantProtocolGuid,
+                  NULL,
+                  (VOID **)&Supplicant
+                  );
+  if (EFI_ERROR (Status)) {
+    Supplicant = NULL;
+  }
+
+  Status = gBS->LocateProtocol (
+                  &gEfiEapConfigurationProtocolGuid,
+                  NULL,
+                  (VOID **)&EapConfig
+                  );
+  if (EFI_ERROR (Status)) {
+    EapConfig = NULL;
+  }
+
+  //
+  // Initialize Nic device data
+  //
+  Nic = AllocateZeroPool (sizeof (WIFI_MGR_DEVICE_DATA));
+  if (Nic == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    return Status;
+  }
+
+  Nic->Signature           = WIFI_MGR_DEVICE_DATA_SIGNATURE;
+  Nic->Private             = mPrivate;
+  Nic->Wmp                 = Wmp;
+  Nic->Supplicant          = Supplicant;
+  Nic->EapConfig           = EapConfig;
+  Nic->UserSelectedProfile = NULL;
+  Nic->OneTimeScanRequest  = FALSE;
+
+  if (Nic->Supplicant != NULL) {
+    Status = WifiMgrGetSupportedSuites (Nic);
+  }
+
+  if (!EFI_ERROR (Status)) {
+    InitializeListHead (&Nic->ProfileList);
+
+    Nic->ConnectPendingNetwork = (WIFI_MGR_NETWORK_PROFILE *)AllocateZeroPool (sizeof (WIFI_MGR_NETWORK_PROFILE));
+    if (Nic->ConnectPendingNetwork == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to allocate memory for ConnectPendingNetwork\n"));
+      goto ERROR;
+    }
+
+    Status = WiFiProfileSyncProtocol->GetProfile (Nic->ConnectPendingNetwork, Nic->MacAddress);
+    if (!EFI_ERROR (Status) && (Nic->ConnectPendingNetwork != NULL)) {
+      Status = WifiMgrConnectToNetwork (Nic, Nic->ConnectPendingNetwork);
+      if (!EFI_ERROR (Status)) {
+        return Status;
+      }
+    } else {
+      DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to get WiFi profile with status %r\n", Status));
+    }
+  } else {
+    DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Failed to get Supported suites with status %r\n", Status));
+  }
+
+  if (Nic->ConnectPendingNetwork != NULL) {
+    if (Nic->ConnectPendingNetwork->Network.AKMSuite != NULL) {
+      FreePool (Nic->ConnectPendingNetwork->Network.AKMSuite);
+    }
+
+    if (Nic->ConnectPendingNetwork->Network.CipherSuite != NULL) {
+      FreePool (Nic->ConnectPendingNetwork->Network.CipherSuite);
+    }
+
+    FreePool (Nic->ConnectPendingNetwork);
+  }
+
+ERROR:
+  if (Nic->Supplicant != NULL) {
+    if (Nic->SupportedSuites.SupportedAKMSuites != NULL) {
+      FreePool (Nic->SupportedSuites.SupportedAKMSuites);
+    }
+
+    if (Nic->SupportedSuites.SupportedSwCipherSuites != NULL) {
+      FreePool (Nic->SupportedSuites.SupportedSwCipherSuites);
+    }
+
+    if (Nic->SupportedSuites.SupportedHwCipherSuites != NULL) {
+      FreePool (Nic->SupportedSuites.SupportedHwCipherSuites);
+    }
+  }
+
+  FreePool (Nic);
+
+  return Status;
+}
+
+/**
   The callback function for connect operation.
 
   ASSERT when errors occur in config token.
@@ -908,12 +1052,13 @@ WifiMgrOnConnectFinished (
   IN  VOID       *Context
   )
 {
-  EFI_STATUS                 Status;
-  WIFI_MGR_MAC_CONFIG_TOKEN  *ConfigToken;
-  WIFI_MGR_NETWORK_PROFILE   *ConnectedProfile;
-  UINT8                      SecurityType;
-  UINT8                      SSIdLen;
-  CHAR8                      *AsciiSSId;
+  EFI_STATUS                        Status;
+  WIFI_MGR_MAC_CONFIG_TOKEN         *ConfigToken;
+  WIFI_MGR_NETWORK_PROFILE          *ConnectedProfile;
+  UINT8                             SecurityType;
+  UINT8                             SSIdLen;
+  CHAR8                             *AsciiSSId;
+  EDKII_WIFI_PROFILE_SYNC_PROTOCOL  *WiFiProfileSyncProtocol;
 
   ASSERT (Context != NULL);
 
@@ -925,6 +1070,24 @@ WifiMgrOnConnectFinished (
   ASSERT (ConfigToken->Type == TokenTypeConnectNetworkToken);
 
   ASSERT (ConfigToken->Token.ConnectNetworkToken != NULL);
+
+  Status = gBS->LocateProtocol (&gEdkiiWiFiProfileSyncProtocolGuid, NULL, (VOID **)&WiFiProfileSyncProtocol);
+  if (!EFI_ERROR (Status)) {
+    WiFiProfileSyncProtocol->SetConnectState (ConfigToken->Token.ConnectNetworkToken->ResultCode);
+    if ((mWifiConnectionCount < MAX_WIFI_CONNETION_ATTEMPTS) &&
+        (ConfigToken->Token.ConnectNetworkToken->ResultCode != ConnectSuccess))
+    {
+      mWifiConnectionCount++;
+      gBS->CloseEvent (Event);
+      Status = ConnectionRetry (WiFiProfileSyncProtocol);
+      if (!EFI_ERROR (Status)) {
+        return;
+      }
+
+      WiFiProfileSyncProtocol->SetConnectState (Status);
+    }
+  }
+
   if (ConfigToken->Token.ConnectNetworkToken->Status != EFI_SUCCESS) {
     if (ConfigToken->Nic->OneTimeConnectRequest) {
       //
