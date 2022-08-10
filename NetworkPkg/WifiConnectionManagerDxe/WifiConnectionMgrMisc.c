@@ -672,9 +672,22 @@ WifiMgrCleanProfileSecrets (
   IN  WIFI_MGR_NETWORK_PROFILE  *Profile
   )
 {
+  EFI_STATUS                        Status;
+  EDKII_WIFI_PROFILE_SYNC_PROTOCOL  *WiFiProfileSyncProtocol;
+
   ZeroMem (Profile->Password, sizeof (CHAR16) * PASSWORD_STORAGE_SIZE);
   ZeroMem (Profile->EapPassword, sizeof (CHAR16) * PASSWORD_STORAGE_SIZE);
   ZeroMem (Profile->PrivateKeyPassword, sizeof (CHAR16) * PASSWORD_STORAGE_SIZE);
+
+  //
+  //  When EFI WiFi profile sync protocol is found the system is performing a recovery boot in secure
+  //  boot mode. The profile sync driver will manage the CA certificate, client certificate, and key
+  //  data, cleaning them at exit boot services.
+  //
+  Status = gBS->LocateProtocol (&gEdkiiWiFiProfileSyncProtocolGuid, NULL, (VOID **)&WiFiProfileSyncProtocol);
+  if (!EFI_ERROR (Status)) {
+    return;
+  }
 
   if (Profile->CACertData != NULL) {
     ZeroMem (Profile->CACertData, Profile->CACertSize);
