@@ -1,0 +1,75 @@
+## @file
+#  Sec Core for FSP to support MultiPhase (SeparatePhase) MemInitialization.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Fsp24SecCoreM
+  FILE_GUID                      = C5BC0719-4A23-4F6E-94DA-05FB6A0DFA9C
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SecMain.c
+  SecMain.h
+  SecFsp.c
+  SecFsp.h
+  SecFspApiChk.c
+
+[Sources.IA32]
+  Ia32/Stack.nasm
+  Ia32/Fsp24ApiEntryM.nasm
+  Ia32/FspApiEntryCommon.nasm
+  Ia32/FspHelper.nasm
+  Ia32/ReadEsp.nasm
+
+[Sources.X64]
+  X64/Stack.nasm
+  X64/Fsp24ApiEntryM.nasm
+  X64/FspApiEntryCommon.nasm
+  X64/FspHelper.nasm
+  X64/ReadRsp.nasm
+
+[Binaries.Ia32]
+  RAW|Vtf0/Bin/ResetVec.ia32.raw |GCC
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  BaseLib
+  PciCf8Lib
+  SerialPortLib
+  FspSwitchStackLib
+  FspCommonLib
+  FspSecPlatformLib
+  CpuLib
+  UefiCpuLib
+  FspMultiPhaseLib
+
+[Pcd]
+  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase              ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamSize              ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspTemporaryRamSize           ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspHeapSizePercentage         ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxInterruptSupported      ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspPrivateTemporaryRamSize    ## CONSUMES
+
+[Ppis]
+  gEfiTemporaryRamSupportPpiGuid                              ## PRODUCES
+  gFspInApiModePpiGuid                                        ## PRODUCES
