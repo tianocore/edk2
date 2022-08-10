@@ -1,7 +1,7 @@
 ## @file
 # Provides drivers and definitions to support fsp in EDKII bios.
 #
-# Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -28,6 +28,14 @@
 
   ##  @libraryclass  Provide FSP TPM measurement related function.
   FspMeasurementLib|Include/Library/FspMeasurementLib.h
+
+  ##  @libraryclass  Provide MultiPhase handling related functions.
+  FspWrapperMultiPhaseProcessLib|Include/Library/FspWrapperMultiPhaseProcessLib.h
+
+  ##  @libraryclass  Provide MultiPhase platform actions related functions.
+  FspWrapperPlatformMultiPhaseLib|Include/Library/FspWrapperMultiPhaseProcessLib.h
+
+
 [Guids]
   #
   # GUID defined in package
