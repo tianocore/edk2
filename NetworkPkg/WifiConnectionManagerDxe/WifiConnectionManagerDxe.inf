@@ -9,7 +9,7 @@
 #  2). WPA2 Personal Network
 #  3). EAP Networks (EAP-TLS, EAP-TTLS/MSCHAPv2 and PEAPv0/MSCHAPv2)
 #
-#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -71,6 +71,7 @@
   gEfiAdapterInformationProtocolGuid            ## SOMETIMES_CONSUMES
   gEfiSupplicantProtocolGuid                    ## SOMETIMES_CONSUMES
   gEfiEapConfigurationProtocolGuid              ## SOMETIMES_CONSUMES
+  gEdkiiWiFiProfileSyncProtocolGuid             ## SOMETIMES_CONSUMES
 
 [Guids]
   gWifiConfigGuid                               ## PRODUCES  ## GUID

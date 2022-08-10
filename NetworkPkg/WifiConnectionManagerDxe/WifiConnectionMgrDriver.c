@@ -1,7 +1,7 @@
 /** @file
   The driver binding protocol for the WiFi Connection Manager.
 
-  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -38,6 +38,11 @@ EFI_GUID  gWifiConfigFormSetGuid            = WIFI_CONNECTION_MANAGER_CONFIG_GUI
 EFI_GUID  mWifiConfigNetworkListRefreshGuid = WIFI_CONFIG_NETWORK_LIST_REFRESH_GUID;
 EFI_GUID  mWifiConfigConnectFormRefreshGuid = WIFI_CONFIG_CONNECT_FORM_REFRESH_GUID;
 EFI_GUID  mWifiConfigMainFormRefreshGuid    = WIFI_CONFIG_MAIN_FORM_REFRESH_GUID;
+
+//
+// Wifi connection attempt counter for retries
+//
+extern UINT8  mWifiConnectionCount;
 
 /**
   Tests to see if this driver supports a given controller. If a child device is provided,
@@ -167,8 +172,10 @@ WifiMgrDxeDriverBindingStart (
   EFI_WIRELESS_MAC_CONNECTION_II_PROTOCOL  *Wmp;
   EFI_SUPPLICANT_PROTOCOL                  *Supplicant;
   EFI_EAP_CONFIGURATION_PROTOCOL           *EapConfig;
+  EDKII_WIFI_PROFILE_SYNC_PROTOCOL         *WiFiProfileSyncProtocol;
 
-  Nic = NULL;
+  mWifiConnectionCount = 0;
+  Nic                  = NULL;
 
   //
   // Open Protocols
@@ -236,47 +243,73 @@ WifiMgrDxeDriverBindingStart (
   InitializeListHead (&Nic->ProfileList);
 
   //
-  // Record the MAC address of the incoming NIC.
+  // WiFi profile sync protocol installation check for OS recovery flow.
   //
-  Status = NetLibGetMacAddress (
-             ControllerHandle,
-             (EFI_MAC_ADDRESS *)&Nic->MacAddress,
-             &AddressSize
-             );
-  if (EFI_ERROR (Status)) {
-    goto ERROR2;
-  }
-
-  //
-  // Create and start the timer for the status check
-  //
-  Status = gBS->CreateEvent (
-                  EVT_NOTIFY_SIGNAL | EVT_TIMER,
-                  TPL_CALLBACK,
-                  WifiMgrOnTimerTick,
-                  Nic,
-                  &Nic->TickTimer
+  Status = gBS->LocateProtocol (
+                  &gEdkiiWiFiProfileSyncProtocolGuid,
+                  NULL,
+                  (VOID **)&WiFiProfileSyncProtocol
                   );
-  if (EFI_ERROR (Status)) {
-    goto ERROR2;
+  if (!EFI_ERROR (Status)) {
+    Nic->ConnectPendingNetwork = (WIFI_MGR_NETWORK_PROFILE *)AllocateZeroPool (sizeof (WIFI_MGR_NETWORK_PROFILE));
+    if (Nic->ConnectPendingNetwork == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ERROR1;
+    }
+
+    WiFiProfileSyncProtocol->GetProfile (Nic->ConnectPendingNetwork, Nic->MacAddress);
+    if (Nic->ConnectPendingNetwork != NULL) {
+      Status = WifiMgrConnectToNetwork (Nic, Nic->ConnectPendingNetwork);
+      if (!EFI_ERROR (Status)) {
+        goto ERROR1;
+      }
+
+      WiFiProfileSyncProtocol->SetConnectState (Status);
+    }
+  } else {
+    //
+    // Record the MAC address of the incoming NIC.
+    //
+    Status = NetLibGetMacAddress (
+               ControllerHandle,
+               (EFI_MAC_ADDRESS *)&Nic->MacAddress,
+               &AddressSize
+               );
+    if (EFI_ERROR (Status)) {
+      goto ERROR2;
+    }
+
+    //
+    // Create and start the timer for the status check
+    //
+    Status = gBS->CreateEvent (
+                    EVT_NOTIFY_SIGNAL | EVT_TIMER,
+                    TPL_CALLBACK,
+                    WifiMgrOnTimerTick,
+                    Nic,
+                    &Nic->TickTimer
+                    );
+    if (EFI_ERROR (Status)) {
+      goto ERROR2;
+    }
+
+    Status = gBS->SetTimer (Nic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
+    if (EFI_ERROR (Status)) {
+      goto ERROR3;
+    }
+
+    Nic->ConnectState = WifiMgrDisconnected;
+    Nic->ScanState    = WifiMgrScanFinished;
+
+    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+    InsertTailList (&mPrivate->NicList, &Nic->Link);
+    Nic->NicIndex = mPrivate->NicCount++;
+    if (mPrivate->CurrentNic == NULL) {
+      mPrivate->CurrentNic = Nic;
+    }
+
+    gBS->RestoreTPL (OldTpl);
   }
-
-  Status = gBS->SetTimer (Nic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
-  if (EFI_ERROR (Status)) {
-    goto ERROR3;
-  }
-
-  Nic->ConnectState = WifiMgrDisconnected;
-  Nic->ScanState    = WifiMgrScanFinished;
-
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-  InsertTailList (&mPrivate->NicList, &Nic->Link);
-  Nic->NicIndex = mPrivate->NicCount++;
-  if (mPrivate->CurrentNic == NULL) {
-    mPrivate->CurrentNic = Nic;
-  }
-
-  gBS->RestoreTPL (OldTpl);
 
   Status = gBS->InstallProtocolInterface (
                   &ControllerHandle,
@@ -385,10 +418,11 @@ WifiMgrDxeDriverBindingStop (
   IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   )
 {
-  EFI_STATUS                 Status;
-  EFI_TPL                    OldTpl;
-  WIFI_MGR_PRIVATE_PROTOCOL  *WifiMgrIdentifier;
-  WIFI_MGR_DEVICE_DATA       *Nic;
+  EFI_STATUS                        Status;
+  EFI_TPL                           OldTpl;
+  WIFI_MGR_PRIVATE_PROTOCOL         *WifiMgrIdentifier;
+  WIFI_MGR_DEVICE_DATA              *Nic;
+  EDKII_WIFI_PROFILE_SYNC_PROTOCOL  *WiFiProfileSyncProtocol;
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -481,7 +515,15 @@ WifiMgrDxeDriverBindingStop (
   //
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  RemoveEntryList (&Nic->Link);
+  Status = gBS->LocateProtocol (
+                  &gEdkiiWiFiProfileSyncProtocolGuid,
+                  NULL,
+                  (VOID **)&WiFiProfileSyncProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    RemoveEntryList (&Nic->Link);
+  }
+
   mPrivate->NicCount--;
   if (mPrivate->CurrentNic == Nic) {
     mPrivate->CurrentNic = NULL;
