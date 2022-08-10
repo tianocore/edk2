@@ -23,6 +23,7 @@
 #include <Library/PerformanceLib.h>
 #include <Library/FspWrapperPlatformLib.h>
 #include <Library/FspWrapperHobProcessLib.h>
+#include <Library/FspWrapperMultiPhaseProcessLib.h>
 #include <Library/FspWrapperApiLib.h>
 #include <Library/FspMeasurementLib.h>
 
@@ -35,6 +36,8 @@
 #include <Library/FspWrapperApiTestLib.h>
 #include <FspEas.h>
 #include <FspStatusCode.h>
+#include <FspGlobalData.h>
+#include <Library/FspCommonLib.h>
 
 extern EFI_GUID  gFspHobGuid;
 
@@ -119,25 +122,39 @@ PeiFspMemoryInit (
 
   TimeStampCounterStart = AsmReadTsc ();
   Status                = CallFspMemoryInit (FspmUpdDataPtr, &FspHobListPtr);
-  // Create hobs after memory initialization and not in temp RAM. Hence passing the recorded timestamp here
-  PERF_START_EX (&gFspApiPerformanceGuid, "EventRec", NULL, TimeStampCounterStart, FSP_STATUS_CODE_MEMORY_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
-  PERF_END_EX (&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_MEMORY_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
-  DEBUG ((DEBUG_INFO, "Total time spent executing FspMemoryInitApi: %d millisecond\n", DivU64x32 (GetTimeInNanoSecond (AsmReadTsc () - TimeStampCounterStart), 1000000)));
 
   //
   // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
-    DEBUG ((DEBUG_INFO, "FspMemoryInitApi requested reset 0x%x\n", Status));
+    DEBUG ((DEBUG_INFO, "FspMemoryInitApi requested reset %r\n", Status));
     CallFspWrapperResetSystem (Status);
   }
 
-  if (EFI_ERROR (Status)) {
+  if ((Status != FSP_STATUS_VARIABLE_REQUEST) && EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "ERROR - Failed to execute FspMemoryInitApi(), Status = %r\n", Status));
+    ASSERT_EFI_ERROR (Status);
   }
 
-  DEBUG ((DEBUG_INFO, "FspMemoryInit status: 0x%x\n", Status));
-  ASSERT_EFI_ERROR (Status);
+  DEBUG ((DEBUG_INFO, "FspMemoryInit status: %r\n", Status));
+  if (Status == FSP_STATUS_VARIABLE_REQUEST) {
+    //
+    // call to Variable request handler
+    //
+    FspWrapperVariableRequestHandler (&FspHobListPtr, FspMultiPhaseMemInitApiIndex);
+  }
+
+  //
+  // See if MultiPhase process is required or not
+  //
+  FspWrapperMultiPhaseHandler (&FspHobListPtr, FspMultiPhaseMemInitApiIndex);    // FspM MultiPhase
+
+  //
+  // Create hobs after memory initialization and not in temp RAM. Hence passing the recorded timestamp here
+  //
+  PERF_START_EX (&gFspApiPerformanceGuid, "EventRec", NULL, TimeStampCounterStart, FSP_STATUS_CODE_MEMORY_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
+  PERF_END_EX (&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_MEMORY_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
+  DEBUG ((DEBUG_INFO, "Total time spent executing FspMemoryInitApi: %d millisecond\n", DivU64x32 (GetTimeInNanoSecond (AsmReadTsc () - TimeStampCounterStart), 1000000)));
 
   Status = TestFspMemoryInitApiOutput (FspmUpdDataPtr, &FspHobListPtr);
   if (EFI_ERROR (Status)) {
