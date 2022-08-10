@@ -69,7 +69,16 @@ FspApiCallingCheck (
         Status = EFI_UNSUPPORTED;
       } else if (EFI_ERROR (FspUpdSignatureCheck (FspSiliconInitApiIndex, ApiParam))) {
         Status = EFI_INVALID_PARAMETER;
+      } else if (ApiIdx == FspSiliconInitApiIndex) {
+        //
+        // Reset MultiPhase NumberOfPhases to zero
+        //
+        FspData->NumberOfPhases = 0;
       }
+    }
+  } else if (ApiIdx == FspMultiPhaseMemInitApiIndex) {
+    if ((FspData == NULL) || ((UINTN)FspData == MAX_ADDRESS) || ((UINTN)FspData == MAX_UINT32)) {
+      Status = EFI_UNSUPPORTED;
     }
   } else if (ApiIdx == FspSmmInitApiIndex) {
     //
