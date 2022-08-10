@@ -67,6 +67,9 @@ FspApiCommon2:
   cmp    eax, 6   ; FspMultiPhaseSiInitApiIndex API
   jz     FspApiCommon3
 
+  cmp    eax, 8   ; FspMultiPhaseMemInitApiIndex API
+  jz     FspApiCommon3
+
   call   ASM_PFX(AsmGetFspInfoHeader)
   jmp    ASM_PFX(Loader2PeiSwitchStack)
 

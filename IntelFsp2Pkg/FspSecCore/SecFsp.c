@@ -135,6 +135,10 @@ FspGlobalDataInit (
   PeiFspData->CoreStack = BootLoaderStack;
   PeiFspData->PerfIdx   = 2;
   PeiFspData->PerfSig   = FSP_PERFORMANCE_DATA_SIGNATURE;
+  //
+  // Cache FspHobList pointer passed by bootloader via ApiParameter2
+  //
+  PeiFspData->FspHobListPtr = (VOID **)GetFspApiParameter2 ();
 
   SetFspMeasurePoint (FSP_PERF_ID_API_FSP_MEMORY_INIT_ENTRY);
 
