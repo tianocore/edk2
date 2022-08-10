@@ -1,0 +1,48 @@
+## @file
+#  FSP wrapper to handle FSP MultiPhase (SeparatePhase) Initialization.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FspWrapperMultiPhaseProcessLib
+  FILE_GUID                      = 11E657B7-C3D8-405B-94C5-516840E67B75
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FspWrapperMultiPhaseProcessLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+[Sources]
+  PeiFspWrapperMultiPhaseProcessLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  BaseLib
+  PcdLib
+  FspWrapperPlatformLib
+  PeiServicesLib
+  FspWrapperPlatformMultiPhaseLib
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid
+  gEdkiiPeiVariablePpiGuid
+
+[Pcd]
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress       ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress       ## CONSUMES
