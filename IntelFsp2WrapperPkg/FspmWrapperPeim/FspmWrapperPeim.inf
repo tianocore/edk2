@@ -46,6 +46,7 @@
   FspWrapperApiLib
   FspWrapperApiTestLib
   FspMeasurementLib
+  FspWrapperMultiPhaseProcessLib
 
 [Packages]
   MdePkg/MdePkg.dec

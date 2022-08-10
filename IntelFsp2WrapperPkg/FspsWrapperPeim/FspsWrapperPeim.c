@@ -21,6 +21,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/FspWrapperPlatformLib.h>
 #include <Library/FspWrapperHobProcessLib.h>
+#include <Library/FspWrapperMultiPhaseProcessLib.h>
 #include <Library/TimerLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/FspWrapperApiLib.h>
@@ -36,6 +37,7 @@
 #include <Library/FspWrapperApiTestLib.h>
 #include <FspEas.h>
 #include <FspStatusCode.h>
+#include <FspGlobalData.h>
 
 extern EFI_PEI_NOTIFY_DESCRIPTOR  mS3EndOfPeiNotifyDesc;
 extern EFI_GUID                   gFspHobGuid;
@@ -318,23 +320,36 @@ PeiMemoryDiscoveredNotify (
   TimeStampCounterStart = AsmReadTsc ();
   PERF_START_EX (&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_SILICON_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
   Status = CallFspSiliconInit ((VOID *)FspsUpdDataPtr);
-  PERF_END_EX (&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_SILICON_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
-  DEBUG ((DEBUG_INFO, "Total time spent executing FspSiliconInitApi: %d millisecond\n", DivU64x32 (GetTimeInNanoSecond (AsmReadTsc () - TimeStampCounterStart), 1000000)));
 
   //
   // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
-    DEBUG ((DEBUG_INFO, "FspSiliconInitApi requested reset 0x%x\n", Status));
+    DEBUG ((DEBUG_INFO, "FspSiliconInitApi requested reset %r\n", Status));
     CallFspWrapperResetSystem (Status);
   }
 
-  if (EFI_ERROR (Status)) {
+  if ((Status != FSP_STATUS_VARIABLE_REQUEST) && EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "ERROR - Failed to execute FspSiliconInitApi(), Status = %r\n", Status));
+    ASSERT_EFI_ERROR (Status);
   }
 
-  DEBUG ((DEBUG_INFO, "FspSiliconInit status: 0x%x\n", Status));
-  ASSERT_EFI_ERROR (Status);
+  DEBUG ((DEBUG_INFO, "FspSiliconInit status: %r\n", Status));
+
+  if (Status == FSP_STATUS_VARIABLE_REQUEST) {
+    //
+    // call to Variable request handler
+    //
+    FspWrapperVariableRequestHandler (&FspHobListPtr, FspMultiPhaseSiInitApiIndex);
+  }
+
+  //
+  // See if MultiPhase process is required or not
+  //
+  FspWrapperMultiPhaseHandler (&FspHobListPtr, FspMultiPhaseSiInitApiIndex);    // FspS MultiPhase
+
+  PERF_END_EX (&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_SILICON_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
+  DEBUG ((DEBUG_INFO, "Total time spent executing FspSiliconInitApi: %d millisecond\n", DivU64x32 (GetTimeInNanoSecond (AsmReadTsc () - TimeStampCounterStart), 1000000)));
 
   Status = TestFspSiliconInitApiOutput ((VOID *)NULL);
   if (RETURN_ERROR (Status)) {
