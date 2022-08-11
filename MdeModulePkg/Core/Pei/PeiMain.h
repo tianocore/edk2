@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <PiPei.h>
 #include <Ppi/DxeIpl.h>
+#include <Ppi/DelayedDispatch.h>
+#include <Ppi/EndOfPeiPhase.h>
 #include <Ppi/MemoryDiscovered.h>
 #include <Ppi/StatusCode.h>
 #include <Ppi/Reset.h>
@@ -41,6 +43,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/PeImage.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/TimerLib.h>
 #include <Guid/FirmwareFileSystem2.h>
 #include <Guid/FirmwareFileSystem3.h>
 #include <Guid/AprioriFileName.h>
@@ -207,6 +210,29 @@ EFI_STATUS
 
 #define PEI_CORE_HANDLE_SIGNATURE  SIGNATURE_32('P','e','i','C')
 
+#define GET_TIME_IN_US()  ((UINT32)DivU64x32(GetTimeInNanoSecond(GetPerformanceCounter ()), 1000))
+
+//
+// Internal structure for delayed dispatch entries.
+//
+#pragma pack (push, 1)
+
+typedef struct {
+  EFI_GUID                         UniqueId;
+  UINT64                           Context;
+  EFI_DELAYED_DISPATCH_FUNCTION    Function;
+  UINT32                           DispatchTime;
+  UINT32                           MicrosecondDelay;
+} DELAYED_DISPATCH_ENTRY;
+
+typedef struct {
+  UINT32                    Count;
+  UINT32                    DispCount;
+  DELAYED_DISPATCH_ENTRY    Entry[1];     // Actual size based on PCD PcdDelayedDispatchMaxEntries;
+} DELAYED_DISPATCH_TABLE;
+
+#pragma pack (pop)
+
 ///
 /// Pei Core private data structure instance
 ///
@@ -307,6 +333,11 @@ struct _PEI_CORE_INSTANCE {
   // Those Memory Range will be migrated into physical memory.
   //
   HOLE_MEMORY_DATA                  HoleData[HOLE_MAX_NUMBER];
+
+  //
+  // Table of delayed dispatch requests
+  //
+  DELAYED_DISPATCH_TABLE            *DelayedDispatchTable;
 };
 
 ///
@@ -2036,6 +2067,51 @@ extern EFI_PEI_PCI_CFG2_PPI  gPeiDefaultPciCfg2Ppi;
 VOID
 PeiReinitializeFv (
   IN  PEI_CORE_INSTANCE  *PrivateData
+  );
+
+/**
+Register a callback to be called after a minimum delay has occurred.
+
+This service is the single member function of the EFI_DELAYED_DISPATCH_PPI
+
+  @param[in] This           Pointer to the EFI_DELAYED_DISPATCH_PPI instance
+  @param[in] Function       Function to call back
+  @param[in] Context        Context data
+  @param[in] UniqueId       GUID for this Delayed Dispatch request.
+  @param[in] Delay          Delay interval
+
+  @retval EFI_SUCCESS               Function successfully loaded
+  @retval EFI_INVALID_PARAMETER     One of the Arguments is not supported
+  @retval EFI_OUT_OF_RESOURCES      No more entries
+
+**/
+EFI_STATUS
+EFIAPI
+PeiDelayedDispatchRegister (
+  IN  EFI_DELAYED_DISPATCH_PPI       *This,
+  IN  EFI_DELAYED_DISPATCH_FUNCTION  Function,
+  IN  UINT64                         Context,
+  IN  EFI_GUID                       *UniqueId   OPTIONAL,
+  IN  UINT32                         Delay
+  );
+
+/**
+  Wait on a registered Delayed Dispatch unit that has a UniqueId.  Continue
+  to dispatch all registered delayed dispatch entries until *ALL* entries with
+  UniqueId have completed.
+
+  @param[in]     This            The Delayed Dispatch PPI pointer.
+  @param[in]     UniqueId        UniqueId of delayed dispatch entry.
+
+  @retval EFI_SUCCESS            The operation succeeds.
+  @retval EFI_INVALID_PARAMETER  The parameters are invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+PeiDelayedDispatchWaitOnUniqueId (
+  IN EFI_DELAYED_DISPATCH_PPI  *This,
+  IN EFI_GUID                  *UniqueId
   );
 
 #endif
