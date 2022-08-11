@@ -2013,7 +2013,10 @@ PeiDispatcher (
     //  pass. If we did not dispatch a PEIM/FV there is no point in trying again
     //  as it will fail the next time too (nothing has changed).
     //
-  } while (Private->PeimNeedingDispatch && Private->PeimDispatchOnThisPass);
+    // Also continue dispatch loop if there are outstanding delay-
+    // dispatch registrations still running.
+  } while ((Private->PeimNeedingDispatch && Private->PeimDispatchOnThisPass) ||
+           (Private->DelayedDispatchTable->Count > 0));
 }
 
 /**
