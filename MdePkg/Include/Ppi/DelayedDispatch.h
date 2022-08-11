@@ -4,6 +4,7 @@
     Provide timed event service in PEI
 
     Copyright (c) 2020, American Megatrends International LLC. All rights reserved.
+    Copyright (c) Microsoft Corporation.
     SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -15,7 +16,7 @@
 ///
 #define EFI_DELAYED_DISPATCH_PPI_GUID \
   { \
-    0x869c711d, 0x649c, 0x44fe, { 0x8b, 0x9e, 0x2c, 0xbb, 0x29, 0x11, 0xc3, 0xe6} } \
+    0x869c711d, 0x649c, 0x44fe, { 0x8b, 0x9e, 0x2c, 0xbb, 0x29, 0x11, 0xc3, 0xe6} \
   }
 
 /**
@@ -46,10 +47,10 @@ Register a callback to be called after a minimum delay has occurred.
 
 This service is the single member function of the EFI_DELAYED_DISPATCH_PPI
 
-  @param This           Pointer to the EFI_DELAYED_DISPATCH_PPI instance
-  @param Function       Function to call back
-  @param Context        Context data
-  @param Delay          Delay interval
+  @param[in] This           Pointer to the EFI_DELAYED_DISPATCH_PPI instance
+  @param[in] Function       Function to call back
+  @param[in] Context        Context data
+  @param[in] Delay          Delay interval
 
   @retval EFI_SUCCESS               Function successfully loaded
   @retval EFI_INVALID_PARAMETER     One of the Arguments is not supported
@@ -61,8 +62,8 @@ EFI_STATUS
 (EFIAPI *EFI_DELAYED_DISPATCH_REGISTER)(
   IN  EFI_DELAYED_DISPATCH_PPI      *This,
   IN  EFI_DELAYED_DISPATCH_FUNCTION  Function,
-  IN  UINT64                     Context,
-  OUT UINT32                     Delay
+  IN  UINT64                         Context,
+  IN  UINT32                         Delay
   );
 
 ///
