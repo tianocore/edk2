@@ -1,5 +1,5 @@
 /** @file
-    EFI Delayed Dispatch PPI as defined in the PI 1.7 Specification
+    EFI Delayed Dispatch PPI as defined in the PI 1.8 Specification
 
     Provide timed event service in PEI
 
@@ -50,6 +50,7 @@ This service is the single member function of the EFI_DELAYED_DISPATCH_PPI
   @param[in] This           Pointer to the EFI_DELAYED_DISPATCH_PPI instance
   @param[in] Function       Function to call back
   @param[in] Context        Context data
+  @param[in] UniqueId       GUID for this Delayed Dispatch request.
   @param[in] Delay          Delay interval
 
   @retval EFI_SUCCESS               Function successfully loaded
@@ -63,7 +64,27 @@ EFI_STATUS
   IN  EFI_DELAYED_DISPATCH_PPI      *This,
   IN  EFI_DELAYED_DISPATCH_FUNCTION  Function,
   IN  UINT64                         Context,
+  IN  EFI_GUID                      *UniqueId   OPTIONAL,
   IN  UINT32                         Delay
+  );
+
+/**
+  Wait on a registered Delayed Dispatch unit that has a UniqueId.  Continue
+  to dispatch all registered delayed dispatch entries until *ALL* entries with
+  UniqueId have completed.
+
+  @param[in]     This            The Delayed Dispatch PPI pointer.
+  @param[in]     UniqueId        UniqueId of delayed dispatch entry.
+
+  @retval EFI_SUCCESS            The operation succeeds.
+  @retval EFI_INVALID_PARAMETER  The parameters are invalid.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EFI_DELAYED_DISPATCH_WAIT_ON_EVENT)(
+  IN  EFI_DELAYED_DISPATCH_PPI      *This,
+  IN  EFI_GUID                      *UniqueId
   );
 
 ///
@@ -73,7 +94,8 @@ EFI_STATUS
 /// execution.
 ///
 struct _EFI_DELAYED_DISPATCH_PPI {
-  EFI_DELAYED_DISPATCH_REGISTER    Register;
+  EFI_DELAYED_DISPATCH_REGISTER         Register;
+  EFI_DELAYED_DISPATCH_WAIT_ON_EVENT    WaitOnEvent;
 };
 
 extern EFI_GUID  gEfiPeiDelayedDispatchPpiGuid;
