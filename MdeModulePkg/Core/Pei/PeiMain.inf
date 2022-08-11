@@ -66,6 +66,7 @@
   PeCoffLib
   PeiServicesTablePointerLib
   PcdLib
+  TimerLib
 
 [Guids]
   gPeiAprioriFileNameGuid       ## SOMETIMES_CONSUMES   ## File
@@ -78,6 +79,7 @@
   gEfiFirmwareFileSystem3Guid
   gStatusCodeCallbackGuid
   gEdkiiMigratedFvInfoGuid                      ## SOMETIMES_PRODUCES     ## HOB
+  gEfiDelayedDispatchTableGuid                  ## SOMETIMES_PRODUCES     ## HOB
 
 [Ppis]
   gEfiPeiStatusCodePpiGuid                      ## SOMETIMES_CONSUMES # PeiReportStatusService is not ready if this PPI doesn't exist
@@ -100,6 +102,8 @@
   gEfiPeiReset2PpiGuid                          ## SOMETIMES_CONSUMES
   gEfiSecHobDataPpiGuid                         ## SOMETIMES_CONSUMES
   gEfiPeiCoreFvLocationPpiGuid                  ## SOMETIMES_CONSUMES
+  gEfiPeiDelayedDispatchPpiGuid                 ## SOMETIMES_CONSUMES
+  gEfiEndOfPeiSignalPpiGuid                     ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize                  ## CONSUMES
@@ -112,6 +116,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot                        ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack                    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMigrateTemporaryRamFirmwareVolumes      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDelayedDispatchMaxDelayUs               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDelayedDispatchCompletionTimeoutUs      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDelayedDispatchMaxEntries               ## CONSUMES
 
 # [BootMode]
 # S3_RESUME             ## SOMETIMES_CONSUMES
