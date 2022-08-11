@@ -236,6 +236,11 @@ TranslateBmpToGopBlt (
     return RETURN_UNSUPPORTED;
   }
 
+  if ((BmpHeader->ImageOffset == sizeof (BMP_IMAGE_HEADER)) &&
+      ((BmpHeader->BitPerPixel & 0x0D) != 0)) {
+    return RETURN_UNSUPPORTED;
+  }
+
   if (BmpHeader->ImageOffset > sizeof (BMP_IMAGE_HEADER)) {
     switch (BmpHeader->BitPerPixel) {
       case 1:
