@@ -1,0 +1,57 @@
+## @file
+#  Entry point to a EFI/DXE driver. This version is specific to QEMU, and ties
+#  dispatch of the driver in question on the value of a QEMU fw_cfg boolean
+#  variable which is referenced by name via a fixed pointer PCD.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2022, Google LLC. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = UefiDriverEntryPointFwCfgOverrideLib
+  FILE_GUID                      = 73349b79-f148-43b8-b24e-9098a6f3e1db
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UefiDriverEntryPoint|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER
+
+[Sources]
+  UefiDriverEntryPointFwCfgOverrideLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  QemuFwCfgSimpleParserLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiLoadedImageProtocolGuid                   ## SOMETIMES_CONSUMES
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideFwCfgVarName
+
+#
+# For UEFI drivers, these architectural protocols defined in PI 1.0 spec need
+# to be appended and merged to the final dependency section.
+#
+[Depex.common.UEFI_DRIVER]
+  gEfiBdsArchProtocolGuid AND
+  gEfiCpuArchProtocolGuid AND
+  gEfiMetronomeArchProtocolGuid AND
+  gEfiMonotonicCounterArchProtocolGuid AND
+  gEfiRealTimeClockArchProtocolGuid AND
+  gEfiResetArchProtocolGuid AND
+  gEfiRuntimeArchProtocolGuid AND
+  gEfiSecurityArchProtocolGuid AND
+  gEfiTimerArchProtocolGuid AND
+  gEfiVariableWriteArchProtocolGuid AND
+  gEfiVariableArchProtocolGuid AND
+  gEfiWatchdogTimerArchProtocolGuid
