@@ -218,6 +218,10 @@ VirtioFsGetDriverName (
   OUT CHAR16                        **DriverName
   )
 {
+  if ((Language == NULL) || (DriverName == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   if (AsciiStrCmp (Language, "en") != 0) {
     return EFI_UNSUPPORTED;
   }
