@@ -1752,8 +1752,7 @@ Returns:
   // Check whether there is GUID for the SubtypeGuid section
   //
   if ((SectType == EFI_SECTION_FREEFORM_SUBTYPE_GUID) && (CompareGuid (&VendorGuid, &mZeroGuid) == 0)) {
-    Error (NULL, 0, 1001, "Missing options", "GUID");
-    goto Finish;
+    fprintf (stdout, "Warning: input guid value is required for section type %s\n", SectionName);
   }
 
   //
@@ -1825,13 +1824,25 @@ Returns:
     break;
 
   case EFI_SECTION_FREEFORM_SUBTYPE_GUID:
-    Status = GenSectionSubtypeGuidSection (
-              InputFileName,
-              InputFileAlign,
-              InputFileNum,
-              &VendorGuid,
-              &OutFileBuffer
-              );
+    if (CompareGuid (&VendorGuid, &mZeroGuid) == 0) {
+      //
+      // Preserve existing behavior when no GUID value is provided
+      //
+      Status = GenSectionCommonLeafSection (
+                InputFileName,
+                InputFileNum,
+                SectType,
+                &OutFileBuffer
+                );
+    } else {
+      Status = GenSectionSubtypeGuidSection (
+                InputFileName,
+                InputFileAlign,
+                InputFileNum,
+                &VendorGuid,
+                &OutFileBuffer
+                );
+    }
     break;
 
   case EFI_SECTION_VERSION:
