@@ -65,10 +65,15 @@ RedfishGetHostInterfaceProtocolData (
         RecordTmp       = (UINT8 *)Record + Offset;
 
         //
-        // Check Device Type, only PCI/PCIe Network Interface v2 is supported now.
+        // Check Device Type, PCI/PCIe and USB Network Interface v2 is supported.
         //
-        if (*RecordTmp == REDFISH_HOST_INTERFACE_DEVICE_TYPE_PCI_PCIE_V2) {
-          ASSERT (SpecificDataLen == sizeof (PCI_OR_PCIE_INTERFACE_DEVICE_DESCRIPTOR_V2) + 1);
+        if ((*RecordTmp == REDFISH_HOST_INTERFACE_DEVICE_TYPE_PCI_PCIE_V2) || (*RecordTmp == REDFISH_HOST_INTERFACE_DEVICE_TYPE_USB_V2)) {
+          if (*RecordTmp == REDFISH_HOST_INTERFACE_DEVICE_TYPE_PCI_PCIE_V2) {
+            ASSERT (SpecificDataLen == sizeof (PCI_OR_PCIE_INTERFACE_DEVICE_DESCRIPTOR_V2) + 1);
+          } else {
+            ASSERT (SpecificDataLen > sizeof (REDFISH_HOST_INTERFACE_DEVICE_TYPE_USB_V2) + 1);
+          }
+
           *DeviceDescriptor = (REDFISH_INTERFACE_DATA *)RecordTmp;
           Offset            = Offset + SpecificDataLen;
           RecordTmp         = (UINT8 *)Record + Offset;
