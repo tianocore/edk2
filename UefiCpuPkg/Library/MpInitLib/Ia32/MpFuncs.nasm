@@ -179,6 +179,11 @@ ProgramStack:
     mov         esp, dword [edi + CPU_INFO_IN_HOB.ApTopOfStack]
 
 CProcedureInvoke:
+    ;
+    ; Reserve 4 bytes for storing CpuMpData.
+    ; Using sub esp instead of push ebp to avoid overwriting the existed CpuMpData
+    ;
+    sub        esp, 4
     push       ebp               ; push BIST data at top of AP stack
     xor        ebp, ebp          ; clear ebp for call stack trace
     push       ebp

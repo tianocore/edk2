@@ -237,11 +237,17 @@ ProgramStack:
     mov         rsp, qword [rdi + CPU_INFO_IN_HOB.ApTopOfStack]
 
 CProcedureInvoke:
+    ;
+    ; Reserve 8 bytes for storing CpuMpData.
+    ; Using sub rsp instead of push rbp to avoid overwriting existed CpuMpData
+    ;
+    sub        rsp, 8
     push       rbp               ; Push BIST data at top of AP stack
     xor        rbp, rbp          ; Clear ebp for call stack trace
     push       rbp
     mov        rbp, rsp
 
+    push       qword 0          ; Push 8 bytes for alignment
     mov        rax, qword [esi + MP_CPU_EXCHANGE_INFO_FIELD (InitializeFloatingPointUnits)]
     sub        rsp, 20h
     call       rax               ; Call assembly function to initialize FPU per UEFI spec
