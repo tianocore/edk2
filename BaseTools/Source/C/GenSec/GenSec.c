@@ -1112,7 +1112,7 @@ Returns:
   //
   if (TotalLength >= MAX_SECTION_SIZE) {
     SubtypeGuidSect2 = (EFI_FREEFORM_SUBTYPE_GUID_SECTION2 *) FileBuffer;
-    SubtypeGuidSect2->CommonHeader.Type     = EFI_SECTION_GUID_DEFINED;
+    SubtypeGuidSect2->CommonHeader.Type     = EFI_SECTION_FREEFORM_SUBTYPE_GUID;
     SubtypeGuidSect2->CommonHeader.Size[0]  = (UINT8) 0xff;
     SubtypeGuidSect2->CommonHeader.Size[1]  = (UINT8) 0xff;
     SubtypeGuidSect2->CommonHeader.Size[2]  = (UINT8) 0xff;
