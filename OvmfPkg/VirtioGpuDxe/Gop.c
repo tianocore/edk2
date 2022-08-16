@@ -308,7 +308,10 @@ GopQueryMode (
 {
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *GopModeInfo;
 
-  if (ModeNumber >= This->Mode->MaxMode) {
+  if ((Info == NULL) ||
+      (SizeOfInfo == NULL) ||
+      (ModeNumber >= This->Mode->MaxMode))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
