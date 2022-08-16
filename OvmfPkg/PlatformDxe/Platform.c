@@ -232,6 +232,10 @@ ExtractConfig (
 
   DEBUG ((DEBUG_VERBOSE, "%a: Request=\"%s\"\n", __FUNCTION__, Request));
 
+  if ((Progress == NULL) || (Results == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Status = PlatformConfigToFormState (&MainFormState);
   if (EFI_ERROR (Status)) {
     *Progress = Request;
@@ -339,6 +343,10 @@ RouteConfig (
     __FUNCTION__,
     Configuration
     ));
+
+  if (Progress == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   //
   // the "read" step in RMW
