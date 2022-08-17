@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef _PREPI_H_
-#define _PREPI_H_
+#ifndef PREPI_H_
+#define PREPI_H_
 
 #include <PiPei.h>
 
@@ -85,4 +85,4 @@ ProcessLibraryConstructorList (
   VOID
   );
 
-#endif /* _PREPI_H_ */
+#endif // PREPI_H_

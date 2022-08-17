@@ -6,8 +6,8 @@
 
  **/
 
-#ifndef _NORFLASHPLATFORMLIB_H_
-#define _NORFLASHPLATFORMLIB_H_
+#ifndef NORFLASHPLATFORMLIB_H_
+#define NORFLASHPLATFORMLIB_H_
 
 typedef struct {
   UINTN    DeviceBaseAddress;       // Start address of the Device Base Address (DBA)
@@ -27,4 +27,4 @@ NorFlashPlatformGetDevices (
   OUT UINT32                 *Count
   );
 
-#endif /* _NORFLASHPLATFORMLIB_H_ */
+#endif // NORFLASHPLATFORMLIB_H_

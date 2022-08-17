@@ -7,8 +7,8 @@
 
 **/
 
-#ifndef __PREPEICORE_H_
-#define __PREPEICORE_H_
+#ifndef PREPEICORE_H_
+#define PREPEICORE_H_
 
 #include <Library/ArmLib.h>
 #include <Library/ArmPlatformLib.h>

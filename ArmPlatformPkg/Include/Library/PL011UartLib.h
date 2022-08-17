@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __PL011_UART_LIB_H__
-#define __PL011_UART_LIB_H__
+#ifndef PL011_UART_LIB_H_
+#define PL011_UART_LIB_H_
 
 #include <Uefi/UefiBaseType.h>
 

@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __SP805_WATCHDOG_H__
-#define __SP805_WATCHDOG_H__
+#ifndef SP805_WATCHDOG_H_
+#define SP805_WATCHDOG_H_
 
 // SP805 Watchdog Registers
 #define SP805_WDOG_LOAD_REG         ((UINT32)PcdGet32 (PcdSP805WatchdogBase) + 0x000)
@@ -38,4 +38,4 @@
 #define SP805_WDOG_LOCK_IS_LOCKED       0x00000001
 #define SP805_WDOG_SPECIAL_UNLOCK_CODE  0x1ACCE551
 
-#endif // __SP805_WATCHDOG_H__
+#endif // SP805_WATCHDOG_H_
