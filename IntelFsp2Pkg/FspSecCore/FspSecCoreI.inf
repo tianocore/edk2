@@ -1,0 +1,54 @@
+## @file
+#  Sec Core for FSP
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FspSecCoreI
+  FILE_GUID                      = 558782b5-782d-415e-ab9e-0ceb79dc3425
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SecFspApiChk.c
+  SecFsp.h
+
+[Sources.X64]
+  X64/FspApiEntryI.nasm
+  X64/FspApiEntryCommon.nasm
+  X64/FspHelper.nasm
+
+[Sources.IA32]
+  Ia32/FspApiEntryI.nasm
+  Ia32/FspApiEntryCommon.nasm
+  Ia32/FspHelper.nasm
+
+[Binaries.Ia32]
+  RAW|Vtf0/Bin/ResetVec.ia32.raw |GCC
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  BaseLib
+  PciCf8Lib
+  SerialPortLib
+  FspSwitchStackLib
+  FspCommonLib
+  FspSecPlatformLib
+
+

@@ -685,9 +685,9 @@ CreateIdentityMappingPageTables (
   UINTN                           IndexOfPml4Entries;
   UINTN                           IndexOfPdpEntries;
   UINTN                           IndexOfPageDirectoryEntries;
-  UINTN                           NumberOfPml5EntriesNeeded;
-  UINTN                           NumberOfPml4EntriesNeeded;
-  UINTN                           NumberOfPdpEntriesNeeded;
+  UINT32                          NumberOfPml5EntriesNeeded;
+  UINT32                          NumberOfPml4EntriesNeeded;
+  UINT32                          NumberOfPdpEntriesNeeded;
   PAGE_MAP_AND_DIRECTORY_POINTER  *PageMapLevel5Entry;
   PAGE_MAP_AND_DIRECTORY_POINTER  *PageMapLevel4Entry;
   PAGE_MAP_AND_DIRECTORY_POINTER  *PageMap;
