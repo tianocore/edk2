@@ -64,7 +64,7 @@
 
   ##  @libraryclass Redfish Helper Library
   #   Library provides Redfish helper functions.
-  RedfishLib|PrivateInclude/Library/RedfishLib.h
+  RedfishLib|Include/Library/RedfishLib.h
 
 [Protocols]
   ## Include/Protocol/EdkIIRedfishCredential.h
