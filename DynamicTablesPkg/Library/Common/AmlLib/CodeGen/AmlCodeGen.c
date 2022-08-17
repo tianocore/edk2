@@ -2600,3 +2600,253 @@ error_handler:
 
   return Status;
 }
+
+/** AML code generation for a _DSD device data object.
+
+  AmlAddDeviceDataDescriptorPackage (Uuid, DsdNode, PackageNode) is
+  equivalent of the following ASL code:
+    ToUUID(Uuid),
+    Package () {}
+
+  Cf ACPI 6.4 specification, s6.2.5 "_DSD (Device Specific Data)".
+
+  _DSD (Device Specific Data) Implementation Guide
+  https://github.com/UEFI/DSD-Guide
+  Per s3. "'Well-Known _DSD UUIDs and Data Structure Formats'"
+  If creating a Device Properties data then UUID daffd814-6eba-4d8c-8a91-bc9bbf4aa301 should be used.
+
+  @param [in]  Uuid           The Uuid of the descriptor to be created
+  @param [in]  DsdNode        Node of the DSD Package.
+  @param [out] PackageNode    If success, contains the created package node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddDeviceDataDescriptorPackage (
+  IN  CONST EFI_GUID                *Uuid,
+  IN        AML_OBJECT_NODE_HANDLE  DsdNode,
+  OUT       AML_OBJECT_NODE_HANDLE  *PackageNode
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE         *UuidNode;
+  AML_DATA_NODE           *UuidDataNode;
+  AML_OBJECT_NODE_HANDLE  DsdEntryList;
+
+  if ((Uuid == NULL)     ||
+      (PackageNode == NULL) ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)DsdNode) != EAmlNodeObject) ||
+      (!AmlNodeHasOpCode (DsdNode, AML_NAME_OP, 0))                 ||
+      !AmlNameOpCompareName (DsdNode, "_DSD"))
+  {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Get the Package object node of the _DSD node,
+  // which is the 2nd fixed argument (i.e. index 1).
+  DsdEntryList = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                           DsdNode,
+                                           EAmlParseIndexTerm1
+                                           );
+  if ((DsdEntryList == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)DsdEntryList) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (DsdEntryList, AML_PACKAGE_OP, 0)))
+  {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *PackageNode = NULL;
+  UuidDataNode = NULL;
+
+  Status = AmlCodeGenBuffer (NULL, 0, &UuidNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeRaw,
+             (CONST UINT8 *)Uuid,
+             sizeof (EFI_GUID),
+             &UuidDataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HEADER *)UuidNode,
+             (AML_NODE_HEADER *)UuidDataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  UuidDataNode = NULL;
+
+  // Append to the list of _DSD entries.
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)DsdEntryList,
+             (AML_NODE_HANDLE)UuidNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  Status = AmlCodeGenPackage (PackageNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler_detach;
+  }
+
+  // Append to the list of _DSD entries.
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)DsdEntryList,
+             (AML_NODE_HANDLE)*PackageNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler_detach;
+  }
+
+  return Status;
+
+error_handler_detach:
+  if (UuidNode != NULL) {
+    AmlDetachNode ((AML_NODE_HANDLE)UuidNode);
+  }
+
+error_handler:
+  if (UuidNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)UuidNode);
+  }
+
+  if (*PackageNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)*PackageNode);
+    *PackageNode = NULL;
+  }
+
+  if (UuidDataNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)UuidDataNode);
+  }
+
+  return Status;
+}
+
+/** AML code generation to add a package with a name and value,
+    to a parent package.
+    This is useful to build the _DSD package but can be used in other cases.
+
+  AmlAddNameIntegerPackage ("Name", Value, PackageNode) is
+  equivalent of the following ASL code:
+    Package (2) {"Name", Value}
+
+  Cf ACPI 6.4 specification, s6.2.5 "_DSD (Device Specific Data)".
+
+  @param [in]  Name           String to place in first entry of package
+  @param [in]  Value          Integer to place in second entry of package
+  @param [in]  PackageNode    Package to add new sub package to.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddNameIntegerPackage (
+  IN CHAR8                   *Name,
+  IN UINT64                  Value,
+  IN AML_OBJECT_NODE_HANDLE  PackageNode
+  )
+{
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *NameNode;
+  AML_OBJECT_NODE  *ValueNode;
+  AML_OBJECT_NODE  *NewPackageNode;
+
+  if ((Name == NULL) ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PackageNode) != EAmlNodeObject) ||
+      (!AmlNodeHasOpCode (PackageNode, AML_PACKAGE_OP, 0)))
+  {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  NameNode  = NULL;
+  ValueNode = NULL;
+
+  // The new package entry.
+  Status = AmlCodeGenPackage (&NewPackageNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = AmlCodeGenString (Name, &NameNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)NewPackageNode,
+             (AML_NODE_HANDLE)NameNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  NameNode = NULL;
+
+  Status = AmlCodeGenInteger (Value, &ValueNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)NewPackageNode,
+             (AML_NODE_HANDLE)ValueNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  ValueNode = NULL;
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PackageNode,
+             (AML_NODE_HANDLE)NewPackageNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  return Status;
+
+error_handler:
+  if (NewPackageNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)NewPackageNode);
+  }
+
+  if (NameNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)NameNode);
+  }
+
+  if (ValueNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)ValueNode);
+  }
+
+  return Status;
+}
