@@ -130,6 +130,13 @@ VirtioNetGetControllerName (
   }
 
   //
+  // This is a device driver, so ChildHandle must be NULL.
+  //
+  if (ChildHandle != NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
   // confirm that the device is managed by this driver, using the VirtIo
   // Protocol
   //
