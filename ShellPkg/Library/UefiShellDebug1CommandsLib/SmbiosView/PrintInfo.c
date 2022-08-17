@@ -2,6 +2,7 @@
   Module for clarifying the content of the smbios structure element information.
 
   Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 1985 - 2022, American Megatrends International LLC.<BR>
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2015-2019 Hewlett Packard Enterprise Development LP<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -597,8 +598,9 @@ SmbiosPrintStructure (
     //
     case 9:
     {
-      MISC_SLOT_PEER_GROUP  *PeerGroupPtr;
-      UINT8                 PeerGroupCount;
+      MISC_SLOT_PEER_GROUP         *PeerGroupPtr;
+      SMBIOS_TABLE_TYPE9_EXTENDED  *Type9ExtendedStruct;
+      UINT8                        PeerGroupCount;
 
       PRINT_PENDING_STRING (Struct, Type9, SlotDesignation);
       DisplaySystemSlotType (Struct->Type9->SlotType, Option);
@@ -636,9 +638,12 @@ SmbiosPrintStructure (
             ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DATA_BUS_WIDTH), gShellDebug1HiiHandle, PeerGroupPtr[Index].DataBusWidth);
           }
 
-          DisplaySystemSlotHeight (Struct->Type9->SlotHeight, Option);
-          DisplaySystemSlotPhysicalWidth (Struct->Type9->SlotPhysicalWidth, Option);
-          DisplaySystemSlotInformation (Struct->Type9->SlotInformation, Option);
+          // Since PeerGroups has a variable number of entries, new fields added after PeerGroups are defined in
+          // a extended structure. Those fields can be referenced using SMBIOS_TABLE_TYPE9_EXTENDED structure.
+          Type9ExtendedStruct = (SMBIOS_TABLE_TYPE9_EXTENDED *)((UINT8 *)PeerGroupPtr + (PeerGroupCount * sizeof (MISC_SLOT_PEER_GROUP)));
+          DisplaySystemSlotHeight (Type9ExtendedStruct->SlotHeight, Option);
+          DisplaySystemSlotPhysicalWidth (Type9ExtendedStruct->SlotPhysicalWidth, Option);
+          DisplaySystemSlotInformation (Type9ExtendedStruct->SlotInformation, Option);
         }
       }
 
