@@ -1,7 +1,7 @@
 /** @file
   HMAC-SHA256 KDF Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2018 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
