@@ -1884,7 +1884,7 @@ MpInitLibInitialize (
   // Make sure no memory usage outside of the allocated buffer.
   // (ApStackSize - (Buffer - (UINTN)MpBuffer)) is the redundant caused by alignment
   //
-  ASSERT ()(
+  ASSERT (
     (CpuMpData->CpuInfoInHob + sizeof (CPU_INFO_IN_HOB) * MaxLogicalProcessorNumber) ==
     (UINTN)MpBuffer + BufferSize - (ApStackSize - Buffer + (UINTN)MpBuffer)
     );
