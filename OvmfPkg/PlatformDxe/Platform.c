@@ -109,6 +109,11 @@ STATIC EFI_EVENT  mGopEvent;
 STATIC VOID  *mGopTracker;
 
 //
+// The driver image handle, used to obtain the device path for <ConfigHdr>.
+//
+STATIC EFI_HANDLE  mImageHandle;
+
+//
 // Cache the resolutions we get from the GOP.
 //
 typedef struct {
@@ -229,6 +234,10 @@ ExtractConfig (
 {
   MAIN_FORM_STATE  MainFormState;
   EFI_STATUS       Status;
+  EFI_STRING       ConfigRequestHdr;
+  EFI_STRING       ConfigRequest;
+  UINTN            Size;
+  BOOLEAN          AllocatedRequest;
 
   DEBUG ((DEBUG_VERBOSE, "%a: Request=\"%s\"\n", __FUNCTION__, Request));
 
@@ -236,10 +245,65 @@ ExtractConfig (
     return EFI_INVALID_PARAMETER;
   }
 
+  ConfigRequestHdr = NULL;
+  ConfigRequest    = NULL;
+  Size             = 0;
+  AllocatedRequest = FALSE;
+
+  //
+  // Check if <ConfigHdr> matches the GUID and name
+  //
+  *Progress = Request;
+  if ((Request != NULL) &&
+      !HiiIsConfigHdrMatch (
+         Request,
+         &gOvmfPlatformConfigGuid,
+         mVariableName
+         )
+      )
+  {
+    return EFI_NOT_FOUND;
+  }
+
   Status = PlatformConfigToFormState (&MainFormState);
   if (EFI_ERROR (Status)) {
-    *Progress = Request;
     return Status;
+  }
+
+  if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
+    //
+    // Request has no <RequestElement>, so construct full request string.
+    // Allocate and fill a buffer large enough to hold <ConfigHdr>
+    // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a
+    // null terminator.
+    //
+    ConfigRequestHdr = HiiConstructConfigHdr (
+                         &gOvmfPlatformConfigGuid,
+                         mVariableName,
+                         mImageHandle
+                         );
+    if (ConfigRequestHdr == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest    = AllocateZeroPool (Size);
+    AllocatedRequest = TRUE;
+    if (ConfigRequest == NULL) {
+      FreePool (ConfigRequestHdr);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    UnicodeSPrint (
+      ConfigRequest,
+      Size,
+      L"%s&OFFSET=0&WIDTH=%016LX",
+      ConfigRequestHdr,
+      sizeof MainFormState
+      );
+    FreePool (ConfigRequestHdr);
+  } else {
+    ConfigRequest = Request;
   }
 
   //
@@ -247,7 +311,7 @@ ExtractConfig (
   //
   Status = gHiiConfigRouting->BlockToConfig (
                                 gHiiConfigRouting,
-                                Request,
+                                ConfigRequest,
                                 (VOID *)&MainFormState,
                                 sizeof MainFormState,
                                 Results,
@@ -263,6 +327,33 @@ ExtractConfig (
       ));
   } else {
     DEBUG ((DEBUG_VERBOSE, "%a: Results=\"%s\"\n", __FUNCTION__, *Results));
+  }
+
+  //
+  // If we used a newly allocated ConfigRequest, update Progress to point to
+  // original Request instead of ConfigRequest.
+  //
+  if (Request == NULL) {
+    *Progress = NULL;
+  } else if (StrStr (Request, L"OFFSET") == NULL) {
+    if (EFI_ERROR (Status)) {
+      //
+      // Since we constructed ConfigRequest, failure can only occur if there
+      // is not enough memory. In this case, we point Progress to the first
+      // character of Request.
+      //
+      *Progress = Request;
+    } else {
+      //
+      // In case of success, we point Progress to the null terminator of
+      // Request.
+      //
+      *Progress = Request + StrLen (Request);
+    }
+  }
+
+  if (AllocatedRequest) {
+    FreePool (ConfigRequest);
   }
 
   return Status;
@@ -346,6 +437,21 @@ RouteConfig (
 
   if ((Progress == NULL) || (Configuration == NULL)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check if <ConfigHdr> matches the GUID and name
+  //
+  *Progress = Configuration;
+  if ((Configuration != NULL) &&
+      !HiiIsConfigHdrMatch (
+         Configuration,
+         &gOvmfPlatformConfigGuid,
+         mVariableName
+         )
+      )
+  {
+    return EFI_NOT_FOUND;
   }
 
   //
@@ -865,6 +971,11 @@ PlatformInit (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  //
+  // Save the driver image handle.
+  //
+  mImageHandle = ImageHandle;
 
   //
   // Publish the HII package list to HII Database.
