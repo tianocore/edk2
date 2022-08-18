@@ -1,7 +1,7 @@
 ## @file
 #  CPU Exception Handler library instance for SEC/PEI modules.
 #
-#  Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2012 - 2022, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -49,6 +49,11 @@
   LocalApicLib
   PeCoffGetEntryPointLib
   VmgExitLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize
 
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard                    ## CONSUMES
