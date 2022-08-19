@@ -301,6 +301,14 @@ struct _CPU_MP_DATA {
   UINT64         GhcbBase;
 };
 
+//
+// AP_STACK_DATA is stored at the top of each AP stack.
+//
+typedef struct {
+  UINTN          Bist;
+  CPU_MP_DATA    *MpData;
+} AP_STACK_DATA;
+
 #define AP_SAFE_STACK_SIZE   128
 #define AP_RESET_STACK_SIZE  AP_SAFE_STACK_SIZE
 

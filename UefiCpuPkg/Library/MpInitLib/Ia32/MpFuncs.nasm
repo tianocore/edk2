@@ -179,6 +179,14 @@ ProgramStack:
     mov         esp, dword [edi + CPU_INFO_IN_HOB.ApTopOfStack]
 
 CProcedureInvoke:
+    ;
+    ; Reserve 4 bytes for CpuMpData.
+    ; When the AP wakes up again via INIT-SIPI-SIPI, push 0 will cause the existing CpuMpData to be overwritten with 0.
+    ; CpuMpData is filled in via InitializeApData() during the first time INIT-SIPI-SIPI,
+    ; while overwirrten may occurs when under ApInHltLoop but InitFlag is not set to ApInitConfig.
+    ; Therefore reservation is implemented by sub esp instead of push 0.
+    ;
+    sub        esp, 4
     push       ebp               ; push BIST data at top of AP stack
     xor        ebp, ebp          ; clear ebp for call stack trace
     push       ebp
