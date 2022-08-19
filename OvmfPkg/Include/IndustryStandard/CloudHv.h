@@ -16,12 +16,12 @@
 //
 // ACPI timer address
 //
-#define CLOUDHV_ACPI_TIMER_IO_ADDRESS  0xb008
+#define CLOUDHV_ACPI_TIMER_IO_ADDRESS  0x0608
 
 //
 // ACPI shutdown device address
 //
-#define CLOUDHV_ACPI_SHUTDOWN_IO_ADDRESS  0x03c0
+#define CLOUDHV_ACPI_SHUTDOWN_IO_ADDRESS  0x0600
 
 //
 // 32-bit MMIO memory hole base address
