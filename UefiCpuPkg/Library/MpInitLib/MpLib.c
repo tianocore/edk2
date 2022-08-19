@@ -599,12 +599,19 @@ InitializeApData (
 {
   CPU_INFO_IN_HOB                *CpuInfoInHob;
   MSR_IA32_PLATFORM_ID_REGISTER  PlatformIdMsr;
+  AP_STACK_DATA                  *ApStackData;
 
   CpuInfoInHob                                = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
   CpuInfoInHob[ProcessorNumber].InitialApicId = GetInitialApicId ();
   CpuInfoInHob[ProcessorNumber].ApicId        = GetApicId ();
   CpuInfoInHob[ProcessorNumber].Health        = BistData;
   CpuInfoInHob[ProcessorNumber].ApTopOfStack  = ApTopOfStack;
+
+  //
+  // AP_STACK_DATA is stored at the top of AP Stack
+  //
+  ApStackData         = (AP_STACK_DATA *)((UINTN)ApTopOfStack - sizeof (AP_STACK_DATA));
+  ApStackData->MpData = CpuMpData;
 
   CpuMpData->CpuData[ProcessorNumber].Waiting    = FALSE;
   CpuMpData->CpuData[ProcessorNumber].CpuHealthy = (BistData == 0) ? TRUE : FALSE;
@@ -651,6 +658,7 @@ ApWakeupFunction (
   CPU_INFO_IN_HOB   *CpuInfoInHob;
   UINT64            ApTopOfStack;
   UINTN             CurrentApicMode;
+  AP_STACK_DATA     *ApStackData;
 
   //
   // AP finished assembly code and begin to execute C code
@@ -676,7 +684,9 @@ ApWakeupFunction (
       // This is first time AP wakeup, get BIST information from AP stack
       //
       ApTopOfStack = CpuMpData->Buffer + (ProcessorNumber + 1) * CpuMpData->CpuApStackSize;
-      BistData     = *(UINT32 *)((UINTN)ApTopOfStack - sizeof (UINTN));
+      ApStackData  = (AP_STACK_DATA *)((UINTN)ApTopOfStack - sizeof (AP_STACK_DATA));
+      BistData     = (UINT32)ApStackData->Bist;
+
       //
       // CpuMpData->CpuData[0].VolatileRegisters is initialized based on BSP environment,
       //   to initialize AP in InitConfig path.
@@ -1824,14 +1834,22 @@ MpInitLibInitialize (
   AsmGetAddressMap (&AddressMap);
   GetApResetVectorSize (&AddressMap, &ApResetVectorSizeBelow1Mb, &ApResetVectorSizeAbove1Mb);
   ApStackSize = PcdGet32 (PcdCpuApStackSize);
-  ApLoopMode  = GetApLoopMode (&MonitorFilterSize);
+  //
+  // ApStackSize must be power of 2
+  //
+  ASSERT ((ApStackSize & (ApStackSize - 1)) == 0);
+  ApLoopMode = GetApLoopMode (&MonitorFilterSize);
 
   //
   // Save BSP's Control registers for APs.
   //
   SaveVolatileRegisters (&VolatileRegisters);
 
-  BufferSize  = ApStackSize * MaxLogicalProcessorNumber;
+  BufferSize = ApStackSize * MaxLogicalProcessorNumber;
+  //
+  // Allocate extra ApStackSize to let AP stack align on ApStackSize bounday
+  //
+  BufferSize += ApStackSize;
   BufferSize += MonitorFilterSize * MaxLogicalProcessorNumber;
   BufferSize += ApResetVectorSizeBelow1Mb;
   BufferSize  = ALIGN_VALUE (BufferSize, 8);
@@ -1841,13 +1859,13 @@ MpInitLibInitialize (
   MpBuffer    = AllocatePages (EFI_SIZE_TO_PAGES (BufferSize));
   ASSERT (MpBuffer != NULL);
   ZeroMem (MpBuffer, BufferSize);
-  Buffer = (UINTN)MpBuffer;
+  Buffer = ALIGN_VALUE ((UINTN)MpBuffer, ApStackSize);
 
   //
-  //  The layout of the Buffer is as below:
+  //  The layout of the Buffer is as below (lower address on top):
   //
-  //    +--------------------+ <-- Buffer
-  //        AP Stacks (N)
+  //    +--------------------+ <-- Buffer (Pointer of CpuMpData is stored in the top of each AP's stack.)
+  //        AP Stacks (N)                 (StackTop = (RSP + ApStackSize) & ~ApStackSize))
   //    +--------------------+ <-- MonitorBuffer
   //    AP Monitor Filters (N)
   //    +--------------------+ <-- BackupBufferAddr (CpuMpData->BackupBuffer)
@@ -1855,7 +1873,7 @@ MpInitLibInitialize (
   //    +--------------------+
   //           Padding
   //    +--------------------+ <-- ApIdtBase (8-byte boundary)
-  //           AP IDT          All APs share one separate IDT. So AP can get address of CPU_MP_DATA from IDT Base.
+  //           AP IDT          All APs share one separate IDT.
   //    +--------------------+ <-- CpuMpData
   //         CPU_MP_DATA
   //    +--------------------+ <-- CpuMpData->CpuData
@@ -1892,10 +1910,11 @@ MpInitLibInitialize (
 
   //
   // Make sure no memory usage outside of the allocated buffer.
+  // (ApStackSize - (Buffer - (UINTN)MpBuffer)) is the redundant caused by alignment
   //
   ASSERT (
     (CpuMpData->CpuInfoInHob + sizeof (CPU_INFO_IN_HOB) * MaxLogicalProcessorNumber) ==
-    Buffer + BufferSize
+    (UINTN)MpBuffer + BufferSize - (ApStackSize - Buffer + (UINTN)MpBuffer)
     );
 
   //
