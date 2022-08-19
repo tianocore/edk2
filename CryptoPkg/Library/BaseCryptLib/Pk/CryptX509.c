@@ -1678,17 +1678,15 @@ _Exit:
 
 /**
   Verify one X509 certificate was issued by the trusted CA.
+  @param[in]      RootCert          Trusted Root Certificate buffer
 
+  @param[in]      RootCertLength    Trusted Root Certificate buffer length
   @param[in]      CertChain         One or more ASN.1 DER-encoded X.509 certificates
                                     where the first certificate is signed by the Root
                                     Certificate or is the Root Cerificate itself. and
                                     subsequent cerificate is signed by the preceding
                                     cerificate.
   @param[in]      CertChainLength   Total length of the certificate chain, in bytes.
-
-  @param[in]      RootCert          Trusted Root Certificate buffer
-
-  @param[in]      RootCertLength    Trusted Root Certificate buffer length
 
   @retval  TRUE   All cerificates was issued by the first certificate in X509Certchain.
   @retval  FALSE  Invalid certificate or the certificate was not issued by the given
