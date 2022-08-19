@@ -557,7 +557,7 @@ PlatformTdxPublishRamRegions (
     BuildMemoryAllocationHob (
       (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase),
       (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaSize),
-      EfiBootServicesData
+      EfiRuntimeServicesData
       );
   }
 }

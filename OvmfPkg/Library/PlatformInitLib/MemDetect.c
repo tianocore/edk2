@@ -1022,7 +1022,7 @@ PlatformQemuInitializeRamForS3 (
       BuildMemoryAllocationHob (
         (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase),
         (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaSize),
-        PlatformInfoHob->S3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
+        PlatformInfoHob->S3Supported ? EfiACPIMemoryNVS : EfiRuntimeServicesData
         );
     }
 
