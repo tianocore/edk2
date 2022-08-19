@@ -239,11 +239,20 @@ ProgramStack:
     mov         rsp, qword [rdi + CPU_INFO_IN_HOB.ApTopOfStack]
 
 CProcedureInvoke:
+    ;
+    ; Reserve 8 bytes for CpuMpData.
+    ; When the AP wakes up again via INIT-SIPI-SIPI, push 0 will cause the existing CpuMpData to be overwritten with 0.
+    ; CpuMpData is filled in via InitializeApData() during the first time INIT-SIPI-SIPI,
+    ; while overwirrten may occurs when under ApInHltLoop but InitFlag is not set to ApInitConfig.
+    ; Therefore reservation is implemented by sub rsp instead of push 0.
+    ;
+    sub        rsp, 8
     push       rbp               ; Push BIST data at top of AP stack
     xor        rbp, rbp          ; Clear ebp for call stack trace
     push       rbp
     mov        rbp, rsp
 
+    push       qword 0          ; Push 8 bytes for alignment
     mov        rax, qword [esi + MP_CPU_EXCHANGE_INFO_FIELD (InitializeFloatingPointUnits)]
     sub        rsp, 20h
     call       rax               ; Call assembly function to initialize FPU per UEFI spec
