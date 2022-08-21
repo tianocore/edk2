@@ -1,0 +1,41 @@
+## @file
+#  UEFI Application to exercise EFI_MP_SERVICES_PROTOCOL.
+#
+#  Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = MpServicesTest
+  FILE_GUID                      = 43e9defa-7209-4b0d-b136-cc4ca02cb469
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 0.1
+  ENTRY_POINT                    = UefiMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  MpServicesTest.c
+  Options.c
+  Options.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  CacheMaintenanceLib
+  ShellLib
+  UefiApplicationEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiMpServiceProtocolGuid    ## CONSUMES
+
