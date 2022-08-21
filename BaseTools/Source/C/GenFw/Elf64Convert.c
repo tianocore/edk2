@@ -1306,6 +1306,22 @@ WriteSections64 (
         UINT8    *Targ;
 
         //
+        // The _GLOBAL_OFFSET_TABLE_ symbol is not actually an absolute symbol,
+        // but carries the SHN_ABS section index for historical reasons.
+        // It must be accompanied by a R_*_GOT_* type relocation on a
+        // subsequent instruction, which we handle below, specifically to avoid
+        // the GOT indirection, and to refer to the symbol directly. This means
+        // we can simply disregard direct references to the GOT symbol itself,
+        // as the resulting value will never be used.
+        //
+        if (Sym->st_shndx == SHN_ABS) {
+          const UINT8 *SymName = GetSymName (Sym);
+          if (strcmp ((CHAR8 *)SymName, "_GLOBAL_OFFSET_TABLE_") == 0) {
+            continue;
+          }
+        }
+
+        //
         // Check section header index found in symbol table and get the section
         // header location.
         //
@@ -1447,6 +1463,23 @@ WriteSections64 (
 
           switch (ELF_R_TYPE(Rel->r_info)) {
             INT64 Offset;
+
+          case R_AARCH64_LD64_GOTOFF_LO15:
+          case R_AARCH64_LD64_GOTPAGE_LO15:
+            //
+            // Convert into an ADR instruction that refers to the symbol directly.
+            //
+            Offset = Sym->st_value - Rel->r_offset;
+
+            *(UINT32 *)Targ &= 0x1000001f;
+            *(UINT32 *)Targ |= ((Offset & 0x1ffffc) << (5 - 2)) | ((Offset & 0x3) << 29);
+
+            if (Offset < -0x100000 || Offset > 0xfffff) {
+              Error (NULL, 0, 3000, "Invalid", "WriteSections64(): %s failed to relax GOT based symbol reference - image is too big (>1 MiB).",
+                mInImageName);
+              break;
+            }
+            break;
 
           case R_AARCH64_LD64_GOT_LO12_NC:
             //
@@ -1686,6 +1719,8 @@ WriteRelocations64 (
             case R_AARCH64_LDST128_ABS_LO12_NC:
             case R_AARCH64_ADR_GOT_PAGE:
             case R_AARCH64_LD64_GOT_LO12_NC:
+            case R_AARCH64_LD64_GOTOFF_LO15:
+            case R_AARCH64_LD64_GOTPAGE_LO15:
               //
               // No fixups are required for relative relocations, provided that
               // the relative offsets between sections have been preserved in
