@@ -135,7 +135,9 @@ typedef struct {
       UINT8    GenerateKey          : 1;
       UINT8    CheckKey             : 1;
       UINT8    Pkcs1Sign            : 1;
+      UINT8    Pkcs1SignWithNid     : 1;
       UINT8    Pkcs1Verify          : 1;
+      UINT8    Pkcs1VerifyWithNid   : 1;
       UINT8    GetPrivateKeyFromPem : 1;
       UINT8    GetPublicKeyFromX509 : 1;
     } Services;
