@@ -407,6 +407,7 @@ MdeModulePkg: Universal Payload definitions
 F: MdeModulePkg/Include/UniversalPayload/
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
 R: Ray Ni <ray.ni@intel.com> [niruiyu]
+R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 
 MdePkg
 F: MdePkg/
@@ -604,6 +605,8 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/UefiPayloadPkg
 M: Guo Dong <guo.dong@intel.com> [gdong1]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 M: Sean Rhodes <sean@starlabs.systems> [Sean-StarLabs]
+M: James Lu <james.lu@intel.com> [jameslu8]
+R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 S: Maintained
 
 UnitTestFrameworkPkg
