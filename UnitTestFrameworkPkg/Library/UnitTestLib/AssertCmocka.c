@@ -349,7 +349,7 @@ UnitTestAssertNotNull (
                               is either pass, skipped, or failed.
   @param[in]  FunctionName    Null-terminated ASCII string of the function
                               executing the UT_EXPECT_ASSERT_FAILURE() macro.
-  @param[in]  LineNumber      The source file line number of the the function
+  @param[in]  LineNumber      The source file line number of the function
                               executing the UT_EXPECT_ASSERT_FAILURE() macro.
   @param[in]  FileName        Null-terminated ASCII string of the filename
                               executing the UT_EXPECT_ASSERT_FAILURE() macro.
