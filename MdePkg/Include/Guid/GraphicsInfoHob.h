@@ -5,7 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
-  This HOB is introduced in in PI Version 1.4.
+  This HOB is introduced in PI Version 1.4.
 
 **/
 

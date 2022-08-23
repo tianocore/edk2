@@ -384,9 +384,9 @@ FileHandleGetFileName (
   @param[in, out]  Buffer        The pointer to buffer to read into.
   @param[in, out]  Size          The pointer to number of bytes in Buffer.
   @param[in]       Truncate      If the buffer is large enough, this has no effect.
-                                 If the buffer is is too small and Truncate is TRUE,
+                                 If the buffer is too small and Truncate is TRUE,
                                  the line will be truncated.
-                                 If the buffer is is too small and Truncate is FALSE,
+                                 If the buffer is too small and Truncate is FALSE,
                                  then no read will occur.
 
   @param[in, out]  Ascii         Boolean value for indicating whether the file is

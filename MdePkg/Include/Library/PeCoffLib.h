@@ -90,7 +90,7 @@ typedef struct {
   ///
   PHYSICAL_ADDRESS            DestinationAddress;
   ///
-  /// PeCoffLoaderLoadImage() sets EntryPoint to to the entry point of the PE/COFF image.
+  /// PeCoffLoaderLoadImage() sets EntryPoint to the entry point of the PE/COFF image.
   ///
   PHYSICAL_ADDRESS            EntryPoint;
   ///

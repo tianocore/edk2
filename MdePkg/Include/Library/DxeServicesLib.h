@@ -82,7 +82,7 @@ GetSectionFromAnyFvByFileType  (
   If Size is NULL, then ASSERT().
 
 
-  @param  NameGuid             A pointer to to the FFS filename GUID to search for
+  @param  NameGuid             A pointer to the FFS filename GUID to search for
                                within any of the firmware volumes in the platform.
   @param  SectionType          Indicates the FFS section type to search for within
                                the FFS file specified by NameGuid.
@@ -135,7 +135,7 @@ GetSectionFromAnyFv  (
   If Buffer is NULL, then ASSERT().
   If Size is NULL, then ASSERT().
 
-  @param  NameGuid             A pointer to to the FFS filename GUID to search for
+  @param  NameGuid             A pointer to the FFS filename GUID to search for
                                within the firmware volumes that the currently
                                executing module was loaded from.
   @param  SectionType          Indicates the FFS section type to search for within
@@ -269,7 +269,7 @@ GetFileBufferByFilePath (
 
   If NameGuid is NULL, then ASSERT().
 
-   @param  NameGuid             A pointer to to the FFS filename GUID to search for
+   @param  NameGuid             A pointer to the FFS filename GUID to search for
                                 within any of the firmware volumes in the platform.
    @param  SectionType          Indicates the FFS section type to search for within
                                 the FFS file specified by NameGuid.

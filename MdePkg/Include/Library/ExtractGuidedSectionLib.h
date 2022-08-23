@@ -114,7 +114,7 @@ RETURN_STATUS
   If GetInfoHandler is NULL, then ASSERT().
   If DecodeHandler is NULL, then ASSERT().
 
-  @param[in]  SectionGuid    A pointer to the GUID associated with the the handlers
+  @param[in]  SectionGuid    A pointer to the GUID associated with the handlers
                              of the GUIDed section type being registered.
   @param[in]  GetInfoHandler Pointer to a function that examines a GUIDed section and returns the
                              size of the decoded buffer and the size of an optional scratch buffer
@@ -163,7 +163,7 @@ ExtractGuidedSectionGetGuidList (
   Examines a GUIDed section specified by InputSection.
   If GUID for InputSection does not match any of the GUIDs registered through ExtractGuidedSectionRegisterHandlers(),
   then RETURN_UNSUPPORTED is returned.
-  If the GUID of InputSection does match the GUID that this handler supports, then the the associated handler
+  If the GUID of InputSection does match the GUID that this handler supports, then the associated handler
   of type EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER that was registered with ExtractGuidedSectionRegisterHandlers()
   is used to retrieve the OututBufferSize, ScratchSize, and Attributes values. The return status from the handler of
   type EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER is returned.
@@ -206,7 +206,7 @@ ExtractGuidedSectionGetInfo (
   Decodes the GUIDed section specified by InputSection.
   If GUID for InputSection does not match any of the GUIDs registered through ExtractGuidedSectionRegisterHandlers(),
   then RETURN_UNSUPPORTED is returned.
-  If the GUID of InputSection does match the GUID that this handler supports, then the the associated handler
+  If the GUID of InputSection does match the GUID that this handler supports, then the associated handler
   of type EXTRACT_GUIDED_SECTION_DECODE_HANDLER that was registered with ExtractGuidedSectionRegisterHandlers()
   is used to decode InputSection into the buffer specified by OutputBuffer and the authentication status of this
   decode operation is returned in AuthenticationStatus.  If the decoded buffer is identical to the data in InputSection,

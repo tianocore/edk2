@@ -81,8 +81,8 @@ _DriverUnloadHandler (
 EFI_STATUS
 EFIAPI
 _ModuleEntryPoint (
-  IN EFI_HANDLE              ImageHandle,
-  IN IN EFI_MM_SYSTEM_TABLE  *MmSystemTable
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_MM_SYSTEM_TABLE  *MmSystemTable
   )
 {
   EFI_STATUS                 Status;

@@ -144,7 +144,7 @@ struct _EFI_SMM_SYSTEM_TABLE2 {
   ///
 
   ///
-  /// A number between zero and and the NumberOfCpus field. This field designates
+  /// A number between zero and the NumberOfCpus field. This field designates
   /// which processor is executing the SMM infrastructure.
   ///
   UINTN    CurrentlyExecutingCpu;

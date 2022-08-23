@@ -1,7 +1,7 @@
 ## @file
 #  Instance of Debug Library using the Standard Error Device.
 #
-#  Debug Lib that sends messages to the the Standard Error Device in the EFI System Table.
+#  Debug Lib that sends messages to the Standard Error Device in the EFI System Table.
 #
 #  Copyright (c) 2018, Microsoft Corporation
 #

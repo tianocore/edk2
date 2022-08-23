@@ -164,7 +164,7 @@ RfcEncodeTest (
   b64String = Btc->TestOutput;
 
   //
-  // Only testing the the translate functionality, so preallocate the proper
+  // Only testing the translate functionality, so preallocate the proper
   // string buffer.
   //
 
@@ -248,7 +248,7 @@ RfcDecodeTest (
   binString = Btc->TestOutput;
 
   //
-  //  Only testing the the translate functionality
+  //  Only testing the translate functionality
   //
 
   b64StringLen = AsciiStrnLenS (b64String, MAX_TEST_STRING_SIZE);

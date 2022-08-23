@@ -17,7 +17,7 @@
 #include <Library/S3StallLib.h>
 
 /**
-  Stalls the CPU for at least the given number of microseconds and and saves
+  Stalls the CPU for at least the given number of microseconds and saves
   the value in the S3 script to be replayed on S3 resume.
 
   Stalls the CPU for the number of microseconds specified by MicroSeconds.

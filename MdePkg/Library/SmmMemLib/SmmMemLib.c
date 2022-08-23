@@ -1,7 +1,7 @@
 /** @file
   Instance of SMM memory check library.
 
-  SMM memory check library library implementation. This library consumes SMM_ACCESS2_PROTOCOL
+  SMM memory check library implementation. This library consumes SMM_ACCESS2_PROTOCOL
   to get SMRAM information. In order to use this library instance, the platform should produce
   all SMRAM range via SMM_ACCESS2_PROTOCOL, including the range for firmware (like SMM Core
   and SMM driver) and/or specific dedicated hardware.
