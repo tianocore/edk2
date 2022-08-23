@@ -195,5 +195,8 @@
 [Components.X64]
   UefiCpuPkg/Library/CpuExceptionHandlerLib/UnitTest/DxeCpuExceptionHandlerLibUnitTest.inf
 
+[Components.RISCV64]
+  UefiCpuPkg/CpuTimerDxe/CpuTimerDxe.inf
+
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
