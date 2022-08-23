@@ -21,7 +21,7 @@
 #include <Protocol/BootLogo2.h>
 
 //
-// Values in percent of of logo height.
+// Values in percent of logo height.
 //
 #define LOGO_BOTTOM_PADDING    20
 #define PROGRESS_BLOCK_HEIGHT  10
@@ -316,7 +316,7 @@ FindDim (
 
   @param[in] Completion  A value between 0 and 100 indicating the current
                          completion progress of a firmware update.  This
-                         value must the the same or higher than previous
+                         value must the same or higher than previous
                          calls to this service.  The first call of 0 or a
                          value of 0 after reaching a value of 100 resets
                          the progress indicator to 0.

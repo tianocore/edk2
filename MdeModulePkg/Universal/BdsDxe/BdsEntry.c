@@ -832,7 +832,7 @@ BdsEntry (
       for (Index = 0; Index < LoadOptionCount; Index++) {
         //
         // The PlatformRecovery#### options are sorted by OptionNumber.
-        // Find the the smallest unused number as the new OptionNumber.
+        // Find the smallest unused number as the new OptionNumber.
         //
         if (LoadOptions[Index].OptionNumber != Index) {
           break;

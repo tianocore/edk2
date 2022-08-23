@@ -918,7 +918,7 @@ UpdateStatementStatusForForm (
     Link     = GetNextNode (&Form->StatementListHead, Link);
 
     //
-    // For password opcode, not set the the value changed flag.
+    // For password opcode, not set the value changed flag.
     //
     if (Question->Operand == EFI_IFR_PASSWORD_OP) {
       continue;

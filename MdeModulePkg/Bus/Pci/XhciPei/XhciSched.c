@@ -1807,7 +1807,7 @@ XhcPeiSetConfigCmd (
           }
 
           //
-          // Get the bInterval from descriptor and init the the interval field of endpoint context.
+          // Get the bInterval from descriptor and init the interval field of endpoint context.
           // Refer to XHCI 1.1 spec section 6.2.3.6.
           //
           if (DeviceSpeed == EFI_USB_SPEED_FULL) {
@@ -2030,7 +2030,7 @@ XhcPeiSetConfigCmd64 (
           }
 
           //
-          // Get the bInterval from descriptor and init the the interval field of endpoint context.
+          // Get the bInterval from descriptor and init the interval field of endpoint context.
           // Refer to XHCI 1.1 spec section 6.2.3.6.
           //
           if (DeviceSpeed == EFI_USB_SPEED_FULL) {
@@ -2061,7 +2061,7 @@ XhcPeiSetConfigCmd64 (
           InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
           InputContext->EP[Dci-1].MaxESITPayload   = EpDesc->MaxPacketSize;
           //
-          // Get the bInterval from descriptor and init the the interval field of endpoint context
+          // Get the bInterval from descriptor and init the interval field of endpoint context
           //
           if ((DeviceSpeed == EFI_USB_SPEED_FULL) || (DeviceSpeed == EFI_USB_SPEED_LOW)) {
             Interval = EpDesc->Interval;

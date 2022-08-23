@@ -2027,7 +2027,7 @@ Done:
   @param  IfrOpHdr               Ifr opcode header for this opcode.
   @param  VarWidth               The buffer width for this opcode.
   @param  ReturnData             The data block added for this opcode.
-  @param  IsBitVar               Whether the the opcode refers to bit storage.
+  @param  IsBitVar               Whether the opcode refers to bit storage.
 
   @retval  EFI_SUCCESS           This opcode is required.
   @retval  EFI_NOT_FOUND         This opcode is not required.

@@ -78,7 +78,7 @@ align           16
 DebugStackEnd: db "DbgStkEnd >>>>>>"    ;; 16 byte long string - must be 16 bytes to preserve alignment
                 times 0x1ffc dd    0x0  ;; 32K should be enough stack
                                         ;;   This allocation is coocked to insure
-                                        ;;   that the the buffer for the FXSTORE instruction
+                                        ;;   that the buffer for the FXSTORE instruction
                                         ;;   will be 16 byte aligned also.
                                         ;;
 ExceptionNumber: dd 0                   ;; first entry will be the vector number pushed by the stub

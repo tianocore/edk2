@@ -200,7 +200,7 @@ typedef struct _EFI_IFR_GUID_VAREQNAME {
   /// For vareqval (0x100), NameId is 0x100.
   /// This value will convert to a Unicode String following this rule;
   ///            sprintf(StringBuffer, "%d", NameId) .
-  /// The the Unicode String will be used as a EFI Variable Name.
+  /// the Unicode String will be used as a EFI Variable Name.
   ///
   UINT16               NameId;
 } EFI_IFR_GUID_VAREQNAME;

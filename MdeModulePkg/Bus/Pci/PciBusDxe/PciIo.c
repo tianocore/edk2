@@ -73,12 +73,12 @@ InitializePciIoInstance (
 **/
 EFI_STATUS
 PciIoVerifyBarAccess (
-  IN PCI_IO_DEVICE                 *PciIoDevice,
-  IN UINT8                         BarIndex,
-  IN PCI_BAR_TYPE                  Type,
-  IN IN EFI_PCI_IO_PROTOCOL_WIDTH  Width,
-  IN IN UINTN                      Count,
-  IN UINT64                        *Offset
+  IN PCI_IO_DEVICE              *PciIoDevice,
+  IN UINT8                      BarIndex,
+  IN PCI_BAR_TYPE               Type,
+  IN EFI_PCI_IO_PROTOCOL_WIDTH  Width,
+  IN UINTN                      Count,
+  IN UINT64                     *Offset
   )
 {
   if ((UINT32)Width >= EfiPciIoWidthMaximum) {

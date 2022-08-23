@@ -683,7 +683,7 @@ EfiBootManagerGetGopDevicePath (
   );
 
 /**
-  Connect the platform active active video controller.
+  Connect the platform active video controller.
 
   @param VideoController       PCI handle of video controller.
 

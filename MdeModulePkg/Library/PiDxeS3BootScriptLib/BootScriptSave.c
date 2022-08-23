@@ -730,7 +730,7 @@ S3BootScriptGetBootTimeEntryAddAddress (
   }
 
   //
-  // calculate the the start address for the new entry.
+  // calculate the start address for the new entry.
   //
   NewEntryPtr = mS3BootScriptTablePtr->TableBase + TableLength;
 
@@ -2159,7 +2159,7 @@ S3BootScriptCalculateInsertAddress (
     //
     CopyMem (S3TableBase+PositionOffset+EntryLength, S3TableBase+PositionOffset, TableLength - PositionOffset);
     //
-    // calculate the the start address for the new entry.
+    // calculate the start address for the new entry.
     //
     *Script = S3TableBase + PositionOffset;
   } else {

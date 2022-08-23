@@ -862,7 +862,7 @@ ON_EXIT:
                                 from or receive into.
   @param  DataLength            The lenght of the data buffer.
   @param  DataToggle            On input, the initial data toggle for the transfer;
-                                On output, it is updated to to next data toggle to use of
+                                On output, it is updated to next data toggle to use of
                                 the subsequent bulk transfer.
   @param  TimeOut               Indicates the maximum time, in millisecond, which the
                                 transfer is allowed to complete.

@@ -1116,7 +1116,7 @@ BmExpandMediaDevicePath (
   }
 
   //
-  // Detect the the default boot file from removable Media
+  // Detect the default boot file from removable Media
   //
   NextFullPath = NULL;
   Size         = GetDevicePathSize (DevicePath) - END_DEVICE_PATH_LENGTH;
