@@ -95,7 +95,7 @@
   # We need a flag (PCD) to indicate if there is need to do such FSP measurement or NOT.
   # 2) The FSP binary includes FSP code and FSP UPD region. The UPD region is considered
   # as configuration block, and it may be updated by OEM by design.
-  # This flag (PCD) is to indicate if we need isolate the the UPD region from the FSP code region.
+  # This flag (PCD) is to indicate if we need isolate the UPD region from the FSP code region.
   # BIT0: Need measure FSP. (for FSP1.x) - reserved in FSP2.
   # BIT1: Need measure FSPT. (for FSP 2.x)
   # BIT2: Need measure FSPM. (for FSP 2.x)
