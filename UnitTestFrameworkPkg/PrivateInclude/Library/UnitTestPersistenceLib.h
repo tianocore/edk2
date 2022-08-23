@@ -57,7 +57,7 @@ SaveUnitTestCache (
   Will allocate a buffer to hold the loaded data.
 
   @param[in]  FrameworkHandle   A pointer to the framework that is being persisted.
-  @param[in]  SaveData          A pointer pointer that will be updated with the address
+  @param[out] SaveData          A pointer that will be updated with the address
                                 of the loaded data buffer.
 
   @retval     EFI_SUCCESS       Data has been loaded successfully and SaveData is updated

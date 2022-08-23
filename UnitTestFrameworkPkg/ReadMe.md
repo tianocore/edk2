@@ -144,7 +144,7 @@ will be used when adding test cases.
 Great! Now we've finished some of the cruft, red tape, and busy work. We're ready to add some tests. Adding a test
 to a test suite is accomplished with the -- you guessed it -- `AddTestCase` function. It takes in the suite handle;
 a `CHAR8` string for the description and class name; a function pointer for the test case itself; additional, optional
-function pointers for prerequisite check and cleanup routines; and and optional pointer to a context structure.
+function pointers for prerequisite check and cleanup routines; and optional pointer to a context structure.
 
 Okay, that's a lot. Let's take it one piece at a time. The description and class name strings are very similar in
 usage to the suite title and package name strings in the test suites. The former is for user presentation and the
@@ -268,8 +268,8 @@ stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=VS2019 -p MdePkg -t NOOP
 
 ## Building and Running Host-Based Tests
 
-The EDK2 CI infrastructure provides a convenient way to run all host-based tests -- in the the entire tree or just
-selected packages -- and aggregate all the the reports, including highlighting any failures. This functionality is
+The EDK2 CI infrastructure provides a convenient way to run all host-based tests -- in the entire tree or just
+selected packages -- and aggregate all the reports, including highlighting any failures. This functionality is
 provided through the Stuart build system (published by EDK2-PyTools) and the `NOOPT` build target.
 
 ### Building Locally
