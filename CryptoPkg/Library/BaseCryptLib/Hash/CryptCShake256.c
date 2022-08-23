@@ -83,7 +83,7 @@ CShake256Init (
 
     AbsorbLen = 0;
     //
-    // Absorb Absorb bytepad(.., rate).
+    // Absorb bytepad(.., rate).
     //
     EncLen = LeftEncode (EncBuf, CSHAKE256_RATE_IN_BYTES);
     Status = (BOOLEAN)Sha3Update ((Keccak1600_Ctx *)CShake256Context, EncBuf, EncLen);
