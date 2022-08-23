@@ -122,7 +122,7 @@ SearchList (
 
 /**
   Determine what type of device is represented and return it's string.  The
-  string is in allocated memory and must be callee freed.  The HII is is listed below.
+  string is in allocated memory and must be callee freed.  The HII is listed below.
   The actual string cannot be determined.
 
   @param[in] DevicePath     The device to analyze.

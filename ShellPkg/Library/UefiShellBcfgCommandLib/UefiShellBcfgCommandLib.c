@@ -1252,7 +1252,7 @@ BcfgAddOpt (
   }
 
   //
-  // Shouldn't be possible to have have both. Neither is ok though.
+  // Shouldn't be possible to have both. Neither is ok though.
   //
   ASSERT (FileName == NULL || Data == NULL);
 
