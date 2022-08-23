@@ -924,9 +924,10 @@ ON_EXIT:
 }
 
 json_t *
-deleteUriFromService (
+deleteUriFromServiceEx (
   redfishService        *service,
   const char            *uri,
+  const char            *content,
   EFI_HTTP_STATUS_CODE  **StatusCode
   )
 {
@@ -937,6 +938,8 @@ deleteUriFromService (
   EFI_HTTP_REQUEST_DATA  *RequestData = NULL;
   EFI_HTTP_MESSAGE       *RequestMsg  = NULL;
   EFI_HTTP_MESSAGE       ResponseMsg;
+  CHAR8                  ContentLengthStr[80];
+  size_t                 contentLength;
 
   ret = NULL;
 
@@ -956,7 +959,7 @@ deleteUriFromService (
   //
   // Step 1: Create HTTP request message with 4 headers:
   //
-  HttpIoHeader = HttpIoCreateHeader ((service->sessionToken || service->basicAuthStr) ? 5 : 4);
+  HttpIoHeader = HttpIoCreateHeader ((service->sessionToken || service->basicAuthStr) ? 8 : 7);
   if (HttpIoHeader == NULL) {
     ret = NULL;
     goto ON_EXIT;
@@ -978,6 +981,23 @@ deleteUriFromService (
   ASSERT_EFI_ERROR (Status);
   Status = HttpIoSetHeader (HttpIoHeader, "Connection", "Keep-Alive");
   ASSERT_EFI_ERROR (Status);
+
+  Status = HttpIoSetHeader (HttpIoHeader, "Content-Type", "application/json");
+  ASSERT_EFI_ERROR (Status);
+
+  if (content != NULL) {
+    contentLength = strlen (content);
+    AsciiSPrint (
+      ContentLengthStr,
+      sizeof (ContentLengthStr),
+      "%lu",
+      (UINT64)contentLength
+      );
+    Status = HttpIoSetHeader (HttpIoHeader, "Content-Length", ContentLengthStr);
+    ASSERT_EFI_ERROR (Status);
+    Status = HttpIoSetHeader (HttpIoHeader, "OData-Version", "4.0");
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // Step 2: build the rest of HTTP request info.
@@ -1003,6 +1023,11 @@ deleteUriFromService (
   RequestMsg->Data.Request = RequestData;
   RequestMsg->HeaderCount  = HttpIoHeader->HeaderCount;
   RequestMsg->Headers      = HttpIoHeader->Headers;
+
+  if (content != NULL) {
+    RequestMsg->BodyLength = contentLength;
+    RequestMsg->Body       = (VOID *)content;
+  }
 
   ZeroMem (&ResponseMsg, sizeof (ResponseMsg));
 
@@ -1055,6 +1080,16 @@ ON_EXIT:
   RestConfigFreeHttpMessage (&ResponseMsg, FALSE);
 
   return ret;
+}
+
+json_t *
+deleteUriFromService (
+  redfishService        *service,
+  const char            *uri,
+  EFI_HTTP_STATUS_CODE  **StatusCode
+  )
+{
+  return deleteUriFromServiceEx (service, uri, NULL, StatusCode);
 }
 
 redfishPayload *

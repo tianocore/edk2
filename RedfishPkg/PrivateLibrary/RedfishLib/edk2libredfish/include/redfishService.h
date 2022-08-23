@@ -129,6 +129,14 @@ deleteUriFromService (
   EFI_HTTP_STATUS_CODE  **StatusCode
   );
 
+json_t *
+deleteUriFromServiceEx (
+  redfishService        *service,
+  const char            *uri,
+  const char            *content,
+  EFI_HTTP_STATUS_CODE  **StatusCode
+  );
+
 redfishPayload *
 getRedfishServiceRoot (
   redfishService        *service,

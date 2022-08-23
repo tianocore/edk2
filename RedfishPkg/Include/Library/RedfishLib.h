@@ -381,6 +381,47 @@ RedfishPatchToPayload (
   );
 
 /**
+  Use HTTP POST to create new Redfish resource in the Resource Collection.
+
+  The POST request should be submitted to the Resource Collection in which the new resource
+  is to belong. The Resource Collection is addressed by URI. The Redfish may
+  ignore any service controlled properties. The corresponding redfish response will returned,
+  including HTTP StatusCode, Headers and Payload which record any HTTP response messages.
+
+  Callers are responsible for freeing the HTTP StatusCode, Headers and Payload returned in
+  redfish response data.
+
+  @param[in]    RedfishService        The Service to access the Redfish resources.
+  @param[in]    Uri                   Relative path to address the resource.
+  @param[in]    Content               JSON represented properties to be update.
+  @param[in]    ContentSize           Size of the Content to be send to Redfish service
+  @param[in]    ContentType           Type of the Content to be send to Redfish service
+  @param[out]   RedResponse           Pointer to the Redfish response data.
+
+  @retval EFI_SUCCESS             The opeartion is successful, indicates the HTTP StatusCode is not
+                                  NULL and the value is 2XX. The Redfish resource will be returned
+                                  in Payload within RedResponse if server send it back in the HTTP
+                                  response message body.
+  @retval EFI_INVALID_PARAMETER   RedfishService, Uri, Content, or RedResponse is NULL.
+  @retval EFI_DEVICE_ERROR        An unexpected system or network error occurred. Callers can get
+                                  more error info from returned HTTP StatusCode, Headers and Payload
+                                  within RedResponse:
+                                  1. If the returned StatusCode is NULL, indicates any error happen.
+                                  2. If the returned StatusCode is not NULL and the value is not 2XX,
+                                     indicates any error happen.
+**/
+EFI_STATUS
+EFIAPI
+RedfishPostToUri (
+  IN     REDFISH_SERVICE   RedfishService,
+  IN     CONST CHAR8       *Uri,
+  IN     CONST CHAR8       *Content,
+  IN     UINTN             ContentSize,
+  IN     CONST CHAR8       *ContentType,
+  OUT    REDFISH_RESPONSE  *RedResponse
+  );
+
+/**
   Use HTTP POST to create a new resource in target payload.
 
   The POST request should be submitted to the Resource Collection in which the new resource
@@ -447,6 +488,43 @@ EFIAPI
 RedfishDeleteByUri (
   IN     REDFISH_SERVICE   RedfishService,
   IN     CONST CHAR8       *Uri,
+  OUT    REDFISH_RESPONSE  *RedResponse
+  );
+
+/**
+  Use HTTP DELETE to remove a resource.
+
+  This function uses the RedfishService to remove a Redfish resource which is addressed
+  by input Uri (only the relative path is required). The corresponding redfish response will
+  returned, including HTTP StatusCode, Headers and Payload which record any HTTP response
+  messages.
+
+  Callers are responsible for freeing the HTTP StatusCode, Headers and Payload returned in
+  redfish response data.
+
+  @param[in]    RedfishService        The Service to access the Redfish resources.
+  @param[in]    Uri                   Relative path to address the resource.
+  @param[in]    Content               JSON represented properties to be deleted.
+  @param[out]   RedResponse           Pointer to the Redfish response data.
+
+  @retval EFI_SUCCESS             The opeartion is successful, indicates the HTTP StatusCode is not
+                                  NULL and the value is 2XX, the Redfish resource has been removed.
+                                  If there is any message returned from server, it will be returned
+                                  in Payload within RedResponse.
+  @retval EFI_INVALID_PARAMETER   RedfishService, Uri, or RedResponse is NULL.
+  @retval EFI_DEVICE_ERROR        An unexpected system or network error occurred. Callers can get
+                                  more error info from returned HTTP StatusCode, Headers and Payload
+                                  within RedResponse:
+                                  1. If the returned StatusCode is NULL, indicates any error happen.
+                                  2. If the returned StatusCode is not NULL and the value is not 2XX,
+                                     indicates any error happen.
+**/
+EFI_STATUS
+EFIAPI
+RedfishDeleteByUriEx (
+  IN     REDFISH_SERVICE   RedfishService,
+  IN     CONST CHAR8       *Uri,
+  IN     CONST CHAR8       *Content,
   OUT    REDFISH_RESPONSE  *RedResponse
   );
 
