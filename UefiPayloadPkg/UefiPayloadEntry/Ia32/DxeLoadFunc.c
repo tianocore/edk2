@@ -131,7 +131,7 @@ Create4GPageTablesIa32Pae (
   for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
     //
     // Each Directory Pointer entries points to a page of Page Directory entires.
-    // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
+    // So allocate space for them and fill them in the IndexOfPageDirectoryEntries loop.
     //
     PageDirectoryEntry = (VOID *)PageAddress;
     PageAddress       += SIZE_4KB;

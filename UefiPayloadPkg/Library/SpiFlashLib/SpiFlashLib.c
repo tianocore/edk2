@@ -807,7 +807,7 @@ WaitForSpiCycleComplete (
 /**
   Get the SPI region base and size, based on the enum type
 
-  @param[in] FlashRegionType      The Flash Region type for for the base address which is listed in the Descriptor.
+  @param[in] FlashRegionType      The Flash Region type for the base address which is listed in the Descriptor.
   @param[out] BaseAddress         The Flash Linear Address for the Region 'n' Base
   @param[out] RegionSize          The size for the Region 'n'
 

@@ -822,7 +822,7 @@ CreateIdentityMappingPageTables (
   {
     //
     // Each PML5 entry points to a page of PML4 entires.
-    // So lets allocate space for them and fill them in in the IndexOfPml4Entries loop.
+    // So lets allocate space for them and fill them in the IndexOfPml4Entries loop.
     // When 5-Level Paging is disabled, below allocation happens only once.
     //
     PageMapLevel4Entry = (VOID *)BigPageAddress;
@@ -844,7 +844,7 @@ CreateIdentityMappingPageTables (
     {
       //
       // Each PML4 entry points to a page of Page Directory Pointer entires.
-      // So lets allocate space for them and fill them in in the IndexOfPdpEntries loop.
+      // So lets allocate space for them and fill them in the IndexOfPdpEntries loop.
       //
       PageDirectoryPointerEntry = (VOID *)BigPageAddress;
       BigPageAddress           += SIZE_4KB;
@@ -879,7 +879,7 @@ CreateIdentityMappingPageTables (
         {
           //
           // Each Directory Pointer entries points to a page of Page Directory entires.
-          // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
+          // So allocate space for them and fill them in the IndexOfPageDirectoryEntries loop.
           //
           PageDirectoryEntry = (VOID *)BigPageAddress;
           BigPageAddress    += SIZE_4KB;

@@ -476,7 +476,7 @@ LoadElf64Image (
   }
 
   //
-  // Relocate when new new image base is not the preferred image base.
+  // Relocate when new image base is not the preferred image base.
   //
   if (ElfCt->ImageAddress != ElfCt->PreferredImageAddress) {
     RelocateElf64Sections (ElfCt);
