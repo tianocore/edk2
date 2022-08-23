@@ -1325,7 +1325,7 @@ EFI_REDFISH_DISCOVER_PROTOCOL  mRedfishDiscover = {
   @param[in]  ControllerHandle    MAC address of this network interface.
   @param[in]  NetworkProtocolType Network protocol type.
   @param[out] IsNewInstance       BOOLEAN means new instance or not.
-  @param[out] NetworkInterface    Pointer to to EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL.
+  @param[out] NetworkInterface    Pointer to EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL.
 
   @retval EFI_STATUS
 **/
