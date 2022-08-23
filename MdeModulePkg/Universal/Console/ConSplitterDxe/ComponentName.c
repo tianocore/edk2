@@ -507,7 +507,7 @@ ConSplitterSimplePointerComponentNameGetControllerName (
                                  not be NULL for a bus driver that wishes to
                                  retrieve the name of a child controller.
   @param  Language               A pointer to RFC4646 language identifier. This is
-                                 the language of the controller name that that the
+                                 the language of the controller name that the
                                  caller is requesting, and it must match one of the
                                  languages specified in SupportedLanguages.  The
                                  number of languages supported by a driver is up to

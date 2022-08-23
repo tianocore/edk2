@@ -156,7 +156,7 @@ BmSetMemoryTypeInformationVariable (
   }
 
   //
-  // Only check the the Memory Type Information variable in the boot mode
+  // Only check the Memory Type Information variable in the boot mode
   // other than BOOT_WITH_DEFAULT_SETTINGS because the Memory Type
   // Information is not valid in this boot mode.
   //

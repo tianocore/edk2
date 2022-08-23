@@ -1793,7 +1793,7 @@ GetDistanceBetweenMenus (
 
   @param  HighLightMenu      The link_entry pointer to highlight menu.
 
-  @retval  Return the the link_entry pointer top of screen menu.
+  @retval  Return the link_entry pointer top of screen menu.
 
 **/
 LIST_ENTRY *

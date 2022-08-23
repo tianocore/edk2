@@ -965,7 +965,7 @@ XhcControlTransfer (
     //
     // The actual device address has been assigned by XHCI during initializing the device slot.
     // So we just need establish the mapping relationship between the device address requested from UsbBus
-    // and the actual device address assigned by XHCI. The the following invocations through EFI_USB2_HC_PROTOCOL interface
+    // and the actual device address assigned by XHCI. the following invocations through EFI_USB2_HC_PROTOCOL interface
     // can find out the actual device address by it.
     //
     Xhc->UsbDevContext[SlotId].BusDevAddr = (UINT8)Request->Value;
@@ -1206,7 +1206,7 @@ ON_EXIT:
                                 from or receive into.
   @param  DataLength            The lenght of the data buffer.
   @param  DataToggle            On input, the initial data toggle for the transfer;
-                                On output, it is updated to to next data toggle to
+                                On output, it is updated to next data toggle to
                                 use of the subsequent bulk transfer.
   @param  Timeout               Indicates the maximum time, in millisecond, which
                                 the transfer is allowed to complete.

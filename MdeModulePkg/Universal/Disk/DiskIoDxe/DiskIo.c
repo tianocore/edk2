@@ -1002,7 +1002,7 @@ DiskIo2ReadWriteDisk (
     if (!EFI_ERROR (Status) && (Task->Token != NULL)) {
       //
       // Task->Token should be set to NULL by the DiskIo2OnReadWriteComplete
-      // It it's not, that means the non-blocking request was downgraded to blocking request.
+      // If it's not, that means the non-blocking request was downgraded to blocking request.
       //
       DEBUG ((DEBUG_VERBOSE, "DiskIo: Non-blocking request was downgraded to blocking request, signal event directly.\n"));
       Task->Token->TransactionStatus = Status;

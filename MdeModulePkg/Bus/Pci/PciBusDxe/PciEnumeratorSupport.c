@@ -1085,7 +1085,7 @@ PciSetDeviceAttribute (
     // When this attribute is clear, the RomImage and RomSize fields in the PCI IO were
     // initialized based on the PCI option ROM found through the ROM BAR of the PCI controller.
     // When this attribute is set, the PCI option ROM described by the RomImage and RomSize
-    // fields is not from the the ROM BAR of the PCI controller.
+    // fields is not from the ROM BAR of the PCI controller.
     //
     if (!PciIoDevice->EmbeddedRom) {
       Attributes |= EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM;

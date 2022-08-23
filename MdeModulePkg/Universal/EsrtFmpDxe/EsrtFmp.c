@@ -127,7 +127,7 @@ IsSystemFmp (
                            in Table.
   @retval  EFI_SUCCESS     The ImageTypeId GUID in FmpImageInfoBuf matches an
                            existing ESRT entry in Table, and the information
-                           from FmpImageInfoBuf was merged into the the existing
+                           from FmpImageInfoBuf was merged into the existing
                            ESRT entry.
   @retval  EFI_UNSPOORTED  The GUID/HardareInstance in FmpImageInfoBuf has is a
                            duplicate.

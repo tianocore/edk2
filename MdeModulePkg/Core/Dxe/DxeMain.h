@@ -2769,7 +2769,7 @@ MemoryProtectionExitBootServicesCallback (
   @param  Memory            The base address of the range
   @param  Length            The size of the range (in bytes)
 
-  @return EFI_SUCCESS       If the the CPU arch protocol is not installed yet
+  @return EFI_SUCCESS       If the CPU arch protocol is not installed yet
   @return EFI_SUCCESS       If no DXE memory protection policy has been configured
   @return EFI_SUCCESS       If OldType and NewType use the same permission attributes
   @return other             Return value of gCpu->SetMemoryAttributes()

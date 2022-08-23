@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /**
   Check if lang is in supported language codes according to language string.
 
-  This code is used to check if lang is in in supported language codes. It can handle
+  This code is used to check if lang is in supported language codes. It can handle
   RFC4646 and ISO639 language tags.
   In ISO639 language tags, take 3-characters as a delimitation to find matched string.
   In RFC4646 language tags, take semicolon as a delimitation to find matched string.

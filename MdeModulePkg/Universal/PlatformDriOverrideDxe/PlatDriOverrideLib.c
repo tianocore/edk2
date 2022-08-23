@@ -983,7 +983,7 @@ SaveOverridesMapping (
   }
 
   //
-  // Get the the maximum size of an individual EFI variable in current system
+  // Get the maximum size of an individual EFI variable in current system
   //
   gRT->QueryVariableInfo (
          EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,

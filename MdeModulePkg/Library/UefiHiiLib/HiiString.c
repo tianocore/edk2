@@ -36,7 +36,7 @@
                                   String is added or updated in the String Package
                                   associated with HiiHandle for all the languages
                                   that the String Package supports.  If this
-                                  parameter is not NULL, then then String is added
+                                  parameter is not NULL, then String is added
                                   or updated in the String Package associated with
                                   HiiHandle for the set oflanguages specified by
                                   SupportedLanguages.  The format of

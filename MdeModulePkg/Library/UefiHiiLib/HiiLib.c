@@ -635,7 +635,7 @@ InternalHiiBrowserCallback (
 
   if (SetResultsData != NULL) {
     //
-    // Request to to set data in the uncommitted browser state information
+    // Request to set data in the uncommitted browser state information
     //
     ResultsData = SetResultsData;
   } else {
