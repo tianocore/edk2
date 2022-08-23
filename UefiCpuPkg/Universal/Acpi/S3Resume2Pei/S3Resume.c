@@ -688,7 +688,7 @@ RestoreS3PageTables (
     for (IndexOfPml4Entries = 0; IndexOfPml4Entries < NumberOfPml4EntriesNeeded; IndexOfPml4Entries++, PageMapLevel4Entry++) {
       //
       // Each PML4 entry points to a page of Page Directory Pointer entires.
-      // So lets allocate space for them and fill them in in the IndexOfPdpEntries loop.
+      // So lets allocate space for them and fill them in the IndexOfPdpEntries loop.
       //
       PageDirectoryPointerEntry = (PAGE_MAP_AND_DIRECTORY_POINTER *)S3NvsPageTableAddress;
       S3NvsPageTableAddress    += SIZE_4KB;
@@ -716,7 +716,7 @@ RestoreS3PageTables (
         for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
           //
           // Each Directory Pointer entries points to a page of Page Directory entires.
-          // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
+          // So allocate space for them and fill them in the IndexOfPageDirectoryEntries loop.
           //
           PageDirectoryEntry     = (PAGE_TABLE_ENTRY *)S3NvsPageTableAddress;
           S3NvsPageTableAddress += SIZE_4KB;

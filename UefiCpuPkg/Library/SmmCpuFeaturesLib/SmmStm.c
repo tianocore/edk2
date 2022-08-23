@@ -1074,7 +1074,7 @@ GetVmcsSize (
   MSR_IA32_VMX_BASIC_REGISTER  VmxBasic;
 
   //
-  // Read VMCS size and and align to 4KB
+  // Read VMCS size and align to 4KB
   //
   VmxBasic.Uint64 = AsmReadMsr64 (MSR_IA32_VMX_BASIC);
   return ALIGN_VALUE (VmxBasic.Bits.VmcsSize, SIZE_4KB);
