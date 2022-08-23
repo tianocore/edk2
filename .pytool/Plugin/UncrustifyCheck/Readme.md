@@ -94,7 +94,7 @@ to be ignored.
 If `True`, output diffs of formatting changes into the test case log. This is helpful to exactly understand what changes
 need to be made to the source code in order to fix a coding standard compliance issue.
 
-Note that calculating the file diffs on a very large set of of results (e.g. >100 files) can significantly slow down
+Note that calculating the file diffs on a very large set of results (e.g. >100 files) can significantly slow down
 plugin execution.
 
 ### `SkipGitExclusions`
