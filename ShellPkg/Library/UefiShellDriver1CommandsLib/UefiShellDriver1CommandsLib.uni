@@ -171,7 +171,7 @@
 "                   1         - Manufacturing Defaults.\r\n"
 "                   2         - Safe Defaults.\r\n"
 "                   4000-FFFF - Custom Defaults.\r\n"
-"  DriverHandle - Specifies the the handle of the driver to configure.\r\n"
+"  DriverHandle - Specifies the handle of the driver to configure.\r\n"
 "  DeviceHandle - Specifies the handle of a device that the DriverHandle is managing.\r\n"
 "  ChildHandle  - Specifies the handle of a device that is a child of the DeviceHandle. \r\n"
 ".SH DESCRIPTION\r\n"

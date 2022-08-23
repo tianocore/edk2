@@ -9,7 +9,7 @@
 
 #include "UefiShellLevel2CommandsLib.h"
 
-// This function was from from the BdsLib implementation in
+// This function was from the BdsLib implementation in
 // IntelFrameworkModulePkg\Library\GenericBdsLib\BdsConnect.c
 // function name: BdsLibConnectAllEfi
 

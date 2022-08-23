@@ -541,7 +541,7 @@ EFI_STATUS
 /**
   This is an internal shell function to enumerate the handle database.
 
-  This function resets the the handle database so that NEXT_HANDLE and SKIP_HANDLE
+  This function resets the handle database so that NEXT_HANDLE and SKIP_HANDLE
   will start from EnumIndex on the next call.
 
   This must be called after INIT_HANDLE_ENUMERATOR and before CLOSE_HANDLE_ENUMERATOR.

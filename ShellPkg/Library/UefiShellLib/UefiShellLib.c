@@ -4338,9 +4338,9 @@ ShellFileHandleReturnLine (
                                  to hold the next line of the file (as a UCS2
                                  string, even if it is an ASCII file).
   @param[in]       Truncate      If the buffer is large enough, this has no effect.
-                                 If the buffer is is too small and Truncate is TRUE,
+                                 If the buffer is too small and Truncate is TRUE,
                                  the line will be truncated.
-                                 If the buffer is is too small and Truncate is FALSE,
+                                 If the buffer is too small and Truncate is FALSE,
                                  then no read will occur.
 
   @param[in, out]  Ascii         Boolean value for indicating whether the file is

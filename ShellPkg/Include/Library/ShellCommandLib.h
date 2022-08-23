@@ -87,7 +87,7 @@ SHELL_STATUS
   If the ShellSupportLevel is greater than the value of
   PcdShellSupportLevel, then return RETURN_UNSUPPORTED.
 
-  Registers the the handlers specified by GetHelpInfoHandler and CommandHandler
+  Registers the handlers specified by GetHelpInfoHandler and CommandHandler
   with the command specified by CommandString. If the command named by
   CommandString has already been registered, then return
   RETURN_ALREADY_STARTED.
