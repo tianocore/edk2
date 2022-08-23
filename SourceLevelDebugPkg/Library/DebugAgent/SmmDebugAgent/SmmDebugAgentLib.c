@@ -158,7 +158,7 @@ RestoreDebugRegister (
 
   If InitFlag is DEBUG_AGENT_INIT_SMM, it will override IDT table entries
   and initialize debug port. It will get debug agent Mailbox from GUIDed HOB,
-  it it exists, debug agent wiil copied it into the local Mailbox in SMM space.
+  if it exists, debug agent will copy it into the local Mailbox in SMM space.
   it will override IDT table entries and initialize debug port. Context will be
   NULL.
   If InitFlag is DEBUG_AGENT_INIT_ENTER_SMI, debug agent will save Debug
