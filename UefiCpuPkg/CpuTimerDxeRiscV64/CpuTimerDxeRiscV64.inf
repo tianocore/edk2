@@ -1,0 +1,51 @@
+## @file
+# Timer Arch protocol module
+#
+# Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = CpuTimerDxeRiscV64
+  MODULE_UNI_FILE                = CpuTimerDxeRiscV64.uni
+  FILE_GUID                      = 055DDAC6-9142-4013-BF20-FC2E5BC325C9
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TimerDriverInitialize
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+  CpuLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[LibraryClasses.RISCV64]
+  RiscVSbiLib
+
+[Sources.RISCV64]
+  Timer.h
+  Timer.c
+
+[Protocols]
+  gEfiCpuArchProtocolGuid       ## CONSUMES
+  gEfiTimerArchProtocolGuid     ## PRODUCES
+
+[Depex]
+  gEfiCpuArchProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CpuTimerDxeRiscV64Extra.uni
