@@ -19,7 +19,7 @@
   of NameSegs that have less that 4 chars, like "DEV". "DEV" will be expanded
   as "DEV_".
 
-  An AML NameString is not NULL terminated and is is only composed of
+  An AML NameString is not NULL terminated and is only composed of
   4 chars long NameSegs.
 
   @param  [in] NameOpNode   NameOp object node defining a variable.
