@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @param  This       A pointer to the EFI_COMPONENT_NAME_PROTOCOL instance.
   @param  Language   A pointer to a three-character ISO 639-2 language identifier.
-                     This is the language of the driver name that that the caller
+                     This is the language of the driver name that the caller
                      is requesting, and it must match one of the languages specified
                      in SupportedLanguages.  The number of languages supported by a
                      driver is up to the driver writer.
@@ -128,7 +128,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  *gDnsControllerNameTable
 
   @param  This       A pointer to the EFI_COMPONENT_NAME_PROTOCOL instance.
   @param  Language   A pointer to a three-character ISO 639-2 language identifier.
-                     This is the language of the driver name that that the caller
+                     This is the language of the driver name that the caller
                      is requesting, and it must match one of the languages specified
                      in SupportedLanguages.  The number of languages supported by a
                      driver is up to the driver writer.

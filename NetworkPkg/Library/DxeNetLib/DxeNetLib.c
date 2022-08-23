@@ -1011,7 +1011,7 @@ NetListRemoveHead (
 }
 
 /**
-  Remove the last node entry on the list and and return the removed node entry.
+  Remove the last node entry on the list and return the removed node entry.
 
   Removes the last node entry from a doubly linked list. It is up to the caller of
   this function to release the memory used by the first node if that is required. On
