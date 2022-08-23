@@ -539,7 +539,7 @@ STATIC CONST CM_OBJ_PARSER  CmArmCpcInfoParser[] = {
   { "NominalFrequencyInteger",               4,                                               "0x%lx", NULL },
 };
 
-/** A parser for the CM_ARM_MAILBOX_REGISTER_INFO struct.
+/** A parser for the PCC_MAILBOX_REGISTER_INFO struct.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmMailboxRegisterInfoParser[] = {
   { "Register",     sizeof (EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE), NULL,     NULL,
@@ -548,7 +548,7 @@ STATIC CONST CM_OBJ_PARSER  CmArmMailboxRegisterInfoParser[] = {
   { "WriteMask",    8,                                               "0x%llx", NULL },
 };
 
-/** A parser for the CM_ARM_PCC_SUBSPACE_CHANNEL_TIMING_INFO struct.
+/** A parser for the PCC_SUBSPACE_CHANNEL_TIMING_INFO struct.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceChannelTimingInfoParser[] = {
   { "NominalLatency",           4, "0x%x", NULL },
@@ -559,14 +559,14 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceChannelTimingInfoParser[] = {
 /** A parser for EArmObjPccSubspaceType0Info.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType0InfoParser[] = {
-  { "SubspaceId",    1,                                                "0x%x",   NULL },
-  { "Type",          1,                                                "0x%x",   NULL },
-  { "BaseAddress",   8,                                                "0x%llx", NULL },
-  { "AddressLength", 8,                                                "0x%llx", NULL },
-  { "DoorbellReg",   sizeof (CM_ARM_MAILBOX_REGISTER_INFO),
+  { "SubspaceId",    1,                                         "0x%x",   NULL },
+  { "Type",          1,                                         "0x%x",   NULL },
+  { "BaseAddress",   8,                                         "0x%llx", NULL },
+  { "AddressLength", 8,                                         "0x%llx", NULL },
+  { "DoorbellReg",   sizeof (PCC_MAILBOX_REGISTER_INFO),
     NULL, NULL, CmArmMailboxRegisterInfoParser,
     ARRAY_SIZE (CmArmMailboxRegisterInfoParser) },
-  { "DoorbellReg",   sizeof (CM_ARM_PCC_SUBSPACE_CHANNEL_TIMING_INFO),
+  { "DoorbellReg",   sizeof (PCC_SUBSPACE_CHANNEL_TIMING_INFO),
     NULL, NULL, CmArmPccSubspaceChannelTimingInfoParser,
     ARRAY_SIZE (CmArmPccSubspaceChannelTimingInfoParser) },
 };
@@ -574,7 +574,7 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType0InfoParser[] = {
 /** A parser for EArmObjPccSubspaceType1Info.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType1InfoParser[] = {
-  { "GenericPccInfo", sizeof (CM_ARM_PCC_SUBSPACE_GENERIC_INFO),
+  { "GenericPccInfo", sizeof (PCC_SUBSPACE_GENERIC_INFO),
     NULL, NULL, CmArmPccSubspaceType0InfoParser,
     ARRAY_SIZE (CmArmPccSubspaceType0InfoParser) },
   { "PlatIrq",        sizeof (CM_ARM_GENERIC_INTERRUPT),
@@ -585,12 +585,12 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType1InfoParser[] = {
 /** A parser for EArmObjPccSubspaceType2Info.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType2InfoParser[] = {
-  { "GenericPccInfo", sizeof (CM_ARM_PCC_SUBSPACE_GENERIC_INFO),
+  { "GenericPccInfo", sizeof (PCC_SUBSPACE_GENERIC_INFO),
     NULL, NULL, CmArmPccSubspaceType0InfoParser,
     ARRAY_SIZE (CmArmPccSubspaceType0InfoParser) },
-  { "PlatIrq",        sizeof (CM_ARM_GENERIC_INTERRUPT),        NULL,NULL,
+  { "PlatIrq",        sizeof (CM_ARM_GENERIC_INTERRUPT), NULL,NULL,
     CmArmGenericInterruptParser, ARRAY_SIZE (CmArmGenericInterruptParser) },
-  { "PlatIrqAckReg",  sizeof (CM_ARM_MAILBOX_REGISTER_INFO),
+  { "PlatIrqAckReg",  sizeof (PCC_MAILBOX_REGISTER_INFO),
     NULL, NULL, CmArmMailboxRegisterInfoParser,
     ARRAY_SIZE (CmArmMailboxRegisterInfoParser) },
 };
@@ -598,21 +598,21 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType2InfoParser[] = {
 /** A parser for EArmObjPccSubspaceType3Info or EArmObjPccSubspaceType4Info.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType34InfoParser[] = {
-  { "GenericPccInfo",       sizeof (CM_ARM_PCC_SUBSPACE_GENERIC_INFO),
+  { "GenericPccInfo",       sizeof (PCC_SUBSPACE_GENERIC_INFO),
     NULL, NULL, CmArmPccSubspaceType0InfoParser,
     ARRAY_SIZE (CmArmPccSubspaceType0InfoParser) },
-  { "PlatIrq",              sizeof (CM_ARM_GENERIC_INTERRUPT),        NULL,NULL,
+  { "PlatIrq",              sizeof (CM_ARM_GENERIC_INTERRUPT), NULL,NULL,
     CmArmGenericInterruptParser, ARRAY_SIZE (CmArmGenericInterruptParser) },
-  { "PlatIrqAckReg",        sizeof (CM_ARM_MAILBOX_REGISTER_INFO),
+  { "PlatIrqAckReg",        sizeof (PCC_MAILBOX_REGISTER_INFO),
     NULL, NULL, CmArmMailboxRegisterInfoParser,
     ARRAY_SIZE (CmArmMailboxRegisterInfoParser) },
-  { "CmdCompleteCheckReg",  sizeof (CM_ARM_MAILBOX_REGISTER_INFO),
+  { "CmdCompleteCheckReg",  sizeof (PCC_MAILBOX_REGISTER_INFO),
     NULL, NULL, CmArmMailboxRegisterInfoParser,
     ARRAY_SIZE (CmArmMailboxRegisterInfoParser) },
-  { "CmdCompleteUpdateReg", sizeof (CM_ARM_MAILBOX_REGISTER_INFO),
+  { "CmdCompleteUpdateReg", sizeof (PCC_MAILBOX_REGISTER_INFO),
     NULL, NULL, CmArmMailboxRegisterInfoParser,
     ARRAY_SIZE (CmArmMailboxRegisterInfoParser) },
-  { "ErrorStatusReg",       sizeof (CM_ARM_MAILBOX_REGISTER_INFO),
+  { "ErrorStatusReg",       sizeof (PCC_MAILBOX_REGISTER_INFO),
     NULL, NULL, CmArmMailboxRegisterInfoParser,
     ARRAY_SIZE (CmArmMailboxRegisterInfoParser) },
 };
@@ -620,16 +620,16 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType34InfoParser[] = {
 /** A parser for EArmObjPccSubspaceType5Info.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType5InfoParser[] = {
-  { "GenericPccInfo",      sizeof (CM_ARM_PCC_SUBSPACE_GENERIC_INFO),
+  { "GenericPccInfo",      sizeof (PCC_SUBSPACE_GENERIC_INFO),
     NULL, NULL, CmArmPccSubspaceType0InfoParser,
     ARRAY_SIZE (CmArmPccSubspaceType0InfoParser) },
-  { "Version",             2,                                        "0x%x",NULL },
-  { "PlatIrq",             sizeof (CM_ARM_GENERIC_INTERRUPT),        NULL,  NULL,
+  { "Version",             2,                                 "0x%x",NULL },
+  { "PlatIrq",             sizeof (CM_ARM_GENERIC_INTERRUPT), NULL,  NULL,
     CmArmGenericInterruptParser, ARRAY_SIZE (CmArmGenericInterruptParser) },
-  { "CmdCompleteCheckReg", sizeof (CM_ARM_MAILBOX_REGISTER_INFO),
+  { "CmdCompleteCheckReg", sizeof (PCC_MAILBOX_REGISTER_INFO),
     NULL, NULL, CmArmMailboxRegisterInfoParser,
     ARRAY_SIZE (CmArmMailboxRegisterInfoParser) },
-  { "ErrorStatusReg",      sizeof (CM_ARM_MAILBOX_REGISTER_INFO),
+  { "ErrorStatusReg",      sizeof (PCC_MAILBOX_REGISTER_INFO),
     NULL, NULL, CmArmMailboxRegisterInfoParser,
     ARRAY_SIZE (CmArmMailboxRegisterInfoParser) },
 };
