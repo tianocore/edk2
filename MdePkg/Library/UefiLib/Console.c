@@ -413,7 +413,7 @@ CreatePopUp (
   CHAR16                           *TmpString;
 
   //
-  // Determine the length of the longest line in the popup and the the total
+  // Determine the length of the longest line in the popup and the total
   // number of lines in the popup
   //
   VA_START (Args, Key);

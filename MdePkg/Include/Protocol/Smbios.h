@@ -174,7 +174,7 @@ EFI_STATUS
   @param[in]        Type            On entry, it points to the type of the next SMBIOS record to return. If NULL, it
                                     indicates that the next record of any type will be returned. Type is not
                                     modified by the this function.
-  @param[out]       Record          On exit, points to a pointer to the the SMBIOS Record consisting of the formatted area
+  @param[out]       Record          On exit, points to a pointer to the SMBIOS Record consisting of the formatted area
                                     followed by the unformatted area. The unformatted area optionally contains text strings.
   @param[out]       ProducerHandle  On exit, points to the ProducerHandle registered by Add(). If no
                                     ProducerHandle was passed into Add() NULL is returned. If a NULL pointer is

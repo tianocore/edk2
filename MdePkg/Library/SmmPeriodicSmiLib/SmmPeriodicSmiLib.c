@@ -240,7 +240,7 @@ LookupPeriodicSmiLibraryHandler (
   }
 
   //
-  // Search the periodic SMI handler entries for a a matching DispatchHandle
+  // Search the periodic SMI handler entries for a matching DispatchHandle
   //
   for ( Link = GetFirstNode (&gPeriodicSmiLibraryHandlers)
         ; !IsNull (&gPeriodicSmiLibraryHandlers, Link)
@@ -353,7 +353,7 @@ EnlargeFreePeriodicSmiLibraryHandlerList (
   SMI handler.  If no free entries are available, then additional
   entries are allocated.
 
-  @retval  NULL   There are not enough resources available to to allocate a free entry.
+  @retval  NULL   There are not enough resources available to allocate a free entry.
   @retval  other  Pointer to a free PERIODIC_SMI_LIBRARY_HANDLER_CONTEXT structure.
 
 **/

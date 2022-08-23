@@ -289,7 +289,7 @@ struct _EFI_MM_SYSTEM_TABLE {
   ///
 
   ///
-  /// A number between zero and and the NumberOfCpus field. This field designates
+  /// A number between zero and the NumberOfCpus field. This field designates
   /// which processor is executing the MM infrastructure.
   ///
   UINTN    CurrentlyExecutingCpu;
