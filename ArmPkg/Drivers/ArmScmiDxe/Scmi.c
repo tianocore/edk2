@@ -145,8 +145,8 @@ ScmiCommandExecute (
 
 /** Internal common function useful for common protocol discovery messages.
 
-  @param[in] ProtocolId    Protocol Id of the the protocol.
-  @param[in] MesaageId     Message Id of the message.
+  @param[in] ProtocolId    Protocol Id of the protocol.
+  @param[in] MessageId     Message Id of the message.
 
   @param[out] ReturnValues SCMI response return values.
 

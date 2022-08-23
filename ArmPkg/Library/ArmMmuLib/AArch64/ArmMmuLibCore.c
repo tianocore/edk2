@@ -613,7 +613,7 @@ ArmConfigureMmu (
   // loss of coherency when using mismatched attributes, and given that memory
   // is mapped cacheable except for extraordinary cases (such as non-coherent
   // DMA), have the page table walker perform cached accesses as well, and
-  // assert below that that matches the attributes we use for CPU accesses to
+  // assert below that matches the attributes we use for CPU accesses to
   // the region.
   //
   TCR |= TCR_SH_INNER_SHAREABLE |
