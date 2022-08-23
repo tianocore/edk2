@@ -149,7 +149,7 @@ CalculateElfFileSize (
     FileSize2 = Elf32Hdr->e_shoff + Elf32Hdr->e_shentsize * Elf32Hdr->e_shnum;
   } else if (ElfCt->EiClass == ELFCLASS64) {
     Elf64Hdr  = (Elf64_Ehdr *)ElfCt->FileBase;
-    FileSize2 = (UINTN)(Elf64Hdr->e_shoff + Elf64Hdr->e_shentsize * Elf64Hdr->e_shnum);
+    FileSize2 = ((UINTN)Elf64Hdr->e_shoff + (UINTN)(Elf64Hdr->e_shentsize * Elf64Hdr->e_shnum));
   }
 
   *FileSize = MAX (FileSize1, FileSize2);
