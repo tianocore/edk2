@@ -76,7 +76,7 @@ InitializeUnicodeCollationSupportWorker (
     }
 
     //
-    // Find the best matching matching language from the supported languages
+    // Find the best matching language from the supported languages
     // of Unicode Collation (2) protocol.
     //
     BestLanguage = GetBestLanguage (
