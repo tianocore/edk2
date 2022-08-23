@@ -37,7 +37,7 @@ CONST EFI_DEVICE_PATH_PROTOCOL  mUefiDevicePathLibEndDevicePath = {
   @retval TRUE        DevicePath is valid.
   @retval FALSE       DevicePath is NULL.
   @retval FALSE       Maxsize is less than sizeof(EFI_DEVICE_PATH_PROTOCOL).
-  @retval FALSE       The length of any node node in the DevicePath is less
+  @retval FALSE       The length of any node in the DevicePath is less
                       than sizeof (EFI_DEVICE_PATH_PROTOCOL).
   @retval FALSE       If MaxSize is not zero, the size of the DevicePath
                       exceeds MaxSize.
