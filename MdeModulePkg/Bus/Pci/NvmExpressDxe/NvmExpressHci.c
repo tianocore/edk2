@@ -559,7 +559,7 @@ NvmeIdentifyNamespace (
 }
 
 /**
-  Create io completion queue.
+  Create io completion queues.
 
   @param  Private          The pointer to the NVME_CONTROLLER_PRIVATE_DATA data structure.
 
@@ -568,7 +568,7 @@ NvmeIdentifyNamespace (
 
 **/
 EFI_STATUS
-NvmeCreateIoCompletionQueue (
+NvmeCreateIoCompletionQueues (
   IN NVME_CONTROLLER_PRIVATE_DATA  *Private
   )
 {
@@ -631,7 +631,7 @@ NvmeCreateIoCompletionQueue (
 }
 
 /**
-  Create io submission queue.
+  Create io submission queues.
 
   @param  Private          The pointer to the NVME_CONTROLLER_PRIVATE_DATA data structure.
 
@@ -640,7 +640,7 @@ NvmeCreateIoCompletionQueue (
 
 **/
 EFI_STATUS
-NvmeCreateIoSubmissionQueue (
+NvmeCreateIoSubmissionQueues (
   IN NVME_CONTROLLER_PRIVATE_DATA  *Private
   )
 {
@@ -700,6 +700,80 @@ NvmeCreateIoSubmissionQueue (
   }
 
   Private->CreateIoQueue = FALSE;
+
+  return Status;
+}
+
+/**
+  Allocate io submission/completion queues.
+
+  @param  Private          The pointer to the NVME_CONTROLLER_PRIVATE_DATA data structure.
+
+  @return EFI_SUCCESS      Successfully allocated io queues.
+  @return EFI_UNSUPPORTED  Fail to create io queues.
+
+**/
+EFI_STATUS
+NvmeAllocateIoQueues (
+  IN NVME_CONTROLLER_PRIVATE_DATA  *Private
+  )
+{
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET  CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                   Command;
+  EFI_NVM_EXPRESS_COMPLETION                Completion;
+  EFI_STATUS                                Status;
+  NVME_ADMIN_SET_FEATURES                   Feature;
+  NVME_ADMIN_SET_FEATURES_NUM_QUEUES        Queues;
+  UINT16                                    Nsq;
+  UINT16                                    Ncq;
+
+  ZeroMem (&CommandPacket, sizeof (EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof (EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof (EFI_NVM_EXPRESS_COMPLETION));
+  ZeroMem (&Feature, sizeof (NVME_ADMIN_SET_FEATURES));
+  ZeroMem (&Queues, sizeof (NVME_ADMIN_SET_FEATURES_NUM_QUEUES));
+
+  CommandPacket.NvmeCmd        = &Command;
+  CommandPacket.NvmeCompletion = &Completion;
+
+  Command.Cdw0.Opcode          = NVME_ADMIN_SET_FEATURES_CMD;
+  CommandPacket.TransferLength = 0;
+  CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
+  CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
+
+  Feature.Fid = NVME_FEATURE_NUMBER_OF_QUEUES;
+  Feature.Sv  = 0;
+  CopyMem (&CommandPacket.NvmeCmd->Cdw10, &Feature, sizeof (NVME_ADMIN_SET_FEATURES));
+
+  //
+  // Allocate queues (-1 for 0 based value).
+  //
+  Queues.Nsqr = NVME_MAX_QUEUES - 1;
+  Queues.Ncqr = NVME_MAX_QUEUES - 1;
+  CopyMem (&CommandPacket.NvmeCmd->Cdw11, &Feature, sizeof (NVME_ADMIN_SET_FEATURES_NUM_QUEUES));
+
+  CommandPacket.NvmeCmd->Flags = CDW10_VALID | CDW11_VALID;
+
+  Status = Private->Passthru.PassThru (
+                               &Private->Passthru,
+                               0,
+                               &CommandPacket,
+                               NULL
+                               );
+
+  //
+  // DW0 contains the number of allocated submssion/completion queues.
+  //
+  Nsq = Completion.DW0 & 0xFFFFu;
+  Ncq = (Completion.DW0 >> 16u) & 0xFFFFu;
+
+  //
+  // Ensure the number of queues allocated is >= number requested.
+  //
+  if (Nsq < Queues.Nsqr || Ncq < Queues.Ncqr) {
+    DEBUG ((DEBUG_INFO, "Unsupported NVMe controller only allocated %u/%u sqs/cqs.\n", Nsq, Ncq));
+    return EFI_UNSUPPORTED;
+  }
 
   return Status;
 }
@@ -792,7 +866,7 @@ NvmeControllerInit (
   }
 
   //
-  // set number of entries admin submission & completion queues.
+  // Set number of entries admin submission & completion queues.
   //
   Aqa.Asqs  = NVME_ASQ_SIZE;
   Aqa.Rsvd1 = 0;
@@ -913,10 +987,18 @@ NvmeControllerInit (
   DEBUG ((DEBUG_INFO, "    NN        : 0x%x\n", Private->ControllerData->Nn));
 
   //
+  // Allocate I/O completion and submission queues
+  //
+  Status = NvmeAllocateIoQueues (Private);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
   // Create two I/O completion queues.
   // One for blocking I/O, one for non-blocking I/O.
   //
-  Status = NvmeCreateIoCompletionQueue (Private);
+  Status = NvmeCreateIoCompletionQueues (Private);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -925,7 +1007,7 @@ NvmeControllerInit (
   // Create two I/O Submission queues.
   // One for blocking I/O, one for non-blocking I/O.
   //
-  Status = NvmeCreateIoSubmissionQueue (Private);
+  Status = NvmeCreateIoSubmissionQueues (Private);
 
   return Status;
 }

@@ -17,7 +17,7 @@
 #pragma pack(1)
 
 //
-// controller register offsets
+// Controller register offsets
 //
 #define NVME_CAP_OFFSET     0x0000        // Controller Capabilities
 #define NVME_VER_OFFSET     0x0008        // Version
@@ -650,6 +650,38 @@ typedef struct {
   UINT32    Rsvd1 : 23;
   UINT32    Sv    : 1;        /* Save */
 } NVME_ADMIN_SET_FEATURES;
+
+//
+// Set Features Identifiers
+//
+#define NVME_FEATURE_ARBITRATION                0X01
+#define NVME_FEATURE_POWER_MANAGEMENT           0X02
+#define NVME_FEATURE_LBA_RANGE_TYPE             0X03
+#define NVME_FEATURE_TEMPERATURE_THRESHOLD      0X04
+#define NVME_FEATURE_ERROR_RECOVERY             0X05
+#define NVME_FEATURE_VOLATILE_WRITE_CACHE       0X06
+#define NVME_FEATURE_NUMBER_OF_QUEUES           0X07
+#define NVME_FEATURE_INTERRUPT_COALESCING       0X08
+#define NVME_FEATURE_INTERRUPT_VECTOR_CFG       0X09
+#define NVME_FEATURE_WRITE_ATOMICITY            0X0A
+#define NVME_FEATURE_ASYNCHRONOUS_EVENT_CFG     0X0B
+#define NVME_FEATURE_AUTONOMOUS_POWER_CFG       0X0C
+#define NVME_FEATURE_HOST_MEMORY_BUFFER         0X0D
+#define NVME_FEATURE_TIMESTAMP                  0X0E
+#define NVME_FEATURE_KEEP_ALIVE_TIMER           0X0F
+#define NVME_FEATURE_HOST_THERMAL_MANAGEMENT    0X10
+#define NVME_FEATURE_NON_OPERATIONAL_POWER_CFG  0X11
+
+//
+// NvmExpress Admin Set Features (Number of Queues) Command
+//
+typedef struct {
+  //
+  // CDW 11
+  //
+  UINT16    Nsqr;             /* Number of submission queues */
+  UINT16    Ncqr;             /* Number of completion queues */
+} NVME_ADMIN_SET_FEATURES_NUM_QUEUES;
 
 //
 // NvmExpress Admin Format NVM Command
