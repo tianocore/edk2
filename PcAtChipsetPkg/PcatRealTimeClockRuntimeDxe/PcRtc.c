@@ -48,8 +48,8 @@ CompareHMS (
   @param  From   the first date
   @param  To     the second date
 
-  @retval TRUE   From is previous to To within 24 hours.
-  @retval FALSE  From is later, or it is previous to To more than 24 hours.
+  @retval TRUE   From is previous to within 24 hours.
+  @retval FALSE  From is later, or it is previous to more than 24 hours.
 **/
 BOOLEAN
 IsWithinOneDay (
@@ -546,7 +546,7 @@ PcRtcGetTime (
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER A time field is out of range.
-  @retval EFI_DEVICE_ERROR      The time could not be set due due to hardware error.
+  @retval EFI_DEVICE_ERROR      The time could not be set due to hardware error.
 
 **/
 EFI_STATUS
@@ -1277,8 +1277,8 @@ CompareHMS (
   @param  From   the first date
   @param  To     the second date
 
-  @retval TRUE   From is previous to To within 24 hours.
-  @retval FALSE  From is later, or it is previous to To more than 24 hours.
+  @retval TRUE   From is previous to within 24 hours.
+  @retval FALSE  From is later, or it is previous to more than 24 hours.
 **/
 BOOLEAN
 IsWithinOneDay (
