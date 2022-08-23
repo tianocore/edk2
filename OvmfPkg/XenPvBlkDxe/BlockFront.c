@@ -88,7 +88,7 @@ XenPvBlockFree (
 }
 
 /**
-  Wait until until the backend has reached the ExpectedState.
+  Wait until the backend has reached the ExpectedState.
 
   @param Dev            A XEN_BLOCK_FRONT_DEVICE instance.
   @param ExpectedState  The backend state expected.

@@ -259,7 +259,7 @@ DebugClearMemory (
   ASSERT (Buffer != NULL);
 
   //
-  // SetMem() checks for the the ASSERT() condition on Length and returns Buffer
+  // SetMem() checks for the ASSERT() condition on Length and returns Buffer
   //
   return SetMem (Buffer, Length, PcdGet8 (PcdDebugClearMemoryValue));
 }

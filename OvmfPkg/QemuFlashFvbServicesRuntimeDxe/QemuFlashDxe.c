@@ -79,7 +79,7 @@ QemuFlashPtrWrite (
     // Writing to flash is emulated by the hypervisor through the use of write
     // protection. This won't work for an SEV-ES guest because the write won't
     // be recognized as a true MMIO write, which would result in the required
-    // #VC exception. Instead, use the the VMGEXIT MMIO write support directly
+    // #VC exception. Instead, use the VMGEXIT MMIO write support directly
     // to perform the update.
     //
     VmgInit (Ghcb, &InterruptState);
