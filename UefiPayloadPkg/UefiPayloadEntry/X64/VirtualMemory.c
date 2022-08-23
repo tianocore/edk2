@@ -778,9 +778,9 @@ CreateIdentityMappingPageTables (
   // Pre-allocate big pages to avoid later allocations.
   //
   if (!Page1GSupport) {
-    TotalPagesNum = ((NumberOfPdpEntriesNeeded + 1) * NumberOfPml4EntriesNeeded + 1) * NumberOfPml5EntriesNeeded + 1;
+    TotalPagesNum = (UINTN)((NumberOfPdpEntriesNeeded + 1) * NumberOfPml4EntriesNeeded + 1) * NumberOfPml5EntriesNeeded + 1;
   } else {
-    TotalPagesNum = (NumberOfPml4EntriesNeeded + 1) * NumberOfPml5EntriesNeeded + 1;
+    TotalPagesNum = (UINTN)(NumberOfPml4EntriesNeeded + 1) * NumberOfPml5EntriesNeeded + 1;
   }
 
   //

@@ -232,11 +232,11 @@ PciHostBridgeFreeRootBridges (
   UINTN            Count
   )
 {
-  if ((Bridges == NULL) && (Count == 0)) {
+  if ((Bridges == NULL) || (Count == 0)) {
     return;
   }
 
-  ASSERT (Bridges != NULL && Count > 0);
+  ASSERT (Bridges != NULL || Count > 0);
 
   do {
     --Count;
