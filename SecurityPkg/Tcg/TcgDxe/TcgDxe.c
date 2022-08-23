@@ -67,7 +67,7 @@ EFI_TCG_CLIENT_ACPI_TABLE  mTcgClientAcpiTemplate = {
     0x02                      // Revision
     //
     // Compiler initializes the remaining bytes to 0
-    // These fields should be filled in in production
+    // These fields should be filled in production
     //
   },
   0,                                   // 0 for PC Client Platform Class
@@ -88,7 +88,7 @@ EFI_TCG_SERVER_ACPI_TABLE  mTcgServerAcpiTemplate = {
     0x02                      // Revision
     //
     // Compiler initializes the remaining bytes to 0
-    // These fields should be filled in in production
+    // These fields should be filled in production
     //
   },
   1,                                    // 1 for Server Platform Class

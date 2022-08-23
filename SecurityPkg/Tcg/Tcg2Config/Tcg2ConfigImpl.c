@@ -278,7 +278,7 @@ SaveTcg2PpRequestParameter (
 }
 
 /**
-  Save Tcg2 PCR Banks request request to variable space.
+  Save Tcg2 PCR Banks request to variable space.
 
   @param[in] PCRBankIndex     PCR Bank Index.
   @param[in] Enable           Enable or disable this PCR Bank.

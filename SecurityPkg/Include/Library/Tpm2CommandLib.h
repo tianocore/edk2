@@ -136,7 +136,7 @@ Tpm2SelfTest (
 
 /**
   This command allows setting of the authorization policy for the platform hierarchy (platformPolicy), the
-  storage hierarchy (ownerPolicy), and and the endorsement hierarchy (endorsementPolicy).
+  storage hierarchy (ownerPolicy), and the endorsement hierarchy (endorsementPolicy).
 
   @param[in]  AuthHandle            TPM_RH_ENDORSEMENT, TPM_RH_OWNER or TPM_RH_PLATFORM+{PP} parameters to be validated
   @param[in]  AuthSession           Auth Session context

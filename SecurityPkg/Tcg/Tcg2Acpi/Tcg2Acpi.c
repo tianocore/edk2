@@ -97,7 +97,7 @@ EFI_TPM2_ACPI_TABLE_V4  mTpm2AcpiTemplate = {
     EFI_TPM2_ACPI_TABLE_REVISION,
     //
     // Compiler initializes the remaining bytes to 0
-    // These fields should be filled in in production
+    // These fields should be filled in production
     //
   },
   0, // BIT0~15:  PlatformClass
