@@ -260,7 +260,7 @@ SetStaticPageTable (
   {
     //
     // Each PML5 entry points to a page of PML4 entires.
-    // So lets allocate space for them and fill them in in the IndexOfPml4Entries loop.
+    // So lets allocate space for them and fill them in the IndexOfPml4Entries loop.
     // When 5-Level Paging is disabled, below allocation happens only once.
     //
     if (m5LevelPagingNeeded) {
@@ -314,7 +314,7 @@ SetStaticPageTable (
 
           //
           // Each Directory Pointer entries points to a page of Page Directory entires.
-          // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
+          // So allocate space for them and fill them in the IndexOfPageDirectoryEntries loop.
           //
           PageDirectoryEntry = (UINT64 *)((*PageDirectoryPointerEntry) & ~mAddressEncMask & gPhyMask);
           if (PageDirectoryEntry == NULL) {

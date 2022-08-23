@@ -9,7 +9,7 @@
 #include "RegisterCpuFeatures.h"
 
 /**
-  Function that uses DEBUG() macros to display the contents of a a CPU feature bit mask.
+  Function that uses DEBUG() macros to display the contents of a CPU feature bit mask.
 
   @param[in]  FeatureMask  A pointer to the CPU feature bit mask.
   @param[in]  BitMaskSize  CPU feature bits mask buffer size.
@@ -370,7 +370,7 @@ AdjustEntry (
   // than core type dependence. So driver will adjust the feature order to B -> A -> C. and driver
   // will remove the feature dependence in feature B.
   // Driver just needs to make sure before feature C been executed, feature A has finished its task
-  // in all all thread. Feature A finished in all threads also means feature B have finshed in all
+  // in all thread. Feature A finished in all threads also means feature B have finshed in all
   // threads.
   //
   if (Before) {

@@ -176,7 +176,7 @@ SwitchNewBsp (
   );
 
 /**
-  Function that uses DEBUG() macros to display the contents of a a CPU feature bit mask.
+  Function that uses DEBUG() macros to display the contents of a CPU feature bit mask.
 
   @param[in]  FeatureMask  A pointer to the CPU feature bit mask.
   @param[in]  BitMaskSize  CPU feature bits mask buffer size.
