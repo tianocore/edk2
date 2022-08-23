@@ -53,7 +53,10 @@ The framework currently supports the following table generators for ARM:
 * MADT - Multiple APIC Description Table
 * MCFG - PCI Express memory mapped configuration space base address
          Description Table
+* PCCT - Platform Communications Channel Table
+* PPTT - Processor Properties Topology Table
 * SPCR - Serial Port Console Redirection Table
+* SRAT - System Resource Affinity Table
 * SSDT - Secondary System Description Table. This is essentially
          a RAW table generator.
 
