@@ -28,7 +28,7 @@
   Create a EFI Signature List with data fetched from section specified as a argument.
   Found keys are verified using RsaGetPublicKeyFromX509().
 
-  @param[in]        KeyFileGuid    A pointer to to the FFS filename GUID
+  @param[in]        KeyFileGuid    A pointer to the FFS filename GUID
   @param[out]       SigListsSize   A pointer to size of signature list
   @param[out]       SigListOut    a pointer to a callee-allocated buffer with signature lists
 
