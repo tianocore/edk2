@@ -74,7 +74,7 @@ GetTime (
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER A time field is out of range.
-  @retval EFI_DEVICE_ERROR      The time could not be set due due to hardware error.
+  @retval EFI_DEVICE_ERROR      The time could not be set due to hardware error.
 
 **/
 EFI_STATUS
