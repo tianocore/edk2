@@ -1,7 +1,7 @@
 /** @file
   Instance of MM memory check library.
 
-  MM memory check library library implementation. This library consumes MM_ACCESS_PROTOCOL
+  MM memory check library implementation. This library consumes MM_ACCESS_PROTOCOL
   to get MMRAM information. In order to use this library instance, the platform should produce
   all MMRAM range via MM_ACCESS_PROTOCOL, including the range for firmware (like MM Core
   and MM driver) and/or specific dedicated hardware.
