@@ -23,7 +23,7 @@ Abstract:
   API calls, so please reference Microsoft documentation.
 
 
-  gWinNt is a a public exported global that contains the initialized
+  gWinNt is a public exported global that contains the initialized
   data.
 
 **/

@@ -1212,7 +1212,7 @@ Returns:
   //
   // Only need to allocate once. There is only one copy of physical memory for
   // the private data of each FV instance. But in virtual mode or in physical
-  // mode, the address of the the physical memory may be different.
+  // mode, the address of the physical memory may be different.
   //
   Status = gBS->AllocatePool (
                   EfiRuntimeServicesData,
