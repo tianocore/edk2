@@ -344,7 +344,7 @@ RouteConfig (
     Configuration
     ));
 
-  if (Progress == NULL) {
+  if ((Progress == NULL) || (Configuration == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
