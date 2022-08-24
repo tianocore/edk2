@@ -3,6 +3,7 @@
 
   Copyright (c) 2017 - 2018, Linaro Ltd. All rights reserved.<BR>
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -47,8 +48,24 @@ ResetWarm (
   VOID
   )
 {
-  // Map a warm reset into a cold reset
-  ResetCold ();
+  UINTN  Arg1;
+  UINTN  Ret;
+
+  Arg1 = ARM_SMC_ID_PSCI_SYSTEM_RESET2_AARCH64;
+
+  // Is SYSTEM_RESET2 supported?
+  Ret = ArmCallSmc0 (ARM_SMC_ID_PSCI_FEATURES, &Arg1, NULL, NULL);
+  if (Ret == ARM_SMC_PSCI_RET_SUCCESS) {
+    // Send PSCI SYSTEM_RESET2 command
+    ArmCallSmc0 (Arg1, NULL, NULL, NULL);
+  } else {
+    // Map a warm reset into a cold reset
+    DEBUG ((
+      DEBUG_INFO,
+      "Warm reboot not supported by platform, issuing cold reboot\n"
+      ));
+    ResetCold ();
+  }
 }
 
 /**
