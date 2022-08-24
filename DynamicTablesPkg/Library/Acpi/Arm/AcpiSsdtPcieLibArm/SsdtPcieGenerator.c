@@ -298,6 +298,7 @@ GeneratePciDeviceInfo (
   @param [in]       CfgMgrProtocol  Pointer to the Configuration Manager
                                     Protocol interface.
   @param [in]       PciInfo         Pci device information.
+  @param [in]       Uid             Unique Id of the Pci device.
   @param [in, out]  PciNode         Pci node to amend.
 
   @retval EFI_SUCCESS             The function completed successfully.
@@ -311,6 +312,7 @@ GeneratePrt (
   IN            ACPI_PCI_GENERATOR                            *Generator,
   IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN      CONST CM_ARM_PCI_CONFIG_SPACE_INFO                  *PciInfo,
+  IN            UINT32                                        Uid,
   IN  OUT       AML_OBJECT_NODE_HANDLE                        PciNode
   )
 {
@@ -419,7 +421,7 @@ GeneratePrt (
   PrtNode = NULL;
 
   // Generate the Pci slots once all the device have been added.
-  Status = GeneratePciSlots (PciInfo, &Generator->DeviceTable, PciNode);
+  Status = GeneratePciSlots (PciInfo, &Generator->DeviceTable, Uid, PciNode);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     goto exit_handler;
@@ -814,6 +816,7 @@ GeneratePciDevice (
                Generator,
                CfgMgrProtocol,
                PciInfo,
+               Uid,
                PciNode
                );
     if (EFI_ERROR (Status)) {

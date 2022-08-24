@@ -54,9 +54,10 @@ AddOscMethod (
   used. It should be possible to enumerate them, but this is additional
   information.
 
-  @param [in]       PciInfo     Pci device information.
-  @param [in]  MappingTable     The mapping table structure.
-  @param [in, out]  PciNode     Pci node to amend.
+  @param [in]       PciInfo       Pci device information.
+  @param [in]       MappingTable  The mapping table structure.
+  @param [in]       Uid           Unique Id of the Pci device.
+  @param [in, out]  PciNode       Pci node to amend.
 
   @retval EFI_SUCCESS            Success.
   @retval EFI_INVALID_PARAMETER  Invalid parameter.
@@ -67,6 +68,7 @@ EFIAPI
 GeneratePciSlots (
   IN      CONST CM_ARM_PCI_CONFIG_SPACE_INFO  *PciInfo,
   IN      CONST MAPPING_TABLE                 *MappingTable,
+  IN            UINT32                        Uid,
   IN  OUT       AML_OBJECT_NODE_HANDLE        PciNode
   );
 
