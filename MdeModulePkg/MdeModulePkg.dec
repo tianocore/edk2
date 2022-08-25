@@ -2253,6 +2253,11 @@
   # @Prompt The value is use for Usb Network rate limiting supported.
   gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingFactor|100|UINT32|0x10000028
 
+  ## This PCD determines the timer interval to be set when using serial console.<BR>
+  # 0 is considered disabled, and will use KEYBOARD_TIMER_INTERVAL.<BR>
+  # @Prompt Sets the serial console timer interval, in the unit of 100ns.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTerminalKeyboardTimerInterval|0x00000000|UINT32|0x00030025
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.
