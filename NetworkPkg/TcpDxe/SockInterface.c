@@ -661,11 +661,7 @@ SockSend (
                   );
 
     if (NULL == SockToken) {
-      DEBUG (
-        (DEBUG_ERROR,
-         "SockSend: Failed to buffer IO token into socket processing SndToken List\n",
-         Status)
-        );
+      DEBUG ((DEBUG_ERROR, "SockSend: Failed to buffer IO token into socket processing SndToken List\n"));
 
       Status = EFI_OUT_OF_RESOURCES;
       goto Exit;
@@ -674,11 +670,7 @@ SockSend (
     Status = SockProcessTcpSndData (Sock, TxData);
 
     if (EFI_ERROR (Status)) {
-      DEBUG (
-        (DEBUG_ERROR,
-         "SockSend: Failed to process Snd Data\n",
-         Status)
-        );
+      DEBUG ((DEBUG_ERROR, "SockSend: Failed to process Snd Data\n"));
 
       RemoveEntryList (&(SockToken->TokenList));
       FreePool (SockToken);
