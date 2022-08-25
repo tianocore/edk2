@@ -81,6 +81,85 @@ HkdfMdExtractAndExpand (
 }
 
 /**
+  Derive HMAC-based Extract key Derivation Function (HKDF).
+
+  @param[in]   Md               message digest.
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          key size in bytes.
+  @param[in]   Salt             Pointer to the salt(non-secret) value.
+  @param[in]   SaltSize         salt size in bytes.
+  @param[out]  PrkOut           Pointer to buffer to receive hkdf value.
+  @param[in]   PrkOutSize       size of hkdf bytes to generate.
+
+  @retval true   Hkdf generated successfully.
+  @retval false  Hkdf generation failed.
+
+**/
+BOOLEAN
+HkdfMdExtract (
+  IN CONST EVP_MD  *Md,
+  IN CONST UINT8   *Key,
+  IN  UINTN        KeySize,
+  IN CONST UINT8   *Salt,
+  IN UINTN         SaltSize,
+  OUT UINT8        *PrkOut,
+  UINTN            PrkOutSize
+  )
+{
+  EVP_PKEY_CTX  *pHkdfCtx;
+  BOOLEAN       Result;
+
+  if ((Key == NULL) || (Salt == NULL) || (PrkOut == NULL) ||
+      (KeySize > INT_MAX) || (SaltSize > INT_MAX) ||
+      (PrkOutSize > INT_MAX))
+  {
+    return FALSE;
+  }
+
+  pHkdfCtx = EVP_PKEY_CTX_new_id (EVP_PKEY_HKDF, NULL);
+  if (pHkdfCtx == NULL) {
+    return FALSE;
+  }
+
+  Result = EVP_PKEY_derive_init (pHkdfCtx) > 0;
+  if (Result) {
+    Result = EVP_PKEY_CTX_set_hkdf_md (pHkdfCtx, Md) > 0;
+  }
+
+  if (Result) {
+    Result =
+      EVP_PKEY_CTX_hkdf_mode (
+        pHkdfCtx,
+        EVP_PKEY_HKDEF_MODE_EXTRACT_ONLY
+        ) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_CTX_set1_hkdf_salt (
+               pHkdfCtx,
+               Salt,
+               (uint32_t)SaltSize
+               ) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_CTX_set1_hkdf_key (
+               pHkdfCtx,
+               Key,
+               (uint32_t)KeySize
+               ) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_derive (pHkdfCtx, PrkOut, &PrkOutSize) > 0;
+  }
+
+  EVP_PKEY_CTX_free (pHkdfCtx);
+  pHkdfCtx = NULL;
+  return Result;
+}
+
+/**
   Derive SHA256 HMAC-based Expand Key Derivation Function (HKDF).
 
   @param[in]   Md               Message Digest.
@@ -96,7 +175,6 @@ HkdfMdExtractAndExpand (
 
 **/
 BOOLEAN
-EFIAPI
 HkdfMdExpand (
   IN   CONST EVP_MD  *Md,
   IN   CONST UINT8   *Prk,
@@ -180,6 +258,42 @@ HkdfSha256ExtractAndExpand (
 }
 
 /**
+  Derive SHA256 HMAC-based Extract key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          key size in bytes.
+  @param[in]   Salt             Pointer to the salt(non-secret) value.
+  @param[in]   SaltSize         salt size in bytes.
+  @param[out]  PrkOut           Pointer to buffer to receive hkdf value.
+  @param[in]   PrkOutSize       size of hkdf bytes to generate.
+
+  @retval true   Hkdf generated successfully.
+  @retval false  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+HkdfSha256Extract (
+  IN CONST UINT8  *Key,
+  IN UINTN        KeySize,
+  IN CONST UINT8  *Salt,
+  IN UINTN        SaltSize,
+  OUT UINT8       *PrkOut,
+  UINTN           PrkOutSize
+  )
+{
+  return HkdfMdExtract (
+           EVP_sha256 (),
+           Key,
+           KeySize,
+           Salt,
+           SaltSize,
+           PrkOut,
+           PrkOutSize
+           );
+}
+
+/**
   Derive SHA256 HMAC-based Expand Key Derivation Function (HKDF).
 
   @param[in]   Prk              Pointer to the user-supplied key.
@@ -237,6 +351,42 @@ HkdfSha384ExtractAndExpand (
   )
 {
   return HkdfMdExtractAndExpand (EVP_sha384 (), Key, KeySize, Salt, SaltSize, Info, InfoSize, Out, OutSize);
+}
+
+/**
+  Derive SHA384 HMAC-based Extract key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          key size in bytes.
+  @param[in]   Salt             Pointer to the salt(non-secret) value.
+  @param[in]   SaltSize         salt size in bytes.
+  @param[out]  PrkOut           Pointer to buffer to receive hkdf value.
+  @param[in]   PrkOutSize       size of hkdf bytes to generate.
+
+  @retval true   Hkdf generated successfully.
+  @retval false  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+HkdfSha384Extract (
+  IN CONST UINT8  *Key,
+  IN UINTN        KeySize,
+  IN CONST UINT8  *Salt,
+  IN UINTN        SaltSize,
+  OUT UINT8       *PrkOut,
+  UINTN           PrkOutSize
+  )
+{
+  return HkdfMdExtract (
+           EVP_sha384 (),
+           Key,
+           KeySize,
+           Salt,
+           SaltSize,
+           PrkOut,
+           PrkOutSize
+           );
 }
 
 /**

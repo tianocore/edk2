@@ -3189,6 +3189,31 @@ BOOLEAN
   );
 
 /**
+  Derive SHA256 HMAC-based Extract key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          key size in bytes.
+  @param[in]   Salt             Pointer to the salt(non-secret) value.
+  @param[in]   SaltSize         salt size in bytes.
+  @param[out]  PrkOut           Pointer to buffer to receive hkdf value.
+  @param[in]   PrkOutSize       size of hkdf bytes to generate.
+
+  @retval true   Hkdf generated successfully.
+  @retval false  Hkdf generation failed.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_HKDF_SHA_256_EXTRACT)(
+  IN CONST UINT8  *Key,
+  IN UINTN        KeySize,
+  IN CONST UINT8  *Salt,
+  IN UINTN        SaltSize,
+  OUT UINT8       *PrkOut,
+  UINTN           PrkOutSize
+  );
+
+/**
   Derive SHA256 HMAC-based Expand Key Derivation Function (HKDF).
 
   @param[in]   Prk              Pointer to the user-supplied key.
@@ -3240,6 +3265,33 @@ BOOLEAN
   IN   UINTN        InfoSize,
   OUT  UINT8        *Out,
   IN   UINTN        OutSize
+  );
+
+/**
+  Derive SHA384 HMAC-based Extract-and-Expand Key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          Key size in bytes.
+  @param[in]   Salt             Pointer to the salt(non-secret) value.
+  @param[in]   SaltSize         Salt size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_HKDF_SHA_384_EXTRACT)(
+  IN CONST UINT8  *Key,
+  IN UINTN        KeySize,
+  IN CONST UINT8  *Salt,
+  IN UINTN        SaltSize,
+  OUT UINT8       *PrkOut,
+  UINTN           PrkOutSize
   );
 
 /**
@@ -4407,8 +4459,10 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_SM3_HASH_ALL                          Sm3HashAll;
   /// HKDF
   EDKII_CRYPTO_HKDF_SHA_256_EXTRACT_AND_EXPAND       HkdfSha256ExtractAndExpand;
+  EDKII_CRYPTO_HKDF_SHA_256_EXTRACT                  HkdfSha256Extract;
   EDKII_CRYPTO_HKDF_SHA_256_EXPAND                   HkdfSha256Expand;
   EDKII_CRYPTO_HKDF_SHA_384_EXTRACT_AND_EXPAND       HkdfSha384ExtractAndExpand;
+  EDKII_CRYPTO_HKDF_SHA_384_EXTRACT                  HkdfSha384Extract;
   EDKII_CRYPTO_HKDF_SHA_384_EXPAND                   HkdfSha384Expand;
   /// X509 (Continued)
   EDKII_CRYPTO_X509_CONSTRUCT_CERTIFICATE_STACK_V    X509ConstructCertificateStackV;

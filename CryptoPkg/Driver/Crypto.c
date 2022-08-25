@@ -4232,6 +4232,34 @@ CryptoServiceHkdfSha256ExtractAndExpand (
 }
 
 /**
+  Derive SHA256 HMAC-based Extract key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          key size in bytes.
+  @param[in]   Salt             Pointer to the salt(non-secret) value.
+  @param[in]   SaltSize         salt size in bytes.
+  @param[out]  PrkOut           Pointer to buffer to receive hkdf value.
+  @param[in]   PrkOutSize       size of hkdf bytes to generate.
+
+  @retval true   Hkdf generated successfully.
+  @retval false  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceHkdfSha256Extract (
+  IN CONST UINT8  *Key,
+  IN UINTN        KeySize,
+  IN CONST UINT8  *Salt,
+  IN UINTN        SaltSize,
+  OUT UINT8       *PrkOut,
+  UINTN           PrkOutSize
+  )
+{
+  return CALL_BASECRYPTLIB (Hkdf.Services.Sha256Extract, HkdfSha256Extract, (Key, KeySize, Salt, SaltSize, PrkOut, PrkOutSize), FALSE);
+}
+
+/**
   Derive SHA256 HMAC-based Expand Key Derivation Function (HKDF).
 
   @param[in]   Prk              Pointer to the user-supplied key.
@@ -4289,6 +4317,34 @@ CryptoServiceHkdfSha384ExtractAndExpand (
   )
 {
   return CALL_BASECRYPTLIB (Hkdf.Services.Sha384ExtractAndExpand, HkdfSha384ExtractAndExpand, (Key, KeySize, Salt, SaltSize, Info, InfoSize, Out, OutSize), FALSE);
+}
+
+/**
+  Derive SHA384 HMAC-based Extract key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          key size in bytes.
+  @param[in]   Salt             Pointer to the salt(non-secret) value.
+  @param[in]   SaltSize         salt size in bytes.
+  @param[out]  PrkOut           Pointer to buffer to receive hkdf value.
+  @param[in]   PrkOutSize       size of hkdf bytes to generate.
+
+  @retval true   Hkdf generated successfully.
+  @retval false  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceHkdfSha384Extract (
+  IN CONST UINT8  *Key,
+  IN UINTN        KeySize,
+  IN CONST UINT8  *Salt,
+  IN UINTN        SaltSize,
+  OUT UINT8       *PrkOut,
+  UINTN           PrkOutSize
+  )
+{
+  return CALL_BASECRYPTLIB (Hkdf.Services.Sha384Extract, HkdfSha384Extract, (Key, KeySize, Salt, SaltSize, PrkOut, PrkOutSize), FALSE);
 }
 
 /**
@@ -5602,8 +5658,10 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   CryptoServiceSm3HashAll,
   /// HKDF
   CryptoServiceHkdfSha256ExtractAndExpand,
+  CryptoServiceHkdfSha256Extract,
   CryptoServiceHkdfSha256Expand,
   CryptoServiceHkdfSha384ExtractAndExpand,
+  CryptoServiceHkdfSha384Extract,
   CryptoServiceHkdfSha384Expand,
   /// X509 (Continued)
   CryptoServiceX509ConstructCertificateStackV,
