@@ -42,7 +42,7 @@ steps:
 
 - task: UsePythonVersion@0
   inputs:
-    versionSpec: "3.8.x"
+    versionSpec: ">=3.10.6"
     architecture: "x64"
 
 - script: pip install -r pip-requirements.txt --upgrade
