@@ -64,9 +64,6 @@ BITS 16
     mov        si, MP_CPU_EXCHANGE_INFO_FIELD (GdtrProfile)
 o32 lgdt       [cs:si]
 
-    mov        si, MP_CPU_EXCHANGE_INFO_FIELD (IdtrProfile)
-o32 lidt       [cs:si]
-
     ;
     ; Switch to protected mode
     ;
@@ -154,6 +151,11 @@ BITS 64
 
 LongModeStart:
     mov        esi, ebx
+
+    ; Set IDT table at the start of 64 bit code
+    lea        edi, [esi + MP_CPU_EXCHANGE_INFO_FIELD (IdtrProfile)]
+    lidt       [edi]
+
     lea        edi, [esi + MP_CPU_EXCHANGE_INFO_FIELD (InitFlag)]
     cmp        qword [edi], 1       ; ApInitConfig
     jnz        GetApicId
