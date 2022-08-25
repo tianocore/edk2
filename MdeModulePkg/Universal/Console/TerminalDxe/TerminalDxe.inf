@@ -85,8 +85,9 @@
   gEfiSimpleTextOutProtocolGuid                 ## BY_START
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType           ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable    ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType                  ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable           ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTerminalKeyboardTimerInterval  ## SOMETIMES_CONSUMES
 
 # [Event]
 # # Relative timer event set by UnicodeToEfiKey(), used to be one 2 seconds input timeout.
