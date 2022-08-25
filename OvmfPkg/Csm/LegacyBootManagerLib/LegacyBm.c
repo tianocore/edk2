@@ -1159,8 +1159,8 @@ LegacyBmPrintBbsTable (
   UINT16  Index;
 
   DEBUG ((DEBUG_INFO, "\n"));
-  DEBUG ((DEBUG_INFO, " NO  Prio bb/dd/ff cl/sc Type Stat segm:offs\n"));
-  DEBUG ((DEBUG_INFO, "=============================================\n"));
+  DEBUG ((DEBUG_INFO, " NO  Prio bb/dd/ff cl/sc Type Stat segm:offs mseg dseg\n"));
+  DEBUG ((DEBUG_INFO, "======================================================\n"));
   for (Index = 0; Index < BbsCount; Index++) {
     if (!LegacyBmValidBbsEntry (&LocalBbsTable[Index])) {
       continue;
@@ -1168,7 +1168,7 @@ LegacyBmPrintBbsTable (
 
     DEBUG (
       (DEBUG_INFO,
-       " %02x: %04x %02x/%02x/%02x %02x/%02x %04x %04x %04x:%04x\n",
+       " %02x: %04x %02x/%02x/%02x %02x/%02x %04x %04x %04x:%04x %04x %04x\n",
        (UINTN)Index,
        (UINTN)LocalBbsTable[Index].BootPriority,
        (UINTN)LocalBbsTable[Index].Bus,
