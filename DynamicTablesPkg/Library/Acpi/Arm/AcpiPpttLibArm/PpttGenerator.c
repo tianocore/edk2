@@ -436,7 +436,6 @@ IsGicCTokenEqual (
       "the same GICC Info object. ACPI Processor IDs are not unique. " \
       "GicCToken = %p.\n",
       Index1,
-      IndexedObject1->Token,
       Index2,
       ProcNode1->GicCToken
       ));
@@ -566,7 +565,7 @@ AddProcHierarchyNodes (
         DEBUG ((
           DEBUG_ERROR,
           "ERROR: PPTT: Failed to get parent processor hierarchy node " \
-          "reference. Token = %p, Status = %r\n",
+          "reference. ParentToken = %p. ChildToken = %p. Status = %r\n",
           ProcInfoNode->ParentToken,
           ProcInfoNode->Token,
           Status
