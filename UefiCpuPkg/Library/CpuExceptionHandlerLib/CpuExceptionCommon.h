@@ -49,61 +49,6 @@
 
 #define CPU_TSS_GDT_SIZE  (SIZE_2KB + CPU_TSS_DESC_SIZE + CPU_TSS_SIZE)
 
-typedef struct {
-  //
-  // The address of top of known good stack reserved for *ALL* exceptions
-  // listed in field StackSwitchExceptions.
-  //
-  UINTN    KnownGoodStackTop;
-  //
-  // The size of known good stack for *ONE* exception only.
-  //
-  UINTN    KnownGoodStackSize;
-  //
-  // Buffer of exception vector list for stack switch.
-  //
-  UINT8    *StackSwitchExceptions;
-  //
-  // Number of exception vectors in StackSwitchExceptions.
-  //
-  UINTN    StackSwitchExceptionNumber;
-  //
-  // Buffer of IDT table. It must be type of IA32_IDT_GATE_DESCRIPTOR.
-  // Normally there's no need to change IDT table size.
-  //
-  VOID     *IdtTable;
-  //
-  // Size of buffer for IdtTable.
-  //
-  UINTN    IdtTableSize;
-  //
-  // Buffer of GDT table. It must be type of IA32_SEGMENT_DESCRIPTOR.
-  //
-  VOID     *GdtTable;
-  //
-  // Size of buffer for GdtTable.
-  //
-  UINTN    GdtTableSize;
-  //
-  // Pointer to start address of descriptor of exception task gate in the
-  // GDT table. It must be type of IA32_TSS_DESCRIPTOR.
-  //
-  VOID     *ExceptionTssDesc;
-  //
-  // Size of buffer for ExceptionTssDesc.
-  //
-  UINTN    ExceptionTssDescSize;
-  //
-  // Buffer of task-state segment for exceptions. It must be type of
-  // IA32_TASK_STATE_SEGMENT.
-  //
-  VOID     *ExceptionTss;
-  //
-  // Size of buffer for ExceptionTss.
-  //
-  UINTN    ExceptionTssSize;
-} CPU_EXCEPTION_INIT_DATA;
-
 //
 // Record exception handler information
 //
@@ -345,18 +290,22 @@ CommonExceptionHandlerWorker (
   );
 
 /**
-  Setup separate stack for specific exceptions.
+  Setup separate stacks for certain exception handlers.
 
-  @param[in] StackSwitchData      Pointer to data required for setuping up
-                                  stack switch.
+  @param[in]       Buffer        Point to buffer used to separate exception stack.
+  @param[in, out]  BufferSize    On input, it indicates the byte size of Buffer.
+                                 If the size is not enough, the return status will
+                                 be EFI_BUFFER_TOO_SMALL, and output BufferSize
+                                 will be the size it needs.
 
-  @retval EFI_SUCCESS             The exceptions have been successfully
-                                  initialized with new stack.
-  @retval EFI_INVALID_PARAMETER   StackSwitchData contains invalid content.
+  @retval EFI_SUCCESS             The stacks are assigned successfully.
+  @retval EFI_BUFFER_TOO_SMALL    This BufferSize is too small.
+  @retval EFI_UNSUPPORTED         This function is not supported.
 **/
 EFI_STATUS
 ArchSetupExceptionStack (
-  IN CPU_EXCEPTION_INIT_DATA  *StackSwitchData
+  IN     VOID   *Buffer,
+  IN OUT UINTN  *BufferSize
   );
 
 /**
