@@ -68,20 +68,20 @@ SetPcdSettings (
     PcdStatus = PcdSet64S (PcdTdxSharedBitMask, TdSharedPageMask ());
     ASSERT_RETURN_ERROR (PcdStatus);
     DEBUG ((DEBUG_INFO, "TdxSharedBitMask=0x%llx\n", PcdGet64 (PcdTdxSharedBitMask)));
-  } else {
-    PcdStatus = PcdSet64S (PcdPciMmio64Base, PlatformInfoHob->PcdPciMmio64Base);
-    ASSERT_RETURN_ERROR (PcdStatus);
-    PcdStatus = PcdSet64S (PcdPciMmio64Size, PlatformInfoHob->PcdPciMmio64Size);
-    ASSERT_RETURN_ERROR (PcdStatus);
-    PcdStatus = PcdSet64S (PcdPciMmio32Base, PlatformInfoHob->PcdPciMmio32Base);
-    ASSERT_RETURN_ERROR (PcdStatus);
-    PcdStatus = PcdSet64S (PcdPciMmio32Size, PlatformInfoHob->PcdPciMmio32Size);
-    ASSERT_RETURN_ERROR (PcdStatus);
-    PcdStatus = PcdSet64S (PcdPciIoBase, PlatformInfoHob->PcdPciIoBase);
-    ASSERT_RETURN_ERROR (PcdStatus);
-    PcdStatus = PcdSet64S (PcdPciIoSize, PlatformInfoHob->PcdPciIoSize);
-    ASSERT_RETURN_ERROR (PcdStatus);
   }
+
+  PcdStatus = PcdSet64S (PcdPciMmio64Base, PlatformInfoHob->PcdPciMmio64Base);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet64S (PcdPciMmio64Size, PlatformInfoHob->PcdPciMmio64Size);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet64S (PcdPciMmio32Base, PlatformInfoHob->PcdPciMmio32Base);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet64S (PcdPciMmio32Size, PlatformInfoHob->PcdPciMmio32Size);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet64S (PcdPciIoBase, PlatformInfoHob->PcdPciIoBase);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet64S (PcdPciIoSize, PlatformInfoHob->PcdPciIoSize);
+  ASSERT_RETURN_ERROR (PcdStatus);
 }
 
 /**
