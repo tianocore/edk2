@@ -559,7 +559,7 @@ R: Abner Chang <abner.chang@amd.com> [changab]
 
 OvmfPkg: LsiScsi driver
 F: OvmfPkg/LsiScsiDxe/
-R: Gary Lin <gary.lin@hpe.com> [lcp]
+R: Gary Lin <glin@suse.com> [lcp]
 
 OvmfPkg: TCG- and TPM2-related modules
 F: OvmfPkg/Include/IndustryStandard/QemuTpm.h
