@@ -13,8 +13,8 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SmmCpuRendezvousLibNull
   FILE_GUID                      = 1e5790ea-d013-4d7b-9047-b4342a762027
-  MODULE_TYPE                    = DXE_SMM_DRIVER
-  LIBRARY_CLASS                  = SmmCpuRendezvousLib|MM_STANDALONE DXE_SMM_DRIVER
+  MODULE_TYPE                    = BASE
+  LIBRARY_CLASS                  = SmmCpuRendezvousLib
 
 [Sources]
   SmmCpuRendezvousLibNull.c

@@ -6,7 +6,7 @@
 
 **/
 
-#include <Library/DebugLib.h>
+#include <Uefi.h>
 #include <Library/SmmCpuRendezvousLib.h>
 
 /**
