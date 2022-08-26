@@ -23,9 +23,8 @@ EXCEPTION_HANDLER_DATA     mExceptionHandlerData = {
   mExternalInterruptHandlerTable
 };
 
-UINT8  mNewStack[CPU_STACK_SWITCH_EXCEPTION_NUMBER *
-                 CPU_KNOWN_GOOD_STACK_SIZE];
-UINT8  mNewGdt[CPU_TSS_GDT_SIZE];
+UINT8  mBuffer[CPU_STACK_SWITCH_EXCEPTION_NUMBER * CPU_KNOWN_GOOD_STACK_SIZE
+               + CPU_TSS_GDT_SIZE];
 
 /**
   Common exception handler.
@@ -123,85 +122,16 @@ InitializeSeparateExceptionStacks (
   IN OUT UINTN  *BufferSize
   )
 {
-  CPU_EXCEPTION_INIT_DATA  EssData;
-  IA32_DESCRIPTOR          Idtr;
-  IA32_DESCRIPTOR          Gdtr;
-  UINTN                    NeedBufferSize;
-  UINTN                    StackTop;
-  UINT8                    *NewGdtTable;
+  UINTN       LocalBufferSize;
+  EFI_STATUS  Status;
 
-  //
-  // X64 needs only one TSS of current task working for all exceptions
-  // because of its IST feature. IA32 needs one TSS for each exception
-  // in addition to current task. To simplify the code, we report the
-  // needed memory for IA32 case to cover both IA32 and X64 exception
-  // stack switch.
-  //
-  // Layout of memory needed for each processor:
-  //    --------------------------------
-  //    |            Alignment         |  (just in case)
-  //    --------------------------------
-  //    |                              |
-  //    |        Original GDT          |
-  //    |                              |
-  //    --------------------------------
-  //    |    Current task descriptor   |
-  //    --------------------------------
-  //    |                              |
-  //    |  Exception task descriptors  |  X ExceptionNumber
-  //    |                              |
-  //    --------------------------------
-  //    |  Current task-state segment  |
-  //    --------------------------------
-  //    |                              |
-  //    | Exception task-state segment |  X ExceptionNumber
-  //    |                              |
-  //    --------------------------------
-  //
-  AsmReadGdtr (&Gdtr);
   if ((Buffer == NULL) && (BufferSize == NULL)) {
-    SetMem (mNewGdt, sizeof (mNewGdt), 0);
-    StackTop    = (UINTN)mNewStack + sizeof (mNewStack);
-    NewGdtTable = mNewGdt;
+    SetMem (mBuffer, sizeof (mBuffer), 0);
+    LocalBufferSize = sizeof (mBuffer);
+    Status          = ArchSetupExceptionStack (mBuffer, &LocalBufferSize);
+    ASSERT_EFI_ERROR (Status);
+    return Status;
   } else {
-    if (BufferSize == NULL) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    //
-    // Total needed size includes stack size, new GDT table size, TSS size.
-    // Add another DESCRIPTOR size for alignment requiremet.
-    //
-    NeedBufferSize = CPU_STACK_SWITCH_EXCEPTION_NUMBER * CPU_KNOWN_GOOD_STACK_SIZE +
-                     CPU_TSS_DESC_SIZE + Gdtr.Limit + 1 +
-                     CPU_TSS_SIZE +
-                     sizeof (IA32_TSS_DESCRIPTOR);
-    if (*BufferSize < NeedBufferSize) {
-      *BufferSize = NeedBufferSize;
-      return EFI_BUFFER_TOO_SMALL;
-    }
-
-    if (Buffer == NULL) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    StackTop    = (UINTN)Buffer + CPU_STACK_SWITCH_EXCEPTION_NUMBER * CPU_KNOWN_GOOD_STACK_SIZE;
-    NewGdtTable = ALIGN_POINTER (StackTop, sizeof (IA32_TSS_DESCRIPTOR));
+    return ArchSetupExceptionStack (Buffer, BufferSize);
   }
-
-  AsmReadIdtr (&Idtr);
-  EssData.KnownGoodStackTop          = StackTop;
-  EssData.KnownGoodStackSize         = CPU_KNOWN_GOOD_STACK_SIZE;
-  EssData.StackSwitchExceptions      = CPU_STACK_SWITCH_EXCEPTION_LIST;
-  EssData.StackSwitchExceptionNumber = CPU_STACK_SWITCH_EXCEPTION_NUMBER;
-  EssData.IdtTable                   = (VOID *)Idtr.Base;
-  EssData.IdtTableSize               = Idtr.Limit + 1;
-  EssData.GdtTable                   = NewGdtTable;
-  EssData.GdtTableSize               = CPU_TSS_DESC_SIZE + Gdtr.Limit + 1;
-  EssData.ExceptionTssDesc           = NewGdtTable + Gdtr.Limit + 1;
-  EssData.ExceptionTssDescSize       = CPU_TSS_DESC_SIZE;
-  EssData.ExceptionTss               = NewGdtTable + Gdtr.Limit + 1 + CPU_TSS_DESC_SIZE;
-  EssData.ExceptionTssSize           = CPU_TSS_SIZE;
-
-  return ArchSetupExceptionStack (&EssData);
 }

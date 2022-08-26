@@ -104,108 +104,97 @@ ArchRestoreExceptionContext (
 }
 
 /**
-  Setup separate stack for given exceptions.
+  Setup separate stacks for certain exception handlers.
 
-  @param[in] StackSwitchData      Pointer to data required for setuping up
-                                  stack switch.
+  @param[in]       Buffer        Point to buffer used to separate exception stack.
+  @param[in, out]  BufferSize    On input, it indicates the byte size of Buffer.
+                                 If the size is not enough, the return status will
+                                 be EFI_BUFFER_TOO_SMALL, and output BufferSize
+                                 will be the size it needs.
 
-  @retval EFI_SUCCESS             The exceptions have been successfully
-                                  initialized with new stack.
-  @retval EFI_INVALID_PARAMETER   StackSwitchData contains invalid content.
-
+  @retval EFI_SUCCESS             The stacks are assigned successfully.
+  @retval EFI_BUFFER_TOO_SMALL    This BufferSize is too small.
 **/
 EFI_STATUS
 ArchSetupExceptionStack (
-  IN CPU_EXCEPTION_INIT_DATA  *StackSwitchData
+  IN     VOID   *Buffer,
+  IN OUT UINTN  *BufferSize
   )
 {
   IA32_DESCRIPTOR                 Gdtr;
   IA32_DESCRIPTOR                 Idtr;
   IA32_IDT_GATE_DESCRIPTOR        *IdtTable;
   IA32_TSS_DESCRIPTOR             *TssDesc;
+  IA32_TSS_DESCRIPTOR             *TssDescBase;
   IA32_TASK_STATE_SEGMENT         *Tss;
+  VOID                            *NewGdtTable;
   UINTN                           StackTop;
   UINTN                           Index;
   UINTN                           Vector;
   UINTN                           TssBase;
-  UINTN                           GdtSize;
+  UINT8                           *StackSwitchExceptions;
+  UINTN                           NeedBufferSize;
   EXCEPTION_HANDLER_TEMPLATE_MAP  TemplateMap;
 
-  if ((StackSwitchData == NULL) ||
-      (StackSwitchData->KnownGoodStackTop == 0) ||
-      (StackSwitchData->KnownGoodStackSize == 0) ||
-      (StackSwitchData->StackSwitchExceptions == NULL) ||
-      (StackSwitchData->StackSwitchExceptionNumber == 0) ||
-      (StackSwitchData->StackSwitchExceptionNumber > CPU_EXCEPTION_NUM) ||
-      (StackSwitchData->GdtTable == NULL) ||
-      (StackSwitchData->IdtTable == NULL) ||
-      (StackSwitchData->ExceptionTssDesc == NULL) ||
-      (StackSwitchData->ExceptionTss == NULL))
-  {
+  if (BufferSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
-  // The caller is responsible for that the GDT table, no matter the existing
-  // one or newly allocated, has enough space to hold descriptors for exception
-  // task-state segments.
+  // Total needed size includes stack size, new GDT table size, TSS size.
+  // Add another DESCRIPTOR size for alignment requiremet.
   //
-  if (((UINTN)StackSwitchData->GdtTable & (IA32_GDT_ALIGNMENT - 1)) != 0) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if ((UINTN)StackSwitchData->ExceptionTssDesc < (UINTN)(StackSwitchData->GdtTable)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if ((UINTN)StackSwitchData->ExceptionTssDesc + StackSwitchData->ExceptionTssDescSize >
-      ((UINTN)(StackSwitchData->GdtTable) + StackSwitchData->GdtTableSize))
-  {
-    return EFI_INVALID_PARAMETER;
-  }
-
+  // Layout of memory needed for each processor:
+  //    --------------------------------
+  //    |                              |
+  //    |          Stack Size          |  X ExceptionNumber
+  //    |                              |
+  //    --------------------------------
+  //    |          Alignment           |  (just in case)
+  //    --------------------------------
+  //    |                              |
+  //    |         Original GDT         |
+  //    |                              |
+  //    --------------------------------
+  //    |    Current task descriptor   |
+  //    --------------------------------
+  //    |                              |
+  //    |  Exception task descriptors  |  X ExceptionNumber
+  //    |                              |
+  //    --------------------------------
+  //    |  Current task-state segment  |
+  //    --------------------------------
+  //    |                              |
+  //    | Exception task-state segment |  X ExceptionNumber
+  //    |                              |
+  //    --------------------------------
   //
-  // We need one descriptor and one TSS for current task and every exception
-  // specified.
-  //
-  if (StackSwitchData->ExceptionTssDescSize <
-      sizeof (IA32_TSS_DESCRIPTOR) * (StackSwitchData->StackSwitchExceptionNumber + 1))
-  {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (StackSwitchData->ExceptionTssSize <
-      sizeof (IA32_TASK_STATE_SEGMENT) * (StackSwitchData->StackSwitchExceptionNumber + 1))
-  {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  TssDesc = StackSwitchData->ExceptionTssDesc;
-  Tss     = StackSwitchData->ExceptionTss;
-
-  //
-  // Initialize new GDT table and/or IDT table, if any
-  //
-  AsmReadIdtr (&Idtr);
   AsmReadGdtr (&Gdtr);
+  NeedBufferSize = CPU_STACK_SWITCH_EXCEPTION_NUMBER * CPU_KNOWN_GOOD_STACK_SIZE +
+                   sizeof (IA32_TSS_DESCRIPTOR) +
+                   Gdtr.Limit + 1 + CPU_TSS_DESC_SIZE +
+                   CPU_TSS_SIZE;
 
-  GdtSize = (UINTN)TssDesc +
-            sizeof (IA32_TSS_DESCRIPTOR) *
-            (StackSwitchData->StackSwitchExceptionNumber + 1) -
-            (UINTN)(StackSwitchData->GdtTable);
-  if ((UINTN)StackSwitchData->GdtTable != Gdtr.Base) {
-    CopyMem (StackSwitchData->GdtTable, (VOID *)Gdtr.Base, Gdtr.Limit + 1);
-    Gdtr.Base  = (UINTN)StackSwitchData->GdtTable;
-    Gdtr.Limit = (UINT16)GdtSize - 1;
+  if (*BufferSize < NeedBufferSize) {
+    *BufferSize = NeedBufferSize;
+    return EFI_BUFFER_TOO_SMALL;
   }
 
-  if ((UINTN)StackSwitchData->IdtTable != Idtr.Base) {
-    Idtr.Base = (UINTN)StackSwitchData->IdtTable;
+  if (Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
 
-  if (StackSwitchData->IdtTableSize > 0) {
-    Idtr.Limit = (UINT16)(StackSwitchData->IdtTableSize - 1);
-  }
+  AsmReadIdtr (&Idtr);
+  StackSwitchExceptions = CPU_STACK_SWITCH_EXCEPTION_LIST;
+  StackTop              = (UINTN)Buffer + CPU_STACK_SWITCH_EXCEPTION_NUMBER * CPU_KNOWN_GOOD_STACK_SIZE;
+  NewGdtTable           = ALIGN_POINTER (StackTop, sizeof (IA32_TSS_DESCRIPTOR));
+  TssDesc               = (IA32_TSS_DESCRIPTOR *)((UINTN)NewGdtTable + Gdtr.Limit + 1);
+  Tss                   = (IA32_TASK_STATE_SEGMENT *)((UINTN)TssDesc + CPU_TSS_DESC_SIZE);
+  TssDescBase           = TssDesc;
+
+  CopyMem (NewGdtTable, (VOID *)Gdtr.Base, Gdtr.Limit + 1);
+  Gdtr.Base  = (UINTN)NewGdtTable;
+  Gdtr.Limit = (UINT16)(Gdtr.Limit + CPU_TSS_DESC_SIZE);
 
   //
   // Fixup current task descriptor. Task-state segment for current task will
@@ -226,10 +215,10 @@ ArchSetupExceptionStack (
   // Fixup exception task descriptor and task-state segment
   //
   AsmGetTssTemplateMap (&TemplateMap);
-  StackTop = StackSwitchData->KnownGoodStackTop - CPU_STACK_ALIGNMENT;
+  StackTop = StackTop - CPU_STACK_ALIGNMENT;
   StackTop = (UINTN)ALIGN_POINTER (StackTop, CPU_STACK_ALIGNMENT);
-  IdtTable = StackSwitchData->IdtTable;
-  for (Index = 0; Index < StackSwitchData->StackSwitchExceptionNumber; ++Index) {
+  IdtTable = (IA32_IDT_GATE_DESCRIPTOR  *)Idtr.Base;
+  for (Index = 0; Index < CPU_STACK_SWITCH_EXCEPTION_NUMBER; ++Index) {
     TssDesc += 1;
     Tss     += 1;
 
@@ -250,7 +239,7 @@ ArchSetupExceptionStack (
     //
     // Fixup TSS
     //
-    Vector = StackSwitchData->StackSwitchExceptions[Index];
+    Vector = StackSwitchExceptions[Index];
     if ((Vector >= CPU_EXCEPTION_NUM) ||
         (Vector >= (Idtr.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR)))
     {
@@ -270,7 +259,7 @@ ArchSetupExceptionStack (
     Tss->FS     = AsmReadFs ();
     Tss->GS     = AsmReadGs ();
 
-    StackTop -= StackSwitchData->KnownGoodStackSize;
+    StackTop -= CPU_KNOWN_GOOD_STACK_SIZE;
 
     //
     // Update IDT to use Task Gate for given exception
@@ -290,12 +279,7 @@ ArchSetupExceptionStack (
   //
   // Load current task
   //
-  AsmWriteTr ((UINT16)((UINTN)StackSwitchData->ExceptionTssDesc - Gdtr.Base));
-
-  //
-  // Publish IDT
-  //
-  AsmWriteIdtr (&Idtr);
+  AsmWriteTr ((UINT16)((UINTN)TssDescBase - Gdtr.Base));
 
   return EFI_SUCCESS;
 }
