@@ -18,6 +18,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/CcProbeLib.h>
 
 #include <Protocol/IncompatiblePciDeviceSupport.h>
 #include <Protocol/LegacyBios.h>
@@ -264,7 +265,7 @@ CheckDevice (
   //
   // In Td guest OptionRom is not allowed.
   //
-  if (TdIsEnabled ()) {
+  if (CcProbe ()) {
     Length += sizeof mOptionRomConfiguration;
   }
 
@@ -286,7 +287,7 @@ CheckDevice (
   CopyMem (Ptr, &mMmio64Configuration, sizeof mMmio64Configuration);
   Length = sizeof mMmio64Configuration;
 
-  if (TdIsEnabled ()) {
+  if (CcProbe ()) {
     CopyMem (Ptr + Length, &mOptionRomConfiguration, sizeof mOptionRomConfiguration);
     Length += sizeof mOptionRomConfiguration;
   }
