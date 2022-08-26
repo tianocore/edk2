@@ -24,6 +24,7 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  CcProbeLib
   DebugLib
   MemoryAllocationLib
   PcdLib
