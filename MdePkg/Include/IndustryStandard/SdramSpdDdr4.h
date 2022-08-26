@@ -12,6 +12,29 @@
 #ifndef _SDRAM_SPD_DDR4_H_
 #define _SDRAM_SPD_DDR4_H_
 
+//
+// Indices of the fields in the DDR4 SPD buffer
+//
+#define DDR_SPD_PRIMARY_SDRAM_PACKAGE_TYPE_IDX    6
+#define DDR_SPD_SECONDARY_SDRAM_PACKAGE_TYPE_IDX  10
+#define DDR_SPD_MODULE_NOMINAL_VOLTAGE_IDX        11
+#define DDR_SPD_MODULE_ORGANIZATION_IDX           12
+#define DDR_SPD_MODULE_MEMORY_BUS_WIDTH_IDX       13
+#define DDR_SPD_CRC_BYTE_1_IDX                    126
+#define DDR_SPD_CRC_BYTE_2_IDX                    127
+#define DDR_SPD_MODULE_MFG_ID_CODE_1_IDX          320
+#define DDR_SPD_MODULE_MFG_ID_CODE_2_IDX          321
+#define DDR_SPD_MODULE_MFG_LOCATION_IDX           322
+#define DDR_SPD_MODULE_MFG_DATE                   323
+#define DDR_SPD_MODULE_SERIAL_NUM_IDX             325
+#define DDR_SPD_MODULE_PART_NUM_IDX               329
+#define DDR_SPD_MODULE_REV_CODE_IDX               349
+#define DDR_SPD_DRAM_MFG_ID_CODE_1_IDX            350
+#define DDR_SPD_DRAM_MFG_ID_CODE_2_IDX            351
+#define DDR_SPD_DRAM_STEPPING_IDX                 352
+
+#define DDR_SPD_CRC_NUM_BYTES  126
+
 #pragma pack (push, 1)
 
 typedef union {

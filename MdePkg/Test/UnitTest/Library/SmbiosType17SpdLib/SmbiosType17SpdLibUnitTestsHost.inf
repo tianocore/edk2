@@ -1,0 +1,35 @@
+## @file
+# Unit tests of the SMBIOS SPD APIs in SmbiosType17SpdLib that are run from host
+# environment.
+#
+# Copyright (C) Qualcomm Innovation Center, Inc. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = SmbiosType17SpdLibUnitTestsHost
+  FILE_GUID                      = a8b87fa2-6307-4ee7-ab15-861f0ae7676f
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmbiosSpdUnitTest.c
+  SpdTestData.c
+  SpdTestData.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  SmbiosType17SpdLib
+  UnitTestLib

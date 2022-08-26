@@ -15,4 +15,6 @@
   ArmTrngLib|MdePkg/Library/BaseArmTrngLibNull/BaseArmTrngLibNull.inf
   RegisterFilterLib|MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
+  JedecJep106Lib|MdePkg/Library/BaseJedecJep106Lib/BaseJedecJep106Lib.inf
+  SmbiosType17SpdLib|MdePkg/Library/SmbiosType17SpdLib/SmbiosType17SpdLib.inf
   SmmCpuRendezvousLib|MdePkg/Library/SmmCpuRendezvousLibNull/SmmCpuRendezvousLibNull.inf

@@ -1,0 +1,40 @@
+## @file
+#  Library to parse DDR SPD buffers and put that data into SMBIOS Type17 tables.
+#
+#  Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = SmbiosType17SpdLib
+  FILE_GUID                      = 22d9302f-e599-4098-b0e6-86c33016fbc1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BASE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  SmbiosType17SpdLibInternal.h
+  SmbiosType17Ddr5.c
+  SmbiosType17Ddr4.c
+  SmbiosType17Utils.c
+
+[Packages]
+
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  JedecJep106Lib
+
+  MemoryAllocationLib
+  UefiDriverEntryPoint

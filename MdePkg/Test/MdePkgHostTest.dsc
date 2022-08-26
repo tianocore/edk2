@@ -20,7 +20,9 @@
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
 
 [LibraryClasses]
+  JedecJep106Lib|MdePkg/Library/BaseJedecJep106Lib/BaseJedecJep106Lib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+  SmbiosType17SpdLib|MdePkg/Library/SmbiosType17SpdLib/SmbiosType17SpdLib.inf
 
 [Components]
   #
@@ -29,6 +31,9 @@
   MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibHost.inf
   MdePkg/Test/UnitTest/Library/BaseLib/BaseLibUnitTestsHost.inf
   MdePkg/Test/GoogleTest/Library/BaseSafeIntLib/GoogleTestBaseSafeIntLib.inf
+
+  # Build HOST_APPLICATION that tests the SmbiosType17SpdLib
+  MdePkg/Test/UnitTest/Library/SmbiosType17SpdLib/SmbiosType17SpdLibUnitTestsHost.inf
 
   #
   # Build HOST_APPLICATION Libraries
