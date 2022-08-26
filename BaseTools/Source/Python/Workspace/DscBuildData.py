@@ -872,7 +872,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if ModuleType != TAB_COMMON and ModuleType not in SUP_MODULE_LIST:
                     EdkLogger.error('build', OPTION_UNKNOWN, "Unknown module type [%s]" % ModuleType,
                                     File=self.MetaFile, ExtraData=LibraryInstance, Line=LineNo)
-                LibraryClassDict[ModuleType, Arch, LibraryClass] = LibraryInstance
+                LibraryClassDict[Arch, ModuleType, LibraryClass] = LibraryInstance
                 if LibraryInstance not in self._LibraryInstances:
                     self._LibraryInstances.append(LibraryInstance)
 
@@ -881,7 +881,7 @@ class DscBuildData(PlatformBuildClassObject):
             for LibraryClass in LibraryClassSet:
                 # try all possible module types
                 for ModuleType in SUP_MODULE_LIST:
-                    LibraryInstance = LibraryClassDict[ModuleType, self._Arch, LibraryClass]
+                    LibraryInstance = LibraryClassDict[self._Arch, ModuleType, LibraryClass]
                     if LibraryInstance is None:
                         continue
                     self._LibraryClasses[LibraryClass, ModuleType] = LibraryInstance
