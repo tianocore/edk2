@@ -15,7 +15,6 @@
         ##     "<ErrorID>", "<KeyWord>"
         ## ]
         "ExceptionList": [
-          "8006", "main"
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
@@ -39,8 +38,7 @@
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[
-            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec",
-            "CryptoPkg/CryptoPkg.dec"
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
         ],
         # For UEFI shell based apps
         "AcceptableDependencies-UEFI_APPLICATION":[],
