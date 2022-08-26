@@ -69,13 +69,30 @@ typedef struct {
 } MICROCODE_PATCH_INFO;
 
 //
+// CPU volatile registers around INIT-SIPI-SIPI
+//
+typedef struct {
+  UINTN              Cr0;
+  UINTN              Cr3;
+  UINTN              Cr4;
+  UINTN              Dr0;
+  UINTN              Dr1;
+  UINTN              Dr2;
+  UINTN              Dr3;
+  UINTN              Dr6;
+  UINTN              Dr7;
+  IA32_DESCRIPTOR    Gdtr;
+  IA32_DESCRIPTOR    Idtr;
+  UINT16             Tr;
+} CPU_VOLATILE_REGISTERS;
+
+//
 // CPU exchange information for switch BSP
 //
 typedef struct {
-  UINT8              State;        // offset 0
-  UINTN              StackPointer; // offset 4 / 8
-  IA32_DESCRIPTOR    Gdtr;         // offset 8 / 16
-  IA32_DESCRIPTOR    Idtr;         // offset 14 / 26
+  UINT8                     State;             // offset 0
+  UINTN                     StackPointer;      // offset 4 / 8
+  CPU_VOLATILE_REGISTERS    VolatileRegisters; // offset 8 / 16
 } CPU_EXCHANGE_ROLE_INFO;
 
 //
@@ -111,24 +128,6 @@ typedef enum {
   CpuStateFinished,
   CpuStateDisabled
 } CPU_STATE;
-
-//
-// CPU volatile registers around INIT-SIPI-SIPI
-//
-typedef struct {
-  UINTN              Cr0;
-  UINTN              Cr3;
-  UINTN              Cr4;
-  UINTN              Dr0;
-  UINTN              Dr1;
-  UINTN              Dr2;
-  UINTN              Dr3;
-  UINTN              Dr6;
-  UINTN              Dr7;
-  IA32_DESCRIPTOR    Gdtr;
-  IA32_DESCRIPTOR    Idtr;
-  UINT16             Tr;
-} CPU_VOLATILE_REGISTERS;
 
 //
 // AP related data

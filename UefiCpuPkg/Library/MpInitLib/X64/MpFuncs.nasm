@@ -482,22 +482,13 @@ ASM_PFX(AsmExchangeRole):
     push       r14
     push       r15
 
-    mov        rax, cr0
-    push       rax
-
-    mov        rax, cr4
-    push       rax
-
     ; rsi contains MyInfo pointer
     mov        rsi, rcx
 
     ; rdi contains OthersInfo pointer
     mov        rdi, rdx
 
-    ;Store EFLAGS, GDTR and IDTR regiter to stack
     pushfq
-    sgdt       [rsi + CPU_EXCHANGE_ROLE_INFO.Gdtr]
-    sidt       [rsi + CPU_EXCHANGE_ROLE_INFO.Idtr]
 
     ; Store the its StackPointer
     mov        [rsi + CPU_EXCHANGE_ROLE_INFO.StackPointer], rsp
@@ -513,12 +504,6 @@ WaitForOtherStored:
     jmp        WaitForOtherStored
 
 OtherStored:
-    ; Since another CPU already stored its state, load them
-    ; load GDTR value
-    lgdt       [rdi + CPU_EXCHANGE_ROLE_INFO.Gdtr]
-
-    ; load IDTR value
-    lidt       [rdi + CPU_EXCHANGE_ROLE_INFO.Idtr]
 
     ; load its future StackPointer
     mov        rsp, [rdi + CPU_EXCHANGE_ROLE_INFO.StackPointer]
@@ -537,12 +522,6 @@ WaitForOtherLoaded:
 OtherLoaded:
     ; since the other CPU already get the data it want, leave this procedure
     popfq
-
-    pop        rax
-    mov        cr4, rax
-
-    pop        rax
-    mov        cr0, rax
 
     pop        r15
     pop        r14
