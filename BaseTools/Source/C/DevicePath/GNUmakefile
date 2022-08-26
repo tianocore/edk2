@@ -16,8 +16,10 @@ include $(MAKEROOT)/Makefiles/app.makefile
 GCCVERSION = $(shell gcc -dumpversion | awk -F'.' '{print $$1}')
 ifneq ("$(GCCVERSION)", "5")
 ifneq ($(CXX), llvm)
+ifneq ($(DARWIN),Darwin)
 # gcc 12 trips over device path handling
 BUILD_CFLAGS += -Wno-error=stringop-overflow
+endif
 endif
 endif
 
