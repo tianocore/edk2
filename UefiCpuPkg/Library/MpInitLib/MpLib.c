@@ -1,7 +1,7 @@
 /** @file
   CPU MP Initialize Library common functions.
 
-  Copyright (c) 2016 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -14,6 +14,29 @@
 #include <Register/Amd/Ghcb.h>
 
 EFI_GUID  mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
+
+/**
+  Save the volatile registers required to be restored following INIT IPI.
+
+  @param[out]  VolatileRegisters    Returns buffer saved the volatile resisters
+**/
+VOID
+SaveVolatileRegisters (
+  OUT CPU_VOLATILE_REGISTERS  *VolatileRegisters
+  );
+
+/**
+  Restore the volatile registers following INIT IPI.
+
+  @param[in]  VolatileRegisters   Pointer to volatile resisters
+  @param[in]  IsRestoreDr         TRUE:  Restore DRx if supported
+                                  FALSE: Do not restore DRx
+**/
+VOID
+RestoreVolatileRegisters (
+  IN CPU_VOLATILE_REGISTERS  *VolatileRegisters,
+  IN BOOLEAN                 IsRestoreDr
+  );
 
 /**
   The function will check if BSP Execute Disable is enabled.
@@ -83,7 +106,12 @@ FutureBSPProc (
   CPU_MP_DATA  *DataInHob;
 
   DataInHob = (CPU_MP_DATA *)Buffer;
+  //
+  // Save and restore volatile registers when switch BSP
+  //
+  SaveVolatileRegisters (&DataInHob->APInfo.VolatileRegisters);
   AsmExchangeRole (&DataInHob->APInfo, &DataInHob->BSPInfo);
+  RestoreVolatileRegisters (&DataInHob->APInfo.VolatileRegisters, FALSE);
 }
 
 /**
@@ -2233,7 +2261,12 @@ SwitchBSPWorker (
   //
   WakeUpAP (CpuMpData, FALSE, ProcessorNumber, FutureBSPProc, CpuMpData, TRUE);
 
+  //
+  // Save and restore volatile registers when switch BSP
+  //
+  SaveVolatileRegisters (&CpuMpData->BSPInfo.VolatileRegisters);
   AsmExchangeRole (&CpuMpData->BSPInfo, &CpuMpData->APInfo);
+  RestoreVolatileRegisters (&CpuMpData->BSPInfo.VolatileRegisters, FALSE);
 
   //
   // Set the BSP bit of MSR_IA32_APIC_BASE on new BSP
