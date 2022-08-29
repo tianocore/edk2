@@ -125,6 +125,8 @@ DebugPrintMarker (
     AsciiBSPrint (Buffer, sizeof (Buffer), Format, BaseListMarker);
   }
 
+  AsciiDebugGetColorString (Buffer, MAX_DEBUG_MESSAGE_LENGTH, ErrorLevel);
+
   //
   // Send the print string to a Serial Port
   //

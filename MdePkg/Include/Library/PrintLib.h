@@ -2,6 +2,7 @@
   Provides services to print a formatted string to a buffer. All combinations of
   Unicode and ASCII strings are supported.
 
+Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.<BR>
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -929,6 +930,44 @@ EFIAPI
 SPrintLengthAsciiFormat (
   IN  CONST CHAR8  *FormatString,
   IN  VA_LIST      Marker
+  );
+
+/**
+  Wraps a message with ANSI color escape codes.
+
+  @param String     The string to wrap.
+  @param StringLen  The size of the String buffer in characters.
+  @param ErrorLevel The error level.
+
+  @retval RETURN_SUCCESS          The string was successfully updated.
+  @retval RETURN_BUFFER_TOO_SMALL The buffer is too small.
+
+**/
+RETURN_STATUS
+EFIAPI
+AsciiDebugGetColorString (
+  IN OUT CHAR8  *String,
+  IN UINTN      StringLen,
+  IN UINTN      ErrorLevel
+  );
+
+/**
+  Wraps a message with ANSI color escape codes.
+
+  @param String     The string to wrap.
+  @param StringLen  The size of the String buffer in Unicode characters.
+  @param ErrorLevel The error level.
+
+  @retval RETURN_SUCCESS          The string was successfully updated.
+  @retval RETURN_BUFFER_TOO_SMALL The buffer is too small.
+
+**/
+RETURN_STATUS
+EFIAPI
+UnicodeDebugGetColorString (
+  IN OUT CHAR16  *String,
+  IN UINTN       StringLen,
+  IN UINTN       ErrorLevel
   );
 
 #endif
