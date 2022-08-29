@@ -108,6 +108,10 @@ DebugPrintMarker (
       UnicodeBSPrintAsciiFormat (Buffer, sizeof (Buffer), Format, BaseListMarker);
     }
 
+    if (FeaturePcdGet (PcdDebugAnsiSeqSupport)) {
+      UnicodeDebugGetColorString (Buffer, MAX_DEBUG_MESSAGE_LENGTH, ErrorLevel);
+    }
+
     //
     // Send the print string to the Console Output device
     //

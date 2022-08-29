@@ -1,11 +1,14 @@
 /** @file
   Base Print Library instance implementation.
 
+  Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.<BR>
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
+#include <Library/BaseMemoryLib.h>
 
 #include "PrintLibInternal.h"
 
@@ -18,6 +21,19 @@
 VA_LIST  gNullVaList;
 
 #define ASSERT_UNICODE_BUFFER(Buffer)  ASSERT ((((UINTN) (Buffer)) & 0x01) == 0)
+
+//
+// Define the maximum debug and assert message length that this library supports
+//
+#define MAX_DEBUG_MESSAGE_LENGTH  0x100
+
+#define ASCII_RED_ESC_SEQ     "\033[31m"
+#define ASCII_YELLOW_ESC_SEQ  "\033[33m"
+#define ASCII_END_ESC_SEQ     "\033[0m"
+
+#define RED_ESC_SEQ     L"\033[31m"
+#define YELLOW_ESC_SEQ  L"\033[33m"
+#define END_ESC_SEQ     L"\033[0m"
 
 /**
   Produces a Null-terminated Unicode string in an output buffer based on
@@ -833,4 +849,116 @@ SPrintLengthAsciiFormat (
   )
 {
   return BasePrintLibSPrintMarker (NULL, 0, OUTPUT_UNICODE | COUNT_ONLY_NO_PRINT, (CHAR8 *)FormatString, Marker, NULL);
+}
+
+/**
+  Wraps a message with ANSI color escape codes.
+
+  @param String     The string to wrap.
+  @param StringLen  The size of the String buffer in characters.
+  @param ErrorLevel The error level.
+
+  @retval RETURN_SUCCESS          The string was successfully updated.
+  @retval RETURN_BUFFER_TOO_SMALL The buffer is too small.
+
+**/
+RETURN_STATUS
+EFIAPI
+AsciiDebugGetColorString (
+  IN OUT CHAR8  *String,
+  IN UINTN      StringLen,
+  IN UINTN      ErrorLevel
+  )
+{
+  CHAR8  Buffer[MAX_DEBUG_MESSAGE_LENGTH];
+  UINTN  ReqBufferLen;
+
+  ReqBufferLen = AsciiStrLen (String) +
+                 AsciiStrLen (ASCII_RED_ESC_SEQ) +
+                 AsciiStrLen (ASCII_END_ESC_SEQ) +
+                 1;
+
+  if (StringLen < ReqBufferLen) {
+    return RETURN_BUFFER_TOO_SMALL;
+  }
+
+  ZeroMem (Buffer, sizeof (Buffer));
+
+  switch (ErrorLevel) {
+    case DEBUG_WARN:
+      AsciiStrCpyS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, ASCII_YELLOW_ESC_SEQ);
+      break;
+    case DEBUG_ERROR:
+      AsciiStrCpyS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, ASCII_RED_ESC_SEQ);
+      break;
+  }
+
+  AsciiStrCatS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, String);
+
+  switch (ErrorLevel) {
+    case DEBUG_WARN:
+    case DEBUG_ERROR:
+      AsciiStrCatS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, ASCII_END_ESC_SEQ);
+      break;
+  }
+
+  AsciiStrCpyS (String, StringLen, Buffer);
+
+  return RETURN_SUCCESS;
+}
+
+/**
+  Wraps a message with ANSI color escape codes.
+
+  @param String     The string to wrap.
+  @param StringLen  The size of the String buffer in Unicode characters.
+  @param ErrorLevel The error level.
+
+  @retval RETURN_SUCCESS          The string was successfully updated.
+  @retval RETURN_BUFFER_TOO_SMALL The buffer is too small.
+
+**/
+RETURN_STATUS
+EFIAPI
+UnicodeDebugGetColorString (
+  IN OUT CHAR16  *String,
+  IN UINTN       StringLen,
+  IN UINTN       ErrorLevel
+  )
+{
+  CHAR16  Buffer[MAX_DEBUG_MESSAGE_LENGTH];
+  UINTN   ReqBufferLen;
+
+  ReqBufferLen = StrLen (String) +
+                 StrLen (RED_ESC_SEQ) +
+                 StrLen (END_ESC_SEQ) +
+                 1;
+
+  if (StringLen < ReqBufferLen) {
+    return RETURN_BUFFER_TOO_SMALL;
+  }
+
+  ZeroMem (Buffer, sizeof (Buffer));
+
+  switch (ErrorLevel) {
+    case DEBUG_WARN:
+      StrCpyS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, YELLOW_ESC_SEQ);
+      break;
+    case DEBUG_ERROR:
+      StrCpyS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, RED_ESC_SEQ);
+      break;
+  }
+
+  StrCatS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, String);
+
+  switch (ErrorLevel) {
+    case DEBUG_WARN:
+    case DEBUG_ERROR:
+      StrCatS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, END_ESC_SEQ);
+      break;
+  }
+
+  StrCpyS (String, StringLen, Buffer);
+
+  return RETURN_SUCCESS;
 }

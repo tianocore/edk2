@@ -1,6 +1,7 @@
 ## @file
 # EFI/PI MdePkg Package
 #
+# Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.<BR>
 # Copyright (c) 2007 - 2022, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 # (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
@@ -25,6 +26,7 @@
 
 [PcdsFeatureFlag]
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport|TRUE
+  gEfiMdePkgTokenSpaceGuid.PcdDebugAnsiSeqSupport|FALSE
 
 [PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f
