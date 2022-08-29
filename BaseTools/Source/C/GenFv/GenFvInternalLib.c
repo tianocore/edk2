@@ -1004,7 +1004,7 @@ Returns:
       if (IsUseClang) {
         sscanf (Line, "%llx %s %s %s", &TempLongAddress, KeyWord, KeyWord2, FunctionTypeName);
         FunctionAddress = (UINT64) TempLongAddress;
-        if (FunctionTypeName [0] == '_' ) {
+        if (FunctionTypeName [0] != '/' && FunctionTypeName [0] != '.' && FunctionTypeName [1] != ':') {
           fprintf (FvMapFile, "  0x%010llx    ", (unsigned long long) (ImageBaseAddress + FunctionAddress - LinkTimeBaseAddress));
           fprintf (FvMapFile, "%s\n", FunctionTypeName);
         }
