@@ -38,6 +38,7 @@
   RsaPssTests.c
   ParallelhashTests.c
   HkdfTests.c
+  AeadAesGcmTests.c
 
 [Packages]
   MdePkg/MdePkg.dec
