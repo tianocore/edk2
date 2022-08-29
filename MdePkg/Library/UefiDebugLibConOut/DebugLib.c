@@ -20,6 +20,10 @@
 //
 #define MAX_DEBUG_MESSAGE_LENGTH  0x100
 
+#define RED_ESC_SEQ     L"\033[31m"
+#define YELLOW_ESC_SEQ  L"\033[33m"
+#define END_ESC_SEQ     L"\033[0m"
+
 //
 // VA_LIST can not initialize to NULL for all compiler, so we use this to
 // indicate a null VA_LIST
@@ -57,6 +61,62 @@ DebugPrint (
   VA_START (Marker, Format);
   DebugVPrint (ErrorLevel, Format, Marker);
   VA_END (Marker);
+}
+
+/**
+  Wraps a message with ANSI color escape codes.
+
+  @param String     The string to wrap.
+  @param StringLen  The size of the String buffer in Unicode characters.
+  @param ErrorLevel The error level.
+
+  @retval RETURN_SUCCESS          The string was successfully updated.
+  @retval RETURN_BUFFER_TOO_SMALL The buffer is too small.
+
+**/
+STATIC
+RETURN_STATUS
+UnicodeDebugGetColorString (
+  IN OUT CHAR16  *String,
+  IN UINTN       StringLen,
+  IN UINTN       ErrorLevel
+  )
+{
+  CHAR16  Buffer[MAX_DEBUG_MESSAGE_LENGTH];
+  UINTN   ReqBufferLen;
+
+  ReqBufferLen = StrLen (String) +
+                 StrLen (RED_ESC_SEQ) +
+                 StrLen (END_ESC_SEQ) +
+                 1;
+
+  if (StringLen < ReqBufferLen) {
+    return RETURN_BUFFER_TOO_SMALL;
+  }
+
+  ZeroMem (Buffer, sizeof (Buffer));
+
+  switch (ErrorLevel) {
+    case DEBUG_WARN:
+      StrCpyS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, YELLOW_ESC_SEQ);
+      break;
+    case DEBUG_ERROR:
+      StrCpyS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, RED_ESC_SEQ);
+      break;
+  }
+
+  StrCatS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, String);
+
+  switch (ErrorLevel) {
+    case DEBUG_WARN:
+    case DEBUG_ERROR:
+      StrCatS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, END_ESC_SEQ);
+      break;
+  }
+
+  StrCpyS (String, StringLen, Buffer);
+
+  return RETURN_SUCCESS;
 }
 
 /**
@@ -106,6 +166,10 @@ DebugPrintMarker (
       UnicodeVSPrintAsciiFormat (Buffer, sizeof (Buffer), Format, VaListMarker);
     } else {
       UnicodeBSPrintAsciiFormat (Buffer, sizeof (Buffer), Format, BaseListMarker);
+    }
+
+    if (FeaturePcdGet (PcdDebugAnsiSeqSupport)) {
+      UnicodeDebugGetColorString (Buffer, MAX_DEBUG_MESSAGE_LENGTH, ErrorLevel);
     }
 
     //

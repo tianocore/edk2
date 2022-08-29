@@ -26,6 +26,10 @@
 //
 #define MAX_DEBUG_MESSAGE_LENGTH  0x100
 
+#define RED_ESC_SEQ     "\033[31m"
+#define YELLOW_ESC_SEQ  "\033[33m"
+#define END_ESC_SEQ     "\033[0m"
+
 //
 // VA_LIST can not initialize to NULL for all compiler, so we use this to
 // indicate a null VA_LIST
@@ -78,6 +82,62 @@ DebugPrint (
 }
 
 /**
+  Wraps a message with ANSI color escape codes.
+
+  @param String     The string to wrap.
+  @param StringLen  The size of the String buffer in characters.
+  @param ErrorLevel The error level.
+
+  @retval RETURN_SUCCESS          The string was successfully updated.
+  @retval RETURN_BUFFER_TOO_SMALL The buffer is too small.
+
+**/
+STATIC
+RETURN_STATUS
+AsciiDebugGetColorString (
+  IN OUT CHAR8  *String,
+  IN UINTN      StringLen,
+  IN UINTN      ErrorLevel
+  )
+{
+  CHAR8  Buffer[MAX_DEBUG_MESSAGE_LENGTH];
+  UINTN  ReqBufferLen;
+
+  ReqBufferLen = AsciiStrLen (String) +
+                 AsciiStrLen (RED_ESC_SEQ) +
+                 AsciiStrLen (END_ESC_SEQ) +
+                 1;
+
+  if (StringLen < ReqBufferLen) {
+    return RETURN_BUFFER_TOO_SMALL;
+  }
+
+  ZeroMem (Buffer, sizeof (Buffer));
+
+  switch (ErrorLevel) {
+    case DEBUG_WARN:
+      AsciiStrCpyS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, YELLOW_ESC_SEQ);
+      break;
+    case DEBUG_ERROR:
+      AsciiStrCpyS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, RED_ESC_SEQ);
+      break;
+  }
+
+  AsciiStrCatS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, String);
+
+  switch (ErrorLevel) {
+    case DEBUG_WARN:
+    case DEBUG_ERROR:
+      AsciiStrCatS (Buffer, MAX_DEBUG_MESSAGE_LENGTH, END_ESC_SEQ);
+      break;
+  }
+
+  AsciiStrCpyS (String, StringLen, Buffer);
+
+  return RETURN_SUCCESS;
+}
+
+/**
   Prints a debug message to the debug output device if the specified
   error level is enabled base on Null-terminated format string and a
   VA_LIST argument list or a BASE_LIST argument list.
@@ -123,6 +183,10 @@ DebugPrintMarker (
     AsciiVSPrint (Buffer, sizeof (Buffer), Format, VaListMarker);
   } else {
     AsciiBSPrint (Buffer, sizeof (Buffer), Format, BaseListMarker);
+  }
+
+  if (FeaturePcdGet (PcdDebugAnsiSeqSupport)) {
+    AsciiDebugGetColorString (Buffer, MAX_DEBUG_MESSAGE_LENGTH, ErrorLevel);
   }
 
   //
