@@ -14,6 +14,7 @@
 #include <PiPei.h>
 
 #include <IndustryStandard/Nvme.h>
+#include <IndustryStandard/Pci.h>
 
 #include <Ppi/NvmExpressHostController.h>
 #include <Ppi/BlockIo.h>
@@ -22,6 +23,7 @@
 #include <Ppi/NvmExpressPassThru.h>
 #include <Ppi/IoMmu.h>
 #include <Ppi/EndOfPeiPhase.h>
+#include <Ppi/PciDevice.h>
 
 #include <Library/DebugLib.h>
 #include <Library/PeiServicesLib.h>
@@ -29,12 +31,24 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
+#include <Library/DevicePathLib.h>
 
 //
 // Structure forward declarations
 //
 typedef struct _PEI_NVME_NAMESPACE_INFO           PEI_NVME_NAMESPACE_INFO;
 typedef struct _PEI_NVME_CONTROLLER_PRIVATE_DATA  PEI_NVME_CONTROLLER_PRIVATE_DATA;
+
+/**
+  Macro that checks whether device is a NVMHCI Interface.
+
+  @param  _p      Specified device.
+
+  @retval TRUE    Device is a NVMHCI Interface.
+  @retval FALSE   Device is not a NVMHCI Interface.
+
+**/
+#define IS_PCI_NVMHCI(_p)  IS_CLASS3 (_p, PCI_CLASS_MASS_STORAGE, PCI_CLASS_MASS_STORAGE_SOLID_STATE, PCI_IF_MASS_STORAGE_SOLID_STATE_ENTERPRISE_NVMHCI)
 
 #include "NvmExpressPeiHci.h"
 #include "NvmExpressPeiPassThru.h"
@@ -343,6 +357,46 @@ BOOLEAN
 NvmeS3SkipThisController (
   IN  EFI_DEVICE_PATH_PROTOCOL  *HcDevicePath,
   IN  UINTN                     HcDevicePathLength
+  );
+
+/**
+  Callback for EDKII_PCI_DEVICE_PPI installation.
+
+  @param[in] PeiServices         Pointer to PEI Services Table.
+  @param[in] NotifyDescriptor    Pointer to the descriptor for the Notification
+                                 event that caused this function to execute.
+  @param[in] Ppi                 Pointer to the PPI data associated with this function.
+
+  @retval EFI_SUCCESS            The function completes successfully
+  @retval Others                 Cannot initialize Nvme controller from given PCI_DEVICE_PPI
+
+**/
+EFI_STATUS
+EFIAPI
+NvmePciDevicePpiInstallationCallback (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  );
+
+/**
+  Callback for EDKII_NVM_EXPRESS_HOST_CONTROLLER_PPI installation.
+
+  @param[in] PeiServices         Pointer to PEI Services Table.
+  @param[in] NotifyDescriptor    Pointer to the descriptor for the Notification
+                                 event that caused this function to execute.
+  @param[in] Ppi                 Pointer to the PPI data associated with this function.
+
+  @retval EFI_SUCCESS            The function completes successfully
+  @retval Others                 Cannot initialize Nvme controller from given EDKII_NVM_EXPRESS_HOST_CONTROLLER_PPI
+
+**/
+EFI_STATUS
+EFIAPI
+NvmeHostControllerPpiInstallationCallback (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
   );
 
 #endif
