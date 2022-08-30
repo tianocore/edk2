@@ -647,7 +647,11 @@ TlsConfigureSession (
   HttpInstance->TlsConfigData.ConnectionEnd       = EfiTlsClient;
   HttpInstance->TlsConfigData.VerifyMethod        = EFI_TLS_VERIFY_PEER;
   HttpInstance->TlsConfigData.VerifyHost.Flags    = EFI_TLS_VERIFY_FLAG_NONE;
-  HttpInstance->TlsConfigData.VerifyHost.HostName = HttpInstance->RemoteHost;
+  if (HttpInstance->ProxyConnected) {
+    HttpInstance->TlsConfigData.VerifyHost.HostName = HttpInstance->EndPointRemoteHost;
+  } else {
+    HttpInstance->TlsConfigData.VerifyHost.HostName = HttpInstance->RemoteHost;
+  }
   HttpInstance->TlsConfigData.SessionState        = EfiTlsSessionNotStarted;
 
   //
