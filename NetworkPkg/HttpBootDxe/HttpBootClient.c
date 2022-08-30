@@ -965,17 +965,24 @@ HttpBootConnectProxy (
   //
   HostName = Private->EndPointUri;
   Status   = HttpParseUrl (Private->EndPointUri, (UINT32)AsciiStrLen (Private->EndPointUri), FALSE, &UrlParser);
-  Status   = HttpUrlGetHostName (
-               Private->EndPointUri,
-               UrlParser,
-               &HostName
-               );
+  if (EFI_ERROR (Status)) {
+    goto ERROR_1;
+  }
 
-  Status   = HttpIoSetHeader (
-               HttpIoHeader,
-               HTTP_HEADER_HOST,
-               HostName
-               );
+  Status = HttpUrlGetHostName (
+             Private->EndPointUri,
+             UrlParser,
+             &HostName
+             );
+  if (EFI_ERROR (Status)) {
+    goto ERROR_1;
+  }
+
+  Status = HttpIoSetHeader (
+             HttpIoHeader,
+             HTTP_HEADER_HOST,
+             HostName
+             );
   if (EFI_ERROR (Status)) {
     goto ERROR_1;
   }

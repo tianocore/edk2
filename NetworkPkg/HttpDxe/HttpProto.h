@@ -414,7 +414,7 @@ HttpConfigureTcp6 (
 EFI_STATUS
 HttpConnectTcp4 (
   IN  HTTP_PROTOCOL  *HttpInstance,
-  IN  BOOLEAN         TlsConfigure
+  IN  BOOLEAN        TlsConfigure
   );
 
 /**
@@ -432,7 +432,7 @@ HttpConnectTcp4 (
 EFI_STATUS
 HttpConnectTcp6 (
   IN  HTTP_PROTOCOL  *HttpInstance,
-  IN  BOOLEAN         TlsConfigure
+  IN  BOOLEAN        TlsConfigure
   );
 
 /**

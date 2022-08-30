@@ -1216,7 +1216,7 @@ HttpConfigureTcp6 (
 EFI_STATUS
 HttpConnectTcp4 (
   IN  HTTP_PROTOCOL  *HttpInstance,
-  IN  BOOLEAN         TlsConfigure
+  IN  BOOLEAN        TlsConfigure
   )
 {
   EFI_STATUS                 Status;
@@ -1239,7 +1239,7 @@ HttpConnectTcp4 (
     return Status;
   }
 
-  if (Tcp4State == Tcp4StateEstablished && (!HttpInstance->ProxyConnected || !TlsConfigure)) {
+  if ((Tcp4State == Tcp4StateEstablished) && (!HttpInstance->ProxyConnected || !TlsConfigure)) {
     return EFI_SUCCESS;
   } else if (Tcp4State > Tcp4StateEstablished ) {
     HttpCloseConnection (HttpInstance);
@@ -1312,7 +1312,7 @@ HttpConnectTcp4 (
 EFI_STATUS
 HttpConnectTcp6 (
   IN  HTTP_PROTOCOL  *HttpInstance,
-  IN  BOOLEAN         TlsConfigure
+  IN  BOOLEAN        TlsConfigure
   )
 {
   EFI_STATUS                 Status;
@@ -1336,7 +1336,7 @@ HttpConnectTcp6 (
     return Status;
   }
 
-  if (Tcp6State == Tcp6StateEstablished && (!HttpInstance->ProxyConnected || !TlsConfigure)) {
+  if ((Tcp6State == Tcp6StateEstablished) && (!HttpInstance->ProxyConnected || !TlsConfigure)) {
     return EFI_SUCCESS;
   } else if (Tcp6State > Tcp6StateEstablished ) {
     HttpCloseConnection (HttpInstance);

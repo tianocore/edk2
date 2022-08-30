@@ -1564,7 +1564,7 @@ BmExpandLoadFiles (
                                        (UINT16)(sizeof (URI_DEVICE_PATH))
                                        );
     for (Index = 0; Index < HandleCount; Index++) {
-     if (BmMatchHttpBootDevicePath (AppendDevicePathNode (DevicePathFromHandle (Handles[Index]), (EFI_DEVICE_PATH_PROTOCOL *)NullUriPath), FilePath)) {
+      if (BmMatchHttpBootDevicePath (AppendDevicePathNode (DevicePathFromHandle (Handles[Index]), (EFI_DEVICE_PATH_PROTOCOL *)NullUriPath), FilePath)) {
         //
         // Matches HTTP Boot Device Path described as
         //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv4(...)[/Dns(...)]/Uri(...)/Uri(...)

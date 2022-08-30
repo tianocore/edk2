@@ -308,8 +308,8 @@ HttpBootGetBootFileCaller (
   OUT HTTP_BOOT_IMAGE_TYPE       *ImageType
   )
 {
-  HTTP_GET_BOOT_FILE_STATE State;
-  EFI_STATUS               Status;
+  HTTP_GET_BOOT_FILE_STATE  State;
+  EFI_STATUS                Status;
 
   if (Private->BootFileSize == 0) {
     if (Private->EndPointUri != NULL) {
