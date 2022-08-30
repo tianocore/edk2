@@ -3,6 +3,7 @@
   The implementation of EFI Redfidh Discover Protocol.
 
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2022, AMD Incorporated. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -22,8 +23,6 @@ LIST_ENTRY  mEfiRedfishDiscoverRestExInstance;
 EFI_GUID  mRedfishDiscoverTcp4InstanceGuid   = EFI_REDFISH_DISCOVER_TCP4_INSTANCE_GUID;
 EFI_GUID  mRedfishDiscoverTcp6InstanceGuid   = EFI_REDFISH_DISCOVER_TCP6_INSTANCE_GUID;
 EFI_GUID  mRedfishDiscoverRestExInstanceGuid = EFI_REDFISH_DISCOVER_REST_EX_INSTANCE_GUID;
-
-EFI_HANDLE  EfiRedfishDiscoverProtocolHandle = NULL;
 
 EFI_STATUS
 EFIAPI
@@ -312,6 +311,38 @@ GetTargetNetworkInterfaceInternal (
   ThisNetworkInterface = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetFirstNode (&mEfiRedfishDiscoverNetworkInterface);
   while (TRUE) {
     if (CompareMem ((VOID *)&ThisNetworkInterface->MacAddress, &TargetNetworkInterface->MacAddress, ThisNetworkInterface->HwAddressSize) == 0) {
+      return ThisNetworkInterface;
+    }
+
+    if (IsNodeAtEnd (&mEfiRedfishDiscoverNetworkInterface, &ThisNetworkInterface->Entry)) {
+      return NULL;
+    }
+
+    ThisNetworkInterface = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetNextNode (&mEfiRedfishDiscoverNetworkInterface, &ThisNetworkInterface->Entry);
+  }
+
+  return NULL;
+}
+
+/**
+  This function searches EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL
+  instance with the given  Controller handle.
+
+  @param[in] ControllerHandle  The controller handle associated with network interface.
+
+  @retval Non-NULL  EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL is returned.
+  @retval NULL      Non of EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL instance is returned.
+**/
+EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *
+GetTargetNetworkInterfaceInternalByController (
+  IN EFI_HANDLE  ControllerHandle
+  )
+{
+  EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL  *ThisNetworkInterface;
+
+  ThisNetworkInterface = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetFirstNode (&mEfiRedfishDiscoverNetworkInterface);
+  while (TRUE) {
+    if (ThisNetworkInterface->OpenDriverControllerHandle == ControllerHandle) {
       return ThisNetworkInterface;
     }
 
@@ -1619,29 +1650,30 @@ BuildupNetworkInterface (
                       EFI_OPEN_PROTOCOL_BY_DRIVER
                       );
       if (!EFI_ERROR (Status)) {
-        if ((EfiRedfishDiscoverProtocolHandle == NULL) &&
-            (gRequiredProtocol[Index].ProtocolType == ProtocolTypeRestEx) &&
-            !IsListEmpty (&mEfiRedfishDiscoverNetworkInterface)
-            )
-        {
-          // Install the fisrt Redfish Discover Protocol when EFI REST EX protcol is discovered.
-          // This ensures EFI REST EX is ready while EFI_REDFISH_DISCOVER_PROTOCOL consumer acquires
-          // Redfish serivce over network interface.
+        if ((gRequiredProtocol[Index].ProtocolType == ProtocolTypeRestEx)) {
+          // Install Redfish Discover Protocol when EFI REST EX protcol is discovered.
+          // This ensures EFI REST EX is ready while the consumer of EFI_REDFISH_DISCOVER_PROTOCOL
+          // acquires Redfish serivce over network interface.
 
-          Status = gBS->InstallProtocolInterface (
-                          &EfiRedfishDiscoverProtocolHandle,
-                          &gEfiRedfishDiscoverProtocolGuid,
-                          EFI_NATIVE_INTERFACE,
-                          (VOID *)&mRedfishDiscover
-                          );
-        } else if ((EfiRedfishDiscoverProtocolHandle != NULL) && NewNetworkInterfaceInstalled) {
-          Status = gBS->ReinstallProtocolInterface (
-                          EfiRedfishDiscoverProtocolHandle,
-                          &gEfiRedfishDiscoverProtocolGuid,
-                          (VOID *)&mRedfishDiscover,
-                          (VOID *)&mRedfishDiscover
-                          );
-          NewNetworkInterfaceInstalled = FALSE;
+          if (!NewNetworkInterfaceInstalled) {
+            NetworkInterface = GetTargetNetworkInterfaceInternalByController (ControllerHandle);
+            if (NetworkInterface == NULL) {
+              DEBUG ((DEBUG_ERROR, "%a: Can't find network interface by ControllerHandle\n", __FUNCTION__));
+              return Status;
+            }
+          }
+
+          NewNetworkInterfaceInstalled                       = FALSE;
+          NetworkInterface->EfiRedfishDiscoverProtocolHandle = NULL;
+          Status                                             = gBS->InstallProtocolInterface (
+                                                                      &NetworkInterface->EfiRedfishDiscoverProtocolHandle,
+                                                                      &gEfiRedfishDiscoverProtocolGuid,
+                                                                      EFI_NATIVE_INTERFACE,
+                                                                      (VOID *)&mRedfishDiscover
+                                                                      );
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "%a: Fail to install EFI_REDFISH_DISCOVER_PROTOCOL\n", __FUNCTION__));
+          }
         }
       }
 
@@ -1724,6 +1756,7 @@ StopServiceOnNetworkInterface (
   EFI_STATUS                                       Status;
   VOID                                             *Interface;
   EFI_TPL                                          OldTpl;
+  EFI_HANDLE                                       DiscoverProtocolHandle;
   EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL  *ThisNetworkInterface;
   EFI_REDFISH_DISCOVER_REST_EX_INSTANCE_INTERNAL   *RestExInstance;
 
@@ -1743,8 +1776,11 @@ StopServiceOnNetworkInterface (
         ThisNetworkInterface = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetFirstNode (&mEfiRedfishDiscoverNetworkInterface);
         while (TRUE) {
           if (ThisNetworkInterface->NetworkInterfaceProtocolInfo.ProtocolControllerHandle == ControllerHandle) {
+            DiscoverProtocolHandle = ThisNetworkInterface->EfiRedfishDiscoverProtocolHandle;
+            //
+            // Close protocol and destroy service.
+            //
             Status = CloseProtocolService (
-                       // Close protocol and destroy service.
                        ThisBindingProtocol,
                        ControllerHandle,
                        &gRequiredProtocol[Index],
@@ -1756,17 +1792,18 @@ StopServiceOnNetworkInterface (
             }
 
             gBS->RestoreTPL (OldTpl);
-            // Reinstall Redfish Discover protocol to notify network
-            // interface change.
 
-            Status = gBS->ReinstallProtocolInterface (
-                            EfiRedfishDiscoverProtocolHandle,
-                            &gEfiRedfishDiscoverProtocolGuid,
-                            (VOID *)&mRedfishDiscover,
-                            (VOID *)&mRedfishDiscover
-                            );
-            if (EFI_ERROR (Status)) {
-              DEBUG ((DEBUG_ERROR, "%a: Reinstall gEfiRedfishDiscoverProtocolGuid fail.", __FUNCTION__));
+            //
+            // Disconnect EFI Redfish discover driver controller to notify the
+            // clinet which uses .EFI Redfish discover protocol.
+            //
+            if (DiscoverProtocolHandle != NULL) {
+              gBS->DisconnectController (DiscoverProtocolHandle, NULL, NULL);
+              Status = gBS->UninstallProtocolInterface (
+                              DiscoverProtocolHandle,
+                              &gEfiRedfishDiscoverProtocolGuid,
+                              (VOID *)&mRedfishDiscover
+                              );
             }
 
             return Status;
@@ -2030,21 +2067,6 @@ RedfishDiscoverUnload (
   while (!IsListEmpty (&mEfiRedfishDiscoverNetworkInterface)) {
     ThisNetworkInterface = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetFirstNode (&mEfiRedfishDiscoverNetworkInterface);
     StopServiceOnNetworkInterface (&gRedfishDiscoverDriverBinding, ThisNetworkInterface->NetworkInterfaceProtocolInfo.ProtocolControllerHandle);
-  }
-
-  // Disconnect EFI Redfish discover driver controller to notify the
-  // clinet which uses .EFI Redfish discover protocol.
-
-  if (EfiRedfishDiscoverProtocolHandle != NULL) {
-    //
-    // Notify user EFI_REDFISH_DISCOVER_PROTOCOL is unloaded.
-    //
-    gBS->DisconnectController (EfiRedfishDiscoverProtocolHandle, NULL, NULL);
-    Status = gBS->UninstallProtocolInterface (
-                    EfiRedfishDiscoverProtocolHandle,
-                    &gEfiRedfishDiscoverProtocolGuid,
-                    (VOID *)&mRedfishDiscover
-                    );
   }
 
   return Status;

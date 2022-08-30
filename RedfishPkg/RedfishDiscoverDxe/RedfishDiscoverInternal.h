@@ -2,6 +2,7 @@
   This file defines the EFI Redfish Discover Protocol interface.
 
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2022, AMD Incorporated. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -107,6 +108,12 @@ typedef struct {
                                                                                ///< NETWORK_INTERFACE_PROTOCOL_TYPE.
   REDFISH_DISCOVER_NETWORK_INTERFACE_PROTOCOL    NetworkInterfaceProtocolInfo; ///< Network interface protocol information.
   EFI_HANDLE                                     RestExHandle;                 ///< REST EX handle associated with this network interface.
+  //
+  // EFI_REDFISH_DISCOVER_PROTOCOL instance installed
+  // on this network interface.
+  //
+  EFI_HANDLE                                     EfiRedfishDiscoverProtocolHandle; ///< EFI_REDFISH_DISCOVER_PROTOTOCOL instance installed
+                                                                                   ///< on this network interface.
 } EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL;
 
 //
