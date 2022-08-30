@@ -4018,7 +4018,7 @@ class FdfParser:
             if FileType not in {BINARY_FILE_TYPE_PE32, "SEC_PE32"}:
                 raise Warning(WarningString % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == BINARY_FILE_TYPE_PIC:
-            if FileType not in {BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_PIC}:
+            if FileType not in {BINARY_FILE_TYPE_PIC, "SEC_PIC"}:
                 raise Warning(WarningString % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == BINARY_FILE_TYPE_TE:
             if FileType not in {BINARY_FILE_TYPE_TE, "SEC_TE"}:
