@@ -26,6 +26,7 @@
 #include <Library/NetLib.h>
 #include <Library/HttpLib.h>
 #include <Library/DpcLib.h>
+#include <Library/PrintLib.h>
 
 //
 // UEFI Driver Model Protocols
