@@ -2019,8 +2019,8 @@ Returns:
         Status =
           PutFileImage (
             ToolInputFile,
-            (CHAR8*) SectionBuffer + DataOffset,
-            BufferLength - DataOffset
+            (CHAR8*)Ptr + DataOffset,
+            SectionLength - DataOffset
             );
 
         system (SystemCommand);
@@ -2065,8 +2065,8 @@ Returns:
         //
         printf ("/------------ Encapsulation section start -----------------\\\n");
         Status = ParseSection (
-                  SectionBuffer + DataOffset,
-                  BufferLength - DataOffset
+                  Ptr + DataOffset,
+                  SectionLength - DataOffset
                   );
         if (EFI_ERROR (Status)) {
           Error (NULL, 0, 0003, "parse of CRC32 GUIDED section failed", NULL);
