@@ -619,7 +619,7 @@ AmlCodeGenRdDWordMemory (
   See ACPI 6.4 spec, s19.2.8 for more.
 
   @param [in]  IsReadWrite          ReadAndWrite parameter.
-  @param [in]  Addres               AddressBase parameter.
+  @param [in]  Address              AddressBase parameter.
   @param [in]  RangeLength          Range length.
   @param [in]  NameOpNode           NameOp object node defining a named object.
                                     If provided, append the new resource data
