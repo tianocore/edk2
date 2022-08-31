@@ -456,10 +456,7 @@ GetUpdateFileSystem (
   // 2. Get EFI system partition form boot options.
   //
   BootOptionBuffer = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
-  if ((BootOptionBuffer == NULL) ||
-      ((BootOptionCount == 0) && (Map == NULL))
-      )
-  {
+  if ((BootOptionBuffer != NULL) && (BootOptionCount == 0) && (Map == NULL)) {
     return EFI_NOT_FOUND;
   }
 
