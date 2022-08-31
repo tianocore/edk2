@@ -604,6 +604,33 @@ PlatformAddressWidthFromCpuid (
   }
 }
 
+VOID
+EFIAPI
+PlatformDynamicMmioWindow (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  UINT64  AddrSpace, MmioSpace;
+
+  AddrSpace = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth);
+  MmioSpace = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth - 3);
+
+  if ((PlatformInfoHob->PcdPciMmio64Size < MmioSpace) &&
+      (PlatformInfoHob->PcdPciMmio64Base + MmioSpace < AddrSpace))
+  {
+    DEBUG ((DEBUG_INFO, "%a: using dynamic mmio window\n", __func__));
+    DEBUG ((DEBUG_INFO, "%a:   Addr Space 0x%Lx (%Ld GB)\n", __func__, AddrSpace, RShiftU64 (AddrSpace, 30)));
+    DEBUG ((DEBUG_INFO, "%a:   MMIO Space 0x%Lx (%Ld GB)\n", __func__, MmioSpace, RShiftU64 (MmioSpace, 30)));
+    PlatformInfoHob->PcdPciMmio64Size = MmioSpace;
+    PlatformInfoHob->PcdPciMmio64Base = AddrSpace - MmioSpace;
+  } else {
+    DEBUG ((DEBUG_INFO, "%a: using classic mmio window\n", __func__));
+  }
+
+  DEBUG ((DEBUG_INFO, "%a:   Pci64 Base 0x%Lx\n", __func__, PlatformInfoHob->PcdPciMmio64Base));
+  DEBUG ((DEBUG_INFO, "%a:   Pci64 Size 0x%Lx\n", __func__, PlatformInfoHob->PcdPciMmio64Size));
+}
+
 /**
   Iterate over the PCI host bridges resources information optionally provided
   in fw-cfg and find the highest address contained in the PCI MMIO windows. If
@@ -765,6 +792,7 @@ PlatformAddressWidthInitialization (
   if (PlatformInfoHob->PhysMemAddressWidth != 0) {
     // physical address width is known
     PlatformInfoHob->FirstNonAddress = FirstNonAddress;
+    PlatformDynamicMmioWindow (PlatformInfoHob);
     return;
   }
 
