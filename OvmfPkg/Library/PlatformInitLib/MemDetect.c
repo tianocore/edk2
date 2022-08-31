@@ -531,7 +531,7 @@ PlatformAddressWidthFromCpuid (
   IN     BOOLEAN                QemuQuirk
   )
 {
-  UINT32   RegEax, RegEbx, RegEcx, RegEdx;
+  UINT32   RegEax, RegEbx, RegEcx, RegEdx, Max;
   UINT8    PhysBits;
   CHAR8    Signature[13] = { 0 };
   BOOLEAN  Valid         = FALSE;
@@ -541,15 +541,16 @@ PlatformAddressWidthFromCpuid (
   *(UINT32 *)(Signature + 0) = RegEbx;
   *(UINT32 *)(Signature + 4) = RegEdx;
   *(UINT32 *)(Signature + 8) = RegEcx;
+  Max                        = RegEax;
 
-  if (RegEax >= 0x80000001) {
+  if (Max >= 0x80000001) {
     AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
     if ((RegEdx & BIT26) != 0) {
       Page1GSupport = TRUE;
     }
   }
 
-  if (RegEax >= 0x80000008) {
+  if (Max >= 0x80000008) {
     AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
     PhysBits = (UINT8)RegEax;
   } else {
@@ -581,9 +582,16 @@ PlatformAddressWidthFromCpuid (
     ));
 
   if (Valid) {
-    if (PhysBits > 48) {
-      DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 48 (avoid 5-level paging)\n", __func__));
-      PhysBits = 48;
+    if (PhysBits > 47) {
+      /*
+       * Avoid 5-level paging altogether for now, which limits
+       * PhysBits to 48.  Also avoid using address bit 48, due to sign
+       * extension we can't identity-map these addresses (and lots of
+       * places in edk2 assume we have everything identity-mapped).
+       * So the actual limit is 47.
+       */
+      DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 47 (avoid 5-level paging)\n", __func__));
+      PhysBits = 47;
     }
 
     if (!Page1GSupport && (PhysBits > 40)) {
@@ -753,6 +761,19 @@ PlatformAddressWidthInitialization (
     FirstNonAddress = PlatformGetFirstNonAddress (PlatformInfoHob);
   }
 
+  PlatformAddressWidthFromCpuid (PlatformInfoHob, TRUE);
+  if (PlatformInfoHob->PhysMemAddressWidth != 0) {
+    // physical address width is known
+    PlatformInfoHob->FirstNonAddress = FirstNonAddress;
+    return;
+  }
+
+  //
+  // physical address width is NOT known
+  //   -> do some guess work, mostly based on installed memory
+  //   -> try be conservstibe to stay below the guaranteed minimum of
+  //      36 phys bits (aka 64 GB).
+  //
   PhysMemAddressWidth = (UINT8)HighBitSet64 (FirstNonAddress);
 
   //
