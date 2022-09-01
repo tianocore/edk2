@@ -10,7 +10,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = BaseFspWrapperPlatformMultiPhaseLibSample
+  BASE_NAME                      = BaseFspWrapperPlatformMultiPhaseLibNull
   FILE_GUID                      = DB63E5AA-21C6-40BB-879A-CD1762C8427B
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -23,7 +23,7 @@
 #
 
 [Sources]
-  FspWrapperPlatformMultiPhaseLibSample.c
+  FspWrapperPlatformMultiPhaseLibNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
