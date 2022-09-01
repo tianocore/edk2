@@ -12,7 +12,7 @@
 #define NAME_CONFIG_STRING_TYPE  0x01
 #define PATH_CONFIG_STRING_TYPE  0x02
 
-#define ACTION_SET_DEFAUTL_VALUE  0x01
+#define ACTION_SET_DEFAULT_VALUE  0x01
 #define ACTION_VALIDATE_SETTING   0x02
 
 #define HII_LIB_DEFAULT_VARSTORE_SIZE  0x200
@@ -2350,7 +2350,7 @@ InternalHiiIfrValueAction (
   //
   // Only support set default and validate setting action.
   //
-  if ((ActionType != ACTION_SET_DEFAUTL_VALUE) && (ActionType != ACTION_VALIDATE_SETTING)) {
+  if ((ActionType != ACTION_SET_DEFAULT_VALUE) && (ActionType != ACTION_VALIDATE_SETTING)) {
     return FALSE;
   }
 
@@ -2511,7 +2511,7 @@ InternalHiiIfrValueAction (
                                   VarGuid,
                                   VarName,
                                   DevicePath,
-                                  (ActionType == ACTION_SET_DEFAUTL_VALUE) ? &DefaultId : NULL,  // it can be NULL to get the current setting.
+                                  (ActionType == ACTION_SET_DEFAULT_VALUE) ? &DefaultId : NULL,  // it can be NULL to get the current setting.
                                   &ConfigResp
                                   );
 
@@ -2534,7 +2534,7 @@ InternalHiiIfrValueAction (
     // 4. Set the default configuration information or Validate current setting by parse IFR code.
     //    Current Setting is in ConfigResp, will be set into buffer, then check it again.
     //
-    if (ActionType == ACTION_SET_DEFAUTL_VALUE) {
+    if (ActionType == ACTION_SET_DEFAULT_VALUE) {
       //
       // Set the default configuration information.
       //
@@ -2716,7 +2716,7 @@ HiiSetToDefaults (
   IN UINT16            DefaultId
   )
 {
-  return InternalHiiIfrValueAction (Request, DefaultId, ACTION_SET_DEFAUTL_VALUE);
+  return InternalHiiIfrValueAction (Request, DefaultId, ACTION_SET_DEFAULT_VALUE);
 }
 
 /**
