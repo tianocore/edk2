@@ -107,7 +107,7 @@ EDK II Continuous Integration:
 .azurepipelines/
 F: .azurepipelines/
 M: Sean Brogan <sean.brogan@microsoft.com> [spbrogan]
-M: Bret Barkelew <Bret.Barkelew@microsoft.com> [corthon]
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 R: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
@@ -116,12 +116,11 @@ F: .mergify/
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Sean Brogan <sean.brogan@microsoft.com> [spbrogan]
-R: Bret Barkelew <Bret.Barkelew@microsoft.com> [corthon]
 
 .pytool/
 F: .pytool/
 M: Sean Brogan <sean.brogan@microsoft.com> [spbrogan]
-M: Bret Barkelew <Bret.Barkelew@microsoft.com> [corthon]
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 R: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
@@ -614,5 +613,4 @@ F: UnitTestFrameworkPkg/
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 R: Sean Brogan <sean.brogan@microsoft.com> [spbrogan]
-R: Bret Barkelew <Bret.Barkelew@microsoft.com> [corthon]
 S: Maintained
