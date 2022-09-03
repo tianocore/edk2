@@ -144,8 +144,8 @@ LocateAndInstallAcpiFromFv (
 EFI_STATUS
 EFIAPI
 AcpiUpdateChecksum (
-  IN OUT  UINT8      *Buffer,
-  IN      UINTN      Size
+  IN OUT  UINT8  *Buffer,
+  IN      UINTN  Size
   );
 
 /**
@@ -168,11 +168,11 @@ AcpiUpdateChecksum (
 EFI_STATUS
 EFIAPI
 AcpiLocateTableBySignature (
-  IN      EFI_ACPI_SDT_PROTOCOL           *AcpiSdtProtocol,
-  IN      UINT32                          TableSignature,
-  IN OUT  UINTN                           *Index,
-  OUT     EFI_ACPI_DESCRIPTION_HEADER     **Table,
-  OUT     UINTN                           *TableKey
+  IN      EFI_ACPI_SDT_PROTOCOL        *AcpiSdtProtocol,
+  IN      UINT32                       TableSignature,
+  IN OUT  UINTN                        *Index,
+  OUT     EFI_ACPI_DESCRIPTION_HEADER  **Table,
+  OUT     UINTN                        *TableKey
   );
 
 /**
@@ -193,10 +193,10 @@ AcpiLocateTableBySignature (
 EFI_STATUS
 EFIAPI
 AcpiAmlObjectUpdateInteger (
-  IN  EFI_ACPI_SDT_PROTOCOL           *AcpiSdtProtocol,
-  IN  EFI_ACPI_HANDLE                 TableHandle,
-  IN  CHAR8                           *AsciiObjectPath,
-  IN  UINTN                           Value
+  IN  EFI_ACPI_SDT_PROTOCOL  *AcpiSdtProtocol,
+  IN  EFI_ACPI_HANDLE        TableHandle,
+  IN  CHAR8                  *AsciiObjectPath,
+  IN  UINTN                  Value
   );
 
 #endif // __ACPI_LIB_H__

@@ -192,13 +192,13 @@ LocateAndInstallAcpiFromFv (
 EFI_STATUS
 EFIAPI
 AcpiUpdateChecksum (
-  IN OUT  UINT8      *Buffer,
-  IN      UINTN      Size
+  IN OUT  UINT8  *Buffer,
+  IN      UINTN  Size
   )
 {
-  UINTN ChecksumOffset;
+  UINTN  ChecksumOffset;
 
-  if (Buffer == NULL || Size == 0) {
+  if ((Buffer == NULL) || (Size == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -237,11 +237,11 @@ AcpiUpdateChecksum (
 EFI_STATUS
 EFIAPI
 AcpiLocateTableBySignature (
-  IN      EFI_ACPI_SDT_PROTOCOL           *AcpiSdtProtocol,
-  IN      UINT32                          TableSignature,
-  IN OUT  UINTN                           *Index,
-  OUT     EFI_ACPI_DESCRIPTION_HEADER     **Table,
-  OUT     UINTN                           *TableKey
+  IN      EFI_ACPI_SDT_PROTOCOL        *AcpiSdtProtocol,
+  IN      UINT32                       TableSignature,
+  IN OUT  UINTN                        *Index,
+  OUT     EFI_ACPI_DESCRIPTION_HEADER  **Table,
+  OUT     UINTN                        *TableKey
   )
 {
   EFI_STATUS              Status;
@@ -249,9 +249,10 @@ AcpiLocateTableBySignature (
   EFI_ACPI_TABLE_VERSION  TableVersion;
   UINTN                   TableIndex;
 
-  if (AcpiSdtProtocol == NULL
-      || Table == NULL
-      || TableKey == NULL) {
+  if (  (AcpiSdtProtocol == NULL)
+     || (Table == NULL)
+     || (TableKey == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -261,7 +262,7 @@ AcpiLocateTableBySignature (
   // Search for ACPI Table with matching signature
   //
   TableVersion = 0;
-  TableIndex = *Index;
+  TableIndex   = *Index;
   while (!EFI_ERROR (Status)) {
     Status = AcpiSdtProtocol->GetAcpiTable (
                                 TableIndex,
@@ -301,26 +302,26 @@ AcpiLocateTableBySignature (
 EFI_STATUS
 EFIAPI
 AcpiAmlObjectUpdateInteger (
-  IN  EFI_ACPI_SDT_PROTOCOL           *AcpiSdtProtocol,
-  IN  EFI_ACPI_HANDLE                 TableHandle,
-  IN  CHAR8                           *AsciiObjectPath,
-  IN  UINTN                           Value
+  IN  EFI_ACPI_SDT_PROTOCOL  *AcpiSdtProtocol,
+  IN  EFI_ACPI_HANDLE        TableHandle,
+  IN  CHAR8                  *AsciiObjectPath,
+  IN  UINTN                  Value
   )
 {
-  EFI_STATUS            Status;
-  EFI_ACPI_HANDLE       ObjectHandle;
-  EFI_ACPI_HANDLE       DataHandle;
-  EFI_ACPI_DATA_TYPE    DataType;
-  UINT8                 *Buffer;
-  UINTN                 BufferSize;
-  UINTN                 DataSize;
+  EFI_STATUS          Status;
+  EFI_ACPI_HANDLE     ObjectHandle;
+  EFI_ACPI_HANDLE     DataHandle;
+  EFI_ACPI_DATA_TYPE  DataType;
+  UINT8               *Buffer;
+  UINTN               BufferSize;
+  UINTN               DataSize;
 
-  if (AcpiSdtProtocol == NULL || AsciiObjectPath == NULL) {
+  if ((AcpiSdtProtocol == NULL) || (AsciiObjectPath == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   ObjectHandle = NULL;
-  DataHandle = NULL;
+  DataHandle   = NULL;
 
   Status = AcpiSdtProtocol->FindPath (TableHandle, AsciiObjectPath, &ObjectHandle);
   if (EFI_ERROR (Status)) {
@@ -332,6 +333,7 @@ AcpiAmlObjectUpdateInteger (
     Status = EFI_NOT_FOUND;
     goto Exit;
   }
+
   ASSERT (DataType == EFI_ACPI_DATA_TYPE_OPCODE);
   ASSERT (Buffer != NULL);
 
@@ -350,7 +352,7 @@ AcpiAmlObjectUpdateInteger (
   ASSERT (DataType == EFI_ACPI_DATA_TYPE_OPCODE);
   ASSERT (Buffer != NULL);
 
-  if (Buffer[0] == AML_ZERO_OP || Buffer[0] == AML_ONE_OP) {
+  if ((Buffer[0] == AML_ZERO_OP) || (Buffer[0] == AML_ONE_OP)) {
     Status = AcpiSdtProtocol->SetOption (DataHandle, 0, (VOID *)&Value, sizeof (UINT8));
     ASSERT_EFI_ERROR (Status);
   } else {
@@ -358,26 +360,26 @@ AcpiAmlObjectUpdateInteger (
     // Check the size of data object
     //
     switch (Buffer[0]) {
-    case AML_BYTE_PREFIX:
-      DataSize = sizeof (UINT8);
-      break;
+      case AML_BYTE_PREFIX:
+        DataSize = sizeof (UINT8);
+        break;
 
-    case AML_WORD_PREFIX:
-      DataSize = sizeof (UINT16);
-      break;
+      case AML_WORD_PREFIX:
+        DataSize = sizeof (UINT16);
+        break;
 
-    case AML_DWORD_PREFIX:
-      DataSize = sizeof (UINT32);
-      break;
+      case AML_DWORD_PREFIX:
+        DataSize = sizeof (UINT32);
+        break;
 
-    case AML_QWORD_PREFIX:
-      DataSize = sizeof (UINT64);
-      break;
+      case AML_QWORD_PREFIX:
+        DataSize = sizeof (UINT64);
+        break;
 
-    default:
-      // The data type of the ACPI object is not an integer
-      Status = EFI_INVALID_PARAMETER;
-      goto Exit;
+      default:
+        // The data type of the ACPI object is not an integer
+        Status = EFI_INVALID_PARAMETER;
+        goto Exit;
     }
 
     Status = AcpiSdtProtocol->SetOption (DataHandle, 1, (VOID *)&Value, DataSize);
