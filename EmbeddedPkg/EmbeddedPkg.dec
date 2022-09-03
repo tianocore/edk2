@@ -36,6 +36,14 @@
   GdbSerialLib|Include/Library/GdbSerialLib.h
   DebugAgentTimerLib|Include/Library/DebugAgentTimerLib.h
   NorFlashInfoLib|Include/Library/NorFlashInfoLib.h
+  HalRuntimeServicesLib|Include/Library/HalRuntimeServicesLib.h
+  PrePiHobListPointerLib|Include/Library/PrePiHobListPointerLib.h
+  TimeBaseLib|Include/Library/TimeBaseLib.h
+  AcpiLib|Include/Library/AcpiLib.h
+  AndroidBootImgLib|Include/Library/AndroidBootImgLib.h
+  DmaLib|Include/Library/DmaLib.h
+  EfiFileLib|Include/Library/EfiFileLib.h
+  FdtLoadLib|Include/Library/FdtLoadLib.h
 
   DtPlatformDtbLoaderLib|Include/Library/DtPlatformDtbLoaderLib.h
 
