@@ -5545,7 +5545,7 @@ CryptoServiceEcDhComputeKey (
   IN OUT  UINTN        *KeySize
   )
 {
-  return CALL_BASECRYPTLIB (Ec.Services.DhComputeKey, EcDhComputeKey, (EcContext, PeerPublic, PeerPublicSize, CompressFlag ,Key, KeySize), FALSE);
+  return CALL_BASECRYPTLIB (Ec.Services.DhComputeKey, EcDhComputeKey, (EcContext, PeerPublic, PeerPublicSize, CompressFlag, Key, KeySize), FALSE);
 }
 
 const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
