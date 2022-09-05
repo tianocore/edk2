@@ -10,14 +10,16 @@
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
-  BASE_NAME                      = SmmCpuRendezvousLib
-  FILE_GUID                      = 1509Bb36-9Ba4-438B-B195-Ac5914Db14E2
-  MODULE_TYPE                    = DXE_SMM_DRIVER
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = SmmCpuRendezvousLibStandaloneMm
+  FILE_GUID                      = 3BBBBFA9-5DEB-6793-C6F4-F16B6565EB45
+  MODULE_TYPE                    = MM_STANDALONE
   LIBRARY_CLASS                  = SmmCpuRendezvousLib
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  CONSTRUCTOR                    = SmmCpuRendezvousLibStandaloneConstructor
 
 [Sources]
-  SmmCpuRendezvousLib.c
+  SmmCpuRendezvousLibStandaloneMm.c
 
 [Packages]
   MdePkg/MdePkg.dec
