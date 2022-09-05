@@ -11,9 +11,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Debug data
 //
-#define MAX_TEST_DATA_SIZE  512
+#define MAX_TEST_DATA_SIZE    512
 #define BYTES_OF_OPERATION_A  60
-#define BITS_OF_OPERATION_A  480 //(8 * 60)
+#define BITS_OF_OPERATION_A   480// (8 * 60)
 
 GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  BnOperationA[] = {
   0x00, 0x00, 0x00, 0x00, 0x93, 0x61, 0x7a, 0xba, 0xcc, 0x41, 0x73, 0x49, 0xae, 0x20, 0x41, 0x31,
@@ -88,23 +88,23 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  BnResultExpMod[] =  {
 
 // BnOperationA >> 128
 GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  BnResultRShift[] =  {
-                          0x93, 0x61, 0x7a, 0xba, 0xcc, 0x41, 0x73, 0x49, 0xae, 0x20, 0x41, 0x31,
-  0x12, 0xe6, 0xfa, 0x4e, 0x89, 0xa9, 0x7e, 0xa2, 0x0a, 0x9e, 0xee, 0xe6, 0x4b, 0x55, 0xd3, 0x9a,
-  0x21, 0x92, 0x99, 0x2a, 0x27, 0x4f, 0xc1, 0xa8, 0x36, 0xba, 0x3c, 0x23, 0xa3, 0xfe, 0xeb, 0xbd
+  0x93, 0x61, 0x7a, 0xba, 0xcc, 0x41, 0x73, 0x49, 0xae, 0x20, 0x41, 0x31,
+  0x12, 0xe6, 0xfa, 0x4e, 0x89, 0xa9, 0x7e, 0xa2, 0x0a, 0x9e, 0xee, 0xe6,0x4b,  0x55, 0xd3, 0x9a,
+  0x21, 0x92, 0x99, 0x2a, 0x27, 0x4f, 0xc1, 0xa8, 0x36, 0xba, 0x3c, 0x23,0xa3,  0xfe, 0xeb, 0xbd
 };
 
 // 0x12345678
-GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  BnResultUIntSet[] =  {0x12, 0x34, 0x56, 0x78};
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  BnResultUIntSet[] =  { 0x12, 0x34, 0x56, 0x78 };
 
 typedef struct {
-  VOID *BnA;
-  VOID *BnB;
-  VOID *BnC;
-  VOID *BnD;
-  VOID *BnCTX;
+  VOID    *BnA;
+  VOID    *BnB;
+  VOID    *BnC;
+  VOID    *BnD;
+  VOID    *BnCTX;
 } BN_TEST_CONTEXT;
 
-GLOBAL_REMOVE_IF_UNREFERENCED STATIC BN_TEST_CONTEXT mBnContext = {NULL, NULL, NULL, NULL, NULL};
+GLOBAL_REMOVE_IF_UNREFERENCED STATIC BN_TEST_CONTEXT  mBnContext = { NULL, NULL, NULL, NULL, NULL };
 
 //
 // Debug function
@@ -112,18 +112,23 @@ GLOBAL_REMOVE_IF_UNREFERENCED STATIC BN_TEST_CONTEXT mBnContext = {NULL, NULL, N
 STATIC
 BOOLEAN
 EqualBn2Bn (
-  CONST VOID *Expected, CONST VOID *Actual
+  CONST VOID  *Expected,
+  CONST VOID  *Actual
   )
 {
-    if (BigNumCmp(Expected, Actual) == 0)
-        return TRUE;
-    return FALSE;
+  if (BigNumCmp (Expected, Actual) == 0) {
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 STATIC
 BOOLEAN
 EqualBn2Bin (
-  CONST VOID *Bn, CONST UINT8 *Buffer, CONST UINTN BufferSize
+  CONST VOID   *Bn,
+  CONST UINT8  *Buffer,
+  CONST UINTN  BufferSize
   )
 {
   UINTN  BnTestBufferSize;
@@ -135,6 +140,7 @@ EqualBn2Bin (
       return TRUE;
     }
   }
+
   return FALSE;
 }
 
@@ -144,22 +150,24 @@ TestVerifyBnPreReq (
   UNIT_TEST_CONTEXT  Context
   )
 {
-  BN_TEST_CONTEXT *BnContext;
+  BN_TEST_CONTEXT  *BnContext;
 
-  BnContext = Context;
-  BnContext->BnCTX = BigNumNewContext();
-  BnContext->BnA = BigNumInit();
-  BnContext->BnB = BigNumInit();
-  BnContext->BnC = BigNumInit();
-  BnContext->BnD = BigNumInit();
-  if (BnContext->BnCTX == NULL
-        || BnContext->BnA == NULL
-        || BnContext->BnB == NULL
-        || BnContext->BnC == NULL
-        || BnContext->BnD == NULL
-        ) {
+  BnContext        = Context;
+  BnContext->BnCTX = BigNumNewContext ();
+  BnContext->BnA   = BigNumInit ();
+  BnContext->BnB   = BigNumInit ();
+  BnContext->BnC   = BigNumInit ();
+  BnContext->BnD   = BigNumInit ();
+  if (  (BnContext->BnCTX == NULL)
+     || (BnContext->BnA == NULL)
+     || (BnContext->BnB == NULL)
+     || (BnContext->BnC == NULL)
+     || (BnContext->BnD == NULL)
+        )
+  {
     return UNIT_TEST_ERROR_TEST_FAILED;
   }
+
   return UNIT_TEST_PASSED;
 }
 
@@ -169,7 +177,7 @@ TestVerifyBnCleanUp (
   UNIT_TEST_CONTEXT  Context
   )
 {
-  BN_TEST_CONTEXT *BnContext;
+  BN_TEST_CONTEXT  *BnContext;
 
   BnContext = Context;
   BigNumContextFree (BnContext->BnCTX);
@@ -185,63 +193,64 @@ TestVerifyBn (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
-  BN_TEST_CONTEXT *BnContext;
-  UINTN Num;
-  CONST VOID *BnOne;
+  BN_TEST_CONTEXT  *BnContext;
+  UINTN            Num;
+  CONST VOID       *BnOne;
 
   BnContext = Context;
 
   // Calculation tests
   BnContext->BnA = BigNumFromBin (BnOperationA, sizeof (BnOperationA));
   BnContext->BnB = BigNumFromBin (BnOperationB, sizeof (BnOperationB));
-  //C=A+B
+  // C=A+B
   BigNumAdd (BnContext->BnA, BnContext->BnB, BnContext->BnC);
   UT_ASSERT_TRUE (EqualBn2Bin (BnContext->BnC, BnResultSum, sizeof (BnResultSum)));
-  //D=C-A=B
+  // D=C-A=B
   BigNumSub (BnContext->BnC, BnContext->BnA, BnContext->BnD);
   UT_ASSERT_TRUE (EqualBn2Bn (BnContext->BnB, BnContext->BnD));
-  //C=(A+B)%D
+  // C=(A+B)%D
   BnContext->BnD = BigNumFromBin (BnOperationMod, sizeof (BnOperationMod));
   BigNumAddMod (BnContext->BnA, BnContext->BnB, BnContext->BnD, BnContext->BnC);
   UT_ASSERT_TRUE (EqualBn2Bin (BnContext->BnC, BnResultSumMod, sizeof (BnResultSumMod)));
-  //C=(A*B)%D
+  // C=(A*B)%D
   BigNumMulMod (BnContext->BnA, BnContext->BnB, BnContext->BnD, BnContext->BnC);
   UT_ASSERT_TRUE (EqualBn2Bin (BnContext->BnC, BnResultMulMod, sizeof (BnResultMulMod)));
-  //C=A/D
+  // C=A/D
   BigNumDiv (BnContext->BnA, BnContext->BnD, BnContext->BnC);
   UT_ASSERT_TRUE (EqualBn2Bin (BnContext->BnC, BnResultDiv, sizeof (BnResultDiv)));
-  //C=A%D
+  // C=A%D
   BigNumMod (BnContext->BnA, BnContext->BnD, BnContext->BnC);
   UT_ASSERT_TRUE (EqualBn2Bin (BnContext->BnC, BnResultMod, sizeof (BnResultMod)));
-  //1=(A*C)%D
+  // 1=(A*C)%D
   BigNumInverseMod (BnContext->BnA, BnContext->BnD, BnContext->BnC);
   UT_ASSERT_TRUE (EqualBn2Bin (BnContext->BnC, BnResultInverseMod, sizeof (BnResultInverseMod)));
-  //C=(A^B)%D
+  // C=(A^B)%D
   BnContext->BnB = BigNumFromBin (BnOperationExp, sizeof (BnOperationExp));
   BigNumExpMod (BnContext->BnA, BnContext->BnB, BnContext->BnD, BnContext->BnC);
   UT_ASSERT_TRUE (EqualBn2Bin (BnContext->BnC, BnResultExpMod, sizeof (BnResultExpMod)));
-  //C=A>>128
+  // C=A>>128
   BigNumRShift (BnContext->BnA, 128, BnContext->BnC);
   UT_ASSERT_TRUE (EqualBn2Bin (BnContext->BnC, BnResultRShift, sizeof (BnResultRShift)));
-  //C=0x12345678
+  // C=0x12345678
   BigNumSetUint (BnContext->BnC, 0x12345678);
   UT_ASSERT_TRUE (EqualBn2Bin (BnContext->BnC, BnResultUIntSet, sizeof (BnResultUIntSet)));
-  //Bn compare
+  // Bn compare
   UT_ASSERT_TRUE (BigNumIsWord (BnContext->BnC, 0x12345678));
   UT_ASSERT_FALSE (BigNumIsWord (BnContext->BnC, 0x12345600));
   UT_ASSERT_FALSE (BigNumIsOdd (BnContext->BnC));
   UT_ASSERT_TRUE (BigNumIsOdd (BnContext->BnA));
 
-  //Other tests
+  // Other tests
   BigNumConstTime (BnContext->BnA);
   Num = BigNumBytes (BnContext->BnA);
   UT_ASSERT_EQUAL (Num, BYTES_OF_OPERATION_A);
   Num = BigNumBits (BnContext->BnA);
   UT_ASSERT_EQUAL (Num, BITS_OF_OPERATION_A);
-  BnOne = BigNumValueOne();
+  BnOne = BigNumValueOne ();
   if (BnOne == NULL) {
     return UNIT_TEST_ERROR_TEST_FAILED;
   }
+
   UT_ASSERT_TRUE (BigNumIsWord (BnOne, 0x1));
 
   return UNIT_TEST_PASSED;
@@ -251,7 +260,7 @@ TEST_DESC  mBnTest[] = {
   //
   // -----Description----------------Class---------------------Function-----------Pre----------------Post---------Context
   //
-  { "TestVerifyBn()",   "CryptoPkg.BaseCryptLib.BigNumber", TestVerifyBn, TestVerifyBnPreReq, TestVerifyBnCleanUp, &mBnContext   },
+  { "TestVerifyBn()", "CryptoPkg.BaseCryptLib.BigNumber", TestVerifyBn, TestVerifyBnPreReq, TestVerifyBnCleanUp, &mBnContext },
 };
 
-UINTN  mBnTestNum = ARRAY_SIZE(mBnTest);
+UINTN  mBnTestNum = ARRAY_SIZE (mBnTest);
