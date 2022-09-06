@@ -4,6 +4,7 @@ IA32 and X64 Specific relocation fixups
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 --*/
@@ -328,6 +329,84 @@ PeCoffLoaderRelocateArmImage (
      // break omitted - ARM instruction encoding not implemented
   default:
     return RETURN_UNSUPPORTED;
+  }
+
+  return RETURN_SUCCESS;
+}
+
+/**
+  Performs a LoongArch specific relocation fixup.
+
+  @param[in]       Reloc       Pointer to the relocation record.
+  @param[in, out]  Fixup       Pointer to the address to fix up.
+  @param[in, out]  FixupData   Pointer to a buffer to log the fixups.
+  @param[in]       Adjust      The offset to adjust the fixup.
+
+  @return Status code.
+**/
+RETURN_STATUS
+PeCoffLoaderRelocateLoongArch64Image (
+  IN UINT16     *Reloc,
+  IN OUT CHAR8  *Fixup,
+  IN OUT CHAR8  **FixupData,
+  IN UINT64     Adjust
+  )
+{
+  UINT8  RelocType;
+  UINT64 Value;
+  UINT64 Tmp1;
+  UINT64 Tmp2;
+
+  RelocType = ((*Reloc) >> 12);
+  Value     = 0;
+  Tmp1      = 0;
+  Tmp2      = 0;
+
+  switch (RelocType) {
+    case EFI_IMAGE_REL_BASED_LOONGARCH64_MARK_LA:
+      // The next four instructions are used to load a 64 bit address, relocate all of them
+      Value = (*(UINT32 *)Fixup & 0x1ffffe0) << 7 |       // lu12i.w 20bits from bit5
+              (*((UINT32 *)Fixup + 1) & 0x3ffc00) >> 10;  // ori     12bits from bit10
+      Tmp1   = *((UINT32 *)Fixup + 2) & 0x1ffffe0;        // lu32i.d 20bits from bit5
+      Tmp2   = *((UINT32 *)Fixup + 3) & 0x3ffc00;         // lu52i.d 12bits from bit10
+      Value  = Value | (Tmp1 << 27) | (Tmp2 << 42);
+      Value += Adjust;
+
+      *(UINT32 *)Fixup = (*(UINT32 *)Fixup & ~0x1ffffe0) | (((Value >> 12) & 0xfffff) << 5);
+      if (*FixupData != NULL) {
+        *FixupData              = ALIGN_POINTER (*FixupData, sizeof (UINT32));
+        *(UINT32 *)(*FixupData) = *(UINT32 *)Fixup;
+        *FixupData              = *FixupData + sizeof (UINT32);
+      }
+
+      Fixup           += sizeof (UINT32);
+      *(UINT32 *)Fixup = (*(UINT32 *)Fixup & ~0x3ffc00) | ((Value & 0xfff) << 10);
+      if (*FixupData != NULL) {
+        *FixupData              = ALIGN_POINTER (*FixupData, sizeof (UINT32));
+        *(UINT32 *)(*FixupData) = *(UINT32 *)Fixup;
+        *FixupData              = *FixupData + sizeof (UINT32);
+      }
+
+      Fixup           += sizeof (UINT32);
+      *(UINT32 *)Fixup = (*(UINT32 *)Fixup & ~0x1ffffe0) | (((Value >> 32) & 0xfffff) << 5);
+      if (*FixupData != NULL) {
+        *FixupData              = ALIGN_POINTER (*FixupData, sizeof (UINT32));
+        *(UINT32 *)(*FixupData) = *(UINT32 *)Fixup;
+        *FixupData              = *FixupData + sizeof (UINT32);
+      }
+
+      Fixup           += sizeof (UINT32);
+      *(UINT32 *)Fixup = (*(UINT32 *)Fixup & ~0x3ffc00) | (((Value >> 52) & 0xfff) << 10);
+      if (*FixupData != NULL) {
+        *FixupData              = ALIGN_POINTER (*FixupData, sizeof (UINT32));
+        *(UINT32 *)(*FixupData) = *(UINT32 *)Fixup;
+        *FixupData              = *FixupData + sizeof (UINT32);
+      }
+
+      break;
+    default:
+      Error (NULL, 0, 3000, "", "PeCoffLoaderRelocateLoongArch64Image: Fixup[0x%x] Adjust[0x%llx] *Reloc[0x%x], type[0x%x].", *(UINT32 *)Fixup, Adjust, *Reloc, RelocType);
+      return RETURN_UNSUPPORTED;
   }
 
   return RETURN_SUCCESS;

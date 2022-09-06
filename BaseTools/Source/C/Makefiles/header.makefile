@@ -31,6 +31,9 @@ ifndef HOST_ARCH
   ifneq (,$(findstring riscv64,$(uname_m)))
     HOST_ARCH=RISCV64
   endif
+  ifneq (,$(findstring loongarch64,$(uname_m)))
+    HOST_ARCH=LOONGARCH64
+  endif
   ifndef HOST_ARCH
     $(info Could not detected HOST_ARCH from uname results)
     $(error HOST_ARCH is not defined!)
@@ -69,6 +72,9 @@ ARCH_INCLUDE = -I $(MAKEROOT)/Include/AArch64/
 
 else ifeq ($(HOST_ARCH), RISCV64)
 ARCH_INCLUDE = -I $(MAKEROOT)/Include/RiscV64/
+
+else ifeq ($(HOST_ARCH), LOONGARCH64)
+ARCH_INCLUDE = -I $(MAKEROOT)/Include/LoongArch64/
 
 else
 $(error Bad HOST_ARCH)

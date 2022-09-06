@@ -5,6 +5,7 @@
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 Portions Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+Portions Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -62,6 +63,14 @@ PeCoffLoaderRelocateArmImage (
 
 RETURN_STATUS
 PeCoffLoaderRelocateRiscVImage (
+  IN UINT16      *Reloc,
+  IN OUT CHAR8   *Fixup,
+  IN OUT CHAR8   **FixupData,
+  IN UINT64      Adjust
+  );
+
+RETURN_STATUS
+PeCoffLoaderRelocateLoongArch64Image (
   IN UINT16      *Reloc,
   IN OUT CHAR8   *Fixup,
   IN OUT CHAR8   **FixupData,
@@ -184,7 +193,8 @@ Returns:
       ImageContext->Machine != EFI_IMAGE_MACHINE_ARMT && \
       ImageContext->Machine != EFI_IMAGE_MACHINE_EBC  && \
       ImageContext->Machine != EFI_IMAGE_MACHINE_AARCH64 && \
-      ImageContext->Machine != EFI_IMAGE_MACHINE_RISCV64) {
+      ImageContext->Machine != EFI_IMAGE_MACHINE_RISCV64 && \
+      ImageContext->Machine != EFI_IMAGE_MACHINE_LOONGARCH64) {
     if (ImageContext->Machine == IMAGE_FILE_MACHINE_ARM) {
       //
       // There are two types of ARM images. Pure ARM and ARM/Thumb.
@@ -814,6 +824,9 @@ Returns:
           break;
         case EFI_IMAGE_MACHINE_RISCV64:
           Status = PeCoffLoaderRelocateRiscVImage (Reloc, Fixup, &FixupData, Adjust);
+          break;
+        case EFI_IMAGE_MACHINE_LOONGARCH64:
+          Status = PeCoffLoaderRelocateLoongArch64Image (Reloc, Fixup, &FixupData, Adjust);
           break;
         default:
           Status = RETURN_UNSUPPORTED;

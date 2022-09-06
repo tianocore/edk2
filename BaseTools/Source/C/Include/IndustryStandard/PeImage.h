@@ -7,6 +7,7 @@
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -36,23 +37,25 @@
 //
 // PE32+ Machine type for EFI images
 //
-#define IMAGE_FILE_MACHINE_I386     0x014c
-#define IMAGE_FILE_MACHINE_EBC      0x0EBC
-#define IMAGE_FILE_MACHINE_X64      0x8664
-#define IMAGE_FILE_MACHINE_ARM      0x01c0  // Thumb only
-#define IMAGE_FILE_MACHINE_ARMT     0x01c2  // 32bit Mixed ARM and Thumb/Thumb 2  Little Endian
-#define IMAGE_FILE_MACHINE_ARM64    0xAA64  // 64bit ARM Architecture, Little Endian
-#define IMAGE_FILE_MACHINE_RISCV64  0x5064  // 64bit RISC-V ISA
+#define IMAGE_FILE_MACHINE_I386        0x014c
+#define IMAGE_FILE_MACHINE_EBC         0x0EBC
+#define IMAGE_FILE_MACHINE_X64         0x8664
+#define IMAGE_FILE_MACHINE_ARM         0x01c0  // Thumb only
+#define IMAGE_FILE_MACHINE_ARMT        0x01c2  // 32bit Mixed ARM and Thumb/Thumb 2  Little Endian
+#define IMAGE_FILE_MACHINE_ARM64       0xAA64  // 64bit ARM Architecture, Little Endian
+#define IMAGE_FILE_MACHINE_RISCV64     0x5064  // 64bit RISC-V ISA
+#define IMAGE_FILE_MACHINE_LOONGARCH64 0x6264  // 64bit LoongArch Architecture
 
 //
 // Support old names for backward compatible
 //
-#define EFI_IMAGE_MACHINE_IA32      IMAGE_FILE_MACHINE_I386
-#define EFI_IMAGE_MACHINE_EBC       IMAGE_FILE_MACHINE_EBC
-#define EFI_IMAGE_MACHINE_X64       IMAGE_FILE_MACHINE_X64
-#define EFI_IMAGE_MACHINE_ARMT      IMAGE_FILE_MACHINE_ARMT
-#define EFI_IMAGE_MACHINE_AARCH64   IMAGE_FILE_MACHINE_ARM64
-#define EFI_IMAGE_MACHINE_RISCV64   IMAGE_FILE_MACHINE_RISCV64
+#define EFI_IMAGE_MACHINE_IA32        IMAGE_FILE_MACHINE_I386
+#define EFI_IMAGE_MACHINE_EBC         IMAGE_FILE_MACHINE_EBC
+#define EFI_IMAGE_MACHINE_X64         IMAGE_FILE_MACHINE_X64
+#define EFI_IMAGE_MACHINE_ARMT        IMAGE_FILE_MACHINE_ARMT
+#define EFI_IMAGE_MACHINE_AARCH64     IMAGE_FILE_MACHINE_ARM64
+#define EFI_IMAGE_MACHINE_RISCV64     IMAGE_FILE_MACHINE_RISCV64
+#define EFI_IMAGE_MACHINE_LOONGARCH64 IMAGE_FILE_MACHINE_LOONGARCH64
 
 #define EFI_IMAGE_DOS_SIGNATURE     0x5A4D      // MZ
 #define EFI_IMAGE_OS2_SIGNATURE     0x454E      // NE
@@ -500,19 +503,21 @@ typedef struct {
 //
 // Based relocation types.
 //
-#define EFI_IMAGE_REL_BASED_ABSOLUTE      0
-#define EFI_IMAGE_REL_BASED_HIGH          1
-#define EFI_IMAGE_REL_BASED_LOW           2
-#define EFI_IMAGE_REL_BASED_HIGHLOW       3
-#define EFI_IMAGE_REL_BASED_HIGHADJ       4
-#define EFI_IMAGE_REL_BASED_MIPS_JMPADDR  5
-#define EFI_IMAGE_REL_BASED_ARM_MOV32A    5
-#define EFI_IMAGE_REL_BASED_RISCV_HI20    5
-#define EFI_IMAGE_REL_BASED_ARM_MOV32T    7
-#define EFI_IMAGE_REL_BASED_RISCV_LOW12I  7
-#define EFI_IMAGE_REL_BASED_RISCV_LOW12S  8
-#define EFI_IMAGE_REL_BASED_IA64_IMM64    9
-#define EFI_IMAGE_REL_BASED_DIR64         10
+#define EFI_IMAGE_REL_BASED_ABSOLUTE             0
+#define EFI_IMAGE_REL_BASED_HIGH                 1
+#define EFI_IMAGE_REL_BASED_LOW                  2
+#define EFI_IMAGE_REL_BASED_HIGHLOW              3
+#define EFI_IMAGE_REL_BASED_HIGHADJ              4
+#define EFI_IMAGE_REL_BASED_MIPS_JMPADDR         5
+#define EFI_IMAGE_REL_BASED_ARM_MOV32A           5
+#define EFI_IMAGE_REL_BASED_RISCV_HI20           5
+#define EFI_IMAGE_REL_BASED_ARM_MOV32T           7
+#define EFI_IMAGE_REL_BASED_RISCV_LOW12I         7
+#define EFI_IMAGE_REL_BASED_RISCV_LOW12S         8
+#define EFI_IMAGE_REL_BASED_LOONGARCH32_MARK_LA  8
+#define EFI_IMAGE_REL_BASED_LOONGARCH64_MARK_LA  8
+#define EFI_IMAGE_REL_BASED_IA64_IMM64           9
+#define EFI_IMAGE_REL_BASED_DIR64                10
 
 
 ///
