@@ -130,7 +130,7 @@ ArmGicDispatcher (
 
   Fdt = FdtParserHandle->Fdt;
 
-  // The "cpus" node resides at the the root of the DT. Fetch it.
+  // The "cpus" node resides at the root of the DT. Fetch it.
   CpusNode = fdt_path_offset (Fdt, "/cpus");
   if (CpusNode < 0) {
     return EFI_NOT_FOUND;
