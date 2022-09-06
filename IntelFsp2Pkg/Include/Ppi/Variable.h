@@ -184,10 +184,10 @@ EFI_STATUS
 /// to store data in the PEI environment.
 ///
 struct _EDKII_PEI_VARIABLE_PPI {
-  EDKII_PEI_GET_VARIABLE            GetVariable;
-  EDKII_PEI_GET_NEXT_VARIABLE_NAME  GetNextVariableName;
-  EDKII_PEI_SET_VARIABLE            SetVariable;
-  EDKII_PEI_QUERY_VARIABLE_INFO     QueryVariableInfo;
+  EDKII_PEI_GET_VARIABLE              GetVariable;
+  EDKII_PEI_GET_NEXT_VARIABLE_NAME    GetNextVariableName;
+  EDKII_PEI_SET_VARIABLE              SetVariable;
+  EDKII_PEI_QUERY_VARIABLE_INFO       QueryVariableInfo;
 };
 
 extern EFI_GUID  gEdkiiPeiVariablePpiGuid;
