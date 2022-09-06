@@ -151,6 +151,56 @@ typedef struct {
 
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT  8
 
+VOID
+RiscVSetSupervisorScratch (
+  IN UINT64
+  );
+
+UINT64
+RiscVGetSupervisorScratch (
+  VOID
+  );
+
+VOID
+RiscVSetSupervisorStvec (
+  IN UINT64
+  );
+
+UINT64
+RiscVGetSupervisorStvec (
+  VOID
+  );
+
+UINT64
+RiscVGetSupervisorTrapCause (
+  VOID
+  );
+
+VOID
+RiscVSetSupervisorAddressTranslationRegister (
+  IN UINT64
+  );
+
+UINT64
+RiscVReadTimer (
+  VOID
+  );
+
+VOID
+RiscVEnableTimerInterrupt (
+  VOID
+  );
+
+VOID
+RiscVDisableTimerInterrupt (
+  VOID
+  );
+
+VOID
+RiscVClearPendingTimerInterrupt (
+  VOID
+  );
+
 #endif // defined (MDE_CPU_RISCV64)
 
 #if defined (MDE_CPU_LOONGARCH64)
