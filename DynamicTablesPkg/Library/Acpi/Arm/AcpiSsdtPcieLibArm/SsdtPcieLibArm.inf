@@ -30,3 +30,6 @@
   AmlLib
   BaseLib
   SsdtPcieSupportLib
+
+[Pcd]
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdPciUseSegmentAsUid

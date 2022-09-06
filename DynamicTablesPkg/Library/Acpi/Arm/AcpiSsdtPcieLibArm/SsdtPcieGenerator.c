@@ -981,6 +981,7 @@ BuildSsdtPciTableEx (
   UINTN                         Index;
   EFI_ACPI_DESCRIPTION_HEADER   **TableList;
   ACPI_PCI_GENERATOR            *Generator;
+  UINT32                        Uid;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -1036,13 +1037,29 @@ BuildSsdtPciTableEx (
   *Table = TableList;
 
   for (Index = 0; Index < PciCount; Index++) {
+    if (PcdGetBool (PcdPciUseSegmentAsUid)) {
+      Uid = PciInfo[Index].PciSegmentGroupNumber;
+      if (Uid > MAX_PCI_ROOT_COMPLEXES_SUPPORTED) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: SSDT-PCI: Pci root complexes segment number: %d."
+          " Greater than maximum number of Pci root complexes supported = %d.\n",
+          Uid,
+          MAX_PCI_ROOT_COMPLEXES_SUPPORTED
+          ));
+        return EFI_INVALID_PARAMETER;
+      }
+    } else {
+      Uid = Index;
+    }
+
     // Build a SSDT table describing the Pci devices.
     Status = BuildSsdtPciTable (
                Generator,
                CfgMgrProtocol,
                AcpiTableInfo,
                &PciInfo[Index],
-               Index,
+               Uid,
                &TableList[Index]
                );
     if (EFI_ERROR (Status)) {
