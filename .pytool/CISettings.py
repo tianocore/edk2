@@ -55,6 +55,7 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 "DynamicTablesPkg",
                 "EmulatorPkg",
                 "IntelFsp2Pkg",
+                "IntelFsp2WrapperPkg",
                 "MdePkg",
                 "MdeModulePkg",
                 "NetworkPkg",
