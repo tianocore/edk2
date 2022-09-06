@@ -10,6 +10,7 @@
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 Portions Copyright (c) 2016 - 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+Portions Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -38,6 +39,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define IMAGE_FILE_MACHINE_RISCV32         0x5032
 #define IMAGE_FILE_MACHINE_RISCV64         0x5064
 #define IMAGE_FILE_MACHINE_RISCV128        0x5128
+#define IMAGE_FILE_MACHINE_LOONGARCH32     0x6232
+#define IMAGE_FILE_MACHINE_LOONGARCH64     0x6264
 
 //
 // EXE file formats
@@ -502,6 +505,12 @@ typedef struct {
 #define EFI_IMAGE_REL_BASED_RISCV_HI20    5
 #define EFI_IMAGE_REL_BASED_RISCV_LOW12I  7
 #define EFI_IMAGE_REL_BASED_RISCV_LOW12S  8
+
+//
+// Relocation types of LoongArch processor.
+//
+#define EFI_IMAGE_REL_BASED_LOONGARCH32_MARK_LA  8
+#define EFI_IMAGE_REL_BASED_LOONGARCH64_MARK_LA  8
 
 ///
 /// Line number format.
