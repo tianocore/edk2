@@ -7,6 +7,7 @@
 
 Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 Portions Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -2195,12 +2196,13 @@ typedef struct {
 //
 // EFI File location to boot from on removable media devices
 //
-#define EFI_REMOVABLE_MEDIA_FILE_NAME_IA32     L"\\EFI\\BOOT\\BOOTIA32.EFI"
-#define EFI_REMOVABLE_MEDIA_FILE_NAME_IA64     L"\\EFI\\BOOT\\BOOTIA64.EFI"
-#define EFI_REMOVABLE_MEDIA_FILE_NAME_X64      L"\\EFI\\BOOT\\BOOTX64.EFI"
-#define EFI_REMOVABLE_MEDIA_FILE_NAME_ARM      L"\\EFI\\BOOT\\BOOTARM.EFI"
-#define EFI_REMOVABLE_MEDIA_FILE_NAME_AARCH64  L"\\EFI\\BOOT\\BOOTAA64.EFI"
-#define EFI_REMOVABLE_MEDIA_FILE_NAME_RISCV64  L"\\EFI\\BOOT\\BOOTRISCV64.EFI"
+#define EFI_REMOVABLE_MEDIA_FILE_NAME_IA32         L"\\EFI\\BOOT\\BOOTIA32.EFI"
+#define EFI_REMOVABLE_MEDIA_FILE_NAME_IA64         L"\\EFI\\BOOT\\BOOTIA64.EFI"
+#define EFI_REMOVABLE_MEDIA_FILE_NAME_X64          L"\\EFI\\BOOT\\BOOTX64.EFI"
+#define EFI_REMOVABLE_MEDIA_FILE_NAME_ARM          L"\\EFI\\BOOT\\BOOTARM.EFI"
+#define EFI_REMOVABLE_MEDIA_FILE_NAME_AARCH64      L"\\EFI\\BOOT\\BOOTAA64.EFI"
+#define EFI_REMOVABLE_MEDIA_FILE_NAME_RISCV64      L"\\EFI\\BOOT\\BOOTRISCV64.EFI"
+#define EFI_REMOVABLE_MEDIA_FILE_NAME_LOONGARCH64  L"\\EFI\\BOOT\\BOOTLOONGARCH64.EFI"
 
 #if !defined (EFI_REMOVABLE_MEDIA_FILE_NAME)
   #if   defined (MDE_CPU_IA32)
@@ -2214,6 +2216,8 @@ typedef struct {
 #define EFI_REMOVABLE_MEDIA_FILE_NAME  EFI_REMOVABLE_MEDIA_FILE_NAME_AARCH64
   #elif defined (MDE_CPU_RISCV64)
 #define EFI_REMOVABLE_MEDIA_FILE_NAME  EFI_REMOVABLE_MEDIA_FILE_NAME_RISCV64
+  #elif defined (MDE_CPU_LOONGARCH64)
+#define EFI_REMOVABLE_MEDIA_FILE_NAME  EFI_REMOVABLE_MEDIA_FILE_NAME_LOONGARCH64
   #else
     #error Unknown Processor Type
   #endif
