@@ -10,10 +10,10 @@
 #include <FspEas.h>
 
 typedef struct {
-  EFI_PHYSICAL_ADDRESS  MicrocodeRegionBase;
-  UINT64                MicrocodeRegionSize;
-  EFI_PHYSICAL_ADDRESS  CodeRegionBase;
-  UINT64                CodeRegionSize;
+  EFI_PHYSICAL_ADDRESS    MicrocodeRegionBase;
+  UINT64                  MicrocodeRegionSize;
+  EFI_PHYSICAL_ADDRESS    CodeRegionBase;
+  UINT64                  CodeRegionSize;
 } FSPT_CORE_UPD;
 
 typedef struct {
