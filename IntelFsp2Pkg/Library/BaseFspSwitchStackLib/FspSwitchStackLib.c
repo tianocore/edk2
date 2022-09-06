@@ -31,6 +31,6 @@ SwapStack (
 
   FspData            = GetFspGlobalDataPointer ();
   OldStack           = FspData->CoreStack;
-  FspData->CoreStack = (UINTN) NewStack;
+  FspData->CoreStack = (UINTN)NewStack;
   return OldStack;
 }
