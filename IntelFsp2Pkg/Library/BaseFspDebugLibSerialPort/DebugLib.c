@@ -193,8 +193,8 @@ DebugBPrint (
 **/
 VOID
 FillHex (
-  UINTN   Value,
-  CHAR8   *Buffer
+  UINTN  Value,
+  CHAR8  *Buffer
   )
 {
   INTN  Idx;
@@ -227,8 +227,8 @@ DebugAssertInternal (
   VOID
   )
 {
-  CHAR8   Buffer[MAX_DEBUG_MESSAGE_LENGTH];
-  UINTN   *Frame;
+  CHAR8  Buffer[MAX_DEBUG_MESSAGE_LENGTH];
+  UINTN  *Frame;
 
   Frame = (UINTN *)GetStackFramePointer ();
 
@@ -250,6 +250,7 @@ DebugAssertInternal (
       sizeof (Buffer) / sizeof (CHAR8) - 1
       );
   }
+
   SerialPortWrite ((UINT8 *)"ASSERT DUMP:\n", 13);
   while (Frame != NULL) {
     FillHex ((UINTN)Frame, Buffer + 9);
