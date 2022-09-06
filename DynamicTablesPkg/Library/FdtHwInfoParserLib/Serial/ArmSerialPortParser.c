@@ -278,7 +278,7 @@ GetSerialConsoleNode (
     return EFI_INVALID_PARAMETER;
   }
 
-  // The "chosen" node resides at the the root of the DT. Fetch it.
+  // The "chosen" node resides at the root of the DT. Fetch it.
   ChosenNode = fdt_path_offset (Fdt, "/chosen");
   if (ChosenNode < 0) {
     return EFI_NOT_FOUND;

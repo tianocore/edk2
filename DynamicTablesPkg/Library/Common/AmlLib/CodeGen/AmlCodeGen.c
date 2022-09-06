@@ -1072,7 +1072,7 @@ AmlAddPrtEntry (
     goto error_handler;
   }
 
-  // Append to the the list of _PRT entries.
+  // Append to the list of _PRT entries.
   Status = AmlVarListAddTail (
              (AML_NODE_HANDLE)PrtEntryList,
              (AML_NODE_HANDLE)PackageNode

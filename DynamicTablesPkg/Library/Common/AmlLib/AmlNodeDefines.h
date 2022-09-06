@@ -34,7 +34,7 @@ typedef AML_NODE_HEADER *AML_NODE_HANDLE;
 
 /** AML root node.
 
-  The root node is unique and at the head of of tree. It is a fake node used
+  The root node is unique and at the head of tree. It is a fake node used
   to maintain the list of AML statements (stored as object nodes) which are
   at the first scope level.
 */

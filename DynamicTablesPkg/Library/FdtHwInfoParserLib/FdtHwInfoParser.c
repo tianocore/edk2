@@ -168,7 +168,7 @@ HwInfoParse (
 }
 
 /** Cleanup any internal state and resources that were allocated
-    by the the HwInfoParser.
+    by the HwInfoParser.
 
   @param [in]  ParserHandle    A handle to the parser instance.
 

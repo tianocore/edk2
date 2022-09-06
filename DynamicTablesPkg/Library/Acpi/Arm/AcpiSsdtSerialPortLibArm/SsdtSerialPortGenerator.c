@@ -239,7 +239,7 @@ BuildSsdtSerialPortTableEx (
     return Status;
   }
 
-  // Setup the table list early so that that appropriate cleanup
+  // Setup the table list early so that appropriate cleanup
   // can be done in case of failure.
   *Table = TableList;
 
