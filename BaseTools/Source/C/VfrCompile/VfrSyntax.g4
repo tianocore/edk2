@@ -35,12 +35,12 @@ vfrPragmaPackDefinition
     ')'
     ;
 
-vfrDataStructDefinition 
-    :   (TypeDef)? Struct NonNvDataMap? StringIdentifier? '{' vfrDataStructFields[True] '}'  StringIdentifier? ';'
+vfrDataStructDefinition
+    :   (TypeDef)? Struct NonNvDataMap? StringIdentifier? '{' vfrDataStructFields[False] '}'  StringIdentifier? ';'
     ;
 
 vfrDataUnionDefinition
-    :   (TypeDef)? Union NonNvDataMap? StringIdentifier? '{' vfrDataStructFields[False]'}' StringIdentifier? ';'
+    :   (TypeDef)? Union NonNvDataMap? StringIdentifier? '{' vfrDataStructFields[True]'}' StringIdentifier? ';'
     ;
 
 vfrDataStructFields[FieldInUnion]
@@ -117,13 +117,14 @@ dataStructBitField8[FieldInUnion]
 
 // 2.4 VFR FormSet Definition
 vfrFormSetDefinition
+locals[CObj=CIfrClass(), SubObj=CIfrSubClass()]
     :   'formset'
         'guid' '=' guidDefinition ','
         'title' '=' 'STRING_TOKEN' '(' Number ')' ','
         'help' '=' 'STRING_TOKEN' '(' Number ')' ','
         ('classguid' '=' classguidDefinition ',')?
-        ('class' '=' classDefinition ',')?
-        ('subclass' '=' subclassDefinition ',')?
+        ('class' '=' classDefinition[localctx.CObj] ',')?
+        ('subclass' '=' subclassDefinition[localctx.SubObj] ',')?
         vfrFormSetList
         'endformset' ';'
     ;
@@ -132,7 +133,7 @@ classguidDefinition
     :   guidDefinition ('|' guidDefinition)? ('|' guidDefinition)?('|' guidDefinition)?
     ;
 
-classDefinition 
+classDefinition[CObj]
     :   validClassNames ('|' validClassNames)*
     ;
 
@@ -147,7 +148,7 @@ validClassNames
     |   Number
     ;
 
-subclassDefinition 
+subclassDefinition[SubObj]
     :   SubclassSetupApplication
     |   SubclassGeneralApplication
     |   SubclassFrontPage
@@ -207,13 +208,15 @@ vfrStatementVarStoreEfi
         |   'EFI_HII_REF' ','
         )
         ('varid' '=' Number ',')?
-        'attribute' '=' Number ('|' Number)* ','
+        'attribute' '=' vfrVarStoreEfiAttr ('|' vfrVarStoreEfiAttr)* ','
         (   'name' '=' StringIdentifier ','
         |   'name' '=' 'STRING_TOKEN' '(' Number ')' ','  'varsize' '=' Number ','
         )
         'guid' '=' guidDefinition ';'
     ;
 
+vfrVarStoreEfiAttr
+    :   Number;                               
 
 vfrStatementVarStoreNameValue 
     :   'namevaluevarstore' StringIdentifier ','
@@ -236,16 +239,17 @@ vfrStatementSuppressIfFormSet
 
 //2.10.1 GUID Definition
 
-guidSubDefinition
+guidSubDefinition[Guid]
     :   Number ',' Number ',' Number ',' Number ','
         Number ',' Number ',' Number ',' Number
     ;
 
 guidDefinition
+locals[Guid=EFI_GUID()]
     :   '{'
         Number ',' Number ',' Number ','
-        (   '{' guidSubDefinition '}' 
-        |   guidSubDefinition
+        (   '{' guidSubDefinition[localctx.Guid] '}' 
+        |   guidSubDefinition[localctx.Guid]
         )
         '}'
     ;
@@ -254,17 +258,17 @@ getStringId
     :   'STRING_TOKEN' '(' Number ')'
     ;
 
-vfrStatementHeader[QHObj]
+vfrStatementHeader[OpObj]
     :   'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
         'help' '=' 'STRING_TOKEN' '(' Number ')' 
     ;
 
-vfrQuestionHeader[QHObj, QType=None]
-    :   vfrQuestionBaseInfo[QHObj, QType]
-        vfrStatementHeader[QHObj]
+vfrQuestionHeader[OpObj, QType]
+    :   vfrQuestionBaseInfo[OpObj, QType]
+        vfrStatementHeader[OpObj]
     ;
 
-vfrQuestionBaseInfo[QHObj, QType=None]
+vfrQuestionBaseInfo[OpObj, QType]
 locals[BaseInfo=EFI_VARSTORE_INFO(), VarIdStr='', CheckFlag=True]
     :   ('name' '=' StringIdentifier ',')?
         ('varid' '=' vfrStorageVarId[localctx.BaseInfo,localctx.VarIdStr, localctx.CheckFlag] ',')?
@@ -375,6 +379,7 @@ vfrStatementStat
     ;
 
 vfrStatementSubTitle  //2.11.5.1
+locals[OpObj=CIfrSubtitle()]
     :   'subtitle' 
 
         'text' '=' 'STRING_TOKEN' '(' Number ')'
@@ -402,7 +407,7 @@ vfrStatementStaticText
         (',' vfrStatementStatTagList)? ';'
     ;
 
-staticTextFlagsField 
+staticTextFlagsField
     :   Number | questionheaderFlagsField
     ;
 
@@ -411,7 +416,7 @@ vfrStatementCrossReference
     ;
 
 vfrStatementGoto
-locals[QHObj=None, OHObj=None, Guid=None, QType=EFI_QUESION_TYPE.QUESTION_REF]
+locals[OpObj=None, OHObj=None, Guid=None, QType=EFI_QUESION_TYPE.QUESTION_REF]
     :   'goto'
         (   (   DevicePath '=' 'STRING_TOKEN' '(' Number ')' ','
                 FormSetGuid '=' guidDefinition ','
@@ -430,26 +435,25 @@ locals[QHObj=None, OHObj=None, Guid=None, QType=EFI_QUESION_TYPE.QUESTION_REF]
             |
             (   Number ',' )
         )?
-        vfrQuestionHeader[localctx.QHObj, localctx.QType]
-        (',' 'flags' '=' vfrGotoFlags[localctx.QHObj])?
+        vfrQuestionHeader[localctx.OpObj, localctx.QType]
+        (',' 'flags' '=' vfrGotoFlags[localctx.OpObj])?
         (',' 'key' '=' Number)?
         (',' vfrStatementQuestionOptionList)? ';'
     ;
 
 vfrGotoFlags[Obj]
-locals[HFlags=0]
-    :   gotoFlagsField[localctx.HFlags]('|' gotoFlagsField[localctx.HFlags])*
+    :   gotoFlagsField('|' gotoFlagsField)*
     ;
 
-gotoFlagsField[HFlags]
+gotoFlagsField
     :  Number | questionheaderFlagsField
     ;
 
 vfrStatementResetButton
-locals[RBObj]
+locals[OpObj=CIfrResetButton()]
     :  'resetbutton'
-       'defaultStore' '=' StringIdentifier ','
-       vfrStatementHeader[localctx.RBObj] ','
+       'defaultstore' '=' StringIdentifier ','
+       vfrStatementHeader[localctx.OpObj] ','
        (vfrStatementStatTagList ',')?
        'endresetbutton' ';'
     ;
@@ -587,10 +591,10 @@ vfrStatementBooleanType
     ;
 
 vfrStatementCheckBox 
-locals[QHObj=None, BaseInfo=None, QId=None]
+locals[OpObj=CIfrCheckBox(), BaseInfo=None, QId=None]
     :   'checkbox'
-        vfrQuestionBaseInfo[localctx.QHObj, None] 
-        vfrStatementHeader[localctx.QHObj] ','
+        vfrQuestionBaseInfo[localctx.OpObj, None] 
+        vfrStatementHeader[localctx.OpObj] ','
         ('flags' '=' vfrCheckBoxFlags ',')?
         ('key' '=' Number ',')?
         vfrStatementQuestionOptionList
@@ -598,21 +602,22 @@ locals[QHObj=None, BaseInfo=None, QId=None]
     ;
 
 vfrCheckBoxFlags 
-locals[HFlags=0]
-    :   checkboxFlagsField[localctx.HFlags] ('|' checkboxFlagsField[localctx.HFlags])*
+    :   checkboxFlagsField ('|' checkboxFlagsField)*
     ;
 
-checkboxFlagsField[HFlags]
+checkboxFlagsField
     :   Number
+    |   'DEFAULT'
+    |   'MANUFACTURING'
     |   'CHECKBOX_DEFAULT'
     |   'CHECKBOX_DEFAULT_MFG'
     |   questionheaderFlagsField
     ;
 
 vfrStatementAction
-locals[QHObj=None]
+locals[OpObj=CIfrAction(), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'action'
-        vfrQuestionHeader[localctx.QHObj] ','
+        vfrQuestionHeader[localctx.OpObj, localctx.QType] ','
         ('flags' '=' vfrActionFlags ',')?
         'config' '=' getStringId ','
         vfrStatementQuestionTagList
@@ -620,10 +625,9 @@ locals[QHObj=None]
     ;
 
 vfrActionFlags
-locals[HFlags=0]
-    :   actionFlagsField[localctx.HFlags] ('|' actionFlagsField[localctx.HFlags])*
+    :   actionFlagsField ('|' actionFlagsField)*
     ;
-actionFlagsField[HFlags]
+actionFlagsField
     :   Number | questionheaderFlagsField
     ;
 
@@ -632,10 +636,10 @@ vfrStatementNumericType
     ;
 
 vfrStatementNumeric 
-locals[QHObj=None, BaseInfo=None, QId=None]
+locals[OpObj=CIfrNumeric(), BaseInfo=None, QId=None]
     :   'numeric'
-        vfrQuestionBaseInfo[localctx.QHObj, None]  
-        vfrStatementHeader[localctx.QHObj] ','
+        vfrQuestionBaseInfo[localctx.OpObj, None]  
+        vfrStatementHeader[localctx.OpObj] ','
         ('flags' '=' vfrNumericFlags ',')?
         ('key' '=' Number ',')?
         vfrSetMinMaxStep
@@ -666,10 +670,10 @@ numericFlagsField
     ;
 
 vfrStatementOneOf
-locals[QHObj=None, BaseInfo=None, QId=None]
+locals[OpObj=CIfrOneOf(), BaseInfo=None, QId=None]
     :   'oneof'
-        vfrQuestionBaseInfo[localctx.QHObj, None] 
-        vfrStatementHeader[localctx.QHObj] ','
+        vfrQuestionBaseInfo[localctx.OpObj, None] 
+        vfrStatementHeader[localctx.OpObj] ','
         ('flags' '=' vfrOneofFlagsField ',')?
         (vfrSetMinMaxStep)?
         vfrStatementQuestionOptionList
@@ -685,9 +689,9 @@ vfrStatementStringType
     ;
 
 vfrStatementString
-locals[QHObj=None,QType=None]
+locals[OpObj=CIfrString(), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'string'
-        vfrQuestionHeader[localctx.QHObj, localctx.QType] ','
+        vfrQuestionHeader[localctx.OpObj, localctx.QType] ','
         ('flags' '=' vfrStringFlagsField ',')?
         ('key' '=' Number ',')?
         'minsize' '=' Number ','
@@ -697,20 +701,19 @@ locals[QHObj=None,QType=None]
     ;
 
 vfrStringFlagsField 
-locals[HFlags=0]
-    :   stringFlagsField[localctx.HFlags] ('|' stringFlagsField[localctx.HFlags])*
+    :   stringFlagsField ('|' stringFlagsField)*
     ;
 
-stringFlagsField[HFlags]
+stringFlagsField
     :   Number
     |   'MULTI_LINE'
     |   questionheaderFlagsField
     ;
 
 vfrStatementPassword 
-locals[QHObj=None]
+locals[OpObj=CIfrPassword(),QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'password'
-        vfrQuestionHeader[localctx.QHObj] ','
+        vfrQuestionHeader[localctx.OpObj, localctx.QType]','
         ('flags' '=' vfrPasswordFlagsField ',')?
         ('key' '=' Number ',')?
         'minsize' '=' Number ','
@@ -720,19 +723,18 @@ locals[QHObj=None]
     ;
 
 vfrPasswordFlagsField 
-locals[HFlags=0]
-    :   passwordFlagsField[localctx.HFlags]('|' passwordFlagsField[localctx.HFlags])*
+    :   passwordFlagsField('|' passwordFlagsField)*
     ;
 
-passwordFlagsField[HFlags]
+passwordFlagsField
     :   Number
     |   questionheaderFlagsField
     ;
 
 vfrStatementOrderedList 
-locals[QHObj]
+locals[OpObj=CIfrOrderedList(), QType=QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'orderedlist'
-        vfrQuestionHeader[localctx.QHObj] ','
+        vfrQuestionHeader[localctx.OpObj, localctx.QType] ','
         ('maxcontainers' '=' Number ',')?
         ('flags' '=' vfrOrderedListFlags)?
         vfrStatementQuestionOptionList
@@ -740,11 +742,10 @@ locals[QHObj]
     ;
 
 vfrOrderedListFlags 
-locals[HFlags=0]
-    :   orderedlistFlagsField[localctx.HFlags] ('|' orderedlistFlagsField[localctx.HFlags])*
+    :   orderedlistFlagsField ('|' orderedlistFlagsField)*
     ;
 
-orderedlistFlagsField[HFlags]
+orderedlistFlagsField
     :   Number
     |   'UNIQUE'
     |   'NOEMPTY'
@@ -752,9 +753,9 @@ orderedlistFlagsField[HFlags]
     ;
 
 vfrStatementDate 
-locals[QHObj=None]
+locals[OpObj=CIfrDate(), QType=EFI_QUESION_TYPE.QUESTION_DATE]
     :   'date'
-        (   (   vfrQuestionHeader[localctx.QHObj] ','
+        (   (   vfrQuestionHeader[localctx.OpObj, localctx.QType] ','
                 ('flags' '=' vfrDateFlags ',')?
                 vfrStatementQuestionOptionList
             )
@@ -798,9 +799,9 @@ dateFlagsField
     ;
 
 vfrStatementTime 
-locals[QHObj=None, QType=None]
+locals[OpObj=CIfrTime(), QType=EFI_QUESION_TYPE.QUESTION_TIME]
     :   'time'
-        (   (   vfrQuestionHeader[localctx.QHObj, localctx.QType] ','
+        (   (   vfrQuestionHeader[localctx.OpObj, localctx.QType] ','
                 ('flags' '=' vfrTimeFlags ',')?
                 vfrStatementQuestionOptionList
             )
@@ -1080,7 +1081,7 @@ securityExp
     ;
 
 getExp 
-locals[BaseInfo=None, VarIdStr=None]
+locals[BaseInfo=EFI_VARSTORE_INFO(), VarIdStr=None]
     :   'get' '(' vfrStorageVarId[localctx.BaseInfo, localctx.VarIdStr, False]('|' 'flags' '=' vfrNumericFlags)? ')'
     ;
 
@@ -1151,7 +1152,7 @@ tolwerExp
     ;
 
 setExp
-locals[BaseInfo=None, VarIdStr=None]
+locals[BaseInfo=EFI_VARSTORE_INFO(), VarIdStr=None]
     :   'set'
         '('
         vfrStorageVarId[localctx.BaseInfo, localctx.VarIdStr, False]('|' 'flags' '=' vfrNumericFlags)? ','

@@ -52,7 +52,7 @@ class SVfrDataType(object):
     def __init__(self, TypeName=''):
         self.TypeName = TypeName
         self.Type = 0
-        self.Align = 0  #
+        self.Align = 1  #
         self.TotalSize = 0  #
         self.HasBitField = False
         self.Members = None
@@ -61,7 +61,7 @@ class SVfrDataType(object):
 
 class SVfrDataField(object):
 
-    def __init__(self, FieldName=''):
+    def __init__(self, FieldName=None):
         self.FieldName = FieldName
         self.FieldType = None
         self.Offset = 0
@@ -75,9 +75,9 @@ class SVfrDataField(object):
 class CVfrVarDataTypeDB(object):
 
     def __init__(self):
-        self.__PackAlign = 0
+        self.__PackAlign = DEFAULT_PACK_ALIGN
         self.__PackStack = None
-        self.__DataTypeList = None
+        self.__DataTypeList = None  # SVfrDataType
         self.__NewDataType = None
         self.__CurrDataType = None
         self.__CurrDataField = None
@@ -135,6 +135,23 @@ class CVfrVarDataTypeDB(object):
         pNewType.Next = None
         self.__NewDataType = pNewType
 
+    def SetNewTypeType(self, Type):
+        if self.__NewDataType == None:
+            return VfrReturnCode.VFR_RETURN_ERROR_SKIPED
+
+        if Type == None:
+            return VfrReturnCode.VFR_RETURN_FATAL_ERROR
+
+        self.__NewDataType.Type = Type  # need to limit the value of the type
+
+        return VfrReturnCode.VFR_RETURN_SUCCESS
+
+    def SetNewTypeTotalSize(self, Size):
+        self.__NewDataType.TotalSize = Size
+
+    def SetNewTypeTotalAlign(self, Align):
+        self.__NewDataType.Align = Align
+
     def SetNewTypeName(self, TypeName):
         if self.__NewDataType == None:
             return VfrReturnCode.VFR_RETURN_ERROR_SKIPED
@@ -178,12 +195,11 @@ class CVfrVarDataTypeDB(object):
         while pDataType != None:
             if pDataType.TypeName == TypeName:
                 Size = pDataType.TotalSize
-                return VfrReturnCode.VFR_RETURN_SUCCESS, Size
+                return Size, VfrReturnCode.VFR_RETURN_SUCCESS
             pDataType = pDataType.Next
 
-        return VfrReturnCode.VFR_RETURN_UNDEFINED, Size
+        return Size, VfrReturnCode.VFR_RETURN_UNDEFINED
 
-    #　data[1].Name[2]
     def __ExtractStructTypeName(self, VarStr):
         try:
             index = VarStr.index('.')
@@ -195,12 +211,12 @@ class CVfrVarDataTypeDB(object):
     def __ExtractFieldNameAndArrary(self, VarStr, s):
 
         ArrayIdx = INVALID_ARRAY_INDEX
-
+        s_copy = s
         while (s < len(VarStr) and VarStr[s] != '.' and VarStr[s] != '['
                and VarStr[s] != ']'):
             s += 1
 
-        FName = VarStr[0:s]
+        FName = VarStr[s_copy:s]
 
         if s == len(VarStr):
             return ArrayIdx, s, FName, VfrReturnCode.VFR_RETURN_SUCCESS
@@ -216,7 +232,7 @@ class CVfrVarDataTypeDB(object):
             except ValueError:
                 return None, None, None, VfrReturnCode.VFR_RETURN_DATA_STRING_ERROR
             else:
-                ArrayStr = VarStr(s, e)
+                ArrayStr = VarStr[s:e]
                 ArrayIdx = int(ArrayStr)
                 if VarStr[e] == ']':
                     e += 1
@@ -243,7 +259,6 @@ class CVfrVarDataTypeDB(object):
                     FName == 'Minutes'
                 elif FName == 'Second':
                     FName = 'Seconds'
-
             if pField.FieldName == FName:
                 Field = pField
                 return Field, VfrReturnCode.VFR_RETURN_SUCCESS
@@ -258,8 +273,8 @@ class CVfrVarDataTypeDB(object):
         pType, ReturnCode = self.GetDataType(TName)
         if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
             return None, ReturnCode
-
         while (i < len(VarStrName)):
+            # i start from field
             _, i, FName, ReturnCode = self.__ExtractFieldNameAndArrary(
                 VarStrName, i)
             if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
@@ -311,13 +326,14 @@ class CVfrVarDataTypeDB(object):
 
     def GetDataFieldInfo(self, VarStr):
 
-        # VarStrName = VarStr
+        # VarStr -> Type.Field
         Offset = 0
         Type = EFI_IFR_TYPE_OTHER
         Size = 0
         BitField = False
 
         TName, i = self.__ExtractStructTypeName(VarStr)
+
         pType, ReturnCode = self.GetDataType(TName)
         if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
             return Offset, Type, Size, BitField, ReturnCode
@@ -329,7 +345,7 @@ class CVfrVarDataTypeDB(object):
 
         #　if it is not struct data type
         Type = pType.Type
-        Size = pType.ToTalSize
+        Size = pType.TotalSize
 
         while (i < len(VarStr)):
             ArrayIdx, i, FName, ReturnCode = self.__ExtractFieldNameAndArrary(
@@ -362,20 +378,10 @@ class CVfrVarDataTypeDB(object):
 
     def DataTypeAddField(self, FieldName, TypeName, ArrayNum, FieldInUnion):
 
-        if TypeName == None:
-            return VfrReturnCode.VFR_RETURN_ERROR_SKIPED
+        pFieldType, ReturnCode = self.GetDataType(TypeName)
 
-        Flag = False
-
-        pFieldType = self.__DataTypeList
-        while pFieldType != None:
-            if pFieldType.TypeName == TypeName:
-                Flag = True
-                break
-            pFieldType = pFieldType.Next
-
-        if Flag == False:
-            return VfrReturnCode.VFR_RETURN_UNDEFINED
+        if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
+            return ReturnCode
 
         MaxDataTypeSize = self.__NewDataType.TotalSize
 
@@ -399,6 +405,9 @@ class CVfrVarDataTypeDB(object):
 
         if self.__NewDataType.TotalSize % Align == 0:
             pNewField.Offset = self.__NewDataType.TotalSize
+            if FieldName == 'RefData':
+                print(FieldName + ' offset')
+                print(pNewField.Offset)
         else:
             pNewField.Offset = self.__NewDataType.TotalSize + self.__AlignStuff(
                 self.__NewDataType.TotalSize, Align)
@@ -429,17 +438,9 @@ class CVfrVarDataTypeDB(object):
 
     def DataTypeAddBitField(self, FieldName, TypeName, Width, FieldInUnion):
 
-        if TypeName == None:
-            return VfrReturnCode.VFR_RETURN_ERROR_SKIPED
-
-        pFieldType = self.__DataTypeList
-        while pFieldType != None:
-            if pFieldType.TypeName == TypeName:
-                break
-            pFieldType = pFieldType.Next
-
-        if pFieldType == None:
-            return VfrReturnCode.VFR_RETURN_UNDEFINED
+        pFieldType, ReturnCode = self.GetDataType(TypeName)
+        if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
+            return ReturnCode
 
         if Width > MAX_BIT_WIDTH:
             return VfrReturnCode.VFR_RETURN_BIT_WIDTH_ERROR
@@ -447,7 +448,7 @@ class CVfrVarDataTypeDB(object):
         if Width > (pFieldType.TotalSize) * 8:
             return VfrReturnCode.VFR_RETURN_BIT_WIDTH_ERROR
 
-        if FieldName != None and len(FieldName >= MAX_NAME_LEN):
+        if (FieldName != None) and (len(FieldName) >= MAX_NAME_LEN):
             return VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
 
         if Width == 0 and FieldName != None:
@@ -467,11 +468,8 @@ class CVfrVarDataTypeDB(object):
             return VfrReturnCode.VFR_RETURN_OUT_FOR_RESOURCES
 
         MaxDataTypeSize = self.__NewDataType.TotalSize
-        if FieldName != None:
-            pNewField.FieldName = FieldName
-        else:
-            pNewField.FieldName = ''
 
+        pNewField.FieldName = FieldName
         pNewField.FieldType = pFieldType
         pNewField.IsBitField = True
         pNewField.BitWidth = Width
@@ -495,10 +493,11 @@ class CVfrVarDataTypeDB(object):
                 self.__NewDataType.TotalSize = pNewField.FieldType.TotalSize
         else:
             # Check whether the bit fields can be contained within one FieldType.
-            cond1 = ((pTmp != None) and (pTmp.IsBitField) and
-                     (pTmp.FieldType.TypeName == pNewField.FieldType.TypeName))
-            cond2 = (pTmp.BitOffset - pTmp.Offset * 8 + pTmp.BitWidth +
-                     pNewField.BitWidth <= pNewField.FieldType.TotalSize * 8)
+            cond1 = (pTmp != None) and (pTmp.IsBitField) and (
+                pTmp.FieldType.TypeName == pNewField.FieldType.TypeName)
+            cond2 = (pTmp != None) and (pTmp.BitOffset - pTmp.Offset * 8 +
+                                        pTmp.BitWidth + pNewField.BitWidth <=
+                                        pNewField.FieldType.TotalSize * 8)
             if cond1 and cond2:
                 pNewField.BitOffset = pTmp.BitOffset + pTmp.BitWidth
                 pNewField.Offset = pTmp.Offset
@@ -624,8 +623,17 @@ class CVfrDefaultStore(object):
             pNode.RefName = RefName
 
         return VfrReturnCode.VFR_RETURN_SUCCESS
-
-
+    
+    def GetDefaultId(self, RefName):
+        pTmp = self.__DefaultStoreList
+        while(pTmp != None):
+            if pTmp.RefName == RefName:
+                DefaultId = pTmp.DefaultId
+                return DefaultId, VfrReturnCode.VFR_RETURN_SUCCESS
+            pTmp = pTmp.Next
+        return None, VfrReturnCode.VFR_RETURN_UNDEFINED
+            
+                
 class EFI_VFR_VARSTORE_TYPE(Enum):
     EFI_VFR_VARSTORE_INVALID = 0
     EFI_VFR_VARSTORE_BUFFER = 1
@@ -651,27 +659,29 @@ class SVfrVarStorageNode():
                  VarStoreId=0,
                  Guid=None,
                  Flag=True,
-                 EfiVar=None,
+                 EfiValue=None,
                  DataType=None,
                  BitsVarstore=False):
+
         self.Guid = Guid
         self.VarStoreName = VarStoreName
         self.VarStoreId = VarStoreId
         self.AssignedFlag = Flag
         self.Next = None
-        if EfiVar != None:
-            self.EfiVar.EfiVarName = EfiVar.EfiVarName
-            self.EfiVar.EfiVarSize = EfiVar.EfiVarSize
+        self.EfiVar = EfiValue
+        self.DataType = DataType
+        self.NameSpace = []
+
+        if EfiValue != None:
             self.VarstoreType = EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_EFI
         elif DataType != None:
             if BitsVarstore:
                 self.VarstoreType = EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_BUFFER_BITS
             else:
                 self.VarstoreType = EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_BUFFER
-            self.DataType = DataType
         else:
-            self.NameSpace = []
-            self.NameSpace.append(DEFAULT_NAME_TABLE_ITEMS)
+            # self.NameSpace.append(DEFAULT_NAME_TABLE_ITEMS)
+            self.VarstoreType = EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_NAME
 
         # union
 
@@ -688,21 +698,43 @@ class SConfigItem():
                  Offset=None,
                  Width=None,
                  Value=None):
-        self.Name = Name
-        self.Guid = Guid
-        self.Id = Id
-        self.InfoStrList = SConfigInfo(Type, Offset, Width, Value)
+        self.Name = Name  # varstore name
+        self.Guid = Guid  # varstore guid, varstore name + guid deside one varstore
+        self.Id = Id  # default ID
+        if Type != None:
+            # list of Offset/Value in the varstore
+            self.InfoStrList = SConfigInfo(Type, Offset, Width, Value)
+        else:
+            self.InfoStrList = None
         self.Next = None
 
 
 class SConfigInfo():
 
-    def __init__(self, Type, Offset, Width, Value):
+    def __init__(self, Type, Offset, Width, Value: EFI_IFR_TYPE_VALUE):
         self.Type = Type
         self.Offset = Offset
         self.Width = Width
-        self.Value = Value
         self.Next = None
+
+        if Type == EFI_IFR_TYPE_NUM_SIZE_8:
+            self.Value = Value.u8
+        elif Type == EFI_IFR_TYPE_NUM_SIZE_16:
+            self.Value = Value.u16
+        elif Type == EFI_IFR_TYPE_NUM_SIZE_32:
+            self.Value = Value.u32
+        elif Type == EFI_IFR_TYPE_NUM_SIZE_64:
+            self.Value = Value.u64
+        elif Type == EFI_IFR_TYPE_BOOLEAN:
+            self.Value = Value.b
+        elif Type == EFI_IFR_TYPE_TIME:
+            self.Value = Value.time
+        elif Type == EFI_IFR_TYPE_DATE:
+            self.Value = Value.date
+        elif Type == EFI_IFR_TYPE_STRING:
+            self.Value = Value.string
+        elif Type == EFI_IFR_TYPE_BUFFER:
+            self.Value = Value.u8
 
 
 class CVfrBufferConfig(object):
@@ -752,36 +784,39 @@ class CVfrBufferConfig(object):
         return 0
 
     @abstractmethod
-    def Write(self, Mode, Name, Guid, Id, Type, Offset, Width, Value):
+    def Write(self, Mode, Name, Guid, Id, Type, Offset, Width,
+              Value: EFI_IFR_TYPE_VALUE):
         Ret = self.Select(Name, Guid)
         if Ret != 0:
             return Ret
 
         if Mode == 'a':  # add
             if self.Select(Name, Guid, Id) != 0:
-                pItem = SConfigItem(
-                    Name,
-                    Guid,
-                    Id,
-                )
+                pItem = SConfigItem(Name, Guid, Id, Type, Offset, Width, Value)
                 if pItem == None:
                     return 2
+
                 if self.__ItemListHead == None:
                     self.__ItemListHead = pItem
                     self.__ItemListTail = pItem
                 else:
                     self.__ItemListTail.Next = pItem
                     self.__ItemListTail = pItem
+
                 self.__ItemListPos = pItem
 
             else:
+                # tranverse the list to find out if there's already the value for the same offset
                 pInfo = self.__ItemListPos.InfoStrList
                 while pInfo != None:
-                    if pInfo.Offset == Offset: return 0
+                    if pInfo.Offset == Offset:
+                        return 0
                     pInfo = pInfo.Next
 
                 pInfo = SConfigInfo(Type, Offset, Width, Value)
-                if pInfo == None: return 2
+                if pInfo == None:
+                    return 2
+
                 pInfo.Next = self.__ItemListPos.InfoStrList
                 self.__ItemListPos.InfoStrList = pInfo
 
@@ -803,10 +838,7 @@ class CVfrBufferConfig(object):
             if Id != None:
                 self.__ItemListPos.Id = Id
 
-        else:
-            return 1
-
-        return 0
+        return 1
 
 
 gCVfrBufferConfig = CVfrBufferConfig()
@@ -902,6 +934,9 @@ class CVfrDataStorage(object):
                     # More than one varstores referred the same data structures
                     return None, VfrReturnCode.VFR_RETURN_VARSTORE_DATATYPE_REDEFINED_ERROR
             pNode = pNode.Next
+
+        if MatchNode == None:
+            return MatchNode, VfrReturnCode.VFR_RETURN_UNDEFINED
 
         return MatchNode, VfrReturnCode.VFR_RETURN_SUCCESS
 
@@ -1011,27 +1046,31 @@ class CVfrDataStorage(object):
         if StoreName == None or Guid == None or DataTypeDB == None:
             return VfrReturnCode.VFR_RETURN_FATAL_ERROR
         _, ReturnCode = self.GetVarStoreId(StoreName, Guid)
+
         if ReturnCode == VfrReturnCode.VFR_RETURN_SUCCESS:
             return VfrReturnCode.VFR_RETURN_REDEFINED
 
         DataType, ReturnCode = DataTypeDB.GetDataType(TypeName)
+
         if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
             return ReturnCode
 
         if VarStoreId == EFI_VARSTORE_ID_INVALID:
             VarStoreId = self.__GetFreeVarStoreId(
-                EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_NAME)
+                EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_BUFFER)
         else:
             if self.__CheckVarStoreIdFree(VarStoreId) == False:
                 return VfrReturnCode.VFR_RETURN_VARSTOREID_REDEFINED
             self.__MarkVarStoreIdUsed(VarStoreId)
         pNew = SVfrVarStorageNode(StoreName, VarStoreId, Guid, Flag, None,
                                   DataType, IsBitVarStore)
+
         if pNew == None:
             return VfrReturnCode.VFR_RETURN_OUT_FOR_RESOURCES
 
         pNew.Next = self.__BufferVarStoreList
         self.__BufferVarStoreList = pNew
+
         if gCVfrBufferConfig.Register(StoreName, Guid) != 0:
             return VfrReturnCode.VFR_RETURN_FATAL_ERROR
 
@@ -1054,6 +1093,7 @@ class CVfrDataStorage(object):
             self.__MarkVarStoreIdUsed(VarStoreId)
 
         pNode = SVfrVarStorageNode(StoreName, VarStoreId)
+
         if pNode == None:
             return VfrReturnCode.VFR_RETURN_OUT_FOR_RESOURCES  ###
 
@@ -1062,34 +1102,6 @@ class CVfrDataStorage(object):
 
     def DeclareNameVarStoreEnd(self, Guid):
         self.__NewVarStorageNode.Guid = Guid
-        self.__NewVarStorageNode.Next = self.__NameVarStoreList
-        self.__NameVarStoreList = self.__NewVarStorageNode
-        self.__NewVarStorageNode = None
-
-    def DeclareNameVarStore(self, StoreName, VarStoreId, Item, Guid):
-        if StoreName == None:
-            return VfrReturnCode.VFR_RETURN_FATAL_ERROR
-
-        _, ReturnCode = self.GetVarStoreId(StoreName)
-        if ReturnCode == VfrReturnCode.VFR_RETURN_SUCCESS:
-            return VfrReturnCode.VFR_RETURN_REDEFINED
-
-        if VarStoreId == EFI_VARSTORE_ID_INVALID:
-            VarStoreId = self.__GetFreeVarStoreId(
-                EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_NAME)
-        else:
-            if self.__CheckVarStoreIdFree(VarStoreId) == False:
-                return VfrReturnCode.VFR_RETURN_VARSTOREID_REDEFINED
-            self.__MarkVarStoreIdUsed(VarStoreId)
-
-        pNode = SVfrVarStorageNode(StoreName, VarStoreId, Guid)
-        if pNode == None:
-            return VfrReturnCode.VFR_RETURN_OUT_FOR_RESOURCES  ###
-
-        self.__NewVarStorageNode = pNode
-
-        self.NameTableAddItem(Item)
-
         self.__NewVarStorageNode.Next = self.__NameVarStoreList
         self.__NameVarStoreList = self.__NewVarStorageNode
         self.__NewVarStorageNode = None
@@ -1660,7 +1672,6 @@ class CVfrQuestionDB(object):
         pNodeList[2].Next = pNodeList[3]
         pNodeList[3].Next = self.__QuestionList
         self.__QuestionList = pNodeList[0]
-
         # DoPendingAssign
 
         return QuestionId, VfrReturnCode.VFR_RETURN_SUCCESS
