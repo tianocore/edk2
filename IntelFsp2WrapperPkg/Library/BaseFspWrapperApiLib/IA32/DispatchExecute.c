@@ -69,4 +69,3 @@ Execute64BitCode (
 {
   return EFI_UNSUPPORTED;
 }
-

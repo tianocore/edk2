@@ -115,6 +115,7 @@ CallFspNotifyPhase (
   } else {
     Status = Execute64BitCode ((UINTN)NotifyPhaseApi, (UINTN)NotifyPhaseParams, (UINTN)NULL);
   }
+
   SetInterruptState (InterruptState);
 
   return Status;
@@ -152,6 +153,7 @@ CallFspMemoryInit (
   } else {
     Status = Execute64BitCode ((UINTN)FspMemoryInitApi, (UINTN)FspmUpdDataPtr, (UINTN)HobListPtr);
   }
+
   SetInterruptState (InterruptState);
 
   return Status;
@@ -187,6 +189,7 @@ CallTempRamExit (
   } else {
     Status = Execute64BitCode ((UINTN)TempRamExitApi, (UINTN)TempRamExitParam, (UINTN)NULL);
   }
+
   SetInterruptState (InterruptState);
 
   return Status;
@@ -222,6 +225,7 @@ CallFspSiliconInit (
   } else {
     Status = Execute64BitCode ((UINTN)FspSiliconInitApi, (UINTN)FspsUpdDataPtr, (UINTN)NULL);
   }
+
   SetInterruptState (InterruptState);
 
   return Status;
