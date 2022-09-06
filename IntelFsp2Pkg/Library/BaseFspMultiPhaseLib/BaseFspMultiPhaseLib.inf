@@ -15,7 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseFspMultiPhaseLib
-  FILE_GUID                      = C128CADC-623E-4E41-97CB-A7138E627460
+  FILE_GUID                      = 74C14477-E742-4A0A-9787-27B1CF34F698
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = FspMultiPhaseLib
