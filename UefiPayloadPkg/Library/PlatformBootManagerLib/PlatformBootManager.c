@@ -229,7 +229,7 @@ PlatformBootManagerAfterConsole (
   PlatformRegisterFvBootOption (PcdGetPtr (PcdiPXEFileIp6), L"iPXE Network boot IPv6", LOAD_OPTION_ACTIVE);
 
   if (PcdGet16 (PcdPlatformBootTimeOut) > 0) {
-    Print (L"Pess ESC to enter Boot Manager Menu.\n");
+    Print (L"Press ESC to enter Boot Manager Menu.\n");
   }
 }
 
