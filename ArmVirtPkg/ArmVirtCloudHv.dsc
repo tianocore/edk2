@@ -60,7 +60,7 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses.common.PEIM]
-  ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
+  ArmVirtMemInfoLib|ArmVirtPkg/Library/CloudHvVirtMemInfoLib/CloudHvVirtMemInfoPeiLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
