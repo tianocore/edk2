@@ -8,13 +8,13 @@
 //
 //------------------------------------------------------------------------------
 
+#include <Register/RiscV64/RiscVImpl.h>
+
 ASM_GLOBAL ASM_PFX(RiscVDisableSupervisorModeInterrupts)
 ASM_GLOBAL ASM_PFX(RiscVEnableSupervisorModeInterrupt)
 ASM_GLOBAL ASM_PFX(RiscVGetSupervisorModeInterrupts)
 
-#define  SSTATUS_SIE                 0x00000002
-#define  CSR_SSTATUS                 0x100
-  #define  SSTATUS_SPP_BIT_POSITION  8
+#define  SSTATUS_SPP_BIT_POSITION  8
 
 //
 // This routine disables supervisor mode interrupt
@@ -53,11 +53,56 @@ InTrap:
   ret
 
 //
+// Set Supervisor mode trap vector.
+// @param a0 : Value set to Supervisor mode trap vector
+//
+ASM_FUNC (RiscVSetSupervisorStvec)
+    csrrw a1, CSR_STVEC, a0
+    ret
+
+//
+// Get Supervisor mode trap vector.
+// @retval a0 : Value in Supervisor mode trap vector
+//
+ASM_FUNC (RiscVGetSupervisorStvec)
+    csrr a0, CSR_STVEC
+    ret
+
+//
+// Get Supervisor trap cause CSR.
+//
+ASM_FUNC (RiscVGetSupervisorTrapCause)
+    csrrs a0, CSR_SCAUSE, 0
+    ret
+//
 // This routine returns supervisor mode interrupt
 // status.
 //
-ASM_PFX(RiscVGetSupervisorModeInterrupts):
+ASM_FUNC (RiscVGetSupervisorModeInterrupts)
   csrr a0, CSR_SSTATUS
   andi a0, a0, SSTATUS_SIE
   ret
 
+//
+// This routine disables supervisor mode timer interrupt
+//
+ASM_FUNC (RiscVDisableTimerInterrupt)
+    li   a0, SIP_STIP
+    csrc CSR_SIE, a0
+    ret
+
+//
+// This routine enables supervisor mode timer interrupt
+//
+ASM_FUNC (RiscVEnableTimerInterrupt)
+    li    a0, SIP_STIP
+    csrs CSR_SIE, a0
+    ret
+
+//
+// This routine clears pending supervisor mode timer interrupt
+//
+ASM_FUNC (RiscVClearPendingTimerInterrupt)
+    li   a0, SIP_STIP
+    csrc CSR_SIP, a0
+    ret

@@ -401,6 +401,9 @@
   RiscV64/RiscVCpuPause.S           | GCC
   RiscV64/RiscVInterrupt.S          | GCC
   RiscV64/FlushCache.S              | GCC
+  RiscV64/CpuScratch.S              | GCC
+  RiscV64/ReadTimer.S               | GCC
+  RiscV64/RiscVMmu.S                | GCC
 
 [Sources.LOONGARCH64]
   Math64.c
