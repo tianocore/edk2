@@ -32,10 +32,6 @@
   ##  @libraryclass  Provide MultiPhase handling related functions.
   FspWrapperMultiPhaseProcessLib|Include/Library/FspWrapperMultiPhaseProcessLib.h
 
-  ##  @libraryclass  Provide MultiPhase platform actions related functions.
-  FspWrapperPlatformMultiPhaseLib|Include/Library/FspWrapperMultiPhaseProcessLib.h
-
-
 [Guids]
   #
   # GUID defined in package
