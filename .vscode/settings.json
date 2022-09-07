@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "uefiapplicationentrypoint.h": "c",
+        "protocollib.h": "c",
+        "uefi.h": "c",
+        "uefiruntimeservicestablelib.h": "c",
+        "debuglib.h": "c",
+        "amikeycode.h": "c",
+        "uefilib.h": "c"
+    }
+}
