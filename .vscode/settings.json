@@ -6,6 +6,7 @@
         "uefiruntimeservicestablelib.h": "c",
         "debuglib.h": "c",
         "amikeycode.h": "c",
-        "uefilib.h": "c"
+        "uefilib.h": "c",
+        "xutility": "c"
     }
 }
