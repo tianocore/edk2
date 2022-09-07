@@ -4,7 +4,8 @@
 #include <Uefi.h>
 UINTN
 CountProtocolInstances (
-  IN EFI_GUID  *Protocol
+  IN  EFI_GUID  *Protocol,
+  OUT EFI_HANDLE  **HandleBuffer
 );
 
 #endif // OC_MISC_LIB_H

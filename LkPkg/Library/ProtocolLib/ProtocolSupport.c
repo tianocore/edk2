@@ -20,7 +20,6 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/ShellParameters.h>
-#include  <AMI/ProtocolLib.h>
 
 // EFI_STATUS
 // GetArguments (
@@ -148,12 +147,12 @@
 
 UINTN
 CountProtocolInstances (
-  IN EFI_GUID  *Protocol
+  IN  EFI_GUID  *Protocol,
+  OUT EFI_HANDLE  **HandleBuffer
   )
 {
   EFI_STATUS  Status;
   UINTN       HandleCount;
-  EFI_HANDLE  *HandleBuffer;
 
   HandleCount = 0;
 
@@ -162,7 +161,7 @@ CountProtocolInstances (
                   Protocol,
                   NULL,
                   &HandleCount,
-                  &HandleBuffer
+                  HandleBuffer
                   );
   if (EFI_ERROR (Status)) {
     //
@@ -170,9 +169,6 @@ CountProtocolInstances (
     //
     return 0;
   }
-
-  FreePool (HandleBuffer);
-
   return HandleCount;
 }
 
