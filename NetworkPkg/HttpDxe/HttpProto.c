@@ -849,6 +849,11 @@ HttpCleanProtocol (
     HttpInstance->Url = NULL;
   }
 
+  if (HttpInstance->EndPointRemoteHost != NULL) {
+    FreePool (HttpInstance->EndPointRemoteHost);
+    HttpInstance->EndPointRemoteHost = NULL;
+  }
+
   NetMapClean (&HttpInstance->TxTokens);
   NetMapClean (&HttpInstance->RxTokens);
 
@@ -1206,6 +1211,7 @@ HttpConfigureTcp6 (
   connect one TLS session if required.
 
   @param[in]  HttpInstance       The HTTP instance private data.
+  @param[in]  TlsConfigure       The Flag indicates whether it's the new Tls session.
 
   @retval EFI_SUCCESS            The TCP connection is established.
   @retval EFI_NOT_READY          TCP4 protocol child is not created or configured.
@@ -1214,7 +1220,8 @@ HttpConfigureTcp6 (
 **/
 EFI_STATUS
 HttpConnectTcp4 (
-  IN  HTTP_PROTOCOL  *HttpInstance
+  IN  HTTP_PROTOCOL  *HttpInstance,
+  IN  BOOLEAN        TlsConfigure
   )
 {
   EFI_STATUS                 Status;
@@ -1237,16 +1244,18 @@ HttpConnectTcp4 (
     return Status;
   }
 
-  if (Tcp4State == Tcp4StateEstablished) {
+  if ((Tcp4State == Tcp4StateEstablished) && (!HttpInstance->ProxyConnected || !TlsConfigure)) {
     return EFI_SUCCESS;
   } else if (Tcp4State > Tcp4StateEstablished ) {
     HttpCloseConnection (HttpInstance);
   }
 
-  Status = HttpCreateConnection (HttpInstance);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Tcp4 Connection fail - %x\n", Status));
-    return Status;
+  if (!HttpInstance->ProxyConnected) {
+    Status = HttpCreateConnection (HttpInstance);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Tcp4 Connection fail - %x\n", Status));
+      return Status;
+    }
   }
 
   //
@@ -1298,6 +1307,7 @@ HttpConnectTcp4 (
   connect one TLS session if required.
 
   @param[in]  HttpInstance       The HTTP instance private data.
+  @param[in]  TlsConfigure       The Flag indicates whether it's the new Tls session.
 
   @retval EFI_SUCCESS            The TCP connection is established.
   @retval EFI_NOT_READY          TCP6 protocol child is not created or configured.
@@ -1306,7 +1316,8 @@ HttpConnectTcp4 (
 **/
 EFI_STATUS
 HttpConnectTcp6 (
-  IN  HTTP_PROTOCOL  *HttpInstance
+  IN  HTTP_PROTOCOL  *HttpInstance,
+  IN  BOOLEAN        TlsConfigure
   )
 {
   EFI_STATUS                 Status;
@@ -1330,16 +1341,18 @@ HttpConnectTcp6 (
     return Status;
   }
 
-  if (Tcp6State == Tcp6StateEstablished) {
+  if ((Tcp6State == Tcp6StateEstablished) && (!HttpInstance->ProxyConnected || !TlsConfigure)) {
     return EFI_SUCCESS;
   } else if (Tcp6State > Tcp6StateEstablished ) {
     HttpCloseConnection (HttpInstance);
   }
 
-  Status = HttpCreateConnection (HttpInstance);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Tcp6 Connection fail - %x\n", Status));
-    return Status;
+  if (!HttpInstance->ProxyConnected) {
+    Status = HttpCreateConnection (HttpInstance);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Tcp6 Connection fail - %x\n", Status));
+      return Status;
+    }
   }
 
   //
@@ -1434,7 +1447,7 @@ HttpInitSession (
     //
     // Connect TCP.
     //
-    Status = HttpConnectTcp4 (HttpInstance);
+    Status = HttpConnectTcp4 (HttpInstance, TlsConfigure);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -1452,7 +1465,7 @@ HttpInitSession (
     //
     // Connect TCP.
     //
-    Status = HttpConnectTcp6 (HttpInstance);
+    Status = HttpConnectTcp6 (HttpInstance, TlsConfigure);
     if (EFI_ERROR (Status)) {
       return Status;
     }

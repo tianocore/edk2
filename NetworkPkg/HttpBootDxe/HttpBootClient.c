@@ -902,6 +902,188 @@ HttpBootGetBootFileCallback (
 }
 
 /**
+  This function establishes a connection through a proxy server
+
+  @param[in]       Private         The pointer to the driver's private data.
+
+  @retval EFI_SUCCESS              Connection successful.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources
+  @retval Others                   Unexpected error happened.
+
+**/
+EFI_STATUS
+HttpBootConnectProxy (
+  IN     HTTP_BOOT_PRIVATE_DATA  *Private
+  )
+{
+  EFI_STATUS             Status;
+  EFI_HTTP_STATUS_CODE   StatusCode;
+  CHAR8                  *HostName;
+  EFI_HTTP_REQUEST_DATA  *RequestData;
+  HTTP_IO_RESPONSE_DATA  *ResponseData;
+  HTTP_IO                *HttpIo;
+  HTTP_IO_HEADER         *HttpIoHeader;
+  CHAR16                 *Url;
+  CHAR16                 *EndPointUrl;
+  UINTN                  UrlSize;
+  VOID                   *UrlParser;
+
+  UrlSize = AsciiStrSize (Private->BootFileUri);
+  Url     = AllocatePool (UrlSize * sizeof (CHAR16));
+  if (Url == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  AsciiStrToUnicodeStrS (Private->BootFileUri, Url, UrlSize);
+
+  UrlSize     = AsciiStrSize (Private->EndPointUri);
+  EndPointUrl = AllocatePool (UrlSize * (sizeof (CHAR16)));
+  if (EndPointUrl == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ERROR_1;
+  }
+
+  AsciiStrToUnicodeStrS (Private->EndPointUri, EndPointUrl, UrlSize);
+
+  //
+  // Send HTTP request message.
+  //
+
+  //
+  // Build HTTP header for the request, 2 headers are needed to send a CONNECT method:
+  //   Host
+  //   User
+  //
+  HttpIoHeader = HttpIoCreateHeader (2);
+  if (HttpIoHeader == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ERROR_2;
+  }
+
+  //
+  // Add HTTP header field 1: Host (EndPoint URI)
+  //
+  Status   = HttpParseUrl (Private->EndPointUri, (UINT32)AsciiStrLen (Private->EndPointUri), FALSE, &UrlParser);
+  if (EFI_ERROR (Status)) {
+    goto ERROR_2;
+  }
+
+  Status = HttpUrlGetHostName (
+             Private->EndPointUri,
+             UrlParser,
+             &HostName
+             );
+  if (EFI_ERROR (Status)) {
+    goto ERROR_2;
+  }
+
+  Status = HttpIoSetHeader (
+             HttpIoHeader,
+             HTTP_HEADER_HOST,
+             HostName
+             );
+  if (EFI_ERROR (Status)) {
+    goto ERROR_2;
+  }
+
+  //
+  // Add HTTP header field 2: User-Agent
+  //
+  Status = HttpIoSetHeader (
+             HttpIoHeader,
+             HTTP_HEADER_USER_AGENT,
+             HTTP_USER_AGENT_EFI_HTTP_BOOT
+             );
+  if (EFI_ERROR (Status)) {
+    goto ERROR_2;
+  }
+
+  //
+  // Build the rest of HTTP request info.
+  //
+  RequestData = AllocatePool (sizeof (EFI_HTTP_REQUEST_DATA));
+  if (RequestData == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ERROR_2;
+  }
+
+  RequestData->Method      = HttpMethodConnect;
+  RequestData->Url         = Url;
+  RequestData->EndPointUrl = EndPointUrl;
+
+  //
+  // Send out the request to HTTP server.
+  //
+  HttpIo = &Private->HttpIo;
+  Status = HttpIoSendRequest (
+             HttpIo,
+             RequestData,
+             HttpIoHeader->HeaderCount,
+             HttpIoHeader->Headers,
+             0,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    goto ERROR_3;
+  }
+
+  //
+  // Receive HTTP response message.
+  //
+
+  //
+  // Use zero BodyLength to only receive the response headers.
+  //
+  ResponseData = AllocateZeroPool (sizeof (HTTP_IO_RESPONSE_DATA));
+  if (ResponseData == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ERROR_3;
+  }
+
+  Status = HttpIoRecvResponse (
+             &Private->HttpIo,
+             TRUE,
+             ResponseData
+             );
+
+  if (EFI_ERROR (Status) || EFI_ERROR (ResponseData->Status)) {
+    if (EFI_ERROR (ResponseData->Status)) {
+      StatusCode = HttpIo->RspToken.Message->Data.Response->StatusCode;
+      HttpBootPrintErrorMessage (StatusCode);
+      Status = ResponseData->Status;
+    }
+
+    goto ERROR_4;
+  }
+
+  return Status;
+
+ERROR_4:
+  if (ResponseData != NULL) {
+    FreePool (ResponseData);
+  }
+
+ERROR_3:
+  if (RequestData != NULL) {
+    FreePool (RequestData);
+  }
+
+ERROR_2:
+  HttpIoFreeHeader (HttpIoHeader);
+
+ERROR_1:
+  if (EndPointUrl != NULL) {
+    FreePool (EndPointUrl);
+  }
+
+  if (Url != NULL) {
+    FreePool (Url);
+  }
+
+  return Status;
+}
+
+/**
   This function download the boot file by using UEFI HTTP protocol.
 
   @param[in]       Private         The pointer to the driver's private data.
@@ -950,6 +1132,7 @@ HttpBootGetBootFile (
   UINT8                    *Block;
   UINTN                    UrlSize;
   CHAR16                   *Url;
+  CHAR16                   *EndPointUrl;
   BOOLEAN                  IdentityMode;
   UINTN                    ReceivedSize;
   CHAR8                    BaseAuthValue[80];
@@ -977,6 +1160,20 @@ HttpBootGetBootFile (
   }
 
   AsciiStrToUnicodeStrS (Private->BootFileUri, Url, UrlSize);
+
+  if (Private->EndPointUri != NULL) {
+    UrlSize     = AsciiStrSize (Private->EndPointUri);
+    EndPointUrl = AllocatePool (UrlSize * (sizeof (CHAR16)));
+    if (EndPointUrl == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ERROR_1;
+    }
+
+    AsciiStrToUnicodeStrS (Private->EndPointUri, EndPointUrl, UrlSize);
+  } else {
+    EndPointUrl = NULL;
+  }
+
   if (!HeaderOnly && (Buffer != NULL)) {
     Status = HttpBootGetFileFromCache (Private, Url, BufferSize, Buffer, ImageType);
     if (Status != EFI_NOT_FOUND) {
@@ -1106,8 +1303,9 @@ HttpBootGetBootFile (
     goto ERROR_3;
   }
 
-  RequestData->Method = HeaderOnly ? HttpMethodHead : HttpMethodGet;
-  RequestData->Url    = Url;
+  RequestData->Method      = HeaderOnly ? HttpMethodHead : HttpMethodGet;
+  RequestData->Url         = Url;
+  RequestData->EndPointUrl = EndPointUrl;
 
   //
   // 2.3 Record the request info in a temp cache item.
@@ -1441,6 +1639,10 @@ ERROR_2:
   }
 
 ERROR_1:
+  if (EndPointUrl != NULL) {
+    FreePool (EndPointUrl);
+  }
+
   if (Url != NULL) {
     FreePool (Url);
   }
