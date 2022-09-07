@@ -983,7 +983,7 @@ AhciPioTransfer (
   CmdList.AhciCmdCfl = EFI_AHCI_FIS_REGISTER_H2D_LENGTH / 4;
   CmdList.AhciCmdW   = Read ? 0 : 1;
 
-  for (Retry = 0; Retry < AHCI_COMMAND_RETRIES; Retry++) {
+  for (Retry = 0; Retry < PcdGet32 (PcdAhciCommandRetryCount); Retry++) {
     AhciBuildCommand (
       PciIo,
       AhciRegisters,
@@ -1190,7 +1190,7 @@ AhciDmaTransfer (
     }
 
     gBS->RestoreTPL (OldTpl);
-    for (Retry = 0; Retry < AHCI_COMMAND_RETRIES; Retry++) {
+    for (Retry = 0; Retry < PcdGet32 (PcdAhciCommandRetryCount); Retry++) {
       AhciBuildCommand (
         PciIo,
         AhciRegisters,
@@ -1385,7 +1385,7 @@ AhciNonDataTransfer (
 
   CmdList.AhciCmdCfl = EFI_AHCI_FIS_REGISTER_H2D_LENGTH / 4;
 
-  for (Retry = 0; Retry < AHCI_COMMAND_RETRIES; Retry++) {
+  for (Retry = 0; Retry < PcdGet32 (PcdAhciCommandRetryCount); Retry++) {
     AhciBuildCommand (
       PciIo,
       AhciRegisters,

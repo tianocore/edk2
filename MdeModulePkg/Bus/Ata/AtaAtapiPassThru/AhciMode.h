@@ -193,8 +193,6 @@ typedef union {
 #define   AHCI_PORT_DEVSLP_DITO_MASK      0x01FF8000
 #define   AHCI_PORT_DEVSLP_DM_MASK        0x1E000000
 
-#define AHCI_COMMAND_RETRIES  5
-
 #pragma pack(1)
 //
 // Command List structure includes total 32 entries.
