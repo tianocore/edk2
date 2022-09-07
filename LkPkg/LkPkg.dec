@@ -30,4 +30,4 @@ gAmiEfiKeycodeProtocolGuid                 = { 0x0ADFB62D, 0xFF74, 0x484C, { 0x8
 Include
     
 [LibraryClasses]
-
+ProtocolLib|LkPkg/Include/AMI/ProtocolLib.h

@@ -15,6 +15,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef AMI_KEYCODE_H
 #define AMI_KEYCODE_H
 
+#include <Uefi.h>
+
+#include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Protocol/LoadedImage.h>
+#include <Protocol/ShellParameters.h>
 // 0ADFB62D-FF74-484C-8944-F85C4BEA87A8
 #define AMI_EFIKEYCODE_PROTOCOL_GUID \
   { 0x0ADFB62D, 0xFF74, 0x484C, { 0x89, 0x44, 0xF8, 0x5C, 0x4B, 0xEA, 0x87, 0xA8 } }
@@ -56,5 +64,35 @@ struct _AMI_EFIKEYCODE_PROTOCOL {
   EFI_REGISTER_KEYSTROKE_NOTIFY      RegisterKeyNotify;
   EFI_UNREGISTER_KEYSTROKE_NOTIFY    UnregisterKeyNotify;
 };
+
+UINTN
+CountProtocolInstances (
+  IN EFI_GUID  *Protocol
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       HandleCount;
+  EFI_HANDLE  *HandleBuffer;
+
+  HandleCount = 0;
+
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  Protocol,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
+  if (EFI_ERROR (Status)) {
+    //
+    // No instance can be found on error.
+    //
+    return 0;
+  }
+
+  FreePool (HandleBuffer);
+
+  return HandleCount;
+}
 
 #endif // AMI_KEYCODE_H

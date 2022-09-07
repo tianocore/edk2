@@ -1,0 +1,41 @@
+[Defines]
+INF_VERSION                    = 0x00010005
+BASE_NAME                      = LkLogo
+FILE_GUID                      = 6987936E-ED34-44db-AE97-1FA5E4ED2116
+MODULE_TYPE                    = UEFI_APPLICATION
+VERSION_STRING                 = 1.0
+ENTRY_POINT                    = UefiMain
+
+# #
+# #  This flag specifies whether HII resource section is generated into PE image.
+# #
+#   UEFI_HII_RESOURCE_SECTION      = TRUE
+
+# #
+# # The following information is for reference only and not required by the build tools.
+# #
+# #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+# #
+
+[Sources]
+lk_logo.c
+
+[Packages]
+MdePkg/MdePkg.dec
+MdeModulePkg/MdeModulePkg.dec
+LkPkg/LkPkg.dec
+
+[LibraryClasses]
+UefiApplicationEntryPoint
+UefiLib
+ProtocolLib
+
+# [FeaturePcd]
+#   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable   ## CONSUMES
+
+# [Pcd]
+#   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString   ## SOMETIMES_CONSUMES
+#   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes    ## SOMETIMES_CONSUMES
+
+# [UserExtensions.TianoCore."ExtraFiles"]
+#   HelloWorldExtra.uni
