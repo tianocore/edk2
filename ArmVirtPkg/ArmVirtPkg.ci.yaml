@@ -96,7 +96,7 @@
 
     ## options defined .pytool/Plugin/SpellCheck
     "SpellCheck": {
-        "AuditOnly": False,           # Fails right now with over 270 errors
+        "AuditOnly": True,
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
         "ExtendWords": [
             "acpiview",
