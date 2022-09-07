@@ -61,6 +61,7 @@
   Pk/CryptRsaPss.c
   Pk/CryptRsaPssSignNull.c
   Pem/CryptPem.c
+  Bn/CryptBnNull.c
 
   SysCall/CrtWrapper.c
   SysCall/ConstantTimeClock.c
