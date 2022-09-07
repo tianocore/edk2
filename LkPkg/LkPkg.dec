@@ -1,0 +1,33 @@
+## @file
+#   Declarations for the UDK Standard Libraries.
+#
+# Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License which accompanies this distribution.
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+##
+
+
+[Defines]
+DEC_SPECIFICATION              = 0x00010005
+PACKAGE_NAME                   = LkPkg
+PACKAGE_GUID                   = B3E3D3D5-D62B-4497-A175-264F489D127E
+PACKAGE_VERSION                = 0.01
+
+
+[Protocols]
+##  Include/AMI/Protocol/AmiKeycode.h
+gAmiEfiKeycodeProtocolGuid                 = { 0x0ADFB62D, 0xFF74, 0x484C, { 0x89, 0x44, 0xF8, 0x5C, 0x4B, 0xEA, 0x87, 0xA8 }}
+
+
+[Includes]
+
+Include
+    
+[LibraryClasses]
+

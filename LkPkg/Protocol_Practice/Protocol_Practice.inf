@@ -1,0 +1,22 @@
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = protocol_use
+  FILE_GUID                      = 783ACA3D-0F9B-1D60-CB7F-C076BE20EF45
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 0.1
+  ENTRY_POINT                    = UefiMain
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#
+
+[Sources]
+  Protocol_Practice.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
