@@ -23,6 +23,17 @@ ASM_PFX(FspApiCommonContinue):
   jmp $
 
 ;----------------------------------------------------------------------------
+; TempRamInit API
+;
+; Empty function for WHOLEARCHIVE build option
+;
+;----------------------------------------------------------------------------
+global ASM_PFX(TempRamInitApi)
+ASM_PFX(TempRamInitApi):
+  jmp $
+  ret
+
+;----------------------------------------------------------------------------
 ; FspSmmInit API
 ;
 ; This FSP API will notify the FSP about the different phases in the boot
