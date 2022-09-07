@@ -132,6 +132,8 @@
   # Note: for emulation platform such as QEMU, this may not work and should set it as FALSE
   DEFINE CPU_TIMER_LIB_ENABLE  = TRUE
 
+  DEFINE MULTIPLE_DEBUG_PORT_SUPPORT = FALSE
+
 [BuildOptions]
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
 !if $(USE_CBMEM_FOR_CONSOLE) == FALSE
@@ -616,6 +618,10 @@
   #
   MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
+      !if $(MULTIPLE_DEBUG_PORT_SUPPORT) == TRUE
+        DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+        SerialPortLib|UefiPayloadPkg/Library/BaseSerialPortLibHob/BaseSerialPortLibHob.inf
+      !endif
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
 
