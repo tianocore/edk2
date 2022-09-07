@@ -139,6 +139,7 @@ locals[CObj=CIfrClass()]
     ;
 
 validClassNames
+locals[ClassName=0]
     :   ClassNonDevice
     |   ClassDiskDevice                                      
     |   ClassVideoDevice
@@ -221,6 +222,7 @@ locals[VSEObj=CIfrVarStoreEfi()]
     ;
 
 vfrVarStoreEfiAttr
+locals[Attr=0]
     :   Number;                               
 
 vfrStatementVarStoreNameValue 
@@ -261,6 +263,7 @@ locals[Guid=EFI_GUID()]
     ;
 
 getStringId 
+locals[StringId='']
     :   'STRING_TOKEN' '(' Number ')'
     ;
 
@@ -275,13 +278,14 @@ vfrQuestionHeader[OpObj, QType]
     ;
 
 vfrQuestionBaseInfo[OpObj, QType]
-locals[BaseInfo=EFI_VARSTORE_INFO(), VarIdStr='', CheckFlag=True]
+locals[BaseInfo=EFI_VARSTORE_INFO(), CheckFlag=True]
     :   ('name' '=' StringIdentifier ',')?
-        ('varid' '=' vfrStorageVarId[localctx.BaseInfo,localctx.VarIdStr, localctx.CheckFlag] ',')?
+        ('varid' '=' vfrStorageVarId[localctx.BaseInfo, localctx.CheckFlag] ',')?
         ('questionid' '=' Number ',')?
     ;
 
 questionheaderFlagsField
+locals[QHFlag=0]
     :   ReadOnlyFlag
     |   InteractiveFlag
     |   ResetRequiredFlag
@@ -292,7 +296,8 @@ questionheaderFlagsField
     |   LateCheckFlag
     ;
 //2.10.5
-vfrStorageVarId[BaseInfo, VarIdStr, CheckFlag]
+vfrStorageVarId[BaseInfo, CheckFlag]
+locals[VarIdStr='']
     :   (StringIdentifier '[' Number ']')    # vfrStorageVarIdRule1
     |   (StringIdentifier ('.' StringIdentifier ('[' Number ']')? )* ) # vfrStorageVarIdRule2
     ;
@@ -311,10 +316,12 @@ vfrConstantValueField
     ;
 
 vfrImageTag 
+locals[IObj=CIfrImage()]
     :   'image' '=' 'IMAGE_TOKEN' '(' Number ')'
     ;
 
 vfrLockedTag
+locals[LObj=CIfrLocked()]
     :   'locked'
     ;
 
@@ -327,6 +334,7 @@ vfrStatementStatTagList
     ;
 
 vfrFormDefinition 
+locals[FObj=CIfrForm()]
     :   'form' 'formid' '=' Number ','
         'title' '=' 'STRING_TOKEN' '(' Number ')' ';'
         (   vfrStatementImage
@@ -373,6 +381,7 @@ vfrStatementLocked
     ;
 
 vfrStatementRules 
+locals[RObj=CIfrRule()]
     :   'rule' StringIdentifier ','
         vfrStatementExpression
         'endrule' ';'
@@ -391,16 +400,19 @@ locals[OpObj=CIfrSubtitle()]
         'text' '=' 'STRING_TOKEN' '(' Number ')'
         (',' 'flags' '=' vfrSubtitleFlags)?
         (   (',' vfrStatementStatTagList)? ';' 
-        |   (',' vfrStatementStatTagList)?
+        |   
+            (',' vfrStatementStatTagList)?
             (',' (vfrStatementStat | vfrStatementQuestions)* )? 
             'endsubtitle' ';'
         )
     ;
 
 vfrSubtitleFlags 
-    :   subtitleFlagsField ('|' subtitleFlagsField)* ';'
+locals[SubFlags=0]
+    :   subtitleFlagsField ('|' subtitleFlagsField)* 
     ;
 subtitleFlagsField 
+locals[Flag=0]
     :   Number | 'HORIZONTAL'
     ;
 
@@ -414,6 +426,7 @@ vfrStatementStaticText
     ;
 
 staticTextFlagsField
+locals[Flag=0, Line=0]
     :   Number | questionheaderFlagsField
     ;
 
@@ -448,10 +461,12 @@ locals[OpObj=None, OHObj=None, QType=EFI_QUESION_TYPE.QUESTION_REF]
     ;
 
 vfrGotoFlags[Obj]
+locals[GotoFlags=0]
     :   gotoFlagsField('|' gotoFlagsField)*
     ;
 
 gotoFlagsField
+locals[Flag=0]
     :  Number | questionheaderFlagsField
     ;
 
