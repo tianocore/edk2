@@ -87,7 +87,7 @@
 
     ## options defined .pytool/Plugin/SpellCheck
     "SpellCheck": {
-        "AuditOnly": False,
+        "AuditOnly": True,
         "IgnoreFiles": [
             "Library/ArmSoftFloatLib/berkeley-softfloat-3/**"
         ],                           # use gitignore syntax to ignore errors
