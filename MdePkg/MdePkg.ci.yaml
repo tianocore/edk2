@@ -52,6 +52,7 @@
             "Include/IndustryStandard/UefiTcgPlatform.h",
             "Include/Library/PcdLib.h",
             "Include/Library/SafeIntLib.h",
+            "Include/Protocol/DebugSupport.h",
             "Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.c"
         ]
     },
