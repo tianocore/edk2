@@ -963,7 +963,7 @@ HttpBootConnectProxy (
   //
   // Add HTTP header field 1: Host (EndPoint URI)
   //
-  Status   = HttpParseUrl (Private->EndPointUri, (UINT32)AsciiStrLen (Private->EndPointUri), FALSE, &UrlParser);
+  Status = HttpParseUrl (Private->EndPointUri, (UINT32)AsciiStrLen (Private->EndPointUri), FALSE, &UrlParser);
   if (EFI_ERROR (Status)) {
     goto ERROR_2;
   }

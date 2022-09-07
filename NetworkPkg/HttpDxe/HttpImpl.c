@@ -785,6 +785,7 @@ Error3:
     if (EndPointHostName != NULL) {
       FreePool (EndPointHostName);
     }
+
     if (EndPointUrlParser != NULL) {
       HttpUrlFreeParser (EndPointUrlParser);
     }
