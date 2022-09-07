@@ -19,17 +19,38 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiApplicationEntryPoint.h>
-// #include  <AMI/ProtocolLib.h>
 #include  <AMI/ProtocolLib.h>
+EFI_GRAPHICS_OUTPUT_BLT_PIXEL color[] = {
+                                            {0, 0, 255, 0}, // red 
+                                            {250, 250, 255, 0} // snow
+                                        };
 
+VOID Hline(
+    UINTN x1,
+    UINTN x2,
+    UINTN y,
+    EFI_GRAPHICS_OUTPUT_BLT_PIXEL *colour,
+    EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput
+)
+{   UINTN minx, maxx;
+    minx = (x1 < x2) ? x1 : x2;
+    maxx = (x1 > x2) ? x1 : x2;
+    GraphicsOutput->Blt(GraphicsOutput, 
+                        colour,
+                        EfiBltVideoFill,
+                        0, 0,
+                        minx, y,
+                        (maxx - minx + 1),5,
+                        0);
+}
 EFI_STATUS LkBlt(
     IN EFI_GRAPHICS_OUTPUT_PROTOCOL          *GraphicsOutput) 
 {   
     EFI_STATUS Status;
-    EFI_GRAPHICS_OUTPUT_BLT_PIXEL color[] = {
-                                                {0, 0, 255, 0}, // red 
-                                                {250, 250, 255, 0} // snow
-                                            };
+    // EFI_GRAPHICS_OUTPUT_BLT_PIXEL color[] = {
+    //                                             {0, 0, 255, 0}, // red 
+    //                                             {250, 250, 255, 0} // snow
+    //                                         };
 
 
     Status  = GraphicsOutput->Blt(
@@ -38,7 +59,7 @@ EFI_STATUS LkBlt(
                 EfiBltVideoFill,
                 0,0,
                 0,0,
-                100,100,
+                800,600,
                 0);
     if (EFI_ERROR (Status)){
         return Status;
@@ -66,7 +87,10 @@ UefiMain (
     EFI_STATUS  Status;
     EFI_GRAPHICS_OUTPUT_PROTOCOL          *GraphicsOutput;
     EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *Info;
-
+    INTN x1, x2, y ;
+    x1 = 20;
+    x2 = 200;
+    y = 20;
 
     HandleCount = CountProtocolInstances(&gEfiGraphicsOutputProtocolGuid, &HandleBuffer);
     Print(L"HandleCount = %d\n", HandleCount);
@@ -79,19 +103,23 @@ UefiMain (
         if (EFI_ERROR(Status)) {
             continue;
         }
+        Print(L"Current Mode =  %d\n" , GraphicsOutput->Mode->Mode);
+        Print(L"Current HorizontalResolution =  %d Current VerticalResolution =  %d\n" , GraphicsOutput->Mode->Info->HorizontalResolution,\
+                GraphicsOutput->Mode->Info->VerticalResolution);
         for (ModeIndex = 0; ModeIndex < GraphicsOutput->Mode->MaxMode; ModeIndex++) {
 
             Status = GraphicsOutput->QueryMode(
                         GraphicsOutput, ModeIndex, &SizeOfInfo, &Info);
 
-            Print(L"modeindex = %d SizeOfInfo = %d\n", ModeIndex, SizeOfInfo);
-            Print(L"modeindex = %d Info->Version = 0x%04x\n", ModeIndex, Info->Version);
-            Print(L"modeindex = %d Info->HorizontalResolution = %d\n", ModeIndex, Info->HorizontalResolution);
-            Print(L"modeindex = %d Info->VerticalResolution = %d\n", ModeIndex, Info->VerticalResolution);
-            Print(L"modeindex = %d Info->PixelsPerScanLine = %d\n", ModeIndex, Info->PixelsPerScanLine);
+            // Print(L"modeindex = %d SizeOfInfo = %d\n", ModeIndex, SizeOfInfo);
+            // Print(L"modeindex = %d Info->Version = 0x%04x\n", ModeIndex, Info->Version);
+            // Print(L"modeindex = %d Info->HorizontalResolution = %d\n", ModeIndex, Info->HorizontalResolution);
+            // Print(L"modeindex = %d Info->VerticalResolution = %d\n", ModeIndex, Info->VerticalResolution);
+            // Print(L"modeindex = %d Info->PixelsPerScanLine = %d\n", ModeIndex, Info->PixelsPerScanLine);
         }
-        Status = LkBlt(GraphicsOutput);
+        // Status = LkBlt(GraphicsOutput);
         Print(L"LkBlt Status = %r\n", Status);
+        Hline(x1, x2, y, &color[0], GraphicsOutput);
     }
 
 
