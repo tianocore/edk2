@@ -1,7 +1,7 @@
 ## @file
 # dec file for Dynamic Tables Framework.
 #
-# Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
+# Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -38,6 +38,9 @@
 
   ##  @libraryclass  Defines a set of helper methods.
   TableHelperLib|Include/Library/TableHelperLib.h
+
+  ##  @libraryclass  Defines a set of SMBIOS string helper methods.
+  SmbiosStringTableLib|Include/Library/SmbiosStringTableLib.h
 
 [Protocols]
   # Configuration Manager Protocol GUID
