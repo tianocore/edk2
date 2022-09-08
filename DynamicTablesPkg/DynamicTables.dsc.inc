@@ -1,7 +1,7 @@
 ## @file
 #  Dsc include file for Dynamic Tables Framework.
 #
-#  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -18,6 +18,7 @@
   SsdtPcieSupportLib|DynamicTablesPkg/Library/Common/SsdtPcieSupportLib/SsdtPcieSupportLib.inf
   SsdtSerialPortFixupLib|DynamicTablesPkg/Library/Common/SsdtSerialPortFixupLib/SsdtSerialPortFixupLib.inf
   TableHelperLib|DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
+  SmbiosStringTableLib|DynamicTablesPkg/Library/Common/SmbiosStringTableLib/SmbiosStringTableLib.inf
 
 [Components.common]
   #

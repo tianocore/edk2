@@ -1,0 +1,25 @@
+## @file
+#  SMBIOS String Table Helper library.
+#
+#  Copyright (c) 2022, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SmbiosStringTableLib
+  FILE_GUID      = 8C570DD8-531E-473F-85C6-9252746DBAC1
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = SmbiosStringTableLib
+
+[Sources]
+  SmbiosStringTableLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
