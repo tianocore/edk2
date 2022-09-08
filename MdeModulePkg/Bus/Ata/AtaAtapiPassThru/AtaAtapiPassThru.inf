@@ -65,7 +65,8 @@
   gEdkiiAtaAtapiPolicyProtocolGuid              ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAtaSmartEnable   ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAtaSmartEnable          ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAhciCommandRetryCount   ## SOMETIMES_CONSUMES
 
 # [Event]
 # EVENT_TYPE_PERIODIC_TIMER ## SOMETIMES_CONSUMES
