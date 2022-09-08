@@ -1574,6 +1574,10 @@
   # @Prompt SD/MMC Host Controller Operations Timeout (us).
   gEfiMdeModulePkgTokenSpaceGuid.PcdSdMmcGenericTimeoutValue|1000000|UINT32|0x00000031
 
+  ## The Retry Count of AHCI command if there is a failure
+  # @Prompt The value of Retry Count,  Default value is 5.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAhciCommandRetryCount|5|UINT32|0x00000032
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output would be at max column and max row.

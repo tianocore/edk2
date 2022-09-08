@@ -193,7 +193,7 @@ typedef union {
 #define   AHCI_PORT_DEVSLP_DITO_MASK      0x01FF8000
 #define   AHCI_PORT_DEVSLP_DM_MASK        0x1E000000
 
-#define AHCI_COMMAND_RETRIES  5
+#define AHCI_COMMAND_RETRIES  (PcdGet32 (PcdAhciCommandRetryCount))
 
 #pragma pack(1)
 //

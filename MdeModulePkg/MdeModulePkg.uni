@@ -1166,6 +1166,10 @@
                                                                                                    "in the DXE phase. Minimum value is 1. Sections nested more deeply are<BR>"
                                                                                                    "rejected."
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAhciCommandRetryCount_PROMPT  #language en-US "Retry Count of AHCI command if there is a failure"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAhciCommandRetryCount_HELP  #language en-US "This value is used to configure number of retries on AHCI commands, if there is a failure."
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleInRamSupport_PROMPT  #language en-US "Enable Capsule In Ram support"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleInRamSupport_HELP  #language en-US   "Capsule In Ram is to use memory to deliver the capsules that will be processed after system reset.<BR><BR>"
