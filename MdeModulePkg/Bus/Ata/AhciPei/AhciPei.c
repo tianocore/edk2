@@ -405,7 +405,7 @@ AtaAhciInitPrivateDataFromPciDevice (
 {
   EFI_STATUS                Status;
   PCI_TYPE00                PciData;
-  UINTN                     MmioBase;
+  UINT32                    MmioBase;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   UINTN                     DevicePathLength;
   UINT64                    EnabledPciAttributes;
@@ -454,12 +454,14 @@ AtaAhciInitPrivateDataFromPciDevice (
                                   &PciDevice->PciIo,
                                   EfiPciIoWidthUint32,
                                   0x24,
-                                  sizeof (UINTN),
+                                  1,
                                   &MmioBase
                                   );
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
+
+  MmioBase &= 0xFFFFFFF0;
 
   DevicePathLength = GetDevicePathSize (PciDevice->DevicePath);
   DevicePath       = PciDevice->DevicePath;
