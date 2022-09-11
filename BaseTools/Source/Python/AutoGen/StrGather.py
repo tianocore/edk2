@@ -55,6 +55,7 @@ COMMENT_NOT_REFERENCED = ' ' + COMMENT + NOT_REFERENCED
 CHAR_ARRAY_DEFIN = 'unsigned char'
 COMMON_FILE_NAME = 'Strings'
 STRING_TOKEN = re.compile('STRING_TOKEN *\(([A-Z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
+CODE_COMMENT = re.compile('\/\/.*?$|/\*[\w\W\n]*?\*/', re.MULTILINE | re.UNICODE)
 
 EFI_HII_ARRAY_SIZE_LENGTH = 4
 EFI_HII_PACKAGE_HEADER_LENGTH = 4
@@ -510,6 +511,22 @@ def GetFileList(SourceFileList, IncludeList, SkipList):
 
     return FileList
 
+## FilterCommentStr
+#
+# Filter code comment string defined in UniObjectClass
+#
+# @param File:         Input File
+# @param StrNameList:  Already Search string name list (contain string name of code comment)
+#
+# @retval StrNameList: String name list in valid code
+#
+def FilterCommentStr(File, StrNameList):
+    FileCodeComment = CODE_COMMENT.findall(File)
+    StrTokenInComment = STRING_TOKEN.findall("".join(FileCodeComment))
+    for StrName in StrTokenInComment:
+        StrNameList.remove(StrName)
+    return StrNameList
+
 ## SearchString
 #
 # Search whether all string defined in UniObjectClass are referenced
@@ -530,7 +547,7 @@ def SearchString(UniObjectClass, FileList, IsCompatibleMode):
             if os.path.isfile(File):
                 Lines = open(File, 'r')
                 for Line in Lines:
-                    for StrName in STRING_TOKEN.findall(Line):
+                    for StrName in FilterCommentStr(Line, STRING_TOKEN.findall(Line)):
                         EdkLogger.debug(EdkLogger.DEBUG_5, "Found string identifier: " + StrName)
                         UniObjectClass.SetStringReferenced(StrName)
         except:
