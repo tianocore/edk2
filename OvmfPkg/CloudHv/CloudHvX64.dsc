@@ -618,6 +618,8 @@
   # Set Tdx shared bit mask
   gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask|0x0
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableUnacceptedMemory|FALSE
+
   # Set SEV-ES defaults
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize|0

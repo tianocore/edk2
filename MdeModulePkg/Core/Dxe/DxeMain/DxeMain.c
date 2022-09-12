@@ -769,12 +769,24 @@ CoreExitBootServices (
   gTimer->SetTimerPeriod (gTimer, 0);
 
   //
+  // Accept all memory if unaccepted memory isn't enabled.
+  //
+  Status = CoreResolveUnacceptedMemory();
+  if (EFI_ERROR (Status)) {
+    //
+    // Notify other drivers that ExitBootServices failed
+    //
+    CoreNotifySignalList (&gEventExitBootServicesFailedGuid);
+    return Status;
+  }
+
+  //
   // Terminate memory services if the MapKey matches
   //
   Status = CoreTerminateMemoryMap (MapKey);
   if (EFI_ERROR (Status)) {
     //
-    // Notify other drivers that ExitBootServices fail
+    // Notify other drivers that ExitBootServices failed
     //
     CoreNotifySignalList (&gEventExitBootServicesFailedGuid);
     return Status;

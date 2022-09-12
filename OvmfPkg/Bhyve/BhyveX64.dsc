@@ -559,6 +559,8 @@
   # Set Tdx shared bit mask
   gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask|0x0
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableUnacceptedMemory|FALSE
+
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
 
   # MdeModulePkg resolution sets up the system display resolution
