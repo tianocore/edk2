@@ -1338,3 +1338,9 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPcieResizableBarSupport_HELP #language en-US "Indicates if the PCIe Resizable BAR Capability Supported.<BR><BR>\n"
                                                                                             "TRUE  - PCIe Resizable BAR Capability is supported.<BR>\n"
                                                                                             "FALSE - PCIe Resizable BAR Capability is not supported.<BR>"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEnableUnacceptedMemory_PROMPT #language en-US "Support unaccepted memory type"
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEnableUnacceptedMemory_HELP #language en-US "Indicates if the memory map may include unaccepted memory "
+                                                                                          "after ExitBootServices().<BR><BR>\n"
+                                                                                          "TRUE  - The memory map may include unaccepted memory after ExitBootServices().<BR>\n"
+                                                                                          "FALSE - The memory map may not include unaccepted memory after ExitBootServices().<BR>\n"

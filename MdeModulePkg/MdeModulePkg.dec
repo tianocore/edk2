@@ -2102,6 +2102,12 @@
   # @Prompt The shared bit mask when Intel Tdx is enabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask|0x0|UINT64|0x10000025
 
+  ## Indicates if the memory map may include unaccepted memory after ExitBootServices().<BR><BR>
+  #   TRUE  - The memory map may include unaccepted memory after ExitBootServices().<BR>
+  #   FALSE - The memory map may not include unaccepted memory after ExitBootServices().<BR>
+  # @Prompt Support unaccepted memory type.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableUnacceptedMemory|FALSE|BOOLEAN|0x10000026
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.

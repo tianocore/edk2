@@ -2699,6 +2699,16 @@ CoreInitializeMemoryProtection (
   );
 
 /**
+   Accept and convert unaccepted memory to conventional memory if unaccepted
+   memory is not enabled and there is an implementation of MemoryAcceptProtocol
+   installed.
+ **/
+EFI_STATUS
+CoreResolveUnacceptedMemory (
+  VOID
+  );
+
+/**
   Install MemoryAttributesTable on memory allocation.
 
   @param[in] MemoryType EFI memory type.

@@ -526,6 +526,7 @@
 
   # Set ConfidentialComputing defaults
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableUnacceptedMemory|FALSE
 
 !include OvmfPkg/OvmfTpmPcds.dsc.inc
 
