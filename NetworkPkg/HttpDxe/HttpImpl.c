@@ -233,35 +233,45 @@ EfiHttpRequest (
   EFI_HTTP_MESSAGE       *HttpMsg;
   EFI_HTTP_REQUEST_DATA  *Request;
   VOID                   *UrlParser;
+  VOID                   *EndPointUrlParser;
   EFI_STATUS             Status;
   CHAR8                  *HostName;
+  CHAR8                  *EndPointHostName;
   UINTN                  HostNameSize;
   UINT16                 RemotePort;
+  UINT16                 EndPointRemotePort;
   HTTP_PROTOCOL          *HttpInstance;
   BOOLEAN                Configure;
   BOOLEAN                ReConfigure;
   BOOLEAN                TlsConfigure;
   CHAR8                  *RequestMsg;
   CHAR8                  *Url;
+  CHAR8                  *EndPointUrl;
   UINTN                  UrlLen;
   CHAR16                 *HostNameStr;
   HTTP_TOKEN_WRAP        *Wrap;
   CHAR8                  *FileUrl;
   UINTN                  RequestMsgSize;
   EFI_HANDLE             ImageHandle;
+  CHAR8                  *EndPointUrlMsg;
 
   //
   // Initializations
   //
-  Url          = NULL;
-  UrlParser    = NULL;
-  RemotePort   = 0;
-  HostName     = NULL;
-  RequestMsg   = NULL;
-  HostNameStr  = NULL;
-  Wrap         = NULL;
-  FileUrl      = NULL;
-  TlsConfigure = FALSE;
+  Url                = NULL;
+  UrlParser          = NULL;
+  EndPointUrlParser  = NULL;
+  RemotePort         = 0;
+  EndPointRemotePort = 0;
+  HostName           = NULL;
+  EndPointHostName   = NULL;
+  RequestMsg         = NULL;
+  HostNameStr        = NULL;
+  Wrap               = NULL;
+  FileUrl            = NULL;
+  TlsConfigure       = FALSE;
+  EndPointUrl        = NULL;
+  EndPointUrlMsg     = NULL;
 
   if ((This == NULL) || (Token == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -275,14 +285,18 @@ EfiHttpRequest (
   Request = HttpMsg->Data.Request;
 
   //
-  // Only support GET, HEAD, DELETE, PATCH, PUT and POST method in current implementation.
+  // Only support GET, HEAD, DELETE, PATCH, PUT, CONNECT and POST method in current implementation.
   //
   if ((Request != NULL) && (Request->Method != HttpMethodGet) &&
       (Request->Method != HttpMethodHead) && (Request->Method != HttpMethodDelete) &&
       (Request->Method != HttpMethodPut) && (Request->Method != HttpMethodPost) &&
-      (Request->Method != HttpMethodPatch))
+      (Request->Method != HttpMethodPatch) && (Request->Method != HttpMethodConnect))
   {
     return EFI_UNSUPPORTED;
+  }
+
+  if ((Request->Method == HttpMethodConnect) && (Request->EndPointUrl == NULL)) {
+    return EFI_INVALID_PARAMETER;
   }
 
   HttpInstance = HTTP_INSTANCE_FROM_PROTOCOL (This);
@@ -353,11 +367,25 @@ EfiHttpRequest (
 
     UnicodeStrToAsciiStrS (Request->Url, Url, UrlLen);
 
+    if (Request->EndPointUrl != NULL) {
+      UrlLen      = StrLen (Request->EndPointUrl) + 1;
+      EndPointUrl = AllocateZeroPool (UrlLen);
+      if (EndPointUrl == NULL) {
+        goto Error1;
+      }
+
+      UnicodeStrToAsciiStrS (Request->EndPointUrl, EndPointUrl, UrlLen);
+    }
+
     //
     // From the information in Url, the HTTP instance will
     // be able to determine whether to use http or https.
     //
-    HttpInstance->UseHttps = IsHttpsUrl (Url);
+    if (HttpInstance->ProxyConnected) {
+      HttpInstance->UseHttps = IsHttpsUrl (EndPointUrl);
+    } else {
+      HttpInstance->UseHttps = IsHttpsUrl (Url);
+    }
 
     //
     // HTTP is disabled, return directly if the URI is not HTTPS.
@@ -444,9 +472,10 @@ EfiHttpRequest (
       if ((HttpInstance->ConnectionClose == FALSE) &&
           (HttpInstance->RemotePort == RemotePort) &&
           (AsciiStrCmp (HttpInstance->RemoteHost, HostName) == 0) &&
-          (!HttpInstance->UseHttps || (HttpInstance->UseHttps &&
-                                       !TlsConfigure &&
-                                       (HttpInstance->TlsSessionState == EfiTlsSessionDataTransferring))))
+          (!HttpInstance->UseHttps ||
+           HttpInstance->ProxyConnected || (HttpInstance->UseHttps &&
+                                            !TlsConfigure &&
+                                            (HttpInstance->TlsSessionState == EfiTlsSessionDataTransferring))))
       {
         //
         // Host Name and port number of the request URL are the same with previous call to Request().
@@ -599,7 +628,7 @@ EfiHttpRequest (
     goto Error2;
   }
 
-  if (!Configure && !ReConfigure && !TlsConfigure) {
+  if ((!Configure && !ReConfigure) && ((HttpInstance->ProxyConnected && TlsConfigure) || (!TlsConfigure))) {
     //
     // For the new HTTP token, create TX TCP token events.
     //
@@ -632,7 +661,48 @@ EfiHttpRequest (
     }
   }
 
-  Status = HttpGenRequestMessage (HttpMsg, FileUrl, &RequestMsg, &RequestMsgSize);
+  if (HttpInstance->Method == HttpMethodConnect) {
+    Status = HttpParseUrl (EndPointUrl, (UINT32)AsciiStrLen (EndPointUrl), FALSE, &EndPointUrlParser);
+    if (EFI_ERROR (Status)) {
+      goto Error3;
+    }
+
+    Status = HttpUrlGetHostName (
+               EndPointUrl,
+               EndPointUrlParser,
+               &EndPointHostName
+               );
+    if (EFI_ERROR (Status)) {
+      goto Error3;
+    }
+
+    Status = HttpUrlGetPort (EndPointUrl, EndPointUrlParser, &EndPointRemotePort);
+    if (EFI_ERROR (Status)) {
+      if (IsHttpsUrl (EndPointUrl)) {
+        EndPointRemotePort = HTTPS_DEFAULT_PORT;
+      } else {
+        EndPointRemotePort = HTTP_DEFAULT_PORT;
+      }
+    }
+
+    EndPointUrlMsg = AllocateZeroPool (URI_STR_MAX_SIZE);
+    if (EndPointUrlMsg == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Error3;
+    }
+
+    AsciiSPrint (
+      EndPointUrlMsg,
+      URI_STR_MAX_SIZE,
+      "%a:%d",
+      EndPointHostName,
+      EndPointRemotePort
+      );
+
+    Status = HttpGenRequestMessage (HttpMsg, EndPointUrlMsg, &RequestMsg, &RequestMsgSize);
+  } else {
+    Status = HttpGenRequestMessage (HttpMsg, FileUrl, &RequestMsg, &RequestMsgSize);
+  }
 
   if (EFI_ERROR (Status) || (NULL == RequestMsg)) {
     goto Error3;
@@ -668,6 +738,23 @@ EfiHttpRequest (
 
   DispatchDpc ();
 
+  if (HttpInstance->Method == HttpMethodConnect) {
+    HttpInstance->ProxyConnected     = TRUE;
+    HttpInstance->EndPointRemoteHost = EndPointHostName;
+
+    if (EndPointUrlParser != NULL) {
+      HttpUrlFreeParser (EndPointUrlParser);
+    }
+  }
+
+  if (EndPointUrlMsg != NULL) {
+    FreePool (EndPointUrlMsg);
+  }
+
+  if (EndPointUrl != NULL) {
+    FreePool (EndPointUrl);
+  }
+
   if (HostName != NULL) {
     FreePool (HostName);
   }
@@ -698,6 +785,20 @@ Error3:
     TlsCloseTxRxEvent (HttpInstance);
   }
 
+  if (HttpInstance->Method == HttpMethodConnect) {
+    if (EndPointHostName != NULL) {
+      FreePool (EndPointHostName);
+    }
+
+    if (EndPointUrlParser != NULL) {
+      HttpUrlFreeParser (EndPointUrlParser);
+    }
+  }
+
+  if (EndPointUrlMsg != NULL) {
+    FreePool (EndPointUrlMsg);
+  }
+
 Error2:
   HttpCloseConnection (HttpInstance);
 
@@ -723,6 +824,10 @@ Error1:
 
   if (UrlParser != NULL) {
     HttpUrlFreeParser (UrlParser);
+  }
+
+  if (EndPointUrl != NULL) {
+    FreePool (EndPointUrl);
   }
 
   return Status;
