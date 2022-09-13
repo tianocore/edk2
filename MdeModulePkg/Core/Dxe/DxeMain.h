@@ -2708,6 +2708,28 @@ CoreResolveUnacceptedMemory (
   VOID
   );
 
+
+typedef struct _ENABLE_UNACCEPTED_MEMORY_PROTOCOL
+    ENABLE_UNACCEPTED_MEMORY_PROTOCOL;
+
+typedef EFI_STATUS (EFIAPI *ENABLE_UNACCEPTED_MEMORY)(
+  IN ENABLE_UNACCEPTED_MEMORY_PROTOCOL *
+  );
+
+struct _ENABLE_UNACCEPTED_MEMORY_PROTOCOL {
+  ENABLE_UNACCEPTED_MEMORY Enable;
+};
+
+extern EFI_GUID gEnableUnacceptedMemoryProtocolGuid;
+
+/**
+   Implement the protocol for enabling unaccepted memory.
+ **/
+VOID
+InstallEnableUnacceptedMemoryProtocol (
+  VOID
+  );
+
 /**
   Install MemoryAttributesTable on memory allocation.
 

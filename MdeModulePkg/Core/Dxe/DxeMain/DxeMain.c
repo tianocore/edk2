@@ -355,6 +355,11 @@ DxeMain (
   ASSERT_EFI_ERROR (Status);
 
   //
+  // Install unaccepted memory configuration protocol
+  //
+  InstallEnableUnacceptedMemoryProtocol();
+
+  //
   // If Loading modules At fixed address feature is enabled, install Load moduels at fixed address
   // Configuration Table so that user could easily to retrieve the top address to load Dxe and PEI
   // Code and Tseg base to load SMM driver.

@@ -96,6 +96,14 @@ EFI_MEMORY_TYPE_INFORMATION  gMemoryTypeInformation[EfiMaxMemoryType + 1] = {
 //
 GLOBAL_REMOVE_IF_UNREFERENCED   BOOLEAN  gLoadFixedAddressCodeMemoryReady = FALSE;
 
+EFI_STATUS EFIAPI CoreEnableUnacceptedMemory(IN ENABLE_UNACCEPTED_MEMORY_PROTOCOL *);
+
+struct {
+  ENABLE_UNACCEPTED_MEMORY enable;
+} mEnableUnacceptedMemoryProtocol = {
+  CoreEnableUnacceptedMemory,
+};
+
 /**
   Enter critical section by gaining lock on gMemoryLock.
 
@@ -2203,6 +2211,33 @@ CoreResolveUnacceptedMemory (
   }
 
   return AcceptAllUnacceptedMemory(AcceptMemory);
+}
+
+EFI_STATUS
+EFIAPI
+CoreEnableUnacceptedMemory (
+  IN ENABLE_UNACCEPTED_MEMORY_PROTOCOL *This
+  )
+{
+  return PcdSetBoolS(PcdEnableUnacceptedMemory, TRUE);
+}
+
+VOID
+InstallEnableUnacceptedMemoryProtocol (
+  VOID
+  )
+{
+  EFI_HANDLE  Handle;
+  EFI_STATUS  Status;
+
+  Handle = NULL;
+  Status = CoreInstallMultipleProtocolInterfaces (
+             &Handle,
+             &gEnableUnacceptedMemoryProtocolGuid,
+             &mEnableUnacceptedMemoryProtocol,
+             NULL
+             );
+  ASSERT_EFI_ERROR (Status);
 }
 
 /**

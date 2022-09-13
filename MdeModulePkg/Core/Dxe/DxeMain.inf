@@ -122,6 +122,7 @@
   gEfiMemoryAttributesTableGuid                 ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiEndOfDxeEventGroupGuid                    ## SOMETIMES_CONSUMES   ## Event
   gEfiHobMemoryAllocStackGuid                   ## SOMETIMES_CONSUMES   ## SystemTable
+  gEnableUnacceptedMemoryProtocolGuid           ## PRODUCES             ## GUID # Install protocol
 
 [Ppis]
   gEfiVectorHandoffInfoPpiGuid                  ## UNDEFINED # HOB
@@ -187,7 +188,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFwVolDxeMaxEncapsulationDepth           ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableUnacceptedMemory                  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableUnacceptedMemory                  ## CONSUMES ## SOMETIMES_PRODUCES
 
 # [Hob]
 # RESOURCE_DESCRIPTOR   ## CONSUMES
