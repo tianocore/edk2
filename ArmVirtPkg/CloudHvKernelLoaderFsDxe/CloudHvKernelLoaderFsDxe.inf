@@ -1,0 +1,56 @@
+##  @file
+#  DXE driver to expose the 'kernel', 'initrd' and 'cmdline' blobs
+#  provided by Cloud Hypervisor as files in an abstract file system
+#
+#  Copyright (C) 2022, Arm, Limited.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = CloudHvKernelLoaderFsDxe
+  FILE_GUID                      = 57cdf541-2a29-4ae4-97e5-76a4aa2fe090
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CloudHvKernelLoaderFsDxeEntrypoint
+
+[Sources]
+  CloudHvKernelLoaderFsDxe.c
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  FdtLib
+  MemoryAllocationLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+
+[Guids]
+  gEfiFileInfoGuid
+  gEfiFileSystemInfoGuid
+  gEfiFileSystemVolumeLabelInfoIdGuid
+  gQemuKernelLoaderFsMediaGuid
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                ## PRODUCES
+  gEfiLoadFile2ProtocolGuid                 ## PRODUCES
+  gEfiSimpleFileSystemProtocolGuid          ## PRODUCES
+
+[Depex]
+  gEfiRealTimeClockArchProtocolGuid
+
+[FixedPcd]
+  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
