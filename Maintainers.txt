@@ -196,7 +196,7 @@ S: Maintained
 EmulatorPkg: Redfish-related modules
 F: EmulatorPkg/*Redfish*
 M: Abner Chang <abner.chang@amd.com> [changab]
-R: Nickle Wang <nickle@csie.io> [nicklela]
+M: Nickle Wang <nicklew@nvidia.com> [nicklela]
 
 FatPkg
 F: FatPkg/
@@ -543,7 +543,7 @@ R: Ankit Sinha <ankit.sinha@intel.com> [ankit13s]
 RedfishPkg: Redfish related modules
 F: RedfishPkg/
 M: Abner Chang <abner.chang@amd.com> [changab]
-R: Nickle Wang <nickle@csie.io> [nicklela]
+M: Nickle Wang <nicklew@nvidia.com> [nicklela]
 
 SecurityPkg
 F: SecurityPkg/
