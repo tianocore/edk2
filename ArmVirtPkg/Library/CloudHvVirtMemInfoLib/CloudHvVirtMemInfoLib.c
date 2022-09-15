@@ -37,13 +37,14 @@ CloudHvVirtMemInfoPeiLibConstructor (
   )
 {
   VOID                         *DeviceTreeBase;
-  EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttributes;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttributes, ReadOnlyResourceAttributes;
   INT32                        Node, Prev;
   UINT64                       FirMemNodeBase, FirMemNodeSize;
-  UINT64                       CurBase, MemBase;
+  UINT64                       CurBase, MemBase, CurSizeOff;
   UINT64                       CurSize;
+  UINT64                       KernelStart, KernelSize;
   CONST CHAR8                  *Type;
-  INT32                        Len;
+  INT32                        Len, ChosenNode;
   CONST UINT64                 *RegProp;
   RETURN_STATUS                PcdStatus;
   UINT8                        Index;
@@ -53,6 +54,8 @@ CloudHvVirtMemInfoPeiLibConstructor (
   FirMemNodeBase     = 0;
   FirMemNodeSize     = 0;
   Index              = 0;
+  CurSizeOff         = 0;
+  KernelSize         = 0;
   MemBase            = FixedPcdGet64 (PcdSystemMemoryBase);
   ResourceAttributes = (
                         EFI_RESOURCE_ATTRIBUTE_PRESENT |
@@ -60,6 +63,12 @@ CloudHvVirtMemInfoPeiLibConstructor (
                         EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
                         EFI_RESOURCE_ATTRIBUTE_TESTED
                         );
+  ReadOnlyResourceAttributes = (
+                                EFI_RESOURCE_ATTRIBUTE_PRESENT |
+                                EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+                                EFI_RESOURCE_ATTRIBUTE_TESTED |
+                                EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED
+                                );
   DeviceTreeBase = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
   if (DeviceTreeBase == NULL) {
     return EFI_NOT_FOUND;
@@ -70,6 +79,21 @@ CloudHvVirtMemInfoPeiLibConstructor (
   //
   if (fdt_check_header (DeviceTreeBase) != 0) {
     return EFI_NOT_FOUND;
+  }
+
+  //
+  // Try to get kernel image info from DT
+  //
+  ChosenNode = fdt_path_offset (DeviceTreeBase, "/chosen");
+  if (ChosenNode >= 0) {
+    RegProp = fdt_getprop (DeviceTreeBase, ChosenNode, "linux,kernel-start", &Len);
+    if ((RegProp != NULL) && (Len > 0)) {
+      KernelStart = (UINT64)fdt64_to_cpu (ReadUnaligned64 (RegProp));
+      RegProp     = fdt_getprop (DeviceTreeBase, ChosenNode, "linux,kernel-size", &Len);
+      if ((RegProp != NULL) && (Len > 0)) {
+        KernelSize = (UINT64)fdt64_to_cpu (ReadUnaligned64 (RegProp));
+      }
+    }
   }
 
   //
@@ -105,11 +129,26 @@ CloudHvVirtMemInfoPeiLibConstructor (
 
         // We should build Hob seperately for the memory node except the first one
         if (CurBase != MemBase) {
+          // If kernel image resides in current memory node, build hob from CurBase to the beginning of kernel image.
+          if ((KernelSize != 0) && (KernelStart >= CurBase) && (KernelStart + KernelSize <= CurBase + CurSize)) {
+            CurSizeOff =  CurBase + CurSize - KernelStart;
+            // align up with 0x1000
+            CurSizeOff = (CurSizeOff + 0xfff) & ~0xfffUL;
+          }
+
           BuildResourceDescriptorHob (
             EFI_RESOURCE_SYSTEM_MEMORY,
             ResourceAttributes,
             CurBase,
-            CurSize
+            CurSize - CurSizeOff
+            );
+
+          // Add kernel image memory region to hob as read only
+          BuildResourceDescriptorHob (
+            EFI_RESOURCE_SYSTEM_MEMORY,
+            ReadOnlyResourceAttributes,
+            CurBase + CurSize - CurSizeOff,
+            CurSizeOff
             );
         } else {
           FirMemNodeBase = CurBase;
@@ -146,8 +185,27 @@ CloudHvVirtMemInfoPeiLibConstructor (
     return EFI_NOT_FOUND;
   }
 
+  CurSizeOff = 0;
+  // Build hob for the lowest memory node from its base to the beginning of kernel image once the kernel image reside here
+  if ((KernelSize != 0) && (KernelStart >= FirMemNodeBase) && (KernelStart + KernelSize <= FirMemNodeBase + FirMemNodeSize)) {
+    CurSizeOff = FirMemNodeBase + FirMemNodeSize - KernelStart;
+    // Caution the alignment
+    CurSizeOff = (CurSizeOff + 0xfff) & ~0xfffUL;
+
+    // Add kernel image memory region to hob as read only
+    BuildResourceDescriptorHob (
+      EFI_RESOURCE_SYSTEM_MEMORY,
+      ReadOnlyResourceAttributes,
+      FirMemNodeBase + FirMemNodeSize - CurSizeOff,
+      CurSizeOff
+      );
+  }
+
+  FirMemNodeSize -= CurSizeOff;
+
   PcdStatus = PcdSet64S (PcdSystemMemorySize, FirMemNodeSize);
   ASSERT_RETURN_ERROR (PcdStatus);
+
   ASSERT (
     (((UINT64)PcdGet64 (PcdFdBaseAddress) +
       (UINT64)PcdGet32 (PcdFdSize)) <= FirMemNodeBase) ||
