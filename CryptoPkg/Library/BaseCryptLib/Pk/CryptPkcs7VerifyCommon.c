@@ -502,8 +502,6 @@ Pkcs7GetCertificatesList (
   OldBuf       = NULL;
   Signers      = NULL;
 
-  ZeroMem (&CertCtx, sizeof (CertCtx));
-
   //
   // Parameter Checking
   //
