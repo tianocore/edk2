@@ -639,7 +639,8 @@ STATIC CONST CM_OBJ_PARSER  StdObjAcpiTableInfoParser[] = {
   { "TableGeneratorId",   sizeof (ACPI_TABLE_GENERATOR_ID),       "0x%x",   NULL },
   { "AcpiTableData",      sizeof (EFI_ACPI_DESCRIPTION_HEADER *), "0x%p",   NULL },
   { "OemTableId",         8,                                      "0x%LLX", NULL },
-  { "OemRevision",        4,                                      "0x%x",   NULL }
+  { "OemRevision",        4,                                      "0x%x",   NULL },
+  { "MinorRevision",      1,                                      "0x%x",   NULL },
 };
 
 /** A parser for EStdObjSmbiosTableList.
