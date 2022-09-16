@@ -204,3 +204,29 @@ def ExtractFfs(inputfile: str, Ffs_name: str, outputfile: str, Fv_name: str=None
             logger.debug('Extract ffs data is saved in {}.'.format(outputfile))
     else:
         logger.error('Target Ffs/Fv not found!!!')
+
+def ShrinkFv(inputfile: str, outputfile: str) -> None:
+    if not os.path.exists(inputfile):
+        logger.error("Invalid inputfile, can not open {}.".format(inputfile))
+        raise Exception("Process Failed: Invalid inputfile!")
+    # 1. Data Prepare
+    with open(inputfile, "rb") as f:
+        whole_data = f.read()
+    FmmtParser = FMMTParser(inputfile, ROOT_TREE)
+    # 2. DataTree Create
+    logger.debug('Parsing inputfile data......')
+    FmmtParser.ParserFromRoot(FmmtParser.WholeFvTree, whole_data)
+    logger.debug('Done!')
+    TargetFv = FmmtParser.WholeFvTree.Child[0]
+    if TargetFv:
+        FvMod = FvHandler(TargetFv)
+        Status = FvMod.ShrinkFv()
+    else:
+        logger.error('Target Fv not found!!!')
+    # 4. Data Encapsulation
+    if Status:
+        logger.debug('Start encapsulating data......')
+        FmmtParser.Encapsulation(FmmtParser.WholeFvTree, False)
+        with open(outputfile, "wb") as f:
+            f.write(FmmtParser.FinalData)
+        logger.debug('Encapsulated data is saved in {}.'.format(outputfile))
