@@ -145,7 +145,7 @@ def ModifyFvSystemGuid(TargetFv) -> None:
             TargetFv.Data.Data += struct2stream(item.Data.Header)+ item.Data.Data + item.Data.PadData
 
 class FvHandler:
-    def __init__(self, NewFfs, TargetFfs) -> None:
+    def __init__(self, NewFfs, TargetFfs=None) -> None:
         self.NewFfs = NewFfs
         self.TargetFfs = TargetFfs
         self.Status = False
@@ -637,4 +637,30 @@ class FvHandler:
         self.CompressData(Delete_Fv)
         self.Status = True
         logger.debug('Done!')
+        return self.Status
+
+    def ShrinkFv(self) -> bool:
+        TargetFv = self.NewFfs
+        TargetFv.Data.Data = b''
+        if not TargetFv.Data.Free_Space:
+            self.Status = True
+        else:
+            BlockSize = TargetFv.Data.Header.BlockMap[0].Length
+            New_Free_Space = TargetFv.Data.Free_Space%BlockSize
+            Removed_Space = TargetFv.Data.Free_Space - New_Free_Space
+            TargetFv.Child[-1].Data.Data = b'\xff' * New_Free_Space
+            TargetFv.Data.Size -= Removed_Space
+            TargetFv.Data.Header.Fvlength = TargetFv.Data.Size
+            ModifyFvSystemGuid(TargetFv)
+            for item in TargetFv.Child:
+                if item.type == FFS_FREE_SPACE:
+                    TargetFv.Data.Data += item.Data.Data + item.Data.PadData
+                else:
+                    TargetFv.Data.Data += struct2stream(item.Data.Header)+ item.Data.Data + item.Data.PadData
+            TargetFv.Data.ModFvExt()
+            TargetFv.Data.ModFvSize()
+            TargetFv.Data.ModExtHeaderData()
+            ModifyFvExtData(TargetFv)
+            TargetFv.Data.ModCheckSum()
+            self.Status = True
         return self.Status
