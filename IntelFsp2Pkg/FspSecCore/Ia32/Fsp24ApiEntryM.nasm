@@ -40,12 +40,13 @@ struc FSPM_UPD_COMMON_FSP24
     .Revision:                  resb  1
     .Reserved:                  resb  3
     .Length                     resd  1
+    .NvsBufferPtr               resq  1
     .StackBase:                 resq  1
     .StackSize:                 resq  1
     .BootLoaderTolumSize:       resd  1
     .BootMode:                  resd  1
     .FspEventHandler            resq  1
-    .Reserved1:                 resb 24
+    .Reserved1:                 resb 16
     ; }
     .size:
 endstruc
