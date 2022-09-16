@@ -24,7 +24,8 @@ parser.add_argument("-d", "--Delete", dest="Delete", nargs='+',
                         If not given TargetFvName, all the existed target Ffs will be deleted'")
 parser.add_argument("-e", "--Extract", dest="Extract", nargs='+',
                     help="Extract a Ffs Info: '-e inputfile TargetFvName(Optional) TargetFfsName outputfile\
-                        If not given TargetFvName, the first found target Ffs will be extracted'")
+                        If not given TargetFvName, the first found target Ffs will be extracted.\
+                        If only given TargetFvName, not given TargetFfsName, the TargetFv will be extracted to output file'")
 parser.add_argument("-a", "--Add", dest="Add", nargs='+',
                     help="Add a Ffs into a FV:'-a inputfile TargetFvName newffsfile outputfile'")
 parser.add_argument("-r", "--Replace", dest="Replace", nargs='+',

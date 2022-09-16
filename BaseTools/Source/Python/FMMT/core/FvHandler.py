@@ -155,7 +155,6 @@ class FvHandler:
     def CompressData(self, TargetTree) -> None:
         TreePath = TargetTree.GetTreePath()
         pos = len(TreePath)
-        self.Status = False
         while pos:
             if not self.Status:
                 if TreePath[pos-1].type == SECTION_TREE and TreePath[pos-1].Data.Type == 0x02:
@@ -487,7 +486,6 @@ class FvHandler:
                     ~self.NewFfs.Data.Header.State)
             # If TargetFv have enough free space, just move part of the free space to NewFfs, split free space to NewFfs and new free space.
             if TargetLen < 0:
-                self.Status = True
                 self.TargetFfs.Data.Data = b'\xff' * (-TargetLen)
                 TargetFv.Data.Free_Space = (-TargetLen)
                 TargetFv.Data.ModFvExt()
@@ -498,13 +496,14 @@ class FvHandler:
                 ModifyFfsType(self.NewFfs)
                 # Recompress from the Fv node to update all the related node data.
                 self.CompressData(TargetFv)
-            elif TargetLen == 0:
                 self.Status = True
+            elif TargetLen == 0:
                 TargetFv.Child.remove(self.TargetFfs)
                 TargetFv.insertChild(self.NewFfs)
                 ModifyFfsType(self.NewFfs)
                 # Recompress from the Fv node to update all the related node data.
                 self.CompressData(TargetFv)
+                self.Status = True
             # If TargetFv do not have enough free space, need move part of the free space of TargetFv's parent Fv to TargetFv/NewFfs.
             else:
                 if TargetFv.type == FV_TREE:
