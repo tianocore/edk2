@@ -4,6 +4,7 @@
 
   Based on files under Nt32Pkg/MiscSubClassPlatformDxe/
 
+  Copyright (c) 2022, Ampere Computing LLC. All rights reserved.<BR>
   Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
   Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2015, Hisilicon Limited. All rights reserved.<BR>
@@ -160,7 +161,7 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscSystemManufacturer) {
 
   SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE1);
 
-  CopyGuid (&SmbiosRecord->Uuid, &InputData->Uuid);
+  OemGetSystemUuid (&SmbiosRecord->Uuid);
 
   OptionalStrStart = (CHAR8 *)(SmbiosRecord + 1);
   UnicodeStrToAsciiStrS (Manufacturer, OptionalStrStart, ManuStrLen + 1);
