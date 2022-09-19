@@ -235,4 +235,16 @@ OemGetChassisNumPowerCords (
   VOID
   );
 
+/**
+  Fetches the system UUID.
+
+  @param[out] SystemUuid     The pointer to the buffer to store the System UUID.
+
+**/
+VOID
+EFIAPI
+OemGetSystemUuid (
+  OUT GUID  *SystemUuid
+  );
+
 #endif // OEM_MISC_LIB_H_
