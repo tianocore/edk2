@@ -87,3 +87,17 @@ XenHypercallEventChannelOp (
            (INTN)Arguments
            );
 }
+
+INTN
+EFIAPI
+XenHypercallSchedOp (
+  IN     INTN  Operation,
+  IN OUT VOID  *Arguments
+  )
+{
+  return XenHypercall2 (
+           __HYPERVISOR_sched_op,
+           Operation,
+           (INTN)Arguments
+           );
+}

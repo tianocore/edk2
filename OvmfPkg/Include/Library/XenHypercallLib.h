@@ -101,4 +101,11 @@ XenHypercallEventChannelOp (
   IN OUT VOID  *Arguments
   );
 
+INTN
+EFIAPI
+XenHypercallSchedOp (
+  IN     INTN  Operation,
+  IN OUT VOID  *Arguments
+  );
+
 #endif
