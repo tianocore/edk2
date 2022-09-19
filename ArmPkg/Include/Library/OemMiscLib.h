@@ -1,5 +1,6 @@
 /** @file
 *
+*  Copyright (c) 2022, Ampere Computing LLC. All rights reserved.
 *  Copyright (c) 2021, NUVIA Inc. All rights reserved.
 *  Copyright (c) 2015, Hisilicon Limited. All rights reserved.
 *  Copyright (c) 2015, Linaro Limited. All rights reserved.
@@ -58,6 +59,7 @@ typedef enum {
   SkuNumberType03,
   ProcessorPartNumType04,
   ProcessorSerialNumType04,
+  ProcessorVersionType04,
   SmbiosHiiStringFieldMax
 } OEM_MISC_SMBIOS_HII_STRING_FIELD;
 
