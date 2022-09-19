@@ -2,7 +2,7 @@
   Functions for processor information common to ARM and AARCH64.
 
   Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
-  Copyright (c) 2021, Ampere Computing LLC. All rights reserved.<BR>
+  Copyright (c) 2021 - 2022, Ampere Computing LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -131,7 +131,7 @@ SmbiosGetSmcArm64SocId (
   SmcCallStatus = ArmCallSmc1 (SMCCC_ARCH_SOC_ID, &SmcParam, NULL, NULL);
 
   if (SmcCallStatus >= 0) {
-    *Jep106Code = (INT32)SmcParam;
+    *Jep106Code = SmcCallStatus;
   } else {
     Status = EFI_UNSUPPORTED;
   }
@@ -140,7 +140,7 @@ SmbiosGetSmcArm64SocId (
   SmcCallStatus = ArmCallSmc1 (SMCCC_ARCH_SOC_ID, &SmcParam, NULL, NULL);
 
   if (SmcCallStatus >= 0) {
-    *SocRevision = (INT32)SmcParam;
+    *SocRevision = SmcCallStatus;
   } else {
     Status = EFI_UNSUPPORTED;
   }
