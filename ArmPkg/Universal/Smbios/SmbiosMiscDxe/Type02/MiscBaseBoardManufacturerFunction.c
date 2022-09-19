@@ -122,16 +122,6 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscBaseBoardManufacturer) {
     );
   OemUpdateSmbiosInfo (
     mSmbiosMiscHiiHandle,
-    STRING_TOKEN (STR_MISC_BASE_BOARD_MANUFACTURER),
-    BoardManufacturerType02
-    );
-  OemUpdateSmbiosInfo (
-    mSmbiosMiscHiiHandle,
-    STRING_TOKEN (STR_MISC_BASE_BOARD_SERIAL_NUMBER),
-    SerialNumberType02
-    );
-  OemUpdateSmbiosInfo (
-    mSmbiosMiscHiiHandle,
     STRING_TOKEN (STR_MISC_BASE_BOARD_SKU_NUMBER),
     SerialNumberType02
     );
