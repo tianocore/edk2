@@ -1,0 +1,46 @@
+## @file
+#  Xen Hypercall abstraction lib for Intel for runtime services
+#
+#  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2022, Citrix Systems, Inc.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XenHypercallRuntimeLib
+  FILE_GUID                      = f657a395-1d2c-40b5-bd34-eedc203899ab
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  CONSTRUCTOR                    = XenHypercallRuntimeLibConstruct
+
+[Defines.IA32, Defines.X64]
+  LIBRARY_CLASS                  = XenHypercallLib|DXE_RUNTIME_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources.X64]
+  X86RuntimeXenHypercall.c
+  X64/hypercall.nasm
+  X64/RuntimeHypercallPage.nasm
+
+[Sources]
+  XenHypercall.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiRuntimeLib
+
+[Guids.X64]
+  gEfiEventVirtualAddressChangeGuid   # ALWAYS_CONSUMED
