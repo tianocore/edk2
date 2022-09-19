@@ -1,6 +1,7 @@
 /** @file
 *  OemMiscLib.c
 *
+*  Copyright (c) 2022, Ampere Computing LLC. All rights reserved.
 *  Copyright (c) 2021, NUVIA Inc. All rights reserved.
 *  Copyright (c) 2018, Hisilicon Limited. All rights reserved.
 *  Copyright (c) 2018, Linaro Limited. All rights reserved.
@@ -10,6 +11,7 @@
 **/
 
 #include <Uefi.h>
+#include <Guid/ZeroGuid.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HiiLib.h>
@@ -235,4 +237,20 @@ OemGetChassisNumPowerCords (
 {
   ASSERT (FALSE);
   return 1;
+}
+
+/**
+  Fetches the system UUID.
+
+  @param[out] SystemUuid     The pointer to the buffer to store the System UUID.
+
+**/
+VOID
+EFIAPI
+OemGetSystemUuid (
+  OUT GUID  *SystemUuid
+  )
+{
+  ASSERT (FALSE);
+  CopyGuid (SystemUuid, &gZeroGuid);
 }
