@@ -44,7 +44,7 @@ typedef enum {
   VersionType01,
   SkuNumberType01,
   FamilyType01,
-  AssertTagType02,
+  AssetTagType02,
   SerialNumberType02,
   BoardManufacturerType02,
   ProductNameType02,
