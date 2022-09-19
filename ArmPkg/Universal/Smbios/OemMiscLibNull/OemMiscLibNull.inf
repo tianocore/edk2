@@ -30,6 +30,11 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
+  PcdLib
 
 [Guids]
   gZeroGuid
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease
+  gArmTokenSpaceGuid.PcdSystemBiosRelease
