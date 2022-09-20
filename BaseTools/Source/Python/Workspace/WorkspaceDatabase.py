@@ -22,6 +22,7 @@ from .MetaFileParser import *
 from Workspace.DecBuildData import DecBuildData
 from Workspace.DscBuildData import DscBuildData
 from Workspace.InfBuildData import InfBuildData
+from Workspace.TomlBuildData import TomlBuildData
 
 ## Database
 #
@@ -45,6 +46,7 @@ class WorkspaceDatabase(object):
             ".inf"  : MODEL_FILE_INF,
             ".dec"  : MODEL_FILE_DEC,
             ".dsc"  : MODEL_FILE_DSC,
+            ".toml" : MODEL_FILE_TOML,
         }
 
         # file parser
@@ -52,6 +54,7 @@ class WorkspaceDatabase(object):
             MODEL_FILE_INF  :   InfParser,
             MODEL_FILE_DEC  :   DecParser,
             MODEL_FILE_DSC  :   DscParser,
+            MODEL_FILE_TOML :   TomlParser,
         }
 
         # convert to xxxBuildData object
@@ -59,6 +62,7 @@ class WorkspaceDatabase(object):
             MODEL_FILE_INF  :   InfBuildData,
             MODEL_FILE_DEC  :   DecBuildData,
             MODEL_FILE_DSC  :   DscBuildData,
+            MODEL_FILE_TOML :   TomlBuildData,
         }
 
         _CACHE_ = {}    # (FilePath, Arch)  : <object>

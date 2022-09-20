@@ -15,7 +15,7 @@ import Common.EdkLogger as EdkLogger
 from Common.BuildToolError import FORMAT_INVALID
 
 from CommonDataClass.DataClass import MODEL_FILE_DSC, MODEL_FILE_DEC, MODEL_FILE_INF, \
-                                      MODEL_FILE_OTHERS
+                                      MODEL_FILE_OTHERS, MODEL_FILE_TOML
 from Common.DataType import *
 
 class MetaFileTable():
@@ -393,6 +393,9 @@ class MetaFileStorage(object):
         MODEL_FILE_INF      :   ModuleTable,
         MODEL_FILE_DEC      :   PackageTable,
         MODEL_FILE_DSC      :   PlatformTable,
+        # MU_CHANGE [BEGIN]: Add Rust build support
+        MODEL_FILE_TOML     :   ModuleTable,
+        # MU_CHANGE [END]: Add Rust build support
         MODEL_FILE_OTHERS   :   MetaFileTable,
     }
 
@@ -400,6 +403,9 @@ class MetaFileStorage(object):
         ".inf"  : MODEL_FILE_INF,
         ".dec"  : MODEL_FILE_DEC,
         ".dsc"  : MODEL_FILE_DSC,
+        # MU_CHANGE [BEGIN]: Add Rust build support
+        ".toml" : MODEL_FILE_TOML,
+        # MU_CHANGE [END]: Add Rust build support
     }
     _ObjectCache = {}
     ## Constructor

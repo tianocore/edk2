@@ -252,6 +252,10 @@ class AutoGenWorkerInProcess(mp.Process):
                 modulefullpath = os.path.join(module_root,module_file)
                 taskname = " : ".join((modulefullpath,module_arch))
                 module_metafile = PathClass(module_file,module_root)
+
+                if module_metafile.Ext == ".toml":
+                    continue
+
                 if module_path:
                     module_metafile.Path = module_path
                 if module_basename:

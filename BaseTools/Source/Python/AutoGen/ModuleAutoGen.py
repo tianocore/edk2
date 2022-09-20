@@ -26,6 +26,7 @@ from Workspace.MetaFileCommentParser import UsageList
 from .GenPcdDb import CreatePcdDatabaseCode
 from Common.caching import cached_class_function
 from AutoGen.ModuleAutoGenHelper import PlatformInfo,WorkSpaceInfo
+from AutoGen.RustModuleAutoGen import RustModuleAutoGen
 import json
 import tempfile
 
@@ -1858,20 +1859,37 @@ class ModuleAutoGen(AutoGen):
     def LibraryAutoGenList(self):
         RetVal = []
         for Library in self.DependentLibraryList:
-            La = ModuleAutoGen(
-                        self.Workspace,
-                        Library.MetaFile,
-                        self.BuildTarget,
-                        self.ToolChain,
-                        self.Arch,
-                        self.PlatformInfo.MetaFile,
-                        self.DataPipe
-                        )
-            La.IsLibrary = True
-            if La not in RetVal:
-                RetVal.append(La)
-                for Lib in La.CodaTargetList:
-                    self._ApplyBuildRule(Lib.Target, TAB_UNKNOWN_FILE)
+            if type(Library).__name__ == "InfBuildData":
+                La = ModuleAutoGen(
+                            self.Workspace,
+                            Library.MetaFile,
+                            self.BuildTarget,
+                            self.ToolChain,
+                            self.Arch,
+                            self.PlatformInfo.MetaFile,
+                            self.DataPipe
+                            )
+                La.IsLibrary = True
+                if La not in RetVal:
+                    RetVal.append(La)
+                    for Lib in La.CodaTargetList:
+                        self._ApplyBuildRule(Lib.Target, TAB_UNKNOWN_FILE)
+        return RetVal
+
+    ## Summarize the RustModuleAutoGen objects of all libraries used by this module
+    @cached_property
+    def LibraryRustAutoGenList(self):
+        RetVal = []
+        for Library in self.DependentLibraryList:
+            if type(Library).__name__ == "TomlBuildData":
+                La = RustModuleAutoGen(
+                    self.Workspace,
+                    Library.MetaFile,
+                    self.BuildTarget,
+                    self.ToolChain, self.Arch,
+                    DataPipe=self.DataPipe)
+                if La not in RetVal:
+                    RetVal.append(La)
         return RetVal
 
     def GenCMakeHash(self):

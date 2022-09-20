@@ -293,6 +293,9 @@ class InfBuildData(ModuleBuildClassObject):
         elif 'UEFI_HII_RESOURCE_SECTION' in self._Defs \
            and self._Defs['UEFI_HII_RESOURCE_SECTION'] == 'TRUE':
             self._BuildType = 'UEFI_HII'
+        elif self._RawData._Defines.get("RUST_MODULE", None) \
+                and self._RawData._Defines.get("LIBRARY_CLASS", None) is None:
+            self._BuildType = 'RUST_MODULE'
         else:
             self._BuildType = self._ModuleType.upper()
 
