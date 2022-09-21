@@ -122,7 +122,7 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
             for key in vc_vars.keys():
                 logging.debug(f"Var - {key} = {vc_vars[key]}")
                 if key.lower() == 'path':
-                    shell_env.insert_path(vc_vars[key])
+                    shell_env.set_path(vc_vars[key])
                 else:
                     shell_env.set_shell_var(key, vc_vars[key])
 
