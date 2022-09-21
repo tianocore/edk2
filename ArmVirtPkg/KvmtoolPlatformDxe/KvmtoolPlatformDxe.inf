@@ -21,7 +21,7 @@
   KvmtoolPlatformDxe.c
 
 [Packages]
-  ArmVirtPkg/ArmVirtPkg.dec
+  OvmfPkg/OvmfPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -37,7 +37,7 @@
   gEdkiiPlatformHasDeviceTreeGuid ## SOMETIMES_PRODUCES ## PROTOCOL
 
 [Pcd]
-  gArmVirtTokenSpaceGuid.PcdForceNoAcpi
+  gUefiOvmfPkgTokenSpaceGuid.PcdForceNoAcpi
 
 [Depex]
   TRUE
