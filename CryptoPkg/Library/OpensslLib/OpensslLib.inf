@@ -106,6 +106,7 @@
   $(OPENSSL_PATH)/crypto/async/async_wait.c
   $(OPENSSL_PATH)/crypto/bio/b_addr.c
   $(OPENSSL_PATH)/crypto/bio/b_dump.c
+  $(OPENSSL_PATH)/crypto/bio/b_print.c
   $(OPENSSL_PATH)/crypto/bio/b_sock.c
   $(OPENSSL_PATH)/crypto/bio/b_sock2.c
   $(OPENSSL_PATH)/crypto/bio/bf_buff.c
