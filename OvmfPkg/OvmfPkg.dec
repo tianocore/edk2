@@ -161,6 +161,7 @@
   gVMMBootOrderGuid                     = {0x668f4529, 0x63d0, 0x4bb5, {0xb6, 0x5d, 0x6f, 0xbb, 0x9d, 0x36, 0xa4, 0x4a}}
   gUefiOvmfPkgTdxAcpiHobGuid            = {0x6a0c5870, 0xd4ed, 0x44f4, {0xa1, 0x35, 0xdd, 0x23, 0x8b, 0x6f, 0x0c, 0x8d}}
   gEfiNonCcFvGuid                       = {0xae047c6d, 0xbce9, 0x426c, {0xae, 0x03, 0xa6, 0x8e, 0x3b, 0x8a, 0x04, 0x88}}
+  gOvmfVariableGuid                     = {0x50bea1e5, 0xa2c5, 0x46e9, {0x9b, 0x3a, 0x59, 0x59, 0x65, 0x16, 0xb0, 0x0a}}
 
 [Ppis]
   # PPI whose presence in the PPI database signals that the TPM base address
@@ -466,6 +467,12 @@
   #    1 - set from PlatformConfig
   #    2 - set by GOP Driver.
   gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource|0|UINT8|0x64
+
+  #
+  # Whether to force disable ACPI, regardless of the fw_cfg settings
+  # exposed by QEMU
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdForceNoAcpi|0x0|BOOLEAN|0x69
 
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c
