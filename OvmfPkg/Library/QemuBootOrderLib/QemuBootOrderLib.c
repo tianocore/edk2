@@ -1775,34 +1775,38 @@ StoreQemuBootOrder (
                      Translated,
                      &TranslatedSize
                      );
-  while (!RETURN_ERROR (Status)) {
-    EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  while (Status == EFI_SUCCESS ||
+         Status == EFI_UNSUPPORTED)
+  {
+    if (Status == EFI_SUCCESS) {
+      EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
 
-    //
-    // Convert the UEFI devpath prefix to binary representation.
-    //
-    ASSERT (Translated[TranslatedSize] == L'\0');
-    DevicePath = ConvertTextToDevicePath (Translated);
-    if (DevicePath == NULL) {
-      Status = RETURN_OUT_OF_RESOURCES;
-      goto FreeExtraPciRoots;
+      //
+      // Convert the UEFI devpath prefix to binary representation.
+      //
+      ASSERT (Translated[TranslatedSize] == L'\0');
+      DevicePath = ConvertTextToDevicePath (Translated);
+      if (DevicePath == NULL) {
+        Status = RETURN_OUT_OF_RESOURCES;
+        goto FreeExtraPciRoots;
+      }
+
+      UnicodeSPrint (
+        VariableName,
+        sizeof (VariableName),
+        L"QemuBootOrder%04d",
+        VariableIndex++
+        );
+      DEBUG ((DEBUG_INFO, "%a: %s = %s\n", __FUNCTION__, VariableName, Translated));
+      gRT->SetVariable (
+             VariableName,
+             &gQemuBootOrderGuid,
+             EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+             GetDevicePathSize (DevicePath),
+             DevicePath
+             );
+      FreePool (DevicePath);
     }
-
-    UnicodeSPrint (
-      VariableName,
-      sizeof (VariableName),
-      L"QemuBootOrder%04d",
-      VariableIndex++
-      );
-    DEBUG ((DEBUG_INFO, "%a: %s = %s\n", __FUNCTION__, VariableName, Translated));
-    gRT->SetVariable (
-           VariableName,
-           &gQemuBootOrderGuid,
-           EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-           GetDevicePathSize (DevicePath),
-           DevicePath
-           );
-    FreePool (DevicePath);
 
     //
     // Move to the next OFW devpath.
