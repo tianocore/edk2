@@ -494,7 +494,7 @@ BIO_snprintf (
   ...
   )
 {
-  return 0;
+  return -1;
 }
 
 #ifdef __GNUC__
