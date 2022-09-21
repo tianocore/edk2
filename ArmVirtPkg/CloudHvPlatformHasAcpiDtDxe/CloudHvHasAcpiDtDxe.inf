@@ -36,7 +36,7 @@
   gEdkiiPlatformHasDeviceTreeGuid ## SOMETIMES_PRODUCES ## PROTOCOL
 
 [Pcd]
-  gArmVirtTokenSpaceGuid.PcdForceNoAcpi
+  gUefiOvmfPkgTokenSpaceGuid.PcdForceNoAcpi
 
 [Depex]
   gEfiVariableArchProtocolGuid
