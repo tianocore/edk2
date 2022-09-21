@@ -109,6 +109,8 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
             pc = '"' + pc + '"'
         shell_env.set_shell_var("PYTHON_COMMAND", pc)
 
+        logging.debug(f"Print Path Before - {os.environ.get('path')}")
+
         if self.tool_chain_tag.lower().startswith("vs"):
 
             # # Update environment with required VC vars.
@@ -122,10 +124,11 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
             for key in vc_vars.keys():
                 logging.debug(f"Var - {key} = {vc_vars[key]}")
                 if key.lower() == 'path':
-                    shell_env.set_path(vc_vars[key])
+                    shell_env.insert_path(vc_vars[key])
                 else:
                     shell_env.set_shell_var(key, vc_vars[key])
 
+            logging.debug(f"Print Path After - {os.environ.get('path')}")
             self.OutputDir = os.path.join(
                 shell_env.get_shell_var("EDK_TOOLS_PATH"), "Bin", "Win32")
 
