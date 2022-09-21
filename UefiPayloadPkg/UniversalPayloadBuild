@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+if command -v ${PYTHON_COMMAND} >/dev/null 2>&1; then
+    echo python_exe=${PYTHON_COMMAND}
+fi
+
+upl_bldfile_path=${BASH_SOURCE:-$0}
+echo "upl_bldfile_path=$upl_bldfile_path"
+exec "${python_exe:-python}" "$upl_bldfile_path.py" "$@"
