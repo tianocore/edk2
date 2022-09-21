@@ -34,8 +34,6 @@
   gEarly16550UartBaseAddressGuid   = { 0xea67ca3e, 0x1f54, 0x436b, { 0x97, 0x88, 0xd4, 0xeb, 0x29, 0xc3, 0x42, 0x67 } }
   gArmVirtSystemMemorySizeGuid     = { 0x504eccb9, 0x1bf0, 0x4420, { 0x86, 0x5d, 0xdc, 0x66, 0x06, 0xd4, 0x13, 0xbf } }
 
-  gArmVirtVariableGuid   = { 0x50bea1e5, 0xa2c5, 0x46e9, { 0x9b, 0x3a, 0x59, 0x59, 0x65, 0x16, 0xb0, 0x0a } }
-
 [PcdsFeatureFlag]
   #
   # Feature Flag PCD that defines whether TPM2 support is enabled
@@ -69,10 +67,3 @@
   # Cloud Hypervisor has no other way to pass Rsdp address to the guest except use a PCD.
   #
   gArmVirtTokenSpaceGuid.PcdCloudHvAcpiRsdpBaseAddress|0x0|UINT64|0x00000005
-
-[PcdsDynamic]
-  #
-  # Whether to force disable ACPI, regardless of the fw_cfg settings
-  # exposed by QEMU
-  #
-  gArmVirtTokenSpaceGuid.PcdForceNoAcpi|0x0|BOOLEAN|0x00000003
