@@ -432,6 +432,8 @@ ParseOfwNode (
   OUT     BOOLEAN      *IsFinal
   )
 {
+  BOOLEAN  AcceptSlash = FALSE;
+
   //
   // A leading slash is expected. End of string is tolerated.
   //
@@ -464,6 +466,21 @@ ParseOfwNode (
     return RETURN_INVALID_PARAMETER;
   }
 
+  if (SubstringEq (OfwNode->DriverName, "rom")) {
+    //
+    // bug compatibility hack
+    //
+    // qemu passes fw_cfg filenames as rom unit address.
+    // The filenames have slashes:
+    //      /rom@genroms/linuxboot_dma.bin
+    //
+    // Alow slashes in the unit address to avoid the parser trip up,
+    // so we can successfully parse the following lines (the rom
+    // entries themself are ignored).
+    //
+    AcceptSlash = TRUE;
+  }
+
   //
   // unit-address
   //
@@ -475,7 +492,7 @@ ParseOfwNode (
 
   OfwNode->UnitAddress.Ptr = *Ptr;
   OfwNode->UnitAddress.Len = 0;
-  while (IsPrintNotDelim (**Ptr)) {
+  while (IsPrintNotDelim (**Ptr) || (AcceptSlash && **Ptr == '/')) {
     ++*Ptr;
     ++OfwNode->UnitAddress.Len;
   }
