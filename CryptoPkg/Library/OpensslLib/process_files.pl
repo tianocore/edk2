@@ -113,6 +113,18 @@ BEGIN {
             $uefi_config = "UEFI-x86_64-GCC";
             $extension = "S";
             $comment_character = "#";
+        } elsif (uc ($arch) eq "IA32") {
+            $arch = "IA32";
+            $inf_file = "OpensslLibIa32.inf";
+            $uefi_config = "UEFI-x86";
+            $extension = "nasm";
+            $comment_character = ";";
+        } elsif (uc ($arch) eq "IA32GCC") {
+            $arch = "IA32Gcc";
+            $inf_file = "OpensslLibIa32Gcc.inf";
+            $uefi_config = "UEFI-x86-GCC";
+            $extension = "S";
+            $comment_character = "#";
         } else {
             die "Unsupported architecture \"" . $arch . "\"!";
         }
