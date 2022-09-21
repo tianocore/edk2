@@ -233,14 +233,14 @@ HttpBootStart (
     //
     // Remove the file path from EndPointUri
     //
-    EndPointUriLen = AsciiStrLen(EndPointUri) - AsciiStrLen(BootFilePath) + 1;
+    EndPointUriLen       = AsciiStrLen(EndPointUri) - AsciiStrLen(BootFilePath) + 1;
     Private->EndPointUri = AllocateZeroPool (EndPointUriLen);
     AsciiSPrint (Private->EndPointUri, EndPointUriLen, "%a", EndPointUri);
 
     //
     // Add the file path to FilePathUri
     //
-    FilePathUriLen = AsciiStrLen(Uri) + AsciiStrLen(BootFilePath) + 1;
+    FilePathUriLen       = AsciiStrLen(Uri) + AsciiStrLen(BootFilePath) + 1;
     Private->FilePathUri = AllocateZeroPool (FilePathUriLen);
     AsciiSPrint (Private->FilePathUri, FilePathUriLen, "%a%a", Uri, BootFilePath);
 

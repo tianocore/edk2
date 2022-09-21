@@ -631,7 +631,7 @@ HttpBootParseFilePath (
   }
 
   if (TempUri != NULL) {
-    *UriAddress = TempUri;
+    *UriAddress         = TempUri;
     *EndPointUriAddress = Uri;
   }
 
