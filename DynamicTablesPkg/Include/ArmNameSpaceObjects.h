@@ -13,6 +13,7 @@
 #ifndef ARM_NAMESPACE_OBJECTS_H_
 #define ARM_NAMESPACE_OBJECTS_H_
 
+#include <AmlCpcInfo.h>
 #include <StandardNameSpaceObjects.h>
 
 #pragma pack(1)
@@ -63,6 +64,7 @@ typedef enum ArmObjectID {
   EArmObjPciInterruptMapInfo,          ///< 39 - Pci Interrupt Map Info
   EArmObjRmr,                          ///< 40 - Reserved Memory Range Node
   EArmObjMemoryRangeDescriptor,        ///< 41 - Memory Range Descriptor
+  EArmObjCpcInfo,                      ///< 42 - Continuous Performance Control Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -97,99 +99,104 @@ typedef struct CmArmPowerManagementProfileInfo {
 */
 typedef struct CmArmGicCInfo {
   /// The GIC CPU Interface number.
-  UINT32    CPUInterfaceNumber;
+  UINT32             CPUInterfaceNumber;
 
   /** The ACPI Processor UID. This must match the
       _UID of the CPU Device object information described
       in the DSDT/SSDT for the CPU.
   */
-  UINT32    AcpiProcessorUid;
+  UINT32             AcpiProcessorUid;
 
   /** The flags field as described by the GICC structure
       in the ACPI Specification.
   */
-  UINT32    Flags;
+  UINT32             Flags;
 
   /** The parking protocol version field as described by
     the GICC structure in the ACPI Specification.
   */
-  UINT32    ParkingProtocolVersion;
+  UINT32             ParkingProtocolVersion;
 
   /** The Performance Interrupt field as described by
       the GICC structure in the ACPI Specification.
   */
-  UINT32    PerformanceInterruptGsiv;
+  UINT32             PerformanceInterruptGsiv;
 
   /** The CPU Parked address field as described by
       the GICC structure in the ACPI Specification.
   */
-  UINT64    ParkedAddress;
+  UINT64             ParkedAddress;
 
   /** The base address for the GIC CPU Interface
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT64    PhysicalBaseAddress;
+  UINT64             PhysicalBaseAddress;
 
   /** The base address for GICV interface
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT64    GICV;
+  UINT64             GICV;
 
   /** The base address for GICH interface
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT64    GICH;
+  UINT64             GICH;
 
   /** The GICV maintenance interrupt
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT32    VGICMaintenanceInterrupt;
+  UINT32             VGICMaintenanceInterrupt;
 
   /** The base address for GICR interface
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT64    GICRBaseAddress;
+  UINT64             GICRBaseAddress;
 
   /** The MPIDR for the CPU
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT64    MPIDR;
+  UINT64             MPIDR;
 
   /** The Processor Power Efficiency class
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT8     ProcessorPowerEfficiencyClass;
+  UINT8              ProcessorPowerEfficiencyClass;
 
   /** Statistical Profiling Extension buffer overflow GSIV. Zero if
       unsupported by this processor. This field was introduced in
       ACPI 6.3 (MADT revision 5) and is therefore ignored when
       generating MADT revision 4 or lower.
   */
-  UINT16    SpeOverflowInterrupt;
+  UINT16             SpeOverflowInterrupt;
 
   /** The proximity domain to which the logical processor belongs.
       This field is used to populate the GICC affinity structure
       in the SRAT table.
   */
-  UINT32    ProximityDomain;
+  UINT32             ProximityDomain;
 
   /** The clock domain to which the logical processor belongs.
       This field is used to populate the GICC affinity structure
       in the SRAT table.
   */
-  UINT32    ClockDomain;
+  UINT32             ClockDomain;
 
   /** The GICC Affinity flags field as described by the GICC Affinity structure
       in the SRAT table.
   */
-  UINT32    AffinityFlags;
+  UINT32             AffinityFlags;
+
+  /** Optional field: Reference Token for the Cpc info of this processor.
+      i.e. a token referencing a CM_ARM_CPC_INFO object.
+  */
+  CM_OBJECT_TOKEN    CpcToken;
 } CM_ARM_GICC_INFO;
 
 /** A structure that describes the
@@ -1069,6 +1076,24 @@ typedef struct CmArmRmrDescriptor {
   /// Must be a multiple of the page size of 64K.
   UINT64    Length;
 } CM_ARM_MEMORY_RANGE_DESCRIPTOR;
+
+/** A structure that describes the Cpc information.
+
+  Continuous Performance Control is described in DSDT/SSDT and associated
+  to cpus/clusters in the cpu topology.
+
+  Unsupported Optional registers should be encoded with NULL resource
+  Register {(SystemMemory, 0, 0, 0, 0)}
+
+  For values that support Integer or Buffer, integer will be used
+  if buffer is NULL resource.
+  If resource is not NULL then Integer must be 0
+
+  Cf. ACPI 6.4, s8.4.7.1 _CPC (Continuous Performance Control)
+
+  ID: EArmObjCpcInfo
+*/
+typedef AML_CPC_INFO CM_ARM_CPC_INFO;
 
 #pragma pack()
 
