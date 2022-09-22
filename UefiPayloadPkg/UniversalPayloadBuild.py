@@ -1,4 +1,4 @@
-## @file
+## @file1
 # This file contains the script to build UniversalPayload
 #
 # Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
