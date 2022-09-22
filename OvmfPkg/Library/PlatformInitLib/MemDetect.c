@@ -55,15 +55,25 @@ PlatformQemuUc32BaseInitialization (
   }
 
   if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
-    //
-    // On q35, the 32-bit area that we'll mark as UC, through variable MTRRs,
-    // starts at PcdPciExpressBaseAddress. The platform DSC is responsible for
-    // setting PcdPciExpressBaseAddress such that describing the
-    // [PcdPciExpressBaseAddress, 4GB) range require a very small number of
-    // variable MTRRs (preferably 1 or 2).
-    //
+    LowerMemorySize = PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
     ASSERT (PcdGet64 (PcdPciExpressBaseAddress) <= MAX_UINT32);
-    PlatformInfoHob->Uc32Base = (UINT32)PcdGet64 (PcdPciExpressBaseAddress);
+    ASSERT (PcdGet64 (PcdPciExpressBaseAddress) >= LowerMemorySize);
+
+    if (LowerMemorySize <= BASE_2GB) {
+      // Newer qemu with gigabyte aligned memory,
+      // 32-bit pci mmio window is 2G -> 4G then.
+      PlatformInfoHob->Uc32Base = BASE_2GB;
+    } else {
+      //
+      // On q35, the 32-bit area that we'll mark as UC, through variable MTRRs,
+      // starts at PcdPciExpressBaseAddress. The platform DSC is responsible for
+      // setting PcdPciExpressBaseAddress such that describing the
+      // [PcdPciExpressBaseAddress, 4GB) range require a very small number of
+      // variable MTRRs (preferably 1 or 2).
+      //
+      PlatformInfoHob->Uc32Base = (UINT32)PcdGet64 (PcdPciExpressBaseAddress);
+    }
+
     return;
   }
 
