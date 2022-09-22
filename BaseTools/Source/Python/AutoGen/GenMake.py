@@ -24,7 +24,7 @@ import Common.GlobalData as GlobalData
 from collections import OrderedDict
 from Common.DataType import TAB_COMPILER_MSFT
 
-## Regular expression for finding header file inclusions
+## Regular expression for finding header file inclusions Bjj
 gIncludePattern = re.compile(r"^[ \t]*[#%]?[ \t]*include(?:[ \t]*(?:\\(?:\r\n|\r|\n))*[ \t]*)*(?:\(?[\"<]?[ \t]*)([-\w.\\/() \t]+)(?:[ \t]*[\">]?\)?)", re.MULTILINE | re.UNICODE | re.IGNORECASE)
 
 ## Regular expression for matching macro used in header file inclusion
