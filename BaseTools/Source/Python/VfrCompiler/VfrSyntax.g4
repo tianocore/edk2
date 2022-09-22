@@ -481,7 +481,7 @@ locals[OpObj=CIfrResetButton()]
        'endresetbutton' ';'
     ;
 
-vfrStatementQuestions // doing
+vfrStatementQuestions // doing 
     :   vfrStatementBooleanType
     |   vfrStatementDate
     |   vfrStatementNumericType
@@ -555,7 +555,7 @@ vfrStatementQuestionTagList
     :   (vfrStatementQuestionTag)* 
     ;
 
-vfrStatementQuestionOptionTag // doing
+vfrStatementQuestionOptionTag // doing 
     :   vfrStatementSuppressIfQuest
     |   vfrStatementValue
     |   vfrStatementDefault
@@ -603,20 +603,22 @@ vfrStatementOptions
     ;
 
 vfrStatementOneOfOption 
+locals[OOOObj=None] //CIfrOneOfOption()
     :   'option'
-        'text' '=' getStringId ','
+        'text' '=' 'STRING_TOKEN' '(' Number ')' ','
         'value' '=' vfrConstantValueField ','
-        'flags' '=' vfrOneOfOptionFlags(',' vfrImageTag)* ';'
+        'flags' '=' vfrOneOfOptionFlags (',' 'key' '=' Number) ? (',' vfrImageTag)* ';'
     ;
 
-vfrOneOfOptionFlags 
-    :   oneofoptionFlagsField ('|' oneofoptionFlagsField)*
-    ;
+vfrOneOfOptionFlags
+locals[HFlags=0, LFlags=0, LineNum=0]
+    :   oneofoptionFlagsField ('|' oneofoptionFlagsField)*;
 
-oneofoptionFlagsField 
+oneofoptionFlagsField
+	locals[HFlag=0, LFlag=0]
     :   Number
-    |   'OPTION_DEFAULT'
-    |   'OPTION_DEFAULT_MFG'
+    |   OptionDefault
+    |   OptionDefaultMfg
     |   InteractiveFlag
     |   ResetRequiredFlag
     |   RestStyleFlag
@@ -646,9 +648,9 @@ vfrStatementBooleanType
     ;
 
 vfrStatementCheckBox 
-locals[OpObj=CIfrCheckBox(), BaseInfo=EFI_VARSTORE_INFO(), QId=EFI_QUESTION_ID_INVALID]
+locals[OpObj=CIfrCheckBox(), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'checkbox'
-        vfrQuestionBaseInfo[localctx.OpObj, EFI_QUESION_TYPE.QUESTION_NORMAL] 
+        vfrQuestionBaseInfo[localctx.OpObj, QType] 
         vfrStatementHeader[localctx.OpObj] ','
         ('flags' '=' vfrCheckBoxFlags ',')?
         ('key' '=' Number ',')?
@@ -694,29 +696,31 @@ vfrStatementNumericType
     :   vfrStatementNumeric | vfrStatementOneOf
     ;
 
-vfrStatementNumeric 
-locals[OpObj=CIfrNumeric(), BaseInfo=None, QId=None]
+vfrStatementNumeric  
+locals[OpObj=CIfrNumeric(), QType=EFI_QUESION_TYPE.QUESTION_NORMAL] // BaseInfo=EFI_VARSTORE_INFO() not needed
     :   'numeric'
-        vfrQuestionBaseInfo[localctx.OpObj, None]  
+        vfrQuestionBaseInfo[localctx.OpObj, localctx.QType]  
         vfrStatementHeader[localctx.OpObj] ','
         ('flags' '=' vfrNumericFlags ',')?
         ('key' '=' Number ',')?
-        vfrSetMinMaxStep
+        vfrSetMinMaxStep[localctx.OpObj]
         vfrStatementQuestionOptionList
         'endnumeric' ';'
     ;
 
-vfrSetMinMaxStep 
-    :   'minimum' '=' Number ','
-        'maximum' '=' Number ','
+vfrSetMinMaxStep[OpObj] // CIfrMinMaxStepData
+    :   'minimum' '=' ('-')? Number ','
+        'maximum' '=' ('-')? Number ','
         ('step' '=' Number ',')?
     ;
 
-vfrNumericFlags 
+vfrNumericFlags
+locals[HFlags=0, LFlags=0,IsDisplaySpecified=False,LineNum=0]
     :   numericFlagsField ('|' numericFlagsField)*
     ;
 
 numericFlagsField
+locals[HFlag=0,LFlag=0,IsSetType=False,IsDisplaySpecified=False]
     :   Number
     |   'NUMERIC_SIZE_1'
     |   'NUMERIC_SIZE_2'
@@ -729,12 +733,12 @@ numericFlagsField
     ;
 
 vfrStatementOneOf
-locals[OpObj=CIfrOneOf(), BaseInfo=None, QId=None]
+locals[OpObj=CIfrOneOf(), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'oneof'
-        vfrQuestionBaseInfo[localctx.OpObj, None] 
+        vfrQuestionBaseInfo[localctx.OpObj, localctx.QType] 
         vfrStatementHeader[localctx.OpObj] ','
         ('flags' '=' vfrOneofFlagsField ',')?
-        (vfrSetMinMaxStep)?
+        (vfrSetMinMaxStep[localctx.OpObj])?
         vfrStatementQuestionOptionList
         'endoneof' ';'
     ;
@@ -795,7 +799,7 @@ locals[HFlag=0]
     ;
 
 vfrStatementOrderedList 
-locals[OpObj=CIfrOrderedList(), QType=QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
+locals[OpObj=CIfrOrderedList(), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'orderedlist'
         vfrQuestionHeader[localctx.OpObj, localctx.QType] ','
         ('maxcontainers' '=' Number ',')?
@@ -1463,7 +1467,7 @@ Numeric : 'numeric';
 EndNumeric : 'endnumeric';
 Minimum : 'minimum';
 Maximum : 'maximum';
-STEP : 'step';
+Step : 'step';
 Default : 'default';
 Password : 'password';
 EndPassword : 'endpassword';
@@ -1614,7 +1618,18 @@ QuestionRefVal: 'questionrefval';
 StringRefVal: 'stringrefval';
 Map: 'map';
 RefreshGuid: 'refreshguid';
-StringToken : 'STRING_TOKEN';
+StringToken: 'STRING_TOKEN';
+
+OptionDefault: 'OPTION_DEFAULT';
+OptionDefaultMfg: 'OPTION_DEFAULT_MFG';
+
+NumericSizeOne: 'NUMERIC_SIZE_1';
+NumericSizeTwo: 'NUMERIC_SIZE_2';
+NumericSizeFour: 'NUMERIC_SIZE_4';
+NumericSizeEight: 'NUMERIC_SIZE_8';
+DisPlayIntDec: 'DISPLAY_INT_DEC';
+DisPlayUIntDec: 'DISPLAY_UINT_DEC';
+DisPlayUIntHex: 'DISPLAY_UINT_HEX';
 
 Number 
     :   ('0x'[0-9A-Fa-f]+) | [0-9]+

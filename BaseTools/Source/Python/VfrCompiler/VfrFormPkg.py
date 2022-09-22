@@ -1,4 +1,6 @@
 from ast import For
+from re import L
+from sre_parse import FLAGS
 from stat import FILE_ATTRIBUTE_SPARSE_FILE
 from CommonCtypes import *
 from VfrError import VfrReturnCode
@@ -327,7 +329,7 @@ class CIfrOpHeader():
 
     def __init__(self, OpCode, OpHeader: EFI_IFR_OP_HEADER, Length=0):
         self.__OpHeader = OpHeader
-        self.__OpHeader.Opcode = OpCode
+        self.__OpHeader.OpCode = OpCode
 
         self.__OpHeader.Length = OpcodeSizesScopeTable[OpCode].Size if Length == 0 else Length
         self.__OpHeader.Scope = 1 if (OpcodeSizesScopeTable[OpCode].Scope + gScopeCount > 0) else 0
@@ -349,6 +351,9 @@ class CIfrOpHeader():
 
     def DecLength(self, Size):
         self.__OpHeader.Length -= Size
+    
+    def GetOpCode(self):
+        return self.__OpHeader.OpCode
 
 
 class CIfrStatementHeader():
@@ -519,6 +524,93 @@ class CIfrFormSet(CIfrObj, CIfrOpHeader):
         return self.__FormSet.Flags
 
 
+class CIfrOneOfOption(CIfrObj, CIfrOpHeader):
+
+    def __init__(self, Size):  #
+        self.__OneOfOption = EFI_IFR_ONE_OF_OPTION()
+        CIfrOpHeader.__init__(self, EFI_IFR_ONE_OF_OPTION_OP, self.__OneOfOption.Header, Size)
+        self.__OneOfOption.Flags = 0
+        self.__OneOfOption.Option = EFI_STRING_ID_INVALID
+        self.__OneOfOption.Type = EFI_IFR_TYPE_OTHER
+        self.__OneOfOption.Value = EFI_IFR_TYPE_VALUE() #
+
+    def SetOption(self, Option):
+        self.__OneOfOption.Option = Option
+
+    def SetType(self, Type):
+        self.__OneOfOption.Type = Type
+
+    def SetValue(self, Value): #
+        self.__OneOfOption.Value = Value
+
+    def GetFlags(self):
+        return self.__OneOfOption.Flags
+
+    def SetFlags(self, LFlags):
+
+        self.__OneOfOption.Flags = 0
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_OPTION_DEFAULT)
+        if Ret:
+            self.__OneOfOption.Flags |= EFI_IFR_OPTION_DEFAULT
+            
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_OPTION_DEFAULT_MFG)
+        if Ret:
+            self.__OneOfOption.Flags |= EFI_IFR_OPTION_DEFAULT_MFG
+
+
+        if LFlags == EFI_IFR_TYPE_NUM_SIZE_8:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_8)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_8
+
+        elif LFlags == EFI_IFR_TYPE_NUM_SIZE_16:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_16)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_16
+
+        elif LFlags == EFI_IFR_TYPE_NUM_SIZE_32:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_32)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_32
+
+        elif LFlags == EFI_IFR_TYPE_NUM_SIZE_64:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_64)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_64
+
+        elif LFlags == EFI_IFR_TYPE_BOOLEAN:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_BOOLEAN)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_BOOLEAN
+
+        elif LFlags == EFI_IFR_TYPE_TIME:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_TIME)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_TIME
+
+        elif LFlags == EFI_IFR_TYPE_DATE:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_DATE)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_DATE
+
+        elif LFlags == EFI_IFR_TYPE_STRING:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_STRING)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_STRING
+
+        elif LFlags == EFI_IFR_TYPE_OTHER:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_OTHER)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_OTHER
+
+        return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
+
+
+class CIfrOptionKey(CIfrObj, CIfrOpHeader):
+
+    def __init__(self, QuestionId, OptionValue, KeyValue):  
+        
+        self.__OptionKey = EFI_IFR_GUID_OPTIONKEY()
+        CIfrOpHeader.__init__(self, EFI_IFR_GUID_OP, self.__OptionKey.Header,
+                              ctypes.sizeof(EFI_IFR_GUID_OPTIONKEY))
+        self.__OptionKey.ExtendOpCode = EFI_IFR_EXTEND_OP_OPTIONKEY
+        self.__OptionKey.Guid = EFI_IFR_FRAMEWORK_GUID
+        self.__OptionKey.QuestionId = QuestionId
+        self.__OptionKey.OptionValue = OptionValue
+        self.__OptionKey.KeyValue = KeyValue
+
+
 class CIfrClass(CIfrObj, CIfrOpHeader):
 
     def __init__(self, ):  #
@@ -539,7 +631,7 @@ class CIfrSubClass(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, EFI_IFR_GUID_OP, self.__SubClass.Header, ctypes.sizeof(EFI_IFR_GUID_SUBCLASS))
         self.__SubClass.ExtendOpCode = EFI_IFR_EXTEND_OP_SUBCLASS
         self.__SubClass.Guid = EFI_IFR_TIANO_GUID
-        self.__SubClass.Class = EFI_SETUP_APPLICATION_SUBCLASS
+        self.__SubClass.SubClass = EFI_SETUP_APPLICATION_SUBCLASS
 
     def SetSubClass(self, SubClass):
         self.__SubClass = SubClass
@@ -1000,8 +1092,8 @@ class CIfrOrderedList(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
         self.__OrderedList.MaxContainers = 0
         self.__OrderedList.Flags = 0
 
-    def GetQuestion(self, Question):
-        return self.__OrderedList.Question
+    def GetQuestion(self):
+        return self
         # gCurrentQuestion = self.__OrderedList.Question
 
     def SetMaxContainers(self, MaxContainers):
@@ -1012,11 +1104,12 @@ class CIfrOrderedList(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
         ReturnCode = CIfrQuestionHeader.SetFlags(self, HFlags) #
         if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
             return ReturnCode
-
-        if _FLAG_TEST_AND_CLEAR (LFlags, EFI_IFR_UNIQUE_SET):
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, EFI_IFR_UNIQUE_SET)
+        if Ret:
             self.__OrderedList.Flags |= EFI_IFR_UNIQUE_SET
-
-        if _FLAG_TEST_AND_CLEAR (LFlags, EFI_IFR_NO_EMPTY_SET):
+        
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, EFI_IFR_NO_EMPTY_SET)
+        if Ret:
             self.__OrderedList.Flags |= EFI_IFR_NO_EMPTY_SET
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
@@ -1034,8 +1127,8 @@ class CIfrString(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
         self.__Str.MaxSize = 0
 
 
-    def GetQuestion(self, Question):
-        return self.__Str.Question
+    def GetQuestion(self):
+        return self
         # gCurrentQuestion = self.__Str.Question
 
     def SetFlags(self, HFlags, LFlags):
@@ -1043,8 +1136,9 @@ class CIfrString(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
         ReturnCode = CIfrQuestionHeader.SetFlags(self, HFlags) #
         if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
             return ReturnCode
-
-        if _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_STRING_MULTI_LINE):
+        
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_STRING_MULTI_LINE)
+        if Ret:
             self.__Str.Flags |= EFI_IFR_STRING_MULTI_LINE
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
@@ -1065,8 +1159,8 @@ class CIfrPassword(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
         self.__Password.MinSize = 0
         self.__Password.MaxSize = 0
 
-    def GetQuestion(self, Question):
-        return self.__Password.Question
+    def GetQuestion(self):
+        return self
         # gCurrentQuestion = self.__Password.Question
 
     def SetMinSize(self, MinSize):
@@ -1240,22 +1334,28 @@ class CIfrDate(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
         if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
             return ReturnCode
 
-        if _FLAG_TEST_AND_CLEAR (LFlags, EFI_QF_DATE_YEAR_SUPPRESS):
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, EFI_QF_DATE_YEAR_SUPPRESS)
+        if Ret:
             self.__Date.Flags |= EFI_QF_DATE_YEAR_SUPPRESS
 
-        if _FLAG_TEST_AND_CLEAR (LFlags, EFI_QF_DATE_MONTH_SUPPRESS):
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, EFI_QF_DATE_MONTH_SUPPRESS)
+        if Ret:
             self.__Date.Flags |= EFI_QF_DATE_MONTH_SUPPRESS
 
-        if _FLAG_TEST_AND_CLEAR (LFlags, EFI_QF_DATE_DAY_SUPPRESS):
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, EFI_QF_DATE_DAY_SUPPRESS)
+        if Ret:
             self.__Date.Flags |= EFI_QF_DATE_DAY_SUPPRESS
 
-        if _FLAG_TEST_AND_CLEAR (LFlags, QF_DATE_STORAGE_NORMAL):
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, QF_DATE_STORAGE_NORMAL)
+        if Ret:
             self.__Date.Flags |= QF_DATE_STORAGE_NORMAL
 
-        if _FLAG_TEST_AND_CLEAR (LFlags, QF_DATE_STORAGE_TIME):
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, QF_DATE_STORAGE_TIME)
+        if Ret:
             self.__Date.Flags |= QF_DATE_STORAGE_TIME
 
-        if _FLAG_TEST_AND_CLEAR (LFlags, QF_DATE_STORAGE_WAKEUP):
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, QF_DATE_STORAGE_WAKEUP)
+        if Ret:
             self.__Date.Flags |= QF_DATE_STORAGE_WAKEUP
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
@@ -1276,22 +1376,28 @@ class CIfrTime(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
         if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
             return ReturnCode
 
-        if _FLAG_TEST_AND_CLEAR (LFlags, QF_TIME_HOUR_SUPPRESS):
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, QF_TIME_HOUR_SUPPRESS)
+        if Ret:
             self.__Time.Flags |= QF_TIME_HOUR_SUPPRESS
 
-        if _FLAG_TEST_AND_CLEAR (LFlags, QF_TIME_MINUTE_SUPPRESS):
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, QF_TIME_MINUTE_SUPPRESS)
+        if Ret:
             self.__Time.Flags |= QF_TIME_MINUTE_SUPPRESS
 
-        if _FLAG_TEST_AND_CLEAR (LFlags, QF_TIME_SECOND_SUPPRESS):
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, QF_TIME_SECOND_SUPPRESS)
+        if Ret:
             self.__Time.Flags |= QF_TIME_SECOND_SUPPRESS
 
-        if _FLAG_TEST_AND_CLEAR (LFlags, QF_TIME_STORAGE_NORMAL):
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, QF_TIME_STORAGE_NORMAL)
+        if Ret:
             self.__Time.Flags |= QF_TIME_STORAGE_NORMAL
 
-        if _FLAG_TEST_AND_CLEAR (LFlags, QF_TIME_STORAGE_TIME):
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, QF_TIME_STORAGE_TIME)
+        if Ret:
             self.__Time.Flags |= QF_TIME_STORAGE_TIME
 
-        if _FLAG_TEST_AND_CLEAR (LFlags, QF_TIME_STORAGE_WAKEUP):
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, QF_TIME_STORAGE_WAKEUP)
+        if Ret:
             self.__Time.Flags |= QF_TIME_STORAGE_WAKEUP
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
@@ -1300,19 +1406,49 @@ class CIfrTime(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 class CIfrNumeric(CIfrObj, CIfrOpHeader, CIfrQuestionHeader, CIfrMinMaxStepData):
 
     def __init__(self):
-        self.__Numeric = EFI_IFR_NUMERIC()
+        self.__Numeric = EFI_IFR_NUMERIC() # data
         CIfrOpHeader.__init__(self, EFI_IFR_NUMERIC_OP, self.__Numeric.Header)
         CIfrQuestionHeader.__init__(self, self.__Numeric.Question)
-        CIfrMinMaxStepData.__init__(self, self.__Numeric.data, True)
+        CIfrMinMaxStepData.__init__(self, self.__Numeric.Data, True)
         self.__Numeric.Flags = EFI_IFR_NUMERIC_SIZE_1 | EFI_IFR_DISPLAY_UINT_DEC
 
-    def GetQuestion(self, Question):
-        return self.__Numeric.Question
+    def GetQuestion(self):
+        return self
 
     def GetMinMaxData(self, MinMaxStepData):
-        return self.___Numeric.data
-
-
+        return self.__Numeric.Data
+    
+    def SetFlags(self, HFlags, LFlags, DisplaySettingsSpecified=False):
+        ReturnCode = CIfrQuestionHeader.SetFlags(self, HFlags) #
+        if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
+            return ReturnCode
+        if DisplaySettingsSpecified == False:
+            self.__Numeric.Flags = LFlags | EFI_IFR_DISPLAY_UINT_DEC
+        else:
+            self.__Numeric.Flags = LFlags
+        return VfrReturnCode.VFR_RETURN_SUCCESS
+    
+    def SetFlagsForBitField(self, HFlags, LFlags, DisplaySettingsSpecified=False):
+        ReturnCode = CIfrQuestionHeader.SetFlags(self, HFlags) #
+        if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
+            return ReturnCode
+        if DisplaySettingsSpecified == False:
+            self.__Numeric.Flags = LFlags | EDKII_IFR_DISPLAY_UINT_DEC_BIT
+        else:
+            self.__Numeric.Flags = LFlags
+        return VfrReturnCode.VFR_RETURN_SUCCESS   
+    
+    def GetNumericFlags(self):
+        return self.__Numeric.Flags
+    
+    def ShrinkBinSize(self, Size):
+        self.ShrinkBinSize(Size)
+        self.DecLength(Size)
+        #  _EMIT_PENDING_OBJ();
+        Numeric = EFI_IFR_NUMERIC() 
+        self.UpdateHeader()
+        
+        
 
 class CIfrOneOf(CIfrObj, CIfrOpHeader, CIfrQuestionHeader, ):  #
 
@@ -1331,8 +1467,8 @@ class CIfrCheckBox(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
         CIfrQuestionHeader.__init__(self, self.__CheckBox.Question)
         self.__CheckBox.Flags = 0
 
-    def GetQuestion(self, Question):
-        return self.__CheckBox.Question
+    def GetQuestion(self):
+        return self
         # gCurrentQuestion = self.__CheckBox.Question
 
     def GetFlags(self):
@@ -1343,15 +1479,16 @@ class CIfrCheckBox(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
         ReturnCode = CIfrQuestionHeader.SetFlags(self, HFlags) #
         if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
             return ReturnCode
-
-        if _FLAG_TEST_AND_CLEAR (LFlags, EFI_IFR_CHECKBOX_DEFAULT):
+        
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, EFI_IFR_CHECKBOX_DEFAULT)
+        if Ret:
             self.__CheckBox.Flags |= EFI_IFR_CHECKBOX_DEFAULT
 
-        if _FLAG_TEST_AND_CLEAR (LFlags, EFI_IFR_CHECKBOX_DEFAULT_MFG):
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR (LFlags, EFI_IFR_CHECKBOX_DEFAULT_MFG)
+        if Ret:
             self.__CheckBox.Flags |= EFI_IFR_CHECKBOX_DEFAULT_MFG
 
         VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
-
 
 
 class CIfrResetButton(CIfrObj, CIfrOpHeader, CIfrStatementHeader):

@@ -78,6 +78,13 @@ EFI_IFR_FLAG_OPTIONS_ONLY = 0x80
 
 EFI_IFR_STRING_MULTI_LINE = 0x01
 
+EDKII_IFR_DISPLAY_BIT = 0xC0
+EDKII_IFR_DISPLAY_INT_DEC_BIT = 0x00
+EDKII_IFR_DISPLAY_UINT_DEC_BIT = 0x40
+EDKII_IFR_DISPLAY_UINT_HEX_BIT = 0x80
+
+EDKII_IFR_NUMERIC_SIZE_BIT = 0x3F
+
 
 class EFI_GUID(Structure):
     _pack_ = 1
@@ -110,13 +117,18 @@ GuidArray = c_ubyte * 8
 EFI_HII_PLATFORM_SETUP_FORMSET_GUID = EFI_GUID(
     0x93039971, 0x8545, 0x4b04,
     GuidArray(0xb4, 0x5e, 0x32, 0xeb, 0x83, 0x26, 0x4, 0xe))
+
 EFI_IFR_TIANO_GUID = EFI_GUID(
     0xf0b1735, 0x87a0, 0x4193,
     GuidArray(0xb2, 0x66, 0x53, 0x8c, 0x38, 0xaf, 0x48, 0xce))
+
 EDKII_IFR_BIT_VARSTORE_GUID = (0x82DDD68B, 0x9163, 0x4187,
                                GuidArray(0x9B, 0x27, 0x20, 0xA8, 0xFD, 0x60,
                                          0xA7, 0x1D))
 
+EFI_IFR_FRAMEWORK_GUID = (0x31ca5d1a, 0xd511, 0x4931,
+                          GuidArray(0xb7, 0x82, 0xae, 0x6b, 0x2b, 0x17, 0x8c,
+                                    0xd7))
 
 class EFI_IFR_OP_HEADER(Structure):
     _pack_ = 1
@@ -415,7 +427,7 @@ class EFI_IFR_NUMERIC(Structure):
         ('Header', EFI_IFR_OP_HEADER),
         ('Question', EFI_IFR_QUESTION_HEADER),
         ('Flags', c_ubyte),
-        ('data', MINMAXSTEP_DATA),
+        ('Data', MINMAXSTEP_DATA),
     ]
 
 
@@ -481,6 +493,10 @@ class EFI_IFR_ONE_OF_OPTION(Structure):
         ('Type', c_ubyte),
         ('Value', EFI_IFR_TYPE_VALUE),
     ]
+
+
+EFI_IFR_OPTION_DEFAULT = 0x10
+EFI_IFR_OPTION_DEFAULT_MFG = 0x20
 
 
 class EFI_IFR_SUPPRESS_IF(Structure):
@@ -1288,11 +1304,18 @@ EFI_IFR_REFRESH_ID_OP = 0x62
 EFI_IFR_WARNING_IF_OP = 0x63
 EFI_IFR_MATCH2_OP = 0x64
 
-class a():
-    def __init__(self) -> None:
-        self._v = 0
 
-class b():
-    def __init__(self) -> None:
-        self._a = 0
+class EFI_IFR_GUID_OPTIONKEY(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_IFR_OP_HEADER),
+        ('Guid', EFI_GUID),
+        ('ExtendOpCode', c_uint8),
+        ('QuestionId', c_uint16),
+        ('OptionValue', EFI_IFR_TYPE_VALUE),
+        ('KeyValue', c_uint16),
+    ]
 
+
+EFI_IFR_EXTEND_OP_OPTIONKEY = 0x0
+EFI_IFR_EXTEND_OP_VAREQNAME = 0x1

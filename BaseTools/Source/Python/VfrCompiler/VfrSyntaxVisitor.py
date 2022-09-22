@@ -1,10 +1,10 @@
-# Generated from VfrSyntax.g4 by ANTLR 4.7.2
 from cgi import print_environ_usage
 from email.errors import NonPrintableDefect
 from enum import Flag
 from fileinput import lineno
 from itertools import count
 from modulefinder import STORE_NAME
+from msilib.schema import CreateFolder
 from sre_parse import FLAGS
 from tokenize import Number
 from antlr4 import *
@@ -1562,9 +1562,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 if self.__CurrQestVarInfo.IsBitVar:
                     Size = sizeof(c_ulong)
                 else:
-                    Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(self.__CurrQestVarInfo.VarType)
+                    Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(Type)
                 
-                # Size += self.OFFSET_OF (EFI_IFR_DEFAULT, Value) ########
+            # Size += self.OFFSET_OF (EFI_IFR_DEFAULT, Value) ########
             ctx.DObj = CIfrDefault(Size)
             ctx.DObj.SetLineNo((None if ctx.start is None else ctx.start).line)
                 
@@ -1621,17 +1621,138 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementOneOfOption.
     def visitVfrStatementOneOfOption(self, ctx:VfrSyntaxParser.VfrStatementOneOfOptionContext):
-        return self.visitChildren(ctx)
+        
+        if self.__CurrQestVarInfo.VarType == EFI_IFR_TYPE_OTHER:
+            ReturnCode = VfrReturnCode.VFR_RETURN_FATAL_ERROR
+            print("Get data type error.")
+            
+        self.visitChildren(ctx)
+        
+        Value = ctx.vfrConstantValueField().Value
+        Type = self.__CurrQestVarInfo.VarType
+        Size = 0 
+        if self.__CurrentMinMaxData != None:
+            #set min/max value for oneof opcode
+            Step = self.__CurrentMinMaxData.GetStepData(self.__CurrQestVarInfo.VarType, self.__CurrQestVarInfo.IsBitVar)
+            if self.__CurrQestVarInfo.IsBitVar:
+                self.__CurrentMinMaxData.SetMinMaxStepData(Value.u32, Value.u32, Step, EFI_IFR_TYPE_NUM_SIZE_32)
+            else:
+                if Type == EFI_IFR_TYPE_NUM_SIZE_64:
+                    self.__CurrentMinMaxData.SetMinMaxStepData(Value.u64, Value.u64, Step, EFI_IFR_TYPE_NUM_SIZE_64)
+                if Type == EFI_IFR_TYPE_NUM_SIZE_32:
+                    self.__CurrentMinMaxData.SetMinMaxStepData(Value.u32, Value.u32, Step, EFI_IFR_TYPE_NUM_SIZE_32)
+                if Type == EFI_IFR_TYPE_NUM_SIZE_16:
+                    self.__CurrentMinMaxData.SetMinMaxStepData(Value.u16, Value.u16, Step, EFI_IFR_TYPE_NUM_SIZE_16)
+                if Type == EFI_IFR_TYPE_NUM_SIZE_8:
+                    self.__CurrentMinMaxData.SetMinMaxStepData(Value.u8, Value.u8, Step, EFI_IFR_TYPE_NUM_SIZE_8)
+            
+        if self.__CurrQestVarInfo.VarType == EFI_IFR_TYPE_OTHER:
+            Size = sizeof(EFI_IFR_TYPE_VALUE)
+        elif ctx.vfrConstantValueField().ListType:
+            Size = len(Value)
+            if Type == EFI_IFR_TYPE_NUM_SIZE_16:
+                Size *= sizeof(c_ushort)
+            if Type == EFI_IFR_TYPE_NUM_SIZE_32:
+                Size *= sizeof(c_ulong)
+            if Type == EFI_IFR_TYPE_NUM_SIZE_64:
+                Size *= sizeof(c_ulonglong)
+        else:
+            # For the oneof stored in bit fields, set the option type as UINT32.
+            if self.__CurrQestVarInfo.IsBitVar:
+                Size = sizeof(c_long)
+            else:
+                Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(Type)
+        # Size + = offset
+        ctx.OOOObj = CIfrOneOfOption(Size)
+        ctx.OOOObj.SetLineNo((None if ctx.start is None else ctx.start).line)
+        ctx.OOOObj.SetOption(self.__TransNum(ctx.Number(0)))
+        if ctx.vfrConstantValueField().ListType:
+            ctx.OOOObj.SetType(EFI_IFR_TYPE_BUFFER)
+        else:
+            if self.__CurrQestVarInfo.IsBitVar:
+                ctx.OOOObj.SetType(EFI_IFR_TYPE_NUM_SIZE_32)
+            else:
+                ctx.OOOObj.SetType(Type)
+                
+        ctx.OOOObj.SetValue(Value) # 
+        ctx.OOOObj.SetFlags(ctx.vfrOneOfOptionFlags().LFlags)
+        # Array type only for default type OneOfOption.
+        if (ctx.OOOObj.GetFlags() & (EFI_IFR_OPTION_DEFAULT | EFI_IFR_OPTION_DEFAULT_MFG)) == 0 and (ctx.vfrConstantValueField().ListType):
+            ReturnCode = VfrReturnCode.VFR_RETURN_FATAL_ERROR
+            print("Default keyword should with array value type!")            
+        
+        # Clear the default flag if the option not use array value but has default flag.
+        if (ctx.OOOObj.GetFlags() & (EFI_IFR_OPTION_DEFAULT | EFI_IFR_OPTION_DEFAULT_MFG)) != 0 and (ctx.vfrConstantValueField().ListType == False) and (self.__IsOrderedList):
+            ctx.OOOObj.SetFlags(ctx.OOOObj.GetFlags() & ~(EFI_IFR_OPTION_DEFAULT | EFI_IFR_OPTION_DEFAULT_MFG))
+        
+        if self.__CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
+            VarStoreName, ReturnCode = gCVfrDataStorage.GetVarStoreName(self.__CurrQestVarInfo.VarStoreId)
+            VarStoreGuid = gCVfrDataStorage.GetVarStoreGuid(self.__CurrQestVarInfo.VarStoreId)
+            if ctx.OOOObj.GetFlags() & EFI_IFR_OPTION_DEFAULT:
+                self.__CheckDuplicateDefaultValue(EFI_HII_DEFAULT_CLASS_STANDARD, ctx.FLAGS()) #
+                ReturnCode = gCVfrDefaultStore.BufferVarStoreAltConfigAdd(EFI_HII_DEFAULT_CLASS_STANDARD, self.__CurrQestVarInfo, VarStoreName, VarStoreGuid, self.__CurrQestVarInfo.VarType, Value)
+            if ctx.OOOObj.GetFlags() & EFI_IFR_OPTION_DEFAULT_MFG:
+                self.__CheckDuplicateDefaultValue(EFI_HII_DEFAULT_CLASS_MANUFACTURING, ctx.FLAGS()) #
+                ReturnCode = gCVfrDefaultStore.BufferVarStoreAltConfigAdd(EFI_HII_DEFAULT_CLASS_MANUFACTURING, self.__CurrQestVarInfo, VarStoreName, VarStoreGuid, self.__CurrQestVarInfo.VarType, Value)
+        
+        if ctx.Key() != None:
+            ReturnCode = VfrReturnCode.VFR_RETURN_UNSUPPORTED
+            #　Guid Option Key
+            IfrOptionKey = CIfrOptionKey(self.__CurrentQuestion.GetQuestionId(), Value, self.__TransNum(ctx.Number(1)))
+            IfrOptionKey.SetLineNo()
+        if ctx.vfrImageTag() != None:
+            ctx.OOOObj.SetScope(1) #
+            EObj = CIfrEnd() #
+            Line = (None if ctx.stop is None else ctx.stop).line
+            EObj.SetLineNo(Line)
+            
+        return ctx.OOOObj
 
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrOneOfOptionFlags.
     def visitVfrOneOfOptionFlags(self, ctx:VfrSyntaxParser.VfrOneOfOptionFlagsContext):
-        return self.visitChildren(ctx)
+        
+        self.visitChildren(ctx)
+        
+        ctx.LFlags = self.__CurrQestVarInfo.VarType
+        for FlagsFieldCtx in ctx.oneofoptionFlagsField():
+            ctx.HFlags |= FlagsFieldCtx.HFlag
+            ctx.LFlags |= FlagsFieldCtx.LFlag
+            
+        ctx.LineNum = (None if ctx.start is None else ctx.start).line
+        if self.__CurrentQuestion != None: #
+            ReturnCode = self.__CurrentQuestion.SetFlags(ctx.HFlags)
+        
+        return ctx.HFlags, ctx.LFlags
 
 
     # Visit a parse tree produced by VfrSyntaxParser#oneofoptionFlagsField.
     def visitOneofoptionFlagsField(self, ctx:VfrSyntaxParser.OneofoptionFlagsFieldContext):
-        return self.visitChildren(ctx)
+        
+        self.visitChildren(ctx)
+        
+        if ctx.Number() != None:
+            ctx.LFlag = self.__TransNum(ctx.Number())
+        if ctx.OptionDefault() != None:
+            ctx.LFlag = 0x10
+        if ctx.OptionDefaultMfg() != None:
+            ctx.LFlag = 0x20
+        if ctx.InteractiveFlag() != None:
+            ctx.HFlag = 0x04
+        if ctx.ResetRequiredFlag() != None:
+            ctx.HFlag = 0x10
+        if ctx.RestStyleFlag() != None:
+            ctx.HFlag = 0x20
+        if ctx.ReconnectRequiredFlag() != None:
+            ctx.HFlag = 0x40
+        if ctx.ManufacturingFlag() != None:
+            ctx.LFlag = 0x20
+        if ctx.DefaultFlag() != None:
+            ctx.LFlag = 0x10
+        if ctx.NVAccessFlag() != None and ctx.LateCheckFlag() != None:
+            pass # error handle
+            
+        return ctx.HFlag, ctx.LFlag
 
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementRead.
@@ -1717,7 +1838,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                         ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
                         if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
                             print("CheckBox varid only support BOOLEAN data type")
-            
             
         if ctx.FLAGS() != None:
             CBObj.SetFlags(ctx.vfrCheckBoxFlags().HFlags, ctx.vfrCheckBoxFlags().LFlags)
@@ -1831,22 +1951,345 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by VfrSyntaxP-arser#vfrStatementNumeric.
     def visitVfrStatementNumeric(self, ctx:VfrSyntaxParser.VfrStatementNumericContext):
         
-        return self.visitChildren(ctx)
+        self.visitChildren(ctx)
+        NObj = ctx.OpObj
+        NObj.SetLineNo((None if ctx.start is None else ctx.start).line)
+        
+        if self.__CurrQestVarInfo.IsBitVar:
+            GuidObj = CIfrGuid(0)
+            GuidObj.SetGuid(EDKII_IFR_BIT_VARSTORE_GUID)
+            GuidObj.SetLineNo((None if ctx.start is None else ctx.start).line)
+            GuidObj.SetScope(1) # pos
+        
+        # check data type
+        if self.__CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
+            if self.__CurrQestVarInfo.IsBitVar:
+                LFlags = EDKII_IFR_NUMERIC_SIZE_BIT & self.__CurrQestVarInfo.VarTotalSize
+                ReturnCode = NObj.SetFlagsForBitField(NObj.GetFlags(),LFlags)
+            else:
+                DataTypeSize, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(self.__CurrQestVarInfo.VarType)
+                if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
+                    print('Numeric varid is not the valid data type')
+                if DataTypeSize != 0 and DataTypeSize != self.__CurrQestVarInfo.VarTotalSize:
+                    ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                    print('Numeric varid doesn\'t support array')
+                ReturnCode = NObj.SetFlags(NObj.GetFlags(), self.__CurrQestVarInfo.VarType)
+                
+             
+        if ctx.FLAGS() != None:
+            if self.__CurrQestVarInfo.IsBitVar:
+                ReturnCode = NObj.SetFlagsForBitField(ctx.vfrNumericFlags().HFlags,ctx.vfrNumericFlags().LFlags, ctx.vfrNumericFlags().IsDisplaySpecified)
+            else:
+                ReturnCode = NObj.SetFlags(ctx.vfrNumericFlags().HFlags,ctx.vfrNumericFlags().LFlags, ctx.vfrNumericFlags().IsDisplaySpecified)
+        
+        if ctx.Key() != None:
+            Key = self.__TransNum(ctx.Number())
+            self.__AssignQuestionKey(NObj,Key)
+        
+        ShrinkSize = 0
+        IsSupported = True
+        if self.__CurrQestVarInfo.IsBitVar == False:
+            Type = self.__CurrQestVarInfo.VarType
+            # Base on the type to know the actual used size, shrink the buffer size allocate before.
+            if Type == EFI_IFR_TYPE_NUM_SIZE_8:
+                ShrinkSize = 21
+            elif Type == EFI_IFR_TYPE_NUM_SIZE_16:
+                ShrinkSize = 18
+            elif Type == EFI_IFR_TYPE_NUM_SIZE_32:
+                ShrinkSize = 12
+            elif Type == EFI_IFR_TYPE_NUM_SIZE_64:
+                ShrinkSize = 0
+            else:
+                IsSupported = False
+        else:
+            #　Question stored in bit fields saved as UINT32 type, so the ShrinkSize same as EFI_IFR_TYPE_NUM_SIZE_32.
+            ShrinkSize = 12
+            
+        #######　NObj->ShrinkBinSize (ShrinkSize);
+        if IsSupported == False:
+            ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+            print('Numeric question only support UINT8, UINT16, UINT32 and UINT64 data type.')
+
+        EObj = CIfrEnd() #
+        Line = (None if ctx.stop is None else ctx.stop).line
+        EObj.SetLineNo(Line)
+    
+        return NObj
 
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrSetMinMaxStep.
     def visitVfrSetMinMaxStep(self, ctx:VfrSyntaxParser.VfrSetMinMaxStepContext):
-        return self.visitChildren(ctx)
+        IntDecStyle = False
+        if ((self.__CurrQestVarInfo.IsBitVar) and (ctx.OpObj.GetOpcode() == EFI_IFR_NUMERIC_OP) and ((ctx.OpObj.GetNumericFlags() & EDKII_IFR_DISPLAY_BIT) == 0)) or \
+            ((self.__CurrQestVarInfo.IsBitVar == False) and (ctx.OpObj.GetOpcode() == EFI_IFR_NUMERIC_OP) and ((ctx.OpObj.GetNumericFlags() & EFI_IFR_DISPLAY) == 0)):
+                IntDecStyle = True
+        MinNegative = False
+        MaxNegative = False
+        
+        self.visitChildren(ctx)
+        
+        Min = self.__TransNum(ctx.Number(0))
+        Max = self.__TransNum(ctx.Number(1))
+        Step = self.__TransNum(ctx.Number(2)) if ctx.Step() != None else 0
+        
+        if ctx.Negative() != None:
+            MinNegative = True
+        
+        if IntDecStyle == False and MinNegative == True:
+            ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+            print(' \'-\' can\'t be used when not in int decimal type.')
+        if self.__CurrQestVarInfo.IsBitVar:
+            if (IntDecStyle == False) and (Min > (1 << self.__CurrQestVarInfo.VarTotalSize) - 1): # 
+                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                print('BIT type minimum can\'t small than 0, bigger than 2^BitWidth -1')
+            else:
+                Type = self.__CurrQestVarInfo.VarType
+                if Type == EFI_IFR_TYPE_NUM_SIZE_64:
+                    if IntDecStyle:
+                        if MinNegative:
+                            if Min > 0x8000000000000000:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT64 type minimum can\'t small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF')
+                        else:
+                            if Min > 0x7FFFFFFFFFFFFFFF:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT64 type minimum can\'t small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF')
+                    if MinNegative:
+                        Min = ~Min + 1
+
+                if Type == EFI_IFR_TYPE_NUM_SIZE_32:
+                    if IntDecStyle:
+                        if MinNegative:
+                            if Min > 0x80000000:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT32 type minimum can\'t small than -0x80000000, big than 0x7FFFFFFF')
+                        else:
+                            if Min > 0x7FFFFFFF:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT32 type minimum can\'t small than -0x80000000, big than 0x7FFFFFFF')
+                    if MinNegative:
+                        Min = ~Min + 1
+
+                if Type == EFI_IFR_TYPE_NUM_SIZE_16:
+                    if IntDecStyle:
+                        if MinNegative:
+                            if Min > 0x8000:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT16 type minimum can\'t small than -0x8000, big than 0x7FFF')
+                        else:
+                            if Min > 0x7FFF:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT16 type minimum can\'t small than -0x8000, big than 0x7FFF')
+                    if MinNegative:
+                        Min = ~Min + 1
+
+                if Type == EFI_IFR_TYPE_NUM_SIZE_8:
+                    if IntDecStyle:
+                        if MinNegative:
+                            if Min > 0x80:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT8 type minimum can\'t small than -0x80, big than 0x7F')
+                        else:
+                            if Min > 0x7F:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT8 type minimum can\'t small than -0x80, big than 0x7F')
+                    if MinNegative:
+                        Min = ~Min + 1
+
+        if IntDecStyle == False and MaxNegative == True:
+            ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+            print(' \'-\' can\'t be used when not in int decimal type.')
+        if self.__CurrQestVarInfo.IsBitVar:
+            if (IntDecStyle == False) and (Max > (1 << self.__CurrQestVarInfo.VarTotalSize) - 1):
+                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                print('BIT type maximum can\'t be bigger than 2^BitWidth -1')
+            else:
+                Type = self.__CurrQestVarInfo.VarType
+                if Type == EFI_IFR_TYPE_NUM_SIZE_64:
+                    if IntDecStyle:
+                        if MaxNegative:
+                            if Max > 0x8000000000000000:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT64 type minimum can\'t small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF')
+                        else:
+                            if Max > 0x7FFFFFFFFFFFFFFF:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT64 type minimum can\'t small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF')
+                    if MaxNegative:
+                        Max = ~Max + 1
+                    
+                    if Max < Min: #
+                        ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                        print('Maximum can\'t be less than Minimum')
+                        
+
+                if Type == EFI_IFR_TYPE_NUM_SIZE_32:
+                    if IntDecStyle:
+                        if MaxNegative:
+                            if Max > 0x80000000:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT32 type minimum can\'t small than -0x80000000, big than 0x7FFFFFFF')
+                        else:
+                            if Max > 0x7FFFFFFF:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT32 type minimum can\'t small than -0x80000000, big than 0x7FFFFFFF')
+                    if MaxNegative:
+                        Max = ~Max + 1
+                
+                    if Max < Min: #
+                        ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                        print('Maximum can\'t be less than Minimum')
+                        
+
+                if Type == EFI_IFR_TYPE_NUM_SIZE_16:
+                    if IntDecStyle:
+                        if MaxNegative:
+                            if Max > 0x8000:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT16 type minimum can\'t small than -0x8000, big than 0x7FFF')
+                        else:
+                            if Max > 0x7FFF:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT16 type minimum can\'t small than -0x8000, big than 0x7FFF')
+                    if MaxNegative:
+                        Max = ~Max + 1
+                        
+                    if Max < Min: #
+                        ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                        print('Maximum can\'t be less than Minimum')
+
+                if Type == EFI_IFR_TYPE_NUM_SIZE_8:
+                    if IntDecStyle:
+                        if MaxNegative:
+                            if Max > 0x80:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT8 type minimum can\'t small than -0x80, big than 0x7F')
+                        else:
+                            if Max > 0x7F:
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print('INT8 type minimum can\'t small than -0x80, big than 0x7F')
+                    if MaxNegative:
+                        Max = ~Max + 1
+                        
+                    if Max < Min: #
+                        ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                        print('Maximum can\'t be less than Minimum')
+        
+        if self.__CurrQestVarInfo.IsBitVar:
+            ctx.OpObj.SetMinMaxStepData(Min, Max, Step, EFI_IFR_TYPE_NUM_SIZE_32)
+        else:
+            Type = self.__CurrQestVarInfo.VarType
+            if Type == EFI_IFR_TYPE_NUM_SIZE_64:
+                ctx.OpObj.SetMinMaxStepData(Min, Max, Step, EFI_IFR_TYPE_NUM_SIZE_64)
+            if Type == EFI_IFR_TYPE_NUM_SIZE_32:
+                ctx.OpObj.SetMinMaxStepData(Min, Max, Step, EFI_IFR_TYPE_NUM_SIZE_32)
+            if Type == EFI_IFR_TYPE_NUM_SIZE_16:
+                ctx.OpObj.SetMinMaxStepData(Min, Max, Step, EFI_IFR_TYPE_NUM_SIZE_16)
+            if Type == EFI_IFR_TYPE_NUM_SIZE_8:
+                ctx.OpObj.SetMinMaxStepData(Min, Max, Step, EFI_IFR_TYPE_NUM_SIZE_8)
+
+        return ctx.OpObj
 
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrNumericFlags.
     def visitVfrNumericFlags(self, ctx:VfrSyntaxParser.VfrNumericFlagsContext):
-        return self.visitChildren(ctx)
+        
+        ctx.LFlags = self.__CurrQestVarInfo.VarType & EFI_IFR_NUMERIC_SIZE
+        VarStoreType = gCVfrDataStorage.GetVarStoreType(self.__CurrQestVarInfo.VarStoreId)
+        ctx.LineNum = (None if ctx.start is None else ctx.start).line
+        self.visitChildren(ctx)
+        for FlagsFieldCtx in ctx.numericFlagsField():
+            ctx.LFlags |= FlagsFieldCtx.LFlag # need to check
+            ctx.HFlags |= FlagsFieldCtx.HFlag
+            ctx.IsSetType = FlagsFieldCtx.IsSetType
+            ctx.IsDisplaySpecified = FlagsFieldCtx.IsDisplaySpecified
+        
+        if self.__CurrQestVarInfo.IsBitVar == False:
+            if self.__CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
+                if VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_BUFFER or VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_EFI:
+                    if self.__CurrQestVarInfo.VarType != (ctx.LFlags & EFI_IFR_NUMERIC_SIZE):
+                        ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                        print('Numeric Flag is not same to Numeric VarData type')
+                else:
+                    # update data type for name/value store
+                    self.__CurrQestVarInfo.VarType = ctx.LFlags & EFI_IFR_NUMERIC_SIZE
+                    Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(self.__CurrQestVarInfo.VarType)
+                    self.__CurrQestVarInfo.VarTotalSize = Size
+            elif ctx.numericFlagsField().IsSetType:
+                self.__CurrQestVarInfo.VarType = ctx.LFlags & EFI_IFR_NUMERIC_SIZE
+            
+        elif self.__CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID and self.__CurrQestVarInfo.IsBitVar:
+            ctx.LFlags &= EDKII_IFR_DISPLAY_BIT
+            ctx.LFlags |= EDKII_IFR_NUMERIC_SIZE_BIT & self.__CurrQestVarInfo.VarTotalSize
+
+        return ctx.HFlags, ctx.LFlags 
 
 
     # Visit a parse tree produced by VfrSyntaxParser#numericFlagsField.
     def visitNumericFlagsField(self, ctx:VfrSyntaxParser.NumericFlagsFieldContext):
-        return self.visitChildren(ctx)
+        self.visitChildren(ctx)
+
+        if ctx.Number() != None:
+            if self.__TransNum(ctx.Number()) != 0:
+                ReturnCode = VfrReturnCode.VFR_RETURN_UNSUPPORTED
+            else:
+                ReturnCode = VfrReturnCode.VFR_RETURN_SUCCESS
+        if ctx.NumericSizeOne() != None:
+            if self.__CurrQestVarInfo.IsBitVar == False:
+                ctx.LFlag =  (ctx.LFlag & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_1
+                ctx.IsSetType = True
+            else:
+                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                print('Can not specify the size of the numeric value for BIT field')
+
+        if ctx.NumericSizeTwo() != None:
+            if self.__CurrQestVarInfo.IsBitVar == False:
+                ctx.LFlag =  (ctx.LFlag & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_2
+                ctx.IsSetType = True
+            else:
+                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                print('Can not specify the size of the numeric value for BIT field')
+
+        if ctx.NumericSizeFour() != None:
+            if self.__CurrQestVarInfo.IsBitVar == False:
+                ctx.LFlag =  (ctx.LFlag & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_4
+                ctx.IsSetType = True
+            else:
+                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                print('Can not specify the size of the numeric value for BIT field')
+
+        if ctx.NumericSizeEight() != None:
+            if self.__CurrQestVarInfo.IsBitVar == False:
+                ctx.LFlag =  (ctx.LFlag & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_8
+                ctx.IsSetType = True
+            else:
+                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                print('Can not specify the size of the numeric value for BIT field')
+
+        if ctx.DisPlayIntDec() != None:
+            if self.__CurrQestVarInfo.IsBitVar == False:
+                ctx.LFlag =  (ctx.LFlag & ~EFI_IFR_DISPLAY) | EFI_IFR_DISPLAY_INT_DEC
+            else:
+                ctx.LFlag =  (ctx.LFlag & ~EDKII_IFR_DISPLAY_BIT) | EDKII_IFR_DISPLAY_INT_DEC_BIT
+            ctx.IsDisplaySpecified = True
+
+        if ctx.DisPlayUIntHex() != None:
+            if self.__CurrQestVarInfo.IsBitVar == False:
+                ctx.LFlag =  (ctx.LFlag & ~EFI_IFR_DISPLAY) | EFI_IFR_DISPLAY_UINT_DEC
+            else:
+                ctx.LFlag =  (ctx.LFlag & ~EDKII_IFR_DISPLAY_BIT) | EDKII_IFR_DISPLAY_UINT_DEC_BIT
+            ctx.IsDisplaySpecified = True
+
+        if ctx.DisPlayUIntHex() != None:
+            if self.__CurrQestVarInfo.IsBitVar == False:
+                ctx.LFlag =  (ctx.LFlag & ~EFI_IFR_DISPLAY) | EFI_IFR_DISPLAY_UINT_HEX
+            else:
+                ctx.LFlag =  (ctx.LFlag & ~EDKII_IFR_DISPLAY_BIT) | EDKII_IFR_DISPLAY_UINT_HEX_BIT
+            ctx.IsDisplaySpecified = True
+        if ctx.questionheaderFlagsField() != None:
+            ctx.HFlag = ctx.questionheaderFlagsField().QHFlag
+            
+        return ctx.HFlag, ctx.LFlag
 
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementOneOf.
@@ -1884,7 +2327,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.__IsStringOp = True
         SObj = ctx.OpObj
         SObj.SetLineNo((None if ctx.start is None else ctx.start).line)
-        self.__CurrentQuestion = SObj.GetQuestion
+        self.__CurrentQuestion = SObj.GetQuestion()
         
         self.visitChildren(ctx)
 
@@ -1969,7 +2412,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         
         PObj = ctx.OpObj
         PObj.SetLineNo((None if ctx.start is None else ctx.start).line)
-        self.__CurrentQuestion = PObj.GetQuestion
+        self.__CurrentQuestion = PObj.GetQuestion()
         
         self.visitChildren(ctx)
 
@@ -2044,7 +2487,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def visitVfrStatementOrderedList(self, ctx:VfrSyntaxParser.VfrStatementOrderedListContext):
         OLObj = ctx.OpObj
         OLObj.SetLineNo((None if ctx.start is None else ctx.start).line)
-        self.__CurrentQuestion = OLObj.GetQuestion
+        self.__CurrentQuestion = OLObj.GetQuestion()
         self.__IsOrderedList = True
         
         self.visitChildren(ctx)
