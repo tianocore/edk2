@@ -744,12 +744,25 @@ GetResourcePadding (
     //
     // Request defaults.
     //
+    UINT64  Pci64Size = PcdGet64 (PcdPciMmio64Size);
+
+    // non-prefetchable
     SetMmioPadding (
       --FirstResource,
       FALSE,
       TRUE,
       (UINTN)HighBitSetRoundUp32 (SIZE_2MB)
       );
+
+    // prefetchable
+    if (Pci64Size > SIZE_32GB) {
+      SetMmioPadding (
+        --FirstResource,
+        TRUE,
+        FALSE,
+        (UINTN)HighBitSetRoundUp64 (RShiftU64 (Pci64Size, 8))
+        );
+    }
   }
 
   //
