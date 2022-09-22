@@ -36,6 +36,7 @@
   @}
 */
 
+#include <AmlCpcInfo.h>
 #include <IndustryStandard/Acpi.h>
 
 #ifndef AML_HANDLE
@@ -1334,6 +1335,59 @@ AmlAddNameIntegerPackage (
   IN CHAR8                   *Name,
   IN UINT64                  Value,
   IN AML_OBJECT_NODE_HANDLE  PackageNode
+  );
+
+/** Create a _CPC node.
+
+  Creates and optionally adds the following node
+   Name(_CPC, Package()
+   {
+    NumEntries,                              // Integer
+    Revision,                                // Integer
+    HighestPerformance,                      // Integer or Buffer (Resource Descriptor)
+    NominalPerformance,                      // Integer or Buffer (Resource Descriptor)
+    LowestNonlinearPerformance,              // Integer or Buffer (Resource Descriptor)
+    LowestPerformance,                       // Integer or Buffer (Resource Descriptor)
+    GuaranteedPerformanceRegister,           // Buffer (Resource Descriptor)
+    DesiredPerformanceRegister ,             // Buffer (Resource Descriptor)
+    MinimumPerformanceRegister ,             // Buffer (Resource Descriptor)
+    MaximumPerformanceRegister ,             // Buffer (Resource Descriptor)
+    PerformanceReductionToleranceRegister,   // Buffer (Resource Descriptor)
+    TimeWindowRegister,                      // Buffer (Resource Descriptor)
+    CounterWraparoundTime,                   // Integer or Buffer (Resource Descriptor)
+    ReferencePerformanceCounterRegister,     // Buffer (Resource Descriptor)
+    DeliveredPerformanceCounterRegister,     // Buffer (Resource Descriptor)
+    PerformanceLimitedRegister,              // Buffer (Resource Descriptor)
+    CPPCEnableRegister                       // Buffer (Resource Descriptor)
+    AutonomousSelectionEnable,               // Integer or Buffer (Resource Descriptor)
+    AutonomousActivityWindowRegister,        // Buffer (Resource Descriptor)
+    EnergyPerformancePreferenceRegister,     // Buffer (Resource Descriptor)
+    ReferencePerformance                     // Integer or Buffer (Resource Descriptor)
+    LowestFrequency,                         // Integer or Buffer (Resource Descriptor)
+    NominalFrequency                         // Integer or Buffer (Resource Descriptor)
+  })
+
+  If resource buffer is NULL then integer will be used.
+
+  Cf. ACPI 6.4, s8.4.7.1 _CPC (Continuous Performance Control)
+
+  @ingroup CodeGenApis
+
+  @param [in]  CpcInfo               CpcInfo object
+  @param [in]  ParentNode            If provided, set ParentNode as the parent
+                                     of the node created.
+  @param [out] NewCpcNode            If success and provided, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCreateCpcNode (
+  IN  AML_CPC_INFO            *CpcInfo,
+  IN  AML_NODE_HANDLE         ParentNode   OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewCpcNode   OPTIONAL
   );
 
 // DEPRECATED APIS
