@@ -76,6 +76,16 @@ GET_OBJECT_LIST (
   CM_ARM_LPI_INFO
   );
 
+/**
+  This macro expands to a function that retrieves the CPC
+  information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjCpcInfo,
+  CM_ARM_CPC_INFO
+  );
+
 /** Initialize the TokenTable.
 
   One entry should be allocated for each CM_ARM_PROC_HIERARCHY_INFO
@@ -227,6 +237,93 @@ WriteAslName (
   }
 
   return EFI_SUCCESS;
+}
+
+/** Create and add an _CPC Node to Cpu Node.
+
+  For instance, transform an AML node from:
+  Device (C002)
+  {
+      Name (_UID, 2)
+      Name (_HID, "ACPI0007")
+  }
+
+  To:
+  Device (C002)
+  {
+      Name (_UID, 2)
+      Name (_HID, "ACPI0007")
+      Name(_CPC, Package()
+      {
+        NumEntries,                              // Integer
+        Revision,                                // Integer
+        HighestPerformance,                      // Integer or Buffer (Resource Descriptor)
+        NominalPerformance,                      // Integer or Buffer (Resource Descriptor)
+        LowestNonlinearPerformance,              // Integer or Buffer (Resource Descriptor)
+        LowestPerformance,                       // Integer or Buffer (Resource Descriptor)
+        GuaranteedPerformanceRegister,           // Buffer (Resource Descriptor)
+        DesiredPerformanceRegister ,             // Buffer (Resource Descriptor)
+        MinimumPerformanceRegister ,             // Buffer (Resource Descriptor)
+        MaximumPerformanceRegister ,             // Buffer (Resource Descriptor)
+        PerformanceReductionToleranceRegister,   // Buffer (Resource Descriptor)
+        TimeWindowRegister,                      // Buffer (Resource Descriptor)
+        CounterWraparoundTime,                   // Integer or Buffer (Resource Descriptor)
+        ReferencePerformanceCounterRegister,     // Buffer (Resource Descriptor)
+        DeliveredPerformanceCounterRegister,     // Buffer (Resource Descriptor)
+        PerformanceLimitedRegister,              // Buffer (Resource Descriptor)
+        CPPCEnableRegister                       // Buffer (Resource Descriptor)
+        AutonomousSelectionEnable,               // Integer or Buffer (Resource Descriptor)
+        AutonomousActivityWindowRegister,        // Buffer (Resource Descriptor)
+        EnergyPerformancePreferenceRegister,     // Buffer (Resource Descriptor)
+        ReferencePerformance                     // Integer or Buffer (Resource Descriptor)
+        LowestFrequency,                         // Integer or Buffer (Resource Descriptor)
+        NominalFrequency                         // Integer or Buffer (Resource Descriptor)
+      })
+  }
+
+  @param [in]  Generator              The SSDT Cpu Topology generator.
+  @param [in]  CfgMgrProtocol         Pointer to the Configuration Manager
+                                      Protocol Interface.
+  @param [in]  GicCInfo               Pointer to the CM_ARM_GICC_INFO object
+                                      describing the Cpu.
+  @param [in]  Node                   CPU Node to which the _CPC node is
+                                      attached.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+CreateAmlCpcNode (
+  IN  ACPI_CPU_TOPOLOGY_GENERATOR                         *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CM_ARM_GICC_INFO                                    *GicCInfo,
+  IN  AML_OBJECT_NODE_HANDLE                              *Node
+  )
+{
+  EFI_STATUS       Status;
+  CM_ARM_CPC_INFO  *CpcInfo;
+
+  Status = GetEArmObjCpcInfo (
+             CfgMgrProtocol,
+             GicCInfo->CpcToken,
+             &CpcInfo,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlCreateCpcNode (
+             CpcInfo,
+             Node,
+             NULL
+             );
+  ASSERT_EFI_ERROR (Status);
+  return Status;
 }
 
 /** Create and add an _LPI method to Cpu/Cluster Node.
@@ -581,7 +678,20 @@ CreateAmlCpuFromProcHierarchy (
   // CM_ARM_PROC_HIERARCHY_INFO, create an _LPI method returning them.
   if (ProcHierarchyNodeInfo->LpiToken != CM_NULL_TOKEN) {
     Status = CreateAmlLpiMethod (Generator, ProcHierarchyNodeInfo, CpuNode);
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
+  }
+
+  // If a CPC info is associated with the
+  // GicCinfo, create an _CPC method returning them.
+  if (GicCInfo->CpcToken != CM_NULL_TOKEN) {
+    Status = CreateAmlCpcNode (Generator, CfgMgrProtocol, GicCInfo, CpuNode);
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
   }
 
   return Status;
@@ -934,10 +1044,11 @@ CreateTopologyFromGicC (
   IN        AML_OBJECT_NODE_HANDLE                        ScopeNode
   )
 {
-  EFI_STATUS        Status;
-  CM_ARM_GICC_INFO  *GicCInfo;
-  UINT32            GicCInfoCount;
-  UINT32            Index;
+  EFI_STATUS              Status;
+  CM_ARM_GICC_INFO        *GicCInfo;
+  UINT32                  GicCInfoCount;
+  UINT32                  Index;
+  AML_OBJECT_NODE_HANDLE  CpuNode;
 
   ASSERT (Generator != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -961,11 +1072,21 @@ CreateTopologyFromGicC (
                ScopeNode,
                &GicCInfo[Index],
                Index,
-               NULL
+               &CpuNode
                );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       break;
+    }
+
+    // If a CPC info is associated with the
+    // GicCinfo, create an _CPC method returning them.
+    if (GicCInfo->CpcToken != CM_NULL_TOKEN) {
+      Status = CreateAmlCpcNode (Generator, CfgMgrProtocol, &GicCInfo[Index], CpuNode);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        break;
+      }
     }
   } // for
 
