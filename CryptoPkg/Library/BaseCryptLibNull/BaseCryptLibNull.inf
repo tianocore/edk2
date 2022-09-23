@@ -38,6 +38,7 @@
   Hmac/CryptHmacNull.c
   Kdf/CryptHkdfNull.c
   Cipher/CryptAesNull.c
+  Cipher/CryptAeadAesGcmNull.c
   Pk/CryptRsaBasicNull.c
   Pk/CryptRsaExtNull.c
   Pk/CryptPkcs1OaepNull.c
