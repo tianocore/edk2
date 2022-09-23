@@ -319,6 +319,13 @@ typedef struct {
     } Services;
     UINT32    Family;
   } ParallelHash;
+  union {
+    struct {
+      UINT8    Encrypt : 1;
+      UINT8    Decrypt : 1;
+    } Services;
+    UINT32    Family;
+  } AeadAesGcm;
 } PCD_CRYPTO_SERVICE_FAMILY_ENABLE;
 
 #endif
