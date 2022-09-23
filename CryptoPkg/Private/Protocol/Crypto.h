@@ -21,7 +21,7 @@
 /// the EDK II Crypto Protocol is extended, this version define must be
 /// increased.
 ///
-#define EDKII_CRYPTO_VERSION  8
+#define EDKII_CRYPTO_VERSION  9
 
 ///
 /// EDK II Crypto Protocol forward declaration
@@ -264,6 +264,194 @@ BOOLEAN
 (EFIAPI *EDKII_CRYPTO_HMAC_SHA256_FINAL)(
   IN OUT  VOID   *HmacSha256Context,
   OUT     UINT8  *HmacValue
+  );
+
+/**
+  Computes the HMAC-SHA256 digest of a input data buffer.
+
+  This function performs the HMAC-SHA256 digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be digested.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[in]   Key         Pointer to the user-supplied key.
+  @param[in]   KeySize     Key size in bytes.
+  @param[out]  HmacValue   Pointer to a buffer that receives the HMAC-SHA256 digest
+                           value (32 bytes).
+
+  @retval TRUE   HMAC-SHA256 digest computation succeeded.
+  @retval FALSE  HMAC-SHA256 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_HMAC_SHA256_ALL)(
+  IN   CONST VOID   *Data,
+  IN   UINTN        DataSize,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  OUT  UINT8        *HmacValue
+  );
+
+/**
+  Allocates and initializes one HMAC_CTX context for subsequent HMAC-SHA384 use.
+
+  @return  Pointer to the HMAC_CTX context that has been initialized.
+           If the allocations fails, HmacSha384New() returns NULL.
+
+**/
+typedef
+VOID *
+(EFIAPI *EDKII_CRYPTO_HMAC_SHA384_NEW)(
+  VOID
+  );
+
+/**
+  Release the specified HMAC_CTX context.
+
+  @param[in]  HmacSha384Ctx  Pointer to the HMAC_CTX context to be released.
+
+**/
+typedef
+VOID
+(EFIAPI *EDKII_CRYPTO_HMAC_SHA384_FREE)(
+  IN  VOID  *HmacSha384Ctx
+  );
+
+/**
+  Set user-supplied key for subsequent use. It must be done before any
+  calling to HmacSha384Update().
+
+  If HmacSha384Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[out]  HmacSha384Context  Pointer to HMAC-SHA384 context.
+  @param[in]   Key                Pointer to the user-supplied key.
+  @param[in]   KeySize            Key size in bytes.
+
+  @retval TRUE   The Key is set successfully.
+  @retval FALSE  The Key is set unsuccessfully.
+  @retval FALSE  This interface is not supported.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_HMAC_SHA384_SET_KEY)(
+  OUT  VOID         *HmacSha384Context,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize
+  );
+
+/**
+  Makes a copy of an existing HMAC-SHA384 context.
+
+  If HmacSha384Context is NULL, then return FALSE.
+  If NewHmacSha384Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]  HmacSha384Context     Pointer to HMAC-SHA384 context being copied.
+  @param[out] NewHmacSha384Context  Pointer to new HMAC-SHA384 context.
+
+  @retval TRUE   HMAC-SHA384 context copy succeeded.
+  @retval FALSE  HMAC-SHA384 context copy failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_HMAC_SHA384_DUPLICATE)(
+  IN   CONST VOID  *HmacSha384Context,
+  OUT  VOID        *NewHmacSha384Context
+  );
+
+/**
+  Digests the input data and updates HMAC-SHA384 context.
+
+  This function performs HMAC-SHA384 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  HMAC-SHA384 context should be initialized by HmacSha384New(), and should not be finalized
+  by HmacSha384Final(). Behavior with invalid context is undefined.
+
+  If HmacSha384Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  HmacSha384Context Pointer to the HMAC-SHA384 context.
+  @param[in]       Data              Pointer to the buffer containing the data to be digested.
+  @param[in]       DataSize          Size of Data buffer in bytes.
+
+  @retval TRUE   HMAC-SHA384 data digest succeeded.
+  @retval FALSE  HMAC-SHA384 data digest failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_HMAC_SHA384_UPDATE)(
+  IN OUT  VOID        *HmacSha384Context,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  );
+
+/**
+  Completes computation of the HMAC-SHA384 digest value.
+
+  This function completes HMAC-SHA384 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the HMAC-SHA384 context cannot
+  be used again.
+  HMAC-SHA384 context should be initialized by HmacSha384New(), and should not be finalized
+  by HmacSha384Final(). Behavior with invalid HMAC-SHA384 context is undefined.
+
+  If HmacSha384Context is NULL, then return FALSE.
+  If HmacValue is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  HmacSha384Context  Pointer to the HMAC-SHA384 context.
+  @param[out]      HmacValue          Pointer to a buffer that receives the HMAC-SHA384 digest
+                                      value (48 bytes).
+
+  @retval TRUE   HMAC-SHA384 digest computation succeeded.
+  @retval FALSE  HMAC-SHA384 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_HMAC_SHA384_FINAL)(
+  IN OUT  VOID   *HmacSha384Context,
+  OUT     UINT8  *HmacValue
+  );
+
+/**
+  Computes the HMAC-SHA384 digest of a input data buffer.
+
+  This function performs the HMAC-SHA384 digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be digested.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[in]   Key         Pointer to the user-supplied key.
+  @param[in]   KeySize     Key size in bytes.
+  @param[out]  HmacValue   Pointer to a buffer that receives the HMAC-SHA384 digest
+                           value (48 bytes).
+
+  @retval TRUE   HMAC-SHA384 digest computation succeeded.
+  @retval FALSE  HMAC-SHA384 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_HMAC_SHA384_ALL)(
+  IN   CONST VOID   *Data,
+  IN   UINTN        DataSize,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  OUT  UINT8        *HmacValue
   );
 
 // =====================================================================================
@@ -3675,6 +3863,16 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_RSA_PSS_VERIFY                        RsaPssVerify;
   /// Parallel hash
   EDKII_CRYPTO_PARALLEL_HASH_ALL                     ParallelHash256HashAll;
+  /// HMAC SHA256 (continued)
+  EDKII_CRYPTO_HMAC_SHA256_ALL                       HmacSha256All;
+  /// HMAC SHA384
+  EDKII_CRYPTO_HMAC_SHA384_NEW                       HmacSha384New;
+  EDKII_CRYPTO_HMAC_SHA384_FREE                      HmacSha384Free;
+  EDKII_CRYPTO_HMAC_SHA384_SET_KEY                   HmacSha384SetKey;
+  EDKII_CRYPTO_HMAC_SHA384_DUPLICATE                 HmacSha384Duplicate;
+  EDKII_CRYPTO_HMAC_SHA384_UPDATE                    HmacSha384Update;
+  EDKII_CRYPTO_HMAC_SHA384_FINAL                     HmacSha384Final;
+  EDKII_CRYPTO_HMAC_SHA384_ALL                       HmacSha384All;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;

@@ -53,9 +53,22 @@ typedef struct {
       UINT8    Duplicate : 1;
       UINT8    Update    : 1;
       UINT8    Final     : 1;
+      UINT8    All       : 1;
     } Services;
     UINT32    Family;
   } HmacSha256;
+  union {
+    struct {
+      UINT8    New       : 1;
+      UINT8    Free      : 1;
+      UINT8    SetKey    : 1;
+      UINT8    Duplicate : 1;
+      UINT8    Update    : 1;
+      UINT8    Final     : 1;
+      UINT8    All       : 1;
+    } Services;
+    UINT32    Family;
+  } HmacSha384;
   union {
     struct {
       UINT8    GetContextSize : 1;
