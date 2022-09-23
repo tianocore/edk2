@@ -16,6 +16,7 @@
 #include <Library/MemEncryptSevLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
+#include <Pi/PrePiHob.h>
 #include <PiPei.h>
 #include <Register/Amd/Msr.h>
 #include <Register/Intel/SmramSaveStateMap.h>
@@ -63,6 +64,10 @@ AmdSevSnpInitialize (
   for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
     if ((Hob.Raw != NULL) && (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR)) {
       ResourceHob = Hob.ResourceDescriptor;
+      if (ResourceHob->PhysicalStart >= SIZE_4GB) {
+        ResourceHob->ResourceType = EFI_RESOURCE_MEMORY_UNACCEPTED;
+        continue;
+      }
 
       if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
         MemEncryptSevSnpPreValidateSystemRam (
