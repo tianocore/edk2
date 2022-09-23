@@ -45,6 +45,7 @@
   Hmac/CryptHmac.c
   Kdf/CryptHkdfNull.c
   Cipher/CryptAes.c
+  Cipher/CryptAeadAesGcmNull.c
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExtNull.c
   Pk/CryptPkcs1Oaep.c
