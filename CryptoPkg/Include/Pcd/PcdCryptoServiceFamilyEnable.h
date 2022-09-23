@@ -245,7 +245,12 @@ typedef struct {
   } Sm3;
   union {
     struct {
-      UINT8    Sha256ExtractAndExpand;
+      UINT8    Sha256ExtractAndExpand : 1;
+      UINT8    Sha256Extract          : 1;
+      UINT8    Sha256Expand           : 1;
+      UINT8    Sha384ExtractAndExpand : 1;
+      UINT8    Sha384Extract          : 1;
+      UINT8    Sha384Expand           : 1;
     } Services;
     UINT32    Family;
   } Hkdf;
