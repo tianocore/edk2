@@ -43,6 +43,7 @@
   DEFINE SD_MMC_TIMEOUT               = 1000000
   DEFINE USE_CBMEM_FOR_CONSOLE        = FALSE
   DEFINE BOOTSPLASH_IMAGE             = FALSE
+  DEFINE MICROSOFT_RECOMMENDED        = FALSE
   DEFINE NVME_ENABLE                  = TRUE
 
   #
@@ -444,6 +445,7 @@
 
   gUefiPayloadPkgTokenSpaceGuid.PcdDispatchModuleAbove4GMemory|$(ABOVE_4G_MEMORY)
   gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape|$(BOOT_MANAGER_ESCAPE)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFollowMicrosoftRecommended|$(MICROSOFT_RECOMMENDED)
 
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1800000
 
