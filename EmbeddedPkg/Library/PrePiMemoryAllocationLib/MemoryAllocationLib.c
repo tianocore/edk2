@@ -23,41 +23,35 @@ InternalAllocatePages (
   )
 {
   EFI_PEI_HOB_POINTERS  Hob;
-  EFI_PHYSICAL_ADDRESS  Offset;
+  EFI_PHYSICAL_ADDRESS  NewTop;
 
   Hob.Raw = GetHobList ();
 
-  // Check to see if on 4k boundary
-  Offset = Hob.HandoffInformationTable->EfiFreeMemoryTop & 0xFFF;
-  if (Offset != 0) {
-    // If not aligned, make the allocation aligned.
-    Hob.HandoffInformationTable->EfiFreeMemoryTop -= Offset;
-  }
+  NewTop  = Hob.HandoffInformationTable->EfiFreeMemoryTop & ~(EFI_PHYSICAL_ADDRESS)EFI_PAGE_MASK;
+  NewTop -= Pages * EFI_PAGE_SIZE;
 
   //
   // Verify that there is sufficient memory to satisfy the allocation
   //
-  if (Hob.HandoffInformationTable->EfiFreeMemoryTop - ((Pages * EFI_PAGE_SIZE) + sizeof (EFI_HOB_MEMORY_ALLOCATION)) < Hob.HandoffInformationTable->EfiFreeMemoryBottom) {
-    return 0;
-  } else {
-    //
-    // Update the PHIT to reflect the memory usage
-    //
-    Hob.HandoffInformationTable->EfiFreeMemoryTop -= Pages * EFI_PAGE_SIZE;
-
-    // This routine used to create a memory allocation HOB a la PEI, but that's not
-    // necessary for us.
-
-    //
-    // Create a memory allocation HOB.
-    //
-    BuildMemoryAllocationHob (
-      Hob.HandoffInformationTable->EfiFreeMemoryTop,
-      Pages * EFI_PAGE_SIZE,
-      MemoryType
-      );
-    return (VOID *)(UINTN)Hob.HandoffInformationTable->EfiFreeMemoryTop;
+  if (NewTop < (Hob.HandoffInformationTable->EfiFreeMemoryBottom + sizeof (EFI_HOB_MEMORY_ALLOCATION))) {
+    return NULL;
   }
+
+  //
+  // Update the PHIT to reflect the memory usage
+  //
+  Hob.HandoffInformationTable->EfiFreeMemoryTop = NewTop;
+
+  //
+  // Create a memory allocation HOB.
+  //
+  BuildMemoryAllocationHob (
+    Hob.HandoffInformationTable->EfiFreeMemoryTop,
+    Pages * EFI_PAGE_SIZE,
+    MemoryType
+    );
+
+  return (VOID *)(UINTN)Hob.HandoffInformationTable->EfiFreeMemoryTop;
 }
 
 /**
