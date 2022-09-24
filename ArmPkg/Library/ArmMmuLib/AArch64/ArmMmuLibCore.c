@@ -10,6 +10,7 @@
 **/
 
 #include <Uefi.h>
+#include <Pi/PiMultiPhase.h>
 #include <Chipset/AArch64.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/CacheMaintenanceLib.h>
@@ -120,14 +121,14 @@ ReplaceTableEntry (
     // use an ordinary break before make. Otherwise, we will need to
     // temporarily disable the MMU.
     DisableMmu = FALSE;
-    if ((((RegionStart ^ (UINTN)ArmReplaceLiveTranslationEntry) & ~BlockMask) == 0) ||
+    if ((((RegionStart ^ (UINTN)mReplaceLiveEntryFunc) & ~BlockMask) == 0) ||
         (((RegionStart ^ (UINTN)Entry) & ~BlockMask) == 0))
     {
       DisableMmu = TRUE;
       DEBUG ((DEBUG_WARN, "%a: splitting block entry with MMU disabled\n", __FUNCTION__));
     }
 
-    ArmReplaceLiveTranslationEntry (Entry, Value, RegionStart, DisableMmu);
+    mReplaceLiveEntryFunc (Entry, Value, RegionStart, DisableMmu);
   }
 }
 
@@ -747,15 +748,21 @@ ArmMmuBaseLibConstructor (
   )
 {
   extern UINT32  ArmReplaceLiveTranslationEntrySize;
+  VOID           *Hob;
 
-  //
-  // The ArmReplaceLiveTranslationEntry () helper function may be invoked
-  // with the MMU off so we have to ensure that it gets cleaned to the PoC
-  //
-  WriteBackDataCacheRange (
-    (VOID *)(UINTN)ArmReplaceLiveTranslationEntry,
-    ArmReplaceLiveTranslationEntrySize
-    );
+  Hob = GetFirstGuidHob (&gArmMmuReplaceLiveTranslationEntryFuncGuid);
+  if (Hob != NULL) {
+    mReplaceLiveEntryFunc = *(VOID **)GET_GUID_HOB_DATA (Hob);
+  } else {
+    //
+    // The ArmReplaceLiveTranslationEntry () helper function may be invoked
+    // with the MMU off so we have to ensure that it gets cleaned to the PoC
+    //
+    WriteBackDataCacheRange (
+      (VOID *)(UINTN)ArmReplaceLiveTranslationEntry,
+      ArmReplaceLiveTranslationEntrySize
+      );
+  }
 
   return RETURN_SUCCESS;
 }
