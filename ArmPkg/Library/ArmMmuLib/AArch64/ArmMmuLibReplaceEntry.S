@@ -15,6 +15,11 @@
   // check whether we should disable the MMU
   cbz   x3, .L1_\@
 
+  // clean and invalidate first so that we don't clobber
+  // adjacent entries that are dirty in the caches
+  dc    civac, x0
+  dsb   nsh
+
   // disable the MMU
   mrs   x8, sctlr_el\el
   bic   x9, x8, #CTRL_M_BIT
@@ -64,6 +69,10 @@
 .L2_\@:
   .endm
 
+  // Align this routine to a log2 upper bound of its size, so that it is
+  // guaranteed not to cross a page or block boundary.
+  .balign 0x200
+
 //VOID
 //ArmReplaceLiveTranslationEntry (
 //  IN  UINT64  *Entry,
@@ -76,11 +85,6 @@ ASM_FUNC(ArmReplaceLiveTranslationEntry)
   mrs   x4, daif
   msr   daifset, #0xf
   isb
-
-  // clean and invalidate first so that we don't clobber
-  // adjacent entries that are dirty in the caches
-  dc    civac, x0
-  dsb   nsh
 
   EL1_OR_EL2_OR_EL3(x5)
 1:__replace_entry 1
@@ -96,3 +100,6 @@ ASM_GLOBAL ASM_PFX(ArmReplaceLiveTranslationEntrySize)
 
 ASM_PFX(ArmReplaceLiveTranslationEntrySize):
   .long   . - ArmReplaceLiveTranslationEntry
+
+  // Double check that we did not overrun the assumed maximum size
+  .org    ArmReplaceLiveTranslationEntry + 0x200
