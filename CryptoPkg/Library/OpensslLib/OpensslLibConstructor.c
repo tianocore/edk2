@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Uefi.h>
+#include <Base.h>
 
 /**
   An internal OpenSSL function which fetches a local copy of the hardware
@@ -30,7 +30,7 @@ OPENSSL_cpuid_setup (
   @retval EFI_SUCCESS         The construction succeeded.
 
 **/
-EFI_STATUS
+RETURN_STATUS
 EFIAPI
 OpensslLibConstructor (
   VOID
@@ -38,5 +38,5 @@ OpensslLibConstructor (
 {
   OPENSSL_cpuid_setup ();
 
-  return EFI_SUCCESS;
+  return RETURN_SUCCESS;
 }
