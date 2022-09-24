@@ -12,6 +12,9 @@
 
   .macro __replace_entry, el
 
+  // check whether we should disable the MMU
+  cbz   x3, .L1_\@
+
   // disable the MMU
   mrs   x8, sctlr_el\el
   bic   x9, x8, #CTRL_M_BIT
@@ -38,6 +41,27 @@
   // re-enable the MMU
   msr   sctlr_el\el, x8
   isb
+  b     .L2_\@
+
+.L1_\@:
+  // write invalid entry
+  str   xzr, [x0]
+  dsb   nshst
+
+  // flush translations for the target address from the TLBs
+  lsr   x2, x2, #12
+  .if   \el == 1
+  tlbi  vaae1, x2
+  .else
+  tlbi  vae\el, x2
+  .endif
+  dsb   nsh
+
+  // write updated entry
+  str   x1, [x0]
+  dsb   nshst
+
+.L2_\@:
   .endm
 
 //VOID
@@ -58,7 +82,7 @@ ASM_FUNC(ArmReplaceLiveTranslationEntry)
   dc    civac, x0
   dsb   nsh
 
-  EL1_OR_EL2_OR_EL3(x3)
+  EL1_OR_EL2_OR_EL3(x5)
 1:__replace_entry 1
   b     4f
 2:__replace_entry 2

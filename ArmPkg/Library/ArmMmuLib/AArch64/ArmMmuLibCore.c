@@ -18,6 +18,17 @@
 #include <Library/ArmMmuLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
+
+STATIC
+VOID (
+  EFIAPI  *mReplaceLiveEntryFunc
+  )(
+    IN  UINT64  *Entry,
+    IN  UINT64  Value,
+    IN  UINT64  RegionStart,
+    IN  BOOLEAN DisableMmu
+    ) = ArmReplaceLiveTranslationEntry;
 
 STATIC
 UINT64
@@ -83,14 +94,40 @@ ReplaceTableEntry (
   IN  UINT64   *Entry,
   IN  UINT64   Value,
   IN  UINT64   RegionStart,
+  IN  UINT64   BlockMask,
   IN  BOOLEAN  IsLiveBlockMapping
   )
 {
-  if (!ArmMmuEnabled () || !IsLiveBlockMapping) {
+  BOOLEAN  DisableMmu;
+
+  //
+  // Replacing a live block entry with a table entry (or vice versa) requires a
+  // break-before-make sequence as per the architecture. This means the mapping
+  // must be made invalid and cleaned from the TLBs first, and this is a bit of
+  // a hassle if the mapping in question covers the code that is actually doing
+  // the mapping and the unmapping, and so we only bother with this if actually
+  // necessary.
+  //
+
+  if (!IsLiveBlockMapping || !ArmMmuEnabled ()) {
+    // If the mapping is not a live block mapping, or the MMU is not on yet, we
+    // can simply overwrite the entry.
     *Entry = Value;
     ArmUpdateTranslationTableEntry (Entry, (VOID *)(UINTN)RegionStart);
   } else {
-    ArmReplaceLiveTranslationEntry (Entry, Value, RegionStart);
+    // If the mapping in question does not cover the code that updates the
+    // entry in memory, or the entry that we are intending to update, we can
+    // use an ordinary break before make. Otherwise, we will need to
+    // temporarily disable the MMU.
+    DisableMmu = FALSE;
+    if ((((RegionStart ^ (UINTN)ArmReplaceLiveTranslationEntry) & ~BlockMask) == 0) ||
+        (((RegionStart ^ (UINTN)Entry) & ~BlockMask) == 0))
+    {
+      DisableMmu = TRUE;
+      DEBUG ((DEBUG_WARN, "%a: splitting block entry with MMU disabled\n", __FUNCTION__));
+    }
+
+    ArmReplaceLiveTranslationEntry (Entry, Value, RegionStart, DisableMmu);
   }
 }
 
@@ -155,12 +192,13 @@ IsTableEntry (
 STATIC
 EFI_STATUS
 UpdateRegionMappingRecursive (
-  IN  UINT64  RegionStart,
-  IN  UINT64  RegionEnd,
-  IN  UINT64  AttributeSetMask,
-  IN  UINT64  AttributeClearMask,
-  IN  UINT64  *PageTable,
-  IN  UINTN   Level
+  IN  UINT64   RegionStart,
+  IN  UINT64   RegionEnd,
+  IN  UINT64   AttributeSetMask,
+  IN  UINT64   AttributeClearMask,
+  IN  UINT64   *PageTable,
+  IN  UINTN    Level,
+  IN  BOOLEAN  TableIsLive
   )
 {
   UINTN       BlockShift;
@@ -170,6 +208,7 @@ UpdateRegionMappingRecursive (
   UINT64      EntryValue;
   VOID        *TranslationTable;
   EFI_STATUS  Status;
+  BOOLEAN     NextTableIsLive;
 
   ASSERT (((RegionStart | RegionEnd) & EFI_PAGE_MASK) == 0);
 
@@ -198,7 +237,14 @@ UpdateRegionMappingRecursive (
     // the next level. No block mappings are allowed at all at level 0,
     // so in that case, we have to recurse unconditionally.
     //
+    // One special case to take into account is any region that covers the page
+    // table itself: if we'd cover such a region with block mappings, we are
+    // more likely to end up in the situation later where we need to disable
+    // the MMU in order to update page table entries safely, so prefer page
+    // mappings in that particular case.
+    //
     if ((Level == 0) || (((RegionStart | BlockEnd) & BlockMask) != 0) ||
+        ((Level < 3) && (((UINT64)PageTable & ~BlockMask) == RegionStart)) ||
         IsTableEntry (*Entry, Level))
     {
       ASSERT (Level < 3);
@@ -234,7 +280,8 @@ UpdateRegionMappingRecursive (
                      *Entry & TT_ATTRIBUTES_MASK,
                      0,
                      TranslationTable,
-                     Level + 1
+                     Level + 1,
+                     FALSE
                      );
           if (EFI_ERROR (Status)) {
             //
@@ -246,8 +293,11 @@ UpdateRegionMappingRecursive (
             return Status;
           }
         }
+
+        NextTableIsLive = FALSE;
       } else {
         TranslationTable = (VOID *)(UINTN)(*Entry & TT_ADDRESS_MASK_BLOCK_ENTRY);
+        NextTableIsLive  = TableIsLive;
       }
 
       //
@@ -259,7 +309,8 @@ UpdateRegionMappingRecursive (
                  AttributeSetMask,
                  AttributeClearMask,
                  TranslationTable,
-                 Level + 1
+                 Level + 1,
+                 NextTableIsLive
                  );
       if (EFI_ERROR (Status)) {
         if (!IsTableEntry (*Entry, Level)) {
@@ -282,7 +333,8 @@ UpdateRegionMappingRecursive (
           Entry,
           EntryValue,
           RegionStart,
-          IsBlockEntry (*Entry, Level)
+          BlockMask,
+          TableIsLive && IsBlockEntry (*Entry, Level)
           );
       }
     } else {
@@ -291,7 +343,7 @@ UpdateRegionMappingRecursive (
       EntryValue |= (Level == 3) ? TT_TYPE_BLOCK_ENTRY_LEVEL3
                                  : TT_TYPE_BLOCK_ENTRY;
 
-      ReplaceTableEntry (Entry, EntryValue, RegionStart, FALSE);
+      ReplaceTableEntry (Entry, EntryValue, RegionStart, BlockMask, FALSE);
     }
   }
 
@@ -301,10 +353,11 @@ UpdateRegionMappingRecursive (
 STATIC
 EFI_STATUS
 UpdateRegionMapping (
-  IN  UINT64  RegionStart,
-  IN  UINT64  RegionLength,
-  IN  UINT64  AttributeSetMask,
-  IN  UINT64  AttributeClearMask
+  IN  UINT64   RegionStart,
+  IN  UINT64   RegionLength,
+  IN  UINT64   AttributeSetMask,
+  IN  UINT64   AttributeClearMask,
+  IN  BOOLEAN  TableIsLive
   )
 {
   UINTN  T0SZ;
@@ -321,7 +374,8 @@ UpdateRegionMapping (
            AttributeSetMask,
            AttributeClearMask,
            ArmGetTTBR0BaseAddress (),
-           GetRootTableLevel (T0SZ)
+           GetRootTableLevel (T0SZ),
+           TableIsLive
            );
 }
 
@@ -336,7 +390,8 @@ FillTranslationTable (
            MemoryRegion->VirtualBase,
            MemoryRegion->Length,
            ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF,
-           0
+           0,
+           FALSE
            );
 }
 
@@ -410,7 +465,8 @@ ArmSetMemoryAttributes (
            BaseAddress,
            Length,
            PageAttributes,
-           PageAttributeMask
+           PageAttributeMask,
+           TRUE
            );
 }
 
@@ -423,7 +479,13 @@ SetMemoryRegionAttribute (
   IN  UINT64                BlockEntryMask
   )
 {
-  return UpdateRegionMapping (BaseAddress, Length, Attributes, BlockEntryMask);
+  return UpdateRegionMapping (
+           BaseAddress,
+           Length,
+           Attributes,
+           BlockEntryMask,
+           TRUE
+           );
 }
 
 EFI_STATUS
