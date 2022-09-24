@@ -1,7 +1,6 @@
 // /** @file
-// This module provides openSSL Library implementation (libcrypto only, no libssl).
-//
-// This module provides OpenSSL Library implementation (libcrypto only, no libssl).
+// This module provides OpenSSL Library implementation (libcrypto only, no
+// libssl or ecc).
 //
 // Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 //
@@ -9,8 +8,6 @@
 //
 // **/
 
+#string STR_MODULE_ABSTRACT             #language en-US "OpenSSL Library implementation (libcrypto only, no libssl or ecc)"
 
-#string STR_MODULE_ABSTRACT             #language en-US "OpenSSL Library implementation (libcrypto only, no libssl)"
-
-#string STR_MODULE_DESCRIPTION          #language en-US "This module provides OpenSSL Library implementation (libcrypto only, no libssl)."
-
+#string STR_MODULE_DESCRIPTION          #language en-US "This module provides OpenSSL Library implementation (libcrypto only, no libssl or ecc)."
