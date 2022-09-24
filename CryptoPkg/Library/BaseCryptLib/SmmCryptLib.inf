@@ -86,7 +86,6 @@
 
 [LibraryClasses]
   BaseLib
-  IoLib
   BaseMemoryLib
   MemoryAllocationLib
   OpensslLib

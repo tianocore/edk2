@@ -40,9 +40,10 @@
   # Build HOST_APPLICATION that tests the SampleUnitTest
   #
   CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibHost.inf
+  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibHostOpt.inf {
+    <LibraryClasses>
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibOpt.inf
+  }
 
 [BuildOptions]
   *_*_*_CC_FLAGS       = -D DISABLE_NEW_DEPRECATED_INTERFACES
-  MSFT:*_*_*_CC_FLAGS  = /D ENABLE_MD5_DEPRECATED_INTERFACES
-  INTEL:*_*_*_CC_FLAGS = /D ENABLE_MD5_DEPRECATED_INTERFACES
-  GCC:*_*_*_CC_FLAGS   = -D ENABLE_MD5_DEPRECATED_INTERFACES
