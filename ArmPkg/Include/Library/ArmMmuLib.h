@@ -52,9 +52,10 @@ ArmClearMemoryRegionReadOnly (
 VOID
 EFIAPI
 ArmReplaceLiveTranslationEntry (
-  IN  UINT64  *Entry,
-  IN  UINT64  Value,
-  IN  UINT64  RegionStart
+  IN  UINT64   *Entry,
+  IN  UINT64   Value,
+  IN  UINT64   RegionStart,
+  IN  BOOLEAN  DisableMmu
   );
 
 EFI_STATUS
