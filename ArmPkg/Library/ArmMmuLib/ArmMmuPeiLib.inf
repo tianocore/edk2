@@ -29,4 +29,8 @@
 [LibraryClasses]
   ArmLib
   CacheMaintenanceLib
+  HobLib
   MemoryAllocationLib
+
+[Guids]
+  gArmMmuReplaceLiveTranslationEntryFuncGuid
