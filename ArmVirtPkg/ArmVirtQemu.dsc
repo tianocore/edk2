@@ -218,6 +218,9 @@
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|3
   gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x20000
 
+  # Shadowing PEI modules is absolutely pointless when the NOR flash is emulated
+  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot|FALSE
+
 [PcdsFixedAtBuild.AARCH64]
   # Clearing BIT0 in this PCD prevents installing a 32-bit SMBIOS entry point,
   # if the entry point version is >= 3.0. AARCH64 OSes cannot assume the
