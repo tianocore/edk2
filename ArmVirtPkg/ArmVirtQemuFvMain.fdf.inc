@@ -146,11 +146,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   INF MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
   INF OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
-
-  #
-  # EBC support
-  #
-  INF MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
 !endif
 
   #

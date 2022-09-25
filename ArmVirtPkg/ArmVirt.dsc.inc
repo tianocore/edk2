@@ -422,8 +422,3 @@
     <LibraryClasses>
       NULL|EmbeddedPkg/Library/PlatformHasAcpiLib/PlatformHasAcpiLib.inf
   }
-
-  #
-  # EBC support
-  #
-  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
