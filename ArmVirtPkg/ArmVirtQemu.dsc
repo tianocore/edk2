@@ -325,8 +325,6 @@
   }
   ArmPkg/Drivers/CpuPei/CpuPei.inf
 
-  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-
 !if $(TPM2_ENABLE) == TRUE
   MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf {
     <LibraryClasses>
