@@ -17,6 +17,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/SafeIntLib.h>
+#include <Protocol/Tls.h>
+#include <IndustryStandard/Tls1.h>
+#include <Library/PcdLib.h>
+#include <openssl/obj_mac.h>
 #include <openssl/ssl.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>

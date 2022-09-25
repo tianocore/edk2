@@ -245,3 +245,26 @@ TlsWrite (
   ASSERT (FALSE);
   return 0;
 }
+
+/**
+  Shutdown a TLS connection.
+
+  Shutdown the TLS connection without releasing the resources, meaning a new
+  connection can be started without calling TlsNew() and without setting
+  certificates etc.
+
+  @param[in]       Tls            Pointer to the TLS object to shutdown.
+
+  @retval EFI_SUCCESS             The TLS is shutdown successfully.
+  @retval EFI_INVALID_PARAMETER   Tls is NULL.
+  @retval EFI_PROTOCOL_ERROR      Some other error occurred.
+**/
+EFI_STATUS
+EFIAPI
+TlsShutdown (
+  IN     VOID  *Tls
+  )
+{
+  ASSERT (FALSE);
+  return EFI_UNSUPPORTED;
+}
