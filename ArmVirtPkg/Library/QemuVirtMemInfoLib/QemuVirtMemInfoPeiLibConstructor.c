@@ -6,9 +6,10 @@
 
 **/
 
-#include <Base.h>
+#include <Uefi.h>
+#include <Pi/PiMultiPhase.h>
 #include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
+#include <Library/HobLib.h>
 #include <libfdt.h>
 
 RETURN_STATUS
@@ -17,14 +18,14 @@ QemuVirtMemInfoPeiLibConstructor (
   VOID
   )
 {
-  VOID           *DeviceTreeBase;
-  INT32          Node, Prev;
-  UINT64         NewBase, CurBase;
-  UINT64         NewSize, CurSize;
-  CONST CHAR8    *Type;
-  INT32          Len;
-  CONST UINT64   *RegProp;
-  RETURN_STATUS  PcdStatus;
+  VOID          *DeviceTreeBase;
+  INT32         Node, Prev;
+  UINT64        NewBase, CurBase;
+  UINT64        NewSize, CurSize;
+  CONST CHAR8   *Type;
+  INT32         Len;
+  CONST UINT64  *RegProp;
+  VOID          *Hob;
 
   NewBase = 0;
   NewSize = 0;
@@ -86,8 +87,13 @@ QemuVirtMemInfoPeiLibConstructor (
   // Make sure the start of DRAM matches our expectation
   //
   ASSERT (FixedPcdGet64 (PcdSystemMemoryBase) == NewBase);
-  PcdStatus = PcdSet64S (PcdSystemMemorySize, NewSize);
-  ASSERT_RETURN_ERROR (PcdStatus);
+
+  Hob = BuildGuidDataHob (
+          &gArmVirtSystemMemorySizeGuid,
+          &NewSize,
+          sizeof NewSize
+          );
+  ASSERT (Hob != NULL);
 
   //
   // We need to make sure that the machine we are running on has at least
