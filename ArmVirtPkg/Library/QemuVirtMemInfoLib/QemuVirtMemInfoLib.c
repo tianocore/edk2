@@ -6,10 +6,12 @@
 
 **/
 
-#include <Base.h>
+#include <Uefi.h>
+#include <Pi/PiMultiPhase.h>
 #include <Library/ArmLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 
 // Number of Virtual Memory Map Descriptors
@@ -23,6 +25,28 @@
 //
 #define MACH_VIRT_PERIPH_BASE  0x08000000
 #define MACH_VIRT_PERIPH_SIZE  SIZE_128MB
+
+/**
+  Default library constructur that obtains the memory size from a PCD.
+
+  @return  Always returns RETURN_SUCCESS
+
+**/
+RETURN_STATUS
+EFIAPI
+QemuVirtMemInfoLibConstructor (
+  VOID
+  )
+{
+  UINT64  Size;
+  VOID    *Hob;
+
+  Size = PcdGet64 (PcdSystemMemorySize);
+  Hob  = BuildGuidDataHob (&gArmVirtSystemMemorySizeGuid, &Size, sizeof Size);
+  ASSERT (Hob != NULL);
+
+  return RETURN_SUCCESS;
+}
 
 /**
   Return the Virtual Memory Map of your platform
@@ -43,8 +67,15 @@ ArmVirtGetMemoryMap (
   )
 {
   ARM_MEMORY_REGION_DESCRIPTOR  *VirtualMemoryTable;
+  VOID                          *MemorySizeHob;
 
   ASSERT (VirtualMemoryMap != NULL);
+
+  MemorySizeHob = GetFirstGuidHob (&gArmVirtSystemMemorySizeGuid);
+  ASSERT (MemorySizeHob != NULL);
+  if (MemorySizeHob == NULL) {
+    return;
+  }
 
   VirtualMemoryTable = AllocatePool (
                          sizeof (ARM_MEMORY_REGION_DESCRIPTOR) *
@@ -59,7 +90,7 @@ ArmVirtGetMemoryMap (
   // System DRAM
   VirtualMemoryTable[0].PhysicalBase = PcdGet64 (PcdSystemMemoryBase);
   VirtualMemoryTable[0].VirtualBase  = VirtualMemoryTable[0].PhysicalBase;
-  VirtualMemoryTable[0].Length       = PcdGet64 (PcdSystemMemorySize);
+  VirtualMemoryTable[0].Length       = *(UINT64 *)GET_GUID_HOB_DATA (MemorySizeHob);
   VirtualMemoryTable[0].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
 
   DEBUG ((

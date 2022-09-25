@@ -221,6 +221,9 @@
   # Shadowing PEI modules is absolutely pointless when the NOR flash is emulated
   gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot|FALSE
 
+  # System Memory Size -- 128 MB initially, actual size will be fetched from DT
+  gArmTokenSpaceGuid.PcdSystemMemorySize|0x8000000
+
 [PcdsFixedAtBuild.AARCH64]
   # Clearing BIT0 in this PCD prevents installing a 32-bit SMBIOS entry point,
   # if the entry point version is >= 3.0. AARCH64 OSes cannot assume the
@@ -236,9 +239,6 @@
   ## If TRUE, OvmfPkg/AcpiPlatformDxe will not wait for PCI
   #  enumeration to complete before installing ACPI tables.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
-
-  # System Memory Size -- 1 MB initially, actual size will be fetched from DT
-  gArmTokenSpaceGuid.PcdSystemMemorySize|0x00100000
 
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|0x0
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|0x0

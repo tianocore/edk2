@@ -14,6 +14,7 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmVirtMemInfoLib
+  CONSTRUCTOR                    = QemuVirtMemInfoLibConstructor
 
 [Sources]
   QemuVirtMemInfoLib.c
@@ -30,7 +31,9 @@
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
-  PcdLib
+
+[Guids]
+  gArmVirtSystemMemorySizeGuid
 
 [Pcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress

@@ -52,9 +52,18 @@ MemoryPeim (
 {
   EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttributes;
   UINT64                       SystemMemoryTop;
+  UINT64                       SystemMemorySize;
+  VOID                         *Hob;
 
   // Ensure PcdSystemMemorySize has been set
   ASSERT (PcdGet64 (PcdSystemMemorySize) != 0);
+
+  SystemMemorySize = PcdGet64 (PcdSystemMemorySize);
+
+  Hob = GetFirstGuidHob (&gArmVirtSystemMemorySizeGuid);
+  if (Hob != NULL) {
+    SystemMemorySize = *(UINT64 *)GET_GUID_HOB_DATA (Hob);
+  }
 
   //
   // Now, the permanent memory has been installed, we can call AllocatePages()
@@ -66,8 +75,7 @@ MemoryPeim (
                         EFI_RESOURCE_ATTRIBUTE_TESTED
                         );
 
-  SystemMemoryTop = PcdGet64 (PcdSystemMemoryBase) +
-                    PcdGet64 (PcdSystemMemorySize);
+  SystemMemoryTop = PcdGet64 (PcdSystemMemoryBase) + SystemMemorySize;
 
   if (SystemMemoryTop - 1 > MAX_ALLOC_ADDRESS) {
     BuildResourceDescriptorHob (
@@ -87,7 +95,7 @@ MemoryPeim (
       EFI_RESOURCE_SYSTEM_MEMORY,
       ResourceAttributes,
       PcdGet64 (PcdSystemMemoryBase),
-      PcdGet64 (PcdSystemMemorySize)
+      SystemMemorySize
       );
   }
 
