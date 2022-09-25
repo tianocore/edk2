@@ -39,6 +39,7 @@
   HkdfTests.c
   AeadAesGcmTests.c
   BnTests.c
+  EcTests.c
 
 [Packages]
   MdePkg/MdePkg.dec

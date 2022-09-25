@@ -19,6 +19,9 @@
 
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
 
+[PcdsFixedAtBuild]
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled|TRUE
+
 [LibraryClasses]
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/UnitTestHostBaseCryptLib.inf

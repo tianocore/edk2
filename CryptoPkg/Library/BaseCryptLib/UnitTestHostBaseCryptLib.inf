@@ -48,6 +48,8 @@
   Pk/CryptRsaPss.c
   Pk/CryptRsaPssSign.c
   Bn/CryptBn.c
+  Pk/CryptEcNull.c    |*|*|*|!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  Pk/CryptEc.c    |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
 
   SysCall/UnitTestHostCrtWrapper.c
 
