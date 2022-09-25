@@ -53,6 +53,8 @@
   Pk/CryptTs.c
   Pk/CryptRsaPss.c
   Pk/CryptRsaPssSign.c
+  Pk/CryptEcNull.c    |*|*|*|!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  Pk/CryptEc.c    |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
   Pem/CryptPem.c
   Bn/CryptBn.c
 
