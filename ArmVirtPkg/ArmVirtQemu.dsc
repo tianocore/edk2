@@ -288,10 +288,15 @@
   #
   # TPM2 support
   #
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
 !if $(TPM2_ENABLE) == TRUE
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0
+!else
+[PcdsPatchableInModule]
+  # make this PCD patchable instead of dynamic when TPM support is not enabled
+  # this permits setting the PCD in unreachable code without pulling in dynamic PCD support
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
 !endif
 
 [PcdsDynamicHii]
@@ -304,6 +309,13 @@
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|5
 
+[LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
+!if $(TPM2_ENABLE) == TRUE
+  PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+!else
+  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+!endif
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
@@ -315,10 +327,6 @@
   #
   ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
-  MdeModulePkg/Universal/PCD/Pei/Pcd.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  }
   ArmPlatformPkg/PlatformPei/PlatformPeim.inf
   ArmVirtPkg/MemoryInitPei/MemoryInitPeim.inf {
     <LibraryClasses>
@@ -329,6 +337,10 @@
   ArmPkg/Drivers/CpuPei/CpuPei.inf
 
 !if $(TPM2_ENABLE) == TRUE
+  MdeModulePkg/Universal/PCD/Pei/Pcd.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  }
   MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf {
     <LibraryClasses>
       ResetSystemLib|ArmVirtPkg/Library/ArmVirtPsciResetSystemPeiLib/ArmVirtPsciResetSystemPeiLib.inf
