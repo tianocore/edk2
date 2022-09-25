@@ -35,9 +35,10 @@
   Hash/CryptSha512.c
   Hash/CryptSm3.c
   Hash/CryptParallelHashNull.c
-  Hmac/CryptHmacSha256.c
+  Hmac/CryptHmac.c
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
+  Cipher/CryptAeadAesGcm.c
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExt.c
   Pk/CryptPkcs1Oaep.c
@@ -53,6 +54,7 @@
   Pk/CryptRsaPss.c
   Pk/CryptRsaPssSign.c
   Pem/CryptPem.c
+  Bn/CryptBn.c
 
   SysCall/CrtWrapper.c
   SysCall/TimerWrapper.c

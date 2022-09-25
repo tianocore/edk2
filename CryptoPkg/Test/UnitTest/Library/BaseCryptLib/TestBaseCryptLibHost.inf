@@ -37,6 +37,9 @@
   OaepEncryptTests.c
   RsaPssTests.c
   ParallelhashTests.c
+  HkdfTests.c
+  AeadAesGcmTests.c
+  BnTests.c
 
 [Packages]
   MdePkg/MdePkg.dec

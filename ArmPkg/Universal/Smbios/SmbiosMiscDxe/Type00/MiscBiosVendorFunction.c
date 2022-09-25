@@ -1,5 +1,6 @@
 /** @file
 
+  Copyright (c) 2022, Ampere Computing LLC. All rights reserved.<BR>
   Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
   Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2015, Hisilicon Limited. All rights reserved.<BR>
@@ -13,6 +14,7 @@
 #include <Library/DebugLib.h>
 #include <Library/HiiLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/OemMiscLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
@@ -191,11 +193,11 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscBiosVendor) {
     TokenToUpdate = STRING_TOKEN (STR_MISC_BIOS_VERSION);
     HiiSetString (mSmbiosMiscHiiHandle, TokenToUpdate, Version, NULL);
   } else {
-    Version = (CHAR16 *)PcdGetPtr (PcdFirmwareVersionString);
-    if (StrLen (Version) > 0) {
-      TokenToUpdate = STRING_TOKEN (STR_MISC_BIOS_VERSION);
-      HiiSetString (mSmbiosMiscHiiHandle, TokenToUpdate, Version, NULL);
-    }
+    OemUpdateSmbiosInfo (
+      mSmbiosMiscHiiHandle,
+      STRING_TOKEN (STR_MISC_BIOS_VERSION),
+      BiosVersionType00
+      );
   }
 
   Char16String = GetBiosReleaseDate ();
@@ -251,13 +253,11 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscBiosVendor) {
     }
   }
 
-  SmbiosRecord->SystemBiosMajorRelease = (UINT8)(PcdGet16 (PcdSystemBiosRelease) >> 8);
-  SmbiosRecord->SystemBiosMinorRelease = (UINT8)(PcdGet16 (PcdSystemBiosRelease) & 0xFF);
+  SmbiosRecord->SystemBiosMajorRelease = (UINT8)(OemGetBiosRelease () >> 8);
+  SmbiosRecord->SystemBiosMinorRelease = (UINT8)(OemGetBiosRelease () & 0xFF);
 
-  SmbiosRecord->EmbeddedControllerFirmwareMajorRelease = (UINT16)
-                                                         (PcdGet16 (PcdEmbeddedControllerFirmwareRelease) >> 8);
-  SmbiosRecord->EmbeddedControllerFirmwareMinorRelease = (UINT16)
-                                                         (PcdGet16 (PcdEmbeddedControllerFirmwareRelease) & 0xFF);
+  SmbiosRecord->EmbeddedControllerFirmwareMajorRelease = (UINT16)(OemGetEmbeddedControllerFirmwareRelease () >> 8);
+  SmbiosRecord->EmbeddedControllerFirmwareMinorRelease = (UINT16)(OemGetEmbeddedControllerFirmwareRelease () & 0xFF);
 
   OptionalStrStart = (CHAR8 *)(SmbiosRecord + 1);
   UnicodeStrToAsciiStrS (Vendor, OptionalStrStart, VendorStrLen + 1);
