@@ -4239,6 +4239,28 @@ CryptoServiceTlsWrite (
 }
 
 /**
+  Shutdown a TLS connection.
+
+  Shutdown the TLS connection without releasing the resources, meaning a new
+  connection can be started without calling TlsNew() and without setting
+  certificates etc.
+
+  @param[in]       Tls            Pointer to the TLS object to shutdown.
+
+  @retval EFI_SUCCESS             The TLS is shutdown successfully.
+  @retval EFI_INVALID_PARAMETER   Tls is NULL.
+  @retval EFI_PROTOCOL_ERROR      Some other error occurred.
+**/
+EFI_STATUS
+EFIAPI
+CryptoServiceTlsShutdown (
+  IN     VOID  *Tls
+  )
+{
+  return CALL_BASECRYPTLIB (Tls.Services.Shutdown, TlsShutdown, (Tls), EFI_UNSUPPORTED);
+}
+
+/**
   Set a new TLS/SSL method for a particular TLS object.
 
   This function sets a new TLS/SSL method for a particular TLS object.
@@ -4463,11 +4485,41 @@ CryptoServiceTlsSetHostPublicCert (
 /**
   Adds the local private key to the specified TLS object.
 
-  This function adds the local private key (PEM-encoded RSA or PKCS#8 private
+  This function adds the local private key (DER-encoded or PEM-encoded or PKCS#8 private
   key) into the specified TLS object for TLS negotiation.
 
   @param[in]  Tls         Pointer to the TLS object.
-  @param[in]  Data        Pointer to the data buffer of a PEM-encoded RSA
+  @param[in]  Data        Pointer to the data buffer of a DER-encoded or PEM-encoded
+                          or PKCS#8 private key.
+  @param[in]  DataSize    The size of data buffer in bytes.
+  @param[in]  Password    Pointer to NULL-terminated private key password, set it to NULL
+                          if private key not encrypted.
+
+  @retval  EFI_SUCCESS     The operation succeeded.
+  @retval  EFI_UNSUPPORTED This function is not supported.
+  @retval  EFI_ABORTED     Invalid private key data.
+
+**/
+EFI_STATUS
+EFIAPI
+CryptoServiceTlsSetHostPrivateKeyEx (
+  IN     VOID   *Tls,
+  IN     VOID   *Data,
+  IN     UINTN  DataSize,
+  IN     VOID   *Password  OPTIONAL
+  )
+{
+  return CALL_BASECRYPTLIB (TlsSet.Services.HostPrivateKeyEx, TlsSetHostPrivateKeyEx, (Tls, Data, DataSize, Password), EFI_UNSUPPORTED);
+}
+
+/**
+  Adds the local private key to the specified TLS object.
+
+  This function adds the local private key (DER-encoded or PEM-encoded or PKCS#8 private
+  key) into the specified TLS object for TLS negotiation.
+
+  @param[in]  Tls         Pointer to the TLS object.
+  @param[in]  Data        Pointer to the data buffer of a DER-encoded or PEM-encoded
                           or PKCS#8 private key.
   @param[in]  DataSize    The size of data buffer in bytes.
 
@@ -4509,6 +4561,59 @@ CryptoServiceTlsSetCertRevocationList (
   )
 {
   return CALL_BASECRYPTLIB (TlsSet.Services.CertRevocationList, TlsSetCertRevocationList, (Data, DataSize), EFI_UNSUPPORTED);
+}
+
+/**
+  Set the signature algorithm list to used by the TLS object.
+
+  This function sets the signature algorithms for use by a specified TLS object.
+
+  @param[in]  Tls                Pointer to a TLS object.
+  @param[in]  Data               Array of UINT8 of signature algorithms. The array consists of
+                                 pairs of the hash algorithm and the signature algorithm as defined
+                                 in RFC 5246
+  @param[in]  DataSize           The length the SignatureAlgoList. Must be divisible by 2.
+
+  @retval  EFI_SUCCESS           The signature algorithm list was set successfully.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+  @retval  EFI_UNSUPPORTED       No supported TLS signature algorithm was found in SignatureAlgoList
+  @retval  EFI_OUT_OF_RESOURCES  Memory allocation failed.
+
+**/
+EFI_STATUS
+EFIAPI
+CryptoServiceTlsSetSignatureAlgoList (
+  IN     VOID   *Tls,
+  IN     UINT8  *Data,
+  IN     UINTN  DataSize
+  )
+{
+  return CALL_BASECRYPTLIB (TlsSet.Services.SignatureAlgoList, TlsSetSignatureAlgoList, (Tls, Data, DataSize), EFI_UNSUPPORTED);
+}
+
+/**
+  Set the EC curve to be used for TLS flows
+
+  This function sets the EC curve to be used for TLS flows.
+
+  @param[in]  Tls                Pointer to a TLS object.
+  @param[in]  Data               An EC named curve as defined in section 5.1.1 of RFC 4492.
+  @param[in]  DataSize           Size of Data, it should be sizeof (UINT32)
+
+  @retval  EFI_SUCCESS           The EC curve was set successfully.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+  @retval  EFI_UNSUPPORTED       The requested TLS EC curve is not supported
+
+**/
+EFI_STATUS
+EFIAPI
+CryptoServiceTlsSetEcCurve (
+  IN     VOID   *Tls,
+  IN     UINT8  *Data,
+  IN     UINTN  DataSize
+  )
+{
+  return CALL_BASECRYPTLIB (TlsSet.Services.EcCurve, TlsSetEcCurve, (Tls, Data, DataSize), EFI_UNSUPPORTED);
 }
 
 /**
@@ -4824,6 +4929,44 @@ CryptoServiceTlsGetCertRevocationList (
   )
 {
   return CALL_BASECRYPTLIB (TlsGet.Services.CertRevocationList, TlsGetCertRevocationList, (Data, DataSize), EFI_UNSUPPORTED);
+}
+
+/**
+  Derive keying material from a TLS connection.
+
+  This function exports keying material using the mechanism described in RFC
+  5705.
+
+  @param[in]      Tls          Pointer to the TLS object
+  @param[in]      Label        Description of the key for the PRF function
+  @param[in]      Context      Optional context
+  @param[in]      ContextLen   The length of the context value in bytes
+  @param[out]     KeyBuffer    Buffer to hold the output of the TLS-PRF
+  @param[in]      KeyBufferLen The length of the KeyBuffer
+
+  @retval  EFI_SUCCESS             The operation succeeded.
+  @retval  EFI_INVALID_PARAMETER   The TLS object is invalid.
+  @retval  EFI_PROTOCOL_ERROR      Some other error occurred.
+
+**/
+EFI_STATUS
+EFIAPI
+CryptoServiceTlsGetExportKey (
+  IN     VOID        *Tls,
+  IN     CONST VOID  *Label,
+  IN     CONST VOID  *Context,
+  IN     UINTN       ContextLen,
+  OUT    VOID        *KeyBuffer,
+  IN     UINTN       KeyBufferLen
+  )
+{
+  return CALL_BASECRYPTLIB (
+           TlsGet.Services.ExportKey,
+           TlsGetExportKey,
+           (Tls, Label, Context, ContextLen,
+            KeyBuffer, KeyBufferLen),
+           EFI_UNSUPPORTED
+           );
 }
 
 /**
@@ -6266,4 +6409,12 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   CryptoServiceEcGenerateKey,
   CryptoServiceEcGetPubKey,
   CryptoServiceEcDhComputeKey,
+  /// TLS (continued)
+  CryptoServiceTlsShutdown,
+  /// TLS Set (continued)
+  CryptoServiceTlsSetHostPrivateKeyEx,
+  CryptoServiceTlsSetSignatureAlgoList,
+  CryptoServiceTlsSetEcCurve,
+  /// TLS Get (continued)
+  CryptoServiceTlsGetExportKey
 };
