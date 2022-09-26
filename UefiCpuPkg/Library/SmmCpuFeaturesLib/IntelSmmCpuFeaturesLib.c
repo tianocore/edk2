@@ -400,4 +400,3 @@ SmmCpuFeaturesSetSmmRegister (
     AsmWriteMsr64 (SMM_FEATURES_LIB_SMM_FEATURE_CONTROL, Value);
   }
 }
-
