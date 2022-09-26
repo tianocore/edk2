@@ -47,6 +47,9 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
 
+[Protocols]
+  gEfiMemoryAcceptProtocolGuid
+
 [Guids]
   gConfidentialComputingSevSnpBlobGuid
 
