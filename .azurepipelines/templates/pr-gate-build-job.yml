@@ -12,6 +12,7 @@ parameters:
   tool_chain_tag: ''
   vm_image: ''
   arch_list: ''
+  container: ''
   usePythonVersion: '>=3.10.6'
 
 # Build step
@@ -70,6 +71,9 @@ jobs:
 
   pool:
     vmImage: ${{ parameters.vm_image }}
+
+  ${{ if not(eq(parameters.container, '')) }}:
+    container: ${{ parameters.container }}
 
   steps:
   - template: pr-gate-steps.yml
