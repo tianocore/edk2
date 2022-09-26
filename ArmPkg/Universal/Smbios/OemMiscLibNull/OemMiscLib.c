@@ -1,6 +1,7 @@
 /** @file
 *  OemMiscLib.c
 *
+*  Copyright (c) 2022, Ampere Computing LLC. All rights reserved.
 *  Copyright (c) 2021, NUVIA Inc. All rights reserved.
 *  Copyright (c) 2018, Hisilicon Limited. All rights reserved.
 *  Copyright (c) 2018, Linaro Limited. All rights reserved.
@@ -10,10 +11,12 @@
 **/
 
 #include <Uefi.h>
+#include <Guid/ZeroGuid.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HiiLib.h>
 #include <Library/OemMiscLib.h>
+#include <Library/PcdLib.h>
 
 /** Gets the CPU frequency of the specified processor.
 
@@ -235,4 +238,48 @@ OemGetChassisNumPowerCords (
 {
   ASSERT (FALSE);
   return 1;
+}
+
+/**
+  Fetches the system UUID.
+
+  @param[out] SystemUuid     The pointer to the buffer to store the System UUID.
+
+**/
+VOID
+EFIAPI
+OemGetSystemUuid (
+  OUT GUID  *SystemUuid
+  )
+{
+  ASSERT (FALSE);
+  CopyGuid (SystemUuid, &gZeroGuid);
+}
+
+/** Fetches the BIOS release.
+
+  @return The BIOS release.
+**/
+UINT16
+EFIAPI
+OemGetBiosRelease (
+  VOID
+  )
+{
+  ASSERT (FALSE);
+  return PcdGet16 (PcdSystemBiosRelease);
+}
+
+/** Fetches the embedded controller firmware release.
+
+  @return The embedded controller firmware release.
+**/
+UINT16
+EFIAPI
+OemGetEmbeddedControllerFirmwareRelease (
+  VOID
+  )
+{
+  ASSERT (FALSE);
+  return PcdGet16 (PcdEmbeddedControllerFirmwareRelease);
 }

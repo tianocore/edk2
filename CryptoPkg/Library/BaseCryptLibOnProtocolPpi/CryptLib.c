@@ -1201,6 +1201,218 @@ HmacSha256Final (
   CALL_CRYPTO_SERVICE (HmacSha256Final, (HmacSha256Context, HmacValue), FALSE);
 }
 
+/**
+  Computes the HMAC-SHA256 digest of a input data buffer.
+
+  This function performs the HMAC-SHA256 digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be digested.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[in]   Key         Pointer to the user-supplied key.
+  @param[in]   KeySize     Key size in bytes.
+  @param[out]  HmacValue   Pointer to a buffer that receives the HMAC-SHA256 digest
+                           value (32 bytes).
+
+  @retval TRUE   HMAC-SHA256 digest computation succeeded.
+  @retval FALSE  HMAC-SHA256 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha256All (
+  IN   CONST VOID   *Data,
+  IN   UINTN        DataSize,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  OUT  UINT8        *HmacValue
+  )
+{
+  CALL_CRYPTO_SERVICE (HmacSha256All, (Data, DataSize, Key, KeySize, HmacValue), FALSE);
+}
+
+/**
+  Allocates and initializes one HMAC_CTX context for subsequent HMAC-SHA384 use.
+
+  @return  Pointer to the HMAC_CTX context that has been initialized.
+           If the allocations fails, HmacSha384New() returns NULL.
+
+**/
+VOID *
+EFIAPI
+HmacSha384New (
+  VOID
+  )
+{
+  CALL_CRYPTO_SERVICE (HmacSha384New, (), NULL);
+}
+
+/**
+  Release the specified HMAC_CTX context.
+
+  @param[in]  HmacSha384Ctx  Pointer to the HMAC_CTX context to be released.
+
+**/
+VOID
+EFIAPI
+HmacSha384Free (
+  IN  VOID  *HmacSha384Ctx
+  )
+{
+  CALL_VOID_CRYPTO_SERVICE (HmacSha384Free, (HmacSha384Ctx));
+}
+
+/**
+  Set user-supplied key for subsequent use. It must be done before any
+  calling to HmacSha384Update().
+
+  If HmacSha384Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[out]  HmacSha384Context  Pointer to HMAC-SHA384 context.
+  @param[in]   Key                Pointer to the user-supplied key.
+  @param[in]   KeySize            Key size in bytes.
+
+  @retval TRUE   The Key is set successfully.
+  @retval FALSE  The Key is set unsuccessfully.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha384SetKey (
+  OUT  VOID         *HmacSha384Context,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize
+  )
+{
+  CALL_CRYPTO_SERVICE (HmacSha384SetKey, (HmacSha384Context, Key, KeySize), FALSE);
+}
+
+/**
+  Makes a copy of an existing HMAC-SHA384 context.
+
+  If HmacSha384Context is NULL, then return FALSE.
+  If NewHmacSha384Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]  HmacSha384Context     Pointer to HMAC-SHA384 context being copied.
+  @param[out] NewHmacSha384Context  Pointer to new HMAC-SHA384 context.
+
+  @retval TRUE   HMAC-SHA384 context copy succeeded.
+  @retval FALSE  HMAC-SHA384 context copy failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha384Duplicate (
+  IN   CONST VOID  *HmacSha384Context,
+  OUT  VOID        *NewHmacSha384Context
+  )
+{
+  CALL_CRYPTO_SERVICE (HmacSha384Duplicate, (HmacSha384Context, NewHmacSha384Context), FALSE);
+}
+
+/**
+  Digests the input data and updates HMAC-SHA384 context.
+
+  This function performs HMAC-SHA384 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  HMAC-SHA384 context should be initialized by HmacSha384New(), and should not be finalized
+  by HmacSha384Final(). Behavior with invalid context is undefined.
+
+  If HmacSha384Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  HmacSha384Context Pointer to the HMAC-SHA384 context.
+  @param[in]       Data              Pointer to the buffer containing the data to be digested.
+  @param[in]       DataSize          Size of Data buffer in bytes.
+
+  @retval TRUE   HMAC-SHA384 data digest succeeded.
+  @retval FALSE  HMAC-SHA384 data digest failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha384Update (
+  IN OUT  VOID        *HmacSha384Context,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  )
+{
+  CALL_CRYPTO_SERVICE (HmacSha384Update, (HmacSha384Context, Data, DataSize), FALSE);
+}
+
+/**
+  Completes computation of the HMAC-SHA384 digest value.
+
+  This function completes HMAC-SHA384 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the HMAC-SHA384 context cannot
+  be used again.
+  HMAC-SHA384 context should be initialized by HmacSha384New(), and should not be finalized
+  by HmacSha384Final(). Behavior with invalid HMAC-SHA384 context is undefined.
+
+  If HmacSha384Context is NULL, then return FALSE.
+  If HmacValue is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  HmacSha384Context  Pointer to the HMAC-SHA384 context.
+  @param[out]      HmacValue          Pointer to a buffer that receives the HMAC-SHA384 digest
+                                      value (48 bytes).
+
+  @retval TRUE   HMAC-SHA384 digest computation succeeded.
+  @retval FALSE  HMAC-SHA384 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha384Final (
+  IN OUT  VOID   *HmacSha384Context,
+  OUT     UINT8  *HmacValue
+  )
+{
+  CALL_CRYPTO_SERVICE (HmacSha384Final, (HmacSha384Context, HmacValue), FALSE);
+}
+
+/**
+  Computes the HMAC-SHA384 digest of a input data buffer.
+
+  This function performs the HMAC-SHA384 digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be digested.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[in]   Key         Pointer to the user-supplied key.
+  @param[in]   KeySize     Key size in bytes.
+  @param[out]  HmacValue   Pointer to a buffer that receives the HMAC-SHA384 digest
+                           value (48 bytes).
+
+  @retval TRUE   HMAC-SHA384 digest computation succeeded.
+  @retval FALSE  HMAC-SHA384 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha384All (
+  IN   CONST VOID   *Data,
+  IN   UINTN        DataSize,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  OUT  UINT8        *HmacValue
+  )
+{
+  CALL_CRYPTO_SERVICE (HmacSha384All, (Data, DataSize, Key, KeySize, HmacValue), FALSE);
+}
+
 // =====================================================================================
 //    Symmetric Cryptography Primitive
 // =====================================================================================
@@ -1338,6 +1550,99 @@ AesCbcDecrypt (
   )
 {
   CALL_CRYPTO_SERVICE (AesCbcDecrypt, (AesContext, Input, InputSize, Ivec, Output), FALSE);
+}
+
+// =====================================================================================
+//    Authenticated Encryption with Associated Data (AEAD) Cryptography Primitive
+// =====================================================================================
+
+/**
+  Performs AEAD AES-GCM authenticated encryption on a data buffer and additional authenticated data (AAD).
+
+  IvSize must be 12, otherwise FALSE is returned.
+  KeySize must be 16, 24 or 32, otherwise FALSE is returned.
+  TagSize must be 12, 13, 14, 15, 16, otherwise FALSE is returned.
+
+  @param[in]   Key         Pointer to the encryption key.
+  @param[in]   KeySize     Size of the encryption key in bytes.
+  @param[in]   Iv          Pointer to the IV value.
+  @param[in]   IvSize      Size of the IV value in bytes.
+  @param[in]   AData       Pointer to the additional authenticated data (AAD).
+  @param[in]   ADataSize   Size of the additional authenticated data (AAD) in bytes.
+  @param[in]   DataIn      Pointer to the input data buffer to be encrypted.
+  @param[in]   DataInSize  Size of the input data buffer in bytes.
+  @param[out]  TagOut      Pointer to a buffer that receives the authentication tag output.
+  @param[in]   TagSize     Size of the authentication tag in bytes.
+  @param[out]  DataOut     Pointer to a buffer that receives the encryption output.
+  @param[out]  DataOutSize Size of the output data buffer in bytes.
+
+  @retval TRUE   AEAD AES-GCM authenticated encryption succeeded.
+  @retval FALSE  AEAD AES-GCM authenticated encryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+AeadAesGcmEncrypt (
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  IN   CONST UINT8  *Iv,
+  IN   UINTN        IvSize,
+  IN   CONST UINT8  *AData,
+  IN   UINTN        ADataSize,
+  IN   CONST UINT8  *DataIn,
+  IN   UINTN        DataInSize,
+  OUT  UINT8        *TagOut,
+  IN   UINTN        TagSize,
+  OUT  UINT8        *DataOut,
+  OUT  UINTN        *DataOutSize
+  )
+{
+  CALL_CRYPTO_SERVICE (AeadAesGcmEncrypt, (Key, KeySize, Iv, IvSize, AData, ADataSize, DataIn, DataInSize, TagOut, TagSize, DataOut, DataOutSize), FALSE);
+}
+
+/**
+  Performs AEAD AES-GCM authenticated decryption on a data buffer and additional authenticated data (AAD).
+
+  IvSize must be 12, otherwise FALSE is returned.
+  KeySize must be 16, 24 or 32, otherwise FALSE is returned.
+  TagSize must be 12, 13, 14, 15, 16, otherwise FALSE is returned.
+  If additional authenticated data verification fails, FALSE is returned.
+
+  @param[in]   Key         Pointer to the encryption key.
+  @param[in]   KeySize     Size of the encryption key in bytes.
+  @param[in]   Iv          Pointer to the IV value.
+  @param[in]   IvSize      Size of the IV value in bytes.
+  @param[in]   AData       Pointer to the additional authenticated data (AAD).
+  @param[in]   ADataSize   Size of the additional authenticated data (AAD) in bytes.
+  @param[in]   DataIn      Pointer to the input data buffer to be decrypted.
+  @param[in]   DataInSize  Size of the input data buffer in bytes.
+  @param[in]   Tag         Pointer to a buffer that contains the authentication tag.
+  @param[in]   TagSize     Size of the authentication tag in bytes.
+  @param[out]  DataOut     Pointer to a buffer that receives the decryption output.
+  @param[out]  DataOutSize Size of the output data buffer in bytes.
+
+  @retval TRUE   AEAD AES-GCM authenticated decryption succeeded.
+  @retval FALSE  AEAD AES-GCM authenticated decryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+AeadAesGcmDecrypt (
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  IN   CONST UINT8  *Iv,
+  IN   UINTN        IvSize,
+  IN   CONST UINT8  *AData,
+  IN   UINTN        ADataSize,
+  IN   CONST UINT8  *DataIn,
+  IN   UINTN        DataInSize,
+  IN   CONST UINT8  *Tag,
+  IN   UINTN        TagSize,
+  OUT  UINT8        *DataOut,
+  OUT  UINTN        *DataOutSize
+  )
+{
+  CALL_CRYPTO_SERVICE (AeadAesGcmDecrypt, (Key, KeySize, Iv, IvSize, AData, ADataSize, DataIn, DataInSize, Tag, TagSize, DataOut, DataOutSize), FALSE);
 }
 
 // =====================================================================================
@@ -2702,6 +3007,150 @@ HkdfSha256ExtractAndExpand (
 }
 
 /**
+  Derive SHA256 HMAC-based Extract key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          key size in bytes.
+  @param[in]   Salt             Pointer to the salt(non-secret) value.
+  @param[in]   SaltSize         salt size in bytes.
+  @param[out]  PrkOut           Pointer to buffer to receive hkdf value.
+  @param[in]   PrkOutSize       size of hkdf bytes to generate.
+
+  @retval true   Hkdf generated successfully.
+  @retval false  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+HkdfSha256Extract (
+  IN CONST UINT8  *Key,
+  IN UINTN        KeySize,
+  IN CONST UINT8  *Salt,
+  IN UINTN        SaltSize,
+  OUT UINT8       *PrkOut,
+  UINTN           PrkOutSize
+  )
+{
+  CALL_CRYPTO_SERVICE (HkdfSha256Extract, (Key, KeySize, Salt, SaltSize, PrkOut, PrkOutSize), FALSE);
+}
+
+/**
+  Derive SHA256 HMAC-based Expand Key Derivation Function (HKDF).
+
+  @param[in]   Prk              Pointer to the user-supplied key.
+  @param[in]   PrkSize          Key size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+HkdfSha256Expand (
+  IN   CONST UINT8  *Prk,
+  IN   UINTN        PrkSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  )
+{
+  CALL_CRYPTO_SERVICE (HkdfSha256Expand, (Prk, PrkSize, Info, InfoSize, Out, OutSize), FALSE);
+}
+
+/**
+  Derive SHA384 HMAC-based Extract-and-Expand Key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          Key size in bytes.
+  @param[in]   Salt             Pointer to the salt(non-secret) value.
+  @param[in]   SaltSize         Salt size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+HkdfSha384ExtractAndExpand (
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  IN   CONST UINT8  *Salt,
+  IN   UINTN        SaltSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  )
+{
+  CALL_CRYPTO_SERVICE (HkdfSha384ExtractAndExpand, (Key, KeySize, Salt, SaltSize, Info, InfoSize, Out, OutSize), FALSE);
+}
+
+/**
+  Derive SHA384 HMAC-based Extract key Derivation Function (HKDF).
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          key size in bytes.
+  @param[in]   Salt             Pointer to the salt(non-secret) value.
+  @param[in]   SaltSize         salt size in bytes.
+  @param[out]  PrkOut           Pointer to buffer to receive hkdf value.
+  @param[in]   PrkOutSize       size of hkdf bytes to generate.
+
+  @retval true   Hkdf generated successfully.
+  @retval false  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+HkdfSha384Extract (
+  IN CONST UINT8  *Key,
+  IN UINTN        KeySize,
+  IN CONST UINT8  *Salt,
+  IN UINTN        SaltSize,
+  OUT UINT8       *PrkOut,
+  UINTN           PrkOutSize
+  )
+{
+  CALL_CRYPTO_SERVICE (HkdfSha384Extract, (Key, KeySize, Salt, SaltSize, PrkOut, PrkOutSize), FALSE);
+}
+
+/**
+  Derive SHA384 HMAC-based Expand Key Derivation Function (HKDF).
+
+  @param[in]   Prk              Pointer to the user-supplied key.
+  @param[in]   PrkSize          Key size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+HkdfSha384Expand (
+  IN   CONST UINT8  *Prk,
+  IN   UINTN        PrkSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  )
+{
+  CALL_CRYPTO_SERVICE (HkdfSha384Expand, (Prk, PrkSize, Info, InfoSize, Out, OutSize), FALSE);
+}
+
+/**
   Initializes the OpenSSL library.
 
   This function registers ciphers and digests used directly and indirectly
@@ -3611,4 +4060,965 @@ TlsGetCertRevocationList (
   )
 {
   CALL_CRYPTO_SERVICE (TlsGetCertRevocationList, (Data, DataSize), EFI_UNSUPPORTED);
+}
+
+// =====================================================================================
+//    Big number primitive
+// =====================================================================================
+
+/**
+  Allocate new Big Number.
+
+  @retval New BigNum opaque structure or NULL on failure.
+**/
+VOID *
+EFIAPI
+BigNumInit (
+  VOID
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumInit, (), NULL);
+}
+
+/**
+  Allocate new Big Number and assign the provided value to it.
+
+  @param[in]   Buf    Big endian encoded buffer.
+  @param[in]   Len    Buffer length.
+
+  @retval New BigNum opaque structure or NULL on failure.
+**/
+VOID *
+EFIAPI
+BigNumFromBin (
+  IN CONST UINT8  *Buf,
+  IN UINTN        Len
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumFromBin, (Buf, Len), NULL);
+}
+
+/**
+  Convert the absolute value of Bn into big-endian form and store it at Buf.
+  The Buf array should have at least BigNumBytes() in it.
+
+  @param[in]   Bn     Big number to convert.
+  @param[out]  Buf    Output buffer.
+
+  @retval The length of the big-endian number placed at Buf or -1 on error.
+**/
+INTN
+EFIAPI
+BigNumToBin (
+  IN CONST VOID  *Bn,
+  OUT UINT8      *Buf
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumToBin, (Bn, Buf), -1);
+}
+
+/**
+  Free the Big Number.
+
+  @param[in]   Bn      Big number to free.
+  @param[in]   Clear   TRUE if the buffer should be cleared.
+**/
+VOID
+EFIAPI
+BigNumFree (
+  IN VOID     *Bn,
+  IN BOOLEAN  Clear
+  )
+{
+  CALL_VOID_CRYPTO_SERVICE (BigNumFree, (Bn, Clear));
+}
+
+/**
+  Calculate the sum of two Big Numbers.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnRes   The result of BnA + BnB.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumAdd (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumAdd, (BnA, BnB, BnRes), FALSE);
+}
+
+/**
+  Subtract two Big Numbers.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnRes   The result of BnA - BnB.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumSub (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumSub, (BnA, BnB, BnRes), FALSE);
+}
+
+/**
+  Calculate remainder: BnRes = BnA % BnB
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnRes   The result of BnA % BnB.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumMod (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumMod, (BnA, BnB, BnRes), FALSE);
+}
+
+/**
+  Compute BnA to the BnP-th power modulo BnM.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnP     Big number (power).
+  @param[in]   BnM     Big number (modulo).
+  @param[out]  BnRes   The result of (BnA ^ BnP) % BnM.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumExpMod (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnP,
+  IN CONST VOID  *BnM,
+  OUT VOID       *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumExpMod, (BnA, BnP, BnM, BnRes), FALSE);
+}
+
+/**
+  Compute BnA inverse modulo BnM.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnM     Big number (modulo).
+  @param[out]  BnRes   The result, such that (BnA * BnRes) % BnM == 1.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumInverseMod (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnM,
+  OUT VOID       *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumInverseMod, (BnA, BnM, BnRes), FALSE);
+}
+
+/**
+  Divide two Big Numbers.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnRes   The result, such that BnA / BnB.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumDiv (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumDiv, (BnA, BnB, BnRes), FALSE);
+}
+
+/**
+  Multiply two Big Numbers modulo BnM.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[in]   BnM     Big number (modulo).
+  @param[out]  BnRes   The result, such that (BnA * BnB) % BnM.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumMulMod (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  IN CONST VOID  *BnM,
+  OUT VOID       *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumMulMod, (BnA, BnB, BnM, BnRes), FALSE);
+}
+
+/**
+  Compare two Big Numbers.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+
+  @retval 0          BnA == BnB.
+  @retval 1          BnA > BnB.
+  @retval -1         BnA < BnB.
+**/
+INTN
+EFIAPI
+BigNumCmp (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumCmp, (BnA, BnB), 0);
+}
+
+/**
+  Get number of bits in Bn.
+
+  @param[in]   Bn     Big number.
+
+  @retval Number of bits.
+**/
+UINTN
+EFIAPI
+BigNumBits (
+  IN CONST VOID  *Bn
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumBits, (Bn), 0);
+}
+
+/**
+  Get number of bytes in Bn.
+
+  @param[in]   Bn     Big number.
+
+  @retval Number of bytes.
+**/
+UINTN
+EFIAPI
+BigNumBytes (
+  IN CONST VOID  *Bn
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumBytes, (Bn), 0);
+}
+
+/**
+  Checks if Big Number equals to the given Num.
+
+  @param[in]   Bn     Big number.
+  @param[in]   Num    Number.
+
+  @retval TRUE   iff Bn == Num.
+  @retval FALSE  otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumIsWord (
+  IN CONST VOID  *Bn,
+  IN UINTN       Num
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumIsWord, (Bn, Num), FALSE);
+}
+
+/**
+  Checks if Big Number is odd.
+
+  @param[in]   Bn     Big number.
+
+  @retval TRUE   Bn is odd (Bn % 2 == 1).
+  @retval FALSE  otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumIsOdd (
+  IN CONST VOID  *Bn
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumIsOdd, (Bn), FALSE);
+}
+
+/**
+  Copy Big number.
+
+  @param[out]  BnDst     Destination.
+  @param[in]   BnSrc     Source.
+
+  @retval BnDst on success.
+  @retval NULL otherwise.
+**/
+VOID *
+EFIAPI
+BigNumCopy (
+  OUT VOID       *BnDst,
+  IN CONST VOID  *BnSrc
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumCopy, (BnDst, BnSrc), NULL);
+}
+
+/**
+  Get constant Big number with value of "1".
+  This may be used to save expensive allocations.
+
+  @retval Big Number with value of 1.
+**/
+CONST VOID *
+EFIAPI
+BigNumValueOne (
+  VOID
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumValueOne, (), NULL);
+}
+
+/**
+  Shift right Big Number.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   Bn      Big number.
+  @param[in]   N       Number of bits to shift.
+  @param[out]  BnRes   The result.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumRShift (
+  IN CONST VOID  *Bn,
+  IN UINTN       N,
+  OUT VOID       *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumRShift, (Bn, N, BnRes), FALSE);
+}
+
+/**
+  Mark Big Number for constant time computations.
+  This function should be called before any constant time computations are
+  performed on the given Big number.
+
+  @param[in]   Bn     Big number.
+**/
+VOID
+EFIAPI
+BigNumConstTime (
+  IN VOID  *Bn
+  )
+{
+  CALL_VOID_CRYPTO_SERVICE (BigNumConstTime, (Bn));
+}
+
+/**
+  Calculate square modulo.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnM     Big number (modulo).
+  @param[out]  BnRes   The result, such that (BnA ^ 2) % BnM.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumSqrMod (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnM,
+  OUT VOID       *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumSqrMod, (BnA, BnM, BnRes), FALSE);
+}
+
+/**
+  Create new Big Number computation context. This is an opaque structure
+  which should be passed to any function that requires it. The BN context is
+  needed to optimize calculations and expensive allocations.
+
+  @retval Big Number context struct or NULL on failure.
+**/
+VOID *
+EFIAPI
+BigNumNewContext (
+  VOID
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumNewContext, (), NULL);
+}
+
+/**
+  Free Big Number context that was allocated with BigNumNewContext().
+
+  @param[in]   BnCtx     Big number context to free.
+**/
+VOID
+EFIAPI
+BigNumContextFree (
+  IN VOID  *BnCtx
+  )
+{
+  CALL_VOID_CRYPTO_SERVICE (BigNumContextFree, (BnCtx));
+}
+
+/**
+  Set Big Number to a given value.
+
+  @param[in]   Bn     Big number to set.
+  @param[in]   Val    Value to set.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumSetUint (
+  IN VOID   *Bn,
+  IN UINTN  Val
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumSetUint, (Bn, Val), FALSE);
+}
+
+/**
+  Add two Big Numbers modulo BnM.
+
+  @param[in]   BnA       Big number.
+  @param[in]   BnB       Big number.
+  @param[in]   BnM       Big number (modulo).
+  @param[out]  BnRes     The result, such that (BnA + BnB) % BnM.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumAddMod (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  IN CONST VOID  *BnM,
+  OUT VOID       *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumAddMod, (BnA, BnB, BnM, BnRes), FALSE);
+}
+
+/**
+  Initialize new opaque EcGroup object. This object represents an EC curve and
+  and is used for calculation within this group. This object should be freed
+  using EcGroupFree() function.
+
+  @param[in]  CryptoNid   Identifying number for the ECC curve (Defined in
+                          BaseCryptLib.h).
+
+  @retval EcGroup object  On success.
+  @retval NULL            On failure.
+**/
+VOID *
+EFIAPI
+EcGroupInit (
+  IN UINTN  CryptoNid
+  )
+{
+  CALL_CRYPTO_SERVICE (EcGroupInit, (CryptoNid), NULL);
+}
+
+/**
+  Get EC curve parameters. While elliptic curve equation is Y^2 mod P = (X^3 + AX + B) Mod P.
+  This function will set the provided Big Number objects  to the corresponding
+  values. The caller needs to make sure all the "out" BigNumber parameters
+  are properly initialized.
+
+  @param[in]  EcGroup    EC group object.
+  @param[out] BnPrime    Group prime number.
+  @param[out] BnA        A coefficient.
+  @param[out] BnB        B coefficient.
+  @param[in]  BnCtx      BN context.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcGroupGetCurve (
+  IN CONST VOID  *EcGroup,
+  OUT VOID       *BnPrime,
+  OUT VOID       *BnA,
+  OUT VOID       *BnB,
+  IN VOID        *BnCtx
+  )
+{
+  CALL_CRYPTO_SERVICE (EcGroupGetCurve, (EcGroup, BnPrime, BnA, BnB, BnCtx), FALSE);
+}
+
+/**
+  Get EC group order.
+  This function will set the provided Big Number object to the corresponding
+  value. The caller needs to make sure that the "out" BigNumber parameter
+  is properly initialized.
+
+  @param[in]  EcGroup   EC group object.
+  @param[out] BnOrder   Group prime number.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcGroupGetOrder (
+  IN VOID   *EcGroup,
+  OUT VOID  *BnOrder
+  )
+{
+  CALL_CRYPTO_SERVICE (EcGroupGetOrder, (EcGroup, BnOrder), FALSE);
+}
+
+/**
+  Free previously allocated EC group object using EcGroupInit().
+
+  @param[in]  EcGroup   EC group object to free.
+**/
+VOID
+EFIAPI
+EcGroupFree (
+  IN VOID  *EcGroup
+  )
+{
+  CALL_VOID_CRYPTO_SERVICE (EcGroupFree, (EcGroup));
+}
+
+/**
+  Initialize new opaque EC Point object. This object represents an EC point
+  within the given EC group (curve).
+
+  @param[in]  EC Group, properly initialized using EcGroupInit().
+
+  @retval EC Point object  On success.
+  @retval NULL             On failure.
+**/
+VOID *
+EFIAPI
+EcPointInit (
+  IN CONST VOID  *EcGroup
+  )
+{
+  CALL_CRYPTO_SERVICE (EcPointInit, (EcGroup), NULL);
+}
+
+/**
+  Free previously allocated EC Point object using EcPointInit().
+
+  @param[in]  EcPoint   EC Point to free.
+  @param[in]  Clear     TRUE iff the memory should be cleared.
+**/
+VOID
+EFIAPI
+EcPointDeInit (
+  IN VOID     *EcPoint,
+  IN BOOLEAN  Clear
+  )
+{
+  CALL_VOID_CRYPTO_SERVICE (EcPointDeInit, (EcPoint, Clear));
+}
+
+/**
+  Get EC point affine (x,y) coordinates.
+  This function will set the provided Big Number objects to the corresponding
+  values. The caller needs to make sure all the "out" BigNumber parameters
+  are properly initialized.
+
+  @param[in]  EcGroup    EC group object.
+  @param[in]  EcPoint    EC point object.
+  @param[out] BnX        X coordinate.
+  @param[out] BnY        Y coordinate.
+  @param[in]  BnCtx      BN context, created with BigNumNewContext().
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcPointGetAffineCoordinates (
+  IN CONST VOID  *EcGroup,
+  IN CONST VOID  *EcPoint,
+  OUT VOID       *BnX,
+  OUT VOID       *BnY,
+  IN VOID        *BnCtx
+  )
+{
+  CALL_CRYPTO_SERVICE (EcPointGetAffineCoordinates, (EcGroup, EcPoint, BnX, BnY, BnCtx), FALSE);
+}
+
+/**
+  Set EC point affine (x,y) coordinates.
+
+  @param[in]  EcGroup    EC group object.
+  @param[in]  EcPoint    EC point object.
+  @param[in]  BnX        X coordinate.
+  @param[in]  BnY        Y coordinate.
+  @param[in]  BnCtx      BN context, created with BigNumNewContext().
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcPointSetAffineCoordinates (
+  IN CONST VOID  *EcGroup,
+  IN VOID        *EcPoint,
+  IN CONST VOID  *BnX,
+  IN CONST VOID  *BnY,
+  IN VOID        *BnCtx
+  )
+{
+  CALL_CRYPTO_SERVICE (EcPointSetAffineCoordinates, (EcGroup, EcPoint, BnX, BnY, BnCtx), FALSE);
+}
+
+/**
+  EC Point addition. EcPointResult = EcPointA + EcPointB.
+
+  @param[in]  EcGroup          EC group object.
+  @param[out] EcPointResult    EC point to hold the result. The point should
+                               be properly initialized.
+  @param[in]  EcPointA         EC Point.
+  @param[in]  EcPointB         EC Point.
+  @param[in]  BnCtx            BN context, created with BigNumNewContext().
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcPointAdd (
+  IN CONST VOID  *EcGroup,
+  OUT VOID       *EcPointResult,
+  IN CONST VOID  *EcPointA,
+  IN CONST VOID  *EcPointB,
+  IN VOID        *BnCtx
+  )
+{
+  CALL_CRYPTO_SERVICE (EcPointAdd, (EcGroup, EcPointResult, EcPointA, EcPointB, BnCtx), FALSE);
+}
+
+/**
+  Variable EC point multiplication. EcPointResult = EcPoint * BnPScalar.
+
+  @param[in]  EcGroup          EC group object.
+  @param[out] EcPointResult    EC point to hold the result. The point should
+                               be properly initialized.
+  @param[in]  EcPoint          EC Point.
+  @param[in]  BnPScalar        P Scalar.
+  @param[in]  BnCtx            BN context, created with BigNumNewContext().
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcPointMul (
+  IN CONST VOID  *EcGroup,
+  OUT VOID       *EcPointResult,
+  IN CONST VOID  *EcPoint,
+  IN CONST VOID  *BnPScalar,
+  IN VOID        *BnCtx
+  )
+{
+  CALL_CRYPTO_SERVICE (EcPointMul, (EcGroup, EcPointResult, EcPoint, BnPScalar, BnCtx), FALSE);
+}
+
+/**
+  Calculate the inverse of the supplied EC point.
+
+  @param[in]     EcGroup   EC group object.
+  @param[in,out] EcPoint   EC point to invert.
+  @param[in]     BnCtx     BN context, created with BigNumNewContext().
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcPointInvert (
+  IN CONST VOID  *EcGroup,
+  IN OUT VOID    *EcPoint,
+  IN VOID        *BnCtx
+  )
+{
+  CALL_CRYPTO_SERVICE (EcPointInvert, (EcGroup, EcPoint, BnCtx), FALSE);
+}
+
+/**
+  Check if the supplied point is on EC curve.
+
+  @param[in]  EcGroup   EC group object.
+  @param[in]  EcPoint   EC point to check.
+  @param[in]  BnCtx     BN context, created with BigNumNewContext().
+
+  @retval TRUE          On curve.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcPointIsOnCurve (
+  IN CONST VOID  *EcGroup,
+  IN CONST VOID  *EcPoint,
+  IN VOID        *BnCtx
+  )
+{
+  CALL_CRYPTO_SERVICE (EcPointIsOnCurve, (EcGroup, EcPoint, BnCtx), FALSE);
+}
+
+/**
+  Check if the supplied point is at infinity.
+
+  @param[in]  EcGroup   EC group object.
+  @param[in]  EcPoint   EC point to check.
+
+  @retval TRUE          At infinity.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcPointIsAtInfinity (
+  IN CONST VOID  *EcGroup,
+  IN CONST VOID  *EcPoint
+  )
+{
+  CALL_CRYPTO_SERVICE (EcPointIsAtInfinity, (EcGroup, EcPoint), FALSE);
+}
+
+/**
+  Check if EC points are equal.
+
+  @param[in]  EcGroup   EC group object.
+  @param[in]  EcPointA  EC point A.
+  @param[in]  EcPointB  EC point B.
+  @param[in]  BnCtx     BN context, created with BigNumNewContext().
+
+  @retval TRUE          A == B.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcPointEqual (
+  IN CONST VOID  *EcGroup,
+  IN CONST VOID  *EcPointA,
+  IN CONST VOID  *EcPointB,
+  IN VOID        *BnCtx
+  )
+{
+  CALL_CRYPTO_SERVICE (EcPointEqual, (EcGroup, EcPointA, EcPointB, BnCtx), FALSE);
+}
+
+/**
+  Set EC point compressed coordinates. Points can be described in terms of
+  their compressed coordinates. For a point (x, y), for any given value for x
+  such that the point is on the curve there will only ever be two possible
+  values for y. Therefore, a point can be set using this function where BnX is
+  the x coordinate and YBit is a value 0 or 1 to identify which of the two
+  possible values for y should be used.
+
+  @param[in]  EcGroup    EC group object.
+  @param[in]  EcPoint    EC Point.
+  @param[in]  BnX        X coordinate.
+  @param[in]  YBit       0 or 1 to identify which Y value is used.
+  @param[in]  BnCtx      BN context, created with BigNumNewContext().
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcPointSetCompressedCoordinates (
+  IN CONST VOID  *EcGroup,
+  IN VOID        *EcPoint,
+  IN CONST VOID  *BnX,
+  IN UINT8       YBit,
+  IN VOID        *BnCtx
+  )
+{
+  CALL_CRYPTO_SERVICE (EcPointSetCompressedCoordinates, (EcGroup, EcPoint, BnX, YBit, BnCtx), FALSE);
+}
+
+/**
+  Allocates and Initializes one Elliptic Curve Context for subsequent use
+  with the NID.
+
+  @param[in]  Nid cipher NID
+  @return     Pointer to the Elliptic Curve Context that has been initialized.
+              If the allocations fails, EcNewByNid() returns NULL.
+**/
+VOID *
+EFIAPI
+EcNewByNid (
+  IN UINTN  Nid
+  )
+{
+  CALL_CRYPTO_SERVICE (EcNewByNid, (Nid), NULL);
+}
+
+/**
+  Release the specified EC context.
+
+  @param[in]  EcContext  Pointer to the EC context to be released.
+**/
+VOID
+EFIAPI
+EcFree (
+  IN  VOID  *EcContext
+  )
+{
+  CALL_VOID_CRYPTO_SERVICE (EcFree, (EcContext));
+}
+
+/**
+  Generates EC key and returns EC public key (X, Y), Please note, this function uses
+  pseudo random number generator. The caller must make sure RandomSeed()
+  function was properly called before.
+  The Ec context should be correctly initialized by EcNewByNid.
+  This function generates random secret, and computes the public key (X, Y), which is
+  returned via parameter Public, PublicSize.
+  X is the first half of Public with size being PublicSize / 2,
+  Y is the second half of Public with size being PublicSize / 2.
+  EC context is updated accordingly.
+  If the Public buffer is too small to hold the public X, Y, FALSE is returned and
+  PublicSize is set to the required buffer size to obtain the public X, Y.
+  For P-256, the PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+  If EcContext is NULL, then return FALSE.
+  If PublicSize is NULL, then return FALSE.
+  If PublicSize is large enough but Public is NULL, then return FALSE.
+  @param[in, out]  EcContext      Pointer to the EC context.
+  @param[out]      PublicKey      Pointer to the buffer to receive generated public X,Y.
+  @param[in, out]  PublicKeySize  On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
+  @retval TRUE   EC public X,Y generation succeeded.
+  @retval FALSE  EC public X,Y generation failed.
+  @retval FALSE  PublicKeySize is not large enough.
+**/
+BOOLEAN
+EFIAPI
+EcGenerateKey (
+  IN OUT  VOID   *EcContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  )
+{
+  CALL_CRYPTO_SERVICE (EcGenerateKey, (EcContext, PublicKey, PublicKeySize), FALSE);
+}
+
+/**
+  Gets the public key component from the established EC context.
+  The Ec context should be correctly initialized by EcNewByNid, and successfully
+  generate key pair from EcGenerateKey().
+  For P-256, the PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+  @param[in, out]  EcContext      Pointer to EC context being set.
+  @param[out]      PublicKey      Pointer to t buffer to receive generated public X,Y.
+  @param[in, out]  PublicKeySize  On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
+  @retval  TRUE   EC key component was retrieved successfully.
+  @retval  FALSE  Invalid EC key component.
+**/
+BOOLEAN
+EFIAPI
+EcGetPubKey (
+  IN OUT  VOID   *EcContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  )
+{
+  CALL_CRYPTO_SERVICE (EcGetPubKey, (EcContext, PublicKey, PublicKeySize), FALSE);
+}
+
+/**
+  Computes exchanged common key.
+  Given peer's public key (X, Y), this function computes the exchanged common key,
+  based on its own context including value of curve parameter and random secret.
+  X is the first half of PeerPublic with size being PeerPublicSize / 2,
+  Y is the second half of PeerPublic with size being PeerPublicSize / 2.
+  If EcContext is NULL, then return FALSE.
+  If PeerPublic is NULL, then return FALSE.
+  If PeerPublicSize is 0, then return FALSE.
+  If Key is NULL, then return FALSE.
+  If KeySize is not large enough, then return FALSE.
+  For P-256, the PeerPublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PeerPublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PeerPublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+  @param[in, out]  EcContext          Pointer to the EC context.
+  @param[in]       PeerPublic         Pointer to the peer's public X,Y.
+  @param[in]       PeerPublicSize     Size of peer's public X,Y in bytes.
+  @param[in]       CompressFlag       Flag of PeerPublic is compressed or not.
+  @param[out]      Key                Pointer to the buffer to receive generated key.
+  @param[in, out]  KeySize            On input, the size of Key buffer in bytes.
+                                      On output, the size of data returned in Key buffer in bytes.
+  @retval TRUE   EC exchanged key generation succeeded.
+  @retval FALSE  EC exchanged key generation failed.
+  @retval FALSE  KeySize is not large enough.
+**/
+BOOLEAN
+EFIAPI
+EcDhComputeKey (
+  IN OUT  VOID         *EcContext,
+  IN      CONST UINT8  *PeerPublic,
+  IN      UINTN        PeerPublicSize,
+  IN      CONST INT32  *CompressFlag,
+  OUT     UINT8        *Key,
+  IN OUT  UINTN        *KeySize
+  )
+{
+  CALL_CRYPTO_SERVICE (EcDhComputeKey, (EcContext, PeerPublic, PeerPublicSize, CompressFlag, Key, KeySize), FALSE);
 }

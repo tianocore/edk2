@@ -53,9 +53,22 @@ typedef struct {
       UINT8    Duplicate : 1;
       UINT8    Update    : 1;
       UINT8    Final     : 1;
+      UINT8    All       : 1;
     } Services;
     UINT32    Family;
   } HmacSha256;
+  union {
+    struct {
+      UINT8    New       : 1;
+      UINT8    Free      : 1;
+      UINT8    SetKey    : 1;
+      UINT8    Duplicate : 1;
+      UINT8    Update    : 1;
+      UINT8    Final     : 1;
+      UINT8    All       : 1;
+    } Services;
+    UINT32    Family;
+  } HmacSha384;
   union {
     struct {
       UINT8    GetContextSize : 1;
@@ -232,7 +245,12 @@ typedef struct {
   } Sm3;
   union {
     struct {
-      UINT8    Sha256ExtractAndExpand;
+      UINT8    Sha256ExtractAndExpand : 1;
+      UINT8    Sha256Extract          : 1;
+      UINT8    Sha256Expand           : 1;
+      UINT8    Sha384ExtractAndExpand : 1;
+      UINT8    Sha384Extract          : 1;
+      UINT8    Sha384Expand           : 1;
     } Services;
     UINT32    Family;
   } Hkdf;
@@ -301,6 +319,68 @@ typedef struct {
     } Services;
     UINT32    Family;
   } ParallelHash;
+  union {
+    struct {
+      UINT8    Encrypt : 1;
+      UINT8    Decrypt : 1;
+    } Services;
+    UINT32    Family;
+  } AeadAesGcm;
+  union {
+    struct {
+      UINT8    Init        : 1;
+      UINT8    FromBin     : 1;
+      UINT8    ToBin       : 1;
+      UINT8    Free        : 1;
+      UINT8    Add         : 1;
+      UINT8    Sub         : 1;
+      UINT8    Mod         : 1;
+      UINT8    ExpMod      : 1;
+      UINT8    InverseMod  : 1;
+      UINT8    Div         : 1;
+      UINT8    MulMod      : 1;
+      UINT8    Cmp         : 1;
+      UINT8    Bits        : 1;
+      UINT8    Bytes       : 1;
+      UINT8    IsWord      : 1;
+      UINT8    IsOdd       : 1;
+      UINT8    Copy        : 1;
+      UINT8    ValueOne    : 1;
+      UINT8    RShift      : 1;
+      UINT8    ConstTime   : 1;
+      UINT8    SqrMod      : 1;
+      UINT8    NewContext  : 1;
+      UINT8    ContextFree : 1;
+      UINT8    SetUint     : 1;
+      UINT8    AddMod      : 1;
+    } Services;
+    UINT32    Family;
+  } Bn;
+  union {
+    struct {
+      UINT8    GroupInit                     : 1;
+      UINT8    GroupGetCurve                 : 1;
+      UINT8    GroupGetOrder                 : 1;
+      UINT8    GroupFree                     : 1;
+      UINT8    PointInit                     : 1;
+      UINT8    PointDeInit                   : 1;
+      UINT8    PointGetAffineCoordinates     : 1;
+      UINT8    PointSetAffineCoordinates     : 1;
+      UINT8    PointAdd                      : 1;
+      UINT8    PointMul                      : 1;
+      UINT8    PointInvert                   : 1;
+      UINT8    PointIsOnCurve                : 1;
+      UINT8    PointIsAtInfinity             : 1;
+      UINT8    PointEqual                    : 1;
+      UINT8    PointSetCompressedCoordinates : 1;
+      UINT8    NewByNid                      : 1;
+      UINT8    Free                          : 1;
+      UINT8    GenerateKey                   : 1;
+      UINT8    GetPubKey                     : 1;
+      UINT8    DhComputeKey                  : 1;
+    } Services;
+    UINT32    Family;
+  } Ec;
 } PCD_CRYPTO_SERVICE_FAMILY_ENABLE;
 
 #endif

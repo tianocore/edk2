@@ -28,9 +28,10 @@
   Hash/CryptSha256.c
   Hash/CryptSha512.c
   Hash/CryptSm3.c
-  Hmac/CryptHmacSha256.c
+  Hmac/CryptHmac.c
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
+  Cipher/CryptAeadAesGcm.c
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExt.c
   Pk/CryptPkcs1Oaep.c
@@ -46,6 +47,9 @@
   Pem/CryptPem.c
   Pk/CryptRsaPss.c
   Pk/CryptRsaPssSign.c
+  Bn/CryptBn.c
+  Pk/CryptEcNull.c    |*|*|*|!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  Pk/CryptEc.c    |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
 
   SysCall/UnitTestHostCrtWrapper.c
 
