@@ -69,6 +69,7 @@
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
+  ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
   #
   # It is not possible to prevent the ARM compiler for generic intrinsic functions.
   # This library provides the instrinsic functions generate by a given compiler.
