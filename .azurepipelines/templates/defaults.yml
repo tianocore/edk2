@@ -1,0 +1,3 @@
+
+variables:
+  default_python_version: ">=3.10.6"
