@@ -257,13 +257,15 @@
   CryptoPkg/Library/TlsLib/TlsLib.inf
   CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
   CryptoPkg/Library/OpensslLib/OpensslLib.inf
-  CryptoPkg/Library/OpensslLib/OpensslLibOpt.inf
   CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
   CryptoPkg/Library/BaseHashApiLib/BaseHashApiLib.inf
 
   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/SmmCryptLib.inf
+
+[Components.IA32, Components.X64]
+  CryptoPkg/Library/OpensslLib/OpensslLibOpt.inf
 !endif
 
 !if $(CRYPTO_SERVICES) IN "PACKAGE ALL NONE MIN_PEI"
