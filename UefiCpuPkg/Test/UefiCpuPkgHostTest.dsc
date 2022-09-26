@@ -38,3 +38,9 @@
   # Build HOST_APPLICATION that tests the CpuPageTableLib
   #
   UefiCpuPkg/Library/CpuPageTableLib/UnitTest/CpuPageTableLibUnitTestHost.inf
+
+  #
+  # Build PEIM and DXE driver that test the MP service PPI & Protocol
+  #
+  UefiCpuPkg/Test/UnitTest/EfiMpServicesPpiProtocol/EdkiiPeiMpServices2PpiPeiUnitTest.inf
+  UefiCpuPkg/Test/UnitTest/EfiMpServicesPpiProtocol/EfiMpServiceProtocolDxeUnitTest.inf
