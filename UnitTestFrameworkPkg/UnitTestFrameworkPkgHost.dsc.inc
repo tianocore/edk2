@@ -27,7 +27,8 @@
   GCC:*_*_*_CC_FLAGS   = -D UNIT_TESTING_DEBUG=1
   XCODE:*_*_*_CC_FLAGS = -D UNIT_TESTING_DEBUG=1
 !endif
-
+  GCC:*_GCC5_*_CC_FLAGS = --coverage
+  GCC:*_GCC5_*_DLINK_FLAGS = --coverage
 [BuildOptions.common.EDKII.HOST_APPLICATION]
   #
   # MSFT
