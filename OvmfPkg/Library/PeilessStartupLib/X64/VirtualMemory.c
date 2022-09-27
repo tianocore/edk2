@@ -21,11 +21,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PlatformInitLib.h>
 #include "PageTables.h"
 
-//
-// Global variable to keep track current available memory used as page table.
-//
-PAGE_TABLE_POOL  *mPageTablePool = NULL;
-
 UINTN  mLevelShift[5] = {
   0,
   PAGING_L1_ADDRESS_SHIFT,
@@ -273,14 +268,17 @@ ToSplitPageTable (
   reserve at least another PAGE_TABLE_POOL_UNIT_PAGES. But usually this won't
   happen in practice.
 
-  @param PoolPages  The least page number of the pool to be created.
+  @param[in]      PoolPages      The least page number of the pool to be created.
+  @param[in, out] PageTablePool  Pointer of Pointer to the current available memory
+                                  used as page table.
 
   @retval TRUE    The pool is initialized successfully.
   @retval FALSE   The memory is out of resource.
 **/
 BOOLEAN
 InitializePageTablePool (
-  IN UINTN  PoolPages
+  IN UINTN                PoolPages,
+  IN OUT PAGE_TABLE_POOL  **PageTablePool
   )
 {
   VOID  *Buffer;
@@ -303,20 +301,20 @@ InitializePageTablePool (
   //
   // Link all pools into a list for easier track later.
   //
-  if (mPageTablePool == NULL) {
-    mPageTablePool           = Buffer;
-    mPageTablePool->NextPool = mPageTablePool;
+  if (*PageTablePool == NULL) {
+    *(UINT64 *)(UINTN)PageTablePool = (UINT64)(UINTN)Buffer;
+    (*PageTablePool)->NextPool      = *PageTablePool;
   } else {
-    ((PAGE_TABLE_POOL *)Buffer)->NextPool = mPageTablePool->NextPool;
-    mPageTablePool->NextPool              = Buffer;
-    mPageTablePool                        = Buffer;
+    ((PAGE_TABLE_POOL *)Buffer)->NextPool = (*PageTablePool)->NextPool;
+    (*PageTablePool)->NextPool            = Buffer;
+    *PageTablePool                        = Buffer;
   }
 
   //
   // Reserve one page for pool header.
   //
-  mPageTablePool->FreePages = PoolPages - 1;
-  mPageTablePool->Offset    = EFI_PAGES_TO_SIZE (1);
+  (*PageTablePool)->FreePages = PoolPages - 1;
+  (*PageTablePool)->Offset    = EFI_PAGES_TO_SIZE (1);
 
   return TRUE;
 }
@@ -333,14 +331,17 @@ InitializePageTablePool (
   If there is not enough memory remaining to satisfy the request, then NULL is
   returned.
 
-  @param  Pages                 The number of 4 KB pages to allocate.
+  @param[in]      Pages                 The number of 4 KB pages to allocate.
+  @param[in, out] PageTablePool         Pointer of pointer to the current available
+                                        memory used as page table.
 
   @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
 AllocatePageTableMemory (
-  IN UINTN  Pages
+  IN UINTN                Pages,
+  IN OUT PAGE_TABLE_POOL  **PageTablePool
   )
 {
   VOID  *Buffer;
@@ -349,30 +350,31 @@ AllocatePageTableMemory (
     return NULL;
   }
 
-  DEBUG ((DEBUG_INFO, "AllocatePageTableMemory. mPageTablePool=%p, Pages=%d\n", mPageTablePool, Pages));
+  DEBUG ((DEBUG_INFO, "AllocatePageTableMemory. PageTablePool=%p, Pages=%d\n", *PageTablePool, Pages));
   //
   // Renew the pool if necessary.
   //
-  if ((mPageTablePool == NULL) ||
-      (Pages > mPageTablePool->FreePages))
+  if ((*PageTablePool == NULL) ||
+      (Pages > (*PageTablePool)->FreePages))
   {
-    if (!InitializePageTablePool (Pages)) {
+    if (!InitializePageTablePool (Pages, PageTablePool)) {
       return NULL;
     }
   }
 
-  Buffer = (UINT8 *)mPageTablePool + mPageTablePool->Offset;
+  Buffer = (UINT8 *)(*PageTablePool) + (*PageTablePool)->Offset;
 
-  mPageTablePool->Offset    += EFI_PAGES_TO_SIZE (Pages);
-  mPageTablePool->FreePages -= Pages;
+  (*PageTablePool)->Offset    += EFI_PAGES_TO_SIZE (Pages);
+  (*PageTablePool)->FreePages -= Pages;
 
   DEBUG ((
     DEBUG_INFO,
-    "%a:%a: Buffer=0x%Lx Pages=%ld\n",
+    "%a:%a: Buffer=0x%Lx Pages=%ld, PageTablePool=%p\n",
     gEfiCallerBaseName,
     __FUNCTION__,
     Buffer,
-    Pages
+    Pages,
+    *PageTablePool
     ));
 
   return Buffer;
@@ -385,6 +387,8 @@ AllocatePageTableMemory (
   @param[in, out] PageEntry2M           Pointer to 2M page entry.
   @param[in]      StackBase             Stack base address.
   @param[in]      StackSize             Stack size.
+  @param[in, out] PageTablePool         Pointer to the current available memory used as
+                                        page table.
 
 **/
 VOID
@@ -392,7 +396,8 @@ Split2MPageTo4K (
   IN EFI_PHYSICAL_ADDRESS  PhysicalAddress,
   IN OUT UINT64            *PageEntry2M,
   IN EFI_PHYSICAL_ADDRESS  StackBase,
-  IN UINTN                 StackSize
+  IN UINTN                 StackSize,
+  IN OUT PAGE_TABLE_POOL   *PageTablePool
   )
 {
   EFI_PHYSICAL_ADDRESS  PhysicalAddress4K;
@@ -401,7 +406,7 @@ Split2MPageTo4K (
 
   DEBUG ((DEBUG_INFO, "Split2MPageTo4K\n"));
 
-  PageTableEntry = AllocatePageTableMemory (1);
+  PageTableEntry = AllocatePageTableMemory (1, &PageTablePool);
 
   if (PageTableEntry == NULL) {
     ASSERT (FALSE);
@@ -448,6 +453,8 @@ Split2MPageTo4K (
   @param[in, out] PageEntry1G           Pointer to 1G page entry.
   @param[in]      StackBase             Stack base address.
   @param[in]      StackSize             Stack size.
+  @param[in, out] PageTablePool         Pointer to the current available memory used as
+                                        page table.
 
 **/
 VOID
@@ -455,14 +462,16 @@ Split1GPageTo2M (
   IN EFI_PHYSICAL_ADDRESS  PhysicalAddress,
   IN OUT UINT64            *PageEntry1G,
   IN EFI_PHYSICAL_ADDRESS  StackBase,
-  IN UINTN                 StackSize
+  IN UINTN                 StackSize,
+  IN OUT PAGE_TABLE_POOL   *PageTablePool
   )
 {
   EFI_PHYSICAL_ADDRESS  PhysicalAddress2M;
   UINTN                 IndexOfPageDirectoryEntries;
   PAGE_TABLE_ENTRY      *PageDirectoryEntry;
 
-  PageDirectoryEntry = AllocatePageTableMemory (1);
+  DEBUG ((DEBUG_INFO, "Split1GPageTo2M\n"));
+  PageDirectoryEntry = AllocatePageTableMemory (1, &PageTablePool);
 
   if (PageDirectoryEntry == NULL) {
     ASSERT (FALSE);
@@ -480,7 +489,7 @@ Split1GPageTo2M (
       //
       // Need to split this 2M page that covers NULL or stack range.
       //
-      Split2MPageTo4K (PhysicalAddress2M, (UINT64 *)PageDirectoryEntry, StackBase, StackSize);
+      Split2MPageTo4K (PhysicalAddress2M, (UINT64 *)PageDirectoryEntry, StackBase, StackSize, PageTablePool);
     } else {
       //
       // Fill in the Page Directory entries
@@ -496,16 +505,19 @@ Split1GPageTo2M (
 /**
   Set one page of page table pool memory to be read-only.
 
-  @param[in] PageTableBase    Base address of page table (CR3).
-  @param[in] Address          Start address of a page to be set as read-only.
-  @param[in] Level4Paging     Level 4 paging flag.
+  @param[in]      PageTableBase    Base address of page table (CR3).
+  @param[in]      Address          Start address of a page to be set as read-only.
+  @param[in]      Level4Paging     Level 4 paging flag.
+  @param[in, out] PageTablePool    Pointer to the current available memory used as
+                                   page table.
 
 **/
 VOID
 SetPageTablePoolReadOnly (
   IN  UINTN                 PageTableBase,
   IN  EFI_PHYSICAL_ADDRESS  Address,
-  IN  BOOLEAN               Level4Paging
+  IN  BOOLEAN               Level4Paging,
+  IN OUT PAGE_TABLE_POOL    *PageTablePool
   )
 {
   UINTN                 Index;
@@ -573,7 +585,8 @@ SetPageTablePoolReadOnly (
       //
       ASSERT (Level > 1);
 
-      NewPageTable = AllocatePageTableMemory (1);
+      DEBUG ((DEBUG_INFO, "SetPageTablePoolReadOnly\n"));
+      NewPageTable = AllocatePageTableMemory (1, &PageTablePool);
 
       if (NewPageTable == NULL) {
         ASSERT (FALSE);
@@ -604,14 +617,17 @@ SetPageTablePoolReadOnly (
 /**
   Prevent the memory pages used for page table from been overwritten.
 
-  @param[in] PageTableBase    Base address of page table (CR3).
-  @param[in] Level4Paging     Level 4 paging flag.
+  @param[in]      PageTableBase    Base address of page table (CR3).
+  @param[in]      Level4Paging     Level 4 paging flag.
+  @param[in, out] PageTablePool    Pointer to the current available memory used as
+                                   page table.
 
 **/
 VOID
 EnablePageTableProtection (
-  IN  UINTN    PageTableBase,
-  IN  BOOLEAN  Level4Paging
+  IN  UINTN               PageTableBase,
+  IN  BOOLEAN             Level4Paging,
+  IN OUT PAGE_TABLE_POOL  *PageTablePool
   )
 {
   PAGE_TABLE_POOL       *HeadPool;
@@ -621,7 +637,7 @@ EnablePageTableProtection (
 
   DEBUG ((DEBUG_INFO, "EnablePageTableProtection\n"));
 
-  if (mPageTablePool == NULL) {
+  if (PageTablePool == NULL) {
     return;
   }
 
@@ -632,10 +648,10 @@ EnablePageTableProtection (
   AsmWriteCr0 (AsmReadCr0 () & ~CR0_WP);
 
   //
-  // SetPageTablePoolReadOnly might update mPageTablePool. It's safer to
+  // SetPageTablePoolReadOnly might update PageTablePool. It's safer to
   // remember original one in advance.
   //
-  HeadPool = mPageTablePool;
+  HeadPool = PageTablePool;
   Pool     = HeadPool;
   do {
     Address  = (EFI_PHYSICAL_ADDRESS)(UINTN)Pool;
@@ -647,7 +663,7 @@ EnablePageTableProtection (
     // protection to them one by one.
     //
     while (PoolSize > 0) {
-      SetPageTablePoolReadOnly (PageTableBase, Address, Level4Paging);
+      SetPageTablePoolReadOnly (PageTableBase, Address, Level4Paging, PageTablePool);
       Address  += PAGE_TABLE_POOL_UNIT_SIZE;
       PoolSize -= PAGE_TABLE_POOL_UNIT_SIZE;
     }
@@ -700,6 +716,7 @@ CreateIdentityMappingPageTables (
   BOOLEAN                         Page1GSupport;
   PAGE_TABLE_1G_ENTRY             *PageDirectory1GEntry;
   IA32_CR4                        Cr4;
+  PAGE_TABLE_POOL                 *PageTablePool;
 
   //
   // Set PageMapLevel5Entry to suppress incorrect compiler/analyzer warnings
@@ -785,13 +802,14 @@ CreateIdentityMappingPageTables (
     (UINT64)TotalPagesNum
     ));
 
-  BigPageAddress = (UINTN)AllocatePageTableMemory (TotalPagesNum);
+  PageTablePool  = NULL;
+  BigPageAddress = (UINTN)AllocatePageTableMemory (TotalPagesNum, &PageTablePool);
   if (BigPageAddress == 0) {
     ASSERT (FALSE);
     return 0;
   }
 
-  DEBUG ((DEBUG_INFO, "BigPageAddress = 0x%llx\n", BigPageAddress));
+  DEBUG ((DEBUG_INFO, "BigPageAddress = 0x%llx, PageTablePool=%p\n", BigPageAddress, PageTablePool));
 
   //
   // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
@@ -856,7 +874,8 @@ CreateIdentityMappingPageTables (
               PageAddress,
               (UINT64 *)PageDirectory1GEntry,
               StackBase,
-              StackSize
+              StackSize,
+              PageTablePool
               );
           } else {
             //
@@ -892,7 +911,7 @@ CreateIdentityMappingPageTables (
               //
               // Need to split this 2M page that covers NULL or stack range.
               //
-              Split2MPageTo4K (PageAddress, (UINT64 *)PageDirectoryEntry, StackBase, StackSize);
+              Split2MPageTo4K (PageAddress, (UINT64 *)PageDirectoryEntry, StackBase, StackSize, PageTablePool);
             } else {
               //
               // Fill in the Page Directory entries
@@ -929,7 +948,7 @@ CreateIdentityMappingPageTables (
   // Protect the page table by marking the memory used for page table to be
   // read-only.
   //
-  EnablePageTableProtection ((UINTN)PageMap, TRUE);
+  EnablePageTableProtection ((UINTN)PageMap, TRUE, PageTablePool);
 
   return (UINTN)PageMap;
 }
