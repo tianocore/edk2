@@ -94,7 +94,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
 
                 # Run the test.
                 ret = RunCmd('"' + test + '"', "", workingdir=cp)
-                if(ret != 0):
+                if ret != 0:
                     logging.error("UnitTest Execution Error: " +
                                   os.path.basename(test))
                 else:
@@ -115,4 +115,103 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                                             "  %s - %s" % (case.attrib['name'], result.text))
                                         failure_count += 1
 
+            if thebuilder.env.GetValue("CODE_COVERAGE") != "FALSE":
+                if thebuilder.env.GetValue("TOOL_CHAIN_TAG") == "GCC5":
+                    self.gen_code_coverage_gcc(thebuilder)
+                elif thebuilder.env.GetValue("TOOL_CHAIN_TAG").startswith ("VS"):
+                    self.gen_code_coverage_msvc(thebuilder)
+                else:
+                    logging.info("Skipping code coverage. Currently, support GCC and MSVC compiler.")
+
         return failure_count
+
+    def gen_code_coverage_gcc(self, thebuilder):
+        logging.info("Generating UnitTest code coverage")
+
+        buildOutputBase = thebuilder.env.GetValue("BUILD_OUTPUT_BASE")
+        workspace = thebuilder.env.GetValue("WORKSPACE")
+
+        # Generate base code coverage for all source files
+        ret = RunCmd("lcov", f"--no-external --capture --initial --directory {buildOutputBase} --output-file {buildOutputBase}/cov-base.info --rc lcov_branch_coverage=1")
+        if ret != 0:
+            logging.error("UnitTest Coverage: Failed to build initial coverage data.")
+            return 1
+
+        # Coverage data for tested files only
+        ret = RunCmd("lcov", f"--capture --directory {buildOutputBase}/ --output-file {buildOutputBase}/coverage-test.info --rc lcov_branch_coverage=1")
+        if ret != 0:
+            logging.error("UnitTest Coverage: Failed to build coverage data for tested files.")
+            return 1
+
+        # Aggregate all coverage data
+        ret = RunCmd("lcov", f"--add-tracefile {buildOutputBase}/cov-base.info --add-tracefile {buildOutputBase}/coverage-test.info --output-file {buildOutputBase}/total-coverage.info --rc lcov_branch_coverage=1")
+        if ret != 0:
+            logging.error("UnitTest Coverage: Failed to aggregate coverage data.")
+            return 1
+
+        # Generate coverage XML
+        ret = RunCmd("lcov_cobertura",f"{buildOutputBase}/total-coverage.info -o {buildOutputBase}/compare.xml")
+        if ret != 0:
+            logging.error("UnitTest Coverage: Failed to generate coverage XML.")
+            return 1
+
+        # Filter out auto-generated and test code
+        ret = RunCmd("lcov_cobertura",f"{buildOutputBase}/total-coverage.info --excludes ^.*UnitTest\|^.*MU\|^.*Mock\|^.*DEBUG -o {buildOutputBase}/coverage.xml")
+        if ret != 0:
+            logging.error("UnitTest Coverage: Failed generate filtered coverage XML.")
+            return 1
+
+        # Generate all coverage file
+        testCoverageList = glob.glob (f"{workspace}/Build/**/total-coverage.info", recursive=True)
+
+        coverageFile = ""
+        for testCoverage in testCoverageList:
+            coverageFile += " --add-tracefile " + testCoverage
+        ret = RunCmd("lcov", f"{coverageFile} --output-file {workspace}/Build/all-coverage.info --rc lcov_branch_coverage=1")
+        if ret != 0:
+            logging.error("UnitTest Coverage: Failed generate all coverage file.")
+            return 1
+
+        # Generate and XML file if requested.for all package
+        if os.path.isfile(f"{workspace}/Build/coverage.xml"):
+            os.remove(f"{workspace}/Build/coverage.xml")
+        ret = RunCmd("lcov_cobertura",f"{workspace}/Build/all-coverage.info --excludes ^.*UnitTest\|^.*MU\|^.*Mock\|^.*DEBUG -o {workspace}/Build/coverage.xml")
+
+        return 0
+
+
+    def gen_code_coverage_msvc(self, thebuilder):
+        logging.info("Generating UnitTest code coverage")
+
+
+        buildOutputBase = thebuilder.env.GetValue("BUILD_OUTPUT_BASE")
+        testList = glob.glob(os.path.join(buildOutputBase, "**","*Test*.exe"), recursive=True)
+        workspace = thebuilder.env.GetValue("WORKSPACE")
+        workspace = (workspace + os.sep) if workspace[-1] != os.sep else workspace
+        # Generate coverage file
+        coverageFile = ""
+        for testFile in testList:
+            ret = RunCmd("OpenCppCoverage", f"--source {workspace} --export_type binary:{testFile}.cov -- {testFile}")
+            coverageFile += " --input_coverage=" + testFile + ".cov"
+            if ret != 0:
+                logging.error("UnitTest Coverage: Failed to collect coverage data.")
+                return 1
+
+        # Generate and XML file if requested.by each package
+        ret = RunCmd("OpenCppCoverage", f"--export_type cobertura:{os.path.join(buildOutputBase, 'coverage.xml')} --working_dir={workspace}Build {coverageFile}")
+        if ret != 0:
+            logging.error("UnitTest Coverage: Failed to generate cobertura format xml in single package.")
+            return 1
+
+        # Generate total report XML file for all package
+        testCoverageList = glob.glob(os.path.join(workspace, "Build", "**","*Test*.exe.cov"), recursive=True)
+        coverageFile = ""
+        for testCoverage in testCoverageList:
+            coverageFile += " --input_coverage=" + testCoverage
+
+        ret = RunCmd("OpenCppCoverage", f"--export_type cobertura:{workspace}Build/coverage.xml --working_dir={workspace}Build {coverageFile}")
+        if ret != 0:
+            logging.error("UnitTest Coverage: Failed to generate cobertura format xml.")
+            return 1
+
+        return 0
