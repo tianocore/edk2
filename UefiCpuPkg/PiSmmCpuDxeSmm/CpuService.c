@@ -421,11 +421,18 @@ SmmCpuRendezvous (
     goto ON_EXIT;
   }
 
-  //
-  // There are some APs outside SMM, Wait for all avaiable APs to arrive.
-  //
-  SmmWaitForApArrival ();
-  Status = mSmmMpSyncData->AllApArrivedWithException ? EFI_SUCCESS : EFI_TIMEOUT;
+  if ((mSmmMpSyncData->EffectiveSyncMode != SmmCpuSyncModeTradition) && !SmmCpuFeaturesNeedConfigureMtrrs ()) {
+    //
+    // There are some APs outside SMM, Wait for all avaiable APs to arrive.
+    //
+    SmmWaitForApArrival ();
+    Status = mSmmMpSyncData->AllApArrivedWithException ? EFI_SUCCESS : EFI_TIMEOUT;
+  } else {
+    //
+    // BSP has already waitted for APs to arrive SMM if SmmCpuSyncMode selected or need config MTRR.
+    //
+    Status = EFI_TIMEOUT;
+  }
 
 ON_EXIT:
   if (!mSmmMpSyncData->AllApArrivedWithException) {
