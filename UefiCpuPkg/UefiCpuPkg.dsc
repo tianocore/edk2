@@ -177,6 +177,8 @@
   UefiCpuPkg/ResetVector/Vtf0/Bin/ResetVector.inf
   UefiCpuPkg/Library/SmmCpuRendezvousLib/SmmCpuRendezvousLib.inf
   UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
+  UefiCpuPkg/Test/UnitTest/EfiMpServicesPpiProtocol/EdkiiPeiMpServices2PpiPeiUnitTest.inf
+  UefiCpuPkg/Test/UnitTest/EfiMpServicesPpiProtocol/EfiMpServiceProtocolDxeUnitTest.inf
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
