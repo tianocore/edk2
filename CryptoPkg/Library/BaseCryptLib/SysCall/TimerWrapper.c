@@ -118,7 +118,7 @@ gmtime (
 {
   struct tm  *GmTime;
   UINT16     DayNo;
-  UINT16     DayRemainder;
+  UINT32     DayRemainder;
   time_t     Year;
   time_t     YearNo;
   UINT16     TotalDays;
@@ -136,7 +136,7 @@ gmtime (
   ZeroMem ((VOID *)GmTime, (UINTN)sizeof (struct tm));
 
   DayNo        = (UINT16)(*timer / SECSPERDAY);
-  DayRemainder = (UINT16)(*timer % SECSPERDAY);
+  DayRemainder = (UINT32)(*timer % SECSPERDAY);
 
   GmTime->tm_sec  = (int)(DayRemainder % SECSPERMIN);
   GmTime->tm_min  = (int)((DayRemainder % SECSPERHOUR) / SECSPERMIN);
