@@ -16,7 +16,7 @@
   OvmfPkg/OvmfPkg.dec
 
 [Binaries.X64]
-   PE32|/usr/lib/systemd/boot/efi/systemd-bootx64.efi|*
+   PE32|/home/kraxel/projects/systemd/build-meson-sirius/src/boot/efi/systemd-bootx64.efi|*
 
 [Binaries.AA64]
    PE32|/usr/lib/systemd/boot/efi/systemd-bootaa64.efi|*
