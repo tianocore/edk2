@@ -1,7 +1,7 @@
 /** @file
   MTRR setting library
 
-  Copyright (c) 2008 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -214,9 +214,12 @@ MtrrGetAllMtrrs (
 /**
   This function sets all MTRRs (variable and fixed)
 
-  @param[in]  MtrrSetting   A buffer to hold all MTRRs content.
+  Note: The behavior of this function is to program everything in MtrrSetting to hardware.
+        MTRR might not be enabled due to enable bit is clear in MtrrSetting->MtrrDefType.
 
-  @return The pointer of MtrrSetting
+  @param[in]  MtrrSetting  A buffer holding all MTRRs content.
+
+  @retval The pointer of MtrrSetting
 
 **/
 MTRR_SETTINGS *
