@@ -13,25 +13,30 @@ STATIC CONST MTRR_LIB_SYSTEM_PARAMETER  mDefaultSystemParameter = {
 };
 
 STATIC MTRR_LIB_SYSTEM_PARAMETER  mSystemParameters[] = {
-  { 38, TRUE, TRUE, CacheUncacheable,    12 },
-  { 38, TRUE, TRUE, CacheWriteBack,      12 },
-  { 38, TRUE, TRUE, CacheWriteThrough,   12 },
-  { 38, TRUE, TRUE, CacheWriteProtected, 12 },
-  { 38, TRUE, TRUE, CacheWriteCombining, 12 },
+  { 38, TRUE, TRUE,  CacheUncacheable,    12 },
+  { 38, TRUE, TRUE,  CacheWriteBack,      12 },
+  { 38, TRUE, TRUE,  CacheWriteThrough,   12 },
+  { 38, TRUE, TRUE,  CacheWriteProtected, 12 },
+  { 38, TRUE, TRUE,  CacheWriteCombining, 12 },
 
-  { 42, TRUE, TRUE, CacheUncacheable,    12 },
-  { 42, TRUE, TRUE, CacheWriteBack,      12 },
-  { 42, TRUE, TRUE, CacheWriteThrough,   12 },
-  { 42, TRUE, TRUE, CacheWriteProtected, 12 },
-  { 42, TRUE, TRUE, CacheWriteCombining, 12 },
+  { 42, TRUE, TRUE,  CacheUncacheable,    12 },
+  { 42, TRUE, TRUE,  CacheWriteBack,      12 },
+  { 42, TRUE, TRUE,  CacheWriteThrough,   12 },
+  { 42, TRUE, TRUE,  CacheWriteProtected, 12 },
+  { 42, TRUE, TRUE,  CacheWriteCombining, 12 },
 
-  { 48, TRUE, TRUE, CacheUncacheable,    12 },
-  { 48, TRUE, TRUE, CacheWriteBack,      12 },
-  { 48, TRUE, TRUE, CacheWriteThrough,   12 },
-  { 48, TRUE, TRUE, CacheWriteProtected, 12 },
-  { 48, TRUE, TRUE, CacheWriteCombining, 12 },
+  { 48, TRUE, TRUE,  CacheUncacheable,    12 },
+  { 48, TRUE, TRUE,  CacheWriteBack,      12 },
+  { 48, TRUE, TRUE,  CacheWriteThrough,   12 },
+  { 48, TRUE, TRUE,  CacheWriteProtected, 12 },
+  { 48, TRUE, TRUE,  CacheWriteCombining, 12 },
 
-  { 48, TRUE, TRUE, CacheWriteBack,      12, 7}, // 7 bits for MKTME
+  { 48, TRUE, FALSE, CacheUncacheable,    12 },
+  { 48, TRUE, FALSE, CacheWriteBack,      12 },
+  { 48, TRUE, FALSE, CacheWriteThrough,   12 },
+  { 48, TRUE, FALSE, CacheWriteProtected, 12 },
+  { 48, TRUE, FALSE, CacheWriteCombining, 12 },
+  { 48, TRUE, TRUE,  CacheWriteBack,      12, 7},  // 7 bits for MKTME
 };
 
 UINT32  mFixedMtrrsIndex[] = {
