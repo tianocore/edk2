@@ -2416,13 +2416,17 @@ CreatePciIoDevice (
       //
       // Calculate LastVF
       //
-      PFRid  = EFI_PCI_RID (Bus, Device, Func);
-      LastVF = PFRid + FirstVFOffset + (PciIoDevice->InitialVFs - 1) * VFStride;
+      if (PciIoDevice->InitialVFs == 0) {
+        PciIoDevice->ReservedBusNum = 0;
+      } else {
+        PFRid  = EFI_PCI_RID (Bus, Device, Func);
+        LastVF = PFRid + FirstVFOffset + (PciIoDevice->InitialVFs - 1) * VFStride;
 
-      //
-      // Calculate ReservedBusNum for this PF
-      //
-      PciIoDevice->ReservedBusNum = (UINT16)(EFI_PCI_BUS_OF_RID (LastVF) - Bus + 1);
+        //
+        // Calculate ReservedBusNum for this PF
+        //
+        PciIoDevice->ReservedBusNum = (UINT16)(EFI_PCI_BUS_OF_RID (LastVF) - Bus + 1);
+      }
 
       DEBUG ((
         DEBUG_INFO,
