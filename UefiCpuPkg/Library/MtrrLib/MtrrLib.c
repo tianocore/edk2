@@ -33,8 +33,9 @@
 // Context to save and restore when MTRRs are programmed
 //
 typedef struct {
-  UINTN      Cr4;
-  BOOLEAN    InterruptState;
+  UINTN                              Cr4;
+  BOOLEAN                            InterruptState;
+  MSR_IA32_MTRR_DEF_TYPE_REGISTER    DefType;
 } MTRR_CONTEXT;
 
 typedef struct {
@@ -362,10 +363,11 @@ MtrrLibPreMtrrChange (
   CpuFlushTlb ();
 
   //
-  // Disable MTRRs
+  // Save current MTRR default type and disable MTRRs
   //
-  DefType.Uint64 = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
-  DefType.Bits.E = 0;
+  MtrrContext->DefType.Uint64 = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
+  DefType.Uint64              = MtrrContext->DefType.Uint64;
+  DefType.Bits.E              = 0;
   AsmWriteMsr64 (MSR_IA32_MTRR_DEF_TYPE, DefType.Uint64);
 }
 
@@ -418,15 +420,13 @@ MtrrLibPostMtrrChange (
   IN MTRR_CONTEXT  *MtrrContext
   )
 {
-  MSR_IA32_MTRR_DEF_TYPE_REGISTER  DefType;
-
   //
   // Enable Cache MTRR
+  // Note: It's possible that MTRR was not enabled earlier.
+  //       But it will be enabled here unconditionally.
   //
-  DefType.Uint64  = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
-  DefType.Bits.E  = 1;
-  DefType.Bits.FE = 1;
-  AsmWriteMsr64 (MSR_IA32_MTRR_DEF_TYPE, DefType.Uint64);
+  MtrrContext->DefType.Bits.E = 1;
+  AsmWriteMsr64 (MSR_IA32_MTRR_DEF_TYPE, MtrrContext->DefType.Uint64);
 
   MtrrLibPostMtrrChangeEnableCache (MtrrContext);
 }
@@ -1056,6 +1056,8 @@ MtrrLibSetMemoryType (
   UINTN   StartIndex;
   UINTN   EndIndex;
   UINTN   DeltaCount;
+
+  ASSERT (Length != 0);
 
   LengthRight = 0;
   LengthLeft  = 0;
@@ -2335,7 +2337,7 @@ MtrrSetMemoryAttributesInMtrrSettings (
   UINT32         Index;
   UINT64         BaseAddress;
   UINT64         Length;
-  BOOLEAN        Above1MbExist;
+  BOOLEAN        VariableMtrrNeeded;
 
   UINT64                  MtrrValidBitsMask;
   UINT64                  MtrrValidAddressMask;
@@ -2352,8 +2354,10 @@ MtrrSetMemoryAttributesInMtrrSettings (
   MTRR_MEMORY_RANGE       WorkingVariableMtrr[ARRAY_SIZE (MtrrSetting->Variables.Mtrr)];
   BOOLEAN                 VariableSettingModified[ARRAY_SIZE (MtrrSetting->Variables.Mtrr)];
 
-  UINT64  ClearMasks[ARRAY_SIZE (mMtrrLibFixedMtrrTable)];
-  UINT64  OrMasks[ARRAY_SIZE (mMtrrLibFixedMtrrTable)];
+  UINT64   FixedMtrrMemoryLimit;
+  BOOLEAN  FixedMtrrSupported;
+  UINT64   ClearMasks[ARRAY_SIZE (mMtrrLibFixedMtrrTable)];
+  UINT64   OrMasks[ARRAY_SIZE (mMtrrLibFixedMtrrTable)];
 
   MTRR_CONTEXT  MtrrContext;
   BOOLEAN       MtrrContextValid;
@@ -2369,7 +2373,7 @@ MtrrSetMemoryAttributesInMtrrSettings (
   //
   // TRUE indicating the caller requests to set variable MTRRs.
   //
-  Above1MbExist             = FALSE;
+  VariableMtrrNeeded        = FALSE;
   OriginalVariableMtrrCount = 0;
 
   //
@@ -2398,10 +2402,12 @@ MtrrSetMemoryAttributesInMtrrSettings (
   //
   // 1. Validate the parameters.
   //
-  if (!IsMtrrSupported ()) {
+  if (!MtrrLibIsMtrrSupported (&FixedMtrrSupported, &OriginalVariableMtrrCount)) {
     Status = RETURN_UNSUPPORTED;
     goto Exit;
   }
+
+  FixedMtrrMemoryLimit = FixedMtrrSupported ? BASE_1MB : 0;
 
   for (Index = 0; Index < RangeCount; Index++) {
     if (Ranges[Index].Length == 0) {
@@ -2432,19 +2438,18 @@ MtrrSetMemoryAttributesInMtrrSettings (
       goto Exit;
     }
 
-    if (Ranges[Index].BaseAddress + Ranges[Index].Length > BASE_1MB) {
-      Above1MbExist = TRUE;
+    if (Ranges[Index].BaseAddress + Ranges[Index].Length > FixedMtrrMemoryLimit) {
+      VariableMtrrNeeded = TRUE;
     }
   }
 
   //
   // 2. Apply the above-1MB memory attribute settings.
   //
-  if (Above1MbExist) {
+  if (VariableMtrrNeeded) {
     //
     // 2.1. Read all variable MTRRs and convert to Ranges.
     //
-    OriginalVariableMtrrCount = GetVariableMtrrCountWorker ();
     MtrrGetVariableMtrrWorker (MtrrSetting, OriginalVariableMtrrCount, &VariableSettings);
     MtrrLibGetRawVariableRanges (
       &VariableSettings,
@@ -2476,15 +2481,17 @@ MtrrSetMemoryAttributesInMtrrSettings (
     //
     // 2.2. Force [0, 1M) to UC, so that it doesn't impact subtraction algorithm.
     //
-    Status = MtrrLibSetMemoryType (
-               WorkingRanges,
-               ARRAY_SIZE (WorkingRanges),
-               &WorkingRangeCount,
-               0,
-               SIZE_1MB,
-               CacheUncacheable
-               );
-    ASSERT (Status != RETURN_OUT_OF_RESOURCES);
+    if (FixedMtrrMemoryLimit != 0) {
+      Status = MtrrLibSetMemoryType (
+                 WorkingRanges,
+                 ARRAY_SIZE (WorkingRanges),
+                 &WorkingRangeCount,
+                 0,
+                 FixedMtrrMemoryLimit,
+                 CacheUncacheable
+                 );
+      ASSERT (Status != RETURN_OUT_OF_RESOURCES);
+    }
 
     //
     // 2.3. Apply the new memory attribute settings to Ranges.
@@ -2493,13 +2500,13 @@ MtrrSetMemoryAttributesInMtrrSettings (
     for (Index = 0; Index < RangeCount; Index++) {
       BaseAddress = Ranges[Index].BaseAddress;
       Length      = Ranges[Index].Length;
-      if (BaseAddress < BASE_1MB) {
-        if (Length <= BASE_1MB - BaseAddress) {
+      if (BaseAddress < FixedMtrrMemoryLimit) {
+        if (Length <= FixedMtrrMemoryLimit - BaseAddress) {
           continue;
         }
 
-        Length     -= BASE_1MB - BaseAddress;
-        BaseAddress = BASE_1MB;
+        Length     -= FixedMtrrMemoryLimit - BaseAddress;
+        BaseAddress = FixedMtrrMemoryLimit;
       }
 
       Status = MtrrLibSetMemoryType (
@@ -2544,7 +2551,7 @@ MtrrSetMemoryAttributesInMtrrSettings (
       // 2.5. Remove the [0, 1MB) MTRR if it still exists (not merged with other range)
       //
       for (Index = 0; Index < WorkingVariableMtrrCount; Index++) {
-        if ((WorkingVariableMtrr[Index].BaseAddress == 0) && (WorkingVariableMtrr[Index].Length == SIZE_1MB)) {
+        if ((WorkingVariableMtrr[Index].BaseAddress == 0) && (WorkingVariableMtrr[Index].Length == FixedMtrrMemoryLimit)) {
           ASSERT (WorkingVariableMtrr[Index].Type == CacheUncacheable);
           WorkingVariableMtrrCount--;
           CopyMem (
@@ -2583,7 +2590,7 @@ MtrrSetMemoryAttributesInMtrrSettings (
   ZeroMem (ClearMasks, sizeof (ClearMasks));
   ZeroMem (OrMasks, sizeof (OrMasks));
   for (Index = 0; Index < RangeCount; Index++) {
-    if (Ranges[Index].BaseAddress >= BASE_1MB) {
+    if (Ranges[Index].BaseAddress >= FixedMtrrMemoryLimit) {
       continue;
     }
 
@@ -2606,11 +2613,19 @@ MtrrSetMemoryAttributesInMtrrSettings (
   for (Index = 0; Index < ARRAY_SIZE (ClearMasks); Index++) {
     if (ClearMasks[Index] != 0) {
       if (MtrrSetting != NULL) {
-        MtrrSetting->Fixed.Mtrr[Index] = (MtrrSetting->Fixed.Mtrr[Index] & ~ClearMasks[Index]) | OrMasks[Index];
+        //
+        // Fixed MTRR is modified indicating fixed MTRR should be enabled in the end of MTRR programming.
+        //
+        ((MSR_IA32_MTRR_DEF_TYPE_REGISTER *)&MtrrSetting->MtrrDefType)->Bits.FE = 1;
+        MtrrSetting->Fixed.Mtrr[Index]                                          = (MtrrSetting->Fixed.Mtrr[Index] & ~ClearMasks[Index]) | OrMasks[Index];
       } else {
         if (!MtrrContextValid) {
           MtrrLibPreMtrrChange (&MtrrContext);
-          MtrrContextValid = TRUE;
+          //
+          // Fixed MTRR is modified indicating fixed MTRR should be enabled in the end of MTRR programming.
+          //
+          MtrrContext.DefType.Bits.FE = 1;
+          MtrrContextValid            = TRUE;
         }
 
         AsmMsrAndThenOr64 (mMtrrLibFixedMtrrTable[Index].Msr, ~ClearMasks[Index], OrMasks[Index]);
@@ -2653,8 +2668,10 @@ MtrrSetMemoryAttributesInMtrrSettings (
   }
 
   if (MtrrSetting != NULL) {
-    ((MSR_IA32_MTRR_DEF_TYPE_REGISTER *)&MtrrSetting->MtrrDefType)->Bits.E  = 1;
-    ((MSR_IA32_MTRR_DEF_TYPE_REGISTER *)&MtrrSetting->MtrrDefType)->Bits.FE = 1;
+    //
+    // Enable MTRR unconditionally
+    //
+    ((MSR_IA32_MTRR_DEF_TYPE_REGISTER *)&MtrrSetting->MtrrDefType)->Bits.E = 1;
   } else {
     if (MtrrContextValid) {
       MtrrLibPostMtrrChange (&MtrrContext);
