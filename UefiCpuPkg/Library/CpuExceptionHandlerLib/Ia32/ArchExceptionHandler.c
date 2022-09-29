@@ -215,7 +215,10 @@ ArchSetupExceptionStack (
   // Fixup exception task descriptor and task-state segment
   //
   AsmGetTssTemplateMap (&TemplateMap);
-  StackTop = StackTop - CPU_STACK_ALIGNMENT;
+  //
+  // Plus 1 byte is for compact stack layout in case StackTop is already aligned.
+  //
+  StackTop = StackTop - CPU_STACK_ALIGNMENT + 1;
   StackTop = (UINTN)ALIGN_POINTER (StackTop, CPU_STACK_ALIGNMENT);
   IdtTable = (IA32_IDT_GATE_DESCRIPTOR  *)Idtr.Base;
   for (Index = 0; Index < CPU_STACK_SWITCH_EXCEPTION_NUMBER; ++Index) {
