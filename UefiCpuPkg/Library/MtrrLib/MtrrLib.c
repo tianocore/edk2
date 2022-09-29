@@ -5,7 +5,7 @@
     Most of services in this library instance are suggested to be invoked by BSP only,
     except for MtrrSetAllMtrrs() which is used to sync BSP's MTRR setting to APs.
 
-  Copyright (c) 2008 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -139,6 +139,64 @@ VOID
 MtrrDebugPrintAllMtrrsWorker (
   IN MTRR_SETTINGS  *MtrrSetting
   );
+
+/**
+  Return whether MTRR is supported.
+
+  @param[out]  FixedMtrrSupported   Return whether fixed MTRR is supported.
+  @param[out]  VariableMtrrCount    Return the max number of variable MTRRs.
+
+  @retval TRUE  MTRR is supported when either fixed MTRR is supported or max number
+                of variable MTRRs is not 0.
+  @retval FALSE MTRR is not supported when both fixed MTRR is not supported and max
+                number of variable MTRRs is 0.
+**/
+BOOLEAN
+MtrrLibIsMtrrSupported (
+  OUT BOOLEAN  *FixedMtrrSupported  OPTIONAL,
+  OUT UINT32   *VariableMtrrCount   OPTIONAL
+  )
+{
+  CPUID_VERSION_INFO_EDX     Edx;
+  MSR_IA32_MTRRCAP_REGISTER  MtrrCap;
+
+  //
+  // Check CPUID(1).EDX[12] for MTRR capability
+  //
+  AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &Edx.Uint32);
+  if (Edx.Bits.MTRR == 0) {
+    if (FixedMtrrSupported != NULL) {
+      *FixedMtrrSupported = FALSE;
+    }
+
+    if (VariableMtrrCount != NULL) {
+      *VariableMtrrCount = 0;
+    }
+
+    return FALSE;
+  }
+
+  //
+  // Check number of variable MTRRs and fixed MTRRs existence.
+  // If number of variable MTRRs is zero, and fixed MTRRs do not
+  // exist, return false.
+  //
+  MtrrCap.Uint64 = AsmReadMsr64 (MSR_IA32_MTRRCAP);
+  ASSERT (MtrrCap.Bits.VCNT <= ARRAY_SIZE (((MTRR_VARIABLE_SETTINGS *)0)->Mtrr));
+  if (FixedMtrrSupported != NULL) {
+    *FixedMtrrSupported = (BOOLEAN)(MtrrCap.Bits.FIX == 1);
+  }
+
+  if (VariableMtrrCount != NULL) {
+    *VariableMtrrCount = MtrrCap.Bits.VCNT;
+  }
+
+  if ((MtrrCap.Bits.VCNT == 0) && (MtrrCap.Bits.FIX == 0)) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
 
 /**
   Worker function returns the variable MTRR count for the CPU.
@@ -2847,28 +2905,7 @@ IsMtrrSupported (
   VOID
   )
 {
-  CPUID_VERSION_INFO_EDX     Edx;
-  MSR_IA32_MTRRCAP_REGISTER  MtrrCap;
-
-  //
-  // Check CPUID(1).EDX[12] for MTRR capability
-  //
-  AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &Edx.Uint32);
-  if (Edx.Bits.MTRR == 0) {
-    return FALSE;
-  }
-
-  //
-  // Check number of variable MTRRs and fixed MTRRs existence.
-  // If number of variable MTRRs is zero, or fixed MTRRs do not
-  // exist, return false.
-  //
-  MtrrCap.Uint64 = AsmReadMsr64 (MSR_IA32_MTRRCAP);
-  if ((MtrrCap.Bits.VCNT == 0) || (MtrrCap.Bits.FIX == 0)) {
-    return FALSE;
-  }
-
-  return TRUE;
+  return MtrrLibIsMtrrSupported (NULL, NULL);
 }
 
 /**
