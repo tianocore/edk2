@@ -634,6 +634,8 @@
   buildinf.h
   ossl_store.c
   rand_pool.c
+#  SslNull.c
+#  EcSm2Null.c
 
 [Sources.IA32]
   IA32/crypto/aes/aesni-x86.nasm    | MSFT
