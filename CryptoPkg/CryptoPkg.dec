@@ -37,6 +37,15 @@
   #
   HashApiLib|Include/Library/HashApiLib.h
 
+[LibraryClasses.common.Private]
+  ##  @libraryclass  Provides library functions from the openssl project.
+  #
+  OpensslLib|Private/Library/OpensslLib.h
+
+  ##  @libraryclass  Provides compiler intrinsic functions required to link openssl project.
+  #
+  InstrinsicLib|Private/Library/IntrinsicLib.h
+
 [Protocols]
   ## EDK II Crypto DXE protocol
   # 2C2275C9-3A7B-426F-BE54-2D22BD9D1092
