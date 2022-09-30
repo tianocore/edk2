@@ -348,8 +348,10 @@ locals[FObj=CIfrForm()]
         |   vfrStatementConditional
         |   vfrStatementLabel
         |   vfrStatementBanner
+        |   vfrStatementInvalid
         |   vfrStatementExtension
         |   vfrStatementModal
+        |   vfrStatementRefreshEvent ';'
         )*
         'endform' ';' 
     ;
@@ -370,6 +372,7 @@ vfrFormMapDefinition
         |   vfrStatementBanner
         |   vfrStatementExtension
         |   vfrStatementModal
+        |   vfrStatementRefreshEvent ';'
         )*
         'endform' ';' 
     ;
@@ -580,7 +583,7 @@ flagsField
     |   ReconnectRequiredFlag
     |   NVAccessFlag                                     
     |   LateCheckFlag                          
-  ;
+    ;
 
 vfrStatementDefault 
 locals[DObj=None]
@@ -650,7 +653,7 @@ vfrStatementBooleanType
 vfrStatementCheckBox 
 locals[OpObj=CIfrCheckBox(), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'checkbox'
-        vfrQuestionBaseInfo[localctx.OpObj, QType] 
+        vfrQuestionBaseInfo[localctx.OpObj, localctx.QType] 
         vfrStatementHeader[localctx.OpObj] ','
         ('flags' '=' vfrCheckBoxFlags ',')?
         ('key' '=' Number ',')?
@@ -720,7 +723,7 @@ locals[HFlags=0, LFlags=0,IsDisplaySpecified=False,LineNum=0]
     ;
 
 numericFlagsField
-locals[HFlag=0,LFlag=0,IsSetType=False,IsDisplaySpecified=False]
+locals[HFlag=0,IsSetType=False,IsDisplaySpecified=False]
     :   Number
     |   'NUMERIC_SIZE_1'
     |   'NUMERIC_SIZE_2'
@@ -744,6 +747,7 @@ locals[OpObj=CIfrOneOf(), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     ;
 
 vfrOneofFlagsField
+locals[HFlags=0, LFlags=0, LineNum=0]
     :   numericFlagsField ('|' numericFlagsField)*
     ;
 
@@ -923,8 +927,27 @@ locals[LFlag=0]
 
 vfrStatementConditional 
     :   vfrStatementDisableIfStat
-    |   vfrStatementSuppressIfStat
+    |   vfrStatementSuppressIfStat //enhance to be compatible for framework endif
     |   vfrStatementGrayOutIfStat
+    |   vfrStatementInconsistentIfStat   //to be compatible for framework
+    ;
+
+// new seems to be the same as the old, why new?
+vfrStatementConditionalNew 
+    :   vfrStatementDisableIfStat      
+        vfrStatementSuppressIfStatNew  
+        vfrStatementGrayOutIfStatNew   
+        vfrStatementInconsistentIfStat   //to be compatible for framework
+    ;
+
+vfrStatementSuppressIfStat
+locals[SIObj=CIfrSuppressIf()]
+    :   vfrStatementSuppressIfStatNew
+    ;
+
+vfrStatementGrayOutIfStat 
+locals[GOIObj=CIfrGrayOutIf()]
+    :   vfrStatementGrayOutIfStatNew
     ;
 
 vfrStatementStatList 
@@ -933,26 +956,97 @@ vfrStatementStatList
     |   vfrStatementConditional
     |   vfrStatementLabel
     |   vfrStatementExtension
+    |   vfrStatementInvalid
+    ;
+
+vfrStatementStatListOld 
+    :   vfrStatementStat                        
+    |   vfrStatementQuestions                   
+    |   vfrStatementLabel                       
+  // Just for framework vfr compatibility
+    |   vfrStatementInvalid
     ;
 
 vfrStatementDisableIfStat 
+locals[DIObj=CIfrDisableIf()]
     :   'disableif' vfrStatementExpression ';'
         (vfrStatementStatList)*
         'endif' ';'
     ;
 
-vfrStatementSuppressIfStat 
-    :   'suppressif' vfrStatementExpression ';'
+
+// Compatible for framework vfr file
+//
+vfrStatementgrayoutIfSuppressIf
+    :   'suppressif'      
+        ('flags' '=' flagsField ('|' flagsField)* ',')?                       
+        vfrStatementExpression ';'
+    ;
+
+vfrStatementsuppressIfGrayOutIf
+    :   'grayoutif'      
+        ('flags' '=' flagsField ('|' flagsField)* ',')?                       
+        vfrStatementExpression ';'
+    ;
+
+vfrStatementSuppressIfStatNew
+locals[SIObj=CIfrSuppressIf()]
+    :   'suppressif' 
+        ('flags' '=' flagsField ('|' flagsField)* ',')?
+        vfrStatementExpression ';'
         (vfrStatementStatList)*
         'endif' ';'
     ;
 
-vfrStatementGrayOutIfStat 
-    :   'grayoutif' vfrStatementExpression ';'
+vfrStatementGrayOutIfStatNew
+locals[GOIObj=CIfrGrayOutIf()]
+    :   'grayoutif'
+        ('flags' '=' flagsField ('|' flagsField)* ',')?
+        vfrStatementExpression ';'
         (vfrStatementStatList)*
         'endif' ';'
     ;
 
+vfrStatementInconsistentIfStat 
+locals[IIObj=CIfrInconsistentIf()]
+    :   'inconsistentif'     
+        'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
+        ('flags' '=' flagsField ('|' flagsField)* ',')?
+        vfrStatementExpression
+        'endif' ';'
+    ;
+
+vfrStatementInvalid // for compatibility
+    :   vfrStatementInvalidHidden              |   vfrStatementInvalidInventory       
+    |   vfrStatementInvalidSaveRestoreDefaults
+    ;
+
+vfrStatementInvalidHidden
+    :   'hidden'    
+        'value' '=' Number ','
+        'key' '=' Number ';'
+    ;
+
+vfrStatementInvalidInventory
+    :   'inventory'
+        'help' '=' 'STRING_TOKEN' '(' Number ')' ','
+        'text' '=' 'STRING_TOKEN' '(' Number ')' ',' 
+        ('text' '=' 'STRING_TOKEN' '(' Number ')')?
+        ';'
+    ;
+
+vfrStatementInvalidSaveRestoreDefaults
+    :   (   'save'
+        |   'restore'
+        )
+        'defaults' ','
+        'formid' '=' Number ','
+        'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
+        'help' '=' 'STRING_TOKEN' '(' Number ')' 
+        (',' 'flags' '=' flagsField ('|' flagsField)*)?
+        (',' 'key' '=' Number)?
+        ';'
+    ;
 vfrStatementLabel 
 locals[LObj=CIfrLabel()]
     :   'label' Number ';'
@@ -1001,11 +1095,7 @@ vfrExtensionData
 
 vfrExtensionDataComponent
     :   ',' 'data' ('[' Number ']')? 
-        (vfrExtensionDataDotArea)*  '=' Number  
-    ;
-
-vfrExtensionDataDotArea
-    :   '.' StringIdentifier ('[' Number ']')?
+        ( '.' StringIdentifier ('[' Number ']')? )*  '=' Number  
     ;
 
 vfrStatementModal 
@@ -1013,72 +1103,130 @@ vfrStatementModal
     ;
 
 vfrStatementExpression // to do
-locals[RootLevel=0,ExpOpCount=0]
-    :   andTerm ( 'OR' andTerm)*
+locals[ExpInfo=ExpressionInfo()]
+    :   andTerm[localctx.ExpInfo] (vfrStatementExpressionSupplementary[localctx.ExpInfo])*
     ; 
-
-vfrStatementExpressionSub
-locals[RootLevel=0,ExpOpCount=0]
-    :   andTerm ( 'OR' andTerm)*
+    
+vfrStatementExpressionSupplementary[ExpInfo]
+locals[Line=0]
+    :   'OR' andTerm[ExpInfo]
     ;
 
-andTerm
-locals[RootLevel=0,ExpOpCount=0]
-    :   bitwiseorTerm ( 'AND' bitwiseorTerm)*
+vfrStatementExpressionSub // pendingh how to do the rootlevel
+locals[ExpInfo=ExpressionInfo()]
+    :   andTerm[localctx.ExpInfo] (vfrStatementExpressionSubSupplementary[localctx.ExpInfo])*
     ;
 
-bitwiseorTerm
-locals[RootLevel=0,ExpOpCount=0]
-    :   bitwiseandTerm ('|' bitwiseandTerm)*
+vfrStatementExpressionSubSupplementary[ExpInfo]
+locals[Line=0]
+    :   'OR' andTerm[ExpInfo]
     ;
 
-bitwiseandTerm
-locals[RootLevel=0,ExpOpCount=0]
-    :   equalTerm ('&' equalTerm)*
+andTerm[ExpInfo]
+locals[CIfrAndList=[]]
+    :   bitwiseorTerm[ExpInfo] (andTermSupplementary[ExpInfo])*
     ;
 
-equalTerm 
-locals[RootLevel=0,ExpOpCount=0]
-    :   compareTerm ('==' compareTerm | '!=' compareTerm)*
+andTermSupplementary[ExpInfo]
+locals[Line=0]
+    :   'AND' bitwiseorTerm[ExpInfo]
     ;
 
-compareTerm
-locals[RootLevel=0,ExpOpCount=0]
-    :   shiftTerm
-        (   '<' shiftTerm
-        |   '<=' shiftTerm
-        |   '>' shiftTerm
-        |   '>=' shiftTerm
-        )*
+bitwiseorTerm[ExpInfo]
+locals[CIfrBitWiseOrList=[]]
+    :   bitwiseandTerm[ExpInfo] (bitwiseorTermSupplementary[ExpInfo])*
     ;
 
-shiftTerm 
-locals[RootLevel=0,ExpOpCount=0]
-    :   addMinusTerm
-        (   '<<' addMinusTerm
-        |   '>>' addMinusTerm
-        )*
+bitwiseorTermSupplementary[ExpInfo]
+locals[Line=0]
+    :   '|' bitwiseandTerm[ExpInfo]
     ;
 
-addMinusTerm
-locals[RootLevel=0,ExpOpCount=0] 
-    :   multdivmodTerm
-        (   '+' multdivmodTerm
-        |   '-' multdivmodTerm
-        )*
+
+bitwiseandTerm[ExpInfo]
+locals[CIfrBitWiseAndList=[]]
+    :   equalTerm[ExpInfo] (bitwiseandTermSupplementary[ExpInfo])*
     ;
 
-multdivmodTerm 
-locals[RootLevel=0,ExpOpCount=0]
-    :   castTerm
-        (   '*' castTerm
-        |   '/' castTerm
-        |   '%' castTerm
-        )*
+bitwiseandTermSupplementary[ExpInfo]
+locals[Line=0]
+    :   '&' equalTerm[ExpInfo]
     ;
 
-castTerm 
-locals[RootLevel=0,ExpOpCount=0]
+
+equalTerm[ExpInfo]
+locals[CIfrEqualList=[], CIfrNotEqualList=[]]
+    :   compareTerm[localctx.ExpInfo] 
+        (equalTermSupplementary[localctx.CIfrEqualList, localctx.CIfrNotEqualList, ExpInfo])*
+    ;
+
+equalTermSupplementary[CIfrEqualList, CIfrNotEqualList, ExpInfo]
+locals[Line=0]
+    :   ('==' compareTerm[ExpInfo])  # equalTermEqualRule
+        | 
+        ('!=' compareTerm[ExpInfo]) # equalTermNotEqualRule
+    ;
+
+compareTerm[ExpInfo]
+locals[CIfrLessThanList=[], CIfrLessEqualList=[], CIfrGreaterThanList=[], CIfrGreaterEqualList=[]]
+    :   shiftTerm[ExpInfo]
+        (compareTermSupplementary[localctx.CIfrLessThanList, localctx.CIfrLessEqualList, localctx.CIfrGreaterThanList, localctx.CIfrGreaterEqualList, ExpInfo])*
+    ;
+
+compareTermSupplementary[CIfrLessThanList, CIfrLessEqualList, CIfrGreaterThanList, CIfrGreaterEqualList, ExpInfo]
+locals[Line=0]
+    :   ('<' shiftTerm[ExpInfo])   # compareTermLessRule
+        |   
+        ('<=' shiftTerm[ExpInfo])  #  compareTermLessEqualRule
+        |   
+        ('>' shiftTerm[ExpInfo])   #  compareTermGreaterRule
+        |  
+        ('>=' shiftTerm[ExpInfo])  #  compareTermGreaterEqualRule
+    ;
+
+shiftTerm[ExpInfo] 
+locals[CIfrShiftLeftList=[], CIfrShiftRightList=[]]
+    :   addMinusTerm[ExpInfo]
+        (shiftTermSupplementary[localctx.CIfrShiftLeftList, localctx.CIfrShiftRightList, ExpInfo])*
+    ;
+
+shiftTermSupplementary[CIfrShiftLeftList, CIfrShiftRightList, ExpInfo]
+locals[Line=0]
+    :   ('<<' addMinusTerm[ExpInfo])  # shiftTermLeft
+        |   
+        ('>>' addMinusTerm[ExpInfo]) # shiftTermRight
+    ;
+
+addMinusTerm[ExpInfo]
+locals[CIfrAddList=[], CIfrSubtractList=[]]
+    :   multdivmodTerm[ExpInfo]
+        (addMinusTermSupplementary[localctx.CIfrAddList, localctx.CIfrSubtractList, ExpInfo])*
+    ;
+
+addMinusTermSupplementary[CIfrAddList, CIfrSubtractList, ExpInfo]
+locals[Line=0]
+    :   ('+' multdivmodTerm[ExpInfo]) # addMinusTermpAdd
+        |   
+        ('-' multdivmodTerm[ExpInfo]) # addMinusTermSubtract
+    ;
+
+multdivmodTerm[ExpInfo]
+locals[CIfrMultiplyList=[], CIfrDivideList=[], CIfrModuloList=[]]
+    :   castTerm[ExpInfo]
+        (multdivmodTermSupplementary[localctx.CIfrMultiplyList, localctx.CIfrDivideList, localctx.CIfrModuloList, ExpInfo])*
+    ;
+
+multdivmodTermSupplementary[CIfrMultiplyList, CIfrDivideList, CIfrModuloList, ExpInfo]
+locals[Line=0]
+    :   ('*' castTerm[ExpInfo]) # multdivmodTermMul
+        |
+        ('/' castTerm[ExpInfo]) # multdivmodTermDiv
+        |
+        ('%' castTerm[ExpInfo]) # multdivmodTermModulo
+    ;
+
+castTerm[ExpInfo]
+locals[TBObj=None, TUObj=None]
     :   (   '('
             (  'BOOLEAN'
             |  'UINT64'
@@ -1088,127 +1236,114 @@ locals[RootLevel=0,ExpOpCount=0]
             )
             ')'
         )*
-        atomTerm
+        atomTerm[ExpInfo]
     ;
 
-atomTerm
-locals[RootLevel=0,ExpOpCount=0]
-    :   vfrExpressionCatenate
-    |   vfrExpressionMatch
-    |   vfrExpressionMatch2
-    |   vfrExpressionParen
-    |   vfrExpressionBuildInFunction
-    |   vfrExpressionConstant
-    |   vfrExpressionUnaryOp
-    |   vfrExpressionTernaryOp
-    |   vfrExpressionMap
-    |   ('NOT' atomTerm)
-    |   vfrExpressionMatch2
+atomTerm[ExpInfo]
+    :   vfrExpressionCatenate[ExpInfo]
+    |   vfrExpressionMatch[ExpInfo]
+    |   vfrExpressionMatch2[ExpInfo]
+    |   vfrExpressionParen[ExpInfo]
+    |   vfrExpressionBuildInFunction[ExpInfo]
+    |   vfrExpressionConstant[ExpInfo]
+    |   vfrExpressionUnaryOp[ExpInfo]
+    |   vfrExpressionTernaryOp[ExpInfo]
+    |   vfrExpressionMap[ExpInfo]
+    |   ('NOT' atomTerm[ExpInfo])
+    |   vfrExpressionMatch2[ExpInfo]
     ;
 
-vfrExpressionCatenate
-locals[RootLevel=0,ExpOpCount=0]
+vfrExpressionCatenate[ExpInfo]
+locals[CObj=None]
     :   'catenate'
         '(' vfrStatementExpressionSub ',' vfrStatementExpressionSub ')'
     ;
 
-vfrExpressionMatch
-locals[RootLevel=0,ExpOpCount=0]
+vfrExpressionMatch[ExpInfo]
+locals[MObj=None]
     :   'match'
         '(' vfrStatementExpressionSub ',' vfrStatementExpressionSub ')'
     ;
 
-vfrExpressionMatch2
-locals[RootLevel=0,ExpOpCount=0]
+vfrExpressionMatch2[ExpInfo]
+locals[M2Obj=None]
     :   'match2'
         '(' vfrStatementExpressionSub',' ////////vfrStatementExpressionPattern
         vfrStatementExpressionSub ','////////vfrStatementExpressionString
         guidDefinition ')'/////////////////////////////
     ;
 
-vfrExpressionParen
-locals[RootLevel=0,ExpOpCount=0]
+vfrExpressionParen[ExpInfo]
     :   '(' vfrStatementExpressionSub ')'
     ;
 
-vfrExpressionBuildInFunction
-locals[RootLevel=0,ExpOpCount=0]
-    :   dupExp
-    |   vareqvalExp
-    |   ideqvalExp
-    |   ideqidExp
-    |   ideqvallistExp
-    |   questionref1Exp
-    |   rulerefExp
-    |   stringref1Exp
-    |   pushthisExp
-    |   securityExp
-    |   getExp
+vfrExpressionBuildInFunction[ExpInfo]
+    :   dupExp[ExpInfo]
+    |   vareqvalExp[ExpInfo]
+    |   ideqvalExp[ExpInfo]
+    |   ideqidExp[ExpInfo]
+    |   ideqvallistExp[ExpInfo]
+    |   questionref1Exp[ExpInfo]
+    |   rulerefExp[ExpInfo]
+    |   stringref1Exp[ExpInfo]
+    |   pushthisExp[ExpInfo]
+    |   securityExp[ExpInfo]
+    |   getExp[ExpInfo]
     ;
 
-dupExp
-locals[RootLevel=0,ExpOpCount=0]
+dupExp[ExpInfo]
+locals[DObj=None]
     :   'dup'
     ;
 
-vareqvalExp
-locals[RootLevel=0,ExpOpCount=0]
+vareqvalExp[ExpInfo]
     :
     ;
 
-ideqvalExp 
-locals[RootLevel=0,ExpOpCount=0]
+ideqvalExp[ExpInfo]
     :   'ideqval' vfrQuestionDataFieldName '==' Number 
     ;
 
-ideqidExp 
-locals[RootLevel=0,ExpOpCount=0]
+ideqidExp[ExpInfo]
     :   'ideqid' vfrQuestionDataFieldName '==' vfrQuestionDataFieldName 
     ;
 
-ideqvallistExp 
-locals[RootLevel=0,ExpOpCount=0]
+ideqvallistExp[ExpInfo]
     :   'ideqvallist' vfrQuestionDataFieldName '==' (Number)+ 
     ;
 
 vfrQuestionDataFieldName  //////
-locals[RootLevel=0,ExpOpCount=0]
     :   StringIdentifier '[' Number ']'
     |   StringIdentifier ('.' StringIdentifier('[' Number ']')? )*
     ;
 
-questionref1Exp 
-locals[RootLevel=0,ExpOpCount=0]
-    :   'questionref' '(' StringIdentifier | Number ')'
+questionref1Exp[ExpInfo]
+    :   'questionref' 
+        '(' ( StringIdentifier | Number ) ')'
     ;
 
-rulerefExp 
-locals[RootLevel=0,ExpOpCount=0]
+rulerefExp[ExpInfo]
     :   'ruleref' '(' StringIdentifier ')'
     ;
 
-stringref1Exp 
-locals[RootLevel=0,ExpOpCount=0]
+stringref1Exp[ExpInfo]
     :   'stringref' '(' getStringId ')'
     ;
 
-pushthisExp
-locals[RootLevel=0,ExpOpCount=0]
+pushthisExp[ExpInfo]
     :   'pushthis'
     ;
 
-securityExp 
-locals[RootLevel=0,ExpOpCount=0]
+securityExp[ExpInfo]
     :   'security' '(' guidDefinition ')'
     ;
 
-getExp 
+getExp[ExpInfo] 
 locals[BaseInfo=EFI_VARSTORE_INFO()]
     :   'get' '(' vfrStorageVarId[localctx.BaseInfo, False]('|' 'flags' '=' vfrNumericFlags)? ')'
     ;
 
-vfrExpressionConstant
-locals[RootLevel=0,ExpOpCount=0]
+vfrExpressionConstant[ExpInfo] 
     :   'TRUE'
     |   'FALSE'
     |   'ONE'
@@ -1219,32 +1354,28 @@ locals[RootLevel=0,ExpOpCount=0]
     |   Number
     ;
 
-vfrExpressionUnaryOp 
-locals[RootLevel=0,ExpOpCount=0]
-    :   lengthExp
-    |   bitwisenotExp
-    |   question23refExp
-    |   stringref2Exp
-    |   toboolExp
-    |   tostringExp
-    |   unintExp
-    |   toupperExp
-    |   tolwerExp
-    |   setExp
+vfrExpressionUnaryOp[ExpInfo] 
+    :   lengthExp[ExpInfo] 
+    |   bitwisenotExp[ExpInfo] 
+    |   question23refExp[ExpInfo] 
+    |   stringref2Exp[ExpInfo] 
+    |   toboolExp[ExpInfo] 
+    |   tostringExp[ExpInfo] 
+    |   unintExp[ExpInfo] 
+    |   toupperExp[ExpInfo] 
+    |   tolwerExp[ExpInfo] 
+    |   setExp[ExpInfo] 
     ;
 
-lengthExp 
-locals[RootLevel=0,ExpOpCount=0]
+lengthExp[ExpInfo] 
     :   'length' '(' vfrStatementExpression ')'
     ;
 
-bitwisenotExp 
-locals[RootLevel=0,ExpOpCount=0]
+bitwisenotExp[ExpInfo] 
     :   '~' '(' vfrStatementExpression ')'
     ;
 
-question23refExp 
-locals[RootLevel=0,ExpOpCount=0]
+question23refExp[ExpInfo] 
     :   'questionrefval'
         '('
         (DevicePath '=' 'STRING_TOKEN' '(' Number ')' ',' )? //
@@ -1253,39 +1384,33 @@ locals[RootLevel=0,ExpOpCount=0]
         ')'
     ;
 
-stringref2Exp
-locals[RootLevel=0,ExpOpCount=0]
+stringref2Exp[ExpInfo] 
     :   'stringrefval' '(' vfrStatementExpressionSub ')'
     ;
 
-toboolExp
-locals[RootLevel=0,ExpOpCount=0]
+toboolExp[ExpInfo] 
     :   'boolval' '(' vfrStatementExpressionSub ')'
     ;
 
-tostringExp
-locals[RootLevel=0,ExpOpCount=0]
+tostringExp[ExpInfo] 
     :   'stringval' ('format' '=' Number ',' )?
         '(' vfrStatementExpressionSub ')'
     ;
 
-unintExp
-locals[RootLevel=0,ExpOpCount=0]
+unintExp[ExpInfo] 
     :   'unintval' '(' vfrStatementExpressionSub ')'
     ;
 
-toupperExp
-locals[RootLevel=0,ExpOpCount=0]
+toupperExp[ExpInfo]
     :   'toupper' '(' vfrStatementExpressionSub ')'
     ;
 
-tolwerExp
-locals[RootLevel=0,ExpOpCount=0]
+tolwerExp[ExpInfo] 
     :   'tolower' '(' vfrStatementExpressionSub ')'
     ;
 
-setExp
-locals[BaseInfo=EFI_VARSTORE_INFO(), RootLevel=0, ExpOpCount=0]
+setExp[ExpInfo] 
+locals[BaseInfo=EFI_VARSTORE_INFO()]
     :   'set'
         '('
         vfrStorageVarId[localctx.BaseInfo, False]('|' 'flags' '=' vfrNumericFlags)? ','
@@ -1293,17 +1418,15 @@ locals[BaseInfo=EFI_VARSTORE_INFO(), RootLevel=0, ExpOpCount=0]
         ')'
     ;
 
-vfrExpressionTernaryOp 
-locals[RootLevel=0,ExpOpCount=0]
-    :   conditionalExp
-    |   findExp
-    |   midExp
-    |   tokenExp
-    |   spanExp
+vfrExpressionTernaryOp[ExpInfo] 
+    :   conditionalExp[ExpInfo] 
+    |   findExp[ExpInfo] 
+    |   midExp[ExpInfo] 
+    |   tokenExp[ExpInfo] 
+    |   spanExp[ExpInfo] 
     ;
 
-conditionalExp 
-locals[RootLevel=0,ExpOpCount=0]
+conditionalExp[ExpInfo] 
     :   'cond'
         '('
         vfrStatementExpressionSub //
@@ -1314,11 +1437,10 @@ locals[RootLevel=0,ExpOpCount=0]
         ')'
     ;
 
-findExp 
-locals[RootLevel=0,ExpOpCount=0]
+findExp[ExpInfo] 
     :   'find'
         '('
-        findFormat ('|' findFormat)*
+        findFormat[ExpInfo] ('|' findFormat[ExpInfo])*
         ','
         vfrStatementExpressionSub
         ','
@@ -1328,13 +1450,11 @@ locals[RootLevel=0,ExpOpCount=0]
         ')'
     ;
 
-findFormat 
-locals[RootLevel=0,ExpOpCount=0]
+findFormat[ExpInfo] 
     :   'SENSITIVE' | 'INSENSITIVE'
     ;
 
-midExp 
-locals[RootLevel=0,ExpOpCount=0]
+midExp[ExpInfo] 
     :   'mid'
         '('
         vfrStatementExpressionSub
@@ -1345,8 +1465,7 @@ locals[RootLevel=0,ExpOpCount=0]
         ')'
     ;
 
-tokenExp 
-locals[RootLevel=0,ExpOpCount=0]
+tokenExp[ExpInfo]  
     :   'token'
         '('
         vfrStatementExpressionSub
@@ -1357,8 +1476,7 @@ locals[RootLevel=0,ExpOpCount=0]
         ')'
     ;
 
-spanExp 
-locals[RootLevel=0,ExpOpCount=0]
+spanExp[ExpInfo] 
     :   'span'
         '('
         'flags' '=' spanFlags ('|' spanFlags)*
@@ -1372,14 +1490,12 @@ locals[RootLevel=0,ExpOpCount=0]
     ;
 
 spanFlags
-locals[RootLevel=0,ExpOpCount=0]
     :   Number
     |   'LAST_NON_MATCH'
     |   'FIRST_NON_MATCH'
     ;
 
-vfrExpressionMap 
-locals[RootLevel=0,ExpOpCount=0]
+vfrExpressionMap[ExpInfo] 
     :   'map'
         '('
         vfrStatementExpressionSub
@@ -1408,6 +1524,8 @@ Colon : ':';
 Slash : '/';
 Semicolon : ';';
 Comma : ',';
+Equal : '==';
+NotQqual : '!=';
 /* 
 LineDefinition                           '#line\ [0-9]+\ \'~[\']+\'[\ \t]*\n' << gCVfrErrorHandle.ParseFileScopeRecord (begexpr (), line ()); skip (); newline (); >>
 */

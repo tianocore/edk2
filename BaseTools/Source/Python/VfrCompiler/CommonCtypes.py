@@ -1117,6 +1117,9 @@ class EFI_IFR_THIS(Structure):
     ]
 
 
+EFI_IFR_FLAGS_FIRST_MATCHING = 0x00
+EFI_IFR_FLAGS_FIRST_NON_MATCHING = 0x01
+
 class EFI_IFR_SPAN(Structure):
     _pack_ = 1
     _fields_ = [
