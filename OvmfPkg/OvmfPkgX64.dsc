@@ -1036,6 +1036,7 @@
   OvmfPkg/IoMmuDxe/IoMmuDxe.inf
 
   OvmfPkg/TdxDxe/TdxDxe.inf
+  OvmfPkg/CocoDxe/CocoDxe.inf
 
 !if $(SMM_REQUIRE) == TRUE
   OvmfPkg/SmmAccess/SmmAccess2Dxe.inf

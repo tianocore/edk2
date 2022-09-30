@@ -753,6 +753,7 @@
   OvmfPkg/IoMmuDxe/IoMmuDxe.inf
 
   OvmfPkg/TdxDxe/TdxDxe.inf
+  OvmfPkg/CocoDxe/CocoDxe.inf
 
   #
   # Variable driver stack (non-SMM)

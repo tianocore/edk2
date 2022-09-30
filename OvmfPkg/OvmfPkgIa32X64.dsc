@@ -965,6 +965,7 @@
     <LibraryClasses>
     PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
   }
+  OvmfPkg/CocoDxe/CocoDxe.inf
   OvmfPkg/IoMmuDxe/IoMmuDxe.inf
 
 !if $(SMM_REQUIRE) == TRUE

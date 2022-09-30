@@ -269,6 +269,7 @@ INF  ShellPkg/Application/Shell/Shell.inf
 INF MdeModulePkg/Logo/LogoDxe.inf
 
 INF OvmfPkg/TdxDxe/TdxDxe.inf
+INF OvmfPkg/CocoDxe/CocoDxe.inf
 
 #
 # Usb Support

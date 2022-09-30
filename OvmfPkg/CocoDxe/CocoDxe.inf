@@ -1,0 +1,45 @@
+#/** @file
+#
+#  Driver installs shared protocols needed for confidential compute
+#  technologies.
+#
+#  Copyright (c) 2022, Google LLC. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = CocoDxe
+  FILE_GUID                      = 08162f1e-5147-4d3e-b5a9-fa48c9808419
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CocoDxeEntryPoint
+
+[Sources]
+  CocoDxe.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  MemEncryptSevLib
+  MemEncryptTdxLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+
+[Depex]
+  TRUE
+
+[Guids]
+  gEfiEventBeforeExitBootServicesGuid
+
+[Protocols]
+  gEdkiiMemoryAcceptProtocolGuid
