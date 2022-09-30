@@ -322,7 +322,7 @@ TestVerifyImageTimestampVerify (
   UT_ASSERT_EQUAL (SigningTime.Minute, 50);
   UT_ASSERT_EQUAL (SigningTime.Second, 3);
 
-  return Status;
+  return UNIT_TEST_PASSED;
 }
 
 TEST_DESC  mImageTimestampTest[] = {
