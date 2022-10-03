@@ -153,7 +153,6 @@ EcGetPrivateKeyFromPem (
   OUT  VOID         **EcContext
   )
 {
- #if FixedPcdGetBool (PcdOpensslEcEnabled)
   BOOLEAN  Status;
   BIO      *PemBio;
 
@@ -209,7 +208,4 @@ _Exit:
   BIO_free (PemBio);
 
   return Status;
- #else
-  return FALSE;
- #endif
 }
