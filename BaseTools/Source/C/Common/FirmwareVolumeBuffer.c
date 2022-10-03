@@ -91,7 +91,7 @@ Routine Description:
 
 Arguments:
 
-  SourceFv - Address of the Fv in memory, this firmware volume volume will
+  SourceFv - Address of the Fv in memory, this firmware volume will
              be modified, if SourceFfsFile exists
   SourceFfsFile - Input FFS file to replace
 
@@ -141,7 +141,7 @@ Routine Description:
 
 Arguments:
 
-  SourceFv - Address of the Fv in memory, this firmware volume volume will
+  SourceFv - Address of the Fv in memory, this firmware volume will
              be modified, if SourceFfsFile exists
   SourceFfsFile - Input FFS file to replace
 
@@ -285,7 +285,7 @@ Routine Description:
 
 Arguments:
 
-  SourceFv - Address of the Fv in memory, this firmware volume volume will
+  SourceFv - Address of the Fv in memory, this firmware volume will
              be modified, if SourceFfsFile exists
   SourceFfsFile - Input FFS file to replace
 
