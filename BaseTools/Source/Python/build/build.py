@@ -205,7 +205,7 @@ class MakeSubProc(Popen):
 #
 # This method will call subprocess.Popen to execute an external program with
 # given options in specified directory. Because of the dead-lock issue during
-# redirecting output of the external program, threads are used to to do the
+# redirecting output of the external program, threads are used to do the
 # redirection work.
 #
 # @param  Command               A list or string containing the call of the program
