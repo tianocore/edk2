@@ -19,18 +19,12 @@
 
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
 
-[PcdsFixedAtBuild]
-  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled|TRUE
-
 [LibraryClasses]
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/UnitTestHostBaseCryptLib.inf
   MmServicesTableLib|MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
-
-[LibraryClasses.AARCH64, LibraryClasses.ARM]
-  RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
 
 [LibraryClasses.X64, LibraryClasses.IA32]
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
@@ -40,9 +34,10 @@
   # Build HOST_APPLICATION that tests the SampleUnitTest
   #
   CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibHost.inf
+  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibHostAccel.inf {
+    <LibraryClasses>
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
+  }
 
 [BuildOptions]
-  *_*_*_CC_FLAGS       = -D DISABLE_NEW_DEPRECATED_INTERFACES
-  MSFT:*_*_*_CC_FLAGS  = /D ENABLE_MD5_DEPRECATED_INTERFACES
-  INTEL:*_*_*_CC_FLAGS = /D ENABLE_MD5_DEPRECATED_INTERFACES
-  GCC:*_*_*_CC_FLAGS   = -D ENABLE_MD5_DEPRECATED_INTERFACES
+  *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
