@@ -714,7 +714,7 @@ Tree *MR_compute_pred_tree_ctxXX(p)
     if (p == NULL) return NULL;
 
 /* this appears strange: why do we OR the context
-   of and AND predicate ?  It is because of the way
+   of an AND predicate ?  It is because of the way
    that predicates are evaluated: if the context is
    wrong then it's the same as if the predicate was
    true.  That means that even when one leg of an
@@ -1531,7 +1531,7 @@ Predicate * MR_find_in_aSubBlk(alt)
  *      1.  if lookahead for alt i is contained in the lookahead for any
  *          alt j then ignore semantic predicate of alt i
  *      2.  if lookahead for alt i is not contained in the lookahead for
- *          any alt j then add add predicate i to the OR list to be hoisted
+ *          any alt j then add predicate i to the OR list to be hoisted
  *      3.  if lookahead for alt i overlaps the lookahead for some alt j then
  *          add a dummy semantic predicate for alt j
  *
