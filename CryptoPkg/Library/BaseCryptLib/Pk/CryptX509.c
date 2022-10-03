@@ -881,7 +881,6 @@ EcGetPublicKeyFromX509 (
   OUT  VOID         **EcContext
   )
 {
- #if FixedPcdGetBool (PcdOpensslEcEnabled)
   BOOLEAN   Status;
   EVP_PKEY  *Pkey;
   X509      *X509Cert;
@@ -935,9 +934,6 @@ _Exit:
   }
 
   return Status;
- #else
-  return FALSE;
- #endif
 }
 
 /**
