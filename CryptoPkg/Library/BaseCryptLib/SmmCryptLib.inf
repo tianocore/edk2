@@ -74,19 +74,12 @@
 [Sources.X64]
   Rand/CryptRandTsc.c
 
-[Sources.ARM]
-  Rand/CryptRand.c
-
-[Sources.AARCH64]
-  Rand/CryptRand.c
-
 [Packages]
   MdePkg/MdePkg.dec
   CryptoPkg/CryptoPkg.dec
 
 [LibraryClasses]
   BaseLib
-  IoLib
   BaseMemoryLib
   MemoryAllocationLib
   OpensslLib
@@ -95,18 +88,13 @@
   MmServicesTableLib
   SynchronizationLib
 
-[FixedPcd]
-  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
-
 #
 # Remove these [BuildOptions] after this library is cleaned up
 #
 [BuildOptions]
   #
   # suppress the following warnings so we do not break the build with warnings-as-errors:
-  # C4090: 'function' : different 'const' qualifiers
   #
-  MSFT:*_*_*_CC_FLAGS = /wd4090
 
   XCODE:*_*_*_CC_FLAGS = -mmmx -msse -std=c99
 
