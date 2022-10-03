@@ -18,7 +18,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]
@@ -28,6 +28,7 @@
   Hash/CryptSha256.c
   Hash/CryptSha512.c
   Hash/CryptSm3.c
+  Hash/CryptParallelHashNull.c
   Hmac/CryptHmac.c
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
@@ -48,8 +49,7 @@
   Pk/CryptRsaPss.c
   Pk/CryptRsaPssSign.c
   Bn/CryptBn.c
-  Pk/CryptEcNull.c    |*|*|*|!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
-  Pk/CryptEc.c    |*|*|*|gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  Pk/CryptEc.c
 
   SysCall/UnitTestHostCrtWrapper.c
 
@@ -58,12 +58,6 @@
 
 [Sources.X64]
   Rand/CryptRandTsc.c
-
-[Sources.ARM]
-  Rand/CryptRand.c
-
-[Sources.AARCH64]
-  Rand/CryptRand.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -75,9 +69,7 @@
   MemoryAllocationLib
   DebugLib
   OpensslLib
-
-[FixedPcd]
-  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
+  PrintLib
 
 #
 # Remove these [BuildOptions] after this library is cleaned up
@@ -85,11 +77,9 @@
 [BuildOptions]
   #
   # suppress the following warnings so we do not break the build with warnings-as-errors:
-  # C4090: 'function' : different 'const' qualifiers
-  # C4018: '>': signed/unsigned mismatch
-  MSFT:*_*_*_CC_FLAGS = /wd4090 /wd4018
-
+  #
   GCC:*_CLANG35_*_CC_FLAGS = -std=c99
   GCC:*_CLANG38_*_CC_FLAGS = -std=c99
+  GCC:*_CLANGPDB_*_CC_FLAGS = -std=c99 -Wno-error=incompatible-pointer-types
 
   XCODE:*_*_*_CC_FLAGS = -std=c99
