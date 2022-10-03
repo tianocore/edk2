@@ -27,6 +27,7 @@
   TlsInit.c
   TlsConfig.c
   TlsProcess.c
+  SysCall/inet_pton.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -40,14 +41,3 @@
   MemoryAllocationLib
   OpensslLib
   SafeIntLib
-
-[FixedPcd]
-  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled
-
-[BuildOptions]
-  #
-  # suppress the following warnings so we do not break the build with warnings-as-errors:
-  # C4090: 'function' : different 'const' qualifiers
-  #
-  MSFT:*_*_*_CC_FLAGS = /wd4090
-
