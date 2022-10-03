@@ -299,7 +299,7 @@ Returns:
         return STATUS_ERROR;
       }
       if (TempNumber == 0) {
-        Error (NULL, 0, 1003, "Invalid option value", "Fv block size can't be be set to zero");
+        Error (NULL, 0, 1003, "Invalid option value", "Fv block size can't be set to zero");
         return STATUS_ERROR;
       }
       mFvDataInfo.FvBlocks[0].Length = (UINT32) TempNumber;
