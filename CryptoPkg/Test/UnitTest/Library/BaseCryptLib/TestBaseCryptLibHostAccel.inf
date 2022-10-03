@@ -1,0 +1,55 @@
+## @file
+# Host-based UnitTest for BaseCryptLib
+#
+# Copyright (c) Microsoft Corporation.<BR>
+# Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = BaseCryptLibUnitTestHostAccel
+  FILE_GUID      = B1AED64E-B53A-4D69-B0BA-60EEDAC47A6B
+  MODULE_TYPE    = HOST_APPLICATION
+  VERSION_STRING = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  UnitTestMain.c
+  BaseCryptLibUnitTests.c
+  TestBaseCryptLib.h
+  HashTests.c
+  HmacTests.c
+  BlockCipherTests.c
+  RsaTests.c
+  RsaPkcs7Tests.c
+  Pkcs5Pbkdf2Tests.c
+  AuthenticodeTests.c
+  TSTests.c
+  DhTests.c
+  RandTests.c
+  Pkcs7EkuTests.c
+  OaepEncryptTests.c
+  RsaPssTests.c
+  ParallelhashTests.c
+  HkdfTests.c
+  AeadAesGcmTests.c
+  BnTests.c
+  EcTests.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseCryptLib
+  UnitTestLib
+  MmServicesTableLib
+  SynchronizationLib
