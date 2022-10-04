@@ -213,10 +213,10 @@ SERIAL_IO_DEVICE_PATH  mSerialIoDevicePath = {
   }
 };
 
-#define DEBGU_SERIAL_IO_FIFO_DEPTH  10
+#define DEBUG_SERIAL_IO_FIFO_DEPTH  10
 //
 //  Data buffer for Terminal input character and Debug Symbols.
-//  The depth is DEBGU_SERIAL_IO_FIFO_DEPTH.
+//  The depth is DEBUG_SERIAL_IO_FIFO_DEPTH.
 //  Fields:
 //      First   UINT8: The index of the first data in array Data[].
 //      Last    UINT8: The index, which you can put a new data into array Data[].
@@ -227,7 +227,7 @@ typedef struct {
   UINT8    First;
   UINT8    Last;
   UINT8    Surplus;
-  UINT8    Data[DEBGU_SERIAL_IO_FIFO_DEPTH];
+  UINT8    Data[DEBUG_SERIAL_IO_FIFO_DEPTH];
 } DEBUG_SERIAL_FIFO;
 
 //
@@ -236,10 +236,10 @@ typedef struct {
 EFI_HANDLE         mSerialIoHandle        = NULL;
 UINTN              mLoopbackBuffer        = 0;
 DEBUG_SERIAL_FIFO  mSerialFifoForTerminal = {
-  0, 0, DEBGU_SERIAL_IO_FIFO_DEPTH, { 0 }
+  0, 0, DEBUG_SERIAL_IO_FIFO_DEPTH, { 0 }
 };
 DEBUG_SERIAL_FIFO  mSerialFifoForDebug = {
-  0, 0, DEBGU_SERIAL_IO_FIFO_DEPTH, { 0 }
+  0, 0, DEBUG_SERIAL_IO_FIFO_DEPTH, { 0 }
 };
 
 /**
@@ -251,11 +251,11 @@ DEBUG_SERIAL_FIFO  mSerialFifoForDebug = {
 
 **/
 BOOLEAN
-IsDebugTermianlFifoEmpty (
+IsDebugTerminalFifoEmpty (
   IN DEBUG_SERIAL_FIFO  *Fifo
   )
 {
-  if (Fifo->Surplus == DEBGU_SERIAL_IO_FIFO_DEPTH) {
+  if (Fifo->Surplus == DEBUG_SERIAL_IO_FIFO_DEPTH) {
     return TRUE;
   }
 
@@ -313,7 +313,7 @@ DebugTerminalFifoAdd (
   Fifo->Data[Fifo->Last] = Data;
   Fifo->Surplus--;
   Fifo->Last++;
-  if (Fifo->Last == DEBGU_SERIAL_IO_FIFO_DEPTH) {
+  if (Fifo->Last == DEBUG_SERIAL_IO_FIFO_DEPTH) {
     Fifo->Last = 0;
   }
 
@@ -339,7 +339,7 @@ DebugTerminalFifoRemove (
   //
   // if FIFO is empty, no data can remove
   //
-  if (IsDebugTermianlFifoEmpty (Fifo)) {
+  if (IsDebugTerminalFifoEmpty (Fifo)) {
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -349,7 +349,7 @@ DebugTerminalFifoRemove (
   *Data = Fifo->Data[Fifo->First];
   Fifo->Surplus++;
   Fifo->First++;
-  if (Fifo->First == DEBGU_SERIAL_IO_FIFO_DEPTH) {
+  if (Fifo->First == DEBUG_SERIAL_IO_FIFO_DEPTH) {
     Fifo->First = 0;
   }
 
@@ -532,7 +532,7 @@ SerialGetControl (
   // Check to see if the Terminal FIFO is empty and
   // check to see if the input buffer in the Debug Communication Library is empty
   //
-  if (!IsDebugTermianlFifoEmpty (&mSerialFifoForTerminal) || DebugPortPollBuffer (Handle)) {
+  if (!IsDebugTerminalFifoEmpty (&mSerialFifoForTerminal) || DebugPortPollBuffer (Handle)) {
     *Control &= ~EFI_SERIAL_INPUT_BUFFER_EMPTY;
   }
 
