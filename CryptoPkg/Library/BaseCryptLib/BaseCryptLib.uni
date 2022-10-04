@@ -12,8 +12,6 @@
 //
 // **/
 
-
 #string STR_MODULE_ABSTRACT             #language en-US "Cryptographic Library Instance for DXE_DRIVER"
 
 #string STR_MODULE_DESCRIPTION          #language en-US "Caution: This module requires additional review when modified. This library will have external input - signature. This external input must be validated carefully to avoid security issues such as buffer overflow or integer overflow."
-
