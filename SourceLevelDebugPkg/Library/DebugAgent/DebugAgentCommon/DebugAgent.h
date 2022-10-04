@@ -452,7 +452,7 @@ DebugAgentDataMsgPrint (
   );
 
 /**
-  Read remaing debug packet except for the start symbol
+  Read remaining debug packet except for the start symbol
 
   @param[in]      Handle        Pointer to Debug Port handle.
   @param[in, out] DebugHeader   Debug header buffer including start symbol.

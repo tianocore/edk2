@@ -71,7 +71,7 @@ DebugPortInitialize (
   );
 
 /**
-  Read data from debug device and save the datas in buffer.
+  Read data from debug device and save the data in a buffer.
 
   Reads NumberOfBytes data bytes from a debug device into the buffer
   specified by Buffer. The number of bytes actually read is returned.

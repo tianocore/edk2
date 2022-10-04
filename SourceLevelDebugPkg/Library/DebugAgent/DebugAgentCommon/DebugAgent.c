@@ -1,5 +1,5 @@
 /** @file
-  Commond Debug Agent library implementation. It mainly includes
+  Common Debug Agent library implementation. It mainly includes
   the first C function called by exception/interrupt handlers,
   read/write debug packet to communication with HOST based on transfer
   protocol.
@@ -608,7 +608,7 @@ DebugAgentDataMsgPrint (
 }
 
 /**
-  Read remaing debug packet except for the start symbol
+  Read remaining debug packet except for the start symbol
 
   @param[in]      Handle        Pointer to Debug Port handle.
   @param[in, out] DebugHeader   Debug header buffer including start symbol.
@@ -616,7 +616,7 @@ DebugAgentDataMsgPrint (
   @retval EFI_SUCCESS        Read the symbol in BreakSymbol.
   @retval EFI_CRC_ERROR      CRC check fail.
   @retval EFI_TIMEOUT        Timeout occurs when reading debug packet.
-  @retval EFI_DEVICE_ERROR   Receive the old or responsed packet.
+  @retval EFI_DEVICE_ERROR   Receive the old or response packet.
 
 **/
 EFI_STATUS
@@ -651,7 +651,7 @@ ReadRemainingBreakPacket (
   if (IS_REQUEST (DebugHeader)) {
     if (DebugHeader->SequenceNo == (UINT8)(Mailbox->HostSequenceNo + 1)) {
       //
-      // Only updagte HostSequenceNo for new command packet
+      // Only update HostSequenceNo for new command packet
       //
       UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_HOST_SEQUENCE_NO_INDEX, DebugHeader->SequenceNo);
       return EFI_SUCCESS;
