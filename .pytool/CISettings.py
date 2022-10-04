@@ -73,6 +73,7 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 "UnitTestFrameworkPkg",
                 "OvmfPkg",
                 "RedfishPkg",
+                "SourceLevelDebugPkg",
                 "UefiPayloadPkg"
                 )
 
