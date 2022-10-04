@@ -16,7 +16,7 @@
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/Variable.h>
 #include <Library/PeiServicesLib.h>
-#include <Library/FspWrapperMultiPhaseProcessLib.h>
+#include <Library/FspWrapperPlatformMultiPhaseLib.h>
 
 /**
   Execute 32-bit FSP API entry code.

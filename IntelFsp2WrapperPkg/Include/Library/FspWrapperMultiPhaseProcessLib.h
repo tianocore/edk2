@@ -10,24 +10,6 @@
 #define __FSP_WRAPPER_MULTI_PHASE_PROCESS_LIB_H__
 
 /**
-  FSP Wrapper Platform MultiPhase Handler
-
-  @param[in] FspHobListPtr        - Pointer to FSP HobList (valid after FSP-M completed)
-  @param[in] ComponentIndex       - FSP Component which executing MultiPhase initialization.
-  @param[in] PhaseIndex           - Indicates current execution phase of FSP MultiPhase initialization.
-
-  @retval EFI_STATUS        Always return EFI_SUCCESS
-
-**/
-VOID
-EFIAPI
-FspWrapperPlatformMultiPhaseHandler (
-  IN OUT VOID  **FspHobListPtr,
-  IN UINT8     ComponentIndex,
-  IN UINT32    PhaseIndex
-  );
-
-/**
   FSP Wrapper Variable Request Handler
 
   @param[in] FspHobListPtr        - Pointer to FSP HobList (valid after FSP-M completed)

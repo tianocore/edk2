@@ -33,7 +33,7 @@
   FspWrapperMultiPhaseProcessLib|Include/Library/FspWrapperMultiPhaseProcessLib.h
 
   ##  @libraryclass  Provide MultiPhase platform actions related functions.
-  FspWrapperPlatformMultiPhaseLib|Include/Library/FspWrapperMultiPhaseProcessLib.h
+  FspWrapperPlatformMultiPhaseLib|Include/Library/FspWrapperPlatformMultiPhaseLib.h
 
 
 [Guids]
