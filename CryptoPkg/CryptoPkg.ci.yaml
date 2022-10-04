@@ -24,7 +24,8 @@
         "ExceptionList": [
             "8001", "IsLeap",
             "8001", "OBJ_get0_data",
-            "8001", "OBJ_length"
+            "8001", "OBJ_length",
+            "5005", "X509PopCertificate"
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
