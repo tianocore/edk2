@@ -62,6 +62,7 @@
   @retval EFI_NOT_FOUND             The number of signers found was not 1.
 
 **/
+STATIC
 EFI_STATUS
 GetSignerCertificate (
   IN CONST PKCS7  *CertChain,
@@ -132,6 +133,7 @@ Exit:
   @retval EFI_NOT_FOUND             One or more EKU's were not found in the signature.
 
 **/
+STATIC
 EFI_STATUS
 IsEkuInCertificate (
   IN CONST X509   *Cert,
@@ -255,6 +257,7 @@ Exit:
   @retval EFI_INVALID_PARAMETER     A parameter was invalid.
   @retval EFI_NOT_FOUND             One or more EKU's were not found in the signature.
 **/
+STATIC
 EFI_STATUS
 CheckEKUs (
   IN CONST X509    *SignerCert,

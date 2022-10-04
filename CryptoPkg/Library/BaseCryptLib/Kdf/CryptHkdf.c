@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Library/BaseCryptLib.h>
+#include "InternalCryptLib.h"
 #include <openssl/evp.h>
 #include <openssl/kdf.h>
 
@@ -27,6 +27,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @retval FALSE  Hkdf generation failed.
 
 **/
+STATIC
 BOOLEAN
 HkdfMdExtractAndExpand (
   IN   CONST EVP_MD  *Md,
@@ -95,6 +96,7 @@ HkdfMdExtractAndExpand (
   @retval false  Hkdf generation failed.
 
 **/
+STATIC
 BOOLEAN
 HkdfMdExtract (
   IN CONST EVP_MD  *Md,
@@ -174,6 +176,7 @@ HkdfMdExtract (
   @retval FALSE  Hkdf generation failed.
 
 **/
+STATIC
 BOOLEAN
 HkdfMdExpand (
   IN   CONST EVP_MD  *Md,
