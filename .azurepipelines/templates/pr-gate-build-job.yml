@@ -41,7 +41,7 @@ jobs:
         Build.Pkgs: 'NetworkPkg,RedfishPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_OTHER:
-        Build.Pkgs: 'PcAtChipsetPkg,PrmPkg,ShellPkg,StandaloneMmPkg,SignedCapsulePkg'
+        Build.Pkgs: 'PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,StandaloneMmPkg,SignedCapsulePkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_FMP_FAT_TEST:
         Build.Pkgs: 'FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg'
