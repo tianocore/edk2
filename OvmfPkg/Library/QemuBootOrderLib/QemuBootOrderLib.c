@@ -1709,7 +1709,7 @@ FreeFwCfg:
   Attempt to retrieve the "bootorder" fw_cfg file from QEMU. Translate
   the OpenFirmware device paths therein to UEFI device path fragments.
 
-  On Success store the device path in QemuBootOrderNNNN variables.
+  On Success store the device path in VMMBootOrderNNNN variables.
 **/
 VOID
 EFIAPI
@@ -1794,13 +1794,13 @@ StoreQemuBootOrder (
       UnicodeSPrint (
         VariableName,
         sizeof (VariableName),
-        L"QemuBootOrder%04d",
+        L"VMMBootOrder%04x",
         VariableIndex++
         );
       DEBUG ((DEBUG_INFO, "%a: %s = %s\n", __FUNCTION__, VariableName, Translated));
       gRT->SetVariable (
              VariableName,
-             &gQemuBootOrderGuid,
+             &gVMMBootOrderGuid,
              EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
              GetDevicePathSize (DevicePath),
              DevicePath
