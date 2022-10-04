@@ -34,7 +34,7 @@ extern UINTN  AsmInterruptHandle;
   @param[in]  InterruptType      Interrupt type.
 
   @retval  TRUE     IDT entries were setup by Debug Agent.
-  @retval  FALSE    IDT entries were not setuo by Debug Agent.
+  @retval  FALSE    IDT entries were not setup by Debug Agent.
 
 **/
 BOOLEAN
