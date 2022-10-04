@@ -639,7 +639,6 @@
   BaseLib
   DebugLib
   RngLib
-  PrintLib
 
 [LibraryClasses.ARM]
   ArmSoftFloatLib
