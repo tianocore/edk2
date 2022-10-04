@@ -761,6 +761,19 @@ PlatformAddressWidthInitialization (
     FirstNonAddress = PlatformGetFirstNonAddress (PlatformInfoHob);
   }
 
+  PlatformAddressWidthFromCpuid (PlatformInfoHob, TRUE);
+  if (PlatformInfoHob->PhysMemAddressWidth != 0) {
+    // physical address width is known
+    PlatformInfoHob->FirstNonAddress = FirstNonAddress;
+    return;
+  }
+
+  //
+  // physical address width is NOT known
+  //   -> do some guess work, mostly based on installed memory
+  //   -> try be conservstibe to stay below the guaranteed minimum of
+  //      36 phys bits (aka 64 GB).
+  //
   PhysMemAddressWidth = (UINT8)HighBitSet64 (FirstNonAddress);
 
   //
