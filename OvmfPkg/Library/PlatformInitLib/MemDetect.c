@@ -503,39 +503,105 @@ PlatformGetFirstNonAddress (
 }
 
 /*
- * Use CPUID to figure physical address width.  Does *not* work
- * reliable on qemu.  For historical reasons qemu returns phys-bits=40
- * even in case the host machine supports less than that.
+ * Use CPUID to figure physical address width.
  *
- * qemu has a cpu property (host-phys-bits={on,off}) to change that
- * and make sure guest phys-bits are not larger than host phys-bits.,
- * but it is off by default.  Exception: microvm machine type
- * hard-wires that property to on.
+ * Does *not* work reliable on qemu.  For historical reasons qemu
+ * returns phys-bits=40 by default even in case the host machine
+ * supports less than that.
+ *
+ * So we apply the following rules (which can be enabled/disabled
+ * using the QemuQuirk parameter) to figure whenever we can work with
+ * the returned physical address width or not:
+ *
+ *   (1) If it is 41 or higher consider it valid.
+ *   (2) If it is 40 or lower consider it valid in case it matches a
+ *       known-good value for the CPU vendor, which is:
+ *         ->  36 or 39 for Intel
+ *         ->  40 for AMD
+ *   (3) Otherwise consider it invalid.
+ *
+ * Recommendation: Run qemu with host-phys-bits=on.  That will make
+ * sure guest phys-bits is not larger than host phys-bits.  Some
+ * distro builds do that by default.
  */
 VOID
 EFIAPI
 PlatformAddressWidthFromCpuid (
-  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob,
+  IN     BOOLEAN                QemuQuirk
   )
 {
-  UINT32  RegEax;
+  UINT32   RegEax, RegEbx, RegEcx, RegEdx, Max;
+  UINT8    PhysBits;
+  CHAR8    Signature[13] = { 0 };
+  BOOLEAN  Valid         = FALSE;
+  BOOLEAN  Page1GSupport = FALSE;
 
-  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-  if (RegEax >= 0x80000008) {
-    AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-    PlatformInfoHob->PhysMemAddressWidth = (UINT8)RegEax;
-  } else {
-    PlatformInfoHob->PhysMemAddressWidth = 36;
+  AsmCpuid (0x80000000, &RegEax, &RegEbx, &RegEcx, &RegEdx);
+  *(UINT32 *)(Signature + 0) = RegEbx;
+  *(UINT32 *)(Signature + 4) = RegEdx;
+  *(UINT32 *)(Signature + 8) = RegEcx;
+  Max                        = RegEax;
+
+  if (Max >= 0x80000001) {
+    AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
+    if ((RegEdx & BIT26) != 0) {
+      Page1GSupport = TRUE;
+    }
   }
 
-  PlatformInfoHob->FirstNonAddress = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth);
+  if (Max >= 0x80000008) {
+    AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+    PhysBits = (UINT8)RegEax;
+  } else {
+    PhysBits = 36;
+  }
+
+  if (!QemuQuirk) {
+    Valid = TRUE;
+  } else if (PhysBits >= 41) {
+    Valid = TRUE;
+  } else if (AsciiStrCmp (Signature, "GenuineIntel") == 0) {
+    if ((PhysBits == 36) || (PhysBits == 39)) {
+      Valid = TRUE;
+    }
+  } else if (AsciiStrCmp (Signature, "AuthenticAMD") == 0) {
+    if (PhysBits == 40) {
+      Valid = TRUE;
+    }
+  }
 
   DEBUG ((
     DEBUG_INFO,
-    "%a: cpuid: phys-bits is %d\n",
+    "%a: Signature: '%a', PhysBits: %d, QemuQuirk: %a, Valid: %a\n",
     __FUNCTION__,
-    PlatformInfoHob->PhysMemAddressWidth
+    Signature,
+    PhysBits,
+    QemuQuirk ? "On" : "Off",
+    Valid ? "Yes" : "No"
     ));
+
+  if (Valid) {
+    if (PhysBits > 47) {
+      /*
+       * Avoid 5-level paging altogether for now, which limits
+       * PhysBits to 48.  Also avoid using address bit 48, due to sign
+       * extension we can't identity-map these addresses (and lots of
+       * places in edk2 assume we have everything identity-mapped).
+       * So the actual limit is 47.
+       */
+      DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 47 (avoid 5-level paging)\n", __func__));
+      PhysBits = 47;
+    }
+
+    if (!Page1GSupport && (PhysBits > 40)) {
+      DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 40 (no 1G pages available)\n", __func__));
+      PhysBits = 40;
+    }
+
+    PlatformInfoHob->PhysMemAddressWidth = PhysBits;
+    PlatformInfoHob->FirstNonAddress     = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth);
+  }
 }
 
 /**
@@ -672,7 +738,7 @@ PlatformAddressWidthInitialization (
   EFI_STATUS  Status;
 
   if (PlatformInfoHob->HostBridgeDevId == 0xffff /* microvm */) {
-    PlatformAddressWidthFromCpuid (PlatformInfoHob);
+    PlatformAddressWidthFromCpuid (PlatformInfoHob, FALSE);
     return;
   }
 
