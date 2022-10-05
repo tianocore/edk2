@@ -678,6 +678,10 @@ HttpBootFreeCache (
         FreePool (Cache->RequestData->Url);
       }
 
+      if (Cache->RequestData->ProxyUrl != NULL) {
+        FreePool (Cache->RequestData->ProxyUrl);
+      }
+
       FreePool (Cache->RequestData);
     }
 
@@ -950,6 +954,7 @@ HttpBootGetBootFile (
   UINT8                    *Block;
   UINTN                    UrlSize;
   CHAR16                   *Url;
+  CHAR16                   *ProxyUrl;
   BOOLEAN                  IdentityMode;
   UINTN                    ReceivedSize;
   CHAR8                    BaseAuthValue[80];
@@ -988,6 +993,22 @@ HttpBootGetBootFile (
   //
   // Not found in cache, try to download it through HTTP.
   //
+
+  //
+  // Initialize ProxyUrl - Set to NULL if connecting without Proxy
+  //
+  if (Private->ProxyUri != NULL) {
+    UrlSize  = AsciiStrSize (Private->ProxyUri);
+    ProxyUrl = AllocatePool (UrlSize * (sizeof (CHAR16)));
+    if (ProxyUrl == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ERROR_1;
+    }
+
+    AsciiStrToUnicodeStrS (Private->ProxyUri, ProxyUrl, UrlSize);
+  } else {
+    ProxyUrl = NULL;
+  }
 
   //
   // 1. Create a temp cache item for the requested URI if caller doesn't provide buffer.
@@ -1106,8 +1127,9 @@ HttpBootGetBootFile (
     goto ERROR_3;
   }
 
-  RequestData->Method = HeaderOnly ? HttpMethodHead : HttpMethodGet;
-  RequestData->Url    = Url;
+  RequestData->Method   = HeaderOnly ? HttpMethodHead : HttpMethodGet;
+  RequestData->Url      = Url;
+  RequestData->ProxyUrl = ProxyUrl;
 
   //
   // 2.3 Record the request info in a temp cache item.
@@ -1441,6 +1463,10 @@ ERROR_2:
   }
 
 ERROR_1:
+  if (ProxyUrl != NULL) {
+    FreePool (ProxyUrl);
+  }
+
   if (Url != NULL) {
     FreePool (Url);
   }
