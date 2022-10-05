@@ -510,9 +510,10 @@ EfiHttpRequest (
       if ((HttpInstance->ConnectionClose == FALSE) &&
           (HttpInstance->RemotePort == RemotePort) &&
           (AsciiStrCmp (HttpInstance->RemoteHost, HostName) == 0) &&
-          (!HttpInstance->UseHttps || (HttpInstance->UseHttps &&
-                                       !TlsConfigure &&
-                                       (HttpInstance->TlsSessionState == EfiTlsSessionDataTransferring))))
+          (!HttpInstance->UseHttps ||
+           HttpInstance->ProxyConnected || (HttpInstance->UseHttps &&
+                                            !TlsConfigure &&
+                                            (HttpInstance->TlsSessionState == EfiTlsSessionDataTransferring))))
       {
         //
         // Host Name and port number of the request URL are the same with previous call to Request().
@@ -665,7 +666,7 @@ EfiHttpRequest (
     goto Error2;
   }
 
-  if (!Configure && !ReConfigure && !TlsConfigure) {
+  if ((!Configure && !ReConfigure) && ((HttpInstance->ProxyConnected && TlsConfigure) || (!TlsConfigure))) {
     //
     // For the new HTTP token, create TX TCP token events.
     //
