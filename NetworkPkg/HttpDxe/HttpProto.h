@@ -164,6 +164,15 @@ typedef struct _HTTP_PROTOCOL {
   NET_MAP                           RxTokens;
 
   CHAR8                             *Url;
+  UINTN                             UrlLen;
+
+  //
+  // Proxy support
+  //
+  CHAR8                             *ProxyUrl;
+  UINTN                             ProxyUrlLen;
+  BOOLEAN                           ProxyConnected;
+  CHAR8                             *EndPointHostName;
 
   //
   // Https Support

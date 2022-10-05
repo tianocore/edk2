@@ -162,6 +162,7 @@ EfiHttpConfigure (
     HttpInstance->TimeOutMillisec    = HttpConfigData->TimeOutMillisec;
     HttpInstance->LocalAddressIsIPv6 = HttpConfigData->LocalAddressIsIPv6;
     HttpInstance->ConnectionClose    = FALSE;
+    HttpInstance->ProxyConnected     = FALSE;
 
     if (HttpConfigData->LocalAddressIsIPv6) {
       CopyMem (
@@ -244,6 +245,8 @@ EfiHttpRequest (
   CHAR8                  *RequestMsg;
   CHAR8                  *Url;
   UINTN                  UrlLen;
+  CHAR8                  *ProxyUrl;
+  UINTN                  ProxyUrlLen;
   CHAR16                 *HostNameStr;
   HTTP_TOKEN_WRAP        *Wrap;
   CHAR8                  *FileUrl;
@@ -254,6 +257,7 @@ EfiHttpRequest (
   // Initializations
   //
   Url          = NULL;
+  ProxyUrl     = NULL;
   UrlParser    = NULL;
   RemotePort   = 0;
   HostName     = NULL;
@@ -277,12 +281,18 @@ EfiHttpRequest (
   //
   // Only support GET, HEAD, DELETE, PATCH, PUT and POST method in current implementation.
   //
-  if ((Request != NULL) && (Request->Method != HttpMethodGet) &&
-      (Request->Method != HttpMethodHead) && (Request->Method != HttpMethodDelete) &&
-      (Request->Method != HttpMethodPut) && (Request->Method != HttpMethodPost) &&
-      (Request->Method != HttpMethodPatch))
-  {
-    return EFI_UNSUPPORTED;
+  if (Request != NULL) {
+    switch (Request->Method) {
+    case HttpMethodGet:
+    case HttpMethodHead:
+    case HttpMethodDelete:
+    case HttpMethodPut:
+    case HttpMethodPost:
+    case HttpMethodPatch:
+      break;
+    default:
+      return EFI_UNSUPPORTED;
+    }
   }
 
   HttpInstance = HTTP_INSTANCE_FROM_PROTOCOL (This);
@@ -337,21 +347,48 @@ EfiHttpRequest (
     }
 
     //
-    // Parse the URI of the remote host.
+    // Parse the Request URI.
     //
     Url    = HttpInstance->Url;
     UrlLen = StrLen (Request->Url) + 1;
-    if (UrlLen > HTTP_URL_BUFFER_LEN) {
+    if (UrlLen > HttpInstance->UrlLen) {
       Url = AllocateZeroPool (UrlLen);
       if (Url == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
 
-      FreePool (HttpInstance->Url);
-      HttpInstance->Url = Url;
+      if (HttpInstance->Url != NULL) {
+        FreePool (HttpInstance->Url);
+      }
+
+      HttpInstance->Url     = Url;
+      HttpInstance->UrlLen  = UrlLen;
     }
 
     UnicodeStrToAsciiStrS (Request->Url, Url, UrlLen);
+
+    //
+    // In case of HTTP Connect, parse proxy URI from Request.
+    //
+    if (Request->Method == HttpMethodConnect) {
+      ProxyUrl    = HttpInstance->ProxyUrl;
+      ProxyUrlLen = StrLen (Request->ProxyUrl) + 1;
+      if (ProxyUrlLen > HttpInstance->ProxyUrlLen) {
+        ProxyUrl = AllocateZeroPool (ProxyUrlLen);
+        if (ProxyUrl == NULL) {
+          return EFI_OUT_OF_RESOURCES;
+        }
+
+        if (HttpInstance->ProxyUrl != NULL) {
+          FreePool (HttpInstance->ProxyUrl);
+        }
+
+        HttpInstance->ProxyUrl    = ProxyUrl;
+        HttpInstance->ProxyUrlLen = ProxyUrlLen;
+      }
+
+      UnicodeStrToAsciiStrS (Request->ProxyUrl, ProxyUrl, ProxyUrlLen);
+    }
 
     //
     // From the information in Url, the HTTP instance will
