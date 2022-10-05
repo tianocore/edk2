@@ -199,6 +199,7 @@
   UefiCpuPkg/CpuTimerDxe/CpuTimerDxe.inf
   UefiCpuPkg/Library/CpuExceptionHandlerLib/BaseRiscV64CpuExceptionHandlerLib.inf
   UefiCpuPkg/CpuDxe/CpuDxeRiscV64.inf
+  UefiCpuPkg/Library/CpuTimerLib/BaseRiscV64CpuTimerLib.inf
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
