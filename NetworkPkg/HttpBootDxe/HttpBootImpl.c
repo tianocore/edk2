@@ -315,7 +315,11 @@ HttpBootGetBootFileCaller (
   EFI_STATUS                Status;
 
   if (Private->BootFileSize == 0) {
-    State = GetBootFileHead;
+    if (Private->ProxyUri != NULL) {
+      State = ConnectToProxy;
+    } else {
+      State = GetBootFileHead;
+    }
   } else {
     State = LoadBootFile;
   }
@@ -364,6 +368,16 @@ HttpBootGetBootFileCaller (
         State = GetBootFileError;
       } else {
         State = LoadBootFile;
+      }
+
+      break;
+
+    case ConnectToProxy:
+      Status = HttpBootConnectProxy (Private);
+      if (Status == EFI_SUCCESS) {
+        State = GetBootFileHead;
+      } else {
+        State = GetBootFileError;
       }
 
       break;
