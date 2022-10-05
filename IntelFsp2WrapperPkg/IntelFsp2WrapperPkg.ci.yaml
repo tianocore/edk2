@@ -78,11 +78,7 @@
 
     ## options defined .pytool/Plugin/LibraryClassCheck
     "LibraryClassCheck": {
-        "IgnoreLibraryClass": [
-          # This header file contains a small function in a separate library so platforms
-          # do not have to override the whole main library instance.
-          "FspWrapperPlatformMultiPhaseLib"
-        ]
+        "IgnoreLibraryClass": []
     },
 
     ## options defined .pytool/Plugin/SpellCheck
