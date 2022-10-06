@@ -1,0 +1,51 @@
+## @file
+#  Platform Initialization Lib for RISC-V
+#
+#  This module provides platform specific functions for RISC-V.
+#  Copyright (c) 2022, Ventana Micro Systems Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = BaseRiscV64PlatformInitLib
+  FILE_GUID                      = 0D1B3448-4D8E-44EE-80C9-907443047F79
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformInitLib|SEC PEIM
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+
+[Sources]
+  RiscV64/Platform.c
+  RiscV64/Cpu.c
+  RiscV64/Memory.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  DebugLib
+  IoLib
+  HobLib
+  RiscVSbiLib
+  FdtLib
+  MemoryAllocationLib
+
+[Guids]
+  gFdtHobGuid
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFvBaseAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFvSize

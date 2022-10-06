@@ -291,4 +291,43 @@ PlatformInitEmuVariableNvStore (
   IN VOID  *EmuVariableNvStore
   );
 
+/**
+  Perform Platform PEIM initialization.
+
+  @return EFI_SUCCESS     The platform initialized successfully.
+  @retval  Others        - As the error code indicates
+
+**/
+EFI_STATUS
+EFIAPI
+PlatformPeimInitialization (
+  VOID
+  );
+
+/**
+  Perform Memory PEIM initialization.
+
+  @return EFI_SUCCESS     The platform initialized successfully.
+  @retval  Others        - As the error code indicates
+
+**/
+EFI_STATUS
+EFIAPI
+MemoryPeimInitialization (
+  VOID
+  );
+
+/**
+  Perform CPU PEIM initialization.
+
+  @return EFI_SUCCESS     The platform initialized successfully.
+  @retval  Others        - As the error code indicates
+
+**/
+EFI_STATUS
+EFIAPI
+CpuPeimInitialization (
+  VOID
+  );
+
 #endif // PLATFORM_INIT_LIB_H_
