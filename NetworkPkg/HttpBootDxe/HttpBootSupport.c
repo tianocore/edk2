@@ -566,8 +566,8 @@ HttpBootCheckUriScheme (
 **/
 EFI_STATUS
 HttpBootUriFromDevicePath (
-  IN    URI_DEVICE_PATH     *Node,
-  OUT   CHAR8               **Uri
+  IN    URI_DEVICE_PATH  *Node,
+  OUT   CHAR8            **Uri
   )
 {
   UINTN   UriStrLength;
@@ -630,7 +630,7 @@ HttpBootParseFilePath (
 
   *ProxyUriAddress    = NULL;
   *EndPointUriAddress = NULL;
-  ZeroMem (Node, sizeof(Node));
+  ZeroMem (Node, sizeof (Node));
 
   // Obtain last 2 device path nodes.
   // Looking for sequences:
@@ -643,8 +643,8 @@ HttpBootParseFilePath (
   TempNode = FilePath;
 
   while (!IsDevicePathEnd (TempNode)) {
-    Node[0] = Node[1];
-    Node[1] = TempNode;
+    Node[0]  = Node[1];
+    Node[1]  = TempNode;
     TempNode = NextDevicePathNode (TempNode);
   }
 
@@ -661,7 +661,7 @@ HttpBootParseFilePath (
   // If exists, obtain endpoint URI string.
   if (NodeIsUri[1]) {
     Status = HttpBootUriFromDevicePath (
-               (URI_DEVICE_PATH*)Node[1],
+               (URI_DEVICE_PATH*) Node[1],
                EndPointUriAddress
                );
 
@@ -672,7 +672,7 @@ HttpBootParseFilePath (
     // If exists, obtain proxy URI string.
     if (NodeIsUri[0]) {
       Status = HttpBootUriFromDevicePath (
-                 (URI_DEVICE_PATH*)Node[0],
+                 (URI_DEVICE_PATH*) Node[0],
                  ProxyUriAddress
                  );
 

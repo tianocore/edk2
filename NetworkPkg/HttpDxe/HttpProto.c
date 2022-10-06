@@ -848,8 +848,8 @@ HttpCleanProtocol (
 
   if (HttpInstance->Url != NULL) {
     FreePool (HttpInstance->Url);
-    HttpInstance->Url     = NULL;
-    HttpInstance->UrlLen  = 0;
+    HttpInstance->Url    = NULL;
+    HttpInstance->UrlLen = 0;
   }
 
   if (HttpInstance->ProxyUrl != NULL) {

@@ -326,86 +326,86 @@ HttpBootGetBootFileCaller (
 
   for ( ; ;) {
     switch (State) {
-    case GetBootFileHead:
-      //
-      // Try to use HTTP HEAD method.
-      //
-      Status = HttpBootGetBootFile (
-                 Private,
-                 TRUE,
-                 &Private->BootFileSize,
-                 NULL,
-                 &Private->ImageType
-                 );
-      if ((EFI_ERROR (Status)) && (Status != EFI_BUFFER_TOO_SMALL)) {
-        if ((Private->AuthData != NULL) && (Status == EFI_ACCESS_DENIED)) {
-          //
-          // Try to use HTTP HEAD method again since the Authentication information is provided.
-          //
+      case GetBootFileHead:
+        //
+        // Try to use HTTP HEAD method.
+        //
+        Status = HttpBootGetBootFile (
+                   Private,
+                   TRUE,
+                   &Private->BootFileSize,
+                   NULL,
+                   &Private->ImageType
+                   );
+        if ((EFI_ERROR (Status)) && (Status != EFI_BUFFER_TOO_SMALL)) {
+          if ((Private->AuthData != NULL) && (Status == EFI_ACCESS_DENIED)) {
+            //
+            // Try to use HTTP HEAD method again since the Authentication information is provided.
+            //
+            State = GetBootFileHead;
+          } else {
+            State = GetBootFileGet;
+          }
+        } else {
+          State = LoadBootFile;
+        }
+
+        break;
+
+      case GetBootFileGet:
+        //
+        // Failed to get file size by HEAD method, may be trunked encoding, try HTTP GET method.
+        //
+        ASSERT (Private->BootFileSize == 0);
+        Status = HttpBootGetBootFile (
+                   Private,
+                   FALSE,
+                   &Private->BootFileSize,
+                   NULL,
+                   &Private->ImageType
+                   );
+        if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL)) {
+          State = GetBootFileError;
+        } else {
+          State = LoadBootFile;
+        }
+
+        break;
+
+      case ConnectToProxy:
+        Status = HttpBootConnectProxy (Private);
+        if (Status == EFI_SUCCESS) {
           State = GetBootFileHead;
         } else {
-          State = GetBootFileGet;
+          State = GetBootFileError;
         }
-      } else {
-        State = LoadBootFile;
-      }
 
-      break;
+        break;
 
-    case GetBootFileGet:
-      //
-      // Failed to get file size by HEAD method, may be trunked encoding, try HTTP GET method.
-      //
-      ASSERT (Private->BootFileSize == 0);
-      Status = HttpBootGetBootFile (
-                 Private,
-                 FALSE,
-                 &Private->BootFileSize,
-                 NULL,
-                 &Private->ImageType
-                 );
-      if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL)) {
-        State = GetBootFileError;
-      } else {
-        State = LoadBootFile;
-      }
+      case LoadBootFile:
+        if (*BufferSize < Private->BootFileSize) {
+          *BufferSize = Private->BootFileSize;
+          *ImageType  = Private->ImageType;
+          Status      = EFI_BUFFER_TOO_SMALL;
+          return Status;
+        }
 
-      break;
-
-    case ConnectToProxy:
-      Status = HttpBootConnectProxy (Private);
-      if (Status == EFI_SUCCESS) {
-        State = GetBootFileHead;
-      } else {
-        State = GetBootFileError;
-      }
-
-      break;
-
-    case LoadBootFile:
-      if (*BufferSize < Private->BootFileSize) {
-        *BufferSize = Private->BootFileSize;
-        *ImageType  = Private->ImageType;
-        Status      = EFI_BUFFER_TOO_SMALL;
+        //
+        // Load the boot file into Buffer
+        //
+        Status = HttpBootGetBootFile (
+                   Private,
+                   FALSE,
+                   BufferSize,
+                   Buffer,
+                   ImageType
+                   );
         return Status;
-      }
 
-      //
-      // Load the boot file into Buffer
-      //
-      Status = HttpBootGetBootFile (
-                 Private,
-                 FALSE,
-                 BufferSize,
-                 Buffer,
-                 ImageType
-                 );
-      return Status;
-
-    case GetBootFileError:
-    default:
-      AsciiPrint ("\n  Error: Could not retrieve NBP file size from HTTP server.\n");
-      return Status;
+      case GetBootFileError:
+      default:
+        AsciiPrint ("\n  Error: Could not retrieve NBP file size from HTTP server.\n");
+        return Status;
     }
   }
 }

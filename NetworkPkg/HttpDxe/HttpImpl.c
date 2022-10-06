@@ -260,18 +260,18 @@ EfiHttpRequest (
   //
   // Initializations
   //
-  Url               = NULL;
-  ProxyUrl          = NULL;
-  UrlParser         = NULL;
-  EndPointUrlParser = NULL;
-  RemotePort        = 0;
-  HostName          = NULL;
-  RequestMsg        = NULL;
-  HostNameStr       = NULL;
-  Wrap              = NULL;
-  FileUrl           = NULL;
-  TlsConfigure      = FALSE;
-  EndPointUrlMsg    = NULL;
+  Url                = NULL;
+  ProxyUrl           = NULL;
+  UrlParser          = NULL;
+  EndPointUrlParser  = NULL;
+  RemotePort         = 0;
+  HostName           = NULL;
+  RequestMsg         = NULL;
+  HostNameStr        = NULL;
+  Wrap               = NULL;
+  FileUrl            = NULL;
+  TlsConfigure       = FALSE;
+  EndPointUrlMsg     = NULL;
   EndPointRemotePort = 0;
 
   if ((This == NULL) || (Token == NULL)) {
@@ -290,20 +290,20 @@ EfiHttpRequest (
   //
   if (Request != NULL) {
     switch (Request->Method) {
-    case HttpMethodGet:
-    case HttpMethodHead:
-    case HttpMethodDelete:
-    case HttpMethodPut:
-    case HttpMethodPost:
-    case HttpMethodPatch:
-      break;
-    case HttpMethodConnect:
-      if (Request->ProxyUrl == NULL) {
-        return EFI_INVALID_PARAMETER;
-      }
-      break;
-    default:
-      return EFI_UNSUPPORTED;
+      case HttpMethodGet:
+      case HttpMethodHead:
+      case HttpMethodDelete:
+      case HttpMethodPut:
+      case HttpMethodPost:
+      case HttpMethodPatch:
+        break;
+      case HttpMethodConnect:
+        if (Request->ProxyUrl == NULL) {
+          return EFI_INVALID_PARAMETER;
+        }
+        break;
+      default:
+        return EFI_UNSUPPORTED;
     }
   }
 
@@ -373,8 +373,8 @@ EfiHttpRequest (
         FreePool (HttpInstance->Url);
       }
 
-      HttpInstance->Url     = Url;
-      HttpInstance->UrlLen  = UrlLen;
+      HttpInstance->Url    = Url;
+      HttpInstance->UrlLen = UrlLen;
     }
 
     UnicodeStrToAsciiStrS (Request->Url, Url, UrlLen);
@@ -461,7 +461,7 @@ EfiHttpRequest (
       ParseUrl = Url;
     }
 
-    Status    = HttpParseUrl (ParseUrl, (UINT32)AsciiStrLen (ParseUrl), FALSE, &UrlParser);
+    Status = HttpParseUrl (ParseUrl, (UINT32)AsciiStrLen (ParseUrl), FALSE, &UrlParser);
     if (EFI_ERROR (Status)) {
       goto Error1;
     }

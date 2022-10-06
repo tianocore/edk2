@@ -1012,9 +1012,9 @@ HttpBootConnectProxy (
     goto EXIT;
   }
 
-  RequestData->Method      = HttpMethodConnect;
-  RequestData->ProxyUrl    = ProxyUrl;
-  RequestData->Url         = Url;
+  RequestData->Method   = HttpMethodConnect;
+  RequestData->ProxyUrl = ProxyUrl;
+  RequestData->Url      = Url;
 
   //
   // Send out the request to HTTP server.
