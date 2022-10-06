@@ -85,6 +85,7 @@
   gEfiDiskInfoIdeInterfaceGuid                  ## SOMETIMES_CONSUMES ## GUID
   gEfiDiskInfoScsiInterfaceGuid                 ## SOMETIMES_CONSUMES ## GUID
   gEfiDiskInfoSdMmcInterfaceGuid                ## SOMETIMES_CONSUMES ## GUID
+  gEfiDiskInfoUfsInterfaceGuid                  ## SOMETIMES_CONSUMES ## GUID
 
 [Protocols]
   gEfiPciRootBridgeIoProtocolGuid               ## CONSUMES
