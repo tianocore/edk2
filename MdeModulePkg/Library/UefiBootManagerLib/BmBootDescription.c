@@ -195,7 +195,9 @@ BmGetDescriptionFromDiskInfo (
 
       BmEliminateExtraSpaces (Description);
     }
-  } else if (CompareGuid (&DiskInfo->Interface, &gEfiDiskInfoScsiInterfaceGuid)) {
+  } else if (CompareGuid (&DiskInfo->Interface, &gEfiDiskInfoScsiInterfaceGuid) ||
+             CompareGuid (&DiskInfo->Interface, &gEfiDiskInfoUfsInterfaceGuid))
+  {
     BufferSize = sizeof (EFI_SCSI_INQUIRY_DATA);
     Status     = DiskInfo->Inquiry (
                              DiskInfo,
