@@ -661,7 +661,7 @@ HttpBootParseFilePath (
   // If exists, obtain endpoint URI string.
   if (NodeIsUri[1]) {
     Status = HttpBootUriFromDevicePath (
-               (URI_DEVICE_PATH*)Node[1],
+               (URI_DEVICE_PATH *)Node[1],
                EndPointUriAddress
                );
 
@@ -672,7 +672,7 @@ HttpBootParseFilePath (
     // If exists, obtain proxy URI string.
     if (NodeIsUri[0]) {
       Status = HttpBootUriFromDevicePath (
-                 (URI_DEVICE_PATH*)Node[0],
+                 (URI_DEVICE_PATH *)Node[0],
                  ProxyUriAddress
                  );
 
