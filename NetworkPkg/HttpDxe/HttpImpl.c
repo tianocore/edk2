@@ -301,6 +301,7 @@ EfiHttpRequest (
         if (Request->ProxyUrl == NULL) {
           return EFI_INVALID_PARAMETER;
         }
+
         break;
       default:
         return EFI_UNSUPPORTED;
