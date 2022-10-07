@@ -118,8 +118,8 @@ HttpBootStart (
   CHAR8       *ProxyUri;
   CHAR8       *EndPointUri;
 
-  ProxyUri     = NULL;
-  EndPointUri  = NULL;
+  ProxyUri    = NULL;
+  EndPointUri = NULL;
 
   if ((Private == NULL) || (FilePath == NULL)) {
     return EFI_INVALID_PARAMETER;
