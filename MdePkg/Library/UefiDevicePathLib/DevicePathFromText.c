@@ -388,6 +388,10 @@ DevPathFromTextGenericPath (
            (UINT16)(sizeof (EFI_DEVICE_PATH_PROTOCOL) + DataLength)
            );
 
+  if (Node == NULL) {
+    return NULL;
+  }
+
   StrHexToBytes (DataStr, DataLength * 2, (UINT8 *)(Node + 1), DataLength);
   return Node;
 }
@@ -453,6 +457,10 @@ DevPathFromTextPci (
                                      (UINT16)sizeof (PCI_DEVICE_PATH)
                                      );
 
+  if (Pci == NULL) {
+    return NULL;
+  }
+
   Pci->Function = (UINT8)Strtoi (FunctionStr);
   Pci->Device   = (UINT8)Strtoi (DeviceStr);
 
@@ -481,6 +489,10 @@ DevPathFromTextPcCard (
                                               HW_PCCARD_DP,
                                               (UINT16)sizeof (PCCARD_DEVICE_PATH)
                                               );
+
+  if (Pccard == NULL) {
+    return NULL;
+  }
 
   Pccard->FunctionNumber = (UINT8)Strtoi (FunctionNumberStr);
 
@@ -513,6 +525,10 @@ DevPathFromTextMemoryMapped (
                                                HW_MEMMAP_DP,
                                                (UINT16)sizeof (MEMMAP_DEVICE_PATH)
                                                );
+
+  if (MemMap == NULL) {
+    return NULL;
+  }
 
   MemMap->MemoryType = (UINT32)Strtoi (MemoryTypeStr);
   Strtoi64 (StartingAddressStr, &MemMap->StartingAddress);
@@ -558,6 +574,10 @@ ConvertFromTextVendor (
                                    SubType,
                                    (UINT16)(sizeof (VENDOR_DEVICE_PATH) + Length)
                                    );
+
+  if (Vendor == NULL) {
+    return NULL;
+  }
 
   StrToGuid (GuidStr, &Vendor->Guid);
   StrHexToBytes (DataStr, Length * 2, (UINT8 *)(Vendor + 1), Length);
@@ -607,6 +627,11 @@ DevPathFromTextCtrl (
                                               HW_CONTROLLER_DP,
                                               (UINT16)sizeof (CONTROLLER_DEVICE_PATH)
                                               );
+
+  if (Controller == NULL) {
+    return NULL;
+  }
+
   Controller->ControllerNumber = (UINT32)Strtoi (ControllerStr);
 
   return (EFI_DEVICE_PATH_PROTOCOL *)Controller;
@@ -636,6 +661,10 @@ DevPathFromTextBmc (
                                           HW_BMC_DP,
                                           (UINT16)sizeof (BMC_DEVICE_PATH)
                                           );
+
+  if (BmcDp == NULL) {
+    return NULL;
+  }
 
   BmcDp->InterfaceType = (UINT8)Strtoi (InterfaceTypeStr);
   WriteUnaligned64 (
@@ -706,6 +735,10 @@ DevPathFromTextAcpi (
                                      (UINT16)sizeof (ACPI_HID_DEVICE_PATH)
                                      );
 
+  if (Acpi == NULL) {
+    return NULL;
+  }
+
   Acpi->HID = EisaIdFromText (HIDStr);
   Acpi->UID = (UINT32)Strtoi (UIDStr);
 
@@ -736,6 +769,10 @@ ConvertFromTextAcpi (
                                      ACPI_DP,
                                      (UINT16)sizeof (ACPI_HID_DEVICE_PATH)
                                      );
+
+  if (Acpi == NULL) {
+    return NULL;
+  }
 
   Acpi->HID = EFI_PNP_ID (PnPId);
   Acpi->UID = (UINT32)Strtoi (UIDStr);
@@ -878,6 +915,10 @@ DevPathFromTextAcpiEx (
                                               Length
                                               );
 
+  if (AcpiEx == NULL) {
+    return NULL;
+  }
+
   AcpiEx->HID = EisaIdFromText (HIDStr);
   AcpiEx->CID = EisaIdFromText (CIDStr);
   AcpiEx->UID = (UINT32)Strtoi (UIDStr);
@@ -919,6 +960,10 @@ DevPathFromTextAcpiExp (
                                                  ACPI_EXTENDED_DP,
                                                  Length
                                                  );
+
+  if (AcpiEx == NULL) {
+    return NULL;
+  }
 
   AcpiEx->HID = EisaIdFromText (HIDStr);
   //
@@ -1040,6 +1085,10 @@ DevPathFromTextAta (
                                  (UINT16)sizeof (ATAPI_DEVICE_PATH)
                                  );
 
+  if (Atapi == NULL) {
+    return NULL;
+  }
+
   PrimarySecondaryStr = GetNextParamStr (&TextDeviceNode);
   SlaveMasterStr      = GetNextParamStr (&TextDeviceNode);
   LunStr              = GetNextParamStr (&TextDeviceNode);
@@ -1090,6 +1139,10 @@ DevPathFromTextScsi (
                                  (UINT16)sizeof (SCSI_DEVICE_PATH)
                                  );
 
+  if (Scsi == NULL) {
+    return NULL;
+  }
+
   Scsi->Pun = (UINT16)Strtoi (PunStr);
   Scsi->Lun = (UINT16)Strtoi (LunStr);
 
@@ -1120,6 +1173,10 @@ DevPathFromTextFibre (
                                          MSG_FIBRECHANNEL_DP,
                                          (UINT16)sizeof (FIBRECHANNEL_DEVICE_PATH)
                                          );
+
+  if (Fibre == NULL) {
+    return NULL;
+  }
 
   Fibre->Reserved = 0;
   Strtoi64 (WWNStr, &Fibre->WWN);
@@ -1152,6 +1209,10 @@ DevPathFromTextFibreEx (
                                             MSG_FIBRECHANNELEX_DP,
                                             (UINT16)sizeof (FIBRECHANNELEX_DEVICE_PATH)
                                             );
+
+  if (FibreEx == NULL) {
+    return NULL;
+  }
 
   FibreEx->Reserved = 0;
   Strtoi64 (WWNStr, (UINT64 *)(&FibreEx->WWN));
@@ -1186,6 +1247,10 @@ DevPathFromText1394 (
                                         (UINT16)sizeof (F1394_DEVICE_PATH)
                                         );
 
+  if (F1394DevPath == NULL) {
+    return NULL;
+  }
+
   F1394DevPath->Reserved = 0;
   F1394DevPath->Guid     = StrHexToUint64 (GuidStr);
 
@@ -1217,6 +1282,10 @@ DevPathFromTextUsb (
                                       (UINT16)sizeof (USB_DEVICE_PATH)
                                       );
 
+  if (Usb == NULL) {
+    return NULL;
+  }
+
   Usb->ParentPortNumber = (UINT8)Strtoi (PortStr);
   Usb->InterfaceNumber  = (UINT8)Strtoi (InterfaceStr);
 
@@ -1245,6 +1314,10 @@ DevPathFromTextI2O (
                                     MSG_I2O_DP,
                                     (UINT16)sizeof (I2O_DEVICE_PATH)
                                     );
+
+  if (I2ODevPath == NULL) {
+    return NULL;
+  }
 
   I2ODevPath->Tid = (UINT32)Strtoi (TIDStr);
 
@@ -1281,6 +1354,10 @@ DevPathFromTextInfiniband (
                                            MSG_INFINIBAND_DP,
                                            (UINT16)sizeof (INFINIBAND_DEVICE_PATH)
                                            );
+
+  if (InfiniBand == NULL) {
+    return NULL;
+  }
 
   InfiniBand->ResourceFlags = (UINT32)Strtoi (FlagsStr);
   StrToGuid (GuidStr, (EFI_GUID *)InfiniBand->PortGid);
@@ -1331,6 +1408,11 @@ DevPathFromTextVenPcAnsi (
                                    MSG_VENDOR_DP,
                                    (UINT16)sizeof (VENDOR_DEVICE_PATH)
                                    );
+
+  if (Vendor == NULL) {
+    return NULL;
+  }
+
   CopyGuid (&Vendor->Guid, &gEfiPcAnsiGuid);
 
   return (EFI_DEVICE_PATH_PROTOCOL *)Vendor;
@@ -1356,6 +1438,11 @@ DevPathFromTextVenVt100 (
                                    MSG_VENDOR_DP,
                                    (UINT16)sizeof (VENDOR_DEVICE_PATH)
                                    );
+
+  if (Vendor == NULL) {
+    return NULL;
+  }
+
   CopyGuid (&Vendor->Guid, &gEfiVT100Guid);
 
   return (EFI_DEVICE_PATH_PROTOCOL *)Vendor;
@@ -1381,6 +1468,11 @@ DevPathFromTextVenVt100Plus (
                                    MSG_VENDOR_DP,
                                    (UINT16)sizeof (VENDOR_DEVICE_PATH)
                                    );
+
+  if (Vendor == NULL) {
+    return NULL;
+  }
+
   CopyGuid (&Vendor->Guid, &gEfiVT100PlusGuid);
 
   return (EFI_DEVICE_PATH_PROTOCOL *)Vendor;
@@ -1406,6 +1498,11 @@ DevPathFromTextVenUtf8 (
                                    MSG_VENDOR_DP,
                                    (UINT16)sizeof (VENDOR_DEVICE_PATH)
                                    );
+
+  if (Vendor == NULL) {
+    return NULL;
+  }
+
   CopyGuid (&Vendor->Guid, &gEfiVTUTF8Guid);
 
   return (EFI_DEVICE_PATH_PROTOCOL *)Vendor;
@@ -1433,6 +1530,10 @@ DevPathFromTextUartFlowCtrl (
                                                        MSG_VENDOR_DP,
                                                        (UINT16)sizeof (UART_FLOW_CONTROL_DEVICE_PATH)
                                                        );
+
+  if (UartFlowControl == NULL) {
+    return NULL;
+  }
 
   CopyGuid (&UartFlowControl->Guid, &gEfiUartDevicePathGuid);
   if (StrCmp (ValueStr, L"XonXoff") == 0) {
@@ -1484,6 +1585,10 @@ DevPathFromTextSAS (
                                      MSG_VENDOR_DP,
                                      (UINT16)sizeof (SAS_DEVICE_PATH)
                                      );
+
+  if (Sas == NULL) {
+    return NULL;
+  }
 
   CopyGuid (&Sas->Guid, &gEfiSasDevicePathGuid);
   Strtoi64 (AddressStr, &Sas->SasAddress);
@@ -1580,6 +1685,10 @@ DevPathFromTextSasEx (
                                        (UINT16)sizeof (SASEX_DEVICE_PATH)
                                        );
 
+  if (SasEx == NULL) {
+    return NULL;
+  }
+
   Strtoi64 (AddressStr, &SasAddress);
   Strtoi64 (LunStr, &Lun);
   WriteUnaligned64 ((UINT64 *)&SasEx->SasAddress, SwapBytes64 (SasAddress));
@@ -1663,6 +1772,10 @@ DevPathFromTextNVMe (
                                                      (UINT16)sizeof (NVME_NAMESPACE_DEVICE_PATH)
                                                      );
 
+  if (Nvme == NULL) {
+    return NULL;
+  }
+
   Nvme->NamespaceId = (UINT32)Strtoi (NamespaceIdStr);
   Uuid              = (UINT8 *)&Nvme->NamespaceUuid;
 
@@ -1699,6 +1812,10 @@ DevPathFromTextUfs (
                                 (UINT16)sizeof (UFS_DEVICE_PATH)
                                 );
 
+  if (Ufs == NULL) {
+    return NULL;
+  }
+
   Ufs->Pun = (UINT8)Strtoi (PunStr);
   Ufs->Lun = (UINT8)Strtoi (LunStr);
 
@@ -1728,6 +1845,10 @@ DevPathFromTextSd (
                                       (UINT16)sizeof (SD_DEVICE_PATH)
                                       );
 
+  if (Sd == NULL) {
+    return NULL;
+  }
+
   Sd->SlotNumber = (UINT8)Strtoi (SlotNumberStr);
 
   return (EFI_DEVICE_PATH_PROTOCOL *)Sd;
@@ -1756,6 +1877,10 @@ DevPathFromTextEmmc (
                                         (UINT16)sizeof (EMMC_DEVICE_PATH)
                                         );
 
+  if (Emmc == NULL) {
+    return NULL;
+  }
+
   Emmc->SlotNumber = (UINT8)Strtoi (SlotNumberStr);
 
   return (EFI_DEVICE_PATH_PROTOCOL *)Emmc;
@@ -1781,6 +1906,10 @@ DevPathFromTextDebugPort (
                                  MSG_VENDOR_DP,
                                  (UINT16)sizeof (VENDOR_DEVICE_PATH)
                                  );
+
+  if (Vend == NULL) {
+    return NULL;
+  }
 
   CopyGuid (&Vend->Guid, &gEfiDebugPortProtocolGuid);
 
@@ -1812,6 +1941,10 @@ DevPathFromTextMAC (
                                          MSG_MAC_ADDR_DP,
                                          (UINT16)sizeof (MAC_ADDR_DEVICE_PATH)
                                          );
+
+  if (MACDevPath == NULL) {
+    return NULL;
+  }
 
   MACDevPath->IfType = (UINT8)Strtoi (IfTypeStr);
 
@@ -1882,6 +2015,10 @@ DevPathFromTextIPv4 (
                                         (UINT16)sizeof (IPv4_DEVICE_PATH)
                                         );
 
+  if (IPv4 == NULL) {
+    return NULL;
+  }
+
   StrToIpv4Address (RemoteIPStr, NULL, &IPv4->RemoteIpAddress, NULL);
   IPv4->Protocol = (UINT16)NetworkProtocolFromText (ProtocolStr);
   if (StrCmp (TypeStr, L"Static") == 0) {
@@ -1938,6 +2075,10 @@ DevPathFromTextIPv6 (
                                           (UINT16)sizeof (IPv6_DEVICE_PATH)
                                           );
 
+  if (IPv6 == NULL) {
+    return NULL;
+  }
+
   StrToIpv6Address (RemoteIPStr, NULL, &IPv6->RemoteIpAddress, NULL);
   IPv6->Protocol = (UINT16)NetworkProtocolFromText (ProtocolStr);
   if (StrCmp (TypeStr, L"Static") == 0) {
@@ -1991,6 +2132,10 @@ DevPathFromTextUart (
                                       MSG_UART_DP,
                                       (UINT16)sizeof (UART_DEVICE_PATH)
                                       );
+
+  if (Uart == NULL) {
+    return NULL;
+  }
 
   if (StrCmp (BaudStr, L"DEFAULT") == 0) {
     Uart->BaudRate = 115200;
@@ -2071,6 +2216,10 @@ ConvertFromTextUsbClass (
                                         MSG_USB_CLASS_DP,
                                         (UINT16)sizeof (USB_CLASS_DEVICE_PATH)
                                         );
+
+  if (UsbClass == NULL) {
+    return NULL;
+  }
 
   VIDStr = GetNextParamStr (&TextDeviceNode);
   PIDStr = GetNextParamStr (&TextDeviceNode);
@@ -2513,6 +2662,11 @@ DevPathFromTextUsbWwid (
                                       MSG_USB_WWID_DP,
                                       (UINT16)(sizeof (USB_WWID_DEVICE_PATH) + SerialNumberStrLen * sizeof (CHAR16))
                                       );
+
+  if (UsbWwid == NULL) {
+    return NULL;
+  }
+
   UsbWwid->VendorId        = (UINT16)Strtoi (VIDStr);
   UsbWwid->ProductId       = (UINT16)Strtoi (PIDStr);
   UsbWwid->InterfaceNumber = (UINT16)Strtoi (InterfaceNumStr);
@@ -2552,6 +2706,10 @@ DevPathFromTextUnit (
                                                      MSG_DEVICE_LOGICAL_UNIT_DP,
                                                      (UINT16)sizeof (DEVICE_LOGICAL_UNIT_DEVICE_PATH)
                                                      );
+
+  if (LogicalUnit == NULL) {
+    return NULL;
+  }
 
   LogicalUnit->Lun = (UINT8)Strtoi (LunStr);
 
@@ -2595,6 +2753,10 @@ DevPathFromTextiSCSI (
                                                        MSG_ISCSI_DP,
                                                        (UINT16)(sizeof (ISCSI_DEVICE_PATH_WITH_NAME) + StrLen (NameStr))
                                                        );
+
+  if (ISCSIDevPath == NULL) {
+    return NULL;
+  }
 
   AsciiStr = ISCSIDevPath->TargetName;
   StrToAscii (NameStr, &AsciiStr);
@@ -2657,6 +2819,10 @@ DevPathFromTextVlan (
                                   (UINT16)sizeof (VLAN_DEVICE_PATH)
                                   );
 
+  if (Vlan == NULL) {
+    return NULL;
+  }
+
   Vlan->VlanId = (UINT16)Strtoi (VlanStr);
 
   return (EFI_DEVICE_PATH_PROTOCOL *)Vlan;
@@ -2684,6 +2850,11 @@ DevPathFromTextBluetooth (
                                             MSG_BLUETOOTH_DP,
                                             (UINT16)sizeof (BLUETOOTH_DEVICE_PATH)
                                             );
+
+  if (BluetoothDp == NULL) {
+    return NULL;
+  }
+
   StrHexToBytes (
     BluetoothStr,
     sizeof (BLUETOOTH_ADDRESS) * 2,
@@ -2717,6 +2888,10 @@ DevPathFromTextWiFi (
                                   MSG_WIFI_DP,
                                   (UINT16)sizeof (WIFI_DEVICE_PATH)
                                   );
+
+  if (WiFiDp == NULL) {
+    return NULL;
+  }
 
   if (NULL != SSIdStr) {
     DataLen = StrLen (SSIdStr);
@@ -2756,6 +2931,10 @@ DevPathFromTextBluetoothLE (
                                                          MSG_BLUETOOTH_LE_DP,
                                                          (UINT16)sizeof (BLUETOOTH_LE_DEVICE_PATH)
                                                          );
+
+  if (BluetoothLeDp == NULL) {
+    return NULL;
+  }
 
   BluetoothLeDp->Address.Type = (UINT8)Strtoi (BluetoothLeAddrTypeStr);
   StrHexToBytes (
@@ -2883,6 +3062,10 @@ DevPathFromTextUri (
                                    (UINT16)(sizeof (URI_DEVICE_PATH) + UriLength)
                                    );
 
+  if (Uri == NULL) {
+    return NULL;
+  }
+
   while (UriLength-- != 0) {
     Uri->Uri[UriLength] = (CHAR8)UriStr[UriLength];
   }
@@ -2938,6 +3121,10 @@ DevPathFromTextHD (
                                             (UINT16)sizeof (HARDDRIVE_DEVICE_PATH)
                                             );
 
+  if (Hd == NULL) {
+    return NULL;
+  }
+
   Hd->PartitionNumber = (UINT32)Strtoi (PartitionStr);
 
   ZeroMem (Hd->Signature, 16);
@@ -2991,6 +3178,10 @@ DevPathFromTextCDROM (
                                         (UINT16)sizeof (CDROM_DEVICE_PATH)
                                         );
 
+  if (CDROMDevPath == NULL) {
+    return NULL;
+  }
+
   CDROMDevPath->BootEntry = (UINT32)Strtoi (EntryStr);
   Strtoi64 (StartStr, &CDROMDevPath->PartitionStart);
   Strtoi64 (SizeStr, &CDROMDevPath->PartitionSize);
@@ -3039,6 +3230,10 @@ DevPathFromTextFilePath (
                                    (UINT16)(sizeof (FILEPATH_DEVICE_PATH) + StrLen (TextDeviceNode) * 2)
                                    );
 
+  if (File == NULL) {
+    return NULL;
+  }
+
   StrCpyS (File->PathName, StrLen (TextDeviceNode) + 1, TextDeviceNode);
 
   return (EFI_DEVICE_PATH_PROTOCOL *)File;
@@ -3066,6 +3261,10 @@ DevPathFromTextMedia (
                                             MEDIA_PROTOCOL_DP,
                                             (UINT16)sizeof (MEDIA_PROTOCOL_DEVICE_PATH)
                                             );
+
+  if (Media == NULL) {
+    return NULL;
+  }
 
   StrToGuid (GuidStr, &Media->Protocol);
 
@@ -3095,6 +3294,10 @@ DevPathFromTextFv (
                                           (UINT16)sizeof (MEDIA_FW_VOL_DEVICE_PATH)
                                           );
 
+  if (Fv == NULL) {
+    return NULL;
+  }
+
   StrToGuid (GuidStr, &Fv->FvName);
 
   return (EFI_DEVICE_PATH_PROTOCOL *)Fv;
@@ -3122,6 +3325,10 @@ DevPathFromTextFvFile (
                                                    MEDIA_PIWG_FW_FILE_DP,
                                                    (UINT16)sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH)
                                                    );
+
+  if (FvFile == NULL) {
+    return NULL;
+  }
 
   StrToGuid (GuidStr, &FvFile->FvFileName);
 
@@ -3152,6 +3359,10 @@ DevPathFromTextRelativeOffsetRange (
                                                                    MEDIA_RELATIVE_OFFSET_RANGE_DP,
                                                                    (UINT16)sizeof (MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH)
                                                                    );
+
+  if (Offset == NULL) {
+    return NULL;
+  }
 
   Strtoi64 (StartingOffsetStr, &Offset->StartingOffset);
   Strtoi64 (EndingOffsetStr, &Offset->EndingOffset);
@@ -3189,6 +3400,10 @@ DevPathFromTextRamDisk (
                                                     MEDIA_RAM_DISK_DP,
                                                     (UINT16)sizeof (MEDIA_RAM_DISK_DEVICE_PATH)
                                                     );
+
+  if (RamDisk == NULL) {
+    return NULL;
+  }
 
   Strtoi64 (StartingAddrStr, &StartingAddr);
   WriteUnaligned64 ((UINT64 *)&(RamDisk->StartingAddr[0]), StartingAddr);
@@ -3230,6 +3445,10 @@ DevPathFromTextVirtualDisk (
                                             (UINT16)sizeof (MEDIA_RAM_DISK_DEVICE_PATH)
                                             );
 
+  if (RamDisk == NULL) {
+    return NULL;
+  }
+
   Strtoi64 (StartingAddrStr, &StartingAddr);
   WriteUnaligned64 ((UINT64 *)&(RamDisk->StartingAddr[0]), StartingAddr);
   Strtoi64 (EndingAddrStr, &EndingAddr);
@@ -3269,6 +3488,10 @@ DevPathFromTextVirtualCd (
                                             MEDIA_RAM_DISK_DP,
                                             (UINT16)sizeof (MEDIA_RAM_DISK_DEVICE_PATH)
                                             );
+
+  if (RamDisk == NULL) {
+    return NULL;
+  }
 
   Strtoi64 (StartingAddrStr, &StartingAddr);
   WriteUnaligned64 ((UINT64 *)&(RamDisk->StartingAddr[0]), StartingAddr);
@@ -3310,6 +3533,10 @@ DevPathFromTextPersistentVirtualDisk (
                                             (UINT16)sizeof (MEDIA_RAM_DISK_DEVICE_PATH)
                                             );
 
+  if (RamDisk == NULL) {
+    return NULL;
+  }
+
   Strtoi64 (StartingAddrStr, &StartingAddr);
   WriteUnaligned64 ((UINT64 *)&(RamDisk->StartingAddr[0]), StartingAddr);
   Strtoi64 (EndingAddrStr, &EndingAddr);
@@ -3349,6 +3576,10 @@ DevPathFromTextPersistentVirtualCd (
                                             MEDIA_RAM_DISK_DP,
                                             (UINT16)sizeof (MEDIA_RAM_DISK_DEVICE_PATH)
                                             );
+
+  if (RamDisk == NULL) {
+    return NULL;
+  }
 
   Strtoi64 (StartingAddrStr, &StartingAddr);
   WriteUnaligned64 ((UINT64 *)&(RamDisk->StartingAddr[0]), StartingAddr);
@@ -3404,6 +3635,10 @@ DevPathFromTextBBS (
                                       (UINT16)(sizeof (BBS_BBS_DEVICE_PATH) + StrLen (IdStr))
                                       );
 
+  if (Bbs == NULL) {
+    return NULL;
+  }
+
   if (StrCmp (TypeStr, L"Floppy") == 0) {
     Bbs->DeviceType = BBS_TYPE_FLOPPY;
   } else if (StrCmp (TypeStr, L"HD") == 0) {
@@ -3455,6 +3690,11 @@ DevPathFromTextSata (
                                MSG_SATA_DP,
                                (UINT16)sizeof (SATA_DEVICE_PATH)
                                );
+
+  if (Sata == NULL) {
+    return NULL;
+  }
+
   Sata->HBAPortNumber = (UINT16)Strtoi (Param1);
 
   //
