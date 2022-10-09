@@ -27,6 +27,7 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
+          "Library/BaseRiscV64CpuExceptionHandlerLib/CpuExceptionHandlerLib.h"
         ]
     },
     "CompilerPlugin": {
