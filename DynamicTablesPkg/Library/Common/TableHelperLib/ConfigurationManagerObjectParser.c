@@ -19,6 +19,14 @@ PrintOemId (
   UINT8        *Ptr
   );
 
+STATIC
+VOID
+EFIAPI
+PrintString (
+  CONST CHAR8  *Format,
+  UINT8        *Ptr
+  );
+
 /** A parser for EArmObjBootArchInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmBootArchInfoParser[] = {
@@ -644,6 +652,24 @@ PrintOemId (
     Ptr[4],
     Ptr[5]
     ));
+}
+
+/** Print string.
+
+  The string must be NULL terminated.
+
+  @param [in]  Format  Format to print the Ptr.
+  @param [in]  Ptr     Pointer to the string.
+**/
+STATIC
+VOID
+EFIAPI
+PrintString (
+  CONST CHAR8  *Format,
+  UINT8        *Ptr
+  )
+{
+  DEBUG ((DEBUG_ERROR, "%a", Ptr));
 }
 
 /** Print fields of the objects.
