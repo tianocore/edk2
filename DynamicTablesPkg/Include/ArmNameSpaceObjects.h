@@ -1014,7 +1014,7 @@ typedef struct CmArmPciInterruptMapInfo {
   /// Value on 8 bits (max 255).
   UINT8    PciBus;
 
-  /// Pci Bus.
+  /// Pci Device.
   /// Value on 5 bits (max 31).
   UINT8    PciDevice;
 
