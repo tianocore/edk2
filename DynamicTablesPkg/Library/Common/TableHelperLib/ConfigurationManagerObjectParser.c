@@ -183,21 +183,23 @@ STATIC CONST CM_OBJ_PARSER  CmArmFixedFeatureFlagsParser[] = {
 STATIC CONST CM_OBJ_PARSER  CmArmItsGroupNodeParser[] = {
   { "Token",      sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
   { "ItsIdCount", 4,                        "0x%x", NULL },
-  { "ItsIdToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL }
+  { "ItsIdToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "Identifier", 4,                        "0x%x", NULL },
 };
 
 /** A parser for EArmObjNamedComponent.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmNamedComponentNodeParser[] = {
-  { "Token",             sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
-  { "IdMappingCount",    4,                        "0x%x", NULL },
-  { "IdMappingToken",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
-  { "Flags",             4,                        "0x%x", NULL },
-  { "CacheCoherent",     4,                        "0x%x", NULL },
-  { "AllocationHints",   1,                        "0x%x", NULL },
-  { "MemoryAccessFlags", 1,                        "0x%x", NULL },
-  { "AddressSizeLimit",  1,                        "0x%x", NULL },
-  { "ObjectName",        sizeof (CHAR8 *),         "%a",   NULL }
+  { "Token",             sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "IdMappingCount",    4,                        "0x%x", NULL        },
+  { "IdMappingToken",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "Flags",             4,                        "0x%x", NULL        },
+  { "CacheCoherent",     4,                        "0x%x", NULL        },
+  { "AllocationHints",   1,                        "0x%x", NULL        },
+  { "MemoryAccessFlags", 1,                        "0x%x", NULL        },
+  { "AddressSizeLimit",  1,                        "0x%x", NULL        },
+  { "ObjectName",        sizeof (CHAR8 *),         NULL,   PrintString },
+  { "Identifier",        4,                        "0x%x", NULL        },
 };
 
 /** A parser for EArmObjRootComplex.
@@ -211,7 +213,10 @@ STATIC CONST CM_OBJ_PARSER  CmArmRootComplexNodeParser[] = {
   { "MemoryAccessFlags", 1,                        "0x%x", NULL },
   { "AtsAttribute",      4,                        "0x%x", NULL },
   { "PciSegmentNumber",  4,                        "0x%x", NULL },
-  { "MemoryAddressSize", 1,                        "0x%x", NULL }
+  { "MemoryAddressSize", 1,                        "0x%x", NULL },
+  { "PasidCapabilities", 2,                        "0x%x", NULL },
+  { "Flags",             4,                        "0x%x", NULL },
+  { "Identifier",        4,                        "0x%x", NULL },
 };
 
 /** A parser for EArmObjSmmuV1SmmuV2.
@@ -231,7 +236,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmSmmuV1SmmuV2NodeParser[] = {
   { "SMMU_NSgIrpt",          4,                        "0x%x",   NULL },
   { "SMMU_NSgIrptFlags",     4,                        "0x%x",   NULL },
   { "SMMU_NSgCfgIrpt",       4,                        "0x%x",   NULL },
-  { "SMMU_NSgCfgIrptFlags",  4,                        "0x%x",   NULL }
+  { "SMMU_NSgCfgIrptFlags",  4,                        "0x%x",   NULL },
+  { "Identifier",            4,                        "0x%x",   NULL },
 };
 
 /** A parser for EArmObjSmmuV3.
@@ -249,7 +255,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmSmmuV3NodeParser[] = {
   { "GerrInterrupt",        4,                        "0x%x",   NULL },
   { "SyncInterrupt",        4,                        "0x%x",   NULL },
   { "ProximityDomain",      4,                        "0x%x",   NULL },
-  { "DeviceIdMappingIndex", 4,                        "0x%x",   NULL }
+  { "DeviceIdMappingIndex", 4,                        "0x%x",   NULL },
+  { "Identifier",           4,                        "0x%x",   NULL },
 };
 
 /** A parser for EArmObjPmcg.
@@ -261,7 +268,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmPmcgNodeParser[] = {
   { "BaseAddress",       8,                        "0x%llx", NULL },
   { "OverflowInterrupt", 4,                        "0x%x",   NULL },
   { "Page1BaseAddress",  8,                        "0x%llx", NULL },
-  { "ReferenceToken",    sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL }
+  { "ReferenceToken",    sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "Identifier",        4,                        "0x%x",   NULL },
 };
 
 /** A parser for EArmObjGicItsIdentifierArray.
@@ -432,6 +440,25 @@ STATIC CONST CM_OBJ_PARSER  CmPciInterruptMapInfoParser[] = {
     ARRAY_SIZE (CmArmGenericInterruptParser) },
 };
 
+/** A parser for EArmObjRmr.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmRmrInfoParser[] = {
+  { "Token",             sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "IdMappingCount",    4,                        "0x%x", NULL },
+  { "IdMappingToken",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "Identifier",        4,                        "0x%x", NULL },
+  { "Flags",             4,                        "0x%x", NULL },
+  { "MemRangeDescCount", 4,                        "0x%x", NULL },
+  { "MemRangeDescToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArmObjMemoryRangeDescriptor.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmMemoryRangeDescriptorInfoParser[] = {
+  { "BaseAddress", 8, "0x%llx", NULL },
+  { "Length",      8, "0x%llx", NULL },
+};
+
 /** A parser for EArmObjCpcInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmCpcInfoParser[] = {
@@ -588,6 +615,10 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
     ARRAY_SIZE (CmArmPciAddressMapInfoParser) },
   { "EArmObjPciInterruptMapInfo",          CmPciInterruptMapInfoParser,
     ARRAY_SIZE (CmPciInterruptMapInfoParser) },
+  { "EArmObjRmr",                          CmArmRmrInfoParser,
+    ARRAY_SIZE (CmArmRmrInfoParser) },
+  { "EArmObjMemoryRangeDescriptor",        CmArmMemoryRangeDescriptorInfoParser,
+    ARRAY_SIZE (CmArmMemoryRangeDescriptorInfoParser) },
   { "EArmObjCpcInfo",                      CmArmCpcInfoParser,
     ARRAY_SIZE (CmArmCpcInfoParser) },
   { "EArmObjMax",                          NULL,                                  0                                },
