@@ -785,9 +785,6 @@ GicCPmuNodeParser (
     UINT32  AffinityFlags;                    // {default = 0}
   } CM_ARM_GICC_INFO;
 
-  The pmu information can be found in the pmu node. There is no support
-  for now.
-
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
   The created CmObj are then handed to the parser's caller through the
