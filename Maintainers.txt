@@ -540,6 +540,10 @@ F: OvmfPkg/XenResetVector/
 R: Anthony Perard <anthony.perard@citrix.com> [tperard]
 R: Julien Grall <julien@xen.org> [jgrall]
 
+OvmfPkg: RISC-V Qemu Virt Platform
+F: OvmfPkg/RiscVVirt
+R: Sunil V L <sunilvl@ventanamicro.com> [vlsunil]
+
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/PcAtChipsetPkg
