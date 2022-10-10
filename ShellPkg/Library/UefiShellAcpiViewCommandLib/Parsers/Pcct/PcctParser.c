@@ -146,7 +146,7 @@ ValidatePccDoorbellGas (
   IN VOID   *Context
   )
 {
-  // For slave subspaces this field is optional, if not present the field
+  // For responder subspaces this field is optional, if not present the field
   // should just contain zeros.
   if (*PccSubspaceType == EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) {
     if (IsZeroBuffer (
@@ -214,7 +214,7 @@ ValidatePccErrStatusGas (
   IN VOID   *Context
   )
 {
-  // This field is ignored by the OSPM on slave channels.
+  // This field is ignored by the OSPM on responder channels.
   if (*PccSubspaceType == EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) {
     return;
   }
@@ -237,7 +237,7 @@ ValidatePlatInterrupt (
   IN VOID   *Context
   )
 {
-  // If a slave subspace is present in the PCCT, then the global Platform
+  // If a responder subspace is present in the PCCT, then the global Platform
   // Interrupt flag must be set to 1.
   if ((*PccSubspaceType == EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) &&
       ((*PccGlobalFlags & EFI_ACPI_6_4_PCCT_FLAGS_PLATFORM_INTERRUPT) !=
