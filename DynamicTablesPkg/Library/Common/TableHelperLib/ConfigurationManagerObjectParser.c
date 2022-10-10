@@ -303,7 +303,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmProcHierarchyInfoParser[] = {
   { "ParentToken",                sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
   { "GicCToken",                  sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
   { "NoOfPrivateResources",       4,                        "0x%x", NULL },
-  { "PrivateResourcesArrayToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL }
+  { "PrivateResourcesArrayToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "LpiToken",                   sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
 };
 
 /** A parser for EArmObjCacheInfo.
@@ -315,7 +316,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmCacheInfoParser[] = {
   { "NumberOfSets",          4,                        "0x%x", NULL },
   { "Associativity",         4,                        "0x%x", NULL },
   { "Attributes",            1,                        "0x%x", NULL },
-  { "LineSize",              2,                        "0x%x", NULL }
+  { "LineSize",              2,                        "0x%x", NULL },
+  { "CacheId",               4,                        "0x%x", NULL },
 };
 
 /** A parser for EArmObjProcNodeIdInfo.
@@ -400,14 +402,14 @@ STATIC CONST CM_OBJ_PARSER  AcpiGenericAddressParser[] = {
 /** A parser for EArmObjLpiInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmLpiInfoParser[] = {
-  { "MinResidency",             4,                                               "0x%x",   NULL },
-  { "WorstCaseWakeLatency",     4,                                               "0x%x",   NULL },
-  { "Flags",                    4,                                               "0x%x",   NULL },
-  { "ArchFlags",                4,                                               "0x%x",   NULL },
-  { "ResCntFreq",               4,                                               "0x%x",   NULL },
-  { "EnableParentState",        4,                                               "0x%x",   NULL },
-  { "IsInteger",                1,                                               "%d",     NULL },
-  { "IntegerEntryMethod",       8,                                               "0x%llx", NULL },
+  { "MinResidency",             4,                                               "0x%x",   NULL        },
+  { "WorstCaseWakeLatency",     4,                                               "0x%x",   NULL        },
+  { "Flags",                    4,                                               "0x%x",   NULL        },
+  { "ArchFlags",                4,                                               "0x%x",   NULL        },
+  { "ResCntFreq",               4,                                               "0x%x",   NULL        },
+  { "EnableParentState",        4,                                               "0x%x",   NULL        },
+  { "IsInteger",                1,                                               "%d",     NULL        },
+  { "IntegerEntryMethod",       8,                                               "0x%llx", NULL        },
   { "RegisterEntryMethod",      sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE),
     NULL, NULL, AcpiGenericAddressParser,
     ARRAY_SIZE (AcpiGenericAddressParser) },
@@ -417,7 +419,7 @@ STATIC CONST CM_OBJ_PARSER  CmArmLpiInfoParser[] = {
   { "UsageCounterRegister",     sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE),
     NULL, NULL, AcpiGenericAddressParser,
     ARRAY_SIZE (AcpiGenericAddressParser) },
-  { "StateName",                16,                                              "0x%a",   NULL },
+  { "StateName",                16,                                              NULL,     PrintString },
 };
 
 /** A parser for EArmObjPciAddressMapInfo.
