@@ -1,7 +1,7 @@
 /** @file
   Configuration Manager Object parser.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2022, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -384,12 +384,12 @@ STATIC CONST CM_OBJ_PARSER  AcpiGenericAddressParser[] = {
 /** A parser for EArmObjLpiInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmLpiInfoParser[] = {
-  { "MinResidency",             4,                                               "0x%llx", NULL },
-  { "WorstCaseWakeLatency",     4,                                               "0x%llx", NULL },
-  { "Flags",                    4,                                               "0x%llx", NULL },
-  { "ArchFlags",                4,                                               "0x%llx", NULL },
-  { "ResCntFreq",               4,                                               "0x%llx", NULL },
-  { "EnableParentState",        4,                                               "0x%llx", NULL },
+  { "MinResidency",             4,                                               "0x%x",   NULL },
+  { "WorstCaseWakeLatency",     4,                                               "0x%x",   NULL },
+  { "Flags",                    4,                                               "0x%x",   NULL },
+  { "ArchFlags",                4,                                               "0x%x",   NULL },
+  { "ResCntFreq",               4,                                               "0x%x",   NULL },
+  { "EnableParentState",        4,                                               "0x%x",   NULL },
   { "IsInteger",                1,                                               "%d",     NULL },
   { "IntegerEntryMethod",       8,                                               "0x%llx", NULL },
   { "RegisterEntryMethod",      sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE),
