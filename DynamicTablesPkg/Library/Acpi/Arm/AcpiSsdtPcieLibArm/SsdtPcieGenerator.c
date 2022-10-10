@@ -288,12 +288,6 @@ GeneratePciDeviceInfo (
 
   Cf. ACPI 6.4 specification, s6.2.13 "_PRT (PCI Routing Table)"
 
-  The first model (defining a _CRS object) is used. This is necessary because
-  PCI legacy interrupts are active low and GICv2 SPI interrupts are active
-  high.
-  Even though PCI interrupts cannot be re-routed, only the first model allows
-  to specify the activation state (low/high).
-
   @param [in]       Generator       The SSDT Pci generator.
   @param [in]       CfgMgrProtocol  Pointer to the Configuration Manager
                                     Protocol interface.
@@ -397,6 +391,8 @@ GeneratePrt (
        High word-Device #, Low word-Function #. (for example, device 3,
        function 2 is 0x00030002). To refer to all the functions on a device #,
        use a function number of FFFF).
+
+      Use the second model for _PRT object and describe a hardwired interrupt.
     */
     Status = AmlAddPrtEntry (
                (IrqMapInfo->PciDevice << 16) | 0xFFFF,
