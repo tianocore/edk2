@@ -127,6 +127,14 @@ STATIC CONST CM_OBJ_PARSER  CmArmGenericTimerInfoParser[] = {
 
 /** A parser for EArmObjPlatformGTBlockInfo.
 */
+STATIC CONST CM_OBJ_PARSER  CmArmGTBlockInfoParser[] = {
+  { "GTBlockPhysicalAddress", 8,                        "0x%llx", NULL },
+  { "GTBlockTimerFrameCount", 4,                        "0x%x",   NULL },
+  { "GTBlockTimerFrameToken", sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL }
+};
+
+/** A parser for EArmObjGTBlockTimerFrameInfo.
+*/
 STATIC CONST CM_OBJ_PARSER  CmArmGTBlockTimerFrameInfoParser[] = {
   { "FrameNumber",               1, "0x%x",   NULL },
   { "PhysicalAddressCntBase",    8, "0x%llx", NULL },
@@ -136,14 +144,6 @@ STATIC CONST CM_OBJ_PARSER  CmArmGTBlockTimerFrameInfoParser[] = {
   { "VirtualTimerGSIV",          4, "0x%x",   NULL },
   { "VirtualTimerFlags",         4, "0x%x",   NULL },
   { "CommonFlags",               4, "0x%x",   NULL }
-};
-
-/** A parser for EArmObjGTBlockTimerFrameInfo.
-*/
-STATIC CONST CM_OBJ_PARSER  CmArmGTBlockInfoParser[] = {
-  { "GTBlockPhysicalAddress", 8,                        "0x%llx", NULL },
-  { "GTBlockTimerFrameCount", 4,                        "0x%x",   NULL },
-  { "GTBlockTimerFrameToken", sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL }
 };
 
 /** A parser for EArmObjPlatformGenericWatchdogInfo.
@@ -560,10 +560,10 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
     ARRAY_SIZE (CmArmSerialPortInfoParser) },
   { "EArmObjGenericTimerInfo",             CmArmGenericTimerInfoParser,
     ARRAY_SIZE (CmArmGenericTimerInfoParser) },
-  { "EArmObjPlatformGTBlockInfo",          CmArmGTBlockTimerFrameInfoParser,
-    ARRAY_SIZE (CmArmGTBlockTimerFrameInfoParser) },
-  { "EArmObjGTBlockTimerFrameInfo",        CmArmGTBlockInfoParser,
+  { "EArmObjPlatformGTBlockInfo",          CmArmGTBlockInfoParser,
     ARRAY_SIZE (CmArmGTBlockInfoParser) },
+  { "EArmObjGTBlockTimerFrameInfo",        CmArmGTBlockTimerFrameInfoParser,
+    ARRAY_SIZE (CmArmGTBlockTimerFrameInfoParser) },
   { "EArmObjPlatformGenericWatchdogInfo",  CmArmGenericWatchdogInfoParser,
     ARRAY_SIZE (CmArmGenericWatchdogInfoParser) },
   { "EArmObjPciConfigSpaceInfo",           CmArmPciConfigSpaceInfoParser,

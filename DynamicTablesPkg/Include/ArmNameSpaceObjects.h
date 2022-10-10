@@ -354,6 +354,22 @@ typedef struct CmArmGenericTimerInfo {
 } CM_ARM_GENERIC_TIMER_INFO;
 
 /** A structure that describes the
+    Platform Generic Block Timer information for the Platform.
+
+    ID: EArmObjPlatformGTBlockInfo
+*/
+typedef struct CmArmGTBlockInfo {
+  /// The physical base address for the GT Block Timer structure
+  UINT64             GTBlockPhysicalAddress;
+
+  /// The number of timer frames implemented in the GT Block
+  UINT32             GTBlockTimerFrameCount;
+
+  /// Reference token for the GT Block timer frame list
+  CM_OBJECT_TOKEN    GTBlockTimerFrameToken;
+} CM_ARM_GTBLOCK_INFO;
+
+/** A structure that describes the
     Platform Generic Block Timer Frame information for the Platform.
 
     ID: EArmObjGTBlockTimerFrameInfo
@@ -389,22 +405,6 @@ typedef struct CmArmGTBlockTimerFrameInfo {
   */
   UINT32    CommonFlags;
 } CM_ARM_GTBLOCK_TIMER_FRAME_INFO;
-
-/** A structure that describes the
-    Platform Generic Block Timer information for the Platform.
-
-    ID: EArmObjPlatformGTBlockInfo
-*/
-typedef struct CmArmGTBlockInfo {
-  /// The physical base address for the GT Block Timer structure
-  UINT64             GTBlockPhysicalAddress;
-
-  /// The number of timer frames implemented in the GT Block
-  UINT32             GTBlockTimerFrameCount;
-
-  /// Reference token for the GT Block timer frame list
-  CM_OBJECT_TOKEN    GTBlockTimerFrameToken;
-} CM_ARM_GTBLOCK_INFO;
 
 /** A structure that describes the
     Arm Generic Watchdog information for the Platform.
