@@ -104,6 +104,7 @@
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
+  NvVarStoreFormattedLib|MdeModulePkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
 
 [LibraryClasses.EBC.PEIM]
   IoLib|MdePkg/Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
@@ -443,6 +444,7 @@
   MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
   MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
   MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
+  MdeModulePkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
 
 [Components.IA32, Components.X64, Components.AARCH64]
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
