@@ -1730,11 +1730,11 @@
 
   ## Null-terminated Unicode string that describes the firmware version.
   # @Prompt Firmware version string.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L""|VOID*|0x00010052
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"edk2-stable202208"|VOID*|0x00010052
 
   ## Null-terminated Unicode string that contains the date the firmware was released
   # @Prompt Firmware release data string.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareReleaseDateString|L""|VOID*|0x00010053
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareReleaseDateString|L"26/08/2022"|VOID*|0x00010053
 
   ## PcdStatusCodeMemorySize is used when PcdStatusCodeUseMemory is set to true.
   #  (PcdStatusCodeMemorySize * KBytes) is the total taken memory size.<BR><BR>
