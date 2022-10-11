@@ -52,6 +52,9 @@
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid
 
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+
 [FeaturePcd]
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores
 
