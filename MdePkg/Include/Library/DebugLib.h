@@ -337,6 +337,9 @@ UnitTestDebugAssert (
   IN CONST CHAR8  *Description
   );
 
+  #if defined (_ASSERT)
+    #undef _ASSERT
+  #endif
   #if defined (__clang__) && defined (__FILE_NAME__)
 #define _ASSERT(Expression)  UnitTestDebugAssert (__FILE_NAME__, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
   #else
