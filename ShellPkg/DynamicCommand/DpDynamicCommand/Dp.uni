@@ -41,6 +41,7 @@
 #string STR_DP_TIMER_PROPERTIES        #language en-US  "System Performance Timer counts %s from 0x%Lx to 0x%Lx\n"
 #string STR_DP_VERBOSE_THRESHOLD       #language en-US  "Measurements less than %,Ld microseconds are not displayed.\n"
 #string STR_DP_SECTION_PHASES          #language en-US  "Major Phases"
+#string STR_DP_RESET_END               #language en-US  "  Reset End:               %L8d (us)\n"
 #string STR_DP_SEC_PHASE               #language en-US  "  SEC Phase Duration:      %L8d (us)\n"
 #string STR_DP_PHASE_BDSTO             #language en-US  "         BDS Timeout:   %L8d (ms) included in BDS Duration\n"
 #string STR_DP_PHASE_DURATION          #language en-US  "%5a Phase Duration:   %L8d (ms)\n"
