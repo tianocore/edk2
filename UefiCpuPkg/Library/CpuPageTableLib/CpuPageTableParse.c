@@ -270,10 +270,9 @@ PageTableParse (
   IA32_MAP_ENTRY      OneEntry;
   UINTN               MaxLevel;
 
-  if ((PagingMode == Paging32bit) || (PagingMode == PagingPae) || (PagingMode >= PagingModeMax)) {
+  if ((PagingMode == Paging32bit) || (PagingMode >= PagingModeMax)) {
     //
     // 32bit paging is never supported.
-    // PAE paging will be supported later.
     //
     return RETURN_UNSUPPORTED;
   }
