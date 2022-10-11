@@ -292,3 +292,31 @@ X509GetTBSCert (
   ASSERT (FALSE);
   return FALSE;
 }
+
+/**
+  Retrieve the EC Public Key from one DER-encoded X509 certificate.
+
+  @param[in]  Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]  CertSize     Size of the X509 certificate in bytes.
+  @param[out] EcContext    Pointer to new-generated EC DSA context which contain the retrieved
+                           EC public key component. Use EcFree() function to free the
+                           resource.
+
+  If Cert is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
+
+  @retval  TRUE   EC Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve EC public key from X509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+EcGetPublicKeyFromX509 (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **EcContext
+  )
+{
+  ASSERT (FALSE);
+  return FALSE;
+}
