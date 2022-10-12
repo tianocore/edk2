@@ -2286,6 +2286,7 @@ CreatePciIoDevice (
                          &Data32
                          );
       if ((Data32 & EFI_PCIE_CAPABILITY_DEVICE_CAPABILITIES_2_ARI_FORWARDING) != 0) {
+        PciIoDevice->IsAriEnabled = TRUE;
         //
         // ARI forward support in bridge, so enable it.
         //

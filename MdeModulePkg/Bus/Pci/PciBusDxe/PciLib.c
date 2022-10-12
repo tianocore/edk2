@@ -1106,6 +1106,7 @@ PciScanBus (
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL    *PciRootBridgeIo;
   BOOLEAN                            BusPadding;
   UINT32                             TempReservedBusNum;
+  BOOLEAN                            IsAriEnabled;
 
   PciRootBridgeIo = Bridge->PciRootBridgeIo;
   SecondBus       = 0;
@@ -1116,9 +1117,13 @@ PciScanBus (
   BusPadding      = FALSE;
   PciDevice       = NULL;
   PciAddress      = 0;
+  IsAriEnabled    = FALSE;
 
   for (Device = 0; Device <= PCI_MAX_DEVICE; Device++) {
-    TempReservedBusNum = 0;
+    if (!IsAriEnabled) {
+      TempReservedBusNum = 0;
+    }
+
     for (Func = 0; Func <= PCI_MAX_FUNC; Func++) {
       //
       // Check to see whether a pci device is present
@@ -1156,6 +1161,27 @@ PciScanBus (
 
       if (EFI_ERROR (Status)) {
         continue;
+      }
+
+      //
+      // Per Pcie spec ARI Extended Capability
+      // This capability must be implemented by each function in an ARI device.
+      // It is not applicable to a Root Port, a Switch Downstream Port, an RCiEP, or a Root Complex Event Collector
+      //
+      if (((Device == 0) && (Func == 0)) && (PciDevice->IsAriEnabled)) {
+        IsAriEnabled = TRUE;
+      }
+
+      if (PciDevice->IsAriEnabled != IsAriEnabled) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: %02x:%02x:%02x device ARI Feature(%x) is not consistent with others Function\n",
+          StartBusNumber,
+          Device,
+          Func,
+          PciDevice->IsAriEnabled
+          ));
+        return EFI_DEVICE_ERROR;
       }
 
       PciAddress = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0);
