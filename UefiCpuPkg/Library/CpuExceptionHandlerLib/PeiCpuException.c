@@ -101,6 +101,42 @@ CommonExceptionHandler (
 }
 
 /**
+  Registers a function to be called from the processor interrupt handler.
+
+  This function registers and enables the handler specified by InterruptHandler for a processor
+  interrupt or exception type specified by InterruptType. If InterruptHandler is NULL, then the
+  handler for the processor interrupt or exception type specified by InterruptType is uninstalled.
+  The installed handler is called once for each processor interrupt or exception.
+  NOTE: This function should be invoked after InitializeCpuExceptionHandlers() is invoked,
+  otherwise EFI_UNSUPPORTED returned.
+
+  @param[in]  InterruptType     Defines which interrupt or exception to hook.
+  @param[in]  InterruptHandler  A pointer to a function of type EFI_CPU_INTERRUPT_HANDLER that is called
+                                when a processor interrupt occurs. If this parameter is NULL, then the handler
+                                will be uninstalled.
+
+  @retval EFI_SUCCESS           The handler for the processor interrupt was successfully installed or uninstalled.
+  @retval EFI_ALREADY_STARTED   InterruptHandler is not NULL, and a handler for InterruptType was
+                                previously installed.
+  @retval EFI_INVALID_PARAMETER InterruptHandler is NULL, and a handler for InterruptType was not
+                                previously installed.
+  @retval EFI_UNSUPPORTED       The interrupt specified by InterruptType is not supported,
+                                or this function is not supported.
+**/
+EFI_STATUS
+EFIAPI
+RegisterCpuInterruptHandler (
+  IN EFI_EXCEPTION_TYPE         InterruptType,
+  IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler
+  )
+{
+  EXCEPTION_HANDLER_DATA  *ExceptionHandlerData;
+
+  ExceptionHandlerData = GetExceptionHandlerData ();
+  return RegisterCpuInterruptHandlerWorker (InterruptType, InterruptHandler, ExceptionHandlerData);
+}
+
+/**
   Initializes all CPU exceptions entries and provides the default exception handlers.
 
   Caller should try to get an array of interrupt and/or exception vectors that are in use and need to
@@ -135,7 +171,7 @@ InitializeCpuExceptionHandlers (
   ASSERT (ExceptionHandlerData != NULL);
   ExceptionHandlerData->IdtEntryCount            = CPU_EXCEPTION_NUM;
   ExceptionHandlerData->ReservedVectors          = ReservedVectors;
-  ExceptionHandlerData->ExternalInterruptHandler = NULL;
+  ExceptionHandlerData->ExternalInterruptHandler = AllocateZeroPool (sizeof (EFI_CPU_INTERRUPT_HANDLER) * ExceptionHandlerData->IdtEntryCount);
   InitializeSpinLock (&ExceptionHandlerData->DisplayMessageSpinLock);
 
   Status = InitializeCpuExceptionHandlersWorker (VectorInfo, ExceptionHandlerData);
