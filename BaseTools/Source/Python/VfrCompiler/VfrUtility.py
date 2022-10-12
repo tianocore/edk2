@@ -1411,7 +1411,7 @@ class SVfrQuestionNode():
         self.QuestionId = EFI_QUESTION_ID_INVALID
         self.BitMask = BitMask
         self.Next = None
-        self.Qtype = EFI_QUESION_TYPE.QUESTION_NORMAL
+        self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
 
 
 DATE_YEAR_BITMASK = 0x0000FFFF
@@ -1574,8 +1574,8 @@ class CVfrQuestionDB(object):
 
             QuestionId = pNode.QuestionId
             BitMask = pNode.BitMask
-            if Qtype != None:
-                Qtype = pNode.Qtype
+            if QType != None:
+                QType = pNode.QType
             break
 
         return QuestionId, BitMask, QType

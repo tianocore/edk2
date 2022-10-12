@@ -234,14 +234,12 @@ locals[VSNVObj=CIfrVarStoreNameValue()]
     ;
 
 vfrStatementDisableIfFormSet
-locals[DIObj=CIfrDisableIf()]
     :   'disableif' vfrStatementExpression ';'
         vfrFormSetList
         'endif' ';'
     ;
 
 vfrStatementSuppressIfFormSet 
-locals[SIObj=CIfrSuppressIf()]
     :   'suppressif' vfrStatementExpression ';'
         vfrFormSetList
         'endif' ';'
@@ -301,7 +299,7 @@ locals[QHFlag=0]
 vfrStorageVarId[BaseInfo, CheckFlag]
 locals[VarIdStr='']
     :   (StringIdentifier '[' Number ']')    # vfrStorageVarIdRule1
-    |   (StringIdentifier ('.' arrayName)* ) # vfrStorageVarIdRule2
+    |   (StringIdentifier ('.' StringIdentifier ('[' Number ']')? )* ) # vfrStorageVarIdRule2
     ;
 
 vfrConstantValueField 
@@ -1068,7 +1066,6 @@ locals[BObj=CIfrBanner(), TObj=CIfrTimeout()]
     ;
 
 vfrStatementExtension
-locals[DataBuff='',Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
     :   'guidop'
         'guid' '=' guidDefinition
         (   ',' 'datatype' '='
@@ -1093,14 +1090,13 @@ locals[DataBuff='',Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
     ;
 
 vfrExtensionData
-    :   (   vfrExtensionDataComponent)* 
+    :   (vfrExtensionDataComponent)* 
     ;
 
 vfrExtensionDataComponent
-    :   ',' 'data' ('[' Number ']')?  
-        ( '.' arrayName)*  '=' Number 
+    :   ',' 'data' ('[' Number ']')? 
+        ( '.' StringIdentifier ('[' Number ']')? )*  '=' Number  
     ;
-
 
 vfrStatementModal 
     :   'modal' ';' 
@@ -1297,54 +1293,28 @@ vfrExpressionBuildInFunction[ExpInfo]
 
 dupExp[ExpInfo]
 locals[DObj=None]
-    :   'dup' 
+    :   'dup'
     ;
 
-
-vareqvalExp[ExpInfo] // to do 
-    :   'vareqval' 
-        'var' '(' Number ')'
-        (   '==' Number
-	    |   '<=' Number
-	    |   '<' Number
-	    |   '>=' Number
-	    |   '>' Number
-        )
+vareqvalExp[ExpInfo]
+    :
     ;
 
 ideqvalExp[ExpInfo]
-    :   'ideqval' vfrQuestionDataFieldName 
-        (   '==' Number
-	    |   '<=' Number
-	    |   '<' Number
-	    |   '>=' Number
-	    |   '>' Number
-        )
+    :   'ideqval' vfrQuestionDataFieldName '==' Number 
     ;
 
 ideqidExp[ExpInfo]
-    :   'ideqid' vfrQuestionDataFieldName 
-        (   '==' vfrQuestionDataFieldName
-	    |   '<=' vfrQuestionDataFieldName
-	    |   '<' vfrQuestionDataFieldName
-	    |   '>=' vfrQuestionDataFieldName
-	    |   '>' vfrQuestionDataFieldName
-        ) 
+    :   'ideqid' vfrQuestionDataFieldName '==' vfrQuestionDataFieldName 
     ;
 
-ideqvallistExp[ExpInfo] // issues
+ideqvallistExp[ExpInfo]
     :   'ideqvallist' vfrQuestionDataFieldName '==' (Number)+ 
     ;
 
-vfrQuestionDataFieldName  //10.8 Doing
-locals[QId=EFI_QUESTION_ID_INVALID, Mask=0, VarIdStr='', Line=0]
-    :   (StringIdentifier '[' Number ']') # vfrQuestionDataFieldNameRule1
-        |   (StringIdentifier ('.' arrayName)*) # vfrQuestionDataFieldNameRule2
-    ;
-
-arrayName
-locals[SubStr='']
-    : StringIdentifier ('[' Number ']')?
+vfrQuestionDataFieldName  //////
+    :   StringIdentifier '[' Number ']'
+    |   StringIdentifier ('.' StringIdentifier('[' Number ']')? )*
     ;
 
 questionref1Exp[ExpInfo]
@@ -1357,14 +1327,7 @@ rulerefExp[ExpInfo]
     ;
 
 stringref1Exp[ExpInfo]
-    :   'stringref' '(' 
-        (
-            'STRING_TOKEN' '(' Number ')' 
-        |   Number
-        )
-    
-    
-    ')'
+    :   'stringref' '(' getStringId ')'
     ;
 
 pushthisExp[ExpInfo]
@@ -1375,17 +1338,9 @@ securityExp[ExpInfo]
     :   'security' '(' guidDefinition ')'
     ;
 
-numericVarStoreType
-locals[VarType]
-    :   'NUMERIC_SIZE_1'                        
-    |   'NUMERIC_SIZE_2'                                   
-    |   'NUMERIC_SIZE_4'                           
-    |   'NUMERIC_SIZE_8'
-    ;
-
 getExp[ExpInfo] 
-locals[BaseInfo=EFI_VARSTORE_INFO(), GObj=None]
-    :   'get' '(' vfrStorageVarId[localctx.BaseInfo, False]('|' 'flags' '=' numericVarStoreType)? ')'
+locals[BaseInfo=EFI_VARSTORE_INFO()]
+    :   'get' '(' vfrStorageVarId[localctx.BaseInfo, False]('|' 'flags' '=' vfrNumericFlags)? ')'
     ;
 
 vfrExpressionConstant[ExpInfo] 
@@ -1413,60 +1368,52 @@ vfrExpressionUnaryOp[ExpInfo]
     ;
 
 lengthExp[ExpInfo] 
-locals[LObj=None]
-    :   'length' '(' vfrStatementExpressionSub ')'
+    :   'length' '(' vfrStatementExpression ')'
     ;
 
 bitwisenotExp[ExpInfo] 
-locals[BWNObj=None]
-    :   '~' '(' vfrStatementExpressionSub ')'
+    :   '~' '(' vfrStatementExpression ')'
     ;
 
 question23refExp[ExpInfo] 
     :   'questionrefval'
         '('
-        (DevicePath '=' 'STRING_TOKEN' '(' Number ')' ',' )? 
-        (Uuid '=' guidDefinition ',' )? 
+        (DevicePath '=' 'STRING_TOKEN' '(' Number ')' ',' )? //
+        (Uuid '=' guidDefinition ',' )? ///
         vfrStatementExpressionSub
         ')'
     ;
 
 stringref2Exp[ExpInfo] 
-locals[SR2Obj=None]
     :   'stringrefval' '(' vfrStatementExpressionSub ')'
     ;
 
 toboolExp[ExpInfo] 
-locals[TBObj=None]
     :   'boolval' '(' vfrStatementExpressionSub ')'
     ;
 
 tostringExp[ExpInfo] 
-locals[TSObj=None]
     :   'stringval' ('format' '=' Number ',' )?
         '(' vfrStatementExpressionSub ')'
     ;
 
 unintExp[ExpInfo] 
-locals[TUObj=None]
     :   'unintval' '(' vfrStatementExpressionSub ')'
     ;
 
 toupperExp[ExpInfo]
-locals[TUObj=None]
     :   'toupper' '(' vfrStatementExpressionSub ')'
     ;
 
 tolwerExp[ExpInfo] 
-locals[TLObj=None]
     :   'tolower' '(' vfrStatementExpressionSub ')'
     ;
 
 setExp[ExpInfo] 
-locals[BaseInfo=EFI_VARSTORE_INFO(), TSObj=None]
+locals[BaseInfo=EFI_VARSTORE_INFO()]
     :   'set'
         '('
-        vfrStorageVarId[localctx.BaseInfo, False]('|' 'flags' '=' numericVarStoreType)? ','
+        vfrStorageVarId[localctx.BaseInfo, False]('|' 'flags' '=' vfrNumericFlags)? ','
         vfrStatementExpressionSub
         ')'
     ;
@@ -1480,7 +1427,6 @@ vfrExpressionTernaryOp[ExpInfo]
     ;
 
 conditionalExp[ExpInfo] 
-locals[CObj=None]
     :   'cond'
         '('
         vfrStatementExpressionSub //
@@ -1492,7 +1438,6 @@ locals[CObj=None]
     ;
 
 findExp[ExpInfo] 
-locals[FObj=None]
     :   'find'
         '('
         findFormat[ExpInfo] ('|' findFormat[ExpInfo])*
@@ -1506,12 +1451,10 @@ locals[FObj=None]
     ;
 
 findFormat[ExpInfo] 
-locals[Format=0]
     :   'SENSITIVE' | 'INSENSITIVE'
     ;
 
 midExp[ExpInfo] 
-locals[MObj=None]
     :   'mid'
         '('
         vfrStatementExpressionSub
@@ -1523,7 +1466,6 @@ locals[MObj=None]
     ;
 
 tokenExp[ExpInfo]  
-locals[TObj=None]
     :   'token'
         '('
         vfrStatementExpressionSub
@@ -1535,7 +1477,6 @@ locals[TObj=None]
     ;
 
 spanExp[ExpInfo] 
-locals[SObj=None]
     :   'span'
         '('
         'flags' '=' spanFlags ('|' spanFlags)*
@@ -1549,14 +1490,12 @@ locals[SObj=None]
     ;
 
 spanFlags
-locals[Flag=0]
     :   Number
     |   'LAST_NON_MATCH'
     |   'FIRST_NON_MATCH'
     ;
 
 vfrExpressionMap[ExpInfo] 
-locals[MObj=None]
     :   'map'
         '('
         vfrStatementExpressionSub
@@ -1586,12 +1525,7 @@ Slash : '/';
 Semicolon : ';';
 Comma : ',';
 Equal : '==';
-NotEqual : '!=';
-LessEqual: '<=';
-Less:'<';
-GreaterEqual:'>=';
-Greater:'>';
-
+NotQqual : '!=';
 /* 
 LineDefinition                           '#line\ [0-9]+\ \'~[\']+\'[\ \t]*\n' << gCVfrErrorHandle.ParseFileScopeRecord (begexpr (), line ()); skip (); newline (); >>
 */
@@ -1814,14 +1748,6 @@ NumericSizeEight: 'NUMERIC_SIZE_8';
 DisPlayIntDec: 'DISPLAY_INT_DEC';
 DisPlayUIntDec: 'DISPLAY_UINT_DEC';
 DisPlayUIntHex: 'DISPLAY_UINT_HEX';
-
-Insensitive:  'INSENSITIVE'; 
-Sensitive: 'SENSITIVE';
-
-LastNonMatch: 'LAST_NON_MATCH';
-FirstNonMatch: 'FIRST_NON_MATCH';
-
-
 
 Number 
     :   ('0x'[0-9A-Fa-f]+) | [0-9]+

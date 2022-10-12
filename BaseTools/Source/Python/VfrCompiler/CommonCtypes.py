@@ -614,15 +614,26 @@ class EFI_IFR_EQ_ID_ID(Structure):
         ('QuestionId2', c_uint16),
     ]
 
-
 class EFI_IFR_EQ_ID_VAL_LIST(Structure):
     _pack_ = 1
     _fields_ = [
         ('Header', EFI_IFR_OP_HEADER),
         ('QuestionId', c_uint16),
         ('ListLength', c_uint16),
-        ('ValueList', c_uint16 * 2),  #########
+        ('ValueList', c_uint16 * 2),  #
     ]
+
+
+def Refine_EFI_IFR_EQ_ID_VAL_LIST(nums:int):
+    class EFI_IFR_EQ_ID_VAL_LIST(Structure):
+        _pack_ = 1
+        _fields_ = [
+            ('Header', EFI_IFR_OP_HEADER),
+            ('QuestionId', c_uint16),
+            ('ListLength', c_uint16),
+            ('ValueList', c_uint16 * nums),  #
+        ]
+    return EFI_IFR_EQ_ID_VAL_LIST
 
 
 class EFI_IFR_AND(Structure):
@@ -953,6 +964,23 @@ class EFI_IFR_QUESTION_REF3(Structure):
     _pack_ = 1
     _fields_ = [
         ('Header', EFI_IFR_OP_HEADER),
+    ]
+
+
+class EFI_IFR_QUESTION_REF3_2(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_IFR_OP_HEADER),
+        ('DevicePath', c_uint16),
+    ]
+
+
+class EFI_IFR_QUESTION_REF3_3(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_IFR_OP_HEADER),
+        ('DevicePath', c_uint16),
+        ('Guid', EFI_GUID),
     ]
 
 
@@ -1322,3 +1350,10 @@ class EFI_IFR_GUID_OPTIONKEY(Structure):
 
 EFI_IFR_EXTEND_OP_OPTIONKEY = 0x0
 EFI_IFR_EXTEND_OP_VAREQNAME = 0x1
+
+class EFI_COMPARE_TYPE(Enum):
+    EQUAL = 0
+    LESS_EQUAL = 1
+    LESS_THAN = 2
+    GREATER_THAN = 3
+    GREATER_EQUAL = 4
