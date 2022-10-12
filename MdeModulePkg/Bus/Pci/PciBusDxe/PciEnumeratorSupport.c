@@ -2425,7 +2425,7 @@ CreatePciIoDevice (
         //
         // Calculate ReservedBusNum for this PF
         //
-        PciIoDevice->ReservedBusNum = (UINT16)(EFI_PCI_BUS_OF_RID (LastVF) - Bus + 1);
+        PciIoDevice->ReservedBusNum = (UINT16)(EFI_PCI_BUS_OF_RID (LastVF) - Bus);
       }
 
       DEBUG ((
