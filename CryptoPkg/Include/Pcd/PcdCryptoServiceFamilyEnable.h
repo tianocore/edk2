@@ -383,6 +383,10 @@ typedef struct {
       UINT8    GenerateKey                   : 1;
       UINT8    GetPubKey                     : 1;
       UINT8    DhComputeKey                  : 1;
+      UINT8    GetPublicKeyFromX509          : 1;
+      UINT8    GetPrivateKeyFromPem          : 1;
+      UINT8    DsaSign                       : 1;
+      UINT8    DsaVerify                     : 1;
     } Services;
     UINT32    Family;
   } Ec;
