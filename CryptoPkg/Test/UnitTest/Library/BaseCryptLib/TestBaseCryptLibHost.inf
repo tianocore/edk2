@@ -41,6 +41,7 @@
   AeadAesGcmTests.c
   BnTests.c
   EcTests.c
+  X509Tests.c
 
 [Packages]
   MdePkg/MdePkg.dec
