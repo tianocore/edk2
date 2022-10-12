@@ -262,6 +262,7 @@ struct _PCI_IO_DEVICE {
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR            *BusNumberRanges;
 
   BOOLEAN                                      IsPciExp;
+  BOOLEAN                                      IsAriEnabled;
   //
   // For SR-IOV
   //
