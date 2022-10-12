@@ -763,3 +763,261 @@ fail:
   EC_KEY_free (PeerEcKey);
   return RetVal;
 }
+
+/**
+  Carries out the EC-DSA signature.
+
+  This function carries out the EC-DSA signature.
+  If the Signature buffer is too small to hold the contents of signature, FALSE
+  is returned and SigSize is set to the required buffer size to obtain the signature.
+
+  If EcContext is NULL, then return FALSE.
+  If MessageHash is NULL, then return FALSE.
+  If HashSize need match the HashNid. HashNid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
+  If SigSize is large enough but Signature is NULL, then return FALSE.
+
+  For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
+  For P-384, the SigSize is 96. First 48-byte is R, Second 48-byte is S.
+  For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
+
+  @param[in]       EcContext    Pointer to EC context for signature generation.
+  @param[in]       HashNid      hash NID
+  @param[in]       MessageHash  Pointer to octet message hash to be signed.
+  @param[in]       HashSize     Size of the message hash in bytes.
+  @param[out]      Signature    Pointer to buffer to receive EC-DSA signature.
+  @param[in, out]  SigSize      On input, the size of Signature buffer in bytes.
+                                On output, the size of data returned in Signature buffer in bytes.
+
+  @retval  TRUE   Signature successfully generated in EC-DSA.
+  @retval  FALSE  Signature generation failed.
+  @retval  FALSE  SigSize is too small.
+
+**/
+BOOLEAN
+EFIAPI
+EcDsaSign (
+  IN      VOID         *EcContext,
+  IN      UINTN        HashNid,
+  IN      CONST UINT8  *MessageHash,
+  IN      UINTN        HashSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  )
+{
+  EC_KEY     *EcKey;
+  ECDSA_SIG  *EcDsaSig;
+  INT32      OpenSslNid;
+  UINT8      HalfSize;
+  BIGNUM     *R;
+  BIGNUM     *S;
+  INTN       RSize;
+  INTN       SSize;
+
+  if ((EcContext == NULL) || (MessageHash == NULL)) {
+    return FALSE;
+  }
+
+  if (Signature == NULL) {
+    return FALSE;
+  }
+
+  EcKey      = (EC_KEY *)EcContext;
+  OpenSslNid = EC_GROUP_get_curve_name (EC_KEY_get0_group (EcKey));
+  switch (OpenSslNid) {
+    case NID_X9_62_prime256v1:
+      HalfSize = 32;
+      break;
+    case NID_secp384r1:
+      HalfSize = 48;
+      break;
+    case NID_secp521r1:
+      HalfSize = 66;
+      break;
+    default:
+      return FALSE;
+  }
+
+  if (*SigSize < (UINTN)(HalfSize * 2)) {
+    *SigSize = HalfSize * 2;
+    return FALSE;
+  }
+
+  *SigSize = HalfSize * 2;
+  ZeroMem (Signature, *SigSize);
+
+  switch (HashNid) {
+    case CRYPTO_NID_SHA256:
+      if (HashSize != SHA256_DIGEST_SIZE) {
+        return FALSE;
+      }
+
+      break;
+
+    case CRYPTO_NID_SHA384:
+      if (HashSize != SHA384_DIGEST_SIZE) {
+        return FALSE;
+      }
+
+      break;
+
+    case CRYPTO_NID_SHA512:
+      if (HashSize != SHA512_DIGEST_SIZE) {
+        return FALSE;
+      }
+
+      break;
+
+    default:
+      return FALSE;
+  }
+
+  EcDsaSig = ECDSA_do_sign (
+               MessageHash,
+               (UINT32)HashSize,
+               (EC_KEY *)EcContext
+               );
+  if (EcDsaSig == NULL) {
+    return FALSE;
+  }
+
+  ECDSA_SIG_get0 (EcDsaSig, (CONST BIGNUM **)&R, (CONST BIGNUM **)&S);
+
+  RSize = BN_num_bytes (R);
+  SSize = BN_num_bytes (S);
+  if ((RSize <= 0) || (SSize <= 0)) {
+    ECDSA_SIG_free (EcDsaSig);
+    return FALSE;
+  }
+
+  ASSERT ((UINTN)RSize <= HalfSize && (UINTN)SSize <= HalfSize);
+
+  BN_bn2bin (R, &Signature[0 + HalfSize - RSize]);
+  BN_bn2bin (S, &Signature[HalfSize + HalfSize - SSize]);
+
+  ECDSA_SIG_free (EcDsaSig);
+
+  return TRUE;
+}
+
+/**
+  Verifies the EC-DSA signature.
+
+  If EcContext is NULL, then return FALSE.
+  If MessageHash is NULL, then return FALSE.
+  If Signature is NULL, then return FALSE.
+  If HashSize need match the HashNid. HashNid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
+
+  For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
+  For P-384, the SigSize is 96. First 48-byte is R, Second 48-byte is S.
+  For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
+
+  @param[in]  EcContext    Pointer to EC context for signature verification.
+  @param[in]  HashNid      hash NID
+  @param[in]  MessageHash  Pointer to octet message hash to be checked.
+  @param[in]  HashSize     Size of the message hash in bytes.
+  @param[in]  Signature    Pointer to EC-DSA signature to be verified.
+  @param[in]  SigSize      Size of signature in bytes.
+
+  @retval  TRUE   Valid signature encoded in EC-DSA.
+  @retval  FALSE  Invalid signature or invalid EC context.
+
+**/
+BOOLEAN
+EFIAPI
+EcDsaVerify (
+  IN  VOID         *EcContext,
+  IN  UINTN        HashNid,
+  IN  CONST UINT8  *MessageHash,
+  IN  UINTN        HashSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize
+  )
+{
+  INT32      Result;
+  EC_KEY     *EcKey;
+  ECDSA_SIG  *EcDsaSig;
+  INT32      OpenSslNid;
+  UINT8      HalfSize;
+  BIGNUM     *R;
+  BIGNUM     *S;
+
+  if ((EcContext == NULL) || (MessageHash == NULL) || (Signature == NULL)) {
+    return FALSE;
+  }
+
+  if ((SigSize > INT_MAX) || (SigSize == 0)) {
+    return FALSE;
+  }
+
+  EcKey      = (EC_KEY *)EcContext;
+  OpenSslNid = EC_GROUP_get_curve_name (EC_KEY_get0_group (EcKey));
+  switch (OpenSslNid) {
+    case NID_X9_62_prime256v1:
+      HalfSize = 32;
+      break;
+    case NID_secp384r1:
+      HalfSize = 48;
+      break;
+    case NID_secp521r1:
+      HalfSize = 66;
+      break;
+    default:
+      return FALSE;
+  }
+
+  if (SigSize != (UINTN)(HalfSize * 2)) {
+    return FALSE;
+  }
+
+  switch (HashNid) {
+    case CRYPTO_NID_SHA256:
+      if (HashSize != SHA256_DIGEST_SIZE) {
+        return FALSE;
+      }
+
+      break;
+
+    case CRYPTO_NID_SHA384:
+      if (HashSize != SHA384_DIGEST_SIZE) {
+        return FALSE;
+      }
+
+      break;
+
+    case CRYPTO_NID_SHA512:
+      if (HashSize != SHA512_DIGEST_SIZE) {
+        return FALSE;
+      }
+
+      break;
+
+    default:
+      return FALSE;
+  }
+
+  EcDsaSig = ECDSA_SIG_new ();
+  if (EcDsaSig == NULL) {
+    ECDSA_SIG_free (EcDsaSig);
+    return FALSE;
+  }
+
+  R = BN_bin2bn (Signature, (UINT32)HalfSize, NULL);
+  S = BN_bin2bn (Signature + HalfSize, (UINT32)HalfSize, NULL);
+  if ((R == NULL) || (S == NULL)) {
+    ECDSA_SIG_free (EcDsaSig);
+    return FALSE;
+  }
+
+  ECDSA_SIG_set0 (EcDsaSig, R, S);
+
+  Result = ECDSA_do_verify (
+             MessageHash,
+             (UINT32)HashSize,
+             EcDsaSig,
+             (EC_KEY *)EcContext
+             );
+
+  ECDSA_SIG_free (EcDsaSig);
+
+  return (Result == 1);
+}

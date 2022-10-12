@@ -842,3 +842,86 @@ X509GetTBSCert (
 
   return TRUE;
 }
+
+/**
+  Retrieve the EC Public Key from one DER-encoded X509 certificate.
+
+  @param[in]  Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]  CertSize     Size of the X509 certificate in bytes.
+  @param[out] EcContext    Pointer to new-generated EC DSA context which contain the retrieved
+                           EC public key component. Use EcFree() function to free the
+                           resource.
+
+  If Cert is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
+
+  @retval  TRUE   EC Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve EC public key from X509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+EcGetPublicKeyFromX509 (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **EcContext
+  )
+{
+ #if FixedPcdGetBool (PcdOpensslEcEnabled)
+  BOOLEAN   Status;
+  EVP_PKEY  *Pkey;
+  X509      *X509Cert;
+
+  //
+  // Check input parameters.
+  //
+  if ((Cert == NULL) || (EcContext == NULL)) {
+    return FALSE;
+  }
+
+  Pkey     = NULL;
+  X509Cert = NULL;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **)&X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  Status = FALSE;
+
+  //
+  // Retrieve and check EVP_PKEY data from X509 Certificate.
+  //
+  Pkey = X509_get_pubkey (X509Cert);
+  if ((Pkey == NULL) || (EVP_PKEY_id (Pkey) != EVP_PKEY_EC)) {
+    goto _Exit;
+  }
+
+  //
+  // Duplicate EC Context from the retrieved EVP_PKEY.
+  //
+  if ((*EcContext = EC_KEY_dup (EVP_PKEY_get0_EC_KEY (Pkey))) != NULL) {
+    Status = TRUE;
+  }
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  if (Pkey != NULL) {
+    EVP_PKEY_free (Pkey);
+  }
+
+  return Status;
+ #else
+  return FALSE;
+ #endif
+}
