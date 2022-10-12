@@ -8,7 +8,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "InternalCryptLib.h"
 #include <openssl/x509.h>
+#include <openssl/x509v3.h>
+#include <crypto/asn1.h>
+#include <openssl/asn1.h>
 #include <openssl/rsa.h>
+
+/* OID*/
+#define OID_EXT_KEY_USAGE      { 0x55, 0x1D, 0x25 }
+#define OID_BASIC_CONSTRAINTS  { 0x55, 0x1D, 0x13 }
+
+static CONST UINT8  mOidExtKeyUsage[]      = OID_EXT_KEY_USAGE;
+static CONST UINT8  mOidBasicConstraints[] = OID_BASIC_CONSTRAINTS;
+
+#define CRYPTO_ASN1_TAG_CLASS_MASK  0xC0
+#define CRYPTO_ASN1_TAG_PC_MASK     0x20
+#define CRYPTO_ASN1_TAG_VALUE_MASK  0x1F
 
 /**
   Construct a X509 object from DER-encoded certificate data.
@@ -924,4 +938,1026 @@ _Exit:
  #else
   return FALSE;
  #endif
+}
+
+/**
+  Retrieve the version from one X.509 certificate.
+
+  If Cert is NULL, then return FALSE.
+  If CertSize is 0, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     Version      Pointer to the retrieved version integer.
+
+  @retval TRUE           The certificate version retrieved successfully.
+  @retval FALSE          If  Cert is NULL or CertSize is Zero.
+  @retval FALSE          The operation is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+X509GetVersion (
+  IN      CONST UINT8  *Cert,
+  IN      UINTN        CertSize,
+  OUT     UINTN        *Version
+  )
+{
+  BOOLEAN  Status;
+  X509     *X509Cert;
+
+  X509Cert = NULL;
+  Status   = X509ConstructCertificate (Cert, CertSize, (UINT8 **)&X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    //
+    // Invalid X.509 Certificate
+    //
+    Status = FALSE;
+  }
+
+  if (Status) {
+    *Version = X509_get_version (X509Cert);
+  }
+
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  return Status;
+}
+
+/**
+  Retrieve the serialNumber from one X.509 certificate.
+
+  If Cert is NULL, then return FALSE.
+  If CertSize is 0, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     SerialNumber  Pointer to the retrieved certificate SerialNumber bytes.
+  @param[in, out] SerialNumberSize  The size in bytes of the SerialNumber buffer on input,
+                               and the size of buffer returned SerialNumber on output.
+
+  @retval TRUE                     The certificate serialNumber retrieved successfully.
+  @retval FALSE                    If Cert is NULL or CertSize is Zero.
+                                   If SerialNumberSize is NULL.
+                                   If Certificate is invalid.
+  @retval FALSE                    If no SerialNumber exists.
+  @retval FALSE                    If the SerialNumber is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   SerialNumberSize parameter.
+  @retval FALSE                    The operation is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetSerialNumber (
+  IN      CONST UINT8 *Cert,
+  IN      UINTN CertSize,
+  OUT     UINT8 *SerialNumber, OPTIONAL
+  IN OUT  UINTN         *SerialNumberSize
+  )
+{
+  BOOLEAN       Status;
+  X509          *X509Cert;
+  ASN1_INTEGER  *Asn1Integer;
+
+  Status = FALSE;
+  //
+  // Check input parameters.
+  //
+  if ((Cert == NULL) || (SerialNumberSize == NULL)) {
+    return Status;
+  }
+
+  X509Cert = NULL;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **)&X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    *SerialNumberSize = 0;
+    Status            = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Retrieve subject name from certificate object.
+  //
+  Asn1Integer = X509_get_serialNumber (X509Cert);
+  if (Asn1Integer == NULL) {
+    *SerialNumberSize = 0;
+    Status            = FALSE;
+    goto _Exit;
+  }
+
+  if (*SerialNumberSize < (UINTN)Asn1Integer->length) {
+    *SerialNumberSize = (UINTN)Asn1Integer->length;
+    Status            = FALSE;
+    goto _Exit;
+  }
+
+  if (SerialNumber != NULL) {
+    CopyMem (SerialNumber, Asn1Integer->data, *SerialNumberSize);
+    Status = TRUE;
+  }
+
+  *SerialNumberSize = (UINTN)Asn1Integer->length;
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  return Status;
+}
+
+/**
+  Retrieve the issuer bytes from one X.509 certificate.
+
+  If Cert is NULL, then return FALSE.
+  If CertIssuerSize is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     CertIssuer  Pointer to the retrieved certificate subject bytes.
+  @param[in, out] CertIssuerSize  The size in bytes of the CertIssuer buffer on input,
+                               and the size of buffer returned CertSubject on output.
+
+  @retval  TRUE   The certificate issuer retrieved successfully.
+  @retval  FALSE  Invalid certificate, or the CertIssuerSize is too small for the result.
+                  The CertIssuerSize will be updated with the required size.
+  @retval  FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+X509GetIssuerName (
+  IN      CONST UINT8  *Cert,
+  IN      UINTN        CertSize,
+  OUT     UINT8        *CertIssuer,
+  IN OUT  UINTN        *CertIssuerSize
+  )
+{
+  BOOLEAN    Status;
+  X509       *X509Cert;
+  X509_NAME  *X509Name;
+  UINTN      X509NameSize;
+
+  //
+  // Check input parameters.
+  //
+  if ((Cert == NULL) || (CertIssuerSize == NULL)) {
+    return FALSE;
+  }
+
+  X509Cert = NULL;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **)&X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  Status = FALSE;
+
+  //
+  // Retrieve subject name from certificate object.
+  //
+  X509Name = X509_get_subject_name (X509Cert);
+  if (X509Name == NULL) {
+    goto _Exit;
+  }
+
+  X509NameSize = i2d_X509_NAME (X509Name, NULL);
+  if (*CertIssuerSize < X509NameSize) {
+    *CertIssuerSize = X509NameSize;
+    goto _Exit;
+  }
+
+  *CertIssuerSize = X509NameSize;
+  if (CertIssuer != NULL) {
+    i2d_X509_NAME (X509Name, &CertIssuer);
+    Status = TRUE;
+  }
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  return Status;
+}
+
+/**
+  Retrieve the Signature Algorithm from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     Oid              Signature Algorithm Object identifier buffer.
+  @param[in,out]  OidSize          Signature Algorithm Object identifier buffer size
+
+  @retval TRUE           The certificate Extension data retrieved successfully.
+  @retval FALSE                    If Cert is NULL.
+                                   If OidSize is NULL.
+                                   If Oid is not NULL and *OidSize is 0.
+                                   If Certificate is invalid.
+  @retval FALSE                    If no SignatureType.
+  @retval FALSE                    If the Oid is NULL. The required buffer size
+                                   is returned in the OidSize.
+  @retval FALSE                    The operation is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetSignatureAlgorithm (
+  IN CONST UINT8 *Cert,
+  IN       UINTN CertSize,
+  OUT   UINT8 *Oid, OPTIONAL
+  IN OUT   UINTN       *OidSize
+  )
+{
+  BOOLEAN      Status;
+  X509         *X509Cert;
+  int          Nid;
+  ASN1_OBJECT  *Asn1Obj;
+
+  //
+  // Check input parameters.
+  //
+  if ((Cert == NULL) || (OidSize == NULL) || (CertSize == 0)) {
+    return FALSE;
+  }
+
+  X509Cert = NULL;
+  Status   = FALSE;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **)&X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Retrieve subject name from certificate object.
+  //
+  Nid = X509_get_signature_nid (X509Cert);
+  if (Nid == NID_undef) {
+    *OidSize = 0;
+    Status   = FALSE;
+    goto _Exit;
+  }
+
+  Asn1Obj = OBJ_nid2obj (Nid);
+  if (Asn1Obj == NULL) {
+    *OidSize = 0;
+    Status   = FALSE;
+    goto _Exit;
+  }
+
+  if (*OidSize < (UINTN)Asn1Obj->length) {
+    *OidSize = Asn1Obj->length;
+    Status   = FALSE;
+    goto _Exit;
+  }
+
+  if (Oid != NULL) {
+    CopyMem (Oid, Asn1Obj->data, Asn1Obj->length);
+  }
+
+  *OidSize = Asn1Obj->length;
+  Status   = TRUE;
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  return Status;
+}
+
+/**
+  Retrieve Extension data from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[in]      Oid              Object identifier buffer
+  @param[in]      OidSize          Object identifier buffer size
+  @param[out]     ExtensionData    Extension bytes.
+  @param[in, out] ExtensionDataSize Extension bytes size.
+
+  @retval TRUE                     The certificate Extension data retrieved successfully.
+  @retval FALSE                    If Cert is NULL.
+                                   If ExtensionDataSize is NULL.
+                                   If ExtensionData is not NULL and *ExtensionDataSize is 0.
+                                   If Certificate is invalid.
+  @retval FALSE                    If no Extension entry match Oid.
+  @retval FALSE                    If the ExtensionData is NULL. The required buffer size
+                                   is returned in the ExtensionDataSize parameter.
+  @retval FALSE                    The operation is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetExtensionData (
+  IN     CONST UINT8  *Cert,
+  IN     UINTN        CertSize,
+  IN     CONST UINT8  *Oid,
+  IN     UINTN        OidSize,
+  OUT UINT8           *ExtensionData,
+  IN OUT UINTN        *ExtensionDataSize
+  )
+{
+  BOOLEAN  Status;
+  INTN     i;
+  X509     *X509Cert;
+
+  CONST STACK_OF (X509_EXTENSION) *Extensions;
+  ASN1_OBJECT        *Asn1Obj;
+  ASN1_OCTET_STRING  *Asn1Oct;
+  X509_EXTENSION     *Ext;
+  UINTN              ObjLength;
+  UINTN              OctLength;
+
+  //
+  // Check input parameters.
+  //
+  if ((Cert == NULL) || (CertSize == 0) || (Oid == NULL) || (OidSize == 0) || (ExtensionDataSize == NULL)) {
+    return FALSE;
+  }
+
+  X509Cert = NULL;
+  Status   = FALSE;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **)&X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    *ExtensionDataSize = 0;
+    goto Cleanup;
+  }
+
+  //
+  // Retrieve Extensions from certificate object.
+  //
+  Extensions = X509_get0_extensions (X509Cert);
+  if (sk_X509_EXTENSION_num (Extensions) <= 0) {
+    *ExtensionDataSize = 0;
+    goto Cleanup;
+  }
+
+  //
+  // Traverse Extensions
+  //
+  Status    = FALSE;
+  Asn1Oct   = NULL;
+  OctLength = 0;
+  for (i = 0; i < sk_X509_EXTENSION_num (Extensions); i++) {
+    Ext = sk_X509_EXTENSION_value (Extensions, (int)i);
+    if (Ext == NULL) {
+      continue;
+    }
+
+    Asn1Obj = X509_EXTENSION_get_object (Ext);
+    if (Asn1Obj == NULL) {
+      continue;
+    }
+
+    Asn1Oct = X509_EXTENSION_get_data (Ext);
+    if (Asn1Oct == NULL) {
+      continue;
+    }
+
+    ObjLength = OBJ_length (Asn1Obj);
+    OctLength = ASN1_STRING_length (Asn1Oct);
+    if ((OidSize == ObjLength) && (CompareMem (OBJ_get0_data (Asn1Obj), Oid, OidSize) == 0)) {
+      //
+      // Extension Found
+      //
+      Status = TRUE;
+      break;
+    }
+
+    //
+    // reset to 0 if not found
+    //
+    OctLength = 0;
+  }
+
+  if (Status) {
+    if (*ExtensionDataSize < OctLength) {
+      *ExtensionDataSize = OctLength;
+      Status             = FALSE;
+      goto Cleanup;
+    }
+
+    if (Asn1Oct != NULL) {
+      CopyMem (ExtensionData, ASN1_STRING_get0_data (Asn1Oct), OctLength);
+    }
+
+    *ExtensionDataSize = OctLength;
+  } else {
+    *ExtensionDataSize = 0;
+  }
+
+Cleanup:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  return Status;
+}
+
+/**
+  Retrieve the Extended Key Usage from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     Usage            Key Usage bytes.
+  @param[in, out] UsageSize        Key Usage buffer sizs in bytes.
+
+  @retval TRUE                     The Usage bytes retrieve successfully.
+  @retval FALSE                    If Cert is NULL.
+                                   If CertSize is NULL.
+                                   If Usage is not NULL and *UsageSize is 0.
+                                   If Cert is invalid.
+  @retval FALSE                    If the Usage is NULL. The required buffer size
+                                   is returned in the UsageSize parameter.
+  @retval FALSE                    The operation is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetExtendedKeyUsage (
+  IN     CONST UINT8  *Cert,
+  IN     UINTN        CertSize,
+  OUT UINT8           *Usage,
+  IN OUT UINTN        *UsageSize
+  )
+{
+  BOOLEAN  Status;
+
+  Status = X509GetExtensionData (Cert, CertSize, mOidExtKeyUsage, sizeof (mOidExtKeyUsage), Usage, UsageSize);
+  return Status;
+}
+
+/**
+  Retrieve the Validity from one X.509 certificate
+
+  If Cert is NULL, then return FALSE.
+  If CertIssuerSize is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     From         notBefore Pointer to DateTime object.
+  @param[in,out]  FromSize     notBefore DateTime object size.
+  @param[out]     To           notAfter Pointer to DateTime object.
+  @param[in,out]  ToSize       notAfter DateTime object size.
+
+  Note: X509CompareDateTime to compare DateTime oject
+        x509SetDateTime to get a DateTime object from a DateTimeStr
+
+  @retval  TRUE   The certificate Validity retrieved successfully.
+  @retval  FALSE  Invalid certificate, or Validity retrieve failed.
+  @retval  FALSE  This interface is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetValidity  (
+  IN     CONST UINT8  *Cert,
+  IN     UINTN        CertSize,
+  IN     UINT8        *From,
+  IN OUT UINTN        *FromSize,
+  IN     UINT8        *To,
+  IN OUT UINTN        *ToSize
+  )
+{
+  BOOLEAN          Status;
+  X509             *X509Cert;
+  CONST ASN1_TIME  *F;
+  CONST ASN1_TIME  *T;
+  UINTN            TSize;
+  UINTN            FSize;
+
+  //
+  // Check input parameters.
+  //
+  if ((Cert == NULL) || (FromSize == NULL) || (ToSize == NULL) || (CertSize == 0)) {
+    return FALSE;
+  }
+
+  X509Cert = NULL;
+  Status   = FALSE;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **)&X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    goto _Exit;
+  }
+
+  //
+  // Retrieve Validity from/to from certificate object.
+  //
+  F = X509_get0_notBefore (X509Cert);
+  T = X509_get0_notAfter (X509Cert);
+
+  if ((F == NULL) || (T == NULL)) {
+    goto _Exit;
+  }
+
+  FSize = sizeof (ASN1_TIME) + F->length;
+  if (*FromSize < FSize) {
+    *FromSize = FSize;
+    goto _Exit;
+  }
+
+  *FromSize = FSize;
+  if (From != NULL) {
+    CopyMem (From, F, sizeof (ASN1_TIME));
+    ((ASN1_TIME *)From)->data = From + sizeof (ASN1_TIME);
+    CopyMem (From + sizeof (ASN1_TIME), F->data, F->length);
+  }
+
+  TSize = sizeof (ASN1_TIME) + T->length;
+  if (*ToSize < TSize) {
+    *ToSize = TSize;
+    goto _Exit;
+  }
+
+  *ToSize = TSize;
+  if (To != NULL) {
+    CopyMem (To, T, sizeof (ASN1_TIME));
+    ((ASN1_TIME *)To)->data = To + sizeof (ASN1_TIME);
+    CopyMem (To + sizeof (ASN1_TIME), T->data, T->length);
+  }
+
+  Status = TRUE;
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  return Status;
+}
+
+/**
+  Format a DateTimeStr to DataTime object in DataTime Buffer
+
+  If DateTimeStr is NULL, then return FALSE.
+  If DateTimeSize is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      DateTimeStr      DateTime string like YYYYMMDDhhmmssZ
+                                   Ref: https://www.w3.org/TR/NOTE-datetime
+                                   Z stand for UTC time
+  @param[out]     DateTime         Pointer to a DateTime object.
+  @param[in,out]  DateTimeSize     DateTime object buffer size.
+
+  @retval TRUE                     The DateTime object create successfully.
+  @retval FALSE                    If DateTimeStr is NULL.
+                                   If DateTimeSize is NULL.
+                                   If DateTime is not NULL and *DateTimeSize is 0.
+                                   If Year Month Day Hour Minute Second combination is invalid datetime.
+  @retval FALSE                    If the DateTime is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   DateTimeSize parameter.
+  @retval FALSE                    The operation is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509FormatDateTime (
+  IN  CONST  CHAR8  *DateTimeStr,
+  OUT VOID          *DateTime,
+  IN OUT UINTN      *DateTimeSize
+  )
+{
+  BOOLEAN    Status;
+  INT32      Ret;
+  ASN1_TIME  *Dt;
+  UINTN      DSize;
+
+  Dt     = NULL;
+  Status = FALSE;
+
+  Dt = ASN1_TIME_new ();
+  if (Dt == NULL) {
+    Status = FALSE;
+    goto Cleanup;
+  }
+
+  Ret = ASN1_TIME_set_string_X509 (Dt, DateTimeStr);
+  if (Ret != 1) {
+    Status = FALSE;
+    goto Cleanup;
+  }
+
+  DSize = sizeof (ASN1_TIME) + Dt->length;
+  if (*DateTimeSize < DSize) {
+    *DateTimeSize = DSize;
+    Status        = FALSE;
+    goto Cleanup;
+  }
+
+  *DateTimeSize = DSize;
+  if (DateTime != NULL) {
+    CopyMem (DateTime, Dt, sizeof (ASN1_TIME));
+    ((ASN1_TIME *)DateTime)->data = (UINT8 *)DateTime + sizeof (ASN1_TIME);
+    CopyMem ((UINT8 *)DateTime + sizeof (ASN1_TIME), Dt->data, Dt->length);
+  }
+
+  Status = TRUE;
+
+Cleanup:
+  if (Dt != NULL) {
+    ASN1_TIME_free (Dt);
+  }
+
+  return Status;
+}
+
+/**
+  Compare DateTime1 object and DateTime2 object.
+
+  If DateTime1 is NULL, then return -2.
+  If DateTime2 is NULL, then return -2.
+  If DateTime1 == DateTime2, then return 0
+  If DateTime1 > DateTime2, then return 1
+  If DateTime1 < DateTime2, then return -1
+
+  @param[in]      DateTime1         Pointer to a DateTime Ojbect
+  @param[in]      DateTime2         Pointer to a DateTime Object
+
+  @retval  0      If DateTime1 == DateTime2
+  @retval  1      If DateTime1 > DateTime2
+  @retval  -1     If DateTime1 < DateTime2
+**/
+INT32
+EFIAPI
+X509CompareDateTime (
+  IN CONST  VOID  *DateTime1,
+  IN CONST  VOID  *DateTime2
+  )
+{
+  return (INT32)ASN1_TIME_compare (DateTime1, DateTime2);
+}
+
+/**
+  Retrieve the Key Usage from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     Usage            Key Usage (CRYPTO_X509_KU_*)
+
+  @retval  TRUE   The certificate Key Usage retrieved successfully.
+  @retval  FALSE  Invalid certificate, or Usage is NULL
+  @retval  FALSE  This interface is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetKeyUsage (
+  IN    CONST UINT8  *Cert,
+  IN    UINTN        CertSize,
+  OUT   UINTN        *Usage
+  )
+{
+  BOOLEAN  Status;
+  X509     *X509Cert;
+
+  //
+  // Check input parameters.
+  //
+  if ((Cert == NULL) || (Usage == NULL)) {
+    return FALSE;
+  }
+
+  X509Cert = NULL;
+  Status   = FALSE;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **)&X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    goto _Exit;
+  }
+
+  //
+  // Retrieve subject name from certificate object.
+  //
+  *Usage = X509_get_key_usage (X509Cert);
+  if (*Usage == NID_undef) {
+    goto _Exit;
+  }
+
+  Status = TRUE;
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  return Status;
+}
+
+/**
+  Verify one X509 certificate was issued by the trusted CA.
+  @param[in]      RootCert          Trusted Root Certificate buffer
+
+  @param[in]      RootCertLength    Trusted Root Certificate buffer length
+  @param[in]      CertChain         One or more ASN.1 DER-encoded X.509 certificates
+                                    where the first certificate is signed by the Root
+                                    Certificate or is the Root Cerificate itself. and
+                                    subsequent cerificate is signed by the preceding
+                                    cerificate.
+  @param[in]      CertChainLength   Total length of the certificate chain, in bytes.
+
+  @retval  TRUE   All cerificates was issued by the first certificate in X509Certchain.
+  @retval  FALSE  Invalid certificate or the certificate was not issued by the given
+                  trusted CA.
+**/
+BOOLEAN
+EFIAPI
+X509VerifyCertChain (
+  IN CONST UINT8  *RootCert,
+  IN UINTN        RootCertLength,
+  IN CONST UINT8  *CertChain,
+  IN UINTN        CertChainLength
+  )
+{
+  CONST UINT8  *TmpPtr;
+  UINTN        Length;
+  UINT32       Asn1Tag;
+  UINT32       ObjClass;
+  CONST UINT8  *CurrentCert;
+  UINTN        CurrentCertLen;
+  CONST UINT8  *PrecedingCert;
+  UINTN        PrecedingCertLen;
+  BOOLEAN      VerifyFlag;
+  INT32        Ret;
+
+  PrecedingCert    = RootCert;
+  PrecedingCertLen = RootCertLength;
+
+  CurrentCert    = CertChain;
+  Length         = 0;
+  CurrentCertLen = 0;
+
+  VerifyFlag = FALSE;
+  while (TRUE) {
+    TmpPtr = CurrentCert;
+    Ret    = ASN1_get_object (
+               (CONST UINT8 **)&TmpPtr,
+               (long *)&Length,
+               (int *)&Asn1Tag,
+               (int *)&ObjClass,
+               (long)(CertChainLength + CertChain - TmpPtr)
+               );
+    if ((Asn1Tag != V_ASN1_SEQUENCE) || (Ret == 0x80)) {
+      break;
+    }
+
+    //
+    // Calculate CurrentCert length;
+    //
+    CurrentCertLen = TmpPtr - CurrentCert + Length;
+
+    //
+    // Verify CurrentCert with preceding cert;
+    //
+    VerifyFlag = X509VerifyCert (CurrentCert, CurrentCertLen, PrecedingCert, PrecedingCertLen);
+    if (VerifyFlag == FALSE) {
+      break;
+    }
+
+    //
+    // move Current cert to Preceding cert
+    //
+    PrecedingCertLen = CurrentCertLen;
+    PrecedingCert    = CurrentCert;
+
+    //
+    // Move to next
+    //
+    CurrentCert = CurrentCert + CurrentCertLen;
+  }
+
+  return VerifyFlag;
+}
+
+/**
+  Get one X509 certificate from CertChain.
+
+  @param[in]      CertChain         One or more ASN.1 DER-encoded X.509 certificates
+                                    where the first certificate is signed by the Root
+                                    Certificate or is the Root Cerificate itself. and
+                                    subsequent cerificate is signed by the preceding
+                                    cerificate.
+  @param[in]      CertChainLength   Total length of the certificate chain, in bytes.
+
+  @param[in]      CertIndex         Index of certificate.
+
+  @param[out]     Cert              The certificate at the index of CertChain.
+  @param[out]     CertLength        The length certificate at the index of CertChain.
+
+  @retval  TRUE   Success.
+  @retval  FALSE  Failed to get certificate from certificate chain.
+**/
+BOOLEAN
+EFIAPI
+X509GetCertFromCertChain (
+  IN CONST UINT8   *CertChain,
+  IN UINTN         CertChainLength,
+  IN CONST INT32   CertIndex,
+  OUT CONST UINT8  **Cert,
+  OUT UINTN        *CertLength
+  )
+{
+  UINTN        Asn1Len;
+  INT32        CurrentIndex;
+  UINTN        CurrentCertLen;
+  CONST UINT8  *CurrentCert;
+  CONST UINT8  *TmpPtr;
+  INT32        Ret;
+  UINT32       Asn1Tag;
+  UINT32       ObjClass;
+
+  //
+  // Check input parameters.
+  //
+  if ((CertChain == NULL) || (Cert == NULL) ||
+      (CertIndex < -1) || (CertLength == NULL))
+  {
+    return FALSE;
+  }
+
+  Asn1Len        = 0;
+  CurrentCertLen = 0;
+  CurrentCert    = CertChain;
+  CurrentIndex   = -1;
+
+  //
+  // Traverse the certificate chain
+  //
+  while (TRUE) {
+    TmpPtr = CurrentCert;
+
+    // Get asn1 object and taglen
+    Ret = ASN1_get_object (
+            (CONST UINT8 **)&TmpPtr,
+            (long *)&Asn1Len,
+            (int *)&Asn1Tag,
+            (int *)&ObjClass,
+            (long)(CertChainLength + CertChain - TmpPtr)
+            );
+    if ((Asn1Tag != V_ASN1_SEQUENCE) || (Ret == 0x80)) {
+      break;
+    }
+
+    //
+    // Calculate CurrentCert length;
+    //
+    CurrentCertLen = TmpPtr - CurrentCert + Asn1Len;
+    CurrentIndex++;
+
+    if (CurrentIndex == CertIndex) {
+      *Cert       = CurrentCert;
+      *CertLength = CurrentCertLen;
+      return TRUE;
+    }
+
+    //
+    // Move to next
+    //
+    CurrentCert = CurrentCert + CurrentCertLen;
+  }
+
+  //
+  // If CertIndex is -1, Return the last certificate
+  //
+  if ((CertIndex == -1) && (CurrentIndex >= 0)) {
+    *Cert       = CurrentCert - CurrentCertLen;
+    *CertLength = CurrentCertLen;
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+  Retrieve the tag and length of the tag.
+
+  @param Ptr      The position in the ASN.1 data
+  @param End      End of data
+  @param Length   The variable that will receive the length
+  @param Tag      The expected tag
+
+  @retval      TRUE   Get tag successful
+  @retval      FALSe  Failed to get tag or tag not match
+**/
+BOOLEAN
+EFIAPI
+Asn1GetTag (
+  IN OUT UINT8    **Ptr,
+  IN CONST UINT8  *End,
+  OUT UINTN       *Length,
+  IN     UINT32   Tag
+  )
+{
+  UINT8  *PtrOld;
+  INT32  ObjTag;
+  INT32  ObjCls;
+  long   ObjLength;
+
+  //
+  // Save Ptr position
+  //
+  PtrOld = *Ptr;
+
+  ASN1_get_object ((CONST UINT8 **)Ptr, &ObjLength, &ObjTag, &ObjCls, (INT32)(End - (*Ptr)));
+  if ((ObjTag == (INT32)(Tag & CRYPTO_ASN1_TAG_VALUE_MASK)) &&
+      (ObjCls == (INT32)(Tag & CRYPTO_ASN1_TAG_CLASS_MASK)))
+  {
+    *Length = (UINTN)ObjLength;
+    return TRUE;
+  } else {
+    //
+    // if doesn't match Tag, restore Ptr to origin Ptr
+    //
+    *Ptr = PtrOld;
+    return FALSE;
+  }
+}
+
+/**
+  Retrieve the basic constraints from one X.509 certificate.
+
+  @param[in]      Cert                     Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize                 size of the X509 certificate in bytes.
+  @param[out]     BasicConstraints         basic constraints bytes.
+  @param[in, out] BasicConstraintsSize     basic constraints buffer sizs in bytes.
+
+  @retval TRUE                     The basic constraints retrieve successfully.
+  @retval FALSE                    If cert is NULL.
+                                   If cert_size is NULL.
+                                   If basic_constraints is not NULL and *basic_constraints_size is 0.
+                                   If cert is invalid.
+  @retval FALSE                    The required buffer size is small.
+                                   The return buffer size is basic_constraints_size parameter.
+  @retval FALSE                    If no Extension entry match oid.
+  @retval FALSE                    The operation is not supported.
+ **/
+BOOLEAN
+EFIAPI
+X509GetExtendedBasicConstraints             (
+  CONST UINT8  *Cert,
+  UINTN        CertSize,
+  UINT8        *BasicConstraints,
+  UINTN        *BasicConstraintsSize
+  )
+{
+  BOOLEAN  Status;
+
+  if ((Cert == NULL) || (CertSize == 0) || (BasicConstraintsSize == NULL)) {
+    return FALSE;
+  }
+
+  Status = X509GetExtensionData (
+             (UINT8 *)Cert,
+             CertSize,
+             mOidBasicConstraints,
+             sizeof (mOidBasicConstraints),
+             BasicConstraints,
+             BasicConstraintsSize
+             );
+
+  return Status;
 }
