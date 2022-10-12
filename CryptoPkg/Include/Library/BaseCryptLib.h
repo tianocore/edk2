@@ -16,6 +16,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define CRYPTO_NID_NULL  0x0000
 
+// Hash
+#define CRYPTO_NID_SHA256  0x0001
+#define CRYPTO_NID_SHA384  0x0002
+#define CRYPTO_NID_SHA512  0x0003
+
 // Key Exchange
 #define CRYPTO_NID_SECP256R1  0x0204
 #define CRYPTO_NID_SECP384R1  0x0205
@@ -3676,6 +3681,130 @@ EcDhComputeKey (
   IN      CONST INT32  *CompressFlag,
   OUT     UINT8        *Key,
   IN OUT  UINTN        *KeySize
+  );
+
+/**
+  Retrieve the EC Private Key from the password-protected PEM key data.
+
+  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize      Size of the PEM key data in bytes.
+  @param[in]  Password     NULL-terminated passphrase used for encrypted PEM key data.
+  @param[out] EcContext    Pointer to new-generated EC DSA context which contain the retrieved
+                           EC private key component. Use EcFree() function to free the
+                           resource.
+
+  If PemData is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
+
+  @retval  TRUE   EC Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+EcGetPrivateKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **EcContext
+  );
+
+/**
+  Retrieve the EC Public Key from one DER-encoded X509 certificate.
+
+  @param[in]  Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]  CertSize     Size of the X509 certificate in bytes.
+  @param[out] EcContext    Pointer to new-generated EC DSA context which contain the retrieved
+                           EC public key component. Use EcFree() function to free the
+                           resource.
+
+  If Cert is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
+
+  @retval  TRUE   EC Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve EC public key from X509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+EcGetPublicKeyFromX509 (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **EcContext
+  );
+
+/**
+  Carries out the EC-DSA signature.
+
+  This function carries out the EC-DSA signature.
+  If the Signature buffer is too small to hold the contents of signature, FALSE
+  is returned and SigSize is set to the required buffer size to obtain the signature.
+
+  If EcContext is NULL, then return FALSE.
+  If MessageHash is NULL, then return FALSE.
+  If HashSize need match the HashNid. HashNid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
+  If SigSize is large enough but Signature is NULL, then return FALSE.
+
+  For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
+  For P-384, the SigSize is 96. First 48-byte is R, Second 48-byte is S.
+  For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
+
+  @param[in]       EcContext    Pointer to EC context for signature generation.
+  @param[in]       HashNid      hash NID
+  @param[in]       MessageHash  Pointer to octet message hash to be signed.
+  @param[in]       HashSize     Size of the message hash in bytes.
+  @param[out]      Signature    Pointer to buffer to receive EC-DSA signature.
+  @param[in, out]  SigSize      On input, the size of Signature buffer in bytes.
+                                On output, the size of data returned in Signature buffer in bytes.
+
+  @retval  TRUE   Signature successfully generated in EC-DSA.
+  @retval  FALSE  Signature generation failed.
+  @retval  FALSE  SigSize is too small.
+
+**/
+BOOLEAN
+EFIAPI
+EcDsaSign (
+  IN      VOID         *EcContext,
+  IN      UINTN        HashNid,
+  IN      CONST UINT8  *MessageHash,
+  IN      UINTN        HashSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  );
+
+/**
+  Verifies the EC-DSA signature.
+
+  If EcContext is NULL, then return FALSE.
+  If MessageHash is NULL, then return FALSE.
+  If Signature is NULL, then return FALSE.
+  If HashSize need match the HashNid. HashNid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
+
+  For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
+  For P-384, the SigSize is 96. First 48-byte is R, Second 48-byte is S.
+  For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
+
+  @param[in]  EcContext    Pointer to EC context for signature verification.
+  @param[in]  HashNid      hash NID
+  @param[in]  MessageHash  Pointer to octet message hash to be checked.
+  @param[in]  HashSize     Size of the message hash in bytes.
+  @param[in]  Signature    Pointer to EC-DSA signature to be verified.
+  @param[in]  SigSize      Size of signature in bytes.
+
+  @retval  TRUE   Valid signature encoded in EC-DSA.
+  @retval  FALSE  Invalid signature or invalid EC context.
+
+**/
+BOOLEAN
+EFIAPI
+EcDsaVerify (
+  IN  VOID         *EcContext,
+  IN  UINTN        HashNid,
+  IN  CONST UINT8  *MessageHash,
+  IN  UINTN        HashSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize
   );
 
 #endif // __BASE_CRYPT_LIB_H__
