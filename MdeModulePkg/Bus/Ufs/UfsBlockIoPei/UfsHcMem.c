@@ -1,6 +1,7 @@
 /** @file
 
 Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1985-2022, American Megatrends International LLC. <BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -414,6 +415,9 @@ UfsPeimFreeMem (
   //
   ASSERT (Block != NULL);
 
+  if (Block == NULL) {
+      return;
+  }
   //
   // Release the current memory block if it is empty and not the head
   //
