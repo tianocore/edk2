@@ -761,6 +761,41 @@ UsbEnumerateNewDev (
     ));
 
   //
+  // Host sends a Get_Descriptor request to learn the max packet
+  // size of default pipe (only part of the device's descriptor).
+  // Only the first 8 byte of Device Descriptor is requested,
+  // which could make some USB pen disks confused.
+  // therefore, a second port reset follows.
+  //
+  Status = UsbGetMaxPacketSize0 (Child);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "UsbEnumerateNewDev: failed to get max packet for EP 0 - %r\n", Status));
+    goto ON_ERROR;
+  }
+
+  DEBUG ((DEBUG_INFO, "UsbEnumerateNewDev: max packet size for EP 0 is %d\n", Child->MaxPacket0));
+
+  //
+  // Some USB Pen disks would become confused by a second request for the Device Descriptor
+  // if they did not return the complete Device Descriptor for the first request.
+  // To allow these devices to enumerate successfully it was necessary to reset the port
+  // between the first and second requests for the device descriptor.
+  //
+  if (ResetIsNeeded) {
+    Status = HubApi->ResetPort (HubIf, Port);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "UsbEnumerateNewDev: failed to reset port %d - %r\n", Port, Status));
+
+      return Status;
+    }
+
+    DEBUG ((DEBUG_INFO, "UsbEnumerateNewDev: hub port %d is reset\n", Port));
+  } else {
+    DEBUG ((DEBUG_INFO, "UsbEnumerateNewDev: hub port %d reset is skipped\n", Port));
+  }
+
+  //
   // After port is reset, hub establishes a signal path between
   // the device and host (DEFAULT state). Device's registers are
   // reset, use default address 0 (host enumerates one device at
@@ -798,19 +833,6 @@ UsbEnumerateNewDev (
   gBS->Stall (USB_SET_DEVICE_ADDRESS_STALL);
 
   DEBUG ((DEBUG_INFO, "UsbEnumerateNewDev: device is now ADDRESSED at %d\n", Address));
-
-  //
-  // Host sends a Get_Descriptor request to learn the max packet
-  // size of default pipe (only part of the device's descriptor).
-  //
-  Status = UsbGetMaxPacketSize0 (Child);
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "UsbEnumerateNewDev: failed to get max packet for EP 0 - %r\n", Status));
-    goto ON_ERROR;
-  }
-
-  DEBUG ((DEBUG_INFO, "UsbEnumerateNewDev: max packet size for EP 0 is %d\n", Child->MaxPacket0));
 
   //
   // Host learns about the device's abilities by requesting device's

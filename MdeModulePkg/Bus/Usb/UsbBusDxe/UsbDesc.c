@@ -561,16 +561,22 @@ UsbGetMaxPacketSize0 (
     Status = UsbCtrlGetDesc (UsbDev, USB_DESC_TYPE_DEVICE, 0, 0, &DevDesc, 8);
 
     if (!EFI_ERROR (Status)) {
-      if ((DevDesc.BcdUSB >= 0x0300) && (DevDesc.MaxPacketSize0 == 9)) {
-        UsbDev->MaxPacket0 = 1 << 9;
-        return EFI_SUCCESS;
+      if (DevDesc.BcdUSB >= 0x0300) {
+        UsbDev->MaxPacket0 = (UINT16)1 << DevDesc.MaxPacketSize0;
+      } else {
+        UsbDev->MaxPacket0 = (DevDesc.MaxPacketSize0) ?
+                             (UINT16)DevDesc.MaxPacketSize0 : 0x40;
       }
 
-      UsbDev->MaxPacket0 = DevDesc.MaxPacketSize0;
+      if ((UsbDev->Speed == EFI_USB_SPEED_LOW) ||
+          (UsbDev->Speed == EFI_USB_SPEED_FULL) ||
+          (UsbDev->Speed == EFI_USB_SPEED_HIGH))
+      {
+        gBS->Stall (USB_RETRY_MAX_PACK_SIZE_STALL);
+      }
+
       return EFI_SUCCESS;
     }
-
-    gBS->Stall (USB_RETRY_MAX_PACK_SIZE_STALL);
   }
 
   return EFI_DEVICE_ERROR;
