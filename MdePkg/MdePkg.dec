@@ -1926,6 +1926,11 @@
   #
   ## Include/Protocol/ShellDynamicCommand.h
   gEfiShellDynamicCommandProtocolGuid  = { 0x3c7200e9, 0x005f, 0x4ea4, {0x87, 0xde, 0xa3, 0xdf, 0xac, 0x8a, 0x27, 0xc3 }}
+  #
+  # Protocols defined for RISC-V systems
+  #
+  ## Include/Protocol/RiscVBootProtocol.h
+  gRiscVEfiBootProtocolGuid  = { 0xccd15fec, 0x6f73, 0x4eec, { 0x83, 0x95, 0x3e, 0x69, 0xe4, 0xb9, 0x40, 0xbf }}
 
 #
 # [Error.gEfiMdePkgTokenSpaceGuid]
