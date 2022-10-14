@@ -390,7 +390,7 @@ class CIfrObj():  # wip
         self.__RecordIdx = 0  #\ gCIfrRecordInfoDB.IfrRecordRegister
         self.__LineNo = 0
 
-        print ("======Create IFR [%s]\n", gIfrObjPrintDebugTable[OpCode])
+        # print ("======Create IFR [%s]\n", gIfrObjPrintDebugTable[OpCode])
         return self.__ObjBinBuf
 
     def Struct2Stream(self, Obj) -> bytes:
@@ -913,6 +913,27 @@ class CIfrForm(CIfrObj, CIfrOpHeader):
     def SetFormTitle(self, FormTitle):
         self.__Form.FormTitle = FormTitle
 
+class CIfrFormMap(CIfrObj, CIfrOpHeader):
+
+    def __init__(self):
+        self.__FormMap = EFI_IFR_FORM_MAP()
+        self.__MethodMap = EFI_IFR_FORM_MAP_METHOD()
+        CIfrOpHeader.__init__(self, self.__FormMap.Header, EFI_IFR_FORM_MAP_OP)
+        self.__FormMap.FormId = 0
+    
+    def SetFormId(self, FormId):
+        if FormId == 0:
+            return VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+        
+        if CIfrFormId.CheckFormIdFree(FormId) == False:
+            return VfrReturnCode.VFR_RETURN_FORMID_REDEFINED
+        self.__FormMap.FormId = FormId
+        CIfrFormId.MarkFormIdUsed(FormId)
+        return VfrReturnCode.VFR_RETURN_SUCCESS
+    
+    def SetFormMapMethod(self, MethodTitle, MethodGuid: EFI_GUID):
+        self.__MethodMap.MethodTitle = MethodTitle
+        self.__MethodMap.MethodIdentifier = MethodGuid
 
 class CIfrEnd(CIfrObj, CIfrOpHeader):
 
@@ -1231,6 +1252,9 @@ class CIfrGuid(CIfrObj, CIfrOpHeader):
 
     def __init__(self, Size):
         self.__Guid = EFI_IFR_GUID()
+        self.__Data = []
+        for i in range(0, Size):
+            self.__Data.append(0)
         CIfrOpHeader.__init__(self, self.__Guid.Header, EFI_IFR_GUID_OP,
                               ctypes.sizeof(EFI_IFR_GUID) + Size)
         EFI_IFR_DEFAULT_GUID = EFI_GUID(0, 0, 0,
@@ -1240,8 +1264,8 @@ class CIfrGuid(CIfrObj, CIfrOpHeader):
     def SetGuid(self, Guid):
         self.__Guid = Guid
 
-    def SetData(self, Databuff, Size):  # wip
-        pass
+    def SetData(self, Databuff): 
+        self.__Data = Databuff
 
 
 class CIfrOrderedList(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
