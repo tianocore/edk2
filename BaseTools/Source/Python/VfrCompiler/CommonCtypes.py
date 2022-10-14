@@ -300,7 +300,7 @@ class EFI_IFR_SUBTITLE(Structure):
     _pack_ = 1
     _fields_ = [
         ('Header', EFI_IFR_OP_HEADER),
-        ('Statement', EFI_IFR_STATEMENT_HEADER),
+        ('Statement', EFI_IFR_STATEMENT_HEADER), 
         ('Flags', c_ubyte),
     ]
 
@@ -1187,6 +1187,12 @@ class EFI_IFR_FORM_MAP(Structure):
         ('FormId', c_uint16),
     ]
 
+class EFI_IFR_FORM_MAP_METHOD(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('MethodTitle', c_uint16),
+        ('MethodIdentifier', EFI_GUID),
+    ]
 
 class EFI_IFR_CATENATE(Structure):
     _pack_ = 1
