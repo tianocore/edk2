@@ -93,6 +93,15 @@ typedef struct {
   UINT64    R15;
 } GENERAL_REGISTER;
 
+typedef struct {
+  UINT32    Edi;
+  UINT32    Esi;
+  UINT32    Ebx;
+  UINT32    Edx;
+  UINT32    Ecx;
+  UINT32    Eax;
+} GENERAL_REGISTER_IA32;
+
 extern UINTN               mFaultInstructionLength;
 extern EFI_EXCEPTION_TYPE  mExceptionType;
 extern UINTN               mRspAddress[];
