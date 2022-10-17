@@ -40,6 +40,20 @@
 **/
 typedef UINTN CM_OBJECT_TOKEN;
 
+/**
+  A type representing a SMBIOS structure/table type.
+
+  Types 0 through 127 (7Fh) are reserved for and defined by the
+  SMBIOS specification.
+  Types 128 through 256 (80h to FFh) are available for system and
+  OEM-specific information.
+
+  Note: This Dynamic SMBIOS table generation implementation defines
+  TableType FFh as a NULL table which is used by the Dynamic
+  SMBIOS table dispatcher to terminate the dependency sequence.
+*/
+typedef UINT8 SMBIOS_TABLE_TYPE;
+
 /** The ESTD_OBJECT_ID enum describes the Object IDs
     in the Standard Namespace.
 */
@@ -127,6 +141,9 @@ typedef struct CmAStdObjAcpiTableInfo {
   to NULL.
 */
 typedef struct CmStdObjSmbiosTableInfo {
+  /// SMBIOS Structure/Table Type
+  SMBIOS_TABLE_TYPE            TableType;
+
   /// The SMBIOS Table Generator ID
   SMBIOS_TABLE_GENERATOR_ID    TableGeneratorId;
 
