@@ -15,7 +15,15 @@
         ##     "<ErrorID>", "<KeyWord>"
         ## ]
         "ExceptionList": [
-          "8006", "main"
+          "8006", "main",
+          "8005", "GENERAL_REGISTER.R8",
+          "8005", "GENERAL_REGISTER.R9",
+          "8005", "GENERAL_REGISTER.R10",
+          "8005", "GENERAL_REGISTER.R11",
+          "8005", "GENERAL_REGISTER.R12",
+          "8005", "GENERAL_REGISTER.R13",
+          "8005", "GENERAL_REGISTER.R14",
+          "8005", "GENERAL_REGISTER.R15"
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
