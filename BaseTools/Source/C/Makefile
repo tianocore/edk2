@@ -1,7 +1,7 @@
 ## @file
 # Windows makefile for C tools build.
 #
-# Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 HOST_ARCH = IA32
@@ -21,11 +21,7 @@ APPLICATIONS = \
   LzmaCompress \
   TianoCompress \
   VolInfo \
-  DevicePath \
-  FMMT\
-  BfmLib \
-  FCE
-
+  DevicePath
 
 all: libs apps install
 

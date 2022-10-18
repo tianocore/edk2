@@ -187,30 +187,16 @@ typedef struct {
   } Sha512;
   union {
     struct {
-      UINT8    GetSubjectName              : 1;
-      UINT8    GetCommonName               : 1;
-      UINT8    GetOrganizationName         : 1;
-      UINT8    VerifyCert                  : 1;
-      UINT8    ConstructCertificate        : 1;
-      UINT8    ConstructCertificateStack   : 1;
-      UINT8    ConstructCertificateStackV  : 1;
-      UINT8    Free                        : 1;
-      UINT8    StackFree                   : 1;
-      UINT8    GetTBSCert                  : 1;
-      UINT8    GetVersion                  : 1;
-      UINT8    GetSerialNumber             : 1;
-      UINT8    GetIssuerName               : 1;
-      UINT8    GetSignatureAlgorithm       : 1;
-      UINT8    GetExtensionData            : 1;
-      UINT8    GetExtendedKeyUsage         : 1;
-      UINT8    GetValidity                 : 1;
-      UINT8    FormatDateTime              : 1;
-      UINT8    CompareDateTime             : 1;
-      UINT8    GetKeyUsage                 : 1;
-      UINT8    VerifyCertChain             : 1;
-      UINT8    GetCertFromCertChain        : 1;
-      UINT8    Asn1GetTag                  : 1;
-      UINT8    GetExtendedBasicConstraints : 1;
+      UINT8    GetSubjectName             : 1;
+      UINT8    GetCommonName              : 1;
+      UINT8    GetOrganizationName        : 1;
+      UINT8    VerifyCert                 : 1;
+      UINT8    ConstructCertificate       : 1;
+      UINT8    ConstructCertificateStack  : 1;
+      UINT8    ConstructCertificateStackV : 1;
+      UINT8    Free                       : 1;
+      UINT8    StackFree                  : 1;
+      UINT8    GetTBSCert                 : 1;
     } Services;
     UINT32    Family;
   } X509;
@@ -283,7 +269,6 @@ typedef struct {
       UINT8    CtrlTrafficIn  : 1;
       UINT8    Read           : 1;
       UINT8    Write          : 1;
-      UINT8    Shutdown       : 1;
     } Services;
     UINT32    Family;
   } Tls;
@@ -300,9 +285,6 @@ typedef struct {
       UINT8    HostPublicCert     : 1;
       UINT8    HostPrivateKey     : 1;
       UINT8    CertRevocationList : 1;
-      UINT8    HostPrivateKeyEx   : 1;
-      UINT8    SignatureAlgoList  : 1;
-      UINT8    EcCurve            : 1;
     } Services;
     UINT32    Family;
   } TlsSet;
@@ -321,7 +303,6 @@ typedef struct {
       UINT8    HostPublicCert       : 1;
       UINT8    HostPrivateKey       : 1;
       UINT8    CertRevocationList   : 1;
-      UINT8    ExportKey            : 1;
     } Services;
     UINT32    Family;
   } TlsGet;
@@ -397,10 +378,6 @@ typedef struct {
       UINT8    GenerateKey                   : 1;
       UINT8    GetPubKey                     : 1;
       UINT8    DhComputeKey                  : 1;
-      UINT8    GetPublicKeyFromX509          : 1;
-      UINT8    GetPrivateKeyFromPem          : 1;
-      UINT8    DsaSign                       : 1;
-      UINT8    DsaVerify                     : 1;
     } Services;
     UINT32    Family;
   } Ec;
