@@ -47,7 +47,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.__CVfrQuestionDB = CVfrQuestionDB()
 
         self.__IsStringOp = False # static BOOLEAN gIsStringOp = FALSE;
-        self.__IsOrderedList = True # static BOOLEAN  gIsOrderedList = FALSE;
+        self.__IsOrderedList = False # static BOOLEAN  gIsOrderedList = FALSE;
         self.__CurrentQuestion = None
         self.__CurrentMinMaxData = None # static CIfrMinMaxStepData *gCurrentMinMaxData = NULL;
 
@@ -418,14 +418,18 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.__DeclareStandardDefaultStorage(Line)
         #############################
         
-
-        
+        print('** FormSet Info **')
+        Info = ctx.Node.Data.GetInfo()
+        print(ctx.guidDefinition().getText())
+        # self.__ShowGuid(Info.Guid)
+        print(Info.FormSetTitle)
+        print(Info.Help)
+ 
         return ctx.Node
 
     def InsertChild(self, ParentNode: VfrTreeNode, ChildCtx):
         if ChildCtx != None and ChildCtx.Node != None:
             ParentNode.insertChild(ChildCtx.Node)
-            # ChildCtx.Node.Parent = ParentNode
 
     def __ShowGuid(self, guid):
         print('data1:' + str(guid.Data1) + ' data2:' + str(guid.Data2) + ' data3:' + str(guid.Data3) + ' data4:' +
@@ -570,6 +574,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             DSObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         
         ctx.Node.Data = DSObj
+        
         return ctx.Node
 
 
@@ -598,11 +603,20 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         VarStoreId, ReturnCode = gCVfrDataStorage.GetVarStoreId(StoreName, Guid) # VarId _PCATCH
         VSObj.SetVarStoreId(VarStoreId)
         Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
-        VSObj.SetSize = Size
-        VSObj.SetName = StoreName
+        VSObj.SetSize(Size)
+        VSObj.SetName(StoreName)
         
         ctx.Node.Data = VSObj
-        # self.InsertChild(ctx.Node, ctx.guidDefinition())
+        '''
+        
+        print('** Varstore info **')
+        Info = ctx.Node.Data.GetInfo()
+        print(Info.VarStoreId)
+        print(Info.Name)
+        print(Info.Size)
+        print(ctx.guidDefinition().getText())
+        '''
+        
 
         return VSObj
 
@@ -678,7 +692,15 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         VSEObj.SetName(StoreName)
         
         ctx.Node.Data = VSEObj
-        # self.InsertChild(ctx.Node, ctx.guidDefinition())
+        '''
+        
+        print('** efiVarstore info **')
+        Info = ctx.Node.Data.GetInfo()
+        print(Info.VarStoreId)
+        print(Info.Name)
+        print(Info.Size)
+        print(ctx.guidDefinition().getText())
+        '''
 
         return ctx.Node
 
@@ -726,7 +748,14 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         VSNVObj.SetVarStoreId(VarstoreId)
         
         ctx.Node.Data = VSNVObj
-        # self.InsertChild(ctx.Node, ctx.guidDefinition())
+        '''
+        
+        print('** namevaluevarstore info **')
+        Info = ctx.Node.Data.GetInfo()
+        print(Info.VarStoreId)
+        print(ctx.guidDefinition().getText())
+        '''
+        
         return ctx.Node
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementDisableIfFormSet.
@@ -754,8 +783,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         SIObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         ctx.Node.Data = SIObj
-        Condition = CondInfo('suppressif', ctx.vfrStatementExpression().getText())
+        Condition = 'suppressif' + ' ' +  ctx.vfrStatementExpression().getText()
         ctx.Node.Condition = Condition
+        
 
 
         EObj = CIfrEnd() #
@@ -1175,16 +1205,18 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         FormId = self.__TransNum(ctx.Number(0))
         FObj.SetFormId(FormId)
         FormTitle  = self.__TransNum(ctx.Number(1))
-        FObj.SetFormId(FormTitle)
+        FObj.SetFormTitle(FormTitle)
         
         ctx.Node.Data = FObj
         for Ctx in ctx.vfrForm():
             self.InsertChild(ctx.Node, Ctx)
-
-        EObj = CIfrEnd() #
-        Line = (None if ctx.stop is None else ctx.stop).line
-        EObj.SetLineNo(Line)
-
+        
+        print('** form info **')
+        Info = ctx.Node.Data.GetInfo()
+        print(Info.FormId)
+        print(Info.FormTitle)
+        
+    
         return ctx.Node
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrForm.
@@ -1307,10 +1339,12 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         # sequence question 
         for Ctx in ctx.vfrStatementSubTitleComponent():
             self.InsertChild(ctx.Node, Ctx)
-            
-        EObj = CIfrEnd()
-        Line = (None if ctx.stop is None else ctx.stop).line
-        EObj.SetLineNo(Line)
+        '''
+        print('** Form - Subtitle **')
+        Info = ctx.Node.Data.GetInfo()
+        print(Info.Statement.Prompt)
+        '''
+        
 
         return ctx.Node
 
@@ -1355,7 +1389,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             OpObj.SetQuestionId(Key)
         return
 
-
+    
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementStaticText.
     def visitVfrStatementStaticText(self, ctx:VfrSyntaxParser.VfrStatementStaticTextContext):
 
@@ -1364,7 +1398,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         QId = EFI_QUESTION_ID_INVALID
         Help = self.__TransNum(ctx.Number(0))
         Prompt = self.__TransNum(ctx.Number(1))
-        TxtTwo = self.__TransNum(ctx.Number(2)) if len(ctx.Text()) == 2 else EFI_STRING_ID_INVALID
+        TxtTwo = self.__TransNum(ctx.Number(2)) if len(ctx.Text()) == 3 else EFI_STRING_ID_INVALID
 
         TextFlags = 0
         for FlagsFieldCtx in ctx.staticTextFlagsField():
@@ -1387,9 +1421,15 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             ctx.Node.Data = AObj
             ctx.Node.OpCode = EFI_IFR_ACTION_OP
 
-            EObj = CIfrEnd()
-            Line = (None if ctx.stop is None else ctx.stop).line
-            EObj.SetLineNo(Line)
+            print('** Form - Text -Action **')
+            Info = ctx.Node.Data.GetInfo()
+            print(Info.Question.Header.Prompt)
+            print(Info.Question.Header.Help)
+            print(Info.Question.QuestionId)
+            print(Info.Question.VarStoreId)
+            print(Info.Question.Flags)
+            print(Info.QuestionConfig)
+        
 
         else:
             TObj = CIfrText()
@@ -1399,6 +1439,13 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             TObj.SetPrompt(Prompt)
             TObj.SetTextTwo(TxtTwo)
             ctx.Node.Data = TObj
+
+            print('** Form - Text **')
+            Info = ctx.Node.Data.GetInfo()
+            print(Info.Statement.Prompt)
+            print(Info.Statement.Help)
+            print(Info.TextTwo)
+        
 
         return ctx.Node
 
@@ -1737,7 +1784,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.InsertChild(ctx.Node, Ctx)
         return ctx.Node
 
-
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementQuestionOptionTag.
     def visitVfrStatementQuestionOptionTag(self, ctx:VfrSyntaxParser.VfrStatementQuestionOptionTagContext):
         self.visitChildren(ctx)
@@ -1770,12 +1816,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         SIObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         ctx.Node.Data = SIObj
-        ctx.Node.Expression = ctx.vfrStatementExpression().getText()
-
-        EObj = CIfrEnd() #
-        Line = (None if ctx.stop is None else ctx.stop).line
-        EObj.SetLineNo(Line)
-
+        ctx.Node.Condition = 'suppressif' +  ' ' + ctx.vfrStatementExpression().getText()
+        
         return ctx.Node
 
     def OFFSET_OF(self, Type, Field):
@@ -1887,6 +1929,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         ctx.Node.Data = DObj
         self.InsertChild(ctx.Node, ctx.vfrStatementValue())
+        print('** Form - vfrStatementDefault - Default **')
+        Info = ctx.Node.Data.GetInfo()
+        print(Info.Type)
+        print(Info.DefaultId)
+        # print(Info.Value)
         
         return ctx.Node
 
@@ -1982,7 +2029,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         # Clear the default flag if the option not use array value but has default flag.
         if (OOOObj.GetFlags() & (EFI_IFR_OPTION_DEFAULT | EFI_IFR_OPTION_DEFAULT_MFG)) != 0 and (ctx.vfrConstantValueField().ListType == False) and (self.__IsOrderedList):
             OOOObj.SetFlags(OOOObj.GetFlags() & ~(EFI_IFR_OPTION_DEFAULT | EFI_IFR_OPTION_DEFAULT_MFG))
-
+        
         if self.__CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
             VarStoreName, ReturnCode = gCVfrDataStorage.GetVarStoreName(self.__CurrQestVarInfo.VarStoreId)
             VarStoreGuid = gCVfrDataStorage.GetVarStoreGuid(self.__CurrQestVarInfo.VarStoreId)
@@ -2007,6 +2054,13 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         ctx.Node.Data = OOOObj
         for Ctx in ctx.vfrImageTag():
             self.InsertChild(ctx.Node, Ctx)
+        
+        print('** vfrStatementQuestions - Oneof-Option **')
+        Info = ctx.Node.Data.GetInfo()
+        print(Info.Option)
+        print(Info.Flags)
+        print(Info.Type)
+        print(Info.Value)
 
         return ctx.Node
 
@@ -2086,9 +2140,21 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementQuestionOptionList.
     def visitVfrStatementQuestionOptionList(self, ctx:VfrSyntaxParser.VfrStatementQuestionOptionListContext):
+        
         self.visitChildren(ctx)
         for Ctx in ctx.vfrStatementQuestionOption():
+            if Ctx.vfrStatementQuestionOptionTag() != None:
+                ChildCtx = Ctx.vfrStatementQuestionOptionTag()
+                if ChildCtx.vfrStatementSuppressIfQuest() != None:
+                    SuppressIfNode = ChildCtx.Node
+                    for ChildNode in SuppressIfNode.Child:
+                        ctx.Node.insertChild(ChildNode)
             self.InsertChild(ctx.Node, Ctx)
+            
+        for ChildNode in ctx.Node.Child:
+            if ChildNode.Condition != None:
+                print("test Condition")
+                print(ChildNode.Condition)
         return ctx.Node
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementQuestionOption.
@@ -2191,11 +2257,18 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.__AssignQuestionKey(CBObj, Key)
         
         ctx.Node.Data = CBObj
-        
-
-        EObj = CIfrEnd() #
-        Line = (None if ctx.stop is None else ctx.stop).line
-        EObj.SetLineNo(Line)
+        '''
+        print('** Form - vfrStatementQuestions - CheckBox **')
+        Info = ctx.Node.Data.GetInfo()
+        print(ctx.Node.Condition)
+        print(Info.Question.Header.Prompt)
+        print(Info.Question.Header.Help)
+        print(Info.Question.QuestionId)
+        print(Info.Question.VarStoreId)
+        print(Info.Question.VarStoreInfo.VarName)
+        print(Info.Question.VarStoreInfo.VarOffset)
+        print(Info.Flags)
+        '''
 
         return ctx.Node
 
@@ -2354,10 +2427,17 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         
         ctx.Node.Data = NObj
 
-        EObj = CIfrEnd() #
-        Line = (None if ctx.stop is None else ctx.stop).line
-        EObj.SetLineNo(Line)
-
+        print('** Form - vfrStatementQuestions - Numeric **')
+        Info = ctx.Node.Data.GetInfo()
+        print(Info.Question.Header.Prompt)
+        print(Info.Question.Header.Help)
+        print(Info.Question.QuestionId)
+        print(Info.Question.VarStoreId)
+        print(Info.Question.VarStoreInfo.VarName)
+        print(Info.Question.VarStoreInfo.VarOffset)
+        print(Info.Question.Flags)
+        print(Info.Question.Flags)
+        print(Info.Question.Flags)
         return ctx.Node
 
 
@@ -2715,10 +2795,18 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             print('OneOf question only support UINT8, UINT16, UINT32 and UINT64 data type.')
         
         ctx.Node.Data = OObj
-
-        EObj = CIfrEnd() #
-        Line = (None if ctx.stop is None else ctx.stop).line
-        EObj.SetLineNo(Line)
+        
+        '''
+        print('** Form - vfrStatementQuestions - Oneof **')
+        Info = ctx.Node.Data.GetInfo()
+        print(Info.Question.Header.Prompt)
+        print(Info.Question.Header.Help)
+        print(Info.Question.QuestionId)
+        print(Info.Question.VarStoreId)
+        print(Info.Question.VarStoreInfo.VarName)
+        print(Info.Question.VarStoreInfo.VarOffset)
+        print(Info.Question.Flags)
+        '''    
 
         return ctx.Node
 
@@ -3001,12 +3089,18 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
                 print("OrderedList MaxContainers can't be larger than the max number of elements in array.")
             OLObj.SetMaxContainers(MaxContainers)
-
-        EObj = CIfrEnd() #
-        Line = (None if ctx.stop is None else ctx.stop).line
-        EObj.SetLineNo(Line)
         
         ctx.Node.Data = OLObj
+        '''
+        print('** Form - vfrStatementQuestions - OrderedList **')
+        Info = ctx.Node.Data.GetInfo()
+        print(Info.Question.Header.Prompt)
+        print(Info.Question.Header.Help)
+        print(Info.Question.QuestionId)
+        print(Info.Question.VarStoreId)
+        print(Info.MaxContainers)
+        print(Info.Question.Flags)
+        '''
 
         self.__IsOrderedList = False
 
@@ -3368,6 +3462,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         GOIObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         self.visitChildren(ctx)
         ctx.Node.Data = GOIObj
+        # ctx.Node.Condition = 'grayoutif' + ' ' + ctx.vfrStatementExpression().Exp
         ctx.Node.Condition = 'grayoutif' + ' ' + ctx.vfrStatementExpression().getText()
         for Ctx in ctx.vfrStatementStatList():
             self.InsertChild(ctx.Node, Ctx)
@@ -3424,7 +3519,13 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         LObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         LObj.SetNumber(self.__TransNum(ctx.Number()))
         ctx.Node.Data = LObj
-
+        
+        '''
+        print('** Form - vfrStatementLabel **')
+        Info = ctx.Node.Data.GetInfo()
+        print(ctx.Node.Condition)
+        print(Info.Number)
+        '''
         return ctx.Node
 
 
@@ -3573,6 +3674,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def visitVfrStatementExpression(self, ctx:VfrSyntaxParser.VfrStatementExpressionContext):
         # Root expression extension function called by other function.
         #########################################################
+        ctx.Exp = ctx.getText()
         if ctx.ExpInfo.RootLevel == 0:
             self.__CIfrOpHdrIndex += 1
             if self.__CIfrOpHdrIndex >= MAX_IFR_EXPRESSION_DEPTH:

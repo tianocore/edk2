@@ -661,7 +661,9 @@ class CIfrFormSet(CIfrObj, CIfrOpHeader):
 
     def GetFlags(self):
         return self.__FormSet.Flags
-
+    
+    def GetInfo(self):
+        return self.__FormSet
 
 class CIfrOneOfOption(CIfrObj, CIfrOpHeader):
 
@@ -734,6 +736,9 @@ class CIfrOneOfOption(CIfrObj, CIfrOpHeader):
             self.__OneOfOption.Flags |= EFI_IFR_TYPE_OTHER
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
+
+    def GetInfo(self):
+        return self.__OneOfOption
 
 
 class CIfrOptionKey(CIfrObj, CIfrOpHeader):
@@ -821,6 +826,9 @@ class CIfrVarStore(CIfrObj, CIfrOpHeader):
 
     def SetName(self, Name):
         self.__Varstore.Name = Name  #
+    
+    def GetInfo(self):
+        return self.__Varstore
 
 
 class CIfrVarStoreEfi(CIfrObj, CIfrOpHeader):
@@ -847,7 +855,9 @@ class CIfrVarStoreEfi(CIfrObj, CIfrOpHeader):
 
     def SetAttributes(self, Attributes):
         self.__VarStoreEfi.Attributes = Attributes
-
+    
+    def GetInfo(self):
+        return self.__VarStoreEfi
 
 class CIfrVarStoreNameValue(CIfrObj, CIfrOpHeader):
 
@@ -862,6 +872,9 @@ class CIfrVarStoreNameValue(CIfrObj, CIfrOpHeader):
 
     def SetVarStoreId(self, VarStoreId):
         self.__VarStoreNameValue.VarStoreId = VarStoreId
+    
+    def GetInfo(self):
+        return self.__VarStoreNameValue
 
 
 EFI_BITS_PER_UINT32 = 1 << EFI_BITS_SHIFT_PER_UINT32
@@ -912,6 +925,9 @@ class CIfrForm(CIfrObj, CIfrOpHeader):
 
     def SetFormTitle(self, FormTitle):
         self.__Form.FormTitle = FormTitle
+    
+    def GetInfo(self):
+        return self.__Form
 
 class CIfrFormMap(CIfrObj, CIfrOpHeader):
 
@@ -986,6 +1002,9 @@ class CIfrLabel(CIfrObj, CIfrOpHeader):
 
     def SetNumber(self, Number):
         self.__Label.Number = Number
+    
+    def GetInfo(self):
+        return self.__Label
 
 
 class CIfrRule(CIfrObj, CIfrOpHeader):
@@ -1029,6 +1048,9 @@ class CIfrSubtitle(CIfrObj, CIfrOpHeader, CIfrStatementHeader):
             self.__Subtitle.Flags |= EFI_IFR_FLAGS_HORIZONTAL
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if Flags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
+    
+    def GetInfo(self):
+        return self.__Subtitle
 
 
 class CIfrImage(CIfrObj, CIfrOpHeader):
@@ -1234,6 +1256,9 @@ class CIfrAction(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 
     def SetQuestionConfig(self, QuestionConfig):
         self.__Action.QuestionConfig = QuestionConfig
+    
+    def GetInfo(self):
+        return self.__Action
 
 
 class CIfrText(CIfrObj, CIfrOpHeader, CIfrStatementHeader):
@@ -1246,6 +1271,9 @@ class CIfrText(CIfrObj, CIfrOpHeader, CIfrStatementHeader):
 
     def SetTextTwo(self, StringId):
         self.__Text.TextTwo = StringId
+
+    def GetInfo(self):
+        return self.__Text
 
 
 class CIfrGuid(CIfrObj, CIfrOpHeader):
@@ -1302,6 +1330,9 @@ class CIfrOrderedList(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
             self.__OrderedList.Flags |= EFI_IFR_NO_EMPTY_SET
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
+
+    def GetInfo(self):
+        return self.__OrderedList
 
 
 class CIfrString(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
@@ -1386,7 +1417,9 @@ class CIfrDefault(CIfrObj, CIfrOpHeader):  #
 
     def SetValue(self, Value):  #
         self.__Default.Value = Value
-
+    
+    def GetInfo(self):
+        return self.__Default
 
 class CIfrDefault2(CIfrObj, CIfrOpHeader):
 
@@ -1403,6 +1436,9 @@ class CIfrDefault2(CIfrObj, CIfrOpHeader):
 
     def SetType(self, Type):
         self.__Default.Type = Type
+
+    def GetInfo(self):
+        return self.__Default
 
 
 class CIfrInconsistentIf(CIfrObj, CIfrOpHeader):
@@ -1659,6 +1695,9 @@ class CIfrNumeric(CIfrObj, CIfrOpHeader, CIfrQuestionHeader,
         #  _EMIT_PENDING_OBJ();
         Numeric = EFI_IFR_NUMERIC()
         self.UpdateHeader(Numeric.Header)
+    
+    def GetInfo(self):
+        return self.__Numeric
 
 
 class CIfrOneOf(
@@ -1702,6 +1741,9 @@ class CIfrOneOf(
             self.__OneOf.Flags = LFlags | EDKII_IFR_DISPLAY_UINT_DEC_BIT
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
+    def GetInfo(self):
+        return self.__OneOf
+
 
 class CIfrCheckBox(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 
@@ -1738,6 +1780,9 @@ class CIfrCheckBox(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
             self.__CheckBox.Flags |= EFI_IFR_CHECKBOX_DEFAULT_MFG
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
+
+    def GetInfo(self):
+        return self.__CheckBox
 
 
 class CIfrResetButton(CIfrObj, CIfrOpHeader, CIfrStatementHeader):
