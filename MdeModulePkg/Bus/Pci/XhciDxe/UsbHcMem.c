@@ -132,8 +132,9 @@ UsbHcFreeMemBlock (
 /**
   Alloc some memory from the block.
 
-  @param  Block          The memory block to allocate memory from.
-  @param  Units          Number of memory units to allocate.
+  @param  Block                The memory block to allocate memory from.
+  @param  Units                Number of memory units to allocate.
+  @param  AllocationForRing    The allocated memory is for Ring or not.
 
   @return The pointer to the allocated memory. If couldn't allocate the needed memory,
           the return value is NULL.
@@ -142,7 +143,8 @@ UsbHcFreeMemBlock (
 VOID *
 UsbHcAllocMemFromBlock (
   IN  USBHC_MEM_BLOCK  *Block,
-  IN  UINTN            Units
+  IN  UINTN            Units,
+  IN  BOOLEAN          AllocationForRing
   )
 {
   UINTN  Byte;
@@ -151,12 +153,15 @@ UsbHcAllocMemFromBlock (
   UINT8  StartBit;
   UINTN  Available;
   UINTN  Count;
+  UINTN  MemUnitAddr;
+  UINTN  AlignmentMask;
 
   ASSERT ((Block != 0) && (Units != 0));
 
-  StartByte = 0;
-  StartBit  = 0;
-  Available = 0;
+  StartByte     = 0;
+  StartBit      = 0;
+  Available     = 0;
+  AlignmentMask = ~((UINTN)USBHC_MEM_TRB_RINGS_BOUNDARY - 1);
 
   for (Byte = 0, Bit = 0; Byte < Block->BitsLen;) {
     //
@@ -165,6 +170,20 @@ UsbHcAllocMemFromBlock (
     // Available counts the consective number of zero bit.
     //
     if (!USB_HC_BIT_IS_SET (Block->Bits[Byte], Bit)) {
+      if (AllocationForRing && (Available != 0)) {
+        MemUnitAddr = (UINTN)Block->BufHost + (Byte * 8 + Bit) * USBHC_MEM_UNIT;
+        if ((MemUnitAddr & AlignmentMask) != ((MemUnitAddr - USBHC_MEM_UNIT) & AlignmentMask)) {
+          //
+          // If the TRB Ring memory cross 64K-byte boundary, then restart the
+          // search starting at current memory unit.
+          // Doing so is to meet the TRB Ring boundary requirement in XHCI spec.
+          //
+          Available = 0;
+          StartByte = Byte;
+          StartBit  = Bit;
+        }
+      }
+
       Available++;
 
       if (Available >= Units) {
@@ -438,8 +457,9 @@ UsbHcFreeMemPool (
   Allocate some memory from the host controller's memory pool
   which can be used to communicate with host controller.
 
-  @param  Pool           The host controller's memory pool.
-  @param  Size           Size of the memory to allocate.
+  @param  Pool                 The host controller's memory pool.
+  @param  Size                 Size of the memory to allocate.
+  @param  AllocationForRing    The allocated memory is for Ring or not.
 
   @return The allocated memory or NULL.
 
@@ -447,7 +467,8 @@ UsbHcFreeMemPool (
 VOID *
 UsbHcAllocateMem (
   IN  USBHC_MEM_POOL  *Pool,
-  IN  UINTN           Size
+  IN  UINTN           Size,
+  IN  BOOLEAN         AllocationForRing
   )
 {
   USBHC_MEM_BLOCK  *Head;
@@ -466,7 +487,7 @@ UsbHcAllocateMem (
   // First check whether current memory blocks can satisfy the allocation.
   //
   for (Block = Head; Block != NULL; Block = Block->Next) {
-    Mem = UsbHcAllocMemFromBlock (Block, AllocSize / USBHC_MEM_UNIT);
+    Mem = UsbHcAllocMemFromBlock (Block, AllocSize / USBHC_MEM_UNIT, AllocationForRing);
 
     if (Mem != NULL) {
       ZeroMem (Mem, Size);
@@ -501,7 +522,7 @@ UsbHcAllocateMem (
   // Add the new memory block to the pool, then allocate memory from it
   //
   UsbHcInsertMemBlockToPool (Head, NewBlock);
-  Mem = UsbHcAllocMemFromBlock (NewBlock, AllocSize / USBHC_MEM_UNIT);
+  Mem = UsbHcAllocMemFromBlock (NewBlock, AllocSize / USBHC_MEM_UNIT, AllocationForRing);
 
   if (Mem != NULL) {
     ZeroMem (Mem, Size);
