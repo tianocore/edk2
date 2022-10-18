@@ -516,8 +516,11 @@ class CIfrMinMaxStepData():
         self.__MinMaxStepData.u64.Step = 0
         self.__ValueIsSet = False
         self.__IsNumeric = NumericOpcode
+        self.__VarType = EFI_IFR_TYPE_NUM_SIZE_64 # 
 
     def SetMinMaxStepData(self, MinValue, MaxValue, Step, VarType):  #
+        self.__VarType = VarType
+        
         if self.__ValueIsSet == False:
             if VarType == EFI_IFR_TYPE_NUM_SIZE_64:
                 self.__MinMaxStepData.u64.MinValue = MinValue
@@ -561,6 +564,9 @@ class CIfrMinMaxStepData():
                 if MaxValue > self.__MinMaxStepData.u8.MaxValue:
                     self.__MinMaxStepData.u8.MaxValue = MaxValue
                 self.__MinMaxStepData.u8.Step = Step
+    
+    def GetVarType(self):
+        return self.__VarType
 
     def IsNumericOpcode(self):
         return self.__IsNumeric
@@ -1170,6 +1176,9 @@ class CIfrRef(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
     def SetFormId(self, FormId):
         self.__Ref.FormId = FormId
 
+    def GetInfo(self):
+        return self.__Ref
+
 
 class CIfrRef2(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 
@@ -1186,6 +1195,9 @@ class CIfrRef2(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
     def SetQuestionId(self, QuestionId):
 
         self.__Ref2.QuestionId = QuestionId
+
+    def GetInfo(self):
+        return self.__Ref2
 
 
 class CIfrRef3(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
@@ -1209,6 +1221,9 @@ class CIfrRef3(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 
     def SetFormSetId(self, FormSetId):
         self.__Ref3.FormSetId = FormSetId
+
+    def GetInfo(self):
+        return self.__Ref3
 
 
 class CIfrRef4(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
@@ -1237,6 +1252,9 @@ class CIfrRef4(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
     def SetDevicePath(self, DevicePath):
         self.__Ref4.DevicePath = DevicePath
 
+    def GetInfo(self):
+        return self.__Ref4
+
 
 class CIfrRef5(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 
@@ -1244,6 +1262,9 @@ class CIfrRef5(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
         self.__Ref5 = EFI_IFR_REF5()
         CIfrOpHeader.__init__(self, self.__Ref5.Header, EFI_IFR_REF_OP)
         CIfrQuestionHeader.__init__(self, self.__Ref5.Question)
+    
+    def GetInfo(self):
+        return self.__Ref5
 
 
 class CIfrAction(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
@@ -1369,6 +1390,9 @@ class CIfrString(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 
     def SetMaxSize(self, MaxSize):
         self.__Str.MaxSize = MaxSize
+    
+    def GetInfo(self):
+        return self.__Str
 
 
 class CIfrPassword(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
@@ -1601,7 +1625,9 @@ class CIfrDate(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
             self.__Date.Flags |= QF_DATE_STORAGE_WAKEUP
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
-
+    
+    def GetInfo(self):
+        return self.__Date
 
 class CIfrTime(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 
@@ -1642,6 +1668,9 @@ class CIfrTime(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
             self.__Time.Flags |= QF_TIME_STORAGE_WAKEUP
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
+    
+    def GetInfo(self):
+        return self.__Time
 
 
 class CIfrNumeric(CIfrObj, CIfrOpHeader, CIfrQuestionHeader,
@@ -1796,6 +1825,9 @@ class CIfrResetButton(CIfrObj, CIfrOpHeader, CIfrStatementHeader):
 
     def SetDefaultId(self, DefaultId):
         self.__ResetButton.DefaultId = DefaultId
+    
+    def GetInfo(self):
+        return self.__ResetButton
 
 
 class CIfrOr(CIfrObj, CIfrOpHeader):

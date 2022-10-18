@@ -321,9 +321,9 @@ locals[Value=EFI_IFR_TYPE_VALUE(), ListType=False]
     |   'ONE'           
     |   'ONES'         
     |   'ZERO'
-    |   Number ':' Number ':' Number
-    |   Number '/' Number '/' Number
-    |   Number ';' Number ';' guidDefinition ';' 'STRING_TOKEN' '(' Number ')'
+    |   Number ':' Number ':' Number 
+    |   Number '/' Number '/' Number 
+    |   Number ';' Number ';' guidDefinition ';' 'STRING_TOKEN' '(' Number ')' 
     |   'STRING_TOKEN' '(' Number ')'
     |   '{' Number (',' Number)* '}'
     ;
