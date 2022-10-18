@@ -68,6 +68,32 @@ FreeAlignedBuffer (
 }
 
 /**
+  Remove trailing spaces from the string
+
+  @param String   The ASCII string to remove the trailing spaces
+
+  @retval the new length of the string
+**/
+UINTN
+RemoveTrailingSpaces (
+  IN OUT CHAR8   *String
+)
+{
+  UINTN  Length = AsciiStrLen (String);
+
+  if (Length == 0) {
+    return 0;
+  }
+
+  while ((Length > 0) && (String[Length-1] == ' ')) {
+    Length--;
+  }
+
+  String[Length] = 0;
+  return Length;
+}
+
+/**
   The user Entry Point for module ScsiDisk.
 
   The user code starts with this function.
@@ -203,6 +229,9 @@ ScsiDiskDriverBindingStart (
   UINT8                 MaxRetry;
   BOOLEAN               NeedRetry;
   BOOLEAN               MustReadCapacity;
+  CHAR8                 VendorStr[VENDOR_IDENTIFICATION_LENGTH + 1];
+  CHAR8                 ProductStr[PRODUCT_IDENTIFICATION_LENGTH + 1];
+  CHAR16                DeviceStr[VENDOR_IDENTIFICATION_LENGTH + PRODUCT_IDENTIFICATION_LENGTH + 2];
 
   MustReadCapacity = TRUE;
 
@@ -354,19 +383,35 @@ ScsiDiskDriverBindingStart (
           }
         }
 
+        CopyMem (
+            VendorStr,
+            &ScsiDiskDevice->InquiryData.Reserved_5_95[VENDOR_IDENTIFICATION_OFFSET],
+            VENDOR_IDENTIFICATION_LENGTH);
+        VendorStr[VENDOR_IDENTIFICATION_LENGTH] = 0;
+        RemoveTrailingSpaces (VendorStr);
+
+        CopyMem (
+            ProductStr,
+            &ScsiDiskDevice->InquiryData.Reserved_5_95[PRODUCT_IDENTIFICATION_OFFSET],
+            PRODUCT_IDENTIFICATION_LENGTH);
+        ProductStr[PRODUCT_IDENTIFICATION_LENGTH] = 0;
+        RemoveTrailingSpaces (ProductStr);
+
+        UnicodeSPrint (DeviceStr, sizeof (DeviceStr), L"%a %a", VendorStr, ProductStr);
+
         ScsiDiskDevice->ControllerNameTable = NULL;
         AddUnicodeString2 (
           "eng",
           gScsiDiskComponentName.SupportedLanguages,
           &ScsiDiskDevice->ControllerNameTable,
-          L"SCSI Disk Device",
+          DeviceStr,
           TRUE
           );
         AddUnicodeString2 (
           "en",
           gScsiDiskComponentName2.SupportedLanguages,
           &ScsiDiskDevice->ControllerNameTable,
-          L"SCSI Disk Device",
+          DeviceStr,
           FALSE
           );
         return EFI_SUCCESS;

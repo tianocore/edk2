@@ -46,6 +46,7 @@
   UefiDriverEntryPoint
   DebugLib
   DevicePathLib
+  PrintLib
 
 [Protocols]
   gEfiDiskInfoProtocolGuid                      ## BY_START

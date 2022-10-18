@@ -30,6 +30,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiScsiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/PrintLib.h>
 
 #include <IndustryStandard/Scsi.h>
 #include <IndustryStandard/Atapi.h>
@@ -178,6 +179,13 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gScsiDiskComponentName2;
 #define SCSI_COMMAND_VERSION_1  0x01
 #define SCSI_COMMAND_VERSION_2  0x02
 #define SCSI_COMMAND_VERSION_3  0x03
+
+// Per SCSI spec, EFI_SCSI_INQUIRY_DATA.Reserved_5_95[3 - 10] has the Vendor identification
+// EFI_SCSI_INQUIRY_DATA.Reserved_5_95[11 - 26] has the product identification
+#define VENDOR_IDENTIFICATION_OFFSET   3
+#define VENDOR_IDENTIFICATION_LENGTH   8
+#define PRODUCT_IDENTIFICATION_OFFSET  11
+#define PRODUCT_IDENTIFICATION_LENGTH  16
 
 //
 // SCSI Disk Timeout Experience Value
