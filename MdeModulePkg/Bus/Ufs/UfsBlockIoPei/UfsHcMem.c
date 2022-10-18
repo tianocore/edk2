@@ -2,6 +2,7 @@
 
 Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 
+Copyright (c) 1985 - 2022, American Megatrends International LLC.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -18,8 +19,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 UFS_PEIM_MEM_BLOCK *
 UfsPeimAllocMemBlock (
-  IN  UINTN  Pages
-  )
+    IN  UINTN  Pages
+    )
 {
   UFS_PEIM_MEM_BLOCK    *Block;
   VOID                  *BufHost;
@@ -58,11 +59,11 @@ UfsPeimAllocMemBlock (
   Block->Bits = (UINT8 *)(UINTN)TempPtr;
 
   Status = IoMmuAllocateBuffer (
-             Pages,
-             &BufHost,
-             &MappedAddr,
-             &Mapping
-             );
+                        Pages,
+                        &BufHost,
+                        &MappedAddr,
+                        &Mapping
+                        );
   if (EFI_ERROR (Status)) {
     return NULL;
   }
@@ -84,11 +85,11 @@ UfsPeimAllocMemBlock (
   @param  Block          The memory block to free.
 
 **/
-VOID
+VOID 
 UfsPeimFreeMemBlock (
-  IN UFS_PEIM_MEM_POOL   *Pool,
-  IN UFS_PEIM_MEM_BLOCK  *Block
-  )
+    IN UFS_PEIM_MEM_POOL   *Pool,
+    IN UFS_PEIM_MEM_BLOCK  *Block
+)
 {
   ASSERT ((Pool != NULL) && (Block != NULL));
 
@@ -107,9 +108,9 @@ UfsPeimFreeMemBlock (
 **/
 VOID *
 UfsPeimAllocMemFromBlock (
-  IN  UFS_PEIM_MEM_BLOCK  *Block,
-  IN  UINTN               Units
-  )
+    IN  UFS_PEIM_MEM_BLOCK  *Block,
+    IN  UINTN               Units
+    )
 {
   UINTN  Byte;
   UINT8  Bit;
@@ -174,11 +175,11 @@ UfsPeimAllocMemFromBlock (
   @param  Block          The memory block to insert.
 
 **/
-VOID
+VOID 
 UfsPeimInsertMemBlockToPool (
-  IN UFS_PEIM_MEM_BLOCK  *Head,
-  IN UFS_PEIM_MEM_BLOCK  *Block
-  )
+    IN UFS_PEIM_MEM_BLOCK  *Head,
+    IN UFS_PEIM_MEM_BLOCK  *Block
+    )
 {
   ASSERT ((Head != NULL) && (Block != NULL));
   Block->Next = Head->Next;
@@ -414,6 +415,10 @@ UfsPeimFreeMem (
   //
   ASSERT (Block != NULL);
 
+  if (Block == NULL)
+  {
+    return;
+  }
   //
   // Release the current memory block if it is empty and not the head
   //
