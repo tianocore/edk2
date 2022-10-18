@@ -949,6 +949,7 @@ AhciPioTransfer (
   EFI_AHCI_COMMAND_LIST          CmdList;
   UINT32                         PrdCount;
   UINT32                         Retry;
+  EFI_STATUS                     RecoveryStatus;
 
   if (Read) {
     Flag = EfiPciIoOperationBusMasterWrite;
@@ -1026,8 +1027,8 @@ AhciPioTransfer (
 
     if (Status == EFI_DEVICE_ERROR) {
       DEBUG ((DEBUG_ERROR, "PIO command failed at retry %d\n", Retry));
-      Status = AhciRecoverPortError (PciIo, Port);
-      if (EFI_ERROR (Status)) {
+      RecoveryStatus = AhciRecoverPortError (PciIo, Port);
+      if (EFI_ERROR (RecoveryStatus)) {
         break;
       }
     } else {
@@ -1122,6 +1123,7 @@ AhciDmaTransfer (
   EFI_PCI_IO_PROTOCOL            *PciIo;
   EFI_TPL                        OldTpl;
   UINT32                         Retry;
+  EFI_STATUS                     RecoveryStatus;
 
   Map   = NULL;
   PciIo = Instance->PciIo;
@@ -1220,8 +1222,8 @@ AhciDmaTransfer (
       Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisD2H);
       if (Status == EFI_DEVICE_ERROR) {
         DEBUG ((DEBUG_ERROR, "DMA command failed at retry: %d\n", Retry));
-        Status = AhciRecoverPortError (PciIo, Port);
-        if (EFI_ERROR (Status)) {
+        RecoveryStatus = AhciRecoverPortError (PciIo, Port);
+        if (EFI_ERROR (RecoveryStatus)) {
           break;
         }
       } else {
@@ -1261,14 +1263,14 @@ AhciDmaTransfer (
       Status = AhciCheckFisReceived (PciIo, Port, SataFisD2H);
       if (Status == EFI_DEVICE_ERROR) {
         DEBUG ((DEBUG_ERROR, "DMA command failed at retry: %d\n", Task->RetryTimes));
-        Status = AhciRecoverPortError (PciIo, Port);
+        RecoveryStatus = AhciRecoverPortError (PciIo, Port);
         //
         // If recovery passed mark the Task as not started and change the status
         // to EFI_NOT_READY. This will make the higher level call this function again
         // and on next call the command will be re-issued due to IsStart being FALSE.
         // This also makes the next condition decrement the RetryTimes.
         //
-        if (Status == EFI_SUCCESS) {
+        if (RecoveryStatus == EFI_SUCCESS) {
           Task->IsStart = FALSE;
           Status        = EFI_NOT_READY;
         }
@@ -1375,6 +1377,7 @@ AhciNonDataTransfer (
   EFI_AHCI_COMMAND_FIS   CFis;
   EFI_AHCI_COMMAND_LIST  CmdList;
   UINT32                 Retry;
+  EFI_STATUS             RecoveryStatus;
 
   //
   // Package read needed
@@ -1415,8 +1418,8 @@ AhciNonDataTransfer (
     Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisD2H);
     if (Status == EFI_DEVICE_ERROR) {
       DEBUG ((DEBUG_ERROR, "Non data transfer failed at retry %d\n", Retry));
-      Status = AhciRecoverPortError (PciIo, Port);
-      if (EFI_ERROR (Status)) {
+      RecoveryStatus = AhciRecoverPortError (PciIo, Port);
+      if (EFI_ERROR (RecoveryStatus)) {
         break;
       }
     } else {
