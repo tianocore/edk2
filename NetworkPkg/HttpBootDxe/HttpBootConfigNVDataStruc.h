@@ -27,8 +27,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define FORMID_MAIN_FORM  1
 
-#define KEY_INITIATOR_URI       0x101
-#define KEY_INITIATOR_PROXY_URI 0x102
+#define KEY_INITIATOR_URI        0x101
+#define KEY_INITIATOR_PROXY_URI  0x102
 
 #define HTTP_BOOT_DEFAULT_DESCRIPTION_STR  L"UEFI HTTP"
 
