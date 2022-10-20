@@ -102,6 +102,12 @@ F: */RiscV64/
 M: Sunil V L <sunilvl@ventanamicro.com> [vlsunil]
 R: Daniel Schaefer <git@danielschaefer.me> [JohnAZoidberg]
 
+LOONGARCH64
+F: */LoongArch64/
+M: Chao Li <lichao@loongson.cn> [kilaterlee]
+M: Baoqi Zhang <zhangbaoqi@loongson.cn> [zhangbaoqi-ls]
+R: Dongyan Qian <qiandongyan@loongson.cn> [MarsDoge]
+
 EDK II Continuous Integration:
 ------------------------------
 .azurepipelines/
