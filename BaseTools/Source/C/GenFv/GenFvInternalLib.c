@@ -3559,7 +3559,7 @@ Returns:
       }
 
       // Machine type is LOONGARCH64, set a flag so LoongArch64 reset vector processed.
-      if ((MachineType == EFI_IMAGE_MACHINE_LOONGARCH64)) {
+      if (MachineType == EFI_IMAGE_MACHINE_LOONGARCH64) {
         VerboseMsg("Located LoongArch64 SEC core in child FV");
         mLoongArch = TRUE;
       }
@@ -3721,7 +3721,7 @@ Returns:
       mRiscV = TRUE;
     }
 
-    if ( (ImageContext.Machine == EFI_IMAGE_MACHINE_LOONGARCH64) ) {
+    if (ImageContext.Machine == EFI_IMAGE_MACHINE_LOONGARCH64) {
       mLoongArch = TRUE;
     }
 
@@ -4002,7 +4002,7 @@ Returns:
       mArm = TRUE;
     }
 
-    if ( (ImageContext.Machine == EFI_IMAGE_MACHINE_LOONGARCH64) ) {
+    if (ImageContext.Machine == EFI_IMAGE_MACHINE_LOONGARCH64) {
       mLoongArch = TRUE;
     }
 
