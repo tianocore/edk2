@@ -25,10 +25,8 @@ else:
 gCVfrVarDataTypeDB = CVfrVarDataTypeDB()
 gCVfrDefaultStore =  CVfrDefaultStore()
 gCVfrDataStorage = CVfrDataStorage()
-Root = VfrTreeNode()
 
 # This class defines a complete generic visitor for a parse tree produced by VfrSyntaxParser.
-
 
 class VfrSyntaxVisitor(ParseTreeVisitor):
     gZeroEfiIfrTypeValue = EFI_IFR_TYPE_VALUE()
@@ -56,8 +54,12 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.__IsTimeOp = False
 
         self.__Root = VfrTreeNode()
-
-
+    
+    def GetRoot(self):
+        return self.__Root
+    
+    def GetQuestionDB(self):
+        return self.__CVfrQuestionDB
 
     def __TransId(self, StringIdentifierToken, DefaultValue=None):
         if StringIdentifierToken == None:
@@ -156,11 +158,14 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
 
         self.__CVfrQuestionDB.PrintAllQuestion('test\\Questions.txt')
-        self.DumpYaml(Root.Child[0], 'test\demo.yaml')
-        # print(gCurrentQuestion)
-
+        gCVfrVarDataTypeDB.Dump("test\\DataTypeInfo.txt")
+        
         return
-    
+
+    def DumpYaml(self, Root, FileName):
+        with open(FileName, 'w') as f:
+            self.DumpYamlDfs(Root, f)
+        f.close()
     
     def DumpYamlDfs(self, Root, f):
         
@@ -411,20 +416,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         return 
 
 
-    def DumpYaml(self, Root, FileName):
-        with open(FileName, 'w') as f:
-            self.DumpYamlDfs(Root, f)
-        f.close()
-        
-    
-        '''   
-        if Root.Child != []:
-            for child in Root.Child:
-                dfs(child)
-        '''
-
-
-
     # Visit a parse tree produced by VfrSyntaxParser#pragmaPackShowDef.
     def visitPragmaPackShowDef(self, ctx:VfrSyntaxParser.PragmaPackShowDefContext):
 
@@ -614,7 +605,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrFormSetDefinition.
     def visitVfrFormSetDefinition(self, ctx:VfrSyntaxParser.VfrFormSetDefinitionContext):
-        self.InsertChild(Root, ctx)
+        self.InsertChild(self.__Root, ctx)
 
         self.visitChildren(ctx)
 
