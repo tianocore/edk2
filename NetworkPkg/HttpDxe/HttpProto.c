@@ -737,6 +737,8 @@ HttpInitProtocol (
     goto ON_ERROR;
   }
 
+  HttpInstance->UrlLen = HTTP_URL_BUFFER_LEN;
+
   return EFI_SUCCESS;
 
 ON_ERROR:
@@ -846,8 +848,22 @@ HttpCleanProtocol (
 
   if (HttpInstance->Url != NULL) {
     FreePool (HttpInstance->Url);
-    HttpInstance->Url = NULL;
+    HttpInstance->Url    = NULL;
+    HttpInstance->UrlLen = 0;
   }
+
+  if (HttpInstance->ProxyUrl != NULL) {
+    FreePool (HttpInstance->ProxyUrl);
+    HttpInstance->ProxyUrl    = NULL;
+    HttpInstance->ProxyUrlLen = 0;
+  }
+
+  if (HttpInstance->EndPointHostName != NULL) {
+    FreePool (HttpInstance->EndPointHostName);
+    HttpInstance->EndPointHostName = NULL;
+  }
+
+  HttpInstance->ProxyConnected = FALSE;
 
   NetMapClean (&HttpInstance->TxTokens);
   NetMapClean (&HttpInstance->RxTokens);

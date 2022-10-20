@@ -279,6 +279,122 @@ HttpBootDhcp (
 }
 
 /**
+  Issue calls to HttpBootGetBootFile() based on current Boot File State
+
+  @param[in]          Private         The pointer to the driver's private data.
+  @param[in, out]     BufferSize      On input the size of Buffer in bytes. On output with a return
+                                      code of EFI_SUCCESS, the amount of data transferred to
+                                      Buffer. On output with a return code of EFI_BUFFER_TOO_SMALL,
+                                      the size of Buffer required to retrieve the requested file.
+  @param[in]          Buffer          The memory buffer to transfer the file to. If Buffer is NULL,
+                                      then the size of the requested file is returned in
+                                      BufferSize.
+  @param[out]         ImageType       The image type of the downloaded file.
+
+  @retval EFI_SUCCESS              The file was loaded.
+  @retval EFI_INVALID_PARAMETER    BufferSize is NULL or Buffer Size is not NULL but Buffer is NULL.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources
+  @retval EFI_BUFFER_TOO_SMALL     The BufferSize is too small to read the current directory entry.
+                                   BufferSize has been updated with the size needed to complete
+                                   the request.
+  @retval EFI_ACCESS_DENIED        Server authentication failed.
+  @retval Others                   Unexpected error happened.
+
+**/
+EFI_STATUS
+HttpBootGetBootFileCaller (
+  IN     HTTP_BOOT_PRIVATE_DATA  *Private,
+  IN OUT UINTN                   *BufferSize,
+  IN     VOID                    *Buffer        OPTIONAL,
+  OUT HTTP_BOOT_IMAGE_TYPE       *ImageType
+  )
+{
+  HTTP_GET_BOOT_FILE_STATE  State;
+  EFI_STATUS                Status;
+
+  if (Private->BootFileSize == 0) {
+    State = GetBootFileHead;
+  } else {
+    State = LoadBootFile;
+  }
+
+  for ( ; ;) {
+    switch (State) {
+      case GetBootFileHead:
+        //
+        // Try to use HTTP HEAD method.
+        //
+        Status = HttpBootGetBootFile (
+                   Private,
+                   TRUE,
+                   &Private->BootFileSize,
+                   NULL,
+                   &Private->ImageType
+                   );
+        if ((EFI_ERROR (Status)) && (Status != EFI_BUFFER_TOO_SMALL)) {
+          if ((Private->AuthData != NULL) && (Status == EFI_ACCESS_DENIED)) {
+            //
+            // Try to use HTTP HEAD method again since the Authentication information is provided.
+            //
+            State = GetBootFileHead;
+          } else {
+            State = GetBootFileGet;
+          }
+        } else {
+          State = LoadBootFile;
+        }
+
+        break;
+
+      case GetBootFileGet:
+        //
+        // Failed to get file size by HEAD method, may be trunked encoding, try HTTP GET method.
+        //
+        ASSERT (Private->BootFileSize == 0);
+        Status = HttpBootGetBootFile (
+                   Private,
+                   FALSE,
+                   &Private->BootFileSize,
+                   NULL,
+                   &Private->ImageType
+                   );
+        if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL)) {
+          State = GetBootFileError;
+        } else {
+          State = LoadBootFile;
+        }
+
+        break;
+
+      case LoadBootFile:
+        if (*BufferSize < Private->BootFileSize) {
+          *BufferSize = Private->BootFileSize;
+          *ImageType  = Private->ImageType;
+          Status      = EFI_BUFFER_TOO_SMALL;
+          return Status;
+        }
+
+        //
+        // Load the boot file into Buffer
+        //
+        Status = HttpBootGetBootFile (
+                   Private,
+                   FALSE,
+                   BufferSize,
+                   Buffer,
+                   ImageType
+                   );
+        return Status;
+
+      case GetBootFileError:
+      default:
+        AsciiPrint ("\n  Error: Could not retrieve NBP file size from HTTP server.\n");
+        return Status;
+    }
+  }
+}
+
+/**
   Attempt to download the boot file through HTTP message exchange.
 
   @param[in]          Private         The pointer to the driver's private data.
@@ -349,68 +465,10 @@ HttpBootLoadFile (
     }
   }
 
-  if (Private->BootFileSize == 0) {
-    //
-    // Discover the information about the bootfile if we haven't.
-    //
-
-    //
-    // Try to use HTTP HEAD method.
-    //
-    Status = HttpBootGetBootFile (
-               Private,
-               TRUE,
-               &Private->BootFileSize,
-               NULL,
-               &Private->ImageType
-               );
-    if ((Private->AuthData != NULL) && (Status == EFI_ACCESS_DENIED)) {
-      //
-      // Try to use HTTP HEAD method again since the Authentication information is provided.
-      //
-      Status = HttpBootGetBootFile (
-                 Private,
-                 TRUE,
-                 &Private->BootFileSize,
-                 NULL,
-                 &Private->ImageType
-                 );
-    } else if ((EFI_ERROR (Status)) && (Status != EFI_BUFFER_TOO_SMALL)) {
-      //
-      // Failed to get file size by HEAD method, may be trunked encoding, try HTTP GET method.
-      //
-      ASSERT (Private->BootFileSize == 0);
-      Status = HttpBootGetBootFile (
-                 Private,
-                 FALSE,
-                 &Private->BootFileSize,
-                 NULL,
-                 &Private->ImageType
-                 );
-      if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL)) {
-        AsciiPrint ("\n  Error: Could not retrieve NBP file size from HTTP server.\n");
-        goto ON_EXIT;
-      }
-    }
-  }
-
-  if (*BufferSize < Private->BootFileSize) {
-    *BufferSize = Private->BootFileSize;
-    *ImageType  = Private->ImageType;
-    Status      = EFI_BUFFER_TOO_SMALL;
-    goto ON_EXIT;
-  }
-
   //
-  // Load the boot file into Buffer
+  // Load the Boot File
   //
-  Status = HttpBootGetBootFile (
-             Private,
-             FALSE,
-             BufferSize,
-             Buffer,
-             ImageType
-             );
+  Status = HttpBootGetBootFileCaller (Private, BufferSize, Buffer, ImageType);
 
 ON_EXIT:
   HttpBootUninstallCallback (Private);
