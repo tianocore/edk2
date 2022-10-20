@@ -15,8 +15,8 @@ class VfrTreeNode():
         self.Expression = None
         self.Parent = None
         self.Child = []
-        self.NextRel = None # needed?
-        self.LastRel = None # needed?
+        # self.NextRel = None # needed?
+        # self.LastRel = None # needed?
     
     def HasCondition(self) ->bool:
         if self.Condition == None:
@@ -46,13 +46,13 @@ class VfrTreeNode():
             if not pos:
                 LastTree = self.Child[-1]
                 self.Child.append(NewNode)
-                LastTree.NextRel = NewNode
-                NewNode.LastRel = LastTree
+               # LastTree.NextRel = NewNode
+               # NewNode.LastRel = LastTree
             else:
-                NewNode.NextRel = self.Child[pos-1].NextRel
-                NewNode.LastRel = self.Child[pos].LastRel
-                self.Child[pos-1].NextRel = NewNode
-                self.Child[pos].LastRel = NewNode
+              #  NewNode.NextRel = self.Child[pos-1].NextRel
+               # NewNode.LastRel = self.Child[pos].LastRel
+               # self.Child[pos-1].NextRel = NewNode
+                #self.Child[pos].LastRel = NewNode
                 self.Child.insert(pos, NewNode)
         NewNode.Parent = self
         if self.Condition != None and NewNode.Condition != None:

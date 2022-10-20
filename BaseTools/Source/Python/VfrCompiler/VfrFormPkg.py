@@ -681,7 +681,7 @@ class CIfrOneOfOption(CIfrObj, CIfrOpHeader):
         self.__OneOfOption.Option = EFI_STRING_ID_INVALID
         self.__OneOfOption.Type = EFI_IFR_TYPE_OTHER
         self.__OneOfOption.Value = EFI_IFR_TYPE_VALUE()  #
-
+        
     def SetOption(self, Option):
         self.__OneOfOption.Option = Option
 
@@ -759,6 +759,9 @@ class CIfrOptionKey(CIfrObj, CIfrOpHeader):
         self.__OptionKey.QuestionId = QuestionId
         self.__OptionKey.OptionValue = OptionValue
         self.__OptionKey.KeyValue = KeyValue
+    
+    def GetInfo(self):
+        return  self.__OptionKey
 
 
 class CIfrClass(CIfrObj, CIfrOpHeader):
@@ -773,7 +776,9 @@ class CIfrClass(CIfrObj, CIfrOpHeader):
 
     def SetClass(self, Class):
         self.__Class = Class
-
+        
+    def GetInfo(self):
+        return self.__Class
 
 class CIfrSubClass(CIfrObj, CIfrOpHeader):
 
@@ -788,6 +793,8 @@ class CIfrSubClass(CIfrObj, CIfrOpHeader):
     def SetSubClass(self, SubClass):
         self.__SubClass = SubClass
 
+    def GetInfo(self):
+        return self.__SubClass
 
 class CIfrDefaultStore(CIfrObj, CIfrOpHeader):
 
@@ -809,6 +816,9 @@ class CIfrDefaultStore(CIfrObj, CIfrOpHeader):
 
     def SetDefaultStore(self, DefaultStore: EFI_IFR_DEFAULTSTORE):
         self.__DefaultStore = DefaultStore
+    
+    def GetInfo(self):
+        return self.__DefaultStore
 
 
 class CIfrVarStore(CIfrObj, CIfrOpHeader):
@@ -939,7 +949,7 @@ class CIfrFormMap(CIfrObj, CIfrOpHeader):
 
     def __init__(self):
         self.__FormMap = EFI_IFR_FORM_MAP()
-        self.__MethodMap = EFI_IFR_FORM_MAP_METHOD()
+        self.__MethodMapList = [] # EFI_IFR_FORM_MAP_METHOD()
         CIfrOpHeader.__init__(self, self.__FormMap.Header, EFI_IFR_FORM_MAP_OP)
         self.__FormMap.FormId = 0
     
@@ -954,8 +964,13 @@ class CIfrFormMap(CIfrObj, CIfrOpHeader):
         return VfrReturnCode.VFR_RETURN_SUCCESS
     
     def SetFormMapMethod(self, MethodTitle, MethodGuid: EFI_GUID):
-        self.__MethodMap.MethodTitle = MethodTitle
-        self.__MethodMap.MethodIdentifier = MethodGuid
+        MethodMap = EFI_IFR_FORM_MAP_METHOD()
+        MethodMap.MethodTitle = MethodTitle
+        MethodMap.MethodIdentifier = MethodGuid
+        self.__MethodMapList.append(MethodMap)
+    
+    def GetInfo(self):
+        return self.__FormMap, self.__MethodMapList
 
 class CIfrEnd(CIfrObj, CIfrOpHeader):
 
@@ -981,6 +996,9 @@ class CIfrBanner(CIfrObj, CIfrOpHeader):
 
     def SetAlign(self, Align):
         self.__Banner.Alignment = Align
+    
+    def GetInfo(self):
+        return self.__Banner
 
 
 class CIfrTimeout(CIfrObj, CIfrOpHeader):
@@ -995,6 +1013,9 @@ class CIfrTimeout(CIfrObj, CIfrOpHeader):
 
     def SetTimeout(self, Timeout):
         self.__Timeout.TimeOut = Timeout
+    
+    def GetInfo(self):
+        return self.__Timeout
 
 
 class CIfrLabel(CIfrObj, CIfrOpHeader):
@@ -1315,6 +1336,9 @@ class CIfrGuid(CIfrObj, CIfrOpHeader):
 
     def SetData(self, Databuff): 
         self.__Data = Databuff
+    
+    def GetInfo(self):
+        return self.__Guid
 
 
 class CIfrOrderedList(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):

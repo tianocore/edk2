@@ -314,7 +314,7 @@ locals[VarIdStr='']
     ;
 
 vfrConstantValueField 
-locals[Value=EFI_IFR_TYPE_VALUE(), ListType=False]
+locals[Value=EFI_IFR_TYPE_VALUE(), ValueStr='', ListType=False]
     :   ('-')? Number          
     |   'TRUE'          
     |   'FALSE'         
