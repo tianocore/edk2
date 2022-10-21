@@ -1026,7 +1026,7 @@ class ValueExpressionEx(ValueExpression):
                                     Size += ItemSize
 
                             if Size > 0:
-                                PcdValue = '{' + ','.join(AllPcdValueList) + '}'
+                                PcdValue = '{' + ', '.join(AllPcdValueList) + '}'
                         else:
                             raise  BadExpression("Type: %s, Value: %s, %s"%(self.PcdType, PcdValue, Value))
 

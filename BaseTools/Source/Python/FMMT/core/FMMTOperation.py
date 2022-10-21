@@ -63,9 +63,10 @@ def DeleteFfs(inputfile: str, TargetFfs_name: str, outputfile: str, Fv_name: str
     FmmtParser.WholeFvTree.FindNode(TargetFfs_name, FmmtParser.WholeFvTree.Findlist)
     # Choose the Specfic DeleteFfs with Fv info
     if Fv_name:
-        for item in FmmtParser.WholeFvTree.Findlist:
-            if item.Parent.key != Fv_name and item.Parent.Data.Name != Fv_name:
-                FmmtParser.WholeFvTree.Findlist.remove(item)
+        FindNum = len(FmmtParser.WholeFvTree.Findlist)
+        for index in range(FindNum-1, -1, -1):
+            if FmmtParser.WholeFvTree.Findlist[index].Parent.key != Fv_name and FmmtParser.WholeFvTree.Findlist[index].Parent.Data.Name != Fv_name:
+                FmmtParser.WholeFvTree.Findlist.remove(FmmtParser.WholeFvTree.Findlist[index])
     Status = False
     if FmmtParser.WholeFvTree.Findlist != []:
         for Delete_Ffs in FmmtParser.WholeFvTree.Findlist:
@@ -149,9 +150,10 @@ def ReplaceFfs(inputfile: str, Ffs_name: str, newffsfile: str, outputfile: str, 
     new_ffs.Data.PadData = GetPadSize(new_ffs.Data.Size, FFS_COMMON_ALIGNMENT) * b'\xff'
     FmmtParser.WholeFvTree.FindNode(Ffs_name, FmmtParser.WholeFvTree.Findlist)
     if Fv_name:
-        for item in FmmtParser.WholeFvTree.Findlist:
-            if item.Parent.key != Fv_name and item.Parent.Data.Name != Fv_name:
-                FmmtParser.WholeFvTree.Findlist.remove(item)
+        FindNum = len(FmmtParser.WholeFvTree.Findlist)
+        for index in range(FindNum-1, -1, -1):
+            if FmmtParser.WholeFvTree.Findlist[index].Parent.key != Fv_name and FmmtParser.WholeFvTree.Findlist[index].Parent.Data.Name != Fv_name:
+                FmmtParser.WholeFvTree.Findlist.remove(FmmtParser.WholeFvTree.Findlist[index])
     if FmmtParser.WholeFvTree.Findlist != []:
         for TargetFfs in FmmtParser.WholeFvTree.Findlist:
             FfsMod = FvHandler(newFmmtParser.WholeFvTree.Child[0], TargetFfs)
@@ -180,18 +182,51 @@ def ExtractFfs(inputfile: str, Ffs_name: str, outputfile: str, Fv_name: str=None
     logger.debug('Done!')
     FmmtParser.WholeFvTree.FindNode(Ffs_name, FmmtParser.WholeFvTree.Findlist)
     if Fv_name:
-        for item in FmmtParser.WholeFvTree.Findlist:
-            if item.Parent.key != Fv_name and item.Parent.Data.Name != Fv_name:
-                FmmtParser.WholeFvTree.Findlist.remove(item)
+        FindNum = len(FmmtParser.WholeFvTree.Findlist)
+        for index in range(FindNum-1, -1, -1):
+            if FmmtParser.WholeFvTree.Findlist[index].Parent.key != Fv_name and FmmtParser.WholeFvTree.Findlist[index].Parent.Data.Name != Fv_name:
+                FmmtParser.WholeFvTree.Findlist.remove(FmmtParser.WholeFvTree.Findlist[index])
     if FmmtParser.WholeFvTree.Findlist != []:
         TargetNode = FmmtParser.WholeFvTree.Findlist[0]
-        TargetFv = TargetNode.Parent
-        if TargetFv.Data.Header.Attributes & EFI_FVB2_ERASE_POLARITY:
-            TargetNode.Data.Header.State = c_uint8(
-                ~TargetNode.Data.Header.State)
-        FinalData = struct2stream(TargetNode.Data.Header) + TargetNode.Data.Data
-        with open(outputfile, "wb") as f:
-            f.write(FinalData)
-        logger.debug('Extract ffs data is saved in {}.'.format(outputfile))
+        if TargetNode.type == FV_TREE or SEC_FV_TREE or DATA_FV_TREE:
+            FinalData = struct2stream(TargetNode.Data.Header) + TargetNode.Data.Data
+            with open(outputfile, "wb") as f:
+                f.write(FinalData)
+            logger.debug('Extract fv data is saved in {}.'.format(outputfile))
+        else:
+            TargetFv = TargetNode.Parent
+            if TargetFv.Data.Header.Attributes & EFI_FVB2_ERASE_POLARITY:
+                TargetNode.Data.Header.State = c_uint8(
+                    ~TargetNode.Data.Header.State)
+            FinalData = struct2stream(TargetNode.Data.Header) + TargetNode.Data.Data
+            with open(outputfile, "wb") as f:
+                f.write(FinalData)
+            logger.debug('Extract ffs data is saved in {}.'.format(outputfile))
     else:
-        logger.error('Target Ffs not found!!!')
+        logger.error('Target Ffs/Fv not found!!!')
+
+def ShrinkFv(inputfile: str, outputfile: str) -> None:
+    if not os.path.exists(inputfile):
+        logger.error("Invalid inputfile, can not open {}.".format(inputfile))
+        raise Exception("Process Failed: Invalid inputfile!")
+    # 1. Data Prepare
+    with open(inputfile, "rb") as f:
+        whole_data = f.read()
+    FmmtParser = FMMTParser(inputfile, ROOT_TREE)
+    # 2. DataTree Create
+    logger.debug('Parsing inputfile data......')
+    FmmtParser.ParserFromRoot(FmmtParser.WholeFvTree, whole_data)
+    logger.debug('Done!')
+    TargetFv = FmmtParser.WholeFvTree.Child[0]
+    if TargetFv:
+        FvMod = FvHandler(TargetFv)
+        Status = FvMod.ShrinkFv()
+    else:
+        logger.error('Target Fv not found!!!')
+    # 4. Data Encapsulation
+    if Status:
+        logger.debug('Start encapsulating data......')
+        FmmtParser.Encapsulation(FmmtParser.WholeFvTree, False)
+        with open(outputfile, "wb") as f:
+            f.write(FmmtParser.FinalData)
+        logger.debug('Encapsulated data is saved in {}.'.format(outputfile))

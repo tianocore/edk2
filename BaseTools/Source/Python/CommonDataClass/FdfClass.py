@@ -190,6 +190,18 @@ class GuidSectionClassObject (SectionClassObject) :
         self.FvParentAddr = None
         self.IncludeFvSection = False
 
+## SubType GUID section data in FDF
+#
+#
+class SubTypeGuidSectionClassObject (SectionClassObject) :
+    ## The constructor
+    #
+    #   @param  self        The object pointer
+    #
+    def __init__(self):
+        SectionClassObject.__init__(self)
+        self.SubTypeGuid = None
+
 ## UI section data in FDF
 #
 #

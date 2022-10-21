@@ -24,7 +24,8 @@ parser.add_argument("-d", "--Delete", dest="Delete", nargs='+',
                         If not given TargetFvName, all the existed target Ffs will be deleted'")
 parser.add_argument("-e", "--Extract", dest="Extract", nargs='+',
                     help="Extract a Ffs Info: '-e inputfile TargetFvName(Optional) TargetFfsName outputfile\
-                        If not given TargetFvName, the first found target Ffs will be extracted'")
+                        If not given TargetFvName, the first found target Ffs will be extracted.\
+                        If only given TargetFvName, not given TargetFfsName, the TargetFv will be extracted to output file'")
 parser.add_argument("-a", "--Add", dest="Add", nargs='+',
                     help="Add a Ffs into a FV:'-a inputfile TargetFvName newffsfile outputfile'")
 parser.add_argument("-r", "--Replace", dest="Replace", nargs='+',
@@ -40,6 +41,8 @@ parser.add_argument("-c", "--ConfigFilePath", dest="ConfigFilePath", nargs='+',
                         FmmtConf file saves the target guidtool used in compress/uncompress process.\
                         If do not provide, FMMT tool will search the inputfile folder for FmmtConf.ini firstly, if not found,\
                         the FmmtConf.ini saved in FMMT tool's folder will be used as default.")
+parser.add_argument("-s", "--ShrinkFv", dest="ShrinkFv", nargs='+',
+                    help="Shrink the Fv file: '-s InputFvfile OutputFvfile")
 
 def print_banner():
     print("")
@@ -110,6 +113,9 @@ class FMMT():
         else:
             ReplaceFfs(inputfile, self.CheckFfsName(Ffs_name), newffsfile, outputfile)
 
+    def Shrink(self,inputfile: str, outputfile: str) -> None:
+        self.SetDestPath(inputfile)
+        ShrinkFv(inputfile, outputfile)
 
 def main():
     args=parser.parse_args()
@@ -141,6 +147,8 @@ def main():
                 fmmt.Replace(args.Replace[0],args.Replace[2],args.Replace[3],args.Replace[4],args.Replace[1])
             else:
                 fmmt.Replace(args.Replace[0],args.Replace[1],args.Replace[2],args.Replace[3])
+        elif args.ShrinkFv:
+            fmmt.Shrink(args.ShrinkFv[0], args.ShrinkFv[1])
         else:
             parser.print_help()
     except Exception as e:

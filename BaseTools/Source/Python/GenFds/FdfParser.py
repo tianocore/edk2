@@ -42,6 +42,7 @@ from .DataSection import DataSection
 from .DepexSection import DepexSection
 from .CompressSection import CompressSection
 from .GuidSection import GuidSection
+from .SubTypeGuidSection import SubTypeGuidSection
 from .Capsule import EFI_CERT_TYPE_PKCS7_GUID, EFI_CERT_TYPE_RSA2048_SHA256_GUID, Capsule
 from .CapsuleData import CapsuleFfs, CapsulePayload, CapsuleFv, CapsuleFd, CapsuleAnyFile, CapsuleAfile
 from .RuleComplexFile import RuleComplexFile
@@ -2892,6 +2893,27 @@ class FdfParser:
             DepexSectionObj.Expression = self._SkippedChars.rstrip(T_CHAR_BRACE_R)
             Obj.SectionList.append(DepexSectionObj)
 
+        elif self._IsKeyword("SUBTYPE_GUID"):
+            if AlignValue == 'Auto':
+                raise Warning("Auto alignment can only be used in PE32 or TE section ", self.FileName, self.CurrentLineNumber)
+            SubTypeGuidValue = None
+            if not self._GetNextGuid():
+                raise Warning.Expected("GUID", self.FileName, self.CurrentLineNumber)
+            else:
+                SubTypeGuidValue = self._Token
+
+            if not self._IsToken(TAB_EQUAL_SPLIT):
+                raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
+            if not self._GetNextToken():
+                raise Warning.Expected("section file path", self.FileName, self.CurrentLineNumber)
+            FileName = self._Token
+
+            SubTypeGuidSectionObj = SubTypeGuidSection()
+            SubTypeGuidSectionObj.Alignment = AlignValue
+            SubTypeGuidSectionObj.SubTypeGuid = SubTypeGuidValue
+            SubTypeGuidSectionObj.SectFileName = FileName
+            Obj.SectionList.append(SubTypeGuidSectionObj)
+
         else:
             if not self._GetNextWord():
                 raise Warning.Expected("section type", self.FileName, self.CurrentLineNumber)
@@ -3996,7 +4018,7 @@ class FdfParser:
             if FileType not in {BINARY_FILE_TYPE_PE32, "SEC_PE32"}:
                 raise Warning(WarningString % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == BINARY_FILE_TYPE_PIC:
-            if FileType not in {BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_PIC}:
+            if FileType not in {BINARY_FILE_TYPE_PIC, "SEC_PIC"}:
                 raise Warning(WarningString % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == BINARY_FILE_TYPE_TE:
             if FileType not in {BINARY_FILE_TYPE_TE, "SEC_TE"}:

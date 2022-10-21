@@ -145,7 +145,7 @@ def ModifyFvSystemGuid(TargetFv) -> None:
             TargetFv.Data.Data += struct2stream(item.Data.Header)+ item.Data.Data + item.Data.PadData
 
 class FvHandler:
-    def __init__(self, NewFfs, TargetFfs) -> None:
+    def __init__(self, NewFfs, TargetFfs=None) -> None:
         self.NewFfs = NewFfs
         self.TargetFfs = TargetFfs
         self.Status = False
@@ -155,7 +155,6 @@ class FvHandler:
     def CompressData(self, TargetTree) -> None:
         TreePath = TargetTree.GetTreePath()
         pos = len(TreePath)
-        self.Status = False
         while pos:
             if not self.Status:
                 if TreePath[pos-1].type == SECTION_TREE and TreePath[pos-1].Data.Type == 0x02:
@@ -487,7 +486,6 @@ class FvHandler:
                     ~self.NewFfs.Data.Header.State)
             # If TargetFv have enough free space, just move part of the free space to NewFfs, split free space to NewFfs and new free space.
             if TargetLen < 0:
-                self.Status = True
                 self.TargetFfs.Data.Data = b'\xff' * (-TargetLen)
                 TargetFv.Data.Free_Space = (-TargetLen)
                 TargetFv.Data.ModFvExt()
@@ -498,13 +496,14 @@ class FvHandler:
                 ModifyFfsType(self.NewFfs)
                 # Recompress from the Fv node to update all the related node data.
                 self.CompressData(TargetFv)
-            elif TargetLen == 0:
                 self.Status = True
+            elif TargetLen == 0:
                 TargetFv.Child.remove(self.TargetFfs)
                 TargetFv.insertChild(self.NewFfs)
                 ModifyFfsType(self.NewFfs)
                 # Recompress from the Fv node to update all the related node data.
                 self.CompressData(TargetFv)
+                self.Status = True
             # If TargetFv do not have enough free space, need move part of the free space of TargetFv's parent Fv to TargetFv/NewFfs.
             else:
                 if TargetFv.type == FV_TREE:
@@ -638,4 +637,30 @@ class FvHandler:
         self.CompressData(Delete_Fv)
         self.Status = True
         logger.debug('Done!')
+        return self.Status
+
+    def ShrinkFv(self) -> bool:
+        TargetFv = self.NewFfs
+        TargetFv.Data.Data = b''
+        if not TargetFv.Data.Free_Space:
+            self.Status = True
+        else:
+            BlockSize = TargetFv.Data.Header.BlockMap[0].Length
+            New_Free_Space = TargetFv.Data.Free_Space%BlockSize
+            Removed_Space = TargetFv.Data.Free_Space - New_Free_Space
+            TargetFv.Child[-1].Data.Data = b'\xff' * New_Free_Space
+            TargetFv.Data.Size -= Removed_Space
+            TargetFv.Data.Header.Fvlength = TargetFv.Data.Size
+            ModifyFvSystemGuid(TargetFv)
+            for item in TargetFv.Child:
+                if item.type == FFS_FREE_SPACE:
+                    TargetFv.Data.Data += item.Data.Data + item.Data.PadData
+                else:
+                    TargetFv.Data.Data += struct2stream(item.Data.Header)+ item.Data.Data + item.Data.PadData
+            TargetFv.Data.ModFvExt()
+            TargetFv.Data.ModFvSize()
+            TargetFv.Data.ModExtHeaderData()
+            ModifyFvExtData(TargetFv)
+            TargetFv.Data.ModCheckSum()
+            self.Status = True
         return self.Status
