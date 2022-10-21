@@ -76,8 +76,8 @@ FreeAlignedBuffer (
 **/
 UINTN
 RemoveTrailingSpaces (
-  IN OUT CHAR8   *String
-)
+  IN OUT CHAR8  *String
+  )
 {
   UINTN  Length = AsciiStrLen (String);
 
@@ -384,16 +384,18 @@ ScsiDiskDriverBindingStart (
         }
 
         CopyMem (
-            VendorStr,
-            &ScsiDiskDevice->InquiryData.Reserved_5_95[VENDOR_IDENTIFICATION_OFFSET],
-            VENDOR_IDENTIFICATION_LENGTH);
+          VendorStr,
+          &ScsiDiskDevice->InquiryData.Reserved_5_95[VENDOR_IDENTIFICATION_OFFSET],
+          VENDOR_IDENTIFICATION_LENGTH
+          );
         VendorStr[VENDOR_IDENTIFICATION_LENGTH] = 0;
         RemoveTrailingSpaces (VendorStr);
 
         CopyMem (
-            ProductStr,
-            &ScsiDiskDevice->InquiryData.Reserved_5_95[PRODUCT_IDENTIFICATION_OFFSET],
-            PRODUCT_IDENTIFICATION_LENGTH);
+          ProductStr,
+          &ScsiDiskDevice->InquiryData.Reserved_5_95[PRODUCT_IDENTIFICATION_OFFSET],
+          PRODUCT_IDENTIFICATION_LENGTH
+          );
         ProductStr[PRODUCT_IDENTIFICATION_LENGTH] = 0;
         RemoveTrailingSpaces (ProductStr);
 
