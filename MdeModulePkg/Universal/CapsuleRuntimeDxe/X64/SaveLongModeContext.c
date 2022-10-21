@@ -59,7 +59,14 @@ AllocateReservedMemoryBelow4G (
                   Pages,
                   &Address
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "ERROR AllocateReservedMemoryBelow4G(): %r\n", Status));
+    return NULL;
+  }
+  if (Address == 0) {
+    DEBUG ((DEBUG_ERROR, "ERROR AllocateReservedMemoryBelow4G(): AllocatePages() returned NULL"));
+    return NULL;
+  }
 
   Buffer = (VOID *)(UINTN)Address;
   ZeroMem (Buffer, Size);
@@ -159,14 +166,23 @@ PrepareContextForCapsulePei (
   DEBUG ((DEBUG_INFO, "CapsuleRuntimeDxe X64 TotalPagesNum - 0x%x pages\n", TotalPagesNum));
 
   LongModeBuffer.PageTableAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedMemoryBelow4G (EFI_PAGES_TO_SIZE (TotalPagesNum));
-  ASSERT (LongModeBuffer.PageTableAddress != 0);
+  if (LongModeBuffer.PageTableAddress == 0) {
+    DEBUG ((DEBUG_ERROR, "FATAL ERROR: CapsuleLongModeBuffer cannot be saved, "));
+    DEBUG ((DEBUG_ERROR, "PageTableAddress allocation failed. Capsule in PEI may fail!\n"));
+    return;
+  }
 
   //
   // Allocate stack
   //
   LongModeBuffer.StackSize        = PcdGet32 (PcdCapsulePeiLongModeStackSize);
   LongModeBuffer.StackBaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedMemoryBelow4G (PcdGet32 (PcdCapsulePeiLongModeStackSize));
-  ASSERT (LongModeBuffer.StackBaseAddress != 0);
+  if (LongModeBuffer.StackBaseAddress == 0) {
+    DEBUG ((DEBUG_ERROR, "FATAL ERROR: CapsuleLongModeBuffer cannot be saved, "));
+    DEBUG ((DEBUG_ERROR, "StackBaseAddress allocation failed. Capsule in PEI may fail!\n"));
+    gBS->FreePages (LongModeBuffer.PageTableAddress, TotalPagesNum);
+    return;
+  }
 
   Status = gRT->SetVariable (
                   EFI_CAPSULE_LONG_MODE_BUFFER_NAME,
@@ -189,6 +205,7 @@ PrepareContextForCapsulePei (
       );
   } else {
     DEBUG ((DEBUG_ERROR, "FATAL ERROR: CapsuleLongModeBuffer cannot be saved: %r. Capsule in PEI may fail!\n", Status));
+    gBS->FreePages (LongModeBuffer.PageTableAddress, TotalPagesNum);
     gBS->FreePages (LongModeBuffer.StackBaseAddress, EFI_SIZE_TO_PAGES (LongModeBuffer.StackSize));
   }
 }
