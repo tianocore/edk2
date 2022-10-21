@@ -75,6 +75,12 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         # error handle , value is too large to store
         return NumberToken
 
+    def __ExtractOriginalText(self, ctx):
+        Source = ctx.start.getTokenSource()
+        InputStream = Source.inputStream
+        start, stop  = ctx.start.start, ctx.stop.stop
+        return InputStream.getText(start, stop)
+
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrProgram.
     def visitVfrProgram(self, ctx:VfrSyntaxParser.VfrProgramContext):
@@ -161,260 +167,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         gCVfrVarDataTypeDB.Dump("test\\DataTypeInfo.txt")
         
         return
-
-    def DumpYaml(self, Root, FileName):
-        with open(FileName, 'w') as f:
-            self.DumpYamlDfs(Root, f)
-        f.close()
-    
-    def DumpYamlDfs(self, Root, f):
-        
-        if Root.OpCode != None:
-            
-            if Root.OpCode == EFI_IFR_FORM_SET_OP:
-                Info = Root.Data.GetInfo()
-                f.write('Formset:\n')
-                f.write('  Guid:  {' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
-                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
-                    '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\n')
-                f.write('  Title:  {}\n'.format(Info.FormSetTitle))
-                f.write('  Help:  {}\n'.format(Info.Help))
-                for Guid in Root.Data.GetClassGuid():
-                    f.write('  ClassGuid:  {' + '{}, {}, {},'.format('0x%x'%(Guid.Data1),'0x%x'%(Guid.Data2), '0x%x'%(Guid.Data3)) \
-                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Guid.Data4[0]), '0x%x'%(Guid.Data4[1]), '0x%x'%(Guid.Data4[2]), '0x%x'%(Guid.Data4[3]), \
-                    '0x%x'%(Guid.Data4[4]), '0x%x'%(Guid.Data4[5]), '0x%x'%(Guid.Data4[6]), '0x%x'%(Guid.Data4[7])) + ' }}\n')
-                           
-            if Root.OpCode == EFI_IFR_VARSTORE_OP:
-                Info = Root.Data.GetInfo()
-                f.write('  - varstore:\n')
-                f.write('      varid:  {}\n'.format(Info.VarStoreId))
-                f.write('      name:  {}\n'.format(Info.Name))
-                f.write('      size:  {}\n'.format(Info.Size))
-                f.write('      guid:  {' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
-                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
-                    '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\n')
-
-            if Root.OpCode == EFI_IFR_VARSTORE_EFI_OP:
-                Info = Root.Data.GetInfo()
-                f.write('  - efivarstore:\n')
-                f.write('      varid:  {}\n'.format(Info.VarStoreId))
-                f.write('      name:  {}\n'.format(Info.Name))
-                f.write('      size:  {}\n'.format(Info.Size))
-                f.write('      guid:  {' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
-                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
-                    '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\n')
-                f.write('      attribute:  {}\n'.format(Info.Attributes))
-
-            if Root.OpCode == EFI_IFR_VARSTORE_NAME_VALUE_OP:
-                Info = Root.Data.GetInfo()
-                f.write('  - namevaluevarstore:\n')
-                f.write('      varid:  {}\n'.format(Info.VarStoreId))
-                # f.write('      name:  {}\n'.format(Info.Name))
-                f.write('      guid:  {' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
-                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
-                    '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\n')
-                
-            if Root.OpCode == EFI_IFR_FORM_OP:
-                Info = Root.Data.GetInfo()
-                f.write('  - form:\n')
-                f.write('      FormId:  {}\n'.format(Info.FormId))
-                f.write('      FormTitle:  {}\n'.format(Info.FormTitle))
-
-            if Root.OpCode == EFI_IFR_FORM_MAP_OP:
-                Info, MethodMapList = Root.Data.GetInfo()
-                f.write('  - formmap:\n')
-                f.write('      FormId:  {}\n'.format(Info.FormId))
-                for MethodMap in  MethodMapList:    
-                    f.write('      maptitle:  {}\n'.format(MethodMap.MethodTitle))
-                    f.write('      mapguid:  {' + '{}, {}, {},'.format('0x%x'%(MethodMap.MethodIdentifier.Data1),'0x%x'%(MethodMap.MethodIdentifier.Data2), '0x%x'%(MethodMap.MethodIdentifier.Data3)) \
-                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(MethodMap.MethodIdentifier.Data4[0]), '0x%x'%(MethodMap.MethodIdentifier.Data4[1]), '0x%x'%(MethodMap.MethodIdentifier.Data4[2]), '0x%x'%(MethodMap.MethodIdentifier.Data4[3]), \
-                    '0x%x'%(MethodMap.MethodIdentifier.Data4[4]), '0x%x'%(MethodMap.MethodIdentifier.Data4[5]), '0x%x'%(MethodMap.MethodIdentifier.Data4[6]), '0x%x'%(MethodMap.MethodIdentifier.Data4[7])) + ' }}\n')
-                    
-            if Root.OpCode == EFI_IFR_SUBTITLE_OP:
-                Info = Root.Data.GetInfo()
-                if Root.Condition != None:
-                    f.write('          condition:  {}\n'.format(Root.Condition))
-                f.write('      - subtitle:\n')
-                f.write('          prompt:  {}\n'.format(Info.Statement.Prompt))
-
-            if Root.OpCode == EFI_IFR_TEXT_OP:
-                Info = Root.Data.GetInfo()
-                if Root.Condition != None:
-                    f.write('          condition:  {}\n'.format(Root.Condition))
-                f.write('      - text:\n')
-                f.write('          prompt:  {}\n'.format(Info.Statement.Prompt))
-                f.write('          help:  {}\n'.format(Info.Statement.Help))
-                f.write('          text:  {}\n'.format(Info.TextTwo))
-            
-            if Root.OpCode == EFI_IFR_ACTION_OP:
-                Info = Root.Data.GetInfo()  
-                if Root.Condition != None:
-                    f.write('          condition:  {}\n'.format(Root.Condition))
-                f.write('      - text:\n')
-                f.write('          prompt:  {}\n'.format(Info.Question.Header.Prompt))
-                f.write('          help:  {}\n'.format(Info.Question.Header.Help))
-                f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
-                f.write('          varstoreid:  {}\n'.format(Info.Question.VarStoreId))
-                f.write('          flags:  {}\n'.format(Info.Question.Flags))
-                f.write('          questionconfig:  {}\n'.format(Info.QuestionConfig))  
-
-            if Root.OpCode == EFI_IFR_ONE_OF_OP:
-                Info = Root.Data.GetInfo()  
-                f.write('      - oneof:\n')
-                if Root.Condition != None:
-                    f.write('          condition:  {}\n'.format(Root.Condition))
-                    
-                f.write('          prompt:  {}\n'.format(Info.Question.Header.Prompt))
-                f.write('          help:  {}\n'.format(Info.Question.Header.Help))
-                f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
-                f.write('          varstoreid:  {}\n'.format(Info.Question.VarStoreId))
-                f.write('          varname:  {}\n'.format(Info.Question.VarStoreInfo.VarName))
-                f.write('          varoffset:  {}\n'.format(Info.Question.VarStoreInfo.VarOffset))
-                f.write('          flags:  {}\n'.format(Info.Question.Flags)) 
-
-            if Root.OpCode == EFI_IFR_ONE_OF_OPTION_OP:
-                Info = Root.Data.GetInfo()  
-                f.write('          - option:\n')
-                if Root.Condition != None:
-                    f.write('              condition:  {}\n'.format(Root.Condition))
-                    
-                f.write('              flag:  {}\n'.format(Info.Flags))
-                f.write('              type:  {}\n'.format(Info.Type))
-                f.write('              value:\n')
-               # f.write('            value:  {}\n'.format(Info.Value))
-
-            if Root.OpCode == EFI_IFR_DEFAULT_OP:
-                Info = Root.Data.GetInfo()  
-                f.write('          - default:\n')
-                if Root.Condition != None:
-                    f.write('              condition:  {}\n'.format(Root.Condition))
-                    
-                f.write('              type:  {}\n'.format(Info.Type))
-                f.write('              varstoreid:  {}\n'.format(Info.DefaultId))
-                f.write('              value:\n')
-               # f.write('            value:  {}\n'.format(Info.Value))
-
-            if Root.OpCode == EFI_IFR_ORDERED_LIST_OP:
-                Info = Root.Data.GetInfo()  
-                f.write('      - orderedlist:\n')
-                if Root.Condition != None:
-                    f.write('          condition:  {}\n'.format(Root.Condition))
-                    
-                f.write('          prompt:  {}\n'.format(Info.Question.Header.Prompt))
-                f.write('          help:  {}\n'.format(Info.Question.Header.Help))
-                f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
-                f.write('          varstoreid:  {}\n'.format(Info.Question.VarStoreId))
-                f.write('          maxContainers:  {}\n'.format(Info.MaxContainers))
-                f.write('          flags:  {}\n'.format(Info.Question.Flags)) 
-
-            if Root.OpCode == EFI_IFR_NUMERIC_OP:
-                Info = Root.Data.GetInfo()  
-                f.write('      - numeric:\n')
-                if Root.Condition != None:
-                    f.write('          condition:  {}\n'.format(Root.Condition))
-                    
-                f.write('          prompt:  {}\n'.format(Info.Question.Header.Prompt))
-                f.write('          help:  {}\n'.format(Info.Question.Header.Help))
-                f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
-                f.write('          varstoreid:  {}\n'.format(Info.Question.VarStoreId))
-                f.write('          varname:  {}\n'.format(Info.Question.VarStoreInfo.VarName))
-                f.write('          varoffset:  {}\n'.format(Info.Question.VarStoreInfo.VarOffset))
-                f.write('          flags:  {}\n'.format(Info.Question.Flags)) 
-
-            if Root.OpCode == EFI_IFR_CHECKBOX_OP:
-                Info = Root.Data.GetInfo()  
-                f.write('      - checkbox:\n')
-                if Root.Condition != None:
-                    f.write('          condition:  {}\n'.format(Root.Condition))
-                    
-                f.write('          prompt:  {}\n'.format(Info.Question.Header.Prompt))
-                f.write('          help:  {}\n'.format(Info.Question.Header.Help))
-                f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
-                f.write('          varstoreid:  {}\n'.format(Info.Question.VarStoreId))
-                f.write('          varname:  {}\n'.format(Info.Question.VarStoreInfo.VarName))
-                f.write('          varoffset:  {}\n'.format(Info.Question.VarStoreInfo.VarOffset))
-                f.write('          flags:  {}\n'.format(Info.Question.Flags)) 
-            
-            if Root.OpCode == EFI_IFR_STRING_OP:
-                Info = Root.Data.GetInfo()  
-                f.write('      - string:\n')
-                if Root.Condition != None:
-                    f.write('          condition:  {}\n'.format(Root.Condition))
-                    
-                f.write('          prompt:  {}\n'.format(Info.Question.Header.Prompt))
-                f.write('          help:  {}\n'.format(Info.Question.Header.Help))
-                f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
-                f.write('          varstoreid:  {}\n'.format(Info.Question.VarStoreId))
-                f.write('          varname:  {}\n'.format(Info.Question.VarStoreInfo.VarName))
-                f.write('          varoffset:  {}\n'.format(Info.Question.VarStoreInfo.VarOffset))
-                f.write('          flags:  {}\n'.format(Info.Question.Flags)) 
-                f.write('          stringflags:  {}\n'.format(Info.Flags)) 
-                f.write('          stringminsize:  {}\n'.format(Info.MaxSize)) 
-                f.write('          stringmaxsize:  {}\n'.format(Info.MinSize)) 
-
-            if Root.OpCode == EFI_IFR_REF_OP:
-                Info = Root.Data.GetInfo()  
-                f.write('      - goto:\n')
-                if Root.Condition != None:
-                    f.write('          condition:  {}\n'.format(Root.Condition))
-                
-                if type(Root.Data) == CIfrRef4:
-                    f.write('          formid:  {}\n'.format(Info.FormId))
-                    f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
-                    f.write('          formsetid:  {' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
-                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.FormSetId.Data4[0]), '0x%x'%(Info.FormSetId.Data4[1]), '0x%x'%(Info.FormSetId.Data4[2]), '0x%x'%(Info.FormSetId.Data4[3]), \
-                    '0x%x'%(Info.FormSetId.Data4[4]), '0x%x'%(Info.FormSetId.Data4[5]), '0x%x'%(Info.FormSetId.Data4[6]), '0x%x'%(Info.FormSetId.Data4[7])) + ' }}\n')
-                    f.write('          devicepath:  {}\n'.format(Info.DevicePath))
-
-                if type(Root.Data) == CIfrRef3:
-                    f.write('          formid:  {}\n'.format(Info.FormId))
-                    f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
-                    f.write('          formsetid:  {' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
-                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.FormSetId.Data4[0]), '0x%x'%(Info.FormSetId.Data4[1]), '0x%x'%(Info.FormSetId.Data4[2]), '0x%x'%(Info.FormSetId.Data4[3]), \
-                    '0x%x'%(Info.FormSetId.Data4[4]), '0x%x'%(Info.FormSetId.Data4[5]), '0x%x'%(Info.FormSetId.Data4[6]), '0x%x'%(Info.FormSetId.Data4[7])) + ' }}\n')
-
-                if type(Root.Data) == CIfrRef2:
-                    f.write('          formid:  {}\n'.format(Info.FormId))
-                    f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
-
-                if type(Root.Data) == CIfrRef:
-                    f.write('          formid:  {}\n'.format(Info.FormId))
-
-                f.write('          prompt:  {}\n'.format(Info.Question.Header.Prompt)) 
-                f.write('          help:  {}\n'.format(Info.Question.Header.Help)) 
-
-            if Root.OpCode == EFI_IFR_GUID_OP:
-                Info = Root.Data.GetInfo() 
-                if type(Root.Data) == CIfrLabel: # type(Info) == EFI_IFR_GUID_LABEL
-                    f.write('      - label:\n')
-                    if Root.Condition != None:
-                        f.write('          condition:  {}\n'.format(Root.Condition))
-                        
-                    f.write('          labelnumber:  {}\n'.format(Info.Number))
-
-                if type(Root.Data) == CIfrBanner: 
-                    f.write('      - banner:\n')
-                    if Root.Condition != None:
-                        f.write('          condition:  {}\n'.format(Root.Condition))
-                        
-                    f.write('          title:  {}\n'.format(Info.Title))
-                    f.write('          linenumber:  {}\n'.format(Info.LineNumber))
-                    f.write('          align:  {}\n'.format(Info.Alignment))
-
-                if type(Root.Data) == CIfrTimeout: 
-                    f.write('      - banner:\n')
-                    if Root.Condition != None:
-                        f.write('          condition:  {}\n'.format(Root.Condition))
-                        
-                    f.write('          timeout:  {}\n'.format(Info.TimeOut))
-
-            
-        if Root.Child != []:
-            for Child in Root.Child:
-                self.DumpYamlDfs(Child, f)
-        
-        return 
-
 
     # Visit a parse tree produced by VfrSyntaxParser#pragmaPackShowDef.
     def visitPragmaPackShowDef(self, ctx:VfrSyntaxParser.PragmaPackShowDefContext):
@@ -606,7 +358,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by VfrSyntaxParser#vfrFormSetDefinition.
     def visitVfrFormSetDefinition(self, ctx:VfrSyntaxParser.VfrFormSetDefinitionContext):
         self.InsertChild(self.__Root, ctx)
-
         self.visitChildren(ctx)
 
         ClassGuidNum = 0
@@ -785,6 +536,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         for Ctx in ctx.vfrFormSet():
             self.InsertChild(ctx.Node, Ctx)
+        
         return ctx.Node
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrFormSet.
@@ -1026,12 +778,13 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def visitVfrStatementDisableIfFormSet(self, ctx:VfrSyntaxParser.VfrStatementDisableIfFormSetContext):
 
         DIObj = CIfrDisableIf()
-        self.visitChildren(ctx)
         DIObj.SetLineNo((None if ctx.start is None else ctx.start).line)
-        self.__ConstantOnlyInExpression = False
+        self.__ConstantOnlyInExpression = False # position 
         ctx.Node.Data = DIObj
-        Condition = 'disableif' + ' ' + ctx.vfrStatementExpression().getText()
+        Condition = 'disableif' + ' ' + self.__ExtractOriginalText(ctx.vfrStatementExpression())
         ctx.Node.Condition = Condition
+        
+        self.visitChildren(ctx)
 
         EObj = CIfrEnd() #
         Line = (None if ctx.stop is None else ctx.stop).line
@@ -1044,12 +797,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def visitVfrStatementSuppressIfFormSet(self, ctx:VfrSyntaxParser.VfrStatementSuppressIfFormSetContext):
 
         SIObj = CIfrSuppressIf()
-        self.visitChildren(ctx)
         SIObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         ctx.Node.Data = SIObj
-        Condition = 'suppressif' + ' ' +  ctx.vfrStatementExpression().getText()
+        Condition = 'suppressif' + ' ' +  self.__ExtractOriginalText(ctx.vfrStatementExpression())
         ctx.Node.Condition = Condition
-
+        self.visitChildren(ctx)
 
 
         EObj = CIfrEnd() #
@@ -1601,12 +1353,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.__CVfrRulesDB.RegisterRule(RuleName)
         RObj.SetRuleId(self.__CVfrRulesDB.GetRuleId(RuleName))
         ctx.Node.Data = RObj
-        ctx.Node.Expression = ctx.vfrStatementExpression().getText()
+        ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
 
         # expression
         # end rule
         return ctx.Node
-
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementStat.
     def visitVfrStatementStat(self, ctx:VfrSyntaxParser.VfrStatementStatContext):
@@ -1632,7 +1383,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         Prompt = self.__TransNum(ctx.Number())
         SObj.SetPrompt(Prompt)
-
+        
         self.visitChildren(ctx)
 
         if ctx.vfrSubtitleFlags() != None:
@@ -2021,7 +1772,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         IIObj.SetError(self.__TransNum(ctx.Number()))
 
         ctx.Node.Data = IIObj
-        ctx.Node.Expression = ctx.vfrStatementExpression().getText()
+        ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
 
         EObj = CIfrEnd() #
         Line = (None if ctx.stop is None else ctx.stop).line
@@ -2038,7 +1789,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         NSIObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         NSIObj.SetError(self.__TransNum(ctx.Number()))
         ctx.Node.Data = NSIObj
-        ctx.Node.Expression = ctx.vfrStatementExpression().getText()
+        ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
 
         EObj = CIfrEnd() #
         Line = (None if ctx.stop is None else ctx.stop).line
@@ -2054,7 +1805,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         DIObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         ctx.Node.Data = DIObj
-        ctx.Node.Expression = ctx.vfrStatementExpression().getText()
+        ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
 
         EObj = CIfrEnd() #
         Line = (None if ctx.stop is None else ctx.stop).line
@@ -2112,7 +1863,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         WIObj.SetWarning(self.__TransNum(ctx.Number(0)))
         WIObj.SetTimeOut(self.__TransNum(ctx.Number(1)))
         ctx.Node.Data = WIObj
-        ctx.Node.Expression = ctx.vfrStatementExpression().getText()
+        ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
 
         EObj = CIfrEnd() #
         Line = (None if ctx.stop is None else ctx.stop).line
@@ -2154,12 +1905,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementSuppressIfQuest.
     def visitVfrStatementSuppressIfQuest(self, ctx:VfrSyntaxParser.VfrStatementSuppressIfQuestContext):
 
-        SIObj = CIfrSuppressIf()
-        self.visitChildren(ctx)
-
+        SIObj = CIfrSuppressIf2()
         SIObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         ctx.Node.Data = SIObj
-        ctx.Node.Condition = 'suppressif' +  ' ' + ctx.vfrStatementExpression().getText()
+        ctx.Node.Condition = 'suppressif' + ' ' + self.__ExtractOriginalText(ctx.vfrStatementExpression())
 
         return ctx.Node
 
@@ -2293,8 +2042,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         VObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         ctx.Node.Data = VObj
-        ctx.Node.Expression = ctx.vfrStatementExpression().getText()
-        # ctx.Node.Parent = ctx.parentCtx.Node
+        ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
 
         EObj = CIfrEnd() #
         Line = (None if ctx.stop is None else ctx.stop).line
@@ -2465,7 +2213,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         RObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         ctx.Node.Data = RObj
-        ctx.Node.Expression = ctx.vfrStatementExpression().getText()
+        ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
         EObj = CIfrEnd() #
         Line = (None if ctx.stop is None else ctx.stop).line
         EObj.SetLineNo(Line)
@@ -2479,7 +2227,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         WObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         ctx.Node.Data = WObj
-        ctx.Node.Expression = ctx.vfrStatementExpression().getText()
+        ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
 
         EObj = CIfrEnd() #
         Line = (None if ctx.stop is None else ctx.stop).line
@@ -2492,20 +2240,16 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         self.visitChildren(ctx)
         for Ctx in ctx.vfrStatementQuestionOption():
-            if Ctx.vfrStatementQuestionOptionTag() != None:
-                ChildCtx = Ctx.vfrStatementQuestionOptionTag()
-                if ChildCtx.vfrStatementSuppressIfQuest() != None:
-                    SuppressIfNode = ChildCtx.Node
-                    for ChildNode in SuppressIfNode.Child:
-                        ctx.Node.insertChild(ChildNode)
             self.InsertChild(ctx.Node, Ctx)
+        
 
-        '''    
+        '''
         for ChildNode in ctx.Node.Child:
             if ChildNode.Condition != None:
                 print("test Condition")
                 print(ChildNode.Condition)
         '''
+        
         return ctx.Node
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementQuestionOption.
@@ -2513,6 +2257,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         if ctx.vfrStatementQuestionTag() != None:
             ctx.Node = ctx.vfrStatementQuestionTag().Node
+            
         elif ctx.vfrStatementQuestionOptionTag() != None:
             ctx.Node = ctx.vfrStatementQuestionOptionTag().Node
         # ctx.Node.Parent = ctx.parentCtx.Node
@@ -2610,6 +2355,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         ctx.Node.Data = CBObj
         self.__IsCheckBoxOp = False
+
         '''
         print('** Form - vfrStatementQuestions - CheckBox **')
         Info = ctx.Node.Data.GetInfo()
@@ -3289,6 +3035,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         self.visitChildren(ctx)
 
+        if ctx.FLAGS() != None:
+            HFlags = ctx.vfrStringFlagsField().HFlags
+            LFlags = ctx.vfrStringFlagsField().LFlags
+            ReturnCode = SObj.SetFlags(HFlags, LFlags)
+
         if ctx.Key() != None:
             Key = self.__TransNum(ctx.Number(0))
             self.__AssignQuestionKey(SObj, Key)
@@ -3297,11 +3048,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         else:
             StringMinSize = self.__TransNum(ctx.Number(0))
             StringMaxSize = self.__TransNum(ctx.Number(1))
-
-        if ctx.FLAGS() != None:
-            HFlags = ctx.vfrStringFlagsField().HFlags
-            LFlags = ctx.vfrStringFlagsField().LFlags
-            ReturnCode = SObj.SetFlags(HFlags, LFlags)
 
         VarArraySize = self._GET_CURRQEST_ARRAY_SIZE()
         if StringMinSize > 0xFF:
@@ -3324,6 +3070,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         SObj.SetMaxSize(StringMaxSize)
 
         ctx.Node.Data = SObj
+        
 
         '''
         print('** Form - vfrStatementQuestions - String **')
@@ -3839,15 +3586,14 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementStatListOld.
     def visitVfrStatementStatListOld(self, ctx:VfrSyntaxParser.VfrStatementStatListOldContext):
         return self.visitChildren(ctx)
-
-
+    
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementDisableIfStat.
     def visitVfrStatementDisableIfStat(self, ctx:VfrSyntaxParser.VfrStatementDisableIfStatContext):
         DIObj = CIfrDisableIf()
         DIObj.SetLineNo((None if ctx.start is None else ctx.start).line)
-        self.visitChildren(ctx)
         ctx.Node.Data = DIObj
-        ctx.Node.Condition = 'disableif' + ' ' + ctx.vfrStatementExpression().getText()
+        ctx.Node.Condition = 'disableif' + ' ' + self.__ExtractOriginalText(ctx.vfrStatementExpression())
+        self.visitChildren(ctx)
         for Ctx in ctx.vfrStatementStatList():
             self.InsertChild(ctx.Node, Ctx)
 
@@ -3861,9 +3607,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def visitVfrStatementSuppressIfStatNew(self, ctx:VfrSyntaxParser.VfrStatementSuppressIfStatNewContext):
         SIObj = CIfrSuppressIf()
         SIObj.SetLineNo((None if ctx.start is None else ctx.start).line)
-        self.visitChildren(ctx)
         ctx.Node.Data = SIObj
-        ctx.Node.Condition = 'suppressif' + ' ' + ctx.vfrStatementExpression().getText()
+        ctx.Node.Condition = 'suppressif' + ' ' + self.__ExtractOriginalText(ctx.vfrStatementExpression())
+        self.visitChildren(ctx)
         for Ctx in ctx.vfrStatementStatList():
             self.InsertChild(ctx.Node, Ctx)
 
@@ -3879,10 +3625,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         GOIObj = CIfrGrayOutIf()
         GOIObj.SetLineNo((None if ctx.start is None else ctx.start).line)
-        self.visitChildren(ctx)
         ctx.Node.Data = GOIObj
         # ctx.Node.Condition = 'grayoutif' + ' ' + ctx.vfrStatementExpression().Exp
-        ctx.Node.Condition = 'grayoutif' + ' ' + ctx.vfrStatementExpression().getText()
+        ctx.Node.Condition = 'grayoutif' + ' ' + self.__ExtractOriginalText(ctx.vfrStatementExpression())
+        self.visitChildren(ctx)
         for Ctx in ctx.vfrStatementStatList():
             self.InsertChild(ctx.Node, Ctx)
 
@@ -3902,7 +3648,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         IIObj.SetError(self.__TransNum(ctx.Number()))
         ctx.Node.Data = IIObj
-        ctx.Node.Condition = 'inconsistentif' + ' ' + ctx.vfrStatementExpression().getText()
+        ctx.Node.Condition = 'inconsistentif' + ' ' + self.__ExtractOriginalText(ctx.vfrStatementExpression())
 
         EObj = CIfrEnd() #
         Line = (None if ctx.stop is None else ctx.stop).line
@@ -5152,6 +4898,370 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.MObj
 
+    def DumpYaml(self, Root, FileName):
+        with open(FileName, 'w') as f:
+            self.DumpYamlDfs(Root, f)
+        f.close()
+    
+    def DumpYamlDfs(self, Root, f):
+        
+        if Root.OpCode != None:
+            
+            if Root.OpCode == EFI_IFR_FORM_SET_OP:
+                Info = Root.Data.GetInfo()
+                f.write('Formset:\n')
+                f.write('  Guid:  {' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
+                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
+                    '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\n')
+                f.write('  Title:  {}  # Title STRING_ID\n'.format(Info.FormSetTitle))
+                f.write('  Help:  {}  # Help STRING_ID\n'.format(Info.Help))
+                for Guid in Root.Data.GetClassGuid():
+                    f.write('  ClassGuid:  {' + '{}, {}, {},'.format('0x%x'%(Guid.Data1),'0x%x'%(Guid.Data2), '0x%x'%(Guid.Data3)) \
+                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Guid.Data4[0]), '0x%x'%(Guid.Data4[1]), '0x%x'%(Guid.Data4[2]), '0x%x'%(Guid.Data4[3]), \
+                    '0x%x'%(Guid.Data4[4]), '0x%x'%(Guid.Data4[5]), '0x%x'%(Guid.Data4[6]), '0x%x'%(Guid.Data4[7])) + ' }}\n')
+                           
+            if Root.OpCode == EFI_IFR_VARSTORE_OP:
+                Info = Root.Data.GetInfo()
+                f.write('  - varstore:\n')
+                f.write('      varid:  {}\n'.format(Info.VarStoreId))
+                f.write('      name:  {}\n'.format(Info.Name))
+                f.write('      size:  {}\n'.format(Info.Size))
+                f.write('      guid:  {' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
+                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
+                    '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\n')
+
+            if Root.OpCode == EFI_IFR_VARSTORE_EFI_OP:
+                Info = Root.Data.GetInfo()
+                f.write('  - efivarstore:\n')
+                f.write('      varid:  {}\n'.format(Info.VarStoreId))
+                f.write('      name:  {}\n'.format(Info.Name))
+                f.write('      size:  {}\n'.format(Info.Size))
+                f.write('      guid:  {' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
+                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
+                    '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\n')
+                f.write('      attribute:  {}\n'.format(Info.Attributes))
+
+            if Root.OpCode == EFI_IFR_VARSTORE_NAME_VALUE_OP:
+                Info = Root.Data.GetInfo()
+                f.write('  - namevaluevarstore:\n')
+                f.write('      varid:  {}\n'.format(Info.VarStoreId))
+                # f.write('      name:  {}\n'.format(Info.Name))
+                f.write('      guid:  {' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
+                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
+                    '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\n')
+                
+            if Root.OpCode == EFI_IFR_FORM_OP:
+                Info = Root.Data.GetInfo()
+                f.write('  - form:\n')
+                if Root.Condition != None:
+                    f.write('      condition:  {}\n'.format(Root.Condition))
+                f.write('      FormId:  {}  # FormId STRING_ID\n'.format(Info.FormId))
+                f.write('      FormTitle:  {}  # FormTitle STRING_ID\n'.format(Info.FormTitle))
+
+            if Root.OpCode == EFI_IFR_FORM_MAP_OP:
+                Info, MethodMapList = Root.Data.GetInfo()
+                f.write('  - formmap:\n')
+                if Root.Condition != None:
+                    f.write('      condition:  {}\n'.format(Root.Condition))
+                f.write('      FormId:  {}  # FormId STRING_ID\n'.format(Info.FormId))
+                for MethodMap in  MethodMapList:    
+                    f.write('      maptitle:  {}\n'.format(MethodMap.MethodTitle))
+                    f.write('      mapguid:  {' + '{}, {}, {},'.format('0x%x'%(MethodMap.MethodIdentifier.Data1),'0x%x'%(MethodMap.MethodIdentifier.Data2), '0x%x'%(MethodMap.MethodIdentifier.Data3)) \
+                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(MethodMap.MethodIdentifier.Data4[0]), '0x%x'%(MethodMap.MethodIdentifier.Data4[1]), '0x%x'%(MethodMap.MethodIdentifier.Data4[2]), '0x%x'%(MethodMap.MethodIdentifier.Data4[3]), \
+                    '0x%x'%(MethodMap.MethodIdentifier.Data4[4]), '0x%x'%(MethodMap.MethodIdentifier.Data4[5]), '0x%x'%(MethodMap.MethodIdentifier.Data4[6]), '0x%x'%(MethodMap.MethodIdentifier.Data4[7])) + ' }}\n')
+                    
+            if Root.OpCode == EFI_IFR_SUBTITLE_OP:
+                Info = Root.Data.GetInfo()
+                f.write('      - subtitle:\n')
+                if Root.Condition != None:
+                    f.write('          condition:  {}\n'.format(Root.Condition))
+                f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Statement.Prompt))
+
+            if Root.OpCode == EFI_IFR_TEXT_OP:
+                Info = Root.Data.GetInfo()
+                f.write('      - text:\n')
+                if Root.Condition != None:
+                    f.write('          condition:  {}\n'.format(Root.Condition))
+                f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Statement.Prompt))
+                f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Statement.Help))
+                f.write('          text:  {}  # Statement Help STRING_ID\n'.format(Info.TextTwo))
+            
+            if Root.OpCode == EFI_IFR_ACTION_OP:
+                Info = Root.Data.GetInfo()  
+                f.write('      - text:\n')
+                if Root.Condition != None:
+                    f.write('          condition:  {}\n'.format(Root.Condition))
+                f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
+                f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
+                f.write('          questionid:  {}  # Question QuestionId\n'.format(Info.Question.QuestionId))
+                f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
+                f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags))
+                f.write('          questionconfig:  {}  # QuestionConfig\n'.format(Info.QuestionConfig))  
+
+            if Root.OpCode == EFI_IFR_ONE_OF_OP:
+                Info = Root.Data.GetInfo()  
+                f.write('      - oneof:\n')
+                if Root.Condition != None:
+                    f.write('          condition:  {}\n'.format(Root.Condition))
+                    
+                f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
+                f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
+                f.write('          questionid:  {}  # Question QuestionId\n'.format(Info.Question.QuestionId))
+                f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
+                f.write('          varname:  {}  # Question VarName STRING_ID\n'.format(Info.Question.VarStoreInfo.VarName))
+                f.write('          varoffset:  {}  # Question VarOffset\n'.format(Info.Question.VarStoreInfo.VarOffset))
+                f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags)) 
+
+            if Root.OpCode == EFI_IFR_ONE_OF_OPTION_OP:
+                Info = Root.Data.GetInfo()  
+                f.write('          - option:  {}\n'.format(Info.Option))
+                if Root.Condition != None:
+                    f.write('              condition:  {}\n'.format(Root.Condition))
+                    
+                f.write('              option flag:  {}\n'.format(Info.Flags))
+                f.write('              option type:  {}\n'.format(Info.Type))
+                if Info.Type == EFI_IFR_TYPE_DATE:
+                    f.write('              option value:  {}/{}/{}\n'.format(Info.Value.date.Year, Info.Value.date.Month, Info.Value.date.Day))
+                if Info.Type == EFI_IFR_TYPE_TIME:
+                    f.write('              option value:  {}:{}:{}\n'.format(Info.Value.time.Hour, Info.Value.time.Minute, Info.Value.time.Second))
+                if Info.Type == EFI_IFR_TYPE_REF:
+                    f.write('              option value:  {};{};'.format(Info.Value.ref.QuestionId, Info.Value.ref.FormId) +  '{' + '{}, {}, {},'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data1),'0x%x'%(Info.Value.ref.FormSetGuid.Data2), '0x%x'%(Info.Value.ref.FormSetGuid.Data3)) \
+                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data4[0]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[1]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[2]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[3]), \
+                    '0x%x'%(Info.Value.ref.FormSetGuid.Data4[4]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[5]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[6]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[7])) + ' }}\n' + ';{}'.format(Info.Value.ref.DevicePath))
+                if Info.Type == EFI_IFR_TYPE_STRING:
+                    f.write('              option value:  {}\n'.format(Info.Value.string))    
+                if Info.Type == EFI_IFR_TYPE_NUM_SIZE_8:
+                    f.write('              option value:  {}\n'.format(Info.Value.u8))   
+                if Info.Type == EFI_IFR_TYPE_NUM_SIZE_16:
+                    f.write('              option value:  {}\n'.format(Info.Value.u16))  
+                if Info.Type == EFI_IFR_TYPE_NUM_SIZE_32:
+                    f.write('              option value:  {}\n'.format(Info.Value.u32))  
+                if Info.Type == EFI_IFR_TYPE_NUM_SIZE_64:
+                    f.write('              option value:  {}\n'.format(Info.Value.u64))  
+                if Info.Type == EFI_IFR_TYPE_BOOLEAN:
+                    f.write('              option value:  {}\n'.format(Info.Value.b))  
+
+            if Root.OpCode == EFI_IFR_DEFAULT_OP:
+                Info = Root.Data.GetInfo()  
+                f.write('          - default:\n')
+                if Root.Condition != None:
+                    f.write('              condition:  {}\n'.format(Root.Condition))
+                if type(Root.Data) == CIfrDefault:
+                    f.write('              type:  {}\n'.format(Info.Type))
+                    f.write('              varstoreid:  {}\n'.format(Info.DefaultId))
+                    if Info.Type == EFI_IFR_TYPE_DATE:
+                        f.write('              value:  {}/{}/{}\n'.format(Info.Value.date.Year, Info.Value.date.Month, Info.Value.date.Day))
+                    if Info.Type == EFI_IFR_TYPE_TIME:
+                        f.write('              value:  {}:{}:{}\n'.format(Info.Value.time.Hour, Info.Value.time.Minute, Info.Value.time.Second))
+                    if Info.Type == EFI_IFR_TYPE_REF:
+                        f.write('              option value:  {};{};'.format(Info.Value.ref.QuestionId, Info.Value.ref.FormId) +  '{' + '{}, {}, {},'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data1),'0x%x'%(Info.Value.ref.FormSetGuid.Data2), '0x%x'%(Info.Value.ref.FormSetGuid.Data3)) \
+                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data4[0]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[1]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[2]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[3]), \
+                        '0x%x'%(Info.Value.ref.FormSetGuid.Data4[4]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[5]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[6]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[7])) + ' }}' + ';{}\n'.format(Info.Value.ref.DevicePath))
+                    if Info.Type == EFI_IFR_TYPE_STRING:
+                        f.write('              value:  {}\n'.format(Info.Value.string))    
+                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_8:
+                        f.write('              value:  {}\n'.format(Info.Value.u8))   
+                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_16:
+                        f.write('              value:  {}\n'.format(Info.Value.u16))  
+                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_32:
+                        f.write('              value:  {}\n'.format(Info.Value.u32))  
+                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_64:
+                        f.write('              value:  {}\n'.format(Info.Value.u64))  
+                    if Info.Type == EFI_IFR_TYPE_BOOLEAN:
+                        f.write('              value:  {}\n'.format(Info.Value.b))  
+                    '''
+                    if Info.Type == EFI_IFR_TYPE_BUFFER:
+                        for value in Info.Value
+                        f.write('              value:  {}\n'.format(Info.Value.b)) 
+                    '''
+                if type(Root.Data) == CIfrDefault2:
+                    f.write('              type:  {}\n'.format(Info.Type))
+                    f.write('              defaultid:  {}\n'.format(Info.DefaultId))
+                    
+
+            if Root.OpCode == EFI_IFR_ORDERED_LIST_OP:
+                Info = Root.Data.GetInfo()  
+                f.write('      - orderedlist:\n')
+                if Root.Condition != None:
+                    f.write('          condition:  {}\n'.format(Root.Condition))
+                    
+                f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
+                f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
+                f.write('          questionid:  {}  # Question QuestionId\n'.format(Info.Question.QuestionId))
+                f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
+                f.write('          maxContainers:  {}\n'.format(Info.MaxContainers))
+                f.write('          flags:  {}\n'.format(Info.Question.Flags)) 
+
+            if Root.OpCode == EFI_IFR_NUMERIC_OP:
+                Info = Root.Data.GetInfo()  
+                f.write('      - numeric:\n')
+                if Root.Condition != None:
+                    f.write('          condition:  {}\n'.format(Root.Condition))    
+                f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
+                f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
+                f.write('          questionid:  {}  # Question QuestionId\n'.format(Info.Question.QuestionId))
+                f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
+                f.write('          varname:  {}  # Question VarName STRING_ID\n'.format(Info.Question.VarStoreInfo.VarName))
+                f.write('          varoffset:  {}  # Question VarOffset\n'.format(Info.Question.VarStoreInfo.VarOffset))
+                f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags)) 
+                
+                if Root.Data.GetVarType() == EFI_IFR_TYPE_NUM_SIZE_64:
+                    f.write('          maxvalue:  {}\n'.format(Info.Data.u64.MaxValue))
+                    f.write('          minvalue:  {}\n'.format(Info.Data.u64.MinValue))
+                    f.write('          step:  {}\n'.format(Info.Data.u64.Step))
+
+                if Root.Data.GetVarType() == EFI_IFR_TYPE_NUM_SIZE_32:
+                    f.write('          maxvalue:  {}\n'.format(Info.Data.u32.MaxValue))
+                    f.write('          minvalue:  {}\n'.format(Info.Data.u32.MinValue))
+                    f.write('          step:  {}\n'.format(Info.Data.u32.Step))
+                    
+                if Root.Data.GetVarType() == EFI_IFR_TYPE_NUM_SIZE_16:
+                    f.write('          maxvalue:  {}\n'.format(Info.Data.u16.MaxValue))
+                    f.write('          minvalue:  {}\n'.format(Info.Data.u16.MinValue))
+                    f.write('          step:  {}\n'.format(Info.Data.u16.Step))
+                    
+                if Root.Data.GetVarType() == EFI_IFR_TYPE_NUM_SIZE_8:
+                    f.write('          maxvalue:  {}\n'.format(Info.Data.u8.MaxValue))
+                    f.write('          minvalue:  {}\n'.format(Info.Data.u8.MinValue))
+                    f.write('          step:  {}\n'.format(Info.Data.u8.Step))
+
+            if Root.OpCode == EFI_IFR_CHECKBOX_OP:
+                Info = Root.Data.GetInfo()  
+                f.write('      - checkbox:\n')
+                if Root.Condition != None:
+                    f.write('          condition:  {}\n'.format(Root.Condition))
+                f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
+                f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
+                f.write('          questionid:  {}  # Question QuestionId\n'.format(Info.Question.QuestionId))
+                f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
+                f.write('          varname:  {}  # Question VarName STRING_ID\n'.format(Info.Question.VarStoreInfo.VarName))
+                f.write('          varoffset:  {}  # Question VarOffse\n'.format(Info.Question.VarStoreInfo.VarOffset))
+                f.write('          flags:  {}  # Flags\n'.format(Info.Flags)) 
+
+            if Root.OpCode == EFI_IFR_TIME_OP:
+                Info = Root.Data.GetInfo()  
+                f.write('      - time:\n')
+                if Root.Condition != None:
+                    f.write('          condition:  {}\n'.format(Root.Condition))
+                f.write('          questionid:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.QuestionId))
+                f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
+                f.write('          varname:  {}\n'.format(Info.Question.VarStoreInfo.VarName))
+                f.write('          varoffset:  {}\n'.format(Info.Question.VarStoreInfo.VarOffset))
+                f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
+                f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
+                f.write('          flags:  {}\n'.format(Info.Question.Flags)) 
+
+            if Root.OpCode == EFI_IFR_DATE_OP:
+                Info = Root.Data.GetInfo()  
+                f.write('      - date:\n')
+                if Root.Condition != None:
+                    f.write('          condition:  {}\n'.format(Root.Condition))
+                f.write('          questionid:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.QuestionId))
+                f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
+                f.write('          varname:  {}\n'.format(Info.Question.VarStoreInfo.VarName))
+                f.write('          varoffset:  {}\n'.format(Info.Question.VarStoreInfo.VarOffset))
+                f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
+                f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
+                f.write('          flags:  {}\n'.format(Info.Question.Flags)) 
+                
+            
+            if Root.OpCode == EFI_IFR_STRING_OP:
+                Info = Root.Data.GetInfo()  
+                f.write('      - string:\n')
+                if Root.Condition != None:
+                    f.write('          condition:  {}\n'.format(Root.Condition))
+                f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
+                f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
+                f.write('          questionid:  {}  # Question QuestionId\n'.format(Info.Question.QuestionId))
+                f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
+                f.write('          varname:  {}  # Question VarName STRING_ID\n'.format(Info.Question.VarStoreInfo.VarName))
+                f.write('          varoffset:  {}  # Question VarOffset\n'.format(Info.Question.VarStoreInfo.VarOffset))
+                f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags)) 
+                f.write('          stringflags:  {}\n'.format(Info.Flags)) 
+                f.write('          stringminsize:  {}\n'.format(Info.MinSize)) 
+                f.write('          stringmaxsize:  {}\n'.format(Info.MaxSize)) 
+                
+            if Root.OpCode == EFI_IFR_RESET_BUTTON_OP:
+                Info = Root.Data.GetInfo()  
+                f.write('      - resetbutton:\n')
+                if Root.Condition != None:
+                    f.write('          condition:  {}\n'.format(Root.Condition))
+                f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Statement.Prompt))
+                f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Statement.Help))
+                f.write('          defaultid:  {}\n'.format(Info.DefaultId))
+
+            if Root.OpCode == EFI_IFR_REF_OP:
+                Info = Root.Data.GetInfo()  
+                f.write('      - goto:\n')
+                if Root.Condition != None:
+                    f.write('          condition:  {}\n'.format(Root.Condition))
+                
+                if type(Root.Data) == CIfrRef4:
+                    f.write('          formid:  {}\n'.format(Info.FormId))
+                    f.write('          formsetid:  {' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
+                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.FormSetId.Data4[0]), '0x%x'%(Info.FormSetId.Data4[1]), '0x%x'%(Info.FormSetId.Data4[2]), '0x%x'%(Info.FormSetId.Data4[3]), \
+                    '0x%x'%(Info.FormSetId.Data4[4]), '0x%x'%(Info.FormSetId.Data4[5]), '0x%x'%(Info.FormSetId.Data4[6]), '0x%x'%(Info.FormSetId.Data4[7])) + ' }}\n')
+                    f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
+                    f.write('          devicepath:  {}\n'.format(Info.DevicePath))
+
+                if type(Root.Data) == CIfrRef3:
+                    f.write('          formid:  {}\n'.format(Info.FormId))
+                    f.write('          formsetid:  {' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
+                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.FormSetId.Data4[0]), '0x%x'%(Info.FormSetId.Data4[1]), '0x%x'%(Info.FormSetId.Data4[2]), '0x%x'%(Info.FormSetId.Data4[3]), \
+                    '0x%x'%(Info.FormSetId.Data4[4]), '0x%x'%(Info.FormSetId.Data4[5]), '0x%x'%(Info.FormSetId.Data4[6]), '0x%x'%(Info.FormSetId.Data4[7])) + ' }}\n')
+                    f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
+
+                if type(Root.Data) == CIfrRef2:
+                    f.write('          formid:  {}\n'.format(Info.FormId))
+                    f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
+
+                if type(Root.Data) == CIfrRef:
+                    f.write('          formid:  {}\n'.format(Info.FormId))
+                    f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
+
+                f.write('          prompt:  {}\n'.format(Info.Question.Header.Prompt)) 
+                f.write('          help:  {}\n'.format(Info.Question.Header.Help)) 
+
+            if Root.OpCode == EFI_IFR_GUID_OP:
+                Info = Root.Data.GetInfo() 
+                if type(Root.Data) == CIfrLabel: # type(Info) == EFI_IFR_GUID_LABEL
+                    f.write('      - label:\n')
+                    if Root.Condition != None:
+                        f.write('          condition:  {}\n'.format(Root.Condition))
+                        
+                    f.write('          labelnumber:  {}  # LabelNumber\n'.format(Info.Number))
+
+                if type(Root.Data) == CIfrBanner: 
+                    f.write('      - banner:\n')
+                    if Root.Condition != None:
+                        f.write('          condition:  {}\n'.format(Root.Condition))
+                        
+                    f.write('          title:  {}\n'.format(Info.Title))
+                    f.write('          linenumber:  {}\n'.format(Info.LineNumber))
+                    f.write('          align:  {}\n'.format(Info.Alignment))
+
+                if type(Root.Data) == CIfrTimeout: 
+                    f.write('      - banner:\n')
+                    if Root.Condition != None:
+                        f.write('          condition:  {}\n'.format(Root.Condition))
+                        
+                    f.write('          timeout:  {}\n'.format(Info.TimeOut))
+                
+
+        if Root.Child != []:
+            for ChildNode in Root.Child:
+                
+               # if type(ChildNode.Data) != CIfrSuppressIf2:
+                
+                if Root.OpCode in ConditionOps:
+                    if ChildNode.OpCode in ConditionOps:
+                        ChildNode.Condition = Root.Condition + ' | ' + ChildNode.Condition
+                    else:
+                        ChildNode.Condition = Root.Condition
+
+                self.DumpYamlDfs(ChildNode, f)
+        
+        return 
 
 
 del VfrSyntaxParser

@@ -6103,6 +6103,7 @@ class VfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Value = EFI_IFR_TYPE_VALUE()
+            self.ValueStr = ''
             self.ListType = False
 
         def Number(self, i:int=None):

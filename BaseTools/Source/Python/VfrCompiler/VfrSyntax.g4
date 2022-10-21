@@ -325,7 +325,7 @@ locals[Value=EFI_IFR_TYPE_VALUE(), ValueStr='', ListType=False]
     |   Number '/' Number '/' Number 
     |   Number ';' Number ';' guidDefinition ';' 'STRING_TOKEN' '(' Number ')' 
     |   'STRING_TOKEN' '(' Number ')'
-    |   '{' Number (',' Number)* '}'
+    |   '{' Number (',' Number)* '}' // not support currently
     ;
 
 vfrImageTag
@@ -666,6 +666,8 @@ locals[Node=VfrTreeNode(EFI_IFR_WRITE_OP)]
 vfrStatementQuestionOptionList[Node] //doing
     :   (vfrStatementQuestionOption)*
     ;
+
+
 
 vfrStatementQuestionOption
 locals[Node]

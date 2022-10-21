@@ -1528,6 +1528,12 @@ class CIfrSuppressIf(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__SuppressIf.Header,
                               EFI_IFR_SUPPRESS_IF_OP)
 
+class CIfrSuppressIf2(CIfrObj, CIfrOpHeader):
+
+    def __init__(self):
+        self.__SuppressIf = EFI_IFR_SUPPRESS_IF()
+        CIfrOpHeader.__init__(self, self.__SuppressIf.Header,
+                              EFI_IFR_SUPPRESS_IF_OP)
 
 class CIfrGrayOutIf(CIfrObj, CIfrOpHeader):
 
@@ -1827,8 +1833,8 @@ class CIfrCheckBox(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
         if Ret:
             self.__CheckBox.Flags |= EFI_IFR_CHECKBOX_DEFAULT
 
-        LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags,
-                                           EFI_IFR_CHECKBOX_DEFAULT_MFG)
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_CHECKBOX_DEFAULT_MFG)
+        
         if Ret:
             self.__CheckBox.Flags |= EFI_IFR_CHECKBOX_DEFAULT_MFG
 

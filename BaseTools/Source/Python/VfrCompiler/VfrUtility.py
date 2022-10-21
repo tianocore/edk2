@@ -24,7 +24,7 @@ MAX_NAME_LEN = 64
 MAX_BIT_WIDTH = 32
 EFI_VARSTORE_ID_MAX = 0xFFFF
 EFI_BITS_SHIFT_PER_UINT32 = 0x5
-EFI_BITS_PER_UINT32 = 1 << EFI_BITS_SHIFT_PER_UINT32
+EFI_BITS_PER_UINT32 = (1 << EFI_BITS_SHIFT_PER_UINT32)
 EFI_FREE_VARSTORE_ID_BITMAP_SIZE = int(
     (EFI_VARSTORE_ID_MAX + 1) / EFI_BITS_PER_UINT32)
 
@@ -1447,8 +1447,8 @@ class CVfrQuestionDB(object):
         return VfrReturnCode.VFR_RETURN_UNDEFINED
 
     def FindQuestionById(self, QuestionId):
-        if QuestionId == None:
-            return VfrReturnCode.VFR_RETURN_FATAL_ERROR
+        if QuestionId == EFI_QUESTION_ID_INVALID:
+            return VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
 
         pNode = self.__QuestionList
         while pNode != None:
@@ -1497,8 +1497,7 @@ class CVfrQuestionDB(object):
 
     def RegisterQuestion(self, Name, VarIdStr, QuestionId):
 
-        if (Name != None) and (self.FindQuestionByName(Name)
-                               == VfrReturnCode.VFR_RETURN_SUCCESS):
+        if (Name != None) and (self.FindQuestionByName(Name) == VfrReturnCode.VFR_RETURN_SUCCESS):
             return QuestionId, VfrReturnCode.VFR_RETURN_REDEFINED
 
         pNode = SVfrQuestionNode(Name, VarIdStr)
@@ -1541,7 +1540,7 @@ class CVfrQuestionDB(object):
 
         self.__MarkQuestionIdUnused(QId)
 
-        for pNode in TempList:
+        for pNode in TempList:  
             pNode.QuestionId = NewQId
 
         self.__MarkQuestionIdUsed(NewQId)
@@ -1659,8 +1658,6 @@ class CVfrQuestionDB(object):
             VarIdStrList.append(BaseVarId + '.Second')
 
         else:
-            print(BaseVarId)
-            print(Name)
             VarIdStrList.append(Name + '.Hour')
             VarIdStrList.append(Name + '.Minute')
             VarIdStrList.append(Name + '.Second')
@@ -1871,7 +1868,8 @@ class CVfrQuestionDB(object):
             while(pNode != None):
 
                 f.write('Question VarId is {} and QuestionId is '.format(pNode.VarIdStr))
-                f.write('%#x\n'%(pNode.QuestionId))
+                f.write('%d\n'%(pNode.QuestionId))
+                # f.write('%#x\n'%(pNode.QuestionId))
                 pNode = pNode.Next
 
         f.close()
