@@ -2,6 +2,7 @@
   SCSI disk driver that layers on every SCSI IO protocol in the system.
 
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1985 - 2022, American Megatrends International LLC.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -76,11 +77,12 @@ FreeAlignedBuffer (
 **/
 UINTN
 RemoveTrailingSpaces (
-  IN OUT CHAR8   *String
-)
+  IN OUT CHAR8  *String
+  )
 {
-  UINTN  Length = AsciiStrLen (String);
+  UINTN  Length;
 
+  Length = AsciiStrLen (String);
   if (Length == 0) {
     return 0;
   }
@@ -384,16 +386,18 @@ ScsiDiskDriverBindingStart (
         }
 
         CopyMem (
-            VendorStr,
-            &ScsiDiskDevice->InquiryData.Reserved_5_95[VENDOR_IDENTIFICATION_OFFSET],
-            VENDOR_IDENTIFICATION_LENGTH);
+          VendorStr,
+          &ScsiDiskDevice->InquiryData.Reserved_5_95[VENDOR_IDENTIFICATION_OFFSET],
+          VENDOR_IDENTIFICATION_LENGTH
+          );
         VendorStr[VENDOR_IDENTIFICATION_LENGTH] = 0;
         RemoveTrailingSpaces (VendorStr);
 
         CopyMem (
-            ProductStr,
-            &ScsiDiskDevice->InquiryData.Reserved_5_95[PRODUCT_IDENTIFICATION_OFFSET],
-            PRODUCT_IDENTIFICATION_LENGTH);
+          ProductStr,
+          &ScsiDiskDevice->InquiryData.Reserved_5_95[PRODUCT_IDENTIFICATION_OFFSET],
+          PRODUCT_IDENTIFICATION_LENGTH
+          );
         ProductStr[PRODUCT_IDENTIFICATION_LENGTH] = 0;
         RemoveTrailingSpaces (ProductStr);
 
