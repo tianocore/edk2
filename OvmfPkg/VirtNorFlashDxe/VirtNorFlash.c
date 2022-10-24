@@ -65,35 +65,16 @@ NorFlashUnlockSingleBlock (
   // Raise the Task Priority Level to TPL_NOTIFY to serialise all its operations
   // and to protect shared data structures.
 
-  if (FeaturePcdGet (PcdNorFlashCheckBlockLocked) == TRUE) {
-    do {
-      // Request a lock setup
-      SEND_NOR_COMMAND (BlockAddress, 0, P30_CMD_LOCK_BLOCK_SETUP);
+  // Request a lock setup
+  SEND_NOR_COMMAND (BlockAddress, 0, P30_CMD_LOCK_BLOCK_SETUP);
 
-      // Request an unlock
-      SEND_NOR_COMMAND (BlockAddress, 0, P30_CMD_UNLOCK_BLOCK);
+  // Request an unlock
+  SEND_NOR_COMMAND (BlockAddress, 0, P30_CMD_UNLOCK_BLOCK);
 
-      // Send command for reading device id
-      SEND_NOR_COMMAND (BlockAddress, 2, P30_CMD_READ_DEVICE_ID);
-
-      // Read block lock status
-      LockStatus = MmioRead32 (CREATE_NOR_ADDRESS (BlockAddress, 2));
-
-      // Decode block lock status
-      LockStatus = FOLD_32BIT_INTO_16BIT (LockStatus);
-    } while ((LockStatus & 0x1) == 1);
-  } else {
-    // Request a lock setup
-    SEND_NOR_COMMAND (BlockAddress, 0, P30_CMD_LOCK_BLOCK_SETUP);
-
-    // Request an unlock
-    SEND_NOR_COMMAND (BlockAddress, 0, P30_CMD_UNLOCK_BLOCK);
-
-    // Wait until the status register gives us the all clear
-    do {
-      LockStatus = NorFlashReadStatusRegister (Instance, BlockAddress);
-    } while ((LockStatus & P30_SR_BIT_WRITE) != P30_SR_BIT_WRITE);
-  }
+  // Wait until the status register gives us the all clear
+  do {
+    LockStatus = NorFlashReadStatusRegister (Instance, BlockAddress);
+  } while ((LockStatus & P30_SR_BIT_WRITE) != P30_SR_BIT_WRITE);
 
   // Put device back into Read Array mode
   SEND_NOR_COMMAND (BlockAddress, 0, P30_CMD_READ_ARRAY);
