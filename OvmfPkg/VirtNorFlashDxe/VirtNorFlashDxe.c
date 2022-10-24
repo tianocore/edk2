@@ -34,29 +34,8 @@ NOR_FLASH_INSTANCE  mNorFlashInstanceTemplate = {
   0, // RegionBaseAddress ... NEED TO BE FILLED
   0, // Size ... NEED TO BE FILLED
   0, // StartLba
-
-  {
-    EFI_BLOCK_IO_PROTOCOL_REVISION2, // Revision
-    NULL,                            // Media ... NEED TO BE FILLED
-    NorFlashBlockIoReset,            // Reset;
-    NorFlashBlockIoReadBlocks,       // ReadBlocks
-    NorFlashBlockIoWriteBlocks,      // WriteBlocks
-    NorFlashBlockIoFlushBlocks       // FlushBlocks
-  }, // BlockIoProtocol
-
-  {
-    0,     // MediaId ... NEED TO BE FILLED
-    FALSE, // RemovableMedia
-    TRUE,  // MediaPresent
-    FALSE, // LogicalPartition
-    FALSE, // ReadOnly
-    FALSE, // WriteCaching;
-    0,     // BlockSize ... NEED TO BE FILLED
-    4,     //  IoAlign
-    0,     // LastBlock ... NEED TO BE FILLED
-    0,     // LowestAlignedLba
-    1,     // LogicalBlocksPerPhysicalBlock
-  }, // Media;
+  0, // LastBlock
+  0, // BlockSize
 
   {
     FvbGetAttributes,      // GetAttributes
@@ -115,11 +94,8 @@ NorFlashCreateInstance (
   Instance->DeviceBaseAddress = NorFlashDeviceBase;
   Instance->RegionBaseAddress = NorFlashRegionBase;
   Instance->Size              = NorFlashSize;
-
-  Instance->BlockIoProtocol.Media = &Instance->Media;
-  Instance->Media.MediaId         = Index;
-  Instance->Media.BlockSize       = BlockSize;
-  Instance->Media.LastBlock       = (NorFlashSize / BlockSize)-1;
+  Instance->BlockSize         = BlockSize;
+  Instance->LastBlock         = (NorFlashSize / BlockSize) - 1;
 
   CopyGuid (&Instance->DevicePath.Vendor.Guid, &gEfiCallerIdGuid);
   Instance->DevicePath.Index = (UINT8)Index;
@@ -136,8 +112,6 @@ NorFlashCreateInstance (
                     &Instance->Handle,
                     &gEfiDevicePathProtocolGuid,
                     &Instance->DevicePath,
-                    &gEfiBlockIoProtocolGuid,
-                    &Instance->BlockIoProtocol,
                     &gEfiFirmwareVolumeBlockProtocolGuid,
                     &Instance->FvbProtocol,
                     NULL
@@ -151,8 +125,6 @@ NorFlashCreateInstance (
                     &Instance->Handle,
                     &gEfiDevicePathProtocolGuid,
                     &Instance->DevicePath,
-                    &gEfiBlockIoProtocolGuid,
-                    &Instance->BlockIoProtocol,
                     NULL
                     );
     if (EFI_ERROR (Status)) {
@@ -434,7 +406,7 @@ NorFlashFvbInitialize (
                                 PcdGet64 (PcdFlashNvStorageVariableBase64) : PcdGet32 (PcdFlashNvStorageVariableBase);
 
   // Set the index of the first LBA for the FVB
-  Instance->StartLba = (mFlashNvStorageVariableBase - Instance->RegionBaseAddress) / Instance->Media.BlockSize;
+  Instance->StartLba = (mFlashNvStorageVariableBase - Instance->RegionBaseAddress) / Instance->BlockSize;
 
   BootMode = GetBootModeHob ();
   if (BootMode == BOOT_WITH_DEFAULT_SETTINGS) {
@@ -455,7 +427,7 @@ NorFlashFvbInitialize (
       ));
 
     // Erase all the NorFlash that is reserved for variable storage
-    FvbNumLba = (PcdGet32 (PcdFlashNvStorageVariableSize) + PcdGet32 (PcdFlashNvStorageFtwWorkingSize) + PcdGet32 (PcdFlashNvStorageFtwSpareSize)) / Instance->Media.BlockSize;
+    FvbNumLba = (PcdGet32 (PcdFlashNvStorageVariableSize) + PcdGet32 (PcdFlashNvStorageFtwWorkingSize) + PcdGet32 (PcdFlashNvStorageFtwSpareSize)) / Instance->BlockSize;
 
     Status = FvbEraseBlocks (&Instance->FvbProtocol, (EFI_LBA)0, FvbNumLba, EFI_LBA_LIST_TERMINATOR);
     if (EFI_ERROR (Status)) {
