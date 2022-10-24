@@ -101,6 +101,10 @@
   #                  transports.
   VirtioMmioDeviceLib|Include/Library/VirtioMmioDeviceLib.h
 
+  ##  @libraryclass  Provides a Nor flash interface.
+  #
+  VirtNorFlashPlatformLib|Include/Library/VirtNorFlashPlatformLib.h
+
   ##  @libraryclass  Invoke Xen hypercalls
   #
   XenHypercallLib|Include/Library/XenHypercallLib.h
