@@ -8,8 +8,8 @@
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/NorFlashPlatformLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/VirtNorFlashPlatformLib.h>
 
 #include <Protocol/FdtClient.h>
 
@@ -18,19 +18,19 @@
 #define MAX_FLASH_BANKS  4
 
 EFI_STATUS
-NorFlashPlatformInitialization (
+VirtNorFlashPlatformInitialization (
   VOID
   )
 {
   return EFI_SUCCESS;
 }
 
-NOR_FLASH_DESCRIPTION  mNorFlashDevices[MAX_FLASH_BANKS];
+STATIC VIRT_NOR_FLASH_DESCRIPTION  mNorFlashDevices[MAX_FLASH_BANKS];
 
 EFI_STATUS
-NorFlashPlatformGetDevices (
-  OUT NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
-  OUT UINT32                 *Count
+VirtNorFlashPlatformGetDevices (
+  OUT VIRT_NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
+  OUT UINT32                      *Count
   )
 {
   FDT_CLIENT_PROTOCOL  *FdtClient;
