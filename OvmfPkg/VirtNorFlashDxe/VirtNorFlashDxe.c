@@ -280,6 +280,9 @@ NorFlashWriteFullBlock (
   }
 
 EXIT:
+  // Put device back into Read Array mode
+  SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_READ_ARRAY);
+
   if (!EfiAtRuntime ()) {
     // Interruptions can resume.
     gBS->RestoreTPL (OriginalTPL);
