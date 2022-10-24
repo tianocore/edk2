@@ -38,10 +38,6 @@
   #
   LcdPlatformLib|Include/Library/LcdPlatformLib.h
 
-  ##  @libraryclass  Provides a Nor flash interface.
-  #
-  NorFlashPlatformLib|Include/Library/NorFlashPlatformLib.h
-
   ##  @libraryclass  Provides an interface to the clock of a PL011 device.
   #
   PL011UartClockLib|Include/Library/PL011UartClockLib.h
@@ -55,8 +51,6 @@
 
 [PcdsFeatureFlag.common]
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|FALSE|BOOLEAN|0x00000004
-
-  gArmPlatformTokenSpaceGuid.PcdNorFlashCheckBlockLocked|FALSE|BOOLEAN|0x0000003C
 
   # Disable the GOP controller on ExitBootServices(). By default the value is FALSE,
   # we assume the OS will handle the FrameBuffer from the UEFI GOP information.
