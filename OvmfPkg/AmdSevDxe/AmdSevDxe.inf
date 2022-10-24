@@ -49,6 +49,7 @@
 
 [Protocols]
   gEdkiiMemoryAcceptProtocolGuid
+  gBz3987SevMemoryAcceptanceProtocolGuid
 
 [Guids]
   gConfidentialComputingSevSnpBlobGuid

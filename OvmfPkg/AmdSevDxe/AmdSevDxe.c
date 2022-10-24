@@ -21,6 +21,7 @@
 #include <Guid/ConfidentialComputingSevSnpBlob.h>
 #include <Library/PcdLib.h>
 #include <Pi/PrePiDxeCis.h>
+#include <Protocol/Bz3987SevMemoryAcceptance.h>
 #include <Protocol/MemoryAccept.h>
 
 STATIC CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION  mSnpBootDxeTable = {
@@ -154,6 +155,21 @@ ResolveUnacceptedMemory (
   Status = AcceptAllMemory (AcceptMemory);
   ASSERT_EFI_ERROR (Status);
 }
+
+STATIC
+EFI_STATUS
+EFIAPI
+AllowUnacceptedMemory (
+  IN  BZ3987_SEV_MEMORY_ACCEPTANCE_PROTOCOL  *This
+  )
+{
+  mAcceptAllMemoryAtEBS = FALSE;
+  return EFI_SUCCESS;
+}
+
+STATIC
+BZ3987_SEV_MEMORY_ACCEPTANCE_PROTOCOL
+  mMemoryAcceptanceProtocol = { AllowUnacceptedMemory };
 
 STATIC EDKII_MEMORY_ACCEPT_PROTOCOL  mMemoryAcceptProtocol = {
   AmdSevMemoryAccept
@@ -302,6 +318,16 @@ AmdSevDxeEntryPoint (
 
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "AllowUnacceptedMemory event creation for EventBeforeExitBootServices failed.\n"));
+    }
+
+    Status = gBS->InstallProtocolInterface (
+                    &mAmdSevDxeHandle,
+                    &gBz3987SevMemoryAcceptanceProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &mMemoryAcceptanceProtocol
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Install Bz3987SevMemoryAcceptanceProtocol failed.\n"));
     }
 
     //
