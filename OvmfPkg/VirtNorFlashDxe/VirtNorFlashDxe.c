@@ -59,12 +59,6 @@ NOR_FLASH_INSTANCE  mNorFlashInstanceTemplate = {
   }, // Media;
 
   {
-    EFI_DISK_IO_PROTOCOL_REVISION, // Revision
-    NorFlashDiskIoReadDisk,        // ReadDisk
-    NorFlashDiskIoWriteDisk        // WriteDisk
-  },
-
-  {
     FvbGetAttributes,      // GetAttributes
     FvbSetAttributes,      // SetAttributes
     FvbGetPhysicalAddress, // GetPhysicalAddress
@@ -159,8 +153,6 @@ NorFlashCreateInstance (
                     &Instance->DevicePath,
                     &gEfiBlockIoProtocolGuid,
                     &Instance->BlockIoProtocol,
-                    &gEfiDiskIoProtocolGuid,
-                    &Instance->DiskIoProtocol,
                     NULL
                     );
     if (EFI_ERROR (Status)) {

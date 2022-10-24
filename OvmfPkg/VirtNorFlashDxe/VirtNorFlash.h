@@ -15,7 +15,6 @@
 #include <Guid/EventGroup.h>
 
 #include <Protocol/BlockIo.h>
-#include <Protocol/DiskIo.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 
 #include <Library/DebugLib.h>
@@ -111,7 +110,6 @@
 #define NOR_FLASH_SIGNATURE  SIGNATURE_32('n', 'o', 'r', '0')
 #define INSTANCE_FROM_FVB_THIS(a)     CR(a, NOR_FLASH_INSTANCE, FvbProtocol, NOR_FLASH_SIGNATURE)
 #define INSTANCE_FROM_BLKIO_THIS(a)   CR(a, NOR_FLASH_INSTANCE, BlockIoProtocol, NOR_FLASH_SIGNATURE)
-#define INSTANCE_FROM_DISKIO_THIS(a)  CR(a, NOR_FLASH_INSTANCE, DiskIoProtocol, NOR_FLASH_SIGNATURE)
 
 typedef struct _NOR_FLASH_INSTANCE NOR_FLASH_INSTANCE;
 
@@ -134,7 +132,6 @@ struct _NOR_FLASH_INSTANCE {
 
   EFI_BLOCK_IO_PROTOCOL                  BlockIoProtocol;
   EFI_BLOCK_IO_MEDIA                     Media;
-  EFI_DISK_IO_PROTOCOL                   DiskIoProtocol;
 
   EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL    FvbProtocol;
   VOID                                   *ShadowBuffer;
@@ -201,32 +198,6 @@ EFI_STATUS
 EFIAPI
 NorFlashBlockIoFlushBlocks (
   IN EFI_BLOCK_IO_PROTOCOL  *This
-  );
-
-//
-// DiskIO Protocol function EFI_DISK_IO_PROTOCOL.ReadDisk
-//
-EFI_STATUS
-EFIAPI
-NorFlashDiskIoReadDisk (
-  IN EFI_DISK_IO_PROTOCOL  *This,
-  IN UINT32                MediaId,
-  IN UINT64                Offset,
-  IN UINTN                 BufferSize,
-  OUT VOID                 *Buffer
-  );
-
-//
-// DiskIO Protocol function EFI_DISK_IO_PROTOCOL.WriteDisk
-//
-EFI_STATUS
-EFIAPI
-NorFlashDiskIoWriteDisk (
-  IN EFI_DISK_IO_PROTOCOL  *This,
-  IN UINT32                MediaId,
-  IN UINT64                Offset,
-  IN UINTN                 BufferSize,
-  IN VOID                  *Buffer
   );
 
 //
