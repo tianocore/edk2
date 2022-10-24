@@ -19,7 +19,6 @@
 [Sources.common]
   VirtNorFlash.c
   VirtNorFlash.h
-  VirtNorFlashBlockIoDxe.c
   VirtNorFlashDxe.c
   VirtNorFlashFvb.c
 
