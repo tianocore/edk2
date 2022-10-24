@@ -44,6 +44,8 @@ FspApiCallingCheck (
     //
     if (((UINTN)FspData != MAX_ADDRESS) && ((UINTN)FspData != MAX_UINT32)) {
       Status = EFI_UNSUPPORTED;
+    } else if (ApiParam == NULL) {
+      Status = EFI_SUCCESS;
     } else if (EFI_ERROR (FspUpdSignatureCheck (ApiIdx, ApiParam))) {
       Status = EFI_INVALID_PARAMETER;
     }
@@ -67,9 +69,13 @@ FspApiCallingCheck (
     } else {
       if (FspData->Signature != FSP_GLOBAL_DATA_SIGNATURE) {
         Status = EFI_UNSUPPORTED;
-      } else if (EFI_ERROR (FspUpdSignatureCheck (FspSiliconInitApiIndex, ApiParam))) {
-        Status = EFI_INVALID_PARAMETER;
       } else if (ApiIdx == FspSiliconInitApiIndex) {
+        if (ApiParam == NULL) {
+          Status = EFI_SUCCESS;
+        } else if (EFI_ERROR (FspUpdSignatureCheck (FspSiliconInitApiIndex, ApiParam))) {
+          Status = EFI_INVALID_PARAMETER;
+        }
+
         //
         // Reset MultiPhase NumberOfPhases to zero
         //
@@ -89,6 +95,8 @@ FspApiCallingCheck (
     } else {
       if (FspData->Signature != FSP_GLOBAL_DATA_SIGNATURE) {
         Status = EFI_UNSUPPORTED;
+      } else if (ApiParam == NULL) {
+        Status = EFI_SUCCESS;
       } else if (EFI_ERROR (FspUpdSignatureCheck (FspSmmInitApiIndex, ApiParam))) {
         Status = EFI_INVALID_PARAMETER;
       }
