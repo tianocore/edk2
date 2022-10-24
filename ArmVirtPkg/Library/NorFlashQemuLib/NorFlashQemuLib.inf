@@ -14,17 +14,17 @@
   FILE_GUID                      = 339B7829-4C5F-4EFC-B2DD-5050E530DECE
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = NorFlashPlatformLib
+  LIBRARY_CLASS                  = VirtNorFlashPlatformLib
 
 [Sources.common]
   NorFlashQemuLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
-  ArmPlatformPkg/ArmPlatformPkg.dec
   ArmPkg/ArmPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   BaseLib
