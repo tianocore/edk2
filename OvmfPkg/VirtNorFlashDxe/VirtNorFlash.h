@@ -14,7 +14,6 @@
 
 #include <Guid/EventGroup.h>
 
-#include <Protocol/BlockIo.h>
 #include <Protocol/FirmwareVolumeBlock.h>
 
 #include <Library/DebugLib.h>
@@ -108,8 +107,7 @@
 #define P30_CMD_READ_CONFIGURATION_REGISTER        0x0003
 
 #define NOR_FLASH_SIGNATURE  SIGNATURE_32('n', 'o', 'r', '0')
-#define INSTANCE_FROM_FVB_THIS(a)     CR(a, NOR_FLASH_INSTANCE, FvbProtocol, NOR_FLASH_SIGNATURE)
-#define INSTANCE_FROM_BLKIO_THIS(a)   CR(a, NOR_FLASH_INSTANCE, BlockIoProtocol, NOR_FLASH_SIGNATURE)
+#define INSTANCE_FROM_FVB_THIS(a)  CR(a, NOR_FLASH_INSTANCE, FvbProtocol, NOR_FLASH_SIGNATURE)
 
 typedef struct _NOR_FLASH_INSTANCE NOR_FLASH_INSTANCE;
 
@@ -129,9 +127,8 @@ struct _NOR_FLASH_INSTANCE {
   UINTN                                  RegionBaseAddress;
   UINTN                                  Size;
   EFI_LBA                                StartLba;
-
-  EFI_BLOCK_IO_PROTOCOL                  BlockIoProtocol;
-  EFI_BLOCK_IO_MEDIA                     Media;
+  EFI_LBA                                LastBlock;
+  UINT32                                 BlockSize;
 
   EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL    FvbProtocol;
   VOID                                   *ShadowBuffer;
@@ -153,51 +150,6 @@ NorFlashWriteBuffer (
   IN UINTN               TargetAddress,
   IN UINTN               BufferSizeInBytes,
   IN UINT32              *Buffer
-  );
-
-//
-// BlockIO Protocol function EFI_BLOCK_IO_PROTOCOL.Reset
-//
-EFI_STATUS
-EFIAPI
-NorFlashBlockIoReset (
-  IN EFI_BLOCK_IO_PROTOCOL  *This,
-  IN BOOLEAN                ExtendedVerification
-  );
-
-//
-// BlockIO Protocol function EFI_BLOCK_IO_PROTOCOL.ReadBlocks
-//
-EFI_STATUS
-EFIAPI
-NorFlashBlockIoReadBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL  *This,
-  IN  UINT32                 MediaId,
-  IN  EFI_LBA                Lba,
-  IN  UINTN                  BufferSizeInBytes,
-  OUT VOID                   *Buffer
-  );
-
-//
-// BlockIO Protocol function EFI_BLOCK_IO_PROTOCOL.WriteBlocks
-//
-EFI_STATUS
-EFIAPI
-NorFlashBlockIoWriteBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL  *This,
-  IN  UINT32                 MediaId,
-  IN  EFI_LBA                Lba,
-  IN  UINTN                  BufferSizeInBytes,
-  IN  VOID                   *Buffer
-  );
-
-//
-// BlockIO Protocol function EFI_BLOCK_IO_PROTOCOL.FlushBlocks
-//
-EFI_STATUS
-EFIAPI
-NorFlashBlockIoFlushBlocks (
-  IN EFI_BLOCK_IO_PROTOCOL  *This
   );
 
 //

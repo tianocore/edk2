@@ -89,7 +89,7 @@ InitializeFvAndVariableStoreHeaders (
   }
 
   // Check if the size of the area is at least one block size
-  if ((NvStorageVariableSize <= 0) || (NvStorageVariableSize / Instance->Media.BlockSize <= 0)) {
+  if ((NvStorageVariableSize <= 0) || (NvStorageVariableSize / Instance->BlockSize <= 0)) {
     DEBUG ((
       DEBUG_ERROR,
       "%a: NvStorageVariableSize is 0x%x, should be atleast one block size\n",
@@ -99,7 +99,7 @@ InitializeFvAndVariableStoreHeaders (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((NvStorageFtwWorkingSize <= 0) || (NvStorageFtwWorkingSize / Instance->Media.BlockSize <= 0)) {
+  if ((NvStorageFtwWorkingSize <= 0) || (NvStorageFtwWorkingSize / Instance->BlockSize <= 0)) {
     DEBUG ((
       DEBUG_ERROR,
       "%a: NvStorageFtwWorkingSize is 0x%x, should be atleast one block size\n",
@@ -109,7 +109,7 @@ InitializeFvAndVariableStoreHeaders (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((NvStorageFtwSpareSize <= 0) || (NvStorageFtwSpareSize / Instance->Media.BlockSize <= 0)) {
+  if ((NvStorageFtwSpareSize <= 0) || (NvStorageFtwSpareSize / Instance->BlockSize <= 0)) {
     DEBUG ((
       DEBUG_ERROR,
       "%a: NvStorageFtwSpareSize is 0x%x, should be atleast one block size\n",
@@ -120,9 +120,9 @@ InitializeFvAndVariableStoreHeaders (
   }
 
   // Ensure the Variable area Base Addresses are aligned on a block size boundaries
-  if ((NvStorageVariableBase % Instance->Media.BlockSize != 0) ||
-      (NvStorageFtwWorkingBase % Instance->Media.BlockSize != 0) ||
-      (NvStorageFtwSpareBase % Instance->Media.BlockSize != 0))
+  if ((NvStorageVariableBase % Instance->BlockSize != 0) ||
+      (NvStorageFtwWorkingBase % Instance->BlockSize != 0) ||
+      (NvStorageFtwSpareBase % Instance->BlockSize != 0))
   {
     DEBUG ((DEBUG_ERROR, "%a: NvStorage Base addresses must be aligned to block size boundaries", __FUNCTION__));
     return EFI_INVALID_PARAMETER;
@@ -149,8 +149,8 @@ InitializeFvAndVariableStoreHeaders (
                                                             );
   FirmwareVolumeHeader->HeaderLength          = sizeof (EFI_FIRMWARE_VOLUME_HEADER) + sizeof (EFI_FV_BLOCK_MAP_ENTRY);
   FirmwareVolumeHeader->Revision              = EFI_FVH_REVISION;
-  FirmwareVolumeHeader->BlockMap[0].NumBlocks = Instance->Media.LastBlock + 1;
-  FirmwareVolumeHeader->BlockMap[0].Length    = Instance->Media.BlockSize;
+  FirmwareVolumeHeader->BlockMap[0].NumBlocks = Instance->LastBlock + 1;
+  FirmwareVolumeHeader->BlockMap[0].Length    = Instance->BlockSize;
   FirmwareVolumeHeader->BlockMap[1].NumBlocks = 0;
   FirmwareVolumeHeader->BlockMap[1].Length    = 0;
   FirmwareVolumeHeader->Checksum              = CalculateCheckSum16 ((UINT16 *)FirmwareVolumeHeader, FirmwareVolumeHeader->HeaderLength);
@@ -284,9 +284,6 @@ FvbGetAttributes (
   )
 {
   EFI_FVB_ATTRIBUTES_2  FlashFvbAttributes;
-  NOR_FLASH_INSTANCE    *Instance;
-
-  Instance = INSTANCE_FROM_FVB_THIS (This);
 
   FlashFvbAttributes = (EFI_FVB_ATTRIBUTES_2)(
 
@@ -294,16 +291,11 @@ FvbGetAttributes (
                                               EFI_FVB2_READ_STATUS      | // Reads are currently enabled
                                               EFI_FVB2_STICKY_WRITE     | // A block erase is required to flip bits into EFI_FVB2_ERASE_POLARITY
                                               EFI_FVB2_MEMORY_MAPPED    | // It is memory mapped
-                                              EFI_FVB2_ERASE_POLARITY     // After erasure all bits take this value (i.e. '1')
+                                              EFI_FVB2_ERASE_POLARITY   | // After erasure all bits take this value (i.e. '1')
+                                              EFI_FVB2_WRITE_STATUS     | // Writes are currently enabled
+                                              EFI_FVB2_WRITE_ENABLED_CAP  // Writes may be enabled
 
                                               );
-
-  // Check if it is write protected
-  if (Instance->Media.ReadOnly != TRUE) {
-    FlashFvbAttributes = FlashFvbAttributes         |
-                         EFI_FVB2_WRITE_STATUS      | // Writes are currently enabled
-                         EFI_FVB2_WRITE_ENABLED_CAP;  // Writes may be enabled
-  }
 
   *Attributes = FlashFvbAttributes;
 
@@ -418,15 +410,15 @@ FvbGetBlockSize (
 
   Instance = INSTANCE_FROM_FVB_THIS (This);
 
-  DEBUG ((DEBUG_BLKIO, "FvbGetBlockSize(Lba=%ld, BlockSize=0x%x, LastBlock=%ld)\n", Lba, Instance->Media.BlockSize, Instance->Media.LastBlock));
+  DEBUG ((DEBUG_BLKIO, "FvbGetBlockSize(Lba=%ld, BlockSize=0x%x, LastBlock=%ld)\n", Lba, Instance->BlockSize, Instance->LastBlock));
 
-  if (Lba > Instance->Media.LastBlock) {
-    DEBUG ((DEBUG_ERROR, "FvbGetBlockSize: ERROR - Parameter LBA %ld is beyond the last Lba (%ld).\n", Lba, Instance->Media.LastBlock));
+  if (Lba > Instance->LastBlock) {
+    DEBUG ((DEBUG_ERROR, "FvbGetBlockSize: ERROR - Parameter LBA %ld is beyond the last Lba (%ld).\n", Lba, Instance->LastBlock));
     Status = EFI_INVALID_PARAMETER;
   } else {
     // This is easy because in this platform each NorFlash device has equal sized blocks.
-    *BlockSize      = (UINTN)Instance->Media.BlockSize;
-    *NumberOfBlocks = (UINTN)(Instance->Media.LastBlock - Lba + 1);
+    *BlockSize      = (UINTN)Instance->BlockSize;
+    *NumberOfBlocks = (UINTN)(Instance->LastBlock - Lba + 1);
 
     DEBUG ((DEBUG_BLKIO, "FvbGetBlockSize: *BlockSize=0x%x, *NumberOfBlocks=0x%x.\n", *BlockSize, *NumberOfBlocks));
 
@@ -498,7 +490,7 @@ FvbRead (
   TempStatus = EFI_SUCCESS;
 
   // Cache the block size to avoid de-referencing pointers all the time
-  BlockSize = Instance->Media.BlockSize;
+  BlockSize = Instance->BlockSize;
 
   DEBUG ((DEBUG_BLKIO, "FvbRead: Check if (Offset=0x%x + NumBytes=0x%x) <= BlockSize=0x%x\n", Offset, *NumBytes, BlockSize));
 
@@ -669,13 +661,6 @@ FvbEraseBlocks (
 
   Status = EFI_SUCCESS;
 
-  // Detect WriteDisabled state
-  if (Instance->Media.ReadOnly == TRUE) {
-    // Firmware volume is in WriteDisabled state
-    DEBUG ((DEBUG_ERROR, "FvbEraseBlocks: ERROR - Device is in WriteDisabled state.\n"));
-    return EFI_ACCESS_DENIED;
-  }
-
   // Before erasing, check the entire list of parameters to ensure all specified blocks are valid
 
   VA_START (Args, This);
@@ -698,9 +683,9 @@ FvbEraseBlocks (
       "FvbEraseBlocks: Check if: ( StartingLba=%ld + NumOfLba=%Lu - 1 ) > LastBlock=%ld.\n",
       Instance->StartLba + StartingLba,
       (UINT64)NumOfLba,
-      Instance->Media.LastBlock
+      Instance->LastBlock
       ));
-    if ((NumOfLba == 0) || ((Instance->StartLba + StartingLba + NumOfLba - 1) > Instance->Media.LastBlock)) {
+    if ((NumOfLba == 0) || ((Instance->StartLba + StartingLba + NumOfLba - 1) > Instance->LastBlock)) {
       VA_END (Args);
       DEBUG ((DEBUG_ERROR, "FvbEraseBlocks: ERROR - Lba range goes past the last Lba.\n"));
       Status = EFI_INVALID_PARAMETER;
@@ -733,7 +718,7 @@ FvbEraseBlocks (
       BlockAddress = GET_NOR_BLOCK_ADDRESS (
                        Instance->RegionBaseAddress,
                        Instance->StartLba + StartingLba,
-                       Instance->Media.BlockSize
+                       Instance->BlockSize
                        );
 
       // Erase it
