@@ -401,67 +401,6 @@ NorFlashWriteBlocks (
   return Status;
 }
 
-#define BOTH_ALIGNED(a, b, align)  ((((UINTN)(a) | (UINTN)(b)) & ((align) - 1)) == 0)
-
-/**
-  Copy Length bytes from Source to Destination, using aligned accesses only.
-  Note that this implementation uses memcpy() semantics rather then memmove()
-  semantics, i.e., SourceBuffer and DestinationBuffer should not overlap.
-
-  @param  DestinationBuffer The target of the copy request.
-  @param  SourceBuffer      The place to copy from.
-  @param  Length            The number of bytes to copy.
-
-  @return Destination
-
-**/
-STATIC
-VOID *
-AlignedCopyMem (
-  OUT     VOID        *DestinationBuffer,
-  IN      CONST VOID  *SourceBuffer,
-  IN      UINTN       Length
-  )
-{
-  UINT8         *Destination8;
-  CONST UINT8   *Source8;
-  UINT32        *Destination32;
-  CONST UINT32  *Source32;
-  UINT64        *Destination64;
-  CONST UINT64  *Source64;
-
-  if (BOTH_ALIGNED (DestinationBuffer, SourceBuffer, 8) && (Length >= 8)) {
-    Destination64 = DestinationBuffer;
-    Source64      = SourceBuffer;
-    while (Length >= 8) {
-      *Destination64++ = *Source64++;
-      Length          -= 8;
-    }
-
-    Destination8 = (UINT8 *)Destination64;
-    Source8      = (CONST UINT8 *)Source64;
-  } else if (BOTH_ALIGNED (DestinationBuffer, SourceBuffer, 4) && (Length >= 4)) {
-    Destination32 = DestinationBuffer;
-    Source32      = SourceBuffer;
-    while (Length >= 4) {
-      *Destination32++ = *Source32++;
-      Length          -= 4;
-    }
-
-    Destination8 = (UINT8 *)Destination32;
-    Source8      = (CONST UINT8 *)Source32;
-  } else {
-    Destination8 = DestinationBuffer;
-    Source8      = SourceBuffer;
-  }
-
-  while (Length-- != 0) {
-    *Destination8++ = *Source8++;
-  }
-
-  return DestinationBuffer;
-}
-
 EFI_STATUS
 NorFlashReadBlocks (
   IN NOR_FLASH_INSTANCE  *Instance,
@@ -516,7 +455,7 @@ NorFlashReadBlocks (
   SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_READ_ARRAY);
 
   // Readout the data
-  AlignedCopyMem (Buffer, (VOID *)StartAddress, BufferSizeInBytes);
+  CopyMem (Buffer, (VOID *)StartAddress, BufferSizeInBytes);
 
   return EFI_SUCCESS;
 }
@@ -558,7 +497,7 @@ NorFlashRead (
   SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_READ_ARRAY);
 
   // Readout the data
-  AlignedCopyMem (Buffer, (VOID *)(StartAddress + Offset), BufferSizeInBytes);
+  CopyMem (Buffer, (VOID *)(StartAddress + Offset), BufferSizeInBytes);
 
   return EFI_SUCCESS;
 }
