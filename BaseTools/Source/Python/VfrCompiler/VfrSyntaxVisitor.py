@@ -361,6 +361,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
 
         ClassGuidNum = 0
+        GuidList = []
         if ctx.classguidDefinition() != None:
             GuidList = ctx.classguidDefinition().GuidList
             ClassGuidNum = len(GuidList)
@@ -382,7 +383,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if (self.__OverrideClassGuid != None):
                 FSObj.SetClassGuid(self.__OverrideClassGuid)
 
-        if ClassGuidNum == 1:
+        elif ClassGuidNum == 1:
             if self.__OverrideClassGuid != None:
                 ClassGuidNum  += 1
             FSObj = CIfrFormSet(sizeof(EFI_IFR_FORM_SET) + ClassGuidNum * sizeof(EFI_GUID))
@@ -390,7 +391,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if (self.__OverrideClassGuid != None):
                 FSObj.SetClassGuid(self.__OverrideClassGuid)
 
-        if ClassGuidNum == 2:
+        elif ClassGuidNum == 2:
             if self.__OverrideClassGuid != None:
                 ClassGuidNum += 1
             FSObj = CIfrFormSet(sizeof(EFI_IFR_FORM_SET) + ClassGuidNum * sizeof(EFI_GUID))
@@ -399,7 +400,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if (self.__OverrideClassGuid != None):
                 FSObj.SetClassGuid(self.__OverrideClassGuid)
 
-        if ClassGuidNum == 3:
+        elif ClassGuidNum == 3:
             if self.__OverrideClassGuid != None:
                 ClassGuidNum  += 1
             FSObj = CIfrFormSet(sizeof(EFI_IFR_FORM_SET) + ClassGuidNum * sizeof(EFI_GUID))
@@ -409,7 +410,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if (self.__OverrideClassGuid != None):
                 FSObj.SetClassGuid(self.__OverrideClassGuid)
 
-        if ClassGuidNum == 4:
+        elif ClassGuidNum == 4:
             if self.__OverrideClassGuid != None:
                 ClassGuidNum  += 1
             FSObj = CIfrFormSet(sizeof(EFI_IFR_FORM_SET) + ClassGuidNum * sizeof(EFI_GUID))
@@ -3773,15 +3774,28 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by VfrSyntaxParser#vfrExtensionData.
     def visitVfrExtensionData(self, ctx:VfrSyntaxParser.VfrExtensionDataContext):
         '''
-        self.visitChildren(ctx)
+        
+        TFName = ''
         IsArray = False if ctx.OpenBracket() == None else True
         ArrayIdx = 0
+        ctx.IsStruct = ctx.parentCtx.IsStruct
+        
+        self.visitChildren(ctx)
+
         if IsArray == True:
             ArrayIdx = self.__TransNum(self.__TransNum(ctx.Number(0)))
             ByteOffset  = ArrayIdx * ctx.parentCtx.TypeSize #####
-            if ctx.parentCtx.IsStruct == True:
-                self.__TFName += self.__mTypeName
-            self.visitChildren(ctx)
+            if ctx.IsStruct == True:
+                TFName += ctx.parentCtx.TypeName
+            
+            for i in range(0, len(ctx.arrayName())):
+                
+                
+            
+            
+            
+            
+
             i = 0 if IsArray == False else 1
             if self.__mIsStruct == False:
                 Data = self.__TransNum(ctx.Number(i))
@@ -3796,7 +3810,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 pass
                 ######################## bit operation
             self.__TFName = ''
-        '''
+            '''
+        
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementModal.
@@ -5250,9 +5265,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         if Root.Child != []:
             for ChildNode in Root.Child:
-                
-               # if type(ChildNode.Data) != CIfrSuppressIf2:
-                
                 if Root.OpCode in ConditionOps:
                     if ChildNode.OpCode in ConditionOps:
                         ChildNode.Condition = Root.Condition + ' | ' + ChildNode.Condition

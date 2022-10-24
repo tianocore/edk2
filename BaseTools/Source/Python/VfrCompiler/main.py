@@ -8,18 +8,18 @@ from VfrSyntaxParser import VfrSyntaxParser
 from VfrSyntaxVisitor import VfrSyntaxVisitor
 
 
-def VfrParse(infile, outfile):
-    input_stream = FileStream(infile)
-    lexer = VfrSyntaxLexer(input_stream)
-    stream = CommonTokenStream(lexer)
-    parser = VfrSyntaxParser(stream)
-    tree = parser.vfrProgram()
+def VfrParse(Infile, Outfile):
+    InputStream = FileStream(Infile)
+    Lexer = VfrSyntaxLexer(InputStream)
+    Stream = CommonTokenStream(Lexer)
+    Parser = VfrSyntaxParser(Stream)
+    Tree = Parser.vfrProgram()
     Visitor = VfrSyntaxVisitor()
-    Visitor.visit(tree)
-    Visitor.DumpYaml(Visitor.GetRoot(), outfile)
+    Visitor.visit(Tree)
+    Visitor.DumpYaml(Visitor.GetRoot(), Outfile)
     
 if __name__ == '__main__':
-    infile = "test\\test.i"
-    outfile = 'test\demo.yaml'
-    VfrParse(infile, outfile)
+    Infile = "test\PlatformForms.i"
+    Outfile = 'test\PlatformFormsdemo.yaml'
+    VfrParse(Infile, Outfile)
    
