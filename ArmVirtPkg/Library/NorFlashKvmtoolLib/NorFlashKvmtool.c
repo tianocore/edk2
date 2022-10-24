@@ -9,8 +9,8 @@
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/NorFlashPlatformLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/VirtNorFlashPlatformLib.h>
 #include <Protocol/FdtClient.h>
 
 /** Macro defining the NOR block size configured in Kvmtool.
@@ -25,10 +25,10 @@
 */
 #define LABEL_UEFI_VAR_STORE  "System-firmware"
 
-STATIC NOR_FLASH_DESCRIPTION  mNorFlashDevices[MAX_FLASH_DEVICES];
-STATIC UINTN                  mNorFlashDeviceCount = 0;
-STATIC INT32                  mUefiVarStoreNode    = MAX_INT32;
-STATIC FDT_CLIENT_PROTOCOL    *mFdtClient;
+STATIC VIRT_NOR_FLASH_DESCRIPTION  mNorFlashDevices[MAX_FLASH_DEVICES];
+STATIC UINTN                       mNorFlashDeviceCount = 0;
+STATIC INT32                       mUefiVarStoreNode    = MAX_INT32;
+STATIC FDT_CLIENT_PROTOCOL         *mFdtClient;
 
 /** This function performs platform specific actions to initialise
     the NOR flash, if required.
@@ -36,7 +36,7 @@ STATIC FDT_CLIENT_PROTOCOL    *mFdtClient;
   @retval EFI_SUCCESS           Success.
 **/
 EFI_STATUS
-NorFlashPlatformInitialization (
+VirtNorFlashPlatformInitialization (
   VOID
   )
 {
@@ -89,7 +89,7 @@ NorFlashPlatformInitialization (
 STATIC
 EFI_STATUS
 SetupVariableStore (
-  IN NOR_FLASH_DESCRIPTION  *FlashDevice
+  IN VIRT_NOR_FLASH_DESCRIPTION  *FlashDevice
   )
 {
   UINTN  FlashRegion;
@@ -187,9 +187,9 @@ SetupVariableStore (
   @retval EFI_NOT_FOUND         Flash device not found.
 **/
 EFI_STATUS
-NorFlashPlatformGetDevices (
-  OUT NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
-  OUT UINT32                 *Count
+VirtNorFlashPlatformGetDevices (
+  OUT VIRT_NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
+  OUT UINT32                      *Count
   )
 {
   if (mNorFlashDeviceCount > 0) {
