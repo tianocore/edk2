@@ -17,10 +17,13 @@
 #include <Library/MemEncryptSevLib.h>
 #include <Library/MemEncryptTdxLib.h>
 #include <Protocol/MemoryAccept.h>
+#include <Protocol/MemoryAcceptance.h>
 
 STATIC BOOLEAN  mAcceptAllMemoryAtEBS = TRUE;
 
 STATIC EFI_EVENT  mAcceptAllMemoryEvent = NULL;
+
+STATIC EFI_HANDLE  mCocoDxeHandle = NULL;
 
 STATIC
 EFI_STATUS
@@ -110,6 +113,21 @@ ResolveUnacceptedMemory (
   ASSERT_EFI_ERROR (Status);
 }
 
+STATIC
+EFI_STATUS
+EFIAPI
+AllowUnacceptedMemory (
+  IN  BZ3987_MEMORY_ACCEPTANCE_PROTOCOL  *This
+  )
+{
+  mAcceptAllMemoryAtEBS = FALSE;
+  return EFI_SUCCESS;
+}
+
+STATIC
+BZ3987_MEMORY_ACCEPTANCE_PROTOCOL
+  mMemoryAcceptanceProtocol = { AllowUnacceptedMemory };
+
 EFI_STATUS
 EFIAPI
 CocoDxeEntryPoint (
@@ -140,6 +158,16 @@ CocoDxeEntryPoint (
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "AllowUnacceptedMemory event creation for EventBeforeExitBootServices failed.\n"));
+  }
+
+  Status = gBS->InstallProtocolInterface (
+                  &mCocoDxeHandle,
+                  &gBz3987MemoryAcceptanceProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &mMemoryAcceptanceProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Install Bz3987MemoryAcceptanceProtocol failed.\n"));
   }
 
   return EFI_SUCCESS;
