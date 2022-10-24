@@ -21,6 +21,7 @@
 #include <Guid/ConfidentialComputingSevSnpBlob.h>
 #include <Library/PcdLib.h>
 #include <Pi/PrePiDxeCis.h>
+#include <Protocol/SevMemoryAcceptance.h>
 #include <Protocol/MemoryAccept.h>
 
 STATIC CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION  mSnpBootDxeTable = {
@@ -133,16 +134,30 @@ ResolveUnacceptedMemory (
   IN VOID       *Context
   )
 {
-  EFI_STATUS                    Status;
+  EFI_STATUS  Status;
 
   if (!mAcceptAllMemoryAtEBS) {
     return;
   }
 
-
   Status = AcceptAllMemory ();
   ASSERT_EFI_ERROR (Status);
 }
+
+STATIC
+EFI_STATUS
+EFIAPI
+AllowUnacceptedMemory (
+  IN  OVMF_SEV_MEMORY_ACCEPTANCE_PROTOCOL  *This
+  )
+{
+  mAcceptAllMemoryAtEBS = FALSE;
+  return EFI_SUCCESS;
+}
+
+STATIC
+OVMF_SEV_MEMORY_ACCEPTANCE_PROTOCOL
+  mMemoryAcceptanceProtocol = { AllowUnacceptedMemory };
 
 STATIC EDKII_MEMORY_ACCEPT_PROTOCOL  mMemoryAcceptProtocol = {
   AmdSevMemoryAccept
@@ -291,6 +306,16 @@ AmdSevDxeEntryPoint (
 
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "AllowUnacceptedMemory event creation for EventBeforeExitBootServices failed.\n"));
+    }
+
+    Status = gBS->InstallProtocolInterface (
+                    &mAmdSevDxeHandle,
+                    &gOvmfSevMemoryAcceptanceProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &mMemoryAcceptanceProtocol
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Install OvmfSevMemoryAcceptanceProtocol failed.\n"));
     }
 
     //
