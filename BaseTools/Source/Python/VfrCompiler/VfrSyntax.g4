@@ -1101,7 +1101,7 @@ locals[Node=VfrTreeNode(EFI_IFR_GUID_OP)]
     ;
 
 vfrStatementExtension
-locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), Databuff=[], Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
+locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), DataBuff=[], Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
     :   'guidop'
         'guid' '=' guidDefinition
         (   ',' 'datatype' '='
@@ -1116,7 +1116,7 @@ locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), Databuff=[], Size=0, TypeName='', Type
             |   'EFI_HII_REF' ('[' Number ']')?
             |   StringIdentifier ('[' Number ']')?
             )
-            (vfrExtensionData)*
+            (vfrExtensionData[localctx.DataBuff])*
         )?
         (
             ',' (vfrStatementExtension)*
@@ -1126,7 +1126,8 @@ locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), Databuff=[], Size=0, TypeName='', Type
     ;
 
 
-vfrExtensionData
+vfrExtensionData[DataBuff]
+locals[IsStruct]
     :   ',' 'data' ('[' Number ']')?  
         ( '.' arrayName)*  '=' Number 
     ;
@@ -1143,54 +1144,29 @@ locals[Node=VfrTreeNode(EFI_IFR_MODAL_TAG_OP)]
     ;
 
 vfrStatementExpression // to do
-locals[ExpInfo=ExpressionInfo(), Exp=None]
-    :   andTerm[localctx.ExpInfo] (vfrStatementExpressionSupplementary[localctx.ExpInfo])*
+locals[ExpInfo=ExpressionInfo()]
+    :   andTerm[localctx.ExpInfo] ('OR' andTerm[localctx.ExpInfo])*
     ; 
     
-vfrStatementExpressionSupplementary[ExpInfo]
-locals[Line=0]
-    :   'OR' andTerm[ExpInfo]
-    ;
-
 vfrStatementExpressionSub // pendingh how to do the rootlevel
 locals[ExpInfo=ExpressionInfo()]
-    :   andTerm[localctx.ExpInfo] (vfrStatementExpressionSubSupplementary[localctx.ExpInfo])*
-    ;
-
-vfrStatementExpressionSubSupplementary[ExpInfo]
-locals[Line=0]
-    :   'OR' andTerm[ExpInfo]
+    :   andTerm[localctx.ExpInfo] ('OR' andTerm[localctx.ExpInfo])*
     ;
 
 andTerm[ExpInfo]
 locals[CIfrAndList=[]]
-    :   bitwiseorTerm[ExpInfo] (andTermSupplementary[ExpInfo])*
-    ;
-
-andTermSupplementary[ExpInfo]
-locals[Line=0]
-    :   'AND' bitwiseorTerm[ExpInfo]
+    :   bitwiseorTerm[ExpInfo] ('AND' bitwiseorTerm[ExpInfo])*
     ;
 
 bitwiseorTerm[ExpInfo]
 locals[CIfrBitWiseOrList=[]]
-    :   bitwiseandTerm[ExpInfo] (bitwiseorTermSupplementary[ExpInfo])*
-    ;
-
-bitwiseorTermSupplementary[ExpInfo]
-locals[Line=0]
-    :   '|' bitwiseandTerm[ExpInfo]
+    :   bitwiseandTerm[ExpInfo] ('|' bitwiseandTerm[ExpInfo])*
     ;
 
 
 bitwiseandTerm[ExpInfo]
 locals[CIfrBitWiseAndList=[]]
-    :   equalTerm[ExpInfo] (bitwiseandTermSupplementary[ExpInfo])*
-    ;
-
-bitwiseandTermSupplementary[ExpInfo]
-locals[Line=0]
-    :   '&' equalTerm[ExpInfo]
+    :   equalTerm[ExpInfo] ('&' equalTerm[ExpInfo])*
     ;
 
 
@@ -1199,6 +1175,7 @@ locals[CIfrEqualList=[], CIfrNotEqualList=[]]
     :   compareTerm[localctx.ExpInfo] 
         (equalTermSupplementary[localctx.CIfrEqualList, localctx.CIfrNotEqualList, ExpInfo])*
     ;
+
 
 equalTermSupplementary[CIfrEqualList, CIfrNotEqualList, ExpInfo]
 locals[Line=0]
@@ -1337,7 +1314,7 @@ locals[DObj=None]
     ;
 
 
-vareqvalExp[ExpInfo] // to do 
+vareqvalExp[ExpInfo] 
     :   'vareqval' 
         'var' '(' Number ')'
         (   '==' Number
@@ -1627,7 +1604,8 @@ LessEqual: '<=';
 Less:'<';
 GreaterEqual:'>=';
 Greater:'>';
-
+BitWiseOr: '|';
+BitWiseAnd: '&';
 /* 
 LineDefinition                           '#line\ [0-9]+\ \'~[\']+\'[\ \t]*\n' << gCVfrErrorHandle.ParseFileScopeRecord (begexpr (), line ()); skip (); newline (); >>
 */

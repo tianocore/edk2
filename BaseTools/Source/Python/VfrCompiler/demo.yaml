@@ -1,34 +1,34 @@
 Formset:
-  Guid:  {0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}
+  Guid:  {0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3d}
   Title:  19  # Title STRING_ID
   Help:  20  # Help STRING_ID
-  ClassGuid:  {0x93039971, 0x8545, 0x4b04, { 0xb4, 0x5e, 0x32, 0xeb, 0x83, 0x26, 0x4, 0xe }}
   - varstore:
       varid:  4660
       name:  MyIfrNVData
-      size:  260
-      guid:  {0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}
+      size:  219  # wrong
+      guid:  {0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3d}
   - efivarstore:
       varid:  1
       name:  MyEfiVar
       size:  8
-      guid:  {0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}
-      attribute:  3
+      guid:  {0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3d}
+      attribute:  1918981737
   - efivarstore:
       varid:  2
       name:  MyEfiBitVar
       size:  8
-      guid:  {0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}
-      attribute:  3
+      guid:  {0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3d}
+      attribute:  1953055337
   - efivarstore:
       varid:  3
       name:  MyEfiUnionVar
       size:  1
-      guid:  {0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}
-      attribute:  3
+      guid:  {0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3d}
+      attribute:  1768838505
   - namevaluevarstore:
       varid:  4
-      guid:  {0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}
+      name:  
+      guid:  {0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3d}
   - form:
       FormId:  1  # FormId STRING_ID
       FormTitle:  21  # FormTitle STRING_ID
@@ -46,28 +46,28 @@ Formset:
           questionid:  4663  # Question QuestionId
           varstoreid:  0  # Question VarStoreId
           flags:  4  # Question Flags
-          questionconfig:  0  # QuestionConfig
+          QuestionConfig:  0  # QuestionConfig
       - text:
           prompt:  85  # Statement Prompt STRING_ID
           help:  85  # Statement Help STRING_ID
           questionid:  4664  # Question QuestionId
           varstoreid:  0  # Question VarStoreId
           flags:  4  # Question Flags
-          questionconfig:  0  # QuestionConfig
+          QuestionConfig:  0  # QuestionConfig
       - text:
           prompt:  87  # Statement Prompt STRING_ID
           help:  87  # Statement Help STRING_ID
           questionid:  4675  # Question QuestionId
           varstoreid:  0  # Question VarStoreId
           flags:  4  # Question Flags
-          questionconfig:  0  # QuestionConfig
+          QuestionConfig:  0  # QuestionConfig
       - text:
           prompt:  88  # Statement Prompt STRING_ID
           help:  88  # Statement Help STRING_ID
           questionid:  4676  # Question QuestionId
           varstoreid:  0  # Question VarStoreId
           flags:  4  # Question Flags
-          questionconfig:  0  # QuestionConfig
+          QuestionConfig:  0  # QuestionConfig
       - oneof:
           prompt:  31  # Statement Prompt STRING_ID
           help:  38  # Statement Help STRING_ID
@@ -76,18 +76,18 @@ Formset:
           varname:  93  # Question VarName STRING_ID
           varoffset:  93  # Question VarOffset
           flags:  0  # Question Flags
-          - option:  42
-              option flag:  0
-              option type:  0
-              option value:  0
-          - option:  43
-              option flag:  0
-              option type:  0
-              option value:  1
-          - option:  44
-              option flag:  16
-              option type:  0
-              option value:  2
+          - Option:  42
+              Option Flag:  0
+              Option type:  0
+              Option Value:  0
+          - Option:  43
+              Option Flag:  0
+              Option type:  0
+              Option Value:  1
+          - Option:  44
+              Option Flag:  16
+              Option type:  0
+              Option Value:  2
       - oneof:
           prompt:  31  # Statement Prompt STRING_ID
           help:  38  # Statement Help STRING_ID
@@ -97,83 +97,96 @@ Formset:
           varoffset:  118  # Question VarOffset
           flags:  0  # Question Flags
           - default:
+              prompt:  0  # Statement Prompt STRING_ID 
+              help:  0  # Statement Help STRING_ID
               type:  8
-              defaultid:  0
-          - option:  45
-              option flag:  0
-              option type:  0
-              option value:  0
-          - option:  46
-              option flag:  0
-              option type:  0
-              option value:  1
+              varstoreid:  0
+              value:  0
+          - Option:  45
+              Option Flag:  0
+              Option type:  0
+              Option Value:  0
+          - Option:  46
+              Option Flag:  0
+              Option type:  0
+              Option Value:  1
       - checkbox:
-          condition:  grayoutif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1 | suppressif questionref(MyOneOf) == 0x0
+          condition: grayoutif  ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1 | suppressif questionref(MyOneOf) == 0x0
           prompt:  47  # Statement Prompt STRING_ID
           help:  48  # Statement Help STRING_ID
           questionid:  3  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
           varname:  92  # Question VarName STRING_ID
-          varoffset:  92  # Question VarOffse
+          varoffset:  92  # Question VarOffset
           flags:  3  # Flags
           - default:
-              type:  4
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
+              type:  0 # seems wrong 4
               varstoreid:  0
-              value:  True
+              value:  1
       - label:
-          condition:  suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
+          condition: suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
           labelnumber:  8738  # LabelNumber
       - orderedlist:
-          condition:  suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
+          condition: suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
           prompt:  141  # Statement Prompt STRING_ID
           help:  90  # Statement Help STRING_ID
           questionid:  4  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
           maxContainers:  8
           flags:  0
-          - option:  143
-              option flag:  1
-              option type:  1
-              option value:  2
-          - option:  142
-              option flag:  1
-              option type:  1
-              option value:  1
-          - option:  144
-              option flag:  1
-              option type:  1
-              option value:  3
+          - Option:  143
+              Option Flag:  1
+              Option type:  1
+              Option Value:  2
+          - Option:  142
+              Option Flag:  1
+              Option type:  1
+              Option Value:  1
+          - Option:  144
+              Option Flag:  1
+              Option type:  1
+              Option Value:  3
+          - Option:  145
+              condition: suppressif ideqval MyIfrNVData.BootOrderLarge == 0
+              Option Flag:  1
+              Option type:  1
+              Option Value:  4
       - label:
-          condition:  suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
+          condition: suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
           labelnumber:  8739  # LabelNumber
       - orderedlist:
-          condition:  disableif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x2
+          condition: disableif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x2
           prompt:  82  # Statement Prompt STRING_ID
           help:  80  # Statement Help STRING_ID
           questionid:  5  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
           maxContainers:  8
           flags:  0
-          - option:  39
-              option flag:  0
-              option type:  0
-              option value:  3
-          - option:  40
-              option flag:  0
-              option type:  0
-              option value:  2
-          - option:  41
-              option flag:  0
-              option type:  0
-              option value:  1
+          - Option:  39
+              Option Flag:  0
+              Option type:  0
+              Option Value:  3
+          - Option:  40
+              Option Flag:  0
+              Option type:  0
+              Option Value:  2
+          - Option:  41
+              Option Flag:  0
+              Option type:  0
+              Option Value:  1
           - default:
-              type:  11
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
+              type:  11 # 0
               varstoreid:  0
+              value:  1
       - label:
           labelnumber:  100  # LabelNumber
       - goto:
           formid:  4660
-          questionid:  4660
+          questionid:  4660 # QuetionId的值怎么获取
           prompt:  65
           help:  81
       - goto:
@@ -189,14 +202,14 @@ Formset:
           varname:  89  # Question VarName STRING_ID
           varoffset:  89  # Question VarOffset
           flags:  16  # Question Flags
-          - option:  39
-              option flag:  0
-              option type:  0
-              option value:  0
-          - option:  40
-              option flag:  16
-              option type:  0
-              option value:  1
+          - Option:  39
+              Option Flag:  0 # 16
+              Option type:  0
+              Option Value:  0
+          - Option:  40
+              Option Flag:  16 # 0
+              Option type:  0
+              Option Value:  1
       - oneof:
           prompt:  83  # Statement Prompt STRING_ID
           help:  38  # Statement Help STRING_ID
@@ -205,14 +218,14 @@ Formset:
           varname:  90  # Question VarName STRING_ID
           varoffset:  90  # Question VarOffset
           flags:  16  # Question Flags
-          - option:  39
-              option flag:  16
-              option type:  0
-              option value:  0
-          - option:  40
-              option flag:  0
-              option type:  0
-              option value:  1
+          - Option:  39
+              Option Flag:  16 # 0
+              Option type:  0
+              Option Value:  0
+          - Option:  40 
+              Option Flag:  0 # 16
+              Option type:  0
+              Option Value:  1
       - oneof:
           prompt:  32  # Statement Prompt STRING_ID
           help:  38  # Statement Help STRING_ID
@@ -221,68 +234,70 @@ Formset:
           varname:  91  # Question VarName STRING_ID
           varoffset:  91  # Question VarOffset
           flags:  16  # Question Flags
-          - option:  39
-              option flag:  0
-              option type:  0
-              option value:  0
-          - option:  40
-              option flag:  16
-              option type:  0
-              option value:  1
-          - option:  41
-              option flag:  0
-              option type:  0
-              option value:  3
+          - Option:  39
+              Option Flag:  0
+              Option type:  0
+              Option Value:  0
+          - Option:  40
+              Option Flag:  16
+              Option type:  0
+              Option Value:  1
+          - Option:  41
+              Option Flag:  0
+              Option type:  0
+              Option Value:  3
       - oneof:
           prompt:  34  # Statement Prompt STRING_ID
           help:  35  # Statement Help STRING_ID
           questionid:  9  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  258  # Question VarName STRING_ID
-          varoffset:  258  # Question VarOffset
+          varname:  217  # Question VarName STRING_ID
+          varoffset:  217  # Question VarOffset
           flags:  48  # Question Flags
-          - option:  39
-              option flag:  0
-              option type:  0
-              option value:  0
-          - option:  40
-              option flag:  16
-              option type:  0
-              option value:  1
-          - option:  41
-              option flag:  0
-              option type:  0
-              option value:  3
+          - Option:  39
+              Option Flag:  0
+              Option type:  0
+              Option Value:  0
+          - Option:  40
+              Option Flag:  16
+              Option type:  0
+              Option Value:  1
+          - Option:  41
+              Option Flag:  0
+              Option type:  0
+              Option Value:  3
       - numeric:
           prompt:  36  # Statement Prompt STRING_ID
           help:  37  # Statement Help STRING_ID
           questionid:  10  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  259  # Question VarName STRING_ID
-          varoffset:  259  # Question VarOffset
+          varname:  218  # Question VarName STRING_ID # 259
+          varoffset:  218  # Question VarOffset # 256 # 259
           flags:  48  # Question Flags
           maxvalue:  240
           minvalue:  0
           step:  0
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  0
               varstoreid:  0
               value:  0
       - string:
           prompt:  72  # Statement Prompt STRING_ID
           help:  73  # Statement Help STRING_ID
-          questionid:  4662  # Question QuestionId
+          questionid:  4662  # Question QuestionId # 11
           varstoreid:  4660  # Question VarStoreId
           varname:  0  # Question VarName STRING_ID
           varoffset:  0  # Question VarOffset
           flags:  4  # Question Flags
-          stringflags:  0
-          stringminsize:  6
-          stringmaxsize:  40
+          stringflags:  0  # Flags
+          stringminsize:  6  # MinSize
+          stringmaxsize:  40  # MaxSize
       - numeric:
           prompt:  50  # Statement Prompt STRING_ID
           help:  53  # Statement Help STRING_ID
-          questionid:  11  # Question QuestionId
+          questionid:  11  # Question QuestionId # 12
           varstoreid:  4660  # Question VarStoreId
           varname:  82  # Question VarName STRING_ID
           varoffset:  82  # Question VarOffset
@@ -291,13 +306,15 @@ Formset:
           minvalue:  0
           step:  0
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  0
               varstoreid:  0
               value:  21
       - numeric:
           prompt:  51  # Statement Prompt STRING_ID
           help:  53  # Statement Help STRING_ID
-          questionid:  12  # Question QuestionId
+          questionid:  12  # Question QuestionId # 13
           varstoreid:  4660  # Question VarStoreId
           varname:  82  # Question VarName STRING_ID
           varoffset:  82  # Question VarOffset
@@ -306,8 +323,11 @@ Formset:
           minvalue:  0
           step:  0
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  8
-              defaultid:  0
+              varstoreid:  0
+              value:  0
       - numeric:
           prompt:  52  # Statement Prompt STRING_ID
           help:  54  # Statement Help STRING_ID
@@ -320,17 +340,21 @@ Formset:
           minvalue:  0
           step:  0
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  0
               varstoreid:  0
               value:  18
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  0
               varstoreid:  1
               value:  19
       - numeric:
           prompt:  146  # Statement Prompt STRING_ID
           help:  95  # Statement Help STRING_ID
-          questionid:  13  # Question QuestionId
+          questionid:  13  # Question QuestionId # 14
           varstoreid:  4  # Question VarStoreId
           varname:  146  # Question VarName STRING_ID
           varoffset:  146  # Question VarOffset
@@ -339,29 +363,37 @@ Formset:
           minvalue:  0
           step:  0
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  0
               varstoreid:  0
               value:  16
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  0
               varstoreid:  1
               value:  17
       - numeric:
           prompt:  147  # Statement Prompt STRING_ID
           help:  96  # Statement Help STRING_ID
-          questionid:  14  # Question QuestionId
+          questionid:  14  # Question QuestionId # 15
           varstoreid:  4  # Question VarStoreId
           varname:  147  # Question VarName STRING_ID
           varoffset:  147  # Question VarOffset
           flags:  0  # Question Flags
           maxvalue:  65535
           minvalue:  0
-          step:  0
+          step:  255
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  1
               varstoreid:  0
               value:  18
           - default:
+              prompt:  16  # Statement Prompt STRING_ID
+              help:  255  # Statement Help STRING_ID
               type:  1
               varstoreid:  1
               value:  19
@@ -373,9 +405,9 @@ Formset:
           varname:  148  # Question VarName STRING_ID
           varoffset:  148  # Question VarOffset
           flags:  0  # Question Flags
-          stringflags:  0
-          stringminsize:  2
-          stringmaxsize:  20
+          stringflags:  0  # Flags
+          stringminsize:  2  # MinSize
+          stringmaxsize:  20  # MaxSize
       - oneof:
           prompt:  31  # Statement Prompt STRING_ID
           help:  30  # Statement Help STRING_ID
@@ -384,23 +416,23 @@ Formset:
           varname:  1  # Question VarName STRING_ID
           varoffset:  1  # Question VarOffset
           flags:  0  # Question Flags
-          - option:  45
-              option flag:  1
-              option type:  1
-              option value:  0
-          - option:  46
-              option flag:  17
-              option type:  1
-              option value:  1
+          - Option:  45
+              Option Flag:  1
+              Option type:  1
+              Option Value:  0
+          - Option:  46
+              Option Flag:  17
+              Option type:  1
+              Option Value:  1
       - label:
           labelnumber:  1  # LabelNumber
       - label:
           labelnumber:  4096  # LabelNumber
       - numeric:
-          condition:  grayoutif ideqval MyIfrNVData.HowOldAreYouInYearsManual == 23 AND ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1
+          condition: grayoutif  ideqval MyIfrNVData.HowOldAreYouInYearsManual == 23 AND ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1
           prompt:  49  # Statement Prompt STRING_ID
           help:  55  # Statement Help STRING_ID
-          questionid:  17  # Question QuestionId
+          questionid:  17  # Question QuestionId # 18
           varstoreid:  4660  # Question VarStoreId
           varname:  85  # Question VarName STRING_ID
           varoffset:  85  # Question VarOffset
@@ -409,10 +441,14 @@ Formset:
           minvalue:  0
           step:  1
           - default:
+              prompt:  16  # Statement Prompt STRING_ID
+              help:  499  # Statement Help STRING_ID
               type:  0
               varstoreid:  0
               value:  18
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  0
               varstoreid:  1
               value:  19
@@ -421,13 +457,15 @@ Formset:
           help:  106  # Statement Help STRING_ID
           questionid:  4665  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  236  # Question VarName STRING_ID
-          varoffset:  236  # Question VarOffset
+          varname:  198  # Question VarName STRING_ID # 236
+          varoffset:  198  # Question VarOffset # 236
           flags:  4  # Question Flags
           maxvalue:  255
           minvalue:  0
           step:  1
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  0
               varstoreid:  0
               value:  18
@@ -436,13 +474,15 @@ Formset:
           help:  104  # Statement Help STRING_ID
           questionid:  4672  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  235  # Question VarName STRING_ID
-          varoffset:  235  # Question VarOffset
+          varname:  197  # Question VarName STRING_ID # 235
+          varoffset:  197  # Question VarOffset # 235
           flags:  4  # Question Flags
           maxvalue:  255
           minvalue:  0
           step:  1
           - default:
+              prompt:  32  # Statement Prompt STRING_ID
+              help:  511  # Statement Help STRING_ID
               type:  0
               varstoreid:  0
               value:  18
@@ -453,18 +493,18 @@ Formset:
           varstoreid:  4660  # Question VarStoreId
           maxContainers:  3
           flags:  0
-          - option:  39
-              option flag:  0
-              option type:  0
-              option value:  1
-          - option:  40
-              option flag:  0
-              option type:  0
-              option value:  2
-          - option:  41
-              option flag:  0
-              option type:  0
-              option value:  3
+          - Option:  39
+              Option Flag:  0
+              Option type:  0
+              Option Value:  1
+          - Option:  40
+              Option Flag:  0
+              Option type:  0
+              Option Value:  2
+          - Option:  41
+              Option Flag:  0
+              Option type:  0
+              Option Value:  3
       - resetbutton:
           prompt:  91  # Statement Prompt STRING_ID
           help:  92  # Statement Help STRING_ID
@@ -474,7 +514,7 @@ Formset:
           help:  94  # Statement Help STRING_ID
           defaultid:  1
       - text:
-          condition:  grayoutif NOT security ({ 0x85b75607, 0xf7ce, 0x471e, { 0xb7, 0xe4, 0x2a, 0xea, 0x5f, 0x72, 0x32, 0xee } })
+          condition: grayoutif NOT security (EFI_USER_INFO_ACCESS_SETUP_ADMIN_GUID)
           prompt:  56  # Statement Prompt STRING_ID
           help:  57  # Statement Help STRING_ID
           text:  0  # Statement Help STRING_ID
@@ -486,10 +526,12 @@ Formset:
           varname:  6  # Question VarName STRING_ID
           varoffset:  6  # Question VarOffset
           flags:  4  # Question Flags
-          maxvalue:  255
+          maxvalue:  0
           minvalue:  0
-          step:  0
+          step:  255
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  1
               varstoreid:  0
               value:  18
@@ -499,7 +541,7 @@ Formset:
           questionid:  4912  # Question QuestionId
           varstoreid:  0  # Question VarStoreId
           flags:  4  # Question Flags
-          questionconfig:  0  # QuestionConfig
+          QuestionConfig:  0  # QuestionConfig
       - goto:
           formid:  2
           questionid:  18
@@ -527,8 +569,8 @@ Formset:
           help:  81
       - goto:
           formid:  1
-          formsetid:  {0xb3f56470, 0x6141, 0x4621, { 0x8f, 0x19, 0x70, 0x4e, 0x57, 0x7a, 0xa9, 0xe8 }}
-          questionid:  0
+          formsetid:  {0xb3f56470, 0x6141, 0x4621, { 0x8f, 0x19, 0x70, 0x4e, 0x57, 0x7a, 0xa9, 0xe8}
+          questionid:  23 # 24
           prompt:  107
           help:  108
       - goto:
@@ -537,7 +579,7 @@ Formset:
           prompt:  116
           help:  117
   - form:
-      condition:  suppressif ideqval MyIfrNVData.BootOrderLarge == 0
+      condition: suppressif ideqval MyIfrNVData.BootOrderLarge == 0
       FormId:  2  # FormId STRING_ID
       FormTitle:  22  # FormTitle STRING_ID
       - date:
@@ -545,10 +587,13 @@ Formset:
           varstoreid:  0  # Question VarStoreId
           varname:  65535
           varoffset:  65535
-          prompt:  76  # Statement Prompt STRING_ID
-          help:  77  # Statement Help STRING_ID
-          flags:  0
+        # wrong
+          prompt:  0  # Statement Prompt STRING_ID # wrong
+          help:  0  # Statement Help STRING_ID # wrong
+          flags:  16
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  6
               varstoreid:  0
               value:  2004/1/1
@@ -558,31 +603,33 @@ Formset:
           questionid:  4673  # Question QuestionId
           varstoreid:  0  # Question VarStoreId
           flags:  4  # Question Flags
-          questionconfig:  0  # QuestionConfig
+          QuestionConfig:  0  # QuestionConfig
       - text:
           prompt:  86  # Statement Prompt STRING_ID
           help:  86  # Statement Help STRING_ID
           questionid:  4674  # Question QuestionId
           varstoreid:  0  # Question VarStoreId
           flags:  4  # Question Flags
-          questionconfig:  0  # QuestionConfig
+          QuestionConfig:  0  # QuestionConfig
       - time:
-          questionid:  26  # Statement Prompt STRING_ID
+          questionid:  26  # Statement Prompt STRING_ID # 27
           varstoreid:  0  # Question VarStoreId
           varname:  65535
           varoffset:  65535
-          prompt:  78  # Statement Prompt STRING_ID
-          help:  79  # Statement Help STRING_ID
-          flags:  0
+          prompt:  0  # Statement Prompt STRING_ID # 78
+          help:  0  # Statement Help STRING_ID # 79
+          flags:  16
       - time:
-          questionid:  27  # Statement Prompt STRING_ID
+          questionid:  27  # Statement Prompt STRING_ID # 28
           varstoreid:  4660  # Question VarStoreId
-          varname:  237
-          varoffset:  237
-          prompt:  78  # Statement Prompt STRING_ID
-          help:  78  # Statement Help STRING_ID
-          flags:  0
+          varname:  199
+          varoffset:  199
+          prompt:  0  # Statement Prompt STRING_ID # 78
+          help:  0  # Statement Help STRING_ID # 78
+          flags:  4
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  5
               varstoreid:  0
               value:  15:33:33
@@ -592,7 +639,7 @@ Formset:
           questionid:  28  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
           varname:  92  # Question VarName STRING_ID
-          varoffset:  92  # Question VarOffse
+          varoffset:  92  # Question VarOffset
           flags:  1  # Flags
       - text:
           prompt:  74  # Statement Prompt STRING_ID
@@ -607,13 +654,15 @@ Formset:
           questionid:  29
           prompt:  58
           help:  81
+          - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
+              type:  12
+              varstoreid:  0
+              value:  0
       - goto:
           prompt:  67
           help:  69
-          - default:
-              type:  12
-              varstoreid:  0
-              option value:  0;0;{0x0, 0x0, 0x0, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }};90
       - goto:
           prompt:  68
           help:  70
@@ -621,7 +670,7 @@ Formset:
       FormId:  3  # FormId STRING_ID
       FormTitle:  23  # FormTitle STRING_ID
       - text:
-          condition:  suppressif ideqval MyEfiVar.Field8 == 111
+          condition: suppressif  ideqval MyEfiVar.Field8 == 111
           prompt:  74  # Statement Prompt STRING_ID
           help:  80  # Statement Help STRING_ID
           text:  0  # Statement Help STRING_ID
@@ -642,17 +691,19 @@ Formset:
           minvalue:  0
           step:  0
           - default:
+              prompt:  16  # Statement Prompt STRING_ID
+              help:  255  # Statement Help STRING_ID
               type:  0
               varstoreid:  0
               value:  0
       - numeric:
-          condition:  grayoutif match2 (stringref(STRING_TOKEN(0x00B0)), stringref(STRING_TOKEN(0x00AF)), { 0x63E60A51, 0x497D, 0xD427, {0xC4, 0xA5, 0xB8, 0xAB, 0xDC, 0x3A, 0xAE, 0xB6 }})
+          condition: grayoutif  match2 (stringref(STRING_TOKEN(STR_PATTERN)), stringref(STRING_TOKEN(STR_STRING)), PERL_GUID)
           prompt:  173  # Statement Prompt STRING_ID
           help:  174  # Statement Help STRING_ID
           questionid:  31  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  244  # Question VarName STRING_ID
-          varoffset:  244  # Question VarOffset
+          varname:  203  # Question VarName STRING_ID
+          varoffset:  203  # Question VarOffset
           flags:  0  # Question Flags
           maxvalue:  243
           minvalue:  0
@@ -663,89 +714,89 @@ Formset:
           labelnumber:  8739  # LabelNumber
   - formmap:
       FormId:  4  # FormId STRING_ID
-      maptitle:  149
-      mapguid:  {0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}
-      maptitle:  150
-      mapguid:  {0x3bd2f4ec, 0xe524, 0x46e4, { 0xa9, 0xd8, 0x51, 0x1, 0x17, 0x42, 0x55, 0x62 }}
+      MapTitle: 149
+      MapGuid: {0xA04A27f4, 0xDF00, 0x4D42, {0xB5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3D}}
+      MapTitle: 150
+      MapGuid: {0x3bd2f4ec, 0xe524, 0x46e4, { 0xa9, 0xd8, 0x51, 0x1, 0x17, 0x42, 0x55, 0x62}}
       - oneof:
           prompt:  151  # Statement Prompt STRING_ID
           help:  38  # Statement Help STRING_ID
           questionid:  32  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  230  # Question VarName STRING_ID
-          varoffset:  230  # Question VarOffset
+          varname:  192  # Question VarName STRING_ID
+          varoffset:  192  # Question VarOffset
           flags:  0  # Question Flags
-          - option:  152
-              option flag:  16
-              option type:  0
-              option value:  0
-          - option:  153
-              option flag:  0
-              option type:  0
-              option value:  1
-          - option:  154
-              option flag:  0
-              option type:  0
-              option value:  2
-          - option:  155
-              option flag:  0
-              option type:  0
-              option value:  3
-          - option:  156
-              option flag:  0
-              option type:  0
-              option value:  4
+          - Option:  152
+              Option Flag:  16
+              Option type:  0
+              Option Value:  0
+          - Option:  153
+              Option Flag:  0
+              Option type:  0
+              Option Value:  1
+          - Option:  154
+              Option Flag:  0
+              Option type:  0
+              Option Value:  2
+          - Option:  155
+              Option Flag:  0
+              Option type:  0
+              Option Value:  3
+          - Option:  156
+              Option Flag:  0
+              Option type:  0
+              Option Value:  4
       - checkbox:
-          condition:  grayoutif TRUE
+          condition: grayoutif TRUE
           prompt:  157  # Statement Prompt STRING_ID
           help:  48  # Statement Help STRING_ID
           questionid:  33  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  231  # Question VarName STRING_ID
-          varoffset:  231  # Question VarOffse
+          varname:  193  # Question VarName STRING_ID
+          varoffset:  193  # Question VarOffset
           flags:  0  # Flags
       - oneof:
-          condition:  grayoutif TRUE | suppressif ideqval MyIfrNVData.SerialPortStatus == 0
+          condition: grayoutif TRUE | suppressif ideqval MyIfrNVData.SerialPortStatus == 0
           prompt:  158  # Statement Prompt STRING_ID
           help:  38  # Statement Help STRING_ID
           questionid:  34  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  232  # Question VarName STRING_ID
-          varoffset:  232  # Question VarOffset
+          varname:  194  # Question VarName STRING_ID
+          varoffset:  194  # Question VarOffset
           flags:  0  # Question Flags
-          - option:  160
-              option flag:  17
-              option type:  1
-              option value:  1016
-          - option:  161
-              option flag:  1
-              option type:  1
-              option value:  760
-          - option:  162
-              option flag:  1
-              option type:  1
-              option value:  1000
-          - option:  163
-              option flag:  1
-              option type:  1
-              option value:  744
+          - Option:  160
+              Option Flag:  17
+              Option type:  1
+              Option Value:  248
+          - Option:  161
+              Option Flag:  1
+              Option type:  1
+              Option Value:  248
+          - Option:  162
+              Option Flag:  1
+              Option type:  1
+              Option Value:  232
+          - Option:  163
+              Option Flag:  1
+              Option type:  1
+              Option Value:  232
       - oneof:
-          condition:  grayoutif TRUE | suppressif ideqval MyIfrNVData.SerialPortStatus == 0
+          condition: grayoutif TRUE | suppressif ideqval MyIfrNVData.SerialPortStatus == 0
           prompt:  159  # Statement Prompt STRING_ID
           help:  38  # Statement Help STRING_ID
           questionid:  35  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  234  # Question VarName STRING_ID
-          varoffset:  234  # Question VarOffset
+          varname:  196  # Question VarName STRING_ID
+          varoffset:  196  # Question VarOffset
           flags:  0  # Question Flags
-          - option:  164
-              option flag:  16
-              option type:  0
-              option value:  4
-          - option:  165
-              option flag:  0
-              option type:  0
-              option value:  3
+          - Option:  164
+              Option Flag:  16
+              Option type:  0
+              Option Value:  4
+          - Option:  165
+              Option Flag:  0
+              Option type:  0
+              Option Value:  3
       - goto:
           formid:  1
           questionid:  36
@@ -760,14 +811,14 @@ Formset:
           questionid:  4677  # Question QuestionId
           varstoreid:  0  # Question VarStoreId
           flags:  4  # Question Flags
-          questionconfig:  0  # QuestionConfig
+          QuestionConfig:  0  # QuestionConfig
       - text:
           prompt:  85  # Statement Prompt STRING_ID
           help:  85  # Statement Help STRING_ID
           questionid:  4678  # Question QuestionId
           varstoreid:  0  # Question VarStoreId
           flags:  4  # Question Flags
-          questionconfig:  0  # QuestionConfig
+          QuestionConfig:  0  # QuestionConfig
   - form:
       FormId:  6  # FormId STRING_ID
       FormTitle:  24  # FormTitle STRING_ID
@@ -780,13 +831,15 @@ Formset:
           help:  53  # Statement Help STRING_ID
           questionid:  4679  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  243  # Question VarName STRING_ID
-          varoffset:  243  # Question VarOffset
+          varname:  202  # Question VarName STRING_ID
+          varoffset:  202  # Question VarOffset
           flags:  4  # Question Flags
           maxvalue:  255
           minvalue:  0
           step:  0
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  0
               varstoreid:  0
               value:  0
@@ -812,7 +865,7 @@ Formset:
           questionid:  37  # Question QuestionId
           varstoreid:  2  # Question VarStoreId
           varname:  17  # Question VarName STRING_ID
-          varoffset:  17  # Question VarOffse
+          varoffset:  17  # Question VarOffset
           flags:  1  # Flags
       - oneof:
           prompt:  125  # Statement Prompt STRING_ID
@@ -822,14 +875,14 @@ Formset:
           varname:  18  # Question VarName STRING_ID
           varoffset:  18  # Question VarOffset
           flags:  0  # Question Flags
-          - option:  45
-              option flag:  32
-              option type:  2
-              option value:  0
-          - option:  46
-              option flag:  16
-              option type:  2
-              option value:  1
+          - Option:  45
+              Option Flag:  32
+              Option type:  2
+              Option Value:  0
+          - Option:  46
+              Option Flag:  16
+              Option type:  2
+              Option Value:  1
       - numeric:
           prompt:  127  # Statement Prompt STRING_ID
           help:  131  # Statement Help STRING_ID
@@ -849,14 +902,14 @@ Formset:
           varname:  0  # Question VarName STRING_ID
           varoffset:  0  # Question VarOffset
           flags:  0  # Question Flags
-          - option:  45
-              option flag:  33
-              option type:  1
-              option value:  0
-          - option:  46
-              option flag:  17
-              option type:  1
-              option value:  1
+          - Option:  45
+              Option Flag:  33
+              Option type:  1
+              Option Value:  0
+          - Option:  46
+              Option Flag:  17
+              Option type:  1
+              Option Value:  1
       - subtitle:
           prompt:  27  # Statement Prompt STRING_ID
       - subtitle:
@@ -867,10 +920,10 @@ Formset:
           questionid:  40  # Question QuestionId
           varstoreid:  2  # Question VarStoreId
           varname:  51  # Question VarName STRING_ID
-          varoffset:  51  # Question VarOffse
+          varoffset:  51  # Question VarOffset
           flags:  1  # Flags
       - numeric:
-          condition:  grayoutif ideqval MyEfiBitVar.EfiBitGrayoutTest == 0
+          condition: grayoutif  ideqval MyEfiBitVar.EfiBitGrayoutTest == 0
           prompt:  136  # Statement Prompt STRING_ID
           help:  137  # Statement Help STRING_ID
           questionid:  41  # Question QuestionId
@@ -882,10 +935,14 @@ Formset:
           minvalue:  0
           step:  0
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  2
               varstoreid:  0
               value:  4
           - default:
+              prompt:  644  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  2
               varstoreid:  1
               value:  5
@@ -897,14 +954,14 @@ Formset:
           varname:  41  # Question VarName STRING_ID
           varoffset:  41  # Question VarOffset
           flags:  0  # Question Flags
-          - option:  45
-              option flag:  34
-              option type:  2
-              option value:  0
-          - option:  46
-              option flag:  18
-              option type:  2
-              option value:  1
+          - Option:  45
+              Option Flag:  34
+              Option type:  2
+              Option Value:  0
+          - Option:  46
+              Option Flag:  18
+              Option type:  2
+              Option Value:  1
       - subtitle:
           prompt:  27  # Statement Prompt STRING_ID
       - subtitle:
@@ -914,41 +971,45 @@ Formset:
           help:  124  # Statement Help STRING_ID
           questionid:  42  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  2041  # Question VarName STRING_ID
-          varoffset:  2041  # Question VarOffse
+          varname:  1713  # Question VarName STRING_ID
+          varoffset:  1713  # Question VarOffset
           flags:  1  # Flags
       - oneof:
           prompt:  125  # Statement Prompt STRING_ID
           help:  126  # Statement Help STRING_ID
           questionid:  43  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  2042  # Question VarName STRING_ID
-          varoffset:  2042  # Question VarOffset
+          varname:  1714  # Question VarName STRING_ID
+          varoffset:  1714  # Question VarOffset
           flags:  0  # Question Flags
-          - option:  45
-              option flag:  32
-              option type:  2
-              option value:  0
-          - option:  46
-              option flag:  16
-              option type:  2
-              option value:  1
+          - Option:  45
+              Option Flag:  32
+              Option type:  2
+              Option Value:  0
+          - Option:  46
+              Option Flag:  16
+              Option type:  2
+              Option Value:  1
       - numeric:
           prompt:  127  # Statement Prompt STRING_ID
           help:  128  # Statement Help STRING_ID
           questionid:  44  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  2048  # Question VarName STRING_ID
-          varoffset:  2048  # Question VarOffset
+          varname:  1720  # Question VarName STRING_ID
+          varoffset:  1720  # Question VarOffset
           flags:  0  # Question Flags
           maxvalue:  7
           minvalue:  0
           step:  0
           - default:
+              prompt:  66  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  2
               varstoreid:  0
               value:  6
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  2
               varstoreid:  1
               value:  7
@@ -957,17 +1018,17 @@ Formset:
           help:  130  # Statement Help STRING_ID
           questionid:  45  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  253  # Question VarName STRING_ID
-          varoffset:  253  # Question VarOffset
+          varname:  212  # Question VarName STRING_ID
+          varoffset:  212  # Question VarOffset
           flags:  0  # Question Flags
-          - option:  45
-              option flag:  33
-              option type:  1
-              option value:  0
-          - option:  46
-              option flag:  17
-              option type:  1
-              option value:  1
+          - Option:  45
+              Option Flag:  33
+              Option type:  1
+              Option Value:  0
+          - Option:  46
+              Option Flag:  17
+              Option type:  1
+              Option Value:  1
       - subtitle:
           prompt:  27  # Statement Prompt STRING_ID
       - subtitle:
@@ -977,41 +1038,45 @@ Formset:
           help:  135  # Statement Help STRING_ID
           questionid:  46  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  1992  # Question VarName STRING_ID
-          varoffset:  1992  # Question VarOffset
+          varname:  1664  # Question VarName STRING_ID
+          varoffset:  1664  # Question VarOffset
           flags:  0  # Question Flags
-          - option:  45
-              option flag:  33
-              option type:  2
-              option value:  0
-          - option:  46
-              option flag:  17
-              option type:  2
-              option value:  1
+          - Option:  45
+              Option Flag:  33
+              Option type:  2
+              Option Value:  0
+          - Option:  46
+              Option Flag:  17
+              Option type:  2
+              Option Value:  1
       - checkbox:
           prompt:  132  # Statement Prompt STRING_ID
           help:  133  # Statement Help STRING_ID
           questionid:  47  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  1984  # Question VarName STRING_ID
-          varoffset:  1984  # Question VarOffse
+          varname:  1656  # Question VarName STRING_ID
+          varoffset:  1656  # Question VarOffset
           flags:  1  # Flags
       - numeric:
           prompt:  136  # Statement Prompt STRING_ID
           help:  138  # Statement Help STRING_ID
           questionid:  48  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
-          varname:  2008  # Question VarName STRING_ID
-          varoffset:  2008  # Question VarOffset
+          varname:  1680  # Question VarName STRING_ID
+          varoffset:  1680  # Question VarOffset
           flags:  0  # Question Flags
           maxvalue:  20
           minvalue:  0
           step:  0
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  2
               varstoreid:  0
               value:  16
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  2
               varstoreid:  1
               value:  17
@@ -1031,10 +1096,15 @@ Formset:
           minvalue:  0
           step:  0
           - default:
+              prompt:  76  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  0
               varstoreid:  0
               value:  7
           - default:
+              prompt:  0  # Statement Prompt STRING_ID
+              help:  0  # Statement Help STRING_ID
               type:  0
               varstoreid:  1
               value:  8
+#The End
