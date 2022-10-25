@@ -544,6 +544,7 @@ RedfishPkg: Redfish related modules
 F: RedfishPkg/
 M: Abner Chang <abner.chang@amd.com> [changab]
 M: Nickle Wang <nicklew@nvidia.com> [nicklela]
+R: Igor Kulchytskyy <igork@ami.com> [igorkulchytskyy]
 
 SecurityPkg
 F: SecurityPkg/
