@@ -138,7 +138,7 @@ InitializePciSioSerial (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Initialize UART default setting in gSerialDevTempate
+  // Initialize UART default setting in gSerialDevTemplate
   //
   gSerialDevTemplate.SerialMode.BaudRate     = PcdGet64 (PcdUartDefaultBaudRate);
   gSerialDevTemplate.SerialMode.DataBits     = PcdGet8 (PcdUartDefaultDataBits);
