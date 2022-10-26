@@ -85,29 +85,32 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by VfrSyntaxParser#vfrProgram.
     def visitVfrProgram(self, ctx:VfrSyntaxParser.VfrProgramContext):
         # Basic DataType declare
-
         gCVfrVarDataTypeDB.DeclareDataTypeBegin()
-        gCVfrVarDataTypeDB.SetNewTypeName('UINT8')
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ubyte))
-        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_8)
+        gCVfrVarDataTypeDB.SetNewTypeName('UINT64')
+        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ulonglong))
+        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_64)
+        gCVfrVarDataTypeDB.SetNewTypeAlign(8)
         gCVfrVarDataTypeDB.DeclareDataTypeEnd()
 
-        gCVfrVarDataTypeDB.DeclareDataTypeBegin()
-        gCVfrVarDataTypeDB.SetNewTypeName('UINT16')
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ushort))
-        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_16)
-        gCVfrVarDataTypeDB.DeclareDataTypeEnd()
 
         gCVfrVarDataTypeDB.DeclareDataTypeBegin()
         gCVfrVarDataTypeDB.SetNewTypeName('UINT32')
         gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ulong))
         gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_32)
+        gCVfrVarDataTypeDB.SetNewTypeAlign(4)
         gCVfrVarDataTypeDB.DeclareDataTypeEnd()
-
+        
         gCVfrVarDataTypeDB.DeclareDataTypeBegin()
-        gCVfrVarDataTypeDB.SetNewTypeName('UINT64')
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ulonglong))
-        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_64)
+        gCVfrVarDataTypeDB.SetNewTypeName('UINT16')
+        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ushort))
+        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_16)
+        gCVfrVarDataTypeDB.SetNewTypeAlign(2)
+        gCVfrVarDataTypeDB.DeclareDataTypeEnd()
+        
+        gCVfrVarDataTypeDB.DeclareDataTypeBegin()
+        gCVfrVarDataTypeDB.SetNewTypeName('UINT8')
+        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ubyte))
+        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_8)
         gCVfrVarDataTypeDB.DeclareDataTypeEnd()
 
         gCVfrVarDataTypeDB.DeclareDataTypeBegin()
@@ -117,24 +120,23 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         gCVfrVarDataTypeDB.DeclareDataTypeEnd()
 
         gCVfrVarDataTypeDB.DeclareDataTypeBegin()
-        gCVfrVarDataTypeDB.SetNewTypeName('EFI_STRING_ID')
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ushort))
-        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_STRING)
-        gCVfrVarDataTypeDB.DeclareDataTypeEnd()
-
-        gCVfrVarDataTypeDB.DeclareDataTypeBegin()
         gCVfrVarDataTypeDB.SetNewTypeName('EFI_HII_DATE')
         gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_DATE)
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(EFI_HII_DATE))
         gCVfrVarDataTypeDB.DataTypeAddField('Year', 'UINT16', 0, False)
         gCVfrVarDataTypeDB.DataTypeAddField('Month', 'UINT8', 0, False)
         gCVfrVarDataTypeDB.DataTypeAddField('Day', 'UINT8', 0, False)
         gCVfrVarDataTypeDB.DeclareDataTypeEnd()
 
         gCVfrVarDataTypeDB.DeclareDataTypeBegin()
+        gCVfrVarDataTypeDB.SetNewTypeName('EFI_STRING_ID')
+        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ushort))
+        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_STRING)
+        gCVfrVarDataTypeDB.SetNewTypeAlign(2)
+        gCVfrVarDataTypeDB.DeclareDataTypeEnd()
+
+        gCVfrVarDataTypeDB.DeclareDataTypeBegin()
         gCVfrVarDataTypeDB.SetNewTypeName('EFI_HII_TIME')
         gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_TIME)
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(EFI_HII_TIME))
         gCVfrVarDataTypeDB.DataTypeAddField('Hour', 'UINT8', 0, False)
         gCVfrVarDataTypeDB.DataTypeAddField('Minute', 'UINT8', 0, False)
         gCVfrVarDataTypeDB.DataTypeAddField('Second', 'UINT8', 0, False)
@@ -143,23 +145,24 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         gCVfrVarDataTypeDB.DeclareDataTypeBegin()
         gCVfrVarDataTypeDB.SetNewTypeName('EFI_GUID')
         gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_OTHER)
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(EFI_GUID))
         gCVfrVarDataTypeDB.DataTypeAddField('Data1', 'UINT32', 0, False)
         gCVfrVarDataTypeDB.DataTypeAddField('Data2', 'UINT16', 0, False)
         gCVfrVarDataTypeDB.DataTypeAddField('Data3', 'UINT16', 0, False)
         gCVfrVarDataTypeDB.DataTypeAddField('Data4', 'UINT8', 8, False)
         gCVfrVarDataTypeDB.DeclareDataTypeEnd()
 
-
         gCVfrVarDataTypeDB.DeclareDataTypeBegin()
         gCVfrVarDataTypeDB.SetNewTypeName('EFI_HII_REF')
         gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_REF)
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(EFI_HII_REF))
         gCVfrVarDataTypeDB.DataTypeAddField('QuestionId', 'UINT16', 0, False)
         gCVfrVarDataTypeDB.DataTypeAddField('FormId', 'UINT16', 0, False)
         gCVfrVarDataTypeDB.DataTypeAddField('FormSetGuid', 'EFI_GUID', 0, False)
         gCVfrVarDataTypeDB.DataTypeAddField('DevicePath', 'EFI_STRING_ID', 0, False)
+        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(EFI_HII_REF))
+        gCVfrVarDataTypeDB.SetNewTypeAlign(16)
         gCVfrVarDataTypeDB.DeclareDataTypeEnd()
+
+
 
         self.visitChildren(ctx)
 
@@ -694,11 +697,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             else: ReturnCode = VfrReturnCode.VFR_RETURN_UNSUPPORTED
 
         if IsUEFI23EfiVarstore:
-            gCVfrDataStorage.DeclareBufferVarStore(StoreName, Guid, gCVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore) #
+            gCVfrDataStorage.DeclareBufferVarStore(StoreName, Guid, gCVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore, Attributes) #
             VarStoreId, ReturnCode = gCVfrDataStorage.GetVarStoreId(StoreName, Guid) #
             Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
         else:
-            gCVfrDataStorage.DeclareBufferVarStore(self.__TransId(ctx.StringIdentifier(0)), Guid, gCVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore) #
+            gCVfrDataStorage.DeclareBufferVarStore(self.__TransId(ctx.StringIdentifier(0)), Guid, gCVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore, Attributes) #
             VarStoreId, ReturnCode = gCVfrDataStorage.GetVarStoreId(self.__TransId(ctx.StringIdentifier(0)), Guid) #
             Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
 
@@ -2788,7 +2791,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                         print('Numeric Flag is not same to Numeric VarData type')
                 else:
                     # update data type for name/value store
-                    print('here')
                     self.__CurrQestVarInfo.VarType = ctx.LFlags & EFI_IFR_NUMERIC_SIZE
                     Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(self.__CurrQestVarInfo.VarType)
                     self.__CurrQestVarInfo.VarTotalSize = Size
@@ -3697,7 +3699,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         self.visitChildren(ctx)
 
-        BObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         if ctx.Line() != None:
             BObj = CIfrBanner()
             BObj.SetLineNo((None if ctx.start is None else ctx.start).line)
@@ -4909,6 +4910,72 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         EObj.SetLineNo(Line)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.MObj
+    
+    
+    def DumpJson(self, FileName):
+        try:
+            with open(FileName, 'w') as f:
+                f.write('{\n')
+                f.write('  \"DataStruct\" : {\n')
+                pNode = gCVfrVarDataTypeDB.GetDataTypeList()
+                while pNode != None:
+                    f.write('    \"{}\" : [\n'.format(str(pNode.TypeName)))
+                    FNode = pNode.Members
+                    while FNode != None:
+                        f.write('      {\n')
+                        f.write('        \"Name\": \"{}\",\n'.format(str(FNode.FieldName)))
+                        if FNode.ArrayNum > 0:
+                            f.write('        \"Type\": \"{}[{}]\",\n'.format(str(FNode.FieldType.TypeName),str(FNode.ArrayNum)))
+                        else:
+                            f.write('        \"Type\": \"{}\",\n'.format(str(FNode.FieldType.TypeName)))
+                        f.write('        \"Offset\": {}\n'.format(str(FNode.Offset)))
+                        if FNode.Next == None:
+                            f.write('      }\n')
+                        else:
+                            f.write('      }, \n')
+                        FNode = FNode.Next
+                    if pNode.Next == None:
+                        f.write('    ]\n')
+                    else:
+                        f.write('    ],\n')
+                    pNode = pNode.Next
+                f.write('  },\n')
+                f.write('  \"DataStructAttribute\" : {\n')
+                pNode = gCVfrVarDataTypeDB.GetDataTypeList()
+                while pNode != None:
+                    f.write('    \"{}\"'.format(str(pNode.TypeName)) + ': {\n')
+                    f.write('        \"Alignment\": {},\n'.format(str(pNode.Align)))
+                    f.write('        \"TotalSize\": {}\n'.format(str(pNode.TotalSize)))
+                    if pNode.Next == None:
+                        f.write('      }\n')
+                    else:
+                        f.write('      },\n')
+                    pNode = pNode.Next
+                f.write('  },\n')
+                f.write('  \"VarDefine\" : {\n')
+                pVsNode = gCVfrDataStorage.GetBufferVarStoreList()
+                while pVsNode != None:
+                    f.write('    \"{}\"'.format(str(pVsNode.VarStoreName)) + ': {\n')
+                    f.write('        \"Type\": \"{}\",\n'.format(str(pVsNode.DataType.TypeName)))
+                    f.write('        \"Attributes\": {},\n'.format(str(pVsNode.Attributes)))
+                    f.write('        \"VarStoreId\": {},\n'.format(str(pVsNode.VarStoreId)))
+                    f.write('        \"VendorGuid\": ' + '\"{}, {}, {},'.format('0x%x'%(pVsNode.Guid.Data1),'0x%x'%(pVsNode.Guid.Data2), '0x%x'%(pVsNode.Guid.Data3)) \
+                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(pVsNode.Guid.Data4[0]), '0x%x'%(pVsNode.Guid.Data4[1]), '0x%x'%(pVsNode.Guid.Data4[2]), '0x%x'%(pVsNode.Guid.Data4[3]), \
+                    '0x%x'%(pVsNode.Guid.Data4[4]), '0x%x'%(pVsNode.Guid.Data4[5]), '0x%x'%(pVsNode.Guid.Data4[6]), '0x%x'%(pVsNode.Guid.Data4[7])) + ' }}\"\n')
+                    if pVsNode.Next == None:
+                        f.write('      }\n')
+                    else:
+                        f.write('      },\n')
+                        
+                    pVsNode = pVsNode.Next
+                f.write('  }\n')
+                f.write('}\n')
+                    
+
+            f.close()
+        except IOError as e:
+            print("error")
+            pass
 
     def DumpYaml(self, Root, FileName):
         with open(FileName, 'w') as f:
@@ -5270,7 +5337,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
                 self.DumpYamlDfs(ChildNode, f)
         
-        return 
+        return
 
 
 del VfrSyntaxParser

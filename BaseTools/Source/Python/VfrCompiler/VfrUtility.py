@@ -82,6 +82,9 @@ class CVfrVarDataTypeDB(object):
         self.__CurrDataType = None
         self.__CurrDataField = None
         self.__FirstNewDataTypeName = None
+    
+    def GetDataTypeList(self):
+        return self.__DataTypeList
 
     def Pack(self,
              LineNum,
@@ -149,7 +152,7 @@ class CVfrVarDataTypeDB(object):
     def SetNewTypeTotalSize(self, Size):
         self.__NewDataType.TotalSize = Size
 
-    def SetNewTypeTotalAlign(self, Align):
+    def SetNewTypeAlign(self, Align):
         self.__NewDataType.Align = Align
 
     def SetNewTypeName(self, TypeName):
@@ -177,10 +180,11 @@ class CVfrVarDataTypeDB(object):
     def DeclareDataTypeEnd(self):
         if self.__NewDataType.TypeName == '':
             return
-
-        if self.__NewDataType.TotalSize % self.__NewDataType.Align != 0:
-            self.__NewDataType.TotalSize += self.__AlignStuff(
-                self.__NewDataType.TotalSize, self.__NewDataType.Align)
+        
+        if self.__NewDataType.TypeName != 'EFI_HII_REF':
+            if self.__NewDataType.TotalSize % self.__NewDataType.Align != 0:
+                self.__NewDataType.TotalSize += self.__AlignStuff(
+                    self.__NewDataType.TotalSize, self.__NewDataType.Align)
 
         self.__RegisterNewType(self.__NewDataType)
         if self.__FirstNewDataTypeName == None:
@@ -399,6 +403,7 @@ class CVfrVarDataTypeDB(object):
             return ReturnCode
 
         MaxDataTypeSize = self.__NewDataType.TotalSize
+        
 
         if len(FieldName) >= MAX_NAME_LEN:
             return VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
@@ -588,8 +593,7 @@ class CVfrVarDataTypeDB(object):
         except IOError as e:
             print("error")
             pass
-
-
+    
 class SVfrDefaultStoreNode(object):
 
     def __init__(self,
@@ -719,6 +723,7 @@ class SVfrVarStorageNode():
                  VarStoreName='',
                  VarStoreId=0,
                  Guid=None,
+                 Attributes=0,
                  Flag=True,
                  EfiValue=None,
                  DataType=None,
@@ -728,6 +733,7 @@ class SVfrVarStorageNode():
         self.VarStoreName = VarStoreName
         self.VarStoreId = VarStoreId
         self.AssignedFlag = Flag
+        self.Attributes = Attributes
         self.Next = None
         self.EfiVar = EfiValue
         self.DataType = DataType
@@ -967,6 +973,9 @@ class CVfrDataStorage(object):
             self.__FreeVarStoreIdBitMap.append(0)
         #Question ID0 is reserved
         self.__FreeVarStoreIdBitMap[0] = 0x80000000
+    
+    def GetBufferVarStoreList(self):
+        return self.__BufferVarStoreList
 
     def __CheckGuidField(self, pNode, StoreGuid, HasFoundOne, ReturnCode):
         if StoreGuid != None:
@@ -1111,6 +1120,7 @@ class CVfrDataStorage(object):
                               TypeName,
                               VarStoreId,
                               IsBitVarStore,
+                              Attr=0,
                               Flag=True):
 
         if StoreName == None or Guid == None or DataTypeDB == None:
@@ -1132,7 +1142,7 @@ class CVfrDataStorage(object):
             if self.__CheckVarStoreIdFree(VarStoreId) == False:
                 return VfrReturnCode.VFR_RETURN_VARSTOREID_REDEFINED
             self.__MarkVarStoreIdUsed(VarStoreId)
-        pNew = SVfrVarStorageNode(StoreName, VarStoreId, Guid, Flag, None,
+        pNew = SVfrVarStorageNode(StoreName, VarStoreId, Guid, Attr, Flag, None,
                                   DataType, IsBitVarStore)
 
         if pNew == None:
