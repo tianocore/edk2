@@ -79,7 +79,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Source = ctx.start.getTokenSource()
         InputStream = Source.inputStream
         start, stop  = ctx.start.start, ctx.stop.stop
-        return InputStream.getText(start, stop)
+        Text = InputStream.getText(start, stop)
+        return Text.replace('\n', '')
 
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrProgram.
@@ -314,7 +315,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by VfrSyntaxParser#dataStructFieldUser.
     def visitDataStructFieldUser(self, ctx:VfrSyntaxParser.DataStructFieldUserContext):
         ArrayNum = self.__TransNum(ctx.Number())
-        gCVfrVarDataTypeDB.DataTypeAddField(self.__TransId(ctx.StringIdentifier(1)), self.__TransId(ctx.StringIdentifier(0)), ArrayNum, ctx.FieldInUnion)#error handle _PCATCH
+        if self.__TransId(ctx.StringIdentifier(0)) != 'CHAR16':
+            gCVfrVarDataTypeDB.DataTypeAddField(self.__TransId(ctx.StringIdentifier(1)), self.__TransId(ctx.StringIdentifier(0)), ArrayNum, ctx.FieldInUnion)#error handle _PCATCH
+        else:
+            gCVfrVarDataTypeDB.DataTypeAddField(self.__TransId(ctx.StringIdentifier(1)), 'UINT16', ArrayNum, ctx.FieldInUnion)#error handle _PCATCH
+            
         return self.visitChildren(ctx)
 
 
@@ -1065,10 +1070,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         if ctx.TrueSymbol() != None:
             ctx.ValueStr = 'TRUE'
-            ctx.Value.b = True
+            ctx.Value.b = 1
         elif ctx.FalseSymbol() != None:
             ctx.ValueStr = 'FALSE'
-            ctx.Value.b = False
+            ctx.Value.b = 0
         elif ctx.One() != None:
             ctx.ValueStr = 'ONE'
             ctx.Value.u8 = int(ctx.getText()) #
@@ -1906,7 +1911,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         SIObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         ctx.Node.Data = SIObj
         ctx.Node.Condition = 'suppressif' + ' ' + self.__ExtractOriginalText(ctx.vfrStatementExpression())
-
+        self.visitChildren(ctx)
         return ctx.Node
 
     def OFFSET_OF(self, Type, Field):
@@ -5228,7 +5233,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 f.write('          varoffset:  {}\n'.format(Info.Question.VarStoreInfo.VarOffset))
                 f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
                 f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
-                f.write('          flags:  {}\n'.format(Info.Question.Flags)) 
+                f.write('          flags:  {}\n'.format(Info.Flags)) 
 
             if Root.OpCode == EFI_IFR_DATE_OP:
                 Info = Root.Data.GetInfo()  
@@ -5241,7 +5246,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 f.write('          varoffset:  {}\n'.format(Info.Question.VarStoreInfo.VarOffset))
                 f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
                 f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
-                f.write('          flags:  {}\n'.format(Info.Question.Flags)) 
+                f.write('          flags:  {}\n'.format(Info.Flags)) 
                 
             
             if Root.OpCode == EFI_IFR_STRING_OP:
@@ -5280,7 +5285,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                     f.write('          formsetid:  {' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
                     + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.FormSetId.Data4[0]), '0x%x'%(Info.FormSetId.Data4[1]), '0x%x'%(Info.FormSetId.Data4[2]), '0x%x'%(Info.FormSetId.Data4[3]), \
                     '0x%x'%(Info.FormSetId.Data4[4]), '0x%x'%(Info.FormSetId.Data4[5]), '0x%x'%(Info.FormSetId.Data4[6]), '0x%x'%(Info.FormSetId.Data4[7])) + ' }}\n')
-                    f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
+                    f.write('          questionid:  {}\n'.format(Info.QuestionId))
                     f.write('          devicepath:  {}\n'.format(Info.DevicePath))
 
                 if type(Root.Data) == CIfrRef3:
@@ -5288,11 +5293,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                     f.write('          formsetid:  {' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
                     + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.FormSetId.Data4[0]), '0x%x'%(Info.FormSetId.Data4[1]), '0x%x'%(Info.FormSetId.Data4[2]), '0x%x'%(Info.FormSetId.Data4[3]), \
                     '0x%x'%(Info.FormSetId.Data4[4]), '0x%x'%(Info.FormSetId.Data4[5]), '0x%x'%(Info.FormSetId.Data4[6]), '0x%x'%(Info.FormSetId.Data4[7])) + ' }}\n')
-                    f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
+                    f.write('          questionid:  {}\n'.format(Info.QuestionId))
 
                 if type(Root.Data) == CIfrRef2:
                     f.write('          formid:  {}\n'.format(Info.FormId))
-                    f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
+                    f.write('          questionid:  {}\n'.format(Info.QuestionId))
 
                 if type(Root.Data) == CIfrRef:
                     f.write('          formid:  {}\n'.format(Info.FormId))
@@ -5337,7 +5342,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
                 self.DumpYamlDfs(ChildNode, f)
         
-        return
+        return 
+    
 
 
 del VfrSyntaxParser

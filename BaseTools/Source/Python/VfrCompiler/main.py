@@ -8,7 +8,7 @@ from VfrSyntaxParser import VfrSyntaxParser
 from VfrSyntaxVisitor import VfrSyntaxVisitor
 
 
-def VfrParse(Infile, Outfile):
+def VfrParse(Infile, YamlOutFile,JsonOutFile):
     InputStream = FileStream(Infile)
     Lexer = VfrSyntaxLexer(InputStream)
     Stream = CommonTokenStream(Lexer)
@@ -16,10 +16,12 @@ def VfrParse(Infile, Outfile):
     Tree = Parser.vfrProgram()
     Visitor = VfrSyntaxVisitor()
     Visitor.visit(Tree)
-    Visitor.DumpYaml(Visitor.GetRoot(), Outfile)
+    Visitor.DumpYaml(Visitor.GetRoot(), YamlOutFile)
+    Visitor.DumpJson(JsonOutFile)
     
 if __name__ == '__main__':
-    Infile = "test\PlatformForms.i"
-    Outfile = 'test\PlatformFormsdemo.yaml'
-    VfrParse(Infile, Outfile)
+    Infile = "Atest.i"
+    YamlOutFile = 'Atest.yaml'
+    JsonOutFile = 'Atest.json'
+    VfrParse(Infile, YamlOutFile, JsonOutFile)
    
