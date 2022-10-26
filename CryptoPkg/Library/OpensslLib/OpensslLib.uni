@@ -1,7 +1,5 @@
 // /** @file
-// This module provides openSSL Library implementation.
-//
-// This module provides OpenSSL Library implementation.
+// This module provides OpenSSL Library implementation with TLS features.
 //
 // Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 //
@@ -9,8 +7,6 @@
 //
 // **/
 
+#string STR_MODULE_ABSTRACT             #language en-US "OpenSSL Library implementation with TLS features."
 
-#string STR_MODULE_ABSTRACT             #language en-US "OpenSSL Library implementation"
-
-#string STR_MODULE_DESCRIPTION          #language en-US "This module provides OpenSSL Library implementation."
-
+#string STR_MODULE_DESCRIPTION          #language en-US "This module provides OpenSSL Library implementation with TLS features."

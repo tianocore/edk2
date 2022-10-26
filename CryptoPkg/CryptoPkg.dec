@@ -37,6 +37,15 @@
   #
   HashApiLib|Include/Library/HashApiLib.h
 
+[LibraryClasses.common.Private]
+  ##  @libraryclass  Provides library functions from the openssl project.
+  #
+  OpensslLib|Private/Library/OpensslLib.h
+
+  ##  @libraryclass  Provides compiler intrinsic functions required to link openssl project.
+  #
+  InstrinsicLib|Private/Library/IntrinsicLib.h
+
 [Protocols]
   ## EDK II Crypto DXE protocol
   # 2C2275C9-3A7B-426F-BE54-2D22BD9D1092
@@ -80,39 +89,6 @@
   # @Prompt Set policy for hashing unsigned image for Secure Boot.
   # @ValidList 0x80000001 | 0x00000001, 0x00000002, 0x00000004, 0x00000008, 0x00000010
   gEfiCryptoPkgTokenSpaceGuid.PcdHashApiLibPolicy|0x00000002|UINT32|0x00000001
-
-  ## Enable/Disable the ECC feature in openssl library. The default is disabled.
-  #  If ECC feature is disabled, all related source files will not be compiled.
-  # @Prompt Enable/Disable ECC feature in openssl library
-  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslEcEnabled|FALSE|BOOLEAN|0x0000003
-  # Set it to TRUE if:
-  # 1) Platform needs ECC in TLS, or asymmetric cryptography services such as
-  #    X509 certificate or PEM format data processing.
-  # 2) Platform needs to enable PcdCryptoServiceFamilyEnable.Ec service.
-  # Please note:
-  # ECC feature will cause a significant memory increase, approximate memory impact
-  # in below table for reference by platform developers with FW size limitations.
-  #                                   Uncompressed      LZMA Compressed
-  # CPU   CRYPTO_SERVICES    Module  EC=FALSE  EC=TRUE  EC=FALSE  EC=TRUE  Increase
-  # ====  ===============  ========  ========  =======  ========  =======  ========
-  # IA32  NONE             CryptoPei    21536    21568                         0 KB
-  # IA32  NONE             CryptoDxe    21632    21696                         0 KB
-  # IA32  NONE             CryptoSmm    22976    23072                         0 KB
-  # IA32  MIN_PEI          CryptoPei   248992   249120                         0 KB
-  # IA32  MIN_DXE_MIN_SMM  CryptoDxe   636672   829568    288520   401034    113 KB
-  # IA32  MIN_DXE_MIN_SMM  CryptoSmm   426048   601472    191517   296022    105 KB
-  # IA32  ALL              CryptoPei   423840   598976    189047   293759    104 KB
-  # IA32  ALL              CryptoDxe   645280   838144    292955   405277    113 KB
-  # IA32  ALL              CryptoSmm   441888   617184    198779   303628    105 KB
-  # X64   NONE             CryptoPei    29632    29664                         0 KB
-  # X64   NONE             CryptoDxe    29792    29792                         0 KB
-  # X64   NONE             CryptoSmm    31296    31296                         0 KB
-  # X64   MIN_PEI          CryptoPei   310784   310848                         0 KB
-  # X64   MIN_DXE_MIN_SMM  CryptoDxe   804288  1016256    311436   426596    115 KB
-  # X64   MIN_DXE_MIN_SMM  CryptoSmm   543776   733920    204483   310775    106 KB
-  # X64   ALL              CryptoPei   540384   730240    202494   308467    106 KB
-  # X64   ALL              CryptoDxe   815392  1027296    316228   431321    115 KB
-  # X64   ALL              CryptoSmm   563648   753696    213488   319644    106 KB
 
 [UserExtensions.TianoCore."ExtraFiles"]
   CryptoPkgExtra.uni

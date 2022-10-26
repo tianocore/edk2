@@ -478,7 +478,7 @@ FreeCipherString:
   FreePool (CipherString);
 
 FreeMappedCipher:
-  FreePool (MappedCipher);
+  FreePool ((VOID *)MappedCipher);
 
   return Status;
 }
@@ -1136,9 +1136,6 @@ TlsSetEcCurve (
   IN     UINTN  DataSize
   )
 {
- #if !FixedPcdGetBool (PcdOpensslEcEnabled)
-  return EFI_UNSUPPORTED;
- #else
   TLS_CONNECTION  *TlsConn;
   EC_KEY          *EcKey;
   INT32           Nid;
@@ -1170,23 +1167,22 @@ TlsSetEcCurve (
   }
 
   if (SSL_set1_curves (TlsConn->Ssl, &Nid, 1) != 1) {
-    return EFI_INVALID_PARAMETER;
+    return EFI_UNSUPPORTED;
   }
 
   EcKey = EC_KEY_new_by_curve_name (Nid);
   if (EcKey == NULL) {
-    return EFI_INVALID_PARAMETER;
+    return EFI_UNSUPPORTED;
   }
 
   Ret = SSL_set_tmp_ecdh (TlsConn->Ssl, EcKey);
   EC_KEY_free (EcKey);
 
   if (Ret != 1) {
-    return EFI_INVALID_PARAMETER;
+    return EFI_UNSUPPORTED;
   }
 
   return EFI_SUCCESS;
- #endif
 }
 
 /**
