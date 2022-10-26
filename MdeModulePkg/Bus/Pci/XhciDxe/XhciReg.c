@@ -700,23 +700,9 @@ XhcCheckUsbPortSpeedUsedPsic (
 
   //
   // Check xHCI Supported Protocol Capability, find the PSIV field to match
-  // PortSpeed definition when the Major Revision is 03h.
-  //
-  if (Xhc->Usb3SupOffset != 0xFFFFFFFF) {
-    SpField.Dword = XhciPsivGetPsid (Xhc, Xhc->Usb3SupOffset, PortSpeed);
-    if (SpField.Dword != 0) {
-      //
-      // Found the corresponding PORTSC value in PSIV field of USB3 offset.
-      //
-      UsbSpeedIdMap = USB_PORT_STAT_SUPER_SPEED;
-    }
-  }
-
-  //
-  // Check xHCI Supported Protocol Capability, find the PSIV field to match
   // PortSpeed definition when the Major Revision is 02h.
   //
-  if ((UsbSpeedIdMap == 0) && (Xhc->Usb2SupOffset != 0xFFFFFFFF)) {
+  if (Xhc->Usb2SupOffset != 0xFFFFFFFF) {
     SpField.Dword = XhciPsivGetPsid (Xhc, Xhc->Usb2SupOffset, PortSpeed);
     if (SpField.Dword != 0) {
       //
@@ -733,6 +719,12 @@ XhcCheckUsbPortSpeedUsedPsic (
           // PSIM shows as default High-speed protocol, apply to High-speed mapping
           //
           UsbSpeedIdMap = USB_PORT_STAT_HIGH_SPEED;
+        } else if (SpField.Data.Psim == XHC_SUPPORTED_PROTOCOL_USB2_FULL_SPEED_PSIM) {
+          //
+          // PSIM shows as default Full-speed protocol, return 0
+          // to ensure no port status set
+          //
+          return 0;
         }
       } else if (SpField.Data.Psie == 1) {
         //
@@ -747,6 +739,20 @@ XhcCheckUsbPortSpeedUsedPsic (
           UsbSpeedIdMap = USB_PORT_STAT_LOW_SPEED;
         }
       }
+    }
+  }
+
+  //
+  // Check xHCI Supported Protocol Capability, find the PSIV field to match
+  // PortSpeed definition when the Major Revision is 03h.
+  //
+  if ((UsbSpeedIdMap == 0) && (Xhc->Usb3SupOffset != 0xFFFFFFFF)) {
+    SpField.Dword = XhciPsivGetPsid (Xhc, Xhc->Usb3SupOffset, PortSpeed);
+    if (SpField.Dword != 0) {
+      //
+      // Found the corresponding PORTSC value in PSIV field of USB3 offset.
+      //
+      UsbSpeedIdMap = USB_PORT_STAT_SUPER_SPEED;
     }
   }
 
