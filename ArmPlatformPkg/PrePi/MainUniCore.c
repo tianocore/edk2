@@ -20,12 +20,3 @@ PrimaryMain (
   // We must never return
   ASSERT (FALSE);
 }
-
-VOID
-SecondaryMain (
-  IN  UINTN  MpId
-  )
-{
-  // We must never get into this function on UniCore system
-  ASSERT (FALSE);
-}

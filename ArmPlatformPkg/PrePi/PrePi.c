@@ -177,7 +177,11 @@ CEntryPoint (
   // Initialize the platform specific controllers
   ArmPlatformInitialize (MpId);
 
-  if (ArmPlatformIsPrimaryCore (MpId) && PerformanceMeasurementEnabled ()) {
+  if (!ArmPlatformIsPrimaryCore (MpId)) {
+    ASSERT (FALSE);
+  }
+
+  if (PerformanceMeasurementEnabled ()) {
     // Initialize the Timer Library to setup the Timer HW controller
     TimerConstructor ();
     // We cannot call yet the PerformanceLib because the HOB List has not been initialized
@@ -195,29 +199,21 @@ CEntryPoint (
 
   // Define the Global Variable region when we are not running in XIP
   if (!IS_XIP ()) {
-    if (ArmPlatformIsPrimaryCore (MpId)) {
-      if (ArmIsMpCore ()) {
-        // Signal the Global Variable Region is defined (event: ARM_CPU_EVENT_DEFAULT)
-        ArmCallSEV ();
-      }
-    } else {
-      // Wait the Primary core has defined the address of the Global Variable region (event: ARM_CPU_EVENT_DEFAULT)
-      ArmCallWFE ();
+    if (ArmIsMpCore ()) {
+      // Signal the Global Variable Region is defined (event: ARM_CPU_EVENT_DEFAULT)
+      ArmCallSEV ();
     }
   }
 
-  // If not primary Jump to Secondary Main
-  if (ArmPlatformIsPrimaryCore (MpId)) {
-    InvalidateDataCacheRange (
-      (VOID *)UefiMemoryBase,
-      FixedPcdGet32 (PcdSystemMemoryUefiRegionSize)
-      );
+  InvalidateDataCacheRange (
+    (VOID *)UefiMemoryBase,
+    FixedPcdGet32 (PcdSystemMemoryUefiRegionSize)
+    );
 
-    // Goto primary Main.
-    PrimaryMain (UefiMemoryBase, StacksBase, StartTimeStamp);
-  } else {
-    SecondaryMain (MpId);
-  }
+  PrePiMain (UefiMemoryBase, StacksBase, StartTimeStamp);
+
+  // We must never return
+  ASSERT (FALSE);
 
   // DXE Core should always load and never return
   ASSERT (FALSE);
