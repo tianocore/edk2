@@ -53,10 +53,22 @@ FfsFindNextFile (
   );
 
 /**
-  This service enables discovery sections of a given type within a valid FFS file.
+ * This is a hook which is used to check if the section is the target one.
+ *
+ */
+typedef
+EFI_STATUS
+(EFIAPI *FFS_CHECK_SECTION_HOOK)(
+  IN EFI_COMMON_SECTION_HEADER *Section
+  );
 
-  @param  SearchType            The value of the section type to find.
-  @param  FfsFileHeader         A pointer to the file header that contains the set of sections to
+/**
+  This service enables discovery sections of a given type within a valid FFS file.
+  Caller also can provide a SectionCheckHook to do additional checking.
+
+  @param  SectionType           The value of the section type to find.
+  @param  SectionCheckHook      A hook which can check if the section is the target one.
+  @param  FileHeader            A pointer to the file header that contains the set of sections to
                                 be searched.
   @param  SectionData           A pointer to the discovered section, if successful.
 
@@ -67,9 +79,10 @@ FfsFindNextFile (
 EFI_STATUS
 EFIAPI
 FfsFindSectionData (
-  IN EFI_SECTION_TYPE     SectionType,
-  IN EFI_PEI_FILE_HANDLE  FileHandle,
-  OUT VOID                **SectionData
+  IN EFI_SECTION_TYPE        SectionType,
+  IN FFS_CHECK_SECTION_HOOK  SectionCheckHook,
+  IN EFI_PEI_FILE_HANDLE     FileHandle,
+  OUT VOID                   **SectionData
   );
 
 /**
