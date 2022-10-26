@@ -117,7 +117,7 @@
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [BuildOptions]
-  GCC:*_*_AARCH64_CC_XIPFLAGS = -mno-strict-align
+  GCC:*_*_AARCH64_CC_XIPFLAGS ==
 
 !include NetworkPkg/NetworkBuildOptions.dsc.inc
 
