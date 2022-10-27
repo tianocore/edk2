@@ -2,6 +2,8 @@
   SCSI disk driver that layers on every SCSI IO protocol in the system.
 
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1985 - 2022, American Megatrends International LLC.<BR>
+
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -4247,7 +4249,7 @@ BackOff:
 
   if ((TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) || (EFI_ERROR (ReturnStatus))) {
     DEBUG ((DEBUG_ERROR, "ScsiDiskRead10: Check Condition happened!\n"));
-    Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
+    DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       *NeedRetry = TRUE;
       return EFI_DEVICE_ERROR;
@@ -4371,7 +4373,7 @@ BackOff:
 
   if ((TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) || (EFI_ERROR (ReturnStatus))) {
     DEBUG ((DEBUG_ERROR, "ScsiDiskWrite10: Check Condition happened!\n"));
-    Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
+    DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       *NeedRetry = TRUE;
       return EFI_DEVICE_ERROR;
@@ -4494,7 +4496,7 @@ BackOff:
 
   if ((TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) || (EFI_ERROR (ReturnStatus))) {
     DEBUG ((DEBUG_ERROR, "ScsiDiskRead16: Check Condition happened!\n"));
-    Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
+    DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       *NeedRetry = TRUE;
       return EFI_DEVICE_ERROR;
@@ -4618,7 +4620,7 @@ BackOff:
 
   if ((TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) || (EFI_ERROR (ReturnStatus))) {
     DEBUG ((DEBUG_ERROR, "ScsiDiskWrite16: Check Condition happened!\n"));
-    Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
+    DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       *NeedRetry = TRUE;
       return EFI_DEVICE_ERROR;
@@ -4728,12 +4730,12 @@ ScsiDiskNotify (
   if (Request->TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) {
     DEBUG ((DEBUG_ERROR, "ScsiDiskNotify: Check Condition happened!\n"));
 
-    Status = DetectMediaParsingSenseKeys (
-               ScsiDiskDevice,
-               Request->SenseData,
-               Request->SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA),
-               &Action
-               );
+    DetectMediaParsingSenseKeys (
+      ScsiDiskDevice,
+      Request->SenseData,
+      Request->SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA),
+      &Action
+      );
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       if (++Request->TimesRetry > MaxRetry) {
         Token->TransactionStatus = EFI_DEVICE_ERROR;
