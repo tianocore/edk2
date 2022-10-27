@@ -34,8 +34,8 @@
 #include <Library/UefiRuntimeLib.h>
 #include <Library/PcdLib.h>
 #include <Library/ReportStatusCodeLib.h>
-
 #include "PiSmmCorePrivateData.h"
+#include <Library/SafeIntLib.h>
 
 #define SMRAM_CAPABILITIES  (EFI_MEMORY_WB | EFI_MEMORY_UC)
 
@@ -1354,6 +1354,7 @@ SmmSplitSmramEntry (
   @param[in] ReservedRangeToCompare     Pointer to EFI_SMM_RESERVED_SMRAM_REGION to compare.
 
   @retval TRUE  There is overlap.
+  @retval TRUE  Math error.
   @retval FALSE There is no overlap.
 
 **/
@@ -1363,11 +1364,29 @@ SmmIsSmramOverlap (
   IN EFI_SMM_RESERVED_SMRAM_REGION  *ReservedRangeToCompare
   )
 {
-  UINT64  RangeToCompareEnd;
-  UINT64  ReservedRangeToCompareEnd;
+  UINT64   RangeToCompareEnd;
+  UINT64   ReservedRangeToCompareEnd;
+  BOOLEAN  IsOverUnderflow1;
+  BOOLEAN  IsOverUnderflow2;
 
-  RangeToCompareEnd         = RangeToCompare->CpuStart + RangeToCompare->PhysicalSize;
-  ReservedRangeToCompareEnd = ReservedRangeToCompare->SmramReservedStart + ReservedRangeToCompare->SmramReservedSize;
+  // Check for over or underflow.
+  IsOverUnderflow1 = EFI_ERROR (
+                       SafeUint64Add (
+                         (UINT64)RangeToCompare->CpuStart,
+                         RangeToCompare->PhysicalSize,
+                         &RangeToCompareEnd
+                         )
+                       );
+  IsOverUnderflow2 = EFI_ERROR (
+                       SafeUint64Add (
+                         (UINT64)ReservedRangeToCompare->SmramReservedStart,
+                         ReservedRangeToCompare->SmramReservedSize,
+                         &ReservedRangeToCompareEnd
+                         )
+                       );
+  if (IsOverUnderflow1 || IsOverUnderflow2) {
+    return TRUE;
+  }
 
   if ((RangeToCompare->CpuStart >= ReservedRangeToCompare->SmramReservedStart) &&
       (RangeToCompare->CpuStart < ReservedRangeToCompareEnd))
