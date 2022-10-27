@@ -54,7 +54,7 @@
   MpInitLib|Include/Library/MpInitLib.h
 
   ##  @libraryclass  Provides function to support VMGEXIT processing.
-  VmgExitLib|Include/Library/VmgExitLib.h
+  CcExitLib|Include/Library/CcExitLib.h
 
   ##  @libraryclass  Provides function to get CPU cache information.
   CpuCacheInfoLib|Include/Library/CpuCacheInfoLib.h

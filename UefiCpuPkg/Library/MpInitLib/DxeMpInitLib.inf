@@ -54,7 +54,7 @@
   DebugAgentLib
   SynchronizationLib
   PcdLib
-  VmgExitLib
+  CcExitLib
   MicrocodeLib
 
 [Protocols]

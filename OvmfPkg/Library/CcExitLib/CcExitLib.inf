@@ -8,11 +8,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = SecVmgExitLib
-  FILE_GUID                      = dafff819-f86c-4cff-a70e-83161e5bcf9a
+  BASE_NAME                      = CcExitLib
+  FILE_GUID                      = 0e923c25-13cd-430b-8714-ffe85652a97b
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = VmgExitLib|SEC
+  LIBRARY_CLASS                  = CcExitLib|PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -21,11 +21,11 @@
 #
 
 [Sources.common]
-  VmgExitLib.c
-  VmgExitVcHandler.c
-  VmgExitVcHandler.h
-  SecVmgExitVcHandler.c
-  VmTdExitVeHandler.c
+  CcExitLib.c
+  CcExitVcHandler.c
+  CcExitVcHandler.h
+  PeiDxeCcExitVcHandler.c
+  CcExitVeHandler.c
   X64/TdVmcallCpuid.nasm
 
 [Packages]
@@ -39,10 +39,7 @@
   DebugLib
   LocalApicLib
   MemEncryptSevLib
-  PcdLib
 
-[FixedPcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
+[Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize

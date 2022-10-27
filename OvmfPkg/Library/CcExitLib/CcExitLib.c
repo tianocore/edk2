@@ -9,7 +9,7 @@
 #include <Base.h>
 #include <Uefi.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/VmgExitLib.h>
+#include <Library/CcExitLib.h>
 #include <Register/Amd/Msr.h>
 
 /**

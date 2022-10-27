@@ -7,7 +7,7 @@
 **/
 #include <Base.h>
 #include <Uefi.h>
-#include <Library/VmgExitLib.h>
+#include <Library/CcExitLib.h>
 
 /**
   Handle a #VE exception.
