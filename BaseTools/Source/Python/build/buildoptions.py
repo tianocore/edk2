@@ -102,4 +102,5 @@ class MyOptionParser():
         Parser.add_option("--genfds-multi-thread", action="store_true", dest="GenfdsMultiThread", default=True, help="Enable GenFds multi thread to generate ffs file.")
         Parser.add_option("--no-genfds-multi-thread", action="store_true", dest="NoGenfdsMultiThread", default=False, help="Disable GenFds multi thread to generate ffs file.")
         Parser.add_option("--disable-include-path-check", action="store_true", dest="DisableIncludePathCheck", default=False, help="Disable the include path check for outside of package.")
+        Parser.add_option("--vfr-yaml-enable", action="store_true", dest="VfrYamlEnable", default=False, help="Enable the Vfr to yaml function.")
         self.BuildOption, self.BuildTarget = Parser.parse_args()

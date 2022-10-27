@@ -171,3 +171,5 @@ class MemoryDataPipe(DataPipe):
         self.DataContainer = {"EnableGenfdsMultiThread":GlobalData.gEnableGenfdsMultiThread}
 
         self.DataContainer = {"gPlatformFinalPcds":GlobalData.gPlatformFinalPcds}
+
+        self.DataContainer = {"VfrYamlEnable": GlobalData.gVfrYamlEnable}

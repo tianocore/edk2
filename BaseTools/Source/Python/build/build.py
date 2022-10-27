@@ -748,6 +748,7 @@ class Build():
         GlobalData.gBinCacheSource = BuildOptions.BinCacheSource
         GlobalData.gEnableGenfdsMultiThread = not BuildOptions.NoGenfdsMultiThread
         GlobalData.gDisableIncludePathCheck = BuildOptions.DisableIncludePathCheck
+        GlobalData.gVfrYamlEnable = BuildOptions.VfrYamlEnable
 
         if GlobalData.gBinCacheDest and not GlobalData.gUseHashCache:
             EdkLogger.error("build", OPTION_NOT_SUPPORTED, ExtraData="--binary-destination must be used together with --hash.")
@@ -1460,6 +1461,17 @@ class Build():
 
         # genfds
         if Target == 'fds':
+            if GlobalData.gVfrYamlEnable:
+                from VfrCompiler.main import VfrParse
+                variable_i_filelist = os.path.join(AutoGenObject.BuildDir,"variable_i_filelist.txt")
+                if os.path.exists(variable_i_filelist):
+                    with open(variable_i_filelist) as file:
+                        i_filelist = file.readlines()
+                        for i_file in i_filelist:
+                            inputfile = i_file.replace("\n", "")
+                            yamloutputfile = inputfile.split(".")[0] + '.yaml'
+                            jsonoutputfile = inputfile.split(".")[0] + '.json'
+                            VfrParse(inputfile, yamloutputfile, jsonoutputfile)
             if GenFdsApi(AutoGenObject.GenFdsCommandDict, self.Db):
                 EdkLogger.error("build", COMMAND_FAILURE)
             Threshold = self.GetFreeSizeThreshold()
@@ -2246,6 +2258,15 @@ class Build():
             fw.write("Arch=%s\n" % "|".join((Wa.ArchList)))
             fw.write("BuildDir=%s\n" % Wa.BuildDir)
             fw.write("PlatformGuid=%s\n" % str(Wa.AutoGenObjectList[0].Guid))
+        variable_i_filelist = os.path.join(Wa.BuildDir,"variable_i_filelist.txt")
+        vfr_var_i = []
+        if GlobalData.gVfrYamlEnable:
+            for ma in self.AllModules:
+                vfr_var_i.extend(ma.VarIFiles)
+            SaveFileOnChange(variable_i_filelist, "\n".join(vfr_var_i), False)
+        else:
+            if os.path.exists(variable_i_filelist):
+                os.remove(variable_i_filelist)
 
         if GlobalData.gBinCacheSource:
             BuildModules.extend(self.MakeCacheMiss)
@@ -2358,6 +2379,18 @@ class Build():
                         #
                         # Generate FD image if there's a FDF file found
                         #
+                        if GlobalData.gVfrYamlEnable:
+                            from VfrCompiler.main import VfrParse
+                            variable_i_filelist = os.path.join(Wa.BuildDir,"variable_i_filelist.txt")
+                            if os.path.exists(variable_i_filelist):
+                                with open(variable_i_filelist) as file:
+                                    i_filelist = file.readlines()
+                                    for i_file in i_filelist:
+                                        inputfile = i_file.replace("\n", "")
+                                        yamloutputfile = inputfile.split(".")[0] + '.yaml'
+                                        jsonoutputfile = inputfile.split(".")[0] + '.json'
+                                        print('inputfile ', inputfile)
+                                        VfrParse(inputfile, yamloutputfile, jsonoutputfile)
                         GenFdsStart = time.time()
                         if GenFdsApi(Wa.GenFdsCommandDict, self.Db):
                             EdkLogger.error("build", COMMAND_FAILURE)
