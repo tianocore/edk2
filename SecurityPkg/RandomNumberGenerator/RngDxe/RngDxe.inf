@@ -10,6 +10,7 @@
 #
 #  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+#  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -36,7 +37,6 @@
 [Sources.IA32, Sources.X64]
   Rand/RngDxe.c
   Rand/RdRand.c
-  Rand/RdRand.h
   Rand/AesCore.c
   Rand/AesCore.h
 

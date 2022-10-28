@@ -1,15 +1,23 @@
 /** @file
-  Support routines for RDRAND instruction access.
+  Support routines for RDRAND instruction access, which will leverage
+  Intel Secure Key technology to provide high-quality random numbers for use
+  in applications, or entropy for seeding other random number generators.
+  Refer to http://software.intel.com/en-us/articles/intel-digital-random-number
+  -generator-drng-software-implementation-guide/ for more information about Intel
+  Secure Key technology.
 
+Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
 Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/RngLib.h>
+#include <Library/TimerLib.h>
 
 #include "AesCore.h"
-#include "RdRand.h"
 #include "RngDxeInternals.h"
 
 /**
@@ -87,7 +95,7 @@ RdRandGetSeed128 (
 **/
 EFI_STATUS
 EFIAPI
-RdRandGenerateEntropy (
+GenerateEntropy (
   IN UINTN   Length,
   OUT UINT8  *Entropy
   )
