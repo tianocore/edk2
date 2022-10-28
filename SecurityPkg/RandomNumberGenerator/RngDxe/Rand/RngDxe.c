@@ -126,8 +126,7 @@ ArchGetSupportedRngAlgorithms (
   OUT    EFI_RNG_ALGORITHM  *RNGAlgorithmList
   )
 {
-  UINTN              RequiredSize;
-  EFI_RNG_ALGORITHM  *CpuRngSupportedAlgorithm;
+  UINTN  RequiredSize;
 
   RequiredSize = 2 * sizeof (EFI_RNG_ALGORITHM);
 
@@ -136,9 +135,7 @@ ArchGetSupportedRngAlgorithms (
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  CpuRngSupportedAlgorithm = PcdGetPtr (PcdCpuRngSupportedAlgorithm);
-
-  CopyMem (&RNGAlgorithmList[0], CpuRngSupportedAlgorithm, sizeof (EFI_RNG_ALGORITHM));
+  CopyMem (&RNGAlgorithmList[0], &gEfiRngAlgorithmSp80090Ctr256Guid, sizeof (EFI_RNG_ALGORITHM));
 
   // x86 platforms also support EFI_RNG_ALGORITHM_RAW via RDSEED
   CopyMem (&RNGAlgorithmList[1], &gEfiRngAlgorithmRaw, sizeof (EFI_RNG_ALGORITHM));
