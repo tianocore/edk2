@@ -131,11 +131,11 @@
   ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
   ArmPkg/Library/ArmGenericTimerVirtCounterLib/ArmGenericTimerVirtCounterLib.inf
 
+  ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
+  ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
   ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmPkg/Library/ArmSmcLibNull/ArmSmcLibNull.inf
-  ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
   ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
-  ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
   ArmPkg/Library/OpteeLib/OpteeLib.inf
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
