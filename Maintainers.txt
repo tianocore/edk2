@@ -481,7 +481,7 @@ F: OvmfPkg/Include/Library/MemEncryptSevLib.h
 F: OvmfPkg/IoMmuDxe/AmdSevIoMmu.*
 F: OvmfPkg/Library/BaseMemEncryptSevLib/
 F: OvmfPkg/Library/PlatformBootManagerLibGrub/
-F: OvmfPkg/Library/VmgExitLib/
+F: OvmfPkg/Library/CcExitLib/
 F: OvmfPkg/PlatformPei/AmdSev.c
 F: OvmfPkg/ResetVector/
 F: OvmfPkg/Sec/
