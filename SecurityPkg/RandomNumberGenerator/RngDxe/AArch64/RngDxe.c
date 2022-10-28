@@ -1,11 +1,13 @@
 /** @file
   RNG Driver to produce the UEFI Random Number Generator protocol.
 
-  The driver will use the RNDR instruction to produce random numbers.
+  The driver can use RNDR instruction (through the RngLib and if FEAT_RNG is
+  present) to produce random numbers. It also uses the Arm FW-TRNG interface
+  to implement EFI_RNG_ALGORITHM_RAW.
 
   RNG Algorithms defined in UEFI 2.4:
    - EFI_RNG_ALGORITHM_SP800_90_CTR_256_GUID
-   - EFI_RNG_ALGORITHM_RAW                    - Unsupported
+   - EFI_RNG_ALGORITHM_RAW
    - EFI_RNG_ALGORITHM_SP800_90_HMAC_256_GUID
    - EFI_RNG_ALGORITHM_SP800_90_HASH_256_GUID
    - EFI_RNG_ALGORITHM_X9_31_3DES_GUID        - Unsupported
@@ -26,12 +28,14 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/RngLib.h>
+#include <Library/DebugLib.h>
+#include <Library/ArmTrngLib.h>
 #include <Protocol/Rng.h>
 
 #include "RngDxeInternals.h"
 
 // Maximum number of Rng algorithms.
-#define RNG_AVAILABLE_ALGO_MAX  1
+#define RNG_AVAILABLE_ALGO_MAX  2
 
 /** Allocate and initialize mAvailableAlgoArray with the available
     Rng algorithms. Also update mAvailableAlgoArrayCount.
@@ -46,8 +50,9 @@ GetAvailableAlgorithms (
   )
 {
   UINT64  DummyRand;
+  UINT16  MajorRevision;
+  UINT16  MinorRevision;
 
-  // Allocate RNG_AVAILABLE_ALGO_MAX entries to avoid evaluating
   // Rng algorithms 2 times, one for the allocation, one to populate.
   mAvailableAlgoArray = AllocateZeroPool (RNG_AVAILABLE_ALGO_MAX);
   if (mAvailableAlgoArray == NULL) {
@@ -59,6 +64,16 @@ GetAvailableAlgorithms (
     CopyMem (
       &mAvailableAlgoArray[mAvailableAlgoArrayCount],
       PcdGetPtr (PcdCpuRngSupportedAlgorithm),
+      sizeof (EFI_RNG_ALGORITHM)
+      );
+    mAvailableAlgoArrayCount++;
+  }
+
+  // Raw algorithm (Trng)
+  if (!EFI_ERROR (GetArmTrngVersion (&MajorRevision, &MinorRevision))) {
+    CopyMem (
+      &mAvailableAlgoArray[mAvailableAlgoArrayCount],
+      &gEfiRngAlgorithmRaw,
       sizeof (EFI_RNG_ALGORITHM)
       );
     mAvailableAlgoArrayCount++;
@@ -139,6 +154,11 @@ FoundAlgo:
   if (CompareGuid (RNGAlgorithm, PcdGetPtr (PcdCpuRngSupportedAlgorithm))) {
     Status = RngGetBytes (RNGValueLength, RNGValue);
     return Status;
+  }
+
+  // Raw algorithm (Trng)
+  if (CompareGuid (RNGAlgorithm, &gEfiRngAlgorithmRaw)) {
+    return GenerateEntropy (RNGValueLength, RNGValue);
   }
 
   //
