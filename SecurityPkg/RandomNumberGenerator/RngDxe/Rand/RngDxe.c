@@ -14,13 +14,16 @@
    - EFI_RNG_ALGORITHM_X9_31_3DES_GUID        - Unsupported
    - EFI_RNG_ALGORITHM_X9_31_AES_GUID         - Unsupported
 
+  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "RdRand.h"
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+
 #include "RngDxeInternals.h"
 
 /**
@@ -88,7 +91,7 @@ RngGetRNG (
       return EFI_INVALID_PARAMETER;
     }
 
-    Status = RdRandGenerateEntropy (RNGValueLength, RNGValue);
+    Status = GenerateEntropy (RNGValueLength, RNGValue);
     return Status;
   }
 
