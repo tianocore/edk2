@@ -8,6 +8,7 @@
 
 #include "CpuExceptionHandlerTest.h"
 #include <Library/UefiBootServicesTableLib.h>
+#include <Protocol/Timer.h>
 
 /**
   Initialize Bsp Idt with a new Idt table and return the IA32_DESCRIPTOR buffer.
@@ -162,8 +163,12 @@ CpuExceptionHandlerTestEntry (
 {
   EFI_STATUS                  Status;
   UNIT_TEST_FRAMEWORK_HANDLE  Framework;
+  EFI_TIMER_ARCH_PROTOCOL     *TimerArchProtocol;
+  UINT64                      TimerPeriod;
 
-  Framework = NULL;
+  Framework         = NULL;
+  TimerArchProtocol = NULL;
+  TimerPeriod       = 0;
 
   DEBUG ((DEBUG_INFO, "%a v%a\n", UNIT_TEST_APP_NAME, UNIT_TEST_APP_VERSION));
 
@@ -183,9 +188,32 @@ CpuExceptionHandlerTestEntry (
   }
 
   //
+  // If HpetTimer driver has been dispatched, disable HpetTimer before Unit Test.
+  //
+  gBS->LocateProtocol (&gEfiTimerArchProtocolGuid, NULL, (VOID **)&TimerArchProtocol);
+  if (TimerArchProtocol != NULL) {
+    Status = TimerArchProtocol->GetTimerPeriod (TimerArchProtocol, &TimerPeriod);
+    ASSERT_EFI_ERROR (Status);
+    if (TimerPeriod > 0) {
+      DEBUG ((DEBUG_INFO, "HpetTimer has been dispatched. Disable HpetTimer.\n"));
+      Status = TimerArchProtocol->SetTimerPeriod (TimerArchProtocol, 0);
+      ASSERT_EFI_ERROR (Status);
+    }
+  }
+
+  //
   // Execute the tests.
   //
   Status = RunAllTestSuites (Framework);
+
+  //
+  // Restore HpetTimer after Unit Test.
+  //
+  if ((TimerArchProtocol != NULL) && (TimerPeriod > 0)) {
+    DEBUG ((DEBUG_INFO, "Restore HpetTimer after DxeCpuExceptionHandlerLib UnitTest.\n"));
+    Status = TimerArchProtocol->SetTimerPeriod (TimerArchProtocol, TimerPeriod);
+    ASSERT_EFI_ERROR (Status);
+  }
 
 EXIT:
   if (Framework) {
