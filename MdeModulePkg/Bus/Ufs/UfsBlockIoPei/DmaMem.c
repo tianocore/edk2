@@ -2,7 +2,7 @@
   The DMA memory help function.
 
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
-
+  Copyright (c) 1985 - 2022, American Megatrends International LLC. <BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -240,10 +240,16 @@ IoMmuInit (
   VOID
   )
 {
-  PeiServicesLocatePpi (
-    &gEdkiiIoMmuPpiGuid,
-    0,
-    NULL,
-    (VOID **)&mIoMmu
-    );
+  EFI_STATUS  Status;
+
+  Status =   PeiServicesLocatePpi (
+               &gEdkiiIoMmuPpiGuid,
+               0,
+               NULL,
+               (VOID **)&mIoMmu
+               );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "Locate mIoMmu Ppi is failed!!!\n"));
+  }
 }
