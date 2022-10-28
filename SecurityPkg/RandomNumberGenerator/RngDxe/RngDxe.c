@@ -28,55 +28,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "RngDxeInternals.h"
 
-/**
-  Returns information about the random number generation implementation.
-
-  @param[in]     This                 A pointer to the EFI_RNG_PROTOCOL instance.
-  @param[in,out] RNGAlgorithmListSize On input, the size in bytes of RNGAlgorithmList.
-                                      On output with a return code of EFI_SUCCESS, the size
-                                      in bytes of the data returned in RNGAlgorithmList. On output
-                                      with a return code of EFI_BUFFER_TOO_SMALL,
-                                      the size of RNGAlgorithmList required to obtain the list.
-  @param[out] RNGAlgorithmList        A caller-allocated memory buffer filled by the driver
-                                      with one EFI_RNG_ALGORITHM element for each supported
-                                      RNG algorithm. The list must not change across multiple
-                                      calls to the same driver. The first algorithm in the list
-                                      is the default algorithm for the driver.
-
-  @retval EFI_SUCCESS                 The RNG algorithm list was returned successfully.
-  @retval EFI_UNSUPPORTED             The services is not supported by this driver.
-  @retval EFI_DEVICE_ERROR            The list of algorithms could not be retrieved due to a
-                                      hardware or firmware error.
-  @retval EFI_INVALID_PARAMETER       One or more of the parameters are incorrect.
-  @retval EFI_BUFFER_TOO_SMALL        The buffer RNGAlgorithmList is too small to hold the result.
-
-**/
-EFI_STATUS
-EFIAPI
-RngGetInfo (
-  IN EFI_RNG_PROTOCOL    *This,
-  IN OUT UINTN           *RNGAlgorithmListSize,
-  OUT EFI_RNG_ALGORITHM  *RNGAlgorithmList
-  )
-{
-  EFI_STATUS  Status;
-
-  if ((This == NULL) || (RNGAlgorithmListSize == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Return algorithm list supported by driver.
-  //
-  if (RNGAlgorithmList != NULL) {
-    Status = ArchGetSupportedRngAlgorithms (RNGAlgorithmListSize, RNGAlgorithmList);
-  } else {
-    Status = EFI_INVALID_PARAMETER;
-  }
-
-  return Status;
-}
-
 //
 // The Random Number Generator (RNG) protocol
 //

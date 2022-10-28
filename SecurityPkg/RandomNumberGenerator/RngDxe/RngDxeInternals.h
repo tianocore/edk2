@@ -75,31 +75,6 @@ RngGetRNG (
   );
 
 /**
-  Returns information about the random number generation implementation.
-
-  @param[in,out] RNGAlgorithmListSize On input, the size in bytes of RNGAlgorithmList.
-                                      On output with a return code of EFI_SUCCESS, the size
-                                      in bytes of the data returned in RNGAlgorithmList. On output
-                                      with a return code of EFI_BUFFER_TOO_SMALL,
-                                      the size of RNGAlgorithmList required to obtain the list.
-  @param[out] RNGAlgorithmList        A caller-allocated memory buffer filled by the driver
-                                      with one EFI_RNG_ALGORITHM element for each supported
-                                      RNG algorithm. The list must not change across multiple
-                                      calls to the same driver. The first algorithm in the list
-                                      is the default algorithm for the driver.
-
-  @retval EFI_SUCCESS                 The RNG algorithm list was returned successfully.
-  @retval EFI_BUFFER_TOO_SMALL        The buffer RNGAlgorithmList is too small to hold the result.
-
-**/
-UINTN
-EFIAPI
-ArchGetSupportedRngAlgorithms (
-  IN OUT UINTN              *RNGAlgorithmListSize,
-  OUT    EFI_RNG_ALGORITHM  *RNGAlgorithmList
-  );
-
-/**
   Runs CPU RNG instruction to fill a buffer of arbitrary size with random bytes.
 
   @param[in]   Length        Size of the buffer, in bytes,  to fill with.
