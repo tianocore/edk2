@@ -42,7 +42,7 @@
   Rand/AesCore.h
 
 [Sources.AARCH64]
-  AArch64/RngDxe.c
+  ArmRngDxe.c
   ArmTrng.c
 
 [Packages]
