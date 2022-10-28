@@ -22,10 +22,62 @@
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/RngLib.h>
 #include <Protocol/Rng.h>
 
 #include "RngDxeInternals.h"
+
+// Maximum number of Rng algorithms.
+#define RNG_AVAILABLE_ALGO_MAX  1
+
+/** Allocate and initialize mAvailableAlgoArray with the available
+    Rng algorithms. Also update mAvailableAlgoArrayCount.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+GetAvailableAlgorithms (
+  VOID
+  )
+{
+  UINT64  DummyRand;
+
+  // Allocate RNG_AVAILABLE_ALGO_MAX entries to avoid evaluating
+  // Rng algorithms 2 times, one for the allocation, one to populate.
+  mAvailableAlgoArray = AllocateZeroPool (RNG_AVAILABLE_ALGO_MAX);
+  if (mAvailableAlgoArray == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // Check RngGetBytes() before advertising PcdCpuRngSupportedAlgorithm.
+  if (!EFI_ERROR (RngGetBytes (sizeof (DummyRand), (UINT8 *)&DummyRand))) {
+    CopyMem (
+      &mAvailableAlgoArray[mAvailableAlgoArrayCount],
+      PcdGetPtr (PcdCpuRngSupportedAlgorithm),
+      sizeof (EFI_RNG_ALGORITHM)
+      );
+    mAvailableAlgoArrayCount++;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/** Free mAvailableAlgoArray.
+**/
+VOID
+EFIAPI
+FreeAvailableAlgorithms (
+  VOID
+  )
+{
+  FreePool (mAvailableAlgoArray);
+  return;
+}
 
 /**
   Produces and returns an RNG value using either the default or specified RNG algorithm.
@@ -59,6 +111,7 @@ RngGetRNG (
   )
 {
   EFI_STATUS  Status;
+  UINTN       Index;
 
   if ((This == NULL) || (RNGValueLength == 0) || (RNGValue == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -68,9 +121,21 @@ RngGetRNG (
     //
     // Use the default RNG algorithm if RNGAlgorithm is NULL.
     //
-    RNGAlgorithm = PcdGetPtr (PcdCpuRngSupportedAlgorithm);
+    for (Index = 0; Index < mAvailableAlgoArrayCount; Index++) {
+      if (!IsZeroGuid (&mAvailableAlgoArray[Index])) {
+        RNGAlgorithm = &mAvailableAlgoArray[Index];
+        goto FoundAlgo;
+      }
+    }
+
+    if (Index == mAvailableAlgoArrayCount) {
+      // No algorithm available.
+      ASSERT (Index != mAvailableAlgoArrayCount);
+      return EFI_DEVICE_ERROR;
+    }
   }
 
+FoundAlgo:
   if (CompareGuid (RNGAlgorithm, PcdGetPtr (PcdCpuRngSupportedAlgorithm))) {
     Status = RngGetBytes (RNGValueLength, RNGValue);
     return Status;
@@ -113,13 +178,17 @@ RngGetInfo (
   OUT EFI_RNG_ALGORITHM  *RNGAlgorithmList
   )
 {
-  UINTN              RequiredSize;
-  EFI_RNG_ALGORITHM  *CpuRngSupportedAlgorithm;
-
-  RequiredSize = sizeof (EFI_RNG_ALGORITHM);
+  UINTN  RequiredSize;
 
   if ((This == NULL) || (RNGAlgorithmListSize == NULL)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  RequiredSize = mAvailableAlgoArrayCount * sizeof (EFI_RNG_ALGORITHM);
+
+  if (RequiredSize == 0) {
+    // No supported algorithms found.
+    return EFI_UNSUPPORTED;
   }
 
   if (*RNGAlgorithmListSize < RequiredSize) {
@@ -127,10 +196,12 @@ RngGetInfo (
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  CpuRngSupportedAlgorithm = PcdGetPtr (PcdCpuRngSupportedAlgorithm);
+  if (RNGAlgorithmList == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-  CopyMem (&RNGAlgorithmList[0], CpuRngSupportedAlgorithm, sizeof (EFI_RNG_ALGORITHM));
-
+  // There is no gap in the array, so copy the block.
+  CopyMem (RNGAlgorithmList, mAvailableAlgoArray, RequiredSize);
   *RNGAlgorithmListSize = RequiredSize;
   return EFI_SUCCESS;
 }

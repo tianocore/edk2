@@ -28,6 +28,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "RngDxeInternals.h"
 
 //
+// Array containing the validated Rng algorithm.
+// The entry with the lowest index will be the default algorithm.
+//
+UINTN              mAvailableAlgoArrayCount;
+EFI_RNG_ALGORITHM  *mAvailableAlgoArray;
+
+//
 // The Random Number Generator (RNG) protocol
 //
 EFI_RNG_PROTOCOL  mRngRdRand = {
@@ -66,8 +73,39 @@ RngDriverEntry (
                   &mRngRdRand,
                   NULL
                   );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
-  return Status;
+  //
+  // Get the list of available algorithm.
+  //
+  return GetAvailableAlgorithms ();
+}
+
+/**
+  This is the unload handle for RndgDxe module.
+
+  Disconnect the driver specified by ImageHandle from all the devices in the handle database.
+  Uninstall all the protocols installed in the driver entry point.
+
+  @param[in] ImageHandle           The drivers' driver image.
+
+  @retval    EFI_SUCCESS           The image is unloaded.
+  @retval    Others                Failed to unload the image.
+
+**/
+EFI_STATUS
+EFIAPI
+RngDriverUnLoad (
+  IN EFI_HANDLE  ImageHandle
+  )
+{
+  //
+  // Free the list of available algorithm.
+  //
+  FreeAvailableAlgorithms ();
+  return EFI_SUCCESS;
 }
 
 /**
