@@ -81,96 +81,14 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         start, stop  = ctx.start.start, ctx.stop.stop
         Text = InputStream.getText(start, stop)
         return Text.replace('\n', '')
-
-
+    
     # Visit a parse tree produced by VfrSyntaxParser#vfrProgram.
     def visitVfrProgram(self, ctx:VfrSyntaxParser.VfrProgramContext):
-        # Basic DataType declare
-        gCVfrVarDataTypeDB.DeclareDataTypeBegin()
-        gCVfrVarDataTypeDB.SetNewTypeName('UINT64')
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ulonglong))
-        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_64)
-        gCVfrVarDataTypeDB.SetNewTypeAlign(8)
-        gCVfrVarDataTypeDB.DeclareDataTypeEnd()
 
-
-        gCVfrVarDataTypeDB.DeclareDataTypeBegin()
-        gCVfrVarDataTypeDB.SetNewTypeName('UINT32')
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ulong))
-        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_32)
-        gCVfrVarDataTypeDB.SetNewTypeAlign(4)
-        gCVfrVarDataTypeDB.DeclareDataTypeEnd()
+        #self.__CVfrQuestionDB.PrintAllQuestion('test\\Questions.txt')
+        #gCVfrVarDataTypeDB.Dump("test\\DataTypeInfo.txt")
         
-        gCVfrVarDataTypeDB.DeclareDataTypeBegin()
-        gCVfrVarDataTypeDB.SetNewTypeName('UINT16')
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ushort))
-        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_16)
-        gCVfrVarDataTypeDB.SetNewTypeAlign(2)
-        gCVfrVarDataTypeDB.DeclareDataTypeEnd()
-        
-        gCVfrVarDataTypeDB.DeclareDataTypeBegin()
-        gCVfrVarDataTypeDB.SetNewTypeName('UINT8')
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ubyte))
-        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_8)
-        gCVfrVarDataTypeDB.DeclareDataTypeEnd()
-
-        gCVfrVarDataTypeDB.DeclareDataTypeBegin()
-        gCVfrVarDataTypeDB.SetNewTypeName('BOOLEAN')
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ubyte))
-        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_BOOLEAN)
-        gCVfrVarDataTypeDB.DeclareDataTypeEnd()
-
-        gCVfrVarDataTypeDB.DeclareDataTypeBegin()
-        gCVfrVarDataTypeDB.SetNewTypeName('EFI_HII_DATE')
-        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_DATE)
-        gCVfrVarDataTypeDB.DataTypeAddField('Year', 'UINT16', 0, False)
-        gCVfrVarDataTypeDB.DataTypeAddField('Month', 'UINT8', 0, False)
-        gCVfrVarDataTypeDB.DataTypeAddField('Day', 'UINT8', 0, False)
-        gCVfrVarDataTypeDB.DeclareDataTypeEnd()
-
-        gCVfrVarDataTypeDB.DeclareDataTypeBegin()
-        gCVfrVarDataTypeDB.SetNewTypeName('EFI_STRING_ID')
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(ctypes.c_ushort))
-        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_STRING)
-        gCVfrVarDataTypeDB.SetNewTypeAlign(2)
-        gCVfrVarDataTypeDB.DeclareDataTypeEnd()
-
-        gCVfrVarDataTypeDB.DeclareDataTypeBegin()
-        gCVfrVarDataTypeDB.SetNewTypeName('EFI_HII_TIME')
-        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_TIME)
-        gCVfrVarDataTypeDB.DataTypeAddField('Hour', 'UINT8', 0, False)
-        gCVfrVarDataTypeDB.DataTypeAddField('Minute', 'UINT8', 0, False)
-        gCVfrVarDataTypeDB.DataTypeAddField('Second', 'UINT8', 0, False)
-        gCVfrVarDataTypeDB.DeclareDataTypeEnd()
-
-        gCVfrVarDataTypeDB.DeclareDataTypeBegin()
-        gCVfrVarDataTypeDB.SetNewTypeName('EFI_GUID')
-        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_OTHER)
-        gCVfrVarDataTypeDB.DataTypeAddField('Data1', 'UINT32', 0, False)
-        gCVfrVarDataTypeDB.DataTypeAddField('Data2', 'UINT16', 0, False)
-        gCVfrVarDataTypeDB.DataTypeAddField('Data3', 'UINT16', 0, False)
-        gCVfrVarDataTypeDB.DataTypeAddField('Data4', 'UINT8', 8, False)
-        gCVfrVarDataTypeDB.DeclareDataTypeEnd()
-
-        gCVfrVarDataTypeDB.DeclareDataTypeBegin()
-        gCVfrVarDataTypeDB.SetNewTypeName('EFI_HII_REF')
-        gCVfrVarDataTypeDB.SetNewTypeType(EFI_IFR_TYPE_REF)
-        gCVfrVarDataTypeDB.DataTypeAddField('QuestionId', 'UINT16', 0, False)
-        gCVfrVarDataTypeDB.DataTypeAddField('FormId', 'UINT16', 0, False)
-        gCVfrVarDataTypeDB.DataTypeAddField('FormSetGuid', 'EFI_GUID', 0, False)
-        gCVfrVarDataTypeDB.DataTypeAddField('DevicePath', 'EFI_STRING_ID', 0, False)
-        gCVfrVarDataTypeDB.SetNewTypeTotalSize(sizeof(EFI_HII_REF))
-        gCVfrVarDataTypeDB.SetNewTypeAlign(16)
-        gCVfrVarDataTypeDB.DeclareDataTypeEnd()
-
-
-
-        self.visitChildren(ctx)
-
-        self.__CVfrQuestionDB.PrintAllQuestion('test\\Questions.txt')
-        gCVfrVarDataTypeDB.Dump("test\\DataTypeInfo.txt")
-        
-        return
+        return self.visitChildren(ctx)
 
     # Visit a parse tree produced by VfrSyntaxParser#pragmaPackShowDef.
     def visitPragmaPackShowDef(self, ctx:VfrSyntaxParser.PragmaPackShowDefContext):
@@ -1069,71 +987,59 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             IntDecStyle = True if (NumericQst.GetNumericFlags() & EFI_IFR_DISPLAY) == 0 else False #
 
         if ctx.TrueSymbol() != None:
-            ctx.ValueStr = 'TRUE'
             ctx.Value.b = 1
+           
         elif ctx.FalseSymbol() != None:
-            ctx.ValueStr = 'FALSE'
             ctx.Value.b = 0
+            
         elif ctx.One() != None:
-            ctx.ValueStr = 'ONE'
-            ctx.Value.u8 = int(ctx.getText()) #
+            ctx.Value.u8 = int(ctx.getText())
+
         elif ctx.Ones() != None:
-            ctx.ValueStr = 'ONES'
-            ctx.Value.u64 = int(ctx.getText()) #
+            ctx.Value.u64 = int(ctx.getText())
+
         elif ctx.Zero() != None:
-            ctx.ValueStr = 'ZERO'
-            ctx.Value.u8 = int(ctx.getText()) #
+            ctx.Value.u8 = int(ctx.getText())
+
         elif ctx.Colon() != []:
-            ctx.ValueStr += str(ctx.Number(0))
-            ctx.ValueStr += ':'
-            ctx.ValueStr += str(ctx.Number(1))
-            ctx.ValueStr += ':'
-            ctx.ValueStr += str(ctx.Number(2))
             ctx.Value.time.Hour = self.__TransNum(ctx.Number(0))
             ctx.Value.time.Minute = self.__TransNum(ctx.Number(1))
             ctx.Value.time.Second = self.__TransNum(ctx.Number(2))
+
         elif ctx.Slash() != []:
-            ctx.ValueStr += str(ctx.Number(0))
-            ctx.ValueStr += '/'
-            ctx.ValueStr += str(ctx.Number(1))
-            ctx.ValueStr += '/'
-            ctx.ValueStr += str(ctx.Number(2))
             ctx.Value.date.Year = self.__TransNum(ctx.Number(0))
             ctx.Value.date.Month = self.__TransNum(ctx.Number(1))
             ctx.Value.date.Day = self.__TransNum(ctx.Number(2))
+            
         elif ctx.Semicolon() != []:
             ctx.Value.ref.QuestionId = self.__TransNum(ctx.Number(0))
             ctx.Value.ref.FormId = self.__TransNum(ctx.Number(1))
             ctx.Value.ref.DevicePath = self.__TransNum(ctx.Number(2))
             ctx.Value.ref.FormSetGuid = ctx.guidDefinition().Guid
+            
         elif ctx.StringToken() != None:
             ctx.Value.string = self.__TransNum(ctx.Number(0))
+            
         elif ctx.OpenBrace() != None:
             ctx.ListType = True
-            ctx.Value = []
-            TempValue = EFI_IFR_TYPE_VALUE()
             Type = self.__CurrQestVarInfo.VarType
-            ctx.ValueStr += '{'
-            ctx.ValueStr += str(ctx.Number(0))
-            for i in range(1, len(ctx.Number())):
-                ctx.ValueStr += ','
-                ctx.ValueStr += str(ctx.Number(i))
+            for i in range(0, len(ctx.Number())):
+                TempValue = EFI_IFR_TYPE_VALUE()
                 if Type == EFI_IFR_TYPE_NUM_SIZE_8:
                     TempValue.u8 = self.__TransNum(ctx.Number(i))
-                    ctx.Value.append(TempValue)
+                    ctx.ValueList.append(TempValue)
 
                 if Type == EFI_IFR_TYPE_NUM_SIZE_16:
                     TempValue.u16 = self.__TransNum(ctx.Number(i))
-                    ctx.Value.append(TempValue)
+                    ctx.ValueList.append(TempValue)
 
                 if Type == EFI_IFR_TYPE_NUM_SIZE_32:
                     TempValue.u32 = self.__TransNum(ctx.Number(i))
-                    ctx.Value.append(TempValue)
+                    ctx.ValueList.append(TempValue)
 
                 if Type == EFI_IFR_TYPE_NUM_SIZE_64:
                     TempValue.u64 = self.__TransNum(ctx.Number(i))
-                    ctx.Value.append(TempValue)
-            ctx.ValueStr += '}'
+                    ctx.ValueList.append(TempValue)
         else:
             Negative = True if ctx.Negative() != None else False
             # The value stored in bit fields is always set to UINT32 type.
@@ -1203,7 +1109,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 if Type == EFI_IFR_TYPE_BOOLEAN:
                     ctx.Value.string = self.__TransNum(ctx.Number(0))
 
-        return ctx.Value
+        return ctx.Value, ctx.ValueList
 
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrImageTag.
@@ -1930,63 +1836,71 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         if ctx.vfrConstantValueField() != None:
             Value = ctx.vfrConstantValueField().Value
+            ValueList = ctx.vfrConstantValueField().ValueList
             Type = self.__CurrQestVarInfo.VarType
             Size = 0
-
+                
             if self.__CurrentMinMaxData != None and self.__CurrentMinMaxData.IsNumericOpcode():
                 # check default value is valid for Numeric Opcode
-                NumericQst = CIfrNumeric (self.__CurrentQuestion) #
-                if (NumericQst.GetNumericFlags() & EFI_IFR_DISPLAY) == 0 and self.__CurrQestVarInfo.IsBitVar == False: #
-                    if Type == EFI_IFR_TYPE_NUM_SIZE_8:
-                        if Value.u8 < self.__CurrentMinMaxData.GetMinData(Type, False) or Value.u8 > self.__CurrentMinMaxData.GetMaxData(Type, False):
-                            ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
-                            print("Numeric default value must be between MinValue and MaxValue.")
+                if ValueList == []:
+                    ValueList.append(Value)
+                for i in range(0, len(ValueList)):
+                    Value = ValueList[i]
+                    NumericQst = CIfrNumeric (self.__CurrentQuestion) #
+                    if (NumericQst.GetNumericFlags() & EFI_IFR_DISPLAY) == 0 and self.__CurrQestVarInfo.IsBitVar == False: #
+                        if Type == EFI_IFR_TYPE_NUM_SIZE_8:
+                            if Value.u8 < self.__CurrentMinMaxData.GetMinData(Type, False) or Value.u8 > self.__CurrentMinMaxData.GetMaxData(Type, False):
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print("Numeric default value must be between MinValue and MaxValue.")
 
-                    if Type == EFI_IFR_TYPE_NUM_SIZE_16:
-                        if Value.u16 < self.__CurrentMinMaxData.GetMinData(Type, False) or Value.u16 > self.__CurrentMinMaxData.GetMaxData(Type, False):
-                            ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
-                            print("Numeric default value must be between MinValue and MaxValue.")
+                        if Type == EFI_IFR_TYPE_NUM_SIZE_16:
+                            if Value.u16 < self.__CurrentMinMaxData.GetMinData(Type, False) or Value.u16 > self.__CurrentMinMaxData.GetMaxData(Type, False):
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print("Numeric default value must be between MinValue and MaxValue.")
 
-                    if Type == EFI_IFR_TYPE_NUM_SIZE_32:
-                        if Value.u32 < self.__CurrentMinMaxData.GetMinData(Type, False) or Value.u32 > self.__CurrentMinMaxData.GetMaxData(Type, False):
-                            ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
-                            print("Numeric default value must be between MinValue and MaxValue.")
+                        if Type == EFI_IFR_TYPE_NUM_SIZE_32:
+                            if Value.u32 < self.__CurrentMinMaxData.GetMinData(Type, False) or Value.u32 > self.__CurrentMinMaxData.GetMaxData(Type, False):
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print("Numeric default value must be between MinValue and MaxValue.")
 
-                    if Type == EFI_IFR_TYPE_NUM_SIZE_64:
-                        if Value.u64 < self.__CurrentMinMaxData.GetMinData(Type, False) or Value.u64 > self.__CurrentMinMaxData.GetMaxData(Type, False):
-                            ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
-                            print("Numeric default value must be between MinValue and MaxValue.")
+                        if Type == EFI_IFR_TYPE_NUM_SIZE_64:
+                            if Value.u64 < self.__CurrentMinMaxData.GetMinData(Type, False) or Value.u64 > self.__CurrentMinMaxData.GetMaxData(Type, False):
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print("Numeric default value must be between MinValue and MaxValue.")
 
-                else:
-                    # Value for question stored in bit fields is always set to UINT32 type.
-                    if self.__CurrQestVarInfo.IsBitVar:
-                        if Value.u32 < self.__CurrentMinMaxData.GetMinData(Type, True) or  Value.u32 > self.__CurrentMinMaxData.GetMaxData(Type, True):
-                            ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
-                            print("Numeric default value must be between MinValue and MaxValue.")
                     else:
-                        if Value.u64 < self.__CurrentMinMaxData.GetMinData(Type, False) or  Value.u64 > self.__CurrentMinMaxData.GetMaxData(Type, False):
-                            ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
-                            print("Numeric default value must be between MinValue and MaxValue.")
+                        # Value for question stored in bit fields is always set to UINT32 type.
+                        if self.__CurrQestVarInfo.IsBitVar:
+                            if Value.u32 < self.__CurrentMinMaxData.GetMinData(Type, True) or  Value.u32 > self.__CurrentMinMaxData.GetMaxData(Type, True):
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print("Numeric default value must be between MinValue and MaxValue.")
+                        else:
+                            if Value.u64 < self.__CurrentMinMaxData.GetMinData(Type, False) or  Value.u64 > self.__CurrentMinMaxData.GetMaxData(Type, False):
+                                ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
+                                print("Numeric default value must be between MinValue and MaxValue.")
 
             if Type == EFI_IFR_TYPE_OTHER:
                 ReturnCode = VfrReturnCode.VFR_RETURN_FATAL_ERROR
                 print("Default data type error.")
                 Size = sizeof(EFI_IFR_TYPE_VALUE)
+                
             elif ctx.vfrConstantValueField().ListType:
-                Size = len(Value)
+                if Type == EFI_IFR_TYPE_NUM_SIZE_8:
+                    Size = sizeof(c_ubyte) * len(ValueList)
                 if Type == EFI_IFR_TYPE_NUM_SIZE_16:
-                    Size *= sizeof(c_ushort)
+                    Size = sizeof(c_ushort) * len(ValueList)
                 if Type == EFI_IFR_TYPE_NUM_SIZE_32:
-                    Size *= sizeof(c_ulong)
+                    Size = sizeof(c_ulong) * len(ValueList)
                 if Type == EFI_IFR_TYPE_NUM_SIZE_64:
-                    Size *= sizeof(c_ulonglong)
+                    Size = sizeof(c_ulonglong) * len(ValueList)
+                    
             else:
                 if self.__CurrQestVarInfo.IsBitVar:
-                    Size = sizeof(c_ulong)
+                    Size = sizeof(c_ulong) 
                 else:
                     Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(Type)
 
-            # Size += self.OFFSET_OF (EFI_IFR_DEFAULT, Value) ########
+            '''
             DObj = CIfrDefault(Size)
             DObj.SetLineNo((None if ctx.start is None else ctx.start).line)
 
@@ -2002,7 +1916,26 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
             if ctx.vfrConstantValueField().ListType == False:
                 DObj.SetValue(Value)
+            '''
+            # Size += self.OFFSET_OF (EFI_IFR_DEFAULT, Value) #######
+            if not ctx.vfrConstantValueField().ListType:
+                DObj = CIfrDefault(Size)
+                DObj.SetLineNo((None if ctx.start is None else ctx.start).line)
+                DObj.SetValue(Value)
 
+                if self.__IsStringOp:
+                    DObj.SetType(EFI_IFR_TYPE_STRING)
+                else:
+                    if self.__CurrQestVarInfo.IsBitVar:
+                        DObj.SetType(EFI_IFR_TYPE_NUM_SIZE_32)
+                    else:
+                        DObj.SetType(self.__CurrQestVarInfo.VarType)
+            else:
+                DObj = CIfrDefault3(Size, len(ValueList), Type)
+                DObj.SetLineNo((None if ctx.start is None else ctx.start).line)
+                DObj.SetValue(ValueList)
+                DObj.SetType(EFI_IFR_TYPE_BUFFER)
+                
         else:
             IsExp = True
             DObj = CIfrDefault2()
@@ -2069,7 +2002,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
 
         Value = ctx.vfrConstantValueField().Value
-        ValueStr = ctx.vfrConstantValueField().ValueStr
+        ValueList = ctx.vfrConstantValueField().ValueList
         Type = self.__CurrQestVarInfo.VarType
         Size = 0
         if self.__CurrentMinMaxData != None:
@@ -2090,13 +2023,14 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if self.__CurrQestVarInfo.VarType == EFI_IFR_TYPE_OTHER:
             Size = sizeof(EFI_IFR_TYPE_VALUE)
         elif ctx.vfrConstantValueField().ListType:
-            Size = len(Value)
+            if Type == EFI_IFR_TYPE_NUM_SIZE_8:
+                Size = sizeof(c_ubyte) * len(ValueList)
             if Type == EFI_IFR_TYPE_NUM_SIZE_16:
-                Size *= sizeof(c_ushort)
+                Size = sizeof(c_ushort) * len(ValueList)
             if Type == EFI_IFR_TYPE_NUM_SIZE_32:
-                Size *= sizeof(c_ulong)
+                Size = sizeof(c_ulong) * len(ValueList)
             if Type == EFI_IFR_TYPE_NUM_SIZE_64:
-                Size *= sizeof(c_ulonglong)
+                Size = sizeof(c_ulonglong) * len(ValueList)
         else:
             # For the oneof stored in bit fields, set the option type as UINT32.
             if self.__CurrQestVarInfo.IsBitVar:
@@ -2104,6 +2038,25 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             else:
                 Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(Type)
         # Size + = offset
+        
+        OOOObj = None
+        if not ctx.vfrConstantValueField().ListType:
+            OOOObj = CIfrOneOfOption(Size)
+            if self.__CurrQestVarInfo.IsBitVar:
+                OOOObj.SetType(EFI_IFR_TYPE_NUM_SIZE_32)
+            else:
+                OOOObj.SetType(Type)
+            OOOObj.SetValue(Value)
+        else:
+            OOOObj = CIfrOneOfOption2(Size, len(ValueList), Type)
+            OOOObj.SetType(EFI_IFR_TYPE_BUFFER)
+            OOOObj.SetValue(ValueList)
+            
+            
+        OOOObj.SetLineNo((None if ctx.start is None else ctx.start).line)
+        OOOObj.SetOption(self.__TransNum(ctx.Number(0)))
+            
+        '''
         OOOObj = CIfrOneOfOption(Size)
         OOOObj.SetLineNo((None if ctx.start is None else ctx.start).line)
         OOOObj.SetOption(self.__TransNum(ctx.Number(0)))
@@ -2114,8 +2067,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 OOOObj.SetType(EFI_IFR_TYPE_NUM_SIZE_32)
             else:
                 OOOObj.SetType(Type)
-
-        OOOObj.SetValue(Value) #
+        '''
         ReturnCode = OOOObj.SetFlags(ctx.vfrOneOfOptionFlags().LFlags)
         ReturnCode = self.__CurrentQuestion.SetQHeaderFlags(ctx.vfrOneOfOptionFlags().HFlags)
 
@@ -2916,7 +2868,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             #　Question stored in bit fields saved as UINT32 type, so the ShrinkSize same as EFI_IFR_TYPE_NUM_SIZE_32.
             ShrinkSize = 12
 
-        #######　NObj->ShrinkBinSize (ShrinkSize);
+        # OObj.ShrinkBinSize(ShrinkSize)
         if IsSupported == False:
             ReturnCode = VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
             print('OneOf question only support UINT8, UINT16, UINT32 and UINT64 data type.')
@@ -3785,7 +3737,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         
         self.visitChildren(ctx)
         
-        Data = self.__TransNum(ctx.Number(len(ctx.Number)-1))
+        Data = self.__TransNum(ctx.Number(len(ctx.Number())-1))
         if IsArray == True:
             ArrayIdx = self.__TransNum(self.__TransNum(ctx.Number(0)))
         ByteOffset  = ArrayIdx * ctx.parentCtx.TypeSize #####
@@ -3800,16 +3752,21 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 Offset = int(FieldOffset / 8)
                 PreBits = FieldOffset % 8
                 Mask <<= PreBits
-            
             if FieldType == EFI_IFR_TYPE_NUM_SIZE_8:
-                pass
+                if BitField:
+                    # Set the value to the bit fileds.
+                    Data  <<= PreBits
+                    Value = (Value & (~Mask)) | Data
+                    Begin = ByteOffset + Offset
+                    End = ByteOffset + Offset + sizeof (ctypes.c_ubyte)
+                    ctx.DataBuff[Begin, End] = Value
+                    
+                    
                 
         else:
             ctx.DataBuff.append(Data)
             
         '''
-            
-
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementModal.
@@ -4945,7 +4902,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                         f.write('    ],\n')
                     pNode = pNode.Next
                 f.write('  },\n')
-                f.write('  \"DataStructAttribute\" : {\n')
+                f.write('  \"DataStructAttribute\": {\n')
                 pNode = gCVfrVarDataTypeDB.GetDataTypeList()
                 while pNode != None:
                     f.write('    \"{}\"'.format(str(pNode.TypeName)) + ': {\n')
@@ -5003,7 +4960,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                     f.write('  ClassGuid:  {' + '{}, {}, {},'.format('0x%x'%(Guid.Data1),'0x%x'%(Guid.Data2), '0x%x'%(Guid.Data3)) \
                     + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Guid.Data4[0]), '0x%x'%(Guid.Data4[1]), '0x%x'%(Guid.Data4[2]), '0x%x'%(Guid.Data4[3]), \
                     '0x%x'%(Guid.Data4[4]), '0x%x'%(Guid.Data4[5]), '0x%x'%(Guid.Data4[6]), '0x%x'%(Guid.Data4[7])) + ' }}\n')
-                           
+                
             if Root.OpCode == EFI_IFR_VARSTORE_OP:
                 Info = Root.Data.GetInfo()
                 f.write('  - varstore:\n')
@@ -5104,35 +5061,72 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                     
                 f.write('              option flag:  {}\n'.format(Info.Flags))
                 f.write('              option type:  {}\n'.format(Info.Type))
-                if Info.Type == EFI_IFR_TYPE_DATE:
-                    f.write('              option value:  {}/{}/{}\n'.format(Info.Value.date.Year, Info.Value.date.Month, Info.Value.date.Day))
-                if Info.Type == EFI_IFR_TYPE_TIME:
-                    f.write('              option value:  {}:{}:{}\n'.format(Info.Value.time.Hour, Info.Value.time.Minute, Info.Value.time.Second))
-                if Info.Type == EFI_IFR_TYPE_REF:
-                    f.write('              option value:  {};{};'.format(Info.Value.ref.QuestionId, Info.Value.ref.FormId) +  '{' + '{}, {}, {},'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data1),'0x%x'%(Info.Value.ref.FormSetGuid.Data2), '0x%x'%(Info.Value.ref.FormSetGuid.Data3)) \
-                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data4[0]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[1]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[2]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[3]), \
-                    '0x%x'%(Info.Value.ref.FormSetGuid.Data4[4]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[5]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[6]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[7])) + ' }}\n' + ';{}'.format(Info.Value.ref.DevicePath))
-                if Info.Type == EFI_IFR_TYPE_STRING:
-                    f.write('              option value:  {}\n'.format(Info.Value.string))    
-                if Info.Type == EFI_IFR_TYPE_NUM_SIZE_8:
-                    f.write('              option value:  {}\n'.format(Info.Value.u8))   
-                if Info.Type == EFI_IFR_TYPE_NUM_SIZE_16:
-                    f.write('              option value:  {}\n'.format(Info.Value.u16))  
-                if Info.Type == EFI_IFR_TYPE_NUM_SIZE_32:
-                    f.write('              option value:  {}\n'.format(Info.Value.u32))  
-                if Info.Type == EFI_IFR_TYPE_NUM_SIZE_64:
-                    f.write('              option value:  {}\n'.format(Info.Value.u64))  
-                if Info.Type == EFI_IFR_TYPE_BOOLEAN:
-                    f.write('              option value:  {}\n'.format(Info.Value.b))  
+                
+                if type(Root.Data) == CIfrOneOfOption:
+                    if Info.Type == EFI_IFR_TYPE_DATE:
+                        f.write('              option value:  {}/{}/{}\n'.format(Info.Value.date.Year, Info.Value.date.Month, Info.Value.date.Day))
+                    if Info.Type == EFI_IFR_TYPE_TIME:
+                        f.write('              option value:  {}:{}:{}\n'.format(Info.Value.time.Hour, Info.Value.time.Minute, Info.Value.time.Second))
+                    if Info.Type == EFI_IFR_TYPE_REF:
+                        f.write('              option value:  {};{};'.format(Info.Value.ref.QuestionId, Info.Value.ref.FormId) +  '{' + '{}, {}, {},'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data1),'0x%x'%(Info.Value.ref.FormSetGuid.Data2), '0x%x'%(Info.Value.ref.FormSetGuid.Data3)) \
+                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data4[0]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[1]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[2]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[3]), \
+                        '0x%x'%(Info.Value.ref.FormSetGuid.Data4[4]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[5]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[6]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[7])) + ' }}\n' + ';{}'.format(Info.Value.ref.DevicePath))
+                    if Info.Type == EFI_IFR_TYPE_STRING:
+                        f.write('              option value:  {}\n'.format(Info.Value.string))    
+                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_8:
+                        f.write('              option value:  {}\n'.format(Info.Value.u8))   
+                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_16:
+                        f.write('              option value:  {}\n'.format(Info.Value.u16))  
+                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_32:
+                        f.write('              option value:  {}\n'.format(Info.Value.u32))  
+                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_64:
+                        f.write('              option value:  {}\n'.format(Info.Value.u64))  
+                    if Info.Type == EFI_IFR_TYPE_BOOLEAN:
+                        f.write('              option value:  {}\n'.format(Info.Value.b))  
+                        
+                if type(Root.Data) == CIfrOneOfOption2:
+                    f.write('              value:  {')
+                    print(len(Info.Value))
+                    ValueType = Root.Data.GetValueType()
+                    if ValueType == EFI_IFR_TYPE_STRING:
+                        for i in range(0, len(Info.Value)-1):
+                            f.write('{},'.format(Info.Value[i].string))  
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].string) + '}\n') 
+                        
+                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_8:
+                        for i in range(0, len(Info.Value)-1):
+                            f.write('{},'.format(Info.Value[i].u8))  
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u8) + '}\n') 
+                        
+                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_16:
+                        for i in range(0, len(Info.Value)-1):
+                            f.write('{},'.format(Info.Value[i].u16))  
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u16) + '}\n') 
+                        
+                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_32:
+                        for i in range(0, len(Info.Value)-1):
+                            f.write('{},'.format(Info.Value[i].u32))  
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u32) + '}\n') 
+                        
+                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_64:
+                        for i in range(0, len(Info.Value)-1):
+                            f.write('{},'.format(Info.Value[i].u64))  
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u64) + '}\n') 
+                        
+                    if ValueType == EFI_IFR_TYPE_BOOLEAN:
+                        for i in range(0, len(Info.Value)-1):
+                            f.write('{},'.format(Info.Value[i].b))  
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].b) + '}\n') 
+                    
 
             if Root.OpCode == EFI_IFR_DEFAULT_OP:
                 Info = Root.Data.GetInfo()  
                 f.write('          - default:\n')
                 if Root.Condition != None:
                     f.write('              condition:  {}\n'.format(Root.Condition))
+                f.write('              type:  {}\n'.format(Info.Type))
+                f.write('              defaultId:  {}\n'.format(Info.DefaultId))
                 if type(Root.Data) == CIfrDefault:
-                    f.write('              type:  {}\n'.format(Info.Type))
-                    f.write('              varstoreid:  {}\n'.format(Info.DefaultId))
                     if Info.Type == EFI_IFR_TYPE_DATE:
                         f.write('              value:  {}/{}/{}\n'.format(Info.Value.date.Year, Info.Value.date.Month, Info.Value.date.Day))
                     if Info.Type == EFI_IFR_TYPE_TIME:
@@ -5153,15 +5147,39 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                         f.write('              value:  {}\n'.format(Info.Value.u64))  
                     if Info.Type == EFI_IFR_TYPE_BOOLEAN:
                         f.write('              value:  {}\n'.format(Info.Value.b))  
-                    '''
-                    if Info.Type == EFI_IFR_TYPE_BUFFER:
-                        for value in Info.Value
-                        f.write('              value:  {}\n'.format(Info.Value.b)) 
-                    '''
-                if type(Root.Data) == CIfrDefault2:
-                    f.write('              type:  {}\n'.format(Info.Type))
-                    f.write('              defaultid:  {}\n'.format(Info.DefaultId))
                     
+                if type(Root.Data) == CIfrDefault3:
+                    f.write('              value:  {')
+                    ValueType = Root.Data.GetValueType()
+                    if ValueType == EFI_IFR_TYPE_STRING:
+                        for i in range(0, len(Info.Value)-1):
+                            f.write('{},'.format(Info.Value[i].string))  
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].string) + '}\n') 
+                        
+                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_8:
+                        for i in range(0, len(Info.Value)-1):
+                            f.write('{},'.format(Info.Value[i].u8))  
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u8) + '}\n') 
+                        
+                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_16:
+                        for i in range(0, len(Info.Value)-1):
+                            f.write('{},'.format(Info.Value[i].u16))  
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u16) + '}\n') 
+                        
+                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_32:
+                        for i in range(0, len(Info.Value)-1):
+                            f.write('{},'.format(Info.Value[i].u32))  
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u32) + '}\n') 
+                        
+                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_64:
+                        for i in range(0, len(Info.Value)-1):
+                            f.write('{},'.format(Info.Value[i].u64))  
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u64) + '}\n') 
+                        
+                    if ValueType == EFI_IFR_TYPE_BOOLEAN:
+                        for i in range(0, len(Info.Value)-1):
+                            f.write('{},'.format(Info.Value[i].b))  
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].b) + '}\n') 
 
             if Root.OpCode == EFI_IFR_ORDERED_LIST_OP:
                 Info = Root.Data.GetInfo()  
@@ -5330,7 +5348,21 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                         f.write('          condition:  {}\n'.format(Root.Condition))
                         
                     f.write('          timeout:  {}\n'.format(Info.TimeOut))
+
+                if type(Root.Data) == CIfrClass:                         
+                    f.write('  Class:  {}\n'.format(Info.Class))
+                    
+                if type(Root.Data) == CIfrSubClass:                         
+                    f.write('  SubClass:  {}\n'.format(Info.SubClass))
                 
+                if type(Root.Data) == CIfrGuid:
+                    f.write('      - guidop:\n')
+                    if Root.Condition != None:
+                        f.write('          condition:  {}\n'.format(Root.Condition))
+                    f.write('          guid:  {' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
+                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
+                    '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\n')
+                    
 
         if Root.Child != []:
             for ChildNode in Root.Child:

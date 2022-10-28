@@ -71,6 +71,35 @@ class SVfrDataField(object):
         self.BitOffset = 0
         self.Next = None
 
+class InternalTypes():
+    def __init__(self, TypeName, Type, Size, Align):
+        self.TypeName = TypeName
+        self.Type = Type
+        self.Size = Size
+        self.Align = Align
+
+gInternalTypesTable = [
+    InternalTypes("UINT64", EFI_IFR_TYPE_NUM_SIZE_64,
+                  sizeof(ctypes.c_ulonglong), sizeof(ctypes.c_ulonglong)),
+    InternalTypes("UINT32", EFI_IFR_TYPE_NUM_SIZE_32, sizeof(ctypes.c_ulong),
+                  sizeof(ctypes.c_ulong)),
+    InternalTypes("UINT16", EFI_IFR_TYPE_NUM_SIZE_16, sizeof(ctypes.c_ushort),
+                  sizeof(ctypes.c_ushort)),
+    InternalTypes("UINT8", EFI_IFR_TYPE_NUM_SIZE_8, sizeof(ctypes.c_ubyte),
+                  sizeof(ctypes.c_ubyte)),
+    InternalTypes("BOOLEAN", EFI_IFR_TYPE_BOOLEAN, sizeof(ctypes.c_ubyte),
+                  sizeof(ctypes.c_ubyte)),
+    InternalTypes("EFI_GUID", EFI_IFR_TYPE_OTHER, sizeof(EFI_GUID),
+                  sizeof(c_ubyte * 8)),
+    InternalTypes("EFI_HII_DATE", EFI_IFR_TYPE_DATE, sizeof(EFI_HII_DATE),
+                  sizeof(ctypes.c_ushort)),
+    InternalTypes("EFI_STRING_ID", EFI_IFR_TYPE_STRING,
+                  sizeof(ctypes.c_ushort), sizeof(ctypes.c_ushort)),
+    InternalTypes("EFI_HII_TIME", EFI_IFR_TYPE_TIME, sizeof(EFI_HII_TIME),
+                  sizeof(ctypes.c_ubyte)),
+    InternalTypes("EFI_HII_REF", EFI_IFR_TYPE_REF, sizeof(EFI_HII_REF),
+                  sizeof(EFI_GUID)),
+]
 
 class CVfrVarDataTypeDB(object):
 
@@ -82,6 +111,194 @@ class CVfrVarDataTypeDB(object):
         self.__CurrDataType = None
         self.__CurrDataField = None
         self.__FirstNewDataTypeName = None
+        self.InternalTypesListInit()
+    
+    
+    def InternalTypesListInit(self):
+        for i in range(0, len(gInternalTypesTable)):
+            pNewType = SVfrDataType()
+            pNewType.TypeName = gInternalTypesTable[i].TypeName
+            pNewType.Type = gInternalTypesTable[i].Type
+            pNewType.Align = gInternalTypesTable[i].Align
+            pNewType.TotalSize = gInternalTypesTable[i].Size
+            
+            if gInternalTypesTable[i].TypeName == 'EFI_HII_DATE':
+                pYearField  = SVfrDataField()
+                pMonthField  = SVfrDataField()
+                pDayField  = SVfrDataField()
+                
+                pYearField.FieldName = 'Year'
+                pYearField.FieldType, _ = self.GetDataType('UINT16')
+                pYearField.Offset = 0
+                pYearField.Next = pMonthField
+                pYearField.ArrayNum = 0
+                pYearField.IsBitField = False
+
+                pMonthField.FieldName = 'Month'
+                pMonthField.FieldType, _ = self.GetDataType('UINT8')
+                pMonthField.Offset = 2
+                pMonthField.Next = pDayField
+                pMonthField.ArrayNum = 0
+                pMonthField.IsBitField = False
+
+                pDayField.FieldName = 'Day'
+                pDayField.FieldType, _ = self.GetDataType('UINT8')
+                pDayField.Offset = 3
+                pDayField.Next = None
+                pDayField.ArrayNum = 0
+                pDayField.IsBitField = False
+                
+                pNewType.Members = pYearField
+            
+            elif gInternalTypesTable[i].TypeName == 'EFI_HII_TIME':
+                pHoursField  = SVfrDataField()
+                pMinutesField  = SVfrDataField()
+                pSecondsField  = SVfrDataField()
+                
+                pHoursField.FieldName = 'Hours'
+                pHoursField.FieldType, _ = self.GetDataType('UINT8')
+                pHoursField.Offset = 0
+                pHoursField.Next = pMinutesField
+                pHoursField.ArrayNum = 0
+                pHoursField.IsBitField = False
+
+                pMinutesField.FieldName = 'Minutes'
+                pMinutesField.FieldType, _ = self.GetDataType('UINT8')
+                pMinutesField.Offset = 1
+                pMinutesField.Next = pSecondsField
+                pMinutesField.ArrayNum = 0
+                pMinutesField.IsBitField = False
+
+                pSecondsField.FieldName = 'Seconds'
+                pSecondsField.FieldType, _ = self.GetDataType('UINT8')
+                pSecondsField.Offset = 2
+                pSecondsField.Next = None
+                pSecondsField.ArrayNum = 0
+                pSecondsField.IsBitField = False
+                
+                pNewType.Members = pHoursField
+                
+            elif gInternalTypesTable[i].TypeName == 'EFI_HII_REF':
+                pQuestionIdField  = SVfrDataField()
+                pFormIdField  = SVfrDataField()
+                pFormSetGuidField  = SVfrDataField()
+                pDevicePathField = SVfrDataField()
+                
+                pQuestionIdField.FieldName = 'QuestionId'
+                pQuestionIdField.FieldType, _ = self.GetDataType('UINT16')
+                pQuestionIdField.Offset = 0
+                pQuestionIdField.Next = pFormIdField
+                pQuestionIdField.ArrayNum = 0
+                pQuestionIdField.IsBitField = False
+
+                pFormIdField.FieldName = 'FormId'
+                pFormIdField.FieldType, _ = self.GetDataType('UINT16')
+                pFormIdField.Offset = 2
+                pFormIdField.Next = pFormSetGuidField
+                pFormIdField.ArrayNum = 0
+                pFormIdField.IsBitField = False
+
+                pFormSetGuidField.FieldName = 'FormSetGuid'
+                pFormSetGuidField.FieldType, _ = self.GetDataType('EFI_GUID')
+                pFormSetGuidField.Offset = 4
+                pFormSetGuidField.Next = pDevicePathField
+                pFormSetGuidField.ArrayNum = 0
+                pFormSetGuidField.IsBitField = False
+
+                pDevicePathField.FieldName = 'DevicePath'
+                pDevicePathField.FieldType, _ = self.GetDataType('EFI_STRING_ID')
+                pDevicePathField.Offset = 20
+                pDevicePathField.Next = None
+                pDevicePathField.ArrayNum = 0
+                pDevicePathField.IsBitField = False
+                
+                pNewType.Members = pQuestionIdField
+
+            pNewType.Next = None
+            self.__RegisterNewType(pNewType)
+            pNewType = None
+            
+            
+
+    def InternalTypesListInit2(self):
+
+        self.DeclareDataTypeBegin()
+        self.SetNewTypeName('UINT64')
+        self.SetNewTypeTotalSize(sizeof(ctypes.c_ulonglong))
+        self.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_64)
+        self.SetNewTypeAlign(sizeof(ctypes.c_ulonglong))
+        self.DeclareDataTypeEnd()
+
+
+        self.DeclareDataTypeBegin()
+        self.SetNewTypeName('UINT32')
+        self.SetNewTypeTotalSize(sizeof(ctypes.c_ulong))
+        self.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_32)
+        self.SetNewTypeAlign(sizeof(ctypes.c_ulong))
+        self.DeclareDataTypeEnd()
+        
+        self.DeclareDataTypeBegin()
+        self.SetNewTypeName('UINT16')
+        self.SetNewTypeTotalSize(sizeof(ctypes.c_ushort))
+        self.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_16)
+        self.SetNewTypeAlign(sizeof(ctypes.c_ushort))
+        self.DeclareDataTypeEnd()
+        
+        self.DeclareDataTypeBegin()
+        self.SetNewTypeName('UINT8')
+        self.SetNewTypeTotalSize(sizeof(ctypes.c_ubyte))
+        self.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_8)
+        self.SetNewTypeAlign(sizeof(ctypes.c_ubyte))
+        self.DeclareDataTypeEnd()
+
+        self.DeclareDataTypeBegin()
+        self.SetNewTypeName('BOOLEAN')
+        self.SetNewTypeTotalSize(sizeof(ctypes.c_ubyte))
+        self.SetNewTypeType(EFI_IFR_TYPE_BOOLEAN)
+        self.SetNewTypeAlign(sizeof(ctypes.c_ubyte))
+        self.DeclareDataTypeEnd()
+
+        self.DeclareDataTypeBegin()
+        self.SetNewTypeName('EFI_GUID')
+        self.SetNewTypeTotalSize(sizeof(EFI_GUID))
+        self.SetNewTypeType(EFI_IFR_TYPE_OTHER)
+        self.SetNewTypeAlign(sizeof(c_ubyte * 8))
+        self.DeclareDataTypeEnd()
+
+        self.DeclareDataTypeBegin()
+        self.SetNewTypeName('EFI_HII_DATE')
+        self.SetNewTypeType(EFI_IFR_TYPE_DATE)
+        self.DataTypeAddField('Year', 'UINT16', 0, False)
+        self.DataTypeAddField('Month', 'UINT8', 0, False)
+        self.DataTypeAddField('Day', 'UINT8', 0, False)
+        self.DeclareDataTypeEnd()
+
+        self.DeclareDataTypeBegin()
+        self.SetNewTypeName('EFI_STRING_ID')
+        self.SetNewTypeTotalSize(sizeof(ctypes.c_ushort))
+        self.SetNewTypeType(EFI_IFR_TYPE_STRING)
+        self.SetNewTypeAlign(sizeof(ctypes.c_ushort))
+        self.DeclareDataTypeEnd()
+
+        self.DeclareDataTypeBegin()
+        self.SetNewTypeName('EFI_HII_TIME')
+        self.SetNewTypeType(EFI_IFR_TYPE_TIME)
+        self.DataTypeAddField('Hour', 'UINT8', 0, False)
+        self.DataTypeAddField('Minute', 'UINT8', 0, False)
+        self.DataTypeAddField('Second', 'UINT8', 0, False)
+        self.DeclareDataTypeEnd()
+
+        self.DeclareDataTypeBegin()
+        self.SetNewTypeName('EFI_HII_REF')
+        self.SetNewTypeType(EFI_IFR_TYPE_REF)
+        self.DataTypeAddField('QuestionId', 'UINT16', 0, False)
+        self.DataTypeAddField('FormId', 'UINT16', 0, False)
+        self.DataTypeAddField('FormSetGuid', 'EFI_GUID', 0, False)
+        self.DataTypeAddField('DevicePath', 'EFI_STRING_ID', 0, False)
+        self.SetNewTypeAlign(sizeof(EFI_GUID))
+        self.DeclareDataTypeEnd()
+
+
     
     def GetDataTypeList(self):
         return self.__DataTypeList
@@ -181,10 +398,9 @@ class CVfrVarDataTypeDB(object):
         if self.__NewDataType.TypeName == '':
             return
         
-        if self.__NewDataType.TypeName != 'EFI_HII_REF':
-            if self.__NewDataType.TotalSize % self.__NewDataType.Align != 0:
-                self.__NewDataType.TotalSize += self.__AlignStuff(
-                    self.__NewDataType.TotalSize, self.__NewDataType.Align)
+        if self.__NewDataType.TotalSize % self.__NewDataType.Align != 0:
+            self.__NewDataType.TotalSize += self.__AlignStuff(
+                self.__NewDataType.TotalSize, self.__NewDataType.Align)
 
         self.__RegisterNewType(self.__NewDataType)
         if self.__FirstNewDataTypeName == None:

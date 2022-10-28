@@ -7,8 +7,6 @@ from VfrError import VfrReturnCode
 from VfrUtility import *
 
 from ctypes import *
-
-
 class OpcodeSizesScopeNode():
 
     def __init__(self, Size, Scope):
@@ -188,8 +186,6 @@ gOpcodeSizesScopeTable = [
                          1),  # EFI_IFR_WARNING_IF_OP - 0x63
     OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_MATCH2), 0)
 ]
-
-
 
 
 class SBufferNode():
@@ -406,7 +402,7 @@ class CIfrObj():  # wip
 
     def SetLineNo(self, LineNo):
         self.__LineNo = LineNo
-    
+
     def GetObjBinAddr(self, Addr):
         self.__ObjBinBuf = Addr
         return self.__ObjBinBuf
@@ -423,26 +419,26 @@ class CIfrObj():  # wip
             return True
         else:
             return False
-    
+
     def ShrinkObjBin(self, Size):
         if (self.__DelayEmit) == True and (self.__ObjBinLen > Size):
             self.__ObjBinLen = self.__ObjBinLen - Size
-            
-            
+
+
     def GetObjBin(self):
         return self.__ObjBinBuf
-    
+
     def EMIT_PENDING_OBJ(self):
         if self.__DelayEmit == False or gCreateOp == False:
-            return 
-        
+            return
+
         self.__PkgOffset = gCFormPkg.GetPkgLength()
         # update data buffer to package data
         self.__ObjBinBuf = gCFormPkg.IfrBinBufferGet (self.__ObjBinLen)
-        
+
         self.__DelayEmit = False
-        
-        
+
+
 
 gScopeCount = 0
 gIsOrderedList = False
@@ -516,11 +512,11 @@ class CIfrMinMaxStepData():
         self.__MinMaxStepData.u64.Step = 0
         self.__ValueIsSet = False
         self.__IsNumeric = NumericOpcode
-        self.__VarType = EFI_IFR_TYPE_NUM_SIZE_64 # 
+        self.__VarType = EFI_IFR_TYPE_NUM_SIZE_64 #
 
     def SetMinMaxStepData(self, MinValue, MaxValue, Step, VarType):  #
         self.__VarType = VarType
-        
+
         if self.__ValueIsSet == False:
             if VarType == EFI_IFR_TYPE_NUM_SIZE_64:
                 self.__MinMaxStepData.u64.MinValue = MinValue
@@ -564,7 +560,7 @@ class CIfrMinMaxStepData():
                 if MaxValue > self.__MinMaxStepData.u8.MaxValue:
                     self.__MinMaxStepData.u8.MaxValue = MaxValue
                 self.__MinMaxStepData.u8.Step = Step
-    
+
     def GetVarType(self):
         return self.__VarType
 
@@ -667,7 +663,7 @@ class CIfrFormSet(CIfrObj, CIfrOpHeader):
 
     def GetFlags(self):
         return self.__FormSet.Flags
-    
+
     def GetInfo(self):
         return self.__FormSet
 
@@ -681,7 +677,7 @@ class CIfrOneOfOption(CIfrObj, CIfrOpHeader):
         self.__OneOfOption.Option = EFI_STRING_ID_INVALID
         self.__OneOfOption.Type = EFI_IFR_TYPE_OTHER
         self.__OneOfOption.Value = EFI_IFR_TYPE_VALUE()  #
-        
+
     def SetOption(self, Option):
         self.__OneOfOption.Option = Option
 
@@ -746,6 +742,95 @@ class CIfrOneOfOption(CIfrObj, CIfrOpHeader):
     def GetInfo(self):
         return self.__OneOfOption
 
+class CIfrOneOfOption2(CIfrObj, CIfrOpHeader):
+
+    def __init__(self, Size, Nums, ValueType, ValueList=[]):  #
+        self.__OneOfOption = Refine_EFI_IFR_ONE_OF_OPTION(Nums)
+        Header = EFI_IFR_OP_HEADER()
+        CIfrOpHeader.__init__(self, Header,
+                              EFI_IFR_ONE_OF_OPTION_OP, Size)
+        self.__OneOfOption.Header = Header
+        self.__OneOfOption.Flags = 0
+        self.__OneOfOption.Option = EFI_STRING_ID_INVALID
+        self.__OneOfOption.Type = EFI_IFR_TYPE_OTHER
+        self.__ValueType = ValueType
+        if ValueList != []:
+            ArrayType = EFI_IFR_TYPE_VALUE * Nums
+            ValueArray = ArrayType()
+            for i in range(0, len(ValueList)):
+                ValueArray[i] = ValueList[i]
+            self.__OneOfOption.Value = ValueArray
+
+    def SetOption(self, Option):
+        self.__OneOfOption.Option = Option
+
+    def SetType(self, Type):
+        self.__OneOfOption.Type = Type
+
+    def GetValueType(self):
+        return self.__ValueType
+
+    def SetValue(self, ValueList):  #
+        ArrayType = EFI_IFR_TYPE_VALUE * (len(ValueList))
+        ValueArray = ArrayType()
+        for i in range(0, len(ValueList)):
+            ValueArray[i] = ValueList[i]
+        self.__OneOfOption.Value = ValueArray
+
+    def GetFlags(self):
+        return self.__OneOfOption.Flags
+
+    def SetFlags(self, LFlags):
+
+        self.__OneOfOption.Flags = 0
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_OPTION_DEFAULT)
+        if Ret:
+            self.__OneOfOption.Flags |= EFI_IFR_OPTION_DEFAULT
+
+        LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_OPTION_DEFAULT_MFG)
+        if Ret:
+            self.__OneOfOption.Flags |= EFI_IFR_OPTION_DEFAULT_MFG
+
+        if LFlags == EFI_IFR_TYPE_NUM_SIZE_8:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_8)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_8
+
+        elif LFlags == EFI_IFR_TYPE_NUM_SIZE_16:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_16)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_16
+
+        elif LFlags == EFI_IFR_TYPE_NUM_SIZE_32:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_32)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_32
+
+        elif LFlags == EFI_IFR_TYPE_NUM_SIZE_64:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_64)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_64
+
+        elif LFlags == EFI_IFR_TYPE_BOOLEAN:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_BOOLEAN)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_BOOLEAN
+
+        elif LFlags == EFI_IFR_TYPE_TIME:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_TIME)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_TIME
+
+        elif LFlags == EFI_IFR_TYPE_DATE:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_DATE)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_DATE
+
+        elif LFlags == EFI_IFR_TYPE_STRING:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_STRING)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_STRING
+
+        elif LFlags == EFI_IFR_TYPE_OTHER:
+            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_OTHER)
+            self.__OneOfOption.Flags |= EFI_IFR_TYPE_OTHER
+
+        return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
+
+    def GetInfo(self):
+        return self.__OneOfOption
 
 class CIfrOptionKey(CIfrObj, CIfrOpHeader):
 
@@ -759,7 +844,7 @@ class CIfrOptionKey(CIfrObj, CIfrOpHeader):
         self.__OptionKey.QuestionId = QuestionId
         self.__OptionKey.OptionValue = OptionValue
         self.__OptionKey.KeyValue = KeyValue
-    
+
     def GetInfo(self):
         return  self.__OptionKey
 
@@ -776,7 +861,7 @@ class CIfrClass(CIfrObj, CIfrOpHeader):
 
     def SetClass(self, Class):
         self.__Class = Class
-        
+
     def GetInfo(self):
         return self.__Class
 
@@ -816,7 +901,7 @@ class CIfrDefaultStore(CIfrObj, CIfrOpHeader):
 
     def SetDefaultStore(self, DefaultStore: EFI_IFR_DEFAULTSTORE):
         self.__DefaultStore = DefaultStore
-    
+
     def GetInfo(self):
         return self.__DefaultStore
 
@@ -842,7 +927,7 @@ class CIfrVarStore(CIfrObj, CIfrOpHeader):
 
     def SetName(self, Name):
         self.__Varstore.Name = Name  #
-    
+
     def GetInfo(self):
         return self.__Varstore
 
@@ -871,7 +956,7 @@ class CIfrVarStoreEfi(CIfrObj, CIfrOpHeader):
 
     def SetAttributes(self, Attributes):
         self.__VarStoreEfi.Attributes = Attributes
-    
+
     def GetInfo(self):
         return self.__VarStoreEfi
 
@@ -888,7 +973,7 @@ class CIfrVarStoreNameValue(CIfrObj, CIfrOpHeader):
 
     def SetVarStoreId(self, VarStoreId):
         self.__VarStoreNameValue.VarStoreId = VarStoreId
-    
+
     def GetInfo(self):
         return self.__VarStoreNameValue
 
@@ -941,7 +1026,7 @@ class CIfrForm(CIfrObj, CIfrOpHeader):
 
     def SetFormTitle(self, FormTitle):
         self.__Form.FormTitle = FormTitle
-    
+
     def GetInfo(self):
         return self.__Form
 
@@ -952,23 +1037,23 @@ class CIfrFormMap(CIfrObj, CIfrOpHeader):
         self.__MethodMapList = [] # EFI_IFR_FORM_MAP_METHOD()
         CIfrOpHeader.__init__(self, self.__FormMap.Header, EFI_IFR_FORM_MAP_OP)
         self.__FormMap.FormId = 0
-    
+
     def SetFormId(self, FormId):
         if FormId == 0:
             return VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
-        
+
         if CIfrFormId.CheckFormIdFree(FormId) == False:
             return VfrReturnCode.VFR_RETURN_FORMID_REDEFINED
         self.__FormMap.FormId = FormId
         CIfrFormId.MarkFormIdUsed(FormId)
         return VfrReturnCode.VFR_RETURN_SUCCESS
-    
+
     def SetFormMapMethod(self, MethodTitle, MethodGuid: EFI_GUID):
         MethodMap = EFI_IFR_FORM_MAP_METHOD()
         MethodMap.MethodTitle = MethodTitle
         MethodMap.MethodIdentifier = MethodGuid
         self.__MethodMapList.append(MethodMap)
-    
+
     def GetInfo(self):
         return self.__FormMap, self.__MethodMapList
 
@@ -996,7 +1081,7 @@ class CIfrBanner(CIfrObj, CIfrOpHeader):
 
     def SetAlign(self, Align):
         self.__Banner.Alignment = Align
-    
+
     def GetInfo(self):
         return self.__Banner
 
@@ -1013,7 +1098,7 @@ class CIfrTimeout(CIfrObj, CIfrOpHeader):
 
     def SetTimeout(self, Timeout):
         self.__Timeout.TimeOut = Timeout
-    
+
     def GetInfo(self):
         return self.__Timeout
 
@@ -1029,7 +1114,7 @@ class CIfrLabel(CIfrObj, CIfrOpHeader):
 
     def SetNumber(self, Number):
         self.__Label.Number = Number
-    
+
     def GetInfo(self):
         return self.__Label
 
@@ -1075,7 +1160,7 @@ class CIfrSubtitle(CIfrObj, CIfrOpHeader, CIfrStatementHeader):
             self.__Subtitle.Flags |= EFI_IFR_FLAGS_HORIZONTAL
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if Flags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
-    
+
     def GetInfo(self):
         return self.__Subtitle
 
@@ -1283,7 +1368,7 @@ class CIfrRef5(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
         self.__Ref5 = EFI_IFR_REF5()
         CIfrOpHeader.__init__(self, self.__Ref5.Header, EFI_IFR_REF_OP)
         CIfrQuestionHeader.__init__(self, self.__Ref5.Question)
-    
+
     def GetInfo(self):
         return self.__Ref5
 
@@ -1298,7 +1383,7 @@ class CIfrAction(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 
     def SetQuestionConfig(self, QuestionConfig):
         self.__Action.QuestionConfig = QuestionConfig
-    
+
     def GetInfo(self):
         return self.__Action
 
@@ -1322,9 +1407,9 @@ class CIfrGuid(CIfrObj, CIfrOpHeader):
 
     def __init__(self, Size):
         self.__Guid = EFI_IFR_GUID()
-        self.__Data = []
-        for i in range(0, Size):
-            self.__Data.append(0)
+        self.__Data = bytes()
+        # for i in range(0, Size):
+        #    self.__Data[i] = b'0'
         CIfrOpHeader.__init__(self, self.__Guid.Header, EFI_IFR_GUID_OP,
                               ctypes.sizeof(EFI_IFR_GUID) + Size)
         EFI_IFR_DEFAULT_GUID = EFI_GUID(0, 0, 0,
@@ -1332,11 +1417,11 @@ class CIfrGuid(CIfrObj, CIfrOpHeader):
         self.__Guid.Guid = EFI_IFR_DEFAULT_GUID
 
     def SetGuid(self, Guid):
-        self.__Guid = Guid
+        self.__Guid.Guid = Guid
 
-    def SetData(self, Databuff): 
+    def SetData(self, Databuff):
         self.__Data = Databuff
-    
+
     def GetInfo(self):
         return self.__Guid
 
@@ -1414,7 +1499,7 @@ class CIfrString(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 
     def SetMaxSize(self, MaxSize):
         self.__Str.MaxSize = MaxSize
-    
+
     def GetInfo(self):
         return self.__Str
 
@@ -1463,9 +1548,53 @@ class CIfrDefault(CIfrObj, CIfrOpHeader):  #
     def SetType(self, Type):
         self.__Default.Type = Type
 
-    def SetValue(self, Value):  #
+    def SetValue(self, Value):
         self.__Default.Value = Value
-    
+
+    def GetInfo(self):
+        return self.__Default
+
+class CIfrDefault3(CIfrObj, CIfrOpHeader):  #
+
+    def __init__(self,
+                 Size,
+                 Nums,
+                 ValueType,
+                 DefaultId=EFI_HII_DEFAULT_CLASS_STANDARD,
+                 Type=EFI_IFR_TYPE_OTHER,
+                 ValueList=[]):  #
+        Header = EFI_IFR_OP_HEADER()
+        CIfrOpHeader.__init__(self, Header, EFI_IFR_DEFAULT_OP,
+                              Size)
+        self.__Default = Refine_EFI_IFR_DEFAULT(Nums)
+        self.__Default.header = Header
+        self.__Default.Type = Type
+        self.__Default.DefaultId = DefaultId
+        self.__ValueType = ValueType
+
+        if ValueList != []:
+            ArrayType = EFI_IFR_TYPE_VALUE * Nums
+            ValueArray = ArrayType()
+            for i in range(0, len(ValueList)):
+                ValueArray[i] = ValueList[i]
+            self.__Default.Value = ValueArray
+
+    def SetDefaultId(self, DefaultId):
+        self.__Default.DefaultId = DefaultId
+
+    def GetValueType(self):
+        return self.__ValueType
+
+    def SetType(self, Type):
+        self.__Default.Type = Type
+
+    def SetValue(self, ValueList):
+        ArrayType = EFI_IFR_TYPE_VALUE * (len(ValueList))
+        ValueArray = ArrayType()
+        for i in range(0, len(ValueList)):
+            ValueArray[i] = ValueList[i]
+        self.__Default.Value = ValueArray
+
     def GetInfo(self):
         return self.__Default
 
@@ -1655,7 +1784,7 @@ class CIfrDate(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
             self.__Date.Flags |= QF_DATE_STORAGE_WAKEUP
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
-    
+
     def GetInfo(self):
         return self.__Date
 
@@ -1698,7 +1827,7 @@ class CIfrTime(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
             self.__Time.Flags |= QF_TIME_STORAGE_WAKEUP
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
-    
+
     def GetInfo(self):
         return self.__Time
 
@@ -1754,7 +1883,7 @@ class CIfrNumeric(CIfrObj, CIfrOpHeader, CIfrQuestionHeader,
         #  _EMIT_PENDING_OBJ();
         Numeric = EFI_IFR_NUMERIC()
         self.UpdateHeader(Numeric.Header)
-    
+
     def GetInfo(self):
         return self.__Numeric
 
@@ -1834,7 +1963,7 @@ class CIfrCheckBox(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
             self.__CheckBox.Flags |= EFI_IFR_CHECKBOX_DEFAULT
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_CHECKBOX_DEFAULT_MFG)
-        
+
         if Ret:
             self.__CheckBox.Flags |= EFI_IFR_CHECKBOX_DEFAULT_MFG
 
@@ -1855,7 +1984,7 @@ class CIfrResetButton(CIfrObj, CIfrOpHeader, CIfrStatementHeader):
 
     def SetDefaultId(self, DefaultId):
         self.__ResetButton.DefaultId = DefaultId
-    
+
     def GetInfo(self):
         return self.__ResetButton
 
@@ -2219,14 +2348,16 @@ class CIfrEqIdVal(CIfrObj, CIfrOpHeader):
 
 class CIfrEqIdList(CIfrObj, CIfrOpHeader):
 
-    def __init__(self, LineNo, nums):
-        self.__EqIdVList = Refine_EFI_IFR_EQ_ID_VAL_LIST(nums) # how to generate buffer
+    def __init__(self, LineNo, Nums):
+        self.__EqIdVList = Refine_EFI_IFR_EQ_ID_VAL_LIST(Nums) # how to generate buffer
         print(self.__EqIdVList.Header)
-        CIfrOpHeader.__init__(self, self.__EqIdVList.Header, EFI_IFR_EQ_ID_VAL_OP)
+        Header = CIfrOpHeader()
+        CIfrOpHeader.__init__(self, Header, EFI_IFR_EQ_ID_VAL_OP)
         self.SetLineNo(LineNo)
+        self.__EqIdVList.header = Header
         self.__EqIdVList.QuestionId = EFI_QUESTION_ID_INVALID
         self.__EqIdVList.ListLength = 0
-        for i in range(0, nums):
+        for i in range(0, Nums):
             self.__EqIdVList.ValueList[i] = 0 #
 
     def SetQuestionId(self, QuestionId, VarIdStr, LineNo):

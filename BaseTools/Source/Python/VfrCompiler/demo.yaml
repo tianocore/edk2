@@ -98,7 +98,7 @@ Formset:
           flags:  0  # Question Flags
           - default:
               type:  8
-              defaultid:  0
+              defaultId:  0
           - option:  45
               option flag:  0
               option type:  0
@@ -118,7 +118,7 @@ Formset:
           flags:  3  # Flags
           - default:
               type:  4
-              varstoreid:  0
+              defaultId:  0
               value:  True
       - label:
           condition:  suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
@@ -169,11 +169,12 @@ Formset:
               option value:  2
           - option:  41
               option flag:  0
-              option type:  0
-              option value:  1
+              option type:  11
+              value:  {1,2,3}
           - default:
               type:  11
-              varstoreid:  0
+              defaultId:  0
+              value:  {1,2,3}
       - label:
           labelnumber:  100  # LabelNumber
       - goto:
@@ -271,7 +272,7 @@ Formset:
           step:  0
           - default:
               type:  0
-              varstoreid:  0
+              defaultId:  0
               value:  0
       - string:
           prompt:  72  # Statement Prompt STRING_ID
@@ -297,7 +298,7 @@ Formset:
           step:  0
           - default:
               type:  0
-              varstoreid:  0
+              defaultId:  0
               value:  21
       - numeric:
           prompt:  51  # Statement Prompt STRING_ID
@@ -312,7 +313,7 @@ Formset:
           step:  0
           - default:
               type:  8
-              defaultid:  0
+              defaultId:  0
       - numeric:
           prompt:  52  # Statement Prompt STRING_ID
           help:  54  # Statement Help STRING_ID
@@ -326,11 +327,11 @@ Formset:
           step:  0
           - default:
               type:  0
-              varstoreid:  0
+              defaultId:  0
               value:  18
           - default:
               type:  0
-              varstoreid:  1
+              defaultId:  1
               value:  19
       - numeric:
           prompt:  146  # Statement Prompt STRING_ID
@@ -345,11 +346,11 @@ Formset:
           step:  0
           - default:
               type:  0
-              varstoreid:  0
+              defaultId:  0
               value:  16
           - default:
               type:  0
-              varstoreid:  1
+              defaultId:  1
               value:  17
       - numeric:
           prompt:  147  # Statement Prompt STRING_ID
@@ -364,11 +365,11 @@ Formset:
           step:  0
           - default:
               type:  1
-              varstoreid:  0
+              defaultId:  0
               value:  18
           - default:
               type:  1
-              varstoreid:  1
+              defaultId:  1
               value:  19
       - string:
           prompt:  148  # Statement Prompt STRING_ID
@@ -415,11 +416,11 @@ Formset:
           step:  1
           - default:
               type:  0
-              varstoreid:  0
+              defaultId:  0
               value:  18
           - default:
               type:  0
-              varstoreid:  1
+              defaultId:  1
               value:  19
       - numeric:
           prompt:  105  # Statement Prompt STRING_ID
@@ -434,7 +435,7 @@ Formset:
           step:  1
           - default:
               type:  0
-              varstoreid:  0
+              defaultId:  0
               value:  18
       - numeric:
           prompt:  103  # Statement Prompt STRING_ID
@@ -449,7 +450,7 @@ Formset:
           step:  1
           - default:
               type:  0
-              varstoreid:  0
+              defaultId:  0
               value:  18
       - orderedlist:
           prompt:  103  # Statement Prompt STRING_ID
@@ -496,7 +497,7 @@ Formset:
           step:  0
           - default:
               type:  1
-              varstoreid:  0
+              defaultId:  0
               value:  18
       - text:
           prompt:  112  # Statement Prompt STRING_ID
@@ -555,7 +556,7 @@ Formset:
           flags:  16
           - default:
               type:  6
-              varstoreid:  0
+              defaultId:  0
               value:  2004/1/1
       - text:
           prompt:  89  # Statement Prompt STRING_ID
@@ -589,7 +590,7 @@ Formset:
           flags:  4
           - default:
               type:  5
-              varstoreid:  0
+              defaultId:  0
               value:  15:33:33
       - checkbox:
           prompt:  47  # Statement Prompt STRING_ID
@@ -617,7 +618,7 @@ Formset:
           help:  69
           - default:
               type:  12
-              varstoreid:  0
+              defaultId:  0
               option value:  0;0;{0x0, 0x0, 0x0, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }};90
       - goto:
           prompt:  68
@@ -648,7 +649,7 @@ Formset:
           step:  0
           - default:
               type:  0
-              varstoreid:  0
+              defaultId:  0
               value:  0
       - numeric:
           condition:  grayoutif match2 (stringref(STRING_TOKEN(0x00B0)), stringref(STRING_TOKEN(0x00AF)), { 0x63E60A51, 0x497D, 0xD427, {0xC4, 0xA5, 0xB8, 0xAB, 0xDC, 0x3A, 0xAE, 0xB6 }})
@@ -793,7 +794,7 @@ Formset:
           step:  0
           - default:
               type:  0
-              varstoreid:  0
+              defaultId:  0
               value:  0
       - label:
           labelnumber:  12852  # LabelNumber
@@ -888,11 +889,11 @@ Formset:
           step:  0
           - default:
               type:  2
-              varstoreid:  0
+              defaultId:  0
               value:  4
           - default:
               type:  2
-              varstoreid:  1
+              defaultId:  1
               value:  5
       - oneof:
           prompt:  134  # Statement Prompt STRING_ID
@@ -951,11 +952,11 @@ Formset:
           step:  0
           - default:
               type:  2
-              varstoreid:  0
+              defaultId:  0
               value:  6
           - default:
               type:  2
-              varstoreid:  1
+              defaultId:  1
               value:  7
       - oneof:
           prompt:  129  # Statement Prompt STRING_ID
@@ -1014,11 +1015,11 @@ Formset:
           step:  0
           - default:
               type:  2
-              varstoreid:  0
+              defaultId:  0
               value:  16
           - default:
               type:  2
-              varstoreid:  1
+              defaultId:  1
               value:  17
       - subtitle:
           prompt:  27  # Statement Prompt STRING_ID
@@ -1037,9 +1038,9 @@ Formset:
           step:  0
           - default:
               type:  0
-              varstoreid:  0
+              defaultId:  0
               value:  7
           - default:
               type:  0
-              varstoreid:  1
+              defaultId:  1
               value:  8

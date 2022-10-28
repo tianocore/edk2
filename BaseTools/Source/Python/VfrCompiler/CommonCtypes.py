@@ -1,10 +1,10 @@
 from ctypes import *
-import ctypes
 from re import A, X
 from telnetlib import X3PAD
 from tkinter import YView
 import uuid
 from VfrError import *
+from struct import *
 
 EFI_STRING_ID_INVALID = 0x0
 EFI_HII_DEFAULT_CLASS_STANDARD = 0x0000
@@ -66,6 +66,7 @@ EFI_IFR_TYPE_UNDEFINED = 0x09
 EFI_IFR_TYPE_ACTION = 0x0A
 EFI_IFR_TYPE_BUFFER = 0x0B
 EFI_IFR_TYPE_REF = 0x0C
+
 
 EFI_IFR_FLAGS_HORIZONTAL = 0x01
 
@@ -483,7 +484,7 @@ class EFI_IFR_TYPE_VALUE(Union):
         ('ref', EFI_HII_REF),
     ]
 
-
+    
 class EFI_IFR_ONE_OF_OPTION(Structure):
     _pack_ = 1
     _fields_ = [
@@ -493,6 +494,18 @@ class EFI_IFR_ONE_OF_OPTION(Structure):
         ('Type', c_ubyte),
         ('Value', EFI_IFR_TYPE_VALUE),
     ]
+
+def Refine_EFI_IFR_ONE_OF_OPTION(Nums):
+    class EFI_IFR_ONE_OF_OPTION(Structure):
+        _pack_ = 1
+        _fields_ = [
+            ('Header', EFI_IFR_OP_HEADER),
+            ('Option', c_uint16),
+            ('Flags', c_ubyte),
+            ('Type', c_ubyte),
+            ('Value', EFI_IFR_TYPE_VALUE * Nums),
+        ]
+    return EFI_IFR_ONE_OF_OPTION
 
 
 EFI_IFR_OPTION_DEFAULT = 0x10
@@ -620,18 +633,18 @@ class EFI_IFR_EQ_ID_VAL_LIST(Structure):
         ('Header', EFI_IFR_OP_HEADER),
         ('QuestionId', c_uint16),
         ('ListLength', c_uint16),
-        ('ValueList', c_uint16 * 2),  #
+        ('ValueList', c_uint16 * 1),  #
     ]
 
 
-def Refine_EFI_IFR_EQ_ID_VAL_LIST(nums:int):
+def Refine_EFI_IFR_EQ_ID_VAL_LIST(Nums):
     class EFI_IFR_EQ_ID_VAL_LIST(Structure):
         _pack_ = 1
         _fields_ = [
             ('Header', EFI_IFR_OP_HEADER),
             ('QuestionId', c_uint16),
             ('ListLength', c_uint16),
-            ('ValueList', c_uint16 * nums),  #
+            ('ValueList', c_uint16 * Nums),  #
         ]
     return EFI_IFR_EQ_ID_VAL_LIST
 
@@ -1172,6 +1185,18 @@ class EFI_IFR_DEFAULT(Structure):
         ('Value', EFI_IFR_TYPE_VALUE),
     ]
 
+def Refine_EFI_IFR_DEFAULT(Nums):
+    class EFI_IFR_DEFAULT(Structure):
+        _pack_ = 1
+        _fields_ = [
+            ('Header', EFI_IFR_OP_HEADER),
+            ('DefaultId', c_uint16),
+            ('Type', c_ubyte),
+            ('Value', EFI_IFR_TYPE_VALUE * Nums),
+        ]
+    return EFI_IFR_DEFAULT
+    
+    
 class EFI_IFR_DEFAULT_2(Structure):
     _pack_ = 1
     _fields_ = [
