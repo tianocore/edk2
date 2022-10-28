@@ -71,6 +71,11 @@
   #
   ArmSvcLib|Include/Library/ArmSvcLib.h
 
+  ##  @libraryclass  Provides a Monitor Call interface that will use the
+  #   default conduit (HVC or SMC).
+  #
+  ArmMonitorLib|Include/Library/ArmMonitorLib.h
+
   ##  @libraryclass  Provides a default exception handler.
   #
   DefaultExceptionHandlerLib|Include/Library/DefaultExceptionHandlerLib.h
