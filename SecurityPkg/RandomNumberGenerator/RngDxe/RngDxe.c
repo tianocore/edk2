@@ -23,7 +23,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/RngLib.h>
-#include <Library/TimerLib.h>
 #include <Protocol/Rng.h>
 
 #include "RngDxeInternals.h"
@@ -72,7 +71,7 @@ RngDriverEntry (
 }
 
 /**
-  Calls RDRAND to fill a buffer of arbitrary size with random bytes.
+  Runs CPU RNG instruction to fill a buffer of arbitrary size with random bytes.
 
   @param[in]   Length        Size of the buffer, in bytes,  to fill with.
   @param[out]  RandBuffer    Pointer to the buffer to store the random result.
