@@ -1,13 +1,20 @@
 /** @file
 *
 *  Copyright (c) 2020, NUVIA Inc. All rights reserved.<BR>
-*  Copyright (c) 2012-2017, ARM Limited. All rights reserved.
+*  Copyright (c) 2012 - 2022, Arm Limited. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 * @par Revision Reference:
-*  - SMC Calling Convention version 1.2
+*  - [1] SMC Calling Convention version 1.2
 *    (https://developer.arm.com/documentation/den0028/c/?lang=en)
+*  - [2] Arm True Random Number Generator Firmware, Interface 1.0,
+*    Platform Design Document.
+*    (https://developer.arm.com/documentation/den0098/latest/)
+*
+*  @par Glossary:
+*    - TRNG - True Random Number Generator
+*
 **/
 
 #ifndef ARM_STD_SMC_H_
@@ -138,5 +145,103 @@
 #define ARM_SMC_ID_TOS_UID         0xbf00ff01
 /*                                    0xbf00ff02 is reserved */
 #define ARM_SMC_ID_TOS_REVISION  0xbf00ff03
+
+// Firmware TRNG interface Function IDs
+
+/*
+  SMC/HVC call to get the version of the TRNG backend,
+  Cf. [2], 2.1 TRNG_VERSION
+  Input values:
+    W0    0x8400_0050
+    W1-W7 Reserved (MBZ)
+  Return values:
+    Success (W0 > 0) W0[31] MBZ
+      W0[30:16] Major revision
+      W0[15:0] Minor revision
+      W1 - W3 Reserved (MBZ)
+    Error (W0 < 0)
+      NOT_SUPPORTED Function not implemented
+*/
+#define ARM_SMC_ID_TRNG_VERSION  0x84000050
+
+/*
+  SMC/HVC call to check if a TRNG function ID is implemented by the backend,
+  Cf. [2], Section 2.2 TRNG_FEATURES
+  Input Values
+    W0    0x8400_0051
+    W1    trng_func_id
+    W2-W7 Reserved (MBZ)
+  Return values:
+    Success (W0 >= 0):
+      SUCCESS Function is implemented.
+        > 0     Function is implemented and
+                has specific capabilities,
+                see function definition.
+    Error (W0 < 0)
+      NOT_SUPPORTED Function with FID=trng_func_id
+      is not implemented
+*/
+#define ARM_SMC_ID_TRNG_FEATURES  0x84000051
+
+/*
+  SMC/HVC call to get the UUID of the TRNG backend,
+  Cf. [2], Section 2.3 TRNG_GET_UUID
+  Input Values:
+    W0    0x8400_0052
+    W1-W7 Reserved (MBZ)
+  Return Values:
+    Success (W0 != -1)
+        W0 UUID[31:0]
+        W1 UUID[63:32]
+        W2 UUID[95:64]
+        W3 UUID[127:96]
+    Error (W0 = -1)
+        W0 NOT_SUPPORTED
+*/
+#define ARM_SMC_ID_TRNG_GET_UUID  0x84000052
+
+/*
+  AARCH32 SMC/HVC call to get entropy bits, Cf. [2], Section 2.4 TRNG_RND.
+  Input values:
+    W0    0x8400_0053
+    W2-W7 Reserved (MBZ)
+  Return values:
+    Success (W0 = 0):
+      W0 MBZ
+      W1 Entropy[95:64]
+      W2 Entropy[63:32]
+      W3 Entropy[31:0]
+    Error (W0 < 0)
+          W0 NOT_SUPPORTED
+          NO_ENTROPY
+          INVALID_PARAMETERS
+          W1 - W3 Reserved (MBZ)
+*/
+#define ARM_SMC_ID_TRNG_RND_AARCH32  0x84000053
+
+/*
+  AARCH64 SMC/HVC call to get entropy bits, Cf. [2], Section 2.4 TRNG_RND.
+  Input values:
+      X0    0xC400_0053
+      X2-X7 Reserved (MBZ)
+  Return values:
+    Success (X0 = 0):
+      X0 MBZ
+      X1 Entropy[191:128]
+      X2 Entropy[127:64]
+      X3 Entropy[63:0]
+    Error (X0 < 0)
+          X0 NOT_SUPPORTED
+          NO_ENTROPY
+          INVALID_PARAMETERS
+          X1 - X3 Reserved (MBZ)
+*/
+#define ARM_SMC_ID_TRNG_RND_AARCH64  0xC4000053
+
+// Firmware TRNG status codes
+#define TRNG_STATUS_SUCCESS            (INT32)(0)
+#define TRNG_STATUS_NOT_SUPPORTED      (INT32)(-1)
+#define TRNG_STATUS_INVALID_PARAMETER  (INT32)(-2)
+#define TRNG_STATUS_NO_ENTROPY         (INT32)(-3)
 
 #endif // ARM_STD_SMC_H_
