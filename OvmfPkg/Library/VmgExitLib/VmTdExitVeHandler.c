@@ -300,22 +300,40 @@ MmioExit (
   IN TDCALL_VEINFO_RETURN_DATA   *Veinfo
   )
 {
-  UINT64   Status;
-  UINT32   MmioSize;
-  UINT32   RegSize;
-  UINT8    OpCode;
-  BOOLEAN  SeenRex;
-  UINT64   *Reg;
-  UINT8    *Rip;
-  UINT64   Val;
-  UINT32   OpSize;
-  MODRM    ModRm;
-  REX      Rex;
+  UINT64          Status;
+  UINT32          MmioSize;
+  UINT32          RegSize;
+  UINT8           OpCode;
+  BOOLEAN         SeenRex;
+  UINT64          *Reg;
+  UINT8           *Rip;
+  UINT64          Val;
+  UINT32          OpSize;
+  MODRM           ModRm;
+  REX             Rex;
+  TD_RETURN_DATA  TdReturnData;
+  UINT8           Gpaw;
+  UINT64          TdSharedPageMask;
 
   Rip     = (UINT8 *)Regs->Rip;
   Val     = 0;
   Rex.Val = 0;
   SeenRex = FALSE;
+
+  Status = TdCall (TDCALL_TDINFO, 0, 0, 0, &TdReturnData);
+  if (Status == TDX_EXIT_REASON_SUCCESS) {
+    Gpaw             = (UINT8)(TdReturnData.TdInfo.Gpaw & 0x3f);
+    TdSharedPageMask = 1ULL << (Gpaw - 1);
+  } else {
+    DEBUG ((DEBUG_ERROR, "TDCALL failed with status=%llx\n", Status));
+    return Status;
+  }
+
+  if ((Veinfo->GuestPA & TdSharedPageMask) == 0) {
+    DEBUG ((DEBUG_ERROR, "EPT-violation #VE on private memory is not allowed!"));
+    TdVmCall (TDVMCALL_HALT, 0, 0, 0, 0, 0);
+    CpuDeadLoop ();
+  }
 
   //
   // Default to 32bit transfer
