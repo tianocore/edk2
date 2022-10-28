@@ -1,0 +1,29 @@
+## @file
+#  Arm Monitor Library
+#
+#  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = ArmMonitorLib
+  FILE_GUID                      = F918DACB-FBB8-4CB6-A61D-08E75AF0E7CD
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmMonitorLib
+
+[Sources]
+  ArmMonitorLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmHvcLib
+  ArmSmcLib
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdMonitorConduitHvc
