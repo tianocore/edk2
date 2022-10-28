@@ -1,0 +1,29 @@
+## @file
+#  Arm Firmware TRNG interface library.
+#
+#  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION       = 1.29
+  BASE_NAME         = ArmTrngLib
+  FILE_GUID         = 10DE97C9-28E4-4C9B-A53E-8D7D1B0DD4E0
+  VERSION_STRING    = 1.0
+  MODULE_TYPE       = BASE
+  LIBRARY_CLASS     = ArmTrngLib
+  CONSTRUCTOR       = ArmTrngLibConstructor
+
+[Sources]
+  ArmTrngDefs.h
+  ArmTrngLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmMonitorLib
+  BaseLib
+  BaseMemoryLib
