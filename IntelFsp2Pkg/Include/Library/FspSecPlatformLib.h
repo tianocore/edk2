@@ -17,10 +17,10 @@
   The callee should not use XMM6/XMM7.
   The return address is saved in MM7.
 
-  @retval in saved in EAX - 0 means platform initialization success.
+  @retval in saved in EAX/RAX - 0 means platform initialization success.
                             other means platform initialization fail.
 **/
-UINT32
+UINTN
 EFIAPI
 SecPlatformInit (
   VOID
@@ -37,10 +37,10 @@ SecPlatformInit (
 
   @param[in] FsptUpdDataPtr     Address pointer to the FSPT_UPD data structure. It is saved in ESP.
 
-  @retval in saved in EAX - 0 means Microcode is loaded successfully.
+  @retval in saved in EAX/RAX - 0 means Microcode is loaded successfully.
                             other means Microcode is not loaded successfully.
 **/
-UINT32
+UINTN
 EFIAPI
 LoadMicrocode (
   IN  VOID  *FsptUpdDataPtr
@@ -56,10 +56,10 @@ LoadMicrocode (
 
   @param[in] FsptUpdDataPtr     Address pointer to the FSPT_UPD data structure. It is saved in ESP.
 
-  @retval in saved in EAX - 0 means CAR initialization success.
+  @retval in saved in EAX/RAX - 0 means CAR initialization success.
                             other means CAR initialization fail.
 **/
-UINT32
+UINTN
 EFIAPI
 SecCarInit (
   IN  VOID  *FsptUpdDataPtr

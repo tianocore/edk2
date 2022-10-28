@@ -70,7 +70,7 @@ FspDataPointerFixUp (
   @return   FSP binary base address.
 
 **/
-UINT32
+UINTN
 EFIAPI
 AsmGetFspBaseAddress (
   VOID
@@ -82,7 +82,7 @@ AsmGetFspBaseAddress (
   @return   FSP binary base address.
 
 **/
-UINT32
+UINTN
 EFIAPI
 AsmGetFspInfoHeader (
   VOID
