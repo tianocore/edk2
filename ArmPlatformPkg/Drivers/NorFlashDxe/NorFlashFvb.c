@@ -47,6 +47,7 @@ InitializeFvAndVariableStoreHeaders (
   VOID                        *Headers;
   UINTN                       HeadersLength;
   EFI_FIRMWARE_VOLUME_HEADER  *FirmwareVolumeHeader;
+  EFI_FV_BLOCK_MAP_ENTRY      *BlockMapEntry;
   VARIABLE_STORE_HEADER       *VariableStoreHeader;
   UINT32                      NvStorageFtwSpareSize;
   UINT32                      NvStorageFtwWorkingSize;
@@ -151,9 +152,14 @@ InitializeFvAndVariableStoreHeaders (
   FirmwareVolumeHeader->Revision              = EFI_FVH_REVISION;
   FirmwareVolumeHeader->BlockMap[0].NumBlocks = Instance->Media.LastBlock + 1;
   FirmwareVolumeHeader->BlockMap[0].Length    = Instance->Media.BlockSize;
-  FirmwareVolumeHeader->BlockMap[1].NumBlocks = 0;
-  FirmwareVolumeHeader->BlockMap[1].Length    = 0;
   FirmwareVolumeHeader->Checksum              = CalculateCheckSum16 ((UINT16 *)FirmwareVolumeHeader, FirmwareVolumeHeader->HeaderLength);
+
+  //
+  // EFI_FV_BLOCK_MAP_ENTRY
+  //
+  BlockMapEntry            = (EFI_FV_BLOCK_MAP_ENTRY *)((UINTN)Headers + sizeof (EFI_FIRMWARE_VOLUME_HEADER));
+  BlockMapEntry->NumBlocks = 0;
+  BlockMapEntry->Length    = 0;
 
   //
   // VARIABLE_STORE_HEADER
