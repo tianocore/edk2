@@ -25,6 +25,7 @@
 #include <IndustryStandard/Pci22.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/QemuCpuHotplug.h>
+#include <IndustryStandard/Tdx.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgS3Lib.h>
@@ -813,4 +814,58 @@ PlatformInitEmuVariableNvStore (
   CopyMem (EmuVariableNvStore, Base, Size);
 
   return EFI_SUCCESS;
+}
+
+/**
+ * Do not allow #VE due to EPT violation on the private memory by
+ * checking if SEPT_VE_DISABLE is set in TD_ATTR.
+ *
+ * Virtualization Exceptions (#VE) are delivered to TDX guests due to
+ * specific guest actions such as using specific instructions or
+ * accessing a specific MSR.
+ *
+ * Notable reason for #VE is access to specific guest physical
+ * addresses. It requires special security considerations as it is not
+ * fully in control of the guest kernel. VMM can remove a page from EPT
+ * page table and trigger #VE on access.
+ *
+ * The primary use-case for #VE on a memory access is MMIO: VMM removes
+ * page from EPT to trigger exception in the guest which allows guest to
+ * emulate MMIO with hypercalls.
+ *
+ * MMIO only happens on shared memory. Access to private memory is not
+ * allowed.
+ *
+ * TDX module provides mechanism to disable #VE delivery on access to
+ * private memory. If SEPT_VE_DISABLE TD attribute is set, private EPT
+ * violation will not be reflected to the guest as #VE, but will trigger
+ * exit to VMM.
+ *
+ * Make sure the attribute is set by VMM. Panic otherwise.
+ *
+ * @return VOID
+ */
+VOID
+EFIAPI
+PlatformInitCheckSeptVeDisabled (
+  VOID
+  )
+{
+  UINT64          Status;
+  TD_RETURN_DATA  TdReturnData;
+
+  Status = TdCall (TDCALL_TDINFO, 0, 0, 0, &TdReturnData);
+  if (Status == TDX_EXIT_REASON_SUCCESS) {
+    if (TdReturnData.TdInfo.Attributes & ATTR_SEPT_VE_DISABLE) {
+      DEBUG ((DEBUG_VERBOSE, "SEPT_VE_DISABLE is set.\n"));
+      return;
+    }
+
+    DEBUG ((DEBUG_ERROR, "TD misconfiguration: SEPT_VE_DISABLE attibute must be set!\n"));
+  } else {
+    DEBUG ((DEBUG_ERROR, "TDCALL failed with status=%llx\n", Status));
+  }
+
+  TdVmCall (TDVMCALL_HALT, 0, 0, 0, 0, 0);
+  CpuDeadLoop ();
 }

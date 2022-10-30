@@ -285,4 +285,39 @@ PlatformInitEmuVariableNvStore (
   IN VOID  *EmuVariableNvStore
   );
 
+/**
+ * Do not allow #VE due to EPT violation on the private memory by
+ * checking if SEPT_VE_DISABLE is set in TD_ATTR.
+ *
+ * Virtualization Exceptions (#VE) are delivered to TDX guests due to
+ * specific guest actions such as using specific instructions or
+ * accessing a specific MSR.
+ *
+ * Notable reason for #VE is access to specific guest physical
+ * addresses. It requires special security considerations as it is not
+ * fully in control of the guest kernel. VMM can remove a page from EPT
+ * page table and trigger #VE on access.
+ *
+ * The primary use-case for #VE on a memory access is MMIO: VMM removes
+ * page from EPT to trigger exception in the guest which allows guest to
+ * emulate MMIO with hypercalls.
+ *
+ * MMIO only happens on shared memory. Access to private memory is not
+ * allowed.
+ *
+ * TDX module provides mechanism to disable #VE delivery on access to
+ * private memory. If SEPT_VE_DISABLE TD attribute is set, private EPT
+ * violation will not be reflected to the guest as #VE, but will trigger
+ * exit to VMM.
+ *
+ * Make sure the attribute is set by VMM. Panic otherwise.
+ *
+ * @return VOID
+ */
+VOID
+EFIAPI
+PlatformInitCheckSeptVeDisabled (
+  VOID
+  );
+
 #endif // PLATFORM_INIT_LIB_H_
