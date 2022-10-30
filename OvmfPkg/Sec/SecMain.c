@@ -761,6 +761,11 @@ SecCoreStartupWithStack (
  #if defined (TDX_GUEST_SUPPORTED)
   if (CcProbe () == CcGuestTypeIntelTdx) {
     //
+    // Check if SEPT_VE_DISABLE is set in a earlier stage.
+    //
+    PlatformInitCheckSeptVeDisabled ();
+
+    //
     // For Td guests, the memory map info is in TdHobLib. It should be processed
     // first so that the memory is accepted. Otherwise access to the unaccepted
     // memory will trigger tripple fault.
