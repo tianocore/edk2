@@ -1,0 +1,40 @@
+#/** @file
+#
+#  Component description file for VirtNorFlashDeviceTreeLib module
+#
+#  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VirtNorFlashDeviceTreeLib
+  FILE_GUID                      = 42C30D8E-BFAD-4E77-9041-E7DAAE88DF7A
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = VirtNorFlashPlatformLib
+
+[Sources.common]
+  VirtNorFlashDeviceTreeLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gFdtClientProtocolGuid          ## CONSUMES
+
+[Depex]
+  gFdtClientProtocolGuid
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFvBaseAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFvSize

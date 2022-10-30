@@ -409,6 +409,10 @@
   #  check to decide whether to abort dispatch of the driver it is linked into.
   gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideFwCfgVarName|""|VOID*|0x68
 
+  ## The base address and size of the FVMAIN
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFvBaseAddress|0|UINT64|0x71
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFvSize|0|UINT32|0x72
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
