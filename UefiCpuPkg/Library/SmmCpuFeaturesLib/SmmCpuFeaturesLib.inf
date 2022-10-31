@@ -20,6 +20,7 @@
   CpuFeaturesLib.h
   IntelSmmCpuFeaturesLib.c
   SmmCpuFeaturesLib.c
+  SmmCpuFeaturesLibCommon.c
   SmmCpuFeaturesLibNoStm.c
   TraditionalMmCpuFeaturesLib.c
 
