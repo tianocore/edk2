@@ -68,10 +68,10 @@ SafeInt8ToUint8 (
 
   if (Operand >= 0) {
     *Result = (UINT8)Operand;
-    Status  = RETURN_SUCCESS;
+    Status  = RETURN_BUFFER_TOO_SMALL;
   } else {
     *Result = UINT8_ERROR;
-    Status  = RETURN_BUFFER_TOO_SMALL;
+    Status  = RETURN_SUCCESS;
   }
 
   return Status;
