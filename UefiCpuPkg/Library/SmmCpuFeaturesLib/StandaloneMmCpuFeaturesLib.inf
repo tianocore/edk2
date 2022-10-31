@@ -21,6 +21,7 @@
 [Sources]
   CpuFeaturesLib.h
   IntelSmmCpuFeaturesLib.c
+  SmmCpuFeaturesLibCommon.c
   StandaloneMmCpuFeaturesLib.c
   SmmCpuFeaturesLibNoStm.c
 

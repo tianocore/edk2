@@ -9,6 +9,12 @@
 #ifndef CPU_FEATURES_LIB_H_
 #define CPU_FEATURES_LIB_H_
 
+#include <Library/SmmCpuFeaturesLib.h>
+#include <Library/BaseLib.h>
+#include <Library/PcdLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/DebugLib.h>
+
 /**
   Performs library initialization.
 
