@@ -40,7 +40,11 @@
   Hash/CryptSha256.c
   Hash/CryptSm3.c
   Hash/CryptSha512.c
-  Hash/CryptParallelHashNull.c
+  Hash/CryptSha3.c
+  Hash/CryptXkcp.c
+  Hash/CryptCShake256.c
+  Hash/CryptParallelHash.c
+  Hash/CryptDispatchApPei.c
   Hmac/CryptHmac.c
   Kdf/CryptHkdf.c
   Cipher/CryptAesNull.c
@@ -80,7 +84,12 @@
   OpensslLib
   IntrinsicLib
   PrintLib
+  PeiServicesTablePointerLib
+  PeiServicesLib
+  SynchronizationLib
 
+[Ppis]
+  gEfiPeiMpServicesPpiGuid
 #
 # Remove these [BuildOptions] after this library is cleaned up
 #
