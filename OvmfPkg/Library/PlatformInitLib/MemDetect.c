@@ -42,6 +42,8 @@ Module Name:
 
 #include <Library/PlatformInitLib.h>
 
+#define MEGABYTE_SHIFT  20
+
 VOID
 EFIAPI
 PlatformQemuUc32BaseInitialization (

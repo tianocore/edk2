@@ -7,6 +7,7 @@
 
 **/
 
+#include <Base.h>
 #include <PiPei.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -25,6 +26,7 @@
 #include <ConfidentialComputingGuestAttr.h>
 
 #define ALIGNED_2MB_MASK  0x1fffff
+#define MEGABYTE_SHIFT    20
 
 /**
   This function will be called to accept pages. Only BSP accepts pages.
@@ -375,10 +377,14 @@ ProcessHobList (
   EFI_STATUS            Status;
   EFI_PEI_HOB_POINTERS  Hob;
   EFI_PHYSICAL_ADDRESS  PhysicalEnd;
+  UINT64                ResourceLength;
+  UINT64                AccumulateAcceptedMemory;
 
   Status = EFI_SUCCESS;
   ASSERT (VmmHobList != NULL);
   Hob.Raw = (UINT8 *)VmmHobList;
+
+  AccumulateAcceptedMemory = 0;
 
   //
   // Parse the HOB list until end of list or matching type is found.
@@ -393,7 +399,15 @@ ProcessHobList (
         DEBUG ((DEBUG_INFO, "ResourceLength: 0x%llx\n", Hob.ResourceDescriptor->ResourceLength));
         DEBUG ((DEBUG_INFO, "Owner: %g\n\n", &Hob.ResourceDescriptor->Owner));
 
-        PhysicalEnd = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+        PhysicalEnd    = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+        ResourceLength = Hob.ResourceDescriptor->ResourceLength;
+
+        if (Hob.ResourceDescriptor->PhysicalStart >= BASE_4GB) {
+          //
+          // In current stage, we only accept the memory under 4G
+          //
+          break;
+        }
 
         Status = BspAcceptMemoryResourceRange (
                    Hob.ResourceDescriptor->PhysicalStart,
@@ -402,6 +416,8 @@ ProcessHobList (
         if (EFI_ERROR (Status)) {
           break;
         }
+
+        AccumulateAcceptedMemory += ResourceLength;
       }
     }
 
@@ -461,6 +477,60 @@ ProcessTdxHobList (
 }
 
 /**
+ * Build ResourceDescriptorHob for the unaccepted memory region.
+ * This memory region may be splitted into 2 parts because of lazy accept.
+ *
+ * @param Hob     Point to the EFI_HOB_RESOURCE_DESCRIPTOR
+ * @return VOID
+ */
+VOID
+BuildResourceDescriptorHobForUnacceptedMemory (
+  IN EFI_HOB_RESOURCE_DESCRIPTOR  *Hob
+  )
+{
+  EFI_PHYSICAL_ADDRESS         PhysicalStart;
+  EFI_PHYSICAL_ADDRESS         PhysicalEnd;
+  UINT64                       ResourceLength;
+  EFI_RESOURCE_TYPE            ResourceType;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute;
+  UINT64                       MaxAcceptedMemoryAddress;
+
+  ASSERT (Hob->ResourceType == BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED);
+
+  ResourceType      = BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED;
+  ResourceAttribute = Hob->ResourceAttribute;
+  PhysicalStart     = Hob->PhysicalStart;
+  ResourceLength    = Hob->ResourceLength;
+  PhysicalEnd       = PhysicalStart + ResourceLength;
+
+  //
+  // In the first stage of lazy-accept, all the memory under 4G will be accepted.
+  // The memory above 4G will not be accepted.
+  //
+  MaxAcceptedMemoryAddress = BASE_4GB;
+
+  if (PhysicalEnd <= MaxAcceptedMemoryAddress) {
+    //
+    // This memory region has been accepted.
+    //
+    ResourceType       = EFI_RESOURCE_SYSTEM_MEMORY;
+    ResourceAttribute |= (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_TESTED);
+  } else if (PhysicalStart >= MaxAcceptedMemoryAddress) {
+    //
+    // This memory region hasn't been accepted.
+    // So keep the ResourceType and ResourceAttribute unchange.
+    //
+  }
+
+  BuildResourceDescriptorHob (
+    ResourceType,
+    ResourceAttribute,
+    PhysicalStart,
+    ResourceLength
+    );
+}
+
+/**
   Transfer the incoming HobList for the TD to the final HobList for Dxe.
   The Hobs transferred in this function are ResourceDescriptor hob and
   MemoryAllocation hob.
@@ -489,16 +559,16 @@ TransferTdxHobList (
         ResourceAttribute = Hob.ResourceDescriptor->ResourceAttribute;
 
         if (ResourceType == BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED) {
-          ResourceType       = EFI_RESOURCE_SYSTEM_MEMORY;
-          ResourceAttribute |= (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_TESTED);
+          BuildResourceDescriptorHobForUnacceptedMemory (Hob.ResourceDescriptor);
+        } else {
+          BuildResourceDescriptorHob (
+            ResourceType,
+            ResourceAttribute,
+            Hob.ResourceDescriptor->PhysicalStart,
+            Hob.ResourceDescriptor->ResourceLength
+            );
         }
 
-        BuildResourceDescriptorHob (
-          ResourceType,
-          ResourceAttribute,
-          Hob.ResourceDescriptor->PhysicalStart,
-          Hob.ResourceDescriptor->ResourceLength
-          );
         break;
       case EFI_HOB_TYPE_MEMORY_ALLOCATION:
         BuildMemoryAllocationHob (
