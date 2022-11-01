@@ -26,6 +26,7 @@ STATIC CONST CHAR16  NameEfiACPIMemoryNVS[]           = L"ACPIMemoryNVS";
 STATIC CONST CHAR16  NameEfiMemoryMappedIO[]          = L"MemoryMappedIO";
 STATIC CONST CHAR16  NameEfiMemoryMappedIOPortSpace[] = L"MemoryMappedIOPortSpace";
 STATIC CONST CHAR16  NameEfiPalCode[]                 = L"PalCode";
+STATIC CONST CHAR16  NameEfiUnacceptedMemoryType[]    = L"Unaccepted";
 
 //
 // Need short names for some memory types
@@ -151,6 +152,8 @@ ShellCommandRunMemMap (
   UINT64                 UnusableMemoryPagesSize;
   UINT64                 PalCodePages;
   UINT64                 PalCodePagesSize;
+  UINT64                 UnacceptedPages;
+  UINT64                 UnacceptedPagesSize;
   UINT64                 PersistentPages;
   UINT64                 PersistentPagesSize;
   BOOLEAN                Sfo;
@@ -175,6 +178,7 @@ ShellCommandRunMemMap (
   PalCodePages        = 0;
   PersistentPages     = 0;
   Size                = 0;
+  UnacceptedPages     = 0;
   Descriptors         = NULL;
   ShellStatus         = SHELL_SUCCESS;
   Status              = EFI_SUCCESS;
@@ -303,6 +307,11 @@ ShellCommandRunMemMap (
               TotalPages   += Walker->NumberOfPages;
               PalCodePages += Walker->NumberOfPages;
               break;
+            case EfiUnacceptedMemoryType:
+              ShellPrintHiiEx (-1, -1, NULL, (EFI_STRING_ID)(!Sfo ? STRING_TOKEN (STR_MEMMAP_LIST_ITEM) : STRING_TOKEN (STR_MEMMAP_LIST_ITEM_SFO)), gShellDebug1HiiHandle, NameEfiUnacceptedMemoryType, Walker->PhysicalStart, Walker->PhysicalStart+MultU64x64 (SIZE_4KB, Walker->NumberOfPages)-1, Walker->NumberOfPages, Walker->Attribute);
+              TotalPages      += Walker->NumberOfPages;
+              UnacceptedPages += Walker->NumberOfPages;
+              break;
             default:
               //
               // Shell Spec defines the SFO format.
@@ -335,6 +344,7 @@ ShellCommandRunMemMap (
         MmioSpacePagesSize      = MultU64x64 (SIZE_4KB, MmioSpacePages);
         MmioPortPagesSize       = MultU64x64 (SIZE_4KB, MmioPortPages);
         PalCodePagesSize        = MultU64x64 (SIZE_4KB, PalCodePages);
+        UnacceptedPagesSize     = MultU64x64 (SIZE_4KB, UnacceptedPages);
         PersistentPagesSize     = MultU64x64 (SIZE_4KB, PersistentPages);
         UnusableMemoryPagesSize = MultU64x64 (SIZE_4KB, UnusableMemoryPages);
         if (!Sfo) {
@@ -368,6 +378,8 @@ ShellCommandRunMemMap (
             MmioPortPagesSize,
             PalCodePages,
             PalCodePagesSize,
+            UnacceptedPages,
+            UnacceptedPagesSize,
             AvailPages,
             AvailPagesSize,
             PersistentPages,
@@ -422,6 +434,7 @@ ShellCommandRunMemMap (
             AcpiReclaimPagesSize,
             AcpiNvsPagesSize,
             PalCodePagesSize,
+            UnacceptedPagesSize,
             PersistentPagesSize
             );
         }
