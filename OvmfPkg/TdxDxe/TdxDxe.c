@@ -24,6 +24,7 @@
 #include <Library/HobLib.h>
 #include <Protocol/Cpu.h>
 #include <Protocol/MpInitLibDepProtocols.h>
+#include <Protocol/MemoryAccept.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <ConfidentialComputingGuestAttr.h>
 #include <IndustryStandard/Tdx.h>
@@ -31,6 +32,95 @@
 #include <Library/TdxLib.h>
 #include <TdxAcpiTable.h>
 #include <Library/MemEncryptTdxLib.h>
+
+#define ALIGNED_2MB_MASK  0x1fffff
+EFI_HANDLE  mTdxDxeHandle = NULL;
+
+EFI_STATUS
+EFIAPI
+TdxMemoryAccept (
+  IN EDKII_MEMORY_ACCEPT_PROTOCOL  *This,
+  IN EFI_PHYSICAL_ADDRESS          StartAddress,
+  IN UINTN                         Size
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      AcceptPageSize;
+  UINT64      StartAddress1;
+  UINT64      StartAddress2;
+  UINT64      StartAddress3;
+  UINT64      Length1;
+  UINT64      Length2;
+  UINT64      Length3;
+  UINT64      Pages;
+
+  AcceptPageSize = FixedPcdGet32 (PcdTdxAcceptPageSize);
+  StartAddress1  = 0;
+  StartAddress2  = 0;
+  StartAddress3  = 0;
+  Length1        = 0;
+  Length2        = 0;
+  Length3        = 0;
+
+  if (Size == 0) {
+    return EFI_SUCCESS;
+  }
+
+  if (ALIGN_VALUE (StartAddress, SIZE_2MB) != StartAddress) {
+    StartAddress1 = StartAddress;
+    Length1       = ALIGN_VALUE (StartAddress, SIZE_2MB) - StartAddress;
+    if (Length1 >= Size) {
+      Length1 = Size;
+    }
+
+    StartAddress += Length1;
+    Size         -= Length1;
+  }
+
+  if (Size > SIZE_2MB) {
+    StartAddress2 = StartAddress;
+    Length2       = Size & ~(UINT64)ALIGNED_2MB_MASK;
+    StartAddress += Length2;
+    Size         -= Length2;
+  }
+
+  if (Size) {
+    StartAddress3 = StartAddress;
+    Length3       = Size;
+  }
+
+  Status = EFI_SUCCESS;
+  if (Length1 > 0) {
+    Pages  = Length1 / SIZE_4KB;
+    Status = TdAcceptPages (StartAddress1, Pages, SIZE_4KB);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  if (Length2 > 0) {
+    Pages  = Length2 / AcceptPageSize;
+    Status = TdAcceptPages (StartAddress2, Pages, AcceptPageSize);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  if (Length3 > 0) {
+    Pages  = Length3 / SIZE_4KB;
+    Status = TdAcceptPages (StartAddress3, Pages, SIZE_4KB);
+    ASSERT (!EFI_ERROR (Status));
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  return Status;
+}
+
+EDKII_MEMORY_ACCEPT_PROTOCOL  mMemoryAcceptProtocol = {
+  TdxMemoryAccept
+};
 
 VOID
 SetPcdSettings (
@@ -278,6 +368,19 @@ TdxDxeEntryPoint (
          EFI_NATIVE_INTERFACE,
          NULL
          );
+
+  //
+  // Install MemoryAccept protocol for TDX
+  //
+  Status = gBS->InstallProtocolInterface (
+                  &mTdxDxeHandle,
+                  &gEdkiiMemoryAcceptProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &mMemoryAcceptProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Install EdkiiMemoryAcceptProtocol failed.\n"));
+  }
 
   //
   // Call TDINFO to get actual number of cpus in domain
