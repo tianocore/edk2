@@ -43,7 +43,7 @@ steps:
   inputs:
     filename: stuart_pr_eval
     arguments: -c .pytool/CISettings.py -p ${{ parameters.build_pkgs }} --pr-target origin/$(System.PullRequest.targetBranch) --output-csv-format-string "##vso[task.setvariable variable=pkgs_to_build;isOutpout=true]{pkgcsv}" --output-count-format-string "##vso[task.setvariable variable=pkg_count;isOutpout=true]{pkgcount}"
-  condition: eq(variables['Build.Reason'], 'PullRequest')
+  condition: false
 
 # install spell check prereqs
 - template: spell-check-prereq-steps.yml
