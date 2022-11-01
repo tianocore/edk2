@@ -38,6 +38,7 @@
   BaseMemoryLib
   PcdLib
   UefiCpuLib
+  CpuLib
   DebugAgentLib
   IoLib
   PeCoffLib
