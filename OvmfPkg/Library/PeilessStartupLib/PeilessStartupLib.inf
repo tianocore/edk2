@@ -46,6 +46,7 @@
   BaseMemoryLib
   PcdLib
   UefiCpuLib
+  CpuLib
   DebugAgentLib
   IoLib
   LocalApicLib
