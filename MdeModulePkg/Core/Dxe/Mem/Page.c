@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "DxeMain.h"
 #include "Imem.h"
 #include "HeapGuard.h"
+#include <Pi/PrePiDxeCis.h>
 
 //
 // Entry for tracking the memory regions for each memory type to coalesce similar memory types
@@ -61,6 +62,7 @@ EFI_MEMORY_TYPE_STATISTICS  mMemoryTypeStatistics[EfiMaxMemoryType + 1] = {
   { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiMemoryMappedIOPortSpace
   { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  TRUE  },  // EfiPalCode
   { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiPersistentMemory
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  FALSE },  // EfiUnacceptedMemoryType
   { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE }   // EfiMaxMemoryType
 };
 
@@ -68,22 +70,23 @@ EFI_PHYSICAL_ADDRESS  mDefaultMaximumAddress = MAX_ALLOC_ADDRESS;
 EFI_PHYSICAL_ADDRESS  mDefaultBaseAddress    = MAX_ALLOC_ADDRESS;
 
 EFI_MEMORY_TYPE_INFORMATION  gMemoryTypeInformation[EfiMaxMemoryType + 1] = {
-  { EfiReservedMemoryType,      0 },
-  { EfiLoaderCode,              0 },
-  { EfiLoaderData,              0 },
-  { EfiBootServicesCode,        0 },
-  { EfiBootServicesData,        0 },
-  { EfiRuntimeServicesCode,     0 },
-  { EfiRuntimeServicesData,     0 },
-  { EfiConventionalMemory,      0 },
-  { EfiUnusableMemory,          0 },
-  { EfiACPIReclaimMemory,       0 },
-  { EfiACPIMemoryNVS,           0 },
-  { EfiMemoryMappedIO,          0 },
-  { EfiMemoryMappedIOPortSpace, 0 },
-  { EfiPalCode,                 0 },
-  { EfiPersistentMemory,        0 },
-  { EfiMaxMemoryType,           0 }
+  { EfiReservedMemoryType,          0 },
+  { EfiLoaderCode,                  0 },
+  { EfiLoaderData,                  0 },
+  { EfiBootServicesCode,            0 },
+  { EfiBootServicesData,            0 },
+  { EfiRuntimeServicesCode,         0 },
+  { EfiRuntimeServicesData,         0 },
+  { EfiConventionalMemory,          0 },
+  { EfiUnusableMemory,              0 },
+  { EfiACPIReclaimMemory,           0 },
+  { EfiACPIMemoryNVS,               0 },
+  { EfiMemoryMappedIO,              0 },
+  { EfiMemoryMappedIOPortSpace,     0 },
+  { EfiPalCode,                     0 },
+  { EfiPersistentMemory,            0 },
+  { EFI_GCD_MEMORY_TYPE_UNACCEPTED, 0 },
+  { EfiMaxMemoryType,               0 }
 };
 //
 // Only used when load module at fixed address feature is enabled. True means the memory is alreay successfully allocated
@@ -1286,7 +1289,7 @@ CoreInternalAllocatePages (
   }
 
   if (((MemoryType >= EfiMaxMemoryType) && (MemoryType < MEMORY_TYPE_OEM_RESERVED_MIN)) ||
-      (MemoryType == EfiConventionalMemory) || (MemoryType == EfiPersistentMemory))
+      (MemoryType == EfiConventionalMemory) || (MemoryType == EfiPersistentMemory) || (MemoryType == EfiUnacceptedMemoryType))
   {
     return EFI_INVALID_PARAMETER;
   }
@@ -1953,6 +1956,32 @@ CoreGetMemoryMap (
       MemoryMap->Attribute     = MergeGcdMapEntry.Attributes | EFI_MEMORY_NV |
                                  (MergeGcdMapEntry.Capabilities & (EFI_CACHE_ATTRIBUTE_MASK | EFI_MEMORY_ATTRIBUTE_MASK));
       MemoryMap->Type = EfiPersistentMemory;
+
+      //
+      // Check to see if the new Memory Map Descriptor can be merged with an
+      // existing descriptor if they are adjacent and have the same attributes
+      //
+      MemoryMap = MergeMemoryMapDescriptor (MemoryMapStart, MemoryMap, Size);
+    }
+
+    if (MergeGcdMapEntry.GcdMemoryType == EFI_GCD_MEMORY_TYPE_UNACCEPTED) {
+      //
+      // Page Align GCD range is required. When it is converted to EFI_MEMORY_DESCRIPTOR,
+      // it will be recorded as page PhysicalStart and NumberOfPages.
+      //
+      ASSERT ((MergeGcdMapEntry.BaseAddress & EFI_PAGE_MASK) == 0);
+      ASSERT (((MergeGcdMapEntry.EndAddress - MergeGcdMapEntry.BaseAddress + 1) & EFI_PAGE_MASK) == 0);
+
+      //
+      // Create EFI_MEMORY_DESCRIPTOR for every Unaccepted GCD entries
+      //
+      MemoryMap->PhysicalStart = MergeGcdMapEntry.BaseAddress;
+      MemoryMap->VirtualStart  = 0;
+      MemoryMap->NumberOfPages = RShiftU64 ((MergeGcdMapEntry.EndAddress - MergeGcdMapEntry.BaseAddress + 1), EFI_PAGE_SHIFT);
+      MemoryMap->Attribute     = MergeGcdMapEntry.Attributes |
+                                 (MergeGcdMapEntry.Capabilities & (EFI_MEMORY_RP | EFI_MEMORY_WP | EFI_MEMORY_XP | EFI_MEMORY_RO |
+                                                                   EFI_MEMORY_UC | EFI_MEMORY_UCE | EFI_MEMORY_WC | EFI_MEMORY_WT | EFI_MEMORY_WB));
+      MemoryMap->Type = EfiUnacceptedMemoryType;
 
       //
       // Check to see if the new Memory Map Descriptor can be merged with an

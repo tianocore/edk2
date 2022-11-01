@@ -8,6 +8,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
+#include <Pi/PrePiDxeCis.h>
+#include <Pi/PrePiHob.h>
 #include "DxeMain.h"
 #include "Gcd.h"
 #include "Mem/HeapGuard.h"
@@ -103,6 +105,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8  *mGcdMemoryTypeNames[] = {
   "MMIO     ",  // EfiGcdMemoryTypeMemoryMappedIo
   "PersisMem",  // EfiGcdMemoryTypePersistent
   "MoreRelia",  // EfiGcdMemoryTypeMoreReliable
+  "Unaccepte",  // EFI_GCD_MEMORY_TYPE_UNACCEPTED
   "Unknown  "   // EfiGcdMemoryTypeMaximum
 };
 
@@ -2599,6 +2602,9 @@ CoreInitializeGcdServices (
         case EFI_RESOURCE_MEMORY_MAPPED_IO_PORT:
         case EFI_RESOURCE_MEMORY_RESERVED:
           GcdMemoryType = EfiGcdMemoryTypeReserved;
+          break;
+        case BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED:
+          GcdMemoryType = EFI_GCD_MEMORY_TYPE_UNACCEPTED;
           break;
         case EFI_RESOURCE_IO:
           GcdIoType = EfiGcdIoTypeIo;
