@@ -7,13 +7,14 @@ from VfrError import VfrReturnCode
 from VfrUtility import *
 
 from ctypes import *
+
 class OpcodeSizesScopeNode():
 
     def __init__(self, Size, Scope):
         self.Size = Size
         self.Scope = Scope
 
-
+# dictionary is better, need to modify
 gOpcodeSizesScopeTable = [
     OpcodeSizesScopeNode(0, 0),  # EFI_IFR_INVALID - 0x00
     OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_FORM), 1),  # EFI_IFR_FORM_OP
@@ -860,7 +861,7 @@ class CIfrClass(CIfrObj, CIfrOpHeader):
         self.__Class.Class = EFI_NON_DEVICE_CLASS
 
     def SetClass(self, Class):
-        self.__Class = Class
+        self.__Class.Class = Class
 
     def GetInfo(self):
         return self.__Class
@@ -876,7 +877,7 @@ class CIfrSubClass(CIfrObj, CIfrOpHeader):
         self.__SubClass.SubClass = EFI_SETUP_APPLICATION_SUBCLASS
 
     def SetSubClass(self, SubClass):
-        self.__SubClass = SubClass
+        self.__SubClass.SubClass = SubClass
 
     def GetInfo(self):
         return self.__SubClass
@@ -1516,7 +1517,6 @@ class CIfrPassword(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 
     def GetQuestion(self):
         return self
-        # gCurrentQuestion = self.__Password.Question
 
     def SetQHeaderFlags(self, Flags):
         CIfrQuestionHeader.SetFlags(self, Flags)  #
@@ -1526,6 +1526,9 @@ class CIfrPassword(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 
     def SetMaxSize(self, MaxSize):
         self.__Password.MaxSize = MaxSize
+    
+    def GetInfo(self):
+        return self.__Password
 
 
 class CIfrDefault(CIfrObj, CIfrOpHeader):  #

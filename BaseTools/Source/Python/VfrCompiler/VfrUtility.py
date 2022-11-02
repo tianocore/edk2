@@ -508,6 +508,7 @@ class CVfrVarDataTypeDB(object):
         pType, ReturnCode = self.GetDataType(TName)
         if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
             return None, ReturnCode
+        pField = None
         while (i < len(VarStrName)):
             # i start from field
             _, i, FName, ReturnCode = self.__ExtractFieldNameAndArrary(

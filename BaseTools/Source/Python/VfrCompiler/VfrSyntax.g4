@@ -37,11 +37,11 @@ vfrPragmaPackDefinition
     ;
 
 vfrDataStructDefinition
-    :   (TypeDef)? Struct NonNvDataMap? StringIdentifier? '{' vfrDataStructFields[False] '}'  StringIdentifier? ';'
+    :   (TypeDef)? Struct NonNvDataMap? N1=StringIdentifier? '{' vfrDataStructFields[False] '}'  N2=StringIdentifier? ';'
     ;
 
 vfrDataUnionDefinition
-    :   (TypeDef)? Union NonNvDataMap? StringIdentifier? '{' vfrDataStructFields[True]'}' StringIdentifier? ';'
+    :   (TypeDef)? Union NonNvDataMap? N1=StringIdentifier? '{' vfrDataStructFields[True]'}' N2=StringIdentifier? ';'
     ;
 
 vfrDataStructFields[FieldInUnion]
@@ -64,56 +64,56 @@ vfrDataStructFields[FieldInUnion]
     ;
 
 dataStructField64[FieldInUnion]
-    :   'UINT64' StringIdentifier ('[' Number ']')? ';'
+    :   'UINT64' N=StringIdentifier ('[' Number ']')? ';'
     ;
 
 dataStructField32[FieldInUnion]
-    :   'UINT32' StringIdentifier ('[' Number ']')? ';'
+    :   'UINT32' N=StringIdentifier ('[' Number ']')? ';'
     ;
 
 dataStructField16[FieldInUnion]
-    :   'UINT16' StringIdentifier ('[' Number ']')? ';'
+    :   'UINT16' N=StringIdentifier ('[' Number ']')? ';'
     ;
 
 dataStructField8[FieldInUnion]
-    :   'UINT8' StringIdentifier ('[' Number ']')? ';'
+    :   'UINT8' N=StringIdentifier ('[' Number ']')? ';'
     ;
 
 dataStructFieldBool[FieldInUnion]
-    :   'BOOLEAN' StringIdentifier ('[' Number ']')? ';'
+    :   'BOOLEAN' N=StringIdentifier ('[' Number ']')? ';'
     ;
 
 dataStructFieldString[FieldInUnion]
-    :   'EFI_STRING_ID' StringIdentifier ('[' Number ']')? ';'
+    :   'EFI_STRING_ID' N=StringIdentifier ('[' Number ']')? ';'
     ;
 
 dataStructFieldDate[FieldInUnion]
-    :   'EFI_HII_DATE' StringIdentifier ('[' Number ']')? ';'
+    :   'EFI_HII_DATE' N=StringIdentifier ('[' Number ']')? ';'
     ;
 
 dataStructFieldTime[FieldInUnion]
-    :   'EFI_HII_TIME' StringIdentifier ('[' Number ']')? ';'
+    :   'EFI_HII_TIME' N=StringIdentifier ('[' Number ']')? ';'
     ;
 
 dataStructFieldRef[FieldInUnion]
-    :   'EFI_HII_REF' StringIdentifier ('[' Number ']')? ';'
+    :   'EFI_HII_REF' N=StringIdentifier ('[' Number ']')? ';'
     ;
 
 dataStructFieldUser[FieldInUnion]
-    :   StringIdentifier StringIdentifier ('[' Number ']')? ';'
+    :   T=StringIdentifier N=StringIdentifier ('[' Number ']')? ';'
     ;
 
 dataStructBitField64[FieldInUnion]
-    :   'UINT64'  StringIdentifier? ':' Number ';'
+    :   D='UINT64'  N=StringIdentifier? ':' Number ';'
     ;
 dataStructBitField32[FieldInUnion]
-    :   'UINT32' StringIdentifier? ':' Number ';'
+    :   D='UINT32' N=StringIdentifier? ':' Number ';'
     ;
 dataStructBitField16[FieldInUnion]
-    :   'UINT16' StringIdentifier? ':' Number ';'
+    :   D='UINT16' N=StringIdentifier? ':' Number ';'
     ;
 dataStructBitField8[FieldInUnion]
-    :   'UINT8' StringIdentifier? ':' Number ';'
+    :   D='UINT8' N=StringIdentifier? ':' Number ';'
     ;
 
 // 2.4 VFR FormSet Definition
@@ -187,16 +187,16 @@ locals[Node=None]
 //2.6 VFR Default Stores Definition
 vfrStatementDefaultStore
 locals[Node=VfrTreeNode(EFI_IFR_DEFAULTSTORE_OP)]
-    :   'defaultstore' StringIdentifier ','
-        'prompt' '=' 'STRING_TOKEN' '(' Number ')'
-        (',' 'attribute' '=' Number)? ';'
+    :   'defaultstore' N=StringIdentifier ','
+        'prompt' '=' 'STRING_TOKEN' '(' S=Number ')'
+        (',' 'attribute' '=' A=Number)? ';'
     ;
 
 //2.7 VFR Variable Store Definition
 vfrStatementVarStoreLinear 
 locals[Node=VfrTreeNode(EFI_IFR_VARSTORE_OP)]
     :   'varstore'
-        (   StringIdentifier ','  
+        (   TN=StringIdentifier ','  
         |   'UINT8' ','           
         |   'UINT16' ','          
         |   'UINT32' ',' 
@@ -205,15 +205,15 @@ locals[Node=VfrTreeNode(EFI_IFR_VARSTORE_OP)]
         |   'EFI_HII_TIME' ','
         |   'EFI_HII_REF' ','
         )
-        ('varid' '=' Number ',')?
-        'name' '=' StringIdentifier ','
+        ('varid' '=' ID=Number ',')?
+        'name' '=' SN=StringIdentifier ','
         'guid' '=' guidDefinition ';'
     ;
 
 vfrStatementVarStoreEfi
 locals[Node=VfrTreeNode(EFI_IFR_VARSTORE_EFI_OP)]
     :   'efivarstore'
-        (   StringIdentifier ','
+        (   TN=StringIdentifier ','
         |   'UINT8' ','
         |   'UINT16' ','
         |   'UINT32' ','
@@ -222,10 +222,10 @@ locals[Node=VfrTreeNode(EFI_IFR_VARSTORE_EFI_OP)]
         |   'EFI_HII_TIME' ','
         |   'EFI_HII_REF' ','
         )
-        ('varid' '=' Number ',')?
+        ('varid' '=' ID=Number ',')?
         'attribute' '=' vfrVarStoreEfiAttr ('|' vfrVarStoreEfiAttr)* ','
-        (   'name' '=' StringIdentifier ','
-        |   'name' '=' 'STRING_TOKEN' '(' Number ')' ','  'varsize' '=' Number ','
+        (   'name' '=' SN=StringIdentifier ','
+        |   'name' '=' 'STRING_TOKEN' '(' VN=Number ')' ','  'varsize' '=' N=Number ','
         )
         'guid' '=' guidDefinition ';'
     ;
@@ -236,8 +236,8 @@ locals[Attr=0]
 
 vfrStatementVarStoreNameValue 
 locals[Node=VfrTreeNode(EFI_IFR_VARSTORE_NAME_VALUE_OP)]
-    :   'namevaluevarstore' StringIdentifier ','
-        ('varid' '=' Number ',')?
+    :   'namevaluevarstore' SN=StringIdentifier ','
+        ('varid' '=' ID=Number ',')?
         ('name' '=' 'STRING_TOKEN' '(' Number ')' ',')+
         'guid' '=' guidDefinition ';'
     ;
@@ -285,9 +285,9 @@ vfrQuestionHeader[OpObj, QType]
 
 vfrQuestionBaseInfo[OpObj, QType]
 locals[BaseInfo=EFI_VARSTORE_INFO(), QId=EFI_QUESTION_ID_INVALID, CheckFlag=True]
-    :   ('name' '=' StringIdentifier ',')?
+    :   ('name' '=' QN=StringIdentifier ',')?
         ('varid' '=' vfrStorageVarId[localctx.BaseInfo, localctx.CheckFlag] ',')?
-        ('questionid' '=' Number ',')?
+        ('questionid' '=' ID=Number ',')?
     ;
 
 vfrStatementHeader[OpObj]
@@ -302,19 +302,19 @@ locals[QHFlag=0]
     |   ResetRequiredFlag
     |   RestStyleFlag
     |   ReconnectRequiredFlag
-    |   OptionOnlyFlag
-    |   NVAccessFlag
-    |   LateCheckFlag
+    |   O=OptionOnlyFlag
+    |   N=NVAccessFlag
+    |   L=LateCheckFlag
     ;
 //2.10.5
 vfrStorageVarId[BaseInfo, CheckFlag]
 locals[VarIdStr='']
-    :   (StringIdentifier '[' Number ']')    # vfrStorageVarIdRule1
-    |   (StringIdentifier ('.' arrayName)* ) # vfrStorageVarIdRule2
+    :   (SN1=StringIdentifier '[' I=Number ']')    # vfrStorageVarIdRule1
+    |   (SN2=StringIdentifier ('.' arrayName)* ) # vfrStorageVarIdRule2
     ;
 
 vfrConstantValueField 
-locals[Value=EFI_IFR_TYPE_VALUE(), ValueStr='', ListType=False]
+locals[Value=EFI_IFR_TYPE_VALUE(), ValueList=[], ListType=False]
     :   ('-')? Number          
     |   'TRUE'          
     |   'FALSE'         
@@ -325,7 +325,7 @@ locals[Value=EFI_IFR_TYPE_VALUE(), ValueStr='', ListType=False]
     |   Number '/' Number '/' Number 
     |   Number ';' Number ';' guidDefinition ';' 'STRING_TOKEN' '(' Number ')' 
     |   'STRING_TOKEN' '(' Number ')'
-    |   '{' Number (',' Number)* '}' // not support currently
+    |   '{' Number (',' Number)* '}' 
     ;
 
 vfrImageTag
@@ -376,7 +376,7 @@ locals[Node]
 
 vfrFormMapDefinition
 locals[Node=VfrTreeNode(EFI_IFR_FORM_MAP_OP)]
-    :   'formmap' 'formid' '=' Number ','
+    :   'formmap' 'formid' '=' S1=Number ','
         (   'maptitle' '=' 'STRING_TOKEN' '(' Number ')' ';'
             'mapguid' '=' guidDefinition ';'
         )*
@@ -439,16 +439,16 @@ locals[Flag=0]
 vfrStatementStaticText
 locals[Node=VfrTreeNode(EFI_IFR_TEXT_OP)] 
     :   'text'
-        'help' '=' 'STRING_TOKEN' '(' Number ')' ','
-        'text' '=' 'STRING_TOKEN' '(' Number ')'
-        (',' 'text' '=' 'STRING_TOKEN' '(' Number ')')?
-        (',' 'flags' '=' staticTextFlagsField ('|' staticTextFlagsField)* ',' 'key' '=' Number)?
+        'help' '=' 'STRING_TOKEN' '(' S1=Number ')' ','
+        'text' '=' 'STRING_TOKEN' '(' S2=Number ')'
+        (',' 'text' '=' 'STRING_TOKEN' '(' S3=Number ')')?
+        (',' F='flags' '=' staticTextFlagsField ('|' staticTextFlagsField)* ',' 'key' '=' S4=Number)?
         (',' vfrStatementStatTagList[localctx.Node])? ';'
     ;
 
 staticTextFlagsField
-locals[Flag=0, Line=0]
-    :   Number | questionheaderFlagsField
+locals[Flag=0]
+    :   N=Number | questionheaderFlagsField
     ;
 
 vfrStatementCrossReference 
@@ -471,7 +471,7 @@ locals[Node=VfrTreeNode(EFI_IFR_REF_OP), OpObj=None, OHObj=None, QType=EFI_QUESI
             )
             |
             (   FormId '=' Number ','
-                Question '=' (StringIdentifier ',' | Number ',')
+                Question '=' (QN=StringIdentifier ',' | Number ',')
             )
             |
             (   Number ',' )
@@ -489,13 +489,13 @@ locals[GotoFlags=0]
 
 gotoFlagsField
 locals[Flag=0]
-    :  Number | questionheaderFlagsField
+    :  N=Number | questionheaderFlagsField
     ;
 
 vfrStatementResetButton
 locals[Node=VfrTreeNode(EFI_IFR_RESET_BUTTON_OP), OpObj=CIfrResetButton()]
     :  'resetbutton'
-       'defaultstore' '=' StringIdentifier ','
+       'defaultstore' '=' N=StringIdentifier ','
        vfrStatementHeader[localctx.OpObj] ','
        (vfrStatementStatTagList[localctx.Node] ',')?
        'endresetbutton' ';'
@@ -611,7 +611,7 @@ locals[Node=VfrTreeNode(EFI_IFR_DEFAULT_OP)]   // DObj=None]
         (   (   vfrStatementValue ','
             |   '=' vfrConstantValueField ','
             )
-            (   'defaultstore' '=' StringIdentifier ','
+            (   'defaultstore' '=' SN=StringIdentifier ','
             )?
         )
     ;
@@ -631,11 +631,11 @@ locals[Node=VfrTreeNode(EFI_IFR_ONE_OF_OPTION_OP)] //CIfrOneOfOption()
     :   'option'
         'text' '=' 'STRING_TOKEN' '(' Number ')' ','
         'value' '=' vfrConstantValueField ',' //???
-        'flags' '=' vfrOneOfOptionFlags (',' 'key' '=' Number) ? (',' vfrImageTag)* ';'
+        F='flags' '=' vfrOneOfOptionFlags (',' 'key' '=' KN=Number) ? (',' vfrImageTag)* ';'
     ;
 
 vfrOneOfOptionFlags
-locals[HFlags=0, LFlags=0, LineNum=0]
+locals[HFlags=0, LFlags=0]
     :   oneofoptionFlagsField ('|' oneofoptionFlagsField)*;
 
 oneofoptionFlagsField
@@ -649,8 +649,8 @@ oneofoptionFlagsField
     |   ReconnectRequiredFlag
     |   ManufacturingFlag
     |   DefaultFlag
-    |   NVAccessFlag
-    |   LateCheckFlag
+    |   A=NVAccessFlag
+    |   L=LateCheckFlag
     ;
 
 vfrStatementRead
@@ -681,7 +681,7 @@ locals[Node]
 
 vfrStatementCheckBox 
 locals[Node=VfrTreeNode(EFI_IFR_CHECKBOX_OP), OpObj=CIfrCheckBox(), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
-    :   'checkbox'
+    :   L='checkbox'
         vfrQuestionBaseInfo[localctx.OpObj, localctx.QType] 
         vfrStatementHeader[localctx.OpObj] ','
         ('flags' '=' vfrCheckBoxFlags ',')?
@@ -698,8 +698,8 @@ locals[LFlags=0, HFlags=0]
 checkboxFlagsField
 locals[LFlag=0, HFlag=0]
     :   Number
-    |   'DEFAULT'
-    |   'MANUFACTURING'
+    |   D='DEFAULT'
+    |   M='MANUFACTURING'
     |   'CHECKBOX_DEFAULT'
     |   'CHECKBOX_DEFAULT_MFG'
     |   questionheaderFlagsField
@@ -721,7 +721,7 @@ locals[HFlags=0, LineNum=0]
     ;
 actionFlagsField
 locals[HFlag=0]
-    :   Number | questionheaderFlagsField
+    :   N=Number | questionheaderFlagsField
     ;
 
 vfrStatementNumericType 
@@ -734,7 +734,7 @@ locals[Node=VfrTreeNode(EFI_IFR_NUMERIC_OP), OpObj=CIfrNumeric(), QType=EFI_QUES
     :   'numeric'
         vfrQuestionBaseInfo[localctx.OpObj, localctx.QType]  
         vfrStatementHeader[localctx.OpObj] ','
-        ('flags' '=' vfrNumericFlags ',')?
+        (F='flags' '=' vfrNumericFlags ',')?
         ('key' '=' Number ',')?
         vfrSetMinMaxStep[localctx.OpObj]
         vfrStatementQuestionOptionList[localctx.Node]
@@ -742,19 +742,19 @@ locals[Node=VfrTreeNode(EFI_IFR_NUMERIC_OP), OpObj=CIfrNumeric(), QType=EFI_QUES
     ;
 
 vfrSetMinMaxStep[OpObj] // CIfrMinMaxStepData
-    :   'minimum' '=' ('-')? Number ','
-        'maximum' '=' ('-')? Number ','
-        ('step' '=' Number ',')?
+    :   'minimum' '=' (N1='-')? I=Number ','
+        'maximum' '=' (N2='-')? A=Number ','
+        ('step' '=' S=Number ',')?
     ;
 
 vfrNumericFlags
-locals[HFlags=0, LFlags=0,IsDisplaySpecified=False,LineNum=0]
+locals[HFlags=0, LFlags=0,IsDisplaySpecified=False]
     :   numericFlagsField ('|' numericFlagsField)*
     ;
 
 numericFlagsField
 locals[HFlag=0,IsSetType=False,IsDisplaySpecified=False]
-    :   Number
+    :   N=Number
     |   'NUMERIC_SIZE_1'
     |   'NUMERIC_SIZE_2'
     |   'NUMERIC_SIZE_4'
@@ -770,14 +770,14 @@ locals[Node=VfrTreeNode(EFI_IFR_ONE_OF_OP), OpObj=CIfrOneOf(), QType=EFI_QUESION
     :   'oneof'
         vfrQuestionBaseInfo[localctx.OpObj, localctx.QType] 
         vfrStatementHeader[localctx.OpObj] ','
-        ('flags' '=' vfrOneofFlagsField ',')?
+        (F='flags' '=' vfrOneofFlagsField ',')?
         (vfrSetMinMaxStep[localctx.OpObj])?
         vfrStatementQuestionOptionList[localctx.Node]
         'endoneof' ';'
     ;
 
 vfrOneofFlagsField
-locals[HFlags=0, LFlags=0, LineNum=0]
+locals[HFlags=0, LFlags=0]
     :   numericFlagsField ('|' numericFlagsField)*
     ;
 
@@ -790,22 +790,22 @@ vfrStatementString
 locals[Node=VfrTreeNode(EFI_IFR_STRING_OP), OpObj=CIfrString(), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'string'
         vfrQuestionHeader[localctx.OpObj, localctx.QType] ','
-        ('flags' '=' vfrStringFlagsField ',')?
+        (F='flags' '=' vfrStringFlagsField ',')?
         ('key' '=' Number ',')?
-        'minsize' '=' Number ','
-        'maxsize' '=' Number ','
+        Min='minsize' '=' Number ','
+        Max='maxsize' '=' Number ','
         vfrStatementQuestionOptionList[localctx.Node]
         'endstring' ';'
     ;
 
 vfrStringFlagsField 
-locals[HFlags=0, LFlags=0, LineNum=0]
+locals[HFlags=0, LFlags=0]
     :   stringFlagsField ('|' stringFlagsField)*
     ;
 
 stringFlagsField
 locals[HFlag=0, LFlag=0]
-    :   Number
+    :   N=Number
     |   'MULTI_LINE'
     |   questionheaderFlagsField
     ;
@@ -814,16 +814,17 @@ vfrStatementPassword
 locals[Node=VfrTreeNode(EFI_IFR_PASSWORD_OP), OpObj=CIfrPassword(), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'password'
         vfrQuestionHeader[localctx.OpObj, localctx.QType]','
-        ('flags' '=' vfrPasswordFlagsField ',')?
+        (F='flags' '=' vfrPasswordFlagsField ',')?
         ('key' '=' Number ',')?
-        'minsize' '=' Number ','
-        'maxsize' '=' Number ','
+        Min='minsize' '=' Number ','
+        Max='maxsize' '=' Number ','
+        ('encoding' '=' Number ',')?
         vfrStatementQuestionOptionList[localctx.Node]
         'endpassword' ';'
     ;
 
 vfrPasswordFlagsField 
-locals[HFlags=0, LineNum=0]
+locals[HFlags=0]
     :   passwordFlagsField('|' passwordFlagsField)*
     ;
 
@@ -837,8 +838,8 @@ vfrStatementOrderedList
 locals[Node=VfrTreeNode(EFI_IFR_ORDERED_LIST_OP), OpObj=CIfrOrderedList(), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'orderedlist'
         vfrQuestionHeader[localctx.OpObj, localctx.QType] ','
-        ('maxcontainers' '=' Number ',')?
-        ('flags' '=' vfrOrderedListFlags ',')?
+        (M='maxcontainers' '=' Number ',')?
+        (F='flags' '=' vfrOrderedListFlags ',')?
         vfrStatementQuestionOptionList[localctx.Node]
         'endlist' ';'
     ;
@@ -860,23 +861,23 @@ vfrStatementDate
 locals[Node=VfrTreeNode(EFI_IFR_DATE_OP), OpObj=CIfrDate(), QType=EFI_QUESION_TYPE.QUESTION_DATE, Val=EFI_IFR_TYPE_VALUE()]
     :   'date'
         (   (   vfrQuestionHeader[localctx.OpObj, localctx.QType] ','
-                ('flags' '=' vfrDateFlags ',')?
+                (F1='flags' '=' vfrDateFlags ',')?
                 vfrStatementQuestionOptionList[localctx.Node]
             )
             |
             (   'year' 'varid' '=' StringIdentifier '.' StringIdentifier ','
                 'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
                 'help' '=' 'STRING_TOKEN' '(' Number ')' ','
-                minMaxDateStepDefault[Val.Date, 0]
+                minMaxDateStepDefault[localctx.Val.date, 0]
                 'month' 'varid' '=' StringIdentifier '.' StringIdentifier ','
                 'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
                 'help' '=' 'STRING_TOKEN' '(' Number ')' ','
-                minMaxDateStepDefault[Val.Date, 1]
+                minMaxDateStepDefault[localctx.Val.date, 1]
                 'day' 'varid' '=' StringIdentifier '.' StringIdentifier ','
                 'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
                 'help' '=' 'STRING_TOKEN' '(' Number ')' ','
-                minMaxDateStepDefault[Val.Date, 2]
-                ('flags' '=' vfrDateFlags ',')?
+                minMaxDateStepDefault[localctx.Val.date, 2]
+                (F2='flags' '=' vfrDateFlags ',')?
                 (vfrStatementInconsistentIf)*
             )
         )
@@ -887,7 +888,7 @@ minMaxDateStepDefault[Date, KeyValue]
     :   'minimum' '=' Number ','
         'maximum' '=' Number ','
         ('step' '=' Number ',')?
-        ('default' '=' Number ',')?
+        ('default' '=' N=Number ',')?
     ;
 
 vfrDateFlags 
@@ -909,7 +910,7 @@ vfrStatementTime
 locals[Node=VfrTreeNode(EFI_IFR_TIME_OP), OpObj=CIfrTime(), QType=EFI_QUESION_TYPE.QUESTION_TIME,  Val=EFI_IFR_TYPE_VALUE()]
     :   'time'
         (   (   vfrQuestionHeader[localctx.OpObj, localctx.QType] ','
-                ('flags' '=' vfrTimeFlags ',')?
+                (F1='flags' '=' vfrTimeFlags ',')?
                 vfrStatementQuestionOptionList[localctx.Node]
             )
             |
@@ -917,16 +918,16 @@ locals[Node=VfrTreeNode(EFI_IFR_TIME_OP), OpObj=CIfrTime(), QType=EFI_QUESION_TY
                 'hour' 'varid' '=' StringIdentifier '.' StringIdentifier ','
                 'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
                 'help' '=' 'STRING_TOKEN' '(' Number ')' ','
-                minMaxTimeStepDefault[Val.Time, 0]
+                minMaxTimeStepDefault[localctx.Val.time, 0]
                 'minute' 'varid' '=' StringIdentifier '.' StringIdentifier ','
                 'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
                 'help' '=' 'STRING_TOKEN' '(' Number ')' ','
-                minMaxTimeStepDefault[Val.Time, 1]
+                minMaxTimeStepDefault[localctx.Val.time, 1]
                 'second' 'varid' '=' StringIdentifier '.' StringIdentifier ','
                 'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
                 'help' '=' 'STRING_TOKEN' '(' Number ')' ','
-                minMaxTimeStepDefault[Val.Time, 2]
-                ('flags' '=' vfrTimeFlags ',')?
+                minMaxTimeStepDefault[localctx.Val.time, 2]
+                (F2='flags' '=' vfrTimeFlags ',')?
                 (vfrStatementInconsistentIf)*
             )
         )
@@ -937,7 +938,7 @@ minMaxTimeStepDefault[Time, KeyValue]
     :   'minimum' '=' Number ','
         'maximum' '=' Number ','
         ('step' '=' Number ',')?
-        ('default' '=' Number ',')?
+        ('default' '=' N=Number ',')?
     ;
 
 vfrTimeFlags 
@@ -1101,10 +1102,10 @@ locals[Node=VfrTreeNode(EFI_IFR_GUID_OP)]
     ;
 
 vfrStatementExtension
-locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), DataBuff=[], Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
+locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), DataBuff=bytes(), Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
     :   'guidop'
         'guid' '=' guidDefinition
-        (   ',' 'datatype' '='
+        (   ',' D='datatype' '='
             (   'UINT64' ('[' Number ']')?
             |   'UINT32' ('[' Number ']')?
             |   'UINT16' ('[' Number ']')?
@@ -1326,7 +1327,7 @@ vareqvalExp[ExpInfo]
     ;
 
 ideqvalExp[ExpInfo]
-    :   'ideqval' vfrQuestionDataFieldName 
+    :   I='ideqval' vfrQuestionDataFieldName 
         (   '==' Number
 	    |   '<=' Number
 	    |   '<' Number
@@ -1336,12 +1337,12 @@ ideqvalExp[ExpInfo]
     ;
 
 ideqidExp[ExpInfo]
-    :   'ideqid' vfrQuestionDataFieldName 
-        (   '==' vfrQuestionDataFieldName
-	    |   '<=' vfrQuestionDataFieldName
-	    |   '<' vfrQuestionDataFieldName
-	    |   '>=' vfrQuestionDataFieldName
-	    |   '>' vfrQuestionDataFieldName
+    :   I='ideqid' vfrQuestionDataFieldName 
+        (   E='==' vfrQuestionDataFieldName
+	    |   LE='<=' vfrQuestionDataFieldName
+	    |   L='<' vfrQuestionDataFieldName
+	    |   BE='>=' vfrQuestionDataFieldName
+	    |   B='>' vfrQuestionDataFieldName
         ) 
     ;
 
@@ -1350,9 +1351,9 @@ ideqvallistExp[ExpInfo] // issues
     ;
 
 vfrQuestionDataFieldName  //10.8 Doing
-locals[QId=EFI_QUESTION_ID_INVALID, Mask=0, VarIdStr='', Line=0]
-    :   (StringIdentifier '[' Number ']') # vfrQuestionDataFieldNameRule1
-        |   (StringIdentifier ('.' arrayName)*) # vfrQuestionDataFieldNameRule2
+locals[QId=EFI_QUESTION_ID_INVALID, Mask=0, VarIdStr='', Line=None]
+    :   (SN1=StringIdentifier '[' I=Number ']') # vfrQuestionDataFieldNameRule1
+        |   (SN2=StringIdentifier ('.' arrayName)*) # vfrQuestionDataFieldNameRule2
     ;
 
 arrayName
