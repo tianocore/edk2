@@ -312,8 +312,7 @@ class CVfrVarDataTypeDB(object):
         if Action & VFR_PACK_SHOW:
             Msg = str.format('value of pragma pack(show) == %d' %
                              (self.__PackAlign))
-            print(Msg)  # for test
-            # error handle
+            gCVfrErrorHandle.PrintMsg(LineNum, 'Warning', Msg)
 
         if Action & VFR_PACK_PUSH:
             pNew = SVfrPackStackNode(Identifier, self.__PackAlign)
@@ -325,7 +324,7 @@ class CVfrVarDataTypeDB(object):
         if Action & VFR_PACK_POP:
             pNode = None
             if self.__PackStack == None:
-                pass  #error
+                gCVfrErrorHandle.PrintMsg(LineNum, 'Error', '#pragma pack(pop...) : more pops than pushes')
 
             pNode = self.__PackStack
             while pNode != None:
@@ -337,7 +336,7 @@ class CVfrVarDataTypeDB(object):
         if Action & VFR_PACK_ASSIGN:
             PackAlign = (Number + Number % 2) if (Number > 1) else Number
             if PackAlign == 0 or PackAlign > 16:
-                pass  # error
+                gCVfrErrorHandle.PrintMsg(LineNum, 'Error', "expected pragma parameter to be '1', '2', '4', '8', or '16'")
             else:
                 self.__PackAlign = PackAlign
 
@@ -965,13 +964,7 @@ class SVfrVarStorageNode():
             else:
                 self.VarstoreType = EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_BUFFER
         else:
-            # self.NameSpace.append(DEFAULT_NAME_TABLE_ITEMS)
             self.VarstoreType = EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_NAME
-
-        # union
-
-        # self.NameSPaceNameTable =
-
 
 class SConfigItem():
 
@@ -1142,7 +1135,7 @@ class EFI_VARSTORE_INFO(Structure):
     _pack_ = 1
     _fields_ = [
         ('VarStoreId', c_uint16),
-        ('Info', VarStoreInfoNode),  ##########
+        ('Info', VarStoreInfoNode), 
         ('VarType', c_uint8),
         ('VarTotalSize', c_uint32),
         ('IsBitVar', c_bool),
@@ -1211,7 +1204,6 @@ class CVfrDataStorage(object):
 
             self.__CurrVarStorageNode = pNode
             HasFoundOne = True
-        # 传入的HasFoundOne 为False， self.__CurrVarStorageNode = None
         return False, ReturnCode, HasFoundOne
 
     def __GetVarStoreByDataType(self, DataTypeName, VarGuid):

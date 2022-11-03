@@ -25,7 +25,6 @@ else:
 gCVfrVarDataTypeDB = CVfrVarDataTypeDB()
 gCVfrDefaultStore =  CVfrDefaultStore()
 gCVfrDataStorage = CVfrDataStorage()
-gCVfrErrorHandle = CVfrErrorHandle()
 
 # This class defines a complete generic visitor for a parse tree produced by VfrSyntaxParser.
 class VfrSyntaxVisitor(ParseTreeVisitor):
@@ -82,13 +81,13 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Text = InputStream.getText(start, stop)
         return Text.replace('\n', '')
 
-    def __ErrorHandler(self, ReturnCode, LineNum, TokenValue=None, Message=None):
-        self.__ParserStatus += gCVfrErrorHandle.HandleError(ReturnCode, LineNum, Message)
+    def __ErrorHandler(self, ReturnCode, LineNum, TokenValue=None):
+        self.__ParserStatus += gCVfrErrorHandle.HandleError(ReturnCode, LineNum, TokenValue)
     
     def __CompareErrorHandler(self, ReturnCode, ExpectedCode, LineNum, TokenValue=None, ErrorMsg=None):
         if ReturnCode != ExpectedCode:
             self.__ParserStatus += 1
-            gCVfrErrorHandle.PrintMsg(LineNum, 'Error', ErrorMsg)
+            gCVfrErrorHandle.PrintMsg(LineNum, 'Error', ErrorMsg, TokenValue)
     
     # Visit a parse tree produced by VfrSyntaxParser#vfrProgram.
     def visitVfrProgram(self, ctx:VfrSyntaxParser.VfrProgramContext):

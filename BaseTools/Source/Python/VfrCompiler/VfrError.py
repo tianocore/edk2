@@ -1,7 +1,10 @@
 import imp
 import sys
+import os
 from enum import Enum
-
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from Common.BuildToolError import *
+import Common.EdkLogger as EdkLogger
 
 class VfrReturnCode(Enum) :
     VFR_RETURN_SUCCESS = 0
@@ -84,7 +87,7 @@ class EFI_VFR_WARNING_CODE(Enum) :
     VFR_WARNING_CODEUNDEFINED = 3
 
 
-VFR_WARNING_HANDLE_TABLE = {
+vfrWarningMessage = {
     EFI_VFR_WARNING_CODE.VFR_WARNING_DEFAULT_VALUE_REDEFINED:
     ": default value re-defined with different value",
     EFI_VFR_WARNING_CODE.VFR_WARNING_ACTION_WITH_TEXT_TWO:
@@ -94,20 +97,14 @@ VFR_WARNING_HANDLE_TABLE = {
     EFI_VFR_WARNING_CODE.VFR_WARNING_CODEUNDEFINED: ": undefined Warning Code"
 }
 
-def CheckErrorReturn(f, v) :
-    if f != v:
-        return f
     
-#class SVfrFileScopeRecord():
     
 class CVfrErrorHandle():
 
     def __init__(self):
         self.__InputFileName = None
-        self.__VfrErrorHandleTable = vfrErrorMessage
-        self.__VfrWarningHandleTable = VFR_WARNING_HANDLE_TABLE
-        self.__ScopeRecordListHead = None
-        self.__ScopeRecordListTail = None
+        self.__vfrErrorMessage = vfrErrorMessage
+        self.__vfrWarningMessage = vfrWarningMessage
         self.__WarningAsError = False
 
     def SetWarningAsError(self, WarningAsError):
@@ -115,30 +112,40 @@ class CVfrErrorHandle():
 
     def SetInputFile(self, InputFile):
         self.__InputFileName = InputFile
-
-    def ParseFileScopeRecord(self):
-        pass
-    
-    # def GetFileNameLineNum(self, LineNum):
     
     def HandleWarning(self, WarningCode, LineNum, TokenValue=None):
-        pass
+        if self.__vfrWarningMessage == None:
+            return 1
+        WarningMsg = ''
+        for key in self.__vfrWarningMessage.keys():
+            if WarningCode == self.__vfrWarningMessage[key]:
+                WarningMsg = self.__vfrWarningMessage[key]
+                break
+        if WarningMsg != '':
+            if self.__WarningAsError:
+                EdkLogger.error('VfrCompiler', WarningCode, WarningMsg, self.__InputFileName, LineNum, "warning treated as error")
+            EdkLogger.warn('VfrCompiler', WarningMsg, self.__InputFileName, LineNum, TokenValue)
+            
 
-    def PrintMsg(self, LineNum, MsgType = 'Error', ErrorMsg = None):
+    def PrintMsg(self, LineNum, MsgType = 'Error', ErrorMsg=None, TokenValue=None):
         if MsgType == 'Warning':
-            pass
+            EdkLogger.verbose(ErrorMsg)
+        else:
+            EdkLogger.error('VfrCompiler', 0x3000, ErrorMsg, self.__InputFileName, LineNum, TokenValue)
         
-
-    def HandleError(self, ErrorCode, LineNum=None, Message=None, TokenValue=None):
-        if self.__VfrErrorHandleTable == None:
+        
+    def HandleError(self, ErrorCode, LineNum=None, TokenValue=None):
+        if self.__vfrErrorMessage == None:
             return 1
         ErrorMsg = ''
-        for key in self.__VfrErrorHandleTable.keys():
-            if ErrorCode == self.__VfrErrorHandleTable[key]:
-                ErrorMsg = self.__VfrErrorHandleTable[key]
+        for key in self.__vfrErrorMessage.keys():
+            if ErrorCode == self.__vfrErrorMessage[key]:
+                ErrorMsg = self.__vfrErrorMessage[key]
                 break
         if ErrorMsg != '':
-            #EdkLogger.error('build', ErrorCode, ErrorMsg, None, LineNum, TokenValue)
+            EdkLogger.error('VfrCompiler', ErrorCode, ErrorMsg, self.__InputFileName, LineNum, TokenValue)
             return 1
         else:
             return 0
+
+gCVfrErrorHandle = CVfrErrorHandle()                                                                                                                                                                                                                                                                                                                

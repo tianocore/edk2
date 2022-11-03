@@ -20,7 +20,7 @@ def VfrParse(Infile, YamlOutFile,JsonOutFile):
     Visitor.DumpJson(JsonOutFile)
     
 if __name__ == '__main__':
-    Infile = "test.i"
+    Infile = 'test.i'
     YamlOutFile = 'test.yaml'
     JsonOutFile = 'test.json'
     VfrParse(Infile, YamlOutFile, JsonOutFile)

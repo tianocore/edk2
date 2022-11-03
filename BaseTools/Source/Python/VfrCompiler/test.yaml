@@ -40,28 +40,28 @@ Formset:
           prompt:  28  # Statement Prompt STRING_ID
           help:  80  # Statement Help STRING_ID
           text:  29  # Statement Help STRING_ID
-      - text:
+      - action:
           prompt:  84  # Statement Prompt STRING_ID
           help:  84  # Statement Help STRING_ID
           questionid:  4663  # Question QuestionId
           varstoreid:  0  # Question VarStoreId
           flags:  4  # Question Flags
           questionconfig:  0  # QuestionConfig
-      - text:
+      - action:
           prompt:  85  # Statement Prompt STRING_ID
           help:  85  # Statement Help STRING_ID
           questionid:  4664  # Question QuestionId
           varstoreid:  0  # Question VarStoreId
           flags:  4  # Question Flags
           questionconfig:  0  # QuestionConfig
-      - text:
+      - action:
           prompt:  87  # Statement Prompt STRING_ID
           help:  87  # Statement Help STRING_ID
           questionid:  4675  # Question QuestionId
           varstoreid:  0  # Question VarStoreId
           flags:  4  # Question Flags
           questionconfig:  0  # QuestionConfig
-      - text:
+      - action:
           prompt:  88  # Statement Prompt STRING_ID
           help:  88  # Statement Help STRING_ID
           questionid:  4676  # Question QuestionId
@@ -130,7 +130,7 @@ Formset:
           questionid:  4  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
           maxContainers:  8
-          flags:  0
+          flags:  16
           - option:  143
               option flag:  1
               option type:  1
@@ -158,7 +158,7 @@ Formset:
           questionid:  5  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
           maxContainers:  8
-          flags:  0
+          flags:  16
           - option:  39
               option flag:  0
               option type:  0
@@ -458,7 +458,7 @@ Formset:
           questionid:  4690  # Question QuestionId
           varstoreid:  4660  # Question VarStoreId
           maxContainers:  3
-          flags:  0
+          flags:  4
           - option:  39
               option flag:  0
               option type:  0
@@ -499,7 +499,7 @@ Formset:
               type:  1
               defaultId:  0
               value:  18
-      - text:
+      - action:
           prompt:  112  # Statement Prompt STRING_ID
           help:  113  # Statement Help STRING_ID
           questionid:  4912  # Question QuestionId
@@ -560,14 +560,14 @@ Formset:
               type:  6
               defaultId:  0
               value:  2004/1/1
-      - text:
+      - action:
           prompt:  89  # Statement Prompt STRING_ID
           help:  89  # Statement Help STRING_ID
           questionid:  4673  # Question QuestionId
           varstoreid:  0  # Question VarStoreId
           flags:  4  # Question Flags
           questionconfig:  0  # QuestionConfig
-      - text:
+      - action:
           prompt:  86  # Statement Prompt STRING_ID
           help:  86  # Statement Help STRING_ID
           questionid:  4674  # Question QuestionId
@@ -762,14 +762,14 @@ Formset:
   - form:
       FormId:  5  # FormId STRING_ID
       FormTitle:  102  # FormTitle STRING_ID
-      - text:
+      - action:
           prompt:  84  # Statement Prompt STRING_ID
           help:  84  # Statement Help STRING_ID
           questionid:  4677  # Question QuestionId
           varstoreid:  0  # Question VarStoreId
           flags:  4  # Question Flags
           questionconfig:  0  # QuestionConfig
-      - text:
+      - action:
           prompt:  85  # Statement Prompt STRING_ID
           help:  85  # Statement Help STRING_ID
           questionid:  4678  # Question QuestionId
