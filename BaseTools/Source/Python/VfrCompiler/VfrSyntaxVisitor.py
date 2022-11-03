@@ -35,6 +35,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.__ParserStatus = 0
         self.__CIfrOpHdrIndex = -1
         self.__ConstantOnlyInExpression = False
+        self.__UsedDefaultCount = 0
+        self.__UsedDefaultArray = []
 
         self.__CVfrRulesDB = CVfrRulesDB()
         self.__CIfrOpHdr = []  # MAX_IFR_EXPRESSION_DEPTH
@@ -331,6 +333,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.InsertChild(self.__Root, ctx)
         self.InsertChild(ctx.Node, ctx.classDefinition())
         self.InsertChild(ctx.Node, ctx.subclassDefinition())
+        Line = ctx.start.line
+        self.__DeclareStandardDefaultStorage(Line)
         
         self.visitChildren(ctx)
         ClassGuidNum = 0
@@ -339,7 +343,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             GuidList = ctx.classguidDefinition().GuidList
             ClassGuidNum = len(GuidList)
 
-        Line = ctx.start.line
         DefaultClassGuid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID
 
         if (self.__OverrideClassGuid != None and ClassGuidNum >=4):
@@ -397,7 +400,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         FSObj.SetHelp(self.__TransNum(ctx.Number(1)))
 
         ctx.Node.Data = FSObj
-        self.__DeclareStandardDefaultStorage(Line)
         #############################
         # Declare undefined Question so that they can be used in expression.
 
@@ -584,7 +586,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         ctx.Node.Data = VSObj
 
         return VSObj
-
 
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementVarStoreEfi.
@@ -1805,7 +1806,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.__ErrorHandler(ReturnCode, ctx.SN.line, ctx.SN.text)
             DObj.SetDefaultId(DefaultId)
 
-        self.__CheckDuplicateDefaultValue(DefaultId, ctx.Default())
+        self.__CheckDuplicateDefaultValue(DefaultId, ctx.D.line, ctx.D.text)
         if self.__CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
             VarStoreName, ReturnCode = gCVfrDataStorage.GetVarStoreName(self.__CurrQestVarInfo.VarStoreId)
             self.__ErrorHandler(ReturnCode, Line)
@@ -1919,10 +1920,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.__ErrorHandler(ReturnCode, Line)
             VarStoreGuid = gCVfrDataStorage.GetVarStoreGuid(self.__CurrQestVarInfo.VarStoreId)
             if OOOObj.GetFlags() & EFI_IFR_OPTION_DEFAULT:
-                self.__CheckDuplicateDefaultValue(EFI_HII_DEFAULT_CLASS_STANDARD, ctx.FLAGS()) #
+                self.__CheckDuplicateDefaultValue(EFI_HII_DEFAULT_CLASS_STANDARD, ctx.F.line, ctx.F.text) 
                 self.__ErrorHandler(gCVfrDefaultStore.BufferVarStoreAltConfigAdd(EFI_HII_DEFAULT_CLASS_STANDARD, self.__CurrQestVarInfo, VarStoreName, VarStoreGuid, self.__CurrQestVarInfo.VarType, Value), Line)
             if OOOObj.GetFlags() & EFI_IFR_OPTION_DEFAULT_MFG:
-                self.__CheckDuplicateDefaultValue(EFI_HII_DEFAULT_CLASS_MANUFACTURING, ctx.FLAGS()) #
+                self.__CheckDuplicateDefaultValue(EFI_HII_DEFAULT_CLASS_MANUFACTURING, ctx.F.line, ctx.F.text)
                 self.__ErrorHandler(gCVfrDefaultStore.BufferVarStoreAltConfigAdd(EFI_HII_DEFAULT_CLASS_MANUFACTURING, self.__CurrQestVarInfo, VarStoreName, VarStoreGuid, self.__CurrQestVarInfo.VarType, Value), Line)
 
         if ctx.Key() != None:
@@ -2041,10 +2042,16 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def __GetCurrQestVarInfo(self): #
         return self.__CurrQestVarInfo
 
-    def __CheckDuplicateDefaultValue(self, DefaultId,Tok): #
-        pass
-
-
+    def __CheckDuplicateDefaultValue(self, DefaultId, Line, TokenValue): 
+        for i in range(0, len(self.__UsedDefaultArray)):
+            if self.__UsedDefaultArray[i] == DefaultId:
+                gCVfrErrorHandle.HandleWarning(EFI_VFR_WARNING_CODE.VFR_WARNING_DEFAULT_VALUE_REDEFINED, Line, TokenValue)
+        
+        if len(self.__UsedDefaultArray) >= EFI_IFR_MAX_DEFAULT_TYPE - 1:
+            gCVfrErrorHandle.HandleError(VfrReturnCode.VFR_RETURN_FATAL_ERROR, Line, TokenValue)
+            
+        self.__UsedDefaultArray.append(DefaultId)
+        
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementCheckBox.
     def visitVfrStatementCheckBox(self, ctx:VfrSyntaxParser.VfrStatementCheckBoxContext):
 
@@ -2091,12 +2098,12 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 VarStoreGuid = gCVfrDataStorage.GetVarStoreGuid(self.__CurrQestVarInfo.VarStoreId)
                 self.gZeroEfiIfrTypeValue.b = True
                 if CBObj.GetFlags() & 0x01:
-                    self.__CheckDuplicateDefaultValue(EFI_HII_DEFAULT_CLASS_STANDARD, ctx.FLAGS())
+                    self.__CheckDuplicateDefaultValue(EFI_HII_DEFAULT_CLASS_STANDARD, ctx.F.line, ctx.F.text)
                     ReturnCode = gCVfrDefaultStore.BufferVarStoreAltConfigAdd(EFI_HII_DEFAULT_CLASS_STANDARD,self.__CurrQestVarInfo, VarStoreName, VarStoreGuid, self.__CurrQestVarInfo.VarType, self.gZeroEfiIfrTypeValue)
                     self.__CompareErrorHandler(ReturnCode, VfrReturnCode.VFR_RETURN_SUCCESS, Line, ctx.L.text, "No standard default storage found")
                 if CBObj.GetFlags() & 0x02:
-                    self.__CheckDuplicateDefaultValue(EFI_HII_DEFAULT_CLASS_STANDARD, ctx.FLAGS())
-                    ReturnCode =  gCVfrDefaultStore.BufferVarStoreAltConfigAdd(EFI_HII_DEFAULT_CLASS_MANUFACTURING,self.__CurrQestVarInfo, VarStoreName, VarStoreGuid, self.__CurrQestVarInfo.VarType, self.gZeroEfiIfrTypeValue)
+                    self.__CheckDuplicateDefaultValue(EFI_HII_DEFAULT_CLASS_MANUFACTURING, ctx.F.line, ctx.F.text)
+                    ReturnCode =  gCVfrDefaultStore.BufferVarStoreAltConfigAdd(EFI_HII_DEFAULT_CLASS_MANUFACTURING, self.__CurrQestVarInfo, VarStoreName, VarStoreGuid, self.__CurrQestVarInfo.VarType, self.gZeroEfiIfrTypeValue)
                     self.__CompareErrorHandler(ReturnCode, VfrReturnCode.VFR_RETURN_SUCCESS, Line, ctx.L.text, "No manufacturing default storage found")
         if ctx.Key() != None:
             Key = self.__TransNum(ctx.Number())

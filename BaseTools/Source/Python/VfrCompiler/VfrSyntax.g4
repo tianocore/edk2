@@ -580,18 +580,12 @@ vfrStatementQuestionTagList[Node]
 vfrStatementQuestionOptionTag // doing 
 locals[Node]
     :   vfrStatementSuppressIfQuest
+    |   vfrStatementGrayOutIfQuest
     |   vfrStatementValue
     |   vfrStatementDefault
     |   vfrStatementOptions
     |   vfrStatementRead
     |   vfrStatementWrite
-    ;
-
-vfrStatementSuppressIfQuest 
-locals[Node=VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
-    :   'suppressif' vfrStatementExpression ';'
-        vfrStatementQuestionOptionList[localctx.Node]
-        'endif' (';')?
     ;
 
 flagsField 
@@ -605,9 +599,26 @@ flagsField
     |   LateCheckFlag                          
     ;
 
+vfrStatementSuppressIfQuest 
+locals[Node=VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
+    :   'suppressif' vfrStatementExpression ';'
+        ('flags' '=' flagsField ('|' flagsField )* ',')?
+        vfrStatementQuestionOptionList[localctx.Node]
+        'endif' (';')?
+    ;
+
+vfrStatementGrayOutIfQuest
+locals[Node=VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
+    :   'grayoutif' vfrStatementExpression ';'
+        ('flags' '=' flagsField ('|' flagsField )* ',')?
+        vfrStatementQuestionOptionList[localctx.Node]
+        'endif' (';')?
+    ;
+
+
 vfrStatementDefault //pending
 locals[Node=VfrTreeNode(EFI_IFR_DEFAULT_OP)]   // DObj=None]
-    :   'default'
+    :   D='default'
         (   (   vfrStatementValue ','
             |   '=' vfrConstantValueField ','
             )
@@ -684,7 +695,7 @@ locals[Node=VfrTreeNode(EFI_IFR_CHECKBOX_OP), OpObj=CIfrCheckBox(), QType=EFI_QU
     :   L='checkbox'
         vfrQuestionBaseInfo[localctx.OpObj, localctx.QType] 
         vfrStatementHeader[localctx.OpObj] ','
-        ('flags' '=' vfrCheckBoxFlags ',')?
+        (F='flags' '=' vfrCheckBoxFlags ',')?
         ('key' '=' Number ',')?
         vfrStatementQuestionOptionList[localctx.Node]
         'endcheckbox' ';'
@@ -1144,12 +1155,12 @@ locals[Node=VfrTreeNode(EFI_IFR_MODAL_TAG_OP)]
     :   'modal' 
     ;
 
-vfrStatementExpression // to do
+vfrStatementExpression 
 locals[ExpInfo=ExpressionInfo()]
     :   andTerm[localctx.ExpInfo] ('OR' andTerm[localctx.ExpInfo])*
     ; 
     
-vfrStatementExpressionSub // pendingh how to do the rootlevel
+vfrStatementExpressionSub 
 locals[ExpInfo=ExpressionInfo()]
     :   andTerm[localctx.ExpInfo] ('OR' andTerm[localctx.ExpInfo])*
     ;
@@ -1286,9 +1297,9 @@ locals[MObj=None]
 vfrExpressionMatch2[ExpInfo]
 locals[M2Obj=None]
     :   'match2'
-        '(' vfrStatementExpressionSub',' ////////vfrStatementExpressionPattern
-        vfrStatementExpressionSub ','////////vfrStatementExpressionString
-        guidDefinition ')'/////////////////////////////
+        '(' vfrStatementExpressionSub',' 
+        vfrStatementExpressionSub ','
+        guidDefinition ')'
     ;
 
 vfrExpressionParen[ExpInfo]
@@ -1357,8 +1368,8 @@ locals[QId=EFI_QUESTION_ID_INVALID, Mask=0, VarIdStr='', Line=None]
     ;
 
 arrayName
-locals[SubStr='']
-    : StringIdentifier ('[' Number ']')?
+locals[SubStr='', SubStrZ='']
+    : StringIdentifier ('[' N=Number ']')?
     ;
 
 questionref1Exp[ExpInfo]

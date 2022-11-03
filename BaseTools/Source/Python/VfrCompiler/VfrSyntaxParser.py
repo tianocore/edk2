@@ -138,11 +138,11 @@ def serializedATN():
         buf.write("I\3I\5I\u056b\nI\3J\3J\3J\3J\3J\3K\3K\3K\3K\3K\3K\3K\3")
         buf.write("K\3L\3L\3L\3L\3L\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\5")
         buf.write("M\u058b\nM\3M\3M\3M\5M\u0590\nM\3N\7N\u0593\nN\fN\16N")
-        buf.write("\u0596\13N\3O\3O\3O\3O\3O\3O\3O\5O\u059f\nO\3P\3P\3P\3")
-        buf.write("P\3P\3P\7P\u05a7\nP\fP\16P\u05aa\13P\3P\3P\5P\u05ae\n")
-        buf.write("P\3P\3P\3P\3P\3P\5P\u05b5\nP\3Q\3Q\3Q\3Q\3Q\3Q\7Q\u05bd")
-        buf.write("\nQ\fQ\16Q\u05c0\13Q\3Q\3Q\5Q\u05c4\nQ\3Q\3Q\3Q\3Q\3Q")
-        buf.write("\5Q\u05cb\nQ\3R\3R\3S\3S\3S\3S\3S\3S\3S\3S\5S\u05d7\n")
+        buf.write("\u0596\13N\3O\3O\3O\3O\3O\3O\3O\5O\u059f\nO\3P\3P\3Q\3")
+        buf.write("Q\3Q\3Q\3Q\3Q\3Q\3Q\7Q\u05ab\nQ\fQ\16Q\u05ae\13Q\3Q\3")
+        buf.write("Q\5Q\u05b2\nQ\3Q\3Q\3Q\5Q\u05b7\nQ\3R\3R\3R\3R\3R\3R\3")
+        buf.write("R\3R\7R\u05c1\nR\fR\16R\u05c4\13R\3R\3R\5R\u05c8\nR\3")
+        buf.write("R\3R\3R\5R\u05cd\nR\3S\3S\3S\3S\3S\3S\3S\3S\5S\u05d7\n")
         buf.write("S\3S\3S\3S\3S\5S\u05dd\nS\3T\3T\3T\3T\3U\3U\3V\3V\3V\3")
         buf.write("V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\5V\u05f8")
         buf.write("\nV\3V\3V\7V\u05fc\nV\fV\16V\u05ff\13V\3V\3V\3W\3W\3W")
@@ -368,7 +368,7 @@ def serializedATN():
         buf.write("\u008e\u0549\3\2\2\2\u0090\u0564\3\2\2\2\u0092\u056c\3")
         buf.write("\2\2\2\u0094\u0571\3\2\2\2\u0096\u0579\3\2\2\2\u0098\u057e")
         buf.write("\3\2\2\2\u009a\u0594\3\2\2\2\u009c\u059e\3\2\2\2\u009e")
-        buf.write("\u05a0\3\2\2\2\u00a0\u05b6\3\2\2\2\u00a2\u05cc\3\2\2\2")
+        buf.write("\u05a0\3\2\2\2\u00a0\u05a2\3\2\2\2\u00a2\u05b8\3\2\2\2")
         buf.write("\u00a4\u05ce\3\2\2\2\u00a6\u05de\3\2\2\2\u00a8\u05e2\3")
         buf.write("\2\2\2\u00aa\u05e4\3\2\2\2\u00ac\u0602\3\2\2\2\u00ae\u0615")
         buf.write("\3\2\2\2\u00b0\u0617\3\2\2\2\u00b2\u061b\3\2\2\2\u00b4")
@@ -820,7 +820,7 @@ def serializedATN():
         buf.write("\7\b\2\2\u0531\u0532\7\u00ec\2\2\u0532\u0533\7\30\2\2")
         buf.write("\u0533\u0534\7\u00fa\2\2\u0534\u0535\7\31\2\2\u0535\u0542")
         buf.write("\7!\2\2\u0536\u0537\7@\2\2\u0537\u0538\7\b\2\2\u0538\u053d")
-        buf.write("\5\u00a2R\2\u0539\u053a\7(\2\2\u053a\u053c\5\u00a2R\2")
+        buf.write("\5\u009eP\2\u0539\u053a\7(\2\2\u053a\u053c\5\u009eP\2")
         buf.write("\u053b\u0539\3\2\2\2\u053c\u053f\3\2\2\2\u053d\u053b\3")
         buf.write("\2\2\2\u053d\u053e\3\2\2\2\u053e\u0540\3\2\2\2\u053f\u053d")
         buf.write("\3\2\2\2\u0540\u0541\7!\2\2\u0541\u0543\3\2\2\2\u0542")
@@ -831,8 +831,8 @@ def serializedATN():
         buf.write("\62\2\2\u054b\u054c\7\b\2\2\u054c\u054d\7\u00ec\2\2\u054d")
         buf.write("\u054e\7\30\2\2\u054e\u054f\7\u00fa\2\2\u054f\u0550\7")
         buf.write("\31\2\2\u0550\u055d\7!\2\2\u0551\u0552\7@\2\2\u0552\u0553")
-        buf.write("\7\b\2\2\u0553\u0558\5\u00a2R\2\u0554\u0555\7(\2\2\u0555")
-        buf.write("\u0557\5\u00a2R\2\u0556\u0554\3\2\2\2\u0557\u055a\3\2")
+        buf.write("\7\b\2\2\u0553\u0558\5\u009eP\2\u0554\u0555\7(\2\2\u0555")
+        buf.write("\u0557\5\u009eP\2\u0556\u0554\3\2\2\2\u0557\u055a\3\2")
         buf.write("\2\2\u0558\u0556\3\2\2\2\u0558\u0559\3\2\2\2\u0559\u055b")
         buf.write("\3\2\2\2\u055a\u0558\3\2\2\2\u055b\u055c\7!\2\2\u055c")
         buf.write("\u055e\3\2\2\2\u055d\u0551\3\2\2\2\u055d\u055e\3\2\2\2")
@@ -860,31 +860,31 @@ def serializedATN():
         buf.write("\2\2\2\u0591\u0593\5\u008aF\2\u0592\u0591\3\2\2\2\u0593")
         buf.write("\u0596\3\2\2\2\u0594\u0592\3\2\2\2\u0594\u0595\3\2\2\2")
         buf.write("\u0595\u009b\3\2\2\2\u0596\u0594\3\2\2\2\u0597\u059f\5")
-        buf.write("\u009eP\2\u0598\u059f\5\u00a0Q\2\u0599\u059f\5\u00a6T")
+        buf.write("\u00a0Q\2\u0598\u059f\5\u00a2R\2\u0599\u059f\5\u00a6T")
         buf.write("\2\u059a\u059f\5\u00a4S\2\u059b\u059f\5\u00a8U\2\u059c")
         buf.write("\u059f\5\u00b0Y\2\u059d\u059f\5\u00b2Z\2\u059e\u0597\3")
         buf.write("\2\2\2\u059e\u0598\3\2\2\2\u059e\u0599\3\2\2\2\u059e\u059a")
         buf.write("\3\2\2\2\u059e\u059b\3\2\2\2\u059e\u059c\3\2\2\2\u059e")
-        buf.write("\u059d\3\2\2\2\u059f\u009d\3\2\2\2\u05a0\u05ad\7k\2\2")
-        buf.write("\u05a1\u05a2\7@\2\2\u05a2\u05a3\7\b\2\2\u05a3\u05a8\5")
-        buf.write("\u00a2R\2\u05a4\u05a5\7(\2\2\u05a5\u05a7\5\u00a2R\2\u05a6")
-        buf.write("\u05a4\3\2\2\2\u05a7\u05aa\3\2\2\2\u05a8\u05a6\3\2\2\2")
-        buf.write("\u05a8\u05a9\3\2\2\2\u05a9\u05ab\3\2\2\2\u05aa\u05a8\3")
-        buf.write("\2\2\2\u05ab\u05ac\7!\2\2\u05ac\u05ae\3\2\2\2\u05ad\u05a1")
-        buf.write("\3\2\2\2\u05ad\u05ae\3\2\2\2\u05ae\u05af\3\2\2\2\u05af")
-        buf.write("\u05b0\5\u0124\u0093\2\u05b0\u05b1\7 \2\2\u05b1\u05b2")
-        buf.write("\5\u00b4[\2\u05b2\u05b4\7s\2\2\u05b3\u05b5\7 \2\2\u05b4")
-        buf.write("\u05b3\3\2\2\2\u05b4\u05b5\3\2\2\2\u05b5\u009f\3\2\2\2")
-        buf.write("\u05b6\u05c3\7K\2\2\u05b7\u05b8\7@\2\2\u05b8\u05b9\7\b")
-        buf.write("\2\2\u05b9\u05be\5\u00a2R\2\u05ba\u05bb\7(\2\2\u05bb\u05bd")
-        buf.write("\5\u00a2R\2\u05bc\u05ba\3\2\2\2\u05bd\u05c0\3\2\2\2\u05be")
-        buf.write("\u05bc\3\2\2\2\u05be\u05bf\3\2\2\2\u05bf\u05c1\3\2\2\2")
-        buf.write("\u05c0\u05be\3\2\2\2\u05c1\u05c2\7!\2\2\u05c2\u05c4\3")
-        buf.write("\2\2\2\u05c3\u05b7\3\2\2\2\u05c3\u05c4\3\2\2\2\u05c4\u05c5")
-        buf.write("\3\2\2\2\u05c5\u05c6\5\u0124\u0093\2\u05c6\u05c7\7 \2")
-        buf.write("\2\u05c7\u05c8\5\u00b4[\2\u05c8\u05ca\7s\2\2\u05c9\u05cb")
-        buf.write("\7 \2\2\u05ca\u05c9\3\2\2\2\u05ca\u05cb\3\2\2\2\u05cb")
-        buf.write("\u00a1\3\2\2\2\u05cc\u05cd\t\6\2\2\u05cd\u00a3\3\2\2\2")
+        buf.write("\u059d\3\2\2\2\u059f\u009d\3\2\2\2\u05a0\u05a1\t\6\2\2")
+        buf.write("\u05a1\u009f\3\2\2\2\u05a2\u05a3\7k\2\2\u05a3\u05a4\5")
+        buf.write("\u0124\u0093\2\u05a4\u05b1\7 \2\2\u05a5\u05a6\7@\2\2\u05a6")
+        buf.write("\u05a7\7\b\2\2\u05a7\u05ac\5\u009eP\2\u05a8\u05a9\7(\2")
+        buf.write("\2\u05a9\u05ab\5\u009eP\2\u05aa\u05a8\3\2\2\2\u05ab\u05ae")
+        buf.write("\3\2\2\2\u05ac\u05aa\3\2\2\2\u05ac\u05ad\3\2\2\2\u05ad")
+        buf.write("\u05af\3\2\2\2\u05ae\u05ac\3\2\2\2\u05af\u05b0\7!\2\2")
+        buf.write("\u05b0\u05b2\3\2\2\2\u05b1\u05a5\3\2\2\2\u05b1\u05b2\3")
+        buf.write("\2\2\2\u05b2\u05b3\3\2\2\2\u05b3\u05b4\5\u00b4[\2\u05b4")
+        buf.write("\u05b6\7s\2\2\u05b5\u05b7\7 \2\2\u05b6\u05b5\3\2\2\2\u05b6")
+        buf.write("\u05b7\3\2\2\2\u05b7\u00a1\3\2\2\2\u05b8\u05b9\7K\2\2")
+        buf.write("\u05b9\u05ba\5\u0124\u0093\2\u05ba\u05c7\7 \2\2\u05bb")
+        buf.write("\u05bc\7@\2\2\u05bc\u05bd\7\b\2\2\u05bd\u05c2\5\u009e")
+        buf.write("P\2\u05be\u05bf\7(\2\2\u05bf\u05c1\5\u009eP\2\u05c0\u05be")
+        buf.write("\3\2\2\2\u05c1\u05c4\3\2\2\2\u05c2\u05c0\3\2\2\2\u05c2")
+        buf.write("\u05c3\3\2\2\2\u05c3\u05c5\3\2\2\2\u05c4\u05c2\3\2\2\2")
+        buf.write("\u05c5\u05c6\7!\2\2\u05c6\u05c8\3\2\2\2\u05c7\u05bb\3")
+        buf.write("\2\2\2\u05c7\u05c8\3\2\2\2\u05c8\u05c9\3\2\2\2\u05c9\u05ca")
+        buf.write("\5\u00b4[\2\u05ca\u05cc\7s\2\2\u05cb\u05cd\7 \2\2\u05cc")
+        buf.write("\u05cb\3\2\2\2\u05cc\u05cd\3\2\2\2\u05cd\u00a3\3\2\2\2")
         buf.write("\u05ce\u05d6\7c\2\2\u05cf\u05d0\5\u00a6T\2\u05d0\u05d1")
         buf.write("\7!\2\2\u05d1\u05d7\3\2\2\2\u05d2\u05d3\7\b\2\2\u05d3")
         buf.write("\u05d4\5Z.\2\u05d4\u05d5\7!\2\2\u05d5\u05d7\3\2\2\2\u05d6")
@@ -1174,23 +1174,23 @@ def serializedATN():
         buf.write("\u086a\u086b\3\2\2\2\u086b\u086d\3\2\2\2\u086c\u086a\3")
         buf.write("\2\2\2\u086d\u086e\7s\2\2\u086e\u086f\7 \2\2\u086f\u0105")
         buf.write("\3\2\2\2\u0870\u087d\7k\2\2\u0871\u0872\7@\2\2\u0872\u0873")
-        buf.write("\7\b\2\2\u0873\u0878\5\u00a2R\2\u0874\u0875\7(\2\2\u0875")
-        buf.write("\u0877\5\u00a2R\2\u0876\u0874\3\2\2\2\u0877\u087a\3\2")
+        buf.write("\7\b\2\2\u0873\u0878\5\u009eP\2\u0874\u0875\7(\2\2\u0875")
+        buf.write("\u0877\5\u009eP\2\u0876\u0874\3\2\2\2\u0877\u087a\3\2")
         buf.write("\2\2\u0878\u0876\3\2\2\2\u0878\u0879\3\2\2\2\u0879\u087b")
         buf.write("\3\2\2\2\u087a\u0878\3\2\2\2\u087b\u087c\7!\2\2\u087c")
         buf.write("\u087e\3\2\2\2\u087d\u0871\3\2\2\2\u087d\u087e\3\2\2\2")
         buf.write("\u087e\u087f\3\2\2\2\u087f\u0880\5\u0124\u0093\2\u0880")
         buf.write("\u0881\7 \2\2\u0881\u0107\3\2\2\2\u0882\u088f\7K\2\2\u0883")
-        buf.write("\u0884\7@\2\2\u0884\u0885\7\b\2\2\u0885\u088a\5\u00a2")
-        buf.write("R\2\u0886\u0887\7(\2\2\u0887\u0889\5\u00a2R\2\u0888\u0886")
+        buf.write("\u0884\7@\2\2\u0884\u0885\7\b\2\2\u0885\u088a\5\u009e")
+        buf.write("P\2\u0886\u0887\7(\2\2\u0887\u0889\5\u009eP\2\u0888\u0886")
         buf.write("\3\2\2\2\u0889\u088c\3\2\2\2\u088a\u0888\3\2\2\2\u088a")
         buf.write("\u088b\3\2\2\2\u088b\u088d\3\2\2\2\u088c\u088a\3\2\2\2")
         buf.write("\u088d\u088e\7!\2\2\u088e\u0890\3\2\2\2\u088f\u0883\3")
         buf.write("\2\2\2\u088f\u0890\3\2\2\2\u0890\u0891\3\2\2\2\u0891\u0892")
         buf.write("\5\u0124\u0093\2\u0892\u0893\7 \2\2\u0893\u0109\3\2\2")
         buf.write("\2\u0894\u08a1\7k\2\2\u0895\u0896\7@\2\2\u0896\u0897\7")
-        buf.write("\b\2\2\u0897\u089c\5\u00a2R\2\u0898\u0899\7(\2\2\u0899")
-        buf.write("\u089b\5\u00a2R\2\u089a\u0898\3\2\2\2\u089b\u089e\3\2")
+        buf.write("\b\2\2\u0897\u089c\5\u009eP\2\u0898\u0899\7(\2\2\u0899")
+        buf.write("\u089b\5\u009eP\2\u089a\u0898\3\2\2\2\u089b\u089e\3\2")
         buf.write("\2\2\u089c\u089a\3\2\2\2\u089c\u089d\3\2\2\2\u089d\u089f")
         buf.write("\3\2\2\2\u089e\u089c\3\2\2\2\u089f\u08a0\7!\2\2\u08a0")
         buf.write("\u08a2\3\2\2\2\u08a1\u0895\3\2\2\2\u08a1\u08a2\3\2\2\2")
@@ -1200,8 +1200,8 @@ def serializedATN():
         buf.write("\u08a9\3\2\2\2\u08a9\u08ab\3\2\2\2\u08aa\u08a8\3\2\2\2")
         buf.write("\u08ab\u08ac\7s\2\2\u08ac\u08ad\7 \2\2\u08ad\u010b\3\2")
         buf.write("\2\2\u08ae\u08bb\7K\2\2\u08af\u08b0\7@\2\2\u08b0\u08b1")
-        buf.write("\7\b\2\2\u08b1\u08b6\5\u00a2R\2\u08b2\u08b3\7(\2\2\u08b3")
-        buf.write("\u08b5\5\u00a2R\2\u08b4\u08b2\3\2\2\2\u08b5\u08b8\3\2")
+        buf.write("\7\b\2\2\u08b1\u08b6\5\u009eP\2\u08b2\u08b3\7(\2\2\u08b3")
+        buf.write("\u08b5\5\u009eP\2\u08b4\u08b2\3\2\2\2\u08b5\u08b8\3\2")
         buf.write("\2\2\u08b6\u08b4\3\2\2\2\u08b6\u08b7\3\2\2\2\u08b7\u08b9")
         buf.write("\3\2\2\2\u08b8\u08b6\3\2\2\2\u08b9\u08ba\7!\2\2\u08ba")
         buf.write("\u08bc\3\2\2\2\u08bb\u08af\3\2\2\2\u08bb\u08bc\3\2\2\2")
@@ -1214,7 +1214,7 @@ def serializedATN():
         buf.write("\7\b\2\2\u08cb\u08cc\7\u00ec\2\2\u08cc\u08cd\7\30\2\2")
         buf.write("\u08cd\u08ce\7\u00fa\2\2\u08ce\u08cf\7\31\2\2\u08cf\u08dc")
         buf.write("\7!\2\2\u08d0\u08d1\7@\2\2\u08d1\u08d2\7\b\2\2\u08d2\u08d7")
-        buf.write("\5\u00a2R\2\u08d3\u08d4\7(\2\2\u08d4\u08d6\5\u00a2R\2")
+        buf.write("\5\u009eP\2\u08d3\u08d4\7(\2\2\u08d4\u08d6\5\u009eP\2")
         buf.write("\u08d5\u08d3\3\2\2\2\u08d6\u08d9\3\2\2\2\u08d7\u08d5\3")
         buf.write("\2\2\2\u08d7\u08d8\3\2\2\2\u08d8\u08da\3\2\2\2\u08d9\u08d7")
         buf.write("\3\2\2\2\u08da\u08db\7!\2\2\u08db\u08dd\3\2\2\2\u08dc")
@@ -1246,8 +1246,8 @@ def serializedATN():
         buf.write("\u0919\u091a\7\b\2\2\u091a\u091b\7\u00ec\2\2\u091b\u091c")
         buf.write("\7\30\2\2\u091c\u091d\7\u00fa\2\2\u091d\u0929\7\31\2\2")
         buf.write("\u091e\u091f\7!\2\2\u091f\u0920\7@\2\2\u0920\u0921\7\b")
-        buf.write("\2\2\u0921\u0926\5\u00a2R\2\u0922\u0923\7(\2\2\u0923\u0925")
-        buf.write("\5\u00a2R\2\u0924\u0922\3\2\2\2\u0925\u0928\3\2\2\2\u0926")
+        buf.write("\2\2\u0921\u0926\5\u009eP\2\u0922\u0923\7(\2\2\u0923\u0925")
+        buf.write("\5\u009eP\2\u0924\u0922\3\2\2\2\u0925\u0928\3\2\2\2\u0926")
         buf.write("\u0924\3\2\2\2\u0926\u0927\3\2\2\2\u0927\u092a\3\2\2\2")
         buf.write("\u0928\u0926\3\2\2\2\u0929\u091e\3\2\2\2\u0929\u092a\3")
         buf.write("\2\2\2\u092a\u092f\3\2\2\2\u092b\u092c\7!\2\2\u092c\u092d")
@@ -1553,8 +1553,8 @@ def serializedATN():
         buf.write("\u0460\u0465\u046b\u046e\u0472\u0476\u047d\u0497\u04a1")
         buf.write("\u04a9\u04ad\u04b3\u04b7\u04e5\u04e9\u04f0\u04f6\u04fa")
         buf.write("\u0503\u0508\u0514\u051f\u052c\u053d\u0542\u0547\u0558")
-        buf.write("\u055d\u0562\u056a\u058a\u058f\u0594\u059e\u05a8\u05ad")
-        buf.write("\u05b4\u05be\u05c3\u05ca\u05d6\u05dc\u05f7\u05fd\u0607")
+        buf.write("\u055d\u0562\u056a\u058a\u058f\u0594\u059e\u05ac\u05b1")
+        buf.write("\u05b6\u05c2\u05c7\u05cc\u05d6\u05dc\u05f7\u05fd\u0607")
         buf.write("\u0615\u0622\u0627\u062b\u0636\u063c\u0647\u0650\u065a")
         buf.write("\u066c\u0671\u0675\u0680\u0686\u0690\u0697\u069f\u06a6")
         buf.write("\u06b2\u06bd\u06c0\u06cb\u06d0\u06da\u06e0\u06f3\u06f9")
@@ -1781,9 +1781,9 @@ class VfrSyntaxParser ( Parser ):
     RULE_vfrStatementWarningIf = 75
     RULE_vfrStatementQuestionTagList = 76
     RULE_vfrStatementQuestionOptionTag = 77
-    RULE_vfrStatementSuppressIfQuest = 78
-    RULE_vfrStatementGrayOutIfQuest = 79
-    RULE_flagsField = 80
+    RULE_flagsField = 78
+    RULE_vfrStatementSuppressIfQuest = 79
+    RULE_vfrStatementGrayOutIfQuest = 80
     RULE_vfrStatementDefault = 81
     RULE_vfrStatementValue = 82
     RULE_vfrStatementOptions = 83
@@ -1935,25 +1935,24 @@ class VfrSyntaxParser ( Parser ):
                    "vfrStatementRefresh", "vfrStatementVarstoreDevice", 
                    "vfrStatementRefreshEvent", "vfrStatementWarningIf", 
                    "vfrStatementQuestionTagList", "vfrStatementQuestionOptionTag", 
-                   "vfrStatementSuppressIfQuest", "vfrStatementGrayOutIfQuest", 
-                   "flagsField", "vfrStatementDefault", "vfrStatementValue", 
-                   "vfrStatementOptions", "vfrStatementOneOfOption", "vfrOneOfOptionFlags", 
-                   "oneofoptionFlagsField", "vfrStatementRead", "vfrStatementWrite", 
-                   "vfrStatementQuestionOptionList", "vfrStatementQuestionOption", 
-                   "vfrStatementBooleanType", "vfrStatementCheckBox", "vfrCheckBoxFlags", 
-                   "checkboxFlagsField", "vfrStatementAction", "vfrActionFlags", 
-                   "actionFlagsField", "vfrStatementNumericType", "vfrStatementNumeric", 
-                   "vfrSetMinMaxStep", "vfrNumericFlags", "numericFlagsField", 
-                   "vfrStatementOneOf", "vfrOneofFlagsField", "vfrStatementStringType", 
-                   "vfrStatementString", "vfrStringFlagsField", "stringFlagsField", 
-                   "vfrStatementPassword", "vfrPasswordFlagsField", "passwordFlagsField", 
-                   "vfrStatementOrderedList", "vfrOrderedListFlags", "orderedlistFlagsField", 
-                   "vfrStatementDate", "minMaxDateStepDefault", "vfrDateFlags", 
-                   "dateFlagsField", "vfrStatementTime", "minMaxTimeStepDefault", 
-                   "vfrTimeFlags", "timeFlagsField", "vfrStatementConditional", 
-                   "vfrStatementConditionalNew", "vfrStatementSuppressIfStat", 
-                   "vfrStatementGrayOutIfStat", "vfrStatementStatList", 
-                   "vfrStatementStatListOld", "vfrStatementDisableIfStat", 
+                   "flagsField", "vfrStatementSuppressIfQuest", "vfrStatementGrayOutIfQuest", 
+                   "vfrStatementDefault", "vfrStatementValue", "vfrStatementOptions", 
+                   "vfrStatementOneOfOption", "vfrOneOfOptionFlags", "oneofoptionFlagsField", 
+                   "vfrStatementRead", "vfrStatementWrite", "vfrStatementQuestionOptionList", 
+                   "vfrStatementQuestionOption", "vfrStatementBooleanType", 
+                   "vfrStatementCheckBox", "vfrCheckBoxFlags", "checkboxFlagsField", 
+                   "vfrStatementAction", "vfrActionFlags", "actionFlagsField", 
+                   "vfrStatementNumericType", "vfrStatementNumeric", "vfrSetMinMaxStep", 
+                   "vfrNumericFlags", "numericFlagsField", "vfrStatementOneOf", 
+                   "vfrOneofFlagsField", "vfrStatementStringType", "vfrStatementString", 
+                   "vfrStringFlagsField", "stringFlagsField", "vfrStatementPassword", 
+                   "vfrPasswordFlagsField", "passwordFlagsField", "vfrStatementOrderedList", 
+                   "vfrOrderedListFlags", "orderedlistFlagsField", "vfrStatementDate", 
+                   "minMaxDateStepDefault", "vfrDateFlags", "dateFlagsField", 
+                   "vfrStatementTime", "minMaxTimeStepDefault", "vfrTimeFlags", 
+                   "timeFlagsField", "vfrStatementConditional", "vfrStatementConditionalNew", 
+                   "vfrStatementSuppressIfStat", "vfrStatementGrayOutIfStat", 
+                   "vfrStatementStatList", "vfrStatementStatListOld", "vfrStatementDisableIfStat", 
                    "vfrStatementgrayoutIfSuppressIf", "vfrStatementsuppressIfGrayOutIf", 
                    "vfrStatementSuppressIfStatNew", "vfrStatementGrayOutIfStatNew", 
                    "vfrStatementInconsistentIfStat", "vfrStatementInvalid", 
@@ -9439,6 +9438,71 @@ class VfrSyntaxParser ( Parser ):
         return localctx
 
 
+    class FlagsFieldContext(ParserRuleContext):
+
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
+            super().__init__(parent, invokingState)
+            self.parser = parser
+
+        def Number(self):
+            return self.getToken(VfrSyntaxParser.Number, 0)
+
+        def InteractiveFlag(self):
+            return self.getToken(VfrSyntaxParser.InteractiveFlag, 0)
+
+        def ManufacturingFlag(self):
+            return self.getToken(VfrSyntaxParser.ManufacturingFlag, 0)
+
+        def DefaultFlag(self):
+            return self.getToken(VfrSyntaxParser.DefaultFlag, 0)
+
+        def ResetRequiredFlag(self):
+            return self.getToken(VfrSyntaxParser.ResetRequiredFlag, 0)
+
+        def ReconnectRequiredFlag(self):
+            return self.getToken(VfrSyntaxParser.ReconnectRequiredFlag, 0)
+
+        def NVAccessFlag(self):
+            return self.getToken(VfrSyntaxParser.NVAccessFlag, 0)
+
+        def LateCheckFlag(self):
+            return self.getToken(VfrSyntaxParser.LateCheckFlag, 0)
+
+        def getRuleIndex(self):
+            return VfrSyntaxParser.RULE_flagsField
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFlagsField" ):
+                return visitor.visitFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+
+
+    def flagsField(self):
+
+        localctx = VfrSyntaxParser.FlagsFieldContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 156, self.RULE_flagsField)
+        self._la = 0 # Token type
+        try:
+            self.enterOuterAlt(localctx, 1)
+            self.state = 1438
+            _la = self._input.LA(1)
+            if not(((((_la - 115)) & ~0x3f) == 0 and ((1 << (_la - 115)) & ((1 << (VfrSyntaxParser.DefaultFlag - 115)) | (1 << (VfrSyntaxParser.ManufacturingFlag - 115)) | (1 << (VfrSyntaxParser.InteractiveFlag - 115)) | (1 << (VfrSyntaxParser.NVAccessFlag - 115)) | (1 << (VfrSyntaxParser.ResetRequiredFlag - 115)) | (1 << (VfrSyntaxParser.ReconnectRequiredFlag - 115)) | (1 << (VfrSyntaxParser.LateCheckFlag - 115)))) != 0) or _la==VfrSyntaxParser.Number):
+                self._errHandler.recoverInline(self)
+            else:
+                self._errHandler.reportMatch(self)
+                self.consume()
+        except RecognitionException as re:
+            localctx.exception = re
+            self._errHandler.reportError(self, re)
+            self._errHandler.recover(self, re)
+        finally:
+            self.exitRule()
+        return localctx
+
+
     class VfrStatementSuppressIfQuestContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -9500,51 +9564,51 @@ class VfrSyntaxParser ( Parser ):
     def vfrStatementSuppressIfQuest(self):
 
         localctx = VfrSyntaxParser.VfrStatementSuppressIfQuestContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 156, self.RULE_vfrStatementSuppressIfQuest)
+        self.enterRule(localctx, 158, self.RULE_vfrStatementSuppressIfQuest)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 1438
+            self.state = 1440
             self.match(VfrSyntaxParser.SuppressIf)
-            self.state = 1451
+            self.state = 1441
+            self.vfrStatementExpression()
+            self.state = 1442
+            self.match(VfrSyntaxParser.Semicolon)
+            self.state = 1455
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==VfrSyntaxParser.FLAGS:
-                self.state = 1439
+                self.state = 1443
                 self.match(VfrSyntaxParser.FLAGS)
-                self.state = 1440
+                self.state = 1444
                 self.match(VfrSyntaxParser.T__5)
-                self.state = 1441
+                self.state = 1445
                 self.flagsField()
-                self.state = 1446
+                self.state = 1450
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 while _la==VfrSyntaxParser.BitWiseOr:
-                    self.state = 1442
+                    self.state = 1446
                     self.match(VfrSyntaxParser.BitWiseOr)
-                    self.state = 1443
+                    self.state = 1447
                     self.flagsField()
-                    self.state = 1448
+                    self.state = 1452
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
 
-                self.state = 1449
+                self.state = 1453
                 self.match(VfrSyntaxParser.Comma)
 
 
-            self.state = 1453
-            self.vfrStatementExpression()
-            self.state = 1454
-            self.match(VfrSyntaxParser.Semicolon)
-            self.state = 1455
+            self.state = 1457
             self.vfrStatementQuestionOptionList(localctx.Node)
-            self.state = 1456
-            self.match(VfrSyntaxParser.EndIf)
             self.state = 1458
+            self.match(VfrSyntaxParser.EndIf)
+            self.state = 1460
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,102,self._ctx)
             if la_ == 1:
-                self.state = 1457
+                self.state = 1459
                 self.match(VfrSyntaxParser.Semicolon)
 
 
@@ -9562,7 +9626,7 @@ class VfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_GRAY_OUT_IF_OP)
+            self.Node = VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)
 
         def GrayOutIf(self):
             return self.getToken(VfrSyntaxParser.GrayOutIf, 0)
@@ -9618,119 +9682,54 @@ class VfrSyntaxParser ( Parser ):
     def vfrStatementGrayOutIfQuest(self):
 
         localctx = VfrSyntaxParser.VfrStatementGrayOutIfQuestContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 158, self.RULE_vfrStatementGrayOutIfQuest)
+        self.enterRule(localctx, 160, self.RULE_vfrStatementGrayOutIfQuest)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 1460
+            self.state = 1462
             self.match(VfrSyntaxParser.GrayOutIf)
-            self.state = 1473
+            self.state = 1463
+            self.vfrStatementExpression()
+            self.state = 1464
+            self.match(VfrSyntaxParser.Semicolon)
+            self.state = 1477
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==VfrSyntaxParser.FLAGS:
-                self.state = 1461
+                self.state = 1465
                 self.match(VfrSyntaxParser.FLAGS)
-                self.state = 1462
+                self.state = 1466
                 self.match(VfrSyntaxParser.T__5)
-                self.state = 1463
+                self.state = 1467
                 self.flagsField()
-                self.state = 1468
+                self.state = 1472
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 while _la==VfrSyntaxParser.BitWiseOr:
-                    self.state = 1464
+                    self.state = 1468
                     self.match(VfrSyntaxParser.BitWiseOr)
-                    self.state = 1465
+                    self.state = 1469
                     self.flagsField()
-                    self.state = 1470
+                    self.state = 1474
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
 
-                self.state = 1471
+                self.state = 1475
                 self.match(VfrSyntaxParser.Comma)
 
 
-            self.state = 1475
-            self.vfrStatementExpression()
-            self.state = 1476
-            self.match(VfrSyntaxParser.Semicolon)
-            self.state = 1477
+            self.state = 1479
             self.vfrStatementQuestionOptionList(localctx.Node)
-            self.state = 1478
-            self.match(VfrSyntaxParser.EndIf)
             self.state = 1480
+            self.match(VfrSyntaxParser.EndIf)
+            self.state = 1482
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,105,self._ctx)
             if la_ == 1:
-                self.state = 1479
+                self.state = 1481
                 self.match(VfrSyntaxParser.Semicolon)
 
 
-        except RecognitionException as re:
-            localctx.exception = re
-            self._errHandler.reportError(self, re)
-            self._errHandler.recover(self, re)
-        finally:
-            self.exitRule()
-        return localctx
-
-
-    class FlagsFieldContext(ParserRuleContext):
-
-        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
-            super().__init__(parent, invokingState)
-            self.parser = parser
-
-        def Number(self):
-            return self.getToken(VfrSyntaxParser.Number, 0)
-
-        def InteractiveFlag(self):
-            return self.getToken(VfrSyntaxParser.InteractiveFlag, 0)
-
-        def ManufacturingFlag(self):
-            return self.getToken(VfrSyntaxParser.ManufacturingFlag, 0)
-
-        def DefaultFlag(self):
-            return self.getToken(VfrSyntaxParser.DefaultFlag, 0)
-
-        def ResetRequiredFlag(self):
-            return self.getToken(VfrSyntaxParser.ResetRequiredFlag, 0)
-
-        def ReconnectRequiredFlag(self):
-            return self.getToken(VfrSyntaxParser.ReconnectRequiredFlag, 0)
-
-        def NVAccessFlag(self):
-            return self.getToken(VfrSyntaxParser.NVAccessFlag, 0)
-
-        def LateCheckFlag(self):
-            return self.getToken(VfrSyntaxParser.LateCheckFlag, 0)
-
-        def getRuleIndex(self):
-            return VfrSyntaxParser.RULE_flagsField
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFlagsField" ):
-                return visitor.visitFlagsField(self)
-            else:
-                return visitor.visitChildren(self)
-
-
-
-
-    def flagsField(self):
-
-        localctx = VfrSyntaxParser.FlagsFieldContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 160, self.RULE_flagsField)
-        self._la = 0 # Token type
-        try:
-            self.enterOuterAlt(localctx, 1)
-            self.state = 1482
-            _la = self._input.LA(1)
-            if not(((((_la - 115)) & ~0x3f) == 0 and ((1 << (_la - 115)) & ((1 << (VfrSyntaxParser.DefaultFlag - 115)) | (1 << (VfrSyntaxParser.ManufacturingFlag - 115)) | (1 << (VfrSyntaxParser.InteractiveFlag - 115)) | (1 << (VfrSyntaxParser.NVAccessFlag - 115)) | (1 << (VfrSyntaxParser.ResetRequiredFlag - 115)) | (1 << (VfrSyntaxParser.ReconnectRequiredFlag - 115)) | (1 << (VfrSyntaxParser.LateCheckFlag - 115)))) != 0) or _la==VfrSyntaxParser.Number):
-                self._errHandler.recoverInline(self)
-            else:
-                self._errHandler.reportMatch(self)
-                self.consume()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -9746,6 +9745,7 @@ class VfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_DEFAULT_OP)
+            self.D = None # Token
             self.SN = None # Token
 
         def Default(self):
@@ -9791,7 +9791,7 @@ class VfrSyntaxParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 1484
-            self.match(VfrSyntaxParser.Default)
+            localctx.D = self.match(VfrSyntaxParser.Default)
 
             self.state = 1492
             self._errHandler.sync(self)
@@ -10542,6 +10542,7 @@ class VfrSyntaxParser ( Parser ):
             self.OpObj = CIfrCheckBox()
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
             self.L = None # Token
+            self.F = None # Token
 
         def vfrQuestionBaseInfo(self):
             return self.getTypedRuleContext(VfrSyntaxParser.VfrQuestionBaseInfoContext,0)
@@ -10570,9 +10571,6 @@ class VfrSyntaxParser ( Parser ):
         def CheckBox(self):
             return self.getToken(VfrSyntaxParser.CheckBox, 0)
 
-        def FLAGS(self):
-            return self.getToken(VfrSyntaxParser.FLAGS, 0)
-
         def vfrCheckBoxFlags(self):
             return self.getTypedRuleContext(VfrSyntaxParser.VfrCheckBoxFlagsContext,0)
 
@@ -10582,6 +10580,9 @@ class VfrSyntaxParser ( Parser ):
 
         def Number(self):
             return self.getToken(VfrSyntaxParser.Number, 0)
+
+        def FLAGS(self):
+            return self.getToken(VfrSyntaxParser.FLAGS, 0)
 
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementCheckBox
@@ -10615,7 +10616,7 @@ class VfrSyntaxParser ( Parser ):
             _la = self._input.LA(1)
             if _la==VfrSyntaxParser.FLAGS:
                 self.state = 1583
-                self.match(VfrSyntaxParser.FLAGS)
+                localctx.F = self.match(VfrSyntaxParser.FLAGS)
                 self.state = 1584
                 self.match(VfrSyntaxParser.T__5)
                 self.state = 1585
