@@ -463,7 +463,8 @@ class CVfrVarDataTypeDB(object):
         elif VarStr[s] == '[':
             s += 1
             try:
-                e = VarStr.index(']')
+                e = s + VarStr[s:].index(']')
+                
             except ValueError:
                 return None, None, None, VfrReturnCode.VFR_RETURN_DATA_STRING_ERROR
             else:

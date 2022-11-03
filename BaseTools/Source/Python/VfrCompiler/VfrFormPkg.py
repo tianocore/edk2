@@ -1660,13 +1660,6 @@ class CIfrSuppressIf(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__SuppressIf.Header,
                               EFI_IFR_SUPPRESS_IF_OP)
 
-class CIfrSuppressIf2(CIfrObj, CIfrOpHeader):
-
-    def __init__(self):
-        self.__SuppressIf = EFI_IFR_SUPPRESS_IF()
-        CIfrOpHeader.__init__(self, self.__SuppressIf.Header,
-                              EFI_IFR_SUPPRESS_IF_OP)
-
 class CIfrGrayOutIf(CIfrObj, CIfrOpHeader):
 
     def __init__(self):
