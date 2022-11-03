@@ -309,6 +309,7 @@ BuildHobs (
   EFI_HOB_FIRMWARE_VOLUME       *FvHob;
   UNIVERSAL_PAYLOAD_ACPI_TABLE  *AcpiTable;
   ACPI_BOARD_INFO               *AcpiBoardInfo;
+  EFI_HOB_HANDOFF_INFO_TABLE    *HobInfo;
 
   Hob.Raw           = (UINT8 *)BootloaderParameter;
   MinimalNeededSize = FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
@@ -368,7 +369,8 @@ BuildHobs (
     MemoryTop        = FreeMemoryTop;
   }
 
-  HobConstructor ((VOID *)(UINTN)MemoryBottom, (VOID *)(UINTN)MemoryTop, (VOID *)(UINTN)FreeMemoryBottom, (VOID *)(UINTN)FreeMemoryTop);
+  HobInfo           = HobConstructor ((VOID *)(UINTN)MemoryBottom, (VOID *)(UINTN)MemoryTop, (VOID *)(UINTN)FreeMemoryBottom, (VOID *)(UINTN)FreeMemoryTop);
+  HobInfo->BootMode = Hob.HandoffInformationTable->BootMode;
   //
   // From now on, mHobList will point to the new Hob range.
   //
