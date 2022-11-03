@@ -1,6 +1,7 @@
 ##  @file
 # Provides Shell 'acpiview' command functions
 #
+# Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
 # Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -32,6 +33,7 @@
   Parsers/Bgrt/BgrtParser.c
   Parsers/Dbg2/Dbg2Parser.c
   Parsers/Dsdt/DsdtParser.c
+  Parsers/Erst/ErstParser.c
   Parsers/Facs/FacsParser.c
   Parsers/Fadt/FadtParser.c
   Parsers/Gtdt/GtdtParser.c
