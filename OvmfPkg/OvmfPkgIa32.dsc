@@ -256,6 +256,7 @@
 
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  CcExitLib|UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
   VmgExitLib|UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
 
 [LibraryClasses.common.SEC]
@@ -985,6 +986,7 @@
   OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesSmm.inf {
     <LibraryClasses>
     VmgExitLib|UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
+    CcExitLib|UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
   }
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf {
