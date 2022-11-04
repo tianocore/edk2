@@ -39,7 +39,7 @@ provides the smallest overall firmware overhead.
 
 ## Statically Linking Cryptographic Services
 
-The figure below shows an example of a firmware modules that requires the use of
+The figure below shows an example of a firmware module that requires the use of
 cryptographic services. The cryptographic services are provided by three library
 classes called BaseCryptLib, TlsLib, and HashApiLib. These library classes are
 implemented using APIs from the OpenSSL project that are abstracted by the
@@ -49,7 +49,7 @@ full C runtime library for firmware components. Instead, the CryptoPkg includes
 the smallest subset of services required to build the OpenSSL project in the
 private library class called IntrinsicLib.
 
-The CryptoPkg provides several instances if the BaseCryptLib and OpensslLib with
+The CryptoPkg provides several instances of the BaseCryptLib and OpensslLib with
 different cryptographic service features and performance optimizations. The
 platform developer must select the correct instances based on cryptographic
 service requirements in each UEFI/PI firmware phase (SEC, PEI, DXE, UEFI,
@@ -97,9 +97,9 @@ linking is not available for SEC or UEFI RT modules.
 
 The EDK II modules/libraries that require cryptographic services use the same
 BaseCryptLib/TlsLib/HashApiLib APIs. This means no source changes are required
-to use static linking or dynamic linking. It is a platform configuration options
-to select static linking or dynamic linking. This choice can be make globally,
-per firmware module type, or individual modules.
+to use static linking or dynamic linking. It is a platform configuration option
+to select static linking or dynamic linking. This choice can be made globally,
+per firmware module type, or for individual modules.
 
 ```
 +===================+    +===================+     +===================+
@@ -159,7 +159,7 @@ The table below provides a summary of the supported cryptographic services. It
 indicates if the family or service is deprecated or recommended to not be used.
 It also shows which *CryptLib library instances support the family or service.
 If a cell is blank then the service or family is always disabled and the
-`PcdCryptoServiceFamilyEnable` settings for that family or service is ignored.
+`PcdCryptoServiceFamilyEnable` setting for that family or service is ignored.
 If the cell is not blank, then the service or family is configurable using
 `PcdCryptoServiceFamilyEnable` as long as the correct OpensslLib or TlsLib is
 also configured.
@@ -234,10 +234,10 @@ phases (SEC, PEI, DXE, UEFI, SMM, UEFI RT).
 
 The following table can be used to help select the best OpensslLib instance for
 each phase. The Size column only shows the estimated size increase for a
-compressed IA32/X64 modules that uses the cryptographic services with
+compressed IA32/X64 module that uses the cryptographic services with
 `OpensslLib.inf` as the baseline size. The actual size increase depends on the
 specific set of enabled cryptographic services. If ECC services are not
-required, then size can be reduced by using OpensslLib.inf instead of
+required, then the size can be reduced by using OpensslLib.inf instead of
 `OpensslLibFull.inf`. Performance optimization requires a size increase.
 
 | OpensslLib Instance     | SSL | ECC | Perf Opt | CPU Arch | Size  |
@@ -371,10 +371,10 @@ settings.
 
 ### UEFI Runtime Driver Library Mappings
 
-UEFI Runtime Drivers only supports static linking of cryptographic services.
-The following library mappings are recommended for UEFI Runtime Drivers. It uses
-the runtime specific version of the BaseCryptLib and the null version of the
-TlsLib because TLS services are not typically used in runtime.
+UEFI Runtime Drivers only support static linking of cryptographic services.
+The following library mappings are recommended for UEFI Runtime Drivers. They
+use the runtime specific version of the BaseCryptLib and the null version of the
+TlsLib because TLS services are not typically used at runtime.
 
 ```
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
@@ -394,7 +394,7 @@ configure the cryptographic services supported by the CryptoPei, CryptoDxe,
 and CryptoSmm modules.
 
 * `gEfiCryptoPkgTokenSpaceGuid.PcdHashApiLibPolicy` - This PCD indicates the
-  HASH algorithm to to use in the BaseHashApiLib to calculate hash of data. The
+  HASH algorithm to use in the BaseHashApiLib to calculate hash of data. The
   default hashing algorithm for BaseHashApiLib is set to HASH_ALG_SHA256.
   |  Setting   |    Algorithm     |
   |------------|------------------|
@@ -407,8 +407,8 @@ and CryptoSmm modules.
 * `gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable` - Enable/Disable
    the families and individual services produced by the EDK II Crypto
    Protocols/PPIs. The default is all services disabled. This Structured PCD is
-   associated with `PCD_CRYPTO_SERVICE_FAMILY_ENABLE` structure that defined in
-   `Include/Pcd/PcdCryptoServiceFamilyEnable.h`.
+   associated with the `PCD_CRYPTO_SERVICE_FAMILY_ENABLE` structure that is
+   defined in `Include/Pcd/PcdCryptoServiceFamilyEnable.h`.
 
    There are three layers of priority that determine if a specific family or
    individual cryptographic service is actually enabled in the CryptoPei,
@@ -420,15 +420,15 @@ and CryptoSmm modules.
       OpensslLib instance linked, then the service is always disabled.
    2) BaseCryptLib instance selection.
       * CryptoPei is always linked with the PeiCryptLib instance of the
-        BaseCryptLib library class. The table above have a column for the
+        BaseCryptLib library class. The table above has a column for the
         PeiCryptLib. If the family or service is blank, then that family or
         service is always disabled.
       * CryptoDxe is always linked with the BaseCryptLib instance of the
-        BaseCryptLib library class. The table above have a column for the
+        BaseCryptLib library class. The table above has a column for the
         BaseCryptLib. If the family or service is blank, then that family or
         service is always disabled.
       * CryptoSmm is always linked with the SmmCryptLib instance of the
-        BaseCryptLib library class. The table above have a column for the
+        BaseCryptLib library class. The table above has a column for the
         SmmCryptLib. If the family or service is blank, then that family or
         service is always disabled.
    3) If a family or service is enabled in the OpensslLib instance and it is
@@ -438,11 +438,11 @@ and CryptoSmm modules.
       bit fields for each family of services. All of the families are disabled
       by default. An entire family of services can be enabled by setting the
       family field to the value `PCD_CRYPTO_SERVICE_ENABLE_FAMILY`. Individual
-      services can be enabled by setting a single service name to `TRUE`.
-      Settings listed later in the DSC file have priority over settings earlier
-      in the DSC file, so it is legal for an entire family to be enabled first
-      and then a few individual services disabled by setting the service name to
-      `FALSE`.
+      services can be enabled by setting a single service name (bit) to `TRUE`.
+      Settings listed later in the DSC file have priority over settings listed
+      earlier in the DSC file, so it is valid for an entire family to be enabled
+      first and then for a few individual services to be disabled by setting
+      those service names to `FALSE`.
 
 #### Common PEI PcdCryptoServiceFamilyEnable Settings
 
