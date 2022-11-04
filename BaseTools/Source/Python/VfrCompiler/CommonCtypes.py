@@ -635,7 +635,7 @@ class EFI_IFR_EQ_ID_VAL_LIST(Structure):
         ('Header', EFI_IFR_OP_HEADER),
         ('QuestionId', c_uint16),
         ('ListLength', c_uint16),
-        ('ValueList', c_uint16 * 1),  #
+        ('ValueList', c_uint16),  #
     ]
 
 

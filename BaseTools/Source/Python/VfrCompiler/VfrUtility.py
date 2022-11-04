@@ -217,89 +217,7 @@ class CVfrVarDataTypeDB(object):
             pNewType.Next = None
             self.__RegisterNewType(pNewType)
             pNewType = None
-            
-            
 
-    def InternalTypesListInit2(self):
-
-        self.DeclareDataTypeBegin()
-        self.SetNewTypeName('UINT64')
-        self.SetNewTypeTotalSize(sizeof(ctypes.c_ulonglong))
-        self.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_64)
-        self.SetNewTypeAlign(sizeof(ctypes.c_ulonglong))
-        self.DeclareDataTypeEnd()
-
-
-        self.DeclareDataTypeBegin()
-        self.SetNewTypeName('UINT32')
-        self.SetNewTypeTotalSize(sizeof(ctypes.c_ulong))
-        self.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_32)
-        self.SetNewTypeAlign(sizeof(ctypes.c_ulong))
-        self.DeclareDataTypeEnd()
-        
-        self.DeclareDataTypeBegin()
-        self.SetNewTypeName('UINT16')
-        self.SetNewTypeTotalSize(sizeof(ctypes.c_ushort))
-        self.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_16)
-        self.SetNewTypeAlign(sizeof(ctypes.c_ushort))
-        self.DeclareDataTypeEnd()
-        
-        self.DeclareDataTypeBegin()
-        self.SetNewTypeName('UINT8')
-        self.SetNewTypeTotalSize(sizeof(ctypes.c_ubyte))
-        self.SetNewTypeType(EFI_IFR_TYPE_NUM_SIZE_8)
-        self.SetNewTypeAlign(sizeof(ctypes.c_ubyte))
-        self.DeclareDataTypeEnd()
-
-        self.DeclareDataTypeBegin()
-        self.SetNewTypeName('BOOLEAN')
-        self.SetNewTypeTotalSize(sizeof(ctypes.c_ubyte))
-        self.SetNewTypeType(EFI_IFR_TYPE_BOOLEAN)
-        self.SetNewTypeAlign(sizeof(ctypes.c_ubyte))
-        self.DeclareDataTypeEnd()
-
-        self.DeclareDataTypeBegin()
-        self.SetNewTypeName('EFI_GUID')
-        self.SetNewTypeTotalSize(sizeof(EFI_GUID))
-        self.SetNewTypeType(EFI_IFR_TYPE_OTHER)
-        self.SetNewTypeAlign(sizeof(c_ubyte * 8))
-        self.DeclareDataTypeEnd()
-
-        self.DeclareDataTypeBegin()
-        self.SetNewTypeName('EFI_HII_DATE')
-        self.SetNewTypeType(EFI_IFR_TYPE_DATE)
-        self.DataTypeAddField('Year', 'UINT16', 0, False)
-        self.DataTypeAddField('Month', 'UINT8', 0, False)
-        self.DataTypeAddField('Day', 'UINT8', 0, False)
-        self.DeclareDataTypeEnd()
-
-        self.DeclareDataTypeBegin()
-        self.SetNewTypeName('EFI_STRING_ID')
-        self.SetNewTypeTotalSize(sizeof(ctypes.c_ushort))
-        self.SetNewTypeType(EFI_IFR_TYPE_STRING)
-        self.SetNewTypeAlign(sizeof(ctypes.c_ushort))
-        self.DeclareDataTypeEnd()
-
-        self.DeclareDataTypeBegin()
-        self.SetNewTypeName('EFI_HII_TIME')
-        self.SetNewTypeType(EFI_IFR_TYPE_TIME)
-        self.DataTypeAddField('Hour', 'UINT8', 0, False)
-        self.DataTypeAddField('Minute', 'UINT8', 0, False)
-        self.DataTypeAddField('Second', 'UINT8', 0, False)
-        self.DeclareDataTypeEnd()
-
-        self.DeclareDataTypeBegin()
-        self.SetNewTypeName('EFI_HII_REF')
-        self.SetNewTypeType(EFI_IFR_TYPE_REF)
-        self.DataTypeAddField('QuestionId', 'UINT16', 0, False)
-        self.DataTypeAddField('FormId', 'UINT16', 0, False)
-        self.DataTypeAddField('FormSetGuid', 'EFI_GUID', 0, False)
-        self.DataTypeAddField('DevicePath', 'EFI_STRING_ID', 0, False)
-        self.SetNewTypeAlign(sizeof(EFI_GUID))
-        self.DeclareDataTypeEnd()
-
-
-    
     def GetDataTypeList(self):
         return self.__DataTypeList
 
@@ -900,7 +818,7 @@ class CVfrDefaultStore(object):
             pNode = pNode.Next
         if pNode == None:
             return VfrReturnCode.VFR_RETURN_UNDEFINED
-        # pNode.DefaultId sprintf (NewAltCfg, "%04x", pNode->mDefaultId); 对齐操作？
+        # pNode.DefaultId sprintf (NewAltCfg, "%04x", pNode->mDefaultId);？
         gCVfrBufferConfig.Open()
         if gCVfrBufferConfig.Select(VarStoreName, VarStoreGuid) == 0:
             Returnvalue = gCVfrBufferConfig.Write('a', VarStoreName,
@@ -1562,10 +1480,6 @@ class CVfrStringDB(object):
             f.close()
         except IOError:
             print('Error')
-
-    # PkgHeader =
-    #wip
-
 
 gCVfrStringDB = CVfrStringDB()
 

@@ -90,6 +90,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if ReturnCode != ExpectedCode:
             self.__ParserStatus += 1
             gCVfrErrorHandle.PrintMsg(LineNum, 'Error', ErrorMsg, TokenValue)
+
+    def __InsertChild(self, ParentNode: VfrTreeNode, ChildCtx):
+        if ChildCtx != None and ChildCtx.Node != None:
+            ParentNode.insertChild(ChildCtx.Node)
     
     # Visit a parse tree produced by VfrSyntaxParser#vfrProgram.
     def visitVfrProgram(self, ctx:VfrSyntaxParser.VfrProgramContext):
@@ -330,9 +334,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrFormSetDefinition.
     def visitVfrFormSetDefinition(self, ctx:VfrSyntaxParser.VfrFormSetDefinitionContext):
-        self.InsertChild(self.__Root, ctx)
-        self.InsertChild(ctx.Node, ctx.classDefinition())
-        self.InsertChild(ctx.Node, ctx.subclassDefinition())
+        self.__InsertChild(self.__Root, ctx)
+        self.__InsertChild(ctx.Node, ctx.classDefinition())
+        self.__InsertChild(ctx.Node, ctx.subclassDefinition())
         Line = ctx.start.line
         self.__DeclareStandardDefaultStorage(Line)
         
@@ -400,18 +404,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         FSObj.SetHelp(self.__TransNum(ctx.Number(1)))
 
         ctx.Node.Data = FSObj
-        #############################
         # Declare undefined Question so that they can be used in expression.
 
         return ctx.Node
-
-    def InsertChild(self, ParentNode: VfrTreeNode, ChildCtx):
-        if ChildCtx != None and ChildCtx.Node != None:
-            ParentNode.insertChild(ChildCtx.Node)
-
-    def __ShowGuid(self, guid):
-        print('data1:' + str(guid.Data1) + ' data2:' + str(guid.Data2) + ' data3:' + str(guid.Data3) + ' data4:' +
-              str(guid.Data4[0]) + ' ' + str(guid.Data4[1]) + ' ' + str(guid.Data4[2]) +' ' + str(guid.Data4[3])+' ' + str(guid.Data4[4]) +' ' + str(guid.Data4[5]) +' ' + str(guid.Data4[6]) + ' ' + str(guid.Data4[7]))
 
     # Visit a parse tree produced by VfrSyntaxParser#classguidDefinition.
     def visitClassguidDefinition(self, ctx:VfrSyntaxParser.ClassguidDefinitionContext):
@@ -494,7 +489,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def visitVfrFormSetList(self, ctx:VfrSyntaxParser.VfrFormSetListContext):
         self.visitChildren(ctx)
         for Ctx in ctx.vfrFormSet():
-            self.InsertChild(ctx.Node, Ctx)
+            self.__InsertChild(ctx.Node, Ctx)
         
         return ctx.Node
 
@@ -627,12 +622,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         else:
             IsUEFI23EfiVarstore = False
             NameStringId = self.__TransNum(ctx.VN.text)
-            StoreName = gCVfrStringDB.GetVarStoreNameFromStringId(NameStringId) #############
+            StoreName = gCVfrStringDB.GetVarStoreNameFromStringId(NameStringId) #
             if StoreName == None:
-                self.__ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED, ctx.VN.line, 'Can\'t get varstore name for this StringId!')
+                gCVfrErrorHandle.HandleWarning(VfrReturnCode.VFR_RETURN_UNSUPPORTED, ctx.VN.line, 'Can\'t get varstore name for this StringId!')
             if not(CustomizedName):
                 self.__ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED, Line, 'Old style efivarstore must have String Identifier!')
-                return
             Size = self.__TransNum(ctx.N.text)
             if Size == 1: TypeName = 'UINT8'
             elif Size == 2: TypeName = 'UINT16'
@@ -648,8 +642,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
             self.__ErrorHandler(ReturnCode, Line)
         else:
-            #####################################################
-            self.__ErrorHandler(gCVfrDataStorage.DeclareBufferVarStore(self.__getText(ctx.TN), Guid, gCVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore, Attributes), Line)
+            self.__ErrorHandler(gCVfrDataStorage.DeclareBufferVarStore(self.__getText(ctx.TN), Guid, gCVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore, Attributes), Line) #
             VarStoreId, ReturnCode = gCVfrDataStorage.GetVarStoreId(self.__getText(ctx.TN), Guid) 
             self.__ErrorHandler(ReturnCode, ctx.VN.line, ctx.VN.text)
             Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
@@ -657,7 +650,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         VSEObj.SetGuid(Guid)
         VSEObj.SetVarStoreId (VarStoreId)
-        VSEObj.SetSize(Size) #
+        VSEObj.SetSize(Size) 
         VSEObj.SetName(StoreName)
 
         ctx.Node.Data = VSEObj
@@ -1125,7 +1118,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def visitVfrStatementStatTagList(self, ctx:VfrSyntaxParser.VfrStatementStatTagListContext):
         self.visitChildren(ctx)
         for Ctx in ctx.vfrStatementStatTag():
-            self.InsertChild(ctx.Node, Ctx)
+            self.__InsertChild(ctx.Node, Ctx)
         return ctx.Node
 
 
@@ -1143,7 +1136,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         ctx.Node.Data = FObj
         for Ctx in ctx.vfrForm():
-            self.InsertChild(ctx.Node, Ctx)
+            self.__InsertChild(ctx.Node, Ctx)
 
         return ctx.Node
 
@@ -1196,7 +1189,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 FMapObj.SetFormMapMethod(self.__TransNum(ctx.Number(i+1)), ctx.guidDefinition(i).Guid)
         ctx.Node.Data = FMapObj
         for Ctx in ctx.vfrForm():
-            self.InsertChild(ctx.Node, Ctx)
+            self.__InsertChild(ctx.Node, Ctx)
 
         return ctx.Node
 
@@ -1262,10 +1255,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             SObj.SetFlags(ctx.vfrSubtitleFlags().SubFlags)
 
         ctx.Node.Data = SObj
-        self.InsertChild(ctx.Node, ctx.vfrStatementStatTagList())
+        self.__InsertChild(ctx.Node, ctx.vfrStatementStatTagList())
         # sequence question
         for Ctx in ctx.vfrStatementSubTitleComponent():
-            self.InsertChild(ctx.Node, Ctx)
+            self.__InsertChild(ctx.Node, Ctx)
 
         return ctx.Node
 
@@ -1650,7 +1643,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def visitVfrStatementQuestionTagList(self, ctx:VfrSyntaxParser.VfrStatementQuestionTagListContext):
         self.visitChildren(ctx)
         for Ctx in ctx.vfrStatementQuestionTag():
-            self.InsertChild(ctx.Node, Ctx)
+            self.__InsertChild(ctx.Node, Ctx)
         return ctx.Node
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementQuestionOptionTag.
@@ -1700,10 +1693,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         return ctx.Node
     
-    
-    def OFFSET_OF(self, Type, Field):
-        pass
-
     # Visit a parse tree produced by VfrSyntaxParser#flagsField.
     def visitFlagsField(self, ctx:VfrSyntaxParser.FlagsFieldContext):
         return self.visitChildren(ctx)
@@ -1775,8 +1764,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 else:
                     Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(Type)
                     self.__ErrorHandler(ReturnCode, Line)
-
-            # Size += self.OFFSET_OF (EFI_IFR_DEFAULT, Value) #######
+                    
+            Size += EFI_IFR_DEFAULT.Value.offset
             if not ctx.vfrConstantValueField().ListType:
                 DObj = CIfrDefault(Size)
                 DObj.SetLineNo(Line)
@@ -1815,10 +1804,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if (IsExp == False) and (VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_BUFFER):
                 self.__ErrorHandler(gCVfrDefaultStore.BufferVarStoreAltConfigAdd(DefaultId,self.__CurrQestVarInfo,VarStoreName,VarGuid,self.__CurrQestVarInfo.VarType, Value), Line)
         ctx.Node.Data = DObj
-        self.InsertChild(ctx.Node, ctx.vfrStatementValue())
+        self.__InsertChild(ctx.Node, ctx.vfrStatementValue())
 
         return ctx.Node
-
 
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementValue.
@@ -1884,8 +1872,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             else:
                 Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(Type)
                 self.__ErrorHandler(ReturnCode, Line)
-        # Size + = offset
         
+        Size += EFI_IFR_ONE_OF_OPTION.Value.offset
         OOOObj = None
         if not ctx.vfrConstantValueField().ListType:
             OOOObj = CIfrOneOfOption(Size)
@@ -1935,7 +1923,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             OOOObj.SetScope(1) #
         ctx.Node.Data = OOOObj
         for Ctx in ctx.vfrImageTag():
-            self.InsertChild(ctx.Node, Ctx)
+            self.__InsertChild(ctx.Node, Ctx)
 
         return ctx.Node
 
@@ -2011,7 +1999,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         self.visitChildren(ctx)
         for Ctx in ctx.vfrStatementQuestionOption():
-            self.InsertChild(ctx.Node, Ctx)
+            self.__InsertChild(ctx.Node, Ctx)
 
         return ctx.Node
 
@@ -2925,14 +2913,13 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             DObj.SetPrompt(self.__TransNum(ctx.Number(0)))
             DObj.SetHelp(self.__TransNum(ctx.Number(1)))
 
-            # Size = OFFSET_OF (EFI_IFR_DEFAULT, Value) + sizeof (EFI_HII_DATE);
-            Size = 0
+            Size = EFI_IFR_DEFAULT.Value.offset + sizeof (EFI_HII_DATE)
             DefaultObj = CIfrDefault(Size, EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_DATE, ctx.Val)
             DefaultObj.SetLineNo(Line)
 
         ctx.Node.Data = DObj
         for Ctx in ctx.vfrStatementInconsistentIf():
-            self.InsertChild(ctx.Node, Ctx)
+            self.__InsertChild(ctx.Node, Ctx)
 
         return ctx.Node
 
@@ -3032,14 +3019,13 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             TObj.SetPrompt(self.__TransNum(ctx.Number(0)))
             TObj.SetHelp(self.__TransNum(ctx.Number(1)))
 
-            # Size = OFFSET_OF (EFI_IFR_DEFAULT, Value) + sizeof (EFI_HII_TIME);
-            Size = 0
+            Size = EFI_IFR_DEFAULT.Value.offset + sizeof (EFI_HII_TIME)
             DefaultObj = CIfrDefault(Size, EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_TIME, ctx.Val)
             DefaultObj.SetLineNo(Line)
 
         ctx.Node.Data = TObj
         for Ctx in ctx.vfrStatementInconsistentIf():
-            self.InsertChild(ctx.Node, Ctx)
+            self.__InsertChild(ctx.Node, Ctx)
         return ctx.Node
 
 
@@ -3160,7 +3146,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         ctx.Node.Condition = 'disableif' + ' ' + self.__ExtractOriginalText(ctx.vfrStatementExpression())
         self.visitChildren(ctx)
         for Ctx in ctx.vfrStatementStatList():
-            self.InsertChild(ctx.Node, Ctx)
+            self.__InsertChild(ctx.Node, Ctx)
         return ctx.Node
 
 
@@ -3172,7 +3158,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         ctx.Node.Condition = 'suppressif' + ' ' + self.__ExtractOriginalText(ctx.vfrStatementExpression())
         self.visitChildren(ctx)
         for Ctx in ctx.vfrStatementStatList():
-            self.InsertChild(ctx.Node, Ctx)
+            self.__InsertChild(ctx.Node, Ctx)
 
         return ctx.Node
 
@@ -3186,7 +3172,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         ctx.Node.Condition = 'grayoutif' + ' ' + self.__ExtractOriginalText(ctx.vfrStatementExpression())
         self.visitChildren(ctx)
         for Ctx in ctx.vfrStatementStatList():
-            self.InsertChild(ctx.Node, Ctx)
+            self.__InsertChild(ctx.Node, Ctx)
 
         return ctx.Node
 
@@ -3305,7 +3291,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         GuidObj.SetScope(1)
         ctx.Node.Data = GuidObj
         for Ctx in ctx.vfrStatementExtension():
-            self.InsertChild(ctx.Node, Ctx)
+            self.__InsertChild(ctx.Node, Ctx)
         return ctx.Node
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrExtensionData.
@@ -3385,8 +3371,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementExpression.
     def visitVfrStatementExpression(self, ctx:VfrSyntaxParser.VfrStatementExpressionContext):
-        # Root expression extension function called by other function.
-        #########################################################
+        # Root expression extension function called by other function. ##
         if ctx.ExpInfo.RootLevel == 0:
             self.__CIfrOpHdrIndex += 1
             if self.__CIfrOpHdrIndex >= MAX_IFR_EXPRESSION_DEPTH:
@@ -3417,7 +3402,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementExpressionSub.
     def visitVfrStatementExpressionSub(self, ctx:VfrSyntaxParser.VfrStatementExpressionSubContext):
-        # need more test, seems right
         ctx.ExpInfo.RootLevel = ctx.parentCtx.ExpInfo.RootLevel + 1
         ctx.ExpInfo.ExpOpCount = ctx.parentCtx.ExpInfo.ExpOpCount
 
@@ -3916,7 +3900,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by VfrSyntaxParser#ideqvallistExp.
     def visitIdeqvallistExp(self, ctx:VfrSyntaxParser.IdeqvallistExpContext):
         self.visitChildren(ctx)
-        '''
         Line = ctx.start.line
         Mask = ctx.vfrQuestionDataFieldName().Mask
         QId = ctx.vfrQuestionDataFieldName().QId
@@ -3935,17 +3918,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if QId != EFI_QUESTION_ID_INVALID:
                 EILObj.SetQuestionId(QId, VarIdStr, LineNo)
             EILObj.SetListLength(ListLen)  
-            for i in range(0, ListLen):
-                EILObj.SetValueList(i, ValueList[i])
-                
-            # ctypes里面的ValueList size为2,如果index大于2,如何modify ctypes struct里面的变量大小
-            #EILObj.UpdateIfrBuffer() 
-            
+            EILObj.SetValueList(ValueList)
             self.__SaveOpHdrCond(EILObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
             if QId == EFI_QUESTION_ID_INVALID:
                 EILObj.SetQuestionId(QId, VarIdStr, LineNo)
             ctx.ExpInfo.ExpOpCount += 1
-        '''
         return ctx.ExpInfo
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrQuestionDataFieldNameRule1.
@@ -4089,8 +4066,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             VarIdStr = ctx.vfrStorageVarId().VarIdStr
             QId, Mask, QType = self.__CVfrQuestionDB.GetQuestionId(None, VarIdStr, EFI_QUESION_TYPE.QUESTION_NORMAL)
             if (QId == EFI_QUESTION_ID_INVALID) or (Mask == 0) or (QType == EFI_QUESION_TYPE.QUESTION_NORMAL):
-                ReturnCode = VfrReturnCode.VFR_RETURN_UNSUPPORTED
-                print("Get/Set opcode can't get the enough varstore information")
+                self.__ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED, Line, "Get/Set opcode can't get the enough varstore information")
             if QType == EFI_QUESION_TYPE.QUESTION_DATE:
                 ctx.BaseInfo.VarType = EFI_IFR_TYPE_DATE
             elif QType == EFI_QUESION_TYPE.QUESTION_TIME:
@@ -4107,8 +4083,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             elif Mask == TIME_SECOND_BITMASK:
                 ctx.BaseInfo.VarOffset = 2
             else:
-                ReturnCode = VfrReturnCode.VFR_RETURN_UNSUPPORTED
-                print("Get/Set opcode can't get the enough varstore information")
+                self.__ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED, Line, "Get/Set opcode can't get the enough varstore information")
 
         else:
             VarType = EFI_IFR_TYPE_UNDEFINED
@@ -4116,23 +4091,19 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 VarType = ctx.numericVarStoreType().VarType
 
             if (gCVfrDataStorage.GetVarStoreType(ctx.BaseInfo.VarStoreId) == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_NAME) and (VarType == EFI_IFR_TYPE_UNDEFINED):
-                ReturnCode = VfrReturnCode.VFR_RETURN_UNSUPPORTED
-                print("Get/Set opcode don't support name string")
+                self.__ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED, Line, "Get/Set opcode don't support name string")
 
             if VarType != EFI_IFR_TYPE_UNDEFINED:
                 ctx.BaseInfo.VarType = VarType
                 Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(ctx.BaseInfo.VarType)
-                if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
-                    print("Get/Set opcode can't get var type size")
+                self.__ErrorHandler(ReturnCode, Line, "Get/Set opcode can't get var type size")
                 ctx.BaseInfo.VarTotalSize = Size
 
             Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(ctx.BaseInfo.VarType)
-            if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
-                print("Get/Set opcode can't get var type size")
+            self.__ErrorHandler(ReturnCode, Line, "Get/Set opcode can't get var type size")
 
             if Size != ctx.BaseInfo.VarTotalSize:
-                ReturnCode = VfrReturnCode.VFR_RETURN_UNSUPPORTED
-                print("Get/Set opcode don't support data array")
+                self.__ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED, Line, "Get/Set opcode don't support data array")
 
         ctx.GObj = CIfrGet(Line)
         self.__SaveOpHdrCond(ctx.GObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
@@ -4310,8 +4281,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             VarIdStr = ctx.vfrStorageVarId().VarIdStr
             QId, Mask, QType = self.__CVfrQuestionDB.GetQuestionId(None, VarIdStr, EFI_QUESION_TYPE.QUESTION_NORMAL)
             if (QId == EFI_QUESTION_ID_INVALID) or (Mask == 0) or (QType == EFI_QUESION_TYPE.QUESTION_NORMAL):
-                ReturnCode = VfrReturnCode.VFR_RETURN_UNSUPPORTED
-                print("Get/Set opcode can't get the enough varstore information")
+                self.__ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED, Line, "Get/Set opcode can't get the enough varstore information")
             if QType == EFI_QUESION_TYPE.QUESTION_DATE:
                 ctx.BaseInfo.VarType = EFI_IFR_TYPE_DATE
             elif QType == EFI_QUESION_TYPE.QUESTION_TIME:
@@ -4328,8 +4298,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             elif Mask == TIME_SECOND_BITMASK:
                 ctx.BaseInfo.VarOffset = 2
             else:
-                ReturnCode = VfrReturnCode.VFR_RETURN_UNSUPPORTED
-                print("Get/Set opcode can't get the enough varstore information")
+                self.__ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED, Line, "Get/Set opcode can't get the enough varstore information")
 
         else:
             VarType = EFI_IFR_TYPE_UNDEFINED
@@ -4337,23 +4306,19 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 VarType = ctx.numericVarStoreType().VarType
 
             if (gCVfrDataStorage.GetVarStoreType(ctx.BaseInfo.VarStoreId) == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_NAME) and (VarType == EFI_IFR_TYPE_UNDEFINED):
-                ReturnCode = VfrReturnCode.VFR_RETURN_UNSUPPORTED
-                print("Get/Set opcode don't support name string")
+                self.__ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED, Line, "Get/Set opcode don't support name string")
 
             if VarType != EFI_IFR_TYPE_UNDEFINED:
                 ctx.BaseInfo.VarType = VarType
                 Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(ctx.BaseInfo.VarType)
-                if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
-                    print("Get/Set opcode can't get var type size")
+                self.__ErrorHandler(ReturnCode, Line, "Get/Set opcode can't get var type size")
                 ctx.BaseInfo.VarTotalSize = Size
 
             Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(ctx.BaseInfo.VarType)
-            if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
-                print("Get/Set opcode can't get var type size")
+            self.__ErrorHandler(ReturnCode, Line, "Get/Set opcode can't get var type size")
 
             if Size != ctx.BaseInfo.VarTotalSize:
-                ReturnCode = VfrReturnCode.VFR_RETURN_UNSUPPORTED
-                print("Get/Set opcode don't support data array")
+                self.__ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED, Line, "Get/Set opcode don't support data array")
 
         ctx.TSObj = CIfrSet(Line)
         self.__SaveOpHdrCond(ctx.TSObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)

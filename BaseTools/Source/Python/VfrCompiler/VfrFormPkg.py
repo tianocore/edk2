@@ -1570,7 +1570,7 @@ class CIfrDefault3(CIfrObj, CIfrOpHeader):  #
         CIfrOpHeader.__init__(self, Header, EFI_IFR_DEFAULT_OP,
                               Size)
         self.__Default = Refine_EFI_IFR_DEFAULT(Nums)
-        self.__Default.header = Header
+        self.__Default.Header = Header 
         self.__Default.Type = Type
         self.__Default.DefaultId = DefaultId
         self.__ValueType = ValueType
@@ -2344,17 +2344,21 @@ class CIfrEqIdVal(CIfrObj, CIfrOpHeader):
 
 class CIfrEqIdList(CIfrObj, CIfrOpHeader):
 
-    def __init__(self, LineNo, Nums):
-        self.__EqIdVList = Refine_EFI_IFR_EQ_ID_VAL_LIST(Nums) # how to generate buffer
-        print(self.__EqIdVList.Header)
-        Header = CIfrOpHeader()
+    def __init__(self, LineNo, Nums, ValueList=[]):
+        self.__EqIdVList = Refine_EFI_IFR_EQ_ID_VAL_LIST(Nums) 
+        Header = EFI_IFR_OP_HEADER()
         CIfrOpHeader.__init__(self, Header, EFI_IFR_EQ_ID_VAL_OP)
         self.SetLineNo(LineNo)
-        self.__EqIdVList.header = Header
+        self.__EqIdVList.Header = Header
         self.__EqIdVList.QuestionId = EFI_QUESTION_ID_INVALID
         self.__EqIdVList.ListLength = 0
-        for i in range(0, Nums):
-            self.__EqIdVList.ValueList[i] = 0 #
+        if ValueList != []:
+            ArrayType = c_uint16 * Nums
+            ValueArray = ArrayType()
+            for i in range(0, len(ValueList)):
+                ValueArray[i] = ValueList[i]
+            self.__EqIdVList.ValueList = ValueArray
+            
 
     def SetQuestionId(self, QuestionId, VarIdStr, LineNo):
         if QuestionId != EFI_QUESTION_ID_INVALID:
@@ -2366,23 +2370,13 @@ class CIfrEqIdList(CIfrObj, CIfrOpHeader):
     def SetListLength(self, ListLength):
         self.__EqIdVList.ListLength = ListLength
 
-    '''
-    def UpdateIfrBuffer(self): #
-        ######### _EMIT_PENDING_OBJ();
-        EqIdVList = EFI_IFR_EQ_ID_VAL_LIST()
-        self.UpdateHeader(EqIdVList.Header)
-    '''
-
-    def SetValueList(self, Index, Value): # how to extend size
-
-        self.__EqIdVList.ValueList[Index] = Value
-        print(self.__EqIdVList.ValueList[Index])
-
-        '''
-        if self.ExpendObjBin(sizeof(c_uint16)) == True:
-            self.IncLength(sizeof(c_uint16))
-            self.__EqIdVList.ValueList[Index] = Value 
-        '''
+    def SetValueList(self, ValueList): 
+        if ValueList != []:
+            ArrayType = c_uint16 * len(ValueList)
+            ValueArray = ArrayType()
+            for i in range(0, len(ValueList)):
+                ValueArray[i] = ValueList[i]
+            self.__EqIdVList.ValueList = ValueArray
 
     def GetHeader(self):
         return self.__EqIdVList.Header
