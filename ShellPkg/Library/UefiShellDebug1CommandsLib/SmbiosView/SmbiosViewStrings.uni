@@ -1,6 +1,7 @@
 // /**
 //
 // Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 1985 - 2022, American Megatrends International LLC.<BR>
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
 // (C) Copyright 2015-2019 Hewlett Packard Enterprise Development LP<BR>
 // SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -417,6 +418,7 @@
 #string STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_SLOT_INFORMATION       #language en-US "System Slot Information: "
 #string STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_SLOT_HEIGHT            #language en-US "System Slot Height: "
 #string STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_SLOT_PHYSICAL_WIDTH    #language en-US "System Slot Physical Width: "
+#string STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_SLOT_PITCH             #language en-US "System Slot Pitch: %d\r\n"
 #string STR_SMBIOSVIEW_QUERYTABLE_ONBOARD_DEVICE_TYPE           #language en-US "Onboard Device Type: "
 #string STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_EVENT_LOG_TYPE         #language en-US "System Event Log Type: "
 #string STR_SMBIOSVIEW_QUERYTABLE_EVENT_LOG_VAR_DATA_FORMAT     #language en-US "Event Log Variable Data Format Types: "

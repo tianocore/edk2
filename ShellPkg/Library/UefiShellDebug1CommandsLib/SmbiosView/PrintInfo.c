@@ -638,12 +638,17 @@ SmbiosPrintStructure (
             ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DATA_BUS_WIDTH), gShellDebug1HiiHandle, PeerGroupPtr[Index].DataBusWidth);
           }
 
-          // Since PeerGroups has a variable number of entries, new fields added after PeerGroups are defined in
-          // a extended structure. Those fields can be referenced using SMBIOS_TABLE_TYPE9_EXTENDED structure.
-          Type9ExtendedStruct = (SMBIOS_TABLE_TYPE9_EXTENDED *)((UINT8 *)PeerGroupPtr + (PeerGroupCount * sizeof (MISC_SLOT_PEER_GROUP)));
-          DisplaySystemSlotHeight (Type9ExtendedStruct->SlotHeight, Option);
-          DisplaySystemSlotPhysicalWidth (Type9ExtendedStruct->SlotPhysicalWidth, Option);
-          DisplaySystemSlotInformation (Type9ExtendedStruct->SlotInformation, Option);
+          if (AE_SMBIOS_VERSION (0x3, 0x4)) {
+            // Since PeerGroups has a variable number of entries, new fields added after PeerGroups are defined in
+            // a extended structure. Those fields can be referenced using SMBIOS_TABLE_TYPE9_EXTENDED structure.
+            Type9ExtendedStruct = (SMBIOS_TABLE_TYPE9_EXTENDED *)((UINT8 *)PeerGroupPtr + (PeerGroupCount * sizeof (MISC_SLOT_PEER_GROUP)));
+            DisplaySystemSlotInformation (Type9ExtendedStruct->SlotInformation, Option);
+            DisplaySystemSlotPhysicalWidth (Type9ExtendedStruct->SlotPhysicalWidth, Option);
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_SLOT_PITCH), gShellDebug1HiiHandle, Type9ExtendedStruct->SlotPitch);
+            if (AE_SMBIOS_VERSION (0x3, 0x5)) {
+              DisplaySystemSlotHeight (Type9ExtendedStruct->SlotHeight, Option);
+            }
+          }
         }
       }
 
