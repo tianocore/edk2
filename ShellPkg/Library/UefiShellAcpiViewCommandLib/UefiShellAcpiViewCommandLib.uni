@@ -80,6 +80,7 @@
 "     Extra A. Particular types:\r\n"
 "       AEST  - Arm Error Source Table\r\n"
 "       APIC  - Multiple APIC Description Table (MADT)\r\n"
+"       APMT  - Arm Performance Monitoring Unit Table\r\n"
 "       BGRT  - Boot Graphics Resource Table\r\n"
 "       DBG2  - Debug Port Table 2\r\n"
 "       DSDT  - Differentiated System Description Table\r\n"
