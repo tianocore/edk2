@@ -24,14 +24,8 @@
   PrmContextBufferLib|PrmPkg/Library/DxePrmContextBufferLib/DxePrmContextBufferLib.inf
   PrmModuleDiscoveryLib|PrmPkg/Library/DxePrmModuleDiscoveryLib/DxePrmModuleDiscoveryLib.inf
   PrmPeCoffLib|PrmPkg/Library/DxePrmPeCoffLib/DxePrmPeCoffLib.inf
-  UefiBootServicesTableLib|PrmPkg/Test/UnitTest/Library/UefiBootServicesTableLibUnitTest/UefiBootServicesTableLibUnitTest.inf
 
 [Components]
-  #
-  # Unit test helper libraries
-  #
-  PrmPkg/Test/UnitTest/Library/UefiBootServicesTableLibUnitTest/UefiBootServicesTableLibUnitTest.inf
-
   #
   # Unit test host applications
   #
