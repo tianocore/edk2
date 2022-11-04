@@ -8,7 +8,7 @@ from VfrSyntaxParser import VfrSyntaxParser
 from VfrSyntaxVisitor import VfrSyntaxVisitor
 
 
-def VfrParse(Infile, YamlOutFile,JsonOutFile):
+def VfrParse(Infile, YamlOutFile, JsonOutFile):
     InputStream = FileStream(Infile)
     Lexer = VfrSyntaxLexer(InputStream)
     Stream = CommonTokenStream(Lexer)

@@ -595,8 +595,8 @@ flagsField
     |   DefaultFlag 
     |   ResetRequiredFlag 
     |   ReconnectRequiredFlag
-    |   NVAccessFlag                                     
-    |   LateCheckFlag                          
+    |   N=NVAccessFlag                                     
+    |   L=LateCheckFlag                          
     ;
 
 vfrStatementSuppressIfQuest 
@@ -628,7 +628,7 @@ locals[Node=VfrTreeNode(EFI_IFR_DEFAULT_OP)]   // DObj=None]
     ;
 
 vfrStatementValue 
-locals[Node=VfrTreeNode(EFI_IFR_VALUE_OP), LineNum=0]
+locals[Node=VfrTreeNode(EFI_IFR_VALUE_OP)]
     :   'value' '=' vfrStatementExpression 
     ;
 
@@ -727,7 +727,7 @@ locals[Node=VfrTreeNode(EFI_IFR_ACTION_OP),OpObj=CIfrAction(), QType=EFI_QUESION
     ;
 
 vfrActionFlags
-locals[HFlags=0, LineNum=0]
+locals[HFlags=0]
     :   actionFlagsField ('|' actionFlagsField)*
     ;
 actionFlagsField
@@ -856,7 +856,7 @@ locals[Node=VfrTreeNode(EFI_IFR_ORDERED_LIST_OP), OpObj=CIfrOrderedList(), QType
     ;
 
 vfrOrderedListFlags 
-locals[HFlags=0, LFlags=0, LineNum=0]
+locals[HFlags=0, LFlags=0]
     :   orderedlistFlagsField ('|' orderedlistFlagsField)*
     ;
 
@@ -903,7 +903,7 @@ minMaxDateStepDefault[Date, KeyValue]
     ;
 
 vfrDateFlags 
-locals[LFlags=0, LineNum=0]
+locals[LFlags=0]
     :   dateFlagsField ('|' dateFlagsField)*
     ;
 dateFlagsField 
@@ -953,7 +953,7 @@ minMaxTimeStepDefault[Time, KeyValue]
     ;
 
 vfrTimeFlags 
-locals[LFlags=0, LineNum=0]
+locals[LFlags=0]
     :   timeFlagsField ('|' timeFlagsField)*
     ;
 
@@ -1190,7 +1190,6 @@ locals[CIfrEqualList=[], CIfrNotEqualList=[]]
 
 
 equalTermSupplementary[CIfrEqualList, CIfrNotEqualList, ExpInfo]
-locals[Line=0]
     :   ('==' compareTerm[ExpInfo])  # equalTermEqualRule
         | 
         ('!=' compareTerm[ExpInfo]) # equalTermNotEqualRule
@@ -1203,7 +1202,6 @@ locals[CIfrLessThanList=[], CIfrLessEqualList=[], CIfrGreaterThanList=[], CIfrGr
     ;
 
 compareTermSupplementary[CIfrLessThanList, CIfrLessEqualList, CIfrGreaterThanList, CIfrGreaterEqualList, ExpInfo]
-locals[Line=0]
     :   ('<' shiftTerm[ExpInfo])   # compareTermLessRule
         |   
         ('<=' shiftTerm[ExpInfo])  #  compareTermLessEqualRule
@@ -1220,7 +1218,6 @@ locals[CIfrShiftLeftList=[], CIfrShiftRightList=[]]
     ;
 
 shiftTermSupplementary[CIfrShiftLeftList, CIfrShiftRightList, ExpInfo]
-locals[Line=0]
     :   ('<<' addMinusTerm[ExpInfo])  # shiftTermLeft
         |   
         ('>>' addMinusTerm[ExpInfo]) # shiftTermRight
@@ -1233,7 +1230,6 @@ locals[CIfrAddList=[], CIfrSubtractList=[]]
     ;
 
 addMinusTermSupplementary[CIfrAddList, CIfrSubtractList, ExpInfo]
-locals[Line=0]
     :   ('+' multdivmodTerm[ExpInfo]) # addMinusTermpAdd
         |   
         ('-' multdivmodTerm[ExpInfo]) # addMinusTermSubtract
@@ -1246,7 +1242,6 @@ locals[CIfrMultiplyList=[], CIfrDivideList=[], CIfrModuloList=[]]
     ;
 
 multdivmodTermSupplementary[CIfrMultiplyList, CIfrDivideList, CIfrModuloList, ExpInfo]
-locals[Line=0]
     :   ('*' castTerm[ExpInfo]) # multdivmodTermMul
         |
         ('/' castTerm[ExpInfo]) # multdivmodTermDiv

@@ -9,6 +9,7 @@ else:
 from CommonCtypes import *
 from VfrFormPkg import *
 from VfrUtility import *
+from VfrTree import *
 
 
 # This class defines a complete listener for a parse tree produced by VfrSyntaxParser.
@@ -266,6 +267,15 @@ class VfrSyntaxListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by VfrSyntaxParser#vfrFormSet.
+    def enterVfrFormSet(self, ctx:VfrSyntaxParser.VfrFormSetContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrFormSet.
+    def exitVfrFormSet(self, ctx:VfrSyntaxParser.VfrFormSetContext):
+        pass
+
+
     # Enter a parse tree produced by VfrSyntaxParser#vfrStatementDefaultStore.
     def enterVfrStatementDefaultStore(self, ctx:VfrSyntaxParser.VfrStatementDefaultStoreContext):
         pass
@@ -356,15 +366,6 @@ class VfrSyntaxListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementHeader.
-    def enterVfrStatementHeader(self, ctx:VfrSyntaxParser.VfrStatementHeaderContext):
-        pass
-
-    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementHeader.
-    def exitVfrStatementHeader(self, ctx:VfrSyntaxParser.VfrStatementHeaderContext):
-        pass
-
-
     # Enter a parse tree produced by VfrSyntaxParser#vfrQuestionHeader.
     def enterVfrQuestionHeader(self, ctx:VfrSyntaxParser.VfrQuestionHeaderContext):
         pass
@@ -380,6 +381,15 @@ class VfrSyntaxListener(ParseTreeListener):
 
     # Exit a parse tree produced by VfrSyntaxParser#vfrQuestionBaseInfo.
     def exitVfrQuestionBaseInfo(self, ctx:VfrSyntaxParser.VfrQuestionBaseInfoContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementHeader.
+    def enterVfrStatementHeader(self, ctx:VfrSyntaxParser.VfrStatementHeaderContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementHeader.
+    def exitVfrStatementHeader(self, ctx:VfrSyntaxParser.VfrStatementHeaderContext):
         pass
 
 
@@ -464,6 +474,15 @@ class VfrSyntaxListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by VfrSyntaxParser#vfrForm.
+    def enterVfrForm(self, ctx:VfrSyntaxParser.VfrFormContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrForm.
+    def exitVfrForm(self, ctx:VfrSyntaxParser.VfrFormContext):
+        pass
+
+
     # Enter a parse tree produced by VfrSyntaxParser#vfrFormMapDefinition.
     def enterVfrFormMapDefinition(self, ctx:VfrSyntaxParser.VfrFormMapDefinitionContext):
         pass
@@ -515,6 +534,15 @@ class VfrSyntaxListener(ParseTreeListener):
 
     # Exit a parse tree produced by VfrSyntaxParser#vfrStatementSubTitle.
     def exitVfrStatementSubTitle(self, ctx:VfrSyntaxParser.VfrStatementSubTitleContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementSubTitleComponent.
+    def enterVfrStatementSubTitleComponent(self, ctx:VfrSyntaxParser.VfrStatementSubTitleComponentContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementSubTitleComponent.
+    def exitVfrStatementSubTitleComponent(self, ctx:VfrSyntaxParser.VfrStatementSubTitleComponentContext):
         pass
 
 
@@ -698,12 +726,30 @@ class VfrSyntaxListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by VfrSyntaxParser#flagsField.
+    def enterFlagsField(self, ctx:VfrSyntaxParser.FlagsFieldContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#flagsField.
+    def exitFlagsField(self, ctx:VfrSyntaxParser.FlagsFieldContext):
+        pass
+
+
     # Enter a parse tree produced by VfrSyntaxParser#vfrStatementSuppressIfQuest.
     def enterVfrStatementSuppressIfQuest(self, ctx:VfrSyntaxParser.VfrStatementSuppressIfQuestContext):
         pass
 
     # Exit a parse tree produced by VfrSyntaxParser#vfrStatementSuppressIfQuest.
     def exitVfrStatementSuppressIfQuest(self, ctx:VfrSyntaxParser.VfrStatementSuppressIfQuestContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementGrayOutIfQuest.
+    def enterVfrStatementGrayOutIfQuest(self, ctx:VfrSyntaxParser.VfrStatementGrayOutIfQuestContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementGrayOutIfQuest.
+    def exitVfrStatementGrayOutIfQuest(self, ctx:VfrSyntaxParser.VfrStatementGrayOutIfQuestContext):
         pass
 
 
@@ -785,6 +831,15 @@ class VfrSyntaxListener(ParseTreeListener):
 
     # Exit a parse tree produced by VfrSyntaxParser#vfrStatementQuestionOptionList.
     def exitVfrStatementQuestionOptionList(self, ctx:VfrSyntaxParser.VfrStatementQuestionOptionListContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementQuestionOption.
+    def enterVfrStatementQuestionOption(self, ctx:VfrSyntaxParser.VfrStatementQuestionOptionContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementQuestionOption.
+    def exitVfrStatementQuestionOption(self, ctx:VfrSyntaxParser.VfrStatementQuestionOptionContext):
         pass
 
 
@@ -1085,21 +1140,12 @@ class VfrSyntaxListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementStatList.
-    def enterVfrStatementStatList(self, ctx:VfrSyntaxParser.VfrStatementStatListContext):
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementConditionalNew.
+    def enterVfrStatementConditionalNew(self, ctx:VfrSyntaxParser.VfrStatementConditionalNewContext):
         pass
 
-    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementStatList.
-    def exitVfrStatementStatList(self, ctx:VfrSyntaxParser.VfrStatementStatListContext):
-        pass
-
-
-    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementDisableIfStat.
-    def enterVfrStatementDisableIfStat(self, ctx:VfrSyntaxParser.VfrStatementDisableIfStatContext):
-        pass
-
-    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementDisableIfStat.
-    def exitVfrStatementDisableIfStat(self, ctx:VfrSyntaxParser.VfrStatementDisableIfStatContext):
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementConditionalNew.
+    def exitVfrStatementConditionalNew(self, ctx:VfrSyntaxParser.VfrStatementConditionalNewContext):
         pass
 
 
@@ -1118,6 +1164,114 @@ class VfrSyntaxListener(ParseTreeListener):
 
     # Exit a parse tree produced by VfrSyntaxParser#vfrStatementGrayOutIfStat.
     def exitVfrStatementGrayOutIfStat(self, ctx:VfrSyntaxParser.VfrStatementGrayOutIfStatContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementStatList.
+    def enterVfrStatementStatList(self, ctx:VfrSyntaxParser.VfrStatementStatListContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementStatList.
+    def exitVfrStatementStatList(self, ctx:VfrSyntaxParser.VfrStatementStatListContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementStatListOld.
+    def enterVfrStatementStatListOld(self, ctx:VfrSyntaxParser.VfrStatementStatListOldContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementStatListOld.
+    def exitVfrStatementStatListOld(self, ctx:VfrSyntaxParser.VfrStatementStatListOldContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementDisableIfStat.
+    def enterVfrStatementDisableIfStat(self, ctx:VfrSyntaxParser.VfrStatementDisableIfStatContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementDisableIfStat.
+    def exitVfrStatementDisableIfStat(self, ctx:VfrSyntaxParser.VfrStatementDisableIfStatContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementgrayoutIfSuppressIf.
+    def enterVfrStatementgrayoutIfSuppressIf(self, ctx:VfrSyntaxParser.VfrStatementgrayoutIfSuppressIfContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementgrayoutIfSuppressIf.
+    def exitVfrStatementgrayoutIfSuppressIf(self, ctx:VfrSyntaxParser.VfrStatementgrayoutIfSuppressIfContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementsuppressIfGrayOutIf.
+    def enterVfrStatementsuppressIfGrayOutIf(self, ctx:VfrSyntaxParser.VfrStatementsuppressIfGrayOutIfContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementsuppressIfGrayOutIf.
+    def exitVfrStatementsuppressIfGrayOutIf(self, ctx:VfrSyntaxParser.VfrStatementsuppressIfGrayOutIfContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementSuppressIfStatNew.
+    def enterVfrStatementSuppressIfStatNew(self, ctx:VfrSyntaxParser.VfrStatementSuppressIfStatNewContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementSuppressIfStatNew.
+    def exitVfrStatementSuppressIfStatNew(self, ctx:VfrSyntaxParser.VfrStatementSuppressIfStatNewContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementGrayOutIfStatNew.
+    def enterVfrStatementGrayOutIfStatNew(self, ctx:VfrSyntaxParser.VfrStatementGrayOutIfStatNewContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementGrayOutIfStatNew.
+    def exitVfrStatementGrayOutIfStatNew(self, ctx:VfrSyntaxParser.VfrStatementGrayOutIfStatNewContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementInconsistentIfStat.
+    def enterVfrStatementInconsistentIfStat(self, ctx:VfrSyntaxParser.VfrStatementInconsistentIfStatContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementInconsistentIfStat.
+    def exitVfrStatementInconsistentIfStat(self, ctx:VfrSyntaxParser.VfrStatementInconsistentIfStatContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementInvalid.
+    def enterVfrStatementInvalid(self, ctx:VfrSyntaxParser.VfrStatementInvalidContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementInvalid.
+    def exitVfrStatementInvalid(self, ctx:VfrSyntaxParser.VfrStatementInvalidContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementInvalidHidden.
+    def enterVfrStatementInvalidHidden(self, ctx:VfrSyntaxParser.VfrStatementInvalidHiddenContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementInvalidHidden.
+    def exitVfrStatementInvalidHidden(self, ctx:VfrSyntaxParser.VfrStatementInvalidHiddenContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementInvalidInventory.
+    def enterVfrStatementInvalidInventory(self, ctx:VfrSyntaxParser.VfrStatementInvalidInventoryContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementInvalidInventory.
+    def exitVfrStatementInvalidInventory(self, ctx:VfrSyntaxParser.VfrStatementInvalidInventoryContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementInvalidSaveRestoreDefaults.
+    def enterVfrStatementInvalidSaveRestoreDefaults(self, ctx:VfrSyntaxParser.VfrStatementInvalidSaveRestoreDefaultsContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementInvalidSaveRestoreDefaults.
+    def exitVfrStatementInvalidSaveRestoreDefaults(self, ctx:VfrSyntaxParser.VfrStatementInvalidSaveRestoreDefaultsContext):
         pass
 
 
@@ -1157,24 +1311,6 @@ class VfrSyntaxListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by VfrSyntaxParser#vfrExtensionDataComponent.
-    def enterVfrExtensionDataComponent(self, ctx:VfrSyntaxParser.VfrExtensionDataComponentContext):
-        pass
-
-    # Exit a parse tree produced by VfrSyntaxParser#vfrExtensionDataComponent.
-    def exitVfrExtensionDataComponent(self, ctx:VfrSyntaxParser.VfrExtensionDataComponentContext):
-        pass
-
-
-    # Enter a parse tree produced by VfrSyntaxParser#vfrExtensionDataDotArea.
-    def enterVfrExtensionDataDotArea(self, ctx:VfrSyntaxParser.VfrExtensionDataDotAreaContext):
-        pass
-
-    # Exit a parse tree produced by VfrSyntaxParser#vfrExtensionDataDotArea.
-    def exitVfrExtensionDataDotArea(self, ctx:VfrSyntaxParser.VfrExtensionDataDotAreaContext):
-        pass
-
-
     # Enter a parse tree produced by VfrSyntaxParser#vfrStatementModal.
     def enterVfrStatementModal(self, ctx:VfrSyntaxParser.VfrStatementModalContext):
         pass
@@ -1184,12 +1320,30 @@ class VfrSyntaxListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by VfrSyntaxParser#vfrModalTag.
+    def enterVfrModalTag(self, ctx:VfrSyntaxParser.VfrModalTagContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrModalTag.
+    def exitVfrModalTag(self, ctx:VfrSyntaxParser.VfrModalTagContext):
+        pass
+
+
     # Enter a parse tree produced by VfrSyntaxParser#vfrStatementExpression.
     def enterVfrStatementExpression(self, ctx:VfrSyntaxParser.VfrStatementExpressionContext):
         pass
 
     # Exit a parse tree produced by VfrSyntaxParser#vfrStatementExpression.
     def exitVfrStatementExpression(self, ctx:VfrSyntaxParser.VfrStatementExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrStatementExpressionSub.
+    def enterVfrStatementExpressionSub(self, ctx:VfrSyntaxParser.VfrStatementExpressionSubContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrStatementExpressionSub.
+    def exitVfrStatementExpressionSub(self, ctx:VfrSyntaxParser.VfrStatementExpressionSubContext):
         pass
 
 
@@ -1229,12 +1383,66 @@ class VfrSyntaxListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by VfrSyntaxParser#equalTermEqualRule.
+    def enterEqualTermEqualRule(self, ctx:VfrSyntaxParser.EqualTermEqualRuleContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#equalTermEqualRule.
+    def exitEqualTermEqualRule(self, ctx:VfrSyntaxParser.EqualTermEqualRuleContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#equalTermNotEqualRule.
+    def enterEqualTermNotEqualRule(self, ctx:VfrSyntaxParser.EqualTermNotEqualRuleContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#equalTermNotEqualRule.
+    def exitEqualTermNotEqualRule(self, ctx:VfrSyntaxParser.EqualTermNotEqualRuleContext):
+        pass
+
+
     # Enter a parse tree produced by VfrSyntaxParser#compareTerm.
     def enterCompareTerm(self, ctx:VfrSyntaxParser.CompareTermContext):
         pass
 
     # Exit a parse tree produced by VfrSyntaxParser#compareTerm.
     def exitCompareTerm(self, ctx:VfrSyntaxParser.CompareTermContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#compareTermLessRule.
+    def enterCompareTermLessRule(self, ctx:VfrSyntaxParser.CompareTermLessRuleContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#compareTermLessRule.
+    def exitCompareTermLessRule(self, ctx:VfrSyntaxParser.CompareTermLessRuleContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#compareTermLessEqualRule.
+    def enterCompareTermLessEqualRule(self, ctx:VfrSyntaxParser.CompareTermLessEqualRuleContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#compareTermLessEqualRule.
+    def exitCompareTermLessEqualRule(self, ctx:VfrSyntaxParser.CompareTermLessEqualRuleContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#compareTermGreaterRule.
+    def enterCompareTermGreaterRule(self, ctx:VfrSyntaxParser.CompareTermGreaterRuleContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#compareTermGreaterRule.
+    def exitCompareTermGreaterRule(self, ctx:VfrSyntaxParser.CompareTermGreaterRuleContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#compareTermGreaterEqualRule.
+    def enterCompareTermGreaterEqualRule(self, ctx:VfrSyntaxParser.CompareTermGreaterEqualRuleContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#compareTermGreaterEqualRule.
+    def exitCompareTermGreaterEqualRule(self, ctx:VfrSyntaxParser.CompareTermGreaterEqualRuleContext):
         pass
 
 
@@ -1247,6 +1455,24 @@ class VfrSyntaxListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by VfrSyntaxParser#shiftTermLeft.
+    def enterShiftTermLeft(self, ctx:VfrSyntaxParser.ShiftTermLeftContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#shiftTermLeft.
+    def exitShiftTermLeft(self, ctx:VfrSyntaxParser.ShiftTermLeftContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#shiftTermRight.
+    def enterShiftTermRight(self, ctx:VfrSyntaxParser.ShiftTermRightContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#shiftTermRight.
+    def exitShiftTermRight(self, ctx:VfrSyntaxParser.ShiftTermRightContext):
+        pass
+
+
     # Enter a parse tree produced by VfrSyntaxParser#addMinusTerm.
     def enterAddMinusTerm(self, ctx:VfrSyntaxParser.AddMinusTermContext):
         pass
@@ -1256,12 +1482,57 @@ class VfrSyntaxListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by VfrSyntaxParser#addMinusTermpAdd.
+    def enterAddMinusTermpAdd(self, ctx:VfrSyntaxParser.AddMinusTermpAddContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#addMinusTermpAdd.
+    def exitAddMinusTermpAdd(self, ctx:VfrSyntaxParser.AddMinusTermpAddContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#addMinusTermSubtract.
+    def enterAddMinusTermSubtract(self, ctx:VfrSyntaxParser.AddMinusTermSubtractContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#addMinusTermSubtract.
+    def exitAddMinusTermSubtract(self, ctx:VfrSyntaxParser.AddMinusTermSubtractContext):
+        pass
+
+
     # Enter a parse tree produced by VfrSyntaxParser#multdivmodTerm.
     def enterMultdivmodTerm(self, ctx:VfrSyntaxParser.MultdivmodTermContext):
         pass
 
     # Exit a parse tree produced by VfrSyntaxParser#multdivmodTerm.
     def exitMultdivmodTerm(self, ctx:VfrSyntaxParser.MultdivmodTermContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#multdivmodTermMul.
+    def enterMultdivmodTermMul(self, ctx:VfrSyntaxParser.MultdivmodTermMulContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#multdivmodTermMul.
+    def exitMultdivmodTermMul(self, ctx:VfrSyntaxParser.MultdivmodTermMulContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#multdivmodTermDiv.
+    def enterMultdivmodTermDiv(self, ctx:VfrSyntaxParser.MultdivmodTermDivContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#multdivmodTermDiv.
+    def exitMultdivmodTermDiv(self, ctx:VfrSyntaxParser.MultdivmodTermDivContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#multdivmodTermModulo.
+    def enterMultdivmodTermModulo(self, ctx:VfrSyntaxParser.MultdivmodTermModuloContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#multdivmodTermModulo.
+    def exitMultdivmodTermModulo(self, ctx:VfrSyntaxParser.MultdivmodTermModuloContext):
         pass
 
 
@@ -1301,6 +1572,15 @@ class VfrSyntaxListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by VfrSyntaxParser#vfrExpressionMatch2.
+    def enterVfrExpressionMatch2(self, ctx:VfrSyntaxParser.VfrExpressionMatch2Context):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrExpressionMatch2.
+    def exitVfrExpressionMatch2(self, ctx:VfrSyntaxParser.VfrExpressionMatch2Context):
+        pass
+
+
     # Enter a parse tree produced by VfrSyntaxParser#vfrExpressionParen.
     def enterVfrExpressionParen(self, ctx:VfrSyntaxParser.VfrExpressionParenContext):
         pass
@@ -1325,6 +1605,15 @@ class VfrSyntaxListener(ParseTreeListener):
 
     # Exit a parse tree produced by VfrSyntaxParser#dupExp.
     def exitDupExp(self, ctx:VfrSyntaxParser.DupExpContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vareqvalExp.
+    def enterVareqvalExp(self, ctx:VfrSyntaxParser.VareqvalExpContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vareqvalExp.
+    def exitVareqvalExp(self, ctx:VfrSyntaxParser.VareqvalExpContext):
         pass
 
 
@@ -1355,12 +1644,30 @@ class VfrSyntaxListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by VfrSyntaxParser#vfrQuestionDataFieldName.
-    def enterVfrQuestionDataFieldName(self, ctx:VfrSyntaxParser.VfrQuestionDataFieldNameContext):
+    # Enter a parse tree produced by VfrSyntaxParser#vfrQuestionDataFieldNameRule1.
+    def enterVfrQuestionDataFieldNameRule1(self, ctx:VfrSyntaxParser.VfrQuestionDataFieldNameRule1Context):
         pass
 
-    # Exit a parse tree produced by VfrSyntaxParser#vfrQuestionDataFieldName.
-    def exitVfrQuestionDataFieldName(self, ctx:VfrSyntaxParser.VfrQuestionDataFieldNameContext):
+    # Exit a parse tree produced by VfrSyntaxParser#vfrQuestionDataFieldNameRule1.
+    def exitVfrQuestionDataFieldNameRule1(self, ctx:VfrSyntaxParser.VfrQuestionDataFieldNameRule1Context):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#vfrQuestionDataFieldNameRule2.
+    def enterVfrQuestionDataFieldNameRule2(self, ctx:VfrSyntaxParser.VfrQuestionDataFieldNameRule2Context):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#vfrQuestionDataFieldNameRule2.
+    def exitVfrQuestionDataFieldNameRule2(self, ctx:VfrSyntaxParser.VfrQuestionDataFieldNameRule2Context):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#arrayName.
+    def enterArrayName(self, ctx:VfrSyntaxParser.ArrayNameContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#arrayName.
+    def exitArrayName(self, ctx:VfrSyntaxParser.ArrayNameContext):
         pass
 
 
@@ -1406,6 +1713,15 @@ class VfrSyntaxListener(ParseTreeListener):
 
     # Exit a parse tree produced by VfrSyntaxParser#securityExp.
     def exitSecurityExp(self, ctx:VfrSyntaxParser.SecurityExpContext):
+        pass
+
+
+    # Enter a parse tree produced by VfrSyntaxParser#numericVarStoreType.
+    def enterNumericVarStoreType(self, ctx:VfrSyntaxParser.NumericVarStoreTypeContext):
+        pass
+
+    # Exit a parse tree produced by VfrSyntaxParser#numericVarStoreType.
+    def exitNumericVarStoreType(self, ctx:VfrSyntaxParser.NumericVarStoreTypeContext):
         pass
 
 
@@ -1604,15 +1920,6 @@ class VfrSyntaxListener(ParseTreeListener):
 
     # Exit a parse tree produced by VfrSyntaxParser#vfrExpressionMap.
     def exitVfrExpressionMap(self, ctx:VfrSyntaxParser.VfrExpressionMapContext):
-        pass
-
-
-    # Enter a parse tree produced by VfrSyntaxParser#vfrExpressionMatch2.
-    def enterVfrExpressionMatch2(self, ctx:VfrSyntaxParser.VfrExpressionMatch2Context):
-        pass
-
-    # Exit a parse tree produced by VfrSyntaxParser#vfrExpressionMatch2.
-    def exitVfrExpressionMatch2(self, ctx:VfrSyntaxParser.VfrExpressionMatch2Context):
         pass
 
 
