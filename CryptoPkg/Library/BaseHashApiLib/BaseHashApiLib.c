@@ -6,7 +6,7 @@
   This API, when called, will calculate the Hash using the
   hashing algorithm specified by PcdHashApiLibPolicy.
 
-  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2020-2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -33,9 +33,11 @@ HashApiGetContextSize (
   )
 {
   switch (PcdGet32 (PcdHashApiLibPolicy)) {
+ #ifndef DISABLE_SHA1_DEPRECATED_INTERFACES
     case HASH_ALG_SHA1:
       return Sha1GetContextSize ();
       break;
+ #endif
 
     case HASH_ALG_SHA256:
       return Sha256GetContextSize ();
@@ -75,9 +77,11 @@ HashApiInit (
   )
 {
   switch (PcdGet32 (PcdHashApiLibPolicy)) {
+ #ifndef DISABLE_SHA1_DEPRECATED_INTERFACES
     case HASH_ALG_SHA1:
       return Sha1Init (HashContext);
       break;
+ #endif
 
     case HASH_ALG_SHA256:
       return Sha256Init (HashContext);
@@ -119,9 +123,11 @@ HashApiDuplicate (
   )
 {
   switch (PcdGet32 (PcdHashApiLibPolicy)) {
+ #ifndef DISABLE_SHA1_DEPRECATED_INTERFACES
     case HASH_ALG_SHA1:
       return Sha1Duplicate (HashContext, NewHashContext);
       break;
+ #endif
 
     case HASH_ALG_SHA256:
       return Sha256Duplicate (HashContext, NewHashContext);
@@ -165,9 +171,11 @@ HashApiUpdate (
   )
 {
   switch (PcdGet32 (PcdHashApiLibPolicy)) {
+ #ifndef DISABLE_SHA1_DEPRECATED_INTERFACES
     case HASH_ALG_SHA1:
       return Sha1Update (HashContext, DataToHash, DataToHashLen);
       break;
+ #endif
 
     case HASH_ALG_SHA256:
       return Sha256Update (HashContext, DataToHash, DataToHashLen);
@@ -209,9 +217,11 @@ HashApiFinal (
   )
 {
   switch (PcdGet32 (PcdHashApiLibPolicy)) {
+ #ifndef DISABLE_SHA1_DEPRECATED_INTERFACES
     case HASH_ALG_SHA1:
       return Sha1Final (HashContext, Digest);
       break;
+ #endif
 
     case HASH_ALG_SHA256:
       return Sha256Final (HashContext, Digest);
@@ -255,9 +265,11 @@ HashApiHashAll (
   )
 {
   switch (PcdGet32 (PcdHashApiLibPolicy)) {
+ #ifndef DISABLE_SHA1_DEPRECATED_INTERFACES
     case HASH_ALG_SHA1:
       return Sha1HashAll (DataToHash, DataToHashLen, Digest);
       break;
+ #endif
 
     case HASH_ALG_SHA256:
       return Sha256HashAll (DataToHash, DataToHashLen, Digest);
