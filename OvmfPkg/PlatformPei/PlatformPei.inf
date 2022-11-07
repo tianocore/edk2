@@ -63,7 +63,7 @@
   MtrrLib
   MemEncryptSevLib
   PcdLib
-  VmgExitLib
+  CcExitLib
   PlatformInitLib
 
 [Pcd]
