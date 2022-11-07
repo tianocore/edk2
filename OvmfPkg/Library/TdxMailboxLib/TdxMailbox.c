@@ -13,13 +13,9 @@
 #include <Library/UefiCpuLib.h>
 #include <Library/SynchronizationLib.h>
 #include <Uefi/UefiBaseType.h>
-#include <Library/TdxLib.h>
 #include <IndustryStandard/IntelTdx.h>
 #include <IndustryStandard/Tdx.h>
 #include <Library/TdxMailboxLib.h>
-
-volatile VOID  *mMailBox  = NULL;
-UINT32         mNumOfCpus = 0;
 
 /**
   This function will be called by BSP to get the CPU number.
@@ -32,11 +28,17 @@ GetCpusNum (
   VOID
   )
 {
-  if (mNumOfCpus == 0) {
-    mNumOfCpus = TdVCpuNum ();
+  UINT64          Status;
+  TD_RETURN_DATA  TdReturnData;
+
+  Status = TdCall (TDCALL_TDINFO, 0, 0, 0, &TdReturnData);
+  if (Status == TDX_EXIT_REASON_SUCCESS) {
+    return TdReturnData.TdInfo.NumVcpus;
+  } else {
+    DEBUG ((DEBUG_ERROR, "Failed call TDCALL_TDINFO. %llx\n", Status));
   }
 
-  return mNumOfCpus;
+  return 0;
 }
 
 /**
@@ -48,11 +50,7 @@ GetTdxMailBox (
   VOID
   )
 {
-  if (mMailBox == NULL) {
-    mMailBox = (VOID *)(UINTN)PcdGet32 (PcdOvmfSecGhcbBackupBase);
-  }
-
-  return mMailBox;
+  return (VOID *)(UINTN)PcdGet32 (PcdOvmfSecGhcbBackupBase);
 }
 
 /**
