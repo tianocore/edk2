@@ -21,7 +21,15 @@ ALIGN   16
 ; located just below 0x100000000 (4GB) in the firmware device.
 ;
 %ifdef ALIGN_TOP_TO_4K_FOR_PAGING
-    TIMES (0x1000 - ($ - EndOfPageTables) - 0x20) DB 0
+    TIMES (0x1000 - ($ - EndOfPageTables)) DB 0
+;
+; Pad the VTF0 Reset code for Bsp & Ap to 4k aligned block.
+; Some implementations may need to keep the initial Reset code
+; to be separated out from rest of the code.
+; This padding will make sure lower 4K region below 4 GB may
+; only contains few jmp instructions and data.
+;
+    TIMES (0x1000 - 0x20) DB 0
 %endif
 
 applicationProcessorEntryPoint:
