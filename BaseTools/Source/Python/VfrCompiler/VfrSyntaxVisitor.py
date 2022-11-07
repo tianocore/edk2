@@ -4493,6 +4493,34 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                         
                     pVsNode = pVsNode.Next
                 f.write('  }\n')
+                f.write('  \"Data\" : {\n')
+                pVsNode = gCVfrBufferConfig.GetVarItemList()
+                while pVsNode != None and pVsNode.Id != None:
+                    pInfoNode = pVsNode.InfoStrList
+                    while pInfoNode != None:
+                        f.write('    {\n')
+                        f.write('        \"VendorGuid\": ' + '\"{}, {}, {},'.format('0x%x'%(pVsNode.Guid.Data1),'0x%x'%(pVsNode.Guid.Data2), '0x%x'%(pVsNode.Guid.Data3)) \
+                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(pVsNode.Guid.Data4[0]), '0x%x'%(pVsNode.Guid.Data4[1]), '0x%x'%(pVsNode.Guid.Data4[2]), '0x%x'%(pVsNode.Guid.Data4[3]), \
+                        '0x%x'%(pVsNode.Guid.Data4[4]), '0x%x'%(pVsNode.Guid.Data4[5]), '0x%x'%(pVsNode.Guid.Data4[6]), '0x%x'%(pVsNode.Guid.Data4[7])) + ' }}\",\n')
+                        f.write('        \"VarName\": \"{}\",\n'.format(str(pVsNode.Name)))
+                        f.write('        \"DefaultStore\": \"{}\",\n'.format(str(pVsNode.Id)))
+                        f.write('        \"Size\": \"{}\",\n'.format(str(pInfoNode.Width)))
+                        f.write('        \"Offset\": {},\n'.format(str(pInfoNode.Offset)))
+                        f.write('        \"Value\": \"{}\"\n'.format(str(pInfoNode.Value)))
+                        if pVsNode.Next == None:
+                            f.write('      }\n')
+                        else:
+                            f.write('      },\n')
+                        pInfoNode = pInfoNode.Next
+                    pVsNode = pVsNode.Next
+                f.write('    {\n')
+                f.write('        \"VendorGuid\": \"NA\",\n')
+                f.write('        \"VarName\": \"NA\",\n')
+                f.write('        \"DefaultStore\": \"NA\",\n')
+                f.write('        \"Size\": 0,\n')
+                f.write('        \"Offset\": 0,\n')
+                f.write('        \"Value\": \"0x00\"\n')
+                f.write('    }\n')
                 f.write('}\n')
 
             f.close()
@@ -4502,6 +4530,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def DumpYaml(self, Root, FileName):
         try:
             with open(FileName, 'w') as f:
+                f.write('## DO NOT REMOVE -- VFR Mode\n')
                 self.DumpYamlDfs(Root, f)
             f.close()
         except:

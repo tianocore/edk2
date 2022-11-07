@@ -941,6 +941,9 @@ class CVfrBufferConfig(object):
         self.__ItemListTail = None
         self.__ItemListPos = None
 
+    def GetVarItemList(self):
+        return self.__ItemListHead
+
     @abstractmethod
     def Open(self):
         self.__ItemListPos = self.__ItemListHead

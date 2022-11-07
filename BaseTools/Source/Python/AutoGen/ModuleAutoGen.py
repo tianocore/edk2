@@ -439,7 +439,7 @@ class ModuleAutoGen(AutoGen):
         rt = []
         for SrcFile in self.SourceFileList:
             if SrcFile.Ext.lower() == '.vfr':
-                rt.append(os.path.join(self.OutputDir,os.path.join(os.path.dirname(SrcFile.File), "{}.i".format(SrcFile.BaseName))))
+                rt.append(os.path.join(self.OutputDir, "{}.i".format(SrcFile.BaseName)))
         return rt
 
     ## Return the path of custom file
