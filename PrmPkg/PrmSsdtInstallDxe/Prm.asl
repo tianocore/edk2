@@ -22,7 +22,7 @@ DefinitionBlock (
         Device (PRMT)
         {
             Name (_HID, "80860223")
-            Name (_CID, "80860223")
+            Name (_CID, EisaId ("PNP0C02"))
             Name (_DDN, "PRM Test Device")
 
             //PRM operation region format
