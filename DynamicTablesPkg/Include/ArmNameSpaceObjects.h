@@ -768,6 +768,17 @@ typedef struct CmArmProcHierarchyInfo {
   /// Token identifying a CM_ARM_OBJ_REF structure, itself referencing
   /// CM_ARM_LPI_INFO objects.
   CM_OBJECT_TOKEN    LpiToken;
+  /// Set to TRUE if UID should override index for name and _UID
+  /// for processor container nodes and name of processors.
+  /// This should be consistently set for containers or processors to avoid
+  /// duplicate values
+  BOOLEAN            OverrideNameUidEnabled;
+  /// If OverrideNameUidEnabled is TRUE then this value will be used for name of
+  /// processors and processor containers.
+  UINT16             OverrideName;
+  /// If OverrideNameUidEnabled is TRUE then this value will be used for
+  /// the UID of processor containers.
+  UINT32             OverrideUid;
 } CM_ARM_PROC_HIERARCHY_INFO;
 
 /** A structure that describes the Cache Type Structure (Type 1) in PPTT

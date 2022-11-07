@@ -305,6 +305,9 @@ STATIC CONST CM_OBJ_PARSER  CmArmProcHierarchyInfoParser[] = {
   { "NoOfPrivateResources",       4,                        "0x%x", NULL },
   { "PrivateResourcesArrayToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
   { "LpiToken",                   sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "OverrideNameUidEnabled",     1,                        "%d",   NULL },
+  { "OverrideName",               2,                        "0x%x", NULL },
+  { "OverrideUid",                4,                        "0x%x", NULL }
 };
 
 /** A parser for EArmObjCacheInfo.
