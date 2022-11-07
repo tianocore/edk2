@@ -1,11 +1,13 @@
 /** @file
   RNG Driver to produce the UEFI Random Number Generator protocol.
 
-  The driver will use the RNDR instruction to produce random numbers.
+  The driver can use RNDR instruction (through the RngLib and if FEAT_RNG is
+  present) to produce random numbers. It also uses the Arm FW-TRNG interface
+  to implement EFI_RNG_ALGORITHM_RAW.
 
   RNG Algorithms defined in UEFI 2.4:
    - EFI_RNG_ALGORITHM_SP800_90_CTR_256_GUID
-   - EFI_RNG_ALGORITHM_RAW                    - Unsupported
+   - EFI_RNG_ALGORITHM_RAW
    - EFI_RNG_ALGORITHM_SP800_90_HMAC_256_GUID
    - EFI_RNG_ALGORITHM_SP800_90_HASH_256_GUID
    - EFI_RNG_ALGORITHM_X9_31_3DES_GUID        - Unsupported
@@ -14,6 +16,7 @@
   Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
   Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -21,11 +24,25 @@
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/TimerLib.h>
+#include <Library/RngLib.h>
 #include <Protocol/Rng.h>
 
 #include "RngDxeInternals.h"
+
+/** Free mAvailableAlgoArray.
+**/
+VOID
+EFIAPI
+FreeAvailableAlgorithms (
+  VOID
+  )
+{
+  FreePool (mAvailableAlgoArray);
+  return;
+}
 
 /**
   Produces and returns an RNG value using either the default or specified RNG algorithm.
@@ -59,8 +76,9 @@ RngGetRNG (
   )
 {
   EFI_STATUS  Status;
+  UINTN       Index;
 
-  if ((RNGValueLength == 0) || (RNGValue == NULL)) {
+  if ((This == NULL) || (RNGValueLength == 0) || (RNGValue == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -68,12 +86,29 @@ RngGetRNG (
     //
     // Use the default RNG algorithm if RNGAlgorithm is NULL.
     //
-    RNGAlgorithm = PcdGetPtr (PcdCpuRngSupportedAlgorithm);
+    for (Index = 0; Index < mAvailableAlgoArrayCount; Index++) {
+      if (!IsZeroGuid (&mAvailableAlgoArray[Index])) {
+        RNGAlgorithm = &mAvailableAlgoArray[Index];
+        goto FoundAlgo;
+      }
+    }
+
+    if (Index == mAvailableAlgoArrayCount) {
+      // No algorithm available.
+      ASSERT (Index != mAvailableAlgoArrayCount);
+      return EFI_DEVICE_ERROR;
+    }
   }
 
+FoundAlgo:
   if (CompareGuid (RNGAlgorithm, PcdGetPtr (PcdCpuRngSupportedAlgorithm))) {
     Status = RngGetBytes (RNGValueLength, RNGValue);
     return Status;
+  }
+
+  // Raw algorithm (Trng)
+  if (CompareGuid (RNGAlgorithm, &gEfiRngAlgorithmRaw)) {
+    return GenerateEntropy (RNGValueLength, RNGValue);
   }
 
   //
@@ -85,6 +120,7 @@ RngGetRNG (
 /**
   Returns information about the random number generation implementation.
 
+  @param[in]     This                 A pointer to the EFI_RNG_PROTOCOL instance.
   @param[in,out] RNGAlgorithmListSize On input, the size in bytes of RNGAlgorithmList.
                                       On output with a return code of EFI_SUCCESS, the size
                                       in bytes of the data returned in RNGAlgorithmList. On output
@@ -97,30 +133,45 @@ RngGetRNG (
                                       is the default algorithm for the driver.
 
   @retval EFI_SUCCESS                 The RNG algorithm list was returned successfully.
+  @retval EFI_UNSUPPORTED             The services is not supported by this driver.
+  @retval EFI_DEVICE_ERROR            The list of algorithms could not be retrieved due to a
+                                      hardware or firmware error.
+  @retval EFI_INVALID_PARAMETER       One or more of the parameters are incorrect.
   @retval EFI_BUFFER_TOO_SMALL        The buffer RNGAlgorithmList is too small to hold the result.
 
 **/
-UINTN
+EFI_STATUS
 EFIAPI
-ArchGetSupportedRngAlgorithms (
-  IN OUT UINTN              *RNGAlgorithmListSize,
-  OUT    EFI_RNG_ALGORITHM  *RNGAlgorithmList
+RngGetInfo (
+  IN EFI_RNG_PROTOCOL    *This,
+  IN OUT UINTN           *RNGAlgorithmListSize,
+  OUT EFI_RNG_ALGORITHM  *RNGAlgorithmList
   )
 {
-  UINTN              RequiredSize;
-  EFI_RNG_ALGORITHM  *CpuRngSupportedAlgorithm;
+  UINTN  RequiredSize;
 
-  RequiredSize = sizeof (EFI_RNG_ALGORITHM);
+  if ((This == NULL) || (RNGAlgorithmListSize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  RequiredSize = mAvailableAlgoArrayCount * sizeof (EFI_RNG_ALGORITHM);
+
+  if (RequiredSize == 0) {
+    // No supported algorithms found.
+    return EFI_UNSUPPORTED;
+  }
 
   if (*RNGAlgorithmListSize < RequiredSize) {
     *RNGAlgorithmListSize = RequiredSize;
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  CpuRngSupportedAlgorithm = PcdGetPtr (PcdCpuRngSupportedAlgorithm);
+  if (RNGAlgorithmList == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-  CopyMem (&RNGAlgorithmList[0], CpuRngSupportedAlgorithm, sizeof (EFI_RNG_ALGORITHM));
-
+  // There is no gap in the array, so copy the block.
+  CopyMem (RNGAlgorithmList, mAvailableAlgoArray, RequiredSize);
   *RNGAlgorithmListSize = RequiredSize;
   return EFI_SUCCESS;
 }
