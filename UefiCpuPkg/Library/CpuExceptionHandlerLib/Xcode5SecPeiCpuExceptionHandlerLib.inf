@@ -53,7 +53,7 @@
   PrintLib
   LocalApicLib
   PeCoffGetEntryPointLib
-  VmgExitLib
+  CcExitLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard

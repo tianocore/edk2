@@ -19,7 +19,7 @@
 #include <PiPei.h>
 #include <Register/Amd/Msr.h>
 #include <Register/Intel/SmramSaveStateMap.h>
-#include <Library/VmgExitLib.h>
+#include <Library/CcExitLib.h>
 #include <ConfidentialComputingGuestAttr.h>
 
 #include "Platform.h"

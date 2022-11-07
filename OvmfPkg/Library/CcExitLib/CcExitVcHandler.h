@@ -6,12 +6,12 @@
 
 **/
 
-#ifndef __VMG_EXIT_VC_HANDLER_H__
-#define __VMG_EXIT_VC_HANDLER_H__
+#ifndef CC_EXIT_VC_HANDLER_H_
+#define CC_EXIT_VC_HANDLER_H_
 
 #include <Base.h>
 #include <Uefi.h>
-#include <Library/VmgExitLib.h>
+#include <Library/CcExitLib.h>
 
 /**
   Handle a #VC exception.

@@ -1,27 +1,24 @@
 /** @file
-  Public header file for the VMGEXIT Support library class.
-
-  This library class defines some routines used when invoking the VMGEXIT
-  instruction in support of SEV-ES and to handle #VC exceptions.
+  CcExit Base Support Library.
 
   Copyright (C) 2020, Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (c) 2020 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __VMG_EXIT_LIB_H__
-#define __VMG_EXIT_LIB_H__
-
-#include <Protocol/DebugSupport.h>
-#include <Register/Amd/Ghcb.h>
-
-#define VE_EXCEPTION  20
+#include <Base.h>
+#include <Uefi.h>
+#include <Library/CcExitLib.h>
 
 /**
   Perform VMGEXIT.
 
   Sets the necessary fields of the GHCB, invokes the VMGEXIT instruction and
   then handles the return actions.
+
+  The base library function returns an error in the form of a
+  GHCB_EVENT_INJECTION representing a GP_EXCEPTION.
 
   @param[in, out]  Ghcb       A pointer to the GHCB
   @param[in]       ExitCode   VMGEXIT code to be assigned to the SwExitCode
@@ -43,7 +40,17 @@ VmgExit (
   IN     UINT64  ExitCode,
   IN     UINT64  ExitInfo1,
   IN     UINT64  ExitInfo2
-  );
+  )
+{
+  GHCB_EVENT_INJECTION  Event;
+
+  Event.Uint64          = 0;
+  Event.Elements.Vector = GP_EXCEPTION;
+  Event.Elements.Type   = GHCB_EVENT_INJECTION_TYPE_EXCEPTION;
+  Event.Elements.Valid  = 1;
+
+  return Event.Uint64;
+}
 
 /**
   Perform pre-VMGEXIT initialization/preparation.
@@ -61,7 +68,9 @@ EFIAPI
 VmgInit (
   IN OUT GHCB     *Ghcb,
   IN OUT BOOLEAN  *InterruptState
-  );
+  )
+{
+}
 
 /**
   Perform post-VMGEXIT cleanup.
@@ -79,16 +88,18 @@ EFIAPI
 VmgDone (
   IN OUT GHCB     *Ghcb,
   IN     BOOLEAN  InterruptState
-  );
+  )
+{
+}
 
 /**
-  Marks a specified offset as valid in the GHCB.
+  Marks a field at the specified offset as valid in the GHCB.
 
   The ValidBitmap area represents the areas of the GHCB that have been marked
   valid. Set the bit in ValidBitmap for the input offset.
 
-  @param[in, out]  Ghcb       A pointer to the GHCB
-  @param[in]       Offset     Qword offset in the GHCB to mark valid
+  @param[in, out] Ghcb    Pointer to the Guest-Hypervisor Communication Block
+  @param[in]      Offset  Qword offset in the GHCB to mark valid
 
 **/
 VOID
@@ -96,7 +107,9 @@ EFIAPI
 VmgSetOffsetValid (
   IN OUT GHCB           *Ghcb,
   IN     GHCB_REGISTER  Offset
-  );
+  )
+{
+}
 
 /**
   Checks if a specified offset is valid in the GHCB.
@@ -116,7 +129,10 @@ EFIAPI
 VmgIsOffsetValid (
   IN GHCB           *Ghcb,
   IN GHCB_REGISTER  Offset
-  );
+  )
+{
+  return FALSE;
+}
 
 /**
   Handle a #VC exception.
@@ -142,15 +158,17 @@ EFIAPI
 VmgExitHandleVc (
   IN OUT EFI_EXCEPTION_TYPE  *ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
-  );
+  )
+{
+  *ExceptionType = VC_EXCEPTION;
+
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Handle a #VE exception.
 
   Performs the necessary processing to handle a #VE exception.
-
-  The base library function returns an error equal to VE_EXCEPTION,
-  to be propagated to the standard exception handling stack.
 
   @param[in, out]  ExceptionType  Pointer to an EFI_EXCEPTION_TYPE to be set
                                   as value to use on error.
@@ -168,6 +186,9 @@ EFIAPI
 VmTdExitHandleVe (
   IN OUT EFI_EXCEPTION_TYPE  *ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
-  );
+  )
+{
+  *ExceptionType = VE_EXCEPTION;
 
-#endif
+  return EFI_UNSUPPORTED;
+}
