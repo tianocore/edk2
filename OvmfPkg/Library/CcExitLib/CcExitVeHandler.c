@@ -464,7 +464,7 @@ MmioExit (
 **/
 EFI_STATUS
 EFIAPI
-VmTdExitHandleVe (
+CcExitHandleVe (
   IN OUT EFI_EXCEPTION_TYPE  *ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   )

@@ -33,7 +33,7 @@
 **/
 EFI_STATUS
 EFIAPI
-VmgExitHandleVc (
+CcExitHandleVc (
   IN OUT EFI_EXCEPTION_TYPE  *ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   )

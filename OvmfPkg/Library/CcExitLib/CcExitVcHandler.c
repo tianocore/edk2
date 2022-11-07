@@ -611,7 +611,7 @@ UnsupportedExit (
 {
   UINT64  Status;
 
-  Status = VmgExit (Ghcb, SVM_EXIT_UNSUPPORTED, Regs->ExceptionData, 0);
+  Status = CcExitVmgExit (Ghcb, SVM_EXIT_UNSUPPORTED, Regs->ExceptionData, 0);
   if (Status == 0) {
     GHCB_EVENT_INJECTION  Event;
 
@@ -755,8 +755,8 @@ MmioExit (
       CopyMem (Ghcb->SharedBuffer, &InstructionData->Ext.RegData, Bytes);
 
       Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
-      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-      Status = VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, ExitInfo1, ExitInfo2);
+      CcExitVmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = CcExitVmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, ExitInfo1, ExitInfo2);
       if (Status != 0) {
         return Status;
       }
@@ -807,8 +807,8 @@ MmioExit (
       CopyMem (Ghcb->SharedBuffer, &Regs->Rax, Bytes);
 
       Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
-      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-      Status = VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, ExitInfo1, ExitInfo2);
+      CcExitVmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = CcExitVmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, ExitInfo1, ExitInfo2);
       if (Status != 0) {
         return Status;
       }
@@ -843,8 +843,8 @@ MmioExit (
       CopyMem (Ghcb->SharedBuffer, InstructionData->Immediate, Bytes);
 
       Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
-      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-      Status = VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, ExitInfo1, ExitInfo2);
+      CcExitVmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = CcExitVmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, ExitInfo1, ExitInfo2);
       if (Status != 0) {
         return Status;
       }
@@ -882,8 +882,8 @@ MmioExit (
       ExitInfo2 = Bytes;
 
       Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
-      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-      Status = VmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
+      CcExitVmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = CcExitVmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
       if (Status != 0) {
         return Status;
       }
@@ -942,8 +942,8 @@ MmioExit (
       ExitInfo2 = Bytes;
 
       Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
-      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-      Status = VmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
+      CcExitVmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = CcExitVmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
       if (Status != 0) {
         return Status;
       }
@@ -979,8 +979,8 @@ MmioExit (
       ExitInfo2 = Bytes;
 
       Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
-      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-      Status = VmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
+      CcExitVmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = CcExitVmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
       if (Status != 0) {
         return Status;
       }
@@ -1011,8 +1011,8 @@ MmioExit (
       ExitInfo2 = Bytes;
 
       Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
-      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-      Status = VmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
+      CcExitVmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = CcExitVmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
       if (Status != 0) {
         return Status;
       }
@@ -1068,11 +1068,11 @@ MwaitExit (
   DecodeModRm (Regs, InstructionData);
 
   Ghcb->SaveArea.Rax = Regs->Rax;
-  VmgSetOffsetValid (Ghcb, GhcbRax);
+  CcExitVmgSetOffsetValid (Ghcb, GhcbRax);
   Ghcb->SaveArea.Rcx = Regs->Rcx;
-  VmgSetOffsetValid (Ghcb, GhcbRcx);
+  CcExitVmgSetOffsetValid (Ghcb, GhcbRcx);
 
-  return VmgExit (Ghcb, SVM_EXIT_MWAIT, 0, 0);
+  return CcExitVmgExit (Ghcb, SVM_EXIT_MWAIT, 0, 0);
 }
 
 /**
@@ -1100,13 +1100,13 @@ MonitorExit (
   DecodeModRm (Regs, InstructionData);
 
   Ghcb->SaveArea.Rax = Regs->Rax;  // Identity mapped, so VA = PA
-  VmgSetOffsetValid (Ghcb, GhcbRax);
+  CcExitVmgSetOffsetValid (Ghcb, GhcbRax);
   Ghcb->SaveArea.Rcx = Regs->Rcx;
-  VmgSetOffsetValid (Ghcb, GhcbRcx);
+  CcExitVmgSetOffsetValid (Ghcb, GhcbRcx);
   Ghcb->SaveArea.Rdx = Regs->Rdx;
-  VmgSetOffsetValid (Ghcb, GhcbRdx);
+  CcExitVmgSetOffsetValid (Ghcb, GhcbRdx);
 
-  return VmgExit (Ghcb, SVM_EXIT_MONITOR, 0, 0);
+  return CcExitVmgExit (Ghcb, SVM_EXIT_MONITOR, 0, 0);
 }
 
 /**
@@ -1131,7 +1131,7 @@ WbinvdExit (
   IN     SEV_ES_INSTRUCTION_DATA  *InstructionData
   )
 {
-  return VmgExit (Ghcb, SVM_EXIT_WBINVD, 0, 0);
+  return CcExitVmgExit (Ghcb, SVM_EXIT_WBINVD, 0, 0);
 }
 
 /**
@@ -1160,14 +1160,14 @@ RdtscpExit (
 
   DecodeModRm (Regs, InstructionData);
 
-  Status = VmgExit (Ghcb, SVM_EXIT_RDTSCP, 0, 0);
+  Status = CcExitVmgExit (Ghcb, SVM_EXIT_RDTSCP, 0, 0);
   if (Status != 0) {
     return Status;
   }
 
-  if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRcx) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRdx))
+  if (!CcExitVmgIsOffsetValid (Ghcb, GhcbRax) ||
+      !CcExitVmgIsOffsetValid (Ghcb, GhcbRcx) ||
+      !CcExitVmgIsOffsetValid (Ghcb, GhcbRdx))
   {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
@@ -1206,16 +1206,16 @@ VmmCallExit (
   DecodeModRm (Regs, InstructionData);
 
   Ghcb->SaveArea.Rax = Regs->Rax;
-  VmgSetOffsetValid (Ghcb, GhcbRax);
+  CcExitVmgSetOffsetValid (Ghcb, GhcbRax);
   Ghcb->SaveArea.Cpl = (UINT8)(Regs->Cs & 0x3);
-  VmgSetOffsetValid (Ghcb, GhcbCpl);
+  CcExitVmgSetOffsetValid (Ghcb, GhcbCpl);
 
-  Status = VmgExit (Ghcb, SVM_EXIT_VMMCALL, 0, 0);
+  Status = CcExitVmgExit (Ghcb, SVM_EXIT_VMMCALL, 0, 0);
   if (Status != 0) {
     return Status;
   }
 
-  if (!VmgIsOffsetValid (Ghcb, GhcbRax)) {
+  if (!CcExitVmgIsOffsetValid (Ghcb, GhcbRax)) {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
 
@@ -1254,28 +1254,28 @@ MsrExit (
     case 0x30: // WRMSR
       ExitInfo1          = 1;
       Ghcb->SaveArea.Rax = Regs->Rax;
-      VmgSetOffsetValid (Ghcb, GhcbRax);
+      CcExitVmgSetOffsetValid (Ghcb, GhcbRax);
       Ghcb->SaveArea.Rdx = Regs->Rdx;
-      VmgSetOffsetValid (Ghcb, GhcbRdx);
+      CcExitVmgSetOffsetValid (Ghcb, GhcbRdx);
     //
     // fall through
     //
     case 0x32: // RDMSR
       Ghcb->SaveArea.Rcx = Regs->Rcx;
-      VmgSetOffsetValid (Ghcb, GhcbRcx);
+      CcExitVmgSetOffsetValid (Ghcb, GhcbRcx);
       break;
     default:
       return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
 
-  Status = VmgExit (Ghcb, SVM_EXIT_MSR, ExitInfo1, 0);
+  Status = CcExitVmgExit (Ghcb, SVM_EXIT_MSR, ExitInfo1, 0);
   if (Status != 0) {
     return Status;
   }
 
   if (ExitInfo1 == 0) {
-    if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
-        !VmgIsOffsetValid (Ghcb, GhcbRdx))
+    if (!CcExitVmgIsOffsetValid (Ghcb, GhcbRax) ||
+        !CcExitVmgIsOffsetValid (Ghcb, GhcbRdx))
     {
       return UnsupportedExit (Ghcb, Regs, InstructionData);
     }
@@ -1471,8 +1471,8 @@ IoioExit (
       }
 
       Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
-      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-      Status = VmgExit (Ghcb, SVM_EXIT_IOIO_PROT, ExitInfo1, ExitInfo2);
+      CcExitVmgSetOffsetValid (Ghcb, GhcbSwScratch);
+      Status = CcExitVmgExit (Ghcb, SVM_EXIT_IOIO_PROT, ExitInfo1, ExitInfo2);
       if (Status != 0) {
         return Status;
       }
@@ -1495,15 +1495,15 @@ IoioExit (
       CopyMem (&Ghcb->SaveArea.Rax, &Regs->Rax, IOIO_DATA_BYTES (ExitInfo1));
     }
 
-    VmgSetOffsetValid (Ghcb, GhcbRax);
+    CcExitVmgSetOffsetValid (Ghcb, GhcbRax);
 
-    Status = VmgExit (Ghcb, SVM_EXIT_IOIO_PROT, ExitInfo1, 0);
+    Status = CcExitVmgExit (Ghcb, SVM_EXIT_IOIO_PROT, ExitInfo1, 0);
     if (Status != 0) {
       return Status;
     }
 
     if ((ExitInfo1 & IOIO_TYPE_IN) != 0) {
-      if (!VmgIsOffsetValid (Ghcb, GhcbRax)) {
+      if (!CcExitVmgIsOffsetValid (Ghcb, GhcbRax)) {
         return UnsupportedExit (Ghcb, Regs, InstructionData);
       }
 
@@ -1536,7 +1536,7 @@ InvdExit (
   IN     SEV_ES_INSTRUCTION_DATA  *InstructionData
   )
 {
-  return VmgExit (Ghcb, SVM_EXIT_INVD, 0, 0);
+  return CcExitVmgExit (Ghcb, SVM_EXIT_INVD, 0, 0);
 }
 
 /**
@@ -1581,23 +1581,23 @@ GetCpuidHyp (
 {
   *UnsupportedExit   = FALSE;
   Ghcb->SaveArea.Rax = EaxIn;
-  VmgSetOffsetValid (Ghcb, GhcbRax);
+  CcExitVmgSetOffsetValid (Ghcb, GhcbRax);
   Ghcb->SaveArea.Rcx = EcxIn;
-  VmgSetOffsetValid (Ghcb, GhcbRcx);
+  CcExitVmgSetOffsetValid (Ghcb, GhcbRcx);
   if (EaxIn == CPUID_EXTENDED_STATE) {
     Ghcb->SaveArea.XCr0 = XCr0;
-    VmgSetOffsetValid (Ghcb, GhcbXCr0);
+    CcExitVmgSetOffsetValid (Ghcb, GhcbXCr0);
   }
 
-  *Status = VmgExit (Ghcb, SVM_EXIT_CPUID, 0, 0);
+  *Status = CcExitVmgExit (Ghcb, SVM_EXIT_CPUID, 0, 0);
   if (*Status != 0) {
     return FALSE;
   }
 
-  if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRbx) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRcx) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRdx))
+  if (!CcExitVmgIsOffsetValid (Ghcb, GhcbRax) ||
+      !CcExitVmgIsOffsetValid (Ghcb, GhcbRbx) ||
+      !CcExitVmgIsOffsetValid (Ghcb, GhcbRcx) ||
+      !CcExitVmgIsOffsetValid (Ghcb, GhcbRdx))
   {
     *UnsupportedExit = TRUE;
     return FALSE;
@@ -2049,15 +2049,15 @@ RdpmcExit (
   UINT64  Status;
 
   Ghcb->SaveArea.Rcx = Regs->Rcx;
-  VmgSetOffsetValid (Ghcb, GhcbRcx);
+  CcExitVmgSetOffsetValid (Ghcb, GhcbRcx);
 
-  Status = VmgExit (Ghcb, SVM_EXIT_RDPMC, 0, 0);
+  Status = CcExitVmgExit (Ghcb, SVM_EXIT_RDPMC, 0, 0);
   if (Status != 0) {
     return Status;
   }
 
-  if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRdx))
+  if (!CcExitVmgIsOffsetValid (Ghcb, GhcbRax) ||
+      !CcExitVmgIsOffsetValid (Ghcb, GhcbRdx))
   {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
@@ -2092,13 +2092,13 @@ RdtscExit (
 {
   UINT64  Status;
 
-  Status = VmgExit (Ghcb, SVM_EXIT_RDTSC, 0, 0);
+  Status = CcExitVmgExit (Ghcb, SVM_EXIT_RDTSC, 0, 0);
   if (Status != 0) {
     return Status;
   }
 
-  if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRdx))
+  if (!CcExitVmgIsOffsetValid (Ghcb, GhcbRax) ||
+      !CcExitVmgIsOffsetValid (Ghcb, GhcbRdx))
   {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
@@ -2150,9 +2150,9 @@ Dr7WriteExit (
   // Using a value of 0 for ExitInfo1 means RAX holds the value
   //
   Ghcb->SaveArea.Rax = *Register;
-  VmgSetOffsetValid (Ghcb, GhcbRax);
+  CcExitVmgSetOffsetValid (Ghcb, GhcbRax);
 
-  Status = VmgExit (Ghcb, SVM_EXIT_DR7_WRITE, 0, 0);
+  Status = CcExitVmgExit (Ghcb, SVM_EXIT_DR7_WRITE, 0, 0);
   if (Status != 0) {
     return Status;
   }
@@ -2243,7 +2243,7 @@ InternalVmgExitHandleVc (
 
   Regs = SystemContext.SystemContextX64;
 
-  VmgInit (Ghcb, &InterruptState);
+  CcExitVmgInit (Ghcb, &InterruptState);
 
   ExitCode = Regs->ExceptionData;
   switch (ExitCode) {
@@ -2327,7 +2327,7 @@ InternalVmgExitHandleVc (
     VcRet = EFI_PROTOCOL_ERROR;
   }
 
-  VmgDone (Ghcb, InterruptState);
+  CcExitVmgDone (Ghcb, InterruptState);
 
   return VcRet;
 }
