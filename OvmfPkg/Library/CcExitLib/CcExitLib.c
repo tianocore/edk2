@@ -1,7 +1,8 @@
 /** @file
-  VMGEXIT Support Library.
+  CcExitLib Support Library.
 
   Copyright (C) 2020, Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2020 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -9,7 +10,7 @@
 #include <Base.h>
 #include <Uefi.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/VmgExitLib.h>
+#include <Library/CcExitLib.h>
 #include <Register/Amd/Msr.h>
 
 /**
