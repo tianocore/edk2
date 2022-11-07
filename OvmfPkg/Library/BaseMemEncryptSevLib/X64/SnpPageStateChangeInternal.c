@@ -193,9 +193,9 @@ PageStateChangeVmgExit (
   //
   while (Info->Header.CurrentEntry <= Info->Header.EndEntry) {
     Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
-    VmgSetOffsetValid (Ghcb, GhcbSwScratch);
+    CcExitVmgSetOffsetValid (Ghcb, GhcbSwScratch);
 
-    Status = VmgExit (Ghcb, SVM_EXIT_SNP_PAGE_STATE_CHANGE, 0, 0);
+    Status = CcExitVmgExit (Ghcb, SVM_EXIT_SNP_PAGE_STATE_CHANGE, 0, 0);
 
     //
     // The Page State Change VMGEXIT can pass the failure through the
@@ -251,7 +251,7 @@ InternalSetPageState (
     //
     // Initialize the GHCB
     //
-    VmgInit (Ghcb, &InterruptState);
+    CcExitVmgInit (Ghcb, &InterruptState);
 
     //
     // Build the page state structure
@@ -293,7 +293,7 @@ InternalSetPageState (
       PvalidateRange (Info, CurrentEntry, EndEntry, TRUE);
     }
 
-    VmgDone (Ghcb, InterruptState);
+    CcExitVmgDone (Ghcb, InterruptState);
 
     BaseAddress = NextAddress;
   }
