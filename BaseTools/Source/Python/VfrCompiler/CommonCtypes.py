@@ -189,7 +189,7 @@ class EFI_IFR_VARSTORE(Structure):
         ('Guid', EFI_GUID),
         ('VarStoreId', c_uint16),
         ('Size', c_uint16),
-        ('Name', c_wchar_p),  #################
+        ('Name', c_wchar_p),  
     ]
 
 
@@ -201,7 +201,7 @@ class EFI_IFR_VARSTORE_EFI(Structure):
         ('VarStoreId', c_uint16),
         ('Attributes', c_uint32),
         ('Size', c_uint16),
-        ('Name', c_wchar_p),  ######################
+        ('Name', c_wchar_p),  
     ]
 
 
@@ -339,7 +339,7 @@ class EFI_IFR_QUESTION_HEADER(Structure):
         ('Header', EFI_IFR_STATEMENT_HEADER),
         ('QuestionId', c_uint16),
         ('VarStoreId', c_uint16),
-        ('VarStoreInfo', VarStoreInfoNode),  ##########
+        ('VarStoreInfo', VarStoreInfoNode),  
         ('Flags', c_ubyte),
     ]
 

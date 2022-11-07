@@ -1,0 +1,90 @@
+Formset:
+  Guid:  {0x4f4ef7f0, 0xaa29, 0x4ce9, { 0xba, 0x41, 0x64, 0x3e, 0x1, 0x23, 0xa9, 0x9f }}
+  Title:  2  # Title STRING_ID
+  Help:  3  # Help STRING_ID
+  ClassGuid:  {0x93039971, 0x8545, 0x4b04, { 0xb4, 0x5e, 0x32, 0xeb, 0x83, 0x26, 0x4, 0xe }}
+  - form:
+      FormId:  2  # FormId STRING_ID
+      FormTitle:  5  # FormTitle STRING_ID
+      - text:
+          prompt:  7  # Statement Prompt STRING_ID
+          help:  6  # Statement Help STRING_ID
+          text:  8  # Statement Help STRING_ID
+      - string:
+          prompt:  10  # Statement Prompt STRING_ID
+          help:  9  # Statement Help STRING_ID
+          questionid:  24578  # Question QuestionId
+          varstoreid:  0  # Question VarStoreId
+          varname:  65535  # Question VarName STRING_ID
+          varoffset:  65535  # Question VarOffset
+          flags:  4  # Question Flags
+          stringflags:  0
+          stringminsize:  2
+          stringmaxsize:  19
+      - subtitle:
+          prompt:  4  # Statement Prompt STRING_ID
+      - goto:
+          formid:  3
+          questionid:  24577
+          prompt:  16
+          help:  17
+  - form:
+      FormId:  3  # FormId STRING_ID
+      FormTitle:  18  # FormTitle STRING_ID
+      - label:
+          labelnumber:  5376  # LabelNumber
+      - label:
+          labelnumber:  5631  # LabelNumber
+      - subtitle:
+          prompt:  4  # Statement Prompt STRING_ID
+      - subtitle:
+          prompt:  19  # Statement Prompt STRING_ID
+      - label:
+          labelnumber:  4608  # LabelNumber
+      - label:
+          labelnumber:  4863  # LabelNumber
+      - action:
+          prompt:  4  # Statement Prompt STRING_ID
+          help:  4  # Statement Help STRING_ID
+          questionid:  24579  # Question QuestionId
+          varstoreid:  0  # Question VarStoreId
+          flags:  0  # Question Flags
+          questionconfig:  4  # QuestionConfig
+      - subtitle:
+          prompt:  20  # Statement Prompt STRING_ID
+      - label:
+          labelnumber:  4864  # LabelNumber
+      - label:
+          labelnumber:  5119  # LabelNumber
+  - form:
+      FormId:  4  # FormId STRING_ID
+      FormTitle:  28  # FormTitle STRING_ID
+      - text:
+          condition:  grayoutif TRUE
+          prompt:  10  # Statement Prompt STRING_ID
+          help:  9  # Statement Help STRING_ID
+          text:  11  # Statement Help STRING_ID
+      - text:
+          condition:  grayoutif TRUE
+          prompt:  7  # Statement Prompt STRING_ID
+          help:  6  # Statement Help STRING_ID
+          text:  15  # Statement Help STRING_ID
+      - text:
+          condition:  grayoutif TRUE
+          prompt:  13  # Statement Prompt STRING_ID
+          help:  12  # Statement Help STRING_ID
+          text:  14  # Statement Help STRING_ID
+      - subtitle:
+          condition:  grayoutif TRUE
+          prompt:  4  # Statement Prompt STRING_ID
+      - text:
+          condition:  grayoutif TRUE
+          prompt:  29  # Statement Prompt STRING_ID
+          help:  30  # Statement Help STRING_ID
+          text:  0  # Statement Help STRING_ID
+      - label:
+          condition:  grayoutif TRUE
+          labelnumber:  5120  # LabelNumber
+      - label:
+          condition:  grayoutif TRUE
+          labelnumber:  5375  # LabelNumber

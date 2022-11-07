@@ -2285,13 +2285,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrProgram
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrProgram" ):
-                listener.enterVfrProgram(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrProgram" ):
-                listener.exitVfrProgram(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrProgram" ):
+                return visitor.visitVfrProgram(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2351,13 +2349,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_pragmaPackShowDef
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterPragmaPackShowDef" ):
-                listener.enterPragmaPackShowDef(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitPragmaPackShowDef" ):
-                listener.exitPragmaPackShowDef(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPragmaPackShowDef" ):
+                return visitor.visitPragmaPackShowDef(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2400,13 +2396,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_pragmaPackStackDef
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterPragmaPackStackDef" ):
-                listener.enterPragmaPackStackDef(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitPragmaPackStackDef" ):
-                listener.exitPragmaPackStackDef(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPragmaPackStackDef" ):
+                return visitor.visitPragmaPackStackDef(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2466,13 +2460,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_pragmaPackNumber
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterPragmaPackNumber" ):
-                listener.enterPragmaPackNumber(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitPragmaPackNumber" ):
-                listener.exitPragmaPackNumber(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPragmaPackNumber" ):
+                return visitor.visitPragmaPackNumber(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2528,13 +2520,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrPragmaPackDefinition
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrPragmaPackDefinition" ):
-                listener.enterVfrPragmaPackDefinition(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrPragmaPackDefinition" ):
-                listener.exitVfrPragmaPackDefinition(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrPragmaPackDefinition" ):
+                return visitor.visitVfrPragmaPackDefinition(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2617,13 +2607,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrDataStructDefinition
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrDataStructDefinition" ):
-                listener.enterVfrDataStructDefinition(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrDataStructDefinition" ):
-                listener.exitVfrDataStructDefinition(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrDataStructDefinition" ):
+                return visitor.visitVfrDataStructDefinition(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2725,13 +2713,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrDataUnionDefinition
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrDataUnionDefinition" ):
-                listener.enterVfrDataUnionDefinition(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrDataUnionDefinition" ):
-                listener.exitVfrDataUnionDefinition(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrDataUnionDefinition" ):
+                return visitor.visitVfrDataUnionDefinition(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2903,13 +2889,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrDataStructFields
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrDataStructFields" ):
-                listener.enterVfrDataStructFields(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrDataStructFields" ):
-                listener.exitVfrDataStructFields(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrDataStructFields" ):
+                return visitor.visitVfrDataStructFields(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3042,13 +3026,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dataStructField64
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDataStructField64" ):
-                listener.enterDataStructField64(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDataStructField64" ):
-                listener.exitDataStructField64(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDataStructField64" ):
+                return visitor.visitDataStructField64(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3117,13 +3099,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dataStructField32
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDataStructField32" ):
-                listener.enterDataStructField32(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDataStructField32" ):
-                listener.exitDataStructField32(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDataStructField32" ):
+                return visitor.visitDataStructField32(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3192,13 +3172,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dataStructField16
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDataStructField16" ):
-                listener.enterDataStructField16(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDataStructField16" ):
-                listener.exitDataStructField16(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDataStructField16" ):
+                return visitor.visitDataStructField16(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3267,13 +3245,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dataStructField8
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDataStructField8" ):
-                listener.enterDataStructField8(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDataStructField8" ):
-                listener.exitDataStructField8(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDataStructField8" ):
+                return visitor.visitDataStructField8(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3342,13 +3318,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dataStructFieldBool
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDataStructFieldBool" ):
-                listener.enterDataStructFieldBool(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDataStructFieldBool" ):
-                listener.exitDataStructFieldBool(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDataStructFieldBool" ):
+                return visitor.visitDataStructFieldBool(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3417,13 +3391,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dataStructFieldString
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDataStructFieldString" ):
-                listener.enterDataStructFieldString(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDataStructFieldString" ):
-                listener.exitDataStructFieldString(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDataStructFieldString" ):
+                return visitor.visitDataStructFieldString(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3492,13 +3464,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dataStructFieldDate
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDataStructFieldDate" ):
-                listener.enterDataStructFieldDate(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDataStructFieldDate" ):
-                listener.exitDataStructFieldDate(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDataStructFieldDate" ):
+                return visitor.visitDataStructFieldDate(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3567,13 +3537,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dataStructFieldTime
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDataStructFieldTime" ):
-                listener.enterDataStructFieldTime(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDataStructFieldTime" ):
-                listener.exitDataStructFieldTime(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDataStructFieldTime" ):
+                return visitor.visitDataStructFieldTime(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3642,13 +3610,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dataStructFieldRef
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDataStructFieldRef" ):
-                listener.enterDataStructFieldRef(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDataStructFieldRef" ):
-                listener.exitDataStructFieldRef(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDataStructFieldRef" ):
+                return visitor.visitDataStructFieldRef(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3718,13 +3684,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dataStructFieldUser
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDataStructFieldUser" ):
-                listener.enterDataStructFieldUser(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDataStructFieldUser" ):
-                listener.exitDataStructFieldUser(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDataStructFieldUser" ):
+                return visitor.visitDataStructFieldUser(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3791,13 +3755,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dataStructBitField64
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDataStructBitField64" ):
-                listener.enterDataStructBitField64(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDataStructBitField64" ):
-                listener.exitDataStructBitField64(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDataStructBitField64" ):
+                return visitor.visitDataStructBitField64(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3862,13 +3824,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dataStructBitField32
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDataStructBitField32" ):
-                listener.enterDataStructBitField32(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDataStructBitField32" ):
-                listener.exitDataStructBitField32(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDataStructBitField32" ):
+                return visitor.visitDataStructBitField32(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3933,13 +3893,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dataStructBitField16
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDataStructBitField16" ):
-                listener.enterDataStructBitField16(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDataStructBitField16" ):
-                listener.exitDataStructBitField16(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDataStructBitField16" ):
+                return visitor.visitDataStructBitField16(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4004,13 +3962,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dataStructBitField8
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDataStructBitField8" ):
-                listener.enterDataStructBitField8(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDataStructBitField8" ):
-                listener.exitDataStructBitField8(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDataStructBitField8" ):
+                return visitor.visitDataStructBitField8(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4134,13 +4090,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrFormSetDefinition
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrFormSetDefinition" ):
-                listener.enterVfrFormSetDefinition(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrFormSetDefinition" ):
-                listener.exitVfrFormSetDefinition(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrFormSetDefinition" ):
+                return visitor.visitVfrFormSetDefinition(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4272,13 +4226,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_classguidDefinition
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterClassguidDefinition" ):
-                listener.enterClassguidDefinition(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitClassguidDefinition" ):
-                listener.exitClassguidDefinition(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitClassguidDefinition" ):
+                return visitor.visitClassguidDefinition(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4354,13 +4306,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_classDefinition
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterClassDefinition" ):
-                listener.enterClassDefinition(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitClassDefinition" ):
-                listener.exitClassDefinition(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitClassDefinition" ):
+                return visitor.visitClassDefinition(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4429,13 +4379,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_validClassNames
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterValidClassNames" ):
-                listener.enterValidClassNames(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitValidClassNames" ):
-                listener.exitValidClassNames(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitValidClassNames" ):
+                return visitor.visitValidClassNames(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4488,13 +4436,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_subclassDefinition
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterSubclassDefinition" ):
-                listener.enterSubclassDefinition(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitSubclassDefinition" ):
-                listener.exitSubclassDefinition(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSubclassDefinition" ):
+                return visitor.visitSubclassDefinition(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4540,13 +4486,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrFormSetList
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrFormSetList" ):
-                listener.enterVfrFormSetList(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrFormSetList" ):
-                listener.exitVfrFormSetList(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrFormSetList" ):
+                return visitor.visitVfrFormSetList(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4627,13 +4571,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrFormSet
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrFormSet" ):
-                listener.enterVfrFormSet(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrFormSet" ):
-                listener.exitVfrFormSet(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrFormSet" ):
+                return visitor.visitVfrFormSet(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4748,13 +4690,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementDefaultStore
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementDefaultStore" ):
-                listener.enterVfrStatementDefaultStore(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementDefaultStore" ):
-                listener.exitVfrStatementDefaultStore(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementDefaultStore" ):
+                return visitor.visitVfrStatementDefaultStore(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4877,13 +4817,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementVarStoreLinear
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementVarStoreLinear" ):
-                listener.enterVfrStatementVarStoreLinear(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementVarStoreLinear" ):
-                listener.exitVfrStatementVarStoreLinear(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementVarStoreLinear" ):
+                return visitor.visitVfrStatementVarStoreLinear(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5091,13 +5029,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementVarStoreEfi
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementVarStoreEfi" ):
-                listener.enterVfrStatementVarStoreEfi(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementVarStoreEfi" ):
-                listener.exitVfrStatementVarStoreEfi(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementVarStoreEfi" ):
+                return visitor.visitVfrStatementVarStoreEfi(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5269,13 +5205,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrVarStoreEfiAttr
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrVarStoreEfiAttr" ):
-                listener.enterVfrVarStoreEfiAttr(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrVarStoreEfiAttr" ):
-                listener.exitVfrVarStoreEfiAttr(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrVarStoreEfiAttr" ):
+                return visitor.visitVfrVarStoreEfiAttr(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5364,13 +5298,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementVarStoreNameValue
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementVarStoreNameValue" ):
-                listener.enterVfrStatementVarStoreNameValue(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementVarStoreNameValue" ):
-                listener.exitVfrStatementVarStoreNameValue(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementVarStoreNameValue" ):
+                return visitor.visitVfrStatementVarStoreNameValue(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5473,13 +5405,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementDisableIfFormSet
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementDisableIfFormSet" ):
-                listener.enterVfrStatementDisableIfFormSet(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementDisableIfFormSet" ):
-                listener.exitVfrStatementDisableIfFormSet(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementDisableIfFormSet" ):
+                return visitor.visitVfrStatementDisableIfFormSet(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5541,13 +5471,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementSuppressIfFormSet
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementSuppressIfFormSet" ):
-                listener.enterVfrStatementSuppressIfFormSet(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementSuppressIfFormSet" ):
-                listener.exitVfrStatementSuppressIfFormSet(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementSuppressIfFormSet" ):
+                return visitor.visitVfrStatementSuppressIfFormSet(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5602,13 +5530,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_guidSubDefinition
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterGuidSubDefinition" ):
-                listener.enterGuidSubDefinition(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitGuidSubDefinition" ):
-                listener.exitGuidSubDefinition(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGuidSubDefinition" ):
+                return visitor.visitGuidSubDefinition(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5697,13 +5623,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_guidDefinition
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterGuidDefinition" ):
-                listener.enterGuidDefinition(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitGuidDefinition" ):
-                listener.exitGuidDefinition(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGuidDefinition" ):
+                return visitor.visitGuidDefinition(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5779,13 +5703,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_getStringId
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterGetStringId" ):
-                listener.enterGetStringId(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitGetStringId" ):
-                listener.exitGetStringId(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGetStringId" ):
+                return visitor.visitGetStringId(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5834,13 +5756,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrQuestionHeader
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrQuestionHeader" ):
-                listener.enterVfrQuestionHeader(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrQuestionHeader" ):
-                listener.exitVfrQuestionHeader(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrQuestionHeader" ):
+                return visitor.visitVfrQuestionHeader(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5907,13 +5827,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrQuestionBaseInfo
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrQuestionBaseInfo" ):
-                listener.enterVfrQuestionBaseInfo(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrQuestionBaseInfo" ):
-                listener.exitVfrQuestionBaseInfo(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrQuestionBaseInfo" ):
+                return visitor.visitVfrQuestionBaseInfo(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6020,13 +5938,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementHeader
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementHeader" ):
-                listener.enterVfrStatementHeader(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementHeader" ):
-                listener.exitVfrStatementHeader(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementHeader" ):
+                return visitor.visitVfrStatementHeader(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6109,13 +6025,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_questionheaderFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterQuestionheaderFlagsField" ):
-                listener.enterQuestionheaderFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitQuestionheaderFlagsField" ):
-                listener.exitQuestionheaderFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitQuestionheaderFlagsField" ):
+                return visitor.visitQuestionheaderFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6221,13 +6135,11 @@ class VfrSyntaxParser ( Parser ):
         def Number(self):
             return self.getToken(VfrSyntaxParser.Number, 0)
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStorageVarIdRule1" ):
-                listener.enterVfrStorageVarIdRule1(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStorageVarIdRule1" ):
-                listener.exitVfrStorageVarIdRule1(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStorageVarIdRule1" ):
+                return visitor.visitVfrStorageVarIdRule1(self)
+            else:
+                return visitor.visitChildren(self)
 
 
     class VfrStorageVarIdRule2Context(VfrStorageVarIdContext):
@@ -6251,13 +6163,11 @@ class VfrSyntaxParser ( Parser ):
                 return self.getTypedRuleContext(VfrSyntaxParser.ArrayNameContext,i)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStorageVarIdRule2" ):
-                listener.enterVfrStorageVarIdRule2(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStorageVarIdRule2" ):
-                listener.exitVfrStorageVarIdRule2(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStorageVarIdRule2" ):
+                return visitor.visitVfrStorageVarIdRule2(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6391,13 +6301,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrConstantValueField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrConstantValueField" ):
-                listener.enterVfrConstantValueField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrConstantValueField" ):
-                listener.exitVfrConstantValueField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrConstantValueField" ):
+                return visitor.visitVfrConstantValueField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6573,13 +6481,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrImageTag
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrImageTag" ):
-                listener.enterVfrImageTag(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrImageTag" ):
-                listener.exitVfrImageTag(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrImageTag" ):
+                return visitor.visitVfrImageTag(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6624,13 +6530,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrLockedTag
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrLockedTag" ):
-                listener.enterVfrLockedTag(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrLockedTag" ):
-                listener.exitVfrLockedTag(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrLockedTag" ):
+                return visitor.visitVfrLockedTag(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6670,13 +6574,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementStatTag
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementStatTag" ):
-                listener.enterVfrStatementStatTag(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementStatTag" ):
-                listener.exitVfrStatementStatTag(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementStatTag" ):
+                return visitor.visitVfrStatementStatTag(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6735,13 +6637,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementStatTagList
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementStatTagList" ):
-                listener.enterVfrStatementStatTagList(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementStatTagList" ):
-                listener.exitVfrStatementStatTagList(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementStatTagList" ):
+                return visitor.visitVfrStatementStatTagList(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6829,13 +6729,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrFormDefinition
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrFormDefinition" ):
-                listener.enterVfrFormDefinition(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrFormDefinition" ):
-                listener.exitVfrFormDefinition(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrFormDefinition" ):
+                return visitor.visitVfrFormDefinition(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6959,13 +6857,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrForm
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrForm" ):
-                listener.enterVfrForm(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrForm" ):
-                listener.exitVfrForm(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrForm" ):
+                return visitor.visitVfrForm(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7124,13 +7020,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrFormMapDefinition
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrFormMapDefinition" ):
-                listener.enterVfrFormMapDefinition(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrFormMapDefinition" ):
-                listener.exitVfrFormMapDefinition(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrFormMapDefinition" ):
+                return visitor.visitVfrFormMapDefinition(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7222,13 +7116,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementImage
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementImage" ):
-                listener.enterVfrStatementImage(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementImage" ):
-                listener.exitVfrStatementImage(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementImage" ):
+                return visitor.visitVfrStatementImage(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7269,13 +7161,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementLocked
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementLocked" ):
-                listener.enterVfrStatementLocked(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementLocked" ):
-                listener.exitVfrStatementLocked(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementLocked" ):
+                return visitor.visitVfrStatementLocked(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7328,13 +7218,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementRules
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementRules" ):
-                listener.enterVfrStatementRules(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementRules" ):
-                listener.exitVfrStatementRules(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementRules" ):
+                return visitor.visitVfrStatementRules(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7388,13 +7276,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementStat
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementStat" ):
-                listener.enterVfrStatementStat(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementStat" ):
-                listener.exitVfrStatementStat(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementStat" ):
+                return visitor.visitVfrStatementStat(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7493,13 +7379,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementSubTitle
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementSubTitle" ):
-                listener.enterVfrStatementSubTitle(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementSubTitle" ):
-                listener.exitVfrStatementSubTitle(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementSubTitle" ):
+                return visitor.visitVfrStatementSubTitle(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7620,13 +7504,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementSubTitleComponent
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementSubTitleComponent" ):
-                listener.enterVfrStatementSubTitleComponent(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementSubTitleComponent" ):
-                listener.exitVfrStatementSubTitleComponent(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementSubTitleComponent" ):
+                return visitor.visitVfrStatementSubTitleComponent(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7684,13 +7566,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrSubtitleFlags
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrSubtitleFlags" ):
-                listener.enterVfrSubtitleFlags(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrSubtitleFlags" ):
-                listener.exitVfrSubtitleFlags(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrSubtitleFlags" ):
+                return visitor.visitVfrSubtitleFlags(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7738,13 +7618,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_subtitleFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterSubtitleFlagsField" ):
-                listener.enterSubtitleFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitSubtitleFlagsField" ):
-                listener.exitSubtitleFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSubtitleFlagsField" ):
+                return visitor.visitSubtitleFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7852,13 +7730,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementStaticText
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementStaticText" ):
-                listener.enterVfrStatementStaticText(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementStaticText" ):
-                listener.exitVfrStatementStaticText(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementStaticText" ):
+                return visitor.visitVfrStatementStaticText(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7991,13 +7867,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_staticTextFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterStaticTextFlagsField" ):
-                listener.enterStaticTextFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitStaticTextFlagsField" ):
-                listener.exitStaticTextFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitStaticTextFlagsField" ):
+                return visitor.visitStaticTextFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8050,13 +7924,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementCrossReference
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementCrossReference" ):
-                listener.enterVfrStatementCrossReference(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementCrossReference" ):
-                listener.exitVfrStatementCrossReference(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementCrossReference" ):
+                return visitor.visitVfrStatementCrossReference(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8169,13 +8041,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementGoto
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementGoto" ):
-                listener.enterVfrStatementGoto(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementGoto" ):
-                listener.exitVfrStatementGoto(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementGoto" ):
+                return visitor.visitVfrStatementGoto(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8376,13 +8246,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrGotoFlags
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrGotoFlags" ):
-                listener.enterVfrGotoFlags(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrGotoFlags" ):
-                listener.exitVfrGotoFlags(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrGotoFlags" ):
+                return visitor.visitVfrGotoFlags(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8435,13 +8303,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_gotoFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterGotoFlagsField" ):
-                listener.enterGotoFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitGotoFlagsField" ):
-                listener.exitGotoFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGotoFlagsField" ):
+                return visitor.visitGotoFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8517,13 +8383,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementResetButton
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementResetButton" ):
-                listener.enterVfrStatementResetButton(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementResetButton" ):
-                listener.exitVfrStatementResetButton(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementResetButton" ):
+                return visitor.visitVfrStatementResetButton(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8606,13 +8470,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementQuestions
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementQuestions" ):
-                listener.enterVfrStatementQuestions(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementQuestions" ):
-                listener.exitVfrStatementQuestions(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementQuestions" ):
+                return visitor.visitVfrStatementQuestions(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8716,13 +8578,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementQuestionTag
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementQuestionTag" ):
-                listener.enterVfrStatementQuestionTag(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementQuestionTag" ):
-                listener.exitVfrStatementQuestionTag(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementQuestionTag" ):
+                return visitor.visitVfrStatementQuestionTag(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8854,13 +8714,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementInconsistentIf
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementInconsistentIf" ):
-                listener.enterVfrStatementInconsistentIf(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementInconsistentIf" ):
-                listener.exitVfrStatementInconsistentIf(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementInconsistentIf" ):
+                return visitor.visitVfrStatementInconsistentIf(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8995,13 +8853,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementNoSubmitIf
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementNoSubmitIf" ):
-                listener.enterVfrStatementNoSubmitIf(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementNoSubmitIf" ):
-                listener.exitVfrStatementNoSubmitIf(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementNoSubmitIf" ):
+                return visitor.visitVfrStatementNoSubmitIf(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -9106,13 +8962,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementDisableIfQuest
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementDisableIfQuest" ):
-                listener.enterVfrStatementDisableIfQuest(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementDisableIfQuest" ):
-                listener.exitVfrStatementDisableIfQuest(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementDisableIfQuest" ):
+                return visitor.visitVfrStatementDisableIfQuest(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -9169,13 +9023,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementRefresh
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementRefresh" ):
-                listener.enterVfrStatementRefresh(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementRefresh" ):
-                listener.exitVfrStatementRefresh(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementRefresh" ):
+                return visitor.visitVfrStatementRefresh(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -9231,13 +9083,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementVarstoreDevice
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementVarstoreDevice" ):
-                listener.enterVfrStatementVarstoreDevice(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementVarstoreDevice" ):
-                listener.exitVfrStatementVarstoreDevice(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementVarstoreDevice" ):
+                return visitor.visitVfrStatementVarstoreDevice(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -9291,13 +9141,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementRefreshEvent
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementRefreshEvent" ):
-                listener.enterVfrStatementRefreshEvent(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementRefreshEvent" ):
-                listener.exitVfrStatementRefreshEvent(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementRefreshEvent" ):
+                return visitor.visitVfrStatementRefreshEvent(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -9375,13 +9223,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementWarningIf
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementWarningIf" ):
-                listener.enterVfrStatementWarningIf(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementWarningIf" ):
-                listener.exitVfrStatementWarningIf(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementWarningIf" ):
+                return visitor.visitVfrStatementWarningIf(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -9462,13 +9308,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementQuestionTagList
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementQuestionTagList" ):
-                listener.enterVfrStatementQuestionTagList(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementQuestionTagList" ):
-                listener.exitVfrStatementQuestionTagList(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementQuestionTagList" ):
+                return visitor.visitVfrStatementQuestionTagList(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -9537,13 +9381,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementQuestionOptionTag
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementQuestionOptionTag" ):
-                listener.enterVfrStatementQuestionOptionTag(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementQuestionOptionTag" ):
-                listener.exitVfrStatementQuestionOptionTag(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementQuestionOptionTag" ):
+                return visitor.visitVfrStatementQuestionOptionTag(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -9638,13 +9480,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_flagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFlagsField" ):
-                listener.enterFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFlagsField" ):
-                listener.exitFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFlagsField" ):
+                return visitor.visitFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -9758,13 +9598,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementSuppressIfQuest
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementSuppressIfQuest" ):
-                listener.enterVfrStatementSuppressIfQuest(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementSuppressIfQuest" ):
-                listener.exitVfrStatementSuppressIfQuest(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementSuppressIfQuest" ):
+                return visitor.visitVfrStatementSuppressIfQuest(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -9878,13 +9716,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementGrayOutIfQuest
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementGrayOutIfQuest" ):
-                listener.enterVfrStatementGrayOutIfQuest(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementGrayOutIfQuest" ):
-                listener.exitVfrStatementGrayOutIfQuest(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementGrayOutIfQuest" ):
+                return visitor.visitVfrStatementGrayOutIfQuest(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -9984,13 +9820,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementDefault
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementDefault" ):
-                listener.enterVfrStatementDefault(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementDefault" ):
-                listener.exitVfrStatementDefault(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementDefault" ):
+                return visitor.visitVfrStatementDefault(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -10065,13 +9899,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementValue
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementValue" ):
-                listener.enterVfrStatementValue(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementValue" ):
-                listener.exitVfrStatementValue(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementValue" ):
+                return visitor.visitVfrStatementValue(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -10111,13 +9943,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementOptions
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementOptions" ):
-                listener.enterVfrStatementOptions(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementOptions" ):
-                listener.exitVfrStatementOptions(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementOptions" ):
+                return visitor.visitVfrStatementOptions(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -10205,13 +10035,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementOneOfOption
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementOneOfOption" ):
-                listener.enterVfrStatementOneOfOption(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementOneOfOption" ):
-                listener.exitVfrStatementOneOfOption(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementOneOfOption" ):
+                return visitor.visitVfrStatementOneOfOption(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -10314,13 +10142,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrOneOfOptionFlags
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrOneOfOptionFlags" ):
-                listener.enterVfrOneOfOptionFlags(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrOneOfOptionFlags" ):
-                listener.exitVfrOneOfOptionFlags(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrOneOfOptionFlags" ):
+                return visitor.visitVfrOneOfOptionFlags(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -10401,13 +10227,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_oneofoptionFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterOneofoptionFlagsField" ):
-                listener.enterOneofoptionFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitOneofoptionFlagsField" ):
-                listener.exitOneofoptionFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitOneofoptionFlagsField" ):
+                return visitor.visitOneofoptionFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -10507,13 +10331,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementRead
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementRead" ):
-                listener.enterVfrStatementRead(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementRead" ):
-                listener.exitVfrStatementRead(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementRead" ):
+                return visitor.visitVfrStatementRead(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -10559,13 +10381,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementWrite
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementWrite" ):
-                listener.enterVfrStatementWrite(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementWrite" ):
-                listener.exitVfrStatementWrite(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementWrite" ):
+                return visitor.visitVfrStatementWrite(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -10609,13 +10429,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementQuestionOptionList
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementQuestionOptionList" ):
-                listener.enterVfrStatementQuestionOptionList(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementQuestionOptionList" ):
-                listener.exitVfrStatementQuestionOptionList(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementQuestionOptionList" ):
+                return visitor.visitVfrStatementQuestionOptionList(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -10664,13 +10482,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementQuestionOption
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementQuestionOption" ):
-                listener.enterVfrStatementQuestionOption(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementQuestionOption" ):
-                listener.exitVfrStatementQuestionOption(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementQuestionOption" ):
+                return visitor.visitVfrStatementQuestionOption(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -10723,13 +10539,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementBooleanType
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementBooleanType" ):
-                listener.enterVfrStatementBooleanType(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementBooleanType" ):
-                listener.exitVfrStatementBooleanType(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementBooleanType" ):
+                return visitor.visitVfrStatementBooleanType(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -10818,13 +10632,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementCheckBox
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementCheckBox" ):
-                listener.enterVfrStatementCheckBox(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementCheckBox" ):
-                listener.exitVfrStatementCheckBox(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementCheckBox" ):
+                return visitor.visitVfrStatementCheckBox(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -10911,13 +10723,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrCheckBoxFlags
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrCheckBoxFlags" ):
-                listener.enterVfrCheckBoxFlags(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrCheckBoxFlags" ):
-                listener.exitVfrCheckBoxFlags(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrCheckBoxFlags" ):
+                return visitor.visitVfrCheckBoxFlags(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -10984,13 +10794,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_checkboxFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCheckboxFlagsField" ):
-                listener.enterCheckboxFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCheckboxFlagsField" ):
-                listener.exitCheckboxFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCheckboxFlagsField" ):
+                return visitor.visitCheckboxFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -11102,13 +10910,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementAction
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementAction" ):
-                listener.enterVfrStatementAction(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementAction" ):
-                listener.exitVfrStatementAction(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementAction" ):
+                return visitor.visitVfrStatementAction(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -11192,13 +10998,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrActionFlags
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrActionFlags" ):
-                listener.enterVfrActionFlags(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrActionFlags" ):
-                listener.exitVfrActionFlags(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrActionFlags" ):
+                return visitor.visitVfrActionFlags(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -11251,13 +11055,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_actionFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterActionFlagsField" ):
-                listener.enterActionFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitActionFlagsField" ):
-                listener.exitActionFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitActionFlagsField" ):
+                return visitor.visitActionFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -11310,13 +11112,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementNumericType
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementNumericType" ):
-                listener.enterVfrStatementNumericType(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementNumericType" ):
-                listener.exitVfrStatementNumericType(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementNumericType" ):
+                return visitor.visitVfrStatementNumericType(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -11408,13 +11208,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementNumeric
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementNumeric" ):
-                listener.enterVfrStatementNumeric(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementNumeric" ):
-                listener.exitVfrStatementNumeric(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementNumeric" ):
+                return visitor.visitVfrStatementNumeric(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -11522,13 +11320,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrSetMinMaxStep
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrSetMinMaxStep" ):
-                listener.enterVfrSetMinMaxStep(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrSetMinMaxStep" ):
-                listener.exitVfrSetMinMaxStep(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrSetMinMaxStep" ):
+                return visitor.visitVfrSetMinMaxStep(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -11620,13 +11416,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrNumericFlags
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrNumericFlags" ):
-                listener.enterVfrNumericFlags(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrNumericFlags" ):
-                listener.exitVfrNumericFlags(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrNumericFlags" ):
+                return visitor.visitVfrNumericFlags(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -11702,13 +11496,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_numericFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterNumericFlagsField" ):
-                listener.enterNumericFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitNumericFlagsField" ):
-                listener.exitNumericFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitNumericFlagsField" ):
+                return visitor.visitNumericFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -11829,13 +11621,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementOneOf
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementOneOf" ):
-                listener.enterVfrStatementOneOf(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementOneOf" ):
-                listener.exitVfrStatementOneOf(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementOneOf" ):
+                return visitor.visitVfrStatementOneOf(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -11916,13 +11706,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrOneofFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrOneofFlagsField" ):
-                listener.enterVfrOneofFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrOneofFlagsField" ):
-                listener.exitVfrOneofFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrOneofFlagsField" ):
+                return visitor.visitVfrOneofFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -11975,13 +11763,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementStringType
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementStringType" ):
-                listener.enterVfrStatementStringType(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementStringType" ):
-                listener.exitVfrStatementStringType(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementStringType" ):
+                return visitor.visitVfrStatementStringType(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -12076,13 +11862,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementString
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementString" ):
-                listener.enterVfrStatementString(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementString" ):
-                listener.exitVfrStatementString(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementString" ):
+                return visitor.visitVfrStatementString(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -12183,13 +11967,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStringFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStringFlagsField" ):
-                listener.enterVfrStringFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStringFlagsField" ):
-                listener.exitVfrStringFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStringFlagsField" ):
+                return visitor.visitVfrStringFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -12243,13 +12025,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_stringFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterStringFlagsField" ):
-                listener.enterStringFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitStringFlagsField" ):
-                listener.exitStringFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitStringFlagsField" ):
+                return visitor.visitStringFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -12352,13 +12132,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementPassword
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementPassword" ):
-                listener.enterVfrStatementPassword(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementPassword" ):
-                listener.exitVfrStatementPassword(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementPassword" ):
+                return visitor.visitVfrStatementPassword(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -12472,13 +12250,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrPasswordFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrPasswordFlagsField" ):
-                listener.enterVfrPasswordFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrPasswordFlagsField" ):
-                listener.exitVfrPasswordFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrPasswordFlagsField" ):
+                return visitor.visitVfrPasswordFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -12530,13 +12306,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_passwordFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterPasswordFlagsField" ):
-                listener.enterPasswordFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitPasswordFlagsField" ):
-                listener.exitPasswordFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPasswordFlagsField" ):
+                return visitor.visitPasswordFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -12621,13 +12395,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementOrderedList
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementOrderedList" ):
-                listener.enterVfrStatementOrderedList(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementOrderedList" ):
-                listener.exitVfrStatementOrderedList(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementOrderedList" ):
+                return visitor.visitVfrStatementOrderedList(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -12712,13 +12484,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrOrderedListFlags
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrOrderedListFlags" ):
-                listener.enterVfrOrderedListFlags(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrOrderedListFlags" ):
-                listener.exitVfrOrderedListFlags(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrOrderedListFlags" ):
+                return visitor.visitVfrOrderedListFlags(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -12777,13 +12547,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_orderedlistFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterOrderedlistFlagsField" ):
-                listener.enterOrderedlistFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitOrderedlistFlagsField" ):
-                listener.exitOrderedlistFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitOrderedlistFlagsField" ):
+                return visitor.visitOrderedlistFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -12950,13 +12718,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementDate
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementDate" ):
-                listener.enterVfrStatementDate(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementDate" ):
-                listener.exitVfrStatementDate(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementDate" ):
+                return visitor.visitVfrStatementDate(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -13207,13 +12973,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_minMaxDateStepDefault
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMinMaxDateStepDefault" ):
-                listener.enterMinMaxDateStepDefault(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMinMaxDateStepDefault" ):
-                listener.exitMinMaxDateStepDefault(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMinMaxDateStepDefault" ):
+                return visitor.visitMinMaxDateStepDefault(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -13301,13 +13065,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrDateFlags
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrDateFlags" ):
-                listener.enterVfrDateFlags(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrDateFlags" ):
-                listener.exitVfrDateFlags(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrDateFlags" ):
+                return visitor.visitVfrDateFlags(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -13373,13 +13135,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dateFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDateFlagsField" ):
-                listener.enterDateFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDateFlagsField" ):
-                listener.exitDateFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDateFlagsField" ):
+                return visitor.visitDateFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -13529,13 +13289,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementTime
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementTime" ):
-                listener.enterVfrStatementTime(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementTime" ):
-                listener.exitVfrStatementTime(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementTime" ):
+                return visitor.visitVfrStatementTime(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -13786,13 +13544,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_minMaxTimeStepDefault
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMinMaxTimeStepDefault" ):
-                listener.enterMinMaxTimeStepDefault(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMinMaxTimeStepDefault" ):
-                listener.exitMinMaxTimeStepDefault(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMinMaxTimeStepDefault" ):
+                return visitor.visitMinMaxTimeStepDefault(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -13880,13 +13636,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrTimeFlags
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrTimeFlags" ):
-                listener.enterVfrTimeFlags(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrTimeFlags" ):
-                listener.exitVfrTimeFlags(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrTimeFlags" ):
+                return visitor.visitVfrTimeFlags(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -13952,13 +13706,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_timeFlagsField
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterTimeFlagsField" ):
-                listener.enterTimeFlagsField(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitTimeFlagsField" ):
-                listener.exitTimeFlagsField(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitTimeFlagsField" ):
+                return visitor.visitTimeFlagsField(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -14012,13 +13764,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementConditional
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementConditional" ):
-                listener.enterVfrStatementConditional(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementConditional" ):
-                listener.exitVfrStatementConditional(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementConditional" ):
+                return visitor.visitVfrStatementConditional(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -14089,13 +13839,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementConditionalNew
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementConditionalNew" ):
-                listener.enterVfrStatementConditionalNew(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementConditionalNew" ):
-                listener.exitVfrStatementConditionalNew(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementConditionalNew" ):
+                return visitor.visitVfrStatementConditionalNew(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -14137,13 +13885,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementSuppressIfStat
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementSuppressIfStat" ):
-                listener.enterVfrStatementSuppressIfStat(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementSuppressIfStat" ):
-                listener.exitVfrStatementSuppressIfStat(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementSuppressIfStat" ):
+                return visitor.visitVfrStatementSuppressIfStat(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -14179,13 +13925,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementGrayOutIfStat
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementGrayOutIfStat" ):
-                listener.enterVfrStatementGrayOutIfStat(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementGrayOutIfStat" ):
-                listener.exitVfrStatementGrayOutIfStat(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementGrayOutIfStat" ):
+                return visitor.visitVfrStatementGrayOutIfStat(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -14241,13 +13985,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementStatList
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementStatList" ):
-                listener.enterVfrStatementStatList(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementStatList" ):
-                listener.exitVfrStatementStatList(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementStatList" ):
+                return visitor.visitVfrStatementStatList(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -14327,13 +14069,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementStatListOld
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementStatListOld" ):
-                listener.enterVfrStatementStatListOld(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementStatListOld" ):
-                listener.exitVfrStatementStatListOld(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementStatListOld" ):
+                return visitor.visitVfrStatementStatListOld(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -14411,13 +14151,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementDisableIfStat
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementDisableIfStat" ):
-                listener.enterVfrStatementDisableIfStat(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementDisableIfStat" ):
-                listener.exitVfrStatementDisableIfStat(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementDisableIfStat" ):
+                return visitor.visitVfrStatementDisableIfStat(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -14496,13 +14234,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementgrayoutIfSuppressIf
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementgrayoutIfSuppressIf" ):
-                listener.enterVfrStatementgrayoutIfSuppressIf(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementgrayoutIfSuppressIf" ):
-                listener.exitVfrStatementgrayoutIfSuppressIf(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementgrayoutIfSuppressIf" ):
+                return visitor.visitVfrStatementgrayoutIfSuppressIf(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -14593,13 +14329,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementsuppressIfGrayOutIf
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementsuppressIfGrayOutIf" ):
-                listener.enterVfrStatementsuppressIfGrayOutIf(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementsuppressIfGrayOutIf" ):
-                listener.exitVfrStatementsuppressIfGrayOutIf(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementsuppressIfGrayOutIf" ):
+                return visitor.visitVfrStatementsuppressIfGrayOutIf(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -14704,13 +14438,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementSuppressIfStatNew
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementSuppressIfStatNew" ):
-                listener.enterVfrStatementSuppressIfStatNew(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementSuppressIfStatNew" ):
-                listener.exitVfrStatementSuppressIfStatNew(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementSuppressIfStatNew" ):
+                return visitor.visitVfrStatementSuppressIfStatNew(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -14829,13 +14561,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementGrayOutIfStatNew
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementGrayOutIfStatNew" ):
-                listener.enterVfrStatementGrayOutIfStatNew(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementGrayOutIfStatNew" ):
-                listener.exitVfrStatementGrayOutIfStatNew(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementGrayOutIfStatNew" ):
+                return visitor.visitVfrStatementGrayOutIfStatNew(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -14962,13 +14692,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementInconsistentIfStat
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementInconsistentIfStat" ):
-                listener.enterVfrStatementInconsistentIfStat(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementInconsistentIfStat" ):
-                listener.exitVfrStatementInconsistentIfStat(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementInconsistentIfStat" ):
+                return visitor.visitVfrStatementInconsistentIfStat(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -15058,13 +14786,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementInvalid
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementInvalid" ):
-                listener.enterVfrStatementInvalid(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementInvalid" ):
-                listener.exitVfrStatementInvalid(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementInvalid" ):
+                return visitor.visitVfrStatementInvalid(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -15134,13 +14860,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementInvalidHidden
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementInvalidHidden" ):
-                listener.enterVfrStatementInvalidHidden(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementInvalidHidden" ):
-                listener.exitVfrStatementInvalidHidden(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementInvalidHidden" ):
+                return visitor.visitVfrStatementInvalidHidden(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -15232,13 +14956,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementInvalidInventory
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementInvalidInventory" ):
-                listener.enterVfrStatementInvalidInventory(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementInvalidInventory" ):
-                listener.exitVfrStatementInvalidInventory(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementInvalidInventory" ):
+                return visitor.visitVfrStatementInvalidInventory(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -15388,13 +15110,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementInvalidSaveRestoreDefaults
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementInvalidSaveRestoreDefaults" ):
-                listener.enterVfrStatementInvalidSaveRestoreDefaults(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementInvalidSaveRestoreDefaults" ):
-                listener.exitVfrStatementInvalidSaveRestoreDefaults(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementInvalidSaveRestoreDefaults" ):
+                return visitor.visitVfrStatementInvalidSaveRestoreDefaults(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -15521,13 +15241,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementLabel
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementLabel" ):
-                listener.enterVfrStatementLabel(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementLabel" ):
-                listener.exitVfrStatementLabel(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementLabel" ):
+                return visitor.visitVfrStatementLabel(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -15611,13 +15329,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementBanner
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementBanner" ):
-                listener.enterVfrStatementBanner(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementBanner" ):
-                listener.exitVfrStatementBanner(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementBanner" ):
+                return visitor.visitVfrStatementBanner(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -15792,13 +15508,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementExtension
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementExtension" ):
-                listener.enterVfrStatementExtension(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementExtension" ):
-                listener.exitVfrStatementExtension(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementExtension" ):
+                return visitor.visitVfrStatementExtension(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -16081,13 +15795,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrExtensionData
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrExtensionData" ):
-                listener.enterVfrExtensionData(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrExtensionData" ):
-                listener.exitVfrExtensionData(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrExtensionData" ):
+                return visitor.visitVfrExtensionData(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -16157,13 +15869,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementModal
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementModal" ):
-                listener.enterVfrStatementModal(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementModal" ):
-                listener.exitVfrStatementModal(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementModal" ):
+                return visitor.visitVfrStatementModal(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -16200,13 +15910,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrModalTag
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrModalTag" ):
-                listener.enterVfrModalTag(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrModalTag" ):
-                listener.exitVfrModalTag(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrModalTag" ):
+                return visitor.visitVfrModalTag(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -16251,13 +15959,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementExpression
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementExpression" ):
-                listener.enterVfrStatementExpression(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementExpression" ):
-                listener.exitVfrStatementExpression(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementExpression" ):
+                return visitor.visitVfrStatementExpression(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -16315,13 +16021,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStatementExpressionSub
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrStatementExpressionSub" ):
-                listener.enterVfrStatementExpressionSub(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrStatementExpressionSub" ):
-                listener.exitVfrStatementExpressionSub(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrStatementExpressionSub" ):
+                return visitor.visitVfrStatementExpressionSub(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -16381,13 +16085,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_andTerm
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterAndTerm" ):
-                listener.enterAndTerm(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitAndTerm" ):
-                listener.exitAndTerm(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAndTerm" ):
+                return visitor.visitAndTerm(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -16447,13 +16149,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_bitwiseorTerm
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterBitwiseorTerm" ):
-                listener.enterBitwiseorTerm(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitBitwiseorTerm" ):
-                listener.exitBitwiseorTerm(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitBitwiseorTerm" ):
+                return visitor.visitBitwiseorTerm(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -16513,13 +16213,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_bitwiseandTerm
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterBitwiseandTerm" ):
-                listener.enterBitwiseandTerm(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitBitwiseandTerm" ):
-                listener.exitBitwiseandTerm(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitBitwiseandTerm" ):
+                return visitor.visitBitwiseandTerm(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -16578,13 +16276,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_equalTerm
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterEqualTerm" ):
-                listener.enterEqualTerm(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitEqualTerm" ):
-                listener.exitEqualTerm(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitEqualTerm" ):
+                return visitor.visitEqualTerm(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -16654,13 +16350,11 @@ class VfrSyntaxParser ( Parser ):
             return self.getTypedRuleContext(VfrSyntaxParser.CompareTermContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterEqualTermEqualRule" ):
-                listener.enterEqualTermEqualRule(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitEqualTermEqualRule" ):
-                listener.exitEqualTermEqualRule(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitEqualTermEqualRule" ):
+                return visitor.visitEqualTermEqualRule(self)
+            else:
+                return visitor.visitChildren(self)
 
 
     class EqualTermNotEqualRuleContext(EqualTermSupplementaryContext):
@@ -16675,13 +16369,11 @@ class VfrSyntaxParser ( Parser ):
             return self.getTypedRuleContext(VfrSyntaxParser.CompareTermContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterEqualTermNotEqualRule" ):
-                listener.enterEqualTermNotEqualRule(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitEqualTermNotEqualRule" ):
-                listener.exitEqualTermNotEqualRule(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitEqualTermNotEqualRule" ):
+                return visitor.visitEqualTermNotEqualRule(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -16747,13 +16439,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_compareTerm
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCompareTerm" ):
-                listener.enterCompareTerm(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCompareTerm" ):
-                listener.exitCompareTerm(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCompareTerm" ):
+                return visitor.visitCompareTerm(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -16829,13 +16519,11 @@ class VfrSyntaxParser ( Parser ):
             return self.getTypedRuleContext(VfrSyntaxParser.ShiftTermContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCompareTermLessRule" ):
-                listener.enterCompareTermLessRule(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCompareTermLessRule" ):
-                listener.exitCompareTermLessRule(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCompareTermLessRule" ):
+                return visitor.visitCompareTermLessRule(self)
+            else:
+                return visitor.visitChildren(self)
 
 
     class CompareTermGreaterEqualRuleContext(CompareTermSupplementaryContext):
@@ -16850,13 +16538,11 @@ class VfrSyntaxParser ( Parser ):
             return self.getTypedRuleContext(VfrSyntaxParser.ShiftTermContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCompareTermGreaterEqualRule" ):
-                listener.enterCompareTermGreaterEqualRule(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCompareTermGreaterEqualRule" ):
-                listener.exitCompareTermGreaterEqualRule(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCompareTermGreaterEqualRule" ):
+                return visitor.visitCompareTermGreaterEqualRule(self)
+            else:
+                return visitor.visitChildren(self)
 
 
     class CompareTermGreaterRuleContext(CompareTermSupplementaryContext):
@@ -16871,13 +16557,11 @@ class VfrSyntaxParser ( Parser ):
             return self.getTypedRuleContext(VfrSyntaxParser.ShiftTermContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCompareTermGreaterRule" ):
-                listener.enterCompareTermGreaterRule(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCompareTermGreaterRule" ):
-                listener.exitCompareTermGreaterRule(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCompareTermGreaterRule" ):
+                return visitor.visitCompareTermGreaterRule(self)
+            else:
+                return visitor.visitChildren(self)
 
 
     class CompareTermLessEqualRuleContext(CompareTermSupplementaryContext):
@@ -16892,13 +16576,11 @@ class VfrSyntaxParser ( Parser ):
             return self.getTypedRuleContext(VfrSyntaxParser.ShiftTermContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCompareTermLessEqualRule" ):
-                listener.enterCompareTermLessEqualRule(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCompareTermLessEqualRule" ):
-                listener.exitCompareTermLessEqualRule(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCompareTermLessEqualRule" ):
+                return visitor.visitCompareTermLessEqualRule(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -16978,13 +16660,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_shiftTerm
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterShiftTerm" ):
-                listener.enterShiftTerm(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitShiftTerm" ):
-                listener.exitShiftTerm(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitShiftTerm" ):
+                return visitor.visitShiftTerm(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -17052,13 +16732,11 @@ class VfrSyntaxParser ( Parser ):
             return self.getTypedRuleContext(VfrSyntaxParser.AddMinusTermContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterShiftTermRight" ):
-                listener.enterShiftTermRight(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitShiftTermRight" ):
-                listener.exitShiftTermRight(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitShiftTermRight" ):
+                return visitor.visitShiftTermRight(self)
+            else:
+                return visitor.visitChildren(self)
 
 
     class ShiftTermLeftContext(ShiftTermSupplementaryContext):
@@ -17071,13 +16749,11 @@ class VfrSyntaxParser ( Parser ):
             return self.getTypedRuleContext(VfrSyntaxParser.AddMinusTermContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterShiftTermLeft" ):
-                listener.enterShiftTermLeft(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitShiftTermLeft" ):
-                listener.exitShiftTermLeft(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitShiftTermLeft" ):
+                return visitor.visitShiftTermLeft(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -17141,13 +16817,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_addMinusTerm
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterAddMinusTerm" ):
-                listener.enterAddMinusTerm(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitAddMinusTerm" ):
-                listener.exitAddMinusTerm(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAddMinusTerm" ):
+                return visitor.visitAddMinusTerm(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -17215,13 +16889,11 @@ class VfrSyntaxParser ( Parser ):
             return self.getTypedRuleContext(VfrSyntaxParser.MultdivmodTermContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterAddMinusTermpAdd" ):
-                listener.enterAddMinusTermpAdd(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitAddMinusTermpAdd" ):
-                listener.exitAddMinusTermpAdd(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAddMinusTermpAdd" ):
+                return visitor.visitAddMinusTermpAdd(self)
+            else:
+                return visitor.visitChildren(self)
 
 
     class AddMinusTermSubtractContext(AddMinusTermSupplementaryContext):
@@ -17236,13 +16908,11 @@ class VfrSyntaxParser ( Parser ):
             return self.getTypedRuleContext(VfrSyntaxParser.MultdivmodTermContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterAddMinusTermSubtract" ):
-                listener.enterAddMinusTermSubtract(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitAddMinusTermSubtract" ):
-                listener.exitAddMinusTermSubtract(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAddMinusTermSubtract" ):
+                return visitor.visitAddMinusTermSubtract(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -17307,13 +16977,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_multdivmodTerm
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMultdivmodTerm" ):
-                listener.enterMultdivmodTerm(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMultdivmodTerm" ):
-                listener.exitMultdivmodTerm(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMultdivmodTerm" ):
+                return visitor.visitMultdivmodTerm(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -17386,13 +17054,11 @@ class VfrSyntaxParser ( Parser ):
             return self.getTypedRuleContext(VfrSyntaxParser.CastTermContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMultdivmodTermDiv" ):
-                listener.enterMultdivmodTermDiv(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMultdivmodTermDiv" ):
-                listener.exitMultdivmodTermDiv(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMultdivmodTermDiv" ):
+                return visitor.visitMultdivmodTermDiv(self)
+            else:
+                return visitor.visitChildren(self)
 
 
     class MultdivmodTermMulContext(MultdivmodTermSupplementaryContext):
@@ -17405,13 +17071,11 @@ class VfrSyntaxParser ( Parser ):
             return self.getTypedRuleContext(VfrSyntaxParser.CastTermContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMultdivmodTermMul" ):
-                listener.enterMultdivmodTermMul(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMultdivmodTermMul" ):
-                listener.exitMultdivmodTermMul(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMultdivmodTermMul" ):
+                return visitor.visitMultdivmodTermMul(self)
+            else:
+                return visitor.visitChildren(self)
 
 
     class MultdivmodTermModuloContext(MultdivmodTermSupplementaryContext):
@@ -17424,13 +17088,11 @@ class VfrSyntaxParser ( Parser ):
             return self.getTypedRuleContext(VfrSyntaxParser.CastTermContext,0)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMultdivmodTermModulo" ):
-                listener.enterMultdivmodTermModulo(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMultdivmodTermModulo" ):
-                listener.exitMultdivmodTermModulo(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMultdivmodTermModulo" ):
+                return visitor.visitMultdivmodTermModulo(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -17537,13 +17199,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_castTerm
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCastTerm" ):
-                listener.enterCastTerm(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCastTerm" ):
-                listener.exitCastTerm(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCastTerm" ):
+                return visitor.visitCastTerm(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -17640,13 +17300,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_atomTerm
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterAtomTerm" ):
-                listener.enterAtomTerm(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitAtomTerm" ):
-                listener.exitAtomTerm(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAtomTerm" ):
+                return visitor.visitAtomTerm(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -17768,13 +17426,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrExpressionCatenate
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrExpressionCatenate" ):
-                listener.enterVfrExpressionCatenate(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrExpressionCatenate" ):
-                listener.exitVfrExpressionCatenate(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrExpressionCatenate" ):
+                return visitor.visitVfrExpressionCatenate(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -17837,13 +17493,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrExpressionMatch
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrExpressionMatch" ):
-                listener.enterVfrExpressionMatch(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrExpressionMatch" ):
-                listener.exitVfrExpressionMatch(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrExpressionMatch" ):
+                return visitor.visitVfrExpressionMatch(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -17913,13 +17567,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrExpressionMatch2
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrExpressionMatch2" ):
-                listener.enterVfrExpressionMatch2(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrExpressionMatch2" ):
-                listener.exitVfrExpressionMatch2(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrExpressionMatch2" ):
+                return visitor.visitVfrExpressionMatch2(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -17976,13 +17628,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrExpressionParen
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrExpressionParen" ):
-                listener.enterVfrExpressionParen(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrExpressionParen" ):
-                listener.exitVfrExpressionParen(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrExpressionParen" ):
+                return visitor.visitVfrExpressionParen(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -18063,13 +17713,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrExpressionBuildInFunction
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrExpressionBuildInFunction" ):
-                listener.enterVfrExpressionBuildInFunction(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrExpressionBuildInFunction" ):
-                listener.exitVfrExpressionBuildInFunction(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrExpressionBuildInFunction" ):
+                return visitor.visitVfrExpressionBuildInFunction(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -18164,13 +17812,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_dupExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDupExp" ):
-                listener.enterDupExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDupExp" ):
-                listener.exitDupExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDupExp" ):
+                return visitor.visitDupExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -18236,13 +17882,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vareqvalExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVareqvalExp" ):
-                listener.enterVareqvalExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVareqvalExp" ):
-                listener.exitVareqvalExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVareqvalExp" ):
+                return visitor.visitVareqvalExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -18345,13 +17989,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_ideqvalExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterIdeqvalExp" ):
-                listener.enterIdeqvalExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitIdeqvalExp" ):
-                listener.exitIdeqvalExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitIdeqvalExp" ):
+                return visitor.visitIdeqvalExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -18453,13 +18095,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_ideqidExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterIdeqidExp" ):
-                listener.enterIdeqidExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitIdeqidExp" ):
-                listener.exitIdeqidExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitIdeqidExp" ):
+                return visitor.visitIdeqidExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -18546,13 +18186,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_ideqvallistExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterIdeqvallistExp" ):
-                listener.enterIdeqvallistExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitIdeqvallistExp" ):
-                listener.exitIdeqvallistExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitIdeqvallistExp" ):
+                return visitor.visitIdeqvallistExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -18636,13 +18274,11 @@ class VfrSyntaxParser ( Parser ):
                 return self.getTypedRuleContext(VfrSyntaxParser.ArrayNameContext,i)
 
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrQuestionDataFieldNameRule2" ):
-                listener.enterVfrQuestionDataFieldNameRule2(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrQuestionDataFieldNameRule2" ):
-                listener.exitVfrQuestionDataFieldNameRule2(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrQuestionDataFieldNameRule2" ):
+                return visitor.visitVfrQuestionDataFieldNameRule2(self)
+            else:
+                return visitor.visitChildren(self)
 
 
     class VfrQuestionDataFieldNameRule1Context(VfrQuestionDataFieldNameContext):
@@ -18662,13 +18298,11 @@ class VfrSyntaxParser ( Parser ):
         def Number(self):
             return self.getToken(VfrSyntaxParser.Number, 0)
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrQuestionDataFieldNameRule1" ):
-                listener.enterVfrQuestionDataFieldNameRule1(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrQuestionDataFieldNameRule1" ):
-                listener.exitVfrQuestionDataFieldNameRule1(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrQuestionDataFieldNameRule1" ):
+                return visitor.visitVfrQuestionDataFieldNameRule1(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -18747,13 +18381,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_arrayName
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterArrayName" ):
-                listener.enterArrayName(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitArrayName" ):
-                listener.exitArrayName(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitArrayName" ):
+                return visitor.visitArrayName(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -18814,13 +18446,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_questionref1Exp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterQuestionref1Exp" ):
-                listener.enterQuestionref1Exp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitQuestionref1Exp" ):
-                listener.exitQuestionref1Exp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitQuestionref1Exp" ):
+                return visitor.visitQuestionref1Exp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -18877,13 +18507,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_rulerefExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterRulerefExp" ):
-                listener.enterRulerefExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitRulerefExp" ):
-                listener.exitRulerefExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRulerefExp" ):
+                return visitor.visitRulerefExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -18943,13 +18571,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_stringref1Exp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterStringref1Exp" ):
-                listener.enterStringref1Exp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitStringref1Exp" ):
-                listener.exitStringref1Exp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitStringref1Exp" ):
+                return visitor.visitStringref1Exp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -19009,13 +18635,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_pushthisExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterPushthisExp" ):
-                listener.enterPushthisExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitPushthisExp" ):
-                listener.exitPushthisExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPushthisExp" ):
+                return visitor.visitPushthisExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -19061,13 +18685,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_securityExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterSecurityExp" ):
-                listener.enterSecurityExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitSecurityExp" ):
-                listener.exitSecurityExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSecurityExp" ):
+                return visitor.visitSecurityExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -19117,13 +18739,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_numericVarStoreType
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterNumericVarStoreType" ):
-                listener.enterNumericVarStoreType(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitNumericVarStoreType" ):
-                listener.exitNumericVarStoreType(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitNumericVarStoreType" ):
+                return visitor.visitNumericVarStoreType(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -19187,13 +18807,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_getExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterGetExp" ):
-                listener.enterGetExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitGetExp" ):
-                listener.exitGetExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGetExp" ):
+                return visitor.visitGetExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -19271,13 +18889,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrExpressionConstant
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrExpressionConstant" ):
-                listener.enterVfrExpressionConstant(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrExpressionConstant" ):
-                listener.exitVfrExpressionConstant(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrExpressionConstant" ):
+                return visitor.visitVfrExpressionConstant(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -19356,13 +18972,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrExpressionUnaryOp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrExpressionUnaryOp" ):
-                listener.enterVfrExpressionUnaryOp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrExpressionUnaryOp" ):
-                listener.exitVfrExpressionUnaryOp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrExpressionUnaryOp" ):
+                return visitor.visitVfrExpressionUnaryOp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -19462,13 +19076,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_lengthExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLengthExp" ):
-                listener.enterLengthExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLengthExp" ):
-                listener.exitLengthExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitLengthExp" ):
+                return visitor.visitLengthExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -19521,13 +19133,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_bitwisenotExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterBitwisenotExp" ):
-                listener.enterBitwisenotExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitBitwisenotExp" ):
-                listener.exitBitwisenotExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitBitwisenotExp" ):
+                return visitor.visitBitwisenotExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -19607,13 +19217,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_question23refExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterQuestion23refExp" ):
-                listener.enterQuestion23refExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitQuestion23refExp" ):
-                listener.exitQuestion23refExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitQuestion23refExp" ):
+                return visitor.visitQuestion23refExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -19701,13 +19309,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_stringref2Exp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterStringref2Exp" ):
-                listener.enterStringref2Exp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitStringref2Exp" ):
-                listener.exitStringref2Exp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitStringref2Exp" ):
+                return visitor.visitStringref2Exp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -19760,13 +19366,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_toboolExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterToboolExp" ):
-                listener.enterToboolExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitToboolExp" ):
-                listener.exitToboolExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitToboolExp" ):
+                return visitor.visitToboolExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -19825,13 +19429,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_tostringExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterTostringExp" ):
-                listener.enterTostringExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitTostringExp" ):
-                listener.exitTostringExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitTostringExp" ):
+                return visitor.visitTostringExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -19899,13 +19501,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_unintExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnintExp" ):
-                listener.enterUnintExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnintExp" ):
-                listener.exitUnintExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitUnintExp" ):
+                return visitor.visitUnintExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -19958,13 +19558,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_toupperExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterToupperExp" ):
-                listener.enterToupperExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitToupperExp" ):
-                listener.exitToupperExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitToupperExp" ):
+                return visitor.visitToupperExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -20017,13 +19615,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_tolwerExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterTolwerExp" ):
-                listener.enterTolwerExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitTolwerExp" ):
-                listener.exitTolwerExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitTolwerExp" ):
+                return visitor.visitTolwerExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -20094,13 +19690,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_setExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterSetExp" ):
-                listener.enterSetExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitSetExp" ):
-                listener.exitSetExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSetExp" ):
+                return visitor.visitSetExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -20178,13 +19772,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrExpressionTernaryOp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrExpressionTernaryOp" ):
-                listener.enterVfrExpressionTernaryOp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrExpressionTernaryOp" ):
-                listener.exitVfrExpressionTernaryOp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrExpressionTernaryOp" ):
+                return visitor.visitVfrExpressionTernaryOp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -20265,13 +19857,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_conditionalExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterConditionalExp" ):
-                listener.enterConditionalExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitConditionalExp" ):
-                listener.exitConditionalExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitConditionalExp" ):
+                return visitor.visitConditionalExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -20354,13 +19944,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_findExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFindExp" ):
-                listener.enterFindExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFindExp" ):
-                listener.exitFindExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFindExp" ):
+                return visitor.visitFindExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -20431,13 +20019,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_findFormat
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFindFormat" ):
-                listener.enterFindFormat(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFindFormat" ):
-                listener.exitFindFormat(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFindFormat" ):
+                return visitor.visitFindFormat(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -20499,13 +20085,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_midExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMidExp" ):
-                listener.enterMidExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMidExp" ):
-                listener.exitMidExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMidExp" ):
+                return visitor.visitMidExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -20575,13 +20159,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_tokenExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterTokenExp" ):
-                listener.enterTokenExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitTokenExp" ):
-                listener.exitTokenExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitTokenExp" ):
+                return visitor.visitTokenExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -20667,13 +20249,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_spanExp
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterSpanExp" ):
-                listener.enterSpanExp(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitSpanExp" ):
-                listener.exitSpanExp(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSpanExp" ):
+                return visitor.visitSpanExp(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -20749,13 +20329,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_spanFlags
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterSpanFlags" ):
-                listener.enterSpanFlags(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitSpanFlags" ):
-                listener.exitSpanFlags(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSpanFlags" ):
+                return visitor.visitSpanFlags(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -20830,13 +20408,11 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrExpressionMap
 
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVfrExpressionMap" ):
-                listener.enterVfrExpressionMap(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVfrExpressionMap" ):
-                listener.exitVfrExpressionMap(self)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVfrExpressionMap" ):
+                return visitor.visitVfrExpressionMap(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
