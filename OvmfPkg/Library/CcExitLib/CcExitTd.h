@@ -5,8 +5,8 @@
 
 **/
 
-#ifndef VMTD_EXIT_HANDLER_H_
-#define VMTD_EXIT_HANDLER_H_
+#ifndef CC_EXIT_TD_H_
+#define CC_EXIT_TD_H_
 
 #include <Base.h>
 #include <Uefi.h>

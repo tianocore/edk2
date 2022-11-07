@@ -13,7 +13,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/DebugLib.h>
-#include <Library/VmgExitLib.h>
+#include <Library/CcExitLib.h>
 
 #include <Register/Amd/Ghcb.h>
 #include <Register/Amd/Msr.h>

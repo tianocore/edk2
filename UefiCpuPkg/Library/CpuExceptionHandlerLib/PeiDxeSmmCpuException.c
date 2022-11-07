@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <Library/DebugLib.h>
-#include <Library/VmgExitLib.h>
+#include <Library/CcExitLib.h>
 #include "CpuExceptionCommon.h"
 
 /**

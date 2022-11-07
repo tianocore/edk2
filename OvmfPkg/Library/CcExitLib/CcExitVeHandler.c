@@ -8,8 +8,8 @@
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include "VmTdExitHandler.h"
-#include <Library/VmgExitLib.h>
+#include "CcExitTd.h"
+#include <Library/CcExitLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <IndustryStandard/Tdx.h>
 #include <IndustryStandard/InstructionParsing.h>

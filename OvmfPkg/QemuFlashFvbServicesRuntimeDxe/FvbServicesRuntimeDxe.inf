@@ -53,7 +53,7 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiRuntimeLib
-  VmgExitLib
+  CcExitLib
 
 [Guids]
   gEfiEventVirtualAddressChangeGuid   # ALWAYS_CONSUMED

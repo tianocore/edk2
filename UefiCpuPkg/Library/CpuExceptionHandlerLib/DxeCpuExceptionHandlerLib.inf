@@ -60,4 +60,4 @@
   PeCoffGetEntryPointLib
   MemoryAllocationLib
   DebugLib
-  VmgExitLib
+  CcExitLib

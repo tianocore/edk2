@@ -11,13 +11,12 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/MemEncryptSevLib.h>
-#include <Library/VmgExitLib.h>
+#include <Library/CcExitLib.h>
 #include <Register/Amd/Msr.h>
 #include <Register/Intel/Cpuid.h>
 #include <IndustryStandard/InstructionParsing.h>
 
-#include "VmgExitVcHandler.h"
-// #include <Library/MemEncryptSevLib.h>
+#include "CcExitVcHandler.h"
 
 //
 // Instruction execution mode definition

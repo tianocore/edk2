@@ -53,7 +53,7 @@
   SynchronizationLib
   PeiServicesLib
   PcdLib
-  VmgExitLib
+  CcExitLib
   MicrocodeLib
 
 [Pcd]
