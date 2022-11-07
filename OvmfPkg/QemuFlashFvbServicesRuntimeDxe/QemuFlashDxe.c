@@ -11,7 +11,7 @@
 
 #include <Library/UefiRuntimeLib.h>
 #include <Library/MemEncryptSevLib.h>
-#include <Library/VmgExitLib.h>
+#include <Library/CcExitLib.h>
 #include <Register/Amd/Msr.h>
 
 #include "QemuFlash.h"

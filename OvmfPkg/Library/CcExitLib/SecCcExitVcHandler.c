@@ -10,10 +10,10 @@
 #include <Uefi.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemEncryptSevLib.h>
-#include <Library/VmgExitLib.h>
+#include <Library/CcExitLib.h>
 #include <Register/Amd/Msr.h>
 
-#include "VmgExitVcHandler.h"
+#include "CcExitVcHandler.h"
 
 /**
   Handle a #VC exception.
@@ -61,15 +61,21 @@ VmgExitHandleVc (
   SevEsData->VcCount++;
 
   //
-  // Check for maximum PEI/DXE #VC nesting.
+  // Check for maximum SEC #VC nesting.
   //
   if (SevEsData->VcCount > VMGEXIT_MAXIMUM_VC_COUNT) {
     VmgExitIssueAssert (SevEsData);
   } else if (SevEsData->VcCount > 1) {
+    UINTN  GhcbBackupSize;
+
     //
-    // Nested #VC
+    // Be sure that the proper amount of pages are allocated
     //
-    if (SevEsData->GhcbBackupPages == NULL) {
+    GhcbBackupSize = (VMGEXIT_MAXIMUM_VC_COUNT - 1) * sizeof (*Ghcb);
+    if (GhcbBackupSize > FixedPcdGet32 (PcdOvmfSecGhcbBackupSize)) {
+      //
+      // Not enough SEC backup pages allocated.
+      //
       VmgExitIssueAssert (SevEsData);
     }
 
@@ -78,7 +84,7 @@ VmgExitHandleVc (
     //   To access the correct backup page, increment the backup page pointer
     //   based on the current VcCount.
     //
-    GhcbBackup  = (GHCB *)SevEsData->GhcbBackupPages;
+    GhcbBackup  = (GHCB *)FixedPcdGet32 (PcdOvmfSecGhcbBackupBase);
     GhcbBackup += (SevEsData->VcCount - 2);
 
     CopyMem (GhcbBackup, Ghcb, sizeof (*Ghcb));
