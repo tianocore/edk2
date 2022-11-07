@@ -40,7 +40,7 @@ CommonExceptionHandlerWorker (
       //   On other       - ExceptionType contains (possibly new) exception
       //                    value
       //
-      Status = VmgExitHandleVc (&ExceptionType, SystemContext);
+      Status = CcExitHandleVc (&ExceptionType, SystemContext);
       if (!EFI_ERROR (Status)) {
         return;
       }
@@ -57,7 +57,7 @@ CommonExceptionHandlerWorker (
       //   On other       - ExceptionType contains (possibly new) exception
       //                    value
       //
-      Status = VmTdExitHandleVe (&ExceptionType, SystemContext);
+      Status = CcExitHandleVe (&ExceptionType, SystemContext);
       if (!EFI_ERROR (Status)) {
         return;
       }

@@ -41,7 +41,7 @@
 **/
 UINT64
 EFIAPI
-VmgExit (
+CcExitVmgExit (
   IN OUT GHCB    *Ghcb,
   IN     UINT64  ExitCode,
   IN     UINT64  ExitInfo1,
@@ -56,12 +56,12 @@ VmgExit (
 
   @param[in, out]  Ghcb            A pointer to the GHCB
   @param[in, out]  InterruptState  A pointer to hold the current interrupt
-                                   state, used for restoring in VmgDone ()
+                                   state, used for restoring in CcExitVmgDone ()
 
 **/
 VOID
 EFIAPI
-VmgInit (
+CcExitVmgInit (
   IN OUT GHCB     *Ghcb,
   IN OUT BOOLEAN  *InterruptState
   );
@@ -79,7 +79,7 @@ VmgInit (
 **/
 VOID
 EFIAPI
-VmgDone (
+CcExitVmgDone (
   IN OUT GHCB     *Ghcb,
   IN     BOOLEAN  InterruptState
   );
@@ -96,7 +96,7 @@ VmgDone (
 **/
 VOID
 EFIAPI
-VmgSetOffsetValid (
+CcExitVmgSetOffsetValid (
   IN OUT GHCB           *Ghcb,
   IN     GHCB_REGISTER  Offset
   );
@@ -116,7 +116,7 @@ VmgSetOffsetValid (
 **/
 BOOLEAN
 EFIAPI
-VmgIsOffsetValid (
+CcExitVmgIsOffsetValid (
   IN GHCB           *Ghcb,
   IN GHCB_REGISTER  Offset
   );
@@ -142,7 +142,7 @@ VmgIsOffsetValid (
 **/
 EFI_STATUS
 EFIAPI
-VmgExitHandleVc (
+CcExitHandleVc (
   IN OUT EFI_EXCEPTION_TYPE  *ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );
@@ -168,7 +168,7 @@ VmgExitHandleVc (
 **/
 EFI_STATUS
 EFIAPI
-VmTdExitHandleVe (
+CcExitHandleVe (
   IN OUT EFI_EXCEPTION_TYPE  *ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );

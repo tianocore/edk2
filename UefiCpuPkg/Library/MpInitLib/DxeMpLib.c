@@ -222,9 +222,9 @@ GetSevEsAPMemory (
   Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
   Ghcb                    = Msr.Ghcb;
 
-  VmgInit (Ghcb, &InterruptState);
-  VmgExit (Ghcb, SVM_EXIT_AP_JUMP_TABLE, 0, (UINT64)(UINTN)StartAddress);
-  VmgDone (Ghcb, InterruptState);
+  CcExitVmgInit (Ghcb, &InterruptState);
+  CcExitVmgExit (Ghcb, SVM_EXIT_AP_JUMP_TABLE, 0, (UINT64)(UINTN)StartAddress);
+  CcExitVmgDone (Ghcb, InterruptState);
 
   return (UINTN)StartAddress;
 }
