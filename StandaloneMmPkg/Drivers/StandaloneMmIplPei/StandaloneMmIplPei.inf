@@ -1,0 +1,75 @@
+## @file
+#  This module provide a Standalone SMM compliant implementation of SMM IPL PEIM.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = StandaloneMmIplPei
+  FILE_GUID                      = 578A0D17-2DC0-4C7D-A121-D8D771923BB0
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = SmmIplEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  StandaloneMmIplPei.h
+  StandaloneMmIplPei.c
+
+[Sources.Ia32]
+  Ia32/LoadSmmCore.c
+  Ia32/Thunk32To64.nasm
+
+[Sources.X64]
+  X64/LoadSmmCore.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesTablePointerLib
+  PeiServicesLib
+  BaseLib
+  BaseMemoryLib
+  PeCoffLib
+  CacheMaintenanceLib
+  MemoryAllocationLib
+  DebugLib
+  HobLib
+  IntrinsicLib
+
+[Guids]
+  gMmCoreDataHobGuid
+  gEfiEventReadyToBootGuid
+
+[Ppis]
+  gPeiSmmAccessPpiGuid                     ## CONSUMES
+  gPeiSmmControlPpiGuid                    ## CONSUMES
+
+[FeaturePcd.IA32]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
+
+[Pcd.IA32]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable              ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber     ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable        ## CONSUMES
+
+[Depex]
+  gPeiSmmAccessPpiGuid AND
+  gPeiSmmControlPpiGuid
+
