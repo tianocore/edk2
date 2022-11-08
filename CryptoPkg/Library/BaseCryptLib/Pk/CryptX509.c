@@ -807,6 +807,7 @@ X509GetTBSCert (
   UINT32       Asn1Tag;
   UINT32       ObjClass;
   UINTN        Length;
+  UINTN        Inf;
 
   //
   // Check input parameters.
@@ -836,9 +837,9 @@ X509GetTBSCert (
   //
   Temp   = Cert;
   Length = 0;
-  ASN1_get_object (&Temp, (long *)&Length, (int *)&Asn1Tag, (int *)&ObjClass, (long)CertSize);
+  Inf    = ASN1_get_object (&Temp, (long *)&Length, (int *)&Asn1Tag, (int *)&ObjClass, (long)CertSize);
 
-  if (Asn1Tag != V_ASN1_SEQUENCE) {
+  if (((Inf & 0x80) == 0x00) && (Asn1Tag != V_ASN1_SEQUENCE)) {
     return FALSE;
   }
 
@@ -848,7 +849,7 @@ X509GetTBSCert (
   //
   // Verify the parsed TBSCertificate is one correct SEQUENCE data.
   //
-  if (Asn1Tag != V_ASN1_SEQUENCE) {
+  if (((Inf & 0x80) == 0x00) && (Asn1Tag != V_ASN1_SEQUENCE)) {
     return FALSE;
   }
 
@@ -1888,18 +1889,20 @@ Asn1GetTag (
   IN     UINT32   Tag
   )
 {
-  UINT8  *PtrOld;
-  INT32  ObjTag;
-  INT32  ObjCls;
-  long   ObjLength;
+  UINT8   *PtrOld;
+  INT32   ObjTag;
+  INT32   ObjCls;
+  long    ObjLength;
+  UINT32  Inf;
 
   //
   // Save Ptr position
   //
   PtrOld = *Ptr;
 
-  ASN1_get_object ((CONST UINT8 **)Ptr, &ObjLength, &ObjTag, &ObjCls, (INT32)(End - (*Ptr)));
-  if ((ObjTag == (INT32)(Tag & CRYPTO_ASN1_TAG_VALUE_MASK)) &&
+  Inf = ASN1_get_object ((CONST UINT8 **)Ptr, &ObjLength, &ObjTag, &ObjCls, (INT32)(End - (*Ptr)));
+  if (((Inf & 0x80) == 0x00) &&
+      (ObjTag == (INT32)(Tag & CRYPTO_ASN1_TAG_VALUE_MASK)) &&
       (ObjCls == (INT32)(Tag & CRYPTO_ASN1_TAG_CLASS_MASK)))
   {
     *Length = (UINTN)ObjLength;
