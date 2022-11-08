@@ -729,8 +729,8 @@ EfiShellGetDeviceName (
     //
     // Now check the parent controller using this as the child.
     //
-    if (DeviceNameToReturn == NULL) {
-      PARSE_HANDLE_DATABASE_PARENTS (DeviceHandle, &ParentControllerCount, &ParentControllerBuffer);
+    Status = PARSE_HANDLE_DATABASE_PARENTS (DeviceHandle, &ParentControllerCount, &ParentControllerBuffer);
+    if ((DeviceNameToReturn == NULL) && !EFI_ERROR (Status)) {
       for (LoopVar = 0; LoopVar < ParentControllerCount; LoopVar++) {
         PARSE_HANDLE_DATABASE_UEFI_DRIVERS (ParentControllerBuffer[LoopVar], &ParentDriverCount, &ParentDriverBuffer);
         for (HandleCount = 0; HandleCount < ParentDriverCount; HandleCount++) {

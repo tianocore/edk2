@@ -112,10 +112,13 @@ ShellCommandRunEfiDecompress (
 
         if (ShellStatus == SHELL_SUCCESS) {
           Status = FileHandleGetSize (InFileHandle, &Temp64Bit);
-          ASSERT (Temp64Bit <= (UINT32)(-1));
-          InSize = (UINTN)Temp64Bit;
           ASSERT_EFI_ERROR (Status);
-          InBuffer = AllocateZeroPool (InSize);
+          if (!EFI_ERROR (Status)) {
+            ASSERT (Temp64Bit <= (UINT32)(-1));
+            InSize   = (UINTN)Temp64Bit;
+            InBuffer = AllocateZeroPool (InSize);
+          }
+
           if (InBuffer == NULL) {
             Status = EFI_OUT_OF_RESOURCES;
           } else {
