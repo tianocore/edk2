@@ -152,10 +152,15 @@ SetRuntimeMemoryRangeAttributes (
       continue;
     }
 
+    // The memory space descriptor access attributes are not accurate. Don't pass
+    // in access attributes so SetMemorySpaceAttributes() doesn't update them.
+    // EFI_MEMORY_RUNTIME is not a CPU arch attribute, so calling
+    // SetMemorySpaceAttributes() with only it set will not clear existing page table
+    // attributes for this region, such as EFI_MEMORY_XP
     Status = gDS->SetMemorySpaceAttributes (
                     RuntimeMmioRanges->Range[Index].PhysicalBaseAddress,
                     (UINT64)RuntimeMmioRanges->Range[Index].Length,
-                    Descriptor.Attributes | EFI_MEMORY_RUNTIME
+                    EFI_MEMORY_RUNTIME
                     );
     ASSERT_EFI_ERROR (Status);
     if (EFI_ERROR (Status)) {
