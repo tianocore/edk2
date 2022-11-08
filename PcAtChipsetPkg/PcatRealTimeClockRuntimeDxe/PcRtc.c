@@ -344,7 +344,7 @@ PcRtcInit (
   // so we can use them to get and set wakeup time.
   //
   Status = PcRtcGetWakeupTime (&Enabled, &Pending, &Time, Global);
-  if ((Enabled) || (!EFI_ERROR (Status))) {
+  if ((!EFI_ERROR (Status)) || (Enabled)) {
     return EFI_SUCCESS;
   }
 
@@ -836,8 +836,11 @@ PcRtcSetWakeupTime (
     //
     // Just support set alarm time within 24 hours
     //
-    PcRtcGetTime (&RtcTime, &Capabilities, Global);
-    Status = RtcTimeFieldsValid (&RtcTime);
+    Status = PcRtcGetTime (&RtcTime, &Capabilities, Global);
+    if (!EFI_ERROR (Status)) {
+      Status = RtcTimeFieldsValid (&RtcTime);
+    }
+
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
