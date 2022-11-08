@@ -944,13 +944,14 @@ PrintMismatchMenuInfo (
   UINTN                          FormsetBufferSize;
 
   Question = MenuOption->ThisTag;
-  HiiGetFormSetFromHiiHandle (gFormData->HiiHandle, &FormsetBuffer, &FormsetBufferSize);
 
-  FormSetTitleStr = GetToken (FormsetBuffer->FormSetTitle, gFormData->HiiHandle);
-  FormTitleStr    = GetToken (gFormData->FormTitle, gFormData->HiiHandle);
+  if (!EFI_ERROR (HiiGetFormSetFromHiiHandle (gFormData->HiiHandle, &FormsetBuffer, &FormsetBufferSize))) {
+    FormSetTitleStr = GetToken (FormsetBuffer->FormSetTitle, gFormData->HiiHandle);
+    FormTitleStr    = GetToken (gFormData->FormTitle, gFormData->HiiHandle);
 
-  DEBUG ((DEBUG_ERROR, "\n[%a]: Mismatch Formset    : Formset Guid = %g,  FormSet title = %s\n", gEfiCallerBaseName, &gFormData->FormSetGuid, FormSetTitleStr));
-  DEBUG ((DEBUG_ERROR, "[%a]: Mismatch Form       : FormId = %d,  Form title = %s.\n", gEfiCallerBaseName, gFormData->FormId, FormTitleStr));
+    DEBUG ((DEBUG_ERROR, "\n[%a]: Mismatch Formset    : Formset Guid = %g,  FormSet title = %s\n", gEfiCallerBaseName, &gFormData->FormSetGuid, FormSetTitleStr));
+    DEBUG ((DEBUG_ERROR, "[%a]: Mismatch Form       : FormId = %d,  Form title = %s.\n", gEfiCallerBaseName, gFormData->FormId, FormTitleStr));
+  }
 
   if (Question->OpCode->OpCode == EFI_IFR_ORDERED_LIST_OP) {
     QuestionName = GetToken (((EFI_IFR_ORDERED_LIST *)MenuOption->ThisTag->OpCode)->Question.Header.Prompt, gFormData->HiiHandle);
