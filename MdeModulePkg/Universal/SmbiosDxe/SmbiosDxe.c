@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "SmbiosDxe.h"
+#include <Library/SafeIntLib.h>
 
 //
 // Module Global:
@@ -1594,6 +1595,7 @@ ParseAndAddExistingSmbiosTable (
   CHAR8                     *String;
   EFI_SMBIOS_HANDLE         SmbiosHandle;
   SMBIOS_STRUCTURE_POINTER  SmbiosEnd;
+  UINTN                     SafeIntResult;
 
   mPrivateData.Smbios.MajorVersion = MajorVersion;
   mPrivateData.Smbios.MinorVersion = MinorVersion;
@@ -1608,9 +1610,12 @@ ParseAndAddExistingSmbiosTable (
     //
     // Make sure not to access memory beyond SmbiosEnd
     //
-    if ((Smbios.Raw + sizeof (SMBIOS_STRUCTURE) > SmbiosEnd.Raw) ||
-        (Smbios.Raw + sizeof (SMBIOS_STRUCTURE) < Smbios.Raw))
-    {
+    Status = SafeUintnAdd ((UINTN)Smbios.Raw, sizeof (SMBIOS_STRUCTURE), &SafeIntResult);
+    if (EFI_ERROR (Status)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if ((SafeIntResult > (UINTN)SmbiosEnd.Raw) || (SafeIntResult < (UINTN)Smbios.Raw)) {
       return EFI_INVALID_PARAMETER;
     }
 
