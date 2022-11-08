@@ -473,7 +473,13 @@ InitializeMpExceptionStackSwitchHandlers (
     return;
   }
 
-  MpInitLibGetNumberOfProcessors (&NumberOfProcessors, NULL);
+  Status = MpInitLibGetNumberOfProcessors (&NumberOfProcessors, NULL);
+  ASSERT_EFI_ERROR (Status);
+
+  if (EFI_ERROR (Status)) {
+    NumberOfProcessors = 1;
+  }
+
   SwitchStackData = AllocatePages (EFI_SIZE_TO_PAGES (NumberOfProcessors * sizeof (EXCEPTION_STACK_SWITCH_CONTEXT)));
   ASSERT (SwitchStackData != NULL);
   ZeroMem (SwitchStackData, NumberOfProcessors * sizeof (EXCEPTION_STACK_SWITCH_CONTEXT));
