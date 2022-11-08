@@ -1570,6 +1570,9 @@ TcpIcmpInput (
   BOOLEAN     IcmpErrIsHard;
   BOOLEAN     IcmpErrNotify;
 
+  IcmpErrIsHard = FALSE;
+  IcmpErrNotify = FALSE;
+
   if (Nbuf->TotalSize < sizeof (TCP_HEAD)) {
     goto CLEAN_EXIT;
   }
