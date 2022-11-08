@@ -2453,7 +2453,7 @@ VariableServiceGetVariable (
   AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
   Status = FindVariable (VariableName, VendorGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
-  if ((Variable.CurrPtr == NULL) || EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (Variable.CurrPtr == NULL)) {
     goto Done;
   }
 
