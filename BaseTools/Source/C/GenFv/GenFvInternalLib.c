@@ -2397,7 +2397,7 @@ Returns:
   VerboseMsg("SecCore entry point Address = 0x%llX", (unsigned long long) SecCoreEntryAddress);
   VerboseMsg("BaseAddress = 0x%llX", (unsigned long long) FvInfo->BaseAddress);
   bSecCore = (UINT32)(SecCoreEntryAddress - FvInfo->BaseAddress);
-  VerboseMsg("offset = 0x%llX", bSecCore);
+  VerboseMsg("offset = 0x%X", bSecCore);
 
   if(bSecCore > 0x0fffff) {
     Error(NULL, 0, 3000, "Invalid", "SEC Entry point must be within 1MB of start of the FV");
