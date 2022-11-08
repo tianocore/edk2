@@ -538,6 +538,7 @@ SetupStackGuardPage (
   UINTN                 NumberOfProcessors;
   UINTN                 Bsp;
   UINTN                 Index;
+  EFI_STATUS            Status;
 
   //
   // One extra page at the bottom of the stack is needed for Guard page.
@@ -547,7 +548,13 @@ SetupStackGuardPage (
     ASSERT (FALSE);
   }
 
-  MpInitLibGetNumberOfProcessors (&NumberOfProcessors, NULL);
+  Status = MpInitLibGetNumberOfProcessors (&NumberOfProcessors, NULL);
+  ASSERT_EFI_ERROR (Status);
+
+  if (EFI_ERROR (Status)) {
+    NumberOfProcessors = 1;
+  }
+
   MpInitLibWhoAmI (&Bsp);
   for (Index = 0; Index < NumberOfProcessors; ++Index) {
     StackBase = 0;

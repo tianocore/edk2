@@ -175,7 +175,13 @@ CollectBistDataFromPpi (
   EFI_SEC_PLATFORM_INFORMATION_RECORD2  *PlatformInformationRecord2;
   EFI_SEC_PLATFORM_INFORMATION_CPU      *CpuInstanceInHob;
 
-  MpInitLibGetNumberOfProcessors (&NumberOfProcessors, &NumberOfEnabledProcessors);
+  Status = MpInitLibGetNumberOfProcessors (&NumberOfProcessors, &NumberOfEnabledProcessors);
+  ASSERT_EFI_ERROR (Status);
+
+  if (EFI_ERROR (Status)) {
+    NumberOfProcessors        = 1;
+    NumberOfEnabledProcessors = 1;
+  }
 
   BistInformationSize = sizeof (EFI_SEC_PLATFORM_INFORMATION_RECORD2) +
                         sizeof (EFI_SEC_PLATFORM_INFORMATION_CPU) * NumberOfProcessors;
