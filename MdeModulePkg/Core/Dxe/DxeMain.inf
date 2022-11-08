@@ -100,6 +100,7 @@
   gEfiEventVirtualAddressChangeGuid             ## CONSUMES             ## Event
   ## CONSUMES   ## Event
   ## PRODUCES   ## Event
+  gEfiEventBeforeExitBootServicesGuid
   gEfiEventExitBootServicesGuid
   gEfiHobMemoryAllocModuleGuid                  ## SOMETIMES_CONSUMES   ## HOB
   gEfiFirmwareFileSystem2Guid                   ## CONSUMES             ## GUID # Used to compare with FV's file system guid and get the FV's file system format
