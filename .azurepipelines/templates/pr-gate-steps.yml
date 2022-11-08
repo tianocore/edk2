@@ -12,6 +12,7 @@ parameters:
   build_pkgs: ''
   build_targets: ''
   build_archs: ''
+  extra_install_step: []
 
 steps:
 - checkout: self
@@ -36,6 +37,8 @@ steps:
 - script: git fetch origin $(System.PullRequest.targetBranch)
   displayName: fetch target branch
   condition: eq(variables['Build.Reason'], 'PullRequest')
+
+- ${{ parameters.extra_install_step }}
 
 # trim the package list if this is a PR
 - task: CmdLine@1
@@ -125,6 +128,7 @@ steps:
       TestSuites.xml
       **/BUILD_TOOLS_REPORT.html
       **/OVERRIDELOG.TXT
+      coverage.xml
     flattenFolders: true
   condition: succeededOrFailed()
 
