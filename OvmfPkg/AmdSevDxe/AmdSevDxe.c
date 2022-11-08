@@ -20,6 +20,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Guid/ConfidentialComputingSevSnpBlob.h>
 #include <Library/PcdLib.h>
+#include <Protocol/MemoryAccept.h>
 
 STATIC CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION  mSnpBootDxeTable = {
   SIGNATURE_32 ('A',                                    'M', 'D', 'E'),
@@ -29,6 +30,40 @@ STATIC CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION  mSnpBootDxeTable = {
   FixedPcdGet32 (PcdOvmfSnpSecretsSize),
   (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfCpuidBase),
   FixedPcdGet32 (PcdOvmfCpuidSize),
+};
+
+STATIC EFI_HANDLE  mAmdSevDxeHandle = NULL;
+
+#define IS_ALIGNED(x, y)  ((((x) & ((y) - 1)) == 0))
+
+STATIC
+EFI_STATUS
+EFIAPI
+AmdSevMemoryAccept (
+  IN EDKII_MEMORY_ACCEPT_PROTOCOL  *This,
+  IN EFI_PHYSICAL_ADDRESS          StartAddress,
+  IN UINTN                         Size
+  )
+{
+  //
+  // The StartAddress must be page-aligned, and the Size must be a positive
+  // multiple of SIZE_4KB. Use an assert instead of returning an erros since
+  // this is an EDK2-internal protocol.
+  //
+  ASSERT (IS_ALIGNED (StartAddress, SIZE_4KB));
+  ASSERT (IS_ALIGNED (Size, SIZE_4KB));
+  ASSERT (Size != 0);
+
+  MemEncryptSevSnpPreValidateSystemRam (
+    StartAddress,
+    EFI_SIZE_TO_PAGES (Size)
+    );
+
+  return EFI_SUCCESS;
+}
+
+STATIC EDKII_MEMORY_ACCEPT_PROTOCOL  mMemoryAcceptProtocol = {
+  AmdSevMemoryAccept
 };
 
 EFI_STATUS
@@ -147,11 +182,23 @@ AmdSevDxeEntryPoint (
     }
   }
 
-  //
-  // If its SEV-SNP active guest then install the CONFIDENTIAL_COMPUTING_SEV_SNP_BLOB.
-  // It contains the location for both the Secrets and CPUID page.
-  //
   if (MemEncryptSevSnpIsEnabled ()) {
+    //
+    // Memory acceptance began being required in SEV-SNP, so install the
+    // memory accept protocol implementation for a SEV-SNP active guest.
+    //
+    Status = gBS->InstallProtocolInterface (
+                    &mAmdSevDxeHandle,
+                    &gEdkiiMemoryAcceptProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &mMemoryAcceptProtocol
+                    );
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // If its SEV-SNP active guest then install the CONFIDENTIAL_COMPUTING_SEV_SNP_BLOB.
+    // It contains the location for both the Secrets and CPUID page.
+    //
     return gBS->InstallConfigurationTable (
                   &gConfidentialComputingSevSnpBlobGuid,
                   &mSnpBootDxeTable
