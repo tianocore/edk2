@@ -10,7 +10,6 @@ from VfrUtility import *
 from VfrTree import *
 }
 
-// VFR Program
 vfrProgram 
     :   (vfrPragmaPackDefinition | vfrDataStructDefinition | vfrDataUnionDefinition)* vfrFormSetDefinition
     ;
@@ -177,9 +176,9 @@ locals[Node=None]
     |   vfrStatementVarStoreEfi
     |   vfrStatementVarStoreNameValue
     |   vfrStatementDefaultStore
-    |   vfrStatementDisableIfFormSet //
-    |   vfrStatementSuppressIfFormSet //
-    |   vfrStatementExtension // to do
+    |   vfrStatementDisableIfFormSet 
+    |   vfrStatementSuppressIfFormSet 
+    |   vfrStatementExtension 
     )
     ;
 
@@ -255,8 +254,6 @@ locals[Node=VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
         vfrFormSetList[localctx.Node]
         'endif' ';'
     ;
-
-//2.10.1 GUID Definition
 
 guidSubDefinition[Guid]
     :   Number ',' Number ',' Number ',' Number ','
@@ -364,7 +361,7 @@ locals[Node]
     |   vfrStatementDefault
     |   vfrStatementStat
     |   vfrStatementQuestions
-    |   vfrStatementConditional /////////////
+    |   vfrStatementConditional 
     |   vfrStatementLabel
     |   vfrStatementBanner
     |   vfrStatementInvalid
@@ -408,7 +405,7 @@ locals[Node]
     |   vfrStatementCrossReference
     ;
 
-vfrStatementSubTitle  //2.11.5.1
+vfrStatementSubTitle 
 locals[Node=VfrTreeNode(EFI_IFR_SUBTITLE_OP), OpObj=CIfrSubtitle()]
     :   'subtitle' 
 
@@ -519,7 +516,7 @@ locals[Node]
     |   vfrStatementDisableIfQuest
     |   vfrStatementRefresh
     |   vfrStatementVarstoreDevice
-    |   vfrStatementExtension //pending
+    |   vfrStatementExtension 
     |   vfrStatementRefreshEvent
     |   vfrStatementWarningIf
     ;
@@ -545,7 +542,7 @@ locals[Node=VfrTreeNode(EFI_IFR_NO_SUBMIT_IF_OP)]
 vfrStatementDisableIfQuest 
 locals[Node=VfrTreeNode(EFI_IFR_DISABLE_IF_OP)]
     :   'disableif' vfrStatementExpression ';'
-        vfrStatementQuestionOptionList[localctx.Node] // to do ???????????
+        vfrStatementQuestionOptionList[localctx.Node] 
         'endif' (';')?
     ;
 
@@ -561,7 +558,7 @@ locals[Node=VfrTreeNode(EFI_IFR_VARSTORE_DEVICE_OP)]
 
 vfrStatementRefreshEvent
 locals[Node=VfrTreeNode(EFI_IFR_REFRESH_ID_OP)]
-    :   'refreshguid' '=' guidDefinition ',' /// ???
+    :   'refreshguid' '=' guidDefinition ',' 
     ;
 
 vfrStatementWarningIf 
@@ -577,7 +574,7 @@ vfrStatementQuestionTagList[Node]
     :   (vfrStatementQuestionTag)* 
     ;
 
-vfrStatementQuestionOptionTag // doing 
+vfrStatementQuestionOptionTag 
 locals[Node]
     :   vfrStatementSuppressIfQuest
     |   vfrStatementGrayOutIfQuest
@@ -616,8 +613,8 @@ locals[Node=VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
     ;
 
 
-vfrStatementDefault //pending
-locals[Node=VfrTreeNode(EFI_IFR_DEFAULT_OP)]   // DObj=None]
+vfrStatementDefault 
+locals[Node=VfrTreeNode(EFI_IFR_DEFAULT_OP)]  
     :   D='default'
         (   (   vfrStatementValue ','
             |   '=' vfrConstantValueField ','
@@ -638,10 +635,10 @@ locals[Node]
     ;
 
 vfrStatementOneOfOption 
-locals[Node=VfrTreeNode(EFI_IFR_ONE_OF_OPTION_OP)] //CIfrOneOfOption()
+locals[Node=VfrTreeNode(EFI_IFR_ONE_OF_OPTION_OP)] 
     :   'option'
         'text' '=' 'STRING_TOKEN' '(' Number ')' ','
-        'value' '=' vfrConstantValueField ',' //???
+        'value' '=' vfrConstantValueField ',' 
         F='flags' '=' vfrOneOfOptionFlags (',' 'key' '=' KN=Number) ? (',' vfrImageTag)* ';'
     ;
 
@@ -674,7 +671,7 @@ locals[Node=VfrTreeNode(EFI_IFR_WRITE_OP)]
     :   'write' vfrStatementExpression ';'
     ;
 
-vfrStatementQuestionOptionList[Node] //doing
+vfrStatementQuestionOptionList[Node] 
     :   (vfrStatementQuestionOption)*
     ;
 
@@ -741,7 +738,7 @@ locals[Node]
     ;
 
 vfrStatementNumeric  
-locals[Node=VfrTreeNode(EFI_IFR_NUMERIC_OP), OpObj=CIfrNumeric(), QType=EFI_QUESION_TYPE.QUESTION_NORMAL] // BaseInfo=EFI_VARSTORE_INFO() not needed
+locals[Node=VfrTreeNode(EFI_IFR_NUMERIC_OP), OpObj=CIfrNumeric(), QType=EFI_QUESION_TYPE.QUESTION_NORMAL] 
     :   'numeric'
         vfrQuestionBaseInfo[localctx.OpObj, localctx.QType]  
         vfrStatementHeader[localctx.OpObj] ','
@@ -968,7 +965,7 @@ locals[LFlag=0]
     |   'STORAGE_WAKEUP'
     ;
 
-vfrStatementConditional // 10.13 to do 
+vfrStatementConditional 
 locals[Node]
     :   vfrStatementDisableIfStat
     |   vfrStatementSuppressIfStat //enhance to be compatible for framework endif
@@ -995,7 +992,7 @@ locals[Node]
     :   vfrStatementGrayOutIfStatNew
     ;
 
-vfrStatementStatList ///////////
+vfrStatementStatList 
 locals[Node]
     :   vfrStatementStat
     |   vfrStatementQuestions
@@ -1113,7 +1110,7 @@ locals[Node=VfrTreeNode(EFI_IFR_GUID_OP)]
     ;
 
 vfrStatementExtension
-locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), DataBuff=bytes(), Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
+locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), DataBuff, Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
     :   'guidop'
         'guid' '=' guidDefinition
         (   ',' D='datatype' '='
@@ -1141,7 +1138,7 @@ locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), DataBuff=bytes(), Size=0, TypeName='',
 vfrExtensionData[DataBuff]
 locals[IsStruct]
     :   ',' 'data' ('[' Number ']')?  
-        ( '.' arrayName)*  '=' Number 
+        ( '.' arrayName)*  '=' N=Number 
     ;
 
 
@@ -1352,11 +1349,11 @@ ideqidExp[ExpInfo]
         ) 
     ;
 
-ideqvallistExp[ExpInfo] // issues
+ideqvallistExp[ExpInfo] 
     :   'ideqvallist' vfrQuestionDataFieldName '==' (Number)+ 
     ;
 
-vfrQuestionDataFieldName  //10.8 Doing
+vfrQuestionDataFieldName  
 locals[QId=EFI_QUESTION_ID_INVALID, Mask=0, VarIdStr='', Line=None]
     :   (SN1=StringIdentifier '[' I=Number ']') # vfrQuestionDataFieldNameRule1
         |   (SN2=StringIdentifier ('.' arrayName)*) # vfrQuestionDataFieldNameRule2
@@ -1613,9 +1610,7 @@ GreaterEqual:'>=';
 Greater:'>';
 BitWiseOr: '|';
 BitWiseAnd: '&';
-/* 
-LineDefinition                           '#line\ [0-9]+\ \'~[\']+\'[\ \t]*\n' << gCVfrErrorHandle.ParseFileScopeRecord (begexpr (), line ()); skip (); newline (); >>
-*/
+
 DevicePath : 'devicepath';
 FormSet : 'formset';
 FormSetId : 'formsetid';

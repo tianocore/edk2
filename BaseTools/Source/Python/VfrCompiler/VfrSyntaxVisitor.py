@@ -885,7 +885,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             ctx.BaseInfo.Info.VarOffset, ctx.BaseInfo.VarType, ctx.BaseInfo.VarTotalSize, ctx.BaseInfo.IsBitVar, ReturnCode = gCVfrVarDataTypeDB.GetDataFieldInfo(VarStr)
             self.__ErrorHandler(ReturnCode, ctx.SN2.line, VarStr)
             VarGuid = gCVfrDataStorage.GetVarStoreGuid(ctx.BaseInfo.VarStoreId)
-
             self.__ErrorHandler(gCVfrBufferConfig.Register(SName, VarGuid), ctx.SN2.line)
             Dummy = self.gZeroEfiIfrTypeValue
             ReturnCode = VfrReturnCode(gCVfrBufferConfig.Write(
@@ -1758,7 +1757,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             VarGuid = gCVfrDataStorage.GetVarStoreGuid(self.__CurrQestVarInfo.VarStoreId)
             VarStoreType = gCVfrDataStorage.GetVarStoreType(self.__CurrQestVarInfo.VarStoreId)
             if (IsExp == False) and (VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_BUFFER):
-                self.__ErrorHandler(gCVfrDefaultStore.BufferVarStoreAltConfigAdd(DefaultId,self.__CurrQestVarInfo,VarStoreName,VarGuid,self.__CurrQestVarInfo.VarType, Value), Line)
+                self.__ErrorHandler(gCVfrDefaultStore.BufferVarStoreAltConfigAdd(DefaultId, self.__CurrQestVarInfo, VarStoreName, VarGuid, self.__CurrQestVarInfo.VarType, Value), Line)
         ctx.Node.Data = DObj
         self.__InsertChild(ctx.Node, ctx.vfrStatementValue())
 
@@ -3231,7 +3230,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             ctx.TypeSize, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByTypeName(ctx.TypeName)
             self.__ErrorHandler(ReturnCode, ctx.D.line)
             ctx.Size = ctx.TypeSize * ctx.ArrayNum if ctx.ArrayNum > 0 else ctx.TypeSize
-                
+            ArrayType = ctypes.c_ubyte * ctx.Size
+            ctx.DataBuff = ArrayType()
+            for i in range(0, ctx.Size):
+                ctx.DataBuff[i] = 0
         self.visitChildren(ctx)
 
         Line = ctx.start.line
@@ -3254,35 +3256,87 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         IsArray = False if ctx.OpenBracket() == None else True
         ArrayIdx = 0
         ctx.IsStruct = ctx.parentCtx.IsStruct
+        ctx.DataBuff = ctx.parentCtx.DataBuff
         
         self.visitChildren(ctx)
         
-        Data = self.__TransNum(ctx.Number(len(ctx.Number())-1))
+        Data = self.__TransNum(ctx.N.text)
         if IsArray == True:
             ArrayIdx = self.__TransNum(self.__TransNum(ctx.Number(0)))
-        ByteOffset  = ArrayIdx * ctx.parentCtx.TypeSize #####
+        ByteOffset  = ArrayIdx * ctx.parentCtx.TypeSize 
         if ctx.IsStruct == True:
             TFName += ctx.parentCtx.TypeName
             for i in range(0, len(ctx.arrayName())):
                 TFName += '.'
-                TFName += ctx.arrayName(i).SubStr
-            FieldOffset, FieldType, FieldSize, BitField, ReturnCode = gCVfrVarDataTypeDB.GetDataFieldInfo(TFName)
+                TFName += ctx.arrayName(i).SubStrZ
+            FieldOffset, FieldType, FieldSize, BitField, _ = gCVfrVarDataTypeDB.GetDataFieldInfo(TFName)
             if BitField:
                 Mask = (1 << FieldSize) - 1
                 Offset = int(FieldOffset / 8)
                 PreBits = FieldOffset % 8
                 Mask <<= PreBits
-            if FieldType == EFI_IFR_TYPE_NUM_SIZE_8:
-                if BitField:
-                    # Set the value to the bit fileds.
-                    Data  <<= PreBits
-                    Value = (Value & (~Mask)) | Data
-                    Begin = ByteOffset + Offset
-                    End = ByteOffset + Offset + sizeof (ctypes.c_ubyte)
-                    ctx.DataBuff[Begin, End] = Value
+                Begin = 0
+                End = 0
+                if FieldType == EFI_IFR_TYPE_NUM_SIZE_8:
+                    Data = ctypes.c_ubyte(Data)
+                    if BitField:
+                        # Set the value to the bit fileds.
+                        Data  <<= PreBits
+                        Value = (Value & (~Mask)) | Data
+                        Begin = ByteOffset + Offset
+                        End = ByteOffset + Offset + sizeof (ctypes.c_ubyte)
+                        ctx.DataBuff[Begin: End] = Value
+                    else:
+                        Begin = ByteOffset + FieldOffset
+                        End = ByteOffset + FieldOffset + FieldSize
+                        ctx.DataBuff[Begin: End] = Data
+                        
+                    
+                if FieldType == EFI_IFR_TYPE_NUM_SIZE_16:
+                    Data = ctypes.c_ushort(Data)
+                    if BitField:
+                        # Set the value to the bit fileds.
+                        Data  <<= PreBits
+                        Value = (Value & (~Mask)) | Data
+                        Begin = ByteOffset + Offset
+                        End = ByteOffset + Offset + sizeof (ctypes.c_ushort)
+                        ctx.DataBuff[Begin: End] = Value
+                    else:
+                        Begin = ByteOffset + FieldOffset
+                        End = ByteOffset + FieldOffset + FieldSize
+                        ctx.DataBuff[Begin: End] = Data
+
+
+                if FieldType == EFI_IFR_TYPE_NUM_SIZE_32:
+                    Data = ctypes.c_ulong(Data)
+                    if BitField:
+                        # Set the value to the bit fileds.
+                        Data  <<= PreBits
+                        Value = (Value & (~Mask)) | Data
+                        Begin = ByteOffset + Offset
+                        End = ByteOffset + Offset + sizeof (ctypes.c_ulong)
+                        ctx.DataBuff[Begin: End] = Value
+                    else:
+                        Begin = ByteOffset + FieldOffset
+                        End = ByteOffset + FieldOffset + FieldSize
+                        ctx.DataBuff[Begin: End] = Data
+
+                if FieldType == EFI_IFR_TYPE_NUM_SIZE_64:
+                    Data = ctypes.c_ulonglong(Data)
+                    if BitField:
+                        # Set the value to the bit fileds.
+                        Data  <<= PreBits
+                        Value = (Value & (~Mask)) | Data
+                        Begin = ByteOffset + Offset
+                        End = ByteOffset + Offset + sizeof (ctypes.c_ulonglong)
+                        ctx.DataBuff[Begin: End] = Value
+                    else:
+                        Begin = ByteOffset + FieldOffset
+                        End = ByteOffset + FieldOffset + FieldSize
+                        ctx.DataBuff[Begin: End] = Data
+
         else:
-            ctx.DataBuff.append(Data)
-            
+            ctx.DataBuff[ByteOffset, ByteOffset + ctx.parentCtx.TypeSize] = Data
         '''
         return self.visitChildren(ctx)
 
@@ -4492,13 +4546,16 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                         f.write('      },\n')
                         
                     pVsNode = pVsNode.Next
-                f.write('  }\n')
-                f.write('  \"Data\" : {\n')
+                f.write('  },\n')
+                f.write('  \"Data\" : [\n')
                 pVsNode = gCVfrBufferConfig.GetVarItemList()
-                while pVsNode != None and pVsNode.Id != None:
+                while pVsNode != None:
+                    if pVsNode.Id == None:
+                        pVsNode = pVsNode.Next
+                        continue
                     pInfoNode = pVsNode.InfoStrList
                     while pInfoNode != None:
-                        f.write('    {\n')
+                        f.write('      {\n')
                         f.write('        \"VendorGuid\": ' + '\"{}, {}, {},'.format('0x%x'%(pVsNode.Guid.Data1),'0x%x'%(pVsNode.Guid.Data2), '0x%x'%(pVsNode.Guid.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(pVsNode.Guid.Data4[0]), '0x%x'%(pVsNode.Guid.Data4[1]), '0x%x'%(pVsNode.Guid.Data4[2]), '0x%x'%(pVsNode.Guid.Data4[3]), \
                         '0x%x'%(pVsNode.Guid.Data4[4]), '0x%x'%(pVsNode.Guid.Data4[5]), '0x%x'%(pVsNode.Guid.Data4[6]), '0x%x'%(pVsNode.Guid.Data4[7])) + ' }}\",\n')
@@ -4506,21 +4563,40 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                         f.write('        \"DefaultStore\": \"{}\",\n'.format(str(pVsNode.Id)))
                         f.write('        \"Size\": \"{}\",\n'.format(str(pInfoNode.Width)))
                         f.write('        \"Offset\": {},\n'.format(str(pInfoNode.Offset)))
-                        f.write('        \"Value\": \"{}\"\n'.format(str(pInfoNode.Value)))
-                        if pVsNode.Next == None:
-                            f.write('      }\n')
-                        else:
-                            f.write('      },\n')
+                        #f.write('        \"Value\": \"{}\"\n'.format(str(pInfoNode.Value)))
+                        if pInfoNode.Type == EFI_IFR_TYPE_DATE:
+                            f.write('        \"Value\": \"{}/{}/{}\"\n'.format(pInfoNode.Value.date.Year, pInfoNode.Value.date.Month, pInfoNode.Value.date.Day))
+                        if pInfoNode.Type == EFI_IFR_TYPE_TIME:
+                            f.write('        \"Value\": \"{}:{}:{}\"\n'.format(pInfoNode.Value.time.Hour, pInfoNode.Value.time.Minute, pInfoNode.Value.time.Second))
+                        if pInfoNode.Type == EFI_IFR_TYPE_REF:
+                            f.write('        \"Value\": \"{};{};'.format(pInfoNode.Value.ref.QuestionId, pInfoNode.Value.ref.FormId) +  '{' + '{}, {}, {},'.format('0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data1),'0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data2), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data3)) \
+                            + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[0]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[1]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[2]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[3]), \
+                            '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[4]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[5]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[6]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[7])) + ' }}' + ';{}\n'.format(pInfoNode.Value.ref.DevicePath))
+                        if pInfoNode.Type == EFI_IFR_TYPE_STRING:
+                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.string))    
+                        if pInfoNode.Type == EFI_IFR_TYPE_NUM_SIZE_8:
+                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u8))   
+                        if pInfoNode.Type == EFI_IFR_TYPE_NUM_SIZE_16:
+                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u16))  
+                        if pInfoNode.Type == EFI_IFR_TYPE_NUM_SIZE_32:
+                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u32))  
+                        if pInfoNode.Type == EFI_IFR_TYPE_NUM_SIZE_64:
+                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u64))  
+                        if pInfoNode.Type == EFI_IFR_TYPE_BOOLEAN:
+                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.b))  
+
+                        f.write('      },\n')
                         pInfoNode = pInfoNode.Next
                     pVsNode = pVsNode.Next
-                f.write('    {\n')
+                f.write('      {\n')
                 f.write('        \"VendorGuid\": \"NA\",\n')
                 f.write('        \"VarName\": \"NA\",\n')
                 f.write('        \"DefaultStore\": \"NA\",\n')
                 f.write('        \"Size\": 0,\n')
                 f.write('        \"Offset\": 0,\n')
                 f.write('        \"Value\": \"0x00\"\n')
-                f.write('    }\n')
+                f.write('      }\n')
+                f.write('  ]\n')
                 f.write('}\n')
 
             f.close()
@@ -4662,7 +4738,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                     if Info.Type == EFI_IFR_TYPE_REF:
                         f.write('              option value:  {};{};'.format(Info.Value.ref.QuestionId, Info.Value.ref.FormId) +  '{' + '{}, {}, {},'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data1),'0x%x'%(Info.Value.ref.FormSetGuid.Data2), '0x%x'%(Info.Value.ref.FormSetGuid.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data4[0]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[1]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[2]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[3]), \
-                        '0x%x'%(Info.Value.ref.FormSetGuid.Data4[4]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[5]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[6]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[7])) + ' }}\n' + ';{}'.format(Info.Value.ref.DevicePath))
+                        '0x%x'%(Info.Value.ref.FormSetGuid.Data4[4]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[5]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[6]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[7])) + ' }}' + ';{}\n'.format(Info.Value.ref.DevicePath))
                     if Info.Type == EFI_IFR_TYPE_STRING:
                         f.write('              option value:  {}\n'.format(Info.Value.string))    
                     if Info.Type == EFI_IFR_TYPE_NUM_SIZE_8:
@@ -4930,7 +5006,38 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
                 f.write('          prompt:  {}\n'.format(Info.Question.Header.Prompt)) 
                 f.write('          help:  {}\n'.format(Info.Question.Header.Help)) 
+            
+            if Root.OpCode == EFI_IFR_REFRESH_OP:
+                Info = Root.Data.GetInfo() 
+                f.write('          - refresh:\n')
+                if Root.Condition != None:
+                    f.write('              condition:  {}\n'.format(Root.Condition))
+                f.write('              interval:  {}  # RefreshInterval\n'.format(Info.RefreshInterval))
 
+            if Root.OpCode == EFI_IFR_VARSTORE_DEVICE_OP:
+                Info = Root.Data.GetInfo() 
+                f.write('          - varstoredevice:\n')
+                if Root.Condition != None:
+                    f.write('              condition:  {}\n'.format(Root.Condition))
+                f.write('              devicepath:  {}  # DevicePath\n'.format(Info.DevicePath))
+
+            if Root.OpCode == EFI_IFR_REFRESH_ID_OP:
+                Info = Root.Data.GetInfo() 
+                f.write('          - refreshguid:\n')
+                if Root.Condition != None:
+                    f.write('              condition:  {}\n'.format(Root.Condition))
+                f.write('              eventgroupid:  {' + '{}, {}, {},'.format('0x%x'%(Info.RefreshEventGroupId.Data1),'0x%x'%(Info.RefreshEventGroupId.Data2), '0x%x'%(Info.RefreshEventGroupId.Data3)) \
+                    + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.RefreshEventGroupId.Data4[0]), '0x%x'%(Info.RefreshEventGroupId.Data4[1]), '0x%x'%(Info.RefreshEventGroupId.Data4[2]), '0x%x'%(Info.RefreshEventGroupId.Data4[3]), \
+                    '0x%x'%(Info.RefreshEventGroupId.Data4[4]), '0x%x'%(Info.RefreshEventGroupId.Data4[5]), '0x%x'%(Info.RefreshEventGroupId.Data4[6]), '0x%x'%(Info.RefreshEventGroupId.Data4[7])) + ' }}\n')
+
+            if Root.OpCode == EFI_IFR_WARNING_IF_OP:
+                Info = Root.Data.GetInfo() 
+                f.write('          - warningif:\n')
+                if Root.Condition != None:
+                    f.write('              condition:  {}\n'.format(Root.Condition))
+                f.write('              warning:  {}\n'.format(Info.Warning))
+                f.write('              timeOut:  {}\n'.format(Info.TimeOut))
+                      
             if Root.OpCode == EFI_IFR_GUID_OP:
                 Info = Root.Data.GetInfo() 
                 if type(Root.Data) == CIfrLabel: # type(Info) == EFI_IFR_GUID_LABEL

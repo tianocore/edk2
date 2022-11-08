@@ -1406,9 +1406,9 @@ class CIfrText(CIfrObj, CIfrOpHeader, CIfrStatementHeader):
 
 class CIfrGuid(CIfrObj, CIfrOpHeader):
 
-    def __init__(self, Size):
+    def __init__(self, Size, Databuff=None):
         self.__Guid = EFI_IFR_GUID()
-        self.__Data = bytes()
+        self.__Data = Databuff
         # for i in range(0, Size):
         #    self.__Data[i] = b'0'
         CIfrOpHeader.__init__(self, self.__Guid.Header, EFI_IFR_GUID_OP,
@@ -1703,6 +1703,9 @@ class CIfrWarningIf(CIfrObj, CIfrOpHeader):
 
     def SetTimeOut(self, TimeOut):
         self.__WarningIf.TimeOut = TimeOut
+    
+    def GetInfo(self):
+        return self.__WarningIf
 
 
 class CIfrRefresh(CIfrObj, CIfrOpHeader):
@@ -1714,8 +1717,10 @@ class CIfrRefresh(CIfrObj, CIfrOpHeader):
 
     def SetRefreshInterval(self, RefreshInterval):
         self.__Refresh.RefreshInterval = RefreshInterval
-
-
+    
+    def GetInfo(self):
+        return self.__Refresh
+    
 class CIfrRefreshId(CIfrObj, CIfrOpHeader):
 
     def __init__(self):
@@ -1727,6 +1732,9 @@ class CIfrRefreshId(CIfrObj, CIfrOpHeader):
 
     def SetRefreshEventGroutId(self, RefreshEventGroupId):
         self.__RefreshId.RefreshEventGroupId = RefreshEventGroupId
+    
+    def GetInfo(self):
+        return self.__RefreshId
 
 
 class CIfrVarStoreDevice(CIfrObj, CIfrOpHeader):
@@ -1739,7 +1747,9 @@ class CIfrVarStoreDevice(CIfrObj, CIfrOpHeader):
 
     def SetDevicePath(self, DevicePath):
         self.__VarStoreDevice.DevicePath = DevicePath
-
+    
+    def GetInfo(self):
+        return self.__VarStoreDevice
 
 class CIfrDate(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 

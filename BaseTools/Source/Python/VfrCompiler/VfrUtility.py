@@ -912,7 +912,8 @@ class SConfigInfo():
         self.Offset = Offset
         self.Width = Width
         self.Next = None
-
+        self.Value = Value
+        '''
         if Type == EFI_IFR_TYPE_NUM_SIZE_8:
             self.Value = Value.u8
         elif Type == EFI_IFR_TYPE_NUM_SIZE_16:
@@ -931,6 +932,7 @@ class SConfigInfo():
             self.Value = Value.string
         elif Type == EFI_IFR_TYPE_BUFFER:
             self.Value = Value.u8
+        '''
 
 
 class CVfrBufferConfig(object):
@@ -998,6 +1000,7 @@ class CVfrBufferConfig(object):
             return Ret
 
         if Mode == 'a':  # add
+            #print(self.Select(Name, Guid, Id))
             if self.Select(Name, Guid, Id) != 0:
                 pItem = SConfigItem(Name, Guid, Id, Type, Offset, Width, Value)
                 if pItem == None:
@@ -1048,9 +1051,7 @@ class CVfrBufferConfig(object):
             return 1
         return 0
 
-
 gCVfrBufferConfig = CVfrBufferConfig()
-
 
 class EFI_VARSTORE_INFO(Structure):
     _pack_ = 1

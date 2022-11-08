@@ -15419,7 +15419,7 @@ class VfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_GUID_OP)
-            self.DataBuff = bytes()
+            self.DataBuff = None
             self.Size = 0
             self.TypeName = ''
             self.TypeSize = 0
@@ -15759,6 +15759,7 @@ class VfrSyntaxParser ( Parser ):
             self.parser = parser
             self.DataBuff = None
             self.IsStruct = None
+            self.N = None # Token
             self.DataBuff = DataBuff
 
         def Comma(self):
@@ -15842,7 +15843,7 @@ class VfrSyntaxParser ( Parser ):
             self.state = 2491
             self.match(VfrSyntaxParser.T__5)
             self.state = 2492
-            self.match(VfrSyntaxParser.Number)
+            localctx.N = self.match(VfrSyntaxParser.Number)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
