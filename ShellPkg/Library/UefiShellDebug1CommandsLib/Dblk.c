@@ -158,7 +158,10 @@ ShellCommandRunDblk (
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
 
-        ShellConvertStringToUint64 (LbaString, &Lba, TRUE, FALSE);
+        if (EFI_ERROR (ShellConvertStringToUint64 (LbaString, &Lba, TRUE, FALSE))) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", LbaString);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
       }
 
       if (BlockCountString == NULL) {
@@ -169,12 +172,13 @@ ShellCommandRunDblk (
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
 
-        ShellConvertStringToUint64 (BlockCountString, &BlockCount, TRUE, FALSE);
-        if (BlockCount > 0x10) {
-          BlockCount = 0x10;
-        } else if (BlockCount == 0) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", BlockCountString);
-          ShellStatus = SHELL_INVALID_PARAMETER;
+        if (!EFI_ERROR (ShellConvertStringToUint64 (BlockCountString, &BlockCount, TRUE, FALSE))) {
+          if (BlockCount > 0x10) {
+            BlockCount = 0x10;
+          } else if (BlockCount == 0) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", BlockCountString);
+            ShellStatus = SHELL_INVALID_PARAMETER;
+          }
         }
       }
 

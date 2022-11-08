@@ -1300,6 +1300,7 @@ DoStartupScript (
   CHAR16         *FullFileStringPath;
   UINTN          NewSize;
 
+  CalleeStatus    = EFI_SUCCESS;
   Key.UnicodeChar = CHAR_NULL;
   Key.ScanCode    = 0;
 
