@@ -12,6 +12,7 @@ parameters:
   tool_chain_tag: ''
   vm_image: ''
   arch_list: ''
+  extra_install_step: []
 
 # Build step
 jobs:
@@ -77,3 +78,38 @@ jobs:
       build_pkgs: $(Build.Pkgs)
       build_targets: $(Build.Targets)
       build_archs: ${{ parameters.arch_list }}
+      extra_install_step: ${{ parameters.extra_install_step }}
+
+- job: Build_${{ parameters.tool_chain_tag }}_TARGET_CODE_COVERAGE
+  dependsOn: Build_${{ parameters.tool_chain_tag }}
+  workspace:
+    clean: all
+
+  pool:
+    vmImage: 'windows-2019'
+
+  steps:
+    - checkout: self
+      clean: true
+      fetchDepth: 1
+      submodules: true
+
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download Build Artifacts'
+      inputs:
+        buildType: 'current'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+
+    - task: CmdLine@2
+      displayName: Create code coverage report
+      inputs:
+        script: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          reportgenerator -reports:$(Build.ArtifactStagingDirectory)/**/coverage.xml -targetdir:$(Build.ArtifactStagingDirectory)/Coverage -reporttypes:Cobertura -filefilters:-*Build*;-*UnitTest*;-*Mock*;-*usr*
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish code coverage'
+      inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '$(Build.ArtifactStagingDirectory)/Coverage/Cobertura.xml'
+
