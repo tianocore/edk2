@@ -42,6 +42,7 @@
   DebugLib
   PcdLib
   HobLib
+  SafeIntLib
 
 [Protocols]
   gEfiSmbiosProtocolGuid                            ## PRODUCES
