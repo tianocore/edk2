@@ -1,10 +1,13 @@
 /** @file
-  CpuFlushTlb function.
+  CpuFlushTlb function for Ia32/X64.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
+  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
+#include <Library/BaseLib.h>
 
 /**
   Flushes all the Translation Lookaside Buffers(TLB) entries in a CPU.
@@ -18,8 +21,5 @@ CpuFlushTlb (
   VOID
   )
 {
-  _asm {
-    mov     eax, cr3
-    mov     cr3, eax
-  }
+  AsmWriteCr3 (AsmReadCr3 ());
 }
