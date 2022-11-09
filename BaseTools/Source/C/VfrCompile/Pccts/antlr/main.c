@@ -1295,7 +1295,7 @@ int token;
 #endif
 {
 	int     j;
-        static    char    imag_name[20];
+        static    char    imag_name[25];
 
 	/* look in all lexclasses for the token */
 	if ( TokenString(token) != NULL ) return TokenString(token);
@@ -1306,7 +1306,7 @@ int token;
 	}
 
     if (1) {
-      sprintf(imag_name,"UnknownToken#%d",token);           /* MR13 */
+      snprintf(imag_name, 25, "UnknownToken#%d", token);    /* MR13 */
       return imag_name;                                     /* MR13 */
     }
 
