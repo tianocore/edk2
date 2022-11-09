@@ -15,10 +15,10 @@
 //
 // Processor Information
 //
-#string STR_PROCESSOR_SOCKET_DESIGNATION    #language en-US  "Not Specified"
-#string STR_PROCESSOR_MANUFACTURE           #language en-US  "Not Specified"
-#string STR_PROCESSOR_VERSION               #language en-US  "Not Specified"
-#string STR_PROCESSOR_SERIAL_NUMBER         #language en-US  "Not Specified"
-#string STR_PROCESSOR_ASSET_TAG             #language en-US  "Not Specified"
-#string STR_PROCESSOR_PART_NUMBER           #language en-US  "Not Specified"
+#string STR_PROCESSOR_SOCKET_DESIGNATION    #language en-US  "Not Set"
+#string STR_PROCESSOR_MANUFACTURE           #language en-US  "Not Set"
+#string STR_PROCESSOR_VERSION               #language en-US  "Not Set"
+#string STR_PROCESSOR_SERIAL_NUMBER         #language en-US  "Not Set"
+#string STR_PROCESSOR_ASSET_TAG             #language en-US  "Not Set"
+#string STR_PROCESSOR_PART_NUMBER           #language en-US  "Not Set"
 #string STR_PROCESSOR_UNKNOWN               #language en-US  "Unknown"

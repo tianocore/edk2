@@ -11,8 +11,8 @@
 
 /=#
 
-#string STR_MISC_BIOS_VENDOR           #language en-US  "Not Specified"
-#string STR_MISC_BIOS_VERSION          #language en-US  "Not Specified"
-#string STR_MISC_BIOS_RELEASE_DATE     #language en-US  "Not Specified"
-#string STR_MISC_BIOS_VENDOR           #language en-US  "Not Specified"
+#string STR_MISC_BIOS_VENDOR           #language en-US  "Not Set"
+#string STR_MISC_BIOS_VERSION          #language en-US  "Not Set"
+#string STR_MISC_BIOS_RELEASE_DATE     #language en-US  "Not Set"
+#string STR_MISC_BIOS_VENDOR           #language en-US  "Not Set"
 #string STR_MISC_BIOS_RELEASE_DATE     #language en-US  "12/02/2020"
