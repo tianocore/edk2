@@ -9,6 +9,32 @@
 # Enable individual queries below.
 
 - include:
+    id: cpp/potential-buffer-overflow
+- include:
+    id: cpp/toctou-race-condition
+- include:
+    id: cpp/unclear-array-index-validation
+- include:
+    id: cpp/unsafe-strncat
+- include:
+    id: cpp/use-after-free
+- include:
+    id: cpp/user-controlled-null-termination-tainted
+- include:
+    id: cpp/wrong-number-format-arguments
+- include:
+    id: cpp/wrong-type-format-argument
+- include:
+    id: cpp/conditionallyuninitializedvariable
+- include:
     id: cpp/infinite-loop-with-unsatisfiable-exit-condition
 - include:
     id: cpp/overflow-buffer
+- include:
+    id: cpp/overrunning-write
+- include:
+    id: cpp/overrunning-write-with-float
+- include:
+    id: cpp/pointer-overflow-check
+- include:
+    id: cpp/very-likely-overrunning-write
