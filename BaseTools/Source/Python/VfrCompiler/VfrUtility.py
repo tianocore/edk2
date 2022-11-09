@@ -52,8 +52,8 @@ class SVfrDataType(object):
     def __init__(self, TypeName=''):
         self.TypeName = TypeName
         self.Type = 0
-        self.Align = 1  #
-        self.TotalSize = 0  #
+        self.Align = 1  
+        self.TotalSize = 0  
         self.HasBitField = False
         self.Members = None
         self.Next = None
@@ -106,7 +106,7 @@ class CVfrVarDataTypeDB(object):
     def __init__(self):
         self.__PackAlign = DEFAULT_PACK_ALIGN
         self.__PackStack = None
-        self.__DataTypeList = None  # SVfrDataType
+        self.__DataTypeList = None 
         self.__NewDataType = None
         self.__CurrDataType = None
         self.__CurrDataField = None
@@ -746,7 +746,7 @@ class SVfrDefaultStoreNode(object):
 class CVfrDefaultStore(object):
 
     def __init__(self):
-        self.__DefaultStoreList = None  #
+        self.__DefaultStoreList = None  
 
     def RegisterDefaultStore(self, ObjAddr: EFI_IFR_DEFAULTSTORE, RefName, DefaultStoreNameId, DefaultId):
         if RefName == '' or RefName == None:
@@ -818,7 +818,7 @@ class CVfrDefaultStore(object):
             pNode = pNode.Next
         if pNode == None:
             return VfrReturnCode.VFR_RETURN_UNDEFINED
-        # pNode.DefaultId sprintf (NewAltCfg, "%04x", pNode->mDefaultId);？
+        # pNode.DefaultId sprintf (NewAltCfg, "%04x", pNode->mDefaultId)
         gCVfrBufferConfig.Open()
         if gCVfrBufferConfig.Select(VarStoreName, VarStoreGuid) == 0:
             Returnvalue = gCVfrBufferConfig.Write('a', VarStoreName,
@@ -913,27 +913,6 @@ class SConfigInfo():
         self.Width = Width
         self.Next = None
         self.Value = Value
-        '''
-        if Type == EFI_IFR_TYPE_NUM_SIZE_8:
-            self.Value = Value.u8
-        elif Type == EFI_IFR_TYPE_NUM_SIZE_16:
-            self.Value = Value.u16
-        elif Type == EFI_IFR_TYPE_NUM_SIZE_32:
-            self.Value = Value.u32
-        elif Type == EFI_IFR_TYPE_NUM_SIZE_64:
-            self.Value = Value.u64
-        elif Type == EFI_IFR_TYPE_BOOLEAN:
-            self.Value = Value.b
-        elif Type == EFI_IFR_TYPE_TIME:
-            self.Value = Value.time
-        elif Type == EFI_IFR_TYPE_DATE:
-            self.Value = Value.date
-        elif Type == EFI_IFR_TYPE_STRING:
-            self.Value = Value.string
-        elif Type == EFI_IFR_TYPE_BUFFER:
-            self.Value = Value.u8
-        '''
-
 
 class CVfrBufferConfig(object):
     __metaclass__ = ABCMeta
@@ -1000,7 +979,6 @@ class CVfrBufferConfig(object):
             return Ret
 
         if Mode == 'a':  # add
-            #print(self.Select(Name, Guid, Id))
             if self.Select(Name, Guid, Id) != 0:
                 pItem = SConfigItem(Name, Guid, Id, Type, Offset, Width, Value)
                 if pItem == None:
@@ -1307,7 +1285,7 @@ class CVfrDataStorage(object):
         pNode = SVfrVarStorageNode(StoreName, VarStoreId)
 
         if pNode == None:
-            return VfrReturnCode.VFR_RETURN_OUT_FOR_RESOURCES  ###
+            return VfrReturnCode.VFR_RETURN_OUT_FOR_RESOURCES  
 
         self.__NewVarStorageNode = pNode
         return VfrReturnCode.VFR_RETURN_SUCCESS
@@ -1596,7 +1574,7 @@ class CVfrQuestionDB(object):
 
         return VfrReturnCode.VFR_RETURN_UNDEFINED
 
-    def __GetFreeQuestionId(self):  #
+    def __GetFreeQuestionId(self):  
 
         Index = 0
         for i in range(0, EFI_FREE_QUESTION_ID_BITMAP_SIZE):
@@ -1617,18 +1595,18 @@ class CVfrQuestionDB(object):
 
         return EFI_QUESTION_ID_INVALID
 
-    def __CheckQuestionIdFree(self, QId):  #
+    def __CheckQuestionIdFree(self, QId):  
         Index = int(QId / EFI_BITS_PER_UINT32)
         Offset = QId % EFI_BITS_PER_UINT32
         return (self.__FreeQIdBitMap[Index] & (0x80000000 >> Offset)) == 0
 
-    def __MarkQuestionIdUsed(self, QId):  #
+    def __MarkQuestionIdUsed(self, QId):  
 
         Index = int(QId / EFI_BITS_PER_UINT32)
         Offset = QId % EFI_BITS_PER_UINT32
         self.__FreeQIdBitMap[Index] |= (0x80000000 >> Offset)
 
-    def __MarkQuestionIdUnused(self, QId):  #
+    def __MarkQuestionIdUnused(self, QId):  
         Index = int(QId / EFI_BITS_PER_UINT32)
         Offset = QId % EFI_BITS_PER_UINT32
         self.__FreeQIdBitMap[Index] &= ~(0x80000000 >> Offset)

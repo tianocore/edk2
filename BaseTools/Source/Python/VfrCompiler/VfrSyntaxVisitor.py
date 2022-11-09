@@ -593,8 +593,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
             self.__ErrorHandler(ReturnCode, Line)
         else:
-            self.__ErrorHandler(gCVfrDataStorage.DeclareBufferVarStore(self.__getText(ctx.TN), Guid, gCVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore, Attributes), Line) #
-            VarStoreId, ReturnCode = gCVfrDataStorage.GetVarStoreId(self.__getText(ctx.TN), Guid) 
+            self.__ErrorHandler(gCVfrDataStorage.DeclareBufferVarStore(self.__GetText(ctx.TN), Guid, gCVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore, Attributes), Line) #
+            VarStoreId, ReturnCode = gCVfrDataStorage.GetVarStoreId(self.__GetText(ctx.TN), Guid) 
             self.__ErrorHandler(ReturnCode, ctx.VN.line, ctx.VN.text)
             Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
             self.__ErrorHandler(ReturnCode, ctx.N.line)
@@ -1164,11 +1164,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementRules.
     def visitVfrStatementRules(self, ctx:VfrSyntaxParser.VfrStatementRulesContext):
 
-        RObj=CIfrRule()
+        RObj = CIfrRule()
         self.visitChildren(ctx)
 
         RObj.SetLineNo(ctx.start.line)
-        RuleName = self.__TransId(ctx.StringIdentifier(0))
+        RuleName = self.__TransId(ctx.StringIdentifier())
         self.__CVfrRulesDB.RegisterRule(RuleName)
         RObj.SetRuleId(self.__CVfrRulesDB.GetRuleId(RuleName))
         ctx.Node.Data = RObj
@@ -3605,8 +3605,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by VfrSyntaxParser#castTerm.
     def visitCastTerm(self, ctx:VfrSyntaxParser.CastTermContext):
-        ###################################
-        self.visitChildren(ctx)
+        self.visitChildren(ctx) ##
         CastType = 0xFF
         if ctx.Boolean() != []:
             CastType = 0
@@ -4420,14 +4419,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         EObj.SetLineNo(Line)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.MObj
-
-    def GetRoot(self):
-        return self.__Root
     
-    def GetQuestionDB(self):
-        return self.__CVfrQuestionDB
-    
-    def __getText(self, ctx):
+    def __GetText(self, ctx):
         if ctx == None:
             return None
         else:
@@ -4489,6 +4482,12 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def __InsertChild(self, ParentNode: VfrTreeNode, ChildCtx):
         if ChildCtx != None and ChildCtx.Node != None:
             ParentNode.insertChild(ChildCtx.Node)
+
+    def GetRoot(self):
+        return self.__Root
+    
+    def GetQuestionDB(self):
+        return self.__CVfrQuestionDB
     
     def DumpJson(self, FileName):
         try:
@@ -4678,7 +4677,21 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                     f.write('      mapguid:  {' + '{}, {}, {},'.format('0x%x'%(MethodMap.MethodIdentifier.Data1),'0x%x'%(MethodMap.MethodIdentifier.Data2), '0x%x'%(MethodMap.MethodIdentifier.Data3)) \
                     + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(MethodMap.MethodIdentifier.Data4[0]), '0x%x'%(MethodMap.MethodIdentifier.Data4[1]), '0x%x'%(MethodMap.MethodIdentifier.Data4[2]), '0x%x'%(MethodMap.MethodIdentifier.Data4[3]), \
                     '0x%x'%(MethodMap.MethodIdentifier.Data4[4]), '0x%x'%(MethodMap.MethodIdentifier.Data4[5]), '0x%x'%(MethodMap.MethodIdentifier.Data4[6]), '0x%x'%(MethodMap.MethodIdentifier.Data4[7])) + ' }}\n')
-                    
+            
+            if Root.OpCode == EFI_IFR_IMAGE_OP:
+                Info = Root.Data.GetInfo()
+                f.write('      - image:\n')
+                if Root.Condition != None:
+                    f.write('          condition:  {}\n'.format(Root.Condition))
+                f.write('          Id:  {} # ImageId\n'.format(Info.Id))
+
+            if Root.OpCode == EFI_IFR_RULE_OP:
+                Info = Root.Data.GetInfo()
+                f.write('      - rule:\n')
+                if Root.Condition != None:
+                    f.write('          condition:  {}\n'.format(Root.Condition))
+                f.write('          RuleId:  {} # RuleId\n'.format(Info.RuleId))
+                
             if Root.OpCode == EFI_IFR_SUBTITLE_OP:
                 Info = Root.Data.GetInfo()
                 f.write('      - subtitle:\n')

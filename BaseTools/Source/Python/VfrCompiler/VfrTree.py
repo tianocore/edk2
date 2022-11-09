@@ -15,19 +15,21 @@ class VfrTreeNode():
         self.Expression = None
         self.Parent = None
         self.Child = []
-        '''
-        self.NextRel = None # needed?
-        self.LastRel = None # needed?
-        '''
+
     
-    def HasCondition(self) ->bool:
+    def hasCondition(self) ->bool:
         if self.Condition == None:
             return False
         else:
             return True
-        
     
-    def HasChild(self) -> bool:
+    # Get data from ctypes to bytes.
+    def struct2stream(self, s) -> bytes:
+        length = sizeof(s)
+        p = cast(pointer(s), POINTER(c_char * length))
+        return p.contents.raw
+        
+    def hasChild(self) -> bool:
         if self.Child == []:
             return False
         else:
@@ -48,17 +50,7 @@ class VfrTreeNode():
             if not pos:
                 LastTree = self.Child[-1]
                 self.Child.append(NewNode)
-                '''
-                LastTree.NextRel = NewNode
-                NewNode.LastRel = LastTree
-                '''
             else:
-                '''
-                NewNode.NextRel = self.Child[pos-1].NextRel
-                NewNode.LastRel = self.Child[pos].LastRel
-                self.Child[pos-1].NextRel = NewNode
-                self.Child[pos].LastRel = NewNode
-                '''
                 self.Child.insert(pos, NewNode)
                 
         NewNode.Parent = self
