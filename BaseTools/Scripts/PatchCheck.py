@@ -383,7 +383,10 @@ class GitDiffCheck:
                     self.force_crlf = False
                     self.force_notabs = False
                 if os.path.basename(self.filename) == 'GNUmakefile' or \
-                   os.path.basename(self.filename) == 'Makefile':
+                   os.path.basename(self.filename).lower() == 'makefile' or \
+                   os.path.splitext(self.filename)[1] == '.makefile' or \
+                   self.filename.startswith(
+                        'BaseTools/Source/C/VfrCompile/Pccts/'):
                     self.force_notabs = False
             elif len(line.rstrip()) != 0:
                 self.format_error("didn't find diff command")
