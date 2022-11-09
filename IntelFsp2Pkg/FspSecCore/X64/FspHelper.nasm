@@ -7,10 +7,12 @@
     DEFAULT  REL
     SECTION .text
 
+FSP_HEADER_IMGBASE_OFFSET    EQU   1Ch
+
 global ASM_PFX(AsmGetFspBaseAddress)
 ASM_PFX(AsmGetFspBaseAddress):
    call  ASM_PFX(AsmGetFspInfoHeader)
-   add   rax, 0x1C
+   add   rax, FSP_HEADER_IMGBASE_OFFSET
    mov   eax, [rax]
    ret
 
