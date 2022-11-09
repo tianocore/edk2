@@ -40,8 +40,8 @@ HttpBootAddBootOption (
   UINTN                         Length;
   CHAR8                         AsciiUri[URI_STR_MAX_SIZE];
   CHAR8                         AsciiProxyUri[URI_STR_MAX_SIZE];
+  UINTN                         AsciiProxyUriSize;
   EFI_STATUS                    Status;
-  UINTN                         Index;
   EFI_BOOT_MANAGER_LOAD_OPTION  NewOption;
 
   NewDevicePath   = NULL;
@@ -54,37 +54,26 @@ HttpBootAddBootOption (
   }
 
   //
-  // Convert the scheme to all lower case.
+  // Check the URI Scheme
   //
-  for (Index = 0; Index < StrLen (Uri); Index++) {
-    if (Uri[Index] == L':') {
-      break;
-    }
-
-    if ((Uri[Index] >= L'A') && (Uri[Index] <= L'Z')) {
-      Uri[Index] -= (CHAR16)(L'A' - L'a');
+  UnicodeStrToAsciiStrS (Uri, AsciiUri, sizeof (AsciiUri));
+  UnicodeStrToAsciiStrS (ProxyUri, AsciiProxyUri, sizeof (AsciiProxyUri));
+  Status = HttpBootCheckUriScheme (AsciiUri);
+  if (EFI_ERROR (Status)) {
+    if (Status == EFI_INVALID_PARAMETER) {
+      DEBUG ((DEBUG_ERROR, "Error: Invalid URI address.\n"));
+    } else if (Status == EFI_ACCESS_DENIED) {
+      DEBUG ((DEBUG_ERROR, "Error: Access forbidden, only HTTPS connection is allowed.\n"));
     }
   }
 
-  for (Index = 0; Index < StrLen (ProxyUri); Index++) {
-    if (ProxyUri[Index] == L':') {
-      break;
+  Status = HttpBootCheckUriScheme (AsciiProxyUri);
+  if (EFI_ERROR (Status)) {
+    if (Status == EFI_INVALID_PARAMETER) {
+      DEBUG ((DEBUG_ERROR, "Error: Invalid URI address.\n"));
+    } else if (Status == EFI_ACCESS_DENIED) {
+      DEBUG ((DEBUG_ERROR, "Error: Access forbidden, only HTTPS connection is allowed.\n"));
     }
-
-    if ((ProxyUri[Index] >= L'A') && (ProxyUri[Index] <= L'Z')) {
-      ProxyUri[Index] -= (CHAR16)(L'A' - L'a');
-    }
-  }
-
-  //
-  // Only accept empty URI, or http and https URI.
-  //
-  if ((StrLen (Uri) != 0) && (StrnCmp (Uri, L"http://", 7) != 0) && (StrnCmp (Uri, L"https://", 8) != 0)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if ((StrLen (ProxyUri) != 0) && (StrnCmp (ProxyUri, L"http://", 7) != 0) && (StrnCmp (ProxyUri, L"https://", 8) != 0)) {
-    return EFI_INVALID_PARAMETER;
   }
 
   //
@@ -123,8 +112,8 @@ HttpBootAddBootOption (
   // Update the Proxy node with the input Proxy URI
   //
   if (StrLen (ProxyUri) != 0) {
-    UnicodeStrToAsciiStrS (ProxyUri, AsciiProxyUri, sizeof (AsciiProxyUri));
-    Length = sizeof (EFI_DEVICE_PATH_PROTOCOL) + AsciiStrSize (AsciiProxyUri);
+    AsciiProxyUriSize = AsciiStrSize (AsciiProxyUri);
+    Length = sizeof (EFI_DEVICE_PATH_PROTOCOL) + AsciiProxyUriSize;
     Node   = AllocatePool (Length);
     if (Node == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
@@ -134,7 +123,9 @@ HttpBootAddBootOption (
     Node->DevPath.Type    = MESSAGING_DEVICE_PATH;
     Node->DevPath.SubType = MSG_URI_DP;
     SetDevicePathNodeLength (Node, Length);
-    CopyMem ((UINT8 *)Node + sizeof (EFI_DEVICE_PATH_PROTOCOL), AsciiProxyUri, AsciiStrSize (AsciiProxyUri));
+    CopyMem ((UINT8 *)Node + sizeof (EFI_DEVICE_PATH_PROTOCOL),
+             AsciiProxyUri,
+             AsciiProxyUriSize);
     NewDevicePath = AppendDevicePathNode (TmpDevicePath, (EFI_DEVICE_PATH_PROTOCOL *)Node);
     FreePool (Node);
     if (NewDevicePath == NULL) {
@@ -148,7 +139,6 @@ HttpBootAddBootOption (
   //
   // Update the URI node with the input boot file URI.
   //
-  UnicodeStrToAsciiStrS (Uri, AsciiUri, sizeof (AsciiUri));
   Length = sizeof (EFI_DEVICE_PATH_PROTOCOL) + AsciiStrSize (AsciiUri);
   Node   = AllocatePool (Length);
   if (Node == NULL) {
