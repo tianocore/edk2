@@ -2331,14 +2331,14 @@ TokNode *p;
 			set_nameErrSet = bufErrSet;								/* MR23 */
 		}
 		else {					/* wild card */
-			static char buf[sizeof("zzerr")+10];
-			static char bufErrSet[sizeof("zzerr")+10];
+			static char buf[sizeof("zzerr")+11];
+			static char bufErrSet[sizeof("zzerr")+11];
 			int n = DefErrSet( &b, 0, NULL );
 			int nErrSet = DefErrSetWithSuffix(0, &bErrSet, 1, NULL, "_set");
-			if ( GenCC ) sprintf(buf, "err%d", n);
-			else sprintf(buf, "zzerr%d", n);
+			if ( GenCC ) snprintf(buf, 11, "err%d", n);
+			else snprintf(buf, 11, "zzerr%d", n);
 			if ( GenCC ) sprintf(bufErrSet, "err%d", nErrSet);
-			else sprintf(bufErrSet, "zzerr%d", nErrSet);
+			else snprintf(bufErrSet, 11, "zzerr%d", nErrSet);
 			set_name = buf;
 			set_nameErrSet = bufErrSet;
 		}
