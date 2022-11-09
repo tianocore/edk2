@@ -7,6 +7,8 @@
 
     SECTION .text
 
+FSP_HEADER_IMGBASE_OFFSET    EQU   1Ch
+
 global ASM_PFX(FspInfoHeaderRelativeOff)
 ASM_PFX(FspInfoHeaderRelativeOff):
    DD    0x12345678               ; This value must be patched by the build script
@@ -14,7 +16,7 @@ ASM_PFX(FspInfoHeaderRelativeOff):
 global ASM_PFX(AsmGetFspBaseAddress)
 ASM_PFX(AsmGetFspBaseAddress):
    call  ASM_PFX(AsmGetFspInfoHeader)
-   add   eax, 0x1C
+   add   eax, FSP_HEADER_IMGBASE_OFFSET
    mov   eax, dword [eax]
    ret
 

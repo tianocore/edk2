@@ -594,37 +594,38 @@ ASM_PFX(TempRamInitApi):
   SAVE_EAX
   SAVE_EDX
 
+  CALL_EBP  ASM_PFX(LoadUpdPointerToECX) ; ECX for UPD param
+  SAVE_ECX                               ; save UPD param to slot 3 in xmm6
+
   ;
   ; Sec Platform Init
   ;
-  CALL_EBP  ASM_PFX(LoadUpdPointerToECX) ; ECX for UPD param
   CALL_MMX  ASM_PFX(SecPlatformInit)
   cmp       eax, 0
   jnz       TempRamInitExit
 
   ; Load microcode
   LOAD_ESP
-  CALL_EBP  ASM_PFX(LoadUpdPointerToECX) ; ECX for UPD param
+  LOAD_ECX
   CALL_MMX  ASM_PFX(LoadMicrocodeDefault)
-  SXMMN     xmm6, 3, eax            ;Save microcode return status in ECX-SLOT 3 in xmm6.
+  SAVE_UCODE_STATUS                 ; Save microcode return status in slot 1 in xmm5.
   ;@note If return value eax is not 0, microcode did not load, but continue and attempt to boot.
 
   ; Call Sec CAR Init
   LOAD_ESP
-  CALL_EBP  ASM_PFX(LoadUpdPointerToECX) ; ECX for UPD param
+  LOAD_ECX
   CALL_MMX  ASM_PFX(SecCarInit)
   cmp       eax, 0
   jnz       TempRamInitExit
 
   LOAD_ESP
-  CALL_EBP  ASM_PFX(LoadUpdPointerToECX) ; ECX for UPD param
-  mov       edi, ecx                     ; Save UPD param to EDI for later code use
+  LOAD_ECX
+  mov       edi, ecx                ; Save UPD param to EDI for later code use
   CALL_MMX  ASM_PFX(EstablishStackFsp)
   cmp       eax, 0
   jnz       TempRamInitExit
 
-  LXMMN     xmm6, eax, 3  ;Restore microcode status if no CAR init error from ECX-SLOT 3 in xmm6.
-  SXMMN     xmm6, 3, edi  ;Save FSP-T UPD parameter pointer in ECX-SLOT 3 in xmm6.
+  LOAD_UCODE_STATUS                 ; Restore microcode status if no CAR init error from slot 1 in xmm5.
 
 TempRamInitExit:
   mov       bl, al                  ; save al data in bl
