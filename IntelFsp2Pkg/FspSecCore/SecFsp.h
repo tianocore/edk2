@@ -79,7 +79,7 @@ AsmGetFspBaseAddress (
 /**
   This interface gets FspInfoHeader pointer
 
-  @return   FSP binary base address.
+  @return   FSP info header.
 
 **/
 UINTN
