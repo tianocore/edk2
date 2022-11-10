@@ -1,0 +1,24 @@
+## @file
+# GitHub issue configuration file.
+#
+# This file is meant to direct contributors familiar with GitHub's issue tracker
+# to the external resources used by TianoCore.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+blank_issues_enabled: false
+contact_links:
+  - name: Bugs and Feature Requests
+    url: https://bugzilla.tianocore.org/
+    about: Submit bug reports and feature requests here
+  - name: Reporting Security Issues
+    url: https://github.com/tianocore/tianocore.github.io/wiki/Reporting-Security-Issues
+    about: Read the wiki page that describes the process here
+  - name: EDK II Development Mailing List
+    url: https://edk2.groups.io/g/devel
+    about: Submit code patches and ask questions on the mailing list (devel@edk2.groups.io)
+  - name: EDK II Discussions
+    url: https://github.com/tianocore/edk2/discussions
+    about: You can also reach out on the Discussion section of this repository
