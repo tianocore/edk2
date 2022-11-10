@@ -375,7 +375,7 @@ ArmTrngLibConstructor (
     "FW-TRNG: Version %d.%d, GUID {%g}\n",
     MajorRev,
     MinorRev,
-    Guid
+    &Guid
     ));
 
   DEBUG_CODE_END ();
