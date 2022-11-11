@@ -80,8 +80,8 @@
   AArch64/Synchronization.asm   | MSFT
 
 [Sources.RISCV64]
-  Synchronization.c
-  RiscV64/Synchronization.S
+  Synchronization.c             | GCC
+  RiscV64/Synchronization.S     | GCC
 
 [Sources.LOONGARCH64]
   Synchronization.c
