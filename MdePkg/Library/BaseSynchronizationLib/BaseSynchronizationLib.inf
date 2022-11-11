@@ -81,7 +81,7 @@
 
 [Sources.RISCV64]
   Synchronization.c
-  RiscV64/Synchronization.S
+  RiscV64/Synchronization.S     | GCC
 
 [Sources.LOONGARCH64]
   Synchronization.c
