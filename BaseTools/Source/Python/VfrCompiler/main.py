@@ -3,25 +3,46 @@ from pickletools import uint8
 import sys
 from tkinter.ttk import Treeview
 from antlr4 import*
-from VfrSyntaxLexer import VfrSyntaxLexer
-from VfrSyntaxParser import VfrSyntaxParser
-from VfrSyntaxVisitor import VfrSyntaxVisitor
+from VfrSyntaxVisitor import *
+from VfrSyntaxLexer import *
+from VfrSyntaxParser import *
+
+class VfrCompiler():
+    def __init__(self) -> None:
+        Root = VfrTreeNode()
+        self.__Visitor = VfrSyntaxVisitor(Root)
+        self.__VfrTree = VfrTree(Root)
+     
+    def PreProcess(self):
+        pass
+        
+    
+    def Compile(self, InFile, YamlOutFile, JsonOutFile, BinaryOutFile):
+        gCVfrErrorHandle.SetInputFile(Infile)
+        InputStream = FileStream(Infile)
+        Lexer = VfrSyntaxLexer(InputStream)
+        Stream = CommonTokenStream(Lexer)
+        Parser = VfrSyntaxParser(Stream)
+        tree = Parser.vfrProgram()
+        self.__Visitor.visit(tree)
+        self.__VfrTree.DumpYaml(YamlOutFile)
+        self.__VfrTree.DumpJson(JsonOutFile)
+        self.__VfrTree.GenBinary(BinaryOutFile)
+    
+    def AdjustBin(self):
+        pass
+    
+    def GenBinary(self):
+        pass
 
 
-def VfrParse(Infile, YamlOutFile, JsonOutFile):
-    InputStream = FileStream(Infile)
-    Lexer = VfrSyntaxLexer(InputStream)
-    Stream = CommonTokenStream(Lexer)
-    Parser = VfrSyntaxParser(Stream)
-    Tree = Parser.vfrProgram()
-    Visitor = VfrSyntaxVisitor()
-    Visitor.visit(Tree)
-    Visitor.DumpYaml(Visitor.GetRoot(), YamlOutFile)
-    Visitor.DumpJson(JsonOutFile)
     
 if __name__ == '__main__':
     Infile = 'test.i'
     YamlOutFile = 'test.yaml'
     JsonOutFile = 'test.json'
-    VfrParse(Infile, YamlOutFile, JsonOutFile)
-   
+    BinaryOutFile = 'test.txt'
+    Compiler = VfrCompiler()
+    Compiler.PreProcess()
+    Compiler.Compile(Infile, YamlOutFile, JsonOutFile, BinaryOutFile)
+

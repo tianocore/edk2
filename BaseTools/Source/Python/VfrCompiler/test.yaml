@@ -1,41 +1,49 @@
 ## DO NOT REMOVE -- VFR Mode
 Formset:
-  Guid:  {0x7235c51c, 0xc80, 0x4cab, { 0x87, 0xac, 0x3b, 0x8, 0x4a, 0x63, 0x4, 0xb1 }}
+  Guid:  {0x9e0c30bc, 0x3f06, 0x4ba6, { 0x82, 0x88, 0x9, 0x17, 0x9b, 0x85, 0x5d, 0xbe }}
   Title:  2  # Title STRING_ID
-  Help:  3  # Help STRING_ID
-  ClassGuid:  {0x93039971, 0x8545, 0x4b04, { 0xb4, 0x5e, 0x32, 0xeb, 0x83, 0x26, 0x4, 0xe }}
-  - varstore:
-      varid:  1
-      name:  MainFormState
-      size:  36
-      guid:  {0x7235c51c, 0xc80, 0x4cab, { 0x87, 0xac, 0x3b, 0x8, 0x4a, 0x63, 0x4, 0xb1 }}
+  Help:  12  # Help STRING_ID
+  ClassGuid:  {0x9e0c30bc, 0x3f06, 0x4ba6, { 0x82, 0x88, 0x9, 0x17, 0x9b, 0x85, 0x5d, 0xbe }}
   - form:
-      FormId:  1  # FormId STRING_ID
-      FormTitle:  4  # FormTitle STRING_ID
-      - string:
-          prompt:  5  # Statement Prompt STRING_ID
-          help:  6  # Statement Help STRING_ID
-          questionid:  1  # Question QuestionId
-          varstoreid:  1  # Question VarStoreId
-          varname:  0  # Question VarName STRING_ID
-          varoffset:  0  # Question VarOffset
-          flags:  1  # Question Flags
-          stringflags:  0
-          stringminsize:  0
-          stringmaxsize:  16
+      FormId:  4096  # FormId STRING_ID
+      FormTitle:  2  # FormTitle STRING_ID
+      - banner:
+          title:  3
+          linenumber:  1
+          align:  0
+      - banner:
+          title:  4
+          linenumber:  2
+          align:  0
+      - banner:
+          title:  5
+          linenumber:  2
+          align:  2
+      - banner:
+          title:  7
+          linenumber:  3
+          align:  0
+      - banner:
+          title:  6
+          linenumber:  3
+          align:  2
+      - banner:
+          title:  14
+          linenumber:  4
+          align:  0
+      - banner:
+          title:  15
+          linenumber:  4
+          align:  2
+      - banner:
+          title:  16
+          linenumber:  5
+          align:  0
+      - banner:
+          title:  17
+          linenumber:  5
+          align:  2
       - label:
-          labelnumber:  1  # LabelNumber
-      - action:
-          prompt:  9  # Statement Prompt STRING_ID
-          help:  9  # Statement Help STRING_ID
-          questionid:  3  # Question QuestionId
-          varstoreid:  0  # Question VarStoreId
-          flags:  4  # Question Flags
-          questionconfig:  0  # QuestionConfig
-      - action:
-          prompt:  10  # Statement Prompt STRING_ID
-          help:  10  # Statement Help STRING_ID
-          questionid:  4  # Question QuestionId
-          varstoreid:  0  # Question VarStoreId
-          flags:  4  # Question Flags
-          questionconfig:  0  # QuestionConfig
+          labelnumber:  4096  # LabelNumber
+      - label:
+          labelnumber:  65535  # LabelNumber

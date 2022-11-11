@@ -8,6 +8,9 @@ from VfrUtility import *
 
 from ctypes import *
 
+gCVfrVarDataTypeDB = CVfrVarDataTypeDB()
+gCVfrDefaultStore =  CVfrDefaultStore()
+gCVfrDataStorage = CVfrDataStorage()
 
 class OpcodeSizesScopeNode():
 
@@ -190,32 +193,41 @@ gOpcodeSizesScopeTable = [
 ]
 
 
-class SBufferNode():
+class OpBufferNode():
 
-    def __init__(self, Buffer='', Next=None):
+    def __init__(self, Buffer=None, Next=None):
         self.Buffer = Buffer
         self.Next = Next
-
+    
+class PACKAGE_DATA():
+    def __init__(self, Bu) -> None:
+        #self.Buffer = Buffer
+        pass
+        
 
 class CFormPkg():  
 
-    def __init__(self, BufferSize=4096):
+    def __init__(self):
 
-        Node = SBufferNode()
-        self.__BufferNodeQueueHead = Node
-        self.__BufferNodeQueueTail = Node
-        self.__CurrBufferNode = Node
+        self.__BufferNodeQueueHead = None
+        self.__BufferNodeQueueTail = None
+        self.__CurrBufferNode = None
         self.__ReadBufferNode = None
         self.__ReadBufferOffset = 0
         self.__PkgLength = 0
         self.__PendingAssignList = None
-        self.__BufferSize = BufferSize
+        self.__BufferSize = 0
+    
+    def BuildPkg(self):
+        pass
+    
+    
 
     def GetPkgLength(self):
         return self.__PkgLength
 
     def __createNewNode(self):
-        Node = SBufferNode()
+        Node = OpBufferNode()
         return Node
 
     def __GetNodeBefore(self, CurrentNode):
@@ -259,7 +271,7 @@ class CFormPkg():
         self.__PkgLength += Len
 
         return self.__CurrBufferNode.Buffer
-
+        
 
 
 gCFormPkg = CFormPkg()

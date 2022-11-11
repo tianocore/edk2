@@ -1,17 +1,5 @@
 {
   "DataStruct" : {
-    "MAIN_FORM_STATE" : [
-      {
-        "Name": "CurrentPreferredResolution",
-        "Type": "UINT16[16]",
-        "Offset": 0
-      }, 
-      {
-        "Name": "NextPreferredResolution",
-        "Type": "UINT32",
-        "Offset": 32
-      }
-    ],
     "EFI_HII_REF" : [
       {
         "Name": "QuestionId",
@@ -84,10 +72,6 @@
     ]
   },
   "DataStructAttribute": {
-    "MAIN_FORM_STATE": {
-        "Alignment": 4,
-        "TotalSize": 36
-      },
     "EFI_HII_REF": {
         "Alignment": 16,
         "TotalSize": 22
@@ -130,12 +114,6 @@
       }
   },
   "VarDefine" : {
-    "MainFormState": {
-        "Type": "MAIN_FORM_STATE",
-        "Attributes": 0,
-        "VarStoreId": 1,
-        "VendorGuid": "0x7235c51c, 0xc80, 0x4cab, { 0x87, 0xac, 0x3b, 0x8, 0x4a, 0x63, 0x4, 0xb1 }}"
-      }
   },
   "Data" : [
       {

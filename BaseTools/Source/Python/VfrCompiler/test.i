@@ -1,5 +1,5 @@
-#line 1 "c:\\code\\dev\\pyvfr\\edk2\\OvmfPkg\\PlatformDxe\\PlatformForms.vfr"
-#line 1 "c:\\code\\dev\\pyvfr\\edk2\\Build\\Ovmf3264\\DEBUG_VS2015x86\\X64\\OvmfPkg\\PlatformDxe\\Platform\\DEBUG\\PlatformDxeStrDefs.h"
+#line 1 "c:\\edk2\\MdeModulePkg\\Application\\UiApp\\FrontPageVfr.Vfr"
+#line 1 "c:\\edk2\\Build\\Ovmf3264\\DEBUG_VS2019\\X64\\MdeModulePkg\\Application\\UiApp\\UiApp\\DEBUG\\UiAppStrDefs.h"
 
 
 
@@ -27,7 +27,6 @@
 
 
 
-extern unsigned char PlatformDxeStrings[];
 
 
 
@@ -45,16 +44,14 @@ extern unsigned char PlatformDxeStrings[];
 
 
 
+extern unsigned char UiAppStrings[];
 
 
 
 
 
 
-#line 53 "c:\\code\\dev\\pyvfr\\edk2\\Build\\Ovmf3264\\DEBUG_VS2015x86\\X64\\OvmfPkg\\PlatformDxe\\Platform\\DEBUG\\PlatformDxeStrDefs.h"
 
-#line 55 "c:\\code\\dev\\pyvfr\\edk2\\Build\\Ovmf3264\\DEBUG_VS2015x86\\X64\\OvmfPkg\\PlatformDxe\\Platform\\DEBUG\\PlatformDxeStrDefs.h"
-#line 1 "c:\\code\\dev\\pyvfr\\edk2\\OvmfPkg\\PlatformDxe\\PlatformForms.vfr"
 
 
 
@@ -72,7 +69,6 @@ extern unsigned char PlatformDxeStrings[];
 
 
 
-#line 1 "c:\\code\\dev\\pyvfr\\edk2\\OvmfPkg\\Include\\Guid/OvmfPlatformConfig.h"
 
 
 
@@ -87,12 +83,11 @@ extern unsigned char PlatformDxeStrings[];
 
 
 
+#line 85 "c:\\edk2\\Build\\Ovmf3264\\DEBUG_VS2019\\X64\\MdeModulePkg\\Application\\UiApp\\UiApp\\DEBUG\\UiAppStrDefs.h"
 
-extern EFI_GUID  {0x7235c51c, 0x0c80, 0x4cab, {0x87, 0xac, 0x3b, 0x08, 0x4a, 0x63, 0x04, 0xb1}};
+#line 87 "c:\\edk2\\Build\\Ovmf3264\\DEBUG_VS2019\\X64\\MdeModulePkg\\Application\\UiApp\\UiApp\\DEBUG\\UiAppStrDefs.h"
+#line 1 "c:\\edk2\\MdeModulePkg\\Application\\UiApp\\FrontPageVfr.Vfr"
 
-#line 19 "c:\\code\\dev\\pyvfr\\edk2\\OvmfPkg\\Include\\Guid/OvmfPlatformConfig.h"
-#line 19 "c:\\code\\dev\\pyvfr\\edk2\\OvmfPkg\\PlatformDxe\\PlatformForms.vfr"
-#line 1 "c:\\code\\dev\\pyvfr\\edk2\\ovmfpkg\\platformdxe\\Platform.h"
 
 
 
@@ -107,74 +102,67 @@ extern EFI_GUID  {0x7235c51c, 0x0c80, 0x4cab, {0x87, 0xac, 0x3b, 0x08, 0x4a, 0x6
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-typedef struct {
-  UINT16    CurrentPreferredResolution[16];
-  UINT32    NextPreferredResolution;
-} MAIN_FORM_STATE;
-
-#line 38 "c:\\code\\dev\\pyvfr\\edk2\\ovmfpkg\\platformdxe\\Platform.h"
-#line 20 "c:\\code\\dev\\pyvfr\\edk2\\OvmfPkg\\PlatformDxe\\PlatformForms.vfr"
 
 formset
-  guid  = {0x7235c51c, 0x0c80, 0x4cab, {0x87, 0xac, 0x3b, 0x08, 0x4a, 0x63, 0x04, 0xb1}},
-  title = STRING_TOKEN(0x0002),
-  help  = STRING_TOKEN(0x0003),
+  guid     = { 0x9e0c30bc, 0x3f06, 0x4ba6, 0x82, 0x88, 0x9, 0x17, 0x9b, 0x85, 0x5d, 0xbe },
+  title    = STRING_TOKEN(0x0002),
+  help     = STRING_TOKEN(0x000C ),
+  classguid = { 0x9e0c30bc, 0x3f06, 0x4ba6, 0x82, 0x88, 0x9, 0x17, 0x9b, 0x85, 0x5d, 0xbe },
 
-  varstore MAIN_FORM_STATE,
-    varid = 1,
-    name  = MainFormState,
-    guid  = {0x7235c51c, 0x0c80, 0x4cab, {0x87, 0xac, 0x3b, 0x08, 0x4a, 0x63, 0x04, 0xb1}};
+  form formid = 0x1000,
+       title  = STRING_TOKEN(0x0002);
 
-  form
-    formid = 1,
-    title  = STRING_TOKEN(0x0004);
+    banner
+      title = STRING_TOKEN(0x0003),
+      line  1,
+      align left;
 
+    banner
+      title = STRING_TOKEN(0x0004),
+      line  2,
+      align left;
+
+    banner
+      title = STRING_TOKEN(0x0005),
+      line  2,
+      align right;
+
+    banner
+      title = STRING_TOKEN(0x0007),
+      line  3,
+      align left;
+
+    banner
+      title = STRING_TOKEN(0x0006),
+      line  3,
+      align right;
+
+    banner
+      title = STRING_TOKEN(0x000E),
+      line  4,
+      align left;
+
+    banner
+      title = STRING_TOKEN(0x000F),
+      line  4,
+      align right;
+
+    banner
+      title = STRING_TOKEN(0x0010),
+      line  5,
+      align left;
+
+    banner
+      title = STRING_TOKEN(0x0011),
+      line  5,
+      align right;
+
+    label 0x1000;
     
     
     
-    string
-      varid      = MainFormState.CurrentPreferredResolution,
-      questionid = 1,
-      prompt     = STRING_TOKEN(0x0005),
-      help       = STRING_TOKEN(0x0006),
-      flags      = READ_ONLY,
-      minsize    = 0,
-      maxsize    = 16,
-    endstring;
-
     
-    
-    
-    label 1;
-
-    text
-      help  = STRING_TOKEN(0x0009),
-      text  = STRING_TOKEN(0x0009),
-      flags = INTERACTIVE,
-      key   = 3;
-
-    text
-      help  = STRING_TOKEN(0x000A),
-      text  = STRING_TOKEN(0x000A),
-      flags = INTERACTIVE,
-      key   = 4;
+    label 0xffff;
 
   endform;
 
