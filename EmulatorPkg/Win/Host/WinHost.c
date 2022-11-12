@@ -718,19 +718,9 @@ SecPeCoffGetEntryPoint (
   }
 
   //
-  // Allocate space in NT (not emulator) memory with ReadWrite and Execute attribute.
-  // Extra space is for alignment
+  // XIP for SEC and PEI_CORE
   //
-  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)VirtualAlloc (NULL, (SIZE_T)(ImageContext.ImageSize + (ImageContext.SectionAlignment * 2)), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-  if (ImageContext.ImageAddress == 0) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
-  // Align buffer on section boundary
-  //
-  ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
-  ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)ImageContext.SectionAlignment - 1);
+  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)Pe32Data;
 
   Status = PeCoffLoaderLoadImage (&ImageContext);
   if (EFI_ERROR (Status)) {
