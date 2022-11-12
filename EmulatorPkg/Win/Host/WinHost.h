@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -26,6 +26,7 @@ Abstract:
 #include <Guid/FileSystemInfo.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>
 #include <Ppi/EmuThunk.h>
+#include <Ppi/Reset2.h>
 #include <Protocol/EmuThunk.h>
 #include <Protocol/SimpleFileSystem.h>
 
