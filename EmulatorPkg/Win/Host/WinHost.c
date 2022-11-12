@@ -8,7 +8,7 @@
   This code produces 128 K of temporary memory for the SEC stack by directly
   allocate memory space with ReadWrite and Execute attribute.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016-2020 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -85,14 +85,6 @@ WinPeiAutoScan (
 {
   if (Index >= gSystemMemoryCount) {
     return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Allocate enough memory space for emulator
-  //
-  gSystemMemory[Index].Memory = (EFI_PHYSICAL_ADDRESS)(UINTN)VirtualAlloc (NULL, (SIZE_T)(gSystemMemory[Index].Size), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-  if (gSystemMemory[Index].Memory == 0) {
-    return EFI_OUT_OF_RESOURCES;
   }
 
   *MemoryBase = gSystemMemory[Index].Memory;
@@ -458,6 +450,30 @@ Returns:
   }
 
   //
+  // Allocate "physical" memory space for emulator. It will be reported out later throuth MemoryAutoScan()
+  //
+  for (Index = 0, Done = FALSE; !Done; Index++) {
+    ASSERT (Index < gSystemMemoryCount);
+    gSystemMemory[Index].Size   = ((UINT64)_wtoi (MemorySizeStr)) * ((UINT64)SIZE_1MB);
+    gSystemMemory[Index].Memory = (EFI_PHYSICAL_ADDRESS)(UINTN)VirtualAlloc (NULL, (SIZE_T)(gSystemMemory[Index].Size), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    if (gSystemMemory[Index].Memory == 0) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    //
+    // Find the next region
+    //
+    for (Index1 = 0; MemorySizeStr[Index1] != '!' && MemorySizeStr[Index1] != 0; Index1++) {
+    }
+
+    if (MemorySizeStr[Index1] == 0) {
+      Done = TRUE;
+    }
+
+    MemorySizeStr = MemorySizeStr + Index1 + 1;
+  }
+
+  //
   // Allocate space for gSystemMemory Array
   //
   gFdInfoCount = CountSeparatorsInString (FirmwareVolumesStr, '!') + 1;
@@ -574,32 +590,6 @@ Returns:
 
     SecPrint ("\n\r");
   }
-
-  //
-  // Calculate memory regions and store the information in the gSystemMemory
-  //  global for later use. The autosizing code will use this data to
-  //  map this memory into the SEC process memory space.
-  //
-  for (Index = 0, Done = FALSE; !Done; Index++) {
-    //
-    // Save the size of the memory and make a Unicode filename SystemMemory00, ...
-    //
-    gSystemMemory[Index].Size = ((UINT64)_wtoi (MemorySizeStr)) * ((UINT64)SIZE_1MB);
-
-    //
-    // Find the next region
-    //
-    for (Index1 = 0; MemorySizeStr[Index1] != '!' && MemorySizeStr[Index1] != 0; Index1++) {
-    }
-
-    if (MemorySizeStr[Index1] == 0) {
-      Done = TRUE;
-    }
-
-    MemorySizeStr = MemorySizeStr + Index1 + 1;
-  }
-
-  SecPrint ("\n\r");
 
   //
   // Hand off to SEC Core
