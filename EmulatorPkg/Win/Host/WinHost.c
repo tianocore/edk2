@@ -56,6 +56,14 @@ NT_FD_INFO  *gFdInfo;
 UINTN             gSystemMemoryCount = 0;
 NT_SYSTEM_MEMORY  *gSystemMemory;
 
+BASE_LIBRARY_JUMP_BUFFER  mResetJumpBuffer;
+CHAR8                     *mResetTypeStr[] = {
+  "EfiResetCold",
+  "EfiResetWarm",
+  "EfiResetShutdown",
+  "EfiResetPlatformSpecific"
+};
+
 /*++
 
 Routine Description:
@@ -195,6 +203,45 @@ SecPrint (
     NULL
     );
 }
+
+/**
+  Resets the entire platform.
+
+  @param[in] ResetType      The type of reset to perform.
+  @param[in] ResetStatus    The status code for the reset.
+  @param[in] DataSize       The size, in bytes, of ResetData.
+  @param[in] ResetData      For a ResetType of EfiResetCold, EfiResetWarm, or EfiResetShutdown
+                            the data buffer starts with a Null-terminated string, optionally
+                            followed by additional binary data. The string is a description
+                            that the caller may use to further indicate the reason for the
+                            system reset.
+
+**/
+VOID
+EFIAPI
+WinReset (
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
+  )
+{
+  ASSERT (ResetType <= EfiResetPlatformSpecific);
+  SecPrint ("  Emu ResetSystem is called: ResetType = %s\n", mResetTypeStr[ResetType]);
+
+  if (ResetType == EfiResetShutdown) {
+    exit (0);
+  } else {
+    //
+    // Jump back to SetJump with jump code = ResetType + 1
+    //
+    LongJump (&mResetJumpBuffer, ResetType + 1);
+  }
+}
+
+EFI_PEI_RESET2_PPI  mEmuReset2Ppi = {
+  WinReset
+};
 
 /*++
 
@@ -388,6 +435,7 @@ Returns:
   UINTN                ProcessAffinityMask;
   UINTN                SystemAffinityMask;
   INT32                LowBit;
+  UINTN                ResetJumpCode;
 
   //
   // Enable the privilege so that RTC driver can successfully run SetTime()
@@ -430,6 +478,7 @@ Returns:
   // PPIs pased into PEI_CORE
   //
   AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gEmuThunkPpiGuid, &mSecEmuThunkPpi);
+  AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gEfiPeiReset2PpiGuid, &mEmuReset2Ppi);
 
   //
   // Emulator Bus Driver Thunks
@@ -499,14 +548,6 @@ Returns:
     SecPrint ("ERROR : Can not allocate enough space for SecStack\n\r");
     exit (1);
   }
-
-  SetMem32 (TemporaryRam, TemporaryRamSize, PcdGet32 (PcdInitValueInTempStack));
-
-  SecPrint (
-    "  OS Emulator passing in %u KB of temp RAM at 0x%08lx to SEC\n\r",
-    TemporaryRamSize / SIZE_1KB,
-    TemporaryRam
-    );
 
   //
   // If enabled use the magic page to communicate between modules
@@ -591,6 +632,24 @@ Returns:
     SecPrint ("\n\r");
   }
 
+  ResetJumpCode = SetJump (&mResetJumpBuffer);
+
+  //
+  // Do not clear memory content for warm reset.
+  //
+  if (ResetJumpCode != EfiResetWarm + 1) {
+    SecPrint ("  OS Emulator clearing temp RAM and physical RAM (to be discovered later)......\n\r");
+    SetMem32 (TemporaryRam, TemporaryRamSize, PcdGet32 (PcdInitValueInTempStack));
+    for (Index = 0; Index < gSystemMemoryCount; Index++) {
+      SetMem32 ((VOID *)(UINTN)gSystemMemory[Index].Memory, (UINTN)gSystemMemory[Index].Size, PcdGet32 (PcdInitValueInTempStack));
+    }
+  }
+
+  SecPrint (
+    "  OS Emulator passing in %u KB of temp RAM at 0x%08lx to SEC\n\r",
+    TemporaryRamSize / SIZE_1KB,
+    TemporaryRam
+    );
   //
   // Hand off to SEC Core
   //
