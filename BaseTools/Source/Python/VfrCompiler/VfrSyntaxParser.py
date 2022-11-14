@@ -1589,125 +1589,125 @@ class VfrSyntaxParser ( Parser ):
 
     sharedContextCache = PredictionContextCache()
 
-    literalNames = [ "<INVALID>", "'show'", "'push'", "'pop'", "'#pragma'", 
-                     "'pack'", "'='", "'IMAGE_TOKEN'", "'HORIZONTAL'", "'MULTI_LINE'", 
-                     "'<<'", "'>>'", "'+'", "'*'", "'%'", "'format'", "'?'", 
-                     "'#define'", "'#include'", "'formpkgtype'", "'{'", 
-                     "'}'", "'('", "')'", "'['", "']'", "'.'", "'-'", "':'", 
-                     "'/'", "';'", "','", "'=='", "'!='", "'<='", "'<'", 
-                     "'>='", "'>'", "'|'", "'&'", "'devicepath'", "'formset'", 
-                     "'formsetid'", "'endformset'", "'title'", "'formid'", 
-                     "'oneof'", "'endoneof'", "'prompt'", "'orderedlist'", 
-                     "'maxcontainers'", "'endlist'", "'endform'", "'form'", 
-                     "'formmap'", "'maptitle'", "'mapguid'", "'subtitle'", 
-                     "'endsubtitle'", "'help'", "'text'", "'option'", "'flags'", 
-                     "'date'", "'enddate'", "'year'", "'month'", "'day'", 
-                     "'time'", "'endtime'", "'hour'", "'minute'", "'second'", 
-                     "'grayoutif'", "'label'", "'timeout'", "'inventory'", 
-                     "'_NON_NV_DATA_MAP'", "'struct'", "'union'", "'BOOLEAN'", 
-                     "'UINT64'", "'UINT32'", "'UINT16'", "'UINT8'", "'EFI_STRING_ID'", 
-                     "'EFI_HII_DATE'", "'EFI_HII_TIME'", "'EFI_HII_REF'", 
-                     "'guid'", "'checkbox'", "'endcheckbox'", "'numeric'", 
-                     "'endnumeric'", "'minimum'", "'maximum'", "'step'", 
-                     "'default'", "'password'", "'endpassword'", "'string'", 
-                     "'endstring'", "'minsize'", "'maxsize'", "'encoding'", 
-                     "'suppressif'", "'disableif'", "'hidden'", "'goto'", 
-                     "'formsetguid'", "'inconsistentif'", "'warningif'", 
-                     "'nosubmitif'", "'endif'", "'key'", "'DEFAULT'", "'MANUFACTURING'", 
-                     "'CHECKBOX_DEFAULT'", "'CHECKBOX_DEFAULT_MFG'", "'INTERACTIVE'", 
-                     "'NV_ACCESS'", "'RESET_REQUIRED'", "'RECONNECT_REQUIRED'", 
-                     "'LATE_CHECK'", "'READ_ONLY'", "'OPTIONS_ONLY'", "'REST_STYLE'", 
-                     "'class'", "'subclass'", "'classguid'", "'typedef'", 
-                     "'restore'", "'save'", "'defaults'", "'banner'", "'align'", 
-                     "'left'", "'right'", "'center'", "'line'", "'name'", 
-                     "'varid'", "'question'", "'questionid'", "'image'", 
-                     "'locked'", "'rule'", "'endrule'", "'value'", "'read'", 
-                     "'write'", "'resetbutton'", "'endresetbutton'", "'defaultstore'", 
-                     "'attribute'", "'varstore'", "'efivarstore'", "'varsize'", 
-                     "'namevaluevarstore'", "'action'", "'config'", "'endaction'", 
-                     "'refresh'", "'interval'", "'varstoredevice'", "'guidop'", 
-                     "'endguidop'", "'datatype'", "'data'", "'modal'", "'NON_DEVICE'", 
-                     "'DISK_DEVICE'", "'VIDEO_DEVICE'", "'NETWORK_DEVICE'", 
-                     "'INPUT_DEVICE'", "'ONBOARD_DEVICE'", "'OTHER_DEVICE'", 
-                     "'SETUP_APPLICATION'", "'GENERAL_APPLICATION'", "'FRONT_PAGE'", 
-                     "'SINGLE_USE'", "'YEAR_SUPPRESS'", "'MONTH_SUPPRESS'", 
-                     "'DAY_SUPPRESS'", "'HOUR_SUPPRESS'", "'MINUTE_SUPPRESS'", 
-                     "'SECOND_SUPPRESS'", "'STORAGE_NORMAL'", "'STORAGE_TIME'", 
-                     "'STORAGE_WAKEUP'", "'UNIQUE'", "'NOEMPTY'", "'cond'", 
-                     "'find'", "'mid'", "'token'", "'span'", "'dup'", "'vareqval'", 
-                     "'var'", "'ideqval'", "'ideqid'", "'ideqvallist'", 
-                     "'questionref'", "'ruleref'", "'stringref'", "'pushthis'", 
-                     "'security'", "'get'", "'TRUE'", "'FALSE'", "'ONE'", 
-                     "'ONES'", "'ZERO'", "'UNDEFINED'", "'VERSION'", "'length'", 
-                     "'AND'", "'OR'", "'NOT'", "'set'", "'~'", "'boolval'", 
-                     "'stringval'", "'unintval'", "'toupper'", "'tolower'", 
-                     "'match'", "'match2'", "'catenate'", "'questionrefval'", 
-                     "'stringrefval'", "'map'", "'refreshguid'", "'STRING_TOKEN'", 
-                     "'OPTION_DEFAULT'", "'OPTION_DEFAULT_MFG'", "'NUMERIC_SIZE_1'", 
-                     "'NUMERIC_SIZE_2'", "'NUMERIC_SIZE_4'", "'NUMERIC_SIZE_8'", 
-                     "'DISPLAY_INT_DEC'", "'DISPLAY_UINT_DEC'", "'DISPLAY_UINT_HEX'", 
-                     "'INSENSITIVE'", "'SENSITIVE'", "'LAST_NON_MATCH'", 
+    literalNames = [ "<INVALID>", "'show'", "'push'", "'pop'", "'#pragma'",
+                     "'pack'", "'='", "'IMAGE_TOKEN'", "'HORIZONTAL'", "'MULTI_LINE'",
+                     "'<<'", "'>>'", "'+'", "'*'", "'%'", "'format'", "'?'",
+                     "'#define'", "'#include'", "'formpkgtype'", "'{'",
+                     "'}'", "'('", "')'", "'['", "']'", "'.'", "'-'", "':'",
+                     "'/'", "';'", "','", "'=='", "'!='", "'<='", "'<'",
+                     "'>='", "'>'", "'|'", "'&'", "'devicepath'", "'formset'",
+                     "'formsetid'", "'endformset'", "'title'", "'formid'",
+                     "'oneof'", "'endoneof'", "'prompt'", "'orderedlist'",
+                     "'maxcontainers'", "'endlist'", "'endform'", "'form'",
+                     "'formmap'", "'maptitle'", "'mapguid'", "'subtitle'",
+                     "'endsubtitle'", "'help'", "'text'", "'option'", "'flags'",
+                     "'date'", "'enddate'", "'year'", "'month'", "'day'",
+                     "'time'", "'endtime'", "'hour'", "'minute'", "'second'",
+                     "'grayoutif'", "'label'", "'timeout'", "'inventory'",
+                     "'_NON_NV_DATA_MAP'", "'struct'", "'union'", "'BOOLEAN'",
+                     "'UINT64'", "'UINT32'", "'UINT16'", "'UINT8'", "'EFI_STRING_ID'",
+                     "'EFI_HII_DATE'", "'EFI_HII_TIME'", "'EFI_HII_REF'",
+                     "'guid'", "'checkbox'", "'endcheckbox'", "'numeric'",
+                     "'endnumeric'", "'minimum'", "'maximum'", "'step'",
+                     "'default'", "'password'", "'endpassword'", "'string'",
+                     "'endstring'", "'minsize'", "'maxsize'", "'encoding'",
+                     "'suppressif'", "'disableif'", "'hidden'", "'goto'",
+                     "'formsetguid'", "'inconsistentif'", "'warningif'",
+                     "'nosubmitif'", "'endif'", "'key'", "'DEFAULT'", "'MANUFACTURING'",
+                     "'CHECKBOX_DEFAULT'", "'CHECKBOX_DEFAULT_MFG'", "'INTERACTIVE'",
+                     "'NV_ACCESS'", "'RESET_REQUIRED'", "'RECONNECT_REQUIRED'",
+                     "'LATE_CHECK'", "'READ_ONLY'", "'OPTIONS_ONLY'", "'REST_STYLE'",
+                     "'class'", "'subclass'", "'classguid'", "'typedef'",
+                     "'restore'", "'save'", "'defaults'", "'banner'", "'align'",
+                     "'left'", "'right'", "'center'", "'line'", "'name'",
+                     "'varid'", "'question'", "'questionid'", "'image'",
+                     "'locked'", "'rule'", "'endrule'", "'value'", "'read'",
+                     "'write'", "'resetbutton'", "'endresetbutton'", "'defaultstore'",
+                     "'attribute'", "'varstore'", "'efivarstore'", "'varsize'",
+                     "'namevaluevarstore'", "'action'", "'config'", "'endaction'",
+                     "'refresh'", "'interval'", "'varstoredevice'", "'guidop'",
+                     "'endguidop'", "'datatype'", "'data'", "'modal'", "'NON_DEVICE'",
+                     "'DISK_DEVICE'", "'VIDEO_DEVICE'", "'NETWORK_DEVICE'",
+                     "'INPUT_DEVICE'", "'ONBOARD_DEVICE'", "'OTHER_DEVICE'",
+                     "'SETUP_APPLICATION'", "'GENERAL_APPLICATION'", "'FRONT_PAGE'",
+                     "'SINGLE_USE'", "'YEAR_SUPPRESS'", "'MONTH_SUPPRESS'",
+                     "'DAY_SUPPRESS'", "'HOUR_SUPPRESS'", "'MINUTE_SUPPRESS'",
+                     "'SECOND_SUPPRESS'", "'STORAGE_NORMAL'", "'STORAGE_TIME'",
+                     "'STORAGE_WAKEUP'", "'UNIQUE'", "'NOEMPTY'", "'cond'",
+                     "'find'", "'mid'", "'token'", "'span'", "'dup'", "'vareqval'",
+                     "'var'", "'ideqval'", "'ideqid'", "'ideqvallist'",
+                     "'questionref'", "'ruleref'", "'stringref'", "'pushthis'",
+                     "'security'", "'get'", "'TRUE'", "'FALSE'", "'ONE'",
+                     "'ONES'", "'ZERO'", "'UNDEFINED'", "'VERSION'", "'length'",
+                     "'AND'", "'OR'", "'NOT'", "'set'", "'~'", "'boolval'",
+                     "'stringval'", "'unintval'", "'toupper'", "'tolower'",
+                     "'match'", "'match2'", "'catenate'", "'questionrefval'",
+                     "'stringrefval'", "'map'", "'refreshguid'", "'STRING_TOKEN'",
+                     "'OPTION_DEFAULT'", "'OPTION_DEFAULT_MFG'", "'NUMERIC_SIZE_1'",
+                     "'NUMERIC_SIZE_2'", "'NUMERIC_SIZE_4'", "'NUMERIC_SIZE_8'",
+                     "'DISPLAY_INT_DEC'", "'DISPLAY_UINT_DEC'", "'DISPLAY_UINT_HEX'",
+                     "'INSENSITIVE'", "'SENSITIVE'", "'LAST_NON_MATCH'",
                      "'FIRST_NON_MATCH'" ]
 
-    symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "Define", "Include", "FormPkgType", "OpenBrace", 
-                      "CloseBrace", "OpenParen", "CloseParen", "OpenBracket", 
-                      "CloseBracket", "Dot", "Negative", "Colon", "Slash", 
-                      "Semicolon", "Comma", "Equal", "NotEqual", "LessEqual", 
-                      "Less", "GreaterEqual", "Greater", "BitWiseOr", "BitWiseAnd", 
-                      "DevicePath", "FormSet", "FormSetId", "EndFormSet", 
-                      "Title", "FormId", "OneOf", "EndOneOf", "Prompt", 
-                      "OrderedList", "MaxContainers", "EndList", "EndForm", 
-                      "Form", "FormMap", "MapTitle", "MapGuid", "Subtitle", 
-                      "EndSubtitle", "Help", "Text", "Option", "FLAGS", 
-                      "Date", "EndDate", "Year", "Month", "Day", "Time", 
-                      "EndTime", "Hour", "Minute", "Second", "GrayOutIf", 
-                      "Label", "Timeout", "Inventory", "NonNvDataMap", "Struct", 
-                      "Union", "Boolean", "Uint64", "Uint32", "Uint16", 
-                      "Uint8", "EFI_STRING_ID", "EFI_HII_DATE", "EFI_HII_TIME", 
-                      "EFI_HII_REF", "Uuid", "CheckBox", "EndCheckBox", 
-                      "Numeric", "EndNumeric", "Minimum", "Maximum", "Step", 
-                      "Default", "Password", "EndPassword", "String", "EndString", 
-                      "MinSize", "MaxSize", "Encoding", "SuppressIf", "DisableIf", 
-                      "Hidden", "Goto", "FormSetGuid", "InconsistentIf", 
-                      "WarningIf", "NoSubmitIf", "EndIf", "Key", "DefaultFlag", 
-                      "ManufacturingFlag", "CheckBoxDefaultFlag", "CheckBoxDefaultMfgFlag", 
-                      "InteractiveFlag", "NVAccessFlag", "ResetRequiredFlag", 
-                      "ReconnectRequiredFlag", "LateCheckFlag", "ReadOnlyFlag", 
-                      "OptionOnlyFlag", "RestStyleFlag", "Class", "Subclass", 
-                      "ClassGuid", "TypeDef", "Restore", "Save", "Defaults", 
-                      "Banner", "Align", "Left", "Right", "Center", "Line", 
-                      "Name", "VarId", "Question", "QuestionId", "Image", 
-                      "Locked", "Rule", "EndRule", "Value", "Read", "Write", 
-                      "ResetButton", "EndResetButton", "DefaultStore", "Attribute", 
-                      "Varstore", "Efivarstore", "VarSize", "NameValueVarStore", 
-                      "Action", "Config", "EndAction", "Refresh", "Interval", 
-                      "VarstoreDevice", "GuidOp", "EndGuidOp", "DataType", 
-                      "Data", "Modal", "ClassNonDevice", "ClassDiskDevice", 
-                      "ClassVideoDevice", "ClassNetworkDevice", "ClassInputDevice", 
-                      "ClassOnBoardDevice", "ClassOtherDevice", "SubclassSetupApplication", 
-                      "SubclassGeneralApplication", "SubclassFrontPage", 
-                      "SubclassSingleUse", "YearSupppressFlag", "MonthSuppressFlag", 
-                      "DaySuppressFlag", "HourSupppressFlag", "MinuteSuppressFlag", 
-                      "SecondSuppressFlag", "StorageNormalFlag", "StorageTimeFlag", 
-                      "StorageWakeUpFlag", "UniQueFlag", "NoEmptyFlag", 
-                      "Cond", "Find", "Mid", "Tok", "Span", "Dup", "VarEqVal", 
-                      "Var", "IdEqVal", "IdEqId", "IdEqValList", "QuestionRef", 
-                      "RuleRef", "StringRef", "PushThis", "Security", "Get", 
-                      "TrueSymbol", "FalseSymbol", "One", "Ones", "Zero", 
-                      "Undefined", "Version", "Length", "AND", "OR", "NOT", 
-                      "Set", "BitWiseNot", "BoolVal", "StringVal", "UnIntVal", 
-                      "ToUpper", "ToLower", "Match", "Match2", "Catenate", 
-                      "QuestionRefVal", "StringRefVal", "Map", "RefreshGuid", 
-                      "StringToken", "OptionDefault", "OptionDefaultMfg", 
-                      "NumericSizeOne", "NumericSizeTwo", "NumericSizeFour", 
-                      "NumericSizeEight", "DisPlayIntDec", "DisPlayUIntDec", 
-                      "DisPlayUIntHex", "Insensitive", "Sensitive", "LastNonMatch", 
-                      "FirstNonMatch", "Number", "StringIdentifier", "ComplexDefine", 
-                      "LineDefinition", "IncludeDefinition", "Whitespace", 
+    symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>",
+                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>",
+                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>",
+                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>",
+                      "<INVALID>", "Define", "Include", "FormPkgType", "OpenBrace",
+                      "CloseBrace", "OpenParen", "CloseParen", "OpenBracket",
+                      "CloseBracket", "Dot", "Negative", "Colon", "Slash",
+                      "Semicolon", "Comma", "Equal", "NotEqual", "LessEqual",
+                      "Less", "GreaterEqual", "Greater", "BitWiseOr", "BitWiseAnd",
+                      "DevicePath", "FormSet", "FormSetId", "EndFormSet",
+                      "Title", "FormId", "OneOf", "EndOneOf", "Prompt",
+                      "OrderedList", "MaxContainers", "EndList", "EndForm",
+                      "Form", "FormMap", "MapTitle", "MapGuid", "Subtitle",
+                      "EndSubtitle", "Help", "Text", "Option", "FLAGS",
+                      "Date", "EndDate", "Year", "Month", "Day", "Time",
+                      "EndTime", "Hour", "Minute", "Second", "GrayOutIf",
+                      "Label", "Timeout", "Inventory", "NonNvDataMap", "Struct",
+                      "Union", "Boolean", "Uint64", "Uint32", "Uint16",
+                      "Uint8", "EFI_STRING_ID", "EFI_HII_DATE", "EFI_HII_TIME",
+                      "EFI_HII_REF", "Uuid", "CheckBox", "EndCheckBox",
+                      "Numeric", "EndNumeric", "Minimum", "Maximum", "Step",
+                      "Default", "Password", "EndPassword", "String", "EndString",
+                      "MinSize", "MaxSize", "Encoding", "SuppressIf", "DisableIf",
+                      "Hidden", "Goto", "FormSetGuid", "InconsistentIf",
+                      "WarningIf", "NoSubmitIf", "EndIf", "Key", "DefaultFlag",
+                      "ManufacturingFlag", "CheckBoxDefaultFlag", "CheckBoxDefaultMfgFlag",
+                      "InteractiveFlag", "NVAccessFlag", "ResetRequiredFlag",
+                      "ReconnectRequiredFlag", "LateCheckFlag", "ReadOnlyFlag",
+                      "OptionOnlyFlag", "RestStyleFlag", "Class", "Subclass",
+                      "ClassGuid", "TypeDef", "Restore", "Save", "Defaults",
+                      "Banner", "Align", "Left", "Right", "Center", "Line",
+                      "Name", "VarId", "Question", "QuestionId", "Image",
+                      "Locked", "Rule", "EndRule", "Value", "Read", "Write",
+                      "ResetButton", "EndResetButton", "DefaultStore", "Attribute",
+                      "Varstore", "Efivarstore", "VarSize", "NameValueVarStore",
+                      "Action", "Config", "EndAction", "Refresh", "Interval",
+                      "VarstoreDevice", "GuidOp", "EndGuidOp", "DataType",
+                      "Data", "Modal", "ClassNonDevice", "ClassDiskDevice",
+                      "ClassVideoDevice", "ClassNetworkDevice", "ClassInputDevice",
+                      "ClassOnBoardDevice", "ClassOtherDevice", "SubclassSetupApplication",
+                      "SubclassGeneralApplication", "SubclassFrontPage",
+                      "SubclassSingleUse", "YearSupppressFlag", "MonthSuppressFlag",
+                      "DaySuppressFlag", "HourSupppressFlag", "MinuteSuppressFlag",
+                      "SecondSuppressFlag", "StorageNormalFlag", "StorageTimeFlag",
+                      "StorageWakeUpFlag", "UniQueFlag", "NoEmptyFlag",
+                      "Cond", "Find", "Mid", "Tok", "Span", "Dup", "VarEqVal",
+                      "Var", "IdEqVal", "IdEqId", "IdEqValList", "QuestionRef",
+                      "RuleRef", "StringRef", "PushThis", "Security", "Get",
+                      "TrueSymbol", "FalseSymbol", "One", "Ones", "Zero",
+                      "Undefined", "Version", "Length", "AND", "OR", "NOT",
+                      "Set", "BitWiseNot", "BoolVal", "StringVal", "UnIntVal",
+                      "ToUpper", "ToLower", "Match", "Match2", "Catenate",
+                      "QuestionRefVal", "StringRefVal", "Map", "RefreshGuid",
+                      "StringToken", "OptionDefault", "OptionDefaultMfg",
+                      "NumericSizeOne", "NumericSizeTwo", "NumericSizeFour",
+                      "NumericSizeEight", "DisPlayIntDec", "DisPlayUIntDec",
+                      "DisPlayUIntHex", "Insensitive", "Sensitive", "LastNonMatch",
+                      "FirstNonMatch", "Number", "StringIdentifier", "ComplexDefine",
+                      "LineDefinition", "IncludeDefinition", "Whitespace",
                       "Newline", "LineComment", "Extern" ]
 
     RULE_vfrProgram = 0
@@ -1913,75 +1913,75 @@ class VfrSyntaxParser ( Parser ):
     RULE_spanFlags = 200
     RULE_vfrExpressionMap = 201
 
-    ruleNames =  [ "vfrProgram", "pragmaPackShowDef", "pragmaPackStackDef", 
-                   "pragmaPackNumber", "vfrPragmaPackDefinition", "vfrDataStructDefinition", 
-                   "vfrDataUnionDefinition", "vfrDataStructFields", "dataStructField64", 
-                   "dataStructField32", "dataStructField16", "dataStructField8", 
-                   "dataStructFieldBool", "dataStructFieldString", "dataStructFieldDate", 
-                   "dataStructFieldTime", "dataStructFieldRef", "dataStructFieldUser", 
-                   "dataStructBitField64", "dataStructBitField32", "dataStructBitField16", 
-                   "dataStructBitField8", "vfrFormSetDefinition", "classguidDefinition", 
-                   "classDefinition", "validClassNames", "subclassDefinition", 
-                   "vfrFormSetList", "vfrFormSet", "vfrStatementDefaultStore", 
-                   "vfrStatementVarStoreLinear", "vfrStatementVarStoreEfi", 
-                   "vfrVarStoreEfiAttr", "vfrStatementVarStoreNameValue", 
-                   "vfrStatementDisableIfFormSet", "vfrStatementSuppressIfFormSet", 
-                   "guidSubDefinition", "guidDefinition", "getStringId", 
-                   "vfrQuestionHeader", "vfrQuestionBaseInfo", "vfrStatementHeader", 
-                   "questionheaderFlagsField", "vfrStorageVarId", "vfrConstantValueField", 
-                   "vfrImageTag", "vfrLockedTag", "vfrStatementStatTag", 
-                   "vfrStatementStatTagList", "vfrFormDefinition", "vfrForm", 
-                   "vfrFormMapDefinition", "vfrStatementImage", "vfrStatementLocked", 
-                   "vfrStatementRules", "vfrStatementStat", "vfrStatementSubTitle", 
-                   "vfrStatementSubTitleComponent", "vfrSubtitleFlags", 
-                   "subtitleFlagsField", "vfrStatementStaticText", "staticTextFlagsField", 
-                   "vfrStatementCrossReference", "vfrStatementGoto", "vfrGotoFlags", 
-                   "gotoFlagsField", "vfrStatementResetButton", "vfrStatementQuestions", 
-                   "vfrStatementQuestionTag", "vfrStatementInconsistentIf", 
-                   "vfrStatementNoSubmitIf", "vfrStatementDisableIfQuest", 
-                   "vfrStatementRefresh", "vfrStatementVarstoreDevice", 
-                   "vfrStatementRefreshEvent", "vfrStatementWarningIf", 
-                   "vfrStatementQuestionTagList", "vfrStatementQuestionOptionTag", 
-                   "flagsField", "vfrStatementSuppressIfQuest", "vfrStatementGrayOutIfQuest", 
-                   "vfrStatementDefault", "vfrStatementValue", "vfrStatementOptions", 
-                   "vfrStatementOneOfOption", "vfrOneOfOptionFlags", "oneofoptionFlagsField", 
-                   "vfrStatementRead", "vfrStatementWrite", "vfrStatementQuestionOptionList", 
-                   "vfrStatementQuestionOption", "vfrStatementBooleanType", 
-                   "vfrStatementCheckBox", "vfrCheckBoxFlags", "checkboxFlagsField", 
-                   "vfrStatementAction", "vfrActionFlags", "actionFlagsField", 
-                   "vfrStatementNumericType", "vfrStatementNumeric", "vfrSetMinMaxStep", 
-                   "vfrNumericFlags", "numericFlagsField", "vfrStatementOneOf", 
-                   "vfrOneofFlagsField", "vfrStatementStringType", "vfrStatementString", 
-                   "vfrStringFlagsField", "stringFlagsField", "vfrStatementPassword", 
-                   "vfrPasswordFlagsField", "passwordFlagsField", "vfrStatementOrderedList", 
-                   "vfrOrderedListFlags", "orderedlistFlagsField", "vfrStatementDate", 
-                   "minMaxDateStepDefault", "vfrDateFlags", "dateFlagsField", 
-                   "vfrStatementTime", "minMaxTimeStepDefault", "vfrTimeFlags", 
-                   "timeFlagsField", "vfrStatementConditional", "vfrStatementConditionalNew", 
-                   "vfrStatementSuppressIfStat", "vfrStatementGrayOutIfStat", 
-                   "vfrStatementStatList", "vfrStatementStatListOld", "vfrStatementDisableIfStat", 
-                   "vfrStatementgrayoutIfSuppressIf", "vfrStatementsuppressIfGrayOutIf", 
-                   "vfrStatementSuppressIfStatNew", "vfrStatementGrayOutIfStatNew", 
-                   "vfrStatementInconsistentIfStat", "vfrStatementInvalid", 
-                   "vfrStatementInvalidHidden", "vfrStatementInvalidInventory", 
-                   "vfrStatementInvalidSaveRestoreDefaults", "vfrStatementLabel", 
-                   "vfrStatementBanner", "vfrStatementExtension", "vfrExtensionData", 
-                   "vfrStatementModal", "vfrModalTag", "vfrStatementExpression", 
-                   "vfrStatementExpressionSub", "andTerm", "bitwiseorTerm", 
-                   "bitwiseandTerm", "equalTerm", "equalTermSupplementary", 
-                   "compareTerm", "compareTermSupplementary", "shiftTerm", 
-                   "shiftTermSupplementary", "addMinusTerm", "addMinusTermSupplementary", 
-                   "multdivmodTerm", "multdivmodTermSupplementary", "castTerm", 
-                   "atomTerm", "vfrExpressionCatenate", "vfrExpressionMatch", 
-                   "vfrExpressionMatch2", "vfrExpressionParen", "vfrExpressionBuildInFunction", 
-                   "dupExp", "vareqvalExp", "ideqvalExp", "ideqidExp", "ideqvallistExp", 
-                   "vfrQuestionDataFieldName", "arrayName", "questionref1Exp", 
-                   "rulerefExp", "stringref1Exp", "pushthisExp", "securityExp", 
-                   "numericVarStoreType", "getExp", "vfrExpressionConstant", 
-                   "vfrExpressionUnaryOp", "lengthExp", "bitwisenotExp", 
-                   "question23refExp", "stringref2Exp", "toboolExp", "tostringExp", 
-                   "unintExp", "toupperExp", "tolwerExp", "setExp", "vfrExpressionTernaryOp", 
-                   "conditionalExp", "findExp", "findFormat", "midExp", 
+    ruleNames =  [ "vfrProgram", "pragmaPackShowDef", "pragmaPackStackDef",
+                   "pragmaPackNumber", "vfrPragmaPackDefinition", "vfrDataStructDefinition",
+                   "vfrDataUnionDefinition", "vfrDataStructFields", "dataStructField64",
+                   "dataStructField32", "dataStructField16", "dataStructField8",
+                   "dataStructFieldBool", "dataStructFieldString", "dataStructFieldDate",
+                   "dataStructFieldTime", "dataStructFieldRef", "dataStructFieldUser",
+                   "dataStructBitField64", "dataStructBitField32", "dataStructBitField16",
+                   "dataStructBitField8", "vfrFormSetDefinition", "classguidDefinition",
+                   "classDefinition", "validClassNames", "subclassDefinition",
+                   "vfrFormSetList", "vfrFormSet", "vfrStatementDefaultStore",
+                   "vfrStatementVarStoreLinear", "vfrStatementVarStoreEfi",
+                   "vfrVarStoreEfiAttr", "vfrStatementVarStoreNameValue",
+                   "vfrStatementDisableIfFormSet", "vfrStatementSuppressIfFormSet",
+                   "guidSubDefinition", "guidDefinition", "getStringId",
+                   "vfrQuestionHeader", "vfrQuestionBaseInfo", "vfrStatementHeader",
+                   "questionheaderFlagsField", "vfrStorageVarId", "vfrConstantValueField",
+                   "vfrImageTag", "vfrLockedTag", "vfrStatementStatTag",
+                   "vfrStatementStatTagList", "vfrFormDefinition", "vfrForm",
+                   "vfrFormMapDefinition", "vfrStatementImage", "vfrStatementLocked",
+                   "vfrStatementRules", "vfrStatementStat", "vfrStatementSubTitle",
+                   "vfrStatementSubTitleComponent", "vfrSubtitleFlags",
+                   "subtitleFlagsField", "vfrStatementStaticText", "staticTextFlagsField",
+                   "vfrStatementCrossReference", "vfrStatementGoto", "vfrGotoFlags",
+                   "gotoFlagsField", "vfrStatementResetButton", "vfrStatementQuestions",
+                   "vfrStatementQuestionTag", "vfrStatementInconsistentIf",
+                   "vfrStatementNoSubmitIf", "vfrStatementDisableIfQuest",
+                   "vfrStatementRefresh", "vfrStatementVarstoreDevice",
+                   "vfrStatementRefreshEvent", "vfrStatementWarningIf",
+                   "vfrStatementQuestionTagList", "vfrStatementQuestionOptionTag",
+                   "flagsField", "vfrStatementSuppressIfQuest", "vfrStatementGrayOutIfQuest",
+                   "vfrStatementDefault", "vfrStatementValue", "vfrStatementOptions",
+                   "vfrStatementOneOfOption", "vfrOneOfOptionFlags", "oneofoptionFlagsField",
+                   "vfrStatementRead", "vfrStatementWrite", "vfrStatementQuestionOptionList",
+                   "vfrStatementQuestionOption", "vfrStatementBooleanType",
+                   "vfrStatementCheckBox", "vfrCheckBoxFlags", "checkboxFlagsField",
+                   "vfrStatementAction", "vfrActionFlags", "actionFlagsField",
+                   "vfrStatementNumericType", "vfrStatementNumeric", "vfrSetMinMaxStep",
+                   "vfrNumericFlags", "numericFlagsField", "vfrStatementOneOf",
+                   "vfrOneofFlagsField", "vfrStatementStringType", "vfrStatementString",
+                   "vfrStringFlagsField", "stringFlagsField", "vfrStatementPassword",
+                   "vfrPasswordFlagsField", "passwordFlagsField", "vfrStatementOrderedList",
+                   "vfrOrderedListFlags", "orderedlistFlagsField", "vfrStatementDate",
+                   "minMaxDateStepDefault", "vfrDateFlags", "dateFlagsField",
+                   "vfrStatementTime", "minMaxTimeStepDefault", "vfrTimeFlags",
+                   "timeFlagsField", "vfrStatementConditional", "vfrStatementConditionalNew",
+                   "vfrStatementSuppressIfStat", "vfrStatementGrayOutIfStat",
+                   "vfrStatementStatList", "vfrStatementStatListOld", "vfrStatementDisableIfStat",
+                   "vfrStatementgrayoutIfSuppressIf", "vfrStatementsuppressIfGrayOutIf",
+                   "vfrStatementSuppressIfStatNew", "vfrStatementGrayOutIfStatNew",
+                   "vfrStatementInconsistentIfStat", "vfrStatementInvalid",
+                   "vfrStatementInvalidHidden", "vfrStatementInvalidInventory",
+                   "vfrStatementInvalidSaveRestoreDefaults", "vfrStatementLabel",
+                   "vfrStatementBanner", "vfrStatementExtension", "vfrExtensionData",
+                   "vfrStatementModal", "vfrModalTag", "vfrStatementExpression",
+                   "vfrStatementExpressionSub", "andTerm", "bitwiseorTerm",
+                   "bitwiseandTerm", "equalTerm", "equalTermSupplementary",
+                   "compareTerm", "compareTermSupplementary", "shiftTerm",
+                   "shiftTermSupplementary", "addMinusTerm", "addMinusTermSupplementary",
+                   "multdivmodTerm", "multdivmodTermSupplementary", "castTerm",
+                   "atomTerm", "vfrExpressionCatenate", "vfrExpressionMatch",
+                   "vfrExpressionMatch2", "vfrExpressionParen", "vfrExpressionBuildInFunction",
+                   "dupExp", "vareqvalExp", "ideqvalExp", "ideqidExp", "ideqvallistExp",
+                   "vfrQuestionDataFieldName", "arrayName", "questionref1Exp",
+                   "rulerefExp", "stringref1Exp", "pushthisExp", "securityExp",
+                   "numericVarStoreType", "getExp", "vfrExpressionConstant",
+                   "vfrExpressionUnaryOp", "lengthExp", "bitwisenotExp",
+                   "question23refExp", "stringref2Exp", "toboolExp", "tostringExp",
+                   "unintExp", "toupperExp", "tolwerExp", "setExp", "vfrExpressionTernaryOp",
+                   "conditionalExp", "findExp", "findFormat", "midExp",
                    "tokenExp", "spanExp", "spanFlags", "vfrExpressionMap" ]
 
     EOF = Token.EOF
@@ -5334,7 +5334,7 @@ class VfrSyntaxParser ( Parser ):
                 self.match(VfrSyntaxParser.Comma)
 
 
-            self.state = 829 
+            self.state = 829
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while True:
@@ -5352,7 +5352,7 @@ class VfrSyntaxParser ( Parser ):
                 self.match(VfrSyntaxParser.CloseParen)
                 self.state = 828
                 self.match(VfrSyntaxParser.Comma)
-                self.state = 831 
+                self.state = 831
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if not (_la==VfrSyntaxParser.Name):
@@ -6109,7 +6109,7 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrStorageVarId
 
-     
+
         def copyFrom(self, ctx:ParserRuleContext):
             super().copyFrom(ctx)
             self.BaseInfo = ctx.BaseInfo
@@ -6662,7 +6662,7 @@ class VfrSyntaxParser ( Parser ):
                     self.state = 1009
                     self.match(VfrSyntaxParser.Comma)
                     self.state = 1010
-                    self.vfrStatementStatTag() 
+                    self.vfrStatementStatTag()
                 self.state = 1015
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,59,self._ctx)
@@ -15714,7 +15714,7 @@ class VfrSyntaxParser ( Parser ):
                 while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                     if _alt==1:
                         self.state = 2457
-                        self.vfrExtensionData(localctx.DataBuff) 
+                        self.vfrExtensionData(localctx.DataBuff)
                     self.state = 2462
                     self._errHandler.sync(self)
                     _alt = self._interp.adaptivePredict(self._input,196,self._ctx)
@@ -16330,7 +16330,7 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_equalTermSupplementary
 
-     
+
         def copyFrom(self, ctx:ParserRuleContext):
             super().copyFrom(ctx)
             self.CIfrEqualList = ctx.CIfrEqualList
@@ -16497,7 +16497,7 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_compareTermSupplementary
 
-     
+
         def copyFrom(self, ctx:ParserRuleContext):
             super().copyFrom(ctx)
             self.CIfrLessThanList = ctx.CIfrLessThanList
@@ -16714,7 +16714,7 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_shiftTermSupplementary
 
-     
+
         def copyFrom(self, ctx:ParserRuleContext):
             super().copyFrom(ctx)
             self.CIfrShiftLeftList = ctx.CIfrShiftLeftList
@@ -16871,7 +16871,7 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_addMinusTermSupplementary
 
-     
+
         def copyFrom(self, ctx:ParserRuleContext):
             super().copyFrom(ctx)
             self.CIfrAddList = ctx.CIfrAddList
@@ -17033,7 +17033,7 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_multdivmodTermSupplementary
 
-     
+
         def copyFrom(self, ctx:ParserRuleContext):
             super().copyFrom(ctx)
             self.CIfrMultiplyList = ctx.CIfrMultiplyList
@@ -17231,7 +17231,7 @@ class VfrSyntaxParser ( Parser ):
                         self._errHandler.reportMatch(self)
                         self.consume()
                     self.state = 2612
-                    self.match(VfrSyntaxParser.CloseParen) 
+                    self.match(VfrSyntaxParser.CloseParen)
                 self.state = 2617
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,217,self._ctx)
@@ -18209,13 +18209,13 @@ class VfrSyntaxParser ( Parser ):
             self.vfrQuestionDataFieldName()
             self.state = 2723
             self.match(VfrSyntaxParser.Equal)
-            self.state = 2725 
+            self.state = 2725
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while True:
                 self.state = 2724
                 self.match(VfrSyntaxParser.Number)
-                self.state = 2727 
+                self.state = 2727
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if not (_la==VfrSyntaxParser.Number):
@@ -18244,7 +18244,7 @@ class VfrSyntaxParser ( Parser ):
         def getRuleIndex(self):
             return VfrSyntaxParser.RULE_vfrQuestionDataFieldName
 
-     
+
         def copyFrom(self, ctx:ParserRuleContext):
             super().copyFrom(ctx)
             self.QId = ctx.QId
@@ -20458,8 +20458,3 @@ class VfrSyntaxParser ( Parser ):
         finally:
             self.exitRule()
         return localctx
-
-
-
-
-

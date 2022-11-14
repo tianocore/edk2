@@ -158,10 +158,10 @@ formset
       align right;
 
     label 0x1000;
-    
-    
-    
-    
+
+
+
+
     label 0xffff;
 
   endform;

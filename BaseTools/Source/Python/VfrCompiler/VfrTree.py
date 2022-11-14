@@ -1,28 +1,29 @@
-from CommonCtypes import *   
+from CommonCtypes import *
 from VfrFormPkg import *
 from antlr4 import*
 # Ifr related Info -> ctypes obj
 #　conditional Info
 # Structure Info
-        
+
 class VfrTreeNode():
     def __init__(self, Opcode: int=None) -> None:
-        
+
         self.OpCode = Opcode
-        self.Data = None # save class or bytes
+        self.Data = None
+        self.Buffer = None
         self.Condition = None
         self.Expression = None
         self.Parent = None
         self.Child = []
 
-    
+
     def hasCondition(self) ->bool:
         if self.Condition == None:
             return False
         else:
             return True
-    
-        
+
+
     def hasChild(self) -> bool:
         if self.Child == []:
             return False
@@ -35,7 +36,7 @@ class VfrTreeNode():
             if ParTree.Child[-1] == self:
                 return True
         return False
-        
+
 
     def insertChild(self, NewNode, pos: int=None) -> None:
         if len(self.Child) == 0:
@@ -46,9 +47,9 @@ class VfrTreeNode():
                 self.Child.append(NewNode)
             else:
                 self.Child.insert(pos, NewNode)
-                
+
         NewNode.Parent = self
-                    
+
 
     # lastNode.insertRel(newNode)
     def insertRel(self, newNode) -> None:
@@ -58,7 +59,7 @@ class VfrTreeNode():
             parentTree.Child.insert(new_index, newNode)
         self.NextRel = newNode
         newNode.LastRel = self
-        
+
 
     def deleteNode(self, deletekey: str) -> None:
         FindStatus, DeleteTree = self.FindNode(deletekey)
@@ -80,25 +81,29 @@ class VfrTreeNode():
         else:
             print('Could not find the target tree')
             return None
-    
 
 class VfrTree():
     def __init__(self, Root) -> None:
         self.__Root = Root
        # self.__
-    
+
     def GenBinary(self, FileName):
         try:
-            with open(FileName, 'w') as f:
+            with open(FileName, 'wb') as f:
                 self.GenBinaryDfs(self.__Root, f)
             f.close()
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE, "File open failed for %s" % FileName, None)
-    
+
     def GenBinaryDfs(self, Root, f):
         if Root.OpCode != None:
+            print(type(Root.Data))
             Buffer = self.__StructToStream(Root.Data.GetInfo())
-            print(Buffer)
+
+            if Root.Buffer != None:
+                f.write(Root.Buffer)
+           # else:
+                #f.write(Buffer)
 
         if Root.Child != []:
             for ChildNode in Root.Child:
@@ -109,8 +114,8 @@ class VfrTree():
         Length = sizeof(s)
         P = cast(pointer(s), POINTER(c_char * Length))
         return P.contents.raw
-    
-    
+
+
     def DumpYaml(self, FileName):
         try:
             with open(FileName, 'w') as f:
@@ -120,9 +125,9 @@ class VfrTree():
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE, "File open failed for %s" % FileName, None)
 
-    
+
     def DumpYamlDfs(self, Root, f):
-        
+
         if Root.OpCode != None:
             if Root.OpCode == EFI_IFR_FORM_SET_OP:
                 Info = Root.Data.GetInfo()
@@ -136,7 +141,7 @@ class VfrTree():
                     f.write('  ClassGuid:  {' + '{}, {}, {},'.format('0x%x'%(Guid.Data1),'0x%x'%(Guid.Data2), '0x%x'%(Guid.Data3)) \
                     + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Guid.Data4[0]), '0x%x'%(Guid.Data4[1]), '0x%x'%(Guid.Data4[2]), '0x%x'%(Guid.Data4[3]), \
                     '0x%x'%(Guid.Data4[4]), '0x%x'%(Guid.Data4[5]), '0x%x'%(Guid.Data4[6]), '0x%x'%(Guid.Data4[7])) + ' }}\n')
-                
+
             if Root.OpCode == EFI_IFR_VARSTORE_OP:
                 Info = Root.Data.GetInfo()
                 f.write('  - varstore:\n')
@@ -166,7 +171,7 @@ class VfrTree():
                 f.write('      guid:  {' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
                     + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
                     '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\n')
-                
+
             if Root.OpCode == EFI_IFR_FORM_OP:
                 Info = Root.Data.GetInfo()
                 f.write('  - form:\n')
@@ -181,12 +186,12 @@ class VfrTree():
                 if Root.Condition != None:
                     f.write('      condition:  {}\n'.format(Root.Condition))
                 f.write('      FormId:  {}  # FormId STRING_ID\n'.format(Info.FormId))
-                for MethodMap in  MethodMapList:    
+                for MethodMap in  MethodMapList:
                     f.write('      maptitle:  {}\n'.format(MethodMap.MethodTitle))
                     f.write('      mapguid:  {' + '{}, {}, {},'.format('0x%x'%(MethodMap.MethodIdentifier.Data1),'0x%x'%(MethodMap.MethodIdentifier.Data2), '0x%x'%(MethodMap.MethodIdentifier.Data3)) \
                     + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(MethodMap.MethodIdentifier.Data4[0]), '0x%x'%(MethodMap.MethodIdentifier.Data4[1]), '0x%x'%(MethodMap.MethodIdentifier.Data4[2]), '0x%x'%(MethodMap.MethodIdentifier.Data4[3]), \
                     '0x%x'%(MethodMap.MethodIdentifier.Data4[4]), '0x%x'%(MethodMap.MethodIdentifier.Data4[5]), '0x%x'%(MethodMap.MethodIdentifier.Data4[6]), '0x%x'%(MethodMap.MethodIdentifier.Data4[7])) + ' }}\n')
-            
+
             if Root.OpCode == EFI_IFR_IMAGE_OP:
                 Info = Root.Data.GetInfo()
                 f.write('      - image:\n')
@@ -200,7 +205,7 @@ class VfrTree():
                 if Root.Condition != None:
                     f.write('          condition:  {}\n'.format(Root.Condition))
                 f.write('          RuleId:  {} # RuleId\n'.format(Info.RuleId))
-                
+
             if Root.OpCode == EFI_IFR_SUBTITLE_OP:
                 Info = Root.Data.GetInfo()
                 f.write('      - subtitle:\n')
@@ -216,9 +221,9 @@ class VfrTree():
                 f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Statement.Prompt))
                 f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Statement.Help))
                 f.write('          text:  {}  # Statement Help STRING_ID\n'.format(Info.TextTwo))
-            
+
             if Root.OpCode == EFI_IFR_ACTION_OP:
-                Info = Root.Data.GetInfo()  
+                Info = Root.Data.GetInfo()
                 f.write('      - action:\n')
                 if Root.Condition != None:
                     f.write('          condition:  {}\n'.format(Root.Condition))
@@ -227,31 +232,31 @@ class VfrTree():
                 f.write('          questionid:  {}  # Question QuestionId\n'.format(Info.Question.QuestionId))
                 f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
                 f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags))
-                f.write('          questionconfig:  {}  # QuestionConfig\n'.format(Info.QuestionConfig))  
+                f.write('          questionconfig:  {}  # QuestionConfig\n'.format(Info.QuestionConfig))
 
             if Root.OpCode == EFI_IFR_ONE_OF_OP:
-                Info = Root.Data.GetInfo()  
+                Info = Root.Data.GetInfo()
                 f.write('      - oneof:\n')
                 if Root.Condition != None:
                     f.write('          condition:  {}\n'.format(Root.Condition))
-                    
+
                 f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
                 f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
                 f.write('          questionid:  {}  # Question QuestionId\n'.format(Info.Question.QuestionId))
                 f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
                 f.write('          varname:  {}  # Question VarName STRING_ID\n'.format(Info.Question.VarStoreInfo.VarName))
                 f.write('          varoffset:  {}  # Question VarOffset\n'.format(Info.Question.VarStoreInfo.VarOffset))
-                f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags)) 
+                f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags))
 
             if Root.OpCode == EFI_IFR_ONE_OF_OPTION_OP:
-                Info = Root.Data.GetInfo()  
+                Info = Root.Data.GetInfo()
                 f.write('          - option:  {}\n'.format(Info.Option))
                 if Root.Condition != None:
                     f.write('              condition:  {}\n'.format(Root.Condition))
-                    
+
                 f.write('              option flag:  {}\n'.format(Info.Flags))
                 f.write('              option type:  {}\n'.format(Info.Type))
-                
+
                 if type(Root.Data) == CIfrOneOfOption:
                     if Info.Type == EFI_IFR_TYPE_DATE:
                         f.write('              option value:  {}/{}/{}\n'.format(Info.Value.date.Year, Info.Value.date.Month, Info.Value.date.Day))
@@ -262,54 +267,54 @@ class VfrTree():
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data4[0]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[1]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[2]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[3]), \
                         '0x%x'%(Info.Value.ref.FormSetGuid.Data4[4]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[5]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[6]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[7])) + ' }}' + ';{}\n'.format(Info.Value.ref.DevicePath))
                     if Info.Type == EFI_IFR_TYPE_STRING:
-                        f.write('              option value:  {}\n'.format(Info.Value.string))    
+                        f.write('              option value:  {}\n'.format(Info.Value.string))
                     if Info.Type == EFI_IFR_TYPE_NUM_SIZE_8:
-                        f.write('              option value:  {}\n'.format(Info.Value.u8))   
+                        f.write('              option value:  {}\n'.format(Info.Value.u8))
                     if Info.Type == EFI_IFR_TYPE_NUM_SIZE_16:
-                        f.write('              option value:  {}\n'.format(Info.Value.u16))  
+                        f.write('              option value:  {}\n'.format(Info.Value.u16))
                     if Info.Type == EFI_IFR_TYPE_NUM_SIZE_32:
-                        f.write('              option value:  {}\n'.format(Info.Value.u32))  
+                        f.write('              option value:  {}\n'.format(Info.Value.u32))
                     if Info.Type == EFI_IFR_TYPE_NUM_SIZE_64:
-                        f.write('              option value:  {}\n'.format(Info.Value.u64))  
+                        f.write('              option value:  {}\n'.format(Info.Value.u64))
                     if Info.Type == EFI_IFR_TYPE_BOOLEAN:
-                        f.write('              option value:  {}\n'.format(Info.Value.b))  
-                        
+                        f.write('              option value:  {}\n'.format(Info.Value.b))
+
                 if type(Root.Data) == CIfrOneOfOption2:
                     f.write('              value:  {')
                     ValueType = Root.Data.GetValueType()
                     if ValueType == EFI_IFR_TYPE_STRING:
                         for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].string))  
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].string) + '}\n') 
-                        
+                            f.write('{},'.format(Info.Value[i].string))
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].string) + '}\n')
+
                     if ValueType == EFI_IFR_TYPE_NUM_SIZE_8:
                         for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u8))  
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u8) + '}\n') 
-                        
+                            f.write('{},'.format(Info.Value[i].u8))
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u8) + '}\n')
+
                     if ValueType == EFI_IFR_TYPE_NUM_SIZE_16:
                         for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u16))  
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u16) + '}\n') 
-                        
+                            f.write('{},'.format(Info.Value[i].u16))
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u16) + '}\n')
+
                     if ValueType == EFI_IFR_TYPE_NUM_SIZE_32:
                         for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u32))  
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u32) + '}\n') 
-                        
+                            f.write('{},'.format(Info.Value[i].u32))
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u32) + '}\n')
+
                     if ValueType == EFI_IFR_TYPE_NUM_SIZE_64:
                         for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u64))  
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u64) + '}\n') 
-                        
+                            f.write('{},'.format(Info.Value[i].u64))
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u64) + '}\n')
+
                     if ValueType == EFI_IFR_TYPE_BOOLEAN:
                         for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].b))  
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].b) + '}\n') 
-                    
+                            f.write('{},'.format(Info.Value[i].b))
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].b) + '}\n')
+
 
             if Root.OpCode == EFI_IFR_DEFAULT_OP:
-                Info = Root.Data.GetInfo()  
+                Info = Root.Data.GetInfo()
                 f.write('          - default:\n')
                 if Root.Condition != None:
                     f.write('              condition:  {}\n'.format(Root.Condition))
@@ -325,77 +330,77 @@ class VfrTree():
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data4[0]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[1]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[2]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[3]), \
                         '0x%x'%(Info.Value.ref.FormSetGuid.Data4[4]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[5]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[6]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[7])) + ' }}' + ';{}\n'.format(Info.Value.ref.DevicePath))
                     if Info.Type == EFI_IFR_TYPE_STRING:
-                        f.write('              value:  {}\n'.format(Info.Value.string))    
+                        f.write('              value:  {}\n'.format(Info.Value.string))
                     if Info.Type == EFI_IFR_TYPE_NUM_SIZE_8:
-                        f.write('              value:  {}\n'.format(Info.Value.u8))   
+                        f.write('              value:  {}\n'.format(Info.Value.u8))
                     if Info.Type == EFI_IFR_TYPE_NUM_SIZE_16:
-                        f.write('              value:  {}\n'.format(Info.Value.u16))  
+                        f.write('              value:  {}\n'.format(Info.Value.u16))
                     if Info.Type == EFI_IFR_TYPE_NUM_SIZE_32:
-                        f.write('              value:  {}\n'.format(Info.Value.u32))  
+                        f.write('              value:  {}\n'.format(Info.Value.u32))
                     if Info.Type == EFI_IFR_TYPE_NUM_SIZE_64:
-                        f.write('              value:  {}\n'.format(Info.Value.u64))  
+                        f.write('              value:  {}\n'.format(Info.Value.u64))
                     if Info.Type == EFI_IFR_TYPE_BOOLEAN:
-                        f.write('              value:  {}\n'.format(Info.Value.b))  
-                    
+                        f.write('              value:  {}\n'.format(Info.Value.b))
+
                 if type(Root.Data) == CIfrDefault3:
                     f.write('              value:  {')
                     ValueType = Root.Data.GetValueType()
                     if ValueType == EFI_IFR_TYPE_STRING:
                         for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].string))  
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].string) + '}\n') 
-                        
+                            f.write('{},'.format(Info.Value[i].string))
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].string) + '}\n')
+
                     if ValueType == EFI_IFR_TYPE_NUM_SIZE_8:
                         for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u8))  
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u8) + '}\n') 
-                        
+                            f.write('{},'.format(Info.Value[i].u8))
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u8) + '}\n')
+
                     if ValueType == EFI_IFR_TYPE_NUM_SIZE_16:
                         for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u16))  
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u16) + '}\n') 
-                        
+                            f.write('{},'.format(Info.Value[i].u16))
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u16) + '}\n')
+
                     if ValueType == EFI_IFR_TYPE_NUM_SIZE_32:
                         for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u32))  
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u32) + '}\n') 
-                        
+                            f.write('{},'.format(Info.Value[i].u32))
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u32) + '}\n')
+
                     if ValueType == EFI_IFR_TYPE_NUM_SIZE_64:
                         for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u64))  
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u64) + '}\n') 
-                        
+                            f.write('{},'.format(Info.Value[i].u64))
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u64) + '}\n')
+
                     if ValueType == EFI_IFR_TYPE_BOOLEAN:
                         for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].b))  
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].b) + '}\n') 
+                            f.write('{},'.format(Info.Value[i].b))
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1].b) + '}\n')
 
             if Root.OpCode == EFI_IFR_ORDERED_LIST_OP:
-                Info = Root.Data.GetInfo()  
+                Info = Root.Data.GetInfo()
                 f.write('      - orderedlist:\n')
                 if Root.Condition != None:
                     f.write('          condition:  {}\n'.format(Root.Condition))
-                    
+
                 f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
                 f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
                 f.write('          questionid:  {}  # Question QuestionId\n'.format(Info.Question.QuestionId))
                 f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
                 f.write('          maxContainers:  {}\n'.format(Info.MaxContainers))
-                f.write('          flags:  {}\n'.format(Info.Question.Flags)) 
+                f.write('          flags:  {}\n'.format(Info.Question.Flags))
 
             if Root.OpCode == EFI_IFR_NUMERIC_OP:
-                Info = Root.Data.GetInfo()  
+                Info = Root.Data.GetInfo()
                 f.write('      - numeric:\n')
                 if Root.Condition != None:
-                    f.write('          condition:  {}\n'.format(Root.Condition))    
+                    f.write('          condition:  {}\n'.format(Root.Condition))
                 f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
                 f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
                 f.write('          questionid:  {}  # Question QuestionId\n'.format(Info.Question.QuestionId))
                 f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
                 f.write('          varname:  {}  # Question VarName STRING_ID\n'.format(Info.Question.VarStoreInfo.VarName))
                 f.write('          varoffset:  {}  # Question VarOffset\n'.format(Info.Question.VarStoreInfo.VarOffset))
-                f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags)) 
-                
+                f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags))
+
                 if Root.Data.GetVarType() == EFI_IFR_TYPE_NUM_SIZE_64:
                     f.write('          maxvalue:  {}\n'.format(Info.Data.u64.MaxValue))
                     f.write('          minvalue:  {}\n'.format(Info.Data.u64.MinValue))
@@ -405,19 +410,19 @@ class VfrTree():
                     f.write('          maxvalue:  {}\n'.format(Info.Data.u32.MaxValue))
                     f.write('          minvalue:  {}\n'.format(Info.Data.u32.MinValue))
                     f.write('          step:  {}\n'.format(Info.Data.u32.Step))
-                    
+
                 if Root.Data.GetVarType() == EFI_IFR_TYPE_NUM_SIZE_16:
                     f.write('          maxvalue:  {}\n'.format(Info.Data.u16.MaxValue))
                     f.write('          minvalue:  {}\n'.format(Info.Data.u16.MinValue))
                     f.write('          step:  {}\n'.format(Info.Data.u16.Step))
-                    
+
                 if Root.Data.GetVarType() == EFI_IFR_TYPE_NUM_SIZE_8:
                     f.write('          maxvalue:  {}\n'.format(Info.Data.u8.MaxValue))
                     f.write('          minvalue:  {}\n'.format(Info.Data.u8.MinValue))
                     f.write('          step:  {}\n'.format(Info.Data.u8.Step))
 
             if Root.OpCode == EFI_IFR_CHECKBOX_OP:
-                Info = Root.Data.GetInfo()  
+                Info = Root.Data.GetInfo()
                 f.write('      - checkbox:\n')
                 if Root.Condition != None:
                     f.write('          condition:  {}\n'.format(Root.Condition))
@@ -427,10 +432,10 @@ class VfrTree():
                 f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
                 f.write('          varname:  {}  # Question VarName STRING_ID\n'.format(Info.Question.VarStoreInfo.VarName))
                 f.write('          varoffset:  {}  # Question VarOffset\n'.format(Info.Question.VarStoreInfo.VarOffset))
-                f.write('          flags:  {}  # Flags\n'.format(Info.Flags)) 
+                f.write('          flags:  {}  # Flags\n'.format(Info.Flags))
 
             if Root.OpCode == EFI_IFR_TIME_OP:
-                Info = Root.Data.GetInfo()  
+                Info = Root.Data.GetInfo()
                 f.write('      - time:\n')
                 if Root.Condition != None:
                     f.write('          condition:  {}\n'.format(Root.Condition))
@@ -440,10 +445,10 @@ class VfrTree():
                 f.write('          varoffset:  {}\n'.format(Info.Question.VarStoreInfo.VarOffset))
                 f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
                 f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
-                f.write('          flags:  {}\n'.format(Info.Flags)) 
+                f.write('          flags:  {}\n'.format(Info.Flags))
 
             if Root.OpCode == EFI_IFR_DATE_OP:
-                Info = Root.Data.GetInfo()  
+                Info = Root.Data.GetInfo()
                 f.write('      - date:\n')
                 if Root.Condition != None:
                     f.write('          condition:  {}\n'.format(Root.Condition))
@@ -453,11 +458,11 @@ class VfrTree():
                 f.write('          varoffset:  {}\n'.format(Info.Question.VarStoreInfo.VarOffset))
                 f.write('          prompt:  {}  # Statement Prompt STRING_ID\n'.format(Info.Question.Header.Prompt))
                 f.write('          help:  {}  # Statement Help STRING_ID\n'.format(Info.Question.Header.Help))
-                f.write('          flags:  {}\n'.format(Info.Flags)) 
-                
-            
+                f.write('          flags:  {}\n'.format(Info.Flags))
+
+
             if Root.OpCode == EFI_IFR_STRING_OP:
-                Info = Root.Data.GetInfo()  
+                Info = Root.Data.GetInfo()
                 f.write('      - string:\n')
                 if Root.Condition != None:
                     f.write('          condition:  {}\n'.format(Root.Condition))
@@ -467,13 +472,13 @@ class VfrTree():
                 f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
                 f.write('          varname:  {}  # Question VarName STRING_ID\n'.format(Info.Question.VarStoreInfo.VarName))
                 f.write('          varoffset:  {}  # Question VarOffset\n'.format(Info.Question.VarStoreInfo.VarOffset))
-                f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags)) 
-                f.write('          stringflags:  {}\n'.format(Info.Flags)) 
-                f.write('          stringminsize:  {}\n'.format(Info.MinSize)) 
-                f.write('          stringmaxsize:  {}\n'.format(Info.MaxSize)) 
+                f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags))
+                f.write('          stringflags:  {}\n'.format(Info.Flags))
+                f.write('          stringminsize:  {}\n'.format(Info.MinSize))
+                f.write('          stringmaxsize:  {}\n'.format(Info.MaxSize))
 
             if Root.OpCode == EFI_IFR_PASSWORD_OP:
-                Info = Root.Data.GetInfo()  
+                Info = Root.Data.GetInfo()
                 f.write('      - password:\n')
                 if Root.Condition != None:
                     f.write('          condition:  {}\n'.format(Root.Condition))
@@ -483,13 +488,13 @@ class VfrTree():
                 f.write('          varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
                 f.write('          varname:  {}  # Question VarName STRING_ID\n'.format(Info.Question.VarStoreInfo.VarName))
                 f.write('          varoffset:  {}  # Question VarOffset\n'.format(Info.Question.VarStoreInfo.VarOffset))
-                f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags)) 
-                f.write('          minsize:  {}\n'.format(Info.MinSize)) 
-                f.write('          maxsize:  {}\n'.format(Info.MaxSize)) 
-            
-                
+                f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags))
+                f.write('          minsize:  {}\n'.format(Info.MinSize))
+                f.write('          maxsize:  {}\n'.format(Info.MaxSize))
+
+
             if Root.OpCode == EFI_IFR_RESET_BUTTON_OP:
-                Info = Root.Data.GetInfo()  
+                Info = Root.Data.GetInfo()
                 f.write('      - resetbutton:\n')
                 if Root.Condition != None:
                     f.write('          condition:  {}\n'.format(Root.Condition))
@@ -498,11 +503,11 @@ class VfrTree():
                 f.write('          defaultid:  {}\n'.format(Info.DefaultId))
 
             if Root.OpCode == EFI_IFR_REF_OP:
-                Info = Root.Data.GetInfo()  
+                Info = Root.Data.GetInfo()
                 f.write('      - goto:\n')
                 if Root.Condition != None:
                     f.write('          condition:  {}\n'.format(Root.Condition))
-                
+
                 if type(Root.Data) == CIfrRef4:
                     f.write('          formid:  {}\n'.format(Info.FormId))
                     f.write('          formsetid:  {' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
@@ -526,25 +531,25 @@ class VfrTree():
                     f.write('          formid:  {}\n'.format(Info.FormId))
                     f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
 
-                f.write('          prompt:  {}\n'.format(Info.Question.Header.Prompt)) 
-                f.write('          help:  {}\n'.format(Info.Question.Header.Help)) 
-            
+                f.write('          prompt:  {}\n'.format(Info.Question.Header.Prompt))
+                f.write('          help:  {}\n'.format(Info.Question.Header.Help))
+
             if Root.OpCode == EFI_IFR_REFRESH_OP:
-                Info = Root.Data.GetInfo() 
+                Info = Root.Data.GetInfo()
                 f.write('          - refresh:\n')
                 if Root.Condition != None:
                     f.write('              condition:  {}\n'.format(Root.Condition))
                 f.write('              interval:  {}  # RefreshInterval\n'.format(Info.RefreshInterval))
 
             if Root.OpCode == EFI_IFR_VARSTORE_DEVICE_OP:
-                Info = Root.Data.GetInfo() 
+                Info = Root.Data.GetInfo()
                 f.write('          - varstoredevice:\n')
                 if Root.Condition != None:
                     f.write('              condition:  {}\n'.format(Root.Condition))
                 f.write('              devicepath:  {}  # DevicePath\n'.format(Info.DevicePath))
 
             if Root.OpCode == EFI_IFR_REFRESH_ID_OP:
-                Info = Root.Data.GetInfo() 
+                Info = Root.Data.GetInfo()
                 f.write('          - refreshguid:\n')
                 if Root.Condition != None:
                     f.write('              condition:  {}\n'.format(Root.Condition))
@@ -553,44 +558,44 @@ class VfrTree():
                     '0x%x'%(Info.RefreshEventGroupId.Data4[4]), '0x%x'%(Info.RefreshEventGroupId.Data4[5]), '0x%x'%(Info.RefreshEventGroupId.Data4[6]), '0x%x'%(Info.RefreshEventGroupId.Data4[7])) + ' }}\n')
 
             if Root.OpCode == EFI_IFR_WARNING_IF_OP:
-                Info = Root.Data.GetInfo() 
+                Info = Root.Data.GetInfo()
                 f.write('          - warningif:\n')
                 if Root.Condition != None:
                     f.write('              condition:  {}\n'.format(Root.Condition))
                 f.write('              warning:  {}\n'.format(Info.Warning))
                 f.write('              timeOut:  {}\n'.format(Info.TimeOut))
-                      
+
             if Root.OpCode == EFI_IFR_GUID_OP:
-                Info = Root.Data.GetInfo() 
+                Info = Root.Data.GetInfo()
                 if type(Root.Data) == CIfrLabel: # type(Info) == EFI_IFR_GUID_LABEL
                     f.write('      - label:\n')
                     if Root.Condition != None:
                         f.write('          condition:  {}\n'.format(Root.Condition))
-                        
+
                     f.write('          labelnumber:  {}  # LabelNumber\n'.format(Info.Number))
 
-                if type(Root.Data) == CIfrBanner: 
+                if type(Root.Data) == CIfrBanner:
                     f.write('      - banner:\n')
                     if Root.Condition != None:
                         f.write('          condition:  {}\n'.format(Root.Condition))
-                        
+
                     f.write('          title:  {}\n'.format(Info.Title))
                     f.write('          linenumber:  {}\n'.format(Info.LineNumber))
                     f.write('          align:  {}\n'.format(Info.Alignment))
 
-                if type(Root.Data) == CIfrTimeout: 
+                if type(Root.Data) == CIfrTimeout:
                     f.write('      - banner:\n')
                     if Root.Condition != None:
                         f.write('          condition:  {}\n'.format(Root.Condition))
-                        
+
                     f.write('          timeout:  {}\n'.format(Info.TimeOut))
 
-                if type(Root.Data) == CIfrClass:                         
+                if type(Root.Data) == CIfrClass:
                     f.write('  Class:  {}\n'.format(Info.Class))
-                    
-                if type(Root.Data) == CIfrSubClass:                         
+
+                if type(Root.Data) == CIfrSubClass:
                     f.write('  SubClass:  {}\n'.format(Info.SubClass))
-                
+
                 if type(Root.Data) == CIfrGuid:
                     f.write('      - guidop:\n')
                     if Root.Condition != None:
@@ -598,7 +603,7 @@ class VfrTree():
                     f.write('          guid:  {' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
                     + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
                     '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\n')
-                    
+
 
         if Root.Child != []:
             for ChildNode in Root.Child:
@@ -609,8 +614,8 @@ class VfrTree():
                         ChildNode.Condition = Root.Condition
 
                 self.DumpYamlDfs(ChildNode, f)
-        
-        return 
+
+        return
 
     def DumpJson(self, FileName):
         try:
@@ -666,7 +671,7 @@ class VfrTree():
                         f.write('      }\n')
                     else:
                         f.write('      },\n')
-                        
+
                     pVsNode = pVsNode.Next
                 f.write('  },\n')
                 f.write('  \"Data\" : [\n')
@@ -695,17 +700,17 @@ class VfrTree():
                             + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[0]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[1]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[2]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[3]), \
                             '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[4]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[5]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[6]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[7])) + ' }}' + ';{}\n'.format(pInfoNode.Value.ref.DevicePath))
                         if pInfoNode.Type == EFI_IFR_TYPE_STRING:
-                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.string))    
+                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.string))
                         if pInfoNode.Type == EFI_IFR_TYPE_NUM_SIZE_8:
-                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u8))   
+                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u8))
                         if pInfoNode.Type == EFI_IFR_TYPE_NUM_SIZE_16:
-                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u16))  
+                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u16))
                         if pInfoNode.Type == EFI_IFR_TYPE_NUM_SIZE_32:
-                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u32))  
+                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u32))
                         if pInfoNode.Type == EFI_IFR_TYPE_NUM_SIZE_64:
-                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u64))  
+                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u64))
                         if pInfoNode.Type == EFI_IFR_TYPE_BOOLEAN:
-                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.b))  
+                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.b))
 
                         f.write('      },\n')
                         pInfoNode = pInfoNode.Next
@@ -724,6 +729,3 @@ class VfrTree():
             f.close()
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE, "File open failed for %s" % FileName, None)
-        
-    
-    

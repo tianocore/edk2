@@ -97,8 +97,8 @@ vfrWarningMessage = {
     EFI_VFR_WARNING_CODE.VFR_WARNING_CODEUNDEFINED: ": undefined Warning Code"
 }
 
-    
-    
+
+
 class CVfrErrorHandle():
 
     def __init__(self):
@@ -112,7 +112,7 @@ class CVfrErrorHandle():
 
     def SetInputFile(self, InputFile):
         self.__InputFileName = InputFile
-    
+
     def HandleWarning(self, WarningCode, LineNum, TokenValue=None):
         if self.__vfrWarningMessage == None:
             return 1
@@ -125,15 +125,15 @@ class CVfrErrorHandle():
             if self.__WarningAsError:
                 EdkLogger.error('VfrCompiler', WarningCode, WarningMsg, self.__InputFileName, LineNum, "warning treated as error")
             EdkLogger.warn('VfrCompiler', WarningMsg, self.__InputFileName, LineNum, TokenValue)
-            
+
 
     def PrintMsg(self, LineNum, MsgType = 'Error', ErrorMsg=None, TokenValue=None):
         if MsgType == 'Warning':
             EdkLogger.verbose(ErrorMsg)
         else:
             EdkLogger.error('VfrCompiler', 0x3000, ErrorMsg, self.__InputFileName, LineNum, TokenValue)
-        
-        
+
+
     def HandleError(self, ErrorCode, LineNum=None, TokenValue=None):
         if self.__vfrErrorMessage == None:
             return 1
@@ -148,4 +148,4 @@ class CVfrErrorHandle():
         else:
             return 0
 
-gCVfrErrorHandle = CVfrErrorHandle()                                                                                                                                                                                                                                                                                                                
+gCVfrErrorHandle = CVfrErrorHandle()

@@ -137,8 +137,8 @@ class EFI_IFR_OP_HEADER(Structure):
     _pack_ = 1
     _fields_ = [
         ('OpCode', c_ubyte),
-        ('Length', c_ubyte, 7),  #
-        ('Scope', c_ubyte, 1),  #
+        ('Length', c_ubyte, 7),
+        ('Scope', c_ubyte, 1),
     ]
 
 
@@ -189,7 +189,7 @@ class EFI_IFR_VARSTORE(Structure):
         ('Guid', EFI_GUID),
         ('VarStoreId', c_uint16),
         ('Size', c_uint16),
-        ('Name', c_wchar_p),  
+        ('Name', c_wchar_p),
     ]
 
 
@@ -201,7 +201,7 @@ class EFI_IFR_VARSTORE_EFI(Structure):
         ('VarStoreId', c_uint16),
         ('Attributes', c_uint32),
         ('Size', c_uint16),
-        ('Name', c_wchar_p),  
+        ('Name', c_wchar_p),
     ]
 
 
@@ -303,7 +303,7 @@ class EFI_IFR_SUBTITLE(Structure):
     _pack_ = 1
     _fields_ = [
         ('Header', EFI_IFR_OP_HEADER),
-        ('Statement', EFI_IFR_STATEMENT_HEADER), 
+        ('Statement', EFI_IFR_STATEMENT_HEADER),
         ('Flags', c_ubyte),
     ]
 
@@ -339,7 +339,7 @@ class EFI_IFR_QUESTION_HEADER(Structure):
         ('Header', EFI_IFR_STATEMENT_HEADER),
         ('QuestionId', c_uint16),
         ('VarStoreId', c_uint16),
-        ('VarStoreInfo', VarStoreInfoNode),  
+        ('VarStoreInfo', VarStoreInfoNode),
         ('Flags', c_ubyte),
     ]
 
@@ -486,7 +486,7 @@ class EFI_IFR_TYPE_VALUE(Union):
         ('ref', EFI_HII_REF),
     ]
 
-    
+
 class EFI_IFR_ONE_OF_OPTION(Structure):
     _pack_ = 1
     _fields_ = [
@@ -1197,8 +1197,8 @@ def Refine_EFI_IFR_DEFAULT(Nums):
             ('Value', EFI_IFR_TYPE_VALUE * Nums),
         ]
     return EFI_IFR_DEFAULT
-    
-    
+
+
 class EFI_IFR_DEFAULT_2(Structure):
     _pack_ = 1
     _fields_ = [
