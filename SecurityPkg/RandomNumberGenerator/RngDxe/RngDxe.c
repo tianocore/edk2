@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/RngLib.h>
 #include <Protocol/Rng.h>
@@ -80,7 +81,12 @@ RngDriverEntry (
   //
   // Get the list of available algorithm.
   //
-  return GetAvailableAlgorithms ();
+  Status = GetAvailableAlgorithms ();
+  if (mAvailableAlgoArrayCount == 0) {
+    DEBUG ((DEBUG_WARN, "No Rng algorithm found in RngDxe.\n"));
+  }
+
+  return Status;
 }
 
 /**
