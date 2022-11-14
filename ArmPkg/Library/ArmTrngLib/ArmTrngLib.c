@@ -344,7 +344,6 @@ ArmTrngLibConstructor (
 
   Status = GetArmTrngVersion (&MajorRev, &MinorRev);
   if (RETURN_ERROR (Status)) {
-    ASSERT_RETURN_ERROR (Status);
     goto ErrorHandler;
   }
 
