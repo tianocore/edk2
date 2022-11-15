@@ -482,7 +482,7 @@ GenerateLpiStates (
     }
 
     // We do not support the LevelId field for now, let it to 0.
-    Status = AmlCreateLpiNode (AslName, 1, 0, ScopeNode, &LpiNode);
+    Status = AmlCreateLpiNode (AslName, 0, 0, ScopeNode, &LpiNode);
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       return Status;
