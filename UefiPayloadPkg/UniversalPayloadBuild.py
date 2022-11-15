@@ -31,7 +31,7 @@ class UPLD_INFO_HEADER(LittleEndianStructure):
     def __init__(self):
         self.Identifier     =  b'PLDH'
         self.HeaderLength   = sizeof(UPLD_INFO_HEADER)
-        self.SpecRevision   = 0x0007
+        self.SpecRevision   = 0x0009
         self.Revision       = 0x0000010105
         self.ImageId        = b'UEFI'
         self.ProducerId     = b'INTEL'
@@ -133,7 +133,7 @@ def BuildUniversalPayload(Args, MacroList):
                        FvOutputDir,
                        EntryOutputDir
                        )
-    set_section    = '"{}" -I {} -O {} --set-section-alignment .upld.upld_info=16 --set-section-alignment .upld.uefi_fv=16 {}'.format (
+    set_section    = '"{}" -I {} -O {} --set-section-alignment .upld_info=4 --set-section-alignment .upld.uefi_fv=16 {}'.format (
                        LlvmObjcopyPath,
                        ObjCopyFlag,
                        ObjCopyFlag,
