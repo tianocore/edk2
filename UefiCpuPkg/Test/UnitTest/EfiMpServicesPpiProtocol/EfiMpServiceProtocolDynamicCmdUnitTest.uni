@@ -1,0 +1,34 @@
+// *++
+//
+// Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//
+// Module Name:
+//
+//   EfiMpServiceProtocolDynamicCmdUnitTest.uni
+//
+// Abstract:
+//
+//   String definitions for the Shell mput command
+//
+// Revision History:
+//
+// --*/
+
+/=#
+
+#langdef   en-US "English"
+
+#string STR_MPUT_INVALID_ARG           #language en-US  "Invalid argument(s)\n"
+#string STR_MPUT_TOO_MANY              #language en-US  "Too many arguments\n"
+#string STR_GET_HELP_MPUT              #language en-US  ""
+".TH mput 0 "Display unit test results of EFI MP services protocol"\r\n"
+".SH NAME\r\n"
+"Display unit test results of EFI MP services protocol.\r\n"
+".SH SYNOPSIS\r\n"
+"MPUT [-b] [-?]\r\n"
+".SH OPTIONS\r\n"
+" \r\n"
+"  -b       - Displays on multiple pages\r\n"
+"  -?       - Displays MPUT help information\r\n"
