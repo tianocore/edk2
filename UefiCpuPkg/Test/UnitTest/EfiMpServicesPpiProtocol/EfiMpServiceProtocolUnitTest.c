@@ -258,3 +258,21 @@ DxeEntryPoint (
 {
   return EfiMpServiceProtocolUnitTest ();
 }
+
+/**
+  Standard UEFI application entry point for unit test execution from Shell.
+  Initialize the unit test framework, suite, and unit tests for the EfiMpServiceProtocol and run the unit test.
+
+  @param[in]  ImageHandle    The firmware allocated handle for the EFI image.
+  @param[in]  SystemTable    A pointer to the EFI System Table.
+
+**/
+EFI_STATUS
+EFIAPI
+AppEntryPoint (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  return EfiMpServiceProtocolUnitTest ();
+}
