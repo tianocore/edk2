@@ -1,5 +1,5 @@
 /** @file
-  Common header file for EfiMpServiceProtocolUnitTest DXE driver.
+  Common header file for EdkiiPeiMpServices2Ppi and EfiMpServiceProtocol unit test.
 
   Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
 
