@@ -601,6 +601,42 @@ TABLE_ITEM  ProcessorUpgradeTable[] = {
   {
     0x3F,
     L"Socket LGA4677"
+  },
+  {
+    0x40,
+    L"Socket LGA1700"
+  },
+  {
+    0x41,
+    L"Socket BGA1744"
+  },
+  {
+    0x42,
+    L"Socket BGA1781"
+  },
+  {
+    0x43,
+    L"Socket BGA1211"
+  },
+  {
+    0x44,
+    L"Socket BGA2422"
+  },
+  {
+    0x45,
+    L"Socket LGA1211"
+  },
+  {
+    0x46,
+    L"Socket LGA2422"
+  },
+  {
+    0x47,
+    L"Socket LGA5773"
+  },
+  {
+    0x48,
+    L"Socket BGA5773"
   }
 };
 
