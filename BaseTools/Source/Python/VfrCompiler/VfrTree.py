@@ -6,11 +6,11 @@ from antlr4 import*
 # Structure Info
 
 class VfrTreeNode():
-    def __init__(self, Opcode: int=None) -> None:
+    def __init__(self, Opcode=None, Data=None, Buffer=None) -> None:
 
         self.OpCode = Opcode
-        self.Data = None
-        self.Buffer = None
+        self.Data = Data
+        self.Buffer = Buffer
         self.Condition = None
         self.Expression = None
         self.Parent = None
@@ -39,17 +39,13 @@ class VfrTreeNode():
 
 
     def insertChild(self, NewNode, pos: int=None) -> None:
-        if len(self.Child) == 0:
-            self.Child.append(NewNode)
-        else:
+        if NewNode != None:
             if not pos:
-                LastTree = self.Child[-1]
                 self.Child.append(NewNode)
             else:
                 self.Child.insert(pos, NewNode)
 
         NewNode.Parent = self
-
 
     # lastNode.insertRel(newNode)
     def insertRel(self, newNode) -> None:

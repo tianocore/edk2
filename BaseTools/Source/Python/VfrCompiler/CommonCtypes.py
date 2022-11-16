@@ -141,7 +141,6 @@ class EFI_IFR_OP_HEADER(Structure):
         ('Scope', c_ubyte, 1),
     ]
 
-
 class EFI_IFR_FORM_SET(Structure):
     _pack_ = 1
     _fields_ = [

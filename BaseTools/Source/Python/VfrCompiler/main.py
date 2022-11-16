@@ -45,3 +45,4 @@ if __name__ == '__main__':
     Compiler = VfrCompiler()
     Compiler.PreProcess()
     Compiler.Compile(Infile, YamlOutFile, JsonOutFile, BinaryOutFile)
+    

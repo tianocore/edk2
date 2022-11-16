@@ -1671,7 +1671,8 @@ class CIfrSuppressIf(CIfrObj, CIfrOpHeader):
         self.__SuppressIf = EFI_IFR_SUPPRESS_IF()
         CIfrOpHeader.__init__(self, self.__SuppressIf.Header,
                               EFI_IFR_SUPPRESS_IF_OP)
-
+    def GetInfo(self):
+        return self.__SuppressIf
 
 class CIfrGrayOutIf(CIfrObj, CIfrOpHeader):
 
@@ -1679,6 +1680,9 @@ class CIfrGrayOutIf(CIfrObj, CIfrOpHeader):
         self.__GrayOutIf = EFI_IFR_GRAY_OUT_IF()
         CIfrOpHeader.__init__(self, self.__GrayOutIf.Header,
                               EFI_IFR_GRAY_OUT_IF_OP)
+
+    def GetInfo(self):
+        return self.__GrayOutIf
 
 
 class CIfrValue(CIfrObj, CIfrOpHeader):
@@ -2018,6 +2022,9 @@ class CIfrOr(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__Or.Header, EFI_IFR_OR_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__Or
+
 
 class CIfrAnd(CIfrObj, CIfrOpHeader):
 
@@ -2025,6 +2032,9 @@ class CIfrAnd(CIfrObj, CIfrOpHeader):
         self.__And = EFI_IFR_AND()
         CIfrOpHeader.__init__(self, self.__And.Header, EFI_IFR_AND_OP)
         self.SetLineNo(LineNo)
+
+    def GetInfo(self):
+        return self.__And
 
 
 class CIfrBitWiseOr(CIfrObj, CIfrOpHeader):
@@ -2035,6 +2045,9 @@ class CIfrBitWiseOr(CIfrObj, CIfrOpHeader):
                               EFI_IFR_BITWISE_OR_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__BitWiseOr
+
 
 class CIfrCatenate(CIfrObj, CIfrOpHeader):
 
@@ -2044,6 +2057,9 @@ class CIfrCatenate(CIfrObj, CIfrOpHeader):
                               EFI_IFR_CATENATE_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__Catenate
+
 
 class CIfrDivide(CIfrObj, CIfrOpHeader):
 
@@ -2051,6 +2067,9 @@ class CIfrDivide(CIfrObj, CIfrOpHeader):
         self.__Divide = EFI_IFR_DIVIDE()
         CIfrOpHeader.__init__(self, self.__Divide.Header, EFI_IFR_DIVIDE_OP)
         self.SetLineNo(LineNo)
+
+    def GetInfo(self):
+        return self.__Divide
 
 
 class CIfrEqual(CIfrObj, CIfrOpHeader):
@@ -2060,6 +2079,8 @@ class CIfrEqual(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__Equal.Header, EFI_IFR_EQUAL_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__Equal
 
 class CIfrGreaterEqual(CIfrObj, CIfrOpHeader):
 
@@ -2068,6 +2089,9 @@ class CIfrGreaterEqual(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__GreaterEqual.Header,
                               EFI_IFR_GREATER_EQUAL_OP)
         self.SetLineNo(LineNo)
+
+    def GetInfo(self):
+        return self.__GreaterEqual
 
 
 class CIfrGreaterThan(CIfrObj, CIfrOpHeader):
@@ -2078,6 +2102,9 @@ class CIfrGreaterThan(CIfrObj, CIfrOpHeader):
                               EFI_IFR_GREATER_THAN_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__GreaterThan
+
 
 class CIfrLessEqual(CIfrObj, CIfrOpHeader):
 
@@ -2086,6 +2113,9 @@ class CIfrLessEqual(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__LessEqual.Header,
                               EFI_IFR_LESS_EQUAL_OP)
         self.SetLineNo(LineNo)
+
+    def GetInfo(self):
+        return self.__LessEqual
 
 
 class CIfrLessThan(CIfrObj, CIfrOpHeader):
@@ -2096,6 +2126,9 @@ class CIfrLessThan(CIfrObj, CIfrOpHeader):
                               EFI_IFR_LESS_THAN_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__LessThan
+
 
 class CIfrMap(CIfrObj, CIfrOpHeader):
 
@@ -2104,6 +2137,8 @@ class CIfrMap(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__Map.Header, EFI_IFR_MAP_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__Map
 
 class CIfrMatch(CIfrObj, CIfrOpHeader):
 
@@ -2111,6 +2146,9 @@ class CIfrMatch(CIfrObj, CIfrOpHeader):
         self.__Match = EFI_IFR_MATCH()
         CIfrOpHeader.__init__(self, self.__Match.Header, EFI_IFR_MATCH_OP)
         self.SetLineNo(LineNo)
+
+    def GetInfo(self):
+        return self.__Match
 
 
 class CIfrMatch2(CIfrObj, CIfrOpHeader):
@@ -2121,6 +2159,9 @@ class CIfrMatch2(CIfrObj, CIfrOpHeader):
         self.SetLineNo(LineNo)
         self.__Match2.SyntaxType = Guid
 
+    def GetInfo(self):
+        return self.__Match2
+
 
 class CIfrMultiply(CIfrObj, CIfrOpHeader):
 
@@ -2130,6 +2171,9 @@ class CIfrMultiply(CIfrObj, CIfrOpHeader):
                               EFI_IFR_MULTIPLY_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__Multiply
+
 
 class CIfrModulo(CIfrObj, CIfrOpHeader):
 
@@ -2137,6 +2181,9 @@ class CIfrModulo(CIfrObj, CIfrOpHeader):
         self.__Modulo = EFI_IFR_MODULO()
         CIfrOpHeader.__init__(self, self.__Modulo.Header, EFI_IFR_MODULO_OP)
         self.SetLineNo(LineNo)
+
+    def GetInfo(self):
+        return self.__Modulo
 
 
 class CIfrNotEqual(CIfrObj, CIfrOpHeader):
@@ -2147,6 +2194,8 @@ class CIfrNotEqual(CIfrObj, CIfrOpHeader):
                               EFI_IFR_NOT_EQUAL_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__NotEqual
 
 class CIfrShiftLeft(CIfrObj, CIfrOpHeader):
 
@@ -2155,6 +2204,9 @@ class CIfrShiftLeft(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__ShiftLeft.Header,
                               EFI_IFR_SHIFT_LEFT_OP)
         self.SetLineNo(LineNo)
+
+    def GetInfo(self):
+        return self.__ShiftLeft
 
 
 class CIfrShiftRight(CIfrObj, CIfrOpHeader):
@@ -2165,6 +2217,9 @@ class CIfrShiftRight(CIfrObj, CIfrOpHeader):
                               EFI_IFR_SHIFT_RIGHT_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__ShiftRight
+
 
 class CIfrSubtract(CIfrObj, CIfrOpHeader):
 
@@ -2174,6 +2229,9 @@ class CIfrSubtract(CIfrObj, CIfrOpHeader):
                               EFI_IFR_SUBTRACT_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__Subtract
+
 
 class CIfrConditional(CIfrObj, CIfrOpHeader):
 
@@ -2182,6 +2240,9 @@ class CIfrConditional(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__Conditional.Header,
                               EFI_IFR_CONDITIONAL_OP)
         self.SetLineNo(LineNo)
+
+    def GetInfo(self):
+        return self.__Conditional
 
 
 class CIfrFind(CIfrObj, CIfrOpHeader):
@@ -2194,6 +2255,8 @@ class CIfrFind(CIfrObj, CIfrOpHeader):
     def SetFormat(self, Format):
         self.__Find.Format = Format
 
+    def GetInfo(self):
+        return self.__Find
 
 class CIfrMid(CIfrObj, CIfrOpHeader):
 
@@ -2202,6 +2265,9 @@ class CIfrMid(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__Mid.Header, EFI_IFR_MID_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__Mid
+
 
 class CIfrToken(CIfrObj, CIfrOpHeader):
 
@@ -2209,6 +2275,9 @@ class CIfrToken(CIfrObj, CIfrOpHeader):
         self.__Token = EFI_IFR_TOKEN()
         CIfrOpHeader.__init__(self, self.__Token.Header, EFI_IFR_TOKEN_OP)
         self.SetLineNo(LineNo)
+
+    def GetInfo(self):
+        return self.__Token
 
 
 class CIfrSpan(CIfrObj, CIfrOpHeader):
@@ -2230,6 +2299,8 @@ class CIfrSpan(CIfrObj, CIfrOpHeader):
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
 
+    def GetInfo(self):
+        return self.__Span
 
 class CIfrBitWiseAnd(CIfrObj, CIfrOpHeader):
 
@@ -2238,6 +2309,9 @@ class CIfrBitWiseAnd(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__BitWiseAnd.Header,
                               EFI_IFR_BITWISE_AND_OP)
         self.SetLineNo(LineNo)
+
+    def GetInfo(self):
+        return self.__BitWiseAnd
 
 
 class CIfrBitWiseOr(CIfrObj, CIfrOpHeader):
@@ -2256,6 +2330,9 @@ class CIfrAdd(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__Add.Header, EFI_IFR_ADD_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__Add
+
 
 class CIfrToString(CIfrObj, CIfrOpHeader):
 
@@ -2268,6 +2345,9 @@ class CIfrToString(CIfrObj, CIfrOpHeader):
     def SetFormat(self, Format):
         self.__ToString.Format = Format
 
+    def GetInfo(self):
+        return self.__ToString
+
 
 class CIfrToUpper(CIfrObj, CIfrOpHeader):
 
@@ -2277,6 +2357,9 @@ class CIfrToUpper(CIfrObj, CIfrOpHeader):
                               EFI_IFR_TO_UPPER_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__ToUppper
+
 
 class CIfrToUint(CIfrObj, CIfrOpHeader):
 
@@ -2285,6 +2368,9 @@ class CIfrToUint(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__ToUint.Header, EFI_IFR_TO_UINT_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__ToUint
+
 
 class CIfrToLower(CIfrObj, CIfrOpHeader):
 
@@ -2292,6 +2378,9 @@ class CIfrToLower(CIfrObj, CIfrOpHeader):
         self.__ToLower = EFI_IFR_TO_LOWER()
         CIfrOpHeader.__init__(self, self.__ToLower.Header, EFI_IFR_TO_LOWER_OP)
         self.SetLineNo(LineNo)
+
+    def GetInfo(self):
+        return self.__ToLower
 
 
 class CIfrToBoolean(CIfrObj, CIfrOpHeader):
@@ -2302,6 +2391,9 @@ class CIfrToBoolean(CIfrObj, CIfrOpHeader):
                               EFI_IFR_TO_BOOLEAN_OP)
         self.SetLineNo(LineNo)
 
+    def GetInfo(self):
+        return self.__Boolean
+
 
 class CIfrNot(CIfrObj, CIfrOpHeader):
 
@@ -2309,6 +2401,9 @@ class CIfrNot(CIfrObj, CIfrOpHeader):
         self.__Not = EFI_IFR_NOT()
         CIfrOpHeader.__init__(self, self.__Not.Header, EFI_IFR_NOT_OP)
         self.SetLineNo(LineNo)
+
+    def GetInfo(self):
+        return self.__Not
 
 
 class CIfrDup(CIfrObj, CIfrOpHeader):
@@ -2320,6 +2415,9 @@ class CIfrDup(CIfrObj, CIfrOpHeader):
 
     def GetHeader(self):
         return self.__Dup.Header
+
+    def GetInfo(self):
+        return self.__Dup
 
 
 class CIfrEqIdId(CIfrObj, CIfrOpHeader):
@@ -2346,6 +2444,9 @@ class CIfrEqIdId(CIfrObj, CIfrOpHeader):
         else:
             pass
 
+    def GetInfo(self):
+        return self.__EqIdId
+
 
 class CIfrEqIdVal(CIfrObj, CIfrOpHeader):
 
@@ -2367,6 +2468,9 @@ class CIfrEqIdVal(CIfrObj, CIfrOpHeader):
 
     def GetHeader(self):
         return self.__EqIdVal.Header
+
+    def GetInfo(self):
+        return self.__EqIdVal
 
 
 class CIfrEqIdList(CIfrObj, CIfrOpHeader):
@@ -2406,6 +2510,9 @@ class CIfrEqIdList(CIfrObj, CIfrOpHeader):
     def GetHeader(self):
         return self.__EqIdVList.Header
 
+    def GetInfo(self):
+        return self.__EqIdVList
+
 
 class CIfrUint8(CIfrObj, CIfrOpHeader):
 
@@ -2419,6 +2526,9 @@ class CIfrUint8(CIfrObj, CIfrOpHeader):
 
     def GetHeader(self):
         return self.__Uint8.Header
+
+    def GetInfo(self):
+        return self.__Uint8
 
 
 class CIfrUint16(CIfrObj, CIfrOpHeader):
@@ -2434,6 +2544,9 @@ class CIfrUint16(CIfrObj, CIfrOpHeader):
     def GetHeader(self):
         return self.__Uint16.Header
 
+    def GetInfo(self):
+        return self.__Uint16
+
 
 class CIfrUint32(CIfrObj, CIfrOpHeader):
 
@@ -2448,6 +2561,9 @@ class CIfrUint32(CIfrObj, CIfrOpHeader):
     def GetHeader(self):
         return self.__Uint32.Header
 
+    def GetInfo(self):
+        return self.__Uint32
+
 
 class CIfrUint64(CIfrObj, CIfrOpHeader):
 
@@ -2461,6 +2577,9 @@ class CIfrUint64(CIfrObj, CIfrOpHeader):
 
     def GetHeader(self):
         return self.__Uint64.Header
+
+    def GetInfo(self):
+        return self.__Uint64
 
 
 class CIfrQuestionRef1(CIfrObj, CIfrOpHeader):
@@ -2481,6 +2600,9 @@ class CIfrQuestionRef1(CIfrObj, CIfrOpHeader):
         else:
             pass
 
+    def GetInfo(self):
+        return self.__QuestionRef1
+
 
 class CIfrQuestionRef2(CIfrObj, CIfrOpHeader):
 
@@ -2492,6 +2614,9 @@ class CIfrQuestionRef2(CIfrObj, CIfrOpHeader):
 
     def GetHeader(self):
         return self.__QuestionRef2.Header
+
+    def GetInfo(self):
+        return self.__QuestionRef2
 
 
 class CIfrQuestionRef3(CIfrObj, CIfrOpHeader):
@@ -2505,6 +2630,8 @@ class CIfrQuestionRef3(CIfrObj, CIfrOpHeader):
     def GetHeader(self):
         return self.__QuestionRef3.Header
 
+    def GetInfo(self):
+        return self.__QuestionRef3
 
 class CIfrQuestionRef3_2(CIfrObj, CIfrOpHeader):
 
@@ -2520,6 +2647,9 @@ class CIfrQuestionRef3_2(CIfrObj, CIfrOpHeader):
 
     def GetHeader(self):
         return self.__QuestionRef3_2.Header
+
+    def GetInfo(self):
+        return self.__QuestionRef3_2
 
 
 class CIfrQuestionRef3_3(CIfrObj, CIfrOpHeader):
@@ -2542,6 +2672,9 @@ class CIfrQuestionRef3_3(CIfrObj, CIfrOpHeader):
     def GetHeader(self):
         return self.__QuestionRef3_3.Header
 
+    def GetInfo(self):
+        return self.__QuestionRef3_3
+
 
 class CIfrRuleRef(CIfrObj, CIfrOpHeader):
 
@@ -2556,6 +2689,9 @@ class CIfrRuleRef(CIfrObj, CIfrOpHeader):
 
     def GetHeader(self):
         return self.__RuleRef.Header
+
+    def GetInfo(self):
+        return self.__RuleRef
 
 
 class CIfrStringRef1(CIfrObj, CIfrOpHeader):
@@ -2573,6 +2709,9 @@ class CIfrStringRef1(CIfrObj, CIfrOpHeader):
     def GetHeader(self):
         return self.__StringRef1.Header
 
+    def GetInfo(self):
+        return self.__StringRef1
+
 
 class CIfrStringRef2(CIfrObj, CIfrOpHeader):
 
@@ -2585,6 +2724,9 @@ class CIfrStringRef2(CIfrObj, CIfrOpHeader):
     def GetHeader(self):
         return self.__StringRef2.Header
 
+    def GetInfo(self):
+        return self.__StringRef2
+
 
 class CIfrThis(CIfrObj, CIfrOpHeader):
 
@@ -2596,6 +2738,8 @@ class CIfrThis(CIfrObj, CIfrOpHeader):
     def GetHeader(self):
         return self.__This.Header
 
+    def GetInfo(self):
+        return self.__This
 
 class CIfrSecurity(CIfrObj, CIfrOpHeader):
 
@@ -2612,6 +2756,9 @@ class CIfrSecurity(CIfrObj, CIfrOpHeader):
 
     def GetHeader(self):
         return self.__Security.Header
+
+    def GetInfo(self):
+        return self.__Security
 
 
 class CIfrGet(CIfrObj, CIfrOpHeader):
@@ -2630,6 +2777,9 @@ class CIfrGet(CIfrObj, CIfrOpHeader):
     def GetHeader(self):
         return self.__Get.Header
 
+    def GetInfo(self):
+        return self.__Get
+
 
 class CIfrSet(CIfrObj, CIfrOpHeader):
 
@@ -2647,6 +2797,9 @@ class CIfrSet(CIfrObj, CIfrOpHeader):
     def GetHeader(self):
         return self.__Set.Header
 
+    def GetInfo(self):
+        return self.__Set
+
 
 class CIfrTrue(CIfrObj, CIfrOpHeader):
 
@@ -2657,6 +2810,9 @@ class CIfrTrue(CIfrObj, CIfrOpHeader):
 
     def GetHeader(self):
         return self.__True.Header
+
+    def GetInfo(self):
+        return self.__True
 
 
 class CIfrFalse(CIfrObj, CIfrOpHeader):
@@ -2669,6 +2825,9 @@ class CIfrFalse(CIfrObj, CIfrOpHeader):
     def GetHeader(self):
         return self.__False.Header
 
+    def GetInfo(self):
+        return self.__False
+
 
 class CIfrOne(CIfrObj, CIfrOpHeader):
 
@@ -2679,6 +2838,9 @@ class CIfrOne(CIfrObj, CIfrOpHeader):
 
     def GetHeader(self):
         return self.__One.Header
+
+    def GetInfo(self):
+        return self.__One
 
 
 class CIfrOnes(CIfrObj, CIfrOpHeader):
@@ -2691,6 +2853,8 @@ class CIfrOnes(CIfrObj, CIfrOpHeader):
     def GetHeader(self):
         return self.__Ones.Header
 
+    def GetInfo(self):
+        return self.__Ones
 
 class CIfrZero(CIfrObj, CIfrOpHeader):
 
@@ -2701,6 +2865,9 @@ class CIfrZero(CIfrObj, CIfrOpHeader):
 
     def GetHeader(self):
         return self.__Zero.Header
+
+    def GetInfo(self):
+        return self.__Zero
 
 
 class CIfrUndefined(CIfrObj, CIfrOpHeader):
@@ -2714,6 +2881,9 @@ class CIfrUndefined(CIfrObj, CIfrOpHeader):
     def GetHeader(self):
         return self.__Undefined.Header
 
+    def GetInfo(self):
+        return self.__Undefined
+
 
 class CIfrVersion(CIfrObj, CIfrOpHeader):
 
@@ -2725,6 +2895,9 @@ class CIfrVersion(CIfrObj, CIfrOpHeader):
     def GetHeader(self):
         return self.__Version.Header
 
+    def GetInfo(self):
+        return self.__Version
+
 
 class CIfrLength(CIfrObj, CIfrOpHeader):
 
@@ -2732,6 +2905,9 @@ class CIfrLength(CIfrObj, CIfrOpHeader):
         self.__Length = EFI_IFR_LENGTH()
         CIfrOpHeader.__init__(self, self.__Length.Header, EFI_IFR_LENGTH_OP)
         self.SetLineNo(LineNo)
+
+    def GetInfo(self):
+        return self.__Length
 
 
 class CIfrBitWiseNot(CIfrObj, CIfrOpHeader):
@@ -2741,6 +2917,9 @@ class CIfrBitWiseNot(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__BitWiseNot.Header,
                               EFI_IFR_BITWISE_NOT_OP)
         self.SetLineNo(LineNo)
+
+    def GetInfo(self):
+        return self.__BitWiseNot
 
 
 class ExpressionInfo():

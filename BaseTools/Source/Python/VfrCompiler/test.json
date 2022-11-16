@@ -1,5 +1,274 @@
 {
   "DataStruct" : {
+    "PC_PASSWORD_VARIABLE" : [
+      {
+        "Name": "UserPassword",
+        "Type": "UINT8[32]",
+        "Offset": 0
+      }, 
+      {
+        "Name": "AdminPassword",
+        "Type": "UINT8[32]",
+        "Offset": 32
+      }
+    ],
+    "BMC_LAN_CONFIG" : [
+      {
+        "Name": "OnBoardNIC_IpMode",
+        "Type": "UINT8",
+        "Offset": 0
+      }, 
+      {
+        "Name": "Reserved1",
+        "Type": "UINT8",
+        "Offset": 1
+      }, 
+      {
+        "Name": "OnBoardNIC_IpAddress",
+        "Type": "UINT16[20]",
+        "Offset": 2
+      }, 
+      {
+        "Name": "OnBoardNIC_SubnetMask",
+        "Type": "UINT16[20]",
+        "Offset": 42
+      }, 
+      {
+        "Name": "OnBoardNIC_GatewayIp",
+        "Type": "UINT16[20]",
+        "Offset": 82
+      }, 
+      {
+        "Name": "Dhcp_Name",
+        "Type": "UINT16[64]",
+        "Offset": 122
+      }, 
+      {
+        "Name": "RmmNic_IpMode",
+        "Type": "UINT8",
+        "Offset": 250
+      }, 
+      {
+        "Name": "SecureKcsMode",
+        "Type": "UINT8",
+        "Offset": 251
+      }, 
+      {
+        "Name": "RmmNic_IpAddress",
+        "Type": "UINT16[20]",
+        "Offset": 252
+      }, 
+      {
+        "Name": "RmmNic_SubnetMask",
+        "Type": "UINT16[20]",
+        "Offset": 292
+      }, 
+      {
+        "Name": "RmmNic_GatewayIp",
+        "Type": "UINT16[20]",
+        "Offset": 332
+      }, 
+      {
+        "Name": "RmmPresent",
+        "Type": "UINT8",
+        "Offset": 372
+      }, 
+      {
+        "Name": "NicPresent",
+        "Type": "UINT8",
+        "Offset": 373
+      }, 
+      {
+        "Name": "UserName1",
+        "Type": "UINT16[20]",
+        "Offset": 374
+      }, 
+      {
+        "Name": "UserPassword1",
+        "Type": "UINT16[20]",
+        "Offset": 414
+      }, 
+      {
+        "Name": "EnableChannelUser1",
+        "Type": "UINT8",
+        "Offset": 454
+      }, 
+      {
+        "Name": "Privilege1",
+        "Type": "UINT8",
+        "Offset": 455
+      }, 
+      {
+        "Name": "UserName2",
+        "Type": "UINT16[20]",
+        "Offset": 456
+      }, 
+      {
+        "Name": "UserPassword2",
+        "Type": "UINT16[20]",
+        "Offset": 496
+      }, 
+      {
+        "Name": "EnableChannelUser2",
+        "Type": "UINT8",
+        "Offset": 536
+      }, 
+      {
+        "Name": "Privilege2",
+        "Type": "UINT8",
+        "Offset": 537
+      }, 
+      {
+        "Name": "UserName3",
+        "Type": "UINT16[20]",
+        "Offset": 538
+      }, 
+      {
+        "Name": "UserPassword3",
+        "Type": "UINT16[20]",
+        "Offset": 578
+      }, 
+      {
+        "Name": "EnableChannelUser3",
+        "Type": "UINT8",
+        "Offset": 618
+      }, 
+      {
+        "Name": "Privilege3",
+        "Type": "UINT8",
+        "Offset": 619
+      }, 
+      {
+        "Name": "UserName4",
+        "Type": "UINT16[20]",
+        "Offset": 620
+      }, 
+      {
+        "Name": "UserPassword4",
+        "Type": "UINT16[20]",
+        "Offset": 660
+      }, 
+      {
+        "Name": "EnableChannelUser4",
+        "Type": "UINT8",
+        "Offset": 700
+      }, 
+      {
+        "Name": "Privilege4",
+        "Type": "UINT8",
+        "Offset": 701
+      }, 
+      {
+        "Name": "UserName5",
+        "Type": "UINT16[20]",
+        "Offset": 702
+      }, 
+      {
+        "Name": "UserPassword5",
+        "Type": "UINT16[20]",
+        "Offset": 742
+      }, 
+      {
+        "Name": "EnableChannelUser5",
+        "Type": "UINT8",
+        "Offset": 782
+      }, 
+      {
+        "Name": "Privilege5",
+        "Type": "UINT8",
+        "Offset": 783
+      }, 
+      {
+        "Name": "User",
+        "Type": "UINT8",
+        "Offset": 784
+      }, 
+      {
+        "Name": "BmcStatus",
+        "Type": "UINT32",
+        "Offset": 785
+      }, 
+      {
+        "Name": "OnBoardNIC_Ipv6Mode",
+        "Type": "UINT8",
+        "Offset": 789
+      }, 
+      {
+        "Name": "OnBoardNIC_Ipv6Address",
+        "Type": "UINT16[46]",
+        "Offset": 790
+      }, 
+      {
+        "Name": "OnBoardNIC_GatewayIpv6",
+        "Type": "UINT16[46]",
+        "Offset": 882
+      }, 
+      {
+        "Name": "OnBoardNIC_Ipv6PreLen",
+        "Type": "UINT8",
+        "Offset": 974
+      }, 
+      {
+        "Name": "Reserved3",
+        "Type": "UINT8",
+        "Offset": 975
+      }, 
+      {
+        "Name": "Dhcp_Name_Ipv6",
+        "Type": "UINT16[64]",
+        "Offset": 976
+      }, 
+      {
+        "Name": "OnBoardNIC_IpSelection",
+        "Type": "UINT8",
+        "Offset": 1104
+      }, 
+      {
+        "Name": "RmmNic_Ipv6Mode",
+        "Type": "UINT8",
+        "Offset": 1105
+      }, 
+      {
+        "Name": "RmmNic_Ipv6Address",
+        "Type": "UINT16[46]",
+        "Offset": 1106
+      }, 
+      {
+        "Name": "RmmNic_GatewayIpv6",
+        "Type": "UINT16[46]",
+        "Offset": 1198
+      }, 
+      {
+        "Name": "RmmNic_PrefixLength",
+        "Type": "UINT8",
+        "Offset": 1290
+      }, 
+      {
+        "Name": "Ipv6RmmPresent",
+        "Type": "UINT8",
+        "Offset": 1291
+      }, 
+      {
+        "Name": "DedicatedIPv6",
+        "Type": "UINT8",
+        "Offset": 1292
+      }, 
+      {
+        "Name": "EnableComplexPasswordCheck",
+        "Type": "UINT8",
+        "Offset": 1293
+      }, 
+      {
+        "Name": "OnboardNICPresent",
+        "Type": "UINT8",
+        "Offset": 1294
+      }, 
+      {
+        "Name": "DedicatedIPv6OptionHidden",
+        "Type": "UINT8",
+        "Offset": 1295
+      }
+    ],
     "EFI_HII_REF" : [
       {
         "Name": "QuestionId",
@@ -72,6 +341,14 @@
     ]
   },
   "DataStructAttribute": {
+    "PC_PASSWORD_VARIABLE": {
+        "Alignment": 1,
+        "TotalSize": 64
+      },
+    "BMC_LAN_CONFIG": {
+        "Alignment": 1,
+        "TotalSize": 1296
+      },
     "EFI_HII_REF": {
         "Alignment": 16,
         "TotalSize": 22
@@ -114,6 +391,18 @@
       }
   },
   "VarDefine" : {
+    "BmcLanConfig": {
+        "Type": "BMC_LAN_CONFIG",
+        "Attributes": 0,
+        "VarStoreId": 2,
+        "VendorGuid": "0xec87d643, 0xeba4, 0x4bb5, { 0xa1, 0xe5, 0x3f, 0x3e, 0x36, 0xb2, 0xd, 0xa9 }}"
+      },
+    "Access": {
+        "Type": "UINT8",
+        "Attributes": 2,
+        "VarStoreId": 1,
+        "VendorGuid": "0x3e710061, 0x647a, 0x4c03, { 0xbe, 0x85, 0xfa, 0xd6, 0xcc, 0xfa, 0x5a, 0x18 }}"
+      }
   },
   "Data" : [
       {
