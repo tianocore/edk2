@@ -65,6 +65,8 @@ HttpBootAddBootOption (
     } else if (Status == EFI_ACCESS_DENIED) {
       DEBUG ((DEBUG_ERROR, "Error: Access forbidden, only HTTPS connection is allowed.\n"));
     }
+
+    return Status;
   }
 
   Status = HttpBootCheckUriScheme (AsciiProxyUri);
@@ -74,6 +76,8 @@ HttpBootAddBootOption (
     } else if (Status == EFI_ACCESS_DENIED) {
       DEBUG ((DEBUG_ERROR, "Error: Access forbidden, only HTTPS connection is allowed.\n"));
     }
+
+    return Status;
   }
 
   //
@@ -123,9 +127,11 @@ HttpBootAddBootOption (
     Node->DevPath.Type    = MESSAGING_DEVICE_PATH;
     Node->DevPath.SubType = MSG_URI_DP;
     SetDevicePathNodeLength (Node, Length);
-    CopyMem ((UINT8 *)Node + sizeof (EFI_DEVICE_PATH_PROTOCOL),
-             AsciiProxyUri,
-             AsciiProxyUriSize);
+    CopyMem (
+      (UINT8 *)Node + sizeof (EFI_DEVICE_PATH_PROTOCOL),
+      AsciiProxyUri,
+      AsciiProxyUriSize
+      );
     NewDevicePath = AppendDevicePathNode (TmpDevicePath, (EFI_DEVICE_PATH_PROTOCOL *)Node);
     FreePool (Node);
     if (NewDevicePath == NULL) {
