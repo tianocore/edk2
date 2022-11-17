@@ -7,11 +7,8 @@
 **/
 
 #include <PiMm.h>
-#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
 #include <Library/HobLib.h>
-#include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/SmmServicesTableLib.h>
 #include <Library/TpmMeasurementLib.h>

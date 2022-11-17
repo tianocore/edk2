@@ -1,0 +1,14 @@
+---
+- description: EDK2 (C++) queries
+
+# Bring in all queries from the official cpp-queries suite so individual queries can be explicitly enabled.
+
+- queries: '.'
+  from: codeql/cpp-queries
+
+# Enable individual queries below.
+
+- include:
+    id: cpp/infinite-loop-with-unsatisfiable-exit-condition
+- include:
+    id: cpp/overflow-buffer

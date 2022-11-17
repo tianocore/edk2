@@ -14,14 +14,43 @@
    - EFI_RNG_ALGORITHM_X9_31_3DES_GUID        - Unsupported
    - EFI_RNG_ALGORITHM_X9_31_AES_GUID         - Unsupported
 
+  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "RdRand.h"
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+
 #include "RngDxeInternals.h"
+
+/** Allocate and initialize mAvailableAlgoArray with the available
+    Rng algorithms. Also update mAvailableAlgoArrayCount.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+GetAvailableAlgorithms (
+  VOID
+  )
+{
+  return EFI_SUCCESS;
+}
+
+/** Free mAvailableAlgoArray.
+**/
+VOID
+EFIAPI
+FreeAvailableAlgorithms (
+  VOID
+  )
+{
+  return;
+}
 
 /**
   Produces and returns an RNG value using either the default or specified RNG algorithm.
@@ -56,7 +85,7 @@ RngGetRNG (
 {
   EFI_STATUS  Status;
 
-  if ((RNGValueLength == 0) || (RNGValue == NULL)) {
+  if ((This == NULL) || (RNGValueLength == 0) || (RNGValue == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -88,7 +117,7 @@ RngGetRNG (
       return EFI_INVALID_PARAMETER;
     }
 
-    Status = RdRandGenerateEntropy (RNGValueLength, RNGValue);
+    Status = GenerateEntropy (RNGValueLength, RNGValue);
     return Status;
   }
 
@@ -101,6 +130,7 @@ RngGetRNG (
 /**
   Returns information about the random number generation implementation.
 
+  @param[in]     This                 A pointer to the EFI_RNG_PROTOCOL instance.
   @param[in,out] RNGAlgorithmListSize On input, the size in bytes of RNGAlgorithmList.
                                       On output with a return code of EFI_SUCCESS, the size
                                       in bytes of the data returned in RNGAlgorithmList. On output
@@ -113,18 +143,26 @@ RngGetRNG (
                                       is the default algorithm for the driver.
 
   @retval EFI_SUCCESS                 The RNG algorithm list was returned successfully.
+  @retval EFI_UNSUPPORTED             No supported algorithms found.
+  @retval EFI_DEVICE_ERROR            The list of algorithms could not be retrieved due to a
+                                      hardware or firmware error.
+  @retval EFI_INVALID_PARAMETER       One or more of the parameters are incorrect.
   @retval EFI_BUFFER_TOO_SMALL        The buffer RNGAlgorithmList is too small to hold the result.
 
 **/
-UINTN
+EFI_STATUS
 EFIAPI
-ArchGetSupportedRngAlgorithms (
-  IN OUT UINTN              *RNGAlgorithmListSize,
-  OUT    EFI_RNG_ALGORITHM  *RNGAlgorithmList
+RngGetInfo (
+  IN EFI_RNG_PROTOCOL    *This,
+  IN OUT UINTN           *RNGAlgorithmListSize,
+  OUT EFI_RNG_ALGORITHM  *RNGAlgorithmList
   )
 {
-  UINTN              RequiredSize;
-  EFI_RNG_ALGORITHM  *CpuRngSupportedAlgorithm;
+  UINTN  RequiredSize;
+
+  if ((This == NULL) || (RNGAlgorithmListSize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   RequiredSize = 2 * sizeof (EFI_RNG_ALGORITHM);
 
@@ -133,9 +171,11 @@ ArchGetSupportedRngAlgorithms (
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  CpuRngSupportedAlgorithm = PcdGetPtr (PcdCpuRngSupportedAlgorithm);
+  if (RNGAlgorithmList == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-  CopyMem (&RNGAlgorithmList[0], CpuRngSupportedAlgorithm, sizeof (EFI_RNG_ALGORITHM));
+  CopyMem (&RNGAlgorithmList[0], &gEfiRngAlgorithmSp80090Ctr256Guid, sizeof (EFI_RNG_ALGORITHM));
 
   // x86 platforms also support EFI_RNG_ALGORITHM_RAW via RDSEED
   CopyMem (&RNGAlgorithmList[1], &gEfiRngAlgorithmRaw, sizeof (EFI_RNG_ALGORITHM));

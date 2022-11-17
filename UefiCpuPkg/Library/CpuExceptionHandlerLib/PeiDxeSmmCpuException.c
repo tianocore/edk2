@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <Library/DebugLib.h>
-#include <Library/VmgExitLib.h>
+#include <Library/CcExitLib.h>
 #include "CpuExceptionCommon.h"
 
 /**
@@ -40,7 +40,7 @@ CommonExceptionHandlerWorker (
       //   On other       - ExceptionType contains (possibly new) exception
       //                    value
       //
-      Status = VmgExitHandleVc (&ExceptionType, SystemContext);
+      Status = CcExitHandleVc (&ExceptionType, SystemContext);
       if (!EFI_ERROR (Status)) {
         return;
       }
@@ -57,7 +57,7 @@ CommonExceptionHandlerWorker (
       //   On other       - ExceptionType contains (possibly new) exception
       //                    value
       //
-      Status = VmTdExitHandleVe (&ExceptionType, SystemContext);
+      Status = CcExitHandleVe (&ExceptionType, SystemContext);
       if (!EFI_ERROR (Status)) {
         return;
       }

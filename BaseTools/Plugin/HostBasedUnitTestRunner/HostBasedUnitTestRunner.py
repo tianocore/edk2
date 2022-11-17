@@ -85,9 +85,12 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                 raise NotImplementedError("Unsupported Operating System")
 
             for test in testList:
-                # Configure output name.
+                # Configure output name if test uses cmocka.
                 shell_env.set_shell_var(
-                    'CMOCKA_XML_FILE', test + ".%g." + arch + ".result.xml")
+                    'CMOCKA_XML_FILE', test + ".CMOCKA.%g." + arch + ".result.xml")
+                # Configure output name if test uses gtest.
+                shell_env.set_shell_var(
+                    'GTEST_OUTPUT', "xml:" + test + ".GTEST." + arch + ".result.xml")
 
                 # Run the test.
                 ret = RunCmd('"' + test + '"', "", workingdir=cp)

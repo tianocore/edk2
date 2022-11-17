@@ -2,6 +2,11 @@
   SCSI disk driver that layers on every SCSI IO protocol in the system.
 
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1985 - 2022, American Megatrends International LLC.<BR>
+<<<<<<< HEAD
+=======
+
+>>>>>>> ace365b4e0 (MdeModulePkg/scsi :Coverity scan flags multiple issues in edk2-stable202205)
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -65,6 +70,33 @@ FreeAlignedBuffer (
   if (Buffer != NULL) {
     FreeAlignedPages (Buffer, EFI_SIZE_TO_PAGES (BufferSize));
   }
+}
+
+/**
+  Remove trailing spaces from the string.
+
+  @param String   The ASCII string to remove the trailing spaces.
+
+  @retval the new length of the string.
+**/
+UINTN
+RemoveTrailingSpaces (
+  IN OUT CHAR8  *String
+  )
+{
+  UINTN  Length;
+
+  Length = AsciiStrLen (String);
+  if (Length == 0) {
+    return 0;
+  }
+
+  while ((Length > 0) && (String[Length-1] == ' ')) {
+    Length--;
+  }
+
+  String[Length] = '\0';
+  return Length;
 }
 
 /**
@@ -203,6 +235,9 @@ ScsiDiskDriverBindingStart (
   UINT8                 MaxRetry;
   BOOLEAN               NeedRetry;
   BOOLEAN               MustReadCapacity;
+  CHAR8                 VendorStr[VENDOR_IDENTIFICATION_LENGTH + 1];
+  CHAR8                 ProductStr[PRODUCT_IDENTIFICATION_LENGTH + 1];
+  CHAR16                DeviceStr[VENDOR_IDENTIFICATION_LENGTH + PRODUCT_IDENTIFICATION_LENGTH + 2];
 
   MustReadCapacity = TRUE;
 
@@ -354,19 +389,37 @@ ScsiDiskDriverBindingStart (
           }
         }
 
+        CopyMem (
+          VendorStr,
+          &ScsiDiskDevice->InquiryData.Reserved_5_95[VENDOR_IDENTIFICATION_OFFSET],
+          VENDOR_IDENTIFICATION_LENGTH
+          );
+        VendorStr[VENDOR_IDENTIFICATION_LENGTH] = 0;
+        RemoveTrailingSpaces (VendorStr);
+
+        CopyMem (
+          ProductStr,
+          &ScsiDiskDevice->InquiryData.Reserved_5_95[PRODUCT_IDENTIFICATION_OFFSET],
+          PRODUCT_IDENTIFICATION_LENGTH
+          );
+        ProductStr[PRODUCT_IDENTIFICATION_LENGTH] = 0;
+        RemoveTrailingSpaces (ProductStr);
+
+        UnicodeSPrint (DeviceStr, sizeof (DeviceStr), L"%a %a", VendorStr, ProductStr);
+
         ScsiDiskDevice->ControllerNameTable = NULL;
         AddUnicodeString2 (
           "eng",
           gScsiDiskComponentName.SupportedLanguages,
           &ScsiDiskDevice->ControllerNameTable,
-          L"SCSI Disk Device",
+          DeviceStr,
           TRUE
           );
         AddUnicodeString2 (
           "en",
           gScsiDiskComponentName2.SupportedLanguages,
           &ScsiDiskDevice->ControllerNameTable,
-          L"SCSI Disk Device",
+          DeviceStr,
           FALSE
           );
         return EFI_SUCCESS;
@@ -4247,7 +4300,7 @@ BackOff:
 
   if ((TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) || (EFI_ERROR (ReturnStatus))) {
     DEBUG ((DEBUG_ERROR, "ScsiDiskRead10: Check Condition happened!\n"));
-    Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
+    DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       *NeedRetry = TRUE;
       return EFI_DEVICE_ERROR;
@@ -4371,7 +4424,7 @@ BackOff:
 
   if ((TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) || (EFI_ERROR (ReturnStatus))) {
     DEBUG ((DEBUG_ERROR, "ScsiDiskWrite10: Check Condition happened!\n"));
-    Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
+    DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       *NeedRetry = TRUE;
       return EFI_DEVICE_ERROR;
@@ -4494,7 +4547,7 @@ BackOff:
 
   if ((TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) || (EFI_ERROR (ReturnStatus))) {
     DEBUG ((DEBUG_ERROR, "ScsiDiskRead16: Check Condition happened!\n"));
-    Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
+    DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       *NeedRetry = TRUE;
       return EFI_DEVICE_ERROR;
@@ -4618,7 +4671,7 @@ BackOff:
 
   if ((TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) || (EFI_ERROR (ReturnStatus))) {
     DEBUG ((DEBUG_ERROR, "ScsiDiskWrite16: Check Condition happened!\n"));
-    Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
+    DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       *NeedRetry = TRUE;
       return EFI_DEVICE_ERROR;
@@ -4728,12 +4781,12 @@ ScsiDiskNotify (
   if (Request->TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) {
     DEBUG ((DEBUG_ERROR, "ScsiDiskNotify: Check Condition happened!\n"));
 
-    Status = DetectMediaParsingSenseKeys (
-               ScsiDiskDevice,
-               Request->SenseData,
-               Request->SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA),
-               &Action
-               );
+    DetectMediaParsingSenseKeys (
+      ScsiDiskDevice,
+      Request->SenseData,
+      Request->SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA),
+      &Action
+      );
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       if (++Request->TimesRetry > MaxRetry) {
         Token->TransactionStatus = EFI_DEVICE_ERROR;

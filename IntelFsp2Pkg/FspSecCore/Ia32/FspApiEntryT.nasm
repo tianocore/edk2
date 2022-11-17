@@ -21,7 +21,7 @@ extern   ASM_PFX(PcdGet32 (PcdFspReservedBufferSize))
 ; Following functions will be provided in PlatformSecLib
 ;
 extern ASM_PFX(AsmGetFspBaseAddress)
-extern ASM_PFX(AsmGetFspInfoHeader)
+extern ASM_PFX(AsmGetFspInfoHeaderNoStack)
 ;extern ASM_PFX(LoadMicrocode)    ; @todo: needs a weak implementation
 extern ASM_PFX(SecPlatformInit)   ; @todo: needs a weak implementation
 extern ASM_PFX(SecCarInit)
@@ -160,6 +160,47 @@ endstruc
          RET_ESI_EXT   mm7
 %endmacro
 
+%macro CALL_EDI  1
+
+  mov     edi,  %%ReturnAddress
+  jmp     %1
+%%ReturnAddress:
+
+%endmacro
+
+%macro CALL_EBP 1
+  mov     ebp, %%ReturnAddress
+  jmp     %1
+%%ReturnAddress:
+%endmacro
+
+%macro RET_EBP 0
+  jmp     ebp                           ; restore EIP from EBP
+%endmacro
+
+;
+; Load UPD region pointer in ECX
+;
+global ASM_PFX(LoadUpdPointerToECX)
+ASM_PFX(LoadUpdPointerToECX):
+  ;
+  ; esp + 4 is input UPD parameter
+  ; If esp + 4 is NULL the default UPD should be used
+  ; ecx will be the UPD region that should be used
+  ;
+  mov       ecx, dword [esp + 4]
+  cmp       ecx, 0
+  jnz       ParamValid
+
+  ;
+  ; Fall back to default UPD region
+  ;
+  CALL_EDI  ASM_PFX(AsmGetFspInfoHeaderNoStack)
+  mov       ecx, DWORD [eax + 01Ch]      ; Read FsptImageBaseAddress
+  add       ecx, DWORD [eax + 024h]      ; Get Cfg Region base address = FsptImageBaseAddress + CfgRegionOffset
+ParamValid:
+  RET_EBP
+
 ;
 ; @todo: The strong/weak implementation does not work.
 ;        This needs to be reviewed later.
@@ -187,10 +228,9 @@ endstruc
 global ASM_PFX(LoadMicrocodeDefault)
 ASM_PFX(LoadMicrocodeDefault):
    ; Inputs:
-   ;   esp -> LoadMicrocodeParams pointer
+   ;   ecx -> UPD region contains LoadMicrocodeParams pointer
    ; Register Usage:
-   ;   esp  Preserved
-   ;   All others destroyed
+   ;   All are destroyed
    ; Assumptions:
    ;   No memory available, stack is hard-coded and used for return address
    ;   Executed by SBSP and NBSP
@@ -201,12 +241,9 @@ ASM_PFX(LoadMicrocodeDefault):
    ;
    movd   ebp, mm7
 
+   mov    esp, ecx  ; ECX has been assigned to UPD region
    cmp    esp, 0
    jz     ParamError
-   mov    eax, dword [esp + 4]    ; Parameter pointer
-   cmp    eax, 0
-   jz     ParamError
-   mov    esp, eax
 
    ; skip loading Microcode if the MicrocodeCodeSize is zero
    ; and report error if size is less than 2k
@@ -444,13 +481,15 @@ Done:
 Exit2:
    jmp   ebp
 
-
+;
+; EstablishStackFsp: EDI should be preserved cross this function
+;
 global ASM_PFX(EstablishStackFsp)
 ASM_PFX(EstablishStackFsp):
   ;
   ; Save parameter pointer in edx
   ;
-  mov       edx, dword [esp + 4]
+  mov       edx, ecx   ; ECX has been assigned to UPD region
 
   ;
   ; Enable FSP STACK
@@ -555,13 +594,8 @@ ASM_PFX(TempRamInitApi):
   SAVE_EAX
   SAVE_EDX
 
-  ;
-  ; Check Parameter
-  ;
-  mov       eax, dword [esp + 4]
-  cmp       eax, 0
-  mov       eax, 80000002h
-  jz        TempRamInitExit
+  CALL_EBP  ASM_PFX(LoadUpdPointerToECX) ; ECX for UPD param
+  SAVE_ECX                               ; save UPD param to slot 3 in xmm6
 
   ;
   ; Sec Platform Init
@@ -572,22 +606,26 @@ ASM_PFX(TempRamInitApi):
 
   ; Load microcode
   LOAD_ESP
+  LOAD_ECX
   CALL_MMX  ASM_PFX(LoadMicrocodeDefault)
-  SXMMN     xmm6, 3, eax            ;Save microcode return status in ECX-SLOT 3 in xmm6.
+  SAVE_UCODE_STATUS                 ; Save microcode return status in slot 1 in xmm5.
   ;@note If return value eax is not 0, microcode did not load, but continue and attempt to boot.
 
   ; Call Sec CAR Init
   LOAD_ESP
+  LOAD_ECX
   CALL_MMX  ASM_PFX(SecCarInit)
   cmp       eax, 0
   jnz       TempRamInitExit
 
   LOAD_ESP
+  LOAD_ECX
+  mov       edi, ecx                ; Save UPD param to EDI for later code use
   CALL_MMX  ASM_PFX(EstablishStackFsp)
   cmp       eax, 0
   jnz       TempRamInitExit
 
-  LXMMN     xmm6, eax, 3  ;Restore microcode status if no CAR init error from ECX-SLOT 3 in xmm6.
+  LOAD_UCODE_STATUS                 ; Restore microcode status if no CAR init error from slot 1 in xmm5.
 
 TempRamInitExit:
   mov       bl, al                  ; save al data in bl

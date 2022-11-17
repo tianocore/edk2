@@ -102,6 +102,12 @@ F: */RiscV64/
 M: Sunil V L <sunilvl@ventanamicro.com> [vlsunil]
 R: Daniel Schaefer <git@danielschaefer.me> [JohnAZoidberg]
 
+LOONGARCH64
+F: */LoongArch64/
+M: Chao Li <lichao@loongson.cn> [kilaterlee]
+M: Baoqi Zhang <zhangbaoqi@loongson.cn> [zhangbaoqi-ls]
+R: Dongyan Qian <qiandongyan@loongson.cn> [MarsDoge]
+
 EDK II Continuous Integration:
 ------------------------------
 .azurepipelines/
@@ -110,6 +116,12 @@ M: Sean Brogan <sean.brogan@microsoft.com> [spbrogan]
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 R: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
+
+.github/
+F: .github/
+M: Sean Brogan <sean.brogan@microsoft.com> [spbrogan]
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
+R: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 
 .mergify/
 F: .mergify/
@@ -177,6 +189,7 @@ F: DynamicTablesPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/DynamicTablesPkg
 M: Sami Mujawar <Sami.Mujawar@arm.com> [samimujawar]
 M: Alexei Fedorov <Alexei.Fedorov@arm.com> [AlexeiFedorov]
+R: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
 
 EmbeddedPkg
 F: EmbeddedPkg/
@@ -468,7 +481,7 @@ F: OvmfPkg/Include/Library/MemEncryptSevLib.h
 F: OvmfPkg/IoMmuDxe/AmdSevIoMmu.*
 F: OvmfPkg/Library/BaseMemEncryptSevLib/
 F: OvmfPkg/Library/PlatformBootManagerLibGrub/
-F: OvmfPkg/Library/VmgExitLib/
+F: OvmfPkg/Library/CcExitLib/
 F: OvmfPkg/PlatformPei/AmdSev.c
 F: OvmfPkg/ResetVector/
 F: OvmfPkg/Sec/
@@ -544,6 +557,7 @@ RedfishPkg: Redfish related modules
 F: RedfishPkg/
 M: Abner Chang <abner.chang@amd.com> [changab]
 M: Nickle Wang <nicklew@nvidia.com> [nicklela]
+R: Igor Kulchytskyy <igork@ami.com> [igorkulchytskyy]
 
 SecurityPkg
 F: SecurityPkg/

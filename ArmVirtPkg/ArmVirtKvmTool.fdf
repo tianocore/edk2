@@ -154,7 +154,7 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
-  INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
+  INF OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning + UDF filesystem
@@ -223,6 +223,11 @@ READ_LOCK_STATUS   = TRUE
   # Ramdisk support
   #
   INF MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
+
+  #
+  # Rng Support
+  #
+  INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16

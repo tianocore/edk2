@@ -9,7 +9,7 @@
 **/
 
 #include "MpLib.h"
-#include <Library/VmgExitLib.h>
+#include <Library/CcExitLib.h>
 #include <Register/Amd/Fam17Msr.h>
 #include <Register/Amd/Ghcb.h>
 
@@ -150,16 +150,16 @@ SevSnpCreateSaveArea (
   Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
   Ghcb                    = Msr.Ghcb;
 
-  VmgInit (Ghcb, &InterruptState);
+  CcExitVmgInit (Ghcb, &InterruptState);
   Ghcb->SaveArea.Rax = SaveArea->SevFeatures;
-  VmgSetOffsetValid (Ghcb, GhcbRax);
-  VmgExitStatus = VmgExit (
+  CcExitVmgSetOffsetValid (Ghcb, GhcbRax);
+  VmgExitStatus = CcExitVmgExit (
                     Ghcb,
                     SVM_EXIT_SNP_AP_CREATION,
                     ExitInfo1,
                     ExitInfo2
                     );
-  VmgDone (Ghcb, InterruptState);
+  CcExitVmgDone (Ghcb, InterruptState);
 
   ASSERT (VmgExitStatus == 0);
   if (VmgExitStatus != 0) {

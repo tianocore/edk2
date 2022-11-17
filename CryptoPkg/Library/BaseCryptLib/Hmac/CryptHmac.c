@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
            If the allocations fails, HmacMdNew() returns NULL.
 
 **/
+STATIC
 VOID *
 HmacMdNew (
   VOID
@@ -33,6 +34,7 @@ HmacMdNew (
   @param[in]  HmacMdCtx  Pointer to the HMAC_CTX context to be released.
 
 **/
+STATIC
 VOID
 HmacMdFree (
   IN  VOID  *HmacMdCtx
@@ -59,6 +61,7 @@ HmacMdFree (
   @retval FALSE  The Key is set unsuccessfully.
 
 **/
+STATIC
 BOOLEAN
 HmacMdSetKey (
   IN   CONST EVP_MD  *Md,
@@ -94,6 +97,7 @@ HmacMdSetKey (
   @retval FALSE  HMAC-MD context copy failed.
 
 **/
+STATIC
 BOOLEAN
 HmacMdDuplicate (
   IN   CONST VOID  *HmacMdContext,
@@ -132,6 +136,7 @@ HmacMdDuplicate (
   @retval FALSE  HMAC-MD data digest failed.
 
 **/
+STATIC
 BOOLEAN
 HmacMdUpdate (
   IN OUT  VOID        *HmacMdContext,
@@ -183,6 +188,7 @@ HmacMdUpdate (
   @retval FALSE  HMAC-MD digest computation failed.
 
 **/
+STATIC
 BOOLEAN
 HmacMdFinal (
   IN OUT  VOID   *HmacMdContext,
@@ -233,6 +239,7 @@ HmacMdFinal (
   @retval FALSE  This interface is not supported.
 
 **/
+STATIC
 BOOLEAN
 HmacMdAll (
   IN   CONST EVP_MD  *Md,

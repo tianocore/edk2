@@ -908,7 +908,7 @@ Returns:
     if (FileBuffer != NULL) {
       free (FileBuffer);
     }
-    Error (NULL, 0, 2000, "Invalid parameter", "the size of input file %s can't be zero", InputFileName);
+    Error (NULL, 0, 2000, "Invalid parameter", "the size of input file %s can't be zero", *InputFileName);
     return EFI_NOT_FOUND;
   }
 
@@ -1095,7 +1095,7 @@ Returns:
     if (FileBuffer != NULL) {
       free (FileBuffer);
     }
-    Error (NULL, 0, 2000, "Invalid parameter", "the size of input file %s can't be zero", InputFileName);
+    Error (NULL, 0, 2000, "Invalid parameter", "the size of input file %s can't be zero", *InputFileName);
     return EFI_NOT_FOUND;
   }
 

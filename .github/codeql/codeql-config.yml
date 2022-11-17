@@ -1,0 +1,29 @@
+## @file
+# CodeQL configuration file for edk2.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+name: "CodeQL config"
+
+# The following line disables the default queries. This is used because we want to enable on query at a time by
+# explicitly specifying each query in a "queries" array as they are enabled.
+#
+# See the following for more information about adding custom queries:
+# https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-a-custom-configuration-file
+
+#disable-default-queries: true
+
+queries:
+  - name: EDK2 CodeQL Query List
+    uses: ./.github/codeql/edk2.qls
+
+# We must specify a query for CodeQL to run. Until the first query is enabled, enable the security query suite but
+# exclude all problem levels from impacting the results. After the first query is enabled, this filter can be relaxed
+# to find the level of problems desired from the query.
+query-filters:
+- exclude:
+    problem.severity:
+      - warning
+      - recommendation

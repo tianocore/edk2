@@ -356,7 +356,7 @@ ScanSections32 (
     mCoffOffset += sizeof (EFI_IMAGE_NT_HEADERS32);
   break;
   default:
-    VerboseMsg ("%s unknown e_machine type. Assume IA-32", (UINTN)mEhdr->e_machine);
+    VerboseMsg ("%u unknown e_machine type. Assume IA-32", (UINTN)mEhdr->e_machine);
     mCoffOffset += sizeof (EFI_IMAGE_NT_HEADERS32);
   break;
   }

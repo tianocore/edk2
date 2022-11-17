@@ -1096,7 +1096,7 @@ ScanSections64 (
     break;
 
   default:
-    VerboseMsg ("%s unknown e_machine type. Assume X64", (UINTN)mEhdr->e_machine);
+    VerboseMsg ("%u unknown e_machine type. Assume X64", (UINTN)mEhdr->e_machine);
     NtHdr->Pe32Plus.FileHeader.Machine = EFI_IMAGE_MACHINE_X64;
     NtHdr->Pe32Plus.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
   }
@@ -1837,7 +1837,7 @@ WriteRelocations64 (
             case R_X86_64_REX_GOTPCRELX:
               break;
             case R_X86_64_64:
-              VerboseMsg ("EFI_IMAGE_REL_BASED_DIR64 Offset: 0x%08X",
+              VerboseMsg ("EFI_IMAGE_REL_BASED_DIR64 Offset: 0x%08llX",
                 mCoffSectionsOffset[RelShdr->sh_info] + (Rel->r_offset - SecShdr->sh_addr));
               CoffAddFixup(
                 (UINT32) ((UINT64) mCoffSectionsOffset[RelShdr->sh_info]
@@ -1867,7 +1867,7 @@ WriteRelocations64 (
             //
             // case R_X86_64_32S:
             case R_X86_64_32:
-              VerboseMsg ("EFI_IMAGE_REL_BASED_HIGHLOW Offset: 0x%08X",
+              VerboseMsg ("EFI_IMAGE_REL_BASED_HIGHLOW Offset: 0x%08llX",
                 mCoffSectionsOffset[RelShdr->sh_info] + (Rel->r_offset - SecShdr->sh_addr));
               CoffAddFixup(
                 (UINT32) ((UINT64) mCoffSectionsOffset[RelShdr->sh_info]

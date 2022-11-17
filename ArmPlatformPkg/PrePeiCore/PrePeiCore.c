@@ -11,6 +11,8 @@
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/ArmLib.h>
+#include <Library/PrintLib.h>
+#include <Library/SerialPortLib.h>
 
 #include "PrePeiCore.h"
 
@@ -52,23 +54,50 @@ CreatePpiList (
   *PpiListSize = sizeof (gCommonPpiTable) + PlatformPpiListSize;
 }
 
+/**
+
+ Prints firmware version and build time to serial console.
+
+**/
+STATIC
+VOID
+PrintFirmwareVersion (
+  VOID
+  )
+{
+  CHAR8  Buffer[100];
+  UINTN  CharCount;
+
+  CharCount = AsciiSPrint (
+                Buffer,
+                sizeof (Buffer),
+                "UEFI firmware (version %s built at %a on %a)\n\r",
+                (CHAR16 *)PcdGetPtr (PcdFirmwareVersionString),
+                __TIME__,
+                __DATE__
+                );
+  SerialPortWrite ((UINT8 *)Buffer, CharCount);
+}
+
 VOID
 CEntryPoint (
   IN  UINTN                     MpId,
   IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint
   )
 {
-  // Data Cache enabled on Primary core when MMU is enabled.
-  ArmDisableDataCache ();
-  // Invalidate instruction cache
-  ArmInvalidateInstructionCache ();
-  // Enable Instruction Caches on all cores.
-  ArmEnableInstructionCache ();
+  if (!ArmMmuEnabled ()) {
+    // Data Cache enabled on Primary core when MMU is enabled.
+    ArmDisableDataCache ();
+    // Invalidate instruction cache
+    ArmInvalidateInstructionCache ();
+    // Enable Instruction Caches on all cores.
+    ArmEnableInstructionCache ();
 
-  InvalidateDataCacheRange (
-    (VOID *)(UINTN)PcdGet64 (PcdCPUCoresStackBase),
-    PcdGet32 (PcdCPUCorePrimaryStackSize)
-    );
+    InvalidateDataCacheRange (
+      (VOID *)(UINTN)PcdGet64 (PcdCPUCoresStackBase),
+      PcdGet32 (PcdCPUCorePrimaryStackSize)
+      );
+  }
 
   //
   // Note: Doesn't have to Enable CPU interface in non-secure world,
@@ -93,6 +122,8 @@ CEntryPoint (
     // Invoke "ProcessLibraryConstructorList" to have all library constructors
     // called.
     ProcessLibraryConstructorList ();
+
+    PrintFirmwareVersion ();
 
     // Initialize the Debug Agent for Source Level Debugging
     InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);

@@ -73,15 +73,27 @@ CallFspMultiPhaseEntry (
   //
   // FSP_MULTI_PHASE_INIT and FSP_MULTI_PHASE_SI_INIT API functions having same prototype.
   //
-  UINTN       FspMultiPhaseApiEntry;
-  UINTN       FspMultiPhaseApiOffset;
-  EFI_STATUS  Status;
-  BOOLEAN     InterruptState;
+  UINTN                   FspMultiPhaseApiEntry;
+  UINTN                   FspMultiPhaseApiOffset;
+  EFI_STATUS              Status;
+  BOOLEAN                 InterruptState;
+  BOOLEAN                 IsVariableServiceRequest;
+  FSP_MULTI_PHASE_PARAMS  *FspMultiPhaseParamsPtr;
+
+  FspMultiPhaseParamsPtr   = (FSP_MULTI_PHASE_PARAMS *)FspMultiPhaseParams;
+  IsVariableServiceRequest = FALSE;
+  if ((FspMultiPhaseParamsPtr->MultiPhaseAction == EnumMultiPhaseGetVariableRequestInfo) ||
+      (FspMultiPhaseParamsPtr->MultiPhaseAction == EnumMultiPhaseCompleteVariableRequest))
+  {
+    IsVariableServiceRequest = TRUE;
+  }
 
   if (ComponentIndex == FspMultiPhaseMemInitApiIndex) {
     FspHeader = (FSP_INFO_HEADER *)FspFindFspHeader (PcdGet32 (PcdFspmBaseAddress));
     if (FspHeader == NULL) {
       return EFI_DEVICE_ERROR;
+    } else if (FspHeader->SpecVersion < 0x24) {
+      return EFI_UNSUPPORTED;
     }
 
     FspMultiPhaseApiOffset = FspHeader->FspMultiPhaseMemInitEntryOffset;
@@ -89,6 +101,10 @@ CallFspMultiPhaseEntry (
     FspHeader = (FSP_INFO_HEADER *)FspFindFspHeader (PcdGet32 (PcdFspsBaseAddress));
     if (FspHeader == NULL) {
       return EFI_DEVICE_ERROR;
+    } else if (FspHeader->SpecVersion < 0x22) {
+      return EFI_UNSUPPORTED;
+    } else if ((FspHeader->SpecVersion < 0x24) && (IsVariableServiceRequest == TRUE)) {
+      return EFI_UNSUPPORTED;
     }
 
     FspMultiPhaseApiOffset = FspHeader->FspMultiPhaseSiInitEntryOffset;
@@ -117,10 +133,11 @@ CallFspMultiPhaseEntry (
 /**
   FSP Wrapper Variable Request Handler
 
-  @param[in] FspHobListPtr        - Pointer to FSP HobList (valid after FSP-M completed)
-  @param[in] ComponentIndex       - FSP Component which executing MultiPhase initialization.
+  @param[in, out] FspHobListPtr        - Pointer to FSP HobList (valid after FSP-M completed)
+  @param[in]      ComponentIndex       - FSP Component which executing MultiPhase initialization.
 
-  @retval EFI_UNSUPPORTED   FSP Wrapper cannot support the specific variable request
+  @retval EFI_UNSUPPORTED   FSP Wrapper cannot support the specific variable request,
+                            or FSP does not support VariableService
   @retval EFI_STATUS        Return FSP returned status
 
 **/
@@ -284,10 +301,11 @@ FspWrapperVariableRequestHandler (
 /**
   FSP Wrapper MultiPhase Handler
 
-  @param[in] FspHobListPtr        - Pointer to FSP HobList (valid after FSP-M completed)
-  @param[in] ComponentIndex       - FSP Component which executing MultiPhase initialization.
+  @param[in, out] FspHobListPtr        - Pointer to FSP HobList (valid after FSP-M completed)
+  @param[in]      ComponentIndex       - FSP Component which executing MultiPhase initialization.
 
-  @retval EFI_STATUS        Always return EFI_SUCCESS
+  @retval EFI_UNSUPPORTED   Specific MultiPhase action was not supported.
+  @retval EFI_SUCCESS       MultiPhase action were completed successfully.
 
 **/
 EFI_STATUS

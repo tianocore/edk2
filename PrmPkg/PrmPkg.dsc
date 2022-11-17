@@ -100,7 +100,6 @@
   $(PLATFORM_PACKAGE)/Samples/PrmSampleAcpiParameterBufferModule/Library/DxeAcpiParameterBufferModuleConfigLib/DxeAcpiParameterBufferModuleConfigLib.inf
   $(PLATFORM_PACKAGE)/Samples/PrmSampleContextBufferModule/Library/DxeContextBufferModuleConfigLib/DxeContextBufferModuleConfigLib.inf
   $(PLATFORM_PACKAGE)/Samples/PrmSampleHardwareAccessModule/Library/DxeHardwareAccessModuleConfigLib/DxeHardwareAccessModuleConfigLib.inf
-  $(PLATFORM_PACKAGE)/Test/UnitTest/Library/UefiBootServicesTableLibUnitTest/UefiBootServicesTableLibUnitTest.inf
 
   #
   # PRM Module Discovery Library

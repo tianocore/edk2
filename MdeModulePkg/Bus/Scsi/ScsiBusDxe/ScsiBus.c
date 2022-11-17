@@ -3,6 +3,8 @@
   Extended SCSI Pass Thru protocol in the system.
 
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1985 - 2022, American Megatrends International LLC.<BR>
+
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -531,6 +533,9 @@ SCSIBusDriverBindingStart (
     // then create handle and install scsi i/o protocol.
     //
     Status = ScsiScanCreateDevice (This, Controller, &ScsiTargetId, Lun, ScsiBusDev);
+    if (Status == EFI_OUT_OF_RESOURCES) {
+      goto ErrorExit;
+    }
   }
 
   return EFI_SUCCESS;

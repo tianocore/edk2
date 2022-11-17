@@ -1257,7 +1257,12 @@ AmlCodeGenRdRegister (
   AML_DATA_NODE                         *RdNode;
   EFI_ACPI_GENERIC_REGISTER_DESCRIPTOR  RdRegister;
 
-  if ((AccessSize > EFI_ACPI_6_4_QWORD)  ||
+  // Cf. ACPI 6.4, s14.7 Referencing the PCC address space
+  // The AccessSize represents the Subspace Id for the PCC address space.
+  if (((AddressSpace == EFI_ACPI_6_4_PLATFORM_COMMUNICATION_CHANNEL) &&
+       (AccessSize > 256)) ||
+      ((AddressSpace != EFI_ACPI_6_4_PLATFORM_COMMUNICATION_CHANNEL) &&
+       (AccessSize > EFI_ACPI_6_4_QWORD)) ||
       ((NameOpNode == NULL) && (NewRdNode == NULL)))
   {
     ASSERT (0);
@@ -1406,79 +1411,3 @@ error_handler:
 
   return Status;
 }
-
-// DEPRECATED APIS
-#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
-
-/** DEPRECATED API
-
-  Add an Interrupt Resource Data node.
-
-  This function creates a Resource Data element corresponding to the
-  "Interrupt ()" ASL function, stores it in an AML Data Node.
-
-  It then adds it after the input CurrRdNode in the list of resource data
-  element.
-
-  The Resource Data effectively created is an Extended Interrupt Resource
-  Data. See ACPI 6.3 specification, s6.4.3.6 "Extended Interrupt Descriptor"
-  for more information about Extended Interrupt Resource Data.
-
-  The Extended Interrupt contains one single interrupt.
-
-  This function allocates memory to create a data node. It is the caller's
-  responsibility to either:
-   - attach this node to an AML tree;
-   - delete this node.
-
-  Note: The _CRS node must be defined using the ASL Name () function.
-        e.g. Name (_CRS, ResourceTemplate () {
-               ...
-             }
-
-  @ingroup UserApis
-
-  @param  [in]  NameOpCrsNode    NameOp object node defining a "_CRS" object.
-                                 Must have an OpCode=AML_NAME_OP, SubOpCode=0.
-                                 NameOp object nodes are defined in ASL
-                                 using the "Name ()" function.
-  @param  [in]  ResourceConsumer The device consumes the specified interrupt
-                                 or produces it for use by a child device.
-  @param  [in]  EdgeTriggered    The interrupt is edge triggered or
-                                 level triggered.
-  @param  [in]  ActiveLow        The interrupt is active-high or active-low.
-  @param  [in]  Shared           The interrupt can be shared with other
-                                 devices or not (Exclusive).
-  @param  [in]  IrqList          Interrupt list. Must be non-NULL.
-  @param  [in]  IrqCount         Interrupt count. Must be non-zero.
-
-
-  @retval EFI_SUCCESS             The function completed successfully.
-  @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
-**/
-EFI_STATUS
-EFIAPI
-AmlCodeGenCrsAddRdInterrupt (
-  IN  AML_OBJECT_NODE_HANDLE  NameOpCrsNode,
-  IN  BOOLEAN                 ResourceConsumer,
-  IN  BOOLEAN                 EdgeTriggered,
-  IN  BOOLEAN                 ActiveLow,
-  IN  BOOLEAN                 Shared,
-  IN  UINT32                  *IrqList,
-  IN  UINT8                   IrqCount
-  )
-{
-  return AmlCodeGenRdInterrupt (
-           ResourceConsumer,
-           EdgeTriggered,
-           ActiveLow,
-           Shared,
-           IrqList,
-           IrqCount,
-           NameOpCrsNode,
-           NULL
-           );
-}
-
-#endif // DISABLE_NEW_DEPRECATED_INTERFACES

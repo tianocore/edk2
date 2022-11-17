@@ -40,7 +40,7 @@
   DEFINE NETWORK_SNP_ENABLE              = FALSE
   DEFINE NETWORK_TLS_ENABLE              = FALSE
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS  = TRUE
-  DEFINE NETWORK_ISCSI_ENABLE            = TRUE
+  DEFINE NETWORK_ISCSI_ENABLE            = FALSE
 
 !if $(NETWORK_SNP_ENABLE) == TRUE
   !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
@@ -64,10 +64,8 @@
   QemuFwCfgSimpleParserLib|OvmfPkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
   QemuLoadImageLib|OvmfPkg/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
 
-  ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
-
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
-  NorFlashPlatformLib|ArmVirtPkg/Library/NorFlashQemuLib/NorFlashQemuLib.inf
+  VirtNorFlashPlatformLib|ArmVirtPkg/Library/NorFlashQemuLib/NorFlashQemuLib.inf
 
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
@@ -93,6 +91,12 @@
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
 !endif
 
+[LibraryClasses.AARCH64]
+  ArmPlatformLib|ArmVirtPkg/Library/ArmPlatformLibQemu/ArmPlatformLibQemu.inf
+
+[LibraryClasses.ARM]
+  ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
+
 [LibraryClasses.common.PEIM]
   ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
 
@@ -113,6 +117,8 @@
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [BuildOptions]
+  GCC:*_*_AARCH64_CC_XIPFLAGS ==
+
 !include NetworkPkg/NetworkBuildOptions.dsc.inc
 
 ################################################################################
@@ -212,6 +218,12 @@
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|3
   gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x20000
 
+  # Shadowing PEI modules is absolutely pointless when the NOR flash is emulated
+  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot|FALSE
+
+  # System Memory Size -- 128 MB initially, actual size will be fetched from DT
+  gArmTokenSpaceGuid.PcdSystemMemorySize|0x8000000
+
 [PcdsFixedAtBuild.AARCH64]
   # Clearing BIT0 in this PCD prevents installing a 32-bit SMBIOS entry point,
   # if the entry point version is >= 3.0. AARCH64 OSes cannot assume the
@@ -227,9 +239,6 @@
   ## If TRUE, OvmfPkg/AcpiPlatformDxe will not wait for PCI
   #  enumeration to complete before installing ACPI tables.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
-
-  # System Memory Size -- 1 MB initially, actual size will be fetched from DT
-  gArmTokenSpaceGuid.PcdSystemMemorySize|0x00100000
 
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|0x0
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|0x0
@@ -279,10 +288,15 @@
   #
   # TPM2 support
   #
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
 !if $(TPM2_ENABLE) == TRUE
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0
+!else
+[PcdsPatchableInModule]
+  # make this PCD patchable instead of dynamic when TPM support is not enabled
+  # this permits setting the PCD in unreachable code without pulling in dynamic PCD support
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
 !endif
 
 [PcdsDynamicHii]
@@ -291,6 +305,15 @@
 !if $(TPM2_CONFIG_ENABLE) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x0|"1.3"|NV,BS
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x8|3|NV,BS
+!endif
+
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|5
+
+[LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
+!if $(TPM2_ENABLE) == TRUE
+  PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+!else
+  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 !endif
 
 ################################################################################
@@ -304,17 +327,20 @@
   #
   ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
+  ArmPlatformPkg/PlatformPei/PlatformPeim.inf
+  ArmVirtPkg/MemoryInitPei/MemoryInitPeim.inf {
+    <LibraryClasses>
+!if $(ARCH) == AARCH64
+      ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuPeiLib.inf
+!endif
+  }
+  ArmPkg/Drivers/CpuPei/CpuPei.inf
+
+!if $(TPM2_ENABLE) == TRUE
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
-  ArmPlatformPkg/PlatformPei/PlatformPeim.inf
-  ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
-  ArmPkg/Drivers/CpuPei/CpuPei.inf
-
-  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-
-!if $(TPM2_ENABLE) == TRUE
   MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf {
     <LibraryClasses>
       ResetSystemLib|ArmVirtPkg/Library/ArmVirtPsciResetSystemPeiLib/ArmVirtPsciResetSystemPeiLib.inf
@@ -397,7 +423,7 @@
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/ArmVirtTimerFdtClientLib/ArmVirtTimerFdtClientLib.inf
   }
-  ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
+  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 
   #

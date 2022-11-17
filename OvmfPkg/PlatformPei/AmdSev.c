@@ -19,7 +19,7 @@
 #include <PiPei.h>
 #include <Register/Amd/Msr.h>
 #include <Register/Intel/SmramSaveStateMap.h>
-#include <Library/VmgExitLib.h>
+#include <Library/CcExitLib.h>
 #include <ConfidentialComputingGuestAttr.h>
 
 #include "Platform.h"
@@ -50,7 +50,7 @@ AmdSevSnpInitialize (
   }
 
   //
-  // Query the hypervisor feature using the VmgExit and set the value in the
+  // Query the hypervisor feature using the CcExitVmgExit and set the value in the
   // hypervisor features PCD.
   //
   HvFeatures = GetHypervisorFeature ();
@@ -129,19 +129,19 @@ GetHypervisorFeature (
   //
   // Initialize the GHCB
   //
-  VmgInit (Ghcb, &InterruptState);
+  CcExitVmgInit (Ghcb, &InterruptState);
 
   //
   // Query the Hypervisor Features.
   //
-  Status = VmgExit (Ghcb, SVM_EXIT_HYPERVISOR_FEATURES, 0, 0);
+  Status = CcExitVmgExit (Ghcb, SVM_EXIT_HYPERVISOR_FEATURES, 0, 0);
   if ((Status != 0)) {
     SevEsProtocolFailure (GHCB_TERMINATE_GHCB_GENERAL);
   }
 
   Features = Ghcb->SaveArea.SwExitInfo2;
 
-  VmgDone (Ghcb, InterruptState);
+  CcExitVmgDone (Ghcb, InterruptState);
 
   return Features;
 }

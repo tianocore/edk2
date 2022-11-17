@@ -2397,7 +2397,7 @@ Returns:
   VerboseMsg("SecCore entry point Address = 0x%llX", (unsigned long long) SecCoreEntryAddress);
   VerboseMsg("BaseAddress = 0x%llX", (unsigned long long) FvInfo->BaseAddress);
   bSecCore = (UINT32)(SecCoreEntryAddress - FvInfo->BaseAddress);
-  VerboseMsg("offset = 0x%llX", bSecCore);
+  VerboseMsg("offset = 0x%X", bSecCore);
 
   if(bSecCore > 0x0fffff) {
     Error(NULL, 0, 3000, "Invalid", "SEC Entry point must be within 1MB of start of the FV");
@@ -3559,7 +3559,7 @@ Returns:
       }
 
       // Machine type is LOONGARCH64, set a flag so LoongArch64 reset vector processed.
-      if ((MachineType == EFI_IMAGE_MACHINE_LOONGARCH64)) {
+      if (MachineType == EFI_IMAGE_MACHINE_LOONGARCH64) {
         VerboseMsg("Located LoongArch64 SEC core in child FV");
         mLoongArch = TRUE;
       }
@@ -3721,7 +3721,7 @@ Returns:
       mRiscV = TRUE;
     }
 
-    if ( (ImageContext.Machine == EFI_IMAGE_MACHINE_LOONGARCH64) ) {
+    if (ImageContext.Machine == EFI_IMAGE_MACHINE_LOONGARCH64) {
       mLoongArch = TRUE;
     }
 
@@ -4002,7 +4002,7 @@ Returns:
       mArm = TRUE;
     }
 
-    if ( (ImageContext.Machine == EFI_IMAGE_MACHINE_LOONGARCH64) ) {
+    if (ImageContext.Machine == EFI_IMAGE_MACHINE_LOONGARCH64) {
       mLoongArch = TRUE;
     }
 

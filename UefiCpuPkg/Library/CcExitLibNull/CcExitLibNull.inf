@@ -1,0 +1,28 @@
+## @file
+#  CcExit Base Support Library.
+#
+#  Copyright (C) 2020, Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  Copyright (c) 2020 - 2022, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CcExitLibNull
+  MODULE_UNI_FILE                = CcExitLibNull.uni
+  FILE_GUID                      = 3cd7368f-ef9b-4a9b-9571-2ed93813677e
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CcExitLib
+
+[Sources.common]
+  CcExitLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+

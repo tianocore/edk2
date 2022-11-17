@@ -1,0 +1,40 @@
+## @file
+#  ArmPlatformLib implementation for QEMU/mach-virt on AArch64 that contains a
+#  statically allocated 1:1 mapping of the first 128 MiB of DRAM, as well as
+#  the NOR flash and the device region
+#
+#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+#  Copyright (c) 2022, Google LLC. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = ArmPlatformLibQemu
+  FILE_GUID                      = 40af3a25-f02c-4aef-94ef-7ac0282d21d4
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  DebugLib
+
+[Sources.common]
+  ArmPlatformLibQemu.c
+  IdMap.S
+
+[Sources.AArch64]
+  AArch64/ArmPlatformHelper.S
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdArmPrimaryCore

@@ -20,8 +20,9 @@
 
 [Sources]
   CpuFeaturesLib.h
-  StandaloneMmCpuFeaturesLib.c
+  IntelSmmCpuFeaturesLib.c
   SmmCpuFeaturesLibCommon.c
+  StandaloneMmCpuFeaturesLib.c
   SmmCpuFeaturesLibNoStm.c
 
 [Packages]

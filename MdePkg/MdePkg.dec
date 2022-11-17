@@ -8,6 +8,7 @@
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 # (C) Copyright 2016 - 2021 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
+# Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -278,6 +279,10 @@
 
   ## @libraryclass  Provides function for SMM CPU Rendezvous Library.
   SmmCpuRendezvousLib|Include/Library/SmmCpuRendezvousLib.h
+
+  ##  @libraryclass  Provides services to generate Entropy using a TRNG.
+  #
+  ArmTrngLib|Include/Library/ArmTrngLib.h
 
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
@@ -1023,6 +1028,9 @@
   gEfiPeiDelayedDispatchPpiGuid  = { 0x869c711d, 0x649c, 0x44fe, { 0x8b, 0x9e, 0x2c, 0xbb, 0x29, 0x11, 0xc3, 0xe6 }}
 
 [Protocols]
+  ## Include/Protocol/MemoryAccept.h
+  gEdkiiMemoryAcceptProtocolGuid = { 0x38c74800, 0x5590, 0x4db4, { 0xa0, 0xf3, 0x67, 0x5d, 0x9b, 0x8e, 0x80, 0x26 }}
+
   ## Include/Protocol/Pcd.h
   gPcdProtocolGuid               = { 0x11B34006, 0xD85B, 0x4D0A, { 0xA2, 0x90, 0xD5, 0xA5, 0x71, 0x31, 0x0E, 0xF7 }}
 
