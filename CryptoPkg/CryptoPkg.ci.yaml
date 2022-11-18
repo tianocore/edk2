@@ -13,7 +13,9 @@
             "Library/OpensslLib/IA32Gcc",
             "Library/OpensslLib/X64",
             "Library/OpensslLib/X64Gcc",
-            "Library/Include/openssl"
+            "Library/Include/openssl",
+            # b_print.c is a copy from OpenSSl.
+            "Library/OpensslLib/b_print.c"
         ]
     },
     "EccCheck": {

@@ -530,6 +530,7 @@
   rand_pool.c
   SslNull.c
   EcSm2Null.c
+  b_print.c
 
 [Packages]
   MdePkg/MdePkg.dec
