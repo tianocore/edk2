@@ -65,6 +65,7 @@ class CommonPlatform():
             if PkgName not in PackagesSupported:
                 PackagesSupported.append(PkgName)
         self.PackagesSupported = tuple(PackagesSupported)
+        print(args.ShellUnitTestList)
         print('PackagesSupported for UnitTest is {}'.format(self.PackagesSupported))
 
     def UpdateUnitTestToBuild(self, args):
@@ -187,7 +188,8 @@ class UnitTestPlatformBuilder(PlatformBuilder):
         if CommonPlatformSupportUT.RunShellUnitTest:
             ret = CommonPlatformSupportUT.BuildUnitTest()
             CommonPlatformSupportUT.WriteEfiToStartup()
-        return ret
+            return ret
+        return 0
 
     def FlashRomImage(self):
         ret = super().FlashRomImage()
