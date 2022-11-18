@@ -1,0 +1,25 @@
+## @file
+# File templates/basetools-build-job.yml
+#
+# template file to build basetools
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+parameters:
+  build_UnitTest_flag: ''
+
+# Set default
+- bash: echo "##vso[task.setvariable variable=UT_Count]${{ 0 }}"
+# Pr eval
+- task: CmdLine@1
+  inputs:
+    filename: stuart_pr_eval
+    arguments: -c OvmfPkg/PlatformCI/UnitTestBuild.py --output-count-format-string "##vso[task.setvariable variable=UT_Count;isOutpout=true]{pkgcount}"
+  condition: and(eq(variables['Build.Reason'], 'PullRequest'), in(parameters.build_UnitTest_flag, 'true'))
+# Build
+- task: CmdLine@1
+  inputs:
+    filename: stuart_build
+    arguments: -c OvmfPkg/PlatformCI/UnitTestBuild.py
+  condition: and(gt(variables.UT_Count, 0), succeeded())
