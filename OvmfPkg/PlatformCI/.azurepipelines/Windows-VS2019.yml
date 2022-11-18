@@ -76,6 +76,14 @@ jobs:
             Build.Target: "DEBUG"
             Run.Flags: $(run_flags)
             Run: $(should_run)
+          OVMF_IA32X64_DEBUG_UNIT_TEST:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "IA32,X64"
+            Build.UniTest: '-u MdeModulePkg/Application/HelloWorld/HelloWorld.inf:MdeModulePkg/MdeModulePkg.dsc,UefiCpuPkg/Library/CpuExceptionHandlerLib/UnitTest/ShellCpuExceptionHandlerLibUnitTest.inf:UefiCpuPkg/UefiCpuPkg.dsc'
+            Build.Flags: $(Build.UniTest)
+            Build.Target: "DEBUG"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
           OVMF_IA32X64_RELEASE:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "IA32,X64"
