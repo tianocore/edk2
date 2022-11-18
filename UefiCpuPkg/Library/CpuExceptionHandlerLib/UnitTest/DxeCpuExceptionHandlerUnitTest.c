@@ -169,6 +169,7 @@ CpuExceptionHandlerTestEntry (
   Framework         = NULL;
   TimerArchProtocol = NULL;
   TimerPeriod       = 0;
+  DEBUG ((DEBUG_INFO, "%a v%a\n", UNIT_TEST_APP_NAME, UNIT_TEST_APP_VERSION));
 
   DEBUG ((DEBUG_INFO, "%a v%a\n", UNIT_TEST_APP_NAME, UNIT_TEST_APP_VERSION));
 
