@@ -210,9 +210,18 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         else:
             args += " -pflash " + os.path.join(OutputPath_FV, "OVMF.fd")    # path to firmware
 
-
         if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
-            f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
+            WayToWrite = 'w'
+            try:
+                if CommonPlatform.RunShellUnitTest:
+                    # When RunShellUnitTest is True, CommonPlatform writes some commands to run some Shell UnitTest modules.
+                    # Output UnitTest log into BUILDLOG_*.txt. Also, append commands into startup.nsh instead of overriding it.
+                    BuildLog   = CommonPlatform.ShellUnitTestLog
+                    args      += " -serial file:{}".format(BuildLog)
+                    WayToWrite = 'a'
+            except:
+                pass
+            f = open(os.path.join(VirtualDrive, "startup.nsh"), "{}".format(WayToWrite))
             f.write("BOOT SUCCESS !!! \n")
             ## add commands here
             f.write("reset -s\n")
