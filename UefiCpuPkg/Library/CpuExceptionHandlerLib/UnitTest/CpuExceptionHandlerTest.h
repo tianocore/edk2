@@ -35,6 +35,7 @@
 #ifndef CPU_EXCEPTION_HANDLER_TEST_H_
 #define CPU_EXCEPTION_HANDLER_TEST_H_
 
+#include <PiPei.h>
 #include <Uefi.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -49,7 +50,6 @@
 #include <Library/CpuPageTableLib.h>
 #include <Guid/MemoryAllocationHob.h>
 #include <Protocol/MpService.h>
-#include <PiPei.h>
 #include <Ppi/MpServices2.h>
 
 #define UNIT_TEST_APP_NAME     "Cpu Exception Handler Lib Unit Tests"
