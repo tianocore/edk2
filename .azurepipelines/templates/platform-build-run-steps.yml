@@ -62,7 +62,7 @@ steps:
   displayName: Check if ${{ parameters.build_pkg }} need testing
   inputs:
     filename: stuart_pr_eval
-    arguments: -c ${{ parameters.build_file }} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} --pr-target origin/$(System.PullRequest.targetBranch) --output-count-format-string "##vso[task.setvariable variable=pkg_count;isOutpout=true]{pkgcount}"
+    arguments: -c ${{ parameters.build_file }} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} --pr-target origin/$(System.PullRequest.targetBranch) --output-count-format-string "##vso[task.setvariable variable=pkg_count;isOutpout=true]{pkgcount}" --output-csv-format-string "##vso[task.setvariable variable=pkgs_to_build]{pkgcsv}" 
   condition: eq(variables['Build.Reason'], 'PullRequest')
 
  # Setup repo
@@ -96,7 +96,7 @@ steps:
   displayName: Build
   inputs:
     filename: stuart_build
-    arguments: -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}}
+    arguments: -p $(pkgs_to_build) -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}}
   condition: and(gt(variables.pkg_count, 0), succeeded())
 
 # Run
