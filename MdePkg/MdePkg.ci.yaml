@@ -65,7 +65,8 @@
             "Include/Library/PcdLib.h",
             "Include/Library/SafeIntLib.h",
             "Include/Protocol/DebugSupport.h",
-            "Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.c"
+            "Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.c",
+            "Include/Register/Amd/SmramSaveStateMap.h"
         ]
     },
     ## options defined ci/Plugin/CompilerPlugin
