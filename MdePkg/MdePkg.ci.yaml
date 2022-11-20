@@ -5,6 +5,7 @@
 # Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 # Copyright (c) 2023, Loongson Technology Corporation Limited. All rights reserved.<BR>
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
@@ -72,7 +73,8 @@
             "Include/Protocol/DebugSupport.h",
             "Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.c",
             "Library/BaseFdtLib",
-            "Library/MipiSysTLib/mipi_syst.h"
+            "Library/MipiSysTLib/mipi_syst.h",
+            "Include/Register/Amd/SmramSaveStateMap.h"
         ]
     },
     ## options defined ci/Plugin/CompilerPlugin
