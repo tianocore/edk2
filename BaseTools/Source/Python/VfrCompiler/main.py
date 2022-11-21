@@ -17,7 +17,7 @@ class VfrCompiler():
         pass
 
 
-    def Compile(self, InFile, YamlOutFile, JsonOutFile, BinaryOutFile):
+    def Compile(self, InFile, YamlOutFile, JsonOutFile, BinaryOutFile, CFile):
         gCVfrErrorHandle.SetInputFile(Infile)
         InputStream = FileStream(Infile)
         Lexer = VfrSyntaxLexer(InputStream)
@@ -28,6 +28,7 @@ class VfrCompiler():
         self.__VfrTree.DumpYaml(YamlOutFile)
         self.__VfrTree.DumpJson(JsonOutFile)
         self.__VfrTree.GenBinary(BinaryOutFile)
+        self.__VfrTree.GenCFile(CFile)
 
     def AdjustBin(self):
         pass
@@ -42,7 +43,7 @@ if __name__ == '__main__':
     YamlOutFile = 'test.yaml'
     JsonOutFile = 'test.json'
     BinaryOutFile = 'test.hpk'
+    CFile = 'test.c'
     Compiler = VfrCompiler()
     Compiler.PreProcess()
-    Compiler.Compile(Infile, YamlOutFile, JsonOutFile, BinaryOutFile)
-    
+    Compiler.Compile(Infile, YamlOutFile, JsonOutFile, BinaryOutFile, CFile)

@@ -768,6 +768,13 @@ class CVfrDefaultStore(object):
 
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
+    def UpdateDefaultName(self, DefaultNode):
+        pNode = self.__DefaultStoreList
+        while pNode != None:
+            if pNode.ObjAddr.DefaultId == DefaultNode.Data.GetDefaultId():
+                DefaultNode.Data.SetDefaultName(pNode.ObjAddr.DefaultName)
+            pNode = pNode.Next
+
     def DefaultIdRegistered(self, DefaultId):
         pNode = self.__DefaultStoreList
         while pNode != None:

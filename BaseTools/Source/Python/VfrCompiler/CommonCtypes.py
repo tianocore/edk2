@@ -188,7 +188,7 @@ class EFI_IFR_VARSTORE(Structure):
         ('Guid', EFI_GUID),
         ('VarStoreId', c_uint16),
         ('Size', c_uint16),
-        ('Name', c_wchar_p),
+        ('Name', c_char_p),
     ]
 
 

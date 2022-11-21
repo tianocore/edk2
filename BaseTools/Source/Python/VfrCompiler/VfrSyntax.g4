@@ -1424,6 +1424,7 @@ locals[BaseInfo=EFI_VARSTORE_INFO(), Node=VfrTreeNode(EFI_IFR_GET_OP)]
     ;
 
 vfrExpressionConstant[ExpInfo]
+locals[Node]
     :   'TRUE'
     |   'FALSE'
     |   'ONE'
@@ -1599,7 +1600,7 @@ locals[Nodes=[], Node=VfrTreeNode()]
         '('
         vfrStatementExpressionSub[localctx.Nodes]
         ':'
-        (   vfrStatementExpression[localctx.Node] //
+        (   vfrStatementExpression[localctx.Node]
             ','
             vfrStatementExpression[localctx.Node]
             ';'

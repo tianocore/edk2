@@ -9,10 +9,11 @@ from VfrUtility import *
 from ctypes import *
 
 gCVfrVarDataTypeDB = CVfrVarDataTypeDB()
-gCVfrDefaultStore =  CVfrDefaultStore()
+gCVfrDefaultStore = CVfrDefaultStore()
 gCVfrDataStorage = CVfrDataStorage()
 
-class OpcodeSizesScopeNode():
+
+class OpNode():
 
     def __init__(self, Size, Scope):
         self.Size = Size
@@ -20,176 +21,126 @@ class OpcodeSizesScopeNode():
 
 
 gOpcodeSizesScopeTable = [
-    OpcodeSizesScopeNode(0, 0),  # EFI_IFR_INVALID - 0x00
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_FORM), 1),  # EFI_IFR_FORM_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_SUBTITLE),
-                         1),  # EFI_IFR_SUBTITLE_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_TEXT), 0),  # EFI_IFR_TEXT_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_IMAGE), 0),  # EFI_IFR_IMAGE_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_ONE_OF),
-                         1),  # EFI_IFR_ONE_OF_OP - 0x05
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_CHECKBOX),
-                         1),  # EFI_IFR_CHECKBOX_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_NUMERIC),
-                         1),  # EFI_IFR_NUMERIC_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_PASSWORD),
-                         1),  # EFI_IFR_PASSWORD_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_ONE_OF_OPTION),
-                         0),  # EFI_IFR_ONE_OF_OPTION_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_SUPPRESS_IF),
-                         1),  # EFI_IFR_SUPPRESS_IF - 0x0A
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_LOCKED),
-                         0),  # EFI_IFR_LOCKED_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_ACTION),
-                         1),  # EFI_IFR_ACTION_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_RESET_BUTTON),
-                         1),  # EFI_IFR_RESET_BUTTON_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_FORM_SET),
-                         1),  # EFI_IFR_FORM_SET_OP -0xE
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_REF), 0),  # EFI_IFR_REF_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_NO_SUBMIT_IF),
-                         1),  # EFI_IFR_NO_SUBMIT_IF_OP -0x10
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_INCONSISTENT_IF),
-                         1),  # EFI_IFR_INCONSISTENT_IF_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_EQ_ID_VAL),
-                         0),  # EFI_IFR_EQ_ID_VAL_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_EQ_ID_ID),
-                         0),  # EFI_IFR_EQ_ID_ID_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_EQ_ID_VAL_LIST),
-                         0),  # EFI_IFR_EQ_ID_LIST_OP - 0x14
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_AND), 0),  # EFI_IFR_AND_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_OR), 0),  # EFI_IFR_OR_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_NOT), 0),  # EFI_IFR_NOT_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_RULE), 1),  # EFI_IFR_RULE_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_GRAY_OUT_IF),
-                         1),  # EFI_IFR_GRAYOUT_IF_OP - 0x19
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_DATE), 1),  # EFI_IFR_DATE_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_TIME), 1),  # EFI_IFR_TIME_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_STRING),
-                         1),  # EFI_IFR_STRING_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_REFRESH),
-                         0),  # EFI_IFR_REFRESH_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_DISABLE_IF),
-                         1),  # EFI_IFR_DISABLE_IF_OP - 0x1E
-    OpcodeSizesScopeNode(0, 0),  # 0x1F
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_TO_LOWER),
-                         0),  # EFI_IFR_TO_LOWER_OP - 0x20
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_TO_UPPER),
-                         0),  # EFI_IFR_TO_UPPER_OP - 0x21
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_MAP), 1),  # EFI_IFR_MAP - 0x22
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_ORDERED_LIST),
-                         1),  # EFI_IFR_ORDERED_LIST_OP - 0x23
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_VARSTORE),
-                         0),  # EFI_IFR_VARSTORE_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_VARSTORE_NAME_VALUE),
-                         0),  # EFI_IFR_VARSTORE_NAME_VALUE_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_VARSTORE_EFI),
-                         0),  # EFI_IFR_VARSTORE_EFI_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_VARSTORE_DEVICE),
-                         1),  # EFI_IFR_VARSTORE_DEVICE_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_VERSION),
-                         0),  # EFI_IFR_VERSION_OP - 0x28
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_END), 0),  # EFI_IFR_END_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_MATCH),
-                         0),  # EFI_IFR_MATCH_OP - 0x2A
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_GET), 0),  # EFI_IFR_GET - 0x2B
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_SET), 0),  # EFI_IFR_SET - 0x2C
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_READ),
-                         0),  # EFI_IFR_READ - 0x2D
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_WRITE),
-                         0),  # EFI_IFR_WRITE - 0x2E
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_EQUAL),
-                         0),  # EFI_IFR_EQUAL_OP - 0x2F
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_NOT_EQUAL),
-                         0),  # EFI_IFR_NOT_EQUAL_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_GREATER_THAN),
-                         0),  # EFI_IFR_GREATER_THAN_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_GREATER_EQUAL),
-                         0),  # EFI_IFR_GREATER_EQUAL_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_LESS_THAN),
-                         0),  # EFI_IFR_LESS_THAN_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_LESS_EQUAL),
-                         0),  # EFI_IFR_LESS_EQUAL_OP - 0x34
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_BITWISE_AND),
-                         0),  # EFI_IFR_BITWISE_AND_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_BITWISE_OR),
-                         0),  # EFI_IFR_BITWISE_OR_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_BITWISE_NOT),
-                         0),  # EFI_IFR_BITWISE_NOT_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_SHIFT_LEFT),
-                         0),  # EFI_IFR_SHIFT_LEFT_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_SHIFT_RIGHT),
-                         0),  # EFI_IFR_SHIFT_RIGHT_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_ADD),
-                         0),  # EFI_IFR_ADD_OP - 0x3A
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_SUBTRACT),
-                         0),  # EFI_IFR_SUBTRACT_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_MULTIPLY),
-                         0),  # EFI_IFR_MULTIPLY_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_DIVIDE),
-                         0),  # EFI_IFR_DIVIDE_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_MODULO),
-                         0),  # EFI_IFR_MODULO_OP - 0x3E
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_RULE_REF),
-                         0),  # EFI_IFR_RULE_REF_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_QUESTION_REF1),
-                         0),  # EFI_IFR_QUESTION_REF1_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_QUESTION_REF2),
-                         0),  # EFI_IFR_QUESTION_REF2_OP - 0x41
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_UINT8), 0),  # EFI_IFR_UINT8
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_UINT16), 0),  # EFI_IFR_UINT16
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_UINT32), 0),  # EFI_IFR_UINT32
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_UINT64), 0),  # EFI_IFR_UTNT64
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_TRUE),
-                         0),  # EFI_IFR_TRUE_OP - 0x46
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_FALSE), 0),  # EFI_IFR_FALSE_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_TO_UINT),
-                         0),  # EFI_IFR_TO_UINT_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_TO_STRING),
-                         0),  # EFI_IFR_TO_STRING_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_TO_BOOLEAN),
-                         0),  # EFI_IFR_TO_BOOLEAN_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_MID), 0),  # EFI_IFR_MID_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_FIND), 0),  # EFI_IFR_FIND_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_TOKEN), 0),  # EFI_IFR_TOKEN_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_STRING_REF1),
-                         0),  # EFI_IFR_STRING_REF1_OP - 0x4E
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_STRING_REF2),
-                         0),  # EFI_IFR_STRING_REF2_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_CONDITIONAL),
-                         0),  # EFI_IFR_CONDITIONAL_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_QUESTION_REF3),
-                         0),  # EFI_IFR_QUESTION_REF3_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_ZERO), 0),  # EFI_IFR_ZERO_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_ONE), 0),  # EFI_IFR_ONE_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_ONES), 0),  # EFI_IFR_ONES_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_UNDEFINED),
-                         0),  # EFI_IFR_UNDEFINED_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_LENGTH),
-                         0),  # EFI_IFR_LENGTH_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_DUP),
-                         0),  # EFI_IFR_DUP_OP - 0x57
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_THIS), 0),  # EFI_IFR_THIS_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_SPAN), 0),  # EFI_IFR_SPAN_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_VALUE), 1),  # EFI_IFR_VALUE_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_DEFAULT),
-                         0),  # EFI_IFR_DEFAULT_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_DEFAULTSTORE),
-                         0),  # EFI_IFR_DEFAULTSTORE_OP - 0x5C
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_FORM_MAP),
-                         1),  # EFI_IFR_FORM_MAP_OP - 0x5D
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_CATENATE),
-                         0),  # EFI_IFR_CATENATE_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_GUID), 0),  # EFI_IFR_GUID_OP
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_SECURITY),
-                         0),  # EFI_IFR_SECURITY_OP - 0x60
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_MODAL_TAG),
-                         0),  # EFI_IFR_MODAL_TAG_OP - 0x61
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_REFRESH_ID),
-                         0),  # EFI_IFR_REFRESH_ID_OP - 0x62
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_WARNING_IF),
-                         1),  # EFI_IFR_WARNING_IF_OP - 0x63
-    OpcodeSizesScopeNode(ctypes.sizeof(EFI_IFR_MATCH2), 0)
+    OpNode(0, 0),  # EFI_IFR_INVALID - 0x00
+    OpNode(ctypes.sizeof(EFI_IFR_FORM), 1),  # EFI_IFR_FORM_OP
+    OpNode(ctypes.sizeof(EFI_IFR_SUBTITLE), 1),  # EFI_IFR_SUBTITLE_OP
+    OpNode(ctypes.sizeof(EFI_IFR_TEXT), 0),  # EFI_IFR_TEXT_OP
+    OpNode(ctypes.sizeof(EFI_IFR_IMAGE), 0),  # EFI_IFR_IMAGE_OP
+    OpNode(ctypes.sizeof(EFI_IFR_ONE_OF), 1),  # EFI_IFR_ONE_OF_OP - 0x05
+    OpNode(ctypes.sizeof(EFI_IFR_CHECKBOX), 1),  # EFI_IFR_CHECKBOX_OP
+    OpNode(ctypes.sizeof(EFI_IFR_NUMERIC), 1),  # EFI_IFR_NUMERIC_OP
+    OpNode(ctypes.sizeof(EFI_IFR_PASSWORD), 1),  # EFI_IFR_PASSWORD_OP
+    OpNode(ctypes.sizeof(EFI_IFR_ONE_OF_OPTION),
+           0),  # EFI_IFR_ONE_OF_OPTION_OP
+    OpNode(ctypes.sizeof(EFI_IFR_SUPPRESS_IF),
+           1),  # EFI_IFR_SUPPRESS_IF - 0x0A
+    OpNode(ctypes.sizeof(EFI_IFR_LOCKED), 0),  # EFI_IFR_LOCKED_OP
+    OpNode(ctypes.sizeof(EFI_IFR_ACTION), 1),  # EFI_IFR_ACTION_OP
+    OpNode(ctypes.sizeof(EFI_IFR_RESET_BUTTON), 1),  # EFI_IFR_RESET_BUTTON_OP
+    OpNode(ctypes.sizeof(EFI_IFR_FORM_SET), 1),  # EFI_IFR_FORM_SET_OP -0xE
+    OpNode(ctypes.sizeof(EFI_IFR_REF), 0),  # EFI_IFR_REF_OP
+    OpNode(ctypes.sizeof(EFI_IFR_NO_SUBMIT_IF),
+           1),  # EFI_IFR_NO_SUBMIT_IF_OP -0x10
+    OpNode(ctypes.sizeof(EFI_IFR_INCONSISTENT_IF),
+           1),  # EFI_IFR_INCONSISTENT_IF_OP
+    OpNode(ctypes.sizeof(EFI_IFR_EQ_ID_VAL), 0),  # EFI_IFR_EQ_ID_VAL_OP
+    OpNode(ctypes.sizeof(EFI_IFR_EQ_ID_ID), 0),  # EFI_IFR_EQ_ID_ID_OP
+    OpNode(ctypes.sizeof(EFI_IFR_EQ_ID_VAL_LIST),
+           0),  # EFI_IFR_EQ_ID_LIST_OP - 0x14
+    OpNode(ctypes.sizeof(EFI_IFR_AND), 0),  # EFI_IFR_AND_OP
+    OpNode(ctypes.sizeof(EFI_IFR_OR), 0),  # EFI_IFR_OR_OP
+    OpNode(ctypes.sizeof(EFI_IFR_NOT), 0),  # EFI_IFR_NOT_OP
+    OpNode(ctypes.sizeof(EFI_IFR_RULE), 1),  # EFI_IFR_RULE_OP
+    OpNode(ctypes.sizeof(EFI_IFR_GRAY_OUT_IF),
+           1),  # EFI_IFR_GRAYOUT_IF_OP - 0x19
+    OpNode(ctypes.sizeof(EFI_IFR_DATE), 1),  # EFI_IFR_DATE_OP
+    OpNode(ctypes.sizeof(EFI_IFR_TIME), 1),  # EFI_IFR_TIME_OP
+    OpNode(ctypes.sizeof(EFI_IFR_STRING), 1),  # EFI_IFR_STRING_OP
+    OpNode(ctypes.sizeof(EFI_IFR_REFRESH), 0),  # EFI_IFR_REFRESH_OP
+    OpNode(ctypes.sizeof(EFI_IFR_DISABLE_IF),
+           1),  # EFI_IFR_DISABLE_IF_OP - 0x1E
+    OpNode(0, 0),  # 0x1F
+    OpNode(ctypes.sizeof(EFI_IFR_TO_LOWER), 0),  # EFI_IFR_TO_LOWER_OP - 0x20
+    OpNode(ctypes.sizeof(EFI_IFR_TO_UPPER), 0),  # EFI_IFR_TO_UPPER_OP - 0x21
+    OpNode(ctypes.sizeof(EFI_IFR_MAP), 1),  # EFI_IFR_MAP - 0x22
+    OpNode(ctypes.sizeof(EFI_IFR_ORDERED_LIST),
+           1),  # EFI_IFR_ORDERED_LIST_OP - 0x23
+    OpNode(ctypes.sizeof(EFI_IFR_VARSTORE), 0),  # EFI_IFR_VARSTORE_OP
+    OpNode(ctypes.sizeof(EFI_IFR_VARSTORE_NAME_VALUE),
+           0),  # EFI_IFR_VARSTORE_NAME_VALUE_OP
+    OpNode(ctypes.sizeof(EFI_IFR_VARSTORE_EFI), 0),  # EFI_IFR_VARSTORE_EFI_OP
+    OpNode(ctypes.sizeof(EFI_IFR_VARSTORE_DEVICE),
+           1),  # EFI_IFR_VARSTORE_DEVICE_OP
+    OpNode(ctypes.sizeof(EFI_IFR_VERSION), 0),  # EFI_IFR_VERSION_OP - 0x28
+    OpNode(ctypes.sizeof(EFI_IFR_END), 0),  # EFI_IFR_END_OP
+    OpNode(ctypes.sizeof(EFI_IFR_MATCH), 0),  # EFI_IFR_MATCH_OP - 0x2A
+    OpNode(ctypes.sizeof(EFI_IFR_GET), 0),  # EFI_IFR_GET - 0x2B
+    OpNode(ctypes.sizeof(EFI_IFR_SET), 0),  # EFI_IFR_SET - 0x2C
+    OpNode(ctypes.sizeof(EFI_IFR_READ), 0),  # EFI_IFR_READ - 0x2D
+    OpNode(ctypes.sizeof(EFI_IFR_WRITE), 0),  # EFI_IFR_WRITE - 0x2E
+    OpNode(ctypes.sizeof(EFI_IFR_EQUAL), 0),  # EFI_IFR_EQUAL_OP - 0x2F
+    OpNode(ctypes.sizeof(EFI_IFR_NOT_EQUAL), 0),  # EFI_IFR_NOT_EQUAL_OP
+    OpNode(ctypes.sizeof(EFI_IFR_GREATER_THAN), 0),  # EFI_IFR_GREATER_THAN_OP
+    OpNode(ctypes.sizeof(EFI_IFR_GREATER_EQUAL),
+           0),  # EFI_IFR_GREATER_EQUAL_OP
+    OpNode(ctypes.sizeof(EFI_IFR_LESS_THAN), 0),  # EFI_IFR_LESS_THAN_OP
+    OpNode(ctypes.sizeof(EFI_IFR_LESS_EQUAL),
+           0),  # EFI_IFR_LESS_EQUAL_OP - 0x34
+    OpNode(ctypes.sizeof(EFI_IFR_BITWISE_AND), 0),  # EFI_IFR_BITWISE_AND_OP
+    OpNode(ctypes.sizeof(EFI_IFR_BITWISE_OR), 0),  # EFI_IFR_BITWISE_OR_OP
+    OpNode(ctypes.sizeof(EFI_IFR_BITWISE_NOT), 0),  # EFI_IFR_BITWISE_NOT_OP
+    OpNode(ctypes.sizeof(EFI_IFR_SHIFT_LEFT), 0),  # EFI_IFR_SHIFT_LEFT_OP
+    OpNode(ctypes.sizeof(EFI_IFR_SHIFT_RIGHT), 0),  # EFI_IFR_SHIFT_RIGHT_OP
+    OpNode(ctypes.sizeof(EFI_IFR_ADD), 0),  # EFI_IFR_ADD_OP - 0x3A
+    OpNode(ctypes.sizeof(EFI_IFR_SUBTRACT), 0),  # EFI_IFR_SUBTRACT_OP
+    OpNode(ctypes.sizeof(EFI_IFR_MULTIPLY), 0),  # EFI_IFR_MULTIPLY_OP
+    OpNode(ctypes.sizeof(EFI_IFR_DIVIDE), 0),  # EFI_IFR_DIVIDE_OP
+    OpNode(ctypes.sizeof(EFI_IFR_MODULO), 0),  # EFI_IFR_MODULO_OP - 0x3E
+    OpNode(ctypes.sizeof(EFI_IFR_RULE_REF), 0),  # EFI_IFR_RULE_REF_OP
+    OpNode(ctypes.sizeof(EFI_IFR_QUESTION_REF1),
+           0),  # EFI_IFR_QUESTION_REF1_OP
+    OpNode(ctypes.sizeof(EFI_IFR_QUESTION_REF2),
+           0),  # EFI_IFR_QUESTION_REF2_OP - 0x41
+    OpNode(ctypes.sizeof(EFI_IFR_UINT8), 0),  # EFI_IFR_UINT8
+    OpNode(ctypes.sizeof(EFI_IFR_UINT16), 0),  # EFI_IFR_UINT16
+    OpNode(ctypes.sizeof(EFI_IFR_UINT32), 0),  # EFI_IFR_UINT32
+    OpNode(ctypes.sizeof(EFI_IFR_UINT64), 0),  # EFI_IFR_UTNT64
+    OpNode(ctypes.sizeof(EFI_IFR_TRUE), 0),  # EFI_IFR_TRUE_OP - 0x46
+    OpNode(ctypes.sizeof(EFI_IFR_FALSE), 0),  # EFI_IFR_FALSE_OP
+    OpNode(ctypes.sizeof(EFI_IFR_TO_UINT), 0),  # EFI_IFR_TO_UINT_OP
+    OpNode(ctypes.sizeof(EFI_IFR_TO_STRING), 0),  # EFI_IFR_TO_STRING_OP
+    OpNode(ctypes.sizeof(EFI_IFR_TO_BOOLEAN), 0),  # EFI_IFR_TO_BOOLEAN_OP
+    OpNode(ctypes.sizeof(EFI_IFR_MID), 0),  # EFI_IFR_MID_OP
+    OpNode(ctypes.sizeof(EFI_IFR_FIND), 0),  # EFI_IFR_FIND_OP
+    OpNode(ctypes.sizeof(EFI_IFR_TOKEN), 0),  # EFI_IFR_TOKEN_OP
+    OpNode(ctypes.sizeof(EFI_IFR_STRING_REF1),
+           0),  # EFI_IFR_STRING_REF1_OP - 0x4E
+    OpNode(ctypes.sizeof(EFI_IFR_STRING_REF2), 0),  # EFI_IFR_STRING_REF2_OP
+    OpNode(ctypes.sizeof(EFI_IFR_CONDITIONAL), 0),  # EFI_IFR_CONDITIONAL_OP
+    OpNode(ctypes.sizeof(EFI_IFR_QUESTION_REF3),
+           0),  # EFI_IFR_QUESTION_REF3_OP
+    OpNode(ctypes.sizeof(EFI_IFR_ZERO), 0),  # EFI_IFR_ZERO_OP
+    OpNode(ctypes.sizeof(EFI_IFR_ONE), 0),  # EFI_IFR_ONE_OP
+    OpNode(ctypes.sizeof(EFI_IFR_ONES), 0),  # EFI_IFR_ONES_OP
+    OpNode(ctypes.sizeof(EFI_IFR_UNDEFINED), 0),  # EFI_IFR_UNDEFINED_OP
+    OpNode(ctypes.sizeof(EFI_IFR_LENGTH), 0),  # EFI_IFR_LENGTH_OP
+    OpNode(ctypes.sizeof(EFI_IFR_DUP), 0),  # EFI_IFR_DUP_OP - 0x57
+    OpNode(ctypes.sizeof(EFI_IFR_THIS), 0),  # EFI_IFR_THIS_OP
+    OpNode(ctypes.sizeof(EFI_IFR_SPAN), 0),  # EFI_IFR_SPAN_OP
+    OpNode(ctypes.sizeof(EFI_IFR_VALUE), 1),  # EFI_IFR_VALUE_OP
+    OpNode(ctypes.sizeof(EFI_IFR_DEFAULT), 0),  # EFI_IFR_DEFAULT_OP
+    OpNode(ctypes.sizeof(EFI_IFR_DEFAULTSTORE),
+           0),  # EFI_IFR_DEFAULTSTORE_OP - 0x5C
+    OpNode(ctypes.sizeof(EFI_IFR_FORM_MAP), 1),  # EFI_IFR_FORM_MAP_OP - 0x5D
+    OpNode(ctypes.sizeof(EFI_IFR_CATENATE), 0),  # EFI_IFR_CATENATE_OP
+    OpNode(ctypes.sizeof(EFI_IFR_GUID), 0),  # EFI_IFR_GUID_OP
+    OpNode(ctypes.sizeof(EFI_IFR_SECURITY), 0),  # EFI_IFR_SECURITY_OP - 0x60
+    OpNode(ctypes.sizeof(EFI_IFR_MODAL_TAG), 0),  # EFI_IFR_MODAL_TAG_OP - 0x61
+    OpNode(ctypes.sizeof(EFI_IFR_REFRESH_ID),
+           0),  # EFI_IFR_REFRESH_ID_OP - 0x62
+    OpNode(ctypes.sizeof(EFI_IFR_WARNING_IF),
+           1),  # EFI_IFR_WARNING_IF_OP - 0x63
+    OpNode(ctypes.sizeof(EFI_IFR_MATCH2), 0)
 ]
 
 
@@ -199,7 +150,9 @@ class OpBufferNode():
         self.Buffer = Buffer
         self.Next = Next
 
+
 class PACKAGE_DATA():
+
     def __init__(self, Bu) -> None:
         #self.Buffer = Buffer
         pass
@@ -220,8 +173,6 @@ class CFormPkg():
 
     def BuildPkg(self):
         pass
-
-
 
     def GetPkgLength(self):
         return self.__PkgLength
@@ -271,7 +222,6 @@ class CFormPkg():
         self.__PkgLength += Len
 
         return self.__CurrBufferNode.Buffer
-
 
 
 gCFormPkg = CFormPkg()
@@ -384,7 +334,12 @@ gIfrObjPrintDebugTable = [
 
 class CIfrObj():
 
-    def __init__(self, Obj=None, OpCode=None, ObjBinLen=0, DelayEmit=False, LineNo=0):
+    def __init__(self,
+                 Obj=None,
+                 OpCode=None,
+                 ObjBinLen=0,
+                 DelayEmit=False,
+                 LineNo=0):
 
         self.__DelayEmit = DelayEmit
         self.__PkgOffset = gCFormPkg.GetPkgLength()
@@ -481,6 +436,11 @@ class CIfrOpHeader():
 
     def DecLength(self, Size):
         self.__OpHeader.Length -= Size
+
+    def AdjustLength(self, BeforeSize, AfterSize):
+        self.__OpHeader.Length -= BeforeSize
+        self.__OpHeader.Length += AfterSize
+        self.__OpHeader.Length += 1
 
     def GetOpCode(self):
         return self.__OpHeader.OpCode
@@ -905,6 +865,11 @@ class CIfrDefaultStore(CIfrObj, CIfrOpHeader):
 
     def SetDefaultStore(self, DefaultStore: EFI_IFR_DEFAULTSTORE):
         self.__DefaultStore = DefaultStore
+        CIfrOpHeader.__init__(self, self.__DefaultStore.Header,
+                              EFI_IFR_DEFAULTSTORE_OP)
+
+    def GetDefaultId(self):
+        return self.__DefaultStore.DefaultId
 
     def GetInfo(self):
         return self.__DefaultStore
@@ -918,7 +883,7 @@ class CIfrVarStore(CIfrObj, CIfrOpHeader):
                               EFI_IFR_VARSTORE_OP)
         self.__Varstore.VarStoreId = EFI_VARSTORE_ID_INVALID
         self.__Varstore.Size = 0
-        self.__Varstore.Name = ''
+        self.__Varstore.Name = b''
 
     def SetGuid(self, Guid):
         self.__Varstore.Guid = Guid
@@ -930,7 +895,9 @@ class CIfrVarStore(CIfrObj, CIfrOpHeader):
         self.__Varstore.VarStoreId = VarStoreId
 
     def SetName(self, Name):
-        self.__Varstore.Name = Name
+
+        self.__Varstore.Name = bytes(Name, 'utf-8')
+        self.AdjustLength(sizeof(ctypes.c_char_p), len(Name))
 
     def GetInfo(self):
         return self.__Varstore
@@ -957,6 +924,7 @@ class CIfrVarStoreEfi(CIfrObj, CIfrOpHeader):
 
     def SetName(self, Name):
         self.__VarStoreEfi.Name = Name
+        self.AdjustLength(sizeof(ctypes.c_wchar_p), len(Name))
 
     def SetAttributes(self, Attributes):
         self.__VarStoreEfi.Attributes = Attributes
@@ -1198,12 +1166,18 @@ class CIfrLocked(CIfrObj, CIfrOpHeader):
         self.__Lock = EFI_IFR_LOCKED()
         CIfrOpHeader.__init__(self, self.__Lock.Header, EFI_IFR_LOCKED_OP)
 
+    def GetInfo(self):
+        return self.__Lock
+
 
 class CIfrModal(CIfrObj, CIfrOpHeader):
 
     def __init__(self, ):
         self.__Modal = EFI_IFR_MODAL_TAG()
         CIfrOpHeader.__init__(self, self.__Modal.Header, EFI_IFR_MODAL_TAG_OP)
+
+    def GetInfo(self):
+        return self.__Modal
 
 
 EFI_IFR_QUESTION_FLAG_DEFAULT = 0
@@ -1644,6 +1618,9 @@ class CIfrInconsistentIf(CIfrObj, CIfrOpHeader):
     def SetError(self, Error):
         self.__InconsistentIf.Error = Error
 
+    def GetInfo(self):
+        return self.__InconsistentIf
+
 
 class CIfrNoSubmitIf(CIfrObj, CIfrOpHeader):
 
@@ -1656,6 +1633,9 @@ class CIfrNoSubmitIf(CIfrObj, CIfrOpHeader):
     def SetError(self, Error):
         self.__NoSubmitIf.Error = Error
 
+    def GetInfo(self):
+        return self.__NoSubmitIf
+
 
 class CIfrDisableIf(CIfrObj, CIfrOpHeader):
 
@@ -1664,6 +1644,9 @@ class CIfrDisableIf(CIfrObj, CIfrOpHeader):
         CIfrOpHeader.__init__(self, self.__DisableIf.Header,
                               EFI_IFR_DISABLE_IF_OP)
 
+    def GetInfo(self):
+        return self.__DisableIf
+
 
 class CIfrSuppressIf(CIfrObj, CIfrOpHeader):
 
@@ -1671,8 +1654,10 @@ class CIfrSuppressIf(CIfrObj, CIfrOpHeader):
         self.__SuppressIf = EFI_IFR_SUPPRESS_IF()
         CIfrOpHeader.__init__(self, self.__SuppressIf.Header,
                               EFI_IFR_SUPPRESS_IF_OP)
+
     def GetInfo(self):
         return self.__SuppressIf
+
 
 class CIfrGrayOutIf(CIfrObj, CIfrOpHeader):
 
@@ -1691,6 +1676,9 @@ class CIfrValue(CIfrObj, CIfrOpHeader):
         self.__Value = EFI_IFR_VALUE()
         CIfrOpHeader.__init__(self, self.__Value.Header, EFI_IFR_VALUE_OP)
 
+    def GetInfo(self):
+        return self.__Value
+
 
 class CIfrRead(CIfrObj, CIfrOpHeader):
 
@@ -1698,12 +1686,18 @@ class CIfrRead(CIfrObj, CIfrOpHeader):
         self.__Read = EFI_IFR_READ()
         CIfrOpHeader.__init__(self, self.__Read.Header, EFI_IFR_READ_OP)
 
+    def GetInfo(self):
+        return self.__Read
+
 
 class CIfrWrite(CIfrObj, CIfrOpHeader):
 
     def __init__(self):
         self.__Write = EFI_IFR_WRITE()
         CIfrOpHeader.__init__(self, self.__Write.Header, EFI_IFR_WRITE_OP)
+
+    def GetInfo(self):
+        return self.__Write
 
 
 class CIfrWarningIf(CIfrObj, CIfrOpHeader):
@@ -2082,6 +2076,7 @@ class CIfrEqual(CIfrObj, CIfrOpHeader):
     def GetInfo(self):
         return self.__Equal
 
+
 class CIfrGreaterEqual(CIfrObj, CIfrOpHeader):
 
     def __init__(self, LineNo):
@@ -2140,6 +2135,7 @@ class CIfrMap(CIfrObj, CIfrOpHeader):
     def GetInfo(self):
         return self.__Map
 
+
 class CIfrMatch(CIfrObj, CIfrOpHeader):
 
     def __init__(self, LineNo):
@@ -2196,6 +2192,7 @@ class CIfrNotEqual(CIfrObj, CIfrOpHeader):
 
     def GetInfo(self):
         return self.__NotEqual
+
 
 class CIfrShiftLeft(CIfrObj, CIfrOpHeader):
 
@@ -2258,6 +2255,7 @@ class CIfrFind(CIfrObj, CIfrOpHeader):
     def GetInfo(self):
         return self.__Find
 
+
 class CIfrMid(CIfrObj, CIfrOpHeader):
 
     def __init__(self, LineNo):
@@ -2301,6 +2299,7 @@ class CIfrSpan(CIfrObj, CIfrOpHeader):
 
     def GetInfo(self):
         return self.__Span
+
 
 class CIfrBitWiseAnd(CIfrObj, CIfrOpHeader):
 
@@ -2633,6 +2632,7 @@ class CIfrQuestionRef3(CIfrObj, CIfrOpHeader):
     def GetInfo(self):
         return self.__QuestionRef3
 
+
 class CIfrQuestionRef3_2(CIfrObj, CIfrOpHeader):
 
     def __init__(self, LineNo):
@@ -2740,6 +2740,7 @@ class CIfrThis(CIfrObj, CIfrOpHeader):
 
     def GetInfo(self):
         return self.__This
+
 
 class CIfrSecurity(CIfrObj, CIfrOpHeader):
 
@@ -2855,6 +2856,7 @@ class CIfrOnes(CIfrObj, CIfrOpHeader):
 
     def GetInfo(self):
         return self.__Ones
+
 
 class CIfrZero(CIfrObj, CIfrOpHeader):
 

@@ -45,7 +45,7 @@ class VfrTreeNode():
             else:
                 self.Child.insert(pos, NewNode)
 
-        NewNode.Parent = self
+            NewNode.Parent = self
 
     # lastNode.insertRel(newNode)
     def insertRel(self, newNode) -> None:
@@ -86,17 +86,49 @@ class VfrTree():
     def GenBinary(self, FileName):
         try:
             with open(FileName, 'wb') as f:
+                #f.write(bytes('MyIfrNVData','utf-8'))
+                Name = ctypes.c_wchar_p('MyIfrNVData')
+
+                # f.write(Name)
                 self.GenBinaryDfs(self.__Root, f)
             f.close()
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE, "File open failed for %s" % FileName, None)
 
-    def GenBinaryDfs(self, Root, f):
+    def GenCFile(self, FileName):
+        try:
+            with open(FileName, 'w') as f:
+                self.GenCFileDfs(self.__Root, f)
+            f.close()
+        except:
+            EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE, "File open failed for %s" % FileName, None)
+
+    def GenCFileDfs(self, Root, f):
         if Root.OpCode != None:
-            print(type(Root.Data))
-            Buffer = self.__StructToStream(Root.Data.GetInfo())
+            f.write('{}\n'.format(type(Root.Data)))
+
+            #Buffer = self.__StructToStream(Root.Data.GetInfo())
 
             if Root.Buffer != None:
+                Hex = ''
+                for B in Root.Buffer:
+                    Hex += ' '+ hex(B)
+                f.write('{}\n'.format(Hex))
+
+           # else:
+                #f.write(Buffer)
+
+        if Root.Child != []:
+            for ChildNode in Root.Child:
+                self.GenCFileDfs(ChildNode, f)
+
+    def GenBinaryDfs(self, Root, f, Flag = True):
+        if Root.OpCode != None:
+            #Buffer = self.__StructToStream(Root.Data.GetInfo())
+
+            if Root.Buffer != None:
+                if Root.OpCode == EFI_IFR_DEFAULTSTORE_OP:
+                    Root.Buffer = self.__StructToStream(Root.Data.GetInfo()) # need to update Buffer
                 f.write(Root.Buffer)
            # else:
                 #f.write(Buffer)

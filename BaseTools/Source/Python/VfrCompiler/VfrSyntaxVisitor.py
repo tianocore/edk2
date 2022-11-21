@@ -48,6 +48,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.__IsCheckBoxOp = False
         self.__Root = Root
 
+        self.__DefaultIndex = None
+        self.__DefaultMFIndex = None
+
     # Visit a parse tree produced by VfrSyntaxParser#vfrProgram.
     def visitVfrProgram(self, ctx:VfrSyntaxParser.VfrProgramContext):
 
@@ -287,6 +290,19 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def visitVfrFormSetDefinition(self, ctx:VfrSyntaxParser.VfrFormSetDefinitionContext):
 
         self.__InsertChild(self.__Root, ctx)
+        self.__InsertChild(ctx.Node, ctx.classDefinition())
+        self.__InsertChild(ctx.Node, ctx.subclassDefinition())
+
+
+        DsNode, DsNodeMF = self.__DeclareStandardDefaultStorage(ctx.start.line)
+        ctx.Node.insertChild(DsNode)
+        self.__DefaultIndex = len(ctx.Node.Child)
+        ctx.Node.insertChild(DsNodeMF)
+        self.__DefaultMFIndex = len(ctx.Node.Child)
+
+
+
+        self.visitChildren(ctx)
 
         ClassGuidNum = 0
         GuidList = []
@@ -354,15 +370,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         ctx.Node.Buffer = self.__StructToStream(FSObj.GetInfo())
         for i in range(0, len(GuidList)):
             ctx.Node.Buffer += self.__StructToStream(GuidList[i])
-
-        self.__InsertChild(ctx.Node, ctx.classDefinition())
-        self.__InsertChild(ctx.Node, ctx.subclassDefinition())
-
-        DsNode, DsNodeMF = self.__DeclareStandardDefaultStorage(ctx.start.line)
-        ctx.Node.insertChild(DsNode)
-        ctx.Node.insertChild(DsNodeMF)
-
-        self.visitChildren(ctx)
 
         self.__InsertEndNode(ctx.Node, ctx.stop.line)
 
@@ -486,7 +493,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementDefaultStore.
     def visitVfrStatementDefaultStore(self, ctx:VfrSyntaxParser.VfrStatementDefaultStoreContext):
-        DSObj = CIfrDefaultStore()
         Line = ctx.start.line
         self.visitChildren(ctx)
 
@@ -496,18 +502,19 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD if ctx.Attribute()== None else self.__TransNum(ctx.A.text)
 
         if gCVfrDefaultStore.DefaultIdRegistered(DefaultId) == False:
-            self.__ErrorHandler(gCVfrDefaultStore.RegisterDefaultStore(DSObj.GetDefaultStore(), RefName, DefaultStoreNameId, DefaultId) , Line)
+            DSObj = CIfrDefaultStore()
+            self.__ErrorHandler(gCVfrDefaultStore.RegisterDefaultStore(DSObj.GetDefaultStore(), RefName, DefaultStoreNameId, DefaultId), Line)
             DSObj.SetDefaultName(DefaultStoreNameId)
             DSObj.SetDefaultId (DefaultId)
             DSObj.SetLineNo(Line)
+            ctx.Node.Data = DSObj
+            ctx.Node.Buffer = self.__StructToStream(DSObj.GetInfo())
         else:
             pNode, ReturnCode = gCVfrDefaultStore.ReRegisterDefaultStoreById(DefaultId, RefName, DefaultStoreNameId)
             self.__ErrorHandler(ReturnCode, Line)
-            DSObj.SetDefaultStore = pNode.ObjAddr
-            DSObj.SetLineNo(Line)
+            ctx.Node = None
 
-        ctx.Node.Data = DSObj
-        ctx.Node.Buffer = self.__StructToStream(DSObj.GetInfo())
+
 
         return ctx.Node
 
@@ -1063,11 +1070,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by VfrSyntaxParser#vfrLockedTag.
     def visitVfrLockedTag(self, ctx:VfrSyntaxParser.VfrLockedTagContext):
 
-        LObj=CIfrLocked()
+        LObj = CIfrLocked()
         self.visitChildren(ctx)
         LObj.SetLineNo(ctx.start.line)
         ctx.Node.Data = LObj
-        ctx.Node.Buffer = self.__StructToStream(LObj)
+        ctx.Node.Buffer = self.__StructToStream(LObj.GetInfo())
         return ctx.Node
 
 
@@ -1163,7 +1170,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             for i in range(0, FormMapMethodNumber):
                 FMapObj.SetFormMapMethod(self.__TransNum(ctx.Number(i+1)), ctx.guidDefinition(i).Guid)
         ctx.Node.Data = FMapObj
-        ctx.Node.Buffer = self.__StructToStream(FMapObj.GetInfo())
+        FormMap, MethodMapList = FMapObj.GetInfo()
+        ctx.Node.Buffer = self.__StructToStream(FormMap)
+        for MethodMap in MethodMapList:
+            ctx.Node.Buffer += self.__StructToStream(MethodMap)
         for Ctx in ctx.vfrForm():
             self.__InsertChild(ctx.Node, Ctx)
         self.__InsertEndNode(ctx.Node, ctx.stop.line)
@@ -1795,7 +1805,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             DObj.SetLineNo(Line)
             DObj.SetScope(1)
             self.__InsertChild(ctx.Node, ctx.vfrStatementValue())
-            self.__InsertEndNode(ctx.Node, ctx.V.line)
+            self.__InsertEndNode(ctx.Node, Line)
 
         if ctx.DefaultStore() != None:
             DefaultId, ReturnCode = gCVfrDefaultStore.GetDefaultId(ctx.SN.text)
@@ -1811,7 +1821,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if (IsExp == False) and (VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_BUFFER):
                 self.__ErrorHandler(gCVfrDefaultStore.BufferVarStoreAltConfigAdd(DefaultId, self.__CurrQestVarInfo, VarStoreName, VarGuid, self.__CurrQestVarInfo.VarType, Value), Line)
         ctx.Node.Data = DObj
-        ctx.Node.Buffer = self.__StructToStream(DObj.GetInfo())
+        #ctx.Node.Buffer = self.__StructToStream(DObj.GetInfo())
         return ctx.Node
 
 
@@ -2267,6 +2277,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             ShrinkSize = 12
 
         #######　NObj->ShrinkBinSize (ShrinkSize);
+        NObj.DecLength(ShrinkSize)
         if IsSupported == False:
             self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'Numeric question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
@@ -2599,6 +2610,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         else:
             #　Question stored in bit fields saved as UINT32 type, so the ShrinkSize same as EFI_IFR_TYPE_NUM_SIZE_32.
             ShrinkSize = 12
+
+        OObj.DecLength(ShrinkSize)
 
         # OObj.ShrinkBinSize(ShrinkSize)
         if IsSupported == False:
@@ -3512,10 +3525,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 Node = VfrTreeNode(EFI_IFR_OR_OP, OObj, self.__StructToStream(OObj.GetInfo()))
                 ctx.Nodes.append(Node)
 
-        for Node in ctx.Nodes:
-            if ctx.ParentNode != None:
-                ctx.ParentNode.insertChild(Node)
-
         # Extend OpCode Scope only for the root expression.
         if ctx.ExpInfo.ExpOpCount > 1 and ctx.ExpInfo.RootLevel == 0:
             if self.__SetSavedOpHdrScope():
@@ -3528,6 +3537,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if ctx.ExpInfo.RootLevel == 0:
             self.__ClearSavedOPHdr()
             self.__CIfrOpHdrIndex = self.__CIfrOpHdrIndex - 1
+
+        for Node in ctx.Nodes:
+            if ctx.ParentNode != None:
+                ctx.ParentNode.insertChild(Node)
 
         self.__ConstantOnlyInExpression = False
 
@@ -3627,7 +3640,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         NEObj = CIfrNotEqual(ctx.start.line)
         Node = VfrTreeNode(EFI_IFR_NOT_EQUAL_OP, NEObj, self.__StructToStream(NEObj.GetInfo()))
         ctx.Nodes.append(Node)
-        return ctx.Node
+        return ctx.Nodes
 
 
     # Visit a parse tree produced by VfrSyntaxParser#compareTerm.
@@ -3889,7 +3902,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by VfrSyntaxParser#vfrExpressionParen.
     def visitVfrExpressionParen(self, ctx:VfrSyntaxParser.VfrExpressionParenContext):
         self.visitChildren(ctx)
-        return self.Nodes
+        return ctx.Nodes
 
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrExpressionBuildInFunction.
@@ -4192,7 +4205,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if QId == EFI_QUESTION_ID_INVALID:
                 EILObj.SetQuestionId(QId, VarIdStr, LineNo)
 
-            ctx.Node = VfrTreeNode(EFI_IFR_EQ_ID_VAL_OP, EILObj, self.__StructToStream(EILObj.GetInfo()))
+            # ctx.Node = VfrTreeNode(EFI_IFR_EQ_ID_VAL_OP, EILObj, self.__StructToStream(EILObj.GetInfo()))
             ctx.ExpInfo.ExpOpCount += 1
         return ctx.Node
 
@@ -4387,7 +4400,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 self.__ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED, Line, "Get/Set opcode don't support data array")
 
         GObj = CIfrGet(Line)
-        self.__SaveOpHdrCond(ctx.GObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
+        self.__SaveOpHdrCond(GObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
         GObj.SetVarInfo(ctx.BaseInfo)
         ctx.Node.Data = GObj
         ctx.Node.Buffer = self.__StructToStream(GObj.GetInfo())
@@ -4654,7 +4667,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 self.__ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED, Line, "Get/Set opcode don't support data array")
 
         TSObj = CIfrSet(Line)
-        self.__SaveOpHdrCond(ctx.TSObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
+        self.__SaveOpHdrCond(TSObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
         TSObj.SetVarInfo(ctx.BaseInfo)
         Node = VfrTreeNode(EFI_IFR_SET_OP, TSObj, self.__StructToStream(TSObj.GetInfo()))
         ctx.Nodes.append(Node)
