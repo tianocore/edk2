@@ -54,12 +54,12 @@ typedef struct {
   UINT64     ResolutionX;
   ///
   /// The resolution of the pointer device on the y-axis in counts/mm.
-  /// If 0, then the pointer device does not support an x-axis.
+  /// If 0, then the pointer device does not support an y-axis.
   ///
   UINT64     ResolutionY;
   ///
   /// The resolution of the pointer device on the z-axis in counts/mm.
-  /// If 0, then the pointer device does not support an x-axis.
+  /// If 0, then the pointer device does not support an z-axis.
   ///
   UINT64     ResolutionZ;
   ///
