@@ -28,6 +28,7 @@ extern UINT8               *mBootPerformanceTable;
 extern UINTN               mBootPerformanceTableLength;
 extern MEASUREMENT_RECORD  *mMeasurementList;
 extern UINTN               mMeasurementNum;
+extern UINT64              mResetEnd;
 
 extern PERF_SUMMARY_DATA  SummaryData;    ///< Create the SummaryData structure and init. to ZERO.
 
