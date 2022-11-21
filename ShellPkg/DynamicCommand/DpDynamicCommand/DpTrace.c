@@ -548,6 +548,15 @@ ProcessPhases (
 
   Total = 0;
 
+  // print Reset End if it's valid
+  //
+  if (SecTime > mResetEnd) {
+    SecTime     = SecTime - mResetEnd;                // Calculate sec time duration start from the beginning of firmware image execution
+    ElapsedTime = DurationInMicroSeconds (mResetEnd); // Calculate elapsed time in microseconds
+    Total      += DivU64x32 (ElapsedTime, 1000);      // Accumulate time in milliseconds
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_RESET_END), mDpHiiHandle, ElapsedTime);
+  }
+
   // print SEC phase duration time
   //
   if (SecTime > 0) {
