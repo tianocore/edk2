@@ -22,6 +22,7 @@ jobs:
       vm_image: 'ubuntu-18.04'
       should_run: true
       run_flags: "MAKE_STARTUP_NSH=TRUE QEMU_HEADLESS=TRUE"
+      unit_test_list: ''
 
     #Use matrix to speed up the build process
     strategy:
@@ -55,6 +56,15 @@ jobs:
             Build.Target: "DEBUG"
             Run.Flags: $(run_flags)
             Run: $(should_run)
+          OVMF_X64_DEBUG_UNIT_TEST:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+            # unit_test_list should be the format: '-u ModulePath1:DscPath1,ModulePath2:DscPath2' or '-u ModulePath1:DscPath1 -u ModulePath2:DscPath2'.(Path is workspace relative)
+            unit_test_list: ''
           OVMF_X64_RELEASE:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "X64"
@@ -187,6 +197,7 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
+        unit_test_list: $(unit_test_list)
         extra_install_step:
         - bash: sudo apt-get install qemu
           displayName: Install qemu
