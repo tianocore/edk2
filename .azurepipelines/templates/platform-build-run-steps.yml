@@ -30,6 +30,9 @@ parameters:
 - name: run_flags
   type: string
   default: ''
+- name: unit_test_list
+  type: string
+  default: ''
 
 - name: extra_install_step
   type: stepList
@@ -49,7 +52,9 @@ steps:
   displayName: 'Install/Upgrade pip modules'
 
 # Set default
-- bash: echo "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
+- bash: |
+    echo "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
+    echo "##vso[task.setvariable variable=pkgs_to_build]${{ 'all' }}"
 
 # Fetch the target branch so that pr_eval can diff them.
 # Seems like azure pipelines/github changed checkout process in nov 2020.
@@ -62,7 +67,7 @@ steps:
   displayName: Check if ${{ parameters.build_pkg }} need testing
   inputs:
     filename: stuart_pr_eval
-    arguments: -c ${{ parameters.build_file }} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} --pr-target origin/$(System.PullRequest.targetBranch) --output-count-format-string "##vso[task.setvariable variable=pkg_count;isOutpout=true]{pkgcount}"
+    arguments: -c ${{ parameters.build_file }} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} --pr-target origin/$(System.PullRequest.targetBranch) --output-count-format-string "##vso[task.setvariable variable=pkg_count;isOutpout=true]{pkgcount}" --output-csv-format-string "##vso[task.setvariable variable=pkgs_to_build]{pkgcsv}" ${{ parameters.unit_test_list}}
   condition: eq(variables['Build.Reason'], 'PullRequest')
 
  # Setup repo
@@ -97,14 +102,22 @@ steps:
   inputs:
     filename: stuart_build
     arguments: -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}}
-  condition: and(gt(variables.pkg_count, 0), succeeded())
+  condition: and(and(gt(variables.pkg_count, 0), succeeded()), eq(variables.unit_test_list, ''))
+
+# Build specific pkg for UnitTest
+- task: CmdLine@1
+  displayName: Build UnitTest
+  inputs:
+    filename: stuart_build
+    arguments: ${{ parameters.unit_test_list}} -p $(pkgs_to_build) -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}}
+  condition: and(and(gt(variables.pkg_count, 0), succeeded()), not(eq(variables.unit_test_list, '')))
 
 # Run
 - task: CmdLine@1
   displayName: Run to shell
   inputs:
     filename: stuart_build
-    arguments: -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}} ${{ parameters.run_flags }} --FlashOnly
+    arguments: -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}} ${{ parameters.run_flags }} --FlashOnly ${{ parameters.unit_test_list}}
   condition: and(and(gt(variables.pkg_count, 0), succeeded()), eq(variables['Run'], true))
   timeoutInMinutes: 1
 
