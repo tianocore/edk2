@@ -126,19 +126,74 @@ typedef union {
     ///
     /// [Bit 0] Secure Encrypted Virtualization (Sev) is enabled
     ///
-    UINT32    SevBit    : 1;
+    UINT32    SevBit              : 1;
 
     ///
     /// [Bit 1] Secure Encrypted Virtualization Encrypted State (SevEs) is enabled
     ///
-    UINT32    SevEsBit  : 1;
+    UINT32    SevEsBit            : 1;
 
     ///
     /// [Bit 2] Secure Nested Paging (SevSnp) is enabled
     ///
-    UINT32    SevSnpBit : 1;
+    UINT32    SevSnpBit           : 1;
 
-    UINT32    Reserved2 : 29;
+    ///
+    /// [Bit 3] The guest was run with the Virtual TOM feature enabled in SEV_FEATURES[1]
+    ///
+    UINT32    vTOM_Enabled        : 1;
+
+    ///
+    /// [Bit 4] The guest was run with the ReflectVC feature enabled in SEV_FEATURES[2]
+    ///
+    UINT32    ReflectVC           : 1;
+
+    ///
+    /// [Bit 5] The guest was run with the Restricted Injection feature enabled in SEV_FEATURES[3]
+    ///
+    UINT32    RestrictedInjection : 1;
+
+    ///
+    /// [Bit 6] The guest was run with the Alternate Injection feature enabled in SEV_FEATURES[4]
+    ///
+    UINT32    AlternateInjection  : 1;
+
+    ///
+    /// [Bit 7] This guest was run with debug register swapping enabled in SEV_FEATURES[5]
+    ///
+    UINT32    DebugSwap           : 1;
+
+    ///
+    /// [Bit 8]  This guest was run with the PreventHostIBS feature enabled in SEV_FEATURES[6]
+    ///
+    UINT32    PreventHostIBS      : 1;
+
+    ///
+    /// [Bit 9] The guest was run with the BTB isolation feature enabled in SEV_FEATURES[7]
+    ///
+    UINT32    SNPBTBIsolation     : 1;
+
+    ///
+    /// [Bit 10]
+    ///
+    UINT32    Reserved0           : 1;
+
+    ///
+    /// [Bit 11] The guest was run with the Secure TSC feature enabled in SEV_FEATURES[9]
+    ///
+    UINT32    SecureTsc           : 1;
+
+    ///
+    /// [Bits 12 13 14 15]
+    ///
+    UINT32    Reserved1           : 4;
+
+    ///
+    /// [Bit 16] The guest was run with the VMSA Register Protection feature enabled in SEV_FEATURES[14]
+    ///
+    UINT32    VmsaRegProt_Enabled : 1;
+
+    UINT32    Reserved2           : 15;
   } Bits;
   ///
   /// All bit fields as a 32-bit value
