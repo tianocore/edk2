@@ -332,4 +332,9 @@ ArmGicV3SetPriorityMask (
   IN UINTN  Priority
   );
 
+VOID
+ArmGicV3SendNsG1Sgi (
+  IN UINT64  SgiVal
+  );
+
 #endif // ARMGIC_H_

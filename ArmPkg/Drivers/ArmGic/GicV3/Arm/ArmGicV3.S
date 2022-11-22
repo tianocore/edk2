@@ -29,6 +29,16 @@ ASM_FUNC(ArmGicV3SetControlSystemRegisterEnable)
         isb
         bx      lr
 
+// VOID
+// ArmGicV3SendNsG1Sgi (
+//  IN UINT64          SgiVal
+//  );
+ASM_FUNC(ArmGicV3SendNsG1Sgi)
+        dsb     ishst
+        mcrr    p15, 0, r0, r1, c12 // ICC_SGI1R_EL1
+        isb
+        bx      lr
+
 //VOID
 //ArmGicV3EnableInterruptInterface (
 //  VOID
