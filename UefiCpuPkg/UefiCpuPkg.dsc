@@ -59,6 +59,7 @@
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  VmgExitLib|UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
   CcExitLib|UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
   MicrocodeLib|UefiCpuPkg/Library/MicrocodeLib/MicrocodeLib.inf
   SmmCpuRendezvousLib|UefiCpuPkg/Library/SmmCpuRendezvousLib/SmmCpuRendezvousLib.inf
@@ -163,6 +164,7 @@
   UefiCpuPkg/Library/SmmCpuFeaturesLib/SmmCpuFeaturesLib.inf
   UefiCpuPkg/Library/SmmCpuFeaturesLib/SmmCpuFeaturesLibStm.inf
   UefiCpuPkg/Library/SmmCpuFeaturesLib/StandaloneMmCpuFeaturesLib.inf
+  UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
   UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
   UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationPei.inf
   UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationSmm.inf
