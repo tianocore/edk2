@@ -103,15 +103,28 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
         return build_these_packages
 
+    def AddCommandLineOptions(self, parserObj):
+        parserObj.add_argument('-u', '--UnitTest', dest='ShellUnitTestList', type=str,
+            help='Optional - Key:Value that contains Shell UnitTest list and corresponding DscPath you want to test.(workspace relative)'
+            'Can list multiple by doing -u <UTPath1:DscPath1>,<UTPath2:DscPath2> or -u <UTPath3:DscPath3> -u <UTPath4:DscPath4>',
+            action="append", default=None)
+
+    def RetrieveCommandLineOptions(self, args):
+        if args.ShellUnitTestList:
+            CommonPlatform.UpdatePackagesSupported(args.ShellUnitTestList)
+
     def GetPlatformDscAndConfig(self) -> tuple:
         ''' If a platform desires to provide its DSC then Policy 4 will evaluate if
         any of the changes will be built in the dsc.
 
         The tuple should be (<workspace relative path to dsc file>, <input dictionary of dsc key value pairs>)
+        This Policy 4 can only be applied when PackagesSupported only contains OvmfPkg Since it doesn't support
+        mutiple packages evaluation.
         '''
-        dsc = CommonPlatform.GetDscName(",".join(self.ActualArchitectures))
-        return (f"OvmfPkg/{dsc}", {})
-
+        if (len(CommonPlatform.PackagesSupported) == 1) and (CommonPlatform.PackagesSupported[0] == 'OvmfPkg'):
+            dsc = CommonPlatform.GetDscName(",".join(self.ActualArchitectures))
+            return (f"OvmfPkg/{dsc}", {})
+        return None
 
     # ####################################################################################### #
     #                         Actual Configuration for Platform Build                         #
@@ -126,6 +139,14 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             help="Optional - CSV of architecture to build.  IA32 will use IA32 for Pei & Dxe. "
             "X64 will use X64 for both PEI and DXE.  IA32,X64 will use IA32 for PEI and "
             "X64 for DXE. default is IA32,X64")
+        parserObj.add_argument('-p', '--pkg', '--pkg-dir', dest='PkgsToBuildForUT', type=str,
+            help='Optional - Package list you want to build for UnitTest.efi. (workspace relative).'
+            'Can list multiple by doing -p <pkg1>,<pkg2> or -p <pkg3> -p <pkg4>.If no valid input -p, build and run all -u UnitTest',
+            action="append", default=None)
+        parserObj.add_argument('-u', '--UnitTest', dest='ShellUnitTestList', type=str,
+            help='Optional - Key:Value that contains Shell UnitTest list and corresponding DscPath you want to test.(workspace relative)'
+            'Can list multiple by doing -u <UTPath1:DscPath1>,<UTPath2:DscPath2> or -u <UTPath3:DscPath3> -u <UTPath4:DscPath4>',
+            action="append", default=None)
 
     def RetrieveCommandLineOptions(self, args):
         '''  Retrieve command line options from the argparser '''
@@ -133,6 +154,10 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         shell_environment.GetBuildVars().SetValue("TARGET_ARCH"," ".join(args.build_arch.upper().split(",")), "From CmdLine")
         dsc = CommonPlatform.GetDscName(args.build_arch)
         shell_environment.GetBuildVars().SetValue("ACTIVE_PLATFORM", f"OvmfPkg/{dsc}", "From CmdLine")
+        self.RunShellUnitTest = False
+        if args.ShellUnitTestList:
+            CommonPlatform.UpdateUnitTestConfig(args)
+            self.RunShellUnitTest = CommonPlatform.RunShellUnitTest
 
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
@@ -176,6 +201,11 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         return 0
 
     def PlatformPostBuild(self):
+        if self.RunShellUnitTest:
+            ret = CommonPlatform.BuildUnitTest(self)
+            if ret !=0:
+                logging.critical("Build UnitTest failed")
+                return ret
         return 0
 
     def FlashRomImage(self):
@@ -210,9 +240,13 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         else:
             args += " -pflash " + os.path.join(OutputPath_FV, "OVMF.fd")    # path to firmware
 
-
         if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
             f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
+            if self.RunShellUnitTest:
+                # When RunShellUnitTest is True, write all efi files name into startup.nsh.
+                CommonPlatform.WriteEfiToStartup(VirtualDrive, f)
+                # Output UnitTest log into ShellUnitTestLog.
+                args += " -serial file:{}".format(CommonPlatform.ShellUnitTestLog)
             f.write("BOOT SUCCESS !!! \n")
             ## add commands here
             f.write("reset -s\n")
@@ -222,6 +256,11 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
         if ret == 0xc0000005:
             #for some reason getting a c0000005 on successful return
-            return 0
-
+            ret = 0
+        if self.RunShellUnitTest and ret == 0:
+            # Check the UnitTest boot log.
+            UnitTestResult = CommonPlatform.CheckUnitTestLog()
+            if (UnitTestResult):
+                logging.info("UnitTest failed with this FAILURE MESSAGE:\n{}".format(UnitTestResult))
+                return UnitTestResult
         return ret
