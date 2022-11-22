@@ -158,6 +158,7 @@
           "ipriority",
           "irouter",
           "isenabler",
+          "ishst",
           "istatus",
           "itargets",
           "lable",
