@@ -186,6 +186,12 @@
 
 [Components.X64]
   UefiCpuPkg/Library/CpuExceptionHandlerLib/UnitTest/DxeCpuExceptionHandlerLibUnitTest.inf
+  UefiCpuPkg/Library/CpuExceptionHandlerLib/UnitTest/ShellCpuExceptionHandlerLibUnitTest.inf {
+    <LibraryClasses>
+      CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
+      HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
+      UnitTestResultReportLib|UnitTestFrameworkPkg/Library/UnitTestResultReportLib/UnitTestResultReportLibConOut.inf
+  }
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
