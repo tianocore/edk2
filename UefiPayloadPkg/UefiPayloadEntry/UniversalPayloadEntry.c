@@ -310,6 +310,7 @@ BuildHobs (
   UNIVERSAL_PAYLOAD_ACPI_TABLE  *AcpiTable;
   ACPI_BOARD_INFO               *AcpiBoardInfo;
   EFI_HOB_HANDOFF_INFO_TABLE    *HobInfo;
+  UINT8                         Idx;
 
   Hob.Raw           = (UINT8 *)BootloaderParameter;
   MinimalNeededSize = FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
@@ -397,11 +398,24 @@ BuildHobs (
   GuidHob = GetFirstGuidHob (&gUniversalPayloadExtraDataGuid);
   ASSERT (GuidHob != NULL);
   ExtraData = (UNIVERSAL_PAYLOAD_EXTRA_DATA *)GET_GUID_HOB_DATA (GuidHob);
-  ASSERT (ExtraData->Count == 1);
+  DEBUG ((DEBUG_INFO, "Multiple Fv Count=%d\n", ExtraData->Count));
   ASSERT (AsciiStrCmp (ExtraData->Entry[0].Identifier, "uefi_fv") == 0);
 
   *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)ExtraData->Entry[0].Base;
   ASSERT ((*DxeFv)->FvLength == ExtraData->Entry[0].Size);
+  //
+  // support multiple FVs provided by UPL
+  //
+  for (Idx = 1; Idx < ExtraData->Count; Idx++) {
+    BuildFvHob (ExtraData->Entry[Idx].Base, ExtraData->Entry[Idx].Size);
+    DEBUG ((
+      DEBUG_INFO,
+      "UPL Multiple fv[%d], Base=0x%x, size=0x%x\n",
+      Idx,
+      ExtraData->Entry[Idx].Base,
+      ExtraData->Entry[Idx].Size
+      ));
+  }
 
   //
   // Create guid hob for acpi board information
