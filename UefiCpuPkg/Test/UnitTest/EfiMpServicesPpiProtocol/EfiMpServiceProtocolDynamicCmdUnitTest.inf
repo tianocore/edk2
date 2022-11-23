@@ -1,0 +1,45 @@
+## @file
+# DXE driver that provides Shell 'MpProtocolUnitTest' dynamic command to test EfiMpServiceProtocol.
+#
+# Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x00010005
+  BASE_NAME       = EfiMpServiceProtocolDynamicCmdUnitTest
+  FILE_GUID       = 8C4624B1-58CC-4DF6-9E6D-09B38D67DFA6
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  ENTRY_POINT     = MpProtocolUnitTestCommandInitialize
+  UNLOAD_IMAGE    = MpProtocolUnitTestUnload
+
+[Sources]
+  EfiMpServicesUnitTestCommom.c
+  EfiMpServicesUnitTestCommom.h
+  EfiMpServiceProtocolUnitTest.c
+  EfiMpServiceProtocolDynamicCmdUnitTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  UnitTestPersistenceLib
+  UnitTestLib
+
+[Protocols]
+  gEfiMpServiceProtocolGuid           ## CONSUMES
+  gEfiShellDynamicCommandProtocolGuid ## PRODUCES
+
+[Depex]
+  TRUE
