@@ -26,6 +26,7 @@ typedef struct {
   UINTN                    NumberOfPages;
   EFI_PHYSICAL_ADDRESS     CryptedAddress;
   EFI_PHYSICAL_ADDRESS     PlainTextAddress;
+  UINT64                   ReservedMemBitmap;
 } MAP_INFO;
 
 //
@@ -69,10 +70,297 @@ typedef struct {
   VOID      *StashBuffer;
 
   //
+  // Bitmap of reserved memory
+  //
+  UINT64    ReservedMemBitmap;
+
+  //
   // Followed by the actual common buffer, starting at the next page.
   //
 } COMMON_BUFFER_HEADER;
 #pragma pack ()
+
+//
+// Bitmap of the allocation of reserved memory.
+//
+STATIC UINT64  mReservedMemBitmap = 0;
+
+#if defined (MDE_CPU_X64)
+
+  #pragma pack (1)
+
+//
+// This data structure defines a memory range in the reserved memory region.
+//
+typedef struct {
+  UINT32                  BitmapMask;
+  UINT32                  Shift;
+  UINT32                  Slots;
+  UINT32                  Size;
+  EFI_PHYSICAL_ADDRESS    StartAddressOfMemRange;
+} RESERVED_MEM_RANGE;
+  #pragma pack ()
+
+#define RESERVED_MEM_BITMAP_4K_MASK     0xf
+#define RESERVED_MEM_BITMAP_32K_MASK    0xf0
+#define RESERVED_MEM_BITMAP_256K_MASK   0x300
+#define RESERVED_MEM_BITMAP_1M_MASK     0x400
+#define RESERVED_MEM_BITMAP_2M_MASK     0x800
+#define RESERVED_MEM_BITMAP_MIXED_MASK  0xf000
+#define RESERVED_MEM_BITMAP_MASK        0xffff
+#define IOMMU_RESERVED_MEM_SIZE         SIZE_4MB
+
+#define RESERVED_MEM_RANGE_4K     0
+#define RESERVED_MEM_RANGE_32K    1
+#define RESERVED_MEM_RANGE_256K   2
+#define RESERVED_MEM_RANGE_1M     3
+#define RESERVED_MEM_RANGE_2M     4
+#define RESERVED_MEM_RANGE_MIXED  5
+
+STATIC RESERVED_MEM_RANGE  mReservedMemRanges[6] = {
+  { RESERVED_MEM_BITMAP_4K_MASK,    0,  4, SIZE_4KB,   0 },
+  { RESERVED_MEM_BITMAP_32K_MASK,   4,  4, SIZE_32KB,  0 },
+  { RESERVED_MEM_BITMAP_256K_MASK,  8,  2, SIZE_256KB, 0 },
+  { RESERVED_MEM_BITMAP_1M_MASK,    10, 1, SIZE_1MB,   0 },
+  { RESERVED_MEM_BITMAP_2M_MASK,    11, 1, SIZE_2MB,   0 },
+  { RESERVED_MEM_BITMAP_MIXED_MASK, 12, 4, SIZE_64KB,  0 }
+};
+
+//
+// Start address of the reserved memory region.
+//
+STATIC EFI_PHYSICAL_ADDRESS  mReservedSharedMem = 0;
+#endif
+
+/**
+ * Pre-allocate a memory region and convert it to be shared. This memory region will be
+ * used in the DMA operation for Tdx guest.
+ *
+ * The pre-alloc shared memory contains pieces of memory regions with different size. The
+ * allocation of the shared memory regions are indicated by a 64-bit bitmap (mReservedMemBitmap).
+ *
+ * The shared memory are consumed by IoMmuAllocateBuffer (in which CommonBuffer is allocated) and
+ * IoMmuMap (in which bounce buffer is allocated). The CommonBuffer contains 2 parts, one page for
+ * for the CommonBufferHeader which is private memory, the others are shared memory. So the
+ * initialization of reserved memory for CommonBuffer is different from BounceBuffer.
+ *
+ * @return EFI_SUCCESS Successfully initialize the reserved memory.
+ */
+STATIC
+EFI_STATUS
+IoMmuInitReservedShareMem (
+  VOID
+  )
+{
+ #if defined (MDE_CPU_X64)
+  EFI_STATUS            Status;
+  UINT32                Index;
+  UINT64                TotalPages;
+  EFI_PHYSICAL_ADDRESS  PhysicalAddress;
+  RESERVED_MEM_RANGE    *MemRange;
+
+  if (!CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    return EFI_SUCCESS;
+  }
+
+  TotalPages = EFI_SIZE_TO_PAGES (IOMMU_RESERVED_MEM_SIZE);
+
+  PhysicalAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateAlignedPages (TotalPages, SIZE_2MB);
+  DEBUG ((DEBUG_INFO, "%a: ReservedMem (%d pages) address = 0x%llx\n", __FUNCTION__, TotalPages, PhysicalAddress));
+
+  mReservedSharedMem = PhysicalAddress;
+  mReservedMemBitmap = 0;
+
+  for (Index = 0; Index < ARRAY_SIZE (mReservedMemRanges); Index++) {
+    mReservedMemRanges[Index].StartAddressOfMemRange = PhysicalAddress;
+    PhysicalAddress                                 += ((UINT64)mReservedMemRanges[Index].Slots * (UINT64)mReservedMemRanges[Index].Size);
+  }
+
+  MemRange = &mReservedMemRanges[RESERVED_MEM_RANGE_MIXED];
+  Status   = MemEncryptTdxSetPageSharedBit (
+               0,
+               mReservedSharedMem,
+               EFI_SIZE_TO_PAGES (MemRange->StartAddressOfMemRange - mReservedSharedMem)
+               );
+  ASSERT (!EFI_ERROR (Status));
+
+  for (Index = 0; Index < MemRange->Slots; Index++) {
+    Status = MemEncryptTdxSetPageSharedBit (
+               0,
+               MemRange->StartAddressOfMemRange + Index * MemRange->Size + SIZE_4KB,
+               EFI_SIZE_TO_PAGES (MemRange->Size) - 1
+               );
+    ASSERT (!EFI_ERROR (Status));
+  }
+
+ #endif
+
+  return EFI_SUCCESS;
+}
+
+/**
+ * Release the pre-alloc shared memory.
+ *
+ * @return EFI_SUCCESS  Successfully release the shared memory
+ */
+STATIC
+EFI_STATUS
+IoMmuReleaseReservedShareMem (
+  VOID
+  )
+{
+ #if defined (MDE_CPU_X64)
+  EFI_STATUS          Status;
+  UINT32              Index;
+  RESERVED_MEM_RANGE  *MemRange;
+
+  if (!CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    return EFI_SUCCESS;
+  }
+
+  if (mReservedSharedMem == 0) {
+    return EFI_SUCCESS;
+  }
+
+  MemRange = &mReservedMemRanges[RESERVED_MEM_RANGE_MIXED];
+  Status   = MemEncryptTdxClearPageSharedBit (
+               0,
+               mReservedSharedMem,
+               EFI_SIZE_TO_PAGES (MemRange->StartAddressOfMemRange - mReservedSharedMem)
+               );
+  ASSERT (!EFI_ERROR (Status));
+
+  for (Index = 0; Index < MemRange->Slots; Index++) {
+    Status = MemEncryptTdxClearPageSharedBit (
+               0,
+               MemRange->StartAddressOfMemRange + Index * MemRange->Size + SIZE_4KB,
+               EFI_SIZE_TO_PAGES (MemRange->Size) - 1
+               );
+    ASSERT (!EFI_ERROR (Status));
+  }
+
+  FreeAlignedPages ((VOID *)(UINTN)mReservedSharedMem, EFI_SIZE_TO_PAGES (IOMMU_RESERVED_MEM_SIZE));
+  mReservedSharedMem = 0;
+  mReservedMemBitmap = 0;
+
+ #endif
+
+  return EFI_SUCCESS;
+}
+
+/**
+ * Allocate reserved shared memory for bounce buffer.
+ *
+ * It is only valid for Tdx guest and only for the memory that is in the range of (0,2M].
+ * If the reserved shared memory is exausted or the memory to be allocated is larger than 2M,
+ * then we have to switch to the legacyAllocateBounceBuffer.
+ *
+ * @param Type        Allocate type
+ * @param MemoryType  The memory type to be allocated
+ * @param MapInfo     Pointer to the MAP_INFO
+ * @return EFI_SUCCESS  Successfully allocate the bounce buffer.
+ */
+STATIC
+EFI_STATUS
+IoMmuAllocateBounceBuffer (
+  IN     EFI_ALLOCATE_TYPE  Type,
+  IN     EFI_MEMORY_TYPE    MemoryType,
+  IN OUT MAP_INFO           *MapInfo
+  )
+{
+ #if defined (MDE_CPU_X64)
+  UINTN               Pages;
+  UINT64              MemBitmap;
+  UINT8               Index;
+  RESERVED_MEM_RANGE  *MemRange;
+
+  Pages = MapInfo->NumberOfPages;
+
+  ASSERT (Pages != 0);
+
+  if (!CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    goto LegacyAllocateBounceBuffer;
+  }
+
+  if (mReservedSharedMem == 0) {
+    goto LegacyAllocateBounceBuffer;
+  }
+
+  if (Pages <= EFI_SIZE_TO_PAGES (SIZE_4KB)) {
+    MemRange = &mReservedMemRanges[RESERVED_MEM_RANGE_4K];
+  } else if ((Pages > EFI_SIZE_TO_PAGES (SIZE_4KB)) && (Pages <= EFI_SIZE_TO_PAGES (SIZE_32KB))) {
+    MemRange = &mReservedMemRanges[RESERVED_MEM_RANGE_32K];
+  } else if ((Pages > EFI_SIZE_TO_PAGES (SIZE_32KB)) && (Pages <= EFI_SIZE_TO_PAGES (SIZE_256KB))) {
+    MemRange = &mReservedMemRanges[RESERVED_MEM_RANGE_256K];
+  } else if ((Pages > EFI_SIZE_TO_PAGES (SIZE_256KB)) && (Pages <= EFI_SIZE_TO_PAGES (SIZE_1MB))) {
+    MemRange = &mReservedMemRanges[RESERVED_MEM_RANGE_1M];
+  } else if ((Pages > EFI_SIZE_TO_PAGES (SIZE_1MB)) && (Pages <= EFI_SIZE_TO_PAGES (SIZE_2MB))) {
+    MemRange = &mReservedMemRanges[RESERVED_MEM_RANGE_2M];
+  } else {
+    goto LegacyAllocateBounceBuffer;
+  }
+
+  if ((mReservedMemBitmap & MemRange->BitmapMask) == MemRange->BitmapMask) {
+    goto LegacyAllocateBounceBuffer;
+  }
+
+  MemBitmap = (mReservedMemBitmap & MemRange->BitmapMask) >> MemRange->Shift;
+
+  for (Index = 0; Index < MemRange->Slots; Index++) {
+    if ((MemBitmap & (UINT8)(1<<Index)) == 0) {
+      break;
+    }
+  }
+
+  ASSERT (Index != MemRange->Slots);
+
+  MapInfo->PlainTextAddress  = MemRange->StartAddressOfMemRange + MemRange->Size * Index;
+  MapInfo->ReservedMemBitmap = (UINT32)(1 << (Index + MemRange->Shift));
+  mReservedMemBitmap        |= MapInfo->ReservedMemBitmap;
+
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: range-size: %lx, start-address=0x%llx, bits=%lx, pages=0x%llx, bits-map: 0x%llx\n",
+    __FUNCTION__,
+    MemRange->Size,
+    MapInfo->PlainTextAddress,
+    MapInfo->ReservedMemBitmap,
+    MapInfo->NumberOfPages,
+    mReservedMemBitmap
+    ));
+
+  return EFI_SUCCESS;
+
+LegacyAllocateBounceBuffer:
+
+ #endif
+
+  MapInfo->ReservedMemBitmap = 0;
+  return gBS->AllocatePages (Type, MemoryType, MapInfo->NumberOfPages, &MapInfo->PlainTextAddress);
+}
+
+/**
+ * Free the bounce buffer allocated in IoMmuMap.
+ *
+ * @param MapInfo       Pointer to the MAP_INFO
+ * @return EFI_SUCCESS  Successfully free the bounce buffer.
+ */
+STATIC
+EFI_STATUS
+IoMmuFreeBounceBuffer (
+  IN OUT     MAP_INFO  *MapInfo
+  )
+{
+  if (MapInfo->ReservedMemBitmap == 0) {
+    gBS->FreePages (MapInfo->PlainTextAddress, MapInfo->NumberOfPages);
+  } else {
+    MapInfo->PlainTextAddress  = 0;
+    mReservedMemBitmap        &= (UINT32)(~MapInfo->ReservedMemBitmap);
+    MapInfo->ReservedMemBitmap = 0;
+  }
+
+  return EFI_SUCCESS;
+}
 
 /**
   Provides the controller-specific addresses required to access system memory
@@ -139,6 +427,8 @@ IoMmuMap (
     return EFI_INVALID_PARAMETER;
   }
 
+  Status = EFI_SUCCESS;
+
   //
   // Allocate a MAP_INFO structure to remember the mapping when Unmap() is
   // called later.
@@ -153,11 +443,12 @@ IoMmuMap (
   // Initialize the MAP_INFO structure, except the PlainTextAddress field
   //
   ZeroMem (&MapInfo->Link, sizeof MapInfo->Link);
-  MapInfo->Signature      = MAP_INFO_SIG;
-  MapInfo->Operation      = Operation;
-  MapInfo->NumberOfBytes  = *NumberOfBytes;
-  MapInfo->NumberOfPages  = EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes);
-  MapInfo->CryptedAddress = (UINTN)HostAddress;
+  MapInfo->Signature         = MAP_INFO_SIG;
+  MapInfo->Operation         = Operation;
+  MapInfo->NumberOfBytes     = *NumberOfBytes;
+  MapInfo->NumberOfPages     = EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes);
+  MapInfo->CryptedAddress    = (UINTN)HostAddress;
+  MapInfo->ReservedMemBitmap = 0;
 
   //
   // In the switch statement below, we point "MapInfo->PlainTextAddress" to the
@@ -185,12 +476,11 @@ IoMmuMap (
       //
       // Allocate the implicit plaintext bounce buffer.
       //
-      Status = gBS->AllocatePages (
-                      AllocateType,
-                      EfiBootServicesData,
-                      MapInfo->NumberOfPages,
-                      &MapInfo->PlainTextAddress
-                      );
+      Status = IoMmuAllocateBounceBuffer (
+                 AllocateType,
+                 EfiBootServicesData,
+                 MapInfo
+                 );
       if (EFI_ERROR (Status)) {
         goto FreeMapInfo;
       }
@@ -241,7 +531,8 @@ IoMmuMap (
       // Point "DecryptionSource" to the stash buffer so that we decrypt
       // it to the original location, after the switch statement.
       //
-      DecryptionSource = CommonBufferHeader->StashBuffer;
+      DecryptionSource           = CommonBufferHeader->StashBuffer;
+      MapInfo->ReservedMemBitmap = CommonBufferHeader->ReservedMemBitmap;
       break;
 
     default:
@@ -264,12 +555,16 @@ IoMmuMap (
   } else if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
     //
     // Set the memory shared bit.
+    // If MapInfo->ReservedMemBitmap is 0, it means the bounce buffer is not allocated
+    // from the pre-allocated shared memory, so it must be converted to shared memory here.
     //
-    Status = MemEncryptTdxSetPageSharedBit (
-               0,
-               MapInfo->PlainTextAddress,
-               MapInfo->NumberOfPages
-               );
+    if (MapInfo->ReservedMemBitmap == 0) {
+      Status = MemEncryptTdxSetPageSharedBit (
+                 0,
+                 MapInfo->PlainTextAddress,
+                 MapInfo->NumberOfPages
+                 );
+    }
   } else {
     ASSERT (FALSE);
   }
@@ -311,12 +606,13 @@ IoMmuMap (
 
   DEBUG ((
     DEBUG_VERBOSE,
-    "%a: Mapping=0x%p Device(PlainText)=0x%Lx Crypted=0x%Lx Pages=0x%Lx\n",
+    "%a: Mapping=0x%p Device(PlainText)=0x%Lx Crypted=0x%Lx Pages=0x%Lx, ReservedMemBitmap=0x%Lx\n",
     __FUNCTION__,
     MapInfo,
     MapInfo->PlainTextAddress,
     MapInfo->CryptedAddress,
-    (UINT64)MapInfo->NumberOfPages
+    (UINT64)MapInfo->NumberOfPages,
+    MapInfo->ReservedMemBitmap
     ));
 
   return EFI_SUCCESS;
@@ -435,11 +731,13 @@ IoMmuUnmapWorker (
     // Restore the memory shared bit mask on the area we used to hold the
     // plaintext.
     //
-    Status = MemEncryptTdxClearPageSharedBit (
-               0,
-               MapInfo->PlainTextAddress,
-               MapInfo->NumberOfPages
-               );
+    if (MapInfo->ReservedMemBitmap == 0) {
+      Status = MemEncryptTdxClearPageSharedBit (
+                 0,
+                 MapInfo->PlainTextAddress,
+                 MapInfo->NumberOfPages
+                 );
+    }
   } else {
     ASSERT (FALSE);
   }
@@ -470,8 +768,9 @@ IoMmuUnmapWorker (
       (VOID *)(UINTN)MapInfo->PlainTextAddress,
       EFI_PAGES_TO_SIZE (MapInfo->NumberOfPages)
       );
+
     if (!MemoryMapLocked) {
-      gBS->FreePages (MapInfo->PlainTextAddress, MapInfo->NumberOfPages);
+      IoMmuFreeBounceBuffer (MapInfo);
     }
   }
 
@@ -514,6 +813,112 @@ IoMmuUnmap (
 }
 
 /**
+ * Allocate CommonBuffer from pre-allocated shared memory.
+ * If the pre-allocated shared memory, it will turn to LegacyAllocateCommonBuffer.
+ *
+ * @param MemoryType          Memory type
+ * @param CommonBufferPages   Pages of CommonBuffer
+ * @param PhysicalAddress     Allocated physical address
+ * @param ReservedMemBitmap   Bitmap which indicates the allocation of reserved memory
+ * @return EFI_SUCCESS  Successfully allocate CommonBuffer
+ */
+STATIC
+EFI_STATUS
+IoMmuAllocateCommonBuffer (
+  IN EFI_MEMORY_TYPE        MemoryType,
+  IN UINTN                  CommonBufferPages,
+  OUT EFI_PHYSICAL_ADDRESS  *PhysicalAddress,
+  OUT UINT64                *ReservedMemBitmap
+  )
+{
+ #if defined (MDE_CPU_X64)
+  UINT32              Index;
+  UINT64              MemBitmap;
+  RESERVED_MEM_RANGE  *MemRange;
+
+  ASSERT (PhysicalAddress != NULL);
+  ASSERT (ReservedMemBitmap != NULL);
+
+  MemRange           = &mReservedMemRanges[RESERVED_MEM_RANGE_MIXED];
+  *ReservedMemBitmap = 0;
+  *PhysicalAddress   = 0;
+
+  if (!CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    goto LegacyAllocateCommonBuffer;
+  }
+
+  if (mReservedSharedMem == 0) {
+    goto LegacyAllocateCommonBuffer;
+  }
+
+  if ((mReservedMemBitmap & MemRange->BitmapMask) == MemRange->BitmapMask) {
+    // no free slots
+    goto LegacyAllocateCommonBuffer;
+  }
+
+  if (CommonBufferPages >= EFI_SIZE_TO_PAGES (MemRange->Size)) {
+    // too big
+    goto LegacyAllocateCommonBuffer;
+  }
+
+  MemBitmap = (mReservedMemBitmap & MemRange->BitmapMask) >> MemRange->Shift;
+  // find the free slot
+  for (Index = 0; Index < MemRange->Slots; Index++) {
+    if ((MemBitmap & (UINT8)(1<<Index)) == 0) {
+      break;
+    }
+  }
+
+  ASSERT (Index != MemRange->Slots);
+
+  // We find the free slot
+  *PhysicalAddress    = MemRange->StartAddressOfMemRange + MemRange->Size * Index;
+  *ReservedMemBitmap  = (UINT64)(1 << (Index + MemRange->Shift));
+  mReservedMemBitmap |= *ReservedMemBitmap;
+
+  return EFI_SUCCESS;
+
+LegacyAllocateCommonBuffer:
+ #endif
+
+  return gBS->AllocatePages (
+                AllocateMaxAddress,
+                MemoryType,
+                CommonBufferPages,
+                PhysicalAddress
+                );
+}
+
+/**
+ * Free CommonBuffer which is allocated by IoMmuAllocateCommonBuffer().
+ *
+ * @param CommonBufferHeader  Pointer to the CommonBufferHeader
+ * @param CommonBufferPages   Pages of CommonBuffer
+ * @return EFI_SUCCESS        Successfully free the CommonBuffer
+ */
+STATIC
+EFI_STATUS
+IoMmuFreeCommonBufer (
+  IN COMMON_BUFFER_HEADER  *CommonBufferHeader,
+  IN UINTN                 CommonBufferPages
+  )
+{
+  if (!CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    goto LegacyFreeCommonBuffer;
+  }
+
+  if (CommonBufferHeader->ReservedMemBitmap == 0) {
+    goto LegacyFreeCommonBuffer;
+  }
+
+  mReservedMemBitmap &= (UINT32)(~CommonBufferHeader->ReservedMemBitmap);
+  return EFI_SUCCESS;
+
+LegacyFreeCommonBuffer:
+  return gBS->FreePages ((UINTN)CommonBufferHeader, CommonBufferPages);
+}
+
+/**
   Allocates pages that are suitable for an OperationBusMasterCommonBuffer or
   OperationBusMasterCommonBuffer64 mapping.
 
@@ -551,6 +956,7 @@ IoMmuAllocateBuffer (
   VOID                  *StashBuffer;
   UINTN                 CommonBufferPages;
   COMMON_BUFFER_HEADER  *CommonBufferHeader;
+  UINT64                ReservedMemBitmap;
 
   DEBUG ((
     DEBUG_VERBOSE,
@@ -560,6 +966,8 @@ IoMmuAllocateBuffer (
     (UINT64)Pages,
     Attributes
     ));
+
+  ReservedMemBitmap = 0;
 
   //
   // Validate Attributes
@@ -620,12 +1028,13 @@ IoMmuAllocateBuffer (
     PhysicalAddress = SIZE_4GB - 1;
   }
 
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  MemoryType,
-                  CommonBufferPages,
-                  &PhysicalAddress
-                  );
+  Status = IoMmuAllocateCommonBuffer (
+             MemoryType,
+             CommonBufferPages,
+             &PhysicalAddress,
+             &ReservedMemBitmap
+             );
+
   if (EFI_ERROR (Status)) {
     goto FreeStashBuffer;
   }
@@ -633,8 +1042,9 @@ IoMmuAllocateBuffer (
   CommonBufferHeader = (VOID *)(UINTN)PhysicalAddress;
   PhysicalAddress   += EFI_PAGE_SIZE;
 
-  CommonBufferHeader->Signature   = COMMON_BUFFER_SIG;
-  CommonBufferHeader->StashBuffer = StashBuffer;
+  CommonBufferHeader->Signature         = COMMON_BUFFER_SIG;
+  CommonBufferHeader->StashBuffer       = StashBuffer;
+  CommonBufferHeader->ReservedMemBitmap = ReservedMemBitmap;
 
   *HostAddress = (VOID *)(UINTN)PhysicalAddress;
 
@@ -645,6 +1055,7 @@ IoMmuAllocateBuffer (
     PhysicalAddress,
     StashBuffer
     ));
+
   return EFI_SUCCESS;
 
 FreeStashBuffer:
@@ -707,7 +1118,7 @@ IoMmuFreeBuffer (
   // Release the common buffer itself. Unmap() has re-encrypted it in-place, so
   // no need to zero it.
   //
-  return gBS->FreePages ((UINTN)CommonBufferHeader, CommonBufferPages);
+  return IoMmuFreeCommonBufer (CommonBufferHeader, CommonBufferPages);
 }
 
 /**
@@ -878,6 +1289,8 @@ IoMmuUnmapAllMappings (
       TRUE      // MemoryMapLocked
       );
   }
+
+  IoMmuReleaseReservedShareMem ();
 }
 
 /**
@@ -935,6 +1348,9 @@ InstallIoMmuProtocol (
   if (EFI_ERROR (Status)) {
     goto CloseExitBootEvent;
   }
+
+  Status = IoMmuInitReservedShareMem ();
+  ASSERT (!EFI_ERROR (Status));
 
   return EFI_SUCCESS;
 
