@@ -64,6 +64,18 @@ RngDriverEntry (
   EFI_HANDLE  Handle;
 
   //
+  // Get the list of available algorithm.
+  //
+  Status = GetAvailableAlgorithms ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (mAvailableAlgoArrayCount == 0) {
+    return EFI_REQUEST_UNLOAD_IMAGE;
+  }
+
+  //
   // Install UEFI RNG (Random Number Generator) Protocol
   //
   Handle = NULL;
@@ -74,13 +86,10 @@ RngDriverEntry (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    FreeAvailableAlgorithms ();
   }
 
-  //
-  // Get the list of available algorithm.
-  //
-  return GetAvailableAlgorithms ();
+  return Status;
 }
 
 /**
