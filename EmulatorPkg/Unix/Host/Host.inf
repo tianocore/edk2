@@ -2,7 +2,7 @@
 # Entry Point of Emu Emulator
 #
 # Main executable file of Unix Emulator that loads PEI core after initialization finished.
-# Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2022, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -106,6 +106,7 @@
   gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwSpareBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
   gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage
+  gEmulatorPkgTokenSpaceGuid.PcdPersistentMemorySize
 
 [FeaturePcd]
   gEmulatorPkgTokenSpaceGuid.PcdEmulatorLazyLoadSymbols

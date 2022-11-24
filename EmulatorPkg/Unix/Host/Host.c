@@ -1,6 +1,6 @@
 /*++ @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -102,6 +102,7 @@ main (
   CHAR16                *FirmwareVolumesStr;
   UINTN                 *StackPointer;
   FILE                  *GdbTempFile;
+  EMU_THUNK_PPI         *SecEmuThunkPpi;
 
   //
   // Xcode does not support sourcing gdb scripts directly, so the Xcode XML
@@ -137,7 +138,15 @@ main (
   //
   // PPIs pased into PEI_CORE
   //
-  AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gEmuThunkPpiGuid, &mSecEmuThunkPpi);
+  SecEmuThunkPpi = AllocateZeroPool (sizeof (EMU_THUNK_PPI) + FixedPcdGet32 (PcdPersistentMemorySize));
+  if (SecEmuThunkPpi == NULL) {
+    printf ("ERROR : Can not allocate memory for SecEmuThunkPpi.  Exiting.\n");
+    exit (1);
+  }
+
+  CopyMem (SecEmuThunkPpi, &mSecEmuThunkPpi, sizeof (EMU_THUNK_PPI));
+  SecEmuThunkPpi->PersistentMemorySize = FixedPcdGet32 (PcdPersistentMemorySize);
+  AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gEmuThunkPpiGuid, SecEmuThunkPpi);
 
   SecInitThunkProtocol ();
 
