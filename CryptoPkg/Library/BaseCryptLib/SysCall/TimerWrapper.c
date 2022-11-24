@@ -117,12 +117,12 @@ gmtime (
   )
 {
   struct tm  *GmTime;
-  UINT16     DayNo;
-  UINT32     DayRemainder;
+  UINT64     DayNo;
+  UINT64     DayRemainder;
   time_t     Year;
   time_t     YearNo;
-  UINT16     TotalDays;
-  UINT16     MonthNo;
+  UINT32     TotalDays;
+  UINT32     MonthNo;
 
   if (timer == NULL) {
     return NULL;
@@ -135,8 +135,8 @@ gmtime (
 
   ZeroMem ((VOID *)GmTime, (UINTN)sizeof (struct tm));
 
-  DayNo        = (UINT16)(*timer / SECSPERDAY);
-  DayRemainder = (UINT32)(*timer % SECSPERDAY);
+  DayNo        = (UINT64)(*timer / SECSPERDAY);
+  DayRemainder = (UINT64)(*timer % SECSPERDAY);
 
   GmTime->tm_sec  = (int)(DayRemainder % SECSPERMIN);
   GmTime->tm_min  = (int)((DayRemainder % SECSPERHOUR) / SECSPERMIN);
@@ -144,9 +144,9 @@ gmtime (
   GmTime->tm_wday = (int)((DayNo + 4) % 7);
 
   for (Year = 1970, YearNo = 0; DayNo > 0; Year++) {
-    TotalDays = (UINT16)(IsLeap (Year) ? 366 : 365);
+    TotalDays = (UINT32)(IsLeap (Year) ? 366 : 365);
     if (DayNo >= TotalDays) {
-      DayNo = (UINT16)(DayNo - TotalDays);
+      DayNo = (UINT32)(DayNo - TotalDays);
       YearNo++;
     } else {
       break;
@@ -158,7 +158,7 @@ gmtime (
 
   for (MonthNo = 12; MonthNo > 1; MonthNo--) {
     if (DayNo >= CumulativeDays[IsLeap (Year)][MonthNo]) {
-      DayNo = (UINT16)(DayNo - (UINT16)(CumulativeDays[IsLeap (Year)][MonthNo]));
+      DayNo = (UINT64)(DayNo - (UINT32)(CumulativeDays[IsLeap (Year)][MonthNo]));
       break;
     }
   }
