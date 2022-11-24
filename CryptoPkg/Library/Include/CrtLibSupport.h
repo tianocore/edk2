@@ -109,7 +109,7 @@ typedef UINTN   off_t;
 typedef UINTN   u_int;
 typedef INTN    ptrdiff_t;
 typedef INTN    ssize_t;
-typedef INT32   time_t;
+typedef INT64   time_t;
 typedef UINT8   __uint8_t;
 typedef UINT8   sa_family_t;
 typedef UINT8   u_char;
