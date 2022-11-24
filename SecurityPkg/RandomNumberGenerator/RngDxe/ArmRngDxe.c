@@ -40,6 +40,7 @@ FreeAvailableAlgorithms (
   VOID
   )
 {
+  mAvailableAlgoArrayCount = 0;
   FreePool (mAvailableAlgoArray);
   return;
 }
