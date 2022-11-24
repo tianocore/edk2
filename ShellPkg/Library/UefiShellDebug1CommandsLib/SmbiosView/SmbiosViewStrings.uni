@@ -506,4 +506,7 @@
 #string STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CONFIG_PLAT_SW      #language en-US "Family configurable via platform software support\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CONFIG_OEM          #language en-US "Family configurable via OEM proprietary mechanism\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_BITS_06_63                     #language en-US "Bits 6:63 are reserved\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_IPMI_SPECIFICATION_REVISION    #language en-US "IPMISpecificationRevision: %d.%d\n"
+#string STR_SMBIOSVIEW_PRINTINFO_NV_STORAGE_DEVICE_NOT_PRESENT  #language en-US "NVStorageDevice: Not Present\n"
+#string STR_SMBIOSVIEW_PRINTINFO_BASE_ADDRESS                   #language en-US "BaseAddress: 0x%x\n"
 
