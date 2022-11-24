@@ -30,6 +30,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def __init__(self, Root=None):
         self.__OverrideClassGuid = None
         self.__ParserStatus = 0
+        self.__FormsetGuid = None
+        self.__LastFormNode = None
         self.__CIfrOpHdrIndex = -1
         self.__ConstantOnlyInExpression = False
         self.__UsedDefaultArray = []
@@ -46,10 +48,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.__IsStringOp = False
         self.__IsOrderedList = False
         self.__IsCheckBoxOp = False
-        self.__Root = Root
 
-        self.__DefaultIndex = None
-        self.__DefaultMFIndex = None
+        self.__Root = Root
+        self.NeedAdjustOpcode = False
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrProgram.
     def visitVfrProgram(self, ctx:VfrSyntaxParser.VfrProgramContext):
@@ -296,11 +297,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         DsNode, DsNodeMF = self.__DeclareStandardDefaultStorage(ctx.start.line)
         ctx.Node.insertChild(DsNode)
-        self.__DefaultIndex = len(ctx.Node.Child)
         ctx.Node.insertChild(DsNodeMF)
-        self.__DefaultMFIndex = len(ctx.Node.Child)
-
-
 
         self.visitChildren(ctx)
 
@@ -313,7 +310,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         DefaultClassGuid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID
 
         if (self.__OverrideClassGuid != None and ClassGuidNum >= 4):
-            self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, None, 'Already has 4 class guids, can not add extra class guid!')
+            self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.start.line, None, 'Already has 4 class guids, can not add extra class guid!')
 
         if ClassGuidNum == 0:
             if self.__OverrideClassGuid != None:
@@ -371,9 +368,26 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         for i in range(0, len(GuidList)):
             ctx.Node.Buffer += self.__StructToStream(GuidList[i])
 
+        # Declare undefined Question so that they can be used in expression.
+        InsertOpCodeList = None
+        if gCFormPkg.HavePendingUnassigned():
+            print("Pending")
+            InsertOpCodeList, ReturnCode = gCFormPkg.DeclarePendingQuestion(
+                gCVfrVarDataTypeDB, gCVfrDataStorage, self.__CVfrQuestionDB,
+                ctx.stop.line)
+            Status = 0 if ReturnCode == VfrReturnCode.VFR_RETURN_SUCCESS else 1
+            self.__ParserStatus += Status ###
+            self.NeedAdjustOpcode = True
+
         self.__InsertEndNode(ctx.Node, ctx.stop.line)
 
-        # Declare undefined Question so that they can be used in expression.
+        if self.NeedAdjustOpcode:
+            self.__LastFormNode.Child.pop() #####
+            for InsertOpCode in InsertOpCodeList:
+                InsertNode = VfrTreeNode(InsertOpCode.OpCode, InsertOpCode.Data, self.__StructToStream(InsertOpCode.Data.GetInfo()))
+                self.__LastFormNode.insertChild(InsertNode)
+
+            #gCFormPkg.AdjustDynamicInsertOpcode(self.__LastFormNode, InsertOpCode, False)
 
         return ctx.Node
 
@@ -521,10 +535,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementVarStoreLinear.
     def visitVfrStatementVarStoreLinear(self, ctx:VfrSyntaxParser.VfrStatementVarStoreLinearContext):
-        VSObj = CIfrVarStore()
+
         self.visitChildren(ctx)
-        Line = ctx.start.line
-        VSObj.SetLineNo(Line)
 
         TypeName = str(ctx.getChild(1))
         if TypeName == 'CHAR16':
@@ -539,6 +551,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             VarStoreId = self.__TransNum(ctx.ID.text)
             self.__CompareErrorHandler(VarStoreId!=0, True, ctx.ID.line, ctx.ID.text, 'varid 0 is not allowed.')
         StoreName = ctx.SN.text
+        VSObj = CIfrVarStore(StoreName)
+        Line = ctx.start.line
+        VSObj.SetLineNo(Line)
         Guid = ctx.guidDefinition().Guid
         self.__ErrorHandler(gCVfrDataStorage.DeclareBufferVarStore(StoreName, Guid, gCVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore), Line)
         VSObj.SetGuid(Guid)
@@ -548,7 +563,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
         self.__ErrorHandler(ReturnCode, Line)
         VSObj.SetSize(Size)
-        VSObj.SetName(StoreName)
 
         ctx.Node.Data = VSObj
         ctx.Node.Buffer = self.__StructToStream(VSObj.GetInfo())
@@ -559,10 +573,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementVarStoreEfi.
     def visitVfrStatementVarStoreEfi(self, ctx:VfrSyntaxParser.VfrStatementVarStoreEfiContext):
 
-        VSEObj = CIfrVarStoreEfi()
         self.visitChildren(ctx)
         Line = ctx.start.line
-        VSEObj.SetLineNo(Line)
 
         Guid = ctx.guidDefinition().Guid
 
@@ -621,10 +633,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             Size, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
             self.__ErrorHandler(ReturnCode, ctx.N.line)
 
+        VSEObj = CIfrVarStoreEfi(StoreName)
+        VSEObj.SetLineNo(Line)
         VSEObj.SetGuid(Guid)
         VSEObj.SetVarStoreId (VarStoreId)
         VSEObj.SetSize(Size)
-        VSEObj.SetName(StoreName)
 
         ctx.Node.Data = VSEObj
         ctx.Node.Buffer = self.__StructToStream(VSEObj.GetInfo())
@@ -790,26 +803,26 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if ctx.QType == EFI_QUESION_TYPE.QUESTION_NORMAL:
             if self.__IsCheckBoxOp:
                 ctx.BaseInfo.VarType = EFI_IFR_TYPE_BOOLEAN
-            QId, ReturnCode = self.__CVfrQuestionDB.RegisterQuestion(QName, VarIdStr, QId)
+            QId, ReturnCode = self.__CVfrQuestionDB.RegisterQuestion(QName, VarIdStr, QId, gCFormPkg)
             self.__ErrorHandler(ReturnCode, ctx.start.line)
 
         elif ctx.QType == EFI_QUESION_TYPE.QUESTION_DATE:
             ctx.BaseInfo.VarType = EFI_IFR_TYPE_DATE
-            QId, ReturnCode = self.__CVfrQuestionDB.RegisterNewDateQuestion(QName, VarIdStr, QId)
+            QId, ReturnCode = self.__CVfrQuestionDB.RegisterNewDateQuestion(QName, VarIdStr, QId, gCFormPkg)
             self.__ErrorHandler(ReturnCode, ctx.start.line)
 
         elif ctx.QType == EFI_QUESION_TYPE.QUESTION_TIME:
             ctx.BaseInfo.VarType = EFI_IFR_TYPE_TIME
-            QId, ReturnCode = self.__CVfrQuestionDB.RegisterNewTimeQuestion(QName, VarIdStr, QId)
+            QId, ReturnCode = self.__CVfrQuestionDB.RegisterNewTimeQuestion(QName, VarIdStr, QId, gCFormPkg)
             self.__ErrorHandler(ReturnCode, ctx.start.line)
 
         elif ctx.QType == EFI_QUESION_TYPE.QUESTION_REF:
             ctx.BaseInfo.VarType = EFI_IFR_TYPE_REF
             if VarIdStr != '': #stand for question with storage.
-                QId, ReturnCode = self.__CVfrQuestionDB.RegisterRefQuestion(QName, VarIdStr, QId)
+                QId, ReturnCode = self.__CVfrQuestionDB.RegisterRefQuestion(QName, VarIdStr, QId, gCFormPkg)
                 self.__ErrorHandler(ReturnCode, ctx.start.line)
             else:
-                QId, ReturnCode = self.__CVfrQuestionDB.RegisterQuestion(QName, None, QId)
+                QId, ReturnCode = self.__CVfrQuestionDB.RegisterQuestion(QName, None, QId, gCFormPkg)
                 self.__ErrorHandler(ReturnCode, ctx.start.line)
         else:
             self.__ErrorHandler(VfrReturnCode.VFR_RETURN_FATAL_ERROR, ctx.start.line)
@@ -1118,6 +1131,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         ctx.Node.Buffer = self.__StructToStream(FObj.GetInfo())
 
         self.__InsertEndNode(ctx.Node, ctx.stop.line)
+        self.__LastFormNode = ctx.Node
 
         return ctx.Node
 
@@ -1308,7 +1322,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 gCVfrErrorHandle.HandleWarning(EFI_VFR_WARNING_CODE.VFR_WARNING_ACTION_WITH_TEXT_TWO, ctx.S3.line, ctx.S3.text)
 
             AObj = CIfrAction()
-            QId, _ = self.__CVfrQuestionDB.RegisterQuestion(None, None, QId)
+            QId, _ = self.__CVfrQuestionDB.RegisterQuestion(None, None, QId, gCFormPkg)
             AObj.SetLineNo(ctx.F.line)
             AObj.SetQuestionId(QId)
             AObj.SetHelp(Help)
@@ -1821,7 +1835,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if (IsExp == False) and (VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_BUFFER):
                 self.__ErrorHandler(gCVfrDefaultStore.BufferVarStoreAltConfigAdd(DefaultId, self.__CurrQestVarInfo, VarStoreName, VarGuid, self.__CurrQestVarInfo.VarType, Value), Line)
         ctx.Node.Data = DObj
-        #ctx.Node.Buffer = self.__StructToStream(DObj.GetInfo())
+        ctx.Node.Buffer = self.__StructToStream(DObj.GetInfo())
         return ctx.Node
 
 
@@ -2414,7 +2428,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                     if IntDecStyle:
                         if MaxNegative:
                             if Max > 0x80:
-                               self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT8 type minimum can\'t small than -0x80, big than 0x7F')
+                                self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT8 type minimum can\'t small than -0x80, big than 0x7F')
                         else:
                             if Max > 0x7F:
                                 self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT8 type minimum can\'t small than -0x80, big than 0x7F')
@@ -2960,7 +2974,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if ctx.FLAGS() != None:
                 self.__ErrorHandler(DObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, ctx.vfrDateFlags().LFlags), ctx.F2.line)
 
-            QId, _ = self.__CVfrQuestionDB.RegisterOldDateQuestion(Year, Month, Day, EFI_QUESTION_ID_INVALID)
+            QId, _ = self.__CVfrQuestionDB.RegisterOldDateQuestion(Year, Month, Day, EFI_QUESTION_ID_INVALID, gCFormPkg)
             DObj.SetQuestionId(QId)
             DObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, QF_DATE_STORAGE_TIME)
             DObj.SetPrompt(self.__TransNum(ctx.Number(0)))
@@ -3068,7 +3082,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if ctx.FLAGS() != None:
                 self.__ErrorHandler(TObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, ctx.vfrTimeFlags().LFlags), ctx.F2.line)
 
-            QId, _ = self.__CVfrQuestionDB.RegisterOldTimeQuestion(Hour, Minute, Second, EFI_QUESTION_ID_INVALID)
+            QId, _ = self.__CVfrQuestionDB.RegisterOldTimeQuestion(Hour, Minute, Second, EFI_QUESTION_ID_INVALID, gCFormPkg)
             TObj.SetQuestionId(QId)
             TObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, QF_TIME_STORAGE_TIME)
             TObj.SetPrompt(self.__TransNum(ctx.Number(0)))
@@ -4205,7 +4219,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if QId == EFI_QUESTION_ID_INVALID:
                 EILObj.SetQuestionId(QId, VarIdStr, LineNo)
 
-            # ctx.Node = VfrTreeNode(EFI_IFR_EQ_ID_VAL_OP, EILObj, self.__StructToStream(EILObj.GetInfo()))
+            ctx.Node = VfrTreeNode(EFI_IFR_EQ_ID_VAL_OP, EILObj, self.__StructToStream(EILObj.GetInfo()))
             ctx.ExpInfo.ExpOpCount += 1
         return ctx.Node
 
@@ -4273,6 +4287,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         QR1Obj = CIfrQuestionRef1(Line)
         self.__SaveOpHdrCond(QR1Obj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
+        print('QNAME')
+        print(QName)
         QR1Obj.SetQuestionId(QId, QName, Line)
         ctx.Node.Data = QR1Obj
         ctx.Node.Buffer = self.__StructToStream(QR1Obj.GetInfo())
@@ -4818,7 +4834,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             return
         if OpObj.GetFlags() & EFI_IFR_FLAG_CALLBACK:
             # if the question is not CALLBACK ignore the key.
-            self.__CVfrQuestionDB.UpdateQuestionId(OpObj.GetQuestionId(), Key)
+            self.__CVfrQuestionDB.UpdateQuestionId(OpObj.GetQuestionId(), Key, gCFormPkg)
             OpObj.SetQuestionId(Key)
         return
 
@@ -4862,9 +4878,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Length = sizeof(s)
         P = cast(pointer(s), POINTER(c_char * Length))
         return P.contents.raw
-
-    def GetRoot(self):
-        return self.__Root
 
     def GetQuestionDB(self):
         return self.__CVfrQuestionDB

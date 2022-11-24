@@ -5,10 +5,12 @@ from antlr4 import*
 #　conditional Info
 # Structure Info
 
-class VfrTreeNode():
-    def __init__(self, Opcode=None, Data=None, Buffer=None) -> None:
 
-        self.OpCode = Opcode
+class VfrTreeNode():
+
+    def __init__(self, OpCode=None, Data=None, Buffer=None) -> None:
+
+        self.OpCode = OpCode
         self.Data = Data
         self.Buffer = Buffer
         self.Condition = None
@@ -16,13 +18,11 @@ class VfrTreeNode():
         self.Parent = None
         self.Child = []
 
-
-    def hasCondition(self) ->bool:
+    def hasCondition(self) -> bool:
         if self.Condition == None:
             return False
         else:
             return True
-
 
     def hasChild(self) -> bool:
         if self.Child == []:
@@ -37,8 +37,7 @@ class VfrTreeNode():
                 return True
         return False
 
-
-    def insertChild(self, NewNode, pos: int=None) -> None:
+    def insertChild(self, NewNode, pos: int = None) -> None:
         if NewNode != None:
             if not pos:
                 self.Child.append(NewNode)
@@ -55,7 +54,6 @@ class VfrTreeNode():
             parentTree.Child.insert(new_index, newNode)
         self.NextRel = newNode
         newNode.LastRel = self
-
 
     def deleteNode(self, deletekey: str) -> None:
         FindStatus, DeleteTree = self.FindNode(deletekey)
@@ -79,9 +77,9 @@ class VfrTreeNode():
             return None
 
 class VfrTree():
-    def __init__(self, Root) -> None:
+    def __init__(self, Root: VfrTreeNode) -> None:
         self.__Root = Root
-       # self.__
+    # self.__
 
     def GenBinary(self, FileName):
         try:
@@ -115,8 +113,8 @@ class VfrTree():
                     Hex += ' '+ hex(B)
                 f.write('{}\n'.format(Hex))
 
-           # else:
-                #f.write(Buffer)
+        # else:
+        #f.write(Buffer)
 
         if Root.Child != []:
             for ChildNode in Root.Child:
@@ -130,8 +128,8 @@ class VfrTree():
                 if Root.OpCode == EFI_IFR_DEFAULTSTORE_OP:
                     Root.Buffer = self.__StructToStream(Root.Data.GetInfo()) # need to update Buffer
                 f.write(Root.Buffer)
-           # else:
-                #f.write(Buffer)
+        # else:
+        #f.write(Buffer)
 
         if Root.Child != []:
             for ChildNode in Root.Child:

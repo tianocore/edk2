@@ -12,7 +12,6 @@ gCVfrVarDataTypeDB = CVfrVarDataTypeDB()
 gCVfrDefaultStore = CVfrDefaultStore()
 gCVfrDataStorage = CVfrDataStorage()
 
-
 class OpNode():
 
     def __init__(self, Size, Scope):
@@ -150,26 +149,47 @@ class OpBufferNode():
         self.Buffer = Buffer
         self.Next = Next
 
-
 class PACKAGE_DATA():
 
     def __init__(self, Bu) -> None:
         #self.Buffer = Buffer
         pass
 
+class ASSIGN_FLAG(Enum) :
+    PENDING = 1
+    ASSIGNED = 2
+
+class SPendingAssign():
+
+    def __init__(self, Key, ValAddr, LineNo, Msg, Type=0):
+        self.Key = Key
+        self.Addr = ValAddr
+        self.Flag = ASSIGN_FLAG.PENDING
+        self.LineNo = LineNo
+        self.Msg = Msg
+        self.Type = Type
+        self.Next = None
+
+    def AssignValue(self, Val):
+        if self.Type == 1:
+            self.Addr.QuestionId1 = Val
+        elif self.Type == 2:
+            self.Addr.QuestionId2 = Val
+        else:
+            self.Addr.QuestionId = Val
+
+        self.Flag = ASSIGN_FLAG.ASSIGNED
+
+class InsertOpNode():
+    def __init__(self, Data, OpCode):
+        self.Data = Data
+        self.OpCode = OpCode
 
 class CFormPkg():
 
     def __init__(self):
-
-        self.__BufferNodeQueueHead = None
-        self.__BufferNodeQueueTail = None
-        self.__CurrBufferNode = None
-        self.__ReadBufferNode = None
-        self.__ReadBufferOffset = 0
         self.__PkgLength = 0
         self.__PendingAssignList = None
-        self.__BufferSize = 0
 
     def BuildPkg(self):
         pass
@@ -177,51 +197,157 @@ class CFormPkg():
     def GetPkgLength(self):
         return self.__PkgLength
 
-    def __createNewNode(self):
-        Node = OpBufferNode()
-        return Node
+    def AssignPending(self, Key, VarAddr, LineNo, Msg, Type=0):
+        print('KEY')
+        print(Key)
+        pNew = SPendingAssign(Key, VarAddr, LineNo, Msg, Type)
+        if pNew == None:
+            return VfrReturnCode.VFR_RETURN_OUT_FOR_RESOURCES
+        pNew.Next = self.__PendingAssignList
+        self.__PendingAssignList = pNew
+        return VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def __GetNodeBefore(self, CurrentNode):
-        FirstNode = self.__BufferNodeQueueHead
-        LastNode = self.__BufferNodeQueueHead
-        while FirstNode != None:
-            if FirstNode == CurrentNode:
-                break
+    def DoPendingAssign(self, Key, Val):
+        if Key == None or Val == None:
+            return
+        pNode = self.__PendingAssignList
+        while pNode != None:
+            if pNode.Key == Key:
+                pNode.AssignValue(Val)
+            pNode = pNode.Next
 
-            LastNode = FirstNode
-            FirstNode = FirstNode.Next
+    def HavePendingUnassigned(self):
+        pNode = self.__PendingAssignList
+        while pNode != None:
+            if pNode.Flag == ASSIGN_FLAG.PENDING:
+                return True
+            pNode = pNode.Next
 
-        if FirstNode == None:
-            LastNode = None
+        return False
 
-        return LastNode
+    def PendingAssignPrintAll(self):
+        pNode = self.__PendingAssignList
+        while pNode != None:
+            if pNode.Flag == ASSIGN_FLAG.PENDING:
+                gCVfrErrorHandle.PrintMsg(pNode.LineNo, 'Error', pNode.Msg, pNode.Key)
+            pNode = pNode.Next
 
-    def __InsertNodeBefore(self, CurrentNode, NewNode):
-        LastNode = self.__GetNodeBefore(CurrentNode)
-        if LastNode == None:
-            return VfrReturnCode.VFR_RETURN_MISMATCHED
+    def DeclarePendingQuestion(self, lCVfrVarDataTypeDB: CVfrVarDataTypeDB, lCVfrDataStorage: CVfrDataStorage, lCVfrQuestionDB: CVfrQuestionDB, LineNo):
+        # Declare all questions as Numeric in DisableIf True
+        ReturnList  = []
+        GuidObj = None
+        DIObj = CIfrDisableIf()
+        DIObj.SetLineNo(LineNo)
+        ReturnList.append(InsertOpNode(DIObj, EFI_IFR_DISABLE_IF_OP))
+        # TrueOpcode
+        TObj = CIfrTrue(LineNo)
+        ReturnList.append(InsertOpNode(TObj, EFI_IFR_TRUE_OP))
+        pNode = self.__PendingAssignList
+        while pNode != None:
+            if pNode.Flag == ASSIGN_FLAG.PENDING:
+                Info = EFI_VARSTORE_INFO()
+                VarStr = pNode.Key
+                QId, ReturnCode = lCVfrQuestionDB.RegisterQuestion(None, VarStr, EFI_QUESTION_ID_INVALID, gCFormPkg)
+                if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
+                    gCVfrErrorHandle.HandleError(ReturnCode, pNode.LineNo, pNode.Key)
+                    return [], ReturnCode
+                #ifdef VFREXP_DEBUG
+                #printf("Undefined Question name is %s and Id is 0x%x\n", VarStr, QId);
+                #endif
+                # Get Question Info, framework vfr VarName == StructName
+                ArrayIdx, s, FName, ReturnCode = lCVfrVarDataTypeDB.ExtractFieldNameAndArrary(VarStr, 0)
+                if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
+                    gCVfrErrorHandle.PrintMsg(pNode.LineNo, 'Error', 'Var string is not the valid C variable', pNode.Key)
+                    return [], ReturnCode
 
-        NewNode.Next = LastNode.Next
-        LastNode.Next = NewNode
+                # Get VarStoreType
+                Info.VarStoreId, ReturnCode = lCVfrDataStorage.GetVarStoreId(FName)
+                print(ReturnCode)
+                print(Info.VarStoreId)
 
-    def IfrBinBufferGet(self, Len):
-        if Len == 0 or Len > self.__BufferSize:
-            return None
-        if len(self.__CurrBufferNode.Buffer) + Len > self.__BufferSize:
-            Node = self.__createNewNode()
-            if Node == None:
-                return None
+                if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
+                    gCVfrErrorHandle.PrintMsg (pNode.LineNo, "Error", "Var Store Type is not defined", FName)
+                    return [], ReturnCode
 
-            if self.__BufferNodeQueueTail == None:
-                self.__BufferNodeQueueHead = self.__BufferNodeQueueTail = Node
-            else:
-                self.__BufferNodeQueueTail.Next = Node
-                mBufferNodeQueueTail = Node
-            self.__CurrBufferNode = Node
+                VarStoreType = lCVfrDataStorage.GetVarStoreType(Info.VarStoreId)
+                if s == len(VarStr) and ArrayIdx != INVALID_ARRAY_INDEX:
+                    ReturnCode = lCVfrDataStorage.GetNameVarStoreInfo(Info, ArrayIdx)
+                else:
+                    if VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_EFI:
+                        ReturnCode = lCVfrDataStorage.GetEfiVarStoreInfo(Info)
+                    elif VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_BUFFER or VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_BUFFER_BITS:
+                        VarStr = pNode.Key
+                        SName, ReturnCode = lCVfrDataStorage.GetBufferVarStoreDataTypeName(Info.VarStoreId)
+                        if ReturnCode == VfrReturnCode.VFR_RETURN_SUCCESS:
+                            NewStr = SName + VarStr[s:]
+                            Info.Info.VarOffset, Info.VarType, Info.VarTotalSize, Info.IsBitVar, ReturnCode = lCVfrVarDataTypeDB.GetDataFieldInfo(NewStr)
+                    else:
+                        ReturnCode = VfrReturnCode.VFR_RETURN_UNSUPPORTED
 
-        self.__PkgLength += Len
+                if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
+                    gCVfrErrorHandle.HandleError(ReturnCode, pNode.LineNo, pNode.Key)
+                    return [], ReturnCode
+                # If the storage is bit fields, create Guid opcode to wrap the numeric opcode.
+                if Info.IsBitVar:
+                    GuidObj = CIfrGuid(0)
+                    GuidObj.SetGuid(EDKII_IFR_BIT_VARSTORE_GUID)
+                    GuidObj.SetLineNo(LineNo)
+                    ReturnList.append(InsertOpNode(GuidObj, EFI_IFR_GUID_OP))
 
-        return self.__CurrBufferNode.Buffer
+                CNObj = CIfrNumeric()
+                CNObj.SetLineNo(LineNo)
+                CNObj.SetPrompt(0x0)
+                CNObj.SetHelp(0x0)
+                CNObj.SetQuestionId(QId)
+                CNObj.SetVarStoreInfo(Info)
+                ReturnList.append(InsertOpNode(CNObj, EFI_IFR_GUID_OP))
+
+                if Info.IsBitVar:
+                    MaxValue = 1 << Info.VarTotalSize - 1
+                    CNObj.SetMinMaxStepData(0, MaxValue, 0, EFI_IFR_TYPE_NUM_SIZE_32)
+                    ShrinkSize = 12
+                    LFlags = (EDKII_IFR_NUMERIC_SIZE_BIT & Info.VarTotalSize)
+                    CNObj.SetFlagsForBitField(0, LFlags)
+                else:
+                    # Numeric doesn't support BOOLEAN data type.
+                    # BOOLEAN type has the same data size to UINT8.
+                    if Info.VarType == EFI_IFR_TYPE_BOOLEAN:
+                        Info.VarType = EFI_IFR_TYPE_NUM_SIZE_8
+                    CNObj.SetFlags(0, Info.VarType)
+                    CNObj.SetMinMaxStepData(0, -1, 0, Info.VarType)
+
+                    if Info.VarType == EFI_IFR_TYPE_NUM_SIZE_64:
+                        ShrinkSize = 0
+                    elif Info.VarType == EFI_IFR_TYPE_NUM_SIZE_32:
+                        ShrinkSize = 12
+                    elif Info.VarType == EFI_IFR_TYPE_NUM_SIZE_16:
+                        ShrinkSize = 18
+                    elif Info.VarType == EFI_IFR_TYPE_NUM_SIZE_8:
+                        ShrinkSize = 21
+
+                CNObj.DecLength(ShrinkSize)
+
+                if VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_EFI:
+                    CVNObj = CIfrVarEqName(QId, Info.Info.VarName)
+                    CVNObj.SetLineNo(LineNo)
+                    ReturnList.append(InsertOpNode(CVNObj, EFI_IFR_GUID_OP))
+
+                CEObj = CIfrEnd()
+                CEObj.SetLineNo(LineNo)
+                ReturnList.append(InsertOpNode(CEObj, EFI_IFR_END_OP))
+
+                if GuidObj != None:
+                    CEObjGuid = CIfrEnd()
+                    CEObjGuid.SetLineNo(LineNo)
+                    ReturnList.append(InsertOpNode(CEObjGuid, EFI_IFR_END_OP))
+                    GuidObj.SetScope(1)
+                    GuidObj = None
+            pNode = pNode.Next
+
+        SEObj = CIfrEnd()
+        SEObj.SetLineNo(LineNo)
+        ReturnList.append(InsertOpNode(SEObj, EFI_IFR_END_OP))
+        return ReturnList, VfrReturnCode.VFR_RETURN_SUCCESS
 
 
 gCFormPkg = CFormPkg()
@@ -874,16 +1000,21 @@ class CIfrDefaultStore(CIfrObj, CIfrOpHeader):
     def GetInfo(self):
         return self.__DefaultStore
 
-
 class CIfrVarStore(CIfrObj, CIfrOpHeader):
 
-    def __init__(self, ):
-        self.__Varstore = EFI_IFR_VARSTORE()
+    def __init__(self, StoreName):
+        Nums = len(StoreName)
+        self.__Varstore = Refine_EFI_IFR_VARSTORE(Nums)
         CIfrOpHeader.__init__(self, self.__Varstore.Header,
-                              EFI_IFR_VARSTORE_OP)
+                              EFI_IFR_VARSTORE_OP, sizeof(self.__Varstore))
         self.__Varstore.VarStoreId = EFI_VARSTORE_ID_INVALID
         self.__Varstore.Size = 0
-        self.__Varstore.Name = b''
+        ArrayType = c_ubyte * Nums
+        ValueArray = ArrayType()
+        for i in range(0, Nums):
+
+            ValueArray[i] = ord(StoreName[i])
+        self.__Varstore.Name = ValueArray
 
     def SetGuid(self, Guid):
         self.__Varstore.Guid = Guid
@@ -894,24 +1025,24 @@ class CIfrVarStore(CIfrObj, CIfrOpHeader):
     def SetVarStoreId(self, VarStoreId):
         self.__Varstore.VarStoreId = VarStoreId
 
-    def SetName(self, Name):
-
-        self.__Varstore.Name = bytes(Name, 'utf-8')
-        self.AdjustLength(sizeof(ctypes.c_char_p), len(Name))
-
     def GetInfo(self):
         return self.__Varstore
 
 
 class CIfrVarStoreEfi(CIfrObj, CIfrOpHeader):
 
-    def __init__(self, ):
-        self.__VarStoreEfi = EFI_IFR_VARSTORE_EFI()
+    def __init__(self, StoreName):
+        Nums = len(StoreName)
+        self.__VarStoreEfi = Refine_EFI_IFR_VARSTORE_EFI(Nums)
         CIfrOpHeader.__init__(self, self.__VarStoreEfi.Header,
-                              EFI_IFR_VARSTORE_EFI_OP)
+                              EFI_IFR_VARSTORE_EFI_OP, sizeof(self.__VarStoreEfi))
         self.__VarStoreEfi.VarStoreId = EFI_VAROFFSET_INVALID
         self.__VarStoreEfi.Size = 0
-        self.__VarStoreEfi.Name = ''
+        ArrayType = c_ubyte * Nums
+        ValueArray = ArrayType()
+        for i in range(0, Nums):
+            ValueArray[i] = ord(StoreName[i])
+        self.__VarStoreEfi.Name = ValueArray
 
     def SetGuid(self, Guid):
         self.__VarStoreEfi.Guid = Guid
@@ -921,10 +1052,6 @@ class CIfrVarStoreEfi(CIfrObj, CIfrOpHeader):
 
     def SetVarStoreId(self, VarStoreId):
         self.__VarStoreEfi.VarStoreId = VarStoreId
-
-    def SetName(self, Name):
-        self.__VarStoreEfi.Name = Name
-        self.AdjustLength(sizeof(ctypes.c_wchar_p), len(Name))
 
     def SetAttributes(self, Attributes):
         self.__VarStoreEfi.Attributes = Attributes
@@ -1063,6 +1190,19 @@ class CIfrBanner(CIfrObj, CIfrOpHeader):
     def GetInfo(self):
         return self.__Banner
 
+class CIfrVarEqName(CIfrObj, CIfrOpHeader):
+
+    def __init__(self, QuestionId, NameId):
+        self.__VarEqName = EFI_IFR_GUID_VAREQNAME()
+        CIfrOpHeader.__init__(self, self.__VarEqName.Header, EFI_IFR_GUID_OP,
+                              ctypes.sizeof(EFI_IFR_GUID_VAREQNAME))
+        self.__VarEqName.ExtendOpCode = EFI_IFR_EXTEND_OP_VAREQNAME
+        self.__VarEqName.Guid = EFI_IFR_FRAMEWORK_GUID
+        self.__VarEqName.QuestionId = QuestionId
+        self.__VarEqName.NameId = NameId
+
+    def GetInfo(self):
+        return self.__VarEqName
 
 class CIfrTimeout(CIfrObj, CIfrOpHeader):
 
@@ -1552,10 +1692,11 @@ class CIfrDefault3(CIfrObj, CIfrOpHeader):
                  DefaultId=EFI_HII_DEFAULT_CLASS_STANDARD,
                  Type=EFI_IFR_TYPE_OTHER,
                  ValueList=[]):
-        Header = EFI_IFR_OP_HEADER()
-        CIfrOpHeader.__init__(self, Header, EFI_IFR_DEFAULT_OP, Size)
+        # Header = EFI_IFR_OP_HEADER()
         self.__Default = Refine_EFI_IFR_DEFAULT(Nums)
-        self.__Default.Header = Header
+        CIfrOpHeader.__init__(self, self.__Default.Header, EFI_IFR_DEFAULT_OP, Size)
+        #self.__Default = Refine_EFI_IFR_DEFAULT(Nums)
+        # self.__Default.Header = Header
         self.__Default.Type = Type
         self.__Default.DefaultId = DefaultId
         self.__ValueType = ValueType
@@ -2435,13 +2576,13 @@ class CIfrEqIdId(CIfrObj, CIfrOpHeader):
         if QuestionId != EFI_QUESTION_ID_INVALID:
             self.__EqIdId.QuestionId1 = QuestionId
         else:
-            pass
+            gCFormPkg.AssignPending(VarIdStr, self.__EqIdId, LineNo, "no question refered", 1)
 
     def SetQuestionId2(self, QuestionId, VarIdStr, LineNo):
         if QuestionId != EFI_QUESTION_ID_INVALID:
             self.__EqIdId.QuestionId2 = QuestionId
         else:
-            pass
+            gCFormPkg.AssignPending(VarIdStr, self.__EqIdId, LineNo, "no question refered", 2)
 
     def GetInfo(self):
         return self.__EqIdId
@@ -2460,7 +2601,7 @@ class CIfrEqIdVal(CIfrObj, CIfrOpHeader):
         if QuestionId != EFI_QUESTION_ID_INVALID:
             self.__EqIdVal.QuestionId = QuestionId
         else:
-            pass
+            gCFormPkg.AssignPending(VarIdStr, self.__EqIdVal, LineNo, "no question refered")
 
     def SetValue(self, Value):
         self.__EqIdVal.Value = Value
@@ -2493,7 +2634,7 @@ class CIfrEqIdList(CIfrObj, CIfrOpHeader):
         if QuestionId != EFI_QUESTION_ID_INVALID:
             self.__EqIdVList.QuestionId = QuestionId
         else:
-            pass
+            gCFormPkg.AssignPending(VarIdStr, self.__EqIdVList, LineNo, "no question refered")
 
     def SetListLength(self, ListLength):
         self.__EqIdVList.ListLength = ListLength
@@ -2597,7 +2738,7 @@ class CIfrQuestionRef1(CIfrObj, CIfrOpHeader):
         if QuestionId != EFI_QUESTION_ID_INVALID:
             self.__QuestionRef1.QuestionId = QuestionId
         else:
-            pass
+            gCFormPkg.AssignPending(VarIdStr, self.__QuestionRef1, LineNo, "no question refered")
 
     def GetInfo(self):
         return self.__QuestionRef1

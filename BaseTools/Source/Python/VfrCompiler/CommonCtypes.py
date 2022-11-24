@@ -179,8 +179,6 @@ class EFI_IFR_DEFAULTSTORE(Structure):
         ('DefaultName', c_uint16),
         ('DefaultId', c_uint16),
     ]
-
-
 class EFI_IFR_VARSTORE(Structure):
     _pack_ = 1
     _fields_ = [
@@ -188,9 +186,23 @@ class EFI_IFR_VARSTORE(Structure):
         ('Guid', EFI_GUID),
         ('VarStoreId', c_uint16),
         ('Size', c_uint16),
-        ('Name', c_char_p),
+        ('Name', ARRAY(c_ubyte, 2)),
     ]
 
+def Refine_EFI_IFR_VARSTORE(Nums):
+    class EFI_IFR_VARSTORE(Structure):
+        _pack_ = 1
+        _fields_ = [
+            ('Header', EFI_IFR_OP_HEADER),
+            ('Guid', EFI_GUID),
+            ('VarStoreId', c_uint16),
+            ('Size', c_uint16),
+            ('Name', ARRAY(c_ubyte, Nums)),
+        ]
+        def __init__(self) -> None:
+            self.Header = EFI_IFR_OP_HEADER()
+
+    return EFI_IFR_VARSTORE()
 
 class EFI_IFR_VARSTORE_EFI(Structure):
     _pack_ = 1
@@ -200,8 +212,24 @@ class EFI_IFR_VARSTORE_EFI(Structure):
         ('VarStoreId', c_uint16),
         ('Attributes', c_uint32),
         ('Size', c_uint16),
-        ('Name', c_wchar_p),
+        ('Name', ARRAY(c_ubyte, 2)),
     ]
+
+def Refine_EFI_IFR_VARSTORE_EFI(Nums):
+    class EFI_IFR_VARSTORE_EFI(Structure):
+        _pack_ = 1
+        _fields_ = [
+            ('Header', EFI_IFR_OP_HEADER),
+            ('Guid', EFI_GUID),
+            ('VarStoreId', c_uint16),
+            ('Attributes', c_uint32),
+            ('Size', c_uint16),
+            ('Name', ARRAY(c_ubyte, Nums)),
+        ]
+        def __init__(self) -> None:
+            self.Header = EFI_IFR_OP_HEADER()
+
+    return EFI_IFR_VARSTORE_EFI()
 
 
 class EFI_IFR_GUID(Structure):
@@ -209,6 +237,17 @@ class EFI_IFR_GUID(Structure):
     _fields_ = [
         ('Header', EFI_IFR_OP_HEADER),
         ('Guid', EFI_GUID),
+    ]
+
+class EFI_IFR_GUID_VAREQNAME(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_IFR_OP_HEADER),
+        ('Guid', EFI_GUID),
+        ('ExtendOpCode', c_uint8),
+        ('QuestionId', c_uint16),
+        ('NameId', c_uint16),
+
     ]
 
 
@@ -506,7 +545,10 @@ def Refine_EFI_IFR_ONE_OF_OPTION(Nums):
             ('Type', c_ubyte),
             ('Value', EFI_IFR_TYPE_VALUE * Nums),
         ]
-    return EFI_IFR_ONE_OF_OPTION
+        def __init__(self) -> None:
+            self.Header = EFI_IFR_OP_HEADER()
+
+    return EFI_IFR_ONE_OF_OPTION()
 
 
 EFI_IFR_OPTION_DEFAULT = 0x10
@@ -647,7 +689,10 @@ def Refine_EFI_IFR_EQ_ID_VAL_LIST(Nums):
             ('ListLength', c_uint16),
             ('ValueList', c_uint16 * Nums),  #
         ]
-    return EFI_IFR_EQ_ID_VAL_LIST
+        def __init__(self):
+            self.Header = EFI_IFR_OP_HEADER()
+
+    return EFI_IFR_EQ_ID_VAL_LIST()
 
 
 class EFI_IFR_AND(Structure):
@@ -1193,9 +1238,12 @@ def Refine_EFI_IFR_DEFAULT(Nums):
             ('Header', EFI_IFR_OP_HEADER),
             ('DefaultId', c_uint16),
             ('Type', c_ubyte),
-            ('Value', EFI_IFR_TYPE_VALUE * Nums),
+            ('Value', ARRAY(EFI_IFR_TYPE_VALUE, Nums)),
         ]
-    return EFI_IFR_DEFAULT
+        def __init__(self):
+            self.Header = EFI_IFR_OP_HEADER()
+
+    return EFI_IFR_DEFAULT()
 
 
 class EFI_IFR_DEFAULT_2(Structure):

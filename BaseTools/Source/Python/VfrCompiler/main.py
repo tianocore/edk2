@@ -17,7 +17,7 @@ class VfrCompiler():
         pass
 
 
-    def Compile(self, InFile, YamlOutFile, JsonOutFile, BinaryOutFile, CFile):
+    def Compile(self, Infile, YamlOutFile, JsonOutFile, BinaryOutFile, CFile):
         gCVfrErrorHandle.SetInputFile(Infile)
         InputStream = FileStream(Infile)
         Lexer = VfrSyntaxLexer(InputStream)

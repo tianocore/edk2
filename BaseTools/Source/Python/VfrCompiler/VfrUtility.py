@@ -360,7 +360,7 @@ class CVfrVarDataTypeDB(object):
         else:
             return VarStr[0:index], index + 1
 
-    def __ExtractFieldNameAndArrary(self, VarStr, s):
+    def ExtractFieldNameAndArrary(self, VarStr, s):
 
         ArrayIdx = INVALID_ARRAY_INDEX
         s_copy = s
@@ -429,7 +429,7 @@ class CVfrVarDataTypeDB(object):
         pField = None
         while (i < len(VarStrName)):
             # i start from field
-            _, i, FName, ReturnCode = self.__ExtractFieldNameAndArrary(
+            _, i, FName, ReturnCode = self.ExtractFieldNameAndArrary(
                 VarStrName, i)
             if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
                 return None, ReturnCode
@@ -502,7 +502,7 @@ class CVfrVarDataTypeDB(object):
         Size = pType.TotalSize
 
         while (i < len(VarStr)):
-            ArrayIdx, i, FName, ReturnCode = self.__ExtractFieldNameAndArrary(
+            ArrayIdx, i, FName, ReturnCode = self.ExtractFieldNameAndArrary(
                 VarStr, i)
             if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
                 return Offset, Type, Size, BitField, ReturnCode
@@ -1618,7 +1618,7 @@ class CVfrQuestionDB(object):
         Offset = QId % EFI_BITS_PER_UINT32
         self.__FreeQIdBitMap[Index] &= ~(0x80000000 >> Offset)
 
-    def RegisterQuestion(self, Name, VarIdStr, QuestionId):
+    def RegisterQuestion(self, Name, VarIdStr, QuestionId, gCFormPkg):
 
         if (Name != None) and (self.FindQuestionByName(Name) == VfrReturnCode.VFR_RETURN_SUCCESS):
             return QuestionId, VfrReturnCode.VFR_RETURN_REDEFINED
@@ -1638,11 +1638,11 @@ class CVfrQuestionDB(object):
         pNode.Next = self.__QuestionList
         self.__QuestionList = pNode
 
-        # gCFormPkg.DoPendingAssign
+        gCFormPkg.DoPendingAssign(VarIdStr, QuestionId)
 
         return QuestionId, VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def UpdateQuestionId(self, QId, NewQId):
+    def UpdateQuestionId(self, QId, NewQId, gCFormPkg):
 
         if QId == NewQId:
             # don't update
@@ -1665,10 +1665,10 @@ class CVfrQuestionDB(object):
 
         for pNode in TempList:
             pNode.QuestionId = NewQId
+            gCFormPkg.DoPendingAssign(pNode.VarIdStr, NewQId)
 
         self.__MarkQuestionIdUsed(NewQId)
 
-        # gCFormPkg.DoPendingAssign
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
     def GetQuestionId(self, Name, VarIdStr=None, QType=None):
@@ -1702,7 +1702,7 @@ class CVfrQuestionDB(object):
 
         return QuestionId, BitMask, QType
 
-    def RegisterNewDateQuestion(self, Name, BaseVarId, QuestionId):
+    def RegisterNewDateQuestion(self, Name, BaseVarId, QuestionId, gCFormPkg):
 
         if BaseVarId == '' and Name == None:
             if QuestionId == EFI_QUESTION_ID_INVALID:
@@ -1761,10 +1761,13 @@ class CVfrQuestionDB(object):
         pNodeList[2].Next = self.__QuestionList
         self.__QuestionList = pNodeList[0]
 
-        # DoPendingAssign
+        gCFormPkg.DoPendingAssign(VarIdStrList[0], QuestionId)
+        gCFormPkg.DoPendingAssign(VarIdStrList[1], QuestionId)
+        gCFormPkg.DoPendingAssign(VarIdStrList[2], QuestionId)
+
         return QuestionId, VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def RegisterNewTimeQuestion(self, Name, BaseVarId, QuestionId):
+    def RegisterNewTimeQuestion(self, Name, BaseVarId, QuestionId, gCFormPkg):
         if BaseVarId == '' and Name == None:
             if QuestionId == EFI_QUESTION_ID_INVALID:
                 QuestionId = self.__GetFreeQuestionId()
@@ -1822,10 +1825,13 @@ class CVfrQuestionDB(object):
         pNodeList[2].Next = self.__QuestionList
         self.__QuestionList = pNodeList[0]
 
-        # DoPendingAssign
+        gCFormPkg.DoPendingAssign(VarIdStrList[0], QuestionId)
+        gCFormPkg.DoPendingAssign(VarIdStrList[1], QuestionId)
+        gCFormPkg.DoPendingAssign(VarIdStrList[2], QuestionId)
+
         return QuestionId, VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def RegisterRefQuestion(self, Name, BaseVarId, QuestionId):
+    def RegisterRefQuestion(self, Name, BaseVarId, QuestionId, gCFormPkg):
 
         if BaseVarId == '' and Name == None:
             return QuestionId, VfrReturnCode.VFR_RETURN_FATAL_ERROR
@@ -1890,13 +1896,15 @@ class CVfrQuestionDB(object):
         pNodeList[2].Next = pNodeList[3]
         pNodeList[3].Next = self.__QuestionList
         self.__QuestionList = pNodeList[0]
-        x = self.__QuestionList
 
-        # DoPendingAssign
+        gCFormPkg.DoPendingAssign(VarIdStrList[0], QuestionId)
+        gCFormPkg.DoPendingAssign(VarIdStrList[1], QuestionId)
+        gCFormPkg.DoPendingAssign(VarIdStrList[2], QuestionId)
+        gCFormPkg.DoPendingAssign(VarIdStrList[3], QuestionId)
 
         return QuestionId, VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def RegisterOldDateQuestion(self, YearVarId, MonthVarId, DayVarId, QuestionId):
+    def RegisterOldDateQuestion(self, YearVarId, MonthVarId, DayVarId, QuestionId, gCFormPkg):
         pNodeList = []
         if YearVarId == '' or MonthVarId == '' or DayVarId == '' or YearVarId == None or MonthVarId == None or DayVarId == None:
             return QuestionId, VfrReturnCode.VFR_RETURN_ERROR_SKIPED
@@ -1937,10 +1945,13 @@ class CVfrQuestionDB(object):
         pNodeList[2].Next = self.__QuestionList
         self.__QuestionList = pNodeList[0]
 
-        # DoPendingAssign
+        gCFormPkg.DoPendingAssign(YearVarId, QuestionId)
+        gCFormPkg.DoPendingAssign(MonthVarId, QuestionId)
+        gCFormPkg.DoPendingAssign(DayVarId, QuestionId)
+
         return QuestionId, VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def RegisterOldTimeQuestion(self, HourVarId, MinuteVarId, SecondVarId, QuestionId):
+    def RegisterOldTimeQuestion(self, HourVarId, MinuteVarId, SecondVarId, QuestionId, gCFormPkg):
         pNodeList = []
         if HourVarId == '' or MinuteVarId == '' or SecondVarId == '' or HourVarId == None or MinuteVarId == None or SecondVarId == None:
             return QuestionId, VfrReturnCode.VFR_RETURN_ERROR_SKIPED
@@ -1981,7 +1992,10 @@ class CVfrQuestionDB(object):
         pNodeList[2].Next = self.__QuestionList
         self.__QuestionList = pNodeList[0]
 
-        # DoPendingAssign
+        gCFormPkg.DoPendingAssign(HourVarId, QuestionId)
+        gCFormPkg.DoPendingAssign(MinuteVarId, QuestionId)
+        gCFormPkg.DoPendingAssign(SecondVarId, QuestionId)
+
         return QuestionId, VfrReturnCode.VFR_RETURN_SUCCESS
 
     def PrintAllQuestion(self, FileName):
