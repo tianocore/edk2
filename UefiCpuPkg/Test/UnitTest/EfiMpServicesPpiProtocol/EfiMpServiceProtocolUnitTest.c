@@ -187,18 +187,16 @@ MpServicesUnitTestWhoAmI (
 }
 
 /**
-  Standard DXE driver or UEFI application entry point for unit test execution from DXE or UEFI Shell.
-  Initialize the unit test framework, suite, and unit tests for the EfiMpServiceProtocol and run the unit test.
+  Initialize the unit test framework, suite and unit tests for the EfiMpServiceProtocol and run the unit tests.
 
-  @param[in]  ImageHandle    The firmware allocated handle for the EFI image.
-  @param[in]  SystemTable    A pointer to the EFI System Table.
+  @retval EFI_SUCCESS       Initialize the unit test framework, suite, unit tests and run the unit tests successfully.
+  @retval Others            Initialize the unit test framework, suite, unit tests or run the unit tests unsuccessfully.
 
 **/
 EFI_STATUS
 EFIAPI
-DxeEntryPoint (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+EfiMpServiceProtocolUnitTest (
+  VOID
   )
 {
   EFI_STATUS                  Status;
@@ -241,4 +239,22 @@ EXIT:
   }
 
   return Status;
+}
+
+/**
+  Standard DXE driver or UEFI application entry point for unit test execution from DXE or UEFI Shell.
+  Initialize the unit test framework, suite, and unit tests for the EfiMpServiceProtocol and run the unit test.
+
+  @param[in]  ImageHandle    The firmware allocated handle for the EFI image.
+  @param[in]  SystemTable    A pointer to the EFI System Table.
+
+**/
+EFI_STATUS
+EFIAPI
+DxeEntryPoint (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  return EfiMpServiceProtocolUnitTest ();
 }
