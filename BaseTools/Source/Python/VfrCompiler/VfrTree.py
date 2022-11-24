@@ -172,7 +172,10 @@ class VfrTree():
                 Info = Root.Data.GetInfo()
                 f.write('  - varstore:\n')
                 f.write('      varid:  {}\n'.format(Info.VarStoreId))
-                f.write('      name:  {}\n'.format(Info.Name))
+                Name = ''
+                for i in range(0, len(Info.Name)):
+                    Name += chr(Info.Name[i])
+                f.write('      name:  {}\n'.format(Name))
                 f.write('      size:  {}\n'.format(Info.Size))
                 f.write('      guid:  {' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
                     + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
@@ -182,7 +185,10 @@ class VfrTree():
                 Info = Root.Data.GetInfo()
                 f.write('  - efivarstore:\n')
                 f.write('      varid:  {}\n'.format(Info.VarStoreId))
-                f.write('      name:  {}\n'.format(Info.Name))
+                Name = ''
+                for i in range(0, len(Info.Name)):
+                    Name += chr(Info.Name[i])
+                f.write('      name:  {}\n'.format(Name))
                 f.write('      size:  {}\n'.format(Info.Size))
                 f.write('      guid:  {' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
                     + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
@@ -284,60 +290,14 @@ class VfrTree():
                 f.write('              option type:  {}\n'.format(Info.Type))
 
                 if type(Root.Data) == CIfrOneOfOption:
-                    if Info.Type == EFI_IFR_TYPE_DATE:
-                        f.write('              option value:  {}/{}/{}\n'.format(Info.Value.date.Year, Info.Value.date.Month, Info.Value.date.Day))
-                    if Info.Type == EFI_IFR_TYPE_TIME:
-                        f.write('              option value:  {}:{}:{}\n'.format(Info.Value.time.Hour, Info.Value.time.Minute, Info.Value.time.Second))
-                    if Info.Type == EFI_IFR_TYPE_REF:
-                        f.write('              option value:  {};{};'.format(Info.Value.ref.QuestionId, Info.Value.ref.FormId) +  '{' + '{}, {}, {},'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data1),'0x%x'%(Info.Value.ref.FormSetGuid.Data2), '0x%x'%(Info.Value.ref.FormSetGuid.Data3)) \
-                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data4[0]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[1]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[2]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[3]), \
-                        '0x%x'%(Info.Value.ref.FormSetGuid.Data4[4]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[5]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[6]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[7])) + ' }}' + ';{}\n'.format(Info.Value.ref.DevicePath))
-                    if Info.Type == EFI_IFR_TYPE_STRING:
-                        f.write('              option value:  {}\n'.format(Info.Value.string))
-                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_8:
-                        f.write('              option value:  {}\n'.format(Info.Value.u8))
-                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_16:
-                        f.write('              option value:  {}\n'.format(Info.Value.u16))
-                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_32:
-                        f.write('              option value:  {}\n'.format(Info.Value.u32))
-                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_64:
-                        f.write('              option value:  {}\n'.format(Info.Value.u64))
-                    if Info.Type == EFI_IFR_TYPE_BOOLEAN:
-                        f.write('              option value:  {}\n'.format(Info.Value.b))
-
-                if type(Root.Data) == CIfrOneOfOption2:
-                    f.write('              value:  {')
-                    ValueType = Root.Data.GetValueType()
-                    if ValueType == EFI_IFR_TYPE_STRING:
+                    if len(Info.Value) == 1:
+                        f.write('              option value:  {}\n'.format(Info.Value[0]))
+                    else:
+                        f.write('              option value:  {')
+                        ValueType = Root.Data.GetValueType()
                         for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].string))
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].string) + '}\n')
-
-                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_8:
-                        for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u8))
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u8) + '}\n')
-
-                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_16:
-                        for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u16))
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u16) + '}\n')
-
-                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_32:
-                        for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u32))
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u32) + '}\n')
-
-                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_64:
-                        for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u64))
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u64) + '}\n')
-
-                    if ValueType == EFI_IFR_TYPE_BOOLEAN:
-                        for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].b))
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].b) + '}\n')
-
+                            f.write('{},'.format(Info.Value[i]))
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1]) + '}\n')
 
             if Root.OpCode == EFI_IFR_DEFAULT_OP:
                 Info = Root.Data.GetInfo()
@@ -347,59 +307,24 @@ class VfrTree():
                 f.write('              type:  {}\n'.format(Info.Type))
                 f.write('              defaultId:  {}\n'.format(Info.DefaultId))
                 if type(Root.Data) == CIfrDefault:
-                    if Info.Type == EFI_IFR_TYPE_DATE:
-                        f.write('              value:  {}/{}/{}\n'.format(Info.Value.date.Year, Info.Value.date.Month, Info.Value.date.Day))
-                    if Info.Type == EFI_IFR_TYPE_TIME:
-                        f.write('              value:  {}:{}:{}\n'.format(Info.Value.time.Hour, Info.Value.time.Minute, Info.Value.time.Second))
-                    if Info.Type == EFI_IFR_TYPE_REF:
-                        f.write('              option value:  {};{};'.format(Info.Value.ref.QuestionId, Info.Value.ref.FormId) +  '{' + '{}, {}, {},'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data1),'0x%x'%(Info.Value.ref.FormSetGuid.Data2), '0x%x'%(Info.Value.ref.FormSetGuid.Data3)) \
-                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Value.ref.FormSetGuid.Data4[0]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[1]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[2]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[3]), \
-                        '0x%x'%(Info.Value.ref.FormSetGuid.Data4[4]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[5]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[6]), '0x%x'%(Info.Value.ref.FormSetGuid.Data4[7])) + ' }}' + ';{}\n'.format(Info.Value.ref.DevicePath))
-                    if Info.Type == EFI_IFR_TYPE_STRING:
-                        f.write('              value:  {}\n'.format(Info.Value.string))
-                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_8:
-                        f.write('              value:  {}\n'.format(Info.Value.u8))
-                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_16:
-                        f.write('              value:  {}\n'.format(Info.Value.u16))
-                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_32:
-                        f.write('              value:  {}\n'.format(Info.Value.u32))
-                    if Info.Type == EFI_IFR_TYPE_NUM_SIZE_64:
-                        f.write('              value:  {}\n'.format(Info.Value.u64))
-                    if Info.Type == EFI_IFR_TYPE_BOOLEAN:
-                        f.write('              value:  {}\n'.format(Info.Value.b))
 
-                if type(Root.Data) == CIfrDefault3:
-                    f.write('              value:  {')
-                    ValueType = Root.Data.GetValueType()
-                    if ValueType == EFI_IFR_TYPE_STRING:
-                        for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].string))
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].string) + '}\n')
+                    if len(Info.Value) == 1:
+                        if Info.Type == EFI_IFR_TYPE_DATE:
+                            f.write('              value:  {}/{}/{}\n'.format(Info.Value[0].Year, Info.Value[0].Month, Info.Value[0].Day))
+                        elif Info.Type == EFI_IFR_TYPE_TIME:
+                            f.write('              value:  {}:{}:{}\n'.format(Info.Value[0].Hour, Info.Value[0].Minute, Info.Value[0].Second))
+                        elif Info.Type == EFI_IFR_TYPE_REF:
+                            f.write('              value:  {};{};'.format(Info.Value[0].QuestionId, Info.Value[0].FormId) +  '{' + '{}, {}, {},'.format('0x%x'%(Info.Value[0].FormSetGuid.Data1),'0x%x'%(Info.Value[0].FormSetGuid.Data2), '0x%x'%(Info.Value[0].FormSetGuid.Data3)) \
+                            + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Value[0].FormSetGuid.Data4[0]), '0x%x'%(Info.Value[0].FormSetGuid.Data4[1]), '0x%x'%(Info.Value[0].FormSetGuid.Data4[2]), '0x%x'%(Info.Value[0].FormSetGuid.Data4[3]), \
+                            '0x%x'%(Info.Value[0].FormSetGuid.Data4[4]), '0x%x'%(Info.Value[0].FormSetGuid.Data4[5]), '0x%x'%(Info.Value[0].FormSetGuid.Data4[6]), '0x%x'%(Info.Value[0].FormSetGuid.Data4[7])) + ' }}' + ';{}\n'.format(Info.Value[0].DevicePath))
+                        else:
+                            f.write('              value:  {}\n'.format(Info.Value[0]))
 
-                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_8:
+                    else:
+                        f.write('              value:  {')
                         for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u8))
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u8) + '}\n')
-
-                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_16:
-                        for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u16))
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u16) + '}\n')
-
-                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_32:
-                        for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u32))
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u32) + '}\n')
-
-                    if ValueType == EFI_IFR_TYPE_NUM_SIZE_64:
-                        for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].u64))
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].u64) + '}\n')
-
-                    if ValueType == EFI_IFR_TYPE_BOOLEAN:
-                        for i in range(0, len(Info.Value)-1):
-                            f.write('{},'.format(Info.Value[i].b))
-                        f.write('{}'.format(Info.Value[len(Info.Value)-1].b) + '}\n')
+                            f.write('{},'.format(Info.Value[i]))
+                        f.write('{}'.format(Info.Value[len(Info.Value)-1]) + '}\n')
 
             if Root.OpCode == EFI_IFR_ORDERED_LIST_OP:
                 Info = Root.Data.GetInfo()
@@ -718,25 +643,15 @@ class VfrTree():
                         f.write('        \"Offset\": {},\n'.format(str(pInfoNode.Offset)))
                         #f.write('        \"Value\": \"{}\"\n'.format(str(pInfoNode.Value)))
                         if pInfoNode.Type == EFI_IFR_TYPE_DATE:
-                            f.write('        \"Value\": \"{}/{}/{}\"\n'.format(pInfoNode.Value.date.Year, pInfoNode.Value.date.Month, pInfoNode.Value.date.Day))
-                        if pInfoNode.Type == EFI_IFR_TYPE_TIME:
-                            f.write('        \"Value\": \"{}:{}:{}\"\n'.format(pInfoNode.Value.time.Hour, pInfoNode.Value.time.Minute, pInfoNode.Value.time.Second))
-                        if pInfoNode.Type == EFI_IFR_TYPE_REF:
-                            f.write('        \"Value\": \"{};{};'.format(pInfoNode.Value.ref.QuestionId, pInfoNode.Value.ref.FormId) +  '{' + '{}, {}, {},'.format('0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data1),'0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data2), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data3)) \
-                            + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[0]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[1]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[2]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[3]), \
-                            '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[4]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[5]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[6]), '0x%x'%(pInfoNode.Value.ref.FormSetGuid.Data4[7])) + ' }}' + ';{}\n'.format(pInfoNode.Value.ref.DevicePath))
-                        if pInfoNode.Type == EFI_IFR_TYPE_STRING:
-                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.string))
-                        if pInfoNode.Type == EFI_IFR_TYPE_NUM_SIZE_8:
-                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u8))
-                        if pInfoNode.Type == EFI_IFR_TYPE_NUM_SIZE_16:
-                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u16))
-                        if pInfoNode.Type == EFI_IFR_TYPE_NUM_SIZE_32:
-                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u32))
-                        if pInfoNode.Type == EFI_IFR_TYPE_NUM_SIZE_64:
-                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.u64))
-                        if pInfoNode.Type == EFI_IFR_TYPE_BOOLEAN:
-                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value.b))
+                            f.write('        \"Value\": \"{}/{}/{}\"\n'.format(pInfoNode.Value.Year, pInfoNode.Value.Month, pInfoNode.Value.Day))
+                        elif pInfoNode.Type == EFI_IFR_TYPE_TIME:
+                            f.write('        \"Value\": \"{}:{}:{}\"\n'.format(pInfoNode.Value.Hour, pInfoNode.Value.Minute, pInfoNode.Value.Second))
+                        elif pInfoNode.Type == EFI_IFR_TYPE_REF:
+                            f.write('        \"Value\": \"{};{};'.format(pInfoNode.Value.QuestionId, pInfoNode.Value.FormId) +  '{' + '{}, {}, {},'.format('0x%x'%(pInfoNode.Value.FormSetGuid.Data1),'0x%x'%(pInfoNode.Value.FormSetGuid.Data2), '0x%x'%(pInfoNode.Value.FormSetGuid.Data3)) \
+                            + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(pInfoNode.Value.FormSetGuid.Data4[0]), '0x%x'%(pInfoNode.Value.FormSetGuid.Data4[1]), '0x%x'%(pInfoNode.Value.FormSetGuid.Data4[2]), '0x%x'%(pInfoNode.Value.FormSetGuid.Data4[3]), \
+                            '0x%x'%(pInfoNode.Value.FormSetGuid.Data4[4]), '0x%x'%(pInfoNode.Value.FormSetGuid.Data4[5]), '0x%x'%(pInfoNode.Value.FormSetGuid.Data4[6]), '0x%x'%(pInfoNode.Value.FormSetGuid.Data4[7])) + ' }}' + ';{}\n'.format(pInfoNode.Value.DevicePath))
+                        else:
+                            f.write('        \"Value\": \"{}\"\n'.format(pInfoNode.Value))
 
                         f.write('      },\n')
                         pInfoNode = pInfoNode.Next

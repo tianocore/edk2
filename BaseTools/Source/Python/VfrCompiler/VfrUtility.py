@@ -914,7 +914,7 @@ class SConfigItem():
 
 class SConfigInfo():
 
-    def __init__(self, Type, Offset, Width, Value: EFI_IFR_TYPE_VALUE):
+    def __init__(self, Type, Offset, Width, Value):
         self.Type = Type
         self.Offset = Offset
         self.Width = Width

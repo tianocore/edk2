@@ -5736,12 +5736,12 @@ class VfrSyntaxParser ( Parser ):
 
     class VfrQuestionHeaderContext(ParserRuleContext):
 
-        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1, OpObj=None, QType=None):
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1, Node=None, QType=None):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.OpObj = None
+            self.Node = None
             self.QType = None
-            self.OpObj = OpObj
+            self.Node = Node
             self.QType = QType
 
         def vfrQuestionBaseInfo(self):
@@ -5764,16 +5764,16 @@ class VfrSyntaxParser ( Parser ):
 
 
 
-    def vfrQuestionHeader(self, OpObj, QType):
+    def vfrQuestionHeader(self, Node, QType):
 
-        localctx = VfrSyntaxParser.VfrQuestionHeaderContext(self, self._ctx, self.state, OpObj, QType)
+        localctx = VfrSyntaxParser.VfrQuestionHeaderContext(self, self._ctx, self.state, Node, QType)
         self.enterRule(localctx, 78, self.RULE_vfrQuestionHeader)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 889
-            self.vfrQuestionBaseInfo(OpObj, QType)
+            self.vfrQuestionBaseInfo(Node, QType)
             self.state = 890
-            self.vfrStatementHeader(OpObj)
+            self.vfrStatementHeader(Node)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -5785,17 +5785,17 @@ class VfrSyntaxParser ( Parser ):
 
     class VfrQuestionBaseInfoContext(ParserRuleContext):
 
-        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1, OpObj=None, QType=None):
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1, Node=None, QType=None):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.OpObj = None
+            self.Node = None
             self.QType = None
             self.BaseInfo = EFI_VARSTORE_INFO()
             self.QId = EFI_QUESTION_ID_INVALID
             self.CheckFlag = True
             self.QN = None # Token
             self.ID = None # Token
-            self.OpObj = OpObj
+            self.Node = Node
             self.QType = QType
 
         def Name(self):
@@ -5835,9 +5835,9 @@ class VfrSyntaxParser ( Parser ):
 
 
 
-    def vfrQuestionBaseInfo(self, OpObj, QType):
+    def vfrQuestionBaseInfo(self, Node, QType):
 
-        localctx = VfrSyntaxParser.VfrQuestionBaseInfoContext(self, self._ctx, self.state, OpObj, QType)
+        localctx = VfrSyntaxParser.VfrQuestionBaseInfoContext(self, self._ctx, self.state, Node, QType)
         self.enterRule(localctx, 80, self.RULE_vfrQuestionBaseInfo)
         self._la = 0 # Token type
         try:
@@ -5895,11 +5895,11 @@ class VfrSyntaxParser ( Parser ):
 
     class VfrStatementHeaderContext(ParserRuleContext):
 
-        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1, OpObj=None):
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1, Node=None):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.OpObj = None
-            self.OpObj = OpObj
+            self.Node = None
+            self.Node = Node
 
         def Prompt(self):
             return self.getToken(VfrSyntaxParser.Prompt, 0)
@@ -5946,9 +5946,9 @@ class VfrSyntaxParser ( Parser ):
 
 
 
-    def vfrStatementHeader(self, OpObj):
+    def vfrStatementHeader(self, Node):
 
-        localctx = VfrSyntaxParser.VfrStatementHeaderContext(self, self._ctx, self.state, OpObj)
+        localctx = VfrSyntaxParser.VfrStatementHeaderContext(self, self._ctx, self.state, Node)
         self.enterRule(localctx, 82, self.RULE_vfrStatementHeader)
         try:
             self.enterOuterAlt(localctx, 1)
@@ -7325,7 +7325,6 @@ class VfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_SUBTITLE_OP)
-            self.OpObj = CIfrSubtitle()
 
         def Subtitle(self):
             return self.getToken(VfrSyntaxParser.Subtitle, 0)
@@ -7968,7 +7967,6 @@ class VfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_REF_OP)
-            self.OpObj = None
             self.OHObj = None
             self.QType = EFI_QUESION_TYPE.QUESTION_REF
             self.QN = None # Token
@@ -8171,7 +8169,7 @@ class VfrSyntaxParser ( Parser ):
             else:
                 pass
             self.state = 1257
-            self.vfrQuestionHeader(localctx.OpObj, localctx.QType)
+            self.vfrQuestionHeader(localctx.Node, localctx.QType)
             self.state = 1262
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,81,self._ctx)
@@ -8183,7 +8181,7 @@ class VfrSyntaxParser ( Parser ):
                 self.state = 1260
                 self.match(VfrSyntaxParser.T__5)
                 self.state = 1261
-                self.vfrGotoFlags(localctx.OpObj)
+                self.vfrGotoFlags()
 
 
             self.state = 1268
@@ -8223,12 +8221,10 @@ class VfrSyntaxParser ( Parser ):
 
     class VfrGotoFlagsContext(ParserRuleContext):
 
-        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1, Obj=None):
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Obj = None
             self.GotoFlags = 0
-            self.Obj = Obj
 
         def gotoFlagsField(self, i:int=None):
             if i is None:
@@ -8255,9 +8251,9 @@ class VfrSyntaxParser ( Parser ):
 
 
 
-    def vfrGotoFlags(self, Obj):
+    def vfrGotoFlags(self):
 
-        localctx = VfrSyntaxParser.VfrGotoFlagsContext(self, self._ctx, self.state, Obj)
+        localctx = VfrSyntaxParser.VfrGotoFlagsContext(self, self._ctx, self.state)
         self.enterRule(localctx, 128, self.RULE_vfrGotoFlags)
         self._la = 0 # Token type
         try:
@@ -8348,7 +8344,6 @@ class VfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_RESET_BUTTON_OP)
-            self.OpObj = CIfrResetButton()
             self.N = None # Token
 
         def ResetButton(self):
@@ -8410,7 +8405,7 @@ class VfrSyntaxParser ( Parser ):
             self.state = 1292
             self.match(VfrSyntaxParser.Comma)
             self.state = 1293
-            self.vfrStatementHeader(localctx.OpObj)
+            self.vfrStatementHeader(localctx.Node)
             self.state = 1294
             self.match(VfrSyntaxParser.Comma)
             self.state = 1298
@@ -10587,7 +10582,6 @@ class VfrSyntaxParser ( Parser ):
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_CHECKBOX_OP)
             self.GuidNode = VfrTreeNode(EFI_IFR_GUID_OP)
-            self.OpObj = CIfrCheckBox()
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
             self.L = None # Token
             self.F = None # Token
@@ -10654,9 +10648,9 @@ class VfrSyntaxParser ( Parser ):
             self.state = 1587
             localctx.L = self.match(VfrSyntaxParser.CheckBox)
             self.state = 1588
-            self.vfrQuestionBaseInfo(localctx.OpObj, localctx.QType)
+            self.vfrQuestionBaseInfo(localctx.Node, localctx.QType)
             self.state = 1589
-            self.vfrStatementHeader(localctx.OpObj)
+            self.vfrStatementHeader(localctx.Node)
             self.state = 1590
             self.match(VfrSyntaxParser.Comma)
             self.state = 1596
@@ -10862,7 +10856,6 @@ class VfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_ACTION_OP)
-            self.OpObj = CIfrAction()
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
 
         def Action(self):
@@ -10932,7 +10925,7 @@ class VfrSyntaxParser ( Parser ):
             self.state = 1624
             self.match(VfrSyntaxParser.Action)
             self.state = 1625
-            self.vfrQuestionHeader(localctx.OpObj, localctx.QType)
+            self.vfrQuestionHeader(localctx.Node, localctx.QType)
             self.state = 1626
             self.match(VfrSyntaxParser.Comma)
             self.state = 1632
@@ -11161,7 +11154,6 @@ class VfrSyntaxParser ( Parser ):
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_NUMERIC_OP)
             self.GuidNode = VfrTreeNode(EFI_IFR_GUID_OP)
-            self.OpObj = CIfrNumeric()
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
             self.F = None # Token
 
@@ -11231,9 +11223,9 @@ class VfrSyntaxParser ( Parser ):
             self.state = 1661
             self.match(VfrSyntaxParser.Numeric)
             self.state = 1662
-            self.vfrQuestionBaseInfo(localctx.OpObj, localctx.QType)
+            self.vfrQuestionBaseInfo(localctx.Node, localctx.QType)
             self.state = 1663
-            self.vfrStatementHeader(localctx.OpObj)
+            self.vfrStatementHeader(localctx.Node)
             self.state = 1664
             self.match(VfrSyntaxParser.Comma)
             self.state = 1670
@@ -11265,7 +11257,7 @@ class VfrSyntaxParser ( Parser ):
 
 
             self.state = 1678
-            self.vfrSetMinMaxStep(localctx.OpObj)
+            self.vfrSetMinMaxStep(localctx.Node)
             self.state = 1679
             self.vfrStatementQuestionOptionList(localctx.Node)
             self.state = 1680
@@ -11283,16 +11275,16 @@ class VfrSyntaxParser ( Parser ):
 
     class VfrSetMinMaxStepContext(ParserRuleContext):
 
-        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1, OpObj=None):
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1, Node=None):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.OpObj = None
+            self.Node = None
             self.N1 = None # Token
             self.I = None # Token
             self.N2 = None # Token
             self.A = None # Token
             self.S = None # Token
-            self.OpObj = OpObj
+            self.Node = Node
 
         def Minimum(self):
             return self.getToken(VfrSyntaxParser.Minimum, 0)
@@ -11333,9 +11325,9 @@ class VfrSyntaxParser ( Parser ):
 
 
 
-    def vfrSetMinMaxStep(self, OpObj):
+    def vfrSetMinMaxStep(self, Node):
 
-        localctx = VfrSyntaxParser.VfrSetMinMaxStepContext(self, self._ctx, self.state, OpObj)
+        localctx = VfrSyntaxParser.VfrSetMinMaxStepContext(self, self._ctx, self.state, Node)
         self.enterRule(localctx, 200, self.RULE_vfrSetMinMaxStep)
         self._la = 0 # Token type
         try:
@@ -11581,7 +11573,6 @@ class VfrSyntaxParser ( Parser ):
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_ONE_OF_OP)
             self.GuidNode = VfrTreeNode(EFI_IFR_GUID_OP)
-            self.OpObj = CIfrOneOf()
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
             self.F = None # Token
 
@@ -11645,9 +11636,9 @@ class VfrSyntaxParser ( Parser ):
             self.state = 1722
             self.match(VfrSyntaxParser.OneOf)
             self.state = 1723
-            self.vfrQuestionBaseInfo(localctx.OpObj, localctx.QType)
+            self.vfrQuestionBaseInfo(localctx.Node, localctx.QType)
             self.state = 1724
-            self.vfrStatementHeader(localctx.OpObj)
+            self.vfrStatementHeader(localctx.Node)
             self.state = 1725
             self.match(VfrSyntaxParser.Comma)
             self.state = 1731
@@ -11669,7 +11660,7 @@ class VfrSyntaxParser ( Parser ):
             _la = self._input.LA(1)
             if _la==VfrSyntaxParser.Minimum:
                 self.state = 1733
-                self.vfrSetMinMaxStep(localctx.OpObj)
+                self.vfrSetMinMaxStep(localctx.Node)
 
 
             self.state = 1736
@@ -11813,7 +11804,6 @@ class VfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_STRING_OP)
-            self.OpObj = CIfrString()
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
             self.F = None # Token
             self.Min = None # Token
@@ -11886,7 +11876,7 @@ class VfrSyntaxParser ( Parser ):
             self.state = 1752
             self.match(VfrSyntaxParser.String)
             self.state = 1753
-            self.vfrQuestionHeader(localctx.OpObj, localctx.QType)
+            self.vfrQuestionHeader(localctx.Node, localctx.QType)
             self.state = 1754
             self.match(VfrSyntaxParser.Comma)
             self.state = 1760
@@ -12080,7 +12070,6 @@ class VfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_PASSWORD_OP)
-            self.OpObj = CIfrPassword()
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
             self.F = None # Token
             self.Min = None # Token
@@ -12156,7 +12145,7 @@ class VfrSyntaxParser ( Parser ):
             self.state = 1793
             self.match(VfrSyntaxParser.Password)
             self.state = 1794
-            self.vfrQuestionHeader(localctx.OpObj, localctx.QType)
+            self.vfrQuestionHeader(localctx.Node, localctx.QType)
             self.state = 1795
             self.match(VfrSyntaxParser.Comma)
             self.state = 1801
@@ -12356,7 +12345,6 @@ class VfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_ORDERED_LIST_OP)
-            self.OpObj = CIfrOrderedList()
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
             self.M = None # Token
             self.F = None # Token
@@ -12419,7 +12407,7 @@ class VfrSyntaxParser ( Parser ):
             self.state = 1839
             self.match(VfrSyntaxParser.OrderedList)
             self.state = 1840
-            self.vfrQuestionHeader(localctx.OpObj, localctx.QType)
+            self.vfrQuestionHeader(localctx.Node, localctx.QType)
             self.state = 1841
             self.match(VfrSyntaxParser.Comma)
             self.state = 1846
@@ -12607,7 +12595,6 @@ class VfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_DATE_OP)
-            self.OpObj = CIfrDate()
             self.QType = EFI_QUESION_TYPE.QUESTION_DATE
             self.Val = EFI_IFR_TYPE_VALUE()
             self.F1 = None # Token
@@ -12746,7 +12733,7 @@ class VfrSyntaxParser ( Parser ):
             token = self._input.LA(1)
             if token in [VfrSyntaxParser.Prompt, VfrSyntaxParser.Name, VfrSyntaxParser.VarId, VfrSyntaxParser.QuestionId]:
                 self.state = 1874
-                self.vfrQuestionHeader(localctx.OpObj, localctx.QType)
+                self.vfrQuestionHeader(localctx.Node, localctx.QType)
                 self.state = 1875
                 self.match(VfrSyntaxParser.Comma)
                 self.state = 1881
@@ -13178,7 +13165,6 @@ class VfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_TIME_OP)
-            self.OpObj = CIfrTime()
             self.QType = EFI_QUESION_TYPE.QUESTION_TIME
             self.Val = EFI_IFR_TYPE_VALUE()
             self.F1 = None # Token
@@ -13317,7 +13303,7 @@ class VfrSyntaxParser ( Parser ):
             token = self._input.LA(1)
             if token in [VfrSyntaxParser.Prompt, VfrSyntaxParser.Name, VfrSyntaxParser.VarId, VfrSyntaxParser.QuestionId]:
                 self.state = 2000
-                self.vfrQuestionHeader(localctx.OpObj, localctx.QType)
+                self.vfrQuestionHeader(localctx.Node, localctx.QType)
                 self.state = 2001
                 self.match(VfrSyntaxParser.Comma)
                 self.state = 2007

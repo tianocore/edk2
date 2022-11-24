@@ -593,59 +593,29 @@ class CIfrMinMaxStepData():
 
     def __init__(self, MinMaxStepData, NumericOpcode=False):
         self.__MinMaxStepData = MinMaxStepData
-        self.__MinMaxStepData.u64.MinValue = 0
-        self.__MinMaxStepData.u64.MaxValue = 0
-        self.__MinMaxStepData.u64.Step = 0
+        self.__MinMaxStepData.MinValue = 0
+        self.__MinMaxStepData.MaxValue = 0
+        self.__MinMaxStepData.Step = 0
         self.__ValueIsSet = False
         self.__IsNumeric = NumericOpcode
         self.__VarType = EFI_IFR_TYPE_NUM_SIZE_64
 
-    def SetMinMaxStepData(self, MinValue, MaxValue, Step, VarType):
+    def SetMinMaxStepData(self, MinValue, MaxValue, Step, VarType=None):
         self.__VarType = VarType
 
         if self.__ValueIsSet == False:
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_64:
-                self.__MinMaxStepData.u64.MinValue = MinValue
-                self.__MinMaxStepData.u64.MaxValue = MaxValue
-                self.__MinMaxStepData.u64.Step = Step
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_32:
-                self.__MinMaxStepData.u32.MinValue = MinValue
-                self.__MinMaxStepData.u32.MaxValue = MaxValue
-                self.__MinMaxStepData.u32.Step = Step
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_16:
-                self.__MinMaxStepData.u16.MinValue = MinValue
-                self.__MinMaxStepData.u16.MaxValue = MaxValue
-                self.__MinMaxStepData.u16.Step = Step
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_8:
-                self.__MinMaxStepData.u8.MinValue = MinValue
-                self.__MinMaxStepData.u8.MaxValue = MaxValue
-                self.__MinMaxStepData.u8.Step = Step
+            self.__MinMaxStepData.MinValue = MinValue
+            self.__MinMaxStepData.MaxValue = MaxValue
+            self.__MinMaxStepData.Step = Step
+
             self.__ValueIsSet = True
         else:
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_64:
-                if MinValue < self.__MinMaxStepData.u64.MinValue:
-                    self.__MinMaxStepData.u64.MinValue = MinValue
-                if MaxValue > self.__MinMaxStepData.u64.MaxValue:
-                    self.__MinMaxStepData.u64.MaxValue = MaxValue
-                self.__MinMaxStepData.u64.Step = Step
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_32:
-                if MinValue < self.__MinMaxStepData.u32.MinValue:
-                    self.__MinMaxStepData.u32.MinValue = MinValue
-                if MaxValue > self.__MinMaxStepData.u32.MaxValue:
-                    self.__MinMaxStepData.u32.MaxValue = MaxValue
-                self.__MinMaxStepData.u32.Step = Step
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_16:
-                if MinValue < self.__MinMaxStepData.u16.MinValue:
-                    self.__MinMaxStepData.u16.MinValue = MinValue
-                if MaxValue > self.__MinMaxStepData.u16.MaxValue:
-                    self.__MinMaxStepData.u16.MaxValue = MaxValue
-                self.__MinMaxStepData.u16.Step = Step
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_8:
-                if MinValue < self.__MinMaxStepData.u8.MinValue:
-                    self.__MinMaxStepData.u8.MinValue = MinValue
-                if MaxValue > self.__MinMaxStepData.u8.MaxValue:
-                    self.__MinMaxStepData.u8.MaxValue = MaxValue
-                self.__MinMaxStepData.u8.Step = Step
+            if MinValue < self.__MinMaxStepData.MinValue:
+                self.__MinMaxStepData.MinValue = MinValue
+            if MaxValue > self.__MinMaxStepData.MaxValue:
+                self.__MinMaxStepData.MaxValue = MaxValue
+            self.__MinMaxStepData.Step = Step
+
 
     def GetVarType(self):
         return self.__VarType
@@ -656,56 +626,14 @@ class CIfrMinMaxStepData():
     def UpdateCIfrMinMaxStepData(self, MinMaxStepData):
         self.__MinMaxStepData = MinMaxStepData
 
-    def GetMinData(self, VarType, IsBitVar):
+    def GetMinData(self):
+        return self.__MinMaxStepData.MinValue
 
-        if IsBitVar:
-            return self.__MinMaxStepData.u32.MinValue
+    def GetMaxData(self):
+        return self.__MinMaxStepData.MaxValue
 
-        else:
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_64:
-                return self.__MinMaxStepData.u64.MinValue
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_32:
-                return self.__MinMaxStepData.u32.MinValue
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_16:
-                return self.__MinMaxStepData.u16.MinValue
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_8:
-                return self.__MinMaxStepData.u8.MinValue
-
-        return 0
-
-    def GetMaxData(self, VarType, IsBitVar):
-
-        if IsBitVar:
-            return self.__MinMaxStepData.u32.MaxValue
-
-        else:
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_64:
-                return self.__MinMaxStepData.u64.MaxValue
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_32:
-                return self.__MinMaxStepData.u32.MaxValue
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_16:
-                return self.__MinMaxStepData.u16.MaxValue
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_8:
-                return self.__MinMaxStepData.u8.MaxValue
-
-        return 0
-
-    def GetStepData(self, VarType, IsBitVar):
-
-        if IsBitVar:
-            return self.__MinMaxStepData.u32.Step
-
-        else:
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_64:
-                return self.__MinMaxStepData.u64.Step
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_32:
-                return self.__MinMaxStepData.u32.Step
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_16:
-                return self.__MinMaxStepData.u16.Step
-            if VarType == EFI_IFR_TYPE_NUM_SIZE_8:
-                return self.__MinMaxStepData.u8.Step
-
-        return 0
+    def GetStepData(self):
+        return self.__MinMaxStepData.Step
 
 
 class CIfrFormSet(CIfrObj, CIfrOpHeader):
@@ -754,7 +682,7 @@ class CIfrFormSet(CIfrObj, CIfrOpHeader):
         return self.__FormSet
 
 
-class CIfrOneOfOption(CIfrObj, CIfrOpHeader):
+class CIfrOneOfOption2(CIfrObj, CIfrOpHeader):
 
     def __init__(self, Size):
         self.__OneOfOption = EFI_IFR_ONE_OF_OPTION()
@@ -830,19 +758,18 @@ class CIfrOneOfOption(CIfrObj, CIfrOpHeader):
         return self.__OneOfOption
 
 
-class CIfrOneOfOption2(CIfrObj, CIfrOpHeader):
+class CIfrOneOfOption(CIfrObj, CIfrOpHeader):
 
-    def __init__(self, Size, Nums, ValueType, ValueList=[]):
-        self.__OneOfOption = Refine_EFI_IFR_ONE_OF_OPTION(Nums)
-        Header = EFI_IFR_OP_HEADER()
-        CIfrOpHeader.__init__(self, Header, EFI_IFR_ONE_OF_OPTION_OP, Size)
-        self.__OneOfOption.Header = Header
+    def __init__(self, ValueType, ValueList):
+        Nums = len(ValueList)
+        self.__OneOfOption = Refine_EFI_IFR_ONE_OF_OPTION(ValueType, Nums)
+        CIfrOpHeader.__init__(self, self.__OneOfOption.Header, EFI_IFR_ONE_OF_OPTION_OP, sizeof(self.__OneOfOption))
         self.__OneOfOption.Flags = 0
         self.__OneOfOption.Option = EFI_STRING_ID_INVALID
         self.__OneOfOption.Type = EFI_IFR_TYPE_OTHER
         self.__ValueType = ValueType
         if ValueList != []:
-            ArrayType = EFI_IFR_TYPE_VALUE * Nums
+            ArrayType = TypeDict[ValueType] * Nums
             ValueArray = ArrayType()
             for i in range(0, len(ValueList)):
                 ValueArray[i] = ValueList[i]
@@ -858,7 +785,7 @@ class CIfrOneOfOption2(CIfrObj, CIfrOpHeader):
         return self.__ValueType
 
     def SetValue(self, ValueList):
-        ArrayType = EFI_IFR_TYPE_VALUE * (len(ValueList))
+        ArrayType = TypeDict[self.__ValueType] * (len(ValueList))
         ValueArray = ArrayType()
         for i in range(0, len(ValueList)):
             ValueArray[i] = ValueList[i]
@@ -922,11 +849,11 @@ class CIfrOneOfOption2(CIfrObj, CIfrOpHeader):
 
 class CIfrOptionKey(CIfrObj, CIfrOpHeader):
 
-    def __init__(self, QuestionId, OptionValue, KeyValue):
+    def __init__(self, QuestionId, Type, OptionValue, KeyValue):
 
-        self.__OptionKey = EFI_IFR_GUID_OPTIONKEY()
+        self.__OptionKey = Refine_EFI_IFR_GUID_OPTIONKEY(Type)
         CIfrOpHeader.__init__(self, self.__OptionKey.Header, EFI_IFR_GUID_OP,
-                              ctypes.sizeof(EFI_IFR_GUID_OPTIONKEY))
+                              ctypes.sizeof(self.__OptionKey))
         self.__OptionKey.ExtendOpCode = EFI_IFR_EXTEND_OP_OPTIONKEY
         self.__OptionKey.Guid = EFI_IFR_FRAMEWORK_GUID
         self.__OptionKey.QuestionId = QuestionId
@@ -1656,7 +1583,7 @@ class CIfrPassword(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
         return self.__Password
 
 
-class CIfrDefault(CIfrObj, CIfrOpHeader):
+class CIfrDefault3(CIfrObj, CIfrOpHeader):
 
     def __init__(self,
                  Size,
@@ -1683,26 +1610,23 @@ class CIfrDefault(CIfrObj, CIfrOpHeader):
         return self.__Default
 
 
-class CIfrDefault3(CIfrObj, CIfrOpHeader):
+class CIfrDefault(CIfrObj, CIfrOpHeader):
 
     def __init__(self,
-                 Size,
-                 Nums,
                  ValueType,
+                 ValueList,
                  DefaultId=EFI_HII_DEFAULT_CLASS_STANDARD,
-                 Type=EFI_IFR_TYPE_OTHER,
-                 ValueList=[]):
-        # Header = EFI_IFR_OP_HEADER()
-        self.__Default = Refine_EFI_IFR_DEFAULT(Nums)
-        CIfrOpHeader.__init__(self, self.__Default.Header, EFI_IFR_DEFAULT_OP, Size)
-        #self.__Default = Refine_EFI_IFR_DEFAULT(Nums)
-        # self.__Default.Header = Header
+                 Type=EFI_IFR_TYPE_OTHER):
+        Nums = len(ValueList)
+        self.__Default = Refine_EFI_IFR_DEFAULT(ValueType, Nums)
+        CIfrOpHeader.__init__(self, self.__Default.Header, EFI_IFR_DEFAULT_OP, sizeof(self.__Default))
+
         self.__Default.Type = Type
         self.__Default.DefaultId = DefaultId
         self.__ValueType = ValueType
 
         if ValueList != []:
-            ArrayType = EFI_IFR_TYPE_VALUE * Nums
+            ArrayType = TypeDict[ValueType] * Nums
             ValueArray = ArrayType()
             for i in range(0, len(ValueList)):
                 ValueArray[i] = ValueList[i]
@@ -1718,7 +1642,7 @@ class CIfrDefault3(CIfrObj, CIfrOpHeader):
         self.__Default.Type = Type
 
     def SetValue(self, ValueList):
-        ArrayType = EFI_IFR_TYPE_VALUE * (len(ValueList))
+        ArrayType = TypeDict[self.__ValueType] * (len(ValueList))
         ValueArray = ArrayType()
         for i in range(0, len(ValueList)):
             ValueArray[i] = ValueList[i]
@@ -1734,7 +1658,7 @@ class CIfrDefault2(CIfrObj, CIfrOpHeader):
                  DefaultId=EFI_HII_DEFAULT_CLASS_STANDARD,
                  Type=EFI_IFR_TYPE_OTHER):
         self.__Default = EFI_IFR_DEFAULT_2()
-        CIfrOpHeader.__init__(self, self.__Default.Header, EFI_IFR_DEFAULT_OP)
+        CIfrOpHeader.__init__(self, self.__Default.Header, EFI_IFR_DEFAULT_OP, sizeof(EFI_IFR_DEFAULT_2))
         self.__Default.Type = Type
         self.__Default.DefaultId = DefaultId
 
@@ -2055,9 +1979,10 @@ class CIfrOneOf(
         CIfrOpHeader,
 ):
 
-    def __init__(self):
-        self.__OneOf = EFI_IFR_ONE_OF()
-        CIfrOpHeader.__init__(self, self.__OneOf.Header, EFI_IFR_ONE_OF_OP)
+    def __init__(self, Type):
+        self.__OneOf = Refine_EFI_IFR_ONE_OF(Type)
+        CIfrOpHeader.__init__(self, self.__OneOf.Header, EFI_IFR_ONE_OF_OP,
+                              sizeof(self.__OneOf))
         CIfrQuestionHeader.__init__(self, self.__OneOf.Question)
         self.__OneOf.Flags = 0
 

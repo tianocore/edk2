@@ -88,7 +88,7 @@ EDKII_IFR_NUMERIC_SIZE_BIT = 0x3F
 
 EFI_IFR_MAX_DEFAULT_TYPE = 0x10
 
-
+BasicTypes = [EFI_IFR_TYPE_NUM_SIZE_8, EFI_IFR_TYPE_NUM_SIZE_16, EFI_IFR_TYPE_NUM_SIZE_32, EFI_IFR_TYPE_NUM_SIZE_64]
 class EFI_GUID(Structure):
     _pack_ = 1
     _fields_ = [
@@ -208,20 +208,21 @@ class EFI_IFR_VARSTORE_EFI(Structure):
     _pack_ = 1
     _fields_ = [
         ('Header', EFI_IFR_OP_HEADER),
-        ('Guid', EFI_GUID),
         ('VarStoreId', c_uint16),
+        ('Guid', EFI_GUID),
         ('Attributes', c_uint32),
         ('Size', c_uint16),
         ('Name', ARRAY(c_ubyte, 2)),
     ]
+
 
 def Refine_EFI_IFR_VARSTORE_EFI(Nums):
     class EFI_IFR_VARSTORE_EFI(Structure):
         _pack_ = 1
         _fields_ = [
             ('Header', EFI_IFR_OP_HEADER),
-            ('Guid', EFI_GUID),
             ('VarStoreId', c_uint16),
+            ('Guid', EFI_GUID),
             ('Attributes', c_uint32),
             ('Size', c_uint16),
             ('Name', ARRAY(c_ubyte, Nums)),
@@ -448,6 +449,27 @@ class EFI_IFR_ONE_OF(Structure):
         ('data', MINMAXSTEP_DATA),
     ]
 
+def Refine_EFI_IFR_ONE_OF(Type):
+
+    if Type == EFI_IFR_TYPE_NUM_SIZE_8:
+        DataType = u8Node
+    elif Type == EFI_IFR_TYPE_NUM_SIZE_16:
+        DataType = u16Node
+    elif Type == EFI_IFR_TYPE_NUM_SIZE_32:
+        DataType = u32Node
+    elif Type == EFI_IFR_TYPE_NUM_SIZE_64:
+        DataType = u64Node
+    else:
+        DataType = u32Node
+    class EFI_IFR_ONE_OF(Structure):
+        _pack_ = 1
+        _fields_ = [
+            ('Header', EFI_IFR_OP_HEADER),
+            ('Question', EFI_IFR_QUESTION_HEADER),
+            ('Flags', c_ubyte),
+            ('data', DataType),
+        ]
+    return EFI_IFR_ONE_OF()
 
 EFI_IFR_CHECKBOX_DEFAULT = 0x01
 EFI_IFR_CHECKBOX_DEFAULT_MFG = 0x02
@@ -517,7 +539,7 @@ class EFI_IFR_TYPE_VALUE(Union):
         ('u16', c_uint16),
         ('u32', c_uint32),
         ('u64', c_uint64),
-        ('b', c_bool),
+        ('b', c_ubyte), #
         ('time', EFI_HII_TIME),
         ('date', EFI_HII_DATE),
         ('string', c_uint16),
@@ -535,7 +557,22 @@ class EFI_IFR_ONE_OF_OPTION(Structure):
         ('Value', EFI_IFR_TYPE_VALUE),
     ]
 
-def Refine_EFI_IFR_ONE_OF_OPTION(Nums):
+
+TypeDict = {
+    EFI_IFR_TYPE_NUM_SIZE_8: c_ubyte,
+    EFI_IFR_TYPE_NUM_SIZE_16: c_ushort,
+    EFI_IFR_TYPE_NUM_SIZE_32: c_ulong,
+    EFI_IFR_TYPE_NUM_SIZE_64: c_ulonglong,
+    EFI_IFR_TYPE_BOOLEAN: c_ubyte,
+    EFI_IFR_TYPE_TIME: EFI_HII_TIME,
+    EFI_IFR_TYPE_DATE: EFI_HII_DATE,
+    EFI_IFR_TYPE_STRING: c_uint16,
+    EFI_IFR_TYPE_REF: EFI_HII_REF
+}
+
+def Refine_EFI_IFR_ONE_OF_OPTION(Type, Nums):
+
+    ValueType = TypeDict[Type]
     class EFI_IFR_ONE_OF_OPTION(Structure):
         _pack_ = 1
         _fields_ = [
@@ -543,7 +580,7 @@ def Refine_EFI_IFR_ONE_OF_OPTION(Nums):
             ('Option', c_uint16),
             ('Flags', c_ubyte),
             ('Type', c_ubyte),
-            ('Value', EFI_IFR_TYPE_VALUE * Nums),
+            ('Value', ValueType * Nums),
         ]
         def __init__(self) -> None:
             self.Header = EFI_IFR_OP_HEADER()
@@ -1231,14 +1268,15 @@ class EFI_IFR_DEFAULT(Structure):
         ('Value', EFI_IFR_TYPE_VALUE),
     ]
 
-def Refine_EFI_IFR_DEFAULT(Nums):
+def Refine_EFI_IFR_DEFAULT(Type, Nums):
+    ValueType = TypeDict[Type]
     class EFI_IFR_DEFAULT(Structure):
         _pack_ = 1
         _fields_ = [
             ('Header', EFI_IFR_OP_HEADER),
             ('DefaultId', c_uint16),
             ('Type', c_ubyte),
-            ('Value', ARRAY(EFI_IFR_TYPE_VALUE, Nums)),
+            ('Value', ARRAY(ValueType, Nums)),
         ]
         def __init__(self):
             self.Header = EFI_IFR_OP_HEADER()
@@ -1418,16 +1456,19 @@ EFI_IFR_MATCH2_OP = 0x64
 ConditionOps = [EFI_IFR_NO_SUBMIT_IF_OP, EFI_IFR_DISABLE_IF_OP, EFI_IFR_SUPPRESS_IF_OP, EFI_IFR_GRAY_OUT_IF_OP, EFI_IFR_INCONSISTENT_IF_OP]
 BasicDataTypes = ['UINT8', 'UINT16', 'UINT32', 'UINT64', 'EFI_HII_DATE', 'EFI_HII_TIME', 'EFI_HII_REF']
 
-class EFI_IFR_GUID_OPTIONKEY(Structure):
-    _pack_ = 1
-    _fields_ = [
-        ('Header', EFI_IFR_OP_HEADER),
-        ('Guid', EFI_GUID),
-        ('ExtendOpCode', c_uint8),
-        ('QuestionId', c_uint16),
-        ('OptionValue', EFI_IFR_TYPE_VALUE),
-        ('KeyValue', c_uint16),
-    ]
+def Refine_EFI_IFR_GUID_OPTIONKEY(Type):
+    ValueType = TypeDict[Type]
+    class EFI_IFR_GUID_OPTIONKEY(Structure):
+        _pack_ = 1
+        _fields_ = [
+            ('Header', EFI_IFR_OP_HEADER),
+            ('Guid', EFI_GUID),
+            ('ExtendOpCode', c_uint8),
+            ('QuestionId', c_uint16),
+            ('OptionValue', ValueType),
+            ('KeyValue', c_uint16),
+        ]
+    return EFI_IFR_GUID_OPTIONKEY()
 
 
 EFI_IFR_EXTEND_OP_OPTIONKEY = 0x0

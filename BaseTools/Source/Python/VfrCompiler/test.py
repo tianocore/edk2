@@ -36,27 +36,47 @@ class EFI_IFR_TYPE_VALUE(Union):
         ('u64', c_uint64),
         ('b', c_bool),
     ]
+class EFI_IFR_QUESTION_HEADER(Structure):
+    _pack_ = 1
+    _fields_ = [
 
-def Refine_EFI_IFR_EQ_ID_VAL_LIST(Nums):
+        ('QuestionId', c_uint16),
+        ('VarStoreId', c_uint16),
+
+        ('Flags', c_ubyte),
+    ]
+def Refine_EFI_IFR_EQ_ID_VAL_LIST(Type):
+    DataType = c_uint8
     class EFI_IFR_EQ_ID_VAL_LIST(Structure):
         _pack_ = 1
         _fields_ = [
             ('Header', EFI_IFR_OP_HEADER),
             ('QuestionId', c_uint16),
             ('ListLength', c_uint16),
-            ('ValueList', ARRAY(EFI_IFR_TYPE_VALUE, Nums)),  #
+            ('Data', DataType),
         ]
-        def __init__(self):
-            self.Header = EFI_IFR_OP_HEADER()
+       # def __init__(self):
+         #   self.Header = EFI_IFR_OP_HEADER()
+            #self.Data = c_bool()
 
     #EFI_IFR_EQ_ID_VAL_LIST.Header = EFI_IFR_OP_HEADER()
 
     return EFI_IFR_EQ_ID_VAL_LIST()
 
-x = Refine_EFI_IFR_EQ_ID_VAL_LIST(5)
+x = Refine_EFI_IFR_EQ_ID_VAL_LIST(c_uint16)
 print(x.Header)
 x.QuestionId = 1
 x.ListLength = 2
-print(len(x.ValueList))
+print(type(x.Data))
 y = StructToStream(x)
-print(int('Mm'))
+print(sizeof(x))
+
+class EFI_IFR_EQ_ID_VAL_LIST(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_IFR_OP_HEADER),
+        ('QuestionId', c_uint16),
+        ('ListLength', c_uint16),
+        ]
+    def SetData(self):
+        self.Data = c_bool()
