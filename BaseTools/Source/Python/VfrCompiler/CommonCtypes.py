@@ -446,7 +446,7 @@ class EFI_IFR_ONE_OF(Structure):
         ('Header', EFI_IFR_OP_HEADER),
         ('Question', EFI_IFR_QUESTION_HEADER),
         ('Flags', c_ubyte),
-        ('data', MINMAXSTEP_DATA),
+        ('Data', MINMAXSTEP_DATA),
     ]
 
 def Refine_EFI_IFR_ONE_OF(Type):
@@ -467,7 +467,7 @@ def Refine_EFI_IFR_ONE_OF(Type):
             ('Header', EFI_IFR_OP_HEADER),
             ('Question', EFI_IFR_QUESTION_HEADER),
             ('Flags', c_ubyte),
-            ('data', DataType),
+            ('Data', DataType),
         ]
     return EFI_IFR_ONE_OF()
 
@@ -483,7 +483,6 @@ class EFI_IFR_CHECKBOX(Structure):
         ('Flags', c_ubyte),
     ]
 
-
 class EFI_IFR_NUMERIC(Structure):
     _pack_ = 1
     _fields_ = [
@@ -492,6 +491,28 @@ class EFI_IFR_NUMERIC(Structure):
         ('Flags', c_ubyte),
         ('Data', MINMAXSTEP_DATA),
     ]
+
+def Refine_EFI_IFR_NUMERIC(Type):
+
+    if Type == EFI_IFR_TYPE_NUM_SIZE_8:
+        DataType = u8Node
+    elif Type == EFI_IFR_TYPE_NUM_SIZE_16:
+        DataType = u16Node
+    elif Type == EFI_IFR_TYPE_NUM_SIZE_32:
+        DataType = u32Node
+    elif Type == EFI_IFR_TYPE_NUM_SIZE_64:
+        DataType = u64Node
+    else:
+        DataType = u32Node
+    class EFI_IFR_NUMERIC(Structure):
+        _pack_ = 1
+        _fields_ = [
+            ('Header', EFI_IFR_OP_HEADER),
+            ('Question', EFI_IFR_QUESTION_HEADER),
+            ('Flags', c_ubyte),
+            ('Data', DataType),
+        ]
+    return EFI_IFR_NUMERIC()
 
 
 class EFI_IFR_PASSWORD(Structure):

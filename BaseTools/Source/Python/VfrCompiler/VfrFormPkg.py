@@ -1920,9 +1920,9 @@ class CIfrTime(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 class CIfrNumeric(CIfrObj, CIfrOpHeader, CIfrQuestionHeader,
                   CIfrMinMaxStepData):
 
-    def __init__(self):
-        self.__Numeric = EFI_IFR_NUMERIC()  # data
-        CIfrOpHeader.__init__(self, self.__Numeric.Header, EFI_IFR_NUMERIC_OP)
+    def __init__(self, Type):
+        self.__Numeric = Refine_EFI_IFR_NUMERIC(Type)
+        CIfrOpHeader.__init__(self, self.__Numeric.Header, EFI_IFR_NUMERIC_OP, sizeof(self.__Numeric))
         CIfrQuestionHeader.__init__(self, self.__Numeric.Question)
         CIfrMinMaxStepData.__init__(self, self.__Numeric.Data, True)
         self.__Numeric.Flags = EFI_IFR_NUMERIC_SIZE_1 | EFI_IFR_DISPLAY_UINT_DEC
@@ -1977,13 +1977,14 @@ class CIfrOneOf(
         CIfrQuestionHeader,
         CIfrObj,
         CIfrOpHeader,
-):
+        CIfrMinMaxStepData):
 
     def __init__(self, Type):
         self.__OneOf = Refine_EFI_IFR_ONE_OF(Type)
         CIfrOpHeader.__init__(self, self.__OneOf.Header, EFI_IFR_ONE_OF_OP,
                               sizeof(self.__OneOf))
         CIfrQuestionHeader.__init__(self, self.__OneOf.Question)
+        CIfrMinMaxStepData.__init__(self, self.__OneOf.Data)
         self.__OneOf.Flags = 0
 
     def GetQuestion(self):

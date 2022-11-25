@@ -829,7 +829,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.__CurrentQuestion = ctx.Node.Data.GetQuestion()
 
         elif ctx.Node.OpCode == EFI_IFR_NUMERIC_OP:
-            ctx.Node.Data = CIfrNumeric()
+            ctx.Node.Data = CIfrNumeric(ctx.BaseInfo.VarType)
             self.__CurrentQuestion = ctx.Node.Data.GetQuestion()
 
         if ctx.Node.Data != None:
@@ -2191,28 +2191,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             Key = self.__TransNum(ctx.Number())
             self.__AssignQuestionKey(NObj,Key)
 
-        ShrinkSize = 0
-        IsSupported = True
         if self.__CurrQestVarInfo.IsBitVar == False:
-            Type = self.__CurrQestVarInfo.VarType
-            # Base on the type to know the actual used size, shrink the buffer size allocate before.
-            if Type == EFI_IFR_TYPE_NUM_SIZE_8:
-                ShrinkSize = 21
-            elif Type == EFI_IFR_TYPE_NUM_SIZE_16:
-                ShrinkSize = 18
-            elif Type == EFI_IFR_TYPE_NUM_SIZE_32:
-                ShrinkSize = 12
-            elif Type == EFI_IFR_TYPE_NUM_SIZE_64:
-                ShrinkSize = 0
-            else:
-                IsSupported = False
-        else:
-            #　Question stored in bit fields saved as UINT32 type, so the ShrinkSize same as EFI_IFR_TYPE_NUM_SIZE_32.
-            ShrinkSize = 12
-
-        #######　NObj->ShrinkBinSize (ShrinkSize);
-        NObj.DecLength(ShrinkSize)
-        if IsSupported == False:
             self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'Numeric question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
         ctx.Node.Buffer = self.__StructToStream(NObj.GetInfo())
@@ -2357,7 +2336,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
                     if Max < Min: #
                         self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'Maximum can\'t be less than Minimum')
-
+        '''
         if self.__CurrQestVarInfo.IsBitVar:
             OpObj.SetMinMaxStepData(Min, Max, Step, EFI_IFR_TYPE_NUM_SIZE_32)
         else:
@@ -2370,6 +2349,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 OpObj.SetMinMaxStepData(Min, Max, Step, EFI_IFR_TYPE_NUM_SIZE_16)
             if Type == EFI_IFR_TYPE_NUM_SIZE_8:
                 OpObj.SetMinMaxStepData(Min, Max, Step, EFI_IFR_TYPE_NUM_SIZE_8)
+        '''
+        print(Max)
+
+        OpObj.SetMinMaxStepData(Min, Max, Step)
 
         return ctx.Node
 

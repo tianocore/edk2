@@ -279,6 +279,9 @@ class VfrTree():
                 f.write('          varname:  {}  # Question VarName STRING_ID\n'.format(Info.Question.VarStoreInfo.VarName))
                 f.write('          varoffset:  {}  # Question VarOffset\n'.format(Info.Question.VarStoreInfo.VarOffset))
                 f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags))
+                f.write('          maxvalue:  {}\n'.format(Info.Data.MaxValue))
+                f.write('          minvalue:  {}\n'.format(Info.Data.MinValue))
+                f.write('          step:  {}\n'.format(Info.Data.Step))
 
             if Root.OpCode == EFI_IFR_ONE_OF_OPTION_OP:
                 Info = Root.Data.GetInfo()
@@ -351,26 +354,31 @@ class VfrTree():
                 f.write('          varname:  {}  # Question VarName STRING_ID\n'.format(Info.Question.VarStoreInfo.VarName))
                 f.write('          varoffset:  {}  # Question VarOffset\n'.format(Info.Question.VarStoreInfo.VarOffset))
                 f.write('          flags:  {}  # Question Flags\n'.format(Info.Question.Flags))
+                f.write('          maxvalue:  {}\n'.format(Info.Data.MaxValue))
+                f.write('          minvalue:  {}\n'.format(Info.Data.MinValue))
+                f.write('          step:  {}\n'.format(Info.Data.Step))
+                '''
 
                 if Root.Data.GetVarType() == EFI_IFR_TYPE_NUM_SIZE_64:
-                    f.write('          maxvalue:  {}\n'.format(Info.Data.u64.MaxValue))
-                    f.write('          minvalue:  {}\n'.format(Info.Data.u64.MinValue))
-                    f.write('          step:  {}\n'.format(Info.Data.u64.Step))
+                    f.write('          maxvalue:  {}\n'.format(Info.Data.MaxValue))
+                    f.write('          minvalue:  {}\n'.format(Info.Data.MinValue))
+                    f.write('          step:  {}\n'.format(Info.Data.Step))
 
                 if Root.Data.GetVarType() == EFI_IFR_TYPE_NUM_SIZE_32:
-                    f.write('          maxvalue:  {}\n'.format(Info.Data.u32.MaxValue))
-                    f.write('          minvalue:  {}\n'.format(Info.Data.u32.MinValue))
-                    f.write('          step:  {}\n'.format(Info.Data.u32.Step))
+                    f.write('          maxvalue:  {}\n'.format(Info.Data.MaxValue))
+                    f.write('          minvalue:  {}\n'.format(Info.Data.MinValue))
+                    f.write('          step:  {}\n'.format(Info.Data.Step))
 
                 if Root.Data.GetVarType() == EFI_IFR_TYPE_NUM_SIZE_16:
-                    f.write('          maxvalue:  {}\n'.format(Info.Data.u16.MaxValue))
-                    f.write('          minvalue:  {}\n'.format(Info.Data.u16.MinValue))
-                    f.write('          step:  {}\n'.format(Info.Data.u16.Step))
+                    f.write('          maxvalue:  {}\n'.format(Info.Data.MaxValue))
+                    f.write('          minvalue:  {}\n'.format(Info.Data.MinValue))
+                    f.write('          step:  {}\n'.format(Info.Data.Step))
 
                 if Root.Data.GetVarType() == EFI_IFR_TYPE_NUM_SIZE_8:
-                    f.write('          maxvalue:  {}\n'.format(Info.Data.u8.MaxValue))
-                    f.write('          minvalue:  {}\n'.format(Info.Data.u8.MinValue))
-                    f.write('          step:  {}\n'.format(Info.Data.u8.Step))
+                    f.write('          maxvalue:  {}\n'.format(Info.Data.MaxValue))
+                    f.write('          minvalue:  {}\n'.format(Info.Data.MinValue))
+                    f.write('          step:  {}\n'.format(Info.Data.Step))
+                '''
 
             if Root.OpCode == EFI_IFR_CHECKBOX_OP:
                 Info = Root.Data.GetInfo()
