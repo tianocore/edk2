@@ -294,7 +294,16 @@ class CFormPkg():
                     GuidObj.SetLineNo(LineNo)
                     ReturnList.append(InsertOpNode(GuidObj, EFI_IFR_GUID_OP))
 
-                CNObj = CIfrNumeric()
+
+                if Info.IsBitVar:
+                    Info.VarType = EFI_IFR_TYPE_NUM_SIZE_32
+
+                # Numeric doesn't support BOOLEAN data type.
+                # BOOLEAN type has the same data size to UINT8.
+                elif Info.VarType == EFI_IFR_TYPE_BOOLEAN:
+                    Info.VarType = EFI_IFR_TYPE_NUM_SIZE_8
+
+                CNObj = CIfrNumeric(Info.VarType)
                 CNObj.SetLineNo(LineNo)
                 CNObj.SetPrompt(0x0)
                 CNObj.SetHelp(0x0)
@@ -304,28 +313,12 @@ class CFormPkg():
 
                 if Info.IsBitVar:
                     MaxValue = 1 << Info.VarTotalSize - 1
-                    CNObj.SetMinMaxStepData(0, MaxValue, 0, EFI_IFR_TYPE_NUM_SIZE_32)
-                    ShrinkSize = 12
+                    CNObj.SetMinMaxStepData(0, MaxValue, 0)
                     LFlags = (EDKII_IFR_NUMERIC_SIZE_BIT & Info.VarTotalSize)
                     CNObj.SetFlagsForBitField(0, LFlags)
                 else:
-                    # Numeric doesn't support BOOLEAN data type.
-                    # BOOLEAN type has the same data size to UINT8.
-                    if Info.VarType == EFI_IFR_TYPE_BOOLEAN:
-                        Info.VarType = EFI_IFR_TYPE_NUM_SIZE_8
                     CNObj.SetFlags(0, Info.VarType)
-                    CNObj.SetMinMaxStepData(0, -1, 0, Info.VarType)
-
-                    if Info.VarType == EFI_IFR_TYPE_NUM_SIZE_64:
-                        ShrinkSize = 0
-                    elif Info.VarType == EFI_IFR_TYPE_NUM_SIZE_32:
-                        ShrinkSize = 12
-                    elif Info.VarType == EFI_IFR_TYPE_NUM_SIZE_16:
-                        ShrinkSize = 18
-                    elif Info.VarType == EFI_IFR_TYPE_NUM_SIZE_8:
-                        ShrinkSize = 21
-
-                CNObj.DecLength(ShrinkSize)
+                    CNObj.SetMinMaxStepData(0, -1, 0)
 
                 if VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_EFI:
                     CVNObj = CIfrVarEqName(QId, Info.Info.VarName)
@@ -598,10 +591,8 @@ class CIfrMinMaxStepData():
         self.__MinMaxStepData.Step = 0
         self.__ValueIsSet = False
         self.__IsNumeric = NumericOpcode
-        self.__VarType = EFI_IFR_TYPE_NUM_SIZE_64
 
-    def SetMinMaxStepData(self, MinValue, MaxValue, Step, VarType=None):
-        self.__VarType = VarType
+    def SetMinMaxStepData(self, MinValue, MaxValue, Step):
 
         if self.__ValueIsSet == False:
             self.__MinMaxStepData.MinValue = MinValue
@@ -615,10 +606,6 @@ class CIfrMinMaxStepData():
             if MaxValue > self.__MinMaxStepData.MaxValue:
                 self.__MinMaxStepData.MaxValue = MaxValue
             self.__MinMaxStepData.Step = Step
-
-
-    def GetVarType(self):
-        return self.__VarType
 
     def IsNumericOpcode(self):
         return self.__IsNumeric
@@ -680,83 +667,6 @@ class CIfrFormSet(CIfrObj, CIfrOpHeader):
 
     def GetInfo(self):
         return self.__FormSet
-
-
-class CIfrOneOfOption2(CIfrObj, CIfrOpHeader):
-
-    def __init__(self, Size):
-        self.__OneOfOption = EFI_IFR_ONE_OF_OPTION()
-        CIfrOpHeader.__init__(self, self.__OneOfOption.Header,
-                              EFI_IFR_ONE_OF_OPTION_OP, Size)
-        self.__OneOfOption.Flags = 0
-        self.__OneOfOption.Option = EFI_STRING_ID_INVALID
-        self.__OneOfOption.Type = EFI_IFR_TYPE_OTHER
-        self.__OneOfOption.Value = EFI_IFR_TYPE_VALUE()
-
-    def SetOption(self, Option):
-        self.__OneOfOption.Option = Option
-
-    def SetType(self, Type):
-        self.__OneOfOption.Type = Type
-
-    def SetValue(self, Value):
-        self.__OneOfOption.Value = Value
-
-    def GetFlags(self):
-        return self.__OneOfOption.Flags
-
-    def SetFlags(self, LFlags):
-
-        self.__OneOfOption.Flags = 0
-        LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_OPTION_DEFAULT)
-        if Ret:
-            self.__OneOfOption.Flags |= EFI_IFR_OPTION_DEFAULT
-
-        LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_OPTION_DEFAULT_MFG)
-        if Ret:
-            self.__OneOfOption.Flags |= EFI_IFR_OPTION_DEFAULT_MFG
-
-        if LFlags == EFI_IFR_TYPE_NUM_SIZE_8:
-            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_8)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_8
-
-        elif LFlags == EFI_IFR_TYPE_NUM_SIZE_16:
-            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_16)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_16
-
-        elif LFlags == EFI_IFR_TYPE_NUM_SIZE_32:
-            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_32)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_32
-
-        elif LFlags == EFI_IFR_TYPE_NUM_SIZE_64:
-            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_64)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_64
-
-        elif LFlags == EFI_IFR_TYPE_BOOLEAN:
-            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_BOOLEAN)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_BOOLEAN
-
-        elif LFlags == EFI_IFR_TYPE_TIME:
-            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_TIME)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_TIME
-
-        elif LFlags == EFI_IFR_TYPE_DATE:
-            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_DATE)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_DATE
-
-        elif LFlags == EFI_IFR_TYPE_STRING:
-            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_STRING)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_STRING
-
-        elif LFlags == EFI_IFR_TYPE_OTHER:
-            LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_OTHER)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_OTHER
-
-        return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
-
-    def GetInfo(self):
-        return self.__OneOfOption
-
 
 class CIfrOneOfOption(CIfrObj, CIfrOpHeader):
 
@@ -1581,34 +1491,6 @@ class CIfrPassword(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 
     def GetInfo(self):
         return self.__Password
-
-
-class CIfrDefault3(CIfrObj, CIfrOpHeader):
-
-    def __init__(self,
-                 Size,
-                 DefaultId=EFI_HII_DEFAULT_CLASS_STANDARD,
-                 Type=EFI_IFR_TYPE_OTHER,
-                 Value=EFI_IFR_TYPE_VALUE()):
-        self.__Default = EFI_IFR_DEFAULT()
-        CIfrOpHeader.__init__(self, self.__Default.Header, EFI_IFR_DEFAULT_OP,
-                              Size)
-        self.__Default.Type = Type
-        self.__Default.DefaultId = DefaultId
-        self.__Default.Value = Value
-
-    def SetDefaultId(self, DefaultId):
-        self.__Default.DefaultId = DefaultId
-
-    def SetType(self, Type):
-        self.__Default.Type = Type
-
-    def SetValue(self, Value):
-        self.__Default.Value = Value
-
-    def GetInfo(self):
-        return self.__Default
-
 
 class CIfrDefault(CIfrObj, CIfrOpHeader):
 

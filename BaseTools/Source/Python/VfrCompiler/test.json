@@ -476,7 +476,7 @@
         "DefaultStore": "0",
         "Size": "1",
         "Offset": 1656,
-        "Value": "<CommonCtypes.EFI_IFR_TYPE_VALUE object at 0x000001CB1BBA6240>"
+        "Value": "True"
       },
       {
         "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
@@ -508,7 +508,7 @@
         "DefaultStore": "0",
         "Size": "1",
         "Offset": 1713,
-        "Value": "<CommonCtypes.EFI_IFR_TYPE_VALUE object at 0x000001CB1BBA6240>"
+        "Value": "True"
       },
       {
         "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
@@ -572,7 +572,7 @@
         "DefaultStore": "0",
         "Size": "1",
         "Offset": 92,
-        "Value": "<CommonCtypes.EFI_IFR_TYPE_VALUE object at 0x000001CB1BBA6240>"
+        "Value": "True"
       },
       {
         "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
@@ -612,7 +612,7 @@
         "DefaultStore": "1",
         "Size": "1",
         "Offset": 92,
-        "Value": "<CommonCtypes.EFI_IFR_TYPE_VALUE object at 0x000001CB1BBA6240>"
+        "Value": "True"
       },
       {
         "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
@@ -660,7 +660,7 @@
         "DefaultStore": "0",
         "Size": "1",
         "Offset": 51,
-        "Value": "<CommonCtypes.EFI_IFR_TYPE_VALUE object at 0x000001CB1BBA6240>"
+        "Value": "True"
       },
       {
         "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
@@ -684,7 +684,7 @@
         "DefaultStore": "0",
         "Size": "1",
         "Offset": 17,
-        "Value": "<CommonCtypes.EFI_IFR_TYPE_VALUE object at 0x000001CB1BBA6240>"
+        "Value": "True"
       },
       {
         "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",

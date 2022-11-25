@@ -980,7 +980,7 @@ class CVfrBufferConfig(object):
 
     @abstractmethod
     def Write(self, Mode, Name, Guid, Id, Type, Offset, Width,
-              Value: EFI_IFR_TYPE_VALUE):
+              Value):
         Ret = self.Select(Name, Guid)
         if Ret != 0:
             return Ret

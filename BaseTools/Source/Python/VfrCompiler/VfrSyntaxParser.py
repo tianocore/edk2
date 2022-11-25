@@ -6226,7 +6226,6 @@ class VfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Value = EFI_IFR_TYPE_VALUE()
             self.ValueList = []
             self.ListType = False
 
@@ -12596,7 +12595,7 @@ class VfrSyntaxParser ( Parser ):
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_DATE_OP)
             self.QType = EFI_QUESION_TYPE.QUESTION_DATE
-            self.Val = EFI_IFR_TYPE_VALUE()
+            self.Val = EFI_HII_DATE()
             self.F1 = None # Token
             self.F2 = None # Token
 
@@ -12797,7 +12796,7 @@ class VfrSyntaxParser ( Parser ):
                 self.state = 1905
                 self.match(VfrSyntaxParser.Comma)
                 self.state = 1906
-                self.minMaxDateStepDefault(localctx.Val.date, 0)
+                self.minMaxDateStepDefault(localctx.Val, 0)
                 self.state = 1907
                 self.match(VfrSyntaxParser.Month)
                 self.state = 1908
@@ -12841,7 +12840,7 @@ class VfrSyntaxParser ( Parser ):
                 self.state = 1927
                 self.match(VfrSyntaxParser.Comma)
                 self.state = 1928
-                self.minMaxDateStepDefault(localctx.Val.date, 1)
+                self.minMaxDateStepDefault(localctx.Val, 1)
                 self.state = 1929
                 self.match(VfrSyntaxParser.Day)
                 self.state = 1930
@@ -12885,7 +12884,7 @@ class VfrSyntaxParser ( Parser ):
                 self.state = 1949
                 self.match(VfrSyntaxParser.Comma)
                 self.state = 1950
-                self.minMaxDateStepDefault(localctx.Val.date, 2)
+                self.minMaxDateStepDefault(localctx.Val, 2)
                 self.state = 1956
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -13166,7 +13165,7 @@ class VfrSyntaxParser ( Parser ):
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_TIME_OP)
             self.QType = EFI_QUESION_TYPE.QUESTION_TIME
-            self.Val = EFI_IFR_TYPE_VALUE()
+            self.Val = EFI_HII_TIME()
             self.F1 = None # Token
             self.F2 = None # Token
 
@@ -13367,7 +13366,7 @@ class VfrSyntaxParser ( Parser ):
                 self.state = 2031
                 self.match(VfrSyntaxParser.Comma)
                 self.state = 2032
-                self.minMaxTimeStepDefault(localctx.Val.time, 0)
+                self.minMaxTimeStepDefault(localctx.Val, 0)
                 self.state = 2033
                 self.match(VfrSyntaxParser.Minute)
                 self.state = 2034
@@ -13411,7 +13410,7 @@ class VfrSyntaxParser ( Parser ):
                 self.state = 2053
                 self.match(VfrSyntaxParser.Comma)
                 self.state = 2054
-                self.minMaxTimeStepDefault(localctx.Val.time, 1)
+                self.minMaxTimeStepDefault(localctx.Val, 1)
                 self.state = 2055
                 self.match(VfrSyntaxParser.Second)
                 self.state = 2056
@@ -13455,7 +13454,7 @@ class VfrSyntaxParser ( Parser ):
                 self.state = 2075
                 self.match(VfrSyntaxParser.Comma)
                 self.state = 2076
-                self.minMaxTimeStepDefault(localctx.Val.time, 2)
+                self.minMaxTimeStepDefault(localctx.Val, 2)
                 self.state = 2082
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)

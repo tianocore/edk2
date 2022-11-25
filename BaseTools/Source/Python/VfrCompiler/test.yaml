@@ -77,7 +77,7 @@ Formset:
           varname:  93  # Question VarName STRING_ID
           varoffset:  93  # Question VarOffset
           flags:  0  # Question Flags
-          maxvalue:  0
+          maxvalue:  2
           minvalue:  0
           step:  0
           - option:  42
@@ -100,7 +100,7 @@ Formset:
           varname:  118  # Question VarName STRING_ID
           varoffset:  118  # Question VarOffset
           flags:  0  # Question Flags
-          maxvalue:  0
+          maxvalue:  4
           minvalue:  0
           step:  0
           - default:
@@ -202,7 +202,7 @@ Formset:
           varname:  89  # Question VarName STRING_ID
           varoffset:  89  # Question VarOffset
           flags:  16  # Question Flags
-          maxvalue:  0
+          maxvalue:  1
           minvalue:  0
           step:  0
           - option:  39
@@ -224,7 +224,7 @@ Formset:
           varname:  90  # Question VarName STRING_ID
           varoffset:  90  # Question VarOffset
           flags:  16  # Question Flags
-          maxvalue:  0
+          maxvalue:  1
           minvalue:  0
           step:  0
           - option:  39
@@ -243,7 +243,7 @@ Formset:
           varname:  91  # Question VarName STRING_ID
           varoffset:  91  # Question VarOffset
           flags:  16  # Question Flags
-          maxvalue:  0
+          maxvalue:  3
           minvalue:  0
           step:  0
           - option:  39
@@ -266,7 +266,7 @@ Formset:
           varname:  217  # Question VarName STRING_ID
           varoffset:  217  # Question VarOffset
           flags:  48  # Question Flags
-          maxvalue:  0
+          maxvalue:  3
           minvalue:  0
           step:  0
           - option:  39
@@ -412,7 +412,7 @@ Formset:
           varname:  1  # Question VarName STRING_ID
           varoffset:  1  # Question VarOffset
           flags:  0  # Question Flags
-          maxvalue:  0
+          maxvalue:  1
           minvalue:  0
           step:  0
           - option:  45
@@ -710,7 +710,7 @@ Formset:
           varname:  192  # Question VarName STRING_ID
           varoffset:  192  # Question VarOffset
           flags:  0  # Question Flags
-          maxvalue:  0
+          maxvalue:  4
           minvalue:  0
           step:  0
           - option:  152
@@ -751,8 +751,8 @@ Formset:
           varname:  194  # Question VarName STRING_ID
           varoffset:  194  # Question VarOffset
           flags:  0  # Question Flags
-          maxvalue:  0
-          minvalue:  0
+          maxvalue:  1016
+          minvalue:  744
           step:  0
           - option:  160
               option flag:  17
@@ -779,8 +779,8 @@ Formset:
           varname:  196  # Question VarName STRING_ID
           varoffset:  196  # Question VarOffset
           flags:  0  # Question Flags
-          maxvalue:  0
-          minvalue:  0
+          maxvalue:  4
+          minvalue:  3
           step:  0
           - option:  164
               option flag:  16
@@ -872,7 +872,7 @@ Formset:
           varname:  18  # Question VarName STRING_ID
           varoffset:  18  # Question VarOffset
           flags:  0  # Question Flags
-          maxvalue:  0
+          maxvalue:  1
           minvalue:  0
           step:  0
           - option:  45
@@ -904,7 +904,7 @@ Formset:
           varname:  0  # Question VarName STRING_ID
           varoffset:  0  # Question VarOffset
           flags:  0  # Question Flags
-          maxvalue:  0
+          maxvalue:  1
           minvalue:  0
           step:  0
           - option:  45
@@ -961,7 +961,7 @@ Formset:
           varname:  41  # Question VarName STRING_ID
           varoffset:  41  # Question VarOffset
           flags:  0  # Question Flags
-          maxvalue:  0
+          maxvalue:  1
           minvalue:  0
           step:  0
           - option:  45
@@ -996,7 +996,7 @@ Formset:
           varname:  1714  # Question VarName STRING_ID
           varoffset:  1714  # Question VarOffset
           flags:  0  # Question Flags
-          maxvalue:  0
+          maxvalue:  1
           minvalue:  0
           step:  0
           - option:  45
@@ -1036,7 +1036,7 @@ Formset:
           varname:  212  # Question VarName STRING_ID
           varoffset:  212  # Question VarOffset
           flags:  0  # Question Flags
-          maxvalue:  0
+          maxvalue:  1
           minvalue:  0
           step:  0
           - option:  45
@@ -1061,7 +1061,7 @@ Formset:
           varname:  1664  # Question VarName STRING_ID
           varoffset:  1664  # Question VarOffset
           flags:  0  # Question Flags
-          maxvalue:  0
+          maxvalue:  1
           minvalue:  0
           step:  0
           - option:  45

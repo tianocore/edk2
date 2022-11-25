@@ -866,7 +866,7 @@ locals[HFlag=0, LFlag=0]
     ;
 
 vfrStatementDate
-locals[Node=VfrTreeNode(EFI_IFR_DATE_OP), QType=EFI_QUESION_TYPE.QUESTION_DATE, Val=EFI_IFR_TYPE_VALUE()]
+locals[Node=VfrTreeNode(EFI_IFR_DATE_OP), QType=EFI_QUESION_TYPE.QUESTION_DATE, Val=EFI_HII_DATE()]
     :   'date'
         (   (   vfrQuestionHeader[localctx.Node, localctx.QType] ','
                 (F1='flags' '=' vfrDateFlags ',')?
@@ -876,15 +876,15 @@ locals[Node=VfrTreeNode(EFI_IFR_DATE_OP), QType=EFI_QUESION_TYPE.QUESTION_DATE, 
             (   'year' 'varid' '=' StringIdentifier '.' StringIdentifier ','
                 'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
                 'help' '=' 'STRING_TOKEN' '(' Number ')' ','
-                minMaxDateStepDefault[localctx.Val.date, 0]
+                minMaxDateStepDefault[localctx.Val, 0]
                 'month' 'varid' '=' StringIdentifier '.' StringIdentifier ','
                 'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
                 'help' '=' 'STRING_TOKEN' '(' Number ')' ','
-                minMaxDateStepDefault[localctx.Val.date, 1]
+                minMaxDateStepDefault[localctx.Val, 1]
                 'day' 'varid' '=' StringIdentifier '.' StringIdentifier ','
                 'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
                 'help' '=' 'STRING_TOKEN' '(' Number ')' ','
-                minMaxDateStepDefault[localctx.Val.date, 2]
+                minMaxDateStepDefault[localctx.Val, 2]
                 (F2='flags' '=' vfrDateFlags ',')?
                 (vfrStatementInconsistentIf)*
             )
@@ -915,7 +915,7 @@ locals[LFlag=0]
     ;
 
 vfrStatementTime
-locals[Node=VfrTreeNode(EFI_IFR_TIME_OP), QType=EFI_QUESION_TYPE.QUESTION_TIME,  Val=EFI_IFR_TYPE_VALUE()]
+locals[Node=VfrTreeNode(EFI_IFR_TIME_OP), QType=EFI_QUESION_TYPE.QUESTION_TIME,  Val=EFI_HII_TIME()]
     :   'time'
         (   (   vfrQuestionHeader[localctx.Node, localctx.QType] ','
                 (F1='flags' '=' vfrTimeFlags ',')?
@@ -926,15 +926,15 @@ locals[Node=VfrTreeNode(EFI_IFR_TIME_OP), QType=EFI_QUESION_TYPE.QUESTION_TIME, 
                 'hour' 'varid' '=' StringIdentifier '.' StringIdentifier ','
                 'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
                 'help' '=' 'STRING_TOKEN' '(' Number ')' ','
-                minMaxTimeStepDefault[localctx.Val.time, 0]
+                minMaxTimeStepDefault[localctx.Val, 0]
                 'minute' 'varid' '=' StringIdentifier '.' StringIdentifier ','
                 'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
                 'help' '=' 'STRING_TOKEN' '(' Number ')' ','
-                minMaxTimeStepDefault[localctx.Val.time, 1]
+                minMaxTimeStepDefault[localctx.Val, 1]
                 'second' 'varid' '=' StringIdentifier '.' StringIdentifier ','
                 'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
                 'help' '=' 'STRING_TOKEN' '(' Number ')' ','
-                minMaxTimeStepDefault[localctx.Val.time, 2]
+                minMaxTimeStepDefault[localctx.Val, 2]
                 (F2='flags' '=' vfrTimeFlags ',')?
                 (vfrStatementInconsistentIf)*
             )

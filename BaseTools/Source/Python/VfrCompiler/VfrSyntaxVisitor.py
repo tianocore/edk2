@@ -25,12 +25,12 @@ else:
 
 # This class defines a complete generic visitor for a parse tree produced by VfrSyntaxParser.
 class VfrSyntaxVisitor(ParseTreeVisitor):
-    gZeroEfiIfrTypeValue = EFI_IFR_TYPE_VALUE()
 
     def __init__(self, Root=None):
         self.__OverrideClassGuid = None
         self.__ParserStatus = 0
         self.__FormsetGuid = None
+        self.__Value = None
         self.__LastFormNode = None
         self.__CIfrOpHdrIndex = -1
         self.__ConstantOnlyInExpression = False
@@ -43,7 +43,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         self.__CVfrQuestionDB = CVfrQuestionDB()
         self.__CurrentQuestion = None
-        self.__CurrentMinMaxData = None #
+        self.__CurrentMinMaxData = None
 
         self.__IsStringOp = False
         self.__IsOrderedList = False
@@ -51,6 +51,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         self.__Root = Root
         self.NeedAdjustOpcode = False
+
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrProgram.
     def visitVfrProgram(self, ctx:VfrSyntaxParser.VfrProgramContext):
@@ -826,11 +827,13 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         if ctx.Node.OpCode == EFI_IFR_ONE_OF_OP:
             ctx.Node.Data = CIfrOneOf(ctx.BaseInfo.VarType)
-            self.__CurrentQuestion = ctx.Node.Data.GetQuestion()
+            self.__CurrentQuestion = ctx.Node.Data
+            self.__CurrentMinMaxData = ctx.Node.Data
 
         elif ctx.Node.OpCode == EFI_IFR_NUMERIC_OP:
             ctx.Node.Data = CIfrNumeric(ctx.BaseInfo.VarType)
-            self.__CurrentQuestion = ctx.Node.Data.GetQuestion()
+            self.__CurrentQuestion = ctx.Node.Data
+            self.__CurrentMinMaxData = ctx.Node.Data
 
         if ctx.Node.Data != None:
             ctx.Node.Data.SetQuestionId(QId)
@@ -927,7 +930,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.__ErrorHandler(ReturnCode, ctx.SN2.line, VarStr)
             VarGuid = gCVfrDataStorage.GetVarStoreGuid(ctx.BaseInfo.VarStoreId)
             self.__ErrorHandler(gCVfrBufferConfig.Register(SName, VarGuid), ctx.SN2.line)
-            Dummy = self.gZeroEfiIfrTypeValue
             ReturnCode = VfrReturnCode(gCVfrBufferConfig.Write(
                 'a',
                 SName,
@@ -936,7 +938,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 ctx.BaseInfo.VarType,
                 ctx.BaseInfo.Info.VarOffset,
                 ctx.BaseInfo.VarTotalSize,
-                Dummy)) #　the definition of dummy is needed to check
+                self.__Value))
             self.__ErrorHandler(ReturnCode, ctx.SN2.line)
             self.__ErrorHandler(gCVfrDataStorage.AddBufferVarStoreFieldInfo(ctx.BaseInfo), ctx.SN2.line)
 
@@ -1740,9 +1742,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 # check default value is valid for Numeric Opcode
                 for i in range(0, len(ValueList)):
                     Value = ValueList[i]
-
-                    if Value < self.__CurrentMinMaxData.GetMinData() or Value > self.__CurrentMinMaxData.GetMaxData():
-                        self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "Numeric default value must be between MinValue and MaxValue.")
+                    if type(Value) == int:
+                        if Value < self.__CurrentMinMaxData.GetMinData() or Value > self.__CurrentMinMaxData.GetMaxData():
+                            self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "Numeric default value must be between MinValue and MaxValue.")
 
             if Type == EFI_IFR_TYPE_OTHER:
                 self.__ErrorHandler(VfrReturnCode.VFR_RETURN_FATAL_ERROR, Line, "Default data type error.")
@@ -1823,20 +1825,15 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Type = self.__CurrQestVarInfo.VarType
         if self.__CurrentMinMaxData != None:
             #set min/max value for oneof opcode
-            Step = self.__CurrentMinMaxData.GetStepData(Type, self.__CurrQestVarInfo.IsBitVar)
-            if self.__CurrQestVarInfo.IsBitVar:
-                Type = EFI_IFR_TYPE_NUM_SIZE_32
-            self.__CurrentMinMaxData.SetMinMaxStepData(Value, Step, Type)
+            Step = self.__CurrentMinMaxData.GetStepData()
+            self.__CurrentMinMaxData.SetMinMaxStepData(Value, Value, Step)
 
-       #　EFI_IFR_TYPE_OTHER
-
+        if self.__CurrQestVarInfo.IsBitVar:
+            Type = EFI_IFR_TYPE_NUM_SIZE_32
         OOOObj = CIfrOneOfOption(Type, ValueList)
 
         if not ctx.vfrConstantValueField().ListType:
-            if self.__CurrQestVarInfo.IsBitVar:
-                OOOObj.SetType(EFI_IFR_TYPE_NUM_SIZE_32)
-            else:
-                OOOObj.SetType(Type)
+            OOOObj.SetType(Type)
         else:
             OOOObj.SetType(EFI_IFR_TYPE_BUFFER)
 
@@ -1999,7 +1996,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         ctx.Node.Data = CBObj
         Line =  ctx.start.line
         CBObj.SetLineNo(Line)
-        self.__CurrentQuestion = CBObj.GetQuestion()
+        self.__CurrentQuestion = CBObj
         self.__IsCheckBoxOp = True
 
         self.visitChildren(ctx)
@@ -2041,14 +2038,14 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 self.__CompareErrorHandler(ReturnCode, VfrReturnCode.VFR_RETURN_SUCCESS, Line, ctx.L.text, "Failed to retrieve varstore name")
 
                 VarStoreGuid = gCVfrDataStorage.GetVarStoreGuid(self.__CurrQestVarInfo.VarStoreId)
-                self.gZeroEfiIfrTypeValue.b = True
+                self.__Value = True
                 if CBObj.GetFlags() & 0x01:
                     self.__CheckDuplicateDefaultValue(EFI_HII_DEFAULT_CLASS_STANDARD, ctx.F.line, ctx.F.text)
-                    ReturnCode = gCVfrDefaultStore.BufferVarStoreAltConfigAdd(EFI_HII_DEFAULT_CLASS_STANDARD,self.__CurrQestVarInfo, VarStoreName, VarStoreGuid, self.__CurrQestVarInfo.VarType, self.gZeroEfiIfrTypeValue)
+                    ReturnCode = gCVfrDefaultStore.BufferVarStoreAltConfigAdd(EFI_HII_DEFAULT_CLASS_STANDARD,self.__CurrQestVarInfo, VarStoreName, VarStoreGuid, self.__CurrQestVarInfo.VarType, self.__Value)
                     self.__CompareErrorHandler(ReturnCode, VfrReturnCode.VFR_RETURN_SUCCESS, Line, ctx.L.text, "No standard default storage found")
                 if CBObj.GetFlags() & 0x02:
                     self.__CheckDuplicateDefaultValue(EFI_HII_DEFAULT_CLASS_MANUFACTURING, ctx.F.line, ctx.F.text)
-                    ReturnCode =  gCVfrDefaultStore.BufferVarStoreAltConfigAdd(EFI_HII_DEFAULT_CLASS_MANUFACTURING, self.__CurrQestVarInfo, VarStoreName, VarStoreGuid, self.__CurrQestVarInfo.VarType, self.gZeroEfiIfrTypeValue)
+                    ReturnCode =  gCVfrDefaultStore.BufferVarStoreAltConfigAdd(EFI_HII_DEFAULT_CLASS_MANUFACTURING, self.__CurrQestVarInfo, VarStoreName, VarStoreGuid, self.__CurrQestVarInfo.VarType, self.__Value)
                     self.__CompareErrorHandler(ReturnCode, VfrReturnCode.VFR_RETURN_SUCCESS, Line, ctx.L.text, "No manufacturing default storage found")
         if ctx.Key() != None:
             Key = self.__TransNum(ctx.Number())
@@ -2336,21 +2333,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
                     if Max < Min: #
                         self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'Maximum can\'t be less than Minimum')
-        '''
-        if self.__CurrQestVarInfo.IsBitVar:
-            OpObj.SetMinMaxStepData(Min, Max, Step, EFI_IFR_TYPE_NUM_SIZE_32)
-        else:
-            Type = self.__CurrQestVarInfo.VarType
-            if Type == EFI_IFR_TYPE_NUM_SIZE_64:
-                OpObj.SetMinMaxStepData(Min, Max, Step, EFI_IFR_TYPE_NUM_SIZE_64)
-            if Type == EFI_IFR_TYPE_NUM_SIZE_32:
-                OpObj.SetMinMaxStepData(Min, Max, Step, EFI_IFR_TYPE_NUM_SIZE_32)
-            if Type == EFI_IFR_TYPE_NUM_SIZE_16:
-                OpObj.SetMinMaxStepData(Min, Max, Step, EFI_IFR_TYPE_NUM_SIZE_16)
-            if Type == EFI_IFR_TYPE_NUM_SIZE_8:
-                OpObj.SetMinMaxStepData(Min, Max, Step, EFI_IFR_TYPE_NUM_SIZE_8)
-        '''
-        print(Max)
 
         OpObj.SetMinMaxStepData(Min, Max, Step)
 
@@ -2617,7 +2599,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         SObj = CIfrString()
         ctx.Node.Data = SObj
         SObj.SetLineNo(ctx.start.line)
-        self.__CurrentQuestion = SObj.GetQuestion()
+        self.__CurrentQuestion = SObj
 
         self.visitChildren(ctx)
 
@@ -2692,7 +2674,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         PObj = CIfrPassword()
         ctx.Node.Data = PObj
         PObj.SetLineNo(ctx.start.line)
-        self.__CurrentQuestion = PObj.GetQuestion()
+        self.__CurrentQuestion = PObj
 
         self.visitChildren(ctx)
 
@@ -2760,7 +2742,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         OLObj = CIfrOrderedList()
         ctx.Node.Data = OLObj
         OLObj.SetLineNo(ctx.start.line)
-        self.__CurrentQuestion = OLObj.GetQuestion()
+        self.__CurrentQuestion = OLObj
         self.__IsOrderedList = True
 
         self.visitChildren(ctx)
@@ -2827,7 +2809,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         ctx.Node.Data = DObj
         Line = ctx.start.line
         DObj.SetLineNo(Line)
-
+        self.__Value = ctx.Val
         self.visitChildren(ctx)
 
         if ctx.vfrQuestionHeader() != None:
@@ -2861,8 +2843,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             DObj.SetPrompt(self.__TransNum(ctx.Number(0)))
             DObj.SetHelp(self.__TransNum(ctx.Number(1)))
 
-            Size = EFI_IFR_DEFAULT.Value.offset + sizeof (EFI_HII_DATE)
-            DefaultObj = CIfrDefault(Size, EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_DATE, ctx.Val)
+            DefaultObj = CIfrDefault(EFI_IFR_TYPE_DATE, [ctx.Val], EFI_HII_DEFAULT_CLASS_STANDARD, ctx.Val, EFI_IFR_TYPE_DATE)
             DefaultObj.SetLineNo(Line)
             DefaultNode = VfrTreeNode(EFI_IFR_DEFAULT_OP, DefaultObj, self.__StructToStream(DefaultObj.GetInfo()))
             ctx.Node.insertChild(DefaultNode)
@@ -2936,7 +2917,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         ctx.Node.Data = TObj
         Line = ctx.start.line
         TObj.SetLineNo(Line)
-
+        self.__Value = ctx.Val
         self.visitChildren(ctx)
 
         if ctx.vfrQuestionHeader() != None:
@@ -2969,8 +2950,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             TObj.SetPrompt(self.__TransNum(ctx.Number(0)))
             TObj.SetHelp(self.__TransNum(ctx.Number(1)))
 
-            Size = EFI_IFR_DEFAULT.Value.offset + sizeof (EFI_HII_TIME)
-            DefaultObj = CIfrDefault(Size, EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_TIME, ctx.Val)
+            DefaultObj = CIfrDefault(EFI_IFR_TYPE_TIME, [ctx.Val], EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_TIME)
             DefaultObj.SetLineNo(Line)
             DefaultNode = VfrTreeNode(EFI_IFR_DEFAULT_OP, DefaultObj, self.__StructToStream(DefaultObj.GetInfo()))
             ctx.Node.insertChild(DefaultNode)
@@ -4167,8 +4147,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         QR1Obj = CIfrQuestionRef1(Line)
         self.__SaveOpHdrCond(QR1Obj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
-        print('QNAME')
-        print(QName)
+
         QR1Obj.SetQuestionId(QId, QName, Line)
         ctx.Node.Data = QR1Obj
         ctx.Node.Buffer = self.__StructToStream(QR1Obj.GetInfo())
