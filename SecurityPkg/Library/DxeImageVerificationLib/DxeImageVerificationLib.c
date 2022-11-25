@@ -1686,6 +1686,7 @@ DxeImageVerificationHandler (
   RETURN_STATUS                 PeCoffStatus;
   EFI_STATUS                    HashStatus;
   EFI_STATUS                    DbStatus;
+  EFI_STATUS                    SecBootStatus;
   BOOLEAN                       IsFound;
 
   SignatureList     = NULL;
@@ -1742,23 +1743,29 @@ DxeImageVerificationHandler (
     CpuDeadLoop ();
   }
 
-  GetEfiGlobalVariable2 (EFI_SECURE_BOOT_MODE_NAME, (VOID **)&SecureBoot, NULL);
-  //
-  // Skip verification if SecureBoot variable doesn't exist.
-  //
-  if (SecureBoot == NULL) {
-    return EFI_SUCCESS;
-  }
+  SecBootStatus = GetEfiGlobalVariable2 (EFI_SECURE_BOOT_MODE_NAME, (VOID **)&SecureBoot, NULL);
+  if (!EFI_ERROR (SecBootStatus)) {
+    if (SecureBoot == NULL) {
+      //
+      // Skip verification if SecureBoot variable doesn't exist.
+      //
+      return EFI_SUCCESS;
+    } else {
+      //
+      // Skip verification if SecureBoot is disabled but not AuditMode
+      //
+      if (*SecureBoot == SECURE_BOOT_MODE_DISABLE) {
+        FreePool (SecureBoot);
+        return EFI_SUCCESS;
+      }
 
-  //
-  // Skip verification if SecureBoot is disabled but not AuditMode
-  //
-  if (*SecureBoot == SECURE_BOOT_MODE_DISABLE) {
-    FreePool (SecureBoot);
-    return EFI_SUCCESS;
+      FreePool (SecureBoot);
+    }
+  } else {
+    //
+    // Assume SecureBoot enabled in the case of error.
+    //
   }
-
-  FreePool (SecureBoot);
 
   //
   // Read the Dos header.
