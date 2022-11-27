@@ -653,6 +653,7 @@ PlatformValidateNvVarStore (
       (!CompareGuid (&FvHdrGUID, &NvVarStoreFvHeader->FileSystemGuid)) ||
       (NvVarStoreFvHeader->Signature != EFI_FVH_SIGNATURE) ||
       (NvVarStoreFvHeader->Attributes != 0x4feff) ||
+      ((NvVarStoreFvHeader->HeaderLength & 0x01) != 0) ||
       (NvVarStoreFvHeader->Revision != EFI_FVH_REVISION) ||
       (NvVarStoreFvHeader->FvLength != NvVarStoreSize)
       )
