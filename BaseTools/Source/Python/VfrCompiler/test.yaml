@@ -124,7 +124,7 @@ Formset:
           varoffset:  92  # Question VarOffset
           flags:  3  # Flags
           - default:
-              type:  4
+              type:  0
               defaultId:  0
               value:  1
       - label:

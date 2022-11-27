@@ -1253,18 +1253,23 @@ locals[Nodes=[]]
         ('%' castTerm[ExpInfo]) # multdivmodTermModulo
     ;
 
-castTerm[ExpInfo] // 11.15
+castTerm[ExpInfo]
 locals[Nodes=[]]
-    :   (   '('
-            (  'BOOLEAN'
-            |  'UINT64'
-            |  'UINT32'
-            |  'UINT16'
-            |  'UINT8'
-            )
-            ')'
-        )*
+    :   (castTermSub)*
         atomTerm[ExpInfo]
+    ;
+
+castTermSub
+locals[CastType=0xFF]
+    :   '('
+        (  'BOOLEAN'
+        |  'UINT64'
+        |  'UINT32'
+        |  'UINT16'
+        |  'UINT8'
+        )
+        ')'
+
     ;
 
 atomTerm[ExpInfo]

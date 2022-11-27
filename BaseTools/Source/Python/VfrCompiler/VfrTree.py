@@ -84,10 +84,6 @@ class VfrTree():
     def GenBinary(self, FileName):
         try:
             with open(FileName, 'wb') as f:
-                #f.write(bytes('MyIfrNVData','utf-8'))
-                Name = ctypes.c_wchar_p('MyIfrNVData')
-
-                # f.write(Name)
                 self.GenBinaryDfs(self.__Root, f)
             f.close()
         except:
@@ -104,17 +100,11 @@ class VfrTree():
     def GenCFileDfs(self, Root, f):
         if Root.OpCode != None:
             f.write('{}\n'.format(type(Root.Data)))
-
-            #Buffer = self.__StructToStream(Root.Data.GetInfo())
-
             if Root.Buffer != None:
                 Hex = ''
                 for B in Root.Buffer:
                     Hex += ' '+ hex(B)
                 f.write('{}\n'.format(Hex))
-
-        # else:
-        #f.write(Buffer)
 
         if Root.Child != []:
             for ChildNode in Root.Child:
@@ -122,11 +112,12 @@ class VfrTree():
 
     def GenBinaryDfs(self, Root, f, Flag = True):
         if Root.OpCode != None:
-            #Buffer = self.__StructToStream(Root.Data.GetInfo())
+            if Root.OpCode in ExpOps:
+                Root.Buffer = self.__StructToStream(Root.Data.GetInfo())
 
             if Root.Buffer != None:
-                if Root.OpCode == EFI_IFR_DEFAULTSTORE_OP:
-                    Root.Buffer = self.__StructToStream(Root.Data.GetInfo()) # need to update Buffer
+                #if Root.OpCode == EFI_IFR_DEFAULTSTORE_OP:
+                    #Root.Buffer = self.__StructToStream(Root.Data.GetInfo()) # need to update Buffer
                 f.write(Root.Buffer)
         # else:
         #f.write(Buffer)

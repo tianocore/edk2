@@ -11,7 +11,7 @@ from ctypes import *
 gCVfrVarDataTypeDB = CVfrVarDataTypeDB()
 gCVfrDefaultStore = CVfrDefaultStore()
 gCVfrDataStorage = CVfrDataStorage()
-
+ExpOps = [EFI_IFR_DUP_OP, EFI_IFR_EQ_ID_VAL_OP, EFI_IFR_QUESTION_REF1_OP, EFI_IFR_EQ_ID_VAL_OP, EFI_IFR_EQ_ID_ID_OP, EFI_IFR_EQ_ID_VAL_LIST_OP, EFI_IFR_RULE_REF_OP, EFI_IFR_STRING_REF1_OP, EFI_IFR_THIS_OP, EFI_IFR_SECURITY_OP, EFI_IFR_GET_OP, EFI_IFR_TRUE_OP, EFI_IFR_FALSE_OP, EFI_IFR_ONE_OP, EFI_IFR_ONES_OP, EFI_IFR_ZERO_OP, EFI_IFR_UNDEFINED_OP, EFI_IFR_VERSION_OP, EFI_IFR_UINT64_OP, EFI_IFR_QUESTION_REF2_OP, EFI_IFR_QUESTION_REF3_OP, EFI_IFR_SET_OP, EFI_IFR_DEFAULTSTORE_OP, EFI_IFR_OR_OP]
 class OpNode():
 
     def __init__(self, Size, Scope):
@@ -142,7 +142,6 @@ gOpcodeSizesScopeTable = [
     OpNode(ctypes.sizeof(EFI_IFR_MATCH2), 0)
 ]
 
-
 class OpBufferNode():
 
     def __init__(self, Buffer=None, Next=None):
@@ -198,8 +197,6 @@ class CFormPkg():
         return self.__PkgLength
 
     def AssignPending(self, Key, VarAddr, LineNo, Msg, Type=0):
-        print('KEY')
-        print(Key)
         pNew = SPendingAssign(Key, VarAddr, LineNo, Msg, Type)
         if pNew == None:
             return VfrReturnCode.VFR_RETURN_OUT_FOR_RESOURCES
@@ -262,8 +259,6 @@ class CFormPkg():
 
                 # Get VarStoreType
                 Info.VarStoreId, ReturnCode = lCVfrDataStorage.GetVarStoreId(FName)
-                print(ReturnCode)
-                print(Info.VarStoreId)
 
                 if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
                     gCVfrErrorHandle.PrintMsg (pNode.LineNo, "Error", "Var Store Type is not defined", FName)
@@ -2425,10 +2420,8 @@ class CIfrEqIdList(CIfrObj, CIfrOpHeader):
 
     def __init__(self, LineNo, Nums, ValueList=[]):
         self.__EqIdVList = Refine_EFI_IFR_EQ_ID_VAL_LIST(Nums)
-        Header = EFI_IFR_OP_HEADER()
-        CIfrOpHeader.__init__(self, Header, EFI_IFR_EQ_ID_VAL_OP)
+        CIfrOpHeader.__init__(self, self.__EqIdVList.Header, EFI_IFR_EQ_ID_VAL_LIST_OP, sizeof(self.__EqIdVList))
         self.SetLineNo(LineNo)
-        self.__EqIdVList.Header = Header
         self.__EqIdVList.QuestionId = EFI_QUESTION_ID_INVALID
         self.__EqIdVList.ListLength = 0
         if ValueList != []:
@@ -2517,7 +2510,7 @@ class CIfrUint64(CIfrObj, CIfrOpHeader):
 
     def __init__(self, LineNo):
         self.__Uint64 = EFI_IFR_UINT64()
-        CIfrOpHeader.__init__(self, self.__Uint64.Header, EFI_IFR_UINT64_OP)
+        CIfrOpHeader.__init__(self, self.__Uint64.Header, EFI_IFR_UINT64_OP, sizeof(EFI_IFR_UINT64))
         self.SetLineNo(LineNo)
 
     def SetValue(self, Value):
@@ -2572,7 +2565,7 @@ class CIfrQuestionRef3(CIfrObj, CIfrOpHeader):
     def __init__(self, LineNo):
         self.__QuestionRef3 = EFI_IFR_QUESTION_REF3()
         CIfrOpHeader.__init__(self, self.__QuestionRef3.Header,
-                              EFI_IFR_QUESTION_REF3_OP)
+                              EFI_IFR_QUESTION_REF3_OP, sizeof(EFI_IFR_QUESTION_REF3))
         self.SetLineNo(LineNo)
 
     def GetHeader(self):
@@ -2587,7 +2580,7 @@ class CIfrQuestionRef3_2(CIfrObj, CIfrOpHeader):
     def __init__(self, LineNo):
         self.__QuestionRef3_2 = EFI_IFR_QUESTION_REF3_2()
         CIfrOpHeader.__init__(self, self.__QuestionRef3_2.Header,
-                              EFI_IFR_QUESTION_REF3_OP)
+                              EFI_IFR_QUESTION_REF3_OP, sizeof(EFI_IFR_QUESTION_REF3_2))
         self.SetLineNo(LineNo)
         self.__QuestionRef3_2.DevicePath = EFI_STRING_ID_INVALID
 
@@ -2606,7 +2599,7 @@ class CIfrQuestionRef3_3(CIfrObj, CIfrOpHeader):
     def __init__(self, LineNo):
         self.__QuestionRef3_3 = EFI_IFR_QUESTION_REF3_3()
         CIfrOpHeader.__init__(self, self.__QuestionRef3_3.Header,
-                              EFI_IFR_QUESTION_REF3_OP)
+                              EFI_IFR_QUESTION_REF3_OP, sizeof(EFI_IFR_QUESTION_REF3_3))
         self.SetLineNo(LineNo)
         self.__QuestionRef3_3.DevicePath = EFI_STRING_ID_INVALID
         self.__QuestionRef3_3.Guid = EFI_GUID(

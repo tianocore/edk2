@@ -6,6 +6,7 @@ import uuid
 from VfrError import *
 from struct import *
 
+
 EFI_STRING_ID_INVALID = 0x0
 EFI_HII_DEFAULT_CLASS_STANDARD = 0x0000
 EFI_HII_DEFAULT_CLASS_MANUFACTURING = 0x0001
@@ -764,6 +765,7 @@ class EFI_IFR_OR(Structure):
     _pack_ = 1
     _fields_ = [
         ('Header', EFI_IFR_OP_HEADER),
+
     ]
 
 

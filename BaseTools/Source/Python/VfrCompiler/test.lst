@@ -909,6 +909,7 @@ formset
 
 
 
+
     oneof name = MyOneOf,
 >0000013E: 05 91 1F 00 26 00 01 00 34 12 5D 00 00 10 00 02 00
       varid   = MyIfrNVData.SuppressGrayOutSomething,
