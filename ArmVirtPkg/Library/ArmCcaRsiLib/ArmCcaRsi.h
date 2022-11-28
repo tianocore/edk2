@@ -7,6 +7,7 @@
   @par Glossary:
     - Rsi or RSI   - Realm Service Interface
     - IPA          - Intermediate Physical Address
+    - RIPAS        - Realm IPA state
 
   @par Reference(s):
    - Realm Management Monitor (RMM) Specification, version A-bet0
@@ -17,8 +18,10 @@
 #define ARM_CCA_RSI_H_
 
 // FIDs for Realm Service Interface calls.
-#define FID_RSI_REALM_CONFIG  0xC4000196
-#define FID_RSI_VERSION       0xC4000190
+#define FID_RSI_IPA_STATE_GET  0xC4000198
+#define FID_RSI_IPA_STATE_SET  0xC4000197
+#define FID_RSI_REALM_CONFIG   0xC4000196
+#define FID_RSI_VERSION        0xC4000190
 
 /** RSI Command Return codes
    See Section B4.4.1, RMM Specification, version A-bet0.

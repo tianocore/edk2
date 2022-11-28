@@ -6,6 +6,7 @@
 
     - Rsi or RSI   - Realm Service Interface
     - IPA          - Intermediate Physical Address
+    - RIPAS        - Realm IPA state
 
   @par Reference(s):
    - Realm Management Monitor (RMM) Specification, version A-bet0
@@ -24,6 +25,21 @@
 */
 #define REALM_GRANULE_SIZE  SIZE_4KB
 
+/**
+  A macro defining the mask for the RSI RIPAS type.
+  See Section B4.4.5 RsiRipas type, RMM Specification, version A-bet0.
+*/
+#define RIPAS_TYPE_MASK  0xFF
+
+/** An enum describing the RSI RIPAS.
+   See Section A5.2.2 Realm IPA state, RMM Specification, version A-bet0
+*/
+typedef enum Ripas {
+  RipasEmpty,      ///< Unused IPA location.
+  RipasRam,        ///< Private code or data owned by the Realm.
+  RipasMax         ///< A valid RIPAS type value is less than RipasMax.
+} RIPAS;
+
 /** A structure describing the Realm Configuration.
   See Section B4.4.4 RsiRealmConfig type, RMM Specification, version A-bet0
   The width of the RsiRealmConfig structure is 4096 (0x1000) bytes.
@@ -34,6 +50,40 @@ typedef struct RealmConfig {
   // Unused bits of the RsiRealmConfig structure should be zero.
   UINT8     Reserved[SIZE_4KB - sizeof (UINT64)];
 } REALM_CONFIG;
+
+/**
+  Returns the IPA state for the page pointed by the address.
+
+  @param [in]   Address     Address to retrive IPA state.
+  @param [out]  State       The RIPAS state for the address specified.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+RsiGetIpaState (
+  IN   UINT64  *Address,
+  OUT  RIPAS   *State
+  );
+
+/**
+  Sets the IPA state for the pages pointed by the memory range.
+
+  @param [in]   Address     Address to the start of the memory range.
+  @param [in]   Size        Length of the memory range.
+  @param [in]   State       The RIPAS state to be configured.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+RsiSetIpaState (
+  IN  UINT64  *Address,
+  IN  UINT64  Size,
+  IN  RIPAS   State
+  );
 
 /**
   Read the Realm Configuration.
