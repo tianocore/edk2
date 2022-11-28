@@ -7,6 +7,7 @@
   @par Glossary:
     - Rsi or RSI   - Realm Service Interface
     - IPA          - Intermediate Physical Address
+    - RIPAS        - Realm IPA state
 
   @par Reference(s):
    - Realm Management Monitor (RMM) Specification, version 1.0-rel0
@@ -68,6 +69,117 @@ ArmCcaRsiCmdStatusToReturnStatus (
   } // switch
 
   return RETURN_ABORTED;
+}
+
+/**
+  Returns the IPA state for the page pointed by the address.
+
+  @param [in]       Base        Base of target IPA region.
+  @param [in, out]  Top         End  of target IPA region on input.
+                                Top of IPA region which has the
+                                reported RIPAS value on return.
+  @param [out]  State           The RIPAS state for the address specified.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRsiGetIpaState (
+  IN      UINT64         *Base,
+  IN OUT  UINT64         **Top,
+  OUT     ARM_CCA_RIPAS  *State
+  )
+{
+  RETURN_STATUS  Status;
+  ARM_SMC_ARGS   SmcCmd;
+
+  if ((State == NULL) ||
+      (!IS_REALM_GRANULE_ALIGNED (Base)) ||
+      (!IS_REALM_GRANULE_ALIGNED (*Top)) ||
+      (*Top < Base))
+  {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  ZeroMem (&SmcCmd, sizeof (SmcCmd));
+  SmcCmd.Arg0 = ARM_CCA_FID_RSI_IPA_STATE_GET;
+  SmcCmd.Arg1 = (UINTN)Base;
+  SmcCmd.Arg2 = (UINTN)*Top;
+
+  ArmCallSmc (&SmcCmd);
+  Status = ArmCcaRsiCmdStatusToReturnStatus (SmcCmd.Arg0);
+  if (!RETURN_ERROR (Status)) {
+    *Top   = (UINT64 *)SmcCmd.Arg1;
+    *State = (ARM_CCA_RIPAS)(SmcCmd.Arg2 & ARM_CCA_RIPAS_TYPE_MASK);
+  }
+
+  return Status;
+}
+
+/**
+  Sets the IPA state for the pages pointed by the memory range.
+
+  @param [in]   Address     Address to the start of the memory range.
+  @param [in]   Size        Length of the memory range.
+  @param [in]   State       The RIPAS state to be configured.
+  @param [in]   Flags       The RIPAS change flags.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_ACCESS_DENIED      RIPAS change request was rejected.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRsiSetIpaState (
+  IN  UINT64         *Address,
+  IN  UINT64         Size,
+  IN  ARM_CCA_RIPAS  State,
+  IN  UINT64         Flags
+  )
+{
+  RETURN_STATUS  Status;
+  UINT64         *BaseAddress;
+  UINT64         *EndAddress;
+  ARM_SMC_ARGS   SmcCmd;
+
+  if ((Size == 0) ||
+      (!IS_REALM_GRANULE_ALIGNED (Address))                ||
+      (!IS_REALM_GRANULE_ALIGNED ((UINT8 *)Address + Size)) ||
+      ((State != RipasEmpty) && (State != RipasRam)))
+  {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  BaseAddress = Address;
+  // Divide Size by 8 for the pointer arithmetic
+  // to work, as we are adding to UINT64*.
+  EndAddress = Address + (Size / 8);
+
+  while (Size > 0) {
+    ZeroMem (&SmcCmd, sizeof (SmcCmd));
+    SmcCmd.Arg0 = ARM_CCA_FID_RSI_IPA_STATE_SET;
+    SmcCmd.Arg1 = (UINTN)BaseAddress;
+    SmcCmd.Arg2 = (UINTN)EndAddress;
+    SmcCmd.Arg3 = (UINTN)State;
+    SmcCmd.Arg4 = Flags;
+
+    ArmCallSmc (&SmcCmd);
+    Status = ArmCcaRsiCmdStatusToReturnStatus (SmcCmd.Arg0);
+    if (RETURN_ERROR (Status)) {
+      break;
+    }
+
+    BaseAddress = (UINT64 *)SmcCmd.Arg1;
+    Size        = EndAddress - BaseAddress;
+
+    if ((SmcCmd.Arg2 & ARM_CCA_RSI_RESPONSE_MASK) == ARM_CCA_RIPAS_CHANGE_RESPONSE_REJECT) {
+      Status = RETURN_ACCESS_DENIED;
+      break;
+    }
+  }   // while
+
+  return Status;
 }
 
 /**
