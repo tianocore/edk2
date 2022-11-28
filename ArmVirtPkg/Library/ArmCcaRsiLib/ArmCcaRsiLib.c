@@ -7,6 +7,7 @@
   @par Glossary:
     - Rsi or RSI   - Realm Service Interface
     - IPA          - Intermediate Physical Address
+    - RIPAS        - Realm IPA state
 
   @par Reference(s):
    - Realm Management Monitor (RMM) Specification, version A-bet0
@@ -79,6 +80,97 @@ AddrIsGranuleAligned (
   }
 
   return TRUE;
+}
+
+/**
+  Returns the IPA state for the page pointed by the address.
+
+  @param [in]   Address     Address to retrive IPA state.
+  @param [out]  State       The RIPAS state for the address specified.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+RsiGetIpaState (
+  IN   UINT64  *Address,
+  OUT  RIPAS   *State
+  )
+{
+  RETURN_STATUS  Status;
+  ARM_SMC_ARGS   SmcCmd;
+
+  if ((State == NULL) || (!AddrIsGranuleAligned (Address))) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  ZeroMem (&SmcCmd, sizeof (SmcCmd));
+  SmcCmd.Arg0 = FID_RSI_IPA_STATE_GET;
+  SmcCmd.Arg1 = (UINTN)Address;
+
+  ArmCallSmc (&SmcCmd);
+  Status = RsiCmdStatusToEfiStatus (SmcCmd.Arg0);
+  if (!RETURN_ERROR (Status)) {
+    *State = (RIPAS)(SmcCmd.Arg1 & RIPAS_TYPE_MASK);
+  }
+
+  return Status;
+}
+
+/**
+  Sets the IPA state for the pages pointed by the memory range.
+
+  @param [in]   Address     Address to the start of the memory range.
+  @param [in]   Size        Length of the memory range.
+  @param [in]   State       The RIPAS state to be configured.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+RsiSetIpaState (
+  IN  UINT64  *Address,
+  IN  UINT64  Size,
+  IN  RIPAS   State
+  )
+{
+  RETURN_STATUS  Status;
+  UINT64         *BaseAddress;
+  UINT64         *EndAddress;
+  ARM_SMC_ARGS   SmcCmd;
+
+  if ((Size == 0) ||
+      ((Size & (REALM_GRANULE_SIZE - 1)) != 0) ||
+      (!AddrIsGranuleAligned (Address)))
+  {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  BaseAddress = Address;
+  // Divide Size by 8 for the pointer arithmetic
+  // to work, as we are adding to UINT64*.
+  EndAddress = Address + (Size >> 3);
+
+  while (Size > 0) {
+    ZeroMem (&SmcCmd, sizeof (SmcCmd));
+    SmcCmd.Arg0 = FID_RSI_IPA_STATE_SET;
+    SmcCmd.Arg1 = (UINTN)BaseAddress;
+    SmcCmd.Arg2 = (UINTN)Size;
+    SmcCmd.Arg3 = (UINTN)State;
+
+    ArmCallSmc (&SmcCmd);
+    Status = RsiCmdStatusToEfiStatus (SmcCmd.Arg0);
+    if (RETURN_ERROR (Status)) {
+      break;
+    }
+
+    BaseAddress = (UINT64 *)SmcCmd.Arg1;
+    Size        = EndAddress - BaseAddress;
+  }   // while
+
+  return Status;
 }
 
 /**
