@@ -8,6 +8,7 @@
     - Rsi or RSI   - Realm Service Interface
     - IPA          - Intermediate Physical Address
     - RIPAS        - Realm IPA state
+    - REM          - Realm Extensible Measurement
 
   @par Reference(s):
    - Realm Management Monitor (RMM) Specification, version 1.0-rel0
@@ -178,6 +179,96 @@ ArmCcaRsiSetIpaState (
       break;
     }
   }   // while
+
+  return Status;
+}
+
+/**
+  Extends a measurement to a REM.
+
+  @param [in] MeasurementIndex     Index of the REM.
+  @param [in] Measurement          Pointer to the measurement buffer.
+  @param [in] MeasurementSize      Size of the measurement data.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRsiExtendMeasurement (
+  IN        UINTN          MeasurementIndex,
+  IN  CONST UINT8  *CONST  Measurement,
+  IN        UINTN          MeasurementSize
+  )
+{
+  ARM_SMC_ARGS  SmcCmd;
+  UINT64        *Data64;
+
+  if ((MeasurementIndex < ARM_CCA_MIN_REM_INDEX)  ||
+      (MeasurementIndex > ARM_CCA_MAX_REM_INDEX)  ||
+      (Measurement == NULL)               ||
+      (MeasurementSize == 0)              ||
+      (MeasurementSize > ARM_CCA_MAX_MEASUREMENT_DATA_SIZE_BYTES))
+  {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  ZeroMem (&SmcCmd, sizeof (SmcCmd));
+
+  SmcCmd.Arg0 = ARM_CCA_FID_RSI_MEASUREMENT_EXTEND;
+  SmcCmd.Arg1 = MeasurementIndex;
+  SmcCmd.Arg2 = MeasurementSize;
+
+  Data64 = &SmcCmd.Arg3;
+  CopyMem (Data64, Measurement, MeasurementSize);
+
+  ArmCallSmc (&SmcCmd);
+  return ArmCcaRsiCmdStatusToReturnStatus (SmcCmd.Arg0);
+}
+
+/**
+  Read the measurement value from a REM.
+
+  @param [in]   MeasurementIndex     Index of the REM.
+  @param [out]  MeasurementBuffer     Pointer to store the measurement data.
+  @param [in]   MeasurementBufferSize Size of the measurement buffer.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRsiReadMeasurement (
+  IN    UINTN          MeasurementIndex,
+  OUT   UINT8  *CONST  MeasurementBuffer,
+  IN    UINTN          MeasurementBufferSize
+  )
+{
+  RETURN_STATUS  Status;
+  ARM_SMC_ARGS   SmcCmd;
+  UINT64         *Data64;
+
+  if ((MeasurementIndex < ARM_CCA_MIN_REM_INDEX)  ||
+      (MeasurementIndex > ARM_CCA_MAX_REM_INDEX)  ||
+      (MeasurementBuffer == NULL))
+  {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  if (MeasurementBufferSize < ARM_CCA_MAX_MEASUREMENT_DATA_SIZE_BYTES) {
+    return RETURN_BUFFER_TOO_SMALL;
+  }
+
+  ZeroMem (&SmcCmd, sizeof (SmcCmd));
+  SmcCmd.Arg0 = ARM_CCA_FID_RSI_MEASUREMENT_READ;
+  SmcCmd.Arg1 = MeasurementIndex;
+
+  ArmCallSmc (&SmcCmd);
+  Status = ArmCcaRsiCmdStatusToReturnStatus (SmcCmd.Arg0);
+  if (!RETURN_ERROR (Status)) {
+    Data64 = &SmcCmd.Arg1;
+    CopyMem (MeasurementBuffer, Data64, ARM_CCA_MAX_MEASUREMENT_DATA_SIZE_BYTES);
+  }
 
   return Status;
 }
