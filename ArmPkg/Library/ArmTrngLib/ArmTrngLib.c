@@ -331,14 +331,12 @@ ArmTrngLibConstructor (
   ArmMonitorCall (&Parameters);
   Status = TrngStatusToReturnStatus ((INT32)Parameters.Arg0);
   if (RETURN_ERROR (Status)) {
-    ASSERT_RETURN_ERROR (Status);
     goto ErrorHandler;
   }
 
   // Cf [1] s2.1.3 'Caller responsibilities',
   // SMCCC version must be greater or equal than 1.1
   if ((INT32)Parameters.Arg0 < 0x10001) {
-    ASSERT_RETURN_ERROR (RETURN_UNSUPPORTED);
     goto ErrorHandler;
   }
 
@@ -350,14 +348,12 @@ ArmTrngLibConstructor (
   // Check that the required features are present.
   Status = GetArmTrngFeatures (ARM_SMC_ID_TRNG_RND, NULL);
   if (RETURN_ERROR (Status)) {
-    ASSERT_RETURN_ERROR (Status);
     goto ErrorHandler;
   }
 
   // Check if TRNG UUID is supported and if so trace the GUID.
   Status = GetArmTrngFeatures (ARM_SMC_ID_TRNG_GET_UUID, NULL);
   if (RETURN_ERROR (Status)) {
-    ASSERT_RETURN_ERROR (Status);
     goto ErrorHandler;
   }
 
@@ -365,7 +361,6 @@ ArmTrngLibConstructor (
 
   Status = GetArmTrngUuid (&Guid);
   if (RETURN_ERROR (Status)) {
-    ASSERT_RETURN_ERROR (Status);
     goto ErrorHandler;
   }
 
