@@ -20,6 +20,7 @@
 // FIDs for Realm Service Interface calls.
 #define FID_RSI_ATTESTATION_TOKEN_CONTINUE  0xC4000195
 #define FID_RSI_ATTESTATION_TOKEN_INIT      0xC4000194
+#define FID_RSI_HOST_CALL                   0xC4000199
 #define FID_RSI_IPA_STATE_GET               0xC4000198
 #define FID_RSI_IPA_STATE_SET               0xC4000197
 #define FID_RSI_MEASUREMENT_EXTEND          0xC4000193

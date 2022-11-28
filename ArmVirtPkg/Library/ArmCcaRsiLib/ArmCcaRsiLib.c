@@ -490,6 +490,46 @@ RsiGetRealmConfig (
 }
 
 /**
+  Make a Host Call.
+
+  A Host call can be used by a Realm to make a hypercall.
+  On Realm execution of HVC, an Unknown exception is taken to the Realm.
+
+  @param [in] Args    Pointer to the IPA of the Host call data
+                      structure.
+
+  Note: The IPA of the Host call arguments data structure must be aligned
+         to the Realm granule size.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+RsiHostCall (
+  IN  HOST_CALL_ARGS  *Args
+  )
+{
+  ARM_SMC_ARGS  SmcCmd;
+
+  if ((Args == NULL) || (!AddrIsGranuleAligned ((UINT64 *)Args))) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  STATIC_ASSERT (sizeof (HOST_CALL_ARGS) == SIZE_4KB);
+
+  // Clear the reserved fields
+  ZeroMem (&Args->Reserved, sizeof (Args->Reserved));
+
+  ZeroMem (&SmcCmd, sizeof (SmcCmd));
+  SmcCmd.Arg0 = FID_RSI_HOST_CALL;
+  SmcCmd.Arg1 = (UINTN)Args;
+
+  ArmCallSmc (&SmcCmd);
+  return RsiCmdStatusToEfiStatus (SmcCmd.Arg0);
+}
+
+/**
    Get the version of the RSI implementation.
 
   @param [out] Major  The major version of the RSI implementation.

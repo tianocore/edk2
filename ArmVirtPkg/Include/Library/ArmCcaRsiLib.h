@@ -81,6 +81,21 @@ typedef struct RealmConfig {
   UINT8     Reserved[SIZE_4KB - sizeof (UINT64)];
 } REALM_CONFIG;
 
+/** A structure describing the Host Call arguments
+    See Section 4.4.2 RsiHostCall type, RMM Specification, version A-bet0
+*/
+typedef struct HostCallArgs {
+  UINT64    Imm;
+  UINT64    Gprs0;
+  UINT64    Gprs1;
+  UINT64    Gprs2;
+  UINT64    Gprs3;
+  UINT64    Gprs4;
+  UINT64    Gprs5;
+  UINT64    Gprs6;
+  UINT8     Reserved[0x1000 - (sizeof (UINT64) * 8)];
+} HOST_CALL_ARGS;
+
 /**
   Retrieve an attestation token from the RMM.
 
@@ -196,6 +211,27 @@ RETURN_STATUS
 EFIAPI
 RsiGetRealmConfig (
   IN  REALM_CONFIG  *Config
+  );
+
+/**
+  Make a Host Call.
+
+  A Host call can be used by a Realm to make a hypercall.
+  On Realm execution of HVC, an Unknown exception is taken to the Realm.
+
+  @param [in] Args    Pointer to the IPA of the Host call data
+                      structure.
+
+  Note: The IPA of the Host call arguments data structure must be aligned
+         to the Realm granule size.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+RsiHostCall (
+  IN  HOST_CALL_ARGS  *Args
   );
 
 /**
