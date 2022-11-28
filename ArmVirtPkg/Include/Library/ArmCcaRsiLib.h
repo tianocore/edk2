@@ -32,6 +32,14 @@
 */
 #define ARM_CCA_RIPAS_TYPE_MASK  0xFF
 
+/* Maximum challenge data size in bits.
+*/
+#define ARM_CCA_MAX_CHALLENGE_DATA_SIZE_BITS  512
+
+/* Minimum recommended challenge data size in bits.
+*/
+#define ARM_CCA_MIN_CHALLENGE_DATA_SIZE_BITS  256
+
 /* Maximum measurement data size in bytes.
   See Section C1.17 RmmRealmMeasurement type, RMM Specification, version 1.0-rel0
   The width of the RmmRealmMeasurement type is 512 bits.
@@ -46,6 +54,16 @@
 */
 #define ARM_CCA_MIN_REM_INDEX  1
 #define ARM_CCA_MAX_REM_INDEX  4
+
+/* The values of the RsiHashAlgorithm enumeration.
+   SHA-256 (Secure Hash Standard (SHS))
+*/
+#define ARM_CCA_RSI_HASH_SHA_256  0
+
+/* The values of the RsiHashAlgorithm enumeration.
+   SHA-512 (Secure Hash Standard (SHS))
+*/
+#define ARM_CCA_RSI_HASH_SHA_512  1
 
 /* The RsiRipasChangeFlags fieldset contains flags provided by
    the Realm when requesting a RIPAS change.
@@ -181,6 +199,55 @@ typedef struct ArmCcaRsiHostCallArgs {
 } ARM_CCA_RSI_HOST_CALL_ARGS;
 
 #pragma pack()
+
+/**
+  Retrieve an attestation token from the RMM.
+
+  @param [in]       ChallengeData         Pointer to the challenge data to be
+                                          included in the attestation token.
+  @param [in]       ChallengeDataSizeBits Size of the challenge data in bits.
+  @param [out]      TokenBuffer           Pointer to a buffer to store the
+                                          retrieved attestation token.
+  @param [out]      TokenBufferSize       Length of token data returned.
+
+  Note: The TokenBuffer allocated must be freed by the caller
+  using RsiFreeAttestationToken().
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_OUT_OF_RESOURCES   Out of resources.
+  @retval RETURN_ABORTED            The operation was aborted as the state
+                                    of the Realm or REC does not match the
+                                    state expected by the command.
+                                    Or the Token generation failed for an
+                                    unknown or IMPDEF reason.
+  @retval RETURN_NOT_READY          The operation requested by the command
+                                    is not complete.
+  @retval RETURN_BAD_BUFFER_SIZE    The token buffer size returned in an
+                                    earlier call to RSI_ATTESTATION_TOKEN_INIT
+                                    was insufficient to complete the operation.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRsiGetAttestationToken (
+  IN      CONST UINT8   *CONST  ChallengeData,
+  IN            UINT64          ChallengeDataSizeBits,
+  OUT           UINT8  **CONST  TokenBuffer,
+  OUT           UINT64  *CONST  TokenBufferSize
+  );
+
+/**
+  Free the attestation token buffer.
+
+  @param [in]      TokenBuffer           Pointer to the retrieved
+                                         attestation token.
+  @param [in]      TokenBufferSize       Size of the token buffer.
+**/
+VOID
+ArmCcaRsiFreeAttestationToken (
+  IN           UINT8  *CONST  TokenBuffer,
+  IN           UINT64  CONST  TokenBufferSize
+  );
 
 /**
   Returns the IPA state for the page pointed by the address.
