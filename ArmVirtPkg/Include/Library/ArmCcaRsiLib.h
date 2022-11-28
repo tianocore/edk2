@@ -7,6 +7,8 @@
     - Rsi or RSI   - Realm Service Interface
     - IPA          - Intermediate Physical Address
     - RIPAS        - Realm IPA state
+    - RIM          - Realm Initial Measurement
+    - REM          - Realm Extensible Measurement
 
   @par Reference(s):
    - Realm Management Monitor (RMM) Specification, version A-bet0
@@ -43,6 +45,21 @@
 /* Minimum recommended challenge data size in bits.
 */
 #define MIN_CHALLENGE_DATA_SIZE_BITS  256
+
+/* Maximum measurement data size in bytes.
+  See Section C1.11 RmmRealmMeasurement type, RMM Specification, version A-bet0
+  The width of the RmmRealmMeasurement type is 512 bits.
+*/
+#define MAX_MEASUREMENT_DATA_SIZE_BYTES  64
+
+/* Minimum and Maximum indices for REMs
+  See Section A2.1.3 Realm attributes, RMM Specification, version A-bet0
+  IFMPYL - Attributes of a Realm include an array of measurement values. The
+  first entry in this array is a RIM. The remaining entries in this array are
+  REMs.
+*/
+#define MIN_REM_INDEX  1
+#define MAX_REM_INDEX  4
 
 /** An enum describing the RSI RIPAS.
    See Section A5.2.2 Realm IPA state, RMM Specification, version A-bet0
@@ -125,6 +142,42 @@ RsiSetIpaState (
   IN  UINT64  *Address,
   IN  UINT64  Size,
   IN  RIPAS   State
+  );
+
+/**
+  Extends a measurement to a REM.
+
+  @param [in] MeasurementIndex     Index of the REM.
+  @param [in] Measurement          Pointer to the measurement buffer.
+  @param [in] MeasurementSize      Size of the measurement data.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+RsiExtendMeasurement (
+  IN        UINTN          MeasurementIndex,
+  IN  CONST UINT8  *CONST  Measurement,
+  IN        UINTN          MeasurementSize
+  );
+
+/**
+  Read the measurement value from a REM.
+
+  @param [in]   MeasurementIndex     Index of the REM.
+  @param [out]  MeasurementBuffer     Pointer to store the measurement data.
+  @param [in]   MeasurementBufferSize Size of the measurement buffer.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+RsiReadMeasurement (
+  IN    UINTN          MeasurementIndex,
+  OUT   UINT8  *CONST  MeasurementBuffer,
+  IN    UINTN          MeasurementBufferSize
   );
 
 /**
