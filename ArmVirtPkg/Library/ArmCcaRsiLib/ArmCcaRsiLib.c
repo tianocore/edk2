@@ -306,6 +306,47 @@ ArmCcaRsiGetRealmConfig (
 }
 
 /**
+  Make a Host Call.
+
+  A Host call can be used by a Realm to make a hypercall.
+  On Realm execution of HVC, an Unknown exception is taken to the Realm.
+
+  @param [in] Args    Pointer to the IPA of the Host call data
+                      structure.
+
+  Note: The IPA of the Host call arguments data structure must be aligned
+         to the Realm granule size.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRsiHostCall (
+  IN  ARM_CCA_RSI_HOST_CALL_ARGS  *Args
+  )
+{
+  ARM_SMC_ARGS  SmcCmd;
+
+  // The RMM specification, version 1.0-rel0, section B5.3.3.2 Failure
+  // conditions specifies the alignment requirement for the RsiHostCall
+  // structure as 256 bytes.
+  if ((Args == NULL) || !ADDRESS_IS_ALIGNED (Args, ARM_CCA_RSI_HOST_CALL_ARGS_SIZE)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  // Clear the reserved fields
+  ZeroMem (&Args->Reserved1, sizeof (Args->Reserved1));
+
+  ZeroMem (&SmcCmd, sizeof (SmcCmd));
+  SmcCmd.Arg0 = ARM_CCA_FID_RSI_HOST_CALL;
+  SmcCmd.Arg1 = (UINTN)Args;
+
+  ArmCallSmc (&SmcCmd);
+  return ArmCcaRsiCmdStatusToReturnStatus (SmcCmd.Arg0);
+}
+
+/**
    Get the version of the RSI implementation.
 
   @param [out] UefiImpl     The version of the RSI specification

@@ -117,6 +117,10 @@ typedef enum ArmCcaRipas {
 #define ARM_CCA_REALM_CFG_OFFSET_RPV        0x200
 #define ARM_CCA_REALM_CFG_OFFSET_RESERVED1  (ARM_CCA_REALM_CFG_OFFSET_RPV + ARM_CCA_REALM_CFG_RPV_SIZE)
 
+/* The maximum size of the RsiHostCallArgs structure.
+*/
+#define ARM_CCA_RSI_HOST_CALL_ARGS_SIZE  0x100
+
 #pragma pack(1)
 
 /** A structure describing the Realm Configuration.
@@ -135,6 +139,46 @@ typedef struct ArmCcaRealmConfig {
   /// Unused bits of the RsiRealmConfig structure should be zero.
   UINT8     Reserved1[ARM_CCA_REALM_CFG_SIZE - ARM_CCA_REALM_CFG_OFFSET_RESERVED1];
 } ARM_CCA_REALM_CONFIG;
+
+/** A structure describing the Host Call arguments
+    See Section 5.4.3 RsiHostCall type, RMM Specification, version 1.0-rel0
+*/
+typedef struct ArmCcaRsiHostCallArgs {
+  UINT16    Imm;
+  UINT8     Reserved1[6];
+
+  UINT64    Gprs0;
+  UINT64    Gprs1;
+  UINT64    Gprs2;
+  UINT64    Gprs3;
+  UINT64    Gprs4;
+  UINT64    Gprs5;
+  UINT64    Gprs6;
+  UINT64    Gprs7;
+  UINT64    Gprs8;
+  UINT64    Gprs9;
+  UINT64    Gprs10;
+  UINT64    Gprs11;
+  UINT64    Gprs12;
+  UINT64    Gprs13;
+  UINT64    Gprs14;
+  UINT64    Gprs15;
+  UINT64    Gprs16;
+  UINT64    Gprs17;
+  UINT64    Gprs18;
+  UINT64    Gprs19;
+  UINT64    Gprs20;
+  UINT64    Gprs21;
+  UINT64    Gprs22;
+  UINT64    Gprs23;
+  UINT64    Gprs24;
+  UINT64    Gprs25;
+  UINT64    Gprs26;
+  UINT64    Gprs27;
+  UINT64    Gprs28;
+  UINT64    Gprs29;
+  UINT64    Gprs30;
+} ARM_CCA_RSI_HOST_CALL_ARGS;
 
 #pragma pack()
 
@@ -231,6 +275,27 @@ RETURN_STATUS
 EFIAPI
 ArmCcaRsiGetRealmConfig (
   IN  ARM_CCA_REALM_CONFIG  *Config
+  );
+
+/**
+  Make a Host Call.
+
+  A Host call can be used by a Realm to make a hypercall.
+  On Realm execution of HVC, an Unknown exception is taken to the Realm.
+
+  @param [in] Args    Pointer to the IPA of the Host call data
+                      structure.
+
+  Note: The IPA of the Host call arguments data structure must be aligned
+         to the Realm granule size.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRsiHostCall (
+  IN  ARM_CCA_RSI_HOST_CALL_ARGS  *Args
   );
 
 /**
