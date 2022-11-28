@@ -31,6 +31,19 @@
 */
 #define RIPAS_TYPE_MASK  0xFF
 
+/* Maximum attestation token size
+  RBXKKY The size of an attestation token is no larger than 4KB.
+*/
+#define MAX_ATTESTATION_TOKEN_SIZE  SIZE_4KB
+
+/* Maximum challenge data size in bits.
+*/
+#define MAX_CHALLENGE_DATA_SIZE_BITS  512
+
+/* Minimum recommended challenge data size in bits.
+*/
+#define MIN_CHALLENGE_DATA_SIZE_BITS  256
+
 /** An enum describing the RSI RIPAS.
    See Section A5.2.2 Realm IPA state, RMM Specification, version A-bet0
 */
@@ -50,6 +63,35 @@ typedef struct RealmConfig {
   // Unused bits of the RsiRealmConfig structure should be zero.
   UINT8     Reserved[SIZE_4KB - sizeof (UINT64)];
 } REALM_CONFIG;
+
+/**
+  Retrieve an attestation token from the RMM.
+
+  @param [in]       ChallengeData         Pointer to the challenge data to be
+                                          included in the attestation token.
+  @param [in]       ChallengeDataSizeBits Size of the challenge data in bits.
+  @param [out]      TokenBuffer           Pointer to a buffer to store the
+                                          retrieved attestation token.
+  @param [in, out]  TokenBufferSize       Size of the token buffer on input and
+                                          number of bytes stored in token buffer
+                                          on return.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_ABORTED            The operation was aborted as the state
+                                    of the Realm or REC does not match the
+                                    state expected by the command.
+  @retval RETURN_NOT_READY          The operation requested by the command
+                                    is not complete.
+**/
+RETURN_STATUS
+EFIAPI
+RsiGetAttestationToken (
+  IN      CONST UINT8   *CONST  ChallengeData,
+  IN            UINT64          ChallengeDataSizeBits,
+  OUT           UINT8   *CONST  TokenBuffer,
+  IN OUT        UINT64  *CONST  TokenBufferSize
+  );
 
 /**
   Returns the IPA state for the page pointed by the address.
@@ -111,7 +153,7 @@ RsiGetRealmConfig (
 
   @retval RETURN_SUCCESS            Success.
   @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
- */
+**/
 RETURN_STATUS
 EFIAPI
 RsiGetVersion (

@@ -83,6 +83,199 @@ AddrIsGranuleAligned (
 }
 
 /**
+  Continue the operation to retrieve an attestation token.
+
+  @param [out]     TokenBuffer      Pointer to a buffer to store the
+                                    retrieved attestation token.
+  @param [in,out]  TokenSize        On input size of the token buffer,
+                                    and on output size of the token
+                                    returned if operation is successful,
+                                    otherwise 0.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_ABORTED            The operation was aborted as the state
+                                    of the Realm or REC does not match the
+                                    state expected by the command.
+  @retval RETURN_NOT_READY          The operation requested by the command
+                                    is not complete.
+ **/
+STATIC
+RETURN_STATUS
+EFIAPI
+RsiAttestationTokenContinue (
+  OUT           UINT8   *CONST  TokenBuffer,
+  IN OUT        UINT64  *CONST  TokenSize
+  )
+{
+  RETURN_STATUS  Status;
+  ARM_SMC_ARGS   SmcCmd;
+
+  ZeroMem (&SmcCmd, sizeof (SmcCmd));
+  SmcCmd.Arg0 = FID_RSI_ATTESTATION_TOKEN_CONTINUE;
+  // Set the IPA of the Granule to which the token will be written.
+  SmcCmd.Arg1 = (UINTN)TokenBuffer;
+
+  ArmCallSmc (&SmcCmd);
+  Status = RsiCmdStatusToEfiStatus (SmcCmd.Arg0);
+  if (!RETURN_ERROR (Status)) {
+    // Update the token size
+    *TokenSize = SmcCmd.Arg1;
+  } else {
+    // Clear the TokenBuffer on error.
+    ZeroMem (TokenBuffer, *TokenSize);
+    *TokenSize = 0;
+  }
+
+  return Status;
+}
+
+/**
+  Initialize the operation to retrieve an attestation token.
+
+  @param [in]       ChallengeData         Pointer to the challenge data to be
+                                          included in the attestation token.
+  @param [in]       ChallengeDataSizeBits Size of the challenge data in bits.
+  @param [in]       TokenBuffer           Pointer to a buffer to store the
+                                          retrieved attestation token.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+ **/
+STATIC
+RETURN_STATUS
+EFIAPI
+RsiAttestationTokenInit (
+  IN      CONST UINT8   *CONST  ChallengeData,
+  IN            UINT64          ChallengeDataSizeBits,
+  IN            UINT8   *CONST  TokenBuffer
+  )
+{
+  ARM_SMC_ARGS  SmcCmd;
+  UINT8         *Buffer8;
+  CONST UINT8   *Data8;
+  UINT64        Count;
+  UINT8         TailBits;
+
+  /* See A7.2.2 Attestation token generation, RMM Specification, version A-bet0
+     IWTKDD - If the size of the challenge provided by the relying party is less
+     than 64 bytes, it should be zero-padded prior to calling
+     RSI_ATTESTATION_TOKEN_INIT.
+
+    Therefore, zero out the SmcCmd memory before coping the ChallengeData
+    bits.
+  */
+  ZeroMem (&SmcCmd, sizeof (SmcCmd));
+  SmcCmd.Arg0 = FID_RSI_ATTESTATION_TOKEN_INIT;
+  // Set the IPA of the Granule to which the token will be written.
+  SmcCmd.Arg1 = (UINTN)TokenBuffer;
+
+  // Copy challenge data.
+  Buffer8 = (UINT8 *)&SmcCmd.Arg2;
+  Data8   = ChallengeData;
+
+  // First copy whole bytes
+  Count = ChallengeDataSizeBits >> 3;
+  CopyMem (Buffer8, Data8, Count);
+
+  // Now copy any remaining tail bits.
+  TailBits = ChallengeDataSizeBits & (8 - 1);
+  if (TailBits > 0) {
+    // Advance buffer pointers.
+    Buffer8 += Count;
+    Data8   += Count;
+
+    // Copy tail byte.
+    *Buffer8 = *Data8;
+
+    // Clear unused tail bits.
+    *Buffer8 &= ~(0xFF << TailBits);
+  }
+
+  ArmCallSmc (&SmcCmd);
+  return RsiCmdStatusToEfiStatus (SmcCmd.Arg0);
+}
+
+/**
+  Retrieve an attestation token from the RMM.
+
+  @param [in]       ChallengeData         Pointer to the challenge data to be
+                                          included in the attestation token.
+  @param [in]       ChallengeDataSizeBits Size of the challenge data in bits.
+  @param [out]      TokenBuffer           Pointer to a buffer to store the
+                                          retrieved attestation token.
+  @param [in, out]  TokenBufferSize       Size of the token buffer on input and
+                                          number of bytes stored in token buffer
+                                          on return.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_ABORTED            The operation was aborted as the state
+                                    of the Realm or REC does not match the
+                                    state expected by the command.
+  @retval RETURN_NOT_READY          The operation requested by the command
+                                    is not complete.
+**/
+RETURN_STATUS
+EFIAPI
+RsiGetAttestationToken (
+  IN      CONST UINT8   *CONST  ChallengeData,
+  IN            UINT64          ChallengeDataSizeBits,
+  OUT           UINT8   *CONST  TokenBuffer,
+  IN OUT        UINT64  *CONST  TokenBufferSize
+  )
+{
+  RETURN_STATUS  Status;
+
+  if ((TokenBuffer == NULL) ||
+      (TokenBufferSize == NULL) ||
+      (ChallengeData == NULL))
+  {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  if (*TokenBufferSize < MAX_ATTESTATION_TOKEN_SIZE) {
+    *TokenBufferSize = MAX_ATTESTATION_TOKEN_SIZE;
+    return RETURN_BAD_BUFFER_SIZE;
+  }
+
+  if (!AddrIsGranuleAligned ((UINT64 *)TokenBuffer)) {
+    DEBUG ((DEBUG_ERROR, "ERROR : Token buffer not granule aligned\n"));
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  if (ChallengeDataSizeBits > MAX_CHALLENGE_DATA_SIZE_BITS) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  /* See A7.2.2 Attestation token generation, RMM Specification, version A-bet0
+     IWTKDD - Arm recommends that the challenge should contain at least 32 bytes
+     of unique data.
+  */
+  if (ChallengeDataSizeBits < MIN_CHALLENGE_DATA_SIZE_BITS) {
+    DEBUG ((DEBUG_WARN, "Minimum Challenge data size should be 32 bytes\n"));
+  }
+
+  Status = RsiAttestationTokenInit (
+             ChallengeData,
+             ChallengeDataSizeBits,
+             TokenBuffer
+             );
+  if (RETURN_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  /* Loop until the token is ready or there is an error.
+  */
+  do {
+    Status = RsiAttestationTokenContinue (TokenBuffer, TokenBufferSize);
+  } while (Status == RETURN_NOT_READY);
+
+  return Status;
+}
+
+/**
   Returns the IPA state for the page pointed by the address.
 
   @param [in]   Address     Address to retrive IPA state.
@@ -213,7 +406,7 @@ RsiGetRealmConfig (
 
   @retval RETURN_SUCCESS            Success.
   @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
- */
+**/
 RETURN_STATUS
 EFIAPI
 RsiGetVersion (

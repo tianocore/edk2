@@ -18,10 +18,12 @@
 #define ARM_CCA_RSI_H_
 
 // FIDs for Realm Service Interface calls.
-#define FID_RSI_IPA_STATE_GET  0xC4000198
-#define FID_RSI_IPA_STATE_SET  0xC4000197
-#define FID_RSI_REALM_CONFIG   0xC4000196
-#define FID_RSI_VERSION        0xC4000190
+#define FID_RSI_ATTESTATION_TOKEN_CONTINUE  0xC4000195
+#define FID_RSI_ATTESTATION_TOKEN_INIT      0xC4000194
+#define FID_RSI_IPA_STATE_GET               0xC4000198
+#define FID_RSI_IPA_STATE_SET               0xC4000197
+#define FID_RSI_REALM_CONFIG                0xC4000196
+#define FID_RSI_VERSION                     0xC4000190
 
 /** RSI Command Return codes
    See Section B4.4.1, RMM Specification, version A-bet0.
