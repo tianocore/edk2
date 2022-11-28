@@ -22,6 +22,8 @@
 #define FID_RSI_ATTESTATION_TOKEN_INIT      0xC4000194
 #define FID_RSI_IPA_STATE_GET               0xC4000198
 #define FID_RSI_IPA_STATE_SET               0xC4000197
+#define FID_RSI_MEASUREMENT_EXTEND          0xC4000193
+#define FID_RSI_MEASUREMENT_READ            0xC4000192
 #define FID_RSI_REALM_CONFIG                0xC4000196
 #define FID_RSI_VERSION                     0xC4000190
 
