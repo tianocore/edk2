@@ -23,6 +23,7 @@
 #include <Library/ArmSmcLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include "ArmCcaRsi.h"
 
 /** The version of RSI specification implemented by this module.
@@ -70,6 +71,349 @@ ArmCcaRsiCmdStatusToReturnStatus (
   } // switch
 
   return RETURN_ABORTED;
+}
+
+/**
+  Continue the operation to retrieve an attestation token.
+
+  @param [out]     TokenBuffer      Pointer to a buffer to store the
+                                    retrieved attestation token.
+  @param [in]      Offset           Offset within Token buffer granule
+                                    to start of buffer in bytes.
+  @param [in,out]  TokenSize        On input size of the token buffer,
+                                    and on output size of the token
+                                    returned if operation is successful,
+                                    otherwise 0.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_ABORTED            The operation was aborted as the state
+                                    of the Realm or REC does not match the
+                                    state expected by the command.
+                                    Or the Token generation failed for an
+                                    unknown or IMPDEF reason.
+  @retval RETURN_NOT_READY          The operation requested by the command
+                                    is not complete.
+ **/
+STATIC
+RETURN_STATUS
+EFIAPI
+ArmCcaRsiAttestationTokenContinue (
+  OUT           UINT8   *CONST  TokenBuffer,
+  IN            UINT64   CONST  Offset,
+  IN OUT        UINT64  *CONST  TokenSize
+  )
+{
+  RETURN_STATUS  Status;
+  ARM_SMC_ARGS   SmcCmd;
+
+  ZeroMem (&SmcCmd, sizeof (SmcCmd));
+  SmcCmd.Arg0 = ARM_CCA_FID_RSI_ATTESTATION_TOKEN_CONTINUE;
+  // Set the IPA of the Granule to which the token will be written.
+  SmcCmd.Arg1 = (UINTN)TokenBuffer;
+  // Set the Offset within Granule to start of buffer in bytes
+  SmcCmd.Arg2 = (UINTN)Offset;
+  // Set the size of the buffer in bytes
+  SmcCmd.Arg3 = (UINTN)*TokenSize;
+
+  ArmCallSmc (&SmcCmd);
+  Status = ArmCcaRsiCmdStatusToReturnStatus (SmcCmd.Arg0);
+  if (!RETURN_ERROR (Status)) {
+    // Update the token size
+    *TokenSize = SmcCmd.Arg1;
+  } else {
+    // Clear the TokenBuffer on error.
+    ZeroMem (TokenBuffer, *TokenSize);
+    *TokenSize = 0;
+  }
+
+  return Status;
+}
+
+/**
+  Initialize the operation to retrieve an attestation token.
+
+  @param [in]       ChallengeData         Pointer to the challenge data to be
+                                          included in the attestation token.
+  @param [in]       ChallengeDataSizeBits Size of the challenge data in bits.
+  @param [out]      MaxTokenSize          Pointer to an integer to retrieve
+                                          the maximum attestation token size.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+ **/
+STATIC
+RETURN_STATUS
+EFIAPI
+ArmCcaRsiAttestationTokenInit (
+  IN      CONST UINT8   *CONST  ChallengeData,
+  IN            UINT64          ChallengeDataSizeBits,
+  OUT           UINT64  *CONST  MaxTokenSize
+  )
+{
+  RETURN_STATUS  Status;
+  ARM_SMC_ARGS   SmcCmd;
+  UINT8          *Buffer8;
+  CONST UINT8    *Data8;
+  UINT64         Count;
+  UINT8          TailBits;
+
+  /* See A7.2.2 Attestation token generation, RMM Specification, version 1.0-rel0
+     IWTKDD - If the size of the challenge provided by the relying party is less
+     than 64 bytes, it should be zero-padded prior to calling
+     RSI_ATTESTATION_TOKEN_INIT.
+
+    Therefore, zero out the SmcCmd memory before coping the ChallengeData
+    bits.
+  */
+  ZeroMem (&SmcCmd, sizeof (SmcCmd));
+  SmcCmd.Arg0 = ARM_CCA_FID_RSI_ATTESTATION_TOKEN_INIT;
+  // Copy challenge data.
+  Buffer8 = (UINT8 *)&SmcCmd.Arg1;
+  Data8   = ChallengeData;
+
+  TailBits = ChallengeDataSizeBits & 0x7;
+  Count    = (ChallengeDataSizeBits - TailBits) / 8;
+
+  // First copy whole bytes
+  CopyMem (Buffer8, Data8, Count);
+
+  // Now copy any remaining tail bits.
+  if (TailBits > 0) {
+    // Advance buffer pointers.
+    Buffer8 += Count;
+    Data8   += Count;
+
+    // Copy tail byte.
+    *Buffer8 = *Data8;
+
+    // Clear unused tail bits.
+    *Buffer8 &= ~(0xFF << TailBits);
+  }
+
+  ArmCallSmc (&SmcCmd);
+  Status = ArmCcaRsiCmdStatusToReturnStatus (SmcCmd.Arg0);
+  if (RETURN_ERROR (Status)) {
+    // Set the max token size to zero
+    *MaxTokenSize = 0;
+  } else {
+    *MaxTokenSize = SmcCmd.Arg1;
+  }
+
+  return Status;
+}
+
+/**
+  Free the attestation token buffer.
+
+  @param [in]      TokenBuffer           Pointer to the retrieved
+                                         attestation token.
+  @param [in]      TokenBufferSize       Size of the token buffer.
+**/
+VOID
+ArmCcaRsiFreeAttestationToken (
+  IN           UINT8  *CONST  TokenBuffer,
+  IN           UINT64  CONST  TokenBufferSize
+  )
+{
+  if (TokenBuffer != NULL) {
+    if (TokenBufferSize > 0) {
+      // Scrub the token buffer
+      ZeroMem (TokenBuffer, TokenBufferSize);
+    }
+
+    FreePool (TokenBuffer);
+  }
+}
+
+/**
+  A helper function to Retrieve an attestation token from the RMM.
+
+  @param [in]      Token            Pointer to a buffer to store the
+                                    retrieved attestation token.
+  @param [in,out]  TokenLength      Length of token buffer in input and
+                                    length of token data returned in output.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_OUT_OF_RESOURCES   Out of resources.
+  @retval RETURN_ABORTED            The operation was aborted as the state
+                                    of the Realm or REC does not match the
+                                    state expected by the command.
+                                    Or the Token generation failed for an
+                                    unknown or IMPDEF reason.
+  @retval RETURN_NOT_READY          The operation requested by the command
+                                    is not complete.
+  @retval RETURN_BAD_BUFFER_SIZE    The token buffer size returned in an
+                                    earlier call to RSI_ATTESTATION_TOKEN_INIT
+                                    was insufficient to complete the operation.
+**/
+STATIC
+RETURN_STATUS
+EFIAPI
+ArmCcaRsiGetAttestationTokenHelper (
+  IN      UINT8   *Token,
+  IN OUT  UINT64  *TokenLength
+  )
+{
+  RETURN_STATUS  Status;
+  UINT8          *Granule;
+  UINT64         GranuleSize;
+  UINT64         Offset;
+  UINT64         TokenSize;
+  UINT64         MaxTokenSize;
+
+  if ((Token == NULL) || (TokenLength == NULL) || (*TokenLength == 0)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  // Allocate a granule to retrieve the attestation token chunk.
+  Granule = (UINT8 *)AllocateAlignedPages (
+                       EFI_SIZE_TO_PAGES (ARM_CCA_REALM_GRANULE_SIZE),
+                       ARM_CCA_REALM_GRANULE_SIZE
+                       );
+  if (Granule == NULL) {
+    ASSERT (0);
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  MaxTokenSize = *TokenLength;
+  TokenSize    = 0;
+  do {
+    // Retrieve one Granule of data per loop iteration
+    ZeroMem (Granule, ARM_CCA_REALM_GRANULE_SIZE);
+    Offset = 0;
+    do {
+      // Retrieve sub-Granule chunk of data per loop iteration
+      GranuleSize = ARM_CCA_REALM_GRANULE_SIZE - Offset;
+      Status      = ArmCcaRsiAttestationTokenContinue (
+                      Granule,
+                      Offset,
+                      &GranuleSize
+                      );
+      Offset += GranuleSize;
+    } while ((Status == RETURN_NOT_READY) && (Offset < ARM_CCA_REALM_GRANULE_SIZE));
+
+    if (RETURN_ERROR (Status) && (Status != RETURN_NOT_READY)) {
+      ASSERT (0);
+      TokenSize = 0;
+      break;
+    }
+
+    if (Offset > (MaxTokenSize - TokenSize)) {
+      Status    = RETURN_BAD_BUFFER_SIZE;
+      TokenSize = 0;
+      break;
+    }
+
+    // "Offset" bytes of data are now ready for consumption from "Granule"
+    // Copy the new token data from the Granule.
+    CopyMem (&Token[TokenSize], Granule, Offset);
+    TokenSize += Offset;
+  } while ((Status == RETURN_NOT_READY) && (TokenSize < MaxTokenSize));
+
+  // Update the TokenLength to reflect the token data retrieved.
+  *TokenLength = TokenSize;
+
+  // Scrub the Granule buffer
+  ZeroMem (Granule, ARM_CCA_REALM_GRANULE_SIZE);
+  FreeAlignedPages (Granule, EFI_SIZE_TO_PAGES (ARM_CCA_REALM_GRANULE_SIZE));
+  return Status;
+}
+
+/**
+  Retrieve an attestation token from the RMM.
+
+  @param [in]       ChallengeData         Pointer to the challenge data to be
+                                          included in the attestation token.
+  @param [in]       ChallengeDataSizeBits Size of the challenge data in bits.
+  @param [out]      TokenBuffer           Pointer to a buffer to store the
+                                          retrieved attestation token.
+  @param [out]      TokenBufferSize       Length of token data returned.
+
+  Note: The TokenBuffer allocated must be freed by the caller
+  using RsiFreeAttestationToken().
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_OUT_OF_RESOURCES   Out of resources.
+  @retval RETURN_ABORTED            The operation was aborted as the state
+                                    of the Realm or REC does not match the
+                                    state expected by the command.
+                                    Or the Token generation failed for an
+                                    unknown or IMPDEF reason.
+  @retval RETURN_NOT_READY          The operation requested by the command
+                                    is not complete.
+  @retval RETURN_BAD_BUFFER_SIZE    The token buffer size returned in an
+                                    earlier call to RSI_ATTESTATION_TOKEN_INIT
+                                    was insufficient to complete the operation.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRsiGetAttestationToken (
+  IN      CONST UINT8   *CONST  ChallengeData,
+  IN            UINT64          ChallengeDataSizeBits,
+  OUT           UINT8  **CONST  TokenBuffer,
+  OUT           UINT64  *CONST  TokenBufferSize
+  )
+{
+  RETURN_STATUS  Status;
+  UINT8          *Token;
+  UINT64         TokenLength;
+  UINT64         MaxTokenSize;
+
+  if ((TokenBuffer == NULL) ||
+      (TokenBufferSize == NULL) ||
+      (ChallengeData == NULL))
+  {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  if (ChallengeDataSizeBits > ARM_CCA_MAX_CHALLENGE_DATA_SIZE_BITS) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  /* See A7.2.2 Attestation token generation, RMM Specification, version 1.0-rel0
+     IWTKDD - Arm recommends that the challenge should contain at least 32 bytes
+     of unique data.
+  */
+  if (ChallengeDataSizeBits < ARM_CCA_MIN_CHALLENGE_DATA_SIZE_BITS) {
+    DEBUG ((DEBUG_WARN, "Minimum Challenge data size should be 32 bytes\n"));
+  }
+
+  Status = ArmCcaRsiAttestationTokenInit (
+             ChallengeData,
+             ChallengeDataSizeBits,
+             &MaxTokenSize
+             );
+  if (RETURN_ERROR (Status)) {
+    ASSERT_RETURN_ERROR (Status);
+    return Status;
+  }
+
+  // Allocate a buffer to store the retrieved attestation token.
+  Token = AllocateZeroPool (MaxTokenSize);
+  if (Token == NULL) {
+    ASSERT (0);
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  // Retrieve the attestation token.
+  TokenLength = MaxTokenSize;
+  Status      = ArmCcaRsiGetAttestationTokenHelper (Token, &TokenLength);
+  if (RETURN_ERROR (Status)) {
+    // Scrub the Token on failure.
+    ZeroMem (Token, MaxTokenSize);
+    FreePool (Token);
+
+    *TokenBuffer     = NULL;
+    *TokenBufferSize = 0;
+  } else {
+    *TokenBuffer     = Token;
+    *TokenBufferSize = TokenLength;
+  }
+
+  return Status;
 }
 
 /**
