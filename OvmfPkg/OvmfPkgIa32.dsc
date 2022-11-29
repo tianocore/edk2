@@ -1021,3 +1021,4 @@
 !if $(LOAD_X64_ON_IA32_ENABLE) == TRUE
   OvmfPkg/CompatImageLoaderDxe/CompatImageLoaderDxe.inf
 !endif
+# modified

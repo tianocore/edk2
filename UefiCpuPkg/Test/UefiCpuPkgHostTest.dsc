@@ -38,3 +38,4 @@
   # Build HOST_APPLICATION that tests the CpuPageTableLib
   #
   UefiCpuPkg/Library/CpuPageTableLib/UnitTest/CpuPageTableLibUnitTestHost.inf
+# modified
