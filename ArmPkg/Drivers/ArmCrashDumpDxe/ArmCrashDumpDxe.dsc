@@ -48,3 +48,4 @@
 
 [Components.common]
   ArmPkg/Drivers/ArmCrashDumpDxe/ArmCrashDumpDxe.inf
+# modified

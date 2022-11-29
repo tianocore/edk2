@@ -60,3 +60,4 @@
   RedfishPkg/PrivateLibrary/RedfishLib/RedfishLib.inf
 
   !include RedfishPkg/Redfish.dsc.inc
+# modified
