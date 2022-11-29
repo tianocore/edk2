@@ -34,3 +34,4 @@
   # Build HOST_APPLICATION Libraries
   #
   MdePkg/Library/BaseLib/UnitTestHostBaseLib.inf
+# modified
