@@ -105,7 +105,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The control transfer has been successfully executed.
   @retval EFI_DEVICE_ERROR      The transfer failed. The transfer status is returned in Status.
-  @retval EFI_INVALID_PARAMETE  One or more parameters are invalid.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
   @retval EFI_TIMEOUT           The control transfer fails due to timeout.
 
@@ -148,7 +148,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The bulk transfer has been successfully executed.
   @retval EFI_DEVICE_ERROR      The transfer failed. The transfer status is returned in Status.
-  @retval EFI_INVALID_PARAMETE  One or more parameters are invalid.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
   @retval EFI_OUT_OF_RESOURCES  The request could not be submitted due to a lack of resources.
   @retval EFI_TIMEOUT           The control transfer fails due to timeout.
 
