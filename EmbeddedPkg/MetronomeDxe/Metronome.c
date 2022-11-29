@@ -43,10 +43,9 @@ WaitForTick (
 
   @param TickPeriod
   The period of platform's known time source in 100 nS units.
-  This value on any platform must be at least 10 uS, and must not
-  exceed 200 uS.  The value in this field is a constant that must
-  not be modified after the Metronome architectural protocol is
-  installed.  All consumers must treat this as a read-only field.
+  This value on any platform must not exceed 200 uS.  The value in this field
+  is a constant that must not be modified after the Metronome architectural
+  protocol is installed.  All consumers must treat this as a read-only field.
 
 **/
 EFI_METRONOME_ARCH_PROTOCOL  gMetronome = {
