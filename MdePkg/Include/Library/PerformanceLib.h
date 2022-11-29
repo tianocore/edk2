@@ -352,7 +352,7 @@ LogPerformanceMeasurement (
   Begin Macro to measure the performance of StartImage in core.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT1(dsiable PERF_CORE_START_IMAGE) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT1 (disable PERF_CORE_START_IMAGE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -367,7 +367,7 @@ LogPerformanceMeasurement (
   End Macro to measure the performance of StartImage in core.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT1 (dsiable PERF_CORE_START_IMAGE)of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT1 (disable PERF_CORE_START_IMAGE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -382,7 +382,7 @@ LogPerformanceMeasurement (
   Begin Macro to measure the performance of LoadImage in core.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT2 (dsiable PERF_CORE_LOAD_IAMGE) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT2 (disable PERF_CORE_LOAD_IMAGE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -397,7 +397,7 @@ LogPerformanceMeasurement (
   End Macro to measure the performance of LoadImage in core.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT2 (dsiable PERF_CORE_LOAD_IAMGE) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT2 (disable PERF_CORE_LOAD_IMAGE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -412,7 +412,7 @@ LogPerformanceMeasurement (
   Start Macro to measure the performance of DriverBinding Support in core.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT3 (dsiable PERF_CORE_DB_SUPPORT) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT3 (disable PERF_CORE_DB_SUPPORT) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -427,7 +427,7 @@ LogPerformanceMeasurement (
   End Macro to measure the performance of DriverBinding Support in core.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT3 (dsiable PERF_CORE_DB_SUPPORT) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT3 (disable PERF_CORE_DB_SUPPORT) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -442,7 +442,7 @@ LogPerformanceMeasurement (
   Begin Macro to measure the performance of DriverBinding Start in core.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT4 (dsiable PERF_CORE_DB_START) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT4 (disable PERF_CORE_DB_START) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -457,7 +457,7 @@ LogPerformanceMeasurement (
   End Macro to measure the performance of DriverBinding Start in core.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT4 (dsiable PERF_CORE_DB_START) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT4 (disable PERF_CORE_DB_START) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -472,7 +472,7 @@ LogPerformanceMeasurement (
   Start Macro to measure the performance of DriverBinding Stop in core.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT5 (dsiable PERF_CORE_DB_STOP) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT5 (disable PERF_CORE_DB_STOP) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -487,7 +487,7 @@ LogPerformanceMeasurement (
   End Macro to measure the performance of DriverBinding Stop in core.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT5 (dsiable PERF_CORE_DB_STOP) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT5 (disable PERF_CORE_DB_STOP) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -503,7 +503,7 @@ LogPerformanceMeasurement (
   It can be used to log a meaningful thing which happens at a time point.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT6 (dsiable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT6 (disable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -515,11 +515,11 @@ LogPerformanceMeasurement (
   } while (FALSE)
 
 /**
-  Begin Macro to measure the perofrmance of evnent signal behavior in any module.
+  Begin Macro to measure the performance of evnent signal behavior in any module.
   The event guid will be passed with this macro.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT6 (dsiable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT6 (disable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -531,11 +531,11 @@ LogPerformanceMeasurement (
   } while (FALSE)
 
 /**
-  End Macro to measure the perofrmance of evnent signal behavior in any module.
+  End Macro to measure the performance of evnent signal behavior in any module.
   The event guid will be passed with this macro.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT6 (dsiable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT6 (disable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -547,11 +547,11 @@ LogPerformanceMeasurement (
   } while (FALSE)
 
 /**
-  Begin Macro to measure the perofrmance of a callback function in any module.
+  Begin Macro to measure the performance of a callback function in any module.
   The event guid which trigger the callback function will be passed with this macro.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT6 (dsiable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT6 (disable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -563,11 +563,11 @@ LogPerformanceMeasurement (
   } while (FALSE)
 
 /**
-  End Macro to measure the perofrmance of a callback function in any module.
+  End Macro to measure the performance of a callback function in any module.
   The event guid which trigger the callback function will be passed with this macro.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT6 (dsiable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT6 (disable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -579,10 +579,10 @@ LogPerformanceMeasurement (
   } while (FALSE)
 
 /**
-  Begin Macro to measure the perofrmance of a general function in any module.
+  Begin Macro to measure the performance of a general function in any module.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT6 (dsiable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT6 (disable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -594,10 +594,10 @@ LogPerformanceMeasurement (
   } while (FALSE)
 
 /**
-  End Macro to measure the perofrmance of a general function in any module.
+  End Macro to measure the performance of a general function in any module.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT6 (dsiable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT6 (disable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -609,10 +609,10 @@ LogPerformanceMeasurement (
   } while (FALSE)
 
 /**
-  Begin Macro to measure the perofrmance of a behavior within one module.
+  Begin Macro to measure the performance of a behavior within one module.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT6 (dsiable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT6 (disable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -624,10 +624,10 @@ LogPerformanceMeasurement (
   } while (FALSE)
 
 /**
-  End Macro to measure the perofrmance of a behavior within one module.
+  End Macro to measure the performance of a behavior within one module.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT6 (dsiable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT6 (disable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -639,11 +639,11 @@ LogPerformanceMeasurement (
   } while (FALSE)
 
 /**
-  Begin Macro to measure the perofrmance of a behavior in different modules.
+  Begin Macro to measure the performance of a behavior in different modules.
   Such as the performance of PEI phase, DXE phase, BDS phase.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT6 (dsiable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT6 (disable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
@@ -655,11 +655,11 @@ LogPerformanceMeasurement (
   } while (FALSE)
 
 /**
-  End Macro to measure the perofrmance of a behavior in different modules.
+  End Macro to measure the performance of a behavior in different modules.
   Such as the performance of PEI phase, DXE phase, BDS phase.
 
   If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  and the BIT6 (dsiable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set.
+  and the BIT6 (disable PERF_GENERAL_TYPE) of PcdPerformanceLibraryPropertyMask is not set,
   then LogPerformanceMeasurement() is called.
 
 **/
