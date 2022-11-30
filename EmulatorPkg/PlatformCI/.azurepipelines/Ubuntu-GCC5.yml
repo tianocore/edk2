@@ -15,10 +15,6 @@ trigger:
 pr:
   - master
   - stable/*
-
-variables:
-  - template: ../../../.azurepipelines/templates/defaults.yml
-
 jobs:
   - job: Platform_CI
     variables:
@@ -79,6 +75,8 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
+    container: 'ghcr.io/tianocore/containers/fedora-35-test:2113a0e'
+
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
@@ -89,4 +87,4 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
-        usePythonVersion: ${{ variables.default_python_version }}
+        usePythonVersion: '' # use Python from the container image
