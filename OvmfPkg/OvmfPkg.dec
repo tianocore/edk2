@@ -406,6 +406,8 @@
 
   ## The Tdx accept page size. 0x1000(4k),0x200000(2M)
   gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize|0x200000|UINT32|0x65
+  ## End of physical address of memory to be accepted
+  gUefiOvmfPkgTokenSpaceGuid.PcdAcceptMemoryEndAddress|0x100000000|UINT64|0x69
 
   ## The QEMU fw_cfg variable that UefiDriverEntryPointFwCfgOverrideLib will
   #  check to decide whether to abort dispatch of the driver it is linked into.
