@@ -24,6 +24,11 @@ SMM_CPU_SYNC_MODE            mCpuSmmSyncMode;
 BOOLEAN                      mMachineCheckSupported = FALSE;
 MM_COMPLETION                mSmmStartupThisApToken;
 
+//
+// Processor specified by mPackageFirstThreadIndex[PackageIndex] will do the package-scope register check.
+//
+UINT32  *mPackageFirstThreadIndex = NULL;
+
 extern UINTN  mSmmShadowStackSize;
 
 /**
@@ -157,50 +162,125 @@ ReleaseAllAPs (
 }
 
 /**
-  Checks if all CPUs (with certain exceptions) have checked in for this SMI run
+  Check whether the index of CPU perform the package level register
+  programming during System Management Mode initialization.
 
-  @param   Exceptions     CPU Arrival exception flags.
+  The index of Processor specified by mPackageFirstThreadIndex[PackageIndex]
+  will do the package-scope register programming.
+
+  @param[in] CpuIndex   Processor Index.
+
+  @retval TRUE  Perform the package level register programming.
+  @retval FALSE Don't perform the package level register programming.
+
+**/
+BOOLEAN
+IsPackageFirstThread (
+  IN UINTN  CpuIndex
+  )
+{
+  UINT32  PackageIndex;
+
+  PackageIndex =  gSmmCpuPrivate->ProcessorInfo[CpuIndex].Location.Package;
+
+  ASSERT (mPackageFirstThreadIndex != NULL);
+
+  //
+  // Set the value of mPackageFirstThreadIndex[PackageIndex].
+  // The package-scope register are checked by the first processor (CpuIndex) in Package.
+  //
+  // If mPackageFirstThreadIndex[PackageIndex] equals to (UINT32)-1, then update
+  // to current CpuIndex. If it doesn't equal to (UINT32)-1, don't change it.
+  //
+  if (mPackageFirstThreadIndex[PackageIndex] == (UINT32)-1) {
+    mPackageFirstThreadIndex[PackageIndex] = (UINT32)CpuIndex;
+  }
+
+  return (BOOLEAN)(mPackageFirstThreadIndex[PackageIndex] == CpuIndex);
+}
+
+/**
+  Returns the Number of SMM Delayed & Blocked & Disabled Thread Count.
+
+  @param[in,out] DelayedCount  The Number of SMM Delayed Thread Count.
+  @param[in,out] BlockedCount  The Number of SMM Blocked Thread Count.
+  @param[in,out] DisabledCount The Number of SMM Disabled Thread Count.
+
+**/
+VOID
+GetSmmDelayedBlockedDisabledCount (
+  IN OUT UINT32  *DelayedCount,
+  IN OUT UINT32  *BlockedCount,
+  IN OUT UINT32  *DisabledCount
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < mNumberOfCpus; Index++) {
+    if (IsPackageFirstThread (Index)) {
+      if (DelayedCount != NULL) {
+        *DelayedCount += (UINT32)SmmCpuFeaturesGetSmmRegister (Index, SmmRegSmmDelayed);
+      }
+
+      if (BlockedCount != NULL) {
+        *BlockedCount += (UINT32)SmmCpuFeaturesGetSmmRegister (Index, SmmRegSmmBlocked);
+      }
+
+      if (DisabledCount != NULL) {
+        *DisabledCount += (UINT32)SmmCpuFeaturesGetSmmRegister (Index, SmmRegSmmEnable);
+      }
+    }
+  }
+}
+
+/**
+  Checks if all CPUs (except Blocked & Disabled) have checked in for this SMI run
 
   @retval   TRUE  if all CPUs the have checked in.
   @retval   FALSE  if at least one Normal AP hasn't checked in.
 
 **/
 BOOLEAN
-AllCpusInSmmWithExceptions (
-  SMM_CPU_ARRIVAL_EXCEPTIONS  Exceptions
+AllCpusInSmmExceptBlockedDisabled (
+  VOID
   )
 {
-  UINTN                      Index;
-  SMM_CPU_DATA_BLOCK         *CpuData;
-  EFI_PROCESSOR_INFORMATION  *ProcessorInfo;
+  UINT32  BlockedCount;
+  UINT32  DisabledCount;
 
+  BlockedCount  = 0;
+  DisabledCount = 0;
+
+  //
+  // Check to make sure mSmmMpSyncData->Counter is valid and not locked.
+  //
   ASSERT (*mSmmMpSyncData->Counter <= mNumberOfCpus);
 
+  //
+  // Check whether all CPUs in SMM.
+  //
   if (*mSmmMpSyncData->Counter == mNumberOfCpus) {
     return TRUE;
   }
 
-  CpuData       = mSmmMpSyncData->CpuData;
-  ProcessorInfo = gSmmCpuPrivate->ProcessorInfo;
-  for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
-    if (!(*(CpuData[Index].Present)) && (ProcessorInfo[Index].ProcessorId != INVALID_APIC_ID)) {
-      if (((Exceptions & ARRIVAL_EXCEPTION_DELAYED) != 0) && (SmmCpuFeaturesGetSmmRegister (Index, SmmRegSmmDelayed) != 0)) {
-        continue;
-      }
+  //
+  // Check for the Blocked & Disabled Exceptions Case.
+  //
+  GetSmmDelayedBlockedDisabledCount (NULL, &BlockedCount, &DisabledCount);
 
-      if (((Exceptions & ARRIVAL_EXCEPTION_BLOCKED) != 0) && (SmmCpuFeaturesGetSmmRegister (Index, SmmRegSmmBlocked) != 0)) {
-        continue;
-      }
-
-      if (((Exceptions & ARRIVAL_EXCEPTION_SMI_DISABLED) != 0) && (SmmCpuFeaturesGetSmmRegister (Index, SmmRegSmmEnable) != 0)) {
-        continue;
-      }
-
-      return FALSE;
-    }
+  //
+  // *mSmmMpSyncData->Counter might be updated by all APs concurrently. The value
+  // can be dynamic changed. If some Aps enter the SMI after the BlockedCount &
+  // DisabledCount check, then the *mSmmMpSyncData->Counter will be increased, thus
+  // leading the *mSmmMpSyncData->Counter + BlockedCount + DisabledCount > mNumberOfCpus.
+  // since the BlockedCount & DisabledCount are local variable, it's ok here only for
+  // the checking of all CPUs In Smm.
+  //
+  if (*mSmmMpSyncData->Counter + BlockedCount + DisabledCount >= mNumberOfCpus) {
+    return TRUE;
   }
 
-  return TRUE;
+  return FALSE;
 }
 
 /**
@@ -268,6 +348,11 @@ SmmWaitForApArrival (
   UINTN    Index;
   BOOLEAN  LmceEn;
   BOOLEAN  LmceSignal;
+  UINT32   DelayedCount;
+  UINT32   BlockedCount;
+
+  DelayedCount = 0;
+  BlockedCount = 0;
 
   ASSERT (*mSmmMpSyncData->Counter <= mNumberOfCpus);
 
@@ -296,7 +381,7 @@ SmmWaitForApArrival (
        !IsSyncTimerTimeout (Timer) && !(LmceEn && LmceSignal);
        )
   {
-    mSmmMpSyncData->AllApArrivedWithException = AllCpusInSmmWithExceptions (ARRIVAL_EXCEPTION_BLOCKED | ARRIVAL_EXCEPTION_SMI_DISABLED);
+    mSmmMpSyncData->AllApArrivedWithException = AllCpusInSmmExceptBlockedDisabled ();
     if (mSmmMpSyncData->AllApArrivedWithException) {
       break;
     }
@@ -337,13 +422,21 @@ SmmWaitForApArrival (
          !IsSyncTimerTimeout (Timer);
          )
     {
-      mSmmMpSyncData->AllApArrivedWithException = AllCpusInSmmWithExceptions (ARRIVAL_EXCEPTION_BLOCKED | ARRIVAL_EXCEPTION_SMI_DISABLED);
+      mSmmMpSyncData->AllApArrivedWithException = AllCpusInSmmExceptBlockedDisabled ();
       if (mSmmMpSyncData->AllApArrivedWithException) {
         break;
       }
 
       CpuPause ();
     }
+  }
+
+  if (!mSmmMpSyncData->AllApArrivedWithException) {
+    //
+    // Check for the Blocked & Delayed Case.
+    //
+    GetSmmDelayedBlockedDisabledCount (&DelayedCount, &BlockedCount, NULL);
+    DEBUG ((DEBUG_INFO, "SmmWaitForApArrival: Delayed AP Count = %d, Blocked AP Count = %d\n", DelayedCount, BlockedCount));
   }
 
   return;
@@ -739,6 +832,7 @@ APHandler (
     if (mSmmMpSyncData->BspIndex != -1) {
       //
       // BSP Index is known
+      // Existing AP is in SMI now but BSP not in, so, try bring BSP in SMM.
       //
       BspIndex = mSmmMpSyncData->BspIndex;
       ASSERT (CpuIndex != BspIndex);
@@ -763,12 +857,15 @@ APHandler (
         //
         // Give up since BSP is unable to enter SMM
         // and signal the completion of this AP
+        // Reduce the mSmmMpSyncData->Counter!
+        //
         WaitForSemaphore (mSmmMpSyncData->Counter);
         return;
       }
     } else {
       //
       // Don't know BSP index. Give up without sending IPI to BSP.
+      // Reduce the mSmmMpSyncData->Counter!
       //
       WaitForSemaphore (mSmmMpSyncData->Counter);
       return;
@@ -1668,10 +1765,13 @@ SmiRendezvous (
   } else {
     //
     // Signal presence of this processor
+    // mSmmMpSyncData->Counter is increased here!
+    // "ReleaseSemaphore (mSmmMpSyncData->Counter) == 0" means BSP has already ended the synchronization.
     //
     if (ReleaseSemaphore (mSmmMpSyncData->Counter) == 0) {
       //
       // BSP has already ended the synchronization, so QUIT!!!
+      // Existing AP is too late now to enter SMI since BSP has already ended the synchronization!!!
       //
 
       //
@@ -1781,6 +1881,47 @@ Exit:
   // Restore Cr2
   //
   RestoreCr2 (Cr2);
+}
+
+/**
+  Initialize PackageBsp Info. Processor specified by mPackageFirstThreadIndex[PackageIndex]
+  will do the package-scope register programming. Set default CpuIndex to (UINT32)-1, which
+  means not specified yet.
+
+**/
+VOID
+InitPackageFirstThreadIndexInfo (
+  VOID
+  )
+{
+  UINT32  Index;
+  UINT32  PackageId;
+  UINT32  PackageCount;
+
+  PackageId    = 0;
+  PackageCount = 0;
+
+  //
+  // Count the number of package, set to max PackageId + 1
+  //
+  for (Index = 0; Index < mNumberOfCpus; Index++) {
+    if (PackageId < gSmmCpuPrivate->ProcessorInfo[Index].Location.Package) {
+      PackageId = gSmmCpuPrivate->ProcessorInfo[Index].Location.Package;
+    }
+  }
+
+  PackageCount = PackageId + 1;
+
+  mPackageFirstThreadIndex = (UINT32 *)AllocatePool (sizeof (UINT32) * PackageCount);
+  ASSERT (mPackageFirstThreadIndex != NULL);
+  if (mPackageFirstThreadIndex == NULL) {
+    return;
+  }
+
+  //
+  // Set default CpuIndex to (UINT32)-1, which means not specified yet.
+  //
+  SetMem32 (mPackageFirstThreadIndex, sizeof (UINT32) * PackageCount, (UINT32)-1);
 }
 
 /**
