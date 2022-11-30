@@ -290,7 +290,7 @@ UnitTestAssertStatusEqual (
 {
   CHAR8  TempStr[MAX_STRING_SIZE];
 
-  snprintf (TempStr, sizeof (TempStr), "UT_ASSERT_STATUS_EQUAL(%s:%p)", Description, (VOID *)Status);
+  snprintf (TempStr, sizeof (TempStr), "UT_ASSERT_STATUS_EQUAL(%s:%p expected:%p)", Description, (VOID *)Status, (VOID *)Expected);
   _assert_true ((Status == Expected), TempStr, FileName, (INT32)LineNumber);
 
   return (Status == Expected);
