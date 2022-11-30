@@ -8,6 +8,7 @@
 **/
 
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Ppi/MpServices.h>
@@ -15,11 +16,6 @@
 #include <IndustryStandard/Tdx.h>
 
 #include "Platform.h"
-
-//
-// The value to be written to the Feature Control MSR, retrieved from fw_cfg.
-//
-STATIC UINT64  mFeatureControlValue;
 
 /**
   Write the Feature Control MSR on an Application Processor or the Boot
@@ -38,10 +34,22 @@ WriteFeatureControl (
   IN OUT VOID  *WorkSpace
   )
 {
+  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob = WorkSpace;
+
   if (TdIsEnabled ()) {
-    TdVmCall (TDVMCALL_WRMSR, (UINT64)MSR_IA32_FEATURE_CONTROL, mFeatureControlValue, 0, 0, 0);
+    TdVmCall (
+      TDVMCALL_WRMSR,
+      (UINT64)MSR_IA32_FEATURE_CONTROL,
+      PlatformInfoHob->FeatureControlValue,
+      0,
+      0,
+      0
+      );
   } else {
-    AsmWriteMsr64 (MSR_IA32_FEATURE_CONTROL, mFeatureControlValue);
+    AsmWriteMsr64 (
+      MSR_IA32_FEATURE_CONTROL,
+      PlatformInfoHob->FeatureControlValue
+      );
   }
 }
 
@@ -67,6 +75,15 @@ OnMpServicesAvailable (
 {
   EFI_PEI_MP_SERVICES_PPI  *MpServices;
   EFI_STATUS               Status;
+  EFI_HOB_PLATFORM_INFO    *PlatformInfoHob;
+  EFI_HOB_GUID_TYPE        *GuidHob;
+
+  GuidHob = GetFirstGuidHob (&gUefiOvmfPkgPlatformInfoGuid);
+  if (GuidHob == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  PlatformInfoHob = (EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (GuidHob);
 
   DEBUG ((DEBUG_VERBOSE, "%a: %a\n", gEfiCallerBaseName, __FUNCTION__));
 
@@ -80,7 +97,7 @@ OnMpServicesAvailable (
                              WriteFeatureControl, // Procedure
                              FALSE,               // SingleThread
                              0,                   // TimeoutInMicroSeconds: inf.
-                             NULL                 // ProcedureArgument
+                             PlatformInfoHob      // ProcedureArgument
                              );
   if (EFI_ERROR (Status) && (Status != EFI_NOT_STARTED)) {
     DEBUG ((DEBUG_ERROR, "%a: StartupAllAps(): %r\n", __FUNCTION__, Status));
@@ -90,7 +107,7 @@ OnMpServicesAvailable (
   //
   // Now write the MSR on the BSP too.
   //
-  WriteFeatureControl (NULL);
+  WriteFeatureControl (PlatformInfoHob);
   return EFI_SUCCESS;
 }
 
@@ -107,7 +124,7 @@ STATIC CONST EFI_PEI_NOTIFY_DESCRIPTOR  mMpServicesNotify = {
 
 VOID
 InstallFeatureControlCallback (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   EFI_STATUS            Status;
@@ -119,7 +136,7 @@ InstallFeatureControlCallback (
              &FwCfgItem,
              &FwCfgSize
              );
-  if (EFI_ERROR (Status) || (FwCfgSize != sizeof mFeatureControlValue)) {
+  if (EFI_ERROR (Status) || (FwCfgSize != sizeof (PlatformInfoHob->FeatureControlValue))) {
     //
     // Nothing to do.
     //
@@ -127,7 +144,10 @@ InstallFeatureControlCallback (
   }
 
   QemuFwCfgSelectItem (FwCfgItem);
-  QemuFwCfgReadBytes (sizeof mFeatureControlValue, &mFeatureControlValue);
+  QemuFwCfgReadBytes (
+    sizeof (PlatformInfoHob->FeatureControlValue),
+    &(PlatformInfoHob->FeatureControlValue)
+    );
 
   Status = PeiServicesNotifyPpi (&mMpServicesNotify);
   if (EFI_ERROR (Status)) {
