@@ -431,6 +431,10 @@ DecompressMemFvs (
   PeiMemFv = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdOvmfPeiMemFvBase);
   CopyMem (PeiMemFv, (VOID *)(FvSection + 1), PcdGet32 (PcdOvmfPeiMemFvSize));
 
+  CopyMem ((VOID *)0x420000, (VOID *)(FvSection + 1), PcdGet32 (PcdOvmfPeiMemFvSize));
+  DEBUG ((DEBUG_INFO, "PeiFv: 0x%08x +0x%08x\n", PeiMemFv, PcdGet32 (PcdOvmfPeiMemFvSize)));
+  DEBUG ((DEBUG_INFO, "PeiFv: 0x%08x (copy)\n", 0x420000));
+
   if (PeiMemFv->Signature != EFI_FVH_SIGNATURE) {
     DEBUG ((DEBUG_ERROR, "Extracted FV at %p does not have FV header signature\n", PeiMemFv));
     CpuDeadLoop ();
