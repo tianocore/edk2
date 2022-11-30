@@ -12,7 +12,7 @@ parameters:
   build_pkgs: ''
   build_targets: ''
   build_archs: ''
-  usePythonVersion: '>=3.10.6'
+  usePythonVersion: ''
 
 steps:
 - bash: |

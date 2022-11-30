@@ -13,7 +13,7 @@ parameters:
   vm_image: ''
   arch_list: ''
   container: ''
-  usePythonVersion: '>=3.10.6'
+  usePythonVersion: ''
 
 # Build step
 jobs:
