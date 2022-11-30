@@ -931,6 +931,32 @@ GopInstalled (
   mGopTracker = NULL;
 }
 
+VOID
+DebugPeiFvCheck (
+  VOID
+  )
+{
+  UINT8   *Orig = (VOID *)(UINTN)PcdGet32 (PcdOvmfPeiMemFvBase);
+  UINT8   *Copy = (VOID *)(UINTN)0x420000;
+  UINT32  Size  = PcdGet32 (PcdOvmfPeiMemFvSize);
+  UINT32  Index;
+
+  for (Index = 0; Index < Size; Index++) {
+    if (Orig[Index] == Copy[Index]) {
+      continue;
+    }
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: 0x%08x: 0x%02x (expected 0x%02x)\n",
+      __FUNCTION__,
+      PcdGet32 (PcdOvmfPeiMemFvBase) + Index,
+      Orig[Index],
+      Copy[Index]
+      ));
+  }
+}
+
 /**
   Entry point for this driver.
 
@@ -950,6 +976,8 @@ PlatformInit (
   )
 {
   EFI_STATUS  Status;
+
+  DebugPeiFvCheck ();
 
   ExecutePlatformConfig ();
 

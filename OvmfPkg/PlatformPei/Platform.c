@@ -317,6 +317,32 @@ BuildPlatformInfoHob (
   return (EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (GuidHob);
 }
 
+VOID
+DebugPeiFvCheck (
+  VOID
+  )
+{
+  UINT8   *Orig = (VOID *)(UINTN)PcdGet32 (PcdOvmfPeiMemFvBase);
+  UINT8   *Copy = (VOID *)(UINTN)0x420000;
+  UINT32  Size  = PcdGet32 (PcdOvmfPeiMemFvSize);
+  UINT32  Index;
+
+  for (Index = 0; Index < Size; Index++) {
+    if (Orig[Index] == Copy[Index]) {
+      continue;
+    }
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: 0x%08x: 0x%02x (expected 0x%02x)\n",
+      __FUNCTION__,
+      PcdGet32 (PcdOvmfPeiMemFvBase) + Index,
+      Orig[Index],
+      Copy[Index]
+      ));
+  }
+}
+
 /**
   Perform Platform PEI initialization.
 
@@ -397,6 +423,8 @@ InitializePlatform (
 
   IntelTdxInitialize ();
   InstallFeatureControlCallback (PlatformInfoHob);
+
+  DebugPeiFvCheck ();
 
   return EFI_SUCCESS;
 }
