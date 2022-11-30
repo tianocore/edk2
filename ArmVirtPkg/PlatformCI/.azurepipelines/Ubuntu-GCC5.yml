@@ -75,7 +75,7 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
-    container: 'ghcr.io/tianocore/containers/fedora-35-test:0b7ecfa'
+    container: 'ghcr.io/osteffenrh/edk2-containers/fedora-35-test:5600fe4'
 
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
