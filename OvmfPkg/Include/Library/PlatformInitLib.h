@@ -211,12 +211,30 @@ PlatformMaxCpuCountInitialization (
   Information in HobList is treated as external input. From the security
   perspective before it is consumed, it should be validated.
 
+  One of the major task of processing TdxHobList is to accept memories. Since
+  it is a time-consuming task, accept-memory is split into 2 phases:
+  - Phase-1 accepts a small size of memory by BSP alone.
+  - Phase-2 accetps a large size of memory by BSP and APs together.
+
   @retval   EFI_SUCCESS   Successfully process the hoblist
   @retval   Others        Other error as indicated
 **/
 EFI_STATUS
 EFIAPI
-ProcessTdxHobList (
+PlatformProcessTdxHobListPhase1 (
+  VOID
+  );
+
+/**
+ * This function is called after PlatformProcessTdxHobListPhase1 and to accept
+ * more memory by BSP and APs together.
+ *
+ * @retval EFI_SUCESS  Successfully process the hoblist
+ * @retval Others      Other error as indicated
+ */
+EFI_STATUS
+EFIAPI
+PlatformProcessTdxHobListPhase2 (
   VOID
   );
 

@@ -765,7 +765,7 @@ SecCoreStartupWithStack (
     // first so that the memory is accepted. Otherwise access to the unaccepted
     // memory will trigger tripple fault.
     //
-    if (ProcessTdxHobList () != EFI_SUCCESS) {
+    if (PlatformProcessTdxHobListPhase1 () != EFI_SUCCESS) {
       CpuDeadLoop ();
     }
   }

@@ -20,6 +20,7 @@
 #include <Library/QemuFwCfgLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/TdxLib.h>
+#include <Library/TdxMailboxLib.h>
 #include <Library/SynchronizationLib.h>
 #include <Pi/PrePiHob.h>
 #include <WorkArea.h>
@@ -81,8 +82,6 @@ BspAcceptMemoryResourceRange (
     return EFI_SUCCESS;
   }
 
-  DEBUG ((DEBUG_INFO, "TdAccept: 0x%llx - 0x%llx\n", PhysicalAddress, TotalLength));
-
   if (ALIGN_VALUE (PhysicalAddress, SIZE_2MB) != PhysicalAddress) {
     StartAddress1 = PhysicalAddress;
     Length1       = ALIGN_VALUE (PhysicalAddress, SIZE_2MB) - PhysicalAddress;
@@ -138,6 +137,151 @@ BspAcceptMemoryResourceRange (
   }
 
   return Status;
+}
+
+/**
+ * This function is called by BSP and APs to accept memory.
+ * Note:
+ * The input PhysicalStart/PhysicalEnd indicates the whole memory region
+ * to be accepted. BSP or AP only accepts one piece in the whole memory region.
+ *
+ * @param CpuIndex        vCPU index
+ * @param CpusNum         Total vCPU number of a Tdx guest
+ * @param PhysicalStart   Start address of a memory region which is to be accepted
+ * @param PhysicalEnd     End address of a memory region which is to be accepted
+ * @return EFI_SUCCESS    Successfully accept the memory
+ */
+STATIC
+EFI_STATUS
+EFIAPI
+BspApAcceptMemoryResourceRange (
+  UINT32                CpuIndex,
+  UINT32                CpusNum,
+  EFI_PHYSICAL_ADDRESS  PhysicalStart,
+  EFI_PHYSICAL_ADDRESS  PhysicalEnd
+  )
+{
+  UINT64                Status;
+  UINT64                Pages;
+  UINT64                Stride;
+  UINT64                AcceptPageSize;
+  UINT64                AcceptChunkSize;
+  EFI_PHYSICAL_ADDRESS  PhysicalAddress;
+
+  AcceptPageSize  = (UINT64)(UINTN)FixedPcdGet32 (PcdTdxAcceptPageSize);
+  AcceptChunkSize = (UINT64)(UINTN)FixedPcdGet32 (PcdTdxAcceptMemoryChunkSize);
+
+  Status          = EFI_SUCCESS;
+  Stride          = CpusNum * AcceptChunkSize;
+  PhysicalAddress = PhysicalStart + AcceptChunkSize * CpuIndex;
+
+  while (!EFI_ERROR (Status) && PhysicalAddress < PhysicalEnd) {
+    Pages  = MIN (AcceptChunkSize, PhysicalEnd - PhysicalAddress) / AcceptPageSize;
+    Status = TdAcceptPages (PhysicalAddress, Pages, (UINT32)(UINTN)AcceptPageSize);
+    ASSERT (!EFI_ERROR (Status));
+    PhysicalAddress += Stride;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+ * This function is called by APs to accept memory.
+ *
+ * @param CpuIndex        vCPU index of an AP
+ * @param PhysicalStart   Start address of a memory region which is to be accepted
+ * @param PhysicalEnd     End address of a memory region which is to be accepted
+ * @return EFI_SUCCESS    Successfully accept the memory
+ */
+STATIC
+EFI_STATUS
+EFIAPI
+ApAcceptMemoryResourceRange (
+  UINT32                CpuIndex,
+  EFI_PHYSICAL_ADDRESS  PhysicalStart,
+  EFI_PHYSICAL_ADDRESS  PhysicalEnd
+  )
+{
+  UINT64          Status;
+  TD_RETURN_DATA  TdReturnData;
+
+  Status = TdCall (TDCALL_TDINFO, 0, 0, 0, &TdReturnData);
+  if (Status != TDX_EXIT_REASON_SUCCESS) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  if ((CpuIndex == 0) || (CpuIndex > TdReturnData.TdInfo.NumVcpus)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  return BspApAcceptMemoryResourceRange (CpuIndex, TdReturnData.TdInfo.NumVcpus, PhysicalStart, PhysicalEnd);
+}
+
+/**
+ * This function is called by BSP. It coordinates BSP/APs to accept memory together.
+ *
+ * @param PhysicalStart     Start address of a memory region which is to be accepted
+ * @param PhysicalEnd       End address of a memory region which is to be accepted
+ * @param APsStackAddress   Top address of APs stack
+ * @param CpusNum           Total vCPU number of the Tdx guest
+ * @return EFI_SUCCESS      Successfully accept the memory
+ */
+EFI_STATUS
+EFIAPI
+MpAcceptMemoryResourceRange (
+  IN EFI_PHYSICAL_ADDRESS      PhysicalStart,
+  IN EFI_PHYSICAL_ADDRESS      PhysicalEnd,
+  IN OUT EFI_PHYSICAL_ADDRESS  *APsStackAddress,
+  IN UINT32                    CpusNum
+  )
+{
+  UINT64  TotalLength;
+  UINT64  AcceptChunkSize;
+  UINT32  APsStackSize;
+
+  TotalLength = PhysicalEnd - PhysicalStart;
+
+  if (TotalLength == 0) {
+    return EFI_SUCCESS;
+  }
+
+  AcceptChunkSize = (UINT64)(UINTN)FixedPcdGet32 (PcdTdxAcceptMemoryChunkSize);
+
+  DEBUG ((DEBUG_INFO, "MpAccept : 0x%llx - 0x%llx (0x%llx)\n", PhysicalStart, PhysicalEnd, TotalLength));
+
+  ASSERT (ALIGN_VALUE (PhysicalStart, SIZE_2MB) == PhysicalStart);
+
+  if (TotalLength <= AcceptChunkSize) {
+    return BspAcceptMemoryResourceRange (PhysicalStart, PhysicalEnd);
+  }
+
+  if (*APsStackAddress == 0) {
+    APsStackSize     = (CpusNum - 1) * SIZE_16KB;
+    *APsStackAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (APsStackSize));
+    ASSERT (*APsStackAddress != 0);
+  }
+
+  MpSerializeStart ();
+
+  MpSendWakeupCommand (
+    MpProtectedModeWakeupCommandAcceptPages,
+    (UINT64)(UINTN)ApAcceptMemoryResourceRange,
+    PhysicalStart,
+    PhysicalEnd,
+    *APsStackAddress,
+    SIZE_16KB
+    );
+
+  //
+  // Now BSP does its job.
+  //
+  BspApAcceptMemoryResourceRange (0, CpusNum, PhysicalStart, PhysicalEnd);
+
+  MpSerializeEnd ();
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -357,34 +501,34 @@ ValidateHobList (
 }
 
 /**
-  Processing the incoming HobList for the TDX
-
-  Firmware must parse list, and accept the pages of memory before their can be
-  use by the guest.
+  Phase-1 of accept memory. It will accept a small piece of memory by BSP.
 
   @param[in] VmmHobList    The Hoblist pass the firmware
 
   @retval  EFI_SUCCESS     Process the HobList successfully
   @retval  Others          Other errors as indicated
-
 **/
 EFI_STATUS
 EFIAPI
-ProcessHobList (
+AcceptMemoryPhase1 (
   IN CONST VOID  *VmmHobList
   )
 {
   EFI_STATUS            Status;
   EFI_PEI_HOB_POINTERS  Hob;
   EFI_PHYSICAL_ADDRESS  PhysicalEnd;
-  UINT64                ResourceLength;
-  UINT64                AccumulateAcceptedMemory;
+  EFI_PHYSICAL_ADDRESS  Phase1PhysicalEnd;
 
   Status = EFI_SUCCESS;
   ASSERT (VmmHobList != NULL);
   Hob.Raw = (UINT8 *)VmmHobList;
 
-  AccumulateAcceptedMemory = 0;
+  Phase1PhysicalEnd = (PHYSICAL_ADDRESS)FixedPcdGet64 (PcdTdxAcceptMemoryPhase1EndAddress);
+  if (Phase1PhysicalEnd == 0) {
+    Phase1PhysicalEnd = BASE_4GB;
+  }
+
+  DEBUG ((DEBUG_INFO, "AcceptMemoryPhase1 till 0x%llx\n", Phase1PhysicalEnd));
 
   //
   // Parse the HOB list until end of list or matching type is found.
@@ -399,14 +543,14 @@ ProcessHobList (
         DEBUG ((DEBUG_INFO, "ResourceLength: 0x%llx\n", Hob.ResourceDescriptor->ResourceLength));
         DEBUG ((DEBUG_INFO, "Owner: %g\n\n", &Hob.ResourceDescriptor->Owner));
 
-        PhysicalEnd    = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
-        ResourceLength = Hob.ResourceDescriptor->ResourceLength;
+        PhysicalEnd = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
 
-        if (Hob.ResourceDescriptor->PhysicalStart >= BASE_4GB) {
-          //
-          // In current stage, we only accept the memory under 4G
-          //
+        if (Hob.ResourceDescriptor->PhysicalStart >= Phase1PhysicalEnd) {
           break;
+        }
+
+        if (PhysicalEnd >= Phase1PhysicalEnd) {
+          PhysicalEnd = Phase1PhysicalEnd;
         }
 
         Status = BspAcceptMemoryResourceRange (
@@ -417,7 +561,117 @@ ProcessHobList (
           break;
         }
 
-        AccumulateAcceptedMemory += ResourceLength;
+        if (PhysicalEnd == Phase1PhysicalEnd) {
+          break;
+        }
+      }
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  return Status;
+}
+
+/**
+  Phase-2 of accept memory. It will accept a big piece of memory by BSP/APs.
+
+  @param[in] VmmHobList    The Hoblist pass the firmware
+
+  @retval  EFI_SUCCESS     Process the HobList successfully
+  @retval  Others          Other errors as indicated
+**/
+EFI_STATUS
+EFIAPI
+AcceptMemoryPhase2 (
+  IN CONST VOID  *VmmHobList
+  )
+{
+  EFI_STATUS            Status;
+  EFI_PEI_HOB_POINTERS  Hob;
+  EFI_PHYSICAL_ADDRESS  PhysicalStart;
+  EFI_PHYSICAL_ADDRESS  PhysicalEnd;
+  EFI_PHYSICAL_ADDRESS  Phase1PhysicalEnd;
+  EFI_PHYSICAL_ADDRESS  Phase2PhysicalEnd;
+  EFI_PHYSICAL_ADDRESS  APsStackStartAddress;
+  UINT32                CpusNum;
+
+  Status               = EFI_SUCCESS;
+  CpusNum              = GetCpusNum ();
+  APsStackStartAddress = 0;
+
+  ASSERT (VmmHobList != NULL);
+  Hob.Raw = (UINT8 *)VmmHobList;
+
+  Phase1PhysicalEnd = (PHYSICAL_ADDRESS)FixedPcdGet64 (PcdTdxAcceptMemoryPhase1EndAddress);
+  if (Phase1PhysicalEnd == 0) {
+    Phase1PhysicalEnd = SIZE_4GB;
+  }
+
+  Phase2PhysicalEnd = (PHYSICAL_ADDRESS)FixedPcdGet64 (PcdTdxAcceptMemoryPhase2EndAddress);
+  if (Phase2PhysicalEnd == 0) {
+    Phase2PhysicalEnd = MAX_UINT64;
+  }
+
+  if (Phase2PhysicalEnd < Phase1PhysicalEnd) {
+    ASSERT (FALSE);
+    Phase2PhysicalEnd = Phase1PhysicalEnd;
+  }
+
+  DEBUG ((DEBUG_INFO, "AcceptMemoryPhase2 till 0x%llx\n", Phase2PhysicalEnd));
+
+  //
+  // Parse the HOB list until end of list or matching type is found.
+  //
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      if (Hob.ResourceDescriptor->ResourceType == BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED) {
+        PhysicalStart = Hob.ResourceDescriptor->PhysicalStart;
+        PhysicalEnd   = PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+
+        if (PhysicalEnd <= Phase1PhysicalEnd) {
+          // this memory region has been accepted. Skipped it.
+          Hob.Raw = GET_NEXT_HOB (Hob);
+          continue;
+        }
+
+        if (PhysicalStart >= Phase2PhysicalEnd) {
+          // this memory region is not to be accepted. And we're done.
+          break;
+        }
+
+        if (PhysicalStart >= Phase1PhysicalEnd) {
+          // this memory region has not been acceted.
+        } else if ((PhysicalStart < Phase1PhysicalEnd) && (PhysicalEnd > Phase1PhysicalEnd)) {
+          // part of the memory region has been accepted.
+          PhysicalStart = Phase1PhysicalEnd;
+        }
+
+        // then compare the PhysicalEnd with Phase2PhysicalEnd
+        if (PhysicalEnd >= Phase2PhysicalEnd) {
+          PhysicalEnd = Phase2PhysicalEnd;
+        }
+
+        DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
+        DEBUG ((DEBUG_INFO, "PhysicalStart: 0x%llx\n", Hob.ResourceDescriptor->PhysicalStart));
+        DEBUG ((DEBUG_INFO, "ResourceLength: 0x%llx\n", Hob.ResourceDescriptor->ResourceLength));
+        DEBUG ((DEBUG_INFO, "Owner: %g\n\n", &Hob.ResourceDescriptor->Owner));
+
+        // Now we're ready to accept memory [PhysicalStart, PhysicalEnd)
+        Status = MpAcceptMemoryResourceRange (
+                   PhysicalStart,
+                   PhysicalEnd,
+                   &APsStackStartAddress,
+                   CpusNum
+                   );
+        if (EFI_ERROR (Status)) {
+          ASSERT (FALSE);
+          break;
+        }
+
+        if (PhysicalEnd == Phase2PhysicalEnd) {
+          break;
+        }
       }
     }
 
@@ -435,12 +689,17 @@ ProcessHobList (
   Information in HobList is treated as external input. From the security
   perspective before it is consumed, it should be validated.
 
+  One of the major task of processing TdxHobList is to accept memories. Since
+  it is a time-consuming task, accept-memory is split into 2 phases:
+  - Phase-1 accepts a small size of memory by BSP alone.
+  - Phase-2 accetps a large size of memory by BSP and APs together.
+
   @retval   EFI_SUCCESS   Successfully process the hoblist
   @retval   Others        Other error as indicated
 **/
 EFI_STATUS
 EFIAPI
-ProcessTdxHobList (
+PlatformProcessTdxHobListPhase1 (
   VOID
   )
 {
@@ -469,9 +728,9 @@ ProcessTdxHobList (
   }
 
   //
-  // Process Hoblist to accept memory
+  // Phase-1 of accept memory
   //
-  Status = ProcessHobList (TdHob);
+  Status = AcceptMemoryPhase1 (TdHob);
 
   return Status;
 }
@@ -493,7 +752,9 @@ BuildResourceDescriptorHobForUnacceptedMemory (
   UINT64                       ResourceLength;
   EFI_RESOURCE_TYPE            ResourceType;
   EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute;
-  UINT64                       MaxAcceptedMemoryAddress;
+  EFI_PHYSICAL_ADDRESS         MaxAcceptedMemoryAddress;
+  EFI_PHYSICAL_ADDRESS         Phase1PhysicalEnd;
+  EFI_PHYSICAL_ADDRESS         Phase2PhysicalEnd;
 
   ASSERT (Hob->ResourceType == BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED);
 
@@ -503,11 +764,26 @@ BuildResourceDescriptorHobForUnacceptedMemory (
   ResourceLength    = Hob->ResourceLength;
   PhysicalEnd       = PhysicalStart + ResourceLength;
 
+  Phase1PhysicalEnd = (PHYSICAL_ADDRESS)FixedPcdGet64 (PcdTdxAcceptMemoryPhase1EndAddress);
+  if (Phase1PhysicalEnd == 0) {
+    Phase1PhysicalEnd = SIZE_4GB;
+  }
+
+  Phase2PhysicalEnd = (PHYSICAL_ADDRESS)FixedPcdGet64 (PcdTdxAcceptMemoryPhase2EndAddress);
+  if (Phase2PhysicalEnd == 0) {
+    Phase2PhysicalEnd = MAX_UINT64;
+  }
+
+  if (Phase2PhysicalEnd < Phase1PhysicalEnd) {
+    ASSERT (FALSE);
+    Phase2PhysicalEnd = Phase1PhysicalEnd;
+  }
+
   //
-  // In the first stage of lazy-accept, all the memory under 4G will be accepted.
-  // The memory above 4G will not be accepted.
+  // Accept memory is split into 2 phases:
+  // Phase-2 accept a small size, phase-2 accept a bigger size.
   //
-  MaxAcceptedMemoryAddress = BASE_4GB;
+  MaxAcceptedMemoryAddress = Phase2PhysicalEnd;
 
   if (PhysicalEnd <= MaxAcceptedMemoryAddress) {
     //
@@ -520,6 +796,19 @@ BuildResourceDescriptorHobForUnacceptedMemory (
     // This memory region hasn't been accepted.
     // So keep the ResourceType and ResourceAttribute unchange.
     //
+  } else if ((PhysicalStart < MaxAcceptedMemoryAddress) && (PhysicalEnd > MaxAcceptedMemoryAddress)) {
+    //
+    // Left part of the memory region is accepted. The right part is unaccepted.
+    //
+    BuildResourceDescriptorHob (
+      EFI_RESOURCE_SYSTEM_MEMORY,
+      ResourceAttribute | (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_TESTED),
+      PhysicalStart,
+      MaxAcceptedMemoryAddress - PhysicalStart
+      );
+
+    PhysicalStart  = MaxAcceptedMemoryAddress;
+    ResourceLength = PhysicalEnd - MaxAcceptedMemoryAddress;
   }
 
   BuildResourceDescriptorHob (
@@ -584,6 +873,26 @@ TransferTdxHobList (
 }
 
 /**
+ * This function is called after PlatformProcessTdxHobListPhase1 and to accept
+ * more memory by BSP and APs together.
+ *
+ * @retval EFI_SUCESS  Successfully process the hoblist
+ * @retval Others      Other error as indicated
+ */
+EFI_STATUS
+EFIAPI
+PlatformProcessTdxHobListPhase2 (
+  VOID
+  )
+{
+  AcceptMemoryPhase2 ((VOID *)(UINTN)FixedPcdGet32 (PcdOvmfSecGhcbBase));
+
+  TransferTdxHobList ();
+
+  return EFI_SUCCESS;
+}
+
+/**
   In Tdx guest, the system memory is passed in TdHob by host VMM. So
   the major task of PlatformTdxPublishRamRegions is to walk thru the
   TdHob list and transfer the ResourceDescriptorHob and MemoryAllocationHob
@@ -600,8 +909,6 @@ PlatformTdxPublishRamRegions (
   if (!TdIsEnabled ()) {
     return;
   }
-
-  TransferTdxHobList ();
 
   //
   // The memory region defined by PcdOvmfSecGhcbBackupBase is pre-allocated by

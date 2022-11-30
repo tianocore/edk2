@@ -22,7 +22,16 @@
 **/
 EFI_STATUS
 EFIAPI
-ProcessTdxHobList (
+PlatformProcessTdxHobListPhase1 (
+  VOID
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+EFI_STATUS
+EFIAPI
+PlatformProcessTdxHobListPhase2 (
   VOID
   )
 {

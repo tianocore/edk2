@@ -52,6 +52,7 @@
   PcdLib
   PciLib
   PeiHardwareInfoLib
+  TdxMailboxLib
 
 [LibraryClasses.X64]
   TdxLib
@@ -99,6 +100,9 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
   gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptMemoryPhase1EndAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptMemoryPhase2EndAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptMemoryChunkSize
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
