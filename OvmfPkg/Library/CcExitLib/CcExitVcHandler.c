@@ -1619,6 +1619,10 @@ Dr7WriteExit (
   UINT64                     *Register;
   UINT64                     Status;
 
+  if (MemEncryptSevEsDebugSwapIsEnabled ()) {
+    return UnsupportedExit (Ghcb, Regs, InstructionData);
+  }
+
   Ext       = &InstructionData->Ext;
   SevEsData = (SEV_ES_PER_CPU_DATA *)(Ghcb + 1);
 
@@ -1668,6 +1672,10 @@ Dr7ReadExit (
   CC_INSTRUCTION_OPCODE_EXT  *Ext;
   SEV_ES_PER_CPU_DATA        *SevEsData;
   UINT64                     *Register;
+
+  if (MemEncryptSevEsDebugSwapIsEnabled ()) {
+    return UnsupportedExit (Ghcb, Regs, InstructionData);
+  }
 
   Ext       = &InstructionData->Ext;
   SevEsData = (SEV_ES_PER_CPU_DATA *)(Ghcb + 1);
