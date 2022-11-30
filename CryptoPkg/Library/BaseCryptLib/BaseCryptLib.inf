@@ -35,7 +35,11 @@
   Hash/CryptSha256.c
   Hash/CryptSha512.c
   Hash/CryptSm3.c
-  Hash/CryptParallelHashNull.c
+  Hash/CryptSha3.c
+  Hash/CryptXkcp.c
+  Hash/CryptCShake256.c
+  Hash/CryptParallelHash.c
+  Hash/CryptDispatchApDxe.c
   Hmac/CryptHmac.c
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
@@ -93,6 +97,11 @@
   OpensslLib
   IntrinsicLib
   PrintLib
+  UefiBootServicesTableLib
+  SynchronizationLib
+
+[Protocols]
+  gEfiMpServiceProtocolGuid
 
 #
 # Remove these [BuildOptions] after this library is cleaned up

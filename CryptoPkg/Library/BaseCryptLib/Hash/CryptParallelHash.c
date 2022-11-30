@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "CryptParallelHash.h"
-#include <Library/MmServicesTableLib.h>
 #include <Library/SynchronizationLib.h>
 
 #define PARALLELHASH_CUSTOMIZATION  "ParallelHash"
@@ -67,27 +66,6 @@ ParallelHashApExecute (
       ReleaseSpinLock (&mSpinLockList[Index]);
     }
   }
-}
-
-/**
-  Dispatch the block task to each AP in SMM mode.
-
-**/
-VOID
-EFIAPI
-MmDispatchBlockToAP (
-  VOID
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < gMmst->NumberOfCpus; Index++) {
-    if (Index != gMmst->CurrentlyExecutingCpu) {
-      gMmst->MmStartupThisAp (ParallelHashApExecute, Index, NULL);
-    }
-  }
-
-  return;
 }
 
 /**
@@ -197,9 +175,7 @@ ParallelHash256HashAll (
   //
   // Dispatch blocklist to each AP.
   //
-  if (gMmst != NULL) {
-    MmDispatchBlockToAP ();
-  }
+  DispatchBlockToAp ();
 
   //
   // Wait until all block hash completed.

@@ -201,3 +201,26 @@ CShake256HashAll (
   IN   UINTN       CustomizationLen,
   OUT  UINT8       *HashValue
   );
+
+/**
+  Complete computation of digest of each block.
+
+  Each AP perform the function called by BSP.
+
+  @param[in] ProcedureArgument Argument of the procedure.
+**/
+VOID
+EFIAPI
+ParallelHashApExecute (
+  IN VOID  *ProcedureArgument
+  );
+
+/**
+  Dispatch the block task to each AP.
+
+**/
+VOID
+EFIAPI
+DispatchBlockToAp (
+  VOID
+  );
