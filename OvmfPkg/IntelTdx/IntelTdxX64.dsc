@@ -62,6 +62,11 @@
   #
   DEFINE UP_CPU_DXE_GUID  = 6490f1c5-ebcc-4665-8892-0075b9bb49b7
 
+  #
+  # Define the end of physical address of memory to be accepted. The unit is M.
+  #
+  DEFINE ACCEPT_MEMORY_END_ADDRESS = 512
+
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
@@ -456,6 +461,9 @@
   #
   # TDX need 1G PageTable support
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable|TRUE
+
+  ## End of physical address of memory to be accepted.
+  gUefiOvmfPkgTokenSpaceGuid.PcdAcceptMemoryEndAddress|($(ACCEPT_MEMORY_END_ADDRESS)*0x100000)
 
   gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x20000
 

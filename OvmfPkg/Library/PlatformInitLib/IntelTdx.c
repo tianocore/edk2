@@ -375,7 +375,8 @@ AcceptMemoryForAPsStack (
 }
 
 /**
-  BSP and APs work togeter to accept memory which is under the address of 4G.
+  BSP and APs work togeter to accept memory which is under the address
+  indicated by PcdAcceptMemoryEndAddress.
 
   @param[in] VmmHobList           The Hoblist pass the firmware
   @param[in] CpusNum              Number of vCPUs
@@ -400,13 +401,22 @@ AcceptMemory (
   EFI_PHYSICAL_ADDRESS  PhysicalEnd;
   EFI_PHYSICAL_ADDRESS  AcceptMemoryEndAddress;
 
-  Status                 = EFI_SUCCESS;
-  AcceptMemoryEndAddress = BASE_4GB;
+  Status = EFI_SUCCESS;
 
   ASSERT (VmmHobList != NULL);
   Hob.Raw = (UINT8 *)VmmHobList;
 
-  DEBUG ((DEBUG_INFO, "AcceptMemory under address of 4G\n"));
+  AcceptMemoryEndAddress = (PHYSICAL_ADDRESS)FixedPcdGet64 (PcdAcceptMemoryEndAddress);
+  if (AcceptMemoryEndAddress == 0) {
+    AcceptMemoryEndAddress = MAX_UINT64;
+  }
+
+  if (AcceptMemoryEndAddress <= PhysicalAddressStart) {
+    ASSERT (FALSE);
+    return EFI_SUCCESS;
+  }
+
+  DEBUG ((DEBUG_INFO, "AcceptMemory till 0x%llx\n", AcceptMemoryEndAddress));
 
   //
   // Parse the HOB list until end of list or matching type is found.
@@ -816,11 +826,7 @@ BuildResourceDescriptorHobForUnacceptedMemory (
   ResourceLength    = Hob->ResourceLength;
   PhysicalEnd       = PhysicalStart + ResourceLength;
 
-  //
-  // In the first stage of lazy-accept, all the memory under 4G will be accepted.
-  // The memory above 4G will not be accepted.
-  //
-  MaxAcceptedMemoryAddress = BASE_4GB;
+  MaxAcceptedMemoryAddress = FixedPcdGet64 (PcdAcceptMemoryEndAddress);
 
   if (PhysicalEnd <= MaxAcceptedMemoryAddress) {
     //
@@ -833,6 +839,19 @@ BuildResourceDescriptorHobForUnacceptedMemory (
     // This memory region hasn't been accepted.
     // So keep the ResourceType and ResourceAttribute unchange.
     //
+  } else if ((PhysicalStart < MaxAcceptedMemoryAddress) && (PhysicalEnd > MaxAcceptedMemoryAddress)) {
+    //
+    // Left part of the memory region is accepted. The right part is unaccepted.
+    //
+    BuildResourceDescriptorHob (
+      EFI_RESOURCE_SYSTEM_MEMORY,
+      ResourceAttribute | (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_TESTED),
+      PhysicalStart,
+      MaxAcceptedMemoryAddress - PhysicalStart
+      );
+
+    PhysicalStart  = MaxAcceptedMemoryAddress;
+    ResourceLength = PhysicalEnd - MaxAcceptedMemoryAddress;
   }
 
   BuildResourceDescriptorHob (
