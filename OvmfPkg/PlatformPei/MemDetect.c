@@ -272,6 +272,17 @@ PublishPeiMemory (
   UINT32                S3AcpiReservedMemorySize;
 
   LowerMemorySize = PlatformGetSystemMemorySizeBelow4gb (&mPlatformInfoHob);
+
+  //
+  // At this point only part of memory is accepted in Tdx guest.
+  // So LowerMemorySize should be adjusted accordingly.
+  //
+  if (TdIsEnabled ()) {
+    if (LowerMemorySize > FixedPcdGet64 (PcdTdxAcceptMemoryPhase1EndAddress)) {
+      LowerMemorySize = FixedPcdGet64 (PcdTdxAcceptMemoryPhase1EndAddress);
+    }
+  }
+
   if (mPlatformInfoHob.SmmSmramRequire) {
     //
     // TSEG is chipped from the end of low RAM

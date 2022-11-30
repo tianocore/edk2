@@ -363,6 +363,10 @@ InitializePlatform (
 
   PublishPeiMemory ();
 
+  if (TdIsEnabled ()) {
+    PlatformProcessTdxHobListPhase2 ();
+  }
+
   PlatformQemuUc32BaseInitialization (&mPlatformInfoHob);
 
   InitializeRamRegions (&mPlatformInfoHob);

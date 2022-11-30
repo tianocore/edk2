@@ -130,6 +130,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptMemoryPhase1EndAddress
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable
