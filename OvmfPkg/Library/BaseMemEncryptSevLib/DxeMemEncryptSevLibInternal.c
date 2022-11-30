@@ -40,19 +40,23 @@ AmdMemEncryptionAttrCheck (
   IN  CONFIDENTIAL_COMPUTING_GUEST_ATTR  Attr
   )
 {
+  UINT64  CurrentLevel = CurrentAttr & CCAttrTypeMask;
+
   switch (Attr) {
     case CCAttrAmdSev:
       //
       // SEV is automatically enabled if SEV-ES or SEV-SNP is active.
       //
-      return CurrentAttr >= CCAttrAmdSev;
+      return CurrentLevel >= CCAttrAmdSev;
     case CCAttrAmdSevEs:
       //
       // SEV-ES is automatically enabled if SEV-SNP is active.
       //
-      return CurrentAttr >= CCAttrAmdSevEs;
+      return CurrentLevel >= CCAttrAmdSevEs;
     case CCAttrAmdSevSnp:
-      return CurrentAttr == CCAttrAmdSevSnp;
+      return CurrentLevel == CCAttrAmdSevSnp;
+    case CCAttrFeatureAmdSevDebugSwap:
+      return !!(CurrentAttr & CCAttrFeatureAmdSevDebugSwap);
     default:
       return FALSE;
   }
@@ -158,4 +162,19 @@ MemEncryptSevGetEncryptionMask (
   }
 
   return mSevEncryptionMask;
+}
+
+/**
+  Returns a boolean to indicate whether DebugSwap is enabled.
+
+  @retval TRUE           DebugSwap is enabled
+  @retval FALSE          DebugSwap is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevEsDebugSwapIsEnabled (
+  VOID
+  )
+{
+  return ConfidentialComputingGuestHas (CCAttrFeatureAmdSevDebugSwap);
 }

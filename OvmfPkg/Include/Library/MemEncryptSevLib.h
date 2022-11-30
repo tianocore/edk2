@@ -167,6 +167,18 @@ MemEncryptSevGetEncryptionMask (
   );
 
 /**
+  Returns a boolean to indicate whether DebugSwap is enabled.
+
+  @retval TRUE           DebugSwap is enabled
+  @retval FALSE          DebugSwap is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevEsDebugSwapIsEnabled (
+  VOID
+  );
+
+/**
   Returns the encryption state of the specified virtual address range.
 
   @param[in]  Cr3BaseAddress          Cr3 Base Address (if zero then use
