@@ -26,11 +26,16 @@
   Library/CmockaLib/cmocka/include/cmockery
   Library/GoogleTestLib/googletest/googletest
 
-[LibraryClasses.Common.Private]
+[LibraryClasses]
   ## @libraryclass Allows save and restore unit test internal state
   #
-  UnitTestPersistenceLib|PrivateInclude/Library/UnitTestPersistenceLib.h
+  UnitTestPersistenceLib|Include/Library/UnitTestPersistenceLib.h
 
+  ## @libraryclass GoogleTest infrastructure
+  #
+  GoogleTestLib|Include/Library/GoogleTestLib.h
+
+[LibraryClasses.Common.Private]
   ## @libraryclass Provides a unit test result report
   #
   UnitTestResultReportLib|PrivateInclude/Library/UnitTestResultReportLib.h
@@ -38,10 +43,6 @@
   ## @libraryclass Provides boot-option routines useful in shell-based tests.
   #
   UnitTestBootLib|PrivateInclude/Library/UnitTestBootLib.h
-
-  ## @libraryclass GoogleTest infrastructure
-  #
-  GoogleTestLib|Include/Library/GoogleTestLib.h
 
 [Guids]
   gUnitTestFrameworkPkgTokenSpaceGuid = { 0x833d3aba, 0x39b4, 0x43a2, { 0xb9, 0x30, 0x7a, 0x34, 0x53, 0x39, 0x31, 0xb3 } }
