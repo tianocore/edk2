@@ -8,6 +8,9 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
+variables:
+  - template: defaults.yml
+
 parameters:
 - name: tool_chain_tag
   type: string
@@ -36,7 +39,7 @@ parameters:
   default: []
 - name: usePythonVersion
   type: string
-  default: ">=3.10.6"
+  default: ${{ variables.default_python_version }}
 
 steps:
 - bash: |

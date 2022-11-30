@@ -8,12 +8,15 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
+variables:
+  - template: templates/defaults.yml
+
 parameters:
   tool_chain_tag: ''
   vm_image: ''
   arch_list: ''
   container: ''
-  usePythonVersion: '>=3.10.6'
+  usePythonVersion: ${{ variables.default_python_verison }}
 
 # Build step
 jobs:
