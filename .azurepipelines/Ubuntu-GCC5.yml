@@ -18,7 +18,7 @@ jobs:
   parameters:
     tool_chain_tag: 'GCC5'
     vm_image: 'ubuntu-latest'
-    container: 'ghcr.io/tianocore/containers/fedora-35-build:0b7ecfa'
+    container: 'ghcr.io/osteffenrh/edk2-containers/fedora-35-build:5600fe4'
     usePythonVersion: ''  # use Python from the container image
     arch_list: "IA32,X64,ARM,AARCH64,RISCV64,LOONGARCH64"
 
