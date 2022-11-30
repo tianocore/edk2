@@ -141,3 +141,18 @@ MemEncryptSevGetEncryptionMask (
 
   return SevEsWorkArea->EncryptionMask;
 }
+
+/**
+  Returns a boolean to indicate whether DebugVirtualization is enabled.
+
+  @retval TRUE           DebugVirtualization is enabled
+  @retval FALSE          DebugVirtualization is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevEsDebugVirtualizationIsEnabled (
+  VOID
+  )
+{
+  return FALSE;
+}
