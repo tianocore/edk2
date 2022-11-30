@@ -143,6 +143,25 @@ MemEncryptSevGetEncryptionMask (
 }
 
 /**
+  Returns a boolean to indicate whether DebugSwap is enabled.
+
+  @retval TRUE           DebugSwap is enabled
+  @retval FALSE          DebugSwap is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevEsDebugSwapIsEnabled (
+  VOID
+  )
+{
+  MSR_SEV_STATUS_REGISTER  Msr;
+
+  Msr.Uint32 = InternalMemEncryptSevStatus ();
+
+  return Msr.Bits.DebugSwap ? TRUE : FALSE;
+}
+
+/**
   Locate the page range that covers the initial (pre-SMBASE-relocation) SMRAM
   Save State Map.
 

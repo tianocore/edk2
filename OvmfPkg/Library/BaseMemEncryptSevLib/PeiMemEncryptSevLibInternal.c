@@ -141,3 +141,22 @@ MemEncryptSevGetEncryptionMask (
 
   return SevEsWorkArea->EncryptionMask;
 }
+
+/**
+  Returns a boolean to indicate whether DebugSwap is enabled.
+
+  @retval TRUE           DebugSwap is enabled
+  @retval FALSE          DebugSwap is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevEsDebugSwapIsEnabled (
+  VOID
+  )
+{
+  MSR_SEV_STATUS_REGISTER  Msr;
+
+  Msr.Uint32 = InternalMemEncryptSevStatus ();
+
+  return Msr.Bits.DebugSwap ? TRUE : FALSE;
+}
