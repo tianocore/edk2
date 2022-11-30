@@ -13,8 +13,6 @@
 #include <Library/PlatformInitLib.h>
 #include <IndustryStandard/IntelTdx.h>
 
-extern EFI_HOB_PLATFORM_INFO  mPlatformInfoHob;
-
 VOID
 AddressWidthInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
@@ -98,7 +96,7 @@ IntelTdxInitialize (
 /**
  * @brief Builds PlatformInfo Hob
  */
-VOID
+EFI_HOB_PLATFORM_INFO *
 BuildPlatformInfoHob (
   VOID
   );
