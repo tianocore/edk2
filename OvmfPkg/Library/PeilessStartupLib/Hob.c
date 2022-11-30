@@ -74,17 +74,23 @@ ConstructFwHobList (
   )
 {
   EFI_PEI_HOB_POINTERS  Hob;
+  EFI_PHYSICAL_ADDRESS  PhysicalStart;
   EFI_PHYSICAL_ADDRESS  PhysicalEnd;
   UINT64                ResourceLength;
   EFI_PHYSICAL_ADDRESS  LowMemoryStart;
   UINT64                LowMemoryLength;
+  EFI_PHYSICAL_ADDRESS  Phase1PhysicalEnd;
 
   ASSERT (VmmHobList != NULL);
 
   Hob.Raw = (UINT8 *)VmmHobList;
 
-  LowMemoryLength = 0;
-  LowMemoryStart  = 0;
+  LowMemoryLength   = 0;
+  LowMemoryStart    = 0;
+  Phase1PhysicalEnd = (PHYSICAL_ADDRESS)FixedPcdGet64 (PcdTdxAcceptMemoryPhase1EndAddress);
+  if (Phase1PhysicalEnd == 0) {
+    Phase1PhysicalEnd = BASE_4GB;
+  }
 
   //
   // Parse the HOB list until end of list or matching type is found.
@@ -92,16 +98,20 @@ ConstructFwHobList (
   while (!END_OF_HOB_LIST (Hob)) {
     if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
       if (Hob.ResourceDescriptor->ResourceType == BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED) {
-        PhysicalEnd    = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+        PhysicalStart  = Hob.ResourceDescriptor->PhysicalStart;
+        PhysicalEnd    = PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
         ResourceLength = Hob.ResourceDescriptor->ResourceLength;
+        if (PhysicalEnd >= Phase1PhysicalEnd) {
+          ResourceLength = Phase1PhysicalEnd - PhysicalStart;
+        }
 
-        if (PhysicalEnd <= BASE_4GB) {
+        if (PhysicalStart >= Phase1PhysicalEnd) {
+          break;
+        } else {
           if (ResourceLength > LowMemoryLength) {
             LowMemoryStart  = Hob.ResourceDescriptor->PhysicalStart;
             LowMemoryLength = ResourceLength;
           }
-        } else {
-          break;
         }
       }
     }
@@ -110,7 +120,7 @@ ConstructFwHobList (
   }
 
   if (LowMemoryLength == 0) {
-    DEBUG ((DEBUG_ERROR, "Cannot find a memory region under 4GB for Fw hoblist.\n"));
+    DEBUG ((DEBUG_ERROR, "Cannot find a memory region under 0x%llx for Fw hoblist.\n", Phase1PhysicalEnd));
     return EFI_NOT_FOUND;
   }
 

@@ -53,6 +53,8 @@ InitializePlatform (
   PlatformInfoHob->HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
   DEBUG ((DEBUG_INFO, "HostBridgeDeviceId = 0x%x\n", PlatformInfoHob->HostBridgeDevId));
 
+  PlatformProcessTdxHobListPhase2 ();
+
   PlatformAddressWidthInitialization (PlatformInfoHob);
   DEBUG ((
     DEBUG_INFO,
