@@ -1046,6 +1046,11 @@ PiCpuSmmEntry (
   InitializeDataForMmMp ();
 
   //
+  // Initialize Package First Thread Index Info.
+  //
+  InitPackageFirstThreadIndexInfo ();
+
+  //
   // Install the SMM Mp Protocol into SMM protocol database
   //
   Status = gSmst->SmmInstallProtocolInterface (

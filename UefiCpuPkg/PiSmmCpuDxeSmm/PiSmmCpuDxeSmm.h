@@ -194,11 +194,6 @@ typedef struct {
 
 #define INVALID_APIC_ID  0xFFFFFFFFFFFFFFFFULL
 
-typedef UINT32 SMM_CPU_ARRIVAL_EXCEPTIONS;
-#define ARRIVAL_EXCEPTION_BLOCKED       0x1
-#define ARRIVAL_EXCEPTION_DELAYED       0x2
-#define ARRIVAL_EXCEPTION_SMI_DISABLED  0x4
-
 //
 // Wrapper used to convert EFI_AP_PROCEDURE2 and EFI_AP_PROCEDURE.
 //
@@ -1460,6 +1455,17 @@ EFI_STATUS
 RegisterStartupProcedure (
   IN     EFI_AP_PROCEDURE  Procedure,
   IN OUT VOID              *ProcedureArguments OPTIONAL
+  );
+
+/**
+  Initialize PackageBsp Info. Processor specified by mPackageFirstThreadIndex[PackageIndex]
+  will do the package-scope register programming. Set default CpuIndex to (UINT32)-1, which
+  means not specified yet.
+
+**/
+VOID
+InitPackageFirstThreadIndexInfo (
+  VOID
   );
 
 /**
