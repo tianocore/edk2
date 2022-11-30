@@ -40,6 +40,13 @@ PeiFvInitialization (
     PlatformInfoHob->S3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
     );
 
+  // register debug copy
+  BuildMemoryAllocationHob (
+    0x420000,
+    PcdGet32 (PcdOvmfPeiMemFvSize),
+    PlatformInfoHob->S3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
+    );
+
   //
   // Let DXE know about the DXE FV
   //
