@@ -177,6 +177,8 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
+    container: 'ghcr.io/tianocore/containers/fedora-35-test:0b7ecfa'
+
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
@@ -187,7 +189,4 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
-        extra_install_step:
-        - bash: sudo apt-get install qemu
-          displayName: Install qemu
-          condition: and(gt(variables.pkg_count, 0), succeeded())
+        usePythonVersion: '' # use Python from the container image
