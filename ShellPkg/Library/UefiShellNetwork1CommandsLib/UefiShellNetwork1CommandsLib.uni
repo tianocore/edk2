@@ -52,7 +52,7 @@
 #string STR_PING_NOROUTE_FOUND       #language en-US "There is no route to the destination '%B%s%N' from the source '%B%s%N' was found.\r\n"
 #string STR_PING_START               #language en-US "Ping %s %d data bytes.\r\n"
 #string STR_PING_TIMEOUT             #language en-US "Echo request sequence %d timeout.\r\n"
-#string STR_PING_REPLY_INFO          #language en-US "%d bytes from %s : icmp_seq=%d ttl=%d time%d~%dms\r\n"
+#string STR_PING_REPLY_INFO          #language en-US "%d bytes from %s : icmp_seq=%d ttl=%d time=%d~%dms\r\n"
 #string STR_PING_STAT                #language en-US "\n%d packets transmitted, %d received, %d%% packet loss, time %dms\r\n"
 #string STR_PING_RTT                 #language en-US "\nRtt(round trip time) min=%d~%dms max=%d~%dms avg=%d~%dms\r\n"
 
