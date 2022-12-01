@@ -115,7 +115,7 @@ dataStructBitField8[FieldInUnion]
     :   D='UINT8' N=StringIdentifier? ':' Number ';'
     ;
 
-// 2.4 VFR FormSet Definition
+// VFR FormSet Definition
 vfrFormSetDefinition
 locals[Node=VfrTreeNode(EFI_IFR_FORM_SET_OP)]
     :   'formset'
@@ -454,7 +454,7 @@ locals[Node]
     ;
 
 vfrStatementGoto
-locals[Node=VfrTreeNode(EFI_IFR_REF_OP), OHObj=None, QType=EFI_QUESION_TYPE.QUESTION_REF]
+locals[Node=VfrTreeNode(EFI_IFR_REF_OP), QType=EFI_QUESION_TYPE.QUESTION_REF]
     :   'goto'
         (   (   DevicePath '=' 'STRING_TOKEN' '(' Number ')' ','
                 FormSetGuid '=' guidDefinition ','
@@ -471,7 +471,7 @@ locals[Node=VfrTreeNode(EFI_IFR_REF_OP), OHObj=None, QType=EFI_QUESION_TYPE.QUES
                 Question '=' (QN=StringIdentifier ',' | Number ',')
             )
             |
-            (   Number ',' )
+            (   N=Number ',' )
         )?
         vfrQuestionHeader[localctx.Node, localctx.QType]
         (',' 'flags' '=' vfrGotoFlags)?
@@ -756,7 +756,7 @@ vfrSetMinMaxStep[Node] // CIfrMinMaxStepData
     ;
 
 vfrNumericFlags
-locals[HFlags=0, LFlags=0,IsDisplaySpecified=False]
+locals[HFlags=0, LFlags=0, IsDisplaySpecified=False, UpdateVarType=False]
     :   numericFlagsField ('|' numericFlagsField)*
     ;
 
@@ -1112,7 +1112,7 @@ locals[Node=VfrTreeNode(EFI_IFR_GUID_OP)]
     ;
 
 vfrStatementExtension
-locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), DataBuff, Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
+locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
     :   'guidop'
         'guid' '=' guidDefinition
         (   ',' D='datatype' '='
@@ -1127,7 +1127,7 @@ locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), DataBuff, Size=0, TypeName='', TypeSiz
             |   'EFI_HII_REF' ('[' Number ']')?
             |   StringIdentifier ('[' Number ']')?
             )
-            (vfrExtensionData[localctx.DataBuff])*
+            (vfrExtensionData)*
         )?
         (
             ',' (vfrStatementExtension)*
@@ -1137,8 +1137,8 @@ locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), DataBuff, Size=0, TypeName='', TypeSiz
     ;
 
 
-vfrExtensionData[DataBuff]
-locals[IsStruct]
+vfrExtensionData
+locals[IsStruct, Data]
     :   ',' 'data' ('[' Number ']')?
         ( '.' arrayName)*  '=' N=Number
     ;

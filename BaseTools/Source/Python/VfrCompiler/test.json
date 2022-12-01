@@ -1,313 +1,312 @@
 {
   "DataStruct" : {
-    "MY_EFI_BITS_VARSTORE_DATA" : [
+    "ISCSI_CONFIG_IFR_NVDATA" : [
       {
-        "Name": "BitsData",
-        "Type": "MY_BITS_DATA",
+        "Name": "InitiatorName",
+        "Type": "UINT16[224]",
         "Offset": 0
-      }, 
+      },
       {
-        "Name": "EfiBitGrayoutTest",
-        "Type": "UINT32",
-        "Offset": 4
-      }, 
+        "Name": "AttemptName",
+        "Type": "UINT16[12]",
+        "Offset": 448
+      },
       {
-        "Name": "EfiBitNumeric",
-        "Type": "UINT32",
-        "Offset": 4
-      }, 
-      {
-        "Name": "EfiBitOneof",
-        "Type": "UINT32",
-        "Offset": 4
-      }, 
-      {
-        "Name": "EfiBitCheckbox",
-        "Type": "UINT32",
-        "Offset": 4
-      }, 
-      {
-        "Name": "None",
-        "Type": "UINT32",
-        "Offset": 4
-      }
-    ],
-    "MY_EFI_VARSTORE_DATA" : [
-      {
-        "Name": "Field8",
+        "Name": "Enabled",
         "Type": "UINT8",
-        "Offset": 0
-      }, 
+        "Offset": 472
+      },
       {
-        "Name": "Field16",
+        "Name": "IpMode",
+        "Type": "UINT8",
+        "Offset": 473
+      },
+      {
+        "Name": "ConnectRetryCount",
+        "Type": "UINT8",
+        "Offset": 474
+      },
+      {
+        "Name": "Padding1",
+        "Type": "UINT8",
+        "Offset": 475
+      },
+      {
+        "Name": "ConnectTimeout",
         "Type": "UINT16",
-        "Offset": 1
-      }, 
+        "Offset": 476
+      },
       {
-        "Name": "OrderedList",
-        "Type": "UINT8[3]",
-        "Offset": 3
-      }, 
+        "Name": "InitiatorInfoFromDhcp",
+        "Type": "UINT8",
+        "Offset": 478
+      },
       {
-        "Name": "SubmittedCallback",
+        "Name": "TargetInfoFromDhcp",
+        "Type": "UINT8",
+        "Offset": 479
+      },
+      {
+        "Name": "LocalIp",
+        "Type": "UINT16[16]",
+        "Offset": 480
+      },
+      {
+        "Name": "SubnetMask",
+        "Type": "UINT16[16]",
+        "Offset": 512
+      },
+      {
+        "Name": "Gateway",
+        "Type": "UINT16[16]",
+        "Offset": 544
+      },
+      {
+        "Name": "TargetName",
+        "Type": "UINT16[224]",
+        "Offset": 576
+      },
+      {
+        "Name": "TargetIp",
+        "Type": "UINT16[255]",
+        "Offset": 1024
+      },
+      {
+        "Name": "TargetPort",
         "Type": "UINT16",
-        "Offset": 6
-      }
-    ],
-    "DRIVER_SAMPLE_CONFIGURATION" : [
+        "Offset": 1534
+      },
       {
-        "Name": "MyStringData",
+        "Name": "BootLun",
+        "Type": "UINT16[21]",
+        "Offset": 1536
+      },
+      {
+        "Name": "AuthenticationType",
+        "Type": "UINT8",
+        "Offset": 1578
+      },
+      {
+        "Name": "CHAPType",
+        "Type": "UINT8",
+        "Offset": 1579
+      },
+      {
+        "Name": "CHAPName",
+        "Type": "UINT16[127]",
+        "Offset": 1580
+      },
+      {
+        "Name": "CHAPSecret",
+        "Type": "UINT16[17]",
+        "Offset": 1834
+      },
+      {
+        "Name": "ReverseCHAPName",
+        "Type": "UINT16[127]",
+        "Offset": 1868
+      },
+      {
+        "Name": "ReverseCHAPSecret",
+        "Type": "UINT16[17]",
+        "Offset": 2122
+      },
+      {
+        "Name": "MutualRequired",
+        "Type": "BOOLEAN",
+        "Offset": 2156
+      },
+      {
+        "Name": "Padding2",
+        "Type": "UINT8",
+        "Offset": 2157
+      },
+      {
+        "Name": "KerberosUserName",
+        "Type": "UINT16[96]",
+        "Offset": 2158
+      },
+      {
+        "Name": "KerberosUserSecret",
+        "Type": "UINT16[17]",
+        "Offset": 2350
+      },
+      {
+        "Name": "KerberosKDCName",
+        "Type": "UINT16[96]",
+        "Offset": 2384
+      },
+      {
+        "Name": "KerberosKDCRealm",
+        "Type": "UINT16[96]",
+        "Offset": 2576
+      },
+      {
+        "Name": "KerberosKDCIp",
         "Type": "UINT16[40]",
-        "Offset": 0
-      }, 
+        "Offset": 2768
+      },
       {
-        "Name": "SomethingHiddenForHtml",
+        "Name": "KerberosKDCPort",
         "Type": "UINT16",
-        "Offset": 80
-      }, 
-      {
-        "Name": "HowOldAreYouInYearsManual",
-        "Type": "UINT8",
-        "Offset": 82
-      }, 
-      {
-        "Name": "HowTallAreYouManual",
-        "Type": "UINT16",
-        "Offset": 83
-      }, 
-      {
-        "Name": "HowOldAreYouInYears",
-        "Type": "UINT8",
-        "Offset": 85
-      }, 
-      {
-        "Name": "HowTallAreYou",
-        "Type": "UINT16",
-        "Offset": 86
-      }, 
-      {
-        "Name": "MyFavoriteNumber",
-        "Type": "UINT8",
-        "Offset": 88
-      }, 
-      {
-        "Name": "TestLateCheck",
-        "Type": "UINT8",
-        "Offset": 89
-      }, 
-      {
-        "Name": "TestLateCheck2",
-        "Type": "UINT8",
-        "Offset": 90
-      }, 
-      {
-        "Name": "QuestionAboutTreeHugging",
-        "Type": "UINT8",
-        "Offset": 91
-      }, 
-      {
-        "Name": "ChooseToActivateNuclearWeaponry",
-        "Type": "UINT8",
-        "Offset": 92
-      }, 
-      {
-        "Name": "SuppressGrayOutSomething",
-        "Type": "UINT8",
-        "Offset": 93
-      }, 
-      {
-        "Name": "OrderedList",
-        "Type": "UINT8[8]",
-        "Offset": 94
-      }, 
-      {
-        "Name": "BootOrder",
-        "Type": "UINT16[8]",
-        "Offset": 102
-      }, 
-      {
-        "Name": "BootOrderLarge",
-        "Type": "UINT8",
-        "Offset": 118
-      }, 
-      {
-        "Name": "DynamicRefresh",
-        "Type": "UINT8",
-        "Offset": 119
-      }, 
-      {
-        "Name": "DynamicOneof",
-        "Type": "UINT8",
-        "Offset": 120
-      }, 
+        "Offset": 2848
+      },
       {
         "Name": "DynamicOrderedList",
-        "Type": "UINT8[5]",
-        "Offset": 121
-      }, 
+        "Type": "UINT8[8]",
+        "Offset": 2850
+      },
       {
-        "Name": "Reserved",
-        "Type": "UINT8",
-        "Offset": 126
-      }, 
+        "Name": "DeleteAttemptList",
+        "Type": "UINT8[8]",
+        "Offset": 2858
+      },
       {
-        "Name": "RefData",
-        "Type": "EFI_HII_REF",
-        "Offset": 127
-      }, 
+        "Name": "AddAttemptList",
+        "Type": "UINT8[8]",
+        "Offset": 2866
+      },
       {
-        "Name": "NameValueVar0",
-        "Type": "UINT8",
-        "Offset": 149
-      }, 
+        "Name": "IsId",
+        "Type": "UINT16[13]",
+        "Offset": 2874
+      },
       {
-        "Name": "NameValueVar1",
-        "Type": "UINT16",
-        "Offset": 150
-      }, 
+        "Name": "ISCSIMacAddr",
+        "Type": "UINT16[96]",
+        "Offset": 2900
+      },
       {
-        "Name": "NameValueVar2",
-        "Type": "UINT16[20]",
-        "Offset": 152
-      }, 
+        "Name": "ISCSIAttemptOrder",
+        "Type": "UINT16[96]",
+        "Offset": 3092
+      },
       {
-        "Name": "SerialPortNo",
-        "Type": "UINT8",
-        "Offset": 192
-      }, 
+        "Name": "ISCSIAddAttemptList",
+        "Type": "UINT16[96]",
+        "Offset": 3284
+      },
       {
-        "Name": "SerialPortStatus",
-        "Type": "UINT8",
-        "Offset": 193
-      }, 
+        "Name": "ISCSIDeleteAttemptList",
+        "Type": "UINT16[96]",
+        "Offset": 3476
+      },
       {
-        "Name": "SerialPortIo",
-        "Type": "UINT16",
-        "Offset": 194
-      }, 
+        "Name": "ISCSIDisplayAttemptList",
+        "Type": "UINT16[96]",
+        "Offset": 3668
+      },
       {
-        "Name": "SerialPortIrq",
-        "Type": "UINT8",
-        "Offset": 196
-      }, 
+        "Name": "ISCSIAttemptName",
+        "Type": "UINT16[96]",
+        "Offset": 3860
+      },
       {
-        "Name": "GetDefaultValueFromCallBack",
-        "Type": "UINT8",
-        "Offset": 197
-      }, 
+        "Name": "ISCSIBootEnableList",
+        "Type": "UINT8[8]",
+        "Offset": 4052
+      },
       {
-        "Name": "GetDefaultValueFromAccess",
-        "Type": "UINT8",
-        "Offset": 198
-      }, 
+        "Name": "ISCSIIpAddressTypeList",
+        "Type": "UINT8[8]",
+        "Offset": 4060
+      },
       {
-        "Name": "Time",
-        "Type": "EFI_HII_TIME",
-        "Offset": 199
-      }, 
+        "Name": "ISCSIConnectRetry",
+        "Type": "UINT8[8]",
+        "Offset": 4068
+      },
       {
-        "Name": "RefreshGuidCount",
-        "Type": "UINT8",
-        "Offset": 202
-      }, 
+        "Name": "ISCSIConnectTimeout",
+        "Type": "UINT16[8]",
+        "Offset": 4076
+      },
       {
-        "Name": "Match2",
-        "Type": "UINT8",
-        "Offset": 203
-      }, 
+        "Name": "ISCSIInitiatorInfoViaDHCP",
+        "Type": "UINT8[8]",
+        "Offset": 4092
+      },
       {
-        "Name": "GetDefaultValueFromCallBackForOrderedList",
-        "Type": "UINT8[3]",
-        "Offset": 204
-      }, 
+        "Name": "ISCSITargetInfoViaDHCP",
+        "Type": "UINT8[8]",
+        "Offset": 4100
+      },
       {
-        "Name": "BitCheckbox",
-        "Type": "UINT8",
-        "Offset": 207
-      }, 
+        "Name": "ISCSITargetTcpPort",
+        "Type": "UINT16[8]",
+        "Offset": 4108
+      },
       {
-        "Name": "ReservedBits",
-        "Type": "UINT8",
-        "Offset": 207
-      }, 
+        "Name": "ISCSIAuthenticationMethod",
+        "Type": "UINT8[8]",
+        "Offset": 4124
+      },
       {
-        "Name": "BitOneof",
-        "Type": "UINT16",
-        "Offset": 208
-      }, 
+        "Name": "ISCSIChapType",
+        "Type": "UINT8[8]",
+        "Offset": 4132
+      },
       {
-        "Name": "None",
-        "Type": "UINT16",
-        "Offset": 208
-      }, 
-      {
-        "Name": "BitNumeric",
-        "Type": "UINT16",
-        "Offset": 210
-      }, 
-      {
-        "Name": "MyBitData",
-        "Type": "MY_BITS_DATA",
-        "Offset": 212
-      }, 
-      {
-        "Name": "MyUnionData",
-        "Type": "MY_EFI_UNION_DATA",
-        "Offset": 216
-      }, 
-      {
-        "Name": "QuestionXUefiKeywordRestStyle",
-        "Type": "UINT8",
-        "Offset": 217
-      }, 
-      {
-        "Name": "QuestionNonXUefiKeywordRestStyle",
-        "Type": "UINT8",
-        "Offset": 218
+        "Name": "Keyword",
+        "Type": "KEYWORD_STR[8]",
+        "Offset": 4140
       }
     ],
-    "MY_EFI_UNION_DATA" : [
+    "KEYWORD_STR" : [
       {
-        "Name": "UnionNumeric",
-        "Type": "UINT8",
+        "Name": "ISCSIIsId",
+        "Type": "UINT16[13]",
         "Offset": 0
-      }, 
+      },
       {
-        "Name": "UnionNumericAlias",
-        "Type": "UINT8",
-        "Offset": 0
-      }
-    ],
-    "MY_BITS_DATA" : [
+        "Name": "ISCSIInitiatorIpAddress",
+        "Type": "UINT16[16]",
+        "Offset": 26
+      },
       {
-        "Name": "NestByteField",
-        "Type": "UINT16",
-        "Offset": 0
-      }, 
+        "Name": "ISCSIInitiatorNetmask",
+        "Type": "UINT16[16]",
+        "Offset": 58
+      },
       {
-        "Name": "None",
-        "Type": "UINT8",
-        "Offset": 2
-      }, 
+        "Name": "ISCSIInitiatorGateway",
+        "Type": "UINT16[16]",
+        "Offset": 90
+      },
       {
-        "Name": "NestBitCheckbox",
-        "Type": "UINT8",
-        "Offset": 2
-      }, 
+        "Name": "ISCSITargetName",
+        "Type": "UINT16[224]",
+        "Offset": 122
+      },
       {
-        "Name": "NestBitOneof",
-        "Type": "UINT8",
-        "Offset": 2
-      }, 
+        "Name": "ISCSITargetIpAddress",
+        "Type": "UINT16[255]",
+        "Offset": 570
+      },
       {
-        "Name": "None",
-        "Type": "UINT8",
-        "Offset": 2
-      }, 
+        "Name": "ISCSILun",
+        "Type": "UINT16[21]",
+        "Offset": 1080
+      },
       {
-        "Name": "NestBitNumeric",
-        "Type": "UINT8",
-        "Offset": 3
+        "Name": "ISCSIChapUsername",
+        "Type": "UINT16[127]",
+        "Offset": 1122
+      },
+      {
+        "Name": "ISCSIChapSecret",
+        "Type": "UINT16[17]",
+        "Offset": 1376
+      },
+      {
+        "Name": "ISCSIReverseChapUsername",
+        "Type": "UINT16[127]",
+        "Offset": 1410
+      },
+      {
+        "Name": "ISCSIReverseChapSecret",
+        "Type": "UINT16[17]",
+        "Offset": 1664
       }
     ],
     "EFI_HII_REF" : [
@@ -315,17 +314,17 @@
         "Name": "QuestionId",
         "Type": "UINT16",
         "Offset": 0
-      }, 
+      },
       {
         "Name": "FormId",
         "Type": "UINT16",
         "Offset": 2
-      }, 
+      },
       {
         "Name": "FormSetGuid",
         "Type": "EFI_GUID",
         "Offset": 4
-      }, 
+      },
       {
         "Name": "DevicePath",
         "Type": "EFI_STRING_ID",
@@ -337,12 +336,12 @@
         "Name": "Hours",
         "Type": "UINT8",
         "Offset": 0
-      }, 
+      },
       {
         "Name": "Minutes",
         "Type": "UINT8",
         "Offset": 1
-      }, 
+      },
       {
         "Name": "Seconds",
         "Type": "UINT8",
@@ -356,12 +355,12 @@
         "Name": "Year",
         "Type": "UINT16",
         "Offset": 0
-      }, 
+      },
       {
         "Name": "Month",
         "Type": "UINT8",
         "Offset": 2
-      }, 
+      },
       {
         "Name": "Day",
         "Type": "UINT8",
@@ -382,25 +381,13 @@
     ]
   },
   "DataStructAttribute": {
-    "MY_EFI_BITS_VARSTORE_DATA": {
+    "ISCSI_CONFIG_IFR_NVDATA": {
         "Alignment": 1,
-        "TotalSize": 8
+        "TotalSize": 17724
       },
-    "MY_EFI_VARSTORE_DATA": {
+    "KEYWORD_STR": {
         "Alignment": 1,
-        "TotalSize": 8
-      },
-    "DRIVER_SAMPLE_CONFIGURATION": {
-        "Alignment": 1,
-        "TotalSize": 219
-      },
-    "MY_EFI_UNION_DATA": {
-        "Alignment": 1,
-        "TotalSize": 1
-      },
-    "MY_BITS_DATA": {
-        "Alignment": 1,
-        "TotalSize": 4
+        "TotalSize": 1698
       },
     "EFI_HII_REF": {
         "Alignment": 16,
@@ -444,287 +431,45 @@
       }
   },
   "VarDefine" : {
-    "MyEfiUnionVar": {
-        "Type": "MY_EFI_UNION_DATA",
-        "Attributes": 3,
-        "VarStoreId": 3,
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}"
-      },
-    "MyEfiBitVar": {
-        "Type": "MY_EFI_BITS_VARSTORE_DATA",
-        "Attributes": 3,
-        "VarStoreId": 2,
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}"
-      },
-    "MyEfiVar": {
-        "Type": "MY_EFI_VARSTORE_DATA",
-        "Attributes": 3,
-        "VarStoreId": 1,
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}"
-      },
-    "MyIfrNVData": {
-        "Type": "DRIVER_SAMPLE_CONFIGURATION",
+    "ISCSI_CONFIG_IFR_NVDATA": {
+        "Type": "ISCSI_CONFIG_IFR_NVDATA",
         "Attributes": 0,
-        "VarStoreId": 4660,
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}"
+        "VarStoreId": 26214,
+        "VendorGuid": "0x4b47d616, 0xa8d6, 0x4552, { 0x9d, 0x44, 0xcc, 0xad, 0x2e, 0xf, 0x4c, 0xf9 }}"
       }
   },
   "Data" : [
       {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
+        "VendorGuid": "0x4b47d616, 0xa8d6, 0x4552, { 0x9d, 0x44, 0xcc, 0xad, 0x2e, 0xf, 0x4c, 0xf9 }}",
+        "VarName": "ISCSI_CONFIG_IFR_NVDATA",
         "DefaultStore": "0",
         "Size": "1",
-        "Offset": 1656,
-        "Value": "True"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
-        "DefaultStore": "0",
-        "Size": "6",
-        "Offset": 1664,
+        "Offset": 1579,
         "Value": "1"
       },
       {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
-        "DefaultStore": "0",
-        "Size": "2",
-        "Offset": 212,
-        "Value": "1"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
-        "DefaultStore": "0",
-        "Size": "2",
-        "Offset": 1714,
-        "Value": "1"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
+        "VendorGuid": "0x4b47d616, 0xa8d6, 0x4552, { 0x9d, 0x44, 0xcc, 0xad, 0x2e, 0xf, 0x4c, 0xf9 }}",
+        "VarName": "ISCSI_CONFIG_IFR_NVDATA",
         "DefaultStore": "0",
         "Size": "1",
-        "Offset": 1713,
-        "Value": "True"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
-        "DefaultStore": "0",
-        "Size": "1",
-        "Offset": 196,
-        "Value": "4"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
-        "DefaultStore": "0",
-        "Size": "2",
-        "Offset": 194,
-        "Value": "1016"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
-        "DefaultStore": "0",
-        "Size": "1",
-        "Offset": 192,
+        "Offset": 1578,
         "Value": "0"
       },
       {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
+        "VendorGuid": "0x4b47d616, 0xa8d6, 0x4552, { 0x9d, 0x44, 0xcc, 0xad, 0x2e, 0xf, 0x4c, 0xf9 }}",
+        "VarName": "ISCSI_CONFIG_IFR_NVDATA",
         "DefaultStore": "0",
-        "Size": "1",
-        "Offset": 217,
-        "Value": "1"
+        "Size": "2",
+        "Offset": 476,
+        "Value": "1000"
       },
       {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
+        "VendorGuid": "0x4b47d616, 0xa8d6, 0x4552, { 0x9d, 0x44, 0xcc, 0xad, 0x2e, 0xf, 0x4c, 0xf9 }}",
+        "VarName": "ISCSI_CONFIG_IFR_NVDATA",
         "DefaultStore": "0",
         "Size": "1",
-        "Offset": 91,
-        "Value": "1"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
-        "DefaultStore": "0",
-        "Size": "1",
-        "Offset": 90,
+        "Offset": 472,
         "Value": "0"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
-        "DefaultStore": "0",
-        "Size": "1",
-        "Offset": 89,
-        "Value": "1"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
-        "DefaultStore": "0",
-        "Size": "1",
-        "Offset": 92,
-        "Value": "True"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
-        "DefaultStore": "0",
-        "Size": "1",
-        "Offset": 93,
-        "Value": "2"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
-        "DefaultStore": "1",
-        "Size": "6",
-        "Offset": 1664,
-        "Value": "0"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
-        "DefaultStore": "1",
-        "Size": "2",
-        "Offset": 212,
-        "Value": "0"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
-        "DefaultStore": "1",
-        "Size": "2",
-        "Offset": 1714,
-        "Value": "0"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyIfrNVData",
-        "DefaultStore": "1",
-        "Size": "1",
-        "Offset": 92,
-        "Value": "True"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyEfiVar",
-        "DefaultStore": "0",
-        "Size": "2",
-        "Offset": 6,
-        "Value": "18"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyEfiVar",
-        "DefaultStore": "0",
-        "Size": "2",
-        "Offset": 1,
-        "Value": "1"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyEfiVar",
-        "DefaultStore": "0",
-        "Size": "1",
-        "Offset": 0,
-        "Value": "18"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyEfiVar",
-        "DefaultStore": "1",
-        "Size": "1",
-        "Offset": 0,
-        "Value": "19"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyEfiBitVar",
-        "DefaultStore": "0",
-        "Size": "10",
-        "Offset": 41,
-        "Value": "1"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyEfiBitVar",
-        "DefaultStore": "0",
-        "Size": "1",
-        "Offset": 51,
-        "Value": "True"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyEfiBitVar",
-        "DefaultStore": "0",
-        "Size": "2",
-        "Offset": 0,
-        "Value": "1"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyEfiBitVar",
-        "DefaultStore": "0",
-        "Size": "2",
-        "Offset": 18,
-        "Value": "1"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyEfiBitVar",
-        "DefaultStore": "0",
-        "Size": "1",
-        "Offset": 17,
-        "Value": "True"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyEfiBitVar",
-        "DefaultStore": "1",
-        "Size": "10",
-        "Offset": 41,
-        "Value": "0"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyEfiBitVar",
-        "DefaultStore": "1",
-        "Size": "2",
-        "Offset": 0,
-        "Value": "0"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyEfiBitVar",
-        "DefaultStore": "1",
-        "Size": "2",
-        "Offset": 18,
-        "Value": "0"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyEfiUnionVar",
-        "DefaultStore": "0",
-        "Size": "1",
-        "Offset": 0,
-        "Value": "7"
-      },
-      {
-        "VendorGuid": "0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}",
-        "VarName": "MyEfiUnionVar",
-        "DefaultStore": "1",
-        "Size": "1",
-        "Offset": 0,
-        "Value": "8"
       },
       {
         "VendorGuid": "NA",

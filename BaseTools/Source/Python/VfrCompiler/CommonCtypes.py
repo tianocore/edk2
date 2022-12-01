@@ -241,6 +241,16 @@ class EFI_IFR_GUID(Structure):
         ('Guid', EFI_GUID),
     ]
 
+def Refine_EFI_IFR_BUFFER(Nums):
+    class EFI_IFR_BUFFER(Structure):
+        _pack_ = 1
+        _fields_ = [
+            ('Buffer', ARRAY(c_ubyte, Nums)),
+        ]
+        def SetBuffer(self, Buffer):
+            self.Buffer = Buffer
+    return EFI_IFR_BUFFER()
+
 class EFI_IFR_GUID_VAREQNAME(Structure):
     _pack_ = 1
     _fields_ = [
@@ -1328,6 +1338,15 @@ class EFI_IFR_FORM_MAP_METHOD(Structure):
         ('MethodTitle', c_uint16),
         ('MethodIdentifier', EFI_GUID),
     ]
+def Refine_EFI_IFR_FORM_MAP(Nums):
+    class EFI_IFR_FORM_MAP(Structure):
+        _pack_ = 1
+        _fields_ = [
+            ('Header', EFI_IFR_OP_HEADER),
+            ('FormId', c_uint16),
+            ('FormMapMethod', ARRAY(EFI_IFR_FORM_MAP_METHOD, Nums))
+        ]
+    return EFI_IFR_FORM_MAP()
 
 class EFI_IFR_CATENATE(Structure):
     _pack_ = 1

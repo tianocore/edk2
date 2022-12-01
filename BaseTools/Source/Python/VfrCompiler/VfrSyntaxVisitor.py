@@ -55,8 +55,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrProgram.
     def visitVfrProgram(self, ctx:VfrSyntaxParser.VfrProgramContext):
-
-        #self.__CVfrQuestionDB.PrintAllQuestion('test\\Questions.txt')
+        #self.__CVfrQuestionDB.PrintAllQuestion('Questions.txt')
         #gCVfrVarDataTypeDB.Dump("test\\DataTypeInfo.txt")
 
         return self.visitChildren(ctx)
@@ -567,6 +566,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         ctx.Node.Data = VSObj
         ctx.Node.Buffer = self.__StructToStream(VSObj.GetInfo())
+        ctx.Node.Buffer += bytes('\0',encoding='utf-8')
 
         return VSObj
 
@@ -642,6 +642,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         ctx.Node.Data = VSEObj
         ctx.Node.Buffer = self.__StructToStream(VSEObj.GetInfo())
+        ctx.Node.Buffer += bytes('\0',encoding='utf-8')
 
         return ctx.Node
 
@@ -1172,20 +1173,23 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrFormMapDefinition.
     def visitVfrFormMapDefinition(self, ctx:VfrSyntaxParser.VfrFormMapDefinitionContext):
-
         FMapObj = CIfrFormMap()
         self.visitChildren(ctx)
+        FormMapMethodNumber = len(ctx.MapTitle())
         Line = ctx.start.line
         FMapObj.SetLineNo(Line)
         self.__ErrorHandler(FMapObj.SetFormId(self.__TransNum(ctx.S1.text)), ctx.S1.line, ctx.S1.line)
-        FormMapMethodNumber = len(ctx.MapTitle())
         if FormMapMethodNumber == 0:
             self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'No MapMethod is set for FormMap!')
         else:
             for i in range(0, FormMapMethodNumber):
                 FMapObj.SetFormMapMethod(self.__TransNum(ctx.Number(i+1)), ctx.guidDefinition(i).Guid)
-        ctx.Node.Data = FMapObj
         FormMap, MethodMapList = FMapObj.GetInfo()
+        Info, _ = FMapObj.GetInfo()
+        for MethodMap in MethodMapList:
+            Info.Header.Length += sizeof(EFI_IFR_FORM_MAP_METHOD)
+
+        ctx.Node.Data = FMapObj
         ctx.Node.Buffer = self.__StructToStream(FormMap)
         for MethodMap in MethodMapList:
             ctx.Node.Buffer += self.__StructToStream(MethodMap)
@@ -1389,7 +1393,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         R5Obj = CIfrRef5()
         R5Obj.SetLineNo(Line)
         GObj = R5Obj
-        #ctx.OHObj = R5Obj
 
         if ctx.DevicePath() != None:
             RefType = 4
@@ -1400,9 +1403,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             R4Obj.SetLineNo(Line)
             R4Obj.SetDevicePath(DevPath)
             R4Obj.SetFormId(FId)
-            R4Obj.SetQuestionId(QId)
+            R4Obj.SetQId(QId)
             GObj = R4Obj
-            #ctx.OHObj = R4Obj
 
         elif ctx.FormSetGuid() != None:
             RefType = 3
@@ -1411,9 +1413,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             R3Obj = CIfrRef3()
             R3Obj.SetLineNo(Line)
             R3Obj.SetFormId(FId)
-            R3Obj.SetQuestionId(QId)
+            R3Obj.SetQId(QId)
             GObj = R3Obj
-            #ctx.OHObj = R3Obj
 
         elif ctx.FormId() != None:
             FId = self.__TransNum(ctx.Number(0))
@@ -1428,19 +1429,18 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             R2Obj = CIfrRef2()
             R2Obj.SetLineNo(Line)
             R2Obj.SetFormId(FId)
-            R2Obj.SetQuestionId(QId)
+            R2Obj.SetQId(QId)
             GObj = R2Obj
-        # ctx.OHObj = R2Obj
 
 
-        elif str(ctx.getChild(1)) == str(ctx.Number(0)):
+        elif ctx.N != None:
             RefType = 1
             FId = self.__TransNum(ctx.Number(0))
             RObj = CIfrRef()
             RObj.SetLineNo(Line)
             RObj.SetFormId(FId)
             GObj = RObj
-        # ctx.OHObj = RObj
+
         ctx.Node.Data = GObj
 
         self.visitChildren(ctx)
@@ -1450,18 +1450,15 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         if RefType == 4 or RefType == 3:
             GObj.SetFormSetId(ctx.guidDefinition().Guid)
-        # ctx.OHObj.SetFormSetId(ctx.guidDefinition().Guid)
 
         if ctx.FLAGS() != None:
             GObj.SetFlags(ctx.vfrGotoFlags().GotoFlags)
-        # ctx.OHObj.SetFlags(ctx.vfrGotoFlags().GotoFlags)
 
         if ctx.Key() != None:
             index = int(len(ctx.Number())) - 1
             Key = self.__TransNum(ctx.Number(index))
             self.__AssignQuestionKey(GObj, Key)
 
-        # ctx.OHObj.SetScope(1)
         if ctx.vfrStatementQuestionOptionList() != None:
             GObj.SetScope(1)
             self.__InsertEndNode(ctx.Node, ctx.E.line)
@@ -2048,10 +2045,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                     self.__CheckDuplicateDefaultValue(EFI_HII_DEFAULT_CLASS_MANUFACTURING, ctx.F.line, ctx.F.text)
                     ReturnCode =  gCVfrDefaultStore.BufferVarStoreAltConfigAdd(EFI_HII_DEFAULT_CLASS_MANUFACTURING, self.__CurrQestVarInfo, VarStoreName, VarStoreGuid, self.__CurrQestVarInfo.VarType, self.__Value)
                     self.__CompareErrorHandler(ReturnCode, VfrReturnCode.VFR_RETURN_SUCCESS, Line, ctx.L.text, "No manufacturing default storage found")
+
         if ctx.Key() != None:
             Key = self.__TransNum(ctx.Number())
             self.__AssignQuestionKey(CBObj, Key)
-
         ctx.Node.Buffer = self.__StructToStream(CBObj.GetInfo())
         self.__InsertEndNode(ctx.Node, ctx.stop.line)
         self.__IsCheckBoxOp = False
@@ -2154,6 +2151,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         NObj.SetLineNo(ctx.start.line)
         Line = ctx.start.line
+        UpdateVarType = False
 
         # Create a GUID opcode to wrap the numeric opcode, if it refer to bit varstore.
         if self.__CurrQestVarInfo.IsBitVar:
@@ -2170,16 +2168,17 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if self.__CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
             if self.__CurrQestVarInfo.IsBitVar:
                 LFlags = EDKII_IFR_NUMERIC_SIZE_BIT & self.__CurrQestVarInfo.VarTotalSize
-                self.__ErrorHandler(NObj.SetFlagsForBitField(NObj.GetFlags(),LFlags), Line)
+                self.__ErrorHandler(NObj.SetFlagsForBitField(NObj.GetQFlags(),LFlags), Line)
             else:
                 DataTypeSize, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(self.__CurrQestVarInfo.VarType)
                 self.__ErrorHandler(ReturnCode, Line, 'Numeric varid is not the valid data type')
                 if DataTypeSize != 0 and DataTypeSize != self.__CurrQestVarInfo.VarTotalSize:
                     self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'Numeric varid doesn\'t support array')
-                self.__ErrorHandler(NObj.SetFlags(NObj.GetFlags(), self.__CurrQestVarInfo.VarType), Line)
+                self.__ErrorHandler(NObj.SetFlags(NObj.GetQFlags(), self.__CurrQestVarInfo.VarType), Line)
 
 
         if ctx.FLAGS() != None:
+            UpdateVarType = ctx.vfrNumericFlags().UpdateVarType
             if self.__CurrQestVarInfo.IsBitVar:
                 self.__ErrorHandler(NObj.SetFlagsForBitField(ctx.vfrNumericFlags().HFlags,ctx.vfrNumericFlags().LFlags, ctx.vfrNumericFlags().IsDisplaySpecified), ctx.F.line)
             else:
@@ -2191,6 +2190,16 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         if self.__CurrQestVarInfo.IsBitVar == False:
             self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'Numeric question only support UINT8, UINT16, UINT32 and UINT64 data type.')
+
+        # modify the data for namevalue
+        if UpdateVarType:
+            UpdatedNObj = CIfrNumeric(self.__CurrQestVarInfo.VarType)
+            UpdatedNObj.GetInfo().Question = NObj.GetInfo().Question
+            UpdatedNObj.GetInfo().Flags = NObj.GetInfo().Flags
+            UpdatedNObj.GetInfo().Data.MinValue = NObj.GetInfo().Data.MinValue
+            UpdatedNObj.GetInfo().Data.MaxValue = NObj.GetInfo().Data.MaxValue
+            UpdatedNObj.GetInfo().Data.Step = NObj.GetInfo().Data.Step
+            NObj = UpdatedNObj
 
         ctx.Node.Buffer = self.__StructToStream(NObj.GetInfo())
         self.__InsertEndNode(ctx.Node, ctx.stop.line)
@@ -2387,6 +2396,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 else:
                     ctx.LFlags =  (ctx.LFlags & ~EDKII_IFR_DISPLAY_BIT) | EDKII_IFR_DISPLAY_UINT_HEX_BIT
 
+        VarType = self.__CurrQestVarInfo.VarType
         if self.__CurrQestVarInfo.IsBitVar == False:
             if self.__CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
                 if VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_BUFFER or VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_EFI:
@@ -2403,6 +2413,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         elif self.__CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID and self.__CurrQestVarInfo.IsBitVar:
             ctx.LFlags &= EDKII_IFR_DISPLAY_BIT
             ctx.LFlags |= EDKII_IFR_NUMERIC_SIZE_BIT & self.__CurrQestVarInfo.VarTotalSize
+
+        if VarType != self.__CurrQestVarInfo.VarType:
+            ctx.UpdateVarType = True
 
         return ctx.HFlags, ctx.LFlags
 
@@ -2478,13 +2491,13 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if self.__CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
             if self.__CurrQestVarInfo.IsBitVar:
                 LFlags = EDKII_IFR_NUMERIC_SIZE_BIT & self.__CurrQestVarInfo.VarTotalSize
-                self.__ErrorHandler(OObj.SetFlagsForBitField(OObj.GetFlags(),LFlags), Line)
+                self.__ErrorHandler(OObj.SetFlagsForBitField(OObj.GetQFlags(),LFlags), Line)
             else:
                 DataTypeSize, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByDataType(self.__CurrQestVarInfo.VarType)
                 self.__ErrorHandler(ReturnCode, Line, 'OneOf varid is not the valid data type')
                 if DataTypeSize != 0 and DataTypeSize != self.__CurrQestVarInfo.VarTotalSize:
                     self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'OneOf varid doesn\'t support array')
-                self.__ErrorHandler(OObj.SetFlags(OObj.GetFlags(), self.__CurrQestVarInfo.VarType), Line)
+                self.__ErrorHandler(OObj.SetFlags(OObj.GetQFlags(), self.__CurrQestVarInfo.VarType), Line)
 
         if ctx.FLAGS() != None:
             if self.__CurrQestVarInfo.IsBitVar:
@@ -3231,21 +3244,18 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             ctx.TypeSize, ReturnCode = gCVfrVarDataTypeDB.GetDataTypeSizeByTypeName(ctx.TypeName)
             self.__ErrorHandler(ReturnCode, ctx.D.line)
             ctx.Size = ctx.TypeSize * ctx.ArrayNum if ctx.ArrayNum > 0 else ctx.TypeSize
-            ArrayType = ctypes.c_ubyte * ctx.Size
-            ctx.DataBuff = ArrayType()
-            for i in range(0, ctx.Size):
-                ctx.DataBuff[i] = 0
         self.visitChildren(ctx)
 
         Line = ctx.start.line
         GuidObj = CIfrGuid(ctx.Size)
         GuidObj.SetLineNo(Line)
         GuidObj.SetGuid(ctx.guidDefinition().Guid)
-        if ctx.TypeName != None:
-            GuidObj.SetData(ctx.DataBuff)
+       # if ctx.TypeName != None:
+          #  GuidObj.SetData(ctx.DataBuff)
         # vfrStatementExtension
         GuidObj.SetScope(1)
         ctx.Node.Data = GuidObj
+        ctx.Node.Buffer = self.__StructToStream(GuidObj.GetInfo())
         for Ctx in ctx.vfrStatementExtension():
             self.__InsertChild(ctx.Node, Ctx)
         return ctx.Node
@@ -3257,7 +3267,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         IsArray = False if ctx.OpenBracket() == None else True
         ArrayIdx = 0
         ctx.IsStruct = ctx.parentCtx.IsStruct
-        ctx.DataBuff = ctx.parentCtx.DataBuff
 
         self.visitChildren(ctx)
 
@@ -3276,69 +3285,16 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 Offset = int(FieldOffset / 8)
                 PreBits = FieldOffset % 8
                 Mask <<= PreBits
-                Begin = 0
-                End = 0
-                if FieldType == EFI_IFR_TYPE_NUM_SIZE_8:
-                    Data = ctypes.c_ubyte(Data)
-                    if BitField:
-                        # Set the value to the bit fileds.
-                        Data  <<= PreBits
-                        Value = (Value & (~Mask)) | Data
-                        Begin = ByteOffset + Offset
-                        End = ByteOffset + Offset + sizeof (ctypes.c_ubyte)
-                        ctx.DataBuff[Begin: End] = Value
-                    else:
-                        Begin = ByteOffset + FieldOffset
-                        End = ByteOffset + FieldOffset + FieldSize
-                        ctx.DataBuff[Begin: End] = Data
-
-
-                if FieldType == EFI_IFR_TYPE_NUM_SIZE_16:
-                    Data = ctypes.c_ushort(Data)
-                    if BitField:
-                        # Set the value to the bit fileds.
-                        Data  <<= PreBits
-                        Value = (Value & (~Mask)) | Data
-                        Begin = ByteOffset + Offset
-                        End = ByteOffset + Offset + sizeof (ctypes.c_ushort)
-                        ctx.DataBuff[Begin: End] = Value
-                    else:
-                        Begin = ByteOffset + FieldOffset
-                        End = ByteOffset + FieldOffset + FieldSize
-                        ctx.DataBuff[Begin: End] = Data
-
-
-                if FieldType == EFI_IFR_TYPE_NUM_SIZE_32:
-                    Data = ctypes.c_ulong(Data)
-                    if BitField:
-                        # Set the value to the bit fileds.
-                        Data  <<= PreBits
-                        Value = (Value & (~Mask)) | Data
-                        Begin = ByteOffset + Offset
-                        End = ByteOffset + Offset + sizeof (ctypes.c_ulong)
-                        ctx.DataBuff[Begin: End] = Value
-                    else:
-                        Begin = ByteOffset + FieldOffset
-                        End = ByteOffset + FieldOffset + FieldSize
-                        ctx.DataBuff[Begin: End] = Data
-
-                if FieldType == EFI_IFR_TYPE_NUM_SIZE_64:
-                    Data = ctypes.c_ulonglong(Data)
-                    if BitField:
-                        # Set the value to the bit fileds.
-                        Data  <<= PreBits
-                        Value = (Value & (~Mask)) | Data
-                        Begin = ByteOffset + Offset
-                        End = ByteOffset + Offset + sizeof (ctypes.c_ulonglong)
-                        ctx.DataBuff[Begin: End] = Value
-                    else:
-                        Begin = ByteOffset + FieldOffset
-                        End = ByteOffset + FieldOffset + FieldSize
-                        ctx.DataBuff[Begin: End] = Data
+                Data <<= PreBits
+                ctx.DataBuff.Buffer[Offset] = Data
+            else:
+                ctx.DataBuff.Buffer[FieldOffset] = Data
 
         else:
-            ctx.DataBuff[ByteOffset, ByteOffset + ctx.parentCtx.TypeSize] = Data
+            ctx.Data = Refine_EFI_IFR_BUFFER(ctx.parentCtx.TypeSize)
+            ctx.DataBuff.SetBuffer(Data)
         '''
+
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementModal.
@@ -3737,6 +3693,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             NObj = CIfrNot(ctx.start.line)
             Node = VfrTreeNode(EFI_IFR_NOT_OP, NObj, self.__StructToStream(NObj.GetInfo()))
             ctx.Nodes.append(Node)
+            ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrExpressionCatenate.
@@ -4693,7 +4650,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         if Key == None:
             return
-        if OpObj.GetFlags() & EFI_IFR_FLAG_CALLBACK:
+
+        if OpObj.GetQFlags() & EFI_IFR_FLAG_CALLBACK:
             # if the question is not CALLBACK ignore the key.
             self.__CVfrQuestionDB.UpdateQuestionId(OpObj.GetQuestionId(), Key, gCFormPkg)
             OpObj.SetQuestionId(Key)

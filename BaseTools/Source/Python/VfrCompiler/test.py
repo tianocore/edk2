@@ -63,14 +63,7 @@ def Refine_EFI_IFR_EQ_ID_VAL_LIST(Type):
 
     return EFI_IFR_EQ_ID_VAL_LIST()
 
-x = Refine_EFI_IFR_EQ_ID_VAL_LIST(c_uint16)
-print(x.Header)
-x.QuestionId = 1
-x.ListLength = 2
-print(type(x.Data))
-y = StructToStream(x)
-print(sizeof(x))
-
+print(0x64)
 class EFI_IFR_EQ_ID_VAL_LIST(Structure):
     _pack_ = 1
     _fields_ = [
@@ -80,3 +73,18 @@ class EFI_IFR_EQ_ID_VAL_LIST(Structure):
         ]
     def SetData(self):
         self.Data = c_bool()
+
+
+
+def Refine_EFI_IFR_BUFFER(Nums):
+    class EFI_IFR_BUFFER(Structure):
+        _pack_ = 1
+        _fields_ = [
+            ('Buffer', ARRAY(c_ubyte, Nums)),
+        ]
+        def SetBuffer(self, Buffer):
+            self.Buffer = Buffer
+    return EFI_IFR_BUFFER()
+
+DataBuff = Refine_EFI_IFR_BUFFER(10)
+print(StructToStream(DataBuff))

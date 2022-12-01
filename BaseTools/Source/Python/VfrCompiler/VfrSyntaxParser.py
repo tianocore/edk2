@@ -7968,9 +7968,9 @@ class VfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_REF_OP)
-            self.OHObj = None
             self.QType = EFI_QUESION_TYPE.QUESTION_REF
             self.QN = None # Token
+            self.N = None # Token
             self.E = None # Token
 
         def Goto(self):
@@ -8161,7 +8161,7 @@ class VfrSyntaxParser ( Parser ):
                 pass
             elif token in [VfrSyntaxParser.Number]:
                 self.state = 1255
-                self.match(VfrSyntaxParser.Number)
+                localctx.N = self.match(VfrSyntaxParser.Number)
                 self.state = 1256
                 self.match(VfrSyntaxParser.Comma)
                 pass
@@ -11396,6 +11396,7 @@ class VfrSyntaxParser ( Parser ):
             self.HFlags = 0
             self.LFlags = 0
             self.IsDisplaySpecified = False
+            self.UpdateVarType = False
 
         def numericFlagsField(self, i:int=None):
             if i is None:
@@ -15413,7 +15414,6 @@ class VfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Node = VfrTreeNode(EFI_IFR_GUID_OP)
-            self.DataBuff = None
             self.Size = 0
             self.TypeName = ''
             self.TypeSize = 0
@@ -15708,7 +15708,7 @@ class VfrSyntaxParser ( Parser ):
                 while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                     if _alt==1:
                         self.state = 2459
-                        self.vfrExtensionData(localctx.DataBuff)
+                        self.vfrExtensionData()
                     self.state = 2464
                     self._errHandler.sync(self)
                     _alt = self._interp.adaptivePredict(self._input,196,self._ctx)
@@ -15748,13 +15748,12 @@ class VfrSyntaxParser ( Parser ):
 
     class VfrExtensionDataContext(ParserRuleContext):
 
-        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1, DataBuff=None):
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.DataBuff = None
             self.IsStruct = None
+            self.Data = None
             self.N = None # Token
-            self.DataBuff = DataBuff
 
         def Comma(self):
             return self.getToken(VfrSyntaxParser.Comma, 0)
@@ -15799,9 +15798,9 @@ class VfrSyntaxParser ( Parser ):
 
 
 
-    def vfrExtensionData(self, DataBuff):
+    def vfrExtensionData(self):
 
-        localctx = VfrSyntaxParser.VfrExtensionDataContext(self, self._ctx, self.state, DataBuff)
+        localctx = VfrSyntaxParser.VfrExtensionDataContext(self, self._ctx, self.state)
         self.enterRule(localctx, 284, self.RULE_vfrExtensionData)
         self._la = 0 # Token type
         try:
