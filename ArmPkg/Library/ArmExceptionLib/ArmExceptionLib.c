@@ -69,19 +69,24 @@ STATIC CONST BOOLEAN  gArmRelocateVectorTable = FALSE;
 #endif
 
 /**
-Initializes all CPU exceptions entries and provides the default exception handlers.
+  Initializes all CPU exceptions entries and provides the default exception
+  handlers.
 
-Caller should try to get an array of interrupt and/or exception vectors that are in use and need to
-persist by EFI_VECTOR_HANDOFF_INFO defined in PI 1.3 specification.
-If caller cannot get reserved vector list or it does not exists, set VectorInfo to NULL.
-If VectorInfo is not NULL, the exception vectors will be initialized per vector attribute accordingly.
+  Caller should try to get an array of interrupt and/or exception vectors that
+  are in use and need to persist by EFI_VECTOR_HANDOFF_INFO defined in PI 1.3
+  specification.
+  If caller cannot get reserved vector list or it does not exists, set
+  VectorInfo to NULL.
+  If VectorInfo is not NULL, the exception vectors will be initialized per
+  vector attribute accordingly.
 
-@param[in]  VectorInfo    Pointer to reserved vector list.
+  @param[in]  VectorInfo        Pointer to reserved vector list.
 
-@retval EFI_SUCCESS           CPU Exception Entries have been successfully initialized
-with default exception handlers.
-@retval EFI_INVALID_PARAMETER VectorInfo includes the invalid content if VectorInfo is not NULL.
-@retval EFI_UNSUPPORTED       This function is not supported.
+  @retval EFI_SUCCESS           CPU Exception Entries have been successfully
+                                initialized with default exception handlers.
+  @retval EFI_INVALID_PARAMETER VectorInfo includes the invalid content if
+                                VectorInfo is not NULL.
+  @retval EFI_UNSUPPORTED       This function is not supported.
 
 **/
 EFI_STATUS
@@ -130,19 +135,23 @@ InitializeCpuExceptionHandlers (
 }
 
 /**
-Copies exception handlers to the specified address.
+  Copies exception handlers to the specified address.
 
-Caller should try to get an array of interrupt and/or exception vectors that are in use and need to
-persist by EFI_VECTOR_HANDOFF_INFO defined in PI 1.3 specification.
-If caller cannot get reserved vector list or it does not exists, set VectorInfo to NULL.
-If VectorInfo is not NULL, the exception vectors will be initialized per vector attribute accordingly.
+  Caller should try to get an array of interrupt and/or exception vectors that
+  are in use and need to persist by EFI_VECTOR_HANDOFF_INFO defined in PI 1.3
+  specification.
+  If caller cannot get reserved vector list or it does not exists, set
+  VectorInfo to NULL.
+  If VectorInfo is not NULL, the exception vectors will be initialized per
+  vector attribute accordingly.
 
-@param[in]  VectorInfo    Pointer to reserved vector list.
+  @param[in]  VectorInfo    Pointer to reserved vector list.
 
-@retval EFI_SUCCESS           CPU Exception Entries have been successfully initialized
-with default exception handlers.
-@retval EFI_INVALID_PARAMETER VectorInfo includes the invalid content if VectorInfo is not NULL.
-@retval EFI_UNSUPPORTED       This function is not supported.
+  @retval EFI_SUCCESS           CPU Exception Entries have been successfully
+                                initialized with default exception handlers.
+  @retval EFI_INVALID_PARAMETER VectorInfo includes the invalid content if
+                                VectorInfo is not NULL.
+  @retval EFI_UNSUPPORTED       This function is not supported.
 
 **/
 STATIC
@@ -196,29 +205,33 @@ CopyExceptionHandlers (
 }
 
 /**
-Registers a function to be called from the processor exception handler. (On ARM/AArch64 this only
-provides exception handlers, not interrupt handling which is provided through the Hardware Interrupt
-Protocol.)
+  Registers a function to be called from the processor exception handler.
+  (On ARM/AArch64 this only provides exception handlers, not interrupt handling
+  which is provided through the Hardware Interrupt Protocol.)
 
-This function registers and enables the handler specified by ExceptionHandler for a processor
-interrupt or exception type specified by ExceptionType. If ExceptionHandler is NULL, then the
-handler for the processor interrupt or exception type specified by ExceptionType is uninstalled.
-The installed handler is called once for each processor interrupt or exception.
-NOTE: This function should be invoked after InitializeCpuExceptionHandlers() is invoked,
-otherwise EFI_UNSUPPORTED returned.
+  This function registers and enables the handler specified by ExceptionHandler
+  for a processor interrupt or exception type specified by ExceptionType. If
+  ExceptionHandler is NULL, then the handler for the processor interrupt or
+  exception type specified by ExceptionType is uninstalled.
+  The installed handler is called once for each processor interrupt or
+  exception.
+  NOTE: This function should be invoked after InitializeCpuExceptionHandlers()
+  is invoked, otherwise EFI_UNSUPPORTED returned.
 
-@param[in]  ExceptionType     Defines which interrupt or exception to hook.
-@param[in]  ExceptionHandler  A pointer to a function of type EFI_CPU_INTERRUPT_HANDLER that is called
-when a processor interrupt occurs. If this parameter is NULL, then the handler
-will be uninstalled.
+  @param[in]  ExceptionType     Defines which interrupt or exception to hook.
+  @param[in]  ExceptionHandler  A pointer to a function of type
+                                EFI_CPU_INTERRUPT_HANDLER that is called when a
+                                processor interrupt occurs. If this parameter is
+                                NULL, then the handler will be uninstalled.
 
-@retval EFI_SUCCESS           The handler for the processor interrupt was successfully installed or uninstalled.
-@retval EFI_ALREADY_STARTED   ExceptionHandler is not NULL, and a handler for ExceptionType was
-previously installed.
-@retval EFI_INVALID_PARAMETER ExceptionHandler is NULL, and a handler for ExceptionType was not
-previously installed.
-@retval EFI_UNSUPPORTED       The interrupt specified by ExceptionType is not supported,
-or this function is not supported.
+  @retval EFI_SUCCESS           The handler for the processor interrupt was
+                                successfully installed or uninstalled.
+  @retval EFI_ALREADY_STARTED   ExceptionHandler is not NULL, and a handler
+                                for ExceptionType was previously installed.
+  @retval EFI_INVALID_PARAMETER ExceptionHandler is NULL, and a handler for
+                                ExceptionType was not previously installed.
+  @retval EFI_UNSUPPORTED       The interrupt specified by ExceptionType is not
+                                supported, or this function is not supported.
 **/
 RETURN_STATUS
 RegisterCpuInterruptHandler (
@@ -240,20 +253,20 @@ RegisterCpuInterruptHandler (
 }
 
 /**
-Register exception handler.
+  Register exception handler.
 
-@param  This                  A pointer to the SMM_CPU_SERVICE_PROTOCOL instance.
-@param  ExceptionType         Defines which interrupt or exception to hook. Type EFI_EXCEPTION_TYPE and
-the valid values for this parameter are defined in EFI_DEBUG_SUPPORT_PROTOCOL
-of the UEFI 2.0 specification.
-@param  InterruptHandler      A pointer to a function of type EFI_CPU_INTERRUPT_HANDLER
-that is called when a processor interrupt occurs.
-If this parameter is NULL, then the handler will be uninstalled.
+  @param  This                  A pointer to the SMM_CPU_SERVICE_PROTOCOL instance.
+  @param  ExceptionType         Defines which interrupt or exception to hook. Type EFI_EXCEPTION_TYPE and
+                                the valid values for this parameter are defined in EFI_DEBUG_SUPPORT_PROTOCOL
+                                of the UEFI 2.0 specification.
+  @param  InterruptHandler      A pointer to a function of type EFI_CPU_INTERRUPT_HANDLER
+                                that is called when a processor interrupt occurs.
+                                If this parameter is NULL, then the handler will be uninstalled.
 
-@retval EFI_SUCCESS           The handler for the processor interrupt was successfully installed or uninstalled.
-@retval EFI_ALREADY_STARTED   InterruptHandler is not NULL, and a handler for InterruptType was previously installed.
-@retval EFI_INVALID_PARAMETER InterruptHandler is NULL, and a handler for InterruptType was not previously installed.
-@retval EFI_UNSUPPORTED       The interrupt specified by InterruptType is not supported.
+  @retval EFI_SUCCESS           The handler for the processor interrupt was successfully installed or uninstalled.
+  @retval EFI_ALREADY_STARTED   InterruptHandler is not NULL, and a handler for InterruptType was previously installed.
+  @retval EFI_INVALID_PARAMETER InterruptHandler is NULL, and a handler for InterruptType was not previously installed.
+  @retval EFI_UNSUPPORTED       The interrupt specified by InterruptType is not supported.
 
 **/
 EFI_STATUS
