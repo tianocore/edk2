@@ -14,6 +14,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // The mode of the CPU at the time an SMI occurs
 extern UINT8  mSmmSaveStateRegisterLma;
 
+// SMM S3 resume state Ptr
+extern SMM_S3_RESUME_STATE  *mSmmS3ResumeState;
+
 /**
   Read an SMM Save State register on the target processor.  If this function
   returns EFI_UNSUPPORTED, then the caller is responsible for reading the
@@ -441,4 +444,33 @@ SmmCpuFeaturesCompleteSmmReadyToLock (
   VOID
   )
 {
+  if (mSmmS3ResumeState != NULL ) {
+    mSmmS3ResumeState->SmmS3ResumeEntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)SmmS3MpSemaphoreInit;
+  }
+}
+
+/**
+  Perform SMM MP sync Semaphores re-initialization in the S3 boot path.
+**/
+VOID
+EFIAPI
+SmmS3MpSemaphoreInit (
+  VOID
+  )
+{
+  InitializeMpSyncData ();
+
+  DEBUG ((DEBUG_INFO, "SMM S3 Return CS                = %x\n", mSmmS3ResumeState->ReturnCs));
+  DEBUG ((DEBUG_INFO, "SMM S3 Return Entry Point       = %x\n", mSmmS3ResumeState->ReturnEntryPoint));
+  DEBUG ((DEBUG_INFO, "SMM S3 Return Context1          = %x\n", mSmmS3ResumeState->ReturnContext1));
+  DEBUG ((DEBUG_INFO, "SMM S3 Return Context2          = %x\n", mSmmS3ResumeState->ReturnContext2));
+  DEBUG ((DEBUG_INFO, "SMM S3 Return Stack Pointer     = %x\n", mSmmS3ResumeState->ReturnStackPointer));
+
+  AsmDisablePaging64 (
+    mSmmS3ResumeState->ReturnCs,
+    (UINT32)mSmmS3ResumeState->ReturnEntryPoint,
+    (UINT32)mSmmS3ResumeState->ReturnContext1,
+    (UINT32)mSmmS3ResumeState->ReturnContext2,
+    (UINT32)mSmmS3ResumeState->ReturnStackPointer
+    );
 }

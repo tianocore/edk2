@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/SmmServicesTableLib.h>
 #include <Register/Amd/SmramSaveStateMap.h>
+#include <Guid/AcpiS3Context.h>
 
 // EFER register LMA bit
 #define LMA  BIT10
@@ -104,6 +105,24 @@ InternalSmmCpuFeaturesWriteSaveStateRegister (
   IN EFI_SMM_SAVE_STATE_REGISTER  Register,
   IN UINTN                        Width,
   IN CONST VOID                   *Buffer
+  );
+
+/**
+  Initialize MP synchronization data.
+**/
+VOID
+EFIAPI
+InitializeMpSyncData (
+  VOID
+  );
+
+/**
+  Perform SMM MP sync Semaphores re-initialization in the S3 boot path.
+**/
+VOID
+EFIAPI
+SmmS3MpSemaphoreInit (
+  VOID
   );
 
 #endif
