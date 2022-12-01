@@ -126,10 +126,10 @@ PxeReceive (
   }
 
   //
-  // We have received a packet from network interface, which implies that the
-  // network cable should be present. While, some UNDI driver may not report
-  // correct media status during Snp->Initialize(). So, we need ensure
-  // MediaPresent in SNP mode data is set to correct value.
+  // We have received a packet from the network interface, which implies
+  // that the network cable should be present. Some UNDI drivers may not
+  // report correct media status during Snp->Initialize(), so we need to
+  // ensure MediaPresent in SNP mode data is set to the correct value.
   //
   if (Snp->Mode.MediaPresentSupported && !Snp->Mode.MediaPresent) {
     Snp->Mode.MediaPresent = TRUE;
