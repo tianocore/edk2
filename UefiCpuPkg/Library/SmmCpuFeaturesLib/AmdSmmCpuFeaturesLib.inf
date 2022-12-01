@@ -21,6 +21,8 @@
   SmmCpuFeaturesLib.c
   SmmCpuFeaturesLibCommon.c
   Amd/SmmCpuFeaturesLib.c
+  Amd/SmramSaveState.c
+  Amd/SmramSaveState.h
 
 [Packages]
   MdePkg/MdePkg.dec
