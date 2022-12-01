@@ -137,7 +137,7 @@ persist by EFI_VECTOR_HANDOFF_INFO defined in PI 1.3 specification.
 If caller cannot get reserved vector list or it does not exists, set VectorInfo to NULL.
 If VectorInfo is not NULL, the exception vectors will be initialized per vector attribute accordingly.
 
-@param[in]  VectorInfo    Pointer to reserved vector list.
+@param[in]  BaseAddress    Address to copy exception handlers to.
 
 @retval EFI_SUCCESS           CPU Exception Entries have been successfully initialized
 with default exception handlers.
@@ -242,7 +242,6 @@ RegisterCpuInterruptHandler (
 /**
 Register exception handler.
 
-@param  This                  A pointer to the SMM_CPU_SERVICE_PROTOCOL instance.
 @param  ExceptionType         Defines which interrupt or exception to hook. Type EFI_EXCEPTION_TYPE and
 the valid values for this parameter are defined in EFI_DEBUG_SUPPORT_PROTOCOL
 of the UEFI 2.0 specification.
