@@ -932,7 +932,7 @@ ON_EXIT:
   gBS->RestoreTPL (OldTpl);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "EhcBulkTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
+    DEBUG ((DEBUG_VERBOSE, "EhcBulkTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
   }
 
   return Status;

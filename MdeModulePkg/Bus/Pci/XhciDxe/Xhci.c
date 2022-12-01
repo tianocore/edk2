@@ -1304,7 +1304,7 @@ XhcBulkTransfer (
 
 ON_EXIT:
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "XhcBulkTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
+    DEBUG ((DEBUG_VERBOSE, "XhcBulkTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
   }
 
   gBS->RestoreTPL (OldTpl);
