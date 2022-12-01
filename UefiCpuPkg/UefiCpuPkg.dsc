@@ -178,6 +178,13 @@
     <LibraryClasses>
       SmmCpuFeaturesLib|UefiCpuPkg/Library/SmmCpuFeaturesLib/SmmCpuFeaturesLibStm.inf
   }
+  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf {
+    <Defines>
+      FILE_GUID = B7242C74-BD21-49EE-84B4-07162E8C080D
+    <LibraryClasses>
+      SmmCpuFeaturesLib|UefiCpuPkg/Library/SmmCpuFeaturesLib/AmdSmmCpuFeaturesLib.inf
+      SmmCpuPlatformHookLib|UefiCpuPkg/Library/SmmCpuPlatformHookLibNull/SmmCpuPlatformHookLibNull.inf
+  }
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
   UefiCpuPkg/ResetVector/Vtf0/Bin/ResetVector.inf
   UefiCpuPkg/Library/SmmCpuRendezvousLib/SmmCpuRendezvousLib.inf
@@ -194,6 +201,7 @@
       UnitTestResultReportLib|UnitTestFrameworkPkg/Library/UnitTestResultReportLib/UnitTestResultReportLibConOut.inf
   }
   UefiCpuPkg/Library/SmmSmramSaveStateLib/AmdSmmSmramSaveStateLib.inf
+  UefiCpuPkg/Library/SmmCpuFeaturesLib/AmdSmmCpuFeaturesLib.inf
 
 [Components.X64]
   UefiCpuPkg/Library/CpuExceptionHandlerLib/UnitTest/DxeCpuExceptionHandlerLibUnitTest.inf
