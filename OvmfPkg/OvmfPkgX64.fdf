@@ -276,7 +276,9 @@ INF  OvmfPkg/LsiScsiDxe/LsiScsiDxe.inf
 !endif
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
+!include OvmfPkg/SecureBootDefaultKeys.fdf.inc
   INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+  INF  SecurityPkg/VariableAuthenticated/SecureBootDefaultKeysDxe/SecureBootDefaultKeysDxe.inf
 !endif
 
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
