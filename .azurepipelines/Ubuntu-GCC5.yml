@@ -17,7 +17,7 @@ jobs:
 - template: templates/pr-gate-build-job.yml
   parameters:
     tool_chain_tag: 'GCC5'
-    vm_image: 'ubuntu-latest'
+    vm_image: 'ubuntu-22.04'
     container: 'ghcr.io/tianocore/containers/fedora-35-build:2113a0e'
     arch_list: "IA32,X64,ARM,AARCH64,RISCV64,LOONGARCH64"
     usePythonVersion: ''  # use Python from the container image
