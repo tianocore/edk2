@@ -2,7 +2,7 @@
 # Redfish FDF include file for [FV*] section of all Architectures.
 #
 # This file can be included to the [FV*] section(s) of a platform FDF file
-# by using "!include RedfishPkg/RedfisLibs.fdf.inc" to specify the module instances
+# by using "!include RedfishPkg/Redfish.fdf.inc" to specify the module instances
 # to be built in the firmware volume.
 #
 # (C) Copyright 2020-2021 Hewlett Packard Enterprise Development LP<BR>
