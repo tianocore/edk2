@@ -33,7 +33,7 @@
 #string STR_PING6_NOSOURCE_INDOMAIN        #language en-US  "No sources in %s's multicast domain.\r\n"
 #string STR_PING6_START                    #language en-US  "Ping %s %d data bytes\r\n"
 #string STR_PING6_TIMEOUT                  #language en-US  "Echo request sequence %d timeout.\r\n"
-#string STR_PING6_REPLY_INFO               #language en-US  "%d bytes from %s : icmp_seq=%d ttl=%d time%d~%dms\r\n"
+#string STR_PING6_REPLY_INFO               #language en-US  "%d bytes from %s : icmp_seq=%d ttl=%d time=%d~%dms\r\n"
 #string STR_PING6_STAT                     #language en-US  "\n%d packets transmitted, %d received, %d%% packet loss, time %dms\r\n"
 #string STR_PING6_RTT                      #language en-US  "\nRtt(round trip time) min=%d~%dms max=%d~%dms avg=%d~%dms\r\n"
 
