@@ -379,7 +379,7 @@ InitializePlatform (
   }
 
   InstallClearCacheCallback ();
-  AmdSevInitialize ();
+  AmdSevInitialize (&mPlatformInfoHob);
   if (mPlatformInfoHob.HostBridgeDevId == 0xffff) {
     MiscInitializationForMicrovm (&mPlatformInfoHob);
   } else {
