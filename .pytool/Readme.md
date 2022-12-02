@@ -1,5 +1,12 @@
 # Edk2 Continuous Integration
 
+This file focuses on information for those working with the `.pytools` directory
+directly or interested in lower-level details about how CI works.
+
+If you just want to get started building code, visit
+[Build Instructions](https://github.com/tianocore/tianocore.github.io/wiki/Build-Instruction)
+on the TianoCore wiki.
+
 ## Basic Status
 
 | Package              | Windows VS2019 (IA32/X64)| Ubuntu GCC (IA32/X64/ARM/AARCH64) | Known Issues |
@@ -82,43 +89,18 @@ easily and consistently running locally and in a cloud ci environment.  To do
 that a few steps should be followed.  Details of EDKII Tools can be found in the
 [docs folder here](https://github.com/tianocore/edk2-pytool-extensions/tree/master/docs)
 
-### Prerequisites
-
-1. A supported toolchain (others might work but this is what is tested and validated)
-   * Windows 10:
-     * VS 2017 or VS 2019
-     * Windows SDK (for rc)
-     * Windows WDK (for capsules)
-   * Ubuntu 18.04 or Fedora
-     * GCC5
-   * Easy to add more but this is the current state
-2. Python 3.7.x or newer on path
-3. git on path
-4. Recommended to setup and activate a python virtual environment
-5. Install the requirements `pip install --upgrade -r pip-requirements.txt`
-
 ### Running CI
 
-1. clone your edk2 repo
-2. Activate your python virtual environment in cmd window
-3. Get code dependencies (done only when submodules change)
-   * `stuart_setup -c .pytool/CISettings.py TOOL_CHAIN_TAG=<your tag here>`
-4. Update other dependencies (done more often)
-   * `stuart_update -c .pytool/CISettings.py TOOL_CHAIN_TAG=<your tag here>`
-5. Run CI build (--help will give you options)
-   * `stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=<your tag here>`
-   * -p <pkg1,pkg2,pkg3> : To build only certain packages use a CSV list
-   * -a <arch1,arch2,arch3>: To run only certain architectures use a CSV list
-   * -t <target1,target2>: To run only tests related to certain targets use a
-     CSV list
-   * By default all tests are opted in.  Then given a package.ci.yaml file those
-     tests can be configured for a package. Finally setting the check to the
-     value `skip` will skip that plugin.  Examples:
-     * `CompilerPlugin=skip` skip the build test
-     * `GuidCheck=skip` skip the Guid check
-     * `SpellCheck=skip` skip the spell checker
-     * etc
-6. Detailed reports and logs per package are captured in the `Build` directory
+Quick notes:
+
+* By default all CI plugins are opted in.
+  * Setting the plugin to `skip` as an argument will skip running the plugin.
+    Examples:
+    * `CompilerPlugin=skip` skip the build test
+    * `GuidCheck=skip` skip the Guid check
+    * `SpellCheck=skip` skip the spell checker
+    * etc.
+* Detailed reports and logs per package are captured in the `Build` directory.
 
 ## Current PyTool Test Capabilities
 
