@@ -70,7 +70,7 @@ MemTypeInfoInitialization (
 
 VOID
 InstallFeatureControlCallback (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 VOID
