@@ -41,8 +41,6 @@
 
 #include "Platform.h"
 
-EFI_HOB_PLATFORM_INFO  mPlatformInfoHob = { 0 };
-
 EFI_PEI_PPI_DESCRIPTOR  mPpiBootMode[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
@@ -305,12 +303,18 @@ MaxCpuCountInitialization (
 /**
  * @brief Builds PlatformInfo Hob
  */
-VOID
+EFI_HOB_PLATFORM_INFO *
 BuildPlatformInfoHob (
   VOID
   )
 {
-  BuildGuidDataHob (&gUefiOvmfPkgPlatformInfoGuid, &mPlatformInfoHob, sizeof (EFI_HOB_PLATFORM_INFO));
+  EFI_HOB_PLATFORM_INFO  PlatformInfoHob;
+  EFI_HOB_GUID_TYPE      *GuidHob;
+
+  ZeroMem (&PlatformInfoHob, sizeof PlatformInfoHob);
+  BuildGuidDataHob (&gUefiOvmfPkgPlatformInfoGuid, &PlatformInfoHob, sizeof (EFI_HOB_PLATFORM_INFO));
+  GuidHob = GetFirstGuidHob (&gUefiOvmfPkgPlatformInfoGuid);
+  return (EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (GuidHob);
 }
 
 /**
@@ -329,69 +333,70 @@ InitializePlatform (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS  Status;
+  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob;
+  EFI_STATUS             Status;
 
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
+  PlatformInfoHob = BuildPlatformInfoHob ();
 
-  mPlatformInfoHob.SmmSmramRequire     = FeaturePcdGet (PcdSmmSmramRequire);
-  mPlatformInfoHob.SevEsIsEnabled      = MemEncryptSevEsIsEnabled ();
-  mPlatformInfoHob.PcdPciMmio64Size    = PcdGet64 (PcdPciMmio64Size);
-  mPlatformInfoHob.DefaultMaxCpuNumber = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+  PlatformInfoHob->SmmSmramRequire     = FeaturePcdGet (PcdSmmSmramRequire);
+  PlatformInfoHob->SevEsIsEnabled      = MemEncryptSevEsIsEnabled ();
+  PlatformInfoHob->PcdPciMmio64Size    = PcdGet64 (PcdPciMmio64Size);
+  PlatformInfoHob->DefaultMaxCpuNumber = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
 
   PlatformDebugDumpCmos ();
 
   if (QemuFwCfgS3Enabled ()) {
     DEBUG ((DEBUG_INFO, "S3 support was detected on QEMU\n"));
-    mPlatformInfoHob.S3Supported = TRUE;
+    PlatformInfoHob->S3Supported = TRUE;
     Status                       = PcdSetBoolS (PcdAcpiS3Enable, TRUE);
     ASSERT_EFI_ERROR (Status);
   }
 
-  S3Verification (&mPlatformInfoHob);
-  BootModeInitialization (&mPlatformInfoHob);
+  S3Verification (PlatformInfoHob);
+  BootModeInitialization (PlatformInfoHob);
 
   //
   // Query Host Bridge DID
   //
-  mPlatformInfoHob.HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
-  AddressWidthInitialization (&mPlatformInfoHob);
+  PlatformInfoHob->HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
+  AddressWidthInitialization (PlatformInfoHob);
 
-  MaxCpuCountInitialization (&mPlatformInfoHob);
+  MaxCpuCountInitialization (PlatformInfoHob);
 
-  if (mPlatformInfoHob.SmmSmramRequire) {
-    Q35BoardVerification (&mPlatformInfoHob);
-    Q35TsegMbytesInitialization (&mPlatformInfoHob);
-    Q35SmramAtDefaultSmbaseInitialization (&mPlatformInfoHob);
+  if (PlatformInfoHob->SmmSmramRequire) {
+    Q35BoardVerification (PlatformInfoHob);
+    Q35TsegMbytesInitialization (PlatformInfoHob);
+    Q35SmramAtDefaultSmbaseInitialization (PlatformInfoHob);
   }
 
-  PublishPeiMemory (&mPlatformInfoHob);
+  PublishPeiMemory (PlatformInfoHob);
 
-  PlatformQemuUc32BaseInitialization (&mPlatformInfoHob);
+  PlatformQemuUc32BaseInitialization (PlatformInfoHob);
 
-  InitializeRamRegions (&mPlatformInfoHob);
+  InitializeRamRegions (PlatformInfoHob);
 
-  if (mPlatformInfoHob.BootMode != BOOT_ON_S3_RESUME) {
-    if (!mPlatformInfoHob.SmmSmramRequire) {
+  if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
+    if (!PlatformInfoHob->SmmSmramRequire) {
       ReserveEmuVariableNvStore ();
     }
 
-    PeiFvInitialization (&mPlatformInfoHob);
-    MemTypeInfoInitialization (&mPlatformInfoHob);
-    MemMapInitialization (&mPlatformInfoHob);
-    NoexecDxeInitialization (&mPlatformInfoHob);
+    PeiFvInitialization (PlatformInfoHob);
+    MemTypeInfoInitialization (PlatformInfoHob);
+    MemMapInitialization (PlatformInfoHob);
+    NoexecDxeInitialization (PlatformInfoHob);
   }
 
   InstallClearCacheCallback ();
-  AmdSevInitialize (&mPlatformInfoHob);
-  if (mPlatformInfoHob.HostBridgeDevId == 0xffff) {
-    MiscInitializationForMicrovm (&mPlatformInfoHob);
+  AmdSevInitialize (PlatformInfoHob);
+  if (PlatformInfoHob->HostBridgeDevId == 0xffff) {
+    MiscInitializationForMicrovm (PlatformInfoHob);
   } else {
-    MiscInitialization (&mPlatformInfoHob);
+    MiscInitialization (PlatformInfoHob);
   }
 
   IntelTdxInitialize ();
   InstallFeatureControlCallback ();
-  BuildPlatformInfoHob ();
 
   return EFI_SUCCESS;
 }
