@@ -16,7 +16,7 @@
   FILE_GUID                      = CEB0D9D3-328F-4C24-8C02-28FA1986AE1B
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DebugLib|SEC
+  LIBRARY_CLASS                  = DebugLib|SEC PEI_CORE PEIM
   CONSTRUCTOR                    = PlatformRomDebugLibIoPortConstructor
 
 #
