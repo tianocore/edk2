@@ -22,12 +22,12 @@ AddressWidthInitialization (
 
 VOID
 Q35TsegMbytesInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 VOID
 Q35SmramAtDefaultSmbaseInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 EFI_STATUS
