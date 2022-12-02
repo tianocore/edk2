@@ -361,7 +361,7 @@ InitializePlatform (
     Q35SmramAtDefaultSmbaseInitialization (&mPlatformInfoHob);
   }
 
-  PublishPeiMemory ();
+  PublishPeiMemory (&mPlatformInfoHob);
 
   PlatformQemuUc32BaseInitialization (&mPlatformInfoHob);
 
