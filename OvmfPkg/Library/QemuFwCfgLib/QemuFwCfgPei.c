@@ -9,16 +9,16 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <PiPei.h>
 #include <Library/BaseLib.h>
-#include <Library/IoLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
+#include <Library/IoLib.h>
+#include <Library/PlatformInitLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <WorkArea.h>
 
 #include "QemuFwCfgLibInternal.h"
-
-STATIC BOOLEAN  mQemuFwCfgSupported = FALSE;
-STATIC BOOLEAN  mQemuFwCfgDmaSupported;
 
 /**
   Check if it is Tdx guest
@@ -93,13 +93,39 @@ QemuFwCfgProbe (
     ));
 }
 
+STATIC
+EFI_HOB_PLATFORM_INFO *
+QemuFwCfgGetPlatformInfo (
+  VOID
+  )
+{
+  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob;
+  EFI_HOB_GUID_TYPE      *GuidHob;
+
+  GuidHob = GetFirstGuidHob (&gUefiOvmfPkgPlatformInfoGuid);
+  if (GuidHob == NULL) {
+    return NULL;
+  }
+
+  PlatformInfoHob = (EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (GuidHob);
+
+  if (!PlatformInfoHob->QemuFwCfgChecked) {
+    QemuFwCfgProbe (
+      &PlatformInfoHob->QemuFwCfgSupported,
+      &PlatformInfoHob->QemuFwCfgDmaSupported
+      );
+    PlatformInfoHob->QemuFwCfgChecked = TRUE;
+  }
+
+  return PlatformInfoHob;
+}
+
 RETURN_STATUS
 EFIAPI
 QemuFwCfgInitialize (
   VOID
   )
 {
-  QemuFwCfgProbe (&mQemuFwCfgSupported, &mQemuFwCfgDmaSupported);
   return RETURN_SUCCESS;
 }
 
@@ -117,7 +143,9 @@ InternalQemuFwCfgIsAvailable (
   VOID
   )
 {
-  return mQemuFwCfgSupported;
+  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob = QemuFwCfgGetPlatformInfo ();
+
+  return PlatformInfoHob->QemuFwCfgSupported;
 }
 
 /**
@@ -132,7 +160,9 @@ InternalQemuFwCfgDmaIsAvailable (
   VOID
   )
 {
-  return mQemuFwCfgDmaSupported;
+  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob = QemuFwCfgGetPlatformInfo ();
+
+  return PlatformInfoHob->QemuFwCfgDmaSupported;
 }
 
 /**
