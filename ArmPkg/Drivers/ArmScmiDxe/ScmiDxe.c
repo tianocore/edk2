@@ -40,7 +40,7 @@ STATIC CONST SCMI_PROTOCOL_ENTRY  Protocols[] = {
                              install Base, Clock and Performance protocols.
   @param[in] SystemTable     A pointer to boot time system table.
 
-  @retval EFI_SUCCESS       Driver initalized successfully.
+  @retval EFI_SUCCESS       Driver initialized successfully.
   @retval EFI_UNSUPPORTED   If SCMI base protocol version is not supported.
   @retval !(EFI_SUCCESS)    Other errors.
 **/

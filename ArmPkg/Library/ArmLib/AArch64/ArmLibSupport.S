@@ -20,7 +20,7 @@ ASM_FUNC(ArmReadMidr)
   ret
 
 ASM_FUNC(ArmCacheInfo)
-  mrs     x0, ctr_el0         // Read from Cache Type Regiter (CTR)
+  mrs     x0, ctr_el0         // Read from Cache Type Register (CTR)
   ret
 
 ASM_FUNC(ArmGetInterruptState)

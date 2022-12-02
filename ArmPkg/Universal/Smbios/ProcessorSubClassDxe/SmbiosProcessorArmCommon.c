@@ -79,7 +79,7 @@ SmbiosProcessorHasSeparateCaches (
   return SeparateCaches;
 }
 
-/** Checks if ther ARM64 SoC ID SMC call is supported
+/** Checks if the ARM64 SoC ID SMC call is supported
 
     @return Whether the ARM64 SoC ID call is supported.
 **/

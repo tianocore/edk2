@@ -663,9 +663,9 @@ DisassembleThumbInstruction (
           // ITSTATE = cond:mask   OpCode[7:4]:OpCode[3:0]
           // ITSTATE[7:5] == cond[3:1]
           // ITSTATE[4] == 1st Instruction cond[0]
-          // ITSTATE[3] == 2st Instruction cond[0]
-          // ITSTATE[2] == 3st Instruction cond[0]
-          // ITSTATE[1] == 4st Instruction cond[0]
+          // ITSTATE[3] == 2nd Instruction cond[0]
+          // ITSTATE[2] == 3rd Instruction cond[0]
+          // ITSTATE[1] == 4th Instruction cond[0]
           // ITSTATE[0] == 1 4 instruction IT block. 0 means 0,1,2 or 3 instructions
           // 1st one  in ITSTATE low bits defines the number of instructions
           Mask = (OpCode & 0xf);
