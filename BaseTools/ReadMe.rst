@@ -1,3 +1,13 @@
+::
+
+  Note: New build instructions are available. It is recommended to start with
+  the new instructions if learning how to build edk2 and/or BaseTools for the
+  first time. This page is retained for reference.
+
+New instructions: `Build Instructions`_
+
+.. _`Build Instructions`: https://github.com/tianocore/tianocore.github.io/wiki/Build-Instructions
+
 This directory contains the EDK II build tools and template files.
 Templates are located in the Conf directory, while the tools executables for
 Microsoft Windows Operating Systems are located in the Bin\\Win32 directory, other
@@ -22,9 +32,6 @@ In addition to this, you should set the following environment variables::
 After this, you can run the toolsetup.bat file, which is in the same
 directory as this file.  It should setup the remainder of the environment,
 and build the tools if necessary.
-
-Please also refer to the ``BuildNotes.txt`` file for more information on
-building under Windows.
 
 Unix-like operating systems
 ===========================
