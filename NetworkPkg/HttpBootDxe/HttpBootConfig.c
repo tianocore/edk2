@@ -117,8 +117,8 @@ HttpBootAddBootOption (
   //
   if (StrLen (ProxyUri) != 0) {
     AsciiProxyUriSize = AsciiStrSize (AsciiProxyUri);
-    Length = sizeof (EFI_DEVICE_PATH_PROTOCOL) + AsciiProxyUriSize;
-    Node   = AllocatePool (Length);
+    Length            = sizeof (EFI_DEVICE_PATH_PROTOCOL) + AsciiProxyUriSize;
+    Node              = AllocatePool (Length);
     if (Node == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_EXIT;
