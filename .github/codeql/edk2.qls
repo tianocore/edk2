@@ -12,3 +12,5 @@
     id: cpp/infinite-loop-with-unsatisfiable-exit-condition
 - include:
     id: cpp/overflow-buffer
+- include:
+    id: cpp/unclear-array-index-validation
