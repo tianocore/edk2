@@ -22,7 +22,7 @@
 **/
 EFI_STATUS
 PeiFvInitialization (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   BOOLEAN  SecureS3Needed;
@@ -37,7 +37,7 @@ PeiFvInitialization (
   BuildMemoryAllocationHob (
     PcdGet32 (PcdOvmfPeiMemFvBase),
     PcdGet32 (PcdOvmfPeiMemFvSize),
-    mPlatformInfoHob.S3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
+    PlatformInfoHob->S3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
     );
 
   //
@@ -45,7 +45,7 @@ PeiFvInitialization (
   //
   BuildFvHob (PcdGet32 (PcdOvmfDxeMemFvBase), PcdGet32 (PcdOvmfDxeMemFvSize));
 
-  SecureS3Needed = mPlatformInfoHob.S3Supported && mPlatformInfoHob.SmmSmramRequire;
+  SecureS3Needed = PlatformInfoHob->S3Supported && PlatformInfoHob->SmmSmramRequire;
 
   //
   // Create a memory allocation HOB for the DXE FV.

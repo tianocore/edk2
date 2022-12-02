@@ -372,7 +372,7 @@ InitializePlatform (
       ReserveEmuVariableNvStore ();
     }
 
-    PeiFvInitialization ();
+    PeiFvInitialization (&mPlatformInfoHob);
     MemTypeInfoInitialization ();
     MemMapInitialization (&mPlatformInfoHob);
     NoexecDxeInitialization ();
