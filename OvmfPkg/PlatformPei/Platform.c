@@ -373,7 +373,7 @@ InitializePlatform (
     }
 
     PeiFvInitialization (&mPlatformInfoHob);
-    MemTypeInfoInitialization ();
+    MemTypeInfoInitialization (&mPlatformInfoHob);
     MemMapInitialization (&mPlatformInfoHob);
     NoexecDxeInitialization ();
   }

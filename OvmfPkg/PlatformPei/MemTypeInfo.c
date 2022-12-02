@@ -203,12 +203,12 @@ STATIC CONST EFI_PEI_NOTIFY_DESCRIPTOR  mReadOnlyVariable2Notify = {
 
 VOID
 MemTypeInfoInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   EFI_STATUS  Status;
 
-  if (!mPlatformInfoHob.SmmSmramRequire) {
+  if (!PlatformInfoHob->SmmSmramRequire) {
     //
     // EFI_PEI_READ_ONLY_VARIABLE2_PPI will never be available; install
     // the default memory type information HOB right away.
