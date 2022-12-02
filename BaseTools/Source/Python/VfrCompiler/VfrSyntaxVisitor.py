@@ -57,7 +57,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def visitVfrProgram(self, ctx:VfrSyntaxParser.VfrProgramContext):
         #self.__CVfrQuestionDB.PrintAllQuestion('Questions.txt')
         #gCVfrVarDataTypeDB.Dump("test\\DataTypeInfo.txt")
-
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by VfrSyntaxParser#pragmaPackShowDef.
@@ -1184,10 +1183,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         else:
             for i in range(0, FormMapMethodNumber):
                 FMapObj.SetFormMapMethod(self.__TransNum(ctx.Number(i+1)), ctx.guidDefinition(i).Guid)
-        FormMap, MethodMapList = FMapObj.GetInfo()
-        Info, _ = FMapObj.GetInfo()
-        for MethodMap in MethodMapList:
-            Info.Header.Length += sizeof(EFI_IFR_FORM_MAP_METHOD)
+        FormMap = FMapObj.GetInfo()
+        MethodMapList = FMapObj.GetMethodMapList()
+        for MethodMap in MethodMapList: # Extend Header Size for MethodMapList
+            FormMap.Header.Length += sizeof(EFI_IFR_FORM_MAP_METHOD)
 
         ctx.Node.Data = FMapObj
         ctx.Node.Buffer = self.__StructToStream(FormMap)
@@ -2591,21 +2590,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             ctx.Node = ctx.vfrStatementString().Node
         return ctx.Node
 
-    def _GET_CURRQEST_ARRAY_SIZE(self):
-
-        Size = 1
-        if self.__CurrQestVarInfo.VarType == EFI_IFR_TYPE_NUM_SIZE_8:
-            Size = 1
-        if self.__CurrQestVarInfo.VarType == EFI_IFR_TYPE_NUM_SIZE_16:
-            Size = 2
-        if self.__CurrQestVarInfo.VarType == EFI_IFR_TYPE_NUM_SIZE_32:
-            Size = 4
-        if self.__CurrQestVarInfo.VarType == EFI_IFR_TYPE_NUM_SIZE_64:
-            Size = 8
-
-        return int(self.__CurrQestVarInfo.VarTotalSize / Size)
-
-
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementString.
     def visitVfrStatementString(self, ctx:VfrSyntaxParser.VfrStatementStringContext):
 
@@ -2631,7 +2615,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             StringMinSize = self.__TransNum(ctx.Number(0))
             StringMaxSize = self.__TransNum(ctx.Number(1))
 
-        VarArraySize = self._GET_CURRQEST_ARRAY_SIZE()
+        VarArraySize = self.__GetCurArraySize()
         if StringMinSize > 0xFF:
             self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.Min.line, "String MinSize takes only one byte, which can't be larger than 0xFF.")
         if VarArraySize != 0 and StringMinSize > VarArraySize:
@@ -2705,7 +2689,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             HFlags = ctx.vfrPasswordFlagsField().HFlags
             self.__ErrorHandler(PObj.SetFlags(HFlags), ctx.F.line)
 
-        VarArraySize = self._GET_CURRQEST_ARRAY_SIZE()
+        VarArraySize = self.__GetCurArraySize()
         if PassWordMinSize > 0xFF:
             self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.Min.line, "String MinSize takes only one byte, which can't be larger than 0xFF.")
         if VarArraySize != 0 and PassWordMinSize > VarArraySize:
@@ -2761,7 +2745,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         self.visitChildren(ctx)
 
-        VarArraySize = self._GET_CURRQEST_ARRAY_SIZE()
+        VarArraySize = self.__GetCurArraySize()
         if VarArraySize > 0xFF:
             OLObj.SetMaxContainers(0xFF)
         else:
@@ -3362,6 +3346,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 EObj = CIfrEnd()
                 if self.__CIfrOpHdrLineNo[self.__CIfrOpHdrIndex] != 0:
                     EObj.SetLineNo(self.__CIfrOpHdrLineNo[self.__CIfrOpHdrIndex])
+                else:
+                    EObj.SetLineNo(0)
                 Node = VfrTreeNode(EFI_IFR_END_OP, EObj, self.__StructToStream(EObj.GetInfo()))
                 ctx.Nodes.append(Node)
 
@@ -4697,6 +4683,20 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Length = sizeof(s)
         P = cast(pointer(s), POINTER(c_char * Length))
         return P.contents.raw
+
+    def __GetCurArraySize(self):
+
+        Size = 1
+        if self.__CurrQestVarInfo.VarType == EFI_IFR_TYPE_NUM_SIZE_8:
+            Size = 1
+        if self.__CurrQestVarInfo.VarType == EFI_IFR_TYPE_NUM_SIZE_16:
+            Size = 2
+        if self.__CurrQestVarInfo.VarType == EFI_IFR_TYPE_NUM_SIZE_32:
+            Size = 4
+        if self.__CurrQestVarInfo.VarType == EFI_IFR_TYPE_NUM_SIZE_64:
+            Size = 8
+
+        return int(self.__CurrQestVarInfo.VarTotalSize / Size)
 
     def GetQuestionDB(self):
         return self.__CVfrQuestionDB

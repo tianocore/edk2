@@ -705,29 +705,26 @@ class CVfrVarDataTypeDB(object):
             pTmp = pTmp.Next
         return False
 
-    def Dump(self, FileName):
-        try:
-            with open(FileName, 'w') as f:
-                f.write("PackAlign = " + str(self.__PackAlign) + '\n')
-                pNode = self.__DataTypeList
-                while pNode != None:
-                    f.write('struct {} : Align : {}  TotalSize : '.format(str(pNode.TypeName), str(pNode.Align)))
-                    f.write('%#x\n'%(pNode.TotalSize))
-                    # f.write(" struct " + str(pNode.TypeName) + " : " + " Align " + str(pNode.Align)) + " TotalSize " + str('%#x'%pNode.TotalSize))
-                    f.write('struct {} \n'.format(str(pNode.TypeName)))
-                    FNode = pNode.Members
-                    while(FNode != None):
-                        if FNode.ArrayNum > 0:
-                            f.write('FieldName : {} , Offset : {}, ArrayNum : {} , FieldTypeName : {} , IsBitField : {} \n '.format(str(FNode.FieldName), str(FNode.Offset), str(FNode.ArrayNum), str(FNode.FieldType.TypeName), str(FNode.IsBitField)))
-                        else:
-                            f.write('FieldName : {} , Offset : {}, FieldTypeName : {} ,  IsBitField : {} \n '.format(str(FNode.FieldName), str(FNode.Offset), str(FNode.FieldType.TypeName), str(FNode.IsBitField)))
-                        FNode = FNode.Next
-                    f.write('\n')
-                    pNode = pNode.Next
-            f.close()
-        except IOError as e:
-            print("error")
-            pass
+    def Dump(self, f):
+        f.write("\n\n***************************************************************\n")
+        f.write("PackAlign = " + str(self.__PackAlign) + '\n')
+        pNode = self.__DataTypeList
+        while pNode != None:
+            f.write('\t\tstruct {} : Align : [{}]  TotalSize : [{:#x}]\n\n'.format(pNode.TypeName, pNode.Align, pNode.TotalSize))
+            #f.write('%#x\n'%(pNode.TotalSize))
+            f.write('\t\tstruct {}'.format(str(pNode.TypeName)) + '\t{\n')
+            FNode = pNode.Members
+            while(FNode != None):
+                if FNode.ArrayNum > 0:
+                    f.write('\t\t\t+{:0>8d}[{:0>8x}] {}[{}] <{}>\n'.format(FNode.Offset, FNode.Offset, FNode.FieldName, FNode.ArrayNum, FNode.FieldType.TypeName))
+                else:
+                    f.write('\t\t\t+{:0>8d}[{:0>8x}] {} <{}>\n'.format(FNode.Offset, FNode.Offset, FNode.FieldName, FNode.FieldType.TypeName))
+                FNode = FNode.Next
+            f.write('\t\t};\n')
+            f.write("---------------------------------------------------------------\n")
+            pNode = pNode.Next
+        f.write("***************************************************************\n")
+
 
 class SVfrDefaultStoreNode(object):
 

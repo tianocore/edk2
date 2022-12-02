@@ -1,330 +1,21 @@
 {
   "DataStruct" : {
-    "ISCSI_CONFIG_IFR_NVDATA" : [
-      {
-        "Name": "InitiatorName",
-        "Type": "UINT16[224]",
-        "Offset": 0
-      },
-      {
-        "Name": "AttemptName",
-        "Type": "UINT16[12]",
-        "Offset": 448
-      },
-      {
-        "Name": "Enabled",
-        "Type": "UINT8",
-        "Offset": 472
-      },
-      {
-        "Name": "IpMode",
-        "Type": "UINT8",
-        "Offset": 473
-      },
-      {
-        "Name": "ConnectRetryCount",
-        "Type": "UINT8",
-        "Offset": 474
-      },
-      {
-        "Name": "Padding1",
-        "Type": "UINT8",
-        "Offset": 475
-      },
-      {
-        "Name": "ConnectTimeout",
-        "Type": "UINT16",
-        "Offset": 476
-      },
-      {
-        "Name": "InitiatorInfoFromDhcp",
-        "Type": "UINT8",
-        "Offset": 478
-      },
-      {
-        "Name": "TargetInfoFromDhcp",
-        "Type": "UINT8",
-        "Offset": 479
-      },
-      {
-        "Name": "LocalIp",
-        "Type": "UINT16[16]",
-        "Offset": 480
-      },
-      {
-        "Name": "SubnetMask",
-        "Type": "UINT16[16]",
-        "Offset": 512
-      },
-      {
-        "Name": "Gateway",
-        "Type": "UINT16[16]",
-        "Offset": 544
-      },
-      {
-        "Name": "TargetName",
-        "Type": "UINT16[224]",
-        "Offset": 576
-      },
-      {
-        "Name": "TargetIp",
-        "Type": "UINT16[255]",
-        "Offset": 1024
-      },
-      {
-        "Name": "TargetPort",
-        "Type": "UINT16",
-        "Offset": 1534
-      },
-      {
-        "Name": "BootLun",
-        "Type": "UINT16[21]",
-        "Offset": 1536
-      },
-      {
-        "Name": "AuthenticationType",
-        "Type": "UINT8",
-        "Offset": 1578
-      },
-      {
-        "Name": "CHAPType",
-        "Type": "UINT8",
-        "Offset": 1579
-      },
-      {
-        "Name": "CHAPName",
-        "Type": "UINT16[127]",
-        "Offset": 1580
-      },
-      {
-        "Name": "CHAPSecret",
-        "Type": "UINT16[17]",
-        "Offset": 1834
-      },
-      {
-        "Name": "ReverseCHAPName",
-        "Type": "UINT16[127]",
-        "Offset": 1868
-      },
-      {
-        "Name": "ReverseCHAPSecret",
-        "Type": "UINT16[17]",
-        "Offset": 2122
-      },
-      {
-        "Name": "MutualRequired",
-        "Type": "BOOLEAN",
-        "Offset": 2156
-      },
-      {
-        "Name": "Padding2",
-        "Type": "UINT8",
-        "Offset": 2157
-      },
-      {
-        "Name": "KerberosUserName",
-        "Type": "UINT16[96]",
-        "Offset": 2158
-      },
-      {
-        "Name": "KerberosUserSecret",
-        "Type": "UINT16[17]",
-        "Offset": 2350
-      },
-      {
-        "Name": "KerberosKDCName",
-        "Type": "UINT16[96]",
-        "Offset": 2384
-      },
-      {
-        "Name": "KerberosKDCRealm",
-        "Type": "UINT16[96]",
-        "Offset": 2576
-      },
-      {
-        "Name": "KerberosKDCIp",
-        "Type": "UINT16[40]",
-        "Offset": 2768
-      },
-      {
-        "Name": "KerberosKDCPort",
-        "Type": "UINT16",
-        "Offset": 2848
-      },
-      {
-        "Name": "DynamicOrderedList",
-        "Type": "UINT8[8]",
-        "Offset": 2850
-      },
-      {
-        "Name": "DeleteAttemptList",
-        "Type": "UINT8[8]",
-        "Offset": 2858
-      },
-      {
-        "Name": "AddAttemptList",
-        "Type": "UINT8[8]",
-        "Offset": 2866
-      },
-      {
-        "Name": "IsId",
-        "Type": "UINT16[13]",
-        "Offset": 2874
-      },
-      {
-        "Name": "ISCSIMacAddr",
-        "Type": "UINT16[96]",
-        "Offset": 2900
-      },
-      {
-        "Name": "ISCSIAttemptOrder",
-        "Type": "UINT16[96]",
-        "Offset": 3092
-      },
-      {
-        "Name": "ISCSIAddAttemptList",
-        "Type": "UINT16[96]",
-        "Offset": 3284
-      },
-      {
-        "Name": "ISCSIDeleteAttemptList",
-        "Type": "UINT16[96]",
-        "Offset": 3476
-      },
-      {
-        "Name": "ISCSIDisplayAttemptList",
-        "Type": "UINT16[96]",
-        "Offset": 3668
-      },
-      {
-        "Name": "ISCSIAttemptName",
-        "Type": "UINT16[96]",
-        "Offset": 3860
-      },
-      {
-        "Name": "ISCSIBootEnableList",
-        "Type": "UINT8[8]",
-        "Offset": 4052
-      },
-      {
-        "Name": "ISCSIIpAddressTypeList",
-        "Type": "UINT8[8]",
-        "Offset": 4060
-      },
-      {
-        "Name": "ISCSIConnectRetry",
-        "Type": "UINT8[8]",
-        "Offset": 4068
-      },
-      {
-        "Name": "ISCSIConnectTimeout",
-        "Type": "UINT16[8]",
-        "Offset": 4076
-      },
-      {
-        "Name": "ISCSIInitiatorInfoViaDHCP",
-        "Type": "UINT8[8]",
-        "Offset": 4092
-      },
-      {
-        "Name": "ISCSITargetInfoViaDHCP",
-        "Type": "UINT8[8]",
-        "Offset": 4100
-      },
-      {
-        "Name": "ISCSITargetTcpPort",
-        "Type": "UINT16[8]",
-        "Offset": 4108
-      },
-      {
-        "Name": "ISCSIAuthenticationMethod",
-        "Type": "UINT8[8]",
-        "Offset": 4124
-      },
-      {
-        "Name": "ISCSIChapType",
-        "Type": "UINT8[8]",
-        "Offset": 4132
-      },
-      {
-        "Name": "Keyword",
-        "Type": "KEYWORD_STR[8]",
-        "Offset": 4140
-      }
-    ],
-    "KEYWORD_STR" : [
-      {
-        "Name": "ISCSIIsId",
-        "Type": "UINT16[13]",
-        "Offset": 0
-      },
-      {
-        "Name": "ISCSIInitiatorIpAddress",
-        "Type": "UINT16[16]",
-        "Offset": 26
-      },
-      {
-        "Name": "ISCSIInitiatorNetmask",
-        "Type": "UINT16[16]",
-        "Offset": 58
-      },
-      {
-        "Name": "ISCSIInitiatorGateway",
-        "Type": "UINT16[16]",
-        "Offset": 90
-      },
-      {
-        "Name": "ISCSITargetName",
-        "Type": "UINT16[224]",
-        "Offset": 122
-      },
-      {
-        "Name": "ISCSITargetIpAddress",
-        "Type": "UINT16[255]",
-        "Offset": 570
-      },
-      {
-        "Name": "ISCSILun",
-        "Type": "UINT16[21]",
-        "Offset": 1080
-      },
-      {
-        "Name": "ISCSIChapUsername",
-        "Type": "UINT16[127]",
-        "Offset": 1122
-      },
-      {
-        "Name": "ISCSIChapSecret",
-        "Type": "UINT16[17]",
-        "Offset": 1376
-      },
-      {
-        "Name": "ISCSIReverseChapUsername",
-        "Type": "UINT16[127]",
-        "Offset": 1410
-      },
-      {
-        "Name": "ISCSIReverseChapSecret",
-        "Type": "UINT16[17]",
-        "Offset": 1664
-      }
-    ],
     "EFI_HII_REF" : [
       {
         "Name": "QuestionId",
         "Type": "UINT16",
         "Offset": 0
-      },
+      }, 
       {
         "Name": "FormId",
         "Type": "UINT16",
         "Offset": 2
-      },
+      }, 
       {
         "Name": "FormSetGuid",
         "Type": "EFI_GUID",
         "Offset": 4
-      },
+      }, 
       {
         "Name": "DevicePath",
         "Type": "EFI_STRING_ID",
@@ -336,12 +27,12 @@
         "Name": "Hours",
         "Type": "UINT8",
         "Offset": 0
-      },
+      }, 
       {
         "Name": "Minutes",
         "Type": "UINT8",
         "Offset": 1
-      },
+      }, 
       {
         "Name": "Seconds",
         "Type": "UINT8",
@@ -355,12 +46,12 @@
         "Name": "Year",
         "Type": "UINT16",
         "Offset": 0
-      },
+      }, 
       {
         "Name": "Month",
         "Type": "UINT8",
         "Offset": 2
-      },
+      }, 
       {
         "Name": "Day",
         "Type": "UINT8",
@@ -381,14 +72,6 @@
     ]
   },
   "DataStructAttribute": {
-    "ISCSI_CONFIG_IFR_NVDATA": {
-        "Alignment": 1,
-        "TotalSize": 17724
-      },
-    "KEYWORD_STR": {
-        "Alignment": 1,
-        "TotalSize": 1698
-      },
     "EFI_HII_REF": {
         "Alignment": 16,
         "TotalSize": 22
@@ -431,46 +114,8 @@
       }
   },
   "VarDefine" : {
-    "ISCSI_CONFIG_IFR_NVDATA": {
-        "Type": "ISCSI_CONFIG_IFR_NVDATA",
-        "Attributes": 0,
-        "VarStoreId": 26214,
-        "VendorGuid": "0x4b47d616, 0xa8d6, 0x4552, { 0x9d, 0x44, 0xcc, 0xad, 0x2e, 0xf, 0x4c, 0xf9 }}"
-      }
   },
   "Data" : [
-      {
-        "VendorGuid": "0x4b47d616, 0xa8d6, 0x4552, { 0x9d, 0x44, 0xcc, 0xad, 0x2e, 0xf, 0x4c, 0xf9 }}",
-        "VarName": "ISCSI_CONFIG_IFR_NVDATA",
-        "DefaultStore": "0",
-        "Size": "1",
-        "Offset": 1579,
-        "Value": "1"
-      },
-      {
-        "VendorGuid": "0x4b47d616, 0xa8d6, 0x4552, { 0x9d, 0x44, 0xcc, 0xad, 0x2e, 0xf, 0x4c, 0xf9 }}",
-        "VarName": "ISCSI_CONFIG_IFR_NVDATA",
-        "DefaultStore": "0",
-        "Size": "1",
-        "Offset": 1578,
-        "Value": "0"
-      },
-      {
-        "VendorGuid": "0x4b47d616, 0xa8d6, 0x4552, { 0x9d, 0x44, 0xcc, 0xad, 0x2e, 0xf, 0x4c, 0xf9 }}",
-        "VarName": "ISCSI_CONFIG_IFR_NVDATA",
-        "DefaultStore": "0",
-        "Size": "2",
-        "Offset": 476,
-        "Value": "1000"
-      },
-      {
-        "VendorGuid": "0x4b47d616, 0xa8d6, 0x4552, { 0x9d, 0x44, 0xcc, 0xad, 0x2e, 0xf, 0x4c, 0xf9 }}",
-        "VarName": "ISCSI_CONFIG_IFR_NVDATA",
-        "DefaultStore": "0",
-        "Size": "1",
-        "Offset": 472,
-        "Value": "0"
-      },
       {
         "VendorGuid": "NA",
         "VarName": "NA",

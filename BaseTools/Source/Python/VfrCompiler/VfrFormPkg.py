@@ -187,6 +187,7 @@ class CFormPkg():
 
     def __init__(self):
         self.PkgLength = 0
+        self.Offset = 0
         self.__PendingAssignList = None
 
     def BuildPkgHdr(self):
@@ -449,67 +450,14 @@ gIfrObjPrintDebugTable = [
 
 class CIfrObj():
 
-    def __init__(self,
-                 Obj=None,
-                 OpCode=None,
-                 ObjBinLen=0,
-                 DelayEmit=False,
-                 LineNo=0):
-
-        self.__DelayEmit = DelayEmit
-        self.__PkgOffset = gCFormPkg.PkgLength
-        self.__ObjBinLen = gOpcodeSizesScopeTable[
-            OpCode].Size if ObjBinLen == 0 else ObjBinLen
-
-        self.__ObjBinBuf = Obj
+    def __init__(self, LineNo=0):
         self.__LineNo = LineNo
-
-        # print ("======Create IFR [%s]\n", gIfrObjPrintDebugTable[OpCode])
-        return self.__ObjBinBuf
-
-    def SetObjBin(self, ObjBinLen):
-
-        self.__ObjBinLen = ObjBinLen
-        if self.__DelayEmit == False and gCreateOp == True:
-            self.__ObjBinBuf = gCFormPkg.IfrBinBufferGet(self.__ObjBinLen)
 
     def SetLineNo(self, LineNo):
         self.__LineNo = LineNo
 
-    def GetObjBinAddr(self, Addr):
-        self.__ObjBinBuf = Addr
-        return self.__ObjBinBuf
-
-    def GetObjBinOffset(self):
-        return self.__PkgOffset
-
-    def GetObjBinLen(self):
-        return self.__ObjBinLen
-
-    def ExpendObjBin(self, Size):
-        if (self.__DelayEmit) == True and (
-            (self.__ObjBinLen + Size) > self.__ObjBinLen):
-            self.__ObjBinLen = self.__ObjBinLen + Size
-            return True
-        else:
-            return False
-
-    def ShrinkObjBin(self, Size):
-        if (self.__DelayEmit) == True and (self.__ObjBinLen > Size):
-            self.__ObjBinLen = self.__ObjBinLen - Size
-
-    def GetObjBin(self):
-        return self.__ObjBinBuf
-
-    def EMIT_PENDING_OBJ(self):
-        if self.__DelayEmit == False or gCreateOp == False:
-            return
-
-        self.__PkgOffset = gCFormPkg.GetPkgLength()
-        # update data buffer to package data
-        self.__ObjBinBuf = gCFormPkg.IfrBinBufferGet(self.__ObjBinLen)
-
-        self.__DelayEmit = False
+    def GetLineNo(self):
+        return self.__LineNo
 
 
 gScopeCount = 0
@@ -623,7 +571,6 @@ class CIfrFormSet(CIfrObj, CIfrOpHeader):
 
     def __init__(self, Size):
         self.__FormSet = EFI_IFR_FORM_SET()
-        CIfrObj.__init__(self, self.__FormSet, EFI_IFR_FORM_SET_OP)
         CIfrOpHeader.__init__(self, self.__FormSet.Header, EFI_IFR_FORM_SET_OP,
                               Size)
         self.__FormSet.Help = EFI_STRING_ID_INVALID
@@ -989,7 +936,10 @@ class CIfrFormMap(CIfrObj, CIfrOpHeader):
         self.__MethodMapList.append(MethodMap)
 
     def GetInfo(self):
-        return self.__FormMap, self.__MethodMapList
+        return self.__FormMap
+
+    def GetMethodMapList(self):
+        return self.__MethodMapList
 
 
 class CIfrEnd(CIfrObj, CIfrOpHeader):
@@ -1934,7 +1884,6 @@ class CIfrCheckBox(CIfrObj, CIfrOpHeader, CIfrQuestionHeader):
 
         if Ret:
             self.__CheckBox.Flags |= EFI_IFR_CHECKBOX_DEFAULT_MFG
-        print(self.__CheckBox.Flags)
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
 

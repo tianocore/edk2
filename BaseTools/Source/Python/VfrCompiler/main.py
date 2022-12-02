@@ -8,44 +8,33 @@ from VfrSyntaxLexer import *
 from VfrSyntaxParser import *
 
 class VfrCompiler():
-    def __init__(self) -> None:
-        Root = VfrTreeNode()
-        self.__Visitor = VfrSyntaxVisitor(Root)
-        self.__VfrTree = VfrTree(Root)
+    def __init__(self, InputFile) -> None:
+        self.__Root = VfrTreeNode()
+        self.__InputFile = InputFile
+        self.__VfrTree = VfrTree(self.__Root)
 
     def PreProcess(self):
-        pass
+        gCVfrErrorHandle.SetInputFile(self.__InputFile)
 
-
-    def Compile(self, Infile, YamlOutFile, JsonOutFile, BinaryOutFile, CFile, RecordListFile):
-        gCVfrErrorHandle.SetInputFile(Infile)
-        InputStream = FileStream(Infile)
+    def Compile(self):
+        self.__Visitor = VfrSyntaxVisitor(self.__Root)
+        InputStream = FileStream(self.__InputFile)
         Lexer = VfrSyntaxLexer(InputStream)
         Stream = CommonTokenStream(Lexer)
         Parser = VfrSyntaxParser(Stream)
-        tree = Parser.vfrProgram()
-        self.__Visitor.visit(tree)
-        self.__VfrTree.DumpYaml(YamlOutFile)
-        self.__VfrTree.DumpJson(JsonOutFile)
-        self.__VfrTree.GenBinary(BinaryOutFile)
-        self.__VfrTree.GenCFile(Infile, CFile)
-        self.__VfrTree.GenRecordListFile(RecordListFile)
-
-    def AdjustBin(self):
-        pass
-
-    def GenBinary(self):
-        pass
+        Tree = Parser.vfrProgram()
+        self.__Visitor.visit(Tree)
+        self.__VfrTree.DumpYaml(self.__InputFile)
+        self.__VfrTree.DumpJson(self.__InputFile)
+        self.__VfrTree.GenBinary(self.__InputFile)
+        self.__VfrTree.GenCFile(self.__InputFile)
+        self.__VfrTree.GenRecordListFile(self.__InputFile)
 
 
 
 if __name__ == '__main__':
-    Infile = 'test.i'
-    YamlOutFile = 'test.yaml'
-    JsonOutFile = 'test.json'
-    BinaryOutFile = 'test.hpk'
-    CFile = 'test.c'
-    RecordListFile = 'test.lst'
-    Compiler = VfrCompiler()
+    InputFile = 'test.i'
+
+    Compiler = VfrCompiler(InputFile)
     Compiler.PreProcess()
-    Compiler.Compile(Infile, YamlOutFile, JsonOutFile, BinaryOutFile, CFile, RecordListFile)
+    Compiler.Compile()
