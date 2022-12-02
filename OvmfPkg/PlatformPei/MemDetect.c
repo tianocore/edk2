@@ -41,13 +41,13 @@ Module Name:
 
 VOID
 Q35TsegMbytesInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   UINT16         ExtendedTsegMbytes;
   RETURN_STATUS  PcdStatus;
 
-  ASSERT (mPlatformInfoHob.HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID);
+  ASSERT (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID);
 
   //
   // Check if QEMU offers an extended TSEG.
@@ -68,7 +68,7 @@ Q35TsegMbytesInitialization (
   PciWrite16 (DRAMC_REGISTER_Q35 (MCH_EXT_TSEG_MB), MCH_EXT_TSEG_MB_QUERY);
   ExtendedTsegMbytes = PciRead16 (DRAMC_REGISTER_Q35 (MCH_EXT_TSEG_MB));
   if (ExtendedTsegMbytes == MCH_EXT_TSEG_MB_QUERY) {
-    mPlatformInfoHob.Q35TsegMbytes = PcdGet16 (PcdQ35TsegMbytes);
+    PlatformInfoHob->Q35TsegMbytes = PcdGet16 (PcdQ35TsegMbytes);
     return;
   }
 
@@ -80,19 +80,19 @@ Q35TsegMbytesInitialization (
     ));
   PcdStatus = PcdSet16S (PcdQ35TsegMbytes, ExtendedTsegMbytes);
   ASSERT_RETURN_ERROR (PcdStatus);
-  mPlatformInfoHob.Q35TsegMbytes = ExtendedTsegMbytes;
+  PlatformInfoHob->Q35TsegMbytes = ExtendedTsegMbytes;
 }
 
 VOID
 Q35SmramAtDefaultSmbaseInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   RETURN_STATUS  PcdStatus;
 
-  ASSERT (mPlatformInfoHob.HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID);
+  ASSERT (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID);
 
-  mPlatformInfoHob.Q35SmramAtDefaultSmbase = FALSE;
+  PlatformInfoHob->Q35SmramAtDefaultSmbase = FALSE;
   if (FeaturePcdGet (PcdCsmEnable)) {
     DEBUG ((
       DEBUG_INFO,
@@ -106,19 +106,19 @@ Q35SmramAtDefaultSmbaseInitialization (
     CtlReg = DRAMC_REGISTER_Q35 (MCH_DEFAULT_SMBASE_CTL);
     PciWrite8 (CtlReg, MCH_DEFAULT_SMBASE_QUERY);
     CtlRegVal                                = PciRead8 (CtlReg);
-    mPlatformInfoHob.Q35SmramAtDefaultSmbase = (BOOLEAN)(CtlRegVal ==
+    PlatformInfoHob->Q35SmramAtDefaultSmbase = (BOOLEAN)(CtlRegVal ==
                                                          MCH_DEFAULT_SMBASE_IN_RAM);
     DEBUG ((
       DEBUG_INFO,
       "%a: SMRAM at default SMBASE %a\n",
       __FUNCTION__,
-      mPlatformInfoHob.Q35SmramAtDefaultSmbase ? "found" : "not found"
+      PlatformInfoHob->Q35SmramAtDefaultSmbase ? "found" : "not found"
       ));
   }
 
   PcdStatus = PcdSetBoolS (
                 PcdQ35SmramAtDefaultSmbase,
-                mPlatformInfoHob.Q35SmramAtDefaultSmbase
+                PlatformInfoHob->Q35SmramAtDefaultSmbase
                 );
   ASSERT_RETURN_ERROR (PcdStatus);
 }
