@@ -62,7 +62,7 @@ MaxCpuCountInitialization (
 
 EFI_STATUS
 PeiFvInitialization (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 VOID
