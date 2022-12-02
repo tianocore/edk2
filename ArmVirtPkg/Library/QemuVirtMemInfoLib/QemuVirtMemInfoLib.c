@@ -27,7 +27,7 @@
 #define MACH_VIRT_PERIPH_SIZE  SIZE_128MB
 
 /**
-  Default library constructur that obtains the memory size from a PCD.
+  Default library constructor that obtains the memory size from a PCD.
 
   @return  Always returns RETURN_SUCCESS
 
