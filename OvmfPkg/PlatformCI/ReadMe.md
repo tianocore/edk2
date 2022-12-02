@@ -31,6 +31,9 @@ Pytools build system.
 
 ## Building with Pytools for OvmfPkg
 
+If you are unfamiliar with Pytools, it is recommended to first read through
+the generic set of edk2 [Build Instructions](https://github.com/tianocore/tianocore.github.io/wiki/Build-Instructions).
+
 1. [Optional] Create a Python Virtual Environment - generally once per workspace
 
     ``` bash

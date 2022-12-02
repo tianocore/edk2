@@ -53,7 +53,10 @@ these binary outputs:
 * OvmfVideo.rom
   - This file is not built separately any longer, starting with svn r13520.
 
-More information on building OVMF can be found at:
+If you are new to building in edk2 or looking for the latest build
+instructions, visit https://github.com/tianocore/tianocore.github.io/wiki/Build-Instructions
+
+More OVMF-specific build information can be found at:
 
 https://github.com/tianocore/tianocore.github.io/wiki/How%20to%20build%20OVMF
 
