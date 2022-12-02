@@ -82,7 +82,7 @@ InstallClearCacheCallback (
 
 VOID
 AmdSevInitialize (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 /**

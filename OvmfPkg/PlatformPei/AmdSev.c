@@ -201,7 +201,7 @@ GhcbRegister (
 STATIC
 VOID
 AmdSevEsInitialize (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   UINT8                *GhcbBase;
@@ -228,7 +228,7 @@ AmdSevEsInitialize (
   //   Since the pages must survive across the UEFI to OS transition
   //   make them reserved.
   //
-  GhcbPageCount = mPlatformInfoHob.PcdCpuMaxLogicalProcessorNumber * 2;
+  GhcbPageCount = PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber * 2;
   GhcbBase      = AllocateReservedPages (GhcbPageCount);
   ASSERT (GhcbBase != NULL);
 
@@ -266,7 +266,7 @@ AmdSevEsInitialize (
   // Allocate #VC recursion backup pages. The number of backup pages needed is
   // one less than the maximum VC count.
   //
-  GhcbBackupPageCount = mPlatformInfoHob.PcdCpuMaxLogicalProcessorNumber * (VMGEXIT_MAXIMUM_VC_COUNT - 1);
+  GhcbBackupPageCount = PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber * (VMGEXIT_MAXIMUM_VC_COUNT - 1);
   GhcbBackupBase      = AllocatePages (GhcbBackupPageCount);
   ASSERT (GhcbBackupBase != NULL);
 
@@ -320,7 +320,7 @@ AmdSevEsInitialize (
   **/
 VOID
 AmdSevInitialize (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   UINT64         EncryptionMask;
@@ -367,7 +367,7 @@ AmdSevInitialize (
   // until after re-encryption, in order to prevent an information leak to the
   // hypervisor.
   //
-  if (mPlatformInfoHob.SmmSmramRequire && (mPlatformInfoHob.BootMode != BOOT_ON_S3_RESUME)) {
+  if (PlatformInfoHob->SmmSmramRequire && (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME)) {
     RETURN_STATUS  LocateMapStatus;
     UINTN          MapPagesBase;
     UINTN          MapPagesCount;
@@ -378,7 +378,7 @@ AmdSevInitialize (
                         );
     ASSERT_RETURN_ERROR (LocateMapStatus);
 
-    if (mPlatformInfoHob.Q35SmramAtDefaultSmbase) {
+    if (PlatformInfoHob->Q35SmramAtDefaultSmbase) {
       //
       // The initial SMRAM Save State Map has been covered as part of a larger
       // reserved memory allocation in InitializeRamRegions().
@@ -400,7 +400,7 @@ AmdSevInitialize (
   //
   // Check and perform SEV-ES initialization if required.
   //
-  AmdSevEsInitialize ();
+  AmdSevEsInitialize (PlatformInfoHob);
 
   //
   // Set the Confidential computing attr PCD to communicate which SEV
