@@ -32,7 +32,7 @@ Q35SmramAtDefaultSmbaseInitialization (
 
 EFI_STATUS
 PublishPeiMemory (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 VOID
