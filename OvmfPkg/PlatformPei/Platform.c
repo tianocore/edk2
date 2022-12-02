@@ -231,13 +231,14 @@ ReserveEmuVariableNvStore (
   ASSERT_RETURN_ERROR (PcdStatus);
 }
 
+STATIC
 VOID
 S3Verification (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
  #if defined (MDE_CPU_X64)
-  if (mPlatformInfoHob.SmmSmramRequire && mPlatformInfoHob.S3Supported) {
+  if (PlatformInfoHob->SmmSmramRequire && PlatformInfoHob->S3Supported) {
     DEBUG ((
       DEBUG_ERROR,
       "%a: S3Resume2Pei doesn't support X64 PEI + SMM yet.\n",
@@ -260,12 +261,13 @@ S3Verification (
  #endif
 }
 
+STATIC
 VOID
 Q35BoardVerification (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  if (mPlatformInfoHob.HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+  if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     return;
   }
 
@@ -274,7 +276,7 @@ Q35BoardVerification (
     "%a: no TSEG (SMRAM) on host bridge DID=0x%04x; "
     "only DID=0x%04x (Q35) is supported\n",
     __FUNCTION__,
-    mPlatformInfoHob.HostBridgeDevId,
+    PlatformInfoHob->HostBridgeDevId,
     INTEL_Q35_MCH_DEVICE_ID
     ));
   ASSERT (FALSE);
@@ -345,7 +347,7 @@ InitializePlatform (
     ASSERT_EFI_ERROR (Status);
   }
 
-  S3Verification ();
+  S3Verification (&mPlatformInfoHob);
   BootModeInitialization (&mPlatformInfoHob);
 
   //
@@ -357,7 +359,7 @@ InitializePlatform (
   MaxCpuCountInitialization (&mPlatformInfoHob);
 
   if (mPlatformInfoHob.SmmSmramRequire) {
-    Q35BoardVerification ();
+    Q35BoardVerification (&mPlatformInfoHob);
     Q35TsegMbytesInitialization (&mPlatformInfoHob);
     Q35SmramAtDefaultSmbaseInitialization (&mPlatformInfoHob);
   }
