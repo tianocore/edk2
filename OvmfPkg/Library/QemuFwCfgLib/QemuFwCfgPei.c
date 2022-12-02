@@ -13,7 +13,6 @@
 #include <Library/IoLib.h>
 #include <Library/DebugLib.h>
 #include <Library/QemuFwCfgLib.h>
-#include <Library/MemEncryptSevLib.h>
 #include <WorkArea.h>
 
 #include "QemuFwCfgLibInternal.h"
@@ -27,15 +26,16 @@ STATIC BOOLEAN  mQemuFwCfgDmaSupported;
   @retval    TRUE   It is Tdx guest
   @retval    FALSE  It is not Tdx guest
 **/
+STATIC
 BOOLEAN
-QemuFwCfgIsTdxGuest (
+QemuFwCfgIsCcGuest (
   VOID
   )
 {
   CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER  *CcWorkAreaHeader;
 
   CcWorkAreaHeader = (CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER *)FixedPcdGet32 (PcdOvmfWorkAreaBase);
-  return (CcWorkAreaHeader != NULL && CcWorkAreaHeader->GuestType == CcGuestTypeIntelTdx);
+  return (CcWorkAreaHeader != NULL && CcWorkAreaHeader->GuestType != CcGuestTypeNonEncrypted);
 }
 
 /**
@@ -57,62 +57,49 @@ QemuFwCfgIsAvailable (
   return InternalQemuFwCfgIsAvailable ();
 }
 
+STATIC
+VOID
+QemuFwCfgProbe (
+  BOOLEAN  *Supported,
+  BOOLEAN  *DmaSupported
+  )
+{
+  UINT32   Signature;
+  UINT32   Revision;
+  BOOLEAN  CcGuest;
+
+  // Use direct Io* calls for probing to avoid recursion.
+  IoWrite16 (FW_CFG_IO_SELECTOR, (UINT16)QemuFwCfgItemSignature);
+  IoReadFifo8 (FW_CFG_IO_DATA, sizeof Signature, &Signature);
+  IoWrite16 (FW_CFG_IO_SELECTOR, (UINT16)QemuFwCfgItemInterfaceVersion);
+  IoReadFifo8 (FW_CFG_IO_DATA, sizeof Revision, &Revision);
+  CcGuest = QemuFwCfgIsCcGuest ();
+
+  *Supported    = FALSE;
+  *DmaSupported = FALSE;
+  if ((Signature == SIGNATURE_32 ('Q', 'E', 'M', 'U')) && (Revision >= 1)) {
+    *Supported = TRUE;
+    if ((Revision & FW_CFG_F_DMA) && !CcGuest) {
+      *DmaSupported = TRUE;
+    }
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: Supported %d, DMA %d\n",
+    __func__,
+    *Supported,
+    *DmaSupported
+    ));
+}
+
 RETURN_STATUS
 EFIAPI
 QemuFwCfgInitialize (
   VOID
   )
 {
-  UINT32  Signature;
-  UINT32  Revision;
-
-  //
-  // Enable the access routines while probing to see if it is supported.
-  // For probing we always use the IO Port (IoReadFifo8()) access method.
-  //
-  mQemuFwCfgSupported    = TRUE;
-  mQemuFwCfgDmaSupported = FALSE;
-
-  QemuFwCfgSelectItem (QemuFwCfgItemSignature);
-  Signature = QemuFwCfgRead32 ();
-  DEBUG ((DEBUG_INFO, "FW CFG Signature: 0x%x\n", Signature));
-  QemuFwCfgSelectItem (QemuFwCfgItemInterfaceVersion);
-  Revision = QemuFwCfgRead32 ();
-  DEBUG ((DEBUG_INFO, "FW CFG Revision: 0x%x\n", Revision));
-  if ((Signature != SIGNATURE_32 ('Q', 'E', 'M', 'U')) ||
-      (Revision < 1)
-      )
-  {
-    DEBUG ((DEBUG_INFO, "QemuFwCfg interface not supported.\n"));
-    mQemuFwCfgSupported = FALSE;
-    return RETURN_SUCCESS;
-  }
-
-  if ((Revision & FW_CFG_F_DMA) == 0) {
-    DEBUG ((DEBUG_INFO, "QemuFwCfg interface (IO Port) is supported.\n"));
-  } else {
-    //
-    // If SEV is enabled then we do not support DMA operations in PEI phase.
-    // This is mainly because DMA in SEV guest requires using bounce buffer
-    // (which need to allocate dynamic memory and allocating a PAGE size'd
-    // buffer can be challenge in PEI phase)
-    //
-    if (MemEncryptSevIsEnabled ()) {
-      DEBUG ((DEBUG_INFO, "SEV: QemuFwCfg fallback to IO Port interface.\n"));
-    } else if (QemuFwCfgIsTdxGuest ()) {
-      //
-      // If TDX is enabled then we do not support DMA operations in PEI phase.
-      // This is mainly because DMA in TDX guest requires using bounce buffer
-      // (which need to allocate dynamic memory and allocating a PAGE size'd
-      // buffer can be challenge in PEI phase)
-      //
-      DEBUG ((DEBUG_INFO, "TDX: QemuFwCfg fallback to IO Port interface.\n"));
-    } else {
-      mQemuFwCfgDmaSupported = TRUE;
-      DEBUG ((DEBUG_INFO, "QemuFwCfg interface (DMA) is supported.\n"));
-    }
-  }
-
+  QemuFwCfgProbe (&mQemuFwCfgSupported, &mQemuFwCfgDmaSupported);
   return RETURN_SUCCESS;
 }
 
@@ -184,16 +171,10 @@ InternalQemuFwCfgDmaBytes (
   }
 
   //
-  // SEV does not support DMA operations in PEI stage, we should
-  // not have reached here.
-  //
-  ASSERT (!MemEncryptSevIsEnabled ());
-
-  //
   // TDX does not support DMA operations in PEI stage, we should
   // not have reached here.
   //
-  ASSERT (!QemuFwCfgIsTdxGuest ());
+  ASSERT (!QemuFwCfgIsCcGuest ());
 
   Access.Control = SwapBytes32 (Control);
   Access.Length  = SwapBytes32 (Size);

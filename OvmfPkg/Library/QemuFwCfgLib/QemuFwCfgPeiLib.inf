@@ -41,7 +41,6 @@
   DebugLib
   IoLib
   MemoryAllocationLib
-  MemEncryptSevLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
