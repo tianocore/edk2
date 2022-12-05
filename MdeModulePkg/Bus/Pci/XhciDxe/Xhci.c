@@ -906,19 +906,16 @@ XhcControlTransfer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((MaximumPacketLength != 8)  && (MaximumPacketLength != 16) &&
-      (MaximumPacketLength != 32) && (MaximumPacketLength != 64) &&
-      (MaximumPacketLength != 512)
-      )
-  {
+  // Check for valid maximum packet size
+  if ((DeviceSpeed == EFI_USB_SPEED_SUPER) && (MaximumPacketLength > 1024)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((DeviceSpeed == EFI_USB_SPEED_LOW) && (MaximumPacketLength != 8)) {
+  if ((DeviceSpeed == EFI_USB_SPEED_HIGH) && (MaximumPacketLength > 512)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((DeviceSpeed == EFI_USB_SPEED_SUPER) && (MaximumPacketLength != 512)) {
+  if ((DeviceSpeed == EFI_USB_SPEED_FULL) && (MaximumPacketLength > 64)) {
     return EFI_INVALID_PARAMETER;
   }
 
