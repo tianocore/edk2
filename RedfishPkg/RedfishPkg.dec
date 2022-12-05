@@ -17,7 +17,6 @@
   Include
 
 [Includes.Common.Private]
-  PrivateInclude                # Private header files for C RTL.
   PrivateInclude/Crt            # Private header files for C RTL.
   Library/JsonLib               # Private header files for jansson
                                 # configuration files.
