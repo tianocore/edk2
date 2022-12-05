@@ -371,6 +371,7 @@ XhcGetRootHubPortStatus (
   UINT32             TotalPort;
   UINTN              Index;
   UINTN              MapSize;
+  UINT8              PortSpeed;
   EFI_STATUS         Status;
   USB_DEV_ROUTE      ParentRouteChart;
   EFI_TPL            OldTpl;
@@ -397,32 +398,37 @@ XhcGetRootHubPortStatus (
 
   State = XhcReadOpReg (Xhc, Offset);
 
+  PortSpeed = (State & XHC_PORTSC_PS) >> 10;
+
   //
   // According to XHCI 1.1 spec November 2017,
   // Section 7.2 xHCI Support Protocol Capability
   //
-  PortStatus->PortStatus = XhcCheckUsbPortSpeedUsedPsic (Xhc, ((State & XHC_PORTSC_PS) >> 10));
-  if (PortStatus->PortStatus == 0) {
-    //
-    // According to XHCI 1.1 spec November 2017,
-    // bit 10~13 of the root port status register identifies the speed of the attached device.
-    //
-    switch ((State & XHC_PORTSC_PS) >> 10) {
-      case 2:
-        PortStatus->PortStatus |= USB_PORT_STAT_LOW_SPEED;
-        break;
+  if (PortSpeed > 0) {
+    PortStatus->PortStatus = XhcCheckUsbPortSpeedUsedPsic (Xhc, PortSpeed);
+    // If no match found in ext cap reg, fall back to PORTSC
+    if (PortStatus->PortStatus == 0) {
+      //
+      // According to XHCI 1.1 spec November 2017,
+      // bit 10~13 of the root port status register identifies the speed of the attached device.
+      //
+      switch (PortSpeed) {
+        case 2:
+          PortStatus->PortStatus |= USB_PORT_STAT_LOW_SPEED;
+          break;
 
-      case 3:
-        PortStatus->PortStatus |= USB_PORT_STAT_HIGH_SPEED;
-        break;
+        case 3:
+          PortStatus->PortStatus |= USB_PORT_STAT_HIGH_SPEED;
+          break;
 
-      case 4:
-      case 5:
-        PortStatus->PortStatus |= USB_PORT_STAT_SUPER_SPEED;
-        break;
+        case 4:
+        case 5:
+          PortStatus->PortStatus |= USB_PORT_STAT_SUPER_SPEED;
+          break;
 
-      default:
-        break;
+        default:
+          break;
+      }
     }
   }
 
