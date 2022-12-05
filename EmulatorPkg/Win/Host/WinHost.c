@@ -226,12 +226,26 @@ WinReset (
   IN VOID            *ResetData OPTIONAL
   )
 {
+  UINTN  Index;
+
   ASSERT (ResetType <= EfiResetPlatformSpecific);
   SecPrint ("  Emu ResetSystem is called: ResetType = %s\n", mResetTypeStr[ResetType]);
 
   if (ResetType == EfiResetShutdown) {
     exit (0);
   } else {
+    //
+    // Unload all DLLs
+    //
+    for (Index = 0; Index < mPdbNameModHandleArraySize; Index++) {
+      if (mPdbNameModHandleArray[Index].PdbPointer != NULL) {
+        SecPrint ("  Emu Unload DLL: %s\n", mPdbNameModHandleArray[Index].PdbPointer);
+        FreeLibrary (mPdbNameModHandleArray[Index].ModHandle);
+        HeapFree (GetProcessHeap (), 0, mPdbNameModHandleArray[Index].PdbPointer);
+        mPdbNameModHandleArray[Index].PdbPointer = NULL;
+      }
+    }
+
     //
     // Jump back to SetJump with jump code = ResetType + 1
     //
