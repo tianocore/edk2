@@ -462,6 +462,7 @@ F: OvmfPkg/Library/ResetSystemLib/BaseResetShutdownBhyve.c
 F: OvmfPkg/Library/ResetSystemLib/BaseResetSystemLibBhyve.inf
 R: Rebecca Cran <rebecca@bsdio.com> [bcran]
 R: Peter Grehan <grehan@freebsd.org> [grehan-freebsd]
+R: Corvin Köhne <corvink@freebsd.org> [corvink]
 
 OvmfPkg: cloudhv-related modules
 F: OvmfPkg/CloudHv/
