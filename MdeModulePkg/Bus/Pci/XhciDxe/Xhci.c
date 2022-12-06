@@ -1242,6 +1242,7 @@ XhcBulkTransfer (
   UINT8              SlotId;
   EFI_STATUS         Status;
   EFI_TPL            OldTpl;
+  UINTN              DebugErrorLevel;
 
   //
   // Validate the parameters
@@ -1304,7 +1305,13 @@ XhcBulkTransfer (
 
 ON_EXIT:
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "XhcBulkTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
+    if (Status == EFI_TIMEOUT) {
+      DebugErrorLevel = DEBUG_VERBOSE;
+    } else {
+      DebugErrorLevel = DEBUG_ERROR;
+    }
+
+    DEBUG ((DebugErrorLevel, "XhcBulkTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
   }
 
   gBS->RestoreTPL (OldTpl);

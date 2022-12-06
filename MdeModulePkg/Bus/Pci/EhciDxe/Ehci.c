@@ -848,6 +848,7 @@ EhcBulkTransfer (
   URB          *Urb;
   EFI_TPL      OldTpl;
   EFI_STATUS   Status;
+  UINTN        DebugErrorLevel;
 
   //
   // Validate the parameters
@@ -932,7 +933,13 @@ ON_EXIT:
   gBS->RestoreTPL (OldTpl);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "EhcBulkTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
+    if (Status == EFI_TIMEOUT) {
+      DebugErrorLevel = DEBUG_VERBOSE;
+    } else {
+      DebugErrorLevel = DEBUG_ERROR;
+    }
+
+    DEBUG ((DebugErrorLevel, "EhcBulkTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
   }
 
   return Status;
