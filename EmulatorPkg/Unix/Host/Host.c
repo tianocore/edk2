@@ -145,6 +145,9 @@ main (
   }
 
   CopyMem (SecEmuThunkPpi, &mSecEmuThunkPpi, sizeof (EMU_THUNK_PPI));
+  SecEmuThunkPpi->Argc                 = Argc;
+  SecEmuThunkPpi->Argv                 = Argv;
+  SecEmuThunkPpi->Envp                 = Envp;
   SecEmuThunkPpi->PersistentMemorySize = FixedPcdGet32 (PcdPersistentMemorySize);
   AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gEmuThunkPpiGuid, SecEmuThunkPpi);
 

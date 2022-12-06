@@ -107,6 +107,9 @@ typedef struct {
   EMU_PEI_AUTOSCAN           MemoryAutoScan;
   EMU_PEI_FD_INFORMATION     FirmwareDevices;
   EMU_PEI_THUNK_INTERFACE    Thunk;
+  INTN                       Argc;
+  CHAR8                      **Argv;
+  CHAR8                      **Envp;
   UINTN                      PersistentMemorySize;
   UINT8                      PersistentMemory[0];
 } EMU_THUNK_PPI;
