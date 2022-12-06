@@ -450,6 +450,7 @@ Returns:
   UINTN                SystemAffinityMask;
   INT32                LowBit;
   UINTN                ResetJumpCode;
+  EMU_THUNK_PPI        *SecEmuThunkPpi;
 
   //
   // Enable the privilege so that RTC driver can successfully run SetTime()
@@ -491,7 +492,15 @@ Returns:
   //
   // PPIs pased into PEI_CORE
   //
-  AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gEmuThunkPpiGuid, &mSecEmuThunkPpi);
+  SecEmuThunkPpi = AllocateZeroPool (sizeof (EMU_THUNK_PPI) + FixedPcdGet32 (PcdPersistentMemorySize));
+  if (SecEmuThunkPpi == NULL) {
+    SecPrint ("ERROR : Can not allocate memory for SecEmuThunkPpi.  Exiting.\n");
+    exit (1);
+  }
+
+  CopyMem (SecEmuThunkPpi, &mSecEmuThunkPpi, sizeof (EMU_THUNK_PPI));
+  SecEmuThunkPpi->PersistentMemorySize = FixedPcdGet32 (PcdPersistentMemorySize);
+  AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gEmuThunkPpiGuid, SecEmuThunkPpi);
   AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gEfiPeiReset2PpiGuid, &mEmuReset2Ppi);
 
   //
