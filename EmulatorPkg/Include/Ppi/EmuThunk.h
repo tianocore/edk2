@@ -2,7 +2,7 @@
   Emulator Thunk to abstract OS services from pure EFI code
 
   Copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
-
+  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -107,6 +107,8 @@ typedef struct {
   EMU_PEI_AUTOSCAN           MemoryAutoScan;
   EMU_PEI_FD_INFORMATION     FirmwareDevices;
   EMU_PEI_THUNK_INTERFACE    Thunk;
+  UINTN                      PersistentMemorySize;
+  UINT8                      PersistentMemory[0];
 } EMU_THUNK_PPI;
 
 extern EFI_GUID  gEmuThunkPpiGuid;

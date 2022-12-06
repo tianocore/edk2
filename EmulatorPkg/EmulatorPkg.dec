@@ -2,7 +2,7 @@
 #
 # This is the Emu Emulation Environment Platform
 #
-# Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2022, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2011, Apple Inc. All rights reserved.
 # (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 #
@@ -86,6 +86,7 @@
   # The user ID and password are fixed as below.
   gEmulatorPkgTokenSpaceGuid.PcdRedfishServieUserId|"admin"|VOID*|0x00001022
   gEmulatorPkgTokenSpaceGuid.PcdRedfishServiePassword|"pwd123456"|VOID*|0x00001023
+  gEmulatorPkgTokenSpaceGuid.PcdPersistentMemorySize|0x4000000|UINT32|0x00001024
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   gEmulatorPkgTokenSpaceGuid.PcdEmuBootMode|1|UINT32|0x00001006

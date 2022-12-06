@@ -74,7 +74,7 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
-
+  gEmulatorPkgTokenSpaceGuid.PcdPersistentMemorySize
   gEmulatorPkgTokenSpaceGuid.PcdEmuBootMode
   gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareVolume
   gEmulatorPkgTokenSpaceGuid.PcdEmuMemorySize
