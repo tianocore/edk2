@@ -4,7 +4,7 @@
   (eg. a reboot-based test).
 
   Copyright (c) Microsoft Corporation.<BR>
-  Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -12,7 +12,7 @@
 #ifndef _UNIT_TEST_PERSISTENCE_LIB_H_
 #define _UNIT_TEST_PERSISTENCE_LIB_H_
 
-#include <UnitTestFrameworkTypes.h>
+#include <Library/UnitTestLib.h>
 
 #define UNIT_TEST_PERSISTENCE_LIB_VERSION  1
 
@@ -40,6 +40,7 @@ DoesCacheExist (
   @param[in]  FrameworkHandle   A pointer to the framework that is being persisted.
   @param[in]  SaveData          A pointer to the buffer containing the serialized
                                 framework internal state.
+  @param[in]  SaveStateSize     The size of SaveData in bytes.
 
   @retval     EFI_SUCCESS   Data is persisted and the test can be safely quit.
   @retval     Others        Data is not persisted and test cannot be resumed upon exit.
@@ -49,7 +50,8 @@ EFI_STATUS
 EFIAPI
 SaveUnitTestCache (
   IN UNIT_TEST_FRAMEWORK_HANDLE  FrameworkHandle,
-  IN UNIT_TEST_SAVE_HEADER       *SaveData
+  IN VOID                        *SaveData,
+  IN UINTN                       SaveStateSize
   );
 
 /**
@@ -57,8 +59,9 @@ SaveUnitTestCache (
   Will allocate a buffer to hold the loaded data.
 
   @param[in]  FrameworkHandle   A pointer to the framework that is being persisted.
-  @param[in]  SaveData          A pointer pointer that will be updated with the address
+  @param[out] SaveData          A pointer pointer that will be updated with the address
                                 of the loaded data buffer.
+  @param[out] SaveStateSize     Return the size of SaveData in bytes.
 
   @retval     EFI_SUCCESS       Data has been loaded successfully and SaveData is updated
                                 with a pointer to the buffer.
@@ -70,7 +73,8 @@ EFI_STATUS
 EFIAPI
 LoadUnitTestCache (
   IN  UNIT_TEST_FRAMEWORK_HANDLE  FrameworkHandle,
-  OUT UNIT_TEST_SAVE_HEADER       **SaveData
+  OUT VOID                        **SaveData,
+  OUT UINTN                       *SaveStateSize
   );
 
 #endif

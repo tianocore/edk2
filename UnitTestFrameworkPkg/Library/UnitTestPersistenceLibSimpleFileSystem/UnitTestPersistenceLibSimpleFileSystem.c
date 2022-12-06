@@ -4,6 +4,7 @@
   version of the internal test state in case the test needs to quit and restore.
 
   Copyright (c) Microsoft Corporation.<BR>
+  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -16,6 +17,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/ShellLib.h>
 #include <Protocol/LoadedImage.h>
+#include <UnitTestFrameworkTypes.h>
 
 #define CACHE_FILE_SUFFIX  L"_Cache.dat"
 
@@ -213,6 +215,7 @@ DoesCacheExist (
   @param[in]  FrameworkHandle  A pointer to the framework that is being persisted.
   @param[in]  SaveData         A pointer to the buffer containing the serialized
                                framework internal state.
+  @param[in]  SaveStateSize    The size of SaveData in bytes.
 
   @retval  EFI_SUCCESS  Data is persisted and the test can be safely quit.
   @retval  Others       Data is not persisted and test cannot be resumed upon exit.
@@ -222,7 +225,8 @@ EFI_STATUS
 EFIAPI
 SaveUnitTestCache (
   IN UNIT_TEST_FRAMEWORK_HANDLE  FrameworkHandle,
-  IN UNIT_TEST_SAVE_HEADER       *SaveData
+  IN VOID                        *SaveData,
+  IN UINTN                       SaveStateSize
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *FileDevicePath;
@@ -280,7 +284,7 @@ SaveUnitTestCache (
   //
   // Write the data to the file.
   //
-  WriteCount = SaveData->SaveStateSize;
+  WriteCount = SaveStateSize;
   DEBUG ((DEBUG_INFO, "%a - Writing %d bytes to file...\n", __FUNCTION__, WriteCount));
   Status = ShellWriteFile (
              FileHandle,
@@ -288,7 +292,7 @@ SaveUnitTestCache (
              SaveData
              );
 
-  if (EFI_ERROR (Status) || (WriteCount != SaveData->SaveStateSize)) {
+  if (EFI_ERROR (Status) || (WriteCount != SaveStateSize)) {
     DEBUG ((DEBUG_ERROR, "%a - Writing to file failed! %r\n", __FUNCTION__, Status));
   } else {
     DEBUG ((DEBUG_INFO, "%a - SUCCESS!\n", __FUNCTION__));
@@ -312,8 +316,9 @@ Exit:
   Will allocate a buffer to hold the loaded data.
 
   @param[in]  FrameworkHandle  A pointer to the framework that is being persisted.
-  @param[in]  SaveData         A pointer pointer that will be updated with the address
+  @param[out] SaveData         A pointer pointer that will be updated with the address
                                of the loaded data buffer.
+  @param[out] SaveStateSize    Return the size of SaveData in bytes.
 
   @retval  EFI_SUCCESS  Data has been loaded successfully and SaveData is updated
                         with a pointer to the buffer.
@@ -325,7 +330,8 @@ EFI_STATUS
 EFIAPI
 LoadUnitTestCache (
   IN  UNIT_TEST_FRAMEWORK_HANDLE  FrameworkHandle,
-  OUT UNIT_TEST_SAVE_HEADER       **SaveData
+  OUT VOID                        **SaveData,
+  OUT UINTN                       *SaveStateSize
   )
 {
   EFI_STATUS                Status;
@@ -334,7 +340,7 @@ LoadUnitTestCache (
   BOOLEAN                   IsFileOpened;
   UINT64                    LargeFileSize;
   UINTN                     FileSize;
-  UNIT_TEST_SAVE_HEADER     *Buffer;
+  VOID                      *Buffer;
 
   IsFileOpened = FALSE;
   Buffer       = NULL;
@@ -380,8 +386,9 @@ LoadUnitTestCache (
   //
   // Now that we know the size, let's allocated a buffer to hold the contents.
   //
-  FileSize = (UINTN)LargeFileSize;    // You know what... if it's too large, this lib don't care.
-  Buffer   = AllocatePool (FileSize);
+  FileSize       = (UINTN)LargeFileSize; // You know what... if it's too large, this lib don't care.
+  *SaveStateSize = FileSize;
+  Buffer         = AllocatePool (FileSize);
   if (Buffer == NULL) {
     DEBUG ((DEBUG_ERROR, "%a - Failed to allocate a pool to hold the file contents! %r\n", __FUNCTION__, Status));
     Status = EFI_OUT_OF_RESOURCES;
