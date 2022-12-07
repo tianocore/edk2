@@ -229,6 +229,22 @@ PlatformScanOrAdd64BitE820Ram (
             ));
         }
       }
+    } else if (E820Entry.Type == EfiAcpiAddressRangeReserved) {
+      if (AddHighHob) {
+        DEBUG ((
+          DEBUG_INFO,
+          "%a: Reserved: Base=0x%Lx Length=0x%Lx\n",
+          __FUNCTION__,
+          E820Entry.BaseAddr,
+          E820Entry.Length
+          ));
+        BuildResourceDescriptorHob (
+          EFI_RESOURCE_MEMORY_RESERVED,
+          0,
+          E820Entry.BaseAddr,
+          E820Entry.Length
+          );
+      }
     }
   }
 
