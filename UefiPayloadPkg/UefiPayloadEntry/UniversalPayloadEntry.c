@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2021 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -310,6 +310,7 @@ BuildHobs (
   UNIVERSAL_PAYLOAD_ACPI_TABLE  *AcpiTable;
   ACPI_BOARD_INFO               *AcpiBoardInfo;
   EFI_HOB_HANDOFF_INFO_TABLE    *HobInfo;
+  UINT32                        Index;
 
   Hob.Raw           = (UINT8 *)BootloaderParameter;
   MinimalNeededSize = FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
@@ -397,11 +398,25 @@ BuildHobs (
   GuidHob = GetFirstGuidHob (&gUniversalPayloadExtraDataGuid);
   ASSERT (GuidHob != NULL);
   ExtraData = (UNIVERSAL_PAYLOAD_EXTRA_DATA *)GET_GUID_HOB_DATA (GuidHob);
-  ASSERT (ExtraData->Count == 1);
   ASSERT (AsciiStrCmp (ExtraData->Entry[0].Identifier, "uefi_fv") == 0);
 
   *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)ExtraData->Entry[0].Base;
   ASSERT ((*DxeFv)->FvLength == ExtraData->Entry[0].Size);
+
+  //
+  // Update DXE FV information to first fv hob in the hob list, which
+  // is the empty FvHob created before.
+  //
+  FvHob              = GetFirstHob (EFI_HOB_TYPE_FV);
+  FvHob->BaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)*DxeFv;
+  FvHob->Length      = (*DxeFv)->FvLength;
+
+  //
+  // Build other FV HOBs
+  //
+  for (Index = 1; Index < ExtraData->Count; Index++) {
+    BuildFvHob ((EFI_PHYSICAL_ADDRESS)ExtraData->Entry[Index].Base, ExtraData->Entry[Index].Size);
+  }
 
   //
   // Create guid hob for acpi board information
@@ -413,13 +428,6 @@ BuildHobs (
     ASSERT (AcpiBoardInfo != NULL);
   }
 
-  //
-  // Update DXE FV information to first fv hob in the hob list, which
-  // is the empty FvHob created before.
-  //
-  FvHob              = GetFirstHob (EFI_HOB_TYPE_FV);
-  FvHob->BaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)*DxeFv;
-  FvHob->Length      = (*DxeFv)->FvLength;
   return EFI_SUCCESS;
 }
 
