@@ -7,7 +7,9 @@
 ##
 {
     "LicenseCheck": {
-        "IgnoreFiles": []
+        "IgnoreFiles": [
+            "DeviceSecurity/SpdmLib/Include",
+        ]
     },
     "EccCheck": {
         ## Exception sample looks like below:
@@ -21,7 +23,9 @@
         "IgnoreFiles": [
             "Library/TcgStorageCoreLib/TcgStorageUtil.c",
             "Library/TcgStorageCoreLib/TcgStorageCore.c",
-            "Library/Tpm2CommandLib/Tpm2NVStorage.c"
+            "Library/Tpm2CommandLib/Tpm2NVStorage.c",
+            "DeviceSecurity/SpdmLib/Include",
+            "DeviceSecurity/OsStub"
         ]
     },
     "CompilerPlugin": {
@@ -67,7 +71,11 @@
         ]
     },
     "LibraryClassCheck": {
-        "IgnoreHeaderFile": []
+        "IgnoreHeaderFile": [
+            "DeviceSecurity/SpdmLib/Include/library",
+            "DeviceSecurity/SpdmLib/libspdm/include/library",
+        ],
+        "skip": True
     },
 
     ## options defined ci/Plugin/SpellCheck
