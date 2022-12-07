@@ -1097,7 +1097,7 @@ CoreFindFreePagesI (
       DescEnd = MaxAddress;
     }
 
-    DescEnd = ((DescEnd + 1) & (~(Alignment - 1))) - 1;
+    DescEnd = ((DescEnd + 1) & (~((UINT64)Alignment - 1))) - 1;
 
     // Skip if DescEnd is less than DescStart after alignment clipping
     if (DescEnd < DescStart) {
