@@ -181,6 +181,7 @@ class EFI_IFR_DEFAULTSTORE(Structure):
         ('DefaultName', c_uint16),
         ('DefaultId', c_uint16),
     ]
+
 class EFI_IFR_VARSTORE(Structure):
     _pack_ = 1
     _fields_ = [
@@ -838,6 +839,7 @@ class EFI_IFR_OR(Structure):
     _pack_ = 1
     _fields_ = [
         ('Header', EFI_IFR_OP_HEADER),
+        ('Extend', c_ubyte) #########
 
     ]
 

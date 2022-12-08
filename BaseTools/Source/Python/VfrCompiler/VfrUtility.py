@@ -101,7 +101,7 @@ gInternalTypesTable = [
                   sizeof(EFI_GUID)),
 ]
 
-class CVfrVarDataTypeDB(object):
+class VfrVarDataTypeDB(object):
 
     def __init__(self):
         self.__PackAlign = DEFAULT_PACK_ALIGN
@@ -230,7 +230,7 @@ class CVfrVarDataTypeDB(object):
         if Action & VFR_PACK_SHOW:
             Msg = str.format('value of pragma pack(show) == %d' %
                              (self.__PackAlign))
-            gCVfrErrorHandle.PrintMsg(LineNum, 'Warning', Msg)
+            gVfrErrorHandle.PrintMsg(LineNum, 'Warning', Msg)
 
         if Action & VFR_PACK_PUSH:
             pNew = SVfrPackStackNode(Identifier, self.__PackAlign)
@@ -242,7 +242,7 @@ class CVfrVarDataTypeDB(object):
         if Action & VFR_PACK_POP:
             pNode = None
             if self.__PackStack == None:
-                gCVfrErrorHandle.PrintMsg(LineNum, 'Error', '#pragma pack(pop...) : more pops than pushes')
+                gVfrErrorHandle.PrintMsg(LineNum, 'Error', '#pragma pack(pop...) : more pops than pushes')
 
             pNode = self.__PackStack
             while pNode != None:
@@ -254,7 +254,7 @@ class CVfrVarDataTypeDB(object):
         if Action & VFR_PACK_ASSIGN:
             PackAlign = (Number + Number % 2) if (Number > 1) else Number
             if PackAlign == 0 or PackAlign > 16:
-                gCVfrErrorHandle.PrintMsg(LineNum, 'Error', "expected pragma parameter to be '1', '2', '4', '8', or '16'")
+                gVfrErrorHandle.PrintMsg(LineNum, 'Error', "expected pragma parameter to be '1', '2', '4', '8', or '16'")
             else:
                 self.__PackAlign = PackAlign
 
@@ -742,7 +742,7 @@ class SVfrDefaultStoreNode(object):
         self.Next = None
 
 
-class CVfrDefaultStore(object):
+class VfrDefaultStore(object):
 
     def __init__(self):
         self.__DefaultStoreList = None
@@ -767,11 +767,11 @@ class CVfrDefaultStore(object):
 
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def UpdateDefaultName(self, DefaultNode):
+    def UpdateDefaultStoreName(self, DefaultNode):
         pNode = self.__DefaultStoreList
         while pNode != None:
             if pNode.ObjAddr.DefaultId == DefaultNode.Data.GetDefaultId():
-                DefaultNode.Data.SetDefaultName(pNode.ObjAddr.DefaultName)
+                DefaultNode.Data.SetDefaultStoreName(pNode.RefName)
             pNode = pNode.Next
 
     def DefaultIdRegistered(self, DefaultId):
@@ -825,17 +825,17 @@ class CVfrDefaultStore(object):
         if pNode == None:
             return VfrReturnCode.VFR_RETURN_UNDEFINED
         # pNode.DefaultId sprintf (NewAltCfg, "%04x", pNode->mDefaultId)
-        gCVfrBufferConfig.Open()
-        if gCVfrBufferConfig.Select(VarStoreName, VarStoreGuid) == 0:
-            Returnvalue = gCVfrBufferConfig.Write('a', VarStoreName,
+        gVfrBufferConfig.Open()
+        if gVfrBufferConfig.Select(VarStoreName, VarStoreGuid) == 0:
+            Returnvalue = gVfrBufferConfig.Write('a', VarStoreName,
                                                   VarStoreGuid,
                                                   pNode.DefaultId, Type,
                                                   BaseInfo.Info.VarOffset,
                                                   BaseInfo.VarTotalSize, Value)
             if Returnvalue != 0:
-                gCVfrBufferConfig.Close()
+                gVfrBufferConfig.Close()
                 return VfrReturnCode(Returnvalue)
-        gCVfrBufferConfig.Close()
+        gVfrBufferConfig.Close()
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
 
@@ -920,7 +920,7 @@ class SConfigInfo():
         self.Next = None
         self.Value = Value
 
-class CVfrBufferConfig(object):
+class VfrBufferConfig(object):
     __metaclass__ = ABCMeta
 
     def __init__(self):
@@ -1035,7 +1035,7 @@ class CVfrBufferConfig(object):
             return 1
         return 0
 
-gCVfrBufferConfig = CVfrBufferConfig()
+gVfrBufferConfig = VfrBufferConfig()
 
 class EFI_VARSTORE_INFO(Structure):
     _pack_ = 1
@@ -1075,7 +1075,7 @@ class BufferVarStoreFieldInfoNode():
         self.Next = None
 
 
-class CVfrDataStorage(object):
+class VfrDataStorage(object):
 
     def __init__(self):
         self.__BufferVarStoreList = None  # SVfrVarStorageNode
@@ -1267,7 +1267,7 @@ class CVfrDataStorage(object):
         pNew.Next = self.__BufferVarStoreList
         self.__BufferVarStoreList = pNew
 
-        if gCVfrBufferConfig.Register(StoreName, Guid) != 0:
+        if gVfrBufferConfig.Register(StoreName, Guid) != 0:
             return VfrReturnCode.VFR_RETURN_FATAL_ERROR
 
         return VfrReturnCode.VFR_RETURN_SUCCESS
@@ -1454,7 +1454,7 @@ class CVfrDataStorage(object):
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
 
-class CVfrStringDB(object):
+class VfrStringDB(object):
 
     def __init__(self):
         self.__StringFileName = ''
@@ -1469,7 +1469,7 @@ class CVfrStringDB(object):
         except IOError:
             print('Error')
 
-gCVfrStringDB = CVfrStringDB()
+gVfrStringDB = VfrStringDB()
 
 EFI_RULE_ID_START = 0x01
 EFI_RULE_ID_INVALID = 0x00
@@ -1483,7 +1483,7 @@ class SVfrRuleNode():
         self.Next = None
 
 
-class CVfrRulesDB(object):
+class VfrRulesDB(object):
 
     def __init__(self):
         self.__RuleList = None
@@ -1544,7 +1544,7 @@ TIME_MINUTE_BITMASK = 0x0000FF00
 TIME_SECOND_BITMASK = 0x00FF0000
 
 
-class CVfrQuestionDB(object):
+class VfrQuestionDB(object):
 
     def __init__(self):
         self.__FreeQIdBitMap = []
@@ -1617,7 +1617,7 @@ class CVfrQuestionDB(object):
         Offset = QId % EFI_BITS_PER_UINT32
         self.__FreeQIdBitMap[Index] &= ~(0x80000000 >> Offset)
 
-    def RegisterQuestion(self, Name, VarIdStr, QuestionId, gCFormPkg):
+    def RegisterQuestion(self, Name, VarIdStr, QuestionId, gFormPkg):
 
         if (Name != None) and (self.FindQuestionByName(Name) == VfrReturnCode.VFR_RETURN_SUCCESS):
             return QuestionId, VfrReturnCode.VFR_RETURN_REDEFINED
@@ -1637,11 +1637,11 @@ class CVfrQuestionDB(object):
         pNode.Next = self.__QuestionList
         self.__QuestionList = pNode
 
-        gCFormPkg.DoPendingAssign(VarIdStr, QuestionId)
+        gFormPkg.DoPendingAssign(VarIdStr, QuestionId)
 
         return QuestionId, VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def UpdateQuestionId(self, QId, NewQId, gCFormPkg):
+    def UpdateQuestionId(self, QId, NewQId, gFormPkg):
 
         if QId == NewQId:
             # don't update
@@ -1664,7 +1664,7 @@ class CVfrQuestionDB(object):
 
         for pNode in TempList:
             pNode.QuestionId = NewQId
-            gCFormPkg.DoPendingAssign(pNode.VarIdStr, NewQId)
+            gFormPkg.DoPendingAssign(pNode.VarIdStr, NewQId)
 
         self.__MarkQuestionIdUsed(NewQId)
 
@@ -1701,7 +1701,7 @@ class CVfrQuestionDB(object):
 
         return QuestionId, BitMask, QType
 
-    def RegisterNewDateQuestion(self, Name, BaseVarId, QuestionId, gCFormPkg):
+    def RegisterNewDateQuestion(self, Name, BaseVarId, QuestionId, gFormPkg):
 
         if BaseVarId == '' and Name == None:
             if QuestionId == EFI_QUESTION_ID_INVALID:
@@ -1760,13 +1760,13 @@ class CVfrQuestionDB(object):
         pNodeList[2].Next = self.__QuestionList
         self.__QuestionList = pNodeList[0]
 
-        gCFormPkg.DoPendingAssign(VarIdStrList[0], QuestionId)
-        gCFormPkg.DoPendingAssign(VarIdStrList[1], QuestionId)
-        gCFormPkg.DoPendingAssign(VarIdStrList[2], QuestionId)
+        gFormPkg.DoPendingAssign(VarIdStrList[0], QuestionId)
+        gFormPkg.DoPendingAssign(VarIdStrList[1], QuestionId)
+        gFormPkg.DoPendingAssign(VarIdStrList[2], QuestionId)
 
         return QuestionId, VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def RegisterNewTimeQuestion(self, Name, BaseVarId, QuestionId, gCFormPkg):
+    def RegisterNewTimeQuestion(self, Name, BaseVarId, QuestionId, gFormPkg):
         if BaseVarId == '' and Name == None:
             if QuestionId == EFI_QUESTION_ID_INVALID:
                 QuestionId = self.__GetFreeQuestionId()
@@ -1824,13 +1824,13 @@ class CVfrQuestionDB(object):
         pNodeList[2].Next = self.__QuestionList
         self.__QuestionList = pNodeList[0]
 
-        gCFormPkg.DoPendingAssign(VarIdStrList[0], QuestionId)
-        gCFormPkg.DoPendingAssign(VarIdStrList[1], QuestionId)
-        gCFormPkg.DoPendingAssign(VarIdStrList[2], QuestionId)
+        gFormPkg.DoPendingAssign(VarIdStrList[0], QuestionId)
+        gFormPkg.DoPendingAssign(VarIdStrList[1], QuestionId)
+        gFormPkg.DoPendingAssign(VarIdStrList[2], QuestionId)
 
         return QuestionId, VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def RegisterRefQuestion(self, Name, BaseVarId, QuestionId, gCFormPkg):
+    def RegisterRefQuestion(self, Name, BaseVarId, QuestionId, gFormPkg):
 
         if BaseVarId == '' and Name == None:
             return QuestionId, VfrReturnCode.VFR_RETURN_FATAL_ERROR
@@ -1896,14 +1896,14 @@ class CVfrQuestionDB(object):
         pNodeList[3].Next = self.__QuestionList
         self.__QuestionList = pNodeList[0]
 
-        gCFormPkg.DoPendingAssign(VarIdStrList[0], QuestionId)
-        gCFormPkg.DoPendingAssign(VarIdStrList[1], QuestionId)
-        gCFormPkg.DoPendingAssign(VarIdStrList[2], QuestionId)
-        gCFormPkg.DoPendingAssign(VarIdStrList[3], QuestionId)
+        gFormPkg.DoPendingAssign(VarIdStrList[0], QuestionId)
+        gFormPkg.DoPendingAssign(VarIdStrList[1], QuestionId)
+        gFormPkg.DoPendingAssign(VarIdStrList[2], QuestionId)
+        gFormPkg.DoPendingAssign(VarIdStrList[3], QuestionId)
 
         return QuestionId, VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def RegisterOldDateQuestion(self, YearVarId, MonthVarId, DayVarId, QuestionId, gCFormPkg):
+    def RegisterOldDateQuestion(self, YearVarId, MonthVarId, DayVarId, QuestionId, gFormPkg):
         pNodeList = []
         if YearVarId == '' or MonthVarId == '' or DayVarId == '' or YearVarId == None or MonthVarId == None or DayVarId == None:
             return QuestionId, VfrReturnCode.VFR_RETURN_ERROR_SKIPED
@@ -1944,13 +1944,13 @@ class CVfrQuestionDB(object):
         pNodeList[2].Next = self.__QuestionList
         self.__QuestionList = pNodeList[0]
 
-        gCFormPkg.DoPendingAssign(YearVarId, QuestionId)
-        gCFormPkg.DoPendingAssign(MonthVarId, QuestionId)
-        gCFormPkg.DoPendingAssign(DayVarId, QuestionId)
+        gFormPkg.DoPendingAssign(YearVarId, QuestionId)
+        gFormPkg.DoPendingAssign(MonthVarId, QuestionId)
+        gFormPkg.DoPendingAssign(DayVarId, QuestionId)
 
         return QuestionId, VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def RegisterOldTimeQuestion(self, HourVarId, MinuteVarId, SecondVarId, QuestionId, gCFormPkg):
+    def RegisterOldTimeQuestion(self, HourVarId, MinuteVarId, SecondVarId, QuestionId, gFormPkg):
         pNodeList = []
         if HourVarId == '' or MinuteVarId == '' or SecondVarId == '' or HourVarId == None or MinuteVarId == None or SecondVarId == None:
             return QuestionId, VfrReturnCode.VFR_RETURN_ERROR_SKIPED
@@ -1991,9 +1991,9 @@ class CVfrQuestionDB(object):
         pNodeList[2].Next = self.__QuestionList
         self.__QuestionList = pNodeList[0]
 
-        gCFormPkg.DoPendingAssign(HourVarId, QuestionId)
-        gCFormPkg.DoPendingAssign(MinuteVarId, QuestionId)
-        gCFormPkg.DoPendingAssign(SecondVarId, QuestionId)
+        gFormPkg.DoPendingAssign(HourVarId, QuestionId)
+        gFormPkg.DoPendingAssign(MinuteVarId, QuestionId)
+        gFormPkg.DoPendingAssign(SecondVarId, QuestionId)
 
         return QuestionId, VfrReturnCode.VFR_RETURN_SUCCESS
 

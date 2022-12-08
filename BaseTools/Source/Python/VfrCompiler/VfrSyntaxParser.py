@@ -16068,6 +16068,7 @@ class VfrSyntaxParser ( Parser ):
             self.parser = parser
             self.ExpInfo = None
             self.Nodes = []
+            self.Line = None
             self.L = None # Token
             self.ExpInfo = ExpInfo
 
@@ -16133,6 +16134,7 @@ class VfrSyntaxParser ( Parser ):
             self.parser = parser
             self.ExpInfo = None
             self.Nodes = []
+            self.Line = None
             self.L = None # Token
             self.ExpInfo = ExpInfo
 
@@ -16198,6 +16200,7 @@ class VfrSyntaxParser ( Parser ):
             self.parser = parser
             self.ExpInfo = None
             self.Nodes = []
+            self.Line = None
             self.L = None # Token
             self.ExpInfo = ExpInfo
 
@@ -16263,6 +16266,7 @@ class VfrSyntaxParser ( Parser ):
             self.parser = parser
             self.ExpInfo = None
             self.Nodes = []
+            self.Line = None
             self.ExpInfo = ExpInfo
 
         def compareTerm(self):

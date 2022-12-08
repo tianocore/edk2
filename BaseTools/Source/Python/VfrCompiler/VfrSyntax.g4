@@ -1164,24 +1164,24 @@ locals[ExpInfo=ExpressionInfo(), Nodes=[]]
     ;
 
 andTerm[ExpInfo]
-locals[Nodes=[]]
+locals[Nodes=[], Line]
     :   bitwiseorTerm[ExpInfo] (L='AND' bitwiseorTerm[ExpInfo])*
     ;
 
 bitwiseorTerm[ExpInfo]
-locals[Nodes=[]]
+locals[Nodes=[], Line]
     :   bitwiseandTerm[ExpInfo] (L='|' bitwiseandTerm[ExpInfo])*
     ;
 
 
 bitwiseandTerm[ExpInfo]
-locals[Nodes=[]]
+locals[Nodes=[], Line]
     :   equalTerm[ExpInfo] (L='&' equalTerm[ExpInfo])*
     ;
 
 
 equalTerm[ExpInfo]
-locals[Nodes=[]]
+locals[Nodes=[], Line]
     :   compareTerm[ExpInfo]
         (equalTermSupplementary[ExpInfo])*
     ;

@@ -99,7 +99,7 @@ vfrWarningMessage = {
 
 
 
-class CVfrErrorHandle():
+class VfrErrorHandle():
 
     def __init__(self):
         self.__InputFileName = None
@@ -148,4 +148,4 @@ class CVfrErrorHandle():
         else:
             return 0
 
-gCVfrErrorHandle = CVfrErrorHandle()
+gVfrErrorHandle = VfrErrorHandle()

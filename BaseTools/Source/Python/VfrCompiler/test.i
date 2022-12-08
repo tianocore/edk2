@@ -725,7 +725,7 @@ typedef struct {
 typedef struct {
   MY_BITS_DATA    BitsData;
   UINT32          EfiBitGrayoutTest : 5;
-  UINT32          EfiBitNumeric     : 4; 
+  UINT32          EfiBitNumeric     : 4;
   UINT32          EfiBitOneof       : 10;
   UINT32          EfiBitCheckbox    : 1;
   UINT32                            : 0;

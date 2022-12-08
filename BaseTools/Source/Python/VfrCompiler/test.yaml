@@ -4,6 +4,14 @@ Formset:
   Title:  19  # Title STRING_ID
   Help:  20  # Help STRING_ID
   ClassGuid:  {0x93039971, 0x8545, 0x4b04, { 0xb4, 0x5e, 0x32, 0xeb, 0x83, 0x26, 0x4, 0xe }}
+  - defaultstore:
+      Name:  MyStandardDefault
+      prompt:  91
+      attribute:  0
+  - defaultstore:
+      Name:  MyManufactureDefault
+      prompt:  93
+      attribute:  1
   - varstore:
       varid:  4660
       name:  MyIfrNVData

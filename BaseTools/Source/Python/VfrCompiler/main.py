@@ -16,7 +16,7 @@ class VfrCompiler():
         self.__VfrTree = VfrTree(self.__Root)
 
     def PreProcess(self):
-        gCVfrErrorHandle.SetInputFile(self.__InputFile)
+        gVfrErrorHandle.SetInputFile(self.__InputFile)
 
     def Compile(self):
         self.__Visitor = VfrSyntaxVisitor(self.__Root)
@@ -25,6 +25,8 @@ class VfrCompiler():
         Stream = CommonTokenStream(Lexer)
         Parser = VfrSyntaxParser(Stream)
         self.__Visitor.visit(Parser.vfrProgram())
+        if gFormPkg.HavePendingUnassigned() == True:
+            gFormPkg.PendingAssignPrintAll()
 
 
     def GenFiles(self):

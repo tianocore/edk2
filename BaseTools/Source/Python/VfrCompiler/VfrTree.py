@@ -1,6 +1,7 @@
 from CommonCtypes import *
 from VfrFormPkg import *
 from antlr4 import*
+from CommonCtypes import *
 # Ifr related Info -> ctypes obj
 #　conditional Info
 # Structure Info
@@ -77,10 +78,7 @@ class VfrTreeNode():
             print('Could not find the target tree')
             return None
 
-class ReCordNode(Structure):
-    def __init__(self, Record, LineNo):
-        self.Record = Record
-        self.LineNo = LineNo
+ExpOps = [EFI_IFR_DUP_OP, EFI_IFR_EQ_ID_VAL_OP, EFI_IFR_QUESTION_REF1_OP, EFI_IFR_EQ_ID_VAL_OP, EFI_IFR_EQ_ID_ID_OP, EFI_IFR_EQ_ID_VAL_LIST_OP, EFI_IFR_RULE_REF_OP, EFI_IFR_STRING_REF1_OP, EFI_IFR_THIS_OP, EFI_IFR_SECURITY_OP, EFI_IFR_GET_OP, EFI_IFR_TRUE_OP, EFI_IFR_FALSE_OP, EFI_IFR_ONE_OP, EFI_IFR_ONES_OP, EFI_IFR_ZERO_OP, EFI_IFR_UNDEFINED_OP, EFI_IFR_VERSION_OP, EFI_IFR_UINT64_OP, EFI_IFR_QUESTION_REF2_OP, EFI_IFR_QUESTION_REF3_OP, EFI_IFR_SET_OP, EFI_IFR_DEFAULTSTORE_OP, EFI_IFR_OR_OP]
 class VfrTree():
     def __init__(self, Root: VfrTreeNode) -> None:
         self.__Root = Root
@@ -88,11 +86,11 @@ class VfrTree():
     def GenBinaryFiles(self, InputFile):
 
         # GenBinary
-        PkgHdr = gCFormPkg.BuildPkgHdr()
+        PkgHdr = gFormPkg.BuildPkgHdr()
         try:
             HpkFile = InputFile[:InputFile.find('.')] + '.hpk'
             Hpk = open(HpkFile, 'wb')
-            Hpk.write(self.__StructToStream(PkgHdr))
+            Hpk.write(gFormPkg.StructToStream(PkgHdr))
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE, "File open failed for %s" % HpkFile, None)
 
@@ -113,7 +111,7 @@ class VfrTree():
                 C.write('  0x%02x,'%B)
             C.write('\n')
             C.write('  //' + ' ' + 'PACKAGE HEADER\n')
-            HeaderBuffer = self.__StructToStream(PkgHdr)
+            HeaderBuffer = gFormPkg.StructToStream(PkgHdr)
             for B in HeaderBuffer:
                 C.write('  0x%02x,'%B)
             C.write('\n')
@@ -160,8 +158,8 @@ class VfrTree():
             Lst.write('//\n//  All Opcode Record List\n//\n')
             for RecordLine in RecordLines:
                 Lst.write('{}'.format(RecordLine.Record))
-            Lst.write('\nTotal Size of all record is' + ' {:0>8d}'.format(gCFormPkg.Offset))
-            gCVfrVarDataTypeDB.Dump(Lst)
+            Lst.write('\nTotal Size of all record is' + ' {:0>8d}'.format(gFormPkg.Offset))
+            gVfrVarDataTypeDB.Dump(Lst)
         except:
             EdkLogger.error("VfrCompiler", FILE_WRITE_FAILURE, "File write failed for %s" % LstFile, None)
 
@@ -175,7 +173,7 @@ class VfrTree():
 
             if Root.OpCode in ExpOps:
                 # The Data is likely to be modified, so generate buffer here
-                Root.Buffer = self.__StructToStream(Root.Data.GetInfo())
+                Root.Buffer = gFormPkg.StructToStream(Root.Data.GetInfo())
             if Root.Buffer != None:
                 try:
                     Hpk.write(Root.Buffer)
@@ -188,7 +186,7 @@ class VfrTree():
 
                         self.__Index += 1
                         Data = Root.Buffer[i]
-                        if self.__Index == gCFormPkg.PkgLength:
+                        if self.__Index == gFormPkg.PkgLength:
                             C.write('0x%02x'%Data)
                         elif self.__Index % BYTES_PRE_LINE == 1:
                             C.write('  0x%02x,  '%Data)
@@ -216,8 +214,8 @@ class VfrTree():
 
         try:
             with open(FileName, 'wb') as f:
-                PkgHdr = gCFormPkg.BuildPkgHdr()
-                f.write(self.__StructToStream(PkgHdr))
+                PkgHdr = gFormPkg.BuildPkgHdr()
+                f.write(gFormPkg.StructToStream(PkgHdr))
                 self.GenBinaryDfs(self.__Root, f, InputFile)
             f.close()
         except:
@@ -227,26 +225,24 @@ class VfrTree():
         if Root.OpCode != None:
             if Root.OpCode in ExpOps:
                 # The Data is likely to be modified, so generate buffer here
-                Root.Buffer = self.__StructToStream(Root.Data.GetInfo())
+                Root.Buffer = gFormPkg.StructToStream(Root.Data.GetInfo())
 
             if Root.Buffer != None:
                 try:
                     f.write(Root.Buffer)
                 except:
                     EdkLogger.error("VfrCompiler", FILE_WRITE_FAILURE, "File write failed for %s" % (InputFile[:InputFile.find('.')] + '.hpk'), None)
-            #gCFormPkg.PkgLength += 1
+            #gFormPkg.PkgLength += 1
 
         if Root.Child != []:
             for ChildNode in Root.Child:
                 self.GenBinaryDfs(ChildNode, f, InputFile)
 
     def GenCFile(self, InputFile):
-        self.__Index = 0
         FileName = InputFile[:InputFile.find('.')] + '.c'
-
         try:
             with open(FileName, 'w') as f:
-                PkgHdr = gCFormPkg.BuildPkgHdr()
+                PkgHdr = gFormPkg.BuildPkgHdr()
                 f.write('//\n')
                 f.write('//' + ' ' + 'DO NOT EDIT -- auto-generated file\n')
                 f.write('//\n')
@@ -260,12 +256,13 @@ class VfrTree():
                     f.write('  0x%02x,'%B)
                 f.write('\n')
                 f.write('  //' + ' ' + 'PACKAGE HEADER\n')
-                HeaderBuffer = self.__StructToStream(PkgHdr)
+                HeaderBuffer = gFormPkg.StructToStream(PkgHdr)
                 for B in HeaderBuffer:
                     f.write('  0x%02x,'%B)
                 f.write('\n')
                 f.write('  //' + ' ' + 'PACKAGE DATA\n')
-                self.GenCFileDfs(self.__Root, gCFormPkg.PkgLength, f, InputFile)
+                self.__Index = 0
+                self.GenCFileDfs(self.__Root, gFormPkg.PkgLength, f, InputFile)
                 f.write('\n};\n')
             f.close()
         except:
@@ -326,8 +323,8 @@ class VfrTree():
             Out.write('//\n//  All Opcode Record List\n//\n')
             for RecordLine in RecordLines:
                 Out.write('{}'.format(RecordLine.Record))
-            Out.write('\nTotal Size of all record is' + ' {:0>8d}'.format(gCFormPkg.Offset))
-            gCVfrVarDataTypeDB.Dump(Out)
+            Out.write('\nTotal Size of all record is' + ' {:0>8d}'.format(gFormPkg.Offset))
+            gVfrVarDataTypeDB.Dump(Out)
             In.close()
             Out.close()
         except:
@@ -348,13 +345,6 @@ class VfrTree():
         if Root.Child != []:
             for ChildNode in Root.Child:
                 self.GenRecordListFileDfs(ChildNode, RecordLines)
-
-    # Get data from ctypes to bytes.
-    def __StructToStream(self, s) -> bytes:
-        Length = sizeof(s)
-        P = cast(pointer(s), POINTER(c_char * Length))
-        return P.contents.raw
-
 
     def DumpYaml(self, InputFile):
         FileName = InputFile[:InputFile.find('.')] + '.yaml'
@@ -419,6 +409,17 @@ class VfrTree():
                     f.write('      guid:  {' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
                         '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\n')
+
+                if Root.OpCode == EFI_IFR_DEFAULTSTORE_OP:
+                    gVfrDefaultStore.UpdateDefaultStoreName(Root)
+                    Info = Root.Data.GetInfo()
+                    Name = Root.Data.GetName()
+                    if Name != 'Standard Defaults' and Name != 'Standard ManuFacturing':
+                        f.write('  - defaultstore:\n')
+                        f.write('      Name:  {}\n'.format(Name))
+                        f.write('      prompt:  {}\n'.format(Info.DefaultName))
+                        f.write('      attribute:  {}\n'.format(Info.DefaultId))
+
 
                 if Root.OpCode == EFI_IFR_FORM_OP:
                     Info = Root.Data.GetInfo()
@@ -509,7 +510,7 @@ class VfrTree():
                     f.write('              option flag:  {}\n'.format(Info.Flags))
                     f.write('              option type:  {}\n'.format(Info.Type))
 
-                    if type(Root.Data) == CIfrOneOfOption:
+                    if type(Root.Data) == IfrOneOfOption:
                         if len(Info.Value) == 1:
                             f.write('              option value:  {}\n'.format(Info.Value[0]))
                         else:
@@ -526,7 +527,7 @@ class VfrTree():
                         f.write('              condition:  {}\n'.format(Root.Condition))
                     f.write('              type:  {}\n'.format(Info.Type))
                     f.write('              defaultId:  {}\n'.format(Info.DefaultId))
-                    if type(Root.Data) == CIfrDefault:
+                    if type(Root.Data) == IfrDefault:
 
                         if len(Info.Value) == 1:
                             if Info.Type == EFI_IFR_TYPE_DATE:
@@ -662,7 +663,7 @@ class VfrTree():
                     if Root.Condition != None:
                         f.write('          condition:  {}\n'.format(Root.Condition))
 
-                    if type(Root.Data) == CIfrRef4:
+                    if type(Root.Data) == IfrRef4:
                         f.write('          formid:  {}\n'.format(Info.FormId))
                         f.write('          formsetid:  {' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.FormSetId.Data4[0]), '0x%x'%(Info.FormSetId.Data4[1]), '0x%x'%(Info.FormSetId.Data4[2]), '0x%x'%(Info.FormSetId.Data4[3]), \
@@ -670,18 +671,18 @@ class VfrTree():
                         f.write('          questionid:  {}\n'.format(Info.QuestionId))
                         f.write('          devicepath:  {}\n'.format(Info.DevicePath))
 
-                    if type(Root.Data) == CIfrRef3:
+                    if type(Root.Data) == IfrRef3:
                         f.write('          formid:  {}\n'.format(Info.FormId))
                         f.write('          formsetid:  {' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.FormSetId.Data4[0]), '0x%x'%(Info.FormSetId.Data4[1]), '0x%x'%(Info.FormSetId.Data4[2]), '0x%x'%(Info.FormSetId.Data4[3]), \
                         '0x%x'%(Info.FormSetId.Data4[4]), '0x%x'%(Info.FormSetId.Data4[5]), '0x%x'%(Info.FormSetId.Data4[6]), '0x%x'%(Info.FormSetId.Data4[7])) + ' }}\n')
                         f.write('          questionid:  {}\n'.format(Info.QuestionId))
 
-                    if type(Root.Data) == CIfrRef2:
+                    if type(Root.Data) == IfrRef2:
                         f.write('          formid:  {}\n'.format(Info.FormId))
                         f.write('          questionid:  {}\n'.format(Info.QuestionId))
 
-                    if type(Root.Data) == CIfrRef:
+                    if type(Root.Data) == IfrRef:
                         f.write('          formid:  {}\n'.format(Info.FormId))
                         f.write('          questionid:  {}\n'.format(Info.Question.QuestionId))
 
@@ -721,14 +722,14 @@ class VfrTree():
 
                 if Root.OpCode == EFI_IFR_GUID_OP:
                     Info = Root.Data.GetInfo()
-                    if type(Root.Data) == CIfrLabel: # type(Info) == EFI_IFR_GUID_LABEL
+                    if type(Root.Data) == IfrLabel: # type(Info) == EFI_IFR_GUID_LABEL
                         f.write('      - label:\n')
                         if Root.Condition != None:
                             f.write('          condition:  {}\n'.format(Root.Condition))
 
                         f.write('          labelnumber:  {}  # LabelNumber\n'.format(Info.Number))
 
-                    if type(Root.Data) == CIfrBanner:
+                    if type(Root.Data) == IfrBanner:
                         f.write('      - banner:\n')
                         if Root.Condition != None:
                             f.write('          condition:  {}\n'.format(Root.Condition))
@@ -737,20 +738,20 @@ class VfrTree():
                         f.write('          linenumber:  {}\n'.format(Info.LineNumber))
                         f.write('          align:  {}\n'.format(Info.Alignment))
 
-                    if type(Root.Data) == CIfrTimeout:
+                    if type(Root.Data) == IfrTimeout:
                         f.write('      - banner:\n')
                         if Root.Condition != None:
                             f.write('          condition:  {}\n'.format(Root.Condition))
 
                         f.write('          timeout:  {}\n'.format(Info.TimeOut))
 
-                    if type(Root.Data) == CIfrClass:
+                    if type(Root.Data) == IfrClass:
                         f.write('  Class:  {}\n'.format(Info.Class))
 
-                    if type(Root.Data) == CIfrSubClass:
+                    if type(Root.Data) == IfrSubClass:
                         f.write('  SubClass:  {}\n'.format(Info.SubClass))
 
-                    if type(Root.Data) == CIfrGuid:
+                    if type(Root.Data) == IfrGuid:
                         f.write('      - guidop:\n')
                         if Root.Condition != None:
                             f.write('          condition:  {}\n'.format(Root.Condition))
@@ -779,7 +780,7 @@ class VfrTree():
             with open(FileName, 'w') as f:
                 f.write('{\n')
                 f.write('  \"DataStruct\" : {\n')
-                pNode = gCVfrVarDataTypeDB.GetDataTypeList()
+                pNode = gVfrVarDataTypeDB.GetDataTypeList()
                 while pNode != None:
                     f.write('    \"{}\" : [\n'.format(str(pNode.TypeName)))
                     FNode = pNode.Members
@@ -803,7 +804,7 @@ class VfrTree():
                     pNode = pNode.Next
                 f.write('  },\n')
                 f.write('  \"DataStructAttribute\": {\n')
-                pNode = gCVfrVarDataTypeDB.GetDataTypeList()
+                pNode = gVfrVarDataTypeDB.GetDataTypeList()
                 while pNode != None:
                     f.write('    \"{}\"'.format(str(pNode.TypeName)) + ': {\n')
                     f.write('        \"Alignment\": {},\n'.format(str(pNode.Align)))
@@ -815,7 +816,7 @@ class VfrTree():
                     pNode = pNode.Next
                 f.write('  },\n')
                 f.write('  \"VarDefine\" : {\n')
-                pVsNode = gCVfrDataStorage.GetBufferVarStoreList()
+                pVsNode = gVfrDataStorage.GetBufferVarStoreList()
                 while pVsNode != None:
                     f.write('    \"{}\"'.format(str(pVsNode.VarStoreName)) + ': {\n')
                     f.write('        \"Type\": \"{}\",\n'.format(str(pVsNode.DataType.TypeName)))
@@ -832,7 +833,7 @@ class VfrTree():
                     pVsNode = pVsNode.Next
                 f.write('  },\n')
                 f.write('  \"Data\" : [\n')
-                pVsNode = gCVfrBufferConfig.GetVarItemList()
+                pVsNode = gVfrBufferConfig.GetVarItemList()
                 while pVsNode != None:
                     if pVsNode.Id == None:
                         pVsNode = pVsNode.Next
