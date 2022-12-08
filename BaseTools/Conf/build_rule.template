@@ -145,7 +145,7 @@
         $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
 
     <Command.GCC>
-        "$(CC)" $(CC_FLAGS) $(CC_XIPFLAGS) -c -o ${dst} $(INC) ${src}
+        "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) $(CC_XIPFLAGS) -c -o ${dst} $(INC) ${src}
 
 [C-Header-File]
     <InputFile>
