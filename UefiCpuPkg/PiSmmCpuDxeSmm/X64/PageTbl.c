@@ -1,7 +1,7 @@
 /** @file
 Page Fault (#PF) handler for X64 processors
 
-Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -104,8 +104,9 @@ Is5LevelPagingNeeded (
     ExtFeatureEcx.Bits.FiveLevelPage
     ));
 
-  if (VirPhyAddressSize.Bits.PhysicalAddressBits > 4 * 9 + 12) {
-    ASSERT (ExtFeatureEcx.Bits.FiveLevelPage == 1);
+  if ((VirPhyAddressSize.Bits.PhysicalAddressBits > 4 * 9 + 12) &&
+      (ExtFeatureEcx.Bits.FiveLevelPage == 1))
+  {
     return TRUE;
   } else {
     return FALSE;
