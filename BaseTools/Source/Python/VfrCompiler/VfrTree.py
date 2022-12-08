@@ -369,11 +369,7 @@ class VfrTree():
 
     def DumpYamlDfs(self, Root, f, InputFile):
         try:
-
             if Root.OpCode != None:
-                gCFormPkg.PkgLength += Root.Data.GetInfo().Header.Length
-                Root.Offset = gCFormPkg.Offset
-                gCFormPkg.Offset += Root.Data.GetInfo().Header.Length
 
                 if Root.OpCode == EFI_IFR_FORM_SET_OP:
                     Info = Root.Data.GetInfo()

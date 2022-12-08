@@ -1112,7 +1112,7 @@ locals[Node=VfrTreeNode(EFI_IFR_GUID_OP)]
     ;
 
 vfrStatementExtension
-locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
+locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), Buffer=None, Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
     :   'guidop'
         'guid' '=' guidDefinition
         (   ',' D='datatype' '='
@@ -1138,8 +1138,7 @@ locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), Size=0, TypeName='', TypeSize=0, IsStr
 
 
 vfrExtensionData
-locals[IsStruct, Data]
-    :   ',' 'data' ('[' Number ']')?
+    :   ',' 'data' ('[' I=Number ']')?
         ( '.' arrayName)*  '=' N=Number
     ;
 

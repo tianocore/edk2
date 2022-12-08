@@ -196,6 +196,15 @@ class CFormPkg():
         PkgHdr.Length = self.PkgLength + sizeof(EFI_HII_PACKAGE_HEADER)
         return PkgHdr
 
+    def BuildPkg(self, Root):
+        if Root.OpCode != None:
+            self.PkgLength += Root.Data.GetInfo().Header.Length
+            Root.Offset = gCFormPkg.Offset
+            self.Offset += Root.Data.GetInfo().Header.Length
+        if Root.Child != []:
+            for ChildNode in Root.Child:
+                self.BuildPkg(ChildNode)
+
 
     def AssignPending(self, Key, VarAddr, LineNo, Msg, Type=0):
         pNew = SPendingAssign(Key, VarAddr, LineNo, Msg, Type)
@@ -248,7 +257,7 @@ class CFormPkg():
                 QId, ReturnCode = lCVfrQuestionDB.RegisterQuestion(None, VarStr, EFI_QUESTION_ID_INVALID, gCFormPkg)
                 if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
                     gCVfrErrorHandle.HandleError(ReturnCode, pNode.LineNo, pNode.Key)
-                    return [], ReturnCode
+                    return ReturnList, ReturnCode
                 #ifdef VFREXP_DEBUG
                 #printf("Undefined Question name is %s and Id is 0x%x\n", VarStr, QId);
                 #endif
@@ -256,14 +265,14 @@ class CFormPkg():
                 ArrayIdx, s, FName, ReturnCode = lCVfrVarDataTypeDB.ExtractFieldNameAndArrary(VarStr, 0)
                 if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
                     gCVfrErrorHandle.PrintMsg(pNode.LineNo, 'Error', 'Var string is not the valid C variable', pNode.Key)
-                    return [], ReturnCode
+                    return ReturnList, ReturnCode
 
                 # Get VarStoreType
                 Info.VarStoreId, ReturnCode = lCVfrDataStorage.GetVarStoreId(FName)
 
                 if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
                     gCVfrErrorHandle.PrintMsg (pNode.LineNo, "Error", "Var Store Type is not defined", FName)
-                    return [], ReturnCode
+                    return ReturnList, ReturnCode
 
                 VarStoreType = lCVfrDataStorage.GetVarStoreType(Info.VarStoreId)
                 if s == len(VarStr) and ArrayIdx != INVALID_ARRAY_INDEX:
@@ -275,14 +284,13 @@ class CFormPkg():
                         VarStr = pNode.Key
                         SName, ReturnCode = lCVfrDataStorage.GetBufferVarStoreDataTypeName(Info.VarStoreId)
                         if ReturnCode == VfrReturnCode.VFR_RETURN_SUCCESS:
-                            NewStr = SName + VarStr[s:]
+                            NewStr = SName + '.' + VarStr[s:]
                             Info.Info.VarOffset, Info.VarType, Info.VarTotalSize, Info.IsBitVar, ReturnCode = lCVfrVarDataTypeDB.GetDataFieldInfo(NewStr)
                     else:
                         ReturnCode = VfrReturnCode.VFR_RETURN_UNSUPPORTED
 
                 if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
                     gCVfrErrorHandle.HandleError(ReturnCode, pNode.LineNo, pNode.Key)
-                    return [], ReturnCode
                 # If the storage is bit fields, create Guid opcode to wrap the numeric opcode.
                 if Info.IsBitVar:
                     GuidObj = CIfrGuid(0)
@@ -1320,7 +1328,7 @@ class CIfrGuid(CIfrObj, CIfrOpHeader):
 
     def __init__(self, Size, Data=None):
         self.__Guid = EFI_IFR_GUID()
-        self.__Data = Data
+        self.__Data = Data # databuffer is saved here
         CIfrOpHeader.__init__(self, self.__Guid.Header, EFI_IFR_GUID_OP,
                               ctypes.sizeof(EFI_IFR_GUID) + Size)
         EFI_IFR_DEFAULT_GUID = EFI_GUID(0, 0, 0,

@@ -717,8 +717,10 @@ class CVfrVarDataTypeDB(object):
             while(FNode != None):
                 if FNode.ArrayNum > 0:
                     f.write('\t\t\t+{:0>8d}[{:0>8x}] {}[{}] <{}>\n'.format(FNode.Offset, FNode.Offset, FNode.FieldName, FNode.ArrayNum, FNode.FieldType.TypeName))
-                else:
+                elif FNode.FieldName != None:
                     f.write('\t\t\t+{:0>8d}[{:0>8x}] {} <{}>\n'.format(FNode.Offset, FNode.Offset, FNode.FieldName, FNode.FieldType.TypeName))
+                else:
+                    f.write('\t\t\t+{:0>8d}[{:0>8x}] <{}>\n'.format(FNode.Offset, FNode.Offset, FNode.FieldType.TypeName))
                 FNode = FNode.Next
             f.write('\t\t};\n')
             f.write("---------------------------------------------------------------\n")

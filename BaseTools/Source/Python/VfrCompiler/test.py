@@ -74,17 +74,57 @@ class EFI_IFR_EQ_ID_VAL_LIST(Structure):
     def SetData(self):
         self.Data = c_bool()
 
+class MY_BITS_DATA(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('NestByteField', c_uint16),
+        ('None', c_uint8, 1),
+        ('NestBitCheckbox', c_uint8, 1),
+        ('NestBitOneof', c_uint8, 2),
+        ('NestBitNumeric', c_uint32, 4),
+    ]
+
+class MY_EFI_BITS_VARSTORE_DATA(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('BitsData', MY_BITS_DATA),
+        ('EfiBitGrayoutTest', c_uint32, 5), 
+        ('EfiBitNumeric', c_uint32, 4),
+        ('EfiBitOneof', c_uint32, 10),
+        ('EfiBitCheckbox', c_uint32, 1),
+        ('None', c_int32, 12)
+    ]
 
 
-def Refine_EFI_IFR_BUFFER(Nums):
-    class EFI_IFR_BUFFER(Structure):
-        _pack_ = 1
-        _fields_ = [
-            ('Buffer', ARRAY(c_ubyte, Nums)),
-        ]
-        def SetBuffer(self, Buffer):
-            self.Buffer = Buffer
-    return EFI_IFR_BUFFER()
 
-DataBuff = Refine_EFI_IFR_BUFFER(10)
-print(StructToStream(DataBuff))
+
+x = MY_EFI_BITS_VARSTORE_DATA()
+x.EfiBitNumeric = 1
+x.EfiBitOneof = 1
+x.EfiBitCheckbox = 1
+for B in StructToStream(x):
+    print('0x%02x'%B)
+
+class EFI_IFR_OP_HEADER(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('OpCode', c_ubyte),
+        ('Length', c_ubyte, 7), # 低位
+        ('Scope', c_ubyte, 1), # 高位
+    ]
+
+x = EFI_IFR_OP_HEADER()
+x.OpCode = 1
+x.Length = 9
+x.Scope = 1
+print(StructToStream(x))
+# 1 0001001
+#20 02 08 00
+print(bin(0x89))
+print(bin(0x20))
+print(bin(0x02))
+print(bin(0x08))
+print(bin(0x00))
+#00000000 00100000  00000010 00001000 00000000
+#         00000000  10000000 00110000 00000000
+print(StructToStream(x))

@@ -2,13 +2,15 @@ from distutils.filelist import FileList
 from pickletools import uint8
 import sys
 from tkinter.ttk import Treeview
-from antlr4 import*
+from antlr4 import *
 from VfrSyntaxVisitor import *
 from VfrSyntaxLexer import *
 from VfrSyntaxParser import *
 
+
 class VfrCompiler():
-    def __init__(self, InputFile) -> None:
+
+    def __init__(self, InputFile):
         self.__Root = VfrTreeNode()
         self.__InputFile = InputFile
         self.__VfrTree = VfrTree(self.__Root)
@@ -22,14 +24,16 @@ class VfrCompiler():
         Lexer = VfrSyntaxLexer(InputStream)
         Stream = CommonTokenStream(Lexer)
         Parser = VfrSyntaxParser(Stream)
-        Tree = Parser.vfrProgram()
-        self.__Visitor.visit(Tree)
+        self.__Visitor.visit(Parser.vfrProgram())
+
+
+    def GenFiles(self):
         self.__VfrTree.DumpYaml(self.__InputFile)
         self.__VfrTree.DumpJson(self.__InputFile)
         self.__VfrTree.GenBinary(self.__InputFile)
         self.__VfrTree.GenCFile(self.__InputFile)
         self.__VfrTree.GenRecordListFile(self.__InputFile)
-
+        # self.__VfrTree.GenBinaryFiles(self.__InputFile)
 
 
 if __name__ == '__main__':
@@ -38,3 +42,4 @@ if __name__ == '__main__':
     Compiler = VfrCompiler(InputFile)
     Compiler.PreProcess()
     Compiler.Compile()
+    Compiler.GenFiles()

@@ -142,6 +142,7 @@ class EFI_IFR_OP_HEADER(Structure):
         ('Scope', c_ubyte, 1),
     ]
 
+
 class EFI_IFR_FORM_SET(Structure):
     _pack_ = 1
     _fields_ = [
@@ -245,11 +246,57 @@ def Refine_EFI_IFR_BUFFER(Nums):
     class EFI_IFR_BUFFER(Structure):
         _pack_ = 1
         _fields_ = [
-            ('Buffer', ARRAY(c_ubyte, Nums)),
+            ('Data', ARRAY(c_ubyte, Nums)),
         ]
         def SetBuffer(self, Buffer):
             self.Buffer = Buffer
+
     return EFI_IFR_BUFFER()
+
+def Refine_EFI_IFR_BIT_BUFFER(Nums):
+    class EFI_IFR_BIT_BUFFER(Structure):
+        _pack_ = 1
+        _fields_ = [
+            ('Data', ARRAY(c_ubyte, Nums)),
+        ]
+        def SetBuffer(self, Buffer):
+            self.Buffer = Buffer
+
+    return EFI_IFR_BIT_BUFFER
+
+def Refine_EFI_IFR_BIT(Type, PreBits, Size, Data):
+
+    if PreBits == 0:
+        class Refine_EFI_IFR_BIT(Structure):
+            _pack_ = 1
+            _fields_ = [
+                ('Data', Type, Size), # the really needed data
+                ('Postfix', Type, sizeof(Type) * 8 - Size)
+            ]
+            def __init__(self, Data):
+                self.Data = Data
+
+    elif sizeof(Type) * 8 - Size - PreBits == 0:
+        class Refine_EFI_IFR_BIT(Structure):
+            _pack_ = 1
+            _fields_ = [
+                ('Prefix', Type, PreBits),
+                ('Data', Type, Size), # the really needed data
+            ]
+            def __init__(self, Data):
+                self.Data = Data
+    else:
+        class Refine_EFI_IFR_BIT(Structure):
+            _pack_ = 1
+            _fields_ = [
+                ('Prefix', Type, PreBits),
+                ('Data', Type, Size), # the really needed data
+                ('Postfix', Type, sizeof(Type) * 8 - Size - PreBits)
+            ]
+            def __init__(self, Data):
+                self.Data = Data
+
+    return Refine_EFI_IFR_BIT(Data)
 
 class EFI_IFR_GUID_VAREQNAME(Structure):
     _pack_ = 1
@@ -600,6 +647,22 @@ TypeDict = {
     EFI_IFR_TYPE_DATE: EFI_HII_DATE,
     EFI_IFR_TYPE_STRING: c_uint16,
     EFI_IFR_TYPE_REF: EFI_HII_REF
+}
+
+TypeSizeDict = {
+    EFI_IFR_TYPE_NUM_SIZE_8: 1,
+    EFI_IFR_TYPE_NUM_SIZE_16: 2,
+    EFI_IFR_TYPE_NUM_SIZE_32: 4,
+    EFI_IFR_TYPE_NUM_SIZE_64: 8,
+    EFI_IFR_TYPE_BOOLEAN: 1,
+    EFI_IFR_TYPE_STRING: 2
+}
+
+SizeTypeDict = {
+    1: c_uint8,
+    2: c_uint16,
+    4: c_uint32,
+    8: c_uint64,
 }
 
 def Refine_EFI_IFR_ONE_OF_OPTION(Type, Nums):
