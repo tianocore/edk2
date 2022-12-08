@@ -545,6 +545,7 @@ CcExitHandleVe (
     case EXIT_REASON_MONITOR_INSTRUCTION:
     case EXIT_REASON_WBINVD:
     case EXIT_REASON_RDPMC:
+    case EXIT_REASON_INVD:
       /* Handle as nops. */
       break;
 
