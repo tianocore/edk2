@@ -60,7 +60,8 @@ CreatePageTable (
              Address,
              Length,
              &MapAttribute,
-             &MapMask
+             &MapMask,
+             NULL
              );
   ASSERT (Status == EFI_BUFFER_TOO_SMALL);
   DEBUG ((DEBUG_INFO, "AP Page Table Buffer Size = %x\n", PageTableBufferSize));
@@ -75,7 +76,8 @@ CreatePageTable (
              Address,
              Length,
              &MapAttribute,
-             &MapMask
+             &MapMask,
+             NULL
              );
   ASSERT_EFI_ERROR (Status);
   return PageTable;
