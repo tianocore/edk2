@@ -699,7 +699,8 @@ SingleMapEntryTest (
                           LastMapEntry->LinearAddress,
                           LastMapEntry->Length,
                           &LastMapEntry->Attribute,
-                          &LastMapEntry->Mask
+                          &LastMapEntry->Mask,
+                          NULL
                           );
 
   Attribute = &LastMapEntry->Attribute;
@@ -759,7 +760,8 @@ SingleMapEntryTest (
                LastMapEntry->LinearAddress,
                LastMapEntry->Length,
                &LastMapEntry->Attribute,
-               &LastMapEntry->Mask
+               &LastMapEntry->Mask,
+               NULL
                );
   }
 
