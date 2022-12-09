@@ -146,12 +146,52 @@ ArmGicSendSgiTo (
   IN  UINT8  SgiId
   )
 {
-  MmioWrite32 (
-    GicDistributorBase + ARM_GIC_ICDSGIR,
-    ((TargetListFilter & 0x3) << 24) |
-    ((CPUTargetList & 0xFF) << 16)   |
-    (SgiId & 0xF)
-    );
+  ARM_GIC_ARCH_REVISION  Revision;
+  UINT32                 ApplicableTargets;
+  UINT32                 AFF3;
+  UINT32                 AFF2;
+  UINT32                 AFF1;
+  UINT32                 AFF0;
+  UINT32                 Irm;
+  UINT64                 SGIValue;
+
+  Revision = ArmGicGetSupportedArchRevision ();
+  if (Revision == ARM_GIC_ARCH_REVISION_2) {
+    MmioWrite32 (
+      GicDistributorBase + ARM_GIC_ICDSGIR,
+      ((TargetListFilter & 0x3) << 24) |
+      ((CPUTargetList & 0xFF) << 16)   |
+      (SgiId & 0xF)
+      );
+  } else {
+    // Below routine is adopted from gicv3_raise_secure_g0_sgi in TF-A
+
+    /* Extract affinity fields from target */
+    AFF0 = GET_MPIDR_AFF0 (CPUTargetList);
+    AFF1 = GET_MPIDR_AFF1 (CPUTargetList);
+    AFF2 = GET_MPIDR_AFF2 (CPUTargetList);
+    AFF3 = GET_MPIDR_AFF3 (CPUTargetList);
+
+    /*
+     * Make target list from affinity 0, and ensure GICv3 SGI can target
+     * this PE.
+     */
+    ApplicableTargets = (1 << AFF0);
+
+    /*
+     * Evaluate the filter to see if this is for the target or all others
+     */
+    Irm = (TargetListFilter == ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE) ? SGIR_IRM_TO_OTHERS : SGIR_IRM_TO_AFF;
+
+    /* Raise SGI to PE specified by its affinity */
+    SGIValue = GICV3_SGIR_VALUE (AFF3, AFF2, AFF1, SgiId, Irm, ApplicableTargets);
+
+    /*
+     * Ensure that any shared variable updates depending on out of band
+     * interrupt trigger are observed before raising SGI.
+     */
+    ArmGicV3SendNsG1Sgi (SGIValue);
+  }
 }
 
 /*
