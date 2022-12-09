@@ -33,7 +33,7 @@
   DEFINE SMM_REQUIRE             = FALSE
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
 
-!include OvmfPkg/OvmfTpmDefines.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmDefines.dsc.inc
 
   #
   # Shell can be useful for debugging but should not be enabled for production
@@ -256,7 +256,7 @@
   SmbusLib|MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
 
-!include OvmfPkg/OvmfTpmLibs.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmLibs.dsc.inc
 
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
@@ -669,7 +669,7 @@
 
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
 
-!include OvmfPkg/OvmfTpmPcds.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmPcds.dsc.inc
 
   # Set ConfidentialComputing defaults
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
@@ -684,7 +684,7 @@
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01
 
 [PcdsDynamicHii]
-!include OvmfPkg/OvmfTpmPcdsHii.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmPcdsHii.dsc.inc
 
 ################################################################################
 #
@@ -734,7 +734,7 @@
 !endif
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
-!include OvmfPkg/OvmfTpmComponentsPei.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmComponentsPei.dsc.inc
 
 [Components.X64]
   #
@@ -760,7 +760,7 @@
 !if $(SECURE_BOOT_ENABLE) == TRUE
       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
 !endif
-!include OvmfPkg/OvmfTpmSecurityStub.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmSecurityStub.dsc.inc
   }
 
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
@@ -1032,4 +1032,4 @@
   #
   # TPM support
   #
-!include OvmfPkg/OvmfTpmComponentsDxe.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmComponentsDxe.dsc.inc

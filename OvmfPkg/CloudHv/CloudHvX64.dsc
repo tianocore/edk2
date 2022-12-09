@@ -33,7 +33,7 @@
   DEFINE SMM_REQUIRE             = FALSE
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
 
-!include OvmfPkg/OvmfTpmDefines.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmDefines.dsc.inc
 
   #
   # Network definition
@@ -247,7 +247,7 @@
   SmbusLib|MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
 
-!include OvmfPkg/OvmfTpmLibs.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmLibs.dsc.inc
 
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
@@ -630,7 +630,7 @@
 
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
 
-!include OvmfPkg/OvmfTpmPcds.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmPcds.dsc.inc
 
   # IPv4 and IPv6 PXE Boot support.
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01
@@ -640,7 +640,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
 
 [PcdsDynamicHii]
-!include OvmfPkg/OvmfTpmPcdsHii.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmPcdsHii.dsc.inc
 
 ################################################################################
 #
@@ -690,7 +690,7 @@
 !endif
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
-!include OvmfPkg/OvmfTpmComponentsPei.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmComponentsPei.dsc.inc
 
   #
   # DXE Phase modules
@@ -714,7 +714,7 @@
     <LibraryClasses>
 !if $(SECURE_BOOT_ENABLE) == TRUE
       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
-!include OvmfPkg/OvmfTpmSecurityStub.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmSecurityStub.dsc.inc
 !endif
   }
 
@@ -945,4 +945,4 @@
   #
   # TPM support
   #
-!include OvmfPkg/OvmfTpmComponentsDxe.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmComponentsDxe.dsc.inc

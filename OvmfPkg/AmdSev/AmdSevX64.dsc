@@ -33,7 +33,7 @@
   #
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
 
-!include OvmfPkg/OvmfTpmDefines.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmDefines.dsc.inc
 
   #
   # Shell can be useful for debugging but should not be enabled for production
@@ -200,7 +200,7 @@
   SmbusLib|MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
 
-!include OvmfPkg/OvmfTpmLibs.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmLibs.dsc.inc
 
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
@@ -527,12 +527,12 @@
   # Set ConfidentialComputing defaults
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
 
-!include OvmfPkg/OvmfTpmPcds.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmPcds.dsc.inc
 
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
 
 [PcdsDynamicHii]
-!include OvmfPkg/OvmfTpmPcdsHii.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmPcdsHii.dsc.inc
 
 ################################################################################
 #
@@ -573,7 +573,7 @@
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
   OvmfPkg/AmdSev/SecretPei/SecretPei.inf
 
-!include OvmfPkg/OvmfTpmComponentsPei.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmComponentsPei.dsc.inc
 
   #
   # DXE Phase modules
@@ -595,7 +595,7 @@
 
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
     <LibraryClasses>
-!include OvmfPkg/OvmfTpmSecurityStub.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmSecurityStub.dsc.inc
   }
 
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
@@ -766,4 +766,4 @@
   #
   # TPM support
   #
-!include OvmfPkg/OvmfTpmComponentsDxe.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTpmComponentsDxe.dsc.inc
