@@ -212,7 +212,7 @@ AmdSevEsInitialize (
   UINTN                GhcbBackupPageCount;
   SEV_ES_PER_CPU_DATA  *SevEsData;
   UINTN                PageCount;
-  RETURN_STATUS        PcdStatus, DecryptStatus;
+  RETURN_STATUS        Status;
   IA32_DESCRIPTOR      Gdtr;
   VOID                 *Gdt;
 
@@ -220,8 +220,8 @@ AmdSevEsInitialize (
     return;
   }
 
-  PcdStatus = PcdSetBoolS (PcdSevEsIsEnabled, TRUE);
-  ASSERT_RETURN_ERROR (PcdStatus);
+  Status = PcdSetBoolS (PcdSevEsIsEnabled, TRUE);
+  ASSERT_RETURN_ERROR (Status);
 
   //
   // Allocate GHCB and per-CPU variable pages.
@@ -240,20 +240,20 @@ AmdSevEsInitialize (
   // only clear the encryption mask for the GHCB pages.
   //
   for (PageCount = 0; PageCount < GhcbPageCount; PageCount += 2) {
-    DecryptStatus = MemEncryptSevClearPageEncMask (
-                      0,
-                      GhcbBasePa + EFI_PAGES_TO_SIZE (PageCount),
-                      1
-                      );
-    ASSERT_RETURN_ERROR (DecryptStatus);
+    Status = MemEncryptSevClearPageEncMask (
+               0,
+               GhcbBasePa + EFI_PAGES_TO_SIZE (PageCount),
+               1
+               );
+    ASSERT_RETURN_ERROR (Status);
   }
 
   ZeroMem (GhcbBase, EFI_PAGES_TO_SIZE (GhcbPageCount));
 
-  PcdStatus = PcdSet64S (PcdGhcbBase, GhcbBasePa);
-  ASSERT_RETURN_ERROR (PcdStatus);
-  PcdStatus = PcdSet64S (PcdGhcbSize, EFI_PAGES_TO_SIZE (GhcbPageCount));
-  ASSERT_RETURN_ERROR (PcdStatus);
+  Status = PcdSet64S (PcdGhcbBase, GhcbBasePa);
+  ASSERT_RETURN_ERROR (Status);
+  Status = PcdSet64S (PcdGhcbSize, EFI_PAGES_TO_SIZE (GhcbPageCount));
+  ASSERT_RETURN_ERROR (Status);
 
   DEBUG ((
     DEBUG_INFO,
@@ -294,6 +294,20 @@ AmdSevEsInitialize (
   }
 
   AsmWriteMsr64 (MSR_SEV_ES_GHCB, GhcbBasePa);
+
+  //
+  // Now that the PEI GHCB is set up, the SEC GHCB page is no longer necessary
+  // to keep shared. Later, it is exposed to the OS as EfiConventionalMemory, so
+  // it needs to be marked private. The size of the region is hardcoded in
+  // OvmfPkg/ResetVector/ResetVector.nasmb in the definition of
+  // SNP_SEC_MEM_BASE_DESC_2.
+  //
+  Status = MemEncryptSevSetPageEncMask (
+             0,                                  // Cr3 -- use system Cr3
+             FixedPcdGet32 (PcdOvmfSecGhcbBase), // BaseAddress
+             1                                   // NumPages
+             );
+  ASSERT_RETURN_ERROR (Status);
 
   //
   // The SEV support will clear the C-bit from non-RAM areas.  The early GDT
