@@ -258,7 +258,7 @@ ExtractConfig (
       !HiiIsConfigHdrMatch (
          Request,
          &gOvmfPlatformConfigGuid,
-         mVariableName
+         mHiiFormName
          )
       )
   {
@@ -447,7 +447,7 @@ RouteConfig (
       !HiiIsConfigHdrMatch (
          Configuration,
          &gOvmfPlatformConfigGuid,
-         mVariableName
+         mHiiFormName
          )
       )
   {
