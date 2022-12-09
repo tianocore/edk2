@@ -363,21 +363,24 @@ PageTableLibMapInLevel (
       //
       // Create 512 child-level entries that map to 2M/4K.
       //
-      ParentPagingEntry->Uintn = (UINTN)Buffer + *BufferSize;
-      ZeroMem ((VOID *)ParentPagingEntry->Uintn, SIZE_4KB);
+      PagingEntry = (IA32_PAGING_ENTRY *)((UINTN)Buffer + *BufferSize);
+      ZeroMem (PagingEntry, SIZE_4KB);
+
+      for (SubOffset = 0, Index = 0; Index < 512; Index++) {
+        PagingEntry[Index].Uint64 = OneOfPagingEntry.Uint64 + SubOffset;
+        SubOffset                += RegionLength;
+      }
 
       //
       // Set NOP attributes
       // Note: Should NOT inherit the attributes from the original entry because a zero RW bit
       //       will make the entire region read-only even the child entries set the RW bit.
       //
+      // Use IA32_PE_BASE_ADDRESS_MASK_40 to only get the generic attribute fields.
+      // The Pat bit(bit 12) for LEAF_ENTRY_BIG_PAGESIZE is cleared here.
+      //
       PageTableLibSetPnle (&ParentPagingEntry->Pnle, &NopAttribute, &AllOneMask);
-
-      PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&ParentPagingEntry->Pnle);
-      for (SubOffset = 0, Index = 0; Index < 512; Index++) {
-        PagingEntry[Index].Uint64 = OneOfPagingEntry.Uint64 + SubOffset;
-        SubOffset                += RegionLength;
-      }
+      ParentPagingEntry->Uint64 = ((UINTN)(VOID *)PagingEntry) | (ParentPagingEntry->Uint64 & (~IA32_PE_BASE_ADDRESS_MASK_40));
     }
   } else {
     //
