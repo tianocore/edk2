@@ -74,6 +74,7 @@ typedef enum {
                                  Page table entries that map the linear address range are reset to 0 before set to the new attribute
                                  when a new physical base address is set.
   @param[in]      Mask           The mask used for attribute. The corresponding field in Attribute is ignored if that in Mask is 0.
+  @param[out]     IsModified     TRUE means page table is modified. FALSE means page table is not modified.
 
   @retval RETURN_UNSUPPORTED        PagingMode is not supported.
   @retval RETURN_INVALID_PARAMETER  PageTable, BufferSize, Attribute or Mask is NULL.
@@ -97,7 +98,8 @@ PageTableMap (
   IN     UINT64              LinearAddress,
   IN     UINT64              Length,
   IN     IA32_MAP_ATTRIBUTE  *Attribute,
-  IN     IA32_MAP_ATTRIBUTE  *Mask
+  IN     IA32_MAP_ATTRIBUTE  *Mask,
+  OUT    BOOLEAN             *IsModified   OPTIONAL
   );
 
 typedef struct {
