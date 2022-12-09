@@ -12,7 +12,7 @@
 ################################################################################
 
 [Defines]
-!include OvmfPkgDefines.fdf.inc
+!include OvmfPkg/Include/Fdf/OvmfPkgDefines.fdf.inc
 
 #
 # This will allow the flash device image to be recognize as an ELF, with first
@@ -32,7 +32,7 @@ NumBlocks     = $(FW_BLOCKS)
 0x00000000|0x00040000
 !endif
 
-!include XenElfHeader.fdf.inc
+!include OvmfPkg/Include/Fdf/XenElfHeader.fdf.inc
 
 !if ($(FD_SIZE_IN_KB) == 1024) || ($(FD_SIZE_IN_KB) == 2048)
 0x0000e000|0x00001000
@@ -86,7 +86,7 @@ ErasePolarity = 1
 BlockSize     = $(BLOCK_SIZE)
 NumBlocks     = $(VARS_BLOCKS)
 
-!include VarStore.fdf.inc
+!include OvmfPkg/Include/Fdf/VarStore.fdf.inc
 
 [FD.OVMF_CODE]
 BaseAddress   = $(CODE_BASE_ADDRESS)
@@ -388,7 +388,7 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
    }
  }
 
-!include FvmainCompactScratchEnd.fdf.inc
+!include OvmfPkg/Include/Fdf/FvmainCompactScratchEnd.fdf.inc
 
 ################################################################################
 
