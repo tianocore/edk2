@@ -21,7 +21,7 @@
 //   sizeof (CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER)
 // PcdOvmfConfidentialComputingWorkAreaHeader defined in:
 //   OvmfPkg/OvmfPkg.dec
-//   OvmfPkg/OvmfPkgDefines.fdf.inc
+//   OvmfPkg/Include/Fdf/OvmfPkgDefines.fdf.inc
 typedef struct _CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER {
   UINT8    GuestType;
   UINT8    Reserved1[3];
