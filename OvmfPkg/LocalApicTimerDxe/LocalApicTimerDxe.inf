@@ -27,6 +27,7 @@
   UefiBootServicesTableLib
   BaseLib
   DebugLib
+  NestedInterruptTplLib
   UefiDriverEntryPoint
   LocalApicLib
 
