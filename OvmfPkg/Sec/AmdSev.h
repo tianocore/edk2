@@ -71,7 +71,7 @@ SevEsIsEnabled (
 /**
  Validate System RAM used for decompressing the PEI and DXE firmware volumes
  when SEV-SNP is active. The PCDs SecValidatedStart and SecValidatedEnd are
- set in OvmfPkg/FvmainCompactScratchEnd.fdf.inc.
+ set in OvmfPkg/Include/Fdf/FvmainCompactScratchEnd.fdf.inc.
 
 **/
 VOID

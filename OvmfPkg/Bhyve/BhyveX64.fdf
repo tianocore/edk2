@@ -24,7 +24,7 @@ ErasePolarity = 1
 BlockSize     = $(BLOCK_SIZE)
 NumBlocks     = $(FW_BLOCKS)
 
-!include VarStore.fdf.inc
+!include OvmfPkg/Include/Fdf/VarStore.fdf.inc
 
 $(VARS_SIZE)|$(FVMAIN_SIZE)
 FV = FVMAIN_COMPACT
@@ -43,7 +43,7 @@ ErasePolarity = 1
 BlockSize     = $(BLOCK_SIZE)
 NumBlocks     = $(VARS_BLOCKS)
 
-!include VarStore.fdf.inc
+!include OvmfPkg/Include/Fdf/VarStore.fdf.inc
 
 [FD.BHYVE_CODE]
 BaseAddress   = $(CODE_BASE_ADDRESS)
@@ -368,7 +368,7 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
    }
  }
 
-!include FvmainCompactScratchEnd.fdf.inc
+!include OvmfPkg/Include/Fdf/FvmainCompactScratchEnd.fdf.inc
 
 ################################################################################
 

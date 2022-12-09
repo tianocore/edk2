@@ -378,7 +378,7 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
    }
  }
 
-!include OvmfPkg/FvmainCompactScratchEnd.fdf.inc
+!include OvmfPkg/Include/Fdf/FvmainCompactScratchEnd.fdf.inc
 
 ################################################################################
 
