@@ -38,6 +38,10 @@
   #
   MemEncryptTdxLib|Include/Library/MemEncryptTdxLib.h
 
+  ##  @libraryclass  Handle TPL changes within nested interrupt handlers
+  #
+  NestedInterruptTplLib|Include/Library/NestedInterruptTplLib.h
+
   ##  @libraryclass  Save and restore variables using a file
   #
   NvVarsFileLib|Include/Library/NvVarsFileLib.h
