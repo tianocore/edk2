@@ -637,6 +637,15 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType5InfoParser[] = {
     ARRAY_SIZE (CmArmMailboxRegisterInfoParser) },
 };
 
+/** A parser for EArmObjPsdInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmPsdInfoParser[] = {
+  { "Revision",  1, "0x%llx", NULL },
+  { "DomainId",  4, "0x%x",   NULL },
+  { "CoordType", 4, "0x%x",   NULL },
+  { "NumProc",   4, "0x%x",   NULL },
+};
+
 /** A parser for Arm namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
@@ -733,6 +742,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
     ARRAY_SIZE (CmArmPccSubspaceType34InfoParser) },
   { "EArmObjPccSubspaceType5Info",         CmArmPccSubspaceType5InfoParser,
     ARRAY_SIZE (CmArmPccSubspaceType5InfoParser) },
+  { "EArmObjCpcInfo",                      CmArmPsdInfoParser,
+    ARRAY_SIZE (CmArmPsdInfoParser) },
   { "EArmObjMax",                          NULL,                                  0                                },
 };
 
