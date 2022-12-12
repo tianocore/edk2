@@ -36,7 +36,7 @@
   @}
 */
 
-#include <AmlCpcInfo.h>
+#include <AcpiObjects.h>
 #include <IndustryStandard/Acpi.h>
 
 #ifndef AML_HANDLE

@@ -13,7 +13,7 @@
 #ifndef ARM_NAMESPACE_OBJECTS_H_
 #define ARM_NAMESPACE_OBJECTS_H_
 
-#include <AmlCpcInfo.h>
+#include <AcpiObjects.h>
 #include <StandardNameSpaceObjects.h>
 
 #pragma pack(1)
