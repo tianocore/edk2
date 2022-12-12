@@ -767,11 +767,11 @@ class VfrDefaultStore(object):
 
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def UpdateDefaultStoreName(self, DefaultNode):
+    def UpdateDefaultType(self, DefaultNode):
         pNode = self.__DefaultStoreList
         while pNode != None:
             if pNode.ObjAddr.DefaultId == DefaultNode.Data.GetDefaultId():
-                DefaultNode.Data.SetDefaultStoreName(pNode.RefName)
+                DefaultNode.Data.SetType(pNode.RefName)
             pNode = pNode.Next
 
     def DefaultIdRegistered(self, DefaultId):

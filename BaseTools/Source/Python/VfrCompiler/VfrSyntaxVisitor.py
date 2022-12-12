@@ -545,7 +545,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             VarStoreId = self.__TransNum(ctx.ID.text)
             self.__CompareErrorHandler(VarStoreId!=0, True, ctx.ID.line, ctx.ID.text, 'varid 0 is not allowed.')
         StoreName = ctx.SN.text
-        VSObj = IfrVarStore(StoreName)
+        VSObj = IfrVarStore(TypeName, StoreName)
         Line = ctx.start.line
         VSObj.SetLineNo(Line)
         Guid = ctx.guidDefinition().Guid
@@ -627,7 +627,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             Size, ReturnCode = gVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
             self.__ErrorHandler(ReturnCode, ctx.N.line)
 
-        VSEObj = IfrVarStoreEfi(StoreName)
+        VSEObj = IfrVarStoreEfi(TypeName, StoreName)
         VSEObj.SetLineNo(Line)
         VSEObj.SetGuid(Guid)
         VSEObj.SetVarStoreId (VarStoreId)
@@ -649,8 +649,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementVarStoreNameValue.
     def visitVfrStatementVarStoreNameValue(self, ctx:VfrSyntaxParser.VfrStatementVarStoreNameValueContext):
-
-        VSNVObj = IfrVarStoreNameValue()
+        StoreName = ctx.SN.text
+        VSNVObj = IfrVarStoreNameValue(StoreName)
         self.visitChildren(ctx)
 
         Guid = ctx.guidDefinition().Guid
@@ -662,7 +662,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             VarStoreId = self.__TransNum(ctx.ID.text)
             self.__CompareErrorHandler(VarStoreId !=0, True, ctx.ID.line, ctx.ID.text, 'varid 0 is not allowed')
 
-        StoreName = ctx.SN.text
         Created = False
 
         sIndex = 0 if  HasVarStoreId == False else 1
@@ -672,6 +671,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 self.__ErrorHandler(gVfrDataStorage.DeclareNameVarStoreBegin(StoreName, VarStoreId), ctx.SN.line, ctx.SN.text)
                 Created = True
             Item = self.__TransNum(ctx.Number(i))
+            VSNVObj.SetNameItemList(Item)
             gVfrDataStorage.NameTableAddItem(Item)
 
         gVfrDataStorage.DeclareNameVarStoreEnd(Guid)
@@ -780,6 +780,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         ReturnCode = None
 
         self.visitChildren(ctx)
+
         if ctx.Name() != None:
             QName = ctx.QN.text
             ReturnCode = self.__VfrQuestionDB.FindQuestionByName(QName)
@@ -822,7 +823,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.__CurrQestVarInfo = ctx.BaseInfo
 
         if ctx.Node.OpCode == EFI_IFR_ONE_OF_OP:
-            ctx.Node.Data = IfrOneOf(ctx.BaseInfo.VarType)
+            ctx.Node.Data = IfrOneOf(ctx.BaseInfo.VarType, QName, VarIdStr)
             self.__CurrentQuestion = ctx.Node.Data
             self.__CurrentMinMaxData = ctx.Node.Data
 
@@ -832,6 +833,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.__CurrentMinMaxData = ctx.Node.Data
 
         if ctx.Node.Data != None:
+            if ctx.Node.OpCode == EFI_IFR_CHECKBOX_OP or ctx.Node.OpCode == EFI_IFR_ORDERED_LIST_OP:
+                ctx.Node.Data.SetQName(QName)
+                ctx.Node.Data.SetVarIdStr(VarIdStr)
             ctx.Node.Data.SetQuestionId(QId)
             if ctx.BaseInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
                 ctx.Node.Data.SetVarStoreInfo(ctx.BaseInfo)
@@ -1331,7 +1335,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 Key = self.__TransNum(ctx.S4.text)
                 self.__AssignQuestionKey(AObj, Key)
             ctx.Node.Data = AObj
-            ctx.Node.OpCode = EFI_IFR_ACTION_OP #
+            ctx.Node.OpCode = EFI_IFR_TEXT_OP #
             ctx.Node.Buffer = gFormPkg.StructToStream(AObj.GetInfo())
             self.__InsertEndNode(ctx.Node, ctx.stop.line)
         else:
@@ -1859,9 +1863,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if ctx.Key() != None:
             self.__ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED, ctx.KN.line, ctx.KN.text)
             #　Guid Option Key
-            IfrOptionKey = IfrOptionKey(self.__CurrentQuestion.GetQuestionId(), Type, Value, self.__TransNum(ctx.KN.text))
-            Node = VfrTreeNode(EFI_IFR_GUID_OP, IfrOptionKey, gFormPkg.StructToStream(IfrOptionKey.GetInfo()))
-            IfrOptionKey.SetLineNo()
+            OOOObj.SetIfrOptionKey(self.__TransNum(ctx.KN.text))
+            gIfrOptionKey = IfrOptionKey(self.__CurrentQuestion.GetQuestionId(), Type, Value, self.__TransNum(ctx.KN.text))
+            Node = VfrTreeNode(EFI_IFR_GUID_OP, gIfrOptionKey, gFormPkg.StructToStream(gIfrOptionKey.GetInfo()))
+            gIfrOptionKey.SetLineNo()
             ctx.Node.insertChild(Node)
 
         for Ctx in ctx.vfrImageTag():
@@ -3228,7 +3233,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
 
         Line = ctx.start.line
-        GuidObj = IfrGuid(ctx.Size)
+        GuidObj = IfrExtensionGuid(ctx.Size)
         GuidObj.SetLineNo(Line)
         GuidObj.SetGuid(ctx.guidDefinition().Guid)
         if ctx.TypeName != '':

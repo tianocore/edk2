@@ -281,7 +281,7 @@ vfrQuestionHeader[Node, QType]
     ;
 
 vfrQuestionBaseInfo[Node, QType]
-locals[BaseInfo=EFI_VARSTORE_INFO(), QId=EFI_QUESTION_ID_INVALID, CheckFlag=True]
+locals[BaseInfo=EFI_VARSTORE_INFO(), QId=EFI_QUESTION_ID_INVALID, CheckFlag=True, QName=None, VarIdStr='']
     :   ('name' '=' QN=StringIdentifier ',')?
         ('varid' '=' vfrStorageVarId[localctx.BaseInfo, localctx.CheckFlag] ',')?
         ('questionid' '=' ID=Number ',')?

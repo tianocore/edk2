@@ -5795,6 +5795,8 @@ class VfrSyntaxParser ( Parser ):
             self.BaseInfo = EFI_VARSTORE_INFO()
             self.QId = EFI_QUESTION_ID_INVALID
             self.CheckFlag = True
+            self.QName = None
+            self.VarIdStr = ''
             self.QN = None # Token
             self.ID = None # Token
             self.Node = Node

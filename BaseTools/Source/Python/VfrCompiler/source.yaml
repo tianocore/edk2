@@ -13,7 +13,7 @@ formset:
       attribute:  0x0001 # Default ID
   varstore:
     - type:  DRIVER_SAMPLE_CONFIGURATION
-      varid:  0x1234 # Optional Input, Need to assign if None 
+      varid:  0x1234 # Optional Input, Need to assign if None
       name:  MyIfrNVData
       guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
       size:  219 # Need to Compute
@@ -22,19 +22,19 @@ formset:
       varid:  0x0001 # Optional Input, Need to assign if None
       name:  MyEfiVar
       guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
-      attribute:  0x00000003 # Need to Compute, the Input should be 0x00000001 | 0x00000002 
+      attribute:  0x00000003 # Need to Compute, the Input should be 0x00000001 | 0x00000002
       size:  8 # Need to Compute
     - type:  MY_EFI_BITS_VARSTORE_DATA
       varid:  0x0002 # Optional Input, Need to assign if None
       name:  MyEfiBitVar
       guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
-      attribute:  0x00000003 # Need to Compute, the Input should be 0x00000001 | 0x00000002 
+      attribute:  0x00000003 # Need to Compute, the Input should be 0x00000001 | 0x00000002
       size:  8 # Need to Compute
     - type:  MY_EFI_UNION_DATA
       varid:  0x0003 # Optional Input, Need to assign if None
       name:  MyEfiUnionVar
       guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
-      attribute:  0x00000003 # Need to Compute, the Input should be 0x00000001 | 0x00000002 
+      attribute:  0x00000003 # Need to Compute, the Input should be 0x00000001 | 0x00000002
       size:  1 # Need to Compute
   namevaluevarstore:
     - type:  MyNameValueVar
@@ -46,28 +46,34 @@ formset:
   form:
     formid1:  # FormId STRING_ID
       title:  0x0015  # FormTitle STRING_ID
-      statement:
+      statements:
         - subtitle:
             prompt:  0x001a  # Statement Prompt STRING_ID
             flags:  0x0000  # Optional Input
-        - subtitle:
-            prompt:  0x001b  # Statement Prompt STRING_ID
-            flags:  0x0000  # Optional Input
+            statements: # Optional Input, vfrStatementStatTagList/ vfrStatementStat/ vfrStatementQuestions
+              - image: 0x0000
+              - locked: None
+              - subtitle:
+                  prompt:  0x001a  # Statement Prompt STRING_ID
+              - Oneof:
+                  prompt:  0x001a  # Statement Prompt STRING_ID
         - text:
             help:  0x0050  # Statement Help STRING_ID
             prompt:  0x001c  # Statement Prompt STRING_ID
             text:  0x001d  # Optional Input, Statement TextTwo STRING_ID
+            statements: # Optional Input
+              - image: 0x0000
+              - locked: None
         - text:
             help:  0x0054  # Question Help STRING_ID
             prompt:  0x0054  # Question Prompt STRING_ID
             flags:  0x0004  # Optional Input, Question Flags
             key:  0x1237  # Optional Input, Question QuestionId
-        - text:
-            help:  0x0055  # Question Help STRING_ID
-            prompt:  0x0055  # Question Prompt STRING_ID
-            flags:  0x0004  # Optional Input, Question Flags
-            key:  0x1238  # Optional Input, Question QuestionId
+            statements: # Optional Input, vfrStatementStatTagList
+              - image: 0x0000
+              - locked: None
         - oneof:
+            condition: XXXXX
             name:  MyOneOf  #  Optional Input
             varid:  MyIfrNVData.SuppressGrayOutSomething  #  Optional Input
             questionid:  1  # Optional Input, Need to compute if None
@@ -77,66 +83,26 @@ formset:
             maximum:  2 # Optional Input
             minimum:  0 # Optional Input
             step:  0 # Optional Input
-            option:  
-              - text:  0x002a # Option STRING_ID
-                value:  0x0
-                flags:  0 # Optional Input
-              - text:  0x002b # Option STRING_ID
-                value:  0x1
-                flags:  0 # Optional Input
-              - text:  0x002c # Option STRING_ID
-                value:  0x2
-                flags:  16 # Optional Input
-        - oneof:
-            varid:  MyIfrNVData.BootOrderLarge  #  Optional Input
-            questionid:  2  # Optional Input, Need to compute if None
-            prompt:  0x001f  # Statement Prompt STRING_ID
-            help:  0x0026  # Statement Help STRING_ID
-            flags:  0  # Optional Input
-            maximum:  4 # Optional Input
-            minimum:  0 # Optional Input
-            step:  0 # Optional Input
-            default:
-              - type:  8
-                defaultId:  0
-            option:  
-              - text:  0x002d # Option STRING_ID
-                value:  0x0
-                flags:  0 # Optional Input
-              - text:  0x002e # Option STRING_ID
-                value:  0x1
-                flags:  0 # Optional Input
+            QuestionOptionList:
+              - option:
+                  text:  0x002a # Option STRING_ID
+                  value:  0x0
+                  flags:  0 # Optional Input
+                  key: 0x01 # Optional Input
+                  statements: # Optional Input
+                    - image: 0
+                    - image: 1
+              - image: 1
         - checkbox:
             condition:  grayoutif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1 | suppressif questionref(MyOneOf) == 0x0
+            name:  MyCheckbox  #  Optional Input
             varid:  MyIfrNVData.ChooseToActivateNuclearWeaponry  #  Optional Input
             questionid/key:  3  # Optional Input, Need to compute if None
             prompt:  0x002f  # Statement Prompt STRING_ID
             help:  0x0030  # Statement Help STRING_ID
             flags:  3  # Optional Input
-            default:
-              - type:  0
-                defaultId:  0
-                value:  1
-        - label:
-            number:  0x2222  # Number
-        - orderedlist:
-            varid:  MyIfrNVData.BootOrder  #  Optional Input
-            questionid:  4  # Optional Input, Need to compute if None
-            prompt:  0x008d  # Statement Prompt STRING_ID
-            help:  0x005a  # Statement Help STRING_ID
-            maxContainers:  8 # Optional Input, Need to compute if None
-            flags:  16 # Optional Input 
-            option:  
-              - text:  0x008f # Option STRING_ID
-                value:  0x2
-                flags:  1 # Optional Input
-              - text:  0x008e # Option STRING_ID
-                value:  0x1
-                flags:  1 # Optional Input
-              - text:  0x0090 # Option STRING_ID
-                value:  0x3
-                flags:  1 # Optional Input
-              - text:  0x0091 # Option STRING_ID
-                value:  0x4
-                flags:  1 # Optional Input
-                condition:  suppressif ideqval MyIfrNVData.BootOrderLarge == 0
+            QuestionOptionList:
+              - default:
+                  - type:  0
+                    defaultId:  0
+                    value:  1

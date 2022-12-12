@@ -1,6 +1,7 @@
 from distutils.filelist import FileList
 from pickletools import uint8
 import sys
+import yaml
 from tkinter.ttk import Treeview
 from antlr4 import *
 from VfrSyntaxVisitor import *
@@ -38,10 +39,29 @@ class VfrCompiler():
         # self.__VfrTree.GenBinaryFiles(self.__InputFile)
 
 
+class YamlCompiler():
+    def __init__(self, InputFile):
+        self.__Root = VfrTreeNode()
+        self.__InputFile = InputFile
+        self.__VfrTree = VfrTree(self.__Root)
+
+    def PreProcess(self):
+        pass
+
+    def Compile(self):
+        self.__VfrTree.ReadYaml(self.__InputFile)
+
+
+
 if __name__ == '__main__':
     InputFile = 'test.i'
 
-    Compiler = VfrCompiler(InputFile)
-    Compiler.PreProcess()
-    Compiler.Compile()
-    Compiler.GenFiles()
+    VCompiler = VfrCompiler(InputFile)
+    VCompiler.PreProcess()
+    VCompiler.Compile()
+    VCompiler.GenFiles()
+
+    InputFile = 'test.yaml'
+    YCompiler = YamlCompiler(InputFile)
+    YCompiler.PreProcess()
+    YCompiler.Compile()
