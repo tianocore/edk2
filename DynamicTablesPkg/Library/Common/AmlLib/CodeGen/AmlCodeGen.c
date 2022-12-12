@@ -3523,7 +3523,7 @@ AmlCreateCpcNode (
   }
 
   // Revision 3 per ACPI 6.4 specification
-  if (CpcInfo->Revision == 3) {
+  if (CpcInfo->Revision == EFI_ACPI_6_4_AML_CPC_REVISION_V3) {
     // NumEntries 23 per ACPI 6.4 specification
     NumberOfEntries = 23;
   } else {
