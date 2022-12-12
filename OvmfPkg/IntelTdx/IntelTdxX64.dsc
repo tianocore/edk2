@@ -754,6 +754,8 @@
 
   OvmfPkg/TdxDxe/TdxDxe.inf
 
+  OvmfPkg/IntelTdx/App/TestVeApp/TestVeApp.inf
+
   #
   # Variable driver stack (non-SMM)
   #
