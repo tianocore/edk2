@@ -204,6 +204,11 @@ typedef struct CmArmGicCInfo {
       i.e. a token referencing a CM_ARM_CPC_INFO object.
   */
   CM_OBJECT_TOKEN    CpcToken;
+
+  /** Optional field: Reference Token for the Psd info of this processor.
+      i.e. a token referencing a CM_ARM_PSD_INFO object.
+  */
+  CM_OBJECT_TOKEN    PsdToken;
 } CM_ARM_GICC_INFO;
 
 /** A structure that describes the

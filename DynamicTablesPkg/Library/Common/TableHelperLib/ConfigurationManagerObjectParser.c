@@ -83,7 +83,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmGicCInfoParser[] = {
   { "ProximityDomain",               4,                        "0x%x",   NULL },
   { "ClockDomain",                   4,                        "0x%x",   NULL },
   { "AffinityFlags",                 4,                        "0x%x",   NULL },
-  { "CpcToken",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL }
+  { "CpcToken",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "PsdToken",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
 };
 
 /** A parser for EArmObjGicDInfo.
@@ -766,7 +767,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
     ARRAY_SIZE (CmArmPccSubspaceType34InfoParser) },
   { "EArmObjPccSubspaceType5Info",         CmArmPccSubspaceType5InfoParser,
     ARRAY_SIZE (CmArmPccSubspaceType5InfoParser) },
-  { "EArmObjCpcInfo",                      CmArmPsdInfoParser,
+  { "EArmObjPsdInfo",                      CmArmPsdInfoParser,
     ARRAY_SIZE (CmArmPsdInfoParser) },
   { "EArmObjMax",                          NULL,                                  0                                },
 };
