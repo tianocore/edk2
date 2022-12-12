@@ -25,6 +25,7 @@
   CcExitLib.c
   CcExitVcHandler.c
   CcExitVcHandler.h
+  CcInstruction.c
   PeiDxeCcExitVcHandler.c
   CcExitVeHandler.c
   X64/TdVmcallCpuid.nasm
