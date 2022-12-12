@@ -165,6 +165,9 @@
 [PcdsFixedAtBuild.X64]
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16|UINT8|0x00000011
 
+[PcdsFixedAtBuild.RISCV64]
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
+
 [PcdsFixedAtBuild.common, PcdsDynamic.common]
   #
   # Value to add to a host address to obtain a device address, using
