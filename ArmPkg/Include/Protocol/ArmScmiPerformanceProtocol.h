@@ -1,12 +1,12 @@
 /** @file
 
-  Copyright (c) 2017-2021, Arm Limited. All rights reserved.
+  Copyright (c) 2017-2023, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
-  System Control and Management Interface V1.0
-    http://infocenter.arm.com/help/topic/com.arm.doc.den0056a/
-    DEN0056A_System_Control_and_Management_Interface.pdf
+  System Control and Management Interface, latest version:
+  - https://developer.arm.com/documentation/den0056/latest/
+
 **/
 
 #ifndef ARM_SCMI_PERFORMANCE_PROTOCOL_H_
@@ -14,7 +14,10 @@
 
 #include <Protocol/ArmScmi.h>
 
-#define PERFORMANCE_PROTOCOL_VERSION  0x10000
+/// Arm Scmi performance protocol versions.
+#define PERFORMANCE_PROTOCOL_VERSION_V1  0x10000
+#define PERFORMANCE_PROTOCOL_VERSION_V2  0x20000
+#define PERFORMANCE_PROTOCOL_VERSION_V3  0x30000
 
 #define ARM_SCMI_PERFORMANCE_PROTOCOL_GUID  { \
   0x9b8ba84, 0x3dd3, 0x49a6, {0xa0, 0x5a, 0x31, 0x34, 0xa5, 0xf0, 0x7b, 0xad} \
