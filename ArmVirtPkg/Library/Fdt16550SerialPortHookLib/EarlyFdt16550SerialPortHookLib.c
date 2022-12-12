@@ -1,7 +1,7 @@
 /** @file
   Early Platform Hook Library instance for 16550 Uart.
 
-  Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2020 - 2023, Arm Ltd. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -67,7 +67,7 @@ GetSerialConsolePortAddress (
   }
 
   // Determine the actual path length, as a colon terminates the path.
-  Path = ScanMem8 (Prop, ':', PropSize);
+  Path = ScanMem8 (Prop, PropSize, ':');
   if (Path == NULL) {
     PathLen = AsciiStrLen (Prop);
   } else {
