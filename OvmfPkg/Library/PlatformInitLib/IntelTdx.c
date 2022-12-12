@@ -547,6 +547,7 @@ TransferTdxHobList (
   EFI_PEI_HOB_POINTERS         Hob;
   EFI_RESOURCE_TYPE            ResourceType;
   EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute;
+  VOID                         *GuidedData;
 
   //
   // PcdOvmfSecGhcbBase is used as the TD_HOB in Tdx guest.
@@ -576,6 +577,10 @@ TransferTdxHobList (
           Hob.MemoryAllocation->AllocDescriptor.MemoryLength,
           Hob.MemoryAllocation->AllocDescriptor.MemoryType
           );
+        break;
+      case EFI_HOB_TYPE_GUID_EXTENSION:
+        GuidedData = (VOID *)(&Hob.Guid->Name + 1);
+        BuildGuidDataHob (&Hob.Guid->Name, GuidedData, Hob.Guid->Header.HobLength - sizeof (EFI_HOB_GUID_TYPE));
         break;
     }
 
