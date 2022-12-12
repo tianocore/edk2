@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017 - 2023, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -71,6 +71,7 @@ typedef enum ArmObjectID {
   EArmObjPccSubspaceType3Info,                                 ///< 46 - Pcc Subspace Type 3 Info
   EArmObjPccSubspaceType4Info,                                 ///< 47 - Pcc Subspace Type 4 Info
   EArmObjPccSubspaceType5Info,                                 ///< 48 - Pcc Subspace Type 5 Info
+  EArmObjPsdInfo,                                              ///< 49 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -1296,6 +1297,15 @@ typedef struct CmArmPccSubspaceType5Info {
   /// The WriteMask field is not used.
   PCC_MAILBOX_REGISTER_INFO    ErrorStatusReg;
 } CM_ARM_PCC_SUBSPACE_TYPE5_INFO;
+
+/** A structure that describes a
+    P-State Dependency (PSD) Info.
+
+    Cf. ACPI 6.4, s8.4.5.5 _PSD (P-State Dependency).
+
+    ID: EArmObjPsdInfo
+*/
+typedef AML_PSD_INFO CM_ARM_PSD_INFO;
 
 #pragma pack()
 

@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2022, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -118,6 +119,25 @@ typedef struct AmlCpcInfo {
   EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE    NominalFrequencyBuffer;
   UINT32                                    NominalFrequencyInteger;
 } AML_CPC_INFO;
+
+/** A structure that describes a
+    P-State Dependency (PSD) Info.
+
+  Cf. ACPI 6.4, s8.4.5.5 _PSD (P-State Dependency).
+*/
+typedef struct AmlPsdInfo {
+  /// Revision.
+  UINT8     Revision;
+
+  /// Domain Id.
+  UINT32    Domain;
+
+  /// Coordination type.
+  UINT32    CoordType;
+
+  /// Number of processors belonging to the Domain.
+  UINT32    NumProc;
+} AML_PSD_INFO;
 
 #pragma pack()
 
