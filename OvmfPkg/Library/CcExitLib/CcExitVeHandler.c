@@ -13,6 +13,10 @@
 #include <Library/BaseMemoryLib.h>
 #include <IndustryStandard/Tdx.h>
 #include <IndustryStandard/InstructionParsing.h>
+#include "CcInstruction.h"
+
+#define TDX_MMIO_READ   0
+#define TDX_MMIO_WRITE  1
 
 typedef union {
   struct {
@@ -216,14 +220,15 @@ STATIC
 VOID
 EFIAPI
 TdxDecodeInstruction (
-  IN UINT8  *Rip
+  IN UINT8   *Rip,
+  IN UINT32  Length
   )
 {
   UINTN  i;
 
   DEBUG ((DEBUG_INFO, "TDX: #TD[EPT] instruction (%p):", Rip));
-  for (i = 0; i < 15; i++) {
-    DEBUG ((DEBUG_INFO, "%02x:", Rip[i]));
+  for (i = 0; i < MIN (15, Length); i++) {
+    DEBUG ((DEBUG_INFO, "%02x ", Rip[i]));
   }
 
   DEBUG ((DEBUG_INFO, "\n"));
@@ -235,50 +240,324 @@ TdxDecodeInstruction (
     TdVmCall(TDVMCALL_HALT, 0, 0, 0, 0, 0); \
   }
 
+/**
+ * Tdx MMIO access via TdVmcall.
+ *
+ * @param MmioSize      Size of the MMIO access
+ * @param ReadOrWrite   Read or write operation
+ * @param GuestPA       Guest physical address
+ * @param Val           Pointer to the value which is read or written
+
+ * @retval EFI_SUCCESS  Successfully access the mmio
+ * @retval Others       Other errors as indicated
+ */
 STATIC
-UINT64 *
-EFIAPI
-GetRegFromContext (
-  IN EFI_SYSTEM_CONTEXT_X64  *Regs,
-  IN UINTN                   RegIndex
+UINT64
+TdxMmioReadWrite (
+  IN UINT32  MmioSize,
+  IN UINT32  ReadOrWrite,
+  IN UINT64  GuestPA,
+  IN UINT64  *Val
   )
 {
-  switch (RegIndex) {
-    case 0: return &Regs->Rax;
-      break;
-    case 1: return &Regs->Rcx;
-      break;
-    case 2: return &Regs->Rdx;
-      break;
-    case 3: return &Regs->Rbx;
-      break;
-    case 4: return &Regs->Rsp;
-      break;
-    case 5: return &Regs->Rbp;
-      break;
-    case 6: return &Regs->Rsi;
-      break;
-    case 7: return &Regs->Rdi;
-      break;
-    case 8: return &Regs->R8;
-      break;
-    case 9: return &Regs->R9;
-      break;
-    case 10: return &Regs->R10;
-      break;
-    case 11: return &Regs->R11;
-      break;
-    case 12: return &Regs->R12;
-      break;
-    case 13: return &Regs->R13;
-      break;
-    case 14: return &Regs->R14;
-      break;
-    case 15: return &Regs->R15;
-      break;
+  UINT64  Status;
+
+  if ((MmioSize != 1) && (MmioSize != 2) && (MmioSize != 4) && (MmioSize != 8)) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
   }
 
-  return NULL;
+  if (Val == NULL) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (ReadOrWrite == TDX_MMIO_READ) {
+    Status = TdVmCall (TDVMCALL_MMIO, MmioSize, TDX_MMIO_READ, GuestPA, 0, Val);
+  } else if (ReadOrWrite == TDX_MMIO_WRITE) {
+    Status = TdVmCall (TDVMCALL_MMIO, MmioSize, TDX_MMIO_WRITE, GuestPA, *Val, 0);
+  } else {
+    ASSERT (FALSE);
+    Status = EFI_INVALID_PARAMETER;
+  }
+
+  return Status;
+}
+
+typedef struct {
+  UINT8                   OpCode;
+  UINT32                  Bytes;
+  EFI_PHYSICAL_ADDRESS    Address;
+  UINT64                  Val;
+  UINT64                  *Register;
+  UINT32                  ReadOrWrite;
+} MMIO_EXIT_PARSED_INSTRUCTION;
+
+/**
+ * Parse the MMIO instructions.
+ *
+ * @param Regs              Pointer to the EFI_SYSTEM_CONTEXT_X64 which includes the instructions
+ * @param InstructionData   Pointer to the CC_INSTRUCTION_DATA
+ * @param ParsedInstruction Pointer to the parsed instruction data
+ *
+ * @retval EFI_SUCCESS      Successfully parsed the instructions
+ * @retval Others           Other error as indicated
+ */
+STATIC
+EFI_STATUS
+ParseMmioExitInstructions (
+  IN OUT EFI_SYSTEM_CONTEXT_X64     *Regs,
+  IN OUT CC_INSTRUCTION_DATA        *InstructionData,
+  OUT MMIO_EXIT_PARSED_INSTRUCTION  *ParsedInstruction
+  )
+{
+  EFI_STATUS            Status;
+  UINT8                 OpCode;
+  UINT8                 SignByte;
+  UINT32                Bytes;
+  EFI_PHYSICAL_ADDRESS  Address;
+  UINT64                Val;
+  UINT64                *Register;
+  UINT32                ReadOrWrite;
+
+  Address  = 0;
+  Bytes    = 0;
+  Register = NULL;
+  Status   = EFI_SUCCESS;
+  Val      = 0;
+
+  Status = CcInitInstructionData (InstructionData, NULL, Regs);
+  if (Status != EFI_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "%a: Initialize InstructionData failed! (%r)\n", __FUNCTION__, Status));
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  OpCode = *(InstructionData->OpCodes);
+  if (OpCode == TWO_BYTE_OPCODE_ESCAPE) {
+    OpCode = *(InstructionData->OpCodes + 1);
+  }
+
+  switch (OpCode) {
+    //
+    // MMIO write (MOV reg/memX, regX)
+    //
+    case 0x88:
+      Bytes = 1;
+    //
+    // fall through
+    //
+    case 0x89:
+      CcDecodeModRm (Regs, InstructionData);
+      Bytes = ((Bytes != 0) ? Bytes :
+               (InstructionData->DataSize == Size16Bits) ? 2 :
+               (InstructionData->DataSize == Size32Bits) ? 4 :
+               (InstructionData->DataSize == Size64Bits) ? 8 :
+               0);
+
+      if (InstructionData->Ext.ModRm.Mod == 3) {
+        DEBUG ((DEBUG_ERROR, "%a: Parse Ext.ModRm.Mod error! (OpCode: 0x%x)\n", __FUNCTION__, OpCode));
+        ASSERT (FALSE);
+        return EFI_UNSUPPORTED;
+      }
+
+      Address     = InstructionData->Ext.RmData;
+      Val         = InstructionData->Ext.RegData;
+      ReadOrWrite = TDX_MMIO_WRITE;
+
+      break;
+
+    //
+    // MMIO write (MOV moffsetX, aX)
+    //
+    case 0xA2:
+      Bytes = 1;
+    //
+    // fall through
+    //
+    case 0xA3:
+      Bytes = ((Bytes != 0) ? Bytes :
+               (InstructionData->DataSize == Size16Bits) ? 2 :
+               (InstructionData->DataSize == Size32Bits) ? 4 :
+               (InstructionData->DataSize == Size64Bits) ? 8 :
+               0);
+
+      InstructionData->ImmediateSize = (UINTN)(1 << InstructionData->AddrSize);
+      InstructionData->End          += InstructionData->ImmediateSize;
+      CopyMem (&Address, InstructionData->Immediate, InstructionData->ImmediateSize);
+
+      Val         = Regs->Rax;
+      ReadOrWrite = TDX_MMIO_WRITE;
+      break;
+
+    //
+    // MMIO write (MOV reg/memX, immX)
+    //
+    case 0xC6:
+      Bytes = 1;
+    //
+    // fall through
+    //
+    case 0xC7:
+      CcDecodeModRm (Regs, InstructionData);
+      Bytes = ((Bytes != 0) ? Bytes :
+               (InstructionData->DataSize == Size16Bits) ? 2 :
+               (InstructionData->DataSize == Size32Bits) ? 4 :
+               (InstructionData->DataSize == Size64Bits) ? 8 :
+               0);
+
+      InstructionData->ImmediateSize = Bytes;
+      InstructionData->End          += Bytes;
+
+      Val = 0;
+      CopyMem (&Val, InstructionData->Immediate, InstructionData->ImmediateSize);
+
+      Address     = InstructionData->Ext.RmData;
+      ReadOrWrite = TDX_MMIO_WRITE;
+
+      break;
+
+    //
+    // MMIO read (MOV regX, reg/memX)
+    //
+    case 0x8A:
+      Bytes = 1;
+    //
+    // fall through
+    //
+    case 0x8B:
+      CcDecodeModRm (Regs, InstructionData);
+      Bytes = ((Bytes != 0) ? Bytes :
+               (InstructionData->DataSize == Size16Bits) ? 2 :
+               (InstructionData->DataSize == Size32Bits) ? 4 :
+               (InstructionData->DataSize == Size64Bits) ? 8 :
+               0);
+      if (InstructionData->Ext.ModRm.Mod == 3) {
+        //
+        // NPF on two register operands???
+        //
+        DEBUG ((DEBUG_ERROR, "%a: Parse Ext.ModRm.Mod error! (OpCode: 0x%x)\n", __FUNCTION__, OpCode));
+        ASSERT (FALSE);
+        return EFI_UNSUPPORTED;
+      }
+
+      Address     = InstructionData->Ext.RmData;
+      ReadOrWrite = TDX_MMIO_READ;
+
+      Register = CcGetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
+      if (Bytes == 4) {
+        //
+        // Zero-extend for 32-bit operation
+        //
+        *Register = 0;
+      }
+
+      break;
+
+    //
+    // MMIO read (MOV aX, moffsetX)
+    //
+    case 0xA0:
+      Bytes = 1;
+    //
+    // fall through
+    //
+    case 0xA1:
+      Bytes = ((Bytes != 0) ? Bytes :
+               (InstructionData->DataSize == Size16Bits) ? 2 :
+               (InstructionData->DataSize == Size32Bits) ? 4 :
+               (InstructionData->DataSize == Size64Bits) ? 8 :
+               0);
+
+      InstructionData->ImmediateSize = (UINTN)(1 << InstructionData->AddrSize);
+      InstructionData->End          += InstructionData->ImmediateSize;
+
+      Address = 0;
+      CopyMem (
+        &Address,
+        InstructionData->Immediate,
+        InstructionData->ImmediateSize
+        );
+
+      if (Bytes == 4) {
+        //
+        // Zero-extend for 32-bit operation
+        //
+        Regs->Rax = 0;
+      }
+
+      Register    = &Regs->Rax;
+      ReadOrWrite = TDX_MMIO_READ;
+
+      break;
+
+    //
+    // MMIO read w/ zero-extension ((MOVZX regX, reg/memX)
+    //
+    case 0xB6:
+      Bytes = 1;
+    //
+    // fall through
+    //
+    case 0xB7:
+      CcDecodeModRm (Regs, InstructionData);
+      Bytes   = (Bytes != 0) ? Bytes : 2;
+      Address = InstructionData->Ext.RmData;
+
+      Register = CcGetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
+      SetMem (Register, (UINTN)(1 << InstructionData->DataSize), 0);
+
+      ReadOrWrite = TDX_MMIO_READ;
+
+      break;
+
+    //
+    // MMIO read w/ sign-extension (MOVSX regX, reg/memX)
+    //
+    case 0xBE:
+      Bytes = 1;
+    //
+    // fall through
+    //
+    case 0xBF:
+      CcDecodeModRm (Regs, InstructionData);
+      Bytes = (Bytes != 0) ? Bytes : 2;
+
+      Address = InstructionData->Ext.RmData;
+
+      if (Bytes == 1) {
+        UINT8  *Data;
+        Data     = (UINT8 *)&Val;
+        SignByte = ((*Data & BIT7) != 0) ? 0xFF : 0x00;
+      } else {
+        UINT16  *Data;
+        Data     = (UINT16 *)&Val;
+        SignByte = ((*Data & BIT15) != 0) ? 0xFF : 0x00;
+      }
+
+      Register = CcGetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
+      SetMem (Register, (UINTN)(1 << InstructionData->DataSize), SignByte);
+
+      ReadOrWrite = TDX_MMIO_READ;
+
+      break;
+
+    default:
+      DEBUG ((DEBUG_ERROR, "%a: Invalid MMIO opcode (%x)\n", __FUNCTION__, OpCode));
+      Status = EFI_UNSUPPORTED;
+      ASSERT (FALSE);
+  }
+
+  if (!EFI_ERROR (Status)) {
+    ParsedInstruction->OpCode      = OpCode;
+    ParsedInstruction->Address     = Address;
+    ParsedInstruction->Bytes       = Bytes;
+    ParsedInstruction->Register    = Register;
+    ParsedInstruction->Val         = Val;
+    ParsedInstruction->ReadOrWrite = ReadOrWrite;
+  }
+
+  return Status;
 }
 
 /**
@@ -300,25 +579,13 @@ MmioExit (
   IN TDCALL_VEINFO_RETURN_DATA   *Veinfo
   )
 {
-  UINT64          Status;
-  UINT32          MmioSize;
-  UINT32          RegSize;
-  UINT8           OpCode;
-  BOOLEAN         SeenRex;
-  UINT64          *Reg;
-  UINT8           *Rip;
-  UINT64          Val;
-  UINT32          OpSize;
-  MODRM           ModRm;
-  REX             Rex;
-  TD_RETURN_DATA  TdReturnData;
-  UINT8           Gpaw;
-  UINT64          TdSharedPageMask;
-
-  Rip     = (UINT8 *)Regs->Rip;
-  Val     = 0;
-  Rex.Val = 0;
-  SeenRex = FALSE;
+  UINT64                        Status;
+  TD_RETURN_DATA                TdReturnData;
+  UINT8                         Gpaw;
+  UINT64                        Val;
+  UINT64                        TdSharedPageMask;
+  CC_INSTRUCTION_DATA           InstructionData;
+  MMIO_EXIT_PARSED_INSTRUCTION  ParsedInstruction;
 
   Status = TdCall (TDCALL_TDINFO, 0, 0, 0, &TdReturnData);
   if (Status == TDX_EXIT_REASON_SUCCESS) {
@@ -335,112 +602,41 @@ MmioExit (
     CpuDeadLoop ();
   }
 
-  //
-  // Default to 32bit transfer
-  //
-  OpSize = 4;
+  Status = ParseMmioExitInstructions (Regs, &InstructionData, &ParsedInstruction);
+  if (Status != EFI_SUCCESS) {
+    return Status;
+  }
 
-  do {
-    OpCode = *Rip++;
-    if (OpCode == 0x66) {
-      OpSize = 2;
-    } else if ((OpCode == 0x64) || (OpCode == 0x65) || (OpCode == 0x67)) {
-      continue;
-    } else if ((OpCode >= 0x40) && (OpCode <= 0x4f)) {
-      SeenRex = TRUE;
-      Rex.Val = OpCode;
-    } else {
-      break;
+  if (Veinfo->GuestPA != (ParsedInstruction.Address | TdSharedPageMask)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Address is not correct! (%d: 0x%llx != 0x%llx)\n",
+      __FUNCTION__,
+      ParsedInstruction.OpCode,
+      Veinfo->GuestPA,
+      ParsedInstruction.Address
+      ));
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  if (ParsedInstruction.ReadOrWrite == TDX_MMIO_WRITE ) {
+    Status = TdxMmioReadWrite (ParsedInstruction.Bytes, TDX_MMIO_WRITE, Veinfo->GuestPA, &ParsedInstruction.Val);
+  } else {
+    Val    = 0;
+    Status = TdxMmioReadWrite (ParsedInstruction.Bytes, TDX_MMIO_READ, Veinfo->GuestPA, &Val);
+    if (Status == 0) {
+      CopyMem (ParsedInstruction.Register, &Val, ParsedInstruction.Bytes);
     }
-  } while (TRUE);
-
-  //
-  // We need to have at least 2 more bytes for this instruction
-  //
-  TDX_DECODER_BUG_ON (((UINT64)Rip - Regs->Rip) > 13);
-
-  OpCode = *Rip++;
-  //
-  // Two-byte opecode, get next byte
-  //
-  if (OpCode == 0x0F) {
-    OpCode = *Rip++;
-  }
-
-  switch (OpCode) {
-    case 0x88:
-    case 0x8A:
-    case 0xB6:
-      MmioSize = 1;
-      break;
-    case 0xB7:
-      MmioSize = 2;
-      break;
-    default:
-      MmioSize = Rex.Bits.W ? 8 : OpSize;
-      break;
-  }
-
-  /* Punt on AH/BH/CH/DH unless it shows up. */
-  ModRm.Val = *Rip++;
-  TDX_DECODER_BUG_ON (MmioSize == 1 && ModRm.Bits.Reg > 4 && !SeenRex && OpCode != 0xB6);
-  Reg = GetRegFromContext (Regs, ModRm.Bits.Reg | ((int)Rex.Bits.R << 3));
-  TDX_DECODER_BUG_ON (!Reg);
-
-  if (ModRm.Bits.Rm == 4) {
-    ++Rip; /* SIB byte */
-  }
-
-  if ((ModRm.Bits.Mod == 2) || ((ModRm.Bits.Mod == 0) && (ModRm.Bits.Rm == 5))) {
-    Rip += 4; /* DISP32 */
-  } else if (ModRm.Bits.Mod == 1) {
-    ++Rip;  /* DISP8 */
-  }
-
-  switch (OpCode) {
-    case 0x88:
-    case 0x89:
-      CopyMem ((void *)&Val, Reg, MmioSize);
-      Status = TdVmCall (TDVMCALL_MMIO, MmioSize, 1, Veinfo->GuestPA, Val, 0);
-      break;
-    case 0xC7:
-      CopyMem ((void *)&Val, Rip, OpSize);
-      Status = TdVmCall (TDVMCALL_MMIO, MmioSize, 1, Veinfo->GuestPA, Val, 0);
-      Rip   += OpSize;
-    default:
-      //
-      // 32-bit write registers are zero extended to the full register
-      // Hence 'MOVZX r[32/64], r/m16' is
-      // hardcoded to reg size 8, and the straight MOV case has a reg
-      // size of 8 in the 32-bit read case.
-      //
-      switch (OpCode) {
-        case 0xB6:
-          RegSize = Rex.Bits.W ? 8 : OpSize;
-          break;
-        case 0xB7:
-          RegSize =  8;
-          break;
-        default:
-          RegSize = MmioSize == 4 ? 8 : MmioSize;
-          break;
-      }
-
-      Status = TdVmCall (TDVMCALL_MMIO, MmioSize, 0, Veinfo->GuestPA, 0, &Val);
-      if (Status == 0) {
-        ZeroMem (Reg, RegSize);
-        CopyMem (Reg, (void *)&Val, MmioSize);
-      }
   }
 
   if (Status == 0) {
-    TDX_DECODER_BUG_ON (((UINT64)Rip - Regs->Rip) > 15);
-
     //
     // We change instruction length to reflect true size so handler can
     // bump rip
     //
-    Veinfo->ExitInstructionLength =  (UINT32)((UINT64)Rip - Regs->Rip);
+    Veinfo->ExitInstructionLength =  (UINT32)(CcInstructionLength (&InstructionData));
+    TdxDecodeInstruction ((UINT8 *)Regs->Rip, Veinfo->ExitInstructionLength);
   }
 
   return Status;
