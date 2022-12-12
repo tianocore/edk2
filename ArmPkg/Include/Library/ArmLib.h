@@ -780,6 +780,7 @@ EFIAPI
 ArmHasVhe (
   VOID
   );
+
 #endif // MDE_CPU_AARCH64
 
 #ifdef MDE_CPU_ARM
