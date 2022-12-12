@@ -153,16 +153,20 @@ CreateEsrtEntry (
 
   //
   // Check to see of FmpImageInfoBuf GUID/HardwareInstance is unique
+  // Skip if HardwareInstance is 0 as this is the case if FmpVersion < 3
+  // or the device can not create a unique ID per UEFI specification
   //
-  for (Index = 0; Index < *NumberOfDescriptors; Index++) {
-    if (CompareGuid (&HardwareInstances[Index].ImageTypeGuid, &FmpImageInfoBuf->ImageTypeId)) {
-      if (HardwareInstances[Index].HardwareInstance == FmpHardwareInstance) {
-        DEBUG ((DEBUG_ERROR, "EsrtFmpDxe: Duplicate firmware image descriptor with GUID %g HardwareInstance:0x%x\n", &FmpImageInfoBuf->ImageTypeId, FmpHardwareInstance));
-        ASSERT (
-          !CompareGuid (&HardwareInstances[Index].ImageTypeGuid, &FmpImageInfoBuf->ImageTypeId) ||
-          HardwareInstances[Index].HardwareInstance != FmpHardwareInstance
-          );
-        return EFI_UNSUPPORTED;
+  if (FmpHardwareInstance != 0) {
+    for (Index = 0; Index < *NumberOfDescriptors; Index++) {
+      if (CompareGuid (&HardwareInstances[Index].ImageTypeGuid, &FmpImageInfoBuf->ImageTypeId)) {
+        if (HardwareInstances[Index].HardwareInstance == FmpHardwareInstance) {
+          DEBUG ((DEBUG_ERROR, "EsrtFmpDxe: Duplicate firmware image descriptor with GUID %g HardwareInstance:0x%x\n", &FmpImageInfoBuf->ImageTypeId, FmpHardwareInstance));
+          ASSERT (
+            !CompareGuid (&HardwareInstances[Index].ImageTypeGuid, &FmpImageInfoBuf->ImageTypeId) ||
+            HardwareInstances[Index].HardwareInstance != FmpHardwareInstance
+            );
+          return EFI_UNSUPPORTED;
+        }
       }
     }
   }
