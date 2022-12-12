@@ -39,6 +39,7 @@
   PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
 
 [Components.common]
+  DynamicTablesPkg/Library/DynamicTablesScmiInfoLib/DynamicTablesScmiInfoLib.inf
   DynamicTablesPkg/Library/Common/AcpiHelperLib/AcpiHelperLib.inf
   DynamicTablesPkg/Library/Common/AmlLib/AmlLib.inf
   DynamicTablesPkg/Library/Common/SsdtPcieSupportLib/SsdtPcieSupportLib.inf
