@@ -1,7 +1,7 @@
 /** @file
   Arm Serial Port Parser.
 
-  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2023, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -290,7 +290,7 @@ GetSerialConsoleNode (
   }
 
   // Determine the actual path length, as a colon terminates the path.
-  Path = ScanMem8 (Prop, ':', PropSize);
+  Path = ScanMem8 (Prop, PropSize, ':');
   if (Path == NULL) {
     PathLen = (UINT32)AsciiStrLen (Prop);
   } else {
