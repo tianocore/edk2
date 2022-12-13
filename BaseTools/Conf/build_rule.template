@@ -342,7 +342,6 @@
 
     <OutputFile>
         $(OUTPUT_DIR)(+)$(MODULE_NAME).efi
-        $(DEBUG_DIR)(+)$(MODULE_NAME).efi
         $(OUTPUT_DIR)(+)$(MODULE_NAME).map
 
     <Command.MSFT, Command.INTEL, Command.CLANGPDB>
