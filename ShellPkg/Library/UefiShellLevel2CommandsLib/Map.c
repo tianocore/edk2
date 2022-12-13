@@ -51,7 +51,7 @@ IsNumberLetterOnly (
 /**
   Do a search in the Target delimited list.
 
-  @param[in] List         The list to seatch in.
+  @param[in] List         The list to search in.
   @param[in] MetaTarget   The item to search for. MetaMatching supported.
   @param[out] FullName    Optional pointer to an allocated buffer containing
                           the match.
