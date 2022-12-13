@@ -49,7 +49,11 @@
 #define PERF_ID_CC_TCG2_DXE  0x3130
 
 #define   CC_EVENT_LOG_AREA_COUNT_MAX  1
-#define   INVALID_RTMR_INDEX           4
+#define   CC_MR_INDEX_0_MRTD           0
+#define   CC_MR_INDEX_1_RTMR0          1
+#define   CC_MR_INDEX_2_RTMR1          2
+#define   CC_MR_INDEX_3_RTMR2          3
+#define   CC_MR_INDEX_INVALID          4
 
 typedef struct {
   CHAR16      *VariableName;
@@ -240,7 +244,7 @@ EFI_HANDLE  mImageHandle;
 
   Notes: PE/COFF image is checked by BasePeCoffLib PeCoffLoaderGetImageInfo().
 
-  @param[in]  MrIndex      RTMR index
+  @param[in]  RtmrIndex        RTMR index
   @param[in]  ImageAddress   Start address of image buffer.
   @param[in]  ImageSize      Image size
   @param[out] DigestList     Digest list of this image.
@@ -251,7 +255,7 @@ EFI_HANDLE  mImageHandle;
 **/
 EFI_STATUS
 MeasurePeImageAndExtend (
-  IN  UINT32                MrIndex,
+  IN  UINT32                RtmrIndex,
   IN  EFI_PHYSICAL_ADDRESS  ImageAddress,
   IN  UINTN                 ImageSize,
   OUT TPML_DIGEST_VALUES    *DigestList
@@ -925,10 +929,22 @@ TcgCommLogEvent (
 }
 
 /**
-    RTMR[0]  => PCR[1,7]
-    RTMR[1]  => PCR[2,3,4,5]
-    RTMR[2]  => PCR[8~15]
-    RTMR[3]  => NA
+  According to UEFI Spec 2.10 Section 38.4.1:
+    The following table shows the TPM PCR index mapping and CC event log measurement
+  register index interpretation for Intel TDX, where MRTD means Trust Domain Measurement
+   Register and RTMR means Runtime Measurement Register
+
+    // TPM PCR Index | CC Measurement Register Index | TDX-measurement register
+    //  ------------------------------------------------------------------------
+    // 0             |   0                           |   MRTD
+    // 1, 7          |   1                           |   RTMR[0]
+    // 2~6           |   2                           |   RTMR[1]
+    // 8~15          |   3                           |   RTMR[2]
+
+  @param[in] PCRIndex Index of the TPM PCR
+
+  @retval    UINT32               Index of the CC Event Log Measurement Register Index
+  @retval    CC_MR_INDEX_INVALID  Invalid MR Index
 **/
 UINT32
 EFIAPI
@@ -938,18 +954,20 @@ MapPcrToMrIndex (
 {
   UINT32  MrIndex;
 
-  if ((PCRIndex > 16) || (PCRIndex == 6) || (PCRIndex == 0)) {
+  if (PCRIndex > 15) {
     ASSERT (FALSE);
-    return INVALID_RTMR_INDEX;
+    return CC_MR_INDEX_INVALID;
   }
 
   MrIndex = 0;
-  if ((PCRIndex == 1) || (PCRIndex == 7)) {
-    MrIndex = 0;
-  } else if ((PCRIndex > 1) && (PCRIndex < 6)) {
-    MrIndex = 1;
-  } else if ((PCRIndex > 7) && (PCRIndex < 16)) {
-    MrIndex = 2;
+  if (PCRIndex == 0) {
+    MrIndex = CC_MR_INDEX_0_MRTD;
+  } else if ((PCRIndex == 1) || (PCRIndex == 7)) {
+    MrIndex = CC_MR_INDEX_1_RTMR0;
+  } else if ((PCRIndex >= 2) && (PCRIndex <= 6)) {
+    MrIndex = CC_MR_INDEX_2_RTMR1;
+  } else if ((PCRIndex >= 8) && (PCRIndex <= 15)) {
+    MrIndex = CC_MR_INDEX_3_RTMR2;
   }
 
   return MrIndex;
@@ -967,13 +985,9 @@ TdMapPcrToMrIndex (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((PCRIndex > 16) || (PCRIndex == 0) || (PCRIndex == 6)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   *MrIndex = MapPcrToMrIndex (PCRIndex);
 
-  return *MrIndex == INVALID_RTMR_INDEX ? EFI_INVALID_PARAMETER : EFI_SUCCESS;
+  return *MrIndex == CC_MR_INDEX_INVALID ? EFI_INVALID_PARAMETER : EFI_SUCCESS;
 }
 
 /**
@@ -1197,12 +1211,7 @@ TdxDxeLogHashEvent (
   LogFormat = EFI_CC_EVENT_LOG_FORMAT_TCG_2;
 
   ZeroMem (&CcEvent, sizeof (CcEvent));
-  //
-  // The index of event log is designed as below:
-  //   0  : MRTD
-  //   1-4: RTMR[0-3]
-  //
-  CcEvent.MrIndex   = NewEventHdr->MrIndex + 1;
+  CcEvent.MrIndex   = NewEventHdr->MrIndex;
   CcEvent.EventType = NewEventHdr->EventType;
   DigestBuffer      = (UINT8 *)&CcEvent.Digests;
   EventSizePtr      = CopyDigestListToBuffer (DigestBuffer, DigestList, HASH_ALG_SHA384);
@@ -1270,8 +1279,16 @@ TdxDxeHashLogExtendEvent (
     return Status;
   }
 
+  //
+  // According to UEFI Spec 2.10 Section 38.4.1 the mapping between MrIndex and Intel
+  // TDX Measurement Register is:
+  //    MrIndex 0   <--> MRTD
+  //    MrIndex 1-3 <--> RTMR[0-2]
+  // Only the RMTR registers can be extended in TDVF by HashAndExtend. So MrIndex will
+  // decreased by 1 before it is sent to HashAndExtend.
+  //
   Status = HashAndExtend (
-             NewEventHdr->MrIndex,
+             NewEventHdr->MrIndex - 1,
              HashData,
              (UINTN)HashDataLen,
              &DigestList
@@ -1335,7 +1352,13 @@ TdHashLogExtendEvent (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (CcEvent->Header.MrIndex > 4) {
+  if (CcEvent->Header.MrIndex == CC_MR_INDEX_0_MRTD) {
+    DEBUG ((DEBUG_ERROR, "%a: MRTD cannot be extended in TDVF.\n", __FUNCTION__));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (CcEvent->Header.MrIndex >= CC_MR_INDEX_INVALID) {
+    DEBUG ((DEBUG_ERROR, "%a: MrIndex is invalid. (%d)\n", __FUNCTION__, CcEvent->Header.MrIndex));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1343,8 +1366,16 @@ TdHashLogExtendEvent (
   NewEventHdr.EventType = CcEvent->Header.EventType;
   NewEventHdr.EventSize = CcEvent->Size - sizeof (UINT32) - CcEvent->Header.HeaderSize;
   if ((Flags & EFI_CC_FLAG_PE_COFF_IMAGE) != 0) {
+    //
+    // According to UEFI Spec 2.10 Section 38.4.1 the mapping between MrIndex and Intel
+    // TDX Measurement Register is:
+    //    MrIndex 0   <--> MRTD
+    //    MrIndex 1-3 <--> RTMR[0-2]
+    // Only the RMTR registers can be extended in TDVF by HashAndExtend. So MrIndex will
+    // decreased by 1 before it is sent to MeasurePeImageAndExtend.
+    //
     Status = MeasurePeImageAndExtend (
-               NewEventHdr.MrIndex,
+               NewEventHdr.MrIndex - 1,
                DataToHash,
                (UINTN)DataToHashLen,
                &DigestList
