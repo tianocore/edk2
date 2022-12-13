@@ -151,7 +151,7 @@ locals[ClassName=0]
     |   Number
     ;
 
-subclassDefinition
+subclassDefinitions
 locals[Node=VfrTreeNode(EFI_IFR_GUID_OP)]
     :   SubclassSetupApplication
     |   SubclassGeneralApplication
@@ -510,13 +510,13 @@ locals[Node]
 
 vfrStatementQuestionTag
 locals[Node]
-    :   vfrStatementStatTag ','
+    :   vfrStatementStatTag ',' //
     |   vfrStatementInconsistentIf
     |   vfrStatementNoSubmitIf
     |   vfrStatementDisableIfQuest
     |   vfrStatementRefresh
     |   vfrStatementVarstoreDevice
-    |   vfrStatementExtension
+    |   vfrStatementExtension //
     |   vfrStatementRefreshEvent
     |   vfrStatementWarningIf
     ;

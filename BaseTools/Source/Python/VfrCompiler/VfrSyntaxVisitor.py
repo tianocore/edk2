@@ -833,9 +833,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.__CurrentMinMaxData = ctx.Node.Data
 
         if ctx.Node.Data != None:
-            if ctx.Node.OpCode == EFI_IFR_CHECKBOX_OP or ctx.Node.OpCode == EFI_IFR_ORDERED_LIST_OP:
-                ctx.Node.Data.SetQName(QName)
-                ctx.Node.Data.SetVarIdStr(VarIdStr)
+            ctx.Node.Data.SetQName(QName)
+            ctx.Node.Data.SetVarIdStr(VarIdStr)
             ctx.Node.Data.SetQuestionId(QId)
             if ctx.BaseInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
                 ctx.Node.Data.SetVarStoreInfo(ctx.BaseInfo)
@@ -1557,7 +1556,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementInconsistentIf.
     def visitVfrStatementInconsistentIf(self, ctx:VfrSyntaxParser.VfrStatementInconsistentIfContext):
 
-        IIObj = IfrInconsistentIf()
+        IIObj = IfrInconsistentIf2()
         self.visitChildren(ctx)
 
         IIObj.SetLineNo(ctx.start.line)
@@ -1565,7 +1564,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         ctx.Node.Data = IIObj
         ctx.Node.Buffer = gFormPkg.StructToStream(IIObj.GetInfo())
-        ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
+        ctx.Node.Condition = 'inconsistentif' + ' ' + self.__ExtractOriginalText(ctx.vfrStatementExpression())
         self.__InsertEndNode(ctx.Node, ctx.stop.line)
 
         return ctx.Node
@@ -1580,7 +1579,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         NSIObj.SetError(self.__TransNum(ctx.Number()))
         ctx.Node.Data = NSIObj
         ctx.Node.Buffer = gFormPkg.StructToStream(NSIObj.GetInfo())
-        ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
+        ctx.Node.Condition = 'nosubmitif' + ' ' + self.__ExtractOriginalText(ctx.vfrStatementExpression())
         self.__InsertEndNode(ctx.Node, ctx.stop.line)
 
         return ctx.Node
@@ -1594,7 +1593,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         DIObj.SetLineNo(ctx.start.line)
         ctx.Node.Data = DIObj
         ctx.Node.Buffer = gFormPkg.StructToStream(DIObj.GetInfo())
-        ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
+        ctx.Node.Condition = 'disableif' + ' ' + self.__ExtractOriginalText(ctx.vfrStatementExpression())
+        #ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
         self.__InsertEndNode(ctx.Node, ctx.stop.line)
 
         return ctx.Node
@@ -1933,7 +1933,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         RObj.SetLineNo(ctx.start.line)
         ctx.Node.Data = RObj
         ctx.Node.Buffer = gFormPkg.StructToStream(RObj.GetInfo())
-        ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
+        ctx.Node.Condition = self.__ExtractOriginalText(ctx.vfrStatementExpression())
 
         return ctx.Node
 
@@ -1946,7 +1946,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         WObj.SetLineNo(ctx.start.line)
         ctx.Node.Data = WObj
         ctx.Node.Buffer = gFormPkg.StructToStream(WObj.GetInfo())
-        ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
+        ctx.Node.Condition = self.__ExtractOriginalText(ctx.vfrStatementExpression())
 
         return ctx.Node
 
@@ -4741,7 +4741,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         InputStream = Source.inputStream
         start, stop  = ctx.start.start, ctx.stop.stop
         Text = InputStream.getText(start, stop)
-        return Text.replace('\n', '')
+        return Text.replace('\r', '').replace('\n', '').replace('  ', ' ')
 
     def __CheckDuplicateDefaultValue(self, DefaultId, Line, TokenValue):
         for i in range(0, len(self.__UsedDefaultArray)):

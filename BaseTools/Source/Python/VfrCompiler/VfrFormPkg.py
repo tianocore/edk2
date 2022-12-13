@@ -480,6 +480,28 @@ class IfrLine():
 
     def GetLineNo(self):
         return self.__LineNo
+class IfrBaseInfo():
+    def __init__(self, Obj=None, QName=None, VarIdStr=''):
+
+        self.__Obj = Obj
+        self.__QName = QName
+        self.__VarIdStr = VarIdStr
+
+    def SetQName(self, QName):
+        self.__QName = QName
+
+    def GetQName(self):
+        return self.__QName
+
+    def SetVarIdStr(self, VarIdStr):
+        self.__VarIdStr = VarIdStr
+
+    def GetVarIdStr(self):
+        return self.__VarIdStr
+
+    def GetInfo(self):
+        return self.__Obj
+
 class IfrOpHeader():
 
     def __init__(self, OpHeader: EFI_IFR_OP_HEADER, OpCode=None, Length=0):
@@ -1225,10 +1247,11 @@ class IfrQuestionHeader(IfrStatementHeader):
         self.__QHeader = qHeader
 
 
-class IfrRef(IfrLine, IfrOpHeader, IfrQuestionHeader):
+class IfrRef(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
-    def __init__(self, ):
+    def __init__(self, QName=None, VarIdStr=''):
         self.__Ref = EFI_IFR_REF()
+        IfrBaseInfo.__init__(self, self.__Ref, QName, VarIdStr)
         IfrOpHeader.__init__(self, self.__Ref.Header, EFI_IFR_REF_OP)
         IfrQuestionHeader.__init__(self, self.__Ref.Question)
         self.__Ref.FormId = 0
@@ -1236,14 +1259,11 @@ class IfrRef(IfrLine, IfrOpHeader, IfrQuestionHeader):
     def SetFormId(self, FormId):
         self.__Ref.FormId = FormId
 
-    def GetInfo(self):
-        return self.__Ref
+class IfrRef2(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
-
-class IfrRef2(IfrLine, IfrOpHeader, IfrQuestionHeader):
-
-    def __init__(self, ):
+    def __init__(self, QName=None, VarIdStr=''):
         self.__Ref2 = EFI_IFR_REF2()
+        IfrBaseInfo.__init__(self, self.__Ref2, QName, VarIdStr)
         IfrOpHeader.__init__(self, self.__Ref2.Header, EFI_IFR_REF_OP, sizeof(EFI_IFR_REF2))
         IfrQuestionHeader.__init__(self, self.__Ref2.Question)
         self.__Ref2.FormId = 0
@@ -1256,14 +1276,11 @@ class IfrRef2(IfrLine, IfrOpHeader, IfrQuestionHeader):
 
         self.__Ref2.QuestionId = QuestionId
 
-    def GetInfo(self):
-        return self.__Ref2
+class IfrRef3(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
-
-class IfrRef3(IfrLine, IfrOpHeader, IfrQuestionHeader):
-
-    def __init__(self, ):
+    def __init__(self, QName=None, VarIdStr=''):
         self.__Ref3 = EFI_IFR_REF3()
+        IfrBaseInfo.__init__(self, self.__Ref3, QName, VarIdStr)
         IfrOpHeader.__init__(self, self.__Ref3.Header, EFI_IFR_REF_OP, sizeof(EFI_IFR_REF3))
         IfrQuestionHeader.__init__(self, self.__Ref3.Question)
         self.__Ref3.FormId = 0
@@ -1282,14 +1299,11 @@ class IfrRef3(IfrLine, IfrOpHeader, IfrQuestionHeader):
     def SetFormSetId(self, FormSetId):
         self.__Ref3.FormSetId = FormSetId
 
-    def GetInfo(self):
-        return self.__Ref3
+class IfrRef4(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
-
-class IfrRef4(IfrLine, IfrOpHeader, IfrQuestionHeader):
-
-    def __init__(self, ):
+    def __init__(self, QName=None, VarIdStr=''):
         self.__Ref4 = EFI_IFR_REF4()
+        IfrBaseInfo.__init__(self, self.__Ref4, QName, VarIdStr)
         IfrOpHeader.__init__(self, self.__Ref4.Header, EFI_IFR_REF_OP, sizeof(EFI_IFR_REF4))
         IfrQuestionHeader.__init__(self, self.__Ref4.Question)
         self.__Ref4.FormId = 0
@@ -1312,34 +1326,26 @@ class IfrRef4(IfrLine, IfrOpHeader, IfrQuestionHeader):
     def SetDevicePath(self, DevicePath):
         self.__Ref4.DevicePath = DevicePath
 
-    def GetInfo(self):
-        return self.__Ref4
+class IfrRef5(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
-
-class IfrRef5(IfrLine, IfrOpHeader, IfrQuestionHeader):
-
-    def __init__(self, ):
+    def __init__(self, QName=None, VarIdStr=''):
         self.__Ref5 = EFI_IFR_REF5()
+        IfrBaseInfo.__init__(self, self.__Ref5, QName, VarIdStr)
         IfrOpHeader.__init__(self, self.__Ref5.Header, EFI_IFR_REF_OP, sizeof(EFI_IFR_REF5))
         IfrQuestionHeader.__init__(self, self.__Ref5.Question)
 
-    def GetInfo(self):
-        return self.__Ref5
 
+class IfrAction(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
-class IfrAction(IfrLine, IfrOpHeader, IfrQuestionHeader):
-
-    def __init__(self, ):
+    def __init__(self, QName=None, VarIdStr=''):
         self.__Action = EFI_IFR_ACTION()
+        IfrBaseInfo.__init__(self, self.__Action, QName, VarIdStr)
         IfrOpHeader.__init__(self, self.__Action.Header, EFI_IFR_ACTION_OP)
         IfrQuestionHeader.__init__(self, self.__Action.Question)
         self.__Action.QuestionConfig = EFI_STRING_ID_INVALID
 
     def SetQuestionConfig(self, QuestionConfig):
         self.__Action.QuestionConfig = QuestionConfig
-
-    def GetInfo(self):
-        return self.__Action
 
 
 class IfrText(IfrLine, IfrOpHeader, IfrStatementHeader):
@@ -1404,12 +1410,11 @@ class IfrExtensionGuid(IfrLine, IfrOpHeader):
         return self.__Guid
 
 
-class IfrOrderedList(IfrLine, IfrOpHeader, IfrQuestionHeader):
+class IfrOrderedList(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
     def __init__(self, QName=None, VarIdStr=''):
         self.__OrderedList = EFI_IFR_ORDERED_LIST()
-        self.__QName = QName
-        self.__VarIdStr = VarIdStr
+        IfrBaseInfo.__init__(self, self.__OrderedList, QName, VarIdStr)
         IfrOpHeader.__init__(self, self.__OrderedList.Header,
                               EFI_IFR_ORDERED_LIST_OP)
         IfrQuestionHeader.__init__(self, self.__OrderedList.Question)
@@ -1418,18 +1423,6 @@ class IfrOrderedList(IfrLine, IfrOpHeader, IfrQuestionHeader):
 
     def GetQuestion(self):
         return self
-
-    def SetQName(self, QName):
-        self.__QName = QName
-
-    def GetQName(self):
-        return self.__QName
-
-    def SetVarIdStr(self, VarIdStr):
-        self.__VarIdStr = VarIdStr
-
-    def GetVarIdStr(self):
-        return self.__VarIdStr
 
     def SetQHeaderFlags(self, Flags):
         IfrQuestionHeader.SetFlags(self, Flags)
@@ -1452,14 +1445,11 @@ class IfrOrderedList(IfrLine, IfrOpHeader, IfrQuestionHeader):
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
 
-    def GetInfo(self):
-        return self.__OrderedList
+class IfrString(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
-
-class IfrString(IfrLine, IfrOpHeader, IfrQuestionHeader):
-
-    def __init__(self):
+    def __init__(self, QName=None, VarIdStr=''):
         self.__Str = EFI_IFR_STRING()
+        IfrBaseInfo.__init__(self, self.__Str, QName, VarIdStr)
         IfrOpHeader.__init__(self, self.__Str.Header, EFI_IFR_STRING_OP)
         IfrQuestionHeader.__init__(self, self.__Str.Question)
         self.__Str.Flags = 0
@@ -1490,14 +1480,11 @@ class IfrString(IfrLine, IfrOpHeader, IfrQuestionHeader):
     def SetMaxSize(self, MaxSize):
         self.__Str.MaxSize = MaxSize
 
-    def GetInfo(self):
-        return self.__Str
+class IfrPassword(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
-
-class IfrPassword(IfrLine, IfrOpHeader, IfrQuestionHeader):
-
-    def __init__(self):
+    def __init__(self, QName=None, VarIdStr=''):
         self.__Password = EFI_IFR_PASSWORD()
+        IfrBaseInfo.__init__(self, self.__Password, QName, VarIdStr)
         IfrOpHeader.__init__(self, self.__Password.Header,
                               EFI_IFR_PASSWORD_OP)
         IfrQuestionHeader.__init__(self, self.__Password.Question)
@@ -1515,9 +1502,6 @@ class IfrPassword(IfrLine, IfrOpHeader, IfrQuestionHeader):
 
     def SetMaxSize(self, MaxSize):
         self.__Password.MaxSize = MaxSize
-
-    def GetInfo(self):
-        return self.__Password
 
 class IfrDefault(IfrLine, IfrOpHeader):
 
@@ -1582,6 +1566,20 @@ class IfrDefault2(IfrLine, IfrOpHeader):
 
 
 class IfrInconsistentIf(IfrLine, IfrOpHeader):
+
+    def __init__(self):
+        self.__InconsistentIf = EFI_IFR_INCONSISTENT_IF()
+        IfrOpHeader.__init__(self, self.__InconsistentIf.Header,
+                              EFI_IFR_INCONSISTENT_IF_OP)
+        self.__InconsistentIf.Error = EFI_STRING_ID_INVALID
+
+    def SetError(self, Error):
+        self.__InconsistentIf.Error = Error
+
+    def GetInfo(self):
+        return self.__InconsistentIf
+
+class IfrInconsistentIf2(IfrLine, IfrOpHeader):
 
     def __init__(self):
         self.__InconsistentIf = EFI_IFR_INCONSISTENT_IF()
@@ -1738,10 +1736,11 @@ class IfrVarStoreDevice(IfrLine, IfrOpHeader):
         return self.__VarStoreDevice
 
 
-class IfrDate(IfrLine, IfrOpHeader, IfrQuestionHeader):
+class IfrDate(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
-    def __init__(self):
+    def __init__(self, QName=None, VarIdStr=''):
         self.__Date = EFI_IFR_DATE()
+        IfrBaseInfo.__init__(self, self.__Date, QName, VarIdStr)
         IfrOpHeader.__init__(self, self.__Date.Header, EFI_IFR_DATE_OP)
         IfrQuestionHeader.__init__(self, self.__Date.Question)
         self.__Date.Flags = 0
@@ -1778,14 +1777,12 @@ class IfrDate(IfrLine, IfrOpHeader, IfrQuestionHeader):
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
 
-    def GetInfo(self):
-        return self.__Date
 
+class IfrTime(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
-class IfrTime(IfrLine, IfrOpHeader, IfrQuestionHeader):
-
-    def __init__(self):
+    def __init__(self, QName=None, VarIdStr=''):
         self.__Time = EFI_IFR_TIME()
+        IfrBaseInfo.__init__(self, self.__Time, QName, VarIdStr)
         IfrOpHeader.__init__(self, self.__Time.Header, EFI_IFR_TIME_OP)
         IfrQuestionHeader.__init__(self, self.__Time.Question)
         self.__Time.Flags = 0
@@ -1822,15 +1819,13 @@ class IfrTime(IfrLine, IfrOpHeader, IfrQuestionHeader):
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
 
-    def GetInfo(self):
-        return self.__Time
 
-
-class IfrNumeric(IfrLine, IfrOpHeader, IfrQuestionHeader,
+class IfrNumeric(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader,
                   IfrMinMaxStepData):
 
-    def __init__(self, Type):
+    def __init__(self, Type, QName=None, VarIdStr=''):
         self.__Numeric = Refine_EFI_IFR_NUMERIC(Type)
+        IfrBaseInfo.__init__(self, self.__Numeric, QName, VarIdStr)
         IfrOpHeader.__init__(self, self.__Numeric.Header, EFI_IFR_NUMERIC_OP, sizeof(self.__Numeric))
         IfrQuestionHeader.__init__(self, self.__Numeric.Question)
         IfrMinMaxStepData.__init__(self, self.__Numeric.Data, True)
@@ -1878,20 +1873,17 @@ class IfrNumeric(IfrLine, IfrOpHeader, IfrQuestionHeader,
         Numeric = EFI_IFR_NUMERIC()
         self.UpdateHeader(Numeric.Header)
 
-    def GetInfo(self):
-        return self.__Numeric
-
 
 class IfrOneOf(
         IfrQuestionHeader,
         IfrLine,
+        IfrBaseInfo,
         IfrOpHeader,
         IfrMinMaxStepData):
 
     def __init__(self, Type, QName=None, VarIdStr=''):
         self.__OneOf = Refine_EFI_IFR_ONE_OF(Type)
-        self.__QName = QName
-        self.__VarIdStr = VarIdStr
+        IfrBaseInfo.__init__(self, self.__OneOf, QName, VarIdStr)
         IfrOpHeader.__init__(self, self.__OneOf.Header, EFI_IFR_ONE_OF_OP,
                               sizeof(self.__OneOf))
         IfrQuestionHeader.__init__(self, self.__OneOf.Question)
@@ -1903,18 +1895,6 @@ class IfrOneOf(
 
     def GetMinMaxData(self):
         return self
-
-    def SetQName(self, QName):
-        self.__QName = QName
-
-    def GetQName(self):
-        return self.__QName
-
-    def SetVarIdStr(self, VarIdStr):
-        self.__VarIdStr = VarIdStr
-
-    def GetVarIdStr(self):
-        return self.__VarIdStr
 
     def SetQHeaderFlags(self, Flags):
         IfrQuestionHeader.SetFlags(self, Flags)
@@ -1939,16 +1919,11 @@ class IfrOneOf(
             self.__OneOf.Flags = LFlags | EDKII_IFR_DISPLAY_UINT_DEC_BIT
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def GetInfo(self):
-        return self.__OneOf
-
-
-class IfrCheckBox(IfrLine, IfrOpHeader, IfrQuestionHeader):
+class IfrCheckBox(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
     def __init__(self, QName=None, VarIdStr=''):
         self.__CheckBox = EFI_IFR_CHECKBOX()
-        self.__QName = QName
-        self.__VarIdStr = VarIdStr
+        IfrBaseInfo.__init__(self, self.__CheckBox, QName, VarIdStr)
         IfrOpHeader.__init__(self, self.__CheckBox.Header,
                               EFI_IFR_CHECKBOX_OP)
         IfrQuestionHeader.__init__(self, self.__CheckBox.Question)
@@ -1956,18 +1931,6 @@ class IfrCheckBox(IfrLine, IfrOpHeader, IfrQuestionHeader):
 
     def GetQuestion(self):
         return self
-
-    def SetQName(self, QName):
-        self.__QName = QName
-
-    def GetQName(self):
-        return self.__QName
-
-    def SetVarIdStr(self, VarIdStr):
-        self.__VarIdStr = VarIdStr
-
-    def GetVarIdStr(self):
-        return self.__VarIdStr
 
     def SetQHeaderFlags(self, Flags):
         IfrQuestionHeader.SetFlags(self, Flags)
@@ -1992,9 +1955,6 @@ class IfrCheckBox(IfrLine, IfrOpHeader, IfrQuestionHeader):
             self.__CheckBox.Flags |= EFI_IFR_CHECKBOX_DEFAULT_MFG
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
-
-    def GetInfo(self):
-        return self.__CheckBox
 
 
 class IfrResetButton(IfrLine, IfrOpHeader, IfrStatementHeader):
