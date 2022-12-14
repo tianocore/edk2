@@ -243,7 +243,7 @@ MmIsSchedulable (
         Status = MmLocateProtocol (&DriverGuid, NULL, &Interface);
         if (EFI_ERROR (Status) && (mEfiSystemTable != NULL)) {
           //
-          // For MM Driver, it may depend on uefi protocols
+          // For MM Driver, it may depend on UEFI protocols
           //
           Status = mEfiSystemTable->BootServices->LocateProtocol (&DriverGuid, NULL, &Interface);
         }

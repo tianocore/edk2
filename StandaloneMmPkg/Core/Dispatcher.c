@@ -17,7 +17,7 @@
             and After dependencies. This is done recursively as the call to add
             to the mScheduledQueue checks for Before Depexes and recursively
             adds all Before Depexes. It then adds the item that was passed in
-            and then processess the After dependencies by recursively calling
+            and then processes the After dependencies by recursively calling
             the routine.
 
   Dispatcher Rules:
@@ -93,29 +93,29 @@ LIST_ENTRY  mScheduledQueue = INITIALIZE_LIST_HEAD_VARIABLE (mScheduledQueue);
 LIST_ENTRY  mFwVolList = INITIALIZE_LIST_HEAD_VARIABLE (mFwVolList);
 
 //
-// Flag for the MM Dispacher.  TRUE if dispatcher is executing.
+// Flag for the MM Dispatcher.  TRUE if dispatcher is executing.
 //
 BOOLEAN  gDispatcherRunning = FALSE;
 
 //
-// Flag for the MM Dispacher.  TRUE if there is one or more MM drivers ready to be dispatched
+// Flag for the MM Dispatcher.  TRUE if there is one or more MM drivers ready to be dispatched
 //
 BOOLEAN  gRequestDispatch = FALSE;
 
 //
 // The global variable is defined for Loading modules at fixed address feature to track the MM code
-// memory range usage. It is a bit mapped array in which every bit indicates the correspoding
+// memory range usage. It is a bit mapped array in which every bit indicates the corresponding
 // memory page available or not.
 //
 GLOBAL_REMOVE_IF_UNREFERENCED    UINT64  *mMmCodeMemoryRangeUsageBitMap = NULL;
 
 /**
   To check memory usage bit map array to figure out if the memory range in which the image will be loaded
-  is available or not. If memory range is avaliable, the function will mark the corresponding bits to 1
+  is available or not. If memory range is available, the function will mark the corresponding bits to 1
   which indicates the memory range is used. The function is only invoked when load modules at fixed address
   feature is enabled.
 
-  @param  ImageBase                The base addres the image will be loaded at.
+  @param  ImageBase                The base address the image will be loaded at.
   @param  ImageSize                The size of the image
 
   @retval EFI_SUCCESS              The memory range the image will be loaded in is available
@@ -194,7 +194,7 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
                                     image that needs to be examined by this function.
   @retval EFI_SUCCESS               An fixed loading address is assigned to this image by build tools .
-  @retval EFI_NOT_FOUND             The image has no assigned fixed loadding address.
+  @retval EFI_NOT_FOUND             The image has no assigned fixed loading address.
 
 **/
 EFI_STATUS
@@ -513,7 +513,7 @@ MmPreProcessDepex (
 
   @param  DriverEntry           Driver to work on.
 
-  @retval EFI_SUCCESS           Depex read and preprossesed
+  @retval EFI_SUCCESS           Depex read and preprocessed
   @retval EFI_PROTOCOL_ERROR    The section extraction protocol returned an error
                                 and  Depex reading needs to be retried.
   @retval Error                 DEPEX not found.
@@ -851,7 +851,7 @@ FvIsBeingProcessed (
   The Discovered list is never freed and contains booleans that represent the
   other possible MM driver states.
 
-  @param [in]   FwVolHeader     Pointer to the formware volume header.
+  @param [in]   FwVolHeader     Pointer to the firmware volume header.
   @param [in]   Pe32Data        Pointer to the PE data.
   @param [in]   Pe32DataSize    Size of the PE data.
   @param [in]   Depex           Pointer to the Depex info.
