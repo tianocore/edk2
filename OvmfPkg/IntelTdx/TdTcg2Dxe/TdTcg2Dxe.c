@@ -2411,9 +2411,9 @@ DriverEntry (
 
   mTdxDxeData.BsCap.Size                   = sizeof (EFI_CC_BOOT_SERVICE_CAPABILITY);
   mTdxDxeData.BsCap.ProtocolVersion.Major  = 1;
-  mTdxDxeData.BsCap.ProtocolVersion.Minor  = 1;
+  mTdxDxeData.BsCap.ProtocolVersion.Minor  = 0;
   mTdxDxeData.BsCap.StructureVersion.Major = 1;
-  mTdxDxeData.BsCap.StructureVersion.Minor = 1;
+  mTdxDxeData.BsCap.StructureVersion.Minor = 0;
 
   //
   // Get supported PCR and current Active PCRs
