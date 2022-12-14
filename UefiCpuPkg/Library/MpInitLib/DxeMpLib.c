@@ -13,9 +13,11 @@
 #include <Library/DebugAgentLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/CcExitLib.h>
+#include <Library/CpuPageTableLib.h>
 #include <Register/Amd/Fam17Msr.h>
 #include <Register/Amd/Ghcb.h>
 
+#include <Guid/EventGroup.h>
 #include <Protocol/Timer.h>
 
 #define  AP_SAFE_STACK_SIZE  128
@@ -28,6 +30,7 @@ volatile BOOLEAN  mStopCheckAllApsStatus       = TRUE;
 VOID              *mReservedApLoopFunc         = NULL;
 UINTN             mReservedTopOfApStack;
 volatile UINT32   mNumberToFinish = 0;
+UINTN             mApPageTable;
 
 //
 // Begin wakeup buffer allocation below 0x88000
@@ -407,14 +410,12 @@ RelocateApLoop (
     AsmRelocateApLoopFunc (
       MwaitSupport,
       CpuMpData->ApTargetCState,
-      CpuMpData->PmCodeSegment,
       StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
       (UINTN)&mNumberToFinish,
-      CpuMpData->Pm16CodeSegment,
-      CpuMpData->SevEsAPBuffer,
-      CpuMpData->WakeupBuffer
+      mApPageTable
       );
   }
+
   //
   // It should never reach here
   //
@@ -476,12 +477,27 @@ InitMpGlobalData (
   )
 {
   EFI_STATUS                       Status;
-  EFI_PHYSICAL_ADDRESS             Address;
   UINTN                            ApSafeBufferSize;
   UINTN                            Index;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  MemDesc;
   UINTN                            StackBase;
   CPU_INFO_IN_HOB                  *CpuInfoInHob;
+  IA32_MAP_ATTRIBUTE               MapAttribute;
+  IA32_MAP_ATTRIBUTE               MapMask;
+  UINTN                            PageTable;
+  VOID                             *PageTableBuffer;
+  UINTN                            PageTableBufferSize;
+
+  MapAttribute.Uint64         = mReservedTopOfApStack;
+  MapAttribute.Bits.Present   = 1;
+  MapAttribute.Bits.ReadWrite = 1;
+
+  MapMask.Bits.PageTableBaseAddress = 1;
+  MapMask.Bits.Present              = 1;
+  MapMask.Bits.ReadWrite            = 1;
+
+  PageTable           = 0;
+  PageTableBufferSize = 0;
 
   SaveCpuMpData (CpuMpData);
 
@@ -544,60 +560,69 @@ InitMpGlobalData (
   // Allocating it in advance since memory services are not available in
   // Exit Boot Services callback function.
   //
-  ApSafeBufferSize = EFI_PAGES_TO_SIZE (
-                       EFI_SIZE_TO_PAGES (
-                         CpuMpData->AddressMap.RelocateApLoopFuncSize
-                         )
-                       );
-  Address = BASE_4GB - 1;
-  Status  = gBS->AllocatePages (
-                   AllocateMaxAddress,
-                   EfiReservedMemoryType,
-                   EFI_SIZE_TO_PAGES (ApSafeBufferSize),
-                   &Address
-                   );
-  ASSERT_EFI_ERROR (Status);
-
-  mReservedApLoopFunc = (VOID *)(UINTN)Address;
-  ASSERT (mReservedApLoopFunc != NULL);
-
+  // +------------+
+  // | Ap Loop    |
+  // +------------+
+  // | Stack * N  |
+  // +------------+ (low address)
   //
-  // Make sure that the buffer memory is executable if NX protection is enabled
-  // for EfiReservedMemoryType.
-  //
-  // TODO: Check EFI_MEMORY_XP bit set or not once it's available in DXE GCD
-  //       service.
-  //
-  Status = gDS->GetMemorySpaceDescriptor (Address, &MemDesc);
-  if (!EFI_ERROR (Status)) {
-    gDS->SetMemorySpaceAttributes (
-           Address,
-           ApSafeBufferSize,
-           MemDesc.Attributes & (~EFI_MEMORY_XP)
-           );
-  }
-
   ApSafeBufferSize = EFI_PAGES_TO_SIZE (
                        EFI_SIZE_TO_PAGES (
                          CpuMpData->CpuCount * AP_SAFE_STACK_SIZE
+                         + CpuMpData->AddressMap.RelocateApLoopFuncSize
                          )
                        );
-  Address = BASE_4GB - 1;
-  Status  = gBS->AllocatePages (
-                   AllocateMaxAddress,
-                   EfiReservedMemoryType,
-                   EFI_SIZE_TO_PAGES (ApSafeBufferSize),
-                   &Address
-                   );
-  ASSERT_EFI_ERROR (Status);
 
-  mReservedTopOfApStack = (UINTN)Address + ApSafeBufferSize;
+  mReservedTopOfApStack = (UINTN)AllocateReservedPages (EFI_SIZE_TO_PAGES (ApSafeBufferSize));
+  ASSERT (mReservedTopOfApStack != 0);
   ASSERT ((mReservedTopOfApStack & (UINTN)(CPU_STACK_ALIGNMENT - 1)) == 0);
-  CopyMem (
-    mReservedApLoopFunc,
-    CpuMpData->AddressMap.RelocateApLoopFuncAddress,
-    CpuMpData->AddressMap.RelocateApLoopFuncSize
-    );
+  ASSERT ((AP_SAFE_STACK_SIZE & (CPU_STACK_ALIGNMENT - 1)) == 0);
+
+  mReservedApLoopFunc = (VOID *)(mReservedTopOfApStack + CpuMpData->CpuCount * AP_SAFE_STACK_SIZE);
+  if (StandardSignatureIsAuthenticAMD ()) {
+    CopyMem (
+      mReservedApLoopFunc,
+      CpuMpData->AddressMap.RelocateApLoopFuncAddressAmd,
+      CpuMpData->AddressMap.RelocateApLoopFuncSizeAmd
+      );
+  } else {
+    CopyMem (
+      mReservedApLoopFunc,
+      CpuMpData->AddressMap.RelocateApLoopFuncAddress,
+      CpuMpData->AddressMap.RelocateApLoopFuncSize
+      );
+    //
+    // Allocate reserved memory for page table
+    //
+    Status = PageTableMap (
+               &PageTable,
+               Paging4Level,
+               NULL,
+               &PageTableBufferSize,
+               mReservedTopOfApStack,
+               ApSafeBufferSize,
+               &MapAttribute,
+               &MapMask
+               );
+    ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+    DEBUG ((DEBUG_ERROR, "AP Page Table Buffer Size = %x\n", PageTableBufferSize));
+
+    PageTableBuffer = AllocateReservedPages (EFI_SIZE_TO_PAGES (PageTableBufferSize));
+    ASSERT (PageTableBuffer != NULL);
+    Status = PageTableMap (
+               &PageTable,
+               Paging4Level,
+               PageTableBuffer,
+               &PageTableBufferSize,
+               mReservedTopOfApStack,
+               ApSafeBufferSize,
+               &MapAttribute,
+               &MapMask
+               );
+    ASSERT_EFI_ERROR (Status);
+    mApPageTable           = PageTable;
+    mReservedTopOfApStack += CpuMpData->CpuCount * AP_SAFE_STACK_SIZE;
+  }
 
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,

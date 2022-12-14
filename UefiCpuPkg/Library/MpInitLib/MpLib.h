@@ -392,12 +392,9 @@ typedef
 (EFIAPI *ASM_RELOCATE_AP_LOOP)(
   IN BOOLEAN                 MwaitSupport,
   IN UINTN                   ApTargetCState,
-  IN UINTN                   PmCodeSegment,
   IN UINTN                   TopOfApStack,
   IN UINTN                   NumberToFinish,
-  IN UINTN                   Pm16CodeSegment,
-  IN UINTN                   SevEsAPJumpTable,
-  IN UINTN                   WakeupBuffer
+  IN UINTN                   Cr3
   );
 
 /**
