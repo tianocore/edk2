@@ -115,7 +115,7 @@ you should be good to go.
 
 See this example in 'SampleUnitTestUefiShell.inf'...
 
-```
+```inf
 [Packages]
   MdePkg/MdePkg.dec
 
@@ -130,7 +130,7 @@ See this example in 'SampleUnitTestUefiShell.inf'...
 Also, if you want you test to automatically be picked up by the Test Runner plugin, you will need
 to make sure that the module `BASE_NAME` contains the word `Test`...
 
-```
+```inf
 [Defines]
   BASE_NAME      = SampleUnitTestUefiShell
 ```
@@ -582,6 +582,47 @@ GTEST_OUTPUT=xml:<absolute or relative path to output file>
 ```
 
 This mode is used by the test running plugin to aggregate the results for CI test status reporting in the web view.
+
+### Code Coverage
+
+Host based Unit Tests will automatically enable coverage data.
+
+For Windows, This is primarily leverage for pipeline builds, but this can be leveraged locally using the
+OpenCppCoverage windows tool to parse coverage data to cobertura xml format.
+
+- Windows Prerequisite
+  ```bash
+  Download and install https://github.com/OpenCppCoverage/OpenCppCoverage/releases
+  python -m pip install --upgrade -r ./pip-requirements.txt
+  stuart_ci_build -c .pytool/CISettings.py  -t NOOPT TOOL_CHAIN_TAG=VS2019 -p MdeModulePkg
+  Open Build/coverage.xml
+  ```
+
+  - How to see code coverage data on IDE Visual Studio
+    ```
+    Open Visual Studio VS2019 or above version
+    Click "Tools" -> "OpenCppCoverage Settings"
+    Fill your execute file into "Program to run:"
+    Click "Tools" -> "Run OpenCppCoverage"
+    ```
+
+
+For Linux, This is primarily leveraged for pipeline builds, but this can be leveraged locally using the
+lcov linux tool, and parsed using the lcov_cobertura python tool to parse it to cobertura xml format.
+
+- Linux Prerequisite
+  ```bash
+  sudo apt-get install -y lcov
+  python -m pip install --upgrade -r ./pip-requirements.txt
+  stuart_ci_build -c .pytool/CISettings.py  -t NOOPT TOOL_CHAIN_TAG=GCC5 -p MdeModulePkg
+  Open Build/coverage.xml
+  ```
+  - How to see code coverage data on IDE Visual Studio Code
+    ```
+    Download plugin "Coverage Gutters"
+    Press Hot Key "Ctrl + Shift + P" and click option "Coverage Gutters: Display Coverage"
+    ```
+
 
 ### Important Note
 

@@ -91,6 +91,7 @@
             "pytools",
             "NOFAILURE",
             "cmockery",
+            "cobertura",
             "DHAVE", # build flag for cmocka in the INF
             "gtest", # file name in GoogleTestLib.inf
             "corthon",      # Contact GitHub account in Readme
