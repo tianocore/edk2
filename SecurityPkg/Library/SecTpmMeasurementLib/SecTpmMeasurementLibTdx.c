@@ -33,12 +33,11 @@ typedef struct {
 /**
   Get the mapped RTMR index based on the input PCRIndex.
   RTMR[0]  => PCR[1,7]
-  RTMR[1]  => PCR[2,3,4,5]
+  RTMR[1]  => PCR[2,3,4,5,6]
   RTMR[2]  => PCR[8~15]
   RTMR[3]  => NA
   Note:
     PCR[0] is mapped to MRTD and should not appear here.
-    PCR[6] is reserved for OEM. It is not used.
 
    @param[in] PCRIndex The input PCR index
 
@@ -51,7 +50,7 @@ GetMappedRtmrIndex (
 {
   UINT8  RtmrIndex;
 
-  if ((PCRIndex == 6) || (PCRIndex == 0) || (PCRIndex > 15)) {
+  if ((PCRIndex == 0) || (PCRIndex > 15)) {
     DEBUG ((DEBUG_ERROR, "Invalid PCRIndex(%d) map to MR Index.\n", PCRIndex));
     ASSERT (FALSE);
     return INVALID_PCR2MR_INDEX;
@@ -60,7 +59,7 @@ GetMappedRtmrIndex (
   RtmrIndex = 0;
   if ((PCRIndex == 1) || (PCRIndex == 7)) {
     RtmrIndex = 0;
-  } else if ((PCRIndex >= 2) && (PCRIndex < 6)) {
+  } else if ((PCRIndex >= 2) && (PCRIndex <= 6)) {
     RtmrIndex = 1;
   } else if ((PCRIndex >= 8) && (PCRIndex <= 15)) {
     RtmrIndex = 2;
