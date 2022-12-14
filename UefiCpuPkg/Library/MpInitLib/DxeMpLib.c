@@ -378,32 +378,43 @@ RelocateApLoop (
   IN OUT VOID  *Buffer
   )
 {
-  CPU_MP_DATA           *CpuMpData;
-  BOOLEAN               MwaitSupport;
-  ASM_RELOCATE_AP_LOOP  AsmRelocateApLoopFunc;
-  UINTN                 ProcessorNumber;
-  UINTN                 StackStart;
+  CPU_MP_DATA               *CpuMpData;
+  BOOLEAN                   MwaitSupport;
+  ASM_RELOCATE_AP_LOOP      AsmRelocateApLoopFunc;
+  ASM_RELOCATE_AP_LOOP_AMD  AsmRelocateApLoopFuncAmd;
+  UINTN                     ProcessorNumber;
+  UINTN                     StackStart;
 
   MpInitLibWhoAmI (&ProcessorNumber);
   CpuMpData    = GetCpuMpData ();
   MwaitSupport = IsMwaitSupport ();
-  if (CpuMpData->UseSevEsAPMethod) {
-    StackStart = CpuMpData->SevEsAPResetStackStart;
+  if (StandardSignatureIsAuthenticAMD ()) {
+    StackStart               = CpuMpData->SevEsAPResetStackStart;
+    AsmRelocateApLoopFuncAmd = (ASM_RELOCATE_AP_LOOP_AMD)(UINTN)mReservedApLoopFunc;
+    AsmRelocateApLoopFuncAmd (
+      MwaitSupport,
+      CpuMpData->ApTargetCState,
+      CpuMpData->PmCodeSegment,
+      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
+      (UINTN)&mNumberToFinish,
+      CpuMpData->Pm16CodeSegment,
+      CpuMpData->SevEsAPBuffer,
+      CpuMpData->WakeupBuffer
+      );
   } else {
-    StackStart = mReservedTopOfApStack;
+    StackStart            = mReservedTopOfApStack;
+    AsmRelocateApLoopFunc = (ASM_RELOCATE_AP_LOOP)(UINTN)mReservedApLoopFunc;
+    AsmRelocateApLoopFunc (
+      MwaitSupport,
+      CpuMpData->ApTargetCState,
+      CpuMpData->PmCodeSegment,
+      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
+      (UINTN)&mNumberToFinish,
+      CpuMpData->Pm16CodeSegment,
+      CpuMpData->SevEsAPBuffer,
+      CpuMpData->WakeupBuffer
+      );
   }
-
-  AsmRelocateApLoopFunc = (ASM_RELOCATE_AP_LOOP)(UINTN)mReservedApLoopFunc;
-  AsmRelocateApLoopFunc (
-    MwaitSupport,
-    CpuMpData->ApTargetCState,
-    CpuMpData->PmCodeSegment,
-    StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
-    (UINTN)&mNumberToFinish,
-    CpuMpData->Pm16CodeSegment,
-    CpuMpData->SevEsAPBuffer,
-    CpuMpData->WakeupBuffer
-    );
   //
   // It should never reach here
   //
