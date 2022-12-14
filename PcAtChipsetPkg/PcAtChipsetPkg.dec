@@ -84,6 +84,14 @@
   # @Prompt RTC Target Register address
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister64|0x0|UINT64|0x00000023
 
+  ## Specifies RTC Index Register address in I/O space.
+  # @Prompt RTC Index Register address
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister|0x70|UINT8|0x0000001E
+
+  ## Specifies RTC Target Register address in I/O space.
+  # @Prompt RTC Target Register address
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister|0x71|UINT8|0x0000001F
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Defines the ACPI register set base address.
   #  The invalid 0xFFFF is as its default value. It must be configured to the real value.
@@ -145,14 +153,6 @@
   ## Specifies the initial value for Register_D in RTC.
   # @Prompt Initial value for Register_D in RTC.
   gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterD|0x00|UINT8|0x0000001D
-
-  ## Specifies RTC Index Register address in I/O space.
-  # @Prompt RTC Index Register address
-  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister|0x70|UINT8|0x0000001E
-
-  ## Specifies RTC Target Register address in I/O space.
-  # @Prompt RTC Target Register address
-  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister|0x71|UINT8|0x0000001F
 
   ## RTC Update Timeout Value(microsecond).
   # @Prompt RTC Update Timeout Value.
