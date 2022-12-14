@@ -19,4 +19,7 @@ jobs:
     tool_chain_tag: 'GCC5'
     vm_image: 'ubuntu-latest'
     arch_list: "IA32,X64,ARM,AARCH64,RISCV64,LOONGARCH64"
-
+    extra_install_step:
+    - bash: sudo apt-get install -y lcov
+      displayName: Install Code Coverage Tools
+      condition: and(gt(variables.pkg_count, 0), succeeded())

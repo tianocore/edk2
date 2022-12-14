@@ -12,6 +12,7 @@ parameters:
   tool_chain_tag: ''
   vm_image: ''
   arch_list: ''
+  extra_install_step: []
 
 # Build step
 jobs:
@@ -77,3 +78,4 @@ jobs:
       build_pkgs: $(Build.Pkgs)
       build_targets: $(Build.Targets)
       build_archs: ${{ parameters.arch_list }}
+      extra_install_step: ${{ parameters.extra_install_step }}
