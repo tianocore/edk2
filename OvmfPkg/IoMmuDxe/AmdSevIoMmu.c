@@ -15,18 +15,7 @@
 #include <Library/PcdLib.h>
 #include <ConfidentialComputingGuestAttr.h>
 #include "AmdSevIoMmu.h"
-
-#define MAP_INFO_SIG  SIGNATURE_64 ('M', 'A', 'P', '_', 'I', 'N', 'F', 'O')
-
-typedef struct {
-  UINT64                   Signature;
-  LIST_ENTRY               Link;
-  EDKII_IOMMU_OPERATION    Operation;
-  UINTN                    NumberOfBytes;
-  UINTN                    NumberOfPages;
-  EFI_PHYSICAL_ADDRESS     CryptedAddress;
-  EFI_PHYSICAL_ADDRESS     PlainTextAddress;
-} MAP_INFO;
+#include "IoMmuInternal.h"
 
 //
 // List of the MAP_INFO structures that have been set up by IoMmuMap() and not
@@ -35,7 +24,10 @@ typedef struct {
 //
 STATIC LIST_ENTRY  mMapInfos = INITIALIZE_LIST_HEAD_VARIABLE (mMapInfos);
 
-#define COMMON_BUFFER_SIG  SIGNATURE_64 ('C', 'M', 'N', 'B', 'U', 'F', 'F', 'R')
+//
+// Indicate if the feature of reserved memory is supported in DMA operation.
+//
+BOOLEAN  mReservedSharedMemSupported = FALSE;
 
 //
 // ASCII names for EDKII_IOMMU_OPERATION constants, for debug logging.
@@ -49,30 +41,6 @@ mBusMasterOperationName[EdkiiIoMmuOperationMaximum] = {
   "Write64",
   "CommonBuffer64"
 };
-
-//
-// The following structure enables Map() and Unmap() to perform in-place
-// decryption and encryption, respectively, for BusMasterCommonBuffer[64]
-// operations, without dynamic memory allocation or release.
-//
-// Both COMMON_BUFFER_HEADER and COMMON_BUFFER_HEADER.StashBuffer are allocated
-// by AllocateBuffer() and released by FreeBuffer().
-//
-#pragma pack (1)
-typedef struct {
-  UINT64    Signature;
-
-  //
-  // Always allocated from EfiBootServicesData type memory, and always
-  // encrypted.
-  //
-  VOID      *StashBuffer;
-
-  //
-  // Followed by the actual common buffer, starting at the next page.
-  //
-} COMMON_BUFFER_HEADER;
-#pragma pack ()
 
 /**
   Provides the controller-specific addresses required to access system memory
@@ -139,6 +107,8 @@ IoMmuMap (
     return EFI_INVALID_PARAMETER;
   }
 
+  Status = EFI_SUCCESS;
+
   //
   // Allocate a MAP_INFO structure to remember the mapping when Unmap() is
   // called later.
@@ -153,11 +123,12 @@ IoMmuMap (
   // Initialize the MAP_INFO structure, except the PlainTextAddress field
   //
   ZeroMem (&MapInfo->Link, sizeof MapInfo->Link);
-  MapInfo->Signature      = MAP_INFO_SIG;
-  MapInfo->Operation      = Operation;
-  MapInfo->NumberOfBytes  = *NumberOfBytes;
-  MapInfo->NumberOfPages  = EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes);
-  MapInfo->CryptedAddress = (UINTN)HostAddress;
+  MapInfo->Signature         = MAP_INFO_SIG;
+  MapInfo->Operation         = Operation;
+  MapInfo->NumberOfBytes     = *NumberOfBytes;
+  MapInfo->NumberOfPages     = EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes);
+  MapInfo->CryptedAddress    = (UINTN)HostAddress;
+  MapInfo->ReservedMemBitmap = 0;
 
   //
   // In the switch statement below, we point "MapInfo->PlainTextAddress" to the
@@ -185,12 +156,11 @@ IoMmuMap (
       //
       // Allocate the implicit plaintext bounce buffer.
       //
-      Status = gBS->AllocatePages (
-                      AllocateType,
-                      EfiBootServicesData,
-                      MapInfo->NumberOfPages,
-                      &MapInfo->PlainTextAddress
-                      );
+      Status = IoMmuAllocateBounceBuffer (
+                 AllocateType,
+                 EfiBootServicesData,
+                 MapInfo
+                 );
       if (EFI_ERROR (Status)) {
         goto FreeMapInfo;
       }
@@ -241,7 +211,8 @@ IoMmuMap (
       // Point "DecryptionSource" to the stash buffer so that we decrypt
       // it to the original location, after the switch statement.
       //
-      DecryptionSource = CommonBufferHeader->StashBuffer;
+      DecryptionSource           = CommonBufferHeader->StashBuffer;
+      MapInfo->ReservedMemBitmap = CommonBufferHeader->ReservedMemBitmap;
       break;
 
     default:
@@ -264,12 +235,16 @@ IoMmuMap (
   } else if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
     //
     // Set the memory shared bit.
+    // If MapInfo->ReservedMemBitmap is 0, it means the bounce buffer is not allocated
+    // from the pre-allocated shared memory, so it must be converted to shared memory here.
     //
-    Status = MemEncryptTdxSetPageSharedBit (
-               0,
-               MapInfo->PlainTextAddress,
-               MapInfo->NumberOfPages
-               );
+    if (MapInfo->ReservedMemBitmap == 0) {
+      Status = MemEncryptTdxSetPageSharedBit (
+                 0,
+                 MapInfo->PlainTextAddress,
+                 MapInfo->NumberOfPages
+                 );
+    }
   } else {
     ASSERT (FALSE);
   }
@@ -311,12 +286,13 @@ IoMmuMap (
 
   DEBUG ((
     DEBUG_VERBOSE,
-    "%a: Mapping=0x%p Device(PlainText)=0x%Lx Crypted=0x%Lx Pages=0x%Lx\n",
+    "%a: Mapping=0x%p Device(PlainText)=0x%Lx Crypted=0x%Lx Pages=0x%Lx, ReservedMemBitmap=0x%Lx\n",
     __FUNCTION__,
     MapInfo,
     MapInfo->PlainTextAddress,
     MapInfo->CryptedAddress,
-    (UINT64)MapInfo->NumberOfPages
+    (UINT64)MapInfo->NumberOfPages,
+    MapInfo->ReservedMemBitmap
     ));
 
   return EFI_SUCCESS;
@@ -435,11 +411,13 @@ IoMmuUnmapWorker (
     // Restore the memory shared bit mask on the area we used to hold the
     // plaintext.
     //
-    Status = MemEncryptTdxClearPageSharedBit (
-               0,
-               MapInfo->PlainTextAddress,
-               MapInfo->NumberOfPages
-               );
+    if (MapInfo->ReservedMemBitmap == 0) {
+      Status = MemEncryptTdxClearPageSharedBit (
+                 0,
+                 MapInfo->PlainTextAddress,
+                 MapInfo->NumberOfPages
+                 );
+    }
   } else {
     ASSERT (FALSE);
   }
@@ -470,8 +448,9 @@ IoMmuUnmapWorker (
       (VOID *)(UINTN)MapInfo->PlainTextAddress,
       EFI_PAGES_TO_SIZE (MapInfo->NumberOfPages)
       );
+
     if (!MemoryMapLocked) {
-      gBS->FreePages (MapInfo->PlainTextAddress, MapInfo->NumberOfPages);
+      IoMmuFreeBounceBuffer (MapInfo);
     }
   }
 
@@ -551,6 +530,7 @@ IoMmuAllocateBuffer (
   VOID                  *StashBuffer;
   UINTN                 CommonBufferPages;
   COMMON_BUFFER_HEADER  *CommonBufferHeader;
+  UINT32                ReservedMemBitmap;
 
   DEBUG ((
     DEBUG_VERBOSE,
@@ -620,12 +600,13 @@ IoMmuAllocateBuffer (
     PhysicalAddress = SIZE_4GB - 1;
   }
 
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  MemoryType,
-                  CommonBufferPages,
-                  &PhysicalAddress
-                  );
+  Status = IoMmuAllocateCommonBuffer (
+             MemoryType,
+             CommonBufferPages,
+             &PhysicalAddress,
+             &ReservedMemBitmap
+             );
+
   if (EFI_ERROR (Status)) {
     goto FreeStashBuffer;
   }
@@ -633,8 +614,9 @@ IoMmuAllocateBuffer (
   CommonBufferHeader = (VOID *)(UINTN)PhysicalAddress;
   PhysicalAddress   += EFI_PAGE_SIZE;
 
-  CommonBufferHeader->Signature   = COMMON_BUFFER_SIG;
-  CommonBufferHeader->StashBuffer = StashBuffer;
+  CommonBufferHeader->Signature         = COMMON_BUFFER_SIG;
+  CommonBufferHeader->StashBuffer       = StashBuffer;
+  CommonBufferHeader->ReservedMemBitmap = ReservedMemBitmap;
 
   *HostAddress = (VOID *)(UINTN)PhysicalAddress;
 
@@ -707,7 +689,7 @@ IoMmuFreeBuffer (
   // Release the common buffer itself. Unmap() has re-encrypted it in-place, so
   // no need to zero it.
   //
-  return gBS->FreePages ((UINTN)CommonBufferHeader, CommonBufferPages);
+  return IoMmuFreeCommonBuffer (CommonBufferHeader, CommonBufferPages);
 }
 
 /**
@@ -878,6 +860,11 @@ IoMmuUnmapAllMappings (
       TRUE      // MemoryMapLocked
       );
   }
+
+  //
+  // Release the reserved shared memory as well.
+  //
+  IoMmuReleaseReservedSharedMem (TRUE);
 }
 
 /**
@@ -934,6 +921,19 @@ InstallIoMmuProtocol (
                   );
   if (EFI_ERROR (Status)) {
     goto CloseExitBootEvent;
+  }
+
+  //
+  // Currently only Tdx guest support Reserved shared memory for DMA operation.
+  //
+  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    mReservedSharedMemSupported = TRUE;
+    Status                      = IoMmuInitReservedSharedMem ();
+    if (EFI_ERROR (Status)) {
+      mReservedSharedMemSupported = FALSE;
+    } else {
+      DEBUG ((DEBUG_INFO, "%a: Feature of reserved memory for DMA is supported.\n", __FUNCTION__));
+    }
   }
 
   return EFI_SUCCESS;

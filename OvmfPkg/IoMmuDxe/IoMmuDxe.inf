@@ -21,6 +21,7 @@
   AmdSevIoMmu.c
   AmdSevIoMmu.h
   IoMmuDxe.c
+  IoMmuBuffer.c
 
 [Packages]
   MdePkg/MdePkg.dec
