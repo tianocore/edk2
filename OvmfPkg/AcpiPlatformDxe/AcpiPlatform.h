@@ -21,6 +21,12 @@ typedef struct S3_CONTEXT S3_CONTEXT;
 
 EFI_STATUS
 EFIAPI
+InstallCloudHvTablesTdx (
+  IN   EFI_ACPI_TABLE_PROTOCOL  *AcpiProtocol
+  );
+
+EFI_STATUS
+EFIAPI
 InstallCloudHvTables (
   IN   EFI_ACPI_TABLE_PROTOCOL  *AcpiProtocol
   );

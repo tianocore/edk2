@@ -7,13 +7,100 @@
 
 **/
 
+#include <IndustryStandard/Acpi.h>                        // EFI_ACPI_DESCRIPTION_HEADER
 #include <IndustryStandard/CloudHv.h>                     // CLOUDHV_RSDP_ADDRESS
 #include <IndustryStandard/Xen/arch-x86/hvm/start_info.h> // hvm_start_info
 #include <Library/BaseLib.h>                              // CpuDeadLoop()
 #include <Library/DebugLib.h>                             // DEBUG()
 #include <Library/PcdLib.h>                               // PcdGet32()
+#include <Library/HobLib.h>                               // GetFirstGuidHob(), GetNextGuidHob()
+#include <Library/UefiBootServicesTableLib.h>             // gBS
+
+#include <Protocol/AcpiSystemDescriptionTable.h>
+#include <Protocol/AcpiTable.h>
+#include <Protocol/QemuAcpiTableNotify.h>                 // QEMU_ACPI_TABLE_NOTIFY_PROTOCOL
 
 #include "AcpiPlatform.h"
+
+EFI_HANDLE                       mChAcpiHandle = NULL;
+QEMU_ACPI_TABLE_NOTIFY_PROTOCOL  mChAcpiNotifyProtocol;
+
+EFI_STATUS
+EFIAPI
+InstallCloudHvTablesTdx (
+  IN   EFI_ACPI_TABLE_PROTOCOL  *AcpiProtocol
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       TableHandle;
+
+  EFI_PEI_HOB_POINTERS         Hob;
+  EFI_ACPI_DESCRIPTION_HEADER  *CurrentTable;
+  EFI_ACPI_DESCRIPTION_HEADER  *DsdtTable;
+
+  DsdtTable   = NULL;
+  TableHandle = 0;
+
+  Hob.Guid = (EFI_HOB_GUID_TYPE *)GetFirstGuidHob (&gUefiOvmfPkgTdxAcpiHobGuid);
+
+  while (Hob.Guid != NULL) {
+    CurrentTable = (EFI_ACPI_DESCRIPTION_HEADER *)(&Hob.Guid->Name + 1);
+    if (!AsciiStrnCmp ((CHAR8 *)&CurrentTable->Signature, "DSDT", 4)) {
+      DsdtTable = CurrentTable;
+    } else {
+      //
+      // Install the tables
+      //
+      Status = AcpiProtocol->InstallAcpiTable (
+                               AcpiProtocol,
+                               CurrentTable,
+                               CurrentTable->Length,
+                               &TableHandle
+                               );
+      for (UINTN i = 0; i < CurrentTable->Length; i++) {
+        DEBUG ((DEBUG_INFO, " %x", *((UINT8 *)CurrentTable + i)));
+      }
+
+      DEBUG ((DEBUG_INFO, "\n"));
+    }
+
+    Hob.Raw  = GET_NEXT_HOB (Hob.Raw);
+    Hob.Guid = (EFI_HOB_GUID_TYPE *)GetNextGuidHob (&gUefiOvmfPkgTdxAcpiHobGuid, Hob.Raw);
+  }
+
+  //
+  // Install DSDT table. If we reached this point without finding the DSDT,
+  // then we're out of sync with the hypervisor, and cannot continue.
+  //
+  if (DsdtTable == NULL) {
+    DEBUG ((DEBUG_INFO, "%a: no DSDT found\n", __FUNCTION__));
+    ASSERT (FALSE);
+  }
+
+  Status = AcpiProtocol->InstallAcpiTable (
+                           AcpiProtocol,
+                           DsdtTable,
+                           DsdtTable->Length,
+                           &TableHandle
+                           );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  //
+  // Install a protocol to notify that the ACPI table provided by CH is
+  // ready.
+  //
+  gBS->InstallProtocolInterface (
+         &mChAcpiHandle,
+         &gQemuAcpiTableNotifyProtocolGuid,
+         EFI_NATIVE_INTERFACE,
+         &mChAcpiNotifyProtocol
+         );
+
+  return EFI_SUCCESS;
+}
 
 // Get the ACPI tables from EBDA start
 EFI_STATUS
