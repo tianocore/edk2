@@ -45,6 +45,8 @@
   QemuFwCfgS3Lib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+  HobLib
+  CcProbeLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
@@ -53,6 +55,7 @@
 
 [Guids]
   gRootBridgesConnectedEventGroupGuid
+  gUefiOvmfPkgTdxAcpiHobGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
