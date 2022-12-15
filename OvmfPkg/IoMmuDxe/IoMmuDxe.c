@@ -9,7 +9,7 @@
 
 **/
 
-#include "AmdSevIoMmu.h"
+#include "CcIoMmu.h"
 
 EFI_STATUS
 EFIAPI
