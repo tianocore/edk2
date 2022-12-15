@@ -702,10 +702,11 @@ PlatformValidateNvVarStore (
 
       VariableOffset = NvVarStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER);
     } else {
-      if (!((VariableHeader->State == VAR_IN_DELETED_TRANSITION) ||
-            (VariableHeader->State == VAR_DELETED) ||
-            (VariableHeader->State == VAR_HEADER_VALID_ONLY) ||
-            (VariableHeader->State == VAR_ADDED)))
+      if (!((VariableHeader->State == VAR_HEADER_VALID_ONLY) ||
+            (VariableHeader->State == VAR_ADDED) ||
+            (VariableHeader->State == (VAR_ADDED & VAR_DELETED)) ||
+            (VariableHeader->State == (VAR_ADDED & VAR_IN_DELETED_TRANSITION)) ||
+            (VariableHeader->State == (VAR_ADDED & VAR_IN_DELETED_TRANSITION & VAR_DELETED))))
       {
         DEBUG ((DEBUG_ERROR, "NvVarStore Variable header State was invalid.\n"));
         return FALSE;
