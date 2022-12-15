@@ -9,7 +9,9 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/MemEncryptSevLib.h>
 #include <Library/MemEncryptTdxLib.h>
+#include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include "IoMmuInternal.h"
 
@@ -139,6 +141,7 @@ IoMmuInitReservedSharedMem (
   UINTN                     TotalPages;
   IOMMU_RESERVED_MEM_RANGE  *MemRange;
   EFI_PHYSICAL_ADDRESS      PhysicalAddress;
+  UINT64                    SharedAddress;
 
   if (!mReservedSharedMemSupported) {
     return EFI_UNSUPPORTED;
@@ -163,12 +166,25 @@ IoMmuInitReservedSharedMem (
     MemRange->StartAddressOfMemRange = PhysicalAddress;
 
     for (Index2 = 0; Index2 < MemRange->Slots; Index2++) {
-      Status = MemEncryptTdxSetPageSharedBit (
-                 0,
-                 (UINT64)(UINTN)(MemRange->StartAddressOfMemRange + Index2 * SIZE_OF_MEM_RANGE (MemRange) + MemRange->HeaderSize),
-                 EFI_SIZE_TO_PAGES (MemRange->DataSize)
-                 );
-      ASSERT (!EFI_ERROR (Status));
+      SharedAddress = (UINT64)(UINTN)(MemRange->StartAddressOfMemRange + Index2 * SIZE_OF_MEM_RANGE (MemRange) + MemRange->HeaderSize);
+
+      if (CC_GUEST_IS_SEV (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+        Status = MemEncryptSevClearPageEncMask (
+                   0,
+                   SharedAddress,
+                   EFI_SIZE_TO_PAGES (MemRange->DataSize)
+                   );
+        ASSERT (!EFI_ERROR (Status));
+      } else if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+        Status = MemEncryptTdxSetPageSharedBit (
+                   0,
+                   SharedAddress,
+                   EFI_SIZE_TO_PAGES (MemRange->DataSize)
+                   );
+        ASSERT (!EFI_ERROR (Status));
+      } else {
+        ASSERT (FALSE);
+      }
     }
 
     PhysicalAddress += (MemRange->Slots * SIZE_OF_MEM_RANGE (MemRange));
@@ -190,6 +206,7 @@ IoMmuReleaseReservedSharedMem (
   EFI_STATUS                Status;
   UINT32                    Index1, Index2;
   IOMMU_RESERVED_MEM_RANGE  *MemRange;
+  UINT64                    SharedAddress;
 
   if (!mReservedSharedMemSupported) {
     return EFI_SUCCESS;
@@ -198,12 +215,25 @@ IoMmuReleaseReservedSharedMem (
   for (Index1 = 0; Index1 < ARRAY_SIZE (mReservedMemRanges); Index1++) {
     MemRange = &mReservedMemRanges[Index1];
     for (Index2 = 0; Index2 < MemRange->Slots; Index2++) {
-      Status = MemEncryptTdxClearPageSharedBit (
-                 0,
-                 (UINT64)(UINTN)(MemRange->StartAddressOfMemRange + Index2 * SIZE_OF_MEM_RANGE (MemRange) + MemRange->HeaderSize),
-                 EFI_SIZE_TO_PAGES (MemRange->DataSize)
-                 );
-      ASSERT (!EFI_ERROR (Status));
+      SharedAddress = (UINT64)(UINTN)(MemRange->StartAddressOfMemRange + Index2 * SIZE_OF_MEM_RANGE (MemRange) + MemRange->HeaderSize);
+
+      if (CC_GUEST_IS_SEV (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+        Status = MemEncryptSevSetPageEncMask (
+                   0,
+                   SharedAddress,
+                   EFI_SIZE_TO_PAGES (MemRange->DataSize)
+                   );
+        ASSERT (!EFI_ERROR (Status));
+      } else if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+        Status = MemEncryptTdxClearPageSharedBit (
+                   0,
+                   SharedAddress,
+                   EFI_SIZE_TO_PAGES (MemRange->DataSize)
+                   );
+        ASSERT (!EFI_ERROR (Status));
+      } else {
+        ASSERT (FALSE);
+      }
     }
   }
 
