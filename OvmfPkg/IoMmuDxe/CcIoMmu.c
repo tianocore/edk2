@@ -223,30 +223,32 @@ IoMmuMap (
       goto FreeMapInfo;
   }
 
-  if (CC_GUEST_IS_SEV (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+  if (MapInfo->ReservedMemBitmap == 0) {
     //
-    // Clear the memory encryption mask on the plaintext buffer.
-    //
-    Status = MemEncryptSevClearPageEncMask (
-               0,
-               MapInfo->PlainTextAddress,
-               MapInfo->NumberOfPages
-               );
-  } else if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    //
-    // Set the memory shared bit.
     // If MapInfo->ReservedMemBitmap is 0, it means the bounce buffer is not allocated
     // from the pre-allocated shared memory, so it must be converted to shared memory here.
     //
-    if (MapInfo->ReservedMemBitmap == 0) {
+    if (CC_GUEST_IS_SEV (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+      //
+      // Clear the memory encryption mask on the plaintext buffer.
+      //
+      Status = MemEncryptSevClearPageEncMask (
+                 0,
+                 MapInfo->PlainTextAddress,
+                 MapInfo->NumberOfPages
+                 );
+    } else if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+      //
+      // Set the memory shared bit.
+      //
       Status = MemEncryptTdxSetPageSharedBit (
                  0,
                  MapInfo->PlainTextAddress,
                  MapInfo->NumberOfPages
                  );
+    } else {
+      ASSERT (FALSE);
     }
-  } else {
-    ASSERT (FALSE);
   }
 
   ASSERT_EFI_ERROR (Status);
@@ -396,30 +398,30 @@ IoMmuUnmapWorker (
       break;
   }
 
-  if (CC_GUEST_IS_SEV (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    //
-    // Restore the memory encryption mask on the area we used to hold the
-    // plaintext.
-    //
-    Status = MemEncryptSevSetPageEncMask (
-               0,
-               MapInfo->PlainTextAddress,
-               MapInfo->NumberOfPages
-               );
-  } else if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    //
-    // Restore the memory shared bit mask on the area we used to hold the
-    // plaintext.
-    //
-    if (MapInfo->ReservedMemBitmap == 0) {
+  if (MapInfo->ReservedMemBitmap == 0) {
+    if (CC_GUEST_IS_SEV (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+      //
+      // Restore the memory encryption mask on the area we used to hold the
+      // plaintext.
+      //
+      Status = MemEncryptSevSetPageEncMask (
+                 0,
+                 MapInfo->PlainTextAddress,
+                 MapInfo->NumberOfPages
+                 );
+    } else if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+      //
+      // Restore the memory shared bit mask on the area we used to hold the
+      // plaintext.
+      //
       Status = MemEncryptTdxClearPageSharedBit (
                  0,
                  MapInfo->PlainTextAddress,
                  MapInfo->NumberOfPages
                  );
+    } else {
+      ASSERT (FALSE);
     }
-  } else {
-    ASSERT (FALSE);
   }
 
   ASSERT_EFI_ERROR (Status);
@@ -924,16 +926,14 @@ InstallIoMmuProtocol (
   }
 
   //
-  // Currently only Tdx guest support Reserved shared memory for DMA operation.
+  // For CC guests, use reserved shared memory for DMA operation.
   //
-  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
-    mReservedSharedMemSupported = TRUE;
-    Status                      = IoMmuInitReservedSharedMem ();
-    if (EFI_ERROR (Status)) {
-      mReservedSharedMemSupported = FALSE;
-    } else {
-      DEBUG ((DEBUG_INFO, "%a: Feature of reserved memory for DMA is supported.\n", __FUNCTION__));
-    }
+  mReservedSharedMemSupported = TRUE;
+  Status                      = IoMmuInitReservedSharedMem ();
+  if (EFI_ERROR (Status)) {
+    mReservedSharedMemSupported = FALSE;
+  } else {
+    DEBUG ((DEBUG_INFO, "%a: Feature of reserved memory for DMA is supported.\n", __FUNCTION__));
   }
 
   return EFI_SUCCESS;
