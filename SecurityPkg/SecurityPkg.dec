@@ -80,14 +80,6 @@
   #
   TcgStorageOpalLib|Include/Library/TcgStorageOpalLib.h
 
-  ## @libraryclass  Provides interfaces to access RPMC device.
-  #
-  RpmcLib|Include/Library/RpmcLib.h
-
-  ## @libraryclass  Provides interfaces to access variable root key.
-  #
-  VariableKeyLib|Include/Library/VariableKeyLib.h
-
   ## @libraryclass  Provides interfaces about firmware TPM measurement.
   #
   TcgEventLogRecordLib|Include/Library/TcgEventLogRecordLib.h
