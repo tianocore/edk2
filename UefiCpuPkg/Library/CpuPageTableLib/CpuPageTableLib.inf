@@ -33,3 +33,7 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+
+  [BuildOptions]
+    *_*_*_CC_FLAGS = /FAcs
+    

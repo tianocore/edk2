@@ -492,7 +492,7 @@ InitMpGlobalData (
   MapAttribute.Bits.Present   = 1;
   MapAttribute.Bits.ReadWrite = 1;
 
-  MapMask.Bits.PageTableBaseAddress = 1;
+  MapMask.Bits.PageTableBaseAddressLow = 1;
   MapMask.Bits.Present              = 1;
   MapMask.Bits.ReadWrite            = 1;
 
