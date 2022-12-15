@@ -14,7 +14,7 @@
 
 #include <Library/PcdLib.h>
 #include <ConfidentialComputingGuestAttr.h>
-#include "AmdSevIoMmu.h"
+#include "CcIoMmu.h"
 #include "IoMmuInternal.h"
 
 //
