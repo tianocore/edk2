@@ -26,6 +26,7 @@ Module Name:
 //
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/CcProbeLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HardwareInfoLib.h>
 #include <Library/HobLib.h>
@@ -312,7 +313,9 @@ PlatformGetSystemMemorySizeBelow4gb (
   UINT8       Cmos0x34;
   UINT8       Cmos0x35;
 
-  if (PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) {
+  if ((PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) &&
+      (CcProbe () != CcGuestTypeIntelTdx))
+  {
     // Get the information from PVH memmap
     return (UINT32)GetHighestSystemMemoryAddressFromPvhMemmap (TRUE);
   }
