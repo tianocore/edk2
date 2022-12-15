@@ -579,8 +579,8 @@ TransferTdxHobList (
           );
         break;
       case EFI_HOB_TYPE_GUID_EXTENSION:
-        GuidedData = (VOID *) (&Hob.Guid->Name + 1);
-        BuildGuidDataHob (&Hob.Guid->Name, GuidedData, Hob.Guid->Header.HobLength - sizeof(EFI_HOB_GUID_TYPE));
+        GuidedData = (VOID *)(&Hob.Guid->Name + 1);
+        BuildGuidDataHob (&Hob.Guid->Name, GuidedData, Hob.Guid->Header.HobLength - sizeof (EFI_HOB_GUID_TYPE));
         break;
     }
 

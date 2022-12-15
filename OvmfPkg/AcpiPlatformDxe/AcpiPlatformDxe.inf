@@ -46,6 +46,7 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   HobLib
+  CcProbeLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED

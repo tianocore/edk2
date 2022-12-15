@@ -313,8 +313,9 @@ PlatformGetSystemMemorySizeBelow4gb (
   UINT8       Cmos0x34;
   UINT8       Cmos0x35;
 
-  if (PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID &&
-      CcProbe () != CcGuestTypeIntelTdx) {
+  if ((PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) &&
+      (CcProbe () != CcGuestTypeIntelTdx))
+  {
     // Get the information from PVH memmap
     return (UINT32)GetHighestSystemMemoryAddressFromPvhMemmap (TRUE);
   }
