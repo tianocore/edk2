@@ -709,11 +709,11 @@ AddSmbiosProcessorTypeTable (
   Type4Record->L1CacheHandle     = L1CacheHandle;
   Type4Record->L2CacheHandle     = L2CacheHandle;
   Type4Record->L3CacheHandle     = L3CacheHandle;
-  Type4Record->CoreCount         = MiscProcessorData.CoreCount;
+  Type4Record->CoreCount         = MIN (MiscProcessorData.CoreCount, MAX_UINT8);
   Type4Record->CoreCount2        = MiscProcessorData.CoreCount;
-  Type4Record->EnabledCoreCount  = MiscProcessorData.CoresEnabled;
+  Type4Record->EnabledCoreCount  = MIN (MiscProcessorData.CoresEnabled, MAX_UINT8);
   Type4Record->EnabledCoreCount2 = MiscProcessorData.CoresEnabled;
-  Type4Record->ThreadCount       = MiscProcessorData.ThreadCount;
+  Type4Record->ThreadCount       = MIN (MiscProcessorData.ThreadCount, MAX_UINT8);
   Type4Record->ThreadCount2      = MiscProcessorData.ThreadCount;
 
   Type4Record->CurrentSpeed  = GetCpuFrequency (ProcessorIndex);
