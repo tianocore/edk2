@@ -136,19 +136,22 @@ HttpBootCheckUriScheme (
 /**
   Get the URI address string from the input device path.
 
-  Caller need to free the buffer in the UriAddress pointer.
+  Caller needs to free the buffers returned by this function.
 
-  @param[in]   FilePath         Pointer to the device path which contains a URI device path node.
-  @param[out]  UriAddress       The URI address string extract from the device path.
+  @param[in]   FilePath           Pointer to the device path which contains a URI device path node.
+  @param[out]  ProxyUriAddress    The proxy URI address string extract from the device path (if it exists)
+  @param[out]  EndPointUriAddress The endpoint URI address string for the endpoint host.
 
   @retval EFI_SUCCESS            The URI string is returned.
+  @retval EFI_INVALID_PARAMETER  Parameters are NULL or device path is invalid.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
 
 **/
 EFI_STATUS
 HttpBootParseFilePath (
-  IN     EFI_DEVICE_PATH_PROTOCOL  *FilePath,
-  OUT CHAR8                        **UriAddress
+  IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath,
+  OUT CHAR8                     **ProxyUriAddress,
+  OUT CHAR8                     **EndPointUriAddress
   );
 
 /**

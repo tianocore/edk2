@@ -552,70 +552,144 @@ HttpBootCheckUriScheme (
 }
 
 /**
-  Get the URI address string from the input device path.
+  Get the URI address string from the URI device path node.
 
-  Caller need to free the buffer in the UriAddress pointer.
+  Caller need to free the buffer in the Uri pointer.
 
-  @param[in]   FilePath         Pointer to the device path which contains a URI device path node.
-  @param[out]  UriAddress       The URI address string extract from the device path.
+  @param[in]   Node               Pointer to the URI device path node.
+  @param[out]  Uri                URI string extracted from the device path.
 
   @retval EFI_SUCCESS            The URI string is returned.
+  @retval EFI_INVALID_PARAMETER  Parameters are NULL or invalid URI node.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
+
+**/
+EFI_STATUS
+HttpBootUriFromDevicePath (
+  IN    URI_DEVICE_PATH  *Node,
+  OUT   CHAR8            **Uri
+  )
+{
+  UINTN  UriStrLength;
+
+  if ((Node == NULL) || (Uri == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  UriStrLength = DevicePathNodeLength (Node) - sizeof (EFI_DEVICE_PATH_PROTOCOL);
+
+  if (UriStrLength == 0) {
+    // Invalid URI, return.
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *Uri = AllocatePool (UriStrLength + 1);
+  if (*Uri == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  CopyMem (*Uri, Node->Uri, UriStrLength);
+  (*Uri)[UriStrLength] = '\0';
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Get the URI address string from the input device path.
+
+  Caller needs to free the buffers returned by this function.
+
+  @param[in]   FilePath           Pointer to the device path which contains a URI device path node.
+  @param[out]  ProxyUriAddress    The proxy URI address string extract from the device path (if it exists)
+  @param[out]  EndPointUriAddress The endpoint URI address string for the endpoint host.
+
+  @retval EFI_SUCCESS            The URI string is returned.
+  @retval EFI_INVALID_PARAMETER  Parameters are NULL or device path is invalid.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
 
 **/
 EFI_STATUS
 HttpBootParseFilePath (
-  IN     EFI_DEVICE_PATH_PROTOCOL  *FilePath,
-  OUT CHAR8                        **UriAddress
+  IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath,
+  OUT CHAR8                     **ProxyUriAddress,
+  OUT CHAR8                     **EndPointUriAddress
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
-  URI_DEVICE_PATH           *UriDevicePath;
-  CHAR8                     *Uri;
-  UINTN                     UriStrLength;
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *Node[2];
+  EFI_DEVICE_PATH_PROTOCOL  *TempNode;
+  BOOLEAN                   NodeIsUri[2];
+  UINTN                     Index;
 
-  if (FilePath == NULL) {
+  if ((FilePath == NULL) ||
+      (ProxyUriAddress == NULL) ||
+      (EndPointUriAddress == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
-  *UriAddress = NULL;
+  *ProxyUriAddress    = NULL;
+  *EndPointUriAddress = NULL;
+  ZeroMem (Node, sizeof (Node));
 
+  // Obtain last 2 device path nodes.
+  // Looking for sequences:
+  // 1) //....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)[/Dns(...)]/Uri(ProxyServer)/Uri(EndPointServer/FilePath)
+  // 2) //....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)[/Dns(...)]/Uri(EndPointServer/FilePath)
   //
-  // Extract the URI address from the FilePath
-  //
-  TempDevicePath = FilePath;
-  while (!IsDevicePathEnd (TempDevicePath)) {
-    if ((DevicePathType (TempDevicePath) == MESSAGING_DEVICE_PATH) &&
-        (DevicePathSubType (TempDevicePath) == MSG_URI_DP))
-    {
-      UriDevicePath = (URI_DEVICE_PATH *)TempDevicePath;
-      //
-      // UEFI Spec doesn't require the URI to be a NULL-terminated string
-      // So we allocate a new buffer and always append a '\0' to it.
-      //
-      UriStrLength = DevicePathNodeLength (UriDevicePath) - sizeof (EFI_DEVICE_PATH_PROTOCOL);
-      if (UriStrLength == 0) {
-        //
-        // return a NULL UriAddress if it's a empty URI device path node.
-        //
-        break;
-      }
+  // Expected:
+  // Node[1] - Uri(EndPointServer/FilePath)
+  // Node[0] - Either Uri(EndPointServer/FilePath) or other.
+  TempNode = FilePath;
 
-      Uri = AllocatePool (UriStrLength + 1);
-      if (Uri == NULL) {
-        return EFI_OUT_OF_RESOURCES;
-      }
+  while (!IsDevicePathEnd (TempNode)) {
+    Node[0]  = Node[1];
+    Node[1]  = TempNode;
+    TempNode = NextDevicePathNode (TempNode);
+  }
 
-      CopyMem (Uri, UriDevicePath->Uri, DevicePathNodeLength (UriDevicePath) - sizeof (EFI_DEVICE_PATH_PROTOCOL));
-      Uri[DevicePathNodeLength (UriDevicePath) - sizeof (EFI_DEVICE_PATH_PROTOCOL)] = '\0';
+  // Verify if device path nodes are of type MESSAGING + URI.
+  for (Index = 0; Index < 2; Index++) {
+    if (Node[Index] == NULL) {
+      NodeIsUri[Index] = FALSE;
+    } else {
+      NodeIsUri[Index] = ((DevicePathType (Node[Index]) == MESSAGING_DEVICE_PATH) &&
+                          (DevicePathSubType (Node[Index]) == MSG_URI_DP));
+    }
+  }
 
-      *UriAddress = Uri;
+  // If exists, obtain endpoint URI string.
+  if (NodeIsUri[1]) {
+    Status = HttpBootUriFromDevicePath (
+               (URI_DEVICE_PATH *)Node[1],
+               EndPointUriAddress
+               );
+
+    if (EFI_ERROR (Status)) {
+      return Status;
     }
 
-    TempDevicePath = NextDevicePathNode (TempDevicePath);
+    // If exists, obtain proxy URI string.
+    if (NodeIsUri[0]) {
+      Status = HttpBootUriFromDevicePath (
+                 (URI_DEVICE_PATH *)Node[0],
+                 ProxyUriAddress
+                 );
+
+      if (EFI_ERROR (Status)) {
+        goto ErrorExit;
+      }
+    }
   }
 
   return EFI_SUCCESS;
+
+ErrorExit:
+  ASSERT (*EndPointUriAddress != NULL);
+  FreePool (*EndPointUriAddress);
+  *EndPointUriAddress = NULL;
+
+  return Status;
 }
 
 /**
