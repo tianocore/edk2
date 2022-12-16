@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef enum {
   GetBootFileHead,
   GetBootFileGet,
+  ConnectToProxy,
   LoadBootFile,
   GetBootFileError
 } HTTP_GET_BOOT_FILE_STATE;
