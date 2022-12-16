@@ -168,6 +168,14 @@ typedef struct _HTTP_PROTOCOL {
   UINTN                             UrlLen;
 
   //
+  // Proxy support
+  //
+  CHAR8                             *ProxyUrl;
+  UINTN                             ProxyUrlLen;
+  BOOLEAN                           ProxyConnected;
+  CHAR8                             *EndPointHostName;
+
+  //
   // Https Support
   //
   BOOLEAN                           UseHttps;
