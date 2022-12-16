@@ -1541,6 +1541,11 @@ BmExpandLoadFiles (
   UINTN                     HandleCount;
   UINTN                     Index;
   EFI_DEVICE_PATH_PROTOCOL  *Node;
+  EFI_DEVICE_PATH_PROTOCOL  *NewDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *HttpPath;
+  URI_DEVICE_PATH           *NullUriPath;
+
+  NullUriPath = NULL;
 
   //
   // Get file buffer from load file instance.
@@ -1573,11 +1578,50 @@ BmExpandLoadFiles (
 
     for (Index = 0; Index < HandleCount; Index++) {
       if (BmMatchHttpBootDevicePath (DevicePathFromHandle (Handles[Index]), FilePath)) {
+        //
+        // Matches HTTP Boot Device Path described as
+        //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv4(...)[/Dns(...)]/Uri(...)
+        //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)[/Dns(...)]/Uri(...)
+        //
+        Handle = Handles[Index];
+        goto Done;
+      }
+    }
+
+    NullUriPath = (URI_DEVICE_PATH *)CreateDeviceNode (
+                                       MESSAGING_DEVICE_PATH,
+                                       MSG_URI_DP,
+                                       (UINT16)(sizeof (URI_DEVICE_PATH))
+                                       );
+    for (Index = 0; Index < HandleCount; Index++) {
+      if ((Handles == NULL) || (Handles[Index] == NULL)) {
+        continue;
+      }
+
+      NewDevicePath = DevicePathFromHandle (Handles[Index]);
+      if (NewDevicePath == NULL) {
+        continue;
+      }
+
+      HttpPath = AppendDevicePathNode (NewDevicePath, (EFI_DEVICE_PATH_PROTOCOL *)NullUriPath);
+      if (HttpPath == NULL) {
+        continue;
+      }
+
+      if (BmMatchHttpBootDevicePath (HttpPath, FilePath)) {
+        //
+        // Matches HTTP Boot Device Path described as
+        //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv4(...)[/Dns(...)]/Uri(...)/Uri(...)
+        //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)[/Dns(...)]/Uri(...)/Uri(...)
+        //
         Handle = Handles[Index];
         break;
       }
     }
 
+    FreePool (NullUriPath);
+
+Done:
     if (Handles != NULL) {
       FreePool (Handles);
     }
