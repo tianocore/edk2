@@ -18,6 +18,7 @@ CHAR16  mHttpBootConfigStorageName[] = L"HTTP_BOOT_CONFIG_IFR_NVDATA";
   @param[in]  UsingIpv6           Set to TRUE if creating boot option for IPv6.
   @param[in]  Description         The description text of the boot option.
   @param[in]  Uri                 The URI string of the boot file.
+  @param[in]  ProxyUri            The Proxy URI string for the boot path.
 
   @retval EFI_SUCCESS             The boot option is created successfully.
   @retval Others                  Failed to create new boot option.
@@ -28,48 +29,61 @@ HttpBootAddBootOption (
   IN   HTTP_BOOT_PRIVATE_DATA  *Private,
   IN   BOOLEAN                 UsingIpv6,
   IN   CHAR16                  *Description,
-  IN   CHAR16                  *Uri
+  IN   CHAR16                  *Uri,
+  IN   CHAR16                  *ProxyUri
   )
 {
   EFI_DEV_PATH                  *Node;
   EFI_DEVICE_PATH_PROTOCOL      *TmpDevicePath;
   EFI_DEVICE_PATH_PROTOCOL      *NewDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL      *FinalDevicePath;
   UINTN                         Length;
   CHAR8                         AsciiUri[URI_STR_MAX_SIZE];
+  CHAR8                         AsciiProxyUri[URI_STR_MAX_SIZE];
+  UINTN                         AsciiProxyUriSize;
   EFI_STATUS                    Status;
-  UINTN                         Index;
   EFI_BOOT_MANAGER_LOAD_OPTION  NewOption;
 
-  NewDevicePath = NULL;
-  Node          = NULL;
-  TmpDevicePath = NULL;
+  NewDevicePath   = NULL;
+  Node            = NULL;
+  TmpDevicePath   = NULL;
+  FinalDevicePath = NULL;
 
   if (StrLen (Description) == 0) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
-  // Convert the scheme to all lower case.
+  // Check the URI Scheme
   //
-  for (Index = 0; Index < StrLen (Uri); Index++) {
-    if (Uri[Index] == L':') {
-      break;
+  UnicodeStrToAsciiStrS (Uri, AsciiUri, sizeof (AsciiUri));
+  UnicodeStrToAsciiStrS (ProxyUri, AsciiProxyUri, sizeof (AsciiProxyUri));
+  Status = HttpBootCheckUriScheme (AsciiUri);
+  if (EFI_ERROR (Status)) {
+    if (Status == EFI_INVALID_PARAMETER) {
+      DEBUG ((DEBUG_ERROR, "Error: Invalid URI address.\n"));
+    } else if (Status == EFI_ACCESS_DENIED) {
+      DEBUG ((DEBUG_ERROR, "Error: Access forbidden, only HTTPS connection is allowed.\n"));
     }
 
-    if ((Uri[Index] >= L'A') && (Uri[Index] <= L'Z')) {
-      Uri[Index] -= (CHAR16)(L'A' - L'a');
+    return Status;
+  }
+
+  if (StrLen (ProxyUri) != 0) {
+    Status = HttpBootCheckUriScheme (AsciiProxyUri);
+    if (EFI_ERROR (Status)) {
+      if (Status == EFI_INVALID_PARAMETER) {
+        DEBUG ((DEBUG_ERROR, "Error: Invalid URI address.\n"));
+      } else if (Status == EFI_ACCESS_DENIED) {
+        DEBUG ((DEBUG_ERROR, "Error: Access forbidden, only HTTPS connection is allowed.\n"));
+      }
+
+      return Status;
     }
   }
 
   //
-  // Only accept empty URI, or http and https URI.
-  //
-  if ((StrLen (Uri) != 0) && (StrnCmp (Uri, L"http://", 7) != 0) && (StrnCmp (Uri, L"https://", 8) != 0)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Create a new device path by appending the IP node and URI node to
+  // Create a new device path by appending the IP node, Proxy node and URI node to
   // the driver's parent device path
   //
   if (!UsingIpv6) {
@@ -101,14 +115,42 @@ HttpBootAddBootOption (
   }
 
   //
+  // Update the Proxy node with the input Proxy URI
+  //
+  if (StrLen (ProxyUri) != 0) {
+    AsciiProxyUriSize = AsciiStrSize (AsciiProxyUri);
+    Length            = sizeof (EFI_DEVICE_PATH_PROTOCOL) + AsciiProxyUriSize;
+    Node              = AllocatePool (Length);
+    if (Node == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ON_EXIT;
+    }
+
+    Node->DevPath.Type    = MESSAGING_DEVICE_PATH;
+    Node->DevPath.SubType = MSG_URI_DP;
+    SetDevicePathNodeLength (Node, Length);
+    CopyMem (
+      (UINT8 *)Node + sizeof (EFI_DEVICE_PATH_PROTOCOL),
+      AsciiProxyUri,
+      AsciiProxyUriSize
+      );
+    NewDevicePath = AppendDevicePathNode (TmpDevicePath, (EFI_DEVICE_PATH_PROTOCOL *)Node);
+    FreePool (Node);
+    if (NewDevicePath == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ON_EXIT;
+    }
+  } else {
+    NewDevicePath = TmpDevicePath;
+  }
+
+  //
   // Update the URI node with the input boot file URI.
   //
-  UnicodeStrToAsciiStrS (Uri, AsciiUri, sizeof (AsciiUri));
   Length = sizeof (EFI_DEVICE_PATH_PROTOCOL) + AsciiStrSize (AsciiUri);
   Node   = AllocatePool (Length);
   if (Node == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-    FreePool (TmpDevicePath);
     goto ON_EXIT;
   }
 
@@ -116,10 +158,9 @@ HttpBootAddBootOption (
   Node->DevPath.SubType = MSG_URI_DP;
   SetDevicePathNodeLength (Node, Length);
   CopyMem ((UINT8 *)Node + sizeof (EFI_DEVICE_PATH_PROTOCOL), AsciiUri, AsciiStrSize (AsciiUri));
-  NewDevicePath = AppendDevicePathNode (TmpDevicePath, (EFI_DEVICE_PATH_PROTOCOL *)Node);
+  FinalDevicePath = AppendDevicePathNode (NewDevicePath, (EFI_DEVICE_PATH_PROTOCOL *)Node);
   FreePool (Node);
-  FreePool (TmpDevicePath);
-  if (NewDevicePath == NULL) {
+  if (FinalDevicePath == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
@@ -133,7 +174,7 @@ HttpBootAddBootOption (
              LoadOptionTypeBoot,
              LOAD_OPTION_ACTIVE,
              Description,
-             NewDevicePath,
+             FinalDevicePath,
              NULL,
              0
              );
@@ -146,8 +187,20 @@ HttpBootAddBootOption (
 
 ON_EXIT:
 
+  if (TmpDevicePath != NULL) {
+    if (TmpDevicePath == NewDevicePath) {
+      NewDevicePath = NULL;
+    }
+
+    FreePool (TmpDevicePath);
+  }
+
   if (NewDevicePath != NULL) {
     FreePool (NewDevicePath);
+  }
+
+  if (FinalDevicePath != NULL) {
+    FreePool (FinalDevicePath);
   }
 
   return Status;
@@ -406,7 +459,8 @@ HttpBootFormRouteConfig (
     Private,
     (CallbackInfo->HttpBootNvData.IpVersion == HTTP_BOOT_IP_VERSION_6) ? TRUE : FALSE,
     CallbackInfo->HttpBootNvData.Description,
-    CallbackInfo->HttpBootNvData.Uri
+    CallbackInfo->HttpBootNvData.Uri,
+    CallbackInfo->HttpBootNvData.ProxyUri
     );
 
   return EFI_SUCCESS;
@@ -472,6 +526,7 @@ HttpBootFormCallback (
 
   switch (QuestionId) {
     case KEY_INITIATOR_URI:
+    case KEY_INITIATOR_PROXY_URI:
       //
       // Get user input URI string
       //
