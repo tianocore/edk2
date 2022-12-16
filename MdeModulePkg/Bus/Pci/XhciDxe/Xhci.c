@@ -405,7 +405,7 @@ XhcGetRootHubPortStatus (
   // Section 7.2 xHCI Support Protocol Capability
   //
   if (PortSpeed > 0) {
-    PortStatus->PortStatus = XhcCheckUsbPortSpeedUsedPsic (Xhc, PortSpeed);
+    PortStatus->PortStatus = XhcCheckUsbPortSpeedUsedPsic (Xhc, PortSpeed, PortNumber);
     // If no match found in ext cap reg, fall back to PORTSC
     if (PortStatus->PortStatus == 0) {
       //
