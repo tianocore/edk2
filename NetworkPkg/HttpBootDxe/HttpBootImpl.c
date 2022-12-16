@@ -115,19 +115,21 @@ HttpBootStart (
 {
   UINTN       Index;
   EFI_STATUS  Status;
-  CHAR8       *Uri;
+  CHAR8       *ProxyUri;
+  CHAR8       *EndPointUri;
 
-  Uri = NULL;
+  ProxyUri    = NULL;
+  EndPointUri = NULL;
 
   if ((Private == NULL) || (FilePath == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
-  // Check the URI in the input FilePath, in order to see whether it is
+  // Check the URIs in the input FilePath, in order to see whether it is
   // required to boot from a new specified boot file.
   //
-  Status = HttpBootParseFilePath (FilePath, &Uri);
+  Status = HttpBootParseFilePath (FilePath, &ProxyUri, &EndPointUri);
   if (EFI_ERROR (Status)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -143,28 +145,21 @@ HttpBootStart (
     // recorded before.
     //
     if ((UsingIpv6 != Private->UsingIpv6) ||
-        ((Uri != NULL) && (AsciiStrCmp (Private->BootFileUri, Uri) != 0)))
+        ((EndPointUri != NULL) && (AsciiStrCmp (Private->BootFileUri, EndPointUri) != 0)))
     {
       //
       // Restart is required, first stop then continue this start function.
       //
       Status = HttpBootStop (Private);
       if (EFI_ERROR (Status)) {
-        if (Uri != NULL) {
-          FreePool (Uri);
-        }
-
-        return Status;
+        goto ERROR;
       }
     } else {
       //
       // Restart is not required.
       //
-      if (Uri != NULL) {
-        FreePool (Uri);
-      }
-
-      return EFI_ALREADY_STARTED;
+      Status = EFI_ALREADY_STARTED;
+      goto ERROR;
     }
   }
 
@@ -176,17 +171,16 @@ HttpBootStart (
   } else if (!UsingIpv6 && (Private->Ip4Nic != NULL)) {
     Private->UsingIpv6 = FALSE;
   } else {
-    if (Uri != NULL) {
-      FreePool (Uri);
-    }
-
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    goto ERROR;
   }
 
   //
-  // Record the specified URI and prepare the URI parser if needed.
+  // Record the specified URIs and prepare the URI parser if needed.
   //
-  Private->FilePathUri = Uri;
+  Private->ProxyUri    = ProxyUri;
+  Private->FilePathUri = EndPointUri;
+
   if (Private->FilePathUri != NULL) {
     Status = HttpParseUrl (
                Private->FilePathUri,
@@ -195,8 +189,7 @@ HttpBootStart (
                &Private->FilePathUriParser
                );
     if (EFI_ERROR (Status)) {
-      FreePool (Private->FilePathUri);
-      return Status;
+      goto ERROR;
     }
   }
 
@@ -228,6 +221,17 @@ HttpBootStart (
   Print (L"\n>>Start HTTP Boot over IPv%d", Private->UsingIpv6 ? 6 : 4);
 
   return EFI_SUCCESS;
+
+ERROR:
+  if (ProxyUri != NULL) {
+    FreePool (ProxyUri);
+  }
+
+  if (EndPointUri != NULL) {
+    FreePool (EndPointUri);
+  }
+
+  return Status;
 }
 
 /**
@@ -609,6 +613,11 @@ HttpBootStop (
   if (Private->LastModifiedOrEtag != NULL) {
     FreePool (Private->LastModifiedOrEtag);
     Private->LastModifiedOrEtag = NULL;
+  }
+
+  if (Private->ProxyUri != NULL) {
+    FreePool (Private->ProxyUri);
+    Private->ProxyUri = NULL;
   }
 
   ZeroMem (Private->OfferBuffer, sizeof (Private->OfferBuffer));
