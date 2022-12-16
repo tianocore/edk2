@@ -3,7 +3,7 @@
 
   Set a IDT entry for interrupt vector 3 for debug purpose for x64 platform
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 
@@ -118,7 +118,7 @@ IsLongModeWakingVector (
         ((Facs->OspmFlags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0))
     {
       // Both BIOS and OS wants 64bit vector
-      if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+      if (sizeof (UINTN) == sizeof (UINT64)) {
         return TRUE;
       }
     }

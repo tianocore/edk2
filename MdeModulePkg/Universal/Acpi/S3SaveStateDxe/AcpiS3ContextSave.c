@@ -1,7 +1,7 @@
 /** @file
   This is the implementation to save ACPI S3 Context.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -97,7 +97,7 @@ IsLongModeWakingVectorSupport (
     //
     // BIOS supports 64bit waking vector.
     //
-    if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+    if (sizeof (UINTN) == sizeof (UINT64)) {
       return TRUE;
     }
   }
@@ -110,11 +110,11 @@ IsLongModeWakingVectorSupport (
 
   @param[in] LongModeWakingVectorSupport    Support long mode waking vector or not.
 
-  If BootScriptExector driver will run in 64-bit mode, this function will establish the 1:1
+  If BootScriptExecutor driver will run in 64-bit mode, this function will establish the 1:1
   virtual to physical mapping page table when long mode waking vector is supported, otherwise
   create 4G page table when long mode waking vector is not supported and let PF handler to
   handle > 4G request.
-  If BootScriptExector driver will not run in 64-bit mode, this function will do nothing.
+  If BootScriptExecutor driver will not run in 64-bit mode, this function will do nothing.
 
   @return Page table base address.
 
@@ -124,7 +124,7 @@ S3AllocatePageTablesBuffer (
   IN BOOLEAN  LongModeWakingVectorSupport
   )
 {
-  if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+  if ((FeaturePcdGet (PcdDxeIplSwitchToLongMode)) || (sizeof (UINTN) == sizeof (UINT64))) {
     UINTN                 ExtraPageTablePages;
     UINT32                RegEax;
     UINT32                RegEdx;
