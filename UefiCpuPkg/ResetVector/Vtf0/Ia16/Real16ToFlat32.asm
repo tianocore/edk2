@@ -2,7 +2,7 @@
 ; @file
 ; Transition from 16 bit real mode into 32 bit flat protected mode
 ;
-; Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2008 - 2022, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ;------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ ALIGN   16
 
 GDT_BASE:
 ; null descriptor
-NULL_SEL            equ $-GDT_BASE
+NULL_SEL            equ $-GDT_BASE    ; Selector [0x0]
     DW      0            ; limit 15:0
     DW      0            ; base 15:0
     DB      0            ; base 23:16
@@ -100,42 +100,67 @@ NULL_SEL            equ $-GDT_BASE
     DB      0            ; limit 19:16, flags
     DB      0            ; base 31:24
 
+; Spare segment descriptor
+SPARE1_SEL          equ $-GDT_BASE    ; Selector [0x8]
+    DW      0            ; limit 15:0
+    DW      0            ; base 15:0
+    DB      0            ; base 23:16
+    DB      0            ; sys flag, dpl, type
+    DB      0            ; limit 19:16, flags
+    DB      0            ; base 31:24
+
+; linear code segment descriptor
+LINEAR_CODE_SEL     equ $-GDT_BASE    ; Selector [0x10]
+    DW      0xffff       ; limit 15:0
+    DW      0            ; base 15:0
+    DB      0            ; base 23:16
+    DB      PRESENT_FLAG(1)|DPL(0)|SYSTEM_FLAG(1)|DESC_TYPE(CODE32_TYPE)           ; 09Bh
+    DB      GRANULARITY_FLAG(1)|DEFAULT_SIZE32(1)|CODE64_FLAG(0)|UPPER_LIMIT(0xf)  ; 0CFh
+    DB      0            ; base 31:24
+
 ; linear data segment descriptor
-LINEAR_SEL          equ $-GDT_BASE
+LINEAR_SEL          equ $-GDT_BASE    ; Selector [0x18]
     DW      0xffff       ; limit 15:0
     DW      0            ; base 15:0
     DB      0            ; base 23:16
-    DB      PRESENT_FLAG(1)|DPL(0)|SYSTEM_FLAG(1)|DESC_TYPE(DATA32_TYPE)
-    DB      GRANULARITY_FLAG(1)|DEFAULT_SIZE32(1)|CODE64_FLAG(0)|UPPER_LIMIT(0xf)
+    DB      PRESENT_FLAG(1)|DPL(0)|SYSTEM_FLAG(1)|DESC_TYPE(DATA32_TYPE)           ; 093h
+    DB      GRANULARITY_FLAG(1)|DEFAULT_SIZE32(1)|CODE64_FLAG(0)|UPPER_LIMIT(0xf)  ; 0CFh
     DB      0            ; base 31:24
 
-; linear code segment descriptor
-LINEAR_CODE_SEL     equ $-GDT_BASE
+; Spare segment descriptor
+SPARE2_SEL          equ $-GDT_BASE    ; Selector [0x20]
+    DW      0            ; limit 15:0
+    DW      0            ; base 15:0
+    DB      0            ; base 23:16
+    DB      0            ; sys flag, dpl, type
+    DB      0            ; limit 19:16, flags
+    DB      0            ; base 31:24
+
+; linear code (16-bit) segment descriptor
+LINEAR_CODE16_SEL   equ $-GDT_BASE    ; Selector [0x28]
     DW      0xffff       ; limit 15:0
     DW      0            ; base 15:0
     DB      0            ; base 23:16
-    DB      PRESENT_FLAG(1)|DPL(0)|SYSTEM_FLAG(1)|DESC_TYPE(CODE32_TYPE)
-    DB      GRANULARITY_FLAG(1)|DEFAULT_SIZE32(1)|CODE64_FLAG(0)|UPPER_LIMIT(0xf)
+    DB      PRESENT_FLAG(1)|DPL(0)|SYSTEM_FLAG(1)|DESC_TYPE(CODE32_TYPE)           ; 09Bh
+    DB      GRANULARITY_FLAG(1)|DEFAULT_SIZE32(0)|CODE64_FLAG(0)|UPPER_LIMIT(0xf)  ; 08Fh
     DB      0            ; base 31:24
 
-%ifdef ARCH_X64
+; linear data (16-bit) segment descriptor
+LINEAR_DATA16_SEL   equ $-GDT_BASE    ; Selector [0x30]
+    DW      0xffff       ; limit 15:0
+    DW      0            ; base 15:0
+    DB      0            ; base 23:16
+    DB      PRESENT_FLAG(1)|DPL(0)|SYSTEM_FLAG(1)|DESC_TYPE(DATA32_TYPE)           ; 093h
+    DB      0
+    DB      0            ; base 31:24
+
 ; linear code (64-bit) segment descriptor
-LINEAR_CODE64_SEL   equ $-GDT_BASE
+LINEAR_CODE64_SEL   equ $-GDT_BASE    ; Selector [0x38]
     DW      0xffff       ; limit 15:0
     DW      0            ; base 15:0
     DB      0            ; base 23:16
-    DB      PRESENT_FLAG(1)|DPL(0)|SYSTEM_FLAG(1)|DESC_TYPE(CODE64_TYPE)
-    DB      GRANULARITY_FLAG(1)|DEFAULT_SIZE32(0)|CODE64_FLAG(1)|UPPER_LIMIT(0xf)
-    DB      0            ; base 31:24
-%endif
-
-; linear code segment descriptor
-LINEAR_CODE16_SEL     equ $-GDT_BASE
-    DW      0xffff       ; limit 15:0
-    DW      0            ; base 15:0
-    DB      0            ; base 23:16
-    DB      PRESENT_FLAG(1)|DPL(0)|SYSTEM_FLAG(1)|DESC_TYPE(CODE32_TYPE)
-    DB      GRANULARITY_FLAG(1)|DEFAULT_SIZE32(0)|CODE64_FLAG(0)|UPPER_LIMIT(0xf)
+    DB      PRESENT_FLAG(1)|DPL(0)|SYSTEM_FLAG(1)|DESC_TYPE(CODE64_TYPE)           ; 09Bh
+    DB      GRANULARITY_FLAG(1)|DEFAULT_SIZE32(0)|CODE64_FLAG(1)|UPPER_LIMIT(0xf)  ; 0AFh
     DB      0            ; base 31:24
 
 GDT_END:

@@ -4,7 +4,7 @@
   This module will execute the boot script saved during last boot and after that,
   control is passed to OS waking up handler.
 
-  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -332,9 +332,8 @@ IsLongModeWakingVector (
         ((Facs->OspmFlags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0))
     {
       // Both BIOS and OS wants 64bit vector
-      if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
-        return TRUE;
-      }
+      ASSERT ((FeaturePcdGet (PcdDxeIplSwitchToLongMode)) || (sizeof (UINTN) == sizeof (UINT64)));
+      return TRUE;
     }
   }
 
@@ -521,8 +520,11 @@ S3ResumeBootOs (
       //
       // X64 long mode waking vector
       //
-      DEBUG ((DEBUG_INFO, "Transfer to 64bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
+      DEBUG ((DEBUG_INFO, "Transfer from PEI to 64bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
       if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+        //
+        // 32bit PEI calls to 64bit OS S3 waking vector
+        //
         AsmEnablePaging64 (
           0x38,
           Facs->XFirmwareWakingVector,
@@ -531,29 +533,58 @@ S3ResumeBootOs (
           (UINT64)(UINTN)TempStackTop
           );
       } else {
-        //
-        // Report Status code that no valid waking vector is found
-        //
-        REPORT_STATUS_CODE (
-          EFI_ERROR_CODE | EFI_ERROR_MAJOR,
-          (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_S3_OS_WAKE_ERROR)
-          );
-        DEBUG ((DEBUG_ERROR, "Unsupported for 32bit DXE transfer to 64bit OS waking vector!\r\n"));
-        ASSERT (FALSE);
-        CpuDeadLoop ();
-        return;
+        if (sizeof (UINTN) == sizeof (UINT64)) {
+          //
+          // 64bit PEI calls to 64bit OS S3 waking vector
+          //
+          SwitchStack (
+            (SWITCH_STACK_ENTRY_POINT)(UINTN)Facs->XFirmwareWakingVector,
+            NULL,
+            NULL,
+            (VOID *)(UINTN)TempStackTop
+            );
+        } else {
+          //
+          // Report Status code that no valid waking vector is found.
+          // Note: 32bit PEI + 32bit DXE firmware calling to 64bit OS S3 waking vector is an invalid configuration.
+          //
+          REPORT_STATUS_CODE (
+            EFI_ERROR_CODE | EFI_ERROR_MAJOR,
+            (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_S3_OS_WAKE_ERROR)
+            );
+          DEBUG ((DEBUG_ERROR, "Unsupported for 32bit DXE transfer to 64bit OS waking vector!\r\n"));
+          ASSERT (FALSE);
+          CpuDeadLoop ();
+          return;
+        }
       }
     } else {
       //
       // IA32 protected mode waking vector (Page disabled)
       //
       DEBUG ((DEBUG_INFO, "Transfer to 32bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
-      SwitchStack (
-        (SWITCH_STACK_ENTRY_POINT)(UINTN)Facs->XFirmwareWakingVector,
-        NULL,
-        NULL,
-        (VOID *)(UINTN)TempStackTop
-        );
+      if (sizeof (UINTN) == sizeof (UINT64)) {
+        //
+        // 64bit PEI calls to 32bit OS S3 waking vector
+        //
+        AsmDisablePaging64 (
+          0x10,
+          (UINT32)Facs->XFirmwareWakingVector,
+          0,
+          0,
+          (UINT32)TempStackTop
+          );
+      } else {
+        //
+        // 32bit PEI calls to 32bit OS S3 waking vector
+        //
+        SwitchStack (
+          (SWITCH_STACK_ENTRY_POINT)(UINTN)Facs->XFirmwareWakingVector,
+          NULL,
+          NULL,
+          (VOID *)(UINTN)TempStackTop
+          );
+      }
     }
   } else {
     //
@@ -579,7 +610,7 @@ S3ResumeBootOs (
 
 /**
   Restore S3 page table because we do not trust ACPINvs content.
-  If BootScriptExector driver will not run in 64-bit mode, this function will do nothing.
+  If BootScriptExecutor driver will not run in 64-bit mode, this function will do nothing.
 
   @param S3NvsPageTableAddress   PageTableAddress in ACPINvs
   @param Build4GPageTableOnly    If BIOS just build 4G page table only
@@ -590,7 +621,7 @@ RestoreS3PageTables (
   IN BOOLEAN  Build4GPageTableOnly
   )
 {
-  if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+  if ((FeaturePcdGet (PcdDxeIplSwitchToLongMode)) || (sizeof (UINTN) == sizeof (UINT64))) {
     UINT32                          RegEax;
     UINT32                          RegEdx;
     UINT8                           PhysicalAddressBits;
@@ -825,7 +856,7 @@ S3ResumeExecuteBootScript (
     SignalToSmmByCommunication (&gEdkiiS3SmmInitDoneGuid);
   }
 
-  if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+  if ((FeaturePcdGet (PcdDxeIplSwitchToLongMode)) || (sizeof (UINTN) == sizeof (UINT64))) {
     AsmWriteCr3 ((UINTN)AcpiS3Context->S3NvsPageTableAddress);
   }
 
@@ -1021,7 +1052,7 @@ S3RestoreConfig2 (
     CpuDeadLoop ();
   }
 
-  if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+  if ((FeaturePcdGet (PcdDxeIplSwitchToLongMode)) || (sizeof (UINTN) == sizeof (UINT64))) {
     //
     // Need reconstruct page table here, since we do not trust ACPINvs.
     //
@@ -1039,13 +1070,6 @@ S3RestoreConfig2 (
   //
   GuidHob = GetFirstGuidHob (&gEfiAcpiVariableGuid);
   if (GuidHob != NULL) {
-    //
-    // Below SwitchStack/AsmEnablePaging64 function has
-    // assumption that it's in 32 bits mode now.
-    // Add ASSERT code to indicate this assumption.
-    //
-    ASSERT (sizeof (UINTN) == sizeof (UINT32));
-
     Status = PeiServicesLocatePpi (
                &gPeiSmmAccessPpiGuid,
                0,
@@ -1079,7 +1103,12 @@ S3RestoreConfig2 (
     DEBUG ((DEBUG_INFO, "SMM S3 Return Stack Pointer     = %x\n", SmmS3ResumeState->ReturnStackPointer));
     DEBUG ((DEBUG_INFO, "SMM S3 Smst                     = %x\n", SmmS3ResumeState->Smst));
 
-    if (SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_32) {
+    //
+    // Directly do the switch stack when PEI and SMM env run in the same execution mode.
+    //
+    if (((SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_32) && (sizeof (UINTN) == sizeof (UINT32))) ||
+        ((SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_64) && (sizeof (UINTN) == sizeof (UINT64))))
+    {
       SwitchStack (
         (SWITCH_STACK_ENTRY_POINT)(UINTN)SmmS3ResumeState->SmmS3ResumeEntryPoint,
         (VOID *)AcpiS3Context,
