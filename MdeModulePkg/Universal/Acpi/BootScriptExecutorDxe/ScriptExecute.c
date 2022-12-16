@@ -4,7 +4,7 @@
   This driver is dispatched by Dxe core and the driver will reload itself to ACPI reserved memory
   in the entry point. The functionality is to interpret and restore the S3 boot script
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -95,7 +95,7 @@ S3BootScriptExecutorEntryFunction (
     PeiS3ResumeState->ReturnStatus = (UINT64)(UINTN)Status;
     if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
       //
-      // X64 S3 Resume
+      // X64 DXE to IA32 PEI S3 Resume
       //
       DEBUG ((DEBUG_INFO, "Call AsmDisablePaging64() to return to S3 Resume in PEI Phase\n"));
       PeiS3ResumeState->AsmTransferControl = (EFI_PHYSICAL_ADDRESS)(UINTN)AsmTransferControl32;
@@ -121,7 +121,7 @@ S3BootScriptExecutorEntryFunction (
         );
     } else {
       //
-      // IA32 S3 Resume
+      // IA32 DXE to IA32 PEI S3 Resume / X64 DXE to X64 PEI S3 Resume
       //
       DEBUG ((DEBUG_INFO, "Call SwitchStack() to return to S3 Resume in PEI Phase\n"));
       PeiS3ResumeState->AsmTransferControl = (EFI_PHYSICAL_ADDRESS)(UINTN)AsmTransferControl;
@@ -156,8 +156,11 @@ S3BootScriptExecutorEntryFunction (
       //
       // X64 long mode waking vector
       //
-      DEBUG ((DEBUG_INFO, "Transfer to 64bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
-      if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+      DEBUG ((DEBUG_INFO, "Transfer from 64bit DXE to 64bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
+      if (sizeof (UINTN) == sizeof (UINT64)) {
+        //
+        // 64bit DXE calls to 64bit OS S3 waking vector
+        //
         SwitchStack (
           (SWITCH_STACK_ENTRY_POINT)(UINTN)Facs->XFirmwareWakingVector,
           NULL,
@@ -174,7 +177,10 @@ S3BootScriptExecutorEntryFunction (
       // IA32 protected mode waking vector (Page disabled)
       //
       DEBUG ((DEBUG_INFO, "Transfer to 32bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
-      if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+      if (sizeof (UINTN) == sizeof (UINT64)) {
+        //
+        // 64bit DXE calls to 32bit OS S3 waking vector
+        //
         AsmDisablePaging64 (
           0x10,
           (UINT32)Facs->XFirmwareWakingVector,
@@ -183,6 +189,9 @@ S3BootScriptExecutorEntryFunction (
           (UINT32)TempStackTop
           );
       } else {
+        //
+        // 32bit DXE calls to 32bit OS S3 waking vector
+        //
         SwitchStack (
           (SWITCH_STACK_ENTRY_POINT)(UINTN)Facs->XFirmwareWakingVector,
           NULL,
