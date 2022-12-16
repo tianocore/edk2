@@ -414,8 +414,8 @@ BmGetNetworkDescription (
   //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)
   //
   // The HTTP device path is like:
-  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv4(...)[/Dns(...)]/Uri(...)
-  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)[/Dns(...)]/Uri(...)
+  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv4(...)[/Dns(...)][/Uri(...)]/Uri(...)
+  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)[/Dns(...)][/Uri(...)]/Uri(...)
   //
   while (!IsDevicePathEnd (DevicePath) &&
          ((DevicePathType (DevicePath) != MESSAGING_DEVICE_PATH) ||
