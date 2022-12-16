@@ -18,4 +18,6 @@
 #string STR_BOOT_URI_PROMPT                   #language en-US "Boot URI"
 #string STR_BOOT_URI_HELP                     #language en-US "A new Boot Option will be created according to this Boot URI."
 #string STR_BOOT_DESCRIPTION_PROMPT           #language en-US "Input the description"
+#string STR_BOOT_PROXY_URI_PROMPT             #language en-US "Proxy URI"
+#string STR_BOOT_PROXY_URI_HELP               #language en-US "Proxy URI through which to connect to Boot URI"
 #string STR_NULL_STRING                       #language en-US ""
