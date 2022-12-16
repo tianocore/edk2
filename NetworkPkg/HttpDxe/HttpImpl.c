@@ -407,10 +407,14 @@ EfiHttpRequest (
     }
 
     //
-    // From the information in Url, the HTTP instance will
+    // From the information in the Urls, the HTTP instance will
     // be able to determine whether to use http or https.
     //
-    HttpInstance->UseHttps = IsHttpsUrl (Url);
+    if (Request->Method == HttpMethodConnect) {
+      HttpInstance->UseHttps = IsHttpsUrl (ProxyUrl);
+    } else {
+      HttpInstance->UseHttps = IsHttpsUrl (Url);
+    }
 
     //
     // HTTP is disabled, return directly if the URI is not HTTPS.
@@ -497,9 +501,10 @@ EfiHttpRequest (
       if ((HttpInstance->ConnectionClose == FALSE) &&
           (HttpInstance->RemotePort == RemotePort) &&
           (AsciiStrCmp (HttpInstance->RemoteHost, HostName) == 0) &&
-          (!HttpInstance->UseHttps || (HttpInstance->UseHttps &&
-                                       !TlsConfigure &&
-                                       (HttpInstance->TlsSessionState == EfiTlsSessionDataTransferring))))
+          (!HttpInstance->UseHttps ||
+           HttpInstance->ProxyConnected || (HttpInstance->UseHttps &&
+                                            !TlsConfigure &&
+                                            (HttpInstance->TlsSessionState == EfiTlsSessionDataTransferring))))
       {
         //
         // Host Name and port number of the request URL are the same with previous call to Request().
@@ -652,7 +657,7 @@ EfiHttpRequest (
     goto Error2;
   }
 
-  if (!Configure && !ReConfigure && !TlsConfigure) {
+  if ((!Configure && !ReConfigure) && ((HttpInstance->ProxyConnected && TlsConfigure) || (!TlsConfigure))) {
     //
     // For the new HTTP token, create TX TCP token events.
     //
