@@ -44,6 +44,15 @@ formset
             minsize = URI_STR_MIN_SIZE,
             maxsize = URI_STR_MAX_SIZE,
     endstring;
+
+    string  varid   = HTTP_BOOT_CONFIG_IFR_NVDATA.ProxyUri,
+            prompt  = STRING_TOKEN(STR_BOOT_PROXY_URI_PROMPT),
+            help    = STRING_TOKEN(STR_BOOT_PROXY_URI_HELP),
+            flags   = INTERACTIVE,
+            key     = KEY_INITIATOR_PROXY_URI,
+            minsize = URI_STR_MIN_SIZE,
+            maxsize = URI_STR_MAX_SIZE,
+    endstring;
   endform;
 
 endformset;
