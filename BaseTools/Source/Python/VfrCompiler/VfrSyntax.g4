@@ -151,7 +151,7 @@ locals[ClassName=0]
     |   Number
     ;
 
-subclassDefinitions
+subclassDefinition
 locals[Node=VfrTreeNode(EFI_IFR_GUID_OP)]
     :   SubclassSetupApplication
     |   SubclassGeneralApplication
@@ -357,7 +357,7 @@ locals[Node]
     :
     (   vfrStatementImage
     |   vfrStatementLocked
-    |   vfrStatementRules
+    |   vfrStatementRules //
     |   vfrStatementDefault
     |   vfrStatementStat
     |   vfrStatementQuestions
@@ -510,18 +510,18 @@ locals[Node]
 
 vfrStatementQuestionTag
 locals[Node]
-    :   vfrStatementStatTag ',' //
+    :   vfrStatementStatTag ','
     |   vfrStatementInconsistentIf
     |   vfrStatementNoSubmitIf
     |   vfrStatementDisableIfQuest
     |   vfrStatementRefresh
     |   vfrStatementVarstoreDevice
-    |   vfrStatementExtension //
+    |   vfrStatementExtension
     |   vfrStatementRefreshEvent
     |   vfrStatementWarningIf
     ;
 
-vfrStatementInconsistentIf
+vfrStatementInconsistentIf //
 locals[Node=VfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP)]
     :   'inconsistentif'
         'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
@@ -530,7 +530,7 @@ locals[Node=VfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP)]
         'endif' (';')?
     ;
 
-vfrStatementNoSubmitIf
+vfrStatementNoSubmitIf //
 locals[Node=VfrTreeNode(EFI_IFR_NO_SUBMIT_IF_OP)]
     :   'nosubmitif'
         'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
@@ -561,7 +561,7 @@ locals[Node=VfrTreeNode(EFI_IFR_REFRESH_ID_OP)]
     :   'refreshguid' '=' guidDefinition ','
     ;
 
-vfrStatementWarningIf
+vfrStatementWarningIf //
 locals[Node=VfrTreeNode(EFI_IFR_WARNING_IF_OP)]
     :   'warningif'
         'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
@@ -624,7 +624,7 @@ locals[Node=VfrTreeNode(EFI_IFR_DEFAULT_OP)]
         )
     ;
 
-vfrStatementValue
+vfrStatementValue //
 locals[Node=VfrTreeNode(EFI_IFR_VALUE_OP)]
     :   'value' '=' vfrStatementExpression[localctx.Node]
     ;
@@ -1138,6 +1138,7 @@ locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), Buffer=None, Size=0, TypeName='', Type
 
 
 vfrExtensionData
+locals[TFName='', FName='', TFValue=None]
     :   ',' 'data' ('[' I=Number ']')?
         ( '.' arrayName)*  '=' N=Number
     ;

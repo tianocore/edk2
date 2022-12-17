@@ -4,7 +4,7 @@ formset:
   title:  0x0013  # Title STRING_ID
   help:  0x0014  # Help STRING_ID
   classguid:  '{0x93039971, 0x8545, 0x4b04, { 0xb4, 0x5e, 0x32, 0xeb, 0x83, 0x26, 0x4, 0xe }}'
-  statements:  
+  component:  
     - defaultstore:
         type:  MyStandardDefault
         prompt:  0x005b # DefaultName STRING_ID
@@ -50,7 +50,7 @@ formset:
     - form: 
         formid:  1 # FormId STRING_ID
         title:  0x0015  # FormTitle STRING_ID
-        statements:
+        component:
         - subtitle:
             prompt:  0x001a  # Statement Prompt STRING_ID
             flags:  0x0000  # Optional Input
@@ -115,8 +115,9 @@ formset:
             minimum:  0 # Optional Input
             step:  0 # Optional Input
               - default:
-                  type:  8
                   defaultId:  0
+                  type:  8
+                  value: 'cond (pushthis == 0 ? 0 : cond ((questionref(MyOneOf) >> 0x4 & 0xF00) == 0x0 + 0x2 ? 0 : 1))'
               - option:  
                   text:  0x002d # Option STRING_ID
                   value:  0x0
@@ -134,8 +135,8 @@ formset:
             questionflags:  0 # Optional Input 
             opcodeflags:  0x3  # optional input
               - default:
-                  type:  0
                   defaultId:  0
+                  type:  0
                   value:  1
         - label:
             condition:  'suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0'
@@ -189,8 +190,8 @@ formset:
                   value:  0x1
                   flags:  0 # Optional Input
               - default:
-                  type:  11
                   defaultId:  0
+                  type:  11
                   value:  {1,2,3}
         - label:
             number:  0x64  # Number
@@ -227,8 +228,8 @@ formset:
                   value:  0x1
                   flags:  16 # Optional Input
               - warningif:
-                warning:  172
-                timeOut:  5
+                  warning:  172
+                  timeout:  5
         - oneof:
             varid:  MyIfrNVData.TestLateCheck2  #  Optional Input
             questionid:  7  # Optional Input, Need to compute if None
@@ -305,8 +306,8 @@ formset:
             minimum:  0 # Optional Input
             step:  0 # Optional Input
               - default:
-                  type:  0
                   defaultId:  0
+                  type:  0
                   value:  0
         - string:
             varid:  MyIfrNVData.MyStringData  #  Optional Input
@@ -331,8 +332,8 @@ formset:
             minimum:  0 # Optional Input
             step:  0 # Optional Input
               - default:
-                  type:  0
                   defaultId:  0
+                  type:  0
                   value:  21
         - numeric:
             varid:  MyIfrNVData.HowOldAreYouInYearsManual  #  Optional Input
@@ -345,8 +346,9 @@ formset:
             minimum:  0 # Optional Input
             step:  0 # Optional Input
               - default:
-                  type:  8
                   defaultId:  0
+                  type:  8
+                  value: 'questionrefval(devicepath = STRING_TOKEN (0x006D), guid = { 0xA04A27f4, 0xDF00, 0x4D42, {0xB5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3D} }, 0x1111)'
               - inconsistentif:
                   prompt:  0x0047
                   condition:  'inconsistentif ideqval MyIfrNVData.HowOldAreYouInYearsManual == 99       OR       ideqid MyIfrNVData.HowOldAreYouInYearsManual == MyEfiVar.Field8       OR       ideqvallist MyIfrNVData.HowOldAreYouInYearsManual == 1 3 5 7'
@@ -361,12 +363,12 @@ formset:
             minimum:  0 # Optional Input
             step:  0 # Optional Input
               - default:
-                  type:  0
                   defaultId:  0
+                  type:  0
                   value:  18
               - default:
-                  type:  0
                   defaultId:  1
+                  type:  0
                   value:  19
         - numeric:
             varid:  MyNameValueVar[0]  #  Optional Input
@@ -379,12 +381,12 @@ formset:
             minimum:  0 # Optional Input
             step:  0 # Optional Input
               - default:
-                  type:  0
                   defaultId:  0
+                  type:  0
                   value:  16
               - default:
-                  type:  0
                   defaultId:  1
+                  type:  0
                   value:  17
         - numeric:
             varid:  MyNameValueVar[1]  #  Optional Input
@@ -397,12 +399,12 @@ formset:
             minimum:  0 # Optional Input
             step:  0 # Optional Input
               - default:
-                  type:  1
                   defaultId:  0
+                  type:  1
                   value:  18
               - default:
-                  type:  1
                   defaultId:  1
+                  type:  1
                   value:  19
         - string:
             varid:  MyNameValueVar[2]  #  Optional Input
@@ -447,12 +449,12 @@ formset:
             minimum:  0 # Optional Input
             step:  1 # Optional Input
               - default:
-                  type:  0
                   defaultId:  0
+                  type:  0
                   value:  18
               - default:
-                  type:  0
                   defaultId:  1
+                  type:  0
                   value:  19
         - numeric:
             varid:  MyIfrNVData.GetDefaultValueFromAccess  #  Optional Input
@@ -465,8 +467,8 @@ formset:
             minimum:  0 # Optional Input
             step:  1 # Optional Input
               - default:
-                  type:  0
                   defaultId:  0
+                  type:  0
                   value:  18
         - numeric:
             varid:  MyIfrNVData.GetDefaultValueFromCallBack  #  Optional Input
@@ -479,8 +481,8 @@ formset:
             minimum:  0 # Optional Input
             step:  1 # Optional Input
               - default:
-                  type:  0
                   defaultId:  0
+                  type:  0
                   value:  18
         - orderedlist:
             varid:  MyIfrNVData.GetDefaultValueFromCallBackForOrderedList  #  Optional Input
@@ -501,14 +503,14 @@ formset:
                   text:  0x0029 # Option STRING_ID
                   value:  0x3
                   flags:  0 # Optional Input
-      - resetbutton:
-          prompt:  91  # Statement Prompt STRING_ID
-          help:  92  # Statement Help STRING_ID
-          defaultid:  0
-      - resetbutton:
-          prompt:  93  # Statement Prompt STRING_ID
-          help:  94  # Statement Help STRING_ID
-          defaultid:  1
+        - resetbutton:
+            defaultstore:  MyStandardDefault
+            prompt:  0x005b  # Statement Prompt STRING_ID
+            help:  0x005c  # Statement Help STRING_ID
+        - resetbutton:
+            defaultstore:  MyManufactureDefault
+            prompt:  0x005d  # Statement Prompt STRING_ID
+            help:  0x005e  # Statement Help STRING_ID
         - text:
             condition:  'grayoutif NOT security ({ 0x85b75607, 0xf7ce, 0x471e, { 0xb7, 0xe4, 0x2a, 0xea, 0x5f, 0x72, 0x32, 0xee } })'
             help:  0x0039  # Statement Help STRING_ID
@@ -525,8 +527,8 @@ formset:
             minimum:  0 # Optional Input
             step:  0 # Optional Input
               - default:
-                  type:  1
                   defaultId:  0
+                  type:  1
                   value:  18
         - text:
             help:  0x0071  # Question Help STRING_ID
@@ -576,8 +578,8 @@ formset:
             prompt:  0x006b
             help:  0x006c
             questionflags:  0 # Optional Input 
-      - guidop:
-          guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
+        - guidop:
+            guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
         - goto:
             formid:  0x7
             question:  0x0018 #  Optional Input
@@ -589,7 +591,7 @@ formset:
         formid:  2 # FormId STRING_ID
         condition:  'suppressif ideqval MyIfrNVData.BootOrderLarge == 0'
         title:  0x0016  # FormTitle STRING_ID
-        statements:
+        component:
         - date:
             name:  Date  #  Optional Input
             questionid:  25  # Optional Input, Need to compute if None
@@ -598,8 +600,8 @@ formset:
             questionflags:  0 # Optional Input 
             opcodeflags:  0x10  # optional input
               - default:
-                  type:  6
                   defaultId:  0
+                  type:  6
                   value:  2004/1/1
               - inconsistentif:
                   prompt:  0x0047
@@ -635,8 +637,8 @@ formset:
             questionflags:  0 # Optional Input 
             opcodeflags:  0x4  # optional input
               - default:
-                  type:  5
                   defaultId:  0
+                  type:  5
                   value:  15:33:33
         - checkbox:
             varid:  MyIfrNVData.ChooseToActivateNuclearWeaponry  #  Optional Input
@@ -667,8 +669,8 @@ formset:
             help:  0x0045
             questionflags:  4 # Optional Input 
               - default:
-                  type:  12
                   defaultId:  0
+                  type:  12
                   value:  0;0;{0x0, 0x0, 0x0, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }};90
         - goto:
             questionid/key:  4681 #optional input, Need to compute if None
@@ -678,7 +680,7 @@ formset:
     - form: 
         formid:  3 # FormId STRING_ID
         title:  0x0017  # FormTitle STRING_ID
-        statements:
+        component:
         - text:
             condition:  'suppressif ideqval MyEfiVar.Field8 == 111'
             help:  0x0050  # Statement Help STRING_ID
@@ -702,8 +704,8 @@ formset:
             minimum:  0 # Optional Input
             step:  0 # Optional Input
               - default:
-                  type:  0
                   defaultId:  0
+                  type:  0
                   value:  0
               - refresh:
                   interval:  3  # RefreshInterval
@@ -724,11 +726,12 @@ formset:
             number:  0x2223  # Number
     - formmap: 
         formid:  4 # FormId STRING_ID
-        maptitle:  149
-        mapguid:  {0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}
-        maptitle:  150
-        mapguid:  {0x3bd2f4ec, 0xe524, 0x46e4, { 0xa9, 0xd8, 0x51, 0x1, 0x17, 0x42, 0x55, 0x62 }}
-        statements:
+        map: # optional input
+         - maptitle:  149
+           mapguid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
+         - maptitle:  150
+           mapguid:  '{0x3bd2f4ec, 0xe524, 0x46e4, { 0xa9, 0xd8, 0x51, 0x1, 0x17, 0x42, 0x55, 0x62 }}'
+        component:
         - oneof:
             varid:  MyIfrNVData.SerialPortNo  #  Optional Input
             questionid:  32  # Optional Input, Need to compute if None
@@ -827,7 +830,7 @@ formset:
     - form: 
         formid:  5 # FormId STRING_ID
         title:  0x0066  # FormTitle STRING_ID
-        statements:
+        component:
         - text:
             help:  0x0054  # Question Help STRING_ID
             prompt:  0x0054  # Question Prompt STRING_ID
@@ -841,7 +844,7 @@ formset:
     - form: 
         formid:  6 # FormId STRING_ID
         title:  0x0018  # FormTitle STRING_ID
-        statements:
+        component:
         - text:
             help:  0x0064  # Statement Help STRING_ID
             prompt:  0x0064  # Statement Prompt STRING_ID
@@ -857,11 +860,11 @@ formset:
             minimum:  0 # Optional Input
             step:  0 # Optional Input
               - default:
-                  type:  0
                   defaultId:  0
+                  type:  0
                   value:  0
               - refreshguid:
-                guid:  '{0xf5e655d9, 0x2a6, 0x46f2, { 0x9e, 0x76, 0xb8, 0xbe, 0x8e, 0x60, 0xab, 0x22 }}'
+                  guid:  '{0xf5e655d9, 0x2a6, 0x46f2, { 0x9e, 0x76, 0xb8, 0xbe, 0x8e, 0x60, 0xab, 0x22 }}'
         - label:
             number:  0x3234  # Number
         - label:
@@ -869,7 +872,7 @@ formset:
     - form: 
         formid:  4660 # FormId STRING_ID
         title:  0x0019  # FormTitle STRING_ID
-        statements:
+        component:
         - label:
             number:  0x1234  # Number
         - label:
@@ -877,7 +880,7 @@ formset:
     - form: 
         formid:  7 # FormId STRING_ID
         title:  0x0073  # FormTitle STRING_ID
-        statements:
+        component:
         - subtitle:
             prompt:  0x0076  # Statement Prompt STRING_ID
             flags:  0x0000  # Optional Input
@@ -958,12 +961,12 @@ formset:
             minimum:  0 # Optional Input
             step:  0 # Optional Input
               - default:
-                  type:  2
                   defaultId:  0
+                  type:  2
                   value:  4
               - default:
-                  type:  2
                   defaultId:  1
+                  type:  2
                   value:  5
         - oneof:
             varid:  MyEfiBitVar.EfiBitOneof  #  Optional Input
@@ -1025,12 +1028,12 @@ formset:
             minimum:  0 # Optional Input
             step:  0 # Optional Input
               - default:
-                  type:  2
                   defaultId:  0
+                  type:  2
                   value:  6
               - default:
-                  type:  2
                   defaultId:  1
+                  type:  2
                   value:  7
         - oneof:
             varid:  MyIfrNVData.MyBitData.NestByteField  #  Optional Input
@@ -1092,12 +1095,12 @@ formset:
             minimum:  0 # Optional Input
             step:  0 # Optional Input
               - default:
-                  type:  2
                   defaultId:  0
+                  type:  2
                   value:  16
               - default:
-                  type:  2
                   defaultId:  1
+                  type:  2
                   value:  17
         - subtitle:
             prompt:  0x001b  # Statement Prompt STRING_ID
@@ -1116,12 +1119,12 @@ formset:
             minimum:  0 # Optional Input
             step:  0 # Optional Input
               - default:
-                  type:  0
                   defaultId:  0
+                  type:  0
                   value:  7
               - default:
-                  type:  0
                   defaultId:  1
+                  type:  0
                   value:  8
-      - guidop:
-          guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
+        - guidop:
+            guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'

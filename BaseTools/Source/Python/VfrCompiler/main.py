@@ -61,7 +61,7 @@ if __name__ == '__main__':
     VCompiler.Compile()
     VCompiler.GenFiles()
 
-    InputFile = 'source.yaml'
+    InputFile = 'test.yml'
     YCompiler = YamlCompiler(InputFile)
     YCompiler.PreProcess()
     YCompiler.Compile()

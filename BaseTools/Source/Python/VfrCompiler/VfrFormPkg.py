@@ -199,7 +199,7 @@ class FormPkg():
         PkgHdr.Type = EFI_HII_PACKAGE_FORM
         PkgHdr.Length = self.PkgLength + sizeof(EFI_HII_PACKAGE_HEADER)
         return PkgHdr
-
+    
     def BuildPkg(self, Root):
         if Root.OpCode != None:
             self.PkgLength += Root.Data.GetInfo().Header.Length
@@ -1085,13 +1085,20 @@ class IfrLabel(IfrLine, IfrOpHeader):
 
 class IfrRule(IfrLine, IfrOpHeader):
 
-    def __init__(self, ):
+    def __init__(self, RuleName=None):
         self.__Rule = EFI_IFR_RULE()
+        self.__RuleName = RuleName
         IfrOpHeader.__init__(self, self.__Rule.Header, EFI_IFR_RULE_OP)
         self.__Rule.RuleId = EFI_RULE_ID_INVALID
 
     def SetRuleId(self, RuleId):
         self.__Rule.RuleId = RuleId
+
+    def GetRuleName(self):
+        return self.__RuleName
+
+    def SetRuleName(self, RuleName):
+        self.__RuleName = RuleName
 
     def GetInfo(self):
         return self.__Rule
@@ -1388,8 +1395,13 @@ class IfrGuid(IfrLine, IfrOpHeader):
 
 class IfrExtensionGuid(IfrLine, IfrOpHeader):
 
-    def __init__(self, Size, Data=None):
+    def __init__(self, Size, TypeName='', ArraySize=0, Data=None):
         self.__Guid = EFI_IFR_GUID()
+        if ArraySize != 0:
+            self.__DataType = TypeName +'[' + str(ArraySize) + ']'
+        else:
+            self.__DataType = TypeName
+        self.__FieldList = []
         self.__Data = Data # databuffer is saved here
         IfrOpHeader.__init__(self, self.__Guid.Header, EFI_IFR_GUID_OP,
                               ctypes.sizeof(EFI_IFR_GUID) + Size)
@@ -1402,6 +1414,16 @@ class IfrExtensionGuid(IfrLine, IfrOpHeader):
 
     def SetData(self, Data):
         self.__Data = Data
+
+    def GetDataType(self):
+        return self.__DataType
+
+    def GetFieldList(self):
+        return self.__FieldList
+
+    def SetFieldList(self, TFName, TFValue):
+        self.__FieldList.append([TFName, TFValue])
+
 
     def GetData(self):
         return self.__Data
@@ -1959,8 +1981,9 @@ class IfrCheckBox(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
 class IfrResetButton(IfrLine, IfrOpHeader, IfrStatementHeader):
 
-    def __init__(self):
+    def __init__(self, DefaultStore=None):
         self.__ResetButton = EFI_IFR_RESET_BUTTON()
+        self.__DefaultStore = DefaultStore
         IfrOpHeader.__init__(self, self.__ResetButton.Header,
                               EFI_IFR_RESET_BUTTON_OP)
         IfrStatementHeader.__init__(self, self.__ResetButton.Statement)
@@ -1968,6 +1991,12 @@ class IfrResetButton(IfrLine, IfrOpHeader, IfrStatementHeader):
 
     def SetDefaultId(self, DefaultId):
         self.__ResetButton.DefaultId = DefaultId
+
+    def SetDefaultStore(self, DefaultStore):
+        self.__DefaultStore = DefaultStore
+
+    def GetDefaultStore(self):
+        return self.__DefaultStore
 
     def GetInfo(self):
         return self.__ResetButton

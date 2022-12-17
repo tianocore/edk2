@@ -721,7 +721,7 @@ typedef struct {
 
 
 
-// Data struct def in vfr
+
 typedef struct {
   MY_BITS_DATA    BitsData;
   UINT32          EfiBitGrayoutTest : 5;

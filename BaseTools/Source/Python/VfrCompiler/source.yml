@@ -71,11 +71,16 @@ formset:
           - text:
               help:  0x0054  # Question Help STRING_ID
               prompt:  0x0054  # Question Prompt STRING_ID
-              flags:  0x0004  # Optional Input, Question Flags
+              questionflags:  0x0004  # Optional Input, Question Flags
               key:  0x1237  # Optional Input, Question QuestionId
               statements: # Optional Input, vfrStatementStatTagList
                 - image: 0x0000
                 - locked: None
+          - resetbutton:
+              defaultstore:  MyStandardDefault
+              prompt:  0x005b  # Statement Prompt STRING_ID
+              help:  0x005c  # Statement Help STRING_ID
+              statements: # Optional Input, vfrStatementStatTagList
           - oneof:
               condition: XXXXX
               name:  MyOneOf  #  Optional Input
@@ -175,7 +180,7 @@ formset:
               QuestionOptionList:
                 - inconsistentif:
                     prompt: 0x0063
-                    Exp: 'pushthis != stringref(STRING_TOKEN(0x0062))'
+                    condition: 'pushthis != stringref(STRING_TOKEN(0x0062))'
 
           - time:
               questionid:  8  # Optional Input, Need to compute if None
@@ -201,7 +206,7 @@ formset:
                     value:  2004/1/1
                 - inconsistentif:
                   - prompt: 0x0047
-                    Exp: 'ideqval Date.Day == 31 and ideqvallist Date.Month == 2 4 6 9 11'
+                    condition: 'ideqval Date.Day == 31 and ideqvallist Date.Month == 2 4 6 9 11'
           - action:
               questionid:  291  # Optional Input, Need to compute if None
               prompt:  0x0001  # Statement Prompt STRING_ID
@@ -211,3 +216,11 @@ formset:
               QuestionTagList:
                 - refreshguid:
                   - guid: '{0xb3f56470, 0x6141, 0x4621, { 0x8f, 0x19, 0x70, 0x4e, 0x57, 0x7a, 0xa9, 0xe8 }}'
+    - formmap:
+        formid:  4 # FormId STRING_ID
+        map: #optional input
+         - maptitle:  149
+           mapguid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
+         - maptitle:  150
+           mapguid:  '{0x3bd2f4ec, 0xe524, 0x46e4, { 0xa9, 0xd8, 0x51, 0x1, 0x17, 0x42, 0x55, 0x62 }}'
+        statements:
