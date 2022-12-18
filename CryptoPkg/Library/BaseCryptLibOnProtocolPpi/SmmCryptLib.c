@@ -52,7 +52,6 @@ SmmCryptLibConstructor (
   )
 {
   EFI_STATUS  Status;
-  UINTN       Version;
 
   Status = gSmst->SmmLocateProtocol (
                     &gEdkiiSmmCryptoProtocolGuid,
@@ -63,14 +62,6 @@ SmmCryptLibConstructor (
     DEBUG ((DEBUG_ERROR, "[SmmCryptLib] Failed to locate Crypto SMM Protocol. Status = %r\n", Status));
     ASSERT_EFI_ERROR (Status);
     ASSERT (mSmmCryptoProtocol != NULL);
-    mSmmCryptoProtocol = NULL;
-    return EFI_NOT_FOUND;
-  }
-
-  Version = mSmmCryptoProtocol->GetVersion ();
-  if (Version < EDKII_CRYPTO_VERSION) {
-    DEBUG ((DEBUG_ERROR, "[SmmCryptLib] Crypto SMM Protocol unsupported version %d\n", Version));
-    ASSERT (Version >= EDKII_CRYPTO_VERSION);
     mSmmCryptoProtocol = NULL;
     return EFI_NOT_FOUND;
   }

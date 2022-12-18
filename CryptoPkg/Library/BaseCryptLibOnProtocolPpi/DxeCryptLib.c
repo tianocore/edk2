@@ -49,7 +49,6 @@ DxeCryptLibConstructor (
   )
 {
   EFI_STATUS  Status;
-  UINTN       Version;
 
   Status = gBS->LocateProtocol (
                   &gEdkiiCryptoProtocolGuid,
@@ -61,14 +60,6 @@ DxeCryptLibConstructor (
     DEBUG ((DEBUG_ERROR, "[DxeCryptLib] Failed to locate Crypto Protocol. Status = %r\n", Status));
     ASSERT_EFI_ERROR (Status);
     ASSERT (mCryptoProtocol != NULL);
-    mCryptoProtocol = NULL;
-    return EFI_NOT_FOUND;
-  }
-
-  Version = mCryptoProtocol->GetVersion ();
-  if (Version < EDKII_CRYPTO_VERSION) {
-    DEBUG ((DEBUG_ERROR, "[DxeCryptLib] Crypto Protocol unsupported version %d\n", Version));
-    ASSERT (Version >= EDKII_CRYPTO_VERSION);
     mCryptoProtocol = NULL;
     return EFI_NOT_FOUND;
   }
