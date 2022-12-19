@@ -67,7 +67,8 @@ def BuildUniversalPayload(Args, MacroList):
 
     EntryModuleInf = os.path.normpath("UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf")
     DscPath = os.path.normpath("UefiPayloadPkg/UefiPayloadPkg.dsc")
-    FvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/DXEFV.Fv"))
+    DxeFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/DXEFV.Fv"))
+    BdsFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/BDSFV.Fv"))
     PayloadReportPath = os.path.join(BuildDir, "UefiUniversalPayload.txt")
     ModuleReportPath = os.path.join(BuildDir, "UefiUniversalPayloadEntry.txt")
     UpldInfoFile = os.path.join(BuildDir, "UniversalPayloadInfo.bin")
@@ -119,21 +120,22 @@ def BuildUniversalPayload(Args, MacroList):
     #
     # Copy the DXEFV as a section in elf format Universal Payload entry.
     #
-    remove_section = '"{}" -I {} -O {} --remove-section .upld_info --remove-section .upld.uefi_fv {}'.format (
+    remove_section = '"{}" -I {} -O {} --remove-section .upld_info --remove-section .upld.uefi_fv --remove-section .upld.bds_fv {}'.format (
                        LlvmObjcopyPath,
                        ObjCopyFlag,
                        ObjCopyFlag,
                        EntryOutputDir
                        )
-    add_section    = '"{}" -I {} -O {} --add-section .upld_info={} --add-section .upld.uefi_fv={} {}'.format (
+    add_section    = '"{}" -I {} -O {} --add-section .upld_info={} --add-section .upld.uefi_fv={} --add-section .upld.bds_fv={} {}'.format (
                        LlvmObjcopyPath,
                        ObjCopyFlag,
                        ObjCopyFlag,
                        UpldInfoFile,
-                       FvOutputDir,
+                       DxeFvOutputDir,
+                       BdsFvOutputDir,
                        EntryOutputDir
                        )
-    set_section    = '"{}" -I {} -O {} --set-section-alignment .upld_info=4 --set-section-alignment .upld.uefi_fv=16 {}'.format (
+    set_section    = '"{}" -I {} -O {} --set-section-alignment .upld_info=16 --set-section-alignment .upld.uefi_fv=16 --set-section-alignment .upld.bds_fv=16 {}'.format (
                        LlvmObjcopyPath,
                        ObjCopyFlag,
                        ObjCopyFlag,

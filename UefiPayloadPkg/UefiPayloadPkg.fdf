@@ -59,8 +59,33 @@ INF UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
 FILE FV_IMAGE = 4E35FD93-9C72-4c15-8C4B-E77F1DB2D793 {
     SECTION FV_IMAGE = DXEFV
 }
+FILE FV_IMAGE = FBE6C1E3-2F80-4770-88B0-494186E3346F {
+    SECTION FV_IMAGE = BDSFV
+}
 
 ################################################################################
+[FV.BDSFV]
+FvNameGuid         = CA5590AF-9558-4822-B5EA-BE2E876CD3EC
+BlockSize          = $(FD_BLOCK_SIZE)
+FvForceRebase      = FALSE
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 
 [FV.DXEFV]
 FvNameGuid         = 8063C21A-8E58-4576-95CE-089E87975D23
@@ -106,7 +131,7 @@ INF CryptoPkg/Driver/CryptoDxe.inf
 INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 !endif
 INF UefiCpuPkg/CpuDxe/CpuDxe.inf
-INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+
 INF RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
 INF MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 INF PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
