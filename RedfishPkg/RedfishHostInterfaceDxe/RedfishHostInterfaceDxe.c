@@ -6,6 +6,7 @@
 
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (C) 2022 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -20,6 +21,9 @@
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
+
+static EFI_EVENT  mPlatformHostInterfaceReadylEvent        = NULL;
+static VOID       *mPlatformHostInterfaceReadyRegistration = NULL;
 
 /**
   Create SMBIOS type 42 record for Redfish host interface.
@@ -239,6 +243,27 @@ ON_EXIT:
 }
 
 /**
+  Notification event of platform Redfish Host Interface readiness.
+
+  @param[in]  Event     Event whose notification function is being invoked.
+  @param[in]  Context   The pointer to the notification function's context,
+                        which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+PlatformHostInterfaceInformationReady (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
+  )
+{
+  DEBUG ((DEBUG_INFO, "%a: Platform Redfish Host Interface informtion is ready\n", __FUNCTION__));
+
+  RedfishCreateSmbiosTable42 ();
+  return;
+}
+
+/**
   Main entry for this driver.
 
   @param ImageHandle     Image handle this driver.
@@ -254,8 +279,52 @@ RedfishHostInterfaceDxeEntryPoint (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  EFI_STATUS  Status;
+  EFI_GUID    *ReadyGuid;
+
+  DEBUG ((DEBUG_INFO, "%a: Entry\n.", __FUNCTION__));
+
   //
-  // Create SMBIOS type 42 record.
+  // Check if the Redfish Host Interface depends on
+  // the specific protocol installation.
   //
-  return RedfishCreateSmbiosTable42 ();
+  Status = RedfishPlatformHostInterfaceNotification (&ReadyGuid);
+  if (Status == EFI_SUCCESS) {
+    DEBUG ((DEBUG_INFO, "    Create protocol install notification to know the installation of platform Redfish host interface readiness\n"));
+    DEBUG ((DEBUG_INFO, "    Protocol GUID: %g\n", ReadyGuid));
+    //
+    // Register event for ReadyGuid protocol installed by
+    // platform Redfish host interface library.
+    //
+    Status = gBS->CreateEvent (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    PlatformHostInterfaceInformationReady,
+                    NULL,
+                    &mPlatformHostInterfaceReadylEvent
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "    Fail to create event for the installation of platform Redfish host interface readiness.\n"));
+      return Status;
+    }
+
+    Status = gBS->RegisterProtocolNotify (
+                    ReadyGuid,
+                    mPlatformHostInterfaceReadylEvent,
+                    &mPlatformHostInterfaceReadyRegistration
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "    Fail to register event for the installation of platform Redfish host interface readiness.\n"));
+      return Status;
+    }
+
+    return EFI_SUCCESS;
+  }
+
+  if ((Status == EFI_UNSUPPORTED) || (Status == EFI_ALREADY_STARTED)) {
+    Status = RedfishCreateSmbiosTable42 ();
+  }
+
+  // Return other erros.
+  return Status;
 }
