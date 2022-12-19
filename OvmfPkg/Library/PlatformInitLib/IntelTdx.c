@@ -171,8 +171,8 @@ BspApAcceptMemoryResourceRange (
   AcceptPageSize = (UINT64)(UINTN)FixedPcdGet32 (PcdTdxAcceptPageSize);
 
   Status          = EFI_SUCCESS;
-  Stride          = CpusNum * ACCEPT_CHUNK_SIZE;
-  PhysicalAddress = PhysicalStart + ACCEPT_CHUNK_SIZE * CpuIndex;
+  Stride          = (UINTN)CpusNum * ACCEPT_CHUNK_SIZE;
+  PhysicalAddress = PhysicalStart + ACCEPT_CHUNK_SIZE * (UINTN)CpuIndex;
 
   while (!EFI_ERROR (Status) && PhysicalAddress < PhysicalEnd) {
     Pages  = MIN (ACCEPT_CHUNK_SIZE, PhysicalEnd - PhysicalAddress) / AcceptPageSize;
