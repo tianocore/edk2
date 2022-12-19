@@ -17,6 +17,7 @@
 //
 // The Library classes this module consumes
 //
+#include <Library/BaseMemoryLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
@@ -409,6 +410,20 @@ DebugDumpCmos (
   }
 }
 
+EFI_HOB_PLATFORM_INFO *
+BuildPlatformInfoHob (
+  VOID
+  )
+{
+  EFI_HOB_PLATFORM_INFO  PlatformInfoHob;
+  EFI_HOB_GUID_TYPE      *GuidHob;
+
+  ZeroMem (&PlatformInfoHob, sizeof PlatformInfoHob);
+  BuildGuidDataHob (&gUefiOvmfPkgPlatformInfoGuid, &PlatformInfoHob, sizeof (EFI_HOB_PLATFORM_INFO));
+  GuidHob = GetFirstGuidHob (&gUefiOvmfPkgPlatformInfoGuid);
+  return (EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (GuidHob);
+}
+
 /**
   Perform Platform PEI initialization.
 
@@ -428,6 +443,11 @@ InitializeXenPlatform (
   EFI_STATUS  Status;
 
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
+
+  //
+  // Platform Info HOB used by QemuFw libraries
+  //
+  BuildPlatformInfoHob ();
 
   DebugDumpCmos ();
 

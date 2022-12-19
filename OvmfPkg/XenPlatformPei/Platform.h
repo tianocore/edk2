@@ -12,6 +12,7 @@
 #define _PLATFORM_PEI_H_INCLUDED_
 
 #include <IndustryStandard/E820.h>
+#include <Library/PlatformInitLib.h>
 
 VOID
 AddIoMemoryBaseSizeHob (
