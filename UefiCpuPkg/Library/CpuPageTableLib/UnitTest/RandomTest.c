@@ -158,7 +158,8 @@ ValidateAndRandomeModifyPageTablePageTableEntry (
   )
 {
   UINT64             Index;
-  UINT64             TempPhysicalBase;
+  UINT32             PageTableBaseAddressLow;
+  UINT32             PageTableBaseAddressHigh;
   IA32_PAGING_ENTRY  *ChildPageEntry;
   UNIT_TEST_STATUS   Status;
 
@@ -181,17 +182,21 @@ ValidateAndRandomeModifyPageTablePageTableEntry (
     if ((RandomNumber < 100) && RandomBoolean ()) {
       RandomNumber++;
       if (Level == 1) {
-        TempPhysicalBase = PagingEntry->Pte4K.Bits.PageTableBaseAddress;
+        PageTableBaseAddressLow  = PagingEntry->Pte4K.Bits.PageTableBaseAddressLow;
+        PageTableBaseAddressHigh = PagingEntry->Pte4K.Bits.PageTableBaseAddressHigh;
       } else {
-        TempPhysicalBase = PagingEntry->PleB.Bits.PageTableBaseAddress;
+        PageTableBaseAddressLow  = PagingEntry->PleB.Bits.PageTableBaseAddressLow;
+        PageTableBaseAddressHigh = PagingEntry->PleB.Bits.PageTableBaseAddressHigh;
       }
 
       PagingEntry->Uint64             = (Random64 (0, MAX_UINT64) & mValidMaskLeaf[Level].Uint64) | mValidMaskLeafFlag[Level].Uint64;
       PagingEntry->Pte4K.Bits.Present = 1;
       if (Level == 1) {
-        PagingEntry->Pte4K.Bits.PageTableBaseAddress = TempPhysicalBase;
+        PagingEntry->Pte4K.Bits.PageTableBaseAddressLow  = PageTableBaseAddressLow;
+        PagingEntry->Pte4K.Bits.PageTableBaseAddressHigh = PageTableBaseAddressHigh;
       } else {
-        PagingEntry->PleB.Bits.PageTableBaseAddress = TempPhysicalBase;
+        PagingEntry->PleB.Bits.PageTableBaseAddressLow  = PageTableBaseAddressLow;
+        PagingEntry->PleB.Bits.PageTableBaseAddressHigh = PageTableBaseAddressHigh;
       }
 
       if ((PagingEntry->Uint64 & mValidMaskLeaf[Level].Uint64) != PagingEntry->Uint64) {
@@ -213,15 +218,17 @@ ValidateAndRandomeModifyPageTablePageTableEntry (
 
   if ((RandomNumber < 100) && RandomBoolean ()) {
     RandomNumber++;
-    TempPhysicalBase = PagingEntry->Pnle.Bits.PageTableBaseAddress;
+    PageTableBaseAddressLow  = PagingEntry->PleB.Bits.PageTableBaseAddressLow;
+    PageTableBaseAddressHigh = PagingEntry->PleB.Bits.PageTableBaseAddressHigh;
 
-    PagingEntry->Uint64                         = Random64 (0, MAX_UINT64) & mValidMaskNoLeaf[Level].Uint64;
-    PagingEntry->Pnle.Bits.Present              = 1;
-    PagingEntry->Pnle.Bits.PageTableBaseAddress = TempPhysicalBase;
+    PagingEntry->Uint64                             = Random64 (0, MAX_UINT64) & mValidMaskNoLeaf[Level].Uint64;
+    PagingEntry->Pnle.Bits.Present                  = 1;
+    PagingEntry->PleB.Bits.PageTableBaseAddressLow  = PageTableBaseAddressLow;
+    PagingEntry->PleB.Bits.PageTableBaseAddressHigh = PageTableBaseAddressHigh;
     ASSERT ((PagingEntry->Uint64 & mValidMaskLeafFlag[Level].Uint64) != mValidMaskLeafFlag[Level].Uint64);
   }
 
-  ChildPageEntry = (IA32_PAGING_ENTRY  *)(UINTN)((PagingEntry->Pnle.Bits.PageTableBaseAddress) << 12);
+  ChildPageEntry = (IA32_PAGING_ENTRY  *)(UINTN)(IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&PagingEntry->Pnle));
   for (Index = 0; Index < 512; Index++) {
     Status = ValidateAndRandomeModifyPageTablePageTableEntry (&ChildPageEntry[Index], Level-1, MaxLeafLevel, Address + (Index<<(9*(Level-1) + 3)));
     if (Status != UNIT_TEST_PASSED) {
@@ -335,17 +342,19 @@ GenerateSingleRandomMapEntry (
   }
 
   if (mRandomOption & ONLY_ONE_ONE_MAPPING) {
-    MapEntrys->Maps[MapsIndex].Attribute.Bits.PageTableBaseAddress = MapEntrys->Maps[MapsIndex].LinearAddress >> 12;
-    MapEntrys->Maps[MapsIndex].Mask.Bits.PageTableBaseAddress      = 0xFFFFFFFFFF;
+    MapEntrys->Maps[MapsIndex].Attribute.Uint64 &= (~IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS_MASK);
+    MapEntrys->Maps[MapsIndex].Attribute.Uint64 |= MapEntrys->Maps[MapsIndex].LinearAddress;
+    MapEntrys->Maps[MapsIndex].Mask.Uint64      |= IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS_MASK;
   } else {
     //
     // Todo: If the mask bit for base address is zero, when dump the pagetable, every entry mapping to physical address zeor.
     //       This means the map count will be a large number, and impossible to finish in proper time.
     //       Need to avoid such case when remove the Random option ONLY_ONE_ONE_MAPPING
     //
-    MapEntrys->Maps[MapsIndex].Attribute.Bits.PageTableBaseAddress = (Random64 (0, (((UINT64)1)<<52) - 1) & AlignedTable[Random32 (0, ARRAY_SIZE (AlignedTable) -1)])>> 12;
+    MapEntrys->Maps[MapsIndex].Attribute.Uint64 &= (~IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS_MASK);
+    MapEntrys->Maps[MapsIndex].Attribute.Uint64 |= (Random64 (0, (((UINT64)1)<<52) - 1) & AlignedTable[Random32 (0, ARRAY_SIZE (AlignedTable) -1)])>> 12;
     if (RandomBoolean ()) {
-      MapEntrys->Maps[MapsIndex].Mask.Bits.PageTableBaseAddress = 0;
+      MapEntrys->Maps[MapsIndex].Mask.Uint64 &= (~IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS_MASK);
     }
   }
 
@@ -393,8 +402,9 @@ CompareEntrysforOnePoint (
   //
   for (Index = 0; Index < MapCount; Index++) {
     if ((Address >= Map[Index].LinearAddress) && (Address < (Map[Index].LinearAddress + Map[Index].Length))) {
-      AttributeInMap.Uint64                    = (Map[Index].Attribute.Uint64 & mSupportedBit.Uint64);
-      AttributeInMap.Bits.PageTableBaseAddress = ((Address - Map[Index].LinearAddress) >> 12) + Map[Index].Attribute.Bits.PageTableBaseAddress;
+      AttributeInMap.Uint64  = (Map[Index].Attribute.Uint64 & mSupportedBit.Uint64);
+      AttributeInMap.Uint64 &= (~IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS_MASK);
+      AttributeInMap.Uint64 |= (Address - Map[Index].LinearAddress + IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (&Map[Index].Attribute)) & IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS_MASK;
       break;
     }
   }
@@ -404,8 +414,10 @@ CompareEntrysforOnePoint (
   //
   for (Index = 0; Index < InitMapCount; Index++) {
     if ((Address >= InitMap[Index].LinearAddress) && (Address < (InitMap[Index].LinearAddress + InitMap[Index].Length))) {
-      AttributeInInitMap.Uint64                    = (InitMap[Index].Attribute.Uint64 & mSupportedBit.Uint64);
-      AttributeInInitMap.Bits.PageTableBaseAddress = ((Address - InitMap[Index].LinearAddress) >> 12) + InitMap[Index].Attribute.Bits.PageTableBaseAddress;
+      AttributeInInitMap.Uint64  = (InitMap[Index].Attribute.Uint64 & mSupportedBit.Uint64);
+      AttributeInInitMap.Uint64 &= (~IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS_MASK);
+      AttributeInInitMap.Uint64 |= (Address - InitMap[Index].LinearAddress + IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (&InitMap[Index].Attribute)) & IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS_MASK;
+
       break;
     }
   }
@@ -422,8 +434,9 @@ CompareEntrysforOnePoint (
       MaskInMapEntrys.Uint64      |= MapEntrys->Maps[Index].Mask.Uint64;
       AttributeInMapEntrys.Uint64 &= (~MapEntrys->Maps[Index].Mask.Uint64);
       AttributeInMapEntrys.Uint64 |=  (MapEntrys->Maps[Index].Attribute.Uint64 & MapEntrys->Maps[Index].Mask.Uint64);
-      if (MapEntrys->Maps[Index].Mask.Bits.PageTableBaseAddress != 0) {
-        AttributeInMapEntrys.Bits.PageTableBaseAddress = ((Address - MapEntrys->Maps[Index].LinearAddress) >> 12) + MapEntrys->Maps[Index].Attribute.Bits.PageTableBaseAddress;
+      if (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (&MapEntrys->Maps[Index].Mask) != 0) {
+        AttributeInMapEntrys.Uint64 &= (~IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS_MASK);
+        AttributeInMapEntrys.Uint64 |= (Address - MapEntrys->Maps[Index].LinearAddress + IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (&MapEntrys->Maps[Index].Attribute)) & IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS_MASK;
       }
     }
   }
@@ -437,8 +450,8 @@ CompareEntrysforOnePoint (
   if ((AttributeInMap.Uint64 & MaskInMapEntrys.Uint64) != (AttributeInMapEntrys.Uint64 & MaskInMapEntrys.Uint64)) {
     DEBUG ((DEBUG_INFO, "======detailed information begin=====\n"));
     DEBUG ((DEBUG_INFO, "\nError: Detect different attribute on a point with linear address: 0x%lx\n", Address));
-    DEBUG ((DEBUG_INFO, "By parsing page table, the point has Attribute 0x%lx, and map to physical address 0x%lx\n", IA32_MAP_ATTRIBUTE_ATTRIBUTES (&AttributeInMap) & MaskInMapEntrys.Uint64, AttributeInMap.Bits.PageTableBaseAddress));
-    DEBUG ((DEBUG_INFO, "While according to inputs, the point should Attribute 0x%lx, and should map to physical address 0x%lx\n", IA32_MAP_ATTRIBUTE_ATTRIBUTES (&AttributeInMapEntrys) & MaskInMapEntrys.Uint64, AttributeInMapEntrys.Bits.PageTableBaseAddress));
+    DEBUG ((DEBUG_INFO, "By parsing page table, the point has Attribute 0x%lx, and map to physical address 0x%lx\n", IA32_MAP_ATTRIBUTE_ATTRIBUTES (&AttributeInMap) & MaskInMapEntrys.Uint64, IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (&AttributeInMap)));
+    DEBUG ((DEBUG_INFO, "While according to inputs, the point should Attribute 0x%lx, and should map to physical address 0x%lx\n", IA32_MAP_ATTRIBUTE_ATTRIBUTES (&AttributeInMapEntrys) & MaskInMapEntrys.Uint64, IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (&AttributeInMapEntrys)));
     DEBUG ((DEBUG_INFO, "The total Mask is 0x%lx\n", MaskInMapEntrys.Uint64));
 
     if (MapEntrys->InitCount != 0) {
@@ -889,21 +902,18 @@ TestCaseforRandomTest (
   UT_ASSERT_EQUAL (Random64 (100, 100), 100);
   UT_ASSERT_TRUE ((Random32 (9, 10) >= 9) & (Random32 (9, 10) <= 10));
   UT_ASSERT_TRUE ((Random64 (9, 10) >= 9) & (Random64 (9, 10) <= 10));
-
-  mSupportedBit.Bits.Present              = 1;
-  mSupportedBit.Bits.ReadWrite            = 1;
-  mSupportedBit.Bits.UserSupervisor       = 1;
-  mSupportedBit.Bits.WriteThrough         = 1;
-  mSupportedBit.Bits.CacheDisabled        = 1;
-  mSupportedBit.Bits.Accessed             = 1;
-  mSupportedBit.Bits.Dirty                = 1;
-  mSupportedBit.Bits.Pat                  = 1;
-  mSupportedBit.Bits.Global               = 1;
-  mSupportedBit.Bits.Reserved1            = 0;
-  mSupportedBit.Bits.PageTableBaseAddress = 0;
-  mSupportedBit.Bits.Reserved2            = 0;
-  mSupportedBit.Bits.ProtectionKey        = 0xF;
-  mSupportedBit.Bits.Nx                   = 1;
+  mSupportedBit.Uint64              = 0;
+  mSupportedBit.Bits.Present        = 1;
+  mSupportedBit.Bits.ReadWrite      = 1;
+  mSupportedBit.Bits.UserSupervisor = 1;
+  mSupportedBit.Bits.WriteThrough   = 1;
+  mSupportedBit.Bits.CacheDisabled  = 1;
+  mSupportedBit.Bits.Accessed       = 1;
+  mSupportedBit.Bits.Dirty          = 1;
+  mSupportedBit.Bits.Pat            = 1;
+  mSupportedBit.Bits.Global         = 1;
+  mSupportedBit.Bits.ProtectionKey  = 0xF;
+  mSupportedBit.Bits.Nx             = 1;
 
   mRandomOption = ((CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT *)Context)->RandomOption;
   mNumberIndex  = 0;
