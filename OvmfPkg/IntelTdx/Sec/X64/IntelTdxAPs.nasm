@@ -40,8 +40,69 @@ do_wait_loop:
     cmp     eax, MpProtectedModeWakeupCommandWakeup
     je      .do_wakeup
 
+    cmp     eax, MpProtectedModeWakeupCommandAcceptPages
+    je      .do_accept_pages
+
     ; Don't support this command, so ignore
     jmp     .check_command
+
+.do_accept_pages:
+    ;
+    ; Read the top stack address from arguments
+    mov     rsi, [rsp + AcceptPageArgsTopStackAddress]
+
+    ;
+    ; Calculate the top stack address of the AP.
+    ; ApStackAddr = BaseStackAddr + (vCpuIndex) * ApStackSize
+    xor     rdx, rdx
+    xor     rbx, rbx
+    xor     rax, rax
+    mov     eax, [rsp + AcceptPageArgsApStackSize]
+    mov     ebx, r9d    ; vCpuIndex
+    mul     ebx
+    add     rsi, rax    ; now rsi is ApStackAddr
+
+.start_accept_pages:
+    ;
+    ; Read the function address which will be called
+    mov     rax, [rsp + WakeupVectorOffset]
+
+    ;
+    ; vCPU index as the first argument
+    mov     ecx, r9d
+    mov     rdx, [rsp + AcceptPageArgsPhysicalStart]
+    mov     r8, [rsp + AcceptPageArgsPhysicalEnd]
+
+    ; save the Mailbox address to rbx
+    mov     rbx, rsp
+
+    ;
+    ; set AP Stack
+    mov     rsp, rsi
+    nop
+
+    ; save rax (the Mailbox address)
+    push    rbx
+
+    call    rax
+
+    ; recove rsp
+    pop     rbx
+    mov     rsp, rbx
+    ;
+    ; recover r8, r9
+    mov     rax, 1
+    tdcall
+
+    mov     eax, 0FFFFFFFFh
+    lock xadd dword [rsp + CpusExitingOffset], eax
+    dec     eax
+
+.check_exiting_cnt:
+    cmp     eax, 0
+    je      do_wait_loop
+    mov     eax, dword[rsp + CpusExitingOffset]
+    jmp     .check_exiting_cnt
 
 .do_wakeup:
     ;
