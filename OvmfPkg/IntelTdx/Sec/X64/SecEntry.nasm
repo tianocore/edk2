@@ -10,7 +10,6 @@
 ;------------------------------------------------------------------------------
 
 #include <Base.h>
-%include "TdxCommondefs.inc"
 
 DEFAULT REL
 SECTION .text
@@ -49,6 +48,7 @@ ASM_PFX(_ModuleEntryPoint):
     cmp     byte[eax], VM_GUEST_TYPE_TDX
     jne     InitStack
 
+    %define TDCALL_TDINFO         1
     mov     rax, TDCALL_TDINFO
     tdcall
 
@@ -62,7 +62,9 @@ ASM_PFX(_ModuleEntryPoint):
     mov     rax, r9
     and     rax, 0xffff
     test    rax, rax
-    jne     ParkAp
+    jz      InitStack
+    mov     rsp, FixedPcdGet32 (PcdOvmfSecGhcbBackupBase)
+    jmp     ParkAp
 
 InitStack:
 
@@ -98,54 +100,4 @@ InitStack:
     sub     rsp, 0x20
     call    ASM_PFX(SecCoreStartupWithStack)
 
-    ;
-    ; Note: BSP never gets here. APs will be unblocked by DXE
-    ;
-    ; R8  [31:0]  NUM_VCPUS
-    ;     [63:32] MAX_VCPUS
-    ; R9  [31:0]  VCPU_INDEX
-    ;
-ParkAp:
-
-    mov     rbp,  r9
-
-.do_wait_loop:
-    mov     rsp, FixedPcdGet32 (PcdOvmfSecGhcbBackupBase)
-
-    ;
-    ; register itself in [rsp + CpuArrivalOffset]
-    ;
-    mov       rax, 1
-    lock xadd dword [rsp + CpuArrivalOffset], eax
-    inc       eax
-
-.check_arrival_cnt:
-    cmp       eax, r8d
-    je        .check_command
-    mov       eax, dword[rsp + CpuArrivalOffset]
-    jmp       .check_arrival_cnt
-
-.check_command:
-    mov     eax, dword[rsp + CommandOffset]
-    cmp     eax, MpProtectedModeWakeupCommandNoop
-    je      .check_command
-
-    cmp     eax, MpProtectedModeWakeupCommandWakeup
-    je      .do_wakeup
-
-    ; Don't support this command, so ignore
-    jmp     .check_command
-
-.do_wakeup:
-    ;
-    ; BSP sets these variables before unblocking APs
-    ;   RAX:  WakeupVectorOffset
-    ;   RBX:  Relocated mailbox address
-    ;   RBP:  vCpuId
-    ;
-    mov     rax, 0
-    mov     eax, dword[rsp + WakeupVectorOffset]
-    mov     rbx, [rsp + WakeupArgsRelocatedMailBox]
-    nop
-    jmp     rax
-    jmp     $
+%include "IntelTdxAPs.nasm"
