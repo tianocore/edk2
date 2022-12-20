@@ -1,6 +1,6 @@
 #/** @file
 #
-#  TBD
+#  TdxMailbox Library
 #
 #  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2008, Apple Inc. All rights reserved.<BR>
@@ -19,11 +19,8 @@
   LIBRARY_CLASS                  = TdxMailboxLib
 
 #
-#  VALID_ARCHITECTURES           = X64 IA32
+#  VALID_ARCHITECTURES           = X64
 #
-
-[Sources.IA32]
-  TdxMailboxNull.c
 
 [Sources.X64]
   TdxMailbox.c
