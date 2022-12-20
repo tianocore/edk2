@@ -138,6 +138,10 @@ SerialPortInitialize (
   BOOLEAN                             MmioEnable;
   UINT8                               Value;
 
+  if (mUartCount > 0) {
+    return RETURN_SUCCESS;
+  }
+
   GuidHob = GetFirstGuidHob (&gUniversalPayloadSerialPortInfoGuid);
   while (GuidHob != NULL) {
     SerialPortInfo     = (UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO *)GET_GUID_HOB_DATA (GuidHob);
@@ -329,6 +333,7 @@ SerialPortRead (
 {
   UINTN    BaseAddress;
   BOOLEAN  UseMmio;
+  BOOLEAN  IsNextPort;
   UINT8    *DataBuffer;
   UINTN    BytesLeft;
   UINTN    Result;
@@ -353,6 +358,7 @@ SerialPortRead (
 
     DataBuffer = Buffer;
     BytesLeft  = NumberOfBytes;
+    IsNextPort = FALSE;
 
     Mcr = (UINT8)(SerialPortReadRegister (BaseAddress, R_UART_MCR, UseMmio, Stride) & ~B_UART_MCR_RTS);
 
@@ -367,6 +373,13 @@ SerialPortRead (
           //
           SerialPortWriteRegister (BaseAddress, R_UART_MCR, (UINT8)(Mcr | B_UART_MCR_RTS), UseMmio, Stride);
         }
+
+        IsNextPort = TRUE;
+        break;
+      }
+
+      if (IsNextPort) {
+        break;
       }
 
       if (PcdGetBool (PcdSerialUseHardwareFlowControl)) {
@@ -380,6 +393,10 @@ SerialPortRead (
       // Read byte from the receive buffer.
       //
       *DataBuffer = SerialPortReadRegister (BaseAddress, R_UART_RXBUF, UseMmio, Stride);
+    }
+
+    if ((!IsNextPort) && (*(--DataBuffer) != '\0')) {
+      return Result;
     }
 
     Count++;
@@ -409,10 +426,9 @@ SerialPortPoll (
   BOOLEAN  UseMmio;
   UINT8    Stride;
   UINT8    Count;
-  BOOLEAN  Status;
+  BOOLEAN  IsDataReady;
 
-  Count  = 0;
-  Status = FALSE;
+  Count = 0;
   while (Count < mUartCount) {
     BaseAddress = mUartInfo[Count].BaseAddress;
     UseMmio     = mUartInfo[Count].UseMmio;
@@ -423,7 +439,7 @@ SerialPortPoll (
       continue;
     }
 
-    Status = FALSE;
+    IsDataReady = FALSE;
 
     //
     // Read the serial port status
@@ -436,7 +452,7 @@ SerialPortPoll (
         SerialPortWriteRegister (BaseAddress, R_UART_MCR, (UINT8)(SerialPortReadRegister (BaseAddress, R_UART_MCR, UseMmio, Stride) & ~B_UART_MCR_RTS), UseMmio, Stride);
       }
 
-      Status = TRUE;
+      IsDataReady = TRUE;
     }
 
     if (PcdGetBool (PcdSerialUseHardwareFlowControl)) {
@@ -446,10 +462,14 @@ SerialPortPoll (
       SerialPortWriteRegister (BaseAddress, R_UART_MCR, (UINT8)(SerialPortReadRegister (BaseAddress, R_UART_MCR, UseMmio, Stride) | B_UART_MCR_RTS), UseMmio, Stride);
     }
 
+    if (IsDataReady) {
+      return IsDataReady;
+    }
+
     Count++;
   }
 
-  return Status;
+  return IsDataReady;
 }
 
 /**
@@ -601,6 +621,15 @@ SerialPortGetControl (
 
     if ((Lsr & B_UART_LSR_RXRDY) == 0) {
       *Control |= EFI_SERIAL_INPUT_BUFFER_EMPTY;
+    }
+
+    if ((((*Control & EFI_SERIAL_OUTPUT_BUFFER_EMPTY) == EFI_SERIAL_OUTPUT_BUFFER_EMPTY) &&
+         ((*Control & EFI_SERIAL_INPUT_BUFFER_EMPTY) != EFI_SERIAL_INPUT_BUFFER_EMPTY)) ||
+        ((*Control & (EFI_SERIAL_DATA_SET_READY | EFI_SERIAL_CLEAR_TO_SEND |
+                      EFI_SERIAL_CARRIER_DETECT)) == (EFI_SERIAL_DATA_SET_READY | EFI_SERIAL_CLEAR_TO_SEND |
+                                                      EFI_SERIAL_CARRIER_DETECT)))
+    {
+      return RETURN_SUCCESS;
     }
 
     Count++;
