@@ -135,7 +135,7 @@ def BuildUniversalPayload(Args, MacroList):
                        BdsFvOutputDir,
                        EntryOutputDir
                        )
-    set_section    = '"{}" -I {} -O {} --set-section-alignment .upld_info=16 --set-section-alignment .upld.uefi_fv=16 --set-section-alignment .upld.bds_fv=16 {}'.format (
+    set_section    = '"{}" -I {} -O {} --set-section-alignment .upld_info=4 --set-section-alignment .upld.uefi_fv=16 --set-section-alignment .upld.bds_fv=16 {}'.format (
                        LlvmObjcopyPath,
                        ObjCopyFlag,
                        ObjCopyFlag,
