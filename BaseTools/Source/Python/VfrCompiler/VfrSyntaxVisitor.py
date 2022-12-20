@@ -31,7 +31,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.__Root = Root
         self.__OverrideClassGuid = None
         self.__ParserStatus = 0
-        self.__FormsetGuid = None
+
         self.__Value = None
         self.__LastFormNode = None
         self.__IfrOpHdrIndex = 0
@@ -271,14 +271,14 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def __DeclareStandardDefaultStorage(self, LineNo):
 
         DSObj = IfrDefaultStore("Standard Defaults")
-        gVfrDefaultStore.RegisterDefaultStore(DSObj.GetDefaultStore(), "Standard Defaults", EFI_STRING_ID_INVALID, EFI_HII_DEFAULT_CLASS_STANDARD)
+        gVfrDefaultStore.RegisterDefaultStore(DSObj.DefaultStore, "Standard Defaults", EFI_STRING_ID_INVALID, EFI_HII_DEFAULT_CLASS_STANDARD)
         DSObj.SetLineNo (LineNo)
         DSObj.SetDefaultName (EFI_STRING_ID_INVALID)
         DSObj.SetDefaultId (EFI_HII_DEFAULT_CLASS_STANDARD)
         DsNode = VfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObj, gFormPkg.StructToStream(DSObj.GetInfo()))
 
         DSObjMF = IfrDefaultStore("Standard ManuFacturing")
-        gVfrDefaultStore.RegisterDefaultStore(DSObjMF.GetDefaultStore(), "Standard ManuFacturing", EFI_STRING_ID_INVALID, EFI_HII_DEFAULT_CLASS_MANUFACTURING)
+        gVfrDefaultStore.RegisterDefaultStore(DSObjMF.DefaultStore, "Standard ManuFacturing", EFI_STRING_ID_INVALID, EFI_HII_DEFAULT_CLASS_MANUFACTURING)
         DSObjMF.SetLineNo (LineNo)
         DSObjMF.SetDefaultName (EFI_STRING_ID_INVALID)
         DSObjMF.SetDefaultId (EFI_HII_DEFAULT_CLASS_MANUFACTURING)
@@ -380,7 +380,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.__InsertEndNode(ctx.Node, ctx.stop.line)
 
         if self.__NeedAdjustOpcode:
-            self.__LastFormNode.Child.pop() #####
+            self.__LastFormNode.Child.pop() 
             for InsertOpCode in InsertOpCodeList:
                 InsertNode = VfrTreeNode(InsertOpCode.OpCode, InsertOpCode.Data, gFormPkg.StructToStream(InsertOpCode.Data.GetInfo()))
                 self.__LastFormNode.insertChild(InsertNode)
@@ -512,7 +512,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         if gVfrDefaultStore.DefaultIdRegistered(DefaultId) == False:
             DSObj = IfrDefaultStore(RefName)
-            self.__ErrorHandler(gVfrDefaultStore.RegisterDefaultStore(DSObj.GetDefaultStore(), RefName, DefaultStoreNameId, DefaultId), Line)
+            self.__ErrorHandler(gVfrDefaultStore.RegisterDefaultStore(DSObj.DefaultStore, RefName, DefaultStoreNameId, DefaultId), Line)
             DSObj.SetDefaultName(DefaultStoreNameId)
             DSObj.SetDefaultId (DefaultId)
             DSObj.SetLineNo(Line)
@@ -547,6 +547,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         VSObj = IfrVarStore(TypeName, StoreName)
         Line = ctx.start.line
         VSObj.SetLineNo(Line)
+        VSObj.SetHasVarStoreId(ctx.VarId() != None)
         Guid = ctx.guidDefinition().Guid
         self.__ErrorHandler(gVfrDataStorage.DeclareBufferVarStore(StoreName, Guid, gVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore), Line)
         VSObj.SetGuid(Guid)
@@ -556,7 +557,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Size, ReturnCode = gVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
         self.__ErrorHandler(ReturnCode, Line)
         VSObj.SetSize(Size)
-
         ctx.Node.Data = VSObj
         ctx.Node.Buffer = gFormPkg.StructToStream(VSObj.GetInfo())
         ctx.Node.Buffer += bytes('\0',encoding='utf-8')
@@ -592,8 +592,14 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.__CompareErrorHandler(VarStoreId!=0, True, ctx.ID.line, ctx.ID.text, 'varid 0 is not allowed.')
 
         Attributes = 0
-        for AtrCtx in ctx.vfrVarStoreEfiAttr():
-            Attributes |= AtrCtx.Attr
+        AttributesText = ''
+        for i in range(0, len(ctx.vfrVarStoreEfiAttr())):
+            Attributes |= ctx.vfrVarStoreEfiAttr(i).Attr
+
+            if i != len(ctx.vfrVarStoreEfiAttr()) - 1:
+                AttributesText += '{} | '.format('0x%08x'% (ctx.vfrVarStoreEfiAttr(i).Attr))
+            else:
+                AttributesText += '{}'.format('0x%08x'% (ctx.vfrVarStoreEfiAttr(i).Attr))
 
         if ctx.SN != None:
             StoreName = ctx.SN.text
@@ -628,10 +634,12 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         VSEObj = IfrVarStoreEfi(TypeName, StoreName)
         VSEObj.SetLineNo(Line)
+        VSEObj.SetHasVarStoreId(ctx.VarId() != None)
         VSEObj.SetGuid(Guid)
         VSEObj.SetVarStoreId (VarStoreId)
         VSEObj.SetSize(Size)
         VSEObj.SetAttributes(Attributes)
+        VSEObj.SetAttributesText(AttributesText)
 
         ctx.Node.Data = VSEObj
         ctx.Node.Buffer = gFormPkg.StructToStream(VSEObj.GetInfo())
@@ -835,6 +843,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             ctx.Node.Data.SetQName(QName)
             ctx.Node.Data.SetVarIdStr(VarIdStr)
             ctx.Node.Data.SetQuestionId(QId)
+            ctx.Node.Data.SetHasQuestionId(ctx.QuestionId() != None)
             if ctx.BaseInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
                 ctx.Node.Data.SetVarStoreInfo(ctx.BaseInfo)
 
@@ -1256,12 +1265,12 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         if ctx.vfrSubtitleFlags() != None:
             SObj.SetFlags(ctx.vfrSubtitleFlags().SubFlags)
+            SObj.SetFlagsStream(self.__ExtractOriginalText(ctx.vfrSubtitleFlags()))
 
         ctx.Node.Buffer = gFormPkg.StructToStream(SObj.GetInfo())
         # sequence question
         for Ctx in ctx.vfrStatementSubTitleComponent():
             self.__InsertChild(ctx.Node, Ctx)
-
         ctx.Node.Data = SObj
         self.__InsertEndNode(ctx.Node, ctx.stop.line)
 
@@ -1313,8 +1322,12 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             TxtTwo = self.__TransNum(ctx.S3.text)
 
         TextFlags = 0
-        for FlagsFieldCtx in ctx.staticTextFlagsField():
-            TextFlags |= FlagsFieldCtx.Flag
+        FlagsStream = ''
+        for i in range (0, len(ctx.staticTextFlagsField())):
+            TextFlags |= ctx.staticTextFlagsField(i).Flag
+            FlagsStream += self.__ExtractOriginalText(ctx.staticTextFlagsField(i))
+            if i != len(ctx.staticTextFlagsField()) - 1:
+                FlagsStream += ' | '
 
         if TextFlags & EFI_IFR_FLAG_CALLBACK:
             if TxtTwo != EFI_STRING_ID_INVALID:
@@ -1326,8 +1339,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             AObj.SetQuestionId(QId)
             AObj.SetHelp(Help)
             AObj.SetPrompt(Prompt)
+            AObj.SetFlagsStream(FlagsStream)
             self.__ErrorHandler(AObj.SetFlags(TextFlags), ctx.F.line)
             if ctx.Key() != None:
+                AObj.SetHasKey(True)
                 Key = self.__TransNum(ctx.S4.text)
                 self.__AssignQuestionKey(AObj, Key)
             ctx.Node.Data = AObj
@@ -1639,7 +1654,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         WIObj.SetLineNo(ctx.start.line)
         WIObj.SetWarning(self.__TransNum(ctx.Number(0)))
-        WIObj.SetTimeOut(self.__TransNum(ctx.Number(1)))
+        if ctx.Timeout() != None:
+            WIObj.SetTimeOut(self.__TransNum(ctx.Number(1)))
+            WIObj.SetHasHasTimeOut(True)
         ctx.Node.Data = WIObj
         ctx.Node.Buffer = gFormPkg.StructToStream(WIObj.GetInfo())
         ctx.Node.Expression = self.__ExtractOriginalText(ctx.vfrStatementExpression())
@@ -1743,6 +1760,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
             DObj = IfrDefault(Type, ValueList)
             DObj.SetLineNo(Line)
+            DObj.SetValueStream(self.__ExtractOriginalText(ctx.vfrConstantValueField()))
             if not ctx.vfrConstantValueField().ListType:
 
                 if self.__IsStringOp:
@@ -1767,6 +1785,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             DefaultId, ReturnCode = gVfrDefaultStore.GetDefaultId(ctx.SN.text)
             self.__ErrorHandler(ReturnCode, ctx.SN.line, ctx.SN.text)
             DObj.SetDefaultId(DefaultId)
+            DObj.SetDefaultStore(ctx.SN.text)
 
         self.__CheckDuplicateDefaultValue(DefaultId, ctx.D.line, ctx.D.text)
         if self.__CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
@@ -1832,8 +1851,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         OOOObj.SetLineNo(Line)
         OOOObj.SetOption(self.__TransNum(ctx.Number(0)))
-
-
+        OOOObj.SetValueStream(self.__ExtractOriginalText(ctx.vfrConstantValueField()))
+        OOOObj.SetFlagsStream(self.__ExtractOriginalText(ctx.vfrOneOfOptionFlags()))
         self.__ErrorHandler(OOOObj.SetFlags(ctx.vfrOneOfOptionFlags().LFlags), ctx.F.line)
         self.__ErrorHandler(self.__CurrentQuestion.SetQHeaderFlags(ctx.vfrOneOfOptionFlags().HFlags), ctx.F.line)
 
@@ -2026,6 +2045,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                         self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "CheckBox varid only support BOOLEAN data type")
 
         if ctx.FLAGS() != None:
+            CBObj.SetFlagsStream(self.__ExtractOriginalText(ctx.vfrCheckBoxFlags()))
             CBObj.SetFlags(ctx.vfrCheckBoxFlags().HFlags, ctx.vfrCheckBoxFlags().LFlags)
             if self.__CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
                 VarStoreName, ReturnCode = gVfrDataStorage.GetVarStoreName(self.__CurrQestVarInfo.VarStoreId)
@@ -2179,10 +2199,14 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 self.__ErrorHandler(NObj.SetFlagsForBitField(ctx.vfrNumericFlags().HFlags,ctx.vfrNumericFlags().LFlags, ctx.vfrNumericFlags().IsDisplaySpecified), ctx.F.line)
             else:
                 self.__ErrorHandler(NObj.SetFlags(ctx.vfrNumericFlags().HFlags,ctx.vfrNumericFlags().LFlags, ctx.vfrNumericFlags().IsDisplaySpecified), ctx.F.line)
+            NObj.SetFlagsStream(self.__ExtractOriginalText(ctx.vfrNumericFlags()))
 
         if ctx.Key() != None:
             Key = self.__TransNum(ctx.Number())
             self.__AssignQuestionKey(NObj,Key)
+            NObj.SetHasKey(True)
+
+        NObj.SetHasStep(ctx.vfrSetMinMaxStep().Step() != None)
 
         if self.__CurrQestVarInfo.IsBitVar == False:
             self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'Numeric question only support UINT8, UINT16, UINT32 and UINT64 data type.')
@@ -2190,6 +2214,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         # modify the data for namevalue
         if UpdateVarType:
             UpdatedNObj = IfrNumeric(self.__CurrQestVarInfo.VarType)
+            UpdatedNObj.FlagsStream = NObj.FlagsStream
+            UpdatedNObj.HasKey = NObj.HasKey
+            UpdatedNObj.HasStep = NObj.HasStep
             UpdatedNObj.GetInfo().Question = NObj.GetInfo().Question
             UpdatedNObj.GetInfo().Flags = NObj.GetInfo().Flags
             UpdatedNObj.GetInfo().Data.MinValue = NObj.GetInfo().Data.MinValue
@@ -2504,6 +2531,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if (self.__CurrQestVarInfo.IsBitVar == False) and (self.__CurrQestVarInfo.VarType not in BasicTypes):
             self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'OneOf question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
+        if ctx.vfrSetMinMaxStep() != None:
+            OObj.SetHasMinMax(True)
+            if ctx.vfrSetMinMaxStep().Step() != None:
+                OObj.SetHasStep(True)
+
         ctx.Node.Buffer = gFormPkg.StructToStream(OObj.GetInfo())
         self.__InsertEndNode(ctx.Node, ctx.stop.line)
 
@@ -2602,10 +2634,12 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             HFlags = ctx.vfrStringFlagsField().HFlags
             LFlags = ctx.vfrStringFlagsField().LFlags
             self.__ErrorHandler(SObj.SetFlags(HFlags, LFlags), ctx.F.line)
+            SObj.SetFlagsStream(self.__ExtractOriginalText(ctx.vfrStringFlagsField()))
 
         if ctx.Key() != None:
             Key = self.__TransNum(ctx.Number(0))
             self.__AssignQuestionKey(SObj, Key)
+            SObj.SetHasKey(True)
             StringMinSize = self.__TransNum(ctx.Number(1))
             StringMaxSize = self.__TransNum(ctx.Number(2))
         else:
@@ -2678,6 +2712,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.__AssignQuestionKey(PObj, Key)
             PassWordMinSize = self.__TransNum(ctx.Number(1))
             PasswordMaxSize = self.__TransNum(ctx.Number(2))
+            PObj.SetHasKey(True)
         else:
             PassWordMinSize = self.__TransNum(ctx.Number(0))
             PasswordMaxSize = self.__TransNum(ctx.Number(1))
@@ -2685,6 +2720,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if ctx.FLAGS() != None:
             HFlags = ctx.vfrPasswordFlagsField().HFlags
             self.__ErrorHandler(PObj.SetFlags(HFlags), ctx.F.line)
+            PObj.SetFlagsStream(self.__ExtractOriginalText(ctx.vfrPasswordFlagsField()))
 
         VarArraySize = self.__GetCurArraySize()
         if PassWordMinSize > 0xFF:
@@ -2755,11 +2791,14 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             elif VarArraySize != 0 and MaxContainers > VarArraySize:
                 self.__ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.M.line,"OrderedList MaxContainers can't be larger than the max number of elements in array.")
             OLObj.SetMaxContainers(MaxContainers)
+            OLObj.SetHasMaxContianers(True)
 
         if ctx.FLAGS() != None:
+
             HFlags = ctx.vfrOrderedListFlags().HFlags
             LFlags = ctx.vfrOrderedListFlags().LFlags
             self.__ErrorHandler(OLObj.SetFlags(HFlags, LFlags), ctx.F.line)
+            OLObj.SetFlagsStream(self.__ExtractOriginalText(ctx.vfrOrderedListFlags()))
 
         ctx.Node.Buffer = gFormPkg.StructToStream(OLObj.GetInfo())
         self.__InsertEndNode(ctx.Node, ctx.stop.line)
@@ -2813,6 +2852,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 self.__CurrQestVarInfo.VarType == EFI_IFR_TYPE_DATE
 
             if ctx.FLAGS() != None:
+                DObj.SetFlagsStream(self.__ExtractOriginalText(ctx.vfrDateFlags()))
                 self.__ErrorHandler(DObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, ctx.vfrDateFlags().LFlags), ctx.F1.line)
 
         else:
@@ -2830,6 +2870,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             Day += self.__TransId(ctx.StringIdentifier(5))
 
             if ctx.FLAGS() != None:
+                DObj.SetFlagsStream(self.__ExtractOriginalText(ctx.vfrDateFlags()))
                 self.__ErrorHandler(DObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, ctx.vfrDateFlags().LFlags), ctx.F2.line)
 
             QId, _ = self.__VfrQuestionDB.RegisterOldDateQuestion(Year, Month, Day, EFI_QUESTION_ID_INVALID, gFormPkg)
@@ -2921,6 +2962,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 self.__CurrQestVarInfo.VarType == EFI_IFR_TYPE_TIME
 
             if ctx.FLAGS() != None:
+                TObj.SetFlagsStream(self.__ExtractOriginalText(ctx.vfrTimeFlags()))
                 self.__ErrorHandler(TObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, ctx.vfrTimeFlags().LFlags), ctx.F1.line)
         else:
 
@@ -2937,6 +2979,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             Second += self.__TransId(ctx.StringIdentifier(5))
 
             if ctx.FLAGS() != None:
+                TObj.SetFlagsStream(self.__ExtractOriginalText(ctx.vfrTimeFlags()))
                 self.__ErrorHandler(TObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, ctx.vfrTimeFlags().LFlags), ctx.F2.line)
 
             QId, _ = self.__VfrQuestionDB.RegisterOldTimeQuestion(Hour, Minute, Second, EFI_QUESTION_ID_INVALID, gFormPkg)

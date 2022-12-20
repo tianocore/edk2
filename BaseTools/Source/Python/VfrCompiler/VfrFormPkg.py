@@ -192,14 +192,14 @@ class FormPkg():
     def __init__(self):
         self.PkgLength = 0
         self.Offset = 0
-        self.__PendingAssignList = None
+        self.PendingAssignList = None
 
     def BuildPkgHdr(self):
         PkgHdr = EFI_HII_PACKAGE_HEADER()
         PkgHdr.Type = EFI_HII_PACKAGE_FORM
         PkgHdr.Length = self.PkgLength + sizeof(EFI_HII_PACKAGE_HEADER)
         return PkgHdr
-    
+
     def BuildPkg(self, Root):
         if Root.OpCode != None:
             self.PkgLength += Root.Data.GetInfo().Header.Length
@@ -220,21 +220,21 @@ class FormPkg():
         pNew = SPendingAssign(Key, VarAddr, LineNo, Msg, Type)
         if pNew == None:
             return VfrReturnCode.VFR_RETURN_OUT_FOR_RESOURCES
-        pNew.Next = self.__PendingAssignList
-        self.__PendingAssignList = pNew
+        pNew.Next = self.PendingAssignList
+        self.PendingAssignList = pNew
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
     def DoPendingAssign(self, Key, Val):
         if Key == None or Val == None:
             return
-        pNode = self.__PendingAssignList
+        pNode = self.PendingAssignList
         while pNode != None:
             if pNode.Key == Key:
                 pNode.AssignValue(Val)
             pNode = pNode.Next
 
     def HavePendingUnassigned(self):
-        pNode = self.__PendingAssignList
+        pNode = self.PendingAssignList
         while pNode != None:
             if pNode.Flag == ASSIGN_FLAG.PENDING:
                 return True
@@ -243,7 +243,7 @@ class FormPkg():
         return False
 
     def PendingAssignPrintAll(self):
-        pNode = self.__PendingAssignList
+        pNode = self.PendingAssignList
         while pNode != None:
             if pNode.Flag == ASSIGN_FLAG.PENDING:
                 gVfrErrorHandle.PrintMsg(pNode.LineNo, 'Error', pNode.Msg, pNode.Key)
@@ -259,7 +259,7 @@ class FormPkg():
         # TrueOpcode
         TObj = IfrTrue(LineNo)
         ReturnList.append(InsertOpNode(TObj, EFI_IFR_TRUE_OP))
-        pNode = self.__PendingAssignList
+        pNode = self.PendingAssignList
         while pNode != None:
             if pNode.Flag == ASSIGN_FLAG.PENDING:
                 Info = EFI_VARSTORE_INFO()
@@ -473,451 +473,467 @@ gCurrentMinMaxData = None
 class IfrLine():
 
     def __init__(self, LineNo=0):
-        self.__LineNo = LineNo
+        self.LineNo = LineNo
 
     def SetLineNo(self, LineNo):
-        self.__LineNo = LineNo
+        self.LineNo = LineNo
 
     def GetLineNo(self):
-        return self.__LineNo
+        return self.LineNo
 class IfrBaseInfo():
     def __init__(self, Obj=None, QName=None, VarIdStr=''):
 
-        self.__Obj = Obj
-        self.__QName = QName
-        self.__VarIdStr = VarIdStr
+        self.Obj = Obj
+        self.QName = QName
+        self.VarIdStr = VarIdStr
+
+        self.FlagsStream = ''
+        self.HasKey = False
+        self.HasQuestionId = False
 
     def SetQName(self, QName):
-        self.__QName = QName
-
-    def GetQName(self):
-        return self.__QName
+        self.QName = QName
 
     def SetVarIdStr(self, VarIdStr):
-        self.__VarIdStr = VarIdStr
+        self.VarIdStr = VarIdStr
 
-    def GetVarIdStr(self):
-        return self.__VarIdStr
+    def SetFlagsStream(self, FlagsStream):
+        self.FlagsStream = FlagsStream
+
+    def SetHasKey(self, HasKey):
+        self.HasKey = HasKey
+
+    def SetHasQuestionId(self, HasQuestionId):
+        self.HasQuestionId = HasQuestionId
 
     def GetInfo(self):
-        return self.__Obj
+        return self.Obj
 
 class IfrOpHeader():
 
     def __init__(self, OpHeader: EFI_IFR_OP_HEADER, OpCode=None, Length=0):
-        self.__OpHeader = OpHeader
+        self.OpHeader = OpHeader
         if OpCode != None:
-            self.__OpHeader.OpCode = OpCode
+            self.OpHeader.OpCode = OpCode
 
-            self.__OpHeader.Length = gOpcodeSizesScopeTable[
+            self.OpHeader.Length = gOpcodeSizesScopeTable[
                 OpCode].Size if Length == 0 else Length
-            self.__OpHeader.Scope = 1 if (
+            self.OpHeader.Scope = 1 if (
                 gOpcodeSizesScopeTable[OpCode].Scope + gScopeCount > 0) else 0
 
     def GetLength(self):
-        return self.__OpHeader.Length
+        return self.OpHeader.Length
 
     def SetScope(self, Scope):
-        self.__OpHeader.Scope = Scope
+        self.OpHeader.Scope = Scope
 
     def UpdateHeader(self, Header):
-        self.__OpHeader = Header
+        self.OpHeader = Header
 
     def IncLength(self, Size):
-        self.__OpHeader.Length += Size
+        self.OpHeader.Length += Size
 
     def DecLength(self, Size):
-        self.__OpHeader.Length -= Size
+        self.OpHeader.Length -= Size
 
     def AdjustLength(self, BeforeSize, AfterSize):
-        self.__OpHeader.Length -= BeforeSize
-        self.__OpHeader.Length += AfterSize
-        self.__OpHeader.Length += 1
+        self.OpHeader.Length -= BeforeSize
+        self.OpHeader.Length += AfterSize
+        self.OpHeader.Length += 1
 
     def GetOpCode(self):
-        return self.__OpHeader.OpCode
+        return self.OpHeader.OpCode
 
 
 class IfrStatementHeader():
 
     def __init__(self, sHeader: EFI_IFR_STATEMENT_HEADER):
-        self.__sHeader = sHeader
-        self.__sHeader.Help = EFI_STRING_ID_INVALID
-        self.__sHeader.Prompt = EFI_STRING_ID_INVALID
+        self.sHeader = sHeader
+        self.sHeader.Help = EFI_STRING_ID_INVALID
+        self.sHeader.Prompt = EFI_STRING_ID_INVALID
 
     def GetStatementHeader(self):
-        return self.__sHeader
+        return self.sHeader
 
     def SetPrompt(self, Prompt):
-        self.__sHeader.Prompt = Prompt
+        self.sHeader.Prompt = Prompt
 
     def SetHelp(self, Help):
-        self.__sHeader.Help = Help
+        self.sHeader.Help = Help
 
 
 class IfrMinMaxStepData():
 
     def __init__(self, MinMaxStepData, NumericOpcode=False):
-        self.__MinMaxStepData = MinMaxStepData
-        self.__MinMaxStepData.MinValue = 0
-        self.__MinMaxStepData.MaxValue = 0
-        self.__MinMaxStepData.Step = 0
-        self.__ValueIsSet = False
-        self.__IsNumeric = NumericOpcode
+        self.MinMaxStepData = MinMaxStepData
+        self.MinMaxStepData.MinValue = 0
+        self.MinMaxStepData.MaxValue = 0
+        self.MinMaxStepData.Step = 0
+        self.ValueIsSet = False
+        self.IsNumeric = NumericOpcode
 
     def SetMinMaxStepData(self, MinValue, MaxValue, Step):
 
-        if self.__ValueIsSet == False:
-            self.__MinMaxStepData.MinValue = MinValue
-            self.__MinMaxStepData.MaxValue = MaxValue
-            self.__MinMaxStepData.Step = Step
+        if self.ValueIsSet == False:
+            self.MinMaxStepData.MinValue = MinValue
+            self.MinMaxStepData.MaxValue = MaxValue
+            self.MinMaxStepData.Step = Step
 
-            self.__ValueIsSet = True
+            self.ValueIsSet = True
         else:
-            if MinValue < self.__MinMaxStepData.MinValue:
-                self.__MinMaxStepData.MinValue = MinValue
-            if MaxValue > self.__MinMaxStepData.MaxValue:
-                self.__MinMaxStepData.MaxValue = MaxValue
-            self.__MinMaxStepData.Step = Step
+            if MinValue < self.MinMaxStepData.MinValue:
+                self.MinMaxStepData.MinValue = MinValue
+            if MaxValue > self.MinMaxStepData.MaxValue:
+                self.MinMaxStepData.MaxValue = MaxValue
+            self.MinMaxStepData.Step = Step
 
     def IsNumericOpcode(self):
-        return self.__IsNumeric
+        return self.IsNumeric
 
     def UpdateIfrMinMaxStepData(self, MinMaxStepData):
-        self.__MinMaxStepData = MinMaxStepData
+        self.MinMaxStepData = MinMaxStepData
 
     def GetMinData(self):
-        return self.__MinMaxStepData.MinValue
+        return self.MinMaxStepData.MinValue
 
     def GetMaxData(self):
-        return self.__MinMaxStepData.MaxValue
+        return self.MinMaxStepData.MaxValue
 
     def GetStepData(self):
-        return self.__MinMaxStepData.Step
+        return self.MinMaxStepData.Step
 
 
 class IfrFormSet(IfrLine, IfrOpHeader):
 
     def __init__(self, Size):
-        self.__FormSet = EFI_IFR_FORM_SET()
-        self.__ClassGuid = []
-        IfrOpHeader.__init__(self, self.__FormSet.Header, EFI_IFR_FORM_SET_OP,
+        self.FormSet = EFI_IFR_FORM_SET()
+        self.ClassGuid = []
+        IfrOpHeader.__init__(self, self.FormSet.Header, EFI_IFR_FORM_SET_OP,
                               Size)
-        self.__FormSet.Help = EFI_STRING_ID_INVALID
-        self.__FormSet.FormSetTitle = EFI_STRING_ID_INVALID
-        self.__FormSet.Flags = 0
-        self.__FormSet.Guid = EFI_GUID(0, 0, 0,
+        self.FormSet.Help = EFI_STRING_ID_INVALID
+        self.FormSet.FormSetTitle = EFI_STRING_ID_INVALID
+        self.FormSet.Flags = 0
+        self.FormSet.Guid = EFI_GUID(0, 0, 0,
                                        GuidArray(0, 0, 0, 0, 0, 0, 0, 0))
 
     def SetGuid(self, Guid):
-        self.__FormSet.Guid = Guid
+        self.FormSet.Guid = Guid
 
     def GetGuid(self):
-        return self.__FormSet.Guid
+        return self.FormSet.Guid
 
     def SetFormSetTitle(self, FormSetTitle):
-        self.__FormSet.FormSetTitle = FormSetTitle
+        self.FormSet.FormSetTitle = FormSetTitle
 
     def GetFormSetTitle(self):
-        return self.__FormSet.FormSetTitle
+        return self.FormSet.FormSetTitle
 
     def SetHelp(self, Help):
-        self.__FormSet.Help = Help
+        self.FormSet.Help = Help
 
     def GetHelp(self):
-        return self.__FormSet.Help
+        return self.FormSet.Help
 
     def SetClassGuid(self, Guid):
-        self.__ClassGuid.append(Guid)
-        self.__FormSet.Flags += 1
+        self.ClassGuid.append(Guid)
+        self.FormSet.Flags += 1
 
     def GetClassGuid(self):
-        return self.__ClassGuid
+        return self.ClassGuid
 
     def GetFlags(self):
-        return self.__FormSet.Flags
+        return self.FormSet.Flags
 
     def GetInfo(self):
-        return self.__FormSet
+        return self.FormSet
 
 class IfrOneOfOption(IfrLine, IfrOpHeader):
 
     def __init__(self, ValueType, ValueList):
         Nums = len(ValueList)
-        self.__OneOfOption = Refine_EFI_IFR_ONE_OF_OPTION(ValueType, Nums)
-        self.__IfrOptionKey = None
-        IfrOpHeader.__init__(self, self.__OneOfOption.Header, EFI_IFR_ONE_OF_OPTION_OP, sizeof(self.__OneOfOption))
-        self.__OneOfOption.Flags = 0
-        self.__OneOfOption.Option = EFI_STRING_ID_INVALID
-        self.__OneOfOption.Type = EFI_IFR_TYPE_OTHER
-        self.__ValueType = ValueType
+        self.OneOfOption = Refine_EFI_IFR_ONE_OF_OPTION(ValueType, Nums)
+        IfrOpHeader.__init__(self, self.OneOfOption.Header, EFI_IFR_ONE_OF_OPTION_OP, sizeof(self.OneOfOption))
+        self.OneOfOption.Flags = 0
+        self.OneOfOption.Option = EFI_STRING_ID_INVALID
+        self.OneOfOption.Type = EFI_IFR_TYPE_OTHER
+        self.ValueType = ValueType
         if ValueList != []:
             ArrayType = TypeDict[ValueType] * Nums
             ValueArray = ArrayType()
             for i in range(0, len(ValueList)):
                 ValueArray[i] = ValueList[i]
-            self.__OneOfOption.Value = ValueArray
+            self.OneOfOption.Value = ValueArray
+
+        self.IfrOptionKey = None
+        self.FlagsStream = ''
+        self.ValueStream = ''
 
     def SetOption(self, Option):
-        self.__OneOfOption.Option = Option
+        self.OneOfOption.Option = Option
 
     def SetType(self, Type):
-        self.__OneOfOption.Type = Type
+        self.OneOfOption.Type = Type
 
     def SetIfrOptionKey(self, IfrOptionKey):
-        self.__IfrOptionKey = IfrOptionKey
+        self.IfrOptionKey = IfrOptionKey
 
-    def GetIfrOptionKey(self):
-        return self.__IfrOptionKey
+    def SetFlagsStream(self, FlagsStream):
+        self.FlagsStream = FlagsStream
+
+    def SetValueStream(self, ValueStream):
+        self.ValueStream = ValueStream
 
     def GetValueType(self):
-        return self.__ValueType
+        return self.ValueType
 
     def SetValue(self, ValueList):
-        ArrayType = TypeDict[self.__ValueType] * (len(ValueList))
+        ArrayType = TypeDict[self.ValueType] * (len(ValueList))
         ValueArray = ArrayType()
         for i in range(0, len(ValueList)):
             ValueArray[i] = ValueList[i]
-        self.__OneOfOption.Value = ValueArray
+        self.OneOfOption.Value = ValueArray
 
     def GetFlags(self):
-        return self.__OneOfOption.Flags
+        return self.OneOfOption.Flags
 
     def SetFlags(self, LFlags):
 
-        self.__OneOfOption.Flags = 0
+        self.OneOfOption.Flags = 0
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_OPTION_DEFAULT)
         if Ret:
-            self.__OneOfOption.Flags |= EFI_IFR_OPTION_DEFAULT
+            self.OneOfOption.Flags |= EFI_IFR_OPTION_DEFAULT
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_OPTION_DEFAULT_MFG)
         if Ret:
-            self.__OneOfOption.Flags |= EFI_IFR_OPTION_DEFAULT_MFG
+            self.OneOfOption.Flags |= EFI_IFR_OPTION_DEFAULT_MFG
 
         if LFlags == EFI_IFR_TYPE_NUM_SIZE_8:
             LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_8)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_8
+            self.OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_8
 
         elif LFlags == EFI_IFR_TYPE_NUM_SIZE_16:
             LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_16)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_16
+            self.OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_16
 
         elif LFlags == EFI_IFR_TYPE_NUM_SIZE_32:
             LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_32)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_32
+            self.OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_32
 
         elif LFlags == EFI_IFR_TYPE_NUM_SIZE_64:
             LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_NUM_SIZE_64)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_64
+            self.OneOfOption.Flags |= EFI_IFR_TYPE_NUM_SIZE_64
 
         elif LFlags == EFI_IFR_TYPE_BOOLEAN:
             LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_BOOLEAN)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_BOOLEAN
+            self.OneOfOption.Flags |= EFI_IFR_TYPE_BOOLEAN
 
         elif LFlags == EFI_IFR_TYPE_TIME:
             LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_TIME)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_TIME
+            self.OneOfOption.Flags |= EFI_IFR_TYPE_TIME
 
         elif LFlags == EFI_IFR_TYPE_DATE:
             LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_DATE)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_DATE
+            self.OneOfOption.Flags |= EFI_IFR_TYPE_DATE
 
         elif LFlags == EFI_IFR_TYPE_STRING:
             LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_STRING)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_STRING
+            self.OneOfOption.Flags |= EFI_IFR_TYPE_STRING
 
         elif LFlags == EFI_IFR_TYPE_OTHER:
             LFlags = _FLAG_CLEAR(LFlags, EFI_IFR_TYPE_OTHER)
-            self.__OneOfOption.Flags |= EFI_IFR_TYPE_OTHER
+            self.OneOfOption.Flags |= EFI_IFR_TYPE_OTHER
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
 
     def GetInfo(self):
-        return self.__OneOfOption
+        return self.OneOfOption
 
 
 class IfrOptionKey(IfrLine, IfrOpHeader):
 
     def __init__(self, QuestionId, Type, OptionValue, KeyValue):
 
-        self.__OptionKey = Refine_EFI_IFR_GUID_OPTIONKEY(Type)
-        IfrOpHeader.__init__(self, self.__OptionKey.Header, EFI_IFR_GUID_OP,
-                              ctypes.sizeof(self.__OptionKey))
-        self.__OptionKey.ExtendOpCode = EFI_IFR_EXTEND_OP_OPTIONKEY
-        self.__OptionKey.Guid = EFI_IFR_FRAMEWORK_GUID
-        self.__OptionKey.QuestionId = QuestionId
-        self.__OptionKey.OptionValue = OptionValue
-        self.__OptionKey.KeyValue = KeyValue
+        self.OptionKey = Refine_EFI_IFR_GUID_OPTIONKEY(Type)
+        IfrOpHeader.__init__(self, self.OptionKey.Header, EFI_IFR_GUID_OP,
+                              ctypes.sizeof(self.OptionKey))
+        self.OptionKey.ExtendOpCode = EFI_IFR_EXTEND_OP_OPTIONKEY
+        self.OptionKey.Guid = EFI_IFR_FRAMEWORK_GUID
+        self.OptionKey.QuestionId = QuestionId
+        self.OptionKey.OptionValue = OptionValue
+        self.OptionKey.KeyValue = KeyValue
 
     def GetInfo(self):
-        return self.__OptionKey
+        return self.OptionKey
 
 
 class IfrClass(IfrLine, IfrOpHeader):
 
     def __init__(self, ):
-        self.__Class = EFI_IFR_GUID_CLASS()  # static guid
-        IfrOpHeader.__init__(self, self.__Class.Header, EFI_IFR_GUID_OP,
+        self.Class = EFI_IFR_GUID_CLASS()  # static guid
+        IfrOpHeader.__init__(self, self.Class.Header, EFI_IFR_GUID_OP,
                               ctypes.sizeof(EFI_IFR_GUID_CLASS))
-        self.__Class.ExtendOpCode = EFI_IFR_EXTEND_OP_CLASS
-        self.__Class.Guid = EFI_IFR_TIANO_GUID
-        self.__Class.Class = EFI_NON_DEVICE_CLASS
+        self.Class.ExtendOpCode = EFI_IFR_EXTEND_OP_CLASS
+        self.Class.Guid = EFI_IFR_TIANO_GUID
+        self.Class.Class = EFI_NON_DEVICE_CLASS
 
     def SetClass(self, Class):
-        self.__Class.Class = Class
+        self.Class.Class = Class
 
     def GetInfo(self):
-        return self.__Class
+        return self.Class
 
 
 class IfrSubClass(IfrLine, IfrOpHeader):
 
     def __init__(self, ):
-        self.__SubClass = EFI_IFR_GUID_SUBCLASS()  # static guid
-        IfrOpHeader.__init__(self, self.__SubClass.Header, EFI_IFR_GUID_OP,
+        self.SubClass = EFI_IFR_GUID_SUBCLASS()  # static guid
+        IfrOpHeader.__init__(self, self.SubClass.Header, EFI_IFR_GUID_OP,
                               ctypes.sizeof(EFI_IFR_GUID_SUBCLASS))
-        self.__SubClass.ExtendOpCode = EFI_IFR_EXTEND_OP_SUBCLASS
-        self.__SubClass.Guid = EFI_IFR_TIANO_GUID
-        self.__SubClass.SubClass = EFI_SETUP_APPLICATION_SUBCLASS
+        self.SubClass.ExtendOpCode = EFI_IFR_EXTEND_OP_SUBCLASS
+        self.SubClass.Guid = EFI_IFR_TIANO_GUID
+        self.SubClass.SubClass = EFI_SETUP_APPLICATION_SUBCLASS
 
     def SetSubClass(self, SubClass):
-        self.__SubClass.SubClass = SubClass
+        self.SubClass.SubClass = SubClass
 
     def GetInfo(self):
-        return self.__SubClass
+        return self.SubClass
 
 
 class IfrDefaultStore(IfrLine, IfrOpHeader):
 
     def __init__(self, TypeName=None):
-        self.__DefaultStore = EFI_IFR_DEFAULTSTORE()
-        self.__Type = TypeName
-        IfrOpHeader.__init__(self, self.__DefaultStore.Header,
+        self.DefaultStore = EFI_IFR_DEFAULTSTORE()
+        IfrOpHeader.__init__(self, self.DefaultStore.Header,
                               EFI_IFR_DEFAULTSTORE_OP)
-        self.__DefaultStore.DefaultName = EFI_STRING_ID_INVALID
-        self.__DefaultStore.DefaultId = EFI_VARSTORE_ID_INVALID
+        self.DefaultStore.DefaultName = EFI_STRING_ID_INVALID
+        self.DefaultStore.DefaultId = EFI_VARSTORE_ID_INVALID
+
+        self.Type = TypeName
 
     def SetDefaultName(self, DefaultName):
-        self.__DefaultStore.DefaultName = DefaultName
+        self.DefaultStore.DefaultName = DefaultName
 
     def SetType(self, Type):
-        self.__Type = Type
+        self.Type = Type
 
     def SetDefaultId(self, DefaultId):
-        self.__DefaultStore.DefaultId = DefaultId
-
-    def GetDefaultStore(self):
-        return self.__DefaultStore
+        self.DefaultStore.DefaultId = DefaultId
 
     def SetDefaultStore(self, DefaultStore: EFI_IFR_DEFAULTSTORE):
-        self.__DefaultStore = DefaultStore
-        IfrOpHeader.__init__(self, self.__DefaultStore.Header,
+        self.DefaultStore = DefaultStore
+        IfrOpHeader.__init__(self, self.DefaultStore.Header,
                               EFI_IFR_DEFAULTSTORE_OP)
 
     def GetDefaultId(self):
-        return self.__DefaultStore.DefaultId
+        return self.DefaultStore.DefaultId
 
     def GetInfo(self):
-        return self.__DefaultStore
-
-    def GetType(self):
-        return self.__Type
+        return self.DefaultStore
 
 class IfrVarStore(IfrLine, IfrOpHeader):
 
     def __init__(self, TypeName, StoreName):
         Nums = len(StoreName)
-        self.__Varstore = Refine_EFI_IFR_VARSTORE(Nums)
-        self.__Type = TypeName
-        IfrOpHeader.__init__(self, self.__Varstore.Header,
-                              EFI_IFR_VARSTORE_OP, sizeof(self.__Varstore) + 1)
-        self.__Varstore.VarStoreId = EFI_VARSTORE_ID_INVALID
-        self.__Varstore.Size = 0
+        self.Varstore = Refine_EFI_IFR_VARSTORE(Nums)
+        IfrOpHeader.__init__(self, self.Varstore.Header,
+                              EFI_IFR_VARSTORE_OP, sizeof(self.Varstore) + 1)
+        self.Varstore.VarStoreId = EFI_VARSTORE_ID_INVALID
+        self.Varstore.Size = 0
         ArrayType = c_ubyte * (Nums)
         ValueArray = ArrayType()
         for i in range(0, Nums):
-
             ValueArray[i] = ord(StoreName[i])
-        self.__Varstore.Name = ValueArray
+        self.Varstore.Name = ValueArray
+
+        # info saved for yaml generation
+        self.Type = TypeName
+        self.HasVarStoreId = False
 
     def SetGuid(self, Guid):
-        self.__Varstore.Guid = Guid
+        self.Varstore.Guid = Guid
 
     def SetSize(self, Size):
-        self.__Varstore.Size = Size
+        self.Varstore.Size = Size
 
     def SetVarStoreId(self, VarStoreId):
-        self.__Varstore.VarStoreId = VarStoreId
+        self.Varstore.VarStoreId = VarStoreId
+
+    def SetHasVarStoreId(self, HasVarStoreId):
+        self.HasVarStoreId = HasVarStoreId
 
     def GetInfo(self):
-        return self.__Varstore
-
-    def GetType(self):
-        return self.__Type
-
+        return self.Varstore
 
 class IfrVarStoreEfi(IfrLine, IfrOpHeader):
 
     def __init__(self, TypeName, StoreName):
         Nums = len(StoreName)
-        self.__VarStoreEfi = Refine_EFI_IFR_VARSTORE_EFI(Nums)
-        self.__Type = TypeName
-        IfrOpHeader.__init__(self, self.__VarStoreEfi.Header,
-                              EFI_IFR_VARSTORE_EFI_OP, sizeof(self.__VarStoreEfi) + 1)
-        self.__VarStoreEfi.VarStoreId = EFI_VAROFFSET_INVALID
-        self.__VarStoreEfi.Size = 0
+        self.VarStoreEfi = Refine_EFI_IFR_VARSTORE_EFI(Nums)
+        IfrOpHeader.__init__(self, self.VarStoreEfi.Header,
+                              EFI_IFR_VARSTORE_EFI_OP, sizeof(self.VarStoreEfi) + 1)
+        self.VarStoreEfi.VarStoreId = EFI_VAROFFSET_INVALID
+        self.VarStoreEfi.Size = 0
         ArrayType = c_ubyte * (Nums)
         ValueArray = ArrayType()
         for i in range(0, Nums):
             ValueArray[i] = ord(StoreName[i])
-        self.__VarStoreEfi.Name = ValueArray
+        self.VarStoreEfi.Name = ValueArray
+
+        # info saved for yaml generation
+        self.Type = TypeName
+        self.HasVarStoreId = False
+        self.AttributesText = None
 
     def SetGuid(self, Guid):
-        self.__VarStoreEfi.Guid = Guid
+        self.VarStoreEfi.Guid = Guid
 
     def SetSize(self, Size):
-        self.__VarStoreEfi.Size = Size
+        self.VarStoreEfi.Size = Size
 
     def SetVarStoreId(self, VarStoreId):
-        self.__VarStoreEfi.VarStoreId = VarStoreId
+        self.VarStoreEfi.VarStoreId = VarStoreId
 
     def SetAttributes(self, Attributes):
-        self.__VarStoreEfi.Attributes = Attributes
+        self.VarStoreEfi.Attributes = Attributes
+
+    def SetHasVarStoreId(self, HasVarStoreId):
+        self.HasVarStoreId = HasVarStoreId
+
+    def SetAttributesText(self, AttributesText):
+        self.AttributesText = AttributesText
 
     def GetInfo(self):
-        return self.__VarStoreEfi
-
-    def GetType(self):
-        return self.__Type
+        return self.VarStoreEfi
 
 
 class IfrVarStoreNameValue(IfrLine, IfrOpHeader):
 
     def __init__(self, TypeName):
-        self.__VarStoreNameValue = EFI_IFR_VARSTORE_NAME_VALUE()
-        self.__Type = TypeName
-        self.__NameItemList = []
-        IfrOpHeader.__init__(self, self.__VarStoreNameValue.Header,
+        self.VarStoreNameValue = EFI_IFR_VARSTORE_NAME_VALUE()
+        IfrOpHeader.__init__(self, self.VarStoreNameValue.Header,
                               EFI_IFR_VARSTORE_NAME_VALUE_OP)
-        self.__VarStoreNameValue.VarStoreId = EFI_VAROFFSET_INVALID
+        self.VarStoreNameValue.VarStoreId = EFI_VAROFFSET_INVALID
+
+        self.Type = TypeName
+        self.NameItemList = []
+        self.HasVarStoreId = False
 
     def SetGuid(self, Guid):
-        self.__VarStoreNameValue.Guid = Guid
+        self.VarStoreNameValue.Guid = Guid
 
     def SetVarStoreId(self, VarStoreId):
-        self.__VarStoreNameValue.VarStoreId = VarStoreId
+        self.VarStoreNameValue.VarStoreId = VarStoreId
 
     def SetNameItemList(self, NameItem):
-        self.__NameItemList.append(NameItem)
+        self.NameItemList.append(NameItem)
+
+    def SetHasVarStoreId(self, HasVarStoreId):
+        self.HasVarStoreId = HasVarStoreId
 
     def GetInfo(self):
-        return self.__VarStoreNameValue
+        return self.VarStoreNameValue
 
-    def GetType(self):
-        return self.__Type
-
-    def GetNameItemList(self):
-        return self.__NameItemList
 
 
 
@@ -952,10 +968,10 @@ class IfrFormId():
 class IfrForm(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__Form = EFI_IFR_FORM()
-        IfrOpHeader.__init__(self, self.__Form.Header, EFI_IFR_FORM_OP)
-        self.__Form.FormId = 0
-        self.__Form.FormTitle = EFI_STRING_ID_INVALID
+        self.Form = EFI_IFR_FORM()
+        IfrOpHeader.__init__(self, self.Form.Header, EFI_IFR_FORM_OP)
+        self.Form.FormId = 0
+        self.Form.FormTitle = EFI_STRING_ID_INVALID
 
     def SetFormId(self, FormId):
         # FormId can't be 0.
@@ -963,24 +979,24 @@ class IfrForm(IfrLine, IfrOpHeader):
             return VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
         if IfrFormId.CheckFormIdFree(FormId) == False:
             return VfrReturnCode.VFR_RETURN_FORMID_REDEFINED
-        self.__Form.FormId = FormId
+        self.Form.FormId = FormId
         IfrFormId.MarkFormIdUsed(FormId)
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
     def SetFormTitle(self, FormTitle):
-        self.__Form.FormTitle = FormTitle
+        self.Form.FormTitle = FormTitle
 
     def GetInfo(self):
-        return self.__Form
+        return self.Form
 
 
 class IfrFormMap(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__FormMap = EFI_IFR_FORM_MAP()
-        self.__MethodMapList = []  # EFI_IFR_FORM_MAP_METHOD()
-        IfrOpHeader.__init__(self, self.__FormMap.Header, EFI_IFR_FORM_MAP_OP)
-        self.__FormMap.FormId = 0
+        self.FormMap = EFI_IFR_FORM_MAP()
+        self.MethodMapList = []  # EFI_IFR_FORM_MAP_METHOD()
+        IfrOpHeader.__init__(self, self.FormMap.Header, EFI_IFR_FORM_MAP_OP)
+        self.FormMap.FormId = 0
 
     def SetFormId(self, FormId):
         if FormId == 0:
@@ -988,7 +1004,7 @@ class IfrFormMap(IfrLine, IfrOpHeader):
 
         if IfrFormId.CheckFormIdFree(FormId) == False:
             return VfrReturnCode.VFR_RETURN_FORMID_REDEFINED
-        self.__FormMap.FormId = FormId
+        self.FormMap.FormId = FormId
         IfrFormId.MarkFormIdUsed(FormId)
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
@@ -996,112 +1012,112 @@ class IfrFormMap(IfrLine, IfrOpHeader):
         MethodMap = EFI_IFR_FORM_MAP_METHOD()
         MethodMap.MethodTitle = MethodTitle
         MethodMap.MethodIdentifier = MethodGuid
-        self.__MethodMapList.append(MethodMap)
+        self.MethodMapList.append(MethodMap)
 
     def GetInfo(self):
-        return self.__FormMap
+        return self.FormMap
 
     def GetMethodMapList(self):
-        return self.__MethodMapList
+        return self.MethodMapList
 
 
 class IfrEnd(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__End = EFI_IFR_END()
-        IfrOpHeader.__init__(self, self.__End.Header, EFI_IFR_END_OP)
+        self.End = EFI_IFR_END()
+        IfrOpHeader.__init__(self, self.End.Header, EFI_IFR_END_OP)
 
     def GetInfo(self):
-        return self.__End
+        return self.End
 
 
 class IfrBanner(IfrLine, IfrOpHeader):
 
     def __init__(self, ):
-        self.__Banner = EFI_IFR_GUID_BANNER()
-        IfrOpHeader.__init__(self, self.__Banner.Header, EFI_IFR_GUID_OP,
+        self.Banner = EFI_IFR_GUID_BANNER()
+        IfrOpHeader.__init__(self, self.Banner.Header, EFI_IFR_GUID_OP,
                               ctypes.sizeof(EFI_IFR_GUID_BANNER))
-        self.__Banner.ExtendOpCode = EFI_IFR_EXTEND_OP_BANNER
-        self.__Banner.Guid = EFI_IFR_TIANO_GUID
+        self.Banner.ExtendOpCode = EFI_IFR_EXTEND_OP_BANNER
+        self.Banner.Guid = EFI_IFR_TIANO_GUID
 
     def SetTitle(self, StringId):
-        self.__Banner.Title = StringId
+        self.Banner.Title = StringId
 
     def SetLine(self, Line):
-        self.__Banner.LineNumber = Line
+        self.Banner.LineNumber = Line
 
     def SetAlign(self, Align):
-        self.__Banner.Alignment = Align
+        self.Banner.Alignment = Align
 
     def GetInfo(self):
-        return self.__Banner
+        return self.Banner
 
 class IfrVarEqName(IfrLine, IfrOpHeader):
 
     def __init__(self, QuestionId, NameId):
-        self.__VarEqName = EFI_IFR_GUID_VAREQNAME()
-        IfrOpHeader.__init__(self, self.__VarEqName.Header, EFI_IFR_GUID_OP,
+        self.VarEqName = EFI_IFR_GUID_VAREQNAME()
+        IfrOpHeader.__init__(self, self.VarEqName.Header, EFI_IFR_GUID_OP,
                               ctypes.sizeof(EFI_IFR_GUID_VAREQNAME))
-        self.__VarEqName.ExtendOpCode = EFI_IFR_EXTEND_OP_VAREQNAME
-        self.__VarEqName.Guid = EFI_IFR_FRAMEWORK_GUID
-        self.__VarEqName.QuestionId = QuestionId
-        self.__VarEqName.NameId = NameId
+        self.VarEqName.ExtendOpCode = EFI_IFR_EXTEND_OP_VAREQNAME
+        self.VarEqName.Guid = EFI_IFR_FRAMEWORK_GUID
+        self.VarEqName.QuestionId = QuestionId
+        self.VarEqName.NameId = NameId
 
     def GetInfo(self):
-        return self.__VarEqName
+        return self.VarEqName
 
 class IfrTimeout(IfrLine, IfrOpHeader):
 
     def __init__(self, Timeout=0):
-        self.__Timeout = EFI_IFR_GUID_TIMEOUT()
-        IfrOpHeader.__init__(self, self.__Timeout.Header, EFI_IFR_GUID_OP,
+        self.Timeout = EFI_IFR_GUID_TIMEOUT()
+        IfrOpHeader.__init__(self, self.Timeout.Header, EFI_IFR_GUID_OP,
                               ctypes.sizeof(EFI_IFR_GUID_TIMEOUT))
-        self.__Timeout.ExtendOpCode = EFI_IFR_EXTEND_OP_TIMEOUT
-        self.__Timeout.Guid = EFI_IFR_TIANO_GUID
-        self.__Timeout.TimeOut = Timeout
+        self.Timeout.ExtendOpCode = EFI_IFR_EXTEND_OP_TIMEOUT
+        self.Timeout.Guid = EFI_IFR_TIANO_GUID
+        self.Timeout.TimeOut = Timeout
 
     def SetTimeout(self, Timeout):
-        self.__Timeout.TimeOut = Timeout
+        self.Timeout.TimeOut = Timeout
 
     def GetInfo(self):
-        return self.__Timeout
+        return self.Timeout
 
 
 class IfrLabel(IfrLine, IfrOpHeader):
 
     def __init__(self, ):
-        self.__Label = EFI_IFR_GUID_LABEL()
-        IfrOpHeader.__init__(self, self.__Label.Header, EFI_IFR_GUID_OP,
+        self.Label = EFI_IFR_GUID_LABEL()
+        IfrOpHeader.__init__(self, self.Label.Header, EFI_IFR_GUID_OP,
                               ctypes.sizeof(EFI_IFR_GUID_LABEL))
-        self.__Label.ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL
-        self.__Label.Guid = EFI_IFR_TIANO_GUID
+        self.Label.ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL
+        self.Label.Guid = EFI_IFR_TIANO_GUID
 
     def SetNumber(self, Number):
-        self.__Label.Number = Number
+        self.Label.Number = Number
 
     def GetInfo(self):
-        return self.__Label
+        return self.Label
 
 
 class IfrRule(IfrLine, IfrOpHeader):
 
     def __init__(self, RuleName=None):
-        self.__Rule = EFI_IFR_RULE()
-        self.__RuleName = RuleName
-        IfrOpHeader.__init__(self, self.__Rule.Header, EFI_IFR_RULE_OP)
-        self.__Rule.RuleId = EFI_RULE_ID_INVALID
+        self.Rule = EFI_IFR_RULE()
+        self.RuleName = RuleName
+        IfrOpHeader.__init__(self, self.Rule.Header, EFI_IFR_RULE_OP)
+        self.Rule.RuleId = EFI_RULE_ID_INVALID
 
     def SetRuleId(self, RuleId):
-        self.__Rule.RuleId = RuleId
+        self.Rule.RuleId = RuleId
 
     def GetRuleName(self):
-        return self.__RuleName
+        return self.RuleName
 
     def SetRuleName(self, RuleName):
-        self.__RuleName = RuleName
+        self.RuleName = RuleName
 
     def GetInfo(self):
-        return self.__Rule
+        return self.Rule
 
 
 def _FLAG_TEST_AND_CLEAR(Flags, Mask):
@@ -1120,57 +1136,61 @@ def _FLAG_CLEAR(Flags, Mask):
 class IfrSubtitle(IfrLine, IfrOpHeader, IfrStatementHeader):
 
     def __init__(self, ):
-        self.__Subtitle = EFI_IFR_SUBTITLE()
+        self.Subtitle = EFI_IFR_SUBTITLE()
 
-        IfrOpHeader.__init__(self, self.__Subtitle.Header,
+        IfrOpHeader.__init__(self, self.Subtitle.Header,
                               EFI_IFR_SUBTITLE_OP)
-        IfrStatementHeader.__init__(self, self.__Subtitle.Statement)
+        IfrStatementHeader.__init__(self, self.Subtitle.Statement)
+        self.Subtitle.Flags = 0
 
-        self.__Subtitle.Flags = 0
+        self.FlagsStream = ''
 
     def SetFlags(self, Flags):
         Flags, Result = _FLAG_TEST_AND_CLEAR(Flags, EFI_IFR_FLAGS_HORIZONTAL)
         if Result:
-            self.__Subtitle.Flags |= EFI_IFR_FLAGS_HORIZONTAL
+            self.Subtitle.Flags |= EFI_IFR_FLAGS_HORIZONTAL
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if Flags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
 
+    def SetFlagsStream(self, FlagsStream):
+        self.FlagsStream = FlagsStream
+
     def GetInfo(self):
-        return self.__Subtitle
+        return self.Subtitle
 
 
 class IfrImage(IfrLine, IfrOpHeader):
 
     def __init__(self, ):
-        self.__Image = EFI_IFR_IMAGE()
-        IfrOpHeader.__init__(self, self.__Image.Header, EFI_IFR_IMAGE_OP)
-        self.__Image.Id = EFI_IMAGE_ID_INVALID
+        self.Image = EFI_IFR_IMAGE()
+        IfrOpHeader.__init__(self, self.Image.Header, EFI_IFR_IMAGE_OP)
+        self.Image.Id = EFI_IMAGE_ID_INVALID
 
     def SetImageId(self, ImageId):
-        self.__Image.Id = ImageId
+        self.Image.Id = ImageId
 
     def GetInfo(self):
-        return self.__Image
+        return self.Image
 
 
 class IfrLocked(IfrLine, IfrOpHeader):
 
     def __init__(self, ):
-        self.__Lock = EFI_IFR_LOCKED()
-        IfrOpHeader.__init__(self, self.__Lock.Header, EFI_IFR_LOCKED_OP)
+        self.Lock = EFI_IFR_LOCKED()
+        IfrOpHeader.__init__(self, self.Lock.Header, EFI_IFR_LOCKED_OP)
 
     def GetInfo(self):
-        return self.__Lock
+        return self.Lock
 
 
 class IfrModal(IfrLine, IfrOpHeader):
 
     def __init__(self, ):
-        self.__Modal = EFI_IFR_MODAL_TAG()
-        IfrOpHeader.__init__(self, self.__Modal.Header, EFI_IFR_MODAL_TAG_OP)
+        self.Modal = EFI_IFR_MODAL_TAG()
+        IfrOpHeader.__init__(self, self.Modal.Header, EFI_IFR_MODAL_TAG_OP)
 
     def GetInfo(self):
-        return self.__Modal
+        return self.Modal
 
 
 EFI_IFR_QUESTION_FLAG_DEFAULT = 0
@@ -1180,268 +1200,270 @@ class IfrQuestionHeader(IfrStatementHeader):
 
     def __init__(self, QHeader, Flags=EFI_IFR_QUESTION_FLAG_DEFAULT):
 
-        self.__QHeader = QHeader
-        IfrStatementHeader.__init__(self, self.__QHeader.Header)
-        self.__QHeader.QuestionId = EFI_QUESTION_ID_INVALID
-        self.__QHeader.VarStoreId = EFI_VARSTORE_ID_INVALID
-        self.__QHeader.VarStoreInfo.VarName = EFI_STRING_ID_INVALID
-        self.__QHeader.VarStoreInfo.VarOffset = EFI_VAROFFSET_INVALID
-        self.__QHeader.Flags = Flags
+        self.QHeader = QHeader
+        IfrStatementHeader.__init__(self, self.QHeader.Header)
+        self.QHeader.QuestionId = EFI_QUESTION_ID_INVALID
+        self.QHeader.VarStoreId = EFI_VARSTORE_ID_INVALID
+        self.QHeader.VarStoreInfo.VarName = EFI_STRING_ID_INVALID
+        self.QHeader.VarStoreInfo.VarOffset = EFI_VAROFFSET_INVALID
+        self.QHeader.Flags = Flags
 
     def GetQuestionId(self):
-        return self.__QHeader.QuestionId
+        return self.QHeader.QuestionId
 
     def SetQuestionId(self, QuestionId):
 
-        self.__QHeader.QuestionId = QuestionId
+        self.QHeader.QuestionId = QuestionId
 
     def GetVarStoreId(self):
-        return self.__QHeader.VarStoreId
+        return self.QHeader.VarStoreId
 
     def SetVarStoreInfo(self, BaseInfo):
 
-        self.__QHeader.VarStoreId = BaseInfo.VarStoreId
-        self.__QHeader.VarStoreInfo.VarName = BaseInfo.Info.VarName
-        self.__QHeader.VarStoreInfo.VarOffset = BaseInfo.Info.VarOffset
+        self.QHeader.VarStoreId = BaseInfo.VarStoreId
+        self.QHeader.VarStoreInfo.VarName = BaseInfo.Info.VarName
+        self.QHeader.VarStoreInfo.VarOffset = BaseInfo.Info.VarOffset
 
     def GetVarStoreInfo(self, Info):  # Bug
 
-        Info.VarStoreId = self.__QHeader.VarStoreId
-        Info.VarStoreInfo = self.__QHeader.VarStoreInfo
+        Info.VarStoreId = self.QHeader.VarStoreId
+        Info.VarStoreInfo = self.QHeader.VarStoreInfo
         return Info
 
     def GetQFlags(self):
-        return self.__QHeader.Flags
+        return self.QHeader.Flags
 
     def SetFlags(self, Flags):
 
         Flags, Ret = _FLAG_TEST_AND_CLEAR(Flags, EFI_IFR_FLAG_READ_ONLY)
         if Ret:
-            self.__QHeader.Flags |= EFI_IFR_FLAG_READ_ONLY
+            self.QHeader.Flags |= EFI_IFR_FLAG_READ_ONLY
 
         Flags = _FLAG_CLEAR(Flags, 0x02)
 
         Flags, Ret = _FLAG_TEST_AND_CLEAR(Flags, EFI_IFR_FLAG_CALLBACK)
         if Ret:
-            self.__QHeader.Flags |= EFI_IFR_FLAG_CALLBACK
+            self.QHeader.Flags |= EFI_IFR_FLAG_CALLBACK
 
         # ignore NVAccessFlag
         Flags = _FLAG_CLEAR(Flags, 0x08)
 
         Flags, Ret = _FLAG_TEST_AND_CLEAR(Flags, EFI_IFR_FLAG_RESET_REQUIRED)
         if Ret:
-            self.__QHeader.Flags |= EFI_IFR_FLAG_RESET_REQUIRED
+            self.QHeader.Flags |= EFI_IFR_FLAG_RESET_REQUIRED
 
         Flags, Ret = _FLAG_TEST_AND_CLEAR(Flags,
                                           EFI_IFR_FLAG_RECONNECT_REQUIRED)
         if Ret:
-            self.__QHeader.Flags |= EFI_IFR_FLAG_RECONNECT_REQUIRED
+            self.QHeader.Flags |= EFI_IFR_FLAG_RECONNECT_REQUIRED
 
         # Set LateCheck Flag to compatible for framework flag
         # but it uses 0x20 as its flag, if in the future UEFI may take this flag
 
         Flags, Ret = _FLAG_TEST_AND_CLEAR(Flags, 0x20)
         if Ret:
-            self.__QHeader.Flags |= 0x20
+            self.QHeader.Flags |= 0x20
 
         Flags, Ret = _FLAG_TEST_AND_CLEAR(Flags, EFI_IFR_FLAG_OPTIONS_ONLY)
         if Ret:
-            self.__QHeader.Flags |= EFI_IFR_FLAG_OPTIONS_ONLY
+            self.QHeader.Flags |= EFI_IFR_FLAG_OPTIONS_ONLY
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if Flags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
 
     def UpdateIfrQuestionHeader(self, qHeader):
-        self.__QHeader = qHeader
+        self.QHeader = qHeader
 
 
 class IfrRef(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
     def __init__(self, QName=None, VarIdStr=''):
-        self.__Ref = EFI_IFR_REF()
-        IfrBaseInfo.__init__(self, self.__Ref, QName, VarIdStr)
-        IfrOpHeader.__init__(self, self.__Ref.Header, EFI_IFR_REF_OP)
-        IfrQuestionHeader.__init__(self, self.__Ref.Question)
-        self.__Ref.FormId = 0
+        self.Ref = EFI_IFR_REF()
+        IfrBaseInfo.__init__(self, self.Ref, QName, VarIdStr)
+        IfrOpHeader.__init__(self, self.Ref.Header, EFI_IFR_REF_OP)
+        IfrQuestionHeader.__init__(self, self.Ref.Question)
+        self.Ref.FormId = 0
 
     def SetFormId(self, FormId):
-        self.__Ref.FormId = FormId
+        self.Ref.FormId = FormId
 
 class IfrRef2(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
     def __init__(self, QName=None, VarIdStr=''):
-        self.__Ref2 = EFI_IFR_REF2()
-        IfrBaseInfo.__init__(self, self.__Ref2, QName, VarIdStr)
-        IfrOpHeader.__init__(self, self.__Ref2.Header, EFI_IFR_REF_OP, sizeof(EFI_IFR_REF2))
-        IfrQuestionHeader.__init__(self, self.__Ref2.Question)
-        self.__Ref2.FormId = 0
-        self.__Ref2.QuestionId = EFI_QUESTION_ID_INVALID
+        self.Ref2 = EFI_IFR_REF2()
+        IfrBaseInfo.__init__(self, self.Ref2, QName, VarIdStr)
+        IfrOpHeader.__init__(self, self.Ref2.Header, EFI_IFR_REF_OP, sizeof(EFI_IFR_REF2))
+        IfrQuestionHeader.__init__(self, self.Ref2.Question)
+        self.Ref2.FormId = 0
+        self.Ref2.QuestionId = EFI_QUESTION_ID_INVALID
 
     def SetFormId(self, FormId):
-        self.__Ref2.FormId = FormId
+        self.Ref2.FormId = FormId
 
     def SetQId(self, QuestionId):
 
-        self.__Ref2.QuestionId = QuestionId
+        self.Ref2.QuestionId = QuestionId
 
 class IfrRef3(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
     def __init__(self, QName=None, VarIdStr=''):
-        self.__Ref3 = EFI_IFR_REF3()
-        IfrBaseInfo.__init__(self, self.__Ref3, QName, VarIdStr)
-        IfrOpHeader.__init__(self, self.__Ref3.Header, EFI_IFR_REF_OP, sizeof(EFI_IFR_REF3))
-        IfrQuestionHeader.__init__(self, self.__Ref3.Question)
-        self.__Ref3.FormId = 0
-        self.__Ref3.QuestionId = EFI_QUESTION_ID_INVALID
+        self.Ref3 = EFI_IFR_REF3()
+        IfrBaseInfo.__init__(self, self.Ref3, QName, VarIdStr)
+        IfrOpHeader.__init__(self, self.Ref3.Header, EFI_IFR_REF_OP, sizeof(EFI_IFR_REF3))
+        IfrQuestionHeader.__init__(self, self.Ref3.Question)
+        self.Ref3.FormId = 0
+        self.Ref3.QuestionId = EFI_QUESTION_ID_INVALID
         EFI_IFR_DEFAULT_GUID = EFI_GUID(0, 0, 0,
                                         GuidArray(0, 0, 0, 0, 0, 0, 0, 0))
-        self.__Ref3.FormSetId = EFI_IFR_DEFAULT_GUID
+        self.Ref3.FormSetId = EFI_IFR_DEFAULT_GUID
 
     def SetFormId(self, FormId):
-        self.__Ref3.FormId = FormId
+        self.Ref3.FormId = FormId
 
     def SetQId(self, QuestionId):
 
-        self.__Ref3.QuestionId = QuestionId
+        self.Ref3.QuestionId = QuestionId
 
     def SetFormSetId(self, FormSetId):
-        self.__Ref3.FormSetId = FormSetId
+        self.Ref3.FormSetId = FormSetId
 
 class IfrRef4(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
     def __init__(self, QName=None, VarIdStr=''):
-        self.__Ref4 = EFI_IFR_REF4()
-        IfrBaseInfo.__init__(self, self.__Ref4, QName, VarIdStr)
-        IfrOpHeader.__init__(self, self.__Ref4.Header, EFI_IFR_REF_OP, sizeof(EFI_IFR_REF4))
-        IfrQuestionHeader.__init__(self, self.__Ref4.Question)
-        self.__Ref4.FormId = 0
-        self.__Ref4.QuestionId = EFI_QUESTION_ID_INVALID
+        self.Ref4 = EFI_IFR_REF4()
+        IfrBaseInfo.__init__(self, self.Ref4, QName, VarIdStr)
+        IfrOpHeader.__init__(self, self.Ref4.Header, EFI_IFR_REF_OP, sizeof(EFI_IFR_REF4))
+        IfrQuestionHeader.__init__(self, self.Ref4.Question)
+        self.Ref4.FormId = 0
+        self.Ref4.QuestionId = EFI_QUESTION_ID_INVALID
         EFI_IFR_DEFAULT_GUID = EFI_GUID(0, 0, 0,
                                         GuidArray(0, 0, 0, 0, 0, 0, 0, 0))
-        self.__Ref4.FormSetId = EFI_IFR_DEFAULT_GUID
-        self.__Ref4.DevicePath = EFI_STRING_ID_INVALID
+        self.Ref4.FormSetId = EFI_IFR_DEFAULT_GUID
+        self.Ref4.DevicePath = EFI_STRING_ID_INVALID
 
     def SetFormId(self, FormId):
-        self.__Ref4.FormId = FormId
+        self.Ref4.FormId = FormId
 
     def SetQId(self, QuestionId):
 
-        self.__Ref4.QuestionId = QuestionId
+        self.Ref4.QuestionId = QuestionId
 
     def SetFormSetId(self, FormSetId):
-        self.__Ref4.FormSetId = FormSetId
+        self.Ref4.FormSetId = FormSetId
 
     def SetDevicePath(self, DevicePath):
-        self.__Ref4.DevicePath = DevicePath
+        self.Ref4.DevicePath = DevicePath
 
 class IfrRef5(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
     def __init__(self, QName=None, VarIdStr=''):
-        self.__Ref5 = EFI_IFR_REF5()
-        IfrBaseInfo.__init__(self, self.__Ref5, QName, VarIdStr)
-        IfrOpHeader.__init__(self, self.__Ref5.Header, EFI_IFR_REF_OP, sizeof(EFI_IFR_REF5))
-        IfrQuestionHeader.__init__(self, self.__Ref5.Question)
+        self.Ref5 = EFI_IFR_REF5()
+        IfrBaseInfo.__init__(self, self.Ref5, QName, VarIdStr)
+        IfrOpHeader.__init__(self, self.Ref5.Header, EFI_IFR_REF_OP, sizeof(EFI_IFR_REF5))
+        IfrQuestionHeader.__init__(self, self.Ref5.Question)
 
 
 class IfrAction(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
     def __init__(self, QName=None, VarIdStr=''):
-        self.__Action = EFI_IFR_ACTION()
-        IfrBaseInfo.__init__(self, self.__Action, QName, VarIdStr)
-        IfrOpHeader.__init__(self, self.__Action.Header, EFI_IFR_ACTION_OP)
-        IfrQuestionHeader.__init__(self, self.__Action.Question)
-        self.__Action.QuestionConfig = EFI_STRING_ID_INVALID
+        self.Action = EFI_IFR_ACTION()
+        IfrBaseInfo.__init__(self, self.Action, QName, VarIdStr)
+        IfrOpHeader.__init__(self, self.Action.Header, EFI_IFR_ACTION_OP)
+        IfrQuestionHeader.__init__(self, self.Action.Question)
+        self.Action.QuestionConfig = EFI_STRING_ID_INVALID
 
     def SetQuestionConfig(self, QuestionConfig):
-        self.__Action.QuestionConfig = QuestionConfig
+        self.Action.QuestionConfig = QuestionConfig
 
 
 class IfrText(IfrLine, IfrOpHeader, IfrStatementHeader):
 
     def __init__(self, ):
-        self.__Text = EFI_IFR_TEXT()
-        IfrOpHeader.__init__(self, self.__Text.Header, EFI_IFR_TEXT_OP)
-        IfrStatementHeader.__init__(self, self.__Text.Statement)
-        self.__Text.TextTwo = EFI_STRING_ID_INVALID
+        self.Text = EFI_IFR_TEXT()
+        IfrOpHeader.__init__(self, self.Text.Header, EFI_IFR_TEXT_OP)
+        IfrStatementHeader.__init__(self, self.Text.Statement)
+        self.Text.TextTwo = EFI_STRING_ID_INVALID
 
     def SetTextTwo(self, StringId):
-        self.__Text.TextTwo = StringId
+        self.Text.TextTwo = StringId
 
     def GetInfo(self):
-        return self.__Text
+        return self.Text
 
 
 class IfrGuid(IfrLine, IfrOpHeader):
 
     def __init__(self, Size, Data=None):
-        self.__Guid = EFI_IFR_GUID()
-        self.__Data = Data # databuffer is saved here
-        IfrOpHeader.__init__(self, self.__Guid.Header, EFI_IFR_GUID_OP,
+        self.Guid = EFI_IFR_GUID()
+        self.Data = Data # databuffer is saved here
+        IfrOpHeader.__init__(self, self.Guid.Header, EFI_IFR_GUID_OP,
                               ctypes.sizeof(EFI_IFR_GUID) + Size)
         EFI_IFR_DEFAULT_GUID = EFI_GUID(0, 0, 0,
                                         GuidArray(0, 0, 0, 0, 0, 0, 0, 0))
-        self.__Guid.Guid = EFI_IFR_DEFAULT_GUID
+        self.Guid.Guid = EFI_IFR_DEFAULT_GUID
 
     def SetGuid(self, Guid):
-        self.__Guid.Guid = Guid
+        self.Guid.Guid = Guid
 
     def SetData(self, Data):
-        self.__Data = Data
+        self.Data = Data
 
     def GetData(self):
-        return self.__Data
+        return self.Data
 
     def GetInfo(self): #
-        return self.__Guid
+        return self.Guid
 
 class IfrExtensionGuid(IfrLine, IfrOpHeader):
 
     def __init__(self, Size, TypeName='', ArraySize=0, Data=None):
-        self.__Guid = EFI_IFR_GUID()
+        self.Guid = EFI_IFR_GUID()
         if ArraySize != 0:
-            self.__DataType = TypeName +'[' + str(ArraySize) + ']'
+            self.DataType = TypeName +'[' + str(ArraySize) + ']'
         else:
-            self.__DataType = TypeName
-        self.__FieldList = []
-        self.__Data = Data # databuffer is saved here
-        IfrOpHeader.__init__(self, self.__Guid.Header, EFI_IFR_GUID_OP,
+            self.DataType = TypeName
+        self.FieldList = []
+        self.Data = Data # databuffer is saved here
+        IfrOpHeader.__init__(self, self.Guid.Header, EFI_IFR_GUID_OP,
                               ctypes.sizeof(EFI_IFR_GUID) + Size)
         EFI_IFR_DEFAULT_GUID = EFI_GUID(0, 0, 0,
                                         GuidArray(0, 0, 0, 0, 0, 0, 0, 0))
-        self.__Guid.Guid = EFI_IFR_DEFAULT_GUID
+        self.Guid.Guid = EFI_IFR_DEFAULT_GUID
 
     def SetGuid(self, Guid):
-        self.__Guid.Guid = Guid
+        self.Guid.Guid = Guid
 
     def SetData(self, Data):
-        self.__Data = Data
+        self.Data = Data
 
     def GetDataType(self):
-        return self.__DataType
+        return self.DataType
 
     def GetFieldList(self):
-        return self.__FieldList
+        return self.FieldList
 
     def SetFieldList(self, TFName, TFValue):
-        self.__FieldList.append([TFName, TFValue])
+        self.FieldList.append([TFName, TFValue])
 
 
     def GetData(self):
-        return self.__Data
+        return self.Data
 
     def GetInfo(self): #
-        return self.__Guid
+        return self.Guid
 
 
 class IfrOrderedList(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
     def __init__(self, QName=None, VarIdStr=''):
-        self.__OrderedList = EFI_IFR_ORDERED_LIST()
-        IfrBaseInfo.__init__(self, self.__OrderedList, QName, VarIdStr)
-        IfrOpHeader.__init__(self, self.__OrderedList.Header,
+        self.OrderedList = EFI_IFR_ORDERED_LIST()
+        IfrBaseInfo.__init__(self, self.OrderedList, QName, VarIdStr)
+        IfrOpHeader.__init__(self, self.OrderedList.Header,
                               EFI_IFR_ORDERED_LIST_OP)
-        IfrQuestionHeader.__init__(self, self.__OrderedList.Question)
-        self.__OrderedList.MaxContainers = 0
-        self.__OrderedList.Flags = 0
+        IfrQuestionHeader.__init__(self, self.OrderedList.Question)
+        self.OrderedList.MaxContainers = 0
+        self.OrderedList.Flags = 0
+
+        self.HasMaxContianers = False
 
     def GetQuestion(self):
         return self
@@ -1450,7 +1472,10 @@ class IfrOrderedList(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
         IfrQuestionHeader.SetFlags(self, Flags)
 
     def SetMaxContainers(self, MaxContainers):
-        self.__OrderedList.MaxContainers = MaxContainers
+        self.OrderedList.MaxContainers = MaxContainers
+
+    def SetHasMaxContianers(self, HasMaxContianers):
+        self.HasMaxContianers = HasMaxContianers
 
     def SetFlags(self, HFlags, LFlags):
 
@@ -1459,24 +1484,24 @@ class IfrOrderedList(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
             return ReturnCode
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_UNIQUE_SET)
         if Ret:
-            self.__OrderedList.Flags |= EFI_IFR_UNIQUE_SET
+            self.OrderedList.Flags |= EFI_IFR_UNIQUE_SET
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_NO_EMPTY_SET)
         if Ret:
-            self.__OrderedList.Flags |= EFI_IFR_NO_EMPTY_SET
+            self.OrderedList.Flags |= EFI_IFR_NO_EMPTY_SET
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
 
 class IfrString(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
     def __init__(self, QName=None, VarIdStr=''):
-        self.__Str = EFI_IFR_STRING()
-        IfrBaseInfo.__init__(self, self.__Str, QName, VarIdStr)
-        IfrOpHeader.__init__(self, self.__Str.Header, EFI_IFR_STRING_OP)
-        IfrQuestionHeader.__init__(self, self.__Str.Question)
-        self.__Str.Flags = 0
-        self.__Str.MinSize = 0
-        self.__Str.MaxSize = 0
+        self.Str = EFI_IFR_STRING()
+        IfrBaseInfo.__init__(self, self.Str, QName, VarIdStr)
+        IfrOpHeader.__init__(self, self.Str.Header, EFI_IFR_STRING_OP)
+        IfrQuestionHeader.__init__(self, self.Str.Question)
+        self.Str.Flags = 0
+        self.Str.MinSize = 0
+        self.Str.MaxSize = 0
 
     def GetQuestion(self):
         return self
@@ -1492,26 +1517,26 @@ class IfrString(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_STRING_MULTI_LINE)
         if Ret:
-            self.__Str.Flags |= EFI_IFR_STRING_MULTI_LINE
+            self.Str.Flags |= EFI_IFR_STRING_MULTI_LINE
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
 
     def SetMinSize(self, MinSize):
-        self.__Str.MinSize = MinSize
+        self.Str.MinSize = MinSize
 
     def SetMaxSize(self, MaxSize):
-        self.__Str.MaxSize = MaxSize
+        self.Str.MaxSize = MaxSize
 
 class IfrPassword(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
     def __init__(self, QName=None, VarIdStr=''):
-        self.__Password = EFI_IFR_PASSWORD()
-        IfrBaseInfo.__init__(self, self.__Password, QName, VarIdStr)
-        IfrOpHeader.__init__(self, self.__Password.Header,
+        self.Password = EFI_IFR_PASSWORD()
+        IfrBaseInfo.__init__(self, self.Password, QName, VarIdStr)
+        IfrOpHeader.__init__(self, self.Password.Header,
                               EFI_IFR_PASSWORD_OP)
-        IfrQuestionHeader.__init__(self, self.__Password.Question)
-        self.__Password.MinSize = 0
-        self.__Password.MaxSize = 0
+        IfrQuestionHeader.__init__(self, self.Password.Question)
+        self.Password.MinSize = 0
+        self.Password.MaxSize = 0
 
     def GetQuestion(self):
         return self
@@ -1520,10 +1545,10 @@ class IfrPassword(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
         IfrQuestionHeader.SetFlags(self, Flags)
 
     def SetMinSize(self, MinSize):
-        self.__Password.MinSize = MinSize
+        self.Password.MinSize = MinSize
 
     def SetMaxSize(self, MaxSize):
-        self.__Password.MaxSize = MaxSize
+        self.Password.MaxSize = MaxSize
 
 class IfrDefault(IfrLine, IfrOpHeader):
 
@@ -1533,38 +1558,46 @@ class IfrDefault(IfrLine, IfrOpHeader):
                  DefaultId=EFI_HII_DEFAULT_CLASS_STANDARD,
                  Type=EFI_IFR_TYPE_OTHER):
         Nums = len(ValueList)
-        self.__Default = Refine_EFI_IFR_DEFAULT(ValueType, Nums)
-        IfrOpHeader.__init__(self, self.__Default.Header, EFI_IFR_DEFAULT_OP, sizeof(self.__Default))
+        self.Default = Refine_EFI_IFR_DEFAULT(ValueType, Nums)
+        IfrOpHeader.__init__(self, self.Default.Header, EFI_IFR_DEFAULT_OP, sizeof(self.Default))
+        self.Default.Type = Type
+        self.Default.DefaultId = DefaultId
 
-        self.__Default.Type = Type
-        self.__Default.DefaultId = DefaultId
-        self.__ValueType = ValueType
+        self.ValueType = ValueType
+        self.DefaultStore = ''
+        self.ValueStream = ''
 
         if ValueList != []:
             ArrayType = TypeDict[ValueType] * Nums
             ValueArray = ArrayType()
             for i in range(0, len(ValueList)):
                 ValueArray[i] = ValueList[i]
-            self.__Default.Value = ValueArray
+            self.Default.Value = ValueArray
 
     def SetDefaultId(self, DefaultId):
-        self.__Default.DefaultId = DefaultId
+        self.Default.DefaultId = DefaultId
 
     def GetValueType(self):
-        return self.__ValueType
+        return self.ValueType
 
     def SetType(self, Type):
-        self.__Default.Type = Type
+        self.Default.Type = Type
 
     def SetValue(self, ValueList):
-        ArrayType = TypeDict[self.__ValueType] * (len(ValueList))
+        ArrayType = TypeDict[self.ValueType] * (len(ValueList))
         ValueArray = ArrayType()
         for i in range(0, len(ValueList)):
             ValueArray[i] = ValueList[i]
-        self.__Default.Value = ValueArray
+        self.Default.Value = ValueArray
+
+    def SetDefaultStore(self, DefaultStore):
+        self.DefaultStore = DefaultStore
+
+    def SetValueStream(self, ValueStream):
+        self.ValueStream = ValueStream
 
     def GetInfo(self):
-        return self.__Default
+        return self.Default
 
 
 class IfrDefault2(IfrLine, IfrOpHeader):
@@ -1572,200 +1605,210 @@ class IfrDefault2(IfrLine, IfrOpHeader):
     def __init__(self,
                  DefaultId=EFI_HII_DEFAULT_CLASS_STANDARD,
                  Type=EFI_IFR_TYPE_OTHER):
-        self.__Default = EFI_IFR_DEFAULT_2()
-        IfrOpHeader.__init__(self, self.__Default.Header, EFI_IFR_DEFAULT_OP, sizeof(EFI_IFR_DEFAULT_2))
-        self.__Default.Type = Type
-        self.__Default.DefaultId = DefaultId
+        self.Default = EFI_IFR_DEFAULT_2()
+        IfrOpHeader.__init__(self, self.Default.Header, EFI_IFR_DEFAULT_OP, sizeof(EFI_IFR_DEFAULT_2))
+        self.Default.Type = Type
+        self.Default.DefaultId = DefaultId
+
+        self.DefaultStore = ''
 
     def SetDefaultId(self, DefaultId):
-        self.__Default.DefaultId = DefaultId
+        self.Default.DefaultId = DefaultId
 
     def SetType(self, Type):
-        self.__Default.Type = Type
+        self.Default.Type = Type
+
+    def SetDefaultStore(self, DefaultStore):
+        self.DefaultStore = DefaultStore
 
     def GetInfo(self):
-        return self.__Default
+        return self.Default
 
 
 class IfrInconsistentIf(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__InconsistentIf = EFI_IFR_INCONSISTENT_IF()
-        IfrOpHeader.__init__(self, self.__InconsistentIf.Header,
+        self.InconsistentIf = EFI_IFR_INCONSISTENT_IF()
+        IfrOpHeader.__init__(self, self.InconsistentIf.Header,
                               EFI_IFR_INCONSISTENT_IF_OP)
-        self.__InconsistentIf.Error = EFI_STRING_ID_INVALID
+        self.InconsistentIf.Error = EFI_STRING_ID_INVALID
 
     def SetError(self, Error):
-        self.__InconsistentIf.Error = Error
+        self.InconsistentIf.Error = Error
 
     def GetInfo(self):
-        return self.__InconsistentIf
+        return self.InconsistentIf
 
 class IfrInconsistentIf2(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__InconsistentIf = EFI_IFR_INCONSISTENT_IF()
-        IfrOpHeader.__init__(self, self.__InconsistentIf.Header,
+        self.InconsistentIf = EFI_IFR_INCONSISTENT_IF()
+        IfrOpHeader.__init__(self, self.InconsistentIf.Header,
                               EFI_IFR_INCONSISTENT_IF_OP)
-        self.__InconsistentIf.Error = EFI_STRING_ID_INVALID
+        self.InconsistentIf.Error = EFI_STRING_ID_INVALID
 
     def SetError(self, Error):
-        self.__InconsistentIf.Error = Error
+        self.InconsistentIf.Error = Error
 
     def GetInfo(self):
-        return self.__InconsistentIf
+        return self.InconsistentIf
 
 
 class IfrNoSubmitIf(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__NoSubmitIf = EFI_IFR_NO_SUBMIT_IF()
-        IfrOpHeader.__init__(self, self.__NoSubmitIf.Header,
+        self.NoSubmitIf = EFI_IFR_NO_SUBMIT_IF()
+        IfrOpHeader.__init__(self, self.NoSubmitIf.Header,
                               EFI_IFR_NO_SUBMIT_IF_OP)
-        self.__NoSubmitIf.Error = EFI_STRING_ID_INVALID
+        self.NoSubmitIf.Error = EFI_STRING_ID_INVALID
 
     def SetError(self, Error):
-        self.__NoSubmitIf.Error = Error
+        self.NoSubmitIf.Error = Error
 
     def GetInfo(self):
-        return self.__NoSubmitIf
+        return self.NoSubmitIf
 
 
 class IfrDisableIf(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__DisableIf = EFI_IFR_DISABLE_IF()
-        IfrOpHeader.__init__(self, self.__DisableIf.Header,
+        self.DisableIf = EFI_IFR_DISABLE_IF()
+        IfrOpHeader.__init__(self, self.DisableIf.Header,
                               EFI_IFR_DISABLE_IF_OP)
 
     def GetInfo(self):
-        return self.__DisableIf
+        return self.DisableIf
 
 
 class IfrSuppressIf(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__SuppressIf = EFI_IFR_SUPPRESS_IF()
-        IfrOpHeader.__init__(self, self.__SuppressIf.Header,
+        self.SuppressIf = EFI_IFR_SUPPRESS_IF()
+        IfrOpHeader.__init__(self, self.SuppressIf.Header,
                               EFI_IFR_SUPPRESS_IF_OP)
 
     def GetInfo(self):
-        return self.__SuppressIf
+        return self.SuppressIf
 
 
 class IfrGrayOutIf(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__GrayOutIf = EFI_IFR_GRAY_OUT_IF()
-        IfrOpHeader.__init__(self, self.__GrayOutIf.Header,
+        self.GrayOutIf = EFI_IFR_GRAY_OUT_IF()
+        IfrOpHeader.__init__(self, self.GrayOutIf.Header,
                               EFI_IFR_GRAY_OUT_IF_OP)
 
     def GetInfo(self):
-        return self.__GrayOutIf
+        return self.GrayOutIf
 
 
 class IfrValue(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__Value = EFI_IFR_VALUE()
-        IfrOpHeader.__init__(self, self.__Value.Header, EFI_IFR_VALUE_OP)
+        self.Value = EFI_IFR_VALUE()
+        IfrOpHeader.__init__(self, self.Value.Header, EFI_IFR_VALUE_OP)
 
     def GetInfo(self):
-        return self.__Value
+        return self.Value
 
 
 class IfrRead(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__Read = EFI_IFR_READ()
-        IfrOpHeader.__init__(self, self.__Read.Header, EFI_IFR_READ_OP)
+        self.Read = EFI_IFR_READ()
+        IfrOpHeader.__init__(self, self.Read.Header, EFI_IFR_READ_OP)
 
     def GetInfo(self):
-        return self.__Read
+        return self.Read
 
 
 class IfrWrite(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__Write = EFI_IFR_WRITE()
-        IfrOpHeader.__init__(self, self.__Write.Header, EFI_IFR_WRITE_OP)
+        self.Write = EFI_IFR_WRITE()
+        IfrOpHeader.__init__(self, self.Write.Header, EFI_IFR_WRITE_OP)
 
     def GetInfo(self):
-        return self.__Write
+        return self.Write
 
 
 class IfrWarningIf(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__WarningIf = EFI_IFR_WARNING_IF()
-        IfrOpHeader.__init__(self, self.__WarningIf.Header,
+        self.WarningIf = EFI_IFR_WARNING_IF()
+        IfrOpHeader.__init__(self, self.WarningIf.Header,
                               EFI_IFR_WARNING_IF_OP)
-        self.__WarningIf.Warning = EFI_STRING_ID_INVALID
-        self.__WarningIf.TimeOut = 0
+        self.WarningIf.Warning = EFI_STRING_ID_INVALID
+        self.WarningIf.TimeOut = 0
+
+        self.HasTimeOut = False
 
     def SetWarning(self, Warning):
-        self.__WarningIf.Warning = Warning
+        self.WarningIf.Warning = Warning
+
+    def SetHasHasTimeOut(self, HasTimeOut):
+        self.HasTimeOut = HasTimeOut
 
     def SetTimeOut(self, TimeOut):
-        self.__WarningIf.TimeOut = TimeOut
+        self.WarningIf.TimeOut = TimeOut
 
     def GetInfo(self):
-        return self.__WarningIf
+        return self.WarningIf
 
 
 class IfrRefresh(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__Refresh = EFI_IFR_REFRESH()
-        IfrOpHeader.__init__(self, self.__Refresh.Header, EFI_IFR_REFRESH_OP)
-        self.__Refresh.RefreshInterval = 0
+        self.Refresh = EFI_IFR_REFRESH()
+        IfrOpHeader.__init__(self, self.Refresh.Header, EFI_IFR_REFRESH_OP)
+        self.Refresh.RefreshInterval = 0
 
     def SetRefreshInterval(self, RefreshInterval):
-        self.__Refresh.RefreshInterval = RefreshInterval
+        self.Refresh.RefreshInterval = RefreshInterval
 
     def GetInfo(self):
-        return self.__Refresh
+        return self.Refresh
 
 
 class IfrRefreshId(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__RefreshId = EFI_IFR_REFRESH_ID()
-        IfrOpHeader.__init__(self, self.__RefreshId.Header,
+        self.RefreshId = EFI_IFR_REFRESH_ID()
+        IfrOpHeader.__init__(self, self.RefreshId.Header,
                               EFI_IFR_REFRESH_ID_OP)
-        self.__RefreshId.RefreshEventGroupId = EFI_GUID(
+        self.RefreshId.RefreshEventGroupId = EFI_GUID(
             0, 0, 0, GuidArray(0, 0, 0, 0, 0, 0, 0, 0))
 
     def SetRefreshEventGroutId(self, RefreshEventGroupId):
-        self.__RefreshId.RefreshEventGroupId = RefreshEventGroupId
+        self.RefreshId.RefreshEventGroupId = RefreshEventGroupId
 
     def GetInfo(self):
-        return self.__RefreshId
+        return self.RefreshId
 
 
 class IfrVarStoreDevice(IfrLine, IfrOpHeader):
 
     def __init__(self):
-        self.__VarStoreDevice = EFI_IFR_VARSTORE_DEVICE()
-        IfrOpHeader.__init__(self, self.__VarStoreDevice.Header,
+        self.VarStoreDevice = EFI_IFR_VARSTORE_DEVICE()
+        IfrOpHeader.__init__(self, self.VarStoreDevice.Header,
                               EFI_IFR_VARSTORE_DEVICE_OP)
-        self.__VarStoreDevice.DevicePath = EFI_STRING_ID_INVALID
+        self.VarStoreDevice.DevicePath = EFI_STRING_ID_INVALID
 
     def SetDevicePath(self, DevicePath):
-        self.__VarStoreDevice.DevicePath = DevicePath
+        self.VarStoreDevice.DevicePath = DevicePath
 
     def GetInfo(self):
-        return self.__VarStoreDevice
+        return self.VarStoreDevice
 
 
 class IfrDate(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
     def __init__(self, QName=None, VarIdStr=''):
-        self.__Date = EFI_IFR_DATE()
-        IfrBaseInfo.__init__(self, self.__Date, QName, VarIdStr)
-        IfrOpHeader.__init__(self, self.__Date.Header, EFI_IFR_DATE_OP)
-        IfrQuestionHeader.__init__(self, self.__Date.Question)
-        self.__Date.Flags = 0
+        self.Date = EFI_IFR_DATE()
+        IfrBaseInfo.__init__(self, self.Date, QName, VarIdStr)
+        IfrOpHeader.__init__(self, self.Date.Header, EFI_IFR_DATE_OP)
+        IfrQuestionHeader.__init__(self, self.Date.Question)
+        self.Date.Flags = 0
 
     def SetFlags(self, HFlags, LFlags):
 
@@ -1775,27 +1818,27 @@ class IfrDate(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_QF_DATE_YEAR_SUPPRESS)
         if Ret:
-            self.__Date.Flags |= EFI_QF_DATE_YEAR_SUPPRESS
+            self.Date.Flags |= EFI_QF_DATE_YEAR_SUPPRESS
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_QF_DATE_MONTH_SUPPRESS)
         if Ret:
-            self.__Date.Flags |= EFI_QF_DATE_MONTH_SUPPRESS
+            self.Date.Flags |= EFI_QF_DATE_MONTH_SUPPRESS
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_QF_DATE_DAY_SUPPRESS)
         if Ret:
-            self.__Date.Flags |= EFI_QF_DATE_DAY_SUPPRESS
+            self.Date.Flags |= EFI_QF_DATE_DAY_SUPPRESS
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, QF_DATE_STORAGE_NORMAL)
         if Ret:
-            self.__Date.Flags |= QF_DATE_STORAGE_NORMAL
+            self.Date.Flags |= QF_DATE_STORAGE_NORMAL
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, QF_DATE_STORAGE_TIME)
         if Ret:
-            self.__Date.Flags |= QF_DATE_STORAGE_TIME
+            self.Date.Flags |= QF_DATE_STORAGE_TIME
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, QF_DATE_STORAGE_WAKEUP)
         if Ret:
-            self.__Date.Flags |= QF_DATE_STORAGE_WAKEUP
+            self.Date.Flags |= QF_DATE_STORAGE_WAKEUP
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
 
@@ -1803,11 +1846,11 @@ class IfrDate(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 class IfrTime(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
     def __init__(self, QName=None, VarIdStr=''):
-        self.__Time = EFI_IFR_TIME()
-        IfrBaseInfo.__init__(self, self.__Time, QName, VarIdStr)
-        IfrOpHeader.__init__(self, self.__Time.Header, EFI_IFR_TIME_OP)
-        IfrQuestionHeader.__init__(self, self.__Time.Question)
-        self.__Time.Flags = 0
+        self.Time = EFI_IFR_TIME()
+        IfrBaseInfo.__init__(self, self.Time, QName, VarIdStr)
+        IfrOpHeader.__init__(self, self.Time.Header, EFI_IFR_TIME_OP)
+        IfrQuestionHeader.__init__(self, self.Time.Question)
+        self.Time.Flags = 0
 
     def SetFlags(self, HFlags, LFlags):
 
@@ -1817,27 +1860,27 @@ class IfrTime(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, QF_TIME_HOUR_SUPPRESS)
         if Ret:
-            self.__Time.Flags |= QF_TIME_HOUR_SUPPRESS
+            self.Time.Flags |= QF_TIME_HOUR_SUPPRESS
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, QF_TIME_MINUTE_SUPPRESS)
         if Ret:
-            self.__Time.Flags |= QF_TIME_MINUTE_SUPPRESS
+            self.Time.Flags |= QF_TIME_MINUTE_SUPPRESS
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, QF_TIME_SECOND_SUPPRESS)
         if Ret:
-            self.__Time.Flags |= QF_TIME_SECOND_SUPPRESS
+            self.Time.Flags |= QF_TIME_SECOND_SUPPRESS
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, QF_TIME_STORAGE_NORMAL)
         if Ret:
-            self.__Time.Flags |= QF_TIME_STORAGE_NORMAL
+            self.Time.Flags |= QF_TIME_STORAGE_NORMAL
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, QF_TIME_STORAGE_TIME)
         if Ret:
-            self.__Time.Flags |= QF_TIME_STORAGE_TIME
+            self.Time.Flags |= QF_TIME_STORAGE_TIME
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, QF_TIME_STORAGE_WAKEUP)
         if Ret:
-            self.__Time.Flags |= QF_TIME_STORAGE_WAKEUP
+            self.Time.Flags |= QF_TIME_STORAGE_WAKEUP
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
 
@@ -1846,12 +1889,14 @@ class IfrNumeric(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader,
                   IfrMinMaxStepData):
 
     def __init__(self, Type, QName=None, VarIdStr=''):
-        self.__Numeric = Refine_EFI_IFR_NUMERIC(Type)
-        IfrBaseInfo.__init__(self, self.__Numeric, QName, VarIdStr)
-        IfrOpHeader.__init__(self, self.__Numeric.Header, EFI_IFR_NUMERIC_OP, sizeof(self.__Numeric))
-        IfrQuestionHeader.__init__(self, self.__Numeric.Question)
-        IfrMinMaxStepData.__init__(self, self.__Numeric.Data, True)
-        self.__Numeric.Flags = EFI_IFR_NUMERIC_SIZE_1 | EFI_IFR_DISPLAY_UINT_DEC
+        self.Numeric = Refine_EFI_IFR_NUMERIC(Type)
+        IfrBaseInfo.__init__(self, self.Numeric, QName, VarIdStr)
+        IfrOpHeader.__init__(self, self.Numeric.Header, EFI_IFR_NUMERIC_OP, sizeof(self.Numeric))
+        IfrQuestionHeader.__init__(self, self.Numeric.Question)
+        IfrMinMaxStepData.__init__(self, self.Numeric.Data, True)
+        self.Numeric.Flags = EFI_IFR_NUMERIC_SIZE_1 | EFI_IFR_DISPLAY_UINT_DEC
+
+        self.HasStep = False
 
     def GetQuestion(self):
         return self
@@ -1867,9 +1912,9 @@ class IfrNumeric(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader,
         if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
             return ReturnCode
         if DisplaySettingsSpecified == False:
-            self.__Numeric.Flags = LFlags | EFI_IFR_DISPLAY_UINT_DEC
+            self.Numeric.Flags = LFlags | EFI_IFR_DISPLAY_UINT_DEC
         else:
-            self.__Numeric.Flags = LFlags
+            self.Numeric.Flags = LFlags
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
     def SetFlagsForBitField(self,
@@ -1880,21 +1925,16 @@ class IfrNumeric(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader,
         if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
             return ReturnCode
         if DisplaySettingsSpecified == False:
-            self.__Numeric.Flags = LFlags | EDKII_IFR_DISPLAY_UINT_DEC_BIT
+            self.Numeric.Flags = LFlags | EDKII_IFR_DISPLAY_UINT_DEC_BIT
         else:
-            self.__Numeric.Flags = LFlags
+            self.Numeric.Flags = LFlags
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
     def GetNumericFlags(self):
-        return self.__Numeric.Flags
+        return self.Numeric.Flags
 
-    def ShrinkBinSize(self, Size):
-        self.ShrinkBinSize(Size)
-        self.DecLength(Size)
-        #  _EMIT_PENDING_OBJ();
-        Numeric = EFI_IFR_NUMERIC()
-        self.UpdateHeader(Numeric.Header)
-
+    def SetHasStep(self, HasStep):
+        self.HasStep = HasStep
 
 class IfrOneOf(
         IfrQuestionHeader,
@@ -1904,13 +1944,16 @@ class IfrOneOf(
         IfrMinMaxStepData):
 
     def __init__(self, Type, QName=None, VarIdStr=''):
-        self.__OneOf = Refine_EFI_IFR_ONE_OF(Type)
-        IfrBaseInfo.__init__(self, self.__OneOf, QName, VarIdStr)
-        IfrOpHeader.__init__(self, self.__OneOf.Header, EFI_IFR_ONE_OF_OP,
-                              sizeof(self.__OneOf))
-        IfrQuestionHeader.__init__(self, self.__OneOf.Question)
-        IfrMinMaxStepData.__init__(self, self.__OneOf.Data)
-        self.__OneOf.Flags = 0
+        self.OneOf = Refine_EFI_IFR_ONE_OF(Type)
+        IfrBaseInfo.__init__(self, self.OneOf, QName, VarIdStr)
+        IfrOpHeader.__init__(self, self.OneOf.Header, EFI_IFR_ONE_OF_OP,
+                              sizeof(self.OneOf))
+        IfrQuestionHeader.__init__(self, self.OneOf.Question)
+        IfrMinMaxStepData.__init__(self, self.OneOf.Data)
+        self.OneOf.Flags = 0
+
+        self.HasMinMax = False
+        self.HasStep = False
 
     def GetQuestion(self):
         return self
@@ -1926,9 +1969,9 @@ class IfrOneOf(
         if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
             return ReturnCode
         if LFlags & EFI_IFR_DISPLAY:
-            self.__OneOf.Flags = LFlags
+            self.OneOf.Flags = LFlags
         else:
-            self.__OneOf.Flags = LFlags | EFI_IFR_DISPLAY_UINT_DEC
+            self.OneOf.Flags = LFlags | EFI_IFR_DISPLAY_UINT_DEC
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
     def SetFlagsForBitField(self, HFlags, LFlags):
@@ -1936,20 +1979,26 @@ class IfrOneOf(
         if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
             return ReturnCode
         if LFlags & EDKII_IFR_DISPLAY_BIT:
-            self.__OneOf.Flags = LFlags
+            self.OneOf.Flags = LFlags
         else:
-            self.__OneOf.Flags = LFlags | EDKII_IFR_DISPLAY_UINT_DEC_BIT
+            self.OneOf.Flags = LFlags | EDKII_IFR_DISPLAY_UINT_DEC_BIT
         return VfrReturnCode.VFR_RETURN_SUCCESS
+
+    def SetHasMinMax(self, HasMinMax):
+        self.HasMinMax = HasMinMax
+
+    def SetHasStep(self, HasStep):
+        self.HasStep = HasStep
 
 class IfrCheckBox(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
     def __init__(self, QName=None, VarIdStr=''):
-        self.__CheckBox = EFI_IFR_CHECKBOX()
-        IfrBaseInfo.__init__(self, self.__CheckBox, QName, VarIdStr)
-        IfrOpHeader.__init__(self, self.__CheckBox.Header,
+        self.CheckBox = EFI_IFR_CHECKBOX()
+        IfrBaseInfo.__init__(self, self.CheckBox, QName, VarIdStr)
+        IfrOpHeader.__init__(self, self.CheckBox.Header,
                               EFI_IFR_CHECKBOX_OP)
-        IfrQuestionHeader.__init__(self, self.__CheckBox.Question)
-        self.__CheckBox.Flags = 0
+        IfrQuestionHeader.__init__(self, self.CheckBox.Question)
+        self.CheckBox.Flags = 0
 
     def GetQuestion(self):
         return self
@@ -1958,7 +2007,7 @@ class IfrCheckBox(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
         IfrQuestionHeader.SetFlags(self, Flags)
 
     def GetFlags(self):
-        return self.__CheckBox.Flags
+        return self.CheckBox.Flags
 
     def SetFlags(self, HFlags, LFlags):
 
@@ -1968,13 +2017,13 @@ class IfrCheckBox(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags, EFI_IFR_CHECKBOX_DEFAULT)
         if Ret:
-            self.__CheckBox.Flags |= EFI_IFR_CHECKBOX_DEFAULT
+            self.CheckBox.Flags |= EFI_IFR_CHECKBOX_DEFAULT
 
         LFlags, Ret = _FLAG_TEST_AND_CLEAR(LFlags,
                                            EFI_IFR_CHECKBOX_DEFAULT_MFG)
 
         if Ret:
-            self.__CheckBox.Flags |= EFI_IFR_CHECKBOX_DEFAULT_MFG
+            self.CheckBox.Flags |= EFI_IFR_CHECKBOX_DEFAULT_MFG
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
 
@@ -1982,335 +2031,333 @@ class IfrCheckBox(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
 class IfrResetButton(IfrLine, IfrOpHeader, IfrStatementHeader):
 
     def __init__(self, DefaultStore=None):
-        self.__ResetButton = EFI_IFR_RESET_BUTTON()
-        self.__DefaultStore = DefaultStore
-        IfrOpHeader.__init__(self, self.__ResetButton.Header,
+        self.ResetButton = EFI_IFR_RESET_BUTTON()
+        IfrOpHeader.__init__(self, self.ResetButton.Header,
                               EFI_IFR_RESET_BUTTON_OP)
-        IfrStatementHeader.__init__(self, self.__ResetButton.Statement)
-        self.__ResetButton.DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD
+        IfrStatementHeader.__init__(self, self.ResetButton.Statement)
+        self.ResetButton.DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD
+
+        self.DefaultStore = DefaultStore
 
     def SetDefaultId(self, DefaultId):
-        self.__ResetButton.DefaultId = DefaultId
+        self.ResetButton.DefaultId = DefaultId
 
     def SetDefaultStore(self, DefaultStore):
-        self.__DefaultStore = DefaultStore
-
-    def GetDefaultStore(self):
-        return self.__DefaultStore
+        self.DefaultStore = DefaultStore
 
     def GetInfo(self):
-        return self.__ResetButton
+        return self.ResetButton
 
 
 class IfrOr(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Or = EFI_IFR_OR()
-        IfrOpHeader.__init__(self, self.__Or.Header, EFI_IFR_OR_OP)
+        self.Or = EFI_IFR_OR()
+        IfrOpHeader.__init__(self, self.Or.Header, EFI_IFR_OR_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Or
+        return self.Or
 
 
 class IfrAnd(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__And = EFI_IFR_AND()
-        IfrOpHeader.__init__(self, self.__And.Header, EFI_IFR_AND_OP)
+        self.And = EFI_IFR_AND()
+        IfrOpHeader.__init__(self, self.And.Header, EFI_IFR_AND_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__And
+        return self.And
 
 
 class IfrBitWiseOr(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__BitWiseOr = EFI_IFR_BITWISE_OR()
-        IfrOpHeader.__init__(self, self.__BitWiseOr.Header,
+        self.BitWiseOr = EFI_IFR_BITWISE_OR()
+        IfrOpHeader.__init__(self, self.BitWiseOr.Header,
                               EFI_IFR_BITWISE_OR_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__BitWiseOr
+        return self.BitWiseOr
 
 
 class IfrCatenate(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Catenate = EFI_IFR_CATENATE()
-        IfrOpHeader.__init__(self, self.__Catenate.Header,
+        self.Catenate = EFI_IFR_CATENATE()
+        IfrOpHeader.__init__(self, self.Catenate.Header,
                               EFI_IFR_CATENATE_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Catenate
+        return self.Catenate
 
 
 class IfrDivide(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Divide = EFI_IFR_DIVIDE()
-        IfrOpHeader.__init__(self, self.__Divide.Header, EFI_IFR_DIVIDE_OP)
+        self.Divide = EFI_IFR_DIVIDE()
+        IfrOpHeader.__init__(self, self.Divide.Header, EFI_IFR_DIVIDE_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Divide
+        return self.Divide
 
 
 class IfrEqual(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Equal = EFI_IFR_EQUAL()
-        IfrOpHeader.__init__(self, self.__Equal.Header, EFI_IFR_EQUAL_OP)
+        self.Equal = EFI_IFR_EQUAL()
+        IfrOpHeader.__init__(self, self.Equal.Header, EFI_IFR_EQUAL_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Equal
+        return self.Equal
 
 
 class IfrGreaterEqual(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__GreaterEqual = EFI_IFR_GREATER_EQUAL()
-        IfrOpHeader.__init__(self, self.__GreaterEqual.Header,
+        self.GreaterEqual = EFI_IFR_GREATER_EQUAL()
+        IfrOpHeader.__init__(self, self.GreaterEqual.Header,
                               EFI_IFR_GREATER_EQUAL_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__GreaterEqual
+        return self.GreaterEqual
 
 
 class IfrGreaterThan(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__GreaterThan = EFI_IFR_GREATER_THAN()
-        IfrOpHeader.__init__(self, self.__GreaterThan.Header,
+        self.GreaterThan = EFI_IFR_GREATER_THAN()
+        IfrOpHeader.__init__(self, self.GreaterThan.Header,
                               EFI_IFR_GREATER_THAN_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__GreaterThan
+        return self.GreaterThan
 
 
 class IfrLessEqual(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__LessEqual = EFI_IFR_LESS_EQUAL()
-        IfrOpHeader.__init__(self, self.__LessEqual.Header,
+        self.LessEqual = EFI_IFR_LESS_EQUAL()
+        IfrOpHeader.__init__(self, self.LessEqual.Header,
                               EFI_IFR_LESS_EQUAL_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__LessEqual
+        return self.LessEqual
 
 
 class IfrLessThan(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__LessThan = EFI_IFR_LESS_THAN()
-        IfrOpHeader.__init__(self, self.__LessThan.Header,
+        self.LessThan = EFI_IFR_LESS_THAN()
+        IfrOpHeader.__init__(self, self.LessThan.Header,
                               EFI_IFR_LESS_THAN_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__LessThan
+        return self.LessThan
 
 
 class IfrMap(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Map = EFI_IFR_MAP()
-        IfrOpHeader.__init__(self, self.__Map.Header, EFI_IFR_MAP_OP)
+        self.Map = EFI_IFR_MAP()
+        IfrOpHeader.__init__(self, self.Map.Header, EFI_IFR_MAP_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Map
+        return self.Map
 
 
 class IfrMatch(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Match = EFI_IFR_MATCH()
-        IfrOpHeader.__init__(self, self.__Match.Header, EFI_IFR_MATCH_OP)
+        self.Match = EFI_IFR_MATCH()
+        IfrOpHeader.__init__(self, self.Match.Header, EFI_IFR_MATCH_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Match
+        return self.Match
 
 
 class IfrMatch2(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo, Guid):
-        self.__Match2 = EFI_IFR_MATCH2()
-        IfrOpHeader.__init__(self, self.__Match2.Header, EFI_IFR_MATCH2_OP)
+        self.Match2 = EFI_IFR_MATCH2()
+        IfrOpHeader.__init__(self, self.Match2.Header, EFI_IFR_MATCH2_OP)
         self.SetLineNo(LineNo)
-        self.__Match2.SyntaxType = Guid
+        self.Match2.SyntaxType = Guid
 
     def GetInfo(self):
-        return self.__Match2
+        return self.Match2
 
 
 class IfrMultiply(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Multiply = EFI_IFR_MULTIPLY()
-        IfrOpHeader.__init__(self, self.__Multiply.Header,
+        self.Multiply = EFI_IFR_MULTIPLY()
+        IfrOpHeader.__init__(self, self.Multiply.Header,
                               EFI_IFR_MULTIPLY_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Multiply
+        return self.Multiply
 
 
 class IfrModulo(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Modulo = EFI_IFR_MODULO()
-        IfrOpHeader.__init__(self, self.__Modulo.Header, EFI_IFR_MODULO_OP)
+        self.Modulo = EFI_IFR_MODULO()
+        IfrOpHeader.__init__(self, self.Modulo.Header, EFI_IFR_MODULO_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Modulo
+        return self.Modulo
 
 
 class IfrNotEqual(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__NotEqual = EFI_IFR_NOT_EQUAL()
-        IfrOpHeader.__init__(self, self.__NotEqual.Header,
+        self.NotEqual = EFI_IFR_NOT_EQUAL()
+        IfrOpHeader.__init__(self, self.NotEqual.Header,
                               EFI_IFR_NOT_EQUAL_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__NotEqual
+        return self.NotEqual
 
 
 class IfrShiftLeft(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__ShiftLeft = EFI_IFR_SHIFT_LEFT()
-        IfrOpHeader.__init__(self, self.__ShiftLeft.Header,
+        self.ShiftLeft = EFI_IFR_SHIFT_LEFT()
+        IfrOpHeader.__init__(self, self.ShiftLeft.Header,
                               EFI_IFR_SHIFT_LEFT_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__ShiftLeft
+        return self.ShiftLeft
 
 
 class IfrShiftRight(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__ShiftRight = EFI_IFR_SHIFT_RIGHT()
-        IfrOpHeader.__init__(self, self.__ShiftRight.Header,
+        self.ShiftRight = EFI_IFR_SHIFT_RIGHT()
+        IfrOpHeader.__init__(self, self.ShiftRight.Header,
                               EFI_IFR_SHIFT_RIGHT_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__ShiftRight
+        return self.ShiftRight
 
 
 class IfrSubtract(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Subtract = EFI_IFR_SUBTRACT()
-        IfrOpHeader.__init__(self, self.__Subtract.Header,
+        self.Subtract = EFI_IFR_SUBTRACT()
+        IfrOpHeader.__init__(self, self.Subtract.Header,
                               EFI_IFR_SUBTRACT_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Subtract
+        return self.Subtract
 
 
 class IfrConditional(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Conditional = EFI_IFR_CONDITIONAL()
-        IfrOpHeader.__init__(self, self.__Conditional.Header,
+        self.Conditional = EFI_IFR_CONDITIONAL()
+        IfrOpHeader.__init__(self, self.Conditional.Header,
                               EFI_IFR_CONDITIONAL_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Conditional
+        return self.Conditional
 
 
 class IfrFind(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Find = EFI_IFR_FIND()
-        IfrOpHeader.__init__(self, self.__Find.Header, EFI_IFR_FIND_OP)
+        self.Find = EFI_IFR_FIND()
+        IfrOpHeader.__init__(self, self.Find.Header, EFI_IFR_FIND_OP)
         self.SetLineNo(LineNo)
 
     def SetFormat(self, Format):
-        self.__Find.Format = Format
+        self.Find.Format = Format
 
     def GetInfo(self):
-        return self.__Find
+        return self.Find
 
 
 class IfrMid(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Mid = EFI_IFR_MID()
-        IfrOpHeader.__init__(self, self.__Mid.Header, EFI_IFR_MID_OP)
+        self.Mid = EFI_IFR_MID()
+        IfrOpHeader.__init__(self, self.Mid.Header, EFI_IFR_MID_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Mid
+        return self.Mid
 
 
 class IfrToken(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Token = EFI_IFR_TOKEN()
-        IfrOpHeader.__init__(self, self.__Token.Header, EFI_IFR_TOKEN_OP)
+        self.Token = EFI_IFR_TOKEN()
+        IfrOpHeader.__init__(self, self.Token.Header, EFI_IFR_TOKEN_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Token
+        return self.Token
 
 
 class IfrSpan(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Span = EFI_IFR_SPAN()
-        IfrOpHeader.__init__(self, self.__Span.Header, EFI_IFR_SPAN_OP)
+        self.Span = EFI_IFR_SPAN()
+        IfrOpHeader.__init__(self, self.Span.Header, EFI_IFR_SPAN_OP)
         self.SetLineNo(LineNo)
-        self.__Span.Flags = EFI_IFR_FLAGS_FIRST_MATCHING
+        self.Span.Flags = EFI_IFR_FLAGS_FIRST_MATCHING
 
     def SetFlags(self, LFlags):
         if LFlags == EFI_IFR_FLAGS_FIRST_MATCHING:
-            self.__Span.Flags |= EFI_IFR_FLAGS_FIRST_MATCHING
+            self.Span.Flags |= EFI_IFR_FLAGS_FIRST_MATCHING
         else:
             LFlags, Ret = _FLAG_TEST_AND_CLEAR(
                 LFlags, EFI_IFR_FLAGS_FIRST_NON_MATCHING)
             if Ret:
-                self.__Span.Flags |= EFI_IFR_FLAGS_FIRST_NON_MATCHING
+                self.Span.Flags |= EFI_IFR_FLAGS_FIRST_NON_MATCHING
 
         return VfrReturnCode.VFR_RETURN_SUCCESS if LFlags == 0 else VfrReturnCode.VFR_RETURN_FLAGS_UNSUPPORTED
 
     def GetInfo(self):
-        return self.__Span
+        return self.Span
 
 
 class IfrBitWiseAnd(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__BitWiseAnd = EFI_IFR_BITWISE_AND()
-        IfrOpHeader.__init__(self, self.__BitWiseAnd.Header,
+        self.BitWiseAnd = EFI_IFR_BITWISE_AND()
+        IfrOpHeader.__init__(self, self.BitWiseAnd.Header,
                               EFI_IFR_BITWISE_AND_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__BitWiseAnd
+        return self.BitWiseAnd
 
 
 class IfrBitWiseOr(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__BitWiseOr = EFI_IFR_BITWISE_OR()
-        IfrOpHeader.__init__(self, self.__BitWiseOr.Header,
+        self.BitWiseOr = EFI_IFR_BITWISE_OR()
+        IfrOpHeader.__init__(self, self.BitWiseOr.Header,
                               EFI_IFR_BITWISE_OR_OP)
         self.SetLineNo(LineNo)
 
@@ -2318,176 +2365,176 @@ class IfrBitWiseOr(IfrLine, IfrOpHeader):
 class IfrAdd(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Add = EFI_IFR_ADD()
-        IfrOpHeader.__init__(self, self.__Add.Header, EFI_IFR_ADD_OP)
+        self.Add = EFI_IFR_ADD()
+        IfrOpHeader.__init__(self, self.Add.Header, EFI_IFR_ADD_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Add
+        return self.Add
 
 
 class IfrToString(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__ToString = EFI_IFR_TO_STRING()
-        IfrOpHeader.__init__(self, self.__ToString.Header,
+        self.ToString = EFI_IFR_TO_STRING()
+        IfrOpHeader.__init__(self, self.ToString.Header,
                               EFI_IFR_TO_STRING_OP)
         self.SetLineNo(LineNo)
 
     def SetFormat(self, Format):
-        self.__ToString.Format = Format
+        self.ToString.Format = Format
 
     def GetInfo(self):
-        return self.__ToString
+        return self.ToString
 
 
 class IfrToUpper(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__ToUppper = EFI_IFR_TO_UPPER()
-        IfrOpHeader.__init__(self, self.__ToUppper.Header,
+        self.ToUppper = EFI_IFR_TO_UPPER()
+        IfrOpHeader.__init__(self, self.ToUppper.Header,
                               EFI_IFR_TO_UPPER_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__ToUppper
+        return self.ToUppper
 
 
 class IfrToUint(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__ToUint = EFI_IFR_TO_UINT()
-        IfrOpHeader.__init__(self, self.__ToUint.Header, EFI_IFR_TO_UINT_OP)
+        self.ToUint = EFI_IFR_TO_UINT()
+        IfrOpHeader.__init__(self, self.ToUint.Header, EFI_IFR_TO_UINT_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__ToUint
+        return self.ToUint
 
 
 class IfrToLower(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__ToLower = EFI_IFR_TO_LOWER()
-        IfrOpHeader.__init__(self, self.__ToLower.Header, EFI_IFR_TO_LOWER_OP)
+        self.ToLower = EFI_IFR_TO_LOWER()
+        IfrOpHeader.__init__(self, self.ToLower.Header, EFI_IFR_TO_LOWER_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__ToLower
+        return self.ToLower
 
 
 class IfrToBoolean(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Boolean = EFI_IFR_TO_BOOLEAN()
-        IfrOpHeader.__init__(self, self.__Boolean.Header,
+        self.Boolean = EFI_IFR_TO_BOOLEAN()
+        IfrOpHeader.__init__(self, self.Boolean.Header,
                               EFI_IFR_TO_BOOLEAN_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Boolean
+        return self.Boolean
 
 
 class IfrNot(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Not = EFI_IFR_NOT()
-        IfrOpHeader.__init__(self, self.__Not.Header, EFI_IFR_NOT_OP)
+        self.Not = EFI_IFR_NOT()
+        IfrOpHeader.__init__(self, self.Not.Header, EFI_IFR_NOT_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Not
+        return self.Not
 
 
 class IfrDup(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Dup = EFI_IFR_DUP()
-        IfrOpHeader.__init__(self, self.__Dup.Header, EFI_IFR_DUP_OP)
+        self.Dup = EFI_IFR_DUP()
+        IfrOpHeader.__init__(self, self.Dup.Header, EFI_IFR_DUP_OP)
         self.SetLineNo(LineNo)
 
     def GetHeader(self):
-        return self.__Dup.Header
+        return self.Dup.Header
 
     def GetInfo(self):
-        return self.__Dup
+        return self.Dup
 
 
 class IfrEqIdId(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__EqIdId = EFI_IFR_EQ_ID_ID()
-        IfrOpHeader.__init__(self, self.__EqIdId.Header, EFI_IFR_EQ_ID_ID_OP)
+        self.EqIdId = EFI_IFR_EQ_ID_ID()
+        IfrOpHeader.__init__(self, self.EqIdId.Header, EFI_IFR_EQ_ID_ID_OP)
         self.SetLineNo(LineNo)
-        self.__EqIdId.QuestionId1 = EFI_QUESTION_ID_INVALID
-        self.__EqIdId.QuestionId2 = EFI_QUESTION_ID_INVALID
+        self.EqIdId.QuestionId1 = EFI_QUESTION_ID_INVALID
+        self.EqIdId.QuestionId2 = EFI_QUESTION_ID_INVALID
 
     def GetHeader(self):
-        return self.__EqIdId.Header
+        return self.EqIdId.Header
 
     def SetQuestionId1(self, QuestionId, VarIdStr, LineNo):
         if QuestionId != EFI_QUESTION_ID_INVALID:
-            self.__EqIdId.QuestionId1 = QuestionId
+            self.EqIdId.QuestionId1 = QuestionId
         else:
-            gFormPkg.AssignPending(VarIdStr, self.__EqIdId, LineNo, "no question refered", 1)
+            gFormPkg.AssignPending(VarIdStr, self.EqIdId, LineNo, "no question refered", 1)
 
     def SetQuestionId2(self, QuestionId, VarIdStr, LineNo):
         if QuestionId != EFI_QUESTION_ID_INVALID:
-            self.__EqIdId.QuestionId2 = QuestionId
+            self.EqIdId.QuestionId2 = QuestionId
         else:
-            gFormPkg.AssignPending(VarIdStr, self.__EqIdId, LineNo, "no question refered", 2)
+            gFormPkg.AssignPending(VarIdStr, self.EqIdId, LineNo, "no question refered", 2)
 
     def GetInfo(self):
-        return self.__EqIdId
+        return self.EqIdId
 
 
 class IfrEqIdVal(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__EqIdVal = EFI_IFR_EQ_ID_VAL()
-        IfrOpHeader.__init__(self, self.__EqIdVal.Header,
+        self.EqIdVal = EFI_IFR_EQ_ID_VAL()
+        IfrOpHeader.__init__(self, self.EqIdVal.Header,
                               EFI_IFR_EQ_ID_VAL_OP)
         self.SetLineNo(LineNo)
-        self.__EqIdVal.QuestionId = EFI_QUESTION_ID_INVALID
+        self.EqIdVal.QuestionId = EFI_QUESTION_ID_INVALID
 
     def SetQuestionId(self, QuestionId, VarIdStr, LineNo):
         if QuestionId != EFI_QUESTION_ID_INVALID:
-            self.__EqIdVal.QuestionId = QuestionId
+            self.EqIdVal.QuestionId = QuestionId
         else:
-            gFormPkg.AssignPending(VarIdStr, self.__EqIdVal, LineNo, "no question refered")
+            gFormPkg.AssignPending(VarIdStr, self.EqIdVal, LineNo, "no question refered")
 
     def SetValue(self, Value):
-        self.__EqIdVal.Value = Value
+        self.EqIdVal.Value = Value
 
     def GetHeader(self):
-        return self.__EqIdVal.Header
+        return self.EqIdVal.Header
 
     def GetInfo(self):
-        return self.__EqIdVal
+        return self.EqIdVal
 
 
 class IfrEqIdList(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo, Nums, ValueList=[]):
-        self.__EqIdVList = Refine_EFI_IFR_EQ_ID_VAL_LIST(Nums)
-        IfrOpHeader.__init__(self, self.__EqIdVList.Header, EFI_IFR_EQ_ID_VAL_LIST_OP, sizeof(self.__EqIdVList))
+        self.EqIdVList = Refine_EFI_IFR_EQ_ID_VAL_LIST(Nums)
+        IfrOpHeader.__init__(self, self.EqIdVList.Header, EFI_IFR_EQ_ID_VAL_LIST_OP, sizeof(self.EqIdVList))
         self.SetLineNo(LineNo)
-        self.__EqIdVList.QuestionId = EFI_QUESTION_ID_INVALID
-        self.__EqIdVList.ListLength = 0
+        self.EqIdVList.QuestionId = EFI_QUESTION_ID_INVALID
+        self.EqIdVList.ListLength = 0
         if ValueList != []:
             ArrayType = c_uint16 * Nums
             ValueArray = ArrayType()
             for i in range(0, len(ValueList)):
                 ValueArray[i] = ValueList[i]
-            self.__EqIdVList.ValueList = ValueArray
+            self.EqIdVList.ValueList = ValueArray
 
     def SetQuestionId(self, QuestionId, VarIdStr, LineNo):
         if QuestionId != EFI_QUESTION_ID_INVALID:
-            self.__EqIdVList.QuestionId = QuestionId
+            self.EqIdVList.QuestionId = QuestionId
         else:
-            gFormPkg.AssignPending(VarIdStr, self.__EqIdVList, LineNo, "no question refered")
+            gFormPkg.AssignPending(VarIdStr, self.EqIdVList, LineNo, "no question refered")
 
     def SetListLength(self, ListLength):
-        self.__EqIdVList.ListLength = ListLength
+        self.EqIdVList.ListLength = ListLength
 
     def SetValueList(self, ValueList):
         if ValueList != []:
@@ -2495,424 +2542,424 @@ class IfrEqIdList(IfrLine, IfrOpHeader):
             ValueArray = ArrayType()
             for i in range(0, len(ValueList)):
                 ValueArray[i] = ValueList[i]
-            self.__EqIdVList.ValueList = ValueArray
+            self.EqIdVList.ValueList = ValueArray
 
     def GetHeader(self):
-        return self.__EqIdVList.Header
+        return self.EqIdVList.Header
 
     def GetInfo(self):
-        return self.__EqIdVList
+        return self.EqIdVList
 
 
 class IfrUint8(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Uint8 = EFI_IFR_UINT8()
-        IfrOpHeader.__init__(self, self.__Uint8.Header, EFI_IFR_UINT8_OP)
+        self.Uint8 = EFI_IFR_UINT8()
+        IfrOpHeader.__init__(self, self.Uint8.Header, EFI_IFR_UINT8_OP)
         self.SetLineNo(LineNo)
 
     def SetValue(self, Value):
-        self.__Uint8.Value = Value
+        self.Uint8.Value = Value
 
     def GetHeader(self):
-        return self.__Uint8.Header
+        return self.Uint8.Header
 
     def GetInfo(self):
-        return self.__Uint8
+        return self.Uint8
 
 
 class IfrUint16(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Uint16 = EFI_IFR_UINT16()
-        IfrOpHeader.__init__(self, self.__Uint16.Header, EFI_IFR_UINT16_OP)
+        self.Uint16 = EFI_IFR_UINT16()
+        IfrOpHeader.__init__(self, self.Uint16.Header, EFI_IFR_UINT16_OP)
         self.SetLineNo(LineNo)
 
     def SetValue(self, Value):
-        self.__Uint16.Value = Value
+        self.Uint16.Value = Value
 
     def GetHeader(self):
-        return self.__Uint16.Header
+        return self.Uint16.Header
 
     def GetInfo(self):
-        return self.__Uint16
+        return self.Uint16
 
 
 class IfrUint32(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Uint32 = EFI_IFR_UINT32()
-        IfrOpHeader.__init__(self, self.__Uint32.Header, EFI_IFR_UINT32_OP)
+        self.Uint32 = EFI_IFR_UINT32()
+        IfrOpHeader.__init__(self, self.Uint32.Header, EFI_IFR_UINT32_OP)
         self.SetLineNo(LineNo)
 
     def SetValue(self, Value):
-        self.__Uint32.Value = Value
+        self.Uint32.Value = Value
 
     def GetHeader(self):
-        return self.__Uint32.Header
+        return self.Uint32.Header
 
     def GetInfo(self):
-        return self.__Uint32
+        return self.Uint32
 
 
 class IfrUint64(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Uint64 = EFI_IFR_UINT64()
-        IfrOpHeader.__init__(self, self.__Uint64.Header, EFI_IFR_UINT64_OP, sizeof(EFI_IFR_UINT64))
+        self.Uint64 = EFI_IFR_UINT64()
+        IfrOpHeader.__init__(self, self.Uint64.Header, EFI_IFR_UINT64_OP, sizeof(EFI_IFR_UINT64))
         self.SetLineNo(LineNo)
 
     def SetValue(self, Value):
-        self.__Uint64.Value = Value
+        self.Uint64.Value = Value
 
     def GetHeader(self):
-        return self.__Uint64.Header
+        return self.Uint64.Header
 
     def GetInfo(self):
-        return self.__Uint64
+        return self.Uint64
 
 
 class IfrQuestionRef1(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__QuestionRef1 = EFI_IFR_QUESTION_REF1()
-        IfrOpHeader.__init__(self, self.__QuestionRef1.Header,
+        self.QuestionRef1 = EFI_IFR_QUESTION_REF1()
+        IfrOpHeader.__init__(self, self.QuestionRef1.Header,
                               EFI_IFR_QUESTION_REF1_OP)
         self.SetLineNo(LineNo)
-        self.__QuestionRef1.QuestionId = EFI_QUESTION_ID_INVALID
+        self.QuestionRef1.QuestionId = EFI_QUESTION_ID_INVALID
 
     def GetHeader(self):
-        return self.__QuestionRef1.Header
+        return self.QuestionRef1.Header
 
     def SetQuestionId(self, QuestionId, VarIdStr, LineNo):
         if QuestionId != EFI_QUESTION_ID_INVALID:
-            self.__QuestionRef1.QuestionId = QuestionId
+            self.QuestionRef1.QuestionId = QuestionId
         else:
-            gFormPkg.AssignPending(VarIdStr, self.__QuestionRef1, LineNo, "no question refered")
+            gFormPkg.AssignPending(VarIdStr, self.QuestionRef1, LineNo, "no question refered")
 
     def GetInfo(self):
-        return self.__QuestionRef1
+        return self.QuestionRef1
 
 
 class IfrQuestionRef2(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__QuestionRef2 = EFI_IFR_QUESTION_REF2()
-        IfrOpHeader.__init__(self, self.__QuestionRef2.Header,
+        self.QuestionRef2 = EFI_IFR_QUESTION_REF2()
+        IfrOpHeader.__init__(self, self.QuestionRef2.Header,
                               EFI_IFR_QUESTION_REF2_OP)
         self.SetLineNo(LineNo)
 
     def GetHeader(self):
-        return self.__QuestionRef2.Header
+        return self.QuestionRef2.Header
 
     def GetInfo(self):
-        return self.__QuestionRef2
+        return self.QuestionRef2
 
 
 class IfrQuestionRef3(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__QuestionRef3 = EFI_IFR_QUESTION_REF3()
-        IfrOpHeader.__init__(self, self.__QuestionRef3.Header,
+        self.QuestionRef3 = EFI_IFR_QUESTION_REF3()
+        IfrOpHeader.__init__(self, self.QuestionRef3.Header,
                               EFI_IFR_QUESTION_REF3_OP, sizeof(EFI_IFR_QUESTION_REF3))
         self.SetLineNo(LineNo)
 
     def GetHeader(self):
-        return self.__QuestionRef3.Header
+        return self.QuestionRef3.Header
 
     def GetInfo(self):
-        return self.__QuestionRef3
+        return self.QuestionRef3
 
 
 class IfrQuestionRef3_2(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__QuestionRef3_2 = EFI_IFR_QUESTION_REF3_2()
-        IfrOpHeader.__init__(self, self.__QuestionRef3_2.Header,
+        self.QuestionRef3_2 = EFI_IFR_QUESTION_REF3_2()
+        IfrOpHeader.__init__(self, self.QuestionRef3_2.Header,
                               EFI_IFR_QUESTION_REF3_OP, sizeof(EFI_IFR_QUESTION_REF3_2))
         self.SetLineNo(LineNo)
-        self.__QuestionRef3_2.DevicePath = EFI_STRING_ID_INVALID
+        self.QuestionRef3_2.DevicePath = EFI_STRING_ID_INVALID
 
     def SetDevicePath(self, DevicePath):
-        self.__QuestionRef3_2.DevicePath = DevicePath
+        self.QuestionRef3_2.DevicePath = DevicePath
 
     def GetHeader(self):
-        return self.__QuestionRef3_2.Header
+        return self.QuestionRef3_2.Header
 
     def GetInfo(self):
-        return self.__QuestionRef3_2
+        return self.QuestionRef3_2
 
 
 class IfrQuestionRef3_3(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__QuestionRef3_3 = EFI_IFR_QUESTION_REF3_3()
-        IfrOpHeader.__init__(self, self.__QuestionRef3_3.Header,
+        self.QuestionRef3_3 = EFI_IFR_QUESTION_REF3_3()
+        IfrOpHeader.__init__(self, self.QuestionRef3_3.Header,
                               EFI_IFR_QUESTION_REF3_OP, sizeof(EFI_IFR_QUESTION_REF3_3))
         self.SetLineNo(LineNo)
-        self.__QuestionRef3_3.DevicePath = EFI_STRING_ID_INVALID
-        self.__QuestionRef3_3.Guid = EFI_GUID(
+        self.QuestionRef3_3.DevicePath = EFI_STRING_ID_INVALID
+        self.QuestionRef3_3.Guid = EFI_GUID(
             0, 0, 0, GuidArray(0, 0, 0, 0, 0, 0, 0, 0))
 
     def SetDevicePath(self, DevicePath):
-        self.__QuestionRef3_3.DevicePath = DevicePath
+        self.QuestionRef3_3.DevicePath = DevicePath
 
     def SetGuid(self, Guid):
-        self.__QuestionRef3_3.Guid = Guid
+        self.QuestionRef3_3.Guid = Guid
 
     def GetHeader(self):
-        return self.__QuestionRef3_3.Header
+        return self.QuestionRef3_3.Header
 
     def GetInfo(self):
-        return self.__QuestionRef3_3
+        return self.QuestionRef3_3
 
 
 class IfrRuleRef(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__RuleRef = EFI_IFR_RULE_REF()
-        IfrOpHeader.__init__(self, self.__RuleRef.Header, EFI_IFR_RULE_REF_OP)
+        self.RuleRef = EFI_IFR_RULE_REF()
+        IfrOpHeader.__init__(self, self.RuleRef.Header, EFI_IFR_RULE_REF_OP)
         self.SetLineNo(LineNo)
-        self.__RuleRef.RuleId = EFI_RULE_ID_INVALID
+        self.RuleRef.RuleId = EFI_RULE_ID_INVALID
 
     def SetRuleId(self, RuleId):
-        self.__RuleRef.RuleId = RuleId
+        self.RuleRef.RuleId = RuleId
 
     def GetHeader(self):
-        return self.__RuleRef.Header
+        return self.RuleRef.Header
 
     def GetInfo(self):
-        return self.__RuleRef
+        return self.RuleRef
 
 
 class IfrStringRef1(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__StringRef1 = EFI_IFR_STRING_REF1()
-        IfrOpHeader.__init__(self, self.__StringRef1.Header,
+        self.StringRef1 = EFI_IFR_STRING_REF1()
+        IfrOpHeader.__init__(self, self.StringRef1.Header,
                               EFI_IFR_STRING_REF1_OP)
         self.SetLineNo(LineNo)
-        self.__StringRef1.StringId = EFI_STRING_ID_INVALID
+        self.StringRef1.StringId = EFI_STRING_ID_INVALID
 
     def SetStringId(self, StringId):
-        self.__StringRef1.StringId = StringId
+        self.StringRef1.StringId = StringId
 
     def GetHeader(self):
-        return self.__StringRef1.Header
+        return self.StringRef1.Header
 
     def GetInfo(self):
-        return self.__StringRef1
+        return self.StringRef1
 
 
 class IfrStringRef2(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__StringRef2 = EFI_IFR_STRING_REF2()
-        IfrOpHeader.__init__(self, self.__StringRef2.Header,
+        self.StringRef2 = EFI_IFR_STRING_REF2()
+        IfrOpHeader.__init__(self, self.StringRef2.Header,
                               EFI_IFR_STRING_REF2_OP)
         self.SetLineNo(LineNo)
 
     def GetHeader(self):
-        return self.__StringRef2.Header
+        return self.StringRef2.Header
 
     def GetInfo(self):
-        return self.__StringRef2
+        return self.StringRef2
 
 
 class IfrThis(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__This = EFI_IFR_THIS()
-        IfrOpHeader.__init__(self, self.__This.Header, EFI_IFR_THIS_OP)
+        self.This = EFI_IFR_THIS()
+        IfrOpHeader.__init__(self, self.This.Header, EFI_IFR_THIS_OP)
         self.SetLineNo(LineNo)
 
     def GetHeader(self):
-        return self.__This.Header
+        return self.This.Header
 
     def GetInfo(self):
-        return self.__This
+        return self.This
 
 
 class IfrSecurity(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Security = EFI_IFR_SECURITY()
-        IfrOpHeader.__init__(self, self.__Security.Header,
+        self.Security = EFI_IFR_SECURITY()
+        IfrOpHeader.__init__(self, self.Security.Header,
                               EFI_IFR_SECURITY_OP)
         self.SetLineNo(LineNo)
-        self.__Security.Permissions = EFI_GUID(
+        self.Security.Permissions = EFI_GUID(
             0, 0, 0, GuidArray(0, 0, 0, 0, 0, 0, 0, 0))
 
     def SetPermissions(self, Permissions):
-        self.__Security.Permissions = Permissions
+        self.Security.Permissions = Permissions
 
     def GetHeader(self):
-        return self.__Security.Header
+        return self.Security.Header
 
     def GetInfo(self):
-        return self.__Security
+        return self.Security
 
 
 class IfrGet(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Get = EFI_IFR_GET()
-        IfrOpHeader.__init__(self, self.__Get.Header, EFI_IFR_GET_OP)
+        self.Get = EFI_IFR_GET()
+        IfrOpHeader.__init__(self, self.Get.Header, EFI_IFR_GET_OP)
         self.SetLineNo(LineNo)
 
     def SetVarInfo(self, BaseInfo: EFI_VARSTORE_INFO):
-        self.__Get.VarStoreId = BaseInfo.VarStoreId
-        self.__Get.VarStoreInfo.VarName = BaseInfo.Info.VarName
-        self.__Get.VarStoreInfo.VarOffset = BaseInfo.Info.VarOffset
-        self.__Get.VarStoreType = BaseInfo.VarType
+        self.Get.VarStoreId = BaseInfo.VarStoreId
+        self.Get.VarStoreInfo.VarName = BaseInfo.Info.VarName
+        self.Get.VarStoreInfo.VarOffset = BaseInfo.Info.VarOffset
+        self.Get.VarStoreType = BaseInfo.VarType
 
     def GetHeader(self):
-        return self.__Get.Header
+        return self.Get.Header
 
     def GetInfo(self):
-        return self.__Get
+        return self.Get
 
 
 class IfrSet(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Set = EFI_IFR_SET()
-        IfrOpHeader.__init__(self, self.__Set.Header, EFI_IFR_SET_OP)
+        self.Set = EFI_IFR_SET()
+        IfrOpHeader.__init__(self, self.Set.Header, EFI_IFR_SET_OP)
         self.SetLineNo(LineNo)
 
     def SetVarInfo(self, BaseInfo: EFI_VARSTORE_INFO):
-        self.__Set.VarStoreId = BaseInfo.VarStoreId
-        self.__Set.VarStoreInfo.VarName = BaseInfo.Info.VarName
-        self.__Set.VarStoreInfo.VarOffset = BaseInfo.Info.VarOffset
-        self.__Set.VarStoreType = BaseInfo.VarType
+        self.Set.VarStoreId = BaseInfo.VarStoreId
+        self.Set.VarStoreInfo.VarName = BaseInfo.Info.VarName
+        self.Set.VarStoreInfo.VarOffset = BaseInfo.Info.VarOffset
+        self.Set.VarStoreType = BaseInfo.VarType
 
     def GetHeader(self):
-        return self.__Set.Header
+        return self.Set.Header
 
     def GetInfo(self):
-        return self.__Set
+        return self.Set
 
 
 class IfrTrue(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__True = EFI_IFR_TRUE()
-        IfrOpHeader.__init__(self, self.__True.Header, EFI_IFR_TRUE_OP)
+        self.TrueOp = EFI_IFR_TRUE()
+        IfrOpHeader.__init__(self, self.TrueOp.Header, EFI_IFR_TRUE_OP)
         self.SetLineNo(LineNo)
 
     def GetHeader(self):
-        return self.__True.Header
+        return self.TrueOp.Header
 
     def GetInfo(self):
-        return self.__True
+        return self.TrueOp
 
 
 class IfrFalse(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__False = EFI_IFR_TRUE()
-        IfrOpHeader.__init__(self, self.__False.Header, EFI_IFR_FALSE_OP)
+        self.FalseOp = EFI_IFR_TRUE()
+        IfrOpHeader.__init__(self, self.FalseOp.Header, EFI_IFR_FALSE_OP)
         self.SetLineNo(LineNo)
 
     def GetHeader(self):
-        return self.__False.Header
+        return self.FalseOp.Header
 
     def GetInfo(self):
-        return self.__False
+        return self.FalseOp
 
 
 class IfrOne(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__One = EFI_IFR_ONE()
-        IfrOpHeader.__init__(self, self.__One.Header, EFI_IFR_ONE_OP)
+        self.One = EFI_IFR_ONE()
+        IfrOpHeader.__init__(self, self.One.Header, EFI_IFR_ONE_OP)
         self.SetLineNo(LineNo)
 
     def GetHeader(self):
-        return self.__One.Header
+        return self.One.Header
 
     def GetInfo(self):
-        return self.__One
+        return self.One
 
 
 class IfrOnes(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Ones = EFI_IFR_ONE()
-        IfrOpHeader.__init__(self, self.__Ones.Header, EFI_IFR_ONES_OP)
+        self.Ones = EFI_IFR_ONE()
+        IfrOpHeader.__init__(self, self.Ones.Header, EFI_IFR_ONES_OP)
         self.SetLineNo(LineNo)
 
     def GetHeader(self):
-        return self.__Ones.Header
+        return self.Ones.Header
 
     def GetInfo(self):
-        return self.__Ones
+        return self.Ones
 
 
 class IfrZero(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Zero = EFI_IFR_ZERO()
-        IfrOpHeader.__init__(self, self.__Zero.Header, EFI_IFR_ZERO_OP)
+        self.Zero = EFI_IFR_ZERO()
+        IfrOpHeader.__init__(self, self.Zero.Header, EFI_IFR_ZERO_OP)
         self.SetLineNo(LineNo)
 
     def GetHeader(self):
-        return self.__Zero.Header
+        return self.Zero.Header
 
     def GetInfo(self):
-        return self.__Zero
+        return self.Zero
 
 
 class IfrUndefined(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Undefined = EFI_IFR_ZERO()
-        IfrOpHeader.__init__(self, self.__Undefined.Header,
+        self.Undefined = EFI_IFR_ZERO()
+        IfrOpHeader.__init__(self, self.Undefined.Header,
                               EFI_IFR_UNDEFINED_OP)
         self.SetLineNo(LineNo)
 
     def GetHeader(self):
-        return self.__Undefined.Header
+        return self.Undefined.Header
 
     def GetInfo(self):
-        return self.__Undefined
+        return self.Undefined
 
 
 class IfrVersion(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Version = EFI_IFR_VERSION()
-        IfrOpHeader.__init__(self, self.__Version.Header, EFI_IFR_VERSION_OP)
+        self.Version = EFI_IFR_VERSION()
+        IfrOpHeader.__init__(self, self.Version.Header, EFI_IFR_VERSION_OP)
         self.SetLineNo(LineNo)
 
     def GetHeader(self):
-        return self.__Version.Header
+        return self.Version.Header
 
     def GetInfo(self):
-        return self.__Version
+        return self.Version
 
 
 class IfrLength(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__Length = EFI_IFR_LENGTH()
-        IfrOpHeader.__init__(self, self.__Length.Header, EFI_IFR_LENGTH_OP)
+        self.Length = EFI_IFR_LENGTH()
+        IfrOpHeader.__init__(self, self.Length.Header, EFI_IFR_LENGTH_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__Length
+        return self.Length
 
 
 class IfrBitWiseNot(IfrLine, IfrOpHeader):
 
     def __init__(self, LineNo):
-        self.__BitWiseNot = EFI_IFR_BITWISE_NOT()
-        IfrOpHeader.__init__(self, self.__BitWiseNot.Header,
+        self.BitWiseNot = EFI_IFR_BITWISE_NOT()
+        IfrOpHeader.__init__(self, self.BitWiseNot.Header,
                               EFI_IFR_BITWISE_NOT_OP)
         self.SetLineNo(LineNo)
 
     def GetInfo(self):
-        return self.__BitWiseNot
+        return self.BitWiseNot
 
 
 class ExpressionInfo():

@@ -13,30 +13,28 @@ formset:
       type:  MyManufactureDefault
       prompt:  0x005d # DefaultName STRING_ID
       attribute:  0x0001 # Default ID
+  - varstore:
+      type:  DRIVER_SAMPLE_CONFIGURATION
+      varid:  0x1234 # Optional Input, Need to assign if None
+      name:  MyIfrNVData
+      guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
   - efivarstore:
       type:  MY_EFI_VARSTORE_DATA
-      varid:  0x0001 # Optional Input, Need to assign if None
       name:  MyEfiVar
       guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
-      attribute:  0x00000003 # Need to Compute, the Input should be 0x00000001 | 0x00000002 
-      size:  8 # Need to Compute
+      attribute:  0x00000002 | 0x00000001 
   - efivarstore:
       type:  MY_EFI_BITS_VARSTORE_DATA
-      varid:  0x0002 # Optional Input, Need to assign if None
       name:  MyEfiBitVar
       guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
-      attribute:  0x00000003 # Need to Compute, the Input should be 0x00000001 | 0x00000002 
-      size:  8 # Need to Compute
+      attribute:  0x00000002 | 0x00000001 
   - efivarstore:
       type:  MY_EFI_UNION_DATA
-      varid:  0x0003 # Optional Input, Need to assign if None
       name:  MyEfiUnionVar
       guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
-      attribute:  0x00000003 # Need to Compute, the Input should be 0x00000001 | 0x00000002 
-      size:  1 # Need to Compute
+      attribute:  0x00000002 | 0x00000001 
   - namevaluevarstore:
       type:  MyNameValueVar
-      varid:  0x0004 # Optional Input, Need to assign if None
       name:  0x0092 # NameList STRING_ID
       name:  0x0093 # NameList STRING_ID
       name:  0x0094 # NameList STRING_ID
@@ -47,10 +45,8 @@ formset:
       component:  
       - subtitle:
           prompt:  0x001a  # Statement Prompt STRING_ID
-          flags:  0x0000  # Optional Input
       - subtitle:
           prompt:  0x001b  # Statement Prompt STRING_ID
-          flags:  0x0000  # Optional Input
       - text:
           help:  0x0050  # Statement Help STRING_ID
           prompt:  0x001c  # Statement Prompt STRING_ID
@@ -58,34 +54,28 @@ formset:
       - text:
           help:  0x0054  # Question Help STRING_ID
           prompt:  0x0054  # Question Prompt STRING_ID
-          questionflags:  0x0004  # Optional Input, Question Flags
+          flags:  INTERACTIVE  # Optional Input, Question Flags
           key:  0x1237  # Optional Input, Question QuestionId
       - text:
           help:  0x0055  # Question Help STRING_ID
           prompt:  0x0055  # Question Prompt STRING_ID
-          questionflags:  0x0004  # Optional Input, Question Flags
+          flags:  INTERACTIVE  # Optional Input, Question Flags
           key:  0x1238  # Optional Input, Question QuestionId
       - text:
           help:  0x0057  # Question Help STRING_ID
           prompt:  0x0057  # Question Prompt STRING_ID
-          questionflags:  0x0004  # Optional Input, Question Flags
+          flags:  INTERACTIVE  # Optional Input, Question Flags
           key:  0x1243  # Optional Input, Question QuestionId
       - text:
           help:  0x0058  # Question Help STRING_ID
           prompt:  0x0058  # Question Prompt STRING_ID
-          questionflags:  0x0004  # Optional Input, Question Flags
+          flags:  INTERACTIVE  # Optional Input, Question Flags
           key:  0x1244  # Optional Input, Question QuestionId
       - oneof:
           name:  MyOneOf  #  Optional Input
           varid:  MyIfrNVData.SuppressGrayOutSomething  #  Optional Input
-          questionid:  1  # Optional Input, Need to compute if None
           prompt:  0x001f  # Statement Prompt STRING_ID
           help:  0x0026  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x10  # optional input
-          maximum:  2 # Optional Input
-          minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - option:  
               text:  0x002a # Option STRING_ID
@@ -98,23 +88,14 @@ formset:
           - option:  
               text:  0x002c # Option STRING_ID
               value:  0x2
-              flags:  16 # Optional Input
+              flags:  DEFAULT # Optional Input
       - oneof:
           varid:  MyIfrNVData.BootOrderLarge  #  Optional Input
-          questionid:  2  # Optional Input, Need to compute if None
           prompt:  0x001f  # Statement Prompt STRING_ID
           help:  0x0026  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x10  # optional input
-          maximum:  4 # Optional Input
-          minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  8
-              value: 'None'
-              component:  
+              value: 'cond (pushthis == 0 ? 0 : cond ((questionref(MyOneOf) >> 0x4 & 0xF00) == 0x0 + 0x2 ? 0 : 1))'
           - option:  
               text:  0x002d # Option STRING_ID
               value:  0x0
@@ -126,328 +107,256 @@ formset:
       - checkbox:
           condition:  'grayoutif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1 | suppressif questionref(MyOneOf) == 0x0'
           varid:  MyIfrNVData.ChooseToActivateNuclearWeaponry  #  Optional Input
-          questionid/key:  3  # Optional Input, Need to compute if None
           prompt:  0x002f  # Statement Prompt STRING_ID
           help:  0x0030  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x3  # optional input
+          flags:  CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG  # Optional input , flags
           component:  
           - default:
-              defaultId:  0
-              type:  0
-              value:  1
+              value:  TRUE
       - label:
           condition:  'suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0'
           number:  0x2222  # Number
       - orderedlist:
           condition:  'suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0'
           varid:  MyIfrNVData.BootOrder  #  Optional Input
-          questionid:  4  # Optional Input, Need to compute if None
           prompt:  0x008d  # Statement Prompt STRING_ID
           help:  0x005a  # Statement Help STRING_ID
+          flags:  RESET_REQUIRED  # Optional input , flags
           maxcontainers:  8 ## Optional Input, Need to compute if None
-          flags:  16 # Optional Input 
           component:  
           - option:  
               text:  0x008f # Option STRING_ID
-              value:  0x2
-              flags:  1 # Optional Input
+              value:  2
+              flags:  0 # Optional Input
           - option:  
               text:  0x008e # Option STRING_ID
-              value:  0x1
-              flags:  1 # Optional Input
+              value:  1
+              flags:  0 # Optional Input
           - option:  
               text:  0x0090 # Option STRING_ID
-              value:  0x3
-              flags:  1 # Optional Input
+              value:  3
+              flags:  0 # Optional Input
           - option:  
               condition:  'suppressif ideqval MyIfrNVData.BootOrderLarge == 0'
               text:  0x0091 # Option STRING_ID
-              value:  0x4
-              flags:  1 # Optional Input
+              value:  4
+              flags:  0 # Optional Input
       - label:
           condition:  'suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0'
           number:  0x2223  # Number
       - orderedlist:
           condition:  'disableif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x2'
           varid:  MyIfrNVData.OrderedList  #  Optional Input
-          questionid:  5  # Optional Input, Need to compute if None
           prompt:  0x0052  # Statement Prompt STRING_ID
           help:  0x0050  # Statement Help STRING_ID
+          flags:  RESET_REQUIRED  # Optional input , flags
           maxcontainers:  8 ## Optional Input, Need to compute if None
-          flags:  16 # Optional Input 
           component:  
           - option:  
               text:  0x0027 # Option STRING_ID
-              value:  0x3
+              value:  3
               flags:  0 # Optional Input
           - option:  
               text:  0x0028 # Option STRING_ID
-              value:  0x2
+              value:  2
               flags:  0 # Optional Input
           - option:  
               text:  0x0029 # Option STRING_ID
-              value:  0x1
+              value:  1
               flags:  0 # Optional Input
           - default:
-              defaultId:  0
-              type:  11
               value:  {1,2,3}
       - label:
           number:  0x64  # Number
       - goto:
           formid:  0x1234
           question:  0x1234 #  Optional Input
-          questionid/key:  4660 #optional input, Need to compute if None
-          prompt:  0x0041
-          help:  0x0051
-          questionflags:  4 # Optional Input 
+          prompt:  0x0041  # Statement Prompt STRING_ID
+          help:  0x0051  # Statement Help STRING_ID
       - goto:
           formid:  0x1234
           question:  0x1235 #  Optional Input
-          questionid/key:  4661 #optional input, Need to compute if None
-          prompt:  0x0042
-          help:  0x0051
-          questionflags:  4 # Optional Input 
+          prompt:  0x0042  # Statement Prompt STRING_ID
+          help:  0x0051  # Statement Help STRING_ID
       - oneof:
           varid:  MyIfrNVData.TestLateCheck  #  Optional Input
-          questionid:  6  # Optional Input, Need to compute if None
           prompt:  0x0052  # Statement Prompt STRING_ID
           help:  0x0026  # Statement Help STRING_ID
-          questionflags:  16 # Optional Input 
-          opcodeflags:  0x10  # optional input
-          maximum:  1 # Optional Input
-          minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - option:  
               text:  0x0027 # Option STRING_ID
-              value:  0x0
+              value:  0
               flags:  0 # Optional Input
           - option:  
               text:  0x0028 # Option STRING_ID
-              value:  0x1
-              flags:  16 # Optional Input
+              value:  1
+              flags:  DEFAULT # Optional Input
           - warningif:
               warning:  172
               timeout:  5 # optional input 
               expression:  ideqval MyIfrNVData.TestLateCheck == 0
       - oneof:
           varid:  MyIfrNVData.TestLateCheck2  #  Optional Input
-          questionid:  7  # Optional Input, Need to compute if None
           prompt:  0x0053  # Statement Prompt STRING_ID
           help:  0x0026  # Statement Help STRING_ID
-          questionflags:  16 # Optional Input 
-          opcodeflags:  0x10  # optional input
-          maximum:  1 # Optional Input
-          minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - option:  
               text:  0x0027 # Option STRING_ID
-              value:  0x0
-              flags:  16 # Optional Input
+              value:  0
+              flags:  DEFAULT # Optional Input
           - option:  
               text:  0x0028 # Option STRING_ID
-              value:  0x1
+              value:  1
               flags:  0 # Optional Input
           - inconsistentif:
-              prompt:  0x0047
+              prompt:  0x0047 # STRING_ID
               expression:  'ideqid MyIfrNVData.TestLateCheck == MyIfrNVData.TestLateCheck2'
       - oneof:
           varid:  MyIfrNVData.QuestionAboutTreeHugging  #  Optional Input
-          questionid:  8  # Optional Input, Need to compute if None
           prompt:  0x0020  # Statement Prompt STRING_ID
           help:  0x0026  # Statement Help STRING_ID
-          questionflags:  16 # Optional Input 
-          opcodeflags:  0x10  # optional input
-          maximum:  3 # Optional Input
-          minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - option:  
               text:  0x0027 # Option STRING_ID
-              value:  0x0
+              value:  0
               flags:  0 # Optional Input
           - option:  
               text:  0x0028 # Option STRING_ID
-              value:  0x1
-              flags:  16 # Optional Input
+              value:  1
+              flags:  DEFAULT # Optional Input
           - option:  
               text:  0x0029 # Option STRING_ID
-              value:  0x3
+              value:  3
               flags:  0 # Optional Input
       - oneof:
           varid:  MyIfrNVData.QuestionXUefiKeywordRestStyle  #  Optional Input
-          questionid:  9  # Optional Input, Need to compute if None
           prompt:  0x0022  # Statement Prompt STRING_ID
           help:  0x0023  # Statement Help STRING_ID
-          questionflags:  48 # Optional Input 
-          opcodeflags:  0x10  # optional input
-          maximum:  3 # Optional Input
-          minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - option:  
               text:  0x0027 # Option STRING_ID
-              value:  0x0
+              value:  0
               flags:  0 # Optional Input
           - option:  
               text:  0x0028 # Option STRING_ID
-              value:  0x1
-              flags:  16 # Optional Input
+              value:  1
+              flags:  DEFAULT # Optional Input
           - option:  
               text:  0x0029 # Option STRING_ID
-              value:  0x3
+              value:  3
               flags:  0 # Optional Input
       - numeric:
           varid:  MyIfrNVData.QuestionNonXUefiKeywordRestStyle  #  Optional Input
-          questionid/key:  10  # Optional Input, Need to compute if None
           prompt:  0x0024  # Statement Prompt STRING_ID
           help:  0x0025  # Statement Help STRING_ID
-          questionflags:  48 # Optional Input 
-          opcodeflags:  0x10  # optional input
+          flags:  RESET_REQUIRED | REST_STYLE  # Optional input , flags
           maximum:  240 # Optional Input
           minimum:  0 # Optional Input
           step:  0 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  0
               value:  0
       - string:
           varid:  MyIfrNVData.MyStringData  #  Optional Input
-          questionid/key:  4662  # Optional Input, Need to compute if None
           prompt:  0x0048  # Statement Prompt STRING_ID
           help:  0x0049  # Statement Help STRING_ID
-          questionflags:  4 # Optional Input 
-          opcodeflags:  0x0  # optional input
+          flags:  INTERACTIVE  # Optional input , flags
+          key: True # Optional input, key 
           minsize:  6 
           maxsize:  40 
           component:  
           - inconsistentif:
-              prompt:  0x0063
+              prompt:  0x0063 # STRING_ID
               expression:  'pushthis != stringref(STRING_TOKEN(0x0062))'
       - numeric:
           varid:  MyIfrNVData.HowOldAreYouInYearsManual  #  Optional Input
-          questionid/key:  11  # Optional Input, Need to compute if None
           prompt:  0x0032  # Statement Prompt STRING_ID
           help:  0x0035  # Statement Help STRING_ID
-          questionflags:  1 # Optional Input 
-          opcodeflags:  0x10  # optional input
+          flags:  READ_ONLY  # Optional input , flags
           maximum:  240 # Optional Input
           minimum:  0 # Optional Input
           step:  0 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  0
               value:  21
       - numeric:
           varid:  MyIfrNVData.HowOldAreYouInYearsManual  #  Optional Input
-          questionid/key:  12  # Optional Input, Need to compute if None
           prompt:  0x0033  # Statement Prompt STRING_ID
           help:  0x0035  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x10  # optional input
           maximum:  240 # Optional Input
           minimum:  0 # Optional Input
           step:  0 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  8
-              value: 'None'
-              component:  
+              value: 'questionrefval(devicepath = STRING_TOKEN (0x006D), guid = { 0xA04A27f4, 0xDF00, 0x4D42, {0xB5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3D} }, 0x1111)'
           - inconsistentif:
-              prompt:  0x0047
+              prompt:  0x0047 # STRING_ID
               expression:  'ideqval MyIfrNVData.HowOldAreYouInYearsManual == 99       OR       ideqid MyIfrNVData.HowOldAreYouInYearsManual == MyEfiVar.Field8       OR       ideqvallist MyIfrNVData.HowOldAreYouInYearsManual == 1 3 5 7'
       - numeric:
           varid:  MyEfiVar.Field8  #  Optional Input
-          questionid/key:  4369  # Optional Input, Need to compute if None
+          questionid:  4369  # Optional Input, Need to compute if None
           prompt:  0x0034  # Statement Prompt STRING_ID
           help:  0x0036  # Statement Help STRING_ID
-          questionflags:  4 # Optional Input 
-          opcodeflags:  0x30  # optional input
+          flags:  DISPLAY_UINT_HEX | INTERACTIVE  # Optional input , flags
           maximum:  250 # Optional Input
           minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  0
               value:  18
+              defaultstore: MyStandardDefault
           - default:
-              defaultId:  1
-              type:  0
               value:  19
+              defaultstore: MyManufactureDefault
       - numeric:
           varid:  MyNameValueVar[0]  #  Optional Input
-          questionid/key:  13  # Optional Input, Need to compute if None
           prompt:  0x0092  # Statement Prompt STRING_ID
           help:  0x005f  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x10  # optional input
+          flags:  NUMERIC_SIZE_1  # Optional input , flags
           maximum:  255 # Optional Input
           minimum:  0 # Optional Input
           step:  0 # Optional Input
           component:  
           - locked: tag
           - default:
-              defaultId:  0
-              type:  0
               value:  16
+              defaultstore: MyStandardDefault
           - default:
-              defaultId:  1
-              type:  0
               value:  17
+              defaultstore: MyManufactureDefault
       - numeric:
           varid:  MyNameValueVar[1]  #  Optional Input
-          questionid/key:  14  # Optional Input, Need to compute if None
           prompt:  0x0093  # Statement Prompt STRING_ID
           help:  0x0060  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x11  # optional input
+          flags:  NUMERIC_SIZE_2  # Optional input , flags
           maximum:  65535 # Optional Input
           minimum:  0 # Optional Input
           step:  0 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  1
               value:  18
+              defaultstore: MyStandardDefault
           - default:
-              defaultId:  1
-              type:  1
               value:  19
+              defaultstore: MyManufactureDefault
       - string:
           varid:  MyNameValueVar[2]  #  Optional Input
-          questionid/key:  15  # Optional Input, Need to compute if None
           prompt:  0x0094  # Statement Prompt STRING_ID
           help:  0x0061  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x0  # optional input
           minsize:  2 
           maxsize:  20 
       - oneof:
           varid:  MyEfiVar.Field16  #  Optional Input
-          questionid:  16  # Optional Input, Need to compute if None
           prompt:  0x001f  # Statement Prompt STRING_ID
           help:  0x001e  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x11  # optional input
-          maximum:  1 # Optional Input
-          minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - option:  
               text:  0x002d # Option STRING_ID
               value:  0x0
-              flags:  1 # Optional Input
+              flags:  0 # Optional Input
           - option:  
               text:  0x002e # Option STRING_ID
               value:  0x1
-              flags:  17 # Optional Input
+              flags:  DEFAULT # Optional Input
       - label:
           number:  0x1  # Number
       - label:
@@ -455,72 +364,61 @@ formset:
       - numeric:
           condition:  'grayoutif ideqval MyIfrNVData.HowOldAreYouInYearsManual == 23 AND ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1'
           varid:  MyIfrNVData.HowOldAreYouInYears  #  Optional Input
-          questionid/key:  17  # Optional Input, Need to compute if None
           prompt:  0x0031  # Statement Prompt STRING_ID
           help:  0x0037  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x10  # optional input
           maximum:  243 # Optional Input
           minimum:  0 # Optional Input
           step:  1 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  0
               value:  18
+              defaultstore: MyStandardDefault
           - default:
-              defaultId:  1
-              type:  0
               value:  19
+              defaultstore: MyManufactureDefault
       - numeric:
           varid:  MyIfrNVData.GetDefaultValueFromAccess  #  Optional Input
-          questionid/key:  4665  # Optional Input, Need to compute if None
+          questionid:  4665  # Optional Input, Need to compute if None
           prompt:  0x0069  # Statement Prompt STRING_ID
           help:  0x006a  # Statement Help STRING_ID
-          questionflags:  4 # Optional Input 
-          opcodeflags:  0x30  # optional input
+          flags:  DISPLAY_UINT_HEX | INTERACTIVE  # Optional input , flags
           maximum:  255 # Optional Input
           minimum:  0 # Optional Input
           step:  1 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  0
               value:  18
       - numeric:
           varid:  MyIfrNVData.GetDefaultValueFromCallBack  #  Optional Input
-          questionid/key:  4672  # Optional Input, Need to compute if None
+          questionid:  4672  # Optional Input, Need to compute if None
           prompt:  0x0067  # Statement Prompt STRING_ID
           help:  0x0068  # Statement Help STRING_ID
-          questionflags:  4 # Optional Input 
-          opcodeflags:  0x30  # optional input
+          flags:  DISPLAY_UINT_HEX | INTERACTIVE  # Optional input , flags
           maximum:  255 # Optional Input
           minimum:  0 # Optional Input
           step:  1 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  0
               value:  18
       - orderedlist:
           varid:  MyIfrNVData.GetDefaultValueFromCallBackForOrderedList  #  Optional Input
           questionid:  4690  # Optional Input, Need to compute if None
           prompt:  0x0067  # Statement Prompt STRING_ID
           help:  0x0068  # Statement Help STRING_ID
+          flags:  INTERACTIVE  # Optional input , flags
           maxcontainers:  3 ## Optional Input, Need to compute if None
-          flags:  4 # Optional Input 
           component:  
           - option:  
               text:  0x0027 # Option STRING_ID
-              value:  0x1
+              value:  1
               flags:  0 # Optional Input
           - option:  
               text:  0x0028 # Option STRING_ID
-              value:  0x2
+              value:  2
               flags:  0 # Optional Input
           - option:  
               text:  0x0029 # Option STRING_ID
-              value:  0x3
+              value:  3
               flags:  0 # Optional Input
       - resetbutton:
           defaultstore:  MyStandardDefault
@@ -537,67 +435,51 @@ formset:
           text:  0x0000  # Optional Input, Statement TextTwo STRING_ID
       - numeric:
           varid:  MyEfiVar.SubmittedCallback  #  Optional Input
-          questionid/key:  4688  # Optional Input, Need to compute if None
+          questionid:  4688  # Optional Input, Need to compute if None
           prompt:  0x006e  # Statement Prompt STRING_ID
           help:  0x006f  # Statement Help STRING_ID
-          questionflags:  4 # Optional Input 
-          opcodeflags:  0x11  # optional input
+          flags:  INTERACTIVE  # Optional input , flags
           maximum:  255 # Optional Input
           minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  1
               value:  18
       - text:
           help:  0x0071  # Question Help STRING_ID
           prompt:  0x0070  # Question Prompt STRING_ID
-          questionflags:  0x0004  # Optional Input, Question Flags
+          flags:  INTERACTIVE  # Optional Input, Question Flags
           key:  0x1330  # Optional Input, Question QuestionId
       - goto:
           formid:  0x2
           question:  0x0012 #  Optional Input
-          questionid/key:  18 #optional input, Need to compute if None
-          prompt:  0x003b
-          help:  0x0051
-          questionflags:  0 # Optional Input 
+          prompt:  0x003b  # Statement Prompt STRING_ID
+          help:  0x0051  # Statement Help STRING_ID
       - goto:
           formid:  0x3
           question:  0x0013 #  Optional Input
-          questionid/key:  19 #optional input, Need to compute if None
-          prompt:  0x003c
-          help:  0x0051
-          questionflags:  0 # Optional Input 
+          prompt:  0x003c  # Statement Prompt STRING_ID
+          help:  0x0051  # Statement Help STRING_ID
       - goto:
           formid:  0x4
           question:  0x0014 #  Optional Input
-          questionid/key:  20 #optional input, Need to compute if None
-          prompt:  0x003d
-          help:  0x0051
-          questionflags:  0 # Optional Input 
+          prompt:  0x003d  # Statement Prompt STRING_ID
+          help:  0x0051  # Statement Help STRING_ID
       - goto:
           formid:  0x5
           question:  0x0015 #  Optional Input
-          questionid/key:  21 #optional input, Need to compute if None
-          prompt:  0x003f
-          help:  0x0040
-          questionflags:  0 # Optional Input 
+          prompt:  0x003f  # Statement Prompt STRING_ID
+          help:  0x0040  # Statement Help STRING_ID
       - goto:
           formid:  0x6
           question:  0x0016 #  Optional Input
-          questionid/key:  22 #optional input, Need to compute if None
-          prompt:  0x003e
-          help:  0x0051
-          questionflags:  0 # Optional Input 
+          prompt:  0x003e  # Statement Prompt STRING_ID
+          help:  0x0051  # Statement Help STRING_ID
       - goto:
           formid:  0x1
           formsetguid:  '{0xb3f56470, 0x6141, 0x4621, { 0x8f, 0x19, 0x70, 0x4e, 0x57, 0x7a, 0xa9, 0xe8 }}' #  Optional Input
           question:  0x1 #  Optional Input
-          questionid/key:  23 #optional input, Need to compute if None
-          prompt:  0x006b
-          help:  0x006c
-          questionflags:  0 # Optional Input 
+          prompt:  0x006b  # Statement Prompt STRING_ID
+          help:  0x006c  # Statement Help STRING_ID
       - guidop:
           guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
           databuffer: #optional input
@@ -608,10 +490,8 @@ formset:
       - goto:
           formid:  0x7
           question:  0x0018 #  Optional Input
-          questionid/key:  24 #optional input, Need to compute if None
-          prompt:  0x0074
-          help:  0x0075
-          questionflags:  0 # Optional Input 
+          prompt:  0x0074  # Statement Prompt STRING_ID
+          help:  0x0075  # Statement Help STRING_ID
   - form: 
       formid:  2 # FormId STRING_ID
       condition:  'suppressif ideqval MyIfrNVData.BootOrderLarge == 0'
@@ -619,61 +499,49 @@ formset:
       component:  
       - date:
           name:  Date  #  Optional Input
-          questionid:  25  # Optional Input, Need to compute if None
           prompt:  0x004c  # Statement Prompt STRING_ID
           help:  0x004d  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x10  # optional input
+          flags:  STORAGE_TIME  # Optional input , flags
           component:  
           - default:
-              defaultId:  0
-              type:  6
               value:  2004/1/1
           - inconsistentif:
-              prompt:  0x0047
+              prompt:  0x0047 # STRING_ID
               expression:  'ideqval Date.Day == 31     AND     ideqvallist Date.Month == 2 4 6 9 11'
           - inconsistentif:
-              prompt:  0x0047
+              prompt:  0x0047 # STRING_ID
               expression:  'ideqval Date.Day == 30     AND     ideqval Date.Month == 2'
           - inconsistentif:
-              prompt:  0x0047
+              prompt:  0x0047 # STRING_ID
               expression:  'ideqval Date.Day == 0x1D     AND     ideqval Date.Month == 2     AND     NOT     ideqvallist Date.Year == 2004 2008 20012 20016 2020 2024 2028 2032 2036'
       - text:
           help:  0x0059  # Question Help STRING_ID
           prompt:  0x0059  # Question Prompt STRING_ID
-          questionflags:  0x0004  # Optional Input, Question Flags
+          flags:  INTERACTIVE  # Optional Input, Question Flags
           key:  0x1241  # Optional Input, Question QuestionId
       - text:
           help:  0x0056  # Question Help STRING_ID
           prompt:  0x0056  # Question Prompt STRING_ID
-          questionflags:  0x0004  # Optional Input, Question Flags
+          flags:  INTERACTIVE  # Optional Input, Question Flags
           key:  0x1242  # Optional Input, Question QuestionId
       - time:
-          questionid:  26  # Optional Input, Need to compute if None
           prompt:  0x004e  # Statement Prompt STRING_ID
           help:  0x004f  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x10  # optional input
+          flags:  STORAGE_TIME  # Optional input , flags
       - time:
           name:  MyTime  #  Optional Input
           varid:  MyIfrNVData.Time  #  Optional Input
-          questionid:  27  # Optional Input, Need to compute if None
           prompt:  0x004e  # Statement Prompt STRING_ID
           help:  0x004e  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x4  # optional input
+          flags:  STORAGE_NORMAL | SECOND_SUPPRESS  # Optional input , flags
           component:  
           - default:
-              defaultId:  0
-              type:  5
               value:  15:33:33
       - checkbox:
           varid:  MyIfrNVData.ChooseToActivateNuclearWeaponry  #  Optional Input
-          questionid/key:  28  # Optional Input, Need to compute if None
           prompt:  0x002f  # Statement Prompt STRING_ID
           help:  0x0030  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x1  # optional input
+          flags:  CHECKBOX_DEFAULT  # Optional input , flags
       - text:
           help:  0x0050  # Statement Help STRING_ID
           prompt:  0x004a  # Statement Prompt STRING_ID
@@ -685,26 +553,18 @@ formset:
       - goto:
           formid:  0x1
           question:  0x001d #  Optional Input
-          questionid/key:  29 #optional input, Need to compute if None
-          prompt:  0x003a
-          help:  0x0051
-          questionflags:  0 # Optional Input 
+          prompt:  0x003a  # Statement Prompt STRING_ID
+          help:  0x0051  # Statement Help STRING_ID
       - goto:
           varid:  MyIfrNVData.RefData  #  Optional Input
-          questionid/key:  4680 #optional input, Need to compute if None
-          prompt:  0x0043
-          help:  0x0045
-          questionflags:  4 # Optional Input 
+          prompt:  0x0043  # Statement Prompt STRING_ID
+          help:  0x0045  # Statement Help STRING_ID
           component:  
           - default:
-              defaultId:  0
-              type:  12
-              value:  0;0;{0x0, 0x0, 0x0, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 }};90
+              value:  0;0;{ 0x0, 0x0, 0x0, {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} };STRING_TOKEN(0x005A)
       - goto:
-          questionid/key:  4681 #optional input, Need to compute if None
-          prompt:  0x0044
-          help:  0x0046
-          questionflags:  4 # Optional Input 
+          prompt:  0x0044  # Statement Prompt STRING_ID
+          help:  0x0046  # Statement Help STRING_ID
   - form: 
       formid:  3 # FormId STRING_ID
       title:  0x0017  # FormTitle STRING_ID
@@ -717,38 +577,29 @@ formset:
       - goto:
           formid:  0x1
           question:  0x001e #  Optional Input
-          questionid/key:  30 #optional input, Need to compute if None
-          prompt:  0x003a
-          help:  0x0051
-          questionflags:  0 # Optional Input 
+          prompt:  0x003a  # Statement Prompt STRING_ID
+          help:  0x0051  # Statement Help STRING_ID
       - numeric:
           varid:  MyIfrNVData.DynamicRefresh  #  Optional Input
-          questionid/key:  22136  # Optional Input, Need to compute if None
           prompt:  0x0033  # Statement Prompt STRING_ID
           help:  0x0035  # Statement Help STRING_ID
-          questionflags:  4 # Optional Input 
-          opcodeflags:  0x10  # optional input
+          flags:  INTERACTIVE  # Optional input , flags
+          key: True # Optional input, key 
           maximum:  255 # Optional Input
           minimum:  0 # Optional Input
           step:  0 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  0
               value:  0
           - refresh:
               interval:  3  # RefreshInterval
       - numeric:
           condition:  'grayoutif match2 (stringref(STRING_TOKEN(0x00B0)), stringref(STRING_TOKEN(0x00AF)), { 0x63E60A51, 0x497D, 0xD427, {0xC4, 0xA5, 0xB8, 0xAB, 0xDC, 0x3A, 0xAE, 0xB6 }})'
           varid:  MyIfrNVData.Match2  #  Optional Input
-          questionid/key:  31  # Optional Input, Need to compute if None
           prompt:  0x00ad  # Statement Prompt STRING_ID
           help:  0x00ae  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x10  # optional input
           maximum:  243 # Optional Input
           minimum:  0 # Optional Input
-          step:  0 # Optional Input
       - label:
           number:  0x2234  # Number
       - label:
@@ -763,14 +614,8 @@ formset:
       component:  
       - oneof:
           varid:  MyIfrNVData.SerialPortNo  #  Optional Input
-          questionid:  32  # Optional Input, Need to compute if None
           prompt:  0x0097  # Statement Prompt STRING_ID
           help:  0x0026  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x10  # optional input
-          maximum:  4 # Optional Input
-          minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - read:
               expression:  'cond (get(MyIfrNVData.SerialPortStatus) != 0 ? 0 : cond ((get(MyIfrNVData.SerialPortIo) & 0xF00) >> 0x8 == get(MyIfrNVData.SerialPortIrq) - 1 ? UNDEFINED : map (get(MyIfrNVData.SerialPortIo) : 0x3f8,1; 0x2F8,2; 0x3E8,3; 0x2E8,4;)))'
@@ -779,7 +624,7 @@ formset:
           - option:  
               text:  0x0098 # Option STRING_ID
               value:  0x0
-              flags:  16 # Optional Input
+              flags:  DEFAULT # Optional Input
           - option:  
               text:  0x0099 # Option STRING_ID
               value:  0x1
@@ -799,55 +644,40 @@ formset:
       - checkbox:
           condition:  'grayoutif TRUE'
           varid:  MyIfrNVData.SerialPortStatus  #  Optional Input
-          questionid/key:  33  # Optional Input, Need to compute if None
           prompt:  0x009d  # Statement Prompt STRING_ID
           help:  0x0030  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x0  # optional input
       - oneof:
           condition:  'grayoutif TRUE | suppressif ideqval MyIfrNVData.SerialPortStatus == 0'
           varid:  MyIfrNVData.SerialPortIo  #  Optional Input
-          questionid:  34  # Optional Input, Need to compute if None
           prompt:  0x009e  # Statement Prompt STRING_ID
           help:  0x0026  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x11  # optional input
-          maximum:  1016 # Optional Input
-          minimum:  744 # Optional Input
-          step:  0 # Optional Input
           component:  
           - option:  
               text:  0x00a0 # Option STRING_ID
-              value:  0x3f8
-              flags:  17 # Optional Input
+              value:  0x3F8
+              flags:  DEFAULT # Optional Input
           - option:  
               text:  0x00a1 # Option STRING_ID
-              value:  0x2f8
-              flags:  1 # Optional Input
+              value:  0x2F8
+              flags:  0 # Optional Input
           - option:  
               text:  0x00a2 # Option STRING_ID
-              value:  0x3e8
-              flags:  1 # Optional Input
+              value:  0x3E8
+              flags:  0 # Optional Input
           - option:  
               text:  0x00a3 # Option STRING_ID
-              value:  0x2e8
-              flags:  1 # Optional Input
+              value:  0x2E8
+              flags:  0 # Optional Input
       - oneof:
           condition:  'grayoutif TRUE | suppressif ideqval MyIfrNVData.SerialPortStatus == 0'
           varid:  MyIfrNVData.SerialPortIrq  #  Optional Input
-          questionid:  35  # Optional Input, Need to compute if None
           prompt:  0x009f  # Statement Prompt STRING_ID
           help:  0x0026  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x10  # optional input
-          maximum:  4 # Optional Input
-          minimum:  3 # Optional Input
-          step:  0 # Optional Input
           component:  
           - option:  
               text:  0x00a4 # Option STRING_ID
               value:  0x4
-              flags:  16 # Optional Input
+              flags:  DEFAULT # Optional Input
           - option:  
               text:  0x00a5 # Option STRING_ID
               value:  0x3
@@ -855,10 +685,8 @@ formset:
       - goto:
           formid:  0x1
           question:  0x0024 #  Optional Input
-          questionid/key:  36 #optional input, Need to compute if None
-          prompt:  0x003a
-          help:  0x0051
-          questionflags:  0 # Optional Input 
+          prompt:  0x003a  # Statement Prompt STRING_ID
+          help:  0x0051  # Statement Help STRING_ID
   - form: 
       formid:  5 # FormId STRING_ID
       title:  0x0066  # FormTitle STRING_ID
@@ -867,12 +695,12 @@ formset:
       - text:
           help:  0x0054  # Question Help STRING_ID
           prompt:  0x0054  # Question Prompt STRING_ID
-          questionflags:  0x0004  # Optional Input, Question Flags
+          flags:  INTERACTIVE  # Optional Input, Question Flags
           key:  0x1245  # Optional Input, Question QuestionId
       - text:
           help:  0x0055  # Question Help STRING_ID
           prompt:  0x0055  # Question Prompt STRING_ID
-          questionflags:  0x0004  # Optional Input, Question Flags
+          flags:  INTERACTIVE  # Optional Input, Question Flags
           key:  0x1246  # Optional Input, Question QuestionId
   - form: 
       formid:  6 # FormId STRING_ID
@@ -884,18 +712,15 @@ formset:
           text:  0x0000  # Optional Input, Statement TextTwo STRING_ID
       - numeric:
           varid:  MyIfrNVData.RefreshGuidCount  #  Optional Input
-          questionid/key:  4679  # Optional Input, Need to compute if None
           prompt:  0x0065  # Statement Prompt STRING_ID
           help:  0x0035  # Statement Help STRING_ID
-          questionflags:  4 # Optional Input 
-          opcodeflags:  0x10  # optional input
+          flags:  INTERACTIVE  # Optional input , flags
+          key: True # Optional input, key 
           maximum:  255 # Optional Input
           minimum:  0 # Optional Input
           step:  0 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  0
               value:  0
           - refreshguid:
               guid:  '{0xf5e655d9, 0x2a6, 0x46f2, { 0x9e, 0x76, 0xb8, 0xbe, 0x8e, 0x60, 0xab, 0x22 }}'
@@ -917,259 +742,186 @@ formset:
       component:  
       - subtitle:
           prompt:  0x0076  # Statement Prompt STRING_ID
-          flags:  0x0000  # Optional Input
       - checkbox:
           varid:  MyEfiBitVar.BitsData.NestBitCheckbox  #  Optional Input
-          questionid/key:  37  # Optional Input, Need to compute if None
           prompt:  0x007b  # Statement Prompt STRING_ID
           help:  0x007c  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x1  # optional input
+          flags:  CHECKBOX_DEFAULT  # Optional input , flags
       - oneof:
           varid:  MyEfiBitVar.BitsData.NestBitOneof  #  Optional Input
-          questionid:  38  # Optional Input, Need to compute if None
           prompt:  0x007d  # Statement Prompt STRING_ID
           help:  0x007e  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x42  # optional input
-          maximum:  1 # Optional Input
-          minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - option:  
               text:  0x002d # Option STRING_ID
-              value:  0x0
-              flags:  32 # Optional Input
+              value:  0
+              flags:  MANUFACTURING # Optional Input
           - option:  
               text:  0x002e # Option STRING_ID
-              value:  0x1
-              flags:  16 # Optional Input
+              value:  1
+              flags:  DEFAULT # Optional Input
       - numeric:
           varid:  MyEfiBitVar.BitsData.NestBitNumeric  #  Optional Input
-          questionid/key:  26214  # Optional Input, Need to compute if None
+          questionid:  26214  # Optional Input, Need to compute if None
           prompt:  0x007f  # Statement Prompt STRING_ID
           help:  0x0083  # Statement Help STRING_ID
-          questionflags:  4 # Optional Input 
-          opcodeflags:  0xc4  # optional input
+          flags:  DISPLAY_UINT_HEX | INTERACTIVE  # Optional input , flags
           maximum:  15 # Optional Input
           minimum:  2 # Optional Input
           step:  1 # Optional Input
       - oneof:
           varid:  MyEfiBitVar.BitsData.NestByteField  #  Optional Input
-          questionid:  39  # Optional Input, Need to compute if None
           prompt:  0x0081  # Statement Prompt STRING_ID
           help:  0x0082  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x11  # optional input
-          maximum:  1 # Optional Input
-          minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - option:  
               text:  0x002d # Option STRING_ID
-              value:  0x0
-              flags:  33 # Optional Input
+              value:  0
+              flags:  MANUFACTURING # Optional Input
           - option:  
               text:  0x002e # Option STRING_ID
-              value:  0x1
-              flags:  17 # Optional Input
+              value:  1
+              flags:  DEFAULT # Optional Input
       - subtitle:
           prompt:  0x001b  # Statement Prompt STRING_ID
-          flags:  0x0000  # Optional Input
       - subtitle:
           prompt:  0x0077  # Statement Prompt STRING_ID
-          flags:  0x0000  # Optional Input
       - checkbox:
           varid:  MyEfiBitVar.EfiBitCheckbox  #  Optional Input
-          questionid/key:  40  # Optional Input, Need to compute if None
           prompt:  0x0084  # Statement Prompt STRING_ID
           help:  0x0085  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x1  # optional input
+          flags:  CHECKBOX_DEFAULT  # Optional input , flags
       - numeric:
           varid:  MyEfiBitVar.EfiBitNumeric  #  Optional Input
-          questionid/key:  41  # Optional Input, Need to compute if None
           prompt:  0x0088  # Statement Prompt STRING_ID
           help:  0x0089  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x44  # optional input
           maximum:  7 # Optional Input
           minimum:  0 # Optional Input
           step:  0 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  2
               value:  4
+              defaultstore: MyStandardDefault
           - default:
-              defaultId:  1
-              type:  2
               value:  5
+              defaultstore: MyManufactureDefault
       - oneof:
           varid:  MyEfiBitVar.EfiBitOneof  #  Optional Input
           questionid:  39321  # Optional Input, Need to compute if None
           prompt:  0x0086  # Statement Prompt STRING_ID
           help:  0x0087  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x4a  # optional input
-          maximum:  1 # Optional Input
-          minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - option:  
               text:  0x002d # Option STRING_ID
               value:  0x0
-              flags:  34 # Optional Input
+              flags:  MANUFACTURING # Optional Input
           - option:  
               text:  0x002e # Option STRING_ID
               value:  0x1
-              flags:  18 # Optional Input
+              flags:  DEFAULT # Optional Input
       - subtitle:
           prompt:  0x001b  # Statement Prompt STRING_ID
-          flags:  0x0000  # Optional Input
       - subtitle:
           prompt:  0x0078  # Statement Prompt STRING_ID
-          flags:  0x0000  # Optional Input
       - checkbox:
           varid:  MyIfrNVData.MyBitData.NestBitCheckbox  #  Optional Input
-          questionid/key:  42  # Optional Input, Need to compute if None
           prompt:  0x007b  # Statement Prompt STRING_ID
           help:  0x007c  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x1  # optional input
+          flags:  CHECKBOX_DEFAULT  # Optional input , flags
       - oneof:
           varid:  MyIfrNVData.MyBitData.NestBitOneof  #  Optional Input
-          questionid:  43  # Optional Input, Need to compute if None
           prompt:  0x007d  # Statement Prompt STRING_ID
           help:  0x007e  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x42  # optional input
-          maximum:  1 # Optional Input
-          minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - option:  
               text:  0x002d # Option STRING_ID
-              value:  0x0
-              flags:  32 # Optional Input
+              value:  0
+              flags:  MANUFACTURING # Optional Input
           - option:  
               text:  0x002e # Option STRING_ID
-              value:  0x1
-              flags:  16 # Optional Input
+              value:  1
+              flags:  DEFAULT # Optional Input
       - numeric:
           varid:  MyIfrNVData.MyBitData.NestBitNumeric  #  Optional Input
-          questionid/key:  44  # Optional Input, Need to compute if None
           prompt:  0x007f  # Statement Prompt STRING_ID
           help:  0x0080  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x44  # optional input
           maximum:  7 # Optional Input
           minimum:  0 # Optional Input
           step:  0 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  2
               value:  6
+              defaultstore: MyStandardDefault
           - default:
-              defaultId:  1
-              type:  2
               value:  7
+              defaultstore: MyManufactureDefault
       - oneof:
           varid:  MyIfrNVData.MyBitData.NestByteField  #  Optional Input
-          questionid:  45  # Optional Input, Need to compute if None
           prompt:  0x0081  # Statement Prompt STRING_ID
           help:  0x0082  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x11  # optional input
-          maximum:  1 # Optional Input
-          minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - option:  
               text:  0x002d # Option STRING_ID
-              value:  0x0
-              flags:  33 # Optional Input
+              value:  0
+              flags:  MANUFACTURING # Optional Input
           - option:  
               text:  0x002e # Option STRING_ID
-              value:  0x1
-              flags:  17 # Optional Input
+              value:  1
+              flags:  DEFAULT # Optional Input
       - subtitle:
           prompt:  0x001b  # Statement Prompt STRING_ID
-          flags:  0x0000  # Optional Input
       - subtitle:
           prompt:  0x0079  # Statement Prompt STRING_ID
-          flags:  0x0000  # Optional Input
       - oneof:
           varid:  MyIfrNVData.BitOneof  #  Optional Input
-          questionid:  46  # Optional Input, Need to compute if None
           prompt:  0x0086  # Statement Prompt STRING_ID
           help:  0x0087  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x46  # optional input
-          maximum:  1 # Optional Input
-          minimum:  0 # Optional Input
-          step:  0 # Optional Input
           component:  
           - option:  
               text:  0x002d # Option STRING_ID
-              value:  0x0
-              flags:  33 # Optional Input
+              value:  0
+              flags:  MANUFACTURING # Optional Input
           - option:  
               text:  0x002e # Option STRING_ID
-              value:  0x1
-              flags:  17 # Optional Input
+              value:  1
+              flags:  DEFAULT # Optional Input
       - checkbox:
           varid:  MyIfrNVData.BitCheckbox  #  Optional Input
-          questionid/key:  47  # Optional Input, Need to compute if None
           prompt:  0x0084  # Statement Prompt STRING_ID
           help:  0x0085  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x1  # optional input
+          flags:  CHECKBOX_DEFAULT  # Optional input , flags
       - numeric:
           varid:  MyIfrNVData.BitNumeric  #  Optional Input
-          questionid/key:  48  # Optional Input, Need to compute if None
           prompt:  0x0088  # Statement Prompt STRING_ID
           help:  0x008a  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x4c  # optional input
           maximum:  20 # Optional Input
           minimum:  0 # Optional Input
           step:  0 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  2
               value:  16
+              defaultstore: MyStandardDefault
           - default:
-              defaultId:  1
-              type:  2
               value:  17
+              defaultstore: MyManufactureDefault
       - subtitle:
           prompt:  0x001b  # Statement Prompt STRING_ID
-          flags:  0x0000  # Optional Input
       - subtitle:
           prompt:  0x007a  # Statement Prompt STRING_ID
-          flags:  0x0000  # Optional Input
       - numeric:
           varid:  MyEfiUnionVar.UnionNumeric  #  Optional Input
-          questionid/key:  49  # Optional Input, Need to compute if None
           prompt:  0x008b  # Statement Prompt STRING_ID
           help:  0x008c  # Statement Help STRING_ID
-          questionflags:  0 # Optional Input 
-          opcodeflags:  0x10  # optional input
           maximum:  20 # Optional Input
           minimum:  0 # Optional Input
           step:  0 # Optional Input
           component:  
           - default:
-              defaultId:  0
-              type:  0
               value:  7
+              defaultstore: MyStandardDefault
           - default:
-              defaultId:  1
-              type:  0
               value:  8
+              defaultstore: MyManufactureDefault
       - guidop:
           guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
           databuffer: #optional input

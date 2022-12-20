@@ -317,7 +317,7 @@ locals[ValueList=[], ListType=False]
     |   'FALSE'
     |   'ONE'
     |   'ONES'
-    |   'ZERO'
+    |   'ZERO' 
     |   Number ':' Number ':' Number
     |   Number '/' Number '/' Number
     |   Number ';' Number ';' guidDefinition ';' 'STRING_TOKEN' '(' Number ')'
@@ -778,7 +778,7 @@ locals[Node=VfrTreeNode(EFI_IFR_ONE_OF_OP), GuidNode=VfrTreeNode(EFI_IFR_GUID_OP
     :   'oneof'
         vfrQuestionBaseInfo[localctx.Node, localctx.QType]
         vfrStatementHeader[localctx.Node] ','
-        (F='flags' '=' vfrOneofFlagsField ',')?
+        (F='flags' '=' vfrOneofFlagsField ',')? //
         (vfrSetMinMaxStep[localctx.Node])?
         vfrStatementQuestionOptionList[localctx.Node]
         'endoneof' ';'
