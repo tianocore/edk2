@@ -20,6 +20,7 @@
 #include <Library/QemuFwCfgLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/TdxLib.h>
+#include <Library/TdxMailboxLib.h>
 #include <Library/SynchronizationLib.h>
 #include <Pi/PrePiHob.h>
 #include <WorkArea.h>
@@ -27,6 +28,10 @@
 
 #define ALIGNED_2MB_MASK  0x1fffff
 #define MEGABYTE_SHIFT    20
+
+#define ACCEPT_CHUNK_SIZE  SIZE_32MB
+#define AP_STACK_SIZE      SIZE_16KB
+#define APS_STACK_SIZE(CpusNum)  (ALIGN_VALUE(CpusNum*AP_STACK_SIZE, SIZE_2MB))
 
 /**
   This function will be called to accept pages. Only BSP accepts pages.
@@ -81,8 +86,6 @@ BspAcceptMemoryResourceRange (
     return EFI_SUCCESS;
   }
 
-  DEBUG ((DEBUG_INFO, "TdAccept: 0x%llx - 0x%llx\n", PhysicalAddress, TotalLength));
-
   if (ALIGN_VALUE (PhysicalAddress, SIZE_2MB) != PhysicalAddress) {
     StartAddress1 = PhysicalAddress;
     Length1       = ALIGN_VALUE (PhysicalAddress, SIZE_2MB) - PhysicalAddress;
@@ -105,11 +108,6 @@ BspAcceptMemoryResourceRange (
     StartAddress3 = PhysicalAddress;
     Length3       = TotalLength;
   }
-
-  DEBUG ((DEBUG_INFO, "   Part1: 0x%llx - 0x%llx\n", StartAddress1, Length1));
-  DEBUG ((DEBUG_INFO, "   Part2: 0x%llx - 0x%llx\n", StartAddress2, Length2));
-  DEBUG ((DEBUG_INFO, "   Part3: 0x%llx - 0x%llx\n", StartAddress3, Length3));
-  DEBUG ((DEBUG_INFO, "   Page : 0x%x\n", AcceptPageSize));
 
   Status = EFI_SUCCESS;
   if (Length1 > 0) {
@@ -135,6 +133,342 @@ BspAcceptMemoryResourceRange (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+  }
+
+  return Status;
+}
+
+/**
+ * This function is called by BSP and APs to accept memory.
+ * Note:
+ * The input PhysicalStart/PhysicalEnd indicates the whole memory region
+ * to be accepted. BSP or AP only accepts one piece in the whole memory region.
+ *
+ * @param CpuIndex        vCPU index
+ * @param CpusNum         Total vCPU number of a Tdx guest
+ * @param PhysicalStart   Start address of a memory region which is to be accepted
+ * @param PhysicalEnd     End address of a memory region which is to be accepted
+ *
+ * @retval EFI_SUCCESS    Successfully accept the memory
+ * @retval Other          Other errors as indicated
+ */
+STATIC
+EFI_STATUS
+EFIAPI
+BspApAcceptMemoryResourceRange (
+  UINT32                CpuIndex,
+  UINT32                CpusNum,
+  EFI_PHYSICAL_ADDRESS  PhysicalStart,
+  EFI_PHYSICAL_ADDRESS  PhysicalEnd
+  )
+{
+  UINT64                Status;
+  UINT64                Pages;
+  UINT64                Stride;
+  UINT64                AcceptPageSize;
+  EFI_PHYSICAL_ADDRESS  PhysicalAddress;
+
+  AcceptPageSize = (UINT64)(UINTN)FixedPcdGet32 (PcdTdxAcceptPageSize);
+
+  Status          = EFI_SUCCESS;
+  Stride          = (UINTN)CpusNum * ACCEPT_CHUNK_SIZE;
+  PhysicalAddress = PhysicalStart + ACCEPT_CHUNK_SIZE * (UINTN)CpuIndex;
+
+  while (!EFI_ERROR (Status) && PhysicalAddress < PhysicalEnd) {
+    Pages  = MIN (ACCEPT_CHUNK_SIZE, PhysicalEnd - PhysicalAddress) / AcceptPageSize;
+    Status = TdAcceptPages (PhysicalAddress, Pages, (UINT32)(UINTN)AcceptPageSize);
+    ASSERT (!EFI_ERROR (Status));
+    PhysicalAddress += Stride;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+ * This function is called by APs to accept memory.
+ *
+ * @param CpuIndex        vCPU index of an AP
+ * @param PhysicalStart   Start address of a memory region which is to be accepted
+ * @param PhysicalEnd     End address of a memory region which is to be accepted
+ *
+ * @retval EFI_SUCCESS    Successfully accept the memory
+ * @retval Others         Other errors as indicated
+ */
+STATIC
+EFI_STATUS
+EFIAPI
+ApAcceptMemoryResourceRange (
+  UINT32                CpuIndex,
+  EFI_PHYSICAL_ADDRESS  PhysicalStart,
+  EFI_PHYSICAL_ADDRESS  PhysicalEnd
+  )
+{
+  UINT64          Status;
+  TD_RETURN_DATA  TdReturnData;
+
+  Status = TdCall (TDCALL_TDINFO, 0, 0, 0, &TdReturnData);
+  if (Status != TDX_EXIT_REASON_SUCCESS) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  if ((CpuIndex == 0) || (CpuIndex >= TdReturnData.TdInfo.NumVcpus)) {
+    ASSERT (FALSE);
+    return EFI_ABORTED;
+  }
+
+  return BspApAcceptMemoryResourceRange (CpuIndex, TdReturnData.TdInfo.NumVcpus, PhysicalStart, PhysicalEnd);
+}
+
+/**
+ * This function is called by BSP. It coordinates BSP/APs to accept memory together.
+ *
+ * @param PhysicalStart     Start address of a memory region which is to be accepted
+ * @param PhysicalEnd       End address of a memory region which is to be accepted
+ * @param APsStackAddress   APs stack address
+ * @param CpusNum           Total vCPU number of the Tdx guest
+ *
+ * @retval EFI_SUCCESS      Successfully accept the memory
+ * @retval Others           Other errors as indicated
+ */
+EFI_STATUS
+EFIAPI
+MpAcceptMemoryResourceRange (
+  IN EFI_PHYSICAL_ADDRESS      PhysicalStart,
+  IN EFI_PHYSICAL_ADDRESS      PhysicalEnd,
+  IN OUT EFI_PHYSICAL_ADDRESS  APsStackAddress,
+  IN UINT32                    CpusNum
+  )
+{
+  UINT64      Length;
+  EFI_STATUS  Status;
+
+  Length = PhysicalEnd - PhysicalStart;
+
+  DEBUG ((DEBUG_INFO, "MpAccept : 0x%llx - 0x%llx (0x%llx)\n", PhysicalStart, PhysicalEnd, Length));
+
+  if (Length == 0) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // The start address is not 2M aligned. BSP first accept the part which is not 2M aligned.
+  //
+  if (ALIGN_VALUE (PhysicalStart, SIZE_2MB) != PhysicalStart) {
+    Length = MIN (ALIGN_VALUE (PhysicalStart, SIZE_2MB) - PhysicalStart, Length);
+    Status = BspAcceptMemoryResourceRange (PhysicalStart, PhysicalStart + Length);
+    ASSERT (Status == EFI_SUCCESS);
+
+    PhysicalStart += Length;
+    Length         = PhysicalEnd - PhysicalStart;
+  }
+
+  if (Length == 0) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // BSP will accept the memory by itself if the memory is not big enough compared with a chunk.
+  //
+  if (Length <= ACCEPT_CHUNK_SIZE) {
+    return BspAcceptMemoryResourceRange (PhysicalStart, PhysicalEnd);
+  }
+
+  //
+  // Now APs are asked to accept the memory together.
+  //
+  MpSerializeStart ();
+
+  MpSendWakeupCommand (
+    MpProtectedModeWakeupCommandAcceptPages,
+    (UINT64)(UINTN)ApAcceptMemoryResourceRange,
+    PhysicalStart,
+    PhysicalEnd,
+    APsStackAddress,
+    AP_STACK_SIZE
+    );
+
+  //
+  // Now BSP does its job.
+  //
+  BspApAcceptMemoryResourceRange (0, CpusNum, PhysicalStart, PhysicalEnd);
+
+  MpSerializeEnd ();
+
+  return EFI_SUCCESS;
+}
+
+/**
+  BSP accept a small piece of memory which will be used as APs stack.
+
+  @param[in] VmmHobList    The Hoblist pass the firmware
+  @param[in] APsStackSize  APs stack size
+  @param[out] PhysicalAddressEnd    The physical end address of accepted memory in phase-1
+
+  @retval  EFI_SUCCESS     Process the HobList successfully
+  @retval  Others          Other errors as indicated
+**/
+EFI_STATUS
+EFIAPI
+AcceptMemoryForAPsStack (
+  IN CONST VOID             *VmmHobList,
+  IN UINT32                 APsStackSize,
+  OUT EFI_PHYSICAL_ADDRESS  *PhysicalAddressEnd
+  )
+{
+  EFI_STATUS            Status;
+  EFI_PEI_HOB_POINTERS  Hob;
+  EFI_PHYSICAL_ADDRESS  PhysicalEnd;
+  EFI_PHYSICAL_ADDRESS  PhysicalStart;
+  UINT64                ResourceLength;
+  BOOLEAN               MemoryRegionFound;
+
+  ASSERT (VmmHobList != NULL);
+
+  Status            = EFI_SUCCESS;
+  Hob.Raw           = (UINT8 *)VmmHobList;
+  MemoryRegionFound = FALSE;
+
+  DEBUG ((DEBUG_INFO, "AcceptMemoryForAPsStack with APsStackSize=0x%x\n", APsStackSize));
+
+  //
+  // Parse the HOB list until end of list or matching type is found.
+  //
+  while (!END_OF_HOB_LIST (Hob) && !MemoryRegionFound) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      DEBUG ((DEBUG_INFO, "\nResourceType: 0x%x\n", Hob.ResourceDescriptor->ResourceType));
+
+      if (Hob.ResourceDescriptor->ResourceType == BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED) {
+        ResourceLength = Hob.ResourceDescriptor->ResourceLength;
+        PhysicalStart  = Hob.ResourceDescriptor->PhysicalStart;
+        PhysicalEnd    = PhysicalStart + ResourceLength;
+
+        DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
+        DEBUG ((DEBUG_INFO, "PhysicalStart: 0x%llx\n", PhysicalStart));
+        DEBUG ((DEBUG_INFO, "ResourceLength: 0x%llx\n", ResourceLength));
+        DEBUG ((DEBUG_INFO, "Owner: %g\n\n", &Hob.ResourceDescriptor->Owner));
+
+        if (ResourceLength >= APsStackSize) {
+          MemoryRegionFound = TRUE;
+          if (ResourceLength > ACCEPT_CHUNK_SIZE) {
+            PhysicalEnd = Hob.ResourceDescriptor->PhysicalStart + APsStackSize;
+          }
+        }
+
+        Status = BspAcceptMemoryResourceRange (
+                   Hob.ResourceDescriptor->PhysicalStart,
+                   PhysicalEnd
+                   );
+        if (EFI_ERROR (Status)) {
+          break;
+        }
+      }
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  ASSERT (MemoryRegionFound);
+  *PhysicalAddressEnd = PhysicalEnd;
+
+  return Status;
+}
+
+/**
+  BSP and APs work togeter to accept memory which is under the address of 4G.
+
+  @param[in] VmmHobList           The Hoblist pass the firmware
+  @param[in] CpusNum              Number of vCPUs
+  @param[in] APsStackStartAddres  Start address of APs stack
+  @param[in] PhysicalAddressStart Start physical address which to be accepted
+
+  @retval  EFI_SUCCESS     Process the HobList successfully
+  @retval  Others          Other errors as indicated
+**/
+EFI_STATUS
+EFIAPI
+AcceptMemory (
+  IN CONST VOID            *VmmHobList,
+  IN UINT32                CpusNum,
+  IN EFI_PHYSICAL_ADDRESS  APsStackStartAddress,
+  IN EFI_PHYSICAL_ADDRESS  PhysicalAddressStart
+  )
+{
+  EFI_STATUS            Status;
+  EFI_PEI_HOB_POINTERS  Hob;
+  EFI_PHYSICAL_ADDRESS  PhysicalStart;
+  EFI_PHYSICAL_ADDRESS  PhysicalEnd;
+  EFI_PHYSICAL_ADDRESS  AcceptMemoryEndAddress;
+
+  Status                 = EFI_SUCCESS;
+  AcceptMemoryEndAddress = BASE_4GB;
+
+  ASSERT (VmmHobList != NULL);
+  Hob.Raw = (UINT8 *)VmmHobList;
+
+  DEBUG ((DEBUG_INFO, "AcceptMemory under address of 4G\n"));
+
+  //
+  // Parse the HOB list until end of list or matching type is found.
+  //
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      if (Hob.ResourceDescriptor->ResourceType == BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED) {
+        PhysicalStart = Hob.ResourceDescriptor->PhysicalStart;
+        PhysicalEnd   = PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+
+        if (PhysicalEnd <= PhysicalAddressStart) {
+          // this memory region has been accepted. Skipped it.
+          Hob.Raw = GET_NEXT_HOB (Hob);
+          continue;
+        }
+
+        if (PhysicalStart >= AcceptMemoryEndAddress) {
+          // this memory region is not to be accepted. And we're done.
+          break;
+        }
+
+        if (PhysicalStart >= PhysicalAddressStart) {
+          // this memory region has not been acceted.
+        } else if ((PhysicalStart < PhysicalAddressStart) && (PhysicalEnd > PhysicalAddressStart)) {
+          // part of the memory region has been accepted.
+          PhysicalStart = PhysicalAddressStart;
+        }
+
+        // then compare the PhysicalEnd with AcceptMemoryEndAddress
+        if (PhysicalEnd >= AcceptMemoryEndAddress) {
+          PhysicalEnd = AcceptMemoryEndAddress;
+        }
+
+        DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
+        DEBUG ((DEBUG_INFO, "PhysicalStart: 0x%llx\n", Hob.ResourceDescriptor->PhysicalStart));
+        DEBUG ((DEBUG_INFO, "ResourceLength: 0x%llx\n", Hob.ResourceDescriptor->ResourceLength));
+        DEBUG ((DEBUG_INFO, "Owner: %g\n\n", &Hob.ResourceDescriptor->Owner));
+
+        // Now we're ready to accept memory [PhysicalStart, PhysicalEnd)
+        if (CpusNum == 1) {
+          Status = BspAcceptMemoryResourceRange (PhysicalStart, PhysicalEnd);
+        } else {
+          Status = MpAcceptMemoryResourceRange (
+                     PhysicalStart,
+                     PhysicalEnd,
+                     APsStackStartAddress,
+                     CpusNum
+                     );
+        }
+
+        if (EFI_ERROR (Status)) {
+          ASSERT (FALSE);
+          break;
+        }
+
+        if (PhysicalEnd == AcceptMemoryEndAddress) {
+          break;
+        }
+      }
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
   }
 
   return Status;
@@ -375,54 +709,33 @@ ProcessHobList (
   )
 {
   EFI_STATUS            Status;
-  EFI_PEI_HOB_POINTERS  Hob;
+  UINT32                CpusNum;
   EFI_PHYSICAL_ADDRESS  PhysicalEnd;
-  UINT64                ResourceLength;
-  UINT64                AccumulateAcceptedMemory;
+  EFI_PHYSICAL_ADDRESS  APsStackStartAddress;
 
-  Status = EFI_SUCCESS;
-  ASSERT (VmmHobList != NULL);
-  Hob.Raw = (UINT8 *)VmmHobList;
-
-  AccumulateAcceptedMemory = 0;
+  CpusNum = GetCpusNum ();
 
   //
-  // Parse the HOB list until end of list or matching type is found.
+  // If there are mutli-vCPU in a TDX guest, accept memory is split into 2 phases.
+  // Phase-1 accepts a small piece of memory by BSP. This piece of memory
+  // is used to setup AP's stack.
+  // After that phase-2 accepts a big piece of memory by BSP/APs.
   //
-  while (!END_OF_HOB_LIST (Hob)) {
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      DEBUG ((DEBUG_INFO, "\nResourceType: 0x%x\n", Hob.ResourceDescriptor->ResourceType));
-
-      if (Hob.ResourceDescriptor->ResourceType == BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED) {
-        DEBUG ((DEBUG_INFO, "ResourceAttribute: 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
-        DEBUG ((DEBUG_INFO, "PhysicalStart: 0x%llx\n", Hob.ResourceDescriptor->PhysicalStart));
-        DEBUG ((DEBUG_INFO, "ResourceLength: 0x%llx\n", Hob.ResourceDescriptor->ResourceLength));
-        DEBUG ((DEBUG_INFO, "Owner: %g\n\n", &Hob.ResourceDescriptor->Owner));
-
-        PhysicalEnd    = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
-        ResourceLength = Hob.ResourceDescriptor->ResourceLength;
-
-        if (Hob.ResourceDescriptor->PhysicalStart >= BASE_4GB) {
-          //
-          // In current stage, we only accept the memory under 4G
-          //
-          break;
-        }
-
-        Status = BspAcceptMemoryResourceRange (
-                   Hob.ResourceDescriptor->PhysicalStart,
-                   PhysicalEnd
-                   );
-        if (EFI_ERROR (Status)) {
-          break;
-        }
-
-        AccumulateAcceptedMemory += ResourceLength;
-      }
-    }
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
+  // TDVF supports 4K and 2M accept-page-size. The memory which can be accpeted
+  // in 2M accept-page-size must be 2M aligned and multiple 2M. So we align
+  // APsStackSize to 2M size aligned.
+  //
+  if (CpusNum > 1) {
+    Status = AcceptMemoryForAPsStack (VmmHobList, APS_STACK_SIZE (CpusNum), &PhysicalEnd);
+    ASSERT (Status == EFI_SUCCESS);
+    APsStackStartAddress = PhysicalEnd - APS_STACK_SIZE (CpusNum);
+  } else {
+    PhysicalEnd          = 0;
+    APsStackStartAddress = 0;
   }
+
+  Status = AcceptMemory (VmmHobList, CpusNum, APsStackStartAddress, PhysicalEnd);
+  ASSERT (Status == EFI_SUCCESS);
 
   return Status;
 }
