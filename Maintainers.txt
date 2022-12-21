@@ -484,12 +484,12 @@ F: OvmfPkg/Library/CcExitLib/
 F: OvmfPkg/PlatformPei/AmdSev.c
 F: OvmfPkg/ResetVector/
 F: OvmfPkg/Sec/
-R: Brijesh Singh <brijesh.singh@amd.com> [codomania]
 R: Erdem Aktas <erdemaktas@google.com> [ruleof2]
 R: James Bottomley <jejb@linux.ibm.com> [jejb]
 R: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 R: Min Xu <min.m.xu@intel.com> [mxu9]
 R: Tom Lendacky <thomas.lendacky@amd.com> [tlendacky]
+R: Michael Roth <michael.roth@amd.com> [mdroth]
 
 OvmfPkg: FDT related modules
 F: OvmfPkg/Fdt
