@@ -260,7 +260,6 @@ extern UINTN                 mNumberOfCpus;
 extern EFI_SMM_CPU_PROTOCOL  mSmmCpu;
 extern EFI_MM_MP_PROTOCOL    mSmmMp;
 extern BOOLEAN               m5LevelPagingNeeded;
-extern BOOLEAN               mIsReadOnlyPageTable;
 
 ///
 /// The mode of the CPU at the time an SMI occurs
