@@ -222,11 +222,25 @@ EfiSignalEventReadyToBoot (
 {
   EFI_STATUS  Status;
   EFI_EVENT   ReadyToBootEvent;
+  EFI_EVENT   AfterReadyToBootEvent;
 
   Status = EfiCreateEventReadyToBoot (&ReadyToBootEvent);
   if (!EFI_ERROR (Status)) {
     gBS->SignalEvent (ReadyToBootEvent);
     gBS->CloseEvent (ReadyToBootEvent);
+  }
+
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  EfiEventEmptyFunction,
+                  NULL,
+                  &gEfiEventAfterReadyToBootGuid,
+                  &AfterReadyToBootEvent
+                  );
+  if (!EFI_ERROR (Status)) {
+    gBS->SignalEvent (AfterReadyToBootEvent);
+    gBS->CloseEvent (AfterReadyToBootEvent);
   }
 }
 
