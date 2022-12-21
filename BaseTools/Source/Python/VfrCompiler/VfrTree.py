@@ -319,13 +319,13 @@ class VfrTree():
                         self.__Index += 1
                         Data = Root.Buffer[i]
                         if self.__Index == Length:
-                            f.write('0x%02x' % Data)
+                            f.write('0x%02X' % Data)
                         elif self.__Index % BYTES_PRE_LINE == 1:
-                            f.write('  0x%02x,  ' % Data)
+                            f.write('  0x%02X,  ' % Data)
                         elif self.__Index % BYTES_PRE_LINE == 0:
-                            f.write('0x%02x,\n' % Data)
+                            f.write('0x%02X,\n' % Data)
                         else:
-                            f.write('0x%02x,  ' % Data)
+                            f.write('0x%02X,  ' % Data)
                 except:
                     EdkLogger.error(
                         "VfrCompiler", FILE_WRITE_FAILURE,
