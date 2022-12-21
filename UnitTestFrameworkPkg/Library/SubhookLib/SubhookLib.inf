@@ -1,0 +1,31 @@
+## @file
+#  This module provides Subhook Library implementation.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x00010018
+  BASE_NAME       = SubhookLib
+  MODULE_UNI_FILE = SubhookLib.uni
+  FILE_GUID       = 70E03378-E140-46A8-8E65-7719DA14A240
+  MODULE_TYPE     = HOST_APPLICATION
+  VERSION_STRING  = 0.1
+  LIBRARY_CLASS   = SubhookLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  subhook/subhook.c
+
+[Packages]
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS   == /c /EHsc /Zi /DSUBHOOK_STATIC /Od
+  GCC:*_*_IA32_CC_FLAGS == -g -c -O0 -m32
+  GCC:*_*_X64_CC_FLAGS  == -g -c -O0 -m64

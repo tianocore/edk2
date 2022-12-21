@@ -33,6 +33,7 @@
   #
   UnitTestFrameworkPkg/Library/CmockaLib/CmockaLib.inf
   UnitTestFrameworkPkg/Library/GoogleTestLib/GoogleTestLib.inf
+  UnitTestFrameworkPkg/Library/SubhookLib/SubhookLib.inf
   UnitTestFrameworkPkg/Library/Posix/DebugLibPosix/DebugLibPosix.inf
   UnitTestFrameworkPkg/Library/Posix/MemoryAllocationLibPosix/MemoryAllocationLibPosix.inf
   UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLibCmocka.inf
