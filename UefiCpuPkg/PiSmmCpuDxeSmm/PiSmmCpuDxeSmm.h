@@ -266,6 +266,36 @@ extern BOOLEAN               m5LevelPagingNeeded;
 ///
 extern UINT8  mSmmSaveStateRegisterLma;
 
+#define PAGE_TABLE_POOL_ALIGNMENT   BASE_128KB
+#define PAGE_TABLE_POOL_UNIT_SIZE   BASE_128KB
+#define PAGE_TABLE_POOL_UNIT_PAGES  EFI_SIZE_TO_PAGES (PAGE_TABLE_POOL_UNIT_SIZE)
+#define PAGE_TABLE_POOL_ALIGN_MASK  \
+  (~(EFI_PHYSICAL_ADDRESS)(PAGE_TABLE_POOL_ALIGNMENT - 1))
+
+typedef struct {
+  VOID     *NextPool;
+  UINTN    Offset;
+  UINTN    FreePages;
+} PAGE_TABLE_POOL;
+
+/**
+  Disable CET.
+**/
+VOID
+EFIAPI
+DisableCet (
+  VOID
+  );
+
+/**
+  Enable CET.
+**/
+VOID
+EFIAPI
+EnableCet (
+  VOID
+  );
+
 //
 // SMM CPU Protocol function prototypes.
 //

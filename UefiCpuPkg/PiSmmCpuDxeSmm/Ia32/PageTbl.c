@@ -11,24 +11,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PiSmmCpuDxeSmm.h"
 
 /**
-  Disable CET.
-**/
-VOID
-EFIAPI
-DisableCet (
-  VOID
-  );
-
-/**
-  Enable CET.
-**/
-VOID
-EFIAPI
-EnableCet (
-  VOID
-  );
-
-/**
   Create PageTable for SMM use.
 
   @return     PageTable Address
@@ -218,109 +200,6 @@ SmiPFHandler (
 
 Exit:
   ReleaseSpinLock (mPFLock);
-}
-
-/**
-  This function sets memory attribute for page table.
-**/
-VOID
-SetPageTableAttributes (
-  VOID
-  )
-{
-  UINTN    Index2;
-  UINTN    Index3;
-  UINT64   *L1PageTable;
-  UINT64   *L2PageTable;
-  UINT64   *L3PageTable;
-  UINTN    PageTableBase;
-  BOOLEAN  IsSplitted;
-  BOOLEAN  PageTableSplitted;
-  BOOLEAN  CetEnabled;
-
-  //
-  // Don't mark page table to read-only if heap guard is enabled.
-  //
-  //      BIT2: SMM page guard enabled
-  //      BIT3: SMM pool guard enabled
-  //
-  if ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) {
-    DEBUG ((DEBUG_INFO, "Don't mark page table to read-only as heap guard is enabled\n"));
-    return;
-  }
-
-  //
-  // Don't mark page table to read-only if SMM profile is enabled.
-  //
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
-    DEBUG ((DEBUG_INFO, "Don't mark page table to read-only as SMM profile is enabled\n"));
-    return;
-  }
-
-  DEBUG ((DEBUG_INFO, "SetPageTableAttributes\n"));
-
-  //
-  // Disable write protection, because we need mark page table to be write protected.
-  // We need *write* page table memory, to mark itself to be *read only*.
-  //
-  CetEnabled = ((AsmReadCr4 () & CR4_CET_ENABLE) != 0) ? TRUE : FALSE;
-  if (CetEnabled) {
-    //
-    // CET must be disabled if WP is disabled.
-    //
-    DisableCet ();
-  }
-
-  AsmWriteCr0 (AsmReadCr0 () & ~CR0_WP);
-
-  do {
-    DEBUG ((DEBUG_INFO, "Start...\n"));
-    PageTableSplitted = FALSE;
-
-    PageTableBase = AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64;
-    L3PageTable   = (UINT64 *)PageTableBase;
-
-    SmmSetMemoryAttributesEx (PageTableBase, FALSE, (EFI_PHYSICAL_ADDRESS)PageTableBase, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
-    PageTableSplitted = (PageTableSplitted || IsSplitted);
-
-    for (Index3 = 0; Index3 < 4; Index3++) {
-      L2PageTable = (UINT64 *)(UINTN)(L3PageTable[Index3] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
-      if (L2PageTable == NULL) {
-        continue;
-      }
-
-      SmmSetMemoryAttributesEx (PageTableBase, FALSE, (EFI_PHYSICAL_ADDRESS)(UINTN)L2PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
-      PageTableSplitted = (PageTableSplitted || IsSplitted);
-
-      for (Index2 = 0; Index2 < SIZE_4KB/sizeof (UINT64); Index2++) {
-        if ((L2PageTable[Index2] & IA32_PG_PS) != 0) {
-          // 2M
-          continue;
-        }
-
-        L1PageTable = (UINT64 *)(UINTN)(L2PageTable[Index2] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
-        if (L1PageTable == NULL) {
-          continue;
-        }
-
-        SmmSetMemoryAttributesEx (PageTableBase, FALSE, (EFI_PHYSICAL_ADDRESS)(UINTN)L1PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
-        PageTableSplitted = (PageTableSplitted || IsSplitted);
-      }
-    }
-  } while (PageTableSplitted);
-
-  //
-  // Enable write protection, after page table updated.
-  //
-  AsmWriteCr0 (AsmReadCr0 () | CR0_WP);
-  if (CetEnabled) {
-    //
-    // re-enable CET.
-    //
-    EnableCet ();
-  }
-
-  return;
 }
 
 /**
