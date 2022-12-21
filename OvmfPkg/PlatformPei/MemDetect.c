@@ -41,13 +41,13 @@ Module Name:
 
 VOID
 Q35TsegMbytesInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   UINT16         ExtendedTsegMbytes;
   RETURN_STATUS  PcdStatus;
 
-  ASSERT (mPlatformInfoHob.HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID);
+  ASSERT (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID);
 
   //
   // Check if QEMU offers an extended TSEG.
@@ -68,7 +68,7 @@ Q35TsegMbytesInitialization (
   PciWrite16 (DRAMC_REGISTER_Q35 (MCH_EXT_TSEG_MB), MCH_EXT_TSEG_MB_QUERY);
   ExtendedTsegMbytes = PciRead16 (DRAMC_REGISTER_Q35 (MCH_EXT_TSEG_MB));
   if (ExtendedTsegMbytes == MCH_EXT_TSEG_MB_QUERY) {
-    mPlatformInfoHob.Q35TsegMbytes = PcdGet16 (PcdQ35TsegMbytes);
+    PlatformInfoHob->Q35TsegMbytes = PcdGet16 (PcdQ35TsegMbytes);
     return;
   }
 
@@ -80,19 +80,19 @@ Q35TsegMbytesInitialization (
     ));
   PcdStatus = PcdSet16S (PcdQ35TsegMbytes, ExtendedTsegMbytes);
   ASSERT_RETURN_ERROR (PcdStatus);
-  mPlatformInfoHob.Q35TsegMbytes = ExtendedTsegMbytes;
+  PlatformInfoHob->Q35TsegMbytes = ExtendedTsegMbytes;
 }
 
 VOID
 Q35SmramAtDefaultSmbaseInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   RETURN_STATUS  PcdStatus;
 
-  ASSERT (mPlatformInfoHob.HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID);
+  ASSERT (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID);
 
-  mPlatformInfoHob.Q35SmramAtDefaultSmbase = FALSE;
+  PlatformInfoHob->Q35SmramAtDefaultSmbase = FALSE;
   if (FeaturePcdGet (PcdCsmEnable)) {
     DEBUG ((
       DEBUG_INFO,
@@ -106,19 +106,19 @@ Q35SmramAtDefaultSmbaseInitialization (
     CtlReg = DRAMC_REGISTER_Q35 (MCH_DEFAULT_SMBASE_CTL);
     PciWrite8 (CtlReg, MCH_DEFAULT_SMBASE_QUERY);
     CtlRegVal                                = PciRead8 (CtlReg);
-    mPlatformInfoHob.Q35SmramAtDefaultSmbase = (BOOLEAN)(CtlRegVal ==
+    PlatformInfoHob->Q35SmramAtDefaultSmbase = (BOOLEAN)(CtlRegVal ==
                                                          MCH_DEFAULT_SMBASE_IN_RAM);
     DEBUG ((
       DEBUG_INFO,
       "%a: SMRAM at default SMBASE %a\n",
       __FUNCTION__,
-      mPlatformInfoHob.Q35SmramAtDefaultSmbase ? "found" : "not found"
+      PlatformInfoHob->Q35SmramAtDefaultSmbase ? "found" : "not found"
       ));
   }
 
   PcdStatus = PcdSetBoolS (
                 PcdQ35SmramAtDefaultSmbase,
-                mPlatformInfoHob.Q35SmramAtDefaultSmbase
+                PlatformInfoHob->Q35SmramAtDefaultSmbase
                 );
   ASSERT_RETURN_ERROR (PcdStatus);
 }
@@ -188,7 +188,7 @@ AddressWidthInitialization (
 STATIC
 UINT32
 GetPeiMemoryCap (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   BOOLEAN  Page1GSupport;
@@ -225,15 +225,15 @@ GetPeiMemoryCap (
     }
   }
 
-  if (mPlatformInfoHob.PhysMemAddressWidth <= 39) {
+  if (PlatformInfoHob->PhysMemAddressWidth <= 39) {
     Pml4Entries = 1;
-    PdpEntries  = 1 << (mPlatformInfoHob.PhysMemAddressWidth - 30);
+    PdpEntries  = 1 << (PlatformInfoHob->PhysMemAddressWidth - 30);
     ASSERT (PdpEntries <= 0x200);
   } else {
-    if (mPlatformInfoHob.PhysMemAddressWidth > 48) {
+    if (PlatformInfoHob->PhysMemAddressWidth > 48) {
       Pml4Entries = 0x200;
     } else {
-      Pml4Entries = 1 << (mPlatformInfoHob.PhysMemAddressWidth - 39);
+      Pml4Entries = 1 << (PlatformInfoHob->PhysMemAddressWidth - 39);
     }
 
     ASSERT (Pml4Entries <= 0x200);
@@ -260,7 +260,7 @@ GetPeiMemoryCap (
 **/
 EFI_STATUS
 PublishPeiMemory (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   EFI_STATUS            Status;
@@ -271,12 +271,12 @@ PublishPeiMemory (
   UINT32                S3AcpiReservedMemoryBase;
   UINT32                S3AcpiReservedMemorySize;
 
-  LowerMemorySize = PlatformGetSystemMemorySizeBelow4gb (&mPlatformInfoHob);
-  if (mPlatformInfoHob.SmmSmramRequire) {
+  LowerMemorySize = PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
+  if (PlatformInfoHob->SmmSmramRequire) {
     //
     // TSEG is chipped from the end of low RAM
     //
-    LowerMemorySize -= mPlatformInfoHob.Q35TsegMbytes * SIZE_1MB;
+    LowerMemorySize -= PlatformInfoHob->Q35TsegMbytes * SIZE_1MB;
   }
 
   S3AcpiReservedMemoryBase = 0;
@@ -287,27 +287,27 @@ PublishPeiMemory (
   // downwards. Its size is primarily dictated by CpuMpPei. The formula below
   // is an approximation.
   //
-  if (mPlatformInfoHob.S3Supported) {
+  if (PlatformInfoHob->S3Supported) {
     S3AcpiReservedMemorySize = SIZE_512KB +
-                               mPlatformInfoHob.PcdCpuMaxLogicalProcessorNumber *
+                               PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber *
                                PcdGet32 (PcdCpuApStackSize);
     S3AcpiReservedMemoryBase = LowerMemorySize - S3AcpiReservedMemorySize;
     LowerMemorySize          = S3AcpiReservedMemoryBase;
   }
 
-  mPlatformInfoHob.S3AcpiReservedMemoryBase = S3AcpiReservedMemoryBase;
-  mPlatformInfoHob.S3AcpiReservedMemorySize = S3AcpiReservedMemorySize;
+  PlatformInfoHob->S3AcpiReservedMemoryBase = S3AcpiReservedMemoryBase;
+  PlatformInfoHob->S3AcpiReservedMemorySize = S3AcpiReservedMemorySize;
 
-  if (mPlatformInfoHob.BootMode == BOOT_ON_S3_RESUME) {
+  if (PlatformInfoHob->BootMode == BOOT_ON_S3_RESUME) {
     MemoryBase = S3AcpiReservedMemoryBase;
     MemorySize = S3AcpiReservedMemorySize;
   } else {
-    PeiMemoryCap = GetPeiMemoryCap ();
+    PeiMemoryCap = GetPeiMemoryCap (PlatformInfoHob);
     DEBUG ((
       DEBUG_INFO,
       "%a: PhysMemAddressWidth=%d PeiMemoryCap=%u KB\n",
       __FUNCTION__,
-      mPlatformInfoHob.PhysMemAddressWidth,
+      PlatformInfoHob->PhysMemAddressWidth,
       PeiMemoryCap >> 10
       ));
 
@@ -321,7 +321,7 @@ PublishPeiMemory (
     // allocation HOB, and other allocations served from the permanent PEI RAM
     // shouldn't overlap with that HOB.
     //
-    MemoryBase = mPlatformInfoHob.S3Supported && mPlatformInfoHob.SmmSmramRequire ?
+    MemoryBase = PlatformInfoHob->S3Supported && PlatformInfoHob->SmmSmramRequire ?
                  PcdGet32 (PcdOvmfDecompressionScratchEnd) :
                  PcdGet32 (PcdOvmfDxeMemFvBase) + PcdGet32 (PcdOvmfDxeMemFvSize);
     MemorySize = LowerMemorySize - MemoryBase;
@@ -336,7 +336,7 @@ PublishPeiMemory (
   // normal boot permanent PEI RAM. Regarding the S3 boot path, the S3
   // permanent PEI RAM is located even higher.
   //
-  if (mPlatformInfoHob.SmmSmramRequire && mPlatformInfoHob.Q35SmramAtDefaultSmbase) {
+  if (PlatformInfoHob->SmmSmramRequire && PlatformInfoHob->Q35SmramAtDefaultSmbase) {
     ASSERT (SMM_DEFAULT_SMBASE + MCH_DEFAULT_SMBASE_SIZE <= MemoryBase);
   }
 

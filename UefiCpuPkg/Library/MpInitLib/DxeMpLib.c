@@ -1,7 +1,7 @@
 /** @file
   MP initialize support functions for DXE phase.
 
-  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -28,6 +28,7 @@ volatile BOOLEAN  mStopCheckAllApsStatus       = TRUE;
 VOID              *mReservedApLoopFunc         = NULL;
 UINTN             mReservedTopOfApStack;
 volatile UINT32   mNumberToFinish = 0;
+UINTN             mApPageTable;
 
 //
 // Begin wakeup buffer allocation below 0x88000
@@ -378,32 +379,41 @@ RelocateApLoop (
   IN OUT VOID  *Buffer
   )
 {
-  CPU_MP_DATA           *CpuMpData;
-  BOOLEAN               MwaitSupport;
-  ASM_RELOCATE_AP_LOOP  AsmRelocateApLoopFunc;
-  UINTN                 ProcessorNumber;
-  UINTN                 StackStart;
+  CPU_MP_DATA               *CpuMpData;
+  BOOLEAN                   MwaitSupport;
+  ASM_RELOCATE_AP_LOOP      AsmRelocateApLoopFunc;
+  ASM_RELOCATE_AP_LOOP_AMD  AsmRelocateApLoopFuncAmd;
+  UINTN                     ProcessorNumber;
+  UINTN                     StackStart;
 
   MpInitLibWhoAmI (&ProcessorNumber);
   CpuMpData    = GetCpuMpData ();
   MwaitSupport = IsMwaitSupport ();
-  if (CpuMpData->UseSevEsAPMethod) {
-    StackStart = CpuMpData->SevEsAPResetStackStart;
+  if (StandardSignatureIsAuthenticAMD ()) {
+    StackStart               = CpuMpData->UseSevEsAPMethod ? CpuMpData->SevEsAPResetStackStart : mReservedTopOfApStack;
+    AsmRelocateApLoopFuncAmd = (ASM_RELOCATE_AP_LOOP_AMD)(UINTN)mReservedApLoopFunc;
+    AsmRelocateApLoopFuncAmd (
+      MwaitSupport,
+      CpuMpData->ApTargetCState,
+      CpuMpData->PmCodeSegment,
+      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
+      (UINTN)&mNumberToFinish,
+      CpuMpData->Pm16CodeSegment,
+      CpuMpData->SevEsAPBuffer,
+      CpuMpData->WakeupBuffer
+      );
   } else {
-    StackStart = mReservedTopOfApStack;
+    StackStart            = mReservedTopOfApStack;
+    AsmRelocateApLoopFunc = (ASM_RELOCATE_AP_LOOP)(UINTN)mReservedApLoopFunc;
+    AsmRelocateApLoopFunc (
+      MwaitSupport,
+      CpuMpData->ApTargetCState,
+      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
+      (UINTN)&mNumberToFinish,
+      mApPageTable
+      );
   }
 
-  AsmRelocateApLoopFunc = (ASM_RELOCATE_AP_LOOP)(UINTN)mReservedApLoopFunc;
-  AsmRelocateApLoopFunc (
-    MwaitSupport,
-    CpuMpData->ApTargetCState,
-    CpuMpData->PmCodeSegment,
-    StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
-    (UINTN)&mNumberToFinish,
-    CpuMpData->Pm16CodeSegment,
-    CpuMpData->SevEsAPBuffer,
-    CpuMpData->WakeupBuffer
-    );
   //
   // It should never reach here
   //
@@ -465,7 +475,6 @@ InitMpGlobalData (
   )
 {
   EFI_STATUS                       Status;
-  EFI_PHYSICAL_ADDRESS             Address;
   UINTN                            ApSafeBufferSize;
   UINTN                            Index;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  MemDesc;
@@ -533,60 +542,45 @@ InitMpGlobalData (
   // Allocating it in advance since memory services are not available in
   // Exit Boot Services callback function.
   //
-  ApSafeBufferSize = EFI_PAGES_TO_SIZE (
-                       EFI_SIZE_TO_PAGES (
-                         CpuMpData->AddressMap.RelocateApLoopFuncSize
-                         )
-                       );
-  Address = BASE_4GB - 1;
-  Status  = gBS->AllocatePages (
-                   AllocateMaxAddress,
-                   EfiReservedMemoryType,
-                   EFI_SIZE_TO_PAGES (ApSafeBufferSize),
-                   &Address
-                   );
-  ASSERT_EFI_ERROR (Status);
-
-  mReservedApLoopFunc = (VOID *)(UINTN)Address;
-  ASSERT (mReservedApLoopFunc != NULL);
-
+  // +------------+
+  // | Ap Loop    |
+  // +------------+
+  // | Stack * N  |
+  // +------------+ (low address)
   //
-  // Make sure that the buffer memory is executable if NX protection is enabled
-  // for EfiReservedMemoryType.
-  //
-  // TODO: Check EFI_MEMORY_XP bit set or not once it's available in DXE GCD
-  //       service.
-  //
-  Status = gDS->GetMemorySpaceDescriptor (Address, &MemDesc);
-  if (!EFI_ERROR (Status)) {
-    gDS->SetMemorySpaceAttributes (
-           Address,
-           ApSafeBufferSize,
-           MemDesc.Attributes & (~EFI_MEMORY_XP)
-           );
-  }
-
   ApSafeBufferSize = EFI_PAGES_TO_SIZE (
                        EFI_SIZE_TO_PAGES (
                          CpuMpData->CpuCount * AP_SAFE_STACK_SIZE
+                         + CpuMpData->AddressMap.RelocateApLoopFuncSize
                          )
                        );
-  Address = BASE_4GB - 1;
-  Status  = gBS->AllocatePages (
-                   AllocateMaxAddress,
-                   EfiReservedMemoryType,
-                   EFI_SIZE_TO_PAGES (ApSafeBufferSize),
-                   &Address
-                   );
-  ASSERT_EFI_ERROR (Status);
 
-  mReservedTopOfApStack = (UINTN)Address + ApSafeBufferSize;
+  mReservedTopOfApStack = (UINTN)AllocateReservedPages (EFI_SIZE_TO_PAGES (ApSafeBufferSize));
+  ASSERT (mReservedTopOfApStack != 0);
   ASSERT ((mReservedTopOfApStack & (UINTN)(CPU_STACK_ALIGNMENT - 1)) == 0);
-  CopyMem (
-    mReservedApLoopFunc,
-    CpuMpData->AddressMap.RelocateApLoopFuncAddress,
-    CpuMpData->AddressMap.RelocateApLoopFuncSize
-    );
+  ASSERT ((AP_SAFE_STACK_SIZE & (CPU_STACK_ALIGNMENT - 1)) == 0);
+
+  mReservedApLoopFunc = (VOID *)(mReservedTopOfApStack + CpuMpData->CpuCount * AP_SAFE_STACK_SIZE);
+  if (StandardSignatureIsAuthenticAMD ()) {
+    CopyMem (
+      mReservedApLoopFunc,
+      CpuMpData->AddressMap.RelocateApLoopFuncAddressAmd,
+      CpuMpData->AddressMap.RelocateApLoopFuncSizeAmd
+      );
+  } else {
+    CopyMem (
+      mReservedApLoopFunc,
+      CpuMpData->AddressMap.RelocateApLoopFuncAddress,
+      CpuMpData->AddressMap.RelocateApLoopFuncSize
+      );
+
+    mApPageTable = CreatePageTable (
+                     mReservedTopOfApStack,
+                     ApSafeBufferSize
+                     );
+  }
+
+  mReservedTopOfApStack += CpuMpData->CpuCount * AP_SAFE_STACK_SIZE;
 
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,

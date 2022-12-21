@@ -2848,6 +2848,11 @@ typedef struct {
 #define EFI_ACPI_6_4_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('A', 'P', 'I', 'C')
 
 ///
+/// "APMT" Arm Performance Monitoring Unit Table
+///
+#define EFI_ACPI_6_4_ARM_PERFORMANCE_MONITORING_UNIT_TABLE_SIGNATURE  SIGNATURE_32('A', 'P', 'M', 'T')
+
+///
 /// "BERT" Boot Error Record Table
 ///
 #define EFI_ACPI_6_4_BOOT_ERROR_RECORD_TABLE_SIGNATURE  SIGNATURE_32('B', 'E', 'R', 'T')

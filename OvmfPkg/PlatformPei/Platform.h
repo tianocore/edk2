@@ -13,8 +13,6 @@
 #include <Library/PlatformInitLib.h>
 #include <IndustryStandard/IntelTdx.h>
 
-extern EFI_HOB_PLATFORM_INFO  mPlatformInfoHob;
-
 VOID
 AddressWidthInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
@@ -22,17 +20,17 @@ AddressWidthInitialization (
 
 VOID
 Q35TsegMbytesInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 VOID
 Q35SmramAtDefaultSmbaseInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 EFI_STATUS
 PublishPeiMemory (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 VOID
@@ -62,17 +60,17 @@ MaxCpuCountInitialization (
 
 EFI_STATUS
 PeiFvInitialization (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 VOID
 MemTypeInfoInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 VOID
 InstallFeatureControlCallback (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 VOID
@@ -82,7 +80,7 @@ InstallClearCacheCallback (
 
 VOID
 AmdSevInitialize (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
 /**
@@ -98,7 +96,7 @@ IntelTdxInitialize (
 /**
  * @brief Builds PlatformInfo Hob
  */
-VOID
+EFI_HOB_PLATFORM_INFO *
 BuildPlatformInfoHob (
   VOID
   );

@@ -340,6 +340,7 @@
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/DxeDebugAgentLib.inf
 !endif
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
+  CpuPageTableLib|UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
 !if $(PERFORMANCE_MEASUREMENT_ENABLE)
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
@@ -530,14 +531,14 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|$(UART_DEFAULT_PARITY)
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|$(UART_DEFAULT_STOP_BITS)
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|$(DEFAULT_TERMINAL_TYPE)
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize|0x1
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds|50000
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode|1
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0x0
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x0
 !if ($(TARGET) == DEBUG || $(USE_CBMEM_FOR_CONSOLE) == TRUE)
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE
 !else

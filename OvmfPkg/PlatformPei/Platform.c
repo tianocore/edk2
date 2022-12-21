@@ -41,8 +41,6 @@
 
 #include "Platform.h"
 
-EFI_HOB_PLATFORM_INFO  mPlatformInfoHob = { 0 };
-
 EFI_PEI_PPI_DESCRIPTOR  mPpiBootMode[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
@@ -75,16 +73,17 @@ MemMapInitialization (
   ASSERT_RETURN_ERROR (PcdStatus);
 }
 
+STATIC
 VOID
 NoexecDxeInitialization (
-  VOID
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
   RETURN_STATUS  Status;
 
-  Status = PlatformNoexecDxeInitialization (&mPlatformInfoHob);
+  Status = PlatformNoexecDxeInitialization (PlatformInfoHob);
   if (!RETURN_ERROR (Status)) {
-    Status = PcdSetBoolS (PcdSetNxForStack, mPlatformInfoHob.PcdSetNxForStack);
+    Status = PcdSetBoolS (PcdSetNxForStack, PlatformInfoHob->PcdSetNxForStack);
     ASSERT_RETURN_ERROR (Status);
   }
 }
@@ -230,13 +229,14 @@ ReserveEmuVariableNvStore (
   ASSERT_RETURN_ERROR (PcdStatus);
 }
 
+STATIC
 VOID
 S3Verification (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
  #if defined (MDE_CPU_X64)
-  if (mPlatformInfoHob.SmmSmramRequire && mPlatformInfoHob.S3Supported) {
+  if (PlatformInfoHob->SmmSmramRequire && PlatformInfoHob->S3Supported) {
     DEBUG ((
       DEBUG_ERROR,
       "%a: S3Resume2Pei doesn't support X64 PEI + SMM yet.\n",
@@ -259,12 +259,13 @@ S3Verification (
  #endif
 }
 
+STATIC
 VOID
 Q35BoardVerification (
-  VOID
+  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  if (mPlatformInfoHob.HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+  if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     return;
   }
 
@@ -273,7 +274,7 @@ Q35BoardVerification (
     "%a: no TSEG (SMRAM) on host bridge DID=0x%04x; "
     "only DID=0x%04x (Q35) is supported\n",
     __FUNCTION__,
-    mPlatformInfoHob.HostBridgeDevId,
+    PlatformInfoHob->HostBridgeDevId,
     INTEL_Q35_MCH_DEVICE_ID
     ));
   ASSERT (FALSE);
@@ -302,12 +303,18 @@ MaxCpuCountInitialization (
 /**
  * @brief Builds PlatformInfo Hob
  */
-VOID
+EFI_HOB_PLATFORM_INFO *
 BuildPlatformInfoHob (
   VOID
   )
 {
-  BuildGuidDataHob (&gUefiOvmfPkgPlatformInfoGuid, &mPlatformInfoHob, sizeof (EFI_HOB_PLATFORM_INFO));
+  EFI_HOB_PLATFORM_INFO  PlatformInfoHob;
+  EFI_HOB_GUID_TYPE      *GuidHob;
+
+  ZeroMem (&PlatformInfoHob, sizeof PlatformInfoHob);
+  BuildGuidDataHob (&gUefiOvmfPkgPlatformInfoGuid, &PlatformInfoHob, sizeof (EFI_HOB_PLATFORM_INFO));
+  GuidHob = GetFirstGuidHob (&gUefiOvmfPkgPlatformInfoGuid);
+  return (EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (GuidHob);
 }
 
 /**
@@ -326,69 +333,70 @@ InitializePlatform (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS  Status;
+  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob;
+  EFI_STATUS             Status;
 
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
+  PlatformInfoHob = BuildPlatformInfoHob ();
 
-  mPlatformInfoHob.SmmSmramRequire     = FeaturePcdGet (PcdSmmSmramRequire);
-  mPlatformInfoHob.SevEsIsEnabled      = MemEncryptSevEsIsEnabled ();
-  mPlatformInfoHob.PcdPciMmio64Size    = PcdGet64 (PcdPciMmio64Size);
-  mPlatformInfoHob.DefaultMaxCpuNumber = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+  PlatformInfoHob->SmmSmramRequire     = FeaturePcdGet (PcdSmmSmramRequire);
+  PlatformInfoHob->SevEsIsEnabled      = MemEncryptSevEsIsEnabled ();
+  PlatformInfoHob->PcdPciMmio64Size    = PcdGet64 (PcdPciMmio64Size);
+  PlatformInfoHob->DefaultMaxCpuNumber = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
 
   PlatformDebugDumpCmos ();
 
   if (QemuFwCfgS3Enabled ()) {
     DEBUG ((DEBUG_INFO, "S3 support was detected on QEMU\n"));
-    mPlatformInfoHob.S3Supported = TRUE;
+    PlatformInfoHob->S3Supported = TRUE;
     Status                       = PcdSetBoolS (PcdAcpiS3Enable, TRUE);
     ASSERT_EFI_ERROR (Status);
   }
 
-  S3Verification ();
-  BootModeInitialization (&mPlatformInfoHob);
+  S3Verification (PlatformInfoHob);
+  BootModeInitialization (PlatformInfoHob);
 
   //
   // Query Host Bridge DID
   //
-  mPlatformInfoHob.HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
-  AddressWidthInitialization (&mPlatformInfoHob);
+  PlatformInfoHob->HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
+  AddressWidthInitialization (PlatformInfoHob);
 
-  MaxCpuCountInitialization (&mPlatformInfoHob);
+  MaxCpuCountInitialization (PlatformInfoHob);
 
-  if (mPlatformInfoHob.SmmSmramRequire) {
-    Q35BoardVerification ();
-    Q35TsegMbytesInitialization ();
-    Q35SmramAtDefaultSmbaseInitialization ();
+  if (PlatformInfoHob->SmmSmramRequire) {
+    Q35BoardVerification (PlatformInfoHob);
+    Q35TsegMbytesInitialization (PlatformInfoHob);
+    Q35SmramAtDefaultSmbaseInitialization (PlatformInfoHob);
   }
 
-  PublishPeiMemory ();
+  PublishPeiMemory (PlatformInfoHob);
 
-  PlatformQemuUc32BaseInitialization (&mPlatformInfoHob);
+  PlatformQemuUc32BaseInitialization (PlatformInfoHob);
 
-  InitializeRamRegions (&mPlatformInfoHob);
+  InitializeRamRegions (PlatformInfoHob);
 
-  if (mPlatformInfoHob.BootMode != BOOT_ON_S3_RESUME) {
-    if (!mPlatformInfoHob.SmmSmramRequire) {
+  if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
+    if (!PlatformInfoHob->SmmSmramRequire) {
       ReserveEmuVariableNvStore ();
     }
 
-    PeiFvInitialization ();
-    MemTypeInfoInitialization ();
-    MemMapInitialization (&mPlatformInfoHob);
-    NoexecDxeInitialization ();
+    PeiFvInitialization (PlatformInfoHob);
+    MemTypeInfoInitialization (PlatformInfoHob);
+    MemMapInitialization (PlatformInfoHob);
+    NoexecDxeInitialization (PlatformInfoHob);
   }
 
   InstallClearCacheCallback ();
-  AmdSevInitialize ();
-  if (mPlatformInfoHob.HostBridgeDevId == 0xffff) {
-    MiscInitializationForMicrovm (&mPlatformInfoHob);
+  AmdSevInitialize (PlatformInfoHob);
+  if (PlatformInfoHob->HostBridgeDevId == 0xffff) {
+    MiscInitializationForMicrovm (PlatformInfoHob);
   } else {
-    MiscInitialization (&mPlatformInfoHob);
+    MiscInitialization (PlatformInfoHob);
   }
 
   IntelTdxInitialize ();
-  InstallFeatureControlCallback ();
-  BuildPlatformInfoHob ();
+  InstallFeatureControlCallback (PlatformInfoHob);
 
   return EFI_SUCCESS;
 }

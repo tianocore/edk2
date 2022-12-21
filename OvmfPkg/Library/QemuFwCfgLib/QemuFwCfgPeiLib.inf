@@ -39,9 +39,12 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  HobLib
   IoLib
   MemoryAllocationLib
-  MemEncryptSevLib
+
+[Guids]
+  gUefiOvmfPkgPlatformInfoGuid
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase

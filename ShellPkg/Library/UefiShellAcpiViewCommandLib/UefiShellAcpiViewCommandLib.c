@@ -48,6 +48,7 @@ STATIC
 CONST
 ACPI_TABLE_PARSER  ParserList[] = {
   { EFI_ACPI_6_3_ARM_ERROR_SOURCE_TABLE_SIGNATURE,                                                       ParseAcpiAest },
+  { EFI_ACPI_6_4_ARM_PERFORMANCE_MONITORING_UNIT_TABLE_SIGNATURE,                                        ParseAcpiApmt },
   { EFI_ACPI_6_2_BOOT_GRAPHICS_RESOURCE_TABLE_SIGNATURE,                                                 ParseAcpiBgrt },
   { EFI_ACPI_6_2_DEBUG_PORT_2_TABLE_SIGNATURE,                                                           ParseAcpiDbg2 },
   { EFI_ACPI_6_2_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,

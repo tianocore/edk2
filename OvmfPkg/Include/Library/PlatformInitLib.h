@@ -48,6 +48,12 @@ typedef struct {
 
   UINT32               S3AcpiReservedMemoryBase;
   UINT32               S3AcpiReservedMemorySize;
+
+  UINT64               FeatureControlValue;
+
+  BOOLEAN              QemuFwCfgChecked;
+  BOOLEAN              QemuFwCfgSupported;
+  BOOLEAN              QemuFwCfgDmaSupported;
 } EFI_HOB_PLATFORM_INFO;
 #pragma pack()
 

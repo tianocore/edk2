@@ -482,7 +482,7 @@ GenerateLpiStates (
     }
 
     // We do not support the LevelId field for now, let it to 0.
-    Status = AmlCreateLpiNode (AslName, 1, 0, ScopeNode, &LpiNode);
+    Status = AmlCreateLpiNode (AslName, 0, 0, ScopeNode, &LpiNode);
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       return Status;
@@ -553,7 +553,7 @@ GenerateLpiStates (
   @param [in]  Generator    The SSDT Cpu Topology generator.
   @param [in]  ParentNode   Parent node to attach the Cpu node to.
   @param [in]  GicCInfo     CM_ARM_GICC_INFO object used to create the node.
-  @param [in]  CpuIndex     Index used to generate the node name.
+  @param [in]  CpuName      Value used to generate the node name.
   @param [out] CpuNodePtr   If not NULL, return the created Cpu node.
 
   @retval EFI_SUCCESS             Success.
@@ -567,7 +567,7 @@ CreateAmlCpu (
   IN   ACPI_CPU_TOPOLOGY_GENERATOR  *Generator,
   IN   AML_NODE_HANDLE              ParentNode,
   IN   CM_ARM_GICC_INFO             *GicCInfo,
-  IN   UINT32                       CpuIndex,
+  IN   UINT32                       CpuName,
   OUT  AML_OBJECT_NODE_HANDLE       *CpuNodePtr OPTIONAL
   )
 {
@@ -579,7 +579,7 @@ CreateAmlCpu (
   ASSERT (ParentNode != NULL);
   ASSERT (GicCInfo != NULL);
 
-  Status = WriteAslName ('C', CpuIndex, AslName);
+  Status = WriteAslName ('C', CpuName, AslName);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -628,7 +628,7 @@ CreateAmlCpu (
   @param [in]  CfgMgrProtocol         Pointer to the Configuration Manager
                                       Protocol Interface.
   @param [in]  ParentNode             Parent node to attach the Cpu node to.
-  @param [in]  CpuIndex               Index used to generate the node name.
+  @param [in]  CpuName                Value used to generate the node name.
   @param [in]  ProcHierarchyNodeInfo  CM_ARM_PROC_HIERARCHY_INFO describing
                                       the Cpu.
 
@@ -643,7 +643,7 @@ CreateAmlCpuFromProcHierarchy (
   IN        ACPI_CPU_TOPOLOGY_GENERATOR                   *Generator,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN        AML_NODE_HANDLE                               ParentNode,
-  IN        UINT32                                        CpuIndex,
+  IN        UINT32                                        CpuName,
   IN        CM_ARM_PROC_HIERARCHY_INFO                    *ProcHierarchyNodeInfo
   )
 {
@@ -668,7 +668,7 @@ CreateAmlCpuFromProcHierarchy (
     return Status;
   }
 
-  Status = CreateAmlCpu (Generator, ParentNode, GicCInfo, CpuIndex, &CpuNode);
+  Status = CreateAmlCpu (Generator, ParentNode, GicCInfo, CpuName, &CpuNode);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -735,7 +735,8 @@ CreateAmlProcessorContainer (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN        AML_NODE_HANDLE                               ParentNode,
   IN        CM_ARM_PROC_HIERARCHY_INFO                    *ProcHierarchyNodeInfo,
-  IN        UINT32                                        ProcContainerIndex,
+  IN        UINT16                                        ProcContainerName,
+  IN        UINT32                                        ProcContainerUid,
   OUT       AML_OBJECT_NODE_HANDLE                        *ProcContainerNodePtr
   )
 {
@@ -749,7 +750,7 @@ CreateAmlProcessorContainer (
   ASSERT (ProcHierarchyNodeInfo != NULL);
   ASSERT (ProcContainerNodePtr != NULL);
 
-  Status = WriteAslName ('C', ProcContainerIndex, AslNameProcContainer);
+  Status = WriteAslName ('C', ProcContainerName, AslNameProcContainer);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -765,7 +766,7 @@ CreateAmlProcessorContainer (
   // and EFI_ACPI_6_3_PPTT_PROCESSOR_ID_INVALID is set for non-Cpus.
   Status = AmlCodeGenNameInteger (
              "_UID",
-             ProcContainerIndex,
+             ProcContainerUid,
              ProcContainerNode,
              NULL
              );
@@ -838,6 +839,8 @@ CreateAmlCpuTopologyTree (
   UINT32                  Index;
   UINT32                  CpuIndex;
   AML_OBJECT_NODE_HANDLE  ProcContainerNode;
+  UINT32                  Uid;
+  UINT16                  Name;
 
   ASSERT (Generator != NULL);
   ASSERT (Generator->ProcNodeList != NULL);
@@ -868,11 +871,17 @@ CreateAmlCpuTopologyTree (
           return EFI_INVALID_PARAMETER;
         }
 
+        if (Generator->ProcNodeList[Index].OverrideNameUidEnabled) {
+          Name = Generator->ProcNodeList[Index].OverrideName;
+        } else {
+          Name = CpuIndex;
+        }
+
         Status = CreateAmlCpuFromProcHierarchy (
                    Generator,
                    CfgMgrProtocol,
                    ParentNode,
-                   CpuIndex,
+                   Name,
                    &Generator->ProcNodeList[Index]
                    );
         if (EFI_ERROR (Status)) {
@@ -897,12 +906,21 @@ CreateAmlCpuTopologyTree (
           return EFI_INVALID_PARAMETER;
         }
 
+        if (Generator->ProcNodeList[Index].OverrideNameUidEnabled) {
+          Name = Generator->ProcNodeList[Index].OverrideName;
+          Uid  = Generator->ProcNodeList[Index].OverrideUid;
+        } else {
+          Name = *ProcContainerIndex;
+          Uid  = *ProcContainerIndex;
+        }
+
         Status = CreateAmlProcessorContainer (
                    Generator,
                    CfgMgrProtocol,
                    ParentNode,
                    &Generator->ProcNodeList[Index],
-                   *ProcContainerIndex,
+                   Name,
+                   Uid,
                    &ProcContainerNode
                    );
         if (EFI_ERROR (Status)) {

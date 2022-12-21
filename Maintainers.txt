@@ -478,7 +478,7 @@ F: OvmfPkg/AmdSev/
 F: OvmfPkg/AmdSevDxe/
 F: OvmfPkg/Include/Guid/ConfidentialComputingSecret.h
 F: OvmfPkg/Include/Library/MemEncryptSevLib.h
-F: OvmfPkg/IoMmuDxe/AmdSevIoMmu.*
+F: OvmfPkg/IoMmuDxe/CcIoMmu.*
 F: OvmfPkg/Library/BaseMemEncryptSevLib/
 F: OvmfPkg/Library/PlatformBootManagerLibGrub/
 F: OvmfPkg/Library/CcExitLib/
@@ -537,7 +537,7 @@ F: OvmfPkg/XenIoPvhDxe/
 F: OvmfPkg/XenPlatformPei/
 F: OvmfPkg/XenPvBlkDxe/
 F: OvmfPkg/XenResetVector/
-R: Anthony Perard <anthony.perard@citrix.com> [sheep]
+R: Anthony Perard <anthony.perard@citrix.com> [tperard]
 R: Julien Grall <julien@xen.org> [jgrall]
 
 PcAtChipsetPkg

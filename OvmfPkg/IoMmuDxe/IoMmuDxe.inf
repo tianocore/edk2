@@ -18,15 +18,15 @@
   ENTRY_POINT                    = IoMmuDxeEntryPoint
 
 [Sources]
-  AmdSevIoMmu.c
-  AmdSevIoMmu.h
+  CcIoMmu.c
+  CcIoMmu.h
   IoMmuDxe.c
+  IoMmuBuffer.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   OvmfPkg/OvmfPkg.dec
-#  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseLib
