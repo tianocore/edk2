@@ -11,24 +11,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PiSmmCpuDxeSmm.h"
 
 /**
-  Disable CET.
-**/
-VOID
-EFIAPI
-DisableCet (
-  VOID
-  );
-
-/**
-  Enable CET.
-**/
-VOID
-EFIAPI
-EnableCet (
-  VOID
-  );
-
-/**
   Create PageTable for SMM use.
 
   @return     PageTable Address
@@ -319,6 +301,8 @@ SetPageTableAttributes (
     //
     EnableCet ();
   }
+
+  mIsReadOnlyPageTable = TRUE;
 
   return;
 }

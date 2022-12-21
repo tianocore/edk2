@@ -21,24 +21,6 @@ BOOLEAN                   mCpuSmmRestrictedMemoryAccess;
 X86_ASSEMBLY_PATCH_LABEL  gPatch5LevelPagingNeeded;
 
 /**
-  Disable CET.
-**/
-VOID
-EFIAPI
-DisableCet (
-  VOID
-  );
-
-/**
-  Enable CET.
-**/
-VOID
-EFIAPI
-EnableCet (
-  VOID
-  );
-
-/**
   Check if 1-GByte pages is supported by processor or not.
 
   @retval TRUE   1-GByte pages is supported.
@@ -1304,6 +1286,8 @@ SetPageTableAttributes (
     //
     EnableCet ();
   }
+
+  mIsReadOnlyPageTable = TRUE;
 
   return;
 }

@@ -35,6 +35,143 @@ PAGE_ATTRIBUTE_TABLE  mPageAttributeTable[] = {
 BOOLEAN  mIsShadowStack      = FALSE;
 BOOLEAN  m5LevelPagingNeeded = FALSE;
 
+//
+// Global variable to keep track current available memory used as page table.
+//
+PAGE_TABLE_POOL  *mPageTablePool = NULL;
+
+//
+// If memory used by SMM page table has been mareked as ReadOnly.
+//
+BOOLEAN  mIsReadOnlyPageTable = FALSE;
+
+/**
+  Initialize a buffer pool for page table use only.
+
+  To reduce the potential split operation on page table, the pages reserved for
+  page table should be allocated in the times of PAGE_TABLE_POOL_UNIT_PAGES and
+  at the boundary of PAGE_TABLE_POOL_ALIGNMENT. So the page pool is always
+  initialized with number of pages greater than or equal to the given PoolPages.
+
+  Once the pages in the pool are used up, this method should be called again to
+  reserve at least another PAGE_TABLE_POOL_UNIT_PAGES. But usually this won't
+  happen in practice.
+
+  @param PoolPages  The least page number of the pool to be created.
+
+  @retval TRUE    The pool is initialized successfully.
+  @retval FALSE   The memory is out of resource.
+**/
+BOOLEAN
+InitializePageTablePool (
+  IN UINTN  PoolPages
+  )
+{
+  VOID     *Buffer;
+  BOOLEAN  CetEnabled;
+
+  //
+  // Always reserve at least PAGE_TABLE_POOL_UNIT_PAGES, including one page for
+  // header.
+  //
+  PoolPages += 1;   // Add one page for header.
+  PoolPages  = ((PoolPages - 1) / PAGE_TABLE_POOL_UNIT_PAGES + 1) *
+               PAGE_TABLE_POOL_UNIT_PAGES;
+  Buffer = AllocateAlignedPages (PoolPages, PAGE_TABLE_POOL_ALIGNMENT);
+  if (Buffer == NULL) {
+    DEBUG ((DEBUG_ERROR, "ERROR: Out of aligned pages\r\n"));
+    return FALSE;
+  }
+
+  //
+  // Link all pools into a list for easier track later.
+  //
+  if (mPageTablePool == NULL) {
+    mPageTablePool           = Buffer;
+    mPageTablePool->NextPool = mPageTablePool;
+  } else {
+    ((PAGE_TABLE_POOL *)Buffer)->NextPool = mPageTablePool->NextPool;
+    mPageTablePool->NextPool              = Buffer;
+    mPageTablePool                        = Buffer;
+  }
+
+  //
+  // Reserve one page for pool header.
+  //
+  mPageTablePool->FreePages = PoolPages - 1;
+  mPageTablePool->Offset    = EFI_PAGES_TO_SIZE (1);
+
+  //
+  // If page table memory has been marked as RO, mark the new pool pages as read-only.
+  //
+  if (mIsReadOnlyPageTable) {
+    CetEnabled = ((AsmReadCr4 () & CR4_CET_ENABLE) != 0) ? TRUE : FALSE;
+    if (CetEnabled) {
+      //
+      // CET must be disabled if WP is disabled.
+      //
+      DisableCet ();
+    }
+
+    AsmWriteCr0 (AsmReadCr0 () & ~CR0_WP);
+    SmmSetMemoryAttributes ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, EFI_PAGES_TO_SIZE (PoolPages), EFI_MEMORY_RO);
+    AsmWriteCr0 (AsmReadCr0 () | CR0_WP);
+    if (CetEnabled) {
+      //
+      // re-enable CET.
+      //
+      EnableCet ();
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+  This API provides a way to allocate memory for page table.
+
+  This API can be called more once to allocate memory for page tables.
+
+  Allocates the number of 4KB pages of type EfiRuntimeServicesData and returns a pointer to the
+  allocated buffer.  The buffer returned is aligned on a 4KB boundary.  If Pages is 0, then NULL
+  is returned.  If there is not enough memory remaining to satisfy the request, then NULL is
+  returned.
+
+  @param  Pages                 The number of 4 KB pages to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+VOID *
+AllocatePageTableMemory (
+  IN UINTN  Pages
+  )
+{
+  VOID  *Buffer;
+
+  if (Pages == 0) {
+    return NULL;
+  }
+
+  //
+  // Renew the pool if necessary.
+  //
+  if ((mPageTablePool == NULL) ||
+      (Pages > mPageTablePool->FreePages))
+  {
+    if (!InitializePageTablePool (Pages)) {
+      return NULL;
+    }
+  }
+
+  Buffer = (UINT8 *)mPageTablePool + mPageTablePool->Offset;
+
+  mPageTablePool->Offset    += EFI_PAGES_TO_SIZE (Pages);
+  mPageTablePool->FreePages -= Pages;
+
+  return Buffer;
+}
+
 /**
   Return length according to page attributes.
 
