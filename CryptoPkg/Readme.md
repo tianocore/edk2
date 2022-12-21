@@ -207,15 +207,15 @@ also configured.
 | Sha512                          |     N      |     N     |      C      |      C      |      C       |      C      |        C        |
 | X509                            |     N      |     N     |             |             |      C       |      C      |        C        |
 | Tdes                            |     Y      |     Y     |             |             |              |             |                 |
-| Aes.GetContextSize              |     N      |     N     |             |             |      C       |      C      |        C        |
-| Aes.Init                        |     N      |     N     |             |             |      C       |      C      |        C        |
+| Aes.GetContextSize              |     N      |     N     |             |      C      |      C       |      C      |        C        |
+| Aes.Init                        |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Aes.EcbEncrypt                  |     Y      |     Y     |             |             |              |             |                 |
 | Aes.EcbDecrypt                  |     Y      |     Y     |             |             |              |             |                 |
-| Aes.CbcEncrypt                  |     N      |     N     |             |             |      C       |      C      |        C        |
-| Aes.CbcDecrypt                  |     N      |     N     |             |             |      C       |      C      |        C        |
+| Aes.CbcEncrypt                  |     N      |     N     |             |      C      |      C       |      C      |        C        |
+| Aes.CbcDecrypt                  |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Arc4                            |     Y      |     Y     |             |             |              |             |                 |
 | Sm3                             |     N      |     N     |             |      C      |      C       |      C      |        C        |
-| Hkdf                            |     N      |     N     |             |      C      |      C       |             |        C        |
+| Hkdf                            |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Tls                             |     N      |     N     |             |             |    C-Tls     |             |                 |
 | TlsSet                          |     N      |     N     |             |             |    C-Tls     |             |                 |
 | TlsGet                          |     N      |     N     |             |             |    C-Tls     |             |                 |
@@ -460,7 +460,7 @@ and CryptoSmm modules.
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Rsa.Services.Free                    | TRUE
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Rsa.Services.SetKey                  | TRUE
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Pkcs.Services.Pkcs5HashPassword      | TRUE
-  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Hkdf.Services.Sha256ExtractAndExpand | TRUE
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Hkdf.Family                          | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
 ```
 
 #### Common DXE and SMM PcdCryptoServiceFamilyEnable Settings
