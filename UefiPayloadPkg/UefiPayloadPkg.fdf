@@ -59,9 +59,6 @@ INF UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
 FILE FV_IMAGE = 4E35FD93-9C72-4c15-8C4B-E77F1DB2D793 {
     SECTION FV_IMAGE = DXEFV
 }
-FILE FV_IMAGE = FBE6C1E3-2F80-4770-88B0-494186E3346F {
-    SECTION FV_IMAGE = BDSFV
-}
 
 ################################################################################
 [FV.BDSFV]
@@ -275,6 +272,10 @@ INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
 !if $(BOOTSPLASH_IMAGE)
 INF  MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
 INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+!endif
+
+!if $(UNIVERSAL_PAYLOAD) == FALSE
+INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 !endif
 
 #
