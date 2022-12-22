@@ -66,10 +66,6 @@ AhciS3GetEumeratePorts (
     }
   }
 
-  if (S3InitDevices == NULL) {
-    return 0;
-  }
-
   //
   // Only enumerate the ports that exist in the device list.
   //
