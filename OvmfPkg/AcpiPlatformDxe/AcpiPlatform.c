@@ -8,9 +8,7 @@
 **/
 
 #include <OvmfPlatforms.h> // CLOUDHV_DEVICE_ID
-
-#include <Library/CcProbeLib.h> // CcProbe(), CcGuestTypeIntelTdx
-
+#include <ConfidentialComputingGuestAttr.h>
 #include "AcpiPlatform.h"
 
 /**
@@ -35,7 +33,7 @@ InstallAcpiTables (
 
   HostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
   if (HostBridgeDevId == CLOUDHV_DEVICE_ID) {
-    if (CcProbe () == CcGuestTypeIntelTdx) {
+    if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
       Status = InstallCloudHvTablesTdx (AcpiTable);
     } else {
       Status = InstallCloudHvTables (AcpiTable);
