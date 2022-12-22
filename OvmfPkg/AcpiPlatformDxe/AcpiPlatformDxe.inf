@@ -46,7 +46,6 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   HobLib
-  CcProbeLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
@@ -62,6 +61,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtr
   gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtrSize
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
 
 [Depex]
   gEfiAcpiTableProtocolGuid
