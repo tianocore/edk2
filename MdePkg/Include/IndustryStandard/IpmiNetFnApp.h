@@ -12,6 +12,7 @@
   and Appendix H, Sub-function Assignments.
 
   Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -486,6 +487,11 @@ typedef struct {
 //
 #define IPMI_APP_GET_SYSTEM_GUID  0x37
 
+typedef struct {
+  UINT8       CompletionCode;
+  EFI_GUID    SystemUuid;
+} IPMI_GET_SYSTEM_UUID_RESPONSE;
+
 //
 //  Constants and Structure definitions for "Get System GUID" command to follow here
 //
@@ -671,6 +677,30 @@ typedef struct {
 #define IPMI_CHANNEL_MEDIA_TYPE_OEM_START  0x60
 #define IPMI_CHANNEL_MEDIA_TYPE_OEM_END    0x7F
 
+//
+//  Definitions for channel protocol type
+//
+// Not available
+#define IPMI_CHANNEL_PROTOCOL_TYPE_NA  0x00
+// IPMB-1.0
+#define IPMI_CHANNEL_PROTOCOL_TYPE_IPMB_1_0  0x01
+// ICMB-1.0
+#define IPMI_CHANNEL_PROTOCOL_TYPE_ICMB_1_0  0x02
+// Reserved
+#define IPMI_CHANNEL_PROTOCOL_TYPE_RESERVED  0x03
+// IPMI SMBUS
+#define IPMI_CHANNEL_PROTOCOL_TYPE_IPMI_SMBUS  0x04
+// KCS
+#define IPMI_CHANNEL_PROTOCOL_TYPE_KCS  0x05
+// SMIC
+#define IPMI_CHANNEL_PROTOCOL_TYPE_SMIC  0x06
+// BT-10
+#define IPMI_CHANNEL_PROTOCOL_TYPE_BT_10  0x07
+// BT-15
+#define IPMI_CHANNEL_PROTOCOL_TYPE_BT_15  0x08
+// TMode
+#define IPMI_CHANNEL_PROTOCOL_TYPE_TMODE  0x09
+
 typedef union {
   struct {
     UINT8    ChannelNo : 4;
@@ -713,10 +743,9 @@ typedef struct {
   UINT16                               AuxChannelInfo;
 } IPMI_GET_CHANNEL_INFO_RESPONSE;
 
-//
-//  Definitions for Get Channel Info command
-//
-#define IPMI_APP_GET_CHANNEL_INFO  0x42
+typedef struct {
+  IPMI_CHANNEL_INFO_CHANNEL_NUMBER    ChannelNumber;
+} IPMI_GET_CHANNEL_INFO_REQUEST;
 
 //
 //  Constants and Structure definitions for "Get Channel Info" command to follow here
