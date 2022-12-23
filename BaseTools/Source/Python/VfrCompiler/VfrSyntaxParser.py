@@ -7,7 +7,7 @@ import sys
 
 
 
-from CommonCtypes import *
+from VfrCtypes import *
 from VfrFormPkg import *
 from VfrUtility import *
 from VfrTree import *
@@ -20458,8 +20458,3 @@ class VfrSyntaxParser ( Parser ):
         finally:
             self.exitRule()
         return localctx
-
-
-
-
-

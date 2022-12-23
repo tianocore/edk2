@@ -102,48 +102,48 @@ vfrWarningMessage = {
 class VfrErrorHandle():
 
     def __init__(self):
-        self.__InputFileName = None
-        self.__vfrErrorMessage = vfrErrorMessage
-        self.__vfrWarningMessage = vfrWarningMessage
-        self.__WarningAsError = False
+        self.InputFileName = None
+        self.vfrErrorMessage = vfrErrorMessage
+        self.vfrWarningMessage = vfrWarningMessage
+        self.WarningAsError = False
 
     def SetWarningAsError(self, WarningAsError):
-        self.__WarningAsError = WarningAsError
+        self.WarningAsError = WarningAsError
 
     def SetInputFile(self, InputFile):
-        self.__InputFileName = InputFile
+        self.InputFileName = InputFile
 
     def HandleWarning(self, WarningCode, LineNum, TokenValue=None):
-        if self.__vfrWarningMessage == None:
+        if self.vfrWarningMessage == None:
             return 1
         WarningMsg = ''
-        for key in self.__vfrWarningMessage.keys():
-            if WarningCode == self.__vfrWarningMessage[key]:
-                WarningMsg = self.__vfrWarningMessage[key]
+        for key in self.vfrWarningMessage.keys():
+            if WarningCode == self.vfrWarningMessage[key]:
+                WarningMsg = self.vfrWarningMessage[key]
                 break
         if WarningMsg != '':
-            if self.__WarningAsError:
-                EdkLogger.error('VfrCompiler', WarningCode, WarningMsg, self.__InputFileName, LineNum, "warning treated as error")
-            EdkLogger.warn('VfrCompiler', WarningMsg, self.__InputFileName, LineNum, TokenValue)
+            if self.WarningAsError:
+                EdkLogger.error('VfrCompiler', WarningCode, WarningMsg, self.InputFileName, LineNum, "warning treated as error")
+            EdkLogger.warn('VfrCompiler', WarningMsg, self.InputFileName, LineNum, TokenValue)
 
 
     def PrintMsg(self, LineNum, MsgType = 'Error', ErrorMsg=None, TokenValue=None):
         if MsgType == 'Warning':
             EdkLogger.verbose(ErrorMsg)
         else:
-            EdkLogger.error('VfrCompiler', 0x3000, ErrorMsg, self.__InputFileName, LineNum, TokenValue)
+            EdkLogger.error('VfrCompiler', 0x3000, ErrorMsg, self.InputFileName, LineNum, TokenValue)
 
 
     def HandleError(self, ErrorCode, LineNum=None, TokenValue=None):
-        if self.__vfrErrorMessage == None:
+        if self.vfrErrorMessage == None:
             return 1
         ErrorMsg = ''
-        for key in self.__vfrErrorMessage.keys():
-            if ErrorCode == self.__vfrErrorMessage[key]:
-                ErrorMsg = self.__vfrErrorMessage[key]
+        for key in self.vfrErrorMessage.keys():
+            if ErrorCode == self.vfrErrorMessage[key]:
+                ErrorMsg = self.vfrErrorMessage[key]
                 break
         if ErrorMsg != '':
-            EdkLogger.error('VfrCompiler', ErrorCode, ErrorMsg, self.__InputFileName, LineNum, TokenValue)
+            EdkLogger.error('VfrCompiler', ErrorCode, ErrorMsg, self.InputFileName, LineNum, TokenValue)
             return 1
         else:
             return 0

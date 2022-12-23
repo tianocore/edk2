@@ -10,7 +10,7 @@ from re import T
 from sre_parse import FLAGS
 from tokenize import Number
 from antlr4 import *
-from CommonCtypes import *
+from VfrCtypes import *
 from VfrFormPkg import *
 from VfrUtility import *
 from VfrTree import *
@@ -268,7 +268,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.ErrorHandler(gVfrVarDataTypeDB.DataTypeAddBitField(None, 'UINT8', Width, ctx.FieldInUnion), ctx.D.line, ctx.D.text)
         return self.visitChildren(ctx)
 
-    def __DeclareStandardDefaultStorage(self, LineNo):
+    def DeclareStandardDefaultStorage(self, LineNo):
 
         DSObj = IfrDefaultStore("Standard Defaults")
         gVfrDefaultStore.RegisterDefaultStore(DSObj.DefaultStore, "Standard Defaults", EFI_STRING_ID_INVALID, EFI_HII_DEFAULT_CLASS_STANDARD)
@@ -3432,7 +3432,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         return ctx.Node
 
-    def __SaveOpHdrCond(self, OpHdr, Cond, LineNo=0):
+    def SaveOpHdrCond(self, OpHdr, Cond, LineNo=0):
         if Cond == True:
             if self.IfrOpHdr[self.IfrOpHdrIndex] != None:
                 return
@@ -3440,17 +3440,17 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.IfrOpHdrLineNo[self.IfrOpHdrIndex] = LineNo
 
 
-    def __InitOpHdrCond(self):
+    def InitOpHdrCond(self):
         self.IfrOpHdr.append(None)
         self.IfrOpHdrLineNo.append(0)
 
-    def __SetSavedOpHdrScope(self):
+    def SetSavedOpHdrScope(self):
         if  self.IfrOpHdr[self.IfrOpHdrIndex] != None:
             self.IfrOpHdr[self.IfrOpHdrIndex].Scope = 1
             return True
         return False
 
-    def __ClearSavedOPHdr(self):
+    def ClearSavedOPHdr(self):
         self.IfrOpHdr[self.IfrOpHdrIndex] = None
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementExpression.
@@ -4745,19 +4745,19 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
 
-    def __GetText(self, ctx):
+    def GetText(self, ctx):
         if ctx == None:
             return None
         else:
             return ctx.text
 
-    def __TransId(self, StringIdentifierToken, DefaultValue=None):
+    def TransId(self, StringIdentifierToken, DefaultValue=None):
         if StringIdentifierToken == None:
             return DefaultValue
         else:
             return str(StringIdentifierToken)
 
-    def __TransNum(self, NumberToken, DefaultValue=0):
+    def TransNum(self, NumberToken, DefaultValue=0):
         if NumberToken == None:
             return DefaultValue
         else:
@@ -4769,7 +4769,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         # error handle , value is too large to store
         return NumberToken
 
-    def __AssignQuestionKey(self, OpObj, Key):
+    def AssignQuestionKey(self, OpObj, Key):
 
         if Key == None:
             return
@@ -4780,14 +4780,14 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             OpObj.SetQuestionId(Key)
         return
 
-    def __ExtractOriginalText(self, ctx):
+    def ExtractOriginalText(self, ctx):
         Source = ctx.start.getTokenSource()
         InputStream = Source.inputStream
         start, stop  = ctx.start.start, ctx.stop.stop
         Text = InputStream.getText(start, stop)
         return Text.replace('\r', '').replace('\n', '').replace('  ', ' ')
 
-    def __CheckDuplicateDefaultValue(self, DefaultId, Line, TokenValue):
+    def CheckDuplicateDefaultValue(self, DefaultId, Line, TokenValue):
         for i in range(0, len(self.UsedDefaultArray)):
             if self.UsedDefaultArray[i] == DefaultId:
                 gVfrErrorHandle.HandleWarning(EFI_VFR_WARNING_CODE.VFR_WARNING_DEFAULT_VALUE_REDEFINED, Line, TokenValue)
@@ -4797,25 +4797,25 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         self.UsedDefaultArray.append(DefaultId)
 
-    def __ErrorHandler(self, ReturnCode, LineNum, TokenValue=None):
+    def ErrorHandler(self, ReturnCode, LineNum, TokenValue=None):
         self.ParserStatus += gVfrErrorHandle.HandleError(ReturnCode, LineNum, TokenValue)
 
-    def __CompareErrorHandler(self, ReturnCode, ExpectedCode, LineNum, TokenValue=None, ErrorMsg=None):
+    def CompareErrorHandler(self, ReturnCode, ExpectedCode, LineNum, TokenValue=None, ErrorMsg=None):
         if ReturnCode != ExpectedCode:
             self.ParserStatus += 1
             gVfrErrorHandle.PrintMsg(LineNum, 'Error', ErrorMsg, TokenValue)
 
-    def __InsertChild(self, ParentNode: VfrTreeNode, ChildCtx):
+    def InsertChild(self, ParentNode: VfrTreeNode, ChildCtx):
         if ChildCtx != None and ChildCtx.Node != None:
             ParentNode.insertChild(ChildCtx.Node)
 
-    def __InsertEndNode(self, ParentNode, Line):
+    def InsertEndNode(self, ParentNode, Line):
         EObj = IfrEnd()
         EObj.SetLineNo(Line)
         ENode = VfrTreeNode(EFI_IFR_END_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo()))
         ParentNode.insertChild(ENode)
 
-    def __GetCurArraySize(self):
+    def GetCurArraySize(self):
 
         Size = 1
         if self.CurrQestVarInfo.VarType == EFI_IFR_TYPE_NUM_SIZE_8:

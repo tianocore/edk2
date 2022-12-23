@@ -27,8 +27,8 @@ CVfrCompiler::DebugError (
   IN CONST CHAR8   *MsgFmt,
   ...
   )
-  va_list List;
 {
+  va_list List;
   va_start (List, MsgFmt);
   PrintMessage ((CHAR8 *) "ERROR", FileName, LineNumber, MessageCode, (CHAR8 *) Text, (CHAR8 *) MsgFmt, List);
   va_end (List);
@@ -74,7 +74,7 @@ CVfrCompiler::OptionInitialization (
   mOptions.IncludePaths                  = NULL;
   mOptions.SkipCPreprocessor             = TRUE;
   mOptions.CPreprocessorOptions          = NULL;
-  mOptions.HasOverrideClassGuid          = FALSE; //
+  mOptions.HasOverrideClassGuid          = FALSE;
   mOptions.WarningAsError                = FALSE;
   mOptions.AutoDefault                   = FALSE;
   mOptions.CheckDefault                  = FALSE;
@@ -937,3 +937,5 @@ main (
 
   return GetUtilityStatus ();
 }
+
+

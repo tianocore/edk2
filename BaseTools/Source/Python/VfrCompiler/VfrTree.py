@@ -1,8 +1,7 @@
-from CommonCtypes import *
+import yaml
 from VfrFormPkg import *
 from antlr4 import *
-from CommonCtypes import *
-import yaml
+from VfrCtypes import *
 # Ifr related Info -> ctypes obj
 #　conditional Info
 # Structure Info
@@ -195,7 +194,10 @@ class VfrTree():
         if self.Options.CreateRecordListFile:
             # GenRecordList
             try:
-                In = open(self.Options.PreprocessorOutputFileName, 'r')
+                if self.Options.SkipCPreprocessor:
+                    In = open(self.Options.VfrFileName, 'r')
+                else:
+                    In = open(self.Options.PreprocessorOutputFileName, 'r')
                 InFileLines = []
                 for Line in In:
                     InFileLines.append(Line)
@@ -445,7 +447,7 @@ class VfrTree():
             Out.close()
         except:
             EdkLogger.error(
-                "VfrCompiler", FILE_WRITE_FAILURE, "File write failed for %s" % FileName), None)
+                "VfrCompiler", FILE_WRITE_FAILURE, "File write failed for %s" % FileName)
 
     def GenRecordListFileDfs(self, Root, RecordLines):
         if Root.OpCode != None:
@@ -600,7 +602,7 @@ class VfrTree():
                             "File open failed for %s" % FileName, None)
 
     def DumpQuestionInfos(self, Root, f,  ValueIndent):
-        
+
         Info = Root.Data.GetInfo()
         if Root.Condition != None:
             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(Root.Condition))

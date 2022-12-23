@@ -4,7 +4,7 @@ options {
 }
 @header{
 
-from CommonCtypes import *
+from VfrCtypes import *
 from VfrFormPkg import *
 from VfrUtility import *
 from VfrTree import *
@@ -317,7 +317,7 @@ locals[ValueList=[], ListType=False]
     |   'FALSE'
     |   'ONE'
     |   'ONES'
-    |   'ZERO' 
+    |   'ZERO'
     |   Number ':' Number ':' Number
     |   Number '/' Number '/' Number
     |   Number ';' Number ';' guidDefinition ';' 'STRING_TOKEN' '(' Number ')'

@@ -1,6 +1,6 @@
 #Converts a string to an EFI_GUID.
 from BaseTypes import *
-from CommonCtypes import *
+from VfrCtypes import *
 from VfrError import *
 
 def StringToGuid(AsciiGuidBuffer:str, GuidBuffer:EFI_GUID):
@@ -28,7 +28,7 @@ def StringToGuid(AsciiGuidBuffer:str, GuidBuffer:EFI_GUID):
         continue
 
     if Index < 36:
-        #logger.error("Invalid option value")
+        EdkLogger.error("VfrCompiler", PARAMETER_INVALID, "Invalid option value")
         return EFI_ABORTED
 
     #Scan the guid string into the buffer
@@ -46,13 +46,13 @@ def StringToGuid(AsciiGuidBuffer:str, GuidBuffer:EFI_GUID):
         Data4[6] = int(AsciiGuidBuffer[32:34],16)
         Data4[7] = int(AsciiGuidBuffer[34:36],16)
     except:
-        #logger.error("Invalid Data value!")
+        EdkLogger.error("VfrCompiler", PARAMETER_INVALID, "Invalid Data value!")
         Index = 0
 
 
     #Verify the correct number of items were scanned.
     if Index != 11:
-        #logger.error("Invalid option value")
+        EdkLogger.error("VfrCompiler", PARAMETER_INVALID, "Invalid option value")
         return EFI_ABORTED
 
     #Copy the data into our GUID.

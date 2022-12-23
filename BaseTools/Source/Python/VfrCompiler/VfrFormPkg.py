@@ -2,7 +2,7 @@ from ast import For
 from re import L
 from sre_parse import FLAGS
 from stat import FILE_ATTRIBUTE_SPARSE_FILE
-from CommonCtypes import *
+from VfrCtypes import *
 from VfrError import VfrReturnCode
 from VfrUtility import *
 
