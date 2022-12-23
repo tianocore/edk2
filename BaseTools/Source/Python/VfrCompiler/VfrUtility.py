@@ -1459,6 +1459,9 @@ class VfrStringDB(object):
     def __init__(self):
         self.__StringFileName = ''
 
+    def SetStringFileName(self, StringFileName):
+        self.__StringFileName = StringFileName
+
     def GetVarStoreNameFromStringId(self, StringId):
         if self.__StringFileName == '':
             return None

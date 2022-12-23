@@ -2,66 +2,414 @@ from distutils.filelist import FileList
 from pickletools import uint8
 import sys
 import yaml
+import logging
+import argparse
 from tkinter.ttk import Treeview
 from antlr4 import *
 from VfrSyntaxVisitor import *
 from VfrSyntaxLexer import *
 from VfrSyntaxParser import *
+from BaseTypes import *
+from ParseInf import *
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from Common.BuildToolError import *
+import Common.EdkLogger as EdkLogger
+from Common.LongFilePathSupport import LongFilePath
+
+class COMPILER_RUN_STATUS(Enum):
+    STATUS_STARTED = 0
+    STATUS_INITIALIZED = 1
+    STATUS_PREPROCESSED = 2
+    STATUS_COMPILEED = 3
+    STATUS_GENBINARY = 4
+    STATUS_FINISHED = 5
+    STATUS_FAILED = 6
+    STATUS_DEAD = 7
 
 
+PREPROCESSOR_COMMAND = "cl "
+PREPROCESSOR_OPTIONS = "/nologo /E /TC /DVFRCOMPILE "
+VFR_PREPROCESS_FILENAME_EXTENSION =  ".i"
+VFR_PACKAGE_FILENAME_EXTENSION   =   ".hpk"
+VFR_RECORDLIST_FILENAME_EXTENSION  =  ".lst"
+VFR_YAML_FILENAME_EXTENSION  =  ".yml"
+VFR_JSON_FILENAME_EXTENSION  =  ".json"
+
+UTILITY_NAME  = 'VfrCompiler' #
+logger=logging.getLogger('VfrCompiler')
+
+parser=argparse.ArgumentParser(description="VfrCompiler", epilog= "VfrCompile version {} \
+                               Build {} Copyright (c) 2004-2016 Intel Corporation.\
+                               All rights reserved.".format(VFR_COMPILER_VERSION, BUILD_VERSION))
+parser.add_argument("input", dest = "VfrFileName", help = "Input Vfr file name")
+parser.add_argument("--version", action="version", dest = "Version", version="VfrCompile version {} Build {}".format(VFR_COMPILER_VERSION, BUILD_VERSION), help="prints version info")
+parser.add_argument("-l", dest ="CreateRecordListFile",help = "create an output IFR listing file")
+parser.add_argument("-y", dest ="CreateYamlFile",help = "create Yaml file")
+parser.add_argument("-j", dest ="CreateJsonFile",help = "create Json file")
+parser.add_argument("-i", dest = "IncludePaths", help= "add path argument") #
+parser.add_argument("-o", "--output-directory", "-od", dest = "OutputDirectory", help= "deposit all output files to directory OutputDir, \
+                    default is current directory")
+parser.add_argument("-b", "--create-ifr-package", "-ibin", dest = "CreateIfrPkgFile", help = "create an IFR HII pack file")
+parser.add_argument("-n", "--no-pre-processing", "-nopp", dest = "SkipCPreprocessor", help = "do not preprocessing input file")
+parser.add_argument("-f", "--pre-processing-flag", "-ppflag", dest = "CPreprocessorOptions", help = "C-preprocessor argument") #
+parser.add_argument("-s", "--string-db", dest = "StringFileName", help = "input uni string package file")
+parser.add_argument("-g", "--guid", dest = "OverrideClassGuid", help = "override class guid input,\
+                    format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+parser.add_argument("-w", "--warning-as-error", dest = "WarningAsError", help = "treat warning as an error")
+parser.add_argument("-a", "--autodefault", dest = "AutoDefault", help = "generate default value for question opcode if some default is missing")
+parser.add_argument("-d", "--checkdefault", dest = "CheckDefault", help  = "check the default information in a question opcode")
 class VfrCompiler():
 
-    def __init__(self, InputFile):
-        self.__Root = VfrTreeNode()
-        self.__InputFile = InputFile
-        self.__VfrTree = VfrTree(self.__Root)
+    def __init__(self, args, argc):
 
-    def PreProcess(self):
-        gVfrErrorHandle.SetInputFile(self.__InputFile)
+        self.Root = VfrTreeNode()
+        self.Options = Options()
+        self.VfrTree = VfrTree(self.Root, self.Options)
 
-    def Compile(self):
-        self.__Visitor = VfrSyntaxVisitor(self.__Root)
-        InputStream = FileStream(self.__InputFile)
-        Lexer = VfrSyntaxLexer(InputStream)
-        Stream = CommonTokenStream(Lexer)
-        Parser = VfrSyntaxParser(Stream)
-        self.__Visitor.visit(Parser.vfrProgram())
-        if gFormPkg.HavePendingUnassigned() == True:
-            gFormPkg.PendingAssignPrintAll()
+        self.RunStatus = COMPILER_RUN_STATUS.STATUS_STARTED
+        self.PreProcessCmd = PREPROCESSOR_COMMAND
+        self.PreProcessOpt = PREPROCESSOR_OPTIONS
+        self.OptionIntialization(args, argc)
+        if self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED) or self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+            return
+        self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED)
 
 
-    def GenFiles(self):
-        self.__VfrTree.DumpYaml(self.__InputFile)
-        self.__VfrTree.DumpJson(self.__InputFile)
-        self.__VfrTree.GenBinary(self.__InputFile)
-        self.__VfrTree.GenCFile(self.__InputFile)
-        self.__VfrTree.GenRecordListFile(self.__InputFile)
-        # self.__VfrTree.GenBinaryFiles(self.__InputFile)
+    def OptionIntialization(self, args, argc):
+        Status = EFI_SUCCESS
+
+        if argc == 1:
+            parser.print_help()
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+            return
+
+        # parse command line
+        if args.Version:
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+            return
+
+        if args.CreateRecordListFile:
+            self.Options.CreateRecordListFile = True
+
+        if args.IncludePaths:
+            Path = args.IncludePaths
+            if Path == None:
+                EdkLogger.error("VfrCompiler", OPTION_MISSING, "-i missing path argument")
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+                return
+            self.Options.IncludePaths = self.AppendIncludePath(Path) #
+
+        if args.OutputDirectory:
+            self.Options.OutputDirectory = args.OutputDirectory
+            if self.Options.OutputDirectory == None:
+                EdkLogger.error("VfrCompiler", OPTION_MISSING, "-o missing output directory name")
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+                return
+            LastChar = self.Options.OutputDirectory[len(self.Options.OutputDirectory) - 1]
+            if LastChar != '/' and LastChar != '\\':
+                if self.Options.OutputDirectory.find('/') != -1:
+                    self.Options.OutputDirectory += '/'
+                else:
+                    self.Options.OutputDirectory += '\\'
+            EdkLogger.debug(9, "Output Directory {}".format(self.Options.OutputDirectory))
+
+        if args.CreateIfrPkgFile:
+            self.Options.CreateIfrPkgFile = True
+
+        if args.CreateYamlFile:
+            self.Options.CreateYamlFile = True
+
+        if args.CreateJsonFile:
+            self.Options.CreateJsonFile = True
+
+        if args.SkipCPreprocessor:
+            self.Options.SkipCPreprocessor = True
+
+        if args.CPreprocessorOptions:
+            Options = args.CPreprocessorOptions
+            if Options == None:
+                EdkLogger.error("VfrCompiler", OPTION_MISSING, "-od - missing C-preprocessor argument")
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+                return
+            self.Options.CPreprocessorOptions = self.AppendCPreprocessorOptions(Options) #
+
+        if args.StringFileName:
+            StringFileName = args.StringFileName
+            if StringFileName == None:
+                EdkLogger.error("VfrCompiler", OPTION_MISSING, "-s missing input string file name")
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+                return
+            gVfrStringDB.SetStringFileName(StringFileName)
+            EdkLogger.debug(9, "Input string file path {}".format(StringFileName))
 
 
-class YamlCompiler():
-    def __init__(self, InputFile):
-        self.__Root = VfrTreeNode()
-        self.__InputFile = InputFile
-        self.__VfrTree = VfrTree(self.__Root)
+        if args.OverrideClassGuid:
+            res = StringToGuid(args.OverrideClassGuid, self.Options.OverrideClassGuid)
+            if type(res) == 'int':
+                Status  = res
+            else:
+                Status = res[0]
+                self.Options.OverrideClassGuid = res[1]
 
-    def PreProcess(self):
+            if EFI_ERROR(Status):
+                EdkLogger.error("VfrCompiler", FORMAT_INVALID, "Invalid format: {}".format(args.OverrideClassGuid))
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+                return
+
+            self.Options.HasOverrideClassGuid = True
+
+        if args.WarningAsError:
+            self.Options.WarningAsError = True
+
+        if args.AutoDefault:
+            self.Options.AutoDefault = True
+
+        if args.CheckDefault:
+            self.Options.CheckDefault = True
+
+        if args.VfrFileName:
+            self.Options.VfrFileName = args.VfrFileName
+            if self.Options.VfrFileName == None:
+                EdkLogger.error("VfrCompiler", OPTION_MISSING,"VFR file name is not specified.")
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+                return
+            if self.Options.OutputDirectory == None:
+                self.Options.OutputDirectory = ''
+
+        if self.SetBaseFileName() != 0:
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+            return
+
+        if self.SetPkgOutputFileName() != 0:
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+            return
+
+        if self.SetCOutputFileName() != 0:
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+            return
+
+        if self.SetPreprocessorOutputFileName() != 0:
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+            return
+
+        if self.SetRecordListFileName() != 0:
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+            return
+
+        if self.SetYamlFileName() != 0:
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+            return
+
+        if self.SetJsonFileName() != 0:
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+            return
+
+    def SetBaseFileName(self):
+        if self.Options.VfrFileName == None:
+            return -1
+        pFileName = self.Options.VfrFileName
+        while (pFileName.find('\\') != -1) or (pFileName.find('/') != -1):
+
+            if pFileName.find('\\') != -1:
+                i = pFileName.find('\\')
+            else:
+                i = pFileName.find('/')
+
+            if i == len(pFileName) - 1:
+                return -1
+
+            pFileName = pFileName[i+1:]
+
+        if pFileName == '' or pFileName.find('.') == -1:
+            return -1
+
+        self.Options.VfrBaseFileName = pFileName[:pFileName.find('.')]
+        return 0
+
+    def SetPkgOutputFileName(self):
+        if self.Options.VfrBaseFileName == None:
+            return -1
+        self.Options.PkgOutputFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + VFR_PACKAGE_FILENAME_EXTENSION
+        return 0
+
+    def SetCOutputFileName(self):
+        if self.Options.VfrBaseFileName == None:
+            return -1
+        self.Options.COutputFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + ".c"
+        return 0
+
+    def SetPreprocessorOutputFileName(self):
+        if self.Options.VfrBaseFileName == None:
+            return -1
+        self.Options.PreprocessorOutputFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION
+        return 0
+
+    def SetRecordListFileName(self):
+        if self.Options.VfrBaseFileName == None:
+            return -1
+        self.Options.RecordListFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + VFR_RECORDLIST_FILENAME_EXTENSION
+        return 0
+
+    def SetYamlFileName(self):
+        if self.Options.VfrBaseFileName == None:
+            return -1
+        self.Options.YamlFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + VFR_YAML_FILENAME_EXTENSION
+        return 0
+
+    def SetJsonFileName(self):
+        if self.Options.VfrBaseFileName == None:
+            return -1
+        self.Options.JsonFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + VFR_JSON_FILENAME_EXTENSION
+        return 0
+
+    def AppendCPreprocessorOptions(self, Options):
         pass
 
+    def AppendIncludePath(self, Path):
+        pass
+
+
+    def PreProcess(self):
+        if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED):
+            if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+        else:
+            if self.Options.SkipCPreprocessor:
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
+
+            else:
+                try:
+                    fFile = open(LongFilePath(self.Options.VfrFileName), mode='r')
+                    fFile.close()
+                except:
+                    EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE, "Error opening the input VFR file")
+                    if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+                        self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+                    return
+
+                PreProcessCmd = self.PreProcessCmd + " " + self.PreProcessOpt + " "
+                if self.Options.IncludePaths != None:
+                    PreProcessCmd += self.Options.IncludePaths + " "
+                if self.Options.CPreprocessorOptions != None:
+                    PreProcessCmd += self.Options.CPreprocessorOptions  + " "
+                PreProcessCmd += self.Options.VfrFileName + " > "
+                PreProcessCmd += self.Options.PreprocessorOutputFileName
+
+                # if system(PreprocessCmd) ！= 0：
+                # EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "failed to spawn C preprocessor on VFR file {}".format(PreProcessCmd))
+                #self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
+
     def Compile(self):
-        self.__VfrTree.ReadYaml(self.__InputFile)
+
+        if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED):
+            EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "compile error in file %s" % InFileName, InFileName)
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+        else:
+            InFileName = self.Options.VfrFileName if self.Options.SkipCPreprocessor == True\
+                else self.Options.PreprocessorOutputFileName
+
+            gVfrErrorHandle.SetInputFile(InFileName)
+            gVfrErrorHandle.SetWarningAsError(self.Options.WarningAsError)
+
+            try:
+                InputStream = FileStream(InFileName)
+                Lexer = VfrSyntaxLexer(InputStream)
+                Stream = CommonTokenStream(Lexer)
+                Parser = VfrSyntaxParser(Stream)
+            except:
+                EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
+                                "File open failed for %s" % InFileName, InFileName)
+                if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+                    self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+                return
+
+            self.Visitor = VfrSyntaxVisitor(self.Root, self.Options.OverrideClassGuid)
+            self.Visitor.visit(Parser.vfrProgram())
+
+            if self.Visitor.ParserStatus != 0:
+                if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+                    EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "compile error in file %s" % InFileName, InFileName)
+                    self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+                return
+
+            if gFormPkg.HavePendingUnassigned() == True:
+                gFormPkg.PendingAssignPrintAll()
+                if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+                    EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "compile error in file %s" % InFileName, InFileName)
+                    self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+                return
+
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_COMPILEED)
+
+    def GenBinary(self): # gen hpk file
+        if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_COMPILEED):
+            if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+        else:
+            if self.Options.CreateIfrPkgFile:
+                self.VfrTree.GenBinary()
+
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_GENBINARY)
+
+    def GenCFile(self): #gen c file
+        if self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_GENBINARY) == False:
+            if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+        else:
+            if self.Options.CreateIfrPkgFile:
+                self.VfrTree.GenCFile()
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FINISHED)
 
 
+    def GenRecordListFile(self):
+        if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_COMPILEED):
+            if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+        else:
+            if self.Options.CreateRecordListFile:
+                self.VfrTree.GenRecordListFile()
+
+    def GenBinaryFiles(self):
+        if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_COMPILEED):
+            if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+        else:
+            self.VfrTree.GenBinaryFiles()
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FINISHED)
+
+    def DumpYaml(self):
+        if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_COMPILEED):
+            if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+        else:
+            if self.Options.CreateYamlFile:
+                self.VfrTree.DumpYaml()
+
+    def DumpJson(self):
+        if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_COMPILEED):
+            if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+        else:
+            if self.Options.CreateJsonFile:
+                self.VfrTree.DumpJson()
+
+    def SET_RUN_STATUS(self, Status):
+        self.RunStatus = Status
+
+    def IS_RUN_STATUS(self, Status):
+        return self.RunStatus == Status
 
 if __name__ == '__main__':
     InputFile = 'test.i'
+    args = parser.parse_args()
+    argc = len(sys.argv)
+    # SetPrintLevel
 
-    VCompiler = VfrCompiler(InputFile)
-    VCompiler.PreProcess()
-    VCompiler.Compile()
-    VCompiler.GenFiles()
+    Compiler = VfrCompiler(args, argc)
+    Compiler.PreProcess()
+    Compiler.Compile()
+    Compiler.GenBinaryFiles()
+    Compiler.DumpYaml()
+    Compiler.DumpJson()
 
-    InputFile = 'test.yml'
-    YCompiler = YamlCompiler(InputFile)
-    YCompiler.PreProcess()
-    YCompiler.Compile()
+    # set status
