@@ -3,6 +3,7 @@
 
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -29,6 +30,18 @@
 #define REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_IP4      0x01
 #define REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_IP6      0x02
 
+///
+/// Definitions for IP assignment tyeps.
+///
+typedef enum {
+  RedfishHostIpAssignmentUnknown,
+  RedfishHostIpAssignmentStatic,
+  RedfishHostIpAssignmentDhcp,
+  RedfishHostIpAssignmentAutoConfigure,
+  RedfishHostIpAssignmentHostSelected,
+  RedfishHostIpAssignmentReserved
+} REDFISH_HOST_IP_ASSIGNMENT;
+
 #pragma pack(1)
 ///
 /// Structure definitions of Host Interface device type 04h (USB Network Interface V2)
@@ -40,12 +53,18 @@ typedef struct {
                                            ///< idVendor field of the USB descriptor.
   UINT16    IdProduct;                     ///< The Product ID of the device, as read from the
                                            ///< idProduct field of the USB descriptor.
-  UINT8     SecialNumberStr;               ///< The string number for the Serial Number of the
+  UINT8     SerialNumberStr;               ///< The string number for the Serial Number of the
                                            ///< device. The string data is read from the
                                            ///< iSerialNumber.bDescriptorType field of the USB
                                            ///< descriptor, and is converted from Unicode to ASCII
                                            ///< and is NULL terminated.
   UINT8     MacAddress[6];                 ///< The MAC address of the PCI/PCIe network device.
+
+  ///
+  /// Below is defined in Redfish Host Interface spec v1.3
+  ///
+  UINT16    Characteristics;               ///< Additional device characteristics.
+  UINT16    CredentialBootstrappingHandle; ///< Credential bootstrapping handle.
 } USB_INTERFACE_DEVICE_DESCRIPTOR_V2;
 
 //
@@ -74,6 +93,10 @@ typedef struct {
 ///
 /// Define union for the Host Interface Device Descriptor
 ///
+#define USB_INTERFACE_DEVICE_DESCRIPTOR_V2_SIZE_1_3  0x11        ///< Length USB interface device v2 defined in
+                                                                 ///< Redfish host interface spec v1.3
+#define USB_INTERFACE_DEVICE_DESCRIPTOR_V2_SIZE_1_2  0x0d        ///< Length USB interface device v2 defined in
+                                                                 ///< Redfish host interface spec v1.2
 typedef union {
   USB_INTERFACE_DEVICE_DESCRIPTOR_V2            UsbDeviceV2;     ///< Device type USB V2 device discriptor.
   PCI_OR_PCIE_INTERFACE_DEVICE_DESCRIPTOR_V2    PciPcieDeviceV2; ///< Device type PCI/PCIe V2 device discriptor.
