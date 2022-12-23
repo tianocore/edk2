@@ -465,8 +465,8 @@ EFI_STATUS
 (EFIAPI *EFI_CREATE_EVENT)(
   IN  UINT32                       Type,
   IN  EFI_TPL                      NotifyTpl,
-  IN  EFI_EVENT_NOTIFY             NotifyFunction,
-  IN  VOID                         *NotifyContext,
+  IN  EFI_EVENT_NOTIFY             NotifyFunction OPTIONAL,
+  IN  VOID                         *NotifyContext OPTIONAL,
   OUT EFI_EVENT                    *Event
   );
 
