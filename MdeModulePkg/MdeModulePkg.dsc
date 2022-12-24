@@ -104,6 +104,7 @@
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
+  ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
 
 [LibraryClasses.EBC.PEIM]
   IoLib|MdePkg/Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
@@ -217,6 +218,7 @@
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
   MdeModulePkg/Application/DumpDynPcd/DumpDynPcd.inf
   MdeModulePkg/Application/MemoryProfileInfo/MemoryProfileInfo.inf
+  MdeModulePkg/Application/MpServicesTest/MpServicesTest.inf
 
   MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
   MdeModulePkg/Logo/Logo.inf
