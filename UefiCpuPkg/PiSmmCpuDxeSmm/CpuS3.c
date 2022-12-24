@@ -767,6 +767,9 @@ SmmRestoreCpu (
   IA32_DESCRIPTOR           X64Idtr;
   IA32_IDT_GATE_DESCRIPTOR  IdtEntryTable[EXCEPTION_VECTOR_NUMBER];
   EFI_STATUS                Status;
+  EFI_HOB_GUID_TYPE         *GuidHob;
+
+  GuidHob = NULL;
 
   DEBUG ((DEBUG_INFO, "SmmRestoreCpu()\n"));
 
@@ -824,9 +827,25 @@ SmmRestoreCpu (
   }
 
   //
-  // Restore SMBASE for BSP and all APs
+  // Retrive the allocated SmmBase from gSmmRelocationInfoHobGuid
   //
-  SmmRelocateBases ();
+  GuidHob = GetFirstGuidHob (&gSmmRelocationInfoHobGuid);
+  if (GuidHob != NULL) {
+    mSmmRelocated = TRUE;
+  } else {
+    mSmmRelocated = FALSE;
+  }
+
+  //
+  // Check whether Smm Relocation is done or not.
+  // If not, will do the SmmBases Relocation here!!!
+  //
+  if (!mSmmRelocated) {
+    //
+    // Restore SMBASE for BSP and all APs
+    //
+    SmmRelocateBases ();
+  }
 
   //
   // Skip initialization if mAcpiCpuData is not valid

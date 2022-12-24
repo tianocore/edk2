@@ -25,6 +25,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/AcpiS3Context.h>
 #include <Guid/MemoryAttributesTable.h>
 #include <Guid/PiSmmMemoryAttributesTable.h>
+#include <Guid/SmmRelocationInfoHob.h>
 
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
@@ -401,6 +402,10 @@ WriteSaveStateRegister (
   IN UINTN                        Width,
   IN CONST VOID                   *Buffer
   );
+
+extern BOOLEAN  mSmmRelocated;
+extern BOOLEAN  *mSmmInitialized;
+extern UINT32   mBspApicId;
 
 extern CONST UINT8        gcSmmInitTemplate[];
 extern CONST UINT16       gcSmmInitSize;
@@ -1488,9 +1493,9 @@ RegisterStartupProcedure (
   );
 
 /**
-  Initialize PackageBsp Info. Processor specified by mPackageFirstThreadIndex[PackageIndex]
-  will do the package-scope register programming. Set default CpuIndex to (UINT32)-1, which
-  means not specified yet.
+  Initialize mPackageFirstThreadIndex Info. Processor specified by mPackageFirstThreadIndex[PackageIndex]
+  will do the package-scope register programming. Set default CpuIndex to (UINT32)-1, which means not
+  specified yet.
 
 **/
 VOID

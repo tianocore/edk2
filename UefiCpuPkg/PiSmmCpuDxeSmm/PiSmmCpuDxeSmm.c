@@ -85,6 +85,10 @@ EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL  mSmmMemoryAttribute = {
 
 EFI_CPU_INTERRUPT_HANDLER  mExternalVectorTable[EXCEPTION_VECTOR_NUMBER];
 
+BOOLEAN  mSmmRelocated    = FALSE;
+BOOLEAN  *mSmmInitialized = NULL;
+UINT32   mBspApicId       = 0;
+
 //
 // SMM stack information
 //
@@ -545,24 +549,29 @@ PiCpuSmmEntry (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                Status;
-  EFI_MP_SERVICES_PROTOCOL  *MpServices;
-  UINTN                     NumberOfEnabledProcessors;
-  UINTN                     Index;
-  VOID                      *Buffer;
-  UINTN                     BufferPages;
-  UINTN                     TileCodeSize;
-  UINTN                     TileDataSize;
-  UINTN                     TileSize;
-  UINT8                     *Stacks;
-  VOID                      *Registration;
-  UINT32                    RegEax;
-  UINT32                    RegEbx;
-  UINT32                    RegEcx;
-  UINT32                    RegEdx;
-  UINTN                     FamilyId;
-  UINTN                     ModelId;
-  UINT32                    Cr3;
+  EFI_STATUS                    Status;
+  EFI_MP_SERVICES_PROTOCOL      *MpServices;
+  UINTN                         NumberOfEnabledProcessors;
+  UINTN                         Index;
+  VOID                          *Buffer;
+  UINTN                         BufferPages;
+  UINTN                         TileCodeSize;
+  UINTN                         TileDataSize;
+  UINTN                         TileSize;
+  UINT8                         *Stacks;
+  VOID                          *Registration;
+  UINT32                        RegEax;
+  UINT32                        RegEbx;
+  UINT32                        RegEcx;
+  UINT32                        RegEdx;
+  UINTN                         FamilyId;
+  UINTN                         ModelId;
+  UINT32                        Cr3;
+  EFI_HOB_GUID_TYPE             *GuidHob;
+  SMM_RELOCATION_INFO_HOB_DATA  *SmmRelocationInfoHobData;
+
+  GuidHob                  = NULL;
+  SmmRelocationInfoHobData = NULL;
 
   //
   // Initialize address fixup
@@ -637,76 +646,6 @@ PiCpuSmmEntry (
   gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus = mMaxNumberOfCpus;
 
   //
-  // The CPU save state and code for the SMI entry point are tiled within an SMRAM
-  // allocated buffer.  The minimum size of this buffer for a uniprocessor system
-  // is 32 KB, because the entry point is SMBASE + 32KB, and CPU save state area
-  // just below SMBASE + 64KB.  If more than one CPU is present in the platform,
-  // then the SMI entry point and the CPU save state areas can be tiles to minimize
-  // the total amount SMRAM required for all the CPUs.  The tile size can be computed
-  // by adding the   // CPU save state size, any extra CPU specific context, and
-  // the size of code that must be placed at the SMI entry point to transfer
-  // control to a C function in the native SMM execution mode.  This size is
-  // rounded up to the nearest power of 2 to give the tile size for a each CPU.
-  // The total amount of memory required is the maximum number of CPUs that
-  // platform supports times the tile size.  The picture below shows the tiling,
-  // where m is the number of tiles that fit in 32KB.
-  //
-  //  +-----------------------------+  <-- 2^n offset from Base of allocated buffer
-  //  |   CPU m+1 Save State        |
-  //  +-----------------------------+
-  //  |   CPU m+1 Extra Data        |
-  //  +-----------------------------+
-  //  |   Padding                   |
-  //  +-----------------------------+
-  //  |   CPU 2m  SMI Entry         |
-  //  +#############################+  <-- Base of allocated buffer + 64 KB
-  //  |   CPU m-1 Save State        |
-  //  +-----------------------------+
-  //  |   CPU m-1 Extra Data        |
-  //  +-----------------------------+
-  //  |   Padding                   |
-  //  +-----------------------------+
-  //  |   CPU 2m-1 SMI Entry        |
-  //  +=============================+  <-- 2^n offset from Base of allocated buffer
-  //  |   . . . . . . . . . . . .   |
-  //  +=============================+  <-- 2^n offset from Base of allocated buffer
-  //  |   CPU 2 Save State          |
-  //  +-----------------------------+
-  //  |   CPU 2 Extra Data          |
-  //  +-----------------------------+
-  //  |   Padding                   |
-  //  +-----------------------------+
-  //  |   CPU m+1 SMI Entry         |
-  //  +=============================+  <-- Base of allocated buffer + 32 KB
-  //  |   CPU 1 Save State          |
-  //  +-----------------------------+
-  //  |   CPU 1 Extra Data          |
-  //  +-----------------------------+
-  //  |   Padding                   |
-  //  +-----------------------------+
-  //  |   CPU m SMI Entry           |
-  //  +#############################+  <-- Base of allocated buffer + 32 KB == CPU 0 SMBASE + 64 KB
-  //  |   CPU 0 Save State          |
-  //  +-----------------------------+
-  //  |   CPU 0 Extra Data          |
-  //  +-----------------------------+
-  //  |   Padding                   |
-  //  +-----------------------------+
-  //  |   CPU m-1 SMI Entry         |
-  //  +=============================+  <-- 2^n offset from Base of allocated buffer
-  //  |   . . . . . . . . . . . .   |
-  //  +=============================+  <-- 2^n offset from Base of allocated buffer
-  //  |   Padding                   |
-  //  +-----------------------------+
-  //  |   CPU 1 SMI Entry           |
-  //  +=============================+  <-- 2^n offset from Base of allocated buffer
-  //  |   Padding                   |
-  //  +-----------------------------+
-  //  |   CPU 0 SMI Entry           |
-  //  +#############################+  <-- Base of allocated buffer == CPU 0 SMBASE + 32 KB
-  //
-
-  //
   // Retrieve CPU Family
   //
   AsmCpuid (CPUID_VERSION_INFO, &RegEax, NULL, NULL, NULL);
@@ -769,6 +708,75 @@ PiCpuSmmEntry (
   }
 
   //
+  // The CPU save state and code for the SMI entry point are tiled within an SMRAM
+  // allocated buffer.  The minimum size of this buffer for a uniprocessor system
+  // is 32 KB, because the entry point is SMBASE + 32KB (8000h), and CPU save state area
+  // just below SMBASE + 64KB (from FC00 to FFFFh).  If more than one CPU is present in the platform,
+  // then the SMI entry point and the CPU save state areas can be tiles to minimize
+  // the total amount SMRAM required for all the CPUs.  The tile size can be computed
+  // by adding the CPU save state size, any extra CPU specific context, and
+  // the size of code that must be placed at the SMI entry point to transfer
+  // control to a C function in the native SMM execution mode.  This size is
+  // rounded up to the nearest power of 2 to give the tile size for a each CPU.
+  // The total amount of memory required is the maximum number of CPUs that
+  // platform supports times the tile size.  The picture below shows the tiling,
+  // where m is the number of tiles that fit in 32KB.
+  //
+  //  +-----------------------------+  <-- 2^n offset from Base of allocated buffer
+  //  |   CPU m+1 Save State        |
+  //  +-----------------------------+
+  //  |   CPU m+1 Extra Data        |
+  //  +-----------------------------+
+  //  |   Padding                   |
+  //  +-----------------------------+
+  //  |   CPU 2m  SMI Entry         |
+  //  +#############################+
+  //  |   CPU m-1 Save State        |
+  //  +-----------------------------+
+  //  |   CPU m-1 Extra Data        |
+  //  +-----------------------------+
+  //  |   Padding                   |
+  //  +-----------------------------+
+  //  |   CPU 2m-1 SMI Entry        |
+  //  +=============================+  <-- 2^n offset from Base of allocated buffer
+  //  |   . . . . . . . . . . . .   |
+  //  +=============================+  <-- 2^n offset from Base of allocated buffer
+  //  |   CPU 2 Save State          |
+  //  +-----------------------------+
+  //  |   CPU 2 Extra Data          |
+  //  +-----------------------------+
+  //  |   Padding                   |
+  //  +-----------------------------+
+  //  |   CPU m+1 SMI Entry         |
+  //  +=============================+  <-- Base of allocated buffer + 32 KB + TileSize
+  //  |   CPU 1 Save State          |
+  //  +-----------------------------+
+  //  |   CPU 1 Extra Data          |
+  //  +-----------------------------+
+  //  |   Padding                   |
+  //  +-----------------------------+
+  //  |   CPU m SMI Entry           |
+  //  +#############################+  <-- Base of allocated buffer + 32 KB (0x8000) == CPU 0 SMBASE + 64 KB
+  //  |   CPU 0 Save State          |
+  //  +-----------------------------+
+  //  |   CPU 0 Extra Data          |
+  //  +-----------------------------+
+  //  |   Padding                   |
+  //  +-----------------------------+
+  //  |   CPU m-1 SMI Entry         |
+  //  +=============================+  <-- 2^n offset from Base of allocated buffer
+  //  |   . . . . . . . . . . . .   |
+  //  +=============================+  <-- 2^n offset from Base of allocated buffer
+  //  |   Padding                   |
+  //  +-----------------------------+
+  //  |   CPU 1 SMI Entry           |
+  //  +=============================+  <-- 2^n offset from Base of allocated buffer
+  //  |   Padding                   |
+  //  +-----------------------------+
+  //  |   CPU 0 SMI Entry           |
+  //  +#############################+  <-- Base of allocated buffer == CPU 0 SMBASE + 32 KB
+  //
+  //
   // Compute tile size of buffer required to hold the CPU SMRAM Save State Map, extra CPU
   // specific context start starts at SMBASE + SMM_PSD_OFFSET, and the SMI entry point.
   // This size is rounded up to nearest power of 2.
@@ -791,26 +799,47 @@ PiCpuSmmEntry (
   ASSERT (TileSize <= (SMRAM_SAVE_STATE_MAP_OFFSET + sizeof (SMRAM_SAVE_STATE_MAP) - SMM_HANDLER_OFFSET));
 
   //
-  // Allocate buffer for all of the tiles.
+  // Check whether the Required TileSize is enough.
   //
-  // Intel(R) 64 and IA-32 Architectures Software Developer's Manual
-  // Volume 3C, Section 34.11 SMBASE Relocation
-  //   For Pentium and Intel486 processors, the SMBASE values must be
-  //   aligned on a 32-KByte boundary or the processor will enter shutdown
-  //   state during the execution of a RSM instruction.
-  //
-  // Intel486 processors: FamilyId is 4
-  // Pentium processors : FamilyId is 5
-  //
-  BufferPages = EFI_SIZE_TO_PAGES (SIZE_32KB + TileSize * (mMaxNumberOfCpus - 1));
-  if ((FamilyId == 4) || (FamilyId == 5)) {
-    Buffer = AllocateAlignedCodePages (BufferPages, SIZE_32KB);
-  } else {
-    Buffer = AllocateAlignedCodePages (BufferPages, SIZE_4KB);
+  if (TileSize > SIZE_8KB) {
+    DEBUG ((DEBUG_ERROR, "The Range of Smbase in SMRAM is not enough -- Required TileSize = 0x%08x, Actual TileSize = 0x%08x\n", TileSize, SIZE_8KB));
+    ASSERT (TileSize <= SIZE_8KB);
+    return RETURN_BUFFER_TOO_SMALL;
   }
 
-  ASSERT (Buffer != NULL);
-  DEBUG ((DEBUG_INFO, "SMRAM SaveState Buffer (0x%08x, 0x%08x)\n", Buffer, EFI_PAGES_TO_SIZE (BufferPages)));
+  //
+  // Retrive the allocated SmmBase from gSmmRelocationInfoHobGuid
+  //
+  GuidHob = GetFirstGuidHob (&gSmmRelocationInfoHobGuid);
+  if (GuidHob != NULL) {
+    SmmRelocationInfoHobData = GET_GUID_HOB_DATA (GuidHob);
+
+    ASSERT (SmmRelocationInfoHobData->NumberOfProcessors == mMaxNumberOfCpus);
+    mSmmRelocated = TRUE;
+  } else {
+    DEBUG ((DEBUG_INFO, "PiCpuStandaloneMmEntry: gSmmRelocationInfoHobGuid not found!\n"));
+    //
+    // Allocate buffer for all of the tiles.
+    //
+    // Intel(R) 64 and IA-32 Architectures Software Developer's Manual
+    // Volume 3C, Section 34.11 SMBASE Relocation
+    //   For Pentium and Intel486 processors, the SMBASE values must be
+    //   aligned on a 32-KByte boundary or the processor will enter shutdown
+    //   state during the execution of a RSM instruction.
+    //
+    // Intel486 processors: FamilyId is 4
+    // Pentium processors : FamilyId is 5
+    //
+    BufferPages = EFI_SIZE_TO_PAGES (SIZE_32KB + TileSize * (mMaxNumberOfCpus - 1));
+    if ((FamilyId == 4) || (FamilyId == 5)) {
+      Buffer = AllocateAlignedCodePages (BufferPages, SIZE_32KB);
+    } else {
+      Buffer = AllocateAlignedCodePages (BufferPages, SIZE_4KB);
+    }
+
+    ASSERT (Buffer != NULL);
+    DEBUG ((DEBUG_INFO, "New Allcoated SMRAM SaveState Buffer (0x%08x, 0x%08x)\n", Buffer, EFI_PAGES_TO_SIZE (BufferPages)));
+  }
 
   //
   // Allocate buffer for pointers to array in  SMM_CPU_PRIVATE_DATA.
@@ -845,7 +874,8 @@ PiCpuSmmEntry (
   // size for each CPU in the platform
   //
   for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
-    mCpuHotPlugData.SmBase[Index]           = (UINTN)Buffer + Index * TileSize - SMM_HANDLER_OFFSET;
+    mCpuHotPlugData.SmBase[Index] = mSmmRelocated ? (UINTN)SmmRelocationInfoHobData->SmBase[Index] : (UINTN)Buffer + Index * TileSize - SMM_HANDLER_OFFSET;
+
     gSmmCpuPrivate->CpuSaveStateSize[Index] = sizeof (SMRAM_SAVE_STATE_MAP);
     gSmmCpuPrivate->CpuSaveState[Index]     = (VOID *)(mCpuHotPlugData.SmBase[Index] + SMRAM_SAVE_STATE_MAP_OFFSET);
     gSmmCpuPrivate->Operation[Index]        = SmmCpuNone;
@@ -958,17 +988,23 @@ PiCpuSmmEntry (
   InitializeSmmIdt ();
 
   //
-  // Relocate SMM Base addresses to the ones allocated from SMRAM
+  // Check whether Smm Relocation is done or not.
+  // If not, will do the SmmBases Relocation here!!!
   //
-  mRebased = (BOOLEAN *)AllocateZeroPool (sizeof (BOOLEAN) * mMaxNumberOfCpus);
-  ASSERT (mRebased != NULL);
-  SmmRelocateBases ();
+  if (!mSmmRelocated) {
+    //
+    // Relocate SMM Base addresses to the ones allocated from SMRAM
+    //
+    mRebased = (BOOLEAN *)AllocateZeroPool (sizeof (BOOLEAN) * mMaxNumberOfCpus);
+    ASSERT (mRebased != NULL);
+    SmmRelocateBases ();
 
-  //
-  // Call hook for BSP to perform extra actions in normal mode after all
-  // SMM base addresses have been relocated on all CPUs
-  //
-  SmmCpuFeaturesSmmRelocationComplete ();
+    //
+    // Call hook for BSP to perform extra actions in normal mode after all
+    // SMM base addresses have been relocated on all CPUs
+    //
+    SmmCpuFeaturesSmmRelocationComplete ();
+  }
 
   DEBUG ((DEBUG_INFO, "mXdSupported - 0x%x\n", mXdSupported));
 
@@ -997,6 +1033,38 @@ PiCpuSmmEntry (
           );
       }
     }
+  }
+
+  //
+  // For relocated SMBASE, some MSRs & CSRs are still required to be configured in SMM Mode for SMM Initialization.
+  // Those MSRs & CSRs must be configured before normal SMI sources happen.
+  // So, here is to issue SMI IPI (All Excluding  Self SMM IPI + BSP SMM IPI) for SMM init
+  //
+  if (mSmmRelocated) {
+    mSmmInitialized = (BOOLEAN *)AllocateZeroPool (sizeof (BOOLEAN) * mMaxNumberOfCpus);
+    ASSERT (mSmmInitialized != NULL);
+
+    mBspApicId = GetApicId ();
+
+    //
+    // Issue SMI IPI (All Excluding Self SMM IPI + BSP SMM IPI) for SMM init
+    //
+    SendSmiIpi (mBspApicId);
+    SendSmiIpiAllExcludingSelf ();
+
+    //
+    // Wait for all processors to finish its 1st SMI
+    //
+    for (Index = 0; Index < mNumberOfCpus; Index++) {
+      while (mSmmInitialized[Index] == FALSE) {
+      }
+    }
+
+    //
+    // Call hook for BSP to perform extra actions in normal mode after all
+    // SMM base addresses have been relocated on all CPUs
+    //
+    SmmCpuFeaturesSmmRelocationComplete ();
   }
 
   //

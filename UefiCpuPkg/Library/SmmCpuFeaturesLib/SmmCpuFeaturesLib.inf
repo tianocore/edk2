@@ -33,6 +33,10 @@
   PcdLib
   MemoryAllocationLib
   DebugLib
+  HobLib
+
+[Guids]
+  gSmmRelocationInfoHobGuid                ## CONSUMES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## SOMETIMES_CONSUMES

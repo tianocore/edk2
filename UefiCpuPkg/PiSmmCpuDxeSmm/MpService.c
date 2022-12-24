@@ -1703,6 +1703,41 @@ CpuSmmDebugExit (
 }
 
 /**
+  Perform SmbaseRelocationPostSmmInit for CpuIndex, this should be done before
+  normal SMI sources happen.
+
+  @param[in] CpuIndex             CPU Index
+
+**/
+VOID
+SmbaseRelocationPostSmmInit (
+  IN      UINTN  CpuIndex
+  )
+{
+  //
+  // Update SMM IDT entries' code segment and load IDT
+  //
+  AsmWriteIdtr (&gcSmiIdtr);
+
+  //
+  // Initialize SMM specific features on the currently executing CPU
+  //
+  SmmCpuFeaturesInitializeProcessor (
+    CpuIndex,
+    (mBspApicId == GetApicId ()) ? TRUE : FALSE,
+    gSmmCpuPrivate->ProcessorInfo,
+    &mCpuHotPlugData
+    );
+
+  if (!mSmmS3Flag) {
+    //
+    // Check XD and BTS features on each processor on normal boot
+    //
+    CheckFeatureSupported ();
+  }
+}
+
+/**
   C function for SMI entry, each processor comes here upon SMI trigger.
 
   @param    CpuIndex              CPU Index
@@ -1729,6 +1764,25 @@ SmiRendezvous (
   //
   Cr2 = 0;
   SaveCr2 (&Cr2);
+
+  if (mSmmRelocated && !mSmmInitialized[CpuIndex]) {
+    //
+    // Perform SmbaseRelocationPostSmmInit for CpuIndex
+    //
+    SmbaseRelocationPostSmmInit (CpuIndex);
+
+    //
+    // Restore Cr2
+    //
+    RestoreCr2 (Cr2);
+
+    //
+    // Mark the first SMI init for CpuIndex has been done so as to avoid the reentry.
+    //
+    mSmmInitialized[CpuIndex] = TRUE;
+
+    return;
+  }
 
   //
   // Call the user register Startup function first.
@@ -1884,9 +1938,9 @@ Exit:
 }
 
 /**
-  Initialize PackageBsp Info. Processor specified by mPackageFirstThreadIndex[PackageIndex]
-  will do the package-scope register programming. Set default CpuIndex to (UINT32)-1, which
-  means not specified yet.
+  Initialize mPackageFirstThreadIndex Info. Processor specified by mPackageFirstThreadIndex[PackageIndex]
+  will do the package-scope register programming. Set default CpuIndex to (UINT32)-1, which means not
+  specified yet.
 
 **/
 VOID
