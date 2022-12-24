@@ -157,6 +157,7 @@
   ArmPkg/Library/LinuxBootBootManagerLib/LinuxBootBootManagerLib.inf
 
   ArmPkg/Drivers/ArmCrashDumpDxe/ArmCrashDumpDxe.inf
+  ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
   ArmPkg/Drivers/ArmScmiDxe/ArmScmiDxe.inf
 
   ArmPkg/Universal/Smbios/ProcessorSubClassDxe/ProcessorSubClassDxe.inf
