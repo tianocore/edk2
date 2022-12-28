@@ -127,6 +127,8 @@ steps:
       **/BUILD_TOOLS_REPORT.html
       **/OVERRIDELOG.TXT
       BASETOOLS_BUILD*.*
+      **/**/OVMF_CODE.fd
+      **/**/OVMF_VARS.fd
     flattenFolders: true
   condition: succeededOrFailed()
 
