@@ -1,0 +1,65 @@
+## @file
+#  TraceHubDebugLib for PEI[_CORE] module.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiTraceHubDebugLibSyst
+  FILE_GUID                      = C61E8C2E-0935-4E3D-BCBB-5ED84AFD9FD1
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TraceHubDebugLib|PEI_CORE PEIM
+
+  DEFINE MIPI_HEADER_PATH        = mipi/library/include/mipi_syst
+  DEFINE MIPI_SOURCE_PATH        = mipi/library/src
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64
+#
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PcdLib
+  HobLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Sources]
+  PeiTraceHubDebugSystLib.c
+  EnableTraceHubData.c
+  EnableTraceHubData.h
+  MipiWrapper.c
+  MipiWrapper.h
+  TraceHubDebugLibSystPlatform.c
+  TraceHubDebugLibSystPlatform.h
+  TraceHubDebugLibSystApi.h
+  mipi_syst.h
+  $(MIPI_HEADER_PATH)/api.h
+  $(MIPI_HEADER_PATH)/crc32.h
+  $(MIPI_HEADER_PATH)/compiler.h
+  $(MIPI_HEADER_PATH)/message.h
+  $(MIPI_SOURCE_PATH)/mipi_syst_init.c
+  $(MIPI_SOURCE_PATH)/mipi_syst_api.c
+  $(MIPI_SOURCE_PATH)/mipi_syst_crc32.c
+  $(MIPI_SOURCE_PATH)/mipi_syst_writer.c
+
+[Guids]
+  gUniversalPayloadTraceHubDebugInfoGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTraceHubDebugVerbosity
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTraceHubDebugAddress
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /Od

@@ -25,6 +25,7 @@
         "IgnoreFiles": [
             "Library/LzmaCustomDecompressLib",
             "Library/BrotliCustomDecompressLib",
+            "Library/TraceHubDebugLibSysT/mipi_syst.h",
             "Universal/RegularExpressionDxe"
         ]
     },
