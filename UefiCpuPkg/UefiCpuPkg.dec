@@ -2,6 +2,7 @@
 # This Package provides UEFI compatible CPU modules and libraries.
 #
 # Copyright (c) 2007 - 2023, Intel Corporation. All rights reserved.<BR>
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -64,6 +65,9 @@
 
   ##  @libraryclass  Provides function for manipulating x86 paging structures.
   CpuPageTableLib|Include/Library/CpuPageTableLib.h
+
+  ## @libraryclass   Provides functions for manipulating Smram savestate registers.
+  SmmSmramSaveSateLib|Include/Library/SmmSmramSaveStateLib.h
 
 [Guids]
   gUefiCpuPkgTokenSpaceGuid      = { 0xac05bf33, 0x995a, 0x4ed4, { 0xaa, 0xb8, 0xef, 0x7a, 0xe8, 0xf, 0x5c, 0xb0 }}
