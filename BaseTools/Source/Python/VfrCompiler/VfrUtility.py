@@ -308,7 +308,7 @@ class VfrVarDataTypeDB(object):
         self.NewDataType.TypeName = TypeName
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def __AlignStuff(self, Size, Align):
+    def AlignStuff(self, Size, Align):
         return Align - (Size) % (Align)
 
     def DeclareDataTypeEnd(self):
@@ -352,7 +352,7 @@ class VfrVarDataTypeDB(object):
 
         return Size, VfrReturnCode.VFR_RETURN_UNDEFINED
 
-    def __ExtractStructTypeName(self, VarStr):
+    def ExtractStructTypeName(self, VarStr):
         try:
             index = VarStr.index('.')
         except ValueError:
@@ -460,12 +460,12 @@ class VfrVarDataTypeDB(object):
 
         return Offset, VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def __GetFieldWidth(self, Field):
+    def GetFieldWidth(self, Field):
         if Field == None:
             return 0
         return Field.FieldType.Type
 
-    def __GetFieldSize(self, Field, ArrayIdx, BitField):
+    def GetFieldSize(self, Field, ArrayIdx, BitField):
         if Field == None:
             return VfrReturnCode.VFR_RETURN_FATAL_ERROR
 
@@ -525,7 +525,7 @@ class VfrVarDataTypeDB(object):
 
         return Offset, Type, Size, BitField, VfrReturnCode.VFR_RETURN_SUCCESS
 
-    def __RegisterNewType(self, New):
+    def RegisterNewType(self, New):
         New.Next = self.DataTypeList
         self.DataTypeList = New
         return
@@ -1094,7 +1094,7 @@ class VfrDataStorage(object):
     def GetBufferVarStoreList(self):
         return self.BufferVarStoreList
 
-    def __CheckGuidField(self, pNode, StoreGuid, HasFoundOne, ReturnCode):
+    def CheckGuidField(self, pNode, StoreGuid, HasFoundOne, ReturnCode):
         if StoreGuid != None:
             #　If has guid info, compare the guid filed.
             if pNode.Guid.__cmp__(StoreGuid):
@@ -1112,7 +1112,7 @@ class VfrDataStorage(object):
             HasFoundOne = True
         return False, ReturnCode, HasFoundOne
 
-    def __GetVarStoreByDataType(self, DataTypeName, VarGuid):
+    def GetVarStoreByDataType(self, DataTypeName, VarGuid):
         MatchNode = None
         pNode = self.BufferVarStoreList
         while pNode != None:
@@ -1196,7 +1196,7 @@ class VfrDataStorage(object):
 
         return VarStoreId, ReturnCode
 
-    def __GetFreeVarStoreId(self, VarType):
+    def GetFreeVarStoreId(self, VarType):
 
         Index = 0
         for i in range(0, EFI_FREE_VARSTORE_ID_BITMAP_SIZE):
@@ -1216,14 +1216,14 @@ class VfrDataStorage(object):
             Offset += 1
         return EFI_VARSTORE_ID_INVALID
 
-    def __CheckVarStoreIdFree(self, VarStoreId):
+    def CheckVarStoreIdFree(self, VarStoreId):
 
         Index = int(VarStoreId / EFI_BITS_PER_UINT32)
         Offset = VarStoreId % EFI_BITS_PER_UINT32
         return (self.FreeVarStoreIdBitMap[Index] &
                 (0x80000000 >> Offset)) == 0
 
-    def __MarkVarStoreIdUsed(self, VarStoreId):
+    def MarkVarStoreIdUsed(self, VarStoreId):
 
         Index = int(VarStoreId / EFI_BITS_PER_UINT32)
         Offset = VarStoreId % EFI_BITS_PER_UINT32
@@ -1583,7 +1583,7 @@ class VfrQuestionDB(object):
 
         return VfrReturnCode.VFR_RETURN_UNDEFINED
 
-    def __GetFreeQuestionId(self):
+    def GetFreeQuestionId(self):
 
         Index = 0
         for i in range(0, EFI_FREE_QUESTION_ID_BITMAP_SIZE):
@@ -1604,18 +1604,18 @@ class VfrQuestionDB(object):
 
         return EFI_QUESTION_ID_INVALID
 
-    def __CheckQuestionIdFree(self, QId):
+    def CheckQuestionIdFree(self, QId):
         Index = int(QId / EFI_BITS_PER_UINT32)
         Offset = QId % EFI_BITS_PER_UINT32
         return (self.FreeQIdBitMap[Index] & (0x80000000 >> Offset)) == 0
 
-    def __MarkQuestionIdUsed(self, QId):
+    def MarkQuestionIdUsed(self, QId):
 
         Index = int(QId / EFI_BITS_PER_UINT32)
         Offset = QId % EFI_BITS_PER_UINT32
         self.FreeQIdBitMap[Index] |= (0x80000000 >> Offset)
 
-    def __MarkQuestionIdUnused(self, QId):
+    def MarkQuestionIdUnused(self, QId):
         Index = int(QId / EFI_BITS_PER_UINT32)
         Offset = QId % EFI_BITS_PER_UINT32
         self.FreeQIdBitMap[Index] &= ~(0x80000000 >> Offset)

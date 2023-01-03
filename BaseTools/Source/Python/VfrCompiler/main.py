@@ -9,8 +9,7 @@ from antlr4 import *
 from VfrSyntaxVisitor import *
 from VfrSyntaxLexer import *
 from VfrSyntaxParser import *
-from BaseTypes import *
-from ParseInf import *
+from VfrCommon import *
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from VfrError import *
 from Common.LongFilePathSupport import LongFilePath
@@ -68,9 +67,8 @@ class VfrCompiler():
         self.PreProcessCmd = PREPROCESSOR_COMMAND
         self.PreProcessOpt = PREPROCESSOR_OPTIONS
         self.OptionIntialization(Args, Argc)
-        if self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED) or self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
-            return
-        self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED)
+        if (not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)) and (not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)):
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED)
 
 
     def OptionIntialization(self, Args, Argc):
@@ -95,7 +93,7 @@ class VfrCompiler():
                 EdkLogger.error("VfrCompiler", OPTION_MISSING, "-i missing path argument")
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
                 return
-            self.Options.IncludePaths = self.AppendIncludePath(Path) #
+            self.Options.IncludePaths += " -I " + Path
 
         if Args.OutputDirectory:
             self.Options.OutputDirectory = Args.OutputDirectory
@@ -129,7 +127,7 @@ class VfrCompiler():
                 EdkLogger.error("VfrCompiler", OPTION_MISSING, "-od - missing C-preprocessor argument")
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
                 return
-            self.Options.CPreprocessorOptions = self.AppendCPreprocessorOptions(Options) #
+            self.Options.CPreprocessorOptions += ' ' + Options
 
         if Args.StringFileName:
             StringFileName = Args.StringFileName
@@ -260,13 +258,6 @@ class VfrCompiler():
         self.Options.JsonFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + VFR_JSON_FILENAME_EXTENSION
         return 0
 
-    def AppendCPreprocessorOptions(self, Options):
-        pass
-
-    def AppendIncludePath(self, Path):
-        pass
-
-
     def PreProcess(self):
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED):
             if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
@@ -274,7 +265,6 @@ class VfrCompiler():
         else:
             if self.Options.SkipCPreprocessor:
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
-
             else:
                 try:
                     fFile = open(LongFilePath(self.Options.VfrFileName), mode='r')
@@ -347,16 +337,14 @@ class VfrCompiler():
             if self.Options.CreateIfrPkgFile:
                 self.VfrTree.GenBinary()
 
-            #self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_GENBINARY)
-
     def GenCFile(self): #gen c file
-        if self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_GENBINARY) == False:
+        if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_COMPILEED):
             if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
         else:
             if self.Options.CreateIfrPkgFile:
                 self.VfrTree.GenCFile()
-            #self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FINISHED)
+
 
     def GenRecordListFile(self):
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_COMPILEED):
@@ -372,7 +360,6 @@ class VfrCompiler():
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
         else:
             self.VfrTree.GenBinaryFiles()
-            #self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FINISHED)
 
     def DumpYaml(self):
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_COMPILEED):
@@ -389,6 +376,7 @@ class VfrCompiler():
         else:
             if self.Options.CreateJsonFile:
                 self.VfrTree.DumpJson()
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FINISHED)
 
     def SET_RUN_STATUS(self, Status):
         self.RunStatus = Status
@@ -399,7 +387,7 @@ class VfrCompiler():
 def main():
     Args = parser.parse_args()
     Argc = len(sys.argv)
-    # SetPrintLevel
+    # SetPrintLevel (WARNING_LOG_LEVEL)
 
     Compiler = VfrCompiler(Args, Argc)
     Compiler.PreProcess()
@@ -408,7 +396,11 @@ def main():
     Compiler.DumpYaml()
     Compiler.DumpJson()
 
-    # set status
+    Status = Compiler.RunStatus
+    if Status == COMPILER_RUN_STATUS.STATUS_DEAD or Status == COMPILER_RUN_STATUS.STATUS_FAILED:
+        return 2
+
+    return Status
 
 if __name__=="__main__":
     exit(main())

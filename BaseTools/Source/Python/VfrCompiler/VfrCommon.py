@@ -1,7 +1,22 @@
-#Converts a string to an EFI_GUID.
-from BaseTypes import *
 from VfrCtypes import *
-from VfrError import *
+
+#Enumeration of EFI_STATUS.
+RETURN_SUCCESS = EFI_SUCCESS = 0
+EFI_BUFFER_TOO_SMALL = 0x8000000000000000 | (5)
+EFI_ABORTED = 0x8000000000000000 | (21)
+EFI_OUT_OF_RESOURCES = 0x8000000000000000 | (9)
+EFI_INVALID_PARAMETER = 0x8000000000000000 | (2)
+EFI_NOT_FOUND = 0x8000000000000000 | (14)
+RETURN_INVALID_PARAMETER = 0x8000000000000000 | (2)
+RETURN_UNSUPPORTED = 0x8000000000000000 | (3)
+
+def EFI_ERROR(A):
+    if A < 0:
+        return True
+    else:
+        return False
+
+#Converts a string to an EFI_GUID.
 
 def StringToGuid(AsciiGuidBuffer:str, GuidBuffer:EFI_GUID):
     Data4 = [0]*8
