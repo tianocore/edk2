@@ -9,11 +9,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PlatformBootManager.h"
 #include "PlatformConsole.h"
-#include <Protocol/PlatformBootManagerOverride.h>
 #include <Guid/BootManagerMenu.h>
 #include <Library/HobLib.h>
-
-UNIVERSAL_PAYLOAD_PLATFORM_BOOT_MANAGER_OVERRIDE_PROTOCOL  *mUniversalPayloadPlatformBootManagerOverrideInstance = NULL;
 
 /**
   Signal EndOfDxe event and install SMM Ready to lock protocol.
@@ -167,17 +164,6 @@ PlatformBootManagerBeforeConsole (
   EFI_INPUT_KEY                 CustomKey;
   EFI_INPUT_KEY                 Down;
   EFI_BOOT_MANAGER_LOAD_OPTION  BootOption;
-  EFI_STATUS                    Status;
-
-  Status = gBS->LocateProtocol (&gUniversalPayloadPlatformBootManagerOverrideProtocolGuid, NULL, (VOID **)&mUniversalPayloadPlatformBootManagerOverrideInstance);
-  if (EFI_ERROR (Status)) {
-    mUniversalPayloadPlatformBootManagerOverrideInstance = NULL;
-  }
-
-  if (mUniversalPayloadPlatformBootManagerOverrideInstance != NULL) {
-    mUniversalPayloadPlatformBootManagerOverrideInstance->BeforeConsole ();
-    return;
-  }
 
   //
   // Register ENTER as CONTINUE key
@@ -246,11 +232,6 @@ PlatformBootManagerAfterConsole (
   EDKII_PLATFORM_LOGO_PROTOCOL   *PlatformLogo;
   EFI_STATUS                     Status;
 
-  if (mUniversalPayloadPlatformBootManagerOverrideInstance != NULL) {
-    mUniversalPayloadPlatformBootManagerOverrideInstance->AfterConsole ();
-    return;
-  }
-
   Black.Blue = Black.Green = Black.Red = Black.Reserved = 0;
   White.Blue = White.Green = White.Red = White.Reserved = 0xFF;
 
@@ -297,10 +278,6 @@ PlatformBootManagerWaitCallback (
   UINT16  TimeoutRemain
   )
 {
-  if (mUniversalPayloadPlatformBootManagerOverrideInstance != NULL) {
-    mUniversalPayloadPlatformBootManagerOverrideInstance->WaitCallback (TimeoutRemain);
-  }
-
   return;
 }
 
@@ -317,10 +294,6 @@ PlatformBootManagerUnableToBoot (
   VOID
   )
 {
-  if (mUniversalPayloadPlatformBootManagerOverrideInstance != NULL) {
-    mUniversalPayloadPlatformBootManagerOverrideInstance->UnableToBoot ();
-  }
-
   return;
 }
 
