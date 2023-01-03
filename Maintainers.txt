@@ -604,6 +604,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
 M: Eric Dong <eric.dong@intel.com> [ydong10]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
+R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 
 UefiCpuPkg: Sec related modules
 F: UefiCpuPkg/SecCore/
