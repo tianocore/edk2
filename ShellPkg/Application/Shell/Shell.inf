@@ -103,3 +103,4 @@
   gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole           ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellSupplier               ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellMaxHistoryCommandCount ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellDefaultDelay           ## CONSUMES
