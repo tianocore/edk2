@@ -67,8 +67,10 @@ InitializePageTablePool (
   IN UINTN  PoolPages
   )
 {
-  VOID     *Buffer;
-  BOOLEAN  CetEnabled;
+  VOID      *Buffer;
+  BOOLEAN   CetEnabled;
+  BOOLEAN   WpEnabled;
+  IA32_CR0  Cr0;
 
   //
   // Always reserve at least PAGE_TABLE_POOL_UNIT_PAGES, including one page for
@@ -106,21 +108,35 @@ InitializePageTablePool (
   //
   if (mIsReadOnlyPageTable) {
     CetEnabled = ((AsmReadCr4 () & CR4_CET_ENABLE) != 0) ? TRUE : FALSE;
-    if (CetEnabled) {
+    Cr0.UintN  = AsmReadCr0 ();
+    WpEnabled  = (Cr0.Bits.WP != 0) ? TRUE : FALSE;
+    if (WpEnabled) {
       //
-      // CET must be disabled if WP is disabled.
+      // Only disable/enable WP when Cr0.Bits.WP has been set to 1.
       //
-      DisableCet ();
+      Cr0.Bits.WP = 0;
+      AsmWriteCr0 (Cr0.UintN);
+
+      if (CetEnabled) {
+        //
+        // CET must be disabled if WP is disabled.
+        //
+        DisableCet ();
+      }
     }
 
-    AsmWriteCr0 (AsmReadCr0 () & ~CR0_WP);
     SmmSetMemoryAttributes ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, EFI_PAGES_TO_SIZE (PoolPages), EFI_MEMORY_RO);
-    AsmWriteCr0 (AsmReadCr0 () | CR0_WP);
-    if (CetEnabled) {
-      //
-      // re-enable CET.
-      //
-      EnableCet ();
+    if (WpEnabled) {
+      Cr0.UintN   = AsmReadCr0 ();
+      Cr0.Bits.WP = 1;
+      AsmWriteCr0 (Cr0.UintN);
+
+      if (CetEnabled) {
+        //
+        // re-enable CET.
+        //
+        EnableCet ();
+      }
     }
   }
 
