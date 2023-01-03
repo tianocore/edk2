@@ -27,12 +27,15 @@ trap exit_handler EXIT
 
 #
 # Assemble the source file.
+# (nasm doesn't recognize the "--" end-of-options delimiter;
+# <https://bugzilla.nasm.us/show_bug.cgi?id=3392829>.)
 #
-nasm -o "$STEM".bin -- "$STEM".asm
+nasm -o "$STEM".bin "$STEM".asm
 
 #
 # Disassemble it, in order to get a binary dump associated with the source.
-# (ndisasm doesn't recognize the "--" end-of-options delimiter.)
+# (ndisasm doesn't recognize the "--" end-of-options delimiter;
+# <https://bugzilla.nasm.us/show_bug.cgi?id=3392829>.)
 #
 ndisasm "$STEM".bin >"$STEM".disasm
 
