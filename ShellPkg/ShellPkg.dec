@@ -136,3 +136,7 @@
   # Up to this many bytes of vendor specific data will be used. Default is 0
   # (disabled).
   gEfiShellPkgTokenSpaceGuid.PcdShellVendorExtendedDecode|0|UINT32|0x00000013
+
+  ## Controls the default delay the shell will offer to the user at the
+  # start to check if the user wishes to cancel the script autostart
+  gEfiShellPkgTokenSpaceGuid.PcdShellDefaultDelay|5|UINT32|0x00000015
