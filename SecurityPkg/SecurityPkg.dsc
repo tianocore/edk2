@@ -296,6 +296,11 @@
 [Components.X64]
   SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
   SecurityPkg/Library/SecTpmMeasurementLib/SecTpmMeasurementLibTdx.inf
+  SecurityPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf {
+    <LibraryClasses>
+      HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
+  }
 
 [Components.IA32, Components.X64]
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf

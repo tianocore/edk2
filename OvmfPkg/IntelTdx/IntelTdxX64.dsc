@@ -774,7 +774,7 @@
   #
   # Cc Measurement Protocol for Td guest
   #
-  OvmfPkg/IntelTdx/TdTcg2Dxe/TdTcg2Dxe.inf {
+  SecurityPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf {
     <LibraryClasses>
       HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
       NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf

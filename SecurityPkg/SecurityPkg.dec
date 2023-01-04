@@ -574,5 +574,11 @@
   # @Prompt Tpm2AcpiTableLasa LASA field in TPM2 ACPI table.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLasa|0|UINT64|0x00010023
 
+  ## This PCD records LAML field in CC EVENTLOG ACPI table.
+  gEfiSecurityPkgTokenSpaceGuid.PcdCcEventlogAcpiTableLaml|0|UINT32|0x00010025
+
+  ## This PCD records LASA field in CC EVENTLOG ACPI table.
+  gEfiSecurityPkgTokenSpaceGuid.PcdCcEventlogAcpiTableLasa|0|UINT64|0x00010026
+
 [UserExtensions.TianoCore."ExtraFiles"]
   SecurityPkgExtra.uni
