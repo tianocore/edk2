@@ -31,7 +31,6 @@
   MdeModulePkg/MdeModulePkg.dec
   SecurityPkg/SecurityPkg.dec
   CryptoPkg/CryptoPkg.dec
-  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -85,8 +84,8 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2NumberOfPCRBanks                     ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgLogAreaMinLen                         ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2FinalLogAreaLen                      ## CONSUMES
-  gUefiOvmfPkgTokenSpaceGuid.PcdCcEventlogAcpiTableLaml                     ## PRODUCES
-  gUefiOvmfPkgTokenSpaceGuid.PcdCcEventlogAcpiTableLasa                     ## PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdCcEventlogAcpiTableLaml                  ## PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdCcEventlogAcpiTableLasa                  ## PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId                        ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision                  ## CONSUMES
