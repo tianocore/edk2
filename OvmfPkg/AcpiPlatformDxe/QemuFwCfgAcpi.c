@@ -18,8 +18,11 @@
 #include <Library/QemuFwCfgLib.h>             // QemuFwCfgFindFile()
 #include <Library/QemuFwCfgS3Lib.h>           // QemuFwCfgS3Enabled()
 #include <Library/UefiBootServicesTableLib.h> // gBS
+#include <Protocol/CcMeasurement.h>
 
 #include "AcpiPlatform.h"
+
+EFI_CC_MEASUREMENT_PROTOCOL  *mCcProtocol = NULL;
 
 //
 // The user structure for the ordered collection that will track the fw_cfg
@@ -812,6 +815,72 @@ UndoCmdWritePointer (
     ));
 }
 
+/**
+  Mesure firmware acpi configuration data from qemu.
+
+  @param[in] EventData    Pointer to the event data.
+  @param[in] EventSize    Size of event data.
+  @param[in] CfgDataBase  Configuration data base address.
+  @param[in] EventSize    Size of configuration data .
+  @retval  EFI_NOT_FOUND           Cannot locate protocol.
+  @retval  EFI_OUT_OF_RESOURCES    Allocate zero pool failure.
+  @return                          Status codes returned by
+                                   mTcg2Protocol->HashLogExtendEvent.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+MeasureAcpiTableFromQemu (
+  IN CHAR8                 *EventData,
+  IN UINT32                EventSize,
+  IN EFI_PHYSICAL_ADDRESS  CfgDataBase,
+  IN UINTN                 CfgDataLength
+  )
+{
+  EFI_STATUS    Status;
+  EFI_CC_EVENT  *CcEvent;
+  UINT32        MrIndex;
+
+  if (mCcProtocol == NULL) {
+    Status = gBS->LocateProtocol (&gEfiCcMeasurementProtocolGuid, NULL, (VOID **)&mCcProtocol);
+    if (EFI_ERROR (Status)) {
+      //
+      // CcMeasurement protocol is not installed.
+      //
+      return EFI_NOT_FOUND;
+    }
+  }
+
+  Status = mCcProtocol->MapPcrToMrIndex (mCcProtocol, 1, &MrIndex);
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CcEvent = AllocateZeroPool (EventSize + sizeof (EFI_CC_EVENT) - sizeof (CcEvent->Event));
+  if (CcEvent == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  CcEvent->Size                 = EventSize + sizeof (EFI_CC_EVENT) - sizeof (CcEvent->Event);
+  CcEvent->Header.EventType     = EV_PLATFORM_CONFIG_FLAGS;
+  CcEvent->Header.MrIndex       = MrIndex;
+  CcEvent->Header.HeaderSize    = sizeof (EFI_CC_EVENT_HEADER);
+  CcEvent->Header.HeaderVersion = EFI_CC_EVENT_HEADER_VERSION;
+  CopyMem (&CcEvent->Event[0], EventData, EventSize);
+
+  Status = mCcProtocol->HashLogExtendEvent (
+                          mCcProtocol,
+                          0,
+                          CfgDataBase,
+                          CfgDataLength,
+                          CcEvent
+                          );
+
+  FreePool (CcEvent);
+
+  return Status;
+}
+
 //
 // We'll be saving the keys of installed tables so that we can roll them back
 // in case of failure. 128 tables should be enough for anyone (TM).
@@ -901,11 +970,13 @@ Process2ndPassCmdAddPointer (
   CONST EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs;
   CONST EFI_ACPI_DESCRIPTION_HEADER                   *Header;
   EFI_STATUS                                          Status;
+  UINT32                                              Signature;
 
   if ((*NumInstalled < 0) || (*NumInstalled > INSTALLED_TABLES_MAX)) {
     return EFI_INVALID_PARAMETER;
   }
 
+  Signature     = SIGNATURE_32 (' ', ' ', ' ', ' ');
   TrackerEntry  = OrderedCollectionFind (Tracker, AddPointer->PointerFile);
   TrackerEntry2 = OrderedCollectionFind (Tracker, AddPointer->PointeeFile);
   Blob          = OrderedCollectionUserStruct (TrackerEntry);
@@ -962,7 +1033,8 @@ Process2ndPassCmdAddPointer (
   // To make our job simple, the FACS has a custom header. Sigh.
   //
   if (sizeof *Facs <= Blob2Remaining) {
-    Facs = (EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)(UINTN)PointerValue;
+    Facs      = (EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)(UINTN)PointerValue;
+    Signature = Facs->Signature;
 
     if ((Facs->Length >= sizeof *Facs) &&
         (Facs->Length <= Blob2Remaining) &&
@@ -983,7 +1055,8 @@ Process2ndPassCmdAddPointer (
   // check for the uniform tables
   //
   if ((TableSize == 0) && (sizeof *Header <= Blob2Remaining)) {
-    Header = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)PointerValue;
+    Header    = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)PointerValue;
+    Signature = Header->Signature;
 
     if ((Header->Length >= sizeof *Header) &&
         (Header->Length <= Blob2Remaining) &&
@@ -1046,6 +1119,32 @@ Process2ndPassCmdAddPointer (
       Status
       ));
     goto RollbackSeenPointer;
+  }
+
+  //
+  // Measure the installed ACPI table downloaded from QEMU
+  //
+  Status = MeasureAcpiTableFromQemu (
+             (CHAR8 *)&Signature,
+             sizeof (Signature),
+             PointerValue,
+             TableSize
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Measure ACPI table [%-4.4a] with Size = 0x%x failed! Status = %r\n",
+      (CONST CHAR8 *)&Signature,
+      TableSize,
+      Status
+      ));
+  } else {
+    DEBUG ((
+      DEBUG_INFO,
+      "Measure ACPI table [%-4.4a] with Size = 0x%x\n",
+      (CONST CHAR8 *)&Signature,
+      TableSize
+      ));
   }
 
   ++*NumInstalled;

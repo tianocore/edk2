@@ -51,6 +51,7 @@
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiPciIoProtocolGuid                         # PROTOCOL SOMETIMES_CONSUMED
   gQemuAcpiTableNotifyProtocolGuid              # PROTOCOL PRODUCES
+  gEfiCcMeasurementProtocolGuid                 # PROTOCOL SOMETIMES_CONSUMED
 
 [Guids]
   gRootBridgesConnectedEventGroupGuid
