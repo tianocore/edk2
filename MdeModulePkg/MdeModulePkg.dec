@@ -158,6 +158,10 @@
   #
   VariableFlashInfoLib|Include/Library/VariableFlashInfoLib.h
 
+  ##  @libraryclass  Provides services to communicate with Trace Hub.
+  #
+  TraceHubDebugLib|Include/Library/TraceHubDebugLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -432,6 +436,9 @@
 
   ## Include/UniversalPayload/SerialPortInfo.h
   gUniversalPayloadSerialPortInfoGuid = { 0xaa7e190d, 0xbe21, 0x4409, { 0x8e, 0x67, 0xa2, 0xcd, 0xf, 0x61, 0xe1, 0x70 } }
+
+  ## Include/UniversalPayload/TraceHubDebugInfo.h
+  gUniversalPayloadTraceHubDebugInfoGuid = { 0xf88c9c23, 0x646c, 0x4f6c, { 0x8e, 0x3d, 0x36, 0xa9, 0x43, 0xc1, 0x08, 0x35 } }
 
   ## GUID used for Boot Discovery Policy FormSet guid and related variables.
   gBootDiscoveryPolicyMgrFormsetGuid = { 0x5b6f7107, 0xbb3c, 0x4660, { 0x92, 0xcd, 0x54, 0x26, 0x90, 0x28, 0x0b, 0xbd } }
@@ -1087,6 +1094,23 @@
   #   FALSE - UEFI Stack Guard will be disabled.<BR>
   # @Prompt Enable UEFI Stack Guard.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard|FALSE|BOOLEAN|0x30001055
+
+  ## Indicate debug level of Trace Hub message.
+  # This PCD consist of below bits:
+  #   BIT0 - Trace Hub routing
+  #     0 - TraceHubRoutingDisable
+  #     1 - TraceHubRoutingEnable
+  #   BIT2 | BIT1 - Trace Hub debug level
+  #     0 - TraceHubDebugLevelError
+  #     1 - TraceHubDebugLevelErrorWarning
+  #     2 - TraceHubDebugLevelErrorWarningInfo
+  #     3 - TraceHubDebugLevelErrorWarningInfoVerbose
+  # @Prompt Debug level of Trace Hub message.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTraceHubDebugVerbosity|0|UINT8|0x30001056
+
+  ## Indicate MMIO address where Trace Hub message output to.
+  # @Prompt Output MMIO address of Trace Hub message.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTraceHubDebugAddress|0|UINT64|0x30001057
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.

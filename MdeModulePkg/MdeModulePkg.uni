@@ -1290,6 +1290,23 @@
                                                                                     "   TRUE  - UEFI Stack Guard will be enabled.<BR>\n"
                                                                                     "   FALSE - UEFI Stack Guard will be disabled.<BR>"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdTraceHubDebugVerbosity_PROMPT  #language en-US "Debug level of Trace Hub message"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdTraceHubDebugVerbosity_HELP    #language en-US "Indicate debug level of Trace Hub message."
+                                                                                             "  This PCD consist of below bits:"
+                                                                                             "    BIT0 - Trace Hub routing"
+                                                                                             "      0 - TraceHubRoutingDisable"
+                                                                                             "      1 - TraceHubRoutingEnable"
+                                                                                             "    BIT2 | BIT1 - Trace Hub debug level"
+                                                                                             "      0 - TraceHubDebugLevelError"
+                                                                                             "      1 - TraceHubDebugLevelErrorWarning"
+                                                                                             "      2 - TraceHubDebugLevelErrorWarningInfo"
+                                                                                             "      3 - TraceHubDebugLevelErrorWarningInfoVerbose"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdTraceHubDebugAddress_PROMPT  #language en-US "Output MMIO address of Trace Hub message"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdTraceHubDebugAddress_HELP    #language en-US "Indicate MMIO address where Trace Hub message output to."
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSetNvStoreDefaultId_PROMPT  #language en-US "NV Storage DefaultId"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSetNvStoreDefaultId_HELP    #language en-US "This dynamic PCD enables the default variable setting.\n"

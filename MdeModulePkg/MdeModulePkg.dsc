@@ -104,6 +104,10 @@
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
+  TraceHubDebugLib|MdeModulePkg/Library/TraceHubDebugLibSysT/BaseTraceHubDebugLibSyst.inf
+  TraceHubDebugLib|MdeModulePkg/Library/TraceHubDebugLibSysT/PeiTraceHubDebugLibSyst.inf
+  TraceHubDebugLib|MdeModulePkg/Library/TraceHubDebugLibSysT/DxeSmmTraceHubDebugLibSyst.inf
+  TraceHubDebugLib|MdeModulePkg/Library/TraceHubDebugLibNull/TraceHubDebugLibNull.inf
 
 [LibraryClasses.EBC.PEIM]
   IoLib|MdePkg/Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
@@ -443,6 +447,10 @@
   MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
   MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
   MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
+  MdeModulePkg/Library/TraceHubDebugLibSysT/BaseTraceHubDebugLibSyst.inf
+  MdeModulePkg/Library/TraceHubDebugLibSysT/PeiTraceHubDebugLibSyst.inf
+  MdeModulePkg/Library/TraceHubDebugLibSysT/DxeSmmTraceHubDebugLibSyst.inf
+  MdeModulePkg/Library/TraceHubDebugLibNull/TraceHubDebugLibNull.inf
 
 [Components.IA32, Components.X64, Components.AARCH64]
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
