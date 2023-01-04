@@ -18,6 +18,8 @@
 #include <Library/QemuFwCfgLib.h>             // QemuFwCfgFindFile()
 #include <Library/QemuFwCfgS3Lib.h>           // QemuFwCfgS3Enabled()
 #include <Library/UefiBootServicesTableLib.h> // gBS
+#include <Protocol/AcpiSystemDescriptionTable.h>
+#include <Protocol/CcMeasurement.h>
 
 #include "AcpiPlatform.h"
 
@@ -812,11 +814,167 @@ UndoCmdWritePointer (
     ));
 }
 
+/**
+  Mesure firmware ACPI table with CcMeasurement Protocol
+
+  @param[in] CcProtocol   Pointer to the CcMeasurment Protocol
+  @param[in] EventData    Pointer to the event data.
+  @param[in] EventSize    Size of event data.
+  @param[in] CfgDataBase  Configuration data base address.
+  @param[in] EventSize    Size of configuration data .
+  @retval  EFI_NOT_FOUND           Cannot locate protocol.
+  @retval  EFI_OUT_OF_RESOURCES    Allocate zero pool failure.
+  @return                          Status codes returned by
+                                   mTcg2Protocol->HashLogExtendEvent.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+CcMeasureAcpiTable (
+  IN EFI_CC_MEASUREMENT_PROTOCOL  *CcProtocol,
+  IN CHAR8                        *EventData,
+  IN UINT32                       EventSize,
+  IN EFI_PHYSICAL_ADDRESS         CfgDataBase,
+  IN UINTN                        CfgDataLength
+  )
+{
+  EFI_STATUS    Status;
+  EFI_CC_EVENT  *CcEvent;
+  UINT32        MrIndex;
+
+  if (CcProtocol == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = CcProtocol->MapPcrToMrIndex (CcProtocol, 1, &MrIndex);
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CcEvent = AllocateZeroPool (EventSize + sizeof (EFI_CC_EVENT) - sizeof (CcEvent->Event));
+  if (CcEvent == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  CcEvent->Size                 = EventSize + sizeof (EFI_CC_EVENT) - sizeof (CcEvent->Event);
+  CcEvent->Header.EventType     = EV_PLATFORM_CONFIG_FLAGS;
+  CcEvent->Header.MrIndex       = MrIndex;
+  CcEvent->Header.HeaderSize    = sizeof (EFI_CC_EVENT_HEADER);
+  CcEvent->Header.HeaderVersion = EFI_CC_EVENT_HEADER_VERSION;
+  CopyMem (&CcEvent->Event[0], EventData, EventSize);
+
+  Status = CcProtocol->HashLogExtendEvent (
+                         CcProtocol,
+                         0,
+                         CfgDataBase,
+                         CfgDataLength,
+                         CcEvent
+                         );
+
+  FreePool (CcEvent);
+
+  return Status;
+}
+
 //
 // We'll be saving the keys of installed tables so that we can roll them back
 // in case of failure. 128 tables should be enough for anyone (TM).
 //
 #define INSTALLED_TABLES_MAX  128
+
+/**
+ * The ACPI tables are downloaded from QEMU. From the security perspective these are
+ * external inputs and should be measured and extended if possible. So that they can
+ * be audited later. The measurement protocol may be not installed. In this case it
+ * still returns EFI_SUCCESS.
+ *
+ * @param InstalledKey Pointer to an array which contains the keys of the installed ACPI tables
+ * @param Length       Length of the array
+ * @retval EFI_SUCCESS Successfully measure the ACPI tables
+ * @retval Others      Other errors as indicated
+ */
+STATIC
+EFI_STATUS
+MeasureInstalledTablesFromQemu (
+  IN UINTN  *InstalledKey,
+  IN INT32  Length
+  )
+{
+  EFI_STATUS                   Status;
+  UINTN                        Index1;
+  INT32                        Index2;
+  EFI_ACPI_SDT_HEADER          *Table;
+  EFI_ACPI_TABLE_VERSION       Version;
+  UINTN                        TableKey;
+  EFI_ACPI_SDT_PROTOCOL        *AcpiSdtProtocol;
+  EFI_CC_MEASUREMENT_PROTOCOL  *CcProtocol = NULL;
+
+  Status = gBS->LocateProtocol (&gEfiCcMeasurementProtocolGuid, NULL, (VOID **)&CcProtocol);
+  if (EFI_ERROR (Status)) {
+    //
+    // CcMeasurement protocol is not installed.
+    //
+    return EFI_SUCCESS;
+  }
+
+  Status = gBS->LocateProtocol (&gEfiAcpiSdtProtocolGuid, NULL, (void **)&AcpiSdtProtocol);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Unable to locate ACPI SDT protocol.\n"));
+    return Status;
+  }
+
+  Index1 = 0;
+  do {
+    Status = AcpiSdtProtocol->GetAcpiTable (Index1, &Table, &Version, &TableKey);
+    if (EFI_ERROR (Status)) {
+      if (Status == EFI_NOT_FOUND) {
+        //
+        // There is no more ACPI tables found. So we return with EFI_SUCCESS.
+        //
+        Status = EFI_SUCCESS;
+      }
+
+      break;
+    }
+
+    for (Index2 = 0; Index2 < Length; Index2++) {
+      if (TableKey == InstalledKey[Index2]) {
+        break;
+      }
+    }
+
+    if (Index2 < Length) {
+      Status = CcMeasureAcpiTable (
+                 CcProtocol,
+                 (CHAR8 *)&Table->Signature,
+                 sizeof (Table->Signature),
+                 (EFI_PHYSICAL_ADDRESS)(UINTN)Table,
+                 Table->Length
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "Measure ACPI table [%-4.4a] with Size = 0x%x failed! Status = %r\n",
+          (CONST CHAR8 *)&Table->Signature,
+          Table->Length,
+          Status
+          ));
+        break;
+      } else {
+        DEBUG ((
+          DEBUG_INFO,
+          "Measure ACPI table [%-4.4a] with Size = 0x%x\n",
+          (CONST CHAR8 *)&Table->Signature,
+          Table->Length
+          ));
+      }
+    }
+
+    Index1++;
+  } while (TRUE);
+
+  return Status;
+}
 
 /**
   Process a QEMU_LOADER_ADD_POINTER command in order to see if its target byte
@@ -1244,6 +1402,16 @@ InstallQemuFwCfgTables (
       if (EFI_ERROR (Status)) {
         goto UninstallAcpiTables;
       }
+    }
+  }
+
+  //
+  // Measure the ACPI tables which are downloaded from QEMU
+  //
+  if (Installed > 0) {
+    Status = MeasureInstalledTablesFromQemu (InstalledKey, Installed);
+    if (EFI_ERROR (Status)) {
+      goto UninstallAcpiTables;
     }
   }
 
