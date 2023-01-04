@@ -18,12 +18,8 @@
 
 #include <Protocol/AcpiSystemDescriptionTable.h>
 #include <Protocol/AcpiTable.h>
-#include <Protocol/QemuAcpiTableNotify.h>                 // QEMU_ACPI_TABLE_NOTIFY_PROTOCOL
 
 #include "AcpiPlatform.h"
-
-EFI_HANDLE                       mChAcpiHandle = NULL;
-QEMU_ACPI_TABLE_NOTIFY_PROTOCOL  mChAcpiNotifyProtocol;
 
 EFI_STATUS
 EFIAPI
@@ -33,13 +29,15 @@ InstallCloudHvTablesTdx (
 {
   EFI_STATUS  Status;
   UINTN       TableHandle;
+  EFI_HANDLE  ChAcpiHandle;
 
   EFI_PEI_HOB_POINTERS         Hob;
   EFI_ACPI_DESCRIPTION_HEADER  *CurrentTable;
   EFI_ACPI_DESCRIPTION_HEADER  *DsdtTable;
 
-  DsdtTable   = NULL;
-  TableHandle = 0;
+  DsdtTable    = NULL;
+  TableHandle  = 0;
+  ChAcpiHandle = NULL;
 
   Hob.Guid = (EFI_HOB_GUID_TYPE *)GetFirstGuidHob (&gUefiOvmfPkgTdxAcpiHobGuid);
 
@@ -92,12 +90,15 @@ InstallCloudHvTablesTdx (
   // Install a protocol to notify that the ACPI table provided by CH is
   // ready.
   //
-  gBS->InstallProtocolInterface (
-         &mChAcpiHandle,
-         &gQemuAcpiTableNotifyProtocolGuid,
-         EFI_NATIVE_INTERFACE,
-         &mChAcpiNotifyProtocol
-         );
+  Status = gBS->InstallProtocolInterface (
+                  &ChAcpiHandle,
+                  &gQemuAcpiTableNotifyProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   return EFI_SUCCESS;
 }

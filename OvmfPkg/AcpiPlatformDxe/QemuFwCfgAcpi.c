@@ -19,10 +19,7 @@
 #include <Library/QemuFwCfgS3Lib.h>           // QemuFwCfgS3Enabled()
 #include <Library/UefiBootServicesTableLib.h> // gBS
 
-#include <Protocol/QemuAcpiTableNotify.h>
 #include "AcpiPlatform.h"
-EFI_HANDLE                       mQemuAcpiHandle = NULL;
-QEMU_ACPI_TABLE_NOTIFY_PROTOCOL  mAcpiNotifyProtocol;
 
 //
 // The user structure for the ordered collection that will track the fw_cfg
@@ -1103,6 +1100,9 @@ InstallQemuFwCfgTables (
   ORDERED_COLLECTION_ENTRY  *TrackerEntry, *TrackerEntry2;
   ORDERED_COLLECTION        *SeenPointers;
   ORDERED_COLLECTION_ENTRY  *SeenPointerEntry, *SeenPointerEntry2;
+  EFI_HANDLE                QemuAcpiHandle;
+
+  QemuAcpiHandle = NULL;
 
   Status = QemuFwCfgFindFile ("etc/table-loader", &FwCfgItem, &FwCfgSize);
   if (EFI_ERROR (Status)) {
@@ -1250,6 +1250,20 @@ InstallQemuFwCfgTables (
   }
 
   //
+  // Install a protocol to notify that the ACPI table provided by Qemu is
+  // ready.
+  //
+  Status = gBS->InstallProtocolInterface (
+                  &QemuAcpiHandle,
+                  &gQemuAcpiTableNotifyProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    goto UninstallAcpiTables;
+  }
+
+  //
   // Translating the condensed QEMU_LOADER_WRITE_POINTER commands to ACPI S3
   // Boot Script opcodes has to be the last operation in this function, because
   // if it succeeds, it cannot be undone.
@@ -1275,17 +1289,19 @@ UninstallAcpiTables:
       --Installed;
       AcpiProtocol->UninstallAcpiTable (AcpiProtocol, InstalledKey[Installed]);
     }
+
+    //
+    // Uninstall the notification if it has been installed.
+    //
+    if (QemuAcpiHandle != NULL) {
+      gBS->UninstallProtocolInterface (
+             QemuAcpiHandle,
+             &gQemuAcpiTableNotifyProtocolGuid,
+             NULL
+             );
+    }
   } else {
-    //
-    // Install a protocol to notify that the ACPI table provided by Qemu is
-    // ready.
-    //
-    gBS->InstallProtocolInterface (
-           &mQemuAcpiHandle,
-           &gQemuAcpiTableNotifyProtocolGuid,
-           EFI_NATIVE_INTERFACE,
-           &mAcpiNotifyProtocol
-           );
+    DEBUG ((DEBUG_INFO, "%a: installed %d tables\n", __FUNCTION__, Installed));
   }
 
   for (SeenPointerEntry = OrderedCollectionMin (SeenPointers);
