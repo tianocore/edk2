@@ -42,6 +42,21 @@
 
 
 ASM_FUNC(ArmPlatformPeiBootAction)
+#ifdef CAVIUM_ERRATUM_27456
+  /*
+   * On Cavium ThunderX, using non-global mappings that are executable at EL1
+   * results in I-cache corruption. So just avoid the early ID mapping there.
+   *
+   * MIDR implementor   0x43
+   * MIDR part numbers  0xA1 0xA2 (but not 0xAF)
+   */
+  mrs    x0, midr_el1            // read the MIDR into X0
+  ubfx   x1, x0, #24, #8         // grab implementor id
+  ubfx   x0, x0, #7, #9          // grab part number bits [11:3]
+  cmp    x1, #0x43               // compare implementor id
+  ccmp   x0, #0xA0 >> 3, #0, eq  // compare part# bits [11:3]
+  b.eq   0f
+#endif
   mrs    x0, CurrentEL           // check current exception level
   tbnz   x0, #3, 0f              // omit early ID map if above EL1
 
