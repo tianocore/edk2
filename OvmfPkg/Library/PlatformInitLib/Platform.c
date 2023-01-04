@@ -542,6 +542,40 @@ PlatformMaxCpuCountInitialization (
       } while (Selected > 0);
 
       //
+      // Sanity check: we need at least 1 present CPU (CPU#0 is always present).
+      //
+      // The legacy-to-modern switching of the CPU hotplug register block got
+      // broken (for TCG) in QEMU v5.1.0. Refer to "IO port write width clamping
+      // differs between TCG and KVM" at
+      // <http://mid.mail-archive.com/aaedee84-d3ed-a4f9-21e7-d221a28d1683@redhat.com>
+      // or at
+      // <https://lists.gnu.org/archive/html/qemu-devel/2023-01/msg00199.html>.
+      //
+      // A fix was submitted after QEMU v7.2.0: "[PATCH] acpi: cpuhp: fix
+      // guest-visible maximum access size to the legacy reg block".
+      //
+      // If we're affected by this QEMU bug, then we must not continue: it
+      // confuses the multiprocessing in UefiCpuPkg/Library/MpInitLib, and
+      // breaks CPU hot(un)plug with SMI in OvmfPkg/CpuHotplugSmm.
+      //
+      if (Present == 0) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a: Broken CPU hotplug register block: Present=%u Possible=%u.\n"
+          "%a: Switch QEMU's acceleration from TCG to KVM, or update QEMU.\n"
+          "%a: Refer to "
+          "<https://bugzilla.tianocore.org/show_bug.cgi?id=4250>.\n",
+          __FUNCTION__,
+          Present,
+          Possible,
+          __FUNCTION__,
+          __FUNCTION__
+          ));
+        ASSERT (FALSE);
+        CpuDeadLoop ();
+      }
+
+      //
       // Sanity check: fw_cfg and the modern CPU hotplug interface should
       // return the same boot CPU count.
       //
