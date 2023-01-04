@@ -31,6 +31,7 @@
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE TPM2_ENABLE             = FALSE
   DEFINE TPM2_CONFIG_ENABLE      = FALSE
+  DEFINE CAVIUM_ERRATUM_27456    = FALSE
 
   #
   # Network definition
@@ -117,7 +118,11 @@
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [BuildOptions]
+!if $(CAVIUM_ERRATUM_27456) == TRUE
+  GCC:*_*_AARCH64_PP_FLAGS = -DCAVIUM_ERRATUM_27456
+!else
   GCC:*_*_AARCH64_CC_XIPFLAGS ==
+!endif
 
 !include NetworkPkg/NetworkBuildOptions.dsc.inc
 
