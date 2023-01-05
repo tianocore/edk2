@@ -389,7 +389,7 @@ RelocateApLoop (
   MpInitLibWhoAmI (&ProcessorNumber);
   CpuMpData    = GetCpuMpData ();
   MwaitSupport = IsMwaitSupport ();
-  if (StandardSignatureIsAuthenticAMD ()) {
+  if (StandardSignatureIsAuthenticAMD () && (sizeof (UINTN) == sizeof (UINT64))) {
     StackStart               = CpuMpData->UseSevEsAPMethod ? CpuMpData->SevEsAPResetStackStart : mReservedTopOfApStack;
     AsmRelocateApLoopFuncAmd = (ASM_RELOCATE_AP_LOOP_AMD)(UINTN)mReservedApLoopFunc;
     AsmRelocateApLoopFuncAmd (
