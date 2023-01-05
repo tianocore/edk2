@@ -1979,8 +1979,6 @@ DEFINE GCC5_LOONGARCH64_ASLDLINK_FLAGS     = DEF(GCC_LOONGARCH64_ASLDLINK_FLAGS)
 DEFINE GCC5_LOONGARCH64_ASM_FLAGS          = -x assembler-with-cpp -mabi=lp64d -march=loongarch64 -fno-builtin -c -Wall -mno-explicit-relocs
 DEFINE GCC5_LOONGARCH64_PP_FLAGS           = -mabi=lp64d -march=loongarch64 DEF(GCC_PP_FLAGS)
 
-DEFINE GCC_PP_FLAGS                        = -E -x assembler-with-cpp -include AutoGen.h DEF(GCC5_RISCV_OPENSBI_TYPES)
-
 ####################################################################################
 #
 # GCC 4.8 - This configuration is used to compile under Linux to produce
@@ -2456,6 +2454,7 @@ RELEASE_GCC5_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 *_GCC5_RISCV64_RC_FLAGS             = DEF(GCC_RISCV64_RC_FLAGS)
 *_GCC5_RISCV64_OBJCOPY_FLAGS        =
 *_GCC5_RISCV64_DTCPP_FLAGS          = DEF(GCC_DTCPP_FLAGS)
+*_GCC5_RISCV64_PP_FLAGS             = DEF(GCC_PP_FLAGS) DEF(GCC5_RISCV_OPENSBI_TYPES)
 
 ##################
 # GCC5 LOONGARCH64 definitions
