@@ -1850,7 +1850,7 @@ NOOPT_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)/$(MODULE_N
 *_*_*_DTC_PATH                     = DEF(DTC_BIN)
 
 DEFINE GCC_ALL_CC_FLAGS            = -g -Os -fshort-wchar -fno-builtin -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -include AutoGen.h -fno-common
-DEFINE GCC_ARM_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -mabi=aapcs -fno-short-enums -funsigned-char -ffunction-sections -fdata-sections -fomit-frame-pointer -Wno-address -mthumb -mfloat-abi=soft -fno-pic -fno-pie
+DEFINE GCC_ARM_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -mabi=aapcs -fno-short-enums -funsigned-char -ffunction-sections -fdata-sections -fomit-frame-pointer -Wno-address -mthumb -fno-pic -fno-pie
 DEFINE GCC_LOONGARCH64_CC_FLAGS    = DEF(GCC_ALL_CC_FLAGS) -mabi=lp64d -fno-asynchronous-unwind-tables -fno-plt -Wno-address -fno-short-enums -fsigned-char -ffunction-sections -fdata-sections
 DEFINE GCC_ARM_CC_XIPFLAGS         = -mno-unaligned-access
 DEFINE GCC_AARCH64_CC_FLAGS        = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -fno-short-enums -fverbose-asm -funsigned-char  -ffunction-sections -fdata-sections -Wno-address -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-pic -fno-pie -ffixed-x18
@@ -2364,7 +2364,7 @@ RELEASE_GCC5_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -flto -Os
 *_GCC5_ARM_ASM_FLAGS             = DEF(GCC5_ARM_ASM_FLAGS)
 *_GCC5_ARM_DLINK2_FLAGS          = DEF(GCC5_ARM_DLINK2_FLAGS)
 *_GCC5_ARM_DTCPP_FLAGS           = DEF(GCC_DTCPP_FLAGS)
-*_GCC5_ARM_PLATFORM_FLAGS        = -march=armv7-a
+*_GCC5_ARM_PLATFORM_FLAGS        = -march=armv7-a -mfloat-abi=soft
 *_GCC5_ARM_PP_FLAGS              = $(PLATFORM_FLAGS) DEF(GCC_PP_FLAGS)
 *_GCC5_ARM_RC_FLAGS              = DEF(GCC_ARM_RC_FLAGS)
 *_GCC5_ARM_VFRPP_FLAGS           = $(PLATFORM_FLAGS) DEF(GCC_VFRPP_FLAGS)
