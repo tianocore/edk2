@@ -480,6 +480,7 @@ InitMpGlobalData (
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  MemDesc;
   UINTN                            StackBase;
   CPU_INFO_IN_HOB                  *CpuInfoInHob;
+  EFI_PHYSICAL_ADDRESS             Address;
 
   SaveCpuMpData (CpuMpData);
 
@@ -561,13 +562,25 @@ InitMpGlobalData (
   ASSERT ((AP_SAFE_STACK_SIZE & (CPU_STACK_ALIGNMENT - 1)) == 0);
 
   mReservedApLoopFunc = (VOID *)(mReservedTopOfApStack + CpuMpData->CpuCount * AP_SAFE_STACK_SIZE);
-  if (StandardSignatureIsAuthenticAMD ()) {
+  if (StandardSignatureIsAuthenticAMD () && (sizeof (UINTN) == sizeof (UINT64))) {
+    Address = BASE_4GB - 1;
+    Status  = gBS->AllocatePages (
+                     AllocateMaxAddress,
+                     EfiReservedMemoryType,
+                     EFI_SIZE_TO_PAGES (ApSafeBufferSize),
+                     &Address
+                     );
+    ASSERT_EFI_ERROR (Status);
+    mReservedApLoopFunc = (VOID *)((UINTN)Address + CpuMpData->CpuCount * AP_SAFE_STACK_SIZE);
     CopyMem (
       mReservedApLoopFunc,
       CpuMpData->AddressMap.RelocateApLoopFuncAddressAmd,
       CpuMpData->AddressMap.RelocateApLoopFuncSizeAmd
       );
   } else {
+    Address = (UINTN)AllocateReservedPages (EFI_SIZE_TO_PAGES (ApSafeBufferSize));
+    ASSERT (Address != 0);
+    mReservedApLoopFunc = (VOID *)((UINTN)Address + CpuMpData->CpuCount * AP_SAFE_STACK_SIZE);
     CopyMem (
       mReservedApLoopFunc,
       CpuMpData->AddressMap.RelocateApLoopFuncAddress,
@@ -575,12 +588,14 @@ InitMpGlobalData (
       );
 
     mApPageTable = CreatePageTable (
-                     mReservedTopOfApStack,
+                     (UINTN)Address,
                      ApSafeBufferSize
                      );
   }
 
-  mReservedTopOfApStack += CpuMpData->CpuCount * AP_SAFE_STACK_SIZE;
+  mReservedTopOfApStack = (UINTN)Address + CpuMpData->CpuCount * AP_SAFE_STACK_SIZE;
+  ASSERT ((mReservedTopOfApStack & (UINTN)(CPU_STACK_ALIGNMENT - 1)) == 0);
+  ASSERT ((AP_SAFE_STACK_SIZE & (CPU_STACK_ALIGNMENT - 1)) == 0);
 
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
