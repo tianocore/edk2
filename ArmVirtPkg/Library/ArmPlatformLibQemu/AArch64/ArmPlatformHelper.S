@@ -8,9 +8,7 @@
 #include <AsmMacroIoLibV8.h>
 
   .macro mov_i, reg:req, imm:req
-  movz   \reg, :abs_g3:\imm
-  movk   \reg, :abs_g2_nc:\imm
-  movk   \reg, :abs_g1_nc:\imm
+  movz   \reg, :abs_g1:\imm
   movk   \reg, :abs_g0_nc:\imm
   .endm
 
@@ -45,10 +43,9 @@
 
 ASM_FUNC(ArmPlatformPeiBootAction)
   mrs    x0, CurrentEL           // check current exception level
-  tbz    x0, #3, 0f              // bail if above EL1
-  ret
+  tbnz   x0, #3, 0f              // omit early ID map if above EL1
 
-0:mov_i  x0, mairval
+  mov_i  x0, mairval
   mov_i  x1, tcrval
   adrp   x2, idmap
   orr    x2, x2, #0xff << 48     // set non-zero ASID
@@ -87,7 +84,8 @@ ASM_FUNC(ArmPlatformPeiBootAction)
 
   msr    sctlr_el1, x3           // enable MMU and caches
   isb
-  ret
+
+0:b      ArmEnableVFP            // enable SIMD before entering C code
 
 //UINTN
 //ArmPlatformGetCorePosition (
