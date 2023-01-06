@@ -376,7 +376,7 @@ F: MdeModulePkg/*Smi*/
 F: MdeModulePkg/*Smm*/
 F: MdeModulePkg/Include/*Smi*.h
 F: MdeModulePkg/Include/*Smm*.h
-R: Eric Dong <eric.dong@intel.com> [ydong10]
+R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
 R: Ray Ni <ray.ni@intel.com> [niruiyu]
 
 MdeModulePkg: Pei Core
@@ -432,7 +432,6 @@ NetworkPkg
 F: NetworkPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/NetworkPkg
 M: Maciej Rabeda <maciej.rabeda@linux.intel.com> [mrabeda]
-R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
 R: Siyuan Fu <siyuan.fu@intel.com> [sfu5]
 
 OvmfPkg
