@@ -6,5 +6,10 @@
 !if $(TPM1_ENABLE) == TRUE
       NULL|SecurityPkg/Library/DxeTpmMeasureBootLib/DxeTpmMeasureBootLib.inf
 !endif
-      NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
 !endif
+      #
+      # DxeTpm2MeasureBootLib provides security service of TPM2 measure boot and
+      # Confidential Computing (CC) measure boot. It should not be controlled by
+      # TPM2_ENABLE.
+      #
+      NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
