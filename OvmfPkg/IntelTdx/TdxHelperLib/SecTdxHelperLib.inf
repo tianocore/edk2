@@ -1,0 +1,53 @@
+## @file
+#  TdxHelperLib SEC instance
+#
+#  This module provides Tdx helper functions in SEC phase.
+#  Copyright (c) 2021 - 2023, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecTdxHelperLib
+  FILE_GUID                      = ba69ac6b-0c59-4472-899d-b684590ec1e9
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TdxHelperLib|SEC
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  SecTdxHelper.c
+  TdxMeasurementHob.c
+
+[Packages]
+  CryptoPkg/CryptoPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseCryptLib
+  DebugLib
+  HobLib
+  PcdLib
+  TdxMailboxLib
+  TdxLib
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize
+
+[Guids]
+  gCcEventEntryHobGuid
