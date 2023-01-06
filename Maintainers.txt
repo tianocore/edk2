@@ -376,7 +376,7 @@ F: MdeModulePkg/*Smi*/
 F: MdeModulePkg/*Smm*/
 F: MdeModulePkg/Include/*Smi*.h
 F: MdeModulePkg/Include/*Smm*.h
-R: Eric Dong <eric.dong@intel.com> [ydong10]
+R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
 R: Ray Ni <ray.ni@intel.com> [niruiyu]
 
 MdeModulePkg: Pei Core
@@ -432,7 +432,6 @@ NetworkPkg
 F: NetworkPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/NetworkPkg
 M: Maciej Rabeda <maciej.rabeda@linux.intel.com> [mrabeda]
-R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
 R: Siyuan Fu <siyuan.fu@intel.com> [sfu5]
 
 OvmfPkg
@@ -605,6 +604,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
 M: Eric Dong <eric.dong@intel.com> [ydong10]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
+R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 
 UefiCpuPkg: Sec related modules
 F: UefiCpuPkg/SecCore/

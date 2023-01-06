@@ -100,16 +100,24 @@ jobs:
         buildType: 'current'
         targetPath: '$(Build.ArtifactStagingDirectory)'
 
+    - powershell: Write-Host "##vso[task.setvariable variable=is_code_coverage]0"
+      displayName: Give default value for whether CodeCoverage or not
+
+    - powershell: if (Test-Path -Path $(Build.ArtifactStagingDirectory)/**/coverage.xml) {Write-Host "##vso[task.setvariable variable=is_code_coverage]1"}
+      displayName: Check coverage.xml exist or not
+
     - task: CmdLine@2
       displayName: Create code coverage report
       inputs:
         script: |
           dotnet tool install -g dotnet-reportgenerator-globaltool
           reportgenerator -reports:$(Build.ArtifactStagingDirectory)/**/coverage.xml -targetdir:$(Build.ArtifactStagingDirectory)/Coverage -reporttypes:Cobertura -filefilters:-*Build*;-*UnitTest*;-*Mock*;-*usr*
+      condition: eq(variables.is_code_coverage, 1)
 
     - task: PublishCodeCoverageResults@1
       displayName: 'Publish code coverage'
       inputs:
         codeCoverageTool: Cobertura
         summaryFileLocation: '$(Build.ArtifactStagingDirectory)/Coverage/Cobertura.xml'
+      condition: eq(variables.is_code_coverage, 1)
 
