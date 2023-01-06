@@ -1,7 +1,7 @@
 /** @file
   Internal include file for UefiLib.
 
-  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2022, Intel Corporation. All rights reserved.<BR>
    SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -18,7 +18,6 @@
 #include <Protocol/DriverDiagnostics2.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/GraphicsOutput.h>
-#include <Protocol/UgaDraw.h>
 #include <Protocol/HiiFont.h>
 
 #include <Guid/EventGroup.h>
