@@ -224,6 +224,19 @@ PlatformTdxPublishRamRegions (
   );
 
 /**
+  Build the GuidHob for tdx measurements which were done in SEC phase.
+  The measurement values are stored in WorkArea.
+
+  @retval EFI_SUCCESS  The GuidHob is built successfully
+  @retval Others       Other errors as indicated
+**/
+EFI_STATUS
+EFIAPI
+PlatformBuildGuidHobForTdxMeasurement (
+  VOID
+  );
+
+/**
   Check the integrity of NvVarStore.
 
   @param[in] NvVarStoreBase - A pointer to NvVarStore header
