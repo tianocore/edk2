@@ -39,6 +39,8 @@ IntelTdxInitialize (
     return;
   }
 
+  PlatformBuildGuidHobForTdxMeasurement ();
+
   PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrIntelTdx);
   ASSERT_RETURN_ERROR (PcdStatus);
 
