@@ -11,6 +11,7 @@
 #define __OVMF_WORK_AREA_H__
 
 #include <ConfidentialComputingGuestAttr.h>
+#include <IndustryStandard/Tpm20.h>
 
 //
 // Confidential computing work area header definition. Any change
@@ -64,13 +65,20 @@ typedef struct _SEV_WORK_AREA {
   SEC_SEV_ES_WORK_AREA                       SevEsWorkArea;
 } SEV_WORK_AREA;
 
+typedef struct _TDX_MEASUREMENT_DATA {
+  UINT32    Signature;
+  UINT8     HashValue[SHA384_DIGEST_SIZE];
+} TDX_MEASUREMENT_DATA;
+
 //
 // The TDX work area definition
 //
 typedef struct _SEC_TDX_WORK_AREA {
-  UINT32    PageTableReady;
-  UINT32    Gpaw;
-  UINT64    HobList;
+  UINT32                  PageTableReady;
+  UINT32                  Gpaw;
+  UINT64                  HobList;
+  TDX_MEASUREMENT_DATA    TdHobMeasurement;
+  TDX_MEASUREMENT_DATA    CfvMeasurement;
 } SEC_TDX_WORK_AREA;
 
 typedef struct _TDX_WORK_AREA {
