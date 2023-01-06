@@ -24,7 +24,7 @@
 #include <Library/LocalApicLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
 #include <IndustryStandard/Tdx.h>
-#include <Library/PlatformInitLib.h>
+#include <Library/TdxHelperLib.h>
 #include <Library/CcProbeLib.h>
 #include <Library/PeilessStartupLib.h>
 
@@ -67,7 +67,11 @@ SecCoreStartupWithStack (
     // first so that the memory is accepted. Otherwise access to the unaccepted
     // memory will trigger tripple fault.
     //
-    if (ProcessTdxHobList () != EFI_SUCCESS) {
+    if (TdxHelperProcessHobList () != EFI_SUCCESS) {
+      CpuDeadLoop ();
+    }
+
+    if (TdxHelperMeasureCfvImage () != EFI_SUCCESS) {
       CpuDeadLoop ();
     }
   }
