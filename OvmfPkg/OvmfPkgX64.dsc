@@ -725,7 +725,8 @@
   OvmfPkg/Sec/SecMain.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
-      NULL|OvmfPkg/Library/PlatformInitLib/PlatformInitLib.inf
+      NULL|OvmfPkg/IntelTdx/TdxHelperLib/SecTdxHelperLib.inf
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SecCryptLib.inf
   }
 
   #
@@ -808,6 +809,10 @@
       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
 !include OvmfPkg/Include/Dsc/OvmfTpmSecurityStub.dsc.inc
 !endif
+!if $(TPM2_ENABLE) == FALSE
+      NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
+!endif
+
   }
 
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
@@ -1101,6 +1106,15 @@
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
   }
 !endif
+
+  #
+  # Cc Measurement Protocol for Td guest
+  #
+  SecurityPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf {
+    <LibraryClasses>
+      HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
+  }
 
   #
   # TPM support

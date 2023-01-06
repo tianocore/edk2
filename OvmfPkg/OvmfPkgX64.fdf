@@ -403,6 +403,11 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !endif
 
 #
+# EFI_CC_MEASUREMENT_PROTOCOL
+#
+INF SecurityPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf
+
+#
 # TPM support
 #
 !include OvmfPkg/OvmfTpmDxe.fdf.inc
