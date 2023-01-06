@@ -298,7 +298,7 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 #
 # EFI_CC_MEASUREMENT_PROTOCOL
 #
-INF OvmfPkg/IntelTdx/TdTcg2Dxe/TdTcg2Dxe.inf
+INF SecurityPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf
 
 ################################################################################
 
