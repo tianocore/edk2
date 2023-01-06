@@ -536,7 +536,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize|0x1
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds|50000
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode|1
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode|2
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0x0
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x0
 !if ($(TARGET) == DEBUG || $(USE_CBMEM_FOR_CONSOLE) == TRUE)
