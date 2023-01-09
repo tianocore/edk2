@@ -20,8 +20,6 @@
 
 #include "AcpiPlatform.h"
 
-EFI_HANDLE  mChAcpiHandle = NULL;
-
 EFI_STATUS
 EFIAPI
 InstallCloudHvTablesTdx (
@@ -30,13 +28,15 @@ InstallCloudHvTablesTdx (
 {
   EFI_STATUS  Status;
   UINTN       TableHandle;
+  EFI_HANDLE  ChAcpiHandle;
 
   EFI_PEI_HOB_POINTERS         Hob;
   EFI_ACPI_DESCRIPTION_HEADER  *CurrentTable;
   EFI_ACPI_DESCRIPTION_HEADER  *DsdtTable;
 
-  DsdtTable   = NULL;
-  TableHandle = 0;
+  DsdtTable    = NULL;
+  TableHandle  = 0;
+  ChAcpiHandle = NULL;
 
   Hob.Guid = (EFI_HOB_GUID_TYPE *)GetFirstGuidHob (&gUefiOvmfPkgTdxAcpiHobGuid);
 
@@ -90,7 +90,7 @@ InstallCloudHvTablesTdx (
   // ready.
   //
   gBS->InstallProtocolInterface (
-         &mChAcpiHandle,
+         &ChAcpiHandle,
          &gQemuAcpiTableNotifyProtocolGuid,
          EFI_NATIVE_INTERFACE,
          NULL
