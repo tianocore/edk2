@@ -1266,6 +1266,8 @@ InstallQemuFwCfgTables (
     S3Context = NULL;
   }
 
+  DEBUG ((DEBUG_INFO, "%a: installed %d tables\n", __FUNCTION__, Installed));
+
 UninstallAcpiTables:
   if (EFI_ERROR (Status)) {
     //
