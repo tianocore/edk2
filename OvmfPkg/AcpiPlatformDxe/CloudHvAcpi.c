@@ -89,12 +89,16 @@ InstallCloudHvTablesTdx (
   // Install a protocol to notify that the ACPI table provided by CH is
   // ready.
   //
-  gBS->InstallProtocolInterface (
-         &ChAcpiHandle,
-         &gQemuAcpiTableNotifyProtocolGuid,
-         EFI_NATIVE_INTERFACE,
-         NULL
-         );
+  Status = gBS->InstallProtocolInterface (
+                  &ChAcpiHandle,
+                  &gQemuAcpiTableNotifyProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
 
   return EFI_SUCCESS;
 }
