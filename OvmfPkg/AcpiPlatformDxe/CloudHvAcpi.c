@@ -20,8 +20,6 @@
 
 #include "AcpiPlatform.h"
 
-EFI_HANDLE  mChAcpiHandle = NULL;
-
 EFI_STATUS
 EFIAPI
 InstallCloudHvTablesTdx (
@@ -30,6 +28,7 @@ InstallCloudHvTablesTdx (
 {
   EFI_STATUS  Status;
   UINTN       TableHandle;
+  EFI_HANDLE  ChAcpiHandle;
 
   EFI_PEI_HOB_POINTERS         Hob;
   EFI_ACPI_DESCRIPTION_HEADER  *CurrentTable;
@@ -89,8 +88,9 @@ InstallCloudHvTablesTdx (
   // Install a protocol to notify that the ACPI table provided by CH is
   // ready.
   //
+  ChAcpiHandle = NULL;
   gBS->InstallProtocolInterface (
-         &mChAcpiHandle,
+         &ChAcpiHandle,
          &gQemuAcpiTableNotifyProtocolGuid,
          EFI_NATIVE_INTERFACE,
          NULL
