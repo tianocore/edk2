@@ -1250,6 +1250,20 @@ InstallQemuFwCfgTables (
   }
 
   //
+  // Install a protocol to notify that the ACPI table provided by Qemu is
+  // ready.
+  //
+  Status = gBS->InstallProtocolInterface (
+                  &QemuAcpiHandle,
+                  &gQemuAcpiTableNotifyProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    goto UninstallAcpiTables;
+  }
+
+  //
   // Translating the condensed QEMU_LOADER_WRITE_POINTER commands to ACPI S3
   // Boot Script opcodes has to be the last operation in this function, because
   // if it succeeds, it cannot be undone.
@@ -1257,7 +1271,7 @@ InstallQemuFwCfgTables (
   if (S3Context != NULL) {
     Status = TransferS3ContextToBootScript (S3Context);
     if (EFI_ERROR (Status)) {
-      goto UninstallAcpiTables;
+      goto UninstallQemuAcpiTableNotifyProtocol;
     }
 
     //
@@ -1268,6 +1282,15 @@ InstallQemuFwCfgTables (
 
   DEBUG ((DEBUG_INFO, "%a: installed %d tables\n", __FUNCTION__, Installed));
 
+UninstallQemuAcpiTableNotifyProtocol:
+  if (EFI_ERROR (Status)) {
+    gBS->UninstallProtocolInterface (
+           QemuAcpiHandle,
+           &gQemuAcpiTableNotifyProtocolGuid,
+           NULL
+           );
+  }
+
 UninstallAcpiTables:
   if (EFI_ERROR (Status)) {
     //
@@ -1277,17 +1300,6 @@ UninstallAcpiTables:
       --Installed;
       AcpiProtocol->UninstallAcpiTable (AcpiProtocol, InstalledKey[Installed]);
     }
-  } else {
-    //
-    // Install a protocol to notify that the ACPI table provided by Qemu is
-    // ready.
-    //
-    gBS->InstallProtocolInterface (
-           &QemuAcpiHandle,
-           &gQemuAcpiTableNotifyProtocolGuid,
-           EFI_NATIVE_INTERFACE,
-           NULL
-           );
   }
 
   for (SeenPointerEntry = OrderedCollectionMin (SeenPointers);
