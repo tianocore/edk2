@@ -23,6 +23,7 @@
 STATIC CONST COMPATIBILITY_STR  CpuCompatibleStr[] = {
   { "arm,arm-v7"     },
   { "arm,arm-v8"     },
+  { "arm,armv8"      },
   { "arm,cortex-a15" },
   { "arm,cortex-a7"  },
   { "arm,cortex-a57" }
