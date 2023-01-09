@@ -20,7 +20,6 @@
 #include <Library/UefiBootServicesTableLib.h> // gBS
 
 #include "AcpiPlatform.h"
-EFI_HANDLE  mQemuAcpiHandle = NULL;
 
 //
 // The user structure for the ordered collection that will track the fw_cfg
@@ -1101,6 +1100,9 @@ InstallQemuFwCfgTables (
   ORDERED_COLLECTION_ENTRY  *TrackerEntry, *TrackerEntry2;
   ORDERED_COLLECTION        *SeenPointers;
   ORDERED_COLLECTION_ENTRY  *SeenPointerEntry, *SeenPointerEntry2;
+  EFI_HANDLE                QemuAcpiHandle;
+
+  QemuAcpiHandle = NULL;
 
   Status = QemuFwCfgFindFile ("etc/table-loader", &FwCfgItem, &FwCfgSize);
   if (EFI_ERROR (Status)) {
@@ -1279,7 +1281,7 @@ UninstallAcpiTables:
     // ready.
     //
     gBS->InstallProtocolInterface (
-           &mQemuAcpiHandle,
+           &QemuAcpiHandle,
            &gQemuAcpiTableNotifyProtocolGuid,
            EFI_NATIVE_INTERFACE,
            NULL
