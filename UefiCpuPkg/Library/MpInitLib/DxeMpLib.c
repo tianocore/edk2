@@ -1,7 +1,7 @@
 /** @file
   MP initialize support functions for DXE phase.
 
-  Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -378,44 +378,32 @@ RelocateApLoop (
   IN OUT VOID  *Buffer
   )
 {
-  CPU_MP_DATA               *CpuMpData;
-  BOOLEAN                   MwaitSupport;
-  ASM_RELOCATE_AP_LOOP      AsmRelocateApLoopFunc;
-  ASM_RELOCATE_AP_LOOP_AMD  AsmRelocateApLoopFuncAmd;
-  UINTN                     ProcessorNumber;
-  UINTN                     StackStart;
+  CPU_MP_DATA           *CpuMpData;
+  BOOLEAN               MwaitSupport;
+  ASM_RELOCATE_AP_LOOP  AsmRelocateApLoopFunc;
+  UINTN                 ProcessorNumber;
+  UINTN                 StackStart;
 
   MpInitLibWhoAmI (&ProcessorNumber);
   CpuMpData    = GetCpuMpData ();
   MwaitSupport = IsMwaitSupport ();
-  if (StandardSignatureIsAuthenticAMD ()) {
-    StackStart               = CpuMpData->UseSevEsAPMethod ? CpuMpData->SevEsAPResetStackStart : mReservedTopOfApStack;
-    AsmRelocateApLoopFuncAmd = (ASM_RELOCATE_AP_LOOP_AMD)(UINTN)mReservedApLoopFunc;
-    AsmRelocateApLoopFuncAmd (
-      MwaitSupport,
-      CpuMpData->ApTargetCState,
-      CpuMpData->PmCodeSegment,
-      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
-      (UINTN)&mNumberToFinish,
-      CpuMpData->Pm16CodeSegment,
-      CpuMpData->SevEsAPBuffer,
-      CpuMpData->WakeupBuffer
-      );
+  if (CpuMpData->UseSevEsAPMethod) {
+    StackStart = CpuMpData->SevEsAPResetStackStart;
   } else {
-    StackStart            = mReservedTopOfApStack;
-    AsmRelocateApLoopFunc = (ASM_RELOCATE_AP_LOOP)(UINTN)mReservedApLoopFunc;
-    AsmRelocateApLoopFunc (
-      MwaitSupport,
-      CpuMpData->ApTargetCState,
-      CpuMpData->PmCodeSegment,
-      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
-      (UINTN)&mNumberToFinish,
-      CpuMpData->Pm16CodeSegment,
-      CpuMpData->SevEsAPBuffer,
-      CpuMpData->WakeupBuffer
-      );
+    StackStart = mReservedTopOfApStack;
   }
 
+  AsmRelocateApLoopFunc = (ASM_RELOCATE_AP_LOOP)(UINTN)mReservedApLoopFunc;
+  AsmRelocateApLoopFunc (
+    MwaitSupport,
+    CpuMpData->ApTargetCState,
+    CpuMpData->PmCodeSegment,
+    StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
+    (UINTN)&mNumberToFinish,
+    CpuMpData->Pm16CodeSegment,
+    CpuMpData->SevEsAPBuffer,
+    CpuMpData->WakeupBuffer
+    );
   //
   // It should never reach here
   //
