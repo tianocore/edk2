@@ -11,6 +11,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/SmmCpuFeaturesLib.h>
 #include <Uefi/UefiBaseType.h>
+#include <Register/Amd/SmramSaveStateMap.h>
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/SmmSmramSaveStateLib.h>
+
+// EFER register LMA bit
+#define LMA  BIT10
+
+// Machine Specific Registers (MSRs)
+#define SMMADDR_ADDRESS  0xC0010112ul
+#define SMMMASK_ADDRESS  0xC0010113ul
+#define EFER_ADDRESS     0XC0000080ul
+
+// The mode of the CPU at the time an SMI occurs
+STATIC UINT8  mSmmSaveStateRegisterLma;
 
 /**
   Read an SMM Save State register on the target processor.  If this function
@@ -39,7 +54,7 @@ SmmCpuFeaturesReadSaveStateRegister (
   OUT VOID                         *Buffer
   )
 {
-  return EFI_SUCCESS;
+  return SmramSaveStateReadRegister (CpuIndex, Register, Width, Buffer);
 }
 
 /**
@@ -67,7 +82,7 @@ SmmCpuFeaturesWriteSaveStateRegister (
   IN CONST VOID                   *Buffer
   )
 {
-  return EFI_SUCCESS;
+  return SmramSaveStateWriteRegister (CpuIndex, Register, Width, Buffer);
 }
 
 /**
@@ -82,6 +97,13 @@ CpuFeaturesLibInitialization (
   VOID
   )
 {
+  UINT32  LMAValue;
+
+  LMAValue                 = (UINT32)AsmReadMsr64 (EFER_ADDRESS) & LMA;
+  mSmmSaveStateRegisterLma = EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT;
+  if (LMAValue) {
+    mSmmSaveStateRegisterLma = EFI_SMM_SAVE_STATE_REGISTER_LMA_64BIT;
+  }
 }
 
 /**
@@ -117,6 +139,52 @@ SmmCpuFeaturesInitializeProcessor (
   IN CPU_HOT_PLUG_DATA          *CpuHotPlugData
   )
 {
+  AMD_SMRAM_SAVE_STATE_MAP  *CpuState;
+  UINT32                    LMAValue;
+
+  //
+  // Configure SMBASE.
+  //
+  CpuState             = (AMD_SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
+  CpuState->x64.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+
+  // Re-initialize the value of mSmmSaveStateRegisterLma flag which might have been changed in PiCpuSmmDxeSmm Driver
+  // Entry point, to make sure correct value on AMD platform is assigned to be used by SmmCpuFeaturesLib.
+  LMAValue                 = (UINT32)AsmReadMsr64 (EFER_ADDRESS) & LMA;
+  mSmmSaveStateRegisterLma = EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT;
+  if (LMAValue) {
+    mSmmSaveStateRegisterLma = EFI_SMM_SAVE_STATE_REGISTER_LMA_64BIT;
+  }
+
+  //
+  // If SMRR is supported, then program SMRR base/mask MSRs.
+  // The EFI_MSR_SMRR_PHYS_MASK_VALID bit is not set until the first normal SMI.
+  // The code that initializes SMM environment is running in normal mode
+  // from SMRAM region.  If SMRR is enabled here, then the SMRAM region
+  // is protected and the normal mode code execution will fail.
+  //
+  if (FeaturePcdGet (PcdSmrrEnable)) {
+    //
+    // SMRR size cannot be less than 4-KBytes
+    // SMRR size must be of length 2^n
+    // SMRR base alignment cannot be less than SMRR length
+    //
+    if ((CpuHotPlugData->SmrrSize < SIZE_4KB) ||
+        (CpuHotPlugData->SmrrSize != GetPowerOfTwo32 (CpuHotPlugData->SmrrSize)) ||
+        ((CpuHotPlugData->SmrrBase & ~(CpuHotPlugData->SmrrSize - 1)) != CpuHotPlugData->SmrrBase))
+    {
+      //
+      // Print message and halt if CPU is Monarch
+      //
+      if (IsMonarch) {
+        DEBUG ((DEBUG_ERROR, "SMM Base/Size does not meet alignment/size requirement!\n"));
+        CpuDeadLoop ();
+      }
+    } else {
+      AsmWriteMsr64 (SMMADDR_ADDRESS, CpuHotPlugData->SmrrBase);
+      AsmWriteMsr64 (SMMMASK_ADDRESS, ((~(UINT64)(CpuHotPlugData->SmrrSize - 1)) | 0x6600));
+    }
+  }
 }
 
 /**
@@ -159,7 +227,39 @@ SmmCpuFeaturesHookReturnFromSmm (
   IN UINT64                NewInstructionPointer
   )
 {
-  return 0;
+  UINT64                    OriginalInstructionPointer;
+  AMD_SMRAM_SAVE_STATE_MAP  *AmdCpuState;
+
+  AmdCpuState = (AMD_SMRAM_SAVE_STATE_MAP *)CpuState;
+
+  if (mSmmSaveStateRegisterLma == EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT) {
+    OriginalInstructionPointer = (UINT64)AmdCpuState->x86._EIP;
+    AmdCpuState->x86._EIP      = (UINT32)NewInstructionPointer;
+    //
+    // Clear the auto HALT restart flag so the RSM instruction returns
+    // program control to the instruction following the HLT instruction.
+    //
+    if ((AmdCpuState->x86.AutoHALTRestart & BIT0) != 0) {
+      AmdCpuState->x86.AutoHALTRestart &= ~BIT0;
+    }
+  } else {
+    OriginalInstructionPointer = AmdCpuState->x64._RIP;
+    if ((AmdCpuState->x64.EFER & LMA) == 0) {
+      AmdCpuState->x64._RIP = (UINT32)NewInstructionPointer32;
+    } else {
+      AmdCpuState->x64._RIP = (UINT32)NewInstructionPointer;
+    }
+
+    //
+    // Clear the auto HALT restart flag so the RSM instruction returns
+    // program control to the instruction following the HLT instruction.
+    //
+    if ((AmdCpuState->x64.AutoHALTRestart & BIT0) != 0) {
+      AmdCpuState->x64.AutoHALTRestart &= ~BIT0;
+    }
+  }
+
+  return OriginalInstructionPointer;
 }
 
 /**
