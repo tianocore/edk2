@@ -31,3 +31,8 @@
   PcdLib
   MemoryAllocationLib
   DebugLib
+  SmmSmramSaveStateLib
+
+[FeaturePcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdSmrrEnable               ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdSmmFeatureControlEnable  ## CONSUMES
