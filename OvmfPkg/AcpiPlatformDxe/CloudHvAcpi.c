@@ -15,15 +15,12 @@
 #include <Library/PcdLib.h>                               // PcdGet32()
 #include <Library/HobLib.h>                               // GetFirstGuidHob(), GetNextGuidHob()
 #include <Library/UefiBootServicesTableLib.h>             // gBS
-
 #include <Protocol/AcpiSystemDescriptionTable.h>
 #include <Protocol/AcpiTable.h>
-#include <Protocol/QemuAcpiTableNotify.h>                 // QEMU_ACPI_TABLE_NOTIFY_PROTOCOL
 
 #include "AcpiPlatform.h"
 
-EFI_HANDLE                       mChAcpiHandle = NULL;
-QEMU_ACPI_TABLE_NOTIFY_PROTOCOL  mChAcpiNotifyProtocol;
+EFI_HANDLE  mChAcpiHandle = NULL;
 
 EFI_STATUS
 EFIAPI
@@ -96,7 +93,7 @@ InstallCloudHvTablesTdx (
          &mChAcpiHandle,
          &gQemuAcpiTableNotifyProtocolGuid,
          EFI_NATIVE_INTERFACE,
-         &mChAcpiNotifyProtocol
+         NULL
          );
 
   return EFI_SUCCESS;

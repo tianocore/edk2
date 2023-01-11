@@ -19,10 +19,8 @@
 #include <Library/QemuFwCfgS3Lib.h>           // QemuFwCfgS3Enabled()
 #include <Library/UefiBootServicesTableLib.h> // gBS
 
-#include <Protocol/QemuAcpiTableNotify.h>
 #include "AcpiPlatform.h"
-EFI_HANDLE                       mQemuAcpiHandle = NULL;
-QEMU_ACPI_TABLE_NOTIFY_PROTOCOL  mAcpiNotifyProtocol;
+EFI_HANDLE  mQemuAcpiHandle = NULL;
 
 //
 // The user structure for the ordered collection that will track the fw_cfg
@@ -1284,7 +1282,7 @@ UninstallAcpiTables:
            &mQemuAcpiHandle,
            &gQemuAcpiTableNotifyProtocolGuid,
            EFI_NATIVE_INTERFACE,
-           &mAcpiNotifyProtocol
+           NULL
            );
   }
 
