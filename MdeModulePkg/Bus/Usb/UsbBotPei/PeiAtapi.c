@@ -2,6 +2,7 @@
 Pei USB ATAPI command implementations.
 
 Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (C) 2022 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -382,14 +383,14 @@ PeiUsbRead10 (
   ATAPI_PACKET_COMMAND  Packet;
   ATAPI_READ10_CMD      *Read10Packet;
   UINT16                MaxBlock;
-  UINT16                BlocksRemaining;
-  UINT16                SectorCount;
+  UINT32                BlocksRemaining;
+  UINT32                SectorCount;
   UINT32                Lba32;
   UINT32                BlockSize;
   UINT32                ByteCount;
   VOID                  *PtrBuffer;
   EFI_STATUS            Status;
-  UINT16                TimeOut;
+  UINT32                TimeOut;
 
   //
   // prepare command packet for the Inquiry Packet Command.
@@ -401,16 +402,13 @@ PeiUsbRead10 (
 
   BlockSize = (UINT32)PeiBotDevice->Media.BlockSize;
 
-  MaxBlock        = (UINT16)(65535 / BlockSize);
-  BlocksRemaining = (UINT16)NumberOfBlocks;
+  MaxBlock = (UINT16)(MAX_UINT16 / BlockSize);
+  ASSERT (NumberOfBlocks < MAX_UINT32);
+  BlocksRemaining = (UINT32)NumberOfBlocks;
 
   Status = EFI_SUCCESS;
   while (BlocksRemaining > 0) {
-    if (BlocksRemaining <= MaxBlock) {
-      SectorCount = BlocksRemaining;
-    } else {
-      SectorCount = MaxBlock;
-    }
+    SectorCount = MIN (BlocksRemaining, MaxBlock);
 
     //
     // fill the Packet data structure
@@ -435,7 +433,7 @@ PeiUsbRead10 (
 
     ByteCount = SectorCount * BlockSize;
 
-    TimeOut = (UINT16)(SectorCount * 2000);
+    TimeOut = SectorCount * 2000;
 
     //
     // send command packet
@@ -448,16 +446,17 @@ PeiUsbRead10 (
                (VOID *)PtrBuffer,
                ByteCount,
                EfiUsbDataIn,
-               TimeOut
+               (UINT16)MIN (TimeOut, MAX_UINT16)
                );
 
     if (Status != EFI_SUCCESS) {
       return Status;
     }
 
+    ASSERT (Lba32 <= (MAX_UINT32-SectorCount));
     Lba32          += SectorCount;
     PtrBuffer       = (UINT8 *)PtrBuffer + SectorCount * BlockSize;
-    BlocksRemaining = (UINT16)(BlocksRemaining - SectorCount);
+    BlocksRemaining = BlocksRemaining - SectorCount;
   }
 
   return Status;
