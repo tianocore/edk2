@@ -4,6 +4,7 @@
 
 Copyright (c) 2011 - 2020, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
+Copyright (C) 2022 Advanced Micro Devices, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -2807,6 +2808,9 @@ XhcInitializeEndpointContext (
   MaxDci = 0;
 
   NumEp = IfDesc->NumEndpoints;
+  if (NumEp == 0) {
+    MaxDci = 1;
+  }
 
   EpDesc = (USB_ENDPOINT_DESCRIPTOR *)(IfDesc + 1);
   for (EpIndex = 0; EpIndex < NumEp; EpIndex++) {
@@ -3006,6 +3010,9 @@ XhcInitializeEndpointContext64 (
   MaxDci = 0;
 
   NumEp = IfDesc->NumEndpoints;
+  if (NumEp == 0) {
+    MaxDci = 1;
+  }
 
   EpDesc = (USB_ENDPOINT_DESCRIPTOR *)(IfDesc + 1);
   for (EpIndex = 0; EpIndex < NumEp; EpIndex++) {
