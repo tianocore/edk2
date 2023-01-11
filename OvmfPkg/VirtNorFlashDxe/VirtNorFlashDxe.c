@@ -394,14 +394,14 @@ NorFlashFvbInitialize (
                   EfiGcdMemoryTypeMemoryMappedIo,
                   Instance->DeviceBaseAddress,
                   RuntimeMmioRegionSize,
-                  EFI_MEMORY_WC | EFI_MEMORY_RUNTIME
+                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
                   );
   ASSERT_EFI_ERROR (Status);
 
   Status = gDS->SetMemorySpaceAttributes (
                   Instance->DeviceBaseAddress,
                   RuntimeMmioRegionSize,
-                  EFI_MEMORY_WC | EFI_MEMORY_RUNTIME
+                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
                   );
   ASSERT_EFI_ERROR (Status);
 
