@@ -88,3 +88,10 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
+
+[FixedPcd]
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData

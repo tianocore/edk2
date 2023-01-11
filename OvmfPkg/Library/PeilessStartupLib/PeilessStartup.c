@@ -19,20 +19,22 @@
 #include <Library/PlatformInitLib.h>
 #include <ConfidentialComputingGuestAttr.h>
 #include <Guid/MemoryTypeInformation.h>
+#include <Uefi/UefiMultiPhase.h>
 #include <OvmfPlatforms.h>
 #include "PeilessStartupInternal.h"
 
 #define GET_GPAW_INIT_STATE(INFO)  ((UINT8) ((INFO) & 0x3f))
 
-EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
-  { EfiACPIMemoryNVS,       0x004 },
-  { EfiACPIReclaimMemory,   0x008 },
-  { EfiReservedMemoryType,  0x004 },
-  { EfiRuntimeServicesData, 0x024 },
-  { EfiRuntimeServicesCode, 0x030 },
-  { EfiBootServicesCode,    0x180 },
-  { EfiBootServicesData,    0xF00 },
-  { EfiMaxMemoryType,       0x000 }
+#define MEMORY_TYPE_INFO_DEFAULT(Type) \
+  { Type, FixedPcdGet32 (PcdMemoryType ## Type) }
+
+STATIC EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
+  MEMORY_TYPE_INFO_DEFAULT (EfiACPIMemoryNVS),
+  MEMORY_TYPE_INFO_DEFAULT (EfiACPIReclaimMemory),
+  MEMORY_TYPE_INFO_DEFAULT (EfiReservedMemoryType),
+  MEMORY_TYPE_INFO_DEFAULT (EfiRuntimeServicesCode),
+  MEMORY_TYPE_INFO_DEFAULT (EfiRuntimeServicesData),
+  { EfiMaxMemoryType,                               0}
 };
 
 EFI_STATUS
