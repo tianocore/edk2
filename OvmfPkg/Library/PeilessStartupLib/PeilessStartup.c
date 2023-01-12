@@ -41,8 +41,7 @@ InitializePlatform (
   EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  UINT32  LowerMemorySize;
-  VOID    *VariableStore;
+  VOID  *VariableStore;
 
   DEBUG ((DEBUG_INFO, "InitializePlatform in Pei-less boot\n"));
   PlatformDebugDumpCmos ();
@@ -70,14 +69,14 @@ InitializePlatform (
     PlatformInfoHob->PcdCpuBootLogicalProcessorNumber
     ));
 
-  LowerMemorySize = PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
+  PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
   PlatformQemuUc32BaseInitialization (PlatformInfoHob);
   DEBUG ((
     DEBUG_INFO,
     "Uc32Base = 0x%x, Uc32Size = 0x%x, LowerMemorySize = 0x%x\n",
     PlatformInfoHob->Uc32Base,
     PlatformInfoHob->Uc32Size,
-    LowerMemorySize
+    PlatformInfoHob->LowMemory
     ));
 
   VariableStore                                  = PlatformReserveEmuVariableNvStore ();

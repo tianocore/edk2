@@ -26,6 +26,7 @@ typedef struct {
   BOOLEAN              Q35SmramAtDefaultSmbase;
   UINT16               Q35TsegMbytes;
 
+  UINT32               LowMemory;
   UINT64               FirstNonAddress;
   UINT8                PhysMemAddressWidth;
   UINT32               Uc32Base;
@@ -144,7 +145,7 @@ PlatformQemuUc32BaseInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
-UINT32
+VOID
 EFIAPI
 PlatformGetSystemMemorySizeBelow4gb (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
