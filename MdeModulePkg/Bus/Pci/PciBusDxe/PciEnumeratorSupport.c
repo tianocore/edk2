@@ -3,6 +3,7 @@
 
 Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -227,13 +228,15 @@ PciSearchDevice (
 
   DEBUG ((
     DEBUG_INFO,
-    "PciBus: Discovered %s @ [%02x|%02x|%02x]\n",
+    "PciBus: Discovered %s @ [%02x|%02x|%02x]  [VID = 0x%x, DID = 0x%0x]\n",
     IS_PCI_BRIDGE (Pci) ?     L"PPB" :
     IS_CARDBUS_BRIDGE (Pci) ? L"P2C" :
     L"PCI",
     Bus,
     Device,
-    Func
+    Func,
+    Pci->Hdr.VendorId,
+    Pci->Hdr.DeviceId
     ));
 
   if (!IS_PCI_BRIDGE (Pci)) {
