@@ -21,7 +21,7 @@
 extern EFI_PHYSICAL_ADDRESS  mMmMemLibInternalMaximumSupportAddress;
 
 #ifdef MDE_CPU_AARCH64
-#define ARM_PHYSICAL_ADDRESS_BITS  36
+#define ARM_PHYSICAL_ADDRESS_BITS  52
 #endif
 #ifdef MDE_CPU_ARM
 #define ARM_PHYSICAL_ADDRESS_BITS  32
