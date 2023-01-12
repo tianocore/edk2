@@ -968,7 +968,7 @@ PlatformQemuInitializeRam (
   //
   // We'd like to keep the following ranges uncached:
   // - [640 KB, 1 MB)
-  // - [LowerMemorySize, 4 GB)
+  // - [Uc32Base, 4 GB)
   //
   // Everything else should be WB. Unfortunately, programming the inverse (ie.
   // keeping the default UC, and configuring the complement set of the above as
