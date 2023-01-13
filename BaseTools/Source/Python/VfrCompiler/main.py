@@ -13,6 +13,7 @@ from VfrSyntaxVisitor import *
 from VfrSyntaxLexer import *
 from VfrSyntaxParser import *
 from VfrCommon import *
+from YamlTree import *
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from VfrError import *
 from Common.LongFilePathSupport import LongFilePath
@@ -404,7 +405,7 @@ class VfrCompiler():
                 self.VfrTree.DumpJson()
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FINISHED)
 
-    def ParseYamlHeader(self):
+    def ReadYaml(self):
         self.VfrTree.ReadYaml()
 
     def SET_RUN_STATUS(self, Status):
@@ -479,12 +480,9 @@ def main():
     Compiler.PreProcess()
     Compiler.Compile()
     Compiler.GenBinaryFiles()
-
-    # Extended Functions
     Compiler.DumpYaml()
     Compiler.DumpJson()
-    Compiler.ParseYamlHeader()
-
+    
     Status = Compiler.RunStatus
     if Status == COMPILER_RUN_STATUS.STATUS_DEAD or Status == COMPILER_RUN_STATUS.STATUS_FAILED:
         return 2
