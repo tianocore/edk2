@@ -59,7 +59,6 @@ SMM_CPU_PRIVATE_DATA  *gSmmCpuPrivate = &mSmmCpuPrivateData;
 // SMM Relocation variables
 //
 volatile BOOLEAN  *mRebased;
-volatile BOOLEAN  mIsBsp;
 
 ///
 /// Handle for the SMM CPU Protocol
@@ -84,6 +83,10 @@ EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL  mSmmMemoryAttribute = {
 };
 
 EFI_CPU_INTERRUPT_HANDLER  mExternalVectorTable[EXCEPTION_VECTOR_NUMBER];
+
+BOOLEAN  mSmmRelocated    = FALSE;
+BOOLEAN  *mSmmInitialized = NULL;
+UINT32   mBspApicId       = 0;
 
 //
 // SMM stack information
@@ -343,14 +346,17 @@ SmmInitHandler (
   VOID
   )
 {
-  UINT32  ApicId;
-  UINTN   Index;
+  UINT32   ApicId;
+  UINTN    Index;
+  BOOLEAN  IsBsp;
 
   //
   // Update SMM IDT entries' code segment and load IDT
   //
   AsmWriteIdtr (&gcSmiIdtr);
   ApicId = GetApicId ();
+
+  IsBsp = (BOOLEAN)(mBspApicId == ApicId);
 
   ASSERT (mNumberOfCpus <= mMaxNumberOfCpus);
 
@@ -361,7 +367,7 @@ SmmInitHandler (
       //
       SmmCpuFeaturesInitializeProcessor (
         Index,
-        mIsBsp,
+        IsBsp,
         gSmmCpuPrivate->ProcessorInfo,
         &mCpuHotPlugData
         );
@@ -371,9 +377,7 @@ SmmInitHandler (
         // Check XD and BTS features on each processor on normal boot
         //
         CheckFeatureSupported ();
-      }
-
-      if (mIsBsp) {
+      } else if (IsBsp) {
         //
         // BSP rebase is already done above.
         // Initialize private data during S3 resume
@@ -381,16 +385,64 @@ SmmInitHandler (
         InitializeMpSyncData ();
       }
 
-      //
-      // Hook return after RSM to set SMM re-based flag
-      //
-      SemaphoreHook (Index, &mRebased[Index]);
+      if (!mSmmRelocated) {
+        //
+        // Hook return after RSM to set SMM re-based flag
+        //
+        SemaphoreHook (Index, &mRebased[Index]);
+      }
 
       return;
     }
   }
 
   ASSERT (FALSE);
+}
+
+/**
+  Issue SMI IPI (All Excluding Self SMM IPI + BSP SMM IPI) to execute first SMI init.
+
+**/
+VOID
+EFIAPI
+ExecuteFirstSmiInit (
+  VOID
+  )
+{
+  UINTN  Index;
+
+  //
+  // Reset the mSmmInitialized to false.
+  //
+  if (mSmmInitialized == NULL) {
+    mSmmInitialized = (BOOLEAN *)AllocatePool (sizeof (BOOLEAN) * mMaxNumberOfCpus);
+  }
+
+  ASSERT (mSmmInitialized != NULL);
+  if (mSmmInitialized == NULL) {
+    return;
+  }
+
+  ZeroMem (mSmmInitialized, sizeof (BOOLEAN) * mMaxNumberOfCpus);
+
+  //
+  // Get the BSP ApicId.
+  //
+  mBspApicId = GetApicId ();
+
+  //
+  // Issue SMI IPI (All Excluding Self SMM IPI + BSP SMM IPI) for SMM init
+  //
+  SendSmiIpi (mBspApicId);
+  SendSmiIpiAllExcludingSelf ();
+
+  //
+  // Wait for all processors to finish its 1st SMI
+  //
+  for (Index = 0; Index < mNumberOfCpus; Index++) {
+    while (mSmmInitialized[Index] == FALSE) {
+    }
+  }
 }
 
 /**
@@ -409,7 +461,6 @@ SmmRelocateBases (
   SMRAM_SAVE_STATE_MAP  BakBuf2;
   SMRAM_SAVE_STATE_MAP  *CpuStatePtr;
   UINT8                 *U8Ptr;
-  UINT32                ApicId;
   UINTN                 Index;
   UINTN                 BspIndex;
 
@@ -450,17 +501,16 @@ SmmRelocateBases (
   //
   // Retrieve the local APIC ID of current processor
   //
-  ApicId = GetApicId ();
+  mBspApicId = GetApicId ();
 
   //
   // Relocate SM bases for all APs
   // This is APs' 1st SMI - rebase will be done here, and APs' default SMI handler will be overridden by gcSmmInitTemplate
   //
-  mIsBsp   = FALSE;
   BspIndex = (UINTN)-1;
   for (Index = 0; Index < mNumberOfCpus; Index++) {
     mRebased[Index] = FALSE;
-    if (ApicId != (UINT32)gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId) {
+    if (mBspApicId != (UINT32)gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId) {
       SendSmiIpi ((UINT32)gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId);
       //
       // Wait for this AP to finish its 1st SMI
@@ -479,8 +529,7 @@ SmmRelocateBases (
   // Relocate BSP's SMM base
   //
   ASSERT (BspIndex != (UINTN)-1);
-  mIsBsp = TRUE;
-  SendSmiIpi (ApicId);
+  SendSmiIpi (mBspApicId);
   //
   // Wait for the BSP to finish its 1st SMI
   //
@@ -563,6 +612,11 @@ PiCpuSmmEntry (
   UINTN                     FamilyId;
   UINTN                     ModelId;
   UINT32                    Cr3;
+  EFI_HOB_GUID_TYPE         *GuidHob;
+  SMM_BASE_HOB_DATA         *SmmBaseHobData;
+
+  GuidHob        = NULL;
+  SmmBaseHobData = NULL;
 
   //
   // Initialize address fixup
@@ -791,26 +845,51 @@ PiCpuSmmEntry (
   ASSERT (TileSize <= (SMRAM_SAVE_STATE_MAP_OFFSET + sizeof (SMRAM_SAVE_STATE_MAP) - SMM_HANDLER_OFFSET));
 
   //
-  // Allocate buffer for all of the tiles.
+  // Check whether the Required TileSize is enough.
   //
-  // Intel(R) 64 and IA-32 Architectures Software Developer's Manual
-  // Volume 3C, Section 34.11 SMBASE Relocation
-  //   For Pentium and Intel486 processors, the SMBASE values must be
-  //   aligned on a 32-KByte boundary or the processor will enter shutdown
-  //   state during the execution of a RSM instruction.
-  //
-  // Intel486 processors: FamilyId is 4
-  // Pentium processors : FamilyId is 5
-  //
-  BufferPages = EFI_SIZE_TO_PAGES (SIZE_32KB + TileSize * (mMaxNumberOfCpus - 1));
-  if ((FamilyId == 4) || (FamilyId == 5)) {
-    Buffer = AllocateAlignedCodePages (BufferPages, SIZE_32KB);
-  } else {
-    Buffer = AllocateAlignedCodePages (BufferPages, SIZE_4KB);
+  if (TileSize > SIZE_8KB) {
+    DEBUG ((DEBUG_ERROR, "The Range of Smbase in SMRAM is not enough -- Required TileSize = 0x%08x, Actual TileSize = 0x%08x\n", TileSize, SIZE_8KB));
+    CpuDeadLoop ();
+    return RETURN_BUFFER_TOO_SMALL;
   }
 
-  ASSERT (Buffer != NULL);
-  DEBUG ((DEBUG_INFO, "SMRAM SaveState Buffer (0x%08x, 0x%08x)\n", Buffer, EFI_PAGES_TO_SIZE (BufferPages)));
+  //
+  // Retrive the allocated SmmBase from gSmmBaseHobGuid. If found,
+  // means the SmBase relocation has been done.
+  //
+  GuidHob = GetFirstGuidHob (&gSmmBaseHobGuid);
+  if (GuidHob != NULL) {
+    SmmBaseHobData = GET_GUID_HOB_DATA (GuidHob);
+
+    ASSERT (SmmBaseHobData->NumberOfProcessors == mMaxNumberOfCpus);
+    mSmmRelocated = TRUE;
+  } else {
+    //
+    // When the HOB doesn't exist, allocate new SMBASE itself.
+    //
+    DEBUG ((DEBUG_INFO, "PiCpuSmmEntry: gSmmBaseHobGuid not found!\n"));
+    //
+    // Allocate buffer for all of the tiles.
+    //
+    // Intel(R) 64 and IA-32 Architectures Software Developer's Manual
+    // Volume 3C, Section 34.11 SMBASE Relocation
+    //   For Pentium and Intel486 processors, the SMBASE values must be
+    //   aligned on a 32-KByte boundary or the processor will enter shutdown
+    //   state during the execution of a RSM instruction.
+    //
+    // Intel486 processors: FamilyId is 4
+    // Pentium processors : FamilyId is 5
+    //
+    BufferPages = EFI_SIZE_TO_PAGES (SIZE_32KB + TileSize * (mMaxNumberOfCpus - 1));
+    if ((FamilyId == 4) || (FamilyId == 5)) {
+      Buffer = AllocateAlignedCodePages (BufferPages, SIZE_32KB);
+    } else {
+      Buffer = AllocateAlignedCodePages (BufferPages, SIZE_4KB);
+    }
+
+    ASSERT (Buffer != NULL);
+    DEBUG ((DEBUG_INFO, "New Allcoated SMRAM SaveState Buffer (0x%08x, 0x%08x)\n", Buffer, EFI_PAGES_TO_SIZE (BufferPages)));
+  }
 
   //
   // Allocate buffer for pointers to array in  SMM_CPU_PRIVATE_DATA.
@@ -845,7 +924,8 @@ PiCpuSmmEntry (
   // size for each CPU in the platform
   //
   for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
-    mCpuHotPlugData.SmBase[Index]           = (UINTN)Buffer + Index * TileSize - SMM_HANDLER_OFFSET;
+    mCpuHotPlugData.SmBase[Index] = mSmmRelocated ? (UINTN)SmmBaseHobData->SmBase[Index] : (UINTN)Buffer + Index * TileSize - SMM_HANDLER_OFFSET;
+
     gSmmCpuPrivate->CpuSaveStateSize[Index] = sizeof (SMRAM_SAVE_STATE_MAP);
     gSmmCpuPrivate->CpuSaveState[Index]     = (VOID *)(mCpuHotPlugData.SmBase[Index] + SMRAM_SAVE_STATE_MAP_OFFSET);
     gSmmCpuPrivate->Operation[Index]        = SmmCpuNone;
@@ -958,17 +1038,23 @@ PiCpuSmmEntry (
   InitializeSmmIdt ();
 
   //
-  // Relocate SMM Base addresses to the ones allocated from SMRAM
+  // Check whether Smm Relocation is done or not.
+  // If not, will do the SmmBases Relocation here!!!
   //
-  mRebased = (BOOLEAN *)AllocateZeroPool (sizeof (BOOLEAN) * mMaxNumberOfCpus);
-  ASSERT (mRebased != NULL);
-  SmmRelocateBases ();
+  if (!mSmmRelocated) {
+    //
+    // Relocate SMM Base addresses to the ones allocated from SMRAM
+    //
+    mRebased = (BOOLEAN *)AllocateZeroPool (sizeof (BOOLEAN) * mMaxNumberOfCpus);
+    ASSERT (mRebased != NULL);
+    SmmRelocateBases ();
 
-  //
-  // Call hook for BSP to perform extra actions in normal mode after all
-  // SMM base addresses have been relocated on all CPUs
-  //
-  SmmCpuFeaturesSmmRelocationComplete ();
+    //
+    // Call hook for BSP to perform extra actions in normal mode after all
+    // SMM base addresses have been relocated on all CPUs
+    //
+    SmmCpuFeaturesSmmRelocationComplete ();
+  }
 
   DEBUG ((DEBUG_INFO, "mXdSupported - 0x%x\n", mXdSupported));
 
@@ -997,6 +1083,21 @@ PiCpuSmmEntry (
           );
       }
     }
+  }
+
+  //
+  // For relocated SMBASE, some MSRs & CSRs are still required to be configured in SMM Mode for SMM Initialization.
+  // Those MSRs & CSRs must be configured before normal SMI sources happen.
+  // So, here is to issue SMI IPI (All Excluding  Self SMM IPI + BSP SMM IPI) to execute first SMI init.
+  //
+  if (mSmmRelocated) {
+    ExecuteFirstSmiInit ();
+
+    //
+    // Call hook for BSP to perform extra actions in normal mode after all
+    // SMM base addresses have been relocated on all CPUs
+    //
+    SmmCpuFeaturesSmmRelocationComplete ();
   }
 
   //

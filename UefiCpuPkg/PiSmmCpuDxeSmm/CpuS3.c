@@ -824,9 +824,26 @@ SmmRestoreCpu (
   }
 
   //
-  // Restore SMBASE for BSP and all APs
+  // Retrive the allocated SmmBase from gSmmBaseHobGuid. If found,
+  // means the SmBase relocation has been done.
   //
-  SmmRelocateBases ();
+  mSmmRelocated = (BOOLEAN)(GetFirstGuidHob (&gSmmBaseHobGuid) != NULL);
+
+  //
+  // Check whether Smm Relocation is done or not.
+  // If not, will do the SmmBases Relocation here!!!
+  //
+  if (!mSmmRelocated) {
+    //
+    // Restore SMBASE for BSP and all APs
+    //
+    SmmRelocateBases ();
+  } else {
+    //
+    // Issue SMI IPI (All Excluding  Self SMM IPI + BSP SMM IPI) to execute first SMI init.
+    //
+    ExecuteFirstSmiInit ();
+  }
 
   //
   // Skip initialization if mAcpiCpuData is not valid

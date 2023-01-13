@@ -17,15 +17,23 @@
 #include <Library/SmmCpuFeaturesLib.h>
 #include <Library/SmmServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/HobLib.h>
 #include <Pcd/CpuHotEjectData.h>
 #include <PiSmm.h>
 #include <Register/Intel/SmramSaveStateMap.h>
 #include <Register/QemuSmramSaveStateMap.h>
+#include <Guid/SmmBaseHob.h>
 
 //
 // EFER register LMA bit
 //
 #define LMA  BIT10
+
+//
+// Indicate SmBase for each Processors has been relocated or not. If TRUE,
+// means no need to do the relocation in SmmCpuFeaturesInitializeProcessor().
+//
+BOOLEAN  mSmmCpuFeaturesSmmRelocated;
 
 /**
   The constructor function
@@ -43,6 +51,12 @@ SmmCpuFeaturesLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  //
+  // If gSmmBaseHobGuid found, means SmBase info has been relocated and recorded
+  // in the SmBase array.
+  //
+  mSmmCpuFeaturesSmmRelocated = (BOOLEAN)(GetFirstGuidHob (&gSmmBaseHobGuid) != NULL);
+
   //
   // No need to program SMRRs on our virtual platform.
   //
@@ -85,16 +99,21 @@ SmmCpuFeaturesInitializeProcessor (
   QEMU_SMRAM_SAVE_STATE_MAP  *CpuState;
 
   //
-  // Configure SMBASE.
+  // No need to configure SMBASE if SmBase relocation has been done.
   //
-  CpuState = (QEMU_SMRAM_SAVE_STATE_MAP *)(UINTN)(
-                                                  SMM_DEFAULT_SMBASE +
-                                                  SMRAM_SAVE_STATE_MAP_OFFSET
-                                                  );
-  if ((CpuState->x86.SMMRevId & 0xFFFF) == 0) {
-    CpuState->x86.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
-  } else {
-    CpuState->x64.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+  if (!mSmmCpuFeaturesSmmRelocated) {
+    //
+    // Configure SMBASE.
+    //
+    CpuState = (QEMU_SMRAM_SAVE_STATE_MAP *)(UINTN)(
+                                                    SMM_DEFAULT_SMBASE +
+                                                    SMRAM_SAVE_STATE_MAP_OFFSET
+                                                    );
+    if ((CpuState->x86.SMMRevId & 0xFFFF) == 0) {
+      CpuState->x86.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+    } else {
+      CpuState->x64.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+    }
   }
 
   //

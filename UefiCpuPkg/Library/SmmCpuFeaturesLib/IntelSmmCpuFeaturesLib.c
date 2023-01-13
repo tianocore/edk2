@@ -39,6 +39,12 @@ UINT32  mSmrrPhysBaseMsr = SMM_FEATURES_LIB_IA32_SMRR_PHYSBASE;
 UINT32  mSmrrPhysMaskMsr = SMM_FEATURES_LIB_IA32_SMRR_PHYSMASK;
 
 //
+// Indicate SmBase for each Processors has been relocated or not. If TRUE,
+// means no need to do the relocation in SmmCpuFeaturesInitializeProcessor().
+//
+BOOLEAN  mSmmCpuFeaturesSmmRelocated;
+
+//
 // Set default value to assume MTRRs need to be configured on each SMI
 //
 BOOLEAN  mNeedConfigureMtrrs = TRUE;
@@ -144,6 +150,12 @@ CpuFeaturesLibInitialization (
   //
   mSmrrEnabled = (BOOLEAN *)AllocatePool (sizeof (BOOLEAN) * GetCpuMaxLogicalProcessorNumber ());
   ASSERT (mSmrrEnabled != NULL);
+
+  //
+  // If gSmmBaseHobGuid found, means SmBase info has been relocated and recorded
+  // in the SmBase array.
+  //
+  mSmmCpuFeaturesSmmRelocated = (BOOLEAN)(GetFirstGuidHob (&gSmmBaseHobGuid) != NULL);
 }
 
 /**
@@ -187,10 +199,15 @@ SmmCpuFeaturesInitializeProcessor (
   UINTN                 ModelId;
 
   //
-  // Configure SMBASE.
+  // No need to configure SMBASE if SmBase relocation has been done.
   //
-  CpuState             = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
-  CpuState->x86.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+  if (!mSmmCpuFeaturesSmmRelocated) {
+    //
+    // Configure SMBASE.
+    //
+    CpuState             = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
+    CpuState->x86.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+  }
 
   //
   // Intel(R) 64 and IA-32 Architectures Software Developer's Manual

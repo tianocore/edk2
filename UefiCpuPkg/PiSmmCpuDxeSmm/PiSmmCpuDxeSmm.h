@@ -25,6 +25,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/AcpiS3Context.h>
 #include <Guid/MemoryAttributesTable.h>
 #include <Guid/PiSmmMemoryAttributesTable.h>
+#include <Guid/SmmBaseHob.h>
 
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
@@ -349,6 +350,26 @@ SmmWriteSaveState (
   );
 
 /**
+  C function for SMI handler. To change all processor's SMMBase Register.
+
+**/
+VOID
+EFIAPI
+SmmInitHandler (
+  VOID
+  );
+
+/**
+  Issue SMI IPI (All Excluding Self SMM IPI + BSP SMM IPI) to execute first SMI init.
+
+**/
+VOID
+EFIAPI
+ExecuteFirstSmiInit (
+  VOID
+  );
+
+/**
 Read a CPU Save State register on the target processor.
 
 This function abstracts the differences that whether the CPU Save State register is in the
@@ -401,6 +422,10 @@ WriteSaveStateRegister (
   IN UINTN                        Width,
   IN CONST VOID                   *Buffer
   );
+
+extern BOOLEAN  mSmmRelocated;
+extern BOOLEAN  *mSmmInitialized;
+extern UINT32   mBspApicId;
 
 extern CONST UINT8        gcSmmInitTemplate[];
 extern CONST UINT16       gcSmmInitSize;
@@ -1488,9 +1513,9 @@ RegisterStartupProcedure (
   );
 
 /**
-  Initialize PackageBsp Info. Processor specified by mPackageFirstThreadIndex[PackageIndex]
-  will do the package-scope register programming. Set default CpuIndex to (UINT32)-1, which
-  means not specified yet.
+  Initialize mPackageFirstThreadIndex Info. Processor specified by mPackageFirstThreadIndex[PackageIndex]
+  will do the package-scope register programming. Set default CpuIndex to (UINT32)-1, which means not
+  specified yet.
 
 **/
 VOID

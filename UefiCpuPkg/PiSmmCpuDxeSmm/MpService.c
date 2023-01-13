@@ -1723,12 +1723,35 @@ SmiRendezvous (
 
   ASSERT (CpuIndex < mMaxNumberOfCpus);
 
+  if (mSmmRelocated) {
+    ASSERT (mSmmInitialized != NULL);
+  }
+
   //
   // Save Cr2 because Page Fault exception in SMM may override its value,
   // when using on-demand paging for above 4G memory.
   //
   Cr2 = 0;
   SaveCr2 (&Cr2);
+
+  if (mSmmRelocated && !mSmmInitialized[CpuIndex]) {
+    //
+    // Perform SmmInitHandler for CpuIndex
+    //
+    SmmInitHandler ();
+
+    //
+    // Restore Cr2
+    //
+    RestoreCr2 (Cr2);
+
+    //
+    // Mark the first SMI init for CpuIndex has been done so as to avoid the reentry.
+    //
+    mSmmInitialized[CpuIndex] = TRUE;
+
+    return;
+  }
 
   //
   // Call the user register Startup function first.
@@ -1884,9 +1907,9 @@ Exit:
 }
 
 /**
-  Initialize PackageBsp Info. Processor specified by mPackageFirstThreadIndex[PackageIndex]
-  will do the package-scope register programming. Set default CpuIndex to (UINT32)-1, which
-  means not specified yet.
+  Initialize mPackageFirstThreadIndex Info. Processor specified by mPackageFirstThreadIndex[PackageIndex]
+  will do the package-scope register programming. Set default CpuIndex to (UINT32)-1, which means not
+  specified yet.
 
 **/
 VOID

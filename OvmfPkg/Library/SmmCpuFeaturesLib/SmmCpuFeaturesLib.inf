@@ -35,6 +35,10 @@
   SafeIntLib
   SmmServicesTableLib
   UefiBootServicesTableLib
+  HobLib
+
+[Guids]
+  gSmmBaseHobGuid                ## CONSUMES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
