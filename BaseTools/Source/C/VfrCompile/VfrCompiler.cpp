@@ -98,7 +98,7 @@ CVfrCompiler::OptionInitialization (
     } else if (stricmp(Argv[Index], "-l") == 0) {
       mOptions.CreateRecordListFile = TRUE;
       gCIfrRecordInfoDB.TurnOn ();
-    } else if (stricmp(Argv[Index], "-i") == 0) {
+    } else if (stricmp(Argv[Index], "-i") == 0) { 
       Index++;
       if ((Index >= Argc) || (Argv[Index][0] == '-')) {
         DebugError (NULL, 0, 1001, "Missing option", "-i missing path argument");
@@ -937,5 +937,3 @@ main (
 
   return GetUtilityStatus ();
 }
-
-

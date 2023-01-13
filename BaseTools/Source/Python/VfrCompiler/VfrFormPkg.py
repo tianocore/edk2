@@ -203,7 +203,7 @@ class FormPkg():
     def BuildPkg(self, Root):
         if Root.OpCode != None:
             self.PkgLength += Root.Data.GetInfo().Header.Length
-            Root.Offset = gFormPkg.Offset
+            Root.Offset = gFormPkg.Offset #
             self.Offset += Root.Data.GetInfo().Header.Length
         if Root.Child != []:
             for ChildNode in Root.Child:

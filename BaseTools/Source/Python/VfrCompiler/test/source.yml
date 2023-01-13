@@ -1,4 +1,11 @@
 ## DO NOT REMOVE -- VFR Mode
+
+#include <Uefi/UefiMultiPhase.h>
+#include "NVDataStruc.h"
+include:
+  - Uefi/UefiMultiPhase.h
+  - NVDataStruc.h
+
 formset:
   guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
   title:  0x0013  # Title STRING_ID

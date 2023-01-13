@@ -119,6 +119,8 @@ class Options():
         self.AutoDefault = False
         self.CheckDefault = False
 
+        self.HeaderFileName = None
+
 
 class VfrTree():
 
@@ -595,6 +597,9 @@ class VfrTree():
         try:
             with open(FileName, 'w') as f:
                 f.write('## DO NOT REMOVE -- VFR Mode\n')
+                f.write('include:\n')
+                f.write('  - Uefi/UefiMultiPhase.h\n')
+                f.write('  - NVDataStruc.h\n')
                 self.DumpYamlDfs(self.Root, f)
             f.close()
         except:
@@ -1279,7 +1284,25 @@ class VfrTree():
 
         return
 
-    def ReadYaml(self, FileName):
+    def ParserYaml(self, FormsetValues):
+        pass
+
+    def ParseYamlHeader(self, includepaths):
+        FileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header.vfr'
+        try:
+            f = open(FileName, 'w')
+            for includepath in includepaths:
+                f.write("#include <" + includepath + '>\n')
+            f.close()
+        except:
+            EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
+                            "File open failed for %s" % FileName, None)
+
+        # call C preprocessor
+        # delete .vfr 
+
+    def ReadYaml(self):
+        FileName = self.Options.YamlFileName
         try:
             f = open(FileName, 'r')
             #YamlDict = yaml.load(f, Loader=yaml.FullLoader)
@@ -1288,6 +1311,12 @@ class VfrTree():
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
                             "File open failed for %s" % FileName, None)
-        print(Config)
-        for Data in Config:
-            print(Data)
+        #print(Config)
+        if 'include' in Config.keys():
+            self.ParseYamlHeader(Config['include'])
+
+        if 'formset' in Config.keys():
+            self.ParserYaml(Config['formset'])
+
+        # for Key in Config:
+        #    print(Key)

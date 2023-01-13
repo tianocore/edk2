@@ -3,6 +3,9 @@ from pickletools import uint8
 import sys
 import yaml
 import logging
+import subprocess
+import time
+import re
 import argparse
 from tkinter.ttk import Treeview
 from antlr4 import *
@@ -24,15 +27,24 @@ class COMPILER_RUN_STATUS(Enum):
     STATUS_FAILED = 6
     STATUS_DEAD = 7
 
-
+'''
+ This is how we invoke the C preprocessor on the VFR source file
+ to resolve #defines, #includes, etc. To make C source files
+ shareable between VFR and drivers, define VFRCOMPILE so that
+ #ifdefs can be used in shared .h files.
+'''
 PREPROCESSOR_COMMAND = "cl "
 PREPROCESSOR_OPTIONS = "/nologo /E /TC /DVFRCOMPILE "
+
+# Specify the filename extensions for the files we generate.
+VFR__FILENAME_EXTENSION = ".vfr"
 VFR_PREPROCESS_FILENAME_EXTENSION =  ".i"
 VFR_PACKAGE_FILENAME_EXTENSION   =   ".hpk"
 VFR_RECORDLIST_FILENAME_EXTENSION  =  ".lst"
 VFR_YAML_FILENAME_EXTENSION  =  ".yml"
 VFR_JSON_FILENAME_EXTENSION  =  ".json"
 
+WARNING_LOG_LEVEL  = 15
 UTILITY_NAME  = 'VfrCompiler'
 
 parser=argparse.ArgumentParser(description="VfrCompiler", epilog= "VfrCompile version {} \
@@ -93,6 +105,7 @@ class VfrCompiler():
                 EdkLogger.error("VfrCompiler", OPTION_MISSING, "-i missing path argument")
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
                 return
+            self.Options.IncludePaths = ''
             self.Options.IncludePaths += " -I " + Path
 
         if Args.OutputDirectory:
@@ -200,6 +213,10 @@ class VfrCompiler():
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
             return
 
+        if self.SetHeaderFileName() != 0:
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+            return
+
     def SetBaseFileName(self):
         if self.Options.VfrFileName == None:
             return -1
@@ -258,6 +275,12 @@ class VfrCompiler():
         self.Options.JsonFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + VFR_JSON_FILENAME_EXTENSION
         return 0
 
+    def SetHeaderFileName(self):
+        if self.Options.VfrBaseFileName == None:
+            return -1
+        self.Options.HeaderFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header' + VFR_PREPROCESS_FILENAME_EXTENSION
+        return 0
+
     def PreProcess(self):
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED):
             if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
@@ -283,20 +306,23 @@ class VfrCompiler():
                 PreProcessCmd += self.Options.VfrFileName + " > "
                 PreProcessCmd += self.Options.PreprocessorOutputFileName
 
-                # if system(PreprocessCmd) ！= 0：
-                # EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "failed to spawn C preprocessor on VFR file {}".format(PreProcessCmd))
-                #self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
+                #PreProcessCmd = '/showIncludes /nologo /E /TC /DVFRCOMPILE /FIRamDiskDxeStrDefs.h  test/test.vfr > test/test.i'
+                print(PreProcessCmd)
+                if self.ExecuteCmd(PreProcessCmd) != 0:
+                    EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "failed to spawn C preprocessor on VFR file {}".format(PreProcessCmd))
+                    if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+                        self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+                else:
+                    self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
 
     def Compile(self):
-
+        InFileName = self.Options.VfrFileName if self.Options.SkipCPreprocessor == True\
+                else self.Options.PreprocessorOutputFileName
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED):
             EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "compile error in file %s" % InFileName, InFileName)
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
         else:
-            InFileName = self.Options.VfrFileName if self.Options.SkipCPreprocessor == True\
-                else self.Options.PreprocessorOutputFileName
-
-            gVfrErrorHandle.SetInputFile(InFileName)
+            gVfrErrorHandle.SetInputFile(InFileName) #
             gVfrErrorHandle.SetWarningAsError(self.Options.WarningAsError)
 
             try:
@@ -378,23 +404,86 @@ class VfrCompiler():
                 self.VfrTree.DumpJson()
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FINISHED)
 
+    def ParseYamlHeader(self):
+        self.VfrTree.ReadYaml()
+
     def SET_RUN_STATUS(self, Status):
         self.RunStatus = Status
 
     def IS_RUN_STATUS(self, Status):
         return self.RunStatus == Status
 
+    def ExecuteCmd(self,cmd,work_dir=None):
+        reError = '(^b"Error)'  #This will match if str(line) starts with the word "Error"
+        # self.build_log.log(Log.LOG_DBG, "%s" % cmd)
+        failed = False
+        if cmd.strip().startswith('None '):
+            failed = True
+        try:
+            start = int(round(time.time() * 1000))
+            try:
+                if work_dir:
+                    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,cwd=work_dir)
+                else:
+                    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+                while True:
+                    line = p.stdout.readline()
+                    if not line:
+                        break
+                    #self.build_log.log(Log.LOG_DBG, line.strip().decode('ascii', errors='ignore'))
+                    tmp_str = line.split()
+                    error = re.search(reError, str(line)) #Need to do str(line) due to line being a byte object.
+                    if line.strip().startswith('- Failed -'.encode(encoding='ascii')) or \
+                            (len(tmp_str) >= 2 and tmp_str[0].endswith(':'.encode(encoding='ascii')) \
+                            and tmp_str[1] == 'ERROR') or (len(tmp_str) >= 3 \
+                            and tmp_str[0] == 'Error' and tmp_str[2] == '-') or \
+                            ((len(tmp_str) >= 3) and ('error:'.encode(encoding='ascii') in tmp_str[2])):
+                        failed = True
+                    if error:
+                        #self.build_log.log(Log.LOG_ERR, "Failed, please check log file for more details!")
+                        failed = True
+
+                p.communicate()
+
+            except subprocess.CalledProcessError as  e:
+                ret = e.returncode
+            else:
+                ret = 0
+            finally:
+                pass
+                 #self.build_log.log(Log.LOG_DBG, '[cmd=%s]' % cmd)
+            end = int(round(time.time() * 1000))
+
+        except Exception as e:
+            #self.build_log.log(Log.LOG_ERR, e)
+            raise RuntimeError
+        else:
+            if failed:
+                ret = -1
+            if ret == 0:
+                ret_str = 'SUCCESS'
+            else:
+                ret_str = 'FAIL'
+            #self.build_log.log(Log.LOG_DBG, "\t - %s : %d ms\n" % (ret_str, end - start))
+            if ret:
+                #self.clean_up_temp_files()
+                os._exit(ret)
+        return ret
+
 def main():
     Args = parser.parse_args()
     Argc = len(sys.argv)
-    # SetPrintLevel (WARNING_LOG_LEVEL)
-
+    EdkLogger.SetLevel(WARNING_LOG_LEVEL)
     Compiler = VfrCompiler(Args, Argc)
     Compiler.PreProcess()
     Compiler.Compile()
     Compiler.GenBinaryFiles()
+
+    # Extended Functions
     Compiler.DumpYaml()
     Compiler.DumpJson()
+    Compiler.ParseYamlHeader()
 
     Status = Compiler.RunStatus
     if Status == COMPILER_RUN_STATUS.STATUS_DEAD or Status == COMPILER_RUN_STATUS.STATUS_FAILED:
