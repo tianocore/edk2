@@ -13,6 +13,7 @@ parameters:
   vm_image: ''
   arch_list: ''
   extra_install_step: []
+  usePythonVersion: ''
 
 # Build step
 jobs:
@@ -78,6 +79,7 @@ jobs:
       build_pkgs: $(Build.Pkgs)
       build_targets: $(Build.Targets)
       build_archs: ${{ parameters.arch_list }}
+      usePythonVersion: ${{ parameters.usePythonVersion }}
       extra_install_step: ${{ parameters.extra_install_step }}
 
 - job: Build_${{ parameters.tool_chain_tag }}_TARGET_CODE_COVERAGE

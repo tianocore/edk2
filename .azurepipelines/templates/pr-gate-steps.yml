@@ -12,6 +12,7 @@ parameters:
   build_pkgs: ''
   build_targets: ''
   build_archs: ''
+  usePythonVersion: ''
   extra_install_step: []
 
 steps:
@@ -21,8 +22,9 @@ steps:
 
 - task: UsePythonVersion@0
   inputs:
-    versionSpec: '>=3.10.6'
-    architecture: 'x64'
+    versionSpec: ${{ parameters.usePythonVersion }}
+    architecture: "x64"
+  condition: ne('${{ parameters.usePythonVersion }}', '')
 
 - script: pip install -r pip-requirements.txt --upgrade
   displayName: 'Install/Upgrade pip modules'
