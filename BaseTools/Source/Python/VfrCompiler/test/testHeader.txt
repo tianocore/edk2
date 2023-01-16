@@ -1,0 +1,150 @@
+
+
+***************************************************************
+PackAlign = 8
+		struct MY_EFI_BITS_VARSTORE_DATA : Align : [4]  TotalSize : [0x8]
+
+		struct MY_EFI_BITS_VARSTORE_DATA	{
+			+00000000[00000000] BitsData <MY_BITS_DATA>
+			+00000004[00000004] EfiBitGrayoutTest <UINT32>
+			+00000004[00000004] EfiBitNumeric <UINT32>
+			+00000004[00000004] EfiBitOneof <UINT32>
+			+00000004[00000004] EfiBitCheckbox <UINT32>
+			+00000004[00000004] <UINT32>
+		};
+---------------------------------------------------------------
+		struct MY_EFI_VARSTORE_DATA : Align : [2]  TotalSize : [0xa]
+
+		struct MY_EFI_VARSTORE_DATA	{
+			+00000000[00000000] Field8 <UINT8>
+			+00000002[00000002] Field16 <UINT16>
+			+00000004[00000004] OrderedList[3] <UINT8>
+			+00000008[00000008] SubmittedCallback <UINT16>
+		};
+---------------------------------------------------------------
+		struct DRIVER_SAMPLE_CONFIGURATION : Align : [8]  TotalSize : [0xe8]
+
+		struct DRIVER_SAMPLE_CONFIGURATION	{
+			+00000000[00000000] MyStringData[40] <UINT16>
+			+00000080[00000050] SomethingHiddenForHtml <UINT16>
+			+00000082[00000052] HowOldAreYouInYearsManual <UINT8>
+			+00000084[00000054] HowTallAreYouManual <UINT16>
+			+00000086[00000056] HowOldAreYouInYears <UINT8>
+			+00000088[00000058] HowTallAreYou <UINT16>
+			+00000090[0000005a] MyFavoriteNumber <UINT8>
+			+00000091[0000005b] TestLateCheck <UINT8>
+			+00000092[0000005c] TestLateCheck2 <UINT8>
+			+00000093[0000005d] QuestionAboutTreeHugging <UINT8>
+			+00000094[0000005e] ChooseToActivateNuclearWeaponry <UINT8>
+			+00000095[0000005f] SuppressGrayOutSomething <UINT8>
+			+00000096[00000060] OrderedList[8] <UINT8>
+			+00000104[00000068] BootOrder[8] <UINT16>
+			+00000120[00000078] BootOrderLarge <UINT8>
+			+00000121[00000079] DynamicRefresh <UINT8>
+			+00000122[0000007a] DynamicOneof <UINT8>
+			+00000123[0000007b] DynamicOrderedList[5] <UINT8>
+			+00000128[00000080] Reserved <UINT8>
+			+00000136[00000088] RefData <EFI_HII_REF>
+			+00000158[0000009e] NameValueVar0 <UINT8>
+			+00000160[000000a0] NameValueVar1 <UINT16>
+			+00000162[000000a2] NameValueVar2[20] <UINT16>
+			+00000202[000000ca] SerialPortNo <UINT8>
+			+00000203[000000cb] SerialPortStatus <UINT8>
+			+00000204[000000cc] SerialPortIo <UINT16>
+			+00000206[000000ce] SerialPortIrq <UINT8>
+			+00000207[000000cf] GetDefaultValueFromCallBack <UINT8>
+			+00000208[000000d0] GetDefaultValueFromAccess <UINT8>
+			+00000209[000000d1] Time <EFI_HII_TIME>
+			+00000212[000000d4] RefreshGuidCount <UINT8>
+			+00000213[000000d5] Match2 <UINT8>
+			+00000214[000000d6] GetDefaultValueFromCallBackForOrderedList[3] <UINT8>
+			+00000217[000000d9] BitCheckbox <UINT8>
+			+00000217[000000d9] ReservedBits <UINT8>
+			+00000218[000000da] BitOneof <UINT16>
+			+00000218[000000da] <UINT16>
+			+00000220[000000dc] BitNumeric <UINT16>
+			+00000222[000000de] MyBitData <MY_BITS_DATA>
+			+00000226[000000e2] MyUnionData <MY_EFI_UNION_DATA>
+			+00000227[000000e3] QuestionXUefiKeywordRestStyle <UINT8>
+			+00000228[000000e4] QuestionNonXUefiKeywordRestStyle <UINT8>
+		};
+---------------------------------------------------------------
+		struct MY_EFI_UNION_DATA : Align : [1]  TotalSize : [0x1]
+
+		struct MY_EFI_UNION_DATA	{
+			+00000000[00000000] UnionNumeric <UINT8>
+			+00000000[00000000] UnionNumericAlias <UINT8>
+		};
+---------------------------------------------------------------
+		struct MY_BITS_DATA : Align : [2]  TotalSize : [0x4]
+
+		struct MY_BITS_DATA	{
+			+00000000[00000000] NestByteField <UINT16>
+			+00000002[00000002] <UINT8>
+			+00000002[00000002] NestBitCheckbox <UINT8>
+			+00000002[00000002] NestBitOneof <UINT8>
+			+00000002[00000002] <UINT8>
+			+00000003[00000003] NestBitNumeric <UINT8>
+		};
+---------------------------------------------------------------
+		struct EFI_HII_REF : Align : [16]  TotalSize : [0x16]
+
+		struct EFI_HII_REF	{
+			+00000000[00000000] QuestionId <UINT16>
+			+00000002[00000002] FormId <UINT16>
+			+00000004[00000004] FormSetGuid <EFI_GUID>
+			+00000020[00000014] DevicePath <EFI_STRING_ID>
+		};
+---------------------------------------------------------------
+		struct EFI_HII_TIME : Align : [1]  TotalSize : [0x3]
+
+		struct EFI_HII_TIME	{
+			+00000000[00000000] Hours <UINT8>
+			+00000001[00000001] Minutes <UINT8>
+			+00000002[00000002] Seconds <UINT8>
+		};
+---------------------------------------------------------------
+		struct EFI_STRING_ID : Align : [2]  TotalSize : [0x2]
+
+		struct EFI_STRING_ID	{
+		};
+---------------------------------------------------------------
+		struct EFI_HII_DATE : Align : [2]  TotalSize : [0x4]
+
+		struct EFI_HII_DATE	{
+			+00000000[00000000] Year <UINT16>
+			+00000002[00000002] Month <UINT8>
+			+00000003[00000003] Day <UINT8>
+		};
+---------------------------------------------------------------
+		struct EFI_GUID : Align : [8]  TotalSize : [0x10]
+
+		struct EFI_GUID	{
+		};
+---------------------------------------------------------------
+		struct BOOLEAN : Align : [1]  TotalSize : [0x1]
+
+		struct BOOLEAN	{
+		};
+---------------------------------------------------------------
+		struct UINT8 : Align : [1]  TotalSize : [0x1]
+
+		struct UINT8	{
+		};
+---------------------------------------------------------------
+		struct UINT16 : Align : [2]  TotalSize : [0x2]
+
+		struct UINT16	{
+		};
+---------------------------------------------------------------
+		struct UINT32 : Align : [4]  TotalSize : [0x4]
+
+		struct UINT32	{
+		};
+---------------------------------------------------------------
+		struct UINT64 : Align : [8]  TotalSize : [0x8]
+
+		struct UINT64	{
+		};
+---------------------------------------------------------------
+***************************************************************

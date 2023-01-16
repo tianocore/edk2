@@ -11,7 +11,7 @@ from VfrTree import *
 }
 
 vfrProgram
-    :   (vfrPragmaPackDefinition | vfrDataStructDefinition | vfrDataUnionDefinition)* vfrFormSetDefinition
+    :   (vfrPragmaPackDefinition | vfrDataStructDefinition | vfrDataUnionDefinition)* vfrFormSetDefinition?
     ;
 
 pragmaPackShowDef

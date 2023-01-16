@@ -2,6 +2,8 @@ import yaml
 from VfrFormPkg import *
 from antlr4 import *
 from VfrCtypes import *
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from Common.LongFilePathSupport import LongFilePath
 # Ifr related Info -> ctypes obj
 #　conditional Info
 # Structure Info
@@ -120,6 +122,7 @@ class Options():
         self.CheckDefault = False
 
         self.HeaderFileName = None
+        self.CompileYaml = True
 
 
 class VfrTree():
@@ -592,14 +595,35 @@ class VfrTree():
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
                             "File open failed for %s" % FileName, None)
 
+    def InsertHeaderToYaml(self, f):
+        FileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + ".vfr"
+        try:
+            fFile = open(LongFilePath(FileName), mode='r')
+            line = fFile.readline()
+            IsHeaderLine = False
+            while line:
+                if "#include" in line:
+                    IsHeaderLine = True
+                    if line.find('<') != -1:
+                        f.write('  - ' + line[line.find('<') + 1:line.find('>')] + '\n')
+                    if line.find('\"') != -1:
+                        l = line.find('\"') + 1
+                        r = l + line[l:].find('\"')
+                        f.write('  - ' + line[l:r] + '\n')
+                line = fFile.readline()
+                if IsHeaderLine == True and "#include" not in line:
+                    break
+        except:
+            EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
+                            "File open failed for %s" % FileName, None)
+
     def DumpYaml(self):
         FileName = self.Options.YamlFileName
         try:
             with open(FileName, 'w') as f:
                 f.write('## DO NOT REMOVE -- VFR Mode\n')
                 f.write('include:\n')
-                f.write('  - Uefi/UefiMultiPhase.h\n')
-                f.write('  - NVDataStruc.h\n')
+                self.InsertHeaderToYaml(f)
                 self.DumpYamlDfs(self.Root, f)
             f.close()
         except:

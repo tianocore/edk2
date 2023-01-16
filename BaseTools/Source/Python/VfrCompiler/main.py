@@ -56,6 +56,7 @@ parser.add_argument("--version", action="version", version="VfrCompile version {
 parser.add_argument("-l", dest ="CreateRecordListFile",help = "create an output IFR listing file")
 parser.add_argument("-y", dest ="CreateYamlFile",help = "create Yaml file")
 parser.add_argument("-j", dest ="CreateJsonFile",help = "create Json file")
+parser.add_argument("-c", dest ="CompileYaml",help = "compile Yaml file")
 parser.add_argument("-i", dest = "IncludePaths", help= "add path argument") #
 parser.add_argument("-o", "--output-directory", "-od", dest = "OutputDirectory", help= "deposit all output files to directory OutputDir, \
                     default is current directory")
@@ -75,14 +76,13 @@ class VfrCompiler():
         self.Root = VfrTreeNode()
         self.Options = Options()
         self.VfrTree = VfrTree(self.Root, self.Options)
-
+        self.YamlTree = YamlTree(self.Options)
         self.RunStatus = COMPILER_RUN_STATUS.STATUS_STARTED
         self.PreProcessCmd = PREPROCESSOR_COMMAND
         self.PreProcessOpt = PREPROCESSOR_OPTIONS
         self.OptionIntialization(Args, Argc)
         if (not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)) and (not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)):
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED)
-
 
     def OptionIntialization(self, Args, Argc):
         Status = EFI_SUCCESS
@@ -128,6 +128,9 @@ class VfrCompiler():
 
         if Args.CreateYamlFile:
             self.Options.CreateYamlFile = True
+
+        if Args.CompileYaml:
+            self.Options.CompileYaml = True
 
         if Args.CreateJsonFile:
             self.Options.CreateJsonFile = True
@@ -406,7 +409,7 @@ class VfrCompiler():
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FINISHED)
 
     def ReadYaml(self):
-        self.VfrTree.ReadYaml()
+        self.YamlTree.ReadYaml()
 
     def SET_RUN_STATUS(self, Status):
         self.RunStatus = Status
@@ -480,9 +483,12 @@ def main():
     Compiler.PreProcess()
     Compiler.Compile()
     Compiler.GenBinaryFiles()
+    
+    # Extended Features
     Compiler.DumpYaml()
     Compiler.DumpJson()
-    
+    Compiler.ReadYaml()
+
     Status = Compiler.RunStatus
     if Status == COMPILER_RUN_STATUS.STATUS_DEAD or Status == COMPILER_RUN_STATUS.STATUS_FAILED:
         return 2

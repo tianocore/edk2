@@ -113,6 +113,15 @@ class VfrVarDataTypeDB(object):
         self.FirstNewDataTypeName = None
         self.InternalTypesListInit()
 
+    def Clear(self):
+        self.PackAlign = DEFAULT_PACK_ALIGN
+        self.PackStack = None
+        self.DataTypeList = None
+        self.NewDataType = None
+        self.CurrDataType = None
+        self.CurrDataField = None
+        self.FirstNewDataTypeName = None
+        self.InternalTypesListInit()
 
     def InternalTypesListInit(self):
         for i in range(0, len(gInternalTypesTable)):

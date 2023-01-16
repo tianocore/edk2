@@ -27,8 +27,10 @@ else:
 class VfrSyntaxVisitor(ParseTreeVisitor):
 
     def __init__(self, Root=None, OverrideClassGuid=None):
-
-        self.Root = Root
+        if Root == None:
+            self.Root = VfrTreeNode()
+        else:
+            self.Root = Root
         self.OverrideClassGuid = OverrideClassGuid
         self.ParserStatus = 0
 

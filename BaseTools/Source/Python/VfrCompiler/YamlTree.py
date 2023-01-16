@@ -1,7 +1,7 @@
 from VfrSyntaxVisitor import *
 from VfrSyntaxLexer import *
 from VfrSyntaxParser import *
-
+from VfrFormPkg import *
 class YamlTree():
     def __init__(self, Options: Options):
         self.Options = Options
@@ -49,8 +49,18 @@ class YamlTree():
             VfrLexer = VfrSyntaxLexer(InputStream)
             VfrStream = CommonTokenStream(VfrLexer)
             VfrParser = VfrSyntaxParser(VfrStream)
-            self.Visitor = VfrSyntaxVisitor(None, self.Options.OverrideClassGuid)
-            self.Visitor.visit(VfrParser.vfrProgram())
+        except:
+            EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
+                            "File open failed for %s" % FileName, None)
+
+        self.Visitor = VfrSyntaxVisitor(None, self.Options.OverrideClassGuid)
+        gVfrVarDataTypeDB.Clear()
+        self.Visitor.visit(VfrParser.vfrProgram())
+        FileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header.txt'
+        try:
+            f = open(FileName, 'w')
+            gVfrVarDataTypeDB.Dump(f)
+            f.close()
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
                             "File open failed for %s" % FileName, None)
