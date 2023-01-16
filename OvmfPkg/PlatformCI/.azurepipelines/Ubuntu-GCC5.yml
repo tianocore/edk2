@@ -180,6 +180,8 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
+    container: ${{ variables.default_linux_image }}
+
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
@@ -190,8 +192,4 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
-        usePythonVersion: ${{ variables.default_python_version }}
-        extra_install_step:
-        - bash: sudo apt-get install qemu
-          displayName: Install qemu
-          condition: and(gt(variables.pkg_count, 0), succeeded())
+        usePythonVersion: '' # use Python from the container image
