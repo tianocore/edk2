@@ -194,6 +194,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         cmd = "qemu-system-x86_64"
         args  = "-debugcon stdio"                                           # write messages to stdio
         args += " -global isa-debugcon.iobase=0x402"                        # debug messages out thru virtual io port
+        args += " -cpu Broadwell"                                           # workaround Qvmf bug
         args += " -net none"                                                # turn off network
         args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk" # Mount disk with startup.nsh
 
