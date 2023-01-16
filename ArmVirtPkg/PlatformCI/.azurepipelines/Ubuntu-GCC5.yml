@@ -15,6 +15,9 @@ pr:
   - master
   - stable/*
 
+variables:
+  - template: ../../../.azurepipelines/templates/defaults.yml
+
 jobs:
   - job: Platform_CI
     variables:
@@ -85,6 +88,7 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
+        usePythonVersion: ${{ variables.default_python_version }}
         extra_install_step:
         - bash: sudo apt-get install qemu
           displayName: Install qemu
