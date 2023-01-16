@@ -14,6 +14,10 @@ trigger:
 pr:
   - master
   - stable/*
+
+variables:
+  - template: ../../../.azurepipelines/templates/defaults.yml
+
 jobs:
   - job: Platform_CI
     variables:
@@ -133,6 +137,7 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
+        usePythonVersion: ${{ variables.default_python_version }}
         extra_install_step:
         - powershell: choco install qemu --version=2021.5.5; Write-Host "##vso[task.prependpath]c:\Program Files\qemu"
           displayName: Install QEMU and Set QEMU on path # friendly name displayed in the UI
