@@ -9,7 +9,7 @@
 
 #include <PiDxe.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include "EfiMpServicesUnitTestCommom.h"
+#include "EfiMpServicesUnitTestCommon.h"
 
 #define UNIT_TEST_NAME     "EfiMpServiceProtocol Unit Test"
 #define UNIT_TEST_VERSION  "0.1"

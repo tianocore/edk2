@@ -7,7 +7,7 @@
 
 **/
 
-#include "EfiMpServicesUnitTestCommom.h"
+#include "EfiMpServicesUnitTestCommon.h"
 
 /**
   Prep routine for Unit test function.

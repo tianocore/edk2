@@ -9,7 +9,7 @@
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/ShellDynamicCommand.h>
-#include "EfiMpServicesUnitTestCommom.h"
+#include "EfiMpServicesUnitTestCommon.h"
 
 CHAR16  *mMpProtocolUnitTestCommandHelp = L".TH MpProtocolUnitTest 0\r\n.SH NAME\r\nDisplay unit test results of EFI MP services protocol.\r\n";
 

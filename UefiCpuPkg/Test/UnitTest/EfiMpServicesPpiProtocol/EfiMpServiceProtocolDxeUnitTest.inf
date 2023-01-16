@@ -21,8 +21,8 @@
 #
 
 [Sources]
-  EfiMpServicesUnitTestCommom.c
-  EfiMpServicesUnitTestCommom.h
+  EfiMpServicesUnitTestCommon.c
+  EfiMpServicesUnitTestCommon.h
   EfiMpServiceProtocolUnitTest.c
 
 [Packages]

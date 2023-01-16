@@ -9,7 +9,7 @@
 
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
-#include "EfiMpServicesUnitTestCommom.h"
+#include "EfiMpServicesUnitTestCommon.h"
 
 #define UNIT_TEST_NAME     "EdkiiPeiMpServices2Ppi Unit Test"
 #define UNIT_TEST_VERSION  "0.1"

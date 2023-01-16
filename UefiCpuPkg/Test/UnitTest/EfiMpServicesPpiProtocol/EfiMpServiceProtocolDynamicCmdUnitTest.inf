@@ -16,8 +16,8 @@
   UNLOAD_IMAGE    = MpProtocolUnitTestUnload
 
 [Sources]
-  EfiMpServicesUnitTestCommom.c
-  EfiMpServicesUnitTestCommom.h
+  EfiMpServicesUnitTestCommon.c
+  EfiMpServicesUnitTestCommon.h
   EfiMpServiceProtocolUnitTest.c
   EfiMpServiceProtocolDynamicCmdUnitTest.c
 

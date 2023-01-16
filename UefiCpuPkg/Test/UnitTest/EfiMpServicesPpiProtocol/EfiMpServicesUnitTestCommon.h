@@ -7,8 +7,8 @@
 
 **/
 
-#ifndef EFI_MP_SERVICES_UNIT_TEST_COMMOM_H_
-#define EFI_MP_SERVICES_UNIT_TEST_COMMOM_H_
+#ifndef EFI_MP_SERVICES_UNIT_TEST_COMMON_H_
+#define EFI_MP_SERVICES_UNIT_TEST_COMMON_H_
 
 #include <PiPei.h>
 #include <Ppi/MpServices2.h>
