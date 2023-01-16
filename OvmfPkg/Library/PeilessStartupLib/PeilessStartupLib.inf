@@ -67,6 +67,7 @@
   gEfiMemoryTypeInformationGuid
   gPcdDataBaseHobGuid
   gCcEventEntryHobGuid
+  gEfiNonCcFvGuid
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdCfvBase

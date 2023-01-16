@@ -21,6 +21,12 @@ DxeLoadCore (
   IN INTN  FvInstance
   );
 
+EFI_STATUS
+EFIAPI
+FindDxeNonCc (
+  IN INTN  FvInstance
+  );
+
 VOID
 EFIAPI
 TransferHobList (
