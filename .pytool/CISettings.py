@@ -169,15 +169,6 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
             else:
                 logging.warning("Falling back to using in-tree BaseTools")
 
-            if is_linux and self.ActualToolChainTag.upper().startswith("GCC"):
-                if "AARCH64" in self.ActualArchitectures:
-                    scopes += ("gcc_aarch64_linux",)
-                if "ARM" in self.ActualArchitectures:
-                    scopes += ("gcc_arm_linux",)
-                if "RISCV64" in self.ActualArchitectures:
-                    scopes += ("gcc_riscv64_unknown",)
-                if "LOONGARCH64" in self.ActualArchitectures:
-                    scopes += ("gcc_loongarch64_unknown_linux",)
             self.ActualScopes = scopes
         return self.ActualScopes
 
