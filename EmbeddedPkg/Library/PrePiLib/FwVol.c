@@ -264,16 +264,18 @@ FindFileEx (
   Go through the file to search SectionType section,
   when meeting an encapsuled section.
 
-  @param  SectionType  - Filter to find only section of this type.
-  @param  Section      - From where to search.
-  @param  SectionSize  - The file size to search.
-  @param  OutputBuffer - Pointer to the section to search.
+  @param  SectionType       - Filter to find only section of this type.
+  @param  SectionCheckHook  - A hook which can check if the section is the target one.
+  @param  Section           - From where to search.
+  @param  SectionSize       - The file size to search.
+  @param  OutputBuffer      - Pointer to the section to search.
 
   @retval EFI_SUCCESS
 **/
 EFI_STATUS
 FfsProcessSection (
   IN EFI_SECTION_TYPE           SectionType,
+  IN FFS_CHECK_SECTION_HOOK     SectionCheckHook,
   IN EFI_COMMON_SECTION_HEADER  *Section,
   IN UINTN                      SectionSize,
   OUT VOID                      **OutputBuffer
@@ -292,7 +294,9 @@ FfsProcessSection (
   UINT32                    AuthenticationStatus;
   CHAR8                     *CompressedData;
   UINT32                    CompressedDataLength;
+  BOOLEAN                   Found;
 
+  Found         = FALSE;
   *OutputBuffer = NULL;
   ParsedLength  = 0;
   Status        = EFI_NOT_FOUND;
@@ -302,13 +306,23 @@ FfsProcessSection (
     }
 
     if (Section->Type == SectionType) {
-      if (IS_SECTION2 (Section)) {
-        *OutputBuffer = (VOID *)((UINT8 *)Section + sizeof (EFI_COMMON_SECTION_HEADER2));
+      if (SectionCheckHook != NULL) {
+        Found = SectionCheckHook (Section) == EFI_SUCCESS;
       } else {
-        *OutputBuffer = (VOID *)((UINT8 *)Section + sizeof (EFI_COMMON_SECTION_HEADER));
+        Found = TRUE;
       }
 
-      return EFI_SUCCESS;
+      if (Found) {
+        if (IS_SECTION2 (Section)) {
+          *OutputBuffer = (VOID *)((UINT8 *)Section + sizeof (EFI_COMMON_SECTION_HEADER2));
+        } else {
+          *OutputBuffer = (VOID *)((UINT8 *)Section + sizeof (EFI_COMMON_SECTION_HEADER));
+        }
+
+        return EFI_SUCCESS;
+      } else {
+        goto CheckNextSection;
+      }
     } else if ((Section->Type == EFI_SECTION_COMPRESSION) || (Section->Type == EFI_SECTION_GUID_DEFINED)) {
       if (Section->Type == EFI_SECTION_COMPRESSION) {
         if (IS_SECTION2 (Section)) {
@@ -415,6 +429,7 @@ FfsProcessSection (
       } else {
         return FfsProcessSection (
                  SectionType,
+                 SectionCheckHook,
                  DstBuffer,
                  DstBufferSize,
                  OutputBuffer
@@ -422,6 +437,7 @@ FfsProcessSection (
       }
     }
 
+CheckNextSection:
     if (IS_SECTION2 (Section)) {
       SectionLength = SECTION2_SIZE (Section);
     } else {
@@ -456,9 +472,10 @@ FfsProcessSection (
 EFI_STATUS
 EFIAPI
 FfsFindSectionData (
-  IN EFI_SECTION_TYPE     SectionType,
-  IN EFI_PEI_FILE_HANDLE  FileHandle,
-  OUT VOID                **SectionData
+  IN EFI_SECTION_TYPE        SectionType,
+  IN FFS_CHECK_SECTION_HOOK  SectionCheckHook,
+  IN EFI_PEI_FILE_HANDLE     FileHandle,
+  OUT VOID                   **SectionData
   )
 {
   EFI_FFS_FILE_HEADER        *FfsFileHeader;
@@ -478,6 +495,7 @@ FfsFindSectionData (
 
   return FfsProcessSection (
            SectionType,
+           SectionCheckHook,
            Section,
            FileSize,
            SectionData
@@ -799,7 +817,7 @@ FfsProcessFvFile (
   //
   // Find FvImage in FvFile
   //
-  Status = FfsFindSectionData (EFI_SECTION_FIRMWARE_VOLUME_IMAGE, FvFileHandle, (VOID **)&FvImageHandle);
+  Status = FfsFindSectionData (EFI_SECTION_FIRMWARE_VOLUME_IMAGE, NULL, FvFileHandle, (VOID **)&FvImageHandle);
   if (EFI_ERROR (Status)) {
     return Status;
   }
