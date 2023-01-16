@@ -34,6 +34,9 @@ parameters:
 - name: extra_install_step
   type: stepList
   default: []
+- name: usePythonVersion
+  type: string
+  default: ''
 
 steps:
 - checkout: self
@@ -42,8 +45,9 @@ steps:
 
 - task: UsePythonVersion@0
   inputs:
-    versionSpec: ">=3.10.6"
+    versionSpec: ${{ parameters.usePythonVersion }}
     architecture: "x64"
+  condition: ne('${{ parameters.usePythonVersion }}', '')
 
 - script: pip install -r pip-requirements.txt --upgrade
   displayName: 'Install/Upgrade pip modules'
