@@ -14,6 +14,7 @@ parameters:
   arch_list: ''
   extra_install_step: []
   usePythonVersion: ''
+  container: ''
 
 # Build step
 jobs:
@@ -71,6 +72,9 @@ jobs:
 
   pool:
     vmImage: ${{ parameters.vm_image }}
+
+  ${{ if not(eq(parameters.container, '')) }}:
+    container: ${{ parameters.container }}
 
   steps:
   - template: pr-gate-steps.yml
