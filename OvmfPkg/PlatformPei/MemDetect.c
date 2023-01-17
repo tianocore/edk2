@@ -271,7 +271,8 @@ PublishPeiMemory (
   UINT32                S3AcpiReservedMemoryBase;
   UINT32                S3AcpiReservedMemorySize;
 
-  LowerMemorySize = PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
+  PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
+  LowerMemorySize = PlatformInfoHob->LowMemory;
   if (PlatformInfoHob->SmmSmramRequire) {
     //
     // TSEG is chipped from the end of low RAM
