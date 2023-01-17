@@ -112,143 +112,6 @@ PlatformQemuUc32BaseInitialization (
   }
 }
 
-/**
-  Iterate over the RAM entries in QEMU's fw_cfg E820 RAM map that start outside
-  of the 32-bit address range.
-
-  Find the highest exclusive >=4GB RAM address, or produce memory resource
-  descriptor HOBs for RAM entries that start at or above 4GB.
-
-  @param[out] MaxAddress  If MaxAddress is NULL, then PlatformScanOrAdd64BitE820Ram()
-                          produces memory resource descriptor HOBs for RAM
-                          entries that start at or above 4GB.
-
-                          Otherwise, MaxAddress holds the highest exclusive
-                          >=4GB RAM address on output. If QEMU's fw_cfg E820
-                          RAM map contains no RAM entry that starts outside of
-                          the 32-bit address range, then MaxAddress is exactly
-                          4GB on output.
-
-  @retval EFI_SUCCESS         The fw_cfg E820 RAM map was found and processed.
-
-  @retval EFI_PROTOCOL_ERROR  The RAM map was found, but its size wasn't a
-                              whole multiple of sizeof(EFI_E820_ENTRY64). No
-                              RAM entry was processed.
-
-  @return                     Error codes from QemuFwCfgFindFile(). No RAM
-                              entry was processed.
-**/
-STATIC
-EFI_STATUS
-PlatformScanOrAdd64BitE820Ram (
-  IN BOOLEAN  AddHighHob,
-  OUT UINT64  *LowMemory OPTIONAL,
-  OUT UINT64  *MaxAddress OPTIONAL
-  )
-{
-  EFI_STATUS            Status;
-  FIRMWARE_CONFIG_ITEM  FwCfgItem;
-  UINTN                 FwCfgSize;
-  EFI_E820_ENTRY64      E820Entry;
-  UINTN                 Processed;
-
-  Status = QemuFwCfgFindFile ("etc/e820", &FwCfgItem, &FwCfgSize);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  if (FwCfgSize % sizeof E820Entry != 0) {
-    return EFI_PROTOCOL_ERROR;
-  }
-
-  if (LowMemory != NULL) {
-    *LowMemory = 0;
-  }
-
-  if (MaxAddress != NULL) {
-    *MaxAddress = BASE_4GB;
-  }
-
-  QemuFwCfgSelectItem (FwCfgItem);
-  for (Processed = 0; Processed < FwCfgSize; Processed += sizeof E820Entry) {
-    QemuFwCfgReadBytes (sizeof E820Entry, &E820Entry);
-    DEBUG ((
-      DEBUG_VERBOSE,
-      "%a: Base=0x%Lx Length=0x%Lx Type=%u\n",
-      __FUNCTION__,
-      E820Entry.BaseAddr,
-      E820Entry.Length,
-      E820Entry.Type
-      ));
-    if (E820Entry.Type == EfiAcpiAddressRangeMemory) {
-      if (AddHighHob && (E820Entry.BaseAddr >= BASE_4GB)) {
-        UINT64  Base;
-        UINT64  End;
-
-        //
-        // Round up the start address, and round down the end address.
-        //
-        Base = ALIGN_VALUE (E820Entry.BaseAddr, (UINT64)EFI_PAGE_SIZE);
-        End  = (E820Entry.BaseAddr + E820Entry.Length) &
-               ~(UINT64)EFI_PAGE_MASK;
-        if (Base < End) {
-          PlatformAddMemoryRangeHob (Base, End);
-          DEBUG ((
-            DEBUG_VERBOSE,
-            "%a: PlatformAddMemoryRangeHob [0x%Lx, 0x%Lx)\n",
-            __FUNCTION__,
-            Base,
-            End
-            ));
-        }
-      }
-
-      if (MaxAddress || LowMemory) {
-        UINT64  Candidate;
-
-        Candidate = E820Entry.BaseAddr + E820Entry.Length;
-        if (MaxAddress && (Candidate > *MaxAddress)) {
-          *MaxAddress = Candidate;
-          DEBUG ((
-            DEBUG_VERBOSE,
-            "%a: MaxAddress=0x%Lx\n",
-            __FUNCTION__,
-            *MaxAddress
-            ));
-        }
-
-        if (LowMemory && (Candidate > *LowMemory) && (Candidate < BASE_4GB)) {
-          *LowMemory = Candidate;
-          DEBUG ((
-            DEBUG_VERBOSE,
-            "%a: LowMemory=0x%Lx\n",
-            __FUNCTION__,
-            *LowMemory
-            ));
-        }
-      }
-    } else if (E820Entry.Type == EfiAcpiAddressRangeReserved) {
-      if (AddHighHob) {
-        DEBUG ((
-          DEBUG_INFO,
-          "%a: Reserved: Base=0x%Lx Length=0x%Lx\n",
-          __FUNCTION__,
-          E820Entry.BaseAddr,
-          E820Entry.Length
-          ));
-        BuildResourceDescriptorHob (
-          EFI_RESOURCE_MEMORY_RESERVED,
-          0,
-          E820Entry.BaseAddr,
-          E820Entry.Length
-          );
-      }
-    }
-  }
-
-  return EFI_SUCCESS;
-}
-
 typedef VOID (*E820_SCAN_CALLBACK) (
   EFI_E820_ENTRY64       *E820Entry,
   EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
@@ -303,6 +166,53 @@ PlatformGetLowMemoryCB (
   if (PlatformInfoHob->LowMemory < Candidate) {
     DEBUG ((DEBUG_INFO, "%a: LowMemory=0x%Lx\n", __FUNCTION__, Candidate));
     PlatformInfoHob->LowMemory = (UINT32)Candidate;
+  }
+}
+
+/**
+  Create HOBs for reservations and RAM (except low memory).
+**/
+STATIC
+VOID
+PlatformAddHobCB (
+  IN     EFI_E820_ENTRY64       *E820Entry,
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  UINT64  Base, End;
+
+  Base = E820Entry->BaseAddr;
+  End  = E820Entry->BaseAddr + E820Entry->Length;
+
+  switch (E820Entry->Type) {
+    case EfiAcpiAddressRangeMemory:
+      if (Base >= BASE_4GB) {
+        //
+        // Round up the start address, and round down the end address.
+        //
+        Base = ALIGN_VALUE (Base, (UINT64)EFI_PAGE_SIZE);
+        End  = End & ~(UINT64)EFI_PAGE_MASK;
+        if (Base < End) {
+          DEBUG ((DEBUG_INFO, "%a: HighMemory [0x%Lx, 0x%Lx)\n", __FUNCTION__, Base, End));
+          PlatformAddMemoryRangeHob (Base, End);
+        }
+      }
+
+      break;
+    case EfiAcpiAddressRangeReserved:
+      BuildResourceDescriptorHob (EFI_RESOURCE_MEMORY_RESERVED, 0, Base, End);
+      DEBUG ((DEBUG_INFO, "%a: Reserved [0x%Lx, 0x%Lx)\n", __FUNCTION__, Base, End));
+      break;
+    default:
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: Type %u [0x%Lx, 0x%Lx) (NOT HANDLED)\n",
+        __FUNCTION__,
+        E820Entry->Type,
+        Base,
+        End
+        ));
+      break;
   }
 }
 
@@ -1051,7 +961,7 @@ PlatformQemuInitializeRam (
     // entries. Otherwise, create a single memory HOB with the flat >=4GB
     // memory size read from the CMOS.
     //
-    Status = PlatformScanOrAdd64BitE820Ram (TRUE, NULL, NULL);
+    Status = PlatformScanE820 (PlatformAddHobCB, PlatformInfoHob);
     if (EFI_ERROR (Status)) {
       UpperMemorySize = PlatformGetSystemMemorySizeAbove4gb ();
       if (UpperMemorySize != 0) {
