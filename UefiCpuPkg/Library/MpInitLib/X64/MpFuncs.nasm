@@ -459,6 +459,9 @@ ASM_PFX(AsmGetAddressMap):
     lea        rax, [AsmRelocateApLoopStart]
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncAddress], rax
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncSize], AsmRelocateApLoopEnd - AsmRelocateApLoopStart
+    lea        rax, [AsmRelocateApLoopStartAmd64]
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncAddressAmd64], rax
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncSizeAmd64], AsmRelocateApLoopEndAmd64 - AsmRelocateApLoopStartAmd64
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.ModeTransitionOffset], Flat32Start - RendezvousFunnelProcStart
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealNoNxOffset], SwitchToRealProcStart - Flat32Start
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealPM16ModeOffset], PM16Mode - RendezvousFunnelProcStart
