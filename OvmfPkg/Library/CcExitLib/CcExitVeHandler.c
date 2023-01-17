@@ -109,10 +109,11 @@ IoExit (
   UINT64   RepCnt;
   UINT64   Status;
 
-  Val   = 0;
-  Write = Veinfo->ExitQualification.Io.Direction ? FALSE : TRUE;
-  Size  = Veinfo->ExitQualification.Io.Size + 1;
-  Port  = Veinfo->ExitQualification.Io.Port;
+  Val    = 0;
+  Status = 0;
+  Write  = Veinfo->ExitQualification.Io.Direction ? FALSE : TRUE;
+  Size   = Veinfo->ExitQualification.Io.Size + 1;
+  Port   = Veinfo->ExitQualification.Io.Port;
 
   if (Veinfo->ExitQualification.Io.String) {
     //
