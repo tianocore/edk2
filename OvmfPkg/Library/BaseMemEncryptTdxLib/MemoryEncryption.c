@@ -510,8 +510,11 @@ Split1GPageTo2M (
   @param[in]      PagetablePoint        Page table entry pointer (PTE).
   @param[in]      Mode                  Set or Clear shared bit
 
+  @retval         EFI_SUCCESS           Successfully set or clear the memory shared bit
+  @retval         Others                Other error as indicated
 **/
-STATIC VOID
+STATIC
+EFI_STATUS
 SetOrClearSharedBit (
   IN   OUT     UINT64              *PageTablePointer,
   IN           TDX_PAGETABLE_MODE  Mode,
@@ -520,7 +523,8 @@ SetOrClearSharedBit (
   )
 {
   UINT64                        AddressEncMask;
-  UINT64                        Status;
+  UINT64                        TdStatus;
+  EFI_STATUS                    Status;
   EDKII_MEMORY_ACCEPT_PROTOCOL  *MemoryAcceptProtocol;
 
   AddressEncMask = GetMemEncryptionAddressMask ();
@@ -536,16 +540,30 @@ SetOrClearSharedBit (
     PhysicalAddress   &= ~AddressEncMask;
   }
 
-  Status = TdVmCall (TDVMCALL_MAPGPA, PhysicalAddress, Length, 0, 0, NULL);
+  TdStatus = TdVmCall (TDVMCALL_MAPGPA, PhysicalAddress, Length, 0, 0, NULL);
+  if (TdStatus != 0) {
+    DEBUG ((DEBUG_ERROR, "%a: TdVmcall(MAPGPA) failed with %llx\n", __FUNCTION__, TdStatus));
+    ASSERT (FALSE);
+    return EFI_DEVICE_ERROR;
+  }
 
   //
   // If changing shared to private, must accept-page again
   //
   if (Mode == ClearSharedBit) {
     Status = gBS->LocateProtocol (&gEdkiiMemoryAcceptProtocolGuid, NULL, (VOID **)&MemoryAcceptProtocol);
-    ASSERT (!EFI_ERROR (Status));
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed to locate MemoryAcceptProtocol with %r\n", __FUNCTION__, Status));
+      ASSERT (FALSE);
+      return Status;
+    }
+
     Status = MemoryAcceptProtocol->AcceptMemory (MemoryAcceptProtocol, PhysicalAddress, Length);
-    ASSERT (!EFI_ERROR (Status));
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed to AcceptMemory with %r\n", __FUNCTION__, Status));
+      ASSERT (FALSE);
+      return Status;
+    }
   }
 
   DEBUG ((
@@ -558,6 +576,8 @@ SetOrClearSharedBit (
     Mode,
     Status
     ));
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -747,7 +767,11 @@ SetMemorySharedOrPrivate (
       // If we have at least 1GB to go, we can just update this entry
       //
       if (!(PhysicalAddress & (BIT30 - 1)) && (Length >= BIT30)) {
-        SetOrClearSharedBit (&PageDirectory1GEntry->Uint64, Mode, PhysicalAddress, BIT30);
+        Status = SetOrClearSharedBit (&PageDirectory1GEntry->Uint64, Mode, PhysicalAddress, BIT30);
+        if (EFI_ERROR (Status)) {
+          goto Done;
+        }
+
         DEBUG ((
           DEBUG_VERBOSE,
           "%a:%a: updated 1GB entry for Physical=0x%Lx\n",
@@ -809,7 +833,11 @@ SetMemorySharedOrPrivate (
         // If we have at least 2MB left to go, we can just update this entry
         //
         if (!(PhysicalAddress & (BIT21-1)) && (Length >= BIT21)) {
-          SetOrClearSharedBit (&PageDirectory2MEntry->Uint64, Mode, PhysicalAddress, BIT21);
+          Status = SetOrClearSharedBit (&PageDirectory2MEntry->Uint64, Mode, PhysicalAddress, BIT21);
+          if (EFI_ERROR (Status)) {
+            goto Done;
+          }
+
           PhysicalAddress += BIT21;
           Length          -= BIT21;
         } else {
@@ -856,7 +884,11 @@ SetMemorySharedOrPrivate (
           goto Done;
         }
 
-        SetOrClearSharedBit (&PageTableEntry->Uint64, Mode, PhysicalAddress, EFI_PAGE_SIZE);
+        Status = SetOrClearSharedBit (&PageTableEntry->Uint64, Mode, PhysicalAddress, EFI_PAGE_SIZE);
+        if (EFI_ERROR (Status)) {
+          goto Done;
+        }
+
         PhysicalAddress += EFI_PAGE_SIZE;
         Length          -= EFI_PAGE_SIZE;
       }
