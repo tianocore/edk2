@@ -401,6 +401,15 @@ typedef
   IN UINTN                   WakeupBuffer
   );
 
+//
+// Union holds the relocate APs loop entries for different cases
+//
+typedef union {
+  VOID                          *Data;
+  ASM_RELOCATE_AP_LOOP_AMD64    Amd64Entry;   // 64-bit AMD Processor
+  ASM_RELOCATE_AP_LOOP          GenericEntry; // Intel Processor (32-bit or 64-bit), or 32-bit AMD Processor
+} RELOCATE_AP_LOOP_ENTRY;
+
 /**
   Assembly code to get starting address and size of the rendezvous entry for APs.
   Information for fixing a jump instruction in the code is also returned.
