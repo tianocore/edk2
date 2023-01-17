@@ -29,7 +29,7 @@
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Ppi/TemporaryRamSupport.h>
 #include <Ppi/MpInitLibDep.h>
-#include <Library/PlatformInitLib.h>
+#include <Library/TdxHelperLib.h>
 #include <Library/CcProbeLib.h>
 #include "AmdSev.h"
 
@@ -761,11 +761,24 @@ SecCoreStartupWithStack (
  #if defined (TDX_GUEST_SUPPORTED)
   if (CcProbe () == CcGuestTypeIntelTdx) {
     //
+    // From the security perspective all the external input should be measured before
+    // it is consumed. TdHob and Configuration FV (Cfv) image are passed from VMM
+    // and should be measured here.
+    //
+    if (EFI_ERROR (TdxHelperMeasureTdHob ())) {
+      CpuDeadLoop ();
+    }
+
+    if (EFI_ERROR (TdxHelperMeasureCfvImage ())) {
+      CpuDeadLoop ();
+    }
+
+    //
     // For Td guests, the memory map info is in TdHobLib. It should be processed
     // first so that the memory is accepted. Otherwise access to the unaccepted
     // memory will trigger tripple fault.
     //
-    if (ProcessTdxHobList () != EFI_SUCCESS) {
+    if (TdxHelperProcessTdHob () != EFI_SUCCESS) {
       CpuDeadLoop ();
     }
   }
