@@ -303,7 +303,7 @@ typedef struct {
 
 //
 // Multiple APIC Description Table APIC structure types
-// All other values between 0x10 and 0x7F are reserved and
+// All other values between 0x18 and 0x7F are reserved and
 // will be ignored by OSPM. 0x80 ~ 0xFF are reserved for OEM.
 //
 #define EFI_ACPI_6_5_PROCESSOR_LOCAL_APIC           0x00
@@ -323,6 +323,13 @@ typedef struct {
 #define EFI_ACPI_6_5_GICR                           0x0E
 #define EFI_ACPI_6_5_GIC_ITS                        0x0F
 #define EFI_ACPI_6_5_MULTIPROCESSOR_WAKEUP          0x10
+#define EFI_ACPI_6_5_CORE_PIC                       0x11
+#define EFI_ACPI_6_5_LIO_PIC                        0x12
+#define EFI_ACPI_6_5_HT_PIC                         0x13
+#define EFI_ACPI_6_5_EIO_PIC                        0x14
+#define EFI_ACPI_6_5_MSI_PIC                        0x15
+#define EFI_ACPI_6_5_BIO_PIC                        0x16
+#define EFI_ACPI_6_5_LPC_PIC                        0x17
 
 //
 // APIC Structure Definitions
@@ -616,6 +623,92 @@ typedef struct {
 
 #define EFI_ACPI_6_5_MULTIPROCESSOR_WAKEUP_MAILBOX_COMMAND_NOOP    0x0000
 #define EFI_ACPI_6_5_MULTIPROCESSOR_WAKEUP_MAILBOX_COMMAND_WAKEUP  0x0001
+
+///
+/// Core Programmable Interrupt Controller
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT8     Version;
+  UINT32    ProcessorId;
+  UINT32    CoreId;
+  UINT32    Flags;
+} EFI_ACPI_6_5_CORE_PIC_STRUCTURE;
+
+///
+/// Legacy I/O Programmable Interrupt Controller
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT8     Version;
+  UINT64    Address;
+  UINT16    Size;
+  UINT8     Cascade[2];
+  UINT32    CascadeMap[2];
+} EFI_ACPI_6_5_LIO_PIC_STRUCTURE;
+
+///
+/// HyperTransport Programmable Interrupt Controller
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT8     Version;
+  UINT64    Address;
+  UINT16    Size;
+  UINT8     Cascade[8];
+} EFI_ACPI_6_5_HT_PIC_STRUCTURE;
+
+///
+/// Extend I/O Programmable Interrupt Controller
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT8     Version;
+  UINT8     Cascade;
+  UINT8     Node;
+  UINT64    NodeMap;
+} EFI_ACPI_6_5_EIO_PIC_STRUCTURE;
+
+///
+/// MSI Programmable Interrupt Controller
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT8     Version;
+  UINT64    MsgAddress;
+  UINT32    Start;
+  UINT32    Count;
+} EFI_ACPI_6_5_MSI_PIC_STRUCTURE;
+
+///
+/// Bridge I/O Programmable Interrupt Controller
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT8     Version;
+  UINT64    Address;
+  UINT16    Size;
+  UINT16    Id;
+  UINT16    GsiBase;
+} EFI_ACPI_6_5_BIO_PIC_STRUCTURE;
+
+///
+/// Low Pin Count Programmable Interrupt Controller
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT8     Version;
+  UINT64    Address;
+  UINT16    Size;
+  UINT8     Cascade;
+} EFI_ACPI_6_5_LPC_PIC_STRUCTURE;
 
 ///
 /// Smart Battery Description Table (SBST)
