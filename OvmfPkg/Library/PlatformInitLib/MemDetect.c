@@ -55,8 +55,15 @@ PlatformQemuUc32BaseInitialization (
     return;
   }
 
+  if (PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) {
+    PlatformInfoHob->Uc32Size = CLOUDHV_MMIO_HOLE_SIZE;
+    PlatformInfoHob->Uc32Base = CLOUDHV_MMIO_HOLE_ADDRESS;
+    return;
+  }
+
+  PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
+
   if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
-    PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
     ASSERT (PcdGet64 (PcdPciExpressBaseAddress) <= MAX_UINT32);
     ASSERT (PcdGet64 (PcdPciExpressBaseAddress) >= PlatformInfoHob->LowMemory);
 
@@ -78,19 +85,12 @@ PlatformQemuUc32BaseInitialization (
     return;
   }
 
-  if (PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) {
-    PlatformInfoHob->Uc32Size = CLOUDHV_MMIO_HOLE_SIZE;
-    PlatformInfoHob->Uc32Base = CLOUDHV_MMIO_HOLE_ADDRESS;
-    return;
-  }
-
   ASSERT (PlatformInfoHob->HostBridgeDevId == INTEL_82441_DEVICE_ID);
   //
   // On i440fx, start with the [LowerMemorySize, 4GB) range. Make sure one
   // variable MTRR suffices by truncating the size to a whole power of two,
   // while keeping the end affixed to 4GB. This will round the base up.
   //
-  PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
   PlatformInfoHob->Uc32Size = GetPowerOfTwo32 ((UINT32)(SIZE_4GB - PlatformInfoHob->LowMemory));
   PlatformInfoHob->Uc32Base = (UINT32)(SIZE_4GB - PlatformInfoHob->Uc32Size);
   //
