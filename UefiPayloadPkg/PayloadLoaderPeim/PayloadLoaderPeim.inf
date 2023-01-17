@@ -37,6 +37,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
   UefiPayloadPkg/UefiPayloadPkg.dec
 
 [LibraryClasses]
@@ -51,6 +52,10 @@
 
 [Ppis]
   gEfiPeiLoadFilePpiGuid                 ## PRODUCES
+
+[Pcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister
 
 [Guids]
   gUniversalPayloadExtraDataGuid         ## PRODUCES
