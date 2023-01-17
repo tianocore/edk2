@@ -128,7 +128,6 @@ PlatformMemMapInitialization (
 {
   UINT64  PciIoBase;
   UINT64  PciIoSize;
-  UINT32  TopOfLowRam;
   UINT64  PciExBarBase;
   UINT32  PciBase;
   UINT32  PciSize;
@@ -150,7 +149,7 @@ PlatformMemMapInitialization (
     return;
   }
 
-  TopOfLowRam  = PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
+  PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
   PciExBarBase = 0;
   if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     //
@@ -158,11 +157,11 @@ PlatformMemMapInitialization (
     // the base of the 32-bit PCI host aperture.
     //
     PciExBarBase = PcdGet64 (PcdPciExpressBaseAddress);
-    ASSERT (TopOfLowRam <= PciExBarBase);
+    ASSERT (PlatformInfoHob->LowMemory <= PciExBarBase);
     ASSERT (PciExBarBase <= MAX_UINT32 - SIZE_256MB);
     PciBase = (UINT32)(PciExBarBase + SIZE_256MB);
   } else {
-    ASSERT (TopOfLowRam <= PlatformInfoHob->Uc32Base);
+    ASSERT (PlatformInfoHob->LowMemory <= PlatformInfoHob->Uc32Base);
     PciBase = PlatformInfoHob->Uc32Base;
   }
 

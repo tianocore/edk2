@@ -42,7 +42,8 @@ ConstructSecHobList (
 
   ZeroMem (&PlatformInfoHob, sizeof (PlatformInfoHob));
   PlatformInfoHob.HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
-  LowMemorySize                   = PlatformGetSystemMemorySizeBelow4gb (&PlatformInfoHob);
+  PlatformGetSystemMemorySizeBelow4gb (&PlatformInfoHob);
+  LowMemorySize = PlatformInfoHob.LowMemory;
   ASSERT (LowMemorySize != 0);
   LowMemoryStart = FixedPcdGet32 (PcdOvmfDxeMemFvBase) + FixedPcdGet32 (PcdOvmfDxeMemFvSize);
   LowMemorySize -= LowMemoryStart;
