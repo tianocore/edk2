@@ -29,6 +29,7 @@ VOID                    *mReservedApLoopFunc         = NULL;
 UINTN                   mReservedTopOfApStack;
 volatile UINT32         mNumberToFinish = 0;
 RELOCATE_AP_LOOP_ENTRY  mReservedApLoop;
+UINTN                   mApPageTable;
 
 //
 // Begin wakeup buffer allocation below 0x88000
@@ -379,10 +380,10 @@ RelocateApLoop (
   IN OUT VOID  *Buffer
   )
 {
-  CPU_MP_DATA                 *CpuMpData;
-  BOOLEAN                     MwaitSupport;
-  UINTN                       ProcessorNumber;
-  UINTN                       StackStart;
+  CPU_MP_DATA  *CpuMpData;
+  BOOLEAN      MwaitSupport;
+  UINTN        ProcessorNumber;
+  UINTN        StackStart;
 
   MpInitLibWhoAmI (&ProcessorNumber);
   CpuMpData    = GetCpuMpData ();
@@ -404,12 +405,9 @@ RelocateApLoop (
     mReservedApLoop.GenericEntry (
                       MwaitSupport,
                       CpuMpData->ApTargetCState,
-                      CpuMpData->PmCodeSegment,
                       StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
                       (UINTN)&mNumberToFinish,
-                      CpuMpData->Pm16CodeSegment,
-                      CpuMpData->SevEsAPBuffer,
-                      CpuMpData->WakeupBuffer
+                      mApPageTable
                       );
   }
 
@@ -542,12 +540,14 @@ InitMpGlobalData (
     //
     // 64-bit AMD Processor
     //
+    Address        = BASE_4GB - 1;
     ApLoopFuncData = AddressMap->RelocateApLoopFuncAddressAmd64;
     ApLoopFuncSize = AddressMap->RelocateApLoopFuncSizeAmd64;
   } else {
     //
     // Intel Processor (32-bit or 64-bit), or 32-bit AMD Processor
     //
+    Address        = MAX_ADDRESS;
     ApLoopFuncData = AddressMap->RelocateApLoopFuncAddress;
     ApLoopFuncSize = AddressMap->RelocateApLoopFuncSize;
   }
@@ -566,7 +566,7 @@ InitMpGlobalData (
   // | Stack * N  |
   // +------------+ (low address)
   //
-  Address = BASE_4GB - 1;
+
   STATIC_ASSERT ((AP_SAFE_STACK_SIZE & (CPU_STACK_ALIGNMENT - 1)) == 0, "AP_SAFE_STACK_SIZE is not aligned with CPU_STACK_ALIGNMENT");
   AllocSize = EFI_PAGES_TO_SIZE (
                 EFI_SIZE_TO_PAGES (
@@ -603,6 +603,16 @@ InitMpGlobalData (
   ASSERT ((mReservedTopOfApStack & (UINTN)(CPU_STACK_ALIGNMENT - 1)) == 0);
   mReservedApLoop.Data = (VOID *)mReservedTopOfApStack;
   CopyMem (mReservedApLoop.Data, ApLoopFuncData, ApLoopFuncSize);
+
+  if (!StandardSignatureIsAuthenticAMD () && (sizeof (UINTN) == sizeof (UINT64))) {
+    //
+    // 64-bit Intel Processor
+    //
+    mApPageTable = CreatePageTable (
+                     (UINTN)Address,
+                     AllocSize
+                     );
+  }
 
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
