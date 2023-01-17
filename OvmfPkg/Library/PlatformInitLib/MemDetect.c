@@ -251,6 +251,84 @@ PlatformScanOrAdd64BitE820Ram (
   return EFI_SUCCESS;
 }
 
+typedef VOID (*E820_SCAN_CALLBACK) (
+  EFI_E820_ENTRY64       *E820Entry,
+  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+/**
+  Store first address not used by e820 RAM entries in
+  PlatformInfoHob->FirstNonAddress
+**/
+STATIC
+VOID
+PlatformGetFirstNonAddressCB (
+  IN     EFI_E820_ENTRY64       *E820Entry,
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  UINT64  Candidate;
+
+  if (E820Entry->Type != EfiAcpiAddressRangeMemory) {
+    return;
+  }
+
+  Candidate = E820Entry->BaseAddr + E820Entry->Length;
+  if (PlatformInfoHob->FirstNonAddress < Candidate) {
+    DEBUG ((DEBUG_INFO, "%a: FirstNonAddress=0x%Lx\n", __FUNCTION__, Candidate));
+    PlatformInfoHob->FirstNonAddress = Candidate;
+  }
+}
+
+/**
+  Iterate over the entries in QEMU's fw_cfg E820 RAM map, call the
+  passed callback for each entry.
+
+  @param[in] Callback              The callback function to be called.
+
+  @param[in out]  PlatformInfoHob  PlatformInfo struct which is passed
+                                   through to the callback.
+
+  @retval EFI_SUCCESS              The fw_cfg E820 RAM map was found and processed.
+
+  @retval EFI_PROTOCOL_ERROR       The RAM map was found, but its size wasn't a
+                                   whole multiple of sizeof(EFI_E820_ENTRY64). No
+                                   RAM entry was processed.
+
+  @return                          Error codes from QemuFwCfgFindFile(). No RAM
+                                   entry was processed.
+**/
+STATIC
+EFI_STATUS
+PlatformScanE820 (
+  IN      E820_SCAN_CALLBACK     Callback,
+  IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  EFI_STATUS            Status;
+  FIRMWARE_CONFIG_ITEM  FwCfgItem;
+  UINTN                 FwCfgSize;
+  EFI_E820_ENTRY64      E820Entry;
+  UINTN                 Processed;
+
+  Status = QemuFwCfgFindFile ("etc/e820", &FwCfgItem, &FwCfgSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (FwCfgSize % sizeof E820Entry != 0) {
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  QemuFwCfgSelectItem (FwCfgItem);
+  for (Processed = 0; Processed < FwCfgSize; Processed += sizeof E820Entry) {
+    QemuFwCfgReadBytes (sizeof E820Entry, &E820Entry);
+    Callback (&E820Entry, PlatformInfoHob);
+  }
+
+  return EFI_SUCCESS;
+}
+
 /**
   Returns PVH memmap
 
@@ -384,22 +462,16 @@ PlatformGetSystemMemorySizeAbove4gb (
   Return the highest address that DXE could possibly use, plus one.
 **/
 STATIC
-UINT64
+VOID
 PlatformGetFirstNonAddress (
   IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  UINT64                FirstNonAddress;
   UINT32                FwCfgPciMmio64Mb;
   EFI_STATUS            Status;
   FIRMWARE_CONFIG_ITEM  FwCfgItem;
   UINTN                 FwCfgSize;
   UINT64                HotPlugMemoryEnd;
-
-  //
-  // set FirstNonAddress to suppress incorrect compiler/analyzer warnings
-  //
-  FirstNonAddress = 0;
 
   //
   // If QEMU presents an E820 map, then get the highest exclusive >=4GB RAM
@@ -408,9 +480,10 @@ PlatformGetFirstNonAddress (
   // Otherwise, get the flat size of the memory above 4GB from the CMOS (which
   // can only express a size smaller than 1TB), and add it to 4GB.
   //
-  Status = PlatformScanOrAdd64BitE820Ram (FALSE, NULL, &FirstNonAddress);
+  PlatformInfoHob->FirstNonAddress = BASE_4GB;
+  Status                           = PlatformScanE820 (PlatformGetFirstNonAddressCB, PlatformInfoHob);
   if (EFI_ERROR (Status)) {
-    FirstNonAddress = BASE_4GB + PlatformGetSystemMemorySizeAbove4gb ();
+    PlatformInfoHob->FirstNonAddress = BASE_4GB + PlatformGetSystemMemorySizeAbove4gb ();
   }
 
   //
@@ -420,7 +493,7 @@ PlatformGetFirstNonAddress (
   //
  #ifdef MDE_CPU_IA32
   if (!FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
-    return FirstNonAddress;
+    return;
   }
 
  #endif
@@ -473,7 +546,7 @@ PlatformGetFirstNonAddress (
     // determines the highest address plus one. The memory hotplug area (see
     // below) plays no role for the firmware in this case.
     //
-    return FirstNonAddress;
+    return;
   }
 
   //
@@ -497,15 +570,15 @@ PlatformGetFirstNonAddress (
       HotPlugMemoryEnd
       ));
 
-    ASSERT (HotPlugMemoryEnd >= FirstNonAddress);
-    FirstNonAddress = HotPlugMemoryEnd;
+    ASSERT (HotPlugMemoryEnd >= PlatformInfoHob->FirstNonAddress);
+    PlatformInfoHob->FirstNonAddress = HotPlugMemoryEnd;
   }
 
   //
   // SeaBIOS aligns both boundaries of the 64-bit PCI host aperture to 1GB, so
   // that the host can map it with 1GB hugepages. Follow suit.
   //
-  PlatformInfoHob->PcdPciMmio64Base = ALIGN_VALUE (FirstNonAddress, (UINT64)SIZE_1GB);
+  PlatformInfoHob->PcdPciMmio64Base = ALIGN_VALUE (PlatformInfoHob->FirstNonAddress, (UINT64)SIZE_1GB);
   PlatformInfoHob->PcdPciMmio64Size = ALIGN_VALUE (PlatformInfoHob->PcdPciMmio64Size, (UINT64)SIZE_1GB);
 
   //
@@ -519,8 +592,8 @@ PlatformGetFirstNonAddress (
   //
   // The useful address space ends with the 64-bit PCI host aperture.
   //
-  FirstNonAddress = PlatformInfoHob->PcdPciMmio64Base + PlatformInfoHob->PcdPciMmio64Size;
-  return FirstNonAddress;
+  PlatformInfoHob->FirstNonAddress = PlatformInfoHob->PcdPciMmio64Base + PlatformInfoHob->PcdPciMmio64Size;
+  return;
 }
 
 /*
@@ -781,7 +854,6 @@ PlatformAddressWidthInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  UINT64      FirstNonAddress;
   UINT8       PhysMemAddressWidth;
   EFI_STATUS  Status;
 
@@ -794,7 +866,7 @@ PlatformAddressWidthInitialization (
   // First scan host-provided hardware information to assess if the address
   // space is already known. If so, guest must use those values.
   //
-  Status = PlatformScanHostProvided64BitPciMmioEnd (&FirstNonAddress);
+  Status = PlatformScanHostProvided64BitPciMmioEnd (&PlatformInfoHob->FirstNonAddress);
 
   if (EFI_ERROR (Status)) {
     //
@@ -806,13 +878,12 @@ PlatformAddressWidthInitialization (
     // The DXL IPL keys off of the physical address bits advertized in the CPU
     // HOB. To conserve memory, we calculate the minimum address width here.
     //
-    FirstNonAddress = PlatformGetFirstNonAddress (PlatformInfoHob);
+    PlatformGetFirstNonAddress (PlatformInfoHob);
   }
 
   PlatformAddressWidthFromCpuid (PlatformInfoHob, TRUE);
   if (PlatformInfoHob->PhysMemAddressWidth != 0) {
     // physical address width is known
-    PlatformInfoHob->FirstNonAddress = FirstNonAddress;
     PlatformDynamicMmioWindow (PlatformInfoHob);
     return;
   }
@@ -823,13 +894,13 @@ PlatformAddressWidthInitialization (
   //   -> try be conservstibe to stay below the guaranteed minimum of
   //      36 phys bits (aka 64 GB).
   //
-  PhysMemAddressWidth = (UINT8)HighBitSet64 (FirstNonAddress);
+  PhysMemAddressWidth = (UINT8)HighBitSet64 (PlatformInfoHob->FirstNonAddress);
 
   //
   // If FirstNonAddress is not an integral power of two, then we need an
   // additional bit.
   //
-  if ((FirstNonAddress & (FirstNonAddress - 1)) != 0) {
+  if ((PlatformInfoHob->FirstNonAddress & (PlatformInfoHob->FirstNonAddress - 1)) != 0) {
     ++PhysMemAddressWidth;
   }
 
@@ -857,7 +928,6 @@ PlatformAddressWidthInitialization (
   ASSERT (PhysMemAddressWidth <= 48);
  #endif
 
-  PlatformInfoHob->FirstNonAddress     = FirstNonAddress;
   PlatformInfoHob->PhysMemAddressWidth = PhysMemAddressWidth;
 }
 
