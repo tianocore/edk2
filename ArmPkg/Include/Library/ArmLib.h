@@ -108,14 +108,16 @@ typedef enum {
 
 #define ARM_CORE_MASK     ARM_CORE_AFF0
 #define ARM_CLUSTER_MASK  ARM_CORE_AFF1
-#define GET_CORE_ID(MpId)            ((MpId) & ARM_CORE_MASK)
-#define GET_CLUSTER_ID(MpId)         (((MpId) & ARM_CLUSTER_MASK) >> 8)
-#define GET_MPID(ClusterId, CoreId)  (((ClusterId) << 8) | (CoreId))
-#define GET_MPIDR_AFF0(MpId)         ((MpId) & ARM_CORE_AFF0)
-#define GET_MPIDR_AFF1(MpId)         (((MpId) & ARM_CORE_AFF1) >> 8)
-#define GET_MPIDR_AFF2(MpId)         (((MpId) & ARM_CORE_AFF2) >> 16)
-#define GET_MPIDR_AFF3(MpId)         (((MpId) & ARM_CORE_AFF3) >> 32)
+#define GET_CORE_ID(MpId)              ((MpId) & ARM_CORE_MASK)
+#define GET_CLUSTER_ID(MpId)           (((MpId) & ARM_CLUSTER_MASK) >> 8)
+#define GET_MPID(ClusterId, CoreId)    (((ClusterId) << 8) | (CoreId))
+#define GET_MPIDR_AFF0(MpId)           ((MpId) & ARM_CORE_AFF0)
+#define GET_MPIDR_AFF1(MpId)           (((MpId) & ARM_CORE_AFF1) >> 8)
+#define GET_MPIDR_AFF2(MpId)           (((MpId) & ARM_CORE_AFF2) >> 16)
+#define GET_MPIDR_AFF3(MpId)           (((MpId) & ARM_CORE_AFF3) >> 32)
+#define GET_MPIDR_AFFINITY_BITS(MpId)  ((MpId) & 0xFF00FFFFFF)
 #define PRIMARY_CORE_ID  (PcdGet32(PcdArmPrimaryCore) & ARM_CORE_MASK)
+#define MPIDR_MT_BIT     BIT24
 
 /** Reads the CCSIDR register for the specified cache.
 
