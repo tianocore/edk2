@@ -10,6 +10,7 @@
 
 #include <IndustryStandard/Acpi.h>            // EFI_ACPI_DESCRIPTION_HEADER
 #include <IndustryStandard/QemuLoader.h>      // QEMU_LOADER_FNAME_SIZE
+#include <IndustryStandard/UefiTcgPlatform.h>
 #include <Library/BaseLib.h>                  // AsciiStrCmp()
 #include <Library/BaseMemoryLib.h>            // CopyMem()
 #include <Library/DebugLib.h>                 // DEBUG()
@@ -18,6 +19,7 @@
 #include <Library/QemuFwCfgLib.h>             // QemuFwCfgFindFile()
 #include <Library/QemuFwCfgS3Lib.h>           // QemuFwCfgS3Enabled()
 #include <Library/UefiBootServicesTableLib.h> // gBS
+#include <Library/TpmMeasurementLib.h>
 
 #include "AcpiPlatform.h"
 
@@ -1029,6 +1031,30 @@ Process2ndPassCmdAddPointer (
       INSTALLED_TABLES_MAX
       ));
     Status = EFI_OUT_OF_RESOURCES;
+    goto RollbackSeenPointer;
+  }
+
+  //
+  // Measure the ACPI table downloaded from QEMU before it is installed.
+  //
+  Status = TpmMeasureAndLogData (
+             1,
+             EV_PLATFORM_CONFIG_FLAGS,
+             EV_POSTCODE_INFO_ACPI_DATA,
+             ACPI_DATA_LEN,
+             (VOID *)(UINTN)PointerValue,
+             TableSize
+             );
+  //
+  // TPM & Confidential Computing measurement protocol may not be installed.
+  // So EFI_NOT_FOUND is ignored.
+  //
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Measure ACPI table failed! Status = %r\n",
+      Status
+      ));
     goto RollbackSeenPointer;
   }
 
