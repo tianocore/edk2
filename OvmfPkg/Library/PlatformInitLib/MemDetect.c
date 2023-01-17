@@ -217,6 +217,51 @@ PlatformAddHobCB (
 }
 
 /**
+  Check whenever the 64bit PCI MMIO window overlaps with a reservation
+  from qemu.  If so move down the MMIO window to resolve the conflict.
+
+  This happens on (virtual) AMD machines with 1TB address space,
+  because the AMD IOMMU uses an address window just below 1TB.
+**/
+STATIC
+VOID
+PlatformReservationConflictCB (
+  IN     EFI_E820_ENTRY64       *E820Entry,
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  UINT64  IntersectionBase;
+  UINT64  IntersectionEnd;
+  UINT64  NewBase;
+
+  IntersectionBase = MAX (
+                       E820Entry->BaseAddr,
+                       PlatformInfoHob->PcdPciMmio64Base
+                       );
+  IntersectionEnd = MIN (
+                      E820Entry->BaseAddr + E820Entry->Length,
+                      PlatformInfoHob->PcdPciMmio64Base +
+                      PlatformInfoHob->PcdPciMmio64Size
+                      );
+
+  if (IntersectionBase >= IntersectionEnd) {
+    return;  // no overlap
+  }
+
+  NewBase = E820Entry->BaseAddr - PlatformInfoHob->PcdPciMmio64Size;
+  NewBase = NewBase & ~(PlatformInfoHob->PcdPciMmio64Size - 1);
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: move mmio: 0x%Lx => %Lx\n",
+    __FUNCTION__,
+    PlatformInfoHob->PcdPciMmio64Base,
+    NewBase
+    ));
+  PlatformInfoHob->PcdPciMmio64Base = NewBase;
+}
+
+/**
   Iterate over the entries in QEMU's fw_cfg E820 RAM map, call the
   passed callback for each entry.
 
@@ -653,6 +698,7 @@ PlatformDynamicMmioWindow (
     DEBUG ((DEBUG_INFO, "%a:   MMIO Space 0x%Lx (%Ld GB)\n", __func__, MmioSpace, RShiftU64 (MmioSpace, 30)));
     PlatformInfoHob->PcdPciMmio64Size = MmioSpace;
     PlatformInfoHob->PcdPciMmio64Base = AddrSpace - MmioSpace;
+    PlatformScanE820 (PlatformReservationConflictCB, PlatformInfoHob);
   } else {
     DEBUG ((DEBUG_INFO, "%a: using classic mmio window\n", __func__));
   }
