@@ -98,6 +98,10 @@
   #
   SerializeVariablesLib|Include/Library/SerializeVariablesLib.h
 
+  ##  @libraryclass  TdxHelper
+  #
+  TdxHelperLib|Include/Library/TdxHelperLib.h
+
   ##  @libraryclass  Declares utility functions for virtio device drivers.
   VirtioLib|Include/Library/VirtioLib.h
 
