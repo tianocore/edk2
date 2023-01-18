@@ -115,6 +115,31 @@ jobs:
             Run.Flags: $(run_flags)
             Run: $(should_run)
 
+          KVMTOOL_AARCH64_DEBUG:
+            Build.File: "$(package)/PlatformCI/KvmToolBuild.py"
+            Build.Arch: "AARCH64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run: false
+          KVMTOOL_AARCH64_RELEASE:
+            Build.File: "$(package)/PlatformCI/KvmToolBuild.py"
+            Build.Arch: "AARCH64"
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run: false
+          KVMTOOL_ARM_DEBUG:
+            Build.File: "$(package)/PlatformCI/KvmToolBuild.py"
+            Build.Arch: "ARM"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run: false
+          KVMTOOL_ARM_RELEASE:
+            Build.File: "$(package)/PlatformCI/KvmToolBuild.py"
+            Build.Arch: "ARM"
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run: false
+
     workspace:
       clean: all
 
