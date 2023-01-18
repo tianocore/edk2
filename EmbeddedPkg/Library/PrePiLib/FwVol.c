@@ -459,9 +459,11 @@ CheckNextSection:
 
 /**
   This service enables discovery sections of a given type within a valid FFS file.
+  Caller also can provide a SectionCheckHook to do additional checking.
 
-  @param  SearchType            The value of the section type to find.
-  @param  FfsFileHeader         A pointer to the file header that contains the set of sections to
+  @param  SectionType           The value of the section type to find.
+  @param  SectionCheckHook      A hook which can check if the section is the target one.
+  @param  FileHandle            A pointer to the file header that contains the set of sections to
                                 be searched.
   @param  SectionData           A pointer to the discovered section, if successful.
 
@@ -471,7 +473,7 @@ CheckNextSection:
 **/
 EFI_STATUS
 EFIAPI
-FfsFindSectionData (
+FfsFindSectionDataWithHook (
   IN EFI_SECTION_TYPE        SectionType,
   IN FFS_CHECK_SECTION_HOOK  SectionCheckHook,
   IN EFI_PEI_FILE_HANDLE     FileHandle,
@@ -817,7 +819,7 @@ FfsProcessFvFile (
   //
   // Find FvImage in FvFile
   //
-  Status = FfsFindSectionData (EFI_SECTION_FIRMWARE_VOLUME_IMAGE, NULL, FvFileHandle, (VOID **)&FvImageHandle);
+  Status = FfsFindSectionDataWithHook (EFI_SECTION_FIRMWARE_VOLUME_IMAGE, NULL, FvFileHandle, (VOID **)&FvImageHandle);
   if (EFI_ERROR (Status)) {
     return Status;
   }

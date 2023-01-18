@@ -209,7 +209,7 @@ FindDxeNonCc (
   //
   // Find FvImage in FvFile
   //
-  Status = FfsFindSectionData (EFI_SECTION_FIRMWARE_VOLUME_IMAGE, CheckSectionHookForDxeNonCc, FileHandle, (VOID **)&FvImageHandle);
+  Status = FfsFindSectionDataWithHook (EFI_SECTION_FIRMWARE_VOLUME_IMAGE, CheckSectionHookForDxeNonCc, FileHandle, (VOID **)&FvImageHandle);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -303,7 +303,7 @@ DxeLoadCore (
   //
   // Load the DXE Core from a Firmware Volume.
   //
-  Status = FfsFindSectionData (EFI_SECTION_PE32, NULL, FileHandle, &PeCoffImage);
+  Status = FfsFindSectionDataWithHook (EFI_SECTION_PE32, NULL, FileHandle, &PeCoffImage);
   if (EFI_ERROR (Status)) {
     return Status;
   }
