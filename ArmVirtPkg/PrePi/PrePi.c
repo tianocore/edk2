@@ -155,9 +155,9 @@ RelocatePeCoffImage (
                  );
   ASSERT_EFI_ERROR (Status);
 
-  Status = FfsFindSectionData (EFI_SECTION_PE32, FileHandle, &SectionData);
+  Status = FfsFindSectionData (EFI_SECTION_PE32, NULL, FileHandle, &SectionData);
   if (EFI_ERROR (Status)) {
-    Status = FfsFindSectionData (EFI_SECTION_TE, FileHandle, &SectionData);
+    Status = FfsFindSectionData (EFI_SECTION_TE, NULL, FileHandle, &SectionData);
   }
 
   ASSERT_EFI_ERROR (Status);
