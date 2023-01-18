@@ -838,6 +838,7 @@ PlatformAddressWidthInitialization (
 {
   UINT8       PhysMemAddressWidth;
   EFI_STATUS  Status;
+  BOOLEAN     QemuQuirk;
 
   if (PlatformInfoHob->HostBridgeDevId == 0xffff /* microvm */) {
     PlatformAddressWidthFromCpuid (PlatformInfoHob, FALSE);
@@ -863,7 +864,13 @@ PlatformAddressWidthInitialization (
     PlatformGetFirstNonAddress (PlatformInfoHob);
   }
 
-  PlatformAddressWidthFromCpuid (PlatformInfoHob, TRUE);
+  if (PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) {
+    QemuQuirk = FALSE;
+  } else {
+    QemuQuirk = TRUE;
+  }
+
+  PlatformAddressWidthFromCpuid (PlatformInfoHob, QemuQuirk);
   if (PlatformInfoHob->PhysMemAddressWidth != 0) {
     // physical address width is known
     PlatformDynamicMmioWindow (PlatformInfoHob);
