@@ -60,6 +60,9 @@ PrePiMain (
   //
   InvalidateDataCacheRange ((VOID *)(UINTN)PcdGet64 (PcdFdBaseAddress), PcdGet32 (PcdFdSize));
 
+  // SEC phase needs to run library constructors by hand.
+  ProcessLibraryConstructorList ();
+
   // Initialize MMU and Memory HOBs (Resource Descriptor HOBs)
   Status = MemoryPeim (UefiMemoryBase, FixedPcdGet32 (PcdSystemMemoryUefiRegionSize));
   ASSERT_EFI_ERROR (Status);
@@ -92,9 +95,6 @@ PrePiMain (
 
   // Now, the HOB List has been initialized, we can register performance information
   PERF_START (NULL, "PEI", NULL, StartTimeStamp);
-
-  // SEC phase needs to run library constructors by hand.
-  ProcessLibraryConstructorList ();
 
   // Assume the FV that contains the SEC (our code) also contains a compressed FV.
   Status = DecompressFirstFv ();
