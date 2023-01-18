@@ -213,7 +213,7 @@ CoreInternalAllocatePool (
   // If it's not a valid type, fail it
   //
   if (((PoolType >= EfiMaxMemoryType) && (PoolType < MEMORY_TYPE_OEM_RESERVED_MIN)) ||
-      (PoolType == EfiConventionalMemory) || (PoolType == EfiPersistentMemory))
+      (PoolType == EfiConventionalMemory) || (PoolType == EfiPersistentMemory) || (PoolType == EfiUnacceptedMemoryType))
   {
     return EFI_INVALID_PARAMETER;
   }
