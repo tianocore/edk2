@@ -405,6 +405,61 @@ PlatformMiscInitialization (
 }
 
 /**
+  Check for various QEMU bugs concerning CPU numbers.
+
+  Compensate for those bugs if various conditions are satisfied, by updating a
+  suitable subset of the input-output parameters. The function may not return
+  (it may hang deliberately), even in RELEASE builds, if the QEMU bug is
+  impossible to cover up.
+
+  @param[in,out] BootCpuCount  On input, the boot CPU count reported by QEMU via
+                               fw_cfg (QemuFwCfgItemSmpCpuCount). The caller is
+                               responsible for ensuring (BootCpuCount > 0); that
+                               is, if QEMU does not provide the boot CPU count
+                               via fw_cfg *at all*, then this function must not
+                               be called.
+
+  @param[in,out] Present       On input, the number of present-at-boot CPUs, as
+                               reported by QEMU through the modern CPU hotplug
+                               register block.
+
+  @param[in,out] Possible      On input, the number of possible CPUs, as
+                               reported by QEMU through the modern CPU hotplug
+                               register block.
+**/
+STATIC
+VOID
+PlatformCpuCountBugCheck (
+  IN OUT UINT16  *BootCpuCount,
+  IN OUT UINT32  *Present,
+  IN OUT UINT32  *Possible
+  )
+{
+  ASSERT (*BootCpuCount > 0);
+
+  //
+  // Sanity check: fw_cfg and the modern CPU hotplug interface should expose the
+  // same boot CPU count.
+  //
+  if (*BootCpuCount != *Present) {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: QEMU v2.7 reset bug: BootCpuCount=%d Present=%u\n",
+      __FUNCTION__,
+      *BootCpuCount,
+      *Present
+      ));
+    //
+    // The handling of QemuFwCfgItemSmpCpuCount, across CPU hotplug plus
+    // platform reset (including S3), was corrected in QEMU commit e3cadac073a9
+    // ("pc: fix FW_CFG_NB_CPUS to account for -device added CPUs", 2016-11-16),
+    // part of release v2.8.0.
+    //
+    *BootCpuCount = (UINT16)*Present;
+  }
+}
+
+/**
   Fetch the boot CPU count and the possible CPU count from QEMU, and expose
   them to UefiCpuPkg modules.
 **/
@@ -518,8 +573,8 @@ PlatformMaxCpuCountInitialization (
         UINT8  CpuStatus;
 
         //
-        // Read the status of the currently selected CPU. This will help with a
-        // sanity check against "BootCpuCount".
+        // Read the status of the currently selected CPU. This will help with
+        // various CPU count sanity checks.
         //
         CpuStatus = IoRead8 (CpuHpBase + QEMU_CPUHP_R_CPU_STAT);
         if ((CpuStatus & QEMU_CPUHP_STAT_ENABLED) != 0) {
@@ -540,27 +595,7 @@ PlatformMaxCpuCountInitialization (
         ASSERT (Selected == Possible || Selected == 0);
       } while (Selected > 0);
 
-      //
-      // Sanity check: fw_cfg and the modern CPU hotplug interface should
-      // return the same boot CPU count.
-      //
-      if (BootCpuCount != Present) {
-        DEBUG ((
-          DEBUG_WARN,
-          "%a: QEMU v2.7 reset bug: BootCpuCount=%d "
-          "Present=%u\n",
-          __FUNCTION__,
-          BootCpuCount,
-          Present
-          ));
-        //
-        // The handling of QemuFwCfgItemSmpCpuCount, across CPU hotplug plus
-        // platform reset (including S3), was corrected in QEMU commit
-        // e3cadac073a9 ("pc: fix FW_CFG_NB_CPUS to account for -device added
-        // CPUs", 2016-11-16), part of release v2.8.0.
-        //
-        BootCpuCount = (UINT16)Present;
-      }
+      PlatformCpuCountBugCheck (&BootCpuCount, &Present, &Possible);
 
       MaxCpuCount = Possible;
     }
