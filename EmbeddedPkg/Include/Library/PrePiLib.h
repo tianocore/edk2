@@ -86,6 +86,26 @@ FfsFindSectionDataWithHook (
   );
 
 /**
+  This service enables discovery sections of a given type within a valid FFS file.
+
+  @param  SectionType           The value of the section type to find.
+  @param  FileHandle            A pointer to the file header that contains the set of sections to
+                                be searched.
+  @param  SectionData           A pointer to the discovered section, if successful.
+
+  @retval EFI_SUCCESS           The section was found.
+  @retval EFI_NOT_FOUND         The section was not found.
+
+**/
+EFI_STATUS
+EFIAPI
+FfsFindSectionData (
+  IN EFI_SECTION_TYPE     SectionType,
+  IN EFI_PEI_FILE_HANDLE  FileHandle,
+  OUT VOID                **SectionData
+  );
+
+/**
   Find a file in the volume by name
 
   @param FileName       A pointer to the name of the file to
