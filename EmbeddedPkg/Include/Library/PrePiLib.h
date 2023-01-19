@@ -78,7 +78,7 @@ EFI_STATUS
 **/
 EFI_STATUS
 EFIAPI
-FfsFindSectionData (
+FfsFindSectionDataWithHook (
   IN EFI_SECTION_TYPE        SectionType,
   IN FFS_CHECK_SECTION_HOOK  SectionCheckHook,
   IN EFI_PEI_FILE_HANDLE     FileHandle,

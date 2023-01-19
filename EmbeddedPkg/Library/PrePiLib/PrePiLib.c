@@ -131,7 +131,7 @@ LoadDxeCoreFromFfsFile (
   VOID                  *Hob;
   EFI_FV_FILE_INFO      FvFileInfo;
 
-  Status = FfsFindSectionData (EFI_SECTION_PE32, NULL, FileHandle, &PeCoffImage);
+  Status = FfsFindSectionDataWithHook (EFI_SECTION_PE32, NULL, FileHandle, &PeCoffImage);
   if (EFI_ERROR (Status)) {
     return Status;
   }
