@@ -36,6 +36,9 @@
 
 #include <Library/PlatformInitLib.h>
 
+#define CPUHP_BUGCHECK_OVERRIDE_FWCFG_FILE \
+  "opt/org.tianocore/X-Cpuhp-Bugcheck-Override"
+
 VOID
 EFIAPI
 PlatformAddIoMemoryBaseSizeHob (
@@ -438,6 +441,87 @@ PlatformCpuCountBugCheck (
   ASSERT (*BootCpuCount > 0);
 
   //
+  // Sanity check: we need at least 1 present CPU (CPU#0 is always present).
+  //
+  // The legacy-to-modern switching of the CPU hotplug register block got broken
+  // (for TCG) in QEMU v5.1.0. Refer to "IO port write width clamping differs
+  // between TCG and KVM" at
+  // <http://mid.mail-archive.com/aaedee84-d3ed-a4f9-21e7-d221a28d1683@redhat.com>
+  // or at
+  // <https://lists.gnu.org/archive/html/qemu-devel/2023-01/msg00199.html>.
+  //
+  // QEMU received the fix in commit dab30fbef389 ("acpi: cpuhp: fix
+  // guest-visible maximum access size to the legacy reg block", 2023-01-08), to
+  // be included in QEMU v8.0.0.
+  //
+  // If we're affected by this QEMU bug, then we must not continue: it confuses
+  // the multiprocessing in UefiCpuPkg/Library/MpInitLib, and breaks CPU
+  // hot(un)plug with SMI in OvmfPkg/CpuHotplugSmm.
+  //
+  if (*Present == 0) {
+    UINTN                      Idx;
+    STATIC CONST CHAR8 *CONST  Message[] = {
+      "Broken CPU hotplug register block found. Update QEMU to version 8+, or",
+      "to a stable release with commit dab30fbef389 backported. Refer to",
+      "<https://bugzilla.tianocore.org/show_bug.cgi?id=4250>.",
+      "Consequences of the QEMU bug may include, but are not limited to:",
+      "- all firmware logic, dependent on the CPU hotplug register block,",
+      "  being confused, for example, multiprocessing-related logic;",
+      "- guest OS data loss, including filesystem corruption, due to crash or",
+      "  hang during ACPI S3 resume;",
+      "- SMM privilege escalation, by a malicious guest OS or 3rd partty UEFI",
+      "  agent, against the platform firmware.",
+      "These symptoms need not necessarily be limited to the QEMU user",
+      "attempting to hot(un)plug a CPU.",
+      "The firmware will now stop (hang) deliberately, in order to prevent the",
+      "above symptoms.",
+      "You can forcibly override the hang, *at your own risk*, with the",
+      "following *experimental* QEMU command line option:",
+      "  -fw_cfg name=" CPUHP_BUGCHECK_OVERRIDE_FWCFG_FILE ",string=yes",
+      "Please only report such bugs that you can reproduce *without* the",
+      "override.",
+    };
+    RETURN_STATUS              ParseStatus;
+    BOOLEAN                    Override;
+
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Present=%u Possible=%u\n",
+      __FUNCTION__,
+      *Present,
+      *Possible
+      ));
+    for (Idx = 0; Idx < ARRAY_SIZE (Message); ++Idx) {
+      DEBUG ((DEBUG_ERROR, "%a: %a\n", __FUNCTION__, Message[Idx]));
+    }
+
+    ParseStatus = QemuFwCfgParseBool (
+                    CPUHP_BUGCHECK_OVERRIDE_FWCFG_FILE,
+                    &Override
+                    );
+    if (!RETURN_ERROR (ParseStatus) && Override) {
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: \"%a\" active. You've been warned.\n",
+        __FUNCTION__,
+        CPUHP_BUGCHECK_OVERRIDE_FWCFG_FILE
+        ));
+      //
+      // The bug is in QEMU v5.1.0+, where we're not affected by the QEMU v2.7
+      // reset bug, so BootCpuCount from fw_cfg is reliable. Assume a fully
+      // populated topology, like when the modern CPU hotplug interface is
+      // unavailable.
+      //
+      *Present  = *BootCpuCount;
+      *Possible = *BootCpuCount;
+      return;
+    }
+
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+
+  //
   // Sanity check: fw_cfg and the modern CPU hotplug interface should expose the
   // same boot CPU count.
   //
@@ -596,6 +680,9 @@ PlatformMaxCpuCountInitialization (
       } while (Selected > 0);
 
       PlatformCpuCountBugCheck (&BootCpuCount, &Present, &Possible);
+      ASSERT (Present > 0);
+      ASSERT (Present <= Possible);
+      ASSERT (BootCpuCount == Present);
 
       MaxCpuCount = Possible;
     }
