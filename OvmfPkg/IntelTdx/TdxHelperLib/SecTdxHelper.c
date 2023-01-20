@@ -24,6 +24,18 @@
 #include <Library/TdxHelperLib.h>
 
 /**
+  Build the GuidHob for tdx measurements which were done in SEC phase.
+  The measurement values are stored in WorkArea.
+
+  @retval EFI_SUCCESS  The GuidHob is built successfully
+  @retval Others       Other errors as indicated
+**/
+EFI_STATUS
+InternalBuildGuidHobForTdxMeasurement (
+  VOID
+  );
+
+/**
   In Tdx guest, some information need to be passed from host VMM to guest
   firmware. For example, the memory resource, etc. These information are
   prepared by host VMM and put in TdHob which is described in TdxMetadata.
@@ -217,5 +229,9 @@ TdxHelperBuildGuidHobForTdxMeasurement (
   VOID
   )
 {
+ #ifdef TDX_PEI_LESS_BOOT
+  return InternalBuildGuidHobForTdxMeasurement ();
+ #else
   return EFI_UNSUPPORTED;
+ #endif
 }
