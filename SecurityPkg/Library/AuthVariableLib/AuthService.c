@@ -603,7 +603,10 @@ ProcessVarWithPk (
   // Init state of Del. State may change due to secure check
   //
   Del = FALSE;
-  if ((InCustomMode () && UserPhysicalPresent ()) || ((mPlatformMode == SETUP_MODE) && !IsPk)) {
+  if (  (InCustomMode () && UserPhysicalPresent ())
+     || (  (mPlatformMode == SETUP_MODE)
+        && !(FeaturePcdGet (PcdRequireSelfSignedPk) && IsPk)))
+  {
     Payload     = (UINT8 *)Data + AUTHINFO2_SIZE (Data);
     PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
     if (PayloadSize == 0) {
@@ -627,7 +630,9 @@ ProcessVarWithPk (
       return Status;
     }
 
-    if ((mPlatformMode != SETUP_MODE) || IsPk) {
+    if (  (mPlatformMode != SETUP_MODE)
+       || (FeaturePcdGet (PcdRequireSelfSignedPk) && IsPk))
+    {
       Status = VendorKeyIsModified ();
     }
   } else if (mPlatformMode == USER_MODE) {
