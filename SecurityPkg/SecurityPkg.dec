@@ -585,7 +585,7 @@
   #   TRUE  - Require PK to be self-signed.
   #   FALSE - Do not require PK to be self-signed.
   # @Prompt Require PK to be self-signed
-  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|TRUE|BOOLEAN|0x00010027
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|FALSE|BOOLEAN|0x00010027
 
 [UserExtensions.TianoCore."ExtraFiles"]
   SecurityPkgExtra.uni
