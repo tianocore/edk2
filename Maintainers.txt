@@ -117,6 +117,11 @@ M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 R: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
+.devcontainer/
+F: .devcontainer/
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
+R: Chris Fernald <chris.fernald@outlook.com> [cfernald]
+
 .github/
 F: .github/
 M: Sean Brogan <sean.brogan@microsoft.com> [spbrogan]
