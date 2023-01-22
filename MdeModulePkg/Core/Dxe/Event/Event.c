@@ -606,7 +606,7 @@ CoreCheckEvent (
   }
 
   //
-  // If the even looks signalled, get the lock and clear it
+  // If the event looks signalled, get the lock and clear it
   //
 
   if (Event->SignalCount != 0) {
