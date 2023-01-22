@@ -1925,7 +1925,7 @@ VerifyTimeBasedPayload (
   // SignedData.digestAlgorithms shall contain the digest algorithm used when preparing the
   // signature. Only a digest algorithm of SHA-256 is accepted.
   //
-  //    According to PKCS#7 Definition:
+  //    According to PKCS#7 Definition (https://www.rfc-editor.org/rfc/rfc2315):
   //        SignedData ::= SEQUENCE {
   //            version Version,
   //            digestAlgorithms DigestAlgorithmIdentifiers,
@@ -1933,15 +1933,49 @@ VerifyTimeBasedPayload (
   //            .... }
   //    The DigestAlgorithmIdentifiers can be used to determine the hash algorithm
   //    in VARIABLE_AUTHENTICATION_2 descriptor.
-  //    This field has the fixed offset (+13) and be calculated based on two bytes of length encoding.
+  //    This field has the fixed offset (+13) or (+32) based on whether the DER-encoded
+  //    ContentInfo structure is present or not, and can be calculated based on two
+  //    bytes of length encoding.
+  //
+  //    Both condition can be handled in WrapPkcs7Data() in CryptPkcs7VerifyCommon.c.
+  //
+  //    See below examples:
+  //
+  // 1. Without ContentInfo
+  //    30 82 0c da // SEQUENCE (5 element) (3294 BYTES) -- SignedData
+  //       02 01 01 // INTEGER 1 -- Version
+  //       31 0f // SET (1 element) (15 BYTES) -- DigestAlgorithmIdentifiers
+  //          30 0d // SEQUENCE (2 element) (13 BYTES) -- AlgorithmIdentifier
+  //             06 09 // OBJECT-IDENTIFIER (9 BYTES) -- algorithm
+  //                60 86 48 01 65 03 04 02 01 // sha256 [2.16.840.1.101.3.4.2.1]
+  //             05 00 // NULL (0 BYTES) -- parameters
+  //
+  // Example from: https://uefi.org/revocationlistfile
+  //
+  // 2. With ContentInfo
+  //    30 82 05 90 // SEQUENCE (1424 BYTES) -- ContentInfo
+  //       06 09 // OBJECT-IDENTIFIER (9 BYTES) -- ContentType
+  //          2a 86 48 86 f7 0d 01 07 02 // signedData [1.2.840.113549.1.7.2]
+  //       a0 82 05 81 // CONTEXT-SPECIFIC CONSTRUCTED TAG 0 (1409 BYTES) -- content
+  //          30 82 05 7d // SEQUENCE (1405 BYTES) -- SignedData
+  //             02 01 01 // INTEGER 1 -- Version
+  //             31 0f // SET (1 element) (15 BYTES) -- DigestAlgorithmIdentifiers
+  //                30 0d // SEQUENCE (13 BYTES) -- AlgorithmIdentifier
+  //                   06 09 // OBJECT-IDENTIFIER (9 BYTES) -- algorithm
+  //                      60 86 48 01 65 03 04 02 01 // sha256 [2.16.840.1.101.3.4.2.1]
+  //                   05 00 // NULL (0 BYTES) -- parameters
+  //
+  // Example generated with: https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot#Manual_process
   //
   if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
-    if (SigDataSize >= (13 + sizeof (mSha256OidValue))) {
-      if (((*(SigData + 1) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE) ||
-          (CompareMem (SigData + 13, &mSha256OidValue, sizeof (mSha256OidValue)) != 0))
-      {
-        return EFI_SECURITY_VIOLATION;
-      }
+    if (  (  (SigDataSize >= (13 + sizeof (mSha256OidValue)))
+          && (  ((*(SigData + 1) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE)
+             || (CompareMem (SigData + 13, &mSha256OidValue, sizeof (mSha256OidValue)) != 0)))
+       && (  (SigDataSize >= (32 + sizeof (mSha256OidValue)))
+          && (  ((*(SigData + 20) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE)
+             || (CompareMem (SigData + 32, &mSha256OidValue, sizeof (mSha256OidValue)) != 0))))
+    {
+      return EFI_SECURITY_VIOLATION;
     }
   }
 
