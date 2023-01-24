@@ -25,10 +25,11 @@ class CommonPlatform():
     WorkspaceRoot = os.path.realpath(os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
-    DscName = os.path.join("ArmVirtPkg", "ArmVirtQemu.dsc")
+    DscName = os.path.join("ArmVirtPkg", "ArmVirtQemuKernel.dsc")
 
-    # this platform produces a bootable NOR flash image
-    FvQemuArg = " -pflash "
+    # this platform produces an executable image that is invoked using
+    # the Linux/arm64 kernel boot protocol
+    FvQemuArg = " -kernel "
 
 import PlatformBuildLib
 PlatformBuildLib.CommonPlatform = CommonPlatform
