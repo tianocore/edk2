@@ -15,6 +15,7 @@
   .set      TT_MT_MEM, (0x3 << 2) | (0x3 << 8)  // MAIR #3
 
   .set      PAGE_XIP,  TT_TYPE_PAGE  | TT_MT_MEM | TT_AF | TT_RO | TT_NG
+  .set      BLOCK_XIP, TT_TYPE_BLOCK | TT_MT_MEM | TT_AF | TT_RO | TT_NG
   .set      BLOCK_DEV, TT_TYPE_BLOCK | TT_MT_DEV | TT_AF | TT_XN | TT_NG
   .set      BLOCK_MEM, TT_TYPE_BLOCK | TT_MT_MEM | TT_AF | TT_XN | TT_NG
 
@@ -33,7 +34,8 @@ idmap:      /* level 0 */
 
 20:         /* level 2 */
   .quad     3f + TT_TYPE_TABLE            // up to 2 MB of flash
-  .fill     63, 8, 0x0                    // 126 MB of unused flash
+  .quad     BLOCK_XIP | (0x1  << 21)      // another 2 MB of flash
+  .fill     62, 8, 0x0                    // 124 MB of unused flash
   .set      idx, 64
   .rept     448
   .quad     BLOCK_DEV | (idx << 21)       // 896 MB of RW- device mappings
