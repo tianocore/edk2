@@ -226,13 +226,13 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             args += " -cpu cortex-a57"                                          # emulate cpu
         elif(self.env.GetValue("TARGET_ARCH").upper() == "ARM"):
             cmd = "qemu-system-arm"
-            args = "-M virt"
+            args = "-M virt,highmem=off"
             args += " -cpu cortex-a15"                                          # emulate cpu
         else:
             raise NotImplementedError()
 
         # Common Args
-        args += " -pflash " + Built_FV                                     # path to fw
+        args += CommonPlatform.FvQemuArg + Built_FV                         # path to fw
         args += " -m 1024"                                                  # 1gb memory
         # turn off network
         args += " -net none"
