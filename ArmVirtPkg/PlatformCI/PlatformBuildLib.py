@@ -17,21 +17,6 @@ from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
 from edk2toollib.utility_functions import RunCmd
 from edk2toollib.utility_functions import GetHostInfo
 
-# ####################################################################################### #
-#                                Common Configuration                                     #
-# ####################################################################################### #
-
-
-class CommonPlatform():
-    ''' Common settings for this platform.  Define static data here and use
-        for the different parts of stuart
-    '''
-    PackagesSupported = ("ArmVirtPkg",)
-    ArchSupported = ("AARCH64", "ARM")
-    TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
-    Scopes = ('armvirt', 'edk2-build')
-    WorkspaceRoot = os.path.realpath(os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
     # ####################################################################################### #
     #                         Configuration for Update & Setup                                #
@@ -139,7 +124,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
         The tuple should be (<workspace relative path to dsc file>, <input dictionary of dsc key value pairs>)
         '''
-        return (os.path.join("ArmVirtPkg", "ArmVirtQemu.dsc"), {})
+        return (CommonPlatform.DscName, {})
 
 
     # ####################################################################################### #
@@ -163,7 +148,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             "TARGET_ARCH", args.build_arch.upper(), "From CmdLine")
 
         shell_environment.GetBuildVars().SetValue(
-            "ACTIVE_PLATFORM", "ArmVirtPkg/ArmVirtQemu.dsc", "From CmdLine")
+            "ACTIVE_PLATFORM", CommonPlatform.DscName, "From CmdLine")
 
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
