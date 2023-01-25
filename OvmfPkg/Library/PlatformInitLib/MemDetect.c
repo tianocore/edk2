@@ -200,7 +200,7 @@ PlatformAddHobCB (
 
       break;
     case EfiAcpiAddressRangeReserved:
-      BuildResourceDescriptorHob (EFI_RESOURCE_MEMORY_RESERVED, 0, Base, End);
+      BuildResourceDescriptorHob (EFI_RESOURCE_MEMORY_RESERVED, 0, Base, End - Base);
       DEBUG ((DEBUG_INFO, "%a: Reserved [0x%Lx, 0x%Lx)\n", __FUNCTION__, Base, End));
       break;
     default:
