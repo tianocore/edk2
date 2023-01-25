@@ -9,6 +9,8 @@
   @par Reference(s):
   - IO Remapping Table, Platform Design Document, Revision E.d, Feb 2022
     (https://developer.arm.com/documentation/den0049/)
+  - IO Remapping Table, Platform Design Document, Revision E.e, Sept 2022
+      (https://developer.arm.com/documentation/den0049/)
 
   @par Glossary:
   - Ref  : Reference
@@ -24,6 +26,7 @@
 #define EFI_ACPI_IO_REMAPPING_TABLE_REVISION_00  0x0
 #define EFI_ACPI_IO_REMAPPING_TABLE_REVISION_04  0x4   // Deprecated
 #define EFI_ACPI_IO_REMAPPING_TABLE_REVISION_05  0x5
+#define EFI_ACPI_IO_REMAPPING_TABLE_REVISION_06  0x6
 
 #define EFI_ACPI_IORT_TYPE_ITS_GROUP     0x0
 #define EFI_ACPI_IORT_TYPE_NAMED_COMP    0x1
@@ -59,6 +62,7 @@
 #define EFI_ACPI_IORT_SMMUv3_FLAG_COHAC_OVERRIDE    BIT0
 #define EFI_ACPI_IORT_SMMUv3_FLAG_HTTU_OVERRIDE     BIT1
 #define EFI_ACPI_IORT_SMMUv3_FLAG_PROXIMITY_DOMAIN  BIT3
+#define EFI_ACPI_IORT_SMMUv3_FLAG_DEVICEID_VALID    BIT4
 
 #define EFI_ACPI_IORT_SMMUv3_MODEL_GENERIC           0x0
 #define EFI_ACPI_IORT_SMMUv3_MODEL_HISILICON_HI161X  0x1
