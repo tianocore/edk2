@@ -2024,8 +2024,8 @@ DEFINE GCC5_LOONGARCH64_PP_FLAGS           = -mabi=lp64d -march=loongarch64 DEF(
 *_GCC48_IA32_OBJCOPY_FLAGS        =
 *_GCC48_IA32_NASM_FLAGS           = -f elf32
 
-  DEBUG_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -Os
-RELEASE_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -Os -Wno-unused-but-set-variable
+  DEBUG_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS)
+RELEASE_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -Wno-unused-but-set-variable
   NOOPT_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -O0
 
 ##################
@@ -2052,8 +2052,8 @@ RELEASE_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -Os -Wno-unused-but
 *_GCC48_X64_OBJCOPY_FLAGS        =
 *_GCC48_X64_NASM_FLAGS           = -f elf64
 
-  DEBUG_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS) -Os
-RELEASE_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS) -Os -Wno-unused-but-set-variable
+  DEBUG_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS)
+RELEASE_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS) -Wno-unused-but-set-variable
   NOOPT_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS) -O0
 
 ##################
@@ -2161,8 +2161,8 @@ RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -Wno-unused-but-s
 *_GCC49_IA32_OBJCOPY_FLAGS        =
 *_GCC49_IA32_NASM_FLAGS           = -f elf32
 
-  DEBUG_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -Os
-RELEASE_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -Os -Wno-unused-but-set-variable -Wno-unused-const-variable
+  DEBUG_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS)
+RELEASE_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -Wno-unused-but-set-variable -Wno-unused-const-variable
   NOOPT_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -O0
 
 ##################
@@ -2189,8 +2189,8 @@ RELEASE_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -Os -Wno-unused-but
 *_GCC49_X64_OBJCOPY_FLAGS        =
 *_GCC49_X64_NASM_FLAGS           = -f elf64
 
-  DEBUG_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS) -Os
-RELEASE_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS) -Os -Wno-unused-but-set-variable -Wno-unused-const-variable
+  DEBUG_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS)
+RELEASE_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS) -Wno-unused-but-set-variable -Wno-unused-const-variable
   NOOPT_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS) -O0
 
 ##################
@@ -2304,10 +2304,10 @@ RELEASE_GCC49_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 *_GCC5_IA32_OBJCOPY_FLAGS        =
 *_GCC5_IA32_NASM_FLAGS           = -f elf32
 
-  DEBUG_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto -Os
+  DEBUG_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto
   DEBUG_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-m,elf_i386,--oformat=elf32-i386
 
-RELEASE_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto -Os -Wno-unused-but-set-variable -Wno-unused-const-variable
+RELEASE_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
 RELEASE_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-m,elf_i386,--oformat=elf32-i386
 
   NOOPT_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -O0
@@ -2336,10 +2336,10 @@ RELEASE_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,
 *_GCC5_X64_OBJCOPY_FLAGS         =
 *_GCC5_X64_NASM_FLAGS            = -f elf64
 
-  DEBUG_GCC5_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -flto -DUSING_LTO -Os
+  DEBUG_GCC5_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -flto -DUSING_LTO
   DEBUG_GCC5_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -flto -Os
 
-RELEASE_GCC5_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -flto -DUSING_LTO -Os -Wno-unused-but-set-variable -Wno-unused-const-variable
+RELEASE_GCC5_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -flto -DUSING_LTO -Wno-unused-but-set-variable -Wno-unused-const-variable
 RELEASE_GCC5_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -flto -Os
 
   NOOPT_GCC5_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -O0
