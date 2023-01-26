@@ -1,6 +1,10 @@
 /** @file
-  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+  Build GuidHob for tdx measurement.
+
+  Copyright (c) 2022 - 2023, Intel Corporation. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
+
 **/
 
 #include <PiPei.h>
@@ -12,10 +16,7 @@
 #include <Library/HobLib.h>
 #include <Library/PrintLib.h>
 #include <Library/TcgEventLogRecordLib.h>
-#include <Library/TpmMeasurementLib.h>
 #include <WorkArea.h>
-
-#include "PeilessStartupInternal.h"
 
 #pragma pack(1)
 
