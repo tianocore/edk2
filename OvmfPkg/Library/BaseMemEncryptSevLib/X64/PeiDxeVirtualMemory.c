@@ -548,6 +548,7 @@ InternalMemEncryptSevCreateIdentityMap1G (
   PAGE_MAP_AND_DIRECTORY_POINTER  *PageMapLevel4Entry;
   PAGE_TABLE_1G_ENTRY             *PageDirectory1GEntry;
   UINT64                          PgTableMask;
+  UINT64                          *NewPageTable;
   UINT64                          AddressEncMask;
   BOOLEAN                         IsWpEnabled;
   RETURN_STATUS                   Status;
@@ -602,15 +603,23 @@ InternalMemEncryptSevCreateIdentityMap1G (
     PageMapLevel4Entry  = (VOID *)(Cr3BaseAddress & ~PgTableMask);
     PageMapLevel4Entry += PML4_OFFSET (PhysicalAddress);
     if (!PageMapLevel4Entry->Bits.Present) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a:%a: bad PML4 for Physical=0x%Lx\n",
-        gEfiCallerBaseName,
-        __func__,
-        PhysicalAddress
-        ));
-      Status = RETURN_NO_MAPPING;
-      goto Done;
+      NewPageTable = AllocatePageTableMemory (1);
+      if (NewPageTable == NULL) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a:%a: failed to allocate a new PML4 entry\n",
+          gEfiCallerBaseName,
+          __func__
+          ));
+        Status = RETURN_NO_MAPPING;
+        goto Done;
+      }
+
+      SetMem (NewPageTable, EFI_PAGE_SIZE, 0);
+      PageMapLevel4Entry->Uint64          = (UINT64)(UINTN)NewPageTable | AddressEncMask;
+      PageMapLevel4Entry->Bits.MustBeZero = 0;
+      PageMapLevel4Entry->Bits.ReadWrite  = 1;
+      PageMapLevel4Entry->Bits.Present    = 1;
     }
 
     PageDirectory1GEntry = (VOID *)(
