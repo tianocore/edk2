@@ -21,6 +21,7 @@
 #include <Guid/ConfidentialComputingSevSnpBlob.h>
 #include <Library/PcdLib.h>
 #include <Pi/PrePiDxeCis.h>
+#include <Protocol/SevMemoryAcceptance.h>
 #include <Protocol/MemoryAccept.h>
 
 STATIC CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION  mSnpBootDxeTable = {
@@ -142,6 +143,21 @@ ResolveUnacceptedMemory (
   Status = AcceptAllMemory ();
   ASSERT_EFI_ERROR (Status);
 }
+
+STATIC
+EFI_STATUS
+EFIAPI
+AllowUnacceptedMemory (
+  IN  OVMF_SEV_MEMORY_ACCEPTANCE_PROTOCOL  *This
+  )
+{
+  mAcceptAllMemoryAtEBS = FALSE;
+  return EFI_SUCCESS;
+}
+
+STATIC
+OVMF_SEV_MEMORY_ACCEPTANCE_PROTOCOL
+  mMemoryAcceptanceProtocol = { AllowUnacceptedMemory };
 
 STATIC EDKII_MEMORY_ACCEPT_PROTOCOL  mMemoryAcceptProtocol = {
   AmdSevMemoryAccept
@@ -268,11 +284,13 @@ AmdSevDxeEntryPoint (
     // Memory acceptance began being required in SEV-SNP, so install the
     // memory accept protocol implementation for a SEV-SNP active guest.
     //
-    Status = gBS->InstallProtocolInterface (
+    Status = gBS->InstallMultipleProtocolInterfaces (
                     &mAmdSevDxeHandle,
                     &gEdkiiMemoryAcceptProtocolGuid,
-                    EFI_NATIVE_INTERFACE,
-                    &mMemoryAcceptProtocol
+                    &mMemoryAcceptProtocol,
+                    &gOvmfSevMemoryAcceptanceProtocolGuid,
+                    &mMemoryAcceptanceProtocol,
+                    NULL
                     );
     ASSERT_EFI_ERROR (Status);
 
