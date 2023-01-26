@@ -57,8 +57,6 @@
   PrePiLib
   QemuFwCfgLib
   PlatformInitLib
-  HashLib
-  TpmMeasurementLib
 
 [Guids]
   gEfiHobMemoryAllocModuleGuid
@@ -70,9 +68,6 @@
   gEfiNonCcFvGuid
 
 [Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdCfvBase
-  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataOffset
-  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize
   gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataOffset
   gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataSize
@@ -89,5 +84,3 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
