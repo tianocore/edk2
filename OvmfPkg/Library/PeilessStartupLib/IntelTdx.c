@@ -11,6 +11,7 @@
 #include <IndustryStandard/UefiTcgPlatform.h>
 #include <Library/HobLib.h>
 #include <Library/PrintLib.h>
+#include <Library/TcgEventLogRecordLib.h>
 #include <Library/TpmMeasurementLib.h>
 
 #include "PeilessStartupInternal.h"
@@ -25,15 +26,10 @@ typedef struct {
   EFI_CONFIGURATION_TABLE    TableEntry[1];
 } TDX_HANDOFF_TABLE_POINTERS2;
 
-#define FV_HANDOFF_TABLE_DESC  "Fv(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)"
-typedef struct {
-  UINT8                   BlobDescriptionSize;
-  UINT8                   BlobDescription[sizeof (FV_HANDOFF_TABLE_DESC)];
-  EFI_PHYSICAL_ADDRESS    BlobBase;
-  UINT64                  BlobLength;
-} FV_HANDOFF_TABLE_POINTERS2;
-
 #pragma pack()
+
+#define FV_HANDOFF_TABLE_DESC  "Fv(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)"
+typedef PLATFORM_FIRMWARE_BLOB2_STRUCT CFV_HANDOFF_TABLE_POINTERS2;
 
 /**
   Measure the Hoblist passed from the VMM.
@@ -161,9 +157,9 @@ MeasureFvImage (
   IN UINT8                 PcrIndex
   )
 {
-  EFI_STATUS                  Status;
-  FV_HANDOFF_TABLE_POINTERS2  FvBlob2;
-  VOID                        *FvName;
+  EFI_STATUS                   Status;
+  CFV_HANDOFF_TABLE_POINTERS2  FvBlob2;
+  VOID                         *FvName;
 
   //
   // Init the log event for FV measurement
