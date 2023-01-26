@@ -52,6 +52,7 @@
 
 [Guids]
   gConfidentialComputingSevSnpBlobGuid
+  gEfiEventBeforeExitBootServicesGuid
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
