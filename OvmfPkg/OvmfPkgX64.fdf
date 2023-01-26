@@ -189,6 +189,7 @@ INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 INF  FILE_GUID = $(UP_CPU_PEI_GUID) UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
 !include OvmfPkg/OvmfTpmPei.fdf.inc
+!include OvmfPkg/Include/Fdf/OvmfCryptoPei.fdf.inc
 
 ################################################################################
 
@@ -413,6 +414,11 @@ INF SecurityPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf
 # TPM support
 #
 !include OvmfPkg/OvmfTpmDxe.fdf.inc
+
+#
+# Crypto support
+#
+!include OvmfPkg/Include/Fdf/OvmfCryptoDxeSmm.fdf.inc
 
 ################################################################################
 
