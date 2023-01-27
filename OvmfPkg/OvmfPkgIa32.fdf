@@ -173,6 +173,7 @@ INF  OvmfPkg/SmmAccess/SmmAccessPei.inf
 INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
 !include OvmfPkg/OvmfTpmPei.fdf.inc
+!include OvmfPkg/Include/Fdf/OvmfCryptoPei.fdf.inc
 
 ################################################################################
 
@@ -372,6 +373,11 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 # TPM support
 #
 !include OvmfPkg/OvmfTpmDxe.fdf.inc
+
+#
+# Crypto support
+#
+!include OvmfPkg/Include/Fdf/OvmfCryptoDxeSmm.fdf.inc
 
 !if $(LOAD_X64_ON_IA32_ENABLE) == TRUE
 INF  OvmfPkg/CompatImageLoaderDxe/CompatImageLoaderDxe.inf
