@@ -149,6 +149,8 @@ INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
 INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
+!include OvmfPkg/Include/Fdf/OvmfCryptoPei.fdf.inc
+
 ################################################################################
 
 [FV.DXEFV]
@@ -301,6 +303,11 @@ INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 INF  OvmfPkg/EmuVariableFvbRuntimeDxe/Fvb.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+
+#
+# Crypto support
+#
+!include OvmfPkg/Include/Fdf/OvmfCryptoDxeSmm.fdf.inc
 
 ################################################################################
 
