@@ -64,7 +64,7 @@ typedef enum {
   // /// EfiGcdMemoryTypeUnaccepted is defined in PrePiDxeCis.h because it has not been
   // /// defined in PI spec.
   // EfiGcdMemoryTypeUnaccepted,
-  EfiGcdMemoryTypeMaximum = 8
+  EfiGcdMemoryTypeMaximum = 7
 } EFI_GCD_MEMORY_TYPE;
 
 ///
