@@ -86,6 +86,13 @@
   ## Include/Protocol/SmMonitorInit.h
   gEfiSmMonitorInitProtocolGuid  = { 0x228f344d, 0xb3de, 0x43bb, { 0xa4, 0xd7, 0xea, 0x20, 0xb, 0x1b, 0x14, 0x82 }}
 
+[Protocols.RISCV64]
+  #
+  # Protocols defined for RISC-V systems
+  #
+  ## Include/Protocol/RiscVBootProtocol.h
+  gRiscVEfiBootProtocolGuid  = { 0xccd15fec, 0x6f73, 0x4eec, { 0x83, 0x95, 0x3e, 0x69, 0xe4, 0xb9, 0x40, 0xbf }}
+
 #
 # [Error.gUefiCpuPkgTokenSpaceGuid]
 #   0x80000001 | Invalid value provided.
