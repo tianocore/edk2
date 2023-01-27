@@ -20,6 +20,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// After this memory region is defined in PI spec, it should be a value in
 /// EFI_GCD_MEMORY_TYPE in PiDxeCis.h.
 ///
-#define  EFI_GCD_MEMORY_TYPE_UNACCEPTED  7
+#define  EFI_GCD_MEMORY_TYPE_UNACCEPTED  6
 
 #endif
