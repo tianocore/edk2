@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-#python `dirname $0`/RunToolFromSource.py `basename $0` $*
-PYTHONPATH="`dirname $0`/../../Source/Python" \
-    python "`dirname $0`/../../Source/Python"/`basename $0`/`basename $0`.py $*
-
