@@ -257,6 +257,11 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 #
 INF SecurityPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf
 
+#
+# Crypto support
+#
+!include OvmfPkg/Include/Fdf/OvmfCryptoDxeSmm.fdf.inc
+
 ################################################################################
 
 [FV.NCCFV]
