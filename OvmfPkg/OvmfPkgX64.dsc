@@ -724,7 +724,8 @@
   OvmfPkg/Sec/SecMain.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
-      NULL|OvmfPkg/Library/PlatformInitLib/PlatformInitLib.inf
+      NULL|OvmfPkg/IntelTdx/TdxHelperLib/SecTdxHelperLib.inf
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SecCryptLib.inf
   }
 
   #
