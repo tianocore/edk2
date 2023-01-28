@@ -1,0 +1,30 @@
+#/** @file
+#
+#  Component description file for VirtNorFlashStaticLib module
+#
+#  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VirtNorFlashStaticLib
+  FILE_GUID                      = 064742F1-E531-4D7D-A154-22315889CC23
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = VirtNorFlashPlatformLib
+
+[Sources.common]
+  VirtNorFlashStaticLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
