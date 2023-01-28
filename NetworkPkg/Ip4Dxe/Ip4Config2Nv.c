@@ -397,15 +397,15 @@ Ip4Config2ConvertConfigNvDataToIfrNvData (
   UINTN                           DnsCount;
   EFI_IPv4_ADDRESS                *DnsAddress;
 
+  if ((IfrNvData == NULL) || (Instance == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Status      = EFI_SUCCESS;
   Ip4Config2  = &Instance->Ip4Config2;
   Ip4Info     = NULL;
   DnsAddress  = NULL;
   GatewaySize = sizeof (EFI_IPv4_ADDRESS);
-
-  if ((IfrNvData == NULL) || (Instance == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
 
   NET_CHECK_SIGNATURE (Instance, IP4_CONFIG2_INSTANCE_SIGNATURE);
 
@@ -571,6 +571,10 @@ Ip4Config2ConvertIfrNvDataToConfigNvData (
   UINTN          DataSize;
   EFI_INPUT_KEY  Key;
 
+  if ((Instance == NULL) || (IfrFormNvData == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Status    = EFI_SUCCESS;
   Ip4Cfg2   = &Instance->Ip4Config2;
   Ip4NvData = &Instance->Ip4NvData;
@@ -580,10 +584,6 @@ Ip4Config2ConvertIfrNvDataToConfigNvData (
 
   TimeoutEvent    = NULL;
   SetAddressEvent = NULL;
-
-  if ((Instance == NULL) || (IfrFormNvData == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
 
   if (IfrFormNvData->Configure != TRUE) {
     return EFI_SUCCESS;
