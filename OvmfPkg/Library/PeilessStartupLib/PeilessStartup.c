@@ -176,25 +176,7 @@ PeilessStartup (
 
   if (TdIsEnabled ()) {
     //
-    // Measure HobList
-    //
-    Status = TdxHelperMeasureTdHob ();
-    if (EFI_ERROR (Status)) {
-      ASSERT (FALSE);
-      CpuDeadLoop ();
-    }
-
-    //
-    // Measure Tdx CFV
-    //
-    Status = TdxHelperMeasureCfvImage ();
-    if (EFI_ERROR (Status)) {
-      ASSERT (FALSE);
-      CpuDeadLoop ();
-    }
-
-    //
-    // Build GuidHob for tdx measurement
+    // Build GuidHob for the tdx measurements which were done in SEC phase.
     //
     Status = TdxHelperBuildGuidHobForTdxMeasurement ();
     if (EFI_ERROR (Status)) {
