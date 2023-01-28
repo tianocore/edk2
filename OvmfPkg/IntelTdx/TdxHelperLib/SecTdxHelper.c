@@ -175,7 +175,35 @@ TdxHelperMeasureCfvImage (
   VOID
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS      Status;
+  UINT8           Digest[SHA384_DIGEST_SIZE];
+  OVMF_WORK_AREA  *WorkArea;
+
+  Status = HashAndExtendToRtmr (
+             0,
+             (UINT8 *)(UINTN)PcdGet32 (PcdOvmfFlashNvStorageVariableBase),
+             (UINT64)PcdGet32 (PcdCfvRawDataSize),
+             Digest,
+             SHA384_DIGEST_SIZE
+             );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // This function is called in SEC phase and at that moment the Hob service
+  // is not available. So CfvImage measurement value is stored in workarea.
+  //
+  WorkArea = (OVMF_WORK_AREA *)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+  if (WorkArea == NULL) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  WorkArea->TdxWorkArea.SecTdxWorkArea.TdxMeasurementsData.MeasurementsBitmap |= TDX_MEASUREMENT_CFVIMG_BITMASK;
+  CopyMem (WorkArea->TdxWorkArea.SecTdxWorkArea.TdxMeasurementsData.CfvImgHashValue, Digest, SHA384_DIGEST_SIZE);
+
+  return EFI_SUCCESS;
 }
 
 /**
