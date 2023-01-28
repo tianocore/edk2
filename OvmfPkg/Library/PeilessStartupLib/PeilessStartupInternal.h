@@ -59,21 +59,6 @@ ConstructSecHobList (
   );
 
 /**
-  Measure the Hoblist passed from the VMM.
-
-  @param[in] VmmHobList    The Hoblist pass the firmware
-
-  @retval EFI_SUCCESS           Fv image is measured successfully
-                                or it has been already measured.
-  @retval Others                Other errors as indicated
-**/
-EFI_STATUS
-EFIAPI
-MeasureHobList (
-  IN CONST VOID  *VmmHobList
-  );
-
-/**
   Measure FV image.
 
   @param[in]  FvBase            Base address of FV image.
