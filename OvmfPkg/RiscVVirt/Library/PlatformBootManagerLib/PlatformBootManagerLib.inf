@@ -1,0 +1,75 @@
+## @file
+#  Implementation for PlatformBootManagerLib library class interfaces for RISC-V.
+#
+#  Copyright (c) 2022, Ventana Micro Systems Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = DxeRiscV64PlatformBootManagerLib
+  FILE_GUID                      = 4FC87DC9-2666-49BB-9023-B5FAA1E9E732
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformBootManagerLib|DXE_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+
+[Sources]
+  PlatformBm.c
+  PlatformBm.h
+  QemuKernel.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  BootLogoLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  PcdLib
+  PlatformBmPrintScLib
+  QemuBootOrderLib
+  QemuLoadImageLib
+  ReportStatusCodeLib
+  TpmPlatformHierarchyLib
+  UefiBootManagerLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+  gEfiGlobalVariableGuid
+  gRootBridgesConnectedEventGroupGuid
+  gUefiShellFileGuid
+  gEfiTtyTermGuid
+
+[Protocols]
+  gEfiFirmwareVolume2ProtocolGuid
+  gEfiGraphicsOutputProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid
+  gVirtioDeviceProtocolGuid
