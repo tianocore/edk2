@@ -58,25 +58,4 @@ EFIAPI
 ConstructSecHobList (
   );
 
-/**
-  Measure FV image.
-
-  @param[in]  FvBase            Base address of FV image.
-  @param[in]  FvLength          Length of FV image.
-  @param[in]  PcrIndex          Index of PCR
-
-  @retval EFI_SUCCESS           Fv image is measured successfully
-                                or it has been already measured.
-  @retval EFI_OUT_OF_RESOURCES  No enough memory to log the new event.
-  @retval EFI_DEVICE_ERROR      The command was unsuccessful.
-
-**/
-EFI_STATUS
-EFIAPI
-MeasureFvImage (
-  IN EFI_PHYSICAL_ADDRESS  FvBase,
-  IN UINT64                FvLength,
-  IN UINT8                 PcrIndex
-  );
-
 #endif
