@@ -29,7 +29,7 @@
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Ppi/TemporaryRamSupport.h>
 #include <Ppi/MpInitLibDep.h>
-#include <Library/PlatformInitLib.h>
+#include <Library/TdxHelperLib.h>
 #include <Library/CcProbeLib.h>
 #include "AmdSev.h"
 
@@ -765,7 +765,7 @@ SecCoreStartupWithStack (
     // first so that the memory is accepted. Otherwise access to the unaccepted
     // memory will trigger tripple fault.
     //
-    if (ProcessTdxHobList () != EFI_SUCCESS) {
+    if (TdxHelperProcessTdHob () != EFI_SUCCESS) {
       CpuDeadLoop ();
     }
   }
