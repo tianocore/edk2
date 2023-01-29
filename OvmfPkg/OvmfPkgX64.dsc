@@ -743,7 +743,10 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
-  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
+    <LibraryClasses>
+    NULL|MdeModulePkg\Library\BrotliCustomDecompressLib\BrotliCustomDecompressLib.inf
+  }
 
   OvmfPkg/PlatformPei/PlatformPei.inf
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf {
