@@ -58,6 +58,10 @@
   brotli/c/dec/huffman.h
   brotli/c/dec/state.h
   brotli/c/dec/prefix.h
+  brotli/c/common/context.c
+  brotli/c/common/platform.c
+  brotli/c/common/constants.c
+  brotli/c/common/shared_dictionary.c
 
 [Packages]
   MdePkg/MdePkg.dec
