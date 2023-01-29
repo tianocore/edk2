@@ -4,6 +4,7 @@
 # Copyright (c) Microsoft Corporation
 # Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+# Copyright (c) 2023, Loongson Technology Corporation Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
@@ -58,6 +59,7 @@
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
             "Include/IndustryStandard/Acpi64.h",
+            "Include/IndustryStandard/Acpi65.h",
             "Include/IndustryStandard/Tpm12.h",
             "Include/IndustryStandard/Tpm20.h",
             "Include/IndustryStandard/IoRemappingTable.h",
