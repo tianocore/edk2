@@ -221,6 +221,10 @@ class VfrCompiler():
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
             return
 
+        if self.SetUNIStrFileName() != 0:
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+            return
+
     def SetBaseFileName(self):
         if self.Options.VfrFileName == None:
             return -1
@@ -283,6 +287,12 @@ class VfrCompiler():
         if self.Options.VfrBaseFileName == None:
             return -1
         self.Options.HeaderFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header' + VFR_PREPROCESS_FILENAME_EXTENSION
+        return 0
+
+    def SetUNIStrFileName(self):
+        if self.Options.VfrBaseFileName == None:
+            return -1
+        self.Options.UNIStrFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'StrDefs.txt'
         return 0
 
     def PreProcess(self):
@@ -483,7 +493,7 @@ def main():
     Compiler.PreProcess()
     Compiler.Compile()
     Compiler.GenBinaryFiles()
-    
+
     # Extended Features
     Compiler.DumpYaml()
     Compiler.DumpJson()

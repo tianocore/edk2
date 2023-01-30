@@ -64,3 +64,4 @@ class YamlTree():
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
                             "File open failed for %s" % FileName, None)
+            
