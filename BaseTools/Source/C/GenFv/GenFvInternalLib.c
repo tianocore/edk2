@@ -14,11 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Include files
 //
 
-#if defined(__FreeBSD__)
-#include <uuid.h>
-#elif defined(__GNUC__)
-#include <uuid/uuid.h>
-#endif
 #ifdef __GNUC__
 #include <sys/stat.h>
 #endif
