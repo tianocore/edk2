@@ -13,6 +13,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include "CpuDxe.h"
 
+/**
+  Convert a set of ARM short descriptor section attributes into a mask
+  of EFI_MEMORY_xx constants.
+
+  @param  SectionAttributes   The set of page attributes.
+  @param  GcdAttributes       Pointer to the return value.
+
+**/
+STATIC
 EFI_STATUS
 SectionToGcdAttributes (
   IN  UINT32  SectionAttributes,
@@ -74,6 +83,35 @@ SectionToGcdAttributes (
   return EFI_SUCCESS;
 }
 
+/**
+  Convert a arch specific set of page attributes into a mask
+  of EFI_MEMORY_xx constants.
+
+  @param  PageAttributes  The set of page attributes.
+
+  @retval The mask of EFI_MEMORY_xx constants.
+
+**/
+UINT64
+RegionAttributeToGcdAttribute (
+  IN UINTN  PageAttributes
+  )
+{
+  UINT64  Result;
+
+  SectionToGcdAttributes (PageAttributes, &Result);
+  return Result;
+}
+
+/**
+  Convert a set of ARM short descriptor page attributes into a mask
+  of EFI_MEMORY_xx constants.
+
+  @param  PageAttributes      The set of page attributes.
+  @param  GcdAttributes       Pointer to the return value.
+
+**/
+STATIC
 EFI_STATUS
 PageToGcdAttributes (
   IN  UINT32  PageAttributes,
