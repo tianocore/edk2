@@ -1210,8 +1210,8 @@ ScsiScanCreateDevice (
     ScsiBusDev->DevicePath
     );
 
-  if (!DiscoverScsiDevice (ScsiIoDevice)) {
-    Status = EFI_OUT_OF_RESOURCES;
+  Status = DiscoverScsiDevice (ScsiIoDevice);
+  if (EFI_ERROR (Status)) {
     goto ErrorExit;
   }
 
@@ -1276,11 +1276,12 @@ ErrorExit:
 
   @param  ScsiIoDevice    The pointer of SCSI_IO_DEV
 
-  @retval  TRUE   Find SCSI Device and verify it.
-  @retval  FALSE  Unable to find SCSI Device.
+  @retval EFI_SUCCESS           Find SCSI Device and verify it.
+  @retval EFI_NOT_FOUND         Unable to find SCSI Device.
+  @retval EFI_OUT_OF_RESOURCES  Fail to allocate memory resources.
 
 **/
-BOOLEAN
+EFI_STATUS
 DiscoverScsiDevice (
   IN OUT  SCSI_IO_DEV  *ScsiIoDevice
   )
@@ -1294,7 +1295,6 @@ DiscoverScsiDevice (
   EFI_SCSI_SENSE_DATA    *SenseData;
   UINT8                  MaxRetry;
   UINT8                  Index;
-  BOOLEAN                ScsiDeviceFound;
 
   HostAdapterStatus = 0;
   TargetStatus      = 0;
@@ -1302,7 +1302,7 @@ DiscoverScsiDevice (
 
   InquiryData = AllocateAlignedBuffer (ScsiIoDevice, sizeof (EFI_SCSI_INQUIRY_DATA));
   if (InquiryData == NULL) {
-    ScsiDeviceFound = FALSE;
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
@@ -1311,7 +1311,7 @@ DiscoverScsiDevice (
                 sizeof (EFI_SCSI_SENSE_DATA)
                 );
   if (SenseData == NULL) {
-    ScsiDeviceFound = FALSE;
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
@@ -1342,7 +1342,7 @@ DiscoverScsiDevice (
           (SenseData->Error_Code == 0x70) &&
           (SenseData->Sense_Key == EFI_SCSI_SK_ILLEGAL_REQUEST))
       {
-        ScsiDeviceFound = FALSE;
+        Status = EFI_NOT_FOUND;
         goto Done;
       }
 
@@ -1353,13 +1353,13 @@ DiscoverScsiDevice (
         (Status == EFI_INVALID_PARAMETER) ||
         (Status == EFI_UNSUPPORTED))
     {
-      ScsiDeviceFound = FALSE;
+      Status = EFI_NOT_FOUND;
       goto Done;
     }
   }
 
   if (Index == MaxRetry) {
-    ScsiDeviceFound = FALSE;
+    Status = EFI_NOT_FOUND;
     goto Done;
   }
 
@@ -1367,14 +1367,14 @@ DiscoverScsiDevice (
   // Retrieved inquiry data successfully
   //
   if (InquiryData->Peripheral_Qualifier != 0) {
-    ScsiDeviceFound = FALSE;
+    Status = EFI_NOT_FOUND;
     goto Done;
   }
 
   if ((InquiryData->Peripheral_Type >= EFI_SCSI_TYPE_RESERVED_LOW) &&
       (InquiryData->Peripheral_Type <= EFI_SCSI_TYPE_RESERVED_HIGH))
   {
-    ScsiDeviceFound = FALSE;
+    Status = EFI_NOT_FOUND;
     goto Done;
   }
 
@@ -1392,13 +1392,13 @@ DiscoverScsiDevice (
     ScsiIoDevice->ScsiVersion = (UINT8)(InquiryData->Version & 0x07);
   }
 
-  ScsiDeviceFound = TRUE;
+  Status = EFI_SUCCESS;
 
 Done:
   FreeAlignedBuffer (SenseData, sizeof (EFI_SCSI_SENSE_DATA));
   FreeAlignedBuffer (InquiryData, sizeof (EFI_SCSI_INQUIRY_DATA));
 
-  return ScsiDeviceFound;
+  return Status;
 }
 
 /**
