@@ -28,17 +28,17 @@
 // Assume standard LoongArch 64-bit alignment.
 // Need to check portability of long long
 //
-typedef unsigned long   UINT64;
-typedef long            INT64;
-typedef unsigned int    UINT32;
-typedef int             INT32;
-typedef unsigned short  UINT16;
-typedef unsigned short  CHAR16;
-typedef short           INT16;
-typedef unsigned char   BOOLEAN;
-typedef unsigned char   UINT8;
-typedef char            CHAR8;
-typedef char            INT8;
+typedef unsigned long long  UINT64;
+typedef long long           INT64;
+typedef unsigned int        UINT32;
+typedef int                 INT32;
+typedef unsigned short      UINT16;
+typedef unsigned short      CHAR16;
+typedef short               INT16;
+typedef unsigned char       BOOLEAN;
+typedef unsigned char       UINT8;
+typedef char                CHAR8;
+typedef char                INT8;
 
 //
 // Unsigned value of native width.  (4 bytes on supported 32-bit processor instructions,
