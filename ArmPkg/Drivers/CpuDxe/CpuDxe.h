@@ -126,4 +126,18 @@ SetGcdMemorySpaceAttributes (
   IN UINT64                           Attributes
   );
 
+/**
+  Convert an arch specific set of page attributes into a mask
+  of EFI_MEMORY_xx constants.
+
+  @param  PageAttributes  The set of page attributes.
+
+  @retval The mask of EFI_MEMORY_xx constants.
+
+**/
+UINT64
+RegionAttributeToGcdAttribute (
+  IN UINTN  PageAttributes
+  );
+
 #endif // CPU_DXE_H_
