@@ -83,6 +83,23 @@ PageAttributeToGcdAttribute (
   return GcdAttributes;
 }
 
+/**
+  Convert an arch specific set of page attributes into a mask
+  of EFI_MEMORY_xx constants.
+
+  @param  PageAttributes  The set of page attributes.
+
+  @retval The mask of EFI_MEMORY_xx constants.
+
+**/
+UINT64
+RegionAttributeToGcdAttribute (
+  IN UINTN  PageAttributes
+  )
+{
+  return PageAttributeToGcdAttribute (PageAttributes);
+}
+
 STATIC
 UINT64
 GetFirstPageAttribute (
