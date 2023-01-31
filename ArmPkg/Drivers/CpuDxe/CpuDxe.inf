@@ -23,6 +23,7 @@
   CpuDxe.h
   CpuMmuCommon.c
   Exception.c
+  MemoryAttribute.c
 
 [Sources.ARM]
   Arm/Mmu.c
@@ -53,6 +54,7 @@
 
 [Protocols]
   gEfiCpuArchProtocolGuid
+  gEfiMemoryAttributeProtocolGuid
 
 [Guids]
   gEfiDebugImageInfoTableGuid

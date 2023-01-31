@@ -30,8 +30,11 @@
 #include <Protocol/Cpu.h>
 #include <Protocol/DebugSupport.h>
 #include <Protocol/LoadedImage.h>
+#include <Protocol/MemoryAttribute.h>
 
 extern BOOLEAN  mIsFlushingGCD;
+
+extern EFI_MEMORY_ATTRIBUTE_PROTOCOL  mMemoryAttribute;
 
 /**
   This function registers and enables the handler specified by InterruptHandler for a processor
