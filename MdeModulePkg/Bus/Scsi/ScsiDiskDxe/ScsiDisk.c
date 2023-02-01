@@ -3,10 +3,6 @@
 
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 1985 - 2022, American Megatrends International LLC.<BR>
-<<<<<<< HEAD
-=======
-
->>>>>>> ace365b4e0 (MdeModulePkg/scsi :Coverity scan flags multiple issues in edk2-stable202205)
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
