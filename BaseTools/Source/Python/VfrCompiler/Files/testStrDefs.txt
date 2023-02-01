@@ -1,0 +1,9 @@
+String_token 0x0002 | STR_FORM_TITLE | en-US | Driver Health Manager .
+String_token 0x0003 | STR_FORM_HELP | en-US | List all the Driver Health instances to manage .
+String_token 0x0004 | STR_NULL | en-US |  .
+String_token 0x0005 | STR_REPAIR_REQUIRED | en-US | Repair Required. .
+String_token 0x0006 | STR_CONFIGURATION_REQUIRED | en-US | Configuration Required. .
+String_token 0x0007 | STR_FAILED | en-US | Failed. .
+String_token 0x0008 | STR_RECONNECT_REQUIRED | en-US | Reconnect Required. .
+String_token 0x0009 | STR_REBOOT_REQUIRED | en-US | Reboot Required. .
+String_token 0x000A | STR_HEALTHY | en-US | Healthy. .

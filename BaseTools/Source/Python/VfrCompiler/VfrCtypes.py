@@ -106,6 +106,12 @@ class EFI_GUID(Structure):
         for i in range(8):
             self.Data4[i] = listformat[i + 3]
 
+    def to_string(self) -> str:
+        GuidStr = '{' + '{}, {}, {},'.format('0x%x'%(self.Data1),'0x%x'%(self.Data2), '0x%x'%(self.Data3)) \
+                        + '{' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(self.Data4[0]), '0x%x'%(self.Data4[1]), '0x%x'%(self.Data4[2]), '0x%x'%(self.Data4[3]), \
+                        '0x%x'%(self.Data4[4]), '0x%x'%(self.Data4[5]), '0x%x'%(self.Data4[6]), '0x%x'%(self.Data4[7])) + '}}'
+        return GuidStr
+
     def __cmp__(self, otherguid) -> bool:
         if not isinstance(otherguid, EFI_GUID):
             return 'Input is not the GUID instance!'

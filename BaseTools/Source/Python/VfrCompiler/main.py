@@ -73,10 +73,11 @@ class VfrCompiler():
 
     def __init__(self, Args, Argc):
 
-        self.Root = VfrTreeNode()
         self.Options = Options()
-        self.VfrTree = VfrTree(self.Root, self.Options)
-        self.YamlTree = YamlTree(self.Options)
+        self.VfrRoot = VfrTreeNode()
+        self.VfrTree = VfrTree(self.VfrRoot, self.Options)
+        self.YamlRoot = VfrTreeNode()
+        self.YamlTree = YamlTree(self.YamlRoot, self.Options)
         self.RunStatus = COMPILER_RUN_STATUS.STATUS_STARTED
         self.PreProcessCmd = PREPROCESSOR_COMMAND
         self.PreProcessOpt = PREPROCESSOR_OPTIONS
@@ -289,7 +290,7 @@ class VfrCompiler():
         self.Options.HeaderFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header' + VFR_PREPROCESS_FILENAME_EXTENSION
         return 0
 
-    def SetUNIStrFileName(self):
+    def SetUNIStrFileName(self): ##
         if self.Options.VfrBaseFileName == None:
             return -1
         self.Options.UNIStrFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'StrDefs.txt'
@@ -351,7 +352,7 @@ class VfrCompiler():
                     self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
                 return
 
-            self.Visitor = VfrSyntaxVisitor(self.Root, self.Options.OverrideClassGuid)
+            self.Visitor = VfrSyntaxVisitor(self.VfrRoot, self.Options.OverrideClassGuid)
             self.Visitor.visit(VfrParser.vfrProgram())
 
             if self.Visitor.ParserStatus != 0:
@@ -418,8 +419,11 @@ class VfrCompiler():
                 self.VfrTree.DumpJson()
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FINISHED)
 
-    def ReadYaml(self):
-        self.YamlTree.ReadYaml()
+    def PreProcessYaml(self): # wip
+        self.YamlTree.PreProcess()
+
+    def CompileYaml(self): # wip
+        self.YamlTree.Compile()
 
     def SET_RUN_STATUS(self, Status):
         self.RunStatus = Status
@@ -497,7 +501,8 @@ def main():
     # Extended Features
     Compiler.DumpYaml()
     Compiler.DumpJson()
-    Compiler.ReadYaml()
+    Compiler.PreProcessYaml()
+    Compiler.CompileYaml()
 
     Status = Compiler.RunStatus
     if Status == COMPILER_RUN_STATUS.STATUS_DEAD or Status == COMPILER_RUN_STATUS.STATUS_FAILED:
