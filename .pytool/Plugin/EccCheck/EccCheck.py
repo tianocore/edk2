@@ -69,6 +69,13 @@ class EccCheck(ICiBuildPlugin):
         env.set_shell_var('PACKAGES_PATH', os.pathsep.join(Edk2pathObj.PackagePathList))
         self.ECC_PASS = True
 
+        abs_pkg_path = Edk2pathObj.GetAbsolutePathOnThisSystemFromEdk2RelativePath(packagename)
+
+        if abs_pkg_path is None:
+            tc.SetSkipped()
+            tc.LogStdError("No Package folder {0}".format(abs_pkg_path))
+            return 0
+
         # Create temp directory
         temp_path = os.path.join(workspace_path, 'Build', '.pytool', 'Plugin', 'EccCheck')
         try:
@@ -77,7 +84,7 @@ class EccCheck(ICiBuildPlugin):
                 shutil.rmtree(temp_path)
             # Copy package being scanned to temp_path
             shutil.copytree (
-              os.path.join(workspace_path, packagename),
+              abs_pkg_path,
               os.path.join(temp_path, packagename),
               symlinks=True
               )
