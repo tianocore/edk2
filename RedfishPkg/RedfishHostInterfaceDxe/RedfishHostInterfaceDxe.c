@@ -7,6 +7,7 @@
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
   Copyright (C) 2022 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -260,6 +261,13 @@ PlatformHostInterfaceInformationReady (
   DEBUG ((DEBUG_INFO, "%a: Platform Redfish Host Interface informtion is ready\n", __FUNCTION__));
 
   RedfishCreateSmbiosTable42 ();
+
+  //
+  // Close event so we don't create multiple type 42 records
+  //
+  gBS->CloseEvent (Event);
+  mPlatformHostInterfaceReadylEvent = NULL;
+
   return;
 }
 
