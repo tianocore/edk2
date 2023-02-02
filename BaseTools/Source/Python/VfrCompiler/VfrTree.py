@@ -1,4 +1,5 @@
 import yaml
+import CppHeaderParser
 from VfrFormPkg import *
 from antlr4 import *
 from VfrCtypes import *
@@ -121,8 +122,9 @@ class Options():
         self.AutoDefault = False
         self.CheckDefault = False
 
-        self.HeaderFileName = None
-        self.UNIStrFileName = None
+        self.ProcessedInFileName = None
+        self.UniStrDefFileName = None
+        self.HeaderFileName = None # save header info for yaml
         self.CompileYaml = True
 
 
@@ -596,8 +598,8 @@ class VfrTree():
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
                             "File open failed for %s" % FileName, None)
 
-    def InsertHeaderToYaml(self, f):
-        FileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + ".vfr"
+    def InsertHeaderToYaml(self, f): # can be refined
+        FileName = self.Options.VfrFileName
         try:
             fFile = open(LongFilePath(FileName), mode='r')
             line = fFile.readline()
@@ -625,58 +627,74 @@ class VfrTree():
                             "File open failed for %s" % FileName, None)
         return HeaderFiles
 
-
     def GetUniDictsForYaml(self):
-        FileName = self.Options.UNIStrFileName #########
-        try:
-            f = open(FileName, 'r')
-            Lines = f.read()
-            f.close()
-        except:
-            EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
-                            "File open failed for %s" % FileName, None)
+        if self.Options.VfrFileName.find('/') == -1:
+            self.Options.VfrFileName = self.Options.VfrFileName.replace('\\', '/')
+
+        self.Options.UniStrDefFileName = self.FindIncludeHeaderFile('/edk2/', self.Options.VfrFileName.split('/')[-2] + 'StrDefs.h')
+        if self.Options.UniStrDefFileName == None:
+            EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
+                            "File/directory %s not found in workspace" % (self.Options.VfrFileName.split('/')[-2] + 'StrDefs.h'), None)
+        CppHeader = CppHeaderParser.CppHeader(self.Options.UniStrDefFileName)
         UniDict = {}
-        for Line in Lines.split('\n'):
-            Items = Line.split('|')
-            Key = Items[1].strip()
-            Value = int(Items[0].split(' ')[1], 16)
-            UniDict[Value] = Key
+        for Define in CppHeader.defines:
+            Items = Define.split()
+            if len(Items) == 2 and Items[0].find("STR") != -1 and Items[1].find('0x') != -1:
+                UniDict[int(Items[1], 16)] = Items[0]
         return UniDict
 
-    def StringToGuid(self, GuidStr):
-        Items = GuidStr.split(',')
-        Guid = EFI_GUID()
-        Guid.Data1 = int(Items[0], 16)
-        Guid.Data2 = int(Items[1], 16)
-        Guid.Data3 = int(Items[2], 16)
-        for i in range(0, 8):
-            Guid.Data4[i] = int(Items[i+3], 16)
-        return Guid
+
+    def ParseCppHeaderDefines(self, CppHeader, HeaderDict):
+        for Define in CppHeader.defines:
+            Items = Define.split()
+            if len(Items) == 2 and Items[1].find('0x') != -1:
+                HeaderDict[Items[1]] = Items[0]
+            elif len(Items) > 2 and Items[0].find('GUID') != -1:
+                GuidStr = ''
+                for i in range(1, len(Items)):
+                    if Items[i] != '{' and Items[i] != '}' and Items[i] != '{{' and Items[i] !='}}' and Items[i] != '\\':
+                        if ('{' in Items[i]) or ('\\' in Items[i]):
+                            Items[i] = Items[i][1:]
+                        if '}' in Items[i]:
+                            Items[i] = Items[i][:-1]
+
+                        GuidStr += Items[i]
+                GuidItems = GuidStr.split(',')
+                Guid = EFI_GUID()
+                Guid.Data1 = int(GuidItems[0], 16)
+                Guid.Data2 = int(GuidItems[1], 16)
+                Guid.Data3 = int(GuidItems[2], 16)
+                for i in range(0, 8):
+                    Guid.Data4[i] = int(GuidItems[i+3], 16)
+                Key = Items[0]
+                Value = Guid.to_string()
+                HeaderDict[Value] = Key
+
+    def FindIncludeHeaderFile(self, Start, Name):
+        for Relpath, Dirs, Files in os.walk(Start):
+            if Name in Files:
+                FullPath = os.path.join(Start, Relpath, Name)
+                return os.path.normpath(os.path.abspath(FullPath))
+        return None
 
     def GetHeaderDictsForYaml(self, HeaderFiles):
         HeaderDict = {}
         for HeaderFile in HeaderFiles:
             Index = self.Options.VfrFileName.find(self.Options.VfrBaseFileName)
             FileName = self.Options.VfrFileName[:Index] + HeaderFile
-            try:
-                f = open(FileName, 'r')
-                Lines = f.read()
-                f.close()
-            except:
-                EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
-                                "File open failed for %s" % FileName, None)
-            for Line in Lines.split('\n'):
-                if Line.find('#define') != -1:
-                    Items = Line.split()
-                    if len(Items) == 3:
-                        HeaderDict[Items[2]] = Items[1]
-                    elif len(Items) > 3:
-                        GuidStr = ''
-                        for i in range(2, len(Items)):
-                            if Items[i] != '{' and Items[i] != '}':
-                                GuidStr += Items[i]
-                        self.StringToGuid(GuidStr)
-                        HeaderDict[GuidStr] = Items[1]
+            DefineList = []
+            CppHeader = CppHeaderParser.CppHeader(FileName)
+            self.ParseCppHeaderDefines(CppHeader, HeaderDict)
+            for Include in CppHeader.includes:
+                IncludeFile = Include[1:-1].split('/')[1]
+                IncludeHeaderFile = self.FindIncludeHeaderFile("/edk2/", IncludeFile)
+                if IncludeHeaderFile == None:
+                    EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
+                                    "File/directory %s not found in workspace" % IncludeFile, None)
+                CppHeader = CppHeaderParser.CppHeader(IncludeHeaderFile)
+                self.ParseCppHeaderDefines(CppHeader, HeaderDict)
+            print(HeaderDict)
+
         return HeaderDict
 
 
@@ -719,7 +737,7 @@ class VfrTree():
             f.write(ValueIndent + 'flags:  {}  # Optional input , flags\n'.
                         format(Root.Data.FlagsStream))
         if Root.Data.HasKey:
-            f.write(ValueIndent + 'key: {} # Optional input, key \n'.format(Root.Data.HasKey))
+            f.write(ValueIndent + 'key:  {} # Optional input, key\n'.format(Root.Data.HasKey))
 
     def DumpYamlDfsWithUni(self, Root, f, UniDict, HeaderDict):
         try:
@@ -736,27 +754,18 @@ class VfrTree():
                 if Root.OpCode == EFI_IFR_FORM_SET_OP:
                     f.write(KeyIndent + 'formset:\n')
                     ValueIndent = ' ' * (Root.Level + 1) * 2
-                    for Key in HeaderDict:
-                        if Key.find(',') != -1 and self.StringToGuid(Key).__cmp__(Info.Guid):
-                            f.write(ValueIndent + 'guid:  '  + HeaderDict[Key] + '\n')
-                    #f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
-                       # + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
-                       # '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\'\n')
+                    f.write(ValueIndent + 'guid:  '  + HeaderDict[Info.Guid.to_string()] + '\n')
                     f.write(ValueIndent +
                             'title:  ' + self.GenST(UniDict[Info.FormSetTitle]))
                     f.write(
                         ValueIndent + 'help:  ' + self.GenST(UniDict[Info.Help]))
                     if len(Root.Data.GetClassGuid()) == 1:
                         Guid = Root.Data.GetClassGuid()[0]
-                        f.write(ValueIndent + 'classguid:  \'{'  + '{}, {}, {},'.format('0x%x'%(Guid.Data1),'0x%x'%(Guid.Data2), '0x%x'%(Guid.Data3)) \
-                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Guid.Data4[0]), '0x%x'%(Guid.Data4[1]), '0x%x'%(Guid.Data4[2]), '0x%x'%(Guid.Data4[3]), \
-                        '0x%x'%(Guid.Data4[4]), '0x%x'%(Guid.Data4[5]), '0x%x'%(Guid.Data4[6]), '0x%x'%(Guid.Data4[7])) + ' }}\'\n')
+                        f.write(ValueIndent + 'classguid:  '  + HeaderDict[Info.Guid.to_string()] + '\n')
                     else:
                         for i in range(0, len(Root.Data.GetClassGuid())):
                             Guid = Root.Data.GetClassGuid()[i]
-                            f.write(ValueIndent + 'classguid{}:  '.format(i+1) + '\'{'  + '{}, {}, {},'.format('0x%x'%(Guid.Data1),'0x%x'%(Guid.Data2), '0x%x'%(Guid.Data3)) \
-                            + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Guid.Data4[0]), '0x%x'%(Guid.Data4[1]), '0x%x'%(Guid.Data4[2]), '0x%x'%(Guid.Data4[3]), \
-                            '0x%x'%(Guid.Data4[4]), '0x%x'%(Guid.Data4[5]), '0x%x'%(Guid.Data4[6]), '0x%x'%(Guid.Data4[7])) + ' }}\'\n')
+                            f.write(ValueIndent + 'classguid:  '  + HeaderDict[Info.Guid.to_string()] + '\n')
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
@@ -832,7 +841,7 @@ class VfrTree():
                     f.write(KeyIndent + '- form: \n')
                     f.write(
                         ValueIndent +
-                        'formid:  {} \n'.format('0x%04x' %Info.FormId))
+                        'formid:  ' + HeaderDict['{}'.format('0x%04x' %Info.FormId)] + '\n')
                     if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
@@ -847,7 +856,7 @@ class VfrTree():
                     f.write(KeyIndent + '- formmap: \n')
                     f.write(
                         ValueIndent +
-                        'formid:  {} \n'.format('0x%04x' %Info.FormId))
+                        'formid:  ' + HeaderDict['{}'.format('0x%04x' %Info.FormId)] + '\n')
                     if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
@@ -919,10 +928,7 @@ class VfrTree():
                             'flags:  {}  # Optional Input, Question Flags\n'
                             .format(Root.Data.FlagsStream))
                         if Root.Data.HasKey:
-                            f.write(
-                            ValueIndent +
-                            'key:  {}  # Optional Input, Question QuestionId\n'
-                            .format('0x%04x' % (Info.Question.QuestionId)))
+                            f.write(ValueIndent + 'key:  ' + HeaderDict['{}'.format('0x%04x' % (Info.Question.QuestionId))] + '\n')
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
@@ -1153,8 +1159,8 @@ class VfrTree():
                             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
 
-                        f.write(ValueIndent + 'number:  {}  # Number\n'.format(
-                            '0x%x' % (Info.Number)))
+                        f.write(ValueIndent + 'number:  ' + HeaderDict['{}'.format(
+                            '0x%x' % (Info.Number))] + '\n')
 
                     if type(Root.Data) == IfrBanner:
                         f.write(KeyIndent + '- banner:\n')

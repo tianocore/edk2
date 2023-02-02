@@ -60,6 +60,8 @@ parser.add_argument("-c", dest ="CompileYaml",help = "compile Yaml file")
 parser.add_argument("-i", dest = "IncludePaths", help= "add path argument") #
 parser.add_argument("-o", "--output-directory", "-od", dest = "OutputDirectory", help= "deposit all output files to directory OutputDir, \
                     default is current directory")
+parser.add_argument("-oo", "--old-output-directory", "-ood", dest = "OldOutputDirectory", help= "Former directory OutputDir of output files, \
+                    default is current directory")
 parser.add_argument("-b", "--create-ifr-package", "-ibin", dest = "CreateIfrPkgFile", help = "create an IFR HII pack file")
 parser.add_argument("-n", "--no-pre-processing", "-nopp", dest = "SkipCPreprocessor", help = "do not preprocessing input file")
 parser.add_argument("-f", "--pre-processing-flag", "-ppflag", dest = "CPreprocessorOptions", help = "C-preprocessor argument") #
@@ -123,6 +125,14 @@ class VfrCompiler():
                 else:
                     self.Options.OutputDirectory += '\\'
             EdkLogger.debug(9, "Output Directory {}".format(self.Options.OutputDirectory))
+
+        if Args.OldOutputDirectory:
+            self.Options.OldOutputDirectory = Args.OldOutputDirectory
+            if self.Options.OldOutputDirectory == None:
+                EdkLogger.error("VfrCompiler", OPTION_MISSING, "-oo missing output directory name")
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+                return
+            EdkLogger.debug(9, "Old Output Directory {}".format(self.Options.OldOutputDirectory))
 
         if Args.CreateIfrPkgFile:
             self.Options.CreateIfrPkgFile = True
@@ -222,10 +232,6 @@ class VfrCompiler():
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
             return
 
-        if self.SetUNIStrFileName() != 0:
-            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
-            return
-
     def SetBaseFileName(self):
         if self.Options.VfrFileName == None:
             return -1
@@ -290,10 +296,35 @@ class VfrCompiler():
         self.Options.HeaderFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header' + VFR_PREPROCESS_FILENAME_EXTENSION
         return 0
 
-    def SetUNIStrFileName(self): ##
-        if self.Options.VfrBaseFileName == None:
+    def SetOldOutputFileNames(self):
+        #self.Options.ProcessedInFileName = self.VfrTree.FindIncludeHeaderFile('/edk2/', self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)
+
+
+        if self.Options.VfrFileName.find('/') == -1:
+            self.Options.VfrFileName = self.Options.VfrFileName.replace('\\', '/')
+
+        self.Options.UniStrDefFileName = self.VfrTree.FindIncludeHeaderFile('/edk2/', self.Options.VfrFileName.split('/')[-2] + 'StrDefs.h')
+        '''
+        if self.Options.OldOutputDirectory == None:
             return -1
-        self.Options.UNIStrFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'StrDefs.txt'
+        LastChar = self.Options.OldOutputDirectory[len(self.Options.OldOutputDirectory) - 1]
+        if LastChar != '/' and LastChar != '\\':
+            if self.Options.OldOutputDirectory.find('/') != -1:
+                self.Options.OldOutputDirectory += '/'
+                self.Options.ProcessedInFileName  = self.Options.OldOutputDirectory + 'OUTPUT/' + self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION
+                self.Options.UniStrDefFileName = self.Options.OldOutputDirectory + 'DEBUG/' + self.Options.OldOutputDirectory.split('/')[-2] + 'StrDefs.h'
+            else:
+                self.Options.OldOutputDirectory += '\\'
+                self.Options.ProcessedInFileName  = self.Options.OldOutputDirectory + 'OUTPUT\\' + self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION
+                self.Options.UniStrDefFileName = self.Options.OldOutputDirectory + 'DEBUG\\' + self.Options.OldOutputDirectory.split('\\')[-2] + 'StrDefs.h'
+        else:
+            if self.Options.OldOutputDirectory.find('/') != -1:
+                self.Options.ProcessedInFileName = self.Options.OldOutputDirectory + 'OUTPUT/' + self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION
+                self.Options.UniStrDefFileName = self.Options.OldOutputDirectory + 'DEBUG/' + self.Options.OldOutputDirectory.split('/')[-2] + 'StrDefs.h'
+            else:
+                self.Options.ProcessedInFileName = self.Options.OldOutputDirectory + 'OUTPUT\\' + self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION
+                self.Options.UniStrDefFileName = self.Options.OldOutputDirectory + 'DEBUG\\' + self.Options.OldOutputDirectory.split('\\')[-2] + 'StrDefs.h'
+        '''
         return 0
 
     def PreProcess(self):
@@ -331,7 +362,11 @@ class VfrCompiler():
                     self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
 
     def Compile(self):
-        InFileName = self.Options.VfrFileName if self.Options.SkipCPreprocessor == True\
+        self.Options.ProcessedInFileName = self.VfrTree.FindIncludeHeaderFile('/edk2/', self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)
+        if self.Options.ProcessedInFileName == None:
+            EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
+                                "File/directory %s not found in workspace" % (self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION), None)
+        InFileName = self.Options.ProcessedInFileName if self.Options.SkipCPreprocessor == True\
                 else self.Options.PreprocessorOutputFileName
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED):
             EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "compile error in file %s" % InFileName, InFileName)
@@ -501,8 +536,8 @@ def main():
     # Extended Features
     Compiler.DumpYaml()
     Compiler.DumpJson()
-    Compiler.PreProcessYaml()
-    Compiler.CompileYaml()
+    # Compiler.PreProcessYaml()
+    # Compiler.CompileYaml()
 
     Status = Compiler.RunStatus
     if Status == COMPILER_RUN_STATUS.STATUS_DEAD or Status == COMPILER_RUN_STATUS.STATUS_FAILED:
