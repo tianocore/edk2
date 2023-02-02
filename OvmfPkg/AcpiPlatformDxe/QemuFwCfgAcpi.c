@@ -10,6 +10,7 @@
 
 #include <IndustryStandard/Acpi.h>            // EFI_ACPI_DESCRIPTION_HEADER
 #include <IndustryStandard/QemuLoader.h>      // QEMU_LOADER_FNAME_SIZE
+#include <IndustryStandard/UefiTcgPlatform.h>
 #include <Library/BaseLib.h>                  // AsciiStrCmp()
 #include <Library/BaseMemoryLib.h>            // CopyMem()
 #include <Library/DebugLib.h>                 // DEBUG()
@@ -18,6 +19,7 @@
 #include <Library/QemuFwCfgLib.h>             // QemuFwCfgFindFile()
 #include <Library/QemuFwCfgS3Lib.h>           // QemuFwCfgS3Enabled()
 #include <Library/UefiBootServicesTableLib.h> // gBS
+#include <Library/TpmMeasurementLib.h>
 
 #include "AcpiPlatform.h"
 
@@ -415,6 +417,21 @@ ProcessCmdAllocate (
     (UINT64)Blob->Size,
     (UINT64)(UINTN)Blob->Base
     ));
+
+  //
+  // Measure the data which is downloaded from QEMU.
+  // It has to be done before it is consumed. Because the data will
+  // be updated in the following operations.
+  //
+  TpmMeasureAndLogData (
+    1,
+    EV_PLATFORM_CONFIG_FLAGS,
+    EV_POSTCODE_INFO_ACPI_DATA,
+    ACPI_DATA_LEN,
+    (VOID *)(UINTN)Blob->Base,
+    Blob->Size
+    );
+
   return EFI_SUCCESS;
 
 FreeBlob:
@@ -1126,6 +1143,21 @@ InstallQemuFwCfgTables (
   QemuFwCfgSelectItem (FwCfgItem);
   QemuFwCfgReadBytes (FwCfgSize, LoaderStart);
   RestorePciDecoding (OriginalPciAttributes, OriginalPciAttributesCount);
+
+  //
+  // Measure the "etc/table-loader" which is downloaded from QEMU.
+  // It has to be done before it is consumed. Because it would be
+  // updated in the following operations.
+  //
+  TpmMeasureAndLogData (
+    1,
+    EV_PLATFORM_CONFIG_FLAGS,
+    EV_POSTCODE_INFO_ACPI_DATA,
+    ACPI_DATA_LEN,
+    (VOID *)(UINTN)LoaderStart,
+    FwCfgSize
+    );
+
   LoaderEnd = LoaderStart + FwCfgSize / sizeof *LoaderEntry;
 
   AllocationsRestrictedTo32Bit = NULL;
