@@ -2,12 +2,13 @@
   Definitions based on NVMe spec. version 1.1.
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2017 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
   NVMe Specification 1.1
   NVMe Specification 1.4
+  NVMe Specification 2.0
 
 **/
 
@@ -501,6 +502,49 @@ typedef struct {
   UINT16    Rpmessage;                       /* Request/Response Message */
   // UINT8    *Data;                         /* Data to be written or read by signed access where M = 512 * Sector Count. */
 } NVME_RPMB_DATA_FRAME;
+
+//
+// RPMB Device Configuration Block Data Structure.
+// (ref. NVMe Base spec. v2.0 Figure 460).
+//
+typedef struct {
+  UINT8    BPPEnable;     /* Boot Partition Protection Enabled */
+  UINT8    BPLock;        /* Boot Partition Lock */
+  UINT8    NameSpaceWrP;  /* Namespace Write Protection */
+  UINT8    Rsvd1[509];    /* Reserved as of Nvm Express 2.0 Spec */
+} NVME_RPMB_DCB;
+
+//
+// RPMB Request and Response Message Types.
+// (ref. NVMe Base spec. v2.0 Figure 461).
+//
+#define NVME_RPMB_AUTHKEY_PROGRAM           0x0001
+#define NVME_RPMB_COUNTER_READ              0x0002
+#define NVME_RPMB_AUTHDATA_WRITE            0x0003
+#define NVME_RPMB_AUTHDATA_READ             0x0004
+#define NVME_RPMB_RESULT_READ               0x0005
+#define NVME_RPMB_DCB_WRITE                 0x0006
+#define NVME_RPMB_DCB_READ                  0x0007
+#define NVME_RPMB_AUTHKEY_PROGRAM_RESPONSE  0x0100
+#define NVME_RPMB_COUNTER_READ_RESPONSE     0x0200
+#define NVME_RPMB_AUTHDATA_WRITE_RESPONSE   0x0300
+#define NVME_RPMB_AUTHDATA_READ_RESPONSE    0x0400
+#define NVME_RPMB_DCB_WRITE_RESPONSE        0x0600
+#define NVME_RPMB_DCB_READ_RESPONSE         0x0700
+
+//
+// RPMB Operation Result.
+// (ref. NVMe Base spec. v2.0 Figure 462).
+//
+#define NVME_RPMB_RESULT_SUCCESS                 0x00
+#define NVME_RPMB_RESULT_GENERAL_FAILURE         0x01
+#define NVME_RPMB_RESULT_AHTHENTICATION_FAILURE  0x02
+#define NVME_RPMB_RESULT_COUNTER_FAILURE         0x03
+#define NVME_RPMB_RESULT_ADDRESS_FAILURE         0x04
+#define NVME_RPMB_RESULT_WRITE_FAILURE           0x05
+#define NVME_RPMB_RESULT_READ_FAILURE            0x06
+#define NVME_RPMB_RESULT_AUTHKEY_NOT_PROGRAMMED  0x07
+#define NVME_RPMB_RESULT_INVALID_DCB             0x08
 
 //
 // NvmExpress Admin Identify Cmd
