@@ -182,7 +182,7 @@ InstallMemoryAttributesTable (
   MemoryAttributesTable->Version         = EFI_MEMORY_ATTRIBUTES_TABLE_VERSION;
   MemoryAttributesTable->NumberOfEntries = RuntimeEntryCount;
   MemoryAttributesTable->DescriptorSize  = (UINT32)DescriptorSize;
-  MemoryAttributesTable->Reserved        = 0;
+  MemoryAttributesTable->Flags           = 0;
   DEBUG ((DEBUG_VERBOSE, "MemoryAttributesTable:\n"));
   DEBUG ((DEBUG_VERBOSE, "  Version              - 0x%08x\n", MemoryAttributesTable->Version));
   DEBUG ((DEBUG_VERBOSE, "  NumberOfEntries      - 0x%08x\n", MemoryAttributesTable->NumberOfEntries));
