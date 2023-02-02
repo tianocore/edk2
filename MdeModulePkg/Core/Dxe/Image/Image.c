@@ -1400,6 +1400,16 @@ CoreLoadImageCommon (
   }
 
   //
+  // Check whether we are loading a runtime image that lacks support for
+  // IBT/BTI landing pads.
+  //
+  if ((Image->ImageContext.ImageCodeMemoryType == EfiRuntimeServicesCode) &&
+      ((Image->ImageContext.DllCharacteristicsEx & EFI_IMAGE_DLLCHARACTERISTICS_EX_FORWARD_CFI_COMPAT) == 0))
+  {
+    gMemoryAttributesTableForwardCfi = FALSE;
+  }
+
+  //
   // Reinstall loaded image protocol to fire any notifications
   //
   Status = CoreReinstallProtocolInterface (
