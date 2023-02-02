@@ -331,153 +331,36 @@ CreateOrUpdatePageTable (
 }
 
 /**
-  Set one page of page table pool memory to be read-only.
-
-  @param[in] PageTableBase    Base address of page table (CR3).
-  @param[in] Address          Start address of a page to be set as read-only.
-  @param[in] Level4Paging     Level 4 paging flag.
-
-**/
-VOID
-SetPageTablePoolReadOnly (
-  IN  UINTN                 PageTableBase,
-  IN  EFI_PHYSICAL_ADDRESS  Address,
-  IN  BOOLEAN               Level4Paging
-  )
-{
-  UINTN                 Index;
-  UINTN                 EntryIndex;
-  UINT64                AddressEncMask;
-  EFI_PHYSICAL_ADDRESS  PhysicalAddress;
-  UINT64                *PageTable;
-  UINT64                *NewPageTable;
-  UINT64                PageAttr;
-  UINT64                LevelSize[5];
-  UINT64                LevelMask[5];
-  UINTN                 LevelShift[5];
-  UINTN                 Level;
-  UINT64                PoolUnitSize;
-
-  ASSERT (PageTableBase != 0);
-
-  //
-  // Since the page table is always from page table pool, which is always
-  // located at the boundary of PcdPageTablePoolAlignment, we just need to
-  // set the whole pool unit to be read-only.
-  //
-  Address = Address & PAGE_TABLE_POOL_ALIGN_MASK;
-
-  LevelShift[1] = PAGING_L1_ADDRESS_SHIFT;
-  LevelShift[2] = PAGING_L2_ADDRESS_SHIFT;
-  LevelShift[3] = PAGING_L3_ADDRESS_SHIFT;
-  LevelShift[4] = PAGING_L4_ADDRESS_SHIFT;
-
-  LevelMask[1] = PAGING_4K_ADDRESS_MASK_64;
-  LevelMask[2] = PAGING_2M_ADDRESS_MASK_64;
-  LevelMask[3] = PAGING_1G_ADDRESS_MASK_64;
-  LevelMask[4] = PAGING_1G_ADDRESS_MASK_64;
-
-  LevelSize[1] = SIZE_4KB;
-  LevelSize[2] = SIZE_2MB;
-  LevelSize[3] = SIZE_1GB;
-  LevelSize[4] = SIZE_512GB;
-
-  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) &
-                   PAGING_1G_ADDRESS_MASK_64;
-  PageTable    = (UINT64 *)(UINTN)PageTableBase;
-  PoolUnitSize = PAGE_TABLE_POOL_UNIT_SIZE;
-
-  for (Level = (Level4Paging) ? 4 : 3; Level > 0; --Level) {
-    Index  = ((UINTN)RShiftU64 (Address, LevelShift[Level]));
-    Index &= PAGING_PAE_INDEX_MASK;
-
-    PageAttr = PageTable[Index];
-    if ((PageAttr & IA32_PG_PS) == 0) {
-      //
-      // Go to next level of table.
-      //
-      PageTable = (UINT64 *)(UINTN)(PageAttr & ~AddressEncMask &
-                                    PAGING_4K_ADDRESS_MASK_64);
-      continue;
-    }
-
-    if (PoolUnitSize >= LevelSize[Level]) {
-      //
-      // Clear R/W bit if current page granularity is not larger than pool unit
-      // size.
-      //
-      if ((PageAttr & IA32_PG_RW) != 0) {
-        while (PoolUnitSize > 0) {
-          //
-          // PAGE_TABLE_POOL_UNIT_SIZE and PAGE_TABLE_POOL_ALIGNMENT are fit in
-          // one page (2MB). Then we don't need to update attributes for pages
-          // crossing page directory. ASSERT below is for that purpose.
-          //
-          ASSERT (Index < EFI_PAGE_SIZE/sizeof (UINT64));
-
-          PageTable[Index] &= ~(UINT64)IA32_PG_RW;
-          PoolUnitSize     -= LevelSize[Level];
-
-          ++Index;
-        }
-      }
-
-      break;
-    } else {
-      //
-      // The smaller granularity of page must be needed.
-      //
-      ASSERT (Level > 1);
-
-      NewPageTable = AllocatePageTableMemory (1);
-      ASSERT (NewPageTable != NULL);
-
-      PhysicalAddress = PageAttr & LevelMask[Level];
-      for (EntryIndex = 0;
-           EntryIndex < EFI_PAGE_SIZE/sizeof (UINT64);
-           ++EntryIndex)
-      {
-        NewPageTable[EntryIndex] = PhysicalAddress  | AddressEncMask |
-                                   IA32_PG_P | IA32_PG_RW;
-        if (Level > 2) {
-          NewPageTable[EntryIndex] |= IA32_PG_PS;
-        }
-
-        PhysicalAddress += LevelSize[Level - 1];
-      }
-
-      PageTable[Index] = (UINT64)(UINTN)NewPageTable | AddressEncMask |
-                         IA32_PG_P | IA32_PG_RW;
-      PageTable = NewPageTable;
-    }
-  }
-}
-
-/**
   Prevent the memory pages used for page table from been overwritten.
 
-  @param[in] PageTableBase    Base address of page table (CR3).
-  @param[in] Level4Paging     Level 4 paging flag.
+  @param[in] PageTableBase   Base address of page table (CR3).
+  @param[in] PagingMode      The paging mode.
 
 **/
 VOID
 EnablePageTableProtection (
-  IN  UINTN    PageTableBase,
-  IN  BOOLEAN  Level4Paging
+  IN  UINTN        PageTableBase,
+  IN  PAGING_MODE  PagingMode
   )
 {
   PAGE_TABLE_POOL       *HeadPool;
   PAGE_TABLE_POOL       *Pool;
   UINT64                PoolSize;
   EFI_PHYSICAL_ADDRESS  Address;
+  IA32_MAP_ATTRIBUTE    MapAttribute;
+  IA32_MAP_ATTRIBUTE    MapMask;
 
   if (mPageTablePool == NULL) {
     return;
   }
 
+  MapAttribute.Uint64         = 0;
+  MapAttribute.Bits.ReadWrite = 0;
+  MapMask.Uint64              = 0;
+  MapMask.Bits.ReadWrite      = 1;
+
   //
-  // No need to clear CR0.WP since PageTableBase has't been written to CR3 yet.
-  // SetPageTablePoolReadOnly might update mPageTablePool. It's safer to
+  // CreateOrUpdatePageTable might update mPageTablePool. It's safer to
   // remember original one in advance.
   //
   HeadPool = mPageTablePool;
@@ -485,18 +368,10 @@ EnablePageTableProtection (
   do {
     Address  = (EFI_PHYSICAL_ADDRESS)(UINTN)Pool;
     PoolSize = Pool->Offset + EFI_PAGES_TO_SIZE (Pool->FreePages);
-
     //
-    // The size of one pool must be multiple of PAGE_TABLE_POOL_UNIT_SIZE, which
-    // is one of page size of the processor (2MB by default). Let's apply the
-    // protection to them one by one.
+    // Set entire pool including header, used-memory and left free-memory as ReadOnly.
     //
-    while (PoolSize > 0) {
-      SetPageTablePoolReadOnly (PageTableBase, Address, Level4Paging);
-      Address  += PAGE_TABLE_POOL_UNIT_SIZE;
-      PoolSize -= PAGE_TABLE_POOL_UNIT_SIZE;
-    }
-
+    CreateOrUpdatePageTable (&PageTableBase, PagingMode, Address, PoolSize, &MapAttribute, &MapMask);
     Pool = Pool->NextPool;
   } while (Pool != HeadPool);
 
@@ -688,7 +563,7 @@ CreateIdentityMappingPageTables (
   // Protect the page table by marking the memory used for page table to be
   // read-only.
   //
-  EnablePageTableProtection ((UINTN)PageTable, TRUE);
+  EnablePageTableProtection (PageTable, PagingMode);
 
   //
   // Set IA32_EFER.NXE if necessary.
