@@ -1004,7 +1004,7 @@ S3BootScriptCloseTable (
   @param Buffer  The source buffer from which to write data.
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
 **/
 RETURN_STATUS
 EFIAPI
@@ -1020,6 +1020,10 @@ S3BootScriptSaveIoWrite (
   UINT8                     *Script;
   UINT8                     WidthInByte;
   EFI_BOOT_SCRIPT_IO_WRITE  ScriptIoWrite;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   WidthInByte = (UINT8)(0x01 << (Width & 0x03));
 
@@ -1064,7 +1068,7 @@ S3BootScriptSaveIoWrite (
   @param DataMask  A pointer to the data mask to be AND-ed with the data read from the register
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
 **/
 RETURN_STATUS
 EFIAPI
@@ -1079,6 +1083,10 @@ S3BootScriptSaveIoReadWrite (
   UINT8                          *Script;
   UINT8                          WidthInByte;
   EFI_BOOT_SCRIPT_IO_READ_WRITE  ScriptIoReadWrite;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   WidthInByte = (UINT8)(0x01 << (Width & 0x03));
   Length      = (UINT8)(sizeof (EFI_BOOT_SCRIPT_IO_READ_WRITE) + (WidthInByte * 2));
@@ -1114,7 +1122,7 @@ S3BootScriptSaveIoReadWrite (
   @param Buffer  The source buffer from which to write the data.
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
 **/
 RETURN_STATUS
 EFIAPI
@@ -1129,6 +1137,10 @@ S3BootScriptSaveMemWrite (
   UINT8                      *Script;
   UINT8                      WidthInByte;
   EFI_BOOT_SCRIPT_MEM_WRITE  ScriptMemWrite;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   WidthInByte = (UINT8)(0x01 << (Width & 0x03));
 
@@ -1174,7 +1186,7 @@ S3BootScriptSaveMemWrite (
   @param DataMask  A pointer to the data mask to be AND-ed with the data read from the register.
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
 **/
 RETURN_STATUS
 EFIAPI
@@ -1189,6 +1201,10 @@ S3BootScriptSaveMemReadWrite (
   UINT8                           *Script;
   UINT8                           WidthInByte;
   EFI_BOOT_SCRIPT_MEM_READ_WRITE  ScriptMemReadWrite;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   WidthInByte = (UINT8)(0x01 << (Width & 0x03));
   Length      = (UINT8)(sizeof (EFI_BOOT_SCRIPT_MEM_READ_WRITE) + (WidthInByte * 2));
@@ -1224,7 +1240,7 @@ S3BootScriptSaveMemReadWrite (
   @param Buffer    The source buffer from which to write the data.
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
   @note  A known Limitations in the implementation which is 64bits operations are not supported.
 
 **/
@@ -1241,6 +1257,10 @@ S3BootScriptSavePciCfgWrite (
   UINT8                             *Script;
   UINT8                             WidthInByte;
   EFI_BOOT_SCRIPT_PCI_CONFIG_WRITE  ScriptPciWrite;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   if ((Width == S3BootScriptWidthUint64) ||
       (Width == S3BootScriptWidthFifoUint64) ||
@@ -1293,7 +1313,7 @@ S3BootScriptSavePciCfgWrite (
   @param DataMask    A pointer to the data mask to be AND-ed.
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN__SUCCESS           Opcode is added.
+  @retval RETURN__SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
   @note  A known Limitations in the implementation which is 64bits operations are not supported.
 
 **/
@@ -1310,6 +1330,10 @@ S3BootScriptSavePciCfgReadWrite (
   UINT8                                  *Script;
   UINT8                                  WidthInByte;
   EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE  ScriptPciReadWrite;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   if ((Width == S3BootScriptWidthUint64) ||
       (Width == S3BootScriptWidthFifoUint64) ||
@@ -1357,7 +1381,7 @@ S3BootScriptSavePciCfgReadWrite (
   @param Buffer    The source buffer from which to write the data.
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
   @note  A known Limitations in the implementation which is 64bits operations are not supported.
 
 **/
@@ -1375,6 +1399,10 @@ S3BootScriptSavePciCfg2Write (
   UINT8                              *Script;
   UINT8                              WidthInByte;
   EFI_BOOT_SCRIPT_PCI_CONFIG2_WRITE  ScriptPciWrite2;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   if ((Width == S3BootScriptWidthUint64) ||
       (Width == S3BootScriptWidthFifoUint64) ||
@@ -1429,7 +1457,7 @@ S3BootScriptSavePciCfg2Write (
   @param DataMask    A pointer to the data mask to be AND-ed.
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
   @note  A known Limitations in the implementation which is 64bits operations are not supported.
 
 **/
@@ -1447,6 +1475,10 @@ S3BootScriptSavePciCfg2ReadWrite (
   UINT8                                   *Script;
   UINT8                                   WidthInByte;
   EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE  ScriptPciReadWrite2;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   if ((Width == S3BootScriptWidthUint64) ||
       (Width == S3BootScriptWidthFifoUint64) ||
@@ -1601,7 +1633,7 @@ CheckParameters (
   @param Buffer         Contains the value of data to execute to the SMBUS slave device.
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
 **/
 RETURN_STATUS
 EFIAPI
@@ -1617,6 +1649,10 @@ S3BootScriptSaveSmbusExecute (
   UINT8                          DataSize;
   UINT8                          *Script;
   EFI_BOOT_SCRIPT_SMBUS_EXECUTE  ScriptSmbusExecute;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   if (Length == NULL) {
     BufferLength = 0;
@@ -1670,7 +1706,7 @@ S3BootScriptSaveSmbusExecute (
   @param Duration   Duration in microseconds of the stall
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
 **/
 RETURN_STATUS
 EFIAPI
@@ -1681,6 +1717,10 @@ S3BootScriptSaveStall (
   UINT8                  Length;
   UINT8                  *Script;
   EFI_BOOT_SCRIPT_STALL  ScriptStall;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_STALL));
 
@@ -1710,7 +1750,7 @@ S3BootScriptSaveStall (
   @param Context      Argument to be passed into the EntryPoint of the code to be dispatched.
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
 **/
 RETURN_STATUS
 EFIAPI
@@ -1722,6 +1762,10 @@ S3BootScriptSaveDispatch2 (
   UINT8                       Length;
   UINT8                       *Script;
   EFI_BOOT_SCRIPT_DISPATCH_2  ScriptDispatch2;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_DISPATCH_2));
 
@@ -1762,7 +1806,7 @@ S3BootScriptSaveDispatch2 (
   @param LoopTimes The times of the register polling.
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
 
 **/
 RETURN_STATUS
@@ -1780,6 +1824,10 @@ S3BootScriptSaveMemPoll (
   UINT8                     *Script;
   UINT8                     WidthInByte;
   EFI_BOOT_SCRIPT_MEM_POLL  ScriptMemPoll;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   WidthInByte = (UINT8)(0x01 << (Width & 0x03));
 
@@ -1817,7 +1865,7 @@ S3BootScriptSaveMemPoll (
   @param Information       Information to be logged in the boot scrpit
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
 
 **/
 RETURN_STATUS
@@ -1830,6 +1878,10 @@ S3BootScriptSaveInformation (
   UINT8                        Length;
   UINT8                        *Script;
   EFI_BOOT_SCRIPT_INFORMATION  ScriptInformation;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   //
   // Truncation check
@@ -1868,7 +1920,7 @@ S3BootScriptSaveInformation (
   @param String            The string to save to boot script table
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
 
 **/
 RETURN_STATUS
@@ -1889,7 +1941,7 @@ S3BootScriptSaveInformationAsciiString (
   @param EntryPoint   Entry point of the code to be dispatched.
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
 **/
 RETURN_STATUS
 EFIAPI
@@ -1900,6 +1952,10 @@ S3BootScriptSaveDispatch (
   UINT8                     Length;
   UINT8                     *Script;
   EFI_BOOT_SCRIPT_DISPATCH  ScriptDispatch;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_DISPATCH));
 
@@ -1935,7 +1991,7 @@ S3BootScriptSaveDispatch (
                                 granularity so the delay may be longer.
 
  @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
- @retval RETURN_SUCCESS          Opcode is added.
+ @retval RETURN_SUCCESS          Opcode is added or no action is required as ACPI S3 was disabled.
 
 **/
 RETURN_STATUS
@@ -1952,6 +2008,10 @@ S3BootScriptSaveIoPoll (
   UINT8                    *Script;
   UINT8                    Length;
   EFI_BOOT_SCRIPT_IO_POLL  ScriptIoPoll;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   WidthInByte = (UINT8)(0x01 << (Width & 0x03));
   Length      = (UINT8)(sizeof (EFI_BOOT_SCRIPT_IO_POLL) + (WidthInByte * 2));
@@ -1992,7 +2052,7 @@ S3BootScriptSaveIoPoll (
                                 granularity so the delay may be longer.
 
  @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
- @retval RETURN_SUCCESS           Opcode is added.
+ @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
   @note  A known Limitations in the implementation which is 64bits operations are not supported.
 
 **/
@@ -2010,6 +2070,10 @@ S3BootScriptSavePciPoll (
   UINT8                            WidthInByte;
   UINT8                            Length;
   EFI_BOOT_SCRIPT_PCI_CONFIG_POLL  ScriptPciPoll;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   if ((Width == S3BootScriptWidthUint64) ||
       (Width == S3BootScriptWidthFifoUint64) ||
@@ -2058,7 +2122,7 @@ S3BootScriptSavePciPoll (
                                 granularity so the delay may be longer.
 
  @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
- @retval RETURN_SUCCESS           Opcode is added.
+ @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
   @note  A known Limitations in the implementation which is 64bits operations are not supported.
 
 **/
@@ -2077,6 +2141,10 @@ S3BootScriptSavePci2Poll (
   UINT8                             *Script;
   UINT8                             Length;
   EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL  ScriptPci2Poll;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   if ((Width == S3BootScriptWidthUint64) ||
       (Width == S3BootScriptWidthFifoUint64) ||
@@ -2192,7 +2260,7 @@ S3BootScriptCalculateInsertAddress (
 
   @retval RETURN_OUT_OF_RESOURCES  The table is not available.
   @retval RETURN_INVALID_PARAMETER The Position is not a valid position in the boot script table.
-  @retval RETURN_SUCCESS           Opcode is inserted.
+  @retval RETURN_SUCCESS           Opcode is inserted no action is required as ACPI S3 was disabled.
 **/
 RETURN_STATUS
 EFIAPI
@@ -2209,6 +2277,10 @@ S3BootScriptMoveLastOpcode (
   BOOLEAN                        ValidatePosition;
   UINT8                          *LastOpcode;
   UINT8                          TempBootScriptEntry[BOOT_SCRIPT_NODE_MAX_LENGTH];
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   ValidatePosition = FALSE;
   TempPosition     = (Position == NULL) ? NULL : (*Position);
@@ -2297,7 +2369,7 @@ S3BootScriptMoveLastOpcode (
 
   @retval RETURN_INVALID_PARAMETER The Position is not a valid position in the boot script table.
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
-  @retval RETURN_SUCCESS           Opcode is added.
+  @retval RETURN_SUCCESS           Opcode is added or no action is required as ACPI S3 was disabled.
 
 **/
 RETURN_STATUS
@@ -2312,6 +2384,10 @@ S3BootScriptLabelInternal (
   UINT8                        Length;
   UINT8                        *Script;
   EFI_BOOT_SCRIPT_INFORMATION  ScriptInformation;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   //
   // Truncation check
@@ -2357,8 +2433,8 @@ S3BootScriptLabelInternal (
                                 of the inserted opcode in the boot script table.
   @param  Label                 Points to the label which will be inserted in the boot script table.
 
-  @retval EFI_SUCCESS           The operation succeeded. A record was added into the
-                                specified script table.
+  @retval EFI_SUCCESS           The operation succeeded or no action is required.
+                                A record was added into the specified script table if ACPI S3 was enabled.
   @retval EFI_INVALID_PARAMETER The parameter is illegal or the given boot script is not supported.
                                 If the opcode is unknow or not supported because of the PCD
                                 Feature Flags.
@@ -2380,6 +2456,10 @@ S3BootScriptLabel (
   EFI_BOOT_SCRIPT_COMMON_HEADER  ScriptHeader;
   EFI_BOOT_SCRIPT_TABLE_HEADER   TableHeader;
   UINT32                         LabelLength;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   //
   // Check NULL Label
@@ -2443,8 +2523,8 @@ S3BootScriptLabel (
   @param  Position2             The positions in the boot script table to compare
   @param  RelativePosition      On return, points to the result of the comparison
 
-  @retval EFI_SUCCESS           The operation succeeded. A record was added into the
-                                specified script table.
+  @retval EFI_SUCCESS           The operation succeeded or no action is required.
+                                A record was added into the specified script table if ACPI S3 was enabled.
   @retval EFI_INVALID_PARAMETER The parameter is illegal or the given boot script is not supported.
                                 If the opcode is unknow or not supported because of the PCD
                                 Feature Flags.
@@ -2461,6 +2541,10 @@ S3BootScriptCompare (
 {
   UINT8   *Script;
   UINT32  TableLength;
+
+  if (!mS3BootScriptAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   if (RelativePosition == NULL) {
     return EFI_INVALID_PARAMETER;
