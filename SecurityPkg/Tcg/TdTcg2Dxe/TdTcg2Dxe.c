@@ -2510,6 +2510,12 @@ DriverEntry (
     //
     // Create event callback to install CC EventLog ACPI Table
     EfiCreateProtocolNotifyEvent (&gEfiAcpiTableProtocolGuid, TPL_CALLBACK, InstallAcpiTable, NULL, &Registration);
+  } else {
+    //
+    // Cc measurement feature is crucial to a td-guest and it shall stop running immediately
+    // when it is failed to be installed.
+    DEBUG ((DEBUG_ERROR, "%a: CcMeasurement protocol failed to be installed - %r\n", __FUNCTION__, Status));
+    CpuDeadLoop ();
   }
 
   return Status;
