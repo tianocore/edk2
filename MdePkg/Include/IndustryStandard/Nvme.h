@@ -547,6 +547,19 @@ typedef struct {
 #define NVME_RPMB_RESULT_INVALID_DCB             0x08
 
 //
+// Get Log Page - Boot Partition Log Header.
+// (ref. NVMe Base spec. v2.0 Figure 262).
+//
+typedef struct {
+  UINT8     LogIdentifier;   /* Log Identifier, shall be set to 15h */
+  UINT8     Rsvd1[3];
+  UINT32    Bpsz  : 15;      /* Boot Partition Size */
+  UINT32    Rsvd2 : 16;
+  UINT32    Abpid : 1;       /* Active Boot Partition ID */
+  UINT8     Rsvd3[8];
+} NVME_BOOT_PARTITION_HEADER;
+
+//
 // NvmExpress Admin Identify Cmd
 //
 typedef struct {
