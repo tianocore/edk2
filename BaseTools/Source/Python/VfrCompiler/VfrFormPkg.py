@@ -193,6 +193,7 @@ class FormPkg():
         self.PkgLength = 0
         self.Offset = 0
         self.PendingAssignList = None
+        self.List = [] #
 
     def BuildPkgHdr(self):
         PkgHdr = EFI_HII_PACKAGE_HEADER()
@@ -205,14 +206,15 @@ class FormPkg():
             self.PkgLength += Root.Data.GetInfo().Header.Length
             Root.Offset = gFormPkg.Offset #
             self.Offset += Root.Data.GetInfo().Header.Length
+            self.List.append({Root.Data.GetInfo().Header.Length, Root.OpCode})
         if Root.Child != []:
             for ChildNode in Root.Child:
                 self.BuildPkg(ChildNode)
 
     # Get data from ctypes to bytes.
-    def StructToStream(self, s) -> bytes:
-        Length = sizeof(s)
-        P = cast(pointer(s), POINTER(c_char * Length))
+    def StructToStream(self, Struct) -> bytes:
+        Length = sizeof(Struct)
+        P = cast(pointer(Struct), POINTER(c_char * Length))
         return P.contents.raw
 
 

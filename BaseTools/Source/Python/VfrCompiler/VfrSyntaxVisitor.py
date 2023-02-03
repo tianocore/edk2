@@ -2215,6 +2215,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         # modify the data for namevalue
         if UpdateVarType:
+            print(self.CurrQestVarInfo.VarType)
+            print('0x%0x' %NObj.GetInfo().Flags)
+            "07 A6 0F 00 10 00 01 20 00 00 FF FF 04 /23 /01 00 00 00 00 00 00 00 /FF FF FF FF FF FF FF FF /00 00 00 00 00 00 00 00"
             UpdatedNObj = IfrNumeric(self.CurrQestVarInfo.VarType)
             UpdatedNObj.FlagsStream = NObj.FlagsStream
             UpdatedNObj.HasKey = NObj.HasKey

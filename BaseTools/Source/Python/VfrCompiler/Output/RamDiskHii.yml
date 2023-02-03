@@ -1,0 +1,78 @@
+## DO NOT REMOVE -- VFR Mode
+include:
+  - RamDiskNVData.h
+formset:
+  guid:  RAM_DISK_FORM_SET_GUID
+  title:  STRING_TOKEN(STR_FORM_SET_TITLE)
+  help:  STRING_TOKEN(STR_FORM_SET_TITLE_HELP)
+  classguid:  RAM_DISK_FORM_SET_GUID
+  component:  
+  - form: 
+      formid:  MAIN_FORM_ID
+      title:  STRING_TOKEN(STR_MAIN_FORM_TITLE)
+      component:  
+      - oneof:
+          questionid:  CREATE_RAW_MEMORY_TYPE_QUESTION_ID # Optional Input, Need to compute if None
+          prompt:  STRING_TOKEN(STR_MEMORY_TYPE_PROMPT)
+          help:  STRING_TOKEN(STR_MEMORY_TYPE_HELP)
+          component:  
+          - option:  
+              text:  STRING_TOKEN(STR_RAM_DISK_BOOT_SERVICE_DATA_MEMORY)
+              value:  0x00
+              flags:  DEFAULT # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_RAM_DISK_RESERVED_MEMORY)
+              value:  0x01
+              flags:  0 # Optional Input
+      - subtitle:
+          prompt:  STRING_TOKEN(STR_RAM_DISK_NULL_STRING)
+      - goto:
+          formid:  0x2000
+          question:  RAM_DISK_RESERVED_MEMORY #  Optional Input
+          prompt:  STRING_TOKEN(STR_GOTO_ADD_RAW_FORM)
+          help:  STRING_TOKEN(STR_GOTO_ADD_RAW_FORM_HELP)
+      - goto:
+          formid:  0x1000
+          question:  MAIN_GOTO_FILE_EXPLORER_ID #  Optional Input
+          prompt:  STRING_TOKEN(STR_GOTO_ADD_FROM_FILE_FORM)
+          help:  STRING_TOKEN(STR_GOTO_ADD_FROM_FILE_FORM_HELP)
+      - subtitle:
+          prompt:  STRING_TOKEN(STR_RAM_DISK_NULL_STRING)
+      - subtitle:
+          prompt:  STRING_TOKEN(STR_RAM_DISK_LIST_TEXT)
+      - label:
+          number:  MAIN_LABEL_LIST_START
+      - label:
+          number:  MAIN_LABEL_LIST_END
+      - subtitle:
+          prompt:  STRING_TOKEN(STR_RAM_DISK_NULL_STRING)
+      - text:
+          help:  STRING_TOKEN(STR_REMOVE_SEL_HELP)
+          prompt:  STRING_TOKEN(STR_REMOVE_SEL_TEXT)
+          flags:  INTERACTIVE  # Optional Input, Question Flags
+          key:  MAIN_REMOVE_RD_QUESTION_ID # Optional Input, Question QuestionId
+  - form: 
+      formid:  CREATE_RAW_RAM_DISK_FORM_ID
+      title:  STRING_TOKEN(STR_ADD_RAW_FORM_TITLE)
+      component:  
+      - subtitle:
+          prompt:  STRING_TOKEN(STR_RAM_DISK_NULL_STRING)
+      - numeric:
+          questionid:  CREATE_RAW_SIZE_QUESTION_ID # Optional Input, Need to compute if None
+          prompt:  STRING_TOKEN(STR_SIZE_PROMPT)
+          help:  STRING_TOKEN(STR_SIZE_HELP)
+          flags:  NUMERIC_SIZE_8 | DISPLAY_UINT_HEX | INTERACTIVE  # Optional input , flags
+          maximum:  0xffffffff # Optional Input
+          minimum:  0x1 # Optional Input
+      - subtitle:
+          prompt:  STRING_TOKEN(STR_RAM_DISK_NULL_STRING)
+      - text:
+          help:  STRING_TOKEN(STR_CREATE_AND_EXIT_HELP)
+          prompt:  STRING_TOKEN(STR_CREATE_AND_EXIT_PROMPT)
+          flags:  INTERACTIVE  # Optional Input, Question Flags
+          key:  CREATE_RAW_SUBMIT_QUESTION_ID # Optional Input, Question QuestionId
+      - text:
+          help:  STRING_TOKEN(STR_DISCARD_AND_EXIT_HELP)
+          prompt:  STRING_TOKEN(STR_DISCARD_AND_EXIT_PROMPT)
+          flags:  INTERACTIVE  # Optional Input, Question Flags
+          key:  CREATE_RAW_DISCARD_QUESTION_ID # Optional Input, Question QuestionId

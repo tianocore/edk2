@@ -3,6 +3,7 @@ from pickletools import uint8
 import sys
 import yaml
 import logging
+import shutil
 import subprocess
 import time
 import re
@@ -296,43 +297,12 @@ class VfrCompiler():
         self.Options.HeaderFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header' + VFR_PREPROCESS_FILENAME_EXTENSION
         return 0
 
-    def SetOldOutputFileNames(self):
-        #self.Options.ProcessedInFileName = self.VfrTree.FindIncludeHeaderFile('/edk2/', self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)
-
-
-        if self.Options.VfrFileName.find('/') == -1:
-            self.Options.VfrFileName = self.Options.VfrFileName.replace('\\', '/')
-
-        self.Options.UniStrDefFileName = self.VfrTree.FindIncludeHeaderFile('/edk2/', self.Options.VfrFileName.split('/')[-2] + 'StrDefs.h')
-        '''
-        if self.Options.OldOutputDirectory == None:
-            return -1
-        LastChar = self.Options.OldOutputDirectory[len(self.Options.OldOutputDirectory) - 1]
-        if LastChar != '/' and LastChar != '\\':
-            if self.Options.OldOutputDirectory.find('/') != -1:
-                self.Options.OldOutputDirectory += '/'
-                self.Options.ProcessedInFileName  = self.Options.OldOutputDirectory + 'OUTPUT/' + self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION
-                self.Options.UniStrDefFileName = self.Options.OldOutputDirectory + 'DEBUG/' + self.Options.OldOutputDirectory.split('/')[-2] + 'StrDefs.h'
-            else:
-                self.Options.OldOutputDirectory += '\\'
-                self.Options.ProcessedInFileName  = self.Options.OldOutputDirectory + 'OUTPUT\\' + self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION
-                self.Options.UniStrDefFileName = self.Options.OldOutputDirectory + 'DEBUG\\' + self.Options.OldOutputDirectory.split('\\')[-2] + 'StrDefs.h'
-        else:
-            if self.Options.OldOutputDirectory.find('/') != -1:
-                self.Options.ProcessedInFileName = self.Options.OldOutputDirectory + 'OUTPUT/' + self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION
-                self.Options.UniStrDefFileName = self.Options.OldOutputDirectory + 'DEBUG/' + self.Options.OldOutputDirectory.split('/')[-2] + 'StrDefs.h'
-            else:
-                self.Options.ProcessedInFileName = self.Options.OldOutputDirectory + 'OUTPUT\\' + self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION
-                self.Options.UniStrDefFileName = self.Options.OldOutputDirectory + 'DEBUG\\' + self.Options.OldOutputDirectory.split('\\')[-2] + 'StrDefs.h'
-        '''
-        return 0
-
     def PreProcess(self):
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED):
             if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
         else:
-            if self.Options.SkipCPreprocessor:
+            if self.Options.SkipCPreprocessor == False:  ##### wip
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
             else:
                 try:
@@ -362,12 +332,8 @@ class VfrCompiler():
                     self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
 
     def Compile(self):
-        self.Options.ProcessedInFileName = self.VfrTree.FindIncludeHeaderFile('/edk2/', self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)
-        if self.Options.ProcessedInFileName == None:
-            EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
-                                "File/directory %s not found in workspace" % (self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION), None)
-        InFileName = self.Options.ProcessedInFileName if self.Options.SkipCPreprocessor == True\
-                else self.Options.PreprocessorOutputFileName
+        InFileName = self.Options.VfrFileName if self.Options.SkipCPreprocessor == True\
+                else self.Options.PreprocessorOutputFileName #
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED):
             EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "compile error in file %s" % InFileName, InFileName)
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
@@ -524,11 +490,20 @@ class VfrCompiler():
                 os._exit(ret)
         return ret
 
+    def CopyFile(self):
+        self.Options.ProcessedInFileName = self.VfrTree.FindIncludeHeaderFile('/edk2/', self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)[0]
+        if self.Options.ProcessedInFileName == None:
+            EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
+                                "File/directory %s not found in workspace" % (self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION), None)
+        shutil.copyfile(self.Options.VfrFileName, self.Options.OutputDirectory + self.Options.VfrBaseFileName + '.vfr')
+        shutil.copyfile(self.Options.ProcessedInFileName, self.Options.OutputDirectory + self.Options.VfrBaseFileName + '.i')
+
 def main():
     Args = parser.parse_args()
     Argc = len(sys.argv)
     EdkLogger.SetLevel(WARNING_LOG_LEVEL)
     Compiler = VfrCompiler(Args, Argc)
+    Compiler.CopyFile() #
     Compiler.PreProcess()
     Compiler.Compile()
     Compiler.GenBinaryFiles()

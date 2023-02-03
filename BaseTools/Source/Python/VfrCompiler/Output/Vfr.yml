@@ -1,0 +1,554 @@
+## DO NOT REMOVE -- VFR Mode
+include:
+  - Uefi/UefiMultiPhase.h
+  - NVDataStruc.h
+formset:
+  guid:  DRIVER_SAMPLE_FORMSET_GUID
+  title:  STRING_TOKEN(STR_FORM_SET_TITLE)
+  help:  STRING_TOKEN(STR_FORM_SET_TITLE_HELP)
+  classguid:  DRIVER_SAMPLE_FORMSET_GUID
+  component:  
+  - defaultstore:
+      type:  MyStandardDefault
+      prompt:  STRING_TOKEN(STR_STANDARD_DEFAULT_PROMPT)
+      attribute:  0x0000 # Default ID
+  - defaultstore:
+      type:  MyManufactureDefault
+      prompt:  STRING_TOKEN(STR_MANUFACTURE_DEFAULT_PROMPT)
+      attribute:  0x0001 # Default ID
+  - varstore:
+      type:  DRIVER_SAMPLE_CONFIGURATION
+      varid:  0x1234 # Optional Input, Need to assign if None
+      name:  MyIfrNVData
+      guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
+  - efivarstore:
+      type:  MY_EFI_VARSTORE_DATA
+      name:  MyEfiVar
+      guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
+      attribute:  0x00000002 | 0x00000001 
+  - efivarstore:
+      type:  MY_EFI_BITS_VARSTORE_DATA
+      name:  MyEfiBitVar
+      guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
+      attribute:  0x00000002 | 0x00000001 
+  - efivarstore:
+      type:  MY_EFI_UNION_DATA
+      name:  MyEfiUnionVar
+      guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
+      attribute:  0x00000002 | 0x00000001 
+  - namevaluevarstore:
+      type:  MyNameValueVar
+      name:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME0)
+      name:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME1)
+      name:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME2)
+      guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
+  - form: 
+      formid:  EFI_VARIABLE_NON_VOLATILE
+      title:  STRING_TOKEN(STR_FORM1_TITLE)
+      component:  
+      - subtitle:
+          prompt:  STRING_TOKEN(STR_SUBTITLE_TEXT)
+      - subtitle:
+          prompt:  STRING_TOKEN(STR_SUBTITLE_TEXT2)
+      - text:
+          help:  STRING_TOKEN(STR_TEXT_HELP)
+          prompt:  STRING_TOKEN(STR_CPU_STRING)
+          text:  STRING_TOKEN(STR_CPU_STRING2)
+      - text:
+          help:  STRING_TOKEN(STR_EXIT_TEXT)
+          prompt:  STRING_TOKEN(STR_EXIT_TEXT)
+          flags:  INTERACTIVE  # Optional Input, Question Flags
+          key:  0x1237  # Optional Input, Question QuestionId
+      - text:
+          help:  STRING_TOKEN(STR_SAVE_TEXT)
+          prompt:  STRING_TOKEN(STR_SAVE_TEXT)
+          flags:  INTERACTIVE  # Optional Input, Question Flags
+          key:  0x1238  # Optional Input, Question QuestionId
+      - text:
+          help:  STRING_TOKEN(STR_SAVE_CURRENT)
+          prompt:  STRING_TOKEN(STR_SAVE_CURRENT)
+          flags:  INTERACTIVE  # Optional Input, Question Flags
+          key:  0x1243  # Optional Input, Question QuestionId
+      - text:
+          help:  STRING_TOKEN(STR_DISCARD_CURRENT_AND_EXIT)
+          prompt:  STRING_TOKEN(STR_DISCARD_CURRENT_AND_EXIT)
+          flags:  INTERACTIVE  # Optional Input, Question Flags
+          key:  0x1244  # Optional Input, Question QuestionId
+      - oneof:
+          name:  MyOneOf  #  Optional Input
+          varid:  MyIfrNVData.SuppressGrayOutSomething  #  Optional Input
+          prompt:  STRING_TOKEN(STR_ONE_OF_PROMPT)
+          help:  STRING_TOKEN(STR_ONE_OF_HELP)
+          component:  
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT4)
+              value:  0x0
+              flags:  0 # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT5)
+              value:  0x1
+              flags:  0 # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT6)
+              value:  0x2
+              flags:  DEFAULT # Optional Input
+      - oneof:
+          varid:  MyIfrNVData.BootOrderLarge  #  Optional Input
+          prompt:  STRING_TOKEN(STR_ONE_OF_PROMPT)
+          help:  STRING_TOKEN(STR_ONE_OF_HELP)
+          component:  
+          - default:
+              value: 'cond (pushthis == 0 ? 0 : cond ((questionref(MyOneOf) >> 0x4 & 0xF00) == 0x0 + 0x2 ? 0 : 1))'
+          - option:  
+              text:  STRING_TOKEN(STR_BOOT_ORDER1)
+              value:  0x0
+              flags:  0 # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_BOOT_ORDER2)
+              value:  0x1
+              flags:  0 # Optional Input
+      - checkbox:
+          condition:  'grayoutif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1 | suppressif questionref(MyOneOf) == 0x0'
+          varid:  MyIfrNVData.ChooseToActivateNuclearWeaponry  #  Optional Input
+          prompt:  STRING_TOKEN(STR_CHECK_BOX_PROMPT)
+          help:  STRING_TOKEN(STR_CHECK_BOX_HELP)
+          flags:  CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG  # Optional input , flags
+          component:  
+          - default:
+              value:  TRUE
+      - label:
+          condition:  'suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0'
+          number:  LABEL_UPDATE_BBS
+      - orderedlist:
+          condition:  'suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0'
+          varid:  MyIfrNVData.BootOrder  #  Optional Input
+          prompt:  STRING_TOKEN(STR_BOOT_OPTIONS)
+          help:  STRING_TOKEN(STR_NULL_STRING)
+          flags:  RESET_REQUIRED  # Optional input , flags
+          maxcontainers:  8 ## Optional Input, Need to compute if None
+          component:  
+          - option:  
+              text:  STRING_TOKEN(STR_BOOT_OPTION2)
+              value:  2
+              flags:  0 # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_BOOT_OPTION1)
+              value:  1
+              flags:  0 # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_BOOT_OPTION3)
+              value:  3
+              flags:  0 # Optional Input
+          - option:  
+              condition:  'suppressif ideqval MyIfrNVData.BootOrderLarge == 0'
+              text:  STRING_TOKEN(STR_BOOT_OPTION4)
+              value:  4
+              flags:  0 # Optional Input
+      - label:
+          condition:  'suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0'
+          number:  LABEL_END
+      - orderedlist:
+          condition:  'disableif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x2'
+          varid:  MyIfrNVData.OrderedList  #  Optional Input
+          prompt:  STRING_TOKEN(STR_TEST_OPCODE)
+          help:  STRING_TOKEN(STR_TEXT_HELP)
+          flags:  RESET_REQUIRED  # Optional input , flags
+          maxcontainers:  8 ## Optional Input, Need to compute if None
+          component:  
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
+              value:  3
+              flags:  0 # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT2)
+              value:  2
+              flags:  0 # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT3)
+              value:  1
+              flags:  0 # Optional Input
+          - default:
+              value:  {1,2,3}
+      - label:
+          number:  0x64  # Number
+      - goto:
+          formid:  0x1234
+          prompt:  STRING_TOKEN(STR_GOTO_DYNAMIC)
+          help:  STRING_TOKEN(STR_GOTO_HELP)
+      - goto:
+          formid:  0x1234
+          prompt:  STRING_TOKEN(STR_GOTO_DYNAMIC2)
+          help:  STRING_TOKEN(STR_GOTO_HELP)
+      - oneof:
+          varid:  MyIfrNVData.TestLateCheck  #  Optional Input
+          prompt:  STRING_TOKEN(STR_TEST_OPCODE)
+          help:  STRING_TOKEN(STR_ONE_OF_HELP)
+          component:  
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
+              value:  0
+              flags:  0 # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT2)
+              value:  1
+              flags:  DEFAULT # Optional Input
+          - warningif:
+              warning:  172
+              timeout:  5 # optional input 
+              expression:  ideqval MyIfrNVData.TestLateCheck == 0
+      - oneof:
+          varid:  MyIfrNVData.TestLateCheck2  #  Optional Input
+          prompt:  STRING_TOKEN(STR_TEST_OPCODE2)
+          help:  STRING_TOKEN(STR_ONE_OF_HELP)
+          component:  
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
+              value:  0
+              flags:  DEFAULT # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT2)
+              value:  1
+              flags:  0 # Optional Input
+          - inconsistentif:
+              prompt:  STRING_TOKEN(STR_ERROR_POPUP)
+              expression:  'ideqid MyIfrNVData.TestLateCheck == MyIfrNVData.TestLateCheck2'
+      - oneof:
+          varid:  MyIfrNVData.QuestionAboutTreeHugging  #  Optional Input
+          prompt:  STRING_TOKEN(STR_ONE_OF_PROMPT_KEYWORD)
+          help:  STRING_TOKEN(STR_ONE_OF_HELP)
+          component:  
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
+              value:  0
+              flags:  0 # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT2)
+              value:  1
+              flags:  DEFAULT # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT3)
+              value:  3
+              flags:  0 # Optional Input
+      - oneof:
+          varid:  MyIfrNVData.QuestionXUefiKeywordRestStyle  #  Optional Input
+          prompt:  STRING_TOKEN(STR_ONE_OF_PROMPT_X_UEFI)
+          help:  STRING_TOKEN(STR_ONE_OF_PROMPT_X_UEFI_HELP)
+          component:  
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
+              value:  0
+              flags:  0 # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT2)
+              value:  1
+              flags:  DEFAULT # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT3)
+              value:  3
+              flags:  0 # Optional Input
+      - numeric:
+          varid:  MyIfrNVData.QuestionNonXUefiKeywordRestStyle  #  Optional Input
+          prompt:  STRING_TOKEN(STR_ONE_OF_PROMPT_NON_X_UEFI)
+          help:  STRING_TOKEN(STR_ONE_OF_PROMPT_NON_X_UEFI_HELP)
+          flags:  RESET_REQUIRED | REST_STYLE  # Optional input , flags
+          maximum:  0xf0 # Optional Input
+          minimum:  0x0 # Optional Input
+          step:  0x0 # Optional Input
+          component:  
+          - default:
+              value:  0
+      - string:
+          varid:  MyIfrNVData.MyStringData  #  Optional Input
+          prompt:  STRING_TOKEN(STR_MY_STRING_PROMPT2)
+          help:  STRING_TOKEN(STR_MY_STRING_HELP2)
+          flags:  INTERACTIVE  # Optional input , flags
+          key:  True # Optional input, key
+          minsize:  6 
+          maxsize:  40 
+          component:  
+          - inconsistentif:
+              prompt:  STRING_TOKEN(STR_STRING_CHECK_ERROR_POPUP)
+              expression:  'pushthis != stringref(STRING_TOKEN(0x0062))'
+      - numeric:
+          varid:  MyIfrNVData.HowOldAreYouInYearsManual  #  Optional Input
+          prompt:  STRING_TOKEN(STR_NUMERIC_READONLY_PROMPT)
+          help:  STRING_TOKEN(STR_NUMERIC_HELP0)
+          flags:  READ_ONLY  # Optional input , flags
+          maximum:  0xf0 # Optional Input
+          minimum:  0x0 # Optional Input
+          step:  0x0 # Optional Input
+          component:  
+          - default:
+              value:  21
+      - numeric:
+          varid:  MyIfrNVData.HowOldAreYouInYearsManual  #  Optional Input
+          prompt:  STRING_TOKEN(STR_NUMERIC_MANUAL_PROMPT)
+          help:  STRING_TOKEN(STR_NUMERIC_HELP0)
+          maximum:  0xf0 # Optional Input
+          minimum:  0x0 # Optional Input
+          step:  0x0 # Optional Input
+          component:  
+          - default:
+              value: 'questionrefval(devicepath = STRING_TOKEN (0x006D), guid = { 0xA04A27f4, 0xDF00, 0x4D42, {0xB5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3D} }, 0x1111)'
+          - inconsistentif:
+              prompt:  STRING_TOKEN(STR_ERROR_POPUP)
+              expression:  'ideqval MyIfrNVData.HowOldAreYouInYearsManual == 99       OR       ideqid MyIfrNVData.HowOldAreYouInYearsManual == MyEfiVar.Field8       OR       ideqvallist MyIfrNVData.HowOldAreYouInYearsManual == 1 3 5 7'
+      - numeric:
+          varid:  MyEfiVar.Field8  #  Optional Input
+          prompt:  STRING_TOKEN(STR_TALL_HEX_PROMPT)
+          help:  STRING_TOKEN(STR_NUMERIC_HELP1)
+          flags:  DISPLAY_UINT_HEX | INTERACTIVE  # Optional input , flags
+          maximum:  0xfa # Optional Input
+          minimum:  0x0 # Optional Input
+          component:  
+          - default:
+              value:  18
+              defaultstore: MyStandardDefault
+          - default:
+              value:  19
+              defaultstore: MyManufactureDefault
+      - numeric:
+          varid:  MyNameValueVar[0]  #  Optional Input
+          prompt:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME0)
+          help:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME0_HELP)
+          flags:  NUMERIC_SIZE_1  # Optional input , flags
+          maximum:  0xff # Optional Input
+          minimum:  0x0 # Optional Input
+          step:  0x0 # Optional Input
+          component:  
+          - locked: tag
+          - default:
+              value:  16
+              defaultstore: MyStandardDefault
+          - default:
+              value:  17
+              defaultstore: MyManufactureDefault
+      - numeric:
+          varid:  MyNameValueVar[1]  #  Optional Input
+          prompt:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME1)
+          help:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME1_HELP)
+          flags:  NUMERIC_SIZE_2  # Optional input , flags
+          maximum:  0xffff # Optional Input
+          minimum:  0x0 # Optional Input
+          step:  0x0 # Optional Input
+          component:  
+          - default:
+              value:  18
+              defaultstore: MyStandardDefault
+          - default:
+              value:  19
+              defaultstore: MyManufactureDefault
+      - string:
+          varid:  MyNameValueVar[2]  #  Optional Input
+          prompt:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME2)
+          help:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME2_HELP)
+          minsize:  2 
+          maxsize:  20 
+      - oneof:
+          varid:  MyEfiVar.Field16  #  Optional Input
+          prompt:  STRING_TOKEN(STR_ONE_OF_PROMPT)
+          help:  STRING_TOKEN(STR_NUMERIC_NUM_HELP)
+          component:  
+          - option:  
+              text:  STRING_TOKEN(STR_BOOT_ORDER1)
+              value:  0x0
+              flags:  0 # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_BOOT_ORDER2)
+              value:  0x1
+              flags:  DEFAULT # Optional Input
+      - label:
+          number:  EFI_VARIABLE_NON_VOLATILE
+      - label:
+          number:  LABEL_2_VALUE
+      - numeric:
+          condition:  'grayoutif ideqval MyIfrNVData.HowOldAreYouInYearsManual == 23 AND ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1'
+          varid:  MyIfrNVData.HowOldAreYouInYears  #  Optional Input
+          prompt:  STRING_TOKEN(STR_NUMERIC_STEP_PROMPT)
+          help:  STRING_TOKEN(STR_NUMERIC_HELP2)
+          maximum:  0xf3 # Optional Input
+          minimum:  0x0 # Optional Input
+          step:  0x1 # Optional Input
+          component:  
+          - default:
+              value:  18
+              defaultstore: MyStandardDefault
+          - default:
+              value:  19
+              defaultstore: MyManufactureDefault
+      - numeric:
+          varid:  MyIfrNVData.GetDefaultValueFromAccess  #  Optional Input
+          prompt:  STRING_TOKEN(STR_DEFAULT_VALUE_FROM_ACCESS_PROMPT)
+          help:  STRING_TOKEN(STR_DEFAULT_VALUE_FROM_ACCESS_HELP)
+          flags:  DISPLAY_UINT_HEX | INTERACTIVE  # Optional input , flags
+          maximum:  0xff # Optional Input
+          minimum:  0x0 # Optional Input
+          step:  0x1 # Optional Input
+          component:  
+          - default:
+              value:  18
+      - numeric:
+          varid:  MyIfrNVData.GetDefaultValueFromCallBack  #  Optional Input
+          prompt:  STRING_TOKEN(STR_DEFAULT_VALUE_FROM_CALLBACK_PROMPT)
+          help:  STRING_TOKEN(STR_DEFAULT_VALUE_FROM_CALLBACK_HELP)
+          flags:  DISPLAY_UINT_HEX | INTERACTIVE  # Optional input , flags
+          maximum:  0xff # Optional Input
+          minimum:  0x0 # Optional Input
+          step:  0x1 # Optional Input
+          component:  
+          - default:
+              value:  18
+      - orderedlist:
+          varid:  MyIfrNVData.GetDefaultValueFromCallBackForOrderedList  #  Optional Input
+          prompt:  STRING_TOKEN(STR_DEFAULT_VALUE_FROM_CALLBACK_PROMPT)
+          help:  STRING_TOKEN(STR_DEFAULT_VALUE_FROM_CALLBACK_HELP)
+          flags:  INTERACTIVE  # Optional input , flags
+          maxcontainers:  3 ## Optional Input, Need to compute if None
+          component:  
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
+              value:  1
+              flags:  0 # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT2)
+              value:  2
+              flags:  0 # Optional Input
+          - option:  
+              text:  STRING_TOKEN(STR_ONE_OF_TEXT3)
+              value:  3
+              flags:  0 # Optional Input
+      - resetbutton:
+          defaultstore:  MyStandardDefault
+          prompt:  STRING_TOKEN(STR_STANDARD_DEFAULT_PROMPT)
+          help:  STRING_TOKEN(STR_STANDARD_DEFAULT_HELP)
+      - resetbutton:
+          defaultstore:  MyManufactureDefault
+          prompt:  STRING_TOKEN(STR_MANUFACTURE_DEFAULT_PROMPT)
+          help:  STRING_TOKEN(STR_MANUFACTURE_DEFAULT_HELP)
+      - text:
+          condition:  'grayoutif NOT security ({ 0x85b75607, 0xf7ce, 0x471e, { 0xb7, 0xe4, 0x2a, 0xea, 0x5f, 0x72, 0x32, 0xee } })'
+          help:  STRING_TOKEN(STR_TEXT_SECRUITY_TEST_HELP)
+          prompt:  STRING_TOKEN(STR_TEXT_SECRUITY_TEST_TEXT)
+      - numeric:
+          varid:  MyEfiVar.SubmittedCallback  #  Optional Input
+          prompt:  STRING_TOKEN(STR_SUBMITTED_CALLBACK_TEST_PROMPT)
+          help:  STRING_TOKEN(STR_SUBMITTED_CALLBACK_TEST_HELP)
+          flags:  INTERACTIVE  # Optional input , flags
+          maximum:  0xff # Optional Input
+          minimum:  0x0 # Optional Input
+          component:  
+          - default:
+              value:  18
+      - text:
+          help:  STRING_TOKEN(STR_POPUP_TEST_HELP)
+          prompt:  STRING_TOKEN(STR_POPUP_TEST_PROMPT)
+          flags:  INTERACTIVE  # Optional Input, Question Flags
+          key:  0x1330  # Optional Input, Question QuestionId
+      - goto:
+          formid:  0x2
+          prompt:  STRING_TOKEN(STR_GOTO_FORM2)
+          help:  STRING_TOKEN(STR_GOTO_HELP)
+      - goto:
+          formid:  0x3
+          prompt:  STRING_TOKEN(STR_GOTO_FORM3)
+          help:  STRING_TOKEN(STR_GOTO_HELP)
+      - goto:
+          formid:  0x4
+          prompt:  STRING_TOKEN(STR_GOTO_FORM4)
+          help:  STRING_TOKEN(STR_GOTO_HELP)
+      - goto:
+          formid:  0x5
+          prompt:  STRING_TOKEN(STR_GOTO_FORM5)
+          help:  STRING_TOKEN(STR_GOTO_FORM5_HELP)
+      - goto:
+          formid:  0x6
+          prompt:  STRING_TOKEN(STR_GOTO_FORM6)
+          help:  STRING_TOKEN(STR_GOTO_HELP)
+      - goto:
+          formid:  0x1
+          formsetguid:  '{0xb3f56470, 0x6141, 0x4621, { 0x8f, 0x19, 0x70, 0x4e, 0x57, 0x7a, 0xa9, 0xe8 }}' #  Optional Input
+          prompt:  STRING_TOKEN(STR_GOTO_ANOTHER_FORMSET)
+          help:  STRING_TOKEN(STR_GOTO_ANOTHER_FORMSET_HELP)
+      - guidop:
+          guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
+          databuffer: #optional input
+          - MY_EFI_VARSTORE_DATA: 
+            data.Field8:  0x21
+            data.Field16:  0x2121
+            data.OrderedList[0]:  0x21
+      - goto:
+          formid:  0x7
+          prompt:  STRING_TOKEN(STR_GOTO_FORM7)
+          help:  STRING_TOKEN(STR_GOTO_FORM7_HELP)
+  - form: 
+      formid:  WIN_CERT_TYPE_PKCS_SIGNED_DATA
+      condition:  'suppressif ideqval MyIfrNVData.BootOrderLarge == 0'
+      title:  STRING_TOKEN(STR_FORM2_TITLE)
+      component:  
+      - date:
+          name:  Date  #  Optional Input
+          prompt:  STRING_TOKEN(STR_DATE_PROMPT)
+          help:  STRING_TOKEN(STR_DATE_HELP)
+          flags:  STORAGE_TIME  # Optional input , flags
+          component:  
+          - default:
+              value:  2004/1/1
+          - inconsistentif:
+              prompt:  STRING_TOKEN(STR_ERROR_POPUP)
+              expression:  'ideqval Date.Day == 31     AND     ideqvallist Date.Month == 2 4 6 9 11'
+          - inconsistentif:
+              prompt:  STRING_TOKEN(STR_ERROR_POPUP)
+              expression:  'ideqval Date.Day == 30     AND     ideqval Date.Month == 2'
+          - inconsistentif:
+              prompt:  STRING_TOKEN(STR_ERROR_POPUP)
+              expression:  'ideqval Date.Day == 0x1D     AND     ideqval Date.Month == 2     AND     NOT     ideqvallist Date.Year == 2004 2008 20012 20016 2020 2024 2028 2032 2036'
+      - text:
+          help:  STRING_TOKEN(STR_SAVE_CURRENT_AND_EXIT)
+          prompt:  STRING_TOKEN(STR_SAVE_CURRENT_AND_EXIT)
+          flags:  INTERACTIVE  # Optional Input, Question Flags
+          key:  0x1241  # Optional Input, Question QuestionId
+      - text:
+          help:  STRING_TOKEN(STR_DISCARD_CURRENT)
+          prompt:  STRING_TOKEN(STR_DISCARD_CURRENT)
+          flags:  INTERACTIVE  # Optional Input, Question Flags
+          key:  0x1242  # Optional Input, Question QuestionId
+      - time:
+          prompt:  STRING_TOKEN(STR_TIME_PROMPT)
+          help:  STRING_TOKEN(STR_TIME_HELP)
+          flags:  STORAGE_TIME  # Optional input , flags
+      - time:
+          name:  MyTime  #  Optional Input
+          varid:  MyIfrNVData.Time  #  Optional Input
+          prompt:  STRING_TOKEN(STR_TIME_PROMPT)
+          help:  STRING_TOKEN(STR_TIME_PROMPT)
+          flags:  STORAGE_NORMAL | SECOND_SUPPRESS  # Optional input , flags
+          component:  
+          - default:
+              value:  15:33:33
+      - checkbox:
+          varid:  MyIfrNVData.ChooseToActivateNuclearWeaponry  #  Optional Input
+          prompt:  STRING_TOKEN(STR_CHECK_BOX_PROMPT)
+          help:  STRING_TOKEN(STR_CHECK_BOX_HELP)
+          flags:  CHECKBOX_DEFAULT  # Optional input , flags
+      - text:
+          help:  STRING_TOKEN(STR_TEXT_HELP)
+          prompt:  STRING_TOKEN(STR_TEXT_TEXT_1)
+      - text:
+          help:  STRING_TOKEN(STR_TEXT_HELP)
+          prompt:  STRING_TOKEN(STR_TEXT_TEXT_1)
+          text:  STRING_TOKEN(STR_TEXT_TEXT_2)
+      - goto:
+          formid:  0x1
+          prompt:  STRING_TOKEN(STR_GOTO_FORM1)
+          help:  STRING_TOKEN(STR_GOTO_HELP)
+      - goto:
+          varid:  MyIfrNVData.RefData  #  Optional Input
+          prompt:  STRING_TOKEN(STR_GOTO_DYNAMIC3)
+          help:  STRING_TOKEN(STR_GOTO_DYNAMIC3_HELP)
+          component:  
+          - default:
+              value:  0;0;{ 0x0, 0x0, 0x0, {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} };STRING_TOKEN(0x005A)
+      - goto:
+          prompt:  STRING_TOKEN(STR_GOTO_DYNAMIC4)
+          help:  STRING_TOKEN(STR_GOTO_DYNAMIC4_HELP)
+  - form: 

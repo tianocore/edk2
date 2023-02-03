@@ -113,7 +113,7 @@ class Options():
         self.YamlFileName = None
         self.CreateJsonFile = True
         self.JsonFileName = None
-        self.SkipCPreprocessor = True
+        self.SkipCPreprocessor = False
         self.CPreprocessorOptions = None
         self.PreprocessorOutputFileName = None
         self.HasOverrideClassGuid = False
@@ -189,7 +189,10 @@ class VfrTree():
                 EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
                                 "File open failed for %s" % LstFile)
 
+        self.List = []
         self.GenBinaryFilesDfs(self.Root, Hpk, C, RecordLines)
+        #print(self.List)
+        #print(gFormPkg.List)
 
         if self.Options.CreateIfrPkgFile:
             #GenCFile
@@ -203,7 +206,7 @@ class VfrTree():
             # GenRecordList
             try:
                 if self.Options.SkipCPreprocessor:
-                    In = open(self.Options.VfrFileName, 'r')
+                    In = open(self.Options.VfrFileName, 'r') #
                 else:
                     In = open(self.Options.PreprocessorOutputFileName, 'r')
                 InFileLines = []
@@ -253,9 +256,9 @@ class VfrTree():
                             (self.Options.PkgOutputFileName))
 
                     try:
+                        self.List.append(len(Root.Buffer))
                         LineBuffer = ''
                         for i in range(0, len(Root.Buffer)):
-
                             self.Index += 1
                             Data = Root.Buffer[i]
                             if self.Index == gFormPkg.PkgLength:
@@ -627,14 +630,19 @@ class VfrTree():
                             "File open failed for %s" % FileName, None)
         return HeaderFiles
 
+    # parse uni string tokens defined in DxeStrDefs.h (saved in debug directory)
     def GetUniDictsForYaml(self):
-        if self.Options.VfrFileName.find('/') == -1:
-            self.Options.VfrFileName = self.Options.VfrFileName.replace('\\', '/')
-
-        self.Options.UniStrDefFileName = self.FindIncludeHeaderFile('/edk2/', self.Options.VfrFileName.split('/')[-2] + 'StrDefs.h')
-        if self.Options.UniStrDefFileName == None:
+        if self.Options.ProcessedInFileName.find('/') == -1:
+            self.Options.ProcessedInFileName = self.Options.ProcessedInFileName.replace('\\', '/')
+        FileList = []
+        if self.Options.ProcessedInFileName.find('DriverSample') != -1:
+            FileList = self.FindIncludeHeaderFile('/edk2/', self.Options.ProcessedInFileName.split('/')[-3][:-3] + 'StrDefs.h')
+        else:
+            FileList = self.FindIncludeHeaderFile('/edk2/', self.Options.ProcessedInFileName.split('/')[-3] + 'StrDefs.h')
+        if self.Options.UniStrDefFileName == []:
             EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
-                            "File/directory %s not found in workspace" % (self.Options.VfrFileName.split('/')[-2] + 'StrDefs.h'), None)
+                            "File/directory %s not found in workspace" % (self.Options.ProcessedInFileName.split('/')[-3] + 'StrDefs.h'), None)
+        self.Options.UniStrDefFileName = FileList[0]
         CppHeader = CppHeaderParser.CppHeader(self.Options.UniStrDefFileName)
         UniDict = {}
         for Define in CppHeader.defines:
@@ -643,17 +651,17 @@ class VfrTree():
                 UniDict[int(Items[1], 16)] = Items[0]
         return UniDict
 
-
-    def ParseCppHeaderDefines(self, CppHeader, HeaderDict):
-        for Define in CppHeader.defines:
+    def ParseDefines(self, Defines, HeaderDict):
+        for Define in Defines:
+            #print(Define)
             Items = Define.split()
             if len(Items) == 2 and Items[1].find('0x') != -1:
-                HeaderDict[Items[1]] = Items[0]
+                HeaderDict[int(Items[1], 16)] = Items[0]
             elif len(Items) > 2 and Items[0].find('GUID') != -1:
                 GuidStr = ''
                 for i in range(1, len(Items)):
                     if Items[i] != '{' and Items[i] != '}' and Items[i] != '{{' and Items[i] !='}}' and Items[i] != '\\':
-                        if ('{' in Items[i]) or ('\\' in Items[i]):
+                        if ('{' in Items[i]):
                             Items[i] = Items[i][1:]
                         if '}' in Items[i]:
                             Items[i] = Items[i][:-1]
@@ -666,37 +674,68 @@ class VfrTree():
                 Guid.Data3 = int(GuidItems[2], 16)
                 for i in range(0, 8):
                     Guid.Data4[i] = int(GuidItems[i+3], 16)
+                if Items[0].find('\\') != -1:
+                    Items[0] = Items[0][:-1]
                 Key = Items[0]
                 Value = Guid.to_string()
                 HeaderDict[Value] = Key
 
     def FindIncludeHeaderFile(self, Start, Name):
+        FileList = []
         for Relpath, Dirs, Files in os.walk(Start):
             if Name in Files:
                 FullPath = os.path.join(Start, Relpath, Name)
-                return os.path.normpath(os.path.abspath(FullPath))
-        return None
+                FileList.append(os.path.normpath(os.path.abspath(FullPath)))
+        return FileList
 
+    # parse header files defined in vfr
     def GetHeaderDictsForYaml(self, HeaderFiles):
         HeaderDict = {}
         for HeaderFile in HeaderFiles:
-            Index = self.Options.VfrFileName.find(self.Options.VfrBaseFileName)
-            FileName = self.Options.VfrFileName[:Index] + HeaderFile
-            DefineList = []
-            CppHeader = CppHeaderParser.CppHeader(FileName)
-            self.ParseCppHeaderDefines(CppHeader, HeaderDict)
+            FileName = HeaderFile.split('/')[-1]
+            FileList = self.FindIncludeHeaderFile("/edk2/", FileName)
+            if FileList == []:
+                EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
+                            "File/directory %s not found in workspace" % (HeaderFile), None)
+            for File in FileList:
+                if File.find(HeaderFile.replace('/','\\')) != -1:
+                    CppHeader = CppHeaderParser.CppHeader(File)
+                    self.ParseDefines(CppHeader.defines, HeaderDict)
+                    break
             for Include in CppHeader.includes:
-                IncludeFile = Include[1:-1].split('/')[1]
-                IncludeHeaderFile = self.FindIncludeHeaderFile("/edk2/", IncludeFile)
-                if IncludeHeaderFile == None:
+                Include = Include[1:-1]
+                IncludeFileName = Include.split('/')[1]
+                IncludeHeaderFileList = self.FindIncludeHeaderFile("/edk2/", IncludeFileName)
+                #print(IncludeHeaderFileList)
+                if IncludeHeaderFileList == []:
                     EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
-                                    "File/directory %s not found in workspace" % IncludeFile, None)
-                CppHeader = CppHeaderParser.CppHeader(IncludeHeaderFile)
-                self.ParseCppHeaderDefines(CppHeader, HeaderDict)
-            print(HeaderDict)
-
+                                    "File/directory %s not found in workspace" % IncludeFileName, None)
+                for File in IncludeHeaderFileList:
+                    if File.find(Include.replace('/','\\')) != -1:
+                        CppHeader = CppHeaderParser.CppHeader(File)
+                        self.ParseDefines(CppHeader.defines, HeaderDict)
+                        break
         return HeaderDict
 
+    def GetVfrDictsForYaml(self):
+        VfrDict = {}
+        File = open(self.Options.VfrFileName, 'r')
+        Defines = []
+        Wrap = False
+        IncompleteLine = ''
+        for Line in File:
+            if Wrap == True:
+                Defines.append(IncompleteLine + Line.replace('\n', ''))
+                Wrap = False
+                continue
+            if "#define" in Line:
+                if Line.find('\\') != -1:
+                    Wrap = True
+                    IncompleteLine = Line.split(" ", 1)[1].replace('\\\n', '')
+                else:
+                    Defines.append(Line.split(" ", 1)[1].replace('\n', ''))
+        self.ParseDefines(Defines, VfrDict)
+        return VfrDict
 
     def DumpYaml(self):
         FileName = self.Options.YamlFileName
@@ -706,9 +745,10 @@ class VfrTree():
                 f.write('include:\n')
                 HeaderFiles = self.InsertHeaderToYaml(f)
                 UniDict = self.GetUniDictsForYaml() # filepath
+                VfrDict = self.GetVfrDictsForYaml()
                 HeaderDict = self.GetHeaderDictsForYaml(HeaderFiles)
-                self.DumpYamlDfsWithUni(self.Root, f, UniDict, HeaderDict)
-                #self.DumpYamlDfs(self.Root, f)
+                self.DumpYamlDfsWithUni(self.Root, f, UniDict, HeaderDict, VfrDict)
+                # self.DumpYamlDfs(self.Root, f)
             f.close()
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
@@ -717,7 +757,7 @@ class VfrTree():
     def GenST(self, Key):
         return 'STRING_TOKEN(' + Key  + ')\n'
 
-    def DumpQuestionInfosWithUni(self, Root, f, ValueIndent, UniDict):
+    def DumpQuestionInfosWithUni(self, Root, f, ValueIndent, UniDict, HeaderDict):
 
         Info = Root.Data.GetInfo()
         if Root.Condition != None:
@@ -728,9 +768,8 @@ class VfrTree():
         if Root.Data.VarIdStr != '':
             f.write(ValueIndent + 'varid:  {}  #  Optional Input\n'.
                                 format(Root.Data.VarIdStr))
-        if Root.Data.HasQuestionId:
-            f.write(ValueIndent + 'questionid:  {}  # Optional Input, Need to compute if None\n'
-                        .format(Info.Question.QuestionId))
+        #if Root.Data.HasQuestionId:
+            #f.write(ValueIndent + 'questionid:  ' + HeaderDict[Info.Question.QuestionId] +' # Optional Input, Need to compute if None\n')
         f.write(ValueIndent + 'prompt:  ' + self.GenST(UniDict[Info.Question.Header.Prompt]))
         f.write(ValueIndent + 'help:  ' + self.GenST(UniDict[Info.Question.Header.Help]))
         if Root.Data.FlagsStream != '':
@@ -739,7 +778,7 @@ class VfrTree():
         if Root.Data.HasKey:
             f.write(ValueIndent + 'key:  {} # Optional input, key\n'.format(Root.Data.HasKey))
 
-    def DumpYamlDfsWithUni(self, Root, f, UniDict, HeaderDict):
+    def DumpYamlDfsWithUni(self, Root, f, UniDict, HeaderDict, VfrDict):
         try:
             if Root.OpCode != None:
                 if Root.Level == 0:
@@ -841,7 +880,7 @@ class VfrTree():
                     f.write(KeyIndent + '- form: \n')
                     f.write(
                         ValueIndent +
-                        'formid:  ' + HeaderDict['{}'.format('0x%04x' %Info.FormId)] + '\n')
+                        'formid:  ' + HeaderDict[Info.FormId] + '\n')
                     if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
@@ -856,7 +895,7 @@ class VfrTree():
                     f.write(KeyIndent + '- formmap: \n')
                     f.write(
                         ValueIndent +
-                        'formid:  ' + HeaderDict['{}'.format('0x%04x' %Info.FormId)] + '\n')
+                        'formid:  ' + HeaderDict[Info.FormId] + '\n')
                     if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
@@ -914,9 +953,10 @@ class VfrTree():
                                 'help:  ' + self.GenST(UniDict[Info.Statement.Help]))
                         f.write(ValueIndent +
                                 'prompt:  ' + self.GenST(UniDict[Info.Statement.Prompt]))
-                        f.write(
-                            ValueIndent +
-                            'text:  ' + self.GenST(UniDict[Info.TextTwo]))
+                        if Info.TextTwo in UniDict.keys():
+                            f.write(
+                                ValueIndent +
+                                'text:  ' + self.GenST(UniDict[Info.TextTwo]))
                     if type(Info) == EFI_IFR_ACTION:
                         f.write(ValueIndent +
                                 'help:  ' + self.GenST(UniDict[Info.Question.Header.Help]))
@@ -928,13 +968,16 @@ class VfrTree():
                             'flags:  {}  # Optional Input, Question Flags\n'
                             .format(Root.Data.FlagsStream))
                         if Root.Data.HasKey:
-                            f.write(ValueIndent + 'key:  ' + HeaderDict['{}'.format('0x%04x' % (Info.Question.QuestionId))] + '\n')
+                            f.write(
+                            ValueIndent +
+                            'key:  {}  # Optional Input, Question QuestionId\n'
+                            .format('0x%04x' % (Info.Question.QuestionId)))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
                 if Root.OpCode == EFI_IFR_ACTION_OP:
                     f.write(KeyIndent + '- action:\n')
-                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict)
+                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict, HeaderDict)
                     f.write(ValueIndent + 'questionconfig:  {}  # QuestionConfig\n'.
                         format(Info.QuestionConfig))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
@@ -943,13 +986,13 @@ class VfrTree():
                 if Root.OpCode == EFI_IFR_ONE_OF_OP:
                     f.write(KeyIndent + '- oneof:\n')
 
-                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict)
+                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict, HeaderDict)
 
                     if Root.Data.HasMinMax:
                         f.write(ValueIndent + 'maximum:  {} # Optional Input\n'.format(
-                                Info.Data.MaxValue))
+                                '0x%0x' % (Info.Data.MaxValue)))
                         f.write(ValueIndent + 'minimum:  {} # Optional Input\n'.format(
-                                Info.Data.MinValue))
+                                '0x%0x' %(Info.Data.MinValue)))
                     if Root.Data.HasStep:
                         f.write(ValueIndent + 'step:  {} # Optional Input\n'.format(
                             Info.Data.Step))
@@ -1003,7 +1046,7 @@ class VfrTree():
 
                 if Root.OpCode == EFI_IFR_ORDERED_LIST_OP:
                     f.write(KeyIndent + '- orderedlist:\n')
-                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict)
+                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict, HeaderDict)
                     f.write(ValueIndent + 'maxcontainers:  {} ## Optional Input, Need to compute if None\n'
                         .format(Info.MaxContainers))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
@@ -1011,40 +1054,40 @@ class VfrTree():
 
                 if Root.OpCode == EFI_IFR_NUMERIC_OP:
                     f.write(KeyIndent + '- numeric:\n')
-                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict)
+                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict, HeaderDict)
 
                     f.write(ValueIndent + 'maximum:  {} # Optional Input\n'.format(
-                            Info.Data.MaxValue))
+                            '0x%0x' % (Info.Data.MaxValue)))
                     f.write(ValueIndent + 'minimum:  {} # Optional Input\n'.format(
-                            Info.Data.MinValue))
+                            '0x%0x' %(Info.Data.MinValue)))
                     if Root.Data.HasStep:
                         f.write(ValueIndent + 'step:  {} # Optional Input\n'.format(
-                        Info.Data.Step))
+                        '0x%0x' %(Info.Data.Step)))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
                 if Root.OpCode == EFI_IFR_CHECKBOX_OP:
                     f.write(KeyIndent + '- checkbox:\n')
-                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict)
+                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict, HeaderDict)
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
                 if Root.OpCode == EFI_IFR_TIME_OP:
                     f.write(KeyIndent + '- time:\n')
-                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict)
+                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict, HeaderDict)
 
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
                 if Root.OpCode == EFI_IFR_DATE_OP:
                     f.write(KeyIndent + '- date:\n')
-                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict)
+                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict, HeaderDict)
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
                 if Root.OpCode == EFI_IFR_STRING_OP:
                     f.write(KeyIndent + '- string:\n')
-                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict)
+                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict, HeaderDict)
                     f.write(ValueIndent + 'minsize:  {} \n'.format(Info.MinSize))
                     f.write(ValueIndent + 'maxsize:  {} \n'.format(Info.MaxSize))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
@@ -1052,7 +1095,7 @@ class VfrTree():
 
                 if Root.OpCode == EFI_IFR_PASSWORD_OP:
                     f.write(KeyIndent + '- password:\n')
-                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict)
+                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict, HeaderDict)
                     f.write(ValueIndent + 'minsize:  {} \n'.format(Info.MinSize))
                     f.write(ValueIndent + 'maxsize:  {} \n'.format(Info.MaxSize))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
@@ -1083,8 +1126,7 @@ class VfrTree():
                         f.write(ValueIndent + 'formsetguid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.FormSetId.Data4[0]), '0x%x'%(Info.FormSetId.Data4[1]), '0x%x'%(Info.FormSetId.Data4[2]), '0x%x'%(Info.FormSetId.Data4[3]), \
                         '0x%x'%(Info.FormSetId.Data4[4]), '0x%x'%(Info.FormSetId.Data4[5]), '0x%x'%(Info.FormSetId.Data4[6]), '0x%x'%(Info.FormSetId.Data4[7])) + ' }}\' #  Optional Input\n')
-                        f.write(ValueIndent + 'question:  {} #  Optional Input\n'.
-                            format('0x%x' % (Info.QuestionId)))
+                        #f.write(ValueIndent + 'question:  ' + HeaderDict[Info.QuestionId] + ' #  Optional Input\n')
                         f.write(ValueIndent + 'devicepath:  {} #  Optional Input\n'.
                             format('0x%04x' % (Info.DevicePath)))
 
@@ -1094,22 +1136,19 @@ class VfrTree():
                         f.write(ValueIndent + 'formsetguid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.FormSetId.Data4[0]), '0x%x'%(Info.FormSetId.Data4[1]), '0x%x'%(Info.FormSetId.Data4[2]), '0x%x'%(Info.FormSetId.Data4[3]), \
                         '0x%x'%(Info.FormSetId.Data4[4]), '0x%x'%(Info.FormSetId.Data4[5]), '0x%x'%(Info.FormSetId.Data4[6]), '0x%x'%(Info.FormSetId.Data4[7])) + ' }}\' #  Optional Input\n')
-                        f.write(ValueIndent + 'question:  {} #  Optional Input\n'.
-                            format('0x%x' % (Info.QuestionId)))
+                        #f.write(ValueIndent + 'question:  ' + HeaderDict[Info.QuestionId] + ' #  Optional Input\n')
 
                     if type(Root.Data) == IfrRef2:
                         f.write(ValueIndent + 'formid:  {}\n'.format(
                             '0x%x' % (Info.FormId)))
-                        f.write(ValueIndent + 'question:  {} #  Optional Input\n'.
-                            format(Info.QuestionId))
+                        #f.write(ValueIndent + 'question:  ' + HeaderDict[Info.QuestionId] + ' #  Optional Input\n')
 
                     if type(Root.Data) == IfrRef:
                         f.write(ValueIndent + 'formid:  {}\n'.format(
                             '0x%x' % (Info.FormId)))
-                        f.write(ValueIndent + 'question:  {} #  Optional Input\n'.
-                            format('0x%04x' % (Info.Question.QuestionId)))
+                        #f.write(ValueIndent + 'question:  ' + HeaderDict[Info.Question.QuestionId] + ' #  Optional Input\n')
 
-                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict)
+                    self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict, HeaderDict)
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
@@ -1158,9 +1197,14 @@ class VfrTree():
                         if Root.Condition != None:
                             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
+                        if Info.Number in HeaderDict.keys():
+                            f.write(ValueIndent + 'number:  ' + HeaderDict[Info.Number] + '\n')
+                        elif Info.Number in VfrDict.keys():
+                            f.write(ValueIndent + 'number:  ' + VfrDict[Info.Number] + '\n')
+                        else:
+                            f.write(ValueIndent + 'number:  {}  # Number\n'.format(
+                            '0x%x' % (Info.Number)))
 
-                        f.write(ValueIndent + 'number:  ' + HeaderDict['{}'.format(
-                            '0x%x' % (Info.Number))] + '\n')
 
                     if type(Root.Data) == IfrBanner:
                         f.write(KeyIndent + '- banner:\n')
@@ -1288,7 +1332,7 @@ class VfrTree():
                         ChildNode.Level = Root.Level + 1
 
 
-                self.DumpYamlDfsWithUni(ChildNode, f, UniDict, HeaderDict)
+                self.DumpYamlDfsWithUni(ChildNode, f, UniDict, HeaderDict, VfrDict)
 
         return
 
@@ -1558,7 +1602,7 @@ class VfrTree():
                                 Info.Data.MinValue))
                     if Root.Data.HasStep:
                         f.write(ValueIndent + 'step:  {} # Optional Input\n'.format(
-                            Info.Data.Step))
+                            '0x%0x' %(Info.Data.Step)))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
@@ -1755,8 +1799,7 @@ class VfrTree():
                         f.write(ValueIndent + 'formsetguid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.FormSetId.Data4[0]), '0x%x'%(Info.FormSetId.Data4[1]), '0x%x'%(Info.FormSetId.Data4[2]), '0x%x'%(Info.FormSetId.Data4[3]), \
                         '0x%x'%(Info.FormSetId.Data4[4]), '0x%x'%(Info.FormSetId.Data4[5]), '0x%x'%(Info.FormSetId.Data4[6]), '0x%x'%(Info.FormSetId.Data4[7])) + ' }}\' #  Optional Input\n')
-                        f.write(ValueIndent + 'question:  {} #  Optional Input\n'.
-                            format('0x%x' % (Info.QuestionId)))
+                        #f.write(ValueIndent + 'question:  {} #  Optional Input\n'.format('0x%x' % (Info.QuestionId)))
                         f.write(ValueIndent + 'devicepath:  {} #  Optional Input\n'.
                             format('0x%04x' % (Info.DevicePath)))
 
@@ -1766,23 +1809,20 @@ class VfrTree():
                         f.write(ValueIndent + 'formsetguid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.FormSetId.Data4[0]), '0x%x'%(Info.FormSetId.Data4[1]), '0x%x'%(Info.FormSetId.Data4[2]), '0x%x'%(Info.FormSetId.Data4[3]), \
                         '0x%x'%(Info.FormSetId.Data4[4]), '0x%x'%(Info.FormSetId.Data4[5]), '0x%x'%(Info.FormSetId.Data4[6]), '0x%x'%(Info.FormSetId.Data4[7])) + ' }}\' #  Optional Input\n')
-                        f.write(ValueIndent + 'question:  {} #  Optional Input\n'.
-                            format('0x%x' % (Info.QuestionId)))
+                        f.write(ValueIndent + 'question:  {} #  Optional Input\n'.format('0x%x' % (Info.QuestionId)))
 
                     if type(Root.Data) == IfrRef2:
                         f.write(ValueIndent + 'formid:  {}\n'.format(
                             '0x%x' % (Info.FormId)))
-                        f.write(ValueIndent + 'question:  {} #  Optional Input\n'.
-                            format(Info.QuestionId))
+                        f.write(ValueIndent + 'question:  {} #  Optional Input\n'.format(Info.QuestionId))
 
                     if type(Root.Data) == IfrRef:
                         f.write(ValueIndent + 'formid:  {}\n'.format(
                             '0x%x' % (Info.FormId)))
-                        f.write(ValueIndent + 'question:  {} #  Optional Input\n'.
-                            format('0x%04x' % (Info.Question.QuestionId)))
+                        f.write(ValueIndent + 'question:  {} #  Optional Input\n'.format('0x%04x' % (Info.Question.QuestionId)))
 
                     self.DumpQuestionInfos(Root, f, ValueIndent)
-                    #f.write(ValueIndent + 'questionflags:  {} # Optional Input \n'.format(Info.Question.Flags))
+                    f.write(ValueIndent + 'questionflags:  {} # Optional Input \n'.format(Info.Question.Flags))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
