@@ -11,6 +11,7 @@
 #define __OVMF_WORK_AREA_H__
 
 #include <ConfidentialComputingGuestAttr.h>
+#include <IndustryStandard/Tpm20.h>
 
 //
 // Confidential computing work area header definition. Any change
@@ -65,18 +66,36 @@ typedef struct _SEV_WORK_AREA {
 } SEV_WORK_AREA;
 
 //
+// Start of TDX Specific WorkArea definition
+//
+
+#define TDX_MEASUREMENT_TDHOB_BITMASK   0x1
+#define TDX_MEASUREMENT_CFVIMG_BITMASK  0x2
+
+typedef struct _TDX_MEASUREMENTS_DATA {
+  UINT32    MeasurementsBitmap;
+  UINT8     TdHobHashValue[SHA384_DIGEST_SIZE];
+  UINT8     CfvImgHashValue[SHA384_DIGEST_SIZE];
+} TDX_MEASUREMENTS_DATA;
+
+//
 // The TDX work area definition
 //
 typedef struct _SEC_TDX_WORK_AREA {
-  UINT32    PageTableReady;
-  UINT32    Gpaw;
-  UINT64    HobList;
+  UINT32                   PageTableReady;
+  UINT32                   Gpaw;
+  UINT64                   HobList;
+  TDX_MEASUREMENTS_DATA    TdxMeasurementsData;
 } SEC_TDX_WORK_AREA;
 
 typedef struct _TDX_WORK_AREA {
   CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER    Header;
   SEC_TDX_WORK_AREA                          SecTdxWorkArea;
 } TDX_WORK_AREA;
+
+//
+// End of TDX Specific WorkArea definition
+//
 
 typedef union {
   CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER    Header;
