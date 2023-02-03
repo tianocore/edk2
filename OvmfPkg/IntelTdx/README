@@ -26,17 +26,19 @@ There are 2 configurations for TDVF.
  - The OvmfX64Pkg.dsc includes SEV/TDX/normal OVMF basic boot capability.
    The final binary can run on SEV/TDX/normal OVMF.
  - No changes to existing OvmfPkgX64 image layout.
- - No need to add additional security features if they do not exist today.
  - No need to remove features if they exist today.
- - RTMR is not supported.
  - PEI phase is NOT skipped in either Td or Non-Td.
+ - RTMR based measurement is supported.
+ - External inputs from Host VMM are measured, such as TdHob, CFV.
+ - Other external inputs are measured, such as FW_CFG data, os loader,
+   initrd, etc.
 
 <b>Config-B:</b>
- - (*) Add a standalone IntelTdx.dsc to a TDX specific directory for a *full*
+ - Add a standalone IntelTdx.dsc to a TDX specific directory for a *full*
    feature TDVF.(Align with existing SEV)
- - (*) Threat model: VMM is out of TCB. (We need necessary change to prevent
+ - Threat model: VMM is out of TCB. (We need necessary change to prevent
    attack from VMM)
- - (*) IntelTdx.dsc includes TDX/normal OVMF basic boot capability. The final
+ - IntelTdx.dsc includes TDX/normal OVMF basic boot capability. The final
    binary can run on TDX/normal OVMF.
  - It might eventually merge with AmdSev.dsc, but NOT at this point of
    time. And we don?t know when it will happen. We need sync with AMD in
@@ -47,13 +49,6 @@ There are 2 configurations for TDVF.
  - Need to measure other external input, such as FW_CFG data, os loader,
    initrd, etc.
  - Need to remove unnecessary attack surfaces, such as network stack.
-
-In current stage, <b>Config-A</b> has been merged into edk2-master branch.
-The corresponding pkg file is OvmfPkg/OvmfPkgX64.dsc.
-
-<b>Config-B</b> is split into several waves. The corresponding pkg file is
-OvmfPkg/IntelTdx/IntelTdxX64.dsc. The features with (*) have been implemented
-and merged into edk2-master branch. Others are in upstreaming progress.
 
 Build
 ------
