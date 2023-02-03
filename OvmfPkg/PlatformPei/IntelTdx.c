@@ -18,6 +18,7 @@
 #include <Library/QemuFwCfgLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/TdxLib.h>
+#include <Library/TdxHelperLib.h>
 #include <Library/PlatformInitLib.h>
 #include <WorkArea.h>
 #include <ConfidentialComputingGuestAttr.h>
@@ -38,6 +39,8 @@ IntelTdxInitialize (
   if (!TdIsEnabled ()) {
     return;
   }
+
+  TdxHelperBuildGuidHobForTdxMeasurement ();
 
   PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrIntelTdx);
   ASSERT_RETURN_ERROR (PcdStatus);
