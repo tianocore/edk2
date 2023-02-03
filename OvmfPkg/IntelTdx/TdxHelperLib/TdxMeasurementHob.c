@@ -15,6 +15,7 @@
 #include <IndustryStandard/UefiTcgPlatform.h>
 #include <Library/HobLib.h>
 #include <Library/PrintLib.h>
+#include <Library/TcgEventLogRecordLib.h>
 #include <WorkArea.h>
 
 #pragma pack(1)
@@ -28,6 +29,9 @@ typedef struct {
 } TDX_HANDOFF_TABLE_POINTERS2;
 
 #pragma pack()
+
+#define FV_HANDOFF_TABLE_DESC  "Fv(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)"
+typedef PLATFORM_FIRMWARE_BLOB2_STRUCT CFV_HANDOFF_TABLE_POINTERS2;
 
 /**
  * Build GuidHob for Tdx measurement.
@@ -113,6 +117,52 @@ BuildTdxMeasurementGuidHob (
 }
 
 /**
+  Get the FvName from the FV header.
+
+  Causion: The FV is untrusted input.
+
+  @param[in]  FvBase            Base address of FV image.
+  @param[in]  FvLength          Length of FV image.
+
+  @return FvName pointer
+  @retval NULL   FvName is NOT found
+**/
+VOID *
+GetFvName (
+  IN EFI_PHYSICAL_ADDRESS  FvBase,
+  IN UINT64                FvLength
+  )
+{
+  EFI_FIRMWARE_VOLUME_HEADER      *FvHeader;
+  EFI_FIRMWARE_VOLUME_EXT_HEADER  *FvExtHeader;
+
+  if (FvBase >= MAX_ADDRESS) {
+    return NULL;
+  }
+
+  if (FvLength >= MAX_ADDRESS - FvBase) {
+    return NULL;
+  }
+
+  if (FvLength < sizeof (EFI_FIRMWARE_VOLUME_HEADER)) {
+    return NULL;
+  }
+
+  FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FvBase;
+  if (FvHeader->ExtHeaderOffset < sizeof (EFI_FIRMWARE_VOLUME_HEADER)) {
+    return NULL;
+  }
+
+  if (FvHeader->ExtHeaderOffset + sizeof (EFI_FIRMWARE_VOLUME_EXT_HEADER) > FvLength) {
+    return NULL;
+  }
+
+  FvExtHeader = (EFI_FIRMWARE_VOLUME_EXT_HEADER *)(UINTN)(FvBase + FvHeader->ExtHeaderOffset);
+
+  return &FvExtHeader->FvName;
+}
+
+/**
   Build the GuidHob for tdx measurements which were done in SEC phase.
   The measurement values are stored in WorkArea.
 
@@ -128,6 +178,10 @@ InternalBuildGuidHobForTdxMeasurement (
   OVMF_WORK_AREA               *WorkArea;
   VOID                         *TdHobList;
   TDX_HANDOFF_TABLE_POINTERS2  HandoffTables;
+  VOID                         *FvName;
+  CFV_HANDOFF_TABLE_POINTERS2  FvBlob2;
+  EFI_PHYSICAL_ADDRESS         FvBase;
+  UINT64                       FvLength;
   UINT8                        *HashValue;
 
   if (!TdIsEnabled ()) {
@@ -161,6 +215,38 @@ InternalBuildGuidHobForTdxMeasurement (
                sizeof (HandoffTables),          // EventSize
                HashValue,                       // HashValue
                SHA384_DIGEST_SIZE               // HashSize
+               );
+  }
+
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  //
+  // Build the GuidHob for Cfv measurement
+  //
+  if (WorkArea->TdxWorkArea.SecTdxWorkArea.TdxMeasurementsData.MeasurementsBitmap & TDX_MEASUREMENT_CFVIMG_BITMASK) {
+    HashValue                   = WorkArea->TdxWorkArea.SecTdxWorkArea.TdxMeasurementsData.CfvImgHashValue;
+    FvBase                      = (UINT64)PcdGet32 (PcdOvmfFlashNvStorageVariableBase);
+    FvLength                    = (UINT64)PcdGet32 (PcdCfvRawDataSize);
+    FvBlob2.BlobDescriptionSize = sizeof (FvBlob2.BlobDescription);
+    CopyMem (FvBlob2.BlobDescription, FV_HANDOFF_TABLE_DESC, sizeof (FvBlob2.BlobDescription));
+    FvName = GetFvName (FvBase, FvLength);
+    if (FvName != NULL) {
+      AsciiSPrint ((CHAR8 *)FvBlob2.BlobDescription, sizeof (FvBlob2.BlobDescription), "Fv(%g)", FvName);
+    }
+
+    FvBlob2.BlobBase   = FvBase;
+    FvBlob2.BlobLength = FvLength;
+
+    Status = BuildTdxMeasurementGuidHob (
+               0,                              // RtmrIndex
+               EV_EFI_PLATFORM_FIRMWARE_BLOB2, // EventType
+               (VOID *)&FvBlob2,               // EventData
+               sizeof (FvBlob2),               // EventSize
+               HashValue,                      // HashValue
+               SHA384_DIGEST_SIZE              // HashSize
                );
   }
 
