@@ -58,8 +58,6 @@
 
 
 [FixedPcd.common]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
-
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType
