@@ -16,79 +16,8 @@
 
 #include "PeilessStartupInternal.h"
 
-#pragma pack(1)
-
-#define HANDOFF_TABLE_DESC  "TdxTable"
-typedef struct {
-  UINT8                      TableDescriptionSize;
-  UINT8                      TableDescription[sizeof (HANDOFF_TABLE_DESC)];
-  UINT64                     NumberOfTables;
-  EFI_CONFIGURATION_TABLE    TableEntry[1];
-} TDX_HANDOFF_TABLE_POINTERS2;
-
-#pragma pack()
-
 #define FV_HANDOFF_TABLE_DESC  "Fv(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)"
 typedef PLATFORM_FIRMWARE_BLOB2_STRUCT CFV_HANDOFF_TABLE_POINTERS2;
-
-/**
-  Measure the Hoblist passed from the VMM.
-
-  @param[in] VmmHobList    The Hoblist pass the firmware
-
-  @retval EFI_SUCCESS           Fv image is measured successfully
-                                or it has been already measured.
-  @retval Others                Other errors as indicated
-**/
-EFI_STATUS
-EFIAPI
-MeasureHobList (
-  IN CONST VOID  *VmmHobList
-  )
-{
-  EFI_PEI_HOB_POINTERS         Hob;
-  TDX_HANDOFF_TABLE_POINTERS2  HandoffTables;
-  EFI_STATUS                   Status;
-
-  if (!TdIsEnabled ()) {
-    ASSERT (FALSE);
-    return EFI_UNSUPPORTED;
-  }
-
-  Hob.Raw = (UINT8 *)VmmHobList;
-
-  //
-  // Parse the HOB list until end of list.
-  //
-  while (!END_OF_HOB_LIST (Hob)) {
-    Hob.Raw = GET_NEXT_HOB (Hob);
-  }
-
-  //
-  // Init the log event for HOB measurement
-  //
-
-  HandoffTables.TableDescriptionSize = sizeof (HandoffTables.TableDescription);
-  CopyMem (HandoffTables.TableDescription, HANDOFF_TABLE_DESC, sizeof (HandoffTables.TableDescription));
-  HandoffTables.NumberOfTables = 1;
-  CopyGuid (&(HandoffTables.TableEntry[0].VendorGuid), &gUefiOvmfPkgTokenSpaceGuid);
-  HandoffTables.TableEntry[0].VendorTable = (VOID *)VmmHobList;
-
-  Status = TpmMeasureAndLogData (
-             1,                                              // PCRIndex
-             EV_EFI_HANDOFF_TABLES2,                         // EventType
-             (VOID *)&HandoffTables,                         // EventData
-             sizeof (HandoffTables),                         // EventSize
-             (UINT8 *)(UINTN)VmmHobList,                     // HashData
-             (UINTN)((UINT8 *)Hob.Raw - (UINT8 *)VmmHobList) // HashDataLen
-             );
-
-  if (EFI_ERROR (Status)) {
-    ASSERT (FALSE);
-  }
-
-  return Status;
-}
 
 /**
   Get the FvName from the FV header.

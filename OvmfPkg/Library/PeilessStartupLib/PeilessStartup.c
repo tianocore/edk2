@@ -17,6 +17,7 @@
 #include <Library/PrePiLib.h>
 #include <Library/PeilessStartupLib.h>
 #include <Library/PlatformInitLib.h>
+#include <Library/TdxHelperLib.h>
 #include <ConfidentialComputingGuestAttr.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <OvmfPlatforms.h>
@@ -179,7 +180,16 @@ PeilessStartup (
     //
     // Measure HobList
     //
-    Status = MeasureHobList (VmmHobList);
+    Status = TdxHelperMeasureTdHob ();
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      CpuDeadLoop ();
+    }
+
+    //
+    // Build GuidHob for tdx measurement
+    //
+    Status = TdxHelperBuildGuidHobForTdxMeasurement ();
     if (EFI_ERROR (Status)) {
       ASSERT (FALSE);
       CpuDeadLoop ();
