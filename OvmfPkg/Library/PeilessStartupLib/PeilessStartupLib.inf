@@ -56,8 +56,6 @@
   PrePiLib
   QemuFwCfgLib
   PlatformInitLib
-  HashLib
-  TpmMeasurementLib
 
 [Guids]
   gEfiHobMemoryAllocModuleGuid
