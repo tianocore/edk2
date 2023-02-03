@@ -1,0 +1,48 @@
+## @file
+#  TdxHelperLib PEI instance
+#
+#  This module provides Tdx helper functions in PEI phase.
+#  Copyright (c) 2021 - 2023, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiTdxHelperLib
+  FILE_GUID                      = 4d22289d-3bde-4501-a737-7719f3215065
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TdxHelperLib|PEIM
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  PeiTdxHelper.c
+  TdxMeasurementHob.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  HobLib
+  PcdLib
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize
+
+[Guids]
+  gCcEventEntryHobGuid
