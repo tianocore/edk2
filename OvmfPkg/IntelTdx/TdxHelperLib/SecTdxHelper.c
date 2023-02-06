@@ -566,10 +566,16 @@ ValidateHobList (
     BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED
   };
 
+  UINT32  TotalSize;
+  UINT32  TDHobSize;
+
   if (VmmHobList == NULL) {
     DEBUG ((DEBUG_ERROR, "HOB: HOB data pointer is NULL\n"));
     return FALSE;
   }
+
+  TotalSize = 0;
+  TDHobSize = (UINT32)FixedPcdGet32 (PcdOvmfSecGhcbSize);
 
   Hob.Raw = (UINT8 *)VmmHobList;
 
@@ -584,6 +590,12 @@ ValidateHobList (
 
     if (Hob.Header->HobLength == 0) {
       DEBUG ((DEBUG_ERROR, "HOB: Hob header LEANGTH should not be zero\n"));
+      return FALSE;
+    }
+
+    TotalSize += Hob.Header->HobLength;
+    if (TotalSize > TDHobSize) {
+      DEBUG ((DEBUG_ERROR, "HOB: TD Hob Size was overflow. Totalsize is  0x%x\n", TotalSize));
       return FALSE;
     }
 
@@ -651,8 +663,14 @@ ValidateHobList (
 
         break;
 
-      // EFI_HOB_GUID_TYPE is variable length data, so skip check
+      // EFI_HOB_GUID_TYPE is variable length data. The total size of the TdHob list is checked at the beginning of the loop.
+      // So we only need to check the min size of the HOB.
       case EFI_HOB_TYPE_GUID_EXTENSION:
+        if (Hob.Header->HobLength < sizeof (EFI_HOB_GUID_TYPE)) {
+          DEBUG ((DEBUG_ERROR, "HOB: Hob length is not less than corresponding hob structure. Type: 0x%04x\n", EFI_HOB_TYPE_GUID_EXTENSION));
+          return FALSE;
+        }
+
         break;
 
       case EFI_HOB_TYPE_FV:
