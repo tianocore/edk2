@@ -1465,7 +1465,7 @@ class IfrOrderedList(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
         self.OrderedList.MaxContainers = 0
         self.OrderedList.Flags = 0
 
-        self.HasMaxContianers = False
+        self.HasMaxContainers = False
 
     def GetQuestion(self):
         return self
@@ -1476,8 +1476,8 @@ class IfrOrderedList(IfrLine, IfrBaseInfo, IfrOpHeader, IfrQuestionHeader):
     def SetMaxContainers(self, MaxContainers):
         self.OrderedList.MaxContainers = MaxContainers
 
-    def SetHasMaxContianers(self, HasMaxContianers):
-        self.HasMaxContianers = HasMaxContianers
+    def SetHasMaxContainers(self, HasMaxContainers):
+        self.HasMaxContainers = HasMaxContainers
 
     def SetFlags(self, HFlags, LFlags):
 

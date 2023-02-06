@@ -74,7 +74,6 @@ class YamlTree():
             pass
 
 
-
     def GetUniDictsForYaml(self):
         FileName = self.Options.UNIStrFileName
         try:

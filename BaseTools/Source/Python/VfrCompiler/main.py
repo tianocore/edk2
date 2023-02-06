@@ -490,7 +490,7 @@ class VfrCompiler():
                 os._exit(ret)
         return ret
 
-    def CopyFile(self):
+    def CopyFileToOutputDir(self):
         self.Options.ProcessedInFileName = self.VfrTree.FindIncludeHeaderFile('/edk2/', self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)[0]
         if self.Options.ProcessedInFileName == None:
             EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
@@ -503,7 +503,7 @@ def main():
     Argc = len(sys.argv)
     EdkLogger.SetLevel(WARNING_LOG_LEVEL)
     Compiler = VfrCompiler(Args, Argc)
-    Compiler.CopyFile() #
+    Compiler.CopyFileToOutputDir() # for development and testing
     Compiler.PreProcess()
     Compiler.Compile()
     Compiler.GenBinaryFiles()

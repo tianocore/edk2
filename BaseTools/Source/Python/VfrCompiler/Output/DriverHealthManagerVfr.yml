@@ -5,7 +5,7 @@ formset:
   guid:  DRIVER_HEALTH_MANAGER_FORMSET_GUID
   title:  STRING_TOKEN(STR_FORM_TITLE)
   help:  STRING_TOKEN(STR_FORM_HELP)
-  classguid:  DRIVER_HEALTH_MANAGER_FORMSET_GUID
+  classguid:  EFI_HII_PLATFORM_SETUP_FORMSET_GUID
   component:  
   - form: 
       formid:  DRIVER_HEALTH_FORM_ID
@@ -20,4 +20,4 @@ formset:
           help:  STRING_TOKEN(STR_NULL)
           prompt:  STRING_TOKEN(STR_NULL)
           flags:  INTERACTIVE  # Optional Input, Question Flags
-          key:  QUESTION_ID_REFRESH_MANAGER # Optional Input, Question QuestionId
+          key:  QUESTION_ID_REFRESH_MANAGER

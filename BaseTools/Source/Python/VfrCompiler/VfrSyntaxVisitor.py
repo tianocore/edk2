@@ -1443,7 +1443,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             R2Obj.SetQId(QId)
             GObj = R2Obj
 
-
         elif ctx.N != None:
             RefType = 1
             FId = self.TransNum(ctx.Number(0))
@@ -1469,6 +1468,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             index = int(len(ctx.Number())) - 1
             Key = self.TransNum(ctx.Number(index))
             self.AssignQuestionKey(GObj, Key)
+            GObj.SetHasKey(True)
 
         if ctx.vfrStatementQuestionOptionList() != None:
             GObj.SetScope(1)
@@ -2215,9 +2215,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         # modify the data for namevalue
         if UpdateVarType:
-            print(self.CurrQestVarInfo.VarType)
-            print('0x%0x' %NObj.GetInfo().Flags)
-            "07 A6 0F 00 10 00 01 20 00 00 FF FF 04 /23 /01 00 00 00 00 00 00 00 /FF FF FF FF FF FF FF FF /00 00 00 00 00 00 00 00"
+            #print(self.CurrQestVarInfo.VarType)
+            #print('0x%0x' %NObj.GetInfo().Flags)
+            #"07 A6 0F 00 10 00 01 20 00 00 FF FF 04 /23 /01 00 00 00 00 00 00 00 /FF FF FF FF FF FF FF FF /00 00 00 00 00 00 00 00"
             UpdatedNObj = IfrNumeric(self.CurrQestVarInfo.VarType)
             UpdatedNObj.FlagsStream = NObj.FlagsStream
             UpdatedNObj.HasKey = NObj.HasKey
@@ -2796,7 +2796,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             elif VarArraySize != 0 and MaxContainers > VarArraySize:
                 self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.M.line,"OrderedList MaxContainers can't be larger than the max number of elements in array.")
             OLObj.SetMaxContainers(MaxContainers)
-            OLObj.SetHasMaxContianers(True)
+            OLObj.SetHasMaxContainers(True)
 
         if ctx.FLAGS() != None:
 

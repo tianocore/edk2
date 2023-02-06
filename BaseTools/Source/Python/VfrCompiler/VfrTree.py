@@ -647,7 +647,7 @@ class VfrTree():
         UniDict = {}
         for Define in CppHeader.defines:
             Items = Define.split()
-            if len(Items) == 2 and Items[0].find("STR") != -1 and Items[1].find('0x') != -1:
+            if len(Items) == 2 and Items[1].find('0x') != -1: # need refine
                 UniDict[int(Items[1], 16)] = Items[0]
         return UniDict
 
@@ -768,15 +768,24 @@ class VfrTree():
         if Root.Data.VarIdStr != '':
             f.write(ValueIndent + 'varid:  {}  #  Optional Input\n'.
                                 format(Root.Data.VarIdStr))
-        #if Root.Data.HasQuestionId:
-            #f.write(ValueIndent + 'questionid:  ' + HeaderDict[Info.Question.QuestionId] +' # Optional Input, Need to compute if None\n')
+        if Root.Data.HasQuestionId:
+            if Info.Question.QuestionId in HeaderDict.keys():
+                f.write(ValueIndent + 'questionid:  ' + HeaderDict[Info.Question.QuestionId] +' # Optional Input, Need to compute if None\n')
+            else:
+                f.write(ValueIndent + 'questionid:  {}  # Optional Input, Need to compute if None\n'
+                        .format("0x%x" % Info.Question.QuestionId))
+
         f.write(ValueIndent + 'prompt:  ' + self.GenST(UniDict[Info.Question.Header.Prompt]))
         f.write(ValueIndent + 'help:  ' + self.GenST(UniDict[Info.Question.Header.Help]))
         if Root.Data.FlagsStream != '':
             f.write(ValueIndent + 'flags:  {}  # Optional input , flags\n'.
                         format(Root.Data.FlagsStream))
         if Root.Data.HasKey:
-            f.write(ValueIndent + 'key:  {} # Optional input, key\n'.format(Root.Data.HasKey))
+            if Info.Question.QuestionId in HeaderDict.keys():
+                f.write(ValueIndent + 'key:  ' + HeaderDict[Info.Question.QuestionId] +' # Optional Input\n')
+            else:
+                f.write(ValueIndent + 'key:  {} # Optional input, key\n'.format("0x%0x " % Info.Question.QuestionId))
+
 
     def DumpYamlDfsWithUni(self, Root, f, UniDict, HeaderDict, VfrDict):
         try:
@@ -800,11 +809,11 @@ class VfrTree():
                         ValueIndent + 'help:  ' + self.GenST(UniDict[Info.Help]))
                     if len(Root.Data.GetClassGuid()) == 1:
                         Guid = Root.Data.GetClassGuid()[0]
-                        f.write(ValueIndent + 'classguid:  '  + HeaderDict[Info.Guid.to_string()] + '\n')
+                        f.write(ValueIndent + 'classguid:  '  + HeaderDict[Guid.to_string()] + '\n')
                     else:
                         for i in range(0, len(Root.Data.GetClassGuid())):
                             Guid = Root.Data.GetClassGuid()[i]
-                            f.write(ValueIndent + 'classguid:  '  + HeaderDict[Info.Guid.to_string()] + '\n')
+                            f.write(ValueIndent + 'classguid:  '  + HeaderDict[Guid.to_string()] + '\n')
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
@@ -821,9 +830,7 @@ class VfrTree():
                     for i in range(0, len(Info.Name)):
                         Name += chr(Info.Name[i])
                     f.write(ValueIndent + 'name:  {}\n'.format(Name))
-                    f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
-                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
-                        '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\'\n')
+                    f.write(ValueIndent + 'guid:  ' + HeaderDict[Info.Guid.to_string()] + '\n')
 
                 if Root.OpCode == EFI_IFR_VARSTORE_EFI_OP:
                     f.write(KeyIndent + '- efivarstore:\n')
@@ -838,9 +845,7 @@ class VfrTree():
                     for i in range(0, len(Info.Name)):
                         Name += chr(Info.Name[i])
                     f.write(ValueIndent + 'name:  {}\n'.format(Name))
-                    f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
-                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
-                        '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\'\n')
+                    f.write(ValueIndent + 'guid:  ' + HeaderDict[Info.Guid.to_string()] + '\n')
                     f.write(
                         ValueIndent +
                         'attribute:  {} \n'
@@ -859,9 +864,7 @@ class VfrTree():
                     for NameItem in Root.Data.NameItemList:
                         f.write(ValueIndent +
                                 'name:  ' + self.GenST(UniDict[NameItem]))
-                    f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
-                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
-                        '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\'\n')
+                    f.write(ValueIndent + 'guid:  ' + HeaderDict[Info.Guid.to_string()] + '\n')
 
                 if Root.OpCode == EFI_IFR_DEFAULTSTORE_OP:
                     gVfrDefaultStore.UpdateDefaultType(Root)
@@ -878,9 +881,11 @@ class VfrTree():
 
                 if Root.OpCode == EFI_IFR_FORM_OP:
                     f.write(KeyIndent + '- form: \n')
-                    f.write(
-                        ValueIndent +
-                        'formid:  ' + HeaderDict[Info.FormId] + '\n')
+                    if (Info.FormId in HeaderDict.keys()) and ("FORM_ID" in HeaderDict[Info.FormId]):
+                        f.write(ValueIndent + 'formid:  ' + HeaderDict[Info.FormId] + '\n')
+                    else:
+                        f.write(ValueIndent + 'formid:  {} \n'.format("0x%x" % Info.FormId))
+
                     if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
@@ -968,10 +973,10 @@ class VfrTree():
                             'flags:  {}  # Optional Input, Question Flags\n'
                             .format(Root.Data.FlagsStream))
                         if Root.Data.HasKey:
-                            f.write(
-                            ValueIndent +
-                            'key:  {}  # Optional Input, Question QuestionId\n'
-                            .format('0x%04x' % (Info.Question.QuestionId)))
+                            if Info.Question.QuestionId in HeaderDict.keys():
+                                f.write(ValueIndent + 'key:  ' + HeaderDict[Info.Question.QuestionId] + '\n')
+                            else:
+                                f.write(ValueIndent +'key:  {}  # Optional Input, Question QuestionId\n'.format('0x%04x' % (Info.Question.QuestionId)))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
@@ -1047,7 +1052,8 @@ class VfrTree():
                 if Root.OpCode == EFI_IFR_ORDERED_LIST_OP:
                     f.write(KeyIndent + '- orderedlist:\n')
                     self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict, HeaderDict)
-                    f.write(ValueIndent + 'maxcontainers:  {} ## Optional Input, Need to compute if None\n'
+                    if Root.Data.HasMaxContainers:
+                        f.write(ValueIndent + 'maxcontainers:  {} ## Optional Input, Need to compute if None\n'
                         .format(Info.MaxContainers))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
@@ -1121,31 +1127,35 @@ class VfrTree():
                                 'condition:  \'{}\'\n'.format(Root.Condition))
 
                     if type(Root.Data) == IfrRef4:
-                        f.write(ValueIndent + 'formid:  {}\n'.format(
-                            '0x%x' % (Info.FormId)))
-                        f.write(ValueIndent + 'formsetguid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
-                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.FormSetId.Data4[0]), '0x%x'%(Info.FormSetId.Data4[1]), '0x%x'%(Info.FormSetId.Data4[2]), '0x%x'%(Info.FormSetId.Data4[3]), \
-                        '0x%x'%(Info.FormSetId.Data4[4]), '0x%x'%(Info.FormSetId.Data4[5]), '0x%x'%(Info.FormSetId.Data4[6]), '0x%x'%(Info.FormSetId.Data4[7])) + ' }}\' #  Optional Input\n')
-                        #f.write(ValueIndent + 'question:  ' + HeaderDict[Info.QuestionId] + ' #  Optional Input\n')
+                        if Info.FormId in HeaderDict.keys() and ("FORM_ID" in HeaderDict[Info.FormId]):
+                            f.write(ValueIndent + 'formid:  ' + HeaderDict[Info.FormId] + '\n')
+                        else:
+                            f.write(ValueIndent + 'formid:  {}\n'.format('0x%x' % (Info.FormId)))
+                        f.write(ValueIndent + 'formsetguid:  ' + HeaderDict[Info.FormSetId.to_string()] + ' # Optional Input\n')
+                        f.write(ValueIndent + 'question:  {} #  Optional Input\n'.format("0x%x" %Info.QuestionId))
                         f.write(ValueIndent + 'devicepath:  {} #  Optional Input\n'.
                             format('0x%04x' % (Info.DevicePath)))
 
                     if type(Root.Data) == IfrRef3:
-                        f.write(ValueIndent + 'formid:  {}\n'.format(
-                            '0x%x' % (Info.FormId)))
-                        f.write(ValueIndent + 'formsetguid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.FormSetId.Data1),'0x%x'%(Info.FormSetId.Data2), '0x%x'%(Info.FormSetId.Data3)) \
-                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.FormSetId.Data4[0]), '0x%x'%(Info.FormSetId.Data4[1]), '0x%x'%(Info.FormSetId.Data4[2]), '0x%x'%(Info.FormSetId.Data4[3]), \
-                        '0x%x'%(Info.FormSetId.Data4[4]), '0x%x'%(Info.FormSetId.Data4[5]), '0x%x'%(Info.FormSetId.Data4[6]), '0x%x'%(Info.FormSetId.Data4[7])) + ' }}\' #  Optional Input\n')
-                        #f.write(ValueIndent + 'question:  ' + HeaderDict[Info.QuestionId] + ' #  Optional Input\n')
+                        if Info.FormId in HeaderDict.keys() and ("FORM_ID" in HeaderDict[Info.FormId]):
+                            f.write(ValueIndent + 'formid:  ' + HeaderDict[Info.FormId] + '\n')
+                        else:
+                            f.write(ValueIndent + 'formid:  {}\n'.format('0x%x' % (Info.FormId)))
+                        f.write(ValueIndent + 'formsetguid:  ' + HeaderDict[Info.FormSetId.to_string()] + ' # Optional Input\n')
+                        f.write(ValueIndent + 'question:  {} #  Optional Input\n'.format("0x%x" %Info.QuestionId))
 
                     if type(Root.Data) == IfrRef2:
-                        f.write(ValueIndent + 'formid:  {}\n'.format(
-                            '0x%x' % (Info.FormId)))
-                        #f.write(ValueIndent + 'question:  ' + HeaderDict[Info.QuestionId] + ' #  Optional Input\n')
+                        if Info.FormId in HeaderDict.keys() and ("FORM_ID" in HeaderDict[Info.FormId]):
+                            f.write(ValueIndent + 'formid:  ' + HeaderDict[Info.FormId] + '\n')
+                        else:
+                            f.write(ValueIndent + 'formid:  {}\n'.format('0x%x' % (Info.FormId)))
+                        f.write(ValueIndent + 'question:  {} #  Optional Input\n'.format("0x%x" %Info.QuestionId))
 
                     if type(Root.Data) == IfrRef:
-                        f.write(ValueIndent + 'formid:  {}\n'.format(
-                            '0x%x' % (Info.FormId)))
+                        if Info.FormId in HeaderDict.keys() and ("FORM_ID" in HeaderDict[Info.FormId]):
+                            f.write(ValueIndent + 'formid:  ' + HeaderDict[Info.FormId] + '\n')
+                        else:
+                            f.write(ValueIndent + 'formid:  {}\n'.format('0x%x' % (Info.FormId)))
                         #f.write(ValueIndent + 'question:  ' + HeaderDict[Info.Question.QuestionId] + ' #  Optional Input\n')
 
                     self.DumpQuestionInfosWithUni(Root, f, ValueIndent, UniDict, HeaderDict)
@@ -1173,9 +1183,7 @@ class VfrTree():
                     if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
-                    f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.RefreshEventGroupId.Data1),'0x%x'%(Info.RefreshEventGroupId.Data2), '0x%x'%(Info.RefreshEventGroupId.Data3)) \
-                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.RefreshEventGroupId.Data4[0]), '0x%x'%(Info.RefreshEventGroupId.Data4[1]), '0x%x'%(Info.RefreshEventGroupId.Data4[2]), '0x%x'%(Info.RefreshEventGroupId.Data4[3]), \
-                        '0x%x'%(Info.RefreshEventGroupId.Data4[4]), '0x%x'%(Info.RefreshEventGroupId.Data4[5]), '0x%x'%(Info.RefreshEventGroupId.Data4[6]), '0x%x'%(Info.RefreshEventGroupId.Data4[7])) + ' }}\'\n')
+                    f.write(ValueIndent + 'guid:  ' + HeaderDict[Info.RefreshEventGroupId.to_string()] + '\n')
 
                 if Root.OpCode == EFI_IFR_WARNING_IF_OP:
                     f.write(KeyIndent + '- warningif:\n')
@@ -1244,9 +1252,7 @@ class VfrTree():
                         if Root.Condition != None:
                             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
-                        f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
-                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
-                        '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\'\n')
+                        f.write(ValueIndent + 'guid:  ' + HeaderDict[Info.Guid.to_string()] + '\n')
                         if Root.Data.GetDataType() != '':
                             f.write(ValueIndent + 'databuffer: #optional input\n')
                             f.write(ValueIndent + '- {}: \n'.format(Root.Data.GetDataType()))
