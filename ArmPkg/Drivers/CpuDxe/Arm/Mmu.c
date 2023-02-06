@@ -480,6 +480,8 @@ GetMemoryRegion (
 
     PageAttributes    = PageTable[PageTableIndex] & TT_DESCRIPTOR_PAGE_ATTRIBUTE_MASK;
     *RegionAttributes = TT_DESCRIPTOR_CONVERT_TO_SECTION_CACHE_POLICY (PageAttributes) |
+                        TT_DESCRIPTOR_CONVERT_TO_SECTION_S (PageAttributes) |
+                        TT_DESCRIPTOR_CONVERT_TO_SECTION_XN (PageAttributes) |
                         TT_DESCRIPTOR_CONVERT_TO_SECTION_AP (PageAttributes);
   }
 
@@ -494,6 +496,7 @@ GetMemoryRegion (
 
       // Scan the page table to find the end of the region.
       Status = GetMemoryRegionPage (PageTable, BaseAddress, RegionLength, RegionAttributes);
+      ASSERT (*RegionLength > 0);
 
       // If we have found the end of the region (Status == EFI_SUCCESS) then we exit the for-loop
       if (Status == EFI_SUCCESS) {
