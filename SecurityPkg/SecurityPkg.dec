@@ -580,5 +580,12 @@
   ## This PCD records LASA field in CC EVENTLOG ACPI table.
   gEfiSecurityPkgTokenSpaceGuid.PcdCcEventlogAcpiTableLasa|0|UINT64|0x00010026
 
+[PcdsFeatureFlag]
+  ## Indicates if the platform requires PK to be self-signed when setting the PK in setup mode.
+  #   TRUE  - Require PK to be self-signed.
+  #   FALSE - Do not require PK to be self-signed.
+  # @Prompt Require PK to be self-signed
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|FALSE|BOOLEAN|0x00010027
+
 [UserExtensions.TianoCore."ExtraFiles"]
   SecurityPkgExtra.uni

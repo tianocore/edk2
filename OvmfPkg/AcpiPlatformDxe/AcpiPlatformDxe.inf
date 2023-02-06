@@ -46,6 +46,7 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   HobLib
+  TpmMeasurementLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED

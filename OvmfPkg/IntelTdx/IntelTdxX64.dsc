@@ -390,6 +390,9 @@
 !ifdef $(CSM_ENABLE)
   gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable|TRUE
 !endif
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|TRUE
+!endif
 
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
@@ -548,10 +551,8 @@
   OvmfPkg/IntelTdx/Sec/SecMain.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
-      TpmMeasurementLib|SecurityPkg/Library/SecTpmMeasurementLib/SecTpmMeasurementLibTdx.inf
+      NULL|OvmfPkg/IntelTdx/TdxHelperLib/SecTdxHelperLib.inf
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SecCryptLib.inf
-      HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
   }
 
   #

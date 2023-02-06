@@ -32,6 +32,7 @@
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE SMM_REQUIRE             = FALSE
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
+  DEFINE CC_MEASUREMENT_ENABLE   = FALSE
 
 !include OvmfPkg/Include/Dsc/OvmfTpmDefines.dsc.inc
 
@@ -513,6 +514,9 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE
 !endif
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|TRUE
+!endif
 
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
@@ -724,7 +728,8 @@
   OvmfPkg/Sec/SecMain.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
-      NULL|OvmfPkg/Library/PlatformInitLib/PlatformInitLib.inf
+      NULL|OvmfPkg/IntelTdx/TdxHelperLib/SecTdxHelperLib.inf
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SecCryptLib.inf
   }
 
   #
@@ -745,7 +750,10 @@
   }
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
-  OvmfPkg/PlatformPei/PlatformPei.inf
+  OvmfPkg/PlatformPei/PlatformPei.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/IntelTdx/TdxHelperLib/PeiTdxHelperLib.inf
+  }
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf {
     <LibraryClasses>
 !if $(SMM_REQUIRE) == TRUE
@@ -1097,6 +1105,17 @@
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
+  }
+!endif
+
+  #
+  # Cc Measurement Protocol for Td guest
+  #
+!if $(CC_MEASUREMENT_ENABLE) == TRUE
+  SecurityPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf {
+    <LibraryClasses>
+      HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
   }
 !endif
 

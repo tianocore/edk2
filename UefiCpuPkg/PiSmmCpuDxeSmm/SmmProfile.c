@@ -1,7 +1,7 @@
 /** @file
 Enable SMM profile.
 
-Copyright (c) 2012 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2023, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017 - 2020, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -587,13 +587,18 @@ InitPaging (
     }
 
     SizeOfMemorySpace = HighBitSet64 (gPhyMask) + 1;
+    ASSERT (SizeOfMemorySpace <= 52);
+
     //
-    // Calculate the table entries of PML4E and PDPTE.
+    // Calculate the table entries of PML5E, PML4E and PDPTE.
     //
     NumberOfPml5Entries = 1;
     if (SizeOfMemorySpace > 48) {
-      NumberOfPml5Entries = (UINTN)LShiftU64 (1, SizeOfMemorySpace - 48);
-      SizeOfMemorySpace   = 48;
+      if (Enable5LevelPaging) {
+        NumberOfPml5Entries = (UINTN)LShiftU64 (1, SizeOfMemorySpace - 48);
+      }
+
+      SizeOfMemorySpace = 48;
     }
 
     NumberOfPml4Entries = 1;

@@ -52,7 +52,6 @@
   PcdLib
   PciLib
   PeiHardwareInfoLib
-  TdxMailboxLib
 
 [LibraryClasses.X64]
   TdxLib

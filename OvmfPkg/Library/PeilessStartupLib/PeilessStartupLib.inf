@@ -29,7 +29,6 @@
   PeilessStartup.c
   Hob.c
   DxeLoad.c
-  IntelTdx.c
   X64/VirtualMemory.c
 
 [Packages]
@@ -57,8 +56,6 @@
   PrePiLib
   QemuFwCfgLib
   PlatformInitLib
-  HashLib
-  TpmMeasurementLib
 
 [Guids]
   gEfiHobMemoryAllocModuleGuid
@@ -70,9 +67,6 @@
   gEfiNonCcFvGuid
 
 [Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdCfvBase
-  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataOffset
-  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize
   gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataOffset
   gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataSize

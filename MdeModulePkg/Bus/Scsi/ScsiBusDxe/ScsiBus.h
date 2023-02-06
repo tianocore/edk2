@@ -455,7 +455,8 @@ ScsiExecuteSCSICommand (
 
   @retval EFI_SUCCESS           Successfully to discover the device and attach
                                 ScsiIoProtocol to it.
-  @retval EFI_OUT_OF_RESOURCES  Fail to discover the device.
+  @retval EFI_NOT_FOUND         Fail to discover the device.
+  @retval EFI_OUT_OF_RESOURCES  Fail to allocate memory resources.
 
 **/
 EFI_STATUS
@@ -473,11 +474,12 @@ ScsiScanCreateDevice (
 
   @param  ScsiIoDevice    The pointer of SCSI_IO_DEV
 
-  @retval  TRUE   Find SCSI Device and verify it.
-  @retval  FALSE  Unable to find SCSI Device.
+  @retval EFI_SUCCESS           Find SCSI Device and verify it.
+  @retval EFI_NOT_FOUND         Unable to find SCSI Device.
+  @retval EFI_OUT_OF_RESOURCES  Fail to allocate memory resources.
 
 **/
-BOOLEAN
+EFI_STATUS
 DiscoverScsiDevice (
   IN  OUT  SCSI_IO_DEV  *ScsiIoDevice
   );
