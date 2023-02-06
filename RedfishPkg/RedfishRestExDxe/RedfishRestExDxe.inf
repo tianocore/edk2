@@ -57,6 +57,7 @@
 
 [Pcd]
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExServiceAccessModeInBand   ## CONSUMES
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExChunkRequestMode   ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   RedfishRestExDxeExtra.uni

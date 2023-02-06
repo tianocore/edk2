@@ -17,6 +17,7 @@
   Include
 
 [Includes.Common.Private]
+  PrivateInclude                # Private header files for C RTL.
   PrivateInclude/Crt            # Private header files for C RTL.
   Library/JsonLib               # Private header files for jansson
                                 # configuration files.
@@ -97,3 +98,9 @@
   # protocol instance.
   #
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDiscoverAccessModeInBand|FALSE|BOOLEAN|0x00001002
+  #
+  # This PCD indicates if the EFI REST EX sends chunk request to Redfish service.
+  # Default is set to non chunk mode.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExChunkRequestMode|FALSE|BOOLEAN|0x00001003
+  
