@@ -927,10 +927,8 @@
 
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
   ## Indicates if DxeIpl should switch to long mode to enter DXE phase.
-  #  It is assumed that 64-bit DxeCore is built in firmware if it is true; otherwise 32-bit DxeCore
-  #  is built in firmware.<BR><BR>
   #   TRUE  - DxeIpl will load a 64-bit DxeCore and switch to long mode to hand over to DxeCore.<BR>
-  #   FALSE - DxeIpl will load a 32-bit DxeCore and perform stack switch to hand over to DxeCore.<BR>
+  #   FALSE - DxeIpl will load a 32-bit or 64-bit DxeCore and perform stack switch to hand over to DxeCore.<BR>
   # @Prompt DxeIpl switch to long mode.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE|BOOLEAN|0x0001003b
 
