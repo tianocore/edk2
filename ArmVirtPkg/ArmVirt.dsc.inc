@@ -363,6 +363,8 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0xC000000000007FD5
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard|TRUE
+
 [Components.common]
   #
   # Ramdisk support
