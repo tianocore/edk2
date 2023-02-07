@@ -21,6 +21,40 @@ ArmConfigureMmu (
   OUT UINTN                         *TranslationTableSize  OPTIONAL
   );
 
+/**
+  Convert a region of memory to read-protected, by clearing the access flag.
+
+  @param  BaseAddress           The start of the region.
+  @param  Length                The size of the region.
+
+  @retval EFI_SUCCESS           The attributes were set successfully.
+  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
+
+**/
+EFI_STATUS
+EFIAPI
+ArmSetMemoryRegionNoAccess (
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
+  );
+
+/**
+  Convert a region of memory to read-enabled, by setting the access flag.
+
+  @param  BaseAddress           The start of the region.
+  @param  Length                The size of the region.
+
+  @retval EFI_SUCCESS           The attributes were set successfully.
+  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
+
+**/
+EFI_STATUS
+EFIAPI
+ArmClearMemoryRegionNoAccess (
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
+  );
+
 EFI_STATUS
 EFIAPI
 ArmSetMemoryRegionNoExec (
