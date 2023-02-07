@@ -14,10 +14,6 @@ include $(MAKEROOT)/Makefiles/app.makefile
 
 LIBS = -lCommon
 ifeq ($(CYGWIN), CYGWIN)
-  LIBS += -L/lib/e2fsprogs -luuid
-endif
-
-ifeq ($(LINUX), Linux)
-  LIBS += -luuid
+  LIBS += -L/lib/e2fsprogs
 endif
 
