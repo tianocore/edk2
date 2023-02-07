@@ -438,7 +438,11 @@ GcdAttributeToPageAttribute (
     PageAttributes |= TT_AP_NO_RO;
   }
 
-  return PageAttributes | TT_AF;
+  if ((GcdAttributes & EFI_MEMORY_RP) == 0) {
+    PageAttributes |= TT_AF;
+  }
+
+  return PageAttributes;
 }
 
 EFI_STATUS
@@ -459,9 +463,9 @@ ArmSetMemoryAttributes (
     // No memory type was set in Attributes, so we are going to update the
     // permissions only.
     //
-    PageAttributes   &= TT_AP_MASK | TT_UXN_MASK | TT_PXN_MASK;
+    PageAttributes   &= TT_AP_MASK | TT_UXN_MASK | TT_PXN_MASK | TT_AF;
     PageAttributeMask = ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_AP_MASK |
-                          TT_PXN_MASK | TT_XN_MASK);
+                          TT_PXN_MASK | TT_XN_MASK | TT_AF);
   }
 
   return UpdateRegionMapping (
@@ -531,6 +535,54 @@ ArmClearMemoryRegionNoExec (
            Length,
            0,
            Mask
+           );
+}
+
+/**
+  Convert a region of memory to read-protected, by clearing the access flag.
+
+  @param  BaseAddress           The start of the region.
+  @param  Length                The size of the region.
+
+  @retval EFI_SUCCESS           The attributes were set successfully.
+  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
+
+**/
+EFI_STATUS
+ArmSetMemoryRegionNoAccess (
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
+  )
+{
+  return SetMemoryRegionAttribute (
+           BaseAddress,
+           Length,
+           0,
+           ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_AF)
+           );
+}
+
+/**
+  Convert a region of memory to read-enabled, by setting the access flag.
+
+  @param  BaseAddress           The start of the region.
+  @param  Length                The size of the region.
+
+  @retval EFI_SUCCESS           The attributes were set successfully.
+  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
+
+**/
+EFI_STATUS
+ArmClearMemoryRegionNoAccess (
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
+  )
+{
+  return SetMemoryRegionAttribute (
+           BaseAddress,
+           Length,
+           TT_AF,
+           ~TT_ADDRESS_MASK_BLOCK_ENTRY
            );
 }
 
