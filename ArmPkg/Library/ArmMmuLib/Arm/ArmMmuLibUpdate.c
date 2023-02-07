@@ -104,7 +104,7 @@ UpdatePageEntries (
 
   // EntryMask: bitmask of values to change (1 = change this value, 0 = leave alone)
   // EntryValue: values at bit positions specified by EntryMask
-  EntryMask = TT_DESCRIPTOR_PAGE_TYPE_MASK | TT_DESCRIPTOR_PAGE_AP_MASK | TT_DESCRIPTOR_PAGE_XN_MASK;
+  EntryMask = TT_DESCRIPTOR_PAGE_TYPE_MASK | TT_DESCRIPTOR_PAGE_AP_MASK | TT_DESCRIPTOR_PAGE_XN_MASK | TT_DESCRIPTOR_PAGE_AF;
   EntryValue = TT_DESCRIPTOR_PAGE_TYPE_PAGE;
 
   // Although the PI spec is unclear on this, the GCD guarantees that only
@@ -136,6 +136,10 @@ UpdatePageEntries (
     // catch unsupported memory type attributes
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
+  }
+
+  if ((Attributes & EFI_MEMORY_RP) == 0) {
+    EntryValue |= TT_DESCRIPTOR_PAGE_AF;
   }
 
   if ((Attributes & EFI_MEMORY_RO) != 0) {
@@ -237,7 +241,7 @@ UpdateSectionEntries (
 
   // Make sure we handle a section range that is unmapped
   EntryMask = TT_DESCRIPTOR_SECTION_TYPE_MASK | TT_DESCRIPTOR_SECTION_XN_MASK |
-              TT_DESCRIPTOR_SECTION_AP_MASK;
+              TT_DESCRIPTOR_SECTION_AP_MASK | TT_DESCRIPTOR_SECTION_AF;
   EntryValue = TT_DESCRIPTOR_SECTION_TYPE_SECTION;
 
   // Although the PI spec is unclear on this, the GCD guarantees that only
@@ -279,6 +283,10 @@ UpdateSectionEntries (
 
   if ((Attributes & EFI_MEMORY_XP) != 0) {
     EntryValue |= TT_DESCRIPTOR_SECTION_XN_MASK;
+  }
+
+  if ((Attributes & EFI_MEMORY_RP) == 0) {
+    EntryValue |= TT_DESCRIPTOR_SECTION_AF;
   }
 
   // obtain page table base
