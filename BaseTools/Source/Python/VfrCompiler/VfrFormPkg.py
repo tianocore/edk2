@@ -1955,8 +1955,8 @@ class IfrOneOf(
         self.OneOf.Flags = 0
 
         self.HasMinMax = False
-        self.HasStep = False
 
+        self.HasStep = False
     def GetQuestion(self):
         return self
 

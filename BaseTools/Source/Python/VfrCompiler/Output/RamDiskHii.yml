@@ -1,6 +1,6 @@
 ## DO NOT REMOVE -- VFR Mode
 include:
-  - RamDiskNVData.h
+- RamDiskNVData.h
 formset:
   guid:  RAM_DISK_FORM_SET_GUID
   title:  STRING_TOKEN(_PCD_VALUE_PcdAcpiDefaultOemRevision)

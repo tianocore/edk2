@@ -514,6 +514,7 @@ class EFI_IFR_ONE_OF(Structure):
         ('Data', MINMAXSTEP_DATA),
     ]
 
+
 def Refine_EFI_IFR_ONE_OF(Type):
 
     if Type == EFI_IFR_TYPE_NUM_SIZE_8:

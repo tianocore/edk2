@@ -229,7 +229,12 @@ class VfrCompiler():
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
             return
 
-        if self.SetHeaderFileName() != 0:
+        if self.SetProcessedYAMLFileName() != 0:
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
+            return
+
+
+        if self.SetExpandedHeaderFileName() != 0:
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
             return
 
@@ -291,10 +296,16 @@ class VfrCompiler():
         self.Options.JsonFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + VFR_JSON_FILENAME_EXTENSION
         return 0
 
-    def SetHeaderFileName(self):
+    def SetProcessedYAMLFileName(self):
         if self.Options.VfrBaseFileName == None:
             return -1
-        self.Options.HeaderFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header' + VFR_PREPROCESS_FILENAME_EXTENSION
+        self.Options.ProcessedYAMLFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Processed.yml'
+        return 0
+
+    def SetExpandedHeaderFileName(self):
+        if self.Options.VfrBaseFileName == None:
+            return -1
+        self.Options.ExpandedHeaderFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header' + VFR_PREPROCESS_FILENAME_EXTENSION
         return 0
 
     def PreProcess(self):
@@ -511,7 +522,7 @@ def main():
     # Extended Features
     Compiler.DumpYaml()
     Compiler.DumpJson()
-    # Compiler.PreProcessYaml()
+    Compiler.PreProcessYaml()
     # Compiler.CompileYaml()
 
     Status = Compiler.RunStatus

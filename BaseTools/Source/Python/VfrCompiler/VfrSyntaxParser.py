@@ -11697,6 +11697,7 @@ class VfrSyntaxParser ( Parser ):
             self.parser = parser
             self.HFlags = 0
             self.LFlags = 0
+            self.UpdateVarType = False
 
         def numericFlagsField(self, i:int=None):
             if i is None:

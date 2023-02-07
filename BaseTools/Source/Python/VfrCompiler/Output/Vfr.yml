@@ -1,7 +1,7 @@
 ## DO NOT REMOVE -- VFR Mode
 include:
-  - Uefi/UefiMultiPhase.h
-  - NVDataStruc.h
+- Uefi/UefiMultiPhase.h
+- NVDataStruc.h
 formset:
   guid:  DRIVER_SAMPLE_FORMSET_GUID
   title:  STRING_TOKEN(STR_FORM_SET_TITLE)
@@ -25,17 +25,17 @@ formset:
       type:  MY_EFI_VARSTORE_DATA
       name:  MyEfiVar
       guid:  DRIVER_SAMPLE_FORMSET_GUID
-      attribute:  0x00000002 | 0x00000001 
+      attribute:  WIN_CERT_TYPE_PKCS_SIGNED_DATA | EFI_VARIABLE_NON_VOLATILE 
   - efivarstore:
       type:  MY_EFI_BITS_VARSTORE_DATA
       name:  MyEfiBitVar
       guid:  DRIVER_SAMPLE_FORMSET_GUID
-      attribute:  0x00000002 | 0x00000001 
+      attribute:  WIN_CERT_TYPE_PKCS_SIGNED_DATA | EFI_VARIABLE_NON_VOLATILE 
   - efivarstore:
       type:  MY_EFI_UNION_DATA
       name:  MyEfiUnionVar
       guid:  DRIVER_SAMPLE_FORMSET_GUID
-      attribute:  0x00000002 | 0x00000001 
+      attribute:  WIN_CERT_TYPE_PKCS_SIGNED_DATA | EFI_VARIABLE_NON_VOLATILE 
   - namevaluevarstore:
       type:  MyNameValueVar
       name:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME0)
@@ -173,10 +173,12 @@ formset:
           formid:  0x1234
           prompt:  STRING_TOKEN(STR_GOTO_DYNAMIC)
           help:  STRING_TOKEN(STR_GOTO_HELP)
+          key:  LABEL_UPDATE1 # Optional Input
       - goto:
           formid:  0x1234
           prompt:  STRING_TOKEN(STR_GOTO_DYNAMIC2)
           help:  STRING_TOKEN(STR_GOTO_HELP)
+          key:  0x1235  # Optional input, key
       - oneof:
           varid:  MyIfrNVData.TestLateCheck  #  Optional Input
           prompt:  STRING_TOKEN(STR_TEST_OPCODE)
@@ -260,7 +262,7 @@ formset:
           prompt:  STRING_TOKEN(STR_MY_STRING_PROMPT2)
           help:  STRING_TOKEN(STR_MY_STRING_HELP2)
           flags:  INTERACTIVE  # Optional input , flags
-          key:  True # Optional input, key
+          key:  0x1236  # Optional input, key
           minsize:  6 
           maxsize:  40 
           component:  
@@ -548,12 +550,14 @@ formset:
           varid:  MyIfrNVData.RefData  #  Optional Input
           prompt:  STRING_TOKEN(STR_GOTO_DYNAMIC3)
           help:  STRING_TOKEN(STR_GOTO_DYNAMIC3_HELP)
+          key:  0x1248  # Optional input, key
           component:  
           - default:
               value:  0;0;{ 0x0, 0x0, 0x0, {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} };STRING_TOKEN(0x005A)
       - goto:
           prompt:  STRING_TOKEN(STR_GOTO_DYNAMIC4)
           help:  STRING_TOKEN(STR_GOTO_DYNAMIC4_HELP)
+          key:  0x1249  # Optional input, key
   - form: 
       formid:  0x3 
       title:  STRING_TOKEN(STR_FORM3_TITLE)
@@ -571,7 +575,7 @@ formset:
           prompt:  STRING_TOKEN(STR_NUMERIC_MANUAL_PROMPT)
           help:  STRING_TOKEN(STR_NUMERIC_HELP0)
           flags:  INTERACTIVE  # Optional input , flags
-          key:  True # Optional input, key
+          key:  0x5678  # Optional input, key
           maximum:  0xff # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x0 # Optional Input
@@ -700,7 +704,7 @@ formset:
           prompt:  STRING_TOKEN(STR_TEXT_REFRESH_GUID_COUNT)
           help:  STRING_TOKEN(STR_NUMERIC_HELP0)
           flags:  INTERACTIVE  # Optional input , flags
-          key:  True # Optional input, key
+          key:  0x1247  # Optional input, key
           maximum:  0xff # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x0 # Optional Input

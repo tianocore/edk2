@@ -1,0 +1,65 @@
+
+
+***************************************************************
+PackAlign = 8
+		struct EFI_HII_REF : Align : [16]  TotalSize : [0x16]
+
+		struct EFI_HII_REF	{
+			+00000000[00000000] QuestionId <UINT16>
+			+00000002[00000002] FormId <UINT16>
+			+00000004[00000004] FormSetGuid <EFI_GUID>
+			+00000020[00000014] DevicePath <EFI_STRING_ID>
+		};
+---------------------------------------------------------------
+		struct EFI_HII_TIME : Align : [1]  TotalSize : [0x3]
+
+		struct EFI_HII_TIME	{
+			+00000000[00000000] Hours <UINT8>
+			+00000001[00000001] Minutes <UINT8>
+			+00000002[00000002] Seconds <UINT8>
+		};
+---------------------------------------------------------------
+		struct EFI_STRING_ID : Align : [2]  TotalSize : [0x2]
+
+		struct EFI_STRING_ID	{
+		};
+---------------------------------------------------------------
+		struct EFI_HII_DATE : Align : [2]  TotalSize : [0x4]
+
+		struct EFI_HII_DATE	{
+			+00000000[00000000] Year <UINT16>
+			+00000002[00000002] Month <UINT8>
+			+00000003[00000003] Day <UINT8>
+		};
+---------------------------------------------------------------
+		struct EFI_GUID : Align : [8]  TotalSize : [0x10]
+
+		struct EFI_GUID	{
+		};
+---------------------------------------------------------------
+		struct BOOLEAN : Align : [1]  TotalSize : [0x1]
+
+		struct BOOLEAN	{
+		};
+---------------------------------------------------------------
+		struct UINT8 : Align : [1]  TotalSize : [0x1]
+
+		struct UINT8	{
+		};
+---------------------------------------------------------------
+		struct UINT16 : Align : [2]  TotalSize : [0x2]
+
+		struct UINT16	{
+		};
+---------------------------------------------------------------
+		struct UINT32 : Align : [4]  TotalSize : [0x4]
+
+		struct UINT32	{
+		};
+---------------------------------------------------------------
+		struct UINT64 : Align : [8]  TotalSize : [0x8]
+
+		struct UINT64	{
+		};
+---------------------------------------------------------------
+***************************************************************

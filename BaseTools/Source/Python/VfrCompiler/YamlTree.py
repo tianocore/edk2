@@ -7,45 +7,63 @@ class YamlTree():
     def __init__(self, Root: VfrTreeNode, Options: Options):
         self.Options = Options
         self.Root = Root
+        self.Config = None
 
+    # transform string token and Header key-values to specific values for yaml
     def PreProcess(self):
-        FileName = self.Options.YamlFileName
         try:
+            FileName = self.Options.YamlFileName
             f = open(FileName, 'r')
-            #YamlDict = yaml.load(f, Loader=yaml.FullLoader)
-            Config = yaml.safe_load(f)
+            #self.Config = yaml.load(f.read(), Loader=yaml.FullLoader)
+            self.Config = yaml.safe_load(f)
             f.close()
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
                             "File open failed for %s" % FileName, None)
-        #print(Config)
-        if 'include' in Config.keys():
-            self.ProcessHeader(Config['include'])
 
-        if 'formset' in Config.keys():
-            # transform string token to specific values for yaml, and generate a new yaml file
-            self.ProcessFormset(Config['formset'])
+        UniDict = self._GetUniDictsForYaml()
+        HeaderDict = self._GetHeaderDictsForYaml(self.Config['include'])
+        self._PreprocessYaml(self.Config, UniDict, HeaderDict)
 
-        # for Key in Config:
-        #    print(Key)
-
-    def ProcessHeader(self, includepaths):
-        FileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header.vfr'
         try:
+            FileName =  self.Options.ProcessedYAMLFileName
             f = open(FileName, 'w')
-            for includepath in includepaths:
-                f.write("#include <" + includepath + '>\n')
+            f.write(yaml.dump(self.Config, allow_unicode=True, default_flow_style=False))
             f.close()
         except:
-            EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
-                            "File open failed for %s" % FileName, None)
+            EdkLogger.error("VfrCompiler", FILE_CREATE_FAILURE,
+                            "File create failed for %s" % FileName, None)
 
-        # call C preprocessor, gen .i file
-        # delete .vfr
+        self._GenExpandedHeaderFile()
 
-        # parse  and collect data structures info in the header files
+    def Compile(self):
+        self._ParseExpandedHeader()
+        self._ParseVfrFormSetDefinition()
+
+
+    def _PreprocessYaml(self, Config, UniDict, HeaderDict):
+        for Key in Config.keys():
+            Value = Config[Key]
+            if isinstance(Value, list): # value is list
+                for Item in Value:
+                    if isinstance(Item, dict):
+                        self._PreprocessYaml(Item, UniDict, HeaderDict)
+
+            elif isinstance(Value, dict): # value is dict
+                self._PreprocessYaml(Value, UniDict, HeaderDict)
+            else:
+                # get the specific value of string token
+                if Value in UniDict.keys():
+                    Config[Key] = 'STRING_TOKEN' + '(' +  UniDict[Value] + ')'
+                # get {key:value} dicts from header files
+                if Value in HeaderDict.keys():
+                    Config[Key] = HeaderDict[Value]
+        return
+
+    # parse and collect data structures info in the ExpandedHeader.i files
+    def _ParseExpandedHeader(self):
         try:
-            InputStream = FileStream(self.Options.HeaderFileName)
+            InputStream = FileStream(self.Options.ExpandedHeaderFileName)
             VfrLexer = VfrSyntaxLexer(InputStream)
             VfrStream = CommonTokenStream(VfrLexer)
             VfrParser = VfrSyntaxParser(VfrStream)
@@ -65,35 +83,125 @@ class YamlTree():
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
                             "File open failed for %s" % FileName, None)
 
-    def ProcessFormset(self, FormsetValues):
-        FileName =  self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Processed.yml'
+    def _GetUniDictsForYaml(self):
+        # key: STRING_TOKEN(STR_FORM_SET_TITLE_HELP), value: 0x1234
+        # type: str
+        FileName = self.Options.UniStrDefFileName
+        CppHeader = CppHeaderParser.CppHeader(self.Options.UniStrDefFileName)
+        UniDict = {}
+        for Define in CppHeader.defines:
+            Items = Define.split()
+            if len(Items) == 2:
+                UniDict['STRING_TOKEN' + '(' + Items[0] + ')'] = Items[1]
+        return UniDict
 
-        self.FV = FormsetValues
-        KeyValueDict = self.GetUniDictsForYaml()
-        for key in KeyValueDict:
-            pass
-
-
-    def GetUniDictsForYaml(self):
-        FileName = self.Options.UNIStrFileName
+    def _GenExpandedHeaderFile(self):
         try:
-            f = open(FileName, 'r')
-            Lines = f.read()
-            f.close()
+            FileName = self.Options.ExpandedHeaderFileName
+            Output = open(FileName, 'w')
+            for HeaderFile in self.Config['include']:
+                FileName = HeaderFile.split('/')[-1]
+                FileList = self._FindIncludeHeaderFile("/edk2/", FileName)
+                CppHeader = None
+                for File in FileList:
+                    if File.find(HeaderFile.replace('/','\\')) != -1:
+                        Output.write(open(File, 'r').read())
+                        CppHeader = CppHeaderParser.CppHeader(File)
+                        break
+                if CppHeader == None:
+                    EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
+                                "File/directory %s not found in workspace" % (HeaderFile), None)
+
+                for Include in CppHeader.includes:
+                    Include = Include[1:-1]
+                    IncludeFileName = Include.split('/')[1]
+                    IncludeHeaderFileList = self._FindIncludeHeaderFile("/edk2/", IncludeFileName)
+                    #print(IncludeHeaderFileList)
+                    Flag = False
+                    for File in IncludeHeaderFileList:
+                        if File.find(Include.replace('/','\\')) != -1:
+                            Output.write(open(File, 'r').read())
+                            Flag = True
+                            break
+                    if Flag == False:
+                        EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
+                                        "File/directory %s not found in workspace" % IncludeFileName, None)
+            Output.close()
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
                             "File open failed for %s" % FileName, None)
-        KeyValueDict = {}
-        for Line in Lines.split('\n'):
-            Items = Line.split('|')
-            Key = Items[1].strip()
-            Value = int(Items[0].split(' ')[1], 16)
-            KeyValueDict[Key] = Value
-        return KeyValueDict
 
+    def _GetHeaderDictsForYaml(self, HeaderFiles):
+        HeaderDict = {}
+        for HeaderFile in HeaderFiles:
+            FileName = HeaderFile.split('/')[-1]
+            FileList = self._FindIncludeHeaderFile("/edk2/", FileName)
+            CppHeader = None
+            for File in FileList:
+                if File.find(HeaderFile.replace('/','\\')) != -1:
+                    CppHeader = CppHeaderParser.CppHeader(File)
+                    self._ParseDefines(CppHeader.defines, HeaderDict)
+                    break
+            if CppHeader == None:
+                EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
+                            "File/directory %s not found in workspace" % (HeaderFile), None)
 
-    def Compile(self):
-        self._ParseVfrFormSetDefinition()
+            for Include in CppHeader.includes:
+                Include = Include[1:-1]
+                IncludeFileName = Include.split('/')[1]
+                IncludeHeaderFileList = self._FindIncludeHeaderFile("/edk2/", IncludeFileName)
+                Flag = False
+                for File in IncludeHeaderFileList:
+                    if File.find(Include.replace('/','\\')) != -1:
+                        CppHeader = CppHeaderParser.CppHeader(File)
+                        self._ParseDefines(CppHeader.defines, HeaderDict)
+                        Flag = True
+                        break
+                if Flag == False:
+                    EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
+                                    "File/directory %s not found in workspace" % IncludeFileName, None)
+        #print(HeaderDict)
+        return HeaderDict
+
+    def _ParseDefines(self, Defines, HeaderDict):
+        for Define in Defines:
+            #print(Define)
+            Items = Define.split()
+            if len(Items) == 2:
+                # key->str, Value->int
+                HeaderDict[Items[0]] = Items[1]
+                # HeaderDict[Items[0]] = int(Items[1], 16)
+            elif len(Items) > 2 and Items[0].find('GUID') != -1:
+                 # key->str, Value->str
+                GuidStr = ''
+                for i in range(1, len(Items)):
+                    if Items[i] != '{' and Items[i] != '}' and Items[i] != '{{' and Items[i] !='}}' and Items[i] != '\\':
+                        if ('{' in Items[i]):
+                            Items[i] = Items[i][1:]
+                        if '}' in Items[i]:
+                            Items[i] = Items[i][:-1]
+
+                        GuidStr += Items[i]
+                GuidItems = GuidStr.split(',')
+                Guid = EFI_GUID()
+                Guid.Data1 = int(GuidItems[0], 16)
+                Guid.Data2 = int(GuidItems[1], 16)
+                Guid.Data3 = int(GuidItems[2], 16)
+                for i in range(0, 8):
+                    Guid.Data4[i] = int(GuidItems[i+3], 16)
+                if Items[0].find('\\') != -1:
+                    Items[0] = Items[0][:-1]
+                Key = Items[0]
+                Value = Guid.to_string()
+                HeaderDict[Key] = Value
+
+    def _FindIncludeHeaderFile(self, Start, Name):
+        FileList = []
+        for Relpath, Dirs, Files in os.walk(Start):
+            if Name in Files:
+                FullPath = os.path.join(Start, Relpath, Name)
+                FileList.append(os.path.normpath(os.path.abspath(FullPath)))
+        return FileList
 
     # parse Formset Definition
     def _ParseVfrFormSetDefinition(self):

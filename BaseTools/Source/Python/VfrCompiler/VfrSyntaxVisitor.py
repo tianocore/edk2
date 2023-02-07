@@ -832,6 +832,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.CurrQestVarInfo = ctx.BaseInfo
 
         if ctx.Node.OpCode == EFI_IFR_ONE_OF_OP:
+            #need to further update the VarType
             ctx.Node.Data = IfrOneOf(ctx.BaseInfo.VarType, QName, VarIdStr)
             self.CurrentQuestion = ctx.Node.Data
             self.CurrentMinMaxData = ctx.Node.Data
@@ -2215,9 +2216,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         # modify the data for namevalue
         if UpdateVarType:
-            #print(self.CurrQestVarInfo.VarType)
-            #print('0x%0x' %NObj.GetInfo().Flags)
-            #"07 A6 0F 00 10 00 01 20 00 00 FF FF 04 /23 /01 00 00 00 00 00 00 00 /FF FF FF FF FF FF FF FF /00 00 00 00 00 00 00 00"
             UpdatedNObj = IfrNumeric(self.CurrQestVarInfo.VarType)
             UpdatedNObj.FlagsStream = NObj.FlagsStream
             UpdatedNObj.HasKey = NObj.HasKey
@@ -2380,6 +2378,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by VfrSyntaxParser#vfrNumericFlags.
     def visitVfrNumericFlags(self, ctx:VfrSyntaxParser.VfrNumericFlagsContext):
 
+        # check data type flag
         ctx.LFlags = self.CurrQestVarInfo.VarType & EFI_IFR_NUMERIC_SIZE
         VarStoreType = gVfrDataStorage.GetVarStoreType(self.CurrQestVarInfo.VarStoreId)
         Line = ctx.start.line
@@ -2388,7 +2387,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         for FlagsFieldCtx in ctx.numericFlagsField():
             ctx.HFlags |= FlagsFieldCtx.HFlag
-            ctx.IsDisplaySpecified = FlagsFieldCtx.IsDisplaySpecified
+            ctx.IsDisplaySpecified |= FlagsFieldCtx.IsDisplaySpecified
             IsSetType |=  FlagsFieldCtx.IsSetType
             if FlagsFieldCtx.NumericSizeOne() != None:
                 if self.CurrQestVarInfo.IsBitVar == False:
@@ -2412,7 +2411,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 else:
                     ctx.LFlags =  (ctx.LFlags & ~EDKII_IFR_DISPLAY_BIT) | EDKII_IFR_DISPLAY_INT_DEC_BIT
 
-            if FlagsFieldCtx.DisPlayUIntHex() != None:
+            if FlagsFieldCtx.DisPlayUIntDec() != None:
                 if self.CurrQestVarInfo.IsBitVar == False:
                     ctx.LFlags =  (ctx.LFlags & ~EFI_IFR_DISPLAY) | EFI_IFR_DISPLAY_UINT_DEC
                 else:
@@ -2485,7 +2484,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if ctx.DisPlayIntDec() != None:
             ctx.IsDisplaySpecified = True
 
-        if ctx.DisPlayUIntHex() != None:
+        if ctx.DisPlayUIntDec() != None:
             ctx.IsDisplaySpecified = True
 
         if ctx.DisPlayUIntHex() != None:
@@ -2501,7 +2500,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
     def visitVfrStatementOneOf(self, ctx:VfrSyntaxParser.VfrStatementOneOfContext):
 
         self.visitChildren(ctx)
-
+        UpdateVarType = False
         OObj = ctx.Node.Data
         Line = ctx.start.line
         OObj.SetLineNo(Line)
@@ -2528,6 +2527,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 self.ErrorHandler(OObj.SetFlags(OObj.GetQFlags(), self.CurrQestVarInfo.VarType), Line)
 
         if ctx.FLAGS() != None:
+            UpdateVarType = ctx.vfrOneofFlagsField().UpdateVarType
             if self.CurrQestVarInfo.IsBitVar:
                 self.ErrorHandler(OObj.SetFlagsForBitField(ctx.vfrOneofFlagsField().HFlags,ctx.vfrOneofFlagsField().LFlags), ctx.F.line)
             else:
@@ -2541,11 +2541,23 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if ctx.vfrSetMinMaxStep().Step() != None:
                 OObj.SetHasStep(True)
 
+        # modify the data Vartype for NameValue
+        if UpdateVarType:
+            UpdatedOObj = IfrOneOf(self.CurrQestVarInfo.VarType)
+            UpdatedOObj.FlagsStream = OObj.FlagsStream
+            UpdatedOObj.HasKey = OObj.HasKey
+            UpdatedOObj.HasStep = OObj.HasStep
+            UpdatedOObj.GetInfo().Question = OObj.GetInfo().Question
+            UpdatedOObj.GetInfo().Flags = OObj.GetInfo().Flags
+            UpdatedOObj.GetInfo().Data.MinValue = OObj.GetInfo().Data.MinValue
+            UpdatedOObj.GetInfo().Data.MaxValue = OObj.GetInfo().Data.MaxValue
+            UpdatedOObj.GetInfo().Data.Step = OObj.GetInfo().Data.Step
+            OObj = UpdatedOObj
+
         ctx.Node.Buffer = gFormPkg.StructToStream(OObj.GetInfo())
         self.InsertEndNode(ctx.Node, ctx.stop.line)
 
         return ctx.Node
-
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrOneofFlagsField.
     def visitVfrOneofFlagsField(self, ctx:VfrSyntaxParser.VfrOneofFlagsFieldContext):
@@ -2558,7 +2570,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         for FlagsFieldCtx in ctx.numericFlagsField():
             ctx.HFlags |= FlagsFieldCtx.HFlag
-            ctx.IsDisplaySpecified = FlagsFieldCtx.IsDisplaySpecified
             IsSetType |= FlagsFieldCtx.IsSetType
             if FlagsFieldCtx.NumericSizeOne() != None:
                 if self.CurrQestVarInfo.IsBitVar == False:
@@ -2582,7 +2593,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 else:
                     ctx.LFlags =  (ctx.LFlags & ~EDKII_IFR_DISPLAY_BIT) | EDKII_IFR_DISPLAY_INT_DEC_BIT
 
-            if FlagsFieldCtx.DisPlayUIntHex() != None:
+            if FlagsFieldCtx.DisPlayUIntDec() != None:
                 if self.CurrQestVarInfo.IsBitVar == False:
                     ctx.LFlags =  (ctx.LFlags & ~EFI_IFR_DISPLAY) | EFI_IFR_DISPLAY_UINT_DEC
                 else:
@@ -2594,6 +2605,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 else:
                     ctx.LFlags =  (ctx.LFlags & ~EDKII_IFR_DISPLAY_BIT) | EDKII_IFR_DISPLAY_UINT_HEX_BIT
 
+        VarType = self.CurrQestVarInfo.VarType
         if self.CurrQestVarInfo.IsBitVar == False:
             if self.CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
                 if VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_BUFFER or VarStoreType == EFI_VFR_VARSTORE_TYPE.EFI_VFR_VARSTORE_EFI:
@@ -2610,6 +2622,9 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         elif self.CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
             ctx.LFlags &= EDKII_IFR_DISPLAY_BIT
             ctx.LFlags |= EDKII_IFR_NUMERIC_SIZE_BIT & self.CurrQestVarInfo.VarTotalSize
+
+        if VarType != self.CurrQestVarInfo.VarType:
+            ctx.UpdateVarType = True
 
         return ctx.HFlags, ctx.LFlags
 

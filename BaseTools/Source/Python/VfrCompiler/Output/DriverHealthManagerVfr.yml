@@ -1,6 +1,6 @@
 ## DO NOT REMOVE -- VFR Mode
 include:
-  - DriverHealthManagerVfr.h
+- DriverHealthManagerVfr.h
 formset:
   guid:  DRIVER_HEALTH_MANAGER_FORMSET_GUID
   title:  STRING_TOKEN(STR_FORM_TITLE)

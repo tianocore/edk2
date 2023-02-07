@@ -785,7 +785,7 @@ locals[Node=VfrTreeNode(EFI_IFR_ONE_OF_OP), GuidNode=VfrTreeNode(EFI_IFR_GUID_OP
     ;
 
 vfrOneofFlagsField
-locals[HFlags=0, LFlags=0]
+locals[HFlags=0, LFlags=0, UpdateVarType=False]
     :   numericFlagsField ('|' numericFlagsField)*
     ;
 
