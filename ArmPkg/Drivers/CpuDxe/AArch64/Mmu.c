@@ -64,6 +64,10 @@ PageAttributeToGcdAttribute (
   }
 
   // Determine protection attributes
+  if ((PageAttributes & TT_AF) == 0) {
+    GcdAttributes |= EFI_MEMORY_RP;
+  }
+
   if (((PageAttributes & TT_AP_MASK) == TT_AP_NO_RO) ||
       ((PageAttributes & TT_AP_MASK) == TT_AP_RO_RO))
   {
@@ -301,7 +305,9 @@ EfiAttributeToArmAttribute (
   }
 
   // Set the access flag to match the block attributes
-  ArmAttributes |= TT_AF;
+  if ((EfiAttributes & EFI_MEMORY_RP) == 0) {
+    ArmAttributes |= TT_AF;
+  }
 
   // Determine protection attributes
   if ((EfiAttributes & EFI_MEMORY_RO) != 0) {
