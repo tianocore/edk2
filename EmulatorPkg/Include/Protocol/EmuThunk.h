@@ -130,7 +130,7 @@ UINT64
 typedef
 VOID
 (EFIAPI *EMU_SLEEP)(
-  IN  UINT64    Milliseconds
+  IN  UINT64    Nanoseconds
   );
 
 typedef
