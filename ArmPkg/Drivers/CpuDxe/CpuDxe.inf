@@ -48,6 +48,7 @@
   DefaultExceptionHandlerLib
   DxeServicesTableLib
   HobLib
+  MemoryAllocationLib
   PeCoffGetEntryPointLib
   UefiDriverEntryPoint
   UefiLib
@@ -64,9 +65,11 @@
 
 [Pcd.common]
   gArmTokenSpaceGuid.PcdVFPEnabled
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy
 
 [FeaturePcd.common]
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
+  gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx
 
 [Depex]
   gHardwareInterruptProtocolGuid OR gHardwareInterrupt2ProtocolGuid
