@@ -252,6 +252,16 @@ UpdateRegionMappingRecursive (
 
       if (!IsTableEntry (*Entry, Level)) {
         //
+        // If the region we are trying to map is already covered by a block
+        // entry with the right attributes, don't bother splitting it up.
+        //
+        if (IsBlockEntry (*Entry, Level) &&
+            ((*Entry & TT_ATTRIBUTES_MASK & ~AttributeClearMask) == AttributeSetMask))
+        {
+          continue;
+        }
+
+        //
         // No table entry exists yet, so we need to allocate a page table
         // for the next level.
         //
