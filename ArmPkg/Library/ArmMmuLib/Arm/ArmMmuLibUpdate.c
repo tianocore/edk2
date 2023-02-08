@@ -170,6 +170,17 @@ UpdatePageEntries (
 
     // Does this descriptor need to be converted from section entry to 4K pages?
     if (!TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE (Descriptor)) {
+      //
+      // If the section mapping covers the requested region with the expected
+      // attributes, splitting it is unnecessary, and should be avoided as it
+      // may result in unbounded recursion when using a strict NX policy.
+      //
+      if ((EntryValue & ~TT_DESCRIPTOR_PAGE_TYPE_MASK & EntryMask) ==
+          (ConvertSectionAttributesToPageAttributes (Descriptor) & EntryMask))
+      {
+        continue;
+      }
+
       Status = ConvertSectionToPages (FirstLevelIdx << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
       if (EFI_ERROR (Status)) {
         // Exit for loop
