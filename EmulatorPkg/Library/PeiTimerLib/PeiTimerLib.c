@@ -1,7 +1,7 @@
 /** @file
   A non-functional instance of the Timer Library.
 
-  Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -65,7 +65,7 @@ NanoSecondDelay (
              );
   if (!EFI_ERROR (Status)) {
     Thunk = (EMU_THUNK_PROTOCOL *)ThunkPpi->Thunk ();
-    Thunk->Sleep (NanoSeconds * 100);
+    Thunk->Sleep (NanoSeconds);
     return NanoSeconds;
   }
 
