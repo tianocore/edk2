@@ -104,12 +104,8 @@ UpdatePageEntries (
 
   // EntryMask: bitmask of values to change (1 = change this value, 0 = leave alone)
   // EntryValue: values at bit positions specified by EntryMask
-  EntryMask = TT_DESCRIPTOR_PAGE_TYPE_MASK | TT_DESCRIPTOR_PAGE_AP_MASK;
-  if ((Attributes & EFI_MEMORY_XP) != 0) {
-    EntryValue = TT_DESCRIPTOR_PAGE_TYPE_PAGE_XN;
-  } else {
-    EntryValue = TT_DESCRIPTOR_PAGE_TYPE_PAGE;
-  }
+  EntryMask = TT_DESCRIPTOR_PAGE_TYPE_MASK | TT_DESCRIPTOR_PAGE_AP_MASK | TT_DESCRIPTOR_PAGE_XN_MASK;
+  EntryValue = TT_DESCRIPTOR_PAGE_TYPE_PAGE;
 
   // Although the PI spec is unclear on this, the GCD guarantees that only
   // one Attribute bit is set at a time, so the order of the conditionals below
@@ -146,6 +142,10 @@ UpdatePageEntries (
     EntryValue |= TT_DESCRIPTOR_PAGE_AP_RO_RO;
   } else {
     EntryValue |= TT_DESCRIPTOR_PAGE_AP_RW_RW;
+  }
+
+  if ((Attributes & EFI_MEMORY_XP) != 0) {
+    EntryValue |= TT_DESCRIPTOR_PAGE_XN_MASK;
   }
 
   // Obtain page table base
