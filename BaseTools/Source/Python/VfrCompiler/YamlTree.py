@@ -25,6 +25,7 @@ class YamlTree():
         HeaderDict = self._GetHeaderDictsForYaml(self.Config['include'])
         self._PreprocessYaml(self.Config, UniDict, HeaderDict)
 
+
         try:
             FileName =  self.Options.ProcessedYAMLFileName
             f = open(FileName, 'w')
@@ -35,6 +36,9 @@ class YamlTree():
                             "File create failed for %s" % FileName, None)
 
         self._GenExpandedHeaderFile()
+
+    def UpdateYamlWithDLT(self):
+        pass
 
     def Compile(self):
         self._ParseExpandedHeader()
@@ -116,7 +120,6 @@ class YamlTree():
                     Include = Include[1:-1]
                     IncludeFileName = Include.split('/')[1]
                     IncludeHeaderFileList = self._FindIncludeHeaderFile("/edk2/", IncludeFileName)
-                    #print(IncludeHeaderFileList)
                     Flag = False
                     for File in IncludeHeaderFileList:
                         if File.find(Include.replace('/','\\')) != -1:

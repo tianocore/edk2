@@ -139,7 +139,6 @@ class VfrTree():
         Hpk = None
         C = None
         RecordLines = []
-
         if self.Options.CreateIfrPkgFile:
             # GenBinary
             PkgHdr = gFormPkg.BuildPkgHdr()
@@ -192,8 +191,8 @@ class VfrTree():
 
         self.List = []
         self._GenBinaryFilesDfs(self.Root, Hpk, C, RecordLines)
-       # print(self.List)
-       #print(gFormPkg.List)
+        print(self.List)
+        print(gFormPkg.List)
 
         if self.Options.CreateIfrPkgFile:
             #GenCFile
@@ -231,7 +230,7 @@ class VfrTree():
                 for RecordLine in RecordLines:
                     Lst.write('{}'.format(RecordLine.Record))
                 Lst.write('\nTotal Size of all record is' +
-                        ' {:0>8d}'.format(gFormPkg.Offset))
+                        ' {:0>8x}'.format(gFormPkg.Offset))
                 gVfrVarDataTypeDB.Dump(Lst)
                 In.close()
                 Lst.close()
@@ -273,7 +272,7 @@ class VfrTree():
 
                             LineBuffer += '{:0>2X} '.format(Root.Buffer[i])
 
-                        Record = '>{:0>8d}: '.format(
+                        Record = '>{:0>8x}: '.format(
                             Root.Offset) + LineBuffer + '\n'
                         LineNo = Root.Data.GetLineNo()
                         RecordLines.append(ReCordNode(Record, LineNo))
@@ -317,7 +316,7 @@ class VfrTree():
                     for i in range(0, len(Root.Buffer)):
                         LineBuffer += '{:0>2X} '.format(Root.Buffer[i])
 
-                    Record = '>{:0>8d}: '.format(
+                    Record = '>{:0>8x}: '.format(
                     Root.Offset) + LineBuffer + '\n'
                     LineNo = Root.Data.GetLineNo()
                     RecordLines.append(ReCordNode(Record, LineNo))
@@ -453,7 +452,7 @@ class VfrTree():
             for RecordLine in RecordLines:
                 Out.write('{}'.format(RecordLine.Record))
             Out.write('\nTotal Size of all record is' +
-                      ' {:0>8d}'.format(gFormPkg.Offset))
+                      ' {:0>8x}'.format(gFormPkg.Offset))
             gVfrVarDataTypeDB.Dump(Out)
             In.close()
             Out.close()
@@ -469,7 +468,7 @@ class VfrTree():
                 for i in range(0, len(Root.Buffer)):
                     LineBuffer += '{:0>2X} '.format(Root.Buffer[i])
 
-                Record = '>{:0>8d}: '.format(Root.Offset) + LineBuffer + '\n'
+                Record = '>{:0>8x}: '.format(Root.Offset) + LineBuffer + '\n'
                 LineNo = Root.Data.GetLineNo()
                 RecordLines.append(ReCordNode(Record, LineNo))
 

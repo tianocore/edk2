@@ -16,7 +16,6 @@ formset:
               value: 1
           help: STRING_TOKEN(0x0012)
           prompt: STRING_TOKEN(0x0011)
-          questionid: '0x2004'
       - subtitle:
           prompt: STRING_TOKEN(0x0005)
       - goto:
@@ -52,10 +51,9 @@ formset:
       - numeric:
           flags: NUMERIC_SIZE_8 | DISPLAY_UINT_HEX | INTERACTIVE
           help: STRING_TOKEN(0x0010)
-          maximum: 4294967295
+          maximum: 18446744073709551615
           minimum: 1
           prompt: STRING_TOKEN(0x000F)
-          questionid: '0x2001'
       - subtitle:
           prompt: STRING_TOKEN(0x0005)
       - text:

@@ -434,6 +434,9 @@ class VfrCompiler():
     def PreProcessYaml(self): # wip
         self.YamlTree.PreProcess()
 
+    def UpdateYamlWithDLT(self): # wip
+        self.YamlTree.UpdateYamlWithDLT()
+
     def CompileYaml(self): # wip
         self.YamlTree.Compile()
 
@@ -523,6 +526,7 @@ def main():
     Compiler.DumpYaml()
     Compiler.DumpJson()
     Compiler.PreProcessYaml()
+    Compiler.UpdateYamlWithDLT()
     # Compiler.CompileYaml()
 
     Status = Compiler.RunStatus

@@ -12,7 +12,6 @@ formset:
       title:  STRING_TOKEN(STR_MAIN_FORM_TITLE)
       component:  
       - oneof:
-          questionid:  CREATE_RAW_MEMORY_TYPE_QUESTION_ID # Optional Input, Need to compute if None
           prompt:  STRING_TOKEN(STR_MEMORY_TYPE_PROMPT)
           help:  STRING_TOKEN(STR_MEMORY_TYPE_HELP)
           component:  
@@ -57,11 +56,10 @@ formset:
       - subtitle:
           prompt:  STRING_TOKEN(STR_RAM_DISK_NULL_STRING)
       - numeric:
-          questionid:  CREATE_RAW_SIZE_QUESTION_ID # Optional Input, Need to compute if None
           prompt:  STRING_TOKEN(STR_SIZE_PROMPT)
           help:  STRING_TOKEN(STR_SIZE_HELP)
           flags:  NUMERIC_SIZE_8 | DISPLAY_UINT_HEX | INTERACTIVE  # Optional input , flags
-          maximum:  0xffffffff # Optional Input
+          maximum:  0xffffffffffffffff # Optional Input
           minimum:  0x1 # Optional Input
       - subtitle:
           prompt:  STRING_TOKEN(STR_RAM_DISK_NULL_STRING)

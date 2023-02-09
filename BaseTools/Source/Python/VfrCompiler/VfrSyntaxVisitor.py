@@ -833,12 +833,12 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         if ctx.Node.OpCode == EFI_IFR_ONE_OF_OP:
             #need to further update the VarType
-            ctx.Node.Data = IfrOneOf(ctx.BaseInfo.VarType, QName, VarIdStr)
+            ctx.Node.Data = IfrOneOf(EFI_IFR_TYPE_NUM_SIZE_64, QName, VarIdStr)
             self.CurrentQuestion = ctx.Node.Data
             self.CurrentMinMaxData = ctx.Node.Data
 
         elif ctx.Node.OpCode == EFI_IFR_NUMERIC_OP:
-            ctx.Node.Data = IfrNumeric(ctx.BaseInfo.VarType)
+            ctx.Node.Data = IfrNumeric(EFI_IFR_TYPE_NUM_SIZE_64)
             self.CurrentQuestion = ctx.Node.Data
             self.CurrentMinMaxData = ctx.Node.Data
 
@@ -2195,7 +2195,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                     self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'Numeric varid doesn\'t support array')
                 self.ErrorHandler(NObj.SetFlags(NObj.GetQFlags(), self.CurrQestVarInfo.VarType), Line)
 
-
         if ctx.FLAGS() != None:
             UpdateVarType = ctx.vfrNumericFlags().UpdateVarType
             if self.CurrQestVarInfo.IsBitVar:
@@ -2220,6 +2219,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             UpdatedNObj.FlagsStream = NObj.FlagsStream
             UpdatedNObj.HasKey = NObj.HasKey
             UpdatedNObj.HasStep = NObj.HasStep
+            UpdatedNObj.LineNo = NObj.LineNo
             UpdatedNObj.GetInfo().Question = NObj.GetInfo().Question
             UpdatedNObj.GetInfo().Flags = NObj.GetInfo().Flags
             UpdatedNObj.GetInfo().Data.MinValue = NObj.GetInfo().Data.MinValue
@@ -2227,6 +2227,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             UpdatedNObj.GetInfo().Data.Step = NObj.GetInfo().Data.Step
             NObj = UpdatedNObj
 
+        ctx.Node.Data = NObj
         ctx.Node.Buffer = gFormPkg.StructToStream(NObj.GetInfo())
         self.InsertEndNode(ctx.Node, ctx.stop.line)
 
@@ -2371,7 +2372,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                         self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'Maximum can\'t be less than Minimum')
 
         OpObj.SetMinMaxStepData(Min, Max, Step)
-
         return ctx.Node
 
 
@@ -2536,17 +2536,18 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if (self.CurrQestVarInfo.IsBitVar == False) and (self.CurrQestVarInfo.VarType not in BasicTypes):
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'OneOf question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
+        # modify the data Vartype for NameValue
         if ctx.vfrSetMinMaxStep() != None:
             OObj.SetHasMinMax(True)
             if ctx.vfrSetMinMaxStep().Step() != None:
                 OObj.SetHasStep(True)
-
         # modify the data Vartype for NameValue
         if UpdateVarType:
             UpdatedOObj = IfrOneOf(self.CurrQestVarInfo.VarType)
             UpdatedOObj.FlagsStream = OObj.FlagsStream
             UpdatedOObj.HasKey = OObj.HasKey
             UpdatedOObj.HasStep = OObj.HasStep
+            UpdatedOObj.LineNo = OObj.LineNo
             UpdatedOObj.GetInfo().Question = OObj.GetInfo().Question
             UpdatedOObj.GetInfo().Flags = OObj.GetInfo().Flags
             UpdatedOObj.GetInfo().Data.MinValue = OObj.GetInfo().Data.MinValue
@@ -2554,6 +2555,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             UpdatedOObj.GetInfo().Data.Step = OObj.GetInfo().Data.Step
             OObj = UpdatedOObj
 
+        ctx.Node.Data = OObj
         ctx.Node.Buffer = gFormPkg.StructToStream(OObj.GetInfo())
         self.InsertEndNode(ctx.Node, ctx.stop.line)
 
