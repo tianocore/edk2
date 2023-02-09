@@ -23,6 +23,10 @@
   Private
   Library/Include
   Library/OpensslLib/openssl/include
+  Library/OpensslLib/openssl/providers/common/include
+  Library/OpensslLib/openssl/providers/implementations/include
+  Library/OpensslLib/OpensslGen/include
+  Library/OpensslLib/OpensslGen/providers/common/include
 
 [LibraryClasses]
   ##  @libraryclass  Provides basic library functions for cryptographic primitives.
