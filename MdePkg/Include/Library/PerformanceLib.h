@@ -526,7 +526,7 @@ LogPerformanceMeasurement (
 #define PERF_EVENT_SIGNAL_BEGIN(EventGuid) \
   do { \
     if (LogPerformanceMeasurementEnabled (PERF_GENERAL_TYPE)) { \
-      LogPerformanceMeasurement (&gEfiCallerIdGuid, EventGuid, __FUNCTION__ , 0, PERF_EVENTSIGNAL_START_ID); \
+      LogPerformanceMeasurement (&gEfiCallerIdGuid, EventGuid, __func__ , 0, PERF_EVENTSIGNAL_START_ID); \
     } \
   } while (FALSE)
 
@@ -542,7 +542,7 @@ LogPerformanceMeasurement (
 #define PERF_EVENT_SIGNAL_END(EventGuid) \
   do { \
     if (LogPerformanceMeasurementEnabled (PERF_GENERAL_TYPE)) { \
-      LogPerformanceMeasurement (&gEfiCallerIdGuid, EventGuid, __FUNCTION__ , 0, PERF_EVENTSIGNAL_END_ID); \
+      LogPerformanceMeasurement (&gEfiCallerIdGuid, EventGuid, __func__ , 0, PERF_EVENTSIGNAL_END_ID); \
     } \
   } while (FALSE)
 
@@ -558,7 +558,7 @@ LogPerformanceMeasurement (
 #define PERF_CALLBACK_BEGIN(TriggerGuid) \
   do { \
     if (LogPerformanceMeasurementEnabled (PERF_GENERAL_TYPE)) { \
-      LogPerformanceMeasurement (&gEfiCallerIdGuid, TriggerGuid, __FUNCTION__ , 0, PERF_CALLBACK_START_ID); \
+      LogPerformanceMeasurement (&gEfiCallerIdGuid, TriggerGuid, __func__ , 0, PERF_CALLBACK_START_ID); \
     } \
   } while (FALSE)
 
@@ -574,7 +574,7 @@ LogPerformanceMeasurement (
 #define PERF_CALLBACK_END(TriggerGuid) \
   do { \
     if (LogPerformanceMeasurementEnabled (PERF_GENERAL_TYPE)) { \
-      LogPerformanceMeasurement (&gEfiCallerIdGuid, TriggerGuid, __FUNCTION__ , 0, PERF_CALLBACK_END_ID); \
+      LogPerformanceMeasurement (&gEfiCallerIdGuid, TriggerGuid, __func__ , 0, PERF_CALLBACK_END_ID); \
     } \
   } while (FALSE)
 
@@ -589,7 +589,7 @@ LogPerformanceMeasurement (
 #define PERF_FUNCTION_BEGIN() \
   do { \
     if (LogPerformanceMeasurementEnabled (PERF_GENERAL_TYPE)) { \
-      LogPerformanceMeasurement (&gEfiCallerIdGuid, NULL, __FUNCTION__ , 0, PERF_FUNCTION_START_ID); \
+      LogPerformanceMeasurement (&gEfiCallerIdGuid, NULL, __func__ , 0, PERF_FUNCTION_START_ID); \
     } \
   } while (FALSE)
 
@@ -604,7 +604,7 @@ LogPerformanceMeasurement (
 #define PERF_FUNCTION_END() \
   do { \
     if (LogPerformanceMeasurementEnabled (PERF_GENERAL_TYPE)) { \
-      LogPerformanceMeasurement (&gEfiCallerIdGuid, NULL, __FUNCTION__ , 0, PERF_FUNCTION_END_ID); \
+      LogPerformanceMeasurement (&gEfiCallerIdGuid, NULL, __func__ , 0, PERF_FUNCTION_END_ID); \
     } \
   } while (FALSE)
 
