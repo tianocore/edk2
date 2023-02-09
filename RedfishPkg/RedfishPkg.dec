@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+# Copyright (c) 2023, American Megatrends International LLC.
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -97,3 +98,13 @@
   # protocol instance.
   #
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDiscoverAccessModeInBand|FALSE|BOOLEAN|0x00001002
+  #
+  # This PCD indicates if the EFI REST EX sends chunk request to Redfish service.
+  # Default is set to non chunk mode.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExChunkRequestMode|FALSE|BOOLEAN|0x00001003
+  #
+  # This PCD indicates if the EFI REST EX adds Expect header to the POST, PATCH, PUT requests to Redfish service.
+  # Default is set to not add.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExAddingExpect|FALSE|BOOLEAN|0x00001004
