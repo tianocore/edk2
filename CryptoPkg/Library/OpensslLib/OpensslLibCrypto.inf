@@ -38,7 +38,7 @@
   buildinf.c
   ossl_store.c
   rand_pool.c
-  SslNull.c
+#  SslNull.c
   EcSm2Null.c
 
 [Packages]
