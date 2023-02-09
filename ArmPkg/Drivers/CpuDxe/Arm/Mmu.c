@@ -165,7 +165,7 @@ SyncCacheConfigPage (
 
   // Convert SectionAttributes into PageAttributes
   NextPageAttributes =
-    TT_DESCRIPTOR_CONVERT_TO_PAGE_CACHE_POLICY (*NextSectionAttributes, 0) |
+    TT_DESCRIPTOR_CONVERT_TO_PAGE_CACHE_POLICY (*NextSectionAttributes) |
     TT_DESCRIPTOR_CONVERT_TO_PAGE_AP (*NextSectionAttributes);
 
   // obtain page table base
@@ -212,7 +212,7 @@ SyncCacheConfigPage (
 
   // Convert back PageAttributes into SectionAttributes
   *NextSectionAttributes =
-    TT_DESCRIPTOR_CONVERT_TO_SECTION_CACHE_POLICY (NextPageAttributes, 0) |
+    TT_DESCRIPTOR_CONVERT_TO_SECTION_CACHE_POLICY (NextPageAttributes) |
     TT_DESCRIPTOR_CONVERT_TO_SECTION_AP (NextPageAttributes);
 
   return EFI_SUCCESS;
@@ -399,7 +399,7 @@ GetMemoryRegionPage (
   UINT32  PageDescriptor;
 
   // Convert the section attributes into page attributes
-  PageAttributes = ConvertSectionAttributesToPageAttributes (*RegionAttributes, 0);
+  PageAttributes = ConvertSectionAttributesToPageAttributes (*RegionAttributes);
 
   // Calculate index into first level translation table for start of modification
   TableIndex = ((*BaseAddress) & TT_DESCRIPTOR_PAGE_INDEX_MASK)  >> TT_DESCRIPTOR_PAGE_BASE_SHIFT;
@@ -479,7 +479,7 @@ GetMemoryRegion (
     ASSERT (PageTableIndex < TRANSLATION_TABLE_PAGE_COUNT);
 
     PageAttributes    = PageTable[PageTableIndex] & TT_DESCRIPTOR_PAGE_ATTRIBUTE_MASK;
-    *RegionAttributes = TT_DESCRIPTOR_CONVERT_TO_SECTION_CACHE_POLICY (PageAttributes, 0) |
+    *RegionAttributes = TT_DESCRIPTOR_CONVERT_TO_SECTION_CACHE_POLICY (PageAttributes) |
                         TT_DESCRIPTOR_CONVERT_TO_SECTION_AP (PageAttributes);
   }
 
