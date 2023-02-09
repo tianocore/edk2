@@ -98,9 +98,8 @@
 #define TT_DESCRIPTOR_PAGE_AP_RO_NO  ((1UL << 9) | (1UL << 4))
 #define TT_DESCRIPTOR_PAGE_AP_RO_RO  ((1UL << 9) | (3UL << 4))
 
-#define TT_DESCRIPTOR_SECTION_XN_MASK    (0x1UL << 4)
-#define TT_DESCRIPTOR_PAGE_XN_MASK       (0x1UL << 0)
-#define TT_DESCRIPTOR_LARGEPAGE_XN_MASK  (0x1UL << 15)
+#define TT_DESCRIPTOR_SECTION_XN_MASK  (0x1UL << 4)
+#define TT_DESCRIPTOR_PAGE_XN_MASK     (0x1UL << 0)
 
 #define TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK                    ((3UL << 12) | (1UL << 3) | (1UL << 2))
 #define TT_DESCRIPTOR_SECTION_CACHEABLE_MASK                       (1UL << 3)
@@ -124,30 +123,14 @@
 #define TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_BACK_ALLOC        ((1UL << 6) | (1UL << 3) | (1UL << 2))
 #define TT_DESCRIPTOR_PAGE_CACHE_POLICY_NON_SHAREABLE_DEVICE    ((2UL << 6) | (0UL << 3) | (0UL << 2))
 
-#define TT_DESCRIPTOR_LARGEPAGE_CACHE_POLICY_MASK                    ((3UL << 12) | (1UL << 3) | (1UL << 2))
-#define TT_DESCRIPTOR_LARGEPAGE_CACHE_POLICY_STRONGLY_ORDERED        ((0UL << 12) | (0UL << 3) | (0UL << 2))
-#define TT_DESCRIPTOR_LARGEPAGE_CACHE_POLICY_SHAREABLE_DEVICE        ((0UL << 12) | (0UL << 3) | (1UL << 2))
-#define TT_DESCRIPTOR_LARGEPAGE_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC  ((0UL << 12) | (1UL << 3) | (0UL << 2))
-#define TT_DESCRIPTOR_LARGEPAGE_CACHE_POLICY_WRITE_BACK_NO_ALLOC     ((0UL << 12) | (1UL << 3) | (1UL << 2))
-#define TT_DESCRIPTOR_LARGEPAGE_CACHE_POLICY_NON_CACHEABLE           ((1UL << 12) | (0UL << 3) | (0UL << 2))
-#define TT_DESCRIPTOR_LARGEPAGE_CACHE_POLICY_WRITE_BACK_ALLOC        ((1UL << 12) | (1UL << 3) | (1UL << 2))
-#define TT_DESCRIPTOR_LARGEPAGE_CACHE_POLICY_NON_SHAREABLE_DEVICE    ((2UL << 12) | (0UL << 3) | (0UL << 2))
+#define TT_DESCRIPTOR_CONVERT_TO_PAGE_AP(Desc)            ((((Desc) & TT_DESCRIPTOR_SECTION_AP_MASK) >> 6) & TT_DESCRIPTOR_PAGE_AP_MASK)
+#define TT_DESCRIPTOR_CONVERT_TO_PAGE_NG(Desc)            ((((Desc) & TT_DESCRIPTOR_SECTION_NG_MASK) >> 6) & TT_DESCRIPTOR_PAGE_NG_MASK)
+#define TT_DESCRIPTOR_CONVERT_TO_PAGE_S(Desc)             ((((Desc) & TT_DESCRIPTOR_SECTION_S_MASK) >> 6) & TT_DESCRIPTOR_PAGE_S_MASK)
+#define TT_DESCRIPTOR_CONVERT_TO_PAGE_XN(Desc)            ((((Desc) & TT_DESCRIPTOR_SECTION_XN_MASK) >> 4) & TT_DESCRIPTOR_PAGE_XN_MASK)
+#define TT_DESCRIPTOR_CONVERT_TO_PAGE_CACHE_POLICY(Desc)  ((((Desc) & (0x3 << 12)) >> 6) | (Desc & (0x3 << 2)))
 
-#define TT_DESCRIPTOR_CONVERT_TO_PAGE_AP(Desc)                         ((((Desc) & TT_DESCRIPTOR_SECTION_AP_MASK) >> 6) & TT_DESCRIPTOR_PAGE_AP_MASK)
-#define TT_DESCRIPTOR_CONVERT_TO_PAGE_NG(Desc)                         ((((Desc) & TT_DESCRIPTOR_SECTION_NG_MASK) >> 6) & TT_DESCRIPTOR_PAGE_NG_MASK)
-#define TT_DESCRIPTOR_CONVERT_TO_PAGE_S(Desc)                          ((((Desc) & TT_DESCRIPTOR_SECTION_S_MASK) >> 6) & TT_DESCRIPTOR_PAGE_S_MASK)
-#define TT_DESCRIPTOR_CONVERT_TO_PAGE_XN(Desc, IsLargePage)            ((IsLargePage)?\
-                                                                    ((((Desc) & TT_DESCRIPTOR_SECTION_XN_MASK) << 11) & TT_DESCRIPTOR_LARGEPAGE_XN_MASK):    \
-                                                                    ((((Desc) & TT_DESCRIPTOR_SECTION_XN_MASK) >> 4) & TT_DESCRIPTOR_PAGE_XN_MASK))
-#define TT_DESCRIPTOR_CONVERT_TO_PAGE_CACHE_POLICY(Desc, IsLargePage)  (IsLargePage?    \
-                                                                    (((Desc) & TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK) & TT_DESCRIPTOR_LARGEPAGE_CACHE_POLICY_MASK): \
-                                                                    (((((Desc) & (0x3 << 12)) >> 6) | (Desc & (0x3 << 2)))))
-
-#define TT_DESCRIPTOR_CONVERT_TO_SECTION_AP(Desc)  ((((Desc) & TT_DESCRIPTOR_PAGE_AP_MASK) << 6) & TT_DESCRIPTOR_SECTION_AP_MASK)
-
-#define TT_DESCRIPTOR_CONVERT_TO_SECTION_CACHE_POLICY(Desc, IsLargePage)  (IsLargePage?    \
-                                                                    (((Desc) & TT_DESCRIPTOR_LARGEPAGE_CACHE_POLICY_MASK) & TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK): \
-                                                                    (((((Desc) & (0x3 << 6)) << 6) | (Desc & (0x3 << 2)))))
+#define TT_DESCRIPTOR_CONVERT_TO_SECTION_AP(Desc)            ((((Desc) & TT_DESCRIPTOR_PAGE_AP_MASK) << 6) & TT_DESCRIPTOR_SECTION_AP_MASK)
+#define TT_DESCRIPTOR_CONVERT_TO_SECTION_CACHE_POLICY(Desc)  ((((Desc) & (0x3 << 6)) << 6) | (Desc & (0x3 << 2)))
 
 #define TT_DESCRIPTOR_SECTION_ATTRIBUTE_MASK  (TT_DESCRIPTOR_SECTION_NS_MASK | TT_DESCRIPTOR_SECTION_NG_MASK |               \
                                                              TT_DESCRIPTOR_SECTION_S_MASK | TT_DESCRIPTOR_SECTION_AP_MASK | \
@@ -230,8 +213,7 @@ typedef UINT32 ARM_PAGE_TABLE_ENTRY;
 
 UINT32
 ConvertSectionAttributesToPageAttributes (
-  IN UINT32   SectionAttributes,
-  IN BOOLEAN  IsLargePage
+  IN UINT32  SectionAttributes
   );
 
 #endif // ARMV7_MMU_H_
