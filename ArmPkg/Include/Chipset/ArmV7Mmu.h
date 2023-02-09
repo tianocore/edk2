@@ -54,11 +54,9 @@
 #define TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE(Desc)  (((Desc) & 3UL) == TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE)
 
 // Translation table descriptor types
-#define TT_DESCRIPTOR_PAGE_TYPE_MASK       (3UL << 0)
-#define TT_DESCRIPTOR_PAGE_TYPE_FAULT      (0UL << 0)
-#define TT_DESCRIPTOR_PAGE_TYPE_PAGE       (2UL << 0)
-#define TT_DESCRIPTOR_PAGE_TYPE_PAGE_XN    (3UL << 0)
-#define TT_DESCRIPTOR_PAGE_TYPE_LARGEPAGE  (1UL << 0)
+#define TT_DESCRIPTOR_PAGE_TYPE_MASK   (1UL << 1)
+#define TT_DESCRIPTOR_PAGE_TYPE_FAULT  (0UL << 1)
+#define TT_DESCRIPTOR_PAGE_TYPE_PAGE   (1UL << 1)
 
 // Section descriptor definitions
 #define TT_DESCRIPTOR_SECTION_SIZE  (0x00100000)
