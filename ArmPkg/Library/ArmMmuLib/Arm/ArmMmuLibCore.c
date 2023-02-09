@@ -145,7 +145,7 @@ PopulateLevel2PageTable (
                                   );
 
       // Translate the Section Descriptor into Page Descriptor
-      SectionDescriptor = TT_DESCRIPTOR_PAGE_TYPE_PAGE | ConvertSectionAttributesToPageAttributes (*SectionEntry, FALSE);
+      SectionDescriptor = TT_DESCRIPTOR_PAGE_TYPE_PAGE | ConvertSectionAttributesToPageAttributes (*SectionEntry);
 
       BaseSectionAddress = TT_DESCRIPTOR_SECTION_BASE_ADDRESS (*SectionEntry);
 

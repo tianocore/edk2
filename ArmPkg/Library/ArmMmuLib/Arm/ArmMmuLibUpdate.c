@@ -53,7 +53,7 @@ ConvertSectionToPages (
 
   // Get section attributes and convert to page attributes
   SectionDescriptor = FirstLevelTable[FirstLevelIdx];
-  PageDescriptor    = TT_DESCRIPTOR_PAGE_TYPE_PAGE | ConvertSectionAttributesToPageAttributes (SectionDescriptor, FALSE);
+  PageDescriptor    = TT_DESCRIPTOR_PAGE_TYPE_PAGE | ConvertSectionAttributesToPageAttributes (SectionDescriptor);
 
   // Allocate a page table for the 4KB entries (we use up a full page even though we only need 1KB)
   PageTable = (volatile ARM_PAGE_TABLE_ENTRY *)AllocatePages (1);
