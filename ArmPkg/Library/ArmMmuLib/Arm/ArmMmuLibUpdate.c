@@ -81,12 +81,12 @@ UpdatePageEntries (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length,
   IN  UINT64                Attributes,
+  IN  UINT32                EntryMask,
   OUT BOOLEAN               *FlushTlbs OPTIONAL
   )
 {
   EFI_STATUS  Status;
   UINT32      EntryValue;
-  UINT32      EntryMask;
   UINT32      FirstLevelIdx;
   UINT32      Offset;
   UINT32      NumPageEntries;
@@ -104,7 +104,6 @@ UpdatePageEntries (
 
   // EntryMask: bitmask of values to change (1 = change this value, 0 = leave alone)
   // EntryValue: values at bit positions specified by EntryMask
-  EntryMask = TT_DESCRIPTOR_PAGE_TYPE_MASK | TT_DESCRIPTOR_PAGE_AP_MASK | TT_DESCRIPTOR_PAGE_XN_MASK | TT_DESCRIPTOR_PAGE_AF;
   EntryValue = TT_DESCRIPTOR_PAGE_TYPE_PAGE;
 
   // Although the PI spec is unclear on this, the GCD guarantees that only
@@ -220,11 +219,11 @@ EFI_STATUS
 UpdateSectionEntries (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length,
-  IN UINT64                Attributes
+  IN UINT64                Attributes,
+  IN UINT32                EntryMask
   )
 {
   EFI_STATUS                           Status;
-  UINT32                               EntryMask;
   UINT32                               EntryValue;
   UINT32                               FirstLevelIdx;
   UINT32                               NumSections;
@@ -240,8 +239,6 @@ UpdateSectionEntries (
   // EntryValue: values at bit positions specified by EntryMask
 
   // Make sure we handle a section range that is unmapped
-  EntryMask = TT_DESCRIPTOR_SECTION_TYPE_MASK | TT_DESCRIPTOR_SECTION_XN_MASK |
-              TT_DESCRIPTOR_SECTION_AP_MASK | TT_DESCRIPTOR_SECTION_AF;
   EntryValue = TT_DESCRIPTOR_SECTION_TYPE_SECTION;
 
   // Although the PI spec is unclear on this, the GCD guarantees that only
@@ -310,6 +307,7 @@ UpdateSectionEntries (
                  (FirstLevelIdx + i) << TT_DESCRIPTOR_SECTION_BASE_SHIFT,
                  TT_DESCRIPTOR_SECTION_SIZE,
                  Attributes,
+                 ConvertSectionAttributesToPageAttributes (EntryMask),
                  NULL
                  );
     } else {
@@ -340,11 +338,26 @@ UpdateSectionEntries (
   return Status;
 }
 
+/**
+  Update the permission or memory type attributes on a range of memory.
+
+  @param  BaseAddress           The start of the region.
+  @param  Length                The size of the region.
+  @param  Attributes            A mask of EFI_MEMORY_xx constants.
+  @param  SectionMask           A mask of short descriptor section attributes
+                                describing which descriptor bits to update.
+
+  @retval EFI_SUCCESS           The attributes were set successfully.
+  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
+
+**/
+STATIC
 EFI_STATUS
-ArmSetMemoryAttributes (
+SetMemoryAttributes (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length,
-  IN UINT64                Attributes
+  IN UINT64                Attributes,
+  IN UINT32                SectionMask
   )
 {
   EFI_STATUS  Status;
@@ -375,7 +388,12 @@ ArmSetMemoryAttributes (
         Attributes
         ));
 
-      Status = UpdateSectionEntries (BaseAddress, ChunkLength, Attributes);
+      Status = UpdateSectionEntries (
+                 BaseAddress,
+                 ChunkLength,
+                 Attributes,
+                 SectionMask
+                 );
 
       FlushTlbs = TRUE;
     } else {
@@ -401,6 +419,7 @@ ArmSetMemoryAttributes (
                  BaseAddress,
                  ChunkLength,
                  Attributes,
+                 ConvertSectionAttributesToPageAttributes (SectionMask),
                  &FlushTlbs
                  );
     }
@@ -420,13 +439,47 @@ ArmSetMemoryAttributes (
   return Status;
 }
 
+/**
+  Update the permission or memory type attributes on a range of memory.
+
+  @param  BaseAddress           The start of the region.
+  @param  Length                The size of the region.
+  @param  Attributes            A mask of EFI_MEMORY_xx constants.
+
+  @retval EFI_SUCCESS           The attributes were set successfully.
+  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
+
+**/
+EFI_STATUS
+ArmSetMemoryAttributes (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT64                Length,
+  IN UINT64                Attributes
+  )
+{
+  return SetMemoryAttributes (
+           BaseAddress,
+           Length,
+           Attributes,
+           TT_DESCRIPTOR_SECTION_TYPE_MASK |
+           TT_DESCRIPTOR_SECTION_XN_MASK |
+           TT_DESCRIPTOR_SECTION_AP_MASK |
+           TT_DESCRIPTOR_SECTION_AF
+           );
+}
+
 EFI_STATUS
 ArmSetMemoryRegionNoExec (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length
   )
 {
-  return ArmSetMemoryAttributes (BaseAddress, Length, EFI_MEMORY_XP);
+  return SetMemoryAttributes (
+           BaseAddress,
+           Length,
+           EFI_MEMORY_XP,
+           TT_DESCRIPTOR_SECTION_XN_MASK
+           );
 }
 
 EFI_STATUS
@@ -435,7 +488,12 @@ ArmClearMemoryRegionNoExec (
   IN  UINT64                Length
   )
 {
-  return ArmSetMemoryAttributes (BaseAddress, Length, __EFI_MEMORY_RWX);
+  return SetMemoryAttributes (
+           BaseAddress,
+           Length,
+           0,
+           TT_DESCRIPTOR_SECTION_XN_MASK
+           );
 }
 
 EFI_STATUS
@@ -444,7 +502,12 @@ ArmSetMemoryRegionReadOnly (
   IN  UINT64                Length
   )
 {
-  return ArmSetMemoryAttributes (BaseAddress, Length, EFI_MEMORY_RO);
+  return SetMemoryAttributes (
+           BaseAddress,
+           Length,
+           EFI_MEMORY_RO,
+           TT_DESCRIPTOR_SECTION_AP_MASK
+           );
 }
 
 EFI_STATUS
@@ -453,5 +516,10 @@ ArmClearMemoryRegionReadOnly (
   IN  UINT64                Length
   )
 {
-  return ArmSetMemoryAttributes (BaseAddress, Length, __EFI_MEMORY_RWX);
+  return SetMemoryAttributes (
+           BaseAddress,
+           Length,
+           0,
+           TT_DESCRIPTOR_SECTION_AP_MASK
+           );
 }
