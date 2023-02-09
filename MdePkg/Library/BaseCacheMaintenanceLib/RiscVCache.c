@@ -76,7 +76,7 @@ InvalidateInstructionCacheRange (
   IN UINTN  Length
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
   return Address;
 }
 
@@ -96,7 +96,7 @@ WriteBackInvalidateDataCache (
   VOID
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
 }
 
 /**
@@ -132,7 +132,7 @@ WriteBackInvalidateDataCacheRange (
   IN      UINTN  Length
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
   return Address;
 }
 
@@ -152,7 +152,7 @@ WriteBackDataCache (
   VOID
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
 }
 
 /**
@@ -187,7 +187,7 @@ WriteBackDataCacheRange (
   IN      UINTN  Length
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
   return Address;
 }
 
@@ -245,6 +245,6 @@ InvalidateDataCacheRange (
   IN      UINTN  Length
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
   return Address;
 }
