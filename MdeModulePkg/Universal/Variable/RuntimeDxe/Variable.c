@@ -2676,7 +2676,11 @@ VariableServiceSetVariable (
     //
     // Only EFI_VARIABLE_NON_VOLATILE attribute is invalid
     //
-    return EFI_INVALID_PARAMETER;
+    if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
+      return EFI_UNSUPPORTED;
+    } else {
+      return EFI_INVALID_PARAMETER;
+    }
   } else if ((Attributes & VARIABLE_ATTRIBUTE_AT_AW) != 0) {
     if (!mVariableModuleGlobal->VariableGlobal.AuthSupport) {
       //
