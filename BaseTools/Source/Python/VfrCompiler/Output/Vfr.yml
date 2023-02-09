@@ -183,6 +183,7 @@ formset:
           varid:  MyIfrNVData.TestLateCheck  #  Optional Input
           prompt:  STRING_TOKEN(STR_TEST_OPCODE)
           help:  STRING_TOKEN(STR_ONE_OF_HELP)
+          flags:  RESET_REQUIRED  # Optional input , flags
           component:  
           - option:  
               text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
@@ -200,6 +201,7 @@ formset:
           varid:  MyIfrNVData.TestLateCheck2  #  Optional Input
           prompt:  STRING_TOKEN(STR_TEST_OPCODE2)
           help:  STRING_TOKEN(STR_ONE_OF_HELP)
+          flags:  RESET_REQUIRED  # Optional input , flags
           component:  
           - option:  
               text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
@@ -216,6 +218,7 @@ formset:
           varid:  MyIfrNVData.QuestionAboutTreeHugging  #  Optional Input
           prompt:  STRING_TOKEN(STR_ONE_OF_PROMPT_KEYWORD)
           help:  STRING_TOKEN(STR_ONE_OF_HELP)
+          flags:  RESET_REQUIRED  # Optional input , flags
           component:  
           - option:  
               text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
@@ -233,6 +236,7 @@ formset:
           varid:  MyIfrNVData.QuestionXUefiKeywordRestStyle  #  Optional Input
           prompt:  STRING_TOKEN(STR_ONE_OF_PROMPT_X_UEFI)
           help:  STRING_TOKEN(STR_ONE_OF_PROMPT_X_UEFI_HELP)
+          flags:  RESET_REQUIRED | REST_STYLE  # Optional input , flags
           component:  
           - option:  
               text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
@@ -309,7 +313,6 @@ formset:
               value:  19
               defaultstore: MyManufactureDefault
       - numeric:
-          varid:  MyNameValueVar[0]  #  Optional Input
           prompt:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME0)
           help:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME0_HELP)
           flags:  NUMERIC_SIZE_1  # Optional input , flags
@@ -325,7 +328,6 @@ formset:
               value:  17
               defaultstore: MyManufactureDefault
       - numeric:
-          varid:  MyNameValueVar[1]  #  Optional Input
           prompt:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME1)
           help:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME1_HELP)
           flags:  NUMERIC_SIZE_2  # Optional input , flags

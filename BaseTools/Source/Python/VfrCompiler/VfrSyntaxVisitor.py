@@ -2205,7 +2205,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         if ctx.Key() != None:
             Key = self.TransNum(ctx.Number())
-            self.AssignQuestionKey(NObj,Key)
+            self.AssignQuestionKey(NObj, Key)
             NObj.SetHasKey(True)
 
         NObj.SetHasStep(ctx.vfrSetMinMaxStep().Step() != None)
@@ -2503,7 +2503,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         UpdateVarType = False
         OObj = ctx.Node.Data
         Line = ctx.start.line
-        OObj.SetLineNo(Line)
         if self.CurrQestVarInfo.IsBitVar:
             GuidObj = IfrGuid(0)
             GuidObj.SetGuid(EDKII_IFR_BIT_VARSTORE_GUID)
@@ -2537,23 +2536,23 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'OneOf question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
         # modify the data Vartype for NameValue
-        if ctx.vfrSetMinMaxStep() != None:
-            OObj.SetHasMinMax(True)
-            if ctx.vfrSetMinMaxStep().Step() != None:
-                OObj.SetHasStep(True)
-        # modify the data Vartype for NameValue
         if UpdateVarType:
             UpdatedOObj = IfrOneOf(self.CurrQestVarInfo.VarType)
-            UpdatedOObj.FlagsStream = OObj.FlagsStream
-            UpdatedOObj.HasKey = OObj.HasKey
-            UpdatedOObj.HasStep = OObj.HasStep
-            UpdatedOObj.LineNo = OObj.LineNo
             UpdatedOObj.GetInfo().Question = OObj.GetInfo().Question
             UpdatedOObj.GetInfo().Flags = OObj.GetInfo().Flags
             UpdatedOObj.GetInfo().Data.MinValue = OObj.GetInfo().Data.MinValue
             UpdatedOObj.GetInfo().Data.MaxValue = OObj.GetInfo().Data.MaxValue
             UpdatedOObj.GetInfo().Data.Step = OObj.GetInfo().Data.Step
             OObj = UpdatedOObj
+
+        OObj.SetLineNo(ctx.start.line)
+        if ctx.FLAGS() != None:
+            OObj.SetFlagsStream(self.ExtractOriginalText(ctx.vfrOneofFlagsField()))
+
+        if ctx.vfrSetMinMaxStep() != None:
+            OObj.SetHasMinMax(True)
+            if ctx.vfrSetMinMaxStep().Step() != None:
+                OObj.SetHasStep(True)
 
         ctx.Node.Data = OObj
         ctx.Node.Buffer = gFormPkg.StructToStream(OObj.GetInfo())

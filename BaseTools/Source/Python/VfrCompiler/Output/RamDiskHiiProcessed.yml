@@ -14,6 +14,7 @@ formset:
               flags: 0
               text: STRING_TOKEN(0x0014)
               value: 1
+          flags: NUMERIC_SIZE_1 | INTERACTIVE
           help: STRING_TOKEN(0x0012)
           prompt: STRING_TOKEN(0x0011)
       - subtitle:

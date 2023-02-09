@@ -189,10 +189,7 @@ class VfrTree():
                 EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
                                 "File open failed for %s" % LstFile)
 
-        self.List = []
         self._GenBinaryFilesDfs(self.Root, Hpk, C, RecordLines)
-        print(self.List)
-        print(gFormPkg.List)
 
         if self.Options.CreateIfrPkgFile:
             #GenCFile
@@ -256,7 +253,6 @@ class VfrTree():
                             (self.Options.PkgOutputFileName))
 
                     try:
-                        self.List.append(len(Root.Buffer))
                         LineBuffer = ''
                         for i in range(0, len(Root.Buffer)):
                             self.Index += 1

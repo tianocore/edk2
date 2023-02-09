@@ -17,19 +17,19 @@ formset:
       type: DRIVER_SAMPLE_CONFIGURATION
       varid: 4660
   - efivarstore:
-      attribute: WIN_CERT_TYPE_PKCS_SIGNED_DATA | EFI_VARIABLE_NON_VOLATILE
+      attribute: 0x0002 | 0x00000001
       guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11,
         0x3d}}'
       name: MyEfiVar
       type: MY_EFI_VARSTORE_DATA
   - efivarstore:
-      attribute: WIN_CERT_TYPE_PKCS_SIGNED_DATA | EFI_VARIABLE_NON_VOLATILE
+      attribute: 0x0002 | 0x00000001
       guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11,
         0x3d}}'
       name: MyEfiBitVar
       type: MY_EFI_BITS_VARSTORE_DATA
   - efivarstore:
-      attribute: WIN_CERT_TYPE_PKCS_SIGNED_DATA | EFI_VARIABLE_NON_VOLATILE
+      attribute: 0x0002 | 0x00000001
       guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11,
         0x3d}}'
       name: MyEfiUnionVar
@@ -193,6 +193,7 @@ formset:
               expression: ideqval MyIfrNVData.TestLateCheck == 0
               timeout: 5
               warning: 172
+          flags: RESET_REQUIRED
           help: STRING_TOKEN(0x0026)
           prompt: STRING_TOKEN(0x0052)
           varid: MyIfrNVData.TestLateCheck
@@ -209,6 +210,7 @@ formset:
           - inconsistentif:
               expression: ideqid MyIfrNVData.TestLateCheck == MyIfrNVData.TestLateCheck2
               prompt: STRING_TOKEN(0x0047)
+          flags: RESET_REQUIRED
           help: STRING_TOKEN(0x0026)
           prompt: STRING_TOKEN(0x0053)
           varid: MyIfrNVData.TestLateCheck2
@@ -226,6 +228,7 @@ formset:
               flags: 0
               text: STRING_TOKEN(0x0029)
               value: 3
+          flags: RESET_REQUIRED
           help: STRING_TOKEN(0x0026)
           prompt: STRING_TOKEN(0x0020)
           varid: MyIfrNVData.QuestionAboutTreeHugging
@@ -243,6 +246,7 @@ formset:
               flags: 0
               text: STRING_TOKEN(0x0029)
               value: 3
+          flags: RESET_REQUIRED | REST_STYLE
           help: STRING_TOKEN(0x0023)
           prompt: STRING_TOKEN(0x0022)
           varid: MyIfrNVData.QuestionXUefiKeywordRestStyle
@@ -327,7 +331,6 @@ formset:
           minimum: 0
           prompt: STRING_TOKEN(0x0092)
           step: 0
-          varid: MyNameValueVar[0]
       - numeric:
           component:
           - default:
@@ -342,7 +345,6 @@ formset:
           minimum: 0
           prompt: STRING_TOKEN(0x0093)
           step: 0
-          varid: MyNameValueVar[1]
       - string:
           help: STRING_TOKEN(0x0061)
           maxsize: 20

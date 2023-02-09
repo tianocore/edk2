@@ -60,8 +60,23 @@ class YamlTree():
                 if Value in UniDict.keys():
                     Config[Key] = 'STRING_TOKEN' + '(' +  UniDict[Value] + ')'
                 # get {key:value} dicts from header files
-                if Value in HeaderDict.keys():
+                elif Value in HeaderDict.keys():
                     Config[Key] = HeaderDict[Value]
+                elif type(Value) == str and '|' in Value:
+                    Items = Value.split('|')
+                    NewValue = ''
+                    for i in range(0, len(Items)):
+                        # get {key:value} dicts from header files
+                        if Items[i].strip() in HeaderDict.keys():
+                            NewValue += HeaderDict[Items[i].strip()]
+                        else:
+                            NewValue += Items[i].strip()
+
+                        if i != len(Items) - 1:
+                            NewValue += ' | '
+                    #print(NewValue)
+                    Config[Key] = NewValue
+
         return
 
     # parse and collect data structures info in the ExpandedHeader.i files

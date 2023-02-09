@@ -193,7 +193,6 @@ class FormPkg():
         self.PkgLength = 0
         self.Offset = 0
         self.PendingAssignList = None
-        self.List = [] #
 
     def BuildPkgHdr(self):
         PkgHdr = EFI_HII_PACKAGE_HEADER()
@@ -206,7 +205,6 @@ class FormPkg():
             self.PkgLength += Root.Data.GetInfo().Header.Length
             Root.Offset = gFormPkg.Offset #
             self.Offset += Root.Data.GetInfo().Header.Length
-            self.List.append(Root.Data.GetInfo().Header.Length)
         if Root.Child != []:
             for ChildNode in Root.Child:
                 self.BuildPkg(ChildNode)
