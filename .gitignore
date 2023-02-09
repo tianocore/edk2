@@ -6,3 +6,4 @@ __pycache__/
 tags/
 .vscode/
 BaseTools/Source/Python/VfrCompiler/test/
+BaseTools/Source/Python/VfrCompiler/Output/
