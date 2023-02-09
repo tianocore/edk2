@@ -3,6 +3,7 @@
 
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2023, American Megatrends International LLC.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -140,9 +141,6 @@ RedfishHttpAddExpectation (
   }
 
   *ItsWrite = FALSE;
-  if (PreservedRequestHeaders != NULL) {
-    *PreservedRequestHeaders = RequestMessage->Headers;
-  }
 
   if ((RequestMessage->Data.Request->Method != HttpMethodPut) && (RequestMessage->Data.Request->Method != HttpMethodPost) &&
       (RequestMessage->Data.Request->Method != HttpMethodPatch))
@@ -152,10 +150,20 @@ RedfishHttpAddExpectation (
 
   *ItsWrite = TRUE;
 
-  NewHeaders = AllocateZeroPool ((RequestMessage->HeaderCount + 1) * sizeof (EFI_HTTP_HEADER));
-  CopyMem ((VOID *)NewHeaders, (VOID *)RequestMessage->Headers, RequestMessage->HeaderCount * sizeof (EFI_HTTP_HEADER));
-  HttpSetFieldNameAndValue (NewHeaders + RequestMessage->HeaderCount, HTTP_HEADER_EXPECT, HTTP_EXPECT_100_CONTINUE);
-  RequestMessage->HeaderCount++;
-  RequestMessage->Headers = NewHeaders;
+  //
+  // Check PCD before adding Expect header
+  //
+  if (FixedPcdGetBool (PcdRedfishRestExAddingExpect)) {
+    if (PreservedRequestHeaders != NULL) {
+      *PreservedRequestHeaders = RequestMessage->Headers;
+    }
+
+    NewHeaders = AllocateZeroPool ((RequestMessage->HeaderCount + 1) * sizeof (EFI_HTTP_HEADER));
+    CopyMem ((VOID *)NewHeaders, (VOID *)RequestMessage->Headers, RequestMessage->HeaderCount * sizeof (EFI_HTTP_HEADER));
+    HttpSetFieldNameAndValue (NewHeaders + RequestMessage->HeaderCount, HTTP_HEADER_EXPECT, HTTP_EXPECT_100_CONTINUE);
+    RequestMessage->HeaderCount++;
+    RequestMessage->Headers = NewHeaders;
+  }
+
   return EFI_SUCCESS;
 }
