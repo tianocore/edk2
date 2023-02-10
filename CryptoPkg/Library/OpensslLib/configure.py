@@ -195,6 +195,7 @@ def sources_filter_fn(filename):
         'randfile.c',
         '/store/',
         '/storemgmt/',
+        'provider_predefined.c'
     ]
     for item in exclude:
         if item in filename:

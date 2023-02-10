@@ -39,6 +39,7 @@
   buildinf.h
   buildinf.c
   ossl_store.c
+  provider.c
   rand_pool.c
 #  SslNull.c
   EcSm2Null.c
