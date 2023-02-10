@@ -13,6 +13,7 @@
 **/
 
 #include "SdMmcPciHcDxe.h"
+#include "BayhubHost.h"
 
 EDKII_SD_MMC_OVERRIDE  *mOverride;
 
@@ -135,6 +136,8 @@ InitializeSdMmcPciHcDxe (
              &gSdMmcPciHcComponentName2
              );
   ASSERT_EFI_ERROR (Status);
+
+  mOverride = &BhtOverride;
 
   return Status;
 }
