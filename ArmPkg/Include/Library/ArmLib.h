@@ -35,6 +35,12 @@ typedef enum {
   // Do NOT use below two attributes if you are not sure.
   ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_NONSHAREABLE,
 
+  // Special region types for memory that must be mapped with read-only or
+  // non-execute permissions from the very start, e.g., to support the use
+  // of the WXN virtual memory control.
+  ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_RO,
+  ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_XP,
+
   ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH,
   ARM_MEMORY_REGION_ATTRIBUTE_DEVICE,
 } ARM_MEMORY_REGION_ATTRIBUTES;

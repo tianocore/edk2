@@ -106,6 +106,14 @@ PopulateLevel2PageTable (
       PageAttributes  = TT_DESCRIPTOR_PAGE_WRITE_BACK;
       PageAttributes &= ~TT_DESCRIPTOR_PAGE_S_SHARED;
       break;
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_RO:
+      PageAttributes  = TT_DESCRIPTOR_PAGE_WRITE_BACK;
+      PageAttributes |= TT_DESCRIPTOR_PAGE_AP_NO_RO;
+      break;
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_XP:
+      PageAttributes  = TT_DESCRIPTOR_PAGE_WRITE_BACK;
+      PageAttributes |= TT_DESCRIPTOR_PAGE_XN_MASK;
+      break;
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH:
       PageAttributes = TT_DESCRIPTOR_PAGE_WRITE_THROUGH;
       break;
@@ -239,6 +247,14 @@ FillTranslationTable (
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_NONSHAREABLE:
       Attributes  = TT_DESCRIPTOR_SECTION_WRITE_BACK;
       Attributes &= ~TT_DESCRIPTOR_SECTION_S_SHARED;
+      break;
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_RO:
+      Attributes  = TT_DESCRIPTOR_SECTION_WRITE_BACK;
+      Attributes |= TT_DESCRIPTOR_SECTION_AP_NO_RO;
+      break;
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_XP:
+      Attributes  = TT_DESCRIPTOR_SECTION_WRITE_BACK;
+      Attributes |= TT_DESCRIPTOR_SECTION_XN_MASK;
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH:
       Attributes = TT_DESCRIPTOR_SECTION_WRITE_THROUGH;
