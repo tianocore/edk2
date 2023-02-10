@@ -112,6 +112,9 @@
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress ## CONSUMES
 
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot            ## CONSUMES
+
 [Pcd.IA32,Pcd.X64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                      ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
@@ -128,7 +131,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
 
 [Depex]
-  gEfiPeiLoadFilePpiGuid AND gEfiPeiMasterBootModePpiGuid
+  gEfiPeiLoadFilePpiGuid AND gEfiPeiMasterBootModePpiGuid AND gEfiPeiMemoryDiscoveredPpiGuid
 
 #
 # [BootMode]

@@ -77,18 +77,20 @@ PeimInitializeDxeIpl (
   BootMode = GetBootModeHob ();
 
   if (BootMode != BOOT_ON_S3_RESUME) {
-    Status = PeiServicesRegisterForShadow (FileHandle);
-    if (Status == EFI_SUCCESS) {
-      //
-      // EFI_SUCESS means it is the first time to call register for shadow.
-      //
-      return Status;
-    }
+    if (PcdGetBool (PcdShadowPeimOnBoot)) {
+      Status = PeiServicesRegisterForShadow (FileHandle);
+      if (Status == EFI_SUCCESS) {
+        //
+        // EFI_SUCESS means it is the first time to call register for shadow.
+        //
+        return Status;
+      }
 
-    //
-    // Ensure that DXE IPL is shadowed to permanent memory.
-    //
-    ASSERT (Status == EFI_ALREADY_STARTED);
+      //
+      // Ensure that DXE IPL is shadowed to permanent memory.
+      //
+      ASSERT (Status == EFI_ALREADY_STARTED);
+    }
 
     //
     // DXE core load requires permanent memory.
