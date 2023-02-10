@@ -430,6 +430,8 @@ Sha512HashAll (
   OUT  UINT8       *HashValue
   )
 {
+  SHA512_CTX  Context;
+
   //
   // Check input parameters.
   //
@@ -444,9 +446,17 @@ Sha512HashAll (
   //
   // OpenSSL SHA-512 Hash Computation.
   //
-  if (SHA512 (Data, DataSize, HashValue) == NULL) {
+  if (!SHA512_Init (&Context)) {
     return FALSE;
-  } else {
-    return TRUE;
   }
+
+  if (!SHA512_Update (&Context, Data, DataSize)) {
+    return FALSE;
+  }
+
+  if (!SHA512_Final (HashValue, &Context)) {
+    return FALSE;
+  }
+
+  return TRUE;
 }
