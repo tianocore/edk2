@@ -37,12 +37,35 @@ ArmMemoryAttributeToPageAttribute (
   IN ARM_MEMORY_REGION_ATTRIBUTES  Attributes
   )
 {
+  UINT64  Permissions;
+
+  switch (Attributes) {
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_RO:
+      Permissions = TT_AP_NO_RO;
+      break;
+
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_XP:
+    case ARM_MEMORY_REGION_ATTRIBUTE_DEVICE:
+      if (ArmReadCurrentEL () == AARCH64_EL2) {
+        Permissions = TT_XN_MASK;
+      } else {
+        Permissions = TT_UXN_MASK | TT_PXN_MASK;
+      }
+
+      break;
+    default:
+      Permissions = 0;
+      break;
+  }
+
   switch (Attributes) {
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_NONSHAREABLE:
       return TT_ATTR_INDX_MEMORY_WRITE_BACK;
 
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
-      return TT_ATTR_INDX_MEMORY_WRITE_BACK | TT_SH_INNER_SHAREABLE;
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_RO:
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_XP:
+      return TT_ATTR_INDX_MEMORY_WRITE_BACK | TT_SH_INNER_SHAREABLE | Permissions;
 
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH:
       return TT_ATTR_INDX_MEMORY_WRITE_THROUGH | TT_SH_INNER_SHAREABLE;
@@ -54,11 +77,7 @@ ArmMemoryAttributeToPageAttribute (
     default:
       ASSERT (0);
     case ARM_MEMORY_REGION_ATTRIBUTE_DEVICE:
-      if (ArmReadCurrentEL () == AARCH64_EL2) {
-        return TT_ATTR_INDX_DEVICE_MEMORY | TT_XN_MASK;
-      } else {
-        return TT_ATTR_INDX_DEVICE_MEMORY | TT_UXN_MASK | TT_PXN_MASK;
-      }
+      return TT_ATTR_INDX_DEVICE_MEMORY | Permissions;
   }
 }
 
