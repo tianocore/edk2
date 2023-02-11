@@ -66,6 +66,8 @@ extern LIST_ENTRY  mGcdMemorySpaceMap;
 
 STATIC LIST_ENTRY  mProtectedImageRecordList;
 
+EFI_CPU_SET_MEMORY_ATTRIBUTES  gCpuSetMemoryAttributes;
+
 /**
   Sort code section in image record, based upon CodeSegmentBase from low to high.
 
@@ -224,8 +226,8 @@ SetUefiImageMemoryAttributes (
 
   DEBUG ((DEBUG_INFO, "SetUefiImageMemoryAttributes - 0x%016lx - 0x%016lx (0x%016lx)\n", BaseAddress, Length, FinalAttributes));
 
-  ASSERT (gCpu != NULL);
-  gCpu->SetMemoryAttributes (gCpu, BaseAddress, Length, FinalAttributes);
+  ASSERT (gCpuSetMemoryAttributes != NULL);
+  gCpuSetMemoryAttributes (gCpu, BaseAddress, Length, FinalAttributes);
 }
 
 /**
@@ -408,7 +410,7 @@ ProtectUefiImage (
   DEBUG ((DEBUG_INFO, "ProtectUefiImageCommon - 0x%x\n", LoadedImage));
   DEBUG ((DEBUG_INFO, "  - 0x%016lx - 0x%016lx\n", (EFI_PHYSICAL_ADDRESS)(UINTN)LoadedImage->ImageBase, LoadedImage->ImageSize));
 
-  if (gCpu == NULL) {
+  if (gCpuSetMemoryAttributes == NULL) {
     return;
   }
 
@@ -995,6 +997,8 @@ MemoryProtectionCpuArchProtocolNotify (
     goto Done;
   }
 
+  gCpuSetMemoryAttributes = gCpu->SetMemoryAttributes;
+
   //
   // Apply the memory protection policy on non-BScode/RTcode regions.
   //
@@ -1278,7 +1282,7 @@ ApplyMemoryProtectionPolicy (
   // permission attributes, and it is the job of the driver that installs this
   // protocol to set the permissions on existing allocations.
   //
-  if (gCpu == NULL) {
+  if (gCpuSetMemoryAttributes == NULL) {
     return EFI_SUCCESS;
   }
 
@@ -1318,5 +1322,5 @@ ApplyMemoryProtectionPolicy (
   //
   NewAttributes = GetPermissionAttributeForMemoryType (NewType);
 
-  return gCpu->SetMemoryAttributes (gCpu, Memory, Length, NewAttributes);
+  return gCpuSetMemoryAttributes (gCpu, Memory, Length, NewAttributes);
 }
