@@ -936,6 +936,8 @@ PeCoffLoaderRelocateImage (
   PHYSICAL_ADDRESS                     BaseAddress;
   UINT32                               NumberOfRvaAndSizes;
   UINT32                               TeStrippedOffset;
+  PHYSICAL_ADDRESS                     *RelocRangeStart;
+  PHYSICAL_ADDRESS                     *RelocRangeEnd;
 
   ASSERT (ImageContext != NULL);
 
@@ -1043,6 +1045,21 @@ PeCoffLoaderRelocateImage (
     // Run the relocation information and apply the fixups
     //
     FixupData = ImageContext->FixupData;
+    if (FixupData != NULL) {
+      FixupData = ALIGN_POINTER (FixupData, sizeof (PHYSICAL_ADDRESS));
+
+      //
+      // Use the first two UINT64s in the fixup data to keep track of the start
+      // and end of the region that is subject to relocation fixups.
+      //
+      RelocRangeStart = (PHYSICAL_ADDRESS *)FixupData;
+      RelocRangeEnd   = RelocRangeStart + 1;
+      FixupData      += 2 * sizeof (PHYSICAL_ADDRESS);
+
+      *RelocRangeStart = MAX_UINT64;
+      *RelocRangeEnd   = 0;
+    }
+
     while ((UINTN)RelocBase < (UINTN)RelocBaseEnd) {
       Reloc = (UINT16 *)((CHAR8 *)RelocBase + sizeof (EFI_IMAGE_BASE_RELOCATION));
       //
@@ -1068,6 +1085,14 @@ PeCoffLoaderRelocateImage (
       if (FixupBase == NULL) {
         ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
         return RETURN_LOAD_ERROR;
+      }
+
+      //
+      // Capture this page in the recorded relocation range
+      //
+      if (FixupData != NULL) {
+        *RelocRangeStart = MIN (*RelocRangeStart, (UINTN)FixupBase);
+        *RelocRangeEnd   = MAX (*RelocRangeEnd, (UINTN)FixupBase + SIZE_4KB);
       }
 
       //
@@ -1470,6 +1495,9 @@ PeCoffLoaderLoadImage (
   //
   ImageContext->FixupData = NULL;
 
+  // Add two UINT64s at the start to carry the min/max of the relocated range
+  ImageContext->FixupDataSize += 2 * sizeof (PHYSICAL_ADDRESS);
+
   //
   // Load the Codeview information if present
   //
@@ -1824,7 +1852,8 @@ PeCoffLoaderRelocateImageForRuntime (
     // by code will not be fixed up, since that would set them back to
     // defaults.
     //
-    FixupData     = RelocationData;
+    FixupData     = ALIGN_POINTER (RelocationData, sizeof (PHYSICAL_ADDRESS));
+    FixupData    += 2 * sizeof (PHYSICAL_ADDRESS);
     RelocBaseOrig = RelocBase;
     while ((UINTN)RelocBase < (UINTN)RelocBaseEnd) {
       //
@@ -1993,4 +2022,55 @@ PeCoffLoaderUnloadImage (
   //
   PeCoffLoaderUnloadImageExtraAction (ImageContext);
   return RETURN_SUCCESS;
+}
+
+/**
+  Retrieve the range subject to relocation fixups from the recorded fixup data
+  of a runtime image
+
+  @param       ImageBase           The base address of a PE/COFF image that has been loaded
+                                   and relocated into system memory.
+  @param       ImageSize           The size, in bytes, of the PE/COFF image.
+  @param       RelocationData      A pointer to the relocation data that was collected when the
+                                   PE/COFF image was relocated using PeCoffLoaderRelocateImage().
+  @param[out]  RelocationRangeMin  The start of the relocated range.
+  @param[out]  RelocationRangeMax  The end of the relocated range.
+
+**/
+VOID
+EFIAPI
+PeCoffLoaderGetRelocationRange (
+  IN  PHYSICAL_ADDRESS  ImageBase,
+  IN  UINTN             ImageSize,
+  IN  VOID              *RelocationData,
+  OUT PHYSICAL_ADDRESS  *RelocationRangeMin,
+  OUT PHYSICAL_ADDRESS  *RelocationRangeMax
+  )
+{
+  PHYSICAL_ADDRESS  *FixupData;
+
+  if ((RelocationData == NULL) || (ImageBase == 0x0)) {
+    return;
+  }
+
+  FixupData = ALIGN_POINTER (RelocationData, sizeof (PHYSICAL_ADDRESS));
+
+  if ((FixupData[0] == MAX_UINT64) && (FixupData[1] == 0)) {
+    // No fixups recorded
+    *RelocationRangeMin = ImageBase;
+    *RelocationRangeMax = ImageBase;
+    return;
+  }
+
+  if ((FixupData[0] < ImageBase) ||
+      (FixupData[1] > (ImageBase + ImageSize)))
+  {
+    ASSERT (FALSE);
+    *RelocationRangeMin = ImageBase;
+    *RelocationRangeMax = ImageBase + ImageSize;
+    return;
+  }
+
+  *RelocationRangeMin = FixupData[0];
+  *RelocationRangeMax = FixupData[1];
 }

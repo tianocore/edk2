@@ -382,4 +382,27 @@ PeCoffLoaderUnloadImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   );
 
+/**
+  Retrieve the range subject to relocation fixups from the recorded fixup data
+  of a runtime image
+
+  @param       ImageBase           The base address of a PE/COFF image that has been loaded
+                                   and relocated into system memory.
+  @param       ImageSize           The size, in bytes, of the PE/COFF image.
+  @param       RelocationData      A pointer to the relocation data that was collected when the
+                                   PE/COFF image was relocated using PeCoffLoaderRelocateImage().
+  @param[out]  RelocationRangeMin  The start of the relocated range.
+  @param[out]  RelocationRangeMax  The end of the relocated range.
+
+**/
+VOID
+EFIAPI
+PeCoffLoaderGetRelocationRange (
+  IN  PHYSICAL_ADDRESS  ImageBase,
+  IN  UINTN             ImageSize,
+  IN  VOID              *RelocationData,
+  OUT PHYSICAL_ADDRESS  *RelocationRangeMin,
+  OUT PHYSICAL_ADDRESS  *RelocationRangeMax
+  );
+
 #endif
