@@ -38,7 +38,7 @@
  .set    SCTLR_EL1_ITD,       0x1 << 7
  .set    SCTLR_EL1_RES1,      (0x1 << 11) | (0x1 << 20) | (0x1 << 22) | (0x1 << 28) | (0x1 << 29)
  .set    sctlrval, SCTLR_ELx_M | SCTLR_ELx_C | SCTLR_ELx_SA | SCTLR_EL1_ITD | SCTLR_EL1_SED
- .set    sctlrval, sctlrval | SCTLR_ELx_I | SCTLR_EL1_SPAN | SCTLR_EL1_RES1
+ .set    sctlrval, sctlrval | SCTLR_ELx_I | SCTLR_EL1_SPAN | SCTLR_EL1_RES1 | SCTLR_EL1_WXN
 
 
 ASM_FUNC(ArmPlatformPeiBootAction)

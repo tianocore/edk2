@@ -31,6 +31,7 @@
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_ARM_DLINK_FLAGS = -z common-page-size=0x1000
+  GCC:*_*_AARCH64_CC_FLAGS = -fpie
   GCC:*_*_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000
 
 [LibraryClasses.common]
