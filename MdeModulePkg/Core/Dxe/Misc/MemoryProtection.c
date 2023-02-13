@@ -1060,6 +1060,8 @@ MemoryProtectionExitBootServicesCallback (
 {
   EFI_RUNTIME_IMAGE_ENTRY  *RuntimeImage;
   LIST_ENTRY               *Link;
+  PHYSICAL_ADDRESS         RelocationRangeStart;
+  PHYSICAL_ADDRESS         RelocationRangeEnd;
 
   //
   // We need remove the RT protection, because RT relocation need write code segment
@@ -1073,7 +1075,22 @@ MemoryProtectionExitBootServicesCallback (
   if (mImageProtectionPolicy != 0) {
     for (Link = gRuntime->ImageHead.ForwardLink; Link != &gRuntime->ImageHead; Link = Link->ForwardLink) {
       RuntimeImage = BASE_CR (Link, EFI_RUNTIME_IMAGE_ENTRY, Link);
-      SetUefiImageMemoryAttributes ((UINT64)(UINTN)RuntimeImage->ImageBase, ALIGN_VALUE (RuntimeImage->ImageSize, EFI_PAGE_SIZE), 0);
+
+      PeCoffLoaderGetRelocationRange (
+        (PHYSICAL_ADDRESS)(UINTN)RuntimeImage->ImageBase,
+        (UINTN)ALIGN_VALUE (RuntimeImage->ImageSize, EFI_PAGE_SIZE),
+        RuntimeImage->RelocationData,
+        &RelocationRangeStart,
+        &RelocationRangeEnd
+        );
+
+      if (RelocationRangeEnd > RelocationRangeStart) {
+        SetUefiImageMemoryAttributes (
+          RelocationRangeStart,
+          (UINTN)(RelocationRangeEnd - RelocationRangeStart),
+          0
+          );
+      }
     }
   }
 }
