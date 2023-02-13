@@ -782,9 +782,7 @@ InitVariablePolicyLib (
     return EFI_ALREADY_STARTED;
   }
 
-  if (!EFI_ERROR (Status)) {
-    Status = VariablePolicyExtraInit ();
-  }
+  Status = VariablePolicyExtraInit ();
 
   if (!EFI_ERROR (Status)) {
     // Save an internal pointer to the GetVariableHelper.
@@ -841,9 +839,7 @@ DeinitVariablePolicyLib (
     return EFI_NOT_READY;
   }
 
-  if (!EFI_ERROR (Status)) {
-    Status = VariablePolicyExtraDeinit ();
-  }
+  Status = VariablePolicyExtraDeinit ();
 
   if (!EFI_ERROR (Status)) {
     mGetVariableHelper  = NULL;
