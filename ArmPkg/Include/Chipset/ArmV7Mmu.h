@@ -157,39 +157,24 @@
 #define TT_DESCRIPTOR_PAGE_BASE_ADDRESS(a)  ((a) & TT_DESCRIPTOR_PAGE_BASE_ADDRESS_MASK)
 #define TT_DESCRIPTOR_PAGE_BASE_SHIFT  12
 
-#define TT_DESCRIPTOR_SECTION_WRITE_BACK(NonSecure)     (TT_DESCRIPTOR_SECTION_TYPE_SECTION                                                           |     \
-                                                            ((NonSecure) ?  TT_DESCRIPTOR_SECTION_NS : 0)    | \
-                                                            TT_DESCRIPTOR_SECTION_NG_GLOBAL                         | \
-                                                            TT_DESCRIPTOR_SECTION_S_SHARED                          | \
-                                                            TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \
-                                                            TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
-                                                            TT_DESCRIPTOR_SECTION_AF                                | \
-                                                            TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC)
-#define TT_DESCRIPTOR_SECTION_WRITE_THROUGH(NonSecure)  (TT_DESCRIPTOR_SECTION_TYPE_SECTION                                                           |     \
-                                                            ((NonSecure) ?  TT_DESCRIPTOR_SECTION_NS : 0)    | \
-                                                            TT_DESCRIPTOR_SECTION_NG_GLOBAL                         | \
-                                                            TT_DESCRIPTOR_SECTION_S_SHARED                          | \
-                                                            TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \
-                                                            TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
-                                                            TT_DESCRIPTOR_SECTION_AF                                | \
-                                                            TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC)
-#define TT_DESCRIPTOR_SECTION_DEVICE(NonSecure)         (TT_DESCRIPTOR_SECTION_TYPE_SECTION                                                           |     \
-                                                            ((NonSecure) ?  TT_DESCRIPTOR_SECTION_NS : 0)    | \
-                                                            TT_DESCRIPTOR_SECTION_NG_GLOBAL                         | \
-                                                            TT_DESCRIPTOR_SECTION_S_NOT_SHARED                      | \
-                                                            TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \
-                                                            TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
-                                                            TT_DESCRIPTOR_SECTION_XN_MASK                           | \
-                                                            TT_DESCRIPTOR_SECTION_AF                                | \
-                                                            TT_DESCRIPTOR_SECTION_CACHE_POLICY_SHAREABLE_DEVICE)
-#define TT_DESCRIPTOR_SECTION_UNCACHED(NonSecure)       (TT_DESCRIPTOR_SECTION_TYPE_SECTION                                                           |    \
-                                                           ((NonSecure) ?  TT_DESCRIPTOR_SECTION_NS : 0)    | \
-                                                           TT_DESCRIPTOR_SECTION_NG_GLOBAL                         | \
-                                                           TT_DESCRIPTOR_SECTION_S_NOT_SHARED                      | \
-                                                           TT_DESCRIPTOR_SECTION_DOMAIN(0)                         | \
-                                                           TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
-                                                            TT_DESCRIPTOR_SECTION_AF                                | \
-                                                           TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE)
+#define TT_DESCRIPTOR_SECTION_DEFAULT  (TT_DESCRIPTOR_SECTION_TYPE_SECTION | \
+                                        TT_DESCRIPTOR_SECTION_NG_GLOBAL    | \
+                                        TT_DESCRIPTOR_SECTION_S_SHARED     | \
+                                        TT_DESCRIPTOR_SECTION_DOMAIN(0)    | \
+                                        TT_DESCRIPTOR_SECTION_AP_RW_RW     | \
+                                        TT_DESCRIPTOR_SECTION_AF)
+
+#define TT_DESCRIPTOR_SECTION_WRITE_BACK  (TT_DESCRIPTOR_SECTION_DEFAULT | \
+                                           TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC)
+
+#define TT_DESCRIPTOR_SECTION_WRITE_THROUGH  (TT_DESCRIPTOR_SECTION_DEFAULT | \
+                                              TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC)
+
+#define TT_DESCRIPTOR_SECTION_DEVICE  (TT_DESCRIPTOR_SECTION_DEFAULT | \
+                                       TT_DESCRIPTOR_SECTION_CACHE_POLICY_SHAREABLE_DEVICE)
+
+#define TT_DESCRIPTOR_SECTION_UNCACHED  (TT_DESCRIPTOR_SECTION_DEFAULT | \
+                                         TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE)
 
 #define TT_DESCRIPTOR_PAGE_WRITE_BACK     (TT_DESCRIPTOR_PAGE_TYPE_PAGE                                                           |          \
                                                         TT_DESCRIPTOR_PAGE_NG_GLOBAL                                                      | \
