@@ -1,0 +1,28 @@
+## @file
+#  Overlay implementation of DXE core gCpuSetMemoryAttributes for ARM.
+#
+#  Copyright (c) 2023, Google LLC. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = ArmSetMemoryOverrideLib
+  FILE_GUID                      = 849a43c0-6ad9-428e-8a5a-e090f7853bd3
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_CORE
+  CONSTRUCTOR                    = ArmSetMemoryOverrideLibConstructor
+
+[Sources.common]
+  ArmSetMemoryOverrideLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmMmuLib
+  DebugLib

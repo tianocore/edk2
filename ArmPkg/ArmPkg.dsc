@@ -119,6 +119,7 @@
   ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
   ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
   ArmPkg/Library/ArmExceptionLib/ArmRelocateExceptionLib.inf
+  ArmPkg/Library/ArmSetMemoryOverrideLib/ArmSetMemoryOverrideLib.inf
 
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
