@@ -202,6 +202,8 @@ Sha256HashAll (
   OUT  UINT8       *HashValue
   )
 {
+  SHA256_CTX  Context;
+
   //
   // Check input parameters.
   //
@@ -216,9 +218,17 @@ Sha256HashAll (
   //
   // OpenSSL SHA-256 Hash Computation.
   //
-  if (SHA256 (Data, DataSize, HashValue) == NULL) {
+  if (!SHA256_Init (&Context)) {
     return FALSE;
-  } else {
-    return TRUE;
   }
+
+  if (!SHA256_Update (&Context, Data, DataSize)) {
+    return FALSE;
+  }
+
+  if (!SHA256_Final (HashValue, &Context)) {
+    return FALSE;
+  }
+
+  return TRUE;
 }
