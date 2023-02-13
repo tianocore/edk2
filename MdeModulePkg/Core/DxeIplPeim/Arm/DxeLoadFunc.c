@@ -11,6 +11,73 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "DxeIpl.h"
 
 #include <Library/ArmMmuLib.h>
+#include <Library/PeCoffLib.h>
+
+/**
+  Discover the code sections of the DXE core, and remap them read-only
+  and executable.
+
+  @param DxeCoreEntryPoint  The entrypoint of the DXE core executable.
+  @param HobList            The list of HOBs passed to the DXE core from PEI.
+**/
+STATIC
+VOID
+RemapDxeCoreCodeReadOnly (
+  IN EFI_PHYSICAL_ADDRESS  DxeCoreEntryPoint,
+  IN EFI_PEI_HOB_POINTERS  HobList
+  )
+{
+  EFI_PEI_HOB_POINTERS                 Hob;
+  PE_COFF_LOADER_IMAGE_CONTEXT         ImageContext;
+  RETURN_STATUS                        Status;
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
+  EFI_IMAGE_SECTION_HEADER             *Section;
+  UINTN                                Index;
+
+  ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
+  ImageContext.Handle    = NULL;
+
+  //
+  // Find the module HOB for the DXE core
+  //
+  for (Hob.Raw = HobList.Raw; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if ((GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_MEMORY_ALLOCATION) &&
+        (CompareGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, &gEfiHobMemoryAllocModuleGuid)) &&
+        (Hob.MemoryAllocationModule->EntryPoint == DxeCoreEntryPoint))
+    {
+      ImageContext.Handle = (VOID *)(UINTN)Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
+      break;
+    }
+  }
+
+  ASSERT (ImageContext.Handle != NULL);
+
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
+  ASSERT_RETURN_ERROR (Status);
+
+  Hdr.Union = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((UINT8 *)ImageContext.Handle +
+                                                  ImageContext.PeCoffHeaderOffset);
+  ASSERT (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE);
+
+  Section = (EFI_IMAGE_SECTION_HEADER *)((UINT8 *)Hdr.Union + sizeof (UINT32) +
+                                         sizeof (EFI_IMAGE_FILE_HEADER) +
+                                         Hdr.Pe32->FileHeader.SizeOfOptionalHeader
+                                         );
+
+  for (Index = 0; Index < Hdr.Pe32->FileHeader.NumberOfSections; Index++) {
+    if ((Section[Index].Characteristics & EFI_IMAGE_SCN_CNT_CODE) != 0) {
+      ArmSetMemoryRegionReadOnly (
+        (UINTN)((UINT8 *)ImageContext.Handle + Section[Index].VirtualAddress),
+        Section[Index].Misc.VirtualSize
+        );
+
+      ArmClearMemoryRegionNoExec (
+        (UINTN)((UINT8 *)ImageContext.Handle + Section[Index].VirtualAddress),
+        Section[Index].Misc.VirtualSize
+        );
+    }
+  }
+}
 
 /**
    Transfers control to DxeCore.
@@ -32,6 +99,12 @@ HandOffToDxeCore (
   VOID        *BaseOfStack;
   VOID        *TopOfStack;
   EFI_STATUS  Status;
+
+  //
+  // DRAM may be mapped with non-executable permissions by default, so
+  // we'll need to map the DXE core code region executable explicitly.
+  //
+  RemapDxeCoreCodeReadOnly (DxeCoreEntryPoint, HobList);
 
   //
   // Allocate 128KB for the Stack

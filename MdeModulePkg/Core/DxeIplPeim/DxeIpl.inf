@@ -82,6 +82,7 @@
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   ArmMmuLib
+  PeCoffLib
 
 [Ppis]
   gEfiDxeIplPpiGuid                      ## PRODUCES
