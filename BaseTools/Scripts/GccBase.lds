@@ -21,9 +21,8 @@ SECTIONS {
   . = PECOFF_HEADER_SIZE;
 
   .text : ALIGN(CONSTANT(COMMONPAGESIZE)) {
-    *(.text .text.* .stub .gnu.linkonce.t.*)
+    *(.text .text.* .stub .gnu.linkonce.t.* .plt)
     *(.rodata .rodata.* .gnu.linkonce.r.*)
-    *(.got .got.*)
 
     /*
      * The contents of AutoGen.c files are mostly constant from the POV of the
@@ -34,6 +33,16 @@ SECTIONS {
      * emitted GUIDs here.
      */
     *:AutoGen.obj(.data.g*Guid)
+
+    /*
+     * AArch64 runtime drivers use 64k alignment, and may run in a mode where
+     * mutual exclusion of RO and XP mappings are hardware enforced. In such
+     * cases, the input sections below, which carry any quantities that are
+     * subject to relocation fixups at runtime, must not share a 4 KiB page
+     * with any code content.
+     */
+    . = ALIGN(CONSTANT(COMMONPAGESIZE) > 0x1000 ? 0x1000 : 0x20);
+    *(.got .got.* .data.rel.ro)
   }
 
   /*
