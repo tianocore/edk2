@@ -38,7 +38,6 @@ pull_request_rules:
     actions:
       queue:
         method: rebase
-        rebase_fallback: none
         name: default
 
   - name: Post a comment on a PR that can not be merged due to a merge conflict
