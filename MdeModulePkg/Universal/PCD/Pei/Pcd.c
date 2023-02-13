@@ -346,73 +346,75 @@ PcdPeimInit (
 {
   EFI_STATUS  Status;
 
-  Status = PeiServicesRegisterForShadow (FileHandle);
-  if (Status == EFI_ALREADY_STARTED) {
-    //
-    // This is now starting in memory, the second time starting.
-    //
-    EFI_PEI_PPI_DESCRIPTOR  *OldPpiList;
-    EFI_PEI_PPI_DESCRIPTOR  *OldPpiList2;
-    VOID                    *Ppi;
-    VOID                    *Ppi2;
+  if (PcdGetBool (PcdShadowPeimOnBoot)) {
+    Status = PeiServicesRegisterForShadow (FileHandle);
+    if (Status == EFI_ALREADY_STARTED) {
+      //
+      // This is now starting in memory, the second time starting.
+      //
+      EFI_PEI_PPI_DESCRIPTOR  *OldPpiList;
+      EFI_PEI_PPI_DESCRIPTOR  *OldPpiList2;
+      VOID                    *Ppi;
+      VOID                    *Ppi2;
 
-    OldPpiList = NULL;
-    Status     = PeiServicesLocatePpi (
-                   &gPcdPpiGuid,
-                   0,
-                   &OldPpiList,
-                   &Ppi
-                   );
-    ASSERT_EFI_ERROR (Status);
-
-    if (OldPpiList != NULL) {
-      Status = PeiServicesReInstallPpi (OldPpiList, &mPpiList[0]);
+      OldPpiList = NULL;
+      Status     = PeiServicesLocatePpi (
+                     &gPcdPpiGuid,
+                     0,
+                     &OldPpiList,
+                     &Ppi
+                     );
       ASSERT_EFI_ERROR (Status);
-    }
 
-    OldPpiList2 = NULL;
-    Status      = PeiServicesLocatePpi (
-                    &gGetPcdInfoPpiGuid,
-                    0,
-                    &OldPpiList2,
-                    &Ppi2
-                    );
-    ASSERT_EFI_ERROR (Status);
+      if (OldPpiList != NULL) {
+        Status = PeiServicesReInstallPpi (OldPpiList, &mPpiList[0]);
+        ASSERT_EFI_ERROR (Status);
+      }
 
-    if (OldPpiList2 != NULL) {
-      Status = PeiServicesReInstallPpi (OldPpiList2, &mPpiList2[0]);
+      OldPpiList2 = NULL;
+      Status      = PeiServicesLocatePpi (
+                      &gGetPcdInfoPpiGuid,
+                      0,
+                      &OldPpiList2,
+                      &Ppi2
+                      );
       ASSERT_EFI_ERROR (Status);
-    }
 
-    OldPpiList = NULL;
-    Status     = PeiServicesLocatePpi (
-                   &gEfiPeiPcdPpiGuid,
-                   0,
-                   &OldPpiList,
-                   &Ppi
-                   );
-    ASSERT_EFI_ERROR (Status);
+      if (OldPpiList2 != NULL) {
+        Status = PeiServicesReInstallPpi (OldPpiList2, &mPpiList2[0]);
+        ASSERT_EFI_ERROR (Status);
+      }
 
-    if (OldPpiList != NULL) {
-      Status = PeiServicesReInstallPpi (OldPpiList, &mPpiList[1]);
+      OldPpiList = NULL;
+      Status     = PeiServicesLocatePpi (
+                     &gEfiPeiPcdPpiGuid,
+                     0,
+                     &OldPpiList,
+                     &Ppi
+                     );
       ASSERT_EFI_ERROR (Status);
-    }
 
-    OldPpiList2 = NULL;
-    Status      = PeiServicesLocatePpi (
-                    &gEfiGetPcdInfoPpiGuid,
-                    0,
-                    &OldPpiList2,
-                    &Ppi2
-                    );
-    ASSERT_EFI_ERROR (Status);
+      if (OldPpiList != NULL) {
+        Status = PeiServicesReInstallPpi (OldPpiList, &mPpiList[1]);
+        ASSERT_EFI_ERROR (Status);
+      }
 
-    if (OldPpiList2 != NULL) {
-      Status = PeiServicesReInstallPpi (OldPpiList2, &mPpiList2[1]);
+      OldPpiList2 = NULL;
+      Status      = PeiServicesLocatePpi (
+                      &gEfiGetPcdInfoPpiGuid,
+                      0,
+                      &OldPpiList2,
+                      &Ppi2
+                      );
       ASSERT_EFI_ERROR (Status);
-    }
 
-    return Status;
+      if (OldPpiList2 != NULL) {
+        Status = PeiServicesReInstallPpi (OldPpiList2, &mPpiList2[1]);
+        ASSERT_EFI_ERROR (Status);
+      }
+
+      return Status;
+    }
   }
 
   BuildPcdDatabase (FileHandle);

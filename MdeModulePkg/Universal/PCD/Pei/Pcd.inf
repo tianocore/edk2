@@ -343,6 +343,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdNvStoreDefaultValueBuffer ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNvStoreDefaultId       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot          ## CONSUMES
 
 [Depex]
   TRUE
