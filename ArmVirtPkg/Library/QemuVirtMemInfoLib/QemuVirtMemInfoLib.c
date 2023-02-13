@@ -91,7 +91,7 @@ ArmVirtGetMemoryMap (
   VirtualMemoryTable[0].PhysicalBase = PcdGet64 (PcdSystemMemoryBase);
   VirtualMemoryTable[0].VirtualBase  = VirtualMemoryTable[0].PhysicalBase;
   VirtualMemoryTable[0].Length       = *(UINT64 *)GET_GUID_HOB_DATA (MemorySizeHob);
-  VirtualMemoryTable[0].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
+  VirtualMemoryTable[0].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_XP;
 
   DEBUG ((
     DEBUG_INFO,
