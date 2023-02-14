@@ -130,6 +130,7 @@ AcceptAllMemory (
   }
 
   gBS->FreePool (AllDescMap);
+  gBS->CloseEvent (mAcceptAllMemoryEvent);
   return Status;
 }
 
