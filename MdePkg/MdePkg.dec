@@ -257,6 +257,9 @@
   #
   UnitTestLib|Include/Library/UnitTestLib.h
 
+  ## @libraryclass Provides service to get the manufacturer given JEP106 bytes.
+  JedecJep106Lib|Include/Library/JedecJep106Lib.h
+
   ## @libraryclass Extension to BaseLib for host based unit tests that allows a
   #                subset of BaseLib services to be hooked for emulation.
   #
