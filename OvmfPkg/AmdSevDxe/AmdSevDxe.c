@@ -123,7 +123,6 @@ AcceptAllMemory (
     }
   }
 
-  gBS->FreePool (AllDescMap);
   return Status;
 }
 
