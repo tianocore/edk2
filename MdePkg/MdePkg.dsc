@@ -136,6 +136,8 @@
   MdePkg/Library/CcProbeLibNull/CcProbeLibNull.inf
   MdePkg/Library/SmmCpuRendezvousLibNull/SmmCpuRendezvousLibNull.inf
 
+  MdePkg/Library/JedecJep106Lib/JedecJep106Lib.inf
+
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   #
   # Add UEFI Target Based Unit Tests
