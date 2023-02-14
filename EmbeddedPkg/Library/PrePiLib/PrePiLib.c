@@ -105,6 +105,8 @@ LoadPeCoffImage (
   //
   InvalidateInstructionCacheRange ((VOID *)(UINTN)*ImageAddress, (UINTN)*ImageSize);
 
+  RemapDxeCore (&ImageContext);
+
   return Status;
 }
 

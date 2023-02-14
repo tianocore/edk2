@@ -37,4 +37,17 @@
 #define GET_GUID_HOB_DATA(GuidHob)       ((VOID *) (((UINT8 *) &((GuidHob)->Name)) + sizeof (EFI_GUID)))
 #define GET_GUID_HOB_DATA_SIZE(GuidHob)  (((GuidHob)->Header).HobLength - sizeof (EFI_HOB_GUID_TYPE))
 
+/**
+  Remap the code section of the DXE core with the read-only and executable
+  permissions.
+
+  @param  ImageContext    The image context describing the loaded PE/COFF image
+
+**/
+VOID
+EFIAPI
+RemapDxeCore (
+  IN  CONST PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+  );
+
 #endif

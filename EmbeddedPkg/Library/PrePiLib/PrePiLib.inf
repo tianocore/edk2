@@ -31,10 +31,19 @@
   FwVol.c
   PrePiLib.c
 
+[Sources.X64, Sources.IA32]
+  X86/RemapDxeCore.c
+
+[Sources.AARCH64, Sources.ARM]
+  Arm/RemapDxeCore.c
+
 [Packages]
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
+
+[Packages.ARM, Packages.AARCH64]
+  ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -49,6 +58,9 @@
   TimerLib
   PerformanceLib
   HobLib
+
+[LibraryClasses.ARM, LibraryClasses.AARCH64]
+  ArmMmuLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
