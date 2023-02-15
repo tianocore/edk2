@@ -13,7 +13,7 @@
             "Library/OpensslLib/IA32Gcc",
             "Library/OpensslLib/X64",
             "Library/OpensslLib/X64Gcc",
-            "Library/Include/openssl"
+            "Library/OpensslLib/openssl-gen",
         ]
     },
     "EccCheck": {
@@ -30,8 +30,7 @@
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
             "Library/OpensslLib/openssl",
-            "Library/Include/openssl",
-            "Library/Include/crypto",
+            "Library/OpensslLib/openssl-gen",
             # The unit testing folder is not to be checked
             "Test/UnitTest",
             # This has OpenSSL interfaces that aren't UEFI spec compliant
@@ -96,9 +95,7 @@
     # options defined in .pytool/Plugin/UncrustifyCheck
     "UncrustifyCheck": {
         "IgnoreFiles": [
-            "opensslconf.h",
-            "dso_conf.h",
-            "opensslconf_generated.h"
+            "Library/OpensslLib/openssl-gen"
         ]
     }
 }
