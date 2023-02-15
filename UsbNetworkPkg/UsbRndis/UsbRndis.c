@@ -8,14 +8,14 @@
 
 #include "UsbRndis.h"
 
-EFI_DRIVER_BINDING_PROTOCOL  gUsbRndisDriverBinding =3D {
+EFI_DRIVER_BINDING_PROTOCOL  gUsbRndisDriverBinding = 3D {
   UsbRndisDriverSupported,
   UsbRndisDriverStart,
   UsbRndisDriverStop,
   USB_RNDIS_DRIVER_VERSION,
   NULL,
   NULL
-};
+}
 
 /**
   Check if this interface is USB Rndis SubType
@@ -34,21 +34,21 @@ IsSupportedDevice (
   EFI_STATUS                    Status;
   EFI_USB_INTERFACE_DESCRIPTOR  InterfaceDescriptor;
 
-  Status =3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &InterfaceDescriptor);
+  Status = 3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &InterfaceDescriptor);
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
 
   // Check specific device/RNDIS and CDC-DATA
-  if (((InterfaceDescriptor.InterfaceClass =3D=3D 0x2) &&
-       (InterfaceDescriptor.InterfaceSubClass =3D=3D 0x2) &&
-       (InterfaceDescriptor.InterfaceProtocol =3D=3D 0xFF)) || \
-      ((InterfaceDescriptor.InterfaceClass =3D=3D 0xEF) &&
-       (InterfaceDescriptor.InterfaceSubClass =3D=3D 0x4) &&
-       (InterfaceDescriptor.InterfaceProtocol =3D=3D 0x1)) || \
-      ((InterfaceDescriptor.InterfaceClass =3D=3D 0xA) &&
-       (InterfaceDescriptor.InterfaceSubClass =3D=3D 0x0) &&
-       (InterfaceDescriptor.InterfaceProtocol =3D=3D 0x00))
+  if (((InterfaceDescriptor.InterfaceClass = 3D = 3D 0x2) &&
+       (InterfaceDescriptor.InterfaceSubClass = 3D = 3D 0x2) &&
+       (InterfaceDescriptor.InterfaceProtocol = 3D = 3D 0xFF)) || \
+      ((InterfaceDescriptor.InterfaceClass = 3D = 3D 0xEF) &&
+       (InterfaceDescriptor.InterfaceSubClass = 3D = 3D 0x4) &&
+       (InterfaceDescriptor.InterfaceProtocol = 3D = 3D 0x1)) || \
+      ((InterfaceDescriptor.InterfaceClass = 3D = 3D 0xA) &&
+       (InterfaceDescriptor.InterfaceSubClass = 3D = 3D 0x0) &&
+       (InterfaceDescriptor.InterfaceProtocol = 3D = 3D 0x00))
       )
   {
     return TRUE;
@@ -73,18 +73,18 @@ IsRndisInterface (
   EFI_STATUS                    Status;
   EFI_USB_INTERFACE_DESCRIPTOR  InterfaceDescriptor;
 
-  Status =3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &InterfaceDescriptor);
+  Status = 3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &InterfaceDescriptor);
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
 
   // Check for specific device/RNDIS and CDC-DATA
-  if (((InterfaceDescriptor.InterfaceClass =3D=3D 0x2) &&
-       (InterfaceDescriptor.InterfaceSubClass =3D=3D 0x2) &&
-       (InterfaceDescriptor.InterfaceProtocol =3D=3D 0xFF)) || \
-      ((InterfaceDescriptor.InterfaceClass =3D=3D 0xEF) &&
-       (InterfaceDescriptor.InterfaceSubClass =3D=3D 0x4) &&
-       (InterfaceDescriptor.InterfaceProtocol =3D=3D 0x1))
+  if (((InterfaceDescriptor.InterfaceClass = 3D = 3D 0x2) &&
+       (InterfaceDescriptor.InterfaceSubClass = 3D = 3D 0x2) &&
+       (InterfaceDescriptor.InterfaceProtocol = 3D = 3D 0xFF)) || \
+      ((InterfaceDescriptor.InterfaceClass = 3D = 3D 0xEF) &&
+       (InterfaceDescriptor.InterfaceSubClass = 3D = 3D 0x4) &&
+       (InterfaceDescriptor.InterfaceProtocol = 3D = 3D 0x1))
       )
   {
     return TRUE;
@@ -112,20 +112,20 @@ IsSameDevice (
   DEBUG ((DEBUG_VERBOSE, "IsSameDevice Entry \n"));
   while (1) {
     if (IsDevicePathEnd (NextDevicePathNode (UsbRndisDataPath))) {
-      if (((USB_DEVICE_PATH *)UsbRndisDataPath)->ParentPortNumber =3D=3D
-          ((USB_DEVICE_PATH *)UsbCdcDataPath)->ParentPortNumber)
+      if (((USB_DEVICE_PATH *)UsbRndisDataPath)->ParentPortNumber = 3D = 3D
+                                                                         ((USB_DEVICE_PATH *)UsbCdcDataPath)->ParentPortNumber)
       {
         return EFI_SUCCESS;
       } else {
         return EFI_UNSUPPORTED;
       }
     } else {
-      if (CompareMem (UsbCdcDataPath, UsbRndisDataPath, sizeof (EFI_DEVICE_PATH_PROTOCOL)) !=3D 0) {
+      if (CompareMem (UsbCdcDataPath, UsbRndisDataPath, sizeof (EFI_DEVICE_PATH_PROTOCOL)) != 3D 0) {
         return EFI_UNSUPPORTED;
       }
 
-      UsbRndisDataPath =3D NextDevicePathNode (UsbRndisDataPath);
-      UsbCdcDataPath   =3D NextDevicePathNode (UsbCdcDataPath);
+      UsbRndisDataPath = 3D NextDevicePathNode (UsbRndisDataPath);
+      UsbCdcDataPath   = 3D NextDevicePathNode (UsbCdcDataPath);
     }
   }
 
@@ -149,15 +149,15 @@ IsUsbCdcData (
   EFI_STATUS                    Status;
   EFI_USB_INTERFACE_DESCRIPTOR  InterfaceDescriptor;
 
-  Status =3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &InterfaceDescriptor);
+  Status = 3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &InterfaceDescriptor);
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
 
   // Check for CDC-DATA
-  if ((InterfaceDescriptor.InterfaceClass =3D=3D 0xA) &&
-      (InterfaceDescriptor.InterfaceSubClass =3D=3D 0x0) &&
-      (InterfaceDescriptor.InterfaceProtocol =3D=3D 0x0))
+  if ((InterfaceDescriptor.InterfaceClass = 3D = 3D 0xA) &&
+      (InterfaceDescriptor.InterfaceSubClass = 3D = 3D 0x0) &&
+      (InterfaceDescriptor.InterfaceProtocol = 3D = 3D 0x0))
   {
     return TRUE;
   }
@@ -182,15 +182,15 @@ IsUsbRndis (
   EFI_STATUS                    Status;
   EFI_USB_INTERFACE_DESCRIPTOR  InterfaceDescriptor;
 
-  Status =3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &InterfaceDescriptor);
+  Status = 3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &InterfaceDescriptor);
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
 
   // Check for Rndis
-  if ((InterfaceDescriptor.InterfaceClass =3D=3D 0x2) &&
-      (InterfaceDescriptor.InterfaceSubClass =3D=3D 0x2) &&
-      (InterfaceDescriptor.InterfaceProtocol =3D=3D 0xFF))
+  if ((InterfaceDescriptor.InterfaceClass = 3D = 3D 0x2) &&
+      (InterfaceDescriptor.InterfaceSubClass = 3D = 3D 0x2) &&
+      (InterfaceDescriptor.InterfaceProtocol = 3D = 3D 0xFF))
   {
     return TRUE;
   }
@@ -224,58 +224,58 @@ UpdateRndisDevice (
   EFI_USB_IO_PROTOCOL          *UsbIo;
   BOOLEAN                      IsRndisInterfaceFlag;
 
-  IsRndisInterfaceFlag =3D FALSE;
+  IsRndisInterfaceFlag = 3D FALSE;
 
-  Status =3D gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEdkIIUsbEthProtocolGuid,
-                  NULL,
-                  &HandleCount,
-                  &HandleBuffer
-                  );
+  Status = 3D gBS->LocateHandleBuffer (
+                     ByProtocol,
+                     &gEdkIIUsbEthProtocolGuid,
+                     NULL,
+                     &HandleCount,
+                     &HandleBuffer
+                     );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  for (Index =3D 0; Index < HandleCount; Index++) {
-    Status =3D gBS->HandleProtocol (
-                    HandleBuffer[Index],
-                    &gEdkIIUsbEthProtocolGuid,
-                    (VOID **)&UsbEthDevice
-                    );
+  for (Index = 3D 0; Index < HandleCount; Index++) {
+    Status = 3D gBS->HandleProtocol (
+                       HandleBuffer[Index],
+                       &gEdkIIUsbEthProtocolGuid,
+                       (VOID **)&UsbEthDevice
+                       );
     if (EFI_ERROR (Status)) {
       continue;
     }
 
-    Status =3D gBS->HandleProtocol (
-                    HandleBuffer[Index],
-                    &gEfiUsbIoProtocolGuid,
-                    (VOID **)&UsbIo
-                    );
+    Status = 3D gBS->HandleProtocol (
+                       HandleBuffer[Index],
+                       &gEfiUsbIoProtocolGuid,
+                       (VOID **)&UsbIo
+                       );
     if (EFI_ERROR (Status)) {
       continue;
     }
 
-    IsRndisInterfaceFlag =3D IsRndisInterface (UsbIo);
-    if (IsRndisInterfaceFlag =3D=3D FALSE) {
+    IsRndisInterfaceFlag = 3D IsRndisInterface (UsbIo);
+    if (IsRndisInterfaceFlag = 3D = 3D FALSE) {
       continue;
     }
 
-    Status =3D gBS->HandleProtocol (
-                    HandleBuffer[Index],
-                    &gEfiDevicePathProtocolGuid,
-                    (VOID **)&UsbRndisDataPath
-                    );
+    Status = 3D gBS->HandleProtocol (
+                       HandleBuffer[Index],
+                       &gEfiDevicePathProtocolGuid,
+                       (VOID **)&UsbRndisDataPath
+                       );
     if (EFI_ERROR (Status)) {
       continue;
     }
 
-    Status =3D IsSameDevice (UsbRndisDataPath, UsbCdcDataPath);
+    Status = 3D IsSameDevice (UsbRndisDataPath, UsbCdcDataPath);
 
     DEBUG ((DEBUG_VERBOSE, "Rndis IsSameDevice %r\n", Status));
 
     if (!EFI_ERROR (Status)) {
-      *UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (UsbEthDevice);
+      *UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (UsbEthDevice);
       FreePool (HandleBuffer);
       return EFI_SUCCESS;
     }
@@ -307,54 +307,54 @@ FindMatchingCdcData (
   EFI_DEVICE_PATH_PROTOCOL  *UsbCdcDataPath;
 
   // Find the parent RNDIS and update the UsbIo for the CDC device
-  Status =3D gBS->HandleProtocol (
-                  UsbRndisDevice->UsbRndisHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **)&UsbRndisDataPath
-                  );
+  Status = 3D gBS->HandleProtocol (
+                     UsbRndisDevice->UsbRndisHandle,
+                     &gEfiDevicePathProtocolGuid,
+                     (VOID **)&UsbRndisDataPath
+                     );
 
   if (EFI_ERROR (Status)) {
     return;
   }
 
-  Status =3D gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiUsbIoProtocolGuid,
-                  NULL,
-                  &HandleCount,
-                  &HandleBuffer
-                  );
+  Status = 3D gBS->LocateHandleBuffer (
+                     ByProtocol,
+                     &gEfiUsbIoProtocolGuid,
+                     NULL,
+                     &HandleCount,
+                     &HandleBuffer
+                     );
   if (EFI_ERROR (Status)) {
     return;
   }
 
-  for (Index =3D 0; Index < HandleCount; Index++) {
-    Status =3D gBS->HandleProtocol (
-                    HandleBuffer[Index],
-                    &gEfiUsbIoProtocolGuid,
-                    (VOID **)&UsbIo
-                    );
+  for (Index = 3D 0; Index < HandleCount; Index++) {
+    Status = 3D gBS->HandleProtocol (
+                       HandleBuffer[Index],
+                       &gEfiUsbIoProtocolGuid,
+                       (VOID **)&UsbIo
+                       );
     ASSERT_EFI_ERROR (Status);
 
     if (IsUsbCdcData (UsbIo)) {
       DEBUG ((DEBUG_VERBOSE, "Rndis FindMatchingCdcData CDCData interface found\n"));
 
-      Status =3D gBS->HandleProtocol (
-                      HandleBuffer[Index],
-                      &gEfiDevicePathProtocolGuid,
-                      (VOID **)&UsbCdcDataPath
-                      );
+      Status = 3D gBS->HandleProtocol (
+                         HandleBuffer[Index],
+                         &gEfiDevicePathProtocolGuid,
+                         (VOID **)&UsbCdcDataPath
+                         );
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_VERBOSE, "Rndis CDCData DevicePath not found\n"));
         FreePool (HandleBuffer);
         return;
       }
 
-      Status =3D IsSameDevice (UsbRndisDataPath, UsbCdcDataPath);
+      Status = 3D IsSameDevice (UsbRndisDataPath, UsbCdcDataPath);
       DEBUG ((DEBUG_VERBOSE, "Rndis IsSameDevice %r\n", Status));
       if (!EFI_ERROR (Status)) {
-        UsbRndisDevice->UsbCdcDataHandle =3D HandleBuffer[Index];
-        UsbRndisDevice->UsbIoCdcData     =3D UsbIo;
+        UsbRndisDevice->UsbCdcDataHandle = 3D HandleBuffer[Index];
+        UsbRndisDevice->UsbIoCdcData     = 3D UsbIo;
         GetEndpoint (UsbRndisDevice->UsbIoCdcData, UsbRndisDevice);
         FreePool (HandleBuffer);
         return;
@@ -394,53 +394,53 @@ FindMatchingRndisDev (
   EFI_DEVICE_PATH_PROTOCOL  *UsbCdcDataPath;
 
   // Find the parent RNDIS and update the UsbIo for the CDC device
-  Status =3D gBS->HandleProtocol (
-                  CdcHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **)&UsbCdcDataPath
-                  );
+  Status = 3D gBS->HandleProtocol (
+                     CdcHandle,
+                     &gEfiDevicePathProtocolGuid,
+                     (VOID **)&UsbCdcDataPath
+                     );
 
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status =3D gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiUsbIoProtocolGuid,
-                  NULL,
-                  &HandleCount,
-                  &HandleBuffer
-                  );
+  Status = 3D gBS->LocateHandleBuffer (
+                     ByProtocol,
+                     &gEfiUsbIoProtocolGuid,
+                     NULL,
+                     &HandleCount,
+                     &HandleBuffer
+                     );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  for (Index =3D 0; Index < HandleCount; Index++) {
-    Status =3D gBS->HandleProtocol (
-                    HandleBuffer[Index],
-                    &gEfiUsbIoProtocolGuid,
-                    (VOID **)&UsbIo
-                    );
+  for (Index = 3D 0; Index < HandleCount; Index++) {
+    Status = 3D gBS->HandleProtocol (
+                       HandleBuffer[Index],
+                       &gEfiUsbIoProtocolGuid,
+                       (VOID **)&UsbIo
+                       );
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
     if (IsUsbRndis (UsbIo)) {
-      Status =3D gBS->HandleProtocol (
-                      HandleBuffer[Index],
-                      &gEfiDevicePathProtocolGuid,
-                      (VOID **)&UsbRndisDataPath
-                      );
+      Status = 3D gBS->HandleProtocol (
+                         HandleBuffer[Index],
+                         &gEfiDevicePathProtocolGuid,
+                         (VOID **)&UsbRndisDataPath
+                         );
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "Usb Rndis DevicePath not found\n"));
         break;
       }
 
-      Status =3D IsSameDevice (UsbRndisDataPath, UsbCdcDataPath);
+      Status = 3D IsSameDevice (UsbRndisDataPath, UsbCdcDataPath);
 
       if (!EFI_ERROR (Status)) {
-        *RndisHandle =3D HandleBuffer[Index];
-        *CdcUsbIo    =3D UsbIo;
+        *RndisHandle = 3D HandleBuffer[Index];
+        *CdcUsbIo    = 3D UsbIo;
         FreePool (HandleBuffer);
         return Status;
       }
@@ -476,19 +476,19 @@ UsbRndisDriverSupported (
   EFI_STATUS           Status;
   EFI_USB_IO_PROTOCOL  *UsbIo;
 
-  Status =3D gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiUsbIoProtocolGuid,
-                  (VOID **)&UsbIo,
-                  This->DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
+  Status = 3D gBS->OpenProtocol (
+                     ControllerHandle,
+                     &gEfiUsbIoProtocolGuid,
+                     (VOID **)&UsbIo,
+                     This->DriverBindingHandle,
+                     ControllerHandle,
+                     EFI_OPEN_PROTOCOL_BY_DRIVER
+                     );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status =3D IsSupportedDevice (UsbIo) ? EFI_SUCCESS : EFI_UNSUPPORTED;
+  Status = 3D IsSupportedDevice (UsbIo) ? EFI_SUCCESS : EFI_UNSUPPORTED;
 
   gBS->CloseProtocol (
          ControllerHandle,
@@ -528,28 +528,28 @@ UsbRndisDriverStart (
   EFI_USB_INTERFACE_DESCRIPTOR  Interface;
   EFI_HANDLE                    RndisHandle;
 
-  RndisHandle =3D ControllerHandle;
+  RndisHandle = 3D ControllerHandle;
 
-  Status =3D gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiUsbIoProtocolGuid,
-                  (VOID **)&UsbIo,
-                  This->DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
+  Status = 3D gBS->OpenProtocol (
+                     ControllerHandle,
+                     &gEfiUsbIoProtocolGuid,
+                     (VOID **)&UsbIo,
+                     This->DriverBindingHandle,
+                     ControllerHandle,
+                     EFI_OPEN_PROTOCOL_BY_DRIVER
+                     );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status =3D gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **)&UsbEthPath,
-                  This->DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
+  Status = 3D gBS->OpenProtocol (
+                     ControllerHandle,
+                     &gEfiDevicePathProtocolGuid,
+                     (VOID **)&UsbEthPath,
+                     This->DriverBindingHandle,
+                     ControllerHandle,
+                     EFI_OPEN_PROTOCOL_BY_DRIVER
+                     );
   if (EFI_ERROR (Status)) {
     gBS->CloseProtocol (
            ControllerHandle,
@@ -572,24 +572,24 @@ UsbRndisDriverStart (
     DEBUG ((DEBUG_INFO, "Rndis CDCData interface found\n"));
 
     // Find the parent RNDIS and update the UsbIo for the CDC device
-    Status =3D UpdateRndisDevice (
-               UsbEthPath,
-               &UsbRndisDevice
-               );
+    Status = 3D UpdateRndisDevice (
+                  UsbEthPath,
+                  &UsbRndisDevice
+                  );
 
     if (!EFI_ERROR (Status)) {
       DEBUG ((DEBUG_INFO, "Rndis Matching interface found\n"));
-      UsbRndisDevice->UsbCdcDataHandle =3D ControllerHandle;
-      UsbRndisDevice->UsbIoCdcData     =3D UsbIo;
+      UsbRndisDevice->UsbCdcDataHandle = 3D ControllerHandle;
+      UsbRndisDevice->UsbIoCdcData     = 3D UsbIo;
       GetEndpoint (UsbRndisDevice->UsbIoCdcData, UsbRndisDevice);
       return Status;
     } else {
       // Check if RnDis exist
-      Status =3D FindMatchingRndisDev (
-                 ControllerHandle,
-                 &UsbIo,
-                 &RndisHandle
-                 );
+      Status = 3D FindMatchingRndisDev (
+                    ControllerHandle,
+                    &UsbIo,
+                    &RndisHandle
+                    );
 
       if (EFI_ERROR (Status)) {
         gBS->CloseProtocol (
@@ -603,7 +603,7 @@ UsbRndisDriverStart (
     }
   }
 
-  UsbRndisDevice =3D AllocateZeroPool (sizeof (USB_RNDIS_DEVICE));
+  UsbRndisDevice = 3D AllocateZeroPool (sizeof (USB_RNDIS_DEVICE));
 
   if (!UsbRndisDevice) {
     DEBUG ((DEBUG_ERROR, "AllocateZeroPool Fail\n"));
@@ -617,10 +617,10 @@ UsbRndisDriverStart (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status =3D LoadAllDescriptor (
-             UsbIo,
-             &UsbRndisDevice->Config
-             );
+  Status = 3D LoadAllDescriptor (
+                UsbIo,
+                &UsbRndisDevice->Config
+                );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a:LoadAllDescriptor status =3D %r\n", __FUNCTION__, Status));
     gBS->CloseProtocol (
@@ -633,10 +633,10 @@ UsbRndisDriverStart (
     return Status;
   }
 
-  Status =3D UsbIo->UsbGetInterfaceDescriptor (
-                    UsbIo,
-                    &Interface
-                    );
+  Status = 3D UsbIo->UsbGetInterfaceDescriptor (
+                       UsbIo,
+                       &Interface
+                       );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a:UsbGetInterfaceDescriptor status =3D %r\n", __FUNCTION__, Status));
     gBS->CloseProtocol (
@@ -650,47 +650,47 @@ UsbRndisDriverStart (
     return Status;
   }
 
-  UsbRndisDevice->Signature                          =3D USB_RNDIS_SIGNATURE;
-  UsbRndisDevice->NumOfInterface                     =3D Interface.InterfaceNumber;
-  UsbRndisDevice->UsbRndisHandle                     =3D RndisHandle;
-  UsbRndisDevice->UsbCdcDataHandle                   =3D 0;
-  UsbRndisDevice->UsbIo                              =3D UsbIo;
-  UsbRndisDevice->UsbEth.UsbEthReceive               =3D RndisUndiReceive;
-  UsbRndisDevice->UsbEth.UsbEthTransmit              =3D RndisUndiTransmit;
-  UsbRndisDevice->UsbEth.UsbEthInterrupt             =3D UsbRndisInterrupt;
-  UsbRndisDevice->UsbEth.UsbEthMacAddress            =3D GetUsbEthMacAddress;
-  UsbRndisDevice->UsbEth.UsbEthMaxBulkSize           =3D UsbEthBulkSize;
-  UsbRndisDevice->UsbEth.UsbHeaderFunDescriptor      =3D GetUsbHeaderFunDescriptor;
-  UsbRndisDevice->UsbEth.UsbUnionFunDescriptor       =3D GetUsbUnionFunDescriptor;
-  UsbRndisDevice->UsbEth.UsbEthFunDescriptor         =3D GetUsbRndisFunDescriptor;
-  UsbRndisDevice->UsbEth.SetUsbEthMcastFilter        =3D SetUsbRndisMcastFilter;
-  UsbRndisDevice->UsbEth.SetUsbEthPowerPatternFilter =3D SetUsbRndisPowerFilter;
-  UsbRndisDevice->UsbEth.GetUsbEthPowerPatternFilter =3D GetUsbRndisPowerFilter;
-  UsbRndisDevice->UsbEth.SetUsbEthPacketFilter       =3D SetUsbRndisPacketFilter;
-  UsbRndisDevice->UsbEth.GetUsbEthStatistic          =3D GetRndisStatistic;
+  UsbRndisDevice->Signature                          = 3D USB_RNDIS_SIGNATURE;
+  UsbRndisDevice->NumOfInterface                     = 3D Interface.InterfaceNumber;
+  UsbRndisDevice->UsbRndisHandle                     = 3D RndisHandle;
+  UsbRndisDevice->UsbCdcDataHandle                   = 3D 0;
+  UsbRndisDevice->UsbIo                              = 3D UsbIo;
+  UsbRndisDevice->UsbEth.UsbEthReceive               = 3D RndisUndiReceive;
+  UsbRndisDevice->UsbEth.UsbEthTransmit              = 3D RndisUndiTransmit;
+  UsbRndisDevice->UsbEth.UsbEthInterrupt             = 3D UsbRndisInterrupt;
+  UsbRndisDevice->UsbEth.UsbEthMacAddress            = 3D GetUsbEthMacAddress;
+  UsbRndisDevice->UsbEth.UsbEthMaxBulkSize           = 3D UsbEthBulkSize;
+  UsbRndisDevice->UsbEth.UsbHeaderFunDescriptor      = 3D GetUsbHeaderFunDescriptor;
+  UsbRndisDevice->UsbEth.UsbUnionFunDescriptor       = 3D GetUsbUnionFunDescriptor;
+  UsbRndisDevice->UsbEth.UsbEthFunDescriptor         = 3D GetUsbRndisFunDescriptor;
+  UsbRndisDevice->UsbEth.SetUsbEthMcastFilter        = 3D SetUsbRndisMcastFilter;
+  UsbRndisDevice->UsbEth.SetUsbEthPowerPatternFilter = 3D SetUsbRndisPowerFilter;
+  UsbRndisDevice->UsbEth.GetUsbEthPowerPatternFilter = 3D GetUsbRndisPowerFilter;
+  UsbRndisDevice->UsbEth.SetUsbEthPacketFilter       = 3D SetUsbRndisPacketFilter;
+  UsbRndisDevice->UsbEth.GetUsbEthStatistic          = 3D GetRndisStatistic;
 
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiGetState        =3D RndisDummyReturn;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiStart           =3D RndisUndiStart;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiStop            =3D RndisUndiStop;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiGetInitInfo     =3D RndisUndiGetInitInfo;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiGetConfigInfo   =3D RndisUndiGetConfigInfo;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiInitialize      =3D RndisUndiInitialize;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiReset           =3D RndisUndiReset;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiShutdown        =3D RndisUndiShutdown;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiInterruptEnable =3D RndisDummyReturn;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiReceiveFilter   =3D RndisUndiReceiveFilter;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiStationAddress  =3D RndisDummyReturn;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiStatistics      =3D NULL;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiMcastIp2Mac     =3D RndisDummyReturn;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiNvData          =3D RndisDummyReturn;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiGetStatus       =3D RndisUndiGetStatus;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiFillHeader      =3D RndisDummyReturn;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiTransmit        =3D NULL;
-  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiReceive         =3D NULL;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiGetState        = 3D RndisDummyReturn;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiStart           = 3D RndisUndiStart;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiStop            = 3D RndisUndiStop;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiGetInitInfo     = 3D RndisUndiGetInitInfo;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiGetConfigInfo   = 3D RndisUndiGetConfigInfo;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiInitialize      = 3D RndisUndiInitialize;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiReset           = 3D RndisUndiReset;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiShutdown        = 3D RndisUndiShutdown;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiInterruptEnable = 3D RndisDummyReturn;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiReceiveFilter   = 3D RndisUndiReceiveFilter;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiStationAddress  = 3D RndisDummyReturn;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiStatistics      = 3D NULL;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiMcastIp2Mac     = 3D RndisDummyReturn;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiNvData          = 3D RndisDummyReturn;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiGetStatus       = 3D RndisUndiGetStatus;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiFillHeader      = 3D RndisDummyReturn;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiTransmit        = 3D NULL;
+  UsbRndisDevice->UsbEth.UsbEthUndi.UsbEthUndiReceive         = 3D NULL;
 
-  UsbRndisDevice->MaxTransferSize       =3D RNDIS_MAX_TRANSFER_SIZE;
-  UsbRndisDevice->MaxPacketsPerTransfer =3D 1;
-  UsbRndisDevice->PacketAlignmentFactor =3D 0;
+  UsbRndisDevice->MaxTransferSize       = 3D RNDIS_MAX_TRANSFER_SIZE;
+  UsbRndisDevice->MaxPacketsPerTransfer = 3D 1;
+  UsbRndisDevice->PacketAlignmentFactor = 3D 0;
 
   InitializeListHead (&UsbRndisDevice->ReceivePacketList);
 
@@ -698,12 +698,12 @@ UsbRndisDriverStart (
   FindMatchingCdcData (UsbRndisDevice);
 
   if (UsbRndisDevice->UsbIoCdcData) {
-    Status =3D gBS->InstallProtocolInterface (
-                    &ControllerHandle,
-                    &gEdkIIUsbEthProtocolGuid,
-                    EFI_NATIVE_INTERFACE,
-                    &(UsbRndisDevice->UsbEth)
-                    );
+    Status = 3D gBS->InstallProtocolInterface (
+                       &ControllerHandle,
+                       &gEdkIIUsbEthProtocolGuid,
+                       EFI_NATIVE_INTERFACE,
+                       &(UsbRndisDevice->UsbEth)
+                       );
     if (EFI_ERROR (Status)) {
       gBS->CloseProtocol (
              ControllerHandle,
@@ -751,25 +751,25 @@ CheckandStopRndisDevice (
   EFI_STATUS           Status;
   EFI_USB_IO_PROTOCOL  *UsbIo;
 
-  Status =3D gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiUsbIoProtocolGuid,
-                  (VOID **)&UsbIo,
-                  This->DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
+  Status = 3D gBS->OpenProtocol (
+                     ControllerHandle,
+                     &gEfiUsbIoProtocolGuid,
+                     (VOID **)&UsbIo,
+                     This->DriverBindingHandle,
+                     ControllerHandle,
+                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                     );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   if (IsUsbRndis (UsbIo)) {
-    Status =3D gBS->CloseProtocol (
-                    ControllerHandle,
-                    &gEfiUsbIoProtocolGuid,
-                    This->DriverBindingHandle,
-                    ControllerHandle
-                    );
+    Status = 3D gBS->CloseProtocol (
+                       ControllerHandle,
+                       &gEfiUsbIoProtocolGuid,
+                       This->DriverBindingHandle,
+                       ControllerHandle
+                       );
     DEBUG ((DEBUG_ERROR, "Rndis ControllerHandle Stop %r\n", Status));
     return Status;
   }
@@ -805,46 +805,46 @@ UsbRndisDriverStop (
 
   DEBUG ((DEBUG_INFO, "UsbRndisDriverStop ControllerHandle %lx\n", ControllerHandle));
 
-  Status =3D gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEdkIIUsbEthProtocolGuid,
-                  (VOID **)&UsbEthProtocol,
-                  This->DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
+  Status = 3D gBS->OpenProtocol (
+                     ControllerHandle,
+                     &gEdkIIUsbEthProtocolGuid,
+                     (VOID **)&UsbEthProtocol,
+                     This->DriverBindingHandle,
+                     ControllerHandle,
+                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                     );
   if (EFI_ERROR (Status)) {
-    Status =3D CheckandStopRndisDevice (This, ControllerHandle);
+    Status = 3D CheckandStopRndisDevice (This, ControllerHandle);
     return Status;
   }
 
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (UsbEthProtocol);
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (UsbEthProtocol);
 
-  Status =3D gBS->CloseProtocol (
-                  UsbRndisDevice->UsbCdcDataHandle,
-                  &gEfiUsbIoProtocolGuid,
-                  This->DriverBindingHandle,
-                  UsbRndisDevice->UsbCdcDataHandle
-                  );
+  Status = 3D gBS->CloseProtocol (
+                     UsbRndisDevice->UsbCdcDataHandle,
+                     &gEfiUsbIoProtocolGuid,
+                     This->DriverBindingHandle,
+                     UsbRndisDevice->UsbCdcDataHandle
+                     );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a:CloseProtocol status =3D %r\n", __FUNCTION__, Status));
   }
 
-  Status =3D gBS->UninstallProtocolInterface (
-                  ControllerHandle,
-                  &gEdkIIUsbEthProtocolGuid,
-                  UsbEthProtocol
-                  );
+  Status = 3D gBS->UninstallProtocolInterface (
+                     ControllerHandle,
+                     &gEdkIIUsbEthProtocolGuid,
+                     UsbEthProtocol
+                     );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status =3D gBS->CloseProtocol (
-                  ControllerHandle,
-                  &gEfiUsbIoProtocolGuid,
-                  This->DriverBindingHandle,
-                  ControllerHandle
-                  );
+  Status = 3D gBS->CloseProtocol (
+                     ControllerHandle,
+                     &gEfiUsbIoProtocolGuid,
+                     This->DriverBindingHandle,
+                     ControllerHandle
+                     );
 
   FreePool (UsbRndisDevice->Config);
   FreePool (UsbRndisDevice);
@@ -872,8 +872,8 @@ UsbRndisEntry (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  gUsbRndisDriverBinding.DriverBindingHandle =3D ImageHandle;
-  gUsbRndisDriverBinding.ImageHandle         =3D ImageHandle;
+  gUsbRndisDriverBinding.DriverBindingHandle = 3D ImageHandle;
+  gUsbRndisDriverBinding.ImageHandle         = 3D ImageHandle;
 
   return gBS->InstallMultipleProtocolInterfaces (
                 &gUsbRndisDriverBinding.DriverBindingHandle,

@@ -33,20 +33,20 @@ LoadAllDescriptor (
   UINT32                     TransStatus;
   EFI_USB_CONFIG_DESCRIPTOR  Tmp;
 
-  Status =3D UsbIo->UsbGetConfigDescriptor (UsbIo, &Tmp);
+  Status = 3D UsbIo->UsbGetConfigDescriptor (UsbIo, &Tmp);
   ASSERT_EFI_ERROR (Status);
 
-  Status =3D gBS->AllocatePool (EfiBootServicesData, Tmp.TotalLength, (VOID **)ConfigDesc);
+  Status = 3D gBS->AllocatePool (EfiBootServicesData, Tmp.TotalLength, (VOID **)ConfigDesc);
   ASSERT_EFI_ERROR (Status);
 
-  Status =3D UsbGetDescriptor (
-             UsbIo,
-             USB_DESC_TYPE_CONFIG << 8 | (Tmp.ConfigurationValue - 1),                   // zero based
-             0,
-             Tmp.TotalLength,
-             *ConfigDesc,
-             &TransStatus
-             );
+  Status = 3D UsbGetDescriptor (
+                UsbIo,
+                USB_DESC_TYPE_CONFIG << 8 | (Tmp.ConfigurationValue - 1),                // zero based
+                0,
+                Tmp.TotalLength,
+                *ConfigDesc,
+                &TransStatus
+                );
   return Status;
 }
 
@@ -67,16 +67,16 @@ NextDescriptor (
   IN OUT UINTN                  *Offset
   )
 {
-  if ((Desc =3D=3D NULL) || (*Offset >=3D Desc->TotalLength)) {
+  if ((Desc = 3D = 3D NULL) || (*Offset >= 3D Desc->TotalLength)) {
     return FALSE;
   }
 
-  if (((EFI_USB_CONFIG_DESCRIPTOR *)((char *)Desc+*Offset))->Length =3D=3D 0) {
+  if (((EFI_USB_CONFIG_DESCRIPTOR *)((char *)Desc+*Offset))->Length = 3D = 3D 0) {
     return FALSE;
   }
 
-  *Offset +=3D ((EFI_USB_CONFIG_DESCRIPTOR *)((char *)Desc+*Offset))->Length;
-  if ( *Offset >=3D Desc->TotalLength ) {
+  *Offset += 3D ((EFI_USB_CONFIG_DESCRIPTOR *)((char *)Desc+*Offset))->Length;
+  if ( *Offset >= 3D Desc->TotalLength ) {
     return FALSE;
   }
 
@@ -107,12 +107,12 @@ GetFunctionalDescriptor (
   UINTN                         Offset;
   EFI_USB_INTERFACE_DESCRIPTOR  *Interface;
 
-  Status =3D EFI_NOT_FOUND;
+  Status = 3D EFI_NOT_FOUND;
 
-  for (Offset =3D 0; NextDescriptor (Config, &Offset);) {
-    Interface =3D (EFI_USB_INTERFACE_DESCRIPTOR *)((UINT8 *)Config + Offset);
-    if (Interface->DescriptorType =3D=3D CS_INTERFACE) {
-      if (((USB_HEADER_FUN_DESCRIPTOR *)Interface)->DescriptorSubtype =3D=3D FunDescriptorType) {
+  for (Offset = 3D 0; NextDescriptor (Config, &Offset);) {
+    Interface = 3D (EFI_USB_INTERFACE_DESCRIPTOR *)((UINT8 *)Config + Offset);
+    if (Interface->DescriptorType = 3D = 3D CS_INTERFACE) {
+      if (((USB_HEADER_FUN_DESCRIPTOR *)Interface)->DescriptorSubtype = 3D = 3D FunDescriptorType) {
         switch (FunDescriptorType) {
           case HEADER_FUN_DESCRIPTOR:
             CopyMem (
@@ -136,7 +136,7 @@ GetFunctionalDescriptor (
               );
             return EFI_SUCCESS;
           default:
-            Status =3D EFI_UNSUPPORTED;
+            Status = 3D EFI_UNSUPPORTED;
             break;
         }
       }
@@ -165,32 +165,32 @@ GetEndpoint (
   EFI_USB_INTERFACE_DESCRIPTOR  Interface;
   EFI_USB_ENDPOINT_DESCRIPTOR   Endpoint;
 
-  Status =3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &Interface);
+  Status = 3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &Interface);
   ASSERT_EFI_ERROR (Status);
 
-  if (Interface.NumEndpoints =3D=3D 0) {
-    Status =3D UsbSetInterface (UsbIo, Interface.InterfaceNumber, 1, &Result);
+  if (Interface.NumEndpoints = 3D = 3D 0) {
+    Status = 3D UsbSetInterface (UsbIo, Interface.InterfaceNumber, 1, &Result);
     ASSERT_EFI_ERROR (Status);
 
-    Status =3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &Interface);
+    Status = 3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &Interface);
     ASSERT_EFI_ERROR (Status);
   }
 
-  for (Index =3D 0; Index < Interface.NumEndpoints; Index++) {
-    Status =3D UsbIo->UsbGetEndpointDescriptor (UsbIo, Index, &Endpoint);
+  for (Index = 3D 0; Index < Interface.NumEndpoints; Index++) {
+    Status = 3D UsbIo->UsbGetEndpointDescriptor (UsbIo, Index, &Endpoint);
     ASSERT_EFI_ERROR (Status);
 
     switch ((Endpoint.Attributes & (BIT0 | BIT1))) {
       case USB_ENDPOINT_BULK:
         if (Endpoint.EndpointAddress & BIT7) {
-          UsbEthDriver->BulkInEndpoint =3D Endpoint.EndpointAddress;
+          UsbEthDriver->BulkInEndpoint = 3D Endpoint.EndpointAddress;
         } else {
-          UsbEthDriver->BulkOutEndpoint =3D Endpoint.EndpointAddress;
+          UsbEthDriver->BulkOutEndpoint = 3D Endpoint.EndpointAddress;
         }
 
         break;
       case USB_ENDPOINT_INTERRUPT:
-        UsbEthDriver->InterruptEndpoint =3D Endpoint.EndpointAddress;
+        UsbEthDriver->InterruptEndpoint = 3D Endpoint.EndpointAddress;
         break;
     }
   }
@@ -232,81 +232,81 @@ UsbEthReceive (
   USB_NCM_DATAGRAM_POINTER_16  *Ndp;
   USB_NCM_DATA_GRAM            *Datagram;
 
-  UsbEthDriver =3D USB_ETHERNET_DEV_FROM_THIS (This);
-  TotalLength  =3D 0;
+  UsbEthDriver = 3D USB_ETHERNET_DEV_FROM_THIS (This);
+  TotalLength  = 3D 0;
 
-  if (UsbEthDriver->TotalDatagram =3D=3D UsbEthDriver->NowDatagram) {
-    Status =3D gBS->HandleProtocol (
-                    UsbEthDriver->UsbCdcDataHandle,
-                    &gEfiUsbIoProtocolGuid,
-                    (VOID **)&UsbIo
-                    );
+  if (UsbEthDriver->TotalDatagram = 3D = 3D UsbEthDriver->NowDatagram) {
+    Status = 3D gBS->HandleProtocol (
+                       UsbEthDriver->UsbCdcDataHandle,
+                       &gEfiUsbIoProtocolGuid,
+                       (VOID **)&UsbIo
+                       );
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
-    if (UsbEthDriver->BulkInEndpoint =3D=3D 0) {
+    if (UsbEthDriver->BulkInEndpoint = 3D = 3D 0) {
       GetEndpoint (UsbIo, UsbEthDriver);
     }
 
-    BulkDataLenght =3D USB_NCM_MAX_NTB_SIZE;
+    BulkDataLenght = 3D USB_NCM_MAX_NTB_SIZE;
     SetMem (UsbEthDriver->BulkBuffer, BulkDataLenght, 0);
-    UsbEthDriver->NowDatagram   =3D 0;
-    UsbEthDriver->TotalDatagram =3D 0;
+    UsbEthDriver->NowDatagram   = 3D 0;
+    UsbEthDriver->TotalDatagram = 3D 0;
 
-    Status =3D UsbIo->UsbBulkTransfer (
-                      UsbIo,
-                      UsbEthDriver->BulkInEndpoint,
-                      UsbEthDriver->BulkBuffer,
-                      &BulkDataLenght,
-                      USB_ETHERNET_BULK_TIMEOUT,
-                      &TransStatus
-                      );
+    Status = 3D UsbIo->UsbBulkTransfer (
+                         UsbIo,
+                         UsbEthDriver->BulkInEndpoint,
+                         UsbEthDriver->BulkBuffer,
+                         &BulkDataLenght,
+                         USB_ETHERNET_BULK_TIMEOUT,
+                         &TransStatus
+                         );
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
-    Nth                         =3D (USB_NCM_TRANSFER_HEADER_16 *)UsbEthDriver->BulkBuffer;
-    Ndp                         =3D (USB_NCM_DATAGRAM_POINTER_16 *)((UINT8 *)UsbEthDriver->BulkBuffer + Nth->NdpIndex);
-    Datagram                    =3D (USB_NCM_DATA_GRAM *)((UINT8 *)Ndp + sizeof (USB_NCM_DATAGRAM_POINTER_16));
-    UsbEthDriver->TotalDatagram =3D (UINT8)((Ndp->Length - 8) / 4 - 1);
+    Nth                         = 3D (USB_NCM_TRANSFER_HEADER_16 *)UsbEthDriver->BulkBuffer;
+    Ndp                         = 3D (USB_NCM_DATAGRAM_POINTER_16 *)((UINT8 *)UsbEthDriver->BulkBuffer + Nth->NdpIndex);
+    Datagram                    = 3D (USB_NCM_DATA_GRAM *)((UINT8 *)Ndp + sizeof (USB_NCM_DATAGRAM_POINTER_16));
+    UsbEthDriver->TotalDatagram = 3D (UINT8)((Ndp->Length - 8) / 4 - 1);
 
-    for (Index =3D 0; Index < UsbEthDriver->TotalDatagram; Index++) {
-      TotalLength +=3D Datagram->DatagramLength;
-      Datagram     =3D (USB_NCM_DATA_GRAM *)((UINT8 *)Datagram + sizeof (USB_NCM_DATA_GRAM));
+    for (Index = 3D 0; Index < UsbEthDriver->TotalDatagram; Index++) {
+      TotalLength += 3D Datagram->DatagramLength;
+      Datagram     = 3D (USB_NCM_DATA_GRAM *)((UINT8 *)Datagram + sizeof (USB_NCM_DATA_GRAM));
     }
 
     if (TotalLength < USB_ETHERNET_FRAME_SIZE) {
-      Datagram =3D (USB_NCM_DATA_GRAM *)((UINT8 *)Ndp + sizeof (USB_NCM_DATAGRAM_POINTER_16));
+      Datagram = 3D (USB_NCM_DATA_GRAM *)((UINT8 *)Ndp + sizeof (USB_NCM_DATAGRAM_POINTER_16));
 
-      TotalLength =3D 0;
-      for (Index =3D 0; Index < UsbEthDriver->TotalDatagram; Index++) {
+      TotalLength = 3D 0;
+      for (Index = 3D 0; Index < UsbEthDriver->TotalDatagram; Index++) {
         CopyMem ((UINT8 *)Packet + TotalLength, (UINT8 *)UsbEthDriver->BulkBuffer + Datagram->DatagramIndex, Datagram->DatagramLength);
-        TotalLength +=3D Datagram->DatagramLength;
-        Datagram     =3D (USB_NCM_DATA_GRAM *)((UINT8 *)Datagram + sizeof (USB_NCM_DATA_GRAM));
+        TotalLength += 3D Datagram->DatagramLength;
+        Datagram     = 3D (USB_NCM_DATA_GRAM *)((UINT8 *)Datagram + sizeof (USB_NCM_DATA_GRAM));
       }
 
-      *PacketLength             =3D TotalLength;
-      UsbEthDriver->NowDatagram =3D UsbEthDriver->TotalDatagram;
+      *PacketLength             = 3D TotalLength;
+      UsbEthDriver->NowDatagram = 3D UsbEthDriver->TotalDatagram;
     } else {
       UsbEthDriver->NowDatagram++;
 
-      Datagram =3D (USB_NCM_DATA_GRAM *)((UINT8 *)Ndp + sizeof (USB_NCM_DATAGRAM_POINTER_16));
+      Datagram = 3D (USB_NCM_DATA_GRAM *)((UINT8 *)Ndp + sizeof (USB_NCM_DATAGRAM_POINTER_16));
       CopyMem (Packet, (UINT8 *)UsbEthDriver->BulkBuffer + Datagram->DatagramIndex, Datagram->DatagramLength);
-      *PacketLength =3D Datagram->DatagramLength;
+      *PacketLength = 3D Datagram->DatagramLength;
     }
 
     return Status;
   } else {
     UsbEthDriver->NowDatagram++;
 
-    Nth      =3D (USB_NCM_TRANSFER_HEADER_16 *)UsbEthDriver->BulkBuffer;
-    Ndp      =3D (USB_NCM_DATAGRAM_POINTER_16 *)((UINT8 *)UsbEthDriver->BulkBuffer + Nth->NdpIndex);
-    Datagram =3D (USB_NCM_DATA_GRAM *)((UINT8 *)Ndp + sizeof (USB_NCM_DATAGRAM_POINTER_16));
-    Datagram =3D (USB_NCM_DATA_GRAM *)((UINT8 *)Datagram + sizeof (USB_NCM_DATA_GRAM) * (UsbEthDriver->NowDatagram - 1));
+    Nth      = 3D (USB_NCM_TRANSFER_HEADER_16 *)UsbEthDriver->BulkBuffer;
+    Ndp      = 3D (USB_NCM_DATAGRAM_POINTER_16 *)((UINT8 *)UsbEthDriver->BulkBuffer + Nth->NdpIndex);
+    Datagram = 3D (USB_NCM_DATA_GRAM *)((UINT8 *)Ndp + sizeof (USB_NCM_DATAGRAM_POINTER_16));
+    Datagram = 3D (USB_NCM_DATA_GRAM *)((UINT8 *)Datagram + sizeof (USB_NCM_DATA_GRAM) * (UsbEthDriver->NowDatagram - 1));
 
     CopyMem (Packet, (UINT8 *)UsbEthDriver->BulkBuffer + Datagram->DatagramIndex, Datagram->DatagramLength);
-    *PacketLength =3D Datagram->DatagramLength;
+    *PacketLength = 3D Datagram->DatagramLength;
 
     return EFI_SUCCESS;
   }
@@ -347,58 +347,58 @@ UsbEthTransmit (
   UINT8                        *TotalPacket;
   UINTN                        TotalLength;
 
-  UsbEthDriver =3D USB_ETHERNET_DEV_FROM_THIS (This);
+  UsbEthDriver = 3D USB_ETHERNET_DEV_FROM_THIS (This);
 
-  Status =3D gBS->HandleProtocol (
-                  UsbEthDriver->UsbCdcDataHandle,
-                  &gEfiUsbIoProtocolGuid,
-                  (VOID **)&UsbIo
-                  );
+  Status = 3D gBS->HandleProtocol (
+                     UsbEthDriver->UsbCdcDataHandle,
+                     &gEfiUsbIoProtocolGuid,
+                     (VOID **)&UsbIo
+                     );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  if (UsbEthDriver->BulkOutEndpoint =3D=3D 0) {
+  if (UsbEthDriver->BulkOutEndpoint = 3D = 3D 0) {
     GetEndpoint (UsbIo, UsbEthDriver);
   }
 
-  TotalLength =3D (UINTN)(USB_NCM_NTH_LENGTH + USB_NCM_NDP_LENGTH + (*PacketLength));
+  TotalLength = 3D (UINTN)(USB_NCM_NTH_LENGTH + USB_NCM_NDP_LENGTH + (*PacketLength));
 
-  Status =3D gBS->AllocatePool (EfiBootServicesData, TotalLength, (VOID **)&TotalPacket);
+  Status = 3D gBS->AllocatePool (EfiBootServicesData, TotalLength, (VOID **)&TotalPacket);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   SetMem (TotalPacket, TotalLength, 0);
 
-  Nth               =3D (USB_NCM_TRANSFER_HEADER_16 *)TotalPacket;
-  Nth->Signature    =3D USB_NCM_NTH_SIGN_16;
-  Nth->HeaderLength =3D USB_NCM_NTH_LENGTH;
-  Nth->Sequence     =3D UsbEthDriver->BulkOutSequence++;
-  Nth->BlockLength  =3D (UINT16)TotalLength;
-  Nth->NdpIndex     =3D Nth->HeaderLength;
+  Nth               = 3D (USB_NCM_TRANSFER_HEADER_16 *)TotalPacket;
+  Nth->Signature    = 3D USB_NCM_NTH_SIGN_16;
+  Nth->HeaderLength = 3D USB_NCM_NTH_LENGTH;
+  Nth->Sequence     = 3D UsbEthDriver->BulkOutSequence++;
+  Nth->BlockLength  = 3D (UINT16)TotalLength;
+  Nth->NdpIndex     = 3D Nth->HeaderLength;
 
-  Ndp               =3D (USB_NCM_DATAGRAM_POINTER_16 *)((UINT8 *)TotalPacket + Nth->NdpIndex);
-  Ndp->Signature    =3D USB_NCM_NDP_SIGN_16;
-  Ndp->Length       =3D USB_NCM_NDP_LENGTH;
-  Ndp->NextNdpIndex =3D 0x00;
+  Ndp               = 3D (USB_NCM_DATAGRAM_POINTER_16 *)((UINT8 *)TotalPacket + Nth->NdpIndex);
+  Ndp->Signature    = 3D USB_NCM_NDP_SIGN_16;
+  Ndp->Length       = 3D USB_NCM_NDP_LENGTH;
+  Ndp->NextNdpIndex = 3D 0x00;
 
-  Datagram                 =3D (USB_NCM_DATA_GRAM *)((UINT8 *)Ndp + sizeof (USB_NCM_DATAGRAM_POINTER_16));
-  Datagram->DatagramIndex  =3D Nth->HeaderLength + Ndp->Length;
-  Datagram->DatagramLength =3D (UINT16)*PacketLength;
+  Datagram                 = 3D (USB_NCM_DATA_GRAM *)((UINT8 *)Ndp + sizeof (USB_NCM_DATAGRAM_POINTER_16));
+  Datagram->DatagramIndex  = 3D Nth->HeaderLength + Ndp->Length;
+  Datagram->DatagramLength = 3D (UINT16)*PacketLength;
 
   CopyMem (TotalPacket + Datagram->DatagramIndex, Packet, *PacketLength);
 
-  *PacketLength =3D TotalLength;
+  *PacketLength = 3D TotalLength;
 
-  Status =3D UsbIo->UsbBulkTransfer (
-                    UsbIo,
-                    UsbEthDriver->BulkOutEndpoint,
-                    TotalPacket,
-                    PacketLength,
-                    USB_ETHERNET_BULK_TIMEOUT,
-                    &TransStatus
-                    );
+  Status = 3D UsbIo->UsbBulkTransfer (
+                       UsbIo,
+                       UsbEthDriver->BulkOutEndpoint,
+                       TotalPacket,
+                       PacketLength,
+                       USB_ETHERNET_BULK_TIMEOUT,
+                       &TransStatus
+                       );
   FreePool (TotalPacket);
   return Status;
 }
@@ -426,7 +426,7 @@ InterruptCallback (
   IN  UINT32  Status
   )
 {
-  if (((EFI_USB_DEVICE_REQUEST *)Data)->Request =3D=3D USB_CDC_NETWORK_CONNECTION) {
+  if (((EFI_USB_DEVICE_REQUEST *)Data)->Request = 3D = 3D USB_CDC_NETWORK_CONNECTION) {
     CopyMem (
       (EFI_USB_DEVICE_REQUEST *)Context,
       (EFI_USB_DEVICE_REQUEST *)Data,
@@ -467,30 +467,30 @@ UsbEthInterrupt (
   USB_ETHERNET_DRIVER  *UsbEthDriver;
   UINTN                DataLength;
 
-  UsbEthDriver =3D USB_ETHERNET_DEV_FROM_THIS (This);
-  DataLength   =3D 0;
+  UsbEthDriver = 3D USB_ETHERNET_DEV_FROM_THIS (This);
+  DataLength   = 3D 0;
 
-  if (IsNewTransfer =3D=3D TRUE) {
-    DataLength =3D sizeof (EFI_USB_DEVICE_REQUEST) + sizeof (USB_CONNECT_SPEED_CHANGE);
-    Status     =3D UsbEthDriver->UsbIo->UsbAsyncInterruptTransfer (
-                                        UsbEthDriver->UsbIo,
-                                        UsbEthDriver->InterruptEndpoint,
-                                        IsNewTransfer,
-                                        PollingInterval,
-                                        DataLength,
-                                        (EFI_ASYNC_USB_TRANSFER_CALLBACK)InterruptCallback,
-                                        Request
-                                        );
+  if (IsNewTransfer = 3D = 3D TRUE) {
+    DataLength = 3D sizeof (EFI_USB_DEVICE_REQUEST) + sizeof (USB_CONNECT_SPEED_CHANGE);
+    Status     = 3D UsbEthDriver->UsbIo->UsbAsyncInterruptTransfer (
+                                           UsbEthDriver->UsbIo,
+                                           UsbEthDriver->InterruptEndpoint,
+                                           IsNewTransfer,
+                                           PollingInterval,
+                                           DataLength,
+                                           (EFI_ASYNC_USB_TRANSFER_CALLBACK)InterruptCallback,
+                                           Request
+                                           );
   } else {
-    Status =3D UsbEthDriver->UsbIo->UsbAsyncInterruptTransfer (
-                                    UsbEthDriver->UsbIo,
-                                    UsbEthDriver->InterruptEndpoint,
-                                    IsNewTransfer,
-                                    0,
-                                    0,
-                                    NULL,
-                                    NULL
-                                    );
+    Status = 3D UsbEthDriver->UsbIo->UsbAsyncInterruptTransfer (
+                                       UsbEthDriver->UsbIo,
+                                       UsbEthDriver->InterruptEndpoint,
+                                       IsNewTransfer,
+                                       0,
+                                       0,
+                                       NULL,
+                                       NULL
+                                       );
   }
 
   return Status;
@@ -524,34 +524,34 @@ GetUsbEthMacAddress (
   UINT8                        Hi;
   UINT8                        Low;
 
-  UsbEthDriver =3D USB_ETHERNET_DEV_FROM_THIS (This);
+  UsbEthDriver = 3D USB_ETHERNET_DEV_FROM_THIS (This);
 
-  Status =3D This->UsbEthFunDescriptor (This, &UsbEthDescriptor);
+  Status = 3D This->UsbEthFunDescriptor (This, &UsbEthDescriptor);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a:UsbEthFunDescriptor status =3D %r\n", __FUNCTION__, Status));
     return Status;
   }
 
-  Status =3D UsbEthDriver->UsbIo->UsbGetStringDescriptor (
-                                  UsbEthDriver->UsbIo,
-                                  0x409,                        // English-US Language ID
-                                  UsbEthDescriptor.MacAddress,
-                                  &Data
-                                  );
+  Status = 3D UsbEthDriver->UsbIo->UsbGetStringDescriptor (
+                                     UsbEthDriver->UsbIo,
+                                     0x409,                     // English-US Language ID
+                                     UsbEthDescriptor.MacAddress,
+                                     &Data
+                                     );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a:UsbGetStringDescriptor status =3D %r\n", __FUNCTION__, Status));
     return Status;
   }
 
-  DataPtr =3D Data;
-  for (Index =3D 0; Index < PXE_HWADDR_LEN_ETHER; Index++) {
+  DataPtr = 3D Data;
+  for (Index = 3D 0; Index < PXE_HWADDR_LEN_ETHER; Index++) {
     CopyMem (TmpStr, DataPtr, sizeof (CHAR16));
     DataPtr++;
-    Hi =3D (UINT8)StrHexToUintn (TmpStr);
+    Hi = 3D (UINT8)StrHexToUintn (TmpStr);
     CopyMem (TmpStr, DataPtr, sizeof (CHAR16));
     DataPtr++;
-    Low                     =3D (UINT8)StrHexToUintn (TmpStr);
-    MacAddress->Addr[Index] =3D (Hi << 4) | Low;
+    Low                     = 3D (UINT8)StrHexToUintn (TmpStr);
+    MacAddress->Addr[Index] = 3D (Hi << 4) | Low;
   }
 
   return Status;
@@ -573,7 +573,7 @@ UsbEthBulkSize (
   OUT UINTN                        *BulkSize
   )
 {
-  *BulkSize =3D USB_NCM_MAX_NTB_SIZE;
+  *BulkSize = 3D USB_NCM_MAX_NTB_SIZE;
   return EFI_SUCCESS;
 }
 
@@ -598,13 +598,13 @@ GetUsbHeaderFunDescriptor (
   EFI_STATUS           Status;
   USB_ETHERNET_DRIVER  *UsbEthDriver;
 
-  UsbEthDriver =3D USB_ETHERNET_DEV_FROM_THIS (This);
+  UsbEthDriver = 3D USB_ETHERNET_DEV_FROM_THIS (This);
 
-  if (UsbHeaderFunDescriptor =3D=3D NULL) {
+  if (UsbHeaderFunDescriptor = 3D = 3D NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Status =3D GetFunctionalDescriptor (UsbEthDriver->Config, HEADER_FUN_DESCRIPTOR, UsbHeaderFunDescriptor);
+  Status = 3D GetFunctionalDescriptor (UsbEthDriver->Config, HEADER_FUN_DESCRIPTOR, UsbHeaderFunDescriptor);
   return Status;
 }
 
@@ -629,13 +629,13 @@ GetUsbUnionFunDescriptor (
   EFI_STATUS           Status;
   USB_ETHERNET_DRIVER  *UsbEthDriver;
 
-  UsbEthDriver =3D USB_ETHERNET_DEV_FROM_THIS (This);
+  UsbEthDriver = 3D USB_ETHERNET_DEV_FROM_THIS (This);
 
-  if (UsbUnionFunDescriptor =3D=3D NULL) {
+  if (UsbUnionFunDescriptor = 3D = 3D NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Status =3D GetFunctionalDescriptor (UsbEthDriver->Config, UNION_FUN_DESCRIPTOR, UsbUnionFunDescriptor);
+  Status = 3D GetFunctionalDescriptor (UsbEthDriver->Config, UNION_FUN_DESCRIPTOR, UsbUnionFunDescriptor);
   return Status;
 }
 
@@ -664,13 +664,13 @@ GetUsbEthFunDescriptor (
   EFI_STATUS           Status;
   USB_ETHERNET_DRIVER  *UsbEthDriver;
 
-  UsbEthDriver =3D USB_ETHERNET_DEV_FROM_THIS (This);
+  UsbEthDriver = 3D USB_ETHERNET_DEV_FROM_THIS (This);
 
-  if (UsbEthFunDescriptor =3D=3D NULL) {
+  if (UsbEthFunDescriptor = 3D = 3D NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Status =3D GetFunctionalDescriptor (UsbEthDriver->Config, ETHERNET_FUN_DESCRIPTOR, UsbEthFunDescriptor);
+  Status = 3D GetFunctionalDescriptor (UsbEthDriver->Config, ETHERNET_FUN_DESCRIPTOR, UsbEthFunDescriptor);
   return Status;
 }
 
@@ -703,22 +703,22 @@ SetUsbEthMcastFilter (
   USB_ETHERNET_FUN_DESCRIPTOR  UsbEthFunDescriptor;
   USB_ETHERNET_DRIVER          *UsbEthDriver;
 
-  UsbEthDriver =3D USB_ETHERNET_DEV_FROM_THIS (This);
+  UsbEthDriver = 3D USB_ETHERNET_DEV_FROM_THIS (This);
 
-  Status =3D This->UsbEthFunDescriptor (This, &UsbEthFunDescriptor);
+  Status = 3D This->UsbEthFunDescriptor (This, &UsbEthFunDescriptor);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  if ((UsbEthFunDescriptor.NumberMcFilters << 1) =3D=3D 0) {
+  if ((UsbEthFunDescriptor.NumberMcFilters << 1) = 3D = 3D 0) {
     return EFI_UNSUPPORTED;
   }
 
-  Request.RequestType =3D USB_ETHERNET_SET_REQ_TYPE;
-  Request.Request     =3D SET_ETH_MULTICAST_FILTERS_REQ;
-  Request.Value       =3D Value;
-  Request.Index       =3D UsbEthDriver->NumOfInterface;
-  Request.Length      =3D Value * 6;
+  Request.RequestType = 3D USB_ETHERNET_SET_REQ_TYPE;
+  Request.Request     = 3D SET_ETH_MULTICAST_FILTERS_REQ;
+  Request.Value       = 3D Value;
+  Request.Index       = 3D UsbEthDriver->NumOfInterface;
+  Request.Length      = 3D Value * 6;
 
   return UsbEthDriver->UsbIo->UsbControlTransfer (
                                 UsbEthDriver->UsbIo,
@@ -760,13 +760,13 @@ SetUsbEthPowerFilter (
   UINT32                  TransStatus;
   USB_ETHERNET_DRIVER     *UsbEthDriver;
 
-  UsbEthDriver =3D USB_ETHERNET_DEV_FROM_THIS (This);
+  UsbEthDriver = 3D USB_ETHERNET_DEV_FROM_THIS (This);
 
-  Request.RequestType =3D USB_ETHERNET_SET_REQ_TYPE;
-  Request.Request     =3D SET_ETH_POWER_MANAGEMENT_PATTERN_FILTER_REQ;
-  Request.Value       =3D Value;
-  Request.Index       =3D UsbEthDriver->NumOfInterface;
-  Request.Length      =3D Length;
+  Request.RequestType = 3D USB_ETHERNET_SET_REQ_TYPE;
+  Request.Request     = 3D SET_ETH_POWER_MANAGEMENT_PATTERN_FILTER_REQ;
+  Request.Value       = 3D Value;
+  Request.Index       = 3D UsbEthDriver->NumOfInterface;
+  Request.Length      = 3D Length;
 
   return UsbEthDriver->UsbIo->UsbControlTransfer (
                                 UsbEthDriver->UsbIo,
@@ -806,13 +806,13 @@ GetUsbEthPowerFilter (
   UINT32                  TransStatus;
   USB_ETHERNET_DRIVER     *UsbEthDriver;
 
-  UsbEthDriver =3D USB_ETHERNET_DEV_FROM_THIS (This);
+  UsbEthDriver = 3D USB_ETHERNET_DEV_FROM_THIS (This);
 
-  Request.RequestType =3D USB_ETHERNET_GET_REQ_TYPE;
-  Request.Request     =3D GET_ETH_POWER_MANAGEMENT_PATTERN_FILTER_REQ;
-  Request.Value       =3D Value;
-  Request.Index       =3D UsbEthDriver->NumOfInterface;
-  Request.Length      =3D USB_ETH_POWER_FILTER_LENGTH;
+  Request.RequestType = 3D USB_ETHERNET_GET_REQ_TYPE;
+  Request.Request     = 3D GET_ETH_POWER_MANAGEMENT_PATTERN_FILTER_REQ;
+  Request.Value       = 3D Value;
+  Request.Index       = 3D UsbEthDriver->NumOfInterface;
+  Request.Length      = 3D USB_ETH_POWER_FILTER_LENGTH;
 
   return UsbEthDriver->UsbIo->UsbControlTransfer (
                                 UsbEthDriver->UsbIo,
@@ -825,13 +825,23 @@ GetUsbEthPowerFilter (
                                 );
 }
 
-BIT_MAP  gTable[] =3D {
-  { PXE_OPFLAGS_RECEIVE_FILTER_UNICAST,            USB_ETH_PACKET_TYPE_DIRECTED      },
-  { PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST,          USB_ETH_PACKET_TYPE_BROADCAST     },
-  { PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST, USB_ETH_PACKET_TYPE_MULTICAST     },
-  { PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS,        USB_ETH_PACKET_TYPE_PROMISCUOUS   },
-  { PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST,      USB_ETH_PACKET_TYPE_ALL_MULTICAST },
-};
+BIT_MAP  gTable[] = 3D {
+  {
+    PXE_OPFLAGS_RECEIVE_FILTER_UNICAST, USB_ETH_PACKET_TYPE_DIRECTED
+  },
+  {
+    PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST, USB_ETH_PACKET_TYPE_BROADCAST
+  },
+  {
+    PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST, USB_ETH_PACKET_TYPE_MULTICAST
+  },
+  {
+    PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS, USB_ETH_PACKET_TYPE_PROMISCUOUS
+  },
+  {
+    PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST, USB_ETH_PACKET_TYPE_ALL_MULTICAST
+  },
+}
 
 /**
   Convert value between PXE receive filter and USB ETH packet filter.
@@ -849,11 +859,11 @@ ConvertFilter (
   UINT32  Index;
   UINT32  Count;
 
-  Count =3D sizeof (gTable)/sizeof (gTable[0]);
+  Count = 3D sizeof (gTable)/sizeof (gTable[0]);
 
-  for (Index =3D 0; (gTable[Index].Src !=3D 0) && (Index < Count); Index++) {
+  for (Index = 3D 0; (gTable[Index].Src != 3D 0) && (Index < Count); Index++) {
     if (gTable[Index].Src & Value) {
-      *CdcFilter |=3D gTable[Index].Dst;
+      *CdcFilter |= 3D gTable[Index].Dst;
     }
   }
 }
@@ -883,16 +893,16 @@ SetUsbEthPacketFilter (
   USB_ETHERNET_DRIVER     *UsbEthDriver;
   UINT16                  CommandFilter;
 
-  UsbEthDriver  =3D USB_ETHERNET_DEV_FROM_THIS (This);
-  CommandFilter =3D 0;
+  UsbEthDriver  = 3D USB_ETHERNET_DEV_FROM_THIS (This);
+  CommandFilter = 3D 0;
 
   ConvertFilter (Value, &CommandFilter);
 
-  Request.RequestType =3D USB_ETHERNET_SET_REQ_TYPE;
-  Request.Request     =3D SET_ETH_PACKET_FILTER_REQ;
-  Request.Value       =3D CommandFilter;
-  Request.Index       =3D UsbEthDriver->NumOfInterface;
-  Request.Length      =3D USB_ETH_PACKET_FILTER_LENGTH;
+  Request.RequestType = 3D USB_ETHERNET_SET_REQ_TYPE;
+  Request.Request     = 3D SET_ETH_PACKET_FILTER_REQ;
+  Request.Value       = 3D CommandFilter;
+  Request.Index       = 3D UsbEthDriver->NumOfInterface;
+  Request.Length      = 3D USB_ETH_PACKET_FILTER_LENGTH;
 
   return UsbEthDriver->UsbIo->UsbControlTransfer (
                                 UsbEthDriver->UsbIo,
@@ -933,22 +943,22 @@ GetUsbEthStatistic (
   USB_ETHERNET_FUN_DESCRIPTOR  UsbEthFunDescriptor;
   USB_ETHERNET_DRIVER          *UsbEthDriver;
 
-  UsbEthDriver =3D USB_ETHERNET_DEV_FROM_THIS (This);
+  UsbEthDriver = 3D USB_ETHERNET_DEV_FROM_THIS (This);
 
-  Status =3D This->UsbEthFunDescriptor (This, &UsbEthFunDescriptor);
+  Status = 3D This->UsbEthFunDescriptor (This, &UsbEthFunDescriptor);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  if (UsbEthFunDescriptor.EthernetStatistics =3D=3D 0) {
+  if (UsbEthFunDescriptor.EthernetStatistics = 3D = 3D 0) {
     return EFI_UNSUPPORTED;
   }
 
-  Request.RequestType =3D USB_ETHERNET_GET_REQ_TYPE;
-  Request.Request     =3D GET_ETH_STATISTIC_REQ;
-  Request.Value       =3D FeatureSelector;
-  Request.Index       =3D UsbEthDriver->NumOfInterface;
-  Request.Length      =3D USB_ETH_STATISTIC;
+  Request.RequestType = 3D USB_ETHERNET_GET_REQ_TYPE;
+  Request.Request     = 3D GET_ETH_STATISTIC_REQ;
+  Request.Value       = 3D FeatureSelector;
+  Request.Index       = 3D UsbEthDriver->NumOfInterface;
+  Request.Length      = 3D USB_ETH_STATISTIC;
 
   return UsbEthDriver->UsbIo->UsbControlTransfer (
                                 UsbEthDriver->UsbIo,

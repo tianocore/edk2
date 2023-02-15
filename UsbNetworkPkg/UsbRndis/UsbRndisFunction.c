@@ -8,8 +8,8 @@
 
 #include "UsbRndis.h"
 
-UINT16  gStopBulkInCnt  =3D 0;
-UINT16  gBlockBulkInCnt =3D 0;
+UINT16  gStopBulkInCnt  = 3D 0;
+UINT16  gBlockBulkInCnt = 3D 0;
 
 /**
   Load All of device descriptor.
@@ -35,30 +35,30 @@ LoadAllDescriptor (
   UINT32                     TransStatus;
   EFI_USB_CONFIG_DESCRIPTOR  Tmp;
 
-  Status =3D UsbIo->UsbGetConfigDescriptor (UsbIo, &Tmp);
+  Status = 3D UsbIo->UsbGetConfigDescriptor (UsbIo, &Tmp);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a:UsbGetConfigDescriptor status =3D %r\n", __FUNCTION__, Status));
     return Status;
   }
 
-  Status =3D gBS->AllocatePool (
-                  EfiBootServicesData,
-                  Tmp.TotalLength,
-                  (VOID **)ConfigDesc
-                  );
+  Status = 3D gBS->AllocatePool (
+                     EfiBootServicesData,
+                     Tmp.TotalLength,
+                     (VOID **)ConfigDesc
+                     );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: AllocatePool status =3D %r\n", __FUNCTION__, Status));
     return Status;
   }
 
-  Status =3D UsbGetDescriptor (
-             UsbIo,
-             USB_DESC_TYPE_CONFIG << 8 | (Tmp.ConfigurationValue - 1),                 // zero based
-             0,
-             Tmp.TotalLength,
-             *ConfigDesc,
-             &TransStatus
-             );
+  Status = 3D UsbGetDescriptor (
+                UsbIo,
+                USB_DESC_TYPE_CONFIG << 8 | (Tmp.ConfigurationValue - 1),              // zero based
+                0,
+                Tmp.TotalLength,
+                *ConfigDesc,
+                &TransStatus
+                );
   return Status;
 }
 
@@ -79,16 +79,16 @@ NextDescriptor (
   IN OUT  UINTN                      *Offset
   )
 {
-  if ((Desc =3D=3D NULL) || (*Offset >=3D Desc->TotalLength)) {
+  if ((Desc = 3D = 3D NULL) || (*Offset >= 3D Desc->TotalLength)) {
     return FALSE;
   }
 
-  if (((EFI_USB_CONFIG_DESCRIPTOR *)((char *)Desc+*Offset))->Length =3D=3D 0) {
+  if (((EFI_USB_CONFIG_DESCRIPTOR *)((char *)Desc+*Offset))->Length = 3D = 3D 0) {
     return FALSE;
   }
 
-  *Offset +=3D ((EFI_USB_CONFIG_DESCRIPTOR *)((char *)Desc+*Offset))->Length;
-  if ( *Offset >=3D Desc->TotalLength ) {
+  *Offset += 3D ((EFI_USB_CONFIG_DESCRIPTOR *)((char *)Desc+*Offset))->Length;
+  if ( *Offset >= 3D Desc->TotalLength ) {
     return FALSE;
   }
 
@@ -119,12 +119,12 @@ GetFunctionalDescriptor (
   UINTN                         Offset;
   EFI_USB_INTERFACE_DESCRIPTOR  *Interface;
 
-  Status =3D EFI_NOT_FOUND;
+  Status = 3D EFI_NOT_FOUND;
 
-  for (Offset =3D 0; NextDescriptor (Config, &Offset);) {
-    Interface =3D (EFI_USB_INTERFACE_DESCRIPTOR *)((UINT8 *)Config + Offset);
-    if (Interface->DescriptorType =3D=3D CS_INTERFACE) {
-      if (((USB_HEADER_FUN_DESCRIPTOR *)Interface)->DescriptorSubtype =3D=3D FunDescriptorType) {
+  for (Offset = 3D 0; NextDescriptor (Config, &Offset);) {
+    Interface = 3D (EFI_USB_INTERFACE_DESCRIPTOR *)((UINT8 *)Config + Offset);
+    if (Interface->DescriptorType = 3D = 3D CS_INTERFACE) {
+      if (((USB_HEADER_FUN_DESCRIPTOR *)Interface)->DescriptorSubtype = 3D = 3D FunDescriptorType) {
         switch (FunDescriptorType) {
           case HEADER_FUN_DESCRIPTOR:
             CopyMem (
@@ -148,7 +148,7 @@ GetFunctionalDescriptor (
               );
             return EFI_SUCCESS;
           default:
-            Status =3D EFI_UNSUPPORTED;
+            Status = 3D EFI_UNSUPPORTED;
             break;
         }
       }
@@ -177,28 +177,28 @@ GetEndpoint (
   EFI_USB_INTERFACE_DESCRIPTOR  Interface;
   EFI_USB_ENDPOINT_DESCRIPTOR   Endpoint;
 
-  Status =3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &Interface);
+  Status = 3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &Interface);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a:UsbGetInterfaceDescriptor status =3D %r\n", __FUNCTION__, Status));
     return;
   }
 
-  if (Interface.NumEndpoints =3D=3D 0 ) {
-    Status =3D UsbSetInterface (UsbIo, 1, 0, &Result);
+  if (Interface.NumEndpoints = 3D = 3D 0 ) {
+    Status = 3D UsbSetInterface (UsbIo, 1, 0, &Result);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a:UsbSetInterface status =3D %r\n", __FUNCTION__, Status));
       return;
     }
 
-    Status =3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &Interface);
+    Status = 3D UsbIo->UsbGetInterfaceDescriptor (UsbIo, &Interface);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a:UsbGetInterfaceDescriptor status =3D %r\n", __FUNCTION__, Status));
       return;
     }
   }
 
-  for (Index =3D 0; Index < Interface.NumEndpoints; Index++) {
-    Status =3D UsbIo->UsbGetEndpointDescriptor (UsbIo, Index, &Endpoint);
+  for (Index = 3D 0; Index < Interface.NumEndpoints; Index++) {
+    Status = 3D UsbIo->UsbGetEndpointDescriptor (UsbIo, Index, &Endpoint);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a:UsbGetEndpointDescriptor status =3D %r\n", __FUNCTION__, Status));
       return;
@@ -207,14 +207,14 @@ GetEndpoint (
     switch ((Endpoint.Attributes & (BIT0 | BIT1))) {
       case USB_ENDPOINT_BULK:
         if (Endpoint.EndpointAddress & BIT7) {
-          UsbRndisDevice->BulkInEndpoint =3D Endpoint.EndpointAddress;
+          UsbRndisDevice->BulkInEndpoint = 3D Endpoint.EndpointAddress;
         } else {
-          UsbRndisDevice->BulkOutEndpoint =3D Endpoint.EndpointAddress;
+          UsbRndisDevice->BulkOutEndpoint = 3D Endpoint.EndpointAddress;
         }
 
         break;
       case USB_ENDPOINT_INTERRUPT:
-        UsbRndisDevice->InterrupEndpoint =3D Endpoint.EndpointAddress;
+        UsbRndisDevice->InterrupEndpoint = 3D Endpoint.EndpointAddress;
         break;
     }
   }
@@ -243,7 +243,7 @@ InterruptCallback (
   IN  UINT32  Status
   )
 {
-  if (((EFI_USB_DEVICE_REQUEST *)Data)->Request =3D=3D 0) {
+  if (((EFI_USB_DEVICE_REQUEST *)Data)->Request = 3D = 3D 0) {
     CopyMem (
       (EFI_USB_DEVICE_REQUEST *)Context,
       (EFI_USB_DEVICE_REQUEST *)Data,
@@ -284,43 +284,43 @@ UsbRndisInterrupt (
   USB_RNDIS_DEVICE  *UsbRndisDevice;
   UINTN             DataLength;
 
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (This);
-  DataLength     =3D 0;
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (This);
+  DataLength     = 3D 0;
 
-  if (IsNewTransfer =3D=3D TRUE) {
-    DataLength =3D sizeof (EFI_USB_DEVICE_REQUEST) + sizeof (USB_CONNECT_SPEED_CHANGE);
-    Status     =3D UsbRndisDevice->UsbIo->UsbAsyncInterruptTransfer (
-                                          UsbRndisDevice->UsbIo,
-                                          UsbRndisDevice->InterrupEndpoint,
-                                          IsNewTransfer,
-                                          PollingInterval,
-                                          DataLength,
-                                          InterruptCallback,
-                                          Requst
-                                          );
+  if (IsNewTransfer = 3D = 3D TRUE) {
+    DataLength = 3D sizeof (EFI_USB_DEVICE_REQUEST) + sizeof (USB_CONNECT_SPEED_CHANGE);
+    Status     = 3D UsbRndisDevice->UsbIo->UsbAsyncInterruptTransfer (
+                                             UsbRndisDevice->UsbIo,
+                                             UsbRndisDevice->InterrupEndpoint,
+                                             IsNewTransfer,
+                                             PollingInterval,
+                                             DataLength,
+                                             InterruptCallback,
+                                             Requst
+                                             );
 
-    if (Status =3D=3D EFI_INVALID_PARAMETER) {
+    if (Status = 3D = 3D EFI_INVALID_PARAMETER) {
       // Because of Stacked AsyncInterrupt request are not supported
-      Status =3D UsbRndisDevice->UsbIo->UsbAsyncInterruptTransfer (
-                                        UsbRndisDevice->UsbIo,
-                                        UsbRndisDevice->InterrupEndpoint,
-                                        0,
-                                        0,
-                                        0,
-                                        NULL,
-                                        NULL
-                                        );
+      Status = 3D UsbRndisDevice->UsbIo->UsbAsyncInterruptTransfer (
+                                           UsbRndisDevice->UsbIo,
+                                           UsbRndisDevice->InterrupEndpoint,
+                                           0,
+                                           0,
+                                           0,
+                                           NULL,
+                                           NULL
+                                           );
     }
   } else {
-    Status =3D UsbRndisDevice->UsbIo->UsbAsyncInterruptTransfer (
-                                      UsbRndisDevice->UsbIo,
-                                      UsbRndisDevice->InterrupEndpoint,
-                                      IsNewTransfer,
-                                      0,
-                                      0,
-                                      NULL,
-                                      NULL
-                                      );
+    Status = 3D UsbRndisDevice->UsbIo->UsbAsyncInterruptTransfer (
+                                         UsbRndisDevice->UsbIo,
+                                         UsbRndisDevice->InterrupEndpoint,
+                                         IsNewTransfer,
+                                         0,
+                                         0,
+                                         NULL,
+                                         NULL
+                                         );
   }
 
   return Status;
@@ -346,18 +346,18 @@ ReadRndisResponseInterrupt (
   UINT32      UsbStatus;
   UINTN       DataLength;
 
-  DataLength =3D 8;
+  DataLength = 3D 8;
 
   ZeroMem (Data, sizeof (Data));
 
-  Status =3D UsbRndisDevice->UsbIo->UsbSyncInterruptTransfer (
-                                    UsbRndisDevice->UsbIo,
-                                    UsbRndisDevice->InterrupEndpoint,
-                                    &Data,
-                                    &DataLength,
-                                    0x20,
-                                    &UsbStatus
-                                    );
+  Status = 3D UsbRndisDevice->UsbIo->UsbSyncInterruptTransfer (
+                                       UsbRndisDevice->UsbIo,
+                                       UsbRndisDevice->InterrupEndpoint,
+                                       &Data,
+                                       &DataLength,
+                                       0x20,
+                                       &UsbStatus
+                                       );
 
   return Status;
 }
@@ -393,28 +393,28 @@ GetUsbEthMacAddress (
   REMOTE_NDIS_QUERY_MAC_MSG    RndisQueryMsg;
   REMOTE_NDIS_QUERY_MAC_CMPLT  RndisQueryMsgCmplt;
 
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (This);
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (This);
 
   ZeroMem (&RndisQueryMsg, sizeof (REMOTE_NDIS_QUERY_MAC_MSG));
   ZeroMem (&RndisQueryMsgCmplt, sizeof (REMOTE_NDIS_QUERY_MAC_CMPLT));
 
-  RndisQueryMsg.QueryMsg.MessageType   =3D RNDIS_QUERY_MSG;
-  RndisQueryMsg.QueryMsg.MessageLength =3D sizeof (REMOTE_NDIS_QUERY_MAC_MSG);
-  RndisQueryMsg.QueryMsg.RequestID     =3D UsbRndisDevice->RequestId;
-  RndisQueryMsg.QueryMsg.Oid           =3D OID_802_3_CURRENT_ADDRESS;
+  RndisQueryMsg.QueryMsg.MessageType   = 3D RNDIS_QUERY_MSG;
+  RndisQueryMsg.QueryMsg.MessageLength = 3D sizeof (REMOTE_NDIS_QUERY_MAC_MSG);
+  RndisQueryMsg.QueryMsg.RequestID     = 3D UsbRndisDevice->RequestId;
+  RndisQueryMsg.QueryMsg.Oid           = 3D OID_802_3_CURRENT_ADDRESS;
 
-  RndisQueryMsgCmplt.QueryCmplt.MessageType   =3D RNDIS_QUERY_CMPLT;
-  RndisQueryMsgCmplt.QueryCmplt.MessageLength =3D sizeof (REMOTE_NDIS_QUERY_MAC_CMPLT);
+  RndisQueryMsgCmplt.QueryCmplt.MessageType   = 3D RNDIS_QUERY_CMPLT;
+  RndisQueryMsgCmplt.QueryCmplt.MessageLength = 3D sizeof (REMOTE_NDIS_QUERY_MAC_CMPLT);
 
-  Status =3D RndisControlMsg (
-             UsbRndisDevice,
-             (REMOTE_NDIS_MSG_HEADER *)&RndisQueryMsg,
-             (REMOTE_NDIS_MSG_HEADER *)&RndisQueryMsgCmplt
-             );
+  Status = 3D RndisControlMsg (
+                UsbRndisDevice,
+                (REMOTE_NDIS_MSG_HEADER *)&RndisQueryMsg,
+                (REMOTE_NDIS_MSG_HEADER *)&RndisQueryMsgCmplt
+                );
   if (!EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "Success to get Mac address from RNDIS message.\n"));
-    for (Index =3D 0; Index < PXE_HWADDR_LEN_ETHER; Index++) {
-      MacAddress->Addr[Index] =3D RndisQueryMsgCmplt.Addr[Index];
+    for (Index = 3D 0; Index < PXE_HWADDR_LEN_ETHER; Index++) {
+      MacAddress->Addr[Index] = 3D RndisQueryMsgCmplt.Addr[Index];
     }
 
     UsbRndisDevice->RequestId++;
@@ -423,32 +423,32 @@ GetUsbEthMacAddress (
 
   // If it is not support the OID_802_3_CURRENT_ADDRESS.
   // To check USB Ethernet functional Descriptor
-  Status =3D This->UsbEthFunDescriptor (This, &UsbEthDescriptor);
+  Status = 3D This->UsbEthFunDescriptor (This, &UsbEthDescriptor);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a:UsbEthFunDescriptor status =3D %r\n", __FUNCTION__, Status));
     return Status;
   }
 
-  Status =3D UsbRndisDevice->UsbIo->UsbGetStringDescriptor (
-                                    UsbRndisDevice->UsbIo,
-                                    0x409,                       // English-US Language ID
-                                    UsbEthDescriptor.MacAddress,
-                                    &Data
-                                    );
+  Status = 3D UsbRndisDevice->UsbIo->UsbGetStringDescriptor (
+                                       UsbRndisDevice->UsbIo,
+                                       0x409,                    // English-US Language ID
+                                       UsbEthDescriptor.MacAddress,
+                                       &Data
+                                       );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a:UsbGetStringDescriptor status =3D %r\n", __FUNCTION__, Status));
     return Status;
   }
 
-  DataPtr =3D Data;
-  for (Index =3D 0; Index < PXE_HWADDR_LEN_ETHER; Index++) {
+  DataPtr = 3D Data;
+  for (Index = 3D 0; Index < PXE_HWADDR_LEN_ETHER; Index++) {
     CopyMem (TmpStr, DataPtr, sizeof (CHAR16));
     DataPtr++;
-    Hi =3D (UINT8)StrHexToUintn (TmpStr);
+    Hi = 3D (UINT8)StrHexToUintn (TmpStr);
     CopyMem (TmpStr, DataPtr, sizeof (CHAR16));
     DataPtr++;
-    Low                     =3D (UINT8)StrHexToUintn (TmpStr);
-    MacAddress->Addr[Index] =3D (Hi << 4) | Low;
+    Low                     = 3D (UINT8)StrHexToUintn (TmpStr);
+    MacAddress->Addr[Index] = 3D (Hi << 4) | Low;
   }
 
   return Status;
@@ -478,37 +478,37 @@ UsbEthBulkSize (
   REMOTE_NDIS_QUERY_MAX_TOTAL_SIZE_MSG    RndisQueryMsg;
   REMOTE_NDIS_QUERY_MAX_TOTAL_SIZE_CMPLT  RndisQueryMsgCmplt;
 
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (This);
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (This);
 
   ZeroMem (&RndisQueryMsg, sizeof (REMOTE_NDIS_QUERY_MAX_TOTAL_SIZE_MSG));
   ZeroMem (&RndisQueryMsgCmplt, sizeof (REMOTE_NDIS_QUERY_MAX_TOTAL_SIZE_CMPLT));
 
-  RndisQueryMsg.QueryMsg.MessageType   =3D RNDIS_QUERY_MSG;
-  RndisQueryMsg.QueryMsg.MessageLength =3D sizeof (REMOTE_NDIS_QUERY_MAX_TOTAL_SIZE_MSG);
-  RndisQueryMsg.QueryMsg.RequestID     =3D UsbRndisDevice->RequestId;
-  RndisQueryMsg.QueryMsg.Oid           =3D OID_GEN_MAXIMUM_TOTAL_SIZE;
+  RndisQueryMsg.QueryMsg.MessageType   = 3D RNDIS_QUERY_MSG;
+  RndisQueryMsg.QueryMsg.MessageLength = 3D sizeof (REMOTE_NDIS_QUERY_MAX_TOTAL_SIZE_MSG);
+  RndisQueryMsg.QueryMsg.RequestID     = 3D UsbRndisDevice->RequestId;
+  RndisQueryMsg.QueryMsg.Oid           = 3D OID_GEN_MAXIMUM_TOTAL_SIZE;
 
-  RndisQueryMsgCmplt.QueryCmplt.MessageType   =3D RNDIS_QUERY_CMPLT;
-  RndisQueryMsgCmplt.QueryCmplt.MessageLength =3D sizeof (REMOTE_NDIS_QUERY_MAX_TOTAL_SIZE_CMPLT);
+  RndisQueryMsgCmplt.QueryCmplt.MessageType   = 3D RNDIS_QUERY_CMPLT;
+  RndisQueryMsgCmplt.QueryCmplt.MessageLength = 3D sizeof (REMOTE_NDIS_QUERY_MAX_TOTAL_SIZE_CMPLT);
 
-  Status =3D RndisControlMsg (
-             UsbRndisDevice,
-             (REMOTE_NDIS_MSG_HEADER *)&RndisQueryMsg,
-             (REMOTE_NDIS_MSG_HEADER *)&RndisQueryMsgCmplt
-             );
+  Status = 3D RndisControlMsg (
+                UsbRndisDevice,
+                (REMOTE_NDIS_MSG_HEADER *)&RndisQueryMsg,
+                (REMOTE_NDIS_MSG_HEADER *)&RndisQueryMsgCmplt
+                );
   if (!EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "Success to get Max Total size : %X  \n", RndisQueryMsgCmplt.MaxTotalSize));
-    *BulkSize =3D RndisQueryMsgCmplt.MaxTotalSize;
+    *BulkSize = 3D RndisQueryMsgCmplt.MaxTotalSize;
     UsbRndisDevice->RequestId++;
     return Status;
   }
 
-  Status =3D This->UsbEthFunDescriptor (This, &UsbEthFunDescriptor);
+  Status = 3D This->UsbEthFunDescriptor (This, &UsbEthFunDescriptor);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  *BulkSize =3D (UINTN)UsbEthFunDescriptor.MaxSegmentSize;
+  *BulkSize = 3D (UINTN)UsbEthFunDescriptor.MaxSegmentSize;
   return Status;
 }
 
@@ -533,17 +533,17 @@ GetUsbHeaderFunDescriptor (
   EFI_STATUS        Status;
   USB_RNDIS_DEVICE  *UsbRndisDevice;
 
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (This);
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (This);
 
-  if (UsbHeaderFunDescriptor =3D=3D NULL) {
+  if (UsbHeaderFunDescriptor = 3D = 3D NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Status =3D GetFunctionalDescriptor (
-             UsbRndisDevice->Config,
-             HEADER_FUN_DESCRIPTOR,
-             UsbHeaderFunDescriptor
-             );
+  Status = 3D GetFunctionalDescriptor (
+                UsbRndisDevice->Config,
+                HEADER_FUN_DESCRIPTOR,
+                UsbHeaderFunDescriptor
+                );
   return Status;
 }
 
@@ -568,17 +568,17 @@ GetUsbUnionFunDescriptor (
   EFI_STATUS        Status;
   USB_RNDIS_DEVICE  *UsbRndisDevice;
 
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (This);
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (This);
 
-  if (UsbUnionFunDescriptor =3D=3D NULL) {
+  if (UsbUnionFunDescriptor = 3D = 3D NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Status =3D GetFunctionalDescriptor (
-             UsbRndisDevice->Config,
-             UNION_FUN_DESCRIPTOR,
-             UsbUnionFunDescriptor
-             );
+  Status = 3D GetFunctionalDescriptor (
+                UsbRndisDevice->Config,
+                UNION_FUN_DESCRIPTOR,
+                UsbUnionFunDescriptor
+                );
   return Status;
 }
 
@@ -607,17 +607,17 @@ GetUsbRndisFunDescriptor (
   EFI_STATUS        Status;
   USB_RNDIS_DEVICE  *UsbRndisDevice;
 
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (This);
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (This);
 
-  if (UsbEthFunDescriptor =3D=3D NULL) {
+  if (UsbEthFunDescriptor = 3D = 3D NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Status =3D GetFunctionalDescriptor (
-             UsbRndisDevice->Config,
-             ETHERNET_FUN_DESCRIPTOR,
-             UsbEthFunDescriptor
-             );
+  Status = 3D GetFunctionalDescriptor (
+                UsbRndisDevice->Config,
+                ETHERNET_FUN_DESCRIPTOR,
+                UsbEthFunDescriptor
+                );
   return Status;
 }
 
@@ -650,22 +650,22 @@ SetUsbRndisMcastFilter (
   USB_ETHERNET_FUN_DESCRIPTOR  UsbEthFunDescriptor;
   USB_RNDIS_DEVICE             *UsbRndisDevice;
 
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (This);
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (This);
 
-  Status =3D This->UsbEthFunDescriptor (This, &UsbEthFunDescriptor);
+  Status = 3D This->UsbEthFunDescriptor (This, &UsbEthFunDescriptor);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  if ((UsbEthFunDescriptor.NumberMcFilters << 1) =3D=3D 0) {
+  if ((UsbEthFunDescriptor.NumberMcFilters << 1) = 3D = 3D 0) {
     return EFI_UNSUPPORTED;
   }
 
-  Request.RequestType =3D USB_ETHERNET_SET_REQ_TYPE;
-  Request.Request     =3D SET_ETH_MULTICAST_FILTERS_REQ;
-  Request.Value       =3D Value;
-  Request.Index       =3D UsbRndisDevice->NumOfInterface;
-  Request.Length      =3D Value * 6;
+  Request.RequestType = 3D USB_ETHERNET_SET_REQ_TYPE;
+  Request.Request     = 3D SET_ETH_MULTICAST_FILTERS_REQ;
+  Request.Value       = 3D Value;
+  Request.Index       = 3D UsbRndisDevice->NumOfInterface;
+  Request.Length      = 3D Value * 6;
 
   return UsbRndisDevice->UsbIo->UsbControlTransfer (
                                   UsbRndisDevice->UsbIo,
@@ -707,13 +707,13 @@ SetUsbRndisPowerFilter (
   UINT32                  TransStatus;
   USB_RNDIS_DEVICE        *UsbRndisDevice;
 
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (This);
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (This);
 
-  Request.RequestType =3D USB_ETHERNET_SET_REQ_TYPE;
-  Request.Request     =3D SET_ETH_POWER_MANAGEMENT_PATTERN_FILTER_REQ;
-  Request.Value       =3D Value;
-  Request.Index       =3D UsbRndisDevice->NumOfInterface;
-  Request.Length      =3D Length;
+  Request.RequestType = 3D USB_ETHERNET_SET_REQ_TYPE;
+  Request.Request     = 3D SET_ETH_POWER_MANAGEMENT_PATTERN_FILTER_REQ;
+  Request.Value       = 3D Value;
+  Request.Index       = 3D UsbRndisDevice->NumOfInterface;
+  Request.Length      = 3D Length;
 
   return UsbRndisDevice->UsbIo->UsbControlTransfer (
                                   UsbRndisDevice->UsbIo,
@@ -753,13 +753,13 @@ GetUsbRndisPowerFilter (
   UINT32                  TransStatus;
   USB_RNDIS_DEVICE        *UsbRndisDevice;
 
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (This);
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (This);
 
-  Request.RequestType =3D USB_ETHERNET_GET_REQ_TYPE;
-  Request.Request     =3D GET_ETH_POWER_MANAGEMENT_PATTERN_FILTER_REQ;
-  Request.Value       =3D Value;
-  Request.Index       =3D UsbRndisDevice->NumOfInterface;
-  Request.Length      =3D USB_ETH_POWER_FILTER_LENGTH;
+  Request.RequestType = 3D USB_ETHERNET_GET_REQ_TYPE;
+  Request.Request     = 3D GET_ETH_POWER_MANAGEMENT_PATTERN_FILTER_REQ;
+  Request.Value       = 3D Value;
+  Request.Index       = 3D UsbRndisDevice->NumOfInterface;
+  Request.Length      = 3D USB_ETH_POWER_FILTER_LENGTH;
 
   return UsbRndisDevice->UsbIo->UsbControlTransfer (
                                   UsbRndisDevice->UsbIo,
@@ -788,19 +788,29 @@ ConvertFilter (
 {
   UINT32                 Index;
   UINT32                 Count;
-  static struct BIT_MAP  Table[] =3D {
-    { PXE_OPFLAGS_RECEIVE_FILTER_UNICAST,            NDIS_PACKET_TYPE_DIRECTED      },
-    { PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST,          NDIS_PACKET_TYPE_BROADCAST     },
-    { PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST, NDIS_PACKET_TYPE_MULTICAST     },
-    { PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS,        NDIS_PACKET_TYPE_PROMISCUOUS   },
-    { PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST,      NDIS_PACKET_TYPE_ALL_MULTICAST },
-  };
+  static struct BIT_MAP  Table[] = 3D {
+    {
+      PXE_OPFLAGS_RECEIVE_FILTER_UNICAST, NDIS_PACKET_TYPE_DIRECTED
+    },
+    {
+      PXE_OPFLAGS_RECEIVE_FILTER_BROADCAST, NDIS_PACKET_TYPE_BROADCAST
+    },
+    {
+      PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST, NDIS_PACKET_TYPE_MULTICAST
+    },
+    {
+      PXE_OPFLAGS_RECEIVE_FILTER_PROMISCUOUS, NDIS_PACKET_TYPE_PROMISCUOUS
+    },
+    {
+      PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST, NDIS_PACKET_TYPE_ALL_MULTICAST
+    },
+  }
 
-  Count =3D sizeof (Table)/sizeof (Table[0]);
+  Count = 3D sizeof (Table)/sizeof (Table[0]);
 
-  for (Index =3D 0; (Table[Index].Src !=3D 0) && (Index < Count); Index++) {
+  for (Index = 3D 0; (Table[Index].Src != 3D 0) && (Index < Count); Index++) {
     if (Table[Index].Src & Value) {
-      *CdcFilter |=3D Table[Index].Dst;
+      *CdcFilter |= 3D Table[Index].Dst;
     }
   }
 }
@@ -833,44 +843,44 @@ RndisUndiReceiveFilter (
   PXE_CPB_RECEIVE_FILTERS      *Cpb;
   USB_ETHERNET_FUN_DESCRIPTOR  UsbEthFunDescriptor;
 
-  Count     =3D 0;
-  CpbAddr   =3D Cdb->CPBaddr;
-  CpbSize   =3D Cdb->CPBsize;
-  SetFilter =3D (UINT16)(Cdb->OpFlags & 0x1F);
-  Cpb       =3D (PXE_CPB_RECEIVE_FILTERS *)(UINTN)CpbAddr;
+  Count     = 3D 0;
+  CpbAddr   = 3D Cdb->CPBaddr;
+  CpbSize   = 3D Cdb->CPBsize;
+  SetFilter = 3D (UINT16)(Cdb->OpFlags & 0x1F);
+  Cpb       = 3D (PXE_CPB_RECEIVE_FILTERS *)(UINTN)CpbAddr;
 
   // The Cpb could be NULL.(ref:PXE_CPBADDR_NOT_USED)
-  Nic->RxFilter =3D (UINT8)SetFilter;
+  Nic->RxFilter = 3D (UINT8)SetFilter;
 
-  if (((SetFilter & PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST) !=3D 0) || (Cpb !=3D NULL)) {
-    if (Cpb !=3D NULL) {
-      Nic->McastCount =3D (UINT8)(CpbSize / PXE_MAC_LENGTH);
+  if (((SetFilter & PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST) != 3D 0) || (Cpb != 3D NULL)) {
+    if (Cpb != 3D NULL) {
+      Nic->McastCount = 3D (UINT8)(CpbSize / PXE_MAC_LENGTH);
       CopyMem (&Nic->McastList, Cpb, Nic->McastCount);
     } else {
-      Nic->McastCount =3D 0;
+      Nic->McastCount = 3D 0;
     }
 
     Nic->UsbEth->UsbEthFunDescriptor (Nic->UsbEth, &UsbEthFunDescriptor);
-    if ((UsbEthFunDescriptor.NumberMcFilters << 1) =3D=3D 0) {
-      Nic->RxFilter |=3D PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST;
+    if ((UsbEthFunDescriptor.NumberMcFilters << 1) = 3D = 3D 0) {
+      Nic->RxFilter |= 3D PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST;
       DEBUG ((DEBUG_INFO, "SetUsbEthPacketFilter Nic %lx Nic->UsbEth %lx ", Nic, Nic->UsbEth));
       Nic->UsbEth->SetUsbEthPacketFilter (Nic->UsbEth, Nic->RxFilter);
     } else {
-      Status =3D gBS->AllocatePool (EfiBootServicesData, Nic->McastCount * 6, (VOID **)&McastList);
+      Status = 3D gBS->AllocatePool (EfiBootServicesData, Nic->McastCount * 6, (VOID **)&McastList);
       if (EFI_ERROR (Status)) {
         return PXE_STATCODE_INVALID_PARAMETER;
       }
 
-      if (Cpb !=3D NULL) {
-        for (Index1 =3D 0; Index1 < Nic->McastCount; Index1++) {
-          for (Index2 =3D 0; Index2 < 6; Index2++) {
-            McastList[Count++] =3D Cpb->MCastList[Index1][Index2];
+      if (Cpb != 3D NULL) {
+        for (Index1 = 3D 0; Index1 < Nic->McastCount; Index1++) {
+          for (Index2 = 3D 0; Index2 < 6; Index2++) {
+            McastList[Count++] = 3D Cpb->MCastList[Index1][Index2];
           }
         }
       }
 
-      Nic->RxFilter |=3D PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST;
-      if (Cpb !=3D NULL) {
+      Nic->RxFilter |= 3D PXE_OPFLAGS_RECEIVE_FILTER_FILTERED_MULTICAST;
+      if (Cpb != 3D NULL) {
         Nic->UsbEth->SetUsbEthMcastFilter (Nic->UsbEth, Nic->McastCount, McastList);
       }
 
@@ -951,12 +961,12 @@ RndisUndiStart (
   DEBUG ((DEBUG_INFO, "RndisUndiStart Nic %lx Cdb %lx Nic State %x\n", Nic, Cdb, Nic->State));
 
   // Issue Rndis Reset and bring the device to RNDIS_BUS_INITIALIZED state
-  Status =3D RndisUndiReset (Cdb, Nic);
+  Status = 3D RndisUndiReset (Cdb, Nic);
   if (EFI_ERROR (Status)) {
     RndisUndiReset (Cdb, Nic);
   }
 
-  Status =3D RndisUndiInitialize (Cdb, Nic);
+  Status = 3D RndisUndiInitialize (Cdb, Nic);
   if (EFI_ERROR (Status)) {
     RndisUndiInitialize (Cdb, Nic);
   }
@@ -1007,15 +1017,15 @@ RndisUndiGetInitInfo (
 
   DEBUG ((DEBUG_INFO, "RndisUndiGetInitInfo\n"));
 
-  UsbEthDevice   =3D Nic->UsbEth;
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (UsbEthDevice);
+  UsbEthDevice   = 3D Nic->UsbEth;
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (UsbEthDevice);
 
-  Db =3D (PXE_DB_GET_INIT_INFO *)(UINTN)Cdb->DBaddr;
+  Db = 3D (PXE_DB_GET_INIT_INFO *)(UINTN)Cdb->DBaddr;
 
-  Db->FrameDataLen =3D UsbRndisDevice->MaxTransferSize - sizeof (REMOTE_NDIS_PACKET_MSG) - PXE_MAC_HEADER_LEN_ETHER;
+  Db->FrameDataLen = 3D UsbRndisDevice->MaxTransferSize - sizeof (REMOTE_NDIS_PACKET_MSG) - PXE_MAC_HEADER_LEN_ETHER;
   // Limit Max MTU size to 1500 bytes as RNDIS spec.
   if (Db->FrameDataLen > PXE_MAX_TXRX_UNIT_ETHER) {
-    Db->FrameDataLen =3D PXE_MAX_TXRX_UNIT_ETHER;
+    Db->FrameDataLen = 3D PXE_MAX_TXRX_UNIT_ETHER;
   }
 
   DEBUG ((DEBUG_INFO, "Db->FrameDataLen %x\n", Db->FrameDataLen));
@@ -1068,23 +1078,23 @@ RndisUndiInitialize (
 
   DEBUG ((DEBUG_INFO, "RndisUndiInitialize\n"));
 
-  UsbEthDriver   =3D Nic->UsbEth;
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (UsbEthDriver);
+  UsbEthDriver   = 3D Nic->UsbEth;
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (UsbEthDriver);
 
   ZeroMem (&RndisInitMsg, sizeof (REMOTE_NDIS_INITIALIZE_MSG));
   ZeroMem (&RndisInitMsgCmplt, sizeof (REMOTE_NDIS_INITIALIZE_CMPLT));
 
-  RndisInitMsg.MessageType     =3D RNDIS_INITIALIZE_MSG;
-  RndisInitMsg.MessageLength   =3D sizeof (REMOTE_NDIS_INITIALIZE_MSG);
-  RndisInitMsg.RequestID       =3D UsbRndisDevice->RequestId;
-  RndisInitMsg.MajorVersion    =3D RNDIS_MAJOR_VERSION;
-  RndisInitMsg.MinorVersion    =3D RNDIS_MINOR_VERSION;
-  RndisInitMsg.MaxTransferSize =3D RNDIS_MAX_TRANSFER_SIZE;
+  RndisInitMsg.MessageType     = 3D RNDIS_INITIALIZE_MSG;
+  RndisInitMsg.MessageLength   = 3D sizeof (REMOTE_NDIS_INITIALIZE_MSG);
+  RndisInitMsg.RequestID       = 3D UsbRndisDevice->RequestId;
+  RndisInitMsg.MajorVersion    = 3D RNDIS_MAJOR_VERSION;
+  RndisInitMsg.MinorVersion    = 3D RNDIS_MINOR_VERSION;
+  RndisInitMsg.MaxTransferSize = 3D RNDIS_MAX_TRANSFER_SIZE;
 
-  RndisInitMsgCmplt.MessageType   =3D RNDIS_INITIALIZE_CMPLT;
-  RndisInitMsgCmplt.MessageLength =3D sizeof (REMOTE_NDIS_INITIALIZE_CMPLT);
+  RndisInitMsgCmplt.MessageType   = 3D RNDIS_INITIALIZE_CMPLT;
+  RndisInitMsgCmplt.MessageLength = 3D sizeof (REMOTE_NDIS_INITIALIZE_CMPLT);
 
-  Status =3D RndisControlMsg (UsbRndisDevice, (REMOTE_NDIS_MSG_HEADER *)&RndisInitMsg, (REMOTE_NDIS_MSG_HEADER *)&RndisInitMsgCmplt);
+  Status = 3D RndisControlMsg (UsbRndisDevice, (REMOTE_NDIS_MSG_HEADER *)&RndisInitMsg, (REMOTE_NDIS_MSG_HEADER *)&RndisInitMsgCmplt);
 
   UsbRndisDevice->RequestId++;
 
@@ -1097,10 +1107,10 @@ RndisUndiInitialize (
     return EFI_UNSUPPORTED;
   }
 
-  UsbRndisDevice->Medium                =3D RndisInitMsgCmplt.Medium;
-  UsbRndisDevice->MaxPacketsPerTransfer =3D RndisInitMsgCmplt.MaxPacketsPerTransfer;
-  UsbRndisDevice->MaxTransferSize       =3D RndisInitMsgCmplt.MaxTransferSize;
-  UsbRndisDevice->PacketAlignmentFactor =3D RndisInitMsgCmplt.PacketAlignmentFactor;
+  UsbRndisDevice->Medium                = 3D RndisInitMsgCmplt.Medium;
+  UsbRndisDevice->MaxPacketsPerTransfer = 3D RndisInitMsgCmplt.MaxPacketsPerTransfer;
+  UsbRndisDevice->MaxTransferSize       = 3D RndisInitMsgCmplt.MaxTransferSize;
+  UsbRndisDevice->PacketAlignmentFactor = 3D RndisInitMsgCmplt.PacketAlignmentFactor;
 
   DEBUG ((DEBUG_INFO, "Medium : %x \n", RndisInitMsgCmplt.Medium));
   DEBUG ((DEBUG_INFO, "MaxPacketsPerTransfer : %x \n", RndisInitMsgCmplt.MaxPacketsPerTransfer));
@@ -1135,21 +1145,21 @@ RndisUndiReset (
 
   DEBUG ((DEBUG_INFO, "RndisUndiReset\n"));
 
-  UsbEthDriver   =3D Nic->UsbEth;
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (UsbEthDriver);
+  UsbEthDriver   = 3D Nic->UsbEth;
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (UsbEthDriver);
 
   ZeroMem (&RndisResetMsg, sizeof (REMOTE_NDIS_RESET_MSG));
   ZeroMem (&RndisResetCmplt, sizeof (REMOTE_NDIS_RESET_CMPLT));
 
-  RndisResetMsg.MessageType   =3D RNDIS_RESET_MSG;
-  RndisResetMsg.MessageLength =3D sizeof (REMOTE_NDIS_RESET_MSG);
+  RndisResetMsg.MessageType   = 3D RNDIS_RESET_MSG;
+  RndisResetMsg.MessageLength = 3D sizeof (REMOTE_NDIS_RESET_MSG);
 
-  RndisResetCmplt.MessageType   =3D RNDIS_RESET_CMPLT;
-  RndisResetCmplt.MessageLength =3D sizeof (REMOTE_NDIS_RESET_CMPLT);
+  RndisResetCmplt.MessageType   = 3D RNDIS_RESET_CMPLT;
+  RndisResetCmplt.MessageLength = 3D sizeof (REMOTE_NDIS_RESET_CMPLT);
 
-  Status =3D RndisControlMsg (UsbRndisDevice, (REMOTE_NDIS_MSG_HEADER *)&RndisResetMsg, (REMOTE_NDIS_MSG_HEADER *)&RndisResetCmplt);
+  Status = 3D RndisControlMsg (UsbRndisDevice, (REMOTE_NDIS_MSG_HEADER *)&RndisResetMsg, (REMOTE_NDIS_MSG_HEADER *)&RndisResetCmplt);
 
-  UsbRndisDevice->RequestId =3D 1;          // Let's start with 1
+  UsbRndisDevice->RequestId = 3D 1;          // Let's start with 1
 
   if (EFI_ERROR (Status) || (RndisResetCmplt.Status & 0x80000000)) {
     return EFI_DEVICE_ERROR;
@@ -1181,21 +1191,21 @@ RndisUndiShutdown (
 
   DEBUG ((DEBUG_INFO, "RndisUndiShutdown\n"));
 
-  UsbEthDriver   =3D Nic->UsbEth;
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (UsbEthDriver);
+  UsbEthDriver   = 3D Nic->UsbEth;
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (UsbEthDriver);
 
   ZeroMem (&RndisHltMsg, sizeof (REMOTE_NDIS_HALT_MSG));
 
-  RndisHltMsg.MessageType   =3D RNDIS_HLT_MSG;
-  RndisHltMsg.MessageLength =3D sizeof (REMOTE_NDIS_HALT_MSG);
+  RndisHltMsg.MessageType   = 3D RNDIS_HLT_MSG;
+  RndisHltMsg.MessageLength = 3D sizeof (REMOTE_NDIS_HALT_MSG);
 
-  Status =3D RndisControlMsg (UsbRndisDevice, (REMOTE_NDIS_MSG_HEADER *)&RndisHltMsg, NULL);
+  Status = 3D RndisControlMsg (UsbRndisDevice, (REMOTE_NDIS_MSG_HEADER *)&RndisHltMsg, NULL);
 
-  if (Status =3D=3D EFI_DEVICE_ERROR) {
-    Status =3D EFI_SUCCESS;
+  if (Status = 3D = 3D EFI_DEVICE_ERROR) {
+    Status = 3D EFI_SUCCESS;
   }
 
-  UsbRndisDevice->RequestId =3D 1;
+  UsbRndisDevice->RequestId = 3D 1;
   return Status;
 }
 
@@ -1215,7 +1225,7 @@ RndisUndiGetStatus (
   IN  NIC_DATA  *Nic
   )
 {
-  Cdb->StatFlags &=3D ~(PXE_STATFLAGS_GET_STATUS_NO_MEDIA);
+  Cdb->StatFlags &= 3D ~(PXE_STATFLAGS_GET_STATUS_NO_MEDIA);
   return EFI_SUCCESS;
 }
 
@@ -1247,17 +1257,17 @@ RndisUndiTransmit (
 
   DEBUG ((DEBUG_INFO, "RndisUndiTransmit DataLength : %x\n", *DataLength));
 
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (This);
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (This);
 
-  RndisPacketMsg =3D AllocateZeroPool (sizeof (REMOTE_NDIS_PACKET_MSG) + *DataLength);
-  if (RndisPacketMsg =3D=3D NULL) {
+  RndisPacketMsg = 3D AllocateZeroPool (sizeof (REMOTE_NDIS_PACKET_MSG) + *DataLength);
+  if (RndisPacketMsg = 3D = 3D NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  RndisPacketMsg->MessageType   =3D RNDIS_PACKET_MSG;
-  RndisPacketMsg->MessageLength =3D sizeof (REMOTE_NDIS_PACKET_MSG) + (UINT32)*DataLength;
-  RndisPacketMsg->DataOffset    =3D sizeof (REMOTE_NDIS_PACKET_MSG) - 8;
-  RndisPacketMsg->DataLength    =3D (UINT32)*DataLength;
+  RndisPacketMsg->MessageType   = 3D RNDIS_PACKET_MSG;
+  RndisPacketMsg->MessageLength = 3D sizeof (REMOTE_NDIS_PACKET_MSG) + (UINT32)*DataLength;
+  RndisPacketMsg->DataOffset    = 3D sizeof (REMOTE_NDIS_PACKET_MSG) - 8;
+  RndisPacketMsg->DataLength    = 3D (UINT32)*DataLength;
 
   CopyMem (
     ((UINT8 *)RndisPacketMsg) + sizeof (REMOTE_NDIS_PACKET_MSG),
@@ -1265,13 +1275,13 @@ RndisUndiTransmit (
     *DataLength
     );
 
-  TransferLength =3D RndisPacketMsg->MessageLength;
+  TransferLength = 3D RndisPacketMsg->MessageLength;
 
-  Status =3D RndisTransmitDataMsg (
-             UsbRndisDevice,
-             (REMOTE_NDIS_MSG_HEADER *)RndisPacketMsg,
-             &TransferLength
-             );
+  Status = 3D RndisTransmitDataMsg (
+                UsbRndisDevice,
+                (REMOTE_NDIS_MSG_HEADER *)RndisPacketMsg,
+                &TransferLength
+                );
 
   DEBUG ((DEBUG_INFO, "\nRndisUndiTransmit TransferLength %lx\n", TransferLength));
 
@@ -1314,41 +1324,41 @@ RndisUndiReceive (
   // Check if there is any outstanding packet to receive
   // The buffer allocated has a linked List followed by the packet.
 
-  UsbRndisDevice =3D USB_RNDIS_DEVICE_FROM_THIS (This);
-  Buffer         =3D NULL;
-  HeadPacket     =3D NULL;
+  UsbRndisDevice = 3D USB_RNDIS_DEVICE_FROM_THIS (This);
+  Buffer         = 3D NULL;
+  HeadPacket     = 3D NULL;
 
   while (1) {
-    Buffer =3D AllocateZeroPool (sizeof (PACKET_LIST) + sizeof (REMOTE_NDIS_PACKET_MSG) + UsbRndisDevice->MaxTransferSize);
-    if (Buffer =3D=3D NULL) {
+    Buffer = 3D AllocateZeroPool (sizeof (PACKET_LIST) + sizeof (REMOTE_NDIS_PACKET_MSG) + UsbRndisDevice->MaxTransferSize);
+    if (Buffer = 3D = 3D NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
 
-    RndisPacketMsg                =3D (REMOTE_NDIS_PACKET_MSG *)(sizeof (PACKET_LIST) + (UINT8 *)Buffer);
-    PacketList                    =3D (PACKET_LIST *)Buffer;
-    PacketList->PacketStartBuffer =3D (UINT8 *)Buffer + sizeof (PACKET_LIST);
+    RndisPacketMsg                = 3D (REMOTE_NDIS_PACKET_MSG *)(sizeof (PACKET_LIST) + (UINT8 *)Buffer);
+    PacketList                    = 3D (PACKET_LIST *)Buffer;
+    PacketList->PacketStartBuffer = 3D (UINT8 *)Buffer + sizeof (PACKET_LIST);
     // Save the original address for freeing it up
-    PacketList->OrgBuffer =3D (UINT8 *)Buffer;
-    TransferLength        =3D UsbRndisDevice->MaxTransferSize;
+    PacketList->OrgBuffer = 3D (UINT8 *)Buffer;
+    TransferLength        = 3D UsbRndisDevice->MaxTransferSize;
 
-    Status =3D RndisReceiveDataMsg (
-               UsbRndisDevice,
-               (REMOTE_NDIS_MSG_HEADER *)RndisPacketMsg,
-               &TransferLength
-               );
+    Status = 3D RndisReceiveDataMsg (
+                  UsbRndisDevice,
+                  (REMOTE_NDIS_MSG_HEADER *)RndisPacketMsg,
+                  &TransferLength
+                  );
 
-    if (EFI_ERROR (Status) || (TransferLength =3D=3D 0)) {
+    if (EFI_ERROR (Status) || (TransferLength = 3D = 3D 0)) {
       FreePool (Buffer);
       break;
     }
 
     // Collect all the RNDIS packet in Linked list.
-    if ((RndisPacketMsg->MessageType =3D=3D RNDIS_PACKET_MSG) &&
-        (RndisPacketMsg->DataOffset =3D=3D sizeof (REMOTE_NDIS_PACKET_MSG) - RNDIS_RESERVED_BYTE_LENGTH) &&
-        (TransferLength >=3D RndisPacketMsg->MessageLength))
+    if ((RndisPacketMsg->MessageType = 3D = 3D RNDIS_PACKET_MSG) &&
+        (RndisPacketMsg->DataOffset = 3D = 3D sizeof (REMOTE_NDIS_PACKET_MSG) - RNDIS_RESERVED_BYTE_LENGTH) &&
+        (TransferLength >= 3D RndisPacketMsg->MessageLength))
     {
       // Insert Packet
-      PacketList->RemainingLength =3D TransferLength;
+      PacketList->RemainingLength = 3D TransferLength;
       InsertTailList (&UsbRndisDevice->ReceivePacketList, Buffer);
     } else {
       FreePool (Buffer);
@@ -1356,32 +1366,32 @@ RndisUndiReceive (
   }
 
   while (!IsListEmpty (&UsbRndisDevice->ReceivePacketList)) {
-    HeadPacket =3D (PACKET_LIST *)GetFirstNode (&UsbRndisDevice->ReceivePacketList);
+    HeadPacket = 3D (PACKET_LIST *)GetFirstNode (&UsbRndisDevice->ReceivePacketList);
 
-    RndisPacketMsg =3D (REMOTE_NDIS_PACKET_MSG *)(UINT8 *)HeadPacket->PacketStartBuffer;
+    RndisPacketMsg = 3D (REMOTE_NDIS_PACKET_MSG *)(UINT8 *)HeadPacket->PacketStartBuffer;
 
     PrintRndisMsg ((REMOTE_NDIS_MSG_HEADER *)RndisPacketMsg);
 
     // Check whether the packet is valid RNDIS packet.
-    if ((HeadPacket->RemainingLength > sizeof (REMOTE_NDIS_PACKET_MSG)) && (RndisPacketMsg->MessageType =3D=3D RNDIS_PACKET_MSG) &&
-        (RndisPacketMsg->DataOffset =3D=3D (sizeof (REMOTE_NDIS_PACKET_MSG) - RNDIS_RESERVED_BYTE_LENGTH)) &&
-        (HeadPacket->RemainingLength >=3D RndisPacketMsg->MessageLength))
+    if ((HeadPacket->RemainingLength > sizeof (REMOTE_NDIS_PACKET_MSG)) && (RndisPacketMsg->MessageType = 3D = 3D RNDIS_PACKET_MSG) &&
+        (RndisPacketMsg->DataOffset = 3D = 3D (sizeof (REMOTE_NDIS_PACKET_MSG) - RNDIS_RESERVED_BYTE_LENGTH)) &&
+        (HeadPacket->RemainingLength >= 3D RndisPacketMsg->MessageLength))
     {
-      if (*DataLength >=3D RndisPacketMsg->DataLength) {
+      if (*DataLength >= 3D RndisPacketMsg->DataLength) {
         CopyMem (
           BulkInData,
           (UINT8 *)RndisPacketMsg + (RndisPacketMsg->DataOffset + RNDIS_RESERVED_BYTE_LENGTH),
           RndisPacketMsg->DataLength
           );
 
-        *DataLength =3D  RndisPacketMsg->DataLength;
+        *DataLength = 3D  RndisPacketMsg->DataLength;
 
-        HeadPacket->RemainingLength   =3D HeadPacket->RemainingLength - RndisPacketMsg->MessageLength;
-        HeadPacket->PacketStartBuffer =3D (UINT8 *)RndisPacketMsg + RndisPacketMsg->MessageLength;
+        HeadPacket->RemainingLength   = 3D HeadPacket->RemainingLength - RndisPacketMsg->MessageLength;
+        HeadPacket->PacketStartBuffer = 3D (UINT8 *)RndisPacketMsg + RndisPacketMsg->MessageLength;
 
         return EFI_SUCCESS;
       } else {
-        *DataLength =3D RndisPacketMsg->DataLength;
+        *DataLength = 3D RndisPacketMsg->DataLength;
         return EFI_BUFFER_TOO_SMALL;
       }
     }
@@ -1431,7 +1441,7 @@ RndisControlMsg (
   OUT REMOTE_NDIS_MSG_HEADER  *RndisMsgResponse
   )
 {
-  EFI_USB_IO_PROTOCOL           *UsbIo =3D UsbRndisDevice->UsbIo;
+  EFI_USB_IO_PROTOCOL           *UsbIo = 3D UsbRndisDevice->UsbIo;
   EFI_USB_DEVICE_REQUEST        DevReq;
   UINT32                        UsbStatus;
   EFI_STATUS                    Status;
@@ -1440,73 +1450,73 @@ RndisControlMsg (
   UINT32                        Index;
   REMOTE_NDIS_INITIALIZE_CMPLT  *RndisInitCmplt;
 
-  SaveResponseType   =3D 0;
-  SaveResponseLength =3D 0;
-  RndisInitCmplt     =3D (REMOTE_NDIS_INITIALIZE_CMPLT *)RndisMsgResponse;
+  SaveResponseType   = 3D 0;
+  SaveResponseLength = 3D 0;
+  RndisInitCmplt     = 3D (REMOTE_NDIS_INITIALIZE_CMPLT *)RndisMsgResponse;
 
   if (RndisMsgResponse) {
-    SaveResponseType   =3D RndisMsgResponse->MessageType;
-    SaveResponseLength =3D RndisMsgResponse->MessageLength;
+    SaveResponseType   = 3D RndisMsgResponse->MessageType;
+    SaveResponseLength = 3D RndisMsgResponse->MessageLength;
   }
 
   ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
 
-  DevReq.RequestType =3D USB_REQ_TYPE_CLASS | USB_TARGET_INTERFACE;
-  DevReq.Request     =3D SEND_ENCAPSULATED_COMMAND;
-  DevReq.Value       =3D 0;
-  DevReq.Index       =3D 0;
-  DevReq.Length      =3D (UINT16)RndisMsg->MessageLength;
+  DevReq.RequestType = 3D USB_REQ_TYPE_CLASS | USB_TARGET_INTERFACE;
+  DevReq.Request     = 3D SEND_ENCAPSULATED_COMMAND;
+  DevReq.Value       = 3D 0;
+  DevReq.Index       = 3D 0;
+  DevReq.Length      = 3D (UINT16)RndisMsg->MessageLength;
 
   PrintRndisMsg (RndisMsg);
 
-  Status =3D UsbIo->UsbControlTransfer (
-                    UsbIo,
-                    &DevReq,
-                    EfiUsbDataOut,
-                    USB_ETHERNET_TRANSFER_TIMEOUT,
-                    RndisMsg,
-                    RndisMsg->MessageLength,
-                    &UsbStatus
-                    );
+  Status = 3D UsbIo->UsbControlTransfer (
+                       UsbIo,
+                       &DevReq,
+                       EfiUsbDataOut,
+                       USB_ETHERNET_TRANSFER_TIMEOUT,
+                       RndisMsg,
+                       RndisMsg->MessageLength,
+                       &UsbStatus
+                       );
 
   DEBUG ((DEBUG_INFO, "RndisControlMsg: UsbStatus : %x Status : %r RndisMsgResponse : %lx\n", UsbStatus, Status, RndisMsgResponse));
 
   // Error or no response expected
-  if ((EFI_ERROR (Status)) || (RndisMsgResponse =3D=3D NULL)) {
+  if ((EFI_ERROR (Status)) || (RndisMsgResponse = 3D = 3D NULL)) {
     DEBUG ((DEBUG_INFO, "RndisControlMsg: UsbStatus : %x Status : %r\n", UsbStatus, Status));
     return Status;
   }
 
-  for (Index =3D 0; Index < (RNDIS_CONTROL_TIMEOUT/100); Index++) {
+  for (Index = 3D 0; Index < (RNDIS_CONTROL_TIMEOUT/100); Index++) {
     ReadRndisResponseInterrupt (UsbRndisDevice);
     ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
 
-    DevReq.RequestType =3D USB_ENDPOINT_DIR_IN | USB_REQ_TYPE_CLASS | USB_TARGET_INTERFACE;
-    DevReq.Request     =3D GET_ENCAPSULATED_RESPONSE;
-    DevReq.Value       =3D 0;
-    DevReq.Index       =3D 0;
-    DevReq.Length      =3D (UINT16)RndisMsgResponse->MessageLength;
+    DevReq.RequestType = 3D USB_ENDPOINT_DIR_IN | USB_REQ_TYPE_CLASS | USB_TARGET_INTERFACE;
+    DevReq.Request     = 3D GET_ENCAPSULATED_RESPONSE;
+    DevReq.Value       = 3D 0;
+    DevReq.Index       = 3D 0;
+    DevReq.Length      = 3D (UINT16)RndisMsgResponse->MessageLength;
 
-    Status =3D UsbIo->UsbControlTransfer (
-                      UsbIo,
-                      &DevReq,
-                      EfiUsbDataIn,
-                      USB_ETHERNET_TRANSFER_TIMEOUT,
-                      RndisMsgResponse,
-                      RndisMsgResponse->MessageLength,
-                      &UsbStatus
-                      );
+    Status = 3D UsbIo->UsbControlTransfer (
+                         UsbIo,
+                         &DevReq,
+                         EfiUsbDataIn,
+                         USB_ETHERNET_TRANSFER_TIMEOUT,
+                         RndisMsgResponse,
+                         RndisMsgResponse->MessageLength,
+                         &UsbStatus
+                         );
 
     DEBUG ((DEBUG_INFO, "RndisControlMsg Response: UsbStatus : %x Status : %r \n", UsbStatus, Status));
 
     PrintRndisMsg (RndisMsgResponse);
 
     if (!EFI_ERROR (Status)) {
-      if ((RndisInitCmplt->RequestID !=3D ((REMOTE_NDIS_INITIALIZE_CMPLT *)RndisMsg)->RequestID) || (RndisInitCmplt->MessageType !=3D SaveResponseType)) {
+      if ((RndisInitCmplt->RequestID != 3D ((REMOTE_NDIS_INITIALIZE_CMPLT *)RndisMsg)->RequestID) || (RndisInitCmplt->MessageType != 3D SaveResponseType)) {
         DEBUG ((DEBUG_INFO, "Retry the response\n"));
 
-        RndisMsgResponse->MessageType   =3D SaveResponseType;
-        RndisMsgResponse->MessageLength =3D SaveResponseLength;
+        RndisMsgResponse->MessageType   = 3D SaveResponseType;
+        RndisMsgResponse->MessageLength = 3D SaveResponseLength;
         continue;
       }
     }
@@ -1539,23 +1549,23 @@ RndisTransmitDataMsg (
   EFI_STATUS  Status;
   UINT32      UsbStatus;
 
-  if (UsbRndisDevice->BulkInEndpoint =3D=3D 0) {
+  if (UsbRndisDevice->BulkInEndpoint = 3D = 3D 0) {
     GetEndpoint (UsbRndisDevice->UsbIoCdcData, UsbRndisDevice);
   }
 
   PrintRndisMsg (RndisMsg);
 
-  Status =3D UsbRndisDevice->UsbIoCdcData->UsbBulkTransfer (
-                                           UsbRndisDevice->UsbIoCdcData,
-                                           UsbRndisDevice->BulkOutEndpoint,
-                                           RndisMsg,
-                                           TransferLength,
-                                           USB_TX_ETHERNET_BULK_TIMEOUT,
-                                           &UsbStatus
-                                           );
+  Status = 3D UsbRndisDevice->UsbIoCdcData->UsbBulkTransfer (
+                                              UsbRndisDevice->UsbIoCdcData,
+                                              UsbRndisDevice->BulkOutEndpoint,
+                                              RndisMsg,
+                                              TransferLength,
+                                              USB_TX_ETHERNET_BULK_TIMEOUT,
+                                              &UsbStatus
+                                              );
 
-  if (Status =3D=3D EFI_SUCCESS) {
-    gStopBulkInCnt =3D MAXIMUM_STOPBULKIN_CNT;     // After sending cmd ,we will polling receive package for MAXIMUM_STOPBULKIN_CNT times
+  if (Status = 3D = 3D EFI_SUCCESS) {
+    gStopBulkInCnt = 3D MAXIMUM_STOPBULKIN_CNT;     // After sending cmd ,we will polling receive package for MAXIMUM_STOPBULKIN_CNT times
   }
 
   return Status;
@@ -1581,37 +1591,37 @@ RndisReceiveDataMsg (
   EFI_STATUS  Status;
   UINT32      UsbStatus;
 
-  UsbStatus =3D 0;
+  UsbStatus = 3D 0;
 
-  if (UsbRndisDevice->BulkInEndpoint =3D=3D 0) {
+  if (UsbRndisDevice->BulkInEndpoint = 3D = 3D 0) {
     GetEndpoint (UsbRndisDevice->UsbIoCdcData, UsbRndisDevice);
   }
 
   // Use gStopBulkInCnt to stop BulkIn command
   if (gStopBulkInCnt || LAN_BULKIN_CMD_CONTROL) {
-    Status =3D UsbRndisDevice->UsbIoCdcData->UsbBulkTransfer (
-                                             UsbRndisDevice->UsbIoCdcData,
-                                             UsbRndisDevice->BulkInEndpoint,
-                                             RndisMsg,
-                                             TransferLength,
-                                             USB_RX_ETHERNET_BULK_TIMEOUT,
-                                             &UsbStatus
-                                             );
+    Status = 3D UsbRndisDevice->UsbIoCdcData->UsbBulkTransfer (
+                                                UsbRndisDevice->UsbIoCdcData,
+                                                UsbRndisDevice->BulkInEndpoint,
+                                                RndisMsg,
+                                                TransferLength,
+                                                USB_RX_ETHERNET_BULK_TIMEOUT,
+                                                &UsbStatus
+                                                );
 
     if (!EFI_ERROR (Status)) {
-      gStopBulkInCnt =3D MINIMUM_STOPBULKIN_CNT;
+      gStopBulkInCnt = 3D MINIMUM_STOPBULKIN_CNT;
     } else {
       gStopBulkInCnt--;
     }
   } else {
-    Status          =3D EFI_TIMEOUT;
-    *TransferLength =3D 0;
+    Status          = 3D EFI_TIMEOUT;
+    *TransferLength = 3D 0;
     gBlockBulkInCnt++;
   }
 
   if (gBlockBulkInCnt > BULKIN_CMD_POLLING_CNT) {
-    gStopBulkInCnt  =3D MINIMUM_STOPBULKIN_CNT;
-    gBlockBulkInCnt =3D 0;
+    gStopBulkInCnt  = 3D MINIMUM_STOPBULKIN_CNT;
+    gBlockBulkInCnt = 3D 0;
   }
 
   PrintRndisMsg (RndisMsg);
@@ -1633,75 +1643,75 @@ PrintRndisMsg (
   UINTN                    Length;
   REMOTE_NDIS_QUERY_CMPLT  *RndisQueryCmplt;
 
-  Length =3D 0;
+  Length = 3D 0;
 
   switch (RndisMsg->MessageType) {
     case RNDIS_PACKET_MSG:
       DEBUG ((DEBUG_INFO, "RNDIS_PACKET_MSG:\n"));
-      Length =3D sizeof (REMOTE_NDIS_PACKET_MSG) + 0x14;
+      Length = 3D sizeof (REMOTE_NDIS_PACKET_MSG) + 0x14;
       break;
     case RNDIS_INITIALIZE_MSG:
       DEBUG ((DEBUG_INFO, "RNDIS_INITIALIZE_MSG:\n"));
-      Length =3D sizeof (REMOTE_NDIS_INITIALIZE_MSG);
+      Length = 3D sizeof (REMOTE_NDIS_INITIALIZE_MSG);
       break;
     case RNDIS_INITIALIZE_CMPLT:
       DEBUG ((DEBUG_INFO, "RNDIS_INITIALIZE_CMPLT:\n"));
-      Length =3D sizeof (REMOTE_NDIS_INITIALIZE_CMPLT);
+      Length = 3D sizeof (REMOTE_NDIS_INITIALIZE_CMPLT);
       break;
     case RNDIS_HLT_MSG:
       DEBUG ((DEBUG_INFO, "RNDIS_HLT_MSG:\n"));
-      Length =3D sizeof (REMOTE_NDIS_HALT_MSG);
+      Length = 3D sizeof (REMOTE_NDIS_HALT_MSG);
       break;
     case RNDIS_QUERY_MSG:
       DEBUG ((DEBUG_INFO, "RNDIS_QUERY_MSG:\n"));
-      Length =3D sizeof (REMOTE_NDIS_QUERY_MSG);
+      Length = 3D sizeof (REMOTE_NDIS_QUERY_MSG);
       break;
     case RNDIS_QUERY_CMPLT:
       DEBUG ((DEBUG_INFO, "RNDIS_QUERY_CMPLT:\n"));
-      RndisQueryCmplt =3D (REMOTE_NDIS_QUERY_CMPLT *)RndisMsg;
-      Length          =3D sizeof (REMOTE_NDIS_QUERY_CMPLT) + RndisQueryCmplt->InformationBufferLength;
+      RndisQueryCmplt = 3D (REMOTE_NDIS_QUERY_CMPLT *)RndisMsg;
+      Length          = 3D sizeof (REMOTE_NDIS_QUERY_CMPLT) + RndisQueryCmplt->InformationBufferLength;
       break;
     case RNDIS_SET_MSG:
       DEBUG ((DEBUG_INFO, "RNDIS_SET_MSG:\n"));
-      Length =3D sizeof (REMOTE_NDIS_SET_MSG);
+      Length = 3D sizeof (REMOTE_NDIS_SET_MSG);
       break;
     case RNDIS_SET_CMPLT:
       DEBUG ((DEBUG_INFO, "RNDIS_SET_CMPLT:\n"));
-      Length =3D sizeof (REMOTE_NDIS_SET_CMPLT);
+      Length = 3D sizeof (REMOTE_NDIS_SET_CMPLT);
       break;
     case RNDIS_RESET_MSG:
       DEBUG ((DEBUG_INFO, "RNDIS_RESET_MSG:\n"));
-      Length =3D sizeof (REMOTE_NDIS_RESET_MSG);
+      Length = 3D sizeof (REMOTE_NDIS_RESET_MSG);
       break;
     case RNDIS_RESET_CMPLT:
       DEBUG ((DEBUG_INFO, "RNDIS_RESET_CMPLT:\n"));
-      Length =3D sizeof (REMOTE_NDIS_RESET_CMPLT);
+      Length = 3D sizeof (REMOTE_NDIS_RESET_CMPLT);
       break;
     case RNDIS_INDICATE_STATUS_MSG:
       DEBUG ((DEBUG_INFO, "RNDIS_INDICATE_STATUS_MSG:\n"));
-      Length =3D sizeof (REMOTE_NDIS_INDICATE_STATUS_MSG);
+      Length = 3D sizeof (REMOTE_NDIS_INDICATE_STATUS_MSG);
       break;
     case RNDIS_KEEPALIVE_MSG:
       DEBUG ((DEBUG_INFO, "RNDIS_KEEPALIVE_MSG:\n"));
-      Length =3D sizeof (REMOTE_NDIS_KEEPALIVE_MSG);
+      Length = 3D sizeof (REMOTE_NDIS_KEEPALIVE_MSG);
       break;
     case RNDIS_KEEPALIVE_CMPLT:
       DEBUG ((DEBUG_INFO, "RNDIS_KEEPALIVE_CMPLT:\n"));
-      Length =3D sizeof (REMOTE_NDIS_KEEPALIVE_CMPLT);
+      Length = 3D sizeof (REMOTE_NDIS_KEEPALIVE_CMPLT);
   }
 
   if (Length) {
-    UINTN  Index =3D 0;
-    for ( ; Length; Length -=3D 4, Index++) {
+    UINTN  Index = 3D 0;
+    for ( ; Length; Length -= 3D 4, Index++) {
       DEBUG ((DEBUG_INFO, "%8X\t", *((UINT32 *)RndisMsg + Index)));
-      if (((Index % 4) =3D=3D 3) && (Index !=3D 0)) {
+      if (((Index % 4) = 3D = 3D 3) && (Index != 3D 0)) {
         DEBUG ((DEBUG_INFO, "\n"));
       }
 
       if ((Length < 8) && (Length > 4)) {
         UINT32  Data32;
         Index++;
-        Data32 =3D *((UINT32 *)RndisMsg + Index);
+        Data32 = 3D *((UINT32 *)RndisMsg + Index);
         DEBUG ((DEBUG_INFO, "%8X\t", Data32));
         break;
       }

@@ -6,7 +6,7 @@
 **/
 #include "UsbCdcEcm.h"
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  gUsbEcmDriverNameTable[] =3D {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  gUsbEcmDriverNameTable[] = 3D {
   {
     "eng;en",
     L"USB ECM Driver"
@@ -15,7 +15,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  gUsbEcmDriverNameTable[]
     NULL,
     NULL
   }
-};
+}
 
 EFI_STATUS
 EFIAPI
@@ -35,17 +35,17 @@ UsbEcmComponentNameGetControllerName (
   OUT CHAR16                      **ControllerName
   );
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUsbEcmComponentName =3D {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUsbEcmComponentName = 3D {
   UsbEcmComponentNameGetDriverName,
   UsbEcmComponentNameGetControllerName,
   "eng"
-};
+}
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gUsbEcmComponentName2 =3D {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gUsbEcmComponentName2 = 3D {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)UsbEcmComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)UsbEcmComponentNameGetControllerName,
   "en"
-};
+}
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -94,7 +94,7 @@ UsbEcmComponentNameGetDriverName (
            This->SupportedLanguages,
            gUsbEcmDriverNameTable,
            DriverName,
-           (BOOLEAN)(This =3D=3D &gUsbEcmComponentName)
+           (BOOLEAN)(This = 3D = 3D &gUsbEcmComponentName)
            );
 }
 

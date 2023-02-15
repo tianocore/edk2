@@ -10,7 +10,7 @@
 
 extern EFI_DRIVER_BINDING_PROTOCOL  gNetworkCommonDriverBinding;
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  gNetworkCommonDriverNameTable[] =3D {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  gNetworkCommonDriverNameTable[] = 3D {
   {
     "eng;en",
     L"Network Common Driver"
@@ -19,8 +19,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  gNetworkCommonDriverName
     NULL,
     NULL
   }
-};
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  *gNetworkCommonControllerNameTable =3D NULL;
+}
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  *gNetworkCommonControllerNameTable = 3D NULL;
 
 EFI_STATUS
 EFIAPI
@@ -40,17 +40,17 @@ NetworkCommonComponentNameGetControllerName (
   OUT CHAR16                      **ControllerName
   );
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gNetworkCommonComponentName =3D {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gNetworkCommonComponentName = 3D {
   NetworkCommonComponentNameGetDriverName,
   NetworkCommonComponentNameGetControllerName,
   "eng"
-};
+}
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gNetworkCommonComponentName2 =3D {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gNetworkCommonComponentName2 = 3D {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)NetworkCommonComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)NetworkCommonComponentNameGetControllerName,
   "en"
-};
+}
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -99,7 +99,7 @@ NetworkCommonComponentNameGetDriverName (
            This->SupportedLanguages,
            gNetworkCommonDriverNameTable,
            DriverName,
-           (BOOLEAN)(This =3D=3D &gNetworkCommonComponentName)
+           (BOOLEAN)(This = 3D = 3D &gNetworkCommonComponentName)
            );
 }
 
@@ -180,18 +180,18 @@ NetworkCommonComponentNameGetControllerName (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (ChildHandle =3D=3D NULL) {
+  if (ChildHandle = 3D = 3D NULL) {
     return EFI_UNSUPPORTED;
   }
 
   //
   // Make sure this driver is currently managing ControllerHandle
   //
-  Status =3D EfiTestManagedDevice (
-             Controller,
-             gNetworkCommonDriverBinding.DriverBindingHandle,
-             &gEdkIIUsbEthProtocolGuid
-             );
+  Status = 3D EfiTestManagedDevice (
+                Controller,
+                gNetworkCommonDriverBinding.DriverBindingHandle,
+                &gEdkIIUsbEthProtocolGuid
+                );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -199,53 +199,53 @@ NetworkCommonComponentNameGetControllerName (
   //
   // Make sure this driver produced ChildHandle
   //
-  Status =3D EfiTestChildHandle (
-             Controller,
-             ChildHandle,
-             &gEdkIIUsbEthProtocolGuid
-             );
+  Status = 3D EfiTestChildHandle (
+                Controller,
+                ChildHandle,
+                &gEdkIIUsbEthProtocolGuid
+                );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status =3D gBS->HandleProtocol (Controller, &gEfiUsbIoProtocolGuid, (VOID **)&UsbIo);
+  Status = 3D gBS->HandleProtocol (Controller, &gEfiUsbIoProtocolGuid, (VOID **)&UsbIo);
 
   if (!EFI_ERROR (Status)) {
-    Status =3D UsbIo->UsbGetDeviceDescriptor (UsbIo, &DevDesc);
+    Status = 3D UsbIo->UsbGetDeviceDescriptor (UsbIo, &DevDesc);
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
-    Status =3D UsbIo->UsbGetStringDescriptor (UsbIo, 0x409, DevDesc.StrManufacturer, &HandleName);
+    Status = 3D UsbIo->UsbGetStringDescriptor (UsbIo, 0x409, DevDesc.StrManufacturer, &HandleName);
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
-    *ControllerName =3D HandleName;
+    *ControllerName = 3D HandleName;
 
-    if (gNetworkCommonControllerNameTable !=3D NULL) {
+    if (gNetworkCommonControllerNameTable != 3D NULL) {
       FreeUnicodeStringTable (gNetworkCommonControllerNameTable);
-      gNetworkCommonControllerNameTable =3D NULL;
+      gNetworkCommonControllerNameTable = 3D NULL;
     }
 
-    Status =3D AddUnicodeString2 (
-               "eng",
-               gNetworkCommonComponentName.SupportedLanguages,
-               &gNetworkCommonControllerNameTable,
-               HandleName,
-               TRUE
-               );
+    Status = 3D AddUnicodeString2 (
+                  "eng",
+                  gNetworkCommonComponentName.SupportedLanguages,
+                  &gNetworkCommonControllerNameTable,
+                  HandleName,
+                  TRUE
+                  );
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
-    Status =3D AddUnicodeString2 (
-               "en",
-               gNetworkCommonComponentName2.SupportedLanguages,
-               &gNetworkCommonControllerNameTable,
-               HandleName,
-               FALSE
-               );
+    Status = 3D AddUnicodeString2 (
+                  "en",
+                  gNetworkCommonComponentName2.SupportedLanguages,
+                  &gNetworkCommonControllerNameTable,
+                  HandleName,
+                  FALSE
+                  );
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -255,7 +255,7 @@ NetworkCommonComponentNameGetControllerName (
              This->SupportedLanguages,
              gNetworkCommonControllerNameTable,
              ControllerName,
-             (BOOLEAN)(This =3D=3D &gNetworkCommonComponentName)
+             (BOOLEAN)(This = 3D = 3D &gNetworkCommonComponentName)
              );
   }
 

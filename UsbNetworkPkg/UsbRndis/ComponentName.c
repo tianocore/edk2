@@ -8,7 +8,7 @@
 
 #include "UsbRndis.h"
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  gUsbRndisDriverNameTable[] =3D {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  gUsbRndisDriverNameTable[] = 3D {
   {
     "eng;en",
     L"USB RNDIS Driver"
@@ -17,7 +17,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  gUsbRndisDriverNameTable
     NULL,
     NULL
   }
-};
+}
 
 EFI_STATUS
 EFIAPI
@@ -37,17 +37,17 @@ UsbRndisComponentNameGetControllerName (
   OUT CHAR16                      **ControllerName
   );
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUsbRndisComponentName =3D {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUsbRndisComponentName = 3D {
   UsbRndisComponentNameGetDriverName,
   UsbRndisComponentNameGetControllerName,
   "eng"
-};
+}
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gUsbRndisComponentName2 =3D {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gUsbRndisComponentName2 = 3D {
   (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)UsbRndisComponentNameGetDriverName,
   (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)UsbRndisComponentNameGetControllerName,
   "en"
-};
+}
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -96,7 +96,7 @@ UsbRndisComponentNameGetDriverName (
            This->SupportedLanguages,
            gUsbRndisDriverNameTable,
            DriverName,
-           (BOOLEAN)(This =3D=3D &gUsbRndisComponentName)
+           (BOOLEAN)(This = 3D = 3D &gUsbRndisComponentName)
            );
 }
 
