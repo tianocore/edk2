@@ -367,12 +367,9 @@ typedef
 (EFIAPI *ASM_RELOCATE_AP_LOOP)(
   IN BOOLEAN                 MwaitSupport,
   IN UINTN                   ApTargetCState,
-  IN UINTN                   PmCodeSegment,
   IN UINTN                   TopOfApStack,
   IN UINTN                   NumberToFinish,
-  IN UINTN                   Pm16CodeSegment,
-  IN UINTN                   SevEsAPJumpTable,
-  IN UINTN                   WakeupBuffer
+  IN UINTN                   Cr3
   );
 
 /**
@@ -495,6 +492,18 @@ AllocateCodeBuffer (
 UINTN
 GetSevEsAPMemory (
   VOID
+  );
+
+/**
+  Create 1:1 mapping page table in reserved memory to map the specified address range.
+  @param[in]      LinearAddress  The start of the linear address range.
+  @param[in]      Length         The length of the linear address range.
+  @return The page table to be created.
+**/
+UINTN
+CreatePageTable (
+  IN UINTN  Address,
+  IN UINTN  Length
   );
 
 /**
