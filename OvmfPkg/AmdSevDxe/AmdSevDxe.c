@@ -23,6 +23,10 @@
 #include <Pi/PrePiDxeCis.h>
 #include <Protocol/SevMemoryAcceptance.h>
 #include <Protocol/MemoryAccept.h>
+#include <Uefi/UefiSpec.h>
+
+// Present, initialized, tested bits defined in MdeModulePkg/Core/Dxe/DxeMain.h
+#define EFI_MEMORY_INTERNAL_MASK  0x0700000000000000ULL
 
 STATIC CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION  mSnpBootDxeTable = {
   SIGNATURE_32 ('A',                                    'M', 'D', 'E'),
@@ -116,7 +120,9 @@ AcceptAllMemory (
                     EfiGcdMemoryTypeSystemMemory,
                     Desc->BaseAddress,
                     Desc->Length,
-                    EFI_MEMORY_CPU_CRYPTO | EFI_MEMORY_XP | EFI_MEMORY_RO | EFI_MEMORY_RP
+                    // Allocable system memory resource capabilities as masked
+                    // in MdeModulePkg/Core/Dxe/Mem/Page.c:PromoteMemoryResource
+                    Desc->Capabilities & ~(EFI_MEMORY_INTERNAL_MASK | EFI_MEMORY_RUNTIME)
                     );
     if (EFI_ERROR (Status)) {
       break;
@@ -124,6 +130,7 @@ AcceptAllMemory (
   }
 
   gBS->FreePool (AllDescMap);
+  gBS->CloseEvent (mAcceptAllMemoryEvent);
   return Status;
 }
 
