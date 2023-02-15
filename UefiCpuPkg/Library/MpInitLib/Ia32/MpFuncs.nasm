@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -219,20 +219,17 @@ SwitchToRealProcEnd:
 RendezvousFunnelProcEnd:
 
 ;-------------------------------------------------------------------------------------
-;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack, CountTofinish, Pm16CodeSegment, SevEsAPJumpTable, WakeupBuffer);
-;
-;  The last three parameters (Pm16CodeSegment, SevEsAPJumpTable and WakeupBuffer) are
-;  specific to SEV-ES support and are not applicable on IA32.
+;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, TopOfApStack, CountTofinish, Cr3);
 ;-------------------------------------------------------------------------------------
 AsmRelocateApLoopStart:
     mov        eax, esp
-    mov        esp, [eax + 16]     ; TopOfApStack
+    mov        esp, [eax + 12]     ; TopOfApStack
     push       dword [eax]         ; push return address for stack trace
     push       ebp
     mov        ebp, esp
     mov        ebx, [eax + 8]      ; ApTargetCState
     mov        ecx, [eax + 4]      ; MwaitSupport
-    mov        eax, [eax + 20]     ; CountTofinish
+    mov        eax, [eax + 16]     ; CountTofinish
     lock dec   dword [eax]         ; (*CountTofinish)--
     cmp        cl,  1              ; Check mwait-monitor support
     jnz        HltLoop

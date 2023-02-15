@@ -28,7 +28,7 @@ volatile BOOLEAN        mStopCheckAllApsStatus       = TRUE;
 UINTN                   mReservedTopOfApStack;
 volatile UINT32         mNumberToFinish = 0;
 RELOCATE_AP_LOOP_ENTRY  mReservedApLoop;
-
+UINTN                   mApPageTable;
 
 //
 // Begin wakeup buffer allocation below 0x88000
@@ -379,15 +379,18 @@ RelocateApLoop (
   IN OUT VOID  *Buffer
   )
 {
-  CPU_MP_DATA                  *CpuMpData;
-  BOOLEAN                      MwaitSupport;
-  UINTN                        ProcessorNumber;
-  UINTN                        StackStart;
+  CPU_MP_DATA  *CpuMpData;
+  BOOLEAN      MwaitSupport;
+  UINTN        ProcessorNumber;
+  UINTN        StackStart;
 
   MpInitLibWhoAmI (&ProcessorNumber);
   CpuMpData    = GetCpuMpData ();
   MwaitSupport = IsMwaitSupport ();
   if (CpuMpData->UseSevEsAPMethod) {
+    //
+    // 64-bit AMD Sev processor
+    //
     StackStart = CpuMpData->SevEsAPResetStackStart;
     mReservedApLoop.AmdSevEntry (
                       MwaitSupport,
@@ -400,16 +403,16 @@ RelocateApLoop (
                       CpuMpData->WakeupBuffer
                       );
   } else {
+    //
+    // Intel processor (32-bit or 64-bit), 32-bit AMD processor, or 64-bit AMD non-Sev processor
+    //
     StackStart = mReservedTopOfApStack;
     mReservedApLoop.GenericEntry (
                       MwaitSupport,
                       CpuMpData->ApTargetCState,
-                      CpuMpData->PmCodeSegment,
                       StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
                       (UINTN)&mNumberToFinish,
-                      CpuMpData->Pm16CodeSegment,
-                      CpuMpData->SevEsAPBuffer,
-                      CpuMpData->WakeupBuffer
+                      mApPageTable
                       );
   }
 
@@ -540,9 +543,17 @@ InitMpGlobalData (
 
   AddressMap = &CpuMpData->AddressMap;
   if (CpuMpData->UseSevEsAPMethod) {
+    //
+    // 64-bit AMD Sev processor
+    //
+    Address        = BASE_4GB - 1;
     ApLoopFunc     = AddressMap->RelocateApLoopFuncAddressAmdSev;
     ApLoopFuncSize = AddressMap->RelocateApLoopFuncSizeAmdSev;
   } else {
+    //
+    // Intel processor (32-bit or 64-bit), 32-bit AMD processor, or 64-bit AMD non-Sev processor
+    //
+    Address        = MAX_ADDRESS;
     ApLoopFunc     = AddressMap->RelocateApLoopFuncAddress;
     ApLoopFuncSize = AddressMap->RelocateApLoopFuncSize;
   }
@@ -564,7 +575,6 @@ InitMpGlobalData (
   // +------------+ (low address )
   //
 
-  Address    = BASE_4GB - 1;
   StackPages = EFI_SIZE_TO_PAGES (CpuMpData->CpuCount * AP_SAFE_STACK_SIZE);
   FuncPages  = EFI_SIZE_TO_PAGES (ALIGN_VALUE (ApLoopFuncSize, EFI_PAGE_SIZE));
 
@@ -597,6 +607,16 @@ InitMpGlobalData (
   ASSERT ((mReservedTopOfApStack & (UINTN)(CPU_STACK_ALIGNMENT - 1)) == 0);
   mReservedApLoop.Data = (VOID *)(UINTN)Address;
   CopyMem (mReservedApLoop.Data, ApLoopFunc, ApLoopFuncSize);
+  if (!CpuMpData->UseSevEsAPMethod) {
+    //
+    // non-Sev Processor
+    //
+    mApPageTable = CreatePageTable (
+                     (UINTN)Address,
+                     EFI_PAGES_TO_SIZE (StackPages+FuncPages)
+                     );
+  }
+
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
