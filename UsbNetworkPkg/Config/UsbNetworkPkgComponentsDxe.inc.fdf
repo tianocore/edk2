@@ -1,0 +1,20 @@
+## @file
+# List of Core Components.
+#
+# Copyright (c) 2023, American Megatrends International LLC. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+  INF UsbNetworkPkg/NetworkCommon/NetworkCommon.inf
+
+!if gUsbNetworkPkgTokenSpaceGuid.UsbCdcEcmSupport
+  INF UsbNetworkPkg/UsbCdcEcm/UsbCdcEcm.inf
+!endif
+
+!if gUsbNetworkPkgTokenSpaceGuid.UsbCdcNcmSupport
+  INF UsbNetworkPkg/UsbCdcNcm/UsbCdcNcm.inf
+!endif
+
+!if gUsbNetworkPkgTokenSpaceGuid.UsbRndisSupport
+  INF UsbNetworkPkg/UsbRndis/UsbRndis.inf
+!endif
