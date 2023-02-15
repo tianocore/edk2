@@ -1,0 +1,46 @@
+## @file
+#  This package defines Usb network specific interfaces and library classes
+#  as well as configuration for standard edk2 packages.
+#
+# Copyright (c) 2023, American Megatrends International LLC. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = UsbNetworkPkg
+  PACKAGE_GUID                   = abfab91e-37ea-4cb4-80a6-563dbb0bcec6
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+  Include
+
+[Protocols]
+  ## Include/Protocol/EdkIIUsbEthernet.h
+  gEdkIIUsbEthProtocolGuid = { 0x8d8969cc, 0xfeb0, 0x4303, { 0xb2, 0x1a, 0x1f, 0x11, 0x6f, 0x38, 0x56, 0x43 } }
+
+[Guids]
+  ## Usb Network package token space GUID
+  gUsbNetworkPkgTokenSpaceGuid  = { 0xA1231E82, 0x21B8, 0x4204, { 0x92, 0xBB, 0x37, 0x3A, 0xFB, 0x01, 0xC6, 0xA1 } }
+
+[PcdsFeatureFlag]
+
+  ## Set the PCD 'UsbCdcEcmSupport' to 'TRUE' if 'Usb Cdc Ecm device' need to be enabled.
+  gUsbNetworkPkgTokenSpaceGuid.UsbCdcEcmSupport|FALSE|BOOLEAN|0x00000001
+
+  ## Set the PCD 'UsbCdcNcmSupport' to 'TRUE' if 'Usb Cdc Ncm device' need to be enabled.
+  gUsbNetworkPkgTokenSpaceGuid.UsbCdcNcmSupport|FALSE|BOOLEAN|0x00000002
+
+  ## Set the PCD 'UsbRndisSupport' to 'TRUE' if 'Usb Rndis device' need to be enabled.
+  gUsbNetworkPkgTokenSpaceGuid.UsbRndisSupport|TRUE|BOOLEAN|0x00000003
+
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## Support rate limiting
+  gUsbNetworkPkgTokenSpaceGuid.EnableRateLimiting|FALSE|BOOLEAN|0x00010001
+
+  ## The rate limiting Credit value is check in rate limiter event.
+  #  It is to control the RateLimitingCreditCount max value.
+  gUsbNetworkPkgTokenSpaceGuid.RateLimitingCredit|10|UINT32|0x00010002
+
+  ## The value of rate limiter event for timeout check. Default value is 100(unit 1ms).
+  gUsbNetworkPkgTokenSpaceGuid.RateLimitingFactor|100|UINT32|0x00010003
