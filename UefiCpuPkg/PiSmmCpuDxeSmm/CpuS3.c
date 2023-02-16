@@ -1,7 +1,7 @@
 /** @file
 Code for Processor S3 restoration
 
-Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -824,9 +824,34 @@ SmmRestoreCpu (
   }
 
   //
-  // Restore SMBASE for BSP and all APs
+  // Make sure the gSmmBaseHobGuid existence status is the same between normal and S3 boot.
   //
-  SmmRelocateBases ();
+  ASSERT (mSmmRelocated == (BOOLEAN)(GetFirstGuidHob (&gSmmBaseHobGuid) != NULL));
+  if (mSmmRelocated != (BOOLEAN)(GetFirstGuidHob (&gSmmBaseHobGuid) != NULL)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "gSmmBaseHobGuid %a produced in normal boot but %a in S3 boot!",
+      mSmmRelocated ? "is" : "is not",
+      mSmmRelocated ? "is not" : "is"
+      ));
+    CpuDeadLoop ();
+  }
+
+  //
+  // Check whether Smm Relocation is done or not.
+  // If not, will do the SmmBases Relocation here!!!
+  //
+  if (!mSmmRelocated) {
+    //
+    // Restore SMBASE for BSP and all APs
+    //
+    SmmRelocateBases ();
+  } else {
+    //
+    // Issue SMI IPI (All Excluding  Self SMM IPI + BSP SMM IPI) to execute first SMI init.
+    //
+    ExecuteFirstSmiInit ();
+  }
 
   //
   // Skip initialization if mAcpiCpuData is not valid
