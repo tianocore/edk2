@@ -106,7 +106,7 @@ endif
 endif
 ifneq ($(CLANG),)
 LDFLAGS =
-CXXFLAGS = -Wno-deprecated-register -Wno-unused-result
+CXXFLAGS = -Wno-deprecated-register -Wno-unused-result -std=c++14
 else
 LDFLAGS =
 CXXFLAGS = -Wno-unused-result
