@@ -114,10 +114,11 @@ PCCTS_H=../h
 #
 #   UNIX
 #
-ifeq ($(CXX), llvm)
-BUILD_CC?=$(CLANG_BIN)clang
-else
-BUILD_CC?=cc
+CLANG:=$(shell $(CC) --version | grep clang)
+ifneq ($(CLANG),)
+CC?=$(CLANG_BIN)clang
+else ifeq ($(origin CC),default)
+CC=gcc
 endif
 COPT=-O
 ANTLR=${BIN_DIR}/antlr

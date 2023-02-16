@@ -16,7 +16,8 @@ TOOL_INCLUDE = -I Pccts/h
 #OBJECTS = VfrSyntax.o VfrServices.o DLGLexer.o EfiVfrParser.o ATokenBuffer.o DLexerBase.o AParser.o
 OBJECTS = AParser.o DLexerBase.o ATokenBuffer.o EfiVfrParser.o VfrLexer.o VfrSyntax.o \
           VfrFormPkg.o VfrError.o VfrUtilityLib.o VfrCompiler.o
-ifeq ($(CXX), llvm)
+CLANG:=$(shell $(CC) --version | grep clang)
+ifneq ($(CLANG),)
 VFR_CPPFLAGS = -Wno-deprecated-register -std=c++14 -DPCCTS_USE_NAMESPACE_STD $(CPPFLAGS)
 else
 VFR_CPPFLAGS = -DPCCTS_USE_NAMESPACE_STD $(CPPFLAGS)

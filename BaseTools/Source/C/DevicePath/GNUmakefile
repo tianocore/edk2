@@ -14,8 +14,9 @@ OBJECTS = DevicePath.o UefiDevicePathLib.o DevicePathFromText.o  DevicePathUtili
 include $(MAKEROOT)/Makefiles/app.makefile
 
 GCCVERSION = $(shell $(CC) -dumpversion | awk -F'.' '{print $$1}')
+CLANG := $(shell $(CC) --version | grep clang)
 ifneq ("$(GCCVERSION)", "5")
-ifneq ($(CXX), llvm)
+ifeq ($(CLANG),)
 ifneq ($(DARWIN),Darwin)
 # gcc 12 trips over device path handling
 CFLAGS += -Wno-error=stringop-overflow
