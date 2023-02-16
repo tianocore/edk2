@@ -44,18 +44,19 @@ endif
 CYGWIN:=$(findstring CYGWIN, $(shell uname -s))
 LINUX:=$(findstring Linux, $(shell uname -s))
 DARWIN:=$(findstring Darwin, $(shell uname -s))
-ifeq ($(CXX), llvm)
+CLANG:=$(shell $(CC) --version | grep clang)
+ifneq ($(CLANG),)
 CC ?= $(CLANG_BIN)clang
 CXX ?= $(CLANG_BIN)clang++
 AS ?= $(CLANG_BIN)clang
 AR ?= $(CLANG_BIN)llvm-ar
 LD ?= $(CLANG_BIN)llvm-ld
-else
-CC ?= gcc
-CXX ?= g++
-AS ?= gcc
-AR ?= ar
-LD ?= ld
+else ifeq ($(origin CC),default)
+CC = gcc
+CXX = g++
+AS = gcc
+AR = ar
+LD = ld
 endif
 LINKER ?= $(CC)
 ifeq ($(HOST_ARCH), IA32)
@@ -91,7 +92,7 @@ ifeq ($(DARWIN),Darwin)
 CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror \
 -Wno-deprecated-declarations -Wno-self-assign -Wno-unused-result -nostdlib -g
 else
-ifeq ($(CXX), llvm)
+ifneq ($(CLANG),)
 CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
 -fno-delete-null-pointer-checks -Wall -Werror \
 -Wno-deprecated-declarations -Wno-self-assign \
@@ -103,7 +104,7 @@ CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
 -Wno-unused-result -nostdlib -g
 endif
 endif
-ifeq ($(CXX), llvm)
+ifneq ($(CLANG),)
 LDFLAGS =
 CXXFLAGS = -Wno-deprecated-register -Wno-unused-result
 else
