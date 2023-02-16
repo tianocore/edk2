@@ -59,7 +59,6 @@ SMM_CPU_PRIVATE_DATA  *gSmmCpuPrivate = &mSmmCpuPrivateData;
 // SMM Relocation variables
 //
 volatile BOOLEAN  *mRebased;
-volatile BOOLEAN  mIsBsp;
 
 ///
 /// Handle for the SMM CPU Protocol
@@ -84,6 +83,8 @@ EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL  mSmmMemoryAttribute = {
 };
 
 EFI_CPU_INTERRUPT_HANDLER  mExternalVectorTable[EXCEPTION_VECTOR_NUMBER];
+
+UINT32            mBspApicId       = 0;
 
 //
 // SMM stack information
@@ -343,14 +344,17 @@ SmmInitHandler (
   VOID
   )
 {
-  UINT32  ApicId;
-  UINTN   Index;
+  UINT32   ApicId;
+  UINTN    Index;
+  BOOLEAN  IsBsp;
 
   //
   // Update SMM IDT entries' code segment and load IDT
   //
   AsmWriteIdtr (&gcSmiIdtr);
   ApicId = GetApicId ();
+
+  IsBsp = (BOOLEAN)(mBspApicId == ApicId);
 
   ASSERT (mNumberOfCpus <= mMaxNumberOfCpus);
 
@@ -361,7 +365,7 @@ SmmInitHandler (
       //
       SmmCpuFeaturesInitializeProcessor (
         Index,
-        mIsBsp,
+        IsBsp,
         gSmmCpuPrivate->ProcessorInfo,
         &mCpuHotPlugData
         );
@@ -371,7 +375,7 @@ SmmInitHandler (
         // Check XD and BTS features on each processor on normal boot
         //
         CheckFeatureSupported ();
-      } else if (mIsBsp) {
+      } else if (IsBsp) {
         //
         // BSP rebase is already done above.
         // Initialize private data during S3 resume
@@ -407,7 +411,6 @@ SmmRelocateBases (
   SMRAM_SAVE_STATE_MAP  BakBuf2;
   SMRAM_SAVE_STATE_MAP  *CpuStatePtr;
   UINT8                 *U8Ptr;
-  UINT32                ApicId;
   UINTN                 Index;
   UINTN                 BspIndex;
 
@@ -448,17 +451,16 @@ SmmRelocateBases (
   //
   // Retrieve the local APIC ID of current processor
   //
-  ApicId = GetApicId ();
+  mBspApicId = GetApicId ();
 
   //
   // Relocate SM bases for all APs
   // This is APs' 1st SMI - rebase will be done here, and APs' default SMI handler will be overridden by gcSmmInitTemplate
   //
-  mIsBsp   = FALSE;
   BspIndex = (UINTN)-1;
   for (Index = 0; Index < mNumberOfCpus; Index++) {
     mRebased[Index] = FALSE;
-    if (ApicId != (UINT32)gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId) {
+    if (mBspApicId != (UINT32)gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId) {
       SendSmiIpi ((UINT32)gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId);
       //
       // Wait for this AP to finish its 1st SMI
@@ -477,8 +479,7 @@ SmmRelocateBases (
   // Relocate BSP's SMM base
   //
   ASSERT (BspIndex != (UINTN)-1);
-  mIsBsp = TRUE;
-  SendSmiIpi (ApicId);
+  SendSmiIpi (mBspApicId);
   //
   // Wait for the BSP to finish its 1st SMI
   //
