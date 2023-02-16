@@ -15,13 +15,13 @@ install: $(MAKEROOT)/libs-$(HOST_ARCH) $(LIBRARY)
 	cp $(LIBRARY) $(MAKEROOT)/libs-$(HOST_ARCH)
 
 $(LIBRARY): $(OBJECTS)
-	$(BUILD_AR) crs $@ $^
+	$(AR) crs $@ $^
 
 %.o : %.c
-	$(BUILD_CC)  -c $(BUILD_CPPFLAGS) $(BUILD_CFLAGS) $< -o $@
+	$(CC)  -c $(CPPFLAGS) $(CFLAGS) $< -o $@
 
 %.o : %.cpp
-	$(BUILD_CXX) -c $(BUILD_CPPFLAGS) $(BUILD_CXXFLAGS) $< -o $@
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $@
 
 .PHONY: clean
 clean:
