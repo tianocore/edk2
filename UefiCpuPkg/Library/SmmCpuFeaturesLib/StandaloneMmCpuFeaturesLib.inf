@@ -1,7 +1,7 @@
 ## @file
 #  Standalone MM CPU specific programming.
 #
-#  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) Microsoft Corporation.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -34,6 +34,10 @@
   DebugLib
   MemoryAllocationLib
   PcdLib
+  HobLib
+
+[Guids]
+  gSmmBaseHobGuid                ## CONSUMES
 
 [FixedPcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## SOMETIMES_CONSUMES

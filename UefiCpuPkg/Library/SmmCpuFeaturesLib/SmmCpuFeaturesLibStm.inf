@@ -2,7 +2,7 @@
 #  The CPU specific programming for PiSmmCpuDxeSmm module when STM support
 #  is included.
 #
-#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -64,6 +64,7 @@
   gMsegSmramGuid                           ## SOMETIMES_CONSUMES ## HOB
   gEfiAcpi20TableGuid                      ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAcpi10TableGuid                      ## SOMETIMES_CONSUMES ## SystemTable
+  gSmmBaseHobGuid                          ## CONSUMES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## SOMETIMES_CONSUMES
