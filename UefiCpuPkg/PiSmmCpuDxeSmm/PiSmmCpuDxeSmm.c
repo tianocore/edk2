@@ -1,7 +1,7 @@
 /** @file
 Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
-Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -371,9 +371,7 @@ SmmInitHandler (
         // Check XD and BTS features on each processor on normal boot
         //
         CheckFeatureSupported ();
-      }
-
-      if (mIsBsp) {
+      } else if (mIsBsp) {
         //
         // BSP rebase is already done above.
         // Initialize private data during S3 resume
