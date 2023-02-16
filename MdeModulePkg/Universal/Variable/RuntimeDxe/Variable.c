@@ -2606,10 +2606,10 @@ VariableServiceGetNextVariableName (
   buffer overflow, integer overflow.
   This function will check attribute carefully to avoid authentication bypass.
 
-  @param VariableName                     Name of Variable to be found.
+  @param VariableName                     Name of Variable to be set.
   @param VendorGuid                       Variable vendor GUID.
-  @param Attributes                       Attribute value of the variable found
-  @param DataSize                         Size of Data found. If size is less than the
+  @param Attributes                       Attribute value of the variable to be set.
+  @param DataSize                         Size of Data to be set. If size is less than the
                                           data, this value contains the required size.
   @param Data                             Data pointer.
 
@@ -2618,6 +2618,9 @@ VariableServiceGetNextVariableName (
   @return EFI_OUT_OF_RESOURCES            Resource not enough to set variable.
   @return EFI_NOT_FOUND                   Not found.
   @return EFI_WRITE_PROTECTED             Variable is read-only.
+  @return EFI_UNSUPPORTED                 unsupported operation.
+  @return EFI_SECURITY_VIOLATION          The variable does NOT pass security validations.
+  @return EFI_ACCESS_DENIED               The MOR/MorLock is locked.
 
 **/
 EFI_STATUS
