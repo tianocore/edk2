@@ -89,7 +89,7 @@ PcdMakefileHeader = '''
 '''
 
 WindowsCFLAGS = 'CFLAGS = $(CFLAGS) /wd4200 /wd4034 /wd4101 '
-LinuxCFLAGS = 'BUILD_CFLAGS += -Wno-pointer-to-int-cast -Wno-unused-variable '
+LinuxCFLAGS = 'CFLAGS += -Wno-pointer-to-int-cast -Wno-unused-variable '
 PcdMakefileEnd = '''
 !INCLUDE $(BASE_TOOLS_PATH)\Source\C\Makefiles\ms.common
 !INCLUDE $(BASE_TOOLS_PATH)\Source\C\Makefiles\ms.app
