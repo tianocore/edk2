@@ -164,7 +164,7 @@ PCCTS_H=../h
 #
 #   UNIX  (default)
 #
-ifeq ($(CXX), llvm)
+ifneq ($(CLANG),)
 CC?=$(CLANG_BIN)clang
 else ifeq ($(origin CC),default)
 CC=gcc

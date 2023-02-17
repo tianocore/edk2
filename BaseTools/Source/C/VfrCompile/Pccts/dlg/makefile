@@ -114,7 +114,8 @@ PCCTS_H=../h
 #
 #   UNIX
 #
-ifeq ($(CXX), llvm)
+CLANG:=$(shell $(CC) --version | grep clang)
+ifneq ($(CLANG),)
 CC?=$(CLANG_BIN)clang
 else ifeq ($(origin CC),default)
 CC=cc
