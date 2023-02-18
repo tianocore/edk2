@@ -278,7 +278,11 @@ TimerDriverInitialize (
   //
   // Install interrupt handler for RISC-V Timer.
   //
-  Status = mCpu->RegisterInterruptHandler (mCpu, EXCEPT_RISCV_TIMER_INT, TimerInterruptHandler);
+  Status = mCpu->RegisterInterruptHandler (
+                   mCpu,
+                   EXCEPT_RISCV_IRQ_TIMER_FROM_SMODE,
+                   TimerInterruptHandler
+                   );
   ASSERT_EFI_ERROR (Status);
 
   //

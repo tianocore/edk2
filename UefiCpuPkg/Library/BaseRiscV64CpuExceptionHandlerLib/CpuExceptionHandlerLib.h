@@ -59,7 +59,7 @@ SupervisorModeTrap (
 #define SMODE_TRAP_REGS_t6       31
 #define SMODE_TRAP_REGS_sepc     32
 #define SMODE_TRAP_REGS_sstatus  33
-#define SMODE_TRAP_REGS_sie      34
+#define SMODE_TRAP_REGS_stval    34
 #define SMODE_TRAP_REGS_last     35
 
 #define SMODE_TRAP_REGS_OFFSET(x)  ((SMODE_TRAP_REGS_##x) * __SIZEOF_POINTER__)
@@ -68,7 +68,7 @@ SupervisorModeTrap (
 #pragma pack(1)
 typedef struct {
   //
-  // Below are follow the format of EFI_SYSTEM_CONTEXT
+  // Below follow the format of EFI_SYSTEM_CONTEXT.
   //
   UINT64    zero;
   UINT64    ra;
@@ -102,14 +102,9 @@ typedef struct {
   UINT64    t4;
   UINT64    t5;
   UINT64    t6;
-  //
-  // Below are the additional information to
-  // EFI_SYSTEM_CONTEXT, private to supervisor mode trap
-  // and not public to EFI environment.
-  //
   UINT64    sepc;
   UINT64    sstatus;
-  UINT64    sie;
+  UINT64    stval;
 } SMODE_TRAP_REGISTERS;
 #pragma pack()
 
