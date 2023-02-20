@@ -13,8 +13,12 @@ from antlr4 import *
 from VfrSyntaxVisitor import *
 from VfrSyntaxLexer import *
 from VfrSyntaxParser import *
+from SourceVfrSyntaxParser import SourceVfrSyntaxParser
+from SourceVfrSyntaxVisitor import SourceVfrSyntaxVisitor
+from SourceVfrSyntaxLexer import SourceVfrSyntaxLexer
 from VfrCommon import *
 from YamlTree import *
+from VfrPreProcess import *
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from VfrError import *
 from Common.LongFilePathSupport import LongFilePath
@@ -77,14 +81,16 @@ class VfrCompiler():
     def __init__(self, Args, Argc):
 
         self.Options = Options()
-        self.VfrRoot = VfrTreeNode()
-        self.VfrTree = VfrTree(self.VfrRoot, self.Options)
-        self.YamlRoot = VfrTreeNode()
-        self.YamlTree = YamlTree(self.YamlRoot, self.Options)
         self.RunStatus = COMPILER_RUN_STATUS.STATUS_STARTED
         self.PreProcessCmd = PREPROCESSOR_COMMAND
         self.PreProcessOpt = PREPROCESSOR_OPTIONS
         self.OptionIntialization(Args, Argc)
+        self.CopyFileToOutputDir() # for development and testing
+        self.VfrRoot = VfrTreeNode()
+        self.PreProcessDB = PreProcessDB(self.Options)
+        self.VfrTree = VfrTree(self.VfrRoot, self.PreProcessDB, self.Options)
+        self.YamlRoot = VfrTreeNode()
+        self.YamlTree = YamlTree(self.YamlRoot, self.PreProcessDB, self.Options)
         if (not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)) and (not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)):
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED)
 
@@ -308,43 +314,41 @@ class VfrCompiler():
         self.Options.ExpandedHeaderFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header' + VFR_PREPROCESS_FILENAME_EXTENSION
         return 0
 
+    # Parse and collect data structures info in the ExpandedHeader.i files
+    def ParseHeader(self):
+        try:
+            InputStream = FileStream(self.Options.ProcessedInFileName)
+            VfrLexer = SourceVfrSyntaxLexer(InputStream)
+            VfrStream = CommonTokenStream(VfrLexer)
+            VfrParser = SourceVfrSyntaxParser(VfrStream)
+        except:
+            EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
+                            "File open failed for %s" % self.Options.ExpandedHeaderFileName, None)
+
+        Visitor = SourceVfrSyntaxVisitor()
+        #gVfrVarDataTypeDB.Clear()
+        Visitor.visit(VfrParser.vfrHeader())
+        pNode = gVfrVarDataTypeDB.GetDataTypeList()
+        while pNode != None:
+            print('    \"{}\"'.format(str(pNode.TypeName)) + '\n')
+            pNode = pNode.Next
+        self.VfrTree.DumpJson()
+
     def PreProcess(self):
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED):
             if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
         else:
             if self.Options.SkipCPreprocessor == False:  ##### wip
+                # call C precessor first
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
             else:
-                try:
-                    fFile = open(LongFilePath(self.Options.VfrFileName), mode='r')
-                    fFile.close()
-                except:
-                    EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE, "Error opening the input VFR file")
-                    if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
-                        self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
-                    return
-
-                PreProcessCmd = self.PreProcessCmd + " " + self.PreProcessOpt + " "
-                if self.Options.IncludePaths != None:
-                    PreProcessCmd += self.Options.IncludePaths + " "
-                if self.Options.CPreprocessorOptions != None:
-                    PreProcessCmd += self.Options.CPreprocessorOptions  + " "
-                PreProcessCmd += self.Options.VfrFileName + " > "
-                PreProcessCmd += self.Options.PreprocessorOutputFileName
-
-                #PreProcessCmd = '/showIncludes /nologo /E /TC /DVFRCOMPILE /FIRamDiskDxeStrDefs.h  test/test.vfr > test/test.i'
-                print(PreProcessCmd)
-                if self.ExecuteCmd(PreProcessCmd) != 0:
-                    EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "failed to spawn C preprocessor on VFR file {}".format(PreProcessCmd))
-                    if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
-                        self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
-                else:
-                    self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
+                self.PreProcessDB.Preprocess()
+                self.ParseHeader()
+                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
 
     def Compile(self):
-        InFileName = self.Options.VfrFileName if self.Options.SkipCPreprocessor == True\
-                else self.Options.PreprocessorOutputFileName #
+        InFileName = self.Options.VfrFileName
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED):
             EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "compile error in file %s" % InFileName, InFileName)
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
@@ -354,18 +358,17 @@ class VfrCompiler():
 
             try:
                 InputStream = FileStream(InFileName)
-                VfrLexer = VfrSyntaxLexer(InputStream)
+                VfrLexer = SourceVfrSyntaxLexer(InputStream)
                 VfrStream = CommonTokenStream(VfrLexer)
-                VfrParser = VfrSyntaxParser(VfrStream)
+                VfrParser = SourceVfrSyntaxParser(VfrStream)
             except:
                 EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
                                 "File open failed for %s" % InFileName, InFileName)
                 if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
                     self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
                 return
-
-            self.Visitor = VfrSyntaxVisitor(self.VfrRoot, self.Options.OverrideClassGuid)
-            self.Visitor.visit(VfrParser.vfrProgram())
+            self.Visitor = SourceVfrSyntaxVisitor(self.PreProcessDB, self.VfrRoot, self.Options.OverrideClassGuid)
+            self.Visitor.visit(VfrParser.vfrFormSetDefinition())
 
             if self.Visitor.ParserStatus != 0:
                 if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
@@ -446,66 +449,16 @@ class VfrCompiler():
     def IS_RUN_STATUS(self, Status):
         return self.RunStatus == Status
 
-    def ExecuteCmd(self,cmd,work_dir=None):
-        reError = '(^b"Error)'  #This will match if str(line) starts with the word "Error"
-        # self.build_log.log(Log.LOG_DBG, "%s" % cmd)
-        failed = False
-        if cmd.strip().startswith('None '):
-            failed = True
-        try:
-            start = int(round(time.time() * 1000))
-            try:
-                if work_dir:
-                    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,cwd=work_dir)
-                else:
-                    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    def FindIncludeHeaderFile(self, Start, Name): ##########
+        FileList = []
+        for Relpath, Dirs, Files in os.walk(Start):
+            if Name in Files:
+                FullPath = os.path.join(Start, Relpath, Name)
+                FileList.append(os.path.normpath(os.path.abspath(FullPath)))
+        return FileList
 
-                while True:
-                    line = p.stdout.readline()
-                    if not line:
-                        break
-                    #self.build_log.log(Log.LOG_DBG, line.strip().decode('ascii', errors='ignore'))
-                    tmp_str = line.split()
-                    error = re.search(reError, str(line)) #Need to do str(line) due to line being a byte object.
-                    if line.strip().startswith('- Failed -'.encode(encoding='ascii')) or \
-                            (len(tmp_str) >= 2 and tmp_str[0].endswith(':'.encode(encoding='ascii')) \
-                            and tmp_str[1] == 'ERROR') or (len(tmp_str) >= 3 \
-                            and tmp_str[0] == 'Error' and tmp_str[2] == '-') or \
-                            ((len(tmp_str) >= 3) and ('error:'.encode(encoding='ascii') in tmp_str[2])):
-                        failed = True
-                    if error:
-                        #self.build_log.log(Log.LOG_ERR, "Failed, please check log file for more details!")
-                        failed = True
-
-                p.communicate()
-
-            except subprocess.CalledProcessError as  e:
-                ret = e.returncode
-            else:
-                ret = 0
-            finally:
-                pass
-                 #self.build_log.log(Log.LOG_DBG, '[cmd=%s]' % cmd)
-            end = int(round(time.time() * 1000))
-
-        except Exception as e:
-            #self.build_log.log(Log.LOG_ERR, e)
-            raise RuntimeError
-        else:
-            if failed:
-                ret = -1
-            if ret == 0:
-                ret_str = 'SUCCESS'
-            else:
-                ret_str = 'FAIL'
-            #self.build_log.log(Log.LOG_DBG, "\t - %s : %d ms\n" % (ret_str, end - start))
-            if ret:
-                #self.clean_up_temp_files()
-                os._exit(ret)
-        return ret
-
-    def CopyFileToOutputDir(self):
-        self.Options.ProcessedInFileName = self.VfrTree.FindIncludeHeaderFile('/edk2/', self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)[0]
+    def CopyFileToOutputDir(self): ############
+        self.Options.ProcessedInFileName = self.FindIncludeHeaderFile('/edk2/', self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)[0]
         if self.Options.ProcessedInFileName == None:
             EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
                                 "File/directory %s not found in workspace" % (self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION), None)
@@ -517,16 +470,15 @@ def main():
     Argc = len(sys.argv)
     EdkLogger.SetLevel(WARNING_LOG_LEVEL)
     Compiler = VfrCompiler(Args, Argc)
-    Compiler.CopyFileToOutputDir() # for development and testing
     Compiler.PreProcess()
     Compiler.Compile()
-    Compiler.GenBinaryFiles()
+    #Compiler.GenBinaryFiles()
 
     # Extended Features
-    Compiler.DumpYaml()
+    #Compiler.DumpYaml()
     Compiler.DumpJson()
-    Compiler.PreProcessYaml()
-    Compiler.UpdateYamlWithDLT()
+    #Compiler.PreProcessYaml()
+    #Compiler.UpdateYamlWithDLT()
     # Compiler.CompileYaml()
 
     Status = Compiler.RunStatus

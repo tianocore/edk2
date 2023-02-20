@@ -3,33 +3,35 @@ from VfrSyntaxLexer import *
 from VfrSyntaxParser import *
 from VfrFormPkg import *
 from VfrError import *
+from VfrPreProcess import *
 class YamlTree():
-    def __init__(self, Root: VfrTreeNode, Options: Options):
+    def __init__(self, Root: VfrTreeNode, PreProcessDB: PreProcessDB, Options: Options):
         self.Options = Options
         self.Root = Root
-        self.Config = None
+        self.PreProcessDB = PreProcessDB
+        self.YamlDict = None
 
     # transform string token and Header key-values to specific values for yaml
     def PreProcess(self):
         try:
             FileName = self.Options.YamlFileName
             f = open(FileName, 'r')
-            #self.Config = yaml.load(f.read(), Loader=yaml.FullLoader)
-            self.Config = yaml.safe_load(f)
+            #self.YamlDict = yaml.load(f.read(), Loader=yaml.FullLoader)
+            self.YamlDict = yaml.safe_load(f)
             f.close()
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
                             "File open failed for %s" % FileName, None)
 
         UniDict = self._GetUniDictsForYaml()
-        HeaderDict = self._GetHeaderDictsForYaml(self.Config['include'])
-        self._PreprocessYaml(self.Config, UniDict, HeaderDict)
+        HeaderDict = self._GetHeaderDictsForYaml(self.YamlDict['include'])
+        self._PreprocessYaml(self.YamlDict, UniDict, HeaderDict)
 
 
         try:
             FileName =  self.Options.ProcessedYAMLFileName
             f = open(FileName, 'w')
-            f.write(yaml.dump(self.Config, allow_unicode=True, default_flow_style=False))
+            f.write(yaml.dump(self.YamlDict, allow_unicode=True, default_flow_style=False))
             f.close()
         except:
             EdkLogger.error("VfrCompiler", FILE_CREATE_FAILURE,
@@ -45,9 +47,9 @@ class YamlTree():
         self._ParseVfrFormSetDefinition()
 
 
-    def _PreprocessYaml(self, Config, UniDict, HeaderDict):
-        for Key in Config.keys():
-            Value = Config[Key]
+    def _PreprocessYaml(self, YamlDict, UniDict, HeaderDict):
+        for Key in YamlDict.keys():
+            Value = YamlDict[Key]
             if isinstance(Value, list): # value is list
                 for Item in Value:
                     if isinstance(Item, dict):
@@ -55,14 +57,15 @@ class YamlTree():
 
             elif isinstance(Value, dict): # value is dict
                 self._PreprocessYaml(Value, UniDict, HeaderDict)
-            else:
+
+            elif isinstance(Value, str):# value is str
                 # get the specific value of string token
                 if Value in UniDict.keys():
-                    Config[Key] = 'STRING_TOKEN' + '(' +  UniDict[Value] + ')'
+                    YamlDict[Key] = 'STRING_TOKEN' + '(' +  UniDict[Value] + ')'
                 # get {key:value} dicts from header files
                 elif Value in HeaderDict.keys():
-                    Config[Key] = HeaderDict[Value]
-                elif type(Value) == str and '|' in Value:
+                    YamlDict[Key] = HeaderDict[Value]
+                elif '|' in Value:
                     Items = Value.split('|')
                     NewValue = ''
                     for i in range(0, len(Items)):
@@ -74,8 +77,7 @@ class YamlTree():
 
                         if i != len(Items) - 1:
                             NewValue += ' | '
-                    #print(NewValue)
-                    Config[Key] = NewValue
+                    YamlDict[Key] = NewValue
 
         return
 
@@ -88,10 +90,10 @@ class YamlTree():
             VfrParser = VfrSyntaxParser(VfrStream)
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
-                            "File open failed for %s" % FileName, None)
+                            "File open failed for %s" % self.Options.ExpandedHeaderFileName, None)
 
         self.Visitor = VfrSyntaxVisitor(None, self.Options.OverrideClassGuid)
-        gVfrVarDataTypeDB.Clear()
+        #gVfrVarDataTypeDB.Clear()
         self.Visitor.visit(VfrParser.vfrProgram())
         FileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header.txt'
         try:
@@ -118,7 +120,7 @@ class YamlTree():
         try:
             FileName = self.Options.ExpandedHeaderFileName
             Output = open(FileName, 'w')
-            for HeaderFile in self.Config['include']:
+            for HeaderFile in self.YamlDict['include']:
                 FileName = HeaderFile.split('/')[-1]
                 FileList = self._FindIncludeHeaderFile("/edk2/", FileName)
                 CppHeader = None

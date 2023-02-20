@@ -811,6 +811,8 @@ class IfrDefaultStore(IfrLine, IfrOpHeader):
 
         self.Type = TypeName
 
+        self.HasAttr = False
+
     def SetDefaultName(self, DefaultName):
         self.DefaultStore.DefaultName = DefaultName
 
@@ -1040,6 +1042,8 @@ class IfrBanner(IfrLine, IfrOpHeader):
         self.Banner.ExtendOpCode = EFI_IFR_EXTEND_OP_BANNER
         self.Banner.Guid = EFI_IFR_TIANO_GUID
 
+        self.HasTimeOut = False
+
     def SetTitle(self, StringId):
         self.Banner.Title = StringId
 
@@ -1048,6 +1052,9 @@ class IfrBanner(IfrLine, IfrOpHeader):
 
     def SetAlign(self, Align):
         self.Banner.Alignment = Align
+
+    def SetHasTimeOut(self, HasTimeOut):
+        self.HasTimeOut = HasTimeOut
 
     def GetInfo(self):
         return self.Banner
