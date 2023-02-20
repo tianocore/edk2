@@ -35,6 +35,7 @@
 [LibraryClasses]
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   MipiSysTLib|MdePkg/Library/MipiSysTLib/MipiSysTLib.inf
+  TraceHubDebugLib|MdePkg/Library/TraceHubDebugLibNull/TraceHubDebugLibNull.inf
 
 [Components]
   MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
@@ -137,6 +138,7 @@
   MdePkg/Library/CcProbeLibNull/CcProbeLibNull.inf
   MdePkg/Library/SmmCpuRendezvousLibNull/SmmCpuRendezvousLibNull.inf
   MdePkg/Library/MipiSysTLib/MipiSysTLib.inf
+  MdePkg/Library/TraceHubDebugLibNull/TraceHubDebugLibNull.inf
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   #
