@@ -78,13 +78,12 @@ __PcdSet (
 
   @return PCD value
 **/
-VOID
-__PcdSet (
-  CHAR8   *SkuName             OPTIONAL,
-  CHAR8   *DefaultValueName    OPTIONAL,
-  CHAR8   *TokenSpaceGuidName,
-  CHAR8   *TokenName,
-  UINT64  Value
+UINT64
+__PcdGet (
+  CHAR8  *SkuName             OPTIONAL,
+  CHAR8  *DefaultValueName    OPTIONAL,
+  CHAR8  *TokenSpaceGuidName,
+  CHAR8  *TokenName
   )
 ;
 
