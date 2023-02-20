@@ -34,6 +34,7 @@
 
 [LibraryClasses]
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+  MipiSysTLib|MdePkg/Library/MipiSysTLib/MipiSysTLib.inf
 
 [Components]
   MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
@@ -135,6 +136,7 @@
   MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
   MdePkg/Library/CcProbeLibNull/CcProbeLibNull.inf
   MdePkg/Library/SmmCpuRendezvousLibNull/SmmCpuRendezvousLibNull.inf
+  MdePkg/Library/MipiSysTLib/MipiSysTLib.inf
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   #

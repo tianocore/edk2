@@ -23,3 +23,6 @@
 [submodule "UnitTestFrameworkPkg/Library/GoogleTestLib/googletest"]
 	path = UnitTestFrameworkPkg/Library/GoogleTestLib/googletest
 	url = https://github.com/google/googletest.git
+[submodule "MdePkg/Library/MipiSysTLib/mipisyst"]
+	path = MdePkg/Library/MipiSysTLib/mipisyst
+	url = https://github.com/MIPI-Alliance/public-mipi-sys-t.git
