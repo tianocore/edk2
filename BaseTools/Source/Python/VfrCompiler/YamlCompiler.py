@@ -329,10 +329,6 @@ class VfrCompiler():
         #gVfrVarDataTypeDB.Clear()
         Visitor.visit(VfrParser.vfrHeader())
         pNode = gVfrVarDataTypeDB.GetDataTypeList()
-        while pNode != None:
-            print('    \"{}\"'.format(str(pNode.TypeName)) + '\n')
-            pNode = pNode.Next
-        self.VfrTree.DumpJson()
 
     def PreProcess(self):
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED):
@@ -472,12 +468,12 @@ def main():
     Compiler = VfrCompiler(Args, Argc)
     Compiler.PreProcess()
     Compiler.Compile()
-    #Compiler.GenBinaryFiles()
+    # Compiler.GenBinaryFiles()
 
     # Extended Features
-    #Compiler.DumpYaml()
+    Compiler.DumpYaml()
     Compiler.DumpJson()
-    #Compiler.PreProcessYaml()
+    Compiler.PreProcessYaml()
     #Compiler.UpdateYamlWithDLT()
     # Compiler.CompileYaml()
 

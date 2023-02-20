@@ -280,7 +280,6 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         DSObj.SetDefaultName (EFI_STRING_ID_INVALID)
         DSObj.SetDefaultId (EFI_HII_DEFAULT_CLASS_STANDARD)
         DsNode = VfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObj, gFormPkg.StructToStream(DSObj.GetInfo()))
-
         DSObjMF = IfrDefaultStore("Standard ManuFacturing")
         gVfrDefaultStore.RegisterDefaultStore(DSObjMF.DefaultStore, "Standard ManuFacturing", EFI_STRING_ID_INVALID, EFI_HII_DEFAULT_CLASS_MANUFACTURING)
         DSObjMF.SetLineNo (LineNo)
@@ -296,8 +295,6 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         self.InsertChild(self.Root, ctx)
         self.InsertChild(ctx.Node, ctx.classDefinition())
         self.InsertChild(ctx.Node, ctx.subclassDefinition())
-
-        print('here')
         DsNode, DsNodeMF = self.DeclareStandardDefaultStorage(ctx.start.line)
         ctx.Node.insertChild(DsNode)
         ctx.Node.insertChild(DsNodeMF)
@@ -525,22 +522,24 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SourceVfrSyntaxParser#vfrStatementDefaultStore.
     def visitVfrStatementDefaultStore(self, ctx:SourceVfrSyntaxParser.VfrStatementDefaultStoreContext):
-        Line = ctx.start.line
+
         self.visitChildren(ctx)
 
+        Line = ctx.start.line
         RefName = ctx.D.text
+        DSObj = IfrDefaultStore(RefName)
         DefaultStoreNameId = self.PreProcessDB.Read(ctx.P.text)
         ctx.Node.Dict['prompt'] = KV(ctx.P.text, DefaultStoreNameId)
         DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD
         if ctx.A != None:
             DefaultId = self.TransNum(ctx.A.text)
-            ctx.Node.Dict['attribute'] = KV(DefaultId, DefaultId) #
+            DSObj.HasAttr == True
         elif ctx.S != None:
             DefaultId = self.PreProcessDB.Read(ctx.S.text)
             ctx.Node.Dict['attribute'] = KV(ctx.S.text, DefaultId)
+            DSObj.HasAttr == True
 
         if gVfrDefaultStore.DefaultIdRegistered(DefaultId) == False:
-            DSObj = IfrDefaultStore(RefName)
             self.ErrorHandler(gVfrDefaultStore.RegisterDefaultStore(DSObj.DefaultStore, RefName, DefaultStoreNameId, DefaultId), Line)
             DSObj.SetDefaultName(DefaultStoreNameId)
             DSObj.SetDefaultId (DefaultId)
@@ -550,8 +549,8 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         else:
             pNode, ReturnCode = gVfrDefaultStore.ReRegisterDefaultStoreById(DefaultId, RefName, DefaultStoreNameId)
             self.ErrorHandler(ReturnCode, Line)
-            ctx.Node = None
-
+            ctx.Node.OpCode = EFI_IFR_SHOWN_DEFAULTSTORE_OP # For display in YAML
+            ctx.Node.Data = DSObj
         return ctx.Node
 
 
@@ -849,8 +848,8 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             self.CompareErrorHandler(ReturnCode, VfrReturnCode.VFR_RETURN_UNDEFINED, Tok.line, Tok.text, 'has already been used please used anther number')
 
         if ctx.QType == EFI_QUESION_TYPE.QUESTION_NORMAL:
-            if self.IsCheckBoxOp:
-                ctx.BaseInfo.VarType = EFI_IFR_TYPE_BOOLEAN #
+            #if self.IsCheckBoxOp:
+                #ctx.BaseInfo.VarType = EFI_IFR_TYPE_BOOLEAN #
             QId, ReturnCode = self.VfrQuestionDB.RegisterQuestion(QName, VarIdStr, QId, gFormPkg)
             self.ErrorHandler(ReturnCode, ctx.start.line)
 
@@ -879,13 +878,13 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
 
         if ctx.Node.OpCode == EFI_IFR_ONE_OF_OP:
             #need to further update the VarType
-            ctx.BaseInfo.VarType = EFI_IFR_TYPE_NUM_SIZE_64 #
+            #ctx.BaseInfo.VarType = EFI_IFR_TYPE_NUM_SIZE_64 #
             ctx.Node.Data = IfrOneOf(EFI_IFR_TYPE_NUM_SIZE_64, QName, VarIdStr)
             self.CurrentQuestion = ctx.Node.Data
             self.CurrentMinMaxData = ctx.Node.Data
 
         elif ctx.Node.OpCode == EFI_IFR_NUMERIC_OP:
-            ctx.BaseInfo.VarType = EFI_IFR_TYPE_NUM_SIZE_64 #
+            #ctx.BaseInfo.VarType = EFI_IFR_TYPE_NUM_SIZE_64 #
             ctx.Node.Data = IfrNumeric(EFI_IFR_TYPE_NUM_SIZE_64)
             self.CurrentQuestion = ctx.Node.Data
             self.CurrentMinMaxData = ctx.Node.Data
@@ -1257,10 +1256,10 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'No MapMethod is set for FormMap!')
         else:
             for i in range(SIndex, SIndex + FormMapMethodNumber*2, 2):
-                MapTitle = self.PreProcessDB.Read(str(ctx.StringIdentifier(i)))
-                ctx.Node.Dict['maptitle'] = KV(str(ctx.StringIdentifier(i)), MapTitle)
-                MapGuid = self.PreProcessDB.Read(ctx.StringIdentifier(i + 1))
-                ctx.Node.Dict['mapguid'] = KV(str(ctx.StringIdentifier(i + 1)), MapGuid)
+                MapTitle = self.PreProcessDB.Read(self.TransId(ctx.StringIdentifier(i)))
+                ctx.Node.Dict['maptitle'] = KV(self.TransId(ctx.StringIdentifier(i)), MapTitle)
+                MapGuid = self.PreProcessDB.Read(self.TransId(ctx.StringIdentifier(i + 1)))
+                ctx.Node.Dict['mapguid'] = KV(self.TransId(ctx.StringIdentifier(i + 1)), MapGuid)
                 FMapObj.SetFormMapMethod(MapTitle, MapGuid)
         FormMap = FMapObj.GetInfo()
         MethodMapList = FMapObj.GetMethodMapList()
@@ -1576,6 +1575,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
 
         if ctx.FLAGS() != None:
             GObj.SetFlags(ctx.vfrGotoFlags().GotoFlags)
+            GObj.SetFlagsStream(self.ExtractOriginalText(ctx.vfrGotoFlags()))
 
         if ctx.Key() != None:
             if ctx.KN != None:
@@ -1903,7 +1903,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             ValueList = ctx.vfrConstantValueField().ValueList
             Value = ValueList[0]
             Type = self.CurrQestVarInfo.VarType
-            print(Type)
+
 
             if self.CurrentMinMaxData != None and self.CurrentMinMaxData.IsNumericOpcode():
                 # check default value is valid for Numeric Opcode
@@ -2398,6 +2398,9 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         # modify the data for namevalue
         if UpdateVarType:
             UpdatedNObj = IfrNumeric(self.CurrQestVarInfo.VarType)
+            UpdatedNObj.QName = NObj.QName
+            UpdatedNObj.VarIdStr = NObj.VarIdStr
+            UpdatedNObj.HasQuestionId = NObj.HasQuestionId
             UpdatedNObj.FlagsStream = NObj.FlagsStream
             UpdatedNObj.HasKey = NObj.HasKey
             UpdatedNObj.HasStep = NObj.HasStep
@@ -2723,6 +2726,9 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         # modify the data Vartype for NameValue
         if UpdateVarType:
             UpdatedOObj = IfrOneOf(self.CurrQestVarInfo.VarType)
+            UpdatedOObj.QName = OObj.QName
+            UpdatedOObj.VarIdStr = OObj.VarIdStr
+            UpdatedOObj.HasQuestionId = OObj.HasQuestionId
             UpdatedOObj.GetInfo().Question = OObj.GetInfo().Question
             UpdatedOObj.GetInfo().Flags = OObj.GetInfo().Flags
             UpdatedOObj.GetInfo().Data.MinValue = OObj.GetInfo().Data.MinValue
@@ -4541,7 +4547,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         Line = ctx.start.line
         self.visitChildren(ctx)
         RefStringId = self.PreProcessDB.Read(ctx.S.text)
-        ctx.Node.Dict['stringid'] = KV(ctx.s.text, RefStringId)
+        ctx.Node.Dict['stringid'] = KV(ctx.S.text, RefStringId)
         SR1Obj = IfrStringRef1(Line)
         self.SaveOpHdrCond(SR1Obj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
         SR1Obj.SetStringId(RefStringId)

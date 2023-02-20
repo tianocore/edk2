@@ -201,7 +201,7 @@ class FormPkg():
         return PkgHdr
 
     def BuildPkg(self, Root):
-        if Root.OpCode != None:
+        if Root.OpCode != None and Root.OpCode != EFI_IFR_SHOWN_DEFAULTSTORE_OP:
             self.PkgLength += Root.Data.GetInfo().Header.Length
             Root.Offset = gFormPkg.Offset #
             self.Offset += Root.Data.GetInfo().Header.Length
@@ -808,9 +808,7 @@ class IfrDefaultStore(IfrLine, IfrOpHeader):
                               EFI_IFR_DEFAULTSTORE_OP)
         self.DefaultStore.DefaultName = EFI_STRING_ID_INVALID
         self.DefaultStore.DefaultId = EFI_VARSTORE_ID_INVALID
-
         self.Type = TypeName
-
         self.HasAttr = False
 
     def SetDefaultName(self, DefaultName):

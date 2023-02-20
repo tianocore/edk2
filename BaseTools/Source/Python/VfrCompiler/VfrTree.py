@@ -99,6 +99,8 @@ ExpOps = [
     EFI_IFR_OR_OP
 ]
 
+DefaultDictList = []
+
 
 class VfrTree():
 
@@ -577,93 +579,12 @@ class VfrTree():
                 f.write('include:\n')
                 for HeaderFile in self.PreProcessDB.HeaderFiles:
                     f.write('- ' + HeaderFile + '\n')
-                #HeaderFiles = self._InsertHeaderToYaml(f)
                 self._DumpYamlDfsWithUni(self.Root, f)
                 # self.DumpYamlDfs(self.Root, f)
             f.close()
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
                             "File open failed for %s" % FileName, None)
-
-    def _InsertHeaderToYaml(self, f): # can be refined
-        FileName = self.Options.VfrFileName
-        try:
-            fFile = open(LongFilePath(FileName), mode='r')
-            line = fFile.readline()
-            IsHeaderLine = False
-            HeaderFiles = []
-            while line:
-                if "#include" in line:
-                    IsHeaderLine = True
-                    if line.find('<') != -1:
-                        HeaderFile = line[line.find('<') + 1:line.find('>')]
-                        f.write('- ' + HeaderFile + '\n')
-                        HeaderFiles.append(HeaderFile)
-                    if line.find('\"') != -1:
-                        l = line.find('\"') + 1
-                        r = l + line[l:].find('\"')
-                        HeaderFile = line[l:r]
-                        f.write('- ' + HeaderFile + '\n')
-                        HeaderFiles.append(HeaderFile)
-                line = fFile.readline()
-                if IsHeaderLine == True and "#include" not in line:
-                    break
-            fFile.close()
-        except:
-            EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
-                            "File open failed for %s" % FileName, None)
-        return HeaderFiles
-
-    # parse uni string tokens defined in DxeStrDefs.h (saved in debug directory)
-    def _GetUniDictsForYaml(self):
-        if self.Options.ProcessedInFileName.find('/') == -1:
-            self.Options.ProcessedInFileName = self.Options.ProcessedInFileName.replace('\\', '/')
-        FileList = []
-        if self.Options.ProcessedInFileName.find('DriverSample') != -1:
-            FileList = self._FindIncludeHeaderFile('/edk2/', self.Options.ProcessedInFileName.split('/')[-3][:-3] + 'StrDefs.h')
-        else:
-            FileList = self._FindIncludeHeaderFile('/edk2/', self.Options.ProcessedInFileName.split('/')[-3] + 'StrDefs.h')
-        if self.Options.UniStrDefFileName == []:
-            EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
-                            "File/directory %s not found in workspace" % (self.Options.ProcessedInFileName.split('/')[-3] + 'StrDefs.h'), None)
-        self.Options.UniStrDefFileName = FileList[0]
-        CppHeader = CppHeaderParser.CppHeader(self.Options.UniStrDefFileName)
-        UniDict = {}
-        for Define in CppHeader.defines:
-            Items = Define.split()
-            if len(Items) == 2 and Items[1].find('0x') != -1: # need refine
-                UniDict[int(Items[1], 16)] = Items[0]
-        return UniDict
-
-    def ParseDefines(self, Defines, HeaderDict):
-        for Define in Defines:
-            #print(Define)
-            Items = Define.split()
-            if len(Items) == 2 and Items[1].find('0x') != -1:
-                HeaderDict[int(Items[1], 16)] = Items[0]
-                HeaderDict[Items[1]] = Items[0]
-            elif len(Items) > 2 and Items[0].find('GUID') != -1:
-                GuidStr = ''
-                for i in range(1, len(Items)):
-                    if Items[i] != '{' and Items[i] != '}' and Items[i] != '{{' and Items[i] !='}}' and Items[i] != '\\':
-                        if ('{' in Items[i]):
-                            Items[i] = Items[i][1:]
-                        if '}' in Items[i]:
-                            Items[i] = Items[i][:-1]
-
-                        GuidStr += Items[i]
-                GuidItems = GuidStr.split(',')
-                Guid = EFI_GUID()
-                Guid.Data1 = int(GuidItems[0], 16)
-                Guid.Data2 = int(GuidItems[1], 16)
-                Guid.Data3 = int(GuidItems[2], 16)
-                for i in range(0, 8):
-                    Guid.Data4[i] = int(GuidItems[i+3], 16)
-                if Items[0].find('\\') != -1:
-                    Items[0] = Items[0][:-1]
-                Key = Items[0]
-                Value = Guid.to_string()
-                HeaderDict[Value] = Key
 
     def _FindIncludeHeaderFile(self, Start, Name):
         FileList = []
@@ -673,58 +594,6 @@ class VfrTree():
                 FileList.append(os.path.normpath(os.path.abspath(FullPath)))
         return FileList
 
-    # parse header files defined in vfr
-    def _GetHeaderDictsForYaml(self, HeaderFiles):
-        HeaderDict = {}
-        for HeaderFile in HeaderFiles:
-            FileName = HeaderFile.split('/')[-1]
-            FileList = self._FindIncludeHeaderFile("/edk2/", FileName)
-            if FileList == []:
-                EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
-                            "File/directory %s not found in workspace" % (HeaderFile), None)
-            for File in FileList:
-                if File.find(HeaderFile.replace('/','\\')) != -1:
-                    CppHeader = CppHeaderParser.CppHeader(File)
-                    self.ParseDefines(CppHeader.defines, HeaderDict)
-                    break
-            for Include in CppHeader.includes:
-                Include = Include[1:-1]
-                IncludeFileName = Include.split('/')[1]
-                IncludeHeaderFileList = self._FindIncludeHeaderFile("/edk2/", IncludeFileName)
-                #print(IncludeHeaderFileList)
-                if IncludeHeaderFileList == []:
-                    EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
-                                    "File/directory %s not found in workspace" % IncludeFileName, None)
-                for File in IncludeHeaderFileList:
-                    if File.find(Include.replace('/','\\')) != -1:
-                        CppHeader = CppHeaderParser.CppHeader(File)
-                        self.ParseDefines(CppHeader.defines, HeaderDict)
-                        break
-        #print(HeaderDict)
-        return HeaderDict
-
-    def _GetVfrDictsForYaml(self):
-        VfrDict = {}
-        File = open(self.Options.VfrFileName, 'r')
-        Defines = []
-        Wrap = False
-        IncompleteLine = ''
-        for Line in File:
-            if Wrap == True:
-                Defines.append(IncompleteLine + Line.replace('\n', ''))
-                Wrap = False
-                continue
-            if "#define" in Line:
-                if Line.find('\\') != -1:
-                    Wrap = True
-                    IncompleteLine = Line.split(" ", 1)[1].replace('\\\n', '')
-                else:
-                    Defines.append(Line.split(" ", 1)[1].replace('\n', ''))
-        self.ParseDefines(Defines, VfrDict)
-        return VfrDict
-
-    def _GenST(self, Key):
-        return 'STRING_TOKEN(' + Key  + ')\n'
 
     def _DumpQuestionInfosWithUni(self, Root, f, ValueIndent):
 
@@ -837,16 +706,18 @@ class VfrTree():
 
                 if Root.OpCode == EFI_IFR_DEFAULTSTORE_OP:
                     gVfrDefaultStore.UpdateDefaultType(Root)
-                    Info = Root.Data.GetInfo()
-                    Type = Root.Data.Type
-                    if Type != 'Standard Defaults' and Type != 'Standard ManuFacturing':
-                        f.write(KeyIndent + '- defaultstore:\n')
-                        f.write(ValueIndent + 'type:  {}\n'.format(Type))
-                        f.write(ValueIndent +
-                                'prompt:  ' + 'STRING_TOKEN(' + Root.Dict['prompt'].Key + ')\n' )
+
+                if Root.OpCode == EFI_IFR_SHOWN_DEFAULTSTORE_OP:
+
+                    f.write(KeyIndent + '- defaultstore:\n')
+                    f.write(ValueIndent + 'type:  {}\n'.format(Root.Data.Type))
+                    f.write(ValueIndent + 'prompt:  ' + 'STRING_TOKEN(' + Root.Dict['prompt'].Key + ')\n' )
+                    if Root.Data.HasAttr:
                         if 'attribute' in Root.Dict.keys():
                             f.write(ValueIndent +
-                                    'attribute:  ' + Root.Dict['attribute'].Key + ') # Optional input\n')
+                                    'attribute:  ' + Root.Dict['attribute'].Key + ') # # Default ID, Optional input\n')
+                        else:
+                            f.write(ValueIndent + 'attribute:  {} # Default ID, Optional input\n'.format('0x%04x' % (Info.DefaultId)))
 
                 if Root.OpCode == EFI_IFR_FORM_OP:
                     f.write(KeyIndent + '- form: \n')
@@ -927,10 +798,10 @@ class VfrTree():
                                 'help:  ' + 'STRING_TOKEN(' + Root.Dict['help'].Key + ')\n')
                         f.write(ValueIndent +
                                 'prompt:  ' + 'STRING_TOKEN(' + Root.Dict['prompt'].Key + ')\n')
-                        if Info.TextTwo in Root.Dict.keys():
+                        if 'text' in Root.Dict.keys():
                             f.write(
                                 ValueIndent +
-                                'text:  ' + 'STRING_TOKEN(' + Root.Dict['text'].Key + ')\n')
+                                'text:  ' + 'STRING_TOKEN(' + Root.Dict['text'].Key + ') # Optional Input\n')
                     if type(Info) == EFI_IFR_ACTION:
                         f.write(ValueIndent +
                                 'help:  ' + 'STRING_TOKEN(' + Root.Dict['help'].Key + ')\n')
@@ -1099,8 +970,8 @@ class VfrTree():
                     f.write(ValueIndent + 'defaultstore:  {}\n'.format(
                         Root.Data.DefaultStore))
                     f.write(ValueIndent +
-                            'prompt:  ' + Root.Dict['prompt'].Key + '\n')
-                    f.write(ValueIndent + 'help:  ' + Root.Dict['help'].Key + '\n')
+                            'prompt:  ' + 'STRING_TOKEN(' + Root.Dict['prompt'].Key + ')\n')
+                    f.write(ValueIndent + 'help:  ' + 'STRING_TOKEN(' + Root.Dict['help'].Key + ')\n')
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
@@ -1310,13 +1181,13 @@ class VfrTree():
                     if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
-                    f.write(KeyIndent + '- modal: tag\n')
+                    f.write(KeyIndent + '- modal: null\n')
 
                 if Root.OpCode == EFI_IFR_LOCKED_OP:
                     if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
-                    f.write(KeyIndent + '- locked: tag\n')
+                    f.write(KeyIndent + '- locked: null\n')
 
             self.LastOp = Root.OpCode
 

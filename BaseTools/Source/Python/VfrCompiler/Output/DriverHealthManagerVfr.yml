@@ -20,4 +20,4 @@ formset:
           help:  STRING_TOKEN(STR_NULL)
           prompt:  STRING_TOKEN(STR_NULL)
           flags:  INTERACTIVE  # Optional Input, Question Flags
-          key:  QUESTION_ID_REFRESH_MANAGER
+          key:  QUESTION_ID_REFRESH_MANAGER # Optional Input, Question QuestionId
