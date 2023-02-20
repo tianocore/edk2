@@ -77,6 +77,16 @@ PeCoffLoaderRelocateLoongArch64Image (
   IN UINT64      Adjust
   );
 
+/**
+  Retrieves the PE or TE Header from a PE/COFF or TE image
+
+  @param ImageContext  The context of the image being loaded
+  @param PeHdr         The buffer in which to return the PE header
+  @param TeHdr         The buffer in which to return the TE header
+
+  @return RETURN_SUCCESS if the PE or TE Header is read,
+  Otherwise, the error status from reading the PE/COFF or TE image using the ImageRead function.
+**/
 STATIC
 RETURN_STATUS
 PeCoffLoaderGetPeHeader (
@@ -84,26 +94,6 @@ PeCoffLoaderGetPeHeader (
   OUT    EFI_IMAGE_OPTIONAL_HEADER_UNION **PeHdr,
   OUT    EFI_TE_IMAGE_HEADER             **TeHdr
   )
-/*++
-
-Routine Description:
-
-  Retrieves the PE or TE Header from a PE/COFF or TE image
-
-Arguments:
-
-  ImageContext  - The context of the image being loaded
-
-  PeHdr         - The buffer in which to return the PE header
-
-  TeHdr         - The buffer in which to return the TE header
-
-Returns:
-
-  RETURN_SUCCESS if the PE or TE Header is read,
-  Otherwise, the error status from reading the PE/COFF or TE image using the ImageRead function.
-
---*/
 {
   RETURN_STATUS         Status;
   EFI_IMAGE_DOS_HEADER  DosHdr;
@@ -150,6 +140,17 @@ Returns:
   return RETURN_SUCCESS;
 }
 
+/**
+  Checks the PE or TE header of a PE/COFF or TE image to determine if it supported
+
+  @param ImageContext  The context of the image being loaded
+  @param PeHdr         The buffer in which to return the PE header
+  @param TeHdr         The buffer in which to return the TE header
+
+  @retval RETURN_SUCCESS if the PE/COFF or TE image is supported
+  @retval RETURN_UNSUPPORTED of the PE/COFF or TE image is not supported.
+
+**/
 STATIC
 RETURN_STATUS
 PeCoffLoaderCheckImageType (
@@ -157,26 +158,6 @@ PeCoffLoaderCheckImageType (
   IN     EFI_IMAGE_OPTIONAL_HEADER_UNION       *PeHdr,
   IN     EFI_TE_IMAGE_HEADER                   *TeHdr
   )
-/*++
-
-Routine Description:
-
-  Checks the PE or TE header of a PE/COFF or TE image to determine if it supported
-
-Arguments:
-
-  ImageContext  - The context of the image being loaded
-
-  PeHdr         - The buffer in which to return the PE header
-
-  TeHdr         - The buffer in which to return the TE header
-
-Returns:
-
-  RETURN_SUCCESS if the PE/COFF or TE image is supported
-  RETURN_UNSUPPORTED of the PE/COFF or TE image is not supported.
-
---*/
 {
   //
   // See if the machine type is supported.
@@ -239,31 +220,24 @@ Returns:
   return RETURN_SUCCESS;
 }
 
+/**
+  Retrieves information on a PE/COFF image
+
+  @param This         Calling context
+  @param ImageContext The context of the image being loaded
+
+  @retval RETURN_SUCCESS           The information on the PE/COFF image was collected.
+  @retval RETURN_INVALID_PARAMETER ImageContext is NULL.
+  @retval RETURN_UNSUPPORTED       The PE/COFF image is not supported.
+  @retval Otherwise                The error status from reading the PE/COFF image using the
+                                  ImageContext->ImageRead() function
+
+**/
 RETURN_STATUS
 EFIAPI
 PeCoffLoaderGetImageInfo (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT           *ImageContext
   )
-/*++
-
-Routine Description:
-
-  Retrieves information on a PE/COFF image
-
-Arguments:
-
-  This         - Calling context
-  ImageContext - The context of the image being loaded
-
-Returns:
-
-  RETURN_SUCCESS           - The information on the PE/COFF image was collected.
-  RETURN_INVALID_PARAMETER - ImageContext is NULL.
-  RETURN_UNSUPPORTED       - The PE/COFF image is not supported.
-  Otherwise             - The error status from reading the PE/COFF image using the
-                          ImageContext->ImageRead() function
-
---*/
 {
   RETURN_STATUS                   Status;
   EFI_IMAGE_OPTIONAL_HEADER_UNION *PeHdr;
@@ -539,29 +513,21 @@ Returns:
   return RETURN_SUCCESS;
 }
 
+/**
+  Converts an image address to the loaded address
+
+  @param ImageContext  The context of the image being loaded
+  @param Address       The address to be converted to the loaded address
+
+  @return NULL if the address can not be converted, otherwise, the converted address
+
+--*/
 STATIC
 VOID *
 PeCoffLoaderImageAddress (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT          *ImageContext,
   IN     UINTN                                 Address
   )
-/*++
-
-Routine Description:
-
-  Converts an image address to the loaded address
-
-Arguments:
-
-  ImageContext  - The context of the image being loaded
-
-  Address       - The address to be converted to the loaded address
-
-Returns:
-
-  NULL if the address can not be converted, otherwise, the converted address
-
---*/
 {
   if (Address >= ImageContext->ImageSize) {
     ImageContext->ImageError = IMAGE_ERROR_INVALID_IMAGE_ADDRESS;
@@ -571,30 +537,22 @@ Returns:
   return (UINT8 *) ((UINTN) ImageContext->ImageAddress + Address);
 }
 
+/**
+  Relocates a PE/COFF image in memory
+
+  @param This         Calling context
+  @param ImageContext Contains information on the loaded image to relocate
+
+  @retval RETURN_SUCCESS      if the PE/COFF image was relocated
+  @retval RETURN_LOAD_ERROR   if the image is not a valid PE/COFF image
+  @retval RETURN_UNSUPPORTED  not support
+
+**/
 RETURN_STATUS
 EFIAPI
 PeCoffLoaderRelocateImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
-/*++
-
-Routine Description:
-
-  Relocates a PE/COFF image in memory
-
-Arguments:
-
-  This         - Calling context
-
-  ImageContext - Contains information on the loaded image to relocate
-
-Returns:
-
-  RETURN_SUCCESS      if the PE/COFF image was relocated
-  RETURN_LOAD_ERROR   if the image is not a valid PE/COFF image
-  RETURN_UNSUPPORTED  not support
-
---*/
 {
   RETURN_STATUS                         Status;
   EFI_IMAGE_OPTIONAL_HEADER_UNION       *PeHdr;
@@ -853,31 +811,23 @@ Returns:
   return RETURN_SUCCESS;
 }
 
+/**
+  Loads a PE/COFF image into memory
+
+  @param This         Calling context
+  @param ImageContext Contains information on image to load into memory
+
+  @retval RETURN_SUCCESS            if the PE/COFF image was loaded
+  @retval RETURN_BUFFER_TOO_SMALL   if the caller did not provide a large enough buffer
+  @retval RETURN_LOAD_ERROR         if the image is a runtime driver with no relocations
+  @retval RETURN_INVALID_PARAMETER  if the image address is invalid
+
+**/
 RETURN_STATUS
 EFIAPI
 PeCoffLoaderLoadImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
-/*++
-
-Routine Description:
-
-  Loads a PE/COFF image into memory
-
-Arguments:
-
-  This         - Calling context
-
-  ImageContext - Contains information on image to load into memory
-
-Returns:
-
-  RETURN_SUCCESS            if the PE/COFF image was loaded
-  RETURN_BUFFER_TOO_SMALL   if the caller did not provide a large enough buffer
-  RETURN_LOAD_ERROR         if the image is a runtime driver with no relocations
-  RETURN_INVALID_PARAMETER  if the image address is invalid
-
---*/
 {
   RETURN_STATUS                         Status;
   EFI_IMAGE_OPTIONAL_HEADER_UNION       *PeHdr;

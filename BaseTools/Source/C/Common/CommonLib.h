@@ -95,13 +95,6 @@ GetFileImage (
   )
 ;
 
-EFI_STATUS
-PutFileImage (
-  IN CHAR8    *OutputFileName,
-  IN CHAR8    *OutputFileImage,
-  IN UINT32   BytesToWrite
-  )
-;
 /*++
 
 Routine Description:
@@ -122,6 +115,13 @@ Returns:
   EFI_OUT_OF_RESOURCES     No resource to complete operations.
 
 **/
+EFI_STATUS
+PutFileImage (
+  IN CHAR8    *OutputFileName,
+  IN CHAR8    *OutputFileImage,
+  IN UINT32   BytesToWrite
+  )
+;
 
 UINT8
 CalculateChecksum8 (
