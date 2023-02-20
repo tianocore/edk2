@@ -152,65 +152,43 @@ SetFilePosition (
   FILE_POSITION *Fpos
   );
 
+/**
+  @retval STATUS_SUCCESS always
+**/
 STATUS
 SFPInit (
   VOID
   )
-/*++
-
-Routine Description:
-
-Arguments:
-  None.
-
-Returns:
-  STATUS_SUCCESS always
-
---*/
 {
   memset ((VOID *) &mGlobals, 0, sizeof (mGlobals));
   return STATUS_SUCCESS;
 }
 
+/**
+  Return the line number of the file we're parsing. Used
+  for error reporting purposes.
+
+  @return The line number, or 0 if no file is being processed
+**/
 UINTN
 SFPGetLineNumber (
   VOID
   )
-/*++
-
-Routine Description:
-  Return the line number of the file we're parsing. Used
-  for error reporting purposes.
-
-Arguments:
-  None.
-
-Returns:
-  The line number, or 0 if no file is being processed
-
---*/
 {
   return mGlobals.SourceFile.LineNum;
 }
 
+/**
+  Return the name of the file we're parsing. Used
+  for error reporting purposes.
+
+  @return A pointer to the file name. Null if no file is being
+  processed.
+**/
 CHAR8  *
 SFPGetFileName (
   VOID
   )
-/*++
-
-Routine Description:
-  Return the name of the file we're parsing. Used
-  for error reporting purposes.
-
-Arguments:
-  None.
-
-Returns:
-  A pointer to the file name. Null if no file is being
-  processed.
-
---*/
 {
   if (mGlobals.SourceFile.FileName[0]) {
     return mGlobals.SourceFile.FileName;
@@ -219,22 +197,15 @@ Returns:
   return NULL;
 }
 
+/**
+  Open a file for parsing.
+
+  @param FileName  name of the file to parse
+**/
 STATUS
 SFPOpenFile (
   CHAR8      *FileName
   )
-/*++
-
-Routine Description:
-  Open a file for parsing.
-
-Arguments:
-  FileName  - name of the file to parse
-
-Returns:
-
-
---*/
 {
   STATUS  Status;
   t_strcpy (mGlobals.SourceFile.FileName, FileName);
@@ -242,31 +213,26 @@ Returns:
   return Status;
 }
 
+/**
+  Check to see if the specified token is found at
+  the current position in the input file.
+
+ @note:
+   We do a simple string comparison on this function. It is
+   the responsibility of the caller to ensure that the token
+   is not a subset of some other token.
+
+   The file pointer is advanced past the token in the input file.
+
+  @param Str the token to look for
+
+  @retval TRUE the token is next
+  @retval FALSE the token is not next
+**/
 BOOLEAN
 SFPIsToken (
   CHAR8  *Str
   )
-/*++
-
-Routine Description:
-  Check to see if the specified token is found at
-  the current position in the input file.
-
-Arguments:
-  Str - the token to look for
-
-Returns:
-  TRUE - the token is next
-  FALSE - the token is not next
-
-Notes:
-  We do a simple string comparison on this function. It is
-  the responsibility of the caller to ensure that the token
-  is not a subset of some other token.
-
-  The file pointer is advanced past the token in the input file.
-
---*/
 {
   UINTN  Len;
   SkipWhiteSpace (&mGlobals.SourceFile);
@@ -286,28 +252,23 @@ Notes:
   return FALSE;
 }
 
+/**
+  Check to see if the specified keyword is found at
+  the current position in the input file.
+
+ @note:
+   A keyword is defined as a "special" string that has a non-alphanumeric
+   character following it.
+
+  @param Str keyword to look for
+
+  @retval TRUE the keyword is next
+  @retval FALSE the keyword is not next
+**/
 BOOLEAN
 SFPIsKeyword (
   CHAR8  *Str
   )
-/*++
-
-Routine Description:
-  Check to see if the specified keyword is found at
-  the current position in the input file.
-
-Arguments:
-  Str - keyword to look for
-
-Returns:
-  TRUE - the keyword is next
-  FALSE - the keyword is not next
-
-Notes:
-  A keyword is defined as a "special" string that has a non-alphanumeric
-  character following it.
-
---*/
 {
   UINTN  Len;
   SkipWhiteSpace (&mGlobals.SourceFile);
@@ -331,30 +292,25 @@ Notes:
   return FALSE;
 }
 
+/**
+  Get the next token from the input stream.
+
+ @note:
+   Preceding white space is ignored.
+   The parser's buffer pointer is advanced past the end of the
+   token.
+
+  @param Str pointer to a copy of the next token
+  @param Len size of buffer pointed to by Str
+
+  @retval TRUE  next token successfully returned
+  @retval FALSE otherwise
+**/
 BOOLEAN
 SFPGetNextToken (
   CHAR8  *Str,
   UINTN  Len
   )
-/*++
-
-Routine Description:
-  Get the next token from the input stream.
-
-Arguments:
-  Str - pointer to a copy of the next token
-  Len - size of buffer pointed to by Str
-
-Returns:
-  TRUE  - next token successfully returned
-  FALSE - otherwise
-
-Notes:
-  Preceding white space is ignored.
-  The parser's buffer pointer is advanced past the end of the
-  token.
-
---*/
 {
   UINTN  Index;
   CHAR8  TempChar;
@@ -436,25 +392,20 @@ Notes:
   return FALSE;
 }
 
+/**
+  Parse a GUID from the input stream. Stop when you discover white space.
+
+  @param Str pointer to a copy of the next token
+  @param Len size of buffer pointed to by Str
+
+  @retval TRUE  GUID string returned successfully
+  @retval FALSE otherwise
+**/
 BOOLEAN
 SFPGetGuidToken (
   CHAR8  *Str,
   UINT32 Len
   )
-/*++
-
-Routine Description:
-  Parse a GUID from the input stream. Stop when you discover white space.
-
-Arguments:
-  Str - pointer to a copy of the next token
-  Len - size of buffer pointed to by Str
-
-Returns:
-  TRUE  - GUID string returned successfully
-  FALSE - otherwise
-
---*/
 {
   UINT32  Index;
   SkipWhiteSpace (&mGlobals.SourceFile);
@@ -505,24 +456,19 @@ SFPSkipToToken (
   return FALSE;
 }
 
+/**
+  Check the token at the current file position for a numeric value.
+  May be either decimal or hex.
+
+  @param Value  pointer where to store the value
+
+  @retval FALSE    current token is not a number
+  @retval TRUE     current token is a number
+**/
 BOOLEAN
 SFPGetNumber (
   UINTN *Value
   )
-/*++
-
-Routine Description:
-  Check the token at the current file position for a numeric value.
-  May be either decimal or hex.
-
-Arguments:
-  Value  - pointer where to store the value
-
-Returns:
-  FALSE    - current token is not a number
-  TRUE     - current token is a number
-
---*/
 {
   int Val;
 
@@ -561,23 +507,16 @@ Returns:
   }
 }
 
+/**
+  Close the file being parsed.
+
+  @retval STATUS_SUCCESS the file was closed
+  @retval STATUS_ERROR   no file is currently open
+**/
 STATUS
 SFPCloseFile (
   VOID
   )
-/*++
-
-Routine Description:
-  Close the file being parsed.
-
-Arguments:
-  None.
-
-Returns:
-  STATUS_SUCCESS - the file was closed
-  STATUS_ERROR   - no file is currently open
-
---*/
 {
   if (mGlobals.SourceFile.FileBuffer != NULL) {
     free (mGlobals.SourceFile.FileBuffer);
@@ -588,28 +527,20 @@ Returns:
   return STATUS_ERROR;
 }
 
+/**
+  Given a source file, open the file and parse it
+
+  @param SourceFile        name of file to parse
+  @param ParentSourceFile  for error reporting purposes, the file that #included SourceFile.
+
+  @return Standard status.
+**/
 STATIC
 STATUS
 ProcessIncludeFile (
   SOURCE_FILE *SourceFile,
   SOURCE_FILE *ParentSourceFile
   )
-/*++
-
-Routine Description:
-
-  Given a source file, open the file and parse it
-
-Arguments:
-
-  SourceFile        - name of file to parse
-  ParentSourceFile  - for error reporting purposes, the file that #included SourceFile.
-
-Returns:
-
-  Standard status.
-
---*/
 {
   STATIC UINTN NestDepth = 0;
   CHAR8               FoundFileName[MAX_PATH];
@@ -657,27 +588,19 @@ Finish:
   return Status;
 }
 
+/**
+  Given a source file that's been opened, read the contents into an internal
+  buffer and pre-process it to remove comments.
+
+  @param SourceFile        structure containing info on the file to process
+
+  @return Standard status.
+**/
 STATIC
 STATUS
 ProcessFile (
   SOURCE_FILE *SourceFile
   )
-/*++
-
-Routine Description:
-
-  Given a source file that's been opened, read the contents into an internal
-  buffer and pre-process it to remove comments.
-
-Arguments:
-
-  SourceFile        - structure containing info on the file to process
-
-Returns:
-
-  Standard status.
-
---*/
 {
   //
   // Get the file size, and then read the entire thing into memory.
@@ -706,24 +629,17 @@ Returns:
   return STATUS_SUCCESS;
 }
 
+/**
+  Preprocess a file to replace all carriage returns with NULLs so
+  we can print lines (as part of error messages) from the file to the screen.
+
+  @param SourceFile structure that we use to keep track of an input file.
+**/
 STATIC
 VOID
 PreprocessFile (
   SOURCE_FILE *SourceFile
   )
-/*++
-
-Routine Description:
-  Preprocess a file to replace all carriage returns with NULLs so
-  we can print lines (as part of error messages) from the file to the screen.
-
-Arguments:
-  SourceFile - structure that we use to keep track of an input file.
-
-Returns:
-  Nothing.
-
---*/
 {
   BOOLEAN InComment;
   BOOLEAN SlashSlashComment;
@@ -812,26 +728,21 @@ Returns:
   }
 }
 
+/**
+  Retrieve a quoted-string from the input file.
+
+  @param Str    pointer to a copy of the quoted string parsed
+  @param Length size of buffer pointed to by Str
+
+  @retval TRUE    next token in input stream was a quoted string, and
+                  the string value was returned in Str
+  @retval FALSE   otherwise
+**/
 BOOLEAN
 SFPGetQuotedString (
   CHAR8       *Str,
   INTN         Length
   )
-/*++
-
-Routine Description:
-  Retrieve a quoted-string from the input file.
-
-Arguments:
-  Str    - pointer to a copy of the quoted string parsed
-  Length - size of buffer pointed to by Str
-
-Returns:
-  TRUE    - next token in input stream was a quoted string, and
-            the string value was returned in Str
-  FALSE   - otherwise
-
---*/
 {
   SkipWhiteSpace (&mGlobals.SourceFile);
   if (EndOfFile (&mGlobals.SourceFile)) {
@@ -866,24 +777,17 @@ Returns:
   return FALSE;
 }
 
+/**
+  Return TRUE of FALSE to indicate whether or not we've reached the end of the
+  file we're parsing.
+
+  @retval TRUE    EOF reached
+  @retval FALSE   otherwise
+**/
 BOOLEAN
 SFPIsEOF (
   VOID
   )
-/*++
-
-Routine Description:
-  Return TRUE of FALSE to indicate whether or not we've reached the end of the
-  file we're parsing.
-
-Arguments:
-  NA
-
-Returns:
-  TRUE    - EOF reached
-  FALSE   - otherwise
-
---*/
 {
   SkipWhiteSpace (&mGlobals.SourceFile);
   return EndOfFile (&mGlobals.SourceFile);
@@ -1112,27 +1016,22 @@ SkipWhiteSpace (
   return Count;
 }
 
+/**
+  Compare two strings for equality. The string pointed to by 'Buffer' may or may not be null-terminated,
+  so only compare up to the length of Str.
+
+  @param Buffer  pointer to first (possibly not null-terminated) string
+  @param Str     pointer to null-terminated string to compare to Buffer
+
+  @retval Number of bytes matched if exact match
+  @retval 0 if Buffer does not start with Str
+**/
 STATIC
 UINTN
 t_strcmp (
   CHAR8  *Buffer,
   CHAR8  *Str
   )
-/*++
-
-Routine Description:
-  Compare two strings for equality. The string pointed to by 'Buffer' may or may not be null-terminated,
-  so only compare up to the length of Str.
-
-Arguments:
-  Buffer  - pointer to first (possibly not null-terminated) string
-  Str     - pointer to null-terminated string to compare to Buffer
-
-Returns:
-  Number of bytes matched if exact match
-  0 if Buffer does not start with Str
-
---*/
 {
   UINTN  Len;
 
@@ -1245,28 +1144,23 @@ GetHexChars (
   return Len;
 }
 
+/**
+  Parse a GUID from the input stream. Stop when you discover white space.
+
+ GUID styles
+   Style[0] 12345678-1234-5678-AAAA-BBBBCCCCDDDD
+
+  @param GuidStyle Style of the following GUID token
+  @param Value     pointer to EFI_GUID struct for output
+
+  @retval TRUE  GUID string parsed successfully
+  @retval FALSE otherwise
+**/
 BOOLEAN
 SFPGetGuid (
   INTN         GuidStyle,
   EFI_GUID    *Value
   )
-/*++
-
-Routine Description:
-  Parse a GUID from the input stream. Stop when you discover white space.
-
-Arguments:
-  GuidStyle - Style of the following GUID token
-  Value     - pointer to EFI_GUID struct for output
-
-Returns:
-  TRUE  - GUID string parsed successfully
-  FALSE - otherwise
-
-  GUID styles
-    Style[0] 12345678-1234-5678-AAAA-BBBBCCCCDDDD
-
---*/
 {
   INT32         Value32;
   UINT32        Index;

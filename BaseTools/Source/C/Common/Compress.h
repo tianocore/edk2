@@ -15,13 +15,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "CommonLib.h"
 #include <Common/UefiBaseTypes.h>
-/*++
 
-Routine Description:
-
+/**
   Tiano compression routine.
-
---*/
+**/
 EFI_STATUS
 TianoCompress (
   IN      UINT8   *SrcBuffer,
@@ -31,13 +28,9 @@ TianoCompress (
   )
 ;
 
-/*++
-
-Routine Description:
-
+/**
   Efi compression routine.
-
---*/
+**/
 EFI_STATUS
 EfiCompress (
   IN      UINT8   *SrcBuffer,
@@ -47,29 +40,21 @@ EfiCompress (
   )
 ;
 
-/*++
-
-Routine Description:
-
+/**
   The compression routine.
 
-Arguments:
+  @param SrcBuffer   The buffer storing the source data
+  @param SrcSize     The size of source data
+  @param DstBuffer   The buffer to store the compressed data
+  @param DstSize     On input, the size of DstBuffer; On output,
+              the size of the actual compressed data.
 
-  SrcBuffer   - The buffer storing the source data
-  SrcSize     - The size of source data
-  DstBuffer   - The buffer to store the compressed data
-  DstSize     - On input, the size of DstBuffer; On output,
-                the size of the actual compressed data.
-
-Returns:
-
-  EFI_BUFFER_TOO_SMALL  - The DstBuffer is too small. In this case,
+  @retval EFI_BUFFER_TOO_SMALL  The DstBuffer is too small. In this case,
                 DstSize contains the size needed.
-  EFI_SUCCESS           - Compression is successful.
-  EFI_OUT_OF_RESOURCES  - No resource to complete function.
-  EFI_INVALID_PARAMETER - Parameter supplied is wrong.
-
---*/
+  @retval EFI_SUCCESS           Compression is successful.
+  @retval EFI_OUT_OF_RESOURCES  No resource to complete function.
+  @retval EFI_INVALID_PARAMETER Parameter supplied is wrong.
+**/
 typedef
 EFI_STATUS
 (*COMPRESS_FUNCTION) (

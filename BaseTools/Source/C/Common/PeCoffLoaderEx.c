@@ -65,6 +65,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 UINT32 *RiscVHi20Fixup = NULL;
 
+/**
+  Performs an IA-32 specific relocation fixup
+
+  @param Reloc      Pointer to the relocation record
+  @param Fixup      Pointer to the address to fix up
+  @param FixupData  Pointer to a buffer to log the fixups
+  @param Adjust     The offset to adjust the fixup
+
+  @retval EFI_UNSUPPORTED   - Unsupported now
+**/
 RETURN_STATUS
 PeCoffLoaderRelocateIa32Image (
   IN UINT16      *Reloc,
@@ -72,52 +82,20 @@ PeCoffLoaderRelocateIa32Image (
   IN OUT CHAR8   **FixupData,
   IN UINT64      Adjust
   )
-/*++
-
-Routine Description:
-
-  Performs an IA-32 specific relocation fixup
-
-Arguments:
-
-  Reloc      - Pointer to the relocation record
-
-  Fixup      - Pointer to the address to fix up
-
-  FixupData  - Pointer to a buffer to log the fixups
-
-  Adjust     - The offset to adjust the fixup
-
-Returns:
-
-  EFI_UNSUPPORTED   - Unsupported now
-
---*/
 {
   return RETURN_UNSUPPORTED;
 }
 
-/*++
-
-Routine Description:
-
+/**
   Performs an RISC-V specific relocation fixup
 
-Arguments:
+  @param Reloc      Pointer to the relocation record
+  @param Fixup      Pointer to the address to fix up
+  @param FixupData  Pointer to a buffer to log the fixups
+  @param Adjust     The offset to adjust the fixup
 
-  Reloc      - Pointer to the relocation record
-
-  Fixup      - Pointer to the address to fix up
-
-  FixupData  - Pointer to a buffer to log the fixups
-
-  Adjust     - The offset to adjust the fixup
-
-Returns:
-
-  Status code
-
---*/
+  @return Status code
+**/
 RETURN_STATUS
 PeCoffLoaderRelocateRiscVImage (
   IN UINT16      *Reloc,

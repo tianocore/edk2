@@ -36,6 +36,50 @@ PrintLimitExceeded (
   VOID
   );
 
+/**
+  Prints an error message.
+
+  All arguments are optional, though the printed message may be useless if
+  at least something valid is not specified.
+
+ @note:
+   We print the following (similar to the Warn() and Debug()
+   W
+   Typical error/warning message format:
+
+   bin\VfrCompile.cpp(330) : error C2660: 'AddVfrDataStructField' : function does not take 2 parameters
+
+   BUGBUG -- these three utility functions are almost identical, and
+   should be modified to share code.
+
+   Visual Studio does not find error messages with:
+
+      " error :"
+      " error 1:"
+      " error c1:"
+      " error 1000:"
+      " error c100:"
+
+   It does find:
+      " error c1000:"
+
+  @param FileName name of the file or application. If not specified, then the
+             utility name (as set by the utility calling SetUtilityName()
+             earlier) is used. Otherwise "Unknown utility" is used.
+
+  @param LineNumber the line number of error, typically used by parsers. If the
+               utility is not a parser, then 0 should be specified. Otherwise
+               the FileName and LineNumber info can be used to cause
+               MS Visual Studio to jump to the error.
+
+  @param MessageCode an application-specific error code that can be referenced in
+              other documentation.
+
+  @param Text        the text in question, typically used by parsers.
+
+  @param MsgFmt the format string for the error message. Can contain formatting
+           controls for use with the varargs.
+**/
 VOID
 Error (
   CHAR8   *FileName,
@@ -45,56 +89,6 @@ Error (
   CHAR8   *MsgFmt,
   ...
   )
-/*++
-
-Routine Description:
-  Prints an error message.
-
-Arguments:
-  All arguments are optional, though the printed message may be useless if
-  at least something valid is not specified.
-
-  FileName - name of the file or application. If not specified, then the
-             utility name (as set by the utility calling SetUtilityName()
-             earlier) is used. Otherwise "Unknown utility" is used.
-
-  LineNumber - the line number of error, typically used by parsers. If the
-               utility is not a parser, then 0 should be specified. Otherwise
-               the FileName and LineNumber info can be used to cause
-               MS Visual Studio to jump to the error.
-
-  MessageCode - an application-specific error code that can be referenced in
-              other documentation.
-
-  Text        - the text in question, typically used by parsers.
-
-  MsgFmt - the format string for the error message. Can contain formatting
-           controls for use with the varargs.
-
-Returns:
-  None.
-
-Notes:
-  We print the following (similar to the Warn() and Debug()
-  W
-  Typical error/warning message format:
-
-  bin\VfrCompile.cpp(330) : error C2660: 'AddVfrDataStructField' : function does not take 2 parameters
-
-  BUGBUG -- these three utility functions are almost identical, and
-  should be modified to share code.
-
-  Visual Studio does not find error messages with:
-
-     " error :"
-     " error 1:"
-     " error c1:"
-     " error 1000:"
-     " error c100:"
-
-  It does find:
-     " error c1000:"
---*/
 {
   va_list List;
   //
@@ -127,6 +121,14 @@ Notes:
   va_end (List);
 }
 
+/**
+  Print a parser error, using the source file name and line number
+  set by a previous call to SetParserPosition().
+
+  @param MessageCode   application-specific error code
+  @param Text          text to print in the error message
+  @param MsgFmt        format string to print at the end of the error message
+**/
 VOID
 ParserError (
   UINT32  MessageCode,
@@ -134,21 +136,6 @@ ParserError (
   CHAR8   *MsgFmt,
   ...
   )
-/*++
-
-Routine Description:
-  Print a parser error, using the source file name and line number
-  set by a previous call to SetParserPosition().
-
-Arguments:
-  MessageCode   - application-specific error code
-  Text          - text to print in the error message
-  MsgFmt        - format string to print at the end of the error message
-
-Returns:
-  NA
-
---*/
 {
   va_list List;
   //
@@ -181,6 +168,14 @@ Returns:
   va_end (List);
 }
 
+/**
+  Print a parser warning, using the source file name and line number
+  set by a previous call to SetParserPosition().
+
+  @param ErrorCode     application-specific error code
+  @param OffendingText text to print in the warning message
+  @param MsgFmt        format string to print at the end of the warning message
+**/
 VOID
 ParserWarning (
   UINT32  ErrorCode,
@@ -188,21 +183,6 @@ ParserWarning (
   CHAR8   *MsgFmt,
   ...
   )
-/*++
-
-Routine Description:
-  Print a parser warning, using the source file name and line number
-  set by a previous call to SetParserPosition().
-
-Arguments:
-  ErrorCode     - application-specific error code
-  OffendingText - text to print in the warning message
-  MsgFmt        - format string to print at the end of the warning message
-
-Returns:
-  NA
-
---*/
 {
   va_list List;
   //
@@ -241,6 +221,19 @@ Returns:
   //  }
 }
 
+/**
+  Print a warning message.
+
+  @param FileName    name of the file where the warning was detected, or the name
+                     of the application that detected the warning
+  @param LineNumber  the line number where the warning was detected (parsers).
+                     0 should be specified if the utility is not a parser.
+  @param MessageCode an application-specific warning code that can be referenced in
+                     other documentation.
+  @param Text        the text in question (parsers)
+  @param MsgFmt      the format string for the warning message. Can contain formatting
+                     controls for use with varargs.
+**/
 VOID
 Warning (
   CHAR8   *FileName,
@@ -250,30 +243,6 @@ Warning (
   CHAR8   *MsgFmt,
   ...
   )
-/*++
-
-Routine Description:
-  Print a warning message.
-
-Arguments:
-  FileName    - name of the file where the warning was detected, or the name
-                of the application that detected the warning
-
-  LineNumber  - the line number where the warning was detected (parsers).
-                0 should be specified if the utility is not a parser.
-
-  MessageCode - an application-specific warning code that can be referenced in
-                other documentation.
-
-  Text        - the text in question (parsers)
-
-  MsgFmt      - the format string for the warning message. Can contain formatting
-                controls for use with varargs.
-
-Returns:
-  None.
-
---*/
 {
   va_list List;
 
@@ -313,6 +282,18 @@ Returns:
   va_end (List);
 }
 
+/**
+  Print a Debug message.
+
+  @param FileName    typically the name of the utility printing the debug message, but
+                     can be the name of a file being parsed.
+  @param LineNumber  the line number in FileName (parsers)
+  @param MsgLevel    Debug message print level (0~9)
+  @param Text        the text in question (parsers)
+  @param MsgFmt      the format string for the debug message. Can contain formatting
+                     controls for use with varargs.
+
+**/
 VOID
 DebugMsg (
   CHAR8   *FileName,
@@ -322,28 +303,6 @@ DebugMsg (
   CHAR8   *MsgFmt,
   ...
   )
-/*++
-
-Routine Description:
-  Print a Debug message.
-
-Arguments:
-  FileName    - typically the name of the utility printing the debug message, but
-                can be the name of a file being parsed.
-
-  LineNumber  - the line number in FileName (parsers)
-
-  MsgLevel    - Debug message print level (0~9)
-
-  Text        - the text in question (parsers)
-
-  MsgFmt      - the format string for the debug message. Can contain formatting
-                controls for use with varargs.
-
-Returns:
-  None.
-
---*/
 {
   va_list List;
   //
@@ -358,6 +317,42 @@ Returns:
   va_end (List);
 }
 
+/**
+  Worker routine for all the utility printing services. Prints the message in
+  a format that Visual Studio will find when scanning build outputs for
+  errors or warnings.
+
+ @note:
+   If FileName == NULL then this utility will use the string passed into SetUtilityName().
+
+   LineNumber is only used if the caller is a parser, in which case FileName refers to the
+   file being parsed.
+
+   Text and MsgFmt are both optional, though it would be of little use calling this function with
+   them both NULL.
+
+   Output will typically be of the form:
+     <FileName>(<LineNumber>) : <Type> <Type[0]><MessageCode>: <Text> : <MsgFmt>
+
+     Parser (LineNumber != 0)
+       VfrCompile.cpp(330) : error E2660: AddVfrDataStructField : function does not take 2 parameters
+     Generic utility (LineNumber == 0)
+       UtilityName : error E1234 : Text string : MsgFmt string and args
+
+  @param Type        "warning" or "error" string to insert into the message to be
+                printed. The first character of this string (converted to uppercase)
+                is used to precede the MessageCode value in the output string.
+  @param FileName    name of the file where the warning was detected, or the name
+                of the application that detected the warning
+  @param LineNumber  the line number where the warning was detected (parsers).
+                0 should be specified if the utility is not a parser.
+  @param MessageCode an application-specific warning code that can be referenced in
+                other documentation.
+  @param Text        part of the message to print
+  @param MsgFmt      the format string for the message. Can contain formatting
+                controls for use with varargs.
+  @param List        the variable list.
+**/
 VOID
 PrintMessage (
   CHAR8   *Type,
@@ -368,54 +363,6 @@ PrintMessage (
   CHAR8   *MsgFmt,
   va_list List
   )
-/*++
-
-Routine Description:
-  Worker routine for all the utility printing services. Prints the message in
-  a format that Visual Studio will find when scanning build outputs for
-  errors or warnings.
-
-Arguments:
-  Type        - "warning" or "error" string to insert into the message to be
-                printed. The first character of this string (converted to uppercase)
-                is used to precede the MessageCode value in the output string.
-
-  FileName    - name of the file where the warning was detected, or the name
-                of the application that detected the warning
-
-  LineNumber  - the line number where the warning was detected (parsers).
-                0 should be specified if the utility is not a parser.
-
-  MessageCode - an application-specific warning code that can be referenced in
-                other documentation.
-
-  Text        - part of the message to print
-
-  MsgFmt      - the format string for the message. Can contain formatting
-                controls for use with varargs.
-  List        - the variable list.
-
-Returns:
-  None.
-
-Notes:
-  If FileName == NULL then this utility will use the string passed into SetUtilityName().
-
-  LineNumber is only used if the caller is a parser, in which case FileName refers to the
-  file being parsed.
-
-  Text and MsgFmt are both optional, though it would be of little use calling this function with
-  them both NULL.
-
-  Output will typically be of the form:
-    <FileName>(<LineNumber>) : <Type> <Type[0]><MessageCode>: <Text> : <MsgFmt>
-
-    Parser (LineNumber != 0)
-      VfrCompile.cpp(330) : error E2660: AddVfrDataStructField : function does not take 2 parameters
-    Generic utility (LineNumber == 0)
-      UtilityName : error E1234 : Text string : MsgFmt string and args
-
---*/
 {
   CHAR8       Line[MAX_LINE_LEN];
   CHAR8       Line2[MAX_LINE_LEN];
@@ -523,24 +470,19 @@ Notes:
 
 }
 
+/**
+  Print message into stdout.
+
+  @param MsgFmt      the format string for the message. Can contain formatting
+                     controls for use with varargs.
+  @param List        the variable list.
+**/
 STATIC
 VOID
 PrintSimpleMessage (
   CHAR8   *MsgFmt,
   va_list List
   )
-/*++
-Routine Description:
-  Print message into stdout.
-
-Arguments:
-  MsgFmt      - the format string for the message. Can contain formatting
-                controls for use with varargs.
-  List        - the variable list.
-
-Returns:
-  None.
---*/
 {
   CHAR8       Line[MAX_LINE_LEN];
   //
@@ -552,51 +494,37 @@ Returns:
   }
 }
 
+/**
+  Set the position in a file being parsed. This can be used to
+  print error messages deeper down in a parser.
+
+  @param SourceFileName name of the source file being parsed
+  @param LineNum        line number of the source file being parsed
+**/
 VOID
 ParserSetPosition (
   CHAR8   *SourceFileName,
   UINT32  LineNum
   )
-/*++
-
-Routine Description:
-  Set the position in a file being parsed. This can be used to
-  print error messages deeper down in a parser.
-
-Arguments:
-  SourceFileName - name of the source file being parsed
-  LineNum        - line number of the source file being parsed
-
-Returns:
-  NA
-
---*/
 {
   mSourceFileName     = SourceFileName;
   mSourceFileLineNum  = LineNum;
 }
 
-VOID
-SetUtilityName (
-  CHAR8   *UtilityName
-  )
-/*++
-
-Routine Description:
+/**
   All printed error/warning/debug messages follow the same format, and
   typically will print a filename or utility name followed by the error
   text. However if a filename is not passed to the print routines, then
   they'll print the utility name if you call this function early in your
   app to set the utility name.
 
-Arguments:
-  UtilityName  -  name of the utility, which will be printed with all
-                  error/warning/debug messages.
-
-Returns:
-  NA
-
---*/
+  @param UtilityName  name of the utility, which will be printed with all
+                      error/warning/debug messages.
+**/
+VOID
+SetUtilityName (
+  CHAR8   *UtilityName
+  )
 {
   //
   // Save the name of the utility in our local variable. Make sure its
@@ -613,69 +541,48 @@ Returns:
   }
 }
 
-STATUS
-GetUtilityStatus (
-  VOID
-  )
-/*++
-
-Routine Description:
+/**
   When you call Error() or Warning(), this module keeps track of it and
   sets a local mStatus to STATUS_ERROR or STATUS_WARNING. When the utility
   exits, it can call this function to get the status and use it as a return
   value.
 
-Arguments:
-  None.
-
-Returns:
-  Worst-case status reported, as defined by which print function was called.
-
---*/
+  @return Worst-case status reported, as defined by which print function was called.
+**/
+STATUS
+GetUtilityStatus (
+  VOID
+  )
 {
   return mStatus;
 }
 
+/**
+  Set the printing message Level. This is used by the PrintMsg() function
+  to determine when/if a message should be printed.
+
+  @param LogLevel  0~50 to specify the different level message.
+**/
 VOID
 SetPrintLevel (
   UINT64  LogLevel
   )
-/*++
-
-Routine Description:
-  Set the printing message Level. This is used by the PrintMsg() function
-  to determine when/if a message should be printed.
-
-Arguments:
-  LogLevel  - 0~50 to specify the different level message.
-
-Returns:
-  NA
-
---*/
 {
   mPrintLogLevel = LogLevel;
 }
 
+/**
+  Print a verbose level message.
+
+  @param MsgFmt      the format string for the message. Can contain formatting
+                     controls for use with varargs.
+  @param List        the variable list.
+**/
 VOID
 VerboseMsg (
   CHAR8   *MsgFmt,
   ...
   )
-/*++
-
-Routine Description:
-  Print a verbose level message.
-
-Arguments:
-  MsgFmt      - the format string for the message. Can contain formatting
-                controls for use with varargs.
-  List        - the variable list.
-
-Returns:
-  NA
-
---*/
 {
   va_list List;
   //
@@ -690,25 +597,18 @@ Returns:
   va_end (List);
 }
 
+/**
+  Print a default level message.
+
+  @param MsgFmt      the format string for the message. Can contain formatting
+                     controls for use with varargs.
+  @param List        the variable list.
+**/
 VOID
 NormalMsg (
   CHAR8   *MsgFmt,
   ...
   )
-/*++
-
-Routine Description:
-  Print a default level message.
-
-Arguments:
-  MsgFmt      - the format string for the message. Can contain formatting
-                controls for use with varargs.
-  List        - the variable list.
-
-Returns:
-  NA
-
---*/
 {
   va_list List;
   //
@@ -723,25 +623,18 @@ Returns:
   va_end (List);
 }
 
+/**
+  Print a key level message.
+
+  @param MsgFmt      the format string for the message. Can contain formatting
+                     controls for use with varargs.
+  @param List        the variable list.
+**/
 VOID
 KeyMsg (
   CHAR8   *MsgFmt,
   ...
   )
-/*++
-
-Routine Description:
-  Print a key level message.
-
-Arguments:
-  MsgFmt      - the format string for the message. Can contain formatting
-                controls for use with varargs.
-  List        - the variable list.
-
-Returns:
-  NA
-
---*/
 {
   va_list List;
   //
@@ -756,28 +649,21 @@ Returns:
   va_end (List);
 }
 
+/**
+  Set the limits of how many errors, warnings, and errors+warnings
+  we will print.
+
+  @param MaxErrors       maximum number of error messages to print
+  @param MaxWarnings     maximum number of warning messages to print
+  @param MaxWarningsPlusErrors
+                  maximum number of errors+warnings to print
+**/
 VOID
 SetPrintLimits (
   UINT32  MaxErrors,
   UINT32  MaxWarnings,
   UINT32  MaxWarningsPlusErrors
   )
-/*++
-
-Routine Description:
-  Set the limits of how many errors, warnings, and errors+warnings
-  we will print.
-
-Arguments:
-  MaxErrors       - maximum number of error messages to print
-  MaxWarnings     - maximum number of warning messages to print
-  MaxWarningsPlusErrors
-                  - maximum number of errors+warnings to print
-
-Returns:
-  NA
-
---*/
 {
   mMaxErrors              = MaxErrors;
   mMaxWarnings            = MaxWarnings;

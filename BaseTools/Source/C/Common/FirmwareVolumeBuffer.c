@@ -78,29 +78,21 @@ FvBufCalculateChecksum8 (
 // Procedures start
 //
 
+/**
+  Clears out all files from the Fv buffer in memory
+
+  @param SourceFv Address of the Fv in memory, this firmware volume will
+                  be modified, if SourceFfsFile exists
+  @param SourceFfsFile Input FFS file to replace
+
+  @retval EFI_SUCCESS
+  @retval EFI_NOT_FOUND
+**/
 EFI_STATUS
 FvBufRemoveFileNew (
   IN OUT VOID *Fv,
   IN EFI_GUID *Name
   )
-/*++
-
-Routine Description:
-
-  Clears out all files from the Fv buffer in memory
-
-Arguments:
-
-  SourceFv - Address of the Fv in memory, this firmware volume will
-             be modified, if SourceFfsFile exists
-  SourceFfsFile - Input FFS file to replace
-
-Returns:
-
-  EFI_SUCCESS
-  EFI_NOT_FOUND
-
---*/
 {
   EFI_STATUS                  Status;
   EFI_FFS_FILE_HEADER*        FileToRm;
@@ -127,30 +119,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Clears out all files from the Fv buffer in memory
 
+  @param SourceFv Address of the Fv in memory, this firmware volume will
+                  be modified, if SourceFfsFile exists
+  @param SourceFfsFile Input FFS file to replace
+
+  @retval EFI_SUCCESS
+  @retval EFI_NOT_FOUND
+**/
 EFI_STATUS
 FvBufRemoveFile (
   IN OUT VOID *Fv,
   IN EFI_GUID *Name
   )
-/*++
-
-Routine Description:
-
-  Clears out all files from the Fv buffer in memory
-
-Arguments:
-
-  SourceFv - Address of the Fv in memory, this firmware volume will
-             be modified, if SourceFfsFile exists
-  SourceFfsFile - Input FFS file to replace
-
-Returns:
-
-  EFI_SUCCESS
-  EFI_NOT_FOUND
-
---*/
 {
   EFI_STATUS                  Status;
   EFI_FFS_FILE_HEADER        *NextFile;
@@ -216,27 +199,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Clears out all files from the Fv buffer in memory
 
+  @param SourceFfsFile Input FFS file to update the checksum for
+
+  @retval EFI_SUCCESS
+  @retval EFI_NOT_FOUND
+**/
 EFI_STATUS
 FvBufChecksumFile (
   IN OUT VOID *FfsFile
   )
-/*++
-
-Routine Description:
-
-  Clears out all files from the Fv buffer in memory
-
-Arguments:
-
-  SourceFfsFile - Input FFS file to update the checksum for
-
-Returns:
-
-  EFI_SUCCESS
-  EFI_NOT_FOUND
-
---*/
 {
   EFI_FFS_FILE_HEADER* File = (EFI_FFS_FILE_HEADER*)FfsFile;
   EFI_FFS_FILE_STATE StateBackup;
@@ -272,29 +246,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Clears out all files from the Fv buffer in memory
 
+  @param SourceFv Address of the Fv in memory, this firmware volume will
+                  be modified, if SourceFfsFile exists
+  @param SourceFfsFile Input FFS file to replace
+
+  @retval EFI_SUCCESS
+  @retval EFI_NOT_FOUND
+**/
 EFI_STATUS
 FvBufChecksumHeader (
   IN OUT VOID *Fv
   )
-/*++
-
-Routine Description:
-
-  Clears out all files from the Fv buffer in memory
-
-Arguments:
-
-  SourceFv - Address of the Fv in memory, this firmware volume will
-             be modified, if SourceFfsFile exists
-  SourceFfsFile - Input FFS file to replace
-
-Returns:
-
-  EFI_SUCCESS
-  EFI_NOT_FOUND
-
---*/
 {
   EFI_FIRMWARE_VOLUME_HEADER* FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*)Fv;
 
@@ -308,31 +273,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Clears out all files from the Fv buffer in memory
 
+  @param SourceFv - Address of the Fv in memory
+  @param DestinationFv - Output for destination Fv
+    DestinationFv == NULL - invalid parameter
+    *DestinationFv == NULL - memory will be allocated
+    *DestinationFv != NULL - this address will be the destination
+
+  @retval EFI_SUCCESS
+**/
 EFI_STATUS
 FvBufDuplicate (
   IN VOID *SourceFv,
   IN OUT VOID **DestinationFv
   )
-/*++
-
-Routine Description:
-
-  Clears out all files from the Fv buffer in memory
-
-Arguments:
-
-  SourceFv - Address of the Fv in memory
-  DestinationFv - Output for destination Fv
-    DestinationFv == NULL - invalid parameter
-    *DestinationFv == NULL - memory will be allocated
-    *DestinationFv != NULL - this address will be the destination
-
-Returns:
-
-  EFI_SUCCESS
-
---*/
 {
   EFI_STATUS Status;
   UINTN size;
@@ -358,35 +314,26 @@ Returns:
   return EFI_SUCCESS;
 }
 
-
-EFI_STATUS
-FvBufExtend (
-  IN VOID **Fv,
-  IN UINTN Size
-  )
-/*++
-
-Routine Description:
-
+/**
   Extends a firmware volume by the given number of bytes.
 
   BUGBUG: Does not handle the case where the firmware volume has a
           VTF (Volume Top File).  The VTF will not be moved to the
           end of the extended FV.
 
-Arguments:
+  @param Fv Source and destination firmware volume.
+            Note: The original firmware volume buffer is freed!
 
-  Fv - Source and destination firmware volume.
-       Note: The original firmware volume buffer is freed!
+  @param Size The minimum size that the firmware volume is to be extended by.
+              The FV may be extended more than this size.
 
-  Size - The minimum size that the firmware volume is to be extended by.
-         The FV may be extended more than this size.
-
-Returns:
-
-  EFI_SUCCESS
-
---*/
+  @retval EFI_SUCCESS
+**/
+EFI_STATUS
+FvBufExtend (
+  IN VOID **Fv,
+  IN UINTN Size
+  )
 {
   EFI_STATUS Status;
   UINTN OldSize;
@@ -469,27 +416,17 @@ Returns:
 
 }
 
+/**
+  Clears out all files from the Fv buffer in memory
 
+  @param Fv Address of the Fv in memory
+
+  @retval EFI_SUCCESS
+**/
 EFI_STATUS
 FvBufClearAllFiles (
   IN OUT VOID *Fv
   )
-/*++
-
-Routine Description:
-
-  Clears out all files from the Fv buffer in memory
-
-Arguments:
-
-  Fv - Address of the Fv in memory
-
-Returns:
-
-  EFI_SUCCESS
-
---*/
-
 {
   EFI_FIRMWARE_VOLUME_HEADER *hdr = (EFI_FIRMWARE_VOLUME_HEADER*)Fv;
   EFI_STATUS Status;
@@ -509,28 +446,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Clears out all files from the Fv buffer in memory
 
+  @param Fv Address of the Fv in memory
+
+  @retval EFI_SUCCESS
+**/
 EFI_STATUS
 FvBufGetSize (
   IN VOID *Fv,
   OUT UINTN *Size
   )
-/*++
-
-Routine Description:
-
-  Clears out all files from the Fv buffer in memory
-
-Arguments:
-
-  Fv - Address of the Fv in memory
-
-Returns:
-
-  EFI_SUCCESS
-
---*/
-
 {
   EFI_FIRMWARE_VOLUME_HEADER *hdr = (EFI_FIRMWARE_VOLUME_HEADER*)Fv;
   EFI_FV_BLOCK_MAP_ENTRY *blk = hdr->BlockMap;
@@ -554,28 +481,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Adds a new FFS file
 
+  @param Fv Address of the Fv in memory
+  @param File FFS file to add to Fv
+
+  @retval EFI_SUCCESS
+**/
 EFI_STATUS
 FvBufAddFile (
   IN OUT VOID *Fv,
   IN VOID *File
   )
-/*++
-
-Routine Description:
-
-  Adds a new FFS file
-
-Arguments:
-
-  Fv - Address of the Fv in memory
-  File - FFS file to add to Fv
-
-Returns:
-
-  EFI_SUCCESS
-
---*/
 {
   EFI_FIRMWARE_VOLUME_HEADER *hdr = (EFI_FIRMWARE_VOLUME_HEADER*)Fv;
 
@@ -652,32 +570,23 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Adds a new FFS file.  Extends the firmware volume if needed.
 
+  @param Fv Source and destination firmware volume.
+            Note: If the FV is extended, then the original firmware volume
+             buffer is freed!
+
+  @param Size The minimum size that the firmware volume is to be extended by.
+              The FV may be extended more than this size.
+
+  @retval EFI_SUCCESS
+**/
 EFI_STATUS
 FvBufAddFileWithExtend (
   IN OUT VOID **Fv,
   IN VOID *File
   )
-/*++
-
-Routine Description:
-
-  Adds a new FFS file.  Extends the firmware volume if needed.
-
-Arguments:
-
-  Fv - Source and destination firmware volume.
-       Note: If the FV is extended, then the original firmware volume
-             buffer is freed!
-
-  Size - The minimum size that the firmware volume is to be extended by.
-         The FV may be extended more than this size.
-
-Returns:
-
-  EFI_SUCCESS
-
---*/
 {
   EFI_STATUS Status;
   EFI_FFS_FILE_HEADER* NewFile;
@@ -706,29 +615,20 @@ Returns:
   return Status;
 }
 
+/**
+  Adds a new FFS VFT (Volume Top File) file.  In other words, adds the
+  file to the end of the firmware volume.
 
+  @param Fv Address of the Fv in memory
+  @param File FFS file to add to Fv
+
+  @retval EFI_SUCCESS
+**/
 EFI_STATUS
 FvBufAddVtfFile (
   IN OUT VOID *Fv,
   IN VOID *File
   )
-/*++
-
-Routine Description:
-
-  Adds a new FFS VFT (Volume Top File) file.  In other words, adds the
-  file to the end of the firmware volume.
-
-Arguments:
-
-  Fv - Address of the Fv in memory
-  File - FFS file to add to Fv
-
-Returns:
-
-  EFI_SUCCESS
-
---*/
 {
   EFI_STATUS Status;
 
@@ -811,52 +711,35 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Expands the 3 byte size commonly used in Firmware Volume data structures
 
+  @param Size Address of the 3 byte array representing the size
+
+  @return UINT32
+**/
 VOID
 FvBufCompact3ByteSize (
   OUT VOID* SizeDest,
   IN UINT32 Size
   )
-/*++
-
-Routine Description:
-
-  Expands the 3 byte size commonly used in Firmware Volume data structures
-
-Arguments:
-
-  Size - Address of the 3 byte array representing the size
-
-Returns:
-
-  UINT32
-
---*/
 {
   ((UINT8*)SizeDest)[0] = (UINT8)Size;
   ((UINT8*)SizeDest)[1] = (UINT8)(Size >> 8);
   ((UINT8*)SizeDest)[2] = (UINT8)(Size >> 16);
 }
 
+/**
+  Get the FFS file size.
+
+  @param Ffs Pointer to FFS header
+
+  @return UINT32
+**/
 UINT32
 FvBufGetFfsFileSize (
   IN EFI_FFS_FILE_HEADER *Ffs
   )
-/*++
-
-Routine Description:
-
-  Get the FFS file size.
-
-Arguments:
-
-  Ffs - Pointer to FFS header
-
-Returns:
-
-  UINT32
-
---*/
 {
   if (Ffs == NULL) {
     return 0;
@@ -867,25 +750,17 @@ Returns:
   return FvBufExpand3ByteSize(Ffs->Size);
 }
 
+/**
+  Get the FFS header size.
+
+  @param Ffs Pointer to FFS header
+
+  @return UINT32
+**/
 UINT32
 FvBufGetFfsHeaderSize (
   IN EFI_FFS_FILE_HEADER *Ffs
   )
-/*++
-
-Routine Description:
-
-  Get the FFS header size.
-
-Arguments:
-
-  Ffs - Pointer to FFS header
-
-Returns:
-
-  UINT32
-
---*/
 {
   if (Ffs == NULL) {
     return 0;
@@ -896,60 +771,44 @@ Returns:
   return sizeof(EFI_FFS_FILE_HEADER);
 }
 
+/**
+  Expands the 3 byte size commonly used in Firmware Volume data structures
+
+  @param Size Address of the 3 byte array representing the size
+
+  @return UINT32
+**/
 UINT32
 FvBufExpand3ByteSize (
   IN VOID* Size
   )
-/*++
-
-Routine Description:
-
-  Expands the 3 byte size commonly used in Firmware Volume data structures
-
-Arguments:
-
-  Size - Address of the 3 byte array representing the size
-
-Returns:
-
-  UINT32
-
---*/
 {
   return (((UINT8*)Size)[2] << 16) +
          (((UINT8*)Size)[1] << 8) +
          ((UINT8*)Size)[0];
 }
 
+/**
+  Iterates through the files contained within the firmware volume
+
+  @param Fv Address of the Fv in memory
+  @param Key Should be 0 to get the first file.  After that, it should be
+             passed back in without modifying its contents to retrieve
+             subsequent files.
+  @param File Output file pointer
+    File == NULL - invalid parameter
+    otherwise - *File will be update to the location of the file
+
+  @retval EFI_SUCCESS
+  @retval EFI_NOT_FOUND
+  @retval EFI_VOLUME_CORRUPTED
+**/
 EFI_STATUS
 FvBufFindNextFile (
   IN VOID *Fv,
   IN OUT UINTN *Key,
   OUT VOID **File
   )
-/*++
-
-Routine Description:
-
-  Iterates through the files contained within the firmware volume
-
-Arguments:
-
-  Fv - Address of the Fv in memory
-  Key - Should be 0 to get the first file.  After that, it should be
-        passed back in without modifying its contents to retrieve
-        subsequent files.
-  File - Output file pointer
-    File == NULL - invalid parameter
-    otherwise - *File will be update to the location of the file
-
-Returns:
-
-  EFI_SUCCESS
-  EFI_NOT_FOUND
-  EFI_VOLUME_CORRUPTED
-
---*/
 {
   EFI_FIRMWARE_VOLUME_HEADER *hdr = (EFI_FIRMWARE_VOLUME_HEADER*)Fv;
 
@@ -1028,35 +887,26 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  Searches the Fv for a file by its name
 
+  @param Fv Address of the Fv in memory
+  @param Name Guid filename to search for in the firmware volume
+  @param File Output file pointer
+    File == NULL - Only determine if the file exists, based on return
+                   value from the function call.
+    otherwise - *File will be update to the location of the file
+
+  @retval EFI_SUCCESS
+  @retval EFI_NOT_FOUND
+  @retval EFI_VOLUME_CORRUPTED
+**/
 EFI_STATUS
 FvBufFindFileByName (
   IN VOID *Fv,
   IN EFI_GUID *Name,
   OUT VOID **File
   )
-/*++
-
-Routine Description:
-
-  Searches the Fv for a file by its name
-
-Arguments:
-
-  Fv - Address of the Fv in memory
-  Name - Guid filename to search for in the firmware volume
-  File - Output file pointer
-    File == NULL - Only determine if the file exists, based on return
-                   value from the function call.
-    otherwise - *File will be update to the location of the file
-
-Returns:
-
-  EFI_SUCCESS
-  EFI_NOT_FOUND
-  EFI_VOLUME_CORRUPTED
-
---*/
 {
   EFI_STATUS Status;
   UINTN Key;
@@ -1080,35 +930,26 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  Searches the Fv for a file by its type
 
+  @param Fv Address of the Fv in memory
+  @param Type FFS FILE type to search for
+  @param File Output file pointer
+    (File == NULL) -> Only determine if the file exists, based on return
+                      value from the function call.
+    otherwise -> *File will be update to the location of the file
+
+  @retval EFI_SUCCESS
+  @retval EFI_NOT_FOUND
+  @retval EFI_VOLUME_CORRUPTED
+**/
 EFI_STATUS
 FvBufFindFileByType (
   IN VOID *Fv,
   IN EFI_FV_FILETYPE Type,
   OUT VOID **File
   )
-/*++
-
-Routine Description:
-
-  Searches the Fv for a file by its type
-
-Arguments:
-
-  Fv - Address of the Fv in memory
-  Type - FFS FILE type to search for
-  File - Output file pointer
-    (File == NULL) -> Only determine if the file exists, based on return
-                      value from the function call.
-    otherwise -> *File will be update to the location of the file
-
-Returns:
-
-  EFI_SUCCESS
-  EFI_NOT_FOUND
-  EFI_VOLUME_CORRUPTED
-
---*/
 {
   EFI_STATUS Status;
   UINTN Key;
@@ -1132,34 +973,25 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  Searches the requested file for raw data.
 
+  This routine either returns all the payload of a EFI_FV_FILETYPE_RAW file,
+  or finds the EFI_SECTION_RAW section within the file and returns its data.
+
+  @param FfsFile Address of the FFS file in memory
+  @param RawData Pointer to the raw data within the file
+                 (This is NOT allocated.  It is within the file.)
+  @param RawDataSize Size of the raw data within the file
+
+  @return EFI_STATUS
+**/
 EFI_STATUS
 FvBufGetFileRawData (
   IN  VOID*     FfsFile,
   OUT VOID**    RawData,
   OUT UINTN*    RawDataSize
   )
-/*++
-
-Routine Description:
-
-  Searches the requested file for raw data.
-
-  This routine either returns all the payload of a EFI_FV_FILETYPE_RAW file,
-  or finds the EFI_SECTION_RAW section within the file and returns its data.
-
-Arguments:
-
-  FfsFile - Address of the FFS file in memory
-  RawData - Pointer to the raw data within the file
-            (This is NOT allocated.  It is within the file.)
-  RawDataSize - Size of the raw data within the file
-
-Returns:
-
-  EFI_STATUS
-
---*/
 {
   EFI_STATUS Status;
   EFI_FFS_FILE_HEADER* File;
@@ -1195,7 +1027,19 @@ Returns:
 
 }
 
+/**
+  Packages up a FFS file containing the input raw data.
 
+  The file created will have a type of EFI_FV_FILETYPE_FREEFORM, and will
+  contain one EFI_FV_FILETYPE_RAW section.
+
+  @param RawData Pointer to the raw data to be packed
+  @param RawDataSize Size of the raw data to be packed
+  @param FfsFile Address of the packaged FFS file.
+                 Note: The called must deallocate this memory!
+
+  @return EFI_STATUS
+**/
 EFI_STATUS
 FvBufPackageFreeformRawFile (
   IN EFI_GUID*  Filename,
@@ -1203,27 +1047,6 @@ FvBufPackageFreeformRawFile (
   IN UINTN      RawDataSize,
   OUT VOID**    FfsFile
   )
-/*++
-
-Routine Description:
-
-  Packages up a FFS file containing the input raw data.
-
-  The file created will have a type of EFI_FV_FILETYPE_FREEFORM, and will
-  contain one EFI_FV_FILETYPE_RAW section.
-
-Arguments:
-
-  RawData - Pointer to the raw data to be packed
-  RawDataSize - Size of the raw data to be packed
-  FfsFile - Address of the packaged FFS file.
-            Note: The called must deallocate this memory!
-
-Returns:
-
-  EFI_STATUS
-
---*/
 {
   EFI_FFS_FILE_HEADER* NewFile;
   UINT32 NewFileSize;
@@ -1304,7 +1127,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Iterates through the sections contained within a given array of sections
 
+  @param SectionsStart Address of the start of the FFS sections array
+  @param TotalSectionsSize Total size of all the sections
+  @param Key Should be 0 to get the first section.  After that, it should be
+             passed back in without modifying its contents to retrieve
+             subsequent files.
+  @param Section Output section pointer
+    (Section == NULL) -> invalid parameter
+    otherwise -> *Section will be update to the location of the file
+
+  @retval EFI_SUCCESS
+  @retval EFI_NOT_FOUND
+  @retval EFI_VOLUME_CORRUPTED
+**/
 EFI_STATUS
 FvBufFindNextSection (
   IN VOID *SectionsStart,
@@ -1312,30 +1150,6 @@ FvBufFindNextSection (
   IN OUT UINTN *Key,
   OUT VOID **Section
   )
-/*++
-
-Routine Description:
-
-  Iterates through the sections contained within a given array of sections
-
-Arguments:
-
-  SectionsStart - Address of the start of the FFS sections array
-  TotalSectionsSize - Total size of all the sections
-  Key - Should be 0 to get the first section.  After that, it should be
-        passed back in without modifying its contents to retrieve
-        subsequent files.
-  Section - Output section pointer
-    (Section == NULL) -> invalid parameter
-    otherwise -> *Section will be update to the location of the file
-
-Returns:
-
-  EFI_SUCCESS
-  EFI_NOT_FOUND
-  EFI_VOLUME_CORRUPTED
-
---*/
 {
   EFI_COMMON_SECTION_HEADER *sectionHdr;
   UINTN sectionSize;
@@ -1363,31 +1177,22 @@ Returns:
 
 }
 
+/**
+  Searches the FFS file and counts the number of sections found.
+  The sections are NOT recursed.
 
+  @param FfsFile Address of the FFS file in memory
+  @param Count The location to store the section count in
+
+  @retval EFI_SUCCESS
+  @retval EFI_NOT_FOUND
+  @retval EFI_VOLUME_CORRUPTED
+**/
 EFI_STATUS
 FvBufCountSections (
   IN VOID* FfsFile,
   IN UINTN* Count
   )
-/*++
-
-Routine Description:
-
-  Searches the FFS file and counts the number of sections found.
-  The sections are NOT recursed.
-
-Arguments:
-
-  FfsFile - Address of the FFS file in memory
-  Count - The location to store the section count in
-
-Returns:
-
-  EFI_SUCCESS
-  EFI_NOT_FOUND
-  EFI_VOLUME_CORRUPTED
-
---*/
 {
   EFI_STATUS                 Status;
   UINTN                      Key;
@@ -1424,35 +1229,26 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  Searches the FFS file for a section by its type
 
+  @param FfsFile Address of the FFS file in memory
+  @param Type FFS FILE section type to search for
+  @param Section Output section pointer
+    (Section == NULL) -> Only determine if the section exists, based on return
+                         value from the function call.
+    otherwise -> *Section will be update to the location of the file
+
+  @retval EFI_SUCCESS
+  @retval EFI_NOT_FOUND
+  @retval EFI_VOLUME_CORRUPTED
+**/
 EFI_STATUS
 FvBufFindSectionByType (
   IN VOID *FfsFile,
   IN UINT8 Type,
   OUT VOID **Section
   )
-/*++
-
-Routine Description:
-
-  Searches the FFS file for a section by its type
-
-Arguments:
-
-  FfsFile - Address of the FFS file in memory
-  Type - FFS FILE section type to search for
-  Section - Output section pointer
-    (Section == NULL) -> Only determine if the section exists, based on return
-                         value from the function call.
-    otherwise -> *Section will be update to the location of the file
-
-Returns:
-
-  EFI_SUCCESS
-  EFI_NOT_FOUND
-  EFI_VOLUME_CORRUPTED
-
---*/
 {
   EFI_STATUS Status;
   UINTN Key;
@@ -1487,30 +1283,21 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
-
-EFI_STATUS
-FvBufShrinkWrap (
-  IN VOID *Fv
-  )
-/*++
-
-Routine Description:
-
+/**
   Shrinks a firmware volume (in place) to provide a minimal FV.
 
   BUGBUG: Does not handle the case where the firmware volume has a
           VTF (Volume Top File).  The VTF will not be moved to the
           end of the extended FV.
 
-Arguments:
+  @param Fv Firmware volume.
 
-  Fv - Firmware volume.
-
-Returns:
-
-  EFI_SUCCESS
-
---*/
+ @retval EFI_SUCCESS
+**/
+EFI_STATUS
+FvBufShrinkWrap (
+  IN VOID *Fv
+  )
 {
   EFI_STATUS Status;
   UINTN OldSize;
@@ -1569,32 +1356,23 @@ Returns:
 
 }
 
+/**
+  Searches the FFS file for a section by its type
 
+  @param Fv Address of the Fv in memory
+  @param BlockSize The size of the blocks to convert the Fv to.  If the total size
+                   of the Fv is not evenly divisible by this size, then
+                   EFI_INVALID_PARAMETER will be returned.
+
+  @retval EFI_SUCCESS
+  @retval EFI_NOT_FOUND
+  @retval EFI_VOLUME_CORRUPTED
+**/
 EFI_STATUS
 FvBufUnifyBlockSizes (
   IN OUT VOID *Fv,
   IN UINTN BlockSize
   )
-/*++
-
-Routine Description:
-
-  Searches the FFS file for a section by its type
-
-Arguments:
-
-  Fv - Address of the Fv in memory
-  BlockSize - The size of the blocks to convert the Fv to.  If the total size
-              of the Fv is not evenly divisible by this size, then
-              EFI_INVALID_PARAMETER will be returned.
-
-Returns:
-
-  EFI_SUCCESS
-  EFI_NOT_FOUND
-  EFI_VOLUME_CORRUPTED
-
---*/
 {
   EFI_FIRMWARE_VOLUME_HEADER *hdr = (EFI_FIRMWARE_VOLUME_HEADER*)Fv;
   EFI_FV_BLOCK_MAP_ENTRY *blk = hdr->BlockMap;
@@ -1641,28 +1419,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function calculates the UINT16 sum for the requested region.
+
+  @param Buffer      Pointer to buffer containing byte data of component.
+  @param Size        Size of the buffer
+
+  @return The 16 bit checksum
+**/
 STATIC
 UINT16
 FvBufCalculateSum16 (
   IN UINT16       *Buffer,
   IN UINTN        Size
   )
-/*++
-
-Routine Description:
-
-  This function calculates the UINT16 sum for the requested region.
-
-Arguments:
-
-  Buffer      Pointer to buffer containing byte data of component.
-  Size        Size of the buffer
-
-Returns:
-
-  The 16 bit checksum
-
---*/
 {
   UINTN   Index;
   UINT16  Sum;
@@ -1679,56 +1449,38 @@ Returns:
   return (UINT16) Sum;
 }
 
+/**
+  This function calculates the value needed for a valid UINT16 checksum
 
+  @param Buffer      Pointer to buffer containing byte data of component.
+  @param Size        Size of the buffer
+
+  @return The 16 bit checksum value needed.
+**/
 STATIC
 UINT16
 FvBufCalculateChecksum16 (
   IN UINT16       *Buffer,
   IN UINTN        Size
   )
-/*++
-
-Routine Description::
-
-  This function calculates the value needed for a valid UINT16 checksum
-
-Arguments:
-
-  Buffer      Pointer to buffer containing byte data of component.
-  Size        Size of the buffer
-
-Returns:
-
-  The 16 bit checksum value needed.
-
---*/
 {
   return (UINT16)(0x10000 - FvBufCalculateSum16 (Buffer, Size));
 }
 
+/**
+  This function calculates the UINT8 sum for the requested region.
 
+  @param Buffer      Pointer to buffer containing byte data of component.
+  @param Size        Size of the buffer
+
+  @return The 8 bit checksum value needed.
+**/
 STATIC
 UINT8
 FvBufCalculateSum8 (
   IN UINT8  *Buffer,
   IN UINTN  Size
   )
-/*++
-
-Description:
-
-  This function calculates the UINT8 sum for the requested region.
-
-Input:
-
-  Buffer      Pointer to buffer containing byte data of component.
-  Size        Size of the buffer
-
-Return:
-
-  The 8 bit checksum value needed.
-
---*/
 {
   UINTN   Index;
   UINT8   Sum;
@@ -1745,29 +1497,20 @@ Return:
   return Sum;
 }
 
+/**
+  This function calculates the value needed for a valid UINT8 checksum
 
+  @param Buffer      Pointer to buffer containing byte data of component.
+  @param Size        Size of the buffer
+
+  @return The 8 bit checksum value needed.
+**/
 STATIC
 UINT8
 FvBufCalculateChecksum8 (
   IN UINT8        *Buffer,
   IN UINTN        Size
   )
-/*++
-
-Description:
-
-  This function calculates the value needed for a valid UINT8 checksum
-
-Input:
-
-  Buffer      Pointer to buffer containing byte data of component.
-  Size        Size of the buffer
-
-Return:
-
-  The 8 bit checksum value needed.
-
---*/
 {
   return (UINT8)(0x100 - FvBufCalculateSum8 (Buffer, Size));
 }

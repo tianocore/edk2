@@ -14,25 +14,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Functions implementations
 //
 
+/**
+  Allocates a new string and copies 'String' to clone it
+
+  @param String          The string to clone
+
+  @return CHAR8* - NULL if there are not enough resources
+**/
 CHAR8*
 CloneString (
   IN CHAR8       *String
   )
-/*++
-
-Routine Description:
-
-  Allocates a new string and copies 'String' to clone it
-
-Arguments:
-
-  String          The string to clone
-
-Returns:
-
-  CHAR8* - NULL if there are not enough resources
-
---*/
 {
   CHAR8* NewString;
 
@@ -44,26 +36,17 @@ Returns:
   return NewString;
 }
 
+/**
+  Remove all comments, leading and trailing whitespace from the string.
 
+  @param String          The string to 'strip'
+
+  @return EFI_STATUS
+**/
 EFI_STATUS
 StripInfDscStringInPlace (
   IN CHAR8       *String
   )
-/*++
-
-Routine Description:
-
-  Remove all comments, leading and trailing whitespace from the string.
-
-Arguments:
-
-  String          The string to 'strip'
-
-Returns:
-
-  EFI_STATUS
-
---*/
 {
   CHAR8 *Pos;
 
@@ -110,27 +93,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Creates and returns a 'split' STRING_LIST by splitting the string
+  on whitespace boundaries.
 
+  @param String          The string to 'split'
+
+  @return EFI_STATUS
+**/
 STRING_LIST*
 SplitStringByWhitespace (
   IN CHAR8       *String
   )
-/*++
-
-Routine Description:
-
-  Creates and returns a 'split' STRING_LIST by splitting the string
-  on whitespace boundaries.
-
-Arguments:
-
-  String          The string to 'split'
-
-Returns:
-
-  EFI_STATUS
-
---*/
 {
   CHAR8       *Pos;
   CHAR8       *EndOfSubString;
@@ -172,21 +146,14 @@ Returns:
   return Output;
 }
 
+/**
+  Creates a new STRING_LIST with 0 strings.
 
+  @return STRING_LIST* - Null if there is not enough resources to create the object.
+**/
 STRING_LIST*
 NewStringList (
   )
-/*++
-
-Routine Description:
-
-  Creates a new STRING_LIST with 0 strings.
-
-Returns:
-
-  STRING_LIST* - Null if there is not enough resources to create the object.
-
---*/
 {
   STRING_LIST *NewList;
   NewList = AllocateStringListStruct (0);
@@ -196,24 +163,17 @@ Returns:
   return NewList;
 }
 
+/**
+  Adds String to StringList.  A new copy of String is made before it is
+  added to StringList.
 
+  @return EFI_STATUS
+**/
 EFI_STATUS
 AppendCopyOfStringToList (
   IN OUT STRING_LIST **StringList,
   IN CHAR8       *String
   )
-/*++
-
-Routine Description:
-
-  Adds String to StringList.  A new copy of String is made before it is
-  added to StringList.
-
-Returns:
-
-  EFI_STATUS
-
---*/
 {
   STRING_LIST *OldList;
   STRING_LIST *NewList;
@@ -245,27 +205,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Removes the last string from StringList and frees the memory associated
+  with it.
 
+  @param StringList        The string list to remove the string from
+
+  @return EFI_STATUS
+**/
 EFI_STATUS
 RemoveLastStringFromList (
   IN STRING_LIST       *StringList
   )
-/*++
-
-Routine Description:
-
-  Removes the last string from StringList and frees the memory associated
-  with it.
-
-Arguments:
-
-  StringList        The string list to remove the string from
-
-Returns:
-
-  EFI_STATUS
-
---*/
 {
   if (StringList->Count == 0) {
     return EFI_INVALID_PARAMETER;
@@ -276,49 +227,30 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Allocates a STRING_LIST structure that can store StringCount strings.
 
+  @param StringCount        The number of strings that need to be stored
+
+  @return EFI_STATUS
+**/
 STRING_LIST*
 AllocateStringListStruct (
   IN UINTN StringCount
   )
-/*++
-
-Routine Description:
-
-  Allocates a STRING_LIST structure that can store StringCount strings.
-
-Arguments:
-
-  StringCount        The number of strings that need to be stored
-
-Returns:
-
-  EFI_STATUS
-
---*/
 {
   return malloc (OFFSET_OF(STRING_LIST, Strings[StringCount + 1]));
 }
 
+/**
+  Frees all memory associated with StringList.
 
+  @param StringList        The string list to free
+**/
 VOID
 FreeStringList (
   IN STRING_LIST       *StringList
   )
-/*++
-
-Routine Description:
-
-  Frees all memory associated with StringList.
-
-Arguments:
-
-  StringList        The string list to free
-
-Returns:
-
-  VOID
---*/
 {
   while (StringList->Count > 0) {
     RemoveLastStringFromList (StringList);
@@ -327,27 +259,18 @@ Returns:
   free (StringList);
 }
 
+/**
+  Generates a string that represents the STRING_LIST
 
+  @param StringList        The string list to convert to a string
+
+  @return CHAR8* - The string list represented with a single string.  The returned
+           string must be freed by the caller.
+**/
 CHAR8*
 StringListToString (
   IN STRING_LIST       *StringList
   )
-/*++
-
-Routine Description:
-
-  Generates a string that represents the STRING_LIST
-
-Arguments:
-
-  StringList        The string list to convert to a string
-
-Returns:
-
-  CHAR8* - The string list represented with a single string.  The returned
-           string must be freed by the caller.
-
---*/
 {
   UINTN Count;
   UINTN Length;
@@ -381,26 +304,17 @@ Returns:
   return NewString;
 }
 
+/**
+  Prints out the string list
 
+  @param StringList        The string list to print
+
+  @return EFI_STATUS
+**/
 VOID
 PrintStringList (
   IN STRING_LIST       *StringList
   )
-/*++
-
-Routine Description:
-
-  Prints out the string list
-
-Arguments:
-
-  StringList        The string list to print
-
-Returns:
-
-  EFI_STATUS
-
---*/
 {
   CHAR8* String;
   String = StringListToString (StringList);
