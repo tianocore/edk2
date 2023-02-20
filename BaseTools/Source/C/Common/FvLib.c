@@ -22,29 +22,22 @@ UINT32                      mFvLength   = 0;
 //
 // External function implementations
 //
+
+/**
+  This initializes the FV lib with a pointer to the FV and length.  It does not
+  verify the FV in any way.
+
+  @param Fv            Buffer containing the FV.
+  @param FvLength      Length of the FV
+
+  @retval EFI_SUCCESS             Function Completed successfully.
+  @retval EFI_INVALID_PARAMETER   A required parameter was NULL.
+**/
 EFI_STATUS
 InitializeFvLib (
   IN VOID                         *Fv,
   IN UINT32                       FvLength
   )
-/*++
-
-Routine Description:
-
-  This initializes the FV lib with a pointer to the FV and length.  It does not
-  verify the FV in any way.
-
-Arguments:
-
-  Fv            Buffer containing the FV.
-  FvLength      Length of the FV
-
-Returns:
-
-  EFI_SUCCESS             Function Completed successfully.
-  EFI_INVALID_PARAMETER   A required parameter was NULL.
-
---*/
 {
   //
   // Verify input arguments
@@ -59,29 +52,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function returns a pointer to the current FV and the size.
+
+  @param FvHeader      Pointer to the FV buffer.
+  @param FvLength      Length of the FV
+
+  @retval EFI_SUCCESS             Function Completed successfully.
+  @retval EFI_INVALID_PARAMETER   A required parameter was NULL.
+  @retvalEFI_ABORTED             The library needs to be initialized.
+**/
 EFI_STATUS
 GetFvHeader (
   OUT EFI_FIRMWARE_VOLUME_HEADER  **FvHeader,
   OUT UINT32                      *FvLength
   )
-/*++
-
-Routine Description:
-
-  This function returns a pointer to the current FV and the size.
-
-Arguments:
-
-  FvHeader      Pointer to the FV buffer.
-  FvLength      Length of the FV
-
-Returns:
-
-  EFI_SUCCESS             Function Completed successfully.
-  EFI_INVALID_PARAMETER   A required parameter was NULL.
-  EFI_ABORTED             The library needs to be initialized.
-
---*/
 {
   //
   // Verify library has been initialized.
@@ -101,31 +86,23 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function returns the next file.  If the current file is NULL, it returns
+  the first file in the FV.  If the function returns EFI_SUCCESS and the file
+  pointer is NULL, then there are no more files in the FV.
+
+  @param CurrentFile   Pointer to the current file, must be within the current FV.
+  @param NextFile      Pointer to the next file in the FV.
+
+  @retval EFI_SUCCESS             Function completed successfully.
+  @retval EFI_INVALID_PARAMETER   A required parameter was NULL or is out of range.
+  @retval EFI_ABORTED             The library needs to be initialized.
+**/
 EFI_STATUS
 GetNextFile (
   IN EFI_FFS_FILE_HEADER          *CurrentFile,
   OUT EFI_FFS_FILE_HEADER         **NextFile
   )
-/*++
-
-Routine Description:
-
-  This function returns the next file.  If the current file is NULL, it returns
-  the first file in the FV.  If the function returns EFI_SUCCESS and the file
-  pointer is NULL, then there are no more files in the FV.
-
-Arguments:
-
-  CurrentFile   Pointer to the current file, must be within the current FV.
-  NextFile      Pointer to the next file in the FV.
-
-Returns:
-
-  EFI_SUCCESS             Function completed successfully.
-  EFI_INVALID_PARAMETER   A required parameter was NULL or is out of range.
-  EFI_ABORTED             The library needs to be initialized.
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -214,29 +191,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Find a file by name.  The function will return NULL if the file is not found.
+
+  @param FileName    The GUID file name of the file to search for.
+  @param File        Return pointer.  In the case of an error, contents are undefined.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error was encountered.
+  @retval EFI_INVALID_PARAMETER   One of the parameters was NULL.
+**/
 EFI_STATUS
 GetFileByName (
   IN EFI_GUID                     *FileName,
   OUT EFI_FFS_FILE_HEADER         **File
   )
-/*++
-
-Routine Description:
-
-  Find a file by name.  The function will return NULL if the file is not found.
-
-Arguments:
-
-  FileName    The GUID file name of the file to search for.
-  File        Return pointer.  In the case of an error, contents are undefined.
-
-Returns:
-
-  EFI_SUCCESS             The function completed successfully.
-  EFI_ABORTED             An error was encountered.
-  EFI_INVALID_PARAMETER   One of the parameters was NULL.
-
---*/
 {
   EFI_FFS_FILE_HEADER *CurrentFile;
   EFI_STATUS          Status;
@@ -295,33 +264,25 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Find a file by type and instance.  An instance of 1 is the first instance.
+  The function will return NULL if a matching file cannot be found.
+  File type EFI_FV_FILETYPE_ALL means any file type is valid.
+
+  @param FileType    Type of file to search for.
+  @param Instance    Instance of the file type to return.
+  @param File        Return pointer.  In the case of an error, contents are undefined.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error was encountered.
+  @retval EFI_INVALID_PARAMETER   One of the parameters was NULL.
+**/
 EFI_STATUS
 GetFileByType (
   IN EFI_FV_FILETYPE              FileType,
   IN UINTN                        Instance,
   OUT EFI_FFS_FILE_HEADER         **File
   )
-/*++
-
-Routine Description:
-
-  Find a file by type and instance.  An instance of 1 is the first instance.
-  The function will return NULL if a matching file cannot be found.
-  File type EFI_FV_FILETYPE_ALL means any file type is valid.
-
-Arguments:
-
-  FileType    Type of file to search for.
-  Instance    Instance of the file type to return.
-  File        Return pointer.  In the case of an error, contents are undefined.
-
-Returns:
-
-  EFI_SUCCESS             The function completed successfully.
-  EFI_ABORTED             An error was encountered.
-  EFI_INVALID_PARAMETER   One of the parameters was NULL.
-
---*/
 {
   EFI_FFS_FILE_HEADER *CurrentFile;
   EFI_STATUS          Status;
@@ -383,6 +344,23 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Helper function to search a sequence of sections from the section pointed
+  by FirstSection to SearchEnd for the Instance-th section of type SectionType.
+  The current counter is saved in StartIndex and when the section is found, it's
+  saved in Section. GUID-defined sections, if special processing is not required,
+  are searched recursively in a depth-first manner.
+
+  @param FirstSection The first section to start searching from.
+  @param SearchEnd    The end address to stop search.
+  @param SectionType  The type of section to search.
+  @param StartIndex   The current counter is saved.
+  @param Instance     The requested n-th section number.
+  @param Section      The found section returned.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_NOT_FOUND           The section is not found.
+**/
 EFI_STATUS
 SearchSectionByType (
   IN EFI_FILE_SECTION_POINTER  FirstSection,
@@ -392,30 +370,6 @@ SearchSectionByType (
   IN UINTN                     Instance,
   OUT EFI_FILE_SECTION_POINTER *Section
   )
-/*++
-
-Routine Description:
-
-  Helper function to search a sequence of sections from the section pointed
-  by FirstSection to SearchEnd for the Instance-th section of type SectionType.
-  The current counter is saved in StartIndex and when the section is found, it's
-  saved in Section. GUID-defined sections, if special processing is not required,
-  are searched recursively in a depth-first manner.
-
-Arguments:
-
-  FirstSection The first section to start searching from.
-  SearchEnd    The end address to stop search.
-  SectionType  The type of section to search.
-  StartIndex   The current counter is saved.
-  Instance     The requested n-th section number.
-  Section      The found section returned.
-
-Returns:
-
-  EFI_SUCCESS             The function completed successfully.
-  EFI_NOT_FOUND           The section is not found.
---*/
 {
   EFI_FILE_SECTION_POINTER  CurrentSection;
   EFI_FILE_SECTION_POINTER  InnerSection;
@@ -479,6 +433,22 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  Find a section in a file by type and instance.  An instance of 1 is the first
+  instance.  The function will return NULL if a matching section cannot be found.
+  GUID-defined sections, if special processing is not needed, are handled in a
+  depth-first manner.
+
+  @param File        The file to search.
+  @param SectionType Type of file to search for.
+  @param Instance    Instance of the section to return.
+  @param Section     Return pointer.  In the case of an error, contents are undefined.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error was encountered.
+  @retval EFI_INVALID_PARAMETER   One of the parameters was NULL.
+  @retval EFI_NOT_FOUND           No found.
+**/
 EFI_STATUS
 GetSectionByType (
   IN EFI_FFS_FILE_HEADER          *File,
@@ -486,29 +456,6 @@ GetSectionByType (
   IN UINTN                        Instance,
   OUT EFI_FILE_SECTION_POINTER    *Section
   )
-/*++
-
-Routine Description:
-
-  Find a section in a file by type and instance.  An instance of 1 is the first
-  instance.  The function will return NULL if a matching section cannot be found.
-  GUID-defined sections, if special processing is not needed, are handled in a
-  depth-first manner.
-
-Arguments:
-
-  File        The file to search.
-  SectionType Type of file to search for.
-  Instance    Instance of the section to return.
-  Section     Return pointer.  In the case of an error, contents are undefined.
-
-Returns:
-
-  EFI_SUCCESS             The function completed successfully.
-  EFI_ABORTED             An error was encountered.
-  EFI_INVALID_PARAMETER   One of the parameters was NULL.
-  EFI_NOT_FOUND           No found.
---*/
 {
   EFI_FILE_SECTION_POINTER  CurrentSection;
   EFI_STATUS                Status;
@@ -560,31 +507,25 @@ Returns:
     return EFI_NOT_FOUND;
   }
 }
+
 //
 // will not parse compressed sections
 //
+
+/**
+  Verify the current pointer points to a valid FV header.
+
+  @param FvHeader     Pointer to an alleged FV file.
+
+  @retval EFI_SUCCESS             The FV header is valid.
+  @retval EFI_VOLUME_CORRUPTED    The FV header is not valid.
+  @retval EFI_INVALID_PARAMETER   A required parameter was NULL.
+  @retval EFI_ABORTED             Operation aborted.
+**/
 EFI_STATUS
 VerifyFv (
   IN EFI_FIRMWARE_VOLUME_HEADER   *FvHeader
   )
-/*++
-
-Routine Description:
-
-  Verify the current pointer points to a valid FV header.
-
-Arguments:
-
-  FvHeader     Pointer to an alleged FV file.
-
-Returns:
-
-  EFI_SUCCESS             The FV header is valid.
-  EFI_VOLUME_CORRUPTED    The FV header is not valid.
-  EFI_INVALID_PARAMETER   A required parameter was NULL.
-  EFI_ABORTED             Operation aborted.
-
---*/
 {
   UINT16  Checksum;
 
@@ -612,28 +553,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Verify the current pointer points to a FFS file header.
+
+  @param FfsHeader     Pointer to an alleged FFS file.
+
+  @retval EFI_SUCCESS           The Ffs header is valid.
+  @retval EFI_NOT_FOUND         This "file" is the beginning of free space.
+  @retval EFI_VOLUME_CORRUPTED  The Ffs header is not valid.
+  @retval EFI_ABORTED           The erase polarity is not known.
+**/
 EFI_STATUS
 VerifyFfsFile (
   IN EFI_FFS_FILE_HEADER  *FfsHeader
   )
-/*++
-
-Routine Description:
-
-  Verify the current pointer points to a FFS file header.
-
-Arguments:
-
-  FfsHeader     Pointer to an alleged FFS file.
-
-Returns:
-
-  EFI_SUCCESS           The Ffs header is valid.
-  EFI_NOT_FOUND         This "file" is the beginning of free space.
-  EFI_VOLUME_CORRUPTED  The Ffs header is not valid.
-  EFI_ABORTED           The erase polarity is not known.
-
---*/
 {
   BOOLEAN             ErasePolarity;
   EFI_STATUS          Status;
@@ -754,25 +687,17 @@ GetSectionHeaderLength(
   return sizeof(EFI_COMMON_SECTION_HEADER);
 }
 
+/**
+  Get FFS file length including FFS header.
+
+  @param FfsHeader   Pointer to EFI_FFS_FILE_HEADER.
+
+  @return UINT32      Length of FFS file header.
+**/
 UINT32
 GetFfsFileLength (
   EFI_FFS_FILE_HEADER *FfsHeader
   )
-/*++
-
-Routine Description:
-
-  Get FFS file length including FFS header.
-
-Arguments:
-
-  FfsHeader   Pointer to EFI_FFS_FILE_HEADER.
-
-Returns:
-
-  UINT32      Length of FFS file header.
-
---*/
 {
   if (FfsHeader == NULL) {
     return 0;
@@ -800,25 +725,17 @@ GetSectionFileLength (
   return Length;
 }
 
+/**
+  Converts a three byte length value into a UINT32.
+
+  @param ThreeByteLength   Pointer to the first of the 3 byte length.
+
+  @return UINT32      Size of the section
+**/
 UINT32
 GetLength (
   UINT8     *ThreeByteLength
   )
-/*++
-
-Routine Description:
-
-  Converts a three byte length value into a UINT32.
-
-Arguments:
-
-  ThreeByteLength   Pointer to the first of the 3 byte length.
-
-Returns:
-
-  UINT32      Size of the section
-
---*/
 {
   UINT32  Length;
 
@@ -832,28 +749,20 @@ Returns:
   return Length;
 }
 
+/**
+  This function returns with the FV erase polarity.  If the erase polarity
+  for a bit is 1, the function return TRUE.
+
+  @param ErasePolarity   A pointer to the erase polarity.
+
+  @retval EFI_SUCCESS              The function completed successfully.
+  @retval EFI_INVALID_PARAMETER    One of the input parameters was invalid.
+  @retval EFI_ABORTED              Operation aborted.
+**/
 EFI_STATUS
 GetErasePolarity (
   OUT BOOLEAN   *ErasePolarity
   )
-/*++
-
-Routine Description:
-
-  This function returns with the FV erase polarity.  If the erase polarity
-  for a bit is 1, the function return TRUE.
-
-Arguments:
-
-  ErasePolarity   A pointer to the erase polarity.
-
-Returns:
-
-  EFI_SUCCESS              The function completed successfully.
-  EFI_INVALID_PARAMETER    One of the input parameters was invalid.
-  EFI_ABORTED              Operation aborted.
-
---*/
 {
   EFI_STATUS  Status;
 
@@ -886,28 +795,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function returns a the highest state bit in the FFS that is set.
+  It in no way validate the FFS file.
+
+  @param ErasePolarity The erase polarity for the file state bits.
+  @param FfsHeader     Pointer to a FFS file.
+
+  @retval UINT8   The hightest set state of the file.
+**/
 UINT8
 GetFileState (
   IN BOOLEAN              ErasePolarity,
   IN EFI_FFS_FILE_HEADER  *FfsHeader
   )
-/*++
-
-Routine Description:
-
-  This function returns a the highest state bit in the FFS that is set.
-  It in no way validate the FFS file.
-
-Arguments:
-
-  ErasePolarity The erase polarity for the file state bits.
-  FfsHeader     Pointer to a FFS file.
-
-Returns:
-
-  UINT8   The hightest set state of the file.
-
---*/
 {
   UINT8 FileState;
   UINT8 HighestBit;
