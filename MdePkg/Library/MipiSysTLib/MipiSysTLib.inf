@@ -26,6 +26,7 @@
 
 [LibraryClasses]
   IoLib
+  BaseLib
   BaseMemoryLib
 
 [Packages]

@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Uefi.h>
 #include <Library/IoLib.h>
+#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include "mipi_syst.h"
 
@@ -175,9 +176,10 @@ MipiSystGetEpochUs (
   VOID
   )
 {
-  UINT64  Epoch;
+  // UINT64  Epoch;
 
-  Epoch = 0;
+  // Epoch = 0;
 
-  return Epoch;
+  // return Epoch;
+  return AsmReadTsc ();
 }
