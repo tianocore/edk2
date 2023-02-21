@@ -352,6 +352,7 @@
 
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/PeiMemEncryptSevLib.inf
   CcProbeLib|OvmfPkg/Library/CcProbeLib/SecPeiCcProbeLib.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibHash.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -730,6 +731,7 @@
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
       NULL|OvmfPkg/IntelTdx/TdxHelperLib/SecTdxHelperLib.inf
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SecCryptLib.inf
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibHash.inf
   }
 
   #
