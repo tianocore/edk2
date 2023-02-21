@@ -756,6 +756,9 @@ class VfrDefaultStore(object):
     def __init__(self):
         self.DefaultStoreList = None
 
+    def Clear(self):
+        self.DefaultStoreList = None
+
     def RegisterDefaultStore(self, ObjAddr: EFI_IFR_DEFAULTSTORE, RefName, DefaultStoreNameId, DefaultId):
         if RefName == '' or RefName == None:
             return VfrReturnCode.VFR_RETURN_FATAL_ERROR

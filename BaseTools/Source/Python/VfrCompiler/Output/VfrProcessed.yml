@@ -2,34 +2,26 @@ formset:
   classguid: '{0x93039971, 0x8545, 0x4b04, {0xb4, 0x5e, 0x32, 0xeb, 0x83, 0x26, 0x4,
     0xe}}'
   component:
-  - defaultstore:
-      attribute: 0
-      prompt: STRING_TOKEN(0x005B)
-      type: MyStandardDefault
-  - defaultstore:
-      attribute: 1
-      prompt: STRING_TOKEN(0x005D)
-      type: MyManufactureDefault
   - varstore:
       guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11,
         0x3d}}'
       name: MyIfrNVData
       type: DRIVER_SAMPLE_CONFIGURATION
-      varid: 4660
+      varid: '0x1234'
   - efivarstore:
-      attribute: 0x0002 | 0x00000001
+      attribute: 0x00000002 | 0x00000001
       guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11,
         0x3d}}'
       name: MyEfiVar
       type: MY_EFI_VARSTORE_DATA
   - efivarstore:
-      attribute: 0x0002 | 0x00000001
+      attribute: 0x00000002 | 0x00000001
       guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11,
         0x3d}}'
       name: MyEfiBitVar
       type: MY_EFI_BITS_VARSTORE_DATA
   - efivarstore:
-      attribute: 0x0002 | 0x00000001
+      attribute: 0x00000002 | 0x00000001
       guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11,
         0x3d}}'
       name: MyEfiUnionVar
@@ -39,6 +31,12 @@ formset:
         0x3d}}'
       name: STRING_TOKEN(0x0094)
       type: MyNameValueVar
+  - defaultstore:
+      prompt: STRING_TOKEN(0x005B)
+      type: MyStandardDefault
+  - defaultstore:
+      prompt: STRING_TOKEN(0x005D)
+      type: MyManufactureDefault
   - form:
       component:
       - subtitle:
@@ -170,11 +168,13 @@ formset:
       - label:
           number: 100
       - goto:
+          flags: INTERACTIVE
           formid: 4660
           help: STRING_TOKEN(0x0051)
-          key: '0x1234'
+          key: 4660
           prompt: STRING_TOKEN(0x0041)
       - goto:
+          flags: INTERACTIVE
           formid: 4660
           help: STRING_TOKEN(0x0051)
           key: 4661
@@ -191,8 +191,8 @@ formset:
               value: 1
           - warningif:
               expression: ideqval MyIfrNVData.TestLateCheck == 0
+              prompt: STRING_TOKEN(0x00AC)
               timeout: 5
-              warning: 172
           flags: RESET_REQUIRED
           help: STRING_TOKEN(0x0026)
           prompt: STRING_TOKEN(0x0052)
@@ -264,7 +264,7 @@ formset:
       - string:
           component:
           - inconsistentif:
-              expression: pushthis != stringref(STRING_TOKEN(0x0062))
+              expression: pushthis != stringref(STRING_TOKEN(STR_STRING_CHECK))
               prompt: STRING_TOKEN(0x0063)
           flags: INTERACTIVE
           help: STRING_TOKEN(0x0049)
@@ -287,9 +287,8 @@ formset:
       - numeric:
           component:
           - default:
-              value: questionrefval(devicepath = STRING_TOKEN (0x006D), guid = { 0xA04A27f4,
-                0xDF00, 0x4D42, {0xB5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3D} },
-                0x1111)
+              value: questionrefval(devicepath = STRING_TOKEN (STR_DEVICE_PATH), guid
+                = DRIVER_SAMPLE_FORMSET_GUID, 0x1111)
           - inconsistentif:
               expression: ideqval MyIfrNVData.HowOldAreYouInYearsManual == 99       OR       ideqid
                 MyIfrNVData.HowOldAreYouInYearsManual == MyEfiVar.Field8       OR       ideqvallist
@@ -318,7 +317,7 @@ formset:
           varid: MyEfiVar.Field8
       - numeric:
           component:
-          - locked: tag
+          - locked: null
           - default:
               defaultstore: MyStandardDefault
               value: 16
@@ -331,6 +330,7 @@ formset:
           minimum: 0
           prompt: STRING_TOKEN(0x0092)
           step: 0
+          varid: MyNameValueVar[0]
       - numeric:
           component:
           - default:
@@ -345,6 +345,7 @@ formset:
           minimum: 0
           prompt: STRING_TOKEN(0x0093)
           step: 0
+          varid: MyNameValueVar[1]
       - string:
           help: STRING_TOKEN(0x0061)
           maxsize: 20
@@ -365,7 +366,7 @@ formset:
           prompt: STRING_TOKEN(0x001F)
           varid: MyEfiVar.Field16
       - label:
-          number: '0x00000001'
+          number: LABEL_1_VALUE
       - label:
           number: LABEL_2_VALUE
       - numeric:
@@ -436,8 +437,7 @@ formset:
           help: STRING_TOKEN(0x005E)
           prompt: STRING_TOKEN(0x005D)
       - text:
-          condition: grayoutif NOT security ({ 0x85b75607, 0xf7ce, 0x471e, { 0xb7,
-            0xe4, 0x2a, 0xea, 0x5f, 0x72, 0x32, 0xee } })
+          condition: grayoutif NOT security (EFI_USER_INFO_ACCESS_SETUP_ADMIN_GUID)
           help: STRING_TOKEN(0x0039)
           prompt: STRING_TOKEN(0x0038)
       - numeric:
@@ -562,13 +562,14 @@ formset:
       - goto:
           component:
           - default:
-              value: 0;0;{ 0x0, 0x0, 0x0, {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}
-                };STRING_TOKEN(0x005A)
+              value: STRING_TOKEN(0x005A)
+          flags: INTERACTIVE
           help: STRING_TOKEN(0x0045)
           key: 4680
           prompt: STRING_TOKEN(0x0043)
           varid: MyIfrNVData.RefData
       - goto:
+          flags: INTERACTIVE
           help: STRING_TOKEN(0x0046)
           key: 4681
           prompt: STRING_TOKEN(0x0044)
@@ -600,9 +601,8 @@ formset:
           step: 0
           varid: MyIfrNVData.DynamicRefresh
       - numeric:
-          condition: grayoutif match2 (stringref(STRING_TOKEN(0x00B0)), stringref(STRING_TOKEN(0x00AF)),
-            { 0x63E60A51, 0x497D, 0xD427, {0xC4, 0xA5, 0xB8, 0xAB, 0xDC, 0x3A, 0xAE,
-            0xB6 }})
+          condition: grayoutif match2 (stringref(STRING_TOKEN(STR_PATTERN)), stringref(STRING_TOKEN(STR_STRING)),
+            PERL_GUID)
           help: STRING_TOKEN(0x00AE)
           maximum: 243
           minimum: 0
@@ -697,17 +697,17 @@ formset:
           formid: 1
           help: STRING_TOKEN(0x0051)
           prompt: STRING_TOKEN(0x003A)
-      formid: '0x00000004'
+      formid: 4
       map:
-      - mapguid: '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2,
-          0x11, 0x3d }}'
-        maptitle: 149
-      - mapguid: '{0x3bd2f4ec, 0xe524, 0x46e4, { 0xa9, 0xd8, 0x51, 0x1, 0x17, 0x42,
-          0x55, 0x62 }}'
-        maptitle: 150
+      - mapguid: '{0x3bd2f4ec, 0xe524, 0x46e4, {0xa9, 0xd8, 0x51, 0x1, 0x17, 0x42,
+          0x55, 0x62}}'
+        maptitle: STRING_TOKEN(0x0096)
+      - mapguid: '{0x3bd2f4ec, 0xe524, 0x46e4, {0xa9, 0xd8, 0x51, 0x1, 0x17, 0x42,
+          0x55, 0x62}}'
+        maptitle: STRING_TOKEN(0x0096)
   - form:
       component:
-      - modal: tag
+      - modal: null
       - text:
           flags: INTERACTIVE
           help: STRING_TOKEN(0x0054)

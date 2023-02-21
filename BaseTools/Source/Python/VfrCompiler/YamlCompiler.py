@@ -433,9 +433,6 @@ class VfrCompiler():
     def PreProcessYaml(self): # wip
         self.YamlTree.PreProcess()
 
-    def UpdateYamlWithDLT(self): # wip
-        self.YamlTree.UpdateYamlWithDLT()
-
     def CompileYaml(self): # wip
         self.YamlTree.Compile()
 
@@ -467,15 +464,15 @@ def main():
     EdkLogger.SetLevel(WARNING_LOG_LEVEL)
     Compiler = VfrCompiler(Args, Argc)
     Compiler.PreProcess()
-    Compiler.Compile()
+    #Compiler.Compile()
     # Compiler.GenBinaryFiles()
 
     # Extended Features
-    Compiler.DumpYaml()
-    Compiler.DumpJson()
+    #Compiler.DumpYaml()
+    #Compiler.DumpJson()
     Compiler.PreProcessYaml()
     #Compiler.UpdateYamlWithDLT()
-    # Compiler.CompileYaml()
+    Compiler.CompileYaml()
 
     Status = Compiler.RunStatus
     if Status == COMPILER_RUN_STATUS.STATUS_DEAD or Status == COMPILER_RUN_STATUS.STATUS_FAILED:

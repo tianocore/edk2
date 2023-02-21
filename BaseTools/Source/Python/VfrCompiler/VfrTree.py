@@ -16,11 +16,12 @@ BUILD_VERSION = 'Developer Build based on Revision: Unknown'
 
 class VfrTreeNode():
 
-    def __init__(self, OpCode=None, Data=None, Buffer=None) -> None:
+    def __init__(self, OpCode=None, Data=None, Buffer=None, ID=None) -> None:
 
         self.OpCode = OpCode
         self.Data = Data
         self.Buffer = Buffer
+        self.ID = None
         self.Condition = None
         self.Expression = None
         self.Dict = {}
@@ -580,7 +581,20 @@ class VfrTree():
                 for HeaderFile in self.PreProcessDB.HeaderFiles:
                     f.write('- ' + HeaderFile + '\n')
                 self._DumpYamlDfsWithUni(self.Root, f)
-                # self.DumpYamlDfs(self.Root, f)
+            f.close()
+        except:
+            EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
+                            "File open failed for %s" % FileName, None)
+
+    def DumpProcessedYaml(self):
+        FileName = self.Options.ProcessedYAMLFileName
+        try:
+            with open(FileName, 'w') as f:
+                f.write('## DO NOT REMOVE -- VFR Mode\n')
+                f.write('include:\n')
+                for HeaderFile in self.PreProcessDB.HeaderFiles:
+                    f.write('- ' + HeaderFile + '\n')
+                self._DumpYamlDfs(self.Root, f)
             f.close()
         except:
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
@@ -1237,13 +1251,11 @@ class VfrTree():
                         .format('0x%04x' % (Info.Question.Header.Prompt)))
         f.write(ValueIndent + 'help:  {}  # Statement Help STRING_ID\n'.
                         format('0x%04x' % (Info.Question.Header.Help)))
-        if Root.Data.FlagsStream != '':
-            f.write(ValueIndent + 'flags:  {}  # Optional input , flags\n'.
+        f.write(ValueIndent + 'flags:  {}  # Optional input , flags\n'.
                         format(Root.Data.FlagsStream))
-        if Root.Data.HasKey:
-            f.write(ValueIndent + 'key: {} # Optional input, key \n'.format(Root.Data.HasKey))
+        f.write(ValueIndent + 'key: {} # Optional input, key \n'.format(Root.Data.HasKey))
 
-    def DumpYamlDfs(self, Root, f):
+    def _DumpYamlDfs(self, Root, f):
         try:
             if Root.OpCode != None:
                 if Root.Level == 0:
@@ -1886,6 +1898,6 @@ class VfrTree():
                         ChildNode.Level = Root.Level + 1
 
 
-                self.DumpYamlDfs(ChildNode, f)
+                self._DumpYamlDfs(ChildNode, f)
 
         return

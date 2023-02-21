@@ -113,7 +113,7 @@ class VfrErrorHandle():
     def SetInputFile(self, InputFile):
         self.InputFileName = InputFile
 
-    def HandleWarning(self, WarningCode, LineNum, TokenValue=None):
+    def HandleWarning(self, WarningCode, LineNum=None, TokenValue=None):
         if self.vfrWarningMessage == None:
             return 1
         WarningMsg = ''

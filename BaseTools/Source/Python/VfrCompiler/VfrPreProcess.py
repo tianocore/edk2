@@ -38,6 +38,7 @@ class Options():
         self.ProcessedYAMLFileName = None
         self.CompileYaml = True
 
+
 class KV():
     def __init__(self, Key, Value) -> None:
         self.Key = Key
@@ -60,7 +61,7 @@ class PreProcessDB():
             return Value
         else:
             StrValue = str(Value)
-            if '0x' in StrValue:
+            if ('0x' in StrValue) or ('0X' in StrValue):
                 Value = int(StrValue, 0)
             else:
                 Value = int(StrValue)
@@ -79,19 +80,15 @@ class PreProcessDB():
             NewValue = ''
             for i in range(0, len(Items)):
                 # get {key:value} dicts from header files
-                    if Items[i].strip() in self.HeaderDict.keys():
-                        if type(self.HeaderDict[Items[i].strip()]) == EFI_GUID:
-                            NewValue += self.HeaderDict[Items[i].strip()].to_string()
-                        else:
-                            NewValue += self.HeaderDict[Items[i].strip()]
-                    elif Items[i].find('0x') or Items[i].find('0X'):
-                        NewValue += Items[i].strip()
-                    else: # ignore flag types
-                        #error
-                        print('error')
-
-                    if i != len(Items) - 1:
-                        NewValue += ' | '
+                if Items[i].strip() in self.HeaderDict.keys():
+                    if type(self.HeaderDict[Items[i].strip()]) == EFI_GUID:
+                        NewValue += self.HeaderDict[Items[i].strip()].to_string()
+                    else:
+                        NewValue += self.HeaderDict[Items[i].strip()]
+                else:
+                    NewValue += Items[i].strip()
+                if i != len(Items) - 1:
+                    NewValue += ' | '
             return NewValue
         else:
             # error
