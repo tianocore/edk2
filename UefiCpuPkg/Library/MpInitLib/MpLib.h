@@ -1,7 +1,7 @@
 /** @file
   Common header file for MP Initialize Library.
 
-  Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -179,6 +179,8 @@ typedef struct {
   UINTN    RendezvousFunnelSize;
   UINT8    *RelocateApLoopFuncAddress;
   UINTN    RelocateApLoopFuncSize;
+  UINT8    *RelocateApLoopFuncAddressAmdSev;
+  UINTN    RelocateApLoopFuncSizeAmdSev;
   UINTN    ModeTransitionOffset;
   UINTN    SwitchToRealNoNxOffset;
   UINTN    SwitchToRealPM16ModeOffset;
@@ -311,7 +313,7 @@ typedef struct {
 
 #define AP_SAFE_STACK_SIZE   128
 #define AP_RESET_STACK_SIZE  AP_SAFE_STACK_SIZE
-
+STATIC_ASSERT ((AP_SAFE_STACK_SIZE & (CPU_STACK_ALIGNMENT - 1)) == 0, "AP_SAFE_STACK_SIZE is not aligned with CPU_STACK_ALIGNMENT");
 #pragma pack(1)
 
 typedef struct {
@@ -363,6 +365,31 @@ extern EFI_GUID  mCpuInitMpLibHobGuid;
 typedef
   VOID
 (EFIAPI *ASM_RELOCATE_AP_LOOP)(
+  IN BOOLEAN                 MwaitSupport,
+  IN UINTN                   ApTargetCState,
+  IN UINTN                   PmCodeSegment,
+  IN UINTN                   TopOfApStack,
+  IN UINTN                   NumberToFinish,
+  IN UINTN                   Pm16CodeSegment,
+  IN UINTN                   SevEsAPJumpTable,
+  IN UINTN                   WakeupBuffer
+  );
+
+/**
+  Assembly code to place AP into safe loop mode for Amd processors with Sev enabled.
+  Place AP into targeted C-State if MONITOR is supported, otherwise
+  place AP into hlt state.
+  Place AP in protected mode if the current is long mode. Due to AP maybe
+  wakeup by some hardware event. It could avoid accessing page table that
+  may not available during booting to OS.
+  @param[in] MwaitSupport    TRUE indicates MONITOR is supported.
+                             FALSE indicates MONITOR is not supported.
+  @param[in] ApTargetCState  Target C-State value.
+  @param[in] PmCodeSegment   Protected mode code segment value.
+**/
+typedef
+  VOID
+(EFIAPI *ASM_RELOCATE_AP_LOOP_AMDSEV)(
   IN BOOLEAN                 MwaitSupport,
   IN UINTN                   ApTargetCState,
   IN UINTN                   PmCodeSegment,

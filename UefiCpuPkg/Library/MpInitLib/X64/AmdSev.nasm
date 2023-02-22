@@ -347,12 +347,13 @@ PM16Mode:
 
 SwitchToRealProcEnd:
 ;-------------------------------------------------------------------------------------
-;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack, CountTofinish, Pm16CodeSegment, SevEsAPJumpTable, WakeupBuffer);
+;  AsmRelocateApLoopAmdSev (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack, CountTofinish, Pm16CodeSegment, SevEsAPJumpTable, WakeupBuffer);
 ;-------------------------------------------------------------------------------------
-AsmRelocateApLoopStart:
+
+AsmRelocateApLoopStartAmdSev:
 BITS 64
     cmp        qword [rsp + 56], 0  ; SevEsAPJumpTable
-    je         NoSevEs
+    je         NoSevEsAmdSev
 
     ;
     ; Perform some SEV-ES related setup before leaving 64-bit mode
@@ -397,7 +398,7 @@ BITS 64
     pop        rdx
     pop        rcx
 
-NoSevEs:
+NoSevEsAmdSev:
     cli                          ; Disable interrupt before switching to 32-bit mode
     mov        rax, [rsp + 40]   ; CountTofinish
     lock dec   dword [rax]       ; (*CountTofinish)--
@@ -413,7 +414,7 @@ NoSevEs:
     push       rcx               ; Save MwaitSupport
     push       rdx               ; Save ApTargetCState
 
-    lea        rax, [PmEntry]    ; rax <- The start address of transition code
+    lea        rax, [PmEntryAmdSev]    ; rax <- The start address of transition code
 
     push       r8
     push       rax
@@ -433,10 +434,10 @@ NoSevEs:
     ;
     ; Far return into 32-bit mode
     ;
-    retfq
+o64 retf
 
 BITS 32
-PmEntry:
+PmEntryAmdSev:
     mov        eax, cr0
     btr        eax, 31           ; Clear CR0.PG
     mov        cr0, eax          ; Disable paging and caches
@@ -454,11 +455,11 @@ PmEntry:
     pop        ecx,
     add        esp, 4
 
-MwaitCheck:
+MwaitCheckAmdSev:
     cmp        cl, 1              ; Check mwait-monitor support
-    jnz        HltLoop
+    jnz        HltLoopAmdSev
     mov        ebx, edx           ; Save C-State to ebx
-MwaitLoop:
+MwaitLoopAmdSev:
     cli
     mov        eax, esp           ; Set Monitor Address
     xor        ecx, ecx           ; ecx = 0
@@ -467,9 +468,9 @@ MwaitLoop:
     mov        eax, ebx           ; Mwait Cx, Target C-State per eax[7:4]
     shl        eax, 4
     mwait
-    jmp        MwaitLoop
+    jmp        MwaitLoopAmdSev
 
-HltLoop:
+HltLoopAmdSev:
     pop        edx                ; PM16CodeSegment
     add        esp, 4
     pop        ebx                ; WakeupBuffer
@@ -477,7 +478,7 @@ HltLoop:
     pop        eax                ; SevEsAPJumpTable
     add        esp, 4
     cmp        eax, 0             ; Check for SEV-ES
-    je         DoHlt
+    je         DoHltAmdSev
 
     cli
     ;
@@ -507,10 +508,10 @@ BITS 32
 
     retf
 
-DoHlt:
+DoHltAmdSev:
     cli
     hlt
-    jmp        DoHlt
+    jmp        DoHltAmdSev
 
 BITS 64
-AsmRelocateApLoopEnd:
+AsmRelocateApLoopEndAmdSev:
