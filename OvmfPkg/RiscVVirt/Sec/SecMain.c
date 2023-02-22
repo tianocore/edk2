@@ -71,8 +71,9 @@ SecStartup (
   FirmwareContext.FlattenedDeviceTree = (UINT64)DeviceTreeAddress;
   SetFirmwareContextPointer (&FirmwareContext);
 
-  StackBase      = (UINT64)FixedPcdGet32 (PcdOvmfSecPeiTempRamBase);
-  UefiMemoryBase = StackBase +  FixedPcdGet32 (PcdOvmfSecPeiTempRamSize) - SIZE_32MB;
+  StackBase = (UINT64)FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) +
+              FixedPcdGet32 (PcdOvmfSecPeiTempRamSize);
+  UefiMemoryBase = StackBase - SIZE_32MB;
 
   // Declare the PI/UEFI memory region
   HobList = HobConstructor (
