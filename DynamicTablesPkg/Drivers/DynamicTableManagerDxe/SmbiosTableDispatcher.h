@@ -32,7 +32,7 @@
   A macro defining the maximum number of dependendant SMBIOS tables
   represented by the SMBIOS table dispatcher.
 */
-#define MAX_SMBIOS_DEPENDENCY  5
+#define MAX_SMBIOS_DEPENDENCY  6
 
 /**
   A macro defining the maximum table types handled by the SMBIOS
@@ -43,11 +43,11 @@
 /**
   A helper macro to populate the SMBIOS table dispatcher table
 */
-#define SMBIOS_TABLE_DEP(TableId, Dep1, Dep2, Dep3, Dep4, Dep5) \
+#define SMBIOS_TABLE_DEP(TableId, Dep1, Dep2, Dep3, Dep4, Dep5, Dep6) \
   { \
     TableId, \
     StNotPresent, \
-    { Dep1, Dep2, Dep3, Dep4, Dep5 } \
+    { Dep1, Dep2, Dep3, Dep4, Dep5, Dep6 } \
   }
 
 /**
