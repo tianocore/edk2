@@ -258,6 +258,7 @@ PageTableLibMapInLevel (
   UINTN               BitStart;
   UINTN               Index;
   IA32_PAGING_ENTRY   *PagingEntry;
+  UINTN               PagingEntryIndex;
   IA32_PAGING_ENTRY   *CurrentPagingEntry;
   UINT64              RegionLength;
   UINT64              SubLength;
@@ -287,6 +288,13 @@ PageTableLibMapInLevel (
 
   LocalParentAttribute.Uint64 = ParentAttribute->Uint64;
   ParentAttribute             = &LocalParentAttribute;
+
+  //
+  // RegionLength: 256T (1 << 48) 512G (1 << 39), 1G (1 << 30), 2M (1 << 21) or 4K (1 << 12).
+  //
+  BitStart         = 12 + (Level - 1) * 9;
+  PagingEntryIndex = (UINTN)BitFieldRead64 (LinearAddress + Offset, BitStart, BitStart + 9 - 1);
+  RegionLength     = REGION_LENGTH (Level);
 
   //
   // ParentPagingEntry ONLY is deferenced for checking Present and MustBeOne bits
@@ -325,8 +333,11 @@ PageTableLibMapInLevel (
     // the actual attributes of grand-parents when determing the memory type.
     //
     PleBAttribute.Uint64 = PageTableLibGetPleBMapAttribute (&ParentPagingEntry->PleB, ParentAttribute);
-    if ((IA32_MAP_ATTRIBUTE_ATTRIBUTES (&PleBAttribute) & IA32_MAP_ATTRIBUTE_ATTRIBUTES (Mask))
-        == (IA32_MAP_ATTRIBUTE_ATTRIBUTES (Attribute) & IA32_MAP_ATTRIBUTE_ATTRIBUTES (Mask)))
+    if ((((IA32_MAP_ATTRIBUTE_ATTRIBUTES (&PleBAttribute) & IA32_MAP_ATTRIBUTE_ATTRIBUTES (Mask))
+          == (IA32_MAP_ATTRIBUTE_ATTRIBUTES (Attribute) & IA32_MAP_ATTRIBUTE_ATTRIBUTES (Mask)))) &&
+        (  (Mask->Bits.PageTableBaseAddress == 0)
+        || ((IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (&PleBAttribute) + PagingEntryIndex * RegionLength)
+            == (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset))))
     {
       //
       // This function is called when the memory length is less than the region length of the parent level.
@@ -353,8 +364,7 @@ PageTableLibMapInLevel (
       //
       PageTableLibSetPnle (&ParentPagingEntry->Pnle, &NopAttribute, &AllOneMask);
 
-      RegionLength = REGION_LENGTH (Level);
-      PagingEntry  = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&ParentPagingEntry->Pnle);
+      PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&ParentPagingEntry->Pnle);
       for (SubOffset = 0, Index = 0; Index < 512; Index++) {
         PagingEntry[Index].Uint64 = OneOfPagingEntry.Uint64 + SubOffset;
         SubOffset                += RegionLength;
@@ -425,14 +435,11 @@ PageTableLibMapInLevel (
   }
 
   //
-  // RegionLength: 256T (1 << 48) 512G (1 << 39), 1G (1 << 30), 2M (1 << 21) or 4K (1 << 12).
   // RegionStart:  points to the linear address that's aligned on RegionLength and lower than (LinearAddress + Offset).
   //
-  BitStart     = 12 + (Level - 1) * 9;
-  Index        = (UINTN)BitFieldRead64 (LinearAddress + Offset, BitStart, BitStart + 9 - 1);
-  RegionLength = LShiftU64 (1, BitStart);
-  RegionMask   = RegionLength - 1;
-  RegionStart  = (LinearAddress + Offset) & ~RegionMask;
+  Index       = PagingEntryIndex;
+  RegionMask  = RegionLength - 1;
+  RegionStart = (LinearAddress + Offset) & ~RegionMask;
 
   ParentAttribute->Uint64 = PageTableLibGetPnleMapAttribute (&ParentPagingEntry->Pnle, ParentAttribute);
 
