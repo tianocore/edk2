@@ -43,9 +43,10 @@
 /**
   A helper macro to populate the SMBIOS table dispatcher table
 */
-#define SMBIOS_TABLE_DEP(TableId, Dep1, Dep2, Dep3, Dep4, Dep5, Dep6) \
+#define SMBIOS_TABLE_DEP(TableId, Order, Dep1, Dep2, Dep3, Dep4, Dep5, Dep6) \
   { \
     TableId, \
+    Order, \
     StNotPresent, \
     { Dep1, Dep2, Dep3, Dep4, Dep5, Dep6 } \
   }
@@ -60,12 +61,27 @@ typedef enum SmbiosTableState {
 } SMBIOS_TABLE_STATE;
 
 /**
+  An enum describing the dispatch order for the SMBIOS tables.
+*/
+typedef enum DispatchOrder {
+  OrderDef = 0,   ///< Default dispatch order.
+  OrderL1,        ///< Dispatch order 1.
+  OrderL2,        ///< Dispatch order 2.
+  OrderL3,        ///< Dispatch order 3.
+  OrderL4,        ///< Dispatch order 4.
+  OrderL5,        ///< Dispatch order 5.
+  OrderMax        ///< Dispatch order Max.
+} DISPATCH_ORDER;
+
+/**
   A structure describing the dependencies for a SMBIOS table and
   the dispatcher state information.
 */
 typedef struct SmBiosTableDispatcher {
   /// SMBIOS Structure/Table Type
   SMBIOS_TABLE_TYPE     TableType;
+  /// SMBIOS table dispatch order
+  DISPATCH_ORDER        Order;
   /// SMBIOS dispatcher state
   SMBIOS_TABLE_STATE    State;
   /// SMBIOS Structure/Table dependency list
@@ -112,7 +128,7 @@ InitSmbiosTableDispatcher (
   IN  UINT32                        SmbiosTableCount
   );
 
-/** Schedule the dispatch of a SMBIOS table.
+/** Schedule the dispatch of SMBIOS tables.
 
   The SMBIOS dispatcher state table is used to establish the dependency
   order in which the SMBIOS tables are installed. This allows the SMBIOS
@@ -127,8 +143,15 @@ InitSmbiosTableDispatcher (
   - no cyclic dependency is allowed.
   The dependency list is terminated by SMTT_NULL.
 
-  @param [in]  TableType            The SMBIOS table type to schedule for
-                                    dispatch.
+  The SMBIOS dispatcher dispatches the tables that have the default
+  order (OrderDef) set before the ordered SMBIOS tables are dispatched.
+  The SMBIOS_TABLE_DISPATCHER.Order field is used to establish the
+  dispatch order.
+
+  The order specified in the SMBIOS dispatcher table must be unique for all
+  orders other than OrderDef. The dependency walk is only done for tables
+  that have the default dispatch order.
+
   @param [in]  TableFactoryProtocol Pointer to the Table Factory Protocol
                                     interface.
   @param [in]  CfgMgrProtocol       Pointer to the Configuration Manager
@@ -146,8 +169,7 @@ InitSmbiosTableDispatcher (
 **/
 EFI_STATUS
 EFIAPI
-DispatchSmbiosTable (
-  IN CONST SMBIOS_TABLE_TYPE                             TableType,
+DispatchSmbiosTables (
   IN CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  *CONST  TableFactoryProtocol,
   IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN       EFI_SMBIOS_PROTOCOL                           *SmbiosProtocol,
