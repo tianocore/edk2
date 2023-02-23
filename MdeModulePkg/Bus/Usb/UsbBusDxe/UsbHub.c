@@ -609,7 +609,7 @@ UsbHubInit (
   Status  = UsbHubReadDesc (HubDev, HubDesc);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "UsbHubInit: failed to read HUB descriptor %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbHubInit: failed to read HUB descriptor - %r\n", Status));
     return Status;
   }
 
