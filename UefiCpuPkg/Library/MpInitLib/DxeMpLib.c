@@ -20,14 +20,15 @@
 
 #define  AP_SAFE_STACK_SIZE  128
 
-CPU_MP_DATA       *mCpuMpData                  = NULL;
-EFI_EVENT         mCheckAllApsEvent            = NULL;
-EFI_EVENT         mMpInitExitBootServicesEvent = NULL;
-EFI_EVENT         mLegacyBootEvent             = NULL;
-volatile BOOLEAN  mStopCheckAllApsStatus       = TRUE;
-VOID              *mReservedApLoopFunc         = NULL;
-UINTN             mReservedTopOfApStack;
-volatile UINT32   mNumberToFinish = 0;
+CPU_MP_DATA             *mCpuMpData                  = NULL;
+EFI_EVENT               mCheckAllApsEvent            = NULL;
+EFI_EVENT               mMpInitExitBootServicesEvent = NULL;
+EFI_EVENT               mLegacyBootEvent             = NULL;
+volatile BOOLEAN        mStopCheckAllApsStatus       = TRUE;
+UINTN                   mReservedTopOfApStack;
+volatile UINT32         mNumberToFinish = 0;
+RELOCATE_AP_LOOP_ENTRY  mReservedApLoop;
+
 
 //
 // Begin wakeup buffer allocation below 0x88000
@@ -380,8 +381,6 @@ RelocateApLoop (
 {
   CPU_MP_DATA                  *CpuMpData;
   BOOLEAN                      MwaitSupport;
-  ASM_RELOCATE_AP_LOOP         AsmRelocateApLoopFunc;
-  ASM_RELOCATE_AP_LOOP_AMDSEV  AsmRelocateApLoopFuncAmdSev;
   UINTN                        ProcessorNumber;
   UINTN                        StackStart;
 
@@ -389,31 +388,29 @@ RelocateApLoop (
   CpuMpData    = GetCpuMpData ();
   MwaitSupport = IsMwaitSupport ();
   if (CpuMpData->UseSevEsAPMethod) {
-    StackStart                  = CpuMpData->SevEsAPResetStackStart;
-    AsmRelocateApLoopFuncAmdSev = (ASM_RELOCATE_AP_LOOP)(UINTN)mReservedApLoopFunc;
-    AsmRelocateApLoopFuncAmdSev (
-      MwaitSupport,
-      CpuMpData->ApTargetCState,
-      CpuMpData->PmCodeSegment,
-      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
-      (UINTN)&mNumberToFinish,
-      CpuMpData->Pm16CodeSegment,
-      CpuMpData->SevEsAPBuffer,
-      CpuMpData->WakeupBuffer
-      );
+    StackStart = CpuMpData->SevEsAPResetStackStart;
+    mReservedApLoop.AmdSevEntry (
+                      MwaitSupport,
+                      CpuMpData->ApTargetCState,
+                      CpuMpData->PmCodeSegment,
+                      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
+                      (UINTN)&mNumberToFinish,
+                      CpuMpData->Pm16CodeSegment,
+                      CpuMpData->SevEsAPBuffer,
+                      CpuMpData->WakeupBuffer
+                      );
   } else {
-    StackStart            = mReservedTopOfApStack;
-    AsmRelocateApLoopFunc = (ASM_RELOCATE_AP_LOOP)(UINTN)mReservedApLoopFunc;
-    AsmRelocateApLoopFunc (
-      MwaitSupport,
-      CpuMpData->ApTargetCState,
-      CpuMpData->PmCodeSegment,
-      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
-      (UINTN)&mNumberToFinish,
-      CpuMpData->Pm16CodeSegment,
-      CpuMpData->SevEsAPBuffer,
-      CpuMpData->WakeupBuffer
-      );
+    StackStart = mReservedTopOfApStack;
+    mReservedApLoop.GenericEntry (
+                      MwaitSupport,
+                      CpuMpData->ApTargetCState,
+                      CpuMpData->PmCodeSegment,
+                      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
+                      (UINTN)&mNumberToFinish,
+                      CpuMpData->Pm16CodeSegment,
+                      CpuMpData->SevEsAPBuffer,
+                      CpuMpData->WakeupBuffer
+                      );
   }
 
   //
@@ -477,12 +474,16 @@ InitMpGlobalData (
   )
 {
   EFI_STATUS                       Status;
-  EFI_PHYSICAL_ADDRESS             Address;
-  UINTN                            ApSafeBufferSize;
+  MP_ASSEMBLY_ADDRESS_MAP          *AddressMap;
+  UINTN                            StackPages;
+  UINTN                            FuncPages;
   UINTN                            Index;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  MemDesc;
   UINTN                            StackBase;
   CPU_INFO_IN_HOB                  *CpuInfoInHob;
+  EFI_PHYSICAL_ADDRESS             Address;
+  UINT8                            *ApLoopFunc;
+  UINTN                            ApLoopFuncSize;
 
   SaveCpuMpData (CpuMpData);
 
@@ -537,6 +538,15 @@ InitMpGlobalData (
     }
   }
 
+  AddressMap = &CpuMpData->AddressMap;
+  if (CpuMpData->UseSevEsAPMethod) {
+    ApLoopFunc     = AddressMap->RelocateApLoopFuncAddressAmdSev;
+    ApLoopFuncSize = AddressMap->RelocateApLoopFuncSizeAmdSev;
+  } else {
+    ApLoopFunc     = AddressMap->RelocateApLoopFuncAddress;
+    ApLoopFuncSize = AddressMap->RelocateApLoopFuncSize;
+  }
+
   //
   // Avoid APs access invalid buffer data which allocated by BootServices,
   // so we will allocate reserved data for AP loop code. We also need to
@@ -545,26 +555,31 @@ InitMpGlobalData (
   // Allocating it in advance since memory services are not available in
   // Exit Boot Services callback function.
   //
-  ApSafeBufferSize = EFI_PAGES_TO_SIZE (
-                       EFI_SIZE_TO_PAGES (
-                         CpuMpData->AddressMap.RelocateApLoopFuncSize
-                         )
-                       );
-  Address = BASE_4GB - 1;
-  Status  = gBS->AllocatePages (
-                   AllocateMaxAddress,
-                   EfiReservedMemoryType,
-                   EFI_SIZE_TO_PAGES (ApSafeBufferSize),
-                   &Address
-                   );
-  ASSERT_EFI_ERROR (Status);
-
-  mReservedApLoopFunc = (VOID *)(UINTN)Address;
-  ASSERT (mReservedApLoopFunc != NULL);
-
+  // +------------+ (TopOfApStack)
+  // |  Stack * N |
+  // +------------+
+  // |  Padding   |
+  // +------------+
+  // |  Ap Loop   |
+  // +------------+ (low address )
   //
-  // Make sure that the buffer memory is executable if NX protection is enabled
-  // for EfiReservedMemoryType.
+
+  Address    = BASE_4GB - 1;
+  StackPages = EFI_SIZE_TO_PAGES (CpuMpData->CpuCount * AP_SAFE_STACK_SIZE);
+  FuncPages  = EFI_SIZE_TO_PAGES (ApLoopFuncSize);
+
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  EfiReservedMemoryType,
+                  StackPages+FuncPages,
+                  &Address
+                  );
+  ASSERT_EFI_ERROR (Status);
+  // If a memory range has the EFI_MEMORY_XP attribute, OS loader
+  // may set the IA32_EFER.NXE (No-eXecution Enable) bit in IA32_EFER MSR,
+  // then set the XD (eXecution Disable) bit in the CPU PAE page table.
+  // Here is to make sure that the memory is executable if NX protection is
+  // enabled for EfiReservedMemoryType.
   //
   // TODO: Check EFI_MEMORY_XP bit set or not once it's available in DXE GCD
   //       service.
@@ -573,41 +588,15 @@ InitMpGlobalData (
   if (!EFI_ERROR (Status)) {
     gDS->SetMemorySpaceAttributes (
            Address,
-           ApSafeBufferSize,
+           ALIGN_VALUE (ApLoopFuncSize, EFI_PAGE_SIZE),
            MemDesc.Attributes & (~EFI_MEMORY_XP)
            );
   }
 
-  ApSafeBufferSize = EFI_PAGES_TO_SIZE (
-                       EFI_SIZE_TO_PAGES (
-                         CpuMpData->CpuCount * AP_SAFE_STACK_SIZE
-                         )
-                       );
-  Address = BASE_4GB - 1;
-  Status  = gBS->AllocatePages (
-                   AllocateMaxAddress,
-                   EfiReservedMemoryType,
-                   EFI_SIZE_TO_PAGES (ApSafeBufferSize),
-                   &Address
-                   );
-  ASSERT_EFI_ERROR (Status);
-
-  mReservedTopOfApStack = (UINTN)Address + ApSafeBufferSize;
+  mReservedTopOfApStack = (UINTN)Address + EFI_PAGES_TO_SIZE (StackPages+FuncPages);
   ASSERT ((mReservedTopOfApStack & (UINTN)(CPU_STACK_ALIGNMENT - 1)) == 0);
-  if (CpuMpData->UseSevEsAPMethod) {
-    CopyMem (
-      mReservedApLoopFunc,
-      CpuMpData->AddressMap.RelocateApLoopFuncAddressAmdSev,
-      CpuMpData->AddressMap.RelocateApLoopFuncSizeAmdSev
-      );
-  } else {
-    CopyMem (
-      mReservedApLoopFunc,
-      CpuMpData->AddressMap.RelocateApLoopFuncAddress,
-      CpuMpData->AddressMap.RelocateApLoopFuncSize
-      );
-  }
-
+  mReservedApLoop.Data = (VOID *)(UINTN)Address;
+  CopyMem (mReservedApLoop.Data, ApLoopFunc, ApLoopFuncSize);
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
