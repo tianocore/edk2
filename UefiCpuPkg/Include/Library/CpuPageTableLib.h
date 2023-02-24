@@ -76,7 +76,7 @@ typedef enum {
   @param[in]      Mask           The mask used for attribute. The corresponding field in Attribute is ignored if that in Mask is 0.
 
   @retval RETURN_UNSUPPORTED        PagingMode is not supported.
-  @retval RETURN_INVALID_PARAMETER  PageTable, BufferSize, Attribute or Mask is NULL.
+  @retval RETURN_INVALID_PARAMETER  PageTable, BufferSize, Attribute or Mask is NULL or the combination of Attribute and Mask is invalid.
   @retval RETURN_INVALID_PARAMETER  *BufferSize is not multiple of 4KB.
   @retval RETURN_BUFFER_TOO_SMALL   The buffer is too small for page table creation/updating.
                                     BufferSize is updated to indicate the expected buffer size.
