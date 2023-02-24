@@ -59,19 +59,30 @@ PciDevicePresent (
                                   Pci
                                   );
 
-  if (!EFI_ERROR (Status) && ((Pci->Hdr).VendorId != 0xffff)) {
-    //
-    // Read the entire config header for the device
-    //
-    Status = PciRootBridgeIo->Pci.Read (
-                                    PciRootBridgeIo,
-                                    EfiPciWidthUint32,
-                                    Address,
-                                    sizeof (PCI_TYPE00) / sizeof (UINT32),
-                                    Pci
-                                    );
+  //
+  // The host bridge may be programmed to accept Configuration Retry Status (CRS).  If the PCI device
+  // is slow, and CRS is enabled, the VendorId may read as 0x0001 when not ready.
+  // This behavior is defined in PCI spec that VendorId is 0x0001.
+  // PCI EXPRESS BASE SPECIFICATION, REV. 3.1 section 2.3.1.
+  // Skip the device, as all the other data read will be invalid.
+  //
+  if (!EFI_ERROR (Status)) {
+    if (((Pci->Hdr).VendorId != 0xffff) && ((Pci->Hdr).VendorId != 0x0001)) {
+      //
+      // Read the entire config header for the device
+      //
+      Status = PciRootBridgeIo->Pci.Read (
+                                      PciRootBridgeIo,
+                                      EfiPciWidthUint32,
+                                      Address,
+                                      sizeof (PCI_TYPE00) / sizeof (UINT32),
+                                      Pci
+                                      );
 
-    return EFI_SUCCESS;
+      return EFI_SUCCESS;
+    } else if ((Pci->Hdr).VendorId == 0x0001) {
+      DEBUG ((DEBUG_WARN, "CRS response detected.  Devices that return a CRS response during enumeration are currently ignored\n"));
+    }
   }
 
   return EFI_NOT_FOUND;
