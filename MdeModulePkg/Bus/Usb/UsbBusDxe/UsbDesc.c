@@ -761,7 +761,7 @@ UsbGetOneConfig (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "UsbGetOneConfig: failed to get descript length(%d) %r\n",
+      "UsbGetOneConfig: failed to get descript length(%d) - %r\n",
       Desc.TotalLength,
       Status
       ));
@@ -787,7 +787,7 @@ UsbGetOneConfig (
   Status = UsbCtrlGetDesc (UsbDev, USB_DESC_TYPE_CONFIG, Index, 0, Buf, Desc.TotalLength);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "UsbGetOneConfig: failed to get full descript %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbGetOneConfig: failed to get full descript - %r\n", Status));
 
     FreePool (Buf);
     return NULL;
@@ -891,7 +891,7 @@ UsbBuildDescTable (
   Status = UsbBuildLangTable (UsbDev);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "UsbBuildDescTable: get language ID table %r\n", Status));
+    DEBUG ((DEBUG_INFO, "UsbBuildDescTable: get language ID table - %r\n", Status));
   }
 
   return EFI_SUCCESS;
