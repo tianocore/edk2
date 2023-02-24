@@ -216,6 +216,44 @@ PageTableLibSetPnle (
 }
 
 /**
+  Check if the combination for Attribute and Mask is valid for non-present entry.
+  1.Mask.Present is 0 but some other attributes is provided. This case should be invalid.
+  2.Map non-present range to present. In this case, all attributes should be provided.
+
+  @param[in] Attribute    The attribute of the linear address range.
+  @param[in] Mask         The mask used for attribute to check.
+
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 0 but some other attributes are provided.
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 1 but some other attributes are not provided.
+  @retval RETURN_SUCCESS            The combination for Attribute and Mask is valid.
+**/
+RETURN_STATUS
+IsAttributesAndMaskValidForNonPresentEntry (
+  IN     IA32_MAP_ATTRIBUTE  *Attribute,
+  IN     IA32_MAP_ATTRIBUTE  *Mask
+  )
+{
+  if ((Mask->Bits.Present == 1) && (Attribute->Bits.Present == 1)) {
+    //
+    // Creating new page table or remapping non-present range to present.
+    //
+    if ((Mask->Bits.ReadWrite == 0) || (Mask->Bits.UserSupervisor == 0) || (Mask->Bits.WriteThrough == 0) || (Mask->Bits.CacheDisabled == 0) ||
+        (Mask->Bits.Accessed == 0) || (Mask->Bits.Dirty == 0) || (Mask->Bits.Pat == 0) || (Mask->Bits.Global == 0) ||
+        (Mask->Bits.PageTableBaseAddress == 0) || (Mask->Bits.ProtectionKey == 0) || (Mask->Bits.Nx == 0))
+    {
+      return RETURN_INVALID_PARAMETER;
+    }
+  } else if ((Mask->Bits.Present == 0) && (Mask->Uint64 > 1)) {
+    //
+    // Only change other attributes for non-present range is not permitted.
+    //
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  return RETURN_SUCCESS;
+}
+
+/**
   Update page table to map [LinearAddress, LinearAddress + Length) with specified attribute in the specified level.
 
   @param[in]      ParentPagingEntry The pointer to the page table entry to update.
@@ -237,6 +275,8 @@ PageTableLibSetPnle (
                                     when a new physical base address is set.
   @param[in]      Mask              The mask used for attribute. The corresponding field in Attribute is ignored if that in Mask is 0.
 
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 0 but some other attributes are provided.
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 1 but some other attributes are not provided.
   @retval RETURN_SUCCESS            PageTable is created/updated successfully.
 **/
 RETURN_STATUS
@@ -260,6 +300,7 @@ PageTableLibMapInLevel (
   UINTN               Index;
   IA32_PAGING_ENTRY   *PagingEntry;
   UINTN               PagingEntryIndex;
+  UINTN               PagingEntryIndexEnd;
   IA32_PAGING_ENTRY   *CurrentPagingEntry;
   UINT64              RegionLength;
   UINT64              SubLength;
@@ -306,6 +347,14 @@ PageTableLibMapInLevel (
   //
 
   if (ParentPagingEntry->Pce.Present == 0) {
+    //
+    // [LinearAddress, LinearAddress + Length] contains non-present range.
+    //
+    Status = IsAttributesAndMaskValidForNonPresentEntry (Attribute, Mask);
+    if (RETURN_ERROR (Status)) {
+      return Status;
+    }
+
     //
     // The parent entry is CR3 or PML5E/PML4E/PDPTE/PDE.
     // It does NOT point to an existing page directory.
@@ -384,6 +433,27 @@ PageTableLibMapInLevel (
     }
   } else {
     //
+    // If (LinearAddress + Length - 1) is not in the same ParentPagingEntry with (LinearAddress + Offset), then the remaining child PagingEntry
+    // starting from PagingEntryIndex of ParentPagingEntry is all covered by [LinearAddress + Offset, LinearAddress + Length - 1].
+    //
+    PagingEntryIndexEnd = (BitFieldRead64 (LinearAddress + Length - 1, BitStart + 9, 63) != BitFieldRead64 (LinearAddress + Offset, BitStart + 9, 63)) ? 511 :
+                          (UINTN)BitFieldRead64 (LinearAddress + Length - 1, BitStart, BitStart + 9 - 1);
+    PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&ParentPagingEntry->Pnle);
+    for (Index = PagingEntryIndex; Index <= PagingEntryIndexEnd; Index++) {
+      if (PagingEntry[Index].Pce.Present == 0) {
+        //
+        // [LinearAddress, LinearAddress + Length] contains non-present range.
+        //
+        Status = IsAttributesAndMaskValidForNonPresentEntry (Attribute, Mask);
+        if (RETURN_ERROR (Status)) {
+          return Status;
+        }
+
+        break;
+      }
+    }
+
+    //
     // It's a non-leaf entry
     //
     ChildAttribute.Uint64 = 0;
@@ -430,7 +500,6 @@ PageTableLibMapInLevel (
         // Update child entries to use restrictive attribute inherited from parent.
         // e.g.: Set PDE[0-255].ReadWrite = 0
         //
-        PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&ParentPagingEntry->Pnle);
         for (Index = 0; Index < 512; Index++) {
           if (PagingEntry[Index].Pce.Present == 0) {
             continue;
@@ -557,6 +626,10 @@ PageTableLibMapInLevel (
 
   @retval RETURN_UNSUPPORTED        PagingMode is not supported.
   @retval RETURN_INVALID_PARAMETER  PageTable, BufferSize, Attribute or Mask is NULL.
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 0 but some other attributes are provided.
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 1 but some other attributes are not provided.
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 0 but some other attributes are provided.
+  @retval RETURN_INVALID_PARAMETER  For present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 0 but some other attributes are provided.
   @retval RETURN_INVALID_PARAMETER  *BufferSize is not multiple of 4KB.
   @retval RETURN_BUFFER_TOO_SMALL   The buffer is too small for page table creation/updating.
                                     BufferSize is updated to indicate the expected buffer size.
@@ -615,6 +688,14 @@ PageTableMap (
   }
 
   if ((*BufferSize != 0) && (Buffer == NULL)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  //
+  // If to map [LinearAddress, LinearAddress + Length] as non-present,
+  // all attributes except Present should not be provided.
+  //
+  if ((Attribute->Bits.Present == 0) && (Mask->Bits.Present == 1) && (Mask->Uint64 > 1)) {
     return RETURN_INVALID_PARAMETER;
   }
 
