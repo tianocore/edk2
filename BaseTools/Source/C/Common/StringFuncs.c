@@ -21,12 +21,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @return CHAR8* - NULL if there are not enough resources
 **/
-CHAR8*
+CHAR8 *
 CloneString (
-  IN CHAR8       *String
+  IN CHAR8  *String
   )
 {
-  CHAR8* NewString;
+  CHAR8  *NewString;
 
   NewString = malloc (strlen (String) + 1);
   if (NewString != NULL) {
@@ -45,10 +45,10 @@ CloneString (
 **/
 EFI_STATUS
 StripInfDscStringInPlace (
-  IN CHAR8       *String
+  IN CHAR8  *String
   )
 {
-  CHAR8 *Pos;
+  CHAR8  *Pos;
 
   if (String == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -59,6 +59,7 @@ StripInfDscStringInPlace (
   //
   for (Pos = String; isspace ((int)*Pos); Pos++) {
   }
+
   if (Pos != String) {
     memmove (String, Pos, strlen (Pos) + 1);
   }
@@ -70,12 +71,12 @@ StripInfDscStringInPlace (
   // What about multiline comments?
   //
 
-  Pos = (CHAR8 *) strstr (String,  "//");
+  Pos = (CHAR8 *)strstr (String, "//");
   if (Pos != NULL) {
     *Pos = '\0';
   }
 
-  Pos = (CHAR8 *) strchr (String, '#');
+  Pos = (CHAR8 *)strchr (String, '#');
   if (Pos != NULL) {
     *Pos = '\0';
   }
@@ -86,8 +87,10 @@ StripInfDscStringInPlace (
   for (Pos = String + strlen (String);
        ((Pos - 1) >= String) && (isspace ((int)*(Pos - 1)));
        Pos--
-      ) {
+       )
+  {
   }
+
   *Pos = '\0';
 
   return EFI_SUCCESS;
@@ -101,21 +104,22 @@ StripInfDscStringInPlace (
 
   @return EFI_STATUS
 **/
-STRING_LIST*
+STRING_LIST *
 SplitStringByWhitespace (
-  IN CHAR8       *String
+  IN CHAR8  *String
   )
 {
-  CHAR8       *Pos;
-  CHAR8       *EndOfSubString;
-  CHAR8       *EndOfString;
-  STRING_LIST *Output;
-  UINTN       Item;
+  CHAR8        *Pos;
+  CHAR8        *EndOfSubString;
+  CHAR8        *EndOfString;
+  STRING_LIST  *Output;
+  UINTN        Item;
 
   String = CloneString (String);
   if (String == NULL) {
     return NULL;
   }
+
   EndOfString = String + strlen (String);
 
   Output = NewStringList ();
@@ -125,10 +129,11 @@ SplitStringByWhitespace (
       Pos++;
     }
 
-    for (EndOfSubString=Pos;
+    for (EndOfSubString = Pos;
          (*EndOfSubString != '\0') && !isspace ((int)*EndOfSubString);
          EndOfSubString++
-         ) {
+         )
+    {
     }
 
     if (EndOfSubString == Pos) {
@@ -151,15 +156,17 @@ SplitStringByWhitespace (
 
   @return STRING_LIST* - Null if there is not enough resources to create the object.
 **/
-STRING_LIST*
+STRING_LIST *
 NewStringList (
   )
 {
-  STRING_LIST *NewList;
+  STRING_LIST  *NewList;
+
   NewList = AllocateStringListStruct (0);
   if (NewList != NULL) {
     NewList->Count = 0;
   }
+
   return NewList;
 }
 
@@ -171,13 +178,13 @@ NewStringList (
 **/
 EFI_STATUS
 AppendCopyOfStringToList (
-  IN OUT STRING_LIST **StringList,
-  IN CHAR8       *String
+  IN OUT STRING_LIST  **StringList,
+  IN CHAR8            *String
   )
 {
-  STRING_LIST *OldList;
-  STRING_LIST *NewList;
-  CHAR8       *NewString;
+  STRING_LIST  *OldList;
+  STRING_LIST  *NewList;
+  CHAR8        *NewString;
 
   OldList = *StringList;
   NewList = AllocateStringListStruct (OldList->Count + 1);
@@ -196,7 +203,7 @@ AppendCopyOfStringToList (
     OldList->Strings,
     sizeof (OldList->Strings[0]) * OldList->Count
     );
-  NewList->Count = OldList->Count + 1;
+  NewList->Count                   = OldList->Count + 1;
   NewList->Strings[OldList->Count] = NewString;
 
   *StringList = NewList;
@@ -215,7 +222,7 @@ AppendCopyOfStringToList (
 **/
 EFI_STATUS
 RemoveLastStringFromList (
-  IN STRING_LIST       *StringList
+  IN STRING_LIST  *StringList
   )
 {
   if (StringList->Count == 0) {
@@ -234,12 +241,12 @@ RemoveLastStringFromList (
 
   @return EFI_STATUS
 **/
-STRING_LIST*
+STRING_LIST *
 AllocateStringListStruct (
-  IN UINTN StringCount
+  IN UINTN  StringCount
   )
 {
-  return malloc (OFFSET_OF(STRING_LIST, Strings[StringCount + 1]));
+  return malloc (OFFSET_OF (STRING_LIST, Strings[StringCount + 1]));
 }
 
 /**
@@ -249,7 +256,7 @@ AllocateStringListStruct (
 **/
 VOID
 FreeStringList (
-  IN STRING_LIST       *StringList
+  IN STRING_LIST  *StringList
   )
 {
   while (StringList->Count > 0) {
@@ -267,20 +274,21 @@ FreeStringList (
   @return CHAR8* - The string list represented with a single string.  The returned
            string must be freed by the caller.
 **/
-CHAR8*
+CHAR8 *
 StringListToString (
-  IN STRING_LIST       *StringList
+  IN STRING_LIST  *StringList
   )
 {
-  UINTN Count;
-  UINTN Length;
-  CHAR8 *NewString;
+  UINTN  Count;
+  UINTN  Length;
+  CHAR8  *NewString;
 
   Length = 2;
   for (Count = 0; Count < StringList->Count; Count++) {
     if (Count > 0) {
       Length += 2;
     }
+
     Length += strlen (StringList->Strings[Count]) + 2;
   }
 
@@ -288,6 +296,7 @@ StringListToString (
   if (NewString == NULL) {
     return NewString;
   }
+
   NewString[0] = '\0';
 
   strcat (NewString, "[");
@@ -295,10 +304,12 @@ StringListToString (
     if (Count > 0) {
       strcat (NewString, ", ");
     }
+
     strcat (NewString, "\"");
     strcat (NewString, StringList->Strings[Count]);
     strcat (NewString, "\"");
   }
+
   strcat (NewString, "]");
 
   return NewString;
@@ -308,20 +319,19 @@ StringListToString (
   Prints out the string list
 
   @param StringList        The string list to print
- 
+
   @return EFI_STATUS
 **/
 VOID
 PrintStringList (
-  IN STRING_LIST       *StringList
+  IN STRING_LIST  *StringList
   )
 {
-  CHAR8* String;
+  CHAR8  *String;
+
   String = StringListToString (StringList);
   if (String != NULL) {
     printf ("%s", String);
     free (String);
   }
 }
-
-

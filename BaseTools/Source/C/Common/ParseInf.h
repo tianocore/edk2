@@ -38,9 +38,9 @@ extern "C" {
 **/
 CHAR8 *
 ReadLine (
-  IN MEMORY_FILE    *InputFile,
-  IN OUT CHAR8      *InputBuffer,
-  IN UINTN          MaxLength
+  IN MEMORY_FILE  *InputFile,
+  IN OUT CHAR8    *InputBuffer,
+  IN UINTN        MaxLength
   )
 ;
 
@@ -56,8 +56,8 @@ ReadLine (
 **/
 BOOLEAN
 FindSection (
-  IN MEMORY_FILE    *InputFile,
-  IN CHAR8          *Section
+  IN MEMORY_FILE  *InputFile,
+  IN CHAR8        *Section
   )
 ;
 
@@ -78,11 +78,11 @@ FindSection (
 **/
 EFI_STATUS
 FindToken (
-  IN MEMORY_FILE    *InputFile,
-  IN CHAR8          *Section,
-  IN CHAR8          *Token,
-  IN UINTN          Instance,
-  OUT CHAR8         *Value
+  IN MEMORY_FILE  *InputFile,
+  IN CHAR8        *Section,
+  IN CHAR8        *Token,
+  IN UINTN        Instance,
+  OUT CHAR8       *Value
   )
 ;
 
@@ -98,8 +98,8 @@ FindToken (
 **/
 EFI_STATUS
 StringToGuid (
-  IN CHAR8        *AsciiGuidBuffer,
-  OUT EFI_GUID    *GuidBuffer
+  IN CHAR8      *AsciiGuidBuffer,
+  OUT EFI_GUID  *GuidBuffer
   )
 ;
 
@@ -152,8 +152,8 @@ ReadLineInStream (
 **/
 BOOLEAN
 FindSectionInStream (
-  IN FILE       *InputFile,
-  IN CHAR8      *Section
+  IN FILE   *InputFile,
+  IN CHAR8  *Section
   )
 ;
 

@@ -18,17 +18,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Declare module globals for keeping track of the utility's
 // name and other settings.
 //
-STATIC STATUS mStatus                 = STATUS_SUCCESS;
-STATIC CHAR8  mUtilityName[50]        = { 0 };
-STATIC UINT64 mPrintLogLevel          = INFO_LOG_LEVEL;
-STATIC CHAR8  *mSourceFileName        = NULL;
-STATIC UINT32 mSourceFileLineNum      = 0;
-STATIC UINT32 mErrorCount             = 0;
-STATIC UINT32 mWarningCount           = 0;
-STATIC UINT32 mMaxErrors              = 0;
-STATIC UINT32 mMaxWarnings            = 0;
-STATIC UINT32 mMaxWarningsPlusErrors  = 0;
-STATIC INT8   mPrintLimitsSet         = 0;
+STATIC STATUS  mStatus                = STATUS_SUCCESS;
+STATIC CHAR8   mUtilityName[50]       = { 0 };
+STATIC UINT64  mPrintLogLevel         = INFO_LOG_LEVEL;
+STATIC CHAR8   *mSourceFileName       = NULL;
+STATIC UINT32  mSourceFileLineNum     = 0;
+STATIC UINT32  mErrorCount            = 0;
+STATIC UINT32  mWarningCount          = 0;
+STATIC UINT32  mMaxErrors             = 0;
+STATIC UINT32  mMaxWarnings           = 0;
+STATIC UINT32  mMaxWarningsPlusErrors = 0;
+STATIC INT8    mPrintLimitsSet        = 0;
 
 STATIC
 VOID
@@ -41,7 +41,7 @@ PrintLimitExceeded (
 
   All arguments are optional, though the printed message may be useless if
   at least something valid is not specified.
- 
+
  @note:
    We print the following (similar to the Warn() and Debug()
    W
@@ -90,7 +90,8 @@ Error (
   ...
   )
 {
-  va_list List;
+  va_list  List;
+
   //
   // If limits have been set, then check that we have not exceeded them
   //
@@ -101,16 +102,17 @@ Error (
     if (mMaxWarningsPlusErrors != 0) {
       if (mErrorCount + mWarningCount > mMaxWarningsPlusErrors) {
         PrintLimitExceeded ();
-        return ;
+        return;
       }
     }
+
     //
     // See if we've exceeded our error count
     //
     if (mMaxErrors != 0) {
       if (mErrorCount > mMaxErrors) {
         PrintLimitExceeded ();
-        return ;
+        return;
       }
     }
   }
@@ -137,7 +139,8 @@ ParserError (
   ...
   )
 {
-  va_list List;
+  va_list  List;
+
   //
   // If limits have been set, then check them
   //
@@ -148,16 +151,17 @@ ParserError (
     if (mMaxWarningsPlusErrors != 0) {
       if (mErrorCount + mWarningCount > mMaxWarningsPlusErrors) {
         PrintLimitExceeded ();
-        return ;
+        return;
       }
     }
+
     //
     // See if we've exceeded our error count
     //
     if (mMaxErrors != 0) {
       if (mErrorCount > mMaxErrors) {
         PrintLimitExceeded ();
-        return ;
+        return;
       }
     }
   }
@@ -184,7 +188,8 @@ ParserWarning (
   ...
   )
 {
-  va_list List;
+  va_list  List;
+
   //
   // If limits have been set, then check them
   //
@@ -195,16 +200,17 @@ ParserWarning (
     if (mMaxWarningsPlusErrors != 0) {
       if (mErrorCount + mWarningCount > mMaxWarningsPlusErrors) {
         PrintLimitExceeded ();
-        return ;
+        return;
       }
     }
+
     //
     // See if we've exceeded our warning count
     //
     if (mMaxWarnings != 0) {
       if (mWarningCount > mMaxWarnings) {
         PrintLimitExceeded ();
-        return ;
+        return;
       }
     }
   }
@@ -244,7 +250,7 @@ Warning (
   ...
   )
 {
-  va_list List;
+  va_list  List;
 
   //
   // Current Print Level not output warning information.
@@ -252,6 +258,7 @@ Warning (
   if (WARNING_LOG_LEVEL < mPrintLogLevel) {
     return;
   }
+
   //
   // If limits have been set, then check them
   //
@@ -262,16 +269,17 @@ Warning (
     if (mMaxWarningsPlusErrors != 0) {
       if (mErrorCount + mWarningCount > mMaxWarningsPlusErrors) {
         PrintLimitExceeded ();
-        return ;
+        return;
       }
     }
+
     //
     // See if we've exceeded our warning count
     //
     if (mMaxWarnings != 0) {
       if (mWarningCount > mMaxWarnings) {
         PrintLimitExceeded ();
-        return ;
+        return;
       }
     }
   }
@@ -284,7 +292,7 @@ Warning (
 
 /**
   Print a Debug message.
- 
+
   @param FileName    typically the name of the utility printing the debug message, but
                      can be the name of a file being parsed.
   @param LineNumber  the line number in FileName (parsers)
@@ -304,12 +312,13 @@ DebugMsg (
   ...
   )
 {
-  va_list List;
+  va_list  List;
+
   //
   // If the debug level is less than current print level, then do nothing.
   //
   if (MsgLevel < mPrintLogLevel) {
-    return ;
+    return;
   }
 
   va_start (List, MsgFmt);
@@ -321,7 +330,7 @@ DebugMsg (
   Worker routine for all the utility printing services. Prints the message in
   a format that Visual Studio will find when scanning build outputs for
   errors or warnings.
- 
+
  @note:
    If FileName == NULL then this utility will use the string passed into SetUtilityName().
 
@@ -355,25 +364,25 @@ DebugMsg (
 **/
 VOID
 PrintMessage (
-  CHAR8   *Type,
-  CHAR8   *FileName,
-  UINT32  LineNumber,
-  UINT32  MessageCode,
-  CHAR8   *Text,
-  CHAR8   *MsgFmt,
-  va_list List
+  CHAR8    *Type,
+  CHAR8    *FileName,
+  UINT32   LineNumber,
+  UINT32   MessageCode,
+  CHAR8    *Text,
+  CHAR8    *MsgFmt,
+  va_list  List
   )
 {
-  CHAR8       Line[MAX_LINE_LEN];
-  CHAR8       Line2[MAX_LINE_LEN];
-  CHAR8       *Cptr;
-  struct tm   *NewTime;
-  time_t      CurrentTime;
+  CHAR8      Line[MAX_LINE_LEN];
+  CHAR8      Line2[MAX_LINE_LEN];
+  CHAR8      *Cptr;
+  struct tm  *NewTime;
+  time_t     CurrentTime;
 
   //
   // init local variable
   //
-  Line[0] = '\0';
+  Line[0]  = '\0';
   Line2[0] = '\0';
 
   //
@@ -393,20 +402,23 @@ PrintMessage (
     time (&CurrentTime);
     NewTime = localtime (&CurrentTime);
     if (NewTime != NULL) {
-      fprintf (stdout, "%04d-%02d-%02d %02d:%02d:%02d",
-                       NewTime->tm_year + 1900,
-                       NewTime->tm_mon + 1,
-                       NewTime->tm_mday,
-                       NewTime->tm_hour,
-                       NewTime->tm_min,
-                       NewTime->tm_sec
-                       );
+      fprintf (
+        stdout,
+        "%04d-%02d-%02d %02d:%02d:%02d",
+        NewTime->tm_year + 1900,
+        NewTime->tm_mon + 1,
+        NewTime->tm_mday,
+        NewTime->tm_hour,
+        NewTime->tm_min,
+        NewTime->tm_sec
+        );
     }
+
     if (Cptr != NULL) {
       strcpy (Line, ": ");
       strncat (Line, Cptr, MAX_LINE_LEN - strlen (Line) - 1);
       if (LineNumber != 0) {
-        sprintf (Line2, "(%u)", (unsigned) LineNumber);
+        sprintf (Line2, "(%u)", (unsigned)LineNumber);
         strncat (Line, Line2, MAX_LINE_LEN - strlen (Line) - 1);
       }
     }
@@ -418,10 +430,11 @@ PrintMessage (
       if (mUtilityName[0] != '\0') {
         fprintf (stdout, "%s...\n", mUtilityName);
       }
+
       strncpy (Line, Cptr, MAX_LINE_LEN - 1);
       Line[MAX_LINE_LEN - 1] = 0;
       if (LineNumber != 0) {
-        sprintf (Line2, "(%u)", (unsigned) LineNumber);
+        sprintf (Line2, "(%u)", (unsigned)LineNumber);
         strncat (Line, Line2, MAX_LINE_LEN - strlen (Line) - 1);
       }
     } else {
@@ -448,9 +461,10 @@ PrintMessage (
   strncat (Line, ": ", MAX_LINE_LEN - strlen (Line) - 1);
   strncat (Line, Type, MAX_LINE_LEN - strlen (Line) - 1);
   if (MessageCode != 0) {
-    sprintf (Line2, " %04u", (unsigned) MessageCode);
+    sprintf (Line2, " %04u", (unsigned)MessageCode);
     strncat (Line, Line2, MAX_LINE_LEN - strlen (Line) - 1);
   }
+
   fprintf (stdout, "%s", Line);
   //
   // If offending text was provided, then print it
@@ -458,6 +472,7 @@ PrintMessage (
   if (Text != NULL) {
     fprintf (stdout, ": %s", Text);
   }
+
   fprintf (stdout, "\n");
 
   //
@@ -467,7 +482,6 @@ PrintMessage (
     vsprintf (Line2, MsgFmt, List);
     fprintf (stdout, "  %s\n", Line2);
   }
-
 }
 
 /**
@@ -480,11 +494,12 @@ PrintMessage (
 STATIC
 VOID
 PrintSimpleMessage (
-  CHAR8   *MsgFmt,
-  va_list List
+  CHAR8    *MsgFmt,
+  va_list  List
   )
 {
-  CHAR8       Line[MAX_LINE_LEN];
+  CHAR8  Line[MAX_LINE_LEN];
+
   //
   // Print formatted message if provided
   //
@@ -507,8 +522,8 @@ ParserSetPosition (
   UINT32  LineNum
   )
 {
-  mSourceFileName     = SourceFileName;
-  mSourceFileLineNum  = LineNum;
+  mSourceFileName    = SourceFileName;
+  mSourceFileLineNum = LineNum;
 }
 
 /**
@@ -523,7 +538,7 @@ ParserSetPosition (
 **/
 VOID
 SetUtilityName (
-  CHAR8   *UtilityName
+  CHAR8  *UtilityName
   )
 {
   //
@@ -534,6 +549,7 @@ SetUtilityName (
     if (strlen (UtilityName) >= sizeof (mUtilityName)) {
       Error (UtilityName, 0, 0, "application error", "utility name length exceeds internal buffer size");
     }
+
     strncpy (mUtilityName, UtilityName, sizeof (mUtilityName) - 1);
     mUtilityName[sizeof (mUtilityName) - 1] = 0;
   } else {
@@ -580,16 +596,17 @@ SetPrintLevel (
 **/
 VOID
 VerboseMsg (
-  CHAR8   *MsgFmt,
+  CHAR8  *MsgFmt,
   ...
   )
 {
-  va_list List;
+  va_list  List;
+
   //
   // If the debug level is less than current print level, then do nothing.
   //
   if (VERBOSE_LOG_LEVEL < mPrintLogLevel) {
-    return ;
+    return;
   }
 
   va_start (List, MsgFmt);
@@ -606,16 +623,17 @@ VerboseMsg (
 **/
 VOID
 NormalMsg (
-  CHAR8   *MsgFmt,
+  CHAR8  *MsgFmt,
   ...
   )
 {
-  va_list List;
+  va_list  List;
+
   //
   // If the debug level is less than current print level, then do nothing.
   //
   if (INFO_LOG_LEVEL < mPrintLogLevel) {
-    return ;
+    return;
   }
 
   va_start (List, MsgFmt);
@@ -632,16 +650,17 @@ NormalMsg (
 **/
 VOID
 KeyMsg (
-  CHAR8   *MsgFmt,
+  CHAR8  *MsgFmt,
   ...
   )
 {
-  va_list List;
+  va_list  List;
+
   //
   // If the debug level is less than current print level, then do nothing.
   //
   if (KEY_LOG_LEVEL < mPrintLogLevel) {
-    return ;
+    return;
   }
 
   va_start (List, MsgFmt);
@@ -665,10 +684,10 @@ SetPrintLimits (
   UINT32  MaxWarningsPlusErrors
   )
 {
-  mMaxErrors              = MaxErrors;
-  mMaxWarnings            = MaxWarnings;
-  mMaxWarningsPlusErrors  = MaxWarningsPlusErrors;
-  mPrintLimitsSet         = 1;
+  mMaxErrors             = MaxErrors;
+  mMaxWarnings           = MaxWarnings;
+  mMaxWarningsPlusErrors = MaxWarningsPlusErrors;
+  mPrintLimitsSet        = 1;
 }
 
 STATIC
@@ -677,7 +696,8 @@ PrintLimitExceeded (
   VOID
   )
 {
-  STATIC INT8 mPrintLimitExceeded = 0;
+  STATIC INT8  mPrintLimitExceeded = 0;
+
   //
   // If we've already printed the message, do nothing. Otherwise
   // temporarily increase our print limits so we can pass one
@@ -701,10 +721,10 @@ TestUtilityMessages (
   VOID
   )
 {
-  CHAR8 *ArgStr = "ArgString";
-  int   ArgInt;
+  CHAR8  *ArgStr = "ArgString";
+  int    ArgInt;
 
-  ArgInt  = 0x12345678;
+  ArgInt = 0x12345678;
   //
   // Test without setting utility name
   //
@@ -785,4 +805,5 @@ TestUtilityMessages (
   ParserSetPosition (__FILE__, __LINE__ + 1);
   ParserWarning (4321, "Text1", "Text2 %s 0x%X", ArgStr, ArgInt);
 }
+
 #endif

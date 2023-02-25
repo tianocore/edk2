@@ -27,46 +27,46 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #define MAX_STRING_IDENTIFIER_NAME  100
 
-#define T_CHAR_SPACE                ' '
-#define T_CHAR_NULL                 0
-#define T_CHAR_CR                   '\r'
-#define T_CHAR_TAB                  '\t'
-#define T_CHAR_LF                   '\n'
-#define T_CHAR_SLASH                '/'
-#define T_CHAR_BACKSLASH            '\\'
-#define T_CHAR_DOUBLE_QUOTE         '"'
-#define T_CHAR_LC_X                 'x'
-#define T_CHAR_0                    '0'
-#define T_CHAR_STAR                 '*'
+#define T_CHAR_SPACE         ' '
+#define T_CHAR_NULL          0
+#define T_CHAR_CR            '\r'
+#define T_CHAR_TAB           '\t'
+#define T_CHAR_LF            '\n'
+#define T_CHAR_SLASH         '/'
+#define T_CHAR_BACKSLASH     '\\'
+#define T_CHAR_DOUBLE_QUOTE  '"'
+#define T_CHAR_LC_X          'x'
+#define T_CHAR_0             '0'
+#define T_CHAR_STAR          '*'
 
 //
 // We keep a linked list of these for the source files we process
 //
 typedef struct _SOURCE_FILE {
-  FILE                *Fptr;
-  CHAR8               *FileBuffer;
-  CHAR8               *FileBufferPtr;
-  UINTN               FileSize;
-  CHAR8               FileName[MAX_PATH];
-  UINTN               LineNum;
-  BOOLEAN             EndOfFile;
-  BOOLEAN             SkipToHash;
-  struct _SOURCE_FILE *Previous;
-  struct _SOURCE_FILE *Next;
-  CHAR8               ControlCharacter;
+  FILE                   *Fptr;
+  CHAR8                  *FileBuffer;
+  CHAR8                  *FileBufferPtr;
+  UINTN                  FileSize;
+  CHAR8                  FileName[MAX_PATH];
+  UINTN                  LineNum;
+  BOOLEAN                EndOfFile;
+  BOOLEAN                SkipToHash;
+  struct _SOURCE_FILE    *Previous;
+  struct _SOURCE_FILE    *Next;
+  CHAR8                  ControlCharacter;
 } SOURCE_FILE;
 
 typedef struct {
-  CHAR8   *FileBufferPtr;
+  CHAR8    *FileBufferPtr;
 } FILE_POSITION;
 
 //
 // Keep all our module globals in this structure
 //
 STATIC struct {
-  SOURCE_FILE SourceFile;
-  BOOLEAN     VerboseFile;
-  BOOLEAN     VerboseToken;
+  SOURCE_FILE    SourceFile;
+  BOOLEAN        VerboseFile;
+  BOOLEAN        VerboseToken;
 } mGlobals;
 
 STATIC
@@ -81,7 +81,7 @@ UINTN
 t_strncmp (
   CHAR8  *Str1,
   CHAR8  *Str2,
-  INTN    Len
+  INTN   Len
   );
 
 STATIC
@@ -93,31 +93,31 @@ t_strlen (
 STATIC
 VOID
 RewindFile (
-  SOURCE_FILE *SourceFile
+  SOURCE_FILE  *SourceFile
   );
 
 STATIC
 BOOLEAN
 IsWhiteSpace (
-  SOURCE_FILE *SourceFile
+  SOURCE_FILE  *SourceFile
   );
 
 STATIC
 UINTN
 SkipWhiteSpace (
-  SOURCE_FILE *SourceFile
+  SOURCE_FILE  *SourceFile
   );
 
 STATIC
 BOOLEAN
 EndOfFile (
-  SOURCE_FILE *SourceFile
+  SOURCE_FILE  *SourceFile
   );
 
 STATIC
 VOID
 PreprocessFile (
-  SOURCE_FILE *SourceFile
+  SOURCE_FILE  *SourceFile
   );
 
 STATIC
@@ -130,26 +130,26 @@ t_strcpy (
 STATIC
 STATUS
 ProcessIncludeFile (
-  SOURCE_FILE *SourceFile,
-  SOURCE_FILE *ParentSourceFile
+  SOURCE_FILE  *SourceFile,
+  SOURCE_FILE  *ParentSourceFile
   );
 
 STATIC
 STATUS
 ProcessFile (
-  SOURCE_FILE *SourceFile
+  SOURCE_FILE  *SourceFile
   );
 
 STATIC
 STATUS
 GetFilePosition (
-  FILE_POSITION *Fpos
+  FILE_POSITION  *Fpos
   );
 
 STATIC
 STATUS
 SetFilePosition (
-  FILE_POSITION *Fpos
+  FILE_POSITION  *Fpos
   );
 
 /**
@@ -160,7 +160,7 @@ SFPInit (
   VOID
   )
 {
-  memset ((VOID *) &mGlobals, 0, sizeof (mGlobals));
+  memset ((VOID *)&mGlobals, 0, sizeof (mGlobals));
   return STATUS_SUCCESS;
 }
 
@@ -204,10 +204,11 @@ SFPGetFileName (
 **/
 STATUS
 SFPOpenFile (
-  CHAR8      *FileName
+  CHAR8  *FileName
   )
 {
   STATUS  Status;
+
   t_strcpy (mGlobals.SourceFile.FileName, FileName);
   Status = ProcessIncludeFile (&mGlobals.SourceFile, NULL);
   return Status;
@@ -223,7 +224,7 @@ SFPOpenFile (
    is not a subset of some other token.
 
    The file pointer is advanced past the token in the input file.
- 
+
   @param Str the token to look for
 
   @retval TRUE the token is next
@@ -235,6 +236,7 @@ SFPIsToken (
   )
 {
   UINTN  Len;
+
   SkipWhiteSpace (&mGlobals.SourceFile);
   if (EndOfFile (&mGlobals.SourceFile)) {
     return FALSE;
@@ -259,7 +261,7 @@ SFPIsToken (
  @note:
    A keyword is defined as a "special" string that has a non-alphanumeric
    character following it.
- 
+
   @param Str keyword to look for
 
   @retval TRUE the keyword is next
@@ -271,6 +273,7 @@ SFPIsKeyword (
   )
 {
   UINTN  Len;
+
   SkipWhiteSpace (&mGlobals.SourceFile);
   if (EndOfFile (&mGlobals.SourceFile)) {
     return FALSE;
@@ -299,7 +302,7 @@ SFPIsKeyword (
    Preceding white space is ignored.
    The parser's buffer pointer is advanced past the end of the
    token.
- 
+
   @param Str pointer to a copy of the next token
   @param Len size of buffer pointed to by Str
 
@@ -319,12 +322,14 @@ SFPGetNextToken (
   if (EndOfFile (&mGlobals.SourceFile)) {
     return FALSE;
   }
+
   //
   // Have to have enough string for at least one char and a null-terminator
   //
   if (Len < 2) {
     return FALSE;
   }
+
   //
   // Look at the first character. If it's an identifier, then treat it
   // as such
@@ -340,7 +345,8 @@ SFPGetNextToken (
           ((TempChar >= 'A') && (TempChar <= 'Z')) ||
           ((TempChar >= '0') && (TempChar <= '9')) ||
           (TempChar == '_')
-          ) {
+          )
+      {
         Str[Index] = mGlobals.SourceFile.FileBufferPtr[0];
         mGlobals.SourceFile.FileBufferPtr++;
         Index++;
@@ -351,6 +357,7 @@ SFPGetNextToken (
         break;
       }
     }
+
     //
     // Null terminate and return success
     //
@@ -380,6 +387,7 @@ SFPGetNextToken (
         Index++;
       }
     }
+
     //
     // See if we just ran out of file contents, but did find a token
     //
@@ -403,11 +411,12 @@ SFPGetNextToken (
 **/
 BOOLEAN
 SFPGetGuidToken (
-  CHAR8  *Str,
-  UINT32 Len
+  CHAR8   *Str,
+  UINT32  Len
   )
 {
   UINT32  Index;
+
   SkipWhiteSpace (&mGlobals.SourceFile);
   if (EndOfFile (&mGlobals.SourceFile)) {
     return FALSE;
@@ -438,7 +447,8 @@ SFPSkipToToken (
   )
 {
   UINTN  Len;
-  CHAR8         *SavePos;
+  CHAR8  *SavePos;
+
   Len     = t_strlen (Str);
   SavePos = mGlobals.SourceFile.FileBufferPtr;
   SkipWhiteSpace (&mGlobals.SourceFile);
@@ -467,10 +477,10 @@ SFPSkipToToken (
 **/
 BOOLEAN
 SFPGetNumber (
-  UINTN *Value
+  UINTN  *Value
   )
 {
-  int Val;
+  int  Val;
 
   SkipWhiteSpace (&mGlobals.SourceFile);
   if (EndOfFile (&mGlobals.SourceFile)) {
@@ -488,7 +498,7 @@ SFPGetNumber (
 
       mGlobals.SourceFile.FileBufferPtr += 2;
       sscanf (mGlobals.SourceFile.FileBufferPtr, "%x", &Val);
-      *Value = (UINT32) Val;
+      *Value = (UINT32)Val;
       while (isxdigit ((int)mGlobals.SourceFile.FileBufferPtr[0])) {
         mGlobals.SourceFile.FileBufferPtr++;
       }
@@ -538,13 +548,13 @@ SFPCloseFile (
 STATIC
 STATUS
 ProcessIncludeFile (
-  SOURCE_FILE *SourceFile,
-  SOURCE_FILE *ParentSourceFile
+  SOURCE_FILE  *SourceFile,
+  SOURCE_FILE  *ParentSourceFile
   )
 {
-  STATIC UINTN NestDepth = 0;
-  CHAR8               FoundFileName[MAX_PATH];
-  STATUS              Status;
+  STATIC UINTN  NestDepth = 0;
+  CHAR8         FoundFileName[MAX_PATH];
+  STATUS        Status;
 
   Status = STATUS_SUCCESS;
   NestDepth++;
@@ -561,10 +571,11 @@ ProcessIncludeFile (
   // Make sure we didn't exceed our maximum nesting depth
   //
   if (NestDepth > MAX_NEST_DEPTH) {
-    Error (NULL, 0, 3001, "Not Supported", "%s exceeds max nesting depth (%u)", SourceFile->FileName, (unsigned) NestDepth);
+    Error (NULL, 0, 3001, "Not Supported", "%s exceeds max nesting depth (%u)", SourceFile->FileName, (unsigned)NestDepth);
     Status = STATUS_ERROR;
     goto Finish;
   }
+
   //
   // Try to open the file locally, and if that fails try along our include paths.
   //
@@ -572,6 +583,7 @@ ProcessIncludeFile (
   if ((SourceFile->Fptr = fopen (LongFilePath (FoundFileName), "rb")) == NULL) {
     return STATUS_ERROR;
   }
+
   //
   // Process the file found
   //
@@ -599,7 +611,7 @@ Finish:
 STATIC
 STATUS
 ProcessFile (
-  SOURCE_FILE *SourceFile
+  SOURCE_FILE  *SourceFile
   )
 {
   //
@@ -609,18 +621,18 @@ ProcessFile (
   fseek (SourceFile->Fptr, 0, SEEK_END);
   SourceFile->FileSize = ftell (SourceFile->Fptr);
   if (mGlobals.VerboseFile) {
-    printf ("FileSize = %u (0x%X)\n", (unsigned) SourceFile->FileSize, (unsigned) SourceFile->FileSize);
+    printf ("FileSize = %u (0x%X)\n", (unsigned)SourceFile->FileSize, (unsigned)SourceFile->FileSize);
   }
 
   fseek (SourceFile->Fptr, 0, SEEK_SET);
-  SourceFile->FileBuffer = (CHAR8  *) malloc (SourceFile->FileSize + sizeof (CHAR8 ));
+  SourceFile->FileBuffer = (CHAR8  *)malloc (SourceFile->FileSize + sizeof (CHAR8));
   if (SourceFile->FileBuffer == NULL) {
     Error (NULL, 0, 4001, "Resource: memory cannot be allocated", NULL);
     return STATUS_ERROR;
   }
 
-  fread ((VOID *) SourceFile->FileBuffer, SourceFile->FileSize, 1, SourceFile->Fptr);
-  SourceFile->FileBuffer[(SourceFile->FileSize / sizeof (CHAR8 ))] = T_CHAR_NULL;
+  fread ((VOID *)SourceFile->FileBuffer, SourceFile->FileSize, 1, SourceFile->Fptr);
+  SourceFile->FileBuffer[(SourceFile->FileSize / sizeof (CHAR8))] = T_CHAR_NULL;
   //
   // Pre-process the file to replace comments with spaces
   //
@@ -638,12 +650,12 @@ ProcessFile (
 STATIC
 VOID
 PreprocessFile (
-  SOURCE_FILE *SourceFile
+  SOURCE_FILE  *SourceFile
   )
 {
-  BOOLEAN InComment;
-  BOOLEAN SlashSlashComment;
-  int     LineNum;
+  BOOLEAN  InComment;
+  BOOLEAN  SlashSlashComment;
+  int      LineNum;
 
   RewindFile (SourceFile);
   InComment         = FALSE;
@@ -669,10 +681,11 @@ PreprocessFile (
       // Check for */ comment end
       //
     } else if (InComment &&
-             !SlashSlashComment &&
-             (SourceFile->FileBufferPtr[0] == T_CHAR_STAR) &&
-             (SourceFile->FileBufferPtr[1] == T_CHAR_SLASH)
-            ) {
+               !SlashSlashComment &&
+               (SourceFile->FileBufferPtr[0] == T_CHAR_STAR) &&
+               (SourceFile->FileBufferPtr[1] == T_CHAR_SLASH)
+               )
+    {
       SourceFile->FileBufferPtr[0] = T_CHAR_SPACE;
       SourceFile->FileBufferPtr++;
       SourceFile->FileBufferPtr[0] = T_CHAR_SPACE;
@@ -701,6 +714,7 @@ PreprocessFile (
       SourceFile->FileBufferPtr++;
     }
   }
+
   //
   // Could check for end-of-file and still in a comment, but
   // should not be necessary. So just restore the file pointers.
@@ -740,8 +754,8 @@ PreprocessFile (
 **/
 BOOLEAN
 SFPGetQuotedString (
-  CHAR8       *Str,
-  INTN         Length
+  CHAR8  *Str,
+  INTN   Length
   )
 {
   SkipWhiteSpace (&mGlobals.SourceFile);
@@ -755,6 +769,7 @@ SFPGetQuotedString (
       if (EndOfFile (&mGlobals.SourceFile)) {
         return FALSE;
       }
+
       //
       // Check for closing quote
       //
@@ -770,6 +785,7 @@ SFPGetQuotedString (
       mGlobals.SourceFile.FileBufferPtr++;
     }
   }
+
   //
   // First character was not a quote, or the input string length was
   // insufficient to contain the quoted string, so return failure code.
@@ -797,15 +813,15 @@ SFPIsEOF (
 STATIC
 CHAR8  *
 GetQuotedString (
-  SOURCE_FILE *SourceFile,
-  BOOLEAN     Optional
+  SOURCE_FILE  *SourceFile,
+  BOOLEAN      Optional
   )
 {
-  CHAR8         *String;
-  CHAR8         *Start;
-  CHAR8         *Ptr;
-  UINTN         Len;
-  BOOLEAN       PreviousBackslash;
+  CHAR8    *String;
+  CHAR8    *Start;
+  CHAR8    *Ptr;
+  UINTN    Len;
+  BOOLEAN  PreviousBackslash;
 
   if (SourceFile->FileBufferPtr[0] != T_CHAR_DOUBLE_QUOTE) {
     if (Optional == FALSE) {
@@ -840,14 +856,16 @@ GetQuotedString (
   } else {
     SourceFile->FileBufferPtr++;
   }
+
   //
   // Now allocate memory for the string and save it off
   //
-  String = (CHAR8  *) malloc ((Len + 1) * sizeof (CHAR8 ));
+  String = (CHAR8  *)malloc ((Len + 1) * sizeof (CHAR8));
   if (String == NULL) {
     Error (NULL, 0, 4001, "Resource: memory cannot be allocated", NULL);
     return NULL;
   }
+
   //
   // Copy the string from the file buffer to the local copy.
   // We do no reformatting of it whatsoever at this point.
@@ -863,18 +881,19 @@ GetQuotedString (
   *Ptr = 0;
   return String;
 }
+
 #endif
 STATIC
 BOOLEAN
 EndOfFile (
-  SOURCE_FILE *SourceFile
+  SOURCE_FILE  *SourceFile
   )
 {
   //
   // The file buffer pointer will typically get updated before the End-of-file flag in the
   // source file structure, so check it first.
   //
-  if (SourceFile->FileBufferPtr >= SourceFile->FileBuffer + SourceFile->FileSize / sizeof (CHAR8 )) {
+  if (SourceFile->FileBufferPtr >= SourceFile->FileBuffer + SourceFile->FileSize / sizeof (CHAR8)) {
     SourceFile->EndOfFile = TRUE;
     return TRUE;
   }
@@ -890,19 +909,20 @@ EndOfFile (
 STATIC
 VOID
 ProcessTokenInclude (
-  SOURCE_FILE *SourceFile
+  SOURCE_FILE  *SourceFile
   )
 {
-  CHAR8          IncludeFileName[MAX_PATH];
-  CHAR8          *To;
-  UINTN  Len;
-  BOOLEAN       ReportedError;
-  SOURCE_FILE   IncludedSourceFile;
+  CHAR8        IncludeFileName[MAX_PATH];
+  CHAR8        *To;
+  UINTN        Len;
+  BOOLEAN      ReportedError;
+  SOURCE_FILE  IncludedSourceFile;
 
   ReportedError = FALSE;
   if (SkipWhiteSpace (SourceFile) == 0) {
     Warning (SourceFile->FileName, SourceFile->LineNum, 0, "expected whitespace following #include keyword", NULL);
   }
+
   //
   // Should be quoted file name
   //
@@ -927,6 +947,7 @@ ProcessTokenInclude (
       SourceFile->FileBufferPtr++;
       break;
     }
+
     //
     // If too long, then report the error once and process until the closing quote
     //
@@ -937,7 +958,7 @@ ProcessTokenInclude (
     }
 
     if (!ReportedError) {
-      *To = (CHAR8 ) SourceFile->FileBufferPtr[0];
+      *To = (CHAR8)SourceFile->FileBufferPtr[0];
       To++;
     }
 
@@ -946,41 +967,42 @@ ProcessTokenInclude (
 
   if (!ReportedError) {
     *To = 0;
-    memset ((CHAR8 *) &IncludedSourceFile, 0, sizeof (SOURCE_FILE));
+    memset ((CHAR8 *)&IncludedSourceFile, 0, sizeof (SOURCE_FILE));
     strcpy (IncludedSourceFile.FileName, IncludeFileName);
     ProcessIncludeFile (&IncludedSourceFile, SourceFile);
   }
 
-  return ;
+  return;
 FailDone:
   //
   // Error recovery -- skip to next #
   //
   SourceFile->SkipToHash = TRUE;
 }
+
 #endif
 STATIC
 BOOLEAN
 IsWhiteSpace (
-  SOURCE_FILE *SourceFile
+  SOURCE_FILE  *SourceFile
   )
 {
   switch (*SourceFile->FileBufferPtr) {
-  case T_CHAR_NULL:
-  case T_CHAR_CR:
-  case T_CHAR_SPACE:
-  case T_CHAR_TAB:
-  case T_CHAR_LF:
-    return TRUE;
+    case T_CHAR_NULL:
+    case T_CHAR_CR:
+    case T_CHAR_SPACE:
+    case T_CHAR_TAB:
+    case T_CHAR_LF:
+      return TRUE;
 
-  default:
-    return FALSE;
+    default:
+      return FALSE;
   }
 }
 
 UINTN
 SkipWhiteSpace (
-  SOURCE_FILE *SourceFile
+  SOURCE_FILE  *SourceFile
   )
 {
   UINTN  Count;
@@ -989,22 +1011,23 @@ SkipWhiteSpace (
   while (!EndOfFile (SourceFile)) {
     Count++;
     switch (*SourceFile->FileBufferPtr) {
-    case T_CHAR_NULL:
-    case T_CHAR_CR:
-    case T_CHAR_SPACE:
-    case T_CHAR_TAB:
-      SourceFile->FileBufferPtr++;
-      break;
+      case T_CHAR_NULL:
+      case T_CHAR_CR:
+      case T_CHAR_SPACE:
+      case T_CHAR_TAB:
+        SourceFile->FileBufferPtr++;
+        break;
 
-    case T_CHAR_LF:
-      SourceFile->FileBufferPtr++;
-      SourceFile->LineNum++;
-      break;
+      case T_CHAR_LF:
+        SourceFile->FileBufferPtr++;
+        SourceFile->LineNum++;
+        break;
 
-    default:
-      return Count - 1;
+      default:
+        return Count - 1;
     }
   }
+
   //
   // Some tokens require trailing whitespace. If we're at the end of the
   // file, then we count that as well.
@@ -1056,6 +1079,7 @@ t_strlen (
   )
 {
   UINTN  Len;
+
   Len = 0;
   while (*Str) {
     Len++;
@@ -1070,7 +1094,7 @@ UINTN
 t_strncmp (
   CHAR8  *Str1,
   CHAR8  *Str2,
-  INTN    Len
+  INTN   Len
   )
 {
   while (Len > 0) {
@@ -1093,7 +1117,8 @@ t_strcpy (
   CHAR8  *Src
   )
 {
-  CHAR8   *SaveDest;
+  CHAR8  *SaveDest;
+
   SaveDest = Dest;
   while (*Src) {
     *Dest = *Src;
@@ -1108,7 +1133,7 @@ t_strcpy (
 STATIC
 VOID
 RewindFile (
-  SOURCE_FILE *SourceFile
+  SOURCE_FILE  *SourceFile
   )
 {
   SourceFile->LineNum       = 1;
@@ -1119,11 +1144,12 @@ RewindFile (
 STATIC
 UINT32
 GetHexChars (
-  CHAR8       *Buffer,
-  UINT32      BufferLen
+  CHAR8   *Buffer,
+  UINT32  BufferLen
   )
 {
   UINT32  Len;
+
   Len = 0;
   while (!EndOfFile (&mGlobals.SourceFile) && (Len < BufferLen)) {
     if (isxdigit ((int)mGlobals.SourceFile.FileBufferPtr[0])) {
@@ -1134,6 +1160,7 @@ GetHexChars (
       break;
     }
   }
+
   //
   // Null terminate if we can
   //
@@ -1158,19 +1185,19 @@ GetHexChars (
 **/
 BOOLEAN
 SFPGetGuid (
-  INTN         GuidStyle,
-  EFI_GUID    *Value
+  INTN      GuidStyle,
+  EFI_GUID  *Value
   )
 {
-  INT32         Value32;
-  UINT32        Index;
-  FILE_POSITION FPos;
-  CHAR8         TempString[20];
-  CHAR8         TempString2[3];
-  CHAR8         *From;
-  CHAR8         *To;
-  UINT32        Len;
-  BOOLEAN       Status;
+  INT32          Value32;
+  UINT32         Index;
+  FILE_POSITION  FPos;
+  CHAR8          TempString[20];
+  CHAR8          TempString2[3];
+  CHAR8          *From;
+  CHAR8          *To;
+  UINT32         Len;
+  BOOLEAN        Status;
 
   Status = FALSE;
   //
@@ -1207,7 +1234,7 @@ SFPGetGuid (
     }
 
     sscanf (TempString, "%x", &Value32);
-    Value->Data2 = (UINT16) Value32;
+    Value->Data2 = (UINT16)Value32;
 
     if (mGlobals.SourceFile.FileBufferPtr[0] != '-') {
       goto Done;
@@ -1220,7 +1247,7 @@ SFPGetGuid (
     }
 
     sscanf (TempString, "%x", &Value32);
-    Value->Data3 = (UINT16) Value32;
+    Value->Data3 = (UINT16)Value32;
     //
     // Parse the "AAAA" as two bytes
     //
@@ -1235,8 +1262,8 @@ SFPGetGuid (
     }
 
     sscanf (TempString, "%x", &Value32);
-    Value->Data4[0] = (UINT8) (Value32 >> 8);
-    Value->Data4[1] = (UINT8) Value32;
+    Value->Data4[0] = (UINT8)(Value32 >> 8);
+    Value->Data4[1] = (UINT8)Value32;
     if (mGlobals.SourceFile.FileBufferPtr[0] != '-') {
       goto Done;
     }
@@ -1250,13 +1277,14 @@ SFPGetGuid (
     if ((Len == 0) || (Len > 12)) {
       goto Done;
     }
+
     //
     // Insert leading 0's to make life easier
     //
     if (Len != 12) {
-      From            = TempString + Len - 1;
-      To              = TempString + 11;
-      TempString[12]  = 0;
+      From           = TempString + Len - 1;
+      To             = TempString + 11;
+      TempString[12] = 0;
       while (From >= TempString) {
         *To = *From;
         To--;
@@ -1268,6 +1296,7 @@ SFPGetGuid (
         To--;
       }
     }
+
     //
     // Now parse each byte
     //
@@ -1277,10 +1306,10 @@ SFPGetGuid (
       // Copy the two characters from the input string to something
       // we can parse.
       //
-      TempString2[0]  = TempString[Index * 2];
-      TempString2[1]  = TempString[Index * 2 + 1];
+      TempString2[0] = TempString[Index * 2];
+      TempString2[1] = TempString[Index * 2 + 1];
       sscanf (TempString2, "%x", &Value32);
-      Value->Data4[Index + 2] = (UINT8) Value32;
+      Value->Data4[Index + 2] = (UINT8)Value32;
     }
 
     Status = TRUE;
@@ -1302,7 +1331,7 @@ Done:
 STATIC
 STATUS
 GetFilePosition (
-  FILE_POSITION *Fpos
+  FILE_POSITION  *Fpos
   )
 {
   Fpos->FileBufferPtr = mGlobals.SourceFile.FileBufferPtr;
@@ -1312,7 +1341,7 @@ GetFilePosition (
 STATIC
 STATUS
 SetFilePosition (
-  FILE_POSITION *Fpos
+  FILE_POSITION  *Fpos
   )
 {
   //

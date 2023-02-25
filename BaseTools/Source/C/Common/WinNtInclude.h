@@ -9,14 +9,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __WIN_NT_INCLUDE_H__
 #define __WIN_NT_INCLUDE_H__
 
-#define GUID  _WINNT_DUP_GUID_____
+#define GUID         _WINNT_DUP_GUID_____
 #define _LIST_ENTRY  _WINNT_DUP_LIST_ENTRY_FORWARD
 #define LIST_ENTRY   _WINNT_DUP_LIST_ENTRY
 
 #if (_MSC_VER < 1800)
-#define InterlockedIncrement _WINNT_DUP_InterlockedIncrement
-#define InterlockedDecrement _WINNT_DUP_InterlockedDecrement
-#define InterlockedCompareExchange64 _WINNT_DUP_InterlockedCompareExchange64
+#define InterlockedIncrement          _WINNT_DUP_InterlockedIncrement
+#define InterlockedDecrement          _WINNT_DUP_InterlockedDecrement
+#define InterlockedCompareExchange64  _WINNT_DUP_InterlockedCompareExchange64
 #endif
 
 #undef UNALIGNED
@@ -24,7 +24,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #undef VOID
 
 #ifndef __GNUC__
-#include "windows.h"
+  #include "windows.h"
 
 //
 // Win32 include files do not compile clean with /W4, so we use the warning
@@ -32,18 +32,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // compile at /W4 (highest warning level) with /WX (warnings cause build
 // errors).
 //
-#pragma warning(disable : 4115)
-#pragma warning(disable : 4201)
-#pragma warning(disable : 4214)
-#pragma warning(disable : 4028)
-#pragma warning(disable : 4133)
+  #pragma warning(disable : 4115)
+  #pragma warning(disable : 4201)
+  #pragma warning(disable : 4214)
+  #pragma warning(disable : 4028)
+  #pragma warning(disable : 4133)
 
 //
 // Set the warnings back on as the EFI code must be /W4.
 //
-#pragma warning(default : 4115)
-#pragma warning(default : 4201)
-#pragma warning(default : 4214)
+  #pragma warning(default : 4115)
+  #pragma warning(default : 4201)
+  #pragma warning(default : 4214)
 
 #endif
 
@@ -55,7 +55,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #undef InterlockedCompareExchange64
 #undef InterlockedCompareExchangePointer
 
-#define VOID void
+#define VOID  void
 
 //
 // Prevent collisions with Windows API name macros that deal with Unicode/Not issues

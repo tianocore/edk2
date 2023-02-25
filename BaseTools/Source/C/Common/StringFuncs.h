@@ -17,13 +17,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Common data structures
 //
 typedef struct {
-  UINTN      Count;
+  UINTN    Count;
   //
   // Actually this array can be 0 or more items (based on Count)
   //
-  CHAR8*     Strings[1];
+  CHAR8    *Strings[1];
 } STRING_LIST;
-
 
 //
 // Functions declarations
@@ -36,9 +35,9 @@ typedef struct {
 
   @return CHAR8* - NULL if there are not enough resources
 **/
-CHAR8*
+CHAR8 *
 CloneString (
-  IN CHAR8       *String
+  IN CHAR8  *String
   )
 ;
 
@@ -51,7 +50,7 @@ CloneString (
 **/
 EFI_STATUS
 StripInfDscStringInPlace (
-  IN CHAR8       *String
+  IN CHAR8  *String
   )
 ;
 
@@ -63,9 +62,9 @@ StripInfDscStringInPlace (
 
   @return EFI_STATUS
 **/
-STRING_LIST*
+STRING_LIST *
 SplitStringByWhitespace (
-  IN CHAR8       *String
+  IN CHAR8  *String
   )
 ;
 
@@ -74,11 +73,10 @@ SplitStringByWhitespace (
 
   @return STRING_LIST* - Null if there is not enough resources to create the object.
 **/
-STRING_LIST*
+STRING_LIST *
 NewStringList (
   )
 ;
-
 
 /**
   Adds String to StringList.  A new copy of String is made before it is
@@ -88,8 +86,8 @@ NewStringList (
 **/
 EFI_STATUS
 AppendCopyOfStringToList (
-  IN OUT STRING_LIST **StringList,
-  IN CHAR8       *String
+  IN OUT STRING_LIST  **StringList,
+  IN CHAR8            *String
   )
 ;
 
@@ -103,10 +101,9 @@ AppendCopyOfStringToList (
 **/
 EFI_STATUS
 RemoveLastStringFromList (
-  IN STRING_LIST       *StringList
+  IN STRING_LIST  *StringList
   )
 ;
-
 
 /**
   Allocates a STRING_LIST structure that can store StringCount strings.
@@ -115,12 +112,11 @@ RemoveLastStringFromList (
 
   @return EFI_STATUS
 **/
-STRING_LIST*
+STRING_LIST *
 AllocateStringListStruct (
-  IN UINTN StringCount
+  IN UINTN  StringCount
   )
 ;
-
 
 /**
   Frees all memory associated with StringList.
@@ -131,10 +127,9 @@ AllocateStringListStruct (
 **/
 VOID
 FreeStringList (
-  IN STRING_LIST       *StringList
+  IN STRING_LIST  *StringList
   )
 ;
-
 
 /**
   Generates a string that represents the STRING_LIST
@@ -144,12 +139,11 @@ FreeStringList (
   @return CHAR8* The string list represented with a single string.  The returned
            string must be freed by the caller.
 **/
-CHAR8*
+CHAR8 *
 StringListToString (
-  IN STRING_LIST       *StringList
+  IN STRING_LIST  *StringList
   )
 ;
-
 
 /**
   Prints out the string list
@@ -158,10 +152,8 @@ StringListToString (
 **/
 VOID
 PrintStringList (
-  IN STRING_LIST       *StringList
+  IN STRING_LIST  *StringList
   )
 ;
-
-
 
 #endif

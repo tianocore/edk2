@@ -29,9 +29,9 @@
 //
 // Macro definitions for RISC-V architecture.
 //
-#define RV_X(x, s, n) (((x) >> (s)) & ((1<<(n))-1))
-#define RISCV_IMM_BITS 12
-#define RISCV_IMM_REACH (1LL<<RISCV_IMM_BITS)
+#define RV_X(x, s, n)  (((x) >> (s)) & ((1<<(n))-1))
+#define RISCV_IMM_BITS   12
+#define RISCV_IMM_REACH  (1LL<<RISCV_IMM_BITS)
 #define RISCV_CONST_HIGH_PART(VALUE) \
   (((VALUE) + (RISCV_IMM_REACH/2)) & ~(RISCV_IMM_REACH-1))
 
@@ -40,7 +40,7 @@
 //
 typedef
 RETURN_STATUS
-(EFIAPI *PE_COFF_LOADER_READ_FILE) (
+(EFIAPI *PE_COFF_LOADER_READ_FILE)(
   IN     VOID   *FileHandle,
   IN     UINTN  FileOffset,
   IN OUT UINTN  *ReadSize,
@@ -51,29 +51,28 @@ RETURN_STATUS
 // Context structure used while PE/COFF image is being loaded and relocated
 //
 typedef struct {
-  PHYSICAL_ADDRESS                  ImageAddress;
-  UINT64                            ImageSize;
-  PHYSICAL_ADDRESS                  DestinationAddress;
-  PHYSICAL_ADDRESS                  EntryPoint;
-  PE_COFF_LOADER_READ_FILE          ImageRead;
-  VOID                              *Handle;
-  VOID                              *FixupData;
-  UINT32                            SectionAlignment;
-  UINT32                            PeCoffHeaderOffset;
-  UINT32                            DebugDirectoryEntryRva;
-  VOID                              *CodeView;
-  CHAR8                             *PdbPointer;
-  UINTN                             SizeOfHeaders;
-  UINT32                            ImageCodeMemoryType;
-  UINT32                            ImageDataMemoryType;
-  UINT32                            ImageError;
-  UINTN                             FixupDataSize;
-  UINT16                            Machine;
-  UINT16                            ImageType;
-  BOOLEAN                           RelocationsStripped;
-  BOOLEAN                           IsTeImage;
+  PHYSICAL_ADDRESS            ImageAddress;
+  UINT64                      ImageSize;
+  PHYSICAL_ADDRESS            DestinationAddress;
+  PHYSICAL_ADDRESS            EntryPoint;
+  PE_COFF_LOADER_READ_FILE    ImageRead;
+  VOID                        *Handle;
+  VOID                        *FixupData;
+  UINT32                      SectionAlignment;
+  UINT32                      PeCoffHeaderOffset;
+  UINT32                      DebugDirectoryEntryRva;
+  VOID                        *CodeView;
+  CHAR8                       *PdbPointer;
+  UINTN                       SizeOfHeaders;
+  UINT32                      ImageCodeMemoryType;
+  UINT32                      ImageDataMemoryType;
+  UINT32                      ImageError;
+  UINTN                       FixupDataSize;
+  UINT16                      Machine;
+  UINT16                      ImageType;
+  BOOLEAN                     RelocationsStripped;
+  BOOLEAN                     IsTeImage;
 } PE_COFF_LOADER_IMAGE_CONTEXT;
-
 
 /**
   Retrieves information on a PE/COFF image
@@ -162,7 +161,7 @@ PeCoffLoaderGetEntryPoint (
 UINT16
 EFIAPI
 ThumbMovtImmediateAddress (
-  IN UINT16 *Instruction
+  IN UINT16  *Instruction
   );
 
 /**
@@ -175,10 +174,9 @@ ThumbMovtImmediateAddress (
 VOID
 EFIAPI
 ThumbMovtImmediatePatch (
-  IN OUT UINT16 *Instruction,
-  IN     UINT16 Address
+  IN OUT UINT16  *Instruction,
+  IN     UINT16  Address
   );
-
 
 /**
   Pass in a pointer to an ARM MOVW/MOVT instruction pair and
@@ -192,7 +190,7 @@ ThumbMovtImmediatePatch (
 UINT32
 EFIAPI
 ThumbMovwMovtImmediateAddress (
-  IN UINT16 *Instructions
+  IN UINT16  *Instructions
   );
 
 /**
@@ -204,10 +202,8 @@ ThumbMovwMovtImmediateAddress (
 VOID
 EFIAPI
 ThumbMovwMovtImmediatePatch (
-  IN OUT UINT16 *Instructions,
-  IN     UINT32 Address
+  IN OUT UINT16  *Instructions,
+  IN     UINT32  Address
   );
-
-
 
 #endif

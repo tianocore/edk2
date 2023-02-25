@@ -22,40 +22,39 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 VOID *
 CommonLibBinderAllocate (
-  IN UINTN Size
+  IN UINTN  Size
   );
 
 VOID
 CommonLibBinderFree (
-  IN VOID *Pointer
+  IN VOID  *Pointer
   );
 
 VOID
 CommonLibBinderCopyMem (
-  IN VOID *Destination,
-  IN VOID *Source,
-  IN UINTN Length
+  IN VOID   *Destination,
+  IN VOID   *Source,
+  IN UINTN  Length
   );
 
 VOID
 CommonLibBinderSetMem (
-  IN VOID *Destination,
-  IN UINTN Length,
-  IN UINT8 Value
+  IN VOID   *Destination,
+  IN UINTN  Length,
+  IN UINT8  Value
   );
 
 INTN
 CommonLibBinderCompareMem (
-  IN VOID *MemOne,
-  IN VOID *MemTwo,
-  IN UINTN Length
+  IN VOID   *MemOne,
+  IN VOID   *MemTwo,
+  IN UINTN  Length
   );
 
 BOOLEAN
 CommonLibBinderCompareGuid (
-  IN EFI_GUID *Guid1,
-  IN EFI_GUID *Guid2
+  IN EFI_GUID  *Guid1,
+  IN EFI_GUID  *Guid2
   );
 
 #endif // #ifndef CommonLibs_h_INCLUDED
-

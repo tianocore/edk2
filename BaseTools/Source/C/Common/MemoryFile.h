@@ -17,11 +17,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Common data structures
 //
 typedef struct {
-  CHAR8 *FileImage;
-  CHAR8 *Eof;
-  CHAR8 *CurrentFilePointer;
+  CHAR8    *FileImage;
+  CHAR8    *Eof;
+  CHAR8    *CurrentFilePointer;
 } MEMORY_FILE;
-
 
 //
 // Functions declarations
@@ -39,8 +38,8 @@ typedef struct {
 **/
 EFI_STATUS
 GetMemoryFile (
-  IN CHAR8       *InputFileName,
-  OUT EFI_HANDLE *OutputMemoryFile
+  IN CHAR8        *InputFileName,
+  OUT EFI_HANDLE  *OutputMemoryFile
   )
 ;
 
@@ -53,7 +52,7 @@ GetMemoryFile (
 **/
 EFI_STATUS
 FreeMemoryFile (
-  IN EFI_HANDLE InputMemoryFile
+  IN EFI_HANDLE  InputMemoryFile
   )
 ;
 
@@ -71,9 +70,8 @@ FreeMemoryFile (
 **/
 CHAR8 *
 ReadMemoryFileLine (
-  IN EFI_HANDLE     InputMemoryFile
+  IN EFI_HANDLE  InputMemoryFile
   )
 ;
-
 
 #endif

@@ -13,14 +13,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "CommonLib.h"
 #include "MemoryFile.h"
 
-
 //
 // Local (static) function prototypes
 //
 STATIC
 VOID
 CheckMemoryFileState (
-  IN EFI_HANDLE InputMemoryFile
+  IN EFI_HANDLE  InputMemoryFile
   );
 
 //
@@ -39,14 +38,14 @@ CheckMemoryFileState (
 **/
 EFI_STATUS
 GetMemoryFile (
-  IN CHAR8       *InputFileName,
-  OUT EFI_HANDLE *OutputMemoryFile
+  IN CHAR8        *InputFileName,
+  OUT EFI_HANDLE  *OutputMemoryFile
   )
 {
-  EFI_STATUS  Status;
-  CHAR8       *InputFileImage;
-  UINT32      BytesRead;
-  MEMORY_FILE *NewMemoryFile;
+  EFI_STATUS   Status;
+  CHAR8        *InputFileImage;
+  UINT32       BytesRead;
+  MEMORY_FILE  *NewMemoryFile;
 
   Status = GetFileImage (InputFileName, &InputFileImage, &BytesRead);
   if (EFI_ERROR (Status)) {
@@ -59,9 +58,9 @@ GetMemoryFile (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewMemoryFile->FileImage           = InputFileImage;
-  NewMemoryFile->CurrentFilePointer  = InputFileImage;
-  NewMemoryFile->Eof                 = InputFileImage + BytesRead;
+  NewMemoryFile->FileImage          = InputFileImage;
+  NewMemoryFile->CurrentFilePointer = InputFileImage;
+  NewMemoryFile->Eof                = InputFileImage + BytesRead;
 
   *OutputMemoryFile = (EFI_HANDLE)NewMemoryFile;
 
@@ -79,14 +78,14 @@ GetMemoryFile (
 **/
 EFI_STATUS
 FreeMemoryFile (
-  IN EFI_HANDLE InputMemoryFile
+  IN EFI_HANDLE  InputMemoryFile
   )
 {
-  MEMORY_FILE *MemoryFile;
+  MEMORY_FILE  *MemoryFile;
 
   CheckMemoryFileState (InputMemoryFile);
 
-  MemoryFile = (MEMORY_FILE*)InputMemoryFile;
+  MemoryFile = (MEMORY_FILE *)InputMemoryFile;
 
   free (MemoryFile->FileImage);
 
@@ -115,21 +114,21 @@ FreeMemoryFile (
 **/
 CHAR8 *
 ReadMemoryFileLine (
-  IN EFI_HANDLE     InputMemoryFile
+  IN EFI_HANDLE  InputMemoryFile
   )
 {
-  CHAR8       *EndOfLine;
-  UINTN       CharsToCopy;
-  MEMORY_FILE *InputFile;
-  UINTN       BytesToEof;
-  CHAR8       *OutputString;
+  CHAR8        *EndOfLine;
+  UINTN        CharsToCopy;
+  MEMORY_FILE  *InputFile;
+  UINTN        BytesToEof;
+  CHAR8        *OutputString;
 
   //
   // Verify input parameters are not null
   //
   CheckMemoryFileState (InputMemoryFile);
 
-  InputFile = (MEMORY_FILE*)InputMemoryFile;
+  InputFile = (MEMORY_FILE *)InputMemoryFile;
 
   //
   // Check for end of file condition
@@ -177,13 +176,9 @@ ReadMemoryFileLine (
   // Add the null termination over the 0x0D
   //
   if (OutputString[CharsToCopy - 1] == '\r') {
-
     OutputString[CharsToCopy - 1] = '\0';
-
   } else {
-
     OutputString[CharsToCopy] = '\0';
-
   }
 
   //
@@ -193,6 +188,7 @@ ReadMemoryFileLine (
   if (InputFile->CurrentFilePointer > InputFile->Eof) {
     InputFile->CurrentFilePointer = InputFile->Eof;
   }
+
   CheckMemoryFileState (InputMemoryFile);
 
   //
@@ -201,18 +197,17 @@ ReadMemoryFileLine (
   return OutputString;
 }
 
-
 STATIC
 VOID
 CheckMemoryFileState (
-  IN EFI_HANDLE InputMemoryFile
+  IN EFI_HANDLE  InputMemoryFile
   )
 {
-  MEMORY_FILE *MemoryFile;
+  MEMORY_FILE  *MemoryFile;
 
   assert (InputMemoryFile != NULL);
 
-  MemoryFile = (MEMORY_FILE*)InputMemoryFile;
+  MemoryFile = (MEMORY_FILE *)InputMemoryFile;
 
   assert (MemoryFile->FileImage != NULL);
   assert (MemoryFile->CurrentFilePointer != NULL);
@@ -221,5 +216,3 @@ CheckMemoryFileState (
   assert (MemoryFile->CurrentFilePointer >= MemoryFile->FileImage);
   assert (MemoryFile->CurrentFilePointer <= MemoryFile->Eof);
 }
-
-

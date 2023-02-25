@@ -19,19 +19,19 @@ SFPInit (
 
 STATUS
 SFPOpenFile (
-  CHAR8    *FileName
+  CHAR8  *FileName
   )
 ;
 
 BOOLEAN
 SFPIsKeyword (
-  CHAR8 *Str
+  CHAR8  *Str
   )
 ;
 
 BOOLEAN
 SFPIsToken (
-  CHAR8 *Str
+  CHAR8  *Str
   )
 ;
 
@@ -44,36 +44,36 @@ SFPGetNextToken (
 
 BOOLEAN
 SFPGetGuidToken (
-  CHAR8 *Str,
-  UINT32 Len
+  CHAR8   *Str,
+  UINT32  Len
   )
 ;
 
-#define PARSE_GUID_STYLE_5_FIELDS 0
+#define PARSE_GUID_STYLE_5_FIELDS  0
 
 BOOLEAN
 SFPGetGuid (
-  INTN        GuidStyle,
-  EFI_GUID    *Value
+  INTN      GuidStyle,
+  EFI_GUID  *Value
   )
 ;
 
 BOOLEAN
 SFPSkipToToken (
-  CHAR8 *Str
+  CHAR8  *Str
   )
 ;
 
 BOOLEAN
 SFPGetNumber (
-  UINTN   *Value
+  UINTN  *Value
   )
 ;
 
 BOOLEAN
 SFPGetQuotedString (
-  CHAR8      *Str,
-  INTN       Length
+  CHAR8  *Str,
+  INTN   Length
   )
 ;
 

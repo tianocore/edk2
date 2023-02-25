@@ -17,9 +17,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 
 #if 0
-  //
-  // BUGBUG: Not fully implemented yet.
-  //
+//
+// BUGBUG: Not fully implemented yet.
+//
 
 /**
   This function returns the directory path which contains the particular path.
@@ -38,17 +38,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @return NULL if error
 **/
-CHAR8*
+CHAR8 *
 OsPathDirName (
-  IN CHAR8    *FilePath
+  IN CHAR8  *FilePath
   )
 
 {
-  CHAR8 *Return;
-  CHAR8 *Pos;
-  CHAR8 Char;
-  UINTN Length;
-  INTN  Offset;
+  CHAR8  *Return;
+  CHAR8  *Pos;
+  CHAR8  Char;
+  UINTN  Length;
+  INTN   Offset;
 
   Length = strlen (FilePath);
 
@@ -60,9 +60,10 @@ OsPathDirName (
   // Check for the root directory case
   //
   if (
-    (Length == 3 && isalpha (FilePath[0]) && (strcmp(FilePath + 1, ":\\") == 0)) ||
-    (strcmp(FilePath, "/") == 0)
-    ) {
+      ((Length == 3) && isalpha (FilePath[0]) && (strcmp (FilePath + 1, ":\\") == 0)) ||
+      (strcmp (FilePath, "/") == 0)
+      )
+  {
     return NULL;
   }
 
@@ -70,7 +71,7 @@ OsPathDirName (
   // If the path ends with a path separator, then just append ".."
   //
   Char = FilePath[Length - 1];
-  if (Char == '/' || Char == '\\') {
+  if ((Char == '/') || (Char == '\\')) {
     return OsPathJoin (FilePath, "..");
   }
 
@@ -84,13 +85,13 @@ OsPathDirName (
     }
   }
 }
+
 #endif
 
-
 #if 0
-  //
-  // BUGBUG: Not fully implemented yet.
-  //
+//
+// BUGBUG: Not fully implemented yet.
+//
 
 /**
   This function returns the directory path which contains the particular path.
@@ -107,19 +108,19 @@ OsPathDirName (
 **/
 VOID
 OsPathNormPathInPlace (
-  IN CHAR8    *Path
+  IN CHAR8  *Path
   )
 {
-  CHAR8   *Pos;
-  INTN    Offset;
-  BOOLEAN TryAgain;
-  UINTN   Length;
-  UINTN   Remaining;
-  UINTN   SubLength;
+  CHAR8    *Pos;
+  INTN     Offset;
+  BOOLEAN  TryAgain;
+  UINTN    Length;
+  UINTN    Remaining;
+  UINTN    SubLength;
 
   do {
     TryAgain = FALSE;
-    Length = strlen (Path);
+    Length   = strlen (Path);
 
     for (Offset = 0; Offset < Length; Offset++) {
       Remaining = Length - Offset;
@@ -131,7 +132,8 @@ OsPathNormPathInPlace (
           (Remaining >= 2) &&
           ((Offset > 0) || (Path[0] != '\\')) &&
           IsDirSep (Path[Offset]) && IsDirSep (Path[Offset + 1])
-         ) {
+          )
+      {
         memmove (&Path[Offset], &Path[Offset + 1], Remaining);
         TryAgain = TRUE;
         break;
@@ -141,8 +143,9 @@ OsPathNormPathInPlace (
       // Collapse '/./' -> '/'
       //
       if ((Remaining >= 3) && IsDirSep (Path[Offset]) &&
-           (Path[Offset + 1] == '.') && IsDirSep (Path[Offset + 2])
-         ) {
+          (Path[Offset + 1] == '.') && IsDirSep (Path[Offset + 2])
+          )
+      {
         memmove (&Path[Offset], &Path[Offset + 1], Remaining);
         TryAgain = TRUE;
         break;
@@ -152,9 +155,7 @@ OsPathNormPathInPlace (
       // Collapse 'a/../b' -> 'b'
       //
       // BUGBUG: Not implemented yet
-
     }
-
   } while (TryAgain);
 
   Return = CloneString (FilePath);
@@ -168,9 +169,10 @@ OsPathNormPathInPlace (
   // Check for the root directory case
   //
   if (
-    (Length == 3 && isalpha (Return[0]) && (strcmp(Return + 1, ":\\") == 0)) ||
-    (strcmp(Return, "/") == 0)
-    ) {
+      ((Length == 3) && isalpha (Return[0]) && (strcmp (Return + 1, ":\\") == 0)) ||
+      (strcmp (Return, "/") == 0)
+      )
+  {
     free (Return);
     return NULL;
   }
@@ -185,6 +187,7 @@ OsPathNormPathInPlace (
     }
   }
 }
+
 #endif
 
 /**
@@ -202,16 +205,16 @@ OsPathNormPathInPlace (
 
   @return A CHAR8* string, which must be freed by the caller
 **/
-CHAR8*
+CHAR8 *
 OsPathPeerFilePath (
-  IN CHAR8    *OldPath,
-  IN CHAR8    *Peer
+  IN CHAR8  *OldPath,
+  IN CHAR8  *Peer
   )
 {
-  CHAR8 *Result;
-  INTN    Offset;
+  CHAR8  *Result;
+  INTN   Offset;
 
-  Result = (CHAR8 *) malloc (strlen (OldPath) + strlen (Peer) + 1);
+  Result = (CHAR8 *)malloc (strlen (OldPath) + strlen (Peer) + 1);
   if (Result == NULL) {
     return NULL;
   }
@@ -247,10 +250,11 @@ OsPathPeerFilePath (
 **/
 BOOLEAN
 OsPathExists (
-  IN CHAR8    *InputFileName
+  IN CHAR8  *InputFileName
   )
 {
-  FILE    *InputFile;
+  FILE  *InputFile;
+
   InputFile = fopen (LongFilePath (InputFileName), "rb");
   if (InputFile == NULL) {
     return FALSE;
@@ -259,6 +263,3 @@ OsPathExists (
     return TRUE;
   }
 }
-
-
-

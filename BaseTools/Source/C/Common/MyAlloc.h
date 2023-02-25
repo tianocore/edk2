@@ -22,29 +22,29 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // your project.
 //
 #ifndef USE_MYALLOC
-#define USE_MYALLOC 1
+#define USE_MYALLOC  1
 #endif
 
 #if USE_MYALLOC
 //
 // Replace C library allocation routines with MyAlloc routines.
 //
-#define malloc(size)        MyAlloc ((size), __FILE__, __LINE__)
-#define calloc(count, size) MyAlloc ((count) * (size), __FILE__, __LINE__)
-#define realloc(ptr, size)  MyRealloc ((ptr), (size), __FILE__, __LINE__)
-#define free(ptr)           MyFree ((ptr), __FILE__, __LINE__)
-#define alloc_check(final)  MyCheck ((final), __FILE__, __LINE__)
+#define malloc(size)         MyAlloc ((size), __FILE__, __LINE__)
+#define calloc(count, size)  MyAlloc ((count) * (size), __FILE__, __LINE__)
+#define realloc(ptr, size)   MyRealloc ((ptr), (size), __FILE__, __LINE__)
+#define free(ptr)            MyFree ((ptr), __FILE__, __LINE__)
+#define alloc_check(final)   MyCheck ((final), __FILE__, __LINE__)
 
 //
 // Structure for checking/tracking memory allocations.
 //
 typedef struct MyAllocStruct {
-  UINTN                 Cksum;
-  struct MyAllocStruct  *Next;
-  UINTN                 Line;
-  UINTN                 Size;
-  UINT8                 *File;
-  UINT8                 *Buffer;
+  UINTN                   Cksum;
+  struct MyAllocStruct    *Next;
+  UINTN                   Line;
+  UINTN                   Size;
+  UINT8                   *File;
+  UINT8                   *Buffer;
 } MY_ALLOC_STRUCT;
 //
 // Cksum := (UINTN)This + (UINTN)Next + Line + Size + (UINTN)File +
@@ -84,9 +84,9 @@ typedef struct MyAllocStruct {
 **/
 VOID
 MyCheck (
-  BOOLEAN      Final,
-  UINT8        File[],
-  UINTN        Line
+  BOOLEAN  Final,
+  UINT8    File[],
+  UINTN    Line
   )
 ;
 
@@ -105,9 +105,9 @@ MyCheck (
 **/
 VOID  *
 MyAlloc (
-  UINTN      Size,
-  UINT8      File[],
-  UINTN      Line
+  UINTN  Size,
+  UINT8  File[],
+  UINTN  Line
   )
 ;
 
@@ -126,10 +126,10 @@ MyAlloc (
 **/
 VOID  *
 MyRealloc (
-  VOID       *Ptr,
-  UINTN      Size,
-  UINT8      File[],
-  UINTN      Line
+  VOID   *Ptr,
+  UINTN  Size,
+  UINT8  File[],
+  UINTN  Line
   )
 ;
 
@@ -144,9 +144,9 @@ MyRealloc (
 **/
 VOID
 MyFree (
-  VOID       *Ptr,
-  UINT8      File[],
-  UINTN      Line
+  VOID   *Ptr,
+  UINT8  File[],
+  UINTN  Line
   )
 ;
 

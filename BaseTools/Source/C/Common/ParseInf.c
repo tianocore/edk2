@@ -31,15 +31,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 CHAR8 *
 ReadLine (
-  IN MEMORY_FILE    *InputFile,
-  IN OUT CHAR8      *InputBuffer,
-  IN UINTN          MaxLength
+  IN MEMORY_FILE  *InputFile,
+  IN OUT CHAR8    *InputBuffer,
+  IN UINTN        MaxLength
   )
 
 {
-  CHAR8 *CharPtr;
-  CHAR8 *EndOfLine;
-  UINTN CharsToCopy;
+  CHAR8  *CharPtr;
+  CHAR8  *EndOfLine;
+  UINTN  CharsToCopy;
 
   //
   // Verify input parameters are not null
@@ -55,6 +55,7 @@ ReadLine (
   if (InputFile->CurrentFilePointer >= InputFile->Eof) {
     return NULL;
   }
+
   //
   // Find the next newline char
   //
@@ -79,6 +80,7 @@ ReadLine (
     //
     CharsToCopy = EndOfLine - InputFile->CurrentFilePointer;
   }
+
   //
   // If the end of line is too big for the current buffer, set it to the max
   // size of the buffer (leaving room for the \0.
@@ -86,6 +88,7 @@ ReadLine (
   if (CharsToCopy > MaxLength - 1) {
     CharsToCopy = MaxLength - 1;
   }
+
   //
   // Copy the line.
   //
@@ -95,13 +98,9 @@ ReadLine (
   // Add the null termination over the 0x0D
   //
   if (InputBuffer[CharsToCopy - 1] == '\r') {
-
     InputBuffer[CharsToCopy - 1] = '\0';
-
   } else {
-
     InputBuffer[CharsToCopy] = '\0';
-
   }
 
   //
@@ -116,6 +115,7 @@ ReadLine (
   if (CharPtr != 0) {
     CharPtr[0] = 0;
   }
+
   //
   // Return the string
   //
@@ -134,12 +134,12 @@ ReadLine (
 **/
 BOOLEAN
 FindSection (
-  IN MEMORY_FILE    *InputFile,
-  IN CHAR8          *Section
+  IN MEMORY_FILE  *InputFile,
+  IN CHAR8        *Section
   )
 {
-  CHAR8 InputBuffer[MAX_LONG_FILE_PATH];
-  CHAR8 *CurrentToken;
+  CHAR8  InputBuffer[MAX_LONG_FILE_PATH];
+  CHAR8  *CurrentToken;
 
   //
   // Verify input is not NULL
@@ -192,39 +192,41 @@ FindSection (
 **/
 EFI_STATUS
 FindToken (
-  IN MEMORY_FILE    *InputFile,
-  IN CHAR8          *Section,
-  IN CHAR8          *Token,
-  IN UINTN          Instance,
-  OUT CHAR8         *Value
+  IN MEMORY_FILE  *InputFile,
+  IN CHAR8        *Section,
+  IN CHAR8        *Token,
+  IN UINTN        Instance,
+  OUT CHAR8       *Value
   )
 {
-  CHAR8   InputBuffer[MAX_LONG_FILE_PATH];
-  CHAR8   *CurrentToken;
-  CHAR8   *Delimiter;
-  BOOLEAN ParseError;
-  BOOLEAN ReadError;
-  UINTN   Occurrence;
+  CHAR8    InputBuffer[MAX_LONG_FILE_PATH];
+  CHAR8    *CurrentToken;
+  CHAR8    *Delimiter;
+  BOOLEAN  ParseError;
+  BOOLEAN  ReadError;
+  UINTN    Occurrence;
 
   //
   // Check input parameters
   //
-  if (InputFile->FileImage == NULL ||
-      InputFile->Eof == NULL ||
-      InputFile->CurrentFilePointer == NULL ||
-      Section == NULL ||
-      strlen (Section) == 0 ||
-      Token == NULL ||
-      strlen (Token) == 0 ||
-      Value == NULL
-      ) {
+  if ((InputFile->FileImage == NULL) ||
+      (InputFile->Eof == NULL) ||
+      (InputFile->CurrentFilePointer == NULL) ||
+      (Section == NULL) ||
+      (strlen (Section) == 0) ||
+      (Token == NULL) ||
+      (strlen (Token) == 0) ||
+      (Value == NULL)
+      )
+  {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Initialize error codes
   //
-  ParseError  = FALSE;
-  ReadError   = FALSE;
+  ParseError = FALSE;
+  ReadError  = FALSE;
 
   //
   // Initialize our instance counter for the search token
@@ -246,6 +248,7 @@ FindToken (
         ReadError = TRUE;
         break;
       }
+
       //
       // Get the first non-whitespace string
       //
@@ -255,19 +258,21 @@ FindToken (
       }
 
       CurrentToken = strtok (InputBuffer, " \t\n");
-      if (CurrentToken == NULL || Delimiter == NULL) {
+      if ((CurrentToken == NULL) || (Delimiter == NULL)) {
         //
         // Whitespace line found (or comment) so continue
         //
         CurrentToken = InputBuffer;
         continue;
       }
+
       //
       // Make sure we have not reached the end of the current section
       //
       if (CurrentToken[0] == '[') {
         break;
       }
+
       //
       // Compare the current token with the desired token
       //
@@ -295,6 +300,7 @@ FindToken (
             while (*CurrentToken == ' ' || *CurrentToken == '\t') {
               CurrentToken++;
             }
+
             //
             // Copy the current token to the output value
             //
@@ -302,9 +308,10 @@ FindToken (
             //
             // Strip trailing white space
             //
-            while (strlen(Value) > 0 && (*(Value + strlen(Value) - 1) == ' ' || *(Value + strlen(Value) - 1) == '\t')) {
-              *(Value + strlen(Value) - 1) = 0;
+            while (strlen (Value) > 0 && (*(Value + strlen (Value) - 1) == ' ' || *(Value + strlen (Value) - 1) == '\t')) {
+              *(Value + strlen (Value) - 1) = 0;
             }
+
             return EFI_SUCCESS;
           }
         } else {
@@ -315,13 +322,14 @@ FindToken (
         }
       }
     } while (
-      !ParseError &&
-      !ReadError &&
-      InputFile->CurrentFilePointer < InputFile->Eof &&
-      CurrentToken[0] != '[' &&
-      Occurrence <= Instance
-    );
+             !ParseError &&
+             !ReadError &&
+             InputFile->CurrentFilePointer < InputFile->Eof &&
+             CurrentToken[0] != '[' &&
+             Occurrence <= Instance
+             );
   }
+
   //
   // Distinguish between read errors and INF file format errors.
   //
@@ -353,27 +361,29 @@ StringToGuid (
   OUT EFI_GUID  *GuidBuffer
   )
 {
-  INT32 Index;
-  int   Data1;
-  int   Data2;
-  int   Data3;
-  int   Data4[8];
+  INT32  Index;
+  int    Data1;
+  int    Data2;
+  int    Data3;
+  int    Data4[8];
 
-  if (AsciiGuidBuffer == NULL || GuidBuffer == NULL) {
+  if ((AsciiGuidBuffer == NULL) || (GuidBuffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Check Guid Format strictly xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
   //
-  for (Index = 0; AsciiGuidBuffer[Index] != '\0' && Index < 37; Index ++) {
-    if (Index == 8 || Index == 13 || Index == 18 || Index == 23) {
+  for (Index = 0; AsciiGuidBuffer[Index] != '\0' && Index < 37; Index++) {
+    if ((Index == 8) || (Index == 13) || (Index == 18) || (Index == 23)) {
       if (AsciiGuidBuffer[Index] != '-') {
         break;
       }
     } else {
       if (((AsciiGuidBuffer[Index] >= '0') && (AsciiGuidBuffer[Index] <= '9')) ||
-         ((AsciiGuidBuffer[Index] >= 'a') && (AsciiGuidBuffer[Index] <= 'f')) ||
-         ((AsciiGuidBuffer[Index] >= 'A') && (AsciiGuidBuffer[Index] <= 'F'))) {
+          ((AsciiGuidBuffer[Index] >= 'a') && (AsciiGuidBuffer[Index] <= 'f')) ||
+          ((AsciiGuidBuffer[Index] >= 'A') && (AsciiGuidBuffer[Index] <= 'F')))
+      {
         continue;
       } else {
         break;
@@ -381,7 +391,7 @@ StringToGuid (
     }
   }
 
-  if (Index < 36 || AsciiGuidBuffer[36] != '\0') {
+  if ((Index < 36) || (AsciiGuidBuffer[36] != '\0')) {
     Error (NULL, 0, 1003, "Invalid option value", "Incorrect GUID \"%s\"\n  Correct Format \"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\"", AsciiGuidBuffer);
     return EFI_ABORTED;
   }
@@ -412,20 +422,21 @@ StringToGuid (
     Error (NULL, 0, 1003, "Invalid option value", "Incorrect GUID \"%s\"\n  Correct Format \"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\"", AsciiGuidBuffer);
     return EFI_ABORTED;
   }
+
   //
   // Copy the data into our GUID.
   //
-  GuidBuffer->Data1     = (UINT32) Data1;
-  GuidBuffer->Data2     = (UINT16) Data2;
-  GuidBuffer->Data3     = (UINT16) Data3;
-  GuidBuffer->Data4[0]  = (UINT8) Data4[0];
-  GuidBuffer->Data4[1]  = (UINT8) Data4[1];
-  GuidBuffer->Data4[2]  = (UINT8) Data4[2];
-  GuidBuffer->Data4[3]  = (UINT8) Data4[3];
-  GuidBuffer->Data4[4]  = (UINT8) Data4[4];
-  GuidBuffer->Data4[5]  = (UINT8) Data4[5];
-  GuidBuffer->Data4[6]  = (UINT8) Data4[6];
-  GuidBuffer->Data4[7]  = (UINT8) Data4[7];
+  GuidBuffer->Data1    = (UINT32)Data1;
+  GuidBuffer->Data2    = (UINT16)Data2;
+  GuidBuffer->Data3    = (UINT16)Data3;
+  GuidBuffer->Data4[0] = (UINT8)Data4[0];
+  GuidBuffer->Data4[1] = (UINT8)Data4[1];
+  GuidBuffer->Data4[2] = (UINT8)Data4[2];
+  GuidBuffer->Data4[3] = (UINT8)Data4[3];
+  GuidBuffer->Data4[4] = (UINT8)Data4[4];
+  GuidBuffer->Data4[5] = (UINT8)Data4[5];
+  GuidBuffer->Data4[6] = (UINT8)Data4[6];
+  GuidBuffer->Data4[7] = (UINT8)Data4[7];
 
   return EFI_SUCCESS;
 }
@@ -463,11 +474,12 @@ AsciiStringToUint64 (
   //
   // Check input parameter
   //
-  if (AsciiString == NULL || ReturnValue == NULL || strlen(AsciiString) > 0xFF) {
+  if ((AsciiString == NULL) || (ReturnValue == NULL) || (strlen (AsciiString) > 0xFF)) {
     return EFI_INVALID_PARAMETER;
   }
+
   while (AsciiString[Index] == ' ') {
-    Index ++;
+    Index++;
   }
 
   //
@@ -477,34 +489,37 @@ AsciiStringToUint64 (
   //
   // Skip first two chars only if the string starts with '0x' or '0X'
   //
-  if (AsciiString[Index] == '0' && (AsciiString[Index + 1] == 'x' || AsciiString[Index + 1] == 'X')) {
-    IsHex = TRUE;
+  if ((AsciiString[Index] == '0') && ((AsciiString[Index + 1] == 'x') || (AsciiString[Index + 1] == 'X'))) {
+    IsHex  = TRUE;
     Index += 2;
   }
+
   if (IsHex) {
     //
     // Convert the hex string.
     //
-    for (; AsciiString[Index] != '\0'; Index++) {
+    for ( ; AsciiString[Index] != '\0'; Index++) {
       CurrentChar = AsciiString[Index];
       if (CurrentChar == ' ') {
         break;
       }
+
       //
       // Verify Hex string
       //
       if (isxdigit ((int)CurrentChar) == 0) {
         return EFI_ABORTED;
       }
+
       //
       // Add hex value
       //
       Value *= 16;
-      if (CurrentChar >= '0' && CurrentChar <= '9') {
+      if ((CurrentChar >= '0') && (CurrentChar <= '9')) {
         Value += CurrentChar - '0';
-      } else if (CurrentChar >= 'a' && CurrentChar <= 'f') {
+      } else if ((CurrentChar >= 'a') && (CurrentChar <= 'f')) {
         Value += CurrentChar - 'a' + 10;
-      } else if (CurrentChar >= 'A' && CurrentChar <= 'F') {
+      } else if ((CurrentChar >= 'A') && (CurrentChar <= 'F')) {
         Value += CurrentChar - 'A' + 10;
       }
     }
@@ -514,21 +529,23 @@ AsciiStringToUint64 (
     //
     // Convert dec string is a number
     //
-    for (; Index < strlen (AsciiString); Index++) {
+    for ( ; Index < strlen (AsciiString); Index++) {
       CurrentChar = AsciiString[Index];
       if (CurrentChar == ' ') {
         break;
       }
+
       //
       // Verify Dec string
       //
       if (isdigit ((int)CurrentChar) == 0) {
         return EFI_ABORTED;
       }
+
       //
       // Add dec value
       //
-      Value = Value * 10;
+      Value  = Value * 10;
       Value += CurrentChar - '0';
     }
 
@@ -554,7 +571,7 @@ ReadLineInStream (
   IN OUT CHAR8  *InputBuffer
   )
 {
-  CHAR8 *CharPtr;
+  CHAR8  *CharPtr;
 
   //
   // Verify input parameters are not null
@@ -568,6 +585,7 @@ ReadLineInStream (
   if (fgets (InputBuffer, MAX_LONG_FILE_PATH, InputFile) == NULL) {
     return NULL;
   }
+
   //
   // Strip any comments
   //
@@ -580,6 +598,7 @@ ReadLineInStream (
   if (CharPtr != 0) {
     CharPtr[0] = 0;
   }
+
   //
   // Return the string
   //
@@ -599,12 +618,12 @@ ReadLineInStream (
 **/
 BOOLEAN
 FindSectionInStream (
-  IN FILE       *InputFile,
-  IN CHAR8      *Section
+  IN FILE   *InputFile,
+  IN CHAR8  *Section
   )
 {
-  CHAR8 InputBuffer[MAX_LONG_FILE_PATH];
-  CHAR8 *CurrentToken;
+  CHAR8  InputBuffer[MAX_LONG_FILE_PATH];
+  CHAR8  *CurrentToken;
 
   //
   // Verify input is not NULL
@@ -618,6 +637,7 @@ FindSectionInStream (
   if (fseek (InputFile, 0, SEEK_SET) != 0) {
     return FALSE;
   }
+
   //
   // Read lines until the section is found
   //

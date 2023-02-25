@@ -24,9 +24,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 CalculateCrc32 (
-  IN  UINT8                             *Data,
-  IN  UINTN                             DataSize,
-  IN OUT UINT32                         *CrcOut
+  IN  UINT8      *Data,
+  IN  UINTN      DataSize,
+  IN OUT UINT32  *CrcOut
   )
 ;
 

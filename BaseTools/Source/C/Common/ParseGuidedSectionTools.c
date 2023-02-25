@@ -17,16 +17,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "ParseGuidedSectionTools.h"
 #include "StringFuncs.h"
 
-
 //
 // Local types / structures
 //
 
 typedef struct _GUID_SEC_TOOL_ENTRY {
-  EFI_GUID   Guid;
-  CHAR8*     Name;
-  CHAR8*     Path;
-  struct _GUID_SEC_TOOL_ENTRY *Next;
+  EFI_GUID                       Guid;
+  CHAR8                          *Name;
+  CHAR8                          *Path;
+  struct _GUID_SEC_TOOL_ENTRY    *Next;
 } GUID_SEC_TOOL_ENTRY;
 
 //
@@ -47,12 +46,12 @@ typedef struct _GUID_SEC_TOOL_ENTRY {
 **/
 EFI_HANDLE
 ParseGuidedSectionToolsFile (
-  IN CHAR8    *InputFile
+  IN CHAR8  *InputFile
   )
 {
-  EFI_STATUS Status;
-  EFI_HANDLE MemoryFile;
-  EFI_HANDLE ParsedGuidedSectionTools;
+  EFI_STATUS  Status;
+  EFI_HANDLE  MemoryFile;
+  EFI_HANDLE  ParsedGuidedSectionTools;
 
   Status = GetMemoryFile (InputFile, &MemoryFile);
   if (EFI_ERROR (Status)) {
@@ -80,16 +79,16 @@ ParseGuidedSectionToolsFile (
 **/
 EFI_HANDLE
 ParseGuidedSectionToolsMemoryFile (
-  IN EFI_HANDLE    InputFile
+  IN EFI_HANDLE  InputFile
   )
 {
-  EFI_STATUS  Status;
-  CHAR8       *NextLine;
-  STRING_LIST *Tool;
-  EFI_GUID    Guid;
-  GUID_SEC_TOOL_ENTRY *FirstGuidTool;
-  GUID_SEC_TOOL_ENTRY *LastGuidTool;
-  GUID_SEC_TOOL_ENTRY *NewGuidTool;
+  EFI_STATUS           Status;
+  CHAR8                *NextLine;
+  STRING_LIST          *Tool;
+  EFI_GUID             Guid;
+  GUID_SEC_TOOL_ENTRY  *FirstGuidTool;
+  GUID_SEC_TOOL_ENTRY  *LastGuidTool;
+  GUID_SEC_TOOL_ENTRY  *NewGuidTool;
 
   FirstGuidTool = NULL;
   LastGuidTool  = NULL;
@@ -114,14 +113,15 @@ ParseGuidedSectionToolsMemoryFile (
     Tool = SplitStringByWhitespace (NextLine);
     if ((Tool != NULL) &&
         (Tool->Count == 3)
-       ) {
+        )
+    {
       Status = StringToGuid (Tool->Strings[0], &Guid);
       if (!EFI_ERROR (Status)) {
         NewGuidTool = malloc (sizeof (GUID_SEC_TOOL_ENTRY));
         if (NewGuidTool != NULL) {
           memcpy (&(NewGuidTool->Guid), &Guid, sizeof (Guid));
-          NewGuidTool->Name = CloneString(Tool->Strings[1]);
-          NewGuidTool->Path = CloneString(Tool->Strings[2]);
+          NewGuidTool->Name = CloneString (Tool->Strings[1]);
+          NewGuidTool->Path = CloneString (Tool->Strings[2]);
           NewGuidTool->Next = NULL;
 
           if (FirstGuidTool == NULL) {
@@ -129,6 +129,7 @@ ParseGuidedSectionToolsMemoryFile (
           } else {
             LastGuidTool->Next = NewGuidTool;
           }
+
           LastGuidTool = NewGuidTool;
         }
       }
@@ -137,6 +138,7 @@ ParseGuidedSectionToolsMemoryFile (
     if (Tool != NULL) {
       FreeStringList (Tool);
     }
+
     free (NextLine);
   }
 
@@ -154,15 +156,15 @@ ParseGuidedSectionToolsMemoryFile (
   @retval Non-NULL The tool to use to access the section contents.  (The caller
              must free the memory associated with this string.)
 **/
-CHAR8*
+CHAR8 *
 LookupGuidedSectionToolPath (
-  IN EFI_HANDLE ParsedGuidedSectionToolsHandle,
-  IN EFI_GUID   *SectionGuid
+  IN EFI_HANDLE  ParsedGuidedSectionToolsHandle,
+  IN EFI_GUID    *SectionGuid
   )
 {
-  GUID_SEC_TOOL_ENTRY *GuidTool;
+  GUID_SEC_TOOL_ENTRY  *GuidTool;
 
-  GuidTool = (GUID_SEC_TOOL_ENTRY*)ParsedGuidedSectionToolsHandle;
+  GuidTool = (GUID_SEC_TOOL_ENTRY *)ParsedGuidedSectionToolsHandle;
   if (GuidTool == NULL) {
     return NULL;
   }
@@ -175,5 +177,3 @@ LookupGuidedSectionToolPath (
 
   return NULL;
 }
-
-

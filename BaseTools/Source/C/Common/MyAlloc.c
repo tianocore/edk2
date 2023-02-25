@@ -12,10 +12,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Get back to original alloc/free calls.
 //
-#undef malloc
-#undef calloc
-#undef realloc
-#undef free
+  #undef malloc
+  #undef calloc
+  #undef realloc
+  #undef free
 //
 // Start of allocation list.
 //
@@ -24,8 +24,8 @@ STATIC MY_ALLOC_STRUCT  *MyAllocData = NULL;
 //
 //
 //
-STATIC UINT32           MyAllocHeadMagik  = MYALLOC_HEAD_MAGIK;
-STATIC UINT32           MyAllocTailMagik  = MYALLOC_TAIL_MAGIK;
+STATIC UINT32  MyAllocHeadMagik = MYALLOC_HEAD_MAGIK;
+STATIC UINT32  MyAllocTailMagik = MYALLOC_TAIL_MAGIK;
 
 /**
   Check for corruptions in the allocated memory chain.  If a corruption
@@ -40,12 +40,12 @@ STATIC UINT32           MyAllocTailMagik  = MYALLOC_TAIL_MAGIK;
 **/
 VOID
 MyCheck (
-  BOOLEAN      Final,
-  UINT8        File[],
-  UINTN        Line
+  BOOLEAN  Final,
+  UINT8    File[],
+  UINTN    Line
   )
 {
-  MY_ALLOC_STRUCT *Tmp;
+  MY_ALLOC_STRUCT  *Tmp;
 
   //
   // Check parameters.
@@ -84,34 +84,38 @@ MyCheck (
 
     exit (1);
   }
+
   //
   // Check structure contents.
   //
   for (Tmp = MyAllocData; Tmp != NULL; Tmp = Tmp->Next) {
-    if (memcmp(Tmp->Buffer, &MyAllocHeadMagik, sizeof MyAllocHeadMagik) ||
-        memcmp(&Tmp->Buffer[Tmp->Size + sizeof(UINT32)], &MyAllocTailMagik, sizeof MyAllocTailMagik)) {
+    if (memcmp (Tmp->Buffer, &MyAllocHeadMagik, sizeof MyAllocHeadMagik) ||
+        memcmp (&Tmp->Buffer[Tmp->Size + sizeof (UINT32)], &MyAllocTailMagik, sizeof MyAllocTailMagik))
+    {
       break;
     }
   }
+
   //
   // If Tmp is not NULL, the structure is corrupt.
   //
   if (Tmp != NULL) {
     printf (
-      "\nMyCheck(Final=%u, File=%s, Line=%u)""\nStructure corrupted!"
-      "\nFile=%s, Line=%u, nSize=%u, Head=%xh, Tail=%xh\n",
+      "\nMyCheck(Final=%u, File=%s, Line=%u)" "\nStructure corrupted!"
+                                              "\nFile=%s, Line=%u, nSize=%u, Head=%xh, Tail=%xh\n",
       Final,
       File,
       (unsigned)Line,
       Tmp->File,
-      (unsigned) Tmp->Line,
-      (unsigned) Tmp->Size,
-      (unsigned) *(UINT32 *) (Tmp->Buffer),
-      (unsigned) *(UINT32 *) (&Tmp->Buffer[Tmp->Size + sizeof (UINT32)])
+      (unsigned)Tmp->Line,
+      (unsigned)Tmp->Size,
+      (unsigned)*(UINT32 *)(Tmp->Buffer),
+      (unsigned)*(UINT32 *)(&Tmp->Buffer[Tmp->Size + sizeof (UINT32)])
       );
 
     exit (1);
   }
+
   //
   // If Final is TRUE, display the state of the structure chain.
   //
@@ -129,10 +133,10 @@ MyCheck (
         printf (
           "File=%s, Line=%u, nSize=%u, Head=%xh, Tail=%xh\n",
           Tmp->File,
-          (unsigned) Tmp->Line,
-          (unsigned) Tmp->Size,
-          (unsigned) *(UINT32 *) (Tmp->Buffer),
-          (unsigned) *(UINT32 *) (&Tmp->Buffer[Tmp->Size + sizeof (UINT32)])
+          (unsigned)Tmp->Line,
+          (unsigned)Tmp->Size,
+          (unsigned)*(UINT32 *)(Tmp->Buffer),
+          (unsigned)*(UINT32 *)(&Tmp->Buffer[Tmp->Size + sizeof (UINT32)])
           );
       }
     }
@@ -154,13 +158,13 @@ MyCheck (
 **/
 VOID *
 MyAlloc (
-  UINTN      Size,
-  UINT8 File[],
-  UINTN      Line
+  UINTN  Size,
+  UINT8  File[],
+  UINTN  Line
   )
 {
-  MY_ALLOC_STRUCT *Tmp;
-  UINTN           Len;
+  MY_ALLOC_STRUCT  *Tmp;
+  UINTN            Len;
 
   //
   // Check for invalid parameters.
@@ -176,7 +180,7 @@ MyAlloc (
     exit (1);
   }
 
-  if (Size == 0 || Line == 0) {
+  if ((Size == 0) || (Line == 0)) {
     printf (
       "\nMyAlloc(Size=%u, File=%s, Line=%u)"
       "\nInvalid parameter(s).\n",
@@ -200,6 +204,7 @@ MyAlloc (
 
     exit (1);
   }
+
   //
   // Check the allocation list for corruption.
   //
@@ -224,14 +229,15 @@ MyAlloc (
 
     exit (1);
   }
+
   //
   // Fill in the new entry.
   //
-  Tmp->File = ((UINT8 *) Tmp) + sizeof (MY_ALLOC_STRUCT);
+  Tmp->File = ((UINT8 *)Tmp) + sizeof (MY_ALLOC_STRUCT);
   strcpy ((CHAR8 *)Tmp->File, (CHAR8 *)File);
   Tmp->Line   = Line;
   Tmp->Size   = Size;
-  Tmp->Buffer = (UINT8 *) (((UINTN) Tmp + Len + 9) &~7);
+  Tmp->Buffer = (UINT8 *)(((UINTN)Tmp + Len + 9) &~7);
 
   memcpy (Tmp->Buffer, &MyAllocHeadMagik, sizeof MyAllocHeadMagik);
 
@@ -241,8 +247,8 @@ MyAlloc (
     sizeof MyAllocTailMagik
     );
 
-  Tmp->Next   = MyAllocData;
-  Tmp->Cksum  = (UINTN) Tmp + (UINTN) (Tmp->Next) + Tmp->Line + Tmp->Size + (UINTN) (Tmp->File) + (UINTN) (Tmp->Buffer);
+  Tmp->Next  = MyAllocData;
+  Tmp->Cksum = (UINTN)Tmp + (UINTN)(Tmp->Next) + Tmp->Line + Tmp->Size + (UINTN)(Tmp->File) + (UINTN)(Tmp->Buffer);
 
   MyAllocData = Tmp;
 
@@ -263,14 +269,14 @@ MyAlloc (
 **/
 VOID *
 MyRealloc (
-  VOID       *Ptr,
-  UINTN      Size,
-  UINT8 File[],
-  UINTN      Line
+  VOID   *Ptr,
+  UINTN  Size,
+  UINT8  File[],
+  UINTN  Line
   )
 {
-  MY_ALLOC_STRUCT *Tmp;
-  VOID            *Buffer;
+  MY_ALLOC_STRUCT  *Tmp;
+  VOID             *Buffer;
 
   //
   // Check for invalid parameter(s).
@@ -287,7 +293,7 @@ MyRealloc (
     exit (1);
   }
 
-  if (Size == 0 || Line == 0) {
+  if ((Size == 0) || (Line == 0)) {
     printf (
       "\nMyRealloc(Ptr=%p, Size=%u, File=%s, Line=%u)"
       "\nInvalid parameter(s).\n",
@@ -312,6 +318,7 @@ MyRealloc (
 
     exit (1);
   }
+
   //
   // Find existing buffer in allocation list.
   //
@@ -320,7 +327,7 @@ MyRealloc (
   } else if (&MyAllocData->Buffer[sizeof (UINT32)] == Ptr) {
     Tmp = MyAllocData;
   } else {
-    for (Tmp = MyAllocData;; Tmp = Tmp->Next) {
+    for (Tmp = MyAllocData; ; Tmp = Tmp->Next) {
       if (Tmp->Next == NULL) {
         printf (
           "\nMyRealloc(Ptr=%p, Size=%u, File=%s, Line=%u)"
@@ -337,12 +344,13 @@ MyRealloc (
       Tmp = Tmp->Next;
     }
   }
+
   //
   // Allocate new buffer, copy old data, free old buffer.
   //
   Buffer = MyAlloc (Size, File, Line);
 
-  if (Buffer != NULL && Tmp != NULL) {
+  if ((Buffer != NULL) && (Tmp != NULL)) {
     memcpy (
       Buffer,
       &Tmp->Buffer[sizeof (UINT32)],
@@ -366,13 +374,13 @@ MyRealloc (
 **/
 VOID
 MyFree (
-  VOID       *Ptr,
-  UINT8 File[],
-  UINTN      Line
+  VOID   *Ptr,
+  UINT8  File[],
+  UINTN  Line
   )
 {
-  MY_ALLOC_STRUCT *Tmp;
-  MY_ALLOC_STRUCT *Tmp2;
+  MY_ALLOC_STRUCT  *Tmp;
+  MY_ALLOC_STRUCT  *Tmp2;
 
   //
   // Check for invalid parameter(s).
@@ -411,12 +419,14 @@ MyFree (
 
     exit (1);
   }
+
   //
   // Freeing NULL is always valid.
   //
   if (Ptr == NULL) {
-    return ;
+    return;
   }
+
   //
   // Fail if nothing is allocated.
   //
@@ -431,6 +441,7 @@ MyFree (
 
     exit (1);
   }
+
   //
   // Check for corrupted allocation list.
   //
@@ -449,7 +460,7 @@ MyFree (
     //
     // Walk list looking for matching item.
     //
-    for (Tmp = MyAllocData;; Tmp = Tmp->Next) {
+    for (Tmp = MyAllocData; ; Tmp = Tmp->Next) {
       //
       // Fail if end of list is reached.
       //
@@ -464,6 +475,7 @@ MyFree (
 
         exit (1);
       }
+
       //
       // Leave loop when match is found.
       //
@@ -471,6 +483,7 @@ MyFree (
         break;
       }
     }
+
     //
     // Unlink item from list.
     //
@@ -478,6 +491,7 @@ MyFree (
     Tmp->Next = Tmp->Next->Next;
     Tmp       = Tmp2;
   }
+
   //
   // Release item.
   //

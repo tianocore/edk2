@@ -14,11 +14,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Log message print Level
 //
-#define VERBOSE_LOG_LEVEL    15
-#define WARNING_LOG_LEVEL    15
-#define INFO_LOG_LEVEL       20
-#define KEY_LOG_LEVEL        40
-#define ERROR_LOG_LEVLE      50
+#define VERBOSE_LOG_LEVEL  15
+#define WARNING_LOG_LEVEL  15
+#define INFO_LOG_LEVEL     20
+#define KEY_LOG_LEVEL      40
+#define ERROR_LOG_LEVLE    50
 
 //
 // Status codes returned by EFI utility programs and functions
@@ -26,12 +26,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define STATUS_SUCCESS  0
 #define STATUS_WARNING  1
 #define STATUS_ERROR    2
-#define VOID void
+#define VOID            void
 
 typedef int STATUS;
 
-#define MAX_LINE_LEN               0x200
-#define MAXIMUM_INPUT_FILE_NUM     10
+#define MAX_LINE_LEN            0x200
+#define MAXIMUM_INPUT_FILE_NUM  10
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,19 +53,19 @@ GetUtilityStatus (
 //
 VOID
 SetUtilityName (
-  CHAR8 *ProgramName
+  CHAR8  *ProgramName
   )
 ;
 
 VOID
 PrintMessage (
-  CHAR8   *Type,
-  CHAR8   *FileName,
-  UINT32  LineNumber,
-  UINT32  MessageCode,
-  CHAR8   *Text,
-  CHAR8   *MsgFmt,
-  va_list List
+  CHAR8    *Type,
+  CHAR8    *FileName,
+  UINT32   LineNumber,
+  UINT32   MessageCode,
+  CHAR8    *Text,
+  CHAR8    *MsgFmt,
+  va_list  List
   );
 
 VOID
@@ -103,19 +103,19 @@ DebugMsg (
 
 VOID
 VerboseMsg (
-  CHAR8   *MsgFmt,
+  CHAR8  *MsgFmt,
   ...
   );
 
 VOID
 NormalMsg (
-  CHAR8   *MsgFmt,
+  CHAR8  *MsgFmt,
   ...
   );
 
 VOID
 KeyMsg (
-  CHAR8   *MsgFmt,
+  CHAR8  *MsgFmt,
   ...
   );
 

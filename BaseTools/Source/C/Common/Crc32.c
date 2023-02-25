@@ -281,9 +281,9 @@ UINT32  mCrcTable[256] = {
 **/
 EFI_STATUS
 CalculateCrc32 (
-  IN  UINT8                             *Data,
-  IN  UINTN                             DataSize,
-  IN OUT UINT32                         *CrcOut
+  IN  UINT8      *Data,
+  IN  UINTN      DataSize,
+  IN OUT UINT32  *CrcOut
   )
 {
   UINT32  Crc;
@@ -296,7 +296,7 @@ CalculateCrc32 (
 
   Crc = 0xffffffff;
   for (Index = 0, Ptr = Data; Index < DataSize; Index++, Ptr++) {
-    Crc = (Crc >> 8) ^ mCrcTable[(UINT8) Crc ^ *Ptr];
+    Crc = (Crc >> 8) ^ mCrcTable[(UINT8)Crc ^ *Ptr];
   }
 
   *CrcOut = Crc ^ 0xffffffff;

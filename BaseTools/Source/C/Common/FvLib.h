@@ -20,8 +20,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 EFI_STATUS
 InitializeFvLib (
-  IN VOID                         *Fv,
-  IN UINT32                       FvLength
+  IN VOID    *Fv,
+  IN UINT32  FvLength
   )
 ;
 
@@ -34,71 +34,72 @@ GetFvHeader (
 
 EFI_STATUS
 GetNextFile (
-  IN EFI_FFS_FILE_HEADER          *CurrentFile,
-  OUT EFI_FFS_FILE_HEADER         **NextFile
+  IN EFI_FFS_FILE_HEADER   *CurrentFile,
+  OUT EFI_FFS_FILE_HEADER  **NextFile
   )
 ;
 
 EFI_STATUS
 GetFileByName (
-  IN EFI_GUID                     *FileName,
-  OUT EFI_FFS_FILE_HEADER         **File
+  IN EFI_GUID              *FileName,
+  OUT EFI_FFS_FILE_HEADER  **File
   )
 ;
 
 EFI_STATUS
 GetFileByType (
-  IN EFI_FV_FILETYPE              FileType,
-  IN UINTN                        Instance,
-  OUT EFI_FFS_FILE_HEADER         **File
+  IN EFI_FV_FILETYPE       FileType,
+  IN UINTN                 Instance,
+  OUT EFI_FFS_FILE_HEADER  **File
   )
 ;
 
 EFI_STATUS
 GetSectionByType (
-  IN EFI_FFS_FILE_HEADER          *File,
-  IN EFI_SECTION_TYPE             SectionType,
-  IN UINTN                        Instance,
-  OUT EFI_FILE_SECTION_POINTER    *Section
+  IN EFI_FFS_FILE_HEADER        *File,
+  IN EFI_SECTION_TYPE           SectionType,
+  IN UINTN                      Instance,
+  OUT EFI_FILE_SECTION_POINTER  *Section
   )
 ;
+
 //
 // will not parse compressed sections
 //
 EFI_STATUS
 VerifyFv (
-  IN EFI_FIRMWARE_VOLUME_HEADER   *FvHeader
+  IN EFI_FIRMWARE_VOLUME_HEADER  *FvHeader
   )
 ;
 
 EFI_STATUS
 VerifyFfsFile (
-  IN EFI_FFS_FILE_HEADER          *FfsHeader
+  IN EFI_FFS_FILE_HEADER  *FfsHeader
   )
 ;
 
 UINT32
 GetFfsFileLength (
-  EFI_FFS_FILE_HEADER *FfsHeader
+  EFI_FFS_FILE_HEADER  *FfsHeader
   )
 ;
 
 UINT32
 GetSectionFileLength (
-  EFI_COMMON_SECTION_HEADER *SectionHeader
+  EFI_COMMON_SECTION_HEADER  *SectionHeader
   )
 ;
 
 UINT32
-GetFfsHeaderLength(
-   IN EFI_FFS_FILE_HEADER *FfsHeader
-   )
+GetFfsHeaderLength (
+  IN EFI_FFS_FILE_HEADER  *FfsHeader
+  )
 ;
 
 UINT32
-GetSectionHeaderLength(
-   IN EFI_COMMON_SECTION_HEADER *SectionHeader
-   )
+GetSectionHeaderLength (
+  IN EFI_COMMON_SECTION_HEADER  *SectionHeader
+  )
 ;
 
 /*++
@@ -120,7 +121,7 @@ Returns:
 --*/
 UINT32
 GetLength (
-  UINT8                           *ThreeByteLength
+  UINT8  *ThreeByteLength
   )
 ;
 
@@ -141,7 +142,7 @@ Returns:
 --*/
 EFI_STATUS
 GetErasePolarity (
-  OUT BOOLEAN   *ErasePolarity
+  OUT BOOLEAN  *ErasePolarity
   )
 ;
 

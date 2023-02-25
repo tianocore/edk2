@@ -11,9 +11,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <stdlib.h>
 #include <ctype.h>
 #ifdef __GNUC__
-#include <unistd.h>
+  #include <unistd.h>
 #else
-#include <direct.h>
+  #include <direct.h>
 #endif
 #include "CommonLib.h"
 #include "EfiUtilityMsgs.h"
@@ -60,11 +60,11 @@ PeiCopyMem (
   IN UINTN  Length
   )
 {
-  CHAR8 *Destination8;
-  CHAR8 *Source8;
+  CHAR8  *Destination8;
+  CHAR8  *Source8;
 
-  Destination8  = Destination;
-  Source8       = Source;
+  Destination8 = Destination;
+  Source8      = Source;
   while (Length--) {
     *(Destination8++) = *(Source8++);
   }
@@ -100,21 +100,21 @@ CopyMem (
 **/
 INTN
 CompareGuid (
-  IN EFI_GUID     *Guid1,
-  IN EFI_GUID     *Guid2
+  IN EFI_GUID  *Guid1,
+  IN EFI_GUID  *Guid2
   )
 {
-  INT32 *g1;
-  INT32 *g2;
-  INT32 r;
+  INT32  *g1;
+  INT32  *g2;
+  INT32  r;
 
   //
   // Compare 32 bits at a time
   //
-  g1  = (INT32 *) Guid1;
-  g2  = (INT32 *) Guid2;
+  g1 = (INT32 *)Guid1;
+  g2 = (INT32 *)Guid2;
 
-  r   = g1[0] - g2[0];
+  r  = g1[0] - g2[0];
   r |= g1[1] - g2[1];
   r |= g1[2] - g2[2];
   r |= g1[3] - g2[3];
@@ -148,9 +148,10 @@ GetFileImage (
   //
   // Verify input parameters.
   //
-  if (InputFileName == NULL || strlen (InputFileName) == 0 || InputFileImage == NULL) {
+  if ((InputFileName == NULL) || (strlen (InputFileName) == 0) || (InputFileImage == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Open the file and copy contents into a memory buffer.
   //
@@ -162,6 +163,7 @@ GetFileImage (
     Error (NULL, 0, 0001, "Error opening the input file", InputFileName);
     return EFI_ABORTED;
   }
+
   //
   // Go to the end so that we can determine the file size
   //
@@ -170,6 +172,7 @@ GetFileImage (
     fclose (InputFile);
     return EFI_ABORTED;
   }
+
   //
   // Get the file size
   //
@@ -179,6 +182,7 @@ GetFileImage (
     fclose (InputFile);
     return EFI_ABORTED;
   }
+
   //
   // Allocate a buffer
   //
@@ -187,6 +191,7 @@ GetFileImage (
     fclose (InputFile);
     return EFI_OUT_OF_RESOURCES;
   }
+
   //
   // Reset to the beginning of the file
   //
@@ -197,6 +202,7 @@ GetFileImage (
     *InputFileImage = NULL;
     return EFI_ABORTED;
   }
+
   //
   // Read all of the file contents.
   //
@@ -208,6 +214,7 @@ GetFileImage (
     *InputFileImage = NULL;
     return EFI_ABORTED;
   }
+
   //
   // Close the file
   //
@@ -230,9 +237,9 @@ GetFileImage (
 **/
 EFI_STATUS
 PutFileImage (
-  IN CHAR8    *OutputFileName,
-  IN CHAR8    *OutputFileImage,
-  IN UINT32   BytesToWrite
+  IN CHAR8   *OutputFileName,
+  IN CHAR8   *OutputFileImage,
+  IN UINT32  BytesToWrite
   )
 {
   FILE    *OutputFile;
@@ -241,9 +248,10 @@ PutFileImage (
   //
   // Verify input parameters.
   //
-  if (OutputFileName == NULL || strlen (OutputFileName) == 0 || OutputFileImage == NULL) {
+  if ((OutputFileName == NULL) || (strlen (OutputFileName) == 0) || (OutputFileImage == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Open the file and copy contents into a memory buffer.
   //
@@ -265,6 +273,7 @@ PutFileImage (
     fclose (OutputFile);
     return EFI_ABORTED;
   }
+
   //
   // Close the file
   //
@@ -283,11 +292,11 @@ PutFileImage (
 **/
 UINT8
 CalculateChecksum8 (
-  IN UINT8        *Buffer,
-  IN UINTN        Size
+  IN UINT8  *Buffer,
+  IN UINTN  Size
   )
 {
-  return (UINT8) (0x100 - CalculateSum8 (Buffer, Size));
+  return (UINT8)(0x100 - CalculateSum8 (Buffer, Size));
 }
 
 /**
@@ -304,8 +313,8 @@ CalculateSum8 (
   IN UINTN  Size
   )
 {
-  UINTN Index;
-  UINT8 Sum;
+  UINTN  Index;
+  UINT8  Sum;
 
   Sum = 0;
 
@@ -313,7 +322,7 @@ CalculateSum8 (
   // Perform the byte sum for buffer
   //
   for (Index = 0; Index < Size; Index++) {
-    Sum = (UINT8) (Sum + Buffer[Index]);
+    Sum = (UINT8)(Sum + Buffer[Index]);
   }
 
   return Sum;
@@ -324,16 +333,16 @@ CalculateSum8 (
 
   @param Buffer      Pointer to buffer containing byte data of component.
   @param Size        Size of the buffer
- 
+
   @return The 16 bit checksum value needed.
 **/
 UINT16
 CalculateChecksum16 (
-  IN UINT16       *Buffer,
-  IN UINTN        Size
+  IN UINT16  *Buffer,
+  IN UINTN   Size
   )
 {
-  return (UINT16) (0x10000 - CalculateSum16 (Buffer, Size));
+  return (UINT16)(0x10000 - CalculateSum16 (Buffer, Size));
 }
 
 /**
@@ -346,8 +355,8 @@ CalculateChecksum16 (
 **/
 UINT16
 CalculateSum16 (
-  IN UINT16       *Buffer,
-  IN UINTN        Size
+  IN UINT16  *Buffer,
+  IN UINTN   Size
   )
 {
   UINTN   Index;
@@ -359,10 +368,10 @@ CalculateSum16 (
   // Perform the word sum for buffer
   //
   for (Index = 0; Index < Size; Index++) {
-    Sum = (UINT16) (Sum + Buffer[Index]);
+    Sum = (UINT16)(Sum + Buffer[Index]);
   }
 
-  return (UINT16) Sum;
+  return (UINT16)Sum;
 }
 
 /**
@@ -375,7 +384,7 @@ CalculateSum16 (
 **/
 EFI_STATUS
 PrintGuid (
-  IN EFI_GUID *Guid
+  IN EFI_GUID  *Guid
   )
 {
   if (Guid == NULL) {
@@ -385,7 +394,7 @@ PrintGuid (
 
   printf (
     "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x\n",
-    (unsigned) Guid->Data1,
+    (unsigned)Guid->Data1,
     Guid->Data2,
     Guid->Data3,
     Guid->Data4[0],
@@ -414,10 +423,10 @@ PrintGuid (
 **/
 EFI_STATUS
 PrintGuidToBuffer (
-  IN EFI_GUID     *Guid,
-  IN OUT UINT8    *Buffer,
-  IN UINT32       BufferLen,
-  IN BOOLEAN      Uppercase
+  IN EFI_GUID   *Guid,
+  IN OUT UINT8  *Buffer,
+  IN UINT32     BufferLen,
+  IN BOOLEAN    Uppercase
   )
 {
   if (Guid == NULL) {
@@ -434,7 +443,7 @@ PrintGuidToBuffer (
     sprintf (
       (CHAR8 *)Buffer,
       "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-      (unsigned) Guid->Data1,
+      (unsigned)Guid->Data1,
       Guid->Data2,
       Guid->Data3,
       Guid->Data4[0],
@@ -450,7 +459,7 @@ PrintGuidToBuffer (
     sprintf (
       (CHAR8 *)Buffer,
       "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-      (unsigned) Guid->Data1,
+      (unsigned)Guid->Data1,
       Guid->Data2,
       Guid->Data3,
       Guid->Data4[0],
@@ -469,32 +478,42 @@ PrintGuidToBuffer (
 
 #ifdef __GNUC__
 
-size_t _filelength(int fd)
+size_t
+_filelength (
+  int  fd
+  )
 {
-  struct stat stat_buf;
-  fstat(fd, &stat_buf);
+  struct stat  stat_buf;
+
+  fstat (fd, &stat_buf);
   return stat_buf.st_size;
 }
 
-#ifndef __CYGWIN__
-char *strlwr(char *s)
+  #ifndef __CYGWIN__
+char *
+strlwr (
+  char  *s
+  )
 {
-  char *p = s;
-  for(;*s;s++) {
-    *s = tolower(*s);
+  char  *p = s;
+
+  for ( ; *s; s++) {
+    *s = tolower (*s);
   }
+
   return p;
 }
-#endif
+
+  #endif
 #endif
 
-#define WINDOWS_EXTENSION_PATH "\\\\?\\"
-#define WINDOWS_UNC_EXTENSION_PATH "\\\\?\\UNC"
+#define WINDOWS_EXTENSION_PATH      "\\\\?\\"
+#define WINDOWS_UNC_EXTENSION_PATH  "\\\\?\\UNC"
 
 //
 // Global data to store full file path. It is not required to be free.
 //
-CHAR8 mCommonLibFullPath[MAX_LONG_FILE_PATH];
+CHAR8  mCommonLibFullPath[MAX_LONG_FILE_PATH];
 
 /**
   Convert FileName to the long file path, which can support larger than 260 length.
@@ -505,21 +524,21 @@ CHAR8 mCommonLibFullPath[MAX_LONG_FILE_PATH];
 **/
 CHAR8 *
 LongFilePath (
- IN CHAR8 *FileName
- )
+  IN CHAR8  *FileName
+  )
 {
-#ifdef __GNUC__
+ #ifdef __GNUC__
   //
   // __GNUC__ may not be good way to differentiate unix and windows. Need more investigation here.
   // unix has no limitation on file path. Just return FileName.
   //
   return FileName;
-#else
-  CHAR8 *RootPath;
-  CHAR8 *PathPointer;
-  CHAR8 *NextPointer;
+ #else
+  CHAR8  *RootPath;
+  CHAR8  *PathPointer;
+  CHAR8  *NextPointer;
 
-  PathPointer = (CHAR8 *) FileName;
+  PathPointer = (CHAR8 *)FileName;
 
   if (FileName != NULL) {
     //
@@ -528,13 +547,13 @@ LongFilePath (
     mCommonLibFullPath[0] = 0;
     strcpy (mCommonLibFullPath, WINDOWS_EXTENSION_PATH);
 
-    if (strlen (FileName) > 1 && FileName[0] == '\\' && FileName[1] == '\\') {
+    if ((strlen (FileName) > 1) && (FileName[0] == '\\') && (FileName[1] == '\\')) {
       //
       // network path like \\server\share to \\?\UNC\server\share
       //
       strcpy (mCommonLibFullPath, WINDOWS_UNC_EXTENSION_PATH);
-      FileName ++;
-    } else if (strlen (FileName) < 3 || FileName[1] != ':' || (FileName[2] != '\\' && FileName[2] != '/')) {
+      FileName++;
+    } else if ((strlen (FileName) < 3) || (FileName[1] != ':') || ((FileName[2] != '\\') && (FileName[2] != '/'))) {
       //
       // Relative file path. Convert it to absolute path.
       //
@@ -545,18 +564,21 @@ LongFilePath (
           free (RootPath);
           return NULL;
         }
+
         strncat (mCommonLibFullPath, RootPath, MAX_LONG_FILE_PATH - strlen (mCommonLibFullPath) - 1);
-        if (FileName[0] != '\\' && FileName[0] != '/') {
+        if ((FileName[0] != '\\') && (FileName[0] != '/')) {
           if (strlen (mCommonLibFullPath) + 1 > MAX_LONG_FILE_PATH - 1) {
             Error (NULL, 0, 2000, "Invalid parameter", "RootPath is too long!");
             free (RootPath);
             return NULL;
           }
+
           //
           // Attach directory separator
           //
           strncat (mCommonLibFullPath, "\\", MAX_LONG_FILE_PATH - strlen (mCommonLibFullPath) - 1);
         }
+
         free (RootPath);
       }
     }
@@ -568,17 +590,18 @@ LongFilePath (
       Error (NULL, 0, 2000, "Invalid parameter", "FileName %s is too long!", FileName);
       return NULL;
     }
+
     strncat (mCommonLibFullPath, FileName, MAX_LONG_FILE_PATH - strlen (mCommonLibFullPath) - 1);
 
     //
     // Convert directory separator '/' to '\\'
     //
-    PathPointer = (CHAR8 *) mCommonLibFullPath;
+    PathPointer = (CHAR8 *)mCommonLibFullPath;
     do {
       if (*PathPointer == '/') {
         *PathPointer = '\\';
       }
-    } while (*PathPointer ++ != '\0');
+    } while (*PathPointer++ != '\0');
 
     //
     // Convert ":\\\\" to ":\\", because it doesn't work with WINDOWS_EXTENSION_PATH.
@@ -610,7 +633,7 @@ LongFilePath (
     while ((PathPointer = strstr (mCommonLibFullPath, "\\..\\")) != NULL) {
       NextPointer = PathPointer + 3;
       do {
-        PathPointer --;
+        PathPointer--;
       } while (PathPointer > mCommonLibFullPath && *PathPointer != ':' && *PathPointer != '\\');
 
       if (*PathPointer == '\\') {
@@ -631,16 +654,16 @@ LongFilePath (
   }
 
   return PathPointer;
-#endif
+ #endif
 }
 
 CHAR16
 InternalCharToUpper (
-        CHAR16                    Char
+  CHAR16  Char
   )
 {
-  if (Char >= L'a' && Char <= L'z') {
-    return (CHAR16) (Char - (L'a' - L'A'));
+  if ((Char >= L'a') && (Char <= L'z')) {
+    return (CHAR16)(Char - (L'a' - L'A'));
   }
 
   return Char;
@@ -648,13 +671,13 @@ InternalCharToUpper (
 
 UINTN
 StrnLenS (
-   CONST CHAR16              *String,
-   UINTN                     MaxSize
+  CONST CHAR16  *String,
+  UINTN         MaxSize
   )
 {
-  UINTN     Length;
+  UINTN  Length;
 
-  ASSERT (((UINTN) String & BIT0) == 0);
+  ASSERT (((UINTN)String & BIT0) == 0);
 
   //
   // If String is a null pointer or MaxSize is 0, then the StrnLenS function returns zero.
@@ -668,47 +691,48 @@ StrnLenS (
     if (Length >= MaxSize - 1) {
       return MaxSize;
     }
+
     Length++;
   }
+
   return Length;
 }
 
-
 VOID *
 InternalAllocatePool (
-   UINTN   AllocationSize
+  UINTN  AllocationSize
   )
 {
-  VOID * Memory;
+  VOID  *Memory;
 
-  Memory = malloc(AllocationSize);
-  ASSERT(Memory != NULL);
+  Memory = malloc (AllocationSize);
+  ASSERT (Memory != NULL);
   return Memory;
 }
 
-
 VOID *
 InternalReallocatePool (
-   UINTN            OldSize,
-   UINTN            NewSize,
-   VOID             *OldBuffer  OPTIONAL
+  UINTN  OldSize,
+  UINTN  NewSize,
+  VOID   *OldBuffer  OPTIONAL
   )
 {
   VOID  *NewBuffer;
 
   NewBuffer = AllocateZeroPool (NewSize);
-  if (NewBuffer != NULL && OldBuffer != NULL) {
+  if ((NewBuffer != NULL) && (OldBuffer != NULL)) {
     memcpy (NewBuffer, OldBuffer, MIN (OldSize, NewSize));
-    free(OldBuffer);
+    free (OldBuffer);
   }
+
   return NewBuffer;
 }
 
 VOID *
 ReallocatePool (
-   UINTN  OldSize,
-   UINTN  NewSize,
-   VOID   *OldBuffer  OPTIONAL
+  UINTN  OldSize,
+  UINTN  NewSize,
+  VOID   *OldBuffer  OPTIONAL
   )
 {
   return InternalReallocatePool (OldSize, NewSize, OldBuffer);
@@ -733,13 +757,13 @@ ReallocatePool (
 **/
 UINTN
 StrLen (
-  CONST CHAR16              *String
+  CONST CHAR16  *String
   )
 {
-  UINTN   Length;
+  UINTN  Length;
 
   ASSERT (String != NULL);
-  ASSERT (((UINTN) String & BIT0) == 0);
+  ASSERT (((UINTN)String & BIT0) == 0);
 
   for (Length = 0; *String != L'\0'; String++, Length++) {
     //
@@ -747,21 +771,24 @@ StrLen (
     // length should not more than PcdMaximumUnicodeStringLength
     //
   }
+
   return Length;
 }
 
 BOOLEAN
 InternalSafeStringIsOverlap (
-  IN VOID    *Base1,
-  IN UINTN   Size1,
-  IN VOID    *Base2,
-  IN UINTN   Size2
+  IN VOID   *Base1,
+  IN UINTN  Size1,
+  IN VOID   *Base2,
+  IN UINTN  Size2
   )
 {
   if ((((UINTN)Base1 >= (UINTN)Base2) && ((UINTN)Base1 < (UINTN)Base2 + Size2)) ||
-      (((UINTN)Base2 >= (UINTN)Base1) && ((UINTN)Base2 < (UINTN)Base1 + Size1))) {
+      (((UINTN)Base2 >= (UINTN)Base1) && ((UINTN)Base2 < (UINTN)Base1 + Size1)))
+  {
     return TRUE;
   }
+
   return FALSE;
 }
 
@@ -773,7 +800,7 @@ InternalSafeStringNoStrOverlap (
   IN UINTN   Size2
   )
 {
-  return !InternalSafeStringIsOverlap (Str1, Size1 * sizeof(CHAR16), Str2, Size2 * sizeof(CHAR16));
+  return !InternalSafeStringIsOverlap (Str1, Size1 * sizeof (CHAR16), Str2, Size2 * sizeof (CHAR16));
 }
 
 /**
@@ -826,12 +853,12 @@ InternalSafeStringNoStrOverlap (
 **/
 RETURN_STATUS
 StrDecimalToUint64S (
-    CONST CHAR16             *String,
-         CHAR16             **EndPointer,  OPTIONAL
-         UINT64             *Data
+  CONST CHAR16 *String,
+  CHAR16 **EndPointer, OPTIONAL
+  UINT64             *Data
   )
 {
-  ASSERT (((UINTN) String & BIT0) == 0);
+  ASSERT (((UINTN)String & BIT0) == 0);
 
   //
   // 1. Neither String nor Data shall be a null pointer.
@@ -847,7 +874,7 @@ StrDecimalToUint64S (
   }
 
   if (EndPointer != NULL) {
-    *EndPointer = (CHAR16 *) String;
+    *EndPointer = (CHAR16 *)String;
   }
 
   //
@@ -875,8 +902,9 @@ StrDecimalToUint64S (
     if (*Data > ((MAX_UINT64 - (*String - L'0'))/10)) {
       *Data = MAX_UINT64;
       if (EndPointer != NULL) {
-        *EndPointer = (CHAR16 *) String;
+        *EndPointer = (CHAR16 *)String;
       }
+
       return RETURN_UNSUPPORTED;
     }
 
@@ -885,8 +913,9 @@ StrDecimalToUint64S (
   }
 
   if (EndPointer != NULL) {
-    *EndPointer = (CHAR16 *) String;
+    *EndPointer = (CHAR16 *)String;
   }
+
   return RETURN_SUCCESS;
 }
 
@@ -945,12 +974,12 @@ StrDecimalToUint64S (
 **/
 RETURN_STATUS
 StrHexToUint64S (
-    CONST CHAR16             *String,
-         CHAR16             **EndPointer,  OPTIONAL
-         UINT64             *Data
+  CONST CHAR16 *String,
+  CHAR16 **EndPointer, OPTIONAL
+  UINT64             *Data
   )
 {
-  ASSERT (((UINTN) String & BIT0) == 0);
+  ASSERT (((UINTN)String & BIT0) == 0);
 
   //
   // 1. Neither String nor Data shall be a null pointer.
@@ -966,7 +995,7 @@ StrHexToUint64S (
   }
 
   if (EndPointer != NULL) {
-    *EndPointer = (CHAR16 *) String;
+    *EndPointer = (CHAR16 *)String;
   }
 
   //
@@ -988,6 +1017,7 @@ StrHexToUint64S (
       *Data = 0;
       return RETURN_SUCCESS;
     }
+
     //
     // Skip the 'X'
     //
@@ -1005,8 +1035,9 @@ StrHexToUint64S (
     if (*Data > ((MAX_UINT64 - InternalHexCharToUintn (*String))>>4)) {
       *Data = MAX_UINT64;
       if (EndPointer != NULL) {
-        *EndPointer = (CHAR16 *) String;
+        *EndPointer = (CHAR16 *)String;
       }
+
       return RETURN_UNSUPPORTED;
     }
 
@@ -1015,46 +1046,45 @@ StrHexToUint64S (
   }
 
   if (EndPointer != NULL) {
-    *EndPointer = (CHAR16 *) String;
+    *EndPointer = (CHAR16 *)String;
   }
+
   return RETURN_SUCCESS;
 }
 
 UINT64
 StrDecimalToUint64 (
-  CONST CHAR16              *String
+  CONST CHAR16  *String
   )
 {
-  UINT64     Result;
+  UINT64  Result;
 
-  StrDecimalToUint64S (String, (CHAR16 **) NULL, &Result);
+  StrDecimalToUint64S (String, (CHAR16 **)NULL, &Result);
   return Result;
 }
 
-
 UINT64
 StrHexToUint64 (
-  CONST CHAR16             *String
+  CONST CHAR16  *String
   )
 {
-  UINT64    Result;
+  UINT64  Result;
 
-  StrHexToUint64S (String, (CHAR16 **) NULL, &Result);
+  StrHexToUint64S (String, (CHAR16 **)NULL, &Result);
   return Result;
 }
 
 UINTN
 StrSize (
-  CONST CHAR16              *String
+  CONST CHAR16  *String
   )
 {
   return (StrLen (String) + 1) * sizeof (*String);
 }
 
-
 UINT64
 ReadUnaligned64 (
-   CONST UINT64              *Buffer
+  CONST UINT64  *Buffer
   )
 {
   ASSERT (Buffer != NULL);
@@ -1064,8 +1094,8 @@ ReadUnaligned64 (
 
 UINT64
 WriteUnaligned64 (
-   UINT64                    *Buffer,
-   UINT64                    Value
+  UINT64  *Buffer,
+  UINT64  Value
   )
 {
   ASSERT (Buffer != NULL);
@@ -1073,58 +1103,56 @@ WriteUnaligned64 (
   return *Buffer = Value;
 }
 
-
 EFI_GUID *
 CopyGuid (
-   EFI_GUID         *DestinationGuid,
-   CONST EFI_GUID  *SourceGuid
+  EFI_GUID        *DestinationGuid,
+  CONST EFI_GUID  *SourceGuid
   )
 {
   WriteUnaligned64 (
-    (UINT64*)DestinationGuid,
-    ReadUnaligned64 ((CONST UINT64*)SourceGuid)
+    (UINT64 *)DestinationGuid,
+    ReadUnaligned64 ((CONST UINT64 *)SourceGuid)
     );
   WriteUnaligned64 (
-    (UINT64*)DestinationGuid + 1,
-    ReadUnaligned64 ((CONST UINT64*)SourceGuid + 1)
+    (UINT64 *)DestinationGuid + 1,
+    ReadUnaligned64 ((CONST UINT64 *)SourceGuid + 1)
     );
   return DestinationGuid;
 }
 
 UINT16
 SwapBytes16 (
-  UINT16                    Value
+  UINT16  Value
   )
 {
-  return (UINT16) ((Value<< 8) | (Value>> 8));
+  return (UINT16)((Value<< 8) | (Value>> 8));
 }
-
 
 UINT32
 SwapBytes32 (
-  UINT32                    Value
+  UINT32  Value
   )
 {
   UINT32  LowerBytes;
   UINT32  HigherBytes;
 
-  LowerBytes  = (UINT32) SwapBytes16 ((UINT16) Value);
-  HigherBytes = (UINT32) SwapBytes16 ((UINT16) (Value >> 16));
+  LowerBytes  = (UINT32)SwapBytes16 ((UINT16)Value);
+  HigherBytes = (UINT32)SwapBytes16 ((UINT16)(Value >> 16));
   return (LowerBytes << 16 | HigherBytes);
 }
 
 BOOLEAN
 InternalIsDecimalDigitCharacter (
-  CHAR16                    Char
+  CHAR16  Char
   )
 {
-  return (BOOLEAN) (Char >= L'0' && Char <= L'9');
+  return (BOOLEAN)(Char >= L'0' && Char <= L'9');
 }
 
 VOID *
 InternalAllocateCopyPool (
-   UINTN            AllocationSize,
-   CONST VOID       *Buffer
+  UINTN       AllocationSize,
+  CONST VOID  *Buffer
   )
 {
   VOID  *Memory;
@@ -1133,25 +1161,25 @@ InternalAllocateCopyPool (
 
   Memory = malloc (AllocationSize);
   if (Memory != NULL) {
-     Memory = memcpy (Memory, Buffer, AllocationSize);
+    Memory = memcpy (Memory, Buffer, AllocationSize);
   }
+
   return Memory;
 }
 
 BOOLEAN
 InternalIsHexaDecimalDigitCharacter (
-  CHAR16                    Char
+  CHAR16  Char
   )
 {
-
-  return (BOOLEAN) (InternalIsDecimalDigitCharacter (Char) ||
-    (Char >= L'A' && Char <= L'F') ||
-    (Char >= L'a' && Char <= L'f'));
+  return (BOOLEAN)(InternalIsDecimalDigitCharacter (Char) ||
+                   (Char >= L'A' && Char <= L'F') ||
+                   (Char >= L'a' && Char <= L'f'));
 }
 
 UINTN
 InternalHexCharToUintn (
-        CHAR16                    Char
+  CHAR16  Char
   )
 {
   if (InternalIsDecimalDigitCharacter (Char)) {
@@ -1160,7 +1188,6 @@ InternalHexCharToUintn (
 
   return (10 + InternalCharToUpper (Char) - L'A');
 }
-
 
 /**
   Convert a Null-terminated Unicode hexadecimal string to a byte array.
@@ -1208,15 +1235,15 @@ InternalHexCharToUintn (
 **/
 RETURN_STATUS
 StrHexToBytes (
-   CONST CHAR16       *String,
-   UINTN              Length,
-   UINT8              *Buffer,
-   UINTN              MaxBufferSize
+  CONST CHAR16  *String,
+  UINTN         Length,
+  UINT8         *Buffer,
+  UINTN         MaxBufferSize
   )
 {
-  UINTN                  Index;
+  UINTN  Index;
 
-  ASSERT (((UINTN) String & BIT0) == 0);
+  ASSERT (((UINTN)String & BIT0) == 0);
 
   //
   // 1. None of String or Buffer shall be a null pointer.
@@ -1249,6 +1276,7 @@ StrHexToBytes (
       break;
     }
   }
+
   if (Index != Length) {
     return RETURN_UNSUPPORTED;
   }
@@ -1256,18 +1284,18 @@ StrHexToBytes (
   //
   // Convert the hex string to bytes.
   //
-  for(Index = 0; Index < Length; Index++) {
-
+  for (Index = 0; Index < Length; Index++) {
     //
     // For even characters, write the upper nibble for each buffer byte,
     // and for even characters, the lower nibble.
     //
     if ((Index & BIT0) == 0) {
-      Buffer[Index / 2]  = (UINT8) InternalHexCharToUintn (String[Index]) << 4;
+      Buffer[Index / 2] = (UINT8)InternalHexCharToUintn (String[Index]) << 4;
     } else {
-      Buffer[Index / 2] |= (UINT8) InternalHexCharToUintn (String[Index]);
+      Buffer[Index / 2] |= (UINT8)InternalHexCharToUintn (String[Index]);
     }
   }
+
   return RETURN_SUCCESS;
 }
 
@@ -1317,14 +1345,14 @@ StrHexToBytes (
 **/
 RETURN_STATUS
 StrToGuid (
-   CONST CHAR16       *String,
-   EFI_GUID           *Guid
+  CONST CHAR16  *String,
+  EFI_GUID      *Guid
   )
 {
-  RETURN_STATUS          Status;
-  EFI_GUID               LocalGuid;
+  RETURN_STATUS  Status;
+  EFI_GUID       LocalGuid;
 
-  ASSERT (((UINTN) String & BIT0) == 0);
+  ASSERT (((UINTN)String & BIT0) == 0);
 
   //
   // 1. None of String or Guid shall be a null pointer.
@@ -1335,49 +1363,53 @@ StrToGuid (
   //
   // Get aabbccdd in big-endian.
   //
-  Status = StrHexToBytes (String, 2 * sizeof (LocalGuid.Data1), (UINT8 *) &LocalGuid.Data1, sizeof (LocalGuid.Data1));
-  if (RETURN_ERROR (Status) || String[2 * sizeof (LocalGuid.Data1)] != L'-') {
+  Status = StrHexToBytes (String, 2 * sizeof (LocalGuid.Data1), (UINT8 *)&LocalGuid.Data1, sizeof (LocalGuid.Data1));
+  if (RETURN_ERROR (Status) || (String[2 * sizeof (LocalGuid.Data1)] != L'-')) {
     return RETURN_UNSUPPORTED;
   }
+
   //
   // Convert big-endian to little-endian.
   //
   LocalGuid.Data1 = SwapBytes32 (LocalGuid.Data1);
-  String += 2 * sizeof (LocalGuid.Data1) + 1;
+  String         += 2 * sizeof (LocalGuid.Data1) + 1;
 
   //
   // Get eeff in big-endian.
   //
-  Status = StrHexToBytes (String, 2 * sizeof (LocalGuid.Data2), (UINT8 *) &LocalGuid.Data2, sizeof (LocalGuid.Data2));
-  if (RETURN_ERROR (Status) || String[2 * sizeof (LocalGuid.Data2)] != L'-') {
+  Status = StrHexToBytes (String, 2 * sizeof (LocalGuid.Data2), (UINT8 *)&LocalGuid.Data2, sizeof (LocalGuid.Data2));
+  if (RETURN_ERROR (Status) || (String[2 * sizeof (LocalGuid.Data2)] != L'-')) {
     return RETURN_UNSUPPORTED;
   }
+
   //
   // Convert big-endian to little-endian.
   //
   LocalGuid.Data2 = SwapBytes16 (LocalGuid.Data2);
-  String += 2 * sizeof (LocalGuid.Data2) + 1;
+  String         += 2 * sizeof (LocalGuid.Data2) + 1;
 
   //
   // Get gghh in big-endian.
   //
-  Status = StrHexToBytes (String, 2 * sizeof (LocalGuid.Data3), (UINT8 *) &LocalGuid.Data3, sizeof (LocalGuid.Data3));
-  if (RETURN_ERROR (Status) || String[2 * sizeof (LocalGuid.Data3)] != L'-') {
+  Status = StrHexToBytes (String, 2 * sizeof (LocalGuid.Data3), (UINT8 *)&LocalGuid.Data3, sizeof (LocalGuid.Data3));
+  if (RETURN_ERROR (Status) || (String[2 * sizeof (LocalGuid.Data3)] != L'-')) {
     return RETURN_UNSUPPORTED;
   }
+
   //
   // Convert big-endian to little-endian.
   //
   LocalGuid.Data3 = SwapBytes16 (LocalGuid.Data3);
-  String += 2 * sizeof (LocalGuid.Data3) + 1;
+  String         += 2 * sizeof (LocalGuid.Data3) + 1;
 
   //
   // Get iijj.
   //
   Status = StrHexToBytes (String, 2 * 2, &LocalGuid.Data4[0], 2);
-  if (RETURN_ERROR (Status) || String[2 * 2] != L'-') {
+  if (RETURN_ERROR (Status) || (String[2 * 2] != L'-')) {
     return RETURN_UNSUPPORTED;
   }
+
   String += 2 * 2 + 1;
 
   //
@@ -1426,9 +1458,9 @@ StrToGuid (
 **/
 INTN
 StrnCmp (
-        CONST CHAR16              *FirstString,
-        CONST CHAR16              *SecondString,
-        UINTN                     Length
+  CONST CHAR16  *FirstString,
+  CONST CHAR16  *SecondString,
+  UINTN         Length
   )
 {
   if (Length == 0) {
@@ -1445,7 +1477,8 @@ StrnCmp (
   while ((*FirstString != L'\0') &&
          (*SecondString != L'\0') &&
          (*FirstString == *SecondString) &&
-         (Length > 1)) {
+         (Length > 1))
+  {
     FirstString++;
     SecondString++;
     Length--;
@@ -1456,8 +1489,8 @@ StrnCmp (
 
 VOID *
 AllocateCopyPool (
-   UINTN       AllocationSize,
-   CONST VOID  *Buffer
+  UINTN       AllocationSize,
+  CONST VOID  *Buffer
   )
 {
   return InternalAllocateCopyPool (AllocationSize, Buffer);
@@ -1465,8 +1498,8 @@ AllocateCopyPool (
 
 INTN
 StrCmp (
-  CONST CHAR16              *FirstString,
-  CONST CHAR16              *SecondString
+  CONST CHAR16  *FirstString,
+  CONST CHAR16  *SecondString
   )
 {
   //
@@ -1479,12 +1512,13 @@ StrCmp (
     FirstString++;
     SecondString++;
   }
+
   return *FirstString - *SecondString;
 }
 
 UINT64
 SwapBytes64 (
-  UINT64                    Value
+  UINT64  Value
   )
 {
   return InternalMathSwapBytes64 (Value);
@@ -1492,37 +1526,37 @@ SwapBytes64 (
 
 UINT64
 InternalMathSwapBytes64 (
-  UINT64                    Operand
+  UINT64  Operand
   )
 {
   UINT64  LowerBytes;
   UINT64  HigherBytes;
 
-  LowerBytes  = (UINT64) SwapBytes32 ((UINT32) Operand);
-  HigherBytes = (UINT64) SwapBytes32 ((UINT32) (Operand >> 32));
+  LowerBytes  = (UINT64)SwapBytes32 ((UINT32)Operand);
+  HigherBytes = (UINT64)SwapBytes32 ((UINT32)(Operand >> 32));
 
   return (LowerBytes << 32 | HigherBytes);
 }
 
 RETURN_STATUS
 StrToIpv4Address (
-  CONST CHAR16       *String,
-  CHAR16             **EndPointer,
-  EFI_IPv4_ADDRESS       *Address,
-  UINT8              *PrefixLength
+  CONST CHAR16      *String,
+  CHAR16            **EndPointer,
+  EFI_IPv4_ADDRESS  *Address,
+  UINT8             *PrefixLength
   )
 {
-  RETURN_STATUS          Status;
-  UINTN                  AddressIndex;
-  UINT64                 Uint64;
-  EFI_IPv4_ADDRESS       LocalAddress;
-  UINT8                  LocalPrefixLength;
-  CHAR16                 *Pointer;
+  RETURN_STATUS     Status;
+  UINTN             AddressIndex;
+  UINT64            Uint64;
+  EFI_IPv4_ADDRESS  LocalAddress;
+  UINT8             LocalPrefixLength;
+  CHAR16            *Pointer;
 
-  LocalPrefixLength = MAX_UINT8;
+  LocalPrefixLength    = MAX_UINT8;
   LocalAddress.Addr[0] = 0;
 
-  ASSERT (((UINTN) String & BIT0) == 0);
+  ASSERT (((UINTN)String & BIT0) == 0);
 
   //
   // 1. None of String or Guid shall be a null pointer.
@@ -1530,7 +1564,7 @@ StrToIpv4Address (
   SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
   SAFE_STRING_CONSTRAINT_CHECK ((Address != NULL), RETURN_INVALID_PARAMETER);
 
-  for (Pointer = (CHAR16 *) String, AddressIndex = 0; AddressIndex < ARRAY_SIZE (Address->Addr) + 1;) {
+  for (Pointer = (CHAR16 *)String, AddressIndex = 0; AddressIndex < ARRAY_SIZE (Address->Addr) + 1;) {
     if (!InternalIsDecimalDigitCharacter (*Pointer)) {
       //
       // D or P contains invalid characters.
@@ -1541,10 +1575,11 @@ StrToIpv4Address (
     //
     // Get D or P.
     //
-    Status = StrDecimalToUint64S ((CONST CHAR16 *) Pointer, &Pointer, &Uint64);
+    Status = StrDecimalToUint64S ((CONST CHAR16 *)Pointer, &Pointer, &Uint64);
     if (RETURN_ERROR (Status)) {
       return RETURN_UNSUPPORTED;
     }
+
     if (AddressIndex == ARRAY_SIZE (Address->Addr)) {
       //
       // It's P.
@@ -1552,7 +1587,8 @@ StrToIpv4Address (
       if (Uint64 > 32) {
         return RETURN_UNSUPPORTED;
       }
-      LocalPrefixLength = (UINT8) Uint64;
+
+      LocalPrefixLength = (UINT8)Uint64;
     } else {
       //
       // It's D.
@@ -1560,7 +1596,8 @@ StrToIpv4Address (
       if (Uint64 > MAX_UINT8) {
         return RETURN_UNSUPPORTED;
       }
-      LocalAddress.Addr[AddressIndex] = (UINT8) Uint64;
+
+      LocalAddress.Addr[AddressIndex] = (UINT8)Uint64;
       AddressIndex++;
     }
 
@@ -1600,6 +1637,7 @@ StrToIpv4Address (
   if (PrefixLength != NULL) {
     *PrefixLength = LocalPrefixLength;
   }
+
   if (EndPointer != NULL) {
     *EndPointer = Pointer;
   }
@@ -1609,27 +1647,27 @@ StrToIpv4Address (
 
 RETURN_STATUS
 StrToIpv6Address (
-  CONST CHAR16       *String,
-  CHAR16             **EndPointer,
-  EFI_IPv6_ADDRESS   *Address,
-  UINT8              *PrefixLength
+  CONST CHAR16      *String,
+  CHAR16            **EndPointer,
+  EFI_IPv6_ADDRESS  *Address,
+  UINT8             *PrefixLength
   )
 {
-  RETURN_STATUS          Status;
-  UINTN                  AddressIndex;
-  UINT64                 Uint64;
-  EFI_IPv6_ADDRESS       LocalAddress;
-  UINT8                  LocalPrefixLength;
-  CONST CHAR16           *Pointer;
-  CHAR16                 *End;
-  UINTN                  CompressStart;
-  BOOLEAN                ExpectPrefix;
+  RETURN_STATUS     Status;
+  UINTN             AddressIndex;
+  UINT64            Uint64;
+  EFI_IPv6_ADDRESS  LocalAddress;
+  UINT8             LocalPrefixLength;
+  CONST CHAR16      *Pointer;
+  CHAR16            *End;
+  UINTN             CompressStart;
+  BOOLEAN           ExpectPrefix;
 
   LocalPrefixLength = MAX_UINT8;
   CompressStart     = ARRAY_SIZE (Address->Addr);
   ExpectPrefix      = FALSE;
 
-  ASSERT (((UINTN) String & BIT0) == 0);
+  ASSERT (((UINTN)String & BIT0) == 0);
 
   //
   // 1. None of String or Guid shall be a null pointer.
@@ -1657,7 +1695,7 @@ StrToIpv6Address (
         return RETURN_UNSUPPORTED;
       }
 
-      if (CompressStart != ARRAY_SIZE (Address->Addr) || AddressIndex == ARRAY_SIZE (Address->Addr)) {
+      if ((CompressStart != ARRAY_SIZE (Address->Addr)) || (AddressIndex == ARRAY_SIZE (Address->Addr))) {
         //
         // "::" can only appear once.
         // "::" can only appear when address is not full length.
@@ -1677,6 +1715,7 @@ StrToIpv6Address (
             //
             return RETURN_UNSUPPORTED;
           }
+
           Pointer++;
         }
       }
@@ -1699,33 +1738,35 @@ StrToIpv6Address (
         // Get X.
         //
         Status = StrHexToUint64S (Pointer, &End, &Uint64);
-        if (RETURN_ERROR (Status) || End - Pointer > 4) {
+        if (RETURN_ERROR (Status) || (End - Pointer > 4)) {
           //
           // Number of hexadecimal digit characters is no more than 4.
           //
           return RETURN_UNSUPPORTED;
         }
+
         Pointer = End;
         //
         // Uint64 won't exceed MAX_UINT16 if number of hexadecimal digit characters is no more than 4.
         //
         ASSERT (AddressIndex + 1 < ARRAY_SIZE (Address->Addr));
-        LocalAddress.Addr[AddressIndex] = (UINT8) ((UINT16) Uint64 >> 8);
-        LocalAddress.Addr[AddressIndex + 1] = (UINT8) Uint64;
-        AddressIndex += 2;
+        LocalAddress.Addr[AddressIndex]     = (UINT8)((UINT16)Uint64 >> 8);
+        LocalAddress.Addr[AddressIndex + 1] = (UINT8)Uint64;
+        AddressIndex                       += 2;
       } else {
         //
         // Get P, then exit the loop.
         //
         Status = StrDecimalToUint64S (Pointer, &End, &Uint64);
-        if (RETURN_ERROR (Status) || End == Pointer || Uint64 > 128) {
+        if (RETURN_ERROR (Status) || (End == Pointer) || (Uint64 > 128)) {
           //
           // Prefix length should not exceed 128.
           //
           return RETURN_UNSUPPORTED;
         }
-        LocalPrefixLength = (UINT8) Uint64;
-        Pointer = End;
+
+        LocalPrefixLength = (UINT8)Uint64;
+        Pointer           = End;
         break;
       }
     }
@@ -1748,21 +1789,24 @@ StrToIpv6Address (
       //
       break;
     }
+
     Pointer++;
   }
 
-  if ((AddressIndex == ARRAY_SIZE (Address->Addr) && CompressStart != ARRAY_SIZE (Address->Addr)) ||
-    (AddressIndex != ARRAY_SIZE (Address->Addr) && CompressStart == ARRAY_SIZE (Address->Addr))
-      ) {
+  if (((AddressIndex == ARRAY_SIZE (Address->Addr)) && (CompressStart != ARRAY_SIZE (Address->Addr))) ||
+      ((AddressIndex != ARRAY_SIZE (Address->Addr)) && (CompressStart == ARRAY_SIZE (Address->Addr)))
+      )
+  {
     //
     // Full length of address shall not have compressing zeros.
     // Non-full length of address shall have compressing zeros.
     //
     return RETURN_UNSUPPORTED;
   }
+
   memcpy (&Address->Addr[0], &LocalAddress.Addr[0], CompressStart);
   if (AddressIndex > CompressStart) {
-    memset (&Address->Addr[CompressStart], 0,  ARRAY_SIZE (Address->Addr) - AddressIndex);
+    memset (&Address->Addr[CompressStart], 0, ARRAY_SIZE (Address->Addr) - AddressIndex);
     memcpy (
       &Address->Addr[CompressStart + ARRAY_SIZE (Address->Addr) - AddressIndex],
       &LocalAddress.Addr[CompressStart],
@@ -1773,24 +1817,24 @@ StrToIpv6Address (
   if (PrefixLength != NULL) {
     *PrefixLength = LocalPrefixLength;
   }
+
   if (EndPointer != NULL) {
-    *EndPointer = (CHAR16 *) Pointer;
+    *EndPointer = (CHAR16 *)Pointer;
   }
 
   return RETURN_SUCCESS;
 }
 
-
 RETURN_STATUS
 UnicodeStrToAsciiStrS (
-  CONST CHAR16              *Source,
-  CHAR8                     *Destination,
-  UINTN                     DestMax
+  CONST CHAR16  *Source,
+  CHAR8         *Destination,
+  UINTN         DestMax
   )
 {
-  UINTN            SourceLen;
+  UINTN  SourceLen;
 
-  ASSERT (((UINTN) Source & BIT0) == 0);
+  ASSERT (((UINTN)Source & BIT0) == 0);
 
   //
   // 1. Neither Destination nor Source shall be a null pointer.
@@ -1804,6 +1848,7 @@ UnicodeStrToAsciiStrS (
   if (ASCII_RSIZE_MAX != 0) {
     SAFE_STRING_CONSTRAINT_CHECK ((DestMax <= ASCII_RSIZE_MAX), RETURN_INVALID_PARAMETER);
   }
+
   if (RSIZE_MAX != 0) {
     SAFE_STRING_CONSTRAINT_CHECK ((DestMax <= RSIZE_MAX), RETURN_INVALID_PARAMETER);
   }
@@ -1822,7 +1867,7 @@ UnicodeStrToAsciiStrS (
   //
   // 5. Copying shall not take place between objects that overlap.
   //
-  SAFE_STRING_CONSTRAINT_CHECK (!InternalSafeStringIsOverlap (Destination, DestMax, (VOID *)Source, (SourceLen + 1) * sizeof(CHAR16)), RETURN_ACCESS_DENIED);
+  SAFE_STRING_CONSTRAINT_CHECK (!InternalSafeStringIsOverlap (Destination, DestMax, (VOID *)Source, (SourceLen + 1) * sizeof (CHAR16)), RETURN_ACCESS_DENIED);
 
   //
   // convert string
@@ -1833,8 +1878,9 @@ UnicodeStrToAsciiStrS (
     // non-zero value in the upper 8 bits, then ASSERT().
     //
     ASSERT (*Source < 0x100);
-    *(Destination++) = (CHAR8) *(Source++);
+    *(Destination++) = (CHAR8)*(Source++);
   }
+
   *Destination = '\0';
 
   return RETURN_SUCCESS;
@@ -1842,15 +1888,15 @@ UnicodeStrToAsciiStrS (
 
 RETURN_STATUS
 StrCpyS (
-  CHAR16       *Destination,
-  UINTN        DestMax,
-  CONST CHAR16 *Source
+  CHAR16        *Destination,
+  UINTN         DestMax,
+  CONST CHAR16  *Source
   )
 {
-  UINTN            SourceLen;
+  UINTN  SourceLen;
 
-  ASSERT (((UINTN) Destination & BIT0) == 0);
-  ASSERT (((UINTN) Source & BIT0) == 0);
+  ASSERT (((UINTN)Destination & BIT0) == 0);
+  ASSERT (((UINTN)Source & BIT0) == 0);
 
   //
   // 1. Neither Destination nor Source shall be a null pointer.
@@ -1888,6 +1934,7 @@ StrCpyS (
   while (*Source != 0) {
     *(Destination++) = *(Source++);
   }
+
   *Destination = 0;
 
   return RETURN_SUCCESS;
@@ -1898,13 +1945,15 @@ AllocateZeroPool (
   UINTN  AllocationSize
   )
 {
-  VOID * Memory;
-  Memory = malloc(AllocationSize);
+  VOID  *Memory;
+
+  Memory = malloc (AllocationSize);
   ASSERT (Memory != NULL);
   if (Memory == NULL) {
-    fprintf(stderr, "Not memory for malloc\n");
+    fprintf (stderr, "Not memory for malloc\n");
   }
-  memset(Memory, 0, AllocationSize);
+
+  memset (Memory, 0, AllocationSize);
   return Memory;
 }
 
@@ -1918,8 +1967,8 @@ AllocatePool (
 
 UINT16
 WriteUnaligned16 (
-  UINT16                    *Buffer,
-  UINT16                    Value
+  UINT16  *Buffer,
+  UINT16  Value
   )
 {
   ASSERT (Buffer != NULL);
@@ -1929,13 +1978,14 @@ WriteUnaligned16 (
 
 UINT16
 ReadUnaligned16 (
-  CONST UINT16              *Buffer
+  CONST UINT16  *Buffer
   )
 {
   ASSERT (Buffer != NULL);
 
   return *Buffer;
 }
+
 /**
   Return whether the integer string is a hex string.
 
@@ -1947,23 +1997,24 @@ ReadUnaligned16 (
 **/
 BOOLEAN
 IsHexStr (
-   CHAR16   *Str
+  CHAR16  *Str
   )
 {
   //
   // skip preceding white space
   //
   while ((*Str != 0) && *Str == L' ') {
-    Str ++;
+    Str++;
   }
+
   //
   // skip preceding zeros
   //
   while ((*Str != 0) && *Str == L'0') {
-    Str ++;
+    Str++;
   }
 
-  return (BOOLEAN) (*Str == L'x' || *Str == L'X');
+  return (BOOLEAN)(*Str == L'x' || *Str == L'X');
 }
 
 /**
@@ -1977,7 +2028,7 @@ IsHexStr (
 **/
 UINTN
 Strtoi (
-   CHAR16  *Str
+  CHAR16  *Str
   )
 {
   if (IsHexStr (Str)) {
@@ -1997,8 +2048,8 @@ Strtoi (
 **/
 VOID
 Strtoi64 (
-    CHAR16  *Str,
-   UINT64  *Data
+  CHAR16  *Str,
+  UINT64  *Data
   )
 {
   if (IsHexStr (Str)) {
@@ -2018,16 +2069,17 @@ Strtoi64 (
 **/
 VOID
 StrToAscii (
-       CHAR16 *Str,
-    CHAR8  **AsciiStr
+  CHAR16  *Str,
+  CHAR8   **AsciiStr
   )
 {
-  CHAR8 *Dest;
+  CHAR8  *Dest;
 
   Dest = *AsciiStr;
   while (!IS_NULL (*Str)) {
-    *(Dest++) = (CHAR8) *(Str++);
+    *(Dest++) = (CHAR8)*(Str++);
   }
+
   *Dest = 0;
 
   //
@@ -2050,14 +2102,14 @@ StrToAscii (
 **/
 CHAR16 *
 SplitStr (
-    CHAR16 **List,
-       CHAR16 Separator
+  CHAR16  **List,
+  CHAR16  Separator
   )
 {
   CHAR16  *Str;
   CHAR16  *ReturnStr;
 
-  Str = *List;
+  Str       = *List;
   ReturnStr = Str;
 
   if (IS_NULL (*Str)) {
@@ -2071,6 +2123,7 @@ SplitStr (
     if (*Str == Separator) {
       break;
     }
+
     Str++;
   }
 
@@ -2088,4 +2141,3 @@ SplitStr (
   *List = Str;
   return ReturnStr;
 }
-

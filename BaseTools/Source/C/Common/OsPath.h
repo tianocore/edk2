@@ -33,9 +33,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @return NULL if error
 **/
-CHAR8*
+CHAR8 *
 OsPathDirName (
-  IN CHAR8    *FilePath
+  IN CHAR8  *FilePath
   )
 ;
 
@@ -54,7 +54,7 @@ OsPathDirName (
 **/
 VOID
 OsPathNormPathInPlace (
-  IN CHAR8    *Path
+  IN CHAR8  *Path
   )
 ;
 
@@ -73,10 +73,10 @@ OsPathNormPathInPlace (
 
   @return A CHAR8* string, which must be freed by the caller
 **/
-CHAR8*
+CHAR8 *
 OsPathPeerFilePath (
-  IN CHAR8    *OldPath,
-  IN CHAR8    *Peer
+  IN CHAR8  *OldPath,
+  IN CHAR8  *Peer
   )
 ;
 
@@ -90,7 +90,7 @@ OsPathPeerFilePath (
 **/
 BOOLEAN
 OsPathExists (
-  IN CHAR8    *InputFileName
+  IN CHAR8  *InputFileName
   )
 ;
 

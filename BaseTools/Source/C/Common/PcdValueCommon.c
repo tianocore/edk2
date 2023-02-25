@@ -23,13 +23,13 @@ typedef enum {
 } PCD_DATA_TYPE;
 
 typedef struct {
-  CHAR8          *SkuName;
-  CHAR8          *DefaultValueName;
-  CHAR8          *TokenSpaceGuidName;
-  CHAR8          *TokenName;
-  CHAR8          *DataType;
-  CHAR8          *Value;
-  PCD_DATA_TYPE  PcdDataType;
+  CHAR8            *SkuName;
+  CHAR8            *DefaultValueName;
+  CHAR8            *TokenSpaceGuidName;
+  CHAR8            *TokenName;
+  CHAR8            *DataType;
+  CHAR8            *Value;
+  PCD_DATA_TYPE    PcdDataType;
 } PCD_ENTRY;
 
 PCD_ENTRY  *PcdList;
@@ -61,43 +61,45 @@ RecordToken (
   if (Token == NULL) {
     return;
   }
+
   memcpy (Token, &FileBuffer[TokenStart], TokenEnd - TokenStart);
   Token[TokenEnd - TokenStart] = 0;
   switch (TokenIndex) {
-  case 0:
-    PcdList[PcdIndex].SkuName = Token;
-    break;
-  case 1:
-    PcdList[PcdIndex].DefaultValueName = Token;
-    break;
-  case 2:
-    PcdList[PcdIndex].TokenSpaceGuidName = Token;
-    break;
-  case 3:
-    PcdList[PcdIndex].TokenName = Token;
-    break;
-  case 4:
-    PcdList[PcdIndex].DataType = Token;
-    if (strcmp (Token, "BOOLEAN") == 0) {
-      PcdList[PcdIndex].PcdDataType = PcdDataTypeBoolean;
-    } else if (strcmp (Token, "UINT8") == 0) {
-      PcdList[PcdIndex].PcdDataType = PcdDataTypeUint8;
-    } else if (strcmp (Token, "UINT16") == 0) {
-      PcdList[PcdIndex].PcdDataType = PcdDataTypeUint16;
-    } else if (strcmp (Token, "UINT32") == 0) {
-      PcdList[PcdIndex].PcdDataType = PcdDataTypeUint32;
-    } else if (strcmp (Token, "UINT64") == 0) {
-      PcdList[PcdIndex].PcdDataType = PcdDataTypeUint64;
-    } else {
-      PcdList[PcdIndex].PcdDataType = PcdDataTypePointer;
-    }
-    break;
-  case 5:
-    PcdList[PcdIndex].Value = Token;
-    break;
-  default:
-    free (Token);
-    break;
+    case 0:
+      PcdList[PcdIndex].SkuName = Token;
+      break;
+    case 1:
+      PcdList[PcdIndex].DefaultValueName = Token;
+      break;
+    case 2:
+      PcdList[PcdIndex].TokenSpaceGuidName = Token;
+      break;
+    case 3:
+      PcdList[PcdIndex].TokenName = Token;
+      break;
+    case 4:
+      PcdList[PcdIndex].DataType = Token;
+      if (strcmp (Token, "BOOLEAN") == 0) {
+        PcdList[PcdIndex].PcdDataType = PcdDataTypeBoolean;
+      } else if (strcmp (Token, "UINT8") == 0) {
+        PcdList[PcdIndex].PcdDataType = PcdDataTypeUint8;
+      } else if (strcmp (Token, "UINT16") == 0) {
+        PcdList[PcdIndex].PcdDataType = PcdDataTypeUint16;
+      } else if (strcmp (Token, "UINT32") == 0) {
+        PcdList[PcdIndex].PcdDataType = PcdDataTypeUint32;
+      } else if (strcmp (Token, "UINT64") == 0) {
+        PcdList[PcdIndex].PcdDataType = PcdDataTypeUint64;
+      } else {
+        PcdList[PcdIndex].PcdDataType = PcdDataTypePointer;
+      }
+
+      break;
+    case 5:
+      PcdList[PcdIndex].Value = Token;
+      break;
+    default:
+      free (Token);
+      break;
   }
 }
 
@@ -125,24 +127,31 @@ LookupPcdIndex (
   if (SkuName == NULL) {
     SkuName = "DEFAULT";
   }
+
   if (DefaultValueName == NULL) {
     DefaultValueName = "DEFAULT";
   }
+
   for (Index = 0; Index < PcdListLength; Index++) {
-    if (strcmp(PcdList[Index].TokenSpaceGuidName, TokenSpaceGuidName) != 0) {
+    if (strcmp (PcdList[Index].TokenSpaceGuidName, TokenSpaceGuidName) != 0) {
       continue;
     }
-    if (strcmp(PcdList[Index].TokenName, TokenName) != 0) {
+
+    if (strcmp (PcdList[Index].TokenName, TokenName) != 0) {
       continue;
     }
-    if (strcmp(PcdList[Index].SkuName, SkuName) != 0) {
+
+    if (strcmp (PcdList[Index].SkuName, SkuName) != 0) {
       continue;
     }
-    if (strcmp(PcdList[Index].DefaultValueName, DefaultValueName) != 0) {
+
+    if (strcmp (PcdList[Index].DefaultValueName, DefaultValueName) != 0) {
       continue;
     }
+
     return Index;
   }
+
   return -1;
 }
 
@@ -172,21 +181,23 @@ __PcdGet (
     fprintf (stderr, "PCD %s.%s.%s.%s is not in database\n", SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
     exit (EXIT_FAILURE);
   }
+
   switch (PcdList[Index].PcdDataType) {
-  case PcdDataTypeBoolean:
-  case PcdDataTypeUint8:
-  case PcdDataTypeUint16:
-  case PcdDataTypeUint32:
-    return (UINT64)strtoul(PcdList[Index].Value, &End, 16);
-    break;
-  case PcdDataTypeUint64:
-    return (UINT64)strtoul(PcdList[Index].Value, &End, 16);
-    break;
-  case PcdDataTypePointer:
-    fprintf (stderr, "PCD %s.%s.%s.%s is structure.  Use PcdGetPtr()\n", SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
-    exit (EXIT_FAILURE);
-    break;
+    case PcdDataTypeBoolean:
+    case PcdDataTypeUint8:
+    case PcdDataTypeUint16:
+    case PcdDataTypeUint32:
+      return (UINT64)strtoul (PcdList[Index].Value, &End, 16);
+      break;
+    case PcdDataTypeUint64:
+      return (UINT64)strtoul (PcdList[Index].Value, &End, 16);
+      break;
+    case PcdDataTypePointer:
+      fprintf (stderr, "PCD %s.%s.%s.%s is structure.  Use PcdGetPtr()\n", SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
+      exit (EXIT_FAILURE);
+      break;
   }
+
   return 0;
 }
 
@@ -208,39 +219,41 @@ __PcdSet (
   UINT64  Value
   )
 {
-  int    Index;
+  int  Index;
 
   Index = LookupPcdIndex (SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
   if (Index < 0) {
     fprintf (stderr, "PCD %s.%s.%s.%s is not in database\n", SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
     exit (EXIT_FAILURE);
   }
-  free(PcdList[Index].Value);
-  PcdList[Index].Value = malloc(20);
+
+  free (PcdList[Index].Value);
+  PcdList[Index].Value = malloc (20);
   switch (PcdList[Index].PcdDataType) {
-  case PcdDataTypeBoolean:
-    if (Value == 0) {
-      strcpy (PcdList[Index].Value, "0x00");
-    } else {
-      strcpy (PcdList[Index].Value, "0x01");
-    }
-    break;
-  case PcdDataTypeUint8:
-    sprintf(PcdList[Index].Value, "0x%02x", (UINT8)(Value & 0xff));
-    break;
-  case PcdDataTypeUint16:
-    sprintf(PcdList[Index].Value, "0x%04x", (UINT16)(Value & 0xffff));
-    break;
-  case PcdDataTypeUint32:
-    sprintf(PcdList[Index].Value, "0x%08x", (UINT32)(Value & 0xffffffff));
-    break;
-  case PcdDataTypeUint64:
-    sprintf(PcdList[Index].Value, "0x%016llx", (unsigned long long)Value);
-    break;
-  case PcdDataTypePointer:
-    fprintf (stderr, "PCD %s.%s.%s.%s is structure.  Use PcdSetPtr()\n", SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
-    exit (EXIT_FAILURE);
-    break;
+    case PcdDataTypeBoolean:
+      if (Value == 0) {
+        strcpy (PcdList[Index].Value, "0x00");
+      } else {
+        strcpy (PcdList[Index].Value, "0x01");
+      }
+
+      break;
+    case PcdDataTypeUint8:
+      sprintf (PcdList[Index].Value, "0x%02x", (UINT8)(Value & 0xff));
+      break;
+    case PcdDataTypeUint16:
+      sprintf (PcdList[Index].Value, "0x%04x", (UINT16)(Value & 0xffff));
+      break;
+    case PcdDataTypeUint32:
+      sprintf (PcdList[Index].Value, "0x%08x", (UINT32)(Value & 0xffffffff));
+      break;
+    case PcdDataTypeUint64:
+      sprintf (PcdList[Index].Value, "0x%016llx", (unsigned long long)Value);
+      break;
+    case PcdDataTypePointer:
+      fprintf (stderr, "PCD %s.%s.%s.%s is structure.  Use PcdSetPtr()\n", SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
+      exit (EXIT_FAILURE);
+      break;
   }
 }
 
@@ -252,7 +265,7 @@ __PcdSet (
   @param TokenSpaceGuidName    TokenSpaceGuidName String
   @param TokenName             TokenName String
   @param Size                  Size of PCD value buffer
- 
+
   @return PCD value buffer
 **/
 VOID *
@@ -265,40 +278,45 @@ __PcdGetPtr (
   )
 {
   int    Index;
-  CHAR8   *Value;
-  UINT8   *Buffer;
-  CHAR8   *End;
+  CHAR8  *Value;
+  UINT8  *Buffer;
+  CHAR8  *End;
 
   Index = LookupPcdIndex (SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
   if (Index < 0) {
     fprintf (stderr, "PCD %s.%s.%s.%s is not in database\n", SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
     exit (EXIT_FAILURE);
   }
+
   switch (PcdList[Index].PcdDataType) {
-  case PcdDataTypeBoolean:
-  case PcdDataTypeUint8:
-  case PcdDataTypeUint16:
-  case PcdDataTypeUint32:
-  case PcdDataTypeUint64:
-    fprintf (stderr, "PCD %s.%s.%s.%s is a value.  Use PcdGet()\n", SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
-    exit (EXIT_FAILURE);
-    break;
-  case PcdDataTypePointer:
-    Value = &PcdList[Index].Value[1];
-    for (*Size = 0, strtoul(Value, &End, 16); Value != End; strtoul(Value, &End, 16), *Size = *Size + 1) {
-      Value = End + 1;
-    }
-    Buffer = malloc(*Size + 1);
-    if (Buffer == NULL) {
-      *Size = 0;
-      return NULL;
-    }
-    Value = &PcdList[Index].Value[1];
-    for (*Size = 0, Buffer[*Size] = (UINT8) strtoul(Value, &End, 16); Value != End; *Size = *Size + 1, Buffer[*Size] = (UINT8) strtoul(Value, &End, 16)) {
-      Value = End + 1;
-    }
-    return Buffer;
+    case PcdDataTypeBoolean:
+    case PcdDataTypeUint8:
+    case PcdDataTypeUint16:
+    case PcdDataTypeUint32:
+    case PcdDataTypeUint64:
+      fprintf (stderr, "PCD %s.%s.%s.%s is a value.  Use PcdGet()\n", SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
+      exit (EXIT_FAILURE);
+      break;
+    case PcdDataTypePointer:
+      Value = &PcdList[Index].Value[1];
+      for (*Size = 0, strtoul (Value, &End, 16); Value != End; strtoul (Value, &End, 16), *Size = *Size + 1) {
+        Value = End + 1;
+      }
+
+      Buffer = malloc (*Size + 1);
+      if (Buffer == NULL) {
+        *Size = 0;
+        return NULL;
+      }
+
+      Value = &PcdList[Index].Value[1];
+      for (*Size = 0, Buffer[*Size] = (UINT8)strtoul (Value, &End, 16); Value != End; *Size = *Size + 1, Buffer[*Size] = (UINT8)strtoul (Value, &End, 16)) {
+        Value = End + 1;
+      }
+
+      return Buffer;
   }
+
   *Size = 0;
   return 0;
 }
@@ -323,7 +341,7 @@ __PcdSetPtr (
   UINT8   *Value
   )
 {
-  int    Index;
+  int     Index;
   UINT32  ValueIndex;
 
   Index = LookupPcdIndex (SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
@@ -331,31 +349,33 @@ __PcdSetPtr (
     fprintf (stderr, "PCD %s.%s.%s.%s is not in database\n", SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
     exit (EXIT_FAILURE);
   }
+
   switch (PcdList[Index].PcdDataType) {
-  case PcdDataTypeBoolean:
-  case PcdDataTypeUint8:
-  case PcdDataTypeUint16:
-  case PcdDataTypeUint32:
-  case PcdDataTypeUint64:
-    fprintf (stderr, "PCD %s.%s.%s.%s is a value.  Use PcdGet()\n", SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
-    exit (EXIT_FAILURE);
-    break;
-  case PcdDataTypePointer:
-    free(PcdList[Index].Value);
-    PcdList[Index].Value = malloc(Size * 5 + 3);
-    PcdList[Index].Value[0] = '{';
-    for (ValueIndex = 0; ValueIndex < Size; ValueIndex++) {
-      sprintf(&PcdList[Index].Value[1 + ValueIndex * 5], "0x%02x,", Value[ValueIndex]);
-    }
-    PcdList[Index].Value[1 + Size * 5 - 1] = '}';
-    PcdList[Index].Value[1 + Size * 5    ] = 0;
-    break;
+    case PcdDataTypeBoolean:
+    case PcdDataTypeUint8:
+    case PcdDataTypeUint16:
+    case PcdDataTypeUint32:
+    case PcdDataTypeUint64:
+      fprintf (stderr, "PCD %s.%s.%s.%s is a value.  Use PcdGet()\n", SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
+      exit (EXIT_FAILURE);
+      break;
+    case PcdDataTypePointer:
+      free (PcdList[Index].Value);
+      PcdList[Index].Value    = malloc (Size * 5 + 3);
+      PcdList[Index].Value[0] = '{';
+      for (ValueIndex = 0; ValueIndex < Size; ValueIndex++) {
+        sprintf (&PcdList[Index].Value[1 + ValueIndex * 5], "0x%02x,", Value[ValueIndex]);
+      }
+
+      PcdList[Index].Value[1 + Size * 5 - 1] = '}';
+      PcdList[Index].Value[1 + Size * 5]     = 0;
+      break;
   }
 }
 
 /**
   Read the file buffer from the input file.
- 
+
   @param InputFileName Point to the input file name.
   @param FileBuffer    Point to the input file buffer.
   @param FileSize      Size of the file buffer.
@@ -459,15 +479,17 @@ ParseFile (
       NumLines++;
     }
   }
-  PcdList = malloc((NumLines + 1) * sizeof(PcdList[0]));
+
+  PcdList = malloc ((NumLines + 1) * sizeof (PcdList[0]));
 
   for (Index = 0, TokenIndex = 0, PcdListLength = 0, TokenStart = 0; Index < FileSize; Index++) {
     if (FileBuffer[Index] == ' ') {
       continue;
     }
-    if (FileBuffer[Index] == '|' || FileBuffer[Index] == '.' || FileBuffer[Index] == '\n' || FileBuffer[Index] == '\r') {
+
+    if ((FileBuffer[Index] == '|') || (FileBuffer[Index] == '.') || (FileBuffer[Index] == '\n') || (FileBuffer[Index] == '\r')) {
       RecordToken (FileBuffer, PcdListLength, TokenIndex, TokenStart, Index);
-      if (FileBuffer[Index] == '\n' || FileBuffer[Index] == '\r') {
+      if ((FileBuffer[Index] == '\n') || (FileBuffer[Index] == '\r')) {
         if (TokenIndex != 0) {
           PcdListLength++;
           TokenIndex = 0;
@@ -475,10 +497,12 @@ ParseFile (
       } else {
         TokenIndex++;
       }
+
       TokenStart = Index + 1;
       continue;
     }
   }
+
   if (Index > TokenStart) {
     RecordToken (FileBuffer, PcdListLength, TokenIndex, TokenStart, Index);
     if (TokenIndex != 0) {
@@ -495,7 +519,7 @@ ParseFile (
 VOID
 STATIC
 WriteOutputFile (
-  CHAR8   *OutputFileName
+  CHAR8  *OutputFileName
   )
 {
   FILE    *OutputFile;
@@ -584,24 +608,26 @@ ParseArguments (
 
   while (argc > 0) {
     if ((stricmp (argv[0], "-i") == 0) || (stricmp (argv[0], "--input") == 0)) {
-      if (argv[1] == NULL || argv[1][0] == '-') {
+      if ((argv[1] == NULL) || (argv[1][0] == '-')) {
         fprintf (stderr, "Invalid option value.  Input File name is missing for -i option\n");
         exit (EXIT_FAILURE);
       }
+
       *InputFileName = argv[1];
-      argc -= 2;
-      argv += 2;
+      argc          -= 2;
+      argv          += 2;
       continue;
     }
 
     if ((stricmp (argv[0], "-o") == 0) || (stricmp (argv[0], "--output") == 0)) {
-      if (argv[1] == NULL || argv[1][0] == '-') {
+      if ((argv[1] == NULL) || (argv[1][0] == '-')) {
         fprintf (stderr, "Invalid option value.  Output File name is missing for -i option\n");
         exit (EXIT_FAILURE);
       }
+
       *OutputFileName = argv[1];
-      argc -= 2;
-      argv += 2;
+      argc           -= 2;
+      argv           += 2;
       continue;
     }
 
@@ -609,8 +635,9 @@ ParseArguments (
       fprintf (stderr, "Unknown option %s\n", argv[0]);
       exit (EXIT_FAILURE);
     }
-    argc --;
-    argv ++;
+
+    argc--;
+    argv++;
   }
 
   //
@@ -646,7 +673,7 @@ PcdValueMain (
   UINT8   *FileBuffer;
   UINT32  FileSize;
 
-  InputFileName = NULL;
+  InputFileName  = NULL;
   OutputFileName = NULL;
 
   //

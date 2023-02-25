@@ -12,16 +12,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Common/UefiBaseTypes.h>
 #include <Common/UefiInternalFormRepresentation.h>
 
-#define __FIELD_SIZE(TYPE, Field) (sizeof((TYPE *)0)->Field)
-#define __ARRAY_ELEMENT_SIZE(TYPE, Field) (sizeof((TYPE *)0)->Field[0])
-#define __OFFSET_OF(TYPE, Field) ((UINT32)(size_t) &(((TYPE *)0)->Field))
-#define __FLEXIBLE_SIZE(Size, TYPE, Field, MaxIndex)   if (__FIELD_SIZE(TYPE, Field) == 0) Size = MAX((__OFFSET_OF(TYPE, Field) + __ARRAY_ELEMENT_SIZE(TYPE, Field) * (MaxIndex)), Size)
-#define __ARRAY_SIZE(Array) (sizeof(Array)/sizeof(Array[0]))
+#define __FIELD_SIZE(TYPE, Field)                     (sizeof((TYPE *)0)->Field)
+#define __ARRAY_ELEMENT_SIZE(TYPE, Field)             (sizeof((TYPE *)0)->Field[0])
+#define __OFFSET_OF(TYPE, Field)                      ((UINT32)(size_t) &(((TYPE *)0)->Field))
+#define __FLEXIBLE_SIZE(Size, TYPE, Field, MaxIndex)  if (__FIELD_SIZE(TYPE, Field) == 0) Size = MAX((__OFFSET_OF(TYPE, Field) + __ARRAY_ELEMENT_SIZE(TYPE, Field) * (MaxIndex)), Size)
+#define __ARRAY_SIZE(Array)                           (sizeof(Array)/sizeof(Array[0]))
 
-#if defined(_MSC_EXTENSIONS)
-#define __STATIC_ASSERT static_assert
+#if defined (_MSC_EXTENSIONS)
+#define __STATIC_ASSERT  static_assert
 #else
-#define __STATIC_ASSERT _Static_assert
+#define __STATIC_ASSERT  _Static_assert
 #endif
 
 /**
@@ -129,9 +129,9 @@ __PcdSetPtr (
   )
 ;
 
-#define PcdGet(A, B, C, D)  __PcdGet(#A, #B, #C, #D)
-#define PcdSet(A, B, C, D, Value)  __PcdSet(#A, #B, #C, #D, Value)
-#define PcdGetPtr(A, B, C, D, Size)  __PcdGetPtr(#A, #B, #C, #D, Size)
+#define PcdGet(A, B, C, D)                  __PcdGet(#A, #B, #C, #D)
+#define PcdSet(A, B, C, D, Value)           __PcdSet(#A, #B, #C, #D, Value)
+#define PcdGetPtr(A, B, C, D, Size)         __PcdGetPtr(#A, #B, #C, #D, Size)
 #define PcdSetPtr(A, B, C, D, Size, Value)  __PcdSetPtr(#A, #B, #C, #D, Size, Value)
 
 #endif

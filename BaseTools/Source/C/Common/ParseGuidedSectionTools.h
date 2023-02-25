@@ -29,7 +29,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_HANDLE
 ParseGuidedSectionToolsFile (
-  IN CHAR8    *InputFile
+  IN CHAR8  *InputFile
   )
 ;
 
@@ -47,7 +47,7 @@ ParseGuidedSectionToolsFile (
 **/
 EFI_HANDLE
 ParseGuidedSectionToolsMemoryFile (
-  IN EFI_HANDLE    InputFile
+  IN EFI_HANDLE  InputFile
   )
 ;
 
@@ -62,10 +62,10 @@ ParseGuidedSectionToolsMemoryFile (
   @retval Non-NULL The tool to use to access the section contents.  (The caller
              must free the memory associated with this string.)
 **/
-CHAR8*
+CHAR8 *
 LookupGuidedSectionToolPath (
-  IN EFI_HANDLE ParsedGuidedSectionToolsHandle,
-  IN EFI_GUID   *SectionGuid
+  IN EFI_HANDLE  ParsedGuidedSectionToolsHandle,
+  IN EFI_GUID    *SectionGuid
   )
 ;
 
@@ -80,7 +80,7 @@ LookupGuidedSectionToolPath (
 **/
 EFI_STATUS
 FreeParsedGuidedSectionToolsHandle (
-  IN EFI_HANDLE ParsedGuidedSectionToolsHandle
+  IN EFI_HANDLE  ParsedGuidedSectionToolsHandle
   )
 ;
 
