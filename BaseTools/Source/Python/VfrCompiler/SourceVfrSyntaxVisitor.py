@@ -885,7 +885,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
 
         elif ctx.Node.OpCode == EFI_IFR_NUMERIC_OP:
             #ctx.BaseInfo.VarType = EFI_IFR_TYPE_NUM_SIZE_64 #
-            ctx.Node.Data = IfrNumeric(EFI_IFR_TYPE_NUM_SIZE_64)
+            ctx.Node.Data = IfrNumeric(EFI_IFR_TYPE_NUM_SIZE_64, QName, VarIdStr)
             self.CurrentQuestion = ctx.Node.Data
             self.CurrentMinMaxData = ctx.Node.Data
 
@@ -1622,13 +1622,13 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SourceVfrSyntaxParser#vfrStatementResetButton.
     def visitVfrStatementResetButton(self, ctx:SourceVfrSyntaxParser.VfrStatementResetButtonContext):
-        defaultstore = ctx.N.text
-        RBObj = IfrResetButton(defaultstore)
+        Defaultstore = ctx.N.text
+        RBObj = IfrResetButton(Defaultstore)
         ctx.Node.Data = RBObj
         self.visitChildren(ctx)
         Line = ctx.start.line
         RBObj.SetLineNo(Line)
-        DefaultId, ReturnCode = gVfrDefaultStore.GetDefaultId(defaultstore)
+        DefaultId, ReturnCode = gVfrDefaultStore.GetDefaultId(Defaultstore)
         self.ErrorHandler(ReturnCode, ctx.N.line)
         RBObj.SetDefaultId(DefaultId)
 
@@ -2290,6 +2290,8 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         Config = self.PreProcessDB.Read(ctx.S.text)
         ctx.Node.Dict['config'] = KV(ctx.S.text, Config)
         AObj.SetQuestionConfig(Config)
+        if ctx.FLAGS() != None:
+            AObj.SetFlags(ctx.vfrActionFlags().HFlags)
         ctx.Node.Buffer = gFormPkg.StructToStream(AObj.GetInfo())
         self.InsertEndNode(ctx.Node, ctx.stop.line)
 
@@ -2912,7 +2914,6 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             if self.TransNum(ctx.Number()) != 0:
                 self.ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED, ctx.start.line)
         elif ctx.questionheaderFlagsField() != None:
-
             ctx.HFlag = ctx.questionheaderFlagsField().QHFlag
         elif ctx.M != None:
             ctx.LFlag = 0x01
@@ -3032,7 +3033,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             if MaxContainers > 0xFF:
                 self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.M.line, "OrderedList MaxContainers takes only one byte, which can't be larger than 0xFF.")
             elif VarArraySize != 0 and MaxContainers > VarArraySize:
-                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.M.line,"OrderedList MaxContainers can't be larger than the max number of elements in array.")
+                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.M.line, "OrderedList MaxContainers can't be larger than the max number of elements in array.")
             OLObj.SetMaxContainers(MaxContainers)
             OLObj.SetHasMaxContainers(True)
 
@@ -3494,9 +3495,15 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
                 Line = self.PreProcessDB.Read(ctx.SL.text)
                 ctx.Node.Dict['line'] = KV(ctx.SL.text, Line)
             BObj.SetLine(Line)
-            if ctx.Left() != None: BObj.SetAlign(0)
-            if ctx.Center() != None: BObj.SetAlign(1)
-            if ctx.Right() != None: BObj.SetAlign(2)
+            if ctx.Left() != None:
+                ctx.Node.Dict['align'] = KV('left', 0)
+                BObj.SetAlign(0)
+            if ctx.Center() != None:
+                ctx.Node.Dict['align'] = KV('center', 1)
+                BObj.SetAlign(1)
+            if ctx.Right() != None:
+                ctx.Node.Dict['align'] = KV('right', 2)
+                BObj.SetAlign(2)
 
         ctx.Node.Data = BObj
         ctx.Node.Buffer = gFormPkg.StructToStream(BObj.GetInfo())

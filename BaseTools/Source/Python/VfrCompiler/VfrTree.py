@@ -837,7 +837,7 @@ class VfrTree():
                 if Root.OpCode == EFI_IFR_ACTION_OP:
                     f.write(KeyIndent + '- action:\n')
                     self._DumpQuestionInfosWithUni(Root, f, ValueIndent)
-                    f.write(ValueIndent + 'questionconfig:  ' + 'STRING_TOKEN(' + Root.Dict['config'].Key + ')\n')
+                    f.write(ValueIndent + 'config:  ' + 'STRING_TOKEN(' + Root.Dict['config'].Key + ')\n')
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
@@ -1109,10 +1109,9 @@ class VfrTree():
                             else:
                                 f.write(ValueIndent + 'line:  {}\n'.format(
                                 Info.LineNumber))
-                            f.write(ValueIndent + 'align:  {}\n'.format(
-                                Info.Alignment))
+                            f.write(ValueIndent + 'align:  ' + Root.Dict['align'].Key + '\n')
 
-                    if type(Root.Data) == IfrTimeout:
+                    if type(Root.Data) == IfrTimeout: #################
                         f.write(KeyIndent + '- timeout:\n')
                         if Root.Condition != None:
                             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
@@ -1458,13 +1457,12 @@ class VfrTree():
                                 'prompt:  {}  # Question Prompt STRING_ID\n'.
                                 format('0x%04x' %
                                        (Info.Question.Header.Prompt)))
-                        if Root.Data.FlagsStream != '':
-                            f.write(
+
+                        f.write(
                             ValueIndent +
                             'flags:  {}  # Optional Input, Question Flags\n'
                             .format(Root.Data.FlagsStream))
-                        if Root.Data.HasKey:
-                            f.write(
+                        f.write(
                             ValueIndent +
                             'key:  {}  # Optional Input, Question QuestionId\n'
                             .format('0x%04x' % (Info.Question.QuestionId)))
@@ -1478,7 +1476,7 @@ class VfrTree():
 
                     #f.write('varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
                     #f.write(ValueIndent + 'questionflags:  {}  # Question Flags\n'.format(Info.Question.Flags))
-                    f.write(ValueIndent + 'questionconfig:  {}  # QuestionConfig\n'.
+                    f.write(ValueIndent + 'config:  {}  # QuestionConfig\n'.
                         format(Info.QuestionConfig))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
@@ -1490,13 +1488,11 @@ class VfrTree():
 
                     #f.write(ValueIndent + 'questionflags:  {} # Optional Input \n'.format(Info.Question.Flags))
                     #f.write(ValueIndent + 'opcodeflags:  {}  # optional input\n'.format('0x%x' % (Info.Flags)))
-                    if Root.Data.HasMinMax:
-                        f.write(ValueIndent + 'maximum:  {} # Optional Input\n'.format(
+                    f.write(ValueIndent + 'maximum:  {} # Optional Input\n'.format(
                                 Info.Data.MaxValue))
-                        f.write(ValueIndent + 'minimum:  {} # Optional Input\n'.format(
+                    f.write(ValueIndent + 'minimum:  {} # Optional Input\n'.format(
                                 Info.Data.MinValue))
-                    if Root.Data.HasStep:
-                        f.write(ValueIndent + 'step:  {} # Optional Input\n'.format(
+                    f.write(ValueIndent + 'step:  {} # Optional Input\n'.format(
                             '0x%0x' %(Info.Data.Step)))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
@@ -1552,7 +1548,7 @@ class VfrTree():
                                                            1]) + '}\n')
 
                     elif type(Root.Data) == IfrDefault2:
-                        f.write(ValueIndent + 'value: \'{}\'\n'.format(
+                        f.write(ValueIndent + 'value2: \'{}\'\n'.format(
                             Root.Child[0].Expression))
 
                     if Root.Data.DefaultStore != '':

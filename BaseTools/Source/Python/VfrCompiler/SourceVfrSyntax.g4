@@ -355,10 +355,10 @@ locals[Node]
     |   vfrStatementDefault
     |   vfrStatementStat
     |   vfrStatementQuestions
-    |   vfrStatementConditional
+    |   vfrStatementConditional //
     |   vfrStatementLabel
     |   vfrStatementBanner
-    |   vfrStatementInvalid
+    |   vfrStatementInvalid //
     |   vfrStatementExtension
     |   vfrStatementModal
     |   vfrStatementRefreshEvent ';'
@@ -509,9 +509,9 @@ locals[Node]
 vfrStatementQuestionTag
 locals[Node]
     :   vfrStatementStatTag ','
-    |   vfrStatementInconsistentIf
-    |   vfrStatementNoSubmitIf
-    |   vfrStatementDisableIfQuest
+    |   vfrStatementInconsistentIf //
+    |   vfrStatementNoSubmitIf //
+    |   vfrStatementDisableIfQuest //
     |   vfrStatementRefresh
     |   vfrStatementVarstoreDevice
     |   vfrStatementExtension
@@ -574,8 +574,8 @@ vfrStatementQuestionTagList[Node]
 
 vfrStatementQuestionOptionTag
 locals[Node]
-    :   vfrStatementSuppressIfQuest
-    |   vfrStatementGrayOutIfQuest
+    :   vfrStatementSuppressIfQuest //
+    |   vfrStatementGrayOutIfQuest //
     |   vfrStatementValue
     |   vfrStatementDefault
     |   vfrStatementOptions

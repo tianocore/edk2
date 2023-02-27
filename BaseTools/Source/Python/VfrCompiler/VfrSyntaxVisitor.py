@@ -839,7 +839,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.CurrentMinMaxData = ctx.Node.Data
 
         elif ctx.Node.OpCode == EFI_IFR_NUMERIC_OP:
-            ctx.Node.Data = IfrNumeric(EFI_IFR_TYPE_NUM_SIZE_64)
+            ctx.Node.Data = IfrNumeric(EFI_IFR_TYPE_NUM_SIZE_64, QName, VarIdStr)
             self.CurrentQuestion = ctx.Node.Data
             self.CurrentMinMaxData = ctx.Node.Data
 
@@ -1506,13 +1506,13 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementResetButton.
     def visitVfrStatementResetButton(self, ctx:VfrSyntaxParser.VfrStatementResetButtonContext):
-        defaultstore = ctx.N.text
-        RBObj = IfrResetButton(defaultstore)
+        Defaultstore = ctx.N.text
+        RBObj = IfrResetButton(Defaultstore)
         ctx.Node.Data = RBObj
         self.visitChildren(ctx)
         Line = ctx.start.line
         RBObj.SetLineNo(Line)
-        DefaultId, ReturnCode = gVfrDefaultStore.GetDefaultId(defaultstore)
+        DefaultId, ReturnCode = gVfrDefaultStore.GetDefaultId(Defaultstore)
         self.ErrorHandler(ReturnCode, ctx.N.line)
         RBObj.SetDefaultId(DefaultId)
 
@@ -2115,6 +2115,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         AObj.SetLineNo(ctx.start.line)
         AObj.SetQuestionConfig(self.TransNum(ctx.Number()))
+        if ctx.FLAGS() != None:
+            AObj.SetFlags(ctx.vfrActionFlags().HFlags)
         ctx.Node.Buffer = gFormPkg.StructToStream(AObj.GetInfo())
         self.InsertEndNode(ctx.Node, ctx.stop.line)
 
@@ -2190,9 +2192,12 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 self.ErrorHandler(NObj.SetFlagsForBitField(NObj.GetQFlags(),LFlags), Line)
             else:
                 DataTypeSize, ReturnCode = gVfrVarDataTypeDB.GetDataTypeSizeByDataType(self.CurrQestVarInfo.VarType)
+                if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
+                    print('here')
                 self.ErrorHandler(ReturnCode, Line, 'Numeric varid is not the valid data type')
                 if DataTypeSize != 0 and DataTypeSize != self.CurrQestVarInfo.VarTotalSize:
                     self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'Numeric varid doesn\'t support array')
+                    print('here')
                 self.ErrorHandler(NObj.SetFlags(NObj.GetQFlags(), self.CurrQestVarInfo.VarType), Line)
 
         if ctx.FLAGS() != None:
@@ -2810,7 +2815,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if MaxContainers > 0xFF:
                 self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.M.line, "OrderedList MaxContainers takes only one byte, which can't be larger than 0xFF.")
             elif VarArraySize != 0 and MaxContainers > VarArraySize:
-                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.M.line,"OrderedList MaxContainers can't be larger than the max number of elements in array.")
+                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.M.line, "OrderedList MaxContainers can't be larger than the max number of elements in array.")
             OLObj.SetMaxContainers(MaxContainers)
             OLObj.SetHasMaxContainers(True)
 

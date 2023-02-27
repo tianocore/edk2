@@ -7,7 +7,7 @@ formset:
   title:  STRING_TOKEN(STR_FORM_SET_TITLE)
   help:  STRING_TOKEN(STR_FORM_SET_TITLE_HELP)
   classguid:  EFI_HII_PLATFORM_SETUP_FORMSET_GUID
-  component:  
+  component:
   - defaultstore:
       type:  MyStandardDefault
       prompt:  STRING_TOKEN(STR_STANDARD_DEFAULT_PROMPT)
@@ -25,27 +25,27 @@ formset:
       type:  MY_EFI_VARSTORE_DATA
       name:  MyEfiVar
       guid:  DRIVER_SAMPLE_FORMSET_GUID
-      attribute:  WIN_CERT_TYPE_PKCS_SIGNED_DATA | EFI_VARIABLE_NON_VOLATILE 
+      attribute:  WIN_CERT_TYPE_PKCS_SIGNED_DATA | EFI_VARIABLE_NON_VOLATILE
   - efivarstore:
       type:  MY_EFI_BITS_VARSTORE_DATA
       name:  MyEfiBitVar
       guid:  DRIVER_SAMPLE_FORMSET_GUID
-      attribute:  WIN_CERT_TYPE_PKCS_SIGNED_DATA | EFI_VARIABLE_NON_VOLATILE 
+      attribute:  WIN_CERT_TYPE_PKCS_SIGNED_DATA | EFI_VARIABLE_NON_VOLATILE
   - efivarstore:
       type:  MY_EFI_UNION_DATA
       name:  MyEfiUnionVar
       guid:  DRIVER_SAMPLE_FORMSET_GUID
-      attribute:  WIN_CERT_TYPE_PKCS_SIGNED_DATA | EFI_VARIABLE_NON_VOLATILE 
+      attribute:  WIN_CERT_TYPE_PKCS_SIGNED_DATA | EFI_VARIABLE_NON_VOLATILE
   - namevaluevarstore:
       type:  MyNameValueVar
       name:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME0)
       name:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME1)
       name:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME2)
       guid:  DRIVER_SAMPLE_FORMSET_GUID
-  - form: 
-      formid:  0x1 
+  - form:
+      formid:  0x1
       title:  STRING_TOKEN(STR_FORM1_TITLE)
-      component:  
+      component:
       - subtitle:
           prompt:  STRING_TOKEN(STR_SUBTITLE_TEXT)
       - subtitle:
@@ -79,16 +79,16 @@ formset:
           varid:  MyIfrNVData.SuppressGrayOutSomething  #  Optional Input
           prompt:  STRING_TOKEN(STR_ONE_OF_PROMPT)
           help:  STRING_TOKEN(STR_ONE_OF_HELP)
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT4)
               value:  0x0
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT5)
               value:  0x1
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT6)
               value:  0x2
               flags:  DEFAULT # Optional Input
@@ -96,14 +96,14 @@ formset:
           varid:  MyIfrNVData.BootOrderLarge  #  Optional Input
           prompt:  STRING_TOKEN(STR_ONE_OF_PROMPT)
           help:  STRING_TOKEN(STR_ONE_OF_HELP)
-          component:  
+          component:
           - default:
               value: 'cond (pushthis == 0 ? 0 : cond ((questionref(MyOneOf) >> 0x4 & 0xF00) == 0x0 + 0x2 ? 0 : 1))'
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER1)
               value:  0x0
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER2)
               value:  0x1
               flags:  0 # Optional Input
@@ -113,7 +113,7 @@ formset:
           prompt:  STRING_TOKEN(STR_CHECK_BOX_PROMPT)
           help:  STRING_TOKEN(STR_CHECK_BOX_HELP)
           flags:  CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG  # Optional input , flags
-          component:  
+          component:
           - default:
               value:  TRUE
       - label:
@@ -125,20 +125,20 @@ formset:
           prompt:  STRING_TOKEN(STR_BOOT_OPTIONS)
           help:  STRING_TOKEN(STR_NULL_STRING)
           flags:  RESET_REQUIRED  # Optional input , flags
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_BOOT_OPTION2)
               value:  2
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_BOOT_OPTION1)
               value:  1
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_BOOT_OPTION3)
               value:  3
               flags:  0 # Optional Input
-          - option:  
+          - option:
               condition:  'suppressif ideqval MyIfrNVData.BootOrderLarge == 0'
               text:  STRING_TOKEN(STR_BOOT_OPTION4)
               value:  4
@@ -152,16 +152,16 @@ formset:
           prompt:  STRING_TOKEN(STR_TEST_OPCODE)
           help:  STRING_TOKEN(STR_TEXT_HELP)
           flags:  RESET_REQUIRED  # Optional input , flags
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
               value:  3
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT2)
               value:  2
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT3)
               value:  1
               flags:  0 # Optional Input
@@ -184,30 +184,30 @@ formset:
           prompt:  STRING_TOKEN(STR_TEST_OPCODE)
           help:  STRING_TOKEN(STR_ONE_OF_HELP)
           flags:  RESET_REQUIRED  # Optional input , flags
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
               value:  0
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT2)
               value:  1
               flags:  DEFAULT # Optional Input
           - warningif:
               warning:  172
-              timeout:  5 # optional input 
+              timeout:  5 # optional input
               expression:  ideqval MyIfrNVData.TestLateCheck == 0
       - oneof:
           varid:  MyIfrNVData.TestLateCheck2  #  Optional Input
           prompt:  STRING_TOKEN(STR_TEST_OPCODE2)
           help:  STRING_TOKEN(STR_ONE_OF_HELP)
           flags:  RESET_REQUIRED  # Optional input , flags
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
               value:  0
               flags:  DEFAULT # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT2)
               value:  1
               flags:  0 # Optional Input
@@ -219,16 +219,16 @@ formset:
           prompt:  STRING_TOKEN(STR_ONE_OF_PROMPT_KEYWORD)
           help:  STRING_TOKEN(STR_ONE_OF_HELP)
           flags:  RESET_REQUIRED  # Optional input , flags
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
               value:  0
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT2)
               value:  1
               flags:  DEFAULT # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT3)
               value:  3
               flags:  0 # Optional Input
@@ -237,16 +237,16 @@ formset:
           prompt:  STRING_TOKEN(STR_ONE_OF_PROMPT_X_UEFI)
           help:  STRING_TOKEN(STR_ONE_OF_PROMPT_X_UEFI_HELP)
           flags:  RESET_REQUIRED | REST_STYLE  # Optional input , flags
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
               value:  0
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT2)
               value:  1
               flags:  DEFAULT # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT3)
               value:  3
               flags:  0 # Optional Input
@@ -258,7 +258,7 @@ formset:
           maximum:  0xf0 # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x0 # Optional Input
-          component:  
+          component:
           - default:
               value:  0
       - string:
@@ -267,9 +267,9 @@ formset:
           help:  STRING_TOKEN(STR_MY_STRING_HELP2)
           flags:  INTERACTIVE  # Optional input , flags
           key:  0x1236  # Optional input, key
-          minsize:  6 
-          maxsize:  40 
-          component:  
+          minsize:  6
+          maxsize:  40
+          component:
           - inconsistentif:
               prompt:  STRING_TOKEN(STR_STRING_CHECK_ERROR_POPUP)
               expression:  'pushthis != stringref(STRING_TOKEN(0x0062))'
@@ -281,7 +281,7 @@ formset:
           maximum:  0xf0 # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x0 # Optional Input
-          component:  
+          component:
           - default:
               value:  21
       - numeric:
@@ -291,7 +291,7 @@ formset:
           maximum:  0xf0 # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x0 # Optional Input
-          component:  
+          component:
           - default:
               value: 'questionrefval(devicepath = STRING_TOKEN (0x006D), guid = { 0xA04A27f4, 0xDF00, 0x4D42, {0xB5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3D} }, 0x1111)'
           - inconsistentif:
@@ -305,7 +305,7 @@ formset:
           flags:  DISPLAY_UINT_HEX | INTERACTIVE  # Optional input , flags
           maximum:  0xfa # Optional Input
           minimum:  0x0 # Optional Input
-          component:  
+          component:
           - default:
               value:  18
               defaultstore: MyStandardDefault
@@ -319,7 +319,7 @@ formset:
           maximum:  0xff # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x0 # Optional Input
-          component:  
+          component:
           - locked: tag
           - default:
               value:  16
@@ -334,7 +334,7 @@ formset:
           maximum:  0xffff # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x0 # Optional Input
-          component:  
+          component:
           - default:
               value:  18
               defaultstore: MyStandardDefault
@@ -345,18 +345,18 @@ formset:
           varid:  MyNameValueVar[2]  #  Optional Input
           prompt:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME2)
           help:  STRING_TOKEN(STR_NAME_VALUE_VAR_NAME2_HELP)
-          minsize:  2 
-          maxsize:  20 
+          minsize:  2
+          maxsize:  20
       - oneof:
           varid:  MyEfiVar.Field16  #  Optional Input
           prompt:  STRING_TOKEN(STR_ONE_OF_PROMPT)
           help:  STRING_TOKEN(STR_NUMERIC_NUM_HELP)
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER1)
               value:  0x0
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER2)
               value:  0x1
               flags:  DEFAULT # Optional Input
@@ -372,7 +372,7 @@ formset:
           maximum:  0xf3 # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x1 # Optional Input
-          component:  
+          component:
           - default:
               value:  18
               defaultstore: MyStandardDefault
@@ -388,7 +388,7 @@ formset:
           maximum:  0xff # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x1 # Optional Input
-          component:  
+          component:
           - default:
               value:  18
       - numeric:
@@ -400,7 +400,7 @@ formset:
           maximum:  0xff # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x1 # Optional Input
-          component:  
+          component:
           - default:
               value:  18
       - orderedlist:
@@ -409,16 +409,16 @@ formset:
           prompt:  STRING_TOKEN(STR_DEFAULT_VALUE_FROM_CALLBACK_PROMPT)
           help:  STRING_TOKEN(STR_DEFAULT_VALUE_FROM_CALLBACK_HELP)
           flags:  INTERACTIVE  # Optional input , flags
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT1)
               value:  1
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT2)
               value:  2
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_ONE_OF_TEXT3)
               value:  3
               flags:  0 # Optional Input
@@ -442,7 +442,7 @@ formset:
           flags:  INTERACTIVE  # Optional input , flags
           maximum:  0xff # Optional Input
           minimum:  0x0 # Optional Input
-          component:  
+          component:
           - default:
               value:  18
       - text:
@@ -479,7 +479,7 @@ formset:
       - guidop:
           guid:  DRIVER_SAMPLE_FORMSET_GUID
           databuffer: #optional input
-          - MY_EFI_VARSTORE_DATA: 
+          - MY_EFI_VARSTORE_DATA:
             data.Field8:  0x21
             data.Field16:  0x2121
             data.OrderedList[0]:  0x21
@@ -487,17 +487,17 @@ formset:
           formid:  0x7
           prompt:  STRING_TOKEN(STR_GOTO_FORM7)
           help:  STRING_TOKEN(STR_GOTO_FORM7_HELP)
-  - form: 
-      formid:  0x2 
+  - form:
+      formid:  0x2
       condition:  'suppressif ideqval MyIfrNVData.BootOrderLarge == 0'
       title:  STRING_TOKEN(STR_FORM2_TITLE)
-      component:  
+      component:
       - date:
           name:  Date  #  Optional Input
           prompt:  STRING_TOKEN(STR_DATE_PROMPT)
           help:  STRING_TOKEN(STR_DATE_HELP)
           flags:  STORAGE_TIME  # Optional input , flags
-          component:  
+          component:
           - default:
               value:  2004/1/1
           - inconsistentif:
@@ -529,7 +529,7 @@ formset:
           prompt:  STRING_TOKEN(STR_TIME_PROMPT)
           help:  STRING_TOKEN(STR_TIME_PROMPT)
           flags:  STORAGE_NORMAL | SECOND_SUPPRESS  # Optional input , flags
-          component:  
+          component:
           - default:
               value:  15:33:33
       - checkbox:
@@ -553,17 +553,17 @@ formset:
           prompt:  STRING_TOKEN(STR_GOTO_DYNAMIC3)
           help:  STRING_TOKEN(STR_GOTO_DYNAMIC3_HELP)
           key:  0x1248  # Optional input, key
-          component:  
+          component:
           - default:
               value:  0;0;{ 0x0, 0x0, 0x0, {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} };STRING_TOKEN(0x005A)
       - goto:
           prompt:  STRING_TOKEN(STR_GOTO_DYNAMIC4)
           help:  STRING_TOKEN(STR_GOTO_DYNAMIC4_HELP)
           key:  0x1249  # Optional input, key
-  - form: 
-      formid:  0x3 
+  - form:
+      formid:  0x3
       title:  STRING_TOKEN(STR_FORM3_TITLE)
-      component:  
+      component:
       - text:
           condition:  'suppressif ideqval MyEfiVar.Field8 == 111'
           help:  STRING_TOKEN(STR_TEXT_HELP)
@@ -581,7 +581,7 @@ formset:
           maximum:  0xff # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x0 # Optional Input
-          component:  
+          component:
           - default:
               value:  0
           - refresh:
@@ -597,40 +597,40 @@ formset:
           number:  LABEL_UPDATE2
       - label:
           number:  LABEL_END
-  - formmap: 
+  - formmap:
       formid:  EFI_VARIABLE_RUNTIME_ACCESS
       map: # optional input
       - maptitle:  149
         mapguid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
       - maptitle:  150
         mapguid:  '{0x3bd2f4ec, 0xe524, 0x46e4, { 0xa9, 0xd8, 0x51, 0x1, 0x17, 0x42, 0x55, 0x62 }}'
-      component:  
+      component:
       - oneof:
           varid:  MyIfrNVData.SerialPortNo  #  Optional Input
           prompt:  STRING_TOKEN(STR_SERIAL_PORT)
           help:  STRING_TOKEN(STR_ONE_OF_HELP)
-          component:  
+          component:
           - read:
               expression:  'cond (get(MyIfrNVData.SerialPortStatus) != 0 ? 0 : cond ((get(MyIfrNVData.SerialPortIo) & 0xF00) >> 0x8 == get(MyIfrNVData.SerialPortIrq) - 1 ? UNDEFINED : map (get(MyIfrNVData.SerialPortIo) : 0x3f8,1; 0x2F8,2; 0x3E8,3; 0x2E8,4;)))'
           - write:
               expression:  'set(MyIfrNVData.SerialPortStatus, pushthis != 0) AND set(MyIfrNVData.SerialPortIo, map (pushthis : 1,0x3F8; 2,0x2F8; 3,0x3E8; 4,0x2E8;)) AND set (MyIfrNVData.SerialPortIrq, map (pushthis: 1,4; 2,3; 3,4; 4,3;))'
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_SERIAL_PORT_DISABLE)
               value:  0x0
               flags:  DEFAULT # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_SERIAL_PORT1)
               value:  0x1
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_SERIAL_PORT2)
               value:  0x2
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_SERIAL_PORT3)
               value:  0x3
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_SERIAL_PORT4)
               value:  0x4
               flags:  0 # Optional Input
@@ -644,20 +644,20 @@ formset:
           varid:  MyIfrNVData.SerialPortIo  #  Optional Input
           prompt:  STRING_TOKEN(STR_SERIAL_PORT_IO_ADDRESS)
           help:  STRING_TOKEN(STR_ONE_OF_HELP)
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_SERIAL_PORT1_IOADDR)
               value:  0x3F8
               flags:  DEFAULT # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_SERIAL_PORT2_IOADDR)
               value:  0x2F8
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_SERIAL_PORT3_IOADDR)
               value:  0x3E8
               flags:  0 # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_SERIAL_PORT4_IOADDR)
               value:  0x2E8
               flags:  0 # Optional Input
@@ -666,12 +666,12 @@ formset:
           varid:  MyIfrNVData.SerialPortIrq  #  Optional Input
           prompt:  STRING_TOKEN(STR_SERIAL_PORT_IRQ)
           help:  STRING_TOKEN(STR_ONE_OF_HELP)
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_SERIAL_PORT13_IRQ)
               value:  0x4
               flags:  DEFAULT # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_SERIAL_PORT24_IRQ)
               value:  0x3
               flags:  0 # Optional Input
@@ -679,10 +679,10 @@ formset:
           formid:  0x1
           prompt:  STRING_TOKEN(STR_GOTO_FORM1)
           help:  STRING_TOKEN(STR_GOTO_HELP)
-  - form: 
-      formid:  0x5 
+  - form:
+      formid:  0x5
       title:  STRING_TOKEN(STR_MODAL_FORM_TITLE)
-      component:  
+      component:
       - modal: tag
       - text:
           help:  STRING_TOKEN(STR_EXIT_TEXT)
@@ -694,10 +694,10 @@ formset:
           prompt:  STRING_TOKEN(STR_SAVE_TEXT)
           flags:  INTERACTIVE  # Optional Input, Question Flags
           key:  0x1246  # Optional Input, Question QuestionId
-  - form: 
-      formid:  0x6 
+  - form:
+      formid:  0x6
       title:  STRING_TOKEN(STR_FORM6_TITLE)
-      component:  
+      component:
       - text:
           help:  STRING_TOKEN(STR_TEXT_REFRESH_GUID)
           prompt:  STRING_TOKEN(STR_TEXT_REFRESH_GUID)
@@ -710,7 +710,7 @@ formset:
           maximum:  0xff # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x0 # Optional Input
-          component:  
+          component:
           - default:
               value:  0
           - refreshguid:
@@ -719,18 +719,18 @@ formset:
           number:  LABEL_UPDATE3
       - label:
           number:  LABEL_END
-  - form: 
-      formid:  0x1234 
+  - form:
+      formid:  0x1234
       title:  STRING_TOKEN(STR_DYNAMIC_TITLE)
-      component:  
+      component:
       - label:
           number:  LABEL_UPDATE1
       - label:
           number:  LABEL_END
-  - form: 
-      formid:  0x7 
+  - form:
+      formid:  0x7
       title:  STRING_TOKEN(STR_FORM7_TITLE)
-      component:  
+      component:
       - subtitle:
           prompt:  STRING_TOKEN(STR_NEST_BIT_EFI_VARSTORE)
       - checkbox:
@@ -742,12 +742,12 @@ formset:
           varid:  MyEfiBitVar.BitsData.NestBitOneof  #  Optional Input
           prompt:  STRING_TOKEN(STR_ONE_OF_BIT_NEST_PROMPT)
           help:  STRING_TOKEN(STR_ONE_OF_BIT_NEST_HELP)
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER1)
               value:  0
               flags:  MANUFACTURING # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER2)
               value:  1
               flags:  DEFAULT # Optional Input
@@ -764,12 +764,12 @@ formset:
           varid:  MyEfiBitVar.BitsData.NestByteField  #  Optional Input
           prompt:  STRING_TOKEN(BYTE_QUESTION_NEST_BIT_PROMPT)
           help:  STRING_TOKEN(BYTE_QUESTION_NEST_BIT_HELP)
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER1)
               value:  0
               flags:  MANUFACTURING # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER2)
               value:  1
               flags:  DEFAULT # Optional Input
@@ -789,7 +789,7 @@ formset:
           maximum:  0x7 # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x0 # Optional Input
-          component:  
+          component:
           - default:
               value:  4
               defaultstore: MyStandardDefault
@@ -801,12 +801,12 @@ formset:
           questionid:  0x9999  # Optional Input, Need to compute if None
           prompt:  STRING_TOKEN(STR_ONE_OF_BIT_PROMPT)
           help:  STRING_TOKEN(STR_ONE_OF_BIT_HELP)
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER1)
               value:  0x0
               flags:  MANUFACTURING # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER2)
               value:  0x1
               flags:  DEFAULT # Optional Input
@@ -823,12 +823,12 @@ formset:
           varid:  MyIfrNVData.MyBitData.NestBitOneof  #  Optional Input
           prompt:  STRING_TOKEN(STR_ONE_OF_BIT_NEST_PROMPT)
           help:  STRING_TOKEN(STR_ONE_OF_BIT_NEST_HELP)
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER1)
               value:  0
               flags:  MANUFACTURING # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER2)
               value:  1
               flags:  DEFAULT # Optional Input
@@ -839,7 +839,7 @@ formset:
           maximum:  0x7 # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x0 # Optional Input
-          component:  
+          component:
           - default:
               value:  6
               defaultstore: MyStandardDefault
@@ -850,12 +850,12 @@ formset:
           varid:  MyIfrNVData.MyBitData.NestByteField  #  Optional Input
           prompt:  STRING_TOKEN(BYTE_QUESTION_NEST_BIT_PROMPT)
           help:  STRING_TOKEN(BYTE_QUESTION_NEST_BIT_HELP)
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER1)
               value:  0
               flags:  MANUFACTURING # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER2)
               value:  1
               flags:  DEFAULT # Optional Input
@@ -867,12 +867,12 @@ formset:
           varid:  MyIfrNVData.BitOneof  #  Optional Input
           prompt:  STRING_TOKEN(STR_ONE_OF_BIT_PROMPT)
           help:  STRING_TOKEN(STR_ONE_OF_BIT_HELP)
-          component:  
-          - option:  
+          component:
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER1)
               value:  0
               flags:  MANUFACTURING # Optional Input
-          - option:  
+          - option:
               text:  STRING_TOKEN(STR_BOOT_ORDER2)
               value:  1
               flags:  DEFAULT # Optional Input
@@ -888,7 +888,7 @@ formset:
           maximum:  0x14 # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x0 # Optional Input
-          component:  
+          component:
           - default:
               value:  16
               defaultstore: MyStandardDefault
@@ -906,7 +906,7 @@ formset:
           maximum:  0x14 # Optional Input
           minimum:  0x0 # Optional Input
           step:  0x0 # Optional Input
-          component:  
+          component:
           - default:
               value:  7
               defaultstore: MyStandardDefault
@@ -916,7 +916,7 @@ formset:
       - guidop:
           guid:  DRIVER_SAMPLE_FORMSET_GUID
           databuffer: #optional input
-          - MY_EFI_BITS_VARSTORE_DATA: 
+          - MY_EFI_BITS_VARSTORE_DATA:
             data.EfiBitNumeric:  0x1
             data.EfiBitOneof:  0x1
             data.EfiBitCheckbox:  0x1
