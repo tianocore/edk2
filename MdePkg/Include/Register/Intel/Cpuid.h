@@ -6,7 +6,7 @@
   If a register returned is a single 32-bit value, then a data structure is
   not provided for that register.
 
-  Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
@@ -1490,7 +1490,12 @@ typedef union {
     /// RDPKRU/WRPKRU instructions).
     ///
     UINT32    OSPKE            : 1;
-    UINT32    Reserved5        : 9;
+    UINT32    Reserved8        : 8;
+    ///
+    /// [Bit 13] If 1, the following MSRs are supported: IA32_TME_CAPABILITY, IA32_TME_ACTIVATE,
+    /// IA32_TME_EXCLUDE_MASK, and IA32_TME_EXCLUDE_BASE.
+    ///
+    UINT32    TME_EN           : 1;
     ///
     /// [Bits 14] AVX512_VPOPCNTDQ. (Intel Xeon Phi only.).
     ///
